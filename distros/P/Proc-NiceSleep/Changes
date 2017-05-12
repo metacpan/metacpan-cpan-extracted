@@ -1,0 +1,108 @@
+Revision history for Perl module Proc::NiceSleep.
+0.90 Sun Dev 23 2012
+    - change to use Dist::Zilla
+    - update copyrights
+0.88 
+    - no such version
+0.88 
+    - no such version
+0.87 
+    - no such version
+0.86 Sun Dec 12 2010
+    - export yield()
+    - move module to lib/Proc/NiceSleep.pm in distribution.
+0.85 Tue May 02 2006
+    - tagged code in CVS correctly (no user changes)
+0.84 Tue May 02 2006
+    - not released
+    - added reset_all() method, to reset as if we just started the process
+    - bugfix for when Time::HiRes is not installed
+    - added LICENSE file for http://search.cpan.org/~joshr/Proc-NiceSleep
+    - added yield( $maxsleep ): calls maybe_sleep() till it returns 0 or maxsleep seconds have passed
+0.83 Sat Feb 26 2005
+    - more documentation, clean up comments and Changes file
+    - localize '%ENV' for taint-safety under bash
+    - added load_function() and related functionality
+    - min_run_time() default changed to 0.0 from 0.01
+    - changed tests, added t/06-loadfunction.t
+    - added more stats (LAST_MAYBE_SLEEP_TIME, 
+      NUM_TIMES_LOAD_CHECKED, NUM_TIMES_SLEPT, others)
+    - added example3.pl showing use of load_function()
+    - README is now based on the perldocs
+    - moved examples into examples/ subdir
+    - made tests run a little faster
+0.82  Tue Nov 09 2004
+    - documentation updates
+0.81  Tue Nov 09 2004
+    - made use of 'uptime' taint-safe
+0.80  Tue Sep 20 2004
+    - adjust sleep time in response to how far above max_load the system is
+    - not released 
+0.79  Tue Sep 14 2004
+    - changed warning output in example2.pl if Sys::CpuLoad not loaded
+    - added NUM_TIMES_MAYBE_SLEEP_CALLED counter
+    - not released 
+0.78  Mon Sep 13 2004
+    - added NUM_TIMES_SLEPT counter
+    - not released 
+0.77  Tue Aug 31 2004
+    - added over_load_min_sleep_time() & over_load_sleep_drift()
+    - added GetCpuLoad() for OS X,
+    - changed DumpText() to show load output like '0.1 0.2 0.11'
+0.76  Sun Jun 27 2004
+    - updated README
+0.75  Sun Jun 27 2004
+    - avoid warnings in example2.pl if no Proc::ProcessTable 
+0.59  Fri Jan 09 2004
+    - Fixed check of Sys::CpuLoad.
+0.58  Fri Jan 09 2004
+    - Sys::CpuLoad test now checks load() doesn't return
+      undefs (for OS X and others).
+0.57  Tue Apr 23 2002
+    - fixed maybe_sleep() for case when both max_sleep and max_load are set
+0.56  Fri Mar 15 2002
+    - updated version number in README
+0.55  Fri Mar 15 2002
+    - fixed links to mailing lists in LINKS file
+0.54  Fri Mar 15 2002
+    - modified maybe_sleep() to maintain sleepfactor correctly
+    - modified and amended perldocs and LINKS file, partially to include...
+    - new discussion and announcement mailing lists announced.
+    - we show floating point numbers nicer in DumpText
+0.53  Fri Mar 01 2002
+    - renamed public functions from likethis() to like_this(),
+      added temporary legacy old-style funcs
+    - fixed example in docs, touched up DumpText(), 
+    - test Sys::CpuLoad more thoroughly in init()
+0.52  Sat Feb 23 2002
+    - updated README
+0.51  Sat Feb 23 2002
+    - added max_load() feature, rewrote maybe_sleep() for it,
+      documented it, wrote test and example2.pl for it
+    - reorged and updated docs
+    - documented DumpText() and min_sleep_time(), export_ok'ed latter
+    - modified so that 0 value for sleep_factor and/or min_sleep_time
+      disables feature
+0.50  Thu Feb 21 2002
+    - basicsleep test modified for win32
+    - cleaned up example, added cpan-testers status page
+      to LINKS
+0.49  Wed Feb 20 2002
+    - doc correction
+0.48  Wed Feb 20 2002
+    - docs reflect that we're in cpan and pause
+    - added LINKS file to dist
+    - relaced Data::Dumper in example with DumpText()
+    - made work with perl-5.004
+0.47  Tue Feb 19 2002
+    - more doc changes
+0.46  Tue Feb 19 2002
+    - first version uploaded to CPAN at
+      http://cpan.perl.org/authors/id/J/JO/JOSHR/
+0.41  Mon Feb 18 2002
+    - changed named from Time::SmartSleep
+0.36  Mon Feb 18 2002
+    - add nice() function 
+0.01  Sat Feb 16 2002
+    - original version; created by h2xs 1.21 with options
+        -X -n Proc::NiceSleep

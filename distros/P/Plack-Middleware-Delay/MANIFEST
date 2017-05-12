@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+README
+lib/Plack/Middleware/Delay.pm
+t/00-compile.t
+t/01-basic.t
+t/02-anyevent.t
+t/03-streaming.t
+xt/author/critic.t
+xt/release/dist-manifest.t
+xt/release/kwalitee.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

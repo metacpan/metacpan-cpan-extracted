@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+PhotoIndex.pm
+PhotoIndex.xs
+test.pl

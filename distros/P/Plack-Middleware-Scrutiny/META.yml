@@ -1,0 +1,39 @@
+---
+abstract: 'Scrutinize your [psgi] app with an [inline] debugger'
+author:
+  - 'Brock Wilcox <awwaiid@thelackthereof.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Scrutiny
+requires:
+  Data::Dumper: 0
+  Devel::ebug: 0
+  Devel::ebug::Backend: 0
+  Enbugger: 0
+  Enbugger::ebug: 0
+  Exporter: 0
+  File::ShareDir: 0
+  IO::Handle: 0
+  IO::String: 0
+  Plack::App::File: 0
+  Plack::Middleware: 0
+  Plack::Request: 0
+  Plack::Util: 0
+  Plack::Util::Accessor: 0
+  Storable: 0
+  Time::HiRes: 0
+  Try::Tiny: 0
+  Twiggy: 0
+  constant: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+version: 0.02

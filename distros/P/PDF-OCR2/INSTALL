@@ -1,0 +1,171 @@
+INSTALL - install help from scratch
+DESCRIPTION
+    This document helps install PDF::OCR2 and like modules.
+
+    Perl is not the fastest medium- but it is convenient. As of this
+    writing, I work in a small accounting firm. We have a small IT
+    department that maintains a number of projects that make life easier- if
+    not just bearable, for human beings. I am able to maintain some fairly
+    decent and useful projects. Most are relatively complex- and without
+    perl, I would not be able to do so.
+
+    One of the the things I've worked on a are a set of perl modules to
+    facilitate interaction with ocr engines. PDF::OCR2 allows you to get
+    text out of a pdf document, and if there is not text, we call an ocr
+    engine to do work for us. This has proven invaluable at my office. We
+    can look inside the many thousands of documents without altering them in
+    any way.
+
+    I have received various emails for help on installing PDF::OCR2,
+    Image::OCR::Tesseract, etc. The inquiries vary from 'will it work on
+    windows?' to 'why won't it install?'
+
+    This document contains the most common answers to these questions.
+
+MAKE SURE YOU ARE READY TO INSTALL
+    You will need a decent computer and operating system. You will need root
+    access, access to cpan via command line, possibly a package management
+    system such as aopt-get, yum, etc. You will be compiling a thing or two
+    from source.
+
+  posix operating system
+    You need a posix operating system. These are unixes and linuxes.
+
+    I've had excellent results installing on Fedora, Debian, and Ubuntu
+    servers.
+
+  hardware
+    I can't stress enough how much imaging procedures will abuse hardware.
+    Memory is not very important. The cpu, however.. Is very important.
+
+    I would not suggest a production server of anything less than a 1.2Ghz
+    machine. Overall, I get good results on 64bit architecture vs 32bit.
+
+    Ideally speaking, I would have access to a IBM mainframe- but- I don't.
+    The best I get my hands on recently are dual core pentium IVs, they're
+    really not bad. If your company or organization is willing to devote a
+    beefy server to manage ocr and imaging tasks, great. Otherwise, the
+    aforementioned machines will do well.
+
+  cpan, up to date
+    A lot of the requirements here are perl modules. You will be using cpan
+    via the command line. Having command line cpan access seems pretty
+    standard, I've never seen a unix box without it.
+
+    Old cpan commands worked as:
+
+       cpan install Module::Name
+
+    New cpan commands look like:
+
+       cpan Module::Name
+
+    You can update cpan by saying:
+
+       cpan install CPAN
+
+  root access
+    The installation procedures in this document assume you are logged in as
+    root.
+
+   ubuntu, enabling root access
+    By default, on ubuntu, the root account is disabled. It is suggested you
+    enable root access. I understand the reasoning- personally- I don't like
+    sudo. It seems they've disabled it by simply not providing a password
+    for the root account. How 'clever'.
+
+    As of Ubuntu version 8.04, you need to enable root access by providing a
+    root password for the account.
+
+       $ sudo passwd root
+
+    It will ask you for what you want as password.
+
+INSTALL NON PERL DEPENDENCIES
+  gcc-c++ and automake
+   fedora
+       $ yum install -y gcc-c++
+       $ yum install -y automake
+
+   ubuntu
+       $ apt-get install gcc-c++
+       $ apt-get install automake
+
+  imagemagick
+   fedora
+       $ yum install -y imagemagick
+
+   ubuntu
+       $ apt-get install imagemagick
+
+  tesseract
+    Installing tesseract can be tricky. I don't know of a rpm or debian
+    package for this one. You'll very likely have to install this from
+    source. Make sure you have gcc-c++ and automake installed on your
+    system- id you don't know you can proceed, but if you suffer any errors,
+    simple go back, install gcc-c++ and automake, and try again.
+
+    You may be able to simply install the SVN version of tesseract this way:
+
+       $ cd /tmp
+       $ svn checkout http://tesseract-ocr.googlecode.com/svn/trunk/ tesseract-ocr
+       $ cd tesseract-ocr
+       $ ./runautoconf
+       $ mkdir build-directory
+       $ cd build-directory
+       $ ../configure
+       $ make
+       $ make install
+
+    For more info, see google project on ocr, they use tesseract.
+
+INSTALL PERL MODULES
+    Ideally, you could simply say:
+
+       cpan PDF::OCR2
+
+    And, voila- done. And potentially, this might work. If no, I suggest to
+    install perl modules in following similar order..
+
+   perl modules install order
+       $ cpan PDF::API2
+       $ cpan CAM::PDF
+       $ cpan PDF::Burst
+       $ cpan PDF::GetImages 
+       $ cpan Image::OCR::Tesseract
+       $ cpan PDF::OCR2
+
+   Image::OCR::Tesseract
+    If the command 'cpan Image::OCR::Tesseract' fails.. You will need to
+    download the package and install manually from distro.
+
+       $ cd /tmp
+       $ wget http://search.cpan.org/src/LEOCHARRE/Image-OCR-Tesseract-1.22/
+       $ tar -xvf Image-OCR-T(tab completion)
+       $ cd Image-OCR-T(tab completion)
+       $ perl Makefile.PL # or you can do perl t/00(tab completion)
+
+    This will check for image libraries and ocr engine. You will need to
+    have already installed imagemagick and tesseract, as mentioned in this
+    document.
+
+    Make sure you are getting the latest version of Image::OCR::Tesseract,
+    the above example is for version 1.22. I update frequently- so make
+    sure. You can search for the latest version by going to
+    http://search.cpan.org and search for 'Image::OCR::Tesseract'.
+
+    There are INSTALL.* readme files in the package Image::OCR::Tesseract
+    that may want to look through.
+
+   Image::Magick
+    Should already be available ( via previously installing imagemagick ).
+
+BUGS
+    I am very open to corrections, suggestions, hints, tips, criticism. I am
+    not a know-it-all, I have been able to do and share some useful things
+    because of what I learn every day from my peers. Please contact the
+    AUTHOR.
+
+AUTHOR
+    Leo Charre leocharre at cpan dot org
+

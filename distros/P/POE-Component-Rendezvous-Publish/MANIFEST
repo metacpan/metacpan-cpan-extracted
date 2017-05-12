@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/POE/Component/Rendezvous/Publish.pm
+README
+t/1.t
+contrib/http_server.pl
+META.yml                                Module meta-data (added by MakeMaker)

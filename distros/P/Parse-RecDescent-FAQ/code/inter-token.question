@@ -1,0 +1,38 @@
+ my $parse = Parse::RecDescent->new(<<'EndGrammar');
+
+ rebol   : block  { dump_item('block', \@item)  }
+         | scalar { dump_item('scalar', \@item) }
+
+ block       : '[' block_stuff(s?) ']'
+ block_stuff : scalar
+ scalar      : <skip:''> '%' file
+ file        : /w+/
+
+ EndGrammar
+
+My grammar matches a filename, ie: 
+
+ %reb.html
+
+just fine. However, it does not match a filename within a block, ie: 
+
+ [ %reb.html ]
+
+and I know exactly why after tracing the grammar. 
+
+It is trying the 
+
+ <skip:''> '%' file
+
+production with the input text 
+
+ " %reb.html"
+
+note the space in the input text. 
+
+The reason this distresses me is that I have not changed the universal token 
+separator from 
+
+ /\s*/
+
+Yet it did not gobble up the white space between the '[' terminal and the <skip:''>'%' file production

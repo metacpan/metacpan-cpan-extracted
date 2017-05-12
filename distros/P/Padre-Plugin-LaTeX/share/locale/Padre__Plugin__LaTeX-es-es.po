@@ -1,0 +1,75 @@
+msgid ""
+msgstr "Project-Id-Version: _L 10N\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-02-18 22:24+0100\n"
+"PO-Revision-Date: 2011-02-18 22:24+0100\n"
+"Last-Translator: Enrique Nell <blas.gordon@gmail.com>\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: lib/Padre/Plugin/LaTeX.pm:14
+msgid "LaTeX"
+msgstr "LaTeX"
+
+#: lib/Padre/Plugin/LaTeX.pm:38
+msgid "Create/Update PDF"
+msgstr "Crear o actualizar PDF"
+
+#: lib/Padre/Plugin/LaTeX.pm:39
+msgid "View PDF"
+msgstr "Ver PDF"
+
+#: lib/Padre/Plugin/LaTeX.pm:40
+msgid "Run BibTeX"
+msgstr "Ejecutar BibTeX"
+
+#: lib/Padre/Plugin/LaTeX.pm:42
+msgid "Find Symbol/Special Character"
+msgstr "Buscar símbolo o carácter especial"
+
+#: lib/Padre/Plugin/LaTeX.pm:45
+msgid "About"
+msgstr "Acerca de"
+
+#: lib/Padre/Plugin/LaTeX.pm:57
+msgid "LaTeX Plug-in"
+msgstr "Complemento LaTeX"
+
+#: lib/Padre/Plugin/LaTeX.pm:60
+#, perl-format
+msgid ""
+"LaTeX support for Padre\n"
+"\n"
+"For syntax highlighting of BibTeX files install the Kate plugin: Padre::"
+"Plugin::Kate\n"
+"\n"
+"Copyright 2010, 2011 %s\n"
+"This plug-in is free software; you can redistribute it and/or modify it "
+"under the same terms as Padre.\n"
+msgstr "Soporte de LaTeX para Padre\n"
+"\n"
+"Si desea utilizar el resaltado de sintaxis para archivos BibTeX, instale el complemento Kate: Padre::Plugin::Kate.\n"
+"\n"
+"Copyright 2010, 2011 %s\n"
+"Este complemento es software libre; puede redistribuirlo o modificarlo en los mismos términos que Padre.\n"
+
+#: lib/Padre/Plugin/LaTeX.pm:86
+msgid "Creating PDF files is only supported for LaTeX documents."
+msgstr "La creación de archivos PDF sólo se ofrece para documentos LaTeX."
+
+#: lib/Padre/Plugin/LaTeX.pm:112
+msgid "Running BibTeX is only supported for LaTeX documents."
+msgstr "La ejecución de BibTeX sólo se ofrece para documentos LaTeX."
+
+#: lib/Padre/Plugin/LaTeX.pm:132
+msgid "Viewing PDF files is only supported for LaTeX documents."
+msgstr "La visualización de archivos PDF sólo se ofrece para documentos LaTeX."
+
+#: lib/Padre/Plugin/LaTeX.pm:140
+#, perl-format
+msgid "Could not find file '%s'."
+msgstr "No se encontró el archivo '%s'."

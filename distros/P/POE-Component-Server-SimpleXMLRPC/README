@@ -1,0 +1,24 @@
+
+				POE-Component-Server-SimpleXMLRPC
+				   v0.02
+This is a module that enables Frontier functionality from under POE SimpleHTTP server.
+--
+
+ use POE qw(Component::Server::SimpleXMLRPC Component::Logger);
+ 
+ POE::Component::Logger->spawn( ConfigFile => 'external_config_file' );
+ 
+ POE::Component::Server::SimpleXMLRPC->new(
+    PORT => 5555,
+    ADDRESS => '127.0.0.1',
+    RPC_MAP => { test => sub { return { res => 'test ok:' } },
+    ALIAS => 'HTTPD',
+    RECV_SESSION => 'HTTP_GET',
+    LOGGER => { SESSION => 'logger', EVENT => 'log' }
+ );
+ 
+ $poe_kernel->run();
+
+
+--
+$Id: $

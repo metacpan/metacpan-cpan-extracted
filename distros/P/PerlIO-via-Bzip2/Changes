@@ -1,0 +1,13 @@
+Revision history for Perl module PerlIO::via::Bzip2.
+
+2005-03-04 Arjen Laarhoven arjen@cpan.org
+
+  * Version 0.02
+
+    - Compression level can be set.
+    - More tests.
+    - Small documentation nits fixed.
+
+2005-02-26 Arjen Laarhoven arjen@cpan.org
+
+  * Version 0.01 - First release.

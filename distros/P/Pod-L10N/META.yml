@@ -1,0 +1,45 @@
+---
+abstract: 'Pod with L10N'
+author:
+  - 'SHIRAKATA Kentaro <argrath@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::Exception: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.3, CPAN::Meta::Converter version 2.132661'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-L10N
+no_index:
+  directory:
+    - t
+  package:
+    - Pod::Simple::XHTML::LocalPodLinks
+    - Pod::L10N::Model
+provides:
+  Pod::L10N:
+    file: lib/Pod/L10N.pm
+    version: 1.03
+  Pod::L10N::Html:
+    file: lib/Pod/L10N/Html.pm
+    version: 1.03
+  Pod::L10N::Model:
+    file: lib/Pod/L10N/Model.pm
+  Pod::Simple::XHTML::LocalPodLinks:
+    file: lib/Pod/L10N/Html.pm
+requires:
+  Pod::Simple: 3.18
+resources:
+  bugtracker: https://github.com/argrath/Pod-L10N/issues
+  homepage: https://github.com/argrath/Pod-L10N
+  repository: https://github.com/argrath/Pod-L10N.git
+version: 1.03
+x_contributors:
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'SHIRAKATA Kentaro <argrath@ub32.org>'

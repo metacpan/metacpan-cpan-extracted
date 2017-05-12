@@ -1,0 +1,112 @@
+DESCRIPTION
+
+This is the PAR-WebStart distribution, which is a Perl
+version of Java's WebStart technology; see
+  http://java.sun.com/j2se/1.4.2/docs/guide/jws/developersguide/overview.html
+for details.
+
+PAR-WebStart is a helper application associated
+with a browser. When a user clicks on a link that points to a 
+PNLP [PAR Network Launch Protocol] launch file (a special XML file), 
+it causes the browser to launch PAR-WebStart, which then 
+automatically downloads, caches, and runs the specified
+PAR-based application. 
+
+INSTALLATION
+
+Installation proceeds in the usual fashion:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+The following CPAN modules will be required:
+
+  LWP
+  XML::SAX::ExpatXS
+  PAR
+  Module::Signature
+  File::Which
+  Archive::Zip
+
+For Win32 (builds 8xx), ppm packages of all necessary prerequisites 
+are available from ActiveState's default repository, 
+http://www.bribes.org/perl/ppm/, or http://theoryx5.uwinnipeg.ca/ppms/.
+
+After installation, documentation is available for:
+
+  PAR::WebStart: an overview
+  PAR::WebStart::PNLP: description of the PNLP file syntax
+  PAR::WebStart::Util: some helper utilities
+  make_par.pl: a script to make a suitable par archive
+  perlws.pl: a script to register as the application to open .pnlp files
+  pnlp_registry.pl: a script to add the necessary file association on Win32
+  Apache2::WebStart: a mod_perl-2 handler for generating PNLP files
+
+USAGE
+
+An overview of the use is as follows (more details are found in
+the embedded pod documentation in the above modules/scripts):
+
+For the server:
+
+- using PAR, make up one (or several) par archives containing necessary
+modules for the application. One such archive must have a main.pl
+script, which will be run by the client.
+
+- each par file must have an associated file containing the
+md5 checksum of the archive. This is a mild check on the
+integrity of the downloaded archive, and also will be used
+as a test for the client to see if an update for a cached
+par file is available. An included script, make_par, can
+be used for making up a suitable archive.
+
+- although it's possible to turn this feature off, it's
+strongly recommended to sign each archive using Module::Signature.
+
+- place the par files on a server, and make up a PNLP file
+describing the application.
+
+For the client:
+
+- install PAR-WebStart, and associate the perlws.pl script
+with files with a .pnlp extension (the associated content
+type is application/x-perl-pnlp-file). How to do this depends
+on the browser and platform. For Win32, this is done through
+the registry - a script, pnlp_registry.pl, is included
+in this distribution to handle this task.  For linux, with
+KDE, for example, one uses the File Associations menu item
+under Control Center -> KDE Components to associate the perlws.pl
+script with an application/x-perl-pnlp-file (for *.pnlp files), 
+or alternatively, right-click a .pnlp file within 
+the file explorer window and choose "Edit File Type".
+
+- point your broswer to http://theoryx5.uwinnipeg.ca/hello.pnlp
+to test out the installation; after confirming that you do
+want to run this application, you should see a few simple
+"Hello" messages appearing in a console window (the associated
+par and .pnlp files for this application are included in the
+ex/ subdirectory of this distribution).
+
+NOTES AND CAVEATS
+
+This is an alpha version; not all features may
+work as documented. The specs for the current PNLP files
+are subject to change.
+
+AVAILABILITY
+
+As well as on CPAN, the distribution is available via cvs at
+  http://cvs.sourceforge.net/viewcvs.py/cpan-search/Par-WebStart/  
+A ppm package for Win32 is available at
+  http://theoryx5.uwinnipeg.ca/ppms/
+for ActivePerl 8xx builds, and at
+  http://theoryx5.uwinnipeg.ca/ppmpackages/
+for 6xx builds.
+
+COPYRIGHT
+
+Copyright, 2005, by Randy Kobes <r.kobes@uwinnipeg.ca>.
+This software is distributed under the same terms as Perl itself.
+See http://www.perl.com/perl/misc/Artistic.html.

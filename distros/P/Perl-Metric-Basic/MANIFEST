@@ -1,0 +1,11 @@
+Build.PL
+CHANGES
+lib/Perl/Metric/Basic.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/lib/Acme.pm
+t/pod.t
+t/pod_coverage.t
+t/simple.t

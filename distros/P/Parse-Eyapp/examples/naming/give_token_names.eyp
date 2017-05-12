@@ -1,0 +1,74 @@
+%{
+=head1 SYNOPSIS
+
+This example illustrates a way to set a naming scheme for
+the grammar productions using C<give_token_name>.
+
+C<give_token_name>: The name of the production is the Left Hand Side
+of the Production Rule followed by the word _is_ followed by the
+concatenation of the names of the tokens in the right hand side
+(separated by underscores).
+
+Compile it with:
+                  
+                  $ eyapp -C give_token_names.eyp 
+
+and run it:
+                  $ ./give_token_names.pm -t -i -m 1 -c '*a = b'
+
+It will produce an output like:
+
+
+        s_is_ASSIGN(
+          l_is_POINTER(
+            TERMINAL,
+            r_is_l(
+              l_is_VAR(
+                TERMINAL[a]
+              )
+            )
+          ),
+          TERMINAL,
+          r_is_l(
+            l_is_VAR(
+              TERMINAL[b]
+            )
+          )
+        )
+
+
+The main difference between this file and C<give_names_to_tokens.eyp>
+is that the tokens in the right hand sides 
+are already identifiers: C<ASSIGN> and C<POINTER>.
+
+=cut
+%}
+
+%strict
+
+%token ASSIGN  = /=/
+%token POINTER = /\*/
+%token VAR = /([A-Za-z][A-Za-z0-9_]*)/
+
+%namingscheme { \&give_token_name; }
+
+%tree
+
+%%
+s:
+    l ASSIGN r
+  | r
+;
+
+l:
+    POINTER r
+  | VAR
+;
+
+r:
+    l
+;
+
+%%
+
+

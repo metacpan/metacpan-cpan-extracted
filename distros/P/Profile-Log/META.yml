@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Profile-Log
+version:             0.02
+abstract:            collect loggable application profiling stats
+license:             ~
+author:              
+    - Sam Vilain <samv@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    List::Util:                    0
+    Scalar::Util:                  0
+    Set::Object:                   1.1
+    Time::HiRes:                   0
+    YAML:                          0.35
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

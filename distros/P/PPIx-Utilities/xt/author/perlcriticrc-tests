@@ -1,0 +1,50 @@
+##############################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/distributions/PPIx-Utilities/xt/author/perlcriticrc-tests $
+#     $Date: 2009-06-26 11:12:12 -0400 (Fri, 26 Jun 2009) $
+#   $Author: clonezone $
+# $Revision: 3366 $
+##############################################################################
+
+profile-strictness = quiet
+severity = 1
+theme = core + more
+verbose = %f: %m at line %l, column %c.  %e.  (Severity: %s, %p)\n
+
+#-----------------------------------------------------------------------------
+
+[CodeLayout::ProhibitQuotedWordLists]
+strict = 1
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[-CodeLayout::RequireTidyCode]
+
+[ControlStructures::ProhibitPostfixControls]
+flowcontrol = warn die carp croak cluck confess goto exit plan skip
+
+[Documentation::PodSpelling]
+stop_words =
+
+[-Documentation::RequirePodSections]
+
+[-ErrorHandling::RequireUseOfExceptions]
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+
+[Miscellanea::RequireRcsKeywords]
+keywords = URL Date Author Revision
+
+# Character length is not a proper measure of complexity.
+[-RegularExpressions::ProhibitComplexRegexes]
+
+[RegularExpressions::ProhibitUnusualDelimiters]
+allow_all_brackets = 1
+
+[RegularExpressions::RequireBracesForMultiline]
+allow_all_brackets = 1
+
+# Tests are allowed to peek.
+[-Subroutines::ProtectPrivateSubs]

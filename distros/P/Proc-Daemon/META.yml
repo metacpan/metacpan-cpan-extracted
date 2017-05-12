@@ -1,0 +1,23 @@
+---
+abstract: 'Run Perl program(s) as a daemon process'
+author:
+  - 'Earl Hood <earl@earlhood.com>'
+  - 'Detlef Pilzecker <deti@cpan.org>'
+  - 'Pavel Denisov <akreal@cpan.org>'
+build_requires:
+  Proc::ProcessTable: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Proc-Daemon
+requires:
+  POSIX: '0'
+resources:
+  homepage: https://github.com/akreal/Proc-Daemon
+  repository: https://github.com/akreal/Proc-Daemon.git
+version: '0.23'

@@ -1,0 +1,9 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/Pod-BBCode.t
+lib/Pod/BBCode.pm
+bin/pod2bbcode
+META.yml                                 Module meta-data (added by MakeMaker)

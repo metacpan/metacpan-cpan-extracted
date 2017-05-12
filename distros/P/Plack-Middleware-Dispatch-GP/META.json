@@ -1,0 +1,48 @@
+{
+   "abstract" : "dispatcher middleware for general purposes handling",
+   "author" : [
+      "Alexei Pastuchov <palik@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Dispatch-GP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Plack::Builder" : "0",
+            "Plack::Test" : "0",
+            "Test::Exception" : "0.32",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack::Middleware" : "0",
+            "Plack::Request" : "1.0032",
+            "Plack::Util::Accessor" : "0",
+            "Scalar::Util" : "1.27",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01"
+}

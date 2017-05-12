@@ -1,0 +1,62 @@
+Params-Clean
+
+Parse A Routine Allowing Modest Syntax--Casually List Explicit Arg Names:
+Instead of passing args to your functions as positions of @_, or using a hash
+to "name" parameters, Params::Clean can parse your arg list for positional or
+named parameters, flags, typed args, or variable-length lists. 
+The syntax is designed to be clean and easy to read, while handling multiple
+args of the same name, synonymous names, and more.
+
+
+EXAMPLE
+
+$ob->do_it(Verbose, Verbose, $stdout, Filter=>\&rot13, Data=>@info, $logfile);
+
+sub do_it
+{
+	my (   $self,  $filter_sub, $verbosity,   $files,            $data_array )
+	= args POSN 0, NAME Filter, FLAG Verbose, TYPE \&filehandle, LIST Data;
+}
+
+
+
+INSTALLATION
+
+To install this module, run the usual commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module using "perldoc":
+
+    perldoc Params::Clean
+
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Params-Clean
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Params-Clean
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Params-Clean
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Params-Clean
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2008 David Green
+
+This program is free software; you may redistribute it or modify it
+under the same terms as Perl itself.

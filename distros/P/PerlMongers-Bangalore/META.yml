@@ -1,0 +1,48 @@
+---
+abstract: 'We are the Bangalore Perl Mongers'
+author:
+  - 'Shantanu Bhadoria <shantanu at cpan dott org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  List::Util: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PerlMongers-Bangalore
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+    - inc
+  package:
+    - DB
+provides:
+  PerlMongers::Bangalore:
+    file: lib/PerlMongers/Bangalore.pm
+    version: 0.07
+requires:
+  Exporter: 0
+  perl: 5.010000
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/shantanubhadoria/perlmongers-bangalore/issues
+  homepage: https://metacpan.org/release/PerlMongers-Bangalore
+  repository: git://github.com/shantanubhadoria/perlmongers-bangalore.git
+version: 0.07
+x_contributors:
+  - 'Shantanu <shantanu@cpan.org>'
+  - 'Shantanu Bhadoria <shantanu.bhadoria@gmail.com>'
+  - 'Shantanu Bhadoria <shantanu@cpan.org>'

@@ -1,0 +1,46 @@
+PGObject-Type-JSON
+
+This module is a type handler for JSON entities.  This is a best effort mapping
+of types to references.  Literal values are handled as literal references.
+
+The current limitation is that there is no ability to distinguish between a 
+database NULL and a json value of null which can be distinct in PostgreSQL.  
+Such support is planned for 1.0.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc PGObject::Type::JSON
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=PGObject-Type-JSON
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/PGObject-Type-JSON
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/PGObject-Type-JSON
+
+    Search CPAN
+        http://search.cpan.org/dist/PGObject-Type-JSON/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Chris Travers
+
+This program is released under the following license: BSD
+

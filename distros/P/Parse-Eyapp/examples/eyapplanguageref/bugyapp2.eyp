@@ -1,0 +1,4 @@
+%strict
+%%
+expr: NUM;
+%%

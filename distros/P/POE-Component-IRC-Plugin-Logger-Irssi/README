@@ -1,0 +1,30 @@
+POE-Component-IRC-Plugin-Logger-Irssi version 0.001002
+======================================================
+
+POE::Component::IRC::Plugin::Logger::Irssi is an extension to the
+L<POE::Component::IRC::Plugin::Logger> PoCo-IRC plugin that logs
+everything in a format similar to the one used by the irssi IRC client.
+
+It exports one function, B<irssi_format>, that returns a hashref usable as
+a value for C<POE::Component::IRC::Plugin::Logger->new>'s C<format> argument.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules or libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.

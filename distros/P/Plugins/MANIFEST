@@ -1,0 +1,19 @@
+README
+README-Style1
+README-API
+lib/Plugins.pm
+lib/Plugins.pod
+lib/Plugins/API.pm
+lib/Plugins/API.pod
+lib/Plugins/Plugin.pm
+lib/Plugins/SimpleConfig.pm
+lib/Plugins/Style1.pm
+lib/Plugins/Style1.pod
+lib/Plugins/Style1/Plugin.pm
+t/config
+t/foo.t
+t/Ptest.pm
+Makefile.PL
+MANIFEST
+CHANGELOG
+META.yml                                 Module meta-data (added by MakeMaker)

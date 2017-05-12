@@ -1,0 +1,169 @@
+0.46  Fri Dec 14 19:31:35 GMT 2012
+    - Support irssi logs with "/set show_nickmode_empty off"
+
+0.45  Sun May 15 14:36:09 GMT 2011
+    - Fix --version, it was always returning "dev-git"
+
+0.44  Fri May 13 18:28:02 GMT 2011
+    - Allow the bot to respond with a CTCP ACTION (/me)
+
+0.43  Tue Sep 28 08:53:59 GMT 2010
+    - Update SYNOPSIS to reflect App-Pocoirc changes
+    - Fix outdated $VERSION in bin/irchal-seed
+
+0.42  Thu Sep 9 06:29:48 GMT 2010
+    - Mention App::Pocoirc in the SYNOPSIS
+
+0.41  Mon Sep 6 04:36:34 GMT 2010
+    - Add a 'Channels' parameter
+
+0.40  Wed Sep 1 04:34:40 GMT 2010
+    - Fix erroneous dependency (s/Hailo/AI::MegaHAL/)
+
+0.39  Tue Aug 17 22:54:48 GMT 2010
+    - Use Dist::Zilla
+    - Make all warnings fatal
+
+0.38  Sun Mar 14 10:17:48 GMT 2010
+    - Prevent double encoding of non-ASCII channel names
+    - Support non-ASCII 'Own_channel' parameter
+
+0.37  Wed Feb 24 02:39:35 GMT 2010
+    - Always decode bytes before we use them
+    - Fix parsing of pocoirc logs without date stamps
+
+0.36  Fri Feb 19 00:01:26 GMT 2010
+    - Read IRC lines as :bytes by default in irchal-seed. This
+      avoids issues where PERL_UNICODE or the -C option is set to
+      something which tells perl to read STDIN in UTF-8 by default.
+
+0.35  Sun Feb 14 19:01:14 GMT 2010
+    - Add META.yml to MANIFEST
+
+0.34  Sun Feb 14 18:50:45 GMT 2010
+    - Don't ignore abusers, just don't reply to them
+
+0.33  Fri Feb 12 00:07:24 GMT 2010
+    - Print a warning if POE catches an exception in our code
+    - Wait for MegaHAL to save the brain before we quit
+
+0.32  Thu Feb 11 21:03:30 GMT 2010
+    - When we're addressed, trim some whitespace after the nickname
+    - Make MegaHAL.pm and irchal-seed use the same regex to identify lines
+      where the bot is addressed
+    - irchal-seed: Remove Encode code in favor of irc_to_utf8 from pocoirc
+
+0.31  Thu Jan 21 21:39:39 GMT 2010
+    - irchal-seed: Amend bot-nick-catching regex a bit
+    - irchal-seed: Document the --help and --version options
+    - Converted distribution over to Module::Install
+    - Test irchal-seed with Test::Script
+
+0.30  Tue Jan 19 23:49:23 GMT 2010
+    - Fix typo in subroutine name
+
+0.29  Tue Jan 19 23:42:09 GMT 2010
+    - Apply English language corrections to initial_greeting too
+
+0.28  Tue Jan 19 23:18:31 GMT 2010
+    - irchal-seed: Prepend a space to lines beginning with '#' so MegaHAL
+      won't ignore them in megahal.trn
+    - irchal-seed: Add a --version option
+    - Forgot to decode data from MegaHAL's initial_greeting
+    - Depend on POE::Component::IRC 6.20 for some bug fixes
+
+0.27  Sat Nov 14 14:22:06 GMT 2009
+    - Fix a problem with the English correction, especially when non-ASCII
+      characters are involved
+
+0.26  Fri Nov 13 18:32:41 GMT 2009
+    - Various documentation enhancements
+
+0.25  Fri Nov 13 15:28:54 UTC 2009
+    - Add English punctuation correction feature
+
+0.24  Fri May  8 11:56:34 UTC 2009
+    - Remove some duplicate code which was causing an warning
+
+0.23  Tue May  5 15:03:41 UTC 2009
+    - irchal-seed: Always strip color and formatting codes
+    - Depend on new PoCo::AI::MegaHAL which has a bugfix
+
+0.22  Tue May  5 13:58:11 GMT 2009
+    - irchal-seed: Always output text in UTF-8
+
+0.21  Thu Apr 30 12:58:33 GMT 2009
+    - Updated documentation
+    - Outsource recoding to irc_to_utf8() of PoCo::IRC 6.06
+
+0.20  Fri Mar 27 19:04:53 GMT 2009
+    - Fix error in Makefile.PL
+
+0.19  Wed Mar 25 23:49:54 GMT 2009
+    - Forgot to import some functions. Oops.
+
+0.18  Wed Mar 25 23:45:28 GMT 2009
+    - Rename irchal_seed to irchal-seed
+    - Enable the stripping of color/formatting codes with --strip
+
+0.17  Wed Mar 25 16:48:34 UTC 2009
+    - Add irssi support to irchal_seed
+    - Make irchal_seed's casemapping configurable
+    - Improve irchal_seed's documentation
+
+0.16  Sun Mar  8 01:59:32 GMT 2009
+    - Fix typo which was causing CTCP ACTIONs to be ignored
+    - Some Pod updates
+
+0.15  Sat Nov 29 19:28:53 GMT 2008
+    - Added a tip on ignoring URL-only lines to the SYNOPSIS
+
+0.14  Sat Nov 29 19:16:34 GMT 2008
+    - Added program irchal_seed to create a MegaHAL brain from IRC logs
+
+0.13  Sat Nov 29 15:44:05 GMT 2008
+    - It now sees ACTIONs as "$nick $action"
+
+0.12  Sat Nov 15 02:58:06 GMT 2008
+    - Renamed 'Ignore' parameter to 'Ignore_masks'
+    - Renamed 'Flood_interval' parameter to 'Abuse_interval'
+    - Added 'Ignore_regexes' option
+    - Added 'Talkative' option
+    - Added some documentation on ignoring other bots
+
+0.11  Thu Sep 25 00:52:35 GMT 2008
+    - Convert input all to UTF-8 before processing.
+
+0.10  Mon Sep 22 20:33:18 GMT 2008
+    - Fix a serious typo. Sigh.
+
+0.09  Mon Sep 22 20:23:34 GMT 2008
+    - It wasn't responding to its name was mentioned. Fixed that.
+
+0.08  Mon Sep 22 17:58:07 GMT 2008
+    - Refactor internals, get rid of a bug caused by previous bugfix
+    - Make flood protection affect the private channel as well
+
+0.07  Mon Sep 22 16:36:27 GMT 2008
+    - Fixed bug which caused it to learn things twice
+
+0.06  Sat Aug  9 06:30:32 GMT 2008
+    - Strip color/formatting from text before giving it to MegaHAL
+    - Greet people who join our own channel
+
+0.05  Tue Aug  5 19:31:42 GMT 2008
+    - Don't respond to every CTCP ACTION (except in own channel)
+
+0.04  Tue Aug  5 08:55:38 GMT 2008
+    - Fixed the Test::Pod check in 99_pod.t
+
+0.03  Tue Aug  5 06:18:42 GMT 2008
+    - Removed some duplicate code
+    - Added some error checking to transplant method
+
+0.02  Tue Aug  5 02:13:14 GMT 2008
+    - Minor pod updates
+    - Actually part own channel on plugin removal
+
+0.01  Tue Aug  5 01:03:12 GMT 2008
+    - First CPAN release

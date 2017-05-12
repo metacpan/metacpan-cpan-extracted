@@ -1,0 +1,114 @@
+Revision history for Path-Extended
+
+0.23 2015/03/11
+  - let recurse() accept a single code reference as its argument
+
+0.22 2014/08/16
+  - no code changes
+  - dropped Test::Classy dependency
+  - cpanfile
+
+0.21 2012/11/19
+  - made error logs more verbose
+
+0.20 2012/06/22
+  - ::Dir->is_absolute correctly returns if the path you passed to
+    the constructor is absolute or not (fixed by Wolfgang Pecho;
+    previously it always returned true).
+  - ::Dir->rmtree now accepts options that are passed to
+    File::Path::rmtree internally (fixed by Wolfgang Pecho).
+  - fixed "base" option for Path::Extended::Class::File::relative()
+    (by Wolfgang Pecho)
+
+  - store $@ in a variable
+  - requires File::stat 1.0 explicitly to avoid File::Stat 0.01
+    under case-insensitive systems
+
+0.19 2011/05/31
+  - added iomode (for slurp) and no_hidden (for children) options
+    introduced in Path::Class 0.19
+  - dir(undef) now returns undef (as Path::Class 0.17 does)
+  - moved subsumes/contains (of ::Class::Dir class) methods to
+    ::Dir class
+  - subsumes/contains didn't work well if paths have a volume
+  - added tempfile method (only available for ::Class::Dir)
+    introduced in Path::Class 0.24
+  - added resolve method introduced Path::Class 0.17
+  - improved Path::Class compatibility (absolute/relative,
+    mkdir/rmdir)
+  - fixed 0-named subdirectory handling
+
+0.18 2011/02/08
+  - calls for File::Spec 3.23 to avoid relative/absolute issues
+
+0.17 2010/02/09
+  - should not ignore volume unless specified so
+
+0.16 2009/12/19
+  - added a shortcut in the slurp method; no need to loop while
+    slurping without any callbacks/filters
+  - fixed pod nits spotted by FWIE
+  - added is_(read|writ)able methods
+
+0.15 2009/10/07
+  - $_ was not properly set while slurping/saving with multiple
+    callbacks
+  - renamed _path and made it public to support PSGI/Plack
+  - added other IO::Handle methods including fileno
+  - fleshed out the synopsis
+
+0.14 2009/07/04
+  - added file_or_dir() and dir_or_file() to ::Dir object too
+
+0.13 2009/06/26
+  - added "prune" option to $dir->recurse/$dir->children.
+
+0.12 2009/05/15
+  - added file_or_dir() and dir_or_file() for convenience.
+
+0.11 2009/04/14
+  - "find(_dir)" methods did not return items sometimes as relative
+    path may contain "../"
+
+0.10 2009/03/08
+  - fixed a compatibility test which may break under some environment
+  - better pod coverage
+  - reorganized a bit and added "basename" to dir (cf. RT #17312)
+  - better subclassing
+  - forgot to close a directory after ->children, and before ->rmdir
+
+0.09 2009/03/06
+  - "mtime" option of "save" didn't work well.
+
+0.08 2009/03/05
+  - fixed relative/absolute path issue
+
+0.07 2009/03/05
+  - reorganized some methods and added compatible "recurse"
+    and incompatible "new_foreign" methods.
+
+0.06 2009/03/04
+  - parent was broken
+
+0.05 2009/03/04
+  - removed trash
+
+0.04 2009/03/04
+  - logging part is replaced with a Log::Dump module.
+  - some pod fixes
+  - added "grep" method to ::File.
+  - added Path::Extended::Class for better compatibility
+
+0.03 2008/10/27
+  - now Path::Extended::Dir ignores only dot files/directories
+    under the target directory while looking for something.
+    (i.e. don't care if they are under .cpan directory)
+
+0.02 2008/10/26
+  - requires IO 1.27 to support "say"
+  - dir->seek isn't always zero
+  - loosened dir->find(_dir) tests which look like
+    a bit too strict
+
+0.01 2008/10/23
+  - initial release

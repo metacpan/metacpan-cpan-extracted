@@ -1,0 +1,7 @@
+Revision history for Plack-Test-ExternalServer
+
+0.02      2015-07-03 17:11:32Z
+  - added META.json and other modern tooling
+
+0.01      2010-01-15 17:37:21Z
+  - Initial release.

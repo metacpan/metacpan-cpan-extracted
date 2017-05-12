@@ -1,0 +1,130 @@
+NAME
+
+    Pod::Weaver::Role::Section::Formattable - Role for a formattable
+    section
+
+VERSION
+
+    This document describes version 0.001 of
+    Pod::Weaver::Role::Section::Formattable - released July 12, 2015 as
+    part of Pod-Weaver-Role-Section-Formattable.
+
+OVERVIEW
+
+    This role is consumed by sections that operate through the mechanism of
+    String::Formatter, namely that they take a format and input data, and
+    generate a top-level section from that.
+
+REQUIRED METHODS
+
+ default_section_name
+
+    Generate our default section name.
+
+    This is a builder method for the section_name attribute.
+
+ default_format
+
+    The default string to use as the format, when one has not been
+    specified in the configuration.
+
+    This is a builder method for the format attribute.
+
+ATTRIBUTES
+
+ formatter
+
+    This lazily-built attribute holds our formatter.
+
+ section_name
+
+    This attribute holds the section name a consuming plugin will use.
+
+ format
+
+    The string to use when generating the version string.
+
+METHODS
+
+ codes
+
+    This method returns a hashref of codes suitable to building a
+    String::Formatter with. For our list of codes, see OVERVIEW, below.
+
+    Sections consuming this role should consider creating a
+    additional_codes method, as codes returned by that method will be
+    merged in with our default codes. additional_codes should return a
+    list, not a hashref.
+
+    Of course, the choice is yours.
+
+ format_section $input
+
+    Return the text representing the formatted section. This method is
+    called with the $input taken from weave_section.
+
+ build_content($document, $input)
+
+    This method is passed the same $document and $input that the
+    weave_section method is called with, and should return a list of pod
+    elements to insert.
+
+    In almost all cases, this method is used internally, but could be
+    usefully overridden in a subclass.
+
+ weave_section
+
+    Build our section.
+
+CODES
+
+    We provide the following codes:
+
+      * %v - distribution version
+
+      * %d - distribution name
+
+      * %p - package name
+
+      * %{mm} - "main module" name
+
+      * %{tf} - "trial flag", e.g. "-TRIAL" if trial, an empty string if
+      not
+
+      * %t - a tab
+
+      * %n - a newline
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/pod-weaver-role-section-formattable/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+ I'm a material boy in a material world
+
+    Please note I do not expect to be gittip'ed or flattr'ed for this work,
+    rather it is simply a very pleasant surprise. I largely create and
+    release works like this because I need them or I find it enjoyable;
+    however, don't let that stop you if you feel like it ;)
+
+    Flattr
+    <https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Fpod-weaver-role-section-formattable&title=RsrchBoy's%20CPAN%20Pod-Weaver-Role-Section-Formattable&tags=%22RsrchBoy's%20Pod-Weaver-Role-Section-Formattable%20in%20the%20CPAN%22>,
+    Gratipay <https://gratipay.com/RsrchBoy/>, or indulge my Amazon
+    Wishlist <http://bit.ly/rsrchboys-wishlist>... If and *only* if you so
+    desire.
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

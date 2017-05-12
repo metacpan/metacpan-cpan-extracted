@@ -1,0 +1,101 @@
+Pollute version 0.02
+====================
+
+
+Pollute lets you wrap C<use> statements up in files
+that are collections of other modules.  Say you have five 
+modules that are included in all the programs in your
+project, you can write one Includeme.pm file that C<use>s
+Pollute, then uses the five modules, than C<Pollute>s and
+you only have to use one module instead of all five.
+
+It works by taking a listing of all names in the caller's
+symbol table in its C<import> function, then comparing that
+list to another one generated when C<Pollute> is run, and
+assigning all new names into the caller's caller's symbol table.
+
+After C<Pollute>ing, the containers within Pollute:: are released.
+
+Pollute 0.03 keeps only one table of symbol names and has no 
+fine-grained overwriting control.  It's operation is so
+simple that I believe it would be easier, if you need fine-grained
+importation, to copy the source of Pollute.pm into your project
+and modify it than to invent an options language for controlling
+a more powerful Pollute.pm.
+
+For instance, it might be nice to optimize the list of modules
+in such a way to remove all but one of the double-import events.
+Using Pollute 0.02, your module list module might look like this:
+
+cat > ModuleList.pm <<EOF
+	package ModuleList;
+	use Pollute;
+	use foo;
+	use bar;
+	use baz;
+	use fred;
+	use jim;
+	use Shiela::Mbogo;
+	Pollute;
+EOF
+
+and you can import everything in all of them with
+
+	use ModuleList;
+
+wherever you need to.
+
+The following feature to be in version 0.03:
+
+
+Like I was saying, it might be nice to have Pollute track the lists
+of symbols that C<Pollute> exports, so you can refer to the same list
+later.  So here is that functionality too.
+
+
+cat > ModuleListP.pm <<EOF
+	package ModuleListP;
+	use Pollute::Persistent;
+	use foo;
+	use bar;
+	use baz;
+	use fred;
+	use jim;
+	use Shiela::Mbogo;
+	Pollute;
+EOF
+
+This works the same as regular Pollute, but Pollute::Persistent::Pollute, in addition to
+Polluting the caller's symbol table, also defines a Pollute routine within
+the using package, so other packages can import all the new symbols from the polluting
+package's symbol table with, to use the above example,
+
+	&ModuleListP::Pollute;
+
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Perl 5 l-value typeglobs referred to
+by symbolic reference.  And BEGIN blocks.  The test function
+uses Carp as its example of an exporting module.
+
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2001 David L. Nicol.  Released under your choice
+of GPL if you want to give away your derivative works or Artistic if you
+want to sell them.  Enjoy!
+
+

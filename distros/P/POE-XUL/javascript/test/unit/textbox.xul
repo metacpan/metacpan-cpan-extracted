@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<?xml-stylesheet href="../test.css" type="text/css"?>
+
+<window
+    id="layout-window"
+    title="Find Files"
+    orient="vertical"
+    width="800" height="600"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:xul="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+
+<xul:script type="text/javascript" src="../../lib/prototype.js"></xul:script>
+  
+<xul:script type="text/javascript" src="../../lib/unittest.js"></xul:script>
+<xul:script type="text/javascript" src="../../src/util.js"></xul:script>
+<xul:script type="text/javascript" src="../../src/formated.js"></xul:script>
+
+<xul:hbox><xul:vbox>
+    <div id="testlog"> </div>
+    <xul:textbox id="test" rows="4" cols="40" multiline="true"/>
+</xul:vbox></xul:hbox>
+
+<script type="text/javascript">
+
+// --------------------------------------------------------
+new Test.Unit.Runner( {
+    
+    // Loaded
+    test_loaded: function() { 
+        this.assertNotNull( FormatedField.prototype, "FormatedField class is defined" );
+        this.assertNotNull( FormatedField.form_validate, 
+                                    "FormatedField class is defined" );
+        this.assertNotNull( FormatedNumber.prototype, "FormatedNumber class is defined" );
+        this.assertNotNull( FormatedDate.prototype, "FormatedDate class is defined" );
+        this.assertNotNull( FormatedTelephone.prototype, "FormatedTelephone class is defined" );
+        this.assertNotNull( FormatedHeure.prototype, "FormatedHeure class is defined" );
+        this.assertNotNull( FormatedArea.prototype, "FormatedArea class is defined" );
+    },
+  }, "testlog" );
+
+</script>
+</window>

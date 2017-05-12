@@ -1,0 +1,10 @@
+---
+version: 0.11
+date:    Wed Apr 27 09:07:32 PDT 2005
+changes:
+- Make this work with modern day Spiffy
+---
+version: 0.10
+date:    Tue Mar  2 02:22:46 PST 2004
+changes:
+- Maiden Voyage

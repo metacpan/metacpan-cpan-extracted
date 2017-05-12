@@ -1,0 +1,28 @@
+Format: 1.8
+Date: Wed, 18 Mar 2015 09:52:28 +0000
+Source: pgpfinger
+Binary: pgpfinger
+Architecture: source all
+Version: 1.1
+Distribution: stable
+Urgency: low
+Maintainer: Markus Benning <ich@markusbenning.de>
+Changed-By: Markus Benning <ich@markusbenning.de>
+Description: 
+ pgpfinger  - retrieve PGP keys from different sources
+Changes: 
+ pgpfinger (1.1) stable; urgency=low
+ .
+   * fix some doc error in pgpfinger pod
+Checksums-Sha1: 
+ a7e72478575220aa95fb53a5414a40acc1de3d5f 582 pgpfinger_1.1.dsc
+ 24fb2b166201d464233fd4b316a8d7777eef12ae 18515 pgpfinger_1.1.tar.gz
+ 3fd2f7b2455bd4730aa966b478e8b1af8ffd3052 27504 pgpfinger_1.1_all.deb
+Checksums-Sha256: 
+ 2f0719499480115cae7c12404d848031f24bcdb2036d9083294e4104c680e8a2 582 pgpfinger_1.1.dsc
+ af2e6364fd28cd57b39a590656cc81ab8c81a36b68c0060a21c1c7886dab647a 18515 pgpfinger_1.1.tar.gz
+ af9164d06ec4ce88cc839cb4ed2a5f32d35670b3aeaf5f1be8c7a3ccb9f00093 27504 pgpfinger_1.1_all.deb
+Files: 
+ f94fa8ec75199c6b746de97f57c98644 582 perl optional pgpfinger_1.1.dsc
+ 3a8c4107615cc7419bd4a67db2694416 18515 perl optional pgpfinger_1.1.tar.gz
+ 4fee1b78f69826e4e5abca509aeed422 27504 perl optional pgpfinger_1.1_all.deb

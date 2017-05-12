@@ -1,0 +1,17 @@
+=head1 Scrollbar
+
+B<$sb=Paw::Scrollbar::new($widget, [$name]);  #a little bit buggy>
+
+B<Parameter>
+
+     $name      => Name des Widgets [optional]
+
+     $widget    => A reference to the widget which will be
+                   "scrollbared".
+
+B<Beispiel>
+
+     $sb=Paw::Scrollbar::new(widget=>$listbox, name=>"List Scrollbar");
+
+=cut
+

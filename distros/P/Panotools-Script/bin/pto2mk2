@@ -1,0 +1,496 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Panotools::Script;
+use Panotools::Makefile;
+use Panotools::Makefile::Utils qw/ platform /;
+use Getopt::Long;
+use Pod::Usage;
+use File::Spec;
+
+my $path_prefix;
+my $path_mk;
+my $platform;
+my $help = 0;
+
+GetOptions ('p|prefix=s' => \$path_prefix,
+            'o|output=s' => \$path_mk,
+            's|platform=s' => \$platform,
+            'h|help' => \$help);
+
+pod2usage (-verbose => 2) if $help;
+
+my $path_pto = shift || pod2usage;
+die "Can't find $path_pto" unless -e $path_pto;
+my $pto = new Panotools::Script;
+$pto->Read ($path_pto);
+
+my $mk = new Panotools::Makefile;
+
+platform ($platform) if defined $platform;
+
+
+$mk->Comment ('Command line tools');
+
+$mk->Variable ('NONA', ($pto->Option->{remapper} || 'nona'));
+$mk->Variable ('ENBLEND', ($pto->Option->{blender} ||'enblend'));
+$mk->Variable ('ENFUSE', ($pto->Option->{fuser} || 'enfuse'));
+# FIXME doesn't do anything with PTmender smartblend etc...
+$mk->Variable ('HDRMERGE', 'hugin_hdrmerge');
+$mk->Variable ('RM', '-', 'rm');
+# FIXME doesn't modify exiftool command in OS X bundle
+$mk->Variable ('EXIFTOOL', '-', 'exiftool');
+
+platform =~ /MSWin/ ? $mk->Variable ('NULL_DEVICE', 'NUL') : $mk->Variable ('NULL_DEVICE', '/dev/null');
+
+
+$mk->Comment ('Project parameters');
+
+$mk->Variable ('HUGIN_PROJECTION', $pto->Panorama->{f});
+$mk->Variable ('HUGIN_HFOV', $pto->Panorama->{v});
+$mk->Variable ('HUGIN_WIDTH', $pto->Panorama->{w});
+$mk->Variable ('HUGIN_HEIGHT', $pto->Panorama->{h});
+
+
+$mk->Comment ('Options for the programs');
+
+my $var = $mk->Variable ('NONA_LDR_REMAPPED_COMP');
+$var->Values ('-z', $pto->Option->{outputLayersCompression})
+    if ($pto->Option->{outputLayersCompression}
+    && $pto->Option->{outputImageType} =~ /tif/);
+$var->Values ('-z', 'PACKBITS') if ($pto->Option->{outputImageType} =~ /jpg/);
+
+# FIXME hugin_nonaOptions or remapUsingGPU isn't actually defined in the .pto file
+$var = $mk->Variable ('NONA_OPTS');
+$var->Values ('-g') if $pto->Option->{remapUsingGPU} =~ /true/;
+
+$var = $mk->Variable ('ENBLEND_OPTS', ($pto->Option->{enblendOptions} || ''));
+$var->Values ('-w')
+    if ($pto->Panorama->{v} == 360 and $pto->Panorama->{f} =~ /^(1|2|5|8|11|13)$/);
+# FIXME Hugin adjusts ROI based on photo boundaries but we can't do that in Panotools::Script :-(
+if ($pto->Panorama->{S})
+{
+    my ($left, $right, $top, $bottom) = split ',', $pto->Panorama->{S};
+    $var->Values ('-f'. $right .'x'. $bottom .'+'. $left .'+'. $top);
+}
+else
+{
+    $var->Values ('-f'. $pto->Panorama->{w} .'x'. $pto->Panorama->{h});
+}
+
+$var = $mk->Variable ('ENBLEND_LDR_COMP');
+$var->Values ('--compression', $pto->Option->{outputImageTypeCompression})
+    if ($pto->Option->{outputImageTypeCompression}
+    && $pto->Option->{outputImageType} =~ /tif/);
+$var->Values ('--compression', $pto->Option->{outputJPEGQuality})
+    if $pto->Option->{outputImageType} =~ /jpg/;
+
+$var = $mk->Variable ('ENBLEND_HDR_COMP');
+$var->Values ('--compression', $pto->Option->{outputImageTypeHDRCompression})
+    if ($pto->Option->{outputImageTypeHDRCompression}
+    && $pto->Option->{outputImageTypeHDR} =~ /tif/);
+
+$var = $mk->Variable ('HDRMERGE_OPTS', ($pto->Option->{hdrmergeOptions}|| ''));
+
+$var = $mk->Variable ('ENFUSE_OPTS', ($pto->Option->{enfuseOptions} || ''));
+$var->Values ('-w')
+    if ($pto->Panorama->{v} == 360 and $pto->Panorama->{f} =~ /^(1|2|5|8|11|13)$/);
+
+$mk->Variable ('EXIFTOOL_COPY_ARGS')->Values
+    (qw /-ImageDescription -Make -Model -Artist -WhitePoint -Copyright -GPS:all
+    -DateTimeOriginal -CreateDate -UserComment -ColorSpace -OwnerName -SerialNumber/);
+
+
+$mk->Comment ('the output panorama');
+
+$mk->Variable ('LDR_REMAPPED_PREFIX', $path_prefix);
+$mk->Variable ('HDR_STACK_REMAPPED_PREFIX', $path_prefix .'_hdr_');
+$mk->Variable ('LDR_EXPOSURE_REMAPPED_PREFIX', $path_prefix .'_exposure_layers_');
+
+$mk->Variable ('PROJECT_FILE', $path_pto);
+
+$mk->Variable ('LDR_BLENDED',
+    $path_prefix .'.'. ($pto->Option->{outputImageType} || 'tif'));
+$mk->Variable ('LDR_STACKED_BLENDED',
+    $path_prefix .'_fused.'. ($pto->Option->{outputImageType} || 'tif'));
+$mk->Variable ('LDR_EXPOSURE_LAYERS_FUSED',
+    $path_prefix .'_blended_fused.'. ($pto->Option->{outputImageType} || 'tif'));
+$mk->Variable ('HDR_BLENDED',
+    $path_prefix .'_hdr.'. ($pto->Option->{outputImageTypeHDR} || 'exr'));
+
+
+$mk->Comment ('first input image');
+
+$mk->Variable ('INPUT_IMAGE_1', $pto->Image->[0]->Path ($path_pto));
+
+
+$mk->Comment ('all input images');
+
+$var = $mk->Variable ('INPUT_IMAGES');
+for (@{$pto->Image}) { $var->Values ($_->Path ($path_pto)) }
+
+
+$mk->Comment ('remapped images');
+
+$var = $mk->Variable ('LDR_LAYERS');
+for (0 .. scalar @{$pto->Image} -1)
+    { $var->Values ($path_prefix . sprintf("%04d", $_) .'.tif') }
+
+
+$mk->Comment ('remapped images (hdr)');
+
+$var = $mk->Variable ('HDR_LAYERS');
+for (0 .. scalar @{$pto->Image} -1)
+    { $var->Values ($path_prefix .'_hdr_'. sprintf("%04d", $_) .'.exr') }
+
+
+$mk->Comment ('remapped maxval images');
+
+$var = $mk->Variable ('HDR_LAYERS_WEIGHTS');
+for (0 .. scalar @{$pto->Image} -1)
+    { $var->Values ($path_prefix .'_hdr_'. sprintf("%04d", $_) .'_gray.pgm') }
+
+# FIXME doesn't filter input photos by ROI getImagesinROI()
+
+$mk->Comment ('stacked images');
+
+$mk->Variable ('HDR_STACKS_NUMBERS', 0 .. scalar @{$pto->Stacks} -1);
+
+for my $stack (0 .. scalar @{$pto->Stacks} -1)
+{
+    $var = $mk->Variable ('HDR_STACK_'. $stack);
+    $var->Values ($path_prefix .'_stack_hdr_'. sprintf("%04d", $stack) .'.exr');
+
+    $var = $mk->Variable ('HDR_STACK_'. $stack .'_INPUT');
+    $var->Values (map {$path_prefix .'_hdr_'. sprintf("%04d", $_) .'.exr'} @{$pto->Stacks->[$stack]});
+}
+
+$mk->Variable ('HDR_STACKS', map {'$(HDR_STACK_'. $_ .')'} (0 .. scalar @{$pto->Stacks} -1));
+
+
+$mk->Comment ('number of image sets with similar exposure');
+
+$mk->Variable ('LDR_EXPOSURE_EXPOSURE_LAYERS_NUMBERS', 0 .. scalar @{$pto->ExposureLayers} -1);
+
+for my $layer (0 .. scalar @{$pto->ExposureLayers} -1)
+{
+    $var = $mk->Variable ('LDR_EXPOSURE_LAYER_'. $layer);
+    $var->Values ($path_prefix .'_exposure_'. sprintf("%02d", $layer) .'.tif');
+
+    $var = $mk->Variable ('LDR_EXPOSURE_LAYER_'. $layer .'_INPUT');
+    $var->Values (map {$path_prefix .'_exposure_layers_'. sprintf("%04d", $_) .'.tif'} @{$pto->ExposureLayers->[$layer]});
+
+    my $exposure = 0;
+    for (0 .. scalar @{$pto->ExposureLayers->[$layer]} -1)
+    {
+        $exposure += ($pto->Image->[$pto->ExposureLayers->[$layer]->[$_]]->{Eev} || 0);
+    }
+    $mk->Variable ('LDR_EXPOSURE_LAYER_'. $layer .'_EXPOSURE', $exposure / scalar @{$pto->ExposureLayers->[$layer]});
+}
+
+$var = $mk->Variable ('LDR_EXPOSURE_LAYERS');
+$var->Values (map {'$(LDR_EXPOSURE_LAYER_'. $_ .')'} 0 .. scalar @{$pto->ExposureLayers} -1);
+
+$var = $mk->Variable ('LDR_EXPOSURE_LAYERS_REMAPPED');
+for (0 .. scalar @{$pto->Image} -1)
+    { $var->Values ($path_prefix .'_exposure_layers_'. sprintf("%04d", $_) .'.tif') }
+
+
+$mk->Comment ('stacked images for enfuse or other automatic exposure blending tools');
+
+$mk->Variable ('LDR_STACKS_NUMBERS', 0 .. scalar @{$pto->Stacks} -1);
+
+for my $stack (0 .. scalar @{$pto->Stacks} -1)
+{
+    $var = $mk->Variable ('LDR_STACK_'. $stack);
+    $var->Values ($path_prefix .'_stack_ldr_'. sprintf("%04d", $stack) .'.tif');
+
+    $var = $mk->Variable ('LDR_STACK_'. $stack .'_INPUT');
+    $var->Values (map {$path_prefix .'_exposure_layers_'. sprintf("%04d", $_) .'.tif'} @{$pto->Stacks->[$stack]});
+}
+
+$mk->Variable ('LDR_STACKS', map {'$(LDR_STACK_'. $_ .')'} (0 .. scalar @{$pto->Stacks} -1));
+
+$var = $mk->Variable ('TEMP_FILES');
+
+$var->Values ('$(LDR_LAYERS)')
+    if ($pto->Option->{outputLDRBlended} =~ /true/
+    && $pto->Option->{outputLDRLayers} !~ /true/);
+
+$var->Values ('$(LDR_EXPOSURE_LAYERS_REMAPPED)')
+    if (($pto->Option->{outputLDRExposureLayers} =~ /true/
+    || $pto->Option->{outputLDRExposureBlended} =~ /true/
+    || $pto->Option->{outputLDRExposureLayersFused} =~ /true/)
+    && $pto->Option->{outputLDRExposureRemapped} !~ /true/);
+
+$var->Values ('$(LDR_STACKS)')
+    if ($pto->Option->{outputLDRExposureBlended} =~ /true/);
+
+# eh? see above
+$var->Values ('$(LDR_EXPOSURE_LAYERS_REMAPPED)')
+    if ($pto->Option->{outputLDRExposureBlended} =~ /true/
+    && $pto->Option->{outputLDRExposureRemapped} !~ /true/
+    && $pto->Option->{outputLDRExposureLayers} !~ /true/);
+
+
+$var->Values ('$(LDR_EXPOSURE_LAYERS_REMAPPED)', '$(LDR_EXPOSURE_LAYERS)')
+    if ($pto->Option->{outputLDRExposureLayersFused} =~ /true/
+    && $pto->Option->{outputLDRExposureRemapped} !~ /true/
+    && $pto->Option->{outputLDRExposureLayers} !~ /true/);
+
+$var->Values ('$(HDR_LAYERS)', '$(HDR_LAYERS_WEIGHTS)')
+    if ($pto->Option->{outputHDRStacks} =~ /true/
+    && $pto->Option->{outputHDRLayers} !~ /true/);
+
+$var->Values ('$(HDR_STACKS)')
+    if ($pto->Option->{outputHDRBlended} =~ /true/
+    && $pto->Option->{outputHDRStacks} != /true/);
+
+$var->Values ('$(HDR_LAYERS)', '$(HDR_LAYERS_WEIGHTS)')
+    if ($pto->Option->{outputHDRBlended} =~ /true/
+    && $pto->Option->{outputHDRStacks} != /true/
+    && $pto->Option->{outputHDRLayers} != /true/);
+
+$mk->Comment ('some definitions useful in plugin Makefiles');
+
+$mk->Variable ('DO_LDR_BLENDED', 1) if ($pto->Option->{outputLDRBlended} =~ /true/);
+
+$mk->Variable ('DO_LDR_STACKED_BLENDED', 1) if ($pto->Option->{outputLDRExposureBlended} =~ /true/);
+
+$mk->Variable ('DO_LDR_EXPOSURE_LAYERS_FUSED', 1) if ($pto->Option->{outputLDRExposureLayersFused} =~ /true/);
+
+$mk->Variable ('DO_HDR_BLENDED', 1) if ($pto->Option->{outputHDRBlended} =~ /true/);
+
+
+$mk->Comment ('Phony rules');
+
+my $rule = $mk->Rule ('all');
+
+# normal seam blended output
+$rule->Prerequisites ('$(LDR_BLENDED)') if ($pto->Option->{outputLDRBlended} =~ /true/);
+
+# individual remapped images with exposure correction for 'normal' output
+$rule->Prerequisites ('$(LDR_LAYERS)') if $pto->Option->{outputLDRLayers} =~ /true/;
+
+# individual remapped images with no exposure correction for 'fused' output
+$rule->Prerequisites ('$(LDR_EXPOSURE_LAYERS_REMAPPED)') if $pto->Option->{outputLDRExposureRemapped} =~ /true/;
+
+# seam blended exposure layers for 'fused' output
+$rule->Prerequisites ('$(LDR_EXPOSURE_LAYERS)') if $pto->Option->{outputLDRExposureLayers} =~ /true/;
+
+# exposure fused stacks then seam blended
+$rule->Prerequisites ('$(LDR_STACKED_BLENDED)') if ($pto->Option->{outputLDRExposureBlended} =~ /true/);
+
+# blended exposure layers then fused
+$rule->Prerequisites ('$(LDR_EXPOSURE_LAYERS_FUSED)') if ($pto->Option->{outputLDRExposureLayersFused} =~ /true/);
+
+# hdr merged stacks then seam blended
+$rule->Prerequisites ('$(HDR_BLENDED)') if ($pto->Option->{outputHDRBlended} =~ /true/);
+
+# individual remapped images in hdr space
+$rule->Prerequisites ('$(HDR_LAYERS)') if $pto->Option->{outputHDRLayers} =~ /true/;
+
+# hdr merged stacks
+$rule->Prerequisites ('$(HDR_STACKS)') if $pto->Option->{outputHDRStacks} =~ /true/;
+
+$rule = $mk->Rule ('clean');
+$rule->Command (qw/$(RM_SHELL) $(TEMP_FILES_SHELL)/);
+
+$rule = $mk->Rule ('test');
+
+$rule->Command ('@', '-', '$(NONA_SHELL)', '--help', '>', '$(NULL_DEVICE_SHELL)', '2>&1', '&&', 'echo', '[OK]');
+$rule->Command ('@', 'echo', '-n', 'Checking enblend...');
+$rule->Command ('@', '-', '$(ENBLEND_SHELL)', '-h', '>', '$(NULL_DEVICE_SHELL)', '2>&1', '&&', 'echo', '[OK]');
+$rule->Command ('@', 'echo', '-n', 'Checking enfuse...');
+$rule->Command ('@', '-', '$(ENFUSE_SHELL)', '-h', '>', '$(NULL_DEVICE_SHELL)', '2>&1', '&&', 'echo', '[OK]');
+$rule->Command ('@', 'echo', '-n', 'Checking hugin_hdrmerge...');
+$rule->Command ('@', '-', '$(HDRMERGE_SHELL)', '-h', '>', '$(NULL_DEVICE_SHELL)', '2>&1', '&&', 'echo', '[OK]');
+$rule->Command ('@', 'echo', '-n', 'Checking exiftool...');
+$rule->Command ('@', '$(EXIFTOOL_SHELL)', '-ver', '>', '$(NULL_DEVICE_SHELL)', '2>&1', '&&', 'echo', '[OK]', '||', 'echo', '[FAIL]');
+
+$rule = $mk->Rule ('.PHONY');
+$rule->Prerequisites (qw/all clean test/);
+
+
+$mk->Comment ('Rules for ordinary TIFF_m output');
+
+for (0 .. scalar @{$pto->Image} -1)
+{
+    $rule = $mk->Rule ($path_prefix . sprintf("%04d", $_) .'.tif');
+    $rule->Prerequisites ($pto->Image->[$_]->Path ($path_pto));
+    $rule->Prerequisites ('$(PROJECT_FILE)');
+    $rule->Command (qw/$(NONA_SHELL) $(NONA_OPTS_SHELL) $(NONA_LDR_REMAPPED_COMP_SHELL)
+        -r ldr -m TIFF_m -o $(LDR_REMAPPED_PREFIX_SHELL) -i/, $_, '$(PROJECT_FILE_SHELL)');
+}
+
+
+$mk->Comment ('Rules for merge to hdr output');
+
+for (0 .. scalar @{$pto->Image} -1)
+{
+    $rule = $mk->Rule ($path_prefix .'_hdr_'. sprintf("%04d", $_) .'.exr');
+    $rule->Prerequisites ($pto->Image->[$_]->Path ($path_pto));
+    $rule->Prerequisites ('$(PROJECT_FILE)');
+    $rule->Command (qw/$(NONA_SHELL) $(NONA_OPTS_SHELL)
+        -r hdr -m EXR_m -o $(HDR_STACK_REMAPPED_PREFIX_SHELL) -i/, $_, '$(PROJECT_FILE_SHELL)');
+}
+
+
+$mk->Comment ('Rules for exposure layer output');
+
+for (0 .. scalar @{$pto->Image} -1)
+{
+    $rule = $mk->Rule ($path_prefix .'_exposure_layers_'. sprintf("%04d", $_) .'.tif');
+    $rule->Prerequisites ($pto->Image->[$_]->Path ($path_pto));
+    $rule->Prerequisites ('$(PROJECT_FILE)');
+    #FIXME How does this relate to 'p' line E value?
+    my $exposure = $pto->Image->[$_]->{Eev} || 0;
+    $rule->Command (qw/$(NONA_SHELL) $(NONA_OPTS_SHELL) $(NONA_LDR_REMAPPED_COMP_SHELL)
+        -r ldr -e/, $exposure, qw/-m TIFF_m -o $(LDR_EXPOSURE_REMAPPED_PREFIX_SHELL)
+        -i/, $_, '$(PROJECT_FILE_SHELL)');
+}
+
+
+$mk->Comment ('HDR merged stacks');
+
+for my $stack (0 .. scalar @{$pto->Stacks} -1)
+{
+    $rule = $mk->Rule ('$(HDR_STACK_'. $stack .')');
+    $rule->Prerequisites ('$(HDR_STACK_'. $stack .'_INPUT)');
+    $rule->Command ('$(HDRMERGE_SHELL)', '$(HDRMERGE_OPTS_SHELL)', '-o',
+        '$(HDR_STACK_'. $stack .'_SHELL)', '$(HDR_STACK_'. $stack .'_INPUT_SHELL)');
+}
+
+
+$mk->Comment ('LDR fused stacks');
+
+for my $stack (0 .. scalar @{$pto->Stacks} -1)
+{
+    $rule = $mk->Rule ('$(LDR_STACK_'. $stack .')');
+    $rule->Prerequisites ('$(LDR_STACK_'. $stack .'_INPUT)');
+    $rule->Command ('$(ENFUSE_SHELL)', '$(ENFUSE_OPTS_SHELL)', '-o',
+        '$(LDR_STACK_'. $stack .'_SHELL)', '$(LDR_STACK_'. $stack .'_INPUT_SHELL)');
+    $rule->Command ('$(EXIFTOOL_SHELL)', '-overwrite_original_in_place', '-TagsFromFile',
+        '$(INPUT_IMAGE_1_SHELL)', '$(EXIFTOOL_COPY_ARGS_SHELL)', '$(LDR_STACK_'. $stack .'_SHELL)');
+}
+
+
+$mk->Comment ('ldr blended exposure layers');
+
+for my $layer (0 .. scalar @{$pto->ExposureLayers} -1)
+{
+    $rule = $mk->Rule ('$(LDR_EXPOSURE_LAYER_'. $layer .')');
+    $rule->Prerequisites ('$(LDR_EXPOSURE_LAYER_'. $layer .'_INPUT)');
+    $rule->Command ('$(ENBLEND_SHELL)', '$(ENBLEND_LDR_COMP_SHELL)', '$(ENBLEND_OPTS_SHELL)', '-o',
+        '$(LDR_EXPOSURE_LAYER_'. $layer .'_SHELL)', '$(LDR_EXPOSURE_LAYER_'. $layer .'_INPUT_SHELL)');
+    $rule->Command ('$(EXIFTOOL_SHELL)', '-overwrite_original_in_place', '-TagsFromFile',
+        '$(INPUT_IMAGE_1_SHELL)', '$(EXIFTOOL_COPY_ARGS_SHELL)', '$(LDR_EXPOSURE_LAYER_'. $layer .'_SHELL)');
+}
+
+
+$mk->Comment ('Normal blended output');
+
+$rule = $mk->Rule ('$(LDR_BLENDED)');
+$rule->Prerequisites ('$(LDR_LAYERS)');
+$rule->Command qw/$(ENBLEND_SHELL) $(ENBLEND_LDR_COMP_SHELL) $(ENBLEND_OPTS_SHELL)
+    -o $(LDR_BLENDED_SHELL) $(LDR_LAYERS_SHELL)/;
+$rule->Command qw/$(EXIFTOOL_SHELL) -overwrite_original_in_place
+    -TagsFromFile $(INPUT_IMAGE_1_SHELL) $(EXIFTOOL_COPY_ARGS_SHELL) $(LDR_BLENDED_SHELL)/;
+
+
+$mk->Comment ('ldr fused stacks then blended output');
+
+$rule = $mk->Rule ('$(LDR_STACKED_BLENDED)');
+$rule->Prerequisites ('$(LDR_STACKS)');
+$rule->Command (qw/$(ENBLEND_SHELL) $(ENBLEND_LDR_COMP_SHELL) $(ENBLEND_OPTS_SHELL)
+    -o $(LDR_STACKED_BLENDED_SHELL) $(LDR_STACKS_SHELL)/);
+$rule->Command (qw/$(EXIFTOOL_SHELL) -overwrite_original_in_place -TagsFromFile
+    $(INPUT_IMAGE_1_SHELL) $(EXIFTOOL_COPY_ARGS_SHELL) $(LDR_STACKED_BLENDED_SHELL)/);
+
+
+$mk->Comment ('ldr blended layers then fused output');
+
+$rule = $mk->Rule ('$(LDR_EXPOSURE_LAYERS_FUSED)');
+$rule->Prerequisites ('$(LDR_EXPOSURE_LAYERS)');
+$rule->Command (qw/$(ENFUSE_SHELL) $(ENBLEND_LDR_COMP_SHELL) $(ENFUSE_OPTS_SHELL)
+    -o $(LDR_EXPOSURE_LAYERS_FUSED_SHELL) $(LDR_EXPOSURE_LAYERS_SHELL)/);
+$rule->Command (qw/$(EXIFTOOL_SHELL) -overwrite_original_in_place -TagsFromFile
+    $(INPUT_IMAGE_1_SHELL) $(EXIFTOOL_COPY_ARGS_SHELL) $(LDR_EXPOSURE_LAYERS_FUSED_SHELL)/);
+
+
+$mk->Comment ('hdr merged stacks then blended output');
+
+$rule = $mk->Rule ('$(HDR_BLENDED)');
+$rule->Prerequisites ('$(HDR_STACKS)');
+$rule->Command (qw/$(ENBLEND_SHELL) $(ENBLEND_HDR_COMP_SHELL) $(ENBLEND_OPTS_SHELL)
+    -o $(HDR_BLENDED_SHELL) $(HDR_STACKS_SHELL)/);
+
+
+$mk->Comment ('multilayer output based on intermediate TIFF images');
+
+$rule = $mk->Rule ('$(LDR_REMAPPED_PREFIX)_multilayer.tif');
+$rule->Prerequisites ('$(LDR_LAYERS)');
+$rule->Command (qw/tiffcp $(LDR_LAYERS_SHELL) $(LDR_REMAPPED_PREFIX_SHELL)_multilayer.tif/);
+
+$rule = $mk->Rule ('$(LDR_REMAPPED_PREFIX)_fused_multilayer.tif');
+$rule->Prerequisites ('$(LDR_STACKS)', '$(LDR_EXPOSURE_LAYERS)');
+$rule->Command (qw/tiffcp $(LDR_STACKS_SHELL) $(LDR_EXPOSURE_LAYERS_SHELL)
+    $(LDR_REMAPPED_PREFIX_SHELL)_fused_multilayer.tif/);
+
+$rule = $mk->Rule ('$(LDR_REMAPPED_PREFIX)_multilayer.psd');
+$rule->Prerequisites ('$(LDR_LAYERS)');
+$rule->Command (qw/PTtiff2psd -o $(LDR_REMAPPED_PREFIX_SHELL)_multilayer.psd
+    $(LDR_LAYERS_SHELL)/);
+
+$rule = $mk->Rule ('$(LDR_REMAPPED_PREFIX)_fused_multilayer.psd');
+$rule->Prerequisites ('$(LDR_STACKS)', '$(LDR_EXPOSURE_LAYERS)');
+$rule->Command (qw/PTtiff2psd -o $(LDR_REMAPPED_PREFIX_SHELL)_fused_multilayer.psd
+    $(LDR_STACKS_SHELL) $(LDR_EXPOSURE_LAYERS_SHELL)/);
+
+$mk->Write ($path_mk);
+
+0;
+
+__END__
+
+=head1 NAME
+
+pto2mk2 - Create a Makefile for stitching
+
+=head1 SYNOPSIS
+
+pto2mk [options] -o <output_makefile> -p <output_prefix> <project_file>
+
+ Options:
+  -p | --prefix     File path stub for rendered output
+  -o | --output     Filename of generated Makefile
+  -s | --platform   e.g. linux or MSWin32, defaults to current OS
+  -h | --help       Outputs help documentation
+
+=head1 DESCRIPTION
+
+B<pto2mk2> takes a hugin .pto project and generates a Makefile containing all
+the rules necessary for stitching.  The Makefile is typically not portable and
+contains OS and system specific commands.
+
+This tool is a perl version of the C++ pto2mk tool shipped with Hugin.  It is
+intended to test the capability of Panotools::Makefile, and is not intended to
+replace pto2mk in the future.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+=head1 AUTHOR
+
+Bruno Postle - November 2009.
+
+=cut

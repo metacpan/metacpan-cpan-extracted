@@ -1,0 +1,27 @@
+---
+abstract: 'Moose XML Processor'
+author:
+  - 'Sam Crawley <sam@crawley.nz>'
+build_requires:
+  Scriptalicious: '1.16'
+  XML::Compare: '0.04'
+  YAML: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PRANG
+requires:
+  JSON: '2.21'
+  Moose: '1.09'
+  MooseX::Params::Validate: '0.14'
+  Set::Object: '1.09'
+  XML::LibXML: '1.65'
+  perl: '5.010'
+resources:
+  repository: https://github.com/catalyst/PRANG.git
+version: '0.18'

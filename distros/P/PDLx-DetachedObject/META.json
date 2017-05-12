@@ -1,0 +1,82 @@
+{
+   "abstract" : "parent class for subclassing PDL from class frameworks",
+   "author" : [
+      "The Smithsonian Astrophysical Observatory"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDLx-DetachedObject",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Module::Install" : "0",
+            "Module::Install::AuthorRequires" : "0",
+            "Module::Install::AuthorTests" : "0",
+            "Module::Install::AutoLicense" : "0",
+            "Module::Install::CPANfile" : "0",
+            "Module::Install::ReadmeFromPod" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0",
+            "Test::Fixme" : "0",
+            "Test::NoBreakpoints" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "Class::Tiny" : "0",
+            "Moo" : "0",
+            "Object::Tiny" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=PDLx-DetachedObject"
+      },
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.html"
+      ],
+      "repository" : {
+         "url" : "https://github.com/djerius/PDLx-DetachedObject"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

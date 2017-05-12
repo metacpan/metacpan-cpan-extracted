@@ -1,0 +1,6 @@
+name: chop
+docs: |
+    PHP's C<chop> function is an alias to its L<"rtrim"> function.
+
+    Perl has a builtin named L<chop|perlfunc/"chop">. Thus we do
+    not support the use of C<chop> as an alias to L<"rtrim">.

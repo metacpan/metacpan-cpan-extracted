@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+
+use Pegex::Cmd;
+
+Pegex::Cmd->run();
+
+=head1 pegex
+
+This is a tool for compiling L<Pegex> grammars to various formats. See
+L<Pegex::Cmd> for more details.

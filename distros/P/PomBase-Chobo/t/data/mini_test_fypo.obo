@@ -1,0 +1,280 @@
+format-version: 1.2
+date: 14:10:2015 16:48
+saved-by: midori
+auto-generated-by: OBO-Edit 2.3.1
+subsetdef: qc_do_not_annotate "Term not to be used for direct annotation"
+subsetdef: qc_do_not_manually_annotate "Term not to be used for direct manual annotation"
+default-namespace: fission_yeast_phenotype
+remark: svn version: $Revision: 303 $
+ontology: fypo
+
+[Term]
+id: FYPO:0000001
+name: phenotype
+def: "Any of the set of observable characteristics of an organism resulting from the interaction of its genotype with the environment." [PomBase:mah]
+subset: qc_do_not_annotate
+subset: qc_do_not_manually_annotate
+synonym: "fission yeast phenotype" EXACT [PomBase:mah]
+creation_date: 2011-03-16T03:59:25Z
+
+[Term]
+id: FYPO:0000002
+name: cell phenotype
+def: "A phenotype that is observed at the level of an individual cell." [PomBase:mah]
+subset: qc_do_not_annotate
+subset: qc_do_not_manually_annotate
+synonym: "fission yeast cell phenotype" EXACT [PomBase:mah]
+is_a: FYPO:0000001 ! phenotype
+intersection_of: FYPO:0000001 ! phenotype
+intersection_of: inheres_in_part_of GO:0005575
+disjoint_from: FYPO:0000003 ! cell population phenotype
+created_by: midori
+creation_date: 2011-03-16T04:25:28Z
+
+[Term]
+id: FYPO:0000005
+name: abnormal cell morphology
+namespace: fission_yeast_phenotype
+alt_id: FYPO:0000019
+def: "A cell phenotype characterized by altered cell morphology." [PomBase:mah]
+synonym: "cell morphology, misshapen cells" EXACT []
+is_a: FYPO:0000136 {some_modifier="true"} ! cellular structure phenotype
+intersection_of: PATO:0000051
+intersection_of: inheres_in CL:0000000 ! cell
+created_by: mah79
+creation_date: 2011-03-29T05:53:56Z
+
+[Term]
+id: FYPO:0000013
+name: T-shaped cells
+namespace: fission_yeast_phenotype
+synonym: "cell morphology, T shaped" EXACT []
+is_a: FYPO:0000005 ! abnormal cell morphology
+intersection_of: PATO:0001200
+intersection_of: inheres_in CL:0000000 ! cell
+created_by: mah79
+creation_date: 2011-03-29T05:53:56Z
+
+[Term]
+id: FYPO:0000017
+name: elongated cells
+namespace: fission_yeast_phenotype
+synonym: "cell morphology, elongated cells" EXACT []
+is_a: FYPO:0000005 ! abnormal cell morphology
+intersection_of: PATO:0000573
+intersection_of: inheres_in CL:0000000 ! cell
+created_by: mah79
+creation_date: 2011-03-29T05:53:56Z
+
+[Term]
+id: FYPO:0000035
+name: growth auxotrophic for arginine
+namespace: fission_yeast_phenotype
+def: "Auxotrophy in which arginine is required for cell growth." [PomBase:mah]
+is_a: FYPO:0000128 ! auxotrophy
+intersection_of: PATO:0000422
+intersection_of: towards CHEBI:16467
+created_by: mah79
+creation_date: 2011-03-29T05:53:56Z
+
+[Term]
+id: FYPO:0000061
+name: multinucleate
+namespace: fission_yeast_phenotype
+is_a: FYPO:0000136 ! cellular structure phenotype
+intersection_of: PATO:0001908
+intersection_of: inheres_in CL:0000000 ! cell
+created_by: mah79
+creation_date: 2011-03-29T05:53:56Z
+
+[Term]
+id: FYPO:0000114
+name: cellular process phenotype
+namespace: fission_yeast_phenotype
+alt_id: FYPO:0000028
+alt_id: FYPO:00999999
+def: "A phenotype that affects a cellular process." [PomBase:mah]
+synonym: "chromosome condensation defects" EXACT []
+is_a: FYPO:0000002 ! cell phenotype
+intersection_of: PATO:0000001
+intersection_of: inheres_in GO:0030261
+intersection_of: qualifier PATO:0000460
+created_by: mah79
+creation_date: 2011-04-12T12:00:38Z
+
+[Term]
+id: FYPO:0000128
+name: auxotrophy
+namespace: fission_yeast_phenotype
+def: "A phenotype characterized by a cell's inability to synthesize a particular organic compound required for its growth." [PATO:0000422, PomBase:mah]
+is_a: FYPO:0000139 ! cell growth phenotype
+is_a: FYPO:0000140 ! cellular metabolism phenotype
+intersection_of: qualifier PATO:0000422
+created_by: mah79
+creation_date: 2011-03-29T05:54:40Z
+
+[Term]
+id: FYPO:0000133
+name: elongated multinucleate cells
+namespace: fission_yeast_phenotype
+def: "A cell phenotype in which cells contain more than one nucleus apiece and are elongated." [PomBase:mah]
+comment: Test comment.
+is_a: FYPO:0000017 ! elongated cells
+is_a: FYPO:0000061 ! multinucleate
+intersection_of: PATO:0000573
+intersection_of: PATO:0001908
+intersection_of: inheres_in CL:0000000 ! cell
+created_by: mah79
+creation_date: 2011-03-29T05:54:40Z
+
+[Term]
+id: FYPO:0000136
+name: cellular structure phenotype
+namespace: fission_yeast_phenotype
+def: "A phenotype that affects the structure of a cell or a cellular component." [PomBase:mah]
+is_a: FYPO:0000002 ! cell phenotype
+intersection_of: FYPO:0000002 ! cell phenotype
+intersection_of: inheres_in GO:0005575
+created_by: mah79
+creation_date: 2011-04-12T12:01:21Z
+
+[Term]
+id: FYPO:0000139
+name: cell growth phenotype
+namespace: fission_yeast_phenotype
+def: "A cell phenotype that affects the rate or extent of cell growth." []
+is_a: FYPO:0000114 ! cellular process phenotype
+intersection_of: FYPO:0000002 ! cell phenotype
+intersection_of: inheres_in GO:0016049
+created_by: mah79
+creation_date: 2011-04-12T02:22:51Z
+
+[Term]
+id: FYPO:0000140
+name: cellular metabolism phenotype
+namespace: fission_yeast_phenotype
+def: "A phenotype that affects metabolism in the cell." [PomBase:mah]
+is_a: FYPO:0000114 ! cellular process phenotype
+intersection_of: FYPO:0000002 ! cell phenotype
+intersection_of: inheres_in GO:0044237
+created_by: mah79
+creation_date: 2011-04-12T02:23:26Z
+
+[Term]
+id: FYPO:0001320
+name: vegetative cell phenotype
+def: "A phenotype that is observed at the level of an individual cell, when the cell is in the vegetative growth phase of the cell cycle." [PomBase:mah]
+comment: This is a high-level term whose primary purpose is to organize terms beneath it in the ontology, and we expect that it will not be used for direct annotations. Please consider using a more specific term to annotate each phenotype.
+subset: qc_do_not_annotate
+subset: qc_do_not_manually_annotate
+synonym: "cell phenotype during vegetative growth" NARROW
+synonym: "fission yeast vegetative cell phenotype" [PomBase:mah]
+synonym: "vegetative cell phenotype during vegetative growth" EXACT [PomBase:mah]
+synonym: "vegetative cell phenotype in vegetative growth" EXACT A_TYPE [PomBase:mah]
+is_a: FYPO:0000002 ! cell phenotype
+created_by: midori
+creation_date: 2012-08-01T13:52:18Z
+
+[Term]
+id: FYPO:0001321
+name: cellular physical quality phenotype during vegetative growth
+def: "A phenotype that affects any physical object quality, such as morphology, number, location, etc., of a cell or a cellular component in the vegetative growth phase of the life cycle." [PomBase:mah]
+comment: This is a high-level term whose primary purpose is to organize terms beneath it in the ontology, and we expect that it will not be used for direct annotations. Please consider using a more specific term to annotate each phenotype.
+subset: qc_do_not_annotate
+subset: qc_do_not_manually_annotate
+synonym: "cellular physical object quality phenotype during vegetative growth" EXACT [PATO:0001241]
+synonym: "fission yeast cellular physical object quality phenotype during vegetative growth" EXACT [PomBase:mah]
+is_a: FYPO:0000136 ! cellular physical quality phenotype
+is_a: FYPO:0001320 ! vegetative cell phenotype
+created_by: midori
+creation_date: 2012-08-01T14:44:55Z
+
+[Term]
+id: FYPO:0000272
+name: abolished septum formation
+def: "A septation phenotype observed in the vegetative growth phase of the life cycle in which a cell fails to form a septum." [PMID:9649519, PomBase:mah]
+synonym: "abolished mitotic barrier septum assembly" EXACT [GO:1902411, PomBase:mah]
+synonym: "septum initiation defective" RELATED [PomBase:mah]
+is_a: FYPO:0000001 ! phenotype
+created_by: midori
+creation_date: 2011-04-19T04:37:01Z
+
+[Term]
+id: FYPO:0000949
+name: aseptate
+def: "A physical cellular phenotype observed in the vegetative growth phase of the life cycle in which a cell does not contain a septum." [PomBase:mah]
+synonym: "absent septum" EXACT [PomBase:mah]
+synonym: "aseptate during vegetative growth" EXACT [PomBase:mah]
+is_a: FYPO:0001321
+relationship: output_of FYPO:0000272 ! abolished septum formation
+created_by: midori
+creation_date: 2012-04-03T03:38:09Z
+
+[Term]
+id: FYPO:0000950
+name: elongated aseptate cell
+def: "A cell phenotype observed in the vegetative growth phase of the life cycle in which a cell does not contain a septum and is elongated." [PomBase:mah]
+synonym: "elongated aseptate cell during vegetative growth" EXACT [PomBase:mah]
+is_a: FYPO:0000002
+relationship: has_part FYPO:0000017 ! elongated cell
+relationship: has_part FYPO:0000949 ! aseptate
+created_by: midori
+creation_date: 2012-04-03T03:41:12Z
+
+[Term]
+id: FYPO:0000779
+name: inviable elongated dumbbell-shaped cell
+alt_id: FYPO:0000018
+def: "A cell morphology phenotype observed in the vegetative growth phase of the life cycle in which a cell is inviable, is longer than normal and shaped in the form of a dumbbell, i.e. having two connected, rounded parts of approximately equal size, tapering towards a narrower region in the center of the long axis. In some dumbbell-shaped cells, the diameter at the ends is much greater than in wild-type cells." [PomBase:mah]
+is_a: FYPO:0000950 ! elongated aseptate cell
+relationship: has_part FYPO:0000017 ! elongated cell
+created_by: midori
+creation_date: 2012-02-13T12:48:01Z
+
+[Term]
+id: FYPO:0001006
+name: inviable, elongated, multinucleate dumbbell-shaped cell
+def: "A cell phenotype observed in the vegetative growth phase of the life cycle in which a cell contains more than one nucleus, is elongated, is inviable, and is shaped in the form of a dumbbell, i.e. having two connected, rounded parts of approximately equal size, tapering towards a narrower region in the center of the long axis. In a cell with this phenotype, the diameter at the ends may be much greater than in wild-type cells. Septal material may accumulate in patches at the cell surface, but no septum forms." [PMID:8834798, PomBase:mah, PomBase:vw]
+synonym: "elongated, multinucleate dumbbell-shaped cell" EXACT [PomBase:mah]
+synonym: "long, multinucleate dumbbell-shaped cell" EXACT [PomBase:vw]
+is_a: FYPO:0000779 ! inviable elongated dumbbell-shaped cell
+relationship: has_part FYPO:0000061 ! multinucleate
+created_by: midori
+creation_date: 2012-04-25T04:07:50Z
+
+[Term]
+id: EXT:0000001
+name: external term for testing
+namespace: external_cv
+
+[Typedef]
+id: inheres_in
+name: inheres_in
+namespace: fission_yeast_phenotype
+xref: OBO_REL:inheres_in
+
+[Typedef]
+id: qualifier
+name: qualifier
+namespace: fission_yeast_phenotype
+comment: placeholder relation to indicate normality/abnormality.
+
+[Typedef]
+id: towards
+name: towards
+namespace: fission_yeast_phenotype
+comment: relation binding a relational quality or disposition to the relevant type of entity
+xref: OBO_REL:towards
+
+[Typedef]
+id: output_of
+name: output_of
+synonym: "formation results from" EXACT [PomBase:mah]
+xref: RO:0002353
+property_value: usage "Inverse of has_output. Relation between a structure and a process that forms it, or between one process and a preceding process; A output_of B used where B has_output A isn't always true. Implies that process B is the only way to get output. Used in FYPO where one phenotype (c) always results when another phenotype (p) is present. Phenotype (p) may have other consequences in addition to phenotype (c)." xsd:string
+
+[Typedef]
+id: has_part
+name: has_part
+alt_id: has_some_part
+is_transitive: true

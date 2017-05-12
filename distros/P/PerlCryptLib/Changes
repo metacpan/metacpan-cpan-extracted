@@ -1,0 +1,57 @@
+Revision history for Perl extension PerlCryptLib
+================================================
+
+1.11  Sun Oct 24 18:45:21 2010
+	- Added compatibility for deprecated functions removed from cryptlib starting from version 3.4.0
+
+1.10  Sun Apr 18 00:25:33 2010
+	- Done some optimizations in XS code for gcc4 ISO C90 compatibility 
+
+1.09  Sun Jul 26 04:47:10 2009
+	- Cryptlib header's translation has been reviewd
+
+1.08  Sat Mar 14 08:55:13 2009
+	- Fixed missing lines from cryptFinalizeComponents() in .pm
+
+1.07  Thu Mar 03 08:39:24 2009
+	- Fixed typo in Makefile.PL at line #7
+
+1.06  Sun Mar 01 18:20:14 2009
+	- Introduced serching for cryptlib.h in system directory
+
+1.05  Sat Oct 18 18:26:14 2008
+	- Optimized compatibility with different version of cryptlib
+	- Removed 'configure' shell script to simplify CPAN installation
+	- Support for 'cryptlib.h' new types
+
+1.04  Thu Apr 19 19:18:55 2007
+	- Granted compatibility with different version of cryptlib
+	- Introduced 'configure' shell script
+	- Auto-creation of PerlCryptLib.ph header file using
+	  GenPerl.pl script adapted from GenBas.pl cryptlib script
+	- Removed dependences from Constant.pm and Enum.pm
+	- Corrected ppport.h header file to remove warnings
+
+1.03  Fri May 26 07:50:39 2006
+	- Succesfully tested with shared cryptlib library
+	- Added *.inc deletion on 'make realclean'
+	- Added test verbosity,
+
+1.02  Wed May 24 15:28:13 2006
+	- Added support for previously missed functions:
+		* cryptLogin
+		* cryptLogout
+		* cryptCADeleteItem
+		* cryptImportKeyEx
+	- Use of enum-1.016 package to speed-up PerlCryptLib.ph
+	- Added new sub __symbolList to retrieve constants and 
+	  enumerated constants to esport
+
+1.01  Thu May 18 17:02:17 2006
+	- Added support for low-level components macros
+	- Added new test script 2.t for info queries
+	- Corrected cryptExportKey stub
+	- Added object-type constants 
+
+1.00  Fri Apr 21 09:33:23 2006
+	- First stable release

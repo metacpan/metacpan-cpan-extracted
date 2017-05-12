@@ -1,0 +1,144 @@
+%{
+my $INT    = '(int)\b';
+my $ID     = '([a-zA-Z_][a-zA-Z_0-9]*)';
+my $NUM    = '(\d+)';
+%}
+
+%token NUM = /$NUM/
+%token INT = /$INT/
+%token ID  = /$ID/
+
+%right '='
+%left '+'
+
+#%conflict decORexp {
+#  if ($self->YYIs('decl')) { $self->YYSetReduce('ID:DEC' ); }
+#  else { $self->YYSetReduce('ID:EXP' ); }
+#}
+#%explorer decORexp decl
+
+%conflict decORexp decl? ID:DEC : ID:EXP
+
+%expect-rr 1  # expect 1 reduce-reduce conflict
+
+%tree bypass
+
+%%
+prog:
+    %name EMPTY
+    /* empty */
+  | %name PROG
+    prog %decORexp? stmt
+;
+
+stmt: 
+    %name EXP
+    expr ';' 
+  | %name DECL
+    decl    
+;
+
+expr:
+    %name ID:EXP
+    ID                            %PREC decORexp 
+  | %name NUM 
+    NUM
+  | %name TYPECAST
+    INT '(' expr ')' /* typecast */ 
+  | %name PLUS
+    expr '+' expr
+  | %name ASSIGN
+    expr '=' expr
+;
+
+decl:
+    %name DECLARATOR
+    INT declarator ';'
+  | %name DECLARATORINIT
+    INT declarator '=' expr ';'
+;
+
+declarator:
+    %name ID:DEC
+    ID                            %PREC decORexp 
+  | '(' declarator ')'
+;
+
+%%
+
+####################################################
+
+=head1 SYNOPSIS
+
+Compile it with
+ 
+   eyapp -C CplusplusNested
+
+the compile it again, using 'decl' as start symbol:
+
+   eyapp -S decl -P CplusplusNested.eyp
+
+Run it with:
+
+   ./CplusplusNested.pm -t -nos -i
+
+or 
+
+   ./CplusplusNested.pm -t -i -c 'int (x) + 2; int (z) = 4;'
+
+try with inputs:
+
+     int (x) = 2;
+     int (x) + 2;
+
+the output will be a description of the generated abstract syntax tree
+
+=head1  C++ Ambiguities
+
+This grammar models a problematic part of the C++ grammar
+the ambiguity between certain
+declarations and statements. For example,
+
+     int (x) = y+z;
+
+parses as either an expr or a stmt.
+
+
+Eyapp detects this as a reduce/reduce conflict:
+
+  State 17 contains 1 reduce/reduce conflict
+
+  State 17:
+
+	expr -> ID .	(Rule 5)
+	declarator -> ID .	(Rule 11)
+
+	')'	[reduce using rule 11 (declarator)]
+	$default	reduce using rule 5 (expr)
+
+The C++ disambiguation rule is: 
+take it as a declaration if it looks as a declaration,
+otherwise is an expression.
+
+This Eyapp parser solves the problem by dynamically changing the parser.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item * The file C<Cplusplus2.eyp> in C<examples/debuggintut>
+
+=item * L<http://www.gnu.org/software/bison/manual/html_mono/bison.html#GLR-Parsers>
+
+=item * L<http://en.wikipedia.org/wiki/Significantly_Prettier_and_Easier_C%2B%2B_Syntax>
+
+=item * L<http://www.csse.monash.edu.au/~damian/papers/PS/ModestProposal.ps> 
+
+=item * L<http://www.nobugs.org/developer/parsingcpp/>
+
+=item * Edward Willink's "Meta-Compilation for C++" PhD thesis at L<http://www.computing.surrey.ac.uk/Research/CSRG/fog/FogThesis.pdf>
+
+=back
+
+=cut
+

@@ -1,0 +1,6 @@
+<div id="ajax_dialog">
+    <div class="hd">AJAX Message Dialog</div>
+    <div class="bd">
+        Message
+    </div>
+</div>

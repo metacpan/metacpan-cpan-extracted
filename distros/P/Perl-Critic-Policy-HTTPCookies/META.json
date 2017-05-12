@@ -1,0 +1,64 @@
+{
+   "abstract" : "Avoid using HTTP::Cookies",
+   "author" : [
+      "Tom Hukins <tom@eborcom.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Perl-Critic-Policy-HTTPCookies",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic::Policy" : "0",
+            "Perl::Critic::Utils" : "0",
+            "Readonly" : "0",
+            "Scalar::Util" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Perl::Critic::TestUtils" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::Policy::HTTPCookies" : {
+         "file" : "lib/Perl/Critic/Policy/HTTPCookies.pm",
+         "version" : "0.53"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Perl-Critic-Policy-HTTPCookies@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-HTTPCookies"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.scrubhole.org/Perl-Critic-Policy-HTTPCookies"
+      }
+   },
+   "version" : "0.53",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0222"
+}
+

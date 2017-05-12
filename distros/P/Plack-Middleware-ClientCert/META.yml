@@ -1,0 +1,25 @@
+---
+abstract: "Parse digital client certificates for Perl's PSGI web servers."
+author:
+  - 'Keith Carangelo <mail@kcaran.com>'
+build_requires:
+  Plack::Test: 0
+  Plack::Util: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-ClientCert
+requires:
+  Plack::Middleware: 0
+resources:
+  bugtracker: https://github.com/kcaran/Plack-Middleware-ClientCert/issues
+  homepage: https://github.com/kcaran/Plack-Middleware-ClientCert
+  repository: https://github.com/kcaran/Plack-Middleware-ClientCert.git
+version: 0.01
+x_serialization_backend: 'YAML::Tiny version 1.56'

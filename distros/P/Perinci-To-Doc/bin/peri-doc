@@ -1,0 +1,190 @@
+#!perl
+
+# FRAGMENT id=shcompgen-hint command=peri-doc
+
+our $DATE = '2017-02-27'; # DATE
+our $VERSION = '0.84'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+use Perinci::Sub::Util qw(err);
+
+eval { require Perinci::CmdLine::Classic };
+if ($@) {
+    die "This script requires Perinci::CmdLine::Classic, ".
+        "please install it first.\n";
+}
+
+our %SPEC;
+
+$SPEC{gen_doc} = {
+    v => 1.1,
+    summary => 'Display text/POD documentation of Riap function or package',
+    args => {
+        url => {
+            summary => 'URL',
+            schema => 'riap::url*',
+            req => 1,
+            pos => 0,
+        },
+        format => {
+            summary => 'Format',
+            schema => ['str', in => [qw/pod text man html/]],
+        },
+    },
+};
+sub gen_doc {
+    require File::Temp;
+    require File::Which;
+    require Perinci::Access;
+
+    state $pa = Perinci::Access->new();
+
+    my %args = @_;
+    # XXX schema
+    my $url = $args{url} or return [400, "Please specify url"];
+    $url = "pl:$url" if $url =~ m!^/!;
+    my $fname = $url; $fname =~ s!.+/!!;
+
+    my $format = $args{format} // "man";
+    $format = "text" unless
+        File::Which::which("pod2man") && File::Which::which("man");
+
+    my $res = $pa->request(info => $url);
+    return err(500, "Can't info", $res) unless $res->[0] == 200;
+    my $type = $res->[2]{type};
+
+    $res = $pa->request(meta => $url);
+    return err($res) unless $res->[0] == 200;
+    my $meta = $res->[2];
+
+    my $doc;
+    if ($type eq 'function') {
+        #use DD; dd $meta;
+        if ($format =~ /pod|man|html/) {
+            require Perinci::Sub::To::POD;
+            $doc = Perinci::Sub::To::POD->new(meta=>$meta, name=>$fname, url=>$url);
+            $res = $doc->gen_doc;
+            if ($format eq 'pod') {
+                [200, "OK", $res];
+            } elsif ($format eq 'html') {
+                my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+                [200, "OK", $res, {
+                    "cmdline.page_result"=>1,
+                    "cmdline.pager"=>"pod2html --cachedir '$tmpdir'"}];
+            } else { # man
+                [200, "OK", $res, {
+                    "cmdline.page_result"=>1,
+                    "cmdline.pager"=>"pod2man | man -l -"}];
+            }
+        } else {
+            require Perinci::Sub::To::Text;
+            $doc = Perinci::Sub::To::Text->new(meta=>$meta, name=>$fname, url=>$url);
+            $res = $doc->gen_doc;
+            [200, "OK", $res, {"cmdline.page_result"=>1}];
+        }
+    } elsif ($type eq 'package') {
+        $res = $pa->request(child_metas => $url);
+        return err(500, "Can't child_metas $url", $res) unless $res->[0] == 200;
+        my $cmetas = $res->[2];
+        #use DD; dd $cmetas;
+        if ($format =~ /pod|man|html/) {
+            require Perinci::To::POD;
+            $doc = Perinci::To::POD->new(
+                name=>$url, meta=>$meta, child_metas=>$cmetas);
+            $res = $doc->gen_doc;
+            if ($format eq 'pod') {
+                [200, "OK", $res];
+            } elsif ($format eq 'html') {
+                my $tmpdir = File::Temp::tempdir(CLEANUP=>1);
+                [200, "OK", $res, {
+                    "cmdline.page_result"=>1,
+                    "cmdline.pager"=>"pod2html --cachedir '$tmpdir'"}];
+            } else { # man
+                [200, "OK", $res, {
+                    "cmdline.page_result"=>1,
+                    "cmdline.pager"=>"pod2man | man -l -"}];
+            }
+        } else {
+            require Perinci::To::Text;
+            $doc = Perinci::To::Text->new(
+                name=>$url, meta=>$meta, child_metas=>$cmetas);
+            $res = $doc->gen_doc;
+            [200, "OK", $res, {"cmdline.page_result"=>1}];
+        }
+    } else {
+        return [412, "Unsupported entity type '$type'"];
+    }
+}
+
+$ENV{LOG} //= 0; # speed up startup, but allow overriding
+my $cmd = Perinci::CmdLine::Classic->new(
+    url => '/main/gen_doc',
+);
+delete $cmd->common_opts->{format};
+delete $cmd->common_opts->{format_options};
+$cmd->run;
+
+# ABSTRACT: Display text/POD documentation of Riap function or package
+# PODNAME: peri-doc
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+peri-doc - Display text/POD documentation of Riap function or package
+
+=head1 VERSION
+
+This document describes version 0.84 of peri-doc (from Perl distribution Perinci-To-Doc), released on 2017-02-27.
+
+=head1 SYNOPSIS
+
+From command-line:
+
+ % peri-doc /Some/Module/
+ % peri-doc --format=text https://example.com/api/some_func
+ % peri-doc --help
+
+=head1 DESCRIPTION
+
+This script will generate text/POD documentation for a Riap function or package.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-To-Doc>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/sharyanto/perl-Perinci-To-Doc>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-To-Doc>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+Support other entity types in the future.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

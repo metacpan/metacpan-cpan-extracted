@@ -1,0 +1,41 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!-- ZOOMSTOP -->
+
+<HTML>
+
+<!-- *** Created by pp2html, build 1.21 from PerlPoint-Converters 1.0202  -->
+
+<HEAD>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+
+<!-- ZOOMRESTART -->
+
+
+
+<TITLE>Version 0.006   10/27/2000</TITLE>
+</HEAD>
+
+<!-- ************************************************************** -->
+<BODY bgcolor="#FFFFFF" text="#000000" link="#0000CC" vlink="#AAAAAA" alink="#FF0000">
+<a name="Version 0.006   10/27/2000"></a>
+
+<H1>Version 0.006   10/27/2000
+</H1>
+
+<UL>
+<LI>\EMBED  \END_EMBED supported in pp2html</LI>
+<LI>Templates changed (usage of karawane-50.gif)</LI>
+<LI>Activated embedded perl code (use Safe)</LI>
+<LI>pp2latex: rudimentary support of eps files: when you use \IMAGE{src=&quot;filename.gif&quot;} a file named &quot;filename.eps&quot; will be included in the tex file (if it exists ... :-)</LI>
+<LI>ppdoc.pp updated (\INCLUDE parser-paragraphs, parser-tags and parser-active-contents from Jochen Stenzel)</LI>
+<LI>create the slide directory specified by --slide_dir as necessary</LI>
+<LI>pp2latex: included first version of TABLE support (from Alexander Sigel)</LI>
+<LI>--block_indent option for pp2html</LI>
+<LI>--no_index option for pp2html</LI>
+</UL>
+</BODY>
+</HTML>

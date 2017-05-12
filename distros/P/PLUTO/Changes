@@ -1,0 +1,99 @@
+$Id: Changes,v 1.14 2010-05-20 17:29:09 ubuntu Exp $
+
+0.30
+    - Got rid of the DBD-mySQL dependency
+
+0.29
+	- some biopax entities where not being processes properly
+	  because their base uri had >1 # appended to them.
+0.28
+    - Added owl:unionOf to what is parsed out of OWL and
+      inserted in our class map.
+    - fix: hasValue range wasnt being set properly when > 1
+      rdf:types exist.
+
+0.27
+    - Restrictions using hasValue now extracted and added to
+      class restrictions.
+    - parsing of non empty text content wasnt handled properly
+      for different serializations of text.
+    - When URIs are encountered that are slightly incorrect, we
+      attempt to correct them and not just use them as is, as this
+      is usually incorrect (and is better than throwing an 
+      exception). Example, the URI rdf:about="##bar"
+      is changed to #bar.
+0.26
+    - fixed how Module::Conditional::Load was being called
+      because the way we were doing it broke all of a sudden
+0.25
+    - added a select_parser method so that you can specify
+      the sax parser to use (defaulted in the past to pureperl
+      which is way too slow)
+    - added dependency for XML::LibXML (since we use their SAX
+      parser now by default);
+    - added a verbose param to Ontology/OWL/Lite.pm that triggers 
+      a call to debug() in init()
+    - added a 'do_impl' param to Ontology/OWL/Lite.pm that triggers
+      the ->implementations() part of Lite.pm. Look at owllite2perl.pl
+      for how to set the parameter.
+    - DBD::mysql is now a dependency iff mysql is accessible on
+      the users machine.
+      
+0.23/0.24
+    - added a check in issue_query that checks to see whether 
+      the $query was parsed correctly into a ODO::Query::RDQL
+      in ODO::Graph::Storage::Memory.
+    - added more text for warning of missing properties.
+    - bug fix: subClassOf was being added as a restriction and
+      not to inheritance 
+0.22
+    - when parsing owl files, import statements are parsed out,
+      but not traversed. They are returned to the user though.
+      NOTE: if you use prior versions of ODO::Parser::XML, your
+      code may break as statements and imports are returned after
+      calling parse. owllite2perl illustrates this.
+      
+     owllite2perl needs to be updated to produce actual modules, etc.
+     This will hopefully be accomplished next release. In SADI::SADI,
+     a code generator that is based on this module exists. However,
+     it uses RDF::Core to serialize the RDF.
+     
+     - Fixed the RDF code generator. It now produces valid Perl code.
+     - Went through ODO::Ontology::RDFS code and fixed how it processed
+       statements. Basically, I made sure that ISA/inheritance dont contain
+       any undef keys/values. Then i updated the templates so that my updates
+       to ODO::Ontology::RDFS.pm were taken into account.
+     - Updated the test scripts to take into account that parse
+       now returns statements and imports
+     - updated the example scripts to take into account the above.
+     - updated the makefile to add DBD-mysql (eventhough, the db
+       side of ODO/Pluto doesnt work).
+     - added VERSION info for each file that reflects the cvs revision to aide
+       in diff'ing the files.
+
+0.21
+    - Added missing methods that were referred to in Lite.pm
+    - Updated the OWL SAX parser so that entities prefixed by #
+      now have theh base xmlns appended to it
+    - The owl2perl example script still doesnt work 100%, but
+      a script in SADI (sadi-generate-datatypes) does something
+      similar to this script and uses ODO to do it.
+    - Cleaned up the Makefile.PL script (uses Module::Install now)
+0.20
+	- Added trivial tests for empty test suites
+	- Added ODO::DBI::Connector tests
+	- Removed database specific database drivers
+	- Factored out ODO::Ontology::Vocabulary to just ODO::Vocabulary
+	- ODO::Node constructor bug fixes
+	- Added Jena node parser tests
+	- Added Jena system graph tests
+	- Added Jena objects DB/Settings.{n3|pm}, Graph/Settings.{n3|pm}
+	- Began update of OWL::Lite code generator to new API
+	- Removed dependence on Class::ISA
+	- Added initial N3 parser in ODO::Parser::N3; it needs expanded test case coverage
+	- Added support for manipulating graphs stored by Jena
+	- ODO::Ontology and ODO::Ontology::RDFS refactored
+	- ODO::Ontology::RDFS code generation bugs fixed
+	- ODO/RDFS.pm added; contains Perl code generated from RDFS Schema
+0.10
+	- Initial release under the EPL

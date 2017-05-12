@@ -1,0 +1,111 @@
+---
+-
+  name: 'command only'
+  input: 'foo'
+  expect:
+    command: 'FOO'
+-
+  name: 'simple prefix and command'
+  input: ':test foo'
+  expect:
+    command: 'FOO'
+    prefix: 'test'
+-
+  name: 'simple prefix and command, trailing space'
+  input: ':test foo   '
+  expect:
+    command: 'FOO'
+    prefix: 'test'
+-
+  name: 'prefix, command, one middle, trailing params'
+  input: ':test!me@test.ing PRIVMSG #Test :This is a test'
+  expect:
+    command: 'PRIVMSG'
+    prefix: 'test!me@test.ing'
+    params:
+      - '#Test'
+      - 'This is a test'
+-
+  name: 'no prefix, command, one middle, trailing params'
+  input: 'PRIVMSG #foo :This is a test'
+  expect:
+    command: 'PRIVMSG'
+    params:
+      - '#foo'
+      - 'This is a test'
+-
+  name: 'prefix, command, one middle, trailing with spaces'
+  input: ':test PRIVMSG foo :A string   with spaces   '
+  expect:
+    command: 'PRIVMSG'
+    prefix: 'test'
+    params:
+      - 'foo'
+      - 'A string   with spaces   '
+-
+  name: 'extraneous spaces'
+  input: ':test   PRIVMSG   foo   :bar '
+  expect:
+    command: 'PRIVMSG'
+    prefix: 'test'
+    params:
+      - 'foo'
+      - 'bar '
+-
+  name: 'multiple middle params, prefix'
+  input: ':test foo bar baz quux'
+  expect:
+    command: 'FOO'
+    prefix: 'test'
+    params:
+      - 'bar'
+      - 'baz'
+      - 'quux'
+-
+  name: 'multiple middle params, no prefix'
+  input: 'foo bar baz quux'
+  expect:
+    command: 'FOO'
+    params:
+      - 'bar'
+      - 'baz'
+      - 'quux'
+-
+  name: 'multiple middle params, extraneous spaces'
+  input: 'foo   bar   baz   quux'
+  expect:
+    command: 'FOO'
+    params:
+      - 'bar'
+      - 'baz'
+      - 'quux'
+-
+  name: 'multiple middle params, trailing params'
+  input: 'foo bar baz quux :This is a test'
+  expect:
+    command: 'FOO'
+    params:
+      - 'bar'
+      - 'baz'
+      - 'quux'
+      - 'This is a test'
+-
+  name: 'prefix, middle params containing colons'
+  input: ':test PRIVMSG #fo:oo :This is a test'
+  expect:
+    command: 'PRIVMSG'
+    prefix: 'test'
+    params:
+      - '#fo:oo'
+      - 'This is a test'
+-
+  name: 'no prefix, middle params containing colons'
+  input: 'PRIVMSG #fo:oo :This is a test'
+  expect:
+    command: 'PRIVMSG'
+    params:
+      - '#fo:oo'
+      - 'This is a test'
+
+# FIXME tab tests
+# FIXME unicode tests

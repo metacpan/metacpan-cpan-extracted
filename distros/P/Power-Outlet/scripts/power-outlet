@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Std qw{getopts};
+use Power::Outlet;
+
+my $syntax="Syntax: power-outlet [-v] type [SWITCH|ON|OFF|CYCLE|QUERY] [opt1 val1 opt2 val2 ...]";
+my %flags=();
+getopts('vd', \%flags);
+
+die(sprintf("power-outlet: %s\n\n$syntax\n", Power::Outlet->VERSION)) if $flags{"v"};
+
+my $type       = shift or die("$syntax\n");
+my $command    = shift || "SWITCH";
+my %parameters = @ARGV;
+
+my $outlet=Power::Outlet->new(type=>$type, %parameters);
+if ($flags{"d"}) {
+  printf "Loaded: %s\n", ref($outlet); 
+  printf "Command: %s\n", $command;
+  eval 'use Data::Dumper qw{Dumper}';
+  print Dumper($outlet);
+}
+
+my $return = "";
+if ($command =~ m/\AON|\AN/i ) {
+  $return = $outlet->on;
+} elsif (($command =~ m/\AOF|\AF/i )) {
+  $return = $outlet->off;
+} elsif (($command =~ m/\AQ/i )) {
+  $return = $outlet->query;
+} elsif (($command =~ m/\AS/i )) {
+  $return = $outlet->switch;
+} elsif (($command =~ m/\AC/i )) {
+  $return = $outlet->cycle;
+} else {
+  die(qq{Error: Unknown command "$command"\n\n$syntax\n});
+}
+
+print "$return\n";
+
+__END__
+
+=head1 NAME
+
+power-outlet - Control and query a Power::Outlet device from command line
+
+=head1 SYNOPSIS
+
+  power-outlet -v
+  power-outlet iBoot    ON   host mylamp
+  power-outlet iBoot    OFF  host mylamp
+  power-outlet iBootBar ON   host mybar   outlet 1
+  power-outlet iBootBar OFF  host mybar   outlet 1
+  power-outlet WeMo     ON   host mywemo
+  power-outlet WeMo     OFF  host mywemo
+
+=head1 DESCRIPTION
+
+This script provide a command line interface to Power::Outlet devices
+
+=head1 COPYRIGHT
+
+Copyright (c) 2013 Michael R. Davis <mrdvt92>
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. 
+
+=cut

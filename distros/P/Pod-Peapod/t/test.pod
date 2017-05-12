@@ -1,0 +1,140 @@
+=head3 this is an initial head 3 header, no head1 or head2 before it.
+
+=head1 this is the first head 1 header
+
+sd f sadf asd fas df sd fsa df as df ad fa sdf as d fas df asd fa sdf as df asd f asd fa sdf sd fa sdf asd f asd ag f hdg ghsgdh h f gh dfgh df gh df gh fdg h df hdf g hdf gh dfg hdfh df h
+
+
+=head2 this is the first head 2 header
+
+fdd this is a link to L<"Bingo"> end of link
+
+
+=head3 this is head3 aaaa
+
+sd f sadf asd fas df sd fsa df as df ad fa sdf as d fas df asd fa sdf as df asd f asd fa sdf sd fa sdf asd f asd ag f hdg ghsgdh h f gh dfgh df gh df gh fdg h df hdf g hdf gh dfg hdfh df h
+
+
+=head3 this is head3 bbbb
+
+sd f sadf asd fas df sd fsa df as df ad fa sdf as d fas df asd fa sdf as df asd f asd fa sdf sd fa sdf asd f asd ag f hdg ghsgdh h f gh dfgh df gh df gh fdg h df hdf g hdf gh dfg hdfh df h
+
+=head3 this is head3 ccc
+
+sd f sadf asd fas df sd fsa df as df ad fa sdf as d fas df asd fa sdf as df asd f asd fa sdf sd fa sdf asd f asd ag f hdg ghsgdh h f gh dfgh df gh df gh fdg h df hdf g hdf gh dfg hdfh df h
+
+=head3 this is head3 dddd
+
+sd f sadf asd fas df sd fsa df as df ad fa sdf as d fas df asd fa sdf as df asd f asd fa sdf sd fa sdf asd f asd ag f hdg ghsgdh h f gh dfgh df gh df gh fdg h df hdf g hdf gh dfg hdfh df h
+
+=head2 this is head2 bbb
+
+sd f sadf asd fas df sd fsa df as df ad fa sdf as d fas df asd fa sdf as df asd f asd fa sdf sd fa sdf asd f asd ag f hdg ghsgdh h f gh dfgh df gh df gh fdg h df hdf g hdf gh dfg hdfh df h
+
+=head1 this is head1 sdfsdf
+
+sd f sadf asd fas df sd fsa df as df ad fa sdf as d fas df asd fa sdf as df asd f asd fa sdf sd fa sdf asd f asd ag f hdg ghsgdh h f gh dfgh df gh df gh fdg h df hdf g hdf gh dfg hdfh df h
+
+
+text above should be script.
+
+C<this is a big block of code>
+
+
+
+
+
+
+
+
+	even though it doesn't look like it.
+
+	text below should be scriptive.
+
+
+
+
+
+this should be a link L<"green eggs"> to head2
+
+
+=head1 this I< should > be a filename  to junk  head 1
+
+if ( $a <=> $b ) { print junk }
+
+
+=over 4
+
+=item *
+
+ITEMNAMEHERE
+
+=item *
+
+ITEMNAMEHERE
+
+=back
+
+		'',
+
+and some more text here.
+
+		[Command =  'Header1', -command =  
+			sub{ $textwindo insert('insert linestart', 
+				'=head1 HEADERNAMEHERE '); }
+		],
+
+		[Command =  'Header2', -command =  
+			sub{ $textwindo insert('insert linestart', 
+				'=head2 HEADERNAMEHERE '); }
+		],
+
+
+
+
+
+
+
+=over 4
+
+=item *
+
+First item
+
+=item *
+
+Second item
+
+=back
+
+=over 4
+
+=item Foo()
+
+Description of Foo function
+
+=item Bar()
+
+Description of Bar function
+
+=back
+
+over here
+
+=head1 Bingo
+
+the end
+
+=cut
+
+
+
+
+
+
+
+
+
+
+
+

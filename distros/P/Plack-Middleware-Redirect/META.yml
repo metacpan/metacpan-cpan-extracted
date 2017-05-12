@@ -1,0 +1,39 @@
+---
+abstract: 'A simple redirector'
+author:
+  - 'okazu-dm <uhavetwocows@gmail.com>'
+build_requires:
+  Plack::Builder: '0'
+  Plack::Test: '0'
+  Plack::Util: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Redirect
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::Redirect:
+    file: lib/Plack/Middleware/Redirect.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/okazu-dm/p5-plack-middleware-redirect/issues
+  homepage: https://github.com/okazu-dm/p5-plack-middleware-redirect
+  repository: git://github.com/okazu-dm/p5-plack-middleware-redirect.git
+version: '0.01'

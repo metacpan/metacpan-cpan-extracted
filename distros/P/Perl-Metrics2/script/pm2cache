@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+
+use strict;
+use Perl::Metrics2 ();
+
+our $VERSION = '0.01';
+
+unless ( $ARGV[0] and -d $ARGV[0] ) {
+	die("Missing or invalid PPI::Cache directory");
+}
+
+my $metrics = Perl::Metrics2->new(
+	cache => $ARGV[0],
+	study => 1,
+);
+
+$metrics->process_cache;
+
+exit(0);

@@ -1,0 +1,94 @@
+Revision history for Perl extension Proc::PID::File.
+
+1.28 2016/07/28 Dmitri Tikhonov <dmitri@cpan.org>
+    - Fix long-standing sysopen argument precedence bug, closing
+      RT#62380 and RT#102536.
+    - Fixes to POD and Makefile.PL from David Steinbrunner -- thanks!
+
+1.27 2009/10/12 18:46:27 - Erick Calder <e@arix.com>
+   - updated the Changes file
+
+1.26 2009/10/01 01:35:02 - Erick Calder <e@arix.com>
+    - implemented fixes for Cygwin support of PID verification.
+      Thanks to JDHedden for the patch.  see:
+      https://rt.cpan.org/Ticket/Display.html?id=50078
+    - fixed problem with low $COLUMNS values in certain platforms
+      (ps output wraps) - thanks to JDHedden for the patch.  see:
+      https://rt.cpan.org/Ticket/Display.html?id=15015
+    - defaulted values to avoid:
+      Use of uninitialized value in pattern match (m//)
+    - implemented taint checking patch at:
+      https://rt.cpan.org/Public/Bug/Display.html?id=6347
+      thanks to JDHedden for the patch
+    - Reinstated OO interface to solve Clinton Gormley's need for
+      maintaining multiple PID files, one for each child process
+    - Documentation: added example of specifying a directory for the
+      pidfile, as per enquiry by Milko Krachounov; added a newline for
+      debug() function as per David Hawthorne so avoid run-on sentences
+      in output
+
+1.25 2009/06/29 17:41:00 - Mike Canzoneri <mikecanzoneri@gmail.com>
+    - Added support for threads.
+    - Added test for thread support.
+
+1.24 04/04/07 19:26:32 - ekkis
+    - removed OO and procedural interfaces, leaving only the
+      simple one
+
+1.22 06/03/03 17:01:30 - ekkis
+    - incorporated a patch produced by Nigel Wetters <nwetters@cpan.org>
+      that fixed a problem with pidfile removal.  For more info See:
+        https://rt.cpan.org/Ticket/Display.html?id=1732
+      Thanks Nigel!
+
+1.21 2003/06/03 18:10:14 - ekkis
+    - changed version system to manual updates
+    - added dependency code/docs for "ps"
+    - documented that the name verification string passed to the simple
+      interface is used as a regexp
+    - ps output now parsed for COMMAND matching only
+    - Thanks to alan <alan@pair.com> for his continued support.
+
+1.6 2003/05/30 23:14:39 - ekkis
+    - verify() now takes a string to allow the user to supply the command
+      to be matched against
+
+1.5 2003/05/30 22:42:41 - ekkis
+    - added verification of pids using qx/ps/ to avoid bootup problem
+    - modified docs, added standard stuff, included warning
+
+1.4 2003/05/29 05:35:23 - ekkis
+    - implemented running() to avoid race conditions into a new
+      simple interface.  Thanks to Alan Ferrency <alan@pair.com>
+      for pointing it out and suggesting the solution
+
+0.05 Wed Jan 23 01:09:28 2002
+	- remove mtime stuff
+	- interface change, now non-OO
+
+0.04 Thu Jan 10 21:08:34 2002
+	- instead of $pid->active only returning 1 for true, it will simply
+	  return the pid of the active process. Since the pid will never be 0,
+	  active will still be true and work as documented. (thanks to Paul
+	  Baker)
+
+0.03 Wed May 23 01:23:40 2001
+	- make the module work under -T (HASANT)
+	- make the module work with forking servers -- child processes's DESTROY
+	  now won't delete the pid file (Brad Hilton)
+
+0.021 Mon Oct 30 20:49:20 2000
+	- change method of getting file's age from -M to stat() because -M
+	  returns a negative number on Solaris for files < 1 day old (reported
+	  by Tom Leoboldt)
+
+0.02  Wed Sep  6 17:24:52 2000
+	- interface change
+	- added a test suite
+
+0.011 Thu Aug 03 06:40:00 2000
+	- package wrapping fix (The tarball had been wrapped incorrectly.  All
+	  of the files in Proc-PID_File-0.01/Proc/ should be at the top level)
+
+0.01  Mon Jul 31 06:59:56 2000
+	- original version; created by h2xs 1.19

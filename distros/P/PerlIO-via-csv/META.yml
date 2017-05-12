@@ -1,0 +1,25 @@
+---
+abstract: 'PerlIO layer to convert between Excel and CSV'
+author:
+  - 'Scott Lanning <slanning@cpan.org>.'
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PerlIO-via-csv
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Text::CSV_XS: 0.59
+requires:
+  Spreadsheet::ParseExcel: 0.49
+  Spreadsheet::Read: 0.34
+  Text::CSV: 1.10
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

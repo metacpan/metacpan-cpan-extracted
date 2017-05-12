@@ -1,0 +1,9 @@
+<body>
+  <a petal:replace="string:REPLACE">t</a>
+  <a petal:content="string:CONTENT">t</a>
+  <a petal:condition="string:true">CONDITION</a>
+  <a petal:repeat="item loop">LOOP</a>
+  <a petal:omit-tag="" class="OMIT_ME">No surrounding tags</a>
+  <a foo-bar="baz">t</a>
+  <span petal:content="first_name">First</span>
+</body>

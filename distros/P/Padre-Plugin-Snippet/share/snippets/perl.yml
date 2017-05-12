@@ -1,0 +1,125 @@
+
+---
+#
+# Perl snippets bundle for Padre::Plugin::Moose
+# Written by Ahmad M. Zawawi (azawawi)
+#
+# Adapted from snipMate vim plugin by Michael Sanders (msanders)
+# https://github.com/msanders/snipmate.vim/blob/master/snippets/perl.snippets
+# snipMate is released under the MIT license
+# 
+
+# #!/usr/bin/perl
+\#!: #!/usr/bin/perl
+
+# Hash Pointer
+.: =>
+
+# Function
+sub: |
+  sub ${1:function_name} {
+    ${2:#body ...}
+  }
+
+# Conditional
+if: |
+  if (${1}) {
+    ${2:# body...}
+  }
+
+# Conditional if..else
+ife: |
+  if (${1}) {
+    ${2:# body...}
+  }
+  else {
+    ${3:# else...}
+  }
+
+# Conditional if..elsif..else
+ifee: |
+  if (${1}) {
+    ${2:# body...}
+  }
+  elsif (${3}) {
+    ${4:# elsif...}
+  }
+  else {
+    ${5:# else...}
+  }
+
+# Conditional One-line
+xif: |
+  ${1:expression} if ${2:condition};
+
+# Unless conditional
+unless: |
+  unless (${1}) {
+    ${2:# body...}
+  }
+
+# Unless conditional One-line
+xunless: |
+  ${1:expression} unless ${2:condition};
+
+# Try/Except
+eval: |
+  eval {
+    ${1:# do something risky...}
+  };
+  if ($@) {
+    ${2:# handle failure...}
+  }
+
+# While Loop
+wh: |
+  while (${1}) {
+    ${2:# body...}
+  }
+
+# While Loop One-line
+xwh: |
+  ${1:expression} while ${2:condition};
+
+# C-style For Loop
+cfor: |
+  for (my $${2:var} = 0; $$2 < ${1:count}; $$2${3:++}) {
+    ${4:# body...}
+  }
+
+# For loop one-line
+xfor: |
+  ${1:expression} for @${2:array};
+
+# Foreach Loop
+for: |
+  foreach my $${1:x} (@${2:array}) {
+    ${3:# body...}
+  }
+
+# Foreach Loop One-line
+fore: |
+  ${1:expression} foreach @${2:array};
+
+# Package
+cl: |
+  package ${1:ClassName};
+  
+  use base qw(${2:ParentClass});
+  
+  sub new {
+    my $class = shift;
+    $class = ref $class if ref $class;
+    my $self = bless {}, $class;
+    $self;
+  }
+  
+  1;
+
+# Read File
+slurp: |
+  my $${1:var};
+  { local $/ = undef; local *FILE; open FILE, "<${2:file}"; $$1 = <FILE>; close FILE }
+
+# Create a new instance of a class
+new: my $${1:instance} = ${2:ClassName}->new;

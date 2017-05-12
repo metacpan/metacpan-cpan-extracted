@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+use strict;
+
+use Parse::SQLOutput;
+use YAML::XS;
+use Getopt::Long;
+
+my $as = 'hoh';
+my $header = 0;
+my $key = '';
+
+my $input = do { local $/; <STDIN> };
+
+GetOptions(
+    'as=s' => \$as,
+    'header' => \$header,
+    'key=s' => \$key,
+);
+
+my @data = Parse::SQLOutput->new(
+    as => $as,
+    header => $header,
+    key => $key,
+)->parse($input);
+
+print YAML::XS::Dump(@data);

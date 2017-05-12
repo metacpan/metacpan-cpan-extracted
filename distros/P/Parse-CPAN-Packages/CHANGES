@@ -1,0 +1,91 @@
+CHANGES file for Parse::CPAN::Packages
+
+2.40 Fri Feb  7 23:44:00 BST 2015
+  - changelog fix ( thanks to Karen Etheridge <ether@cpan.org> )
+
+2.39 Fri Feb  6 23:44:00 BST 2015
+  - ported from Moose to Moo ( thanks to Olaf Alders <olaf@wundercounter.com> )
+  - github repo added to metadata ( thanks to Olaf Alders <olaf@wundercounter.com> )
+
+2.38 Mon Dec  3 14:57:00 BST 2012
+  - removed some dependency on hash ordering in the tests
+
+2.37 Mon Jul 23 21:59:55 BST 2012
+  - Version bump to repackage due to issue installing using cpanm
+
+2.36 Mon Jul  9 13:58:00 GMT+2 2012
+  - moved author tests to xt to avoid them being run on the user side
+
+2.35 Mon Sep 12 21:47:00 GMT+2 2011
+  - added rudimentary logic to return the subs in a package, as well as verify via regex whether a given sub is in the package
+
+2.34 Tue Aug 30 15:03:00 GMT+2 2011
+  - added methods to the generated objects to try and retrieve dist contents from a local cpan mirror
+  - some refactoring/cleanup with no functional changes
+
+2.33 Sun Dec 27 10:42:59 GMT+2 2010
+  - updated documentation
+    - explanation on how to use local cpan cache ( thanks to Slaven Rezić <SREZIC@cpan.org> )
+    - spelling and package name fixes ( Phillip Moore <w.phillip.moore@gmail.com> )
+  - improved memory use a bit by eleminating temp variable ( thanks to Chris 'BinGOs' Williams <chris@bingosnet.co.uk> )
+
+2.32 Sun Dec 26 14:02:59 GMT+2 2010
+  - better windows compatibility ( thanks to Vincent Pit <perl@profvince.com> )
+
+2.31 Thu Apr 23 11:55:59 BST 2009
+  - use BUILDARGS and BUILD instead of having our own constructor
+
+2.30 Fri Jan 23 10:09:05 GMT 2009
+  - switch to using Moose
+  - use Compress::Zlib instead of IO::Zlib for speed
+  - minor code cleanups
+  - add human-readable license
+  - add an abstract to Makefile.PL
+  - add pod tests, more documentation
+
+2.29 Tue Aug 19 18:37:02 BST 2008
+  - parse the preamble and add methods to access the fields
+    (patch by Mark Fowler)
+
+2.28 Tue Aug 12 08:02:22 BST 2008
+  - stop version.pm warnings
+
+2.27 Sun Dec  2 14:50:14 GMT 2007
+  - fix typo in _ensure_latest_distribution (patch by Kenichi Ishigaki)
+  - stop using Module::Build
+
+2.26 Wed Jun 14 07:31:26 BST 2006
+  - use version.pm (or number comparison if that fails) instead of
+    Sort::Versions for latest_distribution() (spotted by Thomas Klausner)
+  - run perltidy on the source
+
+2.25 Tue Jul  5 01:16:48 BST 2005
+  - fix bug where passing in the gz contents was not working
+
+2.24 Sun Feb  6 10:40:36 GMT 2005
+  - make the new() example in the docs work (spotted by Adam Kennedy)
+
+2.23 Sat Feb  5 17:20:48 GMT 2005
+  - the distribution() method is now documented
+  - remove an "undefined hash element" warning
+
+2.21 Tue Jun 29 14:57:11 BST 2004
+  - now we're able to read the gzipped file directly (using IO::ZLib)
+
+2.20 Sat Mar  6 20:21:57 GMT 2004
+  - list Sort::Versions as a prereq
+  - try and make test more portable (added 'sort')
+  - use Class::Accessor::Fast instead of Class::Accessor::Chained
+
+2.19 Wed Mar  3 22:21:18 GMT 2004
+  - new methods to get the latest distribution and distributions
+  - possibility to pass the contents of 02packages in addition to the
+    filename
+
+2.17 Wed Feb 25 10:29:07 GMT 2004
+  - fix a documentation glitch in the main module
+  - make a ->distributions hash available
+  - A distribution now contains packages
+
+2.12 Fri Feb 13 18:42:57 GMT 2004
+  - first release (suggested by Richard Clamp)

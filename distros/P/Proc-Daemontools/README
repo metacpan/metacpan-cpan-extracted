@@ -1,0 +1,38 @@
+Proc/Daemontools version 1.06
+=============================
+
+This module is a Perl interface for Daemontools package. 
+
+Daemontools was written by Dan Bernstein and is intended to control Unix/Linux 
+daemons.
+								    
+See the Proc::Daemontools man page that was installed with this module for
+information on how to use it in your perl programs.
+
+This module was written on a machine using Daemontools 0.76. If you have and older
+version of daemontools, possibly it will work also.
+
+Please submit bug reports, patches and comments to bnegrao@engepel.com.br.
+
+DEPENDENCIES
+
+    1) the Daemontools package. Version 0.76 is preferred.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   1 - perl Makefile.PL
+   2 - make
+   3 - make test
+   4 - make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Bruno Negrao
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,6 @@
+NAME
+    PDL::Finance::Talib - DEPRECATED (use PDL::Finance::TA instead)
+
+SEE ALSO
+    PDL::Finance::TA
+

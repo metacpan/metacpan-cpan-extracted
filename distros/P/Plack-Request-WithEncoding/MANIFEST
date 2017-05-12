@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/request.pl
+lib/Plack/Request/WithEncoding.pm
+minil.toml
+t/00_compile.t
+t/01_request.t
+xt/local_functions.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/vars.t
+META.yml
+MANIFEST

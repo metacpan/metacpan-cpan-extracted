@@ -1,0 +1,19 @@
+while (1) {}
+while (1) {} continue {}
+LABEL: while (1) {}
+LABEL: while (1) {} continue {}
+until (1) {}
+LABEL: until (1) {}
+foreach qw{} {}
+foreach () {}
+LABEL: foreach $foo ( 1 .. 20 ) {
+}
+foreach my $foo () {}
+foreach state $foo () {}
+for my $foo () {}
+for state $foo () {}
+foreach $foo () {}
+for $foo () {}
+for $foo qw<blah> {}
+for (my $a = 0; $a < 10; $a++) {
+}

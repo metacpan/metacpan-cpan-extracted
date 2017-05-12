@@ -1,0 +1,133 @@
+==================================================
+Changes from 2013-11-03 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.360 at 2014-11-03 18:39:01 +0000
+------------------------------------------
+
+  Change: 321dbe7f3249bb5c82c83fbad8a9faf2b0319f22
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-11-03 11:51:29 +0000
+
+    Update dist.ini for relatively new plugi behaviors. 
+
+  Change: 88af7cb4cc1bd0cb92bcfd3d2e986264f2c040d7
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-10-30 12:38:45 +0000
+
+    Reflect a change in POE::Kernel->stop() behavior. 
+
+------------------------------------------
+version 1.359 at 2014-07-27 07:07:53 +0000
+------------------------------------------
+
+  Change: e9ea00e6e02120b66577e68f1a969cb550eaf3ed
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-27 03:07:53 +0000
+
+    Merge pull request #4 from Hugmeir/master
+
+    Don't assume that /tmp exists, use File::Temp instead 
+
+  Change: b96cbffbbf9e418014bb049449989ccc9a53f505
+  Author: Brian Fraser <fraserbn@gmail.com>
+  Date : 2014-07-27 03:35:16 +0000
+
+    Don't assume that /tmp exists, use File::Temp instead
+
+    Some unixy systems don't have /tmp (android, blackberry 10) which was
+    causing tests in POE to fail. 
+
+------------------------------------------
+version 1.358 at 2014-07-12 22:14:15 +0000
+------------------------------------------
+
+  Change: 9bb32997c9b77e5c3ae33229f3e8b0aae3ad5263
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-12 18:14:15 +0000
+
+    Take 3.5sec off each wheel_tail.pm test run. 
+
+  Change: 50ce8766b931274fcc11ee8da6f1353418f9fb91
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-12 17:36:11 +0000
+
+    Take about 1.5 sec off z_steinert_signal_integrity.pm.
+
+    Most of these fixes are merely reducing timeouts once an expected
+    condition is met. The long wait-for-failure timeout isn't as
+    important once a test has passed, but turning off the timer entirely
+    isn't good either. There could be spurious events that we don't want,
+    and waiting a little extra time gives us some confidence they aren't
+    happening. 
+
+  Change: d7fa569f98714c2a7df7904c034988961fb569ba
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-12 17:28:57 +0000
+
+    Take about 2sec off each k_signals.pm test. 
+
+  Change: 28eb3a365918bf2d283450a2d9bcee7705740355
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-12 17:20:45 +0000
+
+    Take about 3sec off sig_child() tests. 
+
+------------------------------------------
+version 1.357 at 2014-07-12 06:35:21 +0000
+------------------------------------------
+
+  Change: b38be9a86069bdb41244d40198bd30fa94c9cda0
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-12 02:35:21 +0000
+
+    Take about 2sec off each POE::Wheel::Accept test that runs. 
+
+  Change: dc33d14687a3c44e118e4ea702700b54a5e085e5
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-12 02:26:30 +0000
+
+    Take about 3sec off the UDP SocketFactory test. 
+
+  Change: 63153832441b24466c948c375ac3d5f4f7d46eb5
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-12 00:58:37 +0000
+
+    Reduce the time to test basic timers. 
+
+------------------------------------------
+version 1.356 at 2014-07-12 02:41:59 +0000
+------------------------------------------
+
+  Change: a99ffee13fa9a7d149479f89b20855ec4f299e9d
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-11 22:41:59 +0000
+
+    Reduce the time for another test from ~9sec to ~3.5sec. 
+
+  Change: 49b986fda759a77198fd9a315474797b6619b376
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-11 22:09:46 +0000
+
+    Reduce the ending timeout for wheel_tail.pm. 
+
+------------------------------------------
+version 1.355 at 2014-07-08 04:36:33 +0000
+------------------------------------------
+
+  Change: abba8d0ecf3f47a70c4fc52c94b6affdd1f701d8
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-08 00:36:33 +0000
+
+    Resolve some CPAN and Dist::Zilla package recognition issues. 
+
+  Change: c2dbf198a3bebd4885cacf6911454282d20222d0
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-04-08 00:10:24 +0000
+
+    Switch a test from ok() to is() for more fail-time information. 
+
+=================================================
+Plus 29 releases after 2013-11-03 00:00:00 +0000.
+=================================================

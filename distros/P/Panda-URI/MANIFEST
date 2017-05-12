@@ -1,0 +1,39 @@
+Changes
+cloning.xsi
+encode.xsi
+lib/Panda/URI.pm
+lib/Panda/URI.pod
+Makefile.PL
+MANIFEST			This list of files
+misc/mytest.plx
+schemas.xsi
+src/panda/uri.h
+src/panda/uri/all.h
+src/panda/uri/encode.cc
+src/panda/uri/encode.h
+src/panda/uri/ftp.h
+src/panda/uri/http.h
+src/panda/uri/Query.h
+src/panda/uri/Strict.h
+src/panda/uri/URI.cc
+src/panda/uri/URI.h
+src/xs/uri.h
+src/xs/uri/XSURI.cc
+src/xs/uri/XSURI.h
+t/00-Panda-URI.t
+t/01-encode.t
+t/02-parse.t
+t/03-change.t
+t/04-strict-class.t
+t/05-query.t
+t/06-path_segments.t
+t/07-clone.t
+t/08-custom-scheme.t
+t/09-storable.t
+t/10-json.t
+t/99-leaks.t
+typemap
+URI.xs
+URI.xsi
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

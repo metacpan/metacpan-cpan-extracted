@@ -1,0 +1,15 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+datarootdir=${prefix}/share
+datadir=${datarootdir}
+
+privincludedir=${includedir}/evolution-data-server-2.30
+
+Name: libedatabook
+Description: Backend library for evolution address books
+Version: 2.30.3
+Requires: libedataserver-1.2 libebook-1.2 dbus-glib-1
+Libs: -L${libdir} -ledata-book-1.2
+Cflags: -I${privincludedir}

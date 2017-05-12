@@ -1,0 +1,26 @@
+---
+abstract: 'Minimal Lightweight PDF Library'
+author:
+  - 'Father Chrysostomos <sprout at, um, cpan . org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDF-Tiny
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Compress::Zlib: '0'
+  File::Copy: '0'
+  Hash::Util::FieldHash: '0'
+  lib: '0'
+  warnings: '0'
+version: '0.08'

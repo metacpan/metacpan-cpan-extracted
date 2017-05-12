@@ -1,0 +1,35 @@
+PLP - PERL IN HTML PAGES
+
+PLP is yet another Perl embedder, primarily for HTML documents. Unlike
+with other Perl embedders, there is no need to learn a meta-syntax or
+object model: one can just use the normal Perl constructs. PLP runs
+under FastCGI and mod_perl for speeds comparable to those of PHP, but
+can also be run as a standard CGI script.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, documentation will be installed as manual pages:
+
+    man PLP
+
+It can also be found at CPAN:
+
+    http://search.cpan.org/dist/PLP
+
+COPYRIGHT
+
+Copyright (c) 2000-2002 Juerd Waalboer, 2005-2008 Mischa POSLAWSKY.
+All rights reserved.
+
+This software is free software; you can redistribute and/or modify it
+under the terms of the MIT/X11 license (see COPYING).
+

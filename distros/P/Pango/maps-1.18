@@ -1,0 +1,5 @@
+#
+# this file defines mappings only for types that existed in pango 1.18.x
+#
+
+PANGO_TYPE_CAIRO_FONT	PangoCairoFont	GInterface	Pango::Cairo::Font

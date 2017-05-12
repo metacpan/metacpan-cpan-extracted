@@ -1,0 +1,8 @@
+=pod
+
+=sql SQL::Abstract->select(
+  'toto_table',
+  'id, name'
+)
+
+=cut

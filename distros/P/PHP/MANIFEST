@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+PHP.pm
+PHP.c
+PHP.h
+array.c
+test.pl
+META.yml
+README
+META.json                                Module JSON meta-data (added by MakeMaker)

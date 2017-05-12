@@ -1,0 +1,214 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use English qw( -no_match_vars );
+use Getopt::Long;
+use Pod::Usage;
+
+use lib 'lib';
+use Provision::Unix;
+use Provision::Unix::User;
+
+my $prov = Provision::Unix->new( debug => 0 );
+my $user = Provision::Unix::User->new( prov => $prov, debug => 0 );
+my $util = $prov->get_util;
+
+# process command line options
+Getopt::Long::GetOptions(
+
+    'action=s' => \my $action,
+
+    'comment=s'  => \$user->{gecos},
+    'domain=s'   => \$user->{domain},
+    'expire=s'   => \$user->{expire},
+    'gid=s'      => \$user->{gid},
+    'homedir=s'  => \$user->{homedir},
+    'password=s' => \$user->{password},
+    'ssh_key=s'  => \$user->{ssh_key},
+    'quota=s'    => \$user->{quota},
+    'shell=s'    => \$user->{shell},
+    'uid=s'      => \$user->{uid},
+    'username=s' => \$user->{username},
+    'verbose'    => \$user->{debug},
+
+    'help'       => \my $help,
+    'version'    => \my $version,
+) or die "error parsing command line options";
+
+pod2usage( { -verbose => 3 } ) if $help;
+$prov->get_version() and exit if $version;
+die "\n$0 must be run as root!\n\n" if !$EFFECTIVE_USER_ID == 0;
+
+my $conf = $prov->{config};
+$user->{debug} || 0;   # so it's not undef
+
+
+my %actions = map { $_ => 1 }
+    qw/ create destroy suspend restore show repair test creategroup destroygroup modify /;
+pod2usage( { -verbose => 1 } ) if !$actions{$action};
+
+  $action eq 'create'       ? user_create() 
+: $action eq 'creategroup'  ? group_create() 
+: $action eq 'destroy'      ? user_destroy()
+: $action eq 'destroygroup' ? group_destroy()
+: $action eq 'modify'       ? user_modify()
+: die "oops, that feature isn't ready yet\n";
+
+# future functions....
+#: $action->{'suspend'} ? $user->suspend( prompt=>1 )
+#: $action->{'restore'} ? $user->restore( prompt=>1 )
+#: $action->{'show'}    ? $user->show   ( prompt=>1 )
+#: $action->{'repair'}  ? $user->repair ( prompt=>1 )
+#: $action->{'test'}    ? $user->test   ( prompt=>1 )
+
+sub user_create {
+    $user->{username} ||= $util->ask( 'Username' ) || die;
+    $prov->error( "user exists",debug=>0) if $user->exists($user->{username});
+    $user->{password} ||= $util->ask( 'Password', password => 1 );
+    $user->{uid} ||= $util->ask( 'uid' );
+    $user->{gid} ||= $util->ask( 'gid' );
+    if ( $user->{gid} =~ /^[a-zA-Z]+$/ ) {
+        my $gid = getgrnam($user->{gid});
+        if ( ! $gid ) {
+            $user->create_group(group=>$user->{gid}) 
+                if $util->ask( 'group does not exist, create it');
+            $gid = getgrnam($user->{gid}) || die;
+            $user->{gid} = $gid;
+        }
+    }
+    $user->{shell} ||= $util->ask( 'shell',
+        default  => $conf->{User}{shell_default}
+    );
+    $user->{homedir} ||= $util->ask( 'homedir',
+        default  => "$conf->{User}{home_base}/$user->{username}"
+    );
+    $user->{gecos} ||= $util->ask( 'gecos' );
+    if ( $conf->{quota_enable} ) {
+        $user->{quota} ||= $util->ask( 'quota',
+            default  => $conf->{User}{quota_default}
+        );
+    }
+
+    $user->_is_valid_request();
+    $user->create(
+        username => $user->{username},
+        password => $user->{password},
+        uid      => $user->{uid},
+        gid      => $user->{gid},
+        shell    => $user->{shell},
+        homedir  => $user->{homedir},
+        gecos    => $user->{gecos},
+        quota    => $user->{quota},
+        debug    => $user->{debug},
+    );
+};
+
+sub user_modify {
+    $user->{username} ||= $util->ask( 'Username' ) || die;
+    $user->{password} ||= $util->ask( 'Password', password => 1 );
+    $user->{ssh_key} ||= $util->ask( 'SSH public key' );
+    $user->modify(
+        username => $user->{username},
+        password => $user->{password},
+    );
+};
+
+sub user_destroy {
+
+    $user->{username} ||= $util->ask( 'Username' ) || die;
+
+    $user->exists() or die "user $user->{username} does not exist\n";
+    $user->_is_valid_request();
+    $user->destroy( username => $user->{username} );
+};
+
+sub group_create {
+    $user->{group} ||= $util->ask( 'Group' ) || die;
+    $user->create_group( group=>$user->{group} );
+}
+
+sub group_destroy {
+    my $gid = $user->{gid} || $util->ask( 'gid' );
+    if ( $gid ) {
+        $user->{group} = getgrgid( $gid );
+    }
+    my $group = $user->{group} || $util->ask( 'Group' ) || die;
+    $gid   ||= getgrnam($group);
+    $group = getgrnam($gid);
+    die "invalid group or gid" if ( !$gid || ! $group);
+    $user->destroy_group( gid=>$gid, group=>$group );
+}
+
+
+=head1 NAME 
+
+prov_user - a command line interface for provisioning users and groups
+
+=head1 SYNOPSIS
+
+  prov_user --action=[]
+
+Action is one of the following:
+
+  create   - creates a new system user
+  modify   - make changes to an existing user
+  destroy  - remove a user from the system
+  suspend  - disable an account
+  restore  - restore an account
+
+Other parameters are optional. Unless you specify --noprompt, you will be prompted for fill in any missing values.
+
+   --username
+   --comment   - gecos description
+   --domain    - a domain name, if associated with the account
+   --expire    - account expiration date
+   --gid       - group id
+   --homedir   - the full path to the users home directory
+   --password
+   --quota     - disk quota (in MB)
+   --shell
+   --uid       - user id
+   --verbose   - enable debugging options
+
+
+=head1 USAGE
+ 
+ prov_user --action create  --user=matt --pass='neat0app!'
+ prov_user --action destroy --user=matt
+ prov_user --action modify  --user=matt --quota=500
+ 
+
+=head1 DESCRIPTION
+ 
+prov_user is a command line interface to the Provision::User provisioning modules. 
+
+ 
+=head1 CONFIGURATION AND ENVIRONMENT
+ 
+Default settings are found in provision.conf, which should be located in your systems local etc directory (/etc, /usr/local/etc, or /opt/local/etc).
+
+=head1 DEPENDENCIES
+ 
+A list of all the other modules that this module relies upon, including any
+restrictions on versions, and an indication whether these required modules are
+part of the standard Perl distribution, part of the module's distribution,
+or must be installed separately.
+
+
+=head1 AUTHOR
+ 
+Matt Simerson, C<< <matt at tnpi.net> >>
+ 
+ 
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2008 The Network People, Inc. (info@tnpi.net)
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

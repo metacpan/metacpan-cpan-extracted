@@ -1,0 +1,38 @@
+---
+abstract: 'p5u plugin to scan a file or directory for Perl dependencies'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: P5U::Command::Deps
+name: P5U-Command-Deps
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Discover: 0
+  List::MoreUtils: 0
+  P5U: 0
+  Path::Class::Dir: 0
+  Path::Class::File: 0
+  Path::Class::Rule: 0
+  Perl::PrereqScanner: 0
+  perl: 5.10.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=P5U-Command-Deps
+  homepage: https://metacpan.org/release/P5U-Command-Deps
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/tobyink/p5-p5u-command-deps
+version: 0.005

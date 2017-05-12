@@ -1,0 +1,69 @@
+# A simple grammar for the simple JSON data language.
+# For parser implementations that use this grammar, see:
+# * https://github.com/ingydotnet/pegex-json-pm
+
+%grammar json
+%version 0.0.1
+%include pegex-atoms
+
+json: - value -
+
+object:
+  /- '{' -/
+  pair* % /- ',' -/
+  /- '}' -/
+
+pair: string /- ':' -/ value
+
+array:
+  /- '[' -/
+  value* % /- ',' -/
+  /- ']' -/
+
+value:
+  | string
+  | number
+  | object
+  | array
+  | true
+  | false
+  | null
+
+# string and number are interpretations of http://www.json.org/
+string: /
+  DOUBLE
+    (
+      (:
+        BACK (:     # Backslash escapes
+          [
+            DOUBLE    # Double Quote
+            BACK    # Back Slash
+            SLASH     # Foreward Slash
+            'b'     # Back Space
+            'f'     # Form Feed
+            'n'     # New Line
+            'r'     # Carriage Return
+            't'     # Horizontal Tab
+          ]
+        |
+          'u' HEX{4}    # Unicode octet pair
+        )
+      |
+        [^ DOUBLE CONTROLS ]  # Anything else
+      )*
+    )
+  DOUBLE
+/
+
+number: /(
+  DASH?
+  (: '0' | [1-9] DIGIT* )
+  (: DOT DIGIT* )?
+  (: [eE] [ DASH PLUS ]? DIGIT+ )?
+)/
+
+true: 'true'
+
+false: 'false'
+
+null: 'null'

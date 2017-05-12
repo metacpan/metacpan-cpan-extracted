@@ -1,0 +1,10 @@
+Makefile.PL
+MANIFEST
+INSTALL
+README
+lib/PDF/API2/Simple.pm
+examples/01_barebones.pl
+examples/02_links.pl
+examples/03_autoflow.pl
+examples/04_headers.pl
+t/01.t

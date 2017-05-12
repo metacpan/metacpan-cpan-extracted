@@ -1,0 +1,172 @@
+=head1 An overview of Data Templates in Pinwheel
+
+Data view templates are Perl scripts (with a few restrictions).  The
+contents of the template is wrapped in an anonymous sub, and on each call
+the parameters in the 'template' Context object are exposed as local
+variables.  The template has access to a TAG function, and AUTOLOAD is set
+to call TAG for any undefined function calls.
+
+The template must return whatever is returned from the outermost TAG call.
+Since the calling context is not defined, it is recommended that the template
+simply end with the final TAG call.
+
+The TAG function takes a tag name ("schedule", "dc:title", etc), an
+optional list of key/value pairs, and optional content.  For example:
+
+  TAG("br");
+  TAG("body", class => "episode");
+  TAG("strong", "important content");
+  TAG("a", href => "/foo", "Link to foo");
+
+Due to the AUTOLOAD, these could all be written as:
+
+  br();
+  body(class => "episode");
+  strong("important content");
+  a(href => "/foo", "Link to foo");
+
+Serialised as XML these would be:
+
+  <br/>
+  <body class="episode"/>
+  <strong>important content</strong>
+  <a href="/foo">Link to foo</a>
+
+And as JSON:
+
+  {"br":null}
+  {"body":{"class":"episode"}}
+  {"strong":"important content"}
+  {"a":{"href":"/foo","$":"Link to foo"}}
+
+Note the last two lines.  If a tag contains attributes, the JSON value
+will be a hash containing those attributes.  If a tag doesn't contain
+attributes, the JSON value will be either null or a string.  If a tag
+contains both attributes and a string value, the string will be merged in
+as an attribute with the key "$".
+
+The ":" in namespace prefixes is converted to a "$" in the JSON/YAML
+serialisations, eg:
+
+  TAG("po:microsite", "rdf:resource" => "/foo");
+
+As XML:
+
+  <po:microsite rdf:resource="/foo"/>
+
+And as JSON:
+
+  {"po$microsite":{"rdf$resource":"/foo"}}
+
+This keeps the keys valid JavaScript identifiers, so you could reach
+"/foo" with E<lt>objectE<gt>.po$microsite.rdf$resource
+
+Nested tags are created by using an anonymous sub for the content, eg:
+
+  div(sub { span("foo") });
+  body(id => "foo", sub { p("content") });
+
+As XML:
+
+  <div><span>foo</span></div>
+  <body id="foo"><p>content</p></body>
+
+And as JSON:
+
+  {"div":{"span":"foo"}}
+  {"body":{"id":"foo","p":"content"}}
+
+Note that attributes and child tags are combined in the JSON (and YAML)
+outputs -- if you have attributes with the same name as child tags, you'll
+lose one or the other.
+
+To represent a list of items you might do something like this:
+
+  list(sub {
+    item("one");
+    item("two");
+    item("three");
+  });
+
+As XML you'd get:
+
+  <list><item>one</item><item>two</item><item>three</item></list>
+
+But this wouldn't work for the JSON and YAML outputs, because each new
+"item" key would overwrite the previous one.  To fix this you need to add
+an underscore to the end of the "list" tag name:
+
+  list_(sub {
+    item("one");
+    item("two");
+    item("three");
+  });
+
+The trailing underscore is removed before output, and has no effect on the
+XML serialisation, which remains the same as above.  But for the JSON and
+YAML serialisations it means that the contents should be represented by an
+array, ignoring the child tag names:
+
+  {"list":["one","two","three"]}
+
+Another example, where the items have attributes:
+
+  list_(sub {
+    item(n => 4, "four");
+    item(n => 2, "two");
+  });
+
+As XML:
+
+  <list><item n="4">four</item><item n="2">two</item></list>
+
+And as JSON:
+
+  {"list":[{"n":4,"$":"four"},{"n":"2","$":"two"}]}
+
+Parameters from the "template" context are made available as local
+variables with the same name.  For example, given this:
+
+  Context::set("template", msg => "hello");
+
+And this template:
+
+  text($msg);
+
+You'd get (XML/JSON):
+
+  <text>hello</text>
+  {"text":"hello"}
+
+Any undeclared variable in the template is assumed to be a parameter from
+the current "template" context, and you'll get an error if you don't set
+values for all the undeclared variables in the template. However, the
+parser is very simple minded and sees $something[0] as a use of $something
+rather than @something, so it's advisable to stick to scalar variables in
+the template.
+
+As a data template has multiple serialisations, the render call is
+slightly different.  The template is selected with via =E<gt> "hash", and the
+output format (xml, json, yaml) with the format parameter or inherited from
+a respond_to container.  For example...
+
+Use "foo/bar.hash.data" to generate a JSON result:
+
+  render(template => "foo/bar", format => "json", via => "hash");
+
+Use "foo/bar.hash.data" to generate an XML or JSON result:
+
+  respond_to(
+    xml => sub { render(template => "foo/bar", via => "hash") },
+    json => sub { render(template => "foo/bar", via => "hash") }
+  );
+
+Similar to other calls, if the template name matched the current
+controller and action the above could be simplified down to:
+
+  respond_to(
+    xml => sub { render(via => "hash") },
+    json => sub { render(via => "hash") }
+  );
+
+=cut

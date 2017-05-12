@@ -1,0 +1,5 @@
+Changes for Padre-Plugin-Snippet
+
+0.01  2012.3.9
+    - Initial release to CPAN. This plugin was refactored from
+      Padre::Plugin::Moose (AZAWAWI)

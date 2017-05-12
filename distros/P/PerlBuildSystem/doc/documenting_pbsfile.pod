@@ -1,0 +1,104 @@
+
+=head1 DOCUMENTING PBSFILES AND PBS MODULES
+
+Pbsfiles are documented using POD. See I<man perlpod> for a complete reference.
+
+B<PBS> has  commands to help you extract POD documentation from your Pbsfiles.
+Comments, starting with '#', are not POD and thus not extracted.
+
+Two types of POD can be embedded in Pbsfiles pr PBS modules.
+
+=head2 POD documenting how to use the Pbsfile
+
+Documenting how to use a Pbsfile is most often used to help the user find out 
+which targets are defined and how to invokethe PBS command line utility (I<pbs>).
+The output is filtered through pod2text for your convenience.
+
+Extracting the POD:
+
+  pbs --pbsfile_pod 
+  pbs --pp
+
+Pbsfile pod start withBI<=for PBS> followed by a B<=head> tag. It ends when PBS
+either finds:
+
+=over 2
+
+=item * a B<=head> tag of a higher level
+
+=item * B<=for PBS STOP> is found.
+
+=back
+
+You can interleave Pbsfile documentation and structural documentation if you so
+wish.
+
+=head2 POD documenting the structure of the Pbsfile
+
+The structural documentation is the development documentation. It is used to
+explain the Pbsfile structure to the build system maintainers.
+
+This is normal POD. I<pbs> will extract this type of document when the I<--pbs2pod>
+switch is given to I<pbs>. The output is also filtered through pod2text.
+
+
+Extracting the POD:
+
+  pbs --pbs2pod
+
+=head2 Generating HTML and other formats
+
+When given the I<--raw_pod> switch, I<pbs> will not filter the POD with pod2text.
+This allows you to use any of the POD filters available on CPAN.
+
+  pbs --pbs2pod --raw_pod | pod2html > structure_documentation.html
+
+=head2 Example
+
+  =for PBS =head1 PBSFILE HELP
+  
+  =head2 Simple Java build one class example
+  
+  =head2 Targets
+  
+  =over 2 
+  
+  =item * all
+  
+  =back
+  
+  =for PBS STOP
+  
+  This section was not necessary as the next =head tag has higher level. This 
+  sections content will not be extracted.
+  
+  =cut
+  
+  #-------------------------------------------------------------
+  
+  =head1 Structural documentation
+  
+  We let PBS know that B<.java> files are considered source code.
+  
+  =cut
+  
+  ExcludeFromDigestGeneration('java-files' => qr/\.java$/);
+  
+  #-------------------------------------------------------------
+  
+  my @classes = qw(HelloWorld.class) ;
+  
+  =head1 Rules
+  
+  =head2 all
+  
+  We declare a rule to match the I<all> target. This is a convenience rule
+  as we could build I<HelloWorld.class> directly from the command line.
+  
+  =cut
+  
+  ...
+
+=cut
+
+

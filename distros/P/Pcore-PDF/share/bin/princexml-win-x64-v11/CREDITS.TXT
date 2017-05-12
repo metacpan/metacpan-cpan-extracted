@@ -1,0 +1,16 @@
+Licenses for open source libraries used by Prince can be found
+in the following locations in the installation package:
+
+Fontconfig              contrib/COPYING-fontconfig
+FreeType                contrib/LICENSE-freetype
+libcurl                 contrib/COPYING-curl
+libxml2                 contrib/COPYING-libxml2
+jpeglib                 contrib/README-jpeglib
+GIFLIB                  contrib/COPYING-giflib
+zlib                    contrib/README-zlib
+LIBTIFF                 contrib/COPYRIGHT-libtiff
+libpng                  contrib/LICENSE-libpng
+cairo                   contrib/COPYING-cairo
+pixman                  contrib/COPYING-pixman
+Little CMS              contrib/COPYING-lcms
+libthai, datrie         contrib/COPYING-LGPL-2.1

@@ -1,0 +1,28 @@
+Revision history for Perl extension Path::Class::URI
+
+0.08  2014-12-30 17:46:12 CST
+        - bump version of Path::Class so that it has the `components()` method.
+
+0.07  2014-12-22 11:03:10 CST
+        - update dependencies for testing and building
+
+0.06  2014-12-16 22:37:04 CST
+        - fix test so that it passes on Win32
+
+0.05  2014-12-15 18:55:31 CST
+        - components of path must be escaped for URI
+        - add support for passing in a base URI
+
+0.04  Wed Dec  3 16:35:55 JST 2008
+        - Updated VERSION
+
+0.03  Tue Dec  2 18:03:38 JST 2008
+        - Fix for Win32 issue (mattn)
+
+0.02  Tue Dec  2 17:35:16 JST 2008
+        - open() now works
+        - Added ufile() and udir() to Path::Class::File and Dir for transformation
+          (Thanks to mattn and charsbar)
+
+0.01  Mon Dec  1 14:46:39 2008
+        - original version

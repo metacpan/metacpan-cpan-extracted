@@ -1,0 +1,11 @@
+=head1 NAME
+
+A::B - module A::B
+
+=head1 LINKS
+
+L<A>
+L<A::B>
+L<C>
+L<C::D>
+L<C::D::E>

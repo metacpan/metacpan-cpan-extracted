@@ -1,0 +1,54 @@
+POE/Component/Enc/Flac version 1.01
+===================================
+
+This is a POE component for wrapping the lossless audio encoder 'flac'
+
+POE is a multitasking framework for Perl. FLAC stands for Free Lossless 
+Audio Codec and 'flac' is an encoder for this standard. This module wraps
+'flac' into the POE framework, simplifying its use in, for example, a CD music
+ripper and encoder application. It provides an object oriented interface.
+
+To use this module, you will need the POE framework (See http://poe.perl.org/)
+and you will need to install the flac tool (See http://flac.sourceforge.net/).
+
+1.01 is the first public issue of this module.
+
+
+SEE ALSO
+
+    Changes
+    flax(1)
+    POE::Component::Enc::Ogg
+    POE::Component::Enc::Mp3
+    POE::Component::CD::Detect
+    POE::Component::CD::Rip
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+This module requires the following other modules and libraries.
+
+    POE
+    POE::Wheel::Run
+    POE::Filter::Line
+    POE::Driver::SysRW
+    flac
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2004 Steve James. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

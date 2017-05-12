@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+README
+LICENSE
+lib/POE/Component/IRC/Plugin/WWW/Google/Time.pm
+examples/time_bot.pl
+t/00-load.t
+xt/pod-coverage.t
+xt/pod.t
+xt/kwalitee.t
+Makefile.PL
+META.yml
+META.json

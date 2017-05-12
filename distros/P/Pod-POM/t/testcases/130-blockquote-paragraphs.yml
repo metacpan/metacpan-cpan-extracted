@@ -1,0 +1,6 @@
+# blockquote paragraphs
+---
+notes: >
+  Blockquote paragraphs consist of text within an =over/=back sequence without
+  any =item directives.  Such paragraphs can contain further blockquote paragraphs
+  or lists.

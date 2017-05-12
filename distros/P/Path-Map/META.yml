@@ -1,0 +1,28 @@
+---
+abstract: 'map paths to handlers'
+author:
+  - 'Matt Lawrence <mattlaw@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4202, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Path-Map
+provides:
+  Path::Map:
+    file: lib/Path/Map.pm
+    version: 0.04
+  Path::Map::Match:
+    file: lib/Path/Map/Match.pm
+requires:
+  List::MoreUtils: 0
+  List::Util: 0
+  perl: v5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

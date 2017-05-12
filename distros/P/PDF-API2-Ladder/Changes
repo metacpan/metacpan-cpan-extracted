@@ -1,0 +1,11 @@
+Revision history for PDF-API2-Ladder
+
+0.03  2013-09-24 22:47:52 CDT
+        - Added Character Spaces and Font color Options
+
+0.02  2013-09-17 22:53:02 CDT
+        - Removed Legacy POD Entries
+
+0.01  2013-09-17 10:20:00 CDT
+        - Initial release
+        - Added Sparse Documentation

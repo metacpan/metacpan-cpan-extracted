@@ -1,0 +1,64 @@
+Version 0.03 - 11th March 2007
+    + Added Parse::DMIDecode::Examples POD file containing
+      a small selection of useful code examples.
+
+    + Changed Build.PL to be more paranoid defaulting
+      to no while using $build->y_n to work around
+      potential removal of expected method functionality.
+
+    + Added complain.txt.
+
+    + Removed depencancy on Scalar::Util.
+
+    + Added some additional POD.
+
+
+Version 0.02 - 22th October 2006
+    + Added better support for older versions of dmidecode
+      binary output parsing.
+
+    + Improved examples/test.pl.
+
+    + Added examples/synopsis2.pl from the synopsis of
+      Parse::DMIDecode::Handle.
+
+    + Allow get_handles() method to be called without any
+      qualifying paramaters so to return *All* handle
+      objects.
+
+    + Added description() method to handle objects.
+
+    + Added parsed_structures() method to handle objects.
+
+    + Improved parsing inside handle objects to return
+      multiple handle objects where appropriate to allow
+      easier access to unique data pairs.
+
+
+Version 0.01 - 19th October 2006
+    + Pre-release.
+
+    + Created Parse::DMIDecode::Handle objects for each
+      handle structure.
+
+    + Encapsulated the internal data structure which is
+      quite fragile so that people cannot just grab items
+      out of it.
+
+    + Added accessor methods for header information.
+
+    + Added selection methods to return handle objects.
+
+    + Added a method to return a list of all known
+      keyword strings.
+
+    + Added unit tests.
+
+    + Added a whole bunch more since the first release
+      was mostly a placeholder.
+
+
+Version 0.00 - 17th September 2006
+    + Initial developer pre-release to save the namespace
+      and to discuss API prior to full release.
+

@@ -1,0 +1,21 @@
+#Experimental/development/testing scripts and files
+^experiment.*$
+^issue_scripts/.*
+
+#Backups
+.*\.old$
+.*\.bak$
+
+#Blib folder
+^blib/*
+
+#Git folder
+^\.git/*
+
+#Hidden files
+^\..*
+
+#Auto-generated files
+^MYMETA.json$
+^MYMETA.yml$
+^Makefile$

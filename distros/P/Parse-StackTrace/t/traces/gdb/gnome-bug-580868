@@ -1,0 +1,103 @@
+Program received signal SIGABRT, Aborted.
+[Switching to Thread 0x7fe772cf6750 (LWP 22167)]
+0x00007fe76d5710c5 in raise () from /lib/libc.so.6
+(gdb) bt
+#0  0x00007fe76d5710c5 in raise () from /lib/libc.so.6
+#1  0x00007fe76d5725e3 in abort () from /lib/libc.so.6
+#2  0x00007fe76e2804ce in g_logv () from /usr/lib/libglib-2.0.so.0
+#3  0x00007fe76e280553 in g_log () from /usr/lib/libglib-2.0.so.0
+#4  0x00007fe7711af068 in Glib::exception_handlers_invoke () from
+/usr/lib/libglibmm-2.4.so.1
+#5  0x00007fe7711b4965 in Glib::SignalProxyNormal::slot0_void_callback () from
+/usr/lib/libglibmm-2.4.so.1
+#6  0x00007fe76e70e13d in g_closure_invoke () from /usr/lib/libgobject-2.0.so.0
+#7  0x00007fe76e721bfb in signal_emit_unlocked_R () from
+/usr/lib/libgobject-2.0.so.0
+#8  0x00007fe7700eb9fc in gtk_binding_entry_activate () from
+/usr/lib/libgtk-x11-2.0.so.0
+#9  0x00007fe7700ebee1 in binding_match_activate () from
+/usr/lib/libgtk-x11-2.0.so.0
+#10 0x00007fe7700ec15a in gtk_bindings_activate_list () from
+/usr/lib/libgtk-x11-2.0.so.0
+#11 0x00007fe7700ec2c5 in gtk_bindings_activate_event () from
+/usr/lib/libgtk-x11-2.0.so.0
+#12 0x00007fe770131f54 in gtk_entry_key_press () from
+/usr/lib/libgtk-x11-2.0.so.0
+#13 0x00007fe7701a17a8 in _gtk_marshal_BOOLEAN__BOXED () from
+/usr/lib/libgtk-x11-2.0.so.0
+#14 0x00007fe76e70e08f in g_closure_invoke () from /usr/lib/libgobject-2.0.so.0
+#15 0x00007fe76e721376 in signal_emit_unlocked_R () from
+/usr/lib/libgobject-2.0.so.0
+#16 0x00007fe76e7228fd in g_signal_emit_valist () from
+/usr/lib/libgobject-2.0.so.0
+#17 0x00007fe76e722f43 in g_signal_emit () from /usr/lib/libgobject-2.0.so.0
+#18 0x00007fe7702a95de in gtk_widget_event_internal () from
+/usr/lib/libgtk-x11-2.0.so.0
+#19 0x00007fe7702bb89b in gtk_window_propagate_key_event () from
+/usr/lib/libgtk-x11-2.0.so.0
+#20 0x00007fe7702be90b in gtk_window_key_press_event () from
+/usr/lib/libgtk-x11-2.0.so.0
+#21 0x00007fe7727ec092 in Gtk::Widget::on_key_press_event () from
+/usr/lib/libgtkmm-2.4.so.1
+#22 0x00007fe7727f29a3 in Gtk::Widget_Class::key_press_event_callback () from
+/usr/lib/libgtkmm-2.4.so.1
+#23 0x00007fe7701a17a8 in _gtk_marshal_BOOLEAN__BOXED () from
+/usr/lib/libgtk-x11-2.0.so.0
+#24 0x00007fe76e70e13d in g_closure_invoke () from /usr/lib/libgobject-2.0.so.0
+#25 0x00007fe76e721376 in signal_emit_unlocked_R () from
+/usr/lib/libgobject-2.0.so.0
+#26 0x00007fe76e7228fd in g_signal_emit_valist () from
+/usr/lib/libgobject-2.0.so.0
+#27 0x00007fe76e722f43 in g_signal_emit () from /usr/lib/libgobject-2.0.so.0
+#28 0x00007fe7702a95de in gtk_widget_event_internal () from
+/usr/lib/libgtk-x11-2.0.so.0
+#29 0x00007fe77019a11d in gtk_propagate_event () from
+/usr/lib/libgtk-x11-2.0.so.0
+#30 0x00007fe77019b163 in gtk_main_do_event () from
+/usr/lib/libgtk-x11-2.0.so.0
+#31 0x00007fe76fe15ccc in gdk_event_dispatch () from
+/usr/lib/libgdk-x11-2.0.so.0
+#32 0x00007fe76e276811 in g_main_context_dispatch () from
+/usr/lib/libglib-2.0.so.0
+#33 0x00007fe76e279e30 in g_main_context_iterate () from
+/usr/lib/libglib-2.0.so.0
+#34 0x00007fe76e27a2f5 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+#35 0x00007fe77019b577 in gtk_main () from /usr/lib/libgtk-x11-2.0.so.0
+#36 0x00000000004785d2 in gnote::Gnote::start_tray_icon ()
+#37 0x0000000000478b18 in gnote::Gnote::main ()
+#38 0x0000000000476452 in main ()
+
+
+
+If you don't press enter in search field but wait a second it will crash with
+"another" backtrace:
+
+terminate called after throwing an instance of
+'boost::exception_detail::clone_impl<boost::exception_detail::error_info_injector<boost::io::bad_format_string>
+>'
+  what():  boost::bad_format_string: format-string is ill-formed
+
+Program received signal SIGABRT, Aborted.
+[Switching to Thread 0x7f402c6ff750 (LWP 22946)]
+0x00007f4026f7a0c5 in raise () from /lib/libc.so.6
+(gdb) bt
+#0  0x00007f4026f7a0c5 in raise () from /lib/libc.so.6
+#1  0x00007f4026f7b5e3 in abort () from /lib/libc.so.6
+#2  0x00007f40277fe474 in __gnu_cxx::__verbose_terminate_handler () from
+/usr/lib/libstdc++.so.6
+#3  0x00007f40277fc876 in __cxxabiv1::__terminate () from
+/usr/lib/libstdc++.so.6
+#4  0x00007f40277fc8a3 in std::terminate () from /usr/lib/libstdc++.so.6
+#5  0x00007f40277fc98a in __cxa_throw () from /usr/lib/libstdc++.so.6
+#6  0x0000000000489e51 in boost::throw_exception<boost::io::bad_format_string>
+()
+#7  0x0000000000489ef2 in boost::io::detail::maybe_throw_exception ()
+#8  0x000000000048b042 in boost::io::detail::parse_printf_directive<char,
+std::char_traits<char>, std::allocator<char>, __gnu_cxx::__normal_iterator<char
+const*, std::string>, std::ctype<char> > ()
+#9  0x000000000048e62a in boost::basic_format<char, std::char_traits<char>,
+std::allocator<char> >::parse ()
+#10 0x000000000048ea48 in boost::basic_format<char, std::char_traits<char>,
+std::allocator<char> >::basic_format ()
+#11 0x00000000004c0116 in gnote::NoteRecentChanges::update_match_note_count ()
+#12 0x00000000004c0c1e in gnote::NoteRecentChanges::perform_search ()

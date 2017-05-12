@@ -1,0 +1,199 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>script.aculo.us Unit test file</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <script src="../../lib/prototype.js" type="text/javascript"></script>
+  <script src="../../src/util.js" type="text/javascript"></script>
+  <script src="../../src/formated.js" type="text/javascript"></script>
+  <script src="../../src/formatedinput.js" type="text/javascript"></script>
+  <script src="../../lib/unittest.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="../test.css" type="text/css" />
+</head>
+<body>
+
+<h1>FormatedInput Constuctor Unit Tests</h1>
+
+<!-- Log output -->
+<div id="testlog"> </div>
+
+<div id="formated">
+<form>
+<input id="hello" value="" />
+<span id="MESSAGE_hello">hello world</span>
+<span id="ERROR_hello">!</span>
+</form>
+
+<!-- Tests follow -->
+<script type="text/javascript" language="javascript" charset="utf-8">
+
+var cp = { C: [ { leading: "", length: 1, format: "[A:ABCDEFGHJKLMNPQRSTUVYZ]", full_re: "[ABCDEFGHJKLMNPQRSTUVYZ]", re: "[ABCDEFGHJKLMNPQRSTUVYZ]", xform: "uppercase", offset: 0 }, { leading: "", length: 1, format: 9, full_re: "[0-9]", re: "[0-9]", offset: 1 }, { leading: "", length: 1, format: "A", full_re: "[A-Z\\xC0-\\xDF]", re: "[A-Z\\xC0-\\xDF]", xform: "uppercase", offset: 2 }, { leading: "", length: 1, format: " ", full_re: "[\\ ]", re: "[\\ ]", "static": " ", offset: 3 }, { leading: "", length: 1, format: 9, full_re: "[0-9]", re: "[0-9]", offset: 4 }, { leading: "", length: 1, format: "A", full_re: "[A-Z\\xC0-\\xDF]", re: "[A-Z\\xC0-\\xDF]", xform: "uppercase", offset: 5 }, { leading: "", length: 1, format: 9, full_re: "[0-9]", re: "[0-9]", offset: 6 } ], P: [ 0, 1, 2, 3, 4, 5, 6 ] };
+var tel = { C: [ { leading: "", length: 3, format: 999, full_re: "^[0-9]{3}$", re: "[0-9]", offset: 0 }, { leading: "", length: 1, format: "-", full_re: "[\\-]", re: "[\\-]", "static": "-", offset: 3 }, { leading: "", length: 3, format: 999, full_re: "^[0-9]{3}$", re: "[0-9]", offset: 4 }, { leading: "", length: 1, format: "-", full_re: "[\\-]", re: "[\\-]", "static": "-", offset: 7 }, { leading: "", length: 4, format: 9999, full_re: "^[0-9]{4}$", re: "[0-9]", offset: 8 } ], P: [ 0, 0, 0, 1, 2, 2, 2, 3, 4, 4, 4, 4 ] };
+var camp = { C: [ { leading: 0, xform: "leading-space", length: 4, format: 0000, full_re: "^0*[0-9]{0,4}$", re: "[0-9]", offset: 0 }, { leading: "", length: 1, format: "-", full_re: "[\\-]", re: "[\\-]", "static": "-", offset: 4 }, { leading: 0, length: 2, format: 00, full_re: "^0*[0-9]{0,2}$", re: "[0-9]", offset: 5 } ], P: [ 0, 0, 0, 0, 1, 2, 2 ] };
+
+//<![CDATA[
+new Test.Unit.Runner({
+    testPlain: function() { with(this) {
+        var fi = new FormatedInput( 'hello', "{C: [], P: []}" );
+        assert( fi );
+        assertInstanceOf( FormatedInput, fi );
+
+        assertNotNull( fi.input(), "Found the input based on the ID" );
+        assertNotNull( fi.input_element, "Managed to set input element" );
+        delete fi['input_element'];
+
+        fi.setInput( $('hello') );
+        assertNotNull( fi.input_element, "Managed to set input element" );
+
+        fi.setError( $('ERROR_hello') );
+        assertNotNull( fi.error_element, "Managed to set error element" );
+        fi.error_hide();
+        this.assertNotVisible( $( 'ERROR_hello' ) );
+    }},
+    
+    testCP: function() { with(this) {
+        var fi = new FormatedInput( 'hello', cp );
+        assert( fi );
+        assertInstanceOf( FormatedInput, fi );
+
+        var first = "h0h 0h0";
+        var out = fi.transform( first );
+        assert( (out == 'H0H 0H0') );
+
+        var out = fi._match( '' );
+        assert( (out == 'LENGTH'), "Failed with " + out );
+
+        var out = fi._match( 'H0H 0H0' );
+        assert( (out == ''), "Matched with " + out );
+
+        var out = fi._match( 'H0H-0H0' );
+        assert( (out == 'FORMAT'), "Failed with " + out );
+
+        var out = fi._match( 'H0h 0H0' );
+        assert( (out == 'FORMAT'), "Failed with " + out );
+
+        E = fi.input();
+        assertNotNull( E );
+
+        E.value = "h0h 0H0";
+        var ok = fi.validate(0);
+        assert( ok, "Input is OK" );
+        assertEqual( 'h0h 0H0', E.value, "Not transformed" );
+
+        ok = fi.validate(1);
+        assert( ok, "Input is still OK" );
+        assertEqual( 'H0H 0H0', E.value, "Now transformed" );
+
+        E.value = 'bonk';
+        ok = fi.validate(1);
+        assert( !ok, "Input is still OK" );
+        assertEqual( 'bonk', E.value, "Not transformed" );
+        E.value = '';
+    }},
+
+    testTel: function() { with(this) {
+        var fi = new FormatedInput( 'hello', tel );
+        assert( fi );
+        assertInstanceOf( FormatedInput, fi );
+
+        var first = "123-134-1234";
+        var out = fi.transform( first );
+        assertEqual( '123-134-1234', out, "No transformation on " );
+
+        out = fi._match( '' );
+        assertEqual( 'LENGTH', out, "Short match" );
+
+        out = fi._match( '123-123-1234' );
+        assertEqual( '', out, "Good match" );
+
+        out = fi._match( '123-123-12' );
+        assertEqual( 'LENGTH', out, "Short match" );
+
+        out = fi._match( '123-123-1234' );
+        assertEqual( '', out, "Good match" );
+
+        out = fi._match( '123-123-honk' );
+        assertEqual( 'FORMAT', out, "Char mis-match" );
+
+        var E = fi.input();
+        assertNotNull( E );
+        
+        E.value = "123-123-1234";
+        var ok = fi.validate(0);
+        assert( ok, "Input is OK" );
+
+        E.value = "123-123-";
+        ok = fi.validate(0);
+        assert( ok, "Input is temporarily OK" );
+        ok = fi.validate(1);
+        assert( !ok, "Input isn't OK" );
+    }},
+
+    testCamp: function() { with(this) {
+        var fi = new FormatedInput( 'hello', camp );
+        assert( fi );
+        assertInstanceOf( FormatedInput, fi );
+
+        var first = "  10-10";
+        var out = fi.transform( first );
+        assertEqual( '0010-10', out, "Transformed" );
+
+        first = "1010-11";
+        out = fi.transform( first );
+        assertEqual( '1010-11', out, "Not transformed" );
+
+        out = fi._match( '' );
+        assertEqual( 'LENGTH', out, "Short match" );
+
+        out = fi._match( '1234-12' );
+        assertEqual( '', out, "Good match" );
+
+        out = fi._match( '1234-1' );
+        assertEqual( 'LENGTH', out, "Short match" );
+
+        out = fi._match( '1234-h0' );
+        assertEqual( 'FORMAT', out, "Bad match" );
+
+
+        var E = fi.input();
+        assertNotNull( E );
+        
+        E.value = "1234-00";
+        var ok = fi.validate(0);
+        assert( ok, "Input is OK" );
+
+        E.value = "  10-";
+        ok = fi.validate(0);
+        assert( ok, "Input is temporarily OK" );
+        ok = fi.validate(1);
+        assert( !ok, "Input isn't OK" );
+
+        E.value = "  10-00";
+        ok = fi.validate(0);
+        assert( ok, "Input isn't OK" );
+        ok = fi.validate(1);
+        assert( ok, "Input is OK" );
+
+        E.value = "0010-0";
+        ok = fi.validate(0);
+        assert( ok, "Input temporarily OK" );
+        ok = fi.validate(1);
+        assert( !ok, "Input isn't OK" );
+
+    }},
+
+
+    // ------------
+    test_last: function() {
+        Element.hide( $( "formated" ) );
+        this.assertNotVisible( $( 'formated' ) );
+    }
+
+});
+//]]></script>
+
+
+
+</body>
+</html>

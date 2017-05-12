@@ -1,0 +1,123 @@
+NAME
+    Pod::PseudoPod::LaTeX - convert Pod::PseudoPod documents into LaTeX
+
+SYNOPSIS
+    This module is a Pod::PseudoPod subclass, itself a Pod::Simple subclass.
+    This means that this is a full-fledged POD parser. Anything those
+    modules can do, this can do.
+
+    Perhaps a little code snippet.
+
+        use Pod::PseudoPod::LaTeX;
+
+        my $parser = Pod::PseudoPod::LaTeX->new();
+            $parser->emit_environments( sidebar => 'sidebar' );
+        $parser->output_fh( $some_fh );
+        $parser->parse_file( 'some_document.pod' );
+
+        ...
+
+LATEX PRELUDE
+    The generated LaTeX code needs some packages to be loaded to work
+    correctly. Currently it needs
+
+        \usepackage{fancyvrb}  % for Screen and Verbatim environments
+        \usepackage{url}       % for L<> URLs
+        \usepackage{titleref}  % for A<> generated code
+
+    The standard font in LaTeX (Computer Modern) does not support bold and
+    italic variants of its monospace font, an alternative is
+
+        \usepackage[T1]{fontenc}
+        \usepackage{textcomp}
+        \usepackage[scaled]{beramono}
+
+MODULE OPTIONS
+    Currently we support:
+
+    "keep_ligatures"
+        LaTeX usually joins some pair of letters (ff, fi and fl), named
+        ligatures. By default the module split thems. If you prefer to
+        render them with ligatures, use:
+
+          my $parser = Pod::PseudoPod::LaTeX->new( keep_ligatures => 1 );
+
+STYLES / EMITTING ENVIRONMENTS
+    The "emit_environments" method accepts a hashref whose keys are POD
+    environments and values are latex environments. Use this method if you
+    would like "Pod::PseudoPod::LaTeX" to emit a simple
+    "\begin{foo}...\end{foo}" environment rather than emit specific
+    formatting codes. You must define any environemtns you use in this way
+    in your latex prelude.
+
+    You can define your own environments easily. First you need to define
+    the "=begin...=end" environment with:
+
+      $parser->acept_target_as_text('my_environment');
+
+    Then, you can use the "emit_environments" method to tell
+    "Pod::PseudoPod::LaTeX" what LaTeX environment to emit:
+
+      $parser->emit_environments('my_environment' => 'latex_env');
+
+    Also, if "my_environment" is used in POD with a title, it is passed as
+    the first argument to the LaTeX environment. That is,
+
+      =begin my_environment Some title
+
+    Will generate
+
+      \begin{latex_env}{Some title}
+
+AUTHOR
+    chromatic, "<chromatic at wgz.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-pod-pseudopod-tex at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Pod-PseudoPod-LaTeX>.
+    I'll hear about it and you'll hear about any progress on your bug as I
+    make changes.
+
+SUPPORT
+    Read this documentation with the perldoc command:
+
+        $ B<perldoc Pod::PseudoPod::LaTeX>
+
+    You can also look for information at:
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Pod-PseudoPod-LaTeX>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Pod-PseudoPod-LaTeX>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pod-PseudoPod-LaTeX>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Pod-PseudoPod-LaTeX>
+
+ACKNOWLEDGEMENTS and SEE ALSO
+    Based on Allison Randal's Pod::PseudoPod module.
+
+    See also perlpod, Pod::Simple and Pod::TeX. I did not reuse the latter
+    because I need to support the additional POD directives found in
+    PseudoPod.
+
+    Thanks to multiple contributors, including (but not limited to) Dean
+    Serenevy, Moritz Lenz, Alberto Simões, and Jerome Quelin.
+
+    Thanks to Onyx Neon Press (<http://www.onyxneon.com/>) for sponsoring
+    this work under free software guidelines.
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2006, 2009 - 2011, chromatic.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl 5.14
+

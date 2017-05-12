@@ -1,0 +1,21 @@
+Revision history for Perl extension Perf::ARM.
+
+0.01  Tue Feb  1 10:59:42 2000
+    - original version; created by h2xs 1.18
+
+0.02  Tue Jun 27 23:01:09 CDT 2000
+    - request from Elisabeth.Rohde@telekom.de
+      for the module spurs bbacker into action :)
+    - got tests working -- all's well on HP-UX 11.00 with
+      Glance libarm.sl -- haven't tried other platforms
+
+0.03  Wed Nov  1 17:07:45 CST 2000
+    - better README
+    - fixed exit msgs in tests
+    - finally pushing to CPAN
+
+0.04  Mon Sep 10 17:54:10 CDT 2001
+    - removed HP ANSI cc specific compile flags from Makefile.PL
+    - added description of usemymalloc problem
+    - fleshed out to do lists
+    - README reformatting

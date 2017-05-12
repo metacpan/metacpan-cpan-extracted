@@ -1,0 +1,99 @@
+# Opera Mini. Not very innovative UA-string eh?
+
+[AGENT]
+Opera/9.50 (J2ME/MIDP; Opera Mini/4.0.10031/298; U; en)
+
+'original_name'    => 'Opera Mini',
+'parser'           => 'opera_pre',
+'strength'         => 'U',
+'lang'             => 'en',
+'extras'           => ['J2ME/MIDP'],
+'version_raw'      => '9.50',
+'version'          => '9.500',
+'name'             => 'Opera',
+'original_version' => '4.0.10031/298',
+'mobile'           => 1,
+
+[AGENT]
+
+Opera/9.50 (J2ME/MIDP; Opera Mini/4.0.10031/230; U; en
+
+'original_name'    => 'Opera Mini',
+'parser'           => 'opera_pre',
+'strength'         => 'U',
+'lang'             => 'en',
+'extras'           => ['J2ME/MIDP'],
+'version_raw'      => '9.50',
+'version'          => '9.500',
+'name'             => 'Opera',
+'original_version' => '4.0.10031/230',
+'mobile'           => 1,
+
+[AGENT]
+
+Opera/8.01 (J2ME/MIDP; Opera Mini/2.0.4509/1378; nl; U; ssr)
+
+'original_name'    => 'Opera Mini',
+'parser'           => 'opera_pre',
+'strength'         => 'U',
+'os'               => 'ssr',
+'extras'           => ['J2ME/MIDP','nl'],
+'version_raw'      => '8.01',
+'version'          => '8.010',
+'name'             => 'Opera',
+'original_version' => '2.0.4509/1378',
+'mobile'           => 1,
+
+[AGENT]
+
+Opera/8.01 (J2ME/MIDP; Opera Mini/1.1.2277/lofi/nordic/int; O2 Xda II; en; U; ssr)
+
+'original_name'    => 'Opera Mini',
+'parser'           => 'opera_pre',
+'strength'         => 'U',
+'os'               => 'ssr',
+'extras'           => ['J2ME/MIDP','O2 Xda II','en'],
+'version_raw'      => '8.01',
+'version'          => '8.010',
+'name'             => 'Opera',
+'original_version' => '1.1.2277/lofi/nordic/int',
+'mobile'           => 1,
+
+[AGENT]
+Opera/9.60 (J2ME/MIDP; Opera Mini/4.2.13337/504; U; en) Presto/2.2.0
+
+'original_name'    => 'Opera Mini',
+'parser'           => 'opera_pre',
+'strength'         => 'U',
+'os'               => 'J2ME/MIDP',
+'version_raw'      => '9.60',
+'lang'             => 'en',
+'version'          => '9.600',
+'name'             => 'Opera',
+'original_version' => '4.2.13337/504',
+'toolkit'          => ['Presto','2.2.0','2.002000'],
+'mobile'           => 1,
+
+[AGENT]
+Opera/8.01 (J2ME/MIDP; Opera Mini/1.0.1479/HiFi; SonyEricsson P900; no; U; ssr)
+
+'original_name'    => 'Opera Mini',
+'parser'           => 'opera_pre',
+'strength'         => 'U',
+'os'               => 'ssr',
+'extras'           => ['J2ME/MIDP','SonyEricsson P900','no'],
+'version_raw'      => '8.01',
+'version'          => '8.010',
+'name'             => 'Opera',
+'original_version' => '1.0.1479/HiFi',
+'mobile'           => 1,
+
+[AGENT]
+
+SAMSUNG-SGH-i900/1.0 Opera 9.5
+
+'parser'      => 'moz_only',
+'extras'      => [ 'Opera', '9.5' ],
+'version_raw' => '1.0',
+'version'     => '1.000',
+'name'        => 'SAMSUNG-SGH-i900',

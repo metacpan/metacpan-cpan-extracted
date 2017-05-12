@@ -1,0 +1,575 @@
+<html>
+	<head>
+		<title>PML Language Reference</title>
+	</head>
+	<body>
+		<h1>PML Language Reference</h1>
+<hr><br><h2>Introduction</h2>
+<h3>What's the Problem</h3>
+Here's the problem. You develop this really cool CGI script, you spent
+months making the HTML that it generates look good. Then someone tells
+you "Let's make a few changes to the interface". Well, now you have
+to dig through your perl code and change all that HTML that you are
+generating.<br>
+Wouldn't it be nice if you could put all your HTML in seperate files!
+Then you would only have to change those files to update the interface,
+and no one whould have to chnage any code. That brings a whole new problem
+though, because there is some HTML that you generate on the fly and there
+is no way to make it static and put it in a file. In comes PML.
+<h3>PML can help</h3>
+PML allows you to take all your HTML from within your script and put
+it into files. Those files are mostly HTML, but also contain a little
+of the PML Markup Language to do things like variabels and flow control.
+Now your CGI script can have PML read a file, send it some variables
+and send the results to the browser. PML is simple enough so that
+you can have your HTML team edit the files, giving you more time
+to code.<br>
+<h3>Example</h3>
+The best way to describe PML is to take a quick look at some.
+<pre>
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;${title}&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+	@if (${i_am_frank})
+	{
+		 &lt;h1&gt;Cool, you are Frank!&lt;/h1&gt;
+	}
+	@else
+	{
+		 &lt;h1&gt;You must not be Frank.&lt;/h1&gt;
+	}
+&lt;/body&gt;
+&lt;/html&gt;
+</pre>
+<br>
+The first thing you see is <tt>${title}</tt>. That is a PML variable.  When PML
+is executing your PML file, it will replace the <tt>${title}</tt> string with
+the  actual value of that variable. That value can be set from the command
+line, from within your perl script, from within the PML text and also from
+within PML itself.<br>
+Next you will see "<tt>@if (${i_am_frank})</tt>". This should look very
+familiar to a programmer. When PML is executing your PML file, is will decide
+if the variable <tt>${i_am_frank}</tt> is true. If it is, PML will output the
+text that is in the "if block". Otherwise it will output the text in the "else
+block". <br>
+PML offers a lot more then what we have seen so far. You can also
+extend PML from within your perl application or by writing a PML Module
+in perl.
+<hr><br><h2>General Syntax</h2>
+<h3>Text and Whitespace</h3>
+
+All text and whitespace is preserved. The way that you alter the
+output text is using PML functions and variables. PML functions
+begin with an <tt>'@'</tt> symbol. PML variables begin with a
+<tt>'$'</tt> sign. If you want to use a <tt>'@'</tt> or <tt>'$'</tt>
+in your text, you will need to place a backslash <tt>'\\'</tt> in
+front of it. This also makes it so if you need to put a backslash
+in your text, you will need to put in two.
+
+<h3>Arguments</h3>
+
+Most PML functions take arguments. The PML <tt>set</tt> function
+needs to know which variable to set and what value to set. Arguments
+are given inbetween  parathensis. Each argument is seperated by a
+comma.  There is no need to put quotations around text, unless it
+contains a comma. You may use variable, and even other PML functions
+inside the argument list. The argument list can also be empty for
+some PML functions.
+
+<br>
+
+Here are some examples of arguments, using the PML <tt>set</tt> function:
+<pre>
+	# lines that START with a sharp/pound/hash are skipped
+	# how about one argument
+	@set(ThisIsTheNameOfOneVariable)
+
+	# And now two arguments
+	@set(myvariable, Set myvariable to this string)
+
+	# or three
+	@set(x, this is two, this is three)
+
+	# An argument that is a variable
+	@set(x, )
+
+	# An argument that is a PML function
+	@set(x, @perl{1})
+</pre>
+
+<h3>Blocks</h3>
+
+Some of the PML functions need blocks of text to work with. One 
+example is the PML <tt>if</tt> function. The <tt>if</tt> function takes
+one argument and a block. It will output the block of text if
+the argument is true.
+
+<br>
+
+Inside of the block, you can use anything that you can use inside of a block.
+These include, plain text, variables and functions. A block is the text 
+inbetween braces <tt>{</tt> and <tt>}</tt>.
+
+<br>
+
+Here is an example using the PML <tt>if</tt> function:
+<pre>
+	@if( this is true) {
+		Then this text will get output
+	}
+</pre>
+
+Because the parser uses the braces as delimiters, you must use caution
+that you don't use a brace unless you place a backslash before it.
+
+<br>
+
+Here is a block inside another block:
+<pre>
+	@if( this is true) {
+		here comes another
+		@if( this one too) {
+			this is block two
+		}
+
+		back to block one
+	}
+</pre>
+
+<h3>Comments</h3>
+
+Comments is text that is skipped by the parser. It is a great way
+to document what your text is doing, or to temparily to remove text.
+PML comments are started by a <tt>#</tt>, as long as it is the first
+non-whitespace charater on the line. They last until the end of the
+line. To use a <tt>#</tt> you should put a backslash before it.
+
+<pre>
+	# This is a comment
+	This # is not
+	\\# This is not either
+</pre>
+
+<hr><br><h2>Variables</h2>
+<h3>What's a variable?</h3>
+Just like in most programming languages, PML supports variables. Variables
+are a way to label some data, they are like containers with names. When
+you use a variable in PML it is replaced with what ever data it contains.
+<br>
+Let's look at an example:
+<pre>
+	@set('cookiejar', 'peanutbutter')
+	The cookiejar has ${cookiejar} cookies
+</pre>
+Let me explain what just happedned. The first line put the data
+<tt>peanutbutter</tt> into the variable (container) <tt>cookiejar</tt>.
+From this point on, when ever your make mention of <tt>cookiejar</tt>
+PML will replace it with <tt>peanutbutter</tt>. In order to keep PML
+from replacing the word <tt>cookiejar</tt> when you really wanted the
+word <tt>cookiejar</tt> it requires you to inclose your variable name
+in <tt>${}</tt> like on line two above. When ever PML sees something
+like this: <tt>${word}</tt> it will look up the word and replace that
+text with the data in that variable.
+<br>
+And in case you were wondering, when you run that PML code from above
+this is what gets returned from PML:
+<pre>
+	The cookiejar has peanutbutter cookies
+</pre>
+<h3>Variable Names</h3>
+All variable names must begin with either an underscore <tt>'_'</tt> or
+a letter. It can only contain letters, numbers and underscores.
+<h3>Data</h3>
+Variables can contain more then one value at a time. It is like a Perl
+array (internaly it is a Perl Array Reference). You can access the different
+'elements' of your variable using a subscript like this:
+<pre>
+	@set('cookiejar', 'peanutbutter', 'oatmeal', 'sugar')
+	Cookie one is ${cookiejar[0]}
+	Cookie two is ${cookiejar[1]}
+	Cookie three is ${cookiejar[2]}
+</pre>
+This prints
+<pre>
+	Cookie one is peanutbutter
+	Cookie two is oatmeal
+	Cookie three is sugar
+</pre>
+For a better way to do the above see <tt>@foreach</tt>. There are other
+<tt>@set</tt> functions too, like <tt>@append</tt> so
+see those sections for more information.
+<hr><br><h2><tt>set</tt></h2>
+
+The <tt>set</tt> function sets a variable. It takes
+as it's arguments, a variable to set and the value(s)
+to set it to.
+
+<pre>
+	@set(name, Peter)
+	#name is now set to Peter
+	${name}
+</pre>
+
+If you give more then on value, the variable will
+be set as an array. You can then access the 
+individual values by number, starting at 0.
+
+<pre>
+	@set(cookies, peanutbuttter, peanutbutter chip, oatmeal)
+	${cookies[0]}
+	${cookies[1]}
+	${cookies[2]}
+</pre>
+<hr><br><h2><tt>setif</tt></h2>
+
+The <tt>setif</tt> function is the same as the
+<tt>set</tt> function except that the <tt>setif</tt>
+function will not set the variable if it already
+holds a value.
+<hr><br><h2>Append</h2>
+
+The <tt>append</tt> function appends a string to a variable. Before the append, 
+the data in the variable will have spaces removed from the end of it. Then 
+all the spaces will be removed from the front of the string. Finally
+the sting is append to the variable with one space between.
+<br>
+
+If the variable is an array, <tt>append</tt> will add another element to the end of the array.
+
+<pre>
+	@set(myvar, Test One)
+	@append(myvar, and Two)
+	# myvar is now "Test One and Two"
+
+	@set(test, 1, 2, 3)
+	@append(test, 4)
+	# test is now (1, 2, 3, 4) (array)
+</pre>
+<hr><br><h2><tt>prepend</tt></h2>
+
+<tt>prepend</tt> is just like <tt>append</tt> except that the
+string is added to the front of the variable, with a space
+between the string and the variable. If the variable is an
+array, the list is unshifted on to the array.
+<hr><br><h2>Concat</h2>
+
+The <tt>concat</tt> function just like the <tt>append</tt> function except
+<tt>concat</tt> does not add that one space.
+<hr><br><h2>The if function</h2>
+<h3>How to make a descesion</h3>
+You can use the <tt>@if</tt> function to tell PML what text to output
+based on some other data. Let's take a look:
+<pre>
+	@if(1)
+	{
+		This text is printed if the condition is true
+	}
+	@else
+	{
+		This text is printed if the condition is false
+	}
+</pre>
+The <tt>@if</tt> function requires that you give it a condition. 
+If that condition is true then it will process the text in the 
+block flowing the <tt>@if</tt>. If the condition is false and
+you supply an <tt>@else</tt> then PML will process the text in the
+block following the <tt>@else</tt>. The <tt>@else</tt> function
+is optional, but if you use it, it must follow an <tt>@if</tt> function.
+<h3>True and false</h3>
+What is true and false is the same as what Perl considers true or false.
+The very simple answer is: Blank conditions and 0 are false, everything
+else is true.
+<h3>Cool stuff in the condition</h3>
+Just like all other PML functions that take arguments, the <tt>@if</tt>
+function can take variables. Let's look at another example:
+<pre>
+	@set('condition', 1)
+	
+	@if (${condition}) {
+		This text will get printed
+	}
+	
+	@set('condition', 0)
+	
+	@if (${condition}) {
+		This text will NOT get printed
+	}
+</pre>
+<h3>elsif</h3>
+Just like Perl, PML has a <tt>@elsif</tt> function. This function must follow
+a <tt>@if</tt> function, and like <tt>@if</tt>, it must be given a condition.
+If the condition to <tt>@if</tt> is false, then the condition to the next
+<tt>@elsif</tt> function is checked. You can have as many <tt>@elsif</tt>
+functions that you want. Here is an example:
+<pre>
+	@set('c1', 0)
+	@set('c2', 0)
+	@set('c3', 1)
+	
+	@if (${c1})
+	{
+		This text will be printed if c1 is true
+	}
+	@elsif (${c2})
+	{
+		This text will be printed if c2 is true
+	}
+	@elsif (${c3})
+	{
+		This text will be printed if c3 is true
+		(which it is in this example)
+	}
+	@else
+	{
+		This text will be printed if nothing above
+		was true.
+	}
+</pre>
+<h3>unless</h3>
+Another function that came from Perl is the <tt>unless</tt> function.
+<tt>unless</tt> is just like <tt>if</tt> except that the code in the
+<tt>unless</tt> block is executed when the condition is false not
+true. <tt>unless</tt> supports <tt>elsif</tt> and <tt>else</tt> just like
+<tt>if</tt>.
+<pre>
+	@set( condition, 0 )
+	
+	@unless ( ${condition} ) {
+		This text will get output because
+		the condition is false
+	} @else {
+		This text would get output if the
+		condition was true
+	}
+</pre>
+<hr><br><h2>The <tt>foreach</tt> function</h2>
+<h3>How to loop</h3>
+The <tt>foreach</tt> function is used to loop over a set of
+values. Let's look at an example.
+<pre>
+	@foreach ( 1, 2, 3, 4, 5, 6 ) {
+		This is loop number ${.}\n
+	
+	}
+</pre>
+The output of the above code is:
+<pre>
+	This is loop number 1
+	This is loop number 2
+	This is loop number 3
+	This is loop number 4
+	This is loop number 5
+	This is loop number 6
+</pre>
+Each time through the loop, the special variable <tt>${.}</tt> will get
+set to the current argument. That special <tt>\n</tt> insterts a new line.
+This is necessary to get the next loop to be on a new line. This makes
+it possible to loop and keep the loop text on the same line.
+<h3>Looping over variables</h3>
+You can also loop over an array you have set.
+<pre>
+	@set( cookiejar, peanutbutter, oatmeal, sugar )
+	
+	@foreach ( ${cookiejar} ) {
+		I like ${.} cookies\n
+	}
+</pre>
+That code would output:
+<pre>
+	I like peanutbutter cookies
+	I like oatmeal cookies
+	I like sugar cookies
+</pre>
+<hr><br><h2>The <tt>include</tt> function</h2>
+
+The PML <tt>include</tt> function is used to include another
+file in the place of the <tt>include</tt> function. It takes
+an argument list of files to include.
+
+<br>
+
+To place file 'b' inside file 'a' at runtime use the following 
+code:
+
+<pre>
+	# This is file a
+	Blah Blah Blah
+	@include(b)
+</pre>
+
+The <tt>include</tt> function is special in that it is a parse time
+function. This means that the file you are including must exist
+during the parsing of the original file, and you can not use
+variables or other functions in the argument list of the
+<tt>include</tt>. One exception to this rule is if the variable
+was defined outside the file, such as in a Perl script.
+<hr><br><h2>PML Macros</h2>
+<h3>What is a macro?</h3>
+
+A macro is a way to repeat text over and over again without having 
+to type it over and over again. It lets you group some text together
+and give it a name. Then to use that text you just call it by name.
+
+<h3>Defining a macro</h3>
+
+Use the PML <tt>macro</tt> function to define a macro. The <tt>macro</tt>
+function takes arguments and a block. The first argument is the name
+to call the macro and the block is the actual text. Example:
+
+<pre>
+	@macro( mymacro ) {
+		This text is called mymacro
+	}
+</pre>
+
+<h3>Using the macro</h3>
+
+To insert the text from above macro use call it by it's name:
+
+<pre>
+	Some text before the call to the macro
+	@mymacro() 
+	Some text after the call to the macro
+</pre>
+
+After that text is processed, it will look like:
+
+<pre>
+	Some text before the call to the macro
+	This text is called mymacro
+	Some text after the call to the macro
+</pre>
+
+<h3>Macro arguments</h3>
+
+PML macros can take arguments. Here is an example:
+
+<pre>
+	@macro( mymacro, myvariable ) {
+		The variable you passed was ${myvariable}
+	}
+</pre>
+
+Then to call that macro you just:
+
+<pre>
+	@mymacro(test)
+</pre>
+
+<h3>The ARGV Variable</h3>
+
+If your macro was given more arguments then you declared
+in your macro definition, they will be avaliable in the
+<tt>${ARGV}</tt> varible which is an array.
+<hr><br><h2>Need</h2>
+
+The <tt>need</tt> function is used to load in a external PML Module.
+It takes a list of PML Modules to load:
+
+<pre>
+	@need(CGI)
+	@need(LWP)
+</pre>
+
+Note: these are PML modules, not Perl Modules
+<hr><br><h2>The <tt>perl</tt> Function</h2>
+
+The <tt>perl</tt> function is used to eval perl code. This function does not take
+any arguments, just a block. The code to eval should be in the block.
+<br>
+
+You can access the PML variables inside the evaled perl by the hash %v.
+
+<pre>
+	@set(x, 1)
+	@perl{ $v{x}++; undef}
+</pre>
+
+The reason that you need the <tt>undef</tt> is because the output from the 
+eval is injected into the output stream. Your Perl code will always
+be evaled in list context.
+
+<pre>
+	@perl{ scalar localtime }
+	# puts the localtime into the output stream
+</pre>
+<hr><br><h2>Replace If Blank (<tt>rib</tt>)</h2>
+
+This PML function is very useful for HTML tables.
+It is like a reversed <tt>if</tt> function. It takes
+both an argument and a block. If the block turns out
+to be empty, then the function will return the string
+that was passed in the argument list. Here is an example
+used inside HTML:
+
+<pre>
+&lt;td&gt;
+	@rib( &amp;nbsp; ) {
+		@if (condition) {
+			text
+		}
+	}
+&lt;/td&gt;
+</pre>
+
+If the <tt>if</tt> function from above does not
+return any text, the <tt>rib</tt> function will 
+place a &amp;nbsp; in the output stream.
+<hr><br><h2><tt>warning</tt></h2>
+
+The <tt>warning</tt> function controls weather or
+not PML will produce warning messages. By default,
+warnings are turned off. Setting the warning flag
+to a true value will turn them on.
+
+<pre>
+	@warning(1)
+	${new}
+	# this will produce a warning because
+	# new did not have a value
+	@perl{ldkj';;}
+	# warning above because the perl statement
+	# had syntax errors
+</pre>
+<hr><br><h2>The <tt>while</tt> function</h2>
+<h3><tt>while</tt> loops</h3>
+
+The <tt>while</tt> function lets you repeat some text
+over and over while some condition is true.
+
+<pre>
+	@set(condition, 1)
+	@set(i, 1)
+	@while(${condition}) {
+		Loop number 
+	}
+</pre>
+
+That code produces:
+
+<pre>
+	Loop number 1
+	Loop number 2
+	Loop number 3
+</pre>
+
+<h3><tt>until</tt> loops</h3>
+
+You can use <tt>until</tt> instead of <tt>while</tt>.
+The only difference is that <tt>until</tt> only
+loops while the condition is false.
+<hr><br><h2>The <tt>wrap</tt> Function</h2>
+
+<tt>wrap</tt> will take some options as it's arguments
+and alter the text inside it's block. Here are the
+arguments to give to <tt>wrap</tt>
+
+<ol>
+	<li>Number of columns to wrap to (Defaults to 80)
+	<li>Charater to use before wrap (Defaults to blank)
+	<li>Charater to used to start wraped lines (Defaults to blank)
+</ol>
+	</body>
+</html>

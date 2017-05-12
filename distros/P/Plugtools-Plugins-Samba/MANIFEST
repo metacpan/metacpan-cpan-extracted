@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Plugtools/Plugins/Samba.pm
+lib/Plugtools/Plugins/Samba/SIDupdate.pm
+lib/Plugtools/Plugins/Samba/makeSambaAccount.pm
+lib/Plugtools/Plugins/Samba/setPass.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

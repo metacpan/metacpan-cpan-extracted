@@ -1,0 +1,252 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings FATAL => 'all';
+use utf8;
+use Capture::Tiny 'capture';
+use File::Find;
+use File::Spec::Functions qw(catdir catfile splitdir splitpath);
+use File::stat;
+use List::Util 'first';
+use POSIX 'strftime';
+
+my ($LOG_FILE, $ACTION, $NAME, @args) = @ARGV;
+die "Log file argument is missing" if !defined $LOG_FILE;
+die "Action argument is missing" if !defined $ACTION;
+die 'Name argument missing' if !defined $NAME;
+
+my $sub = "_${ACTION}_torrent";
+__PACKAGE__->$sub(@args) if $NAME !~ /^[0-9A-F]+\.meta$/;
+
+sub _inserted_new_torrent {
+    shift @_;
+    my ($size, $torrent_file) = @_;
+
+    for ($size, $torrent_file) {
+        die "An argument is missing for 'inserted_new'" if !defined $_;
+    }
+
+    my $user = getpwuid(stat($torrent_file)->uid);
+    _torrentlog($ACTION, $NAME, $user, $size);
+    return;
+}
+
+sub _erased_torrent {
+    shift @_;
+    my ($size, $down, $up, $ratio) = @_;
+
+    for ($size, $down, $up, $ratio) {
+        die "An argument is missing for 'erased'" if !defined $_;
+    }
+
+    _torrentlog($ACTION, $NAME, $size, $down, $up, $ratio);
+    return;
+}
+
+sub _hash_queued_torrent {
+    shift @_;
+    my ($size, $done_size, $torrent_file, $complete) = @_;
+
+    for ($size, $done_size, $torrent_file, $complete) {
+        die "An argument is missing for 'erased'" if !defined $_;
+    }
+
+    return if $complete || $size != $done_size;
+
+    my $enqueued = stat($torrent_file)->ctime;
+    my $finished = time;
+
+    _torrentlog($ACTION, $NAME, $enqueued, $finished, $size);
+    return;
+}
+
+sub _finished_torrent {
+    shift @_;
+    my ($content, $top_dir, $unrar) = @_;
+
+    chdir $top_dir or die "Can't chdir to $top_dir\n";
+    my $hash_done = time;
+    my $hash_started = 0;
+
+    if (-f $content) {
+        $hash_started = stat($content)->mtime;
+    }
+    else {
+        find(
+            sub {
+                return if -d $_;
+                my $mtime = stat($_)->mtime;
+                $hash_started = $mtime if $mtime > $hash_started;
+            },
+            $content,
+        );
+    }
+
+    my @rars;
+    my $rar_count = -1;
+
+    if ($unrar) {
+        if (-d $content) {
+            push @rars, _find_rar($content);
+            for my $cd (grep { -d } glob "$content/CD*") {
+                push @rars, _find_rar($cd);
+            }
+        }
+        elsif ($content =~ /\.rar$/) {
+            if (_rar_contents($content) > 1) {
+                my $dest_dir = $content;
+                $dest_dir =~ s/\.rar$//;
+                mkdir $dest_dir;
+                chdir $dest_dir or die "Can't chdir to $dest_dir\n";
+            }
+            push @rars, $content;
+        }
+        $rar_count = scalar @rars;
+    }
+
+    _torrentlog($ACTION, $NAME, $hash_started, $hash_done, $rar_count);
+
+    if (@rars) {
+        my $unrar_start = time;
+        for my $rar (@rars) {
+            my $rar_path = catfile($top_dir, $rar);
+            exit if fork; # let's not hold up rtorrent while we unrar
+
+            my $unrar_error;
+            (undef, $unrar_error) = capture {
+                system qw(unrar x -o+ -ierr -idq) => $rar_path;
+            };
+
+            if ($?) {
+                # just keep the first line
+                $unrar_error =~ s/^\n|\n$//gm;
+                $unrar_error =~ s/\n/␤/gm;
+                _torrentlog('unrar_failed', $NAME, $unrar_error);
+                return;
+            }
+        }
+        my $unrar_finish = time;
+
+        my @log_args = ('unrar', $NAME, $unrar_start, $unrar_finish, scalar @rars);
+
+        if (@rars == 1) {
+            my @rar_contents = _rar_contents($rars[0]);
+            push @log_args, $rar_contents[0] if @rar_contents == 1;
+        }
+
+        _torrentlog(@log_args);
+    }
+
+    return;
+}
+
+sub _torrentlog {
+    my @values = @_;
+    open my $log, ">>", $LOG_FILE or die "Can't open $LOG_FILE: $!";
+    my $date = strftime '%Y-%m-%d %H:%M:%S ', localtime;
+    print $log join("\t", $date, @values), "\n";
+    close $log;
+    return;
+}
+
+sub _find_rar {
+    my ($dir) = @_;
+
+    my @files = sort grep { chomp; /\.(?:[0-9]{3}|(?:r(?:ar|\d+)|\d+))$/ } qx/find '$dir' -mindepth 1 -maxdepth 1/;
+    if (@files) {
+        my $target = $files[0];
+        if (my ($rar) = first { /\.rar$/ } @files) {
+            $target = $rar;
+        }
+
+        return $target if _rar_contents($target) == 1;
+    }
+    return;
+}
+
+sub _rar_contents {
+    my ($rar) = @_;
+    return split /\n/, qx/unrar lb '$rar'/;
+}
+
+=encoding utf8
+
+=head1 NAME
+
+irctor-queue - Log RTorrent actions to a file
+
+=head1 DESCRIPTION
+
+This program is meant to be called by RTorrent's event handlers. It logs
+actions to a log file based on the arguments it receives.
+
+Optionally, when RTorrent tells it that a torrent has finished,
+I<irctor-queue> can inspect the downloaded content and call L<unrar(1)> in
+these situations:
+
+=over 4
+
+=item * The content is a single rar file. If the rar archive contains more
+than one file/directory, a directory will be created to contain them, with
+the same name as the archive without the ".rar" suffix)
+
+=item * The content is a directory with a rar archive that contains a single
+file/directory
+
+=item * The content is a directory containing CD[1-9] subdirectories which
+have rar archives (containing only a single file/directory each)
+
+=back
+
+L<POE::Component::IRC::Plugin::RTorrentStatus|POE::Component::IRC::Plugin::RTorrentStatus>
+follows the log file created by this program and announces various events on IRC.
+
+=head1 CONFIGURATION
+
+F<.rtorrent.rc> must have the following lines in it. F</tmp/torrentlog> is the
+log file it will write to. Change it if you want to keep it elsewhere. Note
+that C<irctor_finished> needs to know where you keep your completed files
+(last argument).
+
+ # irctor-queue hooks, with unrar
+ system.method.set_key = event.download.inserted_new,irctor_inserted_new,"execute=irctor-queue,/tmp/torrentlog,inserted_new,$d.get_name=,$d.get_size_bytes=1,$d.get_tied_to_file=1"
+ system.method.set_key = event.download.hash_queued, irctor_hash_queued, "execute=irctor-queue,/tmp/torrentlog,hash_queued, $d.get_name=,$d.get_size_bytes=1,$d.get_completed_bytes=1,$d.get_tied_to_file=1,$d.get_complete=1,$d.get_down_total=1"
+ system.method.set_key = event.download.finished,    irctor_finished,    "execute=irctor-queue,/tmp/torrentlog,finished,    $d.get_name=,$d.get_base_filename=1,/home/leech/torrent/complete"
+ system.method.set_key = event.download.erased,      irctor_erased,      "execute=irctor-queue,/tmp/torrentlog,erased,      $d.get_name=,$d.get_size_bytes=1,$d.get_completed_bytes=1,$d.get_up_total=1,$d.get_ratio=1"
+
+B<Note:> If you don't get any "Finished" events, it's probably because you
+have C<check_hash = no> in your RTorrent config. Remove it. If you have any
+other problems, you should add e.g. C<log.execute = /tmp/exec.log> to store
+any errors RTorrent experiences when executing event hooks.
+
+=head2 With unrar functionality
+
+If wou want the unrar functionality, you must edit the C<irctor_finished>
+line by adding a C<1> argument to the end:
+
+ system.method.set_key = event.download.finished,    irctor_finished,    "execute=irctor-queue,/tmp/torrentlog,finished,    $d.get_name=,$d.get_base_filename=1,/home/leech/torrent/complete,1"
+
+If you have an RTorrent hook which moves completed downloads to
+some directory, make sure the name of that hook comes before (according to
+ASCII sorting) the name of the C<irctor_finished> hook. This is necessary
+because RTorrent executes hooks in alphabetical order.
+
+=head3 Caveats
+
+If an unrar operation fails we try to report the error message, but in some
+cases an empty message will be delivered. One such case is when unrar fails
+due to reaching the user's disk quota, because the error message will be
+delivered to the process' controlling terminal, which we don't catch (yet).
+
+=head1 AUTHOR
+
+Hinrik E<Ouml>rn SigurE<eth>sson, hinrik.sig@gmail.com
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Hinrik E<Ouml>rn SigurE<eth>sson
+
+This program is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

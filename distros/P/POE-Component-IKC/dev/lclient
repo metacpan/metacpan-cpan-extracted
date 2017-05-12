@@ -1,0 +1,39 @@
+#!/usr/bin/perl -w
+use strict;
+
+use lib qw(blib/lib blib/arch);
+
+use POE::Component::IKC::ClientLite;
+
+my $name="Client$$";
+
+
+my $remote=POE::Component::IKC::ClientLite->spawn(
+            port=>21510,            
+            name=>$name,
+            timeout=>5,
+    );
+
+die $POE::Component::IKC::ClientLite::error unless $remote;
+
+print "Hello\n";
+$remote->post('IKC/ping', 'PING') 
+        or die $POE::Component::IKC::ClientLite::error;
+print "world\n";
+my $ret=$remote->call('IKC/ping', 'PING') 
+        or die $POE::Component::IKC::ClientLite::error;
+print "Simple $ret\n";
+
+$|++;
+
+for(my $q=0; $q<10; $q++)
+{
+    
+    print "(((($q ";
+    $ret=$remote->call('IKC/ping', 'PING') 
+        or print '-', $POE::Component::IKC::ClientLite::error;
+    print $ret if $ret;
+    print "))))\n";
+    sleep(1);
+}
+print "\n";

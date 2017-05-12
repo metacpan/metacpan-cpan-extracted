@@ -1,0 +1,6 @@
+name = "Plack-Middleware-Session-Simple"
+
+[FileGatherer]
+exclude_match = ['^test/.*']
+
+

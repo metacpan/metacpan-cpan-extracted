@@ -1,0 +1,22 @@
+docs: |
+    The L<Digest::MD5> module provides sufficient support.
+
+        use Digest::MD5;
+
+        sub md5_file
+        {
+            my $filename = shift;
+            my $ctx = Digest::MD5->new;
+            open my $fh, '<', $filename or die $!;
+            binmode( $fh );
+            $ctx->addfile( $fh )->digest; # or hexdigest, or b64digest
+        }
+
+    Despite providing that possible implementation just above, I've chosen to
+    not include it as an export due to the amount of flexibility of
+    L<Digest::MD5> and the number of ways you may want to get your file
+    handle. After all, you may want to use L<Digest::SHA1>, or
+    L<Digest::MD4> or some other digest mechanism.
+
+    Again, I wonder why PHP has the function as they so arbitrarily
+    hobble it.

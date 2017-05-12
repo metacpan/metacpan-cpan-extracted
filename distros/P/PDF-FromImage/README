@@ -1,0 +1,41 @@
+NAME
+    PDF::FromImage - Create PDF slide from images
+
+SYNOPSIS
+        use PDF::FromImage;
+        
+    my $pdf = PDF::FromImage->new;
+        
+    $pdf->load_images(
+            'page1.png',
+            'page2.png',
+            :
+        );
+        
+    $pdf->write_file('output.pdf');
+
+DESCRIPTION
+    This module create simple pdf image slide from multiple images.
+
+METHODS
+  load_image($filename)
+    Load a image file.
+
+    Supported format are jpeg, tiff, pnm, png, and gif.
+
+  load_images(@filenames)
+    Load multiple images.
+
+  write_file($filename)
+    Generate pdf from loaded images, and write it to file.
+
+AUTHOR
+    Daisuke Murase <typester@cpan.org>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,8 @@
+Revision history for Perl extension Plucene::Plugin::Analyzer::SnowballAnalyzer.
+
+1.1  2004-04-30
+	- added support for Lingua::StopWords
+	- added a full example in POD
+
+1.0  2004-04-30
+	- initial version

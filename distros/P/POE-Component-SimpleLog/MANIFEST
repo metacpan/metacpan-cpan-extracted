@@ -1,0 +1,17 @@
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+lib/POE/Component/SimpleLog.pm
+t/1_load.t
+t/a_distribution.t
+t/a_hasversion.t
+t/a_kwalitee.t
+t/a_manifest.t
+t/a_minimumversion.t
+t/a_pod.t
+t/a_podcoverage.t
+t/a_strict.t
+META.yml                                 Module meta-data (added by MakeMaker)
+examples/log.pl
+Changes

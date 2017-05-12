@@ -1,0 +1,93 @@
+* BROADCAST TASK - Check ./STATUS and see if systems with which you
+  are familiar are correctly described.  Skills: be familiar with some
+  system. ;)
+
+* Look at directories under t/; move or merge the incoming tests  
+under xx-uncategorized/ to the directory to which they belong. In addition 
+to that, try to reorganize the increasingly overlapping and incoherent 
+directory-naming scheme a bit, perhaps grouped by synopses names (see 
+doc/Perl6/Spec/) and then by section names as subdirectories.
+
+* We already have "evalbot" under examples/network/; if Pugs build  
+fails, currently it simply uses the last-known-good version of ./pugs binary.
+However, it would be great for the bot to report a build failure (perhaps
+with nopasted log) on the channel.
+
+* POD format docs/Perl6/Overview/*.pod.
+
+* Rearrange t/ so that it is suited for reuse with multiple Perl 6
+implementations.  The generic Perl 6 tests, suitable to all Perl 6
+implementations, go in t/, and if any tests seem to be implementation
+specific, then perhaps this indicates the standard needs updating.
+
+* Remove all unconditional SKIP/TODO flags from t/, either replacing them
+with conditionals that only SKIP if the current Perl 6 implementation's
+CONFIG vars explicitly don't support the features that the test is for,
+or use Test.pm's &todo function to mark them as Pugs' TODO, or just letting
+them fail.
+
+* Re-group the majority general/implementation-generic Perl 6 tests first
+along lines of what is likely to be implemented together and/or by tier, a
+trivial example already in place being the sanity tests.  With the sanity
+tests plus Test.pm being tier zero, each additional tier can incorporate
+progressively more "difficult" features, and not assume that anything in
+tiers above it will work, only that those in tiers below it do.  This
+progression can be similar to how various other technical standards (such
+as XML or SQL) can come in tiers, with minimum mandatory plus optional
+additional features.
+
+* Gather ideas for our t/ testing and validation suite.
+t/ is getting to be a maintenance headache.  It's not going to scale
+another 2x, 3x, 4x, whatever.  Look at new modern languages (eg,
+scala, slate, pypy), at big languages (ghc, mono), and elsewhere (where?).
+Bring us ideas.  Skills: as described.
+
+* Scan docs directory for files which say "I am out of date" and list
+  them below.  Skills: none.
+
+* Reoccuring task: Syncronize docs/ with current language spec.
+Skills: understand p6 well enough to read p6l and Synopses.
+You can check your understanding of changes on #perl6.
+Things specifically known to need updating:
+ * docs/quickref/namespace
+
+* Reoccuring task: Check the [date] timestamps in STATUS.  They show
+the last time that section was verified as still correct.  If one is
+old, check with someone to see if it has changed.  What someone?  Ask
+on #perl6.  Skills: polite nagging.
+
+* ./pugs -V doesn't mention / is sloppy about a lot of stuff:
+  Note also  say %?CONFIG.perl;
+  Skills: p5, build system.
+** Notably, whether parrot and or p6 have been embedded. It should.
+   May be hard? - the build system is a bit messy.
+** It should perhaps also answer the "usual questions for someone with
+   a problem" - what os, cpu (64 bit?), ghc version, gcc version.
+** Some of the data lifted from `perl -V` at build time is bogus; for
+   example, `archname` on my system is i486-linux-gnu-thread-multi
+   because that's where debian's perl came from.
+
+* Add function aliases in misc/S29_round.pl. Will increase Google juice.
+Skill: know how to make a p6 function alias
+FIXME native english: 'toward' or 'towards'? the article uses both...
+    round_half_up_symmetric => round_matlab
+    round_half_up_asymmetric => round_java
+    round_half_even => round_bankers
+    round_half_even => round_vb
+    round_random => round_stochastic
+    round_ceiling => round_towards_positive_infinity
+    round_floor => round_towards_negative_infinity
+    round_toward_zero => round_fix
+
+* Setup CruiseControl and have it report build failure to the #channel.
+Skill: light sysadminship, code a logfile to IRC gateway (reuse a bot?)
+
+* Sometimes it's necessary to manually run:
+     util/gen_prelude.pl -v -i src/perl6/Prelude.pm -p ./pugs --output blib6/lib/Prelude.pm.yml
+  A flag to build_pugs to do that, as well as a Makefile.PL rule to
+  invoke that would be useful.
+
+* Help out with the introspection interface: write tests and prod for specs.
+  See the bottom of `t/syntax/signature.t`. Also applicable, Capture tests.
+
+* See pugs/misc/runpugs/TODO for "runpugs" tasks.

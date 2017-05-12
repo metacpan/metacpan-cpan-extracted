@@ -1,0 +1,28 @@
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::MyBaseAV
+PROTOTYPES: DISABLE
+
+MyBaseAV* MyBaseAV::new (int arg) {
+    if (arg) RETVAL = new MyBase(arg);
+    else RETVAL = NULL;
+}
+
+int MyBaseAV::val () {
+    RETVAL = THIS->val;
+}
+
+void MyBaseAV::DESTROY ()
+
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::MyBaseHV
+PROTOTYPES: DISABLE
+
+MyBaseHV* MyBaseHV::new (int arg) {
+    if (arg) RETVAL = new MyBase(arg);
+    else RETVAL = NULL;
+}
+
+int MyBaseHV::val () {
+    RETVAL = THIS->val;
+}
+
+void MyBaseHV::DESTROY ()

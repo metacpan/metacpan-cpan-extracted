@@ -1,0 +1,39 @@
+---
+abstract: 'Cross-platform path specification manipulation'
+author:
+  - 'Ken Williams <kwilliams@cpan.org>'
+build_requires:
+  Module::Build: 0.3601
+  Test: 0
+  Test::More: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Path-Class
+requires:
+  Carp: 0
+  Cwd: 0
+  Exporter: 0
+  File::Copy: 0
+  File::Path: 0
+  File::Spec: 3.26
+  File::Temp: 0
+  File::stat: 0
+  IO::Dir: 0
+  IO::File: 0
+  Perl::OSType: 0
+  Scalar::Util: 0
+  overload: 0
+  parent: 0
+  strict: 0
+resources:
+  bugtracker: http://github.com/kenahoo/Path-Class/issues
+  repository: git://github.com/kenahoo/Path-Class.git
+version: 0.37

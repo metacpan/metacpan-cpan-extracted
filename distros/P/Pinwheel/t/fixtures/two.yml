@@ -1,0 +1,19 @@
+two_1:
+  id: 1
+  one_id: 1
+  text: 2.1
+
+two_2:
+  id: 2
+  one_id: 2
+  text: 2.2
+
+two_3:
+  id: 3
+  one_id: 3
+  text: 2.3
+
+two_4:
+  id: 4
+  one_id: 4
+  text: 2.4

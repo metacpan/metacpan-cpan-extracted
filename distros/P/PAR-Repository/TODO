@@ -1,0 +1,56 @@
+ToDo list
+=========
+
+General:
+- Security?
+- HTTPS testing?
+- PAR::Repository::Client bootstrap script
+--> inline PAR::Dist
+--> Require Compress::Zlib
+--> LWP!??!
+--> load and install the "newest" .par file of PAR::Repository::Client from CPAN
+
+PAR
+===
+- Upgrading
+--> use PAR { repository => 'http://foo/', run => 'foo.pl', upgrade => 1 };
+----> "Works" in ::Client, but if a file is found locally, the repository check isn't even
+      reached
+
+- option logic: (Done except for "upgrade")
+  file => 'foo' || repository => 'foo'
+  fallback => 1|0 (1 default for repo, 0 default for file)
+  install => 1|0 or upgrade => 1|0 only for repository?
+
+PAR::Dist and friends
+=====================
+- Storage of dependency information in the PAR's META.yml
+--> For the simple blib_to_par, help the user working with that somehow
+
+PAR::Repository
+===============
+- Convert to using a different ("the best aka most compliant") or even an arbitrary YAML parser for META.yml's
+
+PAR::Indexer
+============
+- dependency management
+--> Implement the indexing of dependencies via static code analysis?
+
+PAR::Repository::Query
+======================
+- implement querying (mostly done)
+--> query arch
+- dependency management
+--> add querying for dependencies
+
+PAR::Repository::Client
+=======================
+- Use Parse::CPAN::Meta instead of YAML::Tiny!?
+- "update" mode needs to deal with dists that are no longer available.
+- "update" mode for scripts!
+- installation verbosity
+- parinstall client script?
+- static dependency resolution
+==> Initial implementation done
+--> special case for 'perl' dependency
+

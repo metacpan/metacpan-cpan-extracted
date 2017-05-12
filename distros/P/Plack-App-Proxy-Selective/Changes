@@ -1,0 +1,13 @@
+Revision history for Perl extension Plack::App::Proxy::Selective
+
+0.08    Sun Jan 22 22:02:53 2011
+        - fixed tests
+
+0.03    Sun Aug 15 22:02:53 2010
+        - added dependency for Test::More 0.94
+
+0.02    Sun Aug 8 20:02:30 2010
+        - fixed messy regular expressions and added more tests
+
+0.01    Sun Aug  1 01:02:53 2010
+        - original version

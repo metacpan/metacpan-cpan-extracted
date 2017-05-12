@@ -1,0 +1,34 @@
+Palm::Doc
+
+PalmDoc helper module for Palm::PDB (p5-Palm).
+
+This module requires p5-Palm to be installed. Unfortunately, CPAN doesn't
+seem able to index it properly so you'll probably have to get it manually.
+
+LICENSING
+=========
+
+Copyright 2004 by Christophe Beauregard
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the Artistic License, a copy of which
+can be found with the Perl distribution.
+
+This code is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+INSTALLING
+==========
+
+This is a standard perl module.
+
+	perl Makefile.PL
+	make
+	make install
+
+FEEDBACK
+==========
+
+	cpb@cpan.org (Christophe Beauregard)
+

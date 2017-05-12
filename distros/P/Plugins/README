@@ -1,0 +1,399 @@
+NAME
+     Plugins - Generic plugins framework
+
+SYNOPSIS
+     use Plugins;
+
+     $plugins = Plugins->new context => $context;
+     $plugins->readconfig($config_file, self => $self);
+     $plugins->initialize();
+
+     $plugins->invoke($method, @args);
+
+     $plugins->invoke_until($method, sub { scalar(@_) }, @args);
+
+     my $iterator = $plugins->iterator();
+     while (@results = &$iterator(@args)) {
+     }
+
+     for my $plugin ($plugins->plugins()) {
+            $plugin->invoke($method);
+     }
+
+DESCRIPTION
+    Plugins provides a simple way for a programs to be assembled at runtime
+    via configuration files.
+
+    Generally, there are only a few ways that a module in a library can be
+    customized for an application: (1) You can change the code of the
+    module; (2) if it presents an object-oriented interface you can subclass
+    it; or (3) the module in question can have a configuration file that
+    allows you to do what you need. Plugins makes it easier to allow
+    behavior to be modified by a configuration file by allowing other code
+    to be mixed in.
+
+    Plugins allows plugins have plugins and for all the plugins to share a
+    single configuration file. This isn't required but sometimes it's nice
+    to have everything in one place.
+
+    Each plugin is implemented by a perl module.
+
+    There can be more than one instance (object) for each plugin (class).
+
+    The Plugins module itself isn't complete and must be subclassed. An
+    example subclass that completes Plugins is Plugins::Style1. Plugins
+    written for use with the Plugins module generally don't need to know how
+    Plugins has been subclassed because the $context that is passed to a
+    plugin allows it to use Plugins directly even if its ancestor did not.
+
+NAMING CONVENTION
+    Since plugins can have plugins, some plugins will have Plugins objects
+    themselves. Some won't. We will term a user of Plugins to be
+    *requestor*. A *requestor* that is not itself a plugin will be termed
+    the *root*. A plugin will be termed a *child* and the *requestor* that
+    invoked it will be termed the *parent*. A plugin that has plugins is a
+    *child requestor*.
+
+CONSTRUCTION AND INITIALIAZATION
+    While there are similarities, using Plugins for the first time (by the
+    *root*) is different than using it as a plugin that has plugins (*child
+    requestor*).
+
+  *root* initialization.
+    The *root requestor* will need to create a plugins object. Since Plugins
+    needs to be subclassed it will create the object using the subclass. For
+    example, Plugins::Style1:
+
+     $plugins = Plugins::Style1->new(%args);
+     $plugins->readconfig($configfile, %args);
+     $plugins->initialize();
+
+  *child requestor* initialization
+    There are three steps for a *requestor* to take to start using plugins.
+    Each step is a call to Plugins:
+
+     $plugins = Plugins->new(context => $context, %args);
+     $plugins->readconfig($configfile, %args);
+     $plugins->initialize();
+
+    The most important argument for "Plugins::new()" is "context ="
+    $context>. The $context comes from the first argument to *child*->new()
+    when Plugins creates plugin object instances.
+
+    For *child requestors*, no %args are needed for new() except for
+    "context =" $context>.
+
+    Likewise, no %args are needed for "readconfig()".
+
+  %args for new()
+    There may be additional parameters depending on how Plugins is
+    subclassed.
+
+    The %args that "new()" userstands are:
+
+    configfile => "/config/file"
+        Provide a configuration file name. If this is done here then "undef"
+        can be passwd for the configfile to "readconfig()".
+
+    api => $api
+        Provide a Plugins::API object that will be passed to any plugins's
+        "new()" invocation.
+
+  %args for readconfig()
+    Readconfig has a positional argument: $configfile:
+
+     $plugins->readconfig($configfile, %args);
+
+    %args for "readconfig()" depend upon how Plugins is subclassed.
+
+USING PLUGINS
+    Plugins provides the following methods for *requestors*:
+
+    invoke($method, @args)
+        This calls each plugin in turn. Plugins are called in the order in
+        which they were configured. No return value is defined. The calls
+        are not eval-wrapped so a "die" in a plugin is fatal.
+
+    invoke_until($method, $testfunc, @args)
+        This calls each plugin in turn. Plugins are called in the order in
+        which they were configured. After each call, the return value from
+        the plugin method invocation is evaluated with "&$testfunc()". If
+        "&$testfunc()" returns a true value, then the return value from the
+        plugin method invocation is returned and no further calls are made.
+
+    plugins()
+        This returns the list of plugin objects. This will be in the order
+        in which the plugins were defined.
+
+    iterator($method)
+        This returns an anonymous function that when invoked will call the
+        first plugin ("$plugin-"method(@args)). Each successive call will
+        call another plugin until it returns undef.
+
+    startconfig()
+        This method can be used instead of "readconfig()" to start the
+        configuration process. It does not read any configuration files. It
+        is required prior to "parseconfig()" or "initialize()".
+
+    parseconfig($configfile, %args)
+        This parses a configuration file. Unlike "readconfig()" it does not
+        call "startconfig()" first.
+
+    api($api)
+        This will set an $api variable that will be passed to "new()" when
+        creating new plugin instances. This is expected to be a Plugins::API
+        object.
+
+RE-CONFIGURATION
+    The "readconfig()" method may be called more than once. Each time it is
+    called, "initialize()" may be called again. When "initialize()" is
+    called a second time, it calls "$plugin->shutdown()" for each of the old
+    plugins before calling "$plugin->new()" to create the new ones.
+
+    Each call to "readconfig()" starts fresh. If you want to add to an
+    existing set of plugins rather than replace them, use "parseconfig()"
+    instead of "readconfig()".
+
+WRITING PLUGINS
+    Plugins can be either a perl module that can be found by looking in @INC
+    or they can be files that are wrapped and eval'ed by the Plugins module.
+
+    For plugins that are files, they will be wrapped with a bit of code:
+
+            package Plugins::AutoGenerated::A_UNIQUE_GENERATED_VALUE;
+            our @ISA = qw(Plugins::Plugin);
+            use strict;
+            THE_CONTENTS_OF_THE_FILE
+
+    This wrapping is done by "file_plugin()" method.
+
+    For plugins that are regular perl modules and thus not auto-wrapped,
+    they should declare themselves to be subclasses of "Plugins::Plugin".
+
+    Plugin objects provide the following methods:
+
+    invoke($method, @args)
+        Basically this just does "$plugin->method(@args)". If $method does
+        not exist, just return undef.
+
+    new()
+        The default "new()" does the following:
+
+         sub new
+         {
+                my ($pkg, $pconfig, %args) = @_;
+                return bless { 
+                        context => $pconfig->{context}, 
+                        api     => $pconfig->{api}, 
+                        config  => \%args 
+                }, $pkg;
+         }
+
+        You'll often want to override "new()".
+
+  Plugin-defined methods
+    Plugins will need to define methods to be called. What methods need to
+    be defined depends upon what they are a plugin for. Plugins for programs
+    that are a Daemon::Generic will generally need "preconfig()" and
+    "postconfig()" methods. Look at the documentation or code of the
+    *requestor*.
+
+    The following methods are called directly by Plugins:
+
+    new($pconfig, @args)
+        Invoked to create an object instance of a plugin. The @args come
+        from the configuration file. The $pconfig is used to pass in
+        plugin-related configuration data. It's a reference to a hash and
+        "$pconfig->{context}" needs to be passed to any *child requestors*
+        so that they can fit themselves in properly.
+
+    shutdown()
+        Called when a object instance is no longer needed due to a reconfig
+        after the configuration file has been changed. On a reconfiguration,
+        all the old objects are destoryed and a new set are created. The
+        default "shutdown()" doesn't do anything.
+
+  AUTOLOAD with Plugins::API
+    The Plugins module has defines an "AUTOLOAD" function in Plugins::Plugin
+    base class to map unknown method invocations into "invoke()". It does
+    this through the Plugins::API module. Plugins that invoke a method that
+    isn't formally defined will have the attempted method invocation
+    redirected through "$self->{myapi}->invoke()" or
+    "$self->{api}->invoke()".
+
+    The default "new()" for plugins will capture a Plugins::API object
+    passed in from Plugins as "$self->{api}". Plugins that have plugins
+    might want to name their Plugins::API object "$self->{myapi}" (assuming
+    they have one).
+
+  Plugins with plugins
+    Plugins that themselves have plugins (*child requestors*) will need to
+    invoke Plugins themselves. If the overall program uses Daemon::Generic,
+    then doing this in a "preconfig()" method is reccomended. In other
+    contexts this may need to be done in "new()".
+
+     sub new
+     {
+            my ($pkg, $pconfig, %args) = @_;
+            return bless { 
+                    context => $pconfig->{context}, 
+                    api     => $pconfig->{api}, 
+                    config  => \%args 
+            }, $pkg;
+     }
+
+     sub preconfig
+     {
+            my ($self, $configfile) = @_;
+            my $config = $self->{config}{configfile} || $configfile;
+            $self->{plugins} = new Plugins %{$self->{context};
+            $self->{plugins}->readconfig($config, self => $self);
+            $self->{plugins}->initialize();
+            $self->{plugins}->invoke('preconfig', $config);
+     }
+
+    It is expected that whichever subclass of Plugins is used by the
+    *parent* should also be used by the child. The following snippet will
+    supress this behavior. This is probably a bad idea unless the *child*
+    uses a different configuration file than then *parent*.
+
+     local($self->{context}{pkg_override}{$config});
+     $self->{plugins} = new Plugins context => $self->{context};
+     $self->{plugins}->readconfig($config, self => $self);
+
+SUBCLASSING
+    If you don't want to use an existing configuration file format, you
+    don't have to.
+
+    Subclass Plugins and override a couple of methods to change the
+    behavior.
+
+    In addition to the methods defined above in the "USING PLUGINS" and in
+    "CONSTRUCTION AND INITIALIAZATION" that probably shoudn't be changed,
+    Plugins defines the following methods:
+
+    parseconfig($configfile, %args)
+        This is the method that actually parses a config file. This must be
+        overridden as the default just calls "die()".
+
+        The parameters come from either a direct call from the *requestor*
+        or are passed through unchanged from "readconfig()".
+
+    post_initialize($context, $plugin)
+        Called by "initialize_plugin()" after new'ing up an instance. The
+        default behavior is to do nothing. The $context is the same context
+        that is passwed to "new()" and "pkg_invoke()" and "addplugin()".
+
+    genkey($context)
+        This is called to generate a unique identifier for each plugin
+        instance. Duplicate identifiers will result in a "die()". The
+        default "genkey()" combines the configuration file name with the
+        plugin package name and thus does not allow multiple instances of
+        the same package.
+
+    $pkg = file_plugin($file, %opts)
+        This will look for $file and then auto-wrap it with a package
+        declaration to turn into a plugin perl module. The auto-generated
+        package name is returned.
+
+        %opts can be:
+
+        search_path
+            If $file isn't an absolute path, search for it in
+            "@{$opts{search_path}}". No search is done if unspecified.
+
+        referenced
+            Where was $file referenced from? (eg: "/some/config-file, line
+            33") Used in error messages only.
+
+        prefile
+            Code to insert in the eval just before the file's contents.
+
+        postfile
+            Code to insert in the eval just after the file's contents.
+
+        isa The value for the generated plugin's @ISA. Defaults to
+            "Plugins::Plugin".
+
+    registerplugin(%context)
+        This add a plugin to a configuration. This is used after
+        "startconfig()" and before "initialize()". This will "require" the
+        plugin unless the symbol table for the plugin already exists. This
+        method should not be overridden.
+
+    addplugin(%context)
+        This is used to bypass the entire "startconfig()",
+        "registerplugin()", "invoke()" process. The plugin will be
+        registered and initialized all at once. This can be used after
+        "initialize()" to add additional plugins. This will "require" the
+        plugin unless the symbol table for the plugin already exists.
+        Duplicate registrations of the same plugin will replace the old
+        plugin ("shutdown()" will be called). This method should not be
+        overridden.
+
+        The %context is the same as for "%registerplugin()"
+
+    pkg_invoke($pkg, [$method, @args])
+        This method will "require" a plugin and (optionally) call a class
+        method. This method should not be overridden.
+
+    initialize_plugin($self, $context)
+        This is used by "addplugin()" and "initialize()" to create plugin
+        instances. It calls "new()" and then "post_initialize()". This
+        method should not be overridden.
+
+  %context for addplugin() and registerplugin()
+    Most of the %context has that is given to "addplugin()" and
+    "registerplugin()" should (in theory) be passed as $context to the
+    plugin's "new($context, %args)" and then as "context => $context" to
+    "Plugins::new()" if the is a *child requestor*.
+
+    The part that is not passed to "Plugins::new()" is the part that defines
+    the *child* plugin:
+
+    pkg => 'Some::Plugin::Module'
+        The perl package name for the plugin.
+
+    new_args => [@args]
+        The @args will be passed to the the plugin's "new()":
+
+         new $pkg (\%context, @args)
+
+    requestor => 'The::Parent::Module'
+        The perl package name of the *parent* module. This will be found
+        with "caller()" if it isn't supplied.
+
+    configfile => "/some/file"
+        Which configuration file referenced the plugin and caused it to be
+        loaded.
+
+    lineno => 38
+        The of where the plugin was registered in $configfile. Used for
+        error messages.
+
+    The rest will be passed to *child* "Plugins::new()" by way of $context:
+
+    pkg_override => "Plugins::Subclass"
+        Plugins has been subclassed, this the name of the subclass.
+        Subclassing should usually be inherited by *child requestors* and
+        this is the mechenism that makes it happen.
+
+  Re-parsing the same configuration file
+    The tricky part of subclassing Plugins is that if a configruation file
+    is shared between *root requestors* and *child requestors* the
+    "parseconfig()" method will be invoked on the same file more than once.
+
+    Store extra things in %context to work around this issue.
+
+SEE ALSO
+    Plugins::Style1 Plugins::API
+
+THANK THE AUTHOR
+    If you find this module useful and wish to show your appreciation to the
+    author, please give me a Request-For-Quote on your next high-speed
+    internet pipe order. I have good pricing for T1s, T3s, OC3s etc.
+
+LICENSE
+    Copyright (C) 2006, David Muir Sharnoff <muir@idiom.com>. This module
+    may be used and redistributed on the same terms as Perl itself.
+

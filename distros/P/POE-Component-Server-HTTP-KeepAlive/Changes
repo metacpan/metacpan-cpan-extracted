@@ -1,0 +1,28 @@
+0.0305 Aug 26 2011
+    Bump POE version
+    Fix tests; Dump -> Dumper
+
+0.0304 Aug 26 2011
+    Bump copyright year
+
+0.0303 Aug 26 2011
+    Tweaks for some platforms    
+
+0.0302 Apr 15 2009
+    Kwalitee tweaks
+
+0.0301 Apr 15 2009
+    Kwalitee tweaks
+
+0.0300 Tue Jan 15 2008
+    Tweak test case
+    
+0.0200 Mon Jan 14 2008
+    Remove useless use YAML from test cases
+    
+0.0100 Mon Jan 7 2008
+	First release to the CPAN
+
+0.01  Fri Dec 21 2007
+	First release
+

@@ -1,0 +1,160 @@
+#!/usr/bin/perl
+
+###############################################################################
+#                          
+# J14Component Example           
+# (c) Nicholas Perez 2006 - 2009. 
+# Licensed under GPLv2     
+#                          
+# Please see the included  
+# LICENSE file for details
+#
+# This example component script, instantiates a single PCJ object, connects to 
+# a remote server, sends presence, and then begins sending messages to itself 
+# on a small random interval
+#                          
+###############################################################################
+
+use warnings;
+use strict;
+
+use 5.010;
+use POE; 									#include POE constants
+use POE::Component::Jabber; 				#include PCJ
+use POE::Filter::XML::Node; 				#include to build nodes
+use Carp;
+
+# First we create our own session within POE to interact with PCJ
+POE::Session->create(
+	options => { debug => 1, trace => 1},
+	inline_states => {
+		_start =>
+			sub
+			{
+				my ($kernel, $heap) = @_[KERNEL, HEAP];
+				$kernel->alias_set('Tester');
+				
+				# Our PCJ instance is a fullblown object we should store
+				# so we can access various bits of data during use
+				
+				$heap->{'component'} = 
+					POE::Component::Jabber->new(
+						IP => 'localhost',
+						Port => '5348',
+						Hostname => 'component.localhost',
+						Username => 'jabberd',
+						Password => 'secret',
+						Alias => 'COMPONENT',
+
+				# Shown below are the various connection types included
+				# from POE::Component::Jabber:
+				
+				# 	LEGACY is for pre-XMPP/Jabber connections
+				# 	XMPP is for XMPP1.0 compliant connections
+				# 	JABBERD14_COMPONENT is for connecting as a service on the
+				# 		backbone of a jabberd1.4.x server
+				# 	JABBERD20_COMPONENT is for connecting as a service on the
+				# 		backbone of a jabberd2.0.x server
+
+						#ConnectionType => +LEGACY,
+						#ConnectionType => +XMPP,
+						ConnectionType => +JABBERD14_COMPONENT,
+						#ConnectionType => +JABBERD20_COMPONENT,
+						Debug => '1',
+                
+                    );
+                
+                # POE::Component::Jabber now uses POE::Component::PubSub to
+                # manage event reporting including incoming packets. So in order
+                # to get anything out of POE::Component::Jabber we need to
+                # subscribe to the various events of which we have interest.
+                
+                # You can see a whole list of potential events (including 
+                # possible error states, but seeing the 
+                # POE::Component::Jabber::Events documentation.
+                
+                # PCJ_READY: Let's us know the connection is up and all of the
+                # various layers of the protocol have been established.
+                $kernel->post('COMPONENT', 'subscribe', +PCJ_READY, 'MyReadyEvent');
+                
+                # PCJ_NODERECEIVED: Fires everytime we get a node down the pipe
+                $kernel->post('COMPONENT', 'subscribe', +PCJ_NODERECEIVED, 'MyReceivedEvent');
+                
+                # We could subscribe to all of the various error conditions or
+                # even all of the various steps along the way so we could 
+                # report the status of the connection as it is building. But 
+                # for simplicity sake, this example will only cover the bare 
+                # minimum to get a connection up and running.
+				
+                # At this point, we have subscribed to the events we want and
+                # are ready to tell the component to connect to the server
+                
+                $kernel->post('COMPONENT', 'connect');
+				
+			},
+
+		_stop =>
+			sub
+			{
+				$_[KERNEL]->alias_remove('Tester');
+			},
+
+        # This is the event with used to subscribe to the PCJ_READY event.
+        # It will fire anytime a connection is fully initialized and ready for
+        # use. It passes no arguments.
+        MyReadyEvent =>
+            sub
+            {
+                say '--- Connection is ready for use! ---';
+
+                # Now will we will send presence
+                my $presence = POE::Filter::XML::Node->new('presence');
+                
+                # The stored POE::Component::Jabber object has a number of 
+                # useful methods we can use outside of POE event posting, 
+                # including jid()
+                $presence->setAttribute('from', $_[HEAP]->{'component'}->jid());
+                
+                # Some of the event names have changed since the 2.x series.
+                # 'output_handler' was replaced by plain old 'output'
+                $_[KERNEL]->post('COMPONENT', 'output', $presence);
+
+                # Now let's send ourselves some messages
+                $_[KERNEL]->yield('MyMessageSendEvent');
+            },
+        
+        # This is our event with which we subscribed to the PCJ_NODERECEIVED
+        # event. Once the connection is up and running, our event will be
+        # called once for every node received. ARG0 will contain the node
+		MyReceivedEvent => 
+            sub
+            {
+                say '--- Node received! ---';
+                say $_[ARG0]->toString();
+                say '----------------------';
+
+            },
+        
+        # This is the event we call from our ready event to start send messages
+        # to us.
+        MyMessageSendEvent =>
+            sub
+            {
+                my $message = POE::Filter::XML::Node->new
+                (
+                    'message',
+                    [
+                        'from', $_[HEAP]->{'component'}->jid(),
+                        'to', $_[HEAP]->{'component'}->jid()
+                    ]
+                );
+
+                $_[KERNEL]->post('COMPONENT', 'output', $message);
+                $_[KERNEL]->delay_set('MyMessageSendEvent', int(rand(6)));
+            },
+	}
+);
+
+POE::Kernel->run();
+
+exit 0;

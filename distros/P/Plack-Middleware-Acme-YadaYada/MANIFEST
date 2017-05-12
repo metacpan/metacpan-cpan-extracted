@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+README
+lib/Plack/Middleware/Acme/YadaYada.pm
+t/00-compile.t
+t/01-works.t
+xt/author/critic.t
+xt/release/dist-manifest.t
+xt/release/kwalitee.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

@@ -1,0 +1,29 @@
+Changes file for Perl::Critic::Policy::logicLAB::RequirePackageNamePattern
+
+0.05 2015-08-27 Maintenance release, update not required
+
+- Forgot to update the Changes (this) file
+
+
+0.04 2015-08-26 Maintenance release, update not required
+
+- Migrated from Module::Build to Dist::Zilla
+
+
+0.03 2014-03-09 Maintenance release, update not required
+
+- Addressed several reports on failing tests from CPAN testers for version 0.02.
+  The test-suite included File::Slurp without using it, but since the smokers assert
+  this is failed [1]
+
+  https://github.com/jonasbn/pcplrpnp/issues/1
+
+
+0.02 2014-03-05 Maintenance release, update not required
+
+- Added Changes (this) file
+
+
+0.01 2014-01-31
+
+- Initial release

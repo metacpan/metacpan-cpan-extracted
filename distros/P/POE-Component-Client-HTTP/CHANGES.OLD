@@ -1,0 +1,117 @@
+============
+Things to do
+============
+
+Nothing at the moment.
+
+=================================================
+Revision history for POE::Component::Client::HTTP
+=================================================
+
+Changes marked with "(!!!)" may break backward compatibility.  Changes
+marked with "(???)" are just information.
+
+Note to self: Don't forget to tag the version after a new distribution
+is released.  For example: `cvs tag -Rc v1_00 .'
+
+---------------
+0.41 2002.03.25
+---------------
+
+Just 0.4001 after people confirmed that it actually works. :)
+
+-----------------------------
+0.4001 (private test release)
+-----------------------------
+
+Frank Konen discovered that this component's Content-Length and header
+size calculations were incorrect before Erick Calder.  Hopefully 0.41
+will fix things for everyone.
+
+Erick Calder discovered a site that didn't work with 0.40.  This
+release patches the fix in 0.40 so both his test cases work, but it's
+not generally relased in case he discovers another problem.  0.41
+should be released in a couple days if all goes well.
+
+---------------
+0.40 2002.03.17
+---------------
+
+Erick Calder <e@arix.com> discovered that Client::HTTP was cutting
+responses short.  It turns out that 0.39 was counting the headers
+towards the content length.  Rocco reset the received octets count at
+the end of the headers.
+
+---------------
+0.39 2001.12.06
+---------------
+
+Rocco installed Client::HTTP in a live program, and it promptly broke.
+This release fixes the new timer code in 0.38.
+
+---------------
+0.38 2001.12.06
+---------------
+
+Fixed the SYNOPSIS per Jason Boxman's recommendation.
+
+Made the Timeout parameter significant.  There was no code behind it
+before now.
+
+---------------
+0.37 2001.10.15
+---------------
+
+Add a MaxSize parameter to the Component's constructor.  When used, it
+can prevent the world from blowing up when someone hands you
+<http://localhost:19/>.
+
+---------------
+0.36 2001.05.29
+---------------
+
+Martijn van Beers sent in a patch to have the client send an entire
+query, parameters and all, and not just the path.
+
+Some servers return bad newlines in the headers.  Detect the newline
+style in the status line, and use that throughout the headers.
+
+Added a new parameter to the 'request' event: A tag that can be used
+to match requests to responses regardless of the URL.  The tag will be
+passed back with a response, in offset 1 of the request packet.
+
+Removed the requirement that an HTTP status line have a protocol type
+and version.
+
+Added the HTTP::Request to the HTTP::Response this module returns.
+The CookieJar needs this, as does everyone who expects this module to
+work properly.
+
+---------------
+0.35 2000.09.20
+---------------
+
+Added cookies support, and documented the CookieJar parameter for
+PoCo::Client::HTTP->spawn().
+
+---------------
+0.34 2000.09.02
+---------------
+
+On crysflame's recommendation, I moved the HTTP.pm file out of
+POE/Component/Client and added a PM directive to Makefile.PL.  Now
+HTTP.pm gets installed.  Fixed the MANIFEST and cleaned up Makefile.PL
+a little while I was in there.
+
+---------------
+0.33 2000.09.01
+---------------
+
+Initial release.  Arbitrarily versioned at 0.33 to indicate the
+author's confidence in its completion (that is, it's about 1/3 of the
+way).  It works for simple GET and POST requests; others may also
+work, but they haven't been tested.
+
+===========================
+EOF: Thank you for reading.
+===========================

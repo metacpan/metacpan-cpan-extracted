@@ -1,0 +1,46 @@
+---
+abstract: 'NoPaste plugin for Padre, The Perl IDE.'
+author:
+  - 'Kevin Dawson <bowtie@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.98
+  Test::Requires: 0.07
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Padre::Plugin::Nopaste
+name: Padre-Plugin-Nopaste
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+recommends:
+  ExtUtils::MakeMaker: 6.78
+  File::Spec::Functions: 3.4
+  List::Util: 1.32
+  Test::Pod: 1.48
+  Test::Pod::Coverage: 1.08
+requires:
+  App::Nopaste: 0.92
+  Carp: 1.32
+  Moo: 1.003001
+  Padre: 0.98
+  Try::Tiny: 0.18
+  constant: 1.27
+  parent: 0.228
+  perl: 5.10.1
+resources:
+  bugtracker: http://padre.perlide.org/trac
+  homepage: http://padre.perlide.org/trac/wiki/PadrePluginNopaste
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-Nopaste/
+version: 0.08

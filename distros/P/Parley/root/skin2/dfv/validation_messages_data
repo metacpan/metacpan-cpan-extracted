@@ -1,0 +1,23 @@
+[%
+    SET error_message = {
+        # messages for missing fields
+        missing => {
+            match_type                  => 'MISSING_SEARCH_MATCH_TYPE',
+            search_terms                => 'MISSING_SEARCH_TERMS',
+
+            moon_stick                  => 'I demand the MOON! On a STICK!',
+        },
+
+        # messages for invalid fields (failed constraints)
+        invalid => {
+            # reCAPTCHA messages (from: http://recaptcha.net/apidocs/captcha/)
+            'incorrect-captcha-sol'     => 'the CAPTCHA solution was incorrect',
+            'recaptcha-not-reachable'   => 'unable to contact the reCAPTCHA verify server',
+        },
+
+        # mappings from field names to something we'd like to show the user
+        name => {
+            email_address               => 'Email Address',
+        },
+    }
+%]

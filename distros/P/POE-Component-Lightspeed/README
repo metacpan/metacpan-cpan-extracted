@@ -1,0 +1,31 @@
+POE-Component-Lightspeed version 0.03
+=====================================
+
+This is the romping grounds of IKC2
+
+INSTALLATION
+
+To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	POE
+	Graph
+	Carp
+	Time::HiRes
+	Socket
+
+COPYRIGHT AND LICENCE
+
+Copyright 2005 by Apocalypse
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

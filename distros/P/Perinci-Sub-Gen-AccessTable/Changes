@@ -1,0 +1,416 @@
+Revision history for Perinci-Sub-Gen-AccessTable
+
+0.55    2016-02-13 (PERLANCAR)
+
+        [Incompatible changes]
+
+        - Make the generated 'sort' argument as array of str instead of str, so
+          we can add an 'in' schema clause to each str and helps tab completion
+          complete each sort field.
+
+
+0.54    2015-09-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.53    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.52    2015-07-15 (PERLANCAR)
+
+	- Add x.dynamic_generator_modules to generated function metadata.
+
+
+0.51    2015-07-01 (PERLANCAR)
+
+	- Tweak schema for --field (add in clause) so completion works.
+
+
+0.50    2015-07-01 (PERLANCAR)
+
+        - No functional changes.
+
+        - Re-upload.
+
+
+0.49    2015-07-01 (PERLANCAR)
+
+        - Support Time::Moment (and use it by default).
+
+
+0.48    2015-04-28 (PERLANCAR)
+
+	- [ux] Use singular form of --fields (--field) when user specifies
+	  a string.
+
+
+0.47    2015-04-22 (PERLANCAR)
+
+	- [ux] Add 'pos=0' property for query.
+
+	- [Bugfix] Forgot to adjust hash key name for query.
+
+
+0.46    2015-04-21 (PERLANCAR)
+
+        - Add some *_aliases args to gen_read_table_func() to set
+          cmdline_aliases for generated args like detail, with_field_names, etc.
+
+        - [ux] Give default alias -l for --detail.
+
+        - [Incompatible Change] Rename --q to --query but give -q as cmdline
+          alias.
+
+
+0.45    2015-04-09 (PERLANCAR)
+
+	- Don't give default to schema when default is undef.
+
+
+0.44    2015-02-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use Data::Sah::Normalize instead of Data::Sah when just for
+	  normalizing schemas.
+
+
+0.43    2015-01-02 (PERLANCAR)
+
+	- Adjust to Data::Sah 0.37 (Data::Sah::Util::Type module renamed to
+	  Data::Sah::Util::Typee::Date).
+
+
+0.42    2014-12-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use new name of renamed/split module SHARYANTO::Locale::Util ->
+	  Locale::Set.
+
+
+0.41     2014-09-17 (PERLANCAR)
+
+         - [Bugfix] did not use SHARYANTO::Locale::Util's setlocale().
+
+         - [Build] Add missing dependency to
+           Perinci::Sub::Property::result::table.
+
+
+0.40     2014-07-22 (SHARYANTO)
+
+         - No functional changes.
+
+         - Skip including prereqs for examples/* to reduce size of dependencies.
+
+
+0.39     2014-06-29 (SHARYANTO)
+
+         - Implement TableDef 1.0.4's include_by_default by introducing
+           'with.FIELD' arguments.
+
+
+0.38     2014-05-06 (SHARYANTO)
+
+         - Add option: extra_args.
+
+         - Add options to disable some aspects:
+           enable_{paging,ordering,random_ordering,filtering,field_selection}.
+
+
+0.37     2014-04-25 (SHARYANTO)
+
+         - Support 'date' type.
+
+
+0.36     2014-04-10 (SHARYANTO)
+
+         - No functional changes.
+
+         - Replace Data::Clone with Function::Fallback::CoreOrPP.
+
+
+0.35     2014-04-02 (SHARYANTO)
+
+         [REMOVED FEATURES]
+
+         - No longer add table description to function's description. Instead,
+           generated help/documentation on table structure will be produced by
+           Perinci::CmdLine's help hooks or corresponding Perinci::To::Doc's
+           hook. See Perinci::Sub::Property::result::table.
+
+
+0.34     2014-03-29 (SHARYANTO)
+
+         - Bugfix: 'table.fields' result metadata had an extra array level.
+
+
+0.33     2014-03-28 (SHARYANTO)
+
+         - Generate result/table property in function metadata.
+
+         - Replace 'result_format_options' with 'table.fields' in result
+           metadata.
+
+
+0.32     2014-03-27 (SHARYANTO)
+
+         - Now follow SHARYANTO::TableSpec 1.0.1 specification. Note that the
+           'index' property in field specification is now renamed to 'pos' in
+           the TableSpec spec, but this module will support both for some time.
+
+
+0.31     2014-03-27 (SHARYANTO)
+
+         - No functional changes.
+
+         - Rebuild to fix POD.
+
+
+0.30     2014-01-09 (SHARYANTO)
+
+         - No functional changes. Use SHARYANTO::Locale::Util instead of POSIX.
+
+
+0.29     2013-12-13 (SHARYANTO)
+
+         - No functional changes. Use Locale::TextDomain::UTF8.
+
+
+0.28     2013-12-12 (SHARYANTO)
+
+         - Switch from Locale::Maketext to Locale::TextDomain.
+
+
+0.27     2013-10-26 (SHARYANTO)
+
+         - Generate 'FIELD.isnt' arguments.
+
+
+0.26     2013-10-05 (SHARYANTO)
+
+         - Add formatting hints for bools.
+
+         - Order result fields by their index in spec.
+
+
+0.25     2013-10-05 (SHARYANTO)
+
+         - Hook can abort function by returning an error response.
+
+
+0.24     2013-10-03 (SHARYANTO)
+
+         - No functional changes. A couple of fixes.
+
+
+0.23     2013-09-12 (SHARYANTO)
+
+         - Generated function will add result_format_options result metadata to
+           hint order of columns.
+
+
+0.22     2013-09-12 (SHARYANTO)
+
+         - Add hook: before_return.
+
+         - Update examples.
+
+
+0.21     2013-09-11 (SHARYANTO)
+
+         - No functional changes. Forgot to silence smartmatch again warnings
+           after 'use warnings'" [CT].
+
+
+0.20     2013-08-07 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add F.in and F.not_in filtering arguments for each field.
+
+         [ETC]
+
+         - Add 'use experimental smartmatch' for 5.18+.
+
+
+0.19     2013-07-05 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Do not produce circular references between 'FIELD' and 'FIELD.is'
+           arguments. This prevents Riap clients from fetching the generated
+           function's metadata.
+
+
+0.18     2013-07-04 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add hooks to allow generated function to execute other stuffs.
+
+
+0.17     2012-11-02 (SHARYANTO)
+
+         - No functional changes. Slightly reduce startup overhead by not using
+           Perinci::Exporter and delay loading modules.
+
+         [INCOMPATIBLE CHANGES]
+
+         - No longer uses Perinci::Exporter (I'm personally deprecating the use
+           of that module).
+
+
+0.16     2012-08-10 (SHARYANTO)
+
+         - No functional changes. To avoid circular dependency, split
+           Perinci::Sub::Gen::common into its own dist and rename it to
+           Perinci::Sub::Gen.
+
+
+0.15     2012-08-04 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Previous fix didn't work.
+
+
+0.14     2012-08-03 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Fix finding caller if function is wrapped (since we use
+           Perinci::Exporter).
+
+
+0.13     2012-07-11 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Now argument 'name' is required.
+
+         [ENHANCEMENTS]
+
+         - Add arguments 'name', 'package', and 'install'. Now installs
+           generated function for you by default.
+
+
+0.12     2012-06-04 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add arguments 'summary' and 'description' to pass to generated
+           metadata.
+
+
+0.11     2012-06-04 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Make terminology consistent (column -> field, row -> record). This
+           means table spec's 'columns' is now 'fields'. Subroutine table data
+           is expected to return 'fields_selected' instead of
+           'columns_selected'. Sorry for this.
+
+
+0.10     2012-03-23 (SHARYANTO)
+
+         [FIXES]
+
+         - Fix --detail
+
+         [INCOMPATIBLE CHANGES]
+
+         - --fields now does not automatically enables --with-field-names
+
+
+0.09     2012-03-22 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Remove 'default_filters' which exposed internal filter structure,
+           replace it with 'default_arg_values' instead.
+
+         - Add 'custom_filters'.
+
+
+0.08     2012-03-22 (SHARYANTO)
+
+         - Fixes for English translation.
+
+         - build: Tweak dependency.
+
+
+0.07     2012-03-22 (SHARYANTO)
+
+         - Rename distribution from Sub-Spec-Gen-ReadTable to
+           Perinci-Sub-Gen-AccessTable.
+
+         [INCOMPATIBLE CHANGES]
+
+         - Syntax of filter arguments become "FIELD.min", "FIELD.max", etc
+           instead of the old "min_FIELD", "max_FIELD", etc. This results in
+           fewer clashes with other arguments.
+
+         - Rename some arguments: show_field_names -> with_field_names.
+
+         - Rename some filter arguments, for consistency: contain -> contains,
+           not -> isnt, match -> matches, lack -> lacks.
+
+         [ENHANCEMENTS]
+
+         - Translation.
+
+         - Add some filter arguments: xmin, xmax.
+
+
+0.06     2012-01-20 (SHARYANTO)
+
+         - No functional changes. Mark deprecation.
+
+
+0.05     2011-11-23 (SHARYANTO)
+
+         - No functional changes. Replace Data::Sah::Util with Data::Sah.
+
+
+0.04     2011-10-19 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES, ENHANCEMENTS]
+
+         - 'table_data' function is now expected to return {data=>DATA, ...}
+           instead of just DATA. This is to allow function to return data that
+           is already filtered (by passing filtered=>1), and/or sorted
+           (sorted=>1), and/or paged (paged=>1) for efficiency.
+
+
+0.03     2011-08-31 (SHARYANTO)
+
+         - No functional changes. Updated because _parse_schema() is moved from
+           Sub::Spec::Utils to Data::Sah::Util.
+
+
+0.02     2011-06-13 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Generated function can search array fields.
+
+         - Column specification clause: column_searchable (default 1) which can
+           be set to false to exclude column from searching.
+
+         - Provide search data (search_fields, search_re) in query.
+
+
+0.01     2011-06-13 (SHARYANTO)
+
+         - First release.

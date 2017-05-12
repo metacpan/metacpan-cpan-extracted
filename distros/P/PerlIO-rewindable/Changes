@@ -1,0 +1,20 @@
+version 0.001; 2011-07-11
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * jump through hoops to avoid compiler warnings
+
+  * remove extraneous variables from C code
+
+  * use full stricture in test suite
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.000; 2010-07-18
+
+  * initial released version

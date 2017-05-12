@@ -1,0 +1,13 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+datarootdir=${prefix}/share
+datadir=${datarootdir}
+includedir=${prefix}/include
+bin=${prefix}/bin/bcop
+xsltpath=/usr/local/share/bcop
+
+Name: bcop
+Description: Compiz option code generator
+Version: 0.8.4
+Requires:
+

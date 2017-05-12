@@ -1,0 +1,166 @@
+NAME
+    Parallel::Mpich::MPD - Mpich MPD wrapper
+
+    *$VERSION*
+SYNOPSIS
+    use Parallel::Mpich::MPD;
+        # VERBOSE LEVEL
+        #$Parallel::Mpich::MPD::Common::WARN=1;
+        #$Parallel::Mpich::MPD::Common::DEBUG=1;
+    
+        #CHECK ENV
+        Parallel::Mpich::MPD::Common::env_Hostsfile(/path/to/machinesfile);
+        Parallel::Mpich::MPD::Common::env_MpichHome(/path/to/mpdhome);
+        Parallel::Mpich::MPD::Common::env_Check();
+    
+        #CHECK MPD AND NETWORK
+        my %hostsup;
+        my %hostsdown;
+        my %info=Parallel::Mpich::MPD::info();    #check mpd master
+        print Dumper(\%info)
+        %hostsup= Parallel::Mpich::MPD::Common::checkHosts(hostsdown => \%hostsdown );    #check ping and ssh on machines 
+        %hostsup= Parallel::Mpich::MPD::check( reboot =>1:0, hostsdown=>\%hostsdown);     #check mpds instances and try to repair
+        ...    
+    
+        # USE MPD
+        Parallel::Mpich::MPD::boot();     #start mpd instances defined by default machinesfile
+        my $alias1=Parallel::Mpich::MPD::makealias();
+        if Parallel::Mpich::MPD::createJob(cmd => $cmd, params => $parms, $machinesfile => $hostsfile, alias => $alias1)){
+          my $job=Parallel::Mpich::MPD::findJob(jobalias => $alias, getone => 1);
+          $job->sig_kill() if defined $job;
+        }
+
+DESCRIPTION
+    This *Parallel::Mpich::MPD*, a wrapper module for MPICH2 Process
+    Management toolkit from <http://www-unix.mcs.anl.gov/mpi/mpich2/>. The
+    wrapper include the following tools: basic configuration, mpdcheck,
+    mpdboot, mpdcleanup, mpdtrace, mpdringtest, mpdallexit, mpiexec,
+    mpdsigjob and mpdlistjobs.
+
+    boot(hosts => @hosts, machinesfile => $machines, checkOnly => 1|0,
+    output => \$output)
+        starts a set of mpd's on a list of machines. boot try to verify that
+        the hosts in the host file are up before attempting start mpds on
+        any of them.
+
+    rebootHost(host => $hostname)
+        restart mpd on the specified host. rebootHost will kill old mpds
+        before restarting a new one. The killed MPDS are filtered by
+        specific port and host.
+
+    check(machinesfile => $file, hostsup => \%hosts, hostsdown =>
+    \%hostsdown , reboot => 1)
+        Check if MPD master and nodes are well up. If MPD master is down it
+        try to ping and ssh machines. If you use the option reboot, check
+        will try to restart mpd on specified machines or to reboot the
+        master.
+
+    info( )
+        return an %info of the master with the following keys (master,
+        hostname, port)
+
+    validateMachinesfile(machinefiles => $filename)
+        check with mpdtrace if all machines specified by filename are up. If
+        not, a temporary file is created with the resized machinesfile
+
+    shutdown( )
+        causes all mpds in the ring to exit
+
+    createJob({cmd => $cmd , machinesfile=> $filename, [params => $params],
+    [ncpu => $ncpu], [alias => $alias])
+        start a new job with the command line and his params. It return true
+        if ok. WARNING ncpu could be redefined if mpdtrace return à small
+        hosts list
+
+        Example:
+
+          Parallel::Mpich::MPD::createJob(cmd => $cmd, params => $parms, ncpu => '3', alias => 'job1');
+
+    listJobs([mpdlistjobs_contents=>$str])
+        Return an Parallel::Mpich::MPD::Job array for all available jobs If
+        mpdlistjobs_contents argument is present, the code will not call
+        mpdlistjobs but take the parameter as a fake results of this command
+
+    findJob([%criteria][, return=>(getone|host2pidlist))
+        find a job from crtiteria. It return a Job instance or undef for no
+        match
+
+        Criteria can be of
+        username=>'somename' or username=>\@arrayOfNames
+        jobid=>'somename' or jobid=>\@arrayOfJobid
+        jobalias=>'somename' or jobalias=>\@arrayOfJobalias
+            To set an array of names;
+
+              $criteria{psid} [&& $criteria{rank}]  You can select psid from the specified rank.
+              $criteria{reloadlist}  force the call of listjobs
+
+   return value
+        By default (no return=>... argument), returned value will be a hash
+        (or a hash ref, depending on context), {jobid1=>$job1,
+        jobid2=>job2,...}
+
+        return=>'getone'
+            Will force to return the one job matching, or undef if none or
+            error if many.
+
+        return=>'host2pidlist'
+            return a hash (or a ref to this hash, depending on context),
+            host=>\@pidlist
+
+   Examples
+    trace([hosts => %hosts], long => 1)
+          Lists the  hostname of each of the mpds in the ring
+          return true if ok
+  
+          [long=1] shows full hostnames and listening ports and ifhn
+
+    makealias( )
+          "handle-" + PID + RAND(100) + Instance COUNTER++
+  
+          return a uniq string  alias
+  
+    clean([hosts => %hosts] [killcmd=>"cmd"])
+        Removes the Unix socket on local (the default) and remote machines
+        This is useful in case the mpd crashed badly and did not remove it,
+        which it normally does [hosts => %hosts] use specified hosts ,
+        [$cleancmd="cmd"] user defined kill command
+
+AUTHOR
+        Olivier Evalet, Alexandre Masselot, "<alexandre.masselot at
+        genebio.com>"
+
+BUGS
+        Please report any bugs or feature requests to
+        "bug-parallel-mpich-mpd at rt.cpan.org", or through the web
+        interface at
+        <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Parallel-Mpich-MPD>.
+        I will be notified, and then you'll automatically be notified of
+        progress on your bug as I make changes.
+
+SUPPORT
+        You can find documentation for this module with the perldoc command.
+
+            perldoc Parallel::Mpich::MPD
+
+        You can also look for information at:
+
+        * AnnoCPAN: Annotated CPAN documentation
+            <http://annocpan.org/dist/Parallel-Mpich-MPD>
+
+        * CPAN Ratings
+            <http://cpanratings.perl.org/d/Parallel-Mpich-MPD>
+
+        * RT: CPAN's request tracker
+            <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parallel-Mpich-MPD>
+
+        * Search CPAN
+            <http://search.cpan.org/dist/Parallel-Mpich-MPD>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+        Copyright 2006 Olivier Evalet, Alexandre Masselot, all rights
+        reserved.
+
+        This program is free software; you can redistribute it and/or modify
+        it under the same terms as Perl itself.
+

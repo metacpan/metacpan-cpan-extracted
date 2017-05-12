@@ -1,0 +1,40 @@
+Revision history for Parse::NetApp::ASUP
+
+1.17  2014/04/28
+
+	Using GNU TAR now. The previous release had PAX headers in the tar file.
+
+1.16  2014/03/18
+
+	Correcting the minimum version of Perl in the META data
+
+1.15  2014/03/03
+
+	Added a POD test
+	Now automatically building meta info
+
+1.13  2014/02/24
+
+	Updated meta information
+	Added LICENSE file into distribution
+
+1.13  2013/03/14
+
+	Further reduction in RAM consumption.
+	Correction of errors in test suite.
+
+1.10  2013/02/21
+
+	Updates to reduce RAM consumption so full-field tests require less resources.
+	Removal of some unused methods.
+	Automation generation of MANIFEST.
+
+1.09  2013/02/12
+
+	Updates to correct errors in test suite.
+	Minor corrections to documentation.
+
+1.07  2013/02/07
+
+	Initial publication.
+	Adapted for both OO and non-OO methods.

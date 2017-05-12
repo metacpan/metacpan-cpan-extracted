@@ -1,0 +1,16 @@
+TODO List for Pod::Compiler
+===========================
+
+* how to handle POD directives within a =begin ... =end block?
+
+* how to treat tabs ( \t ) ?
+
+* Handle consecutive =items and assign only one node for the first one,
+  but allow hyperlinks to all textual forms (very useful for perlfunc).
+
+* honour -linelength also for command paragraphs
+
+* test it with a complex converter
+
+* rewrite podchecker based on this module
+

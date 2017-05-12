@@ -1,0 +1,54 @@
+---
+abstract: 'barcode writer'
+author:
+  - 'Lars Dɪᴇᴄᴋᴏᴡ C<< <daxim@cpan.org> >>'
+build_requires:
+  Capture::Tiny: 0
+  File::Temp: 0
+  GTop: 0
+  IO::File: 0
+  Image::Size: 0
+  Module::Load: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.35
+  perl: 5.010
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PostScript-Barcode
+provides:
+  PostScript::Barcode:
+    file: lib/PostScript/Barcode.pm
+    version: 0.006
+  PostScript::Barcode::GSAPI::Singleton:
+    file: lib/PostScript/Barcode/GSAPI/Singleton.pm
+    version: 0.006
+  PostScript::Barcode::Meta::Types:
+    file: lib/PostScript/Barcode/Meta/Types.pm
+    version: 0.006
+  PostScript::Barcode::azteccode:
+    file: lib/PostScript/Barcode/azteccode.pm
+    version: 0.006
+  PostScript::Barcode::datamatrix:
+    file: lib/PostScript/Barcode/datamatrix.pm
+    version: 0.006
+  PostScript::Barcode::qrcode:
+    file: lib/PostScript/Barcode/qrcode.pm
+    version: 0.006
+requires:
+  Alien::BWIPP: 0.006
+  GSAPI: 0.5
+  IO::CaptureOutput: 1.1102
+  List::Util: 0
+  Moose: 0.93
+  MooseX::Singleton: 0.22
+  perl: 5.010
+resources:
+  bugtracker: http://github.com/daxim/PostScript-Barcode/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/daxim/PostScript-Barcode
+version: 0.006

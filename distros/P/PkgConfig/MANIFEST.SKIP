@@ -1,0 +1,6 @@
+\.git.+
+^Makefile$
+^MANIFEST\.bak$
+^MYMETA\.
+^blib/
+^pm_to_blib$

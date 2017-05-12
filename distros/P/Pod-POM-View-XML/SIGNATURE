@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 96de6fddf515d994b171afe5ea2688e76b53b36c AUTHOR_PLEDGE
+SHA1 3a89ecc2df31b3cff78a1e54af1e940657a3da10 Build.PL
+SHA1 a03faf56c6f372f88da52c20841f95a67304c258 CONTRIBUTORS
+SHA1 6a67aa93b850d38d67a7e7e3ef823a29dd26caff Changes
+SHA1 7afa0780e88017bb97bb1cda175c9cd276b78b86 INSTALL
+SHA1 73f01167fe93f49e71989d82937f26f2b9bb52f2 LICENSE
+SHA1 37306bd735fbd7b610acdfe8e87628d07dc6d06d MANIFEST
+SHA1 45ccf0933c8eee01519f9ae6f4b9fe5bc68724d9 META.json
+SHA1 52775e1322dbd56ebe6ea5221fbc04f83d7ee337 META.yml
+SHA1 113e9a5fb13838873ce0cacc57c9fe0546fdb78b README
+SHA1 8dc9727c122fd68ea36ccc9810e41b45f0b49633 README.mkdn
+SHA1 004df138d6719107540b0fcf49e12ddc75068b43 cpanfile
+SHA1 639f83bf420c255ea268209c8501b17a9a024539 doap.xml
+SHA1 40676cb36643ff3636136bab8aae3a550885eef8 lib/Pod/POM/View/XML.pm
+SHA1 9b42cbafb4c78eaa5f3280b0257842e04fe6edac t/00-compile.t
+SHA1 ec62c256d14bd2ce81586069c4ceb692ced74ae3 t/000-report-versions-tiny.t
+SHA1 c872572f64214b9c2adac37d21d0a352e2af3bb8 t/prefix.t
+SHA1 a864013f3b63d6c5cbbc830e53a312e4c0c209a2 t/snippets.t
+SHA1 a53606f95e24dc52859c8ec35f0cc4daf54a528d t/snippets/escape.sample
+SHA1 9c46fe7a0e635ecd8aeaa91b1fa55921a81dfbff t/snippets/headers.sample
+SHA1 88dee79188d08d275e930341cde9a338d2a9a217 t/snippets/pod.sample
+SHA1 a9a66238c493bc863a624893889f1c4f8333aa07 t/snippets/sequence.sample
+SHA1 da5aff1e8f5d557ebe76cb1ef082e0d9e2382af0 t/snippets/verbatim.sample
+SHA1 6ec599fdae51f6bed957bca20fa10b7ac2b58b6e t/tags.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlSZqrwACgkQ34Hwf+GwC4yKvACg6QSjRbZZgmMDQm0qY1G3k8Ib
+K9cAoMFcqxpoZsoH+uAV37s6ZN06A0E/
+=TvYM
+-----END PGP SIGNATURE-----

@@ -1,0 +1,27 @@
+---
+abstract: 'PSGI middleware for Edge Side Includes (ESI)'
+author:
+  - 'Baldur Kristinsson <bk@mbl.is>'
+build_requires:
+  English: 0
+  Plack::Builder: 0
+  Plack::Test: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102343, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-ESI
+requires:
+  HTTP::Message::PSGI: 0
+  HTTP::Request: 0
+  LWP::UserAgent: 0
+  Plack::Middleware: 0
+  Plack::Request: 0
+  Plack::Util: 0
+  parent: 0
+version: 0.1

@@ -1,0 +1,67 @@
+=encoding UTF-8
+
+PostScript-Barcode version 0.006 is Copyright © 2010, Lars Dɪᴇᴄᴋᴏᴡ
+
+=head1 NAME
+
+README - basic information for users prior to downloading
+
+
+=head1 INSTALLATION
+
+=head2 system-wide installation
+
+    perl Makefile.PL
+    make
+    make test
+    sudo make install
+
+=head2 installation in a private directory
+
+    perl Makefile.PL INSTALL_BASE=~/modules_prefix
+    make
+    make test
+    make install
+
+Do not forget to add F<$HOME/modules_prefix/lib/perl5> to your C<@INC>, see
+L<perlfaq8/"How do I add a directory to my include path (@INC) at runtime?">.
+
+
+=head1 DEPENDENCIES
+
+=head2 Configure time
+
+Perl 5.10, L<Module::Build>
+
+=head2 Run time
+
+=head3 core modules
+
+Perl 5.10, L<List::Util>
+
+=head3 CPAN modules
+
+L<Alien::BWIPP>, L<IO::CaptureOutput>, L<GSAPI>, L<Moose>, L<Moose::Role>,
+L<Moose::Util::TypeConstraints>, L<MooseX::Singleton>
+
+=head2 Build and test time
+
+All of the above and:
+
+=head3 CPAN modules
+
+L<Capture::Tiny>, L<Image::Size>, L<Test::Exception>, L<Test::More>
+
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright © 2010 Lars Dɪᴇᴄᴋᴏᴡ C<< <daxim@cpan.org> >>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0.
+
+=head2 Disclaimer of warranty
+
+This library is distributed in the hope that it will be useful, but without
+any warranty; without even the implied warranty of merchantability or fitness
+for a particular purpose.

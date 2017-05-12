@@ -1,0 +1,4 @@
+docs: |
+    This is trivially implemented as:
+
+        s,$,<br />,mg;

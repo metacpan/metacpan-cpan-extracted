@@ -1,0 +1,276 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::SPDY::Base
+at lib/Protocol/SPDY/Base.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Protocol::SPDY::Base - abstract support for the SPDY protocol
+
+=head1 VERSION
+
+version 1.001
+
+=head1 DESCRIPTION
+
+Provides the base class for client, server and generic (proxy/analysis)
+SPDY handling.
+
+=head1 METHODS
+
+=head2 new
+
+Instantiates a new SPDY-handling object. Applies any attributes
+passed as named parameters.
+
+=head2 sender_zlib
+
+The compression instance used for sending data.
+
+=head2 receiver_zlib
+
+Compression instance used for receiving (decompressing) data.
+
+=head2 request_close
+
+Issue a close request by sending a GOAWAY message.
+
+=head2 restore_initial_settings
+
+Send back the list of settings we'd previously persisted.
+
+Typically called immediately after establishing the connection.
+
+=head2 send_settings
+
+Sends a SETTINGS frame generated from the key/value pairs passed
+to this method.
+
+Typically called immediately after establishing the connection.
+
+Example:
+
+ $spdy->send_settings(
+   initial_window_size    => 32768,
+   max_concurrent_streams => 16,
+ );
+
+=head2 check_version
+
+Called before we do anything with a control frame.
+
+Returns true if it's supported, false if not.
+
+=head2 next_stream_id
+
+Generate the next stream ID for this connection.
+
+Returns the next available stream ID, or 0 if we're out of available streams
+
+=head2 queue_frame
+
+Requests sending the given C< $frame > at the earliest opportunity.
+
+=head2 on_read
+
+This is the method that an external transport would call when it has
+some data received from the other side of the SPDY connection. It
+expects to be called with a scalar containing bytes which can be
+decoded as SPDY frames; any SSL/TLS decoding should happen before
+passing data to this method.
+
+Will call L</dispatch_frame> for any valid frames that can be
+extracted from the stream.
+
+=head2 prioritise_incoming_frames
+
+Given a list of L<Protocol::SPDY::Frame> instances, returns them
+reordered so that higher-priority items such as PING are handled
+first.
+
+Does not yet support stream priority.
+
+=head2 dispatch_frame
+
+Dispatches the given frame to appropriate handlers - this will
+be the matching L<Protocol::SPDY::Stream> if one exists, or
+internal connection state handling for GOAWAY/SETTINGS frames.
+
+=head2 dispatch_unhandled_frame
+
+Called when we receive a frame that's not been picked up by the
+usual handlers - could be a SYN_REPLY on a stream that we don't
+have, for example.
+
+=head2 incoming_stream
+
+Called when a new SYN_STREAM frame is received.
+
+=head2 related_stream
+
+Returns the L<Protocol::SPDY::Stream> matching the stream_id
+for this frame (if it has one).
+
+Will return undef if we have no stream yet or this frame
+does not have a stream_id.
+
+=head2 apply_settings
+
+Applies the given settings to our internal state.
+
+=head2 extract_frame
+
+Given a scalar reference to a byte buffer, this will extract the first frame if possible
+and return the bytes if it succeeded, undef if not. No frame validation is performed: the
+bytes are extracted based on the length information only.
+
+=head2 parse_frame
+
+Parse a frame extracted by L</extract_frame>. Returns an appropriate subclass of L<Protocol::SPDY::Frame>
+if this succeeded, dies if it fails.
+
+=head2 goaway
+
+Requests termination of the connection.
+
+=head2 ping
+
+Sends a ping request. We should get a PING packet back as a high-priority reply.
+
+=head2 settings
+
+Send settings to the remote.
+
+=head2 credential
+
+Sends credential information to the remote.
+
+=head2 version
+
+Returns the version supported by this instance. Currently, this is
+always 3.
+
+=head2 last_stream_id
+
+The ID for the last stream we created.
+
+=head2 write
+
+Calls the external code which is expected to handle writes.
+
+=head2 create_stream
+
+Instantiate a new stream, returning the L<Protocol::SPDY::Stream> instance.
+
+=head2 pending_send
+
+Returns a count of the frames that are waiting to be sent.
+
+=head2 has_stream
+
+Returns true if we have a stream matching the ID on the
+provided L<Protocol::SPDY::Stream> instance.
+
+=head2 stream_by_id
+
+Returns the L<Protocol::SPDY::Stream> matching the given ID.
+
+=head2 expected_upload_bandwidth
+
+The expected rate (kilobyte/sec) we can send data to the other side.
+
+=head2 expected_download_bandwidth
+
+The rate (kilobyte/sec) we expect to be able to receive data from the other side.
+
+=head2 expected_round_trip_time
+
+The rate (kilobyte/sec) we expect to be able to receive data from the other side.
+
+=head2 max_concurrent_streams
+
+The rate (kilobyte/sec) we expect to be able to receive data from the other side.
+
+=head2 current_cwnd
+
+The rate (kilobyte/sec) we expect to be able to receive data from the other side.
+
+=head2 download_retrans_rate
+
+The rate (kilobyte/sec) we expect to be able to receive data from the other side.
+
+=head2 initial_window_size
+
+The rate (kilobyte/sec) we expect to be able to receive data from the other side.
+
+=head2 client_certificate_vector_size
+
+The rate (kilobyte/sec) we expect to be able to receive data from the other side.
+
+=head1 METHODS - Futures
+
+=head2 batch
+
+Future representing the current batch of frames being processed. Used
+for deferring window updates.
+
+=head1 EVENTS
+
+The following events may be raised by this class - use
+L<Mixin::Event::Dispatch/subscribe_to_event> to watch for them:
+
+ $spdy->subscribe_to_event(
+   send_frame => sub {
+     my ($ev, $frame) = @_;
+	 print "Send: $frame\n";
+	 $ev->unsubscribe if $frame->type_name eq 'GOAWAY';
+   }
+ );
+
+=head2 send_frame event
+
+Called with the L<Protocol::SPDY::Frame> instance just before we attempt to send
+a frame to the other side.
+
+=head2 receive_frame event
+
+Called with the L<Protocol::SPDY::Frame> instance just before we attempt to process
+a frame received from the other side.
+
+=head2 ping event
+
+Called when we have received a PING request, just before we send back the reply.
+
+=head2 stream event
+
+Called after we have created a new stream in response to an incoming packet.
+
+=head2 setting event
+
+Called for each new SETTINGS entry received from the other side, just before
+we have applied the value locally.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2015. Licensed under the same terms as Perl itself.

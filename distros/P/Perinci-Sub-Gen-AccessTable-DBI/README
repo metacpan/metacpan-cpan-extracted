@@ -1,0 +1,109 @@
+SYNOPSIS
+
+    Your database table countries:
+
+     | id | eng_name                 | ind_name        |
+     |----+--------------------------+-----------------|
+     | cn | China                    | Cina            |
+     | id | Indonesia                | Indonesia       |
+     | sg | Singapore                | Singapura       |
+     | us | United States of America | Amerika Serikat |
+
+    In list_countries.pl:
+
+     #!perl
+     use strict;
+     use warnings;
+     use Perinci::CmdLine;
+     use Perinci::Sub::Gen::AccessTable::DBI qw(gen_read_dbi_table_func);
+    
+     our %SPEC;
+    
+     my $res = gen_read_dbi_table_func(
+         name        => 'list_countries',
+         summary     => 'func summary',     # opt
+         description => 'func description', # opt
+         dbh         => ...,
+         table_name  => 'countries',
+         table_spec  => {
+             summary => 'List of countries',
+             fields => {
+                 id => {
+                     schema => 'str*',
+                     summary => 'ISO 2-letter code for the country',
+                     index => 0,
+                     sortable => 1,
+                 },
+                 eng_name => {
+                     schema => 'str*',
+                     summary => 'English name',
+                     index => 1,
+                     sortable => 1,
+                 },
+                 ind_name => {
+                     schema => 'str*',
+                     summary => 'Indonesian name',
+                     index => 2,
+                     sortable => 1,
+                 },
+             },
+             pk => 'id',
+         },
+     );
+     die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
+    
+     Perinci::CmdLine->new(url=>'/main/list_countries')->run;
+
+    Now you can do:
+
+     # list all countries, by default only PK field is shown
+     $ list_countries.pl --format=text-simple
+     cn
+     id
+     sg
+     us
+    
+     # show as json, randomize order
+     $ list_countries.pl --format=json --random
+     ["id","us","sg","cn"]
+    
+     # only list countries which contain 'Sin', show all fields (--detail)
+     $ list_countries.pl --q=Sin --detail
+     .----------------------------.
+     | eng_name  | id | ind_name  |
+     +-----------+----+-----------+
+     | Singapore | sg | Singapura |
+     '-----------+----+-----------+
+    
+     # show only certain fields, limit number of records, return in YAML format
+     $ list_countries.pl --fields '[id, eng_name]' --result-limit 2 --format=yaml
+     - 200
+     - OK
+     -
+       - id: cn
+         eng_name: China
+       - id: id
+         eng_name: Indonesia
+
+DESCRIPTION
+
+    This module is just like Perinci::Sub::Gen::AccessTable, except that
+    table data source is from DBI. gen_read_dbi_table_func() accept mostly
+    the same arguments as gen_read_table_func(), except: 'table_name'
+    instead of 'table_data', and 'dbh'.
+
+    Supported databases: SQLite, MySQL, PostgreSQL.
+
+    Early versions tested on: SQLite.
+
+CAVEATS
+
+    It is often not a good idea to expose your database schema directly as
+    API.
+
+FAQ
+
+SEE ALSO
+
+    Perinci::Sub::Gen::AccessTable
+

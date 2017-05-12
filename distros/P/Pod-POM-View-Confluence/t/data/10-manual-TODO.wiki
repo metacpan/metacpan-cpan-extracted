@@ -1,0 +1,37 @@
+h1. NAME
+Pod::POM::View::Confluence - Confluence view of a Pod Object Model
+h1. SYNOPSIS
+{noformat}
+    use Pod::POM::View::Confluence;
+    my $view = 'Pod::POM::View::Confluence';
+    
+    $pom->present($view);
+{noformat}
+h1. DESCRIPTION
+_Confluence_ is an "entreprise wiki" published by Atlassian. Pages can be edited either in _Rich Text_ or _Wiki Markup_. See [http://www.atlassian.com/software/confluence/] for details.
+This module provides a view for {{Pod::POM}} that outputs the information in the _Confluence_ _Wiki Markup_.
+Use it like any other {{Pod::POM::View}} subclass.
+Note that {{=for}} and {{=begin}} / {{=end}} block will not output anything, unless for format {{confluence}}.
+h1. METHODS
+Apart from the {{view_*}} methods (see [Pod::POM] for details), this module supports the two following methods:
+new() Constructor.
+view( $type, $node ) Return the given Pod::POM node as formatted by the View.
+h1. AUTHOR
+Philippe Bruhat (BooK), {{<book@cpan.org>}}
+h1. BUGS
+Please report any bugs or feature requests to {{bug-pod-pom-view-confluence at rt.cpan.org}}, or through the web interface at [http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Pod-POM-View-Confluence]. I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+h1. SUPPORT
+You can find documentation for this module with the perldoc command.
+{noformat}
+    perldoc Pod::POM::View::Confluence
+{noformat}
+You can also look for information at:
+* RT: CPAN's request tracker [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pod-POM-View-Confluence]
+* AnnoCPAN: Annotated CPAN documentation [http://annocpan.org/dist/Pod-POM-View-Confluence]
+* CPAN Ratings [http://cpanratings.perl.org/d/Pod-POM-View-Confluence]
+* Search CPAN [http://search.cpan.org/dist/Pod-POM-View-Confluence]
+
+h1. COPYRIGHT
+Copyright 2008 Philippe Bruhat (BooK), all rights reserved.
+h1. LICENSE
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

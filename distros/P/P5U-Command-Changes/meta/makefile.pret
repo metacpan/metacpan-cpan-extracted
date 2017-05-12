@@ -1,0 +1,13 @@
+# This file provides instructions for packaging.
+
+`P5U-Command-Changes`
+	perl_version_from m`P5U::Command::Changes`;
+	version_from      m`P5U::Command::Changes`;
+	readme_from       m`P5U::Command::Changes`;
+	requires          p`P5U`;
+	requires          p`JSON`;
+	requires          p`LWP::UserAgent`;
+	requires          p`Module::Info`;
+	requires          p`CPAN::Changes`;
+	test_requires     p`Test::More 0.61`.
+

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<REPOSITORYSUMMARY>
+  <SOFTPKG NAME="Apache-Authen-Program" VERSION="0,93,0,0">
+    <TITLE>Apache-Authen-Program</TITLE>
+    <ABSTRACT>mod_perl external program authentication module</ABSTRACT>
+    <AUTHOR>Mark Leighton Fisher &lt;mark-fisher@fisherscreek.com&gt;</AUTHOR>
+    <IMPLEMENTATION>
+      <DEPENDENCY NAME="mod_perl" VERSION="0,0,0,0" />
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+      <CODEBASE HREF="http://theoryx5.uwinnipeg.ca/ppms/x86/Apache-Authen-Program.tar.gz" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="Apache-Session" VERSION="1,80,0,0">
+    <TITLE>Apache-Session</TITLE>
+    <ABSTRACT>A persistence framework for session data</ABSTRACT>
+    <AUTHOR>Casey West &lt;casey@geeknest.com&gt;</AUTHOR>
+    <IMPLEMENTATION>
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+      <CODEBASE HREF="http://theoryx5.uwinnipeg.ca/ppms/x86/Apache-Session.tar.gz" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="AppConfig" VERSION="1,56,0,0">
+    <TITLE>AppConfig</TITLE>
+    <ABSTRACT>AppConfig is a bundle of Perl5 modules for reading configuration files and parsing command line arguments.</ABSTRACT>
+    <AUTHOR>Andy Wardley &lt;abw@wardley.org&gt;</AUTHOR>
+    <IMPLEMENTATION>
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+      <CODEBASE HREF="http://theoryx5.uwinnipeg.ca/ppms/x86/AppConfig.tar.gz" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="Archive-Zip" VERSION="1,1,0,0">
+    <TITLE>Archive-Zip</TITLE>
+    <ABSTRACT>Provide an interface to ZIP archive files.</ABSTRACT>
+    <AUTHOR>Ned Konz (perl@bike-nomad.com)</AUTHOR>
+    <IMPLEMENTATION>
+      <DEPENDENCY NAME="Compress-Zlib" VERSION="1,14,0,0" />
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+      <CODEBASE HREF="http://theoryx5.uwinnipeg.ca/ppms/x86/Archive-Zip.tar.gz" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="PPI" VERSION="1,117,0,0">
+    <TITLE>PPI</TITLE>
+    <ABSTRACT>Parse, Analyze and Manipulate Perl (without perl)</ABSTRACT>
+    <AUTHOR>Adam Kennedy &lt;cpan@ali.as&gt;, L&lt;http://ali.as/&gt;</AUTHOR>
+    <IMPLEMENTATION>
+      <DEPENDENCY NAME="List-MoreUtils" VERSION="0,13,0,0" />
+      <DEPENDENCY NAME="Task-Weaken" VERSION="0,0,0,0" />
+      <DEPENDENCY NAME="Clone" VERSION="0,17,0,0" />
+      <DEPENDENCY NAME="IO-String" VERSION="1,07,0,0" />
+      <DEPENDENCY NAME="Params-Util" VERSION="0,10,0,0" />
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+      <CODEBASE HREF="http://theoryx5.uwinnipeg.ca/ppms/x86/PPI.tar.gz" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="mod_perl" VERSION="2,0,2,0">
+    <TITLE>mod_perl</TITLE>
+    <ABSTRACT>Embed a Perl interpreter in the Apache/2.0 HTTP server</ABSTRACT>
+    <AUTHOR>Philippe M. Chiasson &lt;gozer@cpan.org&gt;</AUTHOR>
+    <IMPLEMENTATION>
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+      <INSTALL EXEC="PPM_PERL" HREF="http://theoryx5.uwinnipeg.ca/ppms/scripts/install_modperl">install_modperl</INSTALL>
+      <CODEBASE HREF="http://theoryx5.uwinnipeg.ca/ppms/x86/mod_perl.tar.gz" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+</REPOSITORYSUMMARY>

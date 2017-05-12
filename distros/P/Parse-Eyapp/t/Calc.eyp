@@ -1,0 +1,96 @@
+# examples/Calc.eyp
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+%right  '^'
+%{
+my %s; # symbol table
+%}
+
+%%
+start: 
+    input { \%s }
+;
+
+input: line * 
+;
+
+line:       
+  '\n'         { undef }
+  | exp '\n'   { $_[1] }
+  | exp ''     { $_[1] } # exp followed by end of input
+  | error  '\n'
+      { 
+        $_[0]->YYErrok; 
+        undef 
+      }
+;
+
+exp:
+    NUM
+  | $VAR                   { $s{$VAR} }
+  | $VAR '=' $exp          { $s{$VAR} = $exp }
+  | exp.left '+' exp.right { $left + $right }
+  | exp.left '-' exp.right { $left - $right }
+  | exp.left '*' exp.right { $left * $right }
+  | exp.left '/' exp.right         
+    {
+       $_[3] and return($_[1] / $_[3]);
+       $_[0]->YYData->{ERRMSG} = "Illegal division by zero.\n";
+       $_[0]->YYError; # Pretend that a syntactic error ocurred: _Error will be called
+       undef
+    }
+  | '-' $exp %prec NEG     { -$exp }
+  | exp.left '^' exp.right { $left ** $right }
+  | '(' $exp ')'           { $exp }
+;
+
+%%
+
+my $lineno = 1;
+
+sub _Error {
+  my $parser = shift;
+
+    exists $parser->YYData->{ERRMSG}
+  and do {
+      print $parser->YYData->{ERRMSG};
+      delete $parser->YYData->{ERRMSG};
+      return;
+  };
+  my($token)=$parser->YYCurval;
+  my($what)= $token ? "input: '$token'" : "end of input";
+  my @expected = $parser->YYExpect();
+  local $" = ', ';
+  die << "ERRMSG";
+
+Syntax error near $what (lin num $lineno). 
+Expected one of these terminals: @expected
+ERRMSG
+}
+
+sub make_lexer {
+  return sub {
+    my $parser = shift;
+
+    for (${$parser->input}) {
+      m{\G[ \t]*}gc;
+      m{\G([0-9]+(?:\.[0-9]+)?)}gc   and return ('NUM',$1);
+      m{\G([A-Za-z][A-Za-z0-9_]*)}gc and return ('VAR',$1);
+      m{\G\n}gc                      and do { $lineno++; return ("\n", "\n") };
+      m{\G(.)}gc                     and return ($1,$1);
+
+      return('',undef);
+    }
+  }
+}
+
+sub Run {
+    my($self)=shift;
+    $self->input(shift()) unless defined(${$self->input});
+
+    return $self->YYParse( yylex => make_lexer(), yyerror => \&_Error,
+      #yydebug =>0x1F
+    );
+}

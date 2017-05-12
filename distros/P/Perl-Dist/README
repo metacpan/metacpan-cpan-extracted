@@ -1,0 +1,96 @@
+NAME
+    Perl::Dist - Perl Distribution Creation Toolkit
+
+DESCRIPTION
+    The Perl::Dist namespace encompasses creation of pre-packaged, binary
+    distributions of Perl, primarily as executable installers for Win32.
+
+    Packages in this namespace include both "builders" and "distributions".
+
+    Builder packages automate the generation of distributions.
+
+    Distribution packages contain configuration files for a particular
+    builder, extra files to be bundled with the pre-packaged binary, and
+    documentation.
+
+    Distribution namespaces are also recommended to consolidate bug
+    reporting using http://rt.cpan.org/.
+
+    *Distribution packages should not contain the pre-packaged install files
+    themselves.*
+
+  BUILDERS
+    At the present time the primarily builder module is Perl::Dist::Inno.
+
+  DISTRIBUTIONS
+    Currently available distributions include:
+
+    *   Perl::Dist::Vanilla -- An experimental "core Perl" distribution
+        intended for distribution developers.
+
+    *   Perl::Dist::Strawberry -- A practical Win32 Perl release for
+        experienced Perl developers familiar with Perl on Unix environments
+        with full CPAN capabilities.
+
+        Strawberry Perl is considered stable, and can be downloaded from the
+        Strawberry Perl website at <http://strawberryperl.com/>.
+
+    *   Perl::Dist::Chocolate -- A concept distribution that bundled a large
+        "standard library" collection of CPAN modules, and provides a
+        variety of WxWindows-based GUI tools.
+
+    *   Perl::Dist::Bootstrap -- Bootstrap Perl is a Perl 5.8.8 distribution
+        designed for people that are themselves creating Perl distributions.
+
+        It installs to a disk location out of the way and not used by any
+        "end-user" distributions, and comes with Perl::Dist and support
+        modules pre-bundled.
+
+ROADMAP
+    Perl::Dist::Inno, based on Inno Setup, is working well, but has a
+    limited lifespace, as it is not capable of produces Windows native .msi
+    installer files.
+
+    Ultimately this means that Perl::Dist will see the additional of an
+    alternative module based on Nullsoft or Wix that allows the creation of
+    .msi files (a major feature for corporate users).
+
+    Various other features are able to be implemented within the Inno Setup
+    feature set, and include:
+
+    *   Bug-squashing Win32 compatibility problems in popular modules
+
+    *   Customisable installation path.
+
+    *   Support installation paths with spaces and other weird characters.
+
+    *   Restore support for .exe installation instead of .zip.
+
+    *   Better uninstall support and upgradability.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Perl-Dist>
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+    David A. Golden <dagolden@cpan.org>
+
+COPYRIGHT
+    Copyright 2007 - 2009 Adam Kennedy.
+
+    Copyright 2006 David A. Golden.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    Perl::Dist, Perl::Dist::Vanilla, Perl::Dist::Strawberry,
+    <http://win32.perl.org/>, <http://vanillaperl.com/>,
+    <irc://irc.perl.org/#win32>, <http://ali.as/>, <http://dagolden.com/>
+

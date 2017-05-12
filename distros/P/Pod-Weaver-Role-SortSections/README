@@ -1,0 +1,37 @@
+SYNOPSIS
+
+    In your Pod::Weaver plugin:
+
+     $self->sort_sections($document, [
+         'NAME',
+         'VERSION',
+         'DESCRIPTION',
+         qr/.+/, # put everything else here
+    
+         'AUTHOR',
+         'COPYRIGHT AND LICENSE',
+         'COPYRIGHT', # sometimes C&L is separated
+         'LICENSE',   # sometimes C&L is separated
+    
+         'SEE ALSO',
+     ]);
+
+DESCRIPTION
+
+    As we add sections to document using various plugins or section
+    modules, sometimes in different orders, the result is that the order of
+    sections might not be like we want. This role provides a
+    sort_sections() to rectify that. This should be done after all section
+    adding.
+
+METHODS
+
+ $obj->sort_sections($document, $spec)
+
+    Sort POD sections. $spec is a list of section names or regexes as
+    specified in Sort::BySpec.
+
+SEE ALSO
+
+    Sort::BySpec
+

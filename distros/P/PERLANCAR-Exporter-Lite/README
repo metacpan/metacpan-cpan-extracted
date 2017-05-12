@@ -1,0 +1,24 @@
+SYNOPSIS
+
+    In lib/YourModule.pm:
+
+     package YourModule;
+     use PERLANCAR::Exporter::Lite qw(import);
+     our @EXPORT = qw(...);
+     our @EXPORT_OK = qw(...);
+
+DESCRIPTION
+
+    This is a stripped down exporter module, to achieve the smallest
+    startup overhead (see Bencher::Scenario::Exporters::Startup for
+    benchmark). This is what I think Exporter::Lite should be.
+
+    This module offers only some features of Exporter: default exports via
+    @EXPORT and optional exports via @EXPORT_OK. You can only use this
+    exporter by importing its import and not by subclassing. There is no
+    support for export tags, export_to_level, etc.
+
+SEE ALSO
+
+    Exporter
+

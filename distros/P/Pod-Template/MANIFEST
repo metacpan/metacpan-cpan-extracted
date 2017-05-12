@@ -1,0 +1,17 @@
+Changes
+MANIFEST			This list of files
+Makefile.PL
+README
+bin/podtmpl.pl
+lib/Pod/Template.pm
+samples/00-simple-include-directive/Bar.pm
+samples/00-simple-include-directive/Foo.pm
+samples/00-simple-include-directive/Simple-Include-Directive.ptmpl
+samples/01-include-directive-with-subdirs/Include-Directive-With-Subdirs.ptmpl
+samples/01-include-directive-with-subdirs/include-code/Bar.pm
+samples/01-include-directive-with-subdirs/include-code/Foo.pm
+samples/01-include-directive-with-subdirs/include-footer/Author.pod
+samples/parse_sample.pl
+t/00_Pod-Template.t
+t/expect/00-simple-include-directive.expect
+t/expect/01-include-directive-with-subdirs.expect

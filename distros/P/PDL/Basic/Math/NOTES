@@ -1,0 +1,41 @@
+Notes
+-----
+
+Fixed to -DUNK (for reasons given below), but tried to get as much
+information on system specifics as possible from header files (may
+need to reconfigure mconf.h on systems other than Linux/Sun/Dec).
+
+Altered handling of nan and infinity to try to provide a consistent
+interface through function calls (system dependencies go in
+Makefile.PL, mconf.h: infinity.c and quiet_nan.c may need more obscure
+fallback ways of generating Inf and NaN for clever-clever compilers).
+
+More work will now be necessary to include extra cephes routines, but
+should be easier to configure what's there for new OSs.
+
+RJRW 29/10/98
+
+- added linalg.shar
+
+TJL 5/1/98
+
+Cephes lib config
+-----------------
+
+I leave the default as -DUNK (mconf.h). This is
+OK as all it means is that the important constants are in
+floating point format rather than binary hex.
+The only advantage of the latter is that it is exact, however
+we prefer portability to exactly the same numbers at the
+epsilon level. (After all PDL also uses system routines).
+
+We can ignore the comments about BIGENDIAN - it is not used
+in any of the .c files we have taken from cephes, **AT LEAST
+SO FAR**.
+
+The PP code includes protos.h whether or not the system
+routines are used. Since the prototypes for system
+and cephes versions should be the same this is not a big
+deal.
+
+KGB 28/11/97

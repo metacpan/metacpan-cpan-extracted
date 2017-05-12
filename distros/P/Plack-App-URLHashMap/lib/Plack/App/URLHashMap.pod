@@ -1,0 +1,40 @@
+=head1 NAME
+
+Plack::App::URLHashMap - Map multiple apps in different paths
+
+=head1 SYNOPSIS
+
+    use Plack::App::URLHashMap;
+ 
+    my $app1 = sub { ... };
+    my $app2 = sub { ... };
+ 
+    my $urlmap = Plack::App::URLMap->new;
+
+    $urlmap->map( '/'    => $app1 );
+    $urlmap->map( '/foo' => $app2 );
+ 
+    my $app = $urlmap->to_app;
+
+=head1 DESCRIPTION
+
+This PSGI application is a simpler alternative to L<Plack::App::URLMap>.
+
+It dispatches requests to different apps by looking up C<PATH_INFO> in a hash.
+
+=head1 CAVEATS
+
+This application requires exact matching, /foo and /foo/ are different paths,
+as such you will need two entries if you want both to work. This works similar
+to a location = block in nginx.
+
+=head1 SEE ALSO
+
+L<Plack::App::URLMap>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014 CV-Library Ltd.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.

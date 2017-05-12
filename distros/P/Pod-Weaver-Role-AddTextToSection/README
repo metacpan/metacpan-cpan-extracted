@@ -1,0 +1,78 @@
+SYNOPSIS
+
+     my $text = <<EOT;
+     This module is made possible by L<Krating Daeng|http://www.kratingdaeng.co.id>.
+    
+     A shout out to my man Punk The Man.
+    
+     Thanks also to:
+    
+     =over
+    
+     =item * my mom
+    
+     =item * my dog
+    
+     =item * my peeps
+    
+     =back
+    
+     EOT
+    
+     $self->add_text_to_section($document, $text, 'THANKS');
+
+DESCRIPTION
+
+METHODS
+
+ $obj->add_text_to_section($document, $text, $section[, \%opts]) => bool
+
+    Add a string $text to a section named $section.
+
+    $text will be converted into a POD element tree first.
+
+    Section are POD paragraphs under a heading (=head1, =head2 and so on).
+    Section name will be searched case-insensitively.
+
+    If section does not yet already exist: will create the section (if
+    create option is true) or will die. Section will be created with =head1
+    heading at the bottom of the document (XXX is there a use-case where we
+    need to add at the top and need to provide a create_top option? XXX is
+    there a use-case where we need to create head2 and so on?).
+
+    If section already exists, will skip and do nothing (if ignore option
+    is true, not unlike INSERT OR IGNORE in SQL) or will add text. Text
+    will be added at the bottom the existing text, unless when top option
+    is true in which case will text will be added at the top the existing
+    text.
+
+    Will return a boolean status which is true when text is actually added
+    to the section.
+
+    Options:
+
+      * create => bool (default: 1)
+
+      Whether to create section if it does not already exist in the
+      document.
+
+      * after_section => str|array
+
+      When creating a section, attempt to put the new section after the
+      specified section(s). This is evaluated before before_section.
+
+      * before_section => str|array
+
+      When creating a section, attempt to put the new section before the
+      specified section(s).
+
+      * ignore => bool (default: 0)
+
+      If set to true, then if section already exist will skip adding the
+      text.
+
+      * top => bool (default: 0)
+
+      If set to true, will add text at the top of existing text instead of
+      at the bottom.
+

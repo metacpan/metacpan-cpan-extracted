@@ -1,0 +1,10 @@
+Revision history for Perl-Meta
+
+0.03    2017-01-01
+        Recognize beer-ware license
+
+0.02    2011-05-10
+        More metadata in own META.yml
+
+0.01    2011-05-09
+        Extract from Module::Install::Metadata

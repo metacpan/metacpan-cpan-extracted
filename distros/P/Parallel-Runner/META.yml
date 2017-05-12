@@ -1,0 +1,30 @@
+---
+abstract: 'An object to manage running things in parallel processes.'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires:
+  Test::Exception::LessClever: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parallel-Runner
+provides:
+  Parallel::Runner:
+    file: lib/Parallel/Runner.pm
+    version: 0.013
+requires:
+  Child: 0.009
+  POSIX: 0
+  Time::HiRes: 0
+resources:
+  bugtracker: http://github.com/exodist/Parallel-Runner/issues
+  homepage: http://open-exodus.net/projects/parrallel-runner
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/exodist/Parallel-Runner
+version: 0.013

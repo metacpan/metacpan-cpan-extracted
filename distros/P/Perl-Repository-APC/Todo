@@ -1,0 +1,50 @@
+2007-04-24  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Patch 31047 breaks patchaperlup because it moves a couple of
+	directories to new places. But the APC patch files do not contain
+	directory removal information, so old directories can only be
+	removed by removing all empty directories.
+
+2007-02-26  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Mac OS X with its case tolereant file system isn't able to run
+	APC with the same level of reliance. We must skip errors that are
+	due to filenamespace overlaps and must take care that these files
+	are not removed later. -- Update 2007-04-24 akoenig : nope, won't
+	do. This suite does not work on case tolerant filesystems, period.
+	It's a nightmare to work around case tolerant filesystems, makes
+	no sense to implement within this module. Needs a higher level
+	approach.
+
+2007-02-14  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Why fails 5.6.2 test 6 of trimtrees?
+
+	# tlds[10]cur[9]uniq[2]fils[4_000]spcused[2]saved[0]Cannot rename "tmp/0/BAD\cJNL0" to "./trimtrees1-jmftIUAw" (Permission denied); Skipping. at eg/trimtrees.pl line 55.
+# Cannot rename "tmp/0/BAD\cJNL1" to "./trimtrees1-R6ghWCxb" (Permission denied); Skipping. at eg/trimtrees.pl line 55.
+# Cannot rename "tmp/0/BAD\cJNL2" to "./trimtrees1-3tFzljlc" (Permission denied); Skipping. at eg/trimtrees.pl line 55.
+# Unsuccessful open on filename containing newline at eg/trimtrees.pl line 162.
+# Cannot read "tmp/0/BAD\cJNL3" (Permission denied); Skipping. at eg/trimtrees.pl line 163.
+# 
+
+	Changed md5 to md5_hex for better debugging. Nope.
+
+	Changed the content of the 4 provoking files: Yupp. Because the
+	way through the find is different for 5.6.2 it took a file with
+	that content from somewhere else.
+
+	FIXED by changing the contents of the fault-provoking files. The
+	order of walking through the trees has slightly changed and that
+	lead to a different order faults during the test. 
+
+2005-11-10  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* finish trimtrees.t and put it in MANIFEST
+
+	* Bug in eg/trimtrees.pl: not portable due to $slashes counting
+	slashes instead of dirsep or how it is called.
+
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "Todo"
+	End:

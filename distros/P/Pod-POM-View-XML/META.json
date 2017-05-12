@@ -1,0 +1,83 @@
+{
+   "abstract" : "XML view of a Pod Object Model",
+   "author" : [
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.023, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-POM-View-XML",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Escape::Houdini" : "0",
+            "PerlX::Maybe" : "0",
+            "Pod::POM::View" : "0",
+            "XML::Writer" : "0.620",
+            "parent" : "0",
+            "strict" : "0",
+            "vars" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::POM" : "0",
+            "Test::More" : "0.88",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Pod::POM::View::XML" : {
+         "file" : "lib/Pod/POM/View/XML.pm",
+         "version" : "v0.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/Pod-POM-View-XML/issues"
+      },
+      "homepage" : "https://github.com/yanick/Pod-POM-View-XML",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Pod-POM-View-XML.git",
+         "web" : "https://github.com/yanick/Pod-POM-View-XML"
+      }
+   },
+   "version" : "0.0.2",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ]
+}
+

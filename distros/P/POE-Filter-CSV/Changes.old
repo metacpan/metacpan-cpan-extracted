@@ -1,0 +1,44 @@
+POE::Filter::CSV
+================
+
+1.16	Fri May 29 13:45:09 BST 2009
+	- Makefile.PL meta changes.
+
+1.14	Tue Jun 24 13:14:53 BST 2008
+	- Added LICENSE information.
+
+1.12	Fri Mar  7 07:15:43 GMT 2008
+	- Kwalitee fixes.
+
+1.10	Fri Jan 18 15:36:12 GMT 2008
+	- Fixed test script naming
+
+1.08	Thu Jan  3 17:16:46 GMT 2008
+	- Fixed for Text::CSV-1.00, prereq version updated
+	- Added clone() method
+
+1.07	Thu Nov  1 12:20:22 GMT 2007
+	- Updated Module::Install to 0.68
+
+1.06	Sat Jul 28 12:35:05 BST 2007
+	- Fixes to abstract_from and build_requires in Makefile.PL
+
+1.05	Sun Feb 25 12:02:06 GMT 2007
+	- Added kwalitee test
+
+1.04	Wed Jan 24 10:52:06 GMT 2007
+	- Makefile.PL now all M::I
+	- Minor code changes.
+	- Documentation fix.
+
+1.03	Tue Sep 26 11:37:09 BST 2006
+	- Switched to Module::Install
+
+1.02	Sun Sep 10 09:11:20 BST 2006
+	- Makefile.PL was executable. Fixed.
+
+1.01	Fri Sep 01 14:28:31 BST 2006
+	- Reorganised distribution.
+	- Added Changes >:)
+	- Added pod and pod coverage tests
+	- Fixed documentation.

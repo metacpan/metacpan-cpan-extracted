@@ -1,0 +1,15 @@
+# This file provides instructions for packaging.
+
+`P5U-Command-Deps`
+	perl_version_from m`P5U::Command::Deps`;
+	version_from      m`P5U::Command::Deps`;
+	readme_from       m`P5U::Command::Deps`;
+	requires          p`Class::Discover 0`;
+	requires          p`List::MoreUtils 0`;
+	requires          p`P5U 0`;
+	requires          p`Path::Class::Dir 0`;
+	requires          p`Path::Class::File 0`;
+	requires          p`Path::Class::Rule 0`;
+	requires          p`Perl::PrereqScanner 0`;
+.
+

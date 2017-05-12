@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+Makefile.PL
+README
+lib/Parse/PAUSE.pm
+lib/Parse/PAUSE/Plugin.pm
+lib/Parse/PAUSE/Plugin/URL.pm
+lib/Parse/PAUSE/Plugin/UploadedFile.pm
+t/00-load.t
+t/release-perl-critic.t
+t/release-pod-coverage.t
+t/release-pod.t
+t/uploaded-file.t
+t/url.t

@@ -1,0 +1,37 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PApp
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Compress::LZF: '1'
+  Convert::Scalar: '1.02'
+  Crypt::Twofish2: '0.01'
+  DBD::mysql: '2.04'
+  DBI: '1.3'
+  Digest::SHA1: '1.01'
+  Guard: '1'
+  JSON::XS: '2.01'
+  MIME::Base64: '0'
+  PApp::SQL: '0.143'
+  Storable: '2.05'
+  String::Similarity: '0.02'
+  URI: '1.22'
+  XML::Parser: '2.31'
+  XML::Sablotron: '1.0100001'
+  common::sense: '3.3'
+version: 2.1

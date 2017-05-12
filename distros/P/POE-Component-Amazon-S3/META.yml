@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                POE-Component-Amazon-S3
+version:             0.01
+abstract:            ~
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Data::Dump:                    0
+    Digest::HMAC_SHA1:             0
+    HTTP::Date:                    0
+    MIME::Base64:                  0
+    POE:                           0
+    POE::Component::Client::HTTP:  0.81
+    URI::Escape:                   0
+    XML::LibXML:                   0
+    XML::LibXML::XPathContext:     0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Andy Grundman <andy@hybridized.org>

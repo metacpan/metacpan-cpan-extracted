@@ -1,0 +1,65 @@
+NAME
+    PerlX::QuoteOperator::Inescapable - a quote-like operator with no string
+    escapes
+
+SYNOPSIS
+            use PerlX::QuoteOperator::Inescapable;
+        
+            my $var1 = q(Hello World);   # standard Perl quote-like operator
+            my $var2 = Q(Hello World);   # this works the same
+        
+            my $var3 = q(Hello\\World);  # string includes a backslash
+            my $var4 = Q(Hello\\World);  # string includes two backslashes!
+
+DESCRIPTION
+    PerlX::QuoteOperator::Inescapable introduces a quote-like operator like
+    `q(...)` but that supports no string escapes! All characters quoted are
+    treated literally.
+
+    Like other quote-like operators, standard left/right bracket pairs are
+    supported; but unlike other quote-like operators, you cannot nest balanced
+    pairs of brackets:
+
+            Q(Hello (Earth) World);   # no!
+
+    By default, a single quote-like operator is defined, `Q`. You can define
+    alternative ones:
+
+            use Path::Class;
+            use PerlX::QuoteOperator::Inescapable
+                    Q => (),   # default Q operator
+                    F => sub ($) { Path::Class::File->new(@_) },
+                    D => sub ($) { Path::Class::Dir->new(@_) },
+            ;
+        
+            my $fonts = D!\\Server1\Marketing\Fonts!;
+
+CAVEATS
+    The current implementation is limited to single-line literals. The
+    quote-like operator, starting delimiter and ending delimiter must all
+    appear on the same line of source code.
+
+BUGS
+    The hash symbol (#) can not be used as a quote delimiter. ☹
+
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-QuoteOperator-Inescapabl
+    e>.
+
+SEE ALSO
+    PerlX::QuoteOperator.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

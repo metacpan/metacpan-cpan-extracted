@@ -1,0 +1,45 @@
+%%
+s:  first '%%' second
+;
+
+first:
+    A first
+  | A
+;
+
+second:
+    A second
+  | A
+;
+
+%%
+
+sub Lexer1 {
+    my($parser)=shift;
+
+    print "In Lexer 1 \n";
+    for (${$parser->YYInput}) {
+        m/\G\s*/gc;
+        m/\G(%%)/gc and do {
+          $parser->YYLexer(\&Lexer2);
+          return ($1, undef);
+        };
+        m/\G(.)/gcs and return($1,$1);
+        return('', undef);
+    }
+}
+
+sub Lexer2 {
+    my($parser)=shift;
+
+    print "In Lexer 2 \n";
+    for (${$parser->YYInput}) {
+        m/\G\s*/gc;
+        m/\GB/gc    and return('A','B');
+        m/\G(.)/gcs and die "Error. Expected 'B', found $1\n";
+    }
+        return('', undef);
+}
+
+__PACKAGE__->lexer(\&Lexer1);
+

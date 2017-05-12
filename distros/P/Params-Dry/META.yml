@@ -1,0 +1,42 @@
+---
+abstract: 'Simple Global Params Management System which helps you to keep DRY principle'
+author:
+  - 'Pawel Guspiel <neo@cpan.org>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.130880'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Params-Dry
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Params::Dry:
+    file: lib/Params/Dry.pm
+    version: 1.2003
+  Params::Dry::Types:
+    file: lib/Params/Dry/Types.pm
+    version: 1.2003
+  Params::Dry::Types::DateTime:
+    file: lib/Params/Dry/Types/DateTime.pm
+    version: 1.2003
+  Params::Dry::Types::Number:
+    file: lib/Params/Dry/Types/Number.pm
+    version: 1.2003
+  Params::Dry::Types::Object:
+    file: lib/Params/Dry/Types/Object.pm
+    version: 1.2003
+  Params::Dry::Types::Ref:
+    file: lib/Params/Dry/Types/Ref.pm
+    version: 1.2003
+  Params::Dry::Types::String:
+    file: lib/Params/Dry/Types/String.pm
+    version: 1.2003
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  repository: https://github.com/neo77/Params-Dry
+version: 1.2003

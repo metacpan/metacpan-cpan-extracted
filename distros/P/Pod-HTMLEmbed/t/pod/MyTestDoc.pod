@@ -1,0 +1,17 @@
+=head1 NAME
+
+MyTestDoc - test documentation
+
+=head1 SYNOPSIS
+
+    use Pod::HTMLEmbed;
+
+=head1 AUTHOR
+
+Daisuke Murase C<typester@gmail.com>
+
+=head1 SEE ALSO
+
+L<Pod::HTMLEmbed>
+
+=cut

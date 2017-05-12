@@ -1,0 +1,546 @@
+
+<html>
+<head>
+<title>Pod::Classdoc</title>
+</head>
+<body>
+<table width='100%' border=0 CELLPADDING='0' CELLSPACING='3'>
+<TR>
+<TD VALIGN='top' align=left><FONT SIZE='-2'>
+ SUMMARY:&nbsp;<a href='#constructor_summary'>CONSTR</a>&nbsp;|&nbsp;<a href='#method_summary'>METHOD</a>
+ </FONT></TD>
+<TD VALIGN='top' align=right><FONT SIZE='-2'>
+DETAIL:&nbsp;<a href='#constructor_detail'>CONSTR</a>&nbsp;|&nbsp;<a href='#method_detail'>METHOD</a>
+</FONT></TD>
+</TR>
+</table><hr>
+<h2>Class Pod::Classdoc</h2>
+
+<p>
+<dl>
+<dt><b>Known Subclasses:</b>
+<dd><a href='../Pod/Classdoc/ForProjectTOC.html'>Pod::Classdoc::ForProjectTOC</a></dd>
+</dt>
+</dl>
+
+<hr>
+
+
+Generate javadoc-like class documentation from embedded POD.
+Uses <a href='http://search.cpan.org/perldoc?PPI::Find'>PPI::Find</a> to locate POD, packages, and methods, then
+processes the extracted POD into a javadoc-ish HTML format. Classdoc POD
+is defined within <code>=begin classdoc</code> and 
+<code>=end classdoc</code> sections. Each such section is associated
+with its immediately succeding package or method statement, unless
+the <code>@xs</code> directive is specified, in which case
+the classdoc is assumed to be for an external (e.g., XS) method.
+Multiple external method classdoc sections may be specified within a single
+<code>=pod ... =cut</code> section, with the final such classdoc section
+associated with any trailing method definition.
+
+
+<p>
+
+<dl>
+
+<dt><b>Author:</b></dt>
+	<dd>Dean Arnold</dd>
+
+<dt><b>Since:</b></dt>
+	<dd>2007-Jun-10
+</dd>
+
+<dt><b>See Also:</b></dt>
+	<dd><a href='http://search.cpan.org/perldoc?PPI'>PPI</a>,
+<br>
+<a href='http://search.cpan.org/perldoc?PPI::Find'>PPI::Find</a>,
+<br>
+<a href='http://java.sun.com/j2se/javadoc/writingdoccomments/'>"How to Write Doc Comments for the Javadoc Tool"</a>
+
+</dd>
+
+<p>
+<i>Class instances are hash
+ references.</i>
+<p>
+<p>
+<i>Unless otherwise noted, <code>$self
+</code> is the object instance variable.</i>
+<p>
+<a name='summary'></a>
+
+<a name='constructor_summary'></a>
+
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#98B5EB'><th align=left><font size='+2'>Constructor Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_new'>new</a>($path, $title, $verbose)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Creates a new empty Pod::Classdoc object.
+</td></tr>
+</table><p>
+
+<a name='method_summary'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#98B5EB'><th align=left><font size='+2'>Method Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_add'>add</a>($txt, $file)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Scan the provided text for Perl packages, adding the packages
+to the current collection of classes.
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_clear'>clear</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Clear this object.
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_getFrameContainer'>getFrameContainer</a>($home)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Generate a toplevel container document for the TOC and
+classdoc frames.
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_getTOC'>getTOC</a>(@order)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Generate a table of contents document for the current collection of
+classdocs as a nested HTML list.
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_makeClassPath'>makeClassPath</a>($class)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Generate fully qualified pathname of output classdoc
+file for a given package name.
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_new'>new</a>()</code>
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_open'>open</a>($path, $pkg)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Load the specified package file.
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_openProject'>openProject</a>(@projects)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Load all the package files within a specified project directory.
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_path'>path</a>($path)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Get or set the output directory path for rendered documents.
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_render'>render</a>($use_private)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Render the loaded packages into classdocs.
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_writeClassdocs'>writeClassdocs</a>($use_private)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Write out the documents for the current collection of
+classdocs.
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_writeFrameContainer'>writeFrameContainer</a>($container, $home)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Write out a toplevel container document for the TOC and
+classdoc frames.
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_writeTOC'>writeTOC</a>(@order)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Write out an table of contents document for the current collection of
+classdocs as a nested HTML list.
+</td></tr>
+</table>
+<p>
+
+<a name='constructor_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#98B5EB'>
+	<th align=left><font size='+2'>Constructor Details</font></th>
+</tr>
+</table>
+
+<a name='_f_new'></a>
+<h3>new</h3>
+<pre>
+new($path, $title, $verbose)
+</pre><p>
+<dl>
+<dd>
+Creates a new empty Pod::Classdoc object.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>$path</code></td><td valign=top align=center> - </td><td align=left><i>(optional)</i>directory path for output documents; default is './classdocs'
+</td></tr>
+<tr><td align=left valign=top><code>$title</code></td><td valign=top align=center> - </td><td align=left><i>(optional)</i>title string to use for head of classdocs
+</td></tr>
+<tr><td align=left valign=top><code>$verbose</code></td><td valign=top align=center> - </td><td align=left><i>(optional)</i>if true, enables diagnostic output (default false)
+
+</td></tr>
+</table></dd>
+<dt><b>Returns:</b><dd>a new Pod::Classdoc object
+</dd>
+</dl></dd></dl><hr>
+
+<p>
+
+<a name='method_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#98B5EB'>
+	<th align=left><font size='+2'>Method Details</font></th>
+</tr></table>
+
+<a name='_f_add'></a>
+<h3>add</h3>
+<pre>
+add($txt, $file)
+</pre><p>
+<dl>
+<dd>
+Scan the provided text for Perl packages, adding the packages
+to the current collection of classes. When a package is located,
+it is scanned for its inherited classes and classdoc'd methods.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>$txt</code></td><td valign=top align=center> - </td><td align=left>the package text as either a scalar string, or an arrayref of
+	the lines of the package
+</td></tr>
+<tr><td align=left valign=top><code>$file</code></td><td valign=top align=center> - </td><td align=left><i>(optional)</i>full path of source file
+
+</td></tr>
+</table></dd>
+<dt><b>Returns:</b><dd>the PPI::Document object generated from the input text
+</dd>
+</dl></dd></dl><hr>
+
+<a name='_f_clear'></a>
+<h3>clear</h3>
+<pre>
+clear()
+</pre><p>
+<dl>
+<dd>
+Clear this object. Removes all currently loaded packages.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>this object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='_f_getFrameContainer'></a>
+<h3>getFrameContainer</h3>
+<pre>
+getFrameContainer($home)
+</pre><p>
+<dl>
+<dd>
+Generate a toplevel container document for the TOC and
+classdoc frames. Assumes the TOC is named 'toc.html'.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>$home</code></td><td valign=top align=center> - </td><td align=left><i>(optional)</i>pathname of a toplevel document to be included in index
+
+</td></tr>
+</table></dd>
+<dt><b>Returns:</b><dd>the frame container document
+</dd>
+</dl></dd></dl><hr>
+
+<a name='_f_getTOC'></a>
+<h3>getTOC</h3>
+<pre>
+getTOC(@order)
+</pre><p>
+<dl>
+<dd>
+Generate a table of contents document for the current collection of
+classdocs as a nested HTML list. Caller may optionally specify
+the order of classes in the menu.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>@order</code></td><td valign=top align=center> - </td><td align=left><i>(optional)</i>list of packages in the order in which they should appear in TOC; if a partial list,
+					any remaining packages will be appended to the TOC in alphabetical order
+</td></tr>
+</table></dd>
+<dt><b>Returns:</b><dd>the TOC document
+</dd>
+</dl></dd></dl><hr>
+
+<a name='_f_makeClassPath'></a>
+<h3>makeClassPath</h3>
+<pre>
+makeClassPath($class)
+</pre><p>
+<dl>
+<dd>
+Generate fully qualified pathname of output classdoc
+file for a given package name. Also creates the path
+if needed.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>$class</code></td><td valign=top align=center> - </td><td align=left>package name to be resolved to output classdoc file
+
+</td></tr>
+</table></dd>
+<dt><b>Returns:</b><dd>the fully qualified pathname to the classdocs for $class,
+	with a '.html' qualifier.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='_f_new'></a>
+<h3>new</h3>
+<pre>
+new()
+</pre><p>
+<dl>
+<dd>&nbsp;
+<p>
+<dd><dl>
+</dl></dd></dl><hr>
+
+<a name='_f_open'></a>
+<h3>open</h3>
+<pre>
+open($path, $pkg)
+</pre><p>
+<dl>
+<dd>
+Load the specified package file.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>$path</code></td><td valign=top align=center> - </td><td align=left>path to the package file.
+</td></tr>
+<tr><td align=left valign=top><code>$pkg</code></td><td valign=top align=center> - </td><td align=left>Perl name of the package
+
+</td></tr>
+</table></dd>
+<dt><b>Returns:</b><dd>the PPI::Document object generated from the input file
+</dd>
+</dl></dd></dl><hr>
+
+<a name='_f_openProject'></a>
+<h3>openProject</h3>
+<pre>
+openProject(@projects)
+</pre><p>
+<dl>
+<dd>
+Load all the package files within a specified project directory.
+Recurses into subdirectories as needed.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>@projects</code></td><td valign=top align=center> - </td><td align=left>list of pathnames of root project directories
+
+</td></tr>
+</table></dd>
+<dt><b>Returns:</b><dd>this Pod::Classdoc object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='_f_path'></a>
+<h3>path</h3>
+<pre>
+path($path)
+</pre><p>
+<dl>
+<dd>
+Get or set the output directory path for rendered documents.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>$path</code></td><td valign=top align=center> - </td><td align=left><i>(optional)</i>root directory where classdocs are to be written; if not provided,
+		a Get operation is executed
+
+@returns	for a Get operation, the current output path;
+			for a Set operation, the prior output path
+</td></tr>
+</table></dd>
+</dl></dd></dl><hr>
+
+<a name='_f_render'></a>
+<h3>render</h3>
+<pre>
+render($use_private)
+</pre><p>
+<dl>
+<dd>
+Render the loaded packages into classdocs. Creates
+subdirectories for subordinate classdocs as needed.
+Package files containing multiple package definitions
+will result in individual files for each package.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>$use_private</code></td><td valign=top align=center> - </td><td align=left><i>(optional)</i>include private methods. By default,
+	only public methods are included in the output; setting this flag
+	causes any documented private methods (methods beginning with an
+	underscore) to be included as well. Note that constructors
+	are always considered public.
+
+@returns	on success, a hashref mapping classnames to an arrayref 
+			of the classdoc formatted output, the input source file name and line number
+			of the class's associated classdoc'd package definition, and
+			a hashref mapping method names to an arrayref of source file name and
+			linenumber; 
+			undef on failure, with error message in $@
+</td></tr>
+</table></dd>
+</dl></dd></dl><hr>
+
+<a name='_f_writeClassdocs'></a>
+<h3>writeClassdocs</h3>
+<pre>
+writeClassdocs($use_private)
+</pre><p>
+<dl>
+<dd>
+Write out the documents for the current collection of
+classdocs. Renders the current set of classdocs before
+writing.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>$use_private</code></td><td valign=top align=center> - </td><td align=left><i>(optional)</i>include private methods. By default,
+	only public methods are included in the output; setting this flag
+	causes any documented private methods (methods beginning with an
+	underscore) to be included as well. Note that constructors
+	are always considered public.
+
+</td></tr>
+</table></dd>
+<dt><b>Returns:</b><dd>undef on failure, with error message in $@; otherwise, a hashref
+	mapping classnames to an arrayref of the full pathname of the classdoc formatted output file,
+	the input source file name and line number of the class's associated classdoc'd package 
+	definition, and a hashref mapping method names to an arrayref of source file name and
+	linenumber.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='_f_writeFrameContainer'></a>
+<h3>writeFrameContainer</h3>
+<pre>
+writeFrameContainer($container, $home)
+</pre><p>
+<dl>
+<dd>
+Write out a toplevel container document for the TOC and
+classdoc frames. Assumes the TOC is named 'toc.html'.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>$container</code></td><td valign=top align=center> - </td><td align=left>name of output file without path; path is taken
+	from the path specified via <method>new<method>() or 
+	<method>path<method>()
+</td></tr>
+<tr><td align=left valign=top><code>$home</code></td><td valign=top align=center> - </td><td align=left><i>(optional)</i>pathname of a toplevel document to be included in index
+
+</td></tr>
+</table></dd>
+<dt><b>Returns:</b><dd>this object on success, undef on failure, with error message in $@
+</dd>
+</dl></dd></dl><hr>
+
+<a name='_f_writeTOC'></a>
+<h3>writeTOC</h3>
+<pre>
+writeTOC(@order)
+</pre><p>
+<dl>
+<dd>
+Write out an table of contents document for the current collection of
+classdocs as a nested HTML list. The output filename is 'toc.html'.
+The caller may optionally specify the order of classes in the menu.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>@order</code></td><td valign=top align=center> - </td><td align=left><i>(optional)</i>list of packages in the order in which they should appear in TOC; if a partial list,
+					any remaining packages will be appended to the TOC in alphabetical order
+</td></tr>
+</table></dd>
+<dt><b>Returns:</b><dd>this object on success, undef on failure, with error message in $@
+</dd>
+</dl></dd></dl><hr>
+
+<small>
+<center>
+<i>Generated by POD::ClassDoc 1.01 on Sat Aug 18 11:02:01 2007</i>
+</center>
+</small>
+</body>
+</html>

@@ -1,0 +1,113 @@
+Revision history for Plack-App-Proxy
+
+0.29    08/31/2013
+        - Better cookie support with the AnyEvent::HTTP backend (Manni Heumann)
+
+0.28    08/24/2013
+        - allow passing options to backend (clkao)
+
+0.27    02/26/2013
+        - Remove more HTTP::Headers assumptions
+
+0.26    02/26/2013
+        - Add parent dependency
+
+0.25    11/10/2012
+        - Fix problem with META.yml
+
+0.24    11/10/2012
+        - Skip CONNECT test on Windows
+
+0.23    11/05/2012
+        - Fix test failures from newer HTTP::Headers
+
+0.22
+        - Filter out Status header since it's forbidden in PSGI spec (miyagawa)
+
+0.21
+        - Bump version to fix some CPAN issues.
+
+0.20
+        - Fix auto guessing of RewriteLocation.
+
+0.19
+        - Add pluggable backends, since AnyEvent seems to be flaky on
+          some systems. (doy)
+
+0.18    02/17/2010
+        - Fixes for RewriteLocation when used on a mounted proxy
+          (hiratara, rbuels)
+        - Ignore $ENV{http_proxy}
+        - Include reason for failure in 502 response
+        - Disabled persistent HTTP connection option in AnyEvent::HTTP
+          
+0.17    01/19/2010
+        - Bump version to fix some CPAN issues
+
+0.16    01/12/2010
+        - Rewrite proxy code to use AnyEvent::HTTP's on_body callback.
+          This gets chunked and gzipped responses working.
+
+0.15    03/26/2010
+        - Added the LoadBalancer middleware (franck cuny)
+        - Fixed SYNOPSIS of RewriteLocation (franck cuny)
+
+0.14    03/12/2010
+        - Fixed META.yml broken (Thanks to miyagawa)
+        - Removed dependencies on Plack-Request
+
+0.13    02/27/2010
+        - Added Connect middleware component
+        - Fixed the problem that responses which status code isn't 200
+          caused freeze on blocking servers
+        - Fixed the leak of $env with perl 5.8.x
+        - Relocated test programs
+
+0.12    02/09/2010
+        - Fixed the pod syntax
+        - Had tests pass without Plack::Server::AnyEvent
+
+0.11    02/08/2010
+        - INCOMPATIBLE: the config option 'host' is now renamed to 'remote'
+        - Made sure the code forward compatible with Plack 1.0
+        - Added a PSGI environment vars support to write middleware
+        - callback options for url/host is deprecated. See the docs how to do
+          that using middleware
+        - Fixed a bug where Location header was rewritten
+        - Added RewriteLocation and AddVia middleware components
+
+0.10    01/29/2010
+        Fixed the bug which drops QUERY_STRING from the original request.
+        Enabled the Set-Cookies headers in the response.
+        (Any other headers are also enabled. See RFC 2616.)
+
+0.09    01/13/2010
+        The tests no longer depend on the Google site.
+
+0.08    01/09/2010
+        Fixed memory leaks for perl 5.8.x.
+        Added more tests.
+
+0.07    01/05/2010
+        Only use AnyEvent::HTTP for both blocking and non-blocking
+        servers
+
+0.06    01/04/2010
+        Fixed typo in MANIFEST.SKIP
+
+0.05    01/04/2010
+        Re-upload with missing changes
+
+0.04    01/04/2010
+        Added gzip support (hiratara)
+        AnyEvent::HTTP fixes (hiratara)
+
+0.03    12/30/2009
+        Don't use google.com for tests because of localizations
+
+0.02    12/25/2009
+        Forgot to include Makefile.PL
+
+0.01    12/22/2009
+        First version, released on an unsuspecting world.
+

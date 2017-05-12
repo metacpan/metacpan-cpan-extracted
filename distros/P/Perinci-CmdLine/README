@@ -1,0 +1,30 @@
+DESCRIPTION
+
+    This module is currently empty, because the implementation is currently
+    split into Perinci::CmdLine::Lite (the lightweight version) and
+    Perinci::CmdLine::Classic (the full but heavier version). There's also
+    Perinci::CmdLine::Any that lets you choose between the two dynamically,
+    à la Any::Moose. And finally there's also Perinci::CmdLine::Inline, the
+    even more lightweight version.
+
+    This module exists solely for convenience of linking purposes.
+
+SEE ALSO
+
+    Perinci::CmdLine::Lite
+
+    Perinci::CmdLine::Classic
+
+    Perinci::CmdLine::Any
+
+    Perinci::CmdLine::Inline
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 6:
+
+      Non-ASCII character seen before =encoding in 'à'. Assuming UTF-8
+

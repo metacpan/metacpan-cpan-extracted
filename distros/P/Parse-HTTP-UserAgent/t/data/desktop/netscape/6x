@@ -1,0 +1,62 @@
+[AGENT]
+
+Mozilla/5.0 (Windows; U; Win98; en-US; rv:0.9.2) Gecko/20010726 Netscape6/6.1
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Windows 98',
+'extras'           => ['Windows'],
+'version_raw'      => '6.1',
+'lang'             => 'en-US',
+'mozilla'          => [ '0.9.2','0.009002'],
+'version'          => '6.100',
+'name'             => 'Netscape',
+'toolkit'          => ['Gecko','20010726','20010726.000'],
+'original_name'    => 'Netscape6',
+
+[AGENT]
+
+Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4.1) Gecko/20020508 Netscape6/6.2.3
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Windows XP',
+'extras'           => ['Windows'],
+'version_raw'      => '6.2.3',
+'lang'             => 'en-US',
+'mozilla'          => [ '0.9.4.1','0.009004001'],
+'version'          => '6.002003',
+'name'             => 'Netscape',
+'toolkit'          => ['Gecko','20020508','20020508.000'],
+'original_name'    => 'Netscape6',
+
+[AGENT]
+
+Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en-US; rv:1.0.2) Gecko/20030208 Netscape/7.02
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'PPC Mac OS X',
+'extras'           => ['Macintosh'],
+'version_raw'      => '7.02',
+'lang'             => 'en-US',
+'mozilla'          => [ '1.0.2', '1.000002'],
+'version'          => '7.020',
+'name'             => 'Netscape',
+'toolkit'          => ['Gecko','20030208','20030208.000']
+
+[AGENT]
+
+Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:0.9.4) Gecko/20011128 Netscape6/6.2.1 (CK-SillyDog)
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Windows XP',
+'extras'           => ['Windows','CK-SillyDog'],
+'version_raw'      => '6.2.1',
+'lang'             => 'en-US',
+'mozilla'          => [ '0.9.4','0.009004'],
+'version'          => '6.002001',
+'name'             => 'Netscape',
+'toolkit'          => ['Gecko','20011128','20011128.000'],
+'original_name'    => 'Netscape6',

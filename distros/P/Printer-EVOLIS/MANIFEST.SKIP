@@ -1,0 +1,6 @@
+.git
+blib
+test
+out
+dump
+docs/*.pdf

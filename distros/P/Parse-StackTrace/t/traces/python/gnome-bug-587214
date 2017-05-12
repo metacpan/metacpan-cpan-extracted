@@ -1,0 +1,37 @@
+Traceback:
+File "/usr/local/lib/python2.6/site-packages/django/core/handlers/base.py" in
+get_response
+  92.                 response = callback(request, *callback_args,
+**callback_kwargs)
+File "/home/sandy/git-gnome/snowy/notes/views.py" in note_detail
+  66.         doc = libxml2.parseDoc(template.replace('%%%CONTENT%%%',
+note.content))
+File "/usr/lib/python2.6/site-packages/libxml2.py" in parseDoc
+  1262.     ret = libxml2mod.xmlParseDoc(cur)
+
+Exception Type: UnicodeEncodeError at
+/test/notes/334/oauth-authorization-header/
+Exception Value: ('ascii', u'\n<note-content version="0.1" \n
+xmlns:link="http://beatniksoftware.com/tomboy/link"\n
+xmlns:size="http://beatniksoftware.com/tomboy/size"\n
+xmlns="http://beatniksoftware.com/tomboy">\n The OAuth Protocol Parameters are
+sent in the Authorization header the following way:\n\n<list><list-item
+dir="ltr">Parameter names and values are encoded per Parameter
+Encoding.\n</list-item><list-item dir="ltr">For each parameter, the name is
+immediately followed by an \u2018=\u2019 character (ASCII code 61), a
+\u2018\u201d\u2019 character (ASCII code 34), the parameter value (MAY be
+empty), and another \u2018\u201d\u2019 character (ASCII code
+34).\n</list-item><list-item dir="ltr">Parameters are separated by a comma
+character (ASCII code 44) and OPTIONAL linear whitespace per
+[RFC2617].\n</list-item><list-item dir="ltr">The OPTIONAL realm parameter is
+added and interpreted per [RFC2617], section
+1.2.</list-item></list>\n\nAuthorization: OAuth
+realm="<link:url>http://sp.example.com/</link:url>",\n               
+oauth_consumer_key="0685bd9184jfhq22",\n               
+oauth_token="ad180jjd733klru7",\n               
+oauth_signature_method="HMAC-SHA1",\n               
+oauth_signature="wOJIO9A2W5mFwDgiDvZbTSMK%2FPY%3D",\n               
+oauth_timestamp="137131200",\n               
+oauth_nonce="4572616e48616d6d65724c61686176",\n               
+oauth_version="1.0"\n\n<link:url>http://oauth.net/core/1.0/#auth_header</link:url>\n</note-content>',
+450, 451, 'ordinal not in range(128)')

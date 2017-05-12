@@ -1,0 +1,6 @@
+docs: |
+    See L<perlfunc/"reverse">. Note the note about scalar
+    context.
+
+        my $derf = reverse "fred";
+        print scalar reverse "fred";

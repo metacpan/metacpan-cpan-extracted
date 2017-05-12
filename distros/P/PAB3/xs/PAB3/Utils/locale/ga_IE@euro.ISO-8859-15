@@ -1,0 +1,57 @@
+grp:3;3
+fd:2
+ifd:2
+dp:.
+ts:,
+cs:¤
+ics:EUR
+csa:l
+css:0
+ns:-
+ps:+
+dtf:%a %d %b %Y %H:%M:%S %Z
+df:%d.%m.%y
+tf:%H:%M:%S
+apf:
+amu:
+pmu:
+aml:
+pml:
+lm1:Eanáir
+lm2:Feabhra
+lm3:Márta
+lm4:Aibreán
+lm5:Bealtaine
+lm6:Meitheamh
+lm7:Iúil
+lm8:Lúnasa
+lm9:Meán Fómhair
+lm10:Deireadh Fómhair
+lm11:Samhain
+lm12:Nollaig
+sm1:Ean
+sm2:Feabh
+sm3:Márta
+sm4:Aib
+sm5:Beal
+sm6:Meith
+sm7:Iúil
+sm8:Lún
+sm9:MFómh
+sm10:DFómh
+sm11:Samh
+sm12:Noll
+ld1:Dé Domhnaigh
+ld2:Dé Luain
+ld3:Dé Máirt
+ld4:Dé Céadaoin
+ld5:Déardaoin
+ld6:Dé hAoine
+ld7:Dé Sathairn
+sd1:Domh
+sd2:Luan
+sd3:Máirt
+sd4:Céad
+sd5:Déar
+sd6:Aoine
+sd7:Sath

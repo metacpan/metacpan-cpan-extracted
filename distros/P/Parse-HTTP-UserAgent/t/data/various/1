@@ -1,0 +1,137 @@
+[AGENT]
+
+Links (0.96; Unix)
+
+'parser'           => 'generic_moz_thing',
+'os'               => 'Unix',
+'version_raw'      => '0.96',
+'version'          => '0.960',
+'name'             => 'Links',
+'generic'          => 1
+
+[AGENT]
+
+Mozilla/4.0 WebTV/2.6 (compatible; MSIE 4.0)
+
+'parser'           => 'moz_only',
+'version_raw'      => '2.6',
+'version'          => '2.600',
+'name'             => 'WebTV',
+
+[AGENT]
+
+Lynx/2.8.4rel.1 libwww-FM/2.14 SSL-MM/1.4.1 OpenSSL/0.9.6c
+
+'parser'           => 'moz_only',
+'extras'           => [ 'libwww-FM/2.14', 'SSL-MM/1.4.1', 'OpenSSL/0.9.6c' ],
+'version_raw'      => '2.8.4rel.1',
+'version'          => '2.008004001',
+'name'             => 'Lynx',
+
+[AGENT]
+
+Lynx/2.8.3rel.1 libwww-FM/2.14
+
+'parser'           => 'moz_only',
+'extras'           => [ 'libwww-FM/2.14' ],
+'version_raw'      => '2.8.3rel.1',
+'version'          => '2.008003001',
+'name'             => 'Lynx',
+
+[AGENT]
+# HotJava
+
+Mozilla/3.0 (x86 [en] Windows NT 5.1; Sun)
+
+'os'               => 'Windows XP',
+'extras'           => ['x86'],
+'version_raw'      => '3.0',
+'lang'             => 'en',
+'version'          => '3.000',
+'name'             => 'HotJava',
+
+[AGENT]
+
+BlackBerry7730/3.7.1 UP.Link/5.1.2.5
+
+'parser'           => 'moz_only',
+'extras'           => [ 'UP.Link/5.1.2.5' ],
+'version_raw'      => '3.7.1',
+'version'          => '3.007001',
+'name'             => 'BlackBerry7730',
+
+[AGENT]
+
+Emacs-W3/2.1.105 URL/1.267 ((Unix?) ; TTY ; sparc-sun-solaris2.3)
+
+parser           => 'emacs',
+extras           => [ 'TTY','sparc-sun-solaris2.3','URL/1.267' ],
+version_raw      => '2.1.105',
+version          => '2.001105',
+name             => 'Emacs-W3',
+os               => 'Unix?',
+
+[AGENT]
+
+Emacs-W3/4.0pre.46 URL/p4.0pre.46 (i686-pc-linux; X11)
+
+'parser'           => 'emacs',
+'os'               => 'i686-pc-linux',
+'extras'           => ['X11', 'URL/p4.0pre.46' ],
+'version_raw'      => '4.0pre.46',
+'version'          => '4.000046',
+'name'             => 'Emacs-W3',
+
+[AGENT]
+
+fetch/1.0 FreeBSD/4.0-CURRENT (i386)
+
+'parser'           => 'generic_moz_thing',
+'os'               => 'FreeBSD 4.0-CURRENT',
+'extras'           => ['i386'],
+'version_raw'      => '1.0',
+'version'          => '1.000',
+'name'             => 'fetch',
+'generic'          => 1
+
+[AGENT]
+
+# name/version
+
+UP.Browser/4.1.2a-XXXX
+
+'parser'           => 'generic_name_version',
+'version_raw'      => '4.1.2a-XXXX',
+'version'          => '4.001002',
+'name'             => 'UP.Browser',
+'generic'          => 1
+
+[AGENT]
+
+Wapalizer/1.0
+
+'parser'           => 'generic_name_version',
+'version_raw'      => '1.0',
+'version'          => '1.000',
+'name'             => 'Wapalizer',
+'generic'          => 1
+
+[AGENT]
+
+YourWap/1.16
+
+'parser'           => 'generic_name_version',
+'version_raw'      => '1.16',
+'version'          => '1.160',
+'name'             => 'YourWap',
+'generic'          => 1
+
+[AGENT]
+
+Nokia-WAP-Toolkit/1.3beta
+
+'parser'           => 'generic_name_version',
+'version_raw'      => '1.3beta',
+'version'          => '1.300',
+'name'             => 'Nokia-WAP-Toolkit',
+'generic'          => 1

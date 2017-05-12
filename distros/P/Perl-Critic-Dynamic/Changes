@@ -1,0 +1,76 @@
+#######################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/tags/Perl-Critic-Dynamic-0.05/Changes $
+#     $Date: 2010-09-30 10:38:54 -0700 (Thu, 30 Sep 2010) $
+#   $Author: thaljef $
+# $Revision: 3944 $
+########################################################################
+
+[0.05] Released on 2010-09-30
+
+    Important:
+    * Starting with this release, Perl::Critic::DynamicPolicy and any 
+      Policy that inherits from it will be marked as "unsfafe".  At the
+      same time, this release requires Perl::Critic 1.108 or newer, which
+      will not load unsafe Policies by default.
+
+      So if you've been using (or developing) dynamic Policies, you
+      must now set (or tell your users to set) the -allow-unsafe
+      switch in either the Perl::Critic constructor or at the perlcritic
+      command line.
+
+    Bug Fixes:
+    * Fixed build failures due to undeclared dependency on Readonly.
+      Apparently, this was caused by a stray comma in the requirements
+      declaration
+
+    New Features:
+    * If a Dynamic policy throws an exception, the contents of EVAL_ERROR
+      will be dumped to STDOUT.  This was suggested by John LoVerso so
+      to make it possible to diagnose why the policy blew up.
+
+    Miscellanea:
+    * Organized author-only tests into the xt/ directory.
+    * Started using the Test::Perl::Critic::Policy framework for unit tests.
+
+[0.04] Released on 2007-08-06
+
+    Miscellanea:
+    * Filled out more documentation.
+    * Readonly is now an explcit dependency.
+    * Added lots of author-time tests.
+
+[0.03]  Not released
+
+     New Features:
+     * Added max_recursion configuration parameter.  This allows you
+       recurse into modules that have inner packages.  The default is
+       0, which means "don't recurse at all".
+
+     Miscellanea:
+     * Perl::Critic::Policy::Dynamic has been moved to 
+       Perl::Critic::DynamicPolicy because all modules in the
+       Perl::Critic::Policy must be concrete classes.
+
+     * Any erros that occur in the child process created
+       by Perl::Critic::DynamicPolicy::violates() will be trapped.
+       Failure is sent to the parent via the exit code of the child.
+
+[0.02]  Not released
+
+     New Features:
+     * Introduced Perl::Critic::Policy::Dynamic.  This is intended
+       as a base class for any Policy that is going to compile code
+       and do things that muck up the symbol table.
+
+     * ValidateAgainstSymbolTable now compiles your code as-is, 
+       which allows it to validate calls to imported subroutines
+       and locally declared subs too.
+
+     * ValidateAgainstSymbolTable has several new configuration hooks.
+       See POD for details.
+
+     * Added several test cases.
+
+[0.01]  Not released
+
+     First draft

@@ -1,0 +1,26 @@
+[AGENT]
+
+Opera/9.80 (Macintosh; Intel Mac OS X 10.6.8; U; en) Presto/2.9.168 Version/11.52
+
+'parser'      => 'opera_pre',
+'strength'    => 'U',
+'os'          => 'Macintosh',
+'extras'      => ['Intel Mac OS X 10.6.8'],
+'toolkit'     => ['Presto','2.9.168','2.009168'],
+'version_raw' => '11.52',
+'lang'        => 'en',
+'version'     => '11.520',
+'name'        => 'Opera',
+
+[AGENT]
+
+Opera/9.80 (Windows NT 6.0; U; tr) Presto/2.9.168 Version/11.52
+
+'parser'      => 'opera_pre',
+'strength'    => 'U',
+'os'          => 'Windows Vista / Server 2008',
+'toolkit'     => ['Presto','2.9.168','2.009168'],
+'version_raw' => '11.52',
+'lang'        => 'tr',
+'version'     => '11.520',
+'name'        => 'Opera',

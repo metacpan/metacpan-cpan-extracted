@@ -1,0 +1,194 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <title>PkgForge Admin - Filesystem Configuration</title>
+  <meta name="author" content="Stephen Quinney">
+</head>
+
+<body>
+  <h1>PkgForge Admin - Filesystem Configuration</h1>
+
+<p>
+One of the most important aspects of the design of the Package Forge
+system is the filesystem used to store all the data associated with
+build jobs at the various stages in their lifecycle. Basically this
+breaks down into three sections:</p>
+
+<dl>
+  <dt>incoming</dt>
+  <dd>This is the directory into which new jobs are submitted. All
+  users of the system must be able to create new sub-directories
+  within this directory. The incoming queue processor must be able to
+  read this directory and also be able to delete anything within the
+  directory.</dd>
+
+  <dt>accepted</dt>
+  <dd>This is the directory into which valid jobs are transferred once
+  they have been accepted by the incoming queue processor. Therefore
+  the incoming queue processor must be able to create sub-directories
+  within this directory. The build daemons and web interface must be
+  able to read all the contents of this directory, the users may wish
+  to also be able to read the contents but it is not essential.  For
+  sanity all users should be prevented from creating or deleting files
+  or directories within this directory (that includes the build
+  daemons and web interface).</dd>
+
+  <dt>results</dt>
+  <dd>This is the directory into which the results of build jobs
+  (e.g. packages and log files) are stored. The build daemons must be
+  able to create sub-directories within this directory. The web
+  interface must have read access for this directory, the users may
+  wish to also be able to read the contents but it is not
+  essential. For sanity all users should be prevented from creating or
+  deleting files or directories within this directory (that includes
+  the incoming queue processor and web interface).</dd>
+
+</dl>
+
+<p>These requirements can be converted into a number of different
+methods of running the system. It could be that each sub-system
+(incoming processor, build daemons and web interface) runs as a
+different Unix user with permissions being managed by the traditional
+Unix model. In the School of Informatics we use OpenAFS so the ACLs
+were done using that system and they are described below.</p>
+
+<p>
+Some form of networked filesystem is required for the build daemons to
+be able to access the input files in the <em>accepted</em> jobs
+directory and store back files into the <em>results</em>
+directory. NFS should work but has not been tested.
+</p>
+
+<h2>Using AFS</h2>
+
+<p>When using AFS it probably makes most sense to have all the
+pkgforge directories within a single AFS volume. This makes it easy to
+move around and make backups. A volume can be created like this:</p>
+
+<pre>
+% vos create -server host1.example.org -partition /vicepd -name pkgforge -maxquota 100000000
+% fs mkmount -dir /afs/example.org/pkgs/pkgforge -vol pkgforge -rw
+</pre>
+
+<p>This would be done as an AFS super-user. Note that the maximum
+quota has been deliberately set to something fairly large, the default
+limit is fairly small and will be reached quite quickly.</p>
+
+<p>Once this has been done the sub-directories can be created:</p>
+
+<pre>
+% mkdir -p /afs/example.org/pkgs/pkgforge
+% mkdir -p /afs/example.org/pkgs/pkgforge/incoming
+% mkdir -p /afs/example.org/pkgs/pkgforge/accepted
+% mkdir -p /afs/example.org/pkgs/pkgforge/results
+</pre>
+
+<h3>Users and Groups</h3>
+
+<p>The different sub-systems each run as the same Unix user but as a
+different AFS user. We currently have the following AFS users:</p>
+
+<ul>
+  <li>pkgforge_incoming.ardbeg.inf.ed.ac.uk</li>
+  <li>pkgforge_web.ardbeg.inf.ed.ac.uk</li>
+  <li>pkgforge_builder.bigfan.inf.ed.ac.uk</li>
+  <li>pkgforge_builder.elman.inf.ed.ac.uk</li>
+  <li>pkgforge_builder.gates.inf.ed.ac.uk</li>
+  <li>pkgforge_builder.bressler.inf.ed.ac.uk</li>
+</ul>
+
+<p>Rather than managing the ACLs on the various directories by adding
+and deleting individual users, which is likely to result in errors and
+oversights, AFS groups are used. This means that the ACLs on the
+directories should never need to be altered. There are normally three
+groups:</p>
+
+<ul>
+  <li>pkgforge_incoming</li>
+  <li>pkgforge_web</li>
+  <li>pkgforge_builder</li>
+</ul>
+
+<p>The purpose of each group should be fairly obvious. Normally
+the <code>pkgforge_incoming</code> and <code>pkgforge_web</code> AFS
+groups would each only contain a single AFS user but there are no
+limits. This is useful when moving services from one host to another
+and they both need access during a transition period.</p>
+
+<p>Full details on managing AFS users and groups can be found
+elsewhere but here is an example of the basics:</p>
+
+<pre>
+% pts creategroup pkgforge_builder
+
+% pts createuser -name pkgforge_builder.host1.example.org -id 28251
+% pts adduser -user pkgforge_builder.host1.example.org -group pkgforge_builder
+</pre>
+
+<p>If you do not already have an appropriate AFS group you may wish to
+create another AFS group (e.g. <code>pkgforge_users</code>) which
+would include all users of the pkgforge system.</p>
+
+<p>Note that the createuser commands must be done as the AFS
+super-user but all the group management can be done as a normal AFS
+user.</p>
+
+<h3>ACLs</h3>
+
+<p>The previous description of requirements is translated into a set
+of AFS ACLs which can now be applied to the previously created
+directories with the various groups. Note that to gain access (for
+either read or write) all the users must be able to at least list the
+higher-level directories in the tree. Note also that to ensure only
+the required ACLs are set on each directory the <code>-clear</code>
+option is being used throughout.</p>
+
+<pre>
+% fs setacl -clear -dir /afs/example.org/pkgs/pkgforge -acl\
+                 system:administrators rlidwka\
+                 pkgforge_incoming     read\
+                 pkgforge_builder      read\
+                 pkgforge_web          read\
+                 pkgforge_users        read\
+                 system:authuser       read
+
+% fs setacl -clear -dir /afs/example.org/pkgs/pkgforge/incoming -acl\
+                 system:administrators rlidwka\
+                 pkgforge_incoming     write\
+                 pkgforge_users        rli\
+                 system:authuser       read
+
+% fs setacl -clear -dir /afs/example.org/pkgs/pkgforge/accepted -acl\
+                 system:administrators rlidwka\
+                 pkgforge_incoming     write\
+                 pkgforge_builder      read\
+                 pkgforge_web          read\
+                 pkgforge_users        read\
+                 system:authuser       read
+
+fs setacl -clear -dir /afs/example.org/pkgs/pkgforge/results -acl\
+                 system:administrators rlidwka\
+                 pkgforge_incoming     write\
+                 pkgforge_builder      write\
+                 pkgforge_web          read\
+                 pkgforge_users        read\
+                 system:authuser       read
+</pre>
+
+<p>It is assumed that the <code>/afs/example.org/pkgs</code> directory
+already existed and was accessible by the users.</p>
+
+<p>Most of the ACLs are fairly self-explanatory but note that for the
+incoming directory the users only have read, lookup and insert rights,
+they do not have any ability to delete entries or write into files
+they do not own (normal <em>write</em> access translates
+into <em>rlidwk</em>) see the DROPBOXES section of the fs_setacl(1)
+manual page for more details.</p>
+
+<p>Note also that we have added permissions for all authenticated
+users to be able to read the contents. Depending on what you are
+building on the pkgforge system you may wish to remove that
+access.</p>
+
+</body>
+</html>

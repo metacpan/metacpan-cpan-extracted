@@ -1,0 +1,78 @@
+{
+   "abstract" : "Simple utility to get canonical paths.",
+   "author" : [
+      "mattn <mattn.jp@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.14.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Path-Canonical",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Path::Canonical" : {
+         "file" : "lib/Path/Canonical.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mattn/p5-Path-Canonical/issues"
+      },
+      "homepage" : "https://github.com/mattn/p5-Path-Canonical",
+      "repository" : {
+         "url" : "git://github.com/mattn/p5-Path-Canonical.git",
+         "web" : "https://github.com/mattn/p5-Path-Canonical"
+      }
+   },
+   "version" : "0.05",
+   "x_authority" : "cpan:MATTN",
+   "x_contributors" : [
+      "lestrrat <lestrrat+github@gmail.com>"
+   ]
+}

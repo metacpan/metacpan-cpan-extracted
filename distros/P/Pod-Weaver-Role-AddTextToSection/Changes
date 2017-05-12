@@ -1,0 +1,36 @@
+0.06    2017-01-14 (PERLANCAR)
+
+	- add_text_to_section() now returns true/false depending on whether
+	  the text is actually added to the section.
+
+
+0.05    2015-04-04 (PERLANCAR)
+
+	- Replace code snippet with a simpler one since we've calculated
+	  headlines positions.
+
+	- Add options: after_section, before_section.
+
+
+0.04    2015-02-12 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] 'use Pod::Elemental::Element::Nested' is required.
+
+
+0.03    2015-01-13 (PERLANCAR)
+
+	- Refactor: rename variables to make it more readable.
+
+	- Minor fix in example (make sure we end with a blank line).
+
+
+0.02    2015-01-10 (PERLANCAR)
+
+	- [Bugfix] logic error for option top=1.
+
+
+0.01    2015-01-10 (PERLANCAR)
+
+        - First release.

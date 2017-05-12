@@ -1,0 +1,116 @@
+NAME
+    Plack::Middleware::EasyHooks - PSGI Middleware the easy way
+
+SYNOPSIS
+      package Plack::Middleware::MyAccessLog;
+
+      use parent qw(Plack::Middleware::EasyHooks);
+ 
+      sub before {
+          my ($self, $env) = @_;
+
+          $env->{MyAccessLog} = {
+              start_time    => time(),
+              response_size => 0,
+          };
+      }
+
+      sub filter {
+          my ($self, $env, $chunk) = @_;
+
+          $env->{MyAccessLog]->{response_size} += length $chunk;
+
+          return $chunk;
+      }
+
+      sub finalize {
+          my ($self, $env) = shift;
+
+          my $time = time() - $env->{MyAccessLog}->{start_time};
+          my $size = $env->{MyAccessLog}->{response_size};
+
+          warn "Request took $time seconds and sent $size bytes";
+      }
+
+      1;
+
+    Or as an inline middleware
+
+      use Plack::Builder;
+
+      my $app = ...; 
+
+      builder {
+          enable 'Plack::Middleware::EasyHooks', 
+              before    => sub { $_[0]->{start_time} = time(); },
+              finalize  => sub {
+                  my $time = time() - $_[0]->{start};
+                  warn "Request took $time seconds";
+              };
+
+          $app;
+      }
+
+DESCRIPTION
+    Plack::Middleware::EasyHooks takes care of the complexities handling
+    streaming in PSGI middleware. Just provide hooks to be called before,
+    during and after the wrapped PSGI application.
+
+    The hooks are called in the following order (much simplified):
+
+        before();
+        $app->();
+        after();
+    
+        filter($_) for @body;
+        tail($env);
+    
+        finalize();
+
+SUPPORTED HOOKS
+    The following methods are available for hooking into the request
+    handling
+
+    before( $env )
+        This method is called before processing the wrapped PSGI
+        application. It receives the PSGI $env hash ref as argument.
+
+        The return value is ignored.
+
+    after( $env, $res )
+        This method is called when the app starts to respond. It receives
+        the PSGI $env and a array ref containing the status code and headers
+        as arguments.
+
+        The middleware can override the status code and headers either by
+        updating the elements of this array ref or by returning a array ref
+        with the new status code and headers.
+
+    filter ( $env, $chunk )
+        This method allows you to filter the content of the response. It is
+        called on each chunk of the response.
+
+        The return value is passed to the next level. If the return value is
+        "undef" proccessing of the request is stopped.
+
+    tail( $env );
+        This methods allows you to add some additional content at the end of
+        the body.
+
+    finalize( $env )
+        This method is called after the request has been processed.
+
+BUGS
+    Unless your PSGI server supports cleanup handles, the finalize() method
+    might be calles before the final chunk is successfully sent to the
+    client.
+
+AUTHOR
+    Peter Makholm <peter@makholm.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 by Peter Makholm.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

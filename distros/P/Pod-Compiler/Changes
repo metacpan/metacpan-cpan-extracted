@@ -1,0 +1,44 @@
+ANNOUNCEMENT
+------------
+
+This package is more or less obsoleted by Pod::Simple.
+I strongly suggest to use Pod::Simple instead, as it
+offers the latest support of perlpodspec and UTF etc.
+
+
+0.21 marek Sun Sep 22 08:30:55 MET 2013
+    - CPAN#74530: Typo in Pod::Compiler::end_pod
+      * fixed typo
+    - CPAN#4893: alttext and something undetected
+      * patch included
+    - CPAN#87690: Pod::Parser not indexed correctly
+      ATTENTION! Change breaks backward compatibility:
+      Had to rename the internal classes
+        Pod::paragraph ==> Pod::paragraph
+        Pod::list      ==> Pod::clist
+      to avoid case-insensitive clashes with Pod::Parser modules
+      on CPAN. See the CPAN RT ticket for more details.
+
+0.20 2004-01-09 10:41:22 MET marek
+    - CPAN#4651 breaking circular references 
+    - CPAN#4652 L<http://foo> unsupported (contrary to pod) 
+      * fixed handling of L<http://url>
+      * fixed Pod::link as_text/as_pod
+      * added t/02link.t
+      * suppress complaint about // in URL nodes
+    - CPAN#4735 L<crontab(5)/"DESCRIPTION"> should be of type man 
+    - CPAN#4736 in Pod::objects L<Pod::doc::collection> should be
+      L<"Pod::doc::collection">
+    - CPAN#4870 missing case insensitive flag(i) for
+      # nonstandard: alttext and url 
+    - CPAN#4871 Pod::link needs more unofficial url types 
+
+  Credits go to http://crazyinsomniac.perlmonk.org/perl/
+  for submitting all of them and providing patches.
+
+0.10 2001-01-12 14:32:52 MET marek
+    - first version to be put on CPAN
+
+0.01 2001-01-04 16:34:05 MET marek
+    - start
+

@@ -1,0 +1,36 @@
+Puppet::Tidy
+
+Puppet::Tidy is a Perl module and standalone application to verify that
+Puppet manifests comply with the Puppet Style Guide which is available
+here: http://docs.puppetlabs.com/guides/style_guide.html.
+
+It was developed after getting bored pretty quickly with manually fixing the
+warnings emitted by the awesome puppet-lint tool.
+
+For more information about Puppet::Tidy please visit it's homepage at
+http://opensource.mtier.org/ptidy.html
+
+Jasper Lievisse Adriaanse
+jasper@mtier.org
+
+REQUIREMENTS
+
+  - File::Copy
+  - Text::Tabs
+
+INSTALLATION
+
+  perl Makefile.PL
+  make
+  make install
+
+STATUS
+
+  Beta. This is an initial release with basic functionality. Only a limited
+  number of tests/checks are currently implemented. Both the number of
+  tests/checks and strictness of them will be improved in future versions.
+
+SUPPORT
+
+In case you have questions or you need support please contact us at
+puppet-tidy@support.mtier.org.

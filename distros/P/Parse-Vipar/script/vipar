@@ -1,0 +1,75 @@
+#!/usr/bin/perl -w # -*- cperl -*-
+
+use FindBin;
+use lib "$FindBin::Bin";
+use lib "$FindBin::Bin/../yalalr";
+#use lib '/usr/lib/perl5/site_perl';
+
+use Parse::YALALR::Build;
+use Parse::Vipar;
+
+sub search_INC ($) {
+    my $file = shift;
+    return if !defined $file;
+    return $file if (-f $file);
+    foreach (@INC) {
+	return "$_/$file" if (-f "$_/$file");
+    }
+    return undef;
+}
+
+sub usage {
+    my $msg = shift;
+    if ($msg) { print "$0: $msg\n"; }
+    print "usage: $0 --data=<input_data> <grammar_filename>\n";
+    exit(1);
+}
+
+######################################################################
+
+my $data;
+my $grammar;
+my $why = 1;
+
+my @ARGS;
+foreach (@ARGV) {
+    if (/^--data=(.*)/) {
+	$data = $1;
+    } elsif (/^--disable-why$/) {
+	$why = 0;
+    } else {
+	push(@ARGS, $_);
+    }
+}
+
+usage("No grammar given")
+  if @ARGS == 0;
+usage("Too many arguments")
+  if @ARGS > 1;
+$grammar = shift(@ARGS);
+
+my $datafile = search_INC($data);
+
+my $grammarfile ||= search_INC($grammar)
+  or die "Unable to find $grammar\n";
+
+my $lang = 'perl';
+
+open(SAMPLE, $grammarfile) or die "open $grammarfile: $!";
+print "Building parser for $grammarfile...\n";
+my $builder = Parse::YALALR::Build->new($lang, \*SAMPLE, why => $why);
+$builder->build_table();
+my $parser = $builder->parser;
+print "Done.\n";
+# print $parser->dump_parser();
+
+print "Constructing UI...\n";
+my $vipar = Parse::Vipar->new(parser => $parser,
+			      builder => $builder,
+			      datafile => $datafile);
+print "Done.\n";
+print "Filling in UI view with $vipar->{datafile}...\n";
+$vipar->fillin();
+print "Done.\n";
+Tk::MainLoop();
+

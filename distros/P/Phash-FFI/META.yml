@@ -1,0 +1,26 @@
+---
+abstract: 'FFI-based pHash interface.'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Phash::FFI
+name: Phash-FFI
+no_index:
+  directory:
+    - examples
+    - inc
+requires:
+  FFI::CheckLib: '0.03'
+  FFI::Platypus: '0.12'
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: git://github.com/gugod/Phash-FFI.git
+version: '0.04'

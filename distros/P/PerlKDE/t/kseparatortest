@@ -1,0 +1,19 @@
+#!/usr/bin/perl -w
+use KDE;
+import KDE::app;
+
+$toplevel = new Qt::Widget;
+
+$mainbox = new Qt::BoxLayout($toplevel, Qt::BoxLayout::TopToBottom, 10);
+
+$sep1 = new KDE::Separator(Qt::Frame::VLine, $toplevel);
+$mainbox->addWidget($sep1);
+
+$sep2 = new KDE::Separator(Qt::Frame::HLine, $toplevel);
+$mainbox->addWidget($sep2);
+
+$mainbox->activate;
+
+$app->setMainWidget($toplevel);
+$toplevel->show;
+exit $app->exec;

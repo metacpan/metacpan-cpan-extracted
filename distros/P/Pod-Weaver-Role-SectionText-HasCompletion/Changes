@@ -1,0 +1,16 @@
+Revision history for Pod-Weaver-Role-SectionText-HasCompletion
+
+0.03    2015-08-26 (PERLANCAR)
+
+	- Formatting.
+
+
+0.02    2015-08-26 (PERLANCAR)
+
+	- Rename method section_text() -> section_text_has_completion() to
+	  avoid conflict with PWR:SectionText::SelfCompletion.
+
+
+0.01    2015-08-26 (PERLANCAR)
+
+        - First release.

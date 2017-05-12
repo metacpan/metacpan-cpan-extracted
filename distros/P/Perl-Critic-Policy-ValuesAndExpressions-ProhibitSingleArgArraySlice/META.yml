@@ -1,0 +1,33 @@
+---
+abstract: 'Prohibit using an array slice with only one index'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-ValuesAndExpressions-ProhibitSingleArgArraySlice
+provides:
+  Perl::Critic::Policy::ValuesAndExpressions::ProhibitSingleArgArraySlice:
+    file: lib/Perl/Critic/Policy/ValuesAndExpressions/ProhibitSingleArgArraySlice.pm
+    version: '0.004'
+requires:
+  Perl::Critic: '1.126'
+  parent: '0'
+  perl: '5.012'
+resources:
+  bugtracker: https://github.com/xsawyerx/perl-critic-policy-valuesandexpressions-prohibitsingleargarrayslice
+  repository: git://github.com/xsawyerx/perl-critic-policy-valuesandexpressions-prohibitsingleargarrayslice.git
+version: '0.004'
+x_authority: cpan:XSAWYERX
+x_serialization_backend: 'YAML::Tiny version 1.69'

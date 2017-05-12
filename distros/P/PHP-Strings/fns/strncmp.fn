@@ -1,0 +1,3 @@
+docs: |
+    Unnecessary. Perl is smart enough. Use
+    L<substr|perlfunc/"substr">.

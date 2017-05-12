@@ -1,0 +1,8 @@
+<note replied="1">
+    <from>Alice</from>
+    <to>Bob</to>
+    <sent year="2010" month="03" day="01" hour="12" minute="01" second="47" />
+    <location latitude="-41.310012" longitude="174.766258" />
+    <subject>Reminder for this weekend</subject>
+    <body>Don't forget the party on Saturday :)</body>
+</note>

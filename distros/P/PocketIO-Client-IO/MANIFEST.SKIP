@@ -1,0 +1,14 @@
+\.tgz$
+\.tar\.gz$
+\.git
+\.bak$
+\.old$
+\.shipit$
+blib/
+test/
+Makefile$
+MANIFEST\.SKIP
+pm_to_blib
+AnyEvent-PocketIO-Client-
+PocketIO-Client-IO-
+

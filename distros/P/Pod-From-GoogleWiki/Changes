@@ -1,0 +1,22 @@
+Revision history for Pod-From-GoogleWiki
+
+0.07    2008.09.28
+        nothing changed, just for 'World-writable Files'
+
+0.06    2008.09.27
+        remove Moose dependence.
+
+0.05    2008.09.20
+        more bug fix
+
+0.04    2008.09.20
+        bug fixes with t/05-for-foorum.t
+
+0.03    2008.09.19 18:43
+        skip the '#labels' in first line
+
+0.02    2008.09.19
+        add table support
+
+0.01    Date/time
+        First version, released on an unsuspecting world.

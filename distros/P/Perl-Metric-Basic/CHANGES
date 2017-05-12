@@ -1,0 +1,15 @@
+CHANGES file for Perl::Metric::Basic:
+
+0.31 Tue Sep  5 09:08:44 BST 2006
+  - add Class::Accessor as a prereq (noticed by Matisse Enzer)
+
+0.30 Sat Jun 25 15:01:30 BST 2005
+  - require at least PPI 0.993, and use the PPI::Document->new in the
+    test
+
+0.29 Thu Jun 23 08:34:59 BST 2005
+  - rename from PPI::Metric::Basic to Perl::Metric::Basic
+
+0.28 Sat Sep 25 17:48:44 BST 2004
+  - first release
+

@@ -1,0 +1,106 @@
+{
+   "abstract" : "interface to secure password storage(s)",
+   "author" : [
+      "Marcin Kasperski <Marcin.Kasperski@mekk.waw.pl>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "keywords" : [
+      "passwords",
+      "security",
+      "secure-storage",
+      "keyring"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Passwd-Keyring-Auto",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Passwd::Keyring::Memory" : "0.24",
+            "Pod::Markdown" : "2.0",
+            "Pod::Readme" : "1.001002",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Passwd::Keyring::Gnome" : "0.30",
+            "Passwd::Keyring::KDEWallet" : "0.20",
+            "Passwd::Keyring::PWSafe3" : "0.21"
+         },
+         "requires" : {
+            "App::Cmd" : "0",
+            "App::Cmd::Plugin::Prompt" : "0",
+            "Config::Simple" : "0",
+            "Config::Tiny" : "0",
+            "File::HomeDir" : "0",
+            "File::ShareDir" : "1.00",
+            "Moo" : "1.00100",
+            "MooseX::Types::Perl" : "0",
+            "Passwd::Keyring::Memory" : "0.24",
+            "Path::Tiny" : "0",
+            "Try::Tiny" : "0",
+            "namespace::clean" : "0",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Passwd::Keyring::Auto" : {
+         "file" : "lib/Passwd/Keyring/Auto.pm",
+         "version" : "0.7201"
+      },
+      "Passwd::Keyring::Auto::App" : {
+         "file" : "lib/Passwd/Keyring/Auto/App.pm"
+      },
+      "Passwd::Keyring::Auto::App::ConfigCreate" : {
+         "file" : "lib/Passwd/Keyring/Auto/App/ConfigCreate.pm"
+      },
+      "Passwd::Keyring::Auto::App::ConfigEdit" : {
+         "file" : "lib/Passwd/Keyring/Auto/App/ConfigEdit.pm"
+      },
+      "Passwd::Keyring::Auto::App::ConfigShow" : {
+         "file" : "lib/Passwd/Keyring/Auto/App/ConfigShow.pm"
+      },
+      "Passwd::Keyring::Auto::App::PasswordClear" : {
+         "file" : "lib/Passwd/Keyring/Auto/App/PasswordClear.pm"
+      },
+      "Passwd::Keyring::Auto::App::PasswordSet" : {
+         "file" : "lib/Passwd/Keyring/Auto/App/PasswordSet.pm"
+      },
+      "Passwd::Keyring::Auto::Chooser" : {
+         "file" : "lib/Passwd/Keyring/Auto/Chooser.pm"
+      },
+      "Passwd::Keyring::Auto::Config" : {
+         "file" : "lib/Passwd/Keyring/Auto/Config.pm"
+      },
+      "Passwd::Keyring::Auto::KeyringAPI" : {
+         "file" : "lib/Passwd/Keyring/Auto/KeyringAPI.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/Mekk/perl-keyring-auto/issues"
+      },
+      "homepage" : "http://bitbucket.org/Mekk/perl-keyring-auto",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://bitbucket.org/Mekk/perl-keyring-auto"
+      }
+   },
+   "version" : "0.7201"
+}

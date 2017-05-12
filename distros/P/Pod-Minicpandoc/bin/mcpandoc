@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+use Pod::Minicpandoc;
+exit( Pod::Minicpandoc->run() );
+
+__END__
+
+=head1 NAME
+
+mcpandoc
+
+=head1 DESCRIPTION
+
+See L<Pod::Minicpandoc> and L<Pod::Perldoc>.
+Forked from L<Pod::Cpandoc>.
+
+=cut
+

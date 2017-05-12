@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+example/elizabot.pl
+lib/POE/Component/IRC/Object.pm
+t/00basic.t

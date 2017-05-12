@@ -1,0 +1,230 @@
+=encoding utf8
+
+=head1 NAME
+
+POSIX::1003::Signals - POSIX using signals
+
+=head1 INHERITANCE
+
+ POSIX::1003::Signals
+   is a POSIX::1003::Module
+
+=head1 SYNOPSIS
+
+  use POSIX::1003::Signals qw(:functions SIGPOLL SIGHUP);
+  sigaction($signal, $action, $oldaction);
+  sigpending($sigset);
+  sigprocmask($how, $sigset, $oldsigset)
+  sigsuspend($signal_mask);
+
+  kill SIGPOLL//SIGHUP, $$;
+
+  use POSIX::1003::Signals '%signals';
+  my $number = $signals{SIGHUP};
+  $signals{SIGNEW} = $number;
+
+=head1 DESCRIPTION
+
+This manual page explains the access to the POSIX C<sigaction>
+functions and its relatives. This module uses two helper objects:
+L<POSIX::SigSet|POSIX::SigSet> and L<POSIX::SigAction|POSIX::SigAction>.
+
+See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
+ 
+=over 4
+
+=item POSIX::1003::Signals-E<gt>B<exampleValue>(NAME)
+
+See L<POSIX::1003::Module/"METHODS">
+
+=item $obj-E<gt>B<import>()
+
+See L<POSIX::1003::Module/"METHODS">
+
+=back
+
+=head1 FUNCTIONS
+
+These functions are implemened in POSIX.xs
+
+=head2 Standard POSIX
+
+=over 4
+
+=item B<kill>(SIGNAL, PROCESS)
+
+Simply L<perlfunc/kill>.
+
+B<Be warned> the order of parameters is reversed in the C<kill>
+exported by POSIX!
+
+  CORE::kill($signal, $pid);
+  ::Signals::kill($signal, $pid);
+  POSIX::kill($pid, $signal);
+
+=item B<raise>(SIGNAL)
+
+Send a signal to the executing process.
+
+=item B<sigaction>(SIGNAL, ACTION, [OLDACTION])
+
+Detailed signal management.  The C<signal> must be a number (like SIGHUP),
+not a string (like "SIGHUP").  The  C<action> and C<oldaction> arguments
+are C<POSIX::SigAction> objects. Returns C<undef> on failure. 
+
+If you use the C<SA_SIGINFO flag>, the signal handler will in addition to
+the first argument (the signal name) also receive a second argument: a
+hash reference, inside which are the following keys with the following
+semantics, as defined by POSIX/SUSv3:
+
+  signo   the signal number
+  errno   the error number
+  code    if this is zero or less, the signal was sent by
+          a user process and the uid and pid make sense,
+          otherwise the signal was sent by the kernel
+
+The following are also defined by POSIX/SUSv3, but unfortunately
+not very widely implemented:
+
+  pid     the process id generating the signal
+  uid     the uid of the process id generating the signal
+  status  exit value or signal for SIGCHLD
+  band    band event for SIGPOLL
+
+A third argument is also passed to the handler, which contains a copy
+of the raw binary contents of the siginfo structure: if a system has
+some non-POSIX fields, this third argument is where to unpack() them
+from.
+
+Note that not all siginfo values make sense simultaneously (some are
+valid only for certain signals, for example), and not all values make
+sense from Perl perspective.
+
+=item B<signal>(SIGNAL, (CODE|'IGNORE'|'DEFAULT'))
+
+Set the CODE (subroutine reference) to be called when the SIGNAL appears.
+See L<perlvar/%SIG>.
+
+   signal(SIGINT, \&handler);
+   $SIG{SIGINT} = \&handler;  # same
+
+=item B<sigpending>(SIGSET)
+
+Examine signals that are blocked and pending.  This uses C<POSIX::SigSet>
+objects for the C<sigset> argument.  Returns C<undef> on failure.
+
+=item B<sigprocmask>(HOW, SIGSET, [OLDSIGSET])
+
+Change and/or examine calling process's signal mask.  This uses
+C<POSIX::SigSet> objects for the C<sigset> and C<oldsigset> arguments.
+Returns C<undef> on failure.
+
+Note that you can't reliably block or unblock a signal from its own signal
+handler if you're using safe signals. Other signals can be blocked or
+unblocked reliably.
+
+=item B<sigsuspend>(SIGSET)
+
+Install a signal mask and suspend process until signal arrives.
+This uses C<POSIX::SigSet> objects for the C<signal_mask> argument.
+Returns C<undef> on failure.
+
+=item B<strsignal>(SIGNAL)
+
+Returns a string reprentation of the SIGNAL.  When the SIGNAL is unknown,
+a standard string is returned (never undef)
+
+=back
+
+=head2 Additional
+
+=over 4
+
+=item B<sigaction_names>()
+
+Returns a list with all known sigaction names, unsorted.
+
+=item B<signal_names>()
+
+Returns a list with all known signal names, unsorted.
+
+=back
+
+=head1 CONSTANTS
+
+=over 4
+
+=item B<%signals>
+
+This exported variable is a (tied) HASH which maps C<SIG*> and
+C<SA_*> names to their numbers.
+
+=back
+
+=head2 Export tag C<:signals>
+
+The following constants are exported, shown here with the values
+discovered during installation of this module:
+
+=for comment
+#TABLE_SIGNALS_START
+
+  SIGABRT    6          SIGKILL    9          SIGTERM    15
+  SIGALRM    14         SIGPIPE    13         SIGTRAP    5
+  SIGBUS     7          SIGPOLL    29         SIGTSTP    20
+  SIGCHLD    17         SIGPROF    27         SIGTTIN    21
+  SIGCLD     17         SIGPWR     30         SIGTTOU    22
+  SIGCONT    18         SIGQUIT    3          SIGURG     23
+  SIGFPE     8          SIGRTMAX   64         SIGUSR1    10
+  SIGHUP     1          SIGRTMIN   34         SIGUSR2    12
+  SIGILL     4          SIGSEGV    11         SIGVTALRM  26
+  SIGINT     2          SIGSTKFLT  16         SIGWINCH   28
+  SIGIO      29         SIGSTOP    19         SIGXCPU    24
+  SIGIOT     6          SIGSYS     31         SIGXFSZ    25
+
+
+=for comment
+#TABLE_SIGNALS_END
+
+
+
+
+
+=head2 Export tag C<:actions>
+
+=for comment
+#TABLE_SIGACTIONS_START
+
+  SA_NOCLDSTOP  1                 SA_ONSTACK    134217728
+  SA_NOCLDWAIT  2                 SA_RESETHAND  2147483648
+  SA_NODEFER    1073741824        SA_RESTART    268435456
+  SA_NOMASK     1073741824        SA_SIGINFO    4
+
+
+=for comment
+#TABLE_SIGACTIONS_END
+
+
+
+
+
+=head1 SEE ALSO
+
+This module is part of POSIX-1003 distribution version 0.98,
+built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights 2011-2013 on the perl code and the related documentation
+ by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

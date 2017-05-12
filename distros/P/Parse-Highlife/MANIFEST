@@ -1,0 +1,27 @@
+Changes
+lib/Parse/Highlife.pm
+lib/Parse/Highlife/AST.pm
+lib/Parse/Highlife/Code.pm
+lib/Parse/Highlife/Compiler.pm
+lib/Parse/Highlife/Parser.pm
+lib/Parse/Highlife/Rule.pm
+lib/Parse/Highlife/Rule/Choice.pm
+lib/Parse/Highlife/Rule/Literal.pm
+lib/Parse/Highlife/Rule/Optional.pm
+lib/Parse/Highlife/Rule/Regex.pm
+lib/Parse/Highlife/Rule/Repetition.pm
+lib/Parse/Highlife/Rule/Sequence.pm
+lib/Parse/Highlife/Rule/Token.pm
+lib/Parse/Highlife/Token.pm
+lib/Parse/Highlife/Token/Characters.pm
+lib/Parse/Highlife/Token/Delimited.pm
+lib/Parse/Highlife/Token/Regex.pm
+lib/Parse/Highlife/Tokenizer.pm
+lib/Parse/Highlife/Transformer.pm
+lib/Parse/Highlife/Utils.pm
+Makefile.PL
+MANIFEST
+README
+t/Parse-Highlife.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,42 @@
+{
+   "abstract" : "Calculates and finds tied ranks of a PDL data matrix",
+   "author" : [
+      "Muthuthanthiri B Thilak L Fernando"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDLDM-Rank",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "PDL" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "0",
+            "perl" : "5.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 2015.071601
+}

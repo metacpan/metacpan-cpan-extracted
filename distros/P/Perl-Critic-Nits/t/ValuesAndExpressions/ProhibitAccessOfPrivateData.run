@@ -1,0 +1,64 @@
+## name allow accessor
+## failures 0
+## cut
+
+$obj->get_key;
+
+## name disallow subscript
+## failures 1
+## cut
+
+$obj->{ key };
+
+## name allow chained accessor
+## failures 0
+## cut
+
+$obj->var->get_vars_data;
+
+## name disallow chained direct member access
+## failures 1
+## cut
+
+$obj->var->{ key };
+
+## name allow long chain
+## failures 0
+## cut
+
+$obj->sibling->child->get_name()
+
+## name disallow long chain w/ private access
+## failures 1
+## cut
+
+$obj->sibling->{ _parent }->name()
+
+## name allow extra whitespace in accessor in a complex statement
+## failures 0
+## cut
+
+my $name = $obj -> get_name() || die "$!"
+
+## name disallow access with extra whitespace in a complex statement
+## failures 1
+## cut
+
+my @name = @obj -> { qw/one two/ } || die "$!";
+
+## name allows $self->{ key }
+## failures 0
+## cut
+
+sub get {
+  my( $self, $key ) = @_;
+  return $self->{ $key };
+}
+
+## name same for array subscripts
+## failures 1
+## cut
+
+my $thing = $coll->[ 0 ];
+
+

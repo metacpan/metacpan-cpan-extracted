@@ -1,0 +1,39 @@
+Revision history for Pod-Loom
+
+0.08   2014-03-23
+	- No functional changes
+	- Change 10-weave.t to work around bug in MetaCPAN indexer:
+	  https://github.com/CPAN-API/cpan-api/issues/307
+
+0.07   2014-03-22
+	- Make POD encoded in Latin-1 work with newer versions of
+	  Pod::Eventual, which treat strings as UTF-8 by default
+
+0.06   2013-01-12
+	- Don't insert __END__ if a file contains only POD
+
+0.05   2011-10-15
+	- Handle =encoding directive
+	- Added bugtracker attribute to Template::Default
+
+0.04   2010-12-11
+	- Use S<C<< >>> instead of \xA0
+	  (It's S<< C<< >> >> that Pod::Simple misinterprets.)
+
+0.03   2010-03-06
+	- If the template returns no POD, don't add a =cut
+	- Include filename in error messages and warnings
+	  Added the error & warning methods to Template
+	- Added SUBROUTINES section to Template::Default
+	- Use \xA0 instead of S<> with C<>
+	  (search.cpan.org's pod2html doesn't seem to like S<C<>>)
+
+0.02   2009-10-20
+	- INCOMPATIBLE CHANGE
+	  Templates should now provide a _build_sections method
+	  instead of a default value for sections
+	- Added the Extender role for custom templates
+	- Added support for Pod::Loom-group_COMMAND to Template
+
+0.01   2009-10-11
+	- Initial release

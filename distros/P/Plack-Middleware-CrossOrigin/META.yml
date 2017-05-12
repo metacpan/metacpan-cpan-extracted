@@ -1,0 +1,32 @@
+---
+abstract: 'Adds headers to allow Cross-Origin Resource Sharing'
+author:
+  - 'Graham Knop <haarg@haarg.org>'
+build_requires:
+  Plack::App::File: '0'
+  Plack::Builder: '0'
+  Plack::Request: '0'
+  Plack::Test: '0'
+  Socket: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.021, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-CrossOrigin
+requires:
+  Plack::Middleware: '0'
+  Plack::Util: '0'
+  Plack::Util::Accessor: '0'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/haarg/Plack-Middleware-CrossOrigin/issues
+  repository: git://github.com/haarg/Plack-Middleware-CrossOrigin.git
+version: '0.012'

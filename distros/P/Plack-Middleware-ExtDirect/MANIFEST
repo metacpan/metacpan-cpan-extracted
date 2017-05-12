@@ -1,0 +1,33 @@
+Changes
+examples/app.psgi
+examples/htdocs/direct-form.html
+examples/htdocs/direct-form.js
+examples/htdocs/direct-grid.html
+examples/htdocs/direct-grid.js
+examples/htdocs/direct-tree.html
+examples/htdocs/direct-tree.js
+examples/htdocs/direct.html
+examples/htdocs/direct.js
+examples/htdocs/example.css
+examples/htdocs/examples.js
+examples/htdocs/index.html
+examples/htdocs/named-arguments.html
+examples/htdocs/named-arguments.js
+examples/plackup_oldperl
+lib/Plack/Middleware/ExtDirect.pm
+lib/Plack/Middleware/ExtDirect.pod
+Makefile.PL
+MANIFEST
+README
+t/01_api.t
+t/02_router.t
+t/03_poll.t
+t/04_env.t
+t/data/cgi-data/bar.png
+t/data/cgi-data/foo.jpg
+t/data/cgi-data/qux.txt
+t/data/cgi-data/script.js
+t/lib/RPC/ExtDirect/Test/Util/Plack.pm
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

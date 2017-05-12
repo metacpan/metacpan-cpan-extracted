@@ -1,0 +1,24 @@
+---
+abstract: 'include/run examples scripts in your documentation without copy/paste'
+author:
+  - 'FOOLISH <FOOLISH@cpan.org>'
+build_requires:
+  Pod::Elemental: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Elemental-Transformer-ExampleRunner
+requires:
+  Data::Dumper: 0
+  Moose: 0
+  Pod::Elemental::Element::Pod5::Command: 0
+  Pod::Elemental::Transformer: 0.101620
+  Pod::Elemental::Types: 0
+  namespace::autoclean: 0
+version: 0.002

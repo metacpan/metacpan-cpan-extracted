@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/Padre/Plugin/CommandLine.pm
+MANIFEST			This list of files
+README
+share/locale/messages.pot
+share/locale/Padre__Plugin__CommandLine-ar.po
+share/locale/Padre__Plugin__CommandLine-de.po
+share/locale/Padre__Plugin__CommandLine-es-es.po
+share/locale/Padre__Plugin__CommandLine-fr-fr.po
+share/locale/Padre__Plugin__CommandLine-ja.po
+share/locale/Padre__Plugin__CommandLine-nl-nl.po
+share/locale/Padre__Plugin__CommandLine-pl.po
+share/locale/Padre__Plugin__CommandLine-pt-br.po
+share/locale/Padre__Plugin__CommandLine-ru.po
+share/locale/Padre__Plugin__CommandLine-tr.po
+share/locale/Padre__Plugin__CommandLine-zh-tw.po
+t/00-load.t
+META.yml

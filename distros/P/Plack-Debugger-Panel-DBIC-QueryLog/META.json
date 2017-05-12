@@ -1,0 +1,58 @@
+{
+   "abstract" : "DBIC query log panel for Plack::Debugger",
+   "author" : [
+      "Peter Mottram (SysPete) <peter@sysnix.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Debugger-Panel-DBIC-QueryLog",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class::QueryLog" : "0",
+            "DBIx::Class::QueryLog::Analyzer" : "0",
+            "Plack" : "0",
+            "Plack::Debugger" : "0",
+            "Plack::Debugger::Panel" : "0",
+            "Plack::Middleware::DBIC::QueryLog" : "0.05",
+            "SQL::Abstract" : "1.70",
+            "Text::MicroTemplate" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/SysPete/Plack-Debugger-Panel-DBIC-QueryLog/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/SysPete/Plack-Debugger-Panel-DBIC-QueryLog.git"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

@@ -1,0 +1,36 @@
+NAME
+    Plack::Middleware::IPAddressFilter - Simple IP address access control
+    middleware
+
+SYNOPSIS
+      use Plack::Builder;
+      my $app = sub { ... };
+  
+      builder {
+        enable "IPAddressFilter", rules [
+                                           # deny from all for default.
+          '+ 127.0.0.1',                   # allow from localhost.
+          '+ 192.168.0.0/24',              # allow from LAN
+          '- 192.168.0.5-192.168.0.10',    #   except from some hosts.
+          '+ 192.0.34.72/255.255.255.240', # allow from subnet.
+        ];
+        $app;
+      }
+
+DESCRIPTION
+    Plack::Middleware::IPAddressFilter is a IP address based access control
+    handler for Plack.
+
+CONFIGURATION
+    rules
+        IP address ranges to allow/deny. '-' prepended ranges are denied,'+'
+        prepended or prepend less are allowd.
+
+AUTHOR
+    Rintaro Ishizaki <rintaro@cpan.org>
+
+SEE ALSO
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

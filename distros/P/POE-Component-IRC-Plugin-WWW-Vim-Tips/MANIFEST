@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+dist.ini
+lib/POE/Component/IRC/Plugin/WWW/Vim/Tips.pm
+t/release-pod-syntax.t
+t/vim.t

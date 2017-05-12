@@ -1,0 +1,15 @@
+[% INCLUDE common/header.tt
+           title = "Error!"
+%]
+
+[% INCLUDE common/navbar.tt %]
+
+<hr />
+
+<h2>Bad e-name registration.</h2>
+
+<hr />
+
+[% INCLUDE common/searchbar.tt %]
+
+[% INCLUDE common/footer.tt %]

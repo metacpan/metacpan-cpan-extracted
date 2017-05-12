@@ -1,0 +1,13 @@
+#$ eyapp -TC DynamicallyChangingTheParser.eyp
+#$ ./DynamicallyChangingTheParser.pm -t -i -c 'D; S'
+#p_is_ds_ss(ds_is_D(TERMINAL[D]),ss_is_S(TERMINAL[S]))
+
+%conflict L {
+  /(?=\G\s*;\s*S)/ ?  $self->YYSetReduce(';', ':L') :  $self->YYSetShift(';') 
+}
+%expect 1
+%%
+p:  ds ';' ss          | ss ; 
+ds: D  %PREC L ';' ds  | %name :L D %PREC L ;
+ss: S  ';' ss          | S  ;
+%%

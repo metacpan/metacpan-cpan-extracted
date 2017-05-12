@@ -1,0 +1,40 @@
+#****f* financial.library/StealMoney
+#  NAME
+#    StealMoney -- Steal money from the Federal Reserve Bank. (V77)
+#  SYNOPSIS
+#    error = StealMoney( userName, amount, destAccount, falseTrail )
+#  FUNCTION
+#    Transfer money from the Federal Reserve Bank into the
+#    specified interest-earning checking account.  No records of
+#    the transaction will be retained.
+#  INPUTS
+#    userName    - name to make the transaction under.  Popular
+#                  favorites include "Ronald Reagan" and
+#                  "Mohamar Quadaffi".
+#    amount      - Number of dollars to transfer (in thousands).
+#    destAccount - A filled-in AccountSpec structure detailing the
+#                  destination account (see financial/accounts.h).
+#                  If NULL, a second Great Depression will be
+#                  triggered.
+#    falseTrail  - If the DA_FALSETRAIL bit is set in the
+#                  destAccount, a falseTrail structure must be
+#                  provided.
+#  RESULT
+#    error - zero for success, else an error code is returned
+#           (see financial/errors.h).
+#  EXAMPLE
+#    Federal regulations prohibit a demonstration of this function.
+#  NOTES
+#    Do not run on Tuesdays!
+#  BUGS
+#    Before V88, this function would occasionally print the
+#    address and home phone number of the caller on local police
+#    976 terminals.  We are confident that this problem has been
+#    resolved.
+#  SEE ALSO
+#    CreateAccountSpec(),security.device/SCMD_DESTROY_EVIDENCE,
+#    financial/misc.h
+#****
+# You can use this space for remarks that should not be included
+# in the documentation.
+#

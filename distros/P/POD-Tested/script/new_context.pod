@@ -1,0 +1,37 @@
+=head1 HEADER
+
+= head2 Example 1
+
+=begin common
+
+  my $cc_value = 'CC' ;
+
+=end common
+
+<Some explaination about test 1 here>
+
+=begin test
+
+  is($cc_value, 'CC', 'expected value') ;
+
+=end test
+
+=head2 Example 2
+
+=for POD::Tested reset
+
+=begin common
+
+  my $cc_value = 'ABC' ;
+
+=end common
+
+<Some explaination about test 2 here>
+
+=begin test
+
+  is($cc_value, 'ABC', 'expected value') ;
+
+=end test
+
+=cut

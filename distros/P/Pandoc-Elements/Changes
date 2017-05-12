@@ -1,0 +1,149 @@
+Revision history for Pandoc-Elements
+
+0.33  2017-02-13 10:57:59 CET
+    - Extend and document document metadata handling (#10)
+    - Fix $document->to_pandoc and friends with first Pandoc argument
+
+0.32  2017-02-01 16:15:21 CET
+    - Deprecate Pandoc::Filter::Usage and remove circular dependency
+
+0.31  2017-02-01 15:52:47 CET
+    - Remove deprecated script pandocwalk
+    - Remove module Pandoc::Filter::Lazy
+
+0.30  2017-01-31 21:23:11 CET
+    - Fix and extend method to_pandoc
+    - Extend document method metavalues
+
+0.29  2017-01-25 12:10:07 CET
+    - Add document methods: to_pandoc, to_markdown, ... (#48)
+    - Add document methods: outline
+    - Make Link/Image methods url/title also setters (#54)
+    - Let pod2pandoc include package name as title
+    - Fix metavalue for MetaBlocks
+
+0.28  2016-11-29 06:49:57 CET
+    - Fix pod2pandoc
+    - Extend selection of serialization format (pandoc_version/api_version)
+
+0.27  2016-11-21 19:36:29 CET
+    - Update internal Document structure and default to Pandoc 1.18
+    - Extend testing
+
+0.26  2016-11-11 10:49:22 CET
+    - Extend Pod::Simple::Pandoc
+    - Add Pandoc::Filter::HeaderIdentifiers
+    - Mark pandocwalk and Pandoc::Filter::Lazy as deprecated
+
+0.25  2016-10-11 21:32:00 CEST
+    - Improve pod2pandoc script
+    - Rename Pandoc::Filter::Usage::frompod to ::pod2usage
+    - Add example filter: section
+    - use new CPAN module Pandoc
+
+0.24  2016-10-06 14:17:31 CEST
+    - Rewrite and rename pandoc-filters to multifilter
+
+0.23  2016-09-30 22:35:22 CEST
+    - Add Pandoc::Filter::Usage and option --about for filter documentation
+    - Extend pandoc-filters to support future Pandoc filters directory
+    - Make most getters also setters
+
+0.22  2016-09-22 12:03:38 CEST
+    - Add pandoc-filters script to run filters specified in document metadata 
+    - Let pandoc_walk/pandoc_filter not filter metadata fields
+    - Add metavars example 
+
+0.21  2016-09-19 22:05:43 CEST
+    - extend method 'keyvals' as setter
+    - document and extend metadata elements by method 'metavalue'
+    - make content method an optional setter (not documented yet)
+    - let to_json return canonical JSON
+
+0.20  2016-09-04 14:34:05 CEST
+    - Revert extended class selector, implement setter for id/class/keyvals instead
+    - Add graphviz example
+
+0.19  2016-09-03 09:42:34 CEST
+    - Extend class selector to test existence of given class
+    - Extend attributes with Hash::MultiValue.
+    - Drop support of special key 'classes' in attributes helper function
+
+0.18  2016-04-06 13:23:35 CEST
+    - Fix and extend attributes function (#29/#26/#14)
+    - Document and test removal of SoftBreak element
+    - fix json serialization to ensure right scalar types (#27)
+
+0.17  2016-03-07 21:15:58 CET
+    - Support stringification of meta elements
+    - Add SoftBreak inline element, introduced in Pandoc 1.16
+
+0.16  2016-02-23 20:16:52 CET
+    - Support new (Pandoc 1.16) document model with Link and Image attributes (issue #11)
+    - Fix blessing metadata top level values
+
+0.15  2015-12-14 10:12:50 CET
+    - fix Pod::Simple::Pandoc for old Pod::Simple
+    - allow more lazy filter scripting
+    - add example to remove unnumbered sections
+
+0.14  2015-12-11 14:11:51 CET
+    - refactor and introduce Pandoc::Filter::Lazy
+
+0.13  2015-12-09 12:43:50 CET
+    - fix passing of output format
+    - add method match (experimental)
+    - added examples myemph.pl and theorem.pl
+
+0.12  2015-12-08 13:55:43 CET
+    - added pod2pandoc script and Pod::Simple::Pandoc
+    - added string as method to replace function stringify
+    - fixed nasty bug in Pandoc::Element constructor reuse
+
+0.11  2015-11-30 13:47:17 CET
+    - UTF-8 output with pandoc_walk and pandoc_filter
+    - include tests of pandoc-walk
+
+0.10  2015-11-26 22:07:39 CET
+    - added utility script pandoc-walk
+    - new method: pandoc_walk
+    - provide special variable $_ to action functions
+
+0.09  2015-11-22 20:40:49 CET
+    - support definition of filters as hash
+
+0.08  2015-09-24 11:10:54 CEST
+    - new helper function: citation
+
+0.07  2015-09-22 15:39:49 CEST
+    - extend documentation and examples
+
+0.06  2015-01-19 12:58:09 CET
+    - fix endless recursion bug (issue #7)
+    - add walker methods to documente elements (issue #4)
+    - simplify access to attributes (issue #8, not documented yet)
+    - rename and document function pandoc_json
+    - extend documentation
+
+0.05  2014-12-27 15:45:38 CET
+    - fixed filter bug (issue #5)
+    - added examples
+    - added more accessor methods
+    - remove method value
+
+0.04  2014-10-27 14:09:21 CET
+    - added accessor methods (issue #1)
+    - refactoring
+
+0.03  2014-10-26 20:52:58 CET
+    - use blessed objects
+    - new methods to_json and from_json
+    - added Pandoc::Filter
+    - changed calling syntax of Pandoc::Walker
+
+0.02  2014-10-26 10:34:37 CET
+    - added Pandoc::Walker
+    - new helper method: element
+
+0.01  2014-10-23 21:34:25 CEST
+    - initial release

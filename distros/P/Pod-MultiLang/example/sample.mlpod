@@ -1,0 +1,19 @@
+
+=encoding utf8
+
+=head1 NAME
+
+sample - sample pod
+J<< ja; sample - サンプル pod >>
+
+=head1 SYNOPSIS
+
+ $ sh example/triconv.sh example/sample.mlpod
+
+=head1 DESCRIPTION
+
+a pod document for demo.
+J<< ja;
+デモ用の pod ドキュメント.
+>>
+

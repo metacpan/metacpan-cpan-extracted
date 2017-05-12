@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               PSPP-Perl
+version:            0.7.2.20090730
+abstract:           ~
+author:
+    - John Darrington <john@darrington.wattle.id.au>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    POSIX:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

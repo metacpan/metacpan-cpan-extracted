@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name: POE-Event-Message
+version: 0.10
+author:
+ - 'Chris Cobb [no dot spam at ccobb dot net]'
+abstract: A generic messaging protocol
+license: perl
+requires:
+    POE::Driver::SysRW:            0
+    POE::Filter::Reference:        0
+    POSIX:                         0
+    Time::Hires:                   0
+    strict:                        0
+    warnings:                      0
+no_index:
+  directory:
+    - inc
+    - t

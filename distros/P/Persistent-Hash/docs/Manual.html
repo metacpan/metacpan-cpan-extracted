@@ -1,0 +1,430 @@
+<HTML>
+<HEAD>
+<TITLE>Persistent::Hash - Programmer Manual</TITLE>
+<LINK REV="made" HREF="mailto:bhcompile@daffy.perf.redhat.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#overview">OVERVIEW</A></LI>
+	<LI><A HREF="#manual conventions">MANUAL CONVENTIONS</A></LI>
+	<LI><A HREF="#what is contained in info">WHAT IS CONTAINED IN INFO</A></LI>
+	<LI><A HREF="#standard persistent::hash">STANDARD PERSISTENT::HASH</A></LI>
+	<LI><A HREF="#indexed persistent::hash">INDEXED PERSISTENT::HASH</A></LI>
+	<LI><A HREF="#a complete data type object">A COMPLETE DATA TYPE OBJECT</A></LI>
+	<LI><A HREF="#implementation details and code conventions">IMPLEMENTATION DETAILS AND CODE CONVENTIONS</A></LI>
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Persistent::Hash - Programmer Manual (0.1)</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Other Persistent::Hash manuals:</P>
+<P><A HREF="/Persistent/Hash.html">the Persistent::Hash manpage</A> - Persistent::Hash module overview and description</P>
+<P><A HREF="/Persistent/Hash/API.html">the Persistent::Hash::API manpage</A> - API Reference</P>
+<P><A HREF="/Persistent/Hash/Storage.html">the Persistent::Hash::Storage manpage</A> - Guide to Persistent::Hash Storage module programmers</P>
+<P>
+<HR>
+<H1><A NAME="overview">OVERVIEW</A></H1>
+<P>The basic implementation of Persistent::Hash uses the perltie mechanism to hook into the standard
+hash structure and provide additionnal functionnality. When creating a subclass (data type), you basically
+create a class that inherits from Persistent::Hash. You control the options of your data type by overloading
+constants/subroutines to the desired behaviour.</P>
+<P>Persistent::Hash uses <CODE>perltie(1)</CODE> to provide storage and indexation. Since we have to deal
+with two different chunk of data, one indexed and other that isn't, it was necessary to 
+use tieing in order to extend the functionnality of a normal hash while keeping the same
+simple interface.</P>
+<P>This Manual will show some real-world examples on how to use Persistent::Hash and how to
+use inheritance to unleash it's full power.</P>
+<P>
+<HR>
+<H1><A NAME="manual conventions">MANUAL CONVENTIONS</A></H1>
+<P>Glossary:</P>
+<UL>
+<LI><STRONG><A NAME="item_Source%3A_The_Persistent%3A%3AHash_source_code">Source: The Persistent::Hash source code</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Data_Type%3A_A_subclass_of_Persistent%3A%3AHash">Data Type: A subclass of Persistent::Hash</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Storage%3A_The_database%2C_flatfile_or_other_mediu">Storage: The database, flatfile or other medium where the data is stored</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Storage_module%3A_The_storage_module_that_knows_ho">Storage module: The storage module that knows how to store to Storage</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_constants">Configuration options: The subclass overloaded constants (API)</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Hash_type%3A_The_hash_MIME_type_constructed_with_t">Hash type: The hash MIME type constructed with the project and package name</A></STRONG><BR>
+
+</UL>
+<P>
+<HR>
+<H1><A NAME="what is contained in info">WHAT IS CONTAINED IN INFO</A></H1>
+<P>The INFO_TABLE holds information pertaining to the hash's basic existence.
+It's the master table from wich 'id' are generated and where the Hash type is written to.
+It also contains information pertaining to time created and time modified. You can 
+retrieve the INFO of a Persistent::Hash through the standard API.</P>
+<P><A HREF="/Persistent/Hash/API.html">the Persistent::Hash::API manpage</A></P>
+<P>
+<HR>
+<H1><A NAME="standard persistent::hash">STANDARD PERSISTENT::HASH</A></H1>
+<P>Consider the following data type:</P>
+<PRE>
+        package MyProject::Customer;</PRE>
+<PRE>
+        use strict;
+        use base qw(Persistent::Hash);</PRE>
+<PRE>
+        use constant PROJECT =&gt; 'MyProject';
+        use constant STRICT_FIELDS =&gt; 0;
+        use constant STORABLE =&gt; 1;</PRE>
+<PRE>
+        1;</PRE>
+<P>This is a very simple data type, all the data will be flattened in the DATA_TABLE, and
+reloaded on retrieval. No indexes. The interface to this hash is simple:</P>
+<PRE>
+        my $hash = MyProject::Customer-&gt;new();
+        $hash-&gt;{key} = 'value';</PRE>
+<PRE>
+        #do some other stuff</PRE>
+<PRE>
+        my $hash_id = $hash-&gt;Save();</PRE>
+<P>At this point, the hash is saved to storage and assigned an id by the storage module.
+This 'id' uniquely identifies the hash in this INFO_TABLE. Meaning, that using <CODE>Load()</CODE>
+with this 'id' in the future will give exactly that hash back. It is important to note
+that every data type that share INFO_TABLE also share id numbers, and 'id' number in 
+an INFO_TABLE leads to a completely different hash in another.</P>
+<PRE>
+        #later on</PRE>
+<PRE>
+        my $reload = MyProject::Customer-&gt;Load($hash_id);</PRE>
+<PRE>
+        print $reload-&gt;{key};</PRE>
+<UL>
+<LI><STRONG><A NAME="item_All_keys_will_be_flattened_in_the_DATA_TABLE">All keys will be flattened in the DATA_TABLE</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_The_Hash_type_will_be_%3A_%22MyProject%2FMyProject">The Hash type will be : ``MyProject/MyProject_Customer''</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_No_strict_fields%2C_so_any_key_can_be_set_in_this_">No strict fields, so any key can be set in this hash</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_This_hash_uses_the_default_INFO_TABLE%3A_%27phash%">This hash uses the default INFO_TABLE: 'phash'</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_This_hash_uses_the_default_DATA_TABLE_%3A_%27phash">This hash uses the default DATA_TABLE : 'phash_data'</A></STRONG><BR>
+
+</UL>
+<P>
+<HR>
+<H1><A NAME="indexed persistent::hash">INDEXED PERSISTENT::HASH</A></H1>
+<PRE>
+        package MyProject::IndexedCustomer;</PRE>
+<PRE>
+        use strict;
+        use base qw(Persistent::Hash);</PRE>
+<PRE>
+        use constant PROJECT =&gt; 'MyProject';
+        use constant STRICT_FIELDS =&gt; 1;</PRE>
+<PRE>
+        use constant DATA_FIELDS =&gt; ['address,'phone','website'];</PRE>
+<PRE>
+        use constant INDEX_TABLE =&gt; 'myproject_customer_index';
+        use constant INDEX_FIELDS =&gt; ['name','email','company'];</PRE>
+<PRE>
+        use constant STORABLE =&gt; 1;</PRE>
+<PRE>
+        1;</PRE>
+<P>Now, this is looking much better. We need to be able to search our objects by name, 
+email and company. Wich means that they need not to be in the serialized version of the
+hash in the database. So using INDEX_TABLE and INDEX_FIELDS, we create an index table
+for this data type like this (MySQL style):</P>
+<PRE>
+        #table definition for 'myproject_customer_index'</PRE>
+<PRE>
+        id int(11),
+        name varchar(100),
+        email varchar(100),
+        company varchar(100),</PRE>
+<P>We are then all set to create and uses our indexed customer data type:</P>
+<PRE>
+        my $customer = MyProject::IndexedCustomer-&gt;new();</PRE>
+<PRE>
+        $customer-&gt;{name} = 'Benoit Beausejour';
+        $customer-&gt;{email} = 'bbeausej\@pobox.com';
+        $customer-&gt;{company} = 'CPAN';
+        $customer-&gt;{address} = '123 nowhere';
+        $customer-&gt;{phone} = '555-5555';
+        $customer-&gt;{website} = '<A HREF="http://www.flatlineconstruct.com">http://www.flatlineconstruct.com</A>';</PRE>
+<PRE>
+        my $customer_id = $customer-&gt;Save();</PRE>
+<P>Then, all values in the index fields will populate the 'myproject_customer_index' table
+while 'phone', 'address' and 'website' will be stored serialized in DATA_TABLE.
+Retrieving that hash later has exactly the same interface as before:</P>
+<PRE>
+        my $customer = MyProject::IndexedCustomer-&gt;Load($customer_id);</PRE>
+<PRE>
+        print $customer-&gt;{name}.&quot; &lt;&quot;.$customer-&gt;{email}.&quot;&gt;\n&quot;;</PRE>
+<P>It is important to choose where a field should be stored as moving a data field to an 
+index field can be a complex task.</P>
+<UL>
+<LI><STRONG><A NAME="item_%27phone%27%2C%27website%27%2C%27address%27_will_b">'phone','website','address' will be flattened in the DATA_TABLE</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_%27name%27%2C%27email%27%2C%27company%27_will_be_s">'name','email','company' will be stored in the INDEX_TABLE</A></STRONG><BR>
+
+<LI><STRONG>The Hash type will be : ``MyProject/MyProject_IndexedCustomer''</STRONG><BR>
+
+<LI><STRONG><A NAME="item_Strict_fields%2C_so_only_the_fields_in_INDEX_FIELD">Strict fields, so only the fields in INDEX_FIELDS and DATA_FIELDS will be allowed</A></STRONG><BR>
+
+<LI><STRONG>This hash uses the default INFO_TABLE: 'phash'</STRONG><BR>
+
+<LI><STRONG>This hash uses the default DATA_TABLE : 'phash_data'</STRONG><BR>
+
+<LI><STRONG><A NAME="item_This_hash_uses_INDEX_TABLE_%27myproject_customer_i">This hash uses INDEX_TABLE 'myproject_customer_index'</A></STRONG><BR>
+
+</UL>
+<P>
+<HR>
+<H1><A NAME="a complete data type object">A COMPLETE DATA TYPE OBJECT</A></H1>
+<PRE>
+        package MyProject::CustomerObject;</PRE>
+<PRE>
+        use strict;
+        use base qw(Persistent::Hash);</PRE>
+<PRE>
+        use constant PROJECT =&gt; 'MyProject';
+        use constant STRICT_FIELDS =&gt; 1;
+</PRE>
+<PRE>
+
+        use constant INFO_TABLE =&gt; 'myproject_customer_info';
+        use constant DATA_TABLE =&gt; 'myproject_customer_data';
+        use constant INDEX_TABLE =&gt; 'myproject_customer_index';</PRE>
+<PRE>
+
+        use constant DATA_FIELDS =&gt; ['address','notes'];
+        use constant INDEX_FIELDS =&gt; ['firstname','lastname','email','website','company'];</PRE>
+<PRE>
+        use constant STORAGE_MODULE =&gt; 'Persistent::Hash::Storage::MySQL';</PRE>
+<PRE>
+        use constant SAVE_ONLY_IF_DIRTY =&gt; 1;
+        use constant LOAD_ON_DEMAND =&gt; 1;</PRE>
+<PRE>
+        my $dbh_cache;</PRE>
+<PRE>
+        sub DatabaseHandle
+        {
+                my $self = shift;</PRE>
+<PRE>
+                if(not defined $dbh_cache)
+                {
+                        $dbh_cache = DBI-&gt;connect('dbi:mysql:db','user','pw');
+                }
+                return $dbh_cache;
+        }
+</PRE>
+<PRE>
+
+        sub FirstName
+        {
+                my $self = shift;
+                my $firstname = shift;</PRE>
+<PRE>
+                if(defined $customer_name)
+                {
+                        $self-&gt;{firstname} = $firstname;
+                }
+</PRE>
+<PRE>
+
+                return $self-&gt;{firstname};      
+        }</PRE>
+<PRE>
+        sub LastName
+        {
+                my $self = shift;
+                my $lastname = shift;</PRE>
+<PRE>
+                if(defined $lastname)
+                {
+                        $self-&gt;{lastname} = $lastname;
+                }</PRE>
+<PRE>
+                return $self-&gt;{lastname};
+        }</PRE>
+<PRE>
+        sub Fullname
+        {
+                my $self = shift;</PRE>
+<PRE>
+                return $self-&gt;{firstname}.&quot; &quot;.$self-&gt;{lastname};
+        }</PRE>
+<PRE>
+        sub Email
+        {
+                my $self = shift;
+                my $email = shift;</PRE>
+<PRE>
+                if(defined $email)
+                {
+                        croak &quot;Bad email format&quot; if !($email =~ /\@/);
+                        $self-&gt;{email} = $email;
+                }
+</PRE>
+<PRE>
+
+                return $self-&gt;{email};
+        }</PRE>
+<PRE>
+        sub Website
+        {
+                my $self = shift;
+                my $website = shift;</PRE>
+<PRE>
+                if(defined $website)
+                {
+                        if($website !~ /^http:\/\//)
+                        {
+                                $website = '<A HREF="http://">http://</A>'.$website;
+                        }
+                        $self-&gt;{website} = $website;
+                }
+                return $self-&gt;{website};
+        }
+</PRE>
+<PRE>
+
+        sub Company
+        {
+                my $self = shift;
+                my $company = shift;</PRE>
+<PRE>
+
+                if(defined $company)
+                {
+                        $self-&gt;{company} = $company;
+                }
+                return $self-&gt;{company};
+        }</PRE>
+<PRE>
+        sub Address
+        {
+                my $self = shift;
+                my $address = shift;</PRE>
+<PRE>
+                if(defined $address)
+                {
+                        $self-&gt;{address} = $address;
+                }
+                return $self-&gt;{address};
+        }</PRE>
+<PRE>
+        sub Notes
+        {
+                my $self = shift;
+                my $notes = shift;
+</PRE>
+<PRE>
+
+                if(defined $notes)
+                {
+                        $self-&gt;{notes} = $notes;
+                }
+                return $self-&gt;{notes};
+        }</PRE>
+<PRE>
+        1;</PRE>
+<P>Now this is a complete customer object, and it's saveable! This class shows that you can 
+use Persistent::Hash to actually build objects that already have the functionnality to
+save themselves to Storage.</P>
+<P>First thing to notice is that this class will use a different INFO_TABLE than the default one.
+This is to make sure that we have unique customer id's and that customer data is self-contained. So the complete customer information will be held in the three defined tables only.</P>
+<P>Now, we have strict fields, so only INDEX_FIELDS and DATA_FIELDS will be allowed in the hash, 
+this will prevent error in the object API from going down in the storage media. The class
+provides accessors for every key to add built-in functionnality. Note that <CODE>Email()</CODE> will 
+roughly check the format of the email provided and croak if errors. <CODE>Website()</CODE> will add a 
+leading 'http://' if it's not present. All this to make sure that what is sent to storage
+follows the good format.Also notice that <CODE>Fullname()</CODE> actually reconstruct the full name from
+the 'firstname' and 'lastname' keys, this might come in handy! :)</P>
+<P>Two new configuration options are used: LOAD_ON_DEMAND and SAVE_ONLY_IF_DIRTY. 
+LOAD_ON_DEMAND comes into play when we a retrieval is made. Basically, if LOAD_ON_DEMAND
+is on, then the ``load'' will load only the ``INFO'' of the object and not it's content. The
+content will only be loaded when a key is accessed.</P>
+<P>SAVE_ONLY_IF_DIRTY makes it so that we only save the object if it has been modified, preventing
+stubbed hash from being commited to Storage.</P>
+<P>The outside interface remains the same, except for our added accessors:
+</P>
+<PRE>
+
+        my $customer = MyProject::CustomerObject-&gt;new();</PRE>
+<PRE>
+        $customer-&gt;Firstname('Benoit');
+        $customer-&gt;Lastname('Beausejour');
+        $customer-&gt;Email('bbeausej\@pobox.com');
+        $customer-&gt;Website('<A HREF="http://www.cpan.org">http://www.cpan.org</A>');
+        $customer-&gt;Notes('A kick ass programmer');</PRE>
+<PRE>
+        my $customer_id = $customer-&gt;Save();</PRE>
+<P>Reloading it is as easy:</P>
+<PRE>
+        my $customer = MyProject::CustomerObject-&gt;Load($customer_id);
+</PRE>
+<PRE>
+
+        print $customer-&gt;Fullname().&quot; &lt;&quot;.$customer-&gt;Email().&quot;&gt;\n&quot;;</PRE>
+<P>What is important here is that we specify a STORAGE_MODULE to work with. This means
+that when the hash is saved to media, it will be saved to a MySQL database, for wich
+we provided a database handle with the <CODE>DatabaseHandle()</CODE> method. The storage module will
+automatically extract the dbh from the object and proceed with the save or retrieval.</P>
+<UL>
+<LI><STRONG><A NAME="item_%27address%27_and_%27notes%27_will_be_flattened_in">'address' and 'notes' will be flattened in 'myproject_customer_data'</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_%27firstname%27%2C%27lastname%27%2C%27email%27%2C%">'firstname','lastname','email','website','company' for in 'myproject_customer_index'</A></STRONG><BR>
+
+<LI><STRONG>The Hash type will be : ``MyProject/MyProject_CustomerObject''</STRONG><BR>
+
+<LI><STRONG>Strict fields, so only the fields in INDEX_FIELDS and DATA_FIELDS will be allowed</STRONG><BR>
+
+<LI><STRONG><A NAME="item_accessed">This hash data will be loaded only when a key is accessed (LOAD_ON_DEMAND)</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_dirty">This hash will only be saved if dirty (SAVE_ONLY_IF_DIRTY)</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_This_hash_explicitely_uses_Persistent%3A%3AHash%3A">This hash explicitely uses Persistent::Hash::Storage::MySQL for storage.</A></STRONG><BR>
+
+</UL>
+<P>
+<HR>
+<H1><A NAME="implementation details and code conventions">IMPLEMENTATION DETAILS AND CODE CONVENTIONS</A></H1>
+<P>A Persistent::Hash has two sides, like a mini-wheat cereal. The tied side, on wich the
+standard API is applied, and the untied side, on wich the internal API is used to provide
+the tied side API. Method in the source with a leading ``_'' are methods that should only
+be called on the untied side of the object.</P>
+<P>All storage specific funcitions are compartemented in the storage modules. They provide
+the logic and calls to perform the save/retrieval on a particular storage medium.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P><CODE>Copyright(c)</CODE> 2002 Benoit Beausejour &lt;<A HREF="mailto:bbeausej@pobox.com">bbeausej@pobox.com</A>&gt;</P>
+<P>All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Benoit Beausejour &lt;<A HREF="mailto:bbeausej@pobox.com">bbeausej@pobox.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>Persistent::Hash(1).
+perltie(1).
+perl(1).</P>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,30 @@
+Revision history for PGObject-Type-DateTime
+
+1.0.5   2016-12-13
+        Add indicator for timezone
+
+1.0.4   2016-07-09
+        Override DateTime methods which clearly return a date-value
+        (i.e. today(), last_day_of_month() and from_day_of_year())
+        to clear the 'is_time' flag.
+        Instead of overriding 'new()', override '_new()' which
+        DateTime uses internally to create instances, the real constructor.
+
+1.0.3   2016-04-21
+        Set 'is_date' and 'is_time' flags in 'new()' instead of our
+        specialized to_/from_db() methods
+
+1.0.2   2014-09-10
+        Minor doc fixes
+
+1.00.001 2014-02-22
+        Adjusted the Makefile.PL to provide explicit dependency
+        for DateTime::TimeZone
+
+1.00    2014-02-20
+        Added NULL handling
+        Added subclassing support
+
+0.01    2013-11-13
+        First version, released on an unsuspecting world.
+

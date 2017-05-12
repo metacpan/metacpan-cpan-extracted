@@ -1,0 +1,47 @@
+==================================================
+Changes from 2013-11-04 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 2.001 at 2014-11-04 20:43:46 +0000
+------------------------------------------
+
+  Change: 7e441d762241d759b610672e4b1ff6a9895f1b44
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 12:38:15 +0000
+
+    add example 
+
+  Change: 84cae2d463815f82418343e37314f65c57dd421d
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 12:35:18 +0000
+
+    fix tests, d0h 
+
+  Change: 9817be8ab74cb3371eb1089e771be33f89b5ea31
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 12:34:24 +0000
+
+    add test 
+
+  Change: eb671868c92351815f5e6ffdf8ab2d285c7f2a4e
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 12:32:10 +0000
+
+    tweak 
+
+  Change: 4929fb62043b3e210670915f5e0c0812982c6321
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 12:28:24 +0000
+
+    copy the stuff! 
+
+  Change: d05021cd83b57f77b8f3799d801e4ee080429d75
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 12:26:25 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

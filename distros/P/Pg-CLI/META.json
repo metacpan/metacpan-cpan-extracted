@@ -1,0 +1,63 @@
+{
+   "abstract" : "Run Postgres CLI utilities",
+   "author" : [
+      "Dave Rolsky <autarch@urth.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pg-CLI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Which" : "0",
+            "IPC::Run3" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "MooseX::Params::Validate" : "0",
+            "MooseX::SemiAffordanceAccessor" : "0",
+            "MooseX::Types::Moose" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Test::More" : "0.88",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-pg-cli@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pg-CLI"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.urth.org/Pg-CLI.git",
+         "web" : "http://git.urth.org/Pg-CLI.git"
+      }
+   },
+   "version" : "0.11"
+}
+

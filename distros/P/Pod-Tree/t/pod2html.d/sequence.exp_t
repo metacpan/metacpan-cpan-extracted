@@ -1,0 +1,60 @@
+<html>
+ <head>
+  <base href="">
+  <link href="" rel="stylesheet" type="text/css">
+  <title>print [-n] file</title>
+ </head>
+ <body bgcolor="#ffffff" text="#000000">
+<h1>TEMPLATE</h1>
+black is the color of my true love's hair
+  
+  <H1><A NAME="NAME">NAME
+
+</A></H1>
+
+<P><B>print</B> [-n] <I>file</I>
+
+</P><H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1>
+
+<P>=head1 introduces a 1st level heading.
+<B>print</B> sends <I>file</I> to a printer.
+<B>bold</B>, <I>italic</I>, zero, <B>bold, <I>bold italic</I>, bold</B> normal.
+Non-breaking&nbsp;space, <CODE>0</CODE>.
+
+</P>
+<P><CODE>code</CODE>, <B>bold <CODE>code</CODE></B>, <I>file</I>, <A NAME="index"></A>
+&lt;, &gt;, /, |, A, &#192;
+<B>&lt;, &gt;, /, |, A, &#192;</B>
+<I><B>&lt;, &gt;, /, |, A, &#192;</B></I>
+
+</P>
+<P>&#169; &#176; &#247; &#189; &#181; &#183; &#172; &#174; &#215;
+
+</P>
+<P><CODE>$a &lt;=&gt; $b</CODE>,
+<CODE>$a &lt;=&gt; $b</CODE>
+
+</P>
+<P><CODE><B>$foo-&gt;bar</B></CODE>,
+<I> <CODE><B>$foo-&gt;bar</B></CODE> </I>,
+
+</P>
+<P>An <CODE><A HREF="page.html#section">page/section</A></CODE> markup.
+
+</P>
+<P><CODE>$a &lt;&lt; $b</CODE>,
+<B> <CODE>$a &gt;&gt; $b</CODE> </B>;
+
+</P>
+<P>see <A HREF="#(%3f%3epattern)"><CODE>(?&gt;pattern)</CODE></A>.
+
+</P>
+<P>see <A HREF="#(%3f%3epattern)">No backtracking</A>.
+
+</P>
+<P><CODE><B><I>Italic Bold Code</I></B></CODE>
+</P>
+ </body>
+</html>

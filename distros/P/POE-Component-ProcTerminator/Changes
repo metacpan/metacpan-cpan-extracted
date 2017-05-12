@@ -1,0 +1,6 @@
+Revision history for POE-Component-ProcTerminator
+0.02    April 12 2012
+        Updated dependency on Constant::Generate and Class::Struct
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

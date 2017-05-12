@@ -1,0 +1,33 @@
+---
+name: PerlIO-via-SeqIO
+version: 0.0322
+author: []
+abstract: PerlIO layer for biological sequence formats
+license: perl
+resources:
+  license: ~
+requires:
+  Bio::Root::Version: 1.006
+  Bio::Seq: 0
+  Bio::SeqIO: 0
+  IO::Seekable: 0
+  IO::String: 0
+  PerlIO::Util: 0
+  Scalar::Util: 1.19
+  Symbol: 0
+  perl: 5.01
+build_requires:
+  File::Spec: 0
+  File::Temp: 0
+  Module::Build: 0
+  Test::More: 0
+recommends:
+  PerlIO::via::gzip: 0.021
+provides:
+  PerlIO::via::SeqIO:
+    file: lib/PerlIO/via/SeqIO.pm
+    version: 0.0322
+generated_by: Module::Build version 0.31012
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

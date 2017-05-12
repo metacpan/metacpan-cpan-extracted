@@ -1,0 +1,11 @@
+=head1 HEADER
+
+=begin test
+
+  sub error { my $x = 1 ;  $x/0 }
+  
+  error() ;
+
+=end test
+
+=cut 

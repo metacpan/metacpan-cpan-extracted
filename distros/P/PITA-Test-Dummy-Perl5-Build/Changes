@@ -1,0 +1,16 @@
+Revision history for PITA-Test-Dummy-Perl5-Build
+
+1.04 Wed  9 Jul 2008
+	- Incremental release to remove Build file
+
+1.03 Sun  1 Jul 2007
+	- Updating for gratuitous CPANTS points
+
+1.02 Tue  2 Jan 2007
+	- Updated to remove the author testing which had a Test::More dep
+
+1.01 Mon  2 Jan 2006
+	- Accidentally bundled Build with the dist. Removed.
+
+1.00 Mon  2 Jan 2006
+        - First (and probably only) version

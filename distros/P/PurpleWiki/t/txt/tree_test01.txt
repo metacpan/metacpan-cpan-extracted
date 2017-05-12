@@ -1,0 +1,48 @@
+= Basic Wiki Test =
+
+== Introduction ==
+
+This is a bare-bones, error-free example of a textual Wiki page.  The
+question is, will this parse correctly?
+
+  Only time will tell.
+  And tell it will.
+
+This is a paragraph.
+
+This is another paragraph.
+
+How about mixed paragraphs and preformatting?
+   This should be preformatted.
+ But is it?
+You should know by now.
+
+What about <strong>HTML</strong> in paragraphs?  You should see the tags.
+
+Does the nowiki tag work?  <nowiki>Well, that depends.  Do you see
+'''quotes''' or not?</nowiki>  If so, then be happy!
+
+=== Lists ===
+
+Tests moved to tree_test14.txt.
+
+=== Formatting ===
+
+This is ''italics''.  This is '''bold'''.  This is '''''bold and
+italic'''''.
+
+UseModWiki also supports HTML bold and italic tags.  This is <i>italics</i>.  This is <b>bold</b>.  This is <b><i>bold and italic</i></b>.  This is <i><b>italic and bold</b></i>.  This is <tt>monospace</tt>.
+=== Links ===
+How about a paragraph with some WikiWords?  How about a [[double
+bracketed free link]]?  How about a link to [http://www.eekim.com/ my
+homepage].  What about the URL itself, like http://www.eekim.com/.
+How about not linking a <nowiki>WikiWikiWord</nowiki>. How about a
+UseMod:InterWiki link?  Finally, how about separating a
+WordFromNumbers""123 using double quotes?
+
+How about some funkier URLs like http://www.burningchrome.com:81/?  Or,
+http://www.eekim.com/cgi-bin/dkr?version=2&date=20021225?
+
+= Conclusion =
+This concludes this test.  We now return you to your regular
+programming.

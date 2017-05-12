@@ -1,0 +1,14 @@
+Build.PL
+Changes
+example/pod2trac.pl
+lib/Pod/Trac.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00.load.t
+t/01trac.t
+t/kwalitee.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t

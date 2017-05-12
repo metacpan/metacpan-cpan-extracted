@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: liblircclient0
+Description: liblircclient0
+Version: 0.8.3
+Libs: -L${libdir} -llirc_client
+Cflags: -I${includedir}

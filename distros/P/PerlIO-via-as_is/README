@@ -1,0 +1,22 @@
+SYNOPSIS
+
+    Reading:
+
+     use PerlIO::via::as_is;
+     open my($fh), "<:via(as_is)", "file";
+     print while <$fh>;
+
+    Writing:
+
+     open my($fh), ">:via(as_is)", "file";
+     print $fh "one", "two\n";
+
+DESCRIPTION
+
+    This PerlIO layer does nothing (reads/writes everything as-is). Created
+    for testing purpose.
+
+SEE ALSO
+
+    PerlIO::via
+

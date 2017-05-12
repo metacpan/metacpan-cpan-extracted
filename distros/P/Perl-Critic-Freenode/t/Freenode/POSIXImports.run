@@ -1,0 +1,24 @@
+## name DefaultImport
+## failures 1
+## cut
+
+use POSIX;
+
+## name DefaultImportWithVersion
+## failures 1
+## cut
+
+use POSIX 1;
+
+## name EmptyImport
+## failures 0
+## cut
+
+use POSIX ();
+
+## name ExplicitImport
+## failures 0
+## cut
+
+use POSIX 'strftime';
+use POSIX qw(strftime strcpy strchr);

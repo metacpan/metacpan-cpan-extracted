@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               Parse-Flash-Cookie
+version:            0.09
+abstract:           A flash cookie parser.
+author:
+    - Andreas Faafeng <aff@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Config:               0
+    DateTime:             0
+    File::Spec::Functions:  0
+    Log::Log4perl:        0
+    Test::Differences:    0
+    Test::Exception:      0
+    Test::More:           0
+    Test::Strict:         0
+    URI::Escape:          0
+    XML::Writer:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

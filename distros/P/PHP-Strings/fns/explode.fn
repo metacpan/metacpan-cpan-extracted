@@ -1,0 +1,12 @@
+docs: |
+    Use the C<\Q> regex metachar and L<split|perlfunc/"split">.
+
+        my @pieces = split /\Q$separator/, $string, $limit;
+
+    See L<perlfunc/"split"> for more details.
+
+    Note that C<split //> will split between every character, rather than
+    returning false. Note also that C<split "..."> is the same as
+    C<split /.../> which means to split everywhere three characters are
+    matched. The first argument to C<split> is always a regex.
+

@@ -1,0 +1,43 @@
+---
+abstract: "Serves an endpoint returns application's C<REVISION>."
+author:
+  - 'Asato Wakisaka <asato.wakisaka@gmail.com>'
+build_requires:
+  File::Temp: '0'
+  HTTP::Request::Common: '0'
+  Plack::Test: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-RevisionPlate
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::RevisionPlate:
+    file: lib/Plack/Middleware/RevisionPlate.pm
+    version: '0.01'
+requires:
+  File::Slurp: '0'
+  Plack::Middleware: '0'
+  Plack::Response: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/astj/p5-Plack-Middleware-RevisionPlate/issues
+  homepage: https://github.com/astj/p5-Plack-Middleware-RevisionPlate
+  repository: git://github.com/astj/p5-Plack-Middleware-RevisionPlate.git
+version: '0.01'
+x_authority: cpan:ASTJ

@@ -1,0 +1,27 @@
+Changes
+lib/Pipe.pm
+lib/Pipe/Tube.pm
+lib/Pipe/Tube/Cat.pm
+lib/Pipe/Tube/Chomp.pm
+lib/Pipe/Tube/Find.pm
+lib/Pipe/Tube/For.pm
+lib/Pipe/Tube/Glob.pm
+lib/Pipe/Tube/Grep.pm
+lib/Pipe/Tube/Map.pm
+lib/Pipe/Tube/Print.pm
+lib/Pipe/Tube/Say.pm
+lib/Pipe/Tube/Sort.pm
+lib/Pipe/Tube/Split.pm
+lib/Pipe/Tube/Tuple.pm
+lib/Pipe/Tube/Uniq.pm
+Makefile.PL
+MANIFEST			This list of files
+t/data/file1
+t/data/file2
+t/data/numbers1
+t/pipe.t
+xt/90-pod.t
+xt/91-pod-coverage.t
+xt/99-critic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

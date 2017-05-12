@@ -1,0 +1,10 @@
+Change log for Perl module PangoConst
+
+0.03 2016-10-15
+* Unnecessary change for kwalitee rating
+
+0.02 2016-10-13
+* Minor tidyup.
+
+0.01 2014-06-16
+* Initial release, nothing but a copy of Gtk2::Pango.

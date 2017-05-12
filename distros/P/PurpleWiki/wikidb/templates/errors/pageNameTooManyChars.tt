@@ -1,0 +1,7 @@
+[% INCLUDE common/header.tt
+           title = "Error!"
+%]
+
+<h2>Page name may not contain space characters: [% pageName %]</h2>
+
+[% INCLUDE common/footer.tt %]

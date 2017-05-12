@@ -1,0 +1,55 @@
+{
+   "abstract" : "A non-blocking wrapper around L<Hailo|Hailo>",
+   "author" : [
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-Hailo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "utils"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Hailo" : 0,
+            "POE" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-POE-Component-Hailo@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Hailo"
+      },
+      "homepage" : "http://search.cpan.org/dist/POE-Component-Hailo/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hinrik/poe-component-hailo.git",
+         "web" : "http://github.com/hinrik/poe-component-hailo"
+      }
+   },
+   "version" : "0.10",
+   "x_authority" : "cpan:HINRIK"
+}
+

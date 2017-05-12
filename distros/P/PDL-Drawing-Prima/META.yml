@@ -1,0 +1,41 @@
+---
+abstract: 'PDL-aware drawing functions for Prima widgets'
+author:
+  - 'David Mertens, E<lt>dcmertens.perl@gmail.comE<gt>.'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  ExtUtils::ParseXS: '3.0'
+configure_requires:
+  Module::Build: '0.28'
+  PDL: v2.4.10
+  Prima: '1.33'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDL-Drawing-Prima
+no_index:
+  directory:
+    - examples
+    - t
+  file:
+    - README.pod
+provides:
+  PDL::Drawing::Prima:
+    file: lib/PDL/Drawing/Prima.pm.PL
+    version: '0.12'
+  PDL::Drawing::Prima::Utils:
+    file: lib/PDL/Drawing/Prima/Utils.pm.PL
+    version: '0.12'
+requires:
+  PDL: v2.4.10
+  Prima: '1.35'
+  perl: v5.8.0
+resources:
+  bugtracker: http://github.com/run4flat/PDL-Drawing-Prima/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/run4flat/PDL-Drawing-Prima
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

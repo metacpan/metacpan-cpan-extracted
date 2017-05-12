@@ -1,0 +1,15 @@
+##############################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/distributions/Perl-Critic/xt/author/40_perlcriticrc-code $
+#     $Date: 2009-10-31 16:12:55 -0400 (Sat, 31 Oct 2009) $
+#   $Author: wyant $
+# $Revision: 3697 $
+##############################################################################
+
+profile-strictness = fatal
+severity = 1
+# theme = core
+verbose = %f: %m at line %l, column %c.  %e.  (Severity: %s, %p)\n
+
+#-----------------------------------------------------------------------------
+
+[Variables::ProhibitUnusedVarsStricter]

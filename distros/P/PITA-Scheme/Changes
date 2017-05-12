@@ -1,0 +1,91 @@
+Revision history for Perl extension PITA::Scheme
+
+0.43 Tue  1 Feb 2011
+	- Updating to Module::Install::DSL 1.00
+	- Updating copyright year
+	- Upgrading to newer version of File::Remove
+	- Load make from Config instead of assuming 'make'
+
+0.42 Wed 22 Jul 2009
+	- Updating to Module::Install 0.91
+	- Request id should now be a GUID
+
+0.41 Tue  2 Sep 2008
+	- No functional changes
+	- Incremental release to fix some Kwalitee issues
+
+0.40  missing
+
+0.30  Fri  9 Mar 2007
+	- Removed perl5.cpan scheme
+	- Upgraded to Module::Install 0.65
+	- Upgraded to handle PITA-XML 0.30
+
+0.29  Wed 14 Mar 2006
+	- Upgraded to Module::Install 0.60
+	- Upgraded to handle the new XML layout in PITA-XML 0.29
+
+0.20  Thu  2 Feb 2006
+	- Fixed a minor cleanup issue, we need to undef the pushd earlier
+	- Synchronised version with PITA 0.20 release
+
+0.15  Tue 31 Jan 2006
+	- Completing refactoring for the upcoming PITA 0.20 release
+
+0.14  Mon 30 Jan 2006
+	- Adding support for detecting Perl5 platforms
+
+0.13  Mon 23 Jan 2006
+	- Make sure we use File::pushd so we don't end up stuck down
+	  some temp directory.
+
+0.12  Sun 22 Jan 2006
+	- Upgrading to properly support the Request ids in PITA-XML 0.15
+
+0.11  Sun 15 Jan 2006
+	- Added a param validation method _DRIVER($scheme)
+	- Added the AUTOMATED_TESTING and PERL_AUTOINSTALL flags
+
+0.10  Sat 14 Jan 2006
+	- Converted over to the renamed PITA::XML
+
+0.09  Mon  9 Jan 2006
+	- Ripped out all the HTTP transfer stuff, as it has been moved
+	  over to PITA-Image.
+	- Take less configuration, only the scheme-specific file.
+	- Requires more constructor arguments.
+
+0.08  Sat  7 Jan 2006
+	- Converted command execution code from flakey IPC::Cmd to the
+	  much saner IPC::Run3.
+
+0.07  ###############
+	- Fixed misspelled method name in Scheme.pm
+
+0.06  Tue  3 Jan 2006
+	- Added the concept of request identifiers, because embedding
+	  that information inside the ResultServer isn't going to work
+	  once we add more functionality and make it a SupportServer.
+
+0.05  Tue  3 Jan 2006
+	- One of the tests need Mobule::Build to be available
+
+0.04  Tue  3 Jan 2006
+	- Accidentally left a Build file in Brian the test dummy.
+	  This was causing test problems
+
+0.03  Mon  2 Jan 2006
+	- Module::Build manual suggests more compatible in more places to
+	  use C<perl Build>/etc than C<./Build>
+	- Incrementing PITA::XML dep
+
+0.02  Mon  2 Jan 2006
+	- Completed what should be the first usable version
+	- Completed Scheme modules for perl5, perl5.make, perl5.build
+	- Should be able to put the results to the server if told where.
+
+0.01  Sat 31 Dec 2005
+	- Initial implementation
+	- Completes sequence up to prepare_package
+	- Releasing to get some early CPAN Testers results
+	  (As this needs to be highly platform neutral)

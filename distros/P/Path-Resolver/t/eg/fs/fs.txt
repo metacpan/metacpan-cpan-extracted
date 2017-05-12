@@ -1,0 +1,1 @@
+Resolver of type fs

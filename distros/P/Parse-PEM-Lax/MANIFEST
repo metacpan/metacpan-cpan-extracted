@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01basic.t
+t/02simple.t
+t/98podsyn.t
+t/99podcov.t
+eg/simple.pl
+lib/Parse/PEM/Lax.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

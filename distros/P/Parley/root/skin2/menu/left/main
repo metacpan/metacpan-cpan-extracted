@@ -1,0 +1,22 @@
+<p>
+    <!-- General Stuff -->
+    <a href="thread/recent">Recent Threads</a>
+</p>
+
+<p>
+    <!-- My -->
+
+    <!-- Preferences -->
+    <a href="my/preferences">Preferences</a>
+</p>
+
+<p>
+    <!-- Admin -->
+    <a href="admin">Admin</a>
+</p>
+
+<p>
+    <!-- Searching -->
+    <a href="javascript:;" onclick="search_dialog.show(); return false;">Search</a>
+    [% INCLUDE shared/search_dialog %]
+</p>

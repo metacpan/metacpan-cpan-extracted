@@ -1,0 +1,9 @@
+ This is a collection of sample configuration and data files to
+serve as examples for how configuration files should look. 
+Some entries are not yet supported by pgloader.pl, so please
+consult the USAGE file or the pod inside pgloader.pl for
+what features are actually implemented. Un-implemented entries 
+are silently ignored.
+
+thanks
+ioannis tambouras

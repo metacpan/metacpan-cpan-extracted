@@ -1,0 +1,8 @@
+Revision history for Plack-Middleware-ServerStatus-Tiny
+
+0.002     2013-06-28 11:40:16 PDT-0700 (Karen Etheridge)
+          - add missing lib include (RT#86511)
+
+0.001     2013-06-17 16:32:04 PDT-0700 (Karen Etheridge)
+          - Initial release.
+

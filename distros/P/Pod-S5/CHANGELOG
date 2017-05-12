@@ -1,0 +1,44 @@
+0.09
+
+	o applied rt.cpan.org#39744
+
+	o fixed rt.cpan.org#85136
+	
+
+0.07
+	o fixed rt#25902
+
+0.06
+	o fixed Makefile.PL
+
+0.05
+	o added correct dependencies to Makefile.PL
+
+	o removed loading of Data::Dumper (needed previously
+	  for debugging)
+
+
+0.04
+	o added Pod::S5 module (standard perl module)
+	  which does the real work. The script pod2s5
+	  now just uses this module to create a slideshow.
+	  The S5 sources are only delivered with pod2s5,
+	  not with Pod::S5. If you use the module, you
+	  have to install the S5 stuff manually.
+
+	  Suggested by Renee Baecker.
+
+	o added 'in_pod' option to Pod::Tree::load_string(),
+	  previously we used ::load_file(), so that
+	  code preceding the pod will still ignored.
+
+
+0.03
+	o fixed package name in AUTOLOAD.
+
+0.02
+	o added test case (make test)
+
+
+0.01
+	o initial release

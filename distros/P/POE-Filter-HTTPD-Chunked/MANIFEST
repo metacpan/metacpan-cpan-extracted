@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/POE/Filter/HTTPD/Chunked.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_pod.t
+t/01_original.t
+t/02_new_tests.t

@@ -1,0 +1,27 @@
+POE::Loop::Kqueue version 0.02
+==============================
+
+This module is an implementation of the POE::Loop interface via kqueue(2).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  POE
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) Sergey Skvortsov <skv@protey.ru>
+All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

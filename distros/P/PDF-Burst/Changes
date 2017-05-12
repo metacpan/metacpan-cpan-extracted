@@ -1,0 +1,89 @@
+2011-10-01
+
+   * Updated documentation to explicitly state dependencies.
+
+2009-05-27 14:20  cvs
+
+	* lib/PDF/Burst.pm, lib/PDF/Burst.pod, t/10_problemfile.dev.t,
+	  t/multiple_page_problem.t: Using pdftk burst method, if you burst
+	  2 different files in the same directory, and they have diff page
+	  counts, (if the first has 5 pages, and the second 2), we return
+	  the most page docs matched A hack has been requested/placed to
+	  help ameliorate this.  What it does is, pdftk places a
+	  doc_data.txt file in the current working directory that holds how
+	  many pages there were in the document, we try to find that file
+	  (doc_data.txt) and read it for count of pages, and then compare
+	  to what we got.
+
+	  This is a hack solution. The real solution is not to burst two
+	  files with the same filename in the same directory.  Or to clean
+	  up afterwards.
+
+2009-05-15 09:47  cvs
+
+	* lib/PDF/Burst.pm: Changed from 'require File::Which' to 'use
+	  File::Which', request/suggestion from  Andreas Hernitscheck.
+
+2009-04-27 15:32  cvs
+
+	* lib/PDF/Burst.pm, t/00_find_which_burst_works.t, t/01_burst14.t:
+	  there were some errors using warnings that did not mean anything
+	  that were taken out by either code change or no warnings
+	  statements.
+
+2009-04-20 10:27  cvs
+
+	* lib/PDF/Burst.pm: added some test docs, problematic files.
+
+2009-03-19 12:37  cvs
+
+	* lib/PDF/Burst.pm, lib/PDF/Burst.pod, t/01_burst14.t: moved doc to
+	  separate .pod file.  added more documentation added better
+	  reporting on test failure
+
+2009-01-06 11:43  cvs
+
+	* lib/PDF/Burst.pm: Added a simple way to change the method that
+	  pdf_burst uses.  Before I used a hard coded alias from
+	  *PDF::Burst::pdf_burst to PDF::Burst::pdf_burst_CAM_PDF, Now we
+	  set the name in $PDF::Burst::BURST_METHOD , one of pdftk,
+	  PDF_API2, CAM_PDF.
+
+2008-12-16 11:07  cvs
+
+	* lib/PDF/Burst.pm, t/01_burst14.t: Made it so there's a nice
+	  $PDF::Burst::errstr that holds errors instead of dying, so any
+	  fails may be treated as pdf_burst('./file.pdf') or
+	  die($PDF::Burst::errstr); added a 'fail' test for this.  Also
+	  cleaned up the doc synopsis a bit and added more see also
+	  references.
+
+2008-08-14 11:44  cvs
+
+	* t/03_burst_ext.t: A
+
+2008-08-14 11:44  cvs
+
+	* lib/PDF/Burst.pm, t/99_cleanup.pl: Added cli burst
+
+2008-08-13 09:37  cvs
+
+	* bin/pdfburst: Added cli script pdfburst
+
+2008-08-07 09:44  cvs
+
+	* lib/PDF/Burst.pm, t/00_burst.t, t/00bust.pl, t/02_burst_scan1.t,
+	  t/pdfapi2-burst.pl: I am adding both CAM::PDF and PDF::API2
+	  methods of bursting a pdf.  pdf_burst is pointing to the CAM::PDF
+	  method by default.
+
+2008-08-05 14:23  cvs
+
+	* MANIFEST, Makefile.PL, t/00_burst.t, t/00bust.pl,
+	  t/trees14pgs.pdf, lib/PDF/Burst.pm, t/scan1.pdf: Initial revision
+
+2008-08-05 14:23  cvs
+
+	* MANIFEST, Makefile.PL, t/00_burst.t, t/00bust.pl,
+	  t/trees14pgs.pdf, lib/PDF/Burst.pm, t/scan1.pdf: init import
+

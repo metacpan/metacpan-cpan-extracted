@@ -1,0 +1,3 @@
+* Add option to return Path::Class records instead of strings ( where possible )
+* Add optional condition handlers to cope with various "bad" conditions that may happen,
+	ie: A file may exist, but due to security permissions it might be unreadable, do we explode, or  .... etc, etc.

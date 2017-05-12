@@ -1,0 +1,58 @@
+{
+   "abstract" : "strftime with GNU extensions",
+   "author" : [
+      "Piotr Roszatycki <dexter@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POSIX-strftime-GNU",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::CChecker" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "POSIX::strftime::GNU" : {
+         "file" : "lib/POSIX/strftime/GNU.pm",
+         "version" : "0.0305"
+      },
+      "POSIX::strftime::GNU::PP" : {
+         "file" : "lib/POSIX/strftime/GNU/PP.pm",
+         "version" : "0.0305"
+      },
+      "POSIX::strftime::GNU::XS" : {
+         "file" : "lib/POSIX/strftime/GNU/XS.pm",
+         "version" : "0.0305"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/dex4er/perl-POSIX-strftime-GNU/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/dex4er/perl-POSIX-strftime-GNU"
+      }
+   },
+   "version" : "0.0305"
+}

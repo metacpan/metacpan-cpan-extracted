@@ -1,0 +1,53 @@
+---
+abstract: 'Middleware for session management'
+author:
+  - 'Tatsuhiko Miyagawa'
+build_requires:
+  HTTP::Cookies: '0'
+  LWP::UserAgent: '0'
+  Test::Fatal: '0.006'
+  Test::More: '0.88'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Session
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Cookie::Baker: '0'
+  Digest::HMAC_SHA1: '1.03'
+  Digest::SHA1: '0'
+  Plack: '0.9910'
+resources:
+  bugtracker: https://github.com/plack/Plack-Middleware-Session/issues
+  homepage: https://github.com/plack/Plack-Middleware-Session
+  repository: https://github.com/plack/Plack-Middleware-Session.git
+version: '0.30'
+x_contributors:
+  - 'Alex Vandiver <alex@chmrr.net>'
+  - 'franck cuny <franck@lumberjaph.net>'
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'Ivan Baidakou <basiliscos@openmailbox.com>'
+  - 'Lee Aylward <lee@laylward.com>'
+  - 'lestrrat <lestrrat+github@gmail.com>'
+  - 'Mark Stosberg <mark@stosberg.com>'
+  - 'Masahiro Chiba <chiba@geminium.com>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 's-aska <s.aska.org@gmail.com>'
+  - 'Stevan Little <stevan.little@iinteractive.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

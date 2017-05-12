@@ -1,0 +1,65 @@
+#!/usr/bin/perl
+
+# Demonstrate dynamic data (generated from function)
+
+use 5.010;
+use strict;
+use warnings;
+use Lingua::EN::Numbers       qw();
+use Lingua::ID::Nums2Words    qw();
+use Perinci::CmdLine;
+use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
+
+our %SPEC;
+
+my $data_sub = sub {
+    my ($query) = shift;
+    my @rows;
+    my $i = $query->{result_start} // 1;
+    my $n = 0;
+    my $N = 25;
+    while (1) {
+        last if $query->{result_limit} && $n >= $query->{result_limit};
+        last if $n >= $N;
+        push @rows, {
+            i=>$i,
+            str_en => Lingua::EN::Numbers::num2en($i),
+            str_id => Lingua::ID::Nums2Words::nums2words($i),
+        };
+        $i++;
+        $n++;
+    }
+    {data => \@rows, paged=>1};
+};
+
+my $res = gen_read_table_func(
+    name => 'num_and_words',
+    table_data => $data_sub,
+    table_spec => {
+        summary => 'Numbers with their English and Indonesian spelling',
+        fields => {
+            i => {
+                schema => 'int*',
+                summary => 'Integer number',
+                index => 0,
+                sortable => 1,
+            },
+            str_en => {
+                schema => 'str*',
+                summary => 'English spelling',
+                index => 1,
+                sortable => 1,
+            },
+            str_id => {
+                schema => 'str*',
+                summary => 'Indonesian spelling',
+                index => 2,
+                sortable => 1,
+            },
+        },
+        pk => 'i',
+    },
+);
+die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
+
+Perinci::CmdLine->new(url=>'/main/num_and_words')->run;

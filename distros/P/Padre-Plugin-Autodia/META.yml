@@ -1,0 +1,48 @@
+---
+abstract: 'Draw UML Class diagrams from Padre, the Perl IDE,'
+author:
+  - 'Kevin Dawson <bowtie@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  File::Spec::Functions: 3.4
+  List::Util: 1.35
+  Test::More: 1.001002
+  Test::Pod: 1.48
+  Test::Pod::Coverage: 1.08
+  Test::Requires: 0.07
+  Test::Software::License: 0.002
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Padre::Plugin::Autodia
+name: Padre-Plugin-Autodia
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Autodia: 2.14
+  Carp: 1.32
+  Cwd: 3.4
+  Data::Printer: 0.35
+  File::Spec: 3.4
+  GraphViz: 2.14
+  Padre: 0.98
+  Try::Tiny: 0.18
+  constant: 1.27
+  parent: 0.228
+  perl: 5.10.1
+resources:
+  bugtracker: http://padre.perlide.org/trac/wiki/Tickets
+  homepage: http://padre.perlide.org/trac/wiki/PadrePluginAutodia
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-Autodia/
+version: 0.04

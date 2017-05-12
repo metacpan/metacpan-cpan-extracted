@@ -1,0 +1,9 @@
+Revision history for Package-Localize
+
+1.001002  2015-09-23
+    - Fix fatal errors on perls 5.16 and earlier
+
+1.001001  2015-09-22
+    - First version released on an unsuspecting world
+
+

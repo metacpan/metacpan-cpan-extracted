@@ -1,0 +1,74 @@
+%token NUM = /(\d+)/
+%token OP  = /([-+*\/])/
+
+%{
+
+my $nxr = 0;
+my $nxs = 0;
+%}
+
+%conflict isInTheMiddle {
+
+
+  $nxs++;
+
+  warn "nxr = $nxr nxs = $nxs\n";
+  if ($nxs == $nxr+1) { 
+    warn "Reducing by :MIDx nxs = $nxs nxr = $nxr input: '".unexpendedInput()."'\n";
+    $self->YYSetReduce(':MIDx' );
+    
+    $nxr = $nxs = 0; 
+  }
+  else { 
+     warn "Shifting input: '".unexpendedInput()."'\n";
+     $self->YYSetShift() 
+     ##$self->YYSetShift(['NUM',]  ) 
+  } 
+}
+
+%%
+
+T: isInTheMiddle S 'other' 'things'
+;
+
+isInTheMiddle: /* empty */
+   {
+     ($nxr) = $_[0]->YYPreParse('ExpList'); 
+     warn "Number of x's = $nxr\n";
+     $nxr = int ($nxr/2);
+   }
+;
+
+S:
+     x  %PREC isInTheMiddle S x  
+  |  %name :MIDx 
+     x  %PREC isInTheMiddle 
+;
+
+x:
+     NUM
+  |  NUM OP x
+;
+%%
+
+=head1 SYNOPSIS
+
+This grammar is similar to the one in file C<nopackrat.eyp>.
+It can't be parsed by LR(k) nor LL(k) algorithms.
+Backtracking LR and GLR algorithms can but will perform poorly.
+
+Compile it with:
+
+   $ eyapp ExpList.eyp 
+   $ eyapp -TC noPackratSolvedExpRG2.eyp
+
+Run it with:
+
+   $ ./noPackratSolvedExpRG2.pm -t -i -m 1 -c '2-3 3*4 5+2 other things'
+
+=head1 SEE ALSO
+
+Files C<nopackrat.eyp>, C<noLRk_exp.eyp>, C<noLRk_expSolved.eyp>
+
+=cut
+

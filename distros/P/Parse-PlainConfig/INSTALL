@@ -1,0 +1,11 @@
+Installation Instructions:
+==========================
+
+If you have root access you can simply execute:
+
+  perl Makefile.PL && make && make install
+
+If you're installing this in your own personal space use something akin to:
+
+  perl Makefile.PL LIB=~/lib && make && make install
+

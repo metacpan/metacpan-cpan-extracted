@@ -1,0 +1,169 @@
+#!/usr/bin/perl -w
+#
+# This program implements a simple translator to convert POD
+# to HTML, Text, or back to POD again (e.g. for normalising a 
+# document).  You can easily extend it to work with any other
+# view modules you create which convert POD to different formats
+# or in different styles.
+#
+# Written by Andy Wardley <abw@kfs.org>.   This is free software.
+#
+# Extended by Andrew Ford to check for any other installed viewers.
+
+use Pod::POM;
+use File::Basename;
+use Getopt::Long;
+
+my $PROGRAM = 'pom2';
+my $program = basename($0);
+my $format;
+my $views = {
+    pod  => 'Pod',
+    text => 'Text',
+    html => 'HTML',
+};
+my %options;
+
+die usage() if grep(/^--?h(elp)?$/, @ARGV);
+
+while (@ARGV and $ARGV[0] =~ /^--([^=]+)(=(.*))?$/) {
+    $options{$1} = $2 ? $3 : 1;
+    shift;
+}
+
+if ($program =~ /^$PROGRAM(.+)$/) {
+    $format = $1;
+}
+else {
+    $format = shift 
+	|| die usage('no output format specified');
+}
+
+while (@ARGV and $ARGV[0] =~ /^--([^=]+)(=(.*))?$/) {
+    $options{$1} = $2 ? $3 : 1;
+    shift;
+}
+
+my $file = shift 
+    || die usage('no filename specified');
+
+$format = lc $format;
+my $view = $views->{ $format };
+
+if (!$view) {
+  DIR:
+    foreach my $libdir (@INC) {
+	foreach (<$libdir/Pod/POM/View/*.pm>) {
+	    (my $module = $_) =~ s{.*/([^/]+).pm$}{$1};
+            if (lc($module) eq $format) {
+		$view = $1;
+		last DIR;
+	    }
+	    else {
+                $views->{lc($module)} = $module;
+	    }
+	}
+    }
+    $view || die usage("invalid format '$format', try one of: " 
+		       . join(', ', sort keys %$views));
+}
+
+$view = "Pod::POM::View::$view";
+if (keys %options) {
+    eval "use $view";
+    $view = $view->new(%options);
+}
+
+Pod::POM->default_view($view)
+    || die "$Pod::POM::ERROR\n";
+
+my $parser;
+{
+    no warnings 'once'; # $Pod::POM::ERROR is only used once
+    $parser = Pod::POM->new( warn => 1 )
+        || die "$Pod::POM::ERROR\n";
+}
+
+my $pom = $parser->parse_file($file)
+    || die $parser->error(), "\n";
+
+print $pom;
+
+
+#------------------------------------------------------------------------
+
+sub usage {
+    my $msg = shift || '';
+
+    if ($program =~ /^$PROGRAM$/) {
+	$program = "pom2 format";
+    }
+    
+    return <<EOF;
+${msg}
+usage: $program file
+EOF
+}
+
+__END__
+
+=head1 NAME
+
+pom2 - convert POD to Text, HTML, etc., with Pod::POM
+
+=head1 SYNOPSIS
+
+    pom2 text MyFile.pm > MyFile.txt
+    pom2 html MyFile.pm > MyFile.html
+    pom2 pod  MyFile.pm > Myfile.pod
+
+    pom2 format [options] MyFile.pm > Myfile.xyz
+
+=head1 DESCRIPTION
+
+This script uses C<Pod::POM> to convert a Pod document into text,
+HTML, back into Pod (e.g. to normalise a document to fix any 
+markup errors), or any other format for which you have a view
+module.
+
+If the viewer is not one of the viewers bundled with C<Pod::POM>, the script
+searches for an installed C<Pod::POM::View> module that matches the
+specified format.  For example if you have C<Pod::POM::View::DocBook>
+installed then you could say:
+
+    pod2 docbook MyFile.pm > MyFile.xml
+
+If any options other than C<--help> are specified then they are passed
+to the constructor method of the view class.  For example:
+
+    pod2 docbook --root=chapter --titlecasing MyFile.pm > MyFile.xml
+
+would convert the Pod document to a DocBook chapter document with the
+titlecasing option enabled.  Note that any string prefixed by "C<-->" is
+taken as a valid option and passed to the constructor; if no value is
+specified then a value of 1 is passed in.
+
+
+=head1 AUTHOR
+
+Andy Wardley E<lt>abw@kfs.orgE<gt>
+
+extended by Andrew Ford E<lt>A.Ford@ford-mason.co.ukE<gt>
+
+=head1 VERSION
+
+This is version 0.3 of pom2.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2000, 2001 Andy Wardley.  All Rights Reserved.
+
+Copyright (C) 2009 Andrew Ford.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+For further information please see L<Pod::POM>.
+

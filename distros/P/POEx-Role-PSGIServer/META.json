@@ -1,0 +1,77 @@
+{
+   "abstract" : "(DEPRECATED) Encapsulated PSGI server behaviors for POE",
+   "author" : [
+      "Nicholas Perez <nperez@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "POEx-Role-PSGIServer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Message::PSGI" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Status" : "0",
+            "Moose::Autobox" : "0",
+            "MooseX::Declare" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::Moose" : "0",
+            "MooseX::Types::Structured" : "0",
+            "POE::Filter::HTTP::Parser" : "1.06",
+            "POE::Filter::Map" : "0",
+            "POE::Filter::Stream" : "0",
+            "POEx::Role::Event" : "0",
+            "POEx::Role::Streaming" : "0",
+            "POEx::Role::TCPServer" : "1.102740",
+            "POEx::Types" : "0",
+            "Plack::Util" : "0",
+            "Scalar::Util" : "0",
+            "aliased" : "0",
+            "bytes" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack" : "0",
+            "Plack::Test::Suite" : "0",
+            "Test::More" : "0",
+            "Test::Requires" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/oalders/poex-role-psgiserver/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/oalders/poex-role-psgiserver.git"
+      }
+   },
+   "version" : "1.150280",
+   "x_contributors" : [
+      "nperez <nperez@cpan.org>",
+      "Olaf Alders <olaf@wundersolutions.com>",
+      "Paul Driver <frodwith@gmail.com>"
+   ],
+   "x_deprecated" : 1
+}
+

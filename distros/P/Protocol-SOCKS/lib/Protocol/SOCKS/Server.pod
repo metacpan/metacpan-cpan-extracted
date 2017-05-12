@@ -1,0 +1,72 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::SOCKS::Server
+at lib/Protocol/SOCKS/Server.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Protocol::SOCKS::Server - server support for SOCKS protocol
+
+=head1 VERSION
+
+Version 0.003
+
+=head1 DESCRIPTION
+
+This provides an abstraction for dealing with the server side of the SOCKS protocol.
+
+=head1 METHODS
+
+=head2 completion
+
+Returns the completion future.
+
+=head2 auth
+
+Returns the auth Future.
+
+=head2 auth_methods
+
+Returns the list of auth methods we can handle.
+
+=head2 init_packet
+
+Initial client packet.
+
+=head2 on_read
+
+Handler for reading data from the client.
+
+=head2 init
+
+Resolves with version and auth method when connection
+has been established
+
+=head2 parse_request
+
+Parse a client request.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Protocol::SOCKS>
+
+L<extract_address|Protocol::SOCKS/extract_address>, L<new|Protocol::SOCKS/new>, L<new_future|Protocol::SOCKS/new_future>, L<pack_address|Protocol::SOCKS/pack_address>, L<pack_fqdn|Protocol::SOCKS/pack_fqdn>, L<pack_ipv4|Protocol::SOCKS/pack_ipv4>, L<pack_ipv6|Protocol::SOCKS/pack_ipv6>, L<version|Protocol::SOCKS/version>, L<write|Protocol::SOCKS/write>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2014. Licensed under the same terms as Perl itself.

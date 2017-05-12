@@ -1,0 +1,10 @@
+Revision history for Perl extension Plack::Middleware::RefererCheck
+
+0.03  Fri Oct 19 12:57:52 UTC 2012
+        - THIS MODULE IS DEPRECATED. SEE DESCRIPTION.
+
+0.02  Fri Dec 18 05:31:39 UTC 2009
+        - parent dependency
+
+0.01  Fri Dec 18 05:31:37 UTC 2009
+        - original version

@@ -1,0 +1,433 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::SPDY::Stream
+at lib/Protocol/SPDY/Stream.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Protocol::SPDY::Stream - single stream representation within a L<Protocol::SPDY> connection
+
+=head1 VERSION
+
+version 1.001
+
+=head1 SYNOPSIS
+
+ # You'd likely be using a subclass or other container here instead
+ my $spdy = Protocol::SPDY->new;
+ # Create initial stream - this example is for an HTTP request
+ my $stream = $spdy->create_frame(
+   # 0 is the default, use 1 if you don't want anything back from the
+   # other side, for example server push
+   unidirectional => 0,
+   # Set to 1 if we're not expecting to send any further frames on this stream
+   # - a GET request with no additional headers for example
+   fin => 0,
+   # Normally headers are provided as an arrayref to preserve order,
+   # but for convenience you could use a hashref instead
+   headers => [
+     ':method'  => 'PUT',
+     ':path:'   => '/some/path?some=param',
+     ':version' => 'HTTP/1.1',
+     ':host'    => 'localhost:1234',
+     ':scheme'  => 'https',
+   ]
+ );
+ # Update the headers - regular HTTP allows trailing headers, with SPDY
+ # you can send additional headers at any time
+ $stream->headers(
+   # There's more to come
+   fin => 0,
+   # Again, arrayref or hashref are allowed here
+   headers => [
+     'content-length' => 5,
+   ]
+ );
+ # Normally scalar (byte) data here, although scalar ref (\'something')
+ # and Future are also allowed
+ $stream->send_data('hello');
+ # as a scalar ref:
+ # $stream->send_data(\(my $buffer = "some data"));
+ # as a Future:
+ # $stream->send_data(my $f = Future->new);
+ # $f->done('the data you expected');
+ # If you want to cancel the stream at any time, use ->reset
+ $stream->reset('CANCEL'); # or STREAM_CANCEL if you've imported the constants
+ # Normally you'd indicate finished by marking a data packet as the final one:
+ $stream->send_data('</html>', fin => 1);
+ # ... and an empty data packet should also be fine:
+ # $stream->send_data('', fin => 1);
+
+=head1 DESCRIPTION
+
+=head2 HTTP semantics
+
+Each stream corresponds to a single HTTP request/response exchange. The request
+is contained within the SYN_STREAM frame, with optional additional HEADERS
+after the initial stream creation, and the response will be in the SYN_REPLY,
+which must at least include the C<:status> and C<:version> headers (so
+the SYN_REPLY must contain the C<200 OK> response, you can't send that in
+a later HEADERS packet).
+
+=head2 Window handling
+
+Each outgoing data frame will decrement the window size; a data frame
+can only be sent if the data length is less than or equal to the remaining
+window size. Sending will thus be paused if the window size is insufficient;
+note that it may be possible for the window size to be less than zero.
+
+* Each frame we receive and process will trigger a window update response.
+This applies to data frames only; windowing does not apply to control frames.
+If we have several frames queued up for processing, we will defer the window
+update until we know the total buffer space freed by processing those frames.
+* Each data frame we send will cause an equivalent reduction in our window
+size
+
+* Extract all frames from buffer
+* For each frame:
+  * If we have a stream ID for the frame, pass it to that stream
+* Stream processing for new data
+  * Calculate total from all new data frames
+  * Send window update if required
+
+=head2 Error handling
+
+There are two main types of error case: stream-level errors, which can
+be handled by closing that stream, or connection-level errors, where
+things have gone so badly wrong that the entire connection needs to be
+dropped.
+
+Stream-level errors are handled by RST_STREAM frames.
+
+Connection-level errors are typically cases where framing has gone out
+of sync (compression failures, incorrect packet lengths, etc.) and
+these are handled by sending a single GOAWAY frame then closing the
+connection immediately.
+
+=head2 Server push support
+
+The server can push additional streams to the client to avoid the unnecessary
+extra SYN_STREAM request/response cycle for additional resources that the server
+knows will be needed to fulfull the main request.
+
+A server push response is requested with L</push_stream> - this example involves
+a single associated stream:
+
+ try {
+   my $assoc = $stream->push_stream;
+   $assoc->closed->on_ready(sub {
+     # Associated stream completed or failed - either way,
+	 # we can now start sending the main data
+	 $stream->send_data($html);
+   })->on_fail(sub {
+     # The other side might already have the data or not
+	 # support server push, so don't panic if our associated
+	 # stream closes before we expected it
+     warn "Associated stream was rejected";
+   });
+ } catch {
+   # We'll get an exception if we tried to push data on a stream
+   # we'd already marked as FIN on our side.
+   warn "Our code is broken";
+   $stream->connection->goaway;
+ };
+
+You can then send that stream using L</start> as usual:
+
+ $assoc->start(
+   headers => {
+     ':scheme' => 'https',
+     ':host'   => 'localhost',
+     ':path'   => '/image/logo.png',
+   }
+ );
+
+Note that associated streams can only be initiated before the
+main stream is in FIN state.
+
+Generally it's safest to create all the associated streams immediately
+after the initial SYN_STREAM request has been received from the client,
+since that will pass enough information back that the client will know
+how to start arranging the responses for caching. You should then be
+able to send data on the streams as and when it becomes available. The
+L<Future> C<needs_all> method may be useful here.
+
+Attempting to initiate server-pushed streams after sending content is
+liable to hit race conditions - see section 3.3.1 in the SPDY spec.
+
+=head1 METHODS
+
+=head2 new
+
+Instantiates a new stream. Expects the following named parameters:
+
+=over 4
+
+=item * connection - the L<Protocol::SPDY::Base> subclass which is
+managing this side of the connection
+
+=item * stream_id - the ID to use for this stream
+
+=item * version - SPDY version, usually 3
+
+=back
+
+=head2 new_from_syn
+
+Constructs a new instance from a L<Protocol::SPDY::Frame::Control::SYN_STREAM>
+frame object.
+
+=head2 update_received_headers_from
+
+Updates L</received_headers> from the given frame.
+
+=head2 from_us
+
+Returns true if we initiated this stream.
+
+=head2 id
+
+Returns the ID for this stream.
+
+=head2 seen_reply
+
+Returns true if we have seen a reply for this stream yet.
+
+=head2 connection
+
+Returns the L<Protocol::SPDY::Base> instance which owns us.
+
+=head2 priority
+
+Returns the priority for this stream (0-7).
+
+=head2 version
+
+Returns the SPDY version for this stream (probably 3).
+
+=head2 syn_frame
+
+Generates a SYN_STREAM frame for starting this stream.
+
+=head2 sent_header
+
+Returns the given header from our recorded list of sent headers
+
+=head2 sent_headers
+
+Returns the hashref of all sent headers. Please don't change the value, it
+might break something: changing this will B<not> send any updates to the
+other side.
+
+=head2 received_header
+
+Returns the given header from our recorded list of received headers.
+
+=head2 received_headers
+
+Returns the hashref of all received headers.
+
+=head2 handle_frame
+
+Attempt to handle the given frame.
+
+=head2 send_window_update
+
+Send out any pending window updates.
+
+=head2 queue_window_update
+
+Request a window update due to data frame processing.
+
+=head2 queue_frame
+
+Asks our connection object to queue the given frame instance.
+
+=head2 start
+
+Start this stream off by sending a SYN_STREAM frame.
+
+=head2 reply
+
+Sends a reply to the stream instantiation request.
+
+=head2 reset
+
+Sends a reset request for this frame.
+
+=head2 push_stream
+
+Creates and returns a new C<server push> stream.
+
+Note that a pushed stream starts with a B< SYN_STREAM > frame but with
+headers that are usually found in a B< SYN_REPLY > frame.
+
+=head2 headers
+
+Send out headers for this frame.
+
+=head2 window_update
+
+Update information on the current window progress.
+
+=head2 send_data
+
+Sends a data packet.
+
+=head1 METHODS - Accessors
+
+These provide read-only access to various pieces of state information.
+
+=head2 associated_stream_id
+
+Which stream we're associated to. Returns 0 if there isn't one.
+
+=head2 associated_stream
+
+The L<Protocol::SPDY::Stream> for the associated stream
+(the "parent" stream to this one, if it exists). Returns undef
+if not found.
+
+=head2 remote_fin
+
+Returns true if the remote has sent us a FIN (half-closed state).
+
+=head2 local_fin
+
+Returns true if we have sent FIN to the remote (half-closed state).
+
+=head2 initial_window_size
+
+Initial window size. Default is 64KB for a new stream.
+
+=head2 transfer_window
+
+Remaining bytes in the current transfer window.
+
+=head2 to_string
+
+String representation of this stream, for debugging.
+
+=head1 METHODS - Futures
+
+The following L<Future>-returning methods are available. Attach events using
+C<on_done>, C<on_fail> or C<on_cancel> or helpers such as C<then> as usual:
+
+ $stream->replied->then(sub {
+   # This also returns a Future, allowing chaining
+   $stream->send_data('...')
+ })->on_fail(sub {
+   die 'here';
+ });
+
+or from the server side:
+
+ $stream->closed->then(sub {
+   # cleanup here after the stream goes away
+ })->on_fail(sub {
+   die "Our stream was reset from the other side: " . shift;
+ });
+
+=head2 replied
+
+We have received a SYN_REPLY from the other side. If the stream is reset before
+that happens, this will be cancelled with the reason as the first parameter.
+
+=head2 finished
+
+This frame has finished sending everything, i.e. we've set the FIN flag on a packet.
+The difference between this and L</closed> is that the other side may have more to
+say. Will be cancelled with the reason on reset.
+
+=head2 remote_finished
+
+This frame has had all the data it's going to get from the other side,
+i.e. we're sending unidirectional data or we have seen the FIN flag on
+an incoming packet.
+
+=head2 closed
+
+The stream has been closed on both sides - either through reset or "natural causes".
+Might still be cancelled if the parent object disappears.
+
+=head2 accepted
+
+The remote accepted this stream immediately after our initial SYN_STREAM. If you
+want notification on rejection, use an ->on_fail handler on this method.
+
+=head1 EVENTS
+
+The following events may be raised by this class - use
+L<Mixin::Event::Dispatch/subscribe_to_event> to watch for them:
+
+ $stream->subscribe_to_event(
+   push => sub {
+     my ($ev, $stream) = @_;
+	 print "Server push: received new stream $stream\n";
+   }
+ );
+
+=head2 push event
+
+Called when we have received a new stream from the other side
+with an associated stream. This currently means the server is
+pre-emptively sending data to us, see L</Server push support>.
+Will be passed the new L<Protocol::SPDY::Stream> instance.
+
+=head2 data event
+
+This will be called whenever we receive data from the other
+side. Will be passed the data payload as a scalar.
+
+=head2 transfer_window event
+
+The remote has sent us a WINDOW_UPDATE packet which means we
+have just updated our transfer window. Will be called with
+the new transfer window size and the delta in bytes.
+
+=head2 headers event
+
+New headers have been received on this stream. Will be called
+with the L<Protocol::SPDY::Frame::Control::HEADERS> containing
+the header information.
+
+=head1 COMPONENTS
+
+Further documentation can be found in the following modules:
+
+=over 4
+
+=item * L<Protocol::SPDY> - top-level protocol object
+
+=item * L<Protocol::SPDY::Frame> - generic frame class
+
+=item * L<Protocol::SPDY::Frame::Control> - specific subclass for control frames
+
+=item * L<Protocol::SPDY::Frame::Data> - specific subclass for data frames
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2015. Licensed under the same terms as Perl itself.

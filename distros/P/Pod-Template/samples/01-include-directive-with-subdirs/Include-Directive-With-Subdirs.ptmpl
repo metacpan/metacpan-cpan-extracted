@@ -1,0 +1,27 @@
+### Include directives with subdirs
+### Just specify them as 'lib => \@subdirs' in the new()
+### call to Pod::Template
+
+=Include Foo.pm as Foo
+=Include Bar.pm
+=Include include-footer/Author.pod as Author
+
+=pod
+
+=head1 NAME 
+
+Simple Include Directive
+
+=head2 Imported from Foo.pm:
+
+=Insert Foo->example
+
+=head2 Imported from Bar.pm:
+
+=Insert Bar.pm->example
+
+=Insert Author->author
+
+=Insert Author->copyright
+
+=cut

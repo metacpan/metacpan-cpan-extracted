@@ -1,0 +1,86 @@
+Revision history for PDL-FuncND
+
+0.11   2014-10-23T17:41:48-0400
+
+ [DOCUMENTATION]
+
+  * document moffatND beta parameter
+  * fix moffatND expression; alpha is actually absorbed into S
+  * indicate that lorentzND is not the same as cauchyND
+
+0.10   2014-02-03T12:18:47-0500
+
+  * promote to stable version
+
+ [BUILD]
+
+  * Make Changes CPAN::Changes::Spec compatible and add test
+
+0.09_02 2014-01-29T16:50:55Z
+
+ [TEST FIX]
+
+  * tweak epsilon in mahalonobis test to pass on OpenBSD 5.4 32 bit
+    boxes
+
+0.09_01 2014-01-27T16:56:03Z
+
+ [DEBUG]
+
+  * add diagnostics to debug failure on 32bit boxes
+
+
+ [BUILD]
+
+  * add missing test requirement on Test::Trap
+
+0.09  2014-01-27T03:15:05Z
+
+ [BUILD]
+
+  * add missing test requirement on Test::Trap
+
+0.08  2014-01-25T16:30:27Z
+
+ [PACKAGING]
+
+  * forgot to update the detailed ChangeLog in the distribution
+
+0.07  2013-03-13T14:31:59Z
+
+ [ENHANCEMENT]
+
+  * now provides the Moffat distribution
+
+0.06  2012-06-19T15:25:36Z
+
+  * Production release, no changes
+
+0.05_02 2012-06-19T11:52:30Z
+
+ [ENHANCEMENT]
+
+  * added LorentzND function
+
+
+0.05  2012-06-18T20:41:35Z
+
+ [ENHANCEMENT]
+
+  * added cauchyND
+
+  * move to main PDL namespace
+
+0.04 2011-02-01T15:49:08Z
+
+  * minor fix in test suite.
+
+0.03 2010-02-26T16:00:16Z
+
+  * default center is always the origin.
+  * BUG FIX: auto center is now in transformed space.
+
+0.01 2010-02-25T17:50:33Z
+
+  * Initial release.
+

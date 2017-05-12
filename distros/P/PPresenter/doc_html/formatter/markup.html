@@ -1,0 +1,194 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Formatter Markup</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Formatter Markup</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<A HREF=index.html>Formatter</A><BR>
+<B>Markup</B>
+<P>
+<A HREF=#diff>Not HTML</A><BR>
+Tags:
+<UL>
+<LI><A HREF=markup_tags.html#visual>visual</A>
+<LI><A HREF=markup_tags.html#params>parameters</A>
+<LI><A HREF=markup_tags.html#logicals>logicals</A>
+    <UL>
+    <LI><A HREF=#addlogicals>add</A>
+    </UL>
+</UL>
+<A HREF=#options>Options</A><BR>
+<UL>
+<LI><A HREF=#specials>special characters</A>
+    <UL>
+    <LI><A HREF=#addspecials>add</A>
+    </UL>
+</UL>
+
+
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> has a few formatters,
+which each enable someone to specify what text should appear on a slide.
+The <B>markup</B> formatter is very close to HTML, but there are a few
+important differences.  There are to simplified versions (sub-classes)
+of the markup formatter:
+<A HREF=simple.html>simple</A> and <A HREF=plain.html>plain</A>.
+<P>
+<H2><A NAME=diff>Differences</A> between markup and HTML</H2>
+<UL>
+<LI>Each tag can be used as a container and as a switch.  For instance:
+<CENTER>
+<TABLE WIDTH=60%>
+<TR><TD BGCOLOR=#EEEEEE>
+<PRE>
+    &lt;TEXT COLOR=red&gt;Some text&lt;/TEXT&gt;
+    &lt;P&gt;a paragraph with one &lt;LARGE&gt;large&lt;/LARGE&gt;
+       word and three &lt;SMALL&gt;small words.
+       &lt;B&gt;bold
+    &lt;/P&gt;
+    See the demo.
+</PRE>
+</TD></TR>
+</TABLE>
+</CENTER>
+Most tags are equivalent to those of HTML, but a few are new.  The
+example shows three containers: <CODE>TEXT</CODE>,
+<CODE>P</CODE>, and <CODE>LARGE</CODE>.
+In this case, <CODE>SMALL</CODE> and <CODE>B</CODE> are used as switches.
+They end with the enclosing container, so at <CODE>&lt;/P&gt;</CODE>.
+<P>
+The results shows:
+<CENTER>
+<TABLE WIDTH=60%>
+<TR><TD BGCOLOR=#EEEEEE>
+<FONT COLOR=red>Some text</FONT>
+<P>a paragraph with one <FONT SIZE=+1>large</FONT> word and
+three <FONT SIZE=-1>small words. <B>bold</B></FONT><BR>
+See the demo.
+</TD></TR>
+</TABLE>
+</CENTER>
+    Tags are not case sensitive, so you may use lowercase.
+    <CODE>&lt;SMALL&gt;</CODE> and <CODE>&lt;LARGE&gt;</CODE> are
+    <EM>logical</EM> styles, in contrast to <CODE>&lt;B&gt;</CODE> which is
+    a <EM>visual</EM> style.
+    <P>
+
+<LI>Visual tags which change the font, like <CODE>&lt;TT&gt;</CODE>, can
+    also be used as parameter: <CODE>&lt;P TT&gt;</CODE>.
+    <P>
+
+<LI>You can add logical tags, which are translated into visual tags.
+    For instance have <CODE>&lt;EMAIL&gt;</CODE> translated into
+    <CODE>&lt;TT B&gt;</CODE>.
+</UL>
+
+<H2><A NAME=options>Markup Formatter Options</A></H2>
+
+The markup-formatter is a sub-class of the formatters, so you
+also have to look at the
+<UL>
+<LI><A HREF=index.html#options>general formatter options</A>.
+</UL>
+<P>
+<DL>
+<DT><B>logicals =&gt;</B> ref-to-hash
+<DD>Hash which defines the translation of logical tags into
+    visual tags.  Logical tags can not be used as parameter
+    to an other tag (to avoid recursion), where most visual tags can.
+    <P>
+    Modify this list as <A HREF=#logicals>demonstrated</A> below,
+    and never directly, because that would change the translations
+    of previously slides too, which is unexpected behaviour.
+    <P>
+<DT><B><A NAME=specials>specials</A> =&gt;</B> ref-to-hash
+<DD>Hash which defines the translation of special characters into
+    visual characters.  Writing HTML-like text causes some conflicts,
+    as for instance the "<CODE>&lt;</CODE>" is used to define tags.
+    In real HTML, you have to write <CODE>&amp;lt;</CODE>, and the
+    same for this markup formatter.
+    <P>
+    Predefined special characters are:
+    <TABLE BORDER=1>
+    <TR><TD>&amp;amp;</TD><TD><CODE>&amp;</CODE></TD></TR>
+    <TR><TD>&amp;lt;</TD><TD><CODE>&lt;</CODE></TD></TR>
+    <TR><TD>&amp;gt;</TD><TD><CODE>&gt;</CODE></TD></TR>
+    <TR><TD>&amp;nbsp;</TD><TD>hard space</TD></TR>
+    <TR><TD>&amp;quot;</TD><TD><CODE>&quot;</CODE></TD></TR>
+    <TR><TD>&amp;quote;</TD><TD><CODE>&quot;</CODE></TD></TR>
+    </TABLE>
+    <P>
+    Below is demonstrated <A HREF=#specials>how to add special characters</A>.
+    You should never change the content of the hash directly.
+</DL>
+
+<H2><A NAME=addlogicals>Adding Logical Tags</A></H2>
+
+You can add logical tags, which are translated into visual tags.
+For instance:  (somewhere inbetween the slides)
+    <PRE>
+    $show->find('formatter', 'markup')
+         ->addLogical(EMAIL => 'TT B');
+</PRE>
+    <PRE>
+    $show->select(formatter => 'markup')
+         ->addLogical(EMAIL => 'TT B');
+</PRE>
+    or (in the script's preamble)
+    <PRE>
+    $show->select('formatter', 'markup')
+         ->addLogical(EMAIL => 'TT B');
+</PRE>
+<P>
+You can add a whole list of logicals at once (preferred!):
+<PRE>
+    $show->find(formatter => 'markup')
+         ->addLogicals(EMAIL => 'TT B',
+       DEMO => 'FONT SIZE=+1 COLOR=green');
+</PRE>
+Note that <CODE>addLogical</CODE> is equivalent to
+<CODE>addLogicals</CODE>.  You can only translate logical
+tags into visual tags, so in this case I was forced to write
+<CODE>FONT SIZE=+1</CODE> in stead of <CODE>LARGE</CODE>
+because <CODE>LARGE</CODE> is a predefined logical.
+
+<H2><A NAME=addspecials>Adding Special Characters</A></H2>
+
+The way you add special characters is equivalent to the way that
+logicals are added, as described above.  The function involved
+is <CODE>addSpecialCharacter</CODE> (same as <CODE>addSpecialCharacters</CODE>).
+<P>
+The argument to the function is a list of name to representation conversions:
+<PRE>
+    $show->select(formatter => 'markup')
+         ->addSpecialCharacters
+            (euro => 'EURO', tilde => '~');
+</PRE>
+After this definition, you can use <CODE>&amp;euro;</CODE> and
+<CODE>&amp;tilde;</CODE> in your text.
+
+    </TD></TR>
+
+<TR><TD VALIGN=top>
+
+    </TD><TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

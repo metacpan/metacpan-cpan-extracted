@@ -1,0 +1,80 @@
+NAME
+    Pod::Weaver::PluginBundle::MARCEL - Build POD documentation like MARCEL
+
+VERSION
+    version 1.102460
+
+SYNOPSIS
+    In "weaver.ini":
+
+        [@MARCEL]
+
+DESCRIPTION
+    This is the bundle used by default for my distributions. It is nearly
+    equivalent to the following:
+
+        [@CorePrep]
+
+        [Name]
+        [Version]
+
+        [Region  / prelude]
+
+        [Generic / SYNOPSIS]
+        [Generic / DESCRIPTION]
+        [Generic / OVERVIEW]
+
+        [Collect / ATTRIBUTES]
+        command = attr
+
+        [CollectWithAutoDoc / METHODS]
+        command = method
+
+        [Collect / FUNCTIONS]
+        command = function
+
+        [Leftovers]
+
+        [Region  / postlude]
+
+        [Installation]
+        [BugsAndLimitations]
+        [Availability]
+        [Authors]
+        [Legal]
+
+FUNCTIONS
+  mvp_bundle_config
+    Defines the bundle's contents.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Pod-Weaver-PluginBundle-MARCEL/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Pod-Weaver-PluginBundle-MARCEL> and may be
+    cloned from <git://github.com/hanekomu/Pod-Weaver-PluginBundle-MARCEL>.
+    Instead of sending patches, please fork this project using the standard
+    git and github infrastructure.
+
+AUTHOR
+    Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

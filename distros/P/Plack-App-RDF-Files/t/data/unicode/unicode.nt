@@ -1,0 +1,3 @@
+<http://example.org/> <http://purl.org/dc/elements/1.1/title> "1:\u00F6" .
+<http://example.org/> <http://purl.org/dc/elements/1.1/title> "2:o\u0308" .
+<http://example.org/> <http://purl.org/dc/elements/1.1/title> "3:\u00F6 o\u0308" .

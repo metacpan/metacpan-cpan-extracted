@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/POD2-IT-Getopt-Long.t
+lib/POD2/IT/Getopt/Long.pm
+META.yml                                 Module meta-data (added by MakeMaker)

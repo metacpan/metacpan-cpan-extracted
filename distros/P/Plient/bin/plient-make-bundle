@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Getopt::Long;
+use File::Find;
+use Plient;
+use Plient::Util 'which';
+
+my %args;
+GetOptions( \%args, 'help|h', ) or die 'unknown option';
+
+my $USAGE =<<EOF;
+USAGE: plient-make-bundle FILE
+EXAMPLES:
+    plient-make-bundle /tmp/plient-bundle.pl
+EOF
+
+if ( $args{help} ) {
+    print $USAGE;
+    exit;
+}
+
+my $fh;
+if ( $ARGV[0] ) {
+    open my $fh, '>', $ARGV[0] or die $!;
+}
+else {
+    $fh = *STDOUT;
+}
+
+print $fh '#! /usr/bin/env perl', "\n";
+print $fh '$ENV{PLIENT_BUNDLE_MODE} = 1;', "\n";
+
+my $plient_dir = $INC{'Plient.pm'};
+$plient_dir =~ s/\.pm$//;
+
+find(
+    sub {
+        return unless -f && /\.pm/;
+        return if /Test\.pm/;
+        append_files( $fh, $_ );
+    },
+    $INC{'Plient.pm'},
+    $plient_dir,
+);
+
+append_files( $fh, which('plient') );
+
+sub append_files {
+    my $to = shift;
+    for my $file (@_) {
+        open my $fh, '<', $file or die $!;
+        print $to "{\n";
+        for ( <$fh> ) {
+            last if /^__END__/;
+            print $to $_;
+        };
+        print $to "}\n\n";
+    }
+}

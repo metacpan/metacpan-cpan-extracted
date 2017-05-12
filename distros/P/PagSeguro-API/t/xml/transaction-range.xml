@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transactionSearchResult>
+    <date>2014-01-28T14:33:42.000-02:00</date>
+    <transactions>
+        <transaction>
+            <date>2014-01-23T14:36:01.000-02:00</date>
+            <code>00000000-0000-0000-0000-000000000000</code>
+            <type>11</type>
+            <status>3</status>
+            <paymentMethod>
+                <type>1</type>
+            </paymentMethod>
+            <grossAmount>1.00</grossAmount>
+            <discountAmount>0.00</discountAmount>
+            <feeAmount>0.45</feeAmount>
+            <netAmount>0.55</netAmount>
+            <lastEventDate>2014-01-23T14:36:17.000-02:00</lastEventDate>
+        </transaction>
+    </transactions>
+    <resultsInThisPage>1</resultsInThisPage>
+    <currentPage>1</currentPage>
+    <totalPages>1</totalPages>
+</transactionSearchResult>

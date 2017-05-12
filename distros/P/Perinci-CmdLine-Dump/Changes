@@ -1,0 +1,54 @@
+0.08    2017-01-13 (PERLANCAR)
+
+	- Adjust to Perinci::CmdLine::Inline 0.45+ (read_config & read_env
+	  now supported).
+
+
+0.07    2017-01-07 (PERLANCAR)
+
+	- [Incompatible change] Rename function dump_perinci_cmdline_script
+	  to dump_pericmd_script, we standardize on the shorter name (old
+	  name is still around but deprecated and undocumented).
+
+
+0.06    2016-10-27 (PERLANCAR)
+
+        - Add skip_detect option.
+
+
+0.05    2015-07-30 (PERLANCAR)
+
+	- When dumping Perinci::CmdLine::Inline script as
+	  Perinci::CmdLine::Lite script, emulate by turning off features
+	  not yet supported by pericmd-inline (currently: read_config=>0,
+	  read_env=>0).
+
+
+0.04    2015-07-30 (PERLANCAR)
+
+	- Support dumping Perinci::CmdLine::Inline script (as if it were
+	  Perinci::CmdLine::Lite script).
+
+	- Include detect result as extra result.
+
+
+0.03    2015-07-30 (PERLANCAR)
+
+	- [ux] Include detection reason in error message.
+
+
+0.02    2014-12-21 (PERLANCAR)
+
+        - Rename dist from Perinci-CmdLine-Base-Patch-DumpAndExit to
+          Perinci-CmdLine-Dump.
+
+        - [Refactoring] Add/extract function:
+          Perinci::CmdLine::Dump::dump_perinci_cmdline_script() that can be
+          reused by App::shcompgen and Pod::Weaver::Plugin::Rinci (and
+          potentially others).
+
+
+0.01    2014-12-14 (PERLANCAR)
+
+        - First release, split from Pod-Weaver-Plugin-Rinci and renamed from
+          ::DumpOnRun to ::DumpAndExit.

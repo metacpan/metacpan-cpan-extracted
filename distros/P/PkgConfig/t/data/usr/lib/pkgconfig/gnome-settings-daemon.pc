@@ -1,0 +1,14 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+libexecdir=${prefix}/lib/gnome-settings-daemon
+plugindir=$(libdir)/gnome-settings-daemon-2.0
+binary=${libexecdir}/gnome-settings-daemon
+
+Name: gnome-settings-daemon
+Description: Utility library for accessing gnome-settings-daemon over DBUS
+Requires: glib-2.0 dbus-1 dbus-glib-1
+Version: 2.30.2
+Libs: -L${libdir}
+Cflags: -I${includedir}/gnome-settings-daemon-2.0

@@ -1,0 +1,98 @@
+
+# potential future syntax
+#%conflict rangeORenum range? reduce ID:RANGE : reduce ID:ENUM
+#%range? ID:RANGE : ID:ENUM
+#%range? ID:RANGE : shift
+#%range? ID:RANGE 
+#%PREC optional if there is only one conflict?
+
+%conflict rangeORenum {
+  $self->YYIf('range', 'ID:RANGE', 'ID:ENUM');
+} 
+
+%explorer rangeORenum 'range' 
+
+%token ID  = /([A-Za-z]\w*)/
+%token NUM = /(\d+)/
+
+%left   ','
+%left   '-' '+'
+%left   '*' '/'
+
+%expect-rr 2
+
+%%
+
+type_decl : 'type' ID '=' type ';'
+;
+
+type : 
+      %name ENUM
+      %rangeORenum? '(' id_list ')'
+    | %name RANGE
+      %rangeORenum? range
+;
+
+range:
+       expr '..' expr
+;
+
+id_list : 
+      %name ID:ENUM
+      ID                      %PREC rangeORenum
+    | id_list ',' ID
+;
+
+expr : '(' expr ')'   { $_[2] } /* bypass */
+    | %name PLUS     expr '+' expr
+    | %name MINUS    expr '-' expr
+    | %name TIMES    expr '*' expr
+    | %name DIV      expr '/' expr
+    | %name COMMA    expr ',' expr
+    | %name ID:RANGE
+      ID                     %PREC rangeORenum
+    | %name NUM      NUM
+;
+
+%%
+
+=head1 SYNOPSIS
+
+See 
+
+=over 2
+
+=item * File C<userange.pl>.
+
+=item * File pascalenumeratedvsrange.eyp in examples/debuggintut/
+
+=item * The Bison manual L<http://www.gnu.org/software/bison/manual/html_mono/bison.html>
+
+=back
+
+Compile it with:
+
+      eyapp -TC pascalnestedeyapp3_5.eyp
+
+The compile it again, but using 'range' as start symbol (option -S)
+and option -P to generate a parser that accepts if a prefix of the input matches:
+
+      eyapp -P -S range pascalnestedeyapp3_5.eyp 
+
+Run it with this options:
+
+    $ ./pascalnestedeyapp3_5.pm -t -i -m 1 -c 'type e = (x, y, z);'
+    $ ./pascalnestedeyapp3_5.pm -t -i -m 1 -c 'type e = (x, @, z);'
+
+Try also these inputs:
+
+                type e = (x) .. (y);
+                type r = (x) ..  y ;
+                type r = (x+2)*3 ..  y/2 ;
+                type e = (x, y, z);
+                type e = (x);
+                type e = (x, y, z) .. (u+v);
+
+
+=cut
+

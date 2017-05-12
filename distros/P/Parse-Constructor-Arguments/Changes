@@ -1,0 +1,7 @@
+Revision history for Parse-Constructor-Arguments:0.091570
+
+0.091570  2009-06-06 00:41:36 UTC
+        Update dist.ini to include MooseX::Types dependency
+
+0.091550  2009-06-04 04:02:54 UTC
+        Initial release

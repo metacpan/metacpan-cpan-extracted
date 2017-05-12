@@ -1,0 +1,46 @@
+#!/usr/local/bin/perl
+# startgoodsrv - start goodsrv
+# 1999 Sey Nakajima <sey@jkc.co.jp>
+use IPC::Open3;
+use strict;
+
+my($Cfgfile, $Cfgname, $Logfile, $Pidfile, $Pipe);
+$Cfgfile = shift || usage();
+$Cfgfile = "$Cfgfile.cfg" if !-f $Cfgfile && -f "$Cfgfile.cfg";
+die "not exist $Cfgfile\n" unless -f $Cfgfile;
+die "cfgfilename must have a '.cfg' extension\n" unless $Cfgfile =~ /\.cfg$/;
+($Cfgname = $Cfgfile) =~ s/\.cfg$//;
+($Logfile = $Cfgfile) =~ s/\.cfg$/.goodsrv.log/;
+($Pipe = $Cfgfile) =~ s/\.cfg$/.goodsrv.pipe/;
+($Pidfile = $Cfgfile) =~ s/\.cfg$/.goodsrv.pid/;
+die "$Pidfile exists, goodsrv for $Cfgname may be already running\n"
+	if -f $Pidfile;
+unless( -p $Pipe ) {
+	system("mkfifo $Pipe") and die "mkfifo $Pipe : error $!\n";
+}
+
+my $Goodsrv = "/usr/local/goods/bin/goodsrv";
+die "cannot execute $Goodsrv\n" unless -x $Goodsrv;
+
+open RH, ">>$Logfile" or die "cannot open $Logfile\n";
+my $curfh = select RH; $| = 1; select $curfh;
+my $Pid = open3(\*WH, ">&RH", "", "$Goodsrv $Cfgname");
+open PID, ">$Pidfile" or die "cannot open $Pidfile\n";
+print PID $Pid;
+close PID;
+open IN, "$Pipe" or die "cannot read open $Pipe\n";
+open OUT, ">$Pipe" or die "cannot write open $Pipe\n"; # dummy for no EOF of IN
+while(<IN>) {
+	print WH;
+	last if /^exit$/;
+}
+close RH;
+close WH;
+close IN;
+close OUT;
+unlink $Pidfile;
+
+sub usage {
+	print "usage: $0 cfgfilename\n";
+	exit(1);
+}

@@ -1,0 +1,12 @@
+Changes
+lib/Parse/CPAN/Packages/Fast.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/TestUtil.pm
+t/basic.t
+t/edge_cases.t
+t/module_lookup.t
+xt/heavy.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

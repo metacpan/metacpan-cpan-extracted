@@ -1,0 +1,133 @@
+====================
+ Pangloss Todo List
+====================
+
+-------------------------------------------------------------------------------
+High Priority
+-------------------------------------------------------------------------------
+
+Trap Pixie Errors?
+    o	eval all Pixie operations?
+
+-------------------------------------------------------------------------------
+Medium Priority
+-------------------------------------------------------------------------------
+
+Pangloss::Version
+    o	PG::Version aren't working with the PAUSE indexer?
+
+Text Search Filter
+
+Date Search Filter
+
+Unicode
+    o	consider using Encode:_utf8_on to force UTF-8 input
+
+HTML Lang/Dir
+    o	Use 'lang' and 'dir' HTML4 attributes for all terms ala:
+	    $term/language/direction
+	(see: 'Storing Keys vs. References' in working-notes.txt)
+
+Term->key possible bug?
+    o	investigate potential bug with unescaped chars in term/key
+	(use quotemeta or an md5 hash as key instead?)
+
+Access Restrictions for Update User
+    o	in controller: update user -> *is user* or admin
+
+Cleanup Edit Language Page
+    o	bring edit/language.html back into line.
+
+
+-------------------------------------------------------------------------------
+Low Priority
+-------------------------------------------------------------------------------
+
+Tests
+    o	find & refactor tests that should use TestFramework
+
+Search Page
+    o	truncate long notes on search page
+
+Search Page Checkbox Addons
+    o	add 'none' for each section? (esp. category)
+    o	add 'select all' and 'clear all' for each section?
+
+MVC Admin Tool
+    o	stop messing with the model in PG::Shell, write a controller instead,
+	and generate OpenFrame::Requests.
+
+Documentation
+    o	finish POD for Search, Search::Request + Results
+    o	POD for Search::Filter::*, Search::Results::Pager
+    o	POD for Pangloss::Apache::Handler
+
+Search Backend (optimizations)
+    o	only sort results up to current page.
+    o	write an indexer to speed up term searches.
+    o	store terms collection by lang->concept->term, instead of concat'd key
+	and index by lang, concept, proofreader, & translator.
+
+Validation & Verification
+    o	User Privileges (make sure languages exist).
+    o	Term Statuses
+    o	Language Direction
+    o	error unless nested objects (ie: Languages, Category, Creator) exist.
+
+Apache Integration
+    o	cleanups & compile support for Pipeline::Config so we can move away
+	from setting cleanups in PG::Apache::Handler
+
+Don't Remove Last Admin User?
+
+Remove 'rm_users' From UserEditor
+
+
+-------------------------------------------------------------------------------
+Nice To Have
+-------------------------------------------------------------------------------
+
+Preserve Error Attributes
+    o	keep attributes when eExists and eNonExistent are thrown.
+    o	preserve old keys of business objects when eInvalid is thrown.
+
+Segments Influence Template Selection
+    o	should segments influence which template is loaded?
+	(on error, at least?)
+
+Store references internally, or build them for each view.
+	(see: 'Storing Keys vs. References' in working-notes.txt)
+
+Report Session Timeouts
+
+Set HTTP 'Expires' Header
+
+Source Language
+    (see: working-notes.txt)
+
+Pangloss Request Object
+    (see: working-notes.txt)
+
+TMX Support
+
+XLIFF Support
+
+Gettext (.po) Support
+
+Formalize App::View
+    o	no sense formalizing this until an API has emerged.
+
+Beef-up Error Flags
+    (see: working-notes.txt)
+
+Handling Other HTTP Requests
+    o	what to do with HEAD / IF-MODIFIED-SINCE requests?
+
+Generalize collection even more? (see: working-notes.txt)
+
+URL -> OF::Request arguments
+    o	segments to convert URL into OF::Request arguments.
+	(ie: search.html --> $arg->{search})
+
+__
+EOF

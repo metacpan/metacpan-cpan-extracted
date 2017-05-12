@@ -1,0 +1,14 @@
+PDFLib is a simpler, more OO interface to pdflib, available
+from http://www.pdflib.com/
+
+It makes creating PDFs from perl fast, easy and safe.
+
+Currently it supports text, images, graphics, and getting/setting all
+parameters. It has builting support for several paper sizes.
+It also takes care of starting/ending new pages, to try and
+make sure that a valid PDF file is always created (though
+unfortunately I think it's still possible to create an invalid
+PDF with this module).
+
+This is free software, you may distribute it under the same
+terms as Perl itself.

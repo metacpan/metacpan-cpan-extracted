@@ -1,0 +1,248 @@
+ROOT 
+{
+   COMMAND head1 
+   {
+      TEXT NAME
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE B
+      {
+         TEXT print
+      }
+      TEXT  [-n] 
+      SEQUENCE I
+      {
+         TEXT file
+      }
+      TEXT 
+
+
+   }
+   COMMAND head1 
+   {
+      TEXT DESCRIPTION
+
+
+   }
+   ORDINARY 
+   {
+      TEXT =head1 introduces a 1st level heading.
+
+      SEQUENCE B
+      {
+         TEXT print
+      }
+      TEXT  sends 
+      SEQUENCE I
+      {
+         TEXT file
+      }
+      TEXT  to a printer.
+
+      SEQUENCE B
+      {
+         TEXT bold
+      }
+      TEXT , 
+      SEQUENCE I
+      {
+         TEXT italic
+      }
+      TEXT , zero, 
+      SEQUENCE B
+      {
+         TEXT bold, 
+         SEQUENCE I
+         {
+            TEXT bold italic
+         }
+         TEXT , bold
+      }
+      TEXT  normal.
+
+      SEQUENCE S
+      {
+         TEXT Non-breaking space
+      }
+      TEXT , 
+      SEQUENCE C
+      {
+         TEXT 0
+      }
+      TEXT .
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE C
+      {
+         TEXT code
+      }
+      TEXT , 
+      SEQUENCE B
+      {
+         TEXT bold 
+         SEQUENCE C
+         {
+            TEXT code
+         }
+      }
+      TEXT , 
+      SEQUENCE F
+      {
+         TEXT file
+      }
+      TEXT , 
+      SEQUENCE X
+      {
+         TEXT index
+      }
+      TEXT 
+           <, >, /, |, A, \xc0
+
+      SEQUENCE B
+      {
+         TEXT <, >, /, |, A, \xc0
+      }
+      TEXT 
+
+      SEQUENCE I
+      {
+         SEQUENCE B
+         {
+            TEXT <, >, /, |, A, \xc0
+         }
+      }
+      TEXT 
+
+
+   }
+   ORDINARY 
+   {
+      TEXT \xa9 \xb0 \xf7 \xbd \xb5 \xb7 \xac \xae \xd7
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE C
+      {
+         TEXT $a <=> $b
+      }
+      TEXT ,
+
+      SEQUENCE C
+      {
+         TEXT $a <=> $b
+      }
+      TEXT 
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE C
+      {
+         SEQUENCE B
+         {
+            TEXT $foo->bar
+         }
+      }
+      TEXT ,
+
+      SEQUENCE I
+      {
+         TEXT  
+         SEQUENCE C
+         {
+            SEQUENCE B
+            {
+               TEXT $foo->bar
+            }
+         }
+         TEXT  
+      }
+      TEXT ,
+
+
+   }
+   ORDINARY 
+   {
+      TEXT An 
+      SEQUENCE C
+      {
+         SEQUENCE L page / section
+         {
+            TEXT page/section
+         }
+      }
+      TEXT  markup.
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE C
+      {
+         TEXT $a << $b
+      }
+      TEXT ,
+
+      SEQUENCE B
+      {
+         TEXT  
+         SEQUENCE C
+         {
+            TEXT $a >> $b
+         }
+         TEXT  
+      }
+      TEXT ;
+
+
+   }
+   ORDINARY 
+   {
+      TEXT see 
+      SEQUENCE L  / (?>pattern)
+      {
+         SEQUENCE C
+         {
+            TEXT (?>pattern)
+         }
+      }
+      TEXT .
+
+
+   }
+   ORDINARY 
+   {
+      TEXT see 
+      SEQUENCE L  / (?>pattern)
+      {
+         TEXT No backtracking
+      }
+      TEXT .
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE C
+      {
+         SEQUENCE B
+         {
+            SEQUENCE I
+            {
+               TEXT Italic Bold Code
+            }
+         }
+      }
+      TEXT 
+
+   }
+}

@@ -1,0 +1,17 @@
+Changes
+gzip.pm
+gzip.xs
+MANIFEST
+Makefile.PL
+README
+t/read.t
+t/write.t
+t/ok3.gz
+t/ok17.gz
+t/ok19
+t/ok21
+t/ok50.gz.short
+t/ok54.gz.len
+t/ok58.gz.crc
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

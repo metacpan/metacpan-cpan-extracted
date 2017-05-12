@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml
+t/00-basic.t
+t/pod.t
+t/pod-coverage.t
+lib/Polycom/App/Push.pm
+lib/Polycom/App/URI.pm

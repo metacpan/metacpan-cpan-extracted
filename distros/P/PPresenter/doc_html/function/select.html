@@ -1,0 +1,127 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; select()</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>select()</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+function<BR>
+<UL>
+<LI><B>select</B>
+<LI><A HREF=find.html>find</A>
+<LI><A HREF=change.html>change</A>
+</UL>
+<B>select via</B><BR>
+<UL>
+<LI><A HREF=#show>show</A><BR>
+<LI><A HREF=#style>style</A><BR>
+<LI><A HREF=#viewport>viewport</A><BR>
+</UL>
+<P>
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.
+Presentations are written in options to style-elements grouped into
+<A HREF=../style/index.html>styles</A>.  To avoid that you have to 
+specify all the style-elements for all the styles each time over again,
+you can <STRONG>select</STRONG> your defaults.
+<P>
+The following selects are available:
+<UL>
+<LI>selections <A HREF=#show>for a show</A>.
+<LI>selections <A HREF=#style>for a style</A>.
+<LI>selections <A HREF=#viewport>for a viewport</A>.
+</UL>
+A select is always of the form:
+<PRE>
+   <I>$object</I>-&gt;select('<I>objtype</I>', <I>name</I>);
+   <I>$object</I>-&gt;select(<I>objtype</I> =&gt; <I>name</I>);
+</PRE>
+Where the <EM>name</EM> is something what is accepted by
+<A HREF=find.html>find</A>:
+a name of an object of the required type, or one of its aliases,
+<CODE>'FIRST'</CODE>, or <CODE>'LAST'</CODE>, or a sequence number in the
+list.
+
+<H2>Selections on a <A NAME=show>Show</A></H2>
+
+Handled by show itself:
+<PRE>
+   my $style    = $show-&gt;select(style    =&gt; 'default');
+   my $viewport = $show-&gt;select(viewport =&gt; 'control');
+</PRE>
+The selected style is the style which will be the default style for
+all viewports which are added to the show after this select statement.
+This function is valid only till the first
+<A HREF=../slide/index.html>slide</A> is defined.
+<P>
+The select for a viewport is only useful to give a default for
+<A HREF=find.html#show>find on a show</A>, nothing more.
+All other selects on a show are passed to the selected style.  The
+following two lines are equivalent:
+<PRE>
+   $show-&gt;select(formatter =&gt; 'plain');
+   $show-&gt;find('style')-&gt;select(formatter =&gt; 'plain');
+</PRE>
+
+<H2>Selections on a <A NAME=style>Style</A></H2>
+
+A style is a combination of lists of style-elements.  Of each list, one is
+selected to be used by default by any viewport which has that style
+selected.
+<P>
+A few ways you can use this select function:
+<PRE>
+   $show-&gt;addStyle(<I>...options...</I>)
+         -&gt;select(formatter =&gt; 'plain');
+   my $style = $show-&gt;find(style =&gt; 'slidenotes')
+         -&gt;select(formatter =&gt; 'simple');
+   $style-&gt;select(formatter =&gt; 'markup');
+</PRE>
+
+<H2>Selections on a <A NAME=viewport>Viewport</A></H2>
+
+A viewport has a selected style, which determines how a slide for that
+viewport should be displayed.  You can select a new style or change
+something in the selected style.
+<P>
+<FONT COLOR=red>BE WARNED:</FONT>
+if you change the selection of a style-element in one viewport, this will
+affect the other viewports which use the same style.
+(may change in the future).
+<P>
+<PRE>
+  $show-&gt;find(viewport =&gt; 'control')
+       -&gt;select(style  =&gt; 'slidenotes');
+  $show-&gt;find(viewport)
+       -&gt;select(template =&gt; 'tm');
+</PRE>
+The latter is dangerous, and would be more clearly written (assuming the
+viewport uses the selected style of the show):
+<PRE>
+   $show-&gt;select(template =&gt; 'tm');
+   $show-&gt;find(viewport)-&gt;find(style)
+        -&gt;select(template =&gt; 'tm');
+</PRE>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

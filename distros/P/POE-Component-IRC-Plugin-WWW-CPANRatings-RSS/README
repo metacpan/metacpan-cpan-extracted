@@ -1,0 +1,281 @@
+NAME
+    POE::Component::IRC::Plugin::WWW::CPANRatings::RSS - announce CPAN
+    ratings on IRC from RSS feed on http://cpanratings.perl.org/
+
+SYNOPSIS
+        #!/usr/bin/env perl
+
+        use strict;
+        use warnings;
+
+        use POE qw(Component::IRC  Component::IRC::Plugin::WWW::CPANRatings::RSS);
+
+        my $irc = POE::Component::IRC->spawn(
+            nick        => 'CPANRatings',
+            server      => 'irc.freenode.net',
+            port        => 6667,
+            ircname     => 'CPAN Ratings Bot',
+        );
+
+        POE::Session->create(
+            package_states => [
+                main => [ qw(_start irc_001 _default  irc_cpanratings) ],
+            ],
+        );
+
+        $poe_kernel->run;
+
+        sub irc_cpanratings {
+            my $in_ref = $_[ARG0];
+            use Data::Dumper;
+            print Dumper $in_ref;
+        }
+
+        sub _start {
+            $irc->yield( register => 'all' );
+
+            $irc->plugin_add(
+                'cpan_ratings' =>
+                    POE::Component::IRC::Plugin::WWW::CPANRatings::RSS->new(
+                        channels => [ '#zofbot' ],
+                    )
+            );
+
+            $irc->yield( connect => {} );
+        }
+
+        sub irc_001 {
+            $irc->yield( join => '#zofbot' );
+        }
+
+
+        * CPANRatings rating: String-String - ●○○○○ - by BKB [ http://cpanratings.perl.org/#4476 ]
+        * CPANRatings rating: IWL - ●○○○○ - by BKB [ http://cpanratings.perl.org/#4474 ]
+        * CPANRatings rating: String - ●○○○○ - by BKB [ http://cpanratings.perl.org/#4472 ]
+        * CPANRatings rating: String-Buffer - ●○○○○ - by BKB [ http://cpanratings.perl.org/#4470 ]
+        * CPANRatings rating: String-Strip - ●○○○○ - by BKB [ http://cpanratings.perl.org/#4468 ]
+        * CPANRatings rating: Acme-Monta - N/A - by BKB [ http://cpanratings.perl.org/#4466 ]
+
+DESCRIPTION
+    The module is POE::Component::IRC plugin which uses
+    POE::Component::IRC::Plugin for its base, thus can be loaded with
+    plugin_add() method. The module provides means to announce new reviews
+    posted to <http://cpanratings.perl.org/>
+
+CONSTRUCTOR
+  "new"
+        # plain
+        $irc->plugin_add(
+            'cpan_ratings' =>
+                POE::Component::IRC::Plugin::WWW::CPANRatings::RSS->new(
+                    channels => [ '#zofbot' ],
+                )
+        );
+
+        # juicy
+            $irc->plugin_add(
+                'cpan_ratings' =>
+                    POE::Component::IRC::Plugin::WWW::CPANRatings::RSS->new(
+                        channels    => [ '#zofbot' ],
+                        rate        => 60;
+                        ua          => { timeout => 30 },
+                        file        => 'cpan_ratings.rss.storable',
+                        format      => 'rating: {:dist:} - {:rating:} - by {:creator:} [ {:link:} ]',
+                        max_ratings => 10,
+                        response_event => 'irc_cpanratings';
+                        auto        => 1,
+                        utf         => 1,
+                    )
+            );
+
+    Constructs and returns a
+    POE::Component::IRC::Plugin::WWW::CPANRatings::RSS object suitable to be
+    fed to POE::Component::IRC's "plugin_add()" method. All of which are
+    optional. You can change all of the arguments dynamically by accessing
+    them as keys in a hashref of the plugin object: "$plug->{rate} = 1000;"
+    Possible arguments are as follows
+
+   "channels"
+        ->new( channels => [ '#zofbot' ], );
+
+    Semi-mandatory, not specifying this argument will render the plugin
+    useless when "auto" option is turned on, however you can still listen to
+    the events emited by the plugin. Takes an arrayref as a value which must
+    contain the channels where the plugin will announce new ratings.
+
+   "rate"
+        ->new( rate => 360, );
+
+    Optional. Takes a positive integer as a value which specifies the
+    interval of "rate" seconds between the checks for new ratings. Defaults
+    to: 60
+
+   "ua"
+        ->new( ua => { timeout => 30 } );
+
+    Optional. Takes a hashref as a value. That hashref will be directly
+    dereferenced into LWP::UserAgent constructor. See LWP::UserAgent's
+    documentation for possible keys/values. Defaults to: "{ timeout => 30 }"
+
+   "file"
+        ->new( file => 'cpan_ratings.rss.storable' );
+
+    Optional. Plugin stores already reported reviews/ratings into a file.
+    Using the "file" argument, which takes a scalar as a value, you can
+    specify the file name for storage. Defaults to:
+    "cpan_ratings.rss.storable"
+
+   "format"
+        ->new( format => 'rating: {:dist:} - {:rating:} - by {:creator:} [ {:link:} ]', );
+
+    Optional. When "auto" argument (see below) is set to a true value the
+    plugin will announce new reviews into the "channels". The "format"
+    argument, which takes a string as a value, specifies the format of the
+    output. Currently all the announcing is done via "/me", let me know if
+    you want that configurable. Special character sequences in the "format"
+    string will be replaced with respective data bits in the following
+    fashion:
+
+        {:dist:}        - name of the distribution
+        {:rating:}      - either the number or the stars (see C<utf>) rating
+        {:creator:}     - name of the creator of the review
+        {:link:}        - link to the review
+
+    The special sequences can be used any number of times if you so desire.
+    The format argument defaults to: <'rating: {:dist:} - {:rating:} - by
+    {:creator:} [ {:link:} ]'>
+
+   "max_ratings"
+        ->new( max_ratings => 5 );
+
+    Optional. The "max_ratings" takes a positive integer as a value and
+    specifies the maximum number of ratings/reviews to report at a time.
+    Anything over that limit won't be reported at all; considering those
+    reviews don't pop up like mushrooms this shouldn't be a problem.
+    Defaults to: 5
+
+   "response_event"
+        ->new( response_event => 'irc_cpanratings' );
+
+    Optional. During its operation, the plugin will emit an event *every
+    time the data is fetched*. The "response_event" specifies the name of
+    the event to emit. Defaults to: "irc_cpanratings"
+
+   "auto"
+        ->new( auto => 1 );
+
+    Optional. Takes either true or false values. When set to a true value
+    plugin will auto-announce new reviews into all the channels specified in
+    "channels" argument. Defaults to: 1
+
+   "utf"
+        ->new( utf => 1 );
+
+    Optional. Takes either true or false values. When set to a true value
+    will use UTF-8 circles to represent the given rating (that is what will
+    replace the "{:rating:}" sequence in the "format" argument). When set to
+    a false value will use simple numbers. Defaults to: 1
+
+EMITED EVENTS
+        $VAR1 = {
+            'rate' => 60,
+            'ratings' => [
+                {
+                    'link' => 'http://cpanratings.perl.org/#4452',
+                    'comment' => 'One of the most useful Acme modules ever! Simply fantastic to show off without losing more than 5 seconds, a real masterpiece of meta-art. I\'d suggest ...',
+                    'creator' => 'Flavio Poletti',
+                    'dist' => 'Acme-EyeDrops',
+                    'rating' => '5'
+                },
+            ],
+            'file' => 'cpan_ratings.rss.storable'
+        };
+
+    The event handler setup to handle the "response_event", which defaults
+    to "irc_cpanratings", will receive input on *every fetch*, thus every
+    "rate" (see CONSTRUCTOR) seconds. The input will come in a form of a
+    hashref in $_[ARG0]. The keys/values of that hashref are as follows.
+
+  "ratings"
+        'ratings' => [
+            {
+                'link' => 'http://cpanratings.perl.org/#4452',
+                'comment' => 'One of the most useful Acme modules ever! Simply fantastic to show off without losing more than 5 seconds, a real masterpiece of meta-art. I\'d suggest ...',
+                'creator' => 'Flavio Poletti',
+                'dist' => 'Acme-EyeDrops',
+                'rating' => '5'
+            },
+        ],
+
+    The "ratings" key will contain a (possibly empty) arrayref of hashrefs
+    where each hashrefs represents a new review. See
+    "WWW::CPANRatings::RSS"'s "fetch()" method of explaination of each of
+    the keys/values of those hashrefs.
+
+   "error"
+        'error' => 'Network error: 500 Timeout',
+
+    If an error occured the "error" key will be present and its value, which
+    will be a scalar, will contain the description of the error.
+
+   "rate"
+        'rate' => 60
+
+    The "rate" key will contain the rate (in seconds) at which the plugin
+    fetches new data.
+
+   "file"
+        'file' => 'cpan_ratings.rss.storable'
+
+    The "file" key will contain the filename of the file where the plugin
+    stores already reported reviews.
+
+EXAMPLES
+    The "examples/" directory of this distribution contains "ratings_bot.pl"
+    which is a fully working CPAN Ratings announcing IRC bot.
+
+AUTHOR
+    Zoffix Znet, "<zoffix at cpan.org>" (<http://zoffix.com>,
+    <http://haslayout.net>)
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-poe-component-irc-plugin-www-cpanratings-rss at rt.cpan.org", or
+    through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-IRC-Plugin
+    -WWW-CPANRatings-RSS>. I will be notified, and then you'll automatically
+    be notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc POE::Component::IRC::Plugin::WWW::CPANRatings::RSS
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-IRC-Plugin-W
+        WW-CPANRatings-RSS>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/POE-Component-IRC-Plugin-WWW-CPANRatings-R
+        SS>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/POE-Component-IRC-Plugin-WWW-CPANRati
+        ngs-RSS>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/POE-Component-IRC-Plugin-WWW-CPANRating
+        s-RSS>
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Zoffix Znet, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

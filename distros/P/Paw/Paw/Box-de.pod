@@ -1,0 +1,62 @@
+=head1 Box Widget
+
+B<$box=Paw::Box::new($direction, [$name], [$title], [$color], [$orientation])>;
+
+B<Parameter>
+
+     $direction   => Richtung in welche die Widgets gepackt werden sollen
+                     "v"ertikal oder "h"orizont
+
+     $color       => Das Farbpaar (colorpair) muss mit
+                     Curses::init_pair(pair_nr, COLOR_fg, COLOR_bg)
+                     erzeugt werden[optional]
+
+     $name        => Name der Box [optional]
+
+     $orientation => "topleft", "topright", "bottomleft", "bottomright",
+                     "center" und "grow" sind die moeglichen Parameter.
+                     Sie geben an wie sich die Box bei Änderung der
+                     Terminalgroesse verhaelt. Entweder behaelt es seinen
+                     Abstand zu der angegebenen Seite bei, es bleibt
+                     zentriert oder es waechst bzw. schrumpft mit dem
+                     Terminal.
+                     (default ist die "Orientation" des Elternwidgets)
+                     [optional]
+
+B<Beispiel>
+
+     $box=Paw::Box::new(direction=>"v",title=>"Start",color=>1);
+
+=head2 put($widget)
+
+pack das Widget in die Box
+
+B<Beispiel>
+
+     $box->put($button0);
+
+=head2 set_border([``shade''])
+
+aktiviert den Rahmen der Box optional auch mit Schatten.
+
+B<Beispiel>
+
+     $box->set_border("shade"); oder $win->set_border();
+
+=head2 abs_move_curs($new_x, $new_y);
+
+Setzt den Packer an die absolute Position in der Box (negative Werte liegen ausserhalb der Box).
+
+B<Beispiel>
+
+     $box->abs_move_curs(new_x=>1);
+
+=head2 rel_move_curs($new_x, $new_y);
+
+Setzt den Packer relativ zur momentanen Position in der Box (auch negative Werte moeglich).
+
+B<Beispiel>
+
+     $box->rel_move_curs(new_y=>3, new_x=>-2);
+
+=cut

@@ -1,0 +1,78 @@
+{
+   "abstract" : "sliding windows on a string or array",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.021, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PerlX-Window",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Hash::FieldHash" : "0",
+            "Variable::Magic" : "0"
+         },
+         "requires" : {
+            "Data::Alias" : "0",
+            "Exporter::Shiny" : "0",
+            "perl" : "5.016000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "PerlX::Window" : {
+         "file" : "lib/PerlX/Window.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Window"
+      },
+      "homepage" : "https://metacpan.org/release/PerlX-Window",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-perlx-window.git",
+         "web" : "https://github.com/tobyink/p5-perlx-window"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/PerlX-Window/project"
+   },
+   "version" : "0.004"
+}

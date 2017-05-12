@@ -1,0 +1,19 @@
+A description of the example programs
+
+speed-test.pl
+  - reads each record of a given input STDF file and prints elapsed time
+
+dump_records_to_ascii.pl 
+  - dumps the contents of each STDF record to ascii 
+
+testtime.pl
+  - Reports test time results for each bin category. 
+
+datalog.pl
+  - Reports a datalogs (or text output from the ATE).
+
+summary.pl
+  - Typical summary report
+
+far.pl
+  - Prints contents of the FAR record.  Useful for quickly determing CPU_TYPE, STDF Specification version

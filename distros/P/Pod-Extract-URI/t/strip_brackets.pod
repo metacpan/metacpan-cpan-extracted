@@ -1,0 +1,24 @@
+use strict;
+use Test::More tests => 3;
+
+BEGIN {
+    use_ok( 'Pod::Extract::URI' );
+}
+
+my $peu = Pod::Extract::URI->new();
+my @uris = $peu->uris_from_file( 't/pod/strip_brackets.pod' );
+is_deeply( \@uris, [
+    'http://www.example.com/1',
+    'http://www.example.com/2',
+    'http://www.example.com/3',
+    'http://www.example.com/4',
+] );
+
+$peu = Pod::Extract::URI->new( strip_brackets => 0 );
+@uris = $peu->uris_from_file( 't/pod/strip_brackets.pod' );
+is_deeply( \@uris, [
+    '<http://www.example.com/1>',
+    '<URL:http://www.example.com/2>',
+    'http://www.example.com/3',
+    'http://www.example.com/4',
+] );

@@ -1,0 +1,78 @@
+NAME
+    Plack::Middleware::CustomErrorDocument - dynamically select error
+    documents based on HTTP status code
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+        # in app.psgi
+
+        $app = Plack::Middleware::CustomErrorDocument->wrap(
+            $app,
+            # dynamic $path (set according to $env):
+            404 => sub {
+                my $env = shift;
+                ...
+                return $path;
+            },
+            # use static path
+            500 => 'path/to/error/doc',
+        );
+
+        # or with Plack::Builder:
+        builder {
+            enable "Plack::Middleware::CustomErrorDocument",
+                404 => sub {
+                ...;
+            };
+            $app;
+        };
+
+        # subrequests are possible, as with Plack::Middleware::ErrorDocument
+        # (but untested and unrecommended)
+        $app = Plack::Middleware::CustomErrorDocument->wrap(
+            $app,
+            404 => sub {
+                my $env = shift;
+                ...
+                return $path;
+            },
+            subrequest => 1,
+        );
+
+DESCRIPTION
+    Dynamically select an appropriate error document for an HTTP status
+    error code. Pass in a subroutine coderef, which should take $env as the
+    sole argument, and return the destination file path as a string.
+
+    An example use would be to return a 'missing' image file for image
+    requests that result in a 404 status (and a standard 404 HTML page for
+    all others).
+
+SEE ALSO
+    *   Plack::Middleware::ErrorDocument
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/mjemmeson/Plack-Middleware-CustomErrorDocument/issue
+    s>. You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/mjemmeson/Plack-Middleware-CustomErrorDocument>
+
+      git clone https://github.com/mjemmeson/Plack-Middleware-CustomErrorDocument.git
+
+AUTHOR
+    Michael Jemmeson <michael.jemmeson@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Foxtons Ltd.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

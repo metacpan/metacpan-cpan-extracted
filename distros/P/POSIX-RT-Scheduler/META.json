@@ -1,0 +1,58 @@
+{
+   "abstract" : "POSIX Scheduler support functions",
+   "author" : [
+      "Leon Timmermans <leont@cpan.org>"
+   ],
+   "dynamic_config" : "1",
+   "generated_by" : "Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120920",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POSIX-RT-Scheduler",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "0",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-posix-rt-scheduler at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=POSIX-RT-Scheduler"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/posix-rt-scheduler.git",
+         "web" : "http://github.com/Leont/posix-rt-scheduler"
+      }
+   },
+   "version" : "0.003"
+}
+

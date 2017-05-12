@@ -1,0 +1,183 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Panotools::Makefile;
+use Panotools::Script;
+
+my $path_output;
+my $path_mk;
+my $help = 0;
+
+GetOptions ('o|output=s' => \$path_output,
+            'm|makefile=s' => \$path_mk,
+            'h|help' => \$help);
+
+pod2usage (-verbose => 2) if $help;
+pod2usage (2) unless (defined $path_output and scalar @ARGV);
+
+my $path_prefix = $path_output;
+$path_prefix =~ s/\.[[:alnum:]]+$//;
+
+my $path_input = shift @ARGV;
+
+my $mk = new Panotools::Makefile;
+$mk->Comment ('Command-line tools');
+$mk->Variable ('PTOMERGE', 'ptomerge');
+$mk->Variable ('PTOSPLIT', 'ptosplit');
+$mk->Variable ('AUTOPANO', 'autopano');
+$mk->Variable ('GENKEYS', 'generatekeys');
+$mk->Variable ('CPCLEAN', 'cpclean');
+$mk->Variable ('RM', '-', 'rm');
+
+$mk->Comment ('Input project file and prefix for output');
+$mk->Variable ('PROJECT_FILE', $path_input);
+$mk->Variable ('PREFIX', $path_prefix);
+$mk->Variable ('PTO_OUT', $path_output);
+
+my $rule = $mk->Rule ('all');
+$rule->Prerequisites ('$(PTO_OUT)');
+
+$rule = $mk->Rule ('.PHONY');
+$rule->Prerequisites ('all', 'clean');
+
+my $pto = new Panotools::Script;
+$pto->Read ($path_input);
+
+my $pix_max = $pto->Option->{cpgenSize} || 1600;
+my $points = $pto->Option->{cpgenNumber} || 25;
+my $ransac = 1;
+$ransac = 0 if (defined $pto->Option->{cpgenRansac} and $pto->Option->{cpgenRansac} eq 'false');
+my @refine = ();
+@refine = ('--refine', '--keep-unrefinable', 0)
+    if (defined $pto->Option->{cpgenRefine} and $pto->Option->{cpgenRefine} eq 'true');
+
+$ransac = 0 if $pto->Image->[0]->v ($pto) > 60;
+
+$mk->Comment ('Rule to create feature-point files when required');
+$rule = $mk->Rule ('%.key');
+$rule->Prerequisites ('%');
+$rule->Command ('$(GENKEYS_SHELL)', '$<', '$@', $pix_max);
+
+$mk->Comment ('Ends of all connected groups');
+my $var_endkeys = $mk->Variable ('END_KEYS');
+
+my @id_ends;
+my $chains = $pto->ConnectedGroups;
+
+for my $chain (@{$chains})
+{
+    $var_endkeys->Values ($pto->Image->[$chain->[0]]->Path ($path_input) .'.key');
+    push @id_ends, $chain->[0];
+    next if scalar @{$chain} == 1;
+    $var_endkeys->Values ($pto->Image->[$chain->[-1]]->Path ($path_input) .'.key');
+    push @id_ends, $chain->[-1];
+}
+
+$mk->Comment ("Files we don't need afterwards");
+my $var_tempfiles = $mk->Variable ('TEMP_FILES');
+
+$var_tempfiles->Values ('$(END_KEYS)');
+
+$mk->Comment ('A project file connecting the ends');
+$rule = $mk->Rule ('$(PREFIX).ends.a.pto');
+$rule->Prerequisites ('$(END_KEYS)');
+$rule->Command ('$(AUTOPANO_SHELL)', @refine, '--ransac', $ransac, '--maxmatches', $points,
+                    '$(PREFIX_SHELL).ends.a.pto', '$(END_KEYS_SHELL)');
+
+$var_tempfiles->Values ('$(PREFIX).ends.a.pto');
+
+$rule = $mk->Rule ('$(PREFIX).ends.b.pto');
+$rule->Prerequisites ('$(PROJECT_FILE)');
+$rule->Command ('$(PTOSPLIT_SHELL)', @id_ends, '$(PROJECT_FILE_SHELL)', '$(PREFIX_SHELL).ends.b.pto');
+$var_tempfiles->Values ('$(PREFIX).ends.b.pto');
+
+$rule = $mk->Rule ('$(PREFIX).ends.c.pto');
+$rule->Prerequisites ('$(PREFIX).ends.b.pto', '$(PREFIX).ends.a.pto');
+$rule->Command ('$(PTOMERGE_SHELL)', '$(PREFIX_SHELL).ends.b.pto', '$(PREFIX_SHELL).ends.a.pto', '$(PREFIX_SHELL).ends.c.pto');
+$var_tempfiles->Values ('$(PREFIX).ends.c.pto');
+
+$rule = $mk->Rule ('$(PREFIX).ends.d.pto');
+$rule->Prerequisites ('$(PREFIX).ends.c.pto');
+$rule->Command ('$(CPCLEAN_SHELL)', '-o', '$(PREFIX_SHELL).ends.d.pto', '$(PREFIX_SHELL).ends.c.pto');
+
+$var_tempfiles->Values ('$(PREFIX).ends.d.pto');
+
+$rule = $mk->Rule ('$(PTO_OUT)');
+$rule->Prerequisites ('$(PROJECT_FILE)', '$(PREFIX).ends.d.pto');
+$rule->Command ('$(PTOMERGE_SHELL)', '$(PROJECT_FILE_SHELL)', '$(PREFIX_SHELL).ends.d.pto',
+                  '$(PTO_OUT_SHELL)');
+
+$rule = $mk->Rule ('clean');
+$rule->Command ('$(RM_SHELL)', '$(TEMP_FILES_SHELL)');
+
+my $rule_secondary = $mk->Rule ('.SECONDARY');
+$rule_secondary->Prerequisites ('$(TEMP_FILES)');
+
+$mk->Write ($path_mk) if defined $path_mk;
+$mk->DoIt ('--always-make', 'all', 'clean') unless defined $path_mk;
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+ptobind - Join the ends of linked photos in a Hugin project
+
+=head1 SYNOPSIS
+
+ptobind [options] --output output.pto input.pto
+
+ Options:
+  -m | --makefile file  Output Makefile
+  -o | --output file    Output project
+  -h | --help           Outputs help documentation.
+
+=head1 DESCRIPTION
+
+B<ptobind> is a wrapper around various tools that generates control points.  Output is
+in the form of a .pto project or a Makefile to create that .pto project.
+
+This is a specialist tool that assumes that the project is already connected
+into one or more chains of control points.  The first and last photos from each
+of these chains are selected for feature matching.  e.g. if there is a single
+chain, then this tool will try and join it into an loop, if there are two
+chains they will be fitted together side-by-side by trying to join the ends to
+each other, any loops will also be joined.
+
+This tool is intended to use the output and intermediate .key files created by
+ptochain.
+
+If the --makefile option is given, rules for generating the project are written
+to a Makefile, if --makefile isn't set then these rules will be executed
+immediately.
+
+Control point generator parameters are set via Option lines in the input
+project:
+
+  #hugin_cpgenSize 1500
+  #hugin_cpgenNumber 25
+  #hugin_cpgenRansac true
+  #hugin_cpgenRefine false
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+=head1 AUTHOR
+
+Bruno Postle - December 2009.
+
+=cut
+
+=begin perl

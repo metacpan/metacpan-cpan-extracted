@@ -1,0 +1,1 @@
+use lib './lib';use strict;use warnings;use Error qw(:try);use Pipeline::Segment;use Test::More tests => 2;ok( my $seg = Pipeline::Segment->new(), "created a segment" );try {  ok( $seg->dispatch(), "dispatched the segment" );} catch Pipeline::Error::Abstract with {  ok( 1, "caught error signalling abstract class use");};1;

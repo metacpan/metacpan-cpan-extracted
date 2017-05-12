@@ -1,0 +1,16 @@
+blib/
+inc/
+Makefile
+*.old
+*.bak
+*.swp
+AtFork.c
+*~
+pm_to_blib
+*.bs
+*.out
+*.o
+ppport.h
+MANIFEST
+META.*
+MYMETA.*

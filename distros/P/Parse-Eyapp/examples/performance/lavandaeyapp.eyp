@@ -1,0 +1,136 @@
+
+%strict
+%token num
+%token date
+%token id
+%token corpo
+%token casa
+%token br
+%token cor
+%token alg
+%token la
+%token fib
+%start Lavanda
+%{use Data::Dumper;%}
+
+%%
+
+Lavanda : Cabec Sacos
+          {
+           my @list = ();
+           foreach (@{$_[2]}) {
+            push @list, grep ref $_, @{$_};
+           }
+           return { 'Cabec' => $_[1], 'Sacos' => \@list }
+          }
+        ;
+
+Cabec : date IdPR
+        { return { 'Data' => $_[1], 'IdPR' => $_[2] } }
+      ;
+
+Sacos : (Saco '.')+
+        { return $_[1] }
+      ;
+
+Saco : num IdCli '(' Lotes ')'
+       {
+        my @list = grep ref $_, @{$_[4]};
+        return { 'Num' => $_[1], 'IdCli' => $_[2], 'Lotes' => \@list };
+       }
+     ;
+
+Lotes : Lote <+ ','>
+        { return $_[1] }
+      ;
+
+Lote : Tipo Qt
+       { return { 'Tipo' => $_[1], 'Qt' => $_[2] } }
+     ;
+
+Tipo : Classe '-' Tinto '-' Fio
+       { return { 'Classe' => $_[1], 'Tinto' => $_[3], 'Fio' => $_[5] } }
+     ;
+
+IdPR : id
+       { return $_[1] }
+     ;
+
+IdCli : id
+        { return $_[1] }
+      ;
+
+Qt : num
+     { return $_[1] }
+   ;
+
+Classe : corpo
+         { return $_[1] }
+       | casa
+         { return $_[1] }
+       ;
+
+Tinto : br
+        { return $_[1] }
+      | cor
+        { return $_[1] }
+      ;
+
+Fio : alg
+      { return $_[1] }
+    | la
+      { return $_[1] }
+    | fib
+      { return $_[1] }
+    ;
+
+
+%%
+
+package main;
+use Data::Dumper;
+my $File;
+my $t = Run();
+
+sub lexical_analyse {
+	my $date = qr/\d{2}-\d{2}-\d{4}/;
+	my $num = qr/\d+/;
+	my $id = qr/[A-Za-z]+/;
+	for ($File) {
+		s/^\s+//;
+		s/^corpo//i        and return ('corpo','corpo');
+		s/^casa//i         and return ('casa','casa');
+		s/^br//i           and return ('br','br');
+		s/^cor//i          and return ('cor','cor');
+		s/^alg//i          and return ('alg','alg');
+		s/^la//i           and return ('la','la');
+		s/^fib//i          and return ('fib','fib');
+		s/^($id)//         and return ('id',$1);
+		s/^($date)//       and return ('date',$1);
+		s/^($num)//        and return ('num',$1);
+		s/^([,.\(\)-])//   and return ($1,$1);
+		return ('',undef);
+	}
+}
+
+sub yyerror {
+	my $parser = shift;
+	my $expected = $parser->YYExpect;
+	my $got = $parser->YYCurtok;
+	die "Parse Error: Expected $expected, got $got\n";
+}
+
+sub Run {
+	my $parser = new lavandaeyapp();
+	init_lex();
+	my $value = $parser->YYParse( yylex => \&lexical_analyse, yyerror => \&yyerror );
+	open OUT, ">parserlavandaEyapp";
+	print OUT Dumper $value;
+	close OUT;
+}
+
+sub init_lex{
+	local $/;
+    undef $/;
+	$File = <>;
+}

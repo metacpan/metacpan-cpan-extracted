@@ -1,0 +1,11 @@
+<html>
+  <body>
+    <p>Okay, let's test the stuff.</p>
+    <div metal:use-macro="./metal-define-slot.html#testmacro">
+      <p metal:fill-slot="boo">
+        This is kind of a simple test:
+        <span petal:replace="bar">Bar</span>
+      </p>
+    </div>
+  </body>
+</html>

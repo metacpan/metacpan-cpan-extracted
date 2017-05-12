@@ -1,0 +1,13 @@
+* should PoCos explicitly reveal and discuss their session architecture
+  in documentation, and perhaps specify which callbacks are called in what
+  session context, and what heap variables are available to the callbacks?
+
+* should there we ways to look to the event queues and see if any sessions have events
+  waiting to run future. This would have simplified the shutdown logic in the
+  TestServer component.
+
+* Should the be standard ways for Pocos to give users ways to set up 
+  handlers in nested sessions and to pass state data down to handlers?
+  
+* Should there be standard error and tracing procedures for POE? Maybe something
+   that runs with a console/ps type utility?

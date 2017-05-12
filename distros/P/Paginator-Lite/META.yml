@@ -1,0 +1,27 @@
+---
+abstract: 'A simple paginator'
+author:
+  - 'Blabos de Blebe <blabos@cpan.org>'
+build_requires:
+  Pod::Coverage::TrustPod: '0'
+  Test::Most: '0'
+  Test::Perl::Critic: '0'
+  Test::Pod: '0'
+  Test::Pod::Coverage: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Paginator-Lite
+requires:
+  Moo: '0'
+  URI: '0'
+resources:
+  bugtracker: https://github.com/blabos/Paginator-Lite/issues
+  repository: https://github.com/blabos/Paginator-Lite.git
+version: '2.001003'
+x_serialization_backend: 'YAML::Tiny version 1.69'

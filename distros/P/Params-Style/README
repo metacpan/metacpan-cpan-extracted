@@ -1,0 +1,33 @@
+Params::Style 
+=============================
+
+$Id: README,v 1.2 2003/12/08 01:47:13 mrodrigu Exp $
+
+NAME
+
+Params::Style - Perl extension for converting named parameters to
+perl_style or javaStyle and vice-versa
+
+INSTALLATION
+
+Params::Style uses Module::Build, so to install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Attribute::Handlers
+  Module::Build        to install
+  Test::More           for testing
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Michel Rodriguez
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

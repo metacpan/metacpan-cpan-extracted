@@ -1,0 +1,4 @@
+:
+#FOR: to demonstrate what happens when ExampleRunner runs something that dies and spews stuff to STDERR
+echo "oh noes!" >&2;
+exit 1

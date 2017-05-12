@@ -1,0 +1,58 @@
+[% INCLUDE common/header.tt
+           title = "Editing $pageName"
+%]
+
+[% IF revision %]
+<p><b>Editing old revision [% revision %]. Saving this page will
+replace the latest revision with this text.</b></p>
+[% END %]
+
+<h2>Edit Conflict!</h2>
+
+[% IF editConflict > 1 %]
+<h3>(This is a new conflict.)</h3>
+[% END %]
+
+<p><b>Someone saved this page after you started editing. The top
+textbox contains the saved text. Only the text in the top textbox will
+be saved.</b></p>
+
+<p>Scroll down to see your edited text.</p>
+
+<p>Last save time: [% lastSavedTime %] (Current time is: [% currentTime %])</p>
+
+<form method="post" action="[% baseUrl %]" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="title" value="[% id %]" />
+<input type="hidden" name="oldtime" value="[% pageTime %]" />
+<input type="hidden" name="oldconflict" value="[% isConflict %]" />
+[% IF revision %]
+  <input type="hidden" name="revision" value="[% revision %]" />
+[% END %]
+
+<textarea name="text" rows="20" cols="80" style="width:100%">
+[% oldText %]
+</textarea>
+
+<p class='editsubmit'>Summarize changes: <input type="text" name="summary" size="60" maxlength="200" /><br />
+<input type="checkbox" name="recent_edit" value="on" />This change is a minor edit.<br />
+<input type="submit" name="Save" value="Save" />
+[% IF userName %]
+  (Your user name is [% userName %].)
+[% ELSE %]
+  (<a href="[% baseUrl %]?action=login">Login</a> if you already have an
+  account, or visit <a href="[% preferencesUrl %]">Preferences</a> to
+  create one.)
+[% END %]
+<input type="submit" name="Preview" value="Preview" /></p>
+
+<hr />
+
+<p><b>This is the text you submitted:</b></p>
+
+<textarea name="newtext" rows="10" cols="80" style="width:100%">
+[% newText %]
+</textarea>
+
+<div><input type="hidden" name=".cgifields" value="recent_edit" /></div></form>
+
+[% INCLUDE common/footer.tt %]

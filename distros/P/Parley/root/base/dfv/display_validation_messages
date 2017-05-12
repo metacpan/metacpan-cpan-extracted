@@ -1,0 +1,22 @@
+[% # deal with validation errors %]
+[% IF validation.defined AND not validation.success %]
+    [% # import message data %] [% PROCESS dfv/validation_messages_data %]
+<span id="validation_errors">
+    [% IF validation.missing %]
+        [% FOR msg_key IN validation.missing %]
+        [% l(error_message.missing.$msg_key) || l('Missing form field: [_1]', msg_key) %]<br />
+        [% END %]
+    [% END %]
+
+    [% IF validation.invalid %]
+        [% FOR field_name IN validation.invalid %]
+            [% nice_field_name = error_message.name.$field_name || field_name%]
+            [% FOR invalid_key IN validation.invalid(field_name) %]
+                [% l(nice_field_name) %]:
+                [% l(error_message.invalid.$invalid_key) || invalid_key %]
+                <br />
+            [% END %]
+        [% END %]
+    [% END %]
+</span>
+[% END %]

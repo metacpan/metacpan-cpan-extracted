@@ -1,0 +1,155 @@
+NAME
+
+  PDFREP - create PDF Report files
+                                                                             
+  This module is used to create a basic data generated PDF file it's main     
+  Purpose is to be generic and usable by all perl scripts in an easy manner   
+  It does create all the indexes, but not the thumbnails. PNG and JPEG Images
+  are also allowed.
+                                                                             
+  DEVELOPMENT                                                                 
+                                                                             
+  STARTED                       26th June 2000                                
+  COMPLETED                     23rd July 2007
+                                                                             
+  VERSION                       2.20                                          
+                                                                             
+  WRITTEN BY                    Trevor Ward                                   
+                                                                             
+  Copyright (c) 2001 Trevor Ward. All rights reserved.                        
+  This program is free software; you can redistribute it and/or               
+  modify it under the same terms as Perl itself. 
+  
+  MODIFICATION INDEX           
+                                                                             
+  The version number to be incremented by .1 for each modification            
+                                                                             
+  Date        Version    By        Comments                                   
+                                                                             
+  28/06/2001  1.00       TRW       Initial Version
+  10/07/2001  1.01       TRW       Added Column Positioning.
+  04/08/2005  2.00       TRW       Bug Fixes and new features
+  23/07/2007  2.20       TRW       Bracket and Makefile Bug Fixes
+  
+INSTALLATION
+
+  REQUIRED.
+  
+  PERL 5.006
+  MODULES	GD
+  		CHART (for test system).
+  		CGI   (for test system).
+  		
+  To install manually, cd to the directory containing the unpacked
+  distribution and do one of the following:
+
+  a.  Create a makefile by running Makefile.PL using the perl
+      program into whose library you want to install and then run
+      make three times:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+  b.  To install into a private library, for example your home
+      directory:
+
+        perl Makefile.PL INSTALLSITELIB=$HOME/lib INSTALLMAN3DIR=$HOME/man
+        make
+        make test
+        make pure_install
+
+EXAMPLES
+
+  Rather than go into how the Module works in detail here. Within the zipped file is a 
+  complete test suite.
+  
+  pdftest.htm is the control HTML code.
+  pdftest.cgi is run by pdftest.htm.
+  pdftest.pm This contains the complete test code. Each line undertaken is documented.
+  
+OVERVIEW.
+  
+  A brief usage of PDFREP.
+  
+  use PDFREP;
+  
+  options:
+  
+  This sets up the PDF REP Module.
+
+  $pdfrep = PDFREP->new();
+
+  This is the first call which generates the pdf file. Hopefully the scalars explain what they are for.
+  
+  ($status, $message) = $pdfrep->heading($filenam, $filedir, $title, $author);
+
+  This sets a font to be used. (F1 is the internal reference for the font).
+   
+  ($status, $message) = $pdfrep->fontset('F1','Helvetica');
+
+  To start writing the data.
+  
+  A function can be used to return the line count to use in intelligent pageing.
+  
+  ($line_count)  = $pdfrep->lcnt();
+  
+  This is done by calling the Pagedata section of PDFREP. This section has various parameters
+  1 The type of data passed
+    np = new page
+    nl = new line
+    nc = new coloumn (using the offset).
+    im = new image
+    
+  The other parameters passed are
+  2  = The column offset . This is the amount of characters from the left hand column of the line.
+  3  = The font size to be used with the font set later. It is the text point size standard is 12
+  4  = The name of the font you want to use as previously set
+  5  = The size of the font on the next data line to allow for correct data throws.
+  6  = Italic 0 = No 1 = yes > 1 get some weird results.
+  7  = Red colour
+  8  = Green colour
+  9  = Blue colour 0 0 0 = black 1 1 1 = white
+  10 = The data. This is the textual data you require.
+  If image 10 contains the name of the image width and height ie. I2 300 60
+
+  For a new page line there are two extra parameters required page size and orientation. The document
+  must have the same all the way through
+
+  11 = Page Size LE = letter A4 = A4
+  12 = Page Orientation PO = Portrait LA = Landscape
+
+  Leaving these blank defaults to Letter Portrait
+
+
+  ($status, $message) = $pdfrep->pagedata('np','0','12','F2','12','0','0','0','0','This is the first bit of text','A4','PO');
+
+  ($status, $message) = $pdfrep->pagedata('nl','0','12','F1','12','0','0','0','0','This is the second bit of text');
+
+  To include an image into the PDF file. It uses the physical file on disc and can then be 
+  used at any point on any page.
+    
+  ($status, $message) = $pdfrep->include_image('I1','test1.png','600','350', 'png', '../');
+    
+  This is the im option for displaying page data
+    
+  ($status, $message) = $pdfrep->pagedata('im','0','12','F1','12','0','0','0','0','I1 600 350');
+
+  OK so are all the data lines and pages written now. Hope so because it's time to write the
+  PDF file. This might take a minute because it's playing with reading the temporary file and
+  outputting this to the PDF File, 
+  1 = Page size LE = Letter and A4 = A4 defaults to letter
+  2 = Page orientation PO = Portrait and LA = Landscape
+
+  ($status, $message) = $pdfrep->writepdf('A4','PO');
+
+  The module always returns the status and a message. so you can just check the status to see if an error
+  occured.
+  
+  
+  Well thats it enjoy the module and I hope it is useful.
+  
+  Please if you find any bugs or wish for any enhancements let me know and I will do
+  my best to accomodate them.
+  

@@ -1,0 +1,13 @@
+This module parses the PhoneCallDB database generated on Palm Treos.
+
+To install, do the usual dance:
+    less Makefile.PL
+    less lib/Palm/TreoPhoneCallDB.pm
+    less t/*
+those being to ensure that I'm not being evil.
+
+then do this to install the module:
+    perl Makefile.PL
+    make
+    make test
+    make install (you may need to do this as root)

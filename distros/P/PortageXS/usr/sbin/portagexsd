@@ -1,0 +1,220 @@
+#!/usr/bin/perl -t
+
+# -----------------------------------------------------------------------------
+#
+# PortageXSd
+#
+# author      : Christian Hartmann <ian@gentoo.org>
+# license     : GPL-2
+# header      : $Header: /srv/cvsroot/portagexs/trunk/usr/sbin/portagexsd,v 1.6 2007/04/09 18:32:13 ian Exp $
+#
+# -----------------------------------------------------------------------------
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# -----------------------------------------------------------------------------
+
+use strict;
+use warnings;
+use Path::Tiny qw(path);
+use PortageXS;
+use IO::Socket;
+use IO::Socket::SSL;
+use Sys::Syslog;
+
+my $pxs=PortageXS->new();
+my ($sock, $s, $v_mode, $c_addr);
+
+sub INT_handler {
+	syslog("info", "exiting...");
+	$sock->close();
+	exit(0);
+}
+
+$SIG{'INT'} = 'INT_handler';
+$SIG{'HUP'} = 'INT_handler';
+$SIG{'TERM'} = 'INT_handler';
+
+syslog("info", 'Starting up portagexs server version '.$pxs->{'VERSION'});
+
+if (!fork()) {
+	&main; # bye parent
+}
+else {
+	exit; # bye shell
+}
+
+sub main {
+	# - Parse config >
+	my %config	= ();
+    use PortageXS::MakeConf;
+    my $conf_data = PortageXS::MakeConf->new( files => [ $pxs->{PORTAGEXS_ETC_DIR}->child('portagexsd.conf') ] );
+
+	$config{'Port'} = $conf_data->getParam("Port","lastseen");
+	$config{'SSLpasswd'} = $conf_data->getParam("SSLpasswd","lastseen");
+	$config{'PidFile'} = $conf_data->getParam("PidFile","lastseen");
+	$config{'Query'} = $conf_data->getParam("Query","lastseen");
+	$config{'Alter'} = $conf_data->getParam("Alter","lastseen");
+	$config{'I_AM_ROOT_AND_I_KNOW_WHAT_I_AM_DOING'} = $conf_data->getParam("I_AM_ROOT_AND_I_KNOW_WHAT_I_AM_DOING","lastseen");
+
+	if (!$config{'I_AM_ROOT_AND_I_KNOW_WHAT_I_AM_DOING'}) {
+		syslog("info", 'Not starting server as it seems that you did not have a look at the configs yet! (/etc/pxs/portagexsd.conf)');
+		exit(0);
+	}
+
+	if(!($sock = IO::Socket::SSL->new( Listen => 5,
+				LocalPort => $config{'Port'},
+				Proto     => 'tcp',
+				Reuse     => 1,
+				SSL_verify_mode => 0x01,
+				SSL_passwd_cb => sub {return $config{'SSLpasswd'}},
+				SSL_key_file => $pxs->{PREFIX}->child('etc/pxs/certs/server-key.pem')->stringify,
+				SSL_cert_file => $pxs->{PREFIX}->child('etc/pxs/certs/server-cert.pem')->stringify,
+				SSL_ca_file => $pxs->{PREFIX}->child('etc/pxs/certs/my-ca.pem')->stringify,
+			)) ) {
+		syslog("info", "Unable to create socket: ", &IO::Socket::SSL::errstr);
+		exit(0);
+	}
+	syslog("info", "socket created: ".$sock);
+	syslog("info", 'Started new server on port '.$config{'Port'}.' with process id '.$$);
+
+	while (1) {
+		syslog("info", "waiting for next connection.");
+
+		while (($s, $c_addr) = $sock->accept()) {
+			my ($peer_cert, $subject_name, $issuer_name, $date, $str);
+			my ($client_port, $c_ip) = sockaddr_in($c_addr);
+			my $client_ipnum = inet_ntoa($c_ip);
+			my $client_host = gethostbyaddr($c_ip, AF_INET);
+			syslog("info", "got a connection from: $client_host"," [$client_ipnum] ");
+
+			if (!$s) {
+				syslog("info", "error: ", $sock->errstr);
+				next;
+			}
+
+			syslog("info", "connection opened ($s - $c_ip)");
+
+			if (ref($sock) eq "IO::Socket::SSL") {
+				$subject_name = $s->peer_certificate("subject");
+				$issuer_name = $s->peer_certificate("issuer");
+			}
+
+			syslog("info", "\t subject: '$subject_name'");
+			syslog("info", "\t issuer: '$issuer_name'");
+			while (<$s>) {
+				my $command=$_;
+				chomp($command);
+
+				if ($command eq "date") {
+					if ($config{'Query'} eq "true") {
+						syslog("info", "from ".$client_host.": ".$command);
+						print $s "1\n";
+						print $s `date`;
+					}
+					else {
+						print $s "1\n";
+						print $s "error - server configuration does not allow this operation.\n";
+					}
+				}
+				elsif ($command eq "version") {
+					if ($config{'Query'} eq "true") {
+						syslog("info", "from ".$client_host.": ".$command);
+						print $s "1\n";
+						print $s 'PortageXS version '.$pxs->{'VERSION'}."\n";
+					}
+					else {
+						print $s "1\n";
+						print $s "error - server configuration does not allow this operation.\n";
+					}
+				}
+				elsif ($command eq "getArch") {
+					if ($config{'Query'} eq "true") {
+						syslog("info", "from ".$client_host.": ".$command);
+						print $s "1\n";
+						print $s $pxs->getArch()."\n";
+					}
+					else {
+						print $s "1\n";
+						print $s "error - server configuration does not allow this operation.\n";
+					}
+				}
+				elsif ($command eq "emerge --sync") {
+					if ($config{'Alter'} eq "true") {
+						syslog("info", "from ".$client_host.": ".$command);
+						print $s "1\n";
+						system("emerge --sync");
+						print $s "done\n";
+					}
+					else {
+						print $s "1\n";
+						print $s "error - server configuration does not allow this operation.\n";
+					}
+				}
+				elsif ($command=~m/searchInstalledPackage (.+)/ || $command eq 'searchInstalledPackage') {
+					if ($config{'Query'} eq "true") {
+						syslog("info", "from ".$client_host.": ".$command." ".$1);
+						my @res = $pxs->searchInstalledPackage($1);
+						print $s ($#res+1)."\n";
+						foreach (@res) {
+							print $s $_."\n";
+						}
+					}
+					else {
+						print $s "1\n";
+						print $s "error - server configuration does not allow this operation.\n";
+					}
+				}
+				elsif ($command=~m/searchPackage (.+)/ || $command eq 'searchPackage') {
+					if ($config{'Query'} eq "true") {
+						syslog("info", "from ".$client_host.": ".$command." ".$1);
+						my @res = $pxs->searchPackage($1);
+						print $s ($#res+1)."\n";
+						foreach (@res) {
+							print $s $_."\n";
+						}
+					}
+					else {
+						print $s "1\n";
+						print $s "error - server configuration does not allow this operation.\n";
+					}
+				}
+				elsif ($command eq "help" || $command eq "?") {
+					syslog("info", "from ".$client_host.": ".$command);
+					print $s "9\n";
+					print $s "Server offers these commands:\n";
+					print $s "date                             : show date\n";
+					print $s "version                          : display PortageXS version\n";
+					print $s "getArch                          : show arch info\n";
+					print $s "emerge --sync                    : `emerge --sync`\n";
+					print $s "searchInstalledPackage [value]   : list installed packages matching given value\n";
+					print $s "searchPackage [value]            : list packages matching given value\n";
+					print $s "help                             : show server commands\n";
+					print $s "bye                              : close connection to server\n";
+				}
+
+
+				elsif ($command eq "bye" || $command eq "quit" || $command eq "exit") {
+					syslog("info", $client_host." disconnected");
+					last;
+				}
+				else {
+					syslog("info", "from ".$client_host." unknown command: ".$command);
+					print $s "1\n";
+					print $s "error\n";
+				}
+			}
+
+			close($s);
+			syslog("info", $client_host."> Connection closed.");
+		}
+	}
+
+	$sock->close();
+	syslog("info", "loop exited.");
+}
+
+exit(0);

@@ -1,0 +1,55 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+use lib './lib';
+use base 'LEOCHARRE::CLI';
+use PDF::OCR::Thorough::Cached;
+#use Smart::Comments '###';
+
+
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /(\d+)/g;
+
+my $conf = config('/etc/pdf2ocr.conf');
+
+my $o= gopts('c:');
+
+
+my $pdfs = argv_aspaths();
+
+scalar @$pdfs or man();
+
+
+for (@$pdfs){ ### Turning to text <%===       >
+   my $p = new PDF::OCR::Thorough::Cached($_) or next;
+	$p->set_abs_cache($conf->{abs_cache});
+
+	$p->is_cached or $p->get_text;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+pdf2ocrturntotext
+
+=head1 USAGE
+
+	pdf2ocrturntotext ./*pdf
+
+
+=head1 DESCRIPTION
+
+This feeds the cache for files provided as argument
+
+=head1 SEE ALSO
+
+PDF::OCR::Thorough::Cached
+pdf2ocr
+PDF::OCR - this package
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+

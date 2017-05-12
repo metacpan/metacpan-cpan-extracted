@@ -1,0 +1,35 @@
+---
+abstract: 'A Collection of Perlish Interfaces to the Gnu Scientific Library'
+author:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3901, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PerlGSL
+no_index:
+  file:
+    - README.pod
+provides:
+  PerlGSL:
+    file: lib/PerlGSL.pm
+    version: 0.002
+recommends:
+  PerlGSL::DiffEq: 0.08
+requires:
+  PerlGSL::DiffEq: 0.08
+  PerlGSL::Integration::MultiDim: 0.003
+  PerlGSL::Integration::SingleDim: 0.002
+  PerlGSL::RootFinding::SingleDim: 0.001
+  parent: 0
+  perl: 5.008
+resources:
+  bugtracker: http://github.com/jberger/PerlGSL/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/PerlGSL
+version: 0.002

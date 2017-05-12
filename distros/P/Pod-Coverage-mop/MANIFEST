@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Pod/Coverage/mop.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-basic.t
+t/10-mop-class.t
+t/20-mop-role.t
+t/30-non-mop.t
+t/40-complex-mop-class.t
+t/lib/ComposedMopClass.pm
+t/lib/PureMopClass.pm
+t/lib/PureMopRole.pm
+t/lib/PurePerlClass.pm

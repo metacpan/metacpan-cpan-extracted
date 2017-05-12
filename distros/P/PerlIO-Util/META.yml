@@ -1,0 +1,32 @@
+---
+abstract: 'A selection of general PerlIO utilities'
+author:
+  - 'Goro Fuji (藤 吾郎) <gfuji(at)cpan.org>.'
+build_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.42
+  ExtUtils::ParseXS: 2.21
+  Test::More: 0.62
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: PerlIO::Util
+name: PerlIO-Util
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  XSLoader: 0.02
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.72

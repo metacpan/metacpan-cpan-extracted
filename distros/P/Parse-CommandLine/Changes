@@ -1,0 +1,8 @@
+Revision history for Perl extension Parse-CommandLine
+
+0.02 2014-06-19T03:10:24Z
+    - [bugfix] care sequenced white spaces
+
+0.01 2014-05-06T04:46:44Z
+    - original version
+

@@ -1,0 +1,44 @@
+Pod-Advent
+
+POD Formatter for The Perl Advent Calendar
+
+This module provides a POD formatter that is designed to facilitate the create of submissions for The Perl Advent Calendar (L<http://perladvent.pm.org>) by providing authors with simple markup that will be automatically transformed to full-fill the specific formatting guidelines. This makes it easier for authors to provide calendar-ready submissions, and for the editors to save lots of time in editting submissions.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Pod::Advent
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pod-Advent
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Pod-Advent
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Pod-Advent
+
+    Search CPAN
+        http://search.cpan.org/dist/Pod-Advent
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2011 David Westbrook
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

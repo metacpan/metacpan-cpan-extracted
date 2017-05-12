@@ -1,0 +1,14 @@
+Revision history for Pod-Weaver-Plugin-Encoding
+
+0.03      2015-07-02 01:12:26Z
+ - eliminate dependency on List::AllUtils
+ - fix recursive searching inside subnodes
+ - eliminate dependency on Moose::Autobox
+ - marked distribution as deprecated in docs and metadata
+
+0.02      2013-10-23
+ - default encoding was changed from 'utf-8' 'to UTF-8'
+ - link was fixed in Pod (haarg++)
+
+0.01      2010-06-05
+ - Initial release.

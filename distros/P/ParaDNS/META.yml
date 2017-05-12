@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                ParaDNS
+version:             2.0
+abstract:            a DNS lookup class for the Danga::Socket framework
+license:             ~
+author:              
+    - Matt Sergeant <matt@sergeant.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Danga::Socket:                 0.52
+    Net::DNS:                      0.48
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

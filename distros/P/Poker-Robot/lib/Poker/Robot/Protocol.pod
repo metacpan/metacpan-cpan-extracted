@@ -1,0 +1,36 @@
+
+=encoding utf8
+
+=head1 NAME
+
+Poker::Robot::Protocol - low-level poker protocol 
+
+=head1 VERSION
+
+Version 0.01.  
+
+=cut
+
+our $VERSION = '0.01';
+
+=head1 INTRODUCTION
+
+Stub documentation. See Poker::Robot. 
+
+=head1 AUTHOR
+
+Nathaniel Graham, C<ngraham@cpan.org>
+
+=head1 SEE ALSO
+
+L<Poker::Robot>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016 Nathaniel Graham.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+=cut

@@ -1,0 +1,56 @@
+Revision history for Perl extension Pogo.
+
+0.01  1999/12/7
+	- original version; created by h2xs 1.19
+
+0.02  1999/12/17
+	- first release
+
+0.03  1999/12/18
+	- fix a bug in Pogo::Array::remove
+	- fix a bug in Pogo::Array::SPLICE
+	- add a document of Pogo::Btree::find_key
+
+0.04  1999/12/19
+	- add Pogo::wait_modification function
+
+0.05  1999/12/20
+	- fix a bug in browse
+	- rename Pogo::who to Pogo::type_of
+	- add a sample script schedule.pl
+
+0.06  1999/12/27
+	- add Pogo::Btree::last_key and Pogo::Btree::prev_key methods
+	- add Pogo::equal and Pogo::object_id functions
+	- browse shows object id
+
+0.07  2000/1/15
+	- fix a bug in Pogo::equal
+	- add Pogo::Ntree
+	- modify new_tie's to accept $pogo and $blessclass arguments
+	- add PogoLink.pm
+	- add sample/person.pl
+
+0.08  2000/1/18
+	- fix a bug in pogocall.c
+	- modify documents in PogoLink.pm
+	- add PogoLink.jp.pod
+
+0.09  
+	- CAUTION! database structure is changed! 
+	- make Pogo and Pogo::* classes derivable
+	- modify new_tie's to take not $pogo but $pogovar
+	- add Pogo::get_root_tie(), Pvar::root_tie(), Pvar::root()
+	- modify Pogo::equal() to be available for not object
+	- modify PogoLink.pm to be available for array or pseudo-hash objects
+	- modify PogoLink::*::new to accept $size argument
+	- modify PogoLink::* classes to use array but hash
+	- change Pogo::Array default size to 0 but 1
+	- fix a bug of Pogo::type_of()
+	- task::initialize() at bootstrap
+	- Pogo::Var::call() can return list
+
+0.10
+	- -D option for Makefile.PL available
+	- Pogo::opened() method added
+	- Pogo::get_root_tie method added

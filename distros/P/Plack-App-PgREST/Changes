@@ -1,0 +1,20 @@
+Revision history for Perl extension Plack::App::PgREST
+
+
+0.06 Wed Apr 24 13:29:42 CST 2013
+        - use plv8x-based pgrest
+
+0.05  Tue Feb  5 20:31:49 CST 2013
+        - postgres 9.0 compatibility
+
+0.04  Fri Feb  1 22:57:40 CST 2013
+        - fix missing deps
+
+0.03  Mon Jan 18 15:30:01 2013
+        - install livescript to sharedir and update instructions
+
+0.02  Mon Jan 18 14:30:01 2013
+        - dist cleanups
+
+0.01  Mon Jan  7 17:18:01 2013
+        - original version

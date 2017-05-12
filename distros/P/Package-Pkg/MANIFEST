@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Package/Pkg.pm
+lib/Package/Pkg/Lexicon.pm
+lib/Package/Pkg/Loader.pm
+t/01-basic.t
+t/02-install.t
+t/03-name.t
+t/03-package.t
+t/04-loader.t
+t/05-lexicon.t

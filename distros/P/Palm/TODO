@@ -1,0 +1,19 @@
+- POD for add-memo.
+- Add support for general-purpose parsers: read the database type (PDB
+  or PRC), creator, and type, and look them up in a database. This
+  should return the name of a Perl module to use to parse that
+  particular database type.
+	The best way of doing this appears to be
+
+	sub load_module
+	{
+		eval "require $_[0]";
+		die if $@;
+		$_[0]->import($_[1..$#_]);
+	}
+  See "Perl Cookbook," 12.3.
+- Add PRC support. Unlike PDBs, the thing to do here is to have
+  registered handlers for various resource types.
+- Add PQA parser.
+- Make $VERSION be a floating-point number. See mail from Andreas J.
+  Koenig <andreas.koenig@anima.de>

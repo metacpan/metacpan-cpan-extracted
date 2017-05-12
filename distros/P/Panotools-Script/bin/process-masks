@@ -1,0 +1,91 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use File::Temp qw/tempdir/;
+use File::Spec;
+use File::Copy;
+
+die "Usage:\n  $0 image1_mask.tif image2_mask.tif [image3_mask.tif ...]\n" unless @ARGV;
+
+my $tempdir = tempdir (CLEANUP => 1);
+
+my $maskdir = File::Spec->catfile ($tempdir, 'mask');
+my $pushdir = File::Spec->catfile ($tempdir, 'push');
+my $workdir = File::Spec->catfile ($tempdir, 'work');
+
+mkdir $maskdir;
+mkdir $pushdir;
+mkdir $workdir;
+
+for my $path (@ARGV)
+{
+    my ($vol, $dir, $file) = File::Spec->splitpath ($path);
+    my $maskdir_file = File::Spec->catfile ($maskdir, $file);
+    my $pushdir_file = File::Spec->catfile ($pushdir, $file);
+    my $workdir_file = File::Spec->catfile ($workdir, $file);
+    system ('convert', '-threshold', '99%', $path, $maskdir_file);
+    system ('convert', '-negate', $maskdir_file, $pushdir_file);
+    copy ($path, $workdir_file);
+}
+
+for my $path (@ARGV)
+{
+    my ($vol, $dir, $file) = File::Spec->splitpath ($path);
+    my $tempdir_file = File::Spec->catfile ($tempdir, $file);
+    my $workdir_file = File::Spec->catfile ($workdir, $file);
+
+    for my $temp (@ARGV)
+    {
+        next if ($temp eq $path);
+        my ($vol, $dir, $temp) = File::Spec->splitpath ($temp);
+        my $pushdir_temp = File::Spec->catfile ($pushdir, $temp);
+        my $maskdir_temp = File::Spec->catfile ($maskdir, $temp);
+        system ('composite', $pushdir_temp, $workdir_file, $maskdir_temp, $tempdir_file);
+        move ($tempdir_file, $workdir_file);
+    }
+
+    move ($path, "$path.bak.tif");
+    move ($workdir_file, $path);
+}
+
+__END__
+
+=head1 NAME
+
+process-masks - Preprocessor for enblend masks
+
+=head1 Synopsis
+
+  process-masks image1_mask.tif [image2_mask.tif ...]
+
+=head1 DESCRIPTION
+
+Transfers white areas in each mask (indicating pixels to keep) as black areas
+in other masks.  Areas to be blended need to be indicated as shades of grey.
+
+Pass mask tif files as program arguments, originals are renamed and
+replaced by processed files.
+
+Requires ImageMagick.
+
+Note masks can be any bit depth, but with no alpha channel.
+
+L<http://www.bruno.postle.net/neatstuff/enblend-mask/>
+L<http://enblend.sourceforge.net/>
+
+=head1 License
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 See Also
+
+L<perl>, L<Panotools::Script>
+
+=head1 Author
+
+October 2006, Bruno Postle <bruno AT postle.net>
+

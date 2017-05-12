@@ -1,0 +1,121 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; find()</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>find()</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+function<BR>
+<UL>
+<LI><B>find</B>
+<LI><A HREF=change.html>change</A>
+<LI><A HREF=select.html>select</A>
+</UL>
+<P>
+find in:<BR>
+<UL>
+<LI><A HREF=#show>show</A><BR>
+<LI><A HREF=#style>style</A><BR>
+<LI><A HREF=#viewport>viewport</A><BR>
+</UL>
+<P>
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.
+Presentations are written in options to style-elements grouped into
+<A HREF=../style/index.html>styles</A>.  Well, sometimes you like to
+find style-elements in the large number of list kept around.
+<P>
+The following searches are available:
+<UL>
+<LI>selections <A HREF=#show>for a show</A>.
+<LI>selections <A HREF=#style>for a style</A>.
+<LI>selections <A HREF=#viewport>for a viewport</A>.
+</UL>
+A find is always of the form:
+<PRE>
+   my $o = <I>$object</I>-&gt;find('<I>objtype</I>', <I>name</I>);
+   my $o = <I>$object</I>-&gt;find(<I>objtype</I> =&gt; <I>name</I>);
+   my $o = <I>$object</I>-&gt;find('<I>objtype</I>');
+   my $o = <I>$object</I>-&gt;find(<I>objtype</I> =&gt; 'SELECTED');
+   my @o = <I>$object</I>-&gt;find(<I>objtype</I> =&gt; 'ALL');
+</PRE>
+Where the <EM>name</EM> is:
+<UL>
+<LI>a name of an object of the required type,
+<LI>one of the aliases of an object of the required type,
+<LI>a sequence number in the list,
+<LI><CODE>'FIRST'</CODE>, <CODE>'LAST'</CODE>, or
+<LI><CODE>'SELECTED'</CODE> (default!).
+</UL>
+Without a name, you will get the <CODE>SELECTED</CODE>.
+<P>
+A strange case is with <CODE>'ALL'</CODE>, because that returns a
+whole list, instead of a single element.
+
+<H2>Find on a <A NAME=show>Show</A></H2>
+
+Handled by show itself:
+<PRE>
+   my $style    = $show-&gt;find(style    =&gt; 'default');
+   my $viewport = $show-&gt;find(viewport =&gt; 'control');
+   my $slide    = $show-&gt;find(slide    =&gt; 'FIRST');
+</PRE>
+All other finds on a show are passed to the selected style.  The
+following two lines are equivalent:
+<PRE>
+   $show-&gt;find(formatter =&gt; 'plain');
+   $show-&gt;find('style')-&gt;find(formatter =&gt; 'plain');
+</PRE>
+
+<H2>Finds on a <A NAME=style>Style</A></H2>
+
+A style is a combination of lists of style-elements. You can search in
+those lists with find.
+<P>
+A few ways you can use this select function:
+<PRE>
+   $show-&gt;addStyle(<I>...options...</I>)
+         -&gt;find(formatter =&gt; 'plain');
+   my $style = $show-&gt;find(style =&gt; 'slidenotes')
+         -&gt;find(formatter =&gt; 'simple');
+   $style-&gt;find(formatter =&gt; 'markup');
+   $style->find('decoration');
+</PRE>
+
+<H2>Selections on a <A NAME=viewport>Viewport</A></H2>
+
+A viewport has a selected style, which determines how a slide for that
+viewport should be displayed.  A find on a viewport will result in a
+find on the selected style.
+<P>
+<PRE>
+  $show-&gt;find(viewport =&gt; 'control')
+       -&gt;find(style    =&gt; 'slidenotes');
+  $show-&gt;addViewport(<I>...options...</I>)
+       -&gt;find(dynamic  =&gt; 'default');
+  $show-&gt;find(viewport)
+       -&gt;find(template =&gt; 'tm');
+</PRE>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

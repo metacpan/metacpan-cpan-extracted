@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: ORBit
+Description: High-performance CORBA Object Request Broker.
+Version: 0.5.17
+Requires: glib
+Libs: -L${libdir} -lORBit -lIIOP -lORBitutil  -lm
+Cflags: -I${includedir}

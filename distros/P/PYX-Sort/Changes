@@ -1,0 +1,11 @@
+0.03 2015-10-21T15:02:50+02:00
+ - Add tests for parse() and parse_handler() methods.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+
+0.02 2015-03-22T01:14:29+01:00
+ - Fix dependencies for PYX::Parser.
+
+0.01 2015-03-20T19:05:32+01:00
+ - First version.

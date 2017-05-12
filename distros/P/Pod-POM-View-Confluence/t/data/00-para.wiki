@@ -1,0 +1,2 @@
+A paragraph is a set of lines in pod.
+It is a single line in Confluence.

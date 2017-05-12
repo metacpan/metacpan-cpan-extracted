@@ -1,0 +1,5 @@
+* MySQL backend
+* mod_perl, FastCGI servers
+* Factory class for Purple::Sequence, so we can have custom sequence
+  generators
+* Documentation, baby!

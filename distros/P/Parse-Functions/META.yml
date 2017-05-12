@@ -1,0 +1,29 @@
+---
+abstract: 'list all the functions in source code'
+author:
+  - 'Gabor Szabo C<szabgab@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.12'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-Functions
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/PadreIDE/Parse-Functions/issues
+  homepage: http://padre.perlide.org/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/PadreIDE/Parse-Functions
+version: '0.01'

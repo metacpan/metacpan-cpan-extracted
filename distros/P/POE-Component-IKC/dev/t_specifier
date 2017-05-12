@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+use strict;
+
+use lib qw(blib/lib blib/arch);
+
+use Data::Dumper;
+use POE::Component::IKC::Specifier;
+
+
+my($t, $d);
+foreach my $foo (qw(poe:kernel/session/state poe:/session/state 
+                    poe:*/session poe://kernel/session/state
+                    poe://kernel/session poe:///session/state
+                    poe://host:303/session/state poe://kernel
+                    poe:state poe:/session))
+{
+    print "======== $foo\n";
+    $t=specifier_parse($foo);
+    if($t)
+    {
+        $d=Dumper $t;
+        $d=~s/\s+/ /g;
+        print "$d\n";
+        $t=specifier_name($t);
+        print "$t\n";
+    } else
+    {
+        print "Invalid\n";
+    }
+    print "\n";
+}

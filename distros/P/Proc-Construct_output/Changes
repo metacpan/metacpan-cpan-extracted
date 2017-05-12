@@ -1,0 +1,6 @@
+Revision history for Perl extension Proc::Construct_output.
+
+0.01  Mon Oct 13 20:33:13 2003
+	- original version; created by h2xs 1.22 with options
+		-XA -n Proc::Construct_output
+

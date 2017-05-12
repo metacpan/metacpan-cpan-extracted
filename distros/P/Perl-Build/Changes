@@ -1,0 +1,243 @@
+Revision history for Perl extension App::perlbuild
+
+1.13 2016-04-02T05:40:07Z
+
+    commit d757b7f982b8efa48d1b802b7fd91c4ff0c03040
+    Merge: 37a22d8 db28ded
+    Author: Tatsuhiko Miyagawa <miyagawa@gmail.com>
+    Date:   Sat Jan 23 09:05:09 2016 -0800
+
+        Merge pull request #54 from tokuhirom/rc-version
+
+        Remove RC version
+
+    commit db28ded756fe80b092a233d98cbce85a5c9ddd77
+    Author: Syohei YOSHIDA <syohex@gmail.com>
+    Date:   Sat Jan 23 17:23:16 2016 +0900
+
+        Remove RC version
+
+        Because old RC versions were removed.
+
+    commit 37a22d802074be898c8dcd0c1fa49ccbf20b57a0
+    Author: Tokuhiro Matsuno <tokuhirom@gmail.com>
+    Date:   Fri Jan 8 19:09:20 2016 +0900
+
+        Rerun fatpacker - Close #52
+
+    commit 445bb6a7cc87ab4c28ca976f0449821b9403082a
+    Merge: 320b022 4c2c637
+    Author: Tokuhiro Matsuno <tokuhirom@gmail.com>
+    Date:   Fri Sep 18 14:47:19 2015 +0900
+
+        Merge pull request #51 from tokuhirom/fix-xz-fetch-issue
+
+        Fix xz fetch issue
+
+    commit 4c2c637578ca8c1d146c873f9494e810f64b39ab
+    Author: Syohei YOSHIDA <syohex@gmail.com>
+    Date:   Fri Sep 18 14:46:07 2015 +0900
+
+        Update perl-build
+
+    commit 8fc95b0fb9f964f6b202404bc79336080dd63e92
+    Author: Syohei YOSHIDA <syohex@gmail.com>
+    Date:   Fri Sep 18 14:44:04 2015 +0900
+
+        Fix fetching .xz file issue
+
+1.12 2015-09-15T02:58:10Z
+
+    - support cperl.
+    - support installing from https
+
+1.11 2015-07-07T23:25:44Z
+
+    - Support stableperl(moznion)
+
+1.10 2014-09-29T06:54:29Z
+
+    - support PERL_BUILD_COMPILE_OPTIONS env (charsbar)
+
+1.09 2014-09-24T02:46:59Z
+
+    - add support for install blead from perl5.git snapshot
+      (charsbar, syohex)
+
+1.08 2014-06-09T02:57:17Z
+
+    - requires newer Pod::Usage for fixing a dependencies error on perl-5.8
+      (kazeburo)
+    - change shebang of perl-build command
+      (kazeburo)
+
+1.07 2014-06-05T07:02:16Z
+
+    - Change default cpan mirror to www.cpan.org.
+      (kazeburo++)
+    - use perl-releases page instead of scraping search.cpan.org
+      (kazeburo++)
+    - update github raw content URI
+      ref: https://developer.github.com/changes/2014-04-25-user-content-security/
+      (chiba)
+
+1.06 2014-04-04T01:11:10Z
+
+    commit e04fcb3280188992fb3ebf85bf93ca11391b08ef
+    Author: tokuhirom <tokuhirom@gmail.com>
+    Date:   Tue Nov 5 09:02:09 2013 +0900
+
+        Support -D,-A,-U,-j as a first argument.
+        https://github.com/tokuhirom/plenv/issues/61
+
+    commit 2c59fa4836d6dab57b1fe079f4e0ca1ff5350f01
+    Author: Katsuhiro KONISHI <konishi@hauN.org>
+    Date:   Thu Oct 17 17:43:07 2013 +0900
+
+        change /usr/bin/perl to $^X
+
+1.05 2013-09-04T01:46:13Z
+
+    - document `--test` option.
+      (tokuhirom)
+    - Tweaks needed for conformance with CPAN::Changes::Spec
+      (Neil Bowers)
+    - plenv-install: Use 'permute' option for Getopt::Long::Parser
+      It allows `plenv install 5.18.1 -Dusedtrace --as 5.18.1-dtrace`.
+      This issue was reported by hanekomu.
+      (tokuhirom)
+
+1.04 2013-08-13T00:03:11Z
+
+    - Added --as option for plenv-install command
+      (tokuhirom)
+    - fix case for PLENV_ROOT environment variable in plenv-uninstall
+      (Akihiro Uchida)
+    - Provide plenv completions. Closed #13
+      (tokuhirom)
+
+1.03 2013-05-31T00:35:58Z
+
+    - It works well as plugin for plenv.
+      (tokuhirom)
+
+1.01 2013-05-29T21:27:28Z
+
+    - Added --symlink-devel-executables option.
+      (tokuhirom)
+    - Added --version option
+      (tokuhirom)
+
+1.00 2013-05-29T09:01:22Z
+
+    [INCOMPATIBLE CHANGES]
+    - `--definitions` and #available_versions returns version number without 'perl-' prefix.
+      (tokuhirom)
+
+0.21 2013-05-28T14:35:30Z
+
+    - Added `--definitions` option. This option is same as ruby-build.
+      (tokuhirom)
+
+0.20 2013-05-17T00:46:48Z
+
+    - use 'test_harness' for parallel testing.
+      (tokuhirom)
+    - Added --tarball-dir option
+      (tokuhirom)
+
+0.19 2013-05-16T02:17:08Z
+
+    - no feature changes
+
+0.18 2013-05-16T01:51:30Z
+
+    - Support --jobs for parallel building.
+      (tokuhirom)
+    - Install from url
+      (tokuhirom)
+
+0.17 2013-04-05T08:36:20Z
+
+    - Perl::Build::Built::new should take HashRef
+      Broken at 0.16.
+      (syohex)
+
+0.16 2013-04-04T04:08:37Z
+
+    - Add a Built package and integrate it into Build.pm
+      (Kent Fredric)
+
+0.15 2013-04-01T01:55:25Z
+
+    - Grammar fix and Typo fixes.
+      (Mark Stosberg)
+
+0.14 2013-03-31T07:23:51Z
+
+    - Documentation enhancements suggested by markstos
+      (tokuhirom)
+
+0.13 2013-03-29T23:46:30Z
+
+    - add to support build-dir command-line option
+      (typester)
+
+0.12 2013-03-28T07:52:13Z
+
+    - packaging, again.
+      Back to Module::Build from Module::Build::Tiny.
+
+0.11 2013-03-28T02:45:03Z
+
+    - re-packaging
+
+0.10 2013-03-27T12:08:57Z
+
+    - Perl5 installs public executable scripts(like `prove`) to /usr/local/share/
+      if it exists.
+      This -A'eval:scriptdir=$prefix/bin' option avoid this feature.
+      (Reported by moznion++)
+
+0.09 2013-03-27T05:13:03Z
+
+    - Remove 'patchperl' option in OO APIs.
+      Use Devel::PatchPerl as a library.
+      (tokuhirom)
+
+0.08 2013-03-22T20:32:06
+
+    - minil-ized
+      (tokuhirom)
+
+0.06 2013-03-10T10:37:42
+
+    - Depend to latest Devel::PatchPerl
+      It removes dependency for IPC::Cmd.
+      (tokuhirom)
+
+0.05 2013-02-01T15:00:50
+
+    commit 1d9912144703e31079ac71f56e0616af4bddee77
+    Author: Syohei YOSHIDA <syohex@gmail.com>
+    Date:   Wed Jan 30 13:58:05 2013 +0900
+
+    Fixed for parsing command line arguments
+
+      - Loop for @D, @A, @U makes no sense
+      - Remove '--' if @ARGV contains it(See also Getopt::Long document).
+
+0.04 2013-01-24T12:19:57
+
+    - switch to HTTP::Tiny
+      (tokuhirom)
+
+0.03 2013-01-23
+
+    - support relative path to install tar ball
+      (tokuhirom)
+
+    - more documentations
+
+0.01 2013-01-12T17:18:43
+    - original version

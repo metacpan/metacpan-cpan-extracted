@@ -1,0 +1,29 @@
+##############################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/tags/Perl-Critic-Dynamic-0.05/xt/author/40_perlcriticrc $
+#     $Date: 2010-09-30 10:38:12 -0700 (Thu, 30 Sep 2010) $
+#   $Author: thaljef $
+# $Revision: 3943 $
+##############################################################################
+
+severity = 1
+theme = core
+
+#-----------------------------------------------------------------------------
+
+[-CodeLayout::RequireTidyCode]
+[-Dynamic::ValidateAgainstSymbolTable]
+[-Documentation::RequirePodLinksIncludeText]
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|DESCRIPTION|AUTHOR|COPYRIGHT
+script_sections = NAME|DESCRIPTION|AUTHOR|COPYRIGHT
+
+[Miscellanea::RequireRcsKeywords]
+keywords = URL Date Author Revision
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[InputOutput::RequireCheckedSyscalls]
+functions = open close
+

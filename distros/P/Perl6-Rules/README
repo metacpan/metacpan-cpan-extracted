@@ -1,0 +1,52 @@
+==============================================================================
+                   Release of version 0.03 of Perl6::Rules
+==============================================================================
+
+
+Perl6/Rules version 0.01
+=========================
+
+This module prototypes the Perl 6 pattern matching and grammar syntax.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Attribute::Handlers
+  Filter::Simple
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 The Perl Foundation
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+
+
+==============================================================================
+
+CHANGES IN VERSION 0.03
+
+
+	- Fixed stupid version requirement
+
+
+==============================================================================
+
+AVAILABILITY
+
+Perl6::Rules has been uploaded to the CPAN
+
+==============================================================================

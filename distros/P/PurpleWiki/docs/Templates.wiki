@@ -1,0 +1,173 @@
+= PurpleWiki Templates =
+
+Beginning with v0.93, PurpleWiki allows you to customize look-and-feel
+using [[Templates]].  By default, PurpleWiki uses TemplateToolkit for
+template support.  However, it can be customized to use other template
+libraries as well.
+
+Every function on PurpleWiki has an associated template.  For example,
+viewPage.tt is called whenever someone views a page.  editPage.tt is
+called whenever someone edits a page.
+
+By default, templates are stored in wikidb/templates (configurable in
+the config file under TemplateDir), which uses the following directory
+structure:
+
+;templates:Each of these templates map to some PurpleWiki function
+;templates/errors:Each of these map to a PurpleWiki error
+;templates/common:These are the common elements that appear on every
+                  PurpleWiki page, such as the header and footer.
+                  Most people will be able to get the look-and-feel
+                  that they want by only modifying these files.
+;templates/lib:Some of the more complicated look-and-feel elements,
+               such as recentChanges.tt, are encapsulated here.  Most
+               people will most likely not edit these, although they
+               are there if you want to do so.
+
+Most of the files in the templates directory take the form:
+
+{{{
+  [% INCLUDE common/header.tt
+             title = "Some title"
+  %]
+
+  Some text relevant to the functionality of the page.  For example,
+  in viewPage.tt, this contains a reference to the body variable.  In
+  editPage.tt, this contains an HTML form for editing the content of a
+  page.
+
+  [% INCLUDE common/footer.tt %]
+}}}
+
+As you can see from this example, most people will be able to
+customize the entire look-and-feel of their site just by editing the
+common/header.tt and common/footer.tt templates.
+
+= Template Variables =
+
+The variables that are available for each template should be
+self-explanatory.  This section lists some of the common and
+noteworthy variables.
+
+The following variables are available to all templates:
+
+;siteName:Name of the site.  Corresponds to <nowiki>SiteName</nowiki>
+          in wikidb/config.
+;baseUrl:Base URL used for constructing URLs for accessing Wiki pages,
+         actions, etc.  Corresponds to <nowiki>ScriptName</nowiki> in
+         wikidb/config.
+;homePage:Name of the Wiki home page.  Corresponds to
+          <nowiki>HomePage</nowiki> in wikidb/config.
+;userName:Username.  If user is not logged in, this variable is
+          undefined.
+;preferencesUrl:URL for editing preferences.
+
+The view and edit templates all use pageName, which corresponds to the
+name of the page being viewed or edited.  The edit templates also use
+id, which corresponds to the internal page name.  The only time the
+internal page name is different from the displayed page name is when
+the name has spaces in it.  For example, <nowiki>[[Hello
+World]]</nowiki> would link to a page of id "Hello_World" and of
+pageName "Hello World".
+
+Both the view and edit templates also have access to visitedPages,
+which is a list of hashes containing the pageName and id of recently
+visited pages:
+
+{{{
+  visitedPages = [
+      {
+           id => ...,
+           pageName => ...
+      },
+      ...
+  ]
+}}}
+
+viewPage.tt and viewRecentChanges.tt have access to expandedPageName,
+which adds spaces to page names that are WikiWords.  By default, this
+is used in the HTML <title> attribute so that search engines do a more
+accurate job of indexing Wiki pages.  You could easily use it for the
+page headline as well.
+
+lib/pageHistory.tt displays the pageHistory variable, a list of
+metadata associated with each version of a page:
+
+{{{
+  pageHistory = [
+      {
+          revision => ...,
+          pageUrl => ...,
+          diffUrl => ...,
+          dateTime => ...,
+          user => ...,
+          host => ...,
+          summary => ...
+      },
+      ...
+  ]
+}}}
+
+lib/recentChanges.tt displays the recentChanges variable, which
+consists of a list of dates.  Each date has a date field (a
+displayable string) and a list of pages.
+
+{{{
+  recentChanges = [
+      {
+          date => ...,
+          pages => [
+              {
+                  id => ...,
+                  pageName => ...,
+                  time => ...,
+                  diffUrl => ...,
+                  numChanges => ...,
+                  changeUrl => ...,
+                  summary => ...,
+                  userName => ...,
+                  userId => ...,
+                  host => ...
+              },
+              ...
+          ]
+      },
+      ...
+  ]
+}}}
+
+lib/searchResults.tt displays search results from each installed
+search module.  The two important variables are modules, which
+contains the names of the installed modules, and results, which uses
+the module name as a hash key and returns a list of results:
+
+{{{
+  results = {
+      Wiki => {
+          url => ...,
+          title => ...,
+          lastModified => ...,
+          summary => ...
+      },
+      ...
+  }
+}}}
+
+= Writing Template Drivers =
+
+In order to use other template libraries with PurpleWiki, you will
+need to write a Template driver.  All you have to do is inherit
+PurpleWiki::Template::Base and overload the process method.
+
+We take advantage of TemplateToolkit's support for sophisticated data
+structures, but we also realize that not all template libraries have
+the same capabilities.  As the need arises, we will consider modifying
+some of the data structures passed to the templates in order to better
+support other libraries.
+
+= Views Versus Templates =
+
+PurpleWiki has the notion of both Views and Templates.  Views
+correspond to how a page is expressed, be it XHTML, plain text, or
+some other format.  Templates correspond to the overall site's
+look-and-feel.

@@ -1,0 +1,130 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Carp;
+use utf8;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Pod::IkiWiki;
+
+our $VERSION = '0.0.3';
+
+my  %translator_params = (
+    'indent'        =>  4,
+    'no_metadata'   =>  0,
+    'links_base'    =>  undef,
+    'formatters'    =>  undef,
+);
+
+my  $indent         =   4;      
+my  $help           =   0;
+
+if (not GetOptions( 'indent=i'      =>  \$translator_params{indent}, 
+                    'no_metadata'   =>  \$translator_params{no_metadata},
+                    'links_base=s'  =>  \$translator_params{links_base},
+                    'formatters=s'  =>  \$translator_params{formatters},
+                    'help' => \$help ) 
+                    or $help) {
+    pod2usage(-exitval => 1, -verbose => 2);
+}
+
+        
+convert(\%translator_params, \*STDIN, \*STDOUT );
+
+sub convert {
+    my  ($params, $in_file, $out_file)  =   @_;
+    my  $parser                         =   Pod::IkiWiki->new( %{ $params } );
+
+    $parser->parse_from_filehandle( $in_file );
+
+    print $out_file $parser->dump_as_ikiwiki();
+
+    return;
+}
+
+__END__
+
+=head1 NAME
+
+pod2ikiwiki - translates POD text to IkiWiki's Markdown format
+
+=head1 VERSION
+
+This documentation refers to pod2ikiwiki version 0.0.1.
+
+=head1 USAGE
+
+    $ pod2ikiwiki [options] < input.pod > output.mdwn
+
+where options are:
+
+=over
+
+=item --indent N 
+
+Set the number of blank spaces for each step of indentation. By default is 4 spaces.
+
+=item --no_metadata
+
+Disable the scanning of metadata such as the title, author and/or license. By
+default is enabled.
+
+=item --links_base text
+
+This option defines a text string for use as a template with the manual pages
+POD links. The module substitutes the special sequence C<%s> with the manual
+page URL. 
+
+Examples:
+
+    --links_base '[[mypodserver %s]]' 
+
+=item --formatters list
+
+Adds a list of formatters to the accept filter of C<=begin> and C<=for>
+directives.
+
+=back
+
+=head1 DESCRIPTION
+
+This program can be used as a text filter. It translates POD text to IkiWiki
+text. IkiWiki uses a slighty modified version of Markdown format.
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Pod::Parser>
+
+=back 
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.  Please report problems to the author.
+Patches are welcome.
+
+=head1 AUTHOR
+
+Victor Moral <victor@taquiones.net>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2008 "Victor Moral" <victor@taquiones.net>
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+

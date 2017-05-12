@@ -1,0 +1,23 @@
+
+severity = 1
+theme = core
+
+#-----------------------------------------------------------------------------
+
+# Just use the emacs/vi settings
+[-CodeLayout::RequireTidyCode]
+
+# Too many false positives
+[-ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+
+# We'll expand the documentation later
+[Documentation::RequirePodSections]
+lib_sections    = NAME|AFFILIATION|DESCRIPTION|AUTHOR|COPYRIGHT
+script_sections = NAME|AFFILIATION|DESCRIPTION|AUTHOR|COPYRIGHT
+
+# No tabs, ever.
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+# We already use Test::Spelling
+[-Documentation::PodSpelling]

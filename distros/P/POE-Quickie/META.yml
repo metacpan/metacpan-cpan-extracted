@@ -1,0 +1,35 @@
+---
+abstract: 'A lazy way to wrap blocking code and programs'
+author:
+  - 'Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>'
+build_requires:
+  Capture::Tiny: 0.07
+  Test::Deep: 0
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Quickie
+no_index:
+  directory:
+    - t
+    - xt
+    - utils
+requires:
+  POE: 1.350
+  POE::Filter::Stream: 0
+  POE::Session: 0
+  POE::Wheel::Run: 0
+  perl: 5.008
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Quickie
+  homepage: http://metacpan.org/release/POE-Quickie
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hinrik/poe-quickie.git
+version: 0.18
+x_authority: cpan:HINRIK

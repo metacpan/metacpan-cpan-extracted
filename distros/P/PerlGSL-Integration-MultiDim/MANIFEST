@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/PerlGSL/Integration/MultiDim.pm
+lib/PerlGSL/Integration/MultiDim.xs
+lib/PerlGSL/Integration/ppport.h
+MANIFEST			This list of files
+META.json
+META.yml
+README.pod
+t/integrate.t

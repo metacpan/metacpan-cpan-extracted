@@ -1,0 +1,144 @@
+Steps to reproduce:
+Haven't been able to reproduce consistently. Sometimes I can work 5-10 minutes before it happens - other times only 30 seconds...
+
+I've had it happen while using the image menu, right-click menu on the image, and the right-click menu on the layers...
+
+
+Stack trace:
+This is from --verbose --stack-trace-mode always:
+
+Parsing '/home/jbaker/.gimp-2.7/colorrc'
+loading menu '/opt/gimp-2.7/share/gimp/2.0/menus/image-menu.xml' for /image-menubar
+loading menu '/opt/gimp-2.7/share/gimp/2.0/menus/layers-menu.xml' for /layers-popup
+loading menu '/opt/gimp-2.7/share/gimp/2.0/menus/image-menu.xml' for /dummy-menubar
+/opt/gimp-2.7/bin/gimp-2.7: fatal error: Segmentation fault
+#0  0x00007f2ba4ca3bbf in waitpid () from /lib/libpthread.so.0
+#1  0x00007f2ba4ec8622 in g_on_error_stack_trace ()
+#2  0x0000000000479203 in gimp_eek (reason=0x736071 "fatal error", 
+#3  0x0000000000479246 in gimp_fatal_error (message=<value optimized out>)
+#4  0x000000000047a026 in gimp_sigfatal_handler (sig_num=<value optimized out>)
+#5  <signal handler called>
+#6  0x00007f2ba538ba47 in g_object_get () from /usr/lib/libgobject-2.0.so.0
+#7  0x00000000005b1c2a in gimp_ui_manager_menu_item_select (
+#8  0x00007f2ba538727d in g_closure_invoke () from /usr/lib/libgobject-2.0.so.0
+#9  0x00007f2ba539ce3b in ?? () from /usr/lib/libgobject-2.0.so.0
+#10 0x00007f2ba539e432 in g_signal_emit_valist ()
+#11 0x00007f2ba539e953 in g_signal_emit () from /usr/lib/libgobject-2.0.so.0
+#12 0x00007f2ba81b2da8 in gtk_menu_item_select ()
+#13 0x00007f2ba81b682c in ?? () from /usr/lib/libgtk-x11-2.0.so.0
+#14 0x00007f2ba81b71fd in ?? () from /usr/lib/libgtk-x11-2.0.so.0
+#15 0x00007f2ba81adb82 in ?? () from /usr/lib/libgtk-x11-2.0.so.0
+#16 0x00007f2ba81a7df8 in ?? () from /usr/lib/libgtk-x11-2.0.so.0
+#17 0x00007f2ba53871cf in g_closure_invoke () from /usr/lib/libgobject-2.0.so.0
+#18 0x00007f2ba539cb1e in ?? () from /usr/lib/libgobject-2.0.so.0
+#19 0x00007f2ba539e2bd in g_signal_emit_valist ()
+#20 0x00007f2ba539e953 in g_signal_emit () from /usr/lib/libgobject-2.0.so.0
+#21 0x00007f2ba82b009e in ?? () from /usr/lib/libgtk-x11-2.0.so.0
+#22 0x00007f2ba81a7df8 in ?? () from /usr/lib/libgtk-x11-2.0.so.0
+#23 0x00007f2ba538727d in g_closure_invoke () from /usr/lib/libgobject-2.0.so.0
+#24 0x00007f2ba539cb1e in ?? () from /usr/lib/libgobject-2.0.so.0
+#25 0x00007f2ba539e2bd in g_signal_emit_valist ()
+#26 0x00007f2ba539e953 in g_signal_emit () from /usr/lib/libgobject-2.0.so.0
+#27 0x00007f2ba82b009e in ?? () from /usr/lib/libgtk-x11-2.0.so.0
+#28 0x00007f2ba81a1852 in gtk_main_do_event ()
+#29 0x00007f2ba7e1af3c in ?? () from /usr/lib/libgdk-x11-2.0.so.0
+#30 0x00007f2ba4eeb20a in g_main_context_dispatch ()
+#31 0x00007f2ba4eee8e0 in ?? () from /usr/lib/libglib-2.0.so.0
+#32 0x00007f2ba4eeedad in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+#33 0x0000000000478b85 in app_run (full_prog_name=<value optimized out>, 
+#34 0x0000000000479976 in main (argc=1, argv=0x7fffb17fdba8) at main.c:397
+
+(script-fu:9153): LibGimpBase-WARNING **: script-fu: gimp_wire_read(): error
+jbaker@jbaker-laptop:/opt/gimp-2.7/bin$ 
+
+#############################
+
+This is from gdb following these instructions: https://wiki.ubuntu.com/Backtrace
+
+Using the gdb like this completely locks the desktop - I have to switch to console to kill the gimp process....
+
+GNU gdb 6.8-debian
+Copyright (C) 2008 Free Software Foundation, Inc.
+License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
+and "show warranty" for details.
+This GDB was configured as "x86_64-linux-gnu"...
+(gdb) ^V[Khandle SIG33 pass nostop noprint
+Signal        Stop	Print	Pass to program	Description
+SIG33         No	No	Yes		Real-time event 33
+(gdb) set pagination 0
+(gdb) 
+(gdb) run --verbose --stack-tro[Kace-mode always
+Starting program: /opt/gimp-2.7/bin/gimp-2.7 --verbose --stack-trace-mode always
+[Thread debugging using libthread_db enabled]
+[New Thread 0x7f49e7be2780 (LWP 8803)]
+This is a development version of GIMP.  Debug messages may appear here.
+
+INIT: gimp_load_config
+Parsing '/home/jbaker/.gimp-2.7/unitrc'
+Parsing '/opt/gimp-2.7/etc/gimp/2.0/gimprc'
+Parsing '/home/jbaker/.gimp-2.7/gimprc'
+gimp_composite: use=yes, verbose=no
+Processor instruction sets: +mmx +sse +sse2 -3dnow -altivec -vis
+Adding theme 'Default' (/opt/gimp-2.7/share/gimp/2.0/themes/Default)
+Adding theme 'Small' (/opt/gimp-2.7/share/gimp/2.0/themes/Small)
+Writing '/home/jbaker/.gimp-2.7/themerc'
+Trying splash '/home/jbaker/.gimp-2.7/gimp-splash.png' ... failed
+Trying splash '/opt/gimp-2.7/share/gimp/2.0/images/gimp-splash.png' ... [New Thread 0x7f49dce2b950 (LWP 8806)]
+[New Thread 0x7f49dc62a950 (LWP 8807)]
+OK
+INIT: gimp_initialize
+INIT: gimp_real_initialize
+INIT: gui_initialize_after_callback
+INIT: gimp_restore
+Parsing '/home/jbaker/.gimp-2.7/parasiterc'
+Loading 'brush factory' data
+Loading 'pattern factory' data
+Loading 'palette factory' data
+Loading 'gradient factory' data
+Loading fonts
+Parsing '/home/jbaker/.gimp-2.7/templaterc'
+Parsing '/home/jbaker/.gimp-2.7/modulerc'
+INIT: gui_restore_callback
+clipboard: writable pixbuf format: image/png
+clipboard: writable pixbuf format: image/bmp
+clipboard: writable pixbuf format: image/x-bmp
+clipboard: writable pixbuf format: image/x-MS-bmp
+clipboard: writable pixbuf format: image/x-icon
+clipboard: writable pixbuf format: image/x-ico
+clipboard: writable pixbuf format: image/x-win-bitmap
+clipboard: writable pixbuf format: image/tiff
+clipboard: writable pixbuf format: image/jpeg
+
+... all parsing output removed ...
+
+INIT: gimp_real_restore
+Parsing '/home/jbaker/.gimp-2.7/pluginrc'
+Starting extension: 'extension-script-fu'
+INIT: gui_restore_after_callback
+Parsing '/home/jbaker/.gimp-2.7/menurc'
+Parsing '/home/jbaker/.gimp-2.7/devicerc'
+Parsing '/home/jbaker/.gimp-2.7/controllerrc'
+Parsing '/home/jbaker/.gimp-2.7/colorrc'
+loading menu '/opt/gimp-2.7/share/gimp/2.0/menus/image-menu.xml' for /image-menubar
+sphere-designer is updating the progress too often
+sphere-designer is updating the progress too often
+loading menu '/opt/gimp-2.7/share/gimp/2.0/menus/image-menu.xml' for /dummy-menubar
+loading menu '/opt/gimp-2.7/share/gimp/2.0/menus/layers-menu.xml' for /layers-popup
+sphere-designer is updating the progress too often
+
+Program received signal SIGSEGV, Segmentation fault.
+[Switching to Thread 0x7f49e7be2780 (LWP 8803)]
+0x00007f49e37a3a47 in g_object_get () from /usr/lib/libgobject-2.0.so.0
+(gdb) 
+(script-fu:8809): LibGimpBase-WARNING **: script-fu: gimp_wire_read(): error
+
+
+
+Other information:
+Ubuntu 9.04 default install.
+AMD Turion64
+
+jbaker@jbaker-laptop:~/git/other/gimp$ cat .git/refs/heads/master
+e0453b44b16e3573b93d6348630c1e6a9fcfbede

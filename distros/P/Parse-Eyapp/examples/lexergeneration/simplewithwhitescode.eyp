@@ -1,0 +1,6 @@
+%whites  { /\G(\s*(?:#.*)?\s*)/gc and $self->tokenline($1 =~ tr{\n}{}) }
+%%
+A:    a 
+    | A d
+;
+%%

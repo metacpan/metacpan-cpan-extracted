@@ -1,0 +1,9 @@
+Makefile.PL
+MANIFEST
+README
+lib/Parse/EBNF.pm
+lib/Parse/EBNF/Rule.pm
+lib/Parse/EBNF/Token.pm
+t/01_use.t
+t/02_rules.t
+META.yml                                 Module meta-data (added by MakeMaker)

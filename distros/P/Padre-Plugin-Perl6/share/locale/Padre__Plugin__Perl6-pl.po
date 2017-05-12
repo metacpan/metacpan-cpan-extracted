@@ -1,0 +1,87 @@
+# Polish translations for Padre-Plugin-Perl package
+# Polskie t�umaczenia dla pakietu Padre-Plugin-Perl.
+# Copyright (C) 2009 THE Padre-Plugin-Perl'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Padre-Plugin-Perl package.
+#
+# Cezary Morga <>, 2009.
+# Cezary Morga <cm@therek.net>, 2009.
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Perl6\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-10 23:25+0300\n"
+"PO-Revision-Date: 2009-05-13 20:32+0200\n"
+"Last-Translator: Cezary Morga <cm@therek.net>\n"
+"Language-Team: Polish <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+"X-Generator: Lokalize 0.3\n"
+
+#: lib/Padre/Plugin/Perl6.pm:62
+msgid "Show Perl6 Help\tF2"
+msgstr "Pokaż pomoc dla  Perl6\tF2"
+
+#: lib/Padre/Plugin/Perl6.pm:77
+msgid "Enable Auto Coloring"
+msgstr "Włącz automatyczne kolorwanie"
+
+#: lib/Padre/Plugin/Perl6.pm:90
+msgid "Export Full HTML"
+msgstr "Pełny eksport do HTML"
+
+#: lib/Padre/Plugin/Perl6.pm:95
+msgid "Export Simple HTML"
+msgstr "Prosty eksport do HTML"
+
+#: lib/Padre/Plugin/Perl6.pm:100
+msgid "Export Snippet HTML"
+msgstr "Eksportuj wycinek do HTML"
+
+#: lib/Padre/Plugin/Perl6.pm:109
+msgid "Cleanup STD.pm Lex Cache"
+msgstr "Wyczyść pamięć podręczną STD.pm"
+
+#: lib/Padre/Plugin/Perl6.pm:118
+msgid "Preferences"
+msgstr "Ustawienia"
+
+#: lib/Padre/Plugin/Perl6.pm:127
+msgid "About"
+msgstr "O wtyczce"
+
+#: lib/Padre/Plugin/Perl6.pm:174
+msgid "Cannot find STD.pm lex cache"
+msgstr "Nie znaleziono pamięci podręcznej STD.pm"
+
+#: lib/Padre/Plugin/Perl6/Preferences.pm:28
+msgid "Perl6 preferences"
+msgstr "Ustawienia Perl6"
+
+#: lib/Padre/Plugin/Perl6/Preferences.pm:121
+msgid "Syntax Highlighter:"
+msgstr "Podświetlenie składni:"
+
+#: lib/Padre/Plugin/Perl6/Preferences.pm:152
+msgid "Pick mildew Directory"
+msgstr "Wybierz katalog mildew"
+
+#: lib/Padre/Plugin/Perl6/Preferences.pm:179
+msgid "Pick rakudo Directory"
+msgstr "Wybierz katalog rakudo"
+
+#: lib/Padre/Document/Perl6.pm:334
+#, perl-format
+msgid "%s is Perl 6 %s "
+msgstr "%s jest %s Perl 6 "
+
+#: lib/Padre/Task/Outline/Perl6.pm:191
+msgid "Outline"
+msgstr "Plan"
+
+#: lib/Padre/Task/Outline/Perl6.pm:224
+msgid "Open &Documentation"
+msgstr "Otwórz &dokument"
+

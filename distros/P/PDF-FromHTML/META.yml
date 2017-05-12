@@ -1,0 +1,95 @@
+---
+abstract: 'Convert HTML documents to PDF'
+author:
+  - '唐鳳 <cpan@audreyt.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: CC0
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PDF-FromHTML
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  PDF::FromHTML:
+    file: lib/PDF/FromHTML.pm
+    version: 0.31
+  PDF::FromHTML::Template:
+    file: lib/PDF/FromHTML/Template.pm
+    version: 0.30
+  PDF::FromHTML::Template::Base:
+    file: lib/PDF/FromHTML/Template/Base.pm
+  PDF::FromHTML::Template::Constants:
+    file: lib/PDF/FromHTML/Template/Constants.pm
+  PDF::FromHTML::Template::Container:
+    file: lib/PDF/FromHTML/Template/Container.pm
+  PDF::FromHTML::Template::Container::Always:
+    file: lib/PDF/FromHTML/Template/Container/Always.pm
+  PDF::FromHTML::Template::Container::Conditional:
+    file: lib/PDF/FromHTML/Template/Container/Conditional.pm
+  PDF::FromHTML::Template::Container::Font:
+    file: lib/PDF/FromHTML/Template/Container/Font.pm
+  PDF::FromHTML::Template::Container::Footer:
+    file: lib/PDF/FromHTML/Template/Container/Footer.pm
+  PDF::FromHTML::Template::Container::Header:
+    file: lib/PDF/FromHTML/Template/Container/Header.pm
+  PDF::FromHTML::Template::Container::Loop:
+    file: lib/PDF/FromHTML/Template/Container/Loop.pm
+  PDF::FromHTML::Template::Container::Margin:
+    file: lib/PDF/FromHTML/Template/Container/Margin.pm
+  PDF::FromHTML::Template::Container::PageDef:
+    file: lib/PDF/FromHTML/Template/Container/PageDef.pm
+  PDF::FromHTML::Template::Container::PdfTemplate:
+    file: lib/PDF/FromHTML/Template/Container/PdfTemplate.pm
+  PDF::FromHTML::Template::Container::Row:
+    file: lib/PDF/FromHTML/Template/Container/Row.pm
+  PDF::FromHTML::Template::Container::Scope:
+    file: lib/PDF/FromHTML/Template/Container/Scope.pm
+  PDF::FromHTML::Template::Container::Section:
+    file: lib/PDF/FromHTML/Template/Container/Section.pm
+  PDF::FromHTML::Template::Context:
+    file: lib/PDF/FromHTML/Template/Context.pm
+  PDF::FromHTML::Template::Element:
+    file: lib/PDF/FromHTML/Template/Element.pm
+  PDF::FromHTML::Template::Element::Bookmark:
+    file: lib/PDF/FromHTML/Template/Element/Bookmark.pm
+  PDF::FromHTML::Template::Element::Circle:
+    file: lib/PDF/FromHTML/Template/Element/Circle.pm
+  PDF::FromHTML::Template::Element::HorizontalRule:
+    file: lib/PDF/FromHTML/Template/Element/HorizontalRule.pm
+  PDF::FromHTML::Template::Element::Image:
+    file: lib/PDF/FromHTML/Template/Element/Image.pm
+  PDF::FromHTML::Template::Element::Line:
+    file: lib/PDF/FromHTML/Template/Element/Line.pm
+  PDF::FromHTML::Template::Element::PageBreak:
+    file: lib/PDF/FromHTML/Template/Element/PageBreak.pm
+  PDF::FromHTML::Template::Element::TextBox:
+    file: lib/PDF/FromHTML/Template/Element/TextBox.pm
+  PDF::FromHTML::Template::Element::Var:
+    file: lib/PDF/FromHTML/Template/Element/Var.pm
+  PDF::FromHTML::Template::Element::Weblink:
+    file: lib/PDF/FromHTML/Template/Element/Weblink.pm
+  PDF::FromHTML::Template::Factory:
+    file: lib/PDF/FromHTML/Template/Factory.pm
+  PDF::FromHTML::Template::Iterator:
+    file: lib/PDF/FromHTML/Template/Iterator.pm
+  PDF::FromHTML::Template::TextObject:
+    file: lib/PDF/FromHTML/Template/TextObject.pm
+  PDF::FromHTML::Twig:
+    file: lib/PDF/FromHTML/Twig.pm
+requires:
+  Graphics::ColorNames: 0
+  Image::Size: 0
+  LWP::Simple: 0
+  List::Util: 0
+  PDF::Writer: 0.05
+  XML::Twig: 0
+  perl: 5.6.0
+version: 0.31

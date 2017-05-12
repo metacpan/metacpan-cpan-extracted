@@ -1,0 +1,28 @@
+Revision history for POE-Component-DirWatch
+0.300004 Sep 29, 2016
+         don't ship MYMETA.json or MYMETA.yml
+
+0.300003 Jan 29, 2015
+         add one second to pauseresume.t (thanks itcharlie)
+
+0.300002 Jan 19, 2015
+         RT#90967: use Class::Load instead of Class::MOP (thanks zoffixznet)
+         use https for github url instead of http (thanks dolmen)
+         disable export of Moose sugar (thanks itcharlie)
+
+0.300001 May 17, 2012
+         Update rt.cpan.org link to not require auth
+
+0.300000 Oct 21, 2010
+         Fixed test typo
+         Updated some POD typos
+
+
+0.200000 Oct 24, 2008
+         Fixed a bug that was appearing with Modified due to Signature weirdness
+         Updated some POD
+         added _generate_signature method to the Signatures role
+         improve all tests and fix rare fail due to incorrect HiRes usage
+
+0.100000 Jan 17, 2008
+         Initial Release

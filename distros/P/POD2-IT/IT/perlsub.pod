@@ -1,0 +1,1582 @@
+=head1 NOME
+X<subroutine> X<function>
+
+perlsub - Subroutine Perl
+
+=head1 SINOSSI
+
+Per dichiarare subroutine:
+X<subroutine, dichiarazione> X<sub>
+
+    sub NOME;			  # Una dichiarazione "anticipata".
+    sub NOME(PROTO);		  #  idem, ma con prototipi
+    sub NOME : ATTR;		  #  con attributi
+    sub NOME(PROTO) : ATTR;	  #  con attributi e prototipi
+
+    sub NOME BLOCCO		  # Una dichiarazione con definizione.
+    sub NOME(PROTO) BLOCCO	  #  idem, ma con prototipi
+    sub NOME : ATTR BLOCCO	  #  con attributi
+    sub NOME(PROTO) : ATTR BLOCCO #  con prototipi ed attributi
+
+Per definire una subroutine anonima durante l'esecuzione:
+X<subroutine, anonima>
+
+    $subref = sub BLOCCO;		 # nessun prototipo
+    $subref = sub (PROTO) BLOCCO;	 # con prototipi
+    $subref = sub : ATTR BLOCCO;	 # con attributi
+    $subref = sub (PROTO) : ATTR BLOCCO; # con prototipi ed attributi
+
+Per importare le subroutine:
+X<import>
+
+    use MODULO qw(NOME1 NOME2 NOME3);
+
+Per chiamare le subroutine:
+X<subroutine, chiamare> X<chiamare>
+
+    NOME(LISTA);   # & e` opzionale quando si usano le parentesi.
+    NOME LISTA;	   # Parentesi opzionali se predichiarata/importata.
+    &NOME(LISTA);  # Evita i prototipi.
+    &NOME;	   # Rende @_ corrente visibile alla subroutine chiamata.
+
+=head1 DESCRIZIONE
+
+Come molti linguaggi, Perl mette a disposizione la possibilitE<agrave> di
+definire delle subroutine da parte dell'utente. Queste possono essere
+collocate ovunque nel programma principale, caricate da altri file
+attraverso le parole chiave C<do>, C<require> o C<use>, oppure generate
+dinamicamente utilizzando C<eval> o subroutine anonime. Potete
+persino chiamare una funzione indirettamente utilizzando una variabile
+che contiene il suo nome o un riferimento di tipo CODE [CODICE, N.d.T.].
+
+Il modello per la chiamata a funzione, e per i valori restituiti da
+questa, in Perl E<egrave> semplice: tutte le funzioni accettano una singola
+lista "piatta" di scalari, e similmente restituiscono al chiamante
+una singola lista piatta di scalari. Qualunque array o hash in queste
+chiamate, e le liste di valori restituiti, verrE<agrave> collassato, perdendo
+la propria identitE<agrave> -- ma potete sempre utilizzare un passaggio per
+riferimento per evitare questo meccanismo. Sia le liste di chiamata che quelle
+restituite possono contenere tanti (o pochi) scalari a vostro piacimento.
+(Spesso una funzione senza un'istruzione di C<return> esplicita E<egrave>
+chiamata subroutine, ma non c'E<egrave> una vera differenza dal punto di vista
+del Perl).
+X<subroutine, parametro> X<parametro>
+
+Qualsiasi argomento passato alla subroutine sarE<agrave> disponibile nell'array
+C<@_>. PerciE<ograve>, se chiamate una funzione con due argomenti, questi
+andrebbero a finire in C<$_[0]> e C<$_[1]>. L'array C<@_> E<egrave> locale,
+ma i suoi elementi sono degli alias dei parametri scalari effettivi.
+In particolare, se aggiornate l'elemento C<$_[0]>, l'argomento
+corrispondente viene aggiornato (o viene segnalato un errore se
+non E<egrave> aggiornabile). Se un argomento E<egrave> un elemento di un array
+o di una hash che non esisteva quando la funzione E<egrave> stata chiamata,
+l'elemento viene creato solo quando (e se) esso viene modificato o
+viene preso un riferimento ad esso. (In alcune versioni piE<ugrave> antiche di
+Perl l'elemento veniva creato indipendentemente dal fatto che esso
+fosse assegnato o meno). Assegnare all'intero array C<@_> rimuove
+tale meccanismo di alias, e non aggiorna gli argomenti.
+X<subroutine, argomento> X<argomento> X<@_>
+
+Si puE<ograve> utilizzare un'istruzione C<return> per uscire da una subroutine,
+specificando un valore da restituire opzionale, che verrE<agrave> valutato nel
+contesto appropriato (lista, scalare o vuoto) dipendentemente dal
+contesto della chiamata alla subroutine stessa. Se non specificate
+alcun valore, la subroutine restituisce una lista vuota in contesto lista,
+il valore C<undef> in contesto scalare, o niente in contesto vuoto. Se
+restituite uno o piE<ugrave> aggregati (array o hash), questi verranno
+appiattiti insieme in una grande lista indistinguibile.
+
+Se non viene trovato nessun C<return> e se l'ultima istruzione E<egrave>
+un'espressione, viene restituito il suo valore. Se l'ultima istruzione E<egrave>
+una struttura di controllo di ciclo come C<foreach> o C<while>, il valore
+restituito non E<egrave> specificato. La subroutine vuota restituisce la lista
+vuota.
+X<subroutine, valore restituito> X<valore restituito> X<return>
+
+Perl non ha parametri formali con nome. In pratica tutto quel che potete
+fare E<egrave> un'assegnazione ad una lista C<my()> di variabili. Le variabili
+che non sono dichiarate private sono globali. Per i dettagli sulla
+creazione di variabili private consultate L<"Variabili Private con my()">
+e L<"Valori Temporanei con local()">. Per creare ambienti protetti per
+un insieme di funzioni in un I<package> separato (e probabilmente un
+file separato) consultate L<perlmod/"Pacchetti">.
+X<parametro formale> X<parametro, formale>
+
+Esempio:
+
+   sub max {
+	   my $max = shift(@_);
+   	   foreach $pippo (@_) {
+	      $max = $pippo if $max < $pippo;
+	   }
+	   return $max;
+   }
+   $migliore = max($lun,$mar,$mer,$gio,$ven);
+
+Esempio:
+
+   # prendi una riga, combinando le righe di continuazione
+   # che iniziano con uno spazio
+
+   sub prendi_riga {
+   $questa_riga = $guarda_avanti;  # variabili globali!
+      RIGA: while (defined($guarda_avanti = <STDIN>)) {
+         if ($guarda_avanti =~ /^[ \t]/) {
+            $questa_riga .= $guarda_avanti;
+         }
+         else {
+            last RIGA;
+         }
+      }
+      return $questa_riga;
+   }
+
+   $guarda_avanti = <STDIN>;# prendi la prima riga
+   while (defined($riga = prendi_riga())) {
+      ...
+   }
+
+Assegnazione ad una lista di variabili private per dare un nome
+agli argomenti:
+
+   sub potrebbe_essere_impostata {
+      my($chiave, $valore) = @_;
+      $Pippo{$chiave} = $valore unless $Pippo{$chiave};
+   }
+
+PoichE<eacute> l'assegnazione copia i valori, questo sistema ha anche l'effetto
+di trasformare una chiamata per riferimento in una chiamata per valore.
+Altrimenti una funzione E<egrave> libera di effettuare modifiche di C<@_> sul
+posto e cambiare i valori del chiamante.
+X<chiamata per riferimento> X<chiamata per valore>
+
+   maiuscolizza($v1, $v2);  # questa cambia $v1 e $v2
+   sub maiuscolizza {
+	   for (@_) { tr/a-z/A-Z/ }
+   }
+
+Non vi E<egrave> consentito modificare le costanti in questo modo, ovviamente.
+Se un argomento fosse in realtE<agrave> un letterale, e voi provaste a cambiarlo,
+vi ritrovereste con un'eccezione (presumibilmente fatale). Ad esempio, quanto
+segue non funziona:
+X<chiamata per riferimento> X<chiamata per valore>
+
+    maiuscolizza("frederick");
+
+Sarebbe molto piE<ugrave> sicuro se la funzione C<maiuscolizza> fosse scritta
+per restituire una copia dei suoi parametri invece che cambiarli sul posto:
+
+   ($v3, $v4) = in_maiuscolo($v1, $v2);  # Questa non cambia $v1 e $v2 
+   sub in_maiuscolo {
+	   return unless defined wantarray;  # contesto vuoto, non fare niente
+	   my @param = @_;
+	   for (@param) { tr/a-z/A-Z/ }
+  	   return wantarray ? @param : $param[0];
+   }
+
+Osservate che questa funzione (non prototipizzata) non si cura se le
+vengono passati scalari reali o array. Perl vede tutti gli argomenti come
+un'unica grande, lunga e piatta lista di parametri in C<@_>. Questa E<egrave>
+un'area dove lo stile di passaggio degli argomenti di Perl risplende. La
+funzione C<in_maiuscolo()> funziona perfettamente senza cambiare la
+definizione di C<in_maiuscolo()> anche quando le passiamo questo genere
+di roba:
+
+    @nuova_lista   = in_maiuscolo(@lista1, @lista2);
+    @nuova_lista   = in_maiuscolo( split /:/, $var );
+
+Non lasciatevi tentare dal fare questo, perE<ograve>:
+
+    (@a, @b)   = in_maiuscolo(@lista1, @lista2);
+
+Come viene appiattita la lista dei parametri di ingresso, anche quella
+dei valori restituiti E<egrave> parimenti appiattita. Quindi tutto quel che
+avete ottenuto E<egrave> immagazzinare tutto in C<@a> ed avere C<@b> vuota.
+Consultate L<Passare per Riferimento> per possibili alternative.
+
+Si puE<ograve> chiamare una subroutine utilizzando un prefisso C<&> esplicito.
+Nel Perl moderno il carattere C<&> E<egrave> opzionale, come lo sono le
+parentesi se la subroutine E<egrave> stata giE<agrave> dichiarata. La C<&>
+I<non> E<egrave> opzionale quando state semplicemente nominando la subroutine,
+come quando utilizzate C<defined()> o C<undef()>. NE<eacute> E<egrave>
+opzionale quando volete effettuare una chiamata indiretta a subroutine, con il
+nome della subroutine o un riferimento utilizzando i costrutti C<&$subref()> o
+C<&{$subref}()>, sebbene la notazione C<< $subref->() >> risolva
+questo particolare problema. Consultate L<perlref> per maggiori
+dettagli su tutto ciE<ograve>.
+
+Le subroutine possono essere chiamate ricorsivamente. Se una
+subroutine E<egrave> chiamata utilizzando la forma C<&>, la lista degli
+argomenti E<egrave> opzionale e, se messa, non viene impostato alcun
+array C<@_> per la subroutine: l'array C<@_> al momento della
+chiamata E<egrave> invece visibile direttamente dalla subroutine. Questo
+E<egrave> un meccanismo di efficienza che i novizi potrebbero voler evitare.
+X<ricorsione>
+
+   &pippo(1,2,3);	# passa tre argomenti
+   pippo(1,2,3);	# idem
+
+   pippo();		# passa la lista vuota
+   &pippo();		# idem
+
+   &pippo;		# pippo() riceve gli argomenti correnti, come pippo(@_) !!
+   pippo;		# come pippo() SE E SOLO SE sub pippo predichiarata,
+               		# altrimenti "pippo"
+               
+Non solo la forma C<&> rende la lista degli argomenti opzionale, ma
+disabilita anche qualsiasi controllo di prototipo possiate aver
+impostato. Questo effetto si ha in parte per ragioni storiche, ed in
+parte per avere un modo comodo per barare quando sapete quel che state
+facendo. Consultate L<Prototipi> piE<ugrave> avanti.
+X<&>
+
+Le subroutine i cui nomi sono tutti in lettere maiuscole sono
+riservati per il nucleo di Perl, cosE<igrave> come i moduli i cui nomi sono
+tutti in lettere minuscole. Una subroutine in sole lettere maiuscole
+E<egrave> una convenzione vagamente seguita che significa che essa verrE<agrave>
+chiamata indirettamente dal sistema di esecuzione stesso, di solito
+durante un evento particolare. Le subroutine che fanno cose speciali
+e predefinite includono C<AUTOLOAD>, C<CLONE>, C<DESTROY> piE<ugrave>
+tutte le funzioni indicate in L<perltie> e L<PerlIO::via>.
+
+Le subroutine C<BEGIN>, C<CHECK>, C<INIT> e C<END> non sono tanto
+subroutine quanto piE<ugrave> blocchi di codice dal nome particolare, dei 
+quali potete averne piE<ugrave> d'uno in un I<package>, e che B<non> potete
+chiamare esplicitamente. Consultate L<perlmod/"BEGIN, CHECK, INIT e END">
+
+=head2 Variabili Private con my()
+X<my> X<variabile, lessicale> X<lessicale> X<variabile lessicale> 
+X<scope, lessicale> X<scope lessicale> X<attributi, my>
+
+Sinossi:
+
+    my $pippo;           # dichiara $pippo locale lessicalmente
+    my (@pin, %co);      # dichiara una lista di variabili localmente
+    my $pippo = "flurp"; # dichiara $pippo lessicale ed inizializzala
+    my @oppip = @pluto;  # dichiara @oppip lessicale ed inizializzala
+    my $x : Pippo = $y;  # simile, con attributi applicati
+
+B<ATTENZIONE>: l'utilizzo delle liste di attributi nelle dichiarazioni
+C<my> E<egrave> ancora in evoluzione. La semantica e l'interfaccia attuali sono
+soggette a cambiamenti. Consultate L<attributes> [attributi, N.d.T.] e
+L<Attribute::Handlers>.
+
+L'operatore C<my> dichiara le variabili elencate come confinate
+lessicalmente all'interno del blocco che le racchiude, della condizione
+(C<if/unless/elsif/else>), ciclo (C<for/foreach/while/until/continue>),
+subroutine, C<eval> o file chiamati con C<do/require/use>. Se viene
+elencato piE<ugrave> di un elemento, la lista va posta fra parentesi. Tutti
+gli elementi nella lista devono essere valori plausibili "a sinistra"
+di un'assegnazione. Possono essere ristretti lessicalmente solo
+identificatori alfanumerici -- variabili del linguaggio "magiche"
+come C<$/>, al momento, devono essere C<local>izzate con C<local>.
+
+Differentemente dalle variabili dinamiche create dall'operatore C<local>,
+le variabili lessicali dichiarate con C<my> sono totalmente nascoste
+dal mondo esterno, incluse tutte le subroutine chiamate. Questo continua
+ad essere vero anche se E<egrave> la stessa subroutine, chiamata ricorsivamente
+o da qualche altra parte -- ciascuna chiamata ha la sua copia.
+X<local>
+
+Questo, perE<ograve>, non significa che una variabile C<my> dichiarata in uno
+I<scope> lessicale che racchiude, sarebbe invisibile; sono tagliati fuori
+solamente gli scope dinamici. Ad esempio, la funzione C<tirasux()> che segue
+ha accesso alla variabile lessicale C<$x>, perchE<eacute> sia il C<my>
+che la C<sub> si trovano nello stesso scope, presumibilmente coincidente
+con quello del file.
+
+    my $x = 10;
+    sub tirasux { $x++ } 
+
+Una C<eval()>, d'altra parte, puE<ograve> vedere variabili lessicali dello scope
+in cui viene valutata, ma solo finchE<eacute> questi nomi non vengono nascosti
+da dichiarazioni all'interno della C<eval()> stessa. Consultate L<perlref>.
+X<eval, scope di>
+
+La lista dei parametri di C<my()> puE<ograve> essere utilizzata in un'assegnazione
+se lo si desidera, il che vi consente di inizilizzare le vostre variabili.
+(Se non viene dato nessun valore di inizializzazione per una determinata
+variabile, questa viene creata con il valore C<undef>). Di solito
+si usa questo meccanismo per dare un nome ai parametri di ingresso ad
+una subroutine. Qualche esempio:
+
+    $arg = "oronzo";	  # variabile "globale"
+    $n = radice_cubica(27);
+    print "$arg pensa che la radice sia $n\n";
+ oronzo pensa che la radice sia 3
+
+    sub radice_cubica {
+   	 my $arg = shift;  # il nome non conta
+	    $arg **= 1/3;
+	    return $arg;
+    }
+
+Il C<my> E<egrave> semplicemente un modificatore di qualcosa che voi potreste
+utilizzare in un'assegnazione. Per questo motivo, quando assegnate
+a delle variabili nella sua lista degli argomenti, C<my> non cambia se queste
+variabili sono viste come scalari o array. Quindi:
+
+    my ($pippo) = <STDIN>;		# ERRORE?
+    my @PIPPO = <STDIN>;
+
+danno tutti e due un contesto lista al lato destro dell'assegnazione, mentre
+
+    my $pippo = <STDIN>;
+
+fornisce un contesto scalare. Ma quanto segue dichiara una sola variabile:
+
+    my $foo, $bar = 1;			# ERRATO
+
+CiE<ograve> ha lo stesso effetto di
+
+    my $foo;
+    $bar = 1;
+
+La variabile dichiara non E<egrave> introdotta (ossia, non E<egrave> visibile)
+se non dopo l'istruzione corrente. Quindi,
+
+    my $x = $x;
+
+puE<ograve> essere utilizzato per inizializzare una nuova variabile C<$x> con
+il valore della vecchia C<$x>, e l'espressione
+
+    my $x = 123 and $x == 123
+
+risulta falsa a meno che la vecchia C<$x> non abbia il valore C<123>.
+
+I limiti lessicali delle strutture di controllo non sono esattamente
+definiti dalle graffe che segnano i blocchi da esse controllati; le
+espressioni di controllo fanno parte esse stesse dello scope. Quindi
+nel ciclo
+
+    while (my $riga = <>) {
+        $riga = lc $riga;
+    } continue {
+        print $riga;
+    }
+
+la visibilitE<agrave> di C<$line> si estende dalla sua dichiarazione all'intero
+resto del costrutto di ciclo (inclusa la clausola C<continue>), ma non
+oltre. Similmente, nel condizionale
+
+    if ((my $risposta = <STDIN>) =~ /^si$/i) {
+        utente_acconsente();
+    } elsif ($risposta =~ /^no$/i) {
+        utente_dissente();
+    } else {
+	chomp $risposta;
+        die "'$risposta' diversa sia da 'si' che da 'no'";
+    }
+
+la visibilitE<agrave> di C<$risposta> si estende dalla sua dichiarazione
+fino al resto del condizionale, incluse eventuali clausole
+C<elsif> e C<else>, ma non oltre. Consultate L<perlsyn/"Istruzioni semplici">
+per maggiori dettagli sulla visibilitE<agrave> di variabili nelle istruzioni
+contenenti modificatori.
+
+Il ciclo C<foreach> ha come comportamento di default di limitare 
+dinamicamente la visibilitE<agrave> della sua variabile di controllo alla
+stessa maniera di C<local>. Comunque, se la variabile di indice viene
+preceduta dalla parola chiave C<my>, o se esiste giE<agrave> un'altra
+lessicale che ha lo stesso nome nello stesso scope, allora viene
+creata una nuova variabile lessicale. Per questo motivo, nel ciclo
+X<foreach> X<for>
+
+    for my $i (1, 2, 3) {
+        una_qualche_funzione();
+    }
+
+la visibilitE<agrave> di C<$i> si estende fino alla fine del ciclo, ma non oltre,
+rendendo quindi il valore di C<$i> inaccessibile da parte di
+C<una_qualche_funzione()>.
+X<foreach> X<for>
+
+Alcuni utenti potrebbero voler incoraggiare l'uso di variabili a visibilitE<agrave>
+limitata lessicalmente. Come supporto per intrappolare l'utilizzo implicito
+di variabili di pacchetto, che risultano sempre globali, se inserite
+
+    use strict 'vars';
+
+allora qualsiasi variabile menzionata da lE<igrave> fino alla fine del blocco
+deve o riferirsi ad una variabile lessicale, o essere predichiarata con
+C<our> o C<use vars>, o anche deve essere completamente qualificata utilizzando
+anche il nome del pacchetto. Altrimenti vi ritroverete con un errore di
+compilazione. Un blocco piE<ugrave> interno puE<ograve> essere gestito
+altrimenti, specificando C<no strict 'vars'>.
+
+Una C<my> ha effetti sia durante la fase di compilazione che durante quella
+di esecuzione vera e propria. Durante la compilazione il compilatore ne
+prende nota. L'utilitE<agrave> principale di questo fatto E<egrave> che C<use strict 'vars'>
+se ne sta calmo a questo punto, ma E<egrave> anche essenziale per la generazione
+delle I<closure> [letteralmente "chiusure", ma utilizzeremo il termine
+inglese, N.d.T.] cosE<igrave> come dettagliato in L<perlref>. L'inizializzazione
+vera e propria E<egrave> ritardata fino all'esecuzione, perE<ograve>, e quindi viene
+eseguita al momento opportuno, come ad esempio ogni volta che si esegue un ciclo.
+
+Le variabili dichiarate con C<my> non fanno parte di alcun pacchetto
+e pertanto non vengono mai qualificate con il nome del pacchetto stesso.
+In particolare, non vi E<egrave> consentito provare a trasformare una variabile
+di pacchetto (o una qualche altra variabile globale) in una lessicale:
+
+    my $pack::var;   # ERRORE! Sintassi non lecita
+    my $_;           # parimenti illecita (al momento)
+
+Infatti, una variabile dinamica (altrimenti nota come variabile
+di pacchetto o globale) E<egrave> ancora accessibile utilizzando la notazione
+di qualifica piena con C<::>, persino quando esiste una variabile
+lessicale con lo stesso nome nell'intervallo di visibilitE<agrave>:
+
+    package main;
+    local $x = 10;
+    my    $x = 20;
+    print "$x e $::x\n";
+
+Questo breve script stampa C<20> e C<10>.
+
+Potete dichiarare variabili C<my> allo scope piE<ugrave> esterno di un file
+per nascondere ciascuno di questi identificatori dal mondo esterno al
+file stesso. Questo modo di procedere E<egrave> simile a quanto avviene per le
+variabili statiche in C, quando queste siano utilizzate a livello di
+file. Per far ciE<ograve> con una subroutine E<egrave> necessario utilizzare una
+I<closure> (una funzione anonima che accede i lessicali racchiusi). Se
+volete creare una subroutine privata che non puE<ograve> essere chiamata al
+di fuori del blocco, potete dichiarare una variabile lessicale che
+contiene un riferimento da una subroutine anonima:
+
+    my $versione_segreta = '1.001-beta';
+    my $subroutine_segreta = sub { print $versione_segreta };
+    &$subroutine_segreta();
+
+FinchE<eacute> il riferimento non viene restituito da nessuna funzione
+all'interno del modulo, nessun modulo al di fuori puE<ograve> vedere questa
+subroutine, perchE<eacute> il suo nome non E<egrave> nella tabella dei simboli di
+alcun pacchetto. Ricordate che non E<egrave> I<VERAMENTE> chiamata
+C<$un_pacchetto_qualsiasi::versione_segreta> o altro: E<egrave> solamente
+C<$versione_segreta>, non qualificata e non qualificabile.
+
+Questo meccanismo, perE<ograve>, non funziona con i metodi della programmazione
+ad oggetti: tutti i metodi ad oggetti devono trovarsi nella tabella
+dei simboli di un qualche pacchetto. Consultate
+L<perlref/"Modelli di Funzione"> per trovare un sistema per aggirare
+questo problema.
+
+=head2 Variabili Private Persistenti
+X<statica> X<variabile, persistente> X<variabele, statica> X<closure>
+
+Solo perchE<eacute> una variabile lessicale E<egrave> lessicalmente (o anche
+staticamente) racchiusa nel suo blocco, C<eval> o C<do> FILE, questo non
+significa che in una funzione lavori come una variabile statica di C.
+PiE<ugrave> che altro si comporta come una variabile automatica di C, ma con
+in piE<ugrave> un'operazione di I<garbage collection> implicita.
+
+Differentemente dalle variabili locali in C o C++, le variabili lessicali
+in Perl non vengono necessariamente riciclate solo perchE<eacute> si E<egrave> usciti
+dal loro scope. Se qualcosa di piE<ugrave> permanente E<egrave> ancora al corrente del
+dato lessicale, quest'ultimo continuerE<agrave> a bazzicare i dintorni. FinchE<eacute>
+qualcos'altro si riferisce ad un lessicale, questo lessicale non
+sarE<agrave> liberato -- e questo E<egrave> esattamente come dovrebbe essere.
+Non vi piacerebbe che la memoria fosse liberata se non quando avete finito
+di utilizzarla, o che di contro sia tenuta in vita quando avete finito.
+La I<garbage collection> automatica si prende cura di tutti questi aspetti
+per voi.
+
+CiE<ograve> significa che potete restituire o salvare riferimento a variabili
+lessicali, laddove invece restituire un puntatore ad una variabile
+automatica in C sarebbe un grave errore. Ci dE<agrave> anche la possibilitE<agrave>
+di simulare le variabili statiche a livello di funzione presenti in C.
+Ecco un meccanismo che fornisce ad una funzione variabili private che
+hanno sia una limitazione di visibilitE<agrave> che una vita di tipo statico.
+Se volete creare qualcosa di simile alle variabili statiche in C, non dovete
+far altro che racchiudere la funzione all'interno di un blocco
+addizionale, e mettere le variabili statiche fuori dalla funzione ma
+dentro al blocco.
+
+   {
+	   my $valore_segreto = 0;
+	   sub dammene_un_altro {
+	      return ++$valore_segreto;
+      }
+   }
+   # $valore_segreto a questo punto diventa irraggiungibile dall'esterno,
+   # ma mantiene il suo valore fra le varie chiamate a dammene_un_altro
+
+Se questa funzione viene inclusa da un file separato utilizzando C<require>
+o C<use>, allora probabilmente va tutto bene. Se si trova tutto nel
+programma principale, dovrete fare in modo che il C<my> sia eseguito
+abbastanza presto, o mettendo il blocco al di sopra del programma
+principale, o piE<ugrave> probabilmente mettendo C<BEGIN> intorno
+al blocco di codice stesso, per essere sicuri che venga eseguito prima
+che il vostro programma cominci l'esecuzione:
+
+   BEGIN {
+	   my $valore_segreto = 0;
+	   sub dammene_un_altro {
+	      return ++$valore_segreto;
+      }
+   }
+
+Consultate L<perlmod/"BEGIN, CHECK, INIT e END"> per maggiori ragguagli
+sui blocchi di codice ad esecuzione particolare, ossia
+C<BEGIN>, C<CHECK>, C<INIT> e C<END>.
+
+Se dichiarate allo scope piE<ugrave> esterno (quello del file), allora le
+lessicali funzionano abbastanza similmente alle variabili statiche
+di file in C. Sono disponibili per tutte le funzioni nello stesso file
+che sono dichiarate dopo di esse, ma risultano inaccessibili dall'esterno
+di questo file. Questa strategia E<egrave> utilizzata a volte nei moduli per
+creare variabili private che possano essere viste dall'intero modulo.
+
+=head2 Valori Temporanei con local()
+X<local> X<scope, dinamico> X<dinamico scope> X<variabile, local>
+X<variabile, temporanea>
+
+B<ATTENZIONE>: in generale, dovreste utilizzare C<my> invece che C<local>,
+perchE<eacute> E<egrave> sia piE<ugrave> veloce che piE<ugrave> sicuro.
+Eccezioni a questa regola generale includono le variabili di punteggiatura, i
+I<filehandle> globali ed i formati, oltre alla manipolazione diretta della
+stessa tabella dei simboli di Perl. C<local> E<egrave> principalmente
+utilizzata quando il valore corrente di una variabile deve essere reso visibile
+ad una subroutine chiamata.
+
+Sinossi:
+
+    # localizzazione di valori
+
+    local $pippo;		# rendi $pippo locale dinamicamente
+    local (@pin, %co);		# rende locale la lista delle variabili
+    local $pippo = "flurp";	# rende $pippo dinamica, e la inizializza
+    local @oppip = @pluto;	# rende $oppip dinamica, e la inizializza
+
+    local $hash{chiave} = "val";# imposta un valore locale per questa
+                                # chiave nella hash
+    local ($cond ? $v1 : $v2);	# vari tipi di supporto per la localizzazione
+                                # di variabili come lvalues
+
+    # localizzazione di simboli
+
+    local *FH;			# localizza $FH, @FH, %FH, &FH  ...
+    local *merlyn = *randal;	# ora $merlyn E<egrave> veramente $randal, come anche
+                                #     @merlyn E<egrave> veramente @randal, ecc
+    local *merlyn = 'randal';	# IDEM: promuove 'randal' a *randal
+    local *merlyn = \$randal;   # fai alias solo di $merlyn, non di @merlyn ecc
+
+[un I<lvalue>, lo ricordiamo, E<egrave> un'espressione che restituisce qualcosa
+di utilizzabile nel lato sinistro di un'assegnazione, N.d.T.]
+
+Un C<local> modifica le proprie variabili elencate rendondole "locali"
+nel blocco racchiudente, o nella C<eval>, o in C<do FILE> ed in
+I<qualsiasi subroutine chiamata da dentro questo blocco>. Un C<local>
+non fa altro che associare valori temporanei a variabili globali (nel
+senso di variabili di pacchetto). I<Non> crea una variabile locale.
+Questo meccanismo E<egrave> noto come scope dinamico; lo scoping lessicale
+si fa con C<my>, che funziona molto piE<ugrave> come le dichiarazioni
+automatiche di C.
+
+Anche alcuni tipi di I<lvalue> possono essere localizzati: elementi
+di hash ed array, loro I<slice>, condizionali (a patto che il loro
+risultato risulti sempre localizzabile) e riferimenti simbolici.
+CosE<igrave> come per variabili semplici, questo sistema crea nuovi valori
+con visibilitE<agrave> dinamica.
+
+Se vengono fornite a C<local> piE<ugrave> di una variabile o espressione, esse
+devono essere poste fra parentesi tonde. Questo operatore funziona
+salvando il valore corrente di tali variabili nella sua
+lista degli argomenti in uno I<stack> nascosto, e ripristinandole
+all'uscita dal blocco, dalla subroutine o dalla C<eval()>. CiE<ograve>
+significa che le subroutine chiamate possono anche riferirsi alla
+variabile locale, ma non a quella globale. Se lo desiderate, potete
+effettaure assegnazione alla lista degli argomenti, il che vi
+consente di inizializzare le vostre variabili locali. (Se non viene
+fornito alcun sistema di inizializzazione per una data variabile, essa
+viene creata con valore indefinito [C<undef>, N.d.T.]).
+
+PoichE<eacute> C<local> E<egrave> un operatore utilizzato a tempo di esecuzione,
+esso viene eseguito tutte le volte in un ciclo, Di conseguenza, E<egrave> piE<ugrave>
+efficiente localizzare le vostre variabili al di fuori di un ciclo.
+
+=head3 Nota grammaticale su local()
+X<local, contesto>
+
+Un C<local> E<egrave> semplicemente un modificatore su un'espressione I<lvalue>.
+Quando fate un'assegnazione da una variabile C<local>izzata, il C<local>
+non cambia se la sua lista E<egrave> vista come scalare o come array. Quindi
+
+    local($pippo) = <STDIN>;
+    local @pippo = <STDIN>;
+
+forniscono entrambe un contesto lista alla parte di destra, mentre
+
+    local $foo = <STDIN>;
+
+fornisce un contesto scalare.
+
+=head3 Localizzazione delle variabili speciali
+X<local, variabile speciale>
+
+Se localizzate una variabile speciale le darete un nuovo valore, ma resterE<agrave>
+magica. Questo significa che tutti gli effetti collaterali associati a
+questo comportamento magico continueranno a funzionare anche con il
+valore localizzato.
+
+Grazie a tutto ciE<ograve> quanto segue funzionerE<agrave> come ci si aspetta:
+
+   # Leggi l'intero contenuto di FILE dentro la variabile $slurp
+   { local $/ = undef; $slurp = <FILE>; }
+
+Osservate, perE<ograve>, che questa caratteristica limita la possibilitE<agrave> di
+localizzazione di alcuni valori; ad esempio, l'istruzione seguente
+provocherE<agrave> la terminazione con C<die> a partire da perl 5.9.0, con errore
+I<Modification of a read-only value attempted> [tentativo di modifica
+di un valore di sola lettura, N.d.T.], perchE<eacute> la variabile C<$1> E<egrave>
+magica e di sola lettura:
+
+    local $1 = 2;
+
+In maniera analoga, ma piE<ugrave> complicata da riconoscere, il brano di codice
+che segue terminerE<agrave> l'esecuzione con C<die> in perl 5.9.0:
+
+    sub f { local $_ = "pippo"; print }
+    for ($1) {
+	    # ora $_ e` un alias di $1, dunque e` magico e di sola lettura
+	    f();
+    }
+
+Leggete la prossima sezione per trovare alternative a questa situazione.
+
+B<ATTENZIONE>: la localizzazione di array e hash "trattati" con C<tie> non
+funziona come descritto, al momento. Questa anomalia verrE<agrave> risolta in una
+futura versione di Perl; nel frattempo, evitate di scrivere codice che si
+basi su un particolare comportamento di array o hash sotto C<tie> localizzati
+(anche se la localizzazione dei singoli elementi E<egrave> a posto).
+Consultate L<perl58delta/"Localising Tied Arrays and Hashes Is Broken>
+["la localizzazione di array e hash sotto C<tie> non funziona", N.d.T.]
+per maggiori dettagli.
+X<local, tie>
+
+=head3 Localizzazione dei glob
+X<local, glob> X<glob>
+
+Il costrutto
+
+    local *nome;
+
+crea una sezione completamente nuova nella tabella dei simboli per il
+glob C<nome>, all'interno del package corrente. CiE<ograve> significa che tutte
+le variabili nel suo I<slot> glob (C<$nome>, C<@nome>, C<%nome>, C<&nome> ed
+il I<filehandle> C<nome>) vengono ripulite (e ripristinate) automaticamente.
+
+Fra l'altro, questo significa che qualsiasi comportamento "magico"
+assunto da queste variabili viene perso, localmente. In altre parole,
+utilizzare C<local */> non avrE<agrave> effetto sul valore interno del
+separatore in ingresso dei record.
+
+E<Egrave> notevole il fatto che, se volete lavorare con un valore nuovo di
+zecca per lo scalare di default C<$_>, ed evitare il potenziale problema
+indicato in precedenza nei casi in cui C<$_> sia latore di un comportamento
+magico, dovete utilizzare C<local *_> invece di C<local $_>.
+
+=head3 Localizzazione di elementi di tipi compositi
+X<local, elemento di tipo composito> X<local, elemento di array>
+X<local, elemento di hash>
+
+E<Egrave> il caso di fermarci un momento a spiegare cosa accade quando
+C<local>izzate un membro di un tipo composito (ossia, di un array o
+di una hash). In questo caso, l'elemento viene C<local>izzato I<per nome>.
+CiE<ograve> significa che quando lo I<scope> della C<local>izzazione termina,
+il valore salvato verrE<agrave> ripristinato nell'elemento della hash la cui
+chiave era nominata nella chiamata a C<local()>. Se questo elemento era
+stato cancellato mentre C<local()> era attiva (ad esempio da una
+chiamata a C<delete()> su una hash o da una C<shift()> di un array),
+ritornerE<agrave> in vita, con il possibile effetto di estendere un array o
+riempire gli elementi mancanti di una hash con C<undef>. Ad esempio,
+se scrivete:
+
+    %hash = ( 'Questo' => 'costituisce', 'una' => 'prova' );
+    @ary  = ( 0..5 );
+    {
+         local($ary[5]) = 6;
+         local($hash{'a'}) = 'drillo';
+         while (my $e = pop(@ary)) {
+             print "$e . . .\n";
+             last unless $e > 3;
+         }
+         if (@ary) {
+             $hash{'solo una'} = 'prova';
+             delete $hash{'una'};
+         }
+    }
+    print join(' ', map { "$_ $hash{$_}" } sort keys %hash),".\n";
+    print "L'array ha ",scalar(@ary)," elementi: ",
+          join(', ', map { defined $_ ? $_ : 'undef' } @ary),"\n";
+
+Perl stamperE<agrave>
+
+    6 . . .
+    4 . . .
+    3 . . .
+    Questa costituisce una prova solo una prova
+    L'array ha 6 elementi: 0, 1, 2, undef, undef, 5
+
+Il comportamento di C<local()> su membri non esistenti di un tipo
+composito E<egrave> soggetto a cambiamenti in futuro.
+
+=head2 Subroutine come Valori a Sinistra di un'Assegnazione
+X<lvalue> X<subroutine, lvalue> X<valore a sinistra>
+X<subroutine, valore a sinistra>
+
+[Quando un'espressione si puE<ograve> utilizzare come possibile valore
+alla I<sinistra> di un'assegnazione, si dice che questa
+restituisce un I<lvalue>, ossia un I<valore a sinistra>. Nel
+seguito utilizzeremo questo termine. N.d.T.]
+
+B<ATTENZIONE>: le subroutine utilizzate come lvalue sono ancora sperimentali,
+l'implementazione potrebbe cambiare nelle versioni future di Perl.
+
+E<Egrave> possibile restituire un valore modificabile da una subroutine. Per
+farlo, non dovete far altro che dichiarare che la subroutine restituirE<agrave>
+un lvalue.
+
+    my $val;
+    sub puo_modificare : lvalue {
+       # return $val; non funziona, non utilizzate la parola "return"
+       $val;
+    }
+    sub non_puo_modificare {
+       $val;
+    }
+
+    puo_modificare() = 5;        # assegna a $val
+    non_puo_modificare()  = 5;   # ERRORE
+
+Il contesto scalare o di lista per la subroutine e per il lato destro
+dell'assegnazione viene determinato come se la chiamata a subroutine fosse
+rimpiazzata da uno scalare. Ad esempio, considerate:
+
+    data(2,3) = prendi_data(3,4);
+
+Entrambe le subroutine qui vengono chiamate in contesto scalare, mentre in:
+
+    (data(2,3)) = prendi_data(3,4);
+
+ed in:
+
+    (data(2),data(3)) = prendi_data(3,4);
+
+tutte le subroutine sono chiamate in constesto lista.
+
+=over 4
+
+=item Le subroutine lvalue sono SPERIMENTALI
+
+Possono sembrare comode, ma ci sono numerosi e fondati motivi per
+avere cautela.
+
+Non potete utilizzare la parola chiave C<return>, dovete passare il valore
+in uscita prima di di uscire dallo I<scope> della subroutine (come
+indicato nel commento all'esempio fatto). Di solito questo non costituisce
+un problema, ma vi toglie la possibilitE<agrave> di uscire esplicitamente da
+un ciclo fortemente innestato, che a volte E<egrave> una via d'uscita comoda.
+
+Le subroutine lvalue violano anche l'incapsulamento. Un normale metodo
+I<mutatore> puE<ograve> controllare l'argomento che viene fornito prima di
+impostare l'attributo che sta proteggendo, mentre una subroutine
+lvalue non ha mai questa opportunitE<agrave>. Considerate:
+
+    my $un_rif_ad_array = [];	# protetto dai mutatori??
+    
+    sub imposta_arr { 		# mutatore normale
+       my $val = shift;
+       die("mi aspettavo un array, mi hai dato ", ref $val)
+	       unless ref $val eq 'ARRAY';
+       $un_rif_ad_array = $val;
+    }
+    sub imposta_arr_lv : lvalue {# mutatore lvalue
+       $un_rif_ad_array;
+    }
+
+    # imposta_arr_lv non puo` fermare questo errore!
+    imposta_arr_lv() = { a => 1 };
+
+=back
+
+=head2 Passare Elementi della Tabella dei Simboli (I<typeglob>)
+X<typeglob> X<*>
+
+B<ATTENZIONE>: il meccanismo descritto in questa sezione era, originariamente,
+l'unico modo per simulare un passaggio per variabile nelle versioni di
+Perl piE<ugrave> datate. Nonostante funzioni ancora bene nelle versioni
+piE<ugrave> moderne, il nuovo meccanismo dei riferimenti E<egrave> in generale
+piE<ugrave> semplice da utilizzare. Vedete piE<ugrave> avanti.
+
+A volte non volete passare il valore di un array ad una subroutine ma,
+piuttosto, il suo nome, di modo che la subroutine possa modificare l'istanza
+globale dell'array stesso invece che lavorare su una copia locale. In Perl
+potete riferirvi a tutti gli oggetti che hanno un determinato nome
+anteponendo un asterisco: C<*pippo>. Questo meccanismo E<egrave> noto come
+un I<typeglob>, perchE<eacute> l'asterisco puE<ograve> essere pensato come se
+fosse un match I<wildcard> [carattere jolly, N.d.T.] per tutti quegli strambi
+caratteri di prefisso per le variabili, le subroutine e cosE<igrave> via.
+
+Quando valutato, il typeglob produce un valore scalare che rappresenta
+tutti gli oggetti che hanno il dato nome, inclusi I<filehandle_>, formati
+e subroutine. Quando gli si assegna qualcosa, si fa in modo che il nome
+utilizzato si riferisca a qualunque C<*> valore gli sia assegnato. Ad
+esempio:
+
+   sub raddoppia_array {
+      local(*unqualcheary) = @_;
+      foreach $elem (@unqualcheary) {
+         $elem *= 2;
+      }
+   }
+   raddoppia_array(*pippo);
+   raddoppia_array(*pluto);
+
+Gli scalari sono sempre passati per riferimento, ossia potete modificare
+gli argomenti scalari senza utilizzare questo meccanismo semplicemente
+utilizzando C<$_[0]> ecc. Potete modificare tutti gli elementi di un
+array passandoli come scalari, ma dovete utilizzare il meccanismo C<*>
+(o l'equivalente con i riferimenti) per utilizzare C<push>, C<pop> o
+cambiare la dimensione dell'array. SarE<agrave> sicuramente piE<ugrave> rapido
+passare il I<typeglob> (o un riferimento).
+
+Anche se non volete modificare un array, questo meccanismo E<egrave> utile per
+passare piE<ugrave> array in un'unica LISTA, perchE<eacute> normalmente il
+meccanismo della LISTA fonderE<agrave> tutti i valori dei vari array senza
+permettervi di distinguerli. Per saperne di piE<ugrave> sui I<typeglob>: 
+L<perldata/"Typeglob e Filehandle">.
+
+=head2 Quando local() ha Ancora Senso
+X<local> X<variabile, locale> X<variabile, local>
+
+Nonostante esista C<my>, ci sono ancora tre situazioni dove l'operatore
+C<local> rifulge in tutto il suo splendore. Ancor meglio, in queste
+tre situazioni I<dovete> utilizzare C<local> invece di C<my>.
+
+=over 4
+
+=item 1.
+
+Dovete assegnare un valore temporaneo ad una variabile globale, specialmente
+C<$_>.
+
+Le variabili globali, come C<@ARGV> o le variabili punteggiatura, devono
+essere C<local>izzate con C<local()>. Il blocco di codice che segue legge
+il file F</etc/motd> e lo divide in parti separate da righe o segni di
+uguaglianza, che sono poste in C<@Campi>.
+
+   {
+      local @ARGV = ("/etc/motd");
+      local $/ = undef;
+      local $_ = <>;	
+      @Campi = split /^\s*=+\s*$/;
+   } 
+
+In particolare, E<egrave> importante C<local>izzare C<$_> in qualsiasi routine che
+assegni qualcosa a tale variabile. Facendo bene attenzione agli assegnamenti
+impliciti nei condizionali di C<while>.
+
+=item 2.
+
+Dovete creare un I<handle> locale per file o directory, o una funzione locale.
+
+Una funzione che abbia bisogno di un file tutto suo deve utilizzare
+C<local()> su un I<typeglob> completo. Quanto segue puE<ograve> essere utilizzato
+per create un nuovo elemento nella tabella dei simboli:
+
+    sub coda_io {
+        local  (*LETTORE, *SCRITTORE);    # non my!
+        pipe    (LETTORE,  SCRITTORE)     or die "pipe: $!";
+        return (*LETTORE, *SCRITTORE);
+    }
+    ($testa, $coda) = coda_io();
+
+Consultate il modulo C<Symbol> per un modo per creare elementi
+anonimi nella tabella dei simboli.
+
+PoichE<eacute> l'assegnazione di un riferimento ad un I<typeglob> crea un alias,
+questa caratteristica si puE<ograve> utilizzare per creare quella che risulta,
+di fatto, una funzione locale, o quantomeno un alias locale.
+
+    {
+        local *cresce = \&restringe; # solo finche' esiste questo blocco
+        cresce();                    # in realta`, chiama restringe()
+        muove();                     # se muove() cresce(), si restringe()
+    }
+    cresce();  # usa la cresce() reale
+
+Consultate L<perlref/"Modelli di Funzione"> per maggiori ragguagli sulla
+manipolazione di funzioni per nome, come in questo caso.
+
+=item 3.
+
+Volete modificare temporaneamente solo un elemento di un array o di
+una hash.
+
+Potete C<local>izzare anche un solo elemento di un aggregato. Di solito
+viene fatto su variabili dinamiche:
+
+   {
+      local $SIG{INT} = 'IGNORE';
+      funct();			    # non interrompibile
+   } 
+   # interrompibilita` ripristinata automaticamente in questo punto
+
+Ma funziona anche su aggregati dichiarati lessicalmente. Prima della
+versione 5.005 questa operazione poteva portare a comportamenti anomali
+in qualche occasione.
+
+=back
+
+=head2 Passaggio per Riferimento
+X<passaggio per riferimento> X<passaggio-per-riferimento> X<riferimento>
+
+Se volete passare piE<ugrave> di un array o hash ad una funzione -- o
+restituirle dalla stessa -- e volete che mantengano la loro integritE<agrave>,
+allora avete bisogno di utilizzare un passaggio per riferimento
+esplicito. Prima di farlo, perE<ograve>, c'E<egrave> bisogno che capiate i
+riferimenti come spiegati in L<perlref>. Viceversa, questa sezione non
+avrE<agrave> molto senso.
+
+Eccovi qualche esempio semplice. Prima di tutto, passiamo un po' di
+array ad una funzione e chiamiamo C<pop> su ciascuno, restituendo una
+nuova lista contenente tutti gli elementi estratti:
+
+   @finali = pop_molti ( \@a, \@b, \@c, \@d );
+
+   sub pop_molti {
+      my $aref;
+      my @listarit = ();
+      foreach $aref ( @_ ) {
+         push @listarit, pop @$aref;
+      }
+      return @listarit;
+    }
+
+Ecco come potete scrivere una funzione che restituisce una lista di chiavi
+che sono presenti in tutte le hash passate in ingresso:
+
+   @comuni = intersezione( \%pippo, \%pluto, \%dree );
+   sub intersezione {
+      my ($k, $href, %vista); # locali
+      foreach $href (@_) {
+         while ( $k = each %$href ) {
+         	$vista{$k}++;
+         }
+      }
+      return grep { $vista{$_} == @_ } keys %vista;
+   }
+
+Fino ad ora, stiamo solo utilizzando il normale meccanismo di restituzione
+di una lista. Che succede se volete passare o restituire una hash? Bene,
+se ne state utilizzando solamente una, o non vi interessa se si concatenano,
+allora la convenzione di chiamata usuale va bene, per quanto sia un po'
+costosetta computazionalmente.
+
+Dove molta gente si inguaia E<egrave> qui:
+
+    (@a, @b) = funzione(@c, @d);
+o
+    (%a, %b) = funzione(%c, %d);
+
+Questa sintassi, molto semplicemente, non funziona. Quel che fa E<egrave>
+impostare solamente C<@a> o C<%a>, e svuotare C<@b> o C<%b>. In piE<ugrave>,
+la funzione non ha ricevuto due array, o hash, separati: solo una
+lunga lista in C<@_>, come al solito.
+
+Se riuscite a fare in modo che chiunque riesca a capirci qualcosa con
+i riferimenti, il codice E<egrave> piE<ugrave> pulito, per quanto non
+cosE<igrave> semplice da leggere. Ecco un esempio di funzione che prende due
+riferimenti ad array come argomenti, restituendo gli elementi dei due array
+nell'ordine di quanti ciascuno ne ha in sE<eacute>:
+
+   ($aref, $bref) = funzione(\@c, \@d);
+   print "@$aref ha piu` elementi di @$bref\n";
+   sub funzione {
+      my ($cref, $dref) = @_;
+      if (@$cref > @$dref) {
+         return ($cref, $dref);
+      } else {
+         return ($dref, $cref);
+      }
+   }
+
+A conti fatti, potete anche fare cosE<igrave>:
+
+   (*a, *b) = funzione(\@c, \@d);
+   print "@$aref ha piu` elementi di @$bref\n";
+   sub funzione {
+      local (*c, *d) = @_;
+      if (@c > @d) {
+         return (\@c, \@d);
+      } else {
+         return (\@d, \@c);
+      }
+   }
+
+Qui stiamo utilizzando i I<typeglob> per ottenere alias nella tabella
+dei simboli. C'E<egrave> da dire che E<egrave> un po' sottile, perE<ograve>, e
+che non funziona se utilizzate variabili dichiarate con C<my>, perchE<eacute>
+solo le variabili globali si trovano nella tabella dei simboli (anche se sono
+in incognito grazie a C<local>).
+
+Se state passando dei I<filehandle>, potete utilizzare, di solito, anche
+il puro e semplice typeglob, come C<*STDOUT>, ma funziona anche con
+riferimenti a typeglob. Ad esempio:
+
+   balbetta(\*STDOUT);
+   sub balbetta {
+      my $fh = shift;
+      print $fh "her umh beh a hmmm\n";
+   }
+
+   $rec = ottieni_rec(\*STDIN);
+   sub ottieni_rec {
+      my $fh = shift;
+      return scalar <$fh>;
+   }
+
+Se avete in mente di generare nuovi filehandle... potete farlo. Fate
+attenzione a restituire solamente il filehandle C<*FH> cosE<igrave> 
+com'E<egrave>, non un suo riferimento.
+
+   sub aprilo {
+      my $path = shift;
+      local *FH;
+      return open (FH, $path) ? *FH : undef;
+   }
+
+=head2 Prototipi
+X<prototipi> X<subroutine, prototipo>
+
+Perl supporta una forma piuttosto limitata di verifica degli argomenti
+durante la compilazione, mediante l'utilizzo di prototipi di funzione. Se
+dichiarate:
+
+    sub mia_push (\@@)
+
+allora C<mia_push()> accetta gli argomenti esattamente come C<push()>.
+La dichiarazione della funzione deve essere visibile al momento della
+compilazione. Il prototipo ha effetto solo sull'interpretazione delle
+chiamate a funzione nuovo stile, dove "nuovo stile" si riferisce alla
+chiamata a funzione senza utilizzare il carattere C<&>. In altre parole,
+se chiamate questa funzione come se fosse parte integrante del
+linguaggio, essa si comporterE<agrave> come tale. Se la chiamate come una
+subroutine vecchio stile, allora si comporterE<agrave> al vecchio modo.
+Da questa regola, naturalmente, discende che i prototipi sono
+ignorati quando ci sono riferimenti a subroutine come C<\&pippo> o su
+chiamate indirette a subroutine come C<&{$subref}> o C<< $ubref->() >>.
+
+Anche le chiamate ai metodi [ossia, alle funzioni associate agli
+oggetti, N.d.T.] non sono influenzate dai prototipi, perchE<eacute>
+la funzione da chiamare non puE<ograve> essere stabilita a tempo di
+compilazione, dal momento che questa dipende dal particolare
+albero di ereditarietE<agrave>.
+
+Visto che lo scopo di questa caratteristica E<egrave> sostanzialmente quella
+di consentirvi di definire subroutine che funzionano come se fossero
+delle funzioni native del linguaggio, ecco i prototipi di alcune
+funzioni che corrispondono quasi esattamente alle relative
+funzioni native:
+
+    Dichiarata come           Chiamata come
+
+    sub mia_link ($$)         mia_link $vecchio, $nuovo
+    sub mia_vec ($$$)         mia_vec $var, $scostamento, 1
+    sub mia_index ($$;$)      mia_index &ottienistringa, "substr"
+    sub mia_syswrite ($$$;$)  mia_syswrite $buf, 0, length($buf) - $off, $off
+    sub mia_reverse (@)       mia_reverse $a, $b, $c
+    sub mia_join ($@)         mia_join ":", $a, $b, $c
+    sub mia_pop (\@)          mia_pop @array
+    sub mia_splice (\@$$@)    mia_splice @array, @array, 0, @pushsudime
+    sub mia_keys (\%)         mia_keys %{$hashref}
+    sub mia_open (*;$)        mia_open HANDLE, $nome
+    sub mia_pipe (**)         mia_pipe HANDLELETTURA, HANDLESCRITTURA
+    sub mia_grep (&@)         mia_grep { /pippo/ } $a, $b, $c
+    sub mia_rand ($)          mia_rand 42
+    sub mia_time ()           mia_time
+
+Ogni carattere di prototipo preceduto da una barra inversa [ossia
+la I<backslash> "\", N.d.T.] impone che il parametro reale debba
+iniziare con quel carattere. Il valore passato in C<@_> sarE<agrave> dunque
+un riferimento al parametro reale passato nella chiamata alla
+subroutine, ottenuto cioE<egrave> applicando C<\> all'argomento.
+
+Potete anche imporre il I<backslash> a molti argomenti
+contemporaneamente, utilizzando la notazione C<\[]>:
+
+    sub mio_rif (\[$@%&*])
+
+che vi consente di chiamare C<mio_rif()> come segue:
+
+    mio_rif $var
+    mio_rif @array
+    mio_rif %hash
+    mio_rif &sub
+    mio_rif *glob
+
+ed il primo argomento di C<mio_rif()> sarE<agrave> un riferimento ad uno
+scalare, un array, una hash, un pezzo di codice o un I<glob>.
+
+Caratteri di prototipo privi di I<backslash> hanno un significato
+particolare. Ciascun carattere C<@> o C<%> consuma tutti gli
+argomenti che rimangono, e forza la loro valutazione in un contesto
+di lista. Un argomento rappresentato da C<$> forza il contesto
+scalare. Un C<&> richiede una subroutine anonima che, se passata
+come primo argomento, non richiede che sia specificata la parola
+chiave C<sub> o che sia seguita da una virgola [separatrice di
+argomenti, N.d.T.].
+
+Un carattere C<*> consente di accettare una I<bareword> [o "parola
+nuda", ossia parola non inclusa fra virgolette semplici o doppie,
+N.d.T.], una costante, un'espressione scalare, un I<typeglob>, o
+un riferimento ad un I<typeglob> in quello slot. Il valore sarE<agrave>
+disponibile alla subroutine o come scalare semplice, o (negli
+ultimi due casi) come riferimento al I<typeglob>. Se volete
+convertire questi argomenti sempre in un riferimento ad un I<typeglob>,
+utilizzate C<Symbol::qualify_to_ref()> come segue:
+
+   use Symbol 'qualify_to_ref';
+
+   sub pippo (*) {
+      my $fh = qualify_to_ref(shift, caller);
+      # ...
+   }
+
+Un I<punto-e-virgola> separa gli argomenti obbligatori da quelli
+opzionali. E<Egrave> ridondante prima di C<@> o C<%>, che in ogni
+caso consumano tutto il resto.
+
+Osservate che gli ultimi tre esempi nella tabella data sono trattati
+in maniera particolare dal I<parser> [il sottosistema che legge il
+sorgente del programma e lo trasforma in qualcosa di eseguibile,
+N.d.T.]. C<mia_grep()> E<egrave> interpretata come un vero operatore di
+lista, C<mia_rand()> come un vero operatore unario con la stessa
+precedenza unaria di C<rand()>, e C<mia_time()> E<egrave> realmente priva
+di argomenti, proprio come C<time()>. Questo significa che se
+scrivete
+
+    mia_time +2;
+
+otterrete C<mia_time() + 2>, non C<mia_time(2)>, che E<egrave> come sarebbe
+interpretata senza il prototipo.
+
+Un aspetto interessante di C<&> E<egrave> che vi consente di generare nuove
+sintassi, a patto che si trovi in posizione iniziale:
+X<&>
+
+   sub try (&@) {
+      my($try,$catch) = @_;
+      eval { &$try };
+      if ($@) {
+         local $_ = $@;
+         &$catch;
+      }
+   }
+   sub catch (&) { $_[0] }
+
+   try {
+      die "topoloso";
+   } catch {
+      /topoloso/ and print "non topoloso\n";
+   };
+
+Viene stampato C<"non topoloso">. (SE<igrave>, rimangono ancora questioni
+irrisolte riguardanti la visibilitE<agrave> di C<@_>. Per il momento
+ignorerE<ograve> domande a riguardo. (Ma osservate che se rendiamo
+C<@_> limitata come visibilitE<agrave> in maniera lessicale, queste
+subroutine anonime possono comportarsi come chiusure...
+(Cavoli, non vi sembra di trovarvi in un programma Lisp?
+(Fate finta di niente)))).
+
+Ecco una re-implementazione dell'operatore Perl C<grep>:
+X<grep>
+
+   sub mia_grep (&@) {
+      my $codice = shift;
+      my @risultato;
+      foreach $_ (@_) {
+         push(@risultato, $_) if &$codice;
+      }
+      @risultato;
+   }
+
+Qualcuno preferirebbe prototipi completamente alfanumerici. Questi sono
+stati lasciati fuori dai prototipi per uno scopo esplicito: aggiungere,
+un giorno, il supporto per parametri formali con nome. Lo scopo principale
+del meccanismo attuale E<egrave> quello di permettere a chi scrive moduli, di
+dare un migliore supporto alla diagnosi per gli utilizzatori dei moduli
+stessi. Larry pensa che questa notazione sia abbastanza comprensibile
+per i programmatori Perl, e che non sia troppo intrusiva nel corpo del
+modulo, nE<eacute> che peggiori la leggibilitE<agrave>. Il I<rumore> causato
+dalla sequenza di caratteri E<egrave> incapsulato all'interno di una piccola
+pillolina, che E<egrave> semplice da ingoiare.
+
+Se provate ad utilizzare una sequenza alfanumerica in un prototipo,
+genererete un I<warning> [messaggio di avvertimento, N.d.T.]
+opzionale - I<Illegal character in prototype...> [ossia,
+I<Carattere non valido nel prototipo...>, N.d.T.]. Purtroppo
+le versioni precedenti di Perl consentivano l'utilizzo di un
+prototipo a patto che la prima parte fosse un prototipo valido.
+Il I<warning> potrE<agrave> essere promosso ad errore fatale in una
+versione futura di Perl, una volta che la maggior parte del
+codice sia stato ripulito da questo tipo di utilizzo.
+
+E<Egrave> probabilmente meglio utilizzare i prototipi per le nuove funzioni,
+senza andare a fare operazioni di "prototipizzazione all'indietro"
+per l'esistente. Dovete infatti prestare particolare attenzione alle
+conseguenze derivanti dalle diversitE<agrave> fra contesto scalare e contesto
+di lista. Ad esempio, se decidete che una funzione debba prendere un
+solo parametro, come questa:
+
+   sub funz ($) {
+      my $n = shift;
+      print "mi hai dato $n\n";
+   }
+
+e qualcuno la utilizzava chiamandola con un array o un'espressione
+che restituisce una lista:
+
+    funz(@pippo);
+    funz( split /:/ );
+
+Con il prototipo, vi viene automaticamente imposta una chiamata a
+C<scalar> di fronte all'argomento, che puE<ograve> riservare piE<ugrave> d'una
+sorpresa. Il vecchio C<@pippo>, che era solito contenere un solo
+scalare, non viene piE<ugrave> passato. Al suo posto, ora viene passato
+C<1>: ossia, il numero di elementi all'interno di C<@pippo>. E
+la funzione C<split> viene ora chiamata in contesto scalare, per
+cui comincia a scrivere dentro la vostra lista dei parametri C<@_>. Cribbio!
+
+Tutto ciE<ograve> E<egrave> molto potente, chiaramente, e dovrebbe essere
+utilizzato con moderazione perchE<eacute> il mondo sia un posto migliore.
+
+=head2 Funzioni Costanti
+X<costanti>
+
+Funzioni che hanno un prototipo C<()> sono potenziali candidate per
+l'inclusione in linea [espansione diretta del codice della
+funzione, che evita la chiamata vera e propria, N.d.T.]. Se il
+risultato a valle dell'ottimizzazione e della semplificazione delle
+costanti E<egrave> una costante o uno scalare lessicalmente circoscritto
+che non ha altri riferimenti, allora verrE<agrave> usato quello al posto
+di ciascuna chiamata fatta alla funzione senza utilizzare C<&>.
+(Consultate F<constant.pm> per un modo semplice di dichiarare
+la maggior parte delle costanti).
+
+Le seguenti funzioni saranno tutte espanse in linea:
+
+    sub pi ()		{ 3.14159 }		# Non proprio, ma ci siamo vicini
+    sub PI ()		{ 4 * atan2 1, 1 }	# Buona come viene,
+						# ed e` pure espansa in linea!
+    sub ST_DEV ()	{ 0 }
+    sub ST_INO ()	{ 1 }
+
+    sub FLAG_PIPPO ()    { 1 << 8 }
+    sub FLAG_PLUTO ()    { 1 << 9 }
+    sub FLAG_MASCHERA () { FLAG_PIPPO | FLAG_PLUTO }
+
+    sub OPZ_TOPO () { not (0x1B58 & FLAG_MASCHERA) }
+
+    sub N () { int(OPZ_TOPO) / 3 }
+
+    sub PIPPO_IMPOSTATO () { 1 if FLAG_MASCHERA & FLAG_PIPPO }
+
+Fate attenzione che quelle che segono non saranno espanse; poichE<eacute>
+contengono ambiti di visibilitE<agrave> interni, la semplificazione
+delle costanti non le riduce ad una singola costante:
+
+   sub pippo_set () { if (FLAG_MASCHERA & FLAG_PIPPO) { 1 } }
+
+   sub baz_val () {
+      if (OPZ_TOPO) {
+         return 23;
+      }
+      else {
+         return 42;
+      }
+   }
+
+Se ridefinite una subrouinte che risultava espandibile, riceverete un
+I<warning> obbligatorio. (Potete anche utilizzare questo I<warning> per sapere
+se una particolare subroutine E<egrave> considerata costante o no). Il
+I<warning> E<egrave> considerato importante abbastanza da non essere opzionale,
+perchE<eacute> le chiamate alla funzione compilate in precedenza utilizzeranno
+ancora la vecchia definizione della funzione. Se avete bisogno di ridefinire
+la subroutine, dovete assicurarvi che non sia espansa in linea, o eliminando
+il prototipo C<()> (che ne cambia il comportamento, quindi attenzione) o
+aggirando il meccanismo di espansione in qualche altro modo, come
+
+   sub non_espansa_in_linea () {
+      23 if $];
+   }
+
+=head2 Ridefinire le Funzioni Native
+X<built-in> X<nativa> X<ridefinire> X<CORE> X<CORE::GLOBAL>
+
+Molte funzioni native possono essere ridefinite, sebbene questo
+approccio debba essere riservato per poche e ben dimostrate
+occasioni. Tipicamente questo approccio potrebbe essere utilizzato
+da un modulo che tenti di emulare una funzionalitE<agrave> nativa su un
+sistema non-Unix.
+
+La ridefinizione puE<ograve> essere effettuata solo importando il nome da un
+modulo in fase di compilazione -- la pre-dichiarazione ordinaria
+non E<egrave> sufficiente. In ogni caso, il pragma C<use subs> vi consente,
+in effetti, di predichiarare le subroutine attraverso la sintassi
+di importazione usuale, e questi nomi possono poi ridefinire
+quelli nativi:
+
+   use subs 'chdir', 'chroot', 'chmod', 'chown';
+   chdir $daqualcheparte;
+   sub chdir { ... }
+
+Per riferirsi senza ambiguitE<agrave> alla forma nativa, occorre precedere
+il nome della funzione con il qualificatore di pacchetto speciale
+C<CORE::>. Ad esempio, C<CORE::open()> si riferisce sempre alla
+funzione nativa C<open()>, anche se il pacchetto corrente ha
+importato qualche altra subroutine chiamata C<&open()> da qualche
+altra parte. Anche se sembra una normale chiamata a funzione, non
+lo E<egrave>: non potete prendervi un riferimento, come l'espressione
+scorretta C<\&CORE::open> puE<ograve> sembrare produrre.
+
+I moduli di libreria non dovrebbero, in generale, esportare nomi
+di funzioni native come C<open> o C<chdir> come parte della loro
+lista C<@EXPORT> di default, perchE<eacute> potrebbero andarsi ad infilare
+nello spazio dei nomi di qualcun altro e cambiar loro la semantica
+in maniera inaspettata. Se il modulo, invece, include questi nomi
+all'interno di C<@EXPORT_OK> sarE<agrave> allora possibile per un utente
+importarli esplicitamente, ma non implicitamente. Ossia, potrebbero
+scrivere:
+
+    use Module 'open';
+
+e verrebbe importata la ridefinizione di C<open>. Ma se
+scrivessero
+
+    use Module;
+
+avrebbero i nomi importati per default senza le ridefinizioni.
+
+Il meccanismo di ridefinizione delle funzioni native viene ristretto,
+abbastanza intenzionalmente, al pacchetto che richiede l'importazione.
+Esiste perE<ograve> un secondo metodo che puE<ograve> essere talvolta
+utilizzato quando volete ridefinire una funzione nativa in tutto il programma,
+senza preoccuparvi dei limiti degli spazi dei nomi. Questo risultato puE<ograve>
+essere ottenuto importando una subroutine nello spazio dei nomi speciale
+C<CORE::GLOBAL::>. Quello che segue E<egrave> un esempio che rimpiazza
+l'operatore C<glob> senza troppo pudore, con qualcosa che gestisce
+le espressioni regolari:
+
+   package REGlob;
+   require Exporter;
+   @ISA = 'Exporter';
+   @EXPORT_OK = 'glob';
+
+   sub import {
+      my $pkg = shift;
+      return unless @_;
+      my $sim = shift;
+      my $dove = ($sim =~ s/^GLOBAL_// ? 'CORE::GLOBAL' : caller(0));
+      $pkg->export($dove, $sim, @_);
+   }
+
+   sub glob {
+      my $pat = shift;
+      my @preso;
+      local *D;
+      if (opendir D, '.') { 
+         @preso = grep /$pat/, readdir D; 
+         closedir D;   
+      }
+      return @preso;
+   }
+   1;
+
+Ed ecco come puE<ograve> essere (ab)usato:
+
+    #use REGlob 'GLOBAL_glob';	    # ridefinisce glob() in OGNI spazio dei nomi
+    package Pippo;
+    use REGlob 'glob';		    # ridefinisce glob() solo in Pippo::
+    print for <^[a-z_]+\.pm\$>;	    # mostra tutti i moduli pragmatici
+
+Il commento iniziale mostra un esempio controverso, persino pericoloso.
+Ridefinendo C<glob> in maniera globale, state forzando il comportamento
+nuovo (e sovversivo) per l'operatore C<glob> in I<ogni> spazio dei nomi,
+senza che i moduli che agiscono nei propri spazi dei nomi ne siano a
+conoscenza o che possano collaborare con questo cambiamento. Ovviamente,
+questo va fatto con estrema cautela -- se proprio va fatto.
+
+L'esempio C<REglob> dato non implementa tutto il supporto necessario a
+ridefinire l'operatore C<glob> in maniera pulita. La C<glob> nativa ha
+comportamenti differenti a seconda che appaia in contesto scalare o di
+lista, mentre la nostra C<REglob> non lo fa. Va osservato che molte
+funzioni native hanno un comportamento sensibile al contesto, e che
+queste varietE<agrave> devono essere adeguatamente supportate da un rimpiazzo
+scritto correttamente. Per un esempio pienamente funzionante su come
+ridefinire C<glob>, studiatevi l'implementazione di C<File::DosGlob>
+nella libreria standard.
+
+Quando ridefinite una funzione nativa, il vostro rimpiazzo dovrebbe
+essere consistente (se possibile) con la sintassi originale. Potete
+ottenere questo effetto utilizzando un prototipo adeguato. Per avere
+il prototipo di una funzione nativa rimpiazzabile, utilizzate
+la funzione C<prototype> passando C<"CORE::nome_funzione_nativa"> come
+parametro (per maggiori dettagli si rimanda a C<perlfunc/prototype>).
+
+Osservate, comunque, che la sintassi di alcune funzioni native non
+puE<ograve> essere espressa da un prototipo (come ad esempio C<system> o
+C<chomp>). Se le ridefinite non sarete in grado di simulare appieno
+la sintassi originale.
+
+Anche le funzioni native C<do>, C<require> e C<glob> possono essere
+ridefinite, ma per una magia particolare la loro sintassi
+viene mantenuta, e non avete bisogno di definire un prototipo
+per i loro rimpiazzi. (Nonostante ciE<ograve>, non potete ridefinire
+la sintassi di C<do BLOCCO>).
+
+C<require> ha una magia nera in piE<ugrave>: se chiamate il vostro rimpiazzo
+C<require> come C<require Pippo::Pluto>, esso in realtE<agrave> riceverE<agrave>
+C<"Pippo/Pluto.pm"> in C<@_>. Consultate L<perlfunc/require>.
+
+Come avrete notato dall'esempio precedente, se ridefinite C<glob>,
+anche l'operatore C<E<lt>*E<gt>> viene rimpiazzato.
+
+In modo simile, ridefinendo la funzione C<readline> si ha un rimpiazzo
+anche per l'operatore di I/O equivalente C<< <FILEHANDLE> >>.
+
+Va detto, infine, che alcune funzioni native (come C<exists> o C<grep>)
+non possono essere ridefinite.
+
+=head2 Caricamento automatico
+X<autoloading> X<AUTOLOAD> X<caricamento automatico>
+
+Se chiamate una funzione non definita, solitamente ottente
+immediatamente un errore fatale, che si lamenta del fatto che
+la subroutine non esiste. (La stessa cosa accade per le
+subroutine utilizzate come metodi, quando il metodo non
+esiste nE<eacute> nel pacchetto nE<eacute> in alcuna delle classi base).
+In ogni caso, perE<ograve>, se viene definita una subroutine chiamata
+C<AUTOLOAD> nel pacchetto o nei pacchetti utilizzati per
+trovare la subroutine originale, allora quella subroutine
+C<AUTOLOAD> viene chiamata con gli argomenti che sarebbero
+stati passati alla subroutine originale. Il nome della
+subroutine originale, pienamente qualificato con il nome
+del pacchetto, appare magicamente nella variabile globale
+C<$AUTOLOAD> dello stesso pacchetto della routine C<AUTOLOAD>.
+Il nome non viene passato come un argomento normale perchE<eacute>,
+ehm, beh, solo perchE<eacute>, ecco per il motivo che...
+
+Molte routine C<AUTOLOAD> caricano una definizione per la subroutine
+richiesta utilizzando C<eval()>, e poi eseguono questa subroutine
+utilizzando una forma particolare di C<goto()>, che cancella lo
+I<stack frame> di C<AUTOLOAD> senza lasciarne traccia. (Andatevi
+a vedere i sorgenti del modulo standard documentato in
+L<AutoLoader>, ad esempio). Ma una routine C<AUTOLOAD> puE<ograve> anche
+semplicemente emulare la subroutine originale senza mai
+definirla. Ad esempio, facciamo finta che una funzione non
+definita debba semplicemente chiamare C<system> con gli
+argomenti dati. Tutto ciE<ograve> che dovreste fare E<egrave>:
+
+   sub AUTOLOAD {
+      my $programma = $AUTOLOAD;
+      $programma =~ s/.*:://;
+      system($programma, @_);
+   }
+   date();
+   who('am', 'i');
+   ls('-l');
+
+Di fatto, se predichiarate le funzioni che volete chiamare in questo
+modo, non avete nemmeno bisogno delle parentesi:
+
+    use subs qw(date who ls);
+    date;
+    who "am", "i";
+    ls -l;
+
+Un esempio piE<ugrave> complesso di questo meccanismo si trova nel modulo
+standard L<Shell>, che puE<ograve> trattare una subroutine non definita come
+chiamata ad un programma esterno.
+
+Sono disponibili meccanismi per aiutare chi scrive moduli a suddividere
+i propri moduli in file caricabili automaticamente. Potete trovare
+il modulo standard AutoLoader descritto in L<AutoLoader> ed in
+L<AutoSplit>, il modulo standard SelfLoader in L<SelfLoader>, e
+la documentazione su come aggiungere funzioni C al codice Perl in
+L<perlxs>.
+
+=head2 Attributi delle Subroutine
+X<attributo> X<subroutine, attributo> X<attrs>
+
+Una dichiarazione o una definizione di subroutine possono avere
+una lista di attributi associata. Se tale lista E<egrave> presente,
+viene suddivisa utilizzando spazi o virgole come separatori,
+e trattata come se fosse stato scritto C<use attributes>.
+Consultate L<attributes> per maggiori dettagli su quali
+attributi sono supportati al momento.
+
+Differentemente dalle limitazioni legate all'obsolescente
+C<use attrs>, la sintassi C<sub : LISTA_ATTRIBUTI> E<egrave> orientata
+ad associare gli attributi con una pre-dichiarazione, e non
+semplicemente con una definizione di subroutine.
+
+Gli attributi devono essere validi come semplici nomi di
+identificatore (senza altri simboli di interpunzione oltre che
+il carattere '_'). Possono avere una lista di parametri,
+che viene controllata semplicemente per assicurarsi che le
+parentesi ('(',')') si innestino correttamente.
+
+Esempi di sintassi valide (anche se gli attributi sono sconosciuti):
+
+    sub fnord (&\%) : scambia(10,pippo(7,3))  :  costosa;
+    sub plugh () : Brutto('\(") :Cattivo;
+    sub xyzzy : _5x5 { ... }
+
+Esempi di sintassi non valida:
+
+    sub fnord : scambia(10,pippo(); # () non bilanciate
+    sub snoid : Brutto('(');	  # () non bilanciate
+    sub xyzzy : 5x5;		  # "5x5" non e` un identificatore valido
+    sub plugh : Y2::north;	  # "Y2::north" identificatore non semplice
+    sub snurt : pippo + pluto;	  # "+" non e` una virgola o uno spazio
+
+La lista degli attributi viene passata come una lista di stringhe costanti
+al codice che li associa alla subroutine. In particolare, il secondo
+esempio di sintassi valida sopra riportato, al momento viene interpretato e 
+chiamato come segue:
+
+    use attributes __PACKAGE__, \&plugh, q[Brutto('\(")], 'Cattivo';
+
+Per maggiori dettagli sulle liste di attributi e la loro manipolazione
+consultate L<attributes> e L<Attribute::Handlers>.
+
+=head1 CONSULTATE ANCHE
+
+Consultate L<perlref/"Modelli di Funzione"> per dettagli su riferimenti e chiusure.
+Consultate L<perlxs> per imparare qualcosa su come chiamare funzioni C da Perl.
+Consultate L<perlembed> per imparare a chiamare subroutine Perl da C.
+Consultate L<perlmod> per imparare a raggruppare le funzioni in file separati.
+Consultate L<perlmodlib> per sapere quali moduli di libreria sono standard.
+Consultate L<perltoot> per imparare a fare chiamate ai metodi di un oggetto.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlsub
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Flavio Poletti.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

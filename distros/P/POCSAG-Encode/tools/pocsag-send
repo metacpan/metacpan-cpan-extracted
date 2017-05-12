@@ -1,0 +1,58 @@
+
+use strict;
+use warnings;
+
+use POCSAG::Encode;
+use POCSAG::PISS;
+
+my $usage = "pocsag-send <serialdevice> <destination> <message>\n"
+	. "\n"
+	. "Example:\n"
+	. "   pocsag-send /dev/ttyUSB0 123456 'Hello, world!'\n"
+	. "\n"
+	. "This program uses the PISS protocol to talk to an external POCSAG\n"
+	. "modem. No, it does not drive the transmitter directly.\n";
+
+my($port, $dest, $message) = @ARGV;
+
+if (!defined $message) {
+	die $usage;
+}
+
+if ($dest !~ /^\d+$/) {
+	warn "Destination is not a number.\n";
+	die $usage;
+}
+
+
+# max buffer length in bytes in the modem
+# (the modem might report a smaller or larger value later)
+my $max_tx_len = 1000;
+
+# open the serial connection to the bit-banging modem
+my $modem = new POCSAG::PISS(
+	'serial' => $port,
+	'serial_speed' => 19200,
+	'max_tx_len' => $max_tx_len,
+	'debug' => 1,
+);
+
+POCSAG::Encode::set_debug(0);
+
+$modem->open() || die "Failed to open PISS modem: " . $modem->error_msg();
+
+# list of messages to send
+my @msgs = (
+	# address, function, type, message
+	[ $dest, 0, 'a', $message ]
+);
+
+# generate the POCSAG encoded binary transmission,
+# returns the messages which did not fit in the buffer
+my($encoded, @left) = POCSAG::Encode::generate($modem->max_tx_len(), @msgs);
+
+# transmit the POCSAG transmission
+$modem->brraaap($encoded)
+	|| die "Failed to send POCSAG brrraaap: " . $modem->error_msg();
+$modem->close();
+

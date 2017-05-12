@@ -1,0 +1,47 @@
+# Added by Dist::Zilla::PluginBundle::Apocalyptic v0.001
+
+# skip Eclipse IDE stuff
+\.includepath$
+\.project$
+\.settings/
+
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+\B\.git\b
+^\.gitignore$
+
+# Ignore Dist::Zilla's build dir
+^\.build/
+
+# Avoid configuration metadata file
+^MYMETA\.
+
+# Avoid Makemaker generated and utility files.
+^Makefile$
+^blib/
+^MakeMaker-\d
+\bpm_to_blib$
+^blibdirs$
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\bBuild.bat$
+\b_build
+\bBuild.COM$
+\bBUILD.COM$
+\bbuild.com$
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+^\.#
+\.bak$
+
+# our tarballs
+\.tar\.gz$
+^releases/
+

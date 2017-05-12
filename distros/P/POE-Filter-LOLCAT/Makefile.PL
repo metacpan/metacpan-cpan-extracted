@@ -1,0 +1,17 @@
+use strict;
+use inc::Module::Install;
+name 'POE-Filter-LOLCAT';
+author 'Chris Williams <chris@bingosnet.co.uk>';
+version_from 'lib/POE/Filter/LOLCAT.pm';
+abstract_from 'lib/POE/Filter/LOLCAT.pm';
+readme_from 'lib/POE/Filter/LOLCAT.pm';
+license 'perl';
+auto_license holder => 'Chris Williams';
+perl_version '5.006';
+build_requires 'Test::More' => 0.47;
+requires 'POE' => 1.004;
+requires 'POE::Filter' => 0;
+requires 'Acme::LOLCAT' => '0.0.5';
+auto_provides;
+githubmeta;
+WriteAll;

@@ -1,0 +1,12 @@
+Revision history for Perl extension Proc::WaitStat.
+
+1.00  Thu Oct 21 12:38:28 EDT 1999
+
+    - Handle a string passed as filehandle to close_die().  I think this
+      changed behavior in 5.005.
+
+0.01  Thu May 15 00:00:00 EDT 1997
+
+    - Initial version.
+
+$Id: Changes,v 1.2 1999-10-21 12:38:48-04 roderick Exp $

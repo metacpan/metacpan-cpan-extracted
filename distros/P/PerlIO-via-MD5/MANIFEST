@@ -1,0 +1,11 @@
+MANIFEST
+CHANGELOG
+README
+TODO
+VERSION
+Makefile.PL
+lib/PerlIO/via/MD5.pm
+t/MD5.t
+t/test.md5
+META.yml                                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

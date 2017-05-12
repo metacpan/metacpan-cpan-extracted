@@ -1,0 +1,8 @@
+use PersistentPerl;
+
+print "1\n";
+if ($ARGV[0]) {
+    PersistentPerl->register_cleanup(sub {print "3\n"});
+    PersistentPerl->register_cleanup(sub {print "4\n"});
+}
+print "2\n";

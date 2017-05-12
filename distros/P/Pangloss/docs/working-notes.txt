@@ -1,0 +1,83 @@
+========================
+ Pangloss Working Notes
+========================
+
+x. Storing Keys vs. References
+
+The issue:
+Ease of access to related data, vs. storage/retrieval of the data.
+
+Includes:
+    o	referential integrity.
+    o	deleting associated objects.
+	(how will this affect Pixie stores?)
+
+Possible intermediate solutions:
+    o	could store keys internally, & build references in the View?
+
+
+x. Pangloss Requests
+
+Translate HTTP request into a Pangloss::Request, and don't do anything if it
+doesn't exist.  This would make loading *.css much quicker.
+
+Eventually:
+    o	Pangloss::Request
+    	(add_term, get_language, etc.)
+    o	Decline::NoPanglossRequest
+
+It would be a good idea to encapsulate all requests to Pangloss in a
+Pangloss::Request object.  If none exists, we can skip most of the
+pipeline.  If one exists, then it can be populated from various
+different sources.  Complicated actions could be defined easily by
+writing segments that modify the request...
+
+(What, and we can't use an OpenFrame::Request for this?  Ok, so it's not as
+ easy to write a Decliner for... is that enough reason to duplicate a lot of
+ effort?)
+
+
+x. More General Error Flags
+
+Now we're inheritting errors via xi:includes...  But the problem with this is
+that Petal does not preserve context from included files!  In order to flag
+mistakes up nicely for the user, we'll have to have more general error flags
+for use in the presentation layer:
+
+	error/language/iso_code_error
+	error/user/name_error
+	...etc...
+
+the edit/*language.html are experiments in this.
+
+x. Errors
+
+    o	Stop exporting error flags by default.  Maybe don't export them at all?
+	Could use $class->eSomeFlag instead?
+
+    o	On error, return to previous page (if possible - use Referer header?).
+
+    o	Some errors may be associated with different actions - say you're
+    	trying to get a term, and load_languages fails...  Wait, bad example,
+	that won't actually happen.  Maybe there's a better one?  Watch out,
+	at any rate.
+
+    o	Anything left to do for Error reporting in the templates?
+
+
+x. Source Language
+
+Let the system know what the Source Language is.  Only one per instance of
+Pangloss.  Admin would have to be able to change this.  (does this belong in
+the LanguageEditor?)
+
+
+x. Generalize Collections even more?
+
+Look into generalizing the Collections even more.  Perhaps we don't need
+individual sub-classes to do the work of what is essentially 1 class.
+(Errors seem to be the only odd piece of the picture).
+
+
+__
+EOF

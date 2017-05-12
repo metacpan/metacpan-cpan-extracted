@@ -1,0 +1,143 @@
+[AGENT]
+
+Mozilla/5.0 (compatible; Konqueror/3.1-rc6; i686 Linux; 20020607)
+
+generic     => 1,
+lang        => '20020607',
+name        => 'Konqueror',
+os          => 'i686 Linux',
+parser      => 'generic_compatible',
+version     => '3.001000006',
+version_raw => '3.1-rc6',
+
+[AGENT]
+
+Mozilla/5.0 (compatible; Konqueror/3.0.0; Linux)
+
+generic     => 1,
+name        => 'Konqueror',
+os          => 'Linux',
+parser      => 'generic_compatible',
+version     => '3.000000',
+version_raw => '3.0.0',
+
+[AGENT]
+
+Mozilla/5.0 (compatible; Konqueror/3.0.0-10; Linux)
+
+generic     => 1,
+name        => 'Konqueror',
+os          => 'Linux',
+parser      => 'generic_compatible',
+version     => '3.000000010',
+version_raw => '3.0.0-10',
+
+[AGENT]
+
+Mozilla/5.0 (compatible; Konqueror/3.0; i686 Linux; 20020423)
+
+generic     => 1,
+lang        => '20020423',
+name        => 'Konqueror',
+os          => 'i686 Linux',
+parser      => 'generic_compatible',
+version     => '3.000',
+version_raw => '3.0',
+
+[AGENT]
+
+Mozilla/5.0 (compatible; Konqueror/3.4; Linux) KHTML/3.4.2 (like Gecko) (Debian package 4:3.4.2-4)
+
+extras      => [ 'KHTML/3.4.2', 'like Gecko', '', 'Debian package 4:3.4.2-4' ],
+generic     => 1,
+name        => 'Konqueror',
+os          => 'Linux',
+parser      => 'generic_compatible',
+version     => '3.400',
+version_raw => '3.4',
+
+[AGENT]
+
+Mozilla/5.0 (compatible; Konqueror/3.4; Linux 2.6.12; X11) KHTML/3.4.1 (like Gecko) (Debian package 4:3.4.1-1)
+
+extras      => [ 'KHTML/3.4.1', 'like Gecko', '', 'Debian package 4:3.4.1-1' ],
+generic     => 1,
+lang        => 'X11',
+name        => 'Konqueror',
+os          => 'Linux 2.6.12',
+parser      => 'generic_compatible',
+version     => '3.400',
+version_raw => '3.4',
+
+[AGENT]
+
+Mozilla/5.0 (compatible; Konqueror/3.4) KHTML/3.4.2 (like Gecko)
+
+extras      => [ 'KHTML/3.4.2', 'like Gecko' ],
+generic     => 1,
+name        => 'Konqueror',
+parser      => 'generic_compatible',
+version     => '3.400',
+version_raw => '3.4',
+
+[AGENT]
+
+Mozilla/5.0 (compatible; Konqueror/3.5; Linux; i686; U; it-IT) KHTML/3.5.5 (like Gecko) (Debian)
+
+extras      => [ 'i686', 'KHTML/3.5.5', 'like Gecko', '', 'Debian' ],
+generic     => 1,
+lang        => 'it-IT',
+name        => 'Konqueror',
+os          => 'Linux',
+parser      => 'generic_compatible',
+strength    => 'U',
+version     => '3.500',
+version_raw => '3.5',
+
+[AGENT]
+
+Mozilla/5.0 (compatible; Konqueror/3.5; Linux; en_US) KHTML/3.5.6 (like Gecko) (Kubuntu)
+
+extras      => [ 'KHTML/3.5.6', 'like Gecko', '', 'Kubuntu' ],
+generic     => 1,
+lang        => 'en_US',
+name        => 'Konqueror',
+os          => 'Linux',
+parser      => 'generic_compatible',
+version     => '3.500',
+version_raw => '3.5',
+
+[AGENT]
+
+Mozilla/5.0 (compatible; Konqueror/3; Linux 2.4.18-4GB; X11; i686; en_US)
+
+'parser'           => 'generic_compatible',
+'os'               => 'Linux 2.4.18-4GB',
+'extras'           => ['X11','i686'],
+'version_raw'      => '3',
+'lang'             => 'en_US',
+'version'          => '3.000',
+'name'             => 'Konqueror',
+'generic'          => 1
+
+[AGENT]
+
+Mozilla/5.0 (compatible; Konqueror/3; Linux)
+
+'parser'           => 'generic_compatible',
+'os'               => 'Linux',
+'version_raw'      => '3',
+'version'          => '3.000',
+'name'             => 'Konqueror',
+'generic'          => 1
+
+[AGENT]
+
+Mozilla/5.0 (compatible; Konqueror/3; Darwin)
+
+'parser'           => 'generic_compatible',
+'os'               => 'Darwin',
+'version_raw'      => '3',
+'version'          => '3.000',
+'name'             => 'Konqueror',
+'generic'          => 1

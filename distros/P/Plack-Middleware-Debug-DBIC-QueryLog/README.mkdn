@@ -1,0 +1,122 @@
+# NAME
+
+Plack::Middleware::Debug::DBIC::QueryLog - DBIC Query Log and Query Analyzer
+
+# SYNOPSIS
+
+Adds a debug panel and querylog object for logging [DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class) queries.  Has
+support for [Catalyst](http://search.cpan.org/perldoc?Catalyst) via a [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog)
+compatible trait, [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack).
+
+    use Plack::Builder;
+
+    my $app = ...; ## Build your Plack App
+
+    builder {
+      enable 'Debug', panels =>['DBIC::QueryLog'];
+      $app;
+    };
+
+And in you [Catalyst](http://search.cpan.org/perldoc?Catalyst) application, if you are also using
+[Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack)
+
+    package MyApp::Web::Model::Schema;
+    use Moose;
+    extends 'Catalyst::Model::DBIC::Schema';
+
+    __PACKAGE__->config({
+      schema_class => 'MyApp::Schema',
+      traits => ['QueryLog::AdoptPlack'],
+      ## .. rest of configuration
+    });
+
+# DESCRIPTION
+
+[DBIx::Class::QueryLog](http://search.cpan.org/perldoc?DBIx::Class::QueryLog) is a tool in the [DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class) software ecosystem
+which benchmarks queries.  It lets you log the SQL that [DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class)
+is generating, along with bind variables and timestamps.  You can then pass
+the querylog object to an analyzer (such as [DBIx::Class::QueryLog::Analyzer](http://search.cpan.org/perldoc?DBIx::Class::QueryLog::Analyzer))
+to generate sorted statistics for all the queries between certain log points.
+
+Query logging in [Catalyst](http://search.cpan.org/perldoc?Catalyst) is supported for [DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class) via a trait for
+[Catalyst::Model::DBIC::Schema](http://search.cpan.org/perldoc?Catalyst::Model::DBIC::Schema) called
+[Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog).  This trait will
+log all the SQL used by [DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class) for a given request cycle.  This is very
+useful since it can help you identify troublesome or bottlenecking queries.
+
+However, [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog) does not provide
+out of the box outputting of your analyzed query logs.  Usually you need to
+add a bit of templating work to the bottom of your webpage footer, or dump the
+output to the logs.  We'd like to provide a lower ceremony experience.
+
+Additionally, it would be nice if we could provide this functionality for all
+[Plack](http://search.cpan.org/perldoc?Plack) based applications, not just [Catalyst](http://search.cpan.org/perldoc?Catalyst).  Ideally we'd play nice with
+[Plack::Middleware::Debug](http://search.cpan.org/perldoc?Plack::Middleware::Debug) so that the table of our querylog would appear as
+a neat Plack based Debug panel.  This bit of middleware provides that function.
+
+Basically we create a new instance of [DBIx::Class::QueryLog](http://search.cpan.org/perldoc?DBIx::Class::QueryLog) and place it
+into `$env->{'plack.middleware.dbic.querylog'}` (We use the underlying
+features in [Plack::Middleware::DBIC::QueryLog](http://search.cpan.org/perldoc?Plack::Middleware::DBIC::QueryLog)) so that it is accessible by
+all applications running inside of [Plack](http://search.cpan.org/perldoc?Plack).  You need to 'tell' your application's
+instance of [DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class) to use this `$env` key and make sure you set
+[DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class)'s debug object correctly.  The officially supported interface for
+this in via the supporting class [Plack::Middleware::DBIC::QueryLog](http://search.cpan.org/perldoc?Plack::Middleware::DBIC::QueryLog):
+
+    use Plack::Middleware::DBIC::QueryLog;
+
+    my $querylog = Plack::Middleware::DBIC::QueryLog->get_querylog_from_env($env);
+    my $cloned_schema = $schema->clone;
+    $cloned_schema->storage->debug(1);
+    $cloned_schema->storage->debugobj($querylog);
+
+In this example `$env` is a [Plack](http://search.cpan.org/perldoc?Plack) environment, typically passed into your PSGI
+compliant application and `$schema` is an instance of [DBIx::Class::Schema](http://search.cpan.org/perldoc?DBIx::Class::Schema)
+
+We clone `$schema` to avoid associating the querylog with the global, persistant
+DBIC schema object.
+
+Then you need to enable the Debug panel, as in the [\SYNOPSIS](http://search.cpan.org/perldoc?\SYNOPSIS).  That way when
+you view the debug panel, we have SQL to review.
+
+There's an application in '/example' you can review for help.  However, if you
+are using [Catalyst](http://search.cpan.org/perldoc?Catalyst) and a modern [Catalyst::Model::DBIC::Schema](http://search.cpan.org/perldoc?Catalyst::Model::DBIC::Schema) you can use
+the trait [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack),
+which is compatible with [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog).
+
+If you want a querylog but don't want or need the [Plack](http://search.cpan.org/perldoc?Plack) debug panel, you
+should take a look at [Plack::Middleware::DBIC::QueryLog](http://search.cpan.org/perldoc?Plack::Middleware::DBIC::QueryLog).
+
+See the ["SYNOPSIS"](#SYNOPSIS) example for more details.
+
+# OPTIONS
+
+This debug panel defines the following options.
+
+## querylog_class
+
+This is the class which is used to build the `querylog` unless one is already
+defined.  It defaults to [DBIx::Class::QueryLog](http://search.cpan.org/perldoc?DBIx::Class::QueryLog).  You should probably leave
+this alone unless you need to subclass or augment [DBIx::Class::QueryLog](http://search.cpan.org/perldoc?DBIx::Class::QueryLog).
+
+If the class name you pass has not already been included (via `use` or
+`require`) we will automatically try to `require` it.
+
+## querylog_args
+
+Takes a HashRef which is passed to [DBIx::Class::QueryLog](http://search.cpan.org/perldoc?DBIx::Class::QueryLog) at construction.
+
+# SEE ALSO
+
+[Plack::Middleware::Debug](http://search.cpan.org/perldoc?Plack::Middleware::Debug), [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog),
+[Catalyst::Model::DBIC::Schema](http://search.cpan.org/perldoc?Catalyst::Model::DBIC::Schema), [Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack](http://search.cpan.org/perldoc?Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack)
+
+# AUTHOR
+
+John Napiorkowski, `<jjnapiork@cpan.org>`
+
+# COPYRIGHT & LICENSE
+
+Copyright 2011 John Napiorkowski
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

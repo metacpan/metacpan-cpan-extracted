@@ -1,0 +1,15 @@
+=pod
+
+This is a normal paragraph.
+
+	#!/usr/bin/perl
+	use strict;
+	use warnings;
+	
+	while( <> ) {
+		print;
+		}
+		
+This is an ending paragraph.
+
+=cut

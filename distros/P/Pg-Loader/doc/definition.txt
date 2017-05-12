@@ -1,0 +1,10 @@
+=> \d exam
+     Table "public.exam"
+ Column |  Type   | Modifiers
+--------+---------+-----------
+ fn     | text    |
+ ln     | text    |
+ exam   | integer |
+ score  | integer |
+Indexes:
+    "exam_pkey" PRIMARY KEY, btree (fn)

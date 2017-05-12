@@ -1,0 +1,35 @@
+PXP version 0.01
+================
+
+PXP - Perl Xtensions & Plugins
+
+This modules provides a generic plugin framework, similar to the
+Eclipse model.  It has been developed for the IMC project (see
+http://imc.sourceforge.net/) and is now released as an autonomous
+CPAN module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Log::Log4perl
+XML::Simple
+XML::XPath
+I18N::LangTags
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 - dbarth@idealx.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,31 @@
+---
+abstract: 'retrieve the data inlined in Pod'
+author:
+  - 'Francois Perrad <francois.perrad@gadz.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Simple-Data
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Pod::Simple: '3.07'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/fperrad/Pod-Simple-Data/issues
+  homepage: https://github.com/fperrad/Pod-Simple-Data
+  repository: https://github.com/fperrad/Pod-Simple-Data.git
+version: '0.02'

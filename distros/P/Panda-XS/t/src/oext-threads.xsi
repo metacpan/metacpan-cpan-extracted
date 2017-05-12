@@ -1,0 +1,13 @@
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::MyThreadSafe
+PROTOTYPES: DISABLE
+
+MyThreadSafe* MyThreadSafe::new (int arg) {
+    RETVAL = new MyThreadSafe(arg);
+}
+
+int MyThreadSafe::val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+void MyThreadSafe::DESTROY ()

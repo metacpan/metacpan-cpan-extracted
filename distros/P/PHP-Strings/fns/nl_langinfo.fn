@@ -1,0 +1,3 @@
+docs: |
+    L<I18N::Langinfo> has a C<langinfo> command that corresponds to PHP's
+    C<nl_langinfo> function.

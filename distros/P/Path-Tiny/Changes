@@ -1,0 +1,857 @@
+Revision history for Path-Tiny
+
+0.104     2017-02-17 07:17:00-05:00 America/New_York
+
+    - No changes from 0.103-TRIAL.
+
+0.103     2017-02-10 17:25:06-05:00 America/New_York (TRIAL RELEASE)
+
+    [Bug fixes]
+
+    - Path::Tiny 0.101 on Windows made `$path->absolute("/foo")` return an
+      absolute path starting with 'C:/foo', which was an unintentional
+      behavior change.  This release now uses any absolute base without
+      further normalization.
+
+0.101     2017-02-05 09:56:46-05:00 America/New_York (TRIAL RELEASE)
+
+    [Changes]
+
+    - The 'absolute' method now always returns an absolute path, even if a
+      user provided a relative path for the base path.  The old, odd
+      behavior was documented, but people often don't read docs.  The new
+      behavior avoids suprises.
+
+    [Additions]
+
+    - Added 'cached_temp' method.
+
+0.100     2017-01-14 22:47:55-05:00 America/New_York
+
+    - No changes from 0.099-TRIAL.
+
+0.099     2017-01-10 15:12:13-05:00 America/New_York (TRIAL RELEASE)
+
+    [Tests]
+
+    - Fixed tests for eventual removal of '.' from `@INC` in Perl.
+
+    [Documentation]
+
+    - Fixed filehandle mode typo.
+
+    - Fixed typo in relative() that mentioned rel2abs instead of abs2rel.
+
+0.098     2016-10-09 23:25:11-04:00 America/New_York
+
+    - No changes from 0.097-TRIAL.
+
+0.097     2016-09-30 22:03:10-04:00 America/New_York (TRIAL RELEASE)
+
+    [Additions]
+
+    - Added 'realpath' option for 'tempfile' and 'tempdir' for situations
+      where an absolute temporary path just isn't enough.
+
+0.096     2016-07-02 21:25:33-04:00 America/New_York
+
+    - No changes from 0.095
+
+0.095     2016-06-28 12:05:03-04:00 America/New_York (TRIAL RELEASE)
+
+    [Tests]
+
+    - Improved method for hiding some modules during tests.
+
+0.094     2016-05-23 12:45:19-04:00 America/New_York
+
+    - Fixed Changes note typo in 0.092.  0.092 had no changes since 0.091,
+      not 0.090, meaning that all 0.091 changes were (and are) included.
+
+0.092     2016-05-23 11:36:54-04:00 America/New_York
+
+    - No changes from 0.091
+
+0.091     2016-05-17 13:32:21-04:00 America/New_York (TRIAL RELEASE)
+
+    [Changes]
+
+    - Path::Tiny will prefer PerlIO::utf8_strict over encoding(UTF-8)
+      if available and Unicode::UTF8 is not installed.
+
+    [Fixes]
+
+    - The 'touch' method can now set the current time on files that aren't
+      owned, as long as they are writeable.
+
+    [Tests]
+
+    - Improved consistency of symlink support inspection; now always
+      looks at $Config{d_symlink}.
+
+    - Skips impossible test on 'msys' platform.
+
+0.090     2016-05-02 07:08:58-04:00 America/New_York
+
+    - No changes from 0.089
+
+0.089     2016-04-26 22:21:00-04:00 America/New_York (TRIAL RELEASE)
+
+    [Fixes]
+
+    - Fix spew_utf8 to allow array references as input.
+
+0.088     2016-04-15 08:41:07-04:00 America/New_York
+
+    - No changes from 0.087
+
+0.087     2016-04-12 12:13:14-04:00 America/New_York (TRIAL RELEASE)
+
+    [Fixes]
+
+    - Fixed bugs in relative symlink resolution for realpath, spew and
+      edit_lines.
+
+    [Changes]
+
+    - Symlink resolution will detect circular loops and throw an error.
+
+0.086     2016-04-03 13:49:37-04:00 America/New_York
+
+    [Documented]
+
+    - Improved documentation of copy and move.
+
+0.084     2016-03-04 07:17:49-05:00 America/New_York
+
+    [Fixes]
+
+    - Fixed relative() for the case with regex metacharacters in the path
+
+0.082     2016-03-01 18:23:26-05:00 America/New_York
+
+    [!!! INCOMPATIBLE CHANGES !!!]
+
+    - (This warning repeated from 0.079-TRIAL) The relative() method no
+      longer uses File::Spec's buggy abs2rel method.  The new Path::Tiny
+      algorithm should be comparable and passes File::Spec abs2rel test
+      cases, except that it correctly accounts for symlinks.  For common
+      use, you are not likely to notice any difference. For uncommon use,
+      this should be an improvement.  As a side benefit, this change drops
+      the minimum File::Spec version required, allowing Path::Tiny to be
+      fatpacked if desired.
+
+    [Changes]
+
+    - no other changes from 0.081
+
+0.081     2016-02-18 16:55:37-05:00 America/New_York (TRIAL RELEASE)
+
+    [Fixed]
+
+    - Fixed lines_utf8+chomp and relative() bugs on Windows
+
+0.079     2016-02-15 20:52:10-07:00 America/Mazatlan (TRIAL RELEASE)
+
+    [!!! INCOMPATIBLE CHANGES !!!]
+
+    - The relative() method no longer uses File::Spec's buggy rel2bs
+      method.  The new Path::Tiny algorithm should be comparable and passes
+      File::Spec abs2rel test cases, except that it correctly accounts for
+      symlinks.  For common use, you are not likely to notice any
+      difference. For uncommon use, this should be an improvement.  As a
+      side benefit, this change drops the minimum File::Spec version
+      required, allowing Path::Tiny to be fatpacked if desired.
+
+    [FIXED]
+
+    - Fixed lines_utf8() with chomping for repeated empty lines.
+
+    [DOCS]
+
+    - Documented that subclassing is not supported
+
+0.077     2016-02-10 14:17:32-07:00 America/Mazatlan (TRIAL RELEASE)
+
+    [ADDED]
+
+    - Added 'edit' and 'edit_lines' plus _utf8 and _raw variants; this
+      is similar to perl's -i flag (though without backups)
+
+0.076     2015-11-16 10:47:24-05:00 America/New_York
+
+    - no changes from 0.075
+
+0.075     2015-11-15 21:02:18-05:00 America/New_York (TRIAL RELEASE)
+
+    [FIXED]
+
+    - Tilde expansion on Windows was resulting in backslashes.  Now they
+      are correctly normalized to forward slashes.
+
+    [DOCS]
+
+    - Typos fixed
+
+0.073     2015-10-30 10:36:18-04:00 America/New_York (TRIAL RELEASE)
+
+    [FIXED]
+
+    - Fixed spewing to a symlink that crosses a filesystem boundary
+
+    [PREREQS]
+
+    - Add Test::MockRandom to META as an recommended test prerequisite.
+
+0.072     2015-07-20 16:07:20-04:00 America/New_York
+
+    - No changes from 0.071
+
+0.071     2015-07-17 13:40:08-04:00 America/New_York (TRIAL RELEASE)
+
+    [FIXED]
+
+    - Fixed incorrect error argument for File::Path functions
+      (mkpath and remove_tree)
+
+0.070     2015-06-28 13:50:16-04:00 America/New_York
+
+    - No changes from 0.069
+
+0.069     2015-06-18 18:09:44-04:00 America/New_York (TRIAL RELEASE)
+
+    [CHANGED]
+
+    - The 'copy' method now returns the object for the copied file
+
+    [FIXED]
+
+    - The 'visit' method only dereferences the callback return value
+      for scalar refs, avoiding some common bugs
+
+0.068     2015-03-23 20:42:56-04:00 America/New_York
+
+    [META]
+
+    - Jumping to 0.068 to get to an even-version for a stable release
+
+    [DOCUMENTED]
+
+    - Noted that 0.66 changed the 'filehandle' method
+
+0.066     2015-03-20 23:59:08-04:00 America/New_York (TRIAL RELEASE)
+
+    [ADDED]
+
+    - Added exclusive locking option to filehandle opens; spew now
+      exclusively locks tempfile used for atomic writes
+
+0.065     2015-03-06 05:59:56-05:00 America/New_York
+
+    [ADDED]
+
+    - Added 'assert' method
+
+    - Added 'visit' method
+
+    - Added support for a negative count for 'lines' to get the
+      last lines of a file
+
+    [FIXED]
+
+    - Fixed tilde expansion if path has spaces
+
+    - Make realpath non-fatal if the parent path exists and only the final
+      path component does not. (Was fatal on Windows and some Unixes.)
+
+    - Removed rendundant locking on tempfile use for spewing
+
+    - Work around File::Temp bugs on older ActiveState Windows Perls
+      https://bugs.activestate.com/show_bug.cgi?id=104767 
+
+    [DOCUMENTED]
+
+    - Fixed SYNOPSIS example
+
+0.064     2015-03-05 03:58:42-05:00 America/New_York (TRIAL RELEASE)
+
+0.063     2015-03-04 16:00:17-05:00 America/New_York (TRIAL RELEASE)
+
+0.062     2015-03-04 13:59:31-05:00 America/New_York (TRIAL RELEASE)
+
+0.061     2014-11-13 16:50:05-05:00 America/New_York
+
+    [FIXED]
+
+    - Fixed append_utf8 and append_raw with 'truncate' option.
+
+0.060     2014-11-04 17:33:39-05:00 America/New_York
+
+    [ADDED]
+
+    - Added 'truncate' option to append for in-place replacement of
+      file contents.
+
+0.059     2014-10-14 12:45:46-04:00 America/New_York
+
+    [FIXED]
+
+    - Fixed precedence bug in the check for Unicode::UTF8
+
+0.058     2014-09-23 11:00:24-04:00 America/New_York
+
+    [ADDED]
+
+    - Added a 'sibling' method as a more efficient form of
+      calling $path->parent->child(...).
+
+    [DOCUMENTED]
+
+    - Every method annotated with the version number of the
+      last API change.
+
+0.057     2014-09-19 11:23:05-04:00 America/New_York
+
+    [FIXED]
+
+    - On AIX, reads that default to locking would fail without
+      write permissions, because locking needs write permissions.
+      The fix is only to lock reads if write permissions exist;
+      otherwise locking is skipped.
+
+0.056     2014-08-07 15:08:41-04:00 America/New_York
+
+    [*** DEPRECATIONS ***]
+
+    - The 'dirname' method is deprecated due to exposing File::Spec
+      inconsistencies
+
+    [ADDED]
+
+    - The 'digest' method now takes a 'chunk_size' option to avoid
+      slurping files entirely into memory.
+
+    [FIXED]
+
+    - Fixed problem throwing errors from 'remove'
+
+0.055     2014-06-30 10:29:28-04:00 America/New_York
+
+    [FIXED]
+
+    - tempfile/tempdir won't warn if used as functions without arguments
+
+0.054     2014-05-04 13:56:11-04:00 America/New_York
+
+    [ADDED]
+
+    - The 'basename' method now takes a list of suffixes to remove before
+      returning the name
+
+    - FREEZE/THAW/TO_JSON serialization helpers
+
+    [CHANGED]
+
+    - When constructing a Path::Tiny object from another, the original
+      is returned unless it's a temp dir/file.  This significantly
+      speeds up calling path($path) if $path is already a Path::Tiny
+      object. (Thanks to Michael Schwern for prompting such benchmarking.)
+
+    [FIXED]
+
+    - Constructing any path -- e.g. with child() -- with undef or
+      zero-length parts throws an error instead of constructing an
+      invalid path
+
+0.053     2014-03-24 09:25:51-04:00 America/New_York (TRIAL RELEASE)
+
+    [INCOMPATIBLE CHANGES]
+
+    - The 'is_file' method now does -e && ! -d and not -f because -f
+      is often more restrictive than people intend or expect.
+
+    [ADDED]
+
+    - Added 'chmod' method with symbolic chmod support ("a=r,u+rx")
+
+0.052     2014-01-14 15:58:03-05:00 America/New_York
+
+    [FIXED]
+
+    - Backslash-to-slash conversion now only happens on Windows
+      (since backslash is legal on Unix, we must allow it)
+
+0.051     2013-12-20 07:34:14 America/New_York
+
+    [FIXED]
+
+    - Fixed file order bug in the new test file
+
+0.050     2013-12-20 07:27:20 America/New_York
+
+    [FIXED]
+
+    - Recursive iteration won't throw an exception if a directory is
+      removed or unreadable during iteration.
+
+0.049     2013-12-12 00:48:01 America/New_York
+
+    [FIXED]
+
+    - Generates filename for atomic writes independent of thread-ID.
+      Fixes crashing bug on Win32 when fork() is called.
+
+0.048     2013-12-11 21:56:23 America/New_York
+
+    [ADDED]
+
+    - Added 'subsumes' method
+
+    [CHANGED]
+
+    - The 'chomp' option for 'lines' will remove any end-of-line sequences
+      fully instead of just chomping the last character
+
+    - The 'flock' package will no longer indexed by PAUSE
+
+    [FIXED]
+
+    - Hides warnings and fixes possible fatal errors from pure-perl Cwd,
+      particularly on MSWin32
+
+0.047     2013-11-26 15:11:13 America/New_York
+
+    [FIXED]
+
+    - Previous lock testing fixes broke on Windows (sigh); now fixed,
+      I hope.
+
+0.046     2013-11-22 17:07:24 America/New_York
+
+    [FIXED]
+
+    - Revised locking tests for portability again: locks are now tested
+      from a separate process
+
+0.045     2013-11-22 15:28:50 America/New_York
+
+    [FIXED]
+
+    - Fixed locking test on AIX
+
+0.044     2013-10-17 17:00:41 America/New_York
+
+    [FIXED]
+
+    - Fixed child path construction against the root path.
+
+    - Fixed path construction when a relative volume is provided as the
+      first argument on Windows; e.g. path("C:", "lib") must be like
+      path("C:lib"), not path("C:/lib").
+
+    - On AIX, shared locking is replaced by exclusive locking on a R/W
+      filehandle, as locking read handles is not supported
+
+0.043     2013-10-14 06:24:06 America/New_York
+
+    [CHANGED]
+
+    - Calling 'absolute' on Windows will add the volume if it is missing
+      (E.g. "/foo" will become "C:/foo").  This matches the behavior
+      of File::Spec->rel2abs.
+
+    [FIXED]
+
+    - Fixed t/00-report-prereqs.t for use with older versions of
+      CPAN::Meta::Requirements
+
+0.042     2013-10-13 11:02:02 America/New_York
+
+    [FIXED]
+
+    - When 'realpath' can't be resolved (because intermediate directories
+      don't exist), the exception now explains the error clearly instead of
+      complaining about path() needing a defined, positive-length argument.
+
+    - On Windows, fixed resolution of relative paths with a volume.
+      E.g. "C:foo" is now correctly translated into getdcwd on "C:"
+      plus "foo".
+
+0.041     2013-10-11 08:56:31 America/New_York
+
+    [FIXES]
+
+    - Removes duplicate test dependency on File::Spec that triggers
+      a CPAN.pm bug
+
+0.040     2013-10-08 22:01:50 America/New_York
+
+    [FIXES]
+
+    - Fixed broken locking test on *bsd
+
+    - When using 'filehandle' to request a locked handle that truncates an
+      existing file and has a binmode starting with ":unix", this fixes a
+      bug where pseudo-layers weren't being cleared properly.
+
+0.039     2013-10-08 16:39:23 America/New_York
+
+    [ADDITIONS]
+
+    - The 'filehandle' method now offers an option to return locked handles
+      based on the file mode.  Input-output methods now rely on this
+      feature internally.  Truncating file modes defer truncation until
+      after an exclusive lock is acquired.
+
+    [FIXES]
+
+    - The 'filehandle' method now respects default encoding set by
+      the caller's open pragma.
+
+0.038     2013-10-01 18:20:05 America/New_York
+
+    [ADDITIONS]
+
+    - Added 'is_rootdir' method to simplify testing if a path is
+      the root directory
+
+0.037     2013-09-25 13:00:25 America/New_York
+
+    [FIXES]
+
+    - Fixed for v5.8
+
+0.036     2013-09-25 09:34:28 America/New_York
+
+    [PREREQS]
+
+    - No longer lists 'threads' as a prerequisite.  If you have a threaded
+      perl, you have it and if you're not, Path::Tiny doesn't care.
+
+0.035     2013-09-24 07:21:55 America/New_York
+
+    [FIXED]
+
+    - Fixed flock warning on BSD that was broken with the autodie
+      removal; now also applies to all BSD flavors
+
+0.034     2013-09-23 16:16:36 America/New_York
+
+    [INCOMPATIBLE CHANGE]
+
+    - Exceptions are now Path::Tiny::Error objects, not autodie exceptions;
+      this removes the last dependency on autodie, which allows us to
+      support Perls as far back as v5.8.1
+
+    [FIXED]
+
+    - BSD/NFS flock fix was not backwards compatible before v5.14.  This
+      fixes it harder.
+
+    [PREREQS]
+
+    - dropped autodie
+
+    - lowered ExtUtils::MakeMaker configure_requires version to 6.17
+
+0.033     2013-09-12 08:54:30 America/New_York
+
+    [FIXED]
+
+    - Perl on BSD may not support locking on an NFS filesystem.  If this is
+      detected, Path::Tiny warns and continues in an unsafe mode.  The
+      'flock' warning category may be fatalized to die instead.
+
+    [DOCUMENTED]
+
+    - Added 'iterator' example showing defaults
+
+0.032     2013-09-06 17:52:48 America/New_York
+
+    [PREREQS]
+
+    - Removed several test dependencies.  Path::Tiny now only needs
+      core modules, though some must be upgraded on old Perls
+
+0.031     2013-08-27 10:03:57 America/New_York
+
+    [FIXED]
+
+    - parent() on paths with internal double dots (e.g. /foo..bar.txt) now works
+      correctly
+
+0.030     2013-08-20 16:10:04 America/New_York
+
+    [FIXED]
+
+    - t/zzz-spec.t used getcwd() instead of getdcwd(), which breaks
+      on Windows if the build directory isn't on the 'C' drive
+
+0.029     2013-08-19 11:52:24 America/New_York
+
+    [FIXED]
+
+    - On Win32, "C:/" no longer is changed to "C:".  Also, "C:" is
+      converted to the absolute path of cwd on the "C:" volume.  UNC paths
+      ("//server/share/") now retain their trailing slash to correctly
+      distinguish volume and directory paths when split
+
+0.028     2013-08-14 13:12:49 America/New_York
+
+    [ADDED]
+
+    - The 'children()' method now takes an optional regular expression to
+      filter the results
+
+0.027     2013-07-25 19:38:44 America/New_York
+
+    [ADDED]
+
+    - Added the 'digest' method to produce a hexadecimal SHA-256
+      (or user-specified) digest of a file
+
+0.026     2013-07-14 21:25:22 America/New_York
+
+    [FIXED]
+
+    - Fixed bug where lines() with a count longer than the
+      file would return undef for the extra lines.  Now returns
+      only the lines in the file if the count is greater than
+      the number of lines.
+
+0.025     2013-07-10 09:32:13 America/New_York
+
+    [FIXED]
+
+    - Spew to an existing symlink now atomically replaces
+      the resolved destination, not the symlink
+
+0.024     2013-06-17 18:12:36 America/New_York
+
+    [FIXED]
+
+    - Win32 pseudo-forks don't load threads.pm, so we do that
+      in CLONE to ensure we get the thread ID
+
+0.023     2013-06-12 07:18:31 America/New_York
+
+    [FIXED]
+
+    - Removing dangling symlinks now works
+
+0.022     2013-05-28 11:57:15 America/New_York
+
+    [ADDED]
+
+    - The 'touch' method can now take an epoch secs argument
+
+0.021     2013-05-17 22:53:18 America/New_York
+
+    [FIXED]
+
+    - Fixed fatal bug with lines_utf8 using chomp
+
+    [DOCS]
+
+    - Pod typos fixed
+
+0.020     2013-04-13 06:58:11 Europe/London
+
+    [FIXED]
+
+    - More descriptive error message if copy() fails
+
+0.019     2013-04-12 06:58:18 Europe/London
+
+    [FIXED]
+
+    - Fixed warning about -l on dirhandle in iterator()
+
+0.018     2013-04-08 12:44:31 America/New_York
+
+    [ADDED]
+
+    - cwd, rootdir, tempfile and tempdir can now be exported on request
+      and used as functions instead of as methods
+
+    [FIXED]
+
+    - Fixed regression in lines() where it no longer returned count
+      of lines in scalar context
+
+0.017     2013-03-28 16:49:15 America/New_York
+
+    [ADDED]
+
+    - path() constructor now glob-expands tildes (~)
+
+    [CHANGED]
+
+    - Improved options validation; invalid options now throw errors
+
+0.016     2013-03-26 14:59:36 America/New_York
+
+    [ADDED]
+
+    - The iterator now has an optional recursive mode
+
+    [CHANGED]
+
+    - We no longer use autodie directly, but we throw our
+      own autodie::exceptions on error.  This avoids the overhead
+      of wrapping built-ins with function calls.
+
+    - Most dependencies are now loaded on demand, reducing startup
+      time.
+
+0.015     2013-03-13 13:20:38 America/New_York
+
+    [CHANGED]
+
+    - touch and touchpath now return the object to allow easy chaining
+      with spew
+
+0.014     2013-03-09 08:54:26 America/New_York
+
+    [ADDED]
+
+    - parent now takes an optional argument to look upwards multiple
+      times in one call.  e.g. $path->parent(2)
+
+0.013     2013-02-22 10:58:05 America/New_York
+
+    [CHANGED]
+
+    - remove_tree now defaults to safe mode and will not attempt to chmod
+      and remove directories with insufficient permissions
+
+    - Temporary files and directories are always created with an
+      absolute path.
+
+    [FIXED]
+
+    - Failures from autodie are reported from our caller's location
+      (as if we called croak()); bumped autodie prereq to 2.14 for
+      this feature
+
+    - Failures from mkpath and remove_tree are now trapped and
+      thrown as exceptions.  (Making an existing path or removing
+      a non-existant path return false and are not errors);
+
+0.012     2013-02-20 09:34:50 America/New_York
+
+    [REMOVED]
+
+    - The 'remove' function no longer works on directories.  The new
+      'remove_tree' method should be used instead.
+
+    [CHANGED]
+
+    - path() now requires a defined, positive-length argument to keep you
+      safe from subtle bugs in your code that pass an undef or empty
+      argument to path suddenly having you operating in the current
+      directory.
+
+    [ADDED]
+
+    - Added Path::Tiny->cwd as a constructor to give an absolute
+      path to the current working directory
+
+    - Added 'remove_tree' as a method for recursively removing
+      a directory
+
+0.011     2013-02-19 11:08:44 America/New_York
+
+    [CHANGED]
+
+    - slurp/spew/etc and openr/openw/etc now repect default layers
+      set by -C or the open pragma
+
+    - spew and append can now be given array references to output
+      to avoid extra copying
+
+0.010     2013-02-16 10:26:38 America/New_York
+
+    [FIXED]
+
+    - The 'tempdir' and 'tempfile' methods can now both take either leading
+      templates or a TEMPLATE option, so you don't have to remember which
+      one File::Temp wants
+
+0.009     2013-02-15 16:05:39 America/New_York
+
+    [CHANGED]
+
+    - Dropped use of '//' to allow Path::Tiny to run on Perl 5.008
+
+0.008     2013-02-15 13:49:54 America/New_York
+
+    [ADDED]
+
+    - Added 'touchpath' method combining 'mkpath' and 'touch'
+
+0.007     2013-02-12 17:41:44 America/New_York
+
+    [FIXED]
+
+    - Unicode::UTF8 0.58 is necessary for optional faster
+      Unicode processing
+
+0.006     2013-02-11 13:22:18 America/New_York
+
+    [FIXED]
+
+    - t/parent.t is amended to work on Windows
+
+    - new() now correctly takes multiple path arguments, like path()
+
+0.005     2013-02-07 15:41:32 America/New_York
+
+    [FIXED]
+
+    - Fixed test for platforms with /sbin symlinked to /usr/sbin
+
+0.004     2013-02-05 19:19:46 America/New_York
+
+    [ADDED]
+
+    - Added slurp_raw and other *_raw helper methods
+
+    - Added realpath method (with thanks to ether)
+
+    - Added canonpath method (with thanks to sjmiller)
+
+    [FIXED]
+
+    - slurp/lines/spew/append now do appropriate flocking
+
+    - Fixed test that fails if run as root (bingos)
+
+    - Fixed test that fails if cwd/getcwd don't agree
+
+    [CHANGED]
+
+    - internal optimizations
+
+0.003     2013-01-31 06:59:50 America/New_York
+
+    [FIXED]
+
+    - lstat was calling the wrong stat [rt.cpan.org #83063]
+
+    - make atomic writes thread-safe [rt.cpan.org #83064]
+
+    [CHANGED]
+
+    - updated bugtracker to point to github
+
+0.002     2013-01-30 22:09:37 America/New_York
+
+    [FIXED]
+
+    - s/File::Stat/File::stat/; # OMG! I hate case insensitivity
+
+0.001     2013-01-30 19:36:22 America/New_York
+
+    - First release
+

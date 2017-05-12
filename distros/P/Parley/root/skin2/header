@@ -1,0 +1,117 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+[% PROCESS shared/useful_tt_stuff %]
+
+<!-- Header : Start -->
+<html>
+    <head>
+        <base href="[% c.request.base %]" />
+        <title>
+            [% c.config.name %]
+
+            [%# Show version if we're debugging %]
+            [% IF c.debug %]
+            ([% c.config.version %])
+            [% END %]
+
+            [%# Show custom page title if we have one %]
+            [% IF page_title %]
+             : [% page_title %]
+            [%# Show thread name if we have one %]
+            [% ELSIF current_thread %]
+             : [% current_thread.subject %]
+            [%# Show forum name if we have one %]
+            [% ELSIF current_forum %]
+             : [% current_forum.name %]
+            [% END %]
+        </title>
+        <meta name="author" content="Chisel Wright" />
+        <link rel="shortcut icon" href="[% c.request.base %]/favicon.ico" type="image/x-icon" />
+
+        <!-- YUI ajax magick -->
+
+        <!-- CSS -->
+        <link rel="stylesheet" type="text/css" href="[%c.uri_for('/static/yui/fonts/fonts-min.css')%]" />
+        <link rel="stylesheet" type="text/css" href="[%c.uri_for('/static/yui/reset-fonts-grids/reset-fonts-grids.css')%]" />
+
+        <link rel="stylesheet" type="text/css" href="[%c.uri_for('/static/yui/button/assets/skins/sam/button.css')%]" />
+        <link rel="stylesheet" type="text/css" href="[%c.uri_for('/static/yui/container/assets/skins/sam/container.css')%]" />
+        <link rel="stylesheet" type="text/css" href="[%c.uri_for('/static/yui/menu/assets/skins/sam/menu.css')%]" /> 
+        <link rel="stylesheet" type="text/css" href="[%c.uri_for('/static/yui/tabview/assets/skins/sam/tabview.css')%]" />
+        <link rel="stylesheet" type="text/css" href="[%c.uri_for('/static/yui/autocomplete/assets/skins/sam/autocomplete.css')%]" />
+
+        <!-- Dependency source files -->
+        <script type="text/javascript" src="[%c.uri_for('/static/yui/yahoo-dom-event/yahoo-dom-event.js')%]"></script>
+        <script type="text/javascript" src="[%c.uri_for('/static/yui/container/container-min.js')%]"></script>
+        <script type="text/javascript" src="[%c.uri_for('/static/yui/utilities/utilities.js')%]"></script>
+        <script type="text/javascript" src="[%c.uri_for('/static/yui/button/button-min.js')%]"></script>
+        <script type="text/javascript" src="[%c.uri_for('/static/yui/menu/menu-min.js')%]"></script>
+        <script type="text/javascript" src="[%c.uri_for('/static/yui/tabview/tabview-min.js')%]"></script>
+        <script type="text/javascript" src="[%c.uri_for('/static/yui/autocomplete/autocomplete-min.js')%]"></script>
+
+        <!-- homebrew javascript -->
+        <script type="text/javascript" src="[%c.uri_for('/static/script/ajax_error_dlg.js')%]"></script>
+
+        [% IF ( (!c.config.site_skin) || (c.config.site_skin && c.config.skin_default_fallback) ) %]
+            [% IF (!c.config.exists('skin_default_css') || c.config.skin_default_css) %]
+            <!-- base styling -->
+            <link type="text/css" rel="stylesheet" title="Parley" href="[%c.uri_for('/static/css/parley-min.css')%]" />
+            [% END %]
+        [% END %]
+        [% IF ((skin = authed_user.preference.skin) || (skin = c.config.site_skin)) %]
+        <!-- Skin : [%skin%] -->
+        <link type="text/css" rel="stylesheet" href="[%c.uri_for("/static/css/parley-${skin}.css")%]" />
+        [% END %]
+
+    </head>
+
+    <body class="yui-skin-sam">
+        <div id="doc4">
+            <div id="hd">
+                <div id="user_information">
+                    [% IF authed_user %]
+                    <em>[% authed_user.forum_name %]</em>
+                    [% ELSE %]
+                    <em>[%l('Guest User')%]</em>
+                    [% END %]
+
+                    &nbsp;
+                    <a href="javascript:YAHOO.parley.language.language_dialog.show();">
+                        [% IF (country_code = c.language) %]
+                        <img src="/static/images/icons/flags/[%country_code%].png" width="16" height="11" alt="[%country_code%]" />
+                        [% ELSE %]
+                        <img src="/static/images/icons/flags/gb.png" width="16" height="11" alt="GB" />
+                        [% END %]
+                    </a>
+                    [% IF authed_user %]
+                    <div class="user_info_actions">
+                        [
+                            <a href="[%c.uri_for('/user/logout')%]">[%l('Logout')%]</a>
+                        ]
+                    </div>
+                    [% ELSE %]
+                    <div class="user_info_actions">
+                        [
+                            <a href="javascript:YAHOO.parley.login.login_dialog.show();">[%l('Login')%]</a>
+                        [%l('or')%]
+                            <a href="[%c.uri_for('/user/signup')%]">[%l('Register')%]</a>
+                        ]
+                    </div>
+                    [% END %]
+                </div>
+            </div><!-- id="hd" -->
+
+            <div id="bd">
+                [% PROCESS menu/menubar %]
+
+                [% IF view.error.messages %]
+                <div class="error_messages">
+                    [% FOREACH msg IN view.error.messages %]
+                    [% msg %]<br />
+                    [% END %]
+                </div>
+                [% END %]
+
+                [% PROCESS dfv/display_validation_messages %]
+<!-- Header : End -->

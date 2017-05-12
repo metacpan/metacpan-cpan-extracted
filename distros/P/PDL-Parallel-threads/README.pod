@@ -1,0 +1,64 @@
+=head1 PDL-Parallel-threads
+
+Sharing PDL data between Perl threads
+
+See the documentation for L<PDL::Parallel::threads> for more about the module.
+This readme covers installation.
+
+=head1 REQUIREMENTS
+
+Before we go any further, be aware that this will not install unless your
+perl was built with thread support. To check if your perl was compiled with
+thread support, type the following at your command prompt:
+
+ perl -V:useithreads
+
+If the output is C<define>, you have thread support. If it is C<undef>,
+you do not have thread support. If it is C<UNKNOWN>, you mis-typed
+C<useithreads>. Check your spelling. :-)
+
+=head1 INSTALLATION
+
+You can install the currently available version of this distribution using
+your favorite CPAN client. For example:
+
+ cpan PDL::Parallel::threads
+ cpanm PDL::Parallel::threads
+
+The easiest way to install the development version is to use cpanm to
+install the tarball:
+
+ cpanm https://github.com/run4flat/PDL-Parallel-threads/tarball/master
+
+You'll need to have L<App::cpanminus> in order to use C<cpanm>. If you
+don't have that, or if you want to compile the code by hand, you can
+download the distribution using git or by directly downloading the zip
+archive at
+
+  https://github.com/run4flat/PDL-Parallel-threads/zipball/master
+
+or the tar.gz tarball at
+
+  https://github.com/run4flat/PDL-Parallel-threads/tarball/master
+
+Unpack and navigate a command-line shell to the root directory. Then issue the
+following commands:
+
+  # Windows          Unixen (including modern Macs)
+  perl Build.PL      perl Build.PL
+  Build              ./Build
+  Build test         ./Bulld test
+  Build install      ./Build install
+                          -- or --
+                     sudo ./Build install
+
+=head1 BUGS
+
+There are no known bugs for thist distribution. If you find any, feel free
+to file bug reports on the github issue tracker:
+
+  https://github.com/run4flat/PDL-Parallel-threads/issues
+
+=head1 AUTHOR
+
+This module was written by David Mertens C<dcmertens.perl@gmail.com>.

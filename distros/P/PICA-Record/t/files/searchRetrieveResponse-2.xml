@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zs:searchRetrieveResponse xmlns:zs="http://www.loc.gov/zing/srw/"><zs:version>1.1</zs:version><zs:numberOfRecords>1</zs:numberOfRecords><zs:records><zs:record><zs:recordSchema>picaxml</zs:recordSchema><zs:recordPacking>xml</zs:recordPacking><zs:recordData><record xmlns="info:srw/schema/5/picaXML-v1.0">
+  <datafield tag="">
+  </datafield>
+  <datafield tag="001@">
+    <subfield code="e">1</subfield>
+  </datafield>
+  <datafield tag="001A">
+    <subfield code="0">3090:10-11-11</subfield>
+  </datafield>
+  <datafield tag="001B">
+    <subfield code="0">0046:07-12-11</subfield>
+    <subfield code="t">15:34:26.000</subfield>
+  </datafield>
+  <datafield tag="001D">
+    <subfield code="0">3090:10-11-11</subfield>
+  </datafield>
+  <datafield tag="001F">
+    <subfield code="0">0</subfield>
+  </datafield>
+  <datafield tag="001U">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield tag="002@">
+    <subfield code="0">Aau</subfield>
+  </datafield>
+  <datafield tag="003@">
+    <subfield code="0">671870297</subfield>
+  </datafield>
+  <datafield tag="004A">
+    <subfield code="0">3866761988</subfield>
+    <subfield code="A">978-3-86676-198-8</subfield>
+  </datafield>
+  <datafield tag="006Y">
+    <subfield code="0">9783866761988/sfi</subfield>
+  </datafield>
+  <datafield tag="007G">
+    <subfield code="c">GBV</subfield>
+    <subfield code="0">671870297</subfield>
+  </datafield>
+  <datafield tag="010@">
+    <subfield code="a">ger</subfield>
+  </datafield>
+  <datafield tag="011@">
+    <subfield code="a">2011</subfield>
+  </datafield>
+  <datafield tag="013@">
+    <subfield code="0">ho</subfield>
+  </datafield>
+  <datafield tag="019@">
+    <subfield code="a">XA-DE-HE</subfield>
+  </datafield>
+  <datafield tag="021A">
+    <subfield code="a">Pierre Bourdieu und das Feld Polizei</subfield>
+    <subfield code="d">ein besonderer Fall des Möglichen</subfield>
+    <subfield code="h">Marcel Schöne</subfield>
+  </datafield>
+  <datafield tag="028A">
+    <subfield code="d">Marcel</subfield>
+    <subfield code="a">Schöne</subfield>
+    <subfield code="9">557869242</subfield>
+    <subfield code="a">Schöne</subfield>
+    <subfield code="d">Marcel</subfield>
+    <subfield code="a">1984-</subfield>
+  </datafield>
+  <datafield tag="028G">
+    <subfield code="d">Pierre</subfield>
+    <subfield code="a">Bourdieu</subfield>
+    <subfield code="9">198371527</subfield>
+    <subfield code="a">Bourdieu</subfield>
+    <subfield code="d">Pierre</subfield>
+    <subfield code="a">1930-2002</subfield>
+  </datafield>
+  <datafield tag="033A">
+    <subfield code="p">Frankfurt am Main</subfield>
+    <subfield code="n">Verl. für Polizeiwiss.</subfield>
+  </datafield>
+  <datafield tag="034D">
+    <subfield code="a">491 S.</subfield>
+  </datafield>
+  <datafield tag="036E">
+    <subfield code="a">Schriften zur empirischen Polizeiforschung</subfield>
+    <subfield code="l">13</subfield>
+  </datafield>
+  <datafield tag="036F">
+    <subfield code="x">1300</subfield>
+    <subfield code="9">47833236X</subfield>
+    <subfield code="a">Schriften zur empirischen Polizeiforschung</subfield>
+    <subfield code="0">1614-5275</subfield>
+    <subfield code="l">13</subfield>
+  </datafield>
+  <datafield tag="037C">
+    <subfield code="b">Zugl.: @Hildesheim</subfield>
+    <subfield code="a">Univ., Diss., 2011</subfield>
+  </datafield>
+  <datafield tag="045G">
+    <subfield code="a">300</subfield>
+    <subfield code="A">DNB</subfield>
+  </datafield>
+  <datafield tag="101@">
+    <subfield code="a">90</subfield>
+  </datafield>
+  <datafield tag="201@" occurrence="01">
+    <subfield code="a">ausleihbar|Derzeit verfuegbar</subfield>
+    <subfield code="b">1</subfield>
+    <subfield code="e">1276651147</subfield>
+    <subfield code="m">mon</subfield>
+    <subfield code="f">1</subfield>
+    <subfield code="l">http://opac.lbs-hildesheim.gbv.de:80/loan/REQ?EPN=1276651147&amp;MTR=mon&amp;BES=1</subfield>
+    <subfield code="u">ausleihbar</subfield>
+    <subfield code="v">Derzeit verfuegbar</subfield>
+  </datafield>
+  <datafield tag="201B" occurrence="01">
+    <subfield code="0">10-11-11</subfield>
+    <subfield code="t">08:41:46.000</subfield>
+  </datafield>
+  <datafield tag="201D" occurrence="01">
+    <subfield code="0">10-11-11</subfield>
+    <subfield code="b">5422</subfield>
+    <subfield code="a">3090</subfield>
+  </datafield>
+  <datafield tag="201F" occurrence="01">
+    <subfield code="0">0</subfield>
+  </datafield>
+  <datafield tag="201U" occurrence="01">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield tag="203@" occurrence="01">
+    <subfield code="0">1276651147</subfield>
+  </datafield>
+  <datafield tag="208@" occurrence="01">
+    <subfield code="a">10-11-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield tag="209A" occurrence="01">
+    <subfield code="f">MAGAZIN</subfield>
+    <subfield code="a">11 : 53597</subfield>
+    <subfield code="d">u</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield tag="209C" occurrence="01">
+    <subfield code="a">11:13921</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield tag="209G" occurrence="01">
+    <subfield code="a">HIL2$04303687</subfield>
+  </datafield>
+  <datafield tag="201@" occurrence="02">
+    <subfield code="a">Nur Lesesaal-Benutzung|Nicht ausleihbar</subfield>
+    <subfield code="b">0</subfield>
+    <subfield code="e">1276651155</subfield>
+    <subfield code="m">mon</subfield>
+    <subfield code="f">1</subfield>
+    <subfield code="u">Nur Lesesaal-Benutzung</subfield>
+    <subfield code="v">Nicht ausleihbar</subfield>
+  </datafield>
+  <datafield tag="201B" occurrence="02">
+    <subfield code="0">10-11-11</subfield>
+    <subfield code="t">08:41:46.000</subfield>
+  </datafield>
+  <datafield tag="201D" occurrence="02">
+    <subfield code="0">10-11-11</subfield>
+    <subfield code="b">5422</subfield>
+    <subfield code="a">3090</subfield>
+  </datafield>
+  <datafield tag="201F" occurrence="02">
+    <subfield code="0">0</subfield>
+  </datafield>
+  <datafield tag="201U" occurrence="02">
+    <subfield code="0">utf8</subfield>
+  </datafield>
+  <datafield tag="203@" occurrence="02">
+    <subfield code="0">1276651155</subfield>
+  </datafield>
+  <datafield tag="208@" occurrence="02">
+    <subfield code="a">10-11-11</subfield>
+    <subfield code="b">z</subfield>
+  </datafield>
+  <datafield tag="209A" occurrence="02">
+    <subfield code="f">Leselounge</subfield>
+    <subfield code="d">f</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield tag="209C" occurrence="02">
+    <subfield code="a">11:13922</subfield>
+    <subfield code="x">00</subfield>
+  </datafield>
+  <datafield tag="209G" occurrence="02">
+    <subfield code="a">HIL2$04303695</subfield>
+  </datafield>
+</record></zs:recordData><zs:recordPosition>1</zs:recordPosition></zs:record></zs:records></zs:searchRetrieveResponse>

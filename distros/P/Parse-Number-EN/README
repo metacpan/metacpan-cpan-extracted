@@ -1,0 +1,43 @@
+SYNOPSIS
+
+     use Parse::Number::EN qw(parse_number_en $Pat);
+    
+     my @a = map {parse_number_en(text=>$_)}
+         ("12,345.67", "-1.2e3", "x123", "1.23", "1,23");
+     # @a = (12345.67, -1200, undef, 1.23, 1)
+    
+     my @b = map {/^$Pat$/ ? 1:0}
+         ("12,345.67", "-1.2e3", "x123", "1,23");
+     # @b = (1, 1, 0, 0)
+
+DESCRIPTION
+
+    The goal for this module is to parse/extract numbers written in some
+    common notation in English text. That means, in addition to what Perl
+    does, it also recognizes thousand separators (and fractions,
+    percentages in the future).
+
+VARIABLES
+
+    None are exported by default, but they are exportable.
+
+ $Pat (REGEX)
+
+    A regex for quickly matching/extracting number from text. It's not 100%
+    perfect (the extracted number might not be valid), but it's simple and
+    fast.
+
+FAQ
+
+ How does this module differ from other number-parsing modules?
+
+    This module uses a single regex and provides the regex for you to use.
+    Other modules might be more accurate and/or faster. But this module is
+    pretty fast.
+
+SEE ALSO
+
+    Lingua::EN::Words2Nums
+
+    Other Parse::Number::* modules (for other languages).
+

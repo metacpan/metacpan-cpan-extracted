@@ -1,0 +1,332 @@
+Revision history for Perl extension Parse::Stallion.
+
+2.01 
+   No change to code, fixed test cases that caused errors
+   due to non-declared variables.
+
+2.00
+    Added the following parameters:
+     incorporate
+     find_all (only for string input)
+     match_maximum
+     global (now only keeps pos of input if global is set)
+     substitute
+     substitution
+     match_start
+     match_length
+
+   Removed need_not_match_whole_string (replaced by
+    match length, though match_length is in parse_and_evaluate)
+
+   Added the following subroutines:
+    search
+    search_and_substitute
+
+   Required version of Test::More to be at least 0.71 (some unknown early
+   version of Test::More fails on is_deeply in a test).
+
+   Removed final_position_routine
+   Removed initial_position_routine
+   Add length_routine
+
+   Changed required output of parse_forward (3rd result is delta).
+
+   Fixed error with not removing entries in bottom_up_left_to_right with
+    fast move back.
+
+   Removed traversal_only
+
+   start_rule found can be sub rule of itself.
+
+1.05
+    Minor change in regexp handling.
+
+    Fixed test case in simple_calc.t for new perl way of displaying regexp.
+
+1.04
+    Removed use Data::Dumper from 3 test files.
+
+1.03
+    Removed many test cases of RecDescent because Parse::RecDescent's code
+    changed and probably not good to have tests depend on changing
+    version of other module.
+
+1.02
+    Modified 2 test cases of Parse::Stallion::RD (no code change) that
+    caused errors on some systems.
+   
+1.01
+    _matched_string in Parse::Stallion::EBNF
+
+    MATCHED_STRING in Parse::Stallion
+
+    parse_trace_routine
+
+1.00
+    'match_min_first' became MATCH_MIN_FIRST
+
+    Modify check for infinite loop (faster)
+
+    Removed checking of repeat positions/rules ("blocked" in former code)
+
+0.92
+    Removed File::Spec
+
+    Removed __ventured
+
+0.91
+    Change to EBNF.pm to make consistent when outputting grammars
+
+    Minor speedups in parse routine
+
+0.90
+    Additions to Parse::Stallion::RD
+
+    Special case start rule is leaf.
+
+    Special case undef input.
+
+0.85
+    removed 0 + from documentation and test code, not needed
+
+    check for left recursion when building parser
+
+    removal of match_once subroutine call
+
+0.83
+    Modification of test rd.t to not fail if Text::Balanced is not present.
+
+0.82
+    Modification of test rd.t to not fail if Text::Balanced is not present.
+
+0.81
+    Modifications to Parse::Stallion::RD to handle namespaces differently,
+    what was done before did not work in perl 5.10 though did work in perl 5.8
+
+0.80
+    MATCH_ONCE added
+
+    Parse::Stallion::RD added
+
+    parse_hash and parameters to parse_forward, parse_backward,
+     second parameter to evaluation, unevaluation
+     access to node in parse tree
+
+    ebnf_new has more informative error message.
+
+    moved VERSION variable to $Parse::Stallion::VERSION
+
+    Fixed bug that prevented evaluation routines in optional rules
+
+    Optional parameter start_rule to parse_and_evaluate. 
+
+    Changed current_value/value_when_entered/final_value/initial_value to
+    current_position/position_when_entered/final_position/initial_position
+
+    Fixed problem with multiple rules that have 0 children not being allowed
+    to repeat on same position, that should be allowed.
+    Also fixed problem with multiple rules have zero width children, that
+    is not allowed.
+
+    Partial string parses (need_not_match_whole_string)
+
+    Parse tree node accessible from parse_forward, parse_backward,
+    evaluation, and unevaluation routines.
+
+    final_position_routine, initial_position_routine, start_position
+
+    no_evaluation, traversal_only, unreachable_rules_allowed,
+    start_rule in parse_and_evaluate
+
+    TOKEN/TERMINAL added for LEAF alias
+
+    Removed copying of input string.
+
+    Tips on large input added to documentation
+
+0.70
+    Parameters to evaluation/parse_forward/parse_backtrack modified
+    to get in hash.
+
+    parse done in eval so can croak error messages to calling code
+
+    Some more functionality to ebnf_new (comments, parse forward,
+     match_min_first, parentheses around rules to subroutines)
+
+0.60
+     Evaluation after parsing also gets entered value as argument.
+
+     EBNF parser set up.  Added STRING_EVALUATION to support this.
+
+     LOCATION subroutine created.
+
+     Added parse_hash as parameter to evaluation, unevaluation, parse_forward,
+     and parse_backtrack.
+
+     Removed increasing_value_function, now a returned value of parse_forward.
+
+     Added initial_value for non standard parses.
+
+     final_value added for parsing non strings.
+
+     fix to passed in separator to use index instead of regex search which
+     would fail on special characters
+
+     Fix for when only one rule in grammar.
+
+     If a multiple rule has maximum of 1 child (i.e. for an optional rule)
+     then the subrules within are not necessarily set to arrays when passed
+     as parameters to the evaluation routine.
+
+     Parameters to which_parameters_are_arrays changed.
+
+0.50
+     EVAL can take more than just a function.
+
+     Leaf can take parenthesized regex'es and use first to set value,
+      got rid of remove_white_space.
+
+     Changed parameters to creating a parser, replaced
+      rules_to_set_up_hash parameter by having it be first parameter.
+
+     Changed paramters to parse_and_evaluate, object to be parsed is
+     its own parameter.
+
+     Changed parse_info to a hash passed in instead of using wantarray
+     context.  This seems more consistent with other programming langauges.
+
+0.4
+     Removed internal function calls to make faster.
+
+     Ensured that default evaluation routines on empty string
+     will return empty string instead of an undefined value.
+
+0.3
+     Fix UNEVAL if given no subroutine
+
+     Removed CSVFH.pm
+
+     Fixed parse_match in unevaluation routine.
+
+     code rewritten to speed up parses
+
+     changed MATCH_MIN_FIRST() to string parameter of MULTIPLE
+
+     NON_STRING_LEAF removed, can be handled by LEAF
+
+0.2
+     leaf rules have their own forward and backtrack subroutines
+
+     backtrack subroutine can end a parse
+
+     leaf can have display (for Parse::Stallion::EBNF)
+
+     error messages on bad rules
+
+0.11
+     fixed name in description of module
+
+0.1
+     additions to the documentation on parsing during evaluation
+
+     able to set up parser if grammar rules ref is the parameter to new
+
+     leaf rules specificied within other rules as only a Regexp (qr)
+
+     fixed finding start_rule if not specified
+
+     set default output of stringify
+
+     internal changes as to how parameters are passed to evaluation routines
+
+     which_parameters_are_arrays now returns 0/1 instead of scalar/array
+
+     added Parse::Stallion::EBNF
+
+     replaced pvalue with more functionality of parse_match
+
+     removed regex_not_match option in leaf, documented how to use
+     do_evaluation_in_parsing as substitute
+
+     removed parse_failed result (parse_succeeded is enough)
+
+     removed backtrack_can_change_value (not needed)
+
+     removed end_of_parse as a function
+
+0.04
+
+     multiple rules can now take lists as arguments instead of just one subrule
+     the total number of subrules and how many times each subrule appears
+     is controllable
+
+     reduced number of methods, now only new and parse_and_evaluate
+
+     internal data structure changes for rule types, simplifying code
+
+     start_rule can be determined automatically
+
+     parse_and_evaluate can take single string as argument (or ref)
+     and will return the resultant evaluation; if in array reference
+     the parse info will also be returned
+
+     more complicated notation to define rules not allowed
+
+     removed scan arrays
+
+     documented parse_function, display_value_function
+
+0.03
+     allowed 'eval' to be an abbreviation for 'evaluation'
+
+     multiple rule now has option match_min_first
+
+     fixed error in case of parsing during evaluation, if multiple
+     rule fails with no children.
+
+     allow more than one parser at a time, notably when
+     evaluating during parsing is on, the code can call another parser
+
+0.02
+     by default white space is not removed from the value passed to
+     a leaf's rule evaluation.  the parameter remove_white_space has
+     been added to handle this.  evaluation during/after parsing
+     was inconsistent before.
+
+     rules_to_set_up_hash parameter now sorted so rules are
+     created in a consistent order.
+
+0.01
+     evaluation can now occur during parsing, replacing
+     on_start, on_match, and on_unmatch
+
+     example directory
+
+     parse returns trace of each step
+
+     optional rule one letter abbreviation changed from p to z
+     optional rule also allows naming of zero_or_one
+
+     mutliple rules' minimum handling fixed
+
+     fixed CSV.pm to handle white space
+
+     not croak when a parse fails
+
+0.009  Multiple rules can now have named-subrules when defining
+       them.  Demonstrated in Parse::Stallion::CSV.
+       Minor changes to the documentation.
+       Parse::Stallion::CSV was corrected to handle
+       quotes and the documentation for it was expanded.
+
+0.008  Modified test script date_with_no_end_string.t to handle different operating
+ systems that have different localtimes
+
+0.007  Modified test script date_parsing.t to handle different operating
+ systems that have different localtimes?
+
+0.006  Modified test script date_parsing.t to handle different operating
+ systems that apparently have a different epoch.
+
+0.005  Originally released version.
+

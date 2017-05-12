@@ -1,0 +1,12 @@
+Revision history for Perl extension POE::Component::Telephony::CTPort
+
+0.03  Thu Oct 14 15:34:28 2004
+	- wrote documentation
+	- this module now starts and stops ctserver for you
+
+0.02  Mon Aug 23 22:00:04 2004
+	- found a newer version of ctserver, and the protocol changed
+		so, I changed everything almost...
+
+0.01  Sat Aug 21 13:47:32 2004
+	- original version

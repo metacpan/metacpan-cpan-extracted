@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 752b3e27dde0f1c40dc1c710c903f62efb5a0618 Changes
+SHA1 35094d8d7d62257392e2f591e990f1c411714d65 MANIFEST
+SHA1 9d807a1d2ab5382b3852fba8691f4b74bba0df0b META.yml
+SHA1 749a5c3ad35aa3ef0204ca882bd9a4cec0607cd9 Makefile.PL
+SHA1 9b2d2129030b4d0804242afd9363ccec55d6324a README
+SHA1 50c4d3b294728b5c8e544c7eb86d8c6d6dac76ee examples/client.pl
+SHA1 3ef362791d224ae41143e246cc066dbbbae08782 examples/log4perl.conf
+SHA1 58c9b300523bcbe6aa720c2ec3fe5231db075158 examples/server.pl
+SHA1 0be4b00280396e19e6aa631e3a405efda4c1e3a1 examples/userdb.txt
+SHA1 ac2c057ed8a8b5e79eb8392fc89c1bd9e6446cbb lib/POE/Component/Server/TacacsPlus.pm
+SHA1 dd64e36c5f9253a66f078bcd4d87ab7a51737f4a lib/POE/Filter/TacacsPlus.pm
+SHA1 41533fbd463e42d2ecf1e119eca910c16809d13e t/01-distribution.t
+SHA1 3a8fa081129a583da1dec4b5882e815f350a497b t/pod-coverage.t
+SHA1 1c2221234c6e97bd628d78e90052efb1a794e6ec t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBAgAGBQJOEQhUAAoJEGN8PvITkwmbaisQAKhgQkpv6+aspE94a/ZA2fRb
+ocYjxzqGf/Z35n6Pc9dByK/7qXq2xVI9nA/E1HjCafBfAwzuJ8fN42/4mx3edCSO
+NUxX2FsDh02pLpuQ84y1JPvNjq9lY48VYL8qz8LOYFN3G/GifP1wUST/FffBfSed
+/SefWZhoZd2agHxBVRNABvjpafAlkJyChv9t7sCkA3n02pyU5atidgANSVDe58GN
+CfnZkCgyWWsQVLi1hF6tq/SKYqL6aX48VEx1RUEjF1LH+qg/6BpaKmFJSe4LKDmP
+DwgdHFhTc4njtnwUIvkPWfReQ+oFAsYiAKQpB9WBxPPa+BKV3wlJWfP/seTQFr1T
+JbRR243V+htsRrLFdLjqGYekdpX32IqHwcwyESg/bl3ydMYGdFhMw9DH4bm1X6+e
+gVB3avRY/fxoFyxu09rztRFtIJx/QeWTIyH3ogUgK4jZzkgjDWaMuXI1EpOv4o6m
+CoqSGyDKbXctKD5FaruEOSIXvKtkov+iPZj9fRZqRng5UzqHKggA4sjV/SKdGu6/
+ADSWMg0+LGOP2ulV/FA9LPU+ux2AISUJSk0F435qSSiscqTjR0j8wDunc3hslA1k
+CKWNvvATK1UXaEp8BVFQaAzE+aP3eLKVe12FQgm49T9US3tEpdy2Qd4PZUxm7c0u
+jenkL9jUhBMWuuiyTOF1
+=dwGM
+-----END PGP SIGNATURE-----

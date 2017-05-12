@@ -1,0 +1,33 @@
+Revision history for POE-Component-Client-eris
+1.4     2013-07-11 Brad Lhotsky <brad@divisionbyzero.net>
+        - Patch from Mattia Barbon to use streams
+
+1.2     2012-11-08 Brad Lhotsky <brad@divisionbyzero.net>
+        - Added 'ReturnType' option to skip Parse::Syslog::Line
+
+1.1     2012-10-15 Brad Lhotsky <brad@divisionbyzero.net>
+        - Fixed Subscribe/Match logic
+
+1.0     2012-09-07 Brad Lhotsky <brad@divisionbyzero.net>
+        - Wrapped parse_syslog_line in eval {};
+
+0.9     2012-08-23 Brad Lhotsky <brad@divisionbyzero.net>
+        - Removed taint checking in tests
+        - Updated author email
+
+0.8     2012-07-06 Brad Lhotsky <brad@divisionbyzero.net>
+        - Fixed bug in match handling
+
+0.7     2012-06-28 Brad Lhotsky <brad@divisionbyzero.net>
+        - Moved to Dist::Zilla
+        - Fixed whitespace at end of lines
+
+0.6 	2011-07-08 Brad Lhotsky <brad@divisionbyzero.net>
+		- Added to https://github.com/reyjrar/POE-Component-Client-eris
+		- Added to PAUSE
+		- scripts/eris-syslog-ng.pl included in distribution
+		- supports match and subscription
+
+0.01    2007-03-02 Brad Lhotsky <brad@divisionbyzero.net>
+        First version, only basic functionality
+

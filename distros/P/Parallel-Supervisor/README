@@ -1,0 +1,53 @@
+Parallel-Supervisor version 0.01
+================================
+
+Many modules provide functionality somewhat similar to
+Parallel::Supervisor, but none are quite like this. The goal is to 
+provide a mechanism for managing a collection of jobs and monitoring
+their output, while remaining as un-complicated and as flexible as
+possible. 
+
+This module can be integrated with Parallel::Jobs,
+Parallel::ForkManager, and probably other modules which provide some
+mechanism of forking, or by calling fork() itself.
+
+The Parallel::Supervisor object tracks the state of each job (prepared,
+running, or finished) and creates a pipe to connect the output of the
+worker to the parent for reading. For situations where this
+functionality is all that is required, it is much easier to implement
+than more complicated solutions such as the top-level Supervisor
+modules, or sophisticated frameworks such as POE. Worker processes do
+not need to be specifically designed for use in its context, and the
+module makes no assumptions about the logic or control flow, allowing
+the parent to respond to the output, or exit status of a job as
+required. 
+
+Please see the perldoc for more details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Symbol
+IO::Pipe
+IO::Handle
+
+Parallel::Supervisor was designed to work on POSIX systems and has not
+been tested on other platforms, such as Windows.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Kevin Semande <perldev@26a.net>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

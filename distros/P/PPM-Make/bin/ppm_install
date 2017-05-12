@@ -1,0 +1,122 @@
+#!/usr/bin/perl
+
+use strict;
+# use warnings;
+use Getopt::Long qw(:config no_ignore_case auto_version auto_help);
+use Pod::Usage;
+$main::VERSION = $PPM::Make::VERSION;
+use PPM::Make::Install;
+my %opts = ();
+my @files = ();
+my %progs = ();
+GetOptions(\%opts, 
+           'ignore|i',
+           'remove|r',
+           'force|f',
+           'upgrade',
+           'skip',
+          ) or pod2usage(2);
+
+my $dist = shift;
+$opts{dist} = $dist if $dist;
+
+my $ppm = PPM::Make::Install->new(%opts);
+$ppm->make_ppm();
+$ppm->ppm_install();
+
+__END__
+
+=head1 NAME
+
+ppm_install - build and install a distribution via ppm
+
+=head1 SYNOPSIS
+
+ ppm_install [options] [Module | Distribution]
+
+Options:
+
+ [--version]          : print version information and exit
+ [--help]             : print this help screen
+ [-r | --remove]      : remove the build directory after installation
+ [-i | --ignore]      : ignore any failing test results
+ [-f | --force]       : force remaking a distribution
+ [--upgrade]          : upgrade via ppm
+ [--program]  b=a     : specify "a" to be used for the "b" program
+ [ --skip]            : skip running the tests
+
+Additional Arguments:
+
+   Module       : specify a module to fetch (requires CPAN.pm)
+   Distribution : specify a distribution to fetch
+
+With no arguments, ppm_install will install a distribution
+inside the current directory.
+
+=head1 DESCRIPTION
+
+C<ppm_install> is an interface to the C<PPM::Make::Install> module,
+and is used to build a PPM (Perl Package Manager) distribution
+from a CPAN source distribution and then install it with 
+the C<ppm> utility. See L<PPM::Make> for a discussion.
+
+Apart from the options described below, without any arguments 
+C<ppm_install> will assume it is inside an unpacked source
+distribution and make the corresponding PPM distribution.
+If it is given an argument of what looks like a module
+name (eg, I<Net::FTP>), it will use C<CPAN.pm> to look up the 
+corresponding distribution and fetch and build it (module
+names are case sensistive). Otherwise, 
+additional arguments (eg, F<package.tar.gz>, or
+I<http://someplace.org/package.tar.gz>) will be interpreted
+as distributions to fetch and build.
+
+=over
+
+=item [-i | --ignore]
+
+By default, C<ppm_install>, if it is building the distribution,
+will die if all tests do not pass. Turning on this option
+instructs C<ppm_install> to ignore any test failures.
+
+=item [ --skip ]
+
+Setting this option will skip running any tests supplied
+with the package.
+
+=item [-r | --remove]
+
+If specified, the directory used to build the ppm distribution
+given on the command line will be removed after a successful install.
+
+=item [-f | --force]
+
+By default, if C<ppm_install> detects a F<blib/> directory,
+it will assume the distribution has already been made, and
+will not remake it. This option forces remaking the distribution.
+
+=item [--upgrade]
+
+Will do an upgrade of the specified package, if applicable.
+
+=item [--help]
+
+This prints out a short help screen and exits.
+
+=item [--version]
+
+This prints out some version information and exits.
+
+=back
+
+=head1 COPYRIGHT
+
+This program is copyright, 2003, by Randy Kobes 
+E<lt>r.kobes@uwinnipeg.caE<gt>.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<PPM> and L<PPM::Make>.
+
+=cut

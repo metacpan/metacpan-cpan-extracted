@@ -1,0 +1,60 @@
+NAME
+    Plack::Middleware::AppStoreReceipt - Verifying a Receipt with the Apple
+    App Store
+
+SYNOPSIS
+    In the app.psgi
+
+        enable "AppStoreReceipt";
+
+    That's it.
+
+    By default, you can POST 'receipt_data' with a base64 encoded string to
+    /receipts/validate
+
+    aka, curl -X POST http://localhost:5000/receipts/validate -d
+    "receipt_data=$base64EncodedString"
+
+    Since it's disable a sandbox request by default, therefore to use the
+    sandbox testing environment, please set allow_sandbox to true
+
+        enable "AppStoreReceipt", allow_sandbox => 1;
+
+    Perhaps, you don't like /receipts/validate endpoint, though you are able
+    to change the default route as well by either
+
+        enable "AppStoreReceipt", route => { 'post' => '/appstore/verify' };
+        (to use route, the format is 'route => { $method => $path }')
+    or
+        enable "AppStoreReceipt", method => 'POST', path => '/appstore/verify';
+
+    And you can even change the default receipt_data parameter
+
+        enable "AppStoreReceipt", receipt_data => '(name of receipt parameter here)';
+
+    If you have a shared secret for iTunes, you may set it as
+
+        enable "AppStoreReceipt", shared_secret => '(shared secret bytes here)';
+
+DESCRIPTION
+    This middleware provides an endpoint for an iOS app to validate its
+    reciept data. Therefore, this middleware ensures that your iOS app does
+    not post the iap receipt to any fake Apple server.
+
+    It does post given receipt data to iTunes production first. If it is a
+    sandbox receipt (told by iTunes production), it will be re-sended to
+    iTunes sandbox again automatically.
+
+AUTHOR
+    zdk
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Plack::Middleware
+
+    http://www.macworld.com/article/1167677/hacker_exploits_ios_flaw_for_fre
+    e_in_app_purchases.html
+

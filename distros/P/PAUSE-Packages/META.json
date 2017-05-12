@@ -1,0 +1,64 @@
+{
+   "abstract" : "interface to PAUSE's packages file (02packages.details.txt)",
+   "author" : [
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PAUSE-Packages",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::DistnameInfo" : "0",
+            "Carp" : "0",
+            "File::HomeDir" : "0.93",
+            "File::Spec::Functions" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON::MaybeXS" : "0",
+            "Moo" : "1.006",
+            "Safe::Isa" : "0",
+            "Types::Standard" : "0",
+            "Types::URI" : "0",
+            "URI" : "0",
+            "URL::Encode" : "0",
+            "autodie" : "2.29",
+            "perl" : "v5.8.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "LWP::UserAgent" : "0",
+            "Path::Class" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.88",
+            "URI::FromHash" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/PAUSE-Packages",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/PAUSE-Packages.git",
+         "web" : "https://github.com/neilb/PAUSE-Packages"
+      }
+   },
+   "version" : "0.17"
+}
+

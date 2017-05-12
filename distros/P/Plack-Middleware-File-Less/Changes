@@ -1,0 +1,17 @@
+Revision history for Perl extension Plack::Middleware::File::Less
+
+0.04
+    - Added missing cpanfile to the tarball
+    
+0.03
+    - Added abstract to pod
+    - Added CSS::LESSp to dependencies to ensure module is available
+      for fallback when the 'lessc' executable is not available
+
+0.02 2013-01-23 10:44:28 Naoya Ito <i.naoya@gmail.com>
+     - forked
+     - Use 'lessc' executable if installed.
+
+0.01
+    - original version by franckcuny
+      <https://github.com/franckcuny/plack-middleware-file-less>

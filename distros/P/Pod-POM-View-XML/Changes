@@ -1,0 +1,15 @@
+Revision history for Pod-POM-View-XML
+
+0.0.2 2014-12-23
+ [BUG FIXES]
+ - Requires XML::Writer >= 0.620.
+
+ [STATISTICS]
+ - code churn: 2 files changed, 19 insertions(+), 2 deletions(-)
+
+0.0.1 2014-12-16
+ - First version, unleashed on an unsuspecting world.
+
+ [STATISTICS]
+ - code churn: 2 files changed, 26 insertions(+), 2 deletions(-)
+

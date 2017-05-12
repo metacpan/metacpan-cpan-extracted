@@ -1,0 +1,113 @@
+NAME
+    POE::Component::Player::Xmms - a wrapper for the "Xmms" player
+
+SYNOPSIS
+            use POE qw(Component::Player::Xmms);
+
+            POE::Component::Player::Xmms->spawn({ alias => 'xmms' });
+            $kernel->post(xmms => play => 'test.mp3');
+
+            POE::Kernel->run();
+
+DESCRIPTION
+    This component is used to manipulate the "Xmms" player from within a POE
+    application.
+
+METHODS
+  spawn
+    Used to initialise the system and create a module instance. The optional
+    hash reference may contain any of the following keys:
+
+    alias
+    Indicates the name of a session to which events will be posted. Default:
+    "main".
+
+    xargs
+    Allows for passing extra arguments to the underlying application. (NOT
+    used if already running)
+
+EVENTS
+  Xmms::Remote events
+    The methods available to Xmms::Remote are dupicated as events, heres the
+    list:
+
+            playlist_clear,
+            playlist,
+            play,
+            get_playlist_length,
+            get_volume,
+            set_main_volume,
+            get_main_volume,
+            is_repeat,
+            is_shuffle,
+            get_info,
+            get_playlist_file,
+            get_playlist_time,
+            set_volume,
+            get_balance,
+            get_balancestr,
+            set_balance,
+            get_skin,
+            toggle_aot,
+            main_win_toggle,
+            pl_win_toggle,
+            eq_win_toggle,
+            prefs_win_toggle,
+            get_output_time,
+            get_output_timestr,
+            stop,
+            is_playing,
+            quit,
+            get_playlist_pos,
+            set_playlist_pos,
+            get_playlist_files,
+            get_version,
+            is_running,
+            show_prefs_box,
+            set_skin,
+            all_win_toggle,
+            get_playlist_titles,
+            get_playlist_title,
+            eject,
+            playlist_next,
+            playlist_prev,
+            pause,
+            toggle_shuffle,
+            toggle_repeat,
+            playlist_delete,
+            playlist_add,
+            playlist_add_url,
+            jump_to_timestr,
+            jump_to_time,
+            get_playlist_timestr,
+            is_main_win,
+            is_pl_win,
+            is_eq_win,
+            get_eq,
+            set_eq,
+            get_eq_preamp,
+            set_eq_preamp,
+            get_eq_band,
+            set_eq_band
+
+    For now, just $kernel->call these to get the return values. I will
+    document these and add event replys for everything later.
+
+EVENTS
+    Events are fired at the session from which the *spawn()* method as
+    called from. Currently there is only one event fired.
+
+  xmms_started
+    This event is fired by the player's notification that it's ready.
+
+AUTHOR
+    David Davis <xantus@cpan.org>
+
+TODO
+    Better documentation on ALL events
+
+    Patches welcome :)
+
+SEE ALSO
+    perl(1), Xmms::Remote
+

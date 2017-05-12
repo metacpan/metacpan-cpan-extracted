@@ -1,0 +1,99 @@
+[%
+
+PROCESS header;
+PROCESS cadre;
+PROCESS adr_expediteur;
+PROCESS product_barcode;
+PROCESS prest_compl_barcode;
+PROCESS adr_destinataire;
+PROCESS footer;
+
+#-------------------------------------------------------------------------------
+# header
+#-------------------------------------------------------------------------------
+
+BLOCK header; 
+
+    "^XA\n";
+    "^CI27\n";      # CodePage 1252
+    "^MUM\n";       # unité mm
+
+END;
+
+#-------------------------------------------------------------------------------
+# cadre
+#-------------------------------------------------------------------------------
+
+BLOCK cadre; 
+
+    "^FO2,2^GB80,135,0.2,B,1^FS\n";
+
+END;
+
+#-------------------------------------------------------------------------------
+# adr_expediteur
+#-------------------------------------------------------------------------------
+
+BLOCK adr_expediteur; 
+
+    FOREACH line IN adr_exp;
+        y = 4+(loop.index*2.5);
+        "^FO12," _ y _ "^APN^FD" _ line _ "^FS\n" IF line.length;
+    END;
+
+END;
+
+#-------------------------------------------------------------------------------
+# product_barcode
+#-------------------------------------------------------------------------------
+
+BLOCK product_barcode; 
+
+    h_code_set = { B => ':', C => ';'};
+    start_code = h_code_set.${code_set};
+    yb = 7+12*produit_codealpha.length;
+    yt = yb + (mode_exp.match("ETR$") ? 10 : 2);
+    "^FO62.5,4^AGR,18,12^FD" _ produit_codealpha _ "^FS\n";
+    "^FO66," _ yb _ "^BCR,10,N,N,N,N^FD>" _ start_code _ n_ext_envoi _ "^FS\n";
+    "^FO62," _ yt _ "^ADR^FD" _ n_ext_envoi_dot _ "^FS\n";
+    "^FO77," _ yb _ "^ADR^FD" _ post_office _ "^FS\n" IF !(mode_exp.match("ETR$"));
+
+END;
+
+#-------------------------------------------------------------------------------
+# prest_compl_barcode
+#-------------------------------------------------------------------------------
+
+BLOCK prest_compl_barcode; 
+
+    IF prest_compl_codealpha;
+        "^FO71,80^ATR^FD" _ prest_compl_codealpha _ "^FS\n";
+        "^FO56,80^BCN,10,N,N,N,N^FD>;" _ prest_compl_codenum _ "^FS\n";
+    END;
+
+END;
+
+#-------------------------------------------------------------------------------
+# adr_destinataire
+#-------------------------------------------------------------------------------
+
+BLOCK adr_destinataire; 
+
+    FOREACH line IN adr_dest;
+        x = 42.5-(loop.index*3.75);
+        "^FO" _ x _ ",26.25^ARR^FD" _ line _ "^FS\n" IF line.size;
+    END;
+
+END;
+
+#-------------------------------------------------------------------------------
+# footer
+#-------------------------------------------------------------------------------
+
+BLOCK footer; 
+
+    "^XZ";
+
+END;
+
+%]

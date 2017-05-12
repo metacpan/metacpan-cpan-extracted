@@ -1,0 +1,6 @@
+Revision history for Perl extension Plucene::Plugin::WeightedQueryParser.
+
+0.01  Mon Feb 23 12:50:32 2004
+	- original version; created by h2xs 1.21 with options
+		-AX -n Plucene::Plugin::WeightedQueryParser
+

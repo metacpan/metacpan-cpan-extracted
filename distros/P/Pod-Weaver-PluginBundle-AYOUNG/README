@@ -1,0 +1,57 @@
+NAME
+    Pod::Weaver::PluginBundle::AYOUNG - AYOUNG's default Pod::Weaver config
+
+VERSION
+    version 0.14
+
+DESCRIPTION
+    Roughly equivalent to:
+
+    *   [@CorePrep]
+
+    *   [Name]
+
+    *   [Version]
+
+    *   [Generic / SYNOPSIS]
+
+    *   [Generic / DESCRIPTION]
+
+    *   [Collect / ATTRIBUTES]
+
+    *   [Collect / METHODS]
+
+    *   [Leftovers]
+
+    *   [Installation]
+
+    *   [SeeAlso]
+
+    *   [Authors]
+
+    *   [Legal]
+
+    *   [-Transformers / List]
+
+        transformer = List
+
+SEEALSO
+    Any of the bundles found in the
+
+    Pod::Weaver::PluginBundle
+
+    namespace.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+AUTHOR
+    Alan Young <harleypig@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Alan Young.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

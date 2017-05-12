@@ -1,0 +1,14 @@
+prefix="${pcfiledir}/../.."
+exec_prefix="${pcfiledir}/../.."
+libdir="${pcfiledir}/../../lib"
+includedir="${pcfiledir}/../../include/freetype2"
+
+Name: FreeType 2
+URL: http://freetype.org
+Description: A free, high-quality, and portable font engine.
+Version: 17.2.11
+Requires:
+Requires.private: zlib, libpng
+Libs: -L${libdir} -lfreetype
+Libs.private: 
+Cflags: -I${includedir}

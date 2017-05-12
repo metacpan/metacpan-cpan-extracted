@@ -1,0 +1,22 @@
+README for PerlIO::via::UnComment
+
+PerlIO layer that removes comments (lines that start with '#') on reading _and_
+writing to a file.  Intended as a development tool but may have uses outside
+of development.
+
+Copyright (c) 2002, 2003, 2004, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>.
+All rights reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+Version:
+ 0.04
+
+Required Modules:
+ (none)
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

@@ -1,0 +1,29 @@
+Revision history for Perl extension POE::Component::FastCGI.
+
+0.16  Mon Sep 20 22:52:03 BST 2010
+
+  Apply a patch RT#61496 from symkat to add the content-length header to responses.
+
+0.14  Thu Aug 26 00:16:47 BST 2010
+
+  Make the use of POE::Session postbacks work again
+
+0.12  Tue Aug 17 13:02:27 BST 2010
+
+  POE Community release
+
+0.11  No longer maintained
+
+  If you wish to have maint. of this module just ask.
+
+  Noticed the rt.cpan.org bug reports, some of which didn't get to me for some
+  reason.
+
+  Fix:
+    RT #50539: FCGI_KEEP_CONN
+    RT #34396: Filter dies with "Wrong version" on big POST requests
+    RT #30282: POE callbacks?
+
+0.1  Sat Mar 12 02:04:51 2005
+	- original version
+

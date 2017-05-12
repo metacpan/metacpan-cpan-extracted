@@ -1,0 +1,1751 @@
+=head1 NOME
+
+perlvar - Variabili predefinite in Perl
+
+=head1 DESCRIZIONE
+
+=head2 Nomi Predefiniti
+
+I nomi illustrati in seguito hanno un significato particolare in Perl.
+La maggior parte dei nomi con caratteri di punteggiatura sono
+ragionevolmente memorizzabili, oppure hanno degli analoghi nelle shell.
+Tuttavia, se desiderate utilizzare nomi lunghi per le variabili,
+non avete che da dichiarare
+
+    use English;
+
+all'inizio del programma. Questa direttiva fa in modo da creare un alias
+di tutti i nomi corti ai corrispondenti nomi lunghi, all'interno del
+pacchetto corrente. Alcune variabili hanno perfino dei nomi di media
+lunghezza, generalmente presi a prestito da B<awk>. In generale E<egrave>
+meglio utilizzare la direttiva modificata
+
+    use English '-no_match_vars';
+
+se non avete bisogno di C<$PREMATCH>, C<$MATCH> o C<$POSTMATCH>, poichE<egrave>
+in questo modo si evita una degradazione delle prestazioni nell'utilizzo
+delle espressioni regolari. Consultate L<English> per maggiori dettagli.
+
+Le variabili che dipendono dal I<filehandle> selezionato in un dato
+momento possono essere impostate anche chiamando un metodo appropriato sull'oggetto IO::Handle, sebbene ciE<ograve> risulti meno
+efficiente rispetto ad utilizzare le normali variabili interne.
+(Per gli aspetti collegati, le righe di sommario nel seguito del
+documento contengono la parola HANDLE). Prima di tutto dovete
+dichiarare
+
+    use IO::Handle;
+
+dopo di che potete utilizzare
+
+    metodo HANDLE ESPRESSIONE
+
+o, in maniera piE<ugrave> sicura,
+
+    HANDLE->metodo(ESPRESSIONE)
+
+Ciascun metodo restituisce il vecchio valore dell'attributo di IO::Handle. Ciascun
+metodo supporta una ESPRESSIONE opzionale che, se fornita, specifica
+il nuovo valore per l'attributo IO::Handle in questione. Se non viene
+fornita, invece, la maggior parte dei metodi non altera il valore
+corrente -- eccetto C<autoflush()>, che assumerE<agrave> che sia stato passato
+un 1 al posto vostro, tanto per essere differente.
+
+PoichE<egrave> caricare la classe IO::Handle E<egrave> un'operazione costosa,
+E<egrave> meglio che impariate come utilizzare le variabili interne normali.
+
+Alcune di queste variabili sono considerate "di sola lettura". CiE<ograve>
+significa che se provate ad assegnare loro un valore, direttamente
+o indirettamente attraverso un riferimento, vi ritroverete con
+un'eccezione a C<run-time>.
+
+Dovete prestare particolare attenzione quando modificate il valore
+di default della maggior parte delle variabili speciali descritte in
+questo documento. Nella maggior parte dei casi sarE<agrave> meglio che
+localizziate queste variabili prima di cambiarle, perchE<egrave> altrimenti
+il cambiamento potrebbe alterare il funzionamento di altri moduli
+che si basano sui valori di default. Ecco ad esempio il modo corretto
+per leggere un file tutto in una volta:
+
+    open my $fh, "pippo" or die $!;
+    local $/; # abilita la modalita' "risucchio" localizzata
+    my $contenuto = <$fh>;
+    close $fh;
+
+Al contrario, quanto segue E<egrave> da evitare:
+
+    open my $fh, "pippo" or die $!;
+    undef $/; # abilita la modalita' "risucchio"
+    my $contenuto = <$fh>;
+    close $fh;
+
+poichE<egrave> qualche altro modulo potrebbe voler leggere i dati da qualche file
+in ingresso nella modalitE<agrave> "per linea" di default , cosE<igrave> se abbiamo giE<agrave> eseguito il codice presentato, il valore globale di C<$/>
+E<egrave> stato cambiato per qualsiasi altro pezzo di codice eseguito all'interno del medesimo interprete Perl.
+
+Di solito, quando una variabile E<egrave> localizzata, E<egrave> buona norma assicurarsi
+che questo cambiamento abbia impatto nello C<scope> piE<ugrave> ristretto possibile. Per questo motivo, a meno che non vi troviate giE<agrave> all'interno di un
+blocco C<{}> breve, dovreste crearne uno appositamente. Ad esempio:
+
+    my $contenuto = '';
+    open my $fh, "pippo" or die $!;
+    {
+        local $/;
+        $contenuto = <$fh>;
+    }
+    close $fh;
+
+Ecco un esempio di come il vostro codice puE<ograve> rovinare tutto:
+
+    for (1..5){
+        diversione_pericolosa();
+        print "$_ ";
+    }
+    sub diversione_pericolosa {
+        $_ = 5;
+        # qui si fa qualcosa con $_
+    }
+
+Probabilmente vi aspettate che sia stampato:
+
+    1 2 3 4 5
+
+ma vi ritrovate con:
+
+    5 5 5 5 5
+
+PerchE<egrave>? Per il motivo che C<diversione_pericolosa()> modifica C<$_>
+senza prima localizzarla. La soluzione consiste nell'utilizzare
+C<local()>:
+
+        local $_ = 5;
+
+E<Egrave> facile notare il problema in un esempio cosE<igrave> breve, ma in codice piE<ugrave> complesso andate a caccia di guai se non localizzate i cambiamenti delle variabili speciali.
+
+La lista che segue E<egrave> ordinata inserendo prima le variabili scalari, poi
+gli array, poi le hash.
+
+=over 8
+
+=item $ARG
+
+=item $_
+
+L'ingresso e lo spazio per la ricerca di una espressione regolare predefiniti.
+Le seguenti coppie di righe di codice sono equivalenti:
+
+    while (<>) {...}	# equivalenti solo con while!
+    while (defined($_ = <>)) {...}
+
+    /^Subject:/
+    $_ =~ /^Subject:/
+
+    tr/a-z/A-Z/
+    $_ =~ tr/a-z/A-Z/
+
+    chomp
+    chomp($_)
+
+Quelli che seguono sono i posti dove Perl assumerE<agrave> di dover lavorare
+su C<$_> anche se non l'avete dichiarato esplicitamente:
+
+=over 3
+
+=item *
+
+Varie funzioni unarie, incluse C<ord()> ed C<int()>, cosE<igrave> come tutti
+i test sui file (C<-f>, C<-d>) ad eccezione di C<-t>, che per default
+lavora su STDIN.
+
+=item *
+
+Varie funzioni su liste come C<print()> e C<unlink()>.
+
+=item *
+
+Gli operatori di I<pattern matching> C<m//>, C<s///> e C<tr///>, quando
+utilizzati senza l'operatore C<=~>.
+
+=item *
+
+La variabile di iterazione di default in un ciclo C<foreach> se non viene
+specificata nessun'altra variabile.
+
+=item *
+
+La variabile di iterazione implicita nelle funzioni C<grep()> e C<map()>.
+
+=item *
+
+La destinazione di default dove inserire un record in ingresso quando
+il risultato di un'operazione C<< <FH> >> viene utilizzato come unico
+criterio di test in un ciclo C<while>. Al di fuori di un test per un
+ciclo C<while> questo comportamento non ha luogo.
+
+=back
+
+(Memo: sottolineato E<egrave> compreso in certe operazioni.)
+
+=back
+
+=over 8
+
+=item $a
+
+=item $b
+
+Variabili di pacchetto speciali associate all'utilizzo di C<sort()>,
+come da L<perlfunc/sort>. A causa di questa loro peculiaritE<agrave>, C<$a> e
+C<$b> non necessitano di dichiarazione preventiva (con C<use vars> o
+C<our>), anche quando E<egrave> in atto la direttiva C<strict 'vars'>. Non
+create variabili lessicali con C<my $a> o C<my $b> se volete essere
+in grado di utilizzarle nel blocco o nella funzione di comparazione
+di C<sort()>.
+
+=back
+
+=over 8
+
+=item $<I<cifre>>
+
+Contiene il I<sotto-pattern> proveniente dalla corrispondente coppia di
+parentesi di cattura dall'ultimo I<pattern match>, senza contare
+I<pattern> verificati in blocchi piE<ugrave> interni dai quali si E<egrave> giE<agrave> usciti.
+(Memo: come \cifre.) Queste variabili sono tutte in sola lettura
+e vengono ristrette dinamicamente al BLOCCO corrente.
+
+=item $MATCH
+
+=item $&
+
+La stringa che ha verificato il I<pattern match> piE<ugrave> recente (senza
+contare quanto avvenuto di nascosto in un BLOCCO o in una C<eval()>
+racchiusi dal BLOCCO corrente).
+(Memo: come & in alcuni editor). Questa variabile E<egrave> in sola lettura
+e ristretta dinamicamente al BLOCCO corrente.
+
+L'utilizzo di questa variabile in un qualsiasi posto nel programma
+ha come conseguenza una considerevole diminuzione di prestazioni su tutte le applicazioni
+di espressioni regolari. Consultate la sezione C<BUG>.
+
+=item $PREMATCH
+
+=item $`
+
+La stringa che precede ciE<ograve> che E<egrave> stato verificato dall'ultimo
+I<pattern match> effettuato con successo (senza contare quanto
+avvenuto di nascosto in un BLOCCO o in una C<eval()> racchiusi dal
+BLOCCO corrente).
+(Memo: C<`> spesso PRECEDE una stringa di citazione). Questa variabile
+E<egrave> in sola lettura.
+
+L'utilizzo di questa variabile in un qualsiasi posto nel programma
+ha come conseguenza una considerevole diminuzione di prestazioni su tutte le applicazioni
+di espressioni regolari. Consultate la sezione C<BUG>.
+
+=item $POSTMATCH
+
+=item $'
+
+La stringa che segue ciE<ograve> che E<egrave> stato verificato dall'ultimo
+I<pattern match> effettuato con successo (senza contare quanto
+avvenuto di nascosto in un BLOCCO o in una C<eval()> racchiusi dal
+BLOCCO corrente).
+(Memo: C<'> spesso SEGUE una stringa di citazione). 
+Esempio:
+
+    local $_ = 'abcdefghi';
+    /def/;
+    print "$`:$&:$'\n";  	# stampa abc:def:ghi
+
+Questa variabile E<egrave> in sola lettura e ristretta dinamicamente al BLOCCO
+corrente.
+
+L'utilizzo di questa variabile in un qualsiasi posto nel programma
+ha come conseguenza una considerevole diminuzione di prestazioni su tutte le applicazioni
+di espressioni regolari. Consultate la sezione C<BUG>.
+
+=item $LAST_PAREN_MATCH
+
+=item $+
+
+Il testo corrispondente all'ultima alternativa nell'ultima ricerca di
+I<pattern> effettuata con successo. Risulta particolarmente utile quando
+non sapete quale sia stata verificata fra una rosa di alternative. Ad
+esempio:
+
+    /Versione: (.*)|Revisione: (.*)/ && ($rev = $+);
+
+(Memo: sii positivo e guarda avanti.)
+
+Questa variabile E<egrave> in sola lettura e ristretta dinamicamente al BLOCCO
+corrente.
+
+=item $^N
+
+Il testo corrispondente al gruppo utilizzato e chiuso piE<ugrave> di recente
+(ossia, il gruppo che ha la parentesi di chiusura piE<ugrave> a destra)
+dell'ultima ricerca di I<pattern> che ha avuto successo.
+(Memo: la (possibilmente) parentesi iNnestata che si E<egrave> chiusa piE<ugrave>
+di recente).
+
+E<Egrave> principalmente utilizzata all'interno di blocchi C<(?{...})> per
+esaminare il testo che ha verificato il I<pattern> piE<ugrave> di recente. Ad
+esempio, per catturare il testo in una variabile in maniera efficace
+(al di lE<agrave> di C<$1>, C<$2>, ecc.), potete rimpiazzare C<(...)> con
+
+     (?:(...)(?{ $var = $^N }))
+
+Impostando e poi utilizzando C<$var> in questo modo vi toglie dall'impaccio
+di preoccuparvi di quale sia l'esatto numero del gruppo di parentesi che
+vi interessa.
+
+Questa variabile E<egrave> in sola lettura e ristretta dinamicamente al BLOCCO
+corrente.
+
+=item @LAST_MATCH_END
+
+=item @+
+
+Questo array contiene gli spostamenti dei punti terminali degli ultimi
+I<sotto-match> avvenuti con successo all'interno dello scope dinamico
+correntemente attivo. C<$+[0]> E<egrave> lo spostamento nella stringa della
+fine del I<match> intero stesso. CiE<ograve> corrisponde allo stesso valore
+restituito dalla funzione C<pos()> quando viene chiamata sulla
+variabile oggetto dell'ultimo I<match>. L'elemento I<n>esimo di
+questo array contiene lo spostamento del I<sotto-match> I<n>esimo,
+quindi C<$+[1]> E<egrave> lo spostamento dove termina C<$1>, C<$+[2]>
+lo spostamento dove termina C<$2> e cosE<igrave> via. Potete utilizzare
+C<$#+> per determinare quanti sottogruppi erano presenti nell'ultimo
+I<pattern match> che ha avuto successo. Consultate anche gli esempi
+dati per la variabile C<@->.
+
+=item $*
+
+Impostate questa variabile ad un valore intero non nullo per effettuare
+I<match> multilinea in una stringa, a 0 (o C<undef>) per dire a Perl
+che puE<ograve> assumere che le stringhe contengono linee singole, in modo da
+ottimizzare le ricerche di espressioni regolari. I<Pattern match> su
+stringhe che contengono caratteri "a capo" multipli possono produrre
+risultati confusi quando C<$*> E<egrave> 0 o C<undef>. Per default il valore
+di questa variabile E<egrave> C<undef>.
+(Memo: * corrisponde a varie cose).
+Questa variabile influenza solo l'interpretazione di C<^> e C<$>. Un
+"a capo" letterale puE<ograve> essere ricercato anche quando C<$* == 0>.
+
+L'utilizzo di C<$*> E<egrave> deprecato nel Perl moderno, soppiantato dai
+modificatori C</s> e C</m> nel C<pattern matching>.
+
+Assegnando un valore non numerico a C<$*> comporta un avvertimento
+testuale (e fa sE<igrave> che C<$*> si comporti come se C<$* == 0>), mentre
+assegnando un valore numerico comporta l'applicazione implicita della
+funzione C<int()>.
+
+=item HANDLE->input_line_number(ESPRESSIONE)
+
+=item $INPUT_LINE_NUMBER
+
+=item $NR
+
+=item $.
+
+Il numero di linea corrente per l'ultimo I<filehandle> utilizzato.
+
+Ciascun I<filehandle> in Perl tiene conto del numero di linee che
+sono stati letti. (Dipendentemente dal valore di C<$/>, l'idea
+di Perl di cosa sia una linea potrebbe non corrispondere alla vostra).
+Quando viene letta una riga da un I<filehandle> (attraverso
+C<readline> o C<< <> >>), o quando C<tell()> o C<seek()> sono
+chiamate sul I<filehandle> stesso, C<$.> diviene un alias per il
+contatore di linea del C<filehandle> stesso.
+
+Potete modificare il contatore assegnando un nuovo valore a C<$.>, ma
+ciE<ograve> non sposterE<agrave> il puntatore all'interno del I<filehandle>.
+I<Localizzare C<$.> non localizza il contatore di linea del filehandle>.
+Piuttosto, localizzerE<agrave> la visione interna di perl di quale I<filehandle>
+C<$.> stia puntando al momento.
+
+C<$.> viene riazzerato quando il I<filehandle> viene chiuso, ma B<non>
+quando un I<filehandle> aperto viene riaperto senza che ci sia stata
+una C<close()>. Per maggiori dettagli, consultate
+L<perlop/"Operatori di IE<sol>O">. PoichE<egrave> C<< <> >> non porta mai a
+chiusure esplicite, i numeri di linea si incrementano attraverso i file
+di C<ARGV> (ma controllate gli esempi in C<perlfunc/eof>).
+
+Potete anche utilizzare solamente 
+C<< HANDLE->input_line_number(ESPRESSIONE> >> per accedere al contatore
+di linea di un dato I<filehandle> senza dovervi preoccupare di quale
+sia l'I<handle> acceduto piE<ugrave> di recente.
+
+(Memo: molti programmi usano "." per intendere il numero di linea corrente).
+
+=item IO::Handle->input_record_separator(ESPRESSIONE)
+
+=item $INPUT_RECORD_SEPARATOR
+
+=item $RS
+
+=item $/
+
+Il separatore di record di ingresso, "a capo" per default. Questa
+variabile influenza l'idea di Perl su cosa sia una "linea". Funziona
+in maniera simile alla variabile C<RS> di B<awk>, incluso il trattare
+righe vuote come terminatrici quando la variabile E<egrave> impostata
+alla stringa vuota. (Una riga vuota non puE<ograve> contenere spazi o tabulazioni).
+Potete impostare il valore di questa variabile ad una stringa con
+piE<ugrave> caratteri per ottenere un terminatore con piE<ugrave> caratteri, o ad
+C<undef> per leggere fino alla fine del file. Impostarla a C<"\n\n">
+ha un significato leggermente differente rispetto a C<""> nel caso che
+il file contenga linee vuote consecutive. Impostare C<""> significa
+trattare due o piE<ugrave> linee vuote consecutive con un terminatore unico,
+mentre impostare C<"\n\n"> significa ciecamente che il prossimo
+carattere in ingresso appartiene al prossimo paragrafo, anche se
+E<egrave> di nuovo un "a capo".
+(Memo: / delimita le righe quando si scrivono le poesie)
+
+
+    local $/;           # abilita la modalitE<agrave> "risucchio"
+    local $_ = <FH>;    # ora c'e` tutto il file qui
+    s/\n[ \t]+/ /g;
+
+Ricordate: il valore di C<$/> E<egrave> una stringa, non un'espressione regolare.
+B<awk> doveva pur essere migliore in qualcosa. :-)
+
+Impostando C<$/> ad un riferimento ad un intero, ad uno scalare che contiene
+un intero, o ad uno scalare che puE<ograve> essere convertito in un intero, farE<agrave>
+in modo che si cerchi di leggere record invece che linee, laddove la massima
+dimensione per un record E<egrave> quella del valore intero puntato dal riferimento.
+Per cui quanto segue:
+
+    local $/ = \32768; # o \"32768", o \$variabile_contenente_32768
+    open my $fh, $myfile or die $!;
+    local $_ = <$fh>;
+
+leggerE<agrave> un record di non piE<ugrave> di 32768 byte da FILE. Se non state leggendo
+da un file orientato al record (oppure il vostro sistema operativo non ha
+file orientati al record), allora molto probabilmente vi ritroverete con
+un bel pezzo di dati ad ogni lettura. Se un record E<egrave> piE<ugrave> grande della
+dimensione del record che avete impostato vi ritroverete il record
+a pezzetti.
+
+Su VMS, le letture orientate al record sono effettuate con
+l'equivalente di C<sysread()>, per cui E<egrave> buona norma evitare di
+mischiare letture di record e letture non di record sullo stesso
+file. (Difficilmente sarE<agrave> un problema, perchE<egrave> un qualsiasi file
+che volete leggere in modalitE<agrave> record E<egrave> probabilmente inutilizzabile
+in modalitE<agrave> linea). I sistemi non-VMS effettuano l'I/O normalmente,
+per cui E<egrave> sicuro mischiare letture di record e non record di un file.
+
+Consultate anche L<perlport/"Newlines"> e C<$.>.
+
+=item HANDLE->autoflush(ESPRESSIONE)
+
+=item $OUTPUT_AUTOFLUSH
+
+=item $|
+
+Se impostato ad un valore non nullo, forza un I<flush> [svuotamento
+del buffer di scrittura, N.d.T.] immediato e dopo ciascuna scrittura
+o C<print()> sul canale di uscita correntemente selezionato. Per
+default E<egrave> 0 (indipendentemente dal fatto che il canale sia effettivamente
+bufferizzato o meno; C<$|> vi dice solamente se avete chiesto
+esplicitamente a Perl di effettuare un I<flush> dopo ogni
+scrittura). C<STDOUT> sarE<agrave> tipicamente bufferizzato alla riga se
+l'uscita E<egrave> verso un terminale e bufferizzato al blocco altrimenti.
+Impostare questa variabile E<egrave> principalmente utile quando state
+inviando dati ad una pipe o ad un socket, come quando state
+facendo girare un programma Perl sotto C<rsh> e volete vedere l'output
+appena viene generato. Questa variabile non ha alcun effetto sul
+buffering in ingresso. Consultate C<perlfunc/getc> per questo.
+(Memo: quando volete che le vostre tubature [I<pipe> in inglese, che
+E<egrave> lo stesso nome del carattere C<|>, N.d.T.] scarichino pesante).
+
+=item IO::Handle->output_field_separator ESPRESSIONE
+
+=item $OUTPUT_FIELD_SEPARATOR
+
+=item $OFS
+
+=item $,
+
+Il separatore dei campi di uscita per l'operatore C<< print() >>. Se
+definito, questo valore viene stampato fra ogni parametro passato a
+C<print()>. Per default E<egrave> C<undef>.
+(Memo: ciE<ograve> che viene stampato quando c'E<egrave> una "," nell'istruzione di
+C<print()>).
+
+=item IO::Handle->output_record_separator ESPRESSIONE
+
+=item $OUTPUT_RECORD_SEPARATOR
+
+=item $ORS
+
+=item $\
+
+Il separatore dei record di uscita per l'operatore C<print()>. Se
+definito, questo valore E<egrave> stampato dopo l'ultimo dei parametri di
+C<print()>. Per default E<egrave> C<undef>.
+(Memo: impostate C<$\> invece di aggiungere "\n" alla fine della
+C<print()>. Inoltre, E<egrave> piE<ugrave> o meno come C<$/>, ma E<egrave> ciE<ograve> che vi viene
+dato "dietro" da Perl [gioco di parole intraducibile, perchE<egrave> "dietro"
+in inglese E<egrave> "back", come in "backslash" che E<egrave> il carattere C<\>, N.d.T.]).
+
+=item $LIST_SEPARATOR
+
+=item $"
+
+E<Egrave> come C<$,> eccetto che si applica ad array e valori I<slice>
+interpolati all'interno di una stringa in virgolette doppie (o stringhe
+che vengono interpretate analogamente a virgolette doppie). Per
+default E<egrave> uno spazio.
+(Memo: ovvio, penso).
+
+=item $SUBSCRIPT_SEPARATOR
+
+=item $SUBSEP
+
+=item $;
+
+Il separatore di pedice per l'emulazione di array multidimensionali.
+Se vi riferite ad un elemento di una hash come segue
+
+    $pippo{$a,$b,$c}
+
+in realtE<agrave> state intendendo
+
+    $pippo{join($;, $a, $b, $c)}
+
+Ma non mettete
+
+    @pippo{$a,$b,$c}	# una slice -- notare il carattere "@"
+
+che significa
+
+    ($pippo{$a},$pippo{$b},$pippo{$c})
+
+Per default E<egrave> "\034", lo stesso di C<SUBSEP> in B<awk>. Se le vostre
+chiavi contengono dati binari potrebbe non esistere un valore sicuro per
+C<$;>.
+(Memo: la virgola (il separatore sintattico dei pedici) E<egrave> un mezzo
+punto-e-virgola. Lo so, E<egrave> piuttosto stupido come memo, ma C<$,>
+E<egrave> giE<agrave> preso per qualcosa di piE<ugrave> importante).
+
+Prendete comunque in considerazione l'utilizzo degli array multidimensionali
+"reali" descritti in L<perllol>.
+
+=item $#
+
+Il formato di uscita per i numeri stampati. Questa variabile E<egrave> un
+tentativo un po' goffo di emulare la variabile C<OFMT> di B<awk>. Ci
+sono volte, perE<ograve>, in cui B<awk> e Perl hanno differenti punti di vista
+su cosa sia da considerare "numerico". Il valore iniziale E<egrave> "%.I<n>g",
+ove I<n> E<egrave> il valore della macro C<DBL_DIG> dall'header file F<float.h>
+del vostro sistema. In questo differisce da B<awk>, in cui C<OFMT> ha
+valore di default "%.6g", per cui avrete bisogno di impostare C<$#>
+esplicitamente per avere il valore di B<awk>.
+(Memo: # E<egrave> il segno per i numeri).
+
+L'utilizzo di C<$#> E<egrave> deprecato.
+
+=item HANDLE->format_page_number(ESPRESSIONE)
+
+=item $FORMAT_PAGE_NUMBER
+
+=item $%
+
+Il numero di pagina corrente nel canale di uscita selezionato al momento.
+Utilizzato con i I<format>.
+(Memo: % E<egrave> il numero di pagina in B<nroff>).
+
+=item HANDLE->format_lines_per_page(ESPRESSIONE)
+
+=item $FORMAT_LINES_PER_PAGE
+
+=item $=
+
+La lunghezza di pagina corrente (in termini di linee stampabili) del canale
+di uscita selezionato al momento. Per default vale 60.
+Utilizzato con i I<format>.
+(Memo: = ha righe orizzontali).
+
+=item HANDLE->format_lines_left(ESPRESSIONE)
+
+=item $FORMAT_LINES_LEFT
+
+=item $-
+
+Il numero di righe rimaste sulla pagina del canale di uscita selezionato
+al momento.
+Utilizzato con i I<format>.
+(Memo: linee_sulla_pagina - linee_stampate).
+
+=item @LAST_MATCH_START
+
+=item @-
+
+C<$-[0]> E<egrave> lo scostamento dell'inizio dell'ultimo I<match> avvenuto con
+successo. C<$-[>I<n>C<]> E<egrave> lo scostamento dell'inizio della sottostringa
+"colpita" dal I<sotto-pattern> I<n>esimo, o C<undef> se il I<sotto-pattern>
+non E<egrave> stato verificato.
+
+Per questo motivo dopo un I<match> su C<$_>, C<$&> coincide con 
+C<substr $_, $-[0], $+[0] - $-[0]>. Similmente, $I<n> coincide con
+C<substr $_, $-[n], $+[n] - $-[n]> se C<$-[n]> E<egrave> definito e C<$+>
+coincide con C<substr $_, $-[$#-], $+[$#-] - $-[$#-]>.
+Si puE<ograve> utilizzare C<$#-> per trovare l'ultimo sottogruppo "colpito"
+nell'ultimo C<match> che ha avuto successo. Confrontatelo con C<$#+>,
+il numero di sottogruppi dell'espressione regolare. Confrontatelo con
+C<@+>.
+
+Questo array contiene gli scostamenti degli inizi dei I<sotto-match>
+che hanno avuto successo piE<ugrave> di recente nello scope dinamico attivo al
+momento. C<$-[0]> E<egrave> lo scostamento nella stringa dell'inizio del
+C<match> intero. L'elemento I<n>esimo di questo array contiene lo
+scostamento del I<sotto-match> I<n>esimo, per cui C<$-[1]> E<egrave> lo
+scostamento dove inizia C<$1>, C<$-[2]> E<egrave> lo scostamento dove
+inizia C<$2> e cosE<igrave> via.
+
+Dopo un I<match> su una variabile qualsiasi C<$var>:
+
+=over 5
+
+=item C<$`> E<egrave> uguale a C<substr($var, 0, $-[0])>
+
+=item C<$&> E<egrave> uguale a C<substr($var, $-[0], $+[0] - $-[0])>
+
+=item C<$'> E<egrave> uguale a C<substr($var, $+[0])>
+
+=item C<$1> E<egrave> uguale a C<substr($var, $-[1], $+[1] - $-[1])>  
+
+=item C<$2> E<egrave> uguale a C<substr($var, $-[2], $+[2] - $-[2])>
+
+=item C<$3> E<egrave> uguale a C<substr($var, $-[3], $+[3] - $-[3])>
+
+=back
+
+=item HANDLE->format_name(ESPRESSIONE)
+
+=item $FORMAT_NAME
+
+=item $~
+
+Il nome del formato di report corrente per il canale di uscita selezionato
+al momento. Per default E<egrave> il nome del I<filehandle>.
+(Memo: fratello di C<$^>).
+
+=item HANDLE->format_top_name(ESPRESSIONE)
+
+=item $FORMAT_TOP_NAME
+
+=item $^
+
+Il nome del formato di inizio-pagina per il canale di uscita selezionato
+al momento. Per default E<egrave> il nome del I<filehandle> con C<_TOP> aggiunto
+alla fine.
+(Memo: punta all'inizio della pagina).
+
+=item IO::Handle->format_line_break_characters ESPRESSIONE
+
+=item $FORMAT_LINE_BREAK_CHARACTERS
+
+=item $:
+
+L'insieme di caratteri corrente dopo i quali una stringa puE<ograve> essere
+interrotta per riempire i campi di continuazione (che iniziano con ^)
+in un I<format>. Per default E<egrave> S<" \n-">, per interrompere su spazi
+vuoti e "-".
+(Memo: una "colonna" [":" in inglese si chiama I<colon>, N.d.T.]
+in poesia E<egrave> una parte di una linea).
+
+=item IO::Handle->format_formfeed ESPRESSIONE
+
+=item $FORMAT_FORMFEED
+
+=item $^L
+
+CiE<ograve> che viene stampato come I<form feed> [carattere di avanzamento, N.d.T.] 
+dai I<format>. Per default E<egrave> C<\f>.
+
+=item $ACCUMULATOR
+
+=item $^A
+
+Il valore corrente dell'accumulatore C<write()> per le righe di C<format()>.
+Un I<format> contiene un numero C<formline()> di chiamate che inseriscono
+il proprio risultato in C<$^A>. Dopo aver chiamato il proprio I<format>,
+C<write()> stampa il contenuto di C<$^A> e lo svuota. Per questo motivo
+non vedrete mai il contenuto di C<$^A> a meno che non chiamiate
+C<formline()> per conto vostro e poi andate a vederne il valore.
+Consultate L<perlform> e L<perlfunc/formline()>.
+
+=item $CHILD_ERROR
+
+=item $?
+
+Lo stato restituito dall'ultima operazione di chiusura di una pipe,
+comando I<backtick> (C<``>), chiamata con successo a C<wait()> o
+C<waitpid()>, o dall'operatore C<system()>. Contiene la parola a 16
+bit di stato restituita dalla chiamata C<wait()> (o perlomeno E<egrave>
+costruita in modo da assomigliarle). Per questo motivo, il valore
+di uscita del sottoprocesso in realtE<agrave> E<egrave> (C<<< $? >> 8 >>>), e
+C<$? & 127> indica quale segnale, se ce n'E<egrave> stato, ha causato la
+terminazione del processo, mentre C<$? & 128> indica se c'E<egrave> stato
+un I<core dump>.
+(Memo: simile alle shell B<sh> e B<ksh>)
+
+In piE<ugrave>, se la variabile C<h_errno> E<egrave> supportata in C, il suo valore
+viene restituito via C<$?> se una qualsiasi funzione della
+famiglia C<gethost*()> fallisce.
+
+Se avete installato un I<handler> di segnale per C<SIGCHLD>, il valore
+di C<$?> sarE<agrave> generalmente sbagliato al di fuori dell'handler stesso.
+
+All'interno di una subroutine C<END>, C<$?> contiene il valore che
+verrE<agrave> passato ad C<exit()>. Potete modificare C<$?> in una subroutine
+C<END> per cambiare lo stato di uscita del vostro programma. Ad
+esempio:
+
+    END {
+        $? = 1 if $? == 255;  # die lo imposta a 255
+    } 
+
+Sotto VMS, la direttiva C<use vmsish 'status'> fa sE<igrave> che C<$?>
+rifletta il valore di uscita VMS reale, invece che quello di emulazione
+POSIX che si avrebbe di default; consultate L<perlvms/$?> per i
+dettagli.
+
+Consultate anche L<Indicatori di Errore>.
+
+=item ${^ENCODING}
+
+Il I<riferimento-oggetto> all'oggetto Encode che E<egrave> utilizzato per
+convertire il codice sorgente in Unicode. Grazie a questa variabile il
+vostro script perl non ha bisogno di essere scritto in UTF-8. Per
+default E<egrave> C<undef>. La manipolazione diretta di questa variabile E<egrave>
+caldamente scoraggiata. Consultate anche L<encoding> per maggiori
+dettagli.
+
+=item $OS_ERROR
+
+=item $ERRNO
+
+=item $!
+
+Se utilizzata numericamente, restituisce il valore corrente della
+variabile C C<errno>, o, in altre parole, se una chiamata di sistema
+o di libreria fallisce, imposta questa variabile. CiE<ograve> significa che
+il valore di C<$!> ha senso solo I<immediatamente> dopo un
+B<fallimento>:
+
+    if (open(FH, $nomefile)) {
+        # Qui $! non ha senso.
+	...
+    } else {
+        # SOLO qui $! ha senso.
+	...
+        # Gia' qui $! potrebbe aver perso ogni senso.
+    }
+    # Poiche' qui potremmo aver avuto un successo o un fallimento,
+    # qui $! non ha senso.
+
+Nell'esempio I<non ha senso> indica qualunque valore: zero, non zero,
+C<undef>. Una chiamata di sistema o di libreria completata con
+successo B<non> imposta la variabile a zero.
+
+Se utilizzata come una stringa, restituisce la corrispondente
+stringa di errore di sistema. Potete assegnare un valore numerico I<n>
+a C<$!> per impostare I<errno> se, ad esempio, volete che C<"$!">
+restituisca la stringa per l'errore I<n>, o se volete
+impostare il valore di uscita per l'operatore C<die()>.
+(Memo: cos'E<egrave> che E<egrave> appena esploso? [il carattere "!" E<egrave> anche detto
+"bang" in inglese, e "bang" E<egrave> il nome onomatopeico per l'esplosione, N.d.T.]).
+
+Consultate anche L<Indicatori di Errore>.
+
+=item %!
+
+Ciascun elemento di C<%!> ha un valore "vero" solo se C<$!> E<egrave>
+impostato al dato valore. Ad esempio, C<$!{ENOENT}> E<egrave> vera se e solo
+se il valore corrente di C<$!> E<egrave> C<ENOENT>; in altri termini, se l'errore
+occorso piE<ugrave> di recente E<egrave> stato "No such file or directory"
+["Nome di file o directory inesistente", N.d.T.] (o il suo equivalente
+"morale": non tutti i sistemi operativi danno questo errore con questa
+stringa esatta, e sicuramente non tutte le lingue).
+Per verificare se una particolare chiave ha senso nel vostro sistema,
+utilizzate C<exists $!{la_chiave}>; per una lista di chiavi
+ammissibili utilizzate C<keys %!>.
+Consultate L<Errno> per maggiori informazioni, e consultate quanto
+detto sopra circa la validitE<agrave> di C<$!>.
+
+=item $EXTENDED_OS_ERROR
+
+=item $^E
+
+Informazione di errore specifica per il sistema operativo in uso.
+Al momento, il valore di questa variabile differisce da C<$!> solo
+sotto VMS, OS/2 e Win32 (e per MacPerl). Su tutte le altre piattaforme,
+C<$^E> E<egrave> sempre semplicemente uguale a C<$!>.
+
+Sotto VMS, c<$^E> fornisce il valore di status VMS risultante
+dall'ultimo errore di sistema. Tale informazione risulta
+un'indicazione piE<ugrave> specifica sull'ultimo errore di sistema rispetto
+a quella data da C<$!>. CiE<ograve> risulta particolarmente importante quando
+C<$!> E<egrave> impostato a B<EVMSERR>.
+
+Sotto OS/2, C<$^E> E<egrave> impostata al codice di errore dell'ultima
+chiamata all'API OS/2 o attraverso CRT o direttamente da perl.
+
+Sotto Win32, C<$^E> restituisce sempre l'ultima informazione di
+errore riportata dalla chiamata Win32 C<GetLastError()>, che
+descrive l'ultimo errore riportato dall'interno dell'API Win32.
+La maggior parte del codice specifico per Win32 riporterE<agrave> i
+propri errori attraverso C<$^E>. Le chiamate C ANSI e
+quelle di tipo Unix impostano C<errno> e per questo motivo il
+codice Perl piE<ugrave> portabile riporterE<agrave> gli errori attraverso C<$!>.
+
+Le avvertenze date nella descrizione di C<$!> si applicano, in
+generale, anche a C<$^E>.
+(Memo: spiegazione di errore Extra).
+
+Consultate anche L<Indicatori di Errore>.
+
+=item $EVAL_ERROR
+
+=item $@
+
+Il messaggio di errore di sintassi di Perl risultante dall'ultimo
+operatore C<eval()>. Se C<$@> E<egrave> la stringa vuota, l'ultima
+chiamata a C<eval()> E<egrave> stata interpretata ["parsed" nell'originale
+inglese, N.d.T.] ed eseguita correttamente
+(per quanto le operazioni invocate potrebbero esser fallite nella
+maniera usuale).
+(Memo: "a" che punto era l'errore di sintassi? [il segno "@" in
+inglese E<egrave> chiamato "at", che corrisponde alla preposizione "a" italiana,
+N.d.T.])
+
+I messaggi di avvertimento non sono raccolti da questa variabile.
+In ogni caso, potete impostare una routine per processare gli
+avvertimenti impostando C<$SIG{__WARN__}> come descritto in seguito.
+
+Consultate anche L<Indicatori di Errore>.
+
+=item $PROCESS_ID
+
+=item $PID
+
+=item $$
+
+L'identificativo numerico del processo Perl che sta eseguendo lo
+script. Questa variabile va considerata in sola lettura, sebbene
+risulti alterata dalle chiamate a C<fork()>.
+(Memo: come per le shell).
+
+Nota per gli utenti Linux: in Linux, le funzioni C C<getpid()> e
+C<getppid()> restituiscono valori differenti da thread differenti.
+PerchE<egrave> sia portabile, questo comportamento non E<egrave> replicato per C<$$>,
+il cui valore rimane consistente attraverso i thread. Se volete
+chiamare la C<getpid()> sottostante, potete utilizzare il modulo
+CPAN C<Linux::Pid>.
+
+=item $REAL_USER_ID
+
+=item $UID
+
+=item $<
+
+L'UID reale di questo processo.
+(Memo: E<egrave> l'UID I<da> cui provenite se state utilizzando setuid).
+Potete cambiare sia l'UID reale che l'UID effettivo in un colpo
+solo utilizzando C<POSIX::setuid()>. PoichE<egrave> le modifiche a C<< $< >>
+richiedono una chiamata di sistema, controllate C<$!> dopo un
+tentativo di cambiamento per individuare possibili errori.
+
+=item $EFFECTIVE_USER_ID
+
+=item $EUID
+
+=item $>
+
+L'UID effettivo di questo processo. Ad esempio:
+
+    $< = $>;		# Imposta l'UID reale uguale a quello effettivo
+    ($<,$>) = ($>,$<);	# scambia UID reale ed effettivo
+
+Potete cambiare sia l'UID effettivo che quello reale allo stesso
+tempo utilizzando C<POSIX::setuid()>. I cambiamenti a C<< $> >>
+richiedono un controllo su C<$!> per individuare qualsiasi possibile
+errore conseguente da un tentativo di cambiamento.
+
+(Memo: E<egrave> l'UID I<verso> il quale siete andati, se state girando setuid).
+C<< $< >> e C<< $> >> possono essere scambiati solo su macchine
+che supportano C<setreuid()>.
+
+=item $REAL_GROUP_ID
+
+=item $GID
+
+=item $(
+
+Il GID reale di questo processo. Se vi trovate su una macchina che
+supporta l'appartenenza a piE<ugrave> gruppi contemporaneamente, restituisce
+una lista dei gruppi a cui appartenete, con gli elementi separati
+da spazi. Il primo numero E<egrave> quello restituito da C<getgid()>, mentre
+i seguenti sono quelli dati da C<getgroups()>, uno dei quali
+potrebbe essere uguale al primo valore.
+
+In ogni caso, il valore assegnato a C<$(> deve essere un unico
+numero utilizzato per impostare il GID reale. Per questo motivo
+il valore dato da C<$(> I<non> deve essere mai utilizzato per
+una successiva assegnazione a C<$(> stesso senza che sia stato
+forzato ad essere un numero, ad esempio mediante una somma con zero.
+
+Potete modificare sia il valore di GID reale che quello effettivo
+in sol colpo utilizzando C<POSIX::setgid()>. I cambiamenti a C<$(>
+richiedono un controllo di C<$!> per individuare qualsiasi possibile
+errore derivante dal tentativo di cambiamento.
+
+(Memo: le parentesi sono utilizzate per I<raggruppare>. Il GID
+reale E<egrave> quello che avete I<lasciato> se state girando setgid
+["lasciato" in inglese E<egrave> "left", che vuol dire anche "sinistra", come
+la parentesi utilizzata per questa variabile, N.d.T.]
+
+=item $EFFECTIVE_GROUP_ID
+
+=item $EGID
+
+=item $)
+
+Il GID effettivo di questo processo. Se vi trovate su una macchina che
+supporta l'appartenenza a piE<ugrave> gruppi contemporaneamente, restituisce
+una lista dei gruppi a cui appartenete, con gli elementi separati
+da spazi. Il primo numero E<egrave> quello restituito da C<getgid()>, mentre
+i seguenti sono quelli dati da C<getgroups()>, uno dei quali
+potrebbe essere uguale al primo valore.
+
+In maniera analoga, un valore assegnato a C<$)> deve essere
+anch'esso una lista di valori numerici separati da spazi. Il primo
+valore va ad impostare il valore del GID effettivo, ed i rimanenti
+(se presenti) sono passati a C<setgroups()>. Per ottenere una lista
+vuota per C<setgroups()> vi basterE<agrave> ripetere il GID effettivo nuovo;
+ossia, per forzare un GID effettivo pari a 5 e svuotare la
+lista di C<setgroups()> in maniera efficace, chiamate
+C< $) = "5 5" >.
+
+Potete cambiare il GID effettivo e quello reale in sol colpo
+utilizzando la funzione C<POSIX::setgid()> (utilizzate solo un
+unico argomento numerico). I cambiamenti a C<$)> richiedono un
+controllo su C<$!> per individuare qualsiasi possibile errore
+dopo un tentativo di cambiamento.
+
+(Memo: le parentesi sono utilizzate per I<raggruppare>. Il GID
+effettivo E<egrave> quello I<giusto> per voi, se state girando setgid
+["giusto" in inglese E<egrave> "right", che vuol dire anche "destra", come
+la parentesi utilizzata per questa variabile, N.d.T.]).
+
+C<< $< >>, C<< $> >>, C<$(> e C<$)> possono essere impostate
+solo su macchine che supportano le corrispondenti routine
+I<set[re][ug]id()>. C<$(> e C<$)> possono essere scambiate solo
+su macchine che supportano C<setregid()>.
+
+=item $PROGRAM_NAME
+
+=item $0
+
+Contiene il nome del programma in esecuzione.
+
+Su alcuni (attenzione: non tutti) sistemi operativi l'assegnazione
+a C<$0> modifica l'area argomenti vista dal programma C<ps>. Su
+alcune piattaforme potreste dover utilizzare opzioni speciali di C<ps>
+o un programma C<ps> differente per poter osservare il cambiamento.
+La modifica di C<$0> E<egrave> piE<ugrave> utile come mezzo per indicare lo stato
+corrente del programma che per nascondere il programma stesso.
+(Memo: uguale a B<sh> e B<ksh>).
+
+Osservate che ci sono limitazione specifiche per ciascuna piattaforma
+per la lunghezza massima di C<$0>. Nel caso piE<ugrave> estremo potrebbe
+essere limitata allo spazio occupato dal valore originario di C<$0>.
+
+In alcune piattaforme potrebbero esserci I<padding> variabili
+[aggiunte di caratteri riempitivi all'inizio o alla fine, N.d.T.],
+ad esempio spazi, dopo il nome modificato cosE<igrave> come mostrato da C<ps>.
+In alcune piattaforme queste aggiunte potrebbero estendersi per la
+lunghezza originale dell'area argomenti, indipendentemente da quel
+che potete fare (ad esempio questo E<egrave> il caso di Linux 2.2).
+
+Nota per gli utenti BSD: impostare C<$0> non rimuove completamente
+la stringa "perl" dall'uscita di C<ps(1)>. Ad esempio, impostando
+C<$0> a C<"pippopluto"> potrebbe risultare in C<"perl: pippopluto (perl)">
+(la presenza di entrambe le stringhe C<"perl: "> e C<" (perl)">
+dipendono dalla variante e dalla versione esatte di BSD che state
+utilizzando). Questa E<egrave> una caratteristica del sistema operativo,
+Perl non puE<ograve> farci niente.
+
+In script I<multithread>, Perl coordina i thread in modo che ciascuno
+di essi possa modificare la propria copia di C<$0> ed il cambiamento
+diventa visibile in C<ps(1)> (assumendo che il sistema operativo
+collabori). Notate che quel che gli altri thread vedono di C<$0>
+non cambia, perchE<egrave> ciascuno di essi ha la propria copia di questa
+variabile.
+
+=item $[
+
+L'indice del primo elemento in un array, ed il primo carattere in
+una sottostringa. Per default vale 0, ma potreste teoricamente
+impostarlo ad 1 per far sE<igrave> che Perl si comporti similmente a
+B<awk> (o Fortran) quando indicizzate un array e quando utilizzate le
+funzioni C<index()> e C<substr()>.
+(Memo: [ inizia l'indicizzazione di un array).
+
+A partire dalla release 5 di Perl, l'assegnazione alla variabile
+C<$[> viene trattata come una direttiva di compilazione, e non
+puE<ograve> influenzare il comportamento in un qualsiasi altro file.
+(Per questo motivo potete solamente assegnarle costanti disponibili
+al tempo di compilazione). Il suo utilizzo E<egrave> caldamente scoraggiato.
+
+Osservate che, diversamente da altre direttive di compilazione
+(come L<strict>), l'assegnazione a C<$[> puE<ograve> essere vista al di fuori
+dello scope lessicale all'interno dello stesso file. In ogni caso
+potete utilizzare C<local()> per restringere il suo nuovo valore
+ad un blocco lessicale.
+
+=item $]
+
+Il valore di versione e livello di patch / 1000 dell'interprete Perl.
+Questa variabile puE<ograve> essere utilizzata per determinare se l'interprete
+Perl che sta eseguendo uno script E<egrave> compreso in un intervallo
+di versioni ammissibili.
+(Memo: questa versione di perl si trova nell'intervallo giusto?
+[la parentesi quadra chiusa indica la chiusura di un intervallo, N.d.T.]).
+Esempio: 
+
+    warn "Niente checksum!\n" if $] < 3.019;
+
+Consultate anche la documentazione di C<use VERSIONE> e
+C<require VERSIONE> per un modo conveniente di fallire se
+l'interprete Perl E<egrave> troppo antiquato.
+
+Quando effettuate i test sulla variabile, per evitare le inaccuratezze
+derivanti dalla rappresentazione dei reali in virgola mobile E<egrave> meglio
+che preferiate dei controlli di diseguaglianza C<< < >> e
+C<< > >> rispetto ai test che contengono uguaglianze: C<< <= >>,
+C<< == >> e C<< >= >>.
+
+La rappresentazione in virgola mobile puE<ograve> a volte portare a confronti
+numerici inaccurati. Controllate C<$^V> per una rappresentazione piE<ugrave>
+moderna della versione Perl, che consente di effettuare comparazioni
+di stringa accurate.
+
+=item $COMPILING
+
+=item $^C
+
+Il valore correntemente associato al flag associato all'opzione
+a linea di comando C<-c>. Principalmente utilizzata con B<-MO=...>
+per consentire al codice di alterare il proprio comportamento
+in fase di compilazione, come ad esempio per C<AUTOLOAD>
+[autocaricare, N.d.T.] in fase di compilazione piuttosto che 
+effettuare in normali caricamenti differiti a tempo di esecuzione.
+Consultate L<perlcc>. Impostare C<$^C = 1> E<egrave> simile a chiamare
+C<B::minus_c>.
+
+=item $DEBUGGING
+
+=item $^D
+
+Il valore corrente dei flag di debugging.
+(Memo: il valore dell'opzione B<-D>).
+PuE<ograve> essere letto ed impostato. Come il suo equivalente a linea di
+comando, potete utilizzare valori numerici o simbolici, ad esempio
+C<$^D = 10> oppure C<$^D = "st">.
+
+=item $SYSTEM_FD_MAX
+
+=item $^F
+
+Il massimo descrittore di file di sistema, usualmente pari a 2.
+I descrittori di file di sistema sono passati ai processi eseguiti
+con C<exec()>, mentre i descrittori di file piE<ugrave> alti non lo sono.
+In piE<ugrave>, durante una C<open()>, i descrittori di file di sistema
+sono preservati anche se C<open()> fallisce. (I descrittori di file
+ordinari sono chiusi prima di un tentativo di C<open()>). Lo status
+di close-on-exec [chiudi quando esegui, N.d.T.] verrE<agrave> deciso in
+base al valore di C<$^F> quando il file, la pipe o il socket
+corrispondenti sono stati aperti, non quello trovato al momento
+della C<exec()>.
+
+=item $^H
+
+ATTENZIONE: questa variabile E<egrave> strettamente ad uso interno. La sua
+disponibilitE<agrave>, comportamento e contenuto sono soggetti a variazioni
+senza preavviso.
+
+Questa variabile contiene suggerimenti per l'interprete Perl utilizzati
+in fase di compilazione. Alla fine della compilazione di un BLOCCO il
+valore di questa variabile viene ripristinato a quello di quando
+l'interprete ha iniziato a compilare il BLOCCO stesso.
+
+Quando perl inizia ad interpretare ["parse" nell'originale inglese,
+N.d.T.] un qualsiasi costrutto di blocco
+che dE<agrave> luogo ad uno scope lessicale (ad esempio il corpo di una C<eval()>,
+un file incluso con C<require()>, il corpo di una C<sub>, il corpo di
+un ciclo, o un blocco condizionale), il valore corrente di C<$^H> viene
+salvato, ma il suo valore E<egrave> lasciato immodificato. Quando la compilazione
+del blocco ha avuto termine, viene ripristinato il valore salvato. Fra
+questi due punti, il codice che viene eseguito all'interno dei blocchi
+BEGIN E<egrave> libero di cambiare il valore di C<$^H>.
+
+Questo comportamento E<egrave> alla base dello scoping lessicale, ed E<egrave> utilizzato,
+ad esempio, nella direttiva C<use strict>.
+
+Il contenuto dovrebbe consistere di un intero: i diversi bit sono
+utilizzati per differenti flag di direttiva. Ecco un esempio:
+
+    sub aggiungi_100 { $^H |= 0x100 }
+
+    sub pippo {
+        BEGIN { aggiungi_100() }
+        pluto->topolino($paperino);
+    }
+
+Considerate quel che accade durante l'esecuzione del blocco BEGIN.
+A questo punto il blocco BEGIN E<egrave> giE<agrave> stato compilato, ma il corpo di
+C<pippo()> E<egrave> ancora in fase di compilazione. Il nuovo valore di C<$^H>
+sarE<agrave> pertanto visibile solo durante la compilazione di C<pippo()>.
+
+La sostituzione del blocco BEGIN con questo:
+
+    BEGIN { require strict; strict->import('vars') }
+
+dimostra come C<use strict 'vars'> E<egrave> implementato. Ecco una
+versione condizionale della stessa direttiva lessicale:
+
+    BEGIN { require strict; strict->import('vars') if $condizione }
+
+=item %^H
+
+ATTENZIONE: questa variabile E<egrave> strettamente ad uso interno. La sua
+disponibilitE<agrave>, comportamento e contenuto sono soggetti a variazioni
+senza preavviso.
+
+La hash C<%^H> fornisce lo stesso raggio semantico di C<$^H>. CiE<ograve>
+la rende utile per implementare direttive lessicalmente ristrette.
+
+=item $INPLACE_EDIT
+
+=item $^I
+
+Il valore corrente dell'estensione di modifica diretta di un file.
+Utilizzate C<undef> per disabilitare questa caratteristica.
+(Memo: il valore dell'opzione C<-i>).
+
+["inplace-edit" E<egrave> la caratteristica di Perl di poter agire direttamente
+su un file che normalmente utilizzerebbe in sola lettura, ad esempio
+per operare modifiche sul file stesso, N.d.T.].
+
+=item $^M
+
+Per default, l'errore di "memoria terminata" non puE<ograve> essere
+impedito e risulta fatale. In ogni caso, se compilato in maniera
+adeguata, Perl puE<ograve> utilizzare il contenuto di C<$^M>
+come riserva di memoria di emergenza dopo C<die()>. Supponete che
+il vostro Perl sia stato compilato con C<-DPERL_EMERGENCY_SBRK>
+e che utilizzi la C<malloc()> di Perl. Allora
+
+    $^M = 'a' x (1 << 16);
+
+allocherebbe un buffer di 64K da utilizzare nelle emergenze. Consultate
+il file F<INSTALL> nella distribuzione di Perl per informazioni su come
+aggiungere flag di compilazione personalizzati quando compilate perl.
+Per scoraggiare l'utilizzo casuale di questa caratteristica avanzata,
+per questa variabile non esiste un nome lungo corrispondente nel
+modulo L<English|English>.
+
+=item $OSNAME
+
+=item $^O
+
+Il nome del sistema operativo nel quale E<egrave> stata compilata questa copia
+dell'interprete Perl, cosE<igrave> come determinato durante il processo
+di configurazione. Il valore E<egrave> identico a C<$Config{'osname'}>.
+Consultate anche L<Config> e l'opzione a linea di comando
+B<-V> documentata in L<perlrun>.
+
+Nelle piattaforme Windows, C<$^O> non E<egrave> molto d'aiuto: essa vale
+infatti sempre C<MSWin32>, e non vi dice la differenza fra
+95/98/ME/NT/2000/XP/CE/.NET. Utilizzate C<Win32::GetOSName()>
+o C<Win32::GetOSVersion()> (consultate L<Win32> e L<perlport>)
+per distinguere fra le differenti varianti.
+
+=item ${^OPEN}
+
+Variabile interna utilizzata da PerlIO. Consiste di una stringa formata
+da due parti, separate da un byte C<\0>. La prima parte descrive i
+I<layer> [strati, N.d.T.] di ingresso, la seconda quelli di uscita.
+
+=item $PERLDB
+
+=item $^P
+
+Variabile interna per il supporto al debugging. Il significato dei vari
+bit E<egrave> soggetto a cambiamento, ma al momento indica:
+
+=over 6
+
+=item 0x01
+
+Debug di ingresso/uscita da subroutine.
+
+=item 0x02
+
+Debug riga-per-riga.
+
+=item 0x04
+
+Disabilita le ottimizzazioni.
+
+=item 0x08
+
+Conserva piE<ugrave> dati per future ispezioni interattive.
+
+=item 0x10
+
+Mantieni informazioni sulle linee nel programma sorgente dove
+una subroutine E<egrave> definita.
+
+=item 0x20
+
+Inizia con la modalitE<agrave> singolo-passo.
+
+=item 0x40
+
+Utilizza l'indirizzo della subroutine invece del nome quando si stampa.
+
+=item 0x80
+
+Fai rapporto anche di C<goto &subroutine>.
+
+=item 0x100
+
+Fornisci nomi di "file" informativi per C<eval()>, basati sul posto
+dove sono state compilate.
+
+=item 0x200
+
+Fornisci nomi informativi alle subroutine anonime, basati sul posto
+dove sono state compilate.
+
+=item 0x400
+
+Debug di ingresso/uscita delle subroutine di asserzione.
+
+=back
+
+Alcuni bit possono essere rilevanti solo in fase di compilazione, alcuni
+solo in fase di esecuzione. Si tratta di un meccanismo nuovo ed i dettagli
+potrebbero cambiare.
+
+=item $LAST_REGEXP_CODE_RESULT
+
+=item $^R
+
+Il risultato della valutazione dell'ultima asserzione C<(?{ codice })>
+in un'espressione regolare eseguita con successo (consultate L<perlre>).
+Potete assegnarle un valore.
+
+=item $EXCEPTIONS_BEING_CAUGHT
+
+=item $^S
+
+Stato corrente dell'interprete.
+
+    $^S         State
+    ---------   -------------------
+    undef       In fase di interpretazione di un modulo o di una eval
+    vero (1)    In fase di valutazione di una eval
+    falso (0)   Altrimenti
+
+Il primo stato puE<ograve> essere riscontrato in I<handler>
+$SIG{__DIE__} e $SIG{__WARN__}.
+
+=item $BASETIME
+
+=item $^T
+
+Il tempo al quale E<egrave> iniziata l'esecuzione del programma, espresso in
+secondi a partire dalla I<epoch> (inizio del 1970). I valori
+restituiti dai test su file B<-M>, B<-A> e B<-C> sono basati su
+questo valore.
+
+=item ${^TAINT}
+
+Riflette se la modalitE<agrave> I<taint> E<egrave> attiva o meno. Il valore 1 indica che
+E<egrave> attiva (il programma E<egrave> stato lanciato con B<-T>), 0 indica che non E<egrave>
+attiva, -1 quando sono abilitati solo gli avvertimenti di I<taint>
+(ossia con le opzioni B<-t> o B<-TU>).
+
+=item ${^UNICODE}
+
+Riflette lo stato di determinate impostazioni di Unicode di Perl.
+Consultate la documentazione L<perlrun> riguardo l'opzione C<-C>
+per maggiori informazioni sui possibili valori. Questa variabili viene
+impostata all'avvio di Perl ed E<egrave> pertanto in sola lettura.
+
+=item ${^UTF8LOCALE}
+
+Questa variabile indica se perl ha individuato un I<locale> UTF-8
+all'avviamento. Tale informazione viene usata da perl quando E<egrave> in
+modalitE<agrave> I<adegua-uso-utf8-al-locale> (come quando si lancia con
+l'opzione a linea di comando C<-CL>); consultate L<perlrun> per
+maggiori informazioni.
+
+=item $PERL_VERSION
+
+=item $^V
+
+Revisione, versione e sottoversione dell'interprete Perl, rappresentate
+come stringa composta da caratteri con questi ordinali. Ad esempio,
+Perl v5.6.0 corrisponde a C<chr(5) . chr(6) . chr(0)> e restituirE<agrave>
+un valore vero per il test C<$^V eq v5.6.0>. Notare che i caratteri
+in questa stringa possono ricadere, potenzialmente, nell'intervallo Unicode.
+
+Questa variabile puE<ograve> essere utilizzata per determinare se l'interprete
+Perl che sta eseguendo il nostro script ricade nell'intervallo
+corretto di versioni ammissibili.
+(Memo: usa ^V per il Controllo Versione). Esempio: 
+
+    warn "Niente dichiarazioni \"our\"!\n" if $^V and $^V lt v5.6.0;
+
+Per convertire C<$^V> nella sua rappresentazione in forma di stringa
+utilizzate la conversione C<"%vd"> di C<sprintf()>:
+
+    printf "la versione e` v%vd\n", $^V;  # versione di Perl
+
+Consultate la documentazione di C<use VERSIONE> e C<require VERSIONE>
+per un modo conveniente di fallire nel caso che l'interprete Perl
+che sta eseguendo il vostro script sia troppo datato.
+
+Consultate anche C<$]> per una rappresentazione piE<ugrave> obsoleta della
+versione dell'interprete Perl.
+
+=item $WARNING
+
+=item $^W
+
+Il valore corrente dell'impostazione di stampa degli avvertimenti,
+inizialmente vera se E<egrave> stato utilizzato B<-w>, falsa altrimenti ma
+modificabile direttamente.
+(Memo: correlata all'opzione B<-w>).
+Consultate anche L<warnings>.
+
+=item ${^WARNING_BITS}
+
+L'insieme attuale di controlli di avvertimento abilitati dalla
+direttiva C<use warnings>. Consultate la documentazione per
+L<warnings> per maggiori dettagli.
+
+=item $EXECUTABLE_NAME
+
+=item $^X
+
+Il nome utilizzato per eseguire la copia corrente di Perl, presa
+da C<argv[0]> del C o (laddove supportato) da F</proc/self/exe>.
+
+Dipendentemente dal sistema operativo ospite, il valore di C<$^X>
+puE<ograve> essere il percorso relativo o assoluto del file del programma
+perl, o puE<ograve> essere la stringa utilizzata per chiamare per ma non
+il percorso del file del programma. In piE<ugrave>, la maggior parte dei
+sistemi operativi consente di eseguire programmi che non
+sono nella variabile d'ambiente C<PATH>, per cui non c'E<egrave>
+garanzia che il valore di C<$^X> sia in C<PATH>. Per il VMS,
+il valore puE<ograve> includere un numero di versione come puE<ograve> non
+includerlo.
+
+Di solito potete utilizzare il valore di C<$^X> per richiamare
+una copia indipendente dello stesso perl che sta girando al
+momento, ad esempio
+
+  @prima_girata = `$^X -le "print int rand 100 for 1..100"`;
+
+Ricordate perE<ograve> che non tutti i sistemi operativi supportano
+C<fork()> o la cattura dell'uscita dei comandi, per cui questa
+istruzione complessa potrebbe non essere portabile.
+
+Non E<egrave> sicuro utilizzare il valore di C<$^X> come percorso di un
+file, perchE<egrave> alcuni sistemi operativi che hanno un suffisso
+obbligatorio per i file eseguibili non richiedono l'uso di questo
+suffisso quando si lancia un comando. Per convertire il valore di
+C<$^X> in un percorso utilizzate le seguenti istruzioni:
+
+  # Costruisci un insieme di nomi di file (non di nomi di comandi).
+  use Config;
+  $questo_perl = $^X;
+  if ($^O ne 'VMS')
+     {$questo_perl .= $Config{_exe}
+          unless $questo_perl =~ m/$Config{_exe}$/i;}
+
+PoichE<egrave> molti sistemi operativi consentono a chiunque con permessi
+di lettura al programma Perl di farne una copia, modificarla e poi
+eseguirla, il programmatore Perl che ha attenzione per la sicurezza
+dovrebbe procedere con cautela per chiamare la copia installata di
+perl, non quella riferita da C<$^X>. Le istruzioni che seguono
+raggiungono questo scopo, e producono un percorso che puE<ograve> essere
+chiamato come comando o riferito come file.
+
+  use Config;
+  $percorso_a_perl_sicuro = $Config{perlpath};
+  if ($^O ne 'VMS')
+     {$percorso_a_perl_sicuro .= $Config{_exe}
+          unless $percorso_a_perl_sicuro =~ m/$Config{_exe}$/i;}
+
+=item ARGV
+
+Il I<filehandle> speciale che itera sui nomi di file della linea
+di comando contenuti in C<@ARGV>. Usualmente scritto come I<filehandle>
+vuoto nell'operatore diamante C<< <> >>. Notate che C<ARGV> corrente
+ha il suo valore magico solamente all'interno dell'operatore
+C<< <> >>; altrove E<egrave> solo un I<filehandle> come altri, corrispondente
+all'ultimo file aperto con C<< <> >>. In particolare, passando
+C<\*ARGV> come parametro ad una funzione che si aspetta di
+ricevere un I<filehandle> puE<ograve> far sE<igrave> che la vostra funzione non legga
+automaticamente il contenuto di tutti i file in C<@ARGV>.
+
+=item $ARGV
+
+contiene il nome del file attualmente letto con C<< <> >>.
+
+=item @ARGV
+
+L'array C<@ARGV> contiene gli argomenti a linea di comando diretti
+allo script [ossia intesi per essere passati allo script piuttosto che
+all'interprete Perl, N.d.T.]. C<$#ARGV> E<egrave>, generalmente, il numero
+di argomenti meno uno, perchE<egrave> C<$ARGV[0]> E<egrave> il primo argomento, I<non>
+il nome stesso del programma. Consultate C<$0> per il nome del comando.
+
+=item ARGVOUT
+
+Il I<filehandle> speciale che punta al file di uscita attualmente
+aperto quando si sta effettuando il processamento di modifica in linea
+con B<-i>. Utile quando dovete effettuare molti inserimenti e non
+volete continuare a modificare C<$_>. Consultate L<perlrun> ove
+si descrive l'opzione B<-i>.
+
+=item @F
+
+L'array C<@F> contiene i campi di ciascuna riga letta quando la
+modalitE<agrave> di autodivisione E<egrave> attiva. Consultate L<perlrun> per
+dettagli sull'opzione B<-a>. Questo array E<egrave> specifico per pacchetto,
+e deve essere dichiarato o utilizzato con il nome di pacchetto completo
+se non vi trovate nel pacchetto C<main> e state lavorando sotto
+C<strict 'vars'>.
+
+=item @INC
+
+L'array C<@INC> contiene la lista dei posti dove i costrutti
+C<do ESPRESSIONE>, C<require> o C<use> vanno a guardare quando
+cercano i file di libreria. Inizialmente consiste degli argomenti
+di tutte le opzioni B<-I> a linea di comando, seguite dalla libreria
+di default di Perl, probabilmente F</usr/local/lib/perl>, seguite da
+".", per rappresentare la directory corrente. ("." non verrE<agrave> aggiunta
+se sono attivi i controlli di I<taint>, sia da B<-T> che da B<-t>).
+Se avete bisogno di modificare questa variabile durante l'esecuzione,
+dovreste utilizzare la direttiva C<use lib> per far sE<igrave> da caricare le
+librerie dipendenti dalla macchina in maniera appropriata:
+
+    use lib '/miopercorso/libdir/';
+    use QualcheMod;
+
+Potete anche inserire degli "agganci" nel sistema di inclusione dei
+file inserendo codice Perl direttamente in C<@INC>. Questi "agganci"
+possono essere riferimenti a subroutine, riferimenti ad array o
+oggetti su cui E<egrave> stata chiamata C<bless()>. Consultate
+L<perlfunc/require> per i dettagli.
+
+=item @_
+
+In una subroutine, l'array C<@_> contiene i parametri passati alla
+subroutine stessa. Consultate L<perlsub>.
+
+=item %INC
+
+La hash C<%INC> contiene elementi per ciascun nome di file incluso
+attraverso gli operatori C<do>, C<require> o C<use>. La chiave
+E<egrave> il nome del file che avete specificato (con i nomi dei moduli
+convertiti a percorsi di file), ed il valore E<egrave> la posizione del file
+trovato. L'operatore C<require> utilizza questa hash per determinare
+se un file particolare E<egrave> stato giE<agrave> incluso.
+
+Se il file E<egrave> stato caricato attraverso un "aggancio" (ad esempio
+un riferimento a subroutine, consultate L<perlfunc/require> per una
+descrizione di questi "agganci"), l'"aggancio" stesso E<egrave> inserito
+per default all'interno di C<%INC> al posto di un nome di file.
+Osservate, comunque, che l'"aggancio" puE<ograve> aver impostato l'elemento
+in C<%INC> di per se per fornire informazioni piE<ugrave> specifiche.
+
+=item %ENV
+
+=item $ENV{espressione}
+
+La hash C<%ENV> contiene il vostro ambiente corrente. Impostare
+un valore in C<%ENV> cambia l'ambiente per tutti i processi
+figli che genererete da qui in avanti con C<fork()>.
+
+=item %SIG
+
+=item $SIG{expr}
+
+La hash C<%SIG> contiene gli I<handler> [funzioni di gestione, N.d.T.]
+per i segnali. Ad esempio:
+
+    sub handler {	# Il primo parametro e` il nome del segnale
+        my($seg) = @_;
+        print "Ricevuto SIG$seg--chiudo tutto\n";
+        close(LOG);
+        exit(0);
+    }
+
+    $SIG{'INT'}  = \&handler;
+    $SIG{'QUIT'} = \&handler;
+    ...
+    $SIG{'INT'}  = 'DEFAULT';	# ripristina l'azione di default
+    $SIG{'QUIT'} = 'IGNORE';	# ignora SIGQUIT
+
+Utilizzare un valore di C<'IGNORE'> usualmente ha l'effetto di ignorare
+il segnale, eccetto che per il segnale C<CHLD>. Consultate L<perlipc>
+per maggiori dettagli su questo caso particolare.
+
+Ecco alcuni esempi aggiuntivi:
+
+    $SIG{"PIPE"} = "Idraulico";   # assume main::Idraulico (sconsigliato)
+    $SIG{"PIPE"} = \&Idraulico;   # tutto bene, assume l'Idraulico corrente
+    $SIG{"PIPE"} = *Idraulico;    # un po' esoterico
+    $SIG{"PIPE"} = Idraulico();   # oops, cosa restituisce Idraulico()?
+
+Assicuratevi di non utilizzare una parola nuda e cruda come nome di
+un gestore di segnale, a meno che non vogliate chiamarla inavvertitamente.
+
+Se il vostro sistema supporta la funzione C<sigaction()>, allora
+l'I<handler> di segnale viene installato utilizzandola. Questo significa
+avere una gestione dei segnali piE<ugrave> robusta.
+
+La politica di consegna dei segnali di default E<egrave> cambiata in Perl
+5.8.0 da immediata (anche nota come "insicura") a differita, anche
+nota come "segnali sicuri". Consultate L<perlipc> per maggiori
+ragguagli.
+
+Alcuni "agganci" interni possono essere impostati anche utilizzando
+la hash C<%SIG>. La routine indicata da C<$SIG{__WARN__}> viene
+chiamata quando si sta per stampare un messaggio di avvertimento.
+Il messaggio viene passato come primo parametro. La presenza di
+"agganci" C<__WARN__> implica la soppressione dell'ordinaria stampa
+su C<STDERR>. Potete utilizzare questa tecnica per salvare
+i messaggi di avvertimento in una variabile, o per trasformare
+questi messaggi in errori fatali, come ad esempio:
+
+    local $SIG{__WARN__} = sub { die $_[0] };
+    eval $programmino;
+
+La routine indicata da C<$SIG{__DIE__}> E<egrave> chiamata quando
+si sta per lanciare un'eccezione fatale. Il messaggio di errore
+viene passato come primo parametro. Quando si esce da una
+routine "agganciata" C<__DIE__>, il processamento dell'eccezione
+prosegue come se l'"aggancio" non ci fosse stato, a meno che
+la routine stessa non esca con un C<goto>, un'uscita da ciclo
+o un C<die()>. L'I<handler> C<__DIE__> E<egrave> esplicitamente
+disabilitato durante la chiamata, in modo che possiate chiamare
+C<die()> all'interno dell'I<handler>. Le cose procedono
+in maniera simile per C<__WARN__>.
+
+A causa di una stortura di implementazione, l'"aggancio"
+C<$SIG{__DIE__}> viene chiamato anche quando ci si trova
+in una C<eval()>. Non vi basate su questo fatto per riscrivere
+un'eccezione pendente in C<$@>, o come bizzarro sostituto
+per scavalcare C<CORE::GLOBAL::die()>. Questa strana
+azione a distanza potrebbe essere sanata in una versione
+futura, di modo che C<$SIG{__DIE__}> venga chiamata solamente
+quando il programma sta per uscire, com'era nelle intenzioni
+originali. Qualsiasi altro utilizzo E<egrave> deprecato.
+
+Gli I<handler> C<__DIE__>/C<__WARN__> sono particolarmente
+speciali in un determinato senso: essi possono essere chiamati
+per riportare (probabili) errori trovati dal I<parser> [la parte
+dell'interprete che si occupa di effettuare l'analisi del
+codice, N.d.T.]. In tal caso il I<parser> potrebbe trovarsi
+in uno stato inconsistente, per cui qualsiasi tentativo di
+valutare codice Perl da un I<handler> del genere risulterebbe
+probabilmente in un errore di segmentazione. CiE<ograve> significa che
+gli avvertimenti o gli errori che risultano dal I<parsing>
+devono essere utilizzati con estrema cautela, come questo:
+
+    require Carp if defined $^S;
+    Carp::confess("Qualcosa di sbagliato") if defined &Carp::confess;
+    die "Qualcosa di sbagliato, ma non ho potuto caricare Carp
+         per avere un backtrace... Per vederlo, provate a far
+         partire Perl con -MCarp";
+
+Qui la prima riga carica C<Carp> I<a meno che> non sia il I<parser>
+a chiamare l'I<handler>. La seconda riga stamperE<agrave> il I<backtrace>
+[la lista delle funzioni chiamate fino a questo punto, N.d.T.]
+e morirE<agrave> se C<Carp> E<egrave> disponibile. La terza riga sarE<agrave> eseguita
+solamente se C<Carp> non E<egrave> disponibile.
+
+Consultate L<perlfunc/die>, L<perlfunc/warn>, L<perlfunc/eval> e
+L<warnings> per ulteriori informazioni.
+
+=back
+
+=head2 Indicatori di Errore
+
+Le variabili C<$@>, C<$!>, C<$^E> e C<$?> contengono informazioni
+sui differenti tipi di condizioni di errore che possono avvenire
+durante l'esecuzione di un programma Perl. Le variabili sono
+mostrate in ordine di "distanza" fra il sottosistema che ha
+generato l'errore ed il processo Perl. Corrispondono 
+rispettivamente ad errori
+individuati dall'interprete Perl, dalla libreria C, dal sistema
+operativo o da un programma esterno.
+
+Per illustrare la differenza fra queste variabili, considerate la
+seguente espressione in Perl, che utilizza stringhe con
+virgolette semplici:
+
+    eval q{
+        open my $pipe, "/cdrom/install |" or die $!;
+        my @ris = <$pipe>;
+        close $pipe or die "pipe guasta: $?, $!";
+    };
+
+Dopo l'esecuzione di questa istruzione tutte e 4 le variabili
+potrebbero essere state impostate.
+
+C<$@> E<egrave> impostata se la stringa passata ad C<eval()> non E<egrave>
+stata compilata correttamente (come accadrebbe ad esempio se C<open>
+o C<close> fossero importati con prototipi errati), o se il codice
+Perl eseguito durante la C<eval()> avesse generato un C<die()>. In
+questi casi il valore di C<$@> E<egrave> l'errore di compilazione, o
+l'argomento fornito a C<die()> (che interpolerE<agrave> C<$!> e C<$?>).
+(Consultate perE<ograve> anche L<Fatal>).
+
+Quando l'espressione C<eval()> viene eseguita, C<open()>,
+C<< <PIPE> >> e C<close()> sono tradotte in chiamate alla
+libreria di I<run-time> [fase di esecuzione, N.d.T.] e da
+qui in chiamate al kernel del sistema operativo. C<$!> viene
+impostata con il valore della variabile C<errno> della libreria
+C se una di queste chiamate fallisce.
+
+Sotto alcuni sistemi operativi, C<$^E> potrebbe contenere una
+descrizione dell'errore un po' piE<ugrave> estesa, come ad esempio
+(in questo caso) "Il cassetto del CDROM non E<egrave> chiuso".
+I sistemi che non supportano messaggi di errore estesi lasciano
+C<$^E> uguale a C<$!>.
+
+Infine, C<$?> potrebbe essere impostata ad un valore diverso da 0
+se il programma esterno F</cdrom/install> fallisce. Gli otto bit
+superiori riflettono le condizioni di errore specifiche incontrate
+dal programma (ossia, il valore della C<exit()> del programma stesso).
+Gli otto bit inferiori riflettono la modalitE<agrave> di fallimento,
+come una morte a seguito di un segnale e la presenza di informazioni
+di I<core dump>. Consultate L<wait(2)> per i dettagli. Diversamente
+da C<$!> e C<$^E>, che sono impostate solo se la condizione di
+errore E<egrave> individuata, la variabile C<$?> E<egrave> impostata per qualunque
+chiamata a C<wait()> o C<close()> su pipe, sovrascrivendo il vecchio
+valore. In questo senso E<egrave> piE<ugrave> simile a C<$@>, che per ciascuna
+C<eval()> viene sempre impostata in caso di fallimento e
+ripulita in caso di successo.
+
+Per maggiori dettagli, consultate le descrizioni individuali date
+sopra per C<$@>, C<$!>, C<$^E> e C<$?>.
+
+=head2 Nota Tecnica sulla Sintassi dei Nomi di Variabile
+
+I nomi di variabile in Perl possono avere numerosi formati.
+Di solito, devono iniziare con una lettera o con un I<underscore>
+[il carattere "_", N.d.T.] nel qual caso possono essere arbitrariamente
+lunghe (fino ad un limite interno di 251 caratteri) e possono
+contenere lettere, cifre numeriche, I<underscore>, la
+sequenza speciale C<::> o C<'>. In questo caso, la parte prima
+dell'ultimo C<::> o C<'> E<egrave> considerata essere un 
+I<qualificatore di pacchetto>; consultate L<perlmod>.
+
+I nomi delle variabili Perl possono anche essere una sequenza
+di cifre numeriche o un singolo carattere di punteggiatura o di
+controllo. Questi nomi sono riservati per usi speciali da parte
+di Perl; ad esempio, i nomi costituiti da sole cifre numeriche
+sono utilizzati per contenere i dati catturati dopo l'applicazione
+di un'espressione regolare. Perl supporta una sintassi speciale
+per i nomi costituiti da un singolo carattere di controllo:
+capisce C<^X> (il carattere "^" seguito dalla lettera C<X>)
+per intendere il carattere control-C<X>. Ad esempio, la notazione
+C<$^W> (segno di dollaro, seguito da "^", seguito da C<W>)
+E<egrave> la variabile scalare il cui nome E<egrave> costituito dal singolo
+carattere control-C<W>. Capite bene che E<egrave> meglio che dover
+digitare un control-C<W> letterale nel vostro programma.
+
+Infine, come novitE<agrave> in Perl 5.6, i nomi delle variabili Perl
+possono essere stringhe alfanumeriche che iniziano con caratteri
+di controllo (o ancora meglio con un carattere "^"). Queste
+variabili devono essere scritte nella forma C<${^Pippo}>; le
+graffe non sono opzionali. C<${^Pippo}> rappresenta la variabile
+scalare il cui nome E<egrave> un control-C<P> seguito dalla stringa "ippo".
+Queste variabili sono riservate per uso speciale futuro da Perl,
+eccetto quelle che iniziano con C<^_> (control-underscore o
+"^" seguito da underscore). Nessun nome di variabile con carattere
+di controllo che inizi con un underscore avrE<agrave> mai un significato
+speciale in qualsivoglia futura versione di Perl; tali nomi
+possono pertanto essere utilizzati senza problemi nei programmi.
+C<$^_> stessa, comunque, E<egrave> riservata.
+
+Gli identificatori Perl che iniziano con cifre numeriche, caratteri
+di controllo o caratteri di interpunzione sono esenti dagli effetti
+della dichiarazione C<package> e sono sempre forzati ad esistere
+nel pacchetto C<main>; sono anche esenti da errori associati all'uso
+della direttiva C<strict 'vars'>. Alcuni altri nomi sono esenti
+in maniera analoga:
+
+	ENV		STDIN
+	INC		STDOUT
+	ARGV		STDERR
+	ARGVOUT		_
+	SIG
+
+In particolare, le nuove variabili speciali del tipo C<${^_XYZ}>
+sono sempre considerate come appartenenti al pacchetto C<main>,
+indipendentemente da qualsiasi dichiarazione C<package> si possa
+trovare nello scope corrente.
+
+=head1 BUG
+
+Causa uno sfortunato accidente dell'implementazione di Perl,
+C<use English> impone una penalitE<agrave> considerevole su tutte le espressioni
+regolari in un programma, senza riguardo al fatto che esse occorrano
+o meno nello scope di C<use English>. Per questa ragione, utilizzare
+C<use English> nelle librerie E<egrave> fortemente scoraggiato. Consultate
+la documentazione del modulo C<Devel::SawAmpersand> su CPAN
+( http://www.cpan.org/modules/by-module/Devel/ ) per maggiori
+informazioni.
+
+Il fatto che anche solo pensiate alla variabile C<$^S> nei
+vostri I<handler> di eccezione E<egrave> semplicemente sbagliato.
+C<$SIG{__DIE__}>, come implementato al momento, attira errori
+dolorosi e difficili da scovare. Evitatelo ed utilizzate
+un blocco C<END{}> o piuttosto ridefinite C<CORE::GLOBAL::die>.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlvar
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Flavio Poletti (re-iniziata da capo dopo una
+prima versione parziale a cura di Alberto Re).
+
+=head2 Revisore
+
+Revisione a cura di shishii (Marco Allegretti).
+
+=cut

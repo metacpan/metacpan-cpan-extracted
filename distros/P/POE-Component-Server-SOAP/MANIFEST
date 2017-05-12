@@ -1,0 +1,16 @@
+MANIFEST
+MANIFEST.SKIP
+Build.PL
+Makefile.PL
+README
+lib/POE/Component/Server/SOAP.pm
+lib/POE/Component/Server/SOAP/Response.pm
+META.yml
+Changes
+LICENSE
+
+examples/test-client.perl
+examples/test-server.perl
+
+t/1_load.t
+t/apocalypse.t

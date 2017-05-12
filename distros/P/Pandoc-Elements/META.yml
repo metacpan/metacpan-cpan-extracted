@@ -1,0 +1,43 @@
+---
+abstract: 'create and process Pandoc documents'
+author:
+  - 'Jakob Voß'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.96'
+  Test::Output: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pandoc-Elements
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Hash::MultiValue: '0.06'
+  IPC::Run3: '0'
+  JSON: '0'
+  List::Util: '0'
+  Pandoc: v0.6.0
+  Pod::Simple: '3.08'
+  Pod::Usage: '0'
+  Scalar::Util: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/nichtich/Pandoc-Elements/issues
+  homepage: https://github.com/nichtich/Pandoc-Elements
+  repository: https://github.com/nichtich/Pandoc-Elements.git
+version: '0.33'
+x_contributors:
+  - 'Benct Philip Jonsson <bpjonsson@gmail.com>'
+  - 'Jakob Voß <jakob.voss@gbv.de>'

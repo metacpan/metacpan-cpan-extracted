@@ -1,0 +1,13 @@
+---
+comment: |
+
+  Ace needs a patch to change its defaults.
+
+match:
+  distribution: |
+    ^(?x:
+    .^   # never matches, only purpose is to let things align nicely
+    |LDS/AcePerl-1.92.tar.gz          # Needs a patch for best optimization.
+    )|
+patches:
+    - "AcePerl-1.92.patch"

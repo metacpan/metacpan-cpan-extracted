@@ -1,0 +1,1114 @@
+##-*- Mode: CPerl -*-
+
+##======================================================================
+## Header Administrivia
+##======================================================================
+
+our $VERSION = '0.08';
+pp_setversion($VERSION);
+
+##------------------------------------------------------
+## pm additions
+pp_addpm({At=>'Top'},<<'EOPM');
+use strict;
+use version;
+
+## $PDL_ATLEAST_2_014 : avoid in-place reshape() in _edit_pdl() for PDL >= 2.014
+##  + prior to PDL-2.014, PDL::reshape() returned a new PDL, but modifies 
+##    the calling object in-place for v2.014
+our $PDL_ATLEAST_2_014 = version->parse($PDL::VERSION) >= version->parse("2.014");
+
+=pod
+
+=head1 NAME
+
+PDL::EditDistance - Wagner-Fischer edit distance and alignment for PDLs.
+
+=head1 SYNOPSIS
+
+ use PDL;
+ use PDL::EditDistance;
+
+ ##-- input PDLs
+ $a = pdl([map { ord($_) } qw(G U M B O)]);
+ $b = pdl([map { ord($_) } qw(G A M B O L)]);
+
+ $a1 = pdl([0, map { ord($_) } qw(G U M B O)]);
+ $b1 = pdl([0, map { ord($_) } qw(G A M B O L)]);
+
+ ##-------------------------------------------------------------
+ ## Levenshtein distance
+ $dist          = edit_distance_static($a,$b, 0,1,1,1);
+ ($dist,$align) = edit_align_static($a,$b, 0,1,1,1);
+
+ ##-------------------------------------------------------------
+ ## Wagner-Fischer distance
+ @costs         = ($costMatch=0,$costInsert=1,$costDelete=1,$costSubstitute=2);
+ $dist          = edit_distance_static($a,$b, @costs);
+ ($dist,$align) = edit_align_static($a,$b, @costs);
+
+ ##-------------------------------------------------------------
+ ## General edit distance
+ $costsMatch = random($a->nelem+1, $b->nelem+1);
+ $costsIns   = random($a->nelem+1, $b->nelem+1);
+ $costsDel   = random($a->nelem+1, $b->nelem+1);
+ $costsSubst = random($a->nelem+1, $b->nelem+1);
+ @costs         = ($costsMatch,$costsIns,$costDel,$costsSubst);
+ $dist          = edit_distance_full($a,$b,@costs);
+ ($dist,$align) = edit_align_full($a,$b,@costs);
+
+ ##-------------------------------------------------------------
+ ## Alignment
+ $op_match = align_op_match();      ##-- constant
+ $op_del   = align_op_insert1();    ##-- constant
+ $op_ins   = align_op_insert2();    ##-- constant
+ $op_subst = align_op_substitute(); ##-- constant
+
+ ($apath,$bpath,$pathlen) = edit_bestpath($align);
+ ($ai,$bi,$ops,$pathlen)  = edit_pathtrace($align);
+
+ ##-------------------------------------------------------------
+ ## Longest Common Subsequence
+ $lcs = edit_lcs($a,$b);
+ ($ai,$bi,$lcslen) = lcs_backtrace($a,$b,$lcs);
+
+=cut
+
+EOPM
+## /pm additions
+##------------------------------------------------------
+
+##------------------------------------------------------
+## Exports: None
+pp_export_nothing();
+
+##------------------------------------------------------
+## Includes / defines
+#pp_addhdr(<<'EOH');
+#EOH
+
+
+##======================================================================
+## C Utilities
+##======================================================================
+pp_addhdr(<<'EOH');
+
+#define ALIGN_OP_MATCH       0
+#define ALIGN_OP_INSERT1     1
+#define ALIGN_OP_INSERT2     2
+#define ALIGN_OP_SUBSTITUTE  3
+
+EOH
+
+
+##======================================================================
+## PDL::PP Wrappers
+##======================================================================
+
+##======================================================================
+## Basic Utilities
+#pp_addpm(<<'EOPM');
+#=pod
+#
+#=head1 Basic Utilities
+#
+#=cut
+#EOPM
+
+##======================================================================
+## Convenience Methods
+
+##------------------------------------------------------
+## _edit_pdl($a()) : ensures pdl-ness
+#pp_add_exported('','_edit_pdl');
+pp_addpm(<<'EOPM');
+
+
+=pod
+
+=head2 _edit_pdl
+
+=for sig
+
+  Signature: (a(N); [o]apdl(N+1))
+
+Convenience method.
+Returns a pdl $apdl() suitable for representing $a(),
+which can be specified as a UTF-8 or byte-string, as an arrays of numbers, or as a PDL.
+$apdl(0) is always set to zero.
+
+=cut
+
+sub _edit_pdl {
+  if (UNIVERSAL::isa($_[0],'PDL')) {
+    return ($PDL_ATLEAST_2_014 ? $_[0]->pdl : $_[0])->flat->reshape($_[0]->nelem+1)->rotate(1);
+  }
+  #return pdl(byte,[0, map { ord($_) } split(//,$_[0])]) if (!ref($_[0]) && !utf8::is_utf8($_[0])); ##-- byte-string (old)
+  elsif (!ref($_[0])) {
+    return pdl(long,[0, unpack('C0C*',$_[0])]) if (utf8::is_utf8($_[0])); ##-- utf8-string
+    return pdl(byte,[0, unpack('U0C*',$_[0])]);                           ##-- byte-string
+  }
+  return pdl([0,@{$_[0]}]);
+}
+
+EOPM
+
+##------------------------------------------------------
+## edit_cost_matrices() : generate cost-matrices (convenience)
+pp_add_exported('','edit_costs');
+pp_addpm(<<'EOPM');
+
+
+=pod
+
+=head2 edit_costs
+
+=for sig
+
+  Signature: (PDL::Type type; int N; int M;
+              [o]costsMatch(N+1,M+1); [o]costsIns(N+1,M+1); [o]costsDel(N+1,M+1); [o]costsSubst(N+1,M+1))
+
+Convenience method.
+Ensures existence and proper dimensionality of cost matrices for inputs
+of length N and M.
+
+=cut
+
+sub edit_costs {
+  return _edit_costs($_[0],$_[1]+1,$_[2]+1,@_[3..$#_]);
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## _edit_costs() : generate cost-matrices (low-level, convenience)
+pp_add_exported('','_edit_costs');
+pp_addpm(<<'EOPM');
+
+
+=pod
+
+=head2 _edit_costs
+
+=for sig
+
+  Signature: (PDL::Type type; int N1; int M1;
+              [o]costsMatch(N1,M1); [o]costsIns(N1,M1); [o]costsDel(N1,M1); [o]costsSubst(N1,M1))
+
+Low-level method.
+Ensures existence and proper dimensionality of cost matrices for inputs
+of length N1-1 and M1-1.
+
+=cut
+
+sub _edit_costs {
+  #my ($type,$n1,$m1,$costsMatch,$costsIns,$costsDel,$costsSubst) = @_;
+  return (_edit_matrix(@_[0..2],$_[3]),
+          _edit_matrix(@_[0..2],$_[4]),
+          _edit_matrix(@_[0..2],$_[5]),
+          _edit_matrix(@_[0..2],$_[6]));
+}
+
+##-- $matrix = _edit_matrix($type,$dim0,$dim1,$mat)
+sub _edit_matrix {
+  return zeroes(@_[0..2]) if (!defined($_[3]));
+  $_[3]->reshape(@_[1,2]) if ($_[3]->ndims != 2 || $_[3]->dim(0) != $_[1] || $_[3]->dim(1) != $_[2]);
+  return $_[3]->type == $_[0] ? $_[3] : $_[3]->convert($_[0]);
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## edit_cost_static() : generate static cost-matrices (convenience)
+pp_add_exported('','edit_costs_static');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 edit_costs_static
+
+=for sig
+
+  Signature: (PDL::Type type; int N; int M;
+              staticCostMatch(); staticCostIns(); staticCostSubst();
+              [o]costsMatch(N+1,M+1); [o]costsIns(N+1,M+1); [o]costsDel(N+1,M+1); [o]costsSubst(N+1,M+1))
+
+Convenience method.
+
+=cut
+
+sub edit_costs_static {
+  #my ($type,$n,$m, $cMatch,$cIns,$cDel,$cSubst, $costsMatch,$costsIns,$costsDel,$costsSubst) = @_;
+  my @costs = edit_costs(@_[0..2],@_[7..$#_]);
+  $costs[$_] .= $_[$_+3] foreach (0..3);
+  return @costs;
+}
+
+EOPM
+
+##======================================================================
+## Distance: Full
+
+##------------------------------------------------------
+## edit_distance_matrix_full() : full distance matrix
+pp_add_exported('','edit_distance_full');
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 edit_distance_full
+
+=for sig
+
+  Signature: (a(N); b(M);
+              costsMatch(N+1,M+1); costsIns(N+1,M+1); costsDel(N+1,M+1); costsSubst(N+1,M+1);
+              [o]dist(N+1,M+1); [o]align(N+1,M+1))
+
+Convenience method.
+Compute the edit distance matrix for inputs $a() and $b(), and
+cost matrices $costsMatch(), $costsIns(), $costsDel(), and $costsSubst().
+$a() and $b() may be specified as PDLs, arrays of numbers, or as strings.
+
+=cut
+
+sub edit_distance_full {
+  return _edit_distance_full(_edit_pdl($_[0]), _edit_pdl($_[1]), @_[2..$#_]);
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## _edit_distance_full : get distance matrix from full cost matrices
+pp_add_exported('','_edit_distance_full');
+pp_def('_edit_distance_full',
+       Pars => ('a1(N1); b1(M1);'
+                .' costsMatch(N1,M1); costsIns(N1,M1); costsDel(N1,M1); costsSubst(N1,M1);'
+		.' [o]dist(N1,M1);'),
+       Code =>
+('
+  int i,j;
+  //
+  //-- initialize distance matrix: insertion costs
+  $dist (N1=>0,M1=>0) = $costsMatch(N1=>0,M1=>0);  //-- BOS always matches
+  for (i=1; i < $SIZE(N1); i++) {
+    $dist(N1=>i,M1=>0) = $dist(N1=>i-1,M1=>0) + $costsDel(N1=>i,M1=>0);  //-- delete (insert1)
+  }
+  for (j=1; j < $SIZE(M1); j++) {
+    $dist(N1=>0,M1=>j) = $dist(N1=>0,M1=>j-1) + $costsIns(N1=>0,M1=>j);  //-- insert (insert2)
+  }
+  //
+  //-- compute distance
+  for (i=1; i < $SIZE(N1); i++) {
+    for (j=1; j < $SIZE(M1); j++) {
+      $GENERIC(dist) cost_insert_1 = $dist(N1=>i-1,M1=>j  ) + $costsDel(N1=>i,M1=>j);
+      $GENERIC(dist) cost_insert_2 = $dist(N1=>i,  M1=>j-1) + $costsIns(N1=>i,M1=>j);
+      $GENERIC(dist) cost_subst = $dist(N1=>i-1,M1=>j-1);
+      if ($a1(N1=>i)==$b1(M1=>j)) {
+        cost_subst += $costsMatch(N1=>i,M1=>j);
+      } else {
+        cost_subst += $costsSubst(N1=>i,M1=>j);
+      }
+      //
+      if (cost_insert_1 < cost_insert_2) {
+        if (cost_insert_1 < cost_subst) {
+          $dist( N1=>i,M1=>j) = cost_insert_1;
+        } else {
+          $dist(N1=>i,M1=>j) = cost_subst;
+        }
+      } else if (cost_insert_2 < cost_subst) {
+         $dist( N1=>i,M1=>j) = cost_insert_2;
+      } else {
+         $dist( N1=>i,M1=>j) = cost_subst;
+      }
+    }
+  }
+'),
+       Doc =>
+q(
+Low-level method.
+Compute the edit distance matrix for input PDLs $a1() and $b1() and
+cost matrices $costsMatch(), $costsIns(), $costsDel(), and $costsSubst().
+
+The first elements of $a1() and $b1() are ignored.
+),
+
+);
+
+
+##======================================================================
+## Distance + Alignment: Full
+
+##------------------------------------------------------
+## edit_align_full() : full distance & alignment matrix
+pp_add_exported('','edit_align_full');
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 edit_align_full
+
+=for sig
+
+  Signature: (a(N); b(M);
+              costsMatch(N+1,M+1); costsIns(N+1,M+1); costsDel(N+1,N+1); costsSubst(N+1,M+1);
+              [o]dist(N+1,M+1); [o]align(N+1,M+1))
+
+Convenience method.
+Compute the edit distance and alignment matrices for inputs $a() and $b(), and
+cost matrices $costsMatch(), $costsIns(), $costsDel(), and $costsSubst().
+$a() and $b() may be specified as PDLs, arrays of numbers, or as strings.
+
+=cut
+
+sub edit_align_full {
+  return _edit_align_full(_edit_pdl($_[0]), _edit_pdl($_[1]), @_[2..$#_]);
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## _edit_align_full : get distance & alignment matrices given full cost matrices
+pp_add_exported('','_edit_align_full');
+pp_def('_edit_align_full',
+       Pars => ('a1(N1); b1(M1);'
+                .' costsMatch(N1,M1); costsIns(N1,M1); costsDel(N1,M1); costsSubst(N1,M1);'
+		.' [o]dist(N1,M1); byte [o]align(N1,M1);'),
+      Code =>
+('
+  int i,j;
+  //
+  //-- initialize distance matrix: insertion costs
+  $dist (N1=>0,M1=>0) = $costsMatch(N1=>0,M1=>0);  //-- BOS always matches
+  $align(N1=>0,M1=>0) = ALIGN_OP_MATCH;            //-- ... marked as "substitute"
+  for (i=1; i < $SIZE(N1); i++) {
+    $dist (N1=>i,M1=>0) = $dist(N1=>i-1,M1=>0) + $costsDel(N1=>i,M1=>0);
+    $align(N1=>i,M1=>0) = ALIGN_OP_INSERT1;
+  }
+  for (j=1; j < $SIZE(M1); j++) {
+    $dist (N1=>0,M1=>j) = $dist(N1=>0,M1=>j-1) + $costsIns(N1=>0,M1=>j);
+    $align(N1=>0,M1=>j) = ALIGN_OP_INSERT2;
+  }
+  //
+  //-- compute distance
+  for (i=1; i < $SIZE(N1); i++) {
+    for (j=1; j < $SIZE(M1); j++) {
+      $GENERIC(dist) cost_insert_1 = $dist(N1=>i-1,M1=>j  ) + $costsDel(N1=>i,M1=>j);
+      $GENERIC(dist) cost_insert_2 = $dist(N1=>i,  M1=>j-1) + $costsIns(N1=>i,M1=>j);
+      $GENERIC(dist) cost_subst    = $dist(N1=>i-1,M1=>j-1);
+      char subst_op;
+      //
+      if ($a1(N1=>i)==$b1(M1=>j)) {
+        cost_subst += $costsMatch(N1=>i,M1=>j);
+        subst_op = ALIGN_OP_MATCH;
+      } else {
+        cost_subst += $costsSubst(N1=>i,M1=>j);
+        subst_op = ALIGN_OP_SUBSTITUTE;
+      }
+      //
+      if (cost_insert_1 < cost_insert_2) {
+        if (cost_insert_1 < cost_subst) {
+          $dist( N1=>i,M1=>j) = cost_insert_1;
+          $align(N1=>i,M1=>j) = ALIGN_OP_INSERT1;
+        } else {
+          $dist(N1=>i,M1=>j) = cost_subst;
+          $align(N1=>i,M1=>j) = subst_op;
+        }
+      } else if (cost_insert_2 < cost_subst) {
+         $dist( N1=>i,M1=>j) = cost_insert_2;
+         $align(N1=>i,M1=>j) = ALIGN_OP_INSERT2;
+      } else {
+         $dist( N1=>i,M1=>j) = cost_subst;
+         $align(N1=>i,M1=>j) = subst_op;
+      }
+    }
+  }
+'),
+       Doc =>
+q(
+Low-level method.
+Compute the edit distance and alignment matrix for input PDLs $a1() and $b1() and
+cost matrices $costsMatch(), $costsIns(), $costsDel(), and $costsSubst().
+
+The first elements of $a1() and $b1() are ignored.
+),
+
+);
+
+
+##======================================================================
+## Distance: Static
+
+##------------------------------------------------------
+## edit_distance_static() : distance matrix using static cost schema
+pp_add_exported('','edit_distance_static');
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 edit_distance_static
+
+=for sig
+
+  Signature: (a(N); b(M);
+              staticCostMatch(); staticCostIns(); staticCostDel(); staticCostSubst();
+              [o]dist(N+1,M+1))
+
+Convenience method.
+Compute the edit distance matrix for inputs $a() and $b() given
+a static cost schema @costs = ($staticCostMatch(), $staticCostIns(), $staticCostDel(), and $staticCostSubst()).
+$a() and $b() may be specified as PDLs, arrays of numbers, or as strings.
+Functionally equivalent to edit_distance_full($matches,@costs,$dist),
+but slightly faster.
+
+=cut
+
+sub edit_distance_static {
+  return _edit_distance_static(_edit_pdl($_[0]), _edit_pdl($_[1]), @_[2..$#_]);
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## _edit_distance_static : get distance matrix from static cost schema
+pp_add_exported('','_edit_distance_static');
+pp_def('_edit_distance_static',
+       Pars => ('a1(N1); b1(M1); costMatch(); costIns(); costDel(); costSubst();'
+		.' [o]dist(N1,M1);'),
+       Code =>
+('
+  int i,j;
+  //
+  //-- initialize distance matrix: insertion costs
+  $dist(N1=>0,M1=>0) = $costMatch();  //-- BOS always matches
+  for (i=1; i < $SIZE(N1); i++) {
+    $dist(N1=>i,M1=>0) = $dist(N1=>i-1,M1=>0) + $costDel(); //-- delete (insert1)
+  }
+  for (j=1; j < $SIZE(M1); j++) {
+    $dist(N1=>0,M1=>j) = $dist(N1=>0,M1=>j-1) + $costIns(); //-- insert (insert2)
+  }
+  //
+  //-- compute distance
+  for (i=1; i < $SIZE(N1); i++) {
+    for (j=1; j < $SIZE(M1); j++) {
+      $GENERIC(dist) cost_insert_1 = $dist(N1=>i-1,M1=>j  ) + $costDel();
+      $GENERIC(dist) cost_insert_2 = $dist(N1=>i,  M1=>j-1) + $costIns();
+      $GENERIC(dist) cost_subst    = $dist(N1=>i-1,M1=>j-1) + ($a1(N1=>i)==$b1(M1=>j)
+						       ? $costMatch()
+						       : $costSubst());
+      if (cost_insert_1 < cost_insert_2) {
+        if (cost_insert_1 < cost_subst) {
+          $dist(N1=>i,M1=>j) = cost_insert_1;
+        } else {
+          $dist(N1=>i,M1=>j) = cost_subst;
+        }
+      } else if (cost_insert_2 < cost_subst) {
+         $dist(N1=>i,M1=>j) = cost_insert_2;
+      } else {
+         $dist(N1=>i,M1=>j) = cost_subst;
+      }
+    }
+  }
+'),
+       Doc =>
+q(
+Low-level method.
+Compute the edit distance matrix for input PDLs $a1() and $b1() given a
+static cost schema @costs = ($costMatch(), $costIns(), $costDel(), $costSubst()).
+Functionally identitical to _edit_distance_matrix_full($matches,@costs,$dist),
+but slightly faster.
+
+The first elements of $a1() and $b1() are ignored.
+),
+);
+
+
+##======================================================================
+## Distance + Alignment: Static
+
+##------------------------------------------------------
+## edit_align_static() : distance + alignment matrices using static cost schema
+pp_add_exported('','edit_align_static');
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 edit_align_static
+
+=for sig
+
+  Signature: (a(N); b(M);
+              staticCostMatch(); staticCostIns(); staticCostDel(); staticCostSubst();
+              [o]dist(N+1,M+1); [o]align(N+1,M+1))
+
+Convenience method.
+Compute the edit distance and alignment matrices for inputs $a() and $b() given
+a static cost schema @costs = ($staticCostMatch(), $staticCostIns(), $staticCostDel(), and $staticCostSubst()).
+$a() and $b() may be specified as PDLs, arrays of numbers, or as strings.
+Functionally equivalent to edit_align_full($matches,@costs,$dist),
+but slightly faster.
+
+=cut
+
+sub edit_align_static {
+  return _edit_align_static(_edit_pdl($_[0]), _edit_pdl($_[1]), @_[2..$#_]);
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## _edit_align_static : get distance & alignment matrices from static cost schema
+pp_add_exported('','_edit_align_static');
+pp_def('_edit_align_static',
+       Pars => ('a1(N1); b1(M1); costMatch(); costIns(); costDel(); costSubst();'
+		.' [o]dist(N1,M1); byte [o]align(N1,M1)'),
+       Code =>
+('
+  int i,j;
+  //
+  //-- initialize distance matrix: insertion costs
+  $dist( N1=>0,M1=>0) = $costMatch();               //-- BOS always matches
+  $align(N1=>0,M1=>0) = ALIGN_OP_MATCH;             //-- ... and is marked as "match"
+  for (i=1; i < $SIZE(N1); i++) {
+    $dist (N1=>i,M1=>0) = $dist(N1=>i-1,M1=>0) + $costDel(); //-- delete (insert1)
+    $align(N1=>i,M1=>0) = ALIGN_OP_INSERT1;
+  }
+  for (j=1; j < $SIZE(M1); j++) {
+    $dist (N1=>0,M1=>j) = $dist(N1=>0,M1=>j-1) + $costIns(); //-- insert (insert2)
+    $align(N1=>0,M1=>j) = ALIGN_OP_INSERT2;
+  }
+  //
+  //-- compute distance
+  for (i=1; i < $SIZE(N1); i++) {
+    for (j=1; j < $SIZE(M1); j++) {
+      $GENERIC(dist) cost_insert_1 = $dist(N1=>i-1,M1=>j  ) + $costDel();
+      $GENERIC(dist) cost_insert_2 = $dist(N1=>i,  M1=>j-1) + $costIns();
+      $GENERIC(dist) cost_subst    = $dist(N1=>i-1,M1=>j-1);
+      char subst_op;
+      //
+      if ($a1(N1=>i)==$b1(M1=>j)) {
+        cost_subst += $costMatch();
+        subst_op = ALIGN_OP_MATCH;
+      } else {
+        cost_subst += $costSubst();
+        subst_op = ALIGN_OP_SUBSTITUTE;
+      }
+      //
+      if (cost_insert_1 < cost_insert_2) {
+        if (cost_insert_1 < cost_subst) {
+          $dist(N1=>i,M1=>j) = cost_insert_1;
+          $align(N1=>i,M1=>j) = ALIGN_OP_INSERT1;
+        } else {
+          $dist(N1=>i,M1=>j) = cost_subst;
+          $align(N1=>i,M1=>j) = subst_op;
+        }
+      } else if (cost_insert_2 < cost_subst) {
+         $dist(N1=>i,M1=>j) = cost_insert_2;
+         $align(N1=>i,M1=>j) = ALIGN_OP_INSERT2;
+      } else {
+         $dist(N1=>i,M1=>j) = cost_subst;
+         $align(N1=>i,M1=>j) = subst_op;
+      }
+    }
+  }
+'),
+       Doc =>
+q(
+Low-level method.
+Compute the edit distance and alignment matrices for input PDLs $a1() and $b1() given a
+static cost schema @costs = ($costMatch(), $costIns(), $costDel(), $costSubst()).
+Functionally identitical to _edit_distance_matrix_full($matches,@costs,$dist),
+but slightly faster.
+
+The first elements of $a1() and $b1() are ignored.
+),
+);
+
+##==============================================================
+## Alignment
+
+##------------------------------------------------------
+## Alignment: Constants
+pp_add_exported('','align_op_insert1');
+pp_def('align_op_insert1',
+       Pars=>'[o]a()',
+       Code=>'$a() = ALIGN_OP_INSERT1;',
+       Doc => 'Alignment matrix value constant for insertion operations on $a() string.',
+      );
+
+pp_add_exported('','align_op_insert2');
+pp_def('align_op_insert2',
+       Pars=>'[o]a()',
+       Code=>'$a() = ALIGN_OP_INSERT2;',
+       Doc => 'Alignment matrix value constant for insertion operations on $a() string.',
+      );
+
+pp_add_exported('','align_op_match');
+pp_def('align_op_match',
+       Pars=>'[o]a()',
+       Code=>'$a() = ALIGN_OP_MATCH;',
+       Doc => 'Alignment matrix value constant for matches.',
+      );
+
+pp_add_exported('','align_op_substitute');
+pp_def('align_op_substitute',
+       Pars=>'[o]a()',
+       Code=>'$a() = ALIGN_OP_SUBSTITUTE;',
+       Doc => 'Alignment matrix value constant for substitution operations.',
+      );
+
+
+pp_add_exported('','align_op_insert');
+pp_add_exported('','align_op_delete');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 align_op_delete
+
+Alias for align_op_insert1()
+
+=head2 align_op_insert
+
+Alias for align_op_insert2()
+
+=cut
+
+*align_op_delete = \&align_op_insert1;
+*align_op_insert = \&align_op_insert2;
+
+EOPM
+
+
+pp_add_exported('','align_ops');
+pp_addpm(<<'EOPM');
+=pod
+
+=head2 align_ops
+
+=for sig
+
+  Signature: ([o]ops(4))
+
+Alignment matrix value constants 4-element pdl (match,insert1,insert2,substitute).a
+
+=cut
+
+sub align_ops { return PDL->sequence(PDL::byte(),4); }
+
+EOPM
+
+##------------------------------------------------------
+## Alignment: best path
+##------------------------------------------------------
+## edit_bestpath() : distance + alignment matrices using static cost schema
+pp_add_exported('','edit_bestpath');
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 edit_bestpath
+
+=for sig
+
+  Signature: (align(N+1,M+1); [o]apath(N+M+2); [o]bpath(N+M+2); [o]pathlen())
+
+Convenience method.
+Compute best path through alignment matrix $align().
+Stores paths for original input strings $a() and $b() in $apath() and $bpath()
+respectively.
+Negative values in $apath() and $bpath() indicate insertion/deletion operations.
+On completion, $pathlen() holds the actual length of the paths.
+
+=cut
+
+sub edit_bestpath {
+  my ($align,$apath,$bpath,$len) = @_;
+  $len=pdl(long,$align->dim(0)+$align->dim(1)) if (!defined($len));
+  if (!defined($apath)) { $apath=zeroes(long,$len); }
+  else { $apath->reshape($len) if ($apath->nelem < $len); }
+  if (!defined($bpath)) { $bpath = zeroes(long,$len); }
+  else { $bpath->reshape($len) if ($bpath->nelem < $len); }
+  _edit_bestpath($align, $apath, $bpath, $len, $align->dim(0)-1, $align->dim(1)-1);
+  return ($apath,$bpath,$len);
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## _edit_bestpath : get best path
+pp_add_exported('','_edit_bestpath');
+pp_def('_edit_bestpath',
+       Pars => ('align(N1,M1); int [o]apath(L); int [o]bpath(L); int [o]len();'),
+       OtherPars => ('int ifinal; int jfinal'),
+       Code =>
+('
+   int i,j,p,endp,tmp;
+   char op;
+   //-- get reversed path & real path length
+   $len()=0;
+   for (p=0,i=$COMP(ifinal),j=$COMP(jfinal); p < $SIZE(L) && (i>0 || j>0); p++) {
+      $apath(L=>p) = i-1;
+      $bpath(L=>p) = j-1;
+      //
+      op = $align(N1=>i,M1=>j);
+      if        (op==ALIGN_OP_INSERT1) {
+        --i;
+      } else if (op==ALIGN_OP_INSERT2) {
+        --j;
+      } else { /* if (op==ALIGN_OP_MATCH || op==ALIGN_OP_SUBSTITUTE) */
+        --i;
+        --j;
+      }
+   }
+   $len() = p;
+   //-- now reverse the paths
+   for (p=0; p < ($len()+1)/2; p++) {
+     endp = $len()-p-1;
+     //
+     tmp             = $apath(L=>p);
+     $apath(L=>p)    = $apath(L=>endp);
+     $apath(L=>endp) = tmp;
+     //
+     tmp = $bpath(L=>p);
+     $bpath(L=>p)    = $bpath(L=>endp);
+     $bpath(L=>endp) = tmp;
+   }
+   //-- now, sanitize the paths
+   for (p=$len(); p > 0; p--) {
+     if ($apath(L=>p) == $apath(L=>p-1)) $apath(L=>p) = -1;
+     if ($bpath(L=>p) == $bpath(L=>p-1)) $bpath(L=>p) = -1;
+   }
+'),
+       Doc =>
+q(
+Low-level method.
+Compute best path through alignment matrix $align() from final index ($ifinal,$jfinal).
+Stores paths for (original) input strings $a() and $b() in $apath() and $bpath()
+respectively.
+Negative values in $apath() and $bpath() indicate insertion/deletion operations.
+On completion, $pathlen() holds the actual length of the paths.
+),
+);
+
+##------------------------------------------------------
+## Alignment: operation backtrace
+
+##------------------------------------------------------
+## edit_backtrace() : alignment operation backtrace
+pp_add_exported('','edit_pathtrace');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 edit_pathtrace
+
+=for sig
+
+  Signature: ( align(N+1,M+1); [o]ai(L); [o]bi(L); [o]ops(L); [o]$pathlen() )
+
+Convenience method.
+Compute alignment path backtrace through alignment matrix $align() from final index ($ifinal,$jfinal).
+Stores raw paths for (original) input strings $a() and $b() in $ai() and $bi()
+respectively.
+Unlike edit_bestpath(), null-moves for $ai() and $bi() are not stored here as negative values.
+Returned pdls ($ai,$bi,$ops) are trimmed to the appropriate path length.
+
+=cut
+
+sub edit_pathtrace {
+  my ($align,$ai,$bi,$ops,$len) = @_;
+  $len=pdl(long,$align->dim(0)+$align->dim(1)) if (!defined($len));
+  if (!defined($ai)) { $ai=zeroes(long,$len); }
+  else { $ai->reshape($len) if ($ai->nelem < $len); }
+  if (!defined($bi)) { $bi = zeroes(long,$len); }
+  else { $bi->reshape($len) if ($bi->nelem < $len); }
+  if (!defined($ops)) { $ops = zeroes(long,$len); }
+  else { $ops->reshape($len) if ($ops->nelem < $len); }
+  _edit_pathtrace($align, $ai,$bi,$ops,$len, $align->dim(0)-1,$align->dim(1)-1);
+  my $lens = ($len->sclr-1);
+  return ((map { $_->slice("0:$lens") } ($ai,$bi,$ops)), $len);
+}
+
+EOPM
+
+##------------------------------------------------------
+## _edit_pathlog : trace path
+pp_add_exported('','_edit_pathtrace');
+pp_def('_edit_pathtrace',
+       Pars => ('align(N1,M1); int [o]ai(L); int [o]bi(L); int [o]ops(L); int [o]len();'),
+       OtherPars => ('int ifinal; int jfinal'),
+       Code =>
+('
+   int i,j,p, tmp;
+   //-- get reversed path & real path length
+   $len() = 0;
+   for (p=0, i=$COMP(ifinal),j=$COMP(jfinal); p < $SIZE(L) && (i>0 || j>0); p++) {
+      int op = $align(N1=>i,M1=>j);
+      $ai(L=>p)  = i;
+      $bi(L=>p)  = j;
+      $ops(L=>p) = op;
+      switch (op) {
+        case ALIGN_OP_INSERT1: --i; break;
+        case ALIGN_OP_INSERT2: --j; break;
+        case ALIGN_OP_MATCH:
+        case ALIGN_OP_SUBSTITUTE:
+        default:               --i; --j; break;
+      }
+   }
+   $len() = p;
+   //-- now reverse the paths
+   for (p=0; p < ($len()+1)/2; p++) {
+     int endp = $len()-p-1;
+     //
+     tmp          = $ai(L=>p);
+     $ai(L=>p)    = $ai(L=>endp);
+     $ai(L=>endp) = tmp;
+     //
+     tmp          = $bi(L=>p);
+     $bi(L=>p)    = $bi(L=>endp);
+     $bi(L=>endp) = tmp;
+     //
+     tmp           = $ops(L=>p);
+     $ops(L=>p)    = $ops(L=>endp);
+     $ops(L=>endp) = tmp;
+   }
+'),
+       Doc =>
+q(
+Low-level method.
+Compute alignment path backtrace through alignment matrix $align() from final index ($ifinal,$jfinal).
+Stores raw paths for (original) input strings $a() and $b() in $ai() and $bi()
+respectively.
+Unlike edit_bestpath(), null-moves for $ai() and $bi() are not stored here as negative values.
+Returned pdls ($ai,$bi,$ops) are trimmed to the appropriate path length.
+),
+);
+
+##======================================================================
+## Longest Common Subsequence (LCS)
+
+##------------------------------------------------------
+## edit_lcs() : lcs matrix (convenience)
+pp_add_exported('','edit_lcs');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 edit_lcs
+
+=for sig
+
+  Signature: (a(N); b(M); int [o]lcs(N+1,M+1);)
+
+Convenience method.
+Compute the longest common subsequence (LCS) matrix for input PDLs $a1() and $b1().
+The output matrix $lcs() contains at cell ($i+1,$j+1) the length of the LCS
+between $a1(0..$i) and $b1(0..$j); thus $lcs($N,$M) contains the
+length of the LCS between $a() and $b().
+
+=cut
+
+sub edit_lcs {
+  return _edit_lcs(_edit_pdl($_[0]), _edit_pdl($_[1]), @_[2..$#_]);
+}
+
+EOPM
+
+##------------------------------------------------------
+## _edit_lcs : get longest common subsequence matrix
+pp_add_exported('','_edit_lcs');
+pp_def('_edit_lcs',
+       Pars => ('a1(N1); b1(M1); int [o]lcs(N1,M1);'),
+       Code =>
+('
+  int i,j, iprev,jprev;
+  //
+  //-- initialize lcs matrix: lcs=0 at borders
+  for (i=0; i < $SIZE(N1); i++) { $lcs(N1=>i,M1=>0) = 0; }
+  for (j=1; j < $SIZE(M1); j++) { $lcs(N1=>0,M1=>j) = 0; }
+  //
+  //-- compute lcs
+  for (i=1,iprev=0; i < $SIZE(N1); i++,iprev++) {
+    for (j=1,jprev=0; j < $SIZE(M1); j++,jprev++) {
+      //
+      if ($a1(N1=>i)==$b1(M1=>j)) {
+        $lcs(N1=>i,M1=>j) = $lcs(N1=>iprev,M1=>jprev)+1;
+      } else {
+        $GENERIC(lcs) lcs_i_jp = $lcs(N1=>i,M1=>jprev);
+        $GENERIC(lcs) lcs_ip_j = $lcs(N1=>iprev,M1=>j);
+        $lcs(N1=>i,M1=>j) = lcs_i_jp > lcs_ip_j ? lcs_i_jp : lcs_ip_j;
+      }
+    }
+  }
+'),
+       Doc =>
+q(
+Low-level method.
+Compute the longest common subsequence (LCS) matrix for input PDLs $a1() and $b1().
+The initial (zeroth) elements of $a1() and $b1() are ignored.
+The output matrix $lcs() contains at cell ($i,$j) the length of the LCS
+between $a1(1..$i) and $b1(1..$j); thus $lcs($N1-1,$M1-1) contains the
+length of the LCS between $a1() and $b1().
+),
+);
+
+##------------------------------------------------------
+## lcs_backtrace : get LCS backtrace (convenience)
+pp_add_exported('','lcs_backtrace');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 lcs_backtrace
+
+=for sig
+
+  Signature: (a(N); b(M); int lcs(N+1,M+1); int ifinal(); int jfinal(); int [o]ai(L); int [o]bi(L); int [o]len())
+
+Convenience method.
+Compute longest-common-subsequence backtrace through LCS matrix $lcs()
+for original input strings ($a(),$b()) from final index ($ifinal,$jfinal).
+Stores raw paths for (original) input strings $a() and $b() in $ai() and $bi()
+respectively.
+
+=cut
+
+sub lcs_backtrace {
+  my ($a,$b,$lcs,$ifinal,$jfinal,$ai,$bi,$len) = @_;
+  $len=pdl(long, pdl(long,$lcs->dims)->min) if (!defined($len));
+  if (!defined($ai)) { $ai=zeroes(long,$len); }
+  else { $ai->reshape($len) if ($ai->nelem < $len); }
+  if (!defined($bi)) { $bi = zeroes(long,$len); }
+  else { $bi->reshape($len) if ($bi->nelem < $len); }
+  if (!defined($ifinal)) { $ifinal = $lcs->dim(0)-1; }
+  if (!defined($jfinal)) { $jfinal = $lcs->dim(1)-1; }
+  _lcs_backtrace(_edit_pdl($a),_edit_pdl($b), $lcs,$ifinal,$jfinal, $ai,$bi,$len);
+  my $lens = ($len->sclr-1);
+  return ($ai->slice("0:$lens"),$bi->slice("0:$lens"), $len);
+}
+
+EOPM
+
+##------------------------------------------------------
+## _lcs_backtrace : get LCS backtrace
+pp_add_exported('','_lcs_backtrace');
+pp_def('_lcs_backtrace',
+       Pars => ('a1(N1); b1(M1); int lcs(N1,M1); int ifinal(); int jfinal(); [o]ai(L); [o]bi(L); int [o]len()'),
+       Code =>
+('
+  int i,j,p, iprev,jprev, tmp;
+  //-- get reversed path & real path length
+  $len() = 0;
+  for (p=0, i=$ifinal(), j=$jfinal(); p < $SIZE(L) && i>0 && j>0; ) {
+    $GENERIC(a1) a1i = $a1(N1=>i);
+    $GENERIC(b1) b1j = $b1(M1=>j);
+    iprev=i-1;
+    jprev=j-1;
+    if (a1i==b1j) {
+      $ai(L=>p) = iprev;
+      $bi(L=>p) = jprev;
+      --i;
+      --j;
+      ++p;
+    } else if ($lcs(N1=>i,M1=>jprev) > $lcs(N1=>iprev,M1=>j)) {
+      --j;
+    } else {
+      --i;
+    }
+  }
+  $len() = p;
+  //-- now reverse the paths
+  for (p=0; p < ($len()+1)/2; p++) {
+    int endp = $len()-p-1;
+    //
+    tmp          = $ai(L=>p);
+    $ai(L=>p)    = $ai(L=>endp);
+    $ai(L=>endp) = tmp;
+    //
+    tmp          = $bi(L=>p);
+    $bi(L=>p)    = $bi(L=>endp);
+    $bi(L=>endp) = tmp;
+  }
+'),
+       Doc =>
+q(
+Low-level method.
+Compute longest-common-subsequence backtrace through LCS matrix $lcs()
+for initial-padded strings ($a1(),$b1()) from final index ($ifinal,$jfinal).
+Stores raw paths for (original) input strings $a() and $b() in $ai() and $bi()
+respectively.
+),
+);
+
+
+
+##======================================================================
+## Footer Administrivia
+##======================================================================
+
+##------------------------------------------------------
+## pm additions
+pp_addpm(<<'EOPM');
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+Perl by Larry Wall.
+
+PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
+
+=cut
+
+##----------------------------------------------------------------------
+=pod
+
+=head1 KNOWN BUGS
+
+Probably many.
+
+=cut
+
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head2 Copyright Policy
+
+Copyright (C) 2006-2015, Bryan Jurish. All rights reserved.
+
+This package is free software, and entirely without warranty.
+You may redistribute it and/or modify it under the same terms
+as Perl itself, either Perl 5.20.2, or at your option any later
+version of Perl 5.
+
+=head1 SEE ALSO
+
+perl(1), PDL(3perl).
+
+=cut
+
+EOPM
+
+
+# Always make sure that you finish your PP declarations with
+# pp_done
+pp_done();
+##----------------------------------------------------------------------

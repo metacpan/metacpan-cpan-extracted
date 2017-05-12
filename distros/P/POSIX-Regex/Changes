@@ -1,0 +1,108 @@
+1.0003: Wed Apr 03 2013
+   - there's an enormous variety of error messages between the
+     perls
+
+1.0002: Fri Mar 29 2013
+   - Matthew Horsfall (alh) <WolfSage@gmail.com> contributed
+     patches via github.  
+
+
+1.0001: Wed Mar 25 11:21:42 EDT 2009
+   - releasing this as 1.0.1 because I had accidentally released
+     it as a developer release
+
+1.0: Thu Aug  7 15:25:12 EDT 2008
+   - after much hullabaloo, I have determined that version.pm
+     needs Module::Build to work reliably with XS and I have
+     further determined that Module::Build causes more problems
+     than it solves.  I hate it.  So I'm removing version.pm and
+     Module::Build and going back to the ultra stable
+     ExtUtils::MakeMaker.
+
+0.90.16: Wed Jul 30 07:28:25 EDT 2008
+   - changed my author and copyright sections, they were all
+     wrong
+   - removed the Makefile.PL, causes problems
+
+0.90.15: Mon Jul 28 06:39:12 EDT 2008
+   - added lib checkers to both .PLs
+
+0.90.14: Thu Jul 24 07:13:03 EDT 2008
+   - We don't need the AutoLoader to use AUTOLOAD, in fact, all
+     it does is try to pick up the autosplit.ix
+   - I also fixed the build problems with const-*.inc (I hope)
+
+0.90.13: Wed Jul 23 16:11:58 EDT 2008
+   - Module::Build needs ExtUtils::CBuilder to build XS
+     (lame)
+
+0.90.12: Tue Jul 22 18:32:27 EDT 2008
+   - moved to module::build
+
+0.90.11: Mon Jun  2 08:26:11 EDT 2008
+   - was using Devel::CheckLib wrong.  Use use-devel-checklib
+     script next time
+
+0.90.10: Tue May 27 12:11:11 EDT 2008
+   - (wow, use version has to be on the same line as our $VERSION
+      for older EUMM)
+
+0.90.9: Mon May 26 15:57:34 EDT 2008
+   - I might as well do a new version of everything using
+     version.pm while I wait for all my CPAN deletes to go
+     through.  I just discovered that version.pm doesn't/didn't
+     go core until perl 5.9...  I really wish I'd have prereqed
+     it everywhere I used it, but I didn't.  *sigh*
+
+0.90.8: Sat May 24 09:22:10 EDT 2008
+   - Gah, Andreas Koenig himself took the trouble to point out
+     further problems with my three number versioning.  I'll now
+     'use version' as he suggests.
+
+0.90.6: Wed May 21 12:56:49 EDT 2008
+   - The Irix compiler (and probably others) can't deal with having
+     if() blocks in the PREINIT -- a braindead error on my part.
+
+0.90.4: Wed May 21 12:56:49 EDT 2008
+   - I misunderstood the use of Devel::CheckLib.
+     You're meant to include it with your distribution, duh.
+
+0.90.3: Sun May 18 09:17:56 EDT 2008
+   - Windows? Seriously?  You're going to need libc I guess.
+     Really, I never gussed windows people would try to compile
+     this.  CPAN Testers rocks in that way.
+   - Devel::CheckLib now looks for libc and regex.h
+   - Wow, linux (really gnu platforms) is the only place where \|
+     works under basic REs.  gnu grep apparently lexes it's own
+     basic REs and only uses regcomp() for certain balancing
+     error-checks.  I did not know that.  Again: perl testers
+     rock.
+
+0.90.1: Sun May 18 09:17:56 EDT 2008
+   - Made the Makefile.PL require a modern ExtUtils::MakeMaker w/
+     ExtUtils::Constant (bsd 6.1 is apparently pure evil)
+
+0.90: Sat May 17 06:54:46 EDT 2008
+   - Fixed various error message typos
+   - Fixed various BSD problems that hopefully also fix the same
+     problems in solaris (installing a bsd virtual machine was
+     enough trouble, ... where would I find solaris?) (bottom
+     line: god bless the perl testers!)
+
+0.89:  Fri Aug 18 16:21:57 EDT 2006
+   - jettero upgraded the version to 89...
+
+0.54:  Fri Aug 18 16:21:33 EDT 2006
+   - jettero added a few gnu regex options
+
+0.53:  Fri Aug 18 15:50:24 EDT 2006
+   - jettero got the matching routines to work great
+
+0.52:  Fri Aug 18 14:24:07 EDT 2006
+   - jettero got some of the primary methods like regcomp and
+     DESTROY working
+
+0.01  Thu Aug 17 18:16:16 2006
+    - original version; created by h2xs 1.23 with options
+      --skip-ppport /usr/include/regex.h
+

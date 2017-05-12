@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+foreach $i (1..10) {
+    print("$i bottle of beer(s) on the wall...\n");
+}
+$j = reverse "!nur yllufsseccus sah margorp niugnep rehtona tsuj";
+print $j, "\n";
+&notify; # note that this is supplied by the trivial penguind
+&message;
+return $j;

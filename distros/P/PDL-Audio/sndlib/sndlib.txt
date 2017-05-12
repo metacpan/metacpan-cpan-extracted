@@ -1,0 +1,1132 @@
+                                   SndLib
+
+                 Bill Schottstaedt (bil@ccrma.stanford.edu)
+
+Contents
+
+Introduction
+Headers
+Data
+Hardware
+Music V
+Examples
+     SndInfo
+     SndPlay
+     SndRecord
+     AudInfo
+     SndSine
+     clmosc
+     Other Examples
+How to Make Sndlib and the examples
+Current Status
+Lower Levels
+Sndlib and Guile
+
+Introduction
+
+The sound library is a collection of sound file and audio hardware handlers
+written in C and running currently on SGI (either audio library), NeXT, Sun,
+Be, OSS or ALSA (Linux and others), Mac, HPUX, MkLinux/LinuxPPC, and Windoze
+systems. It provides relatively straightforward access to many sound file
+headers and data types, and most of the features of the audio hardware.
+
+The following files make up sndlib:
+
+   * io.c (read and write sound file data)
+   * headers.c (read and write sound file headers)
+   * audio.c (read and write sound hardware ports)
+   * sound.c (provide slightly higher level access to the preceding files)
+   * sndlib.h (header for the preceding files)
+   * sndlib2scm.c and sndlib-strings.h (tie preceding into Guile)
+   * clm.c and clm.h (Music V implementation)
+   * clm2scm.c, vct.c and vct.h (tie clm.c into Guile)
+   * old-sndlib.h (old names)
+
+In version 6.0, I changed most of the exported names to use the prefix "mus"
+or "SNDLIB" (to be more in line with the Gnu standard); see old-sndlib.h for
+backwards compatibility.
+
+To build sndlib (sndlib.so if possible, and sndlib.a):
+
+  ./configure
+  make
+
+To install it, 'make install' -- I've tested this process in Linux, SGI,
+Sun, and NeXT. It could conceivably work elsewhere. For more details see How
+to Make Sndlib below.
+
+Headers
+
+Sound files have built-in descriptors known as headers. The following
+functions return the information in the header. In each case the argument to
+the function is the full file name of the sound file.
+
+  int sound_samples (char *arg)          /* samples of sound according to header (can be incorrect) */
+  int sound_frames (char *arg)           /* samples per channel */
+  float sound_duration (char *arg)
+  int sound_datum_size (char *arg)       /* bytes per sample */
+  int sound_data_location (char *arg)    /* location of first sample (bytes) */
+  int sound_chans (char *arg)            /* number of channels (samples are interleaved) */
+  int sound_srate (char *arg)            /* sampling rate */
+  int sound_header_type (char *arg)      /* header type (aiff etc) */
+  int sound_data_format (char *arg)      /* data format (alaw etc) */
+  int sound_original_format (char *arg)  /* unmodified data format specifier */
+  char *sound_comment (char *arg)        /* comment if any */
+  int sound_comment_start (char *arg)    /* comment start (bytes) if any */
+  int sound_comment_end (char *arg)      /* comment end (bytes) */
+  int sound_length (char *arg)           /* true file length (for error checks) */
+  int sound_fact_samples (char *arg)     /* compression scheme data */
+  int sound_distributed (char *arg)      /* is header scattered around in sound file */
+  int sound_write_date (char *arg)       /* bare (uninterpreted) file write date */
+  int sound_type_specifier (char *arg)   /* original header type identifier */
+  int sound_align (char *arg)            /* more compression data */
+  int sound_bits_per_sample(char *arg)   /* bits per sample */
+  int sound_bytes_per_sample(int format) /* bytes per sample */
+  int sound_max_amp(char *arg, int *vals)/* return list of max-amp sample pairs */
+  int sound_aiff_p(char *arg)            /* is it an old-style AIFF file (not AIFC) */
+  void initialize_sndlib(void)           /* initialize everything */
+  int sound_aiff_p(char *arg)            /* if sound's header actually an old-style AIFF (not AIFC) header */
+
+The following can be used to provide user-understandable descriptions of the
+header type and the data format:
+
+  char *sound_type_name(int type)          /* "AIFF" etc */
+  char *sound_format_name(int format)      /* "16-bit big endian linear" etc */
+
+In all cases if an error occurs, -1 is returned; for information about the
+error use:
+
+  int audio_error(void)                    /* returns error code indicated by preceding audio call */
+  char *audio_error_name(int err)          /* gives string decription of error code */
+
+Header data is cached internally, so the actual header is read only if it
+hasn't already been read, or the write date has changed. Loop points are
+also available, if there's interest. To go below the "sound" level, see
+headers.c -- once a header has been read, all the components that have been
+found can be read via functions such as mus_header_srate.
+
+Data
+
+The following functions provide access to sound file data:
+
+  int open_sound_input (char *arg)
+  int open_sound_output (char *arg, int srate, int chans, int data_format, int header_type, char *comment)
+  int reopen_sound_output (char *arg, int type, int format, int data_loc)
+  int close_sound_input (int fd)
+  int close_sound_output (int fd, int bytes_of_data)
+  int read_sound (int fd, int beg, int end, int chans, int **bufs)
+  int write_sound (int fd, int beg, int end, int chans, int **bufs)
+  int seek_sound (int fd, long offset, int origin)
+  int seek_sound_frame (int fd, int frame)
+  int mus_float_sound(char *charbuf, int samps, int charbuf_format, float *buffer)
+
+open_sound_input opens arg for reading. Most standard uncompressed formats
+are readable. This function returns the associated file number, or -1 upon
+failure.
+
+close_sound_input closes an open sound file. Its argument is the integer
+returned by open_sound_input.
+
+open_sound_output opens arg, setting its sampling rate to be srate, number
+of channels to chans, data format to data_format (see sndlib.h for these
+types: SNDLIB_16_LINEAR, for example, means 16-bit 2's complement big endian
+fractions), header type to header_type (AIFF for example; the available
+writable header types are AIFF_sound_file, RIFF_sound_file ('wave'),
+NeXT_sound_file, and IRCAM_sound_file), and comment (if any) to comment. The
+header is not considered complete without an indication of the data size,
+but since this is rarely known in advance, it is supplied when the sound
+file is closed. This function returns the associated file number.
+
+close_sound_output first updates the file's header to reflect the final data
+size bytes_of_data, then closes the file. The argument fd is the integer
+returned by open_sound_output.
+
+read_sound reads data from the file indicated by fd, placing data in the
+array obufs as 32-bit integers in the host's byte order. chans determines
+how many arrays of ints are in obufs, which is filled by read_sound from its
+index beg to end with zero padding if necessary. See the sndplay example
+below if this is not obvious.
+
+write_sound writes data to the file indicated by fd, starting for each of
+chans channels in obufs at beg and ending at end.
+
+seek_sound moves the read or write position for the file indicated by fd to
+offset given the origin indication (both treated as in lseek). The new
+actual position attained is returned. In both cases (the returned value and
+offset), the output datum size is considered to be 2, no matter what it
+really is. That is, use byte positions as if you were always reading and
+writing 16-bit data, and seek_sound will compensate if its actually 32-bit
+floats or whatever. Since this is impossible to understand, there's also
+seek_sound_frame which moves to the indicated frame.
+
+mus_float_sound takes a buffer full of sound data in some format
+(charbuf_format and returns the data as a buffer full of (unscaled) floats.
+
+Hardware
+
+The following functions provide access to audio harware. If an error occurs,
+they return -1, and the audio_error functions can be used to find out what
+went wrong.
+
+  int initialize_audio(void)
+  void save_audio_state(void)
+  void restore_audio_state(void)
+  void describe_audio_state(void)
+  char *report_audio_state(void)
+  int open_audio_output(int dev, int srate, int chans, int format, int size)
+  int open_audio_input(int dev, int srate, int chans, int format, int size)
+  int write_audio(int line, char *buf, int bytes)
+  int close_audio(int line)
+  int read_audio(int line, char *buf, int bytes)
+  int read_audio_state(int dev, int field, int chan, float *val)
+  int write_audio_state(int dev, int field, int chan, float *val)
+  int audio_systems(void)
+  char *audio_system_name(int system)
+  void setup_dsps(int cards, int *dsps, int *mixers) /* OSS only */
+
+initialize_audio takes care of any necessary intialization.
+
+save_audio_state saves the current audio hardware state.
+
+restore_audio_state restores the audio hardware to the last saved state.
+
+describe_audio_state prints to stdout a description of the current state of
+the audio hardware. report_audio_state returns the same description as a
+string.
+
+audio_systems returns the number of separate and complete audio systems
+(soundcards essentially) that are available. audio_system_name returns some
+user-recognizable name for the given card.
+
+open_audio_input opens an audio port to read sound data (i.e. a microphone,
+line in, etc). The input device is dev (see sndlib.h for details; when in
+doubt, use SNDLIB_DEFAULT_DEVICE). The input sampling rate is srate or as
+close as we can get to it. The number of input channels (if available) is
+chans. The input data format is format (when in doubt, use the macro
+SNDLIB_COMPATIBLE_FORMAT). And the input buffer size (if settable at all) is
+size (bytes). This function returns an integer to distinguish its port from
+others that might be in use. In this and other related functions, the device
+has an optional second portion that refers to the soundcard or system for
+that device. SNDLIB_AUDIO_SYSTEM(n) refers to the nth such card, so
+(SNDLIB_DAC_DEVICE | SNDLIB_AUDIO_SYSTEM(1)) is the 2nd card's dac (the
+default is system 0, the first card).
+
+open_audio_output opens an audio port to write date (i.e. speakers, line
+out, etc). The output device is dev (see sndlib.h). Its sampling rate is
+srate, number of channels chans, data format format, and buffer size size.
+This function returns the associated line number of the output port.
+
+close_audio closes the port (input or output) associated with line.
+
+read_audio reads sound data from line. The incoming bytes bytes of data are
+placed in buf. If no error was returned from open_audio_input, the data is
+in the format requested by that function with channels interleaved.
+
+write_audio writes bytes bytes of data in buf to the output port associated
+with line. This data is assumed to be in the format requested by
+open_audio_output with channels interleaved.
+
+read_audio_state and write_audio_state are complicated. They get and set the
+audio hardware state. The audio hardware is treated as a set of "systems"
+(sound cards) each of which has a set of "devices" (dacs, adcs, etc), with
+various "fields" that can be read or set (gain, channels active, etc). For
+example, a microphone is called the SNDLIB_MICROPHONE_DEVICE, and its
+hardware gain setting (if any) is called the SNDLIB_AMP_FIELD. All gains are
+considered to be linear between 0.0 and 1.0, so to set the microphone's
+first channel amplitude to .5 (that is, the gain of the signal before it
+reaches the analog-to-digital converter),
+
+  float vals[1];
+  vals[0]=0.5;
+  write_audio_state(SNDLIB_MICROPHONE_DEVICE,SNDLIB_AMP_FIELD,0,vals);
+
+Similarly
+
+  read_audio_state(SNDLIB_MICROPHONE_DEVICE,SNDLIB_AMP_FIELD,0,vals);
+  amp=vals[0];
+
+returns the current gain in the float array vals. read_audio_state can also
+return a description of the currently available audio hardware.
+
+If a requested operation is not implemented, -1 is returned, and
+SNDLIB_AUDIO_ERROR is set to SNDLIB_CANT_READ or SNDLIB_CANT_WRITE. If an
+error occurs during the requested operation, -1 is returned, and
+SNDLIB_AUDIO_ERROR is set to SNDLIB_READ_ERROR or SNDLIB_WRITE_ERROR. If
+some operation cannot be performed on the current hardware, -1 is returned
+and SNDLIB_AUDIO_ERROR tries to indicate what portion of the requested
+operation is impossible (SNDLIB_SRATE_NOT_AVAILABLE,
+SNDLIB_FORMAT_NOT_AVAILABLE, and so on).
+
+Systems
+
+Each separate sound card is called a system, accessible via the device
+argument through the macro SNDLIB_AUDIO_SYSTEM(n). The count starts at 0
+which is the default. The function audio_systems returns how many such cards
+are available. (Currently it returns more than one only on Linux systems
+with multiple sound cards).
+
+Devices
+
+Each audio system has a set of available devices. To find out what is
+available on a given system
+
+  #define LIST_MAX_SIZE 32;
+  float device_list[LIST_MAX_SIZE];
+  read_audio_state(SNDLIB_AUDIO_SYSTEM(0),SNDLIB_DEVICE_FIELD,LIST_MAX_SIZE,device_list);
+
+The list of available devices is returned in the device_list array, with the
+number of the devices as device_list[0]. The set of device identifiers is in
+sndlib.h (SNDLIB_LINE_IN_DEVICE for example). Two special devices are
+SNDLIB_MIXER_DEVICE and SNDLIB_DAC_FILTER_DEVICE. The latter refers to the
+low-pass filter often associated with a DAC. The former refers to a set of
+analog gain and tone controls often associated with a sound card. The
+individual gains are accessed through the various fields (described below).
+
+Fields
+
+The field argument in read-audio-state and write-audio-state selects one
+aspect of the given card's devices' controls. The simplest operations
+involve SNDLIB_AMP_FIELD and SNDLIB_SRATE_FIELD. The latter gets or sets the
+sampling rate of the device, and the former gets or sets the amplitude
+(between 0.0 and 1.0) of the specified channel of the device. The value to
+be set or returned is in the 0th element of the vals array. An example of
+reading the current microphone gain is given above. The meaning of the field
+argument can depend on which device it is applied to, so there is some
+complexity here. The channel argument usually selects which channel we are
+interested in, but in some cases it instead tells read-audio-state how big a
+returned list can get. A brief description of the fields:
+
+SNDLIB_AMP_FIELD       gain or volume control (0.0 to 1.0)
+SNDLIB_SRATE_FIELD     sampling rate
+SNDLIB_CHANNEL_FIELD   active channels
+
+SNDLIB_BASS_FIELD, SNDLIB_TREBLE_FIELD    mixer's tone control
+SNDLIB_LINE_FIELD      mixer's line-in gain control
+SNDLIB_MIC_FIELD       mixer's microphone gain control
+similarly for SNDLIB_IMIX_FIELD, SNDLIB_IGAIN_FIELD,
+              SNDLIB_RECLEV_FIELD, SNDLIB_PCM_FIELD, SNDLIB_PCM2_FIELD,
+              SNDLIB_OGAIN_FIELD, SNDLIB_LINE1_FIELD,
+              SNDLIB_LINE2_FIELD, SNDLIB_LINE3_FIELD, SNDLIB_SYNTH_FIELD
+
+SNDLIB_FORMAT_FIELD    return list of usable sound formats (e.g. SNDLIB_16_LINEAR)
+SNDLIB_DEVICE_FIELD    return list of available devices (e.g. SNDLIB_MICROPHONE_DEVICE)
+
+MusicV
+
+clm.c and friends implement all the generators found in CLM, a common lisp
+music V implementation, and clm2scm.c ties these into Guile (Scheme). The
+primary clm documentation (which describes both the Scheme and Common Lisp
+implementations) is clm.html found in clm-2.tar.gz alongside sndlib at
+ccrma-ftp. The simplest way to try these out is to load them into Snd; see
+extsnd.html and examp.scm in snd-3.tar.gz for more details. The C
+implementation is essentially the same as the two Lisp versions, but (as
+might be expected), works at a lower level, expecting the caller to handle
+garbage collection and so forth. The following briefly describes the C calls
+(see clm.h).
+
+clm.c implements a bunch of generators and sound IO handlers. Each generator
+has three associated functions, make-gen, gen, and gen_p; the first creates
+the generator (if needed), the second gets the next sample from the
+generator, and the last examines some pointer to determine if it is that
+kind of generator. In addition, there are a variety of "generic" functions
+that generators respond to: mus_free, for example, frees a generator, and
+mus_frequency returns its current frequency, if relevant. All generators are
+pointers to mus_any structs. Finally, CLM has two special data types: frame
+and mixer. A frame is an array that represents a multi-channel sample (that
+is, in a stereo file, at time 0.0, there are two samples, one for each
+channel). A mixer is a array of arrays that represents a set of input and
+output scalers, as if it were the current state of a mixing console's volume
+controls. A frame (a multi-channel input) can be "mixed" into a new frame (a
+multi-channel output) by passing it through a "mixer" (a matrix, the
+operation being a matrix multiply).
+
+   * oscil -- generate a sine wave.
+        o mus_any *mus_make_oscil (float freq, float phase)
+        o float mus_oscil (mus_any *o, float fm, float pm)
+        o int mus_oscil_p (mus_any *ptr)
+
+       mus_any *osc;
+       init_mus_module();
+       osc = mus_make_oscil(440.0,0.0);
+       if (oscil_p(osc)) fprintf(stderr,"%.3f, %.3f ",.1 * mus_oscil(osc,0.0,0.0),mus_frequency(osc));
+       mus_free(osc);
+
+The other generators are:
+
+   * sum_of_cosines -- generate a pulse train made up of cosines
+   * delay -- a delay line with optional interpolation
+   * tap -- read delay line
+   * comb -- comb filter
+   * notch -- notch filter
+   * all_pass -- all pass filter
+   * table_lookup -- interpolating table lookup
+   * sawtooth_wave, triangle_wave, pulse_train, square_wave
+   * rand -- white noise (a step function)
+   * rand-interp -- interpolating noise
+   * asymmetric_fm -- a variety of FM
+   * one_zero, two_zero, one_pole, two_pole -- basic filters
+   * formant -- create a formant region (two poles, two zeros)
+   * sine_summation -- another way to create sine waves
+   * filter, fir_filter, iir_filter -- direct form filters of any order
+   * wave_train -- sequence of possibly overlapping waves
+   * buffer -- a way to handle block processing in the generator world
+   * env -- envelopes
+   * waveshape -- waveshaping
+   * readin, file2sample, file2frame, in_any -- file sample input
+   * locsig, sample2file, frame2file, out_any -- file sample output
+   * src -- sampling rate conversion
+   * granulate -- granular synthesis
+   * convolve -- convolution
+
+Some useful functions provided by clm.c are:
+
+   * float mus_radians2hz(float rads) -- convert radians/sample to
+     cycles/sec.
+   * float mus_hz2radians(float hz) -- and the reverse.
+   * float mus_degrees2radians(float deg) -- convert degrees to radians.
+   * float mus_radians2degrees(float rads) -- and the reverse.
+   * float mus_srate(void) -- current sampling rate
+   * float mus_set_srate(float rate) -- set current sampling rate
+   * float mus_ring_modulate(float sig1, float sig2) -- multiply sig1 by
+     sig2
+   * float mus_amplitude_modulate(float s1, float s2, float s3) -- AM
+   * float mus_contrast_enhancement(float sig, float index)
+   * float mus_dot_product(float *data1, float *data2, int size)
+   * void mus_clear_array(float *arr, int size)
+   * float mus_array_interp(float *wave, float phase, int size)
+   * float mus_polynomial(float *coeffs, float x, int ncoeffs);
+   * void mus_multiply_arrays(float *data, float *window, int len);
+   * void mus_rectangular2polar(float *rl, float *im, int size);
+   * void mus_spectrum(float *rdat, float *idat, float *window, int n, int
+     type)
+   * void mus_fft(float *rl, float *im, int n, int isign, int ipow)
+   * float *mus_make_fft_window(int size, int type, float beta)
+   * void mus_convolution(float* rl1, float* rl2, int n, int ipow)
+   * float *mus_partials2wave(float *partial_data, int partials, float
+     *table, int table_size, int normalize)
+   * float *mus_phasepartials2wave(float *partial_data, int partials, float
+     *table, int table_size, int normalize)
+
+and various others -- see clm.h.
+
+The more useful generic functions are:
+
+   * int mus_free(mus_any *ptr)
+   * char *mus_describe(mus_any *gen)
+   * float mus_phase(mus_any *gen)
+   * float mus_set_phase(mus_any *gen, float val)
+   * float mus_set_frequency(mus_any *gen, float val)
+   * float mus_frequency(mus_any *gen)
+   * int mus_length(mus_any *gen)
+   * int mus_set_length(mus_any *gen, int len)
+   * float *mus_data(mus_any *gen)
+   * float *mus_set_data(mus_any *gen, float *data)
+   * char *mus_name(mus_any *ptr)
+   * int mus_type(mus_any *ptr)
+   * float mus_scaler(mus_any *gen)
+   * float mus_set_scaler(mus_any *gen, float val)
+
+Before using any of these functions, call init_mus_module. Errors are
+reported through mus_error which can be redirected or muffled. See clm2scm.c
+for an example.
+
+  ------------------------------------------------------------------------
+
+Examples
+
+In the following examples I've omitted the usual garrulous C-header gab and
+other inessential stuff. The full program code is available as noted below.
+
+SndInfo
+
+This program prints out a description of a sound file (sndinfo.c).
+
+int main(int argc, char *argv[])
+{
+  int fd,chans,srate,samples;
+  float length;
+  time_t date;
+  char *comment;
+  char timestr[64];
+  initialize_sndlib();
+  fd = mus_open_read(argv[1]); /* see if it exists */
+  if (fd != -1)
+    {
+      close(fd);
+      date = sound_write_date(argv[1]);
+      srate = sound_srate(argv[1]);
+      chans = sound_chans(argv[1]);
+      samples = sound_samples(argv[1]);
+      comment = sound_comment(argv[1]);
+      length = (float)samples / (float)(chans * srate);
+      strftime(timestr,64,"%a %d-%b-%y %H:%M %Z",localtime(&date));
+      fprintf(stdout,"%s:\n  srate: %d\n  chans: %d\n  length: %f\n",
+              argv[1],srate,chans,length);
+      fprintf(stdout,"  type: %s\n  format: %s\n  written: %s\n  comment: %s\n",
+              sound_type_name(sound_header_type(argv[1])),
+              sound_format_name(sound_data_format(argv[1])),
+              timestr,comment);
+    }
+  else
+    fprintf(stderr,"%s: %s\n",argv[1],strerror(errno));
+  return(0);
+}
+
+SndPlay
+
+This code plays a sound file (sndplay.c):
+
+int main(int argc, char *argv[])
+{
+  int fd,afd,i,j,n,k,chans,srate,frames,outbytes;
+  int **bufs;
+  short *obuf;
+  initialize_sndlib();
+  fd = open_sound_input(argv[1]);
+  if (fd != -1)
+    {
+      chans = sound_chans(argv[1]);
+      srate = sound_srate(argv[1]);
+      frames = sound_frames(argv[1]);
+      outbytes = BUFFER_SIZE * chans * 2;
+      bufs = (int **)calloc(chans,sizeof(int *));
+      for (i=0;i<chans;i++) bufs[i] = (int *)calloc(BUFFER_SIZE,sizeof(int));
+      obuf = (short *)calloc(BUFFER_SIZE * chans,sizeof(short));
+      afd = open_audio_output(SNDLIB_DEFAULT_DEVICE,srate,chans,SNDLIB_COMPATIBLE_FORMAT,outbytes);
+      if (afd != -1)
+        {
+          for (i=0;i<frames;i+=BUFFER_SIZE)
+            {
+              read_sound(fd,0,BUFFER_SIZE-1,chans,bufs);
+              for (k=0,j=0;k<BUFFER_SIZE;k++,j+=chans)
+                for (n=0;n<chans;n++) obuf[j+n] = bufs[n][k];
+              write_audio(afd,(char *)obuf,outbytes);
+            }
+          close_audio(afd);
+        }
+      close_sound_input(fd);
+      for (i=0;i<chans;i++) free(bufs[i]);
+      free(bufs);
+      free(obuf);
+    }
+  else
+    fprintf(stderr,"%s: %s ",argv[1],audio_error_name(audio_error()));
+  return(0);
+}
+
+SndRecord
+
+This code records a couple seconds of sound from a microphone. Input formats
+and sampling rates are dependent on available hardware, so in a "real"
+program, you'd use read_audio_state to find out what was available, then
+float-sound to turn that data into a stream of floats. You'd also provide,
+no doubt, some whizzy user interface to turn the thing off. (sndrecord.c)
+
+int main(int argc, char *argv[])
+{
+  int fd,afd,i,err;
+  short *ibuf;
+#if MACOS
+  argc = ccommand(&argv);
+#endif
+  afd = -1;
+  initialize_sndlib();
+  fd = open_sound_output(argv[1],22050,1,SNDLIB_16_LINEAR,NeXT_sound_file,"created by sndrecord");
+  if (fd != -1)
+    {
+      ibuf = (short *)calloc(BUFFER_SIZE,sizeof(short));
+      afd = open_audio_input(SNDLIB_MICROPHONE_DEVICE,22050,1,SNDLIB_16_LINEAR,BUFFER_SIZE);
+      if (afd != -1)
+        {
+          for (i=0;i<10;i++) /* grab 10 buffers of input */
+            {
+              err = read_audio(afd,(char *)ibuf,BUFFER_SIZE*2);
+              if (err != SNDLIB_NO_ERROR) {fprintf(stderr,audio_error_name(audio_error())); break;}
+              write(fd,ibuf,BUFFER_SIZE*2);
+            }
+          close_audio(afd);
+        }
+      else
+        fprintf(stderr,audio_error_name(audio_error()));
+      close_sound_output(fd,BUFFER_SIZE*10*2);
+      free(ibuf);
+    }
+  else
+    fprintf(stderr,"%s: %s ",argv[1],strerror(errno));
+  return(0);
+}
+
+AudInfo
+
+This program describes the current audio harware state (audinfo.c):
+
+int main(int argc, char *argv[])
+{
+  initialize_sndlib();
+  describe_audio_state();
+  return(0);
+}
+
+SndSine
+
+This program writes a one channel NeXT/Sun sound file containing a sine wave
+at 440 Hz.
+
+int main(int argc, char *argv[])
+{
+  int fd,i,k,frames;
+  float phase,incr;
+  int *obuf[1];
+  initialize_sndlib();
+  fd = open_sound_output(argv[1],22050,1,SNDLIB_16_LINEAR,NeXT_sound_file,"created by sndsine");
+  if (fd != -1)
+    {
+      frames = 22050;
+      phase = 0.0;
+      incr = 2*PI*440.0/22050.0;
+      obuf[0] = (int *)calloc(BUFFER_SIZE,sizeof(int));
+      k=0;
+      for (i=0;i<frames;i++)
+        {
+          obuf[0][k] = (int)(3276.8 * sin(phase)); /* amp = .1 */
+          phase += incr;
+          k++;
+          if (k == BUFFER_SIZE)
+            {
+              write_sound(fd,0,BUFFER_SIZE-1,1,obuf);
+              k=0;
+            }
+        }
+      if (k>0) write_sound(fd,0,k-1,1,obuf);
+      close_sound_output(fd,22050*mus_format2bytes(SNDLIB_16_LINEAR));
+      free(obuf[0]);
+    }
+  return(0);
+}
+
+clmosc
+
+This is program uses the clm.c oscillator and output functions to write the
+same sine wave as we wrote in SndSine. (Compile clm.c with -DHAVE_SNDLIB=1).
+
+int main(int argc, char *argv[])
+{
+  int i;
+  mus_any *osc,*op;
+  initialize_sndlib();
+  init_mus_module();
+  osc = mus_make_oscil(440.0,0.0);
+  op = mus_make_file_output("test.snd",22050,1,SNDLIB_16_LINEAR,NeXT_sound_file,"created by clmosc");
+  if (op) for (i=0;i<22050;i++) mus_sample2file(op,i,0,.1 * mus_oscil(osc,0.0,0.0));
+  mus_free(osc);
+  if (op) mus_free(op);
+  return(0);
+}
+
+Here is the fm-violin and a sample with-sound call:
+
+static int feq(float x, int i) {return(fabs(x-i)<.00001);}
+
+void fm_violin(float start, float dur, float frequency, float amplitude, float fm_index, mus_any *op)
+{
+ float pervibfrq = 5.0,
+   ranvibfrq = 16.0,
+   pervibamp = .0025,
+   ranvibamp = .005,
+   noise_amount = 0.0,
+   noise_frq = 1000.0,
+   gliss_amp = 0.0,
+   fm1_rat = 1.0,
+   fm2_rat = 3.0,
+   fm3_rat = 4.0,
+   reverb_amount = 0.0,
+   degree = 0.0,
+   distance = 1.0;
+  float fm_env[] = {0.0, 1.0, 25.0, 0.4, 75.0, 0.6, 100.0, 0.0};
+  float amp_env[] = {0.0, 0.0,  25.0, 1.0, 75.0, 1.0, 100.0, 0.0};
+  float frq_env[] = {0.0, -1.0, 15.0, 1.0, 25.0, 0.0, 100.0, 0.0};
+  int beg = 0,end,easy_case = 0,npartials,i;
+  float *coeffs,*partials;
+  float frq_scl,maxdev,logfrq,sqrtfrq,index1,index2,index3,norm,vib = 0.0,modulation = 0.0,fuzz = 0.0,indfuzz = 1.0,ampfuzz = 1.0;
+  mus_any *carrier,*fmosc1,*fmosc2,*fmosc3,*ampf,*indf1,*indf2,*indf3,*fmnoi = NULL,*pervib,*ranvib,*frqf = NULL,*loc;
+  beg = start * mus_srate();
+  end = beg + dur * mus_srate();
+  frq_scl = mus_hz2radians(frequency);
+  maxdev = frq_scl * fm_index;
+  if ((noise_amount == 0.0) && (feq(fm1_rat,floor(fm1_rat))) && (feq(fm2_rat,floor(fm2_rat))) && (feq(fm3_rat,floor(fm3_rat)))) easy_case = 1;
+  logfrq = log(frequency);
+  sqrtfrq = sqrt(frequency);
+  index1 = maxdev * 5.0 / logfrq; if (index1 > M_PI) index1 = M_PI;
+  index2 = maxdev * 3.0 * (8.5 - logfrq) / (3.0 + frequency * .001); if (index2 > M_PI) index2 = M_PI;
+  index3 = maxdev * 4.0 / sqrtfrq; if (index3 > M_PI) index3 = M_PI;
+  if (easy_case)
+    {
+      npartials = floor(fm1_rat);
+      if ((floor(fm2_rat)) > npartials) npartials = floor(fm2_rat);
+      if ((floor(fm3_rat)) > npartials) npartials = floor(fm3_rat);
+      npartials++;
+      partials = (float *)CALLOC(npartials,sizeof(float));
+      partials[(int)(fm1_rat)] = index1;
+      partials[(int)(fm2_rat)] = index2;
+      partials[(int)(fm3_rat)] = index3;
+      coeffs = mus_partials2polynomial(npartials,partials,1);
+      norm = 1.0;
+    }
+  else norm = index1;
+  carrier = mus_make_oscil(frequency,0.0);
+  if (easy_case == 0)
+    {
+      fmosc1 = mus_make_oscil(frequency * fm1_rat,0.0);
+      fmosc2 = mus_make_oscil(frequency * fm2_rat,0.0);
+      fmosc3 = mus_make_oscil(frequency * fm3_rat,0.0);
+    }
+  else fmosc1 = mus_make_oscil(frequency,0.0);
+  ampf = mus_make_env(amp_env,4,amplitude,0.0,1.0,dur,0,0,NULL);
+  indf1 = mus_make_env(fm_env,4,norm,0.0,1.0,dur,0,0,NULL);
+  if (gliss_amp != 0.0) frqf = mus_make_env(frq_env,4,gliss_amp * frq_scl,0.0,1.0,dur,0,0,NULL);
+  if (easy_case == 0)
+    {
+      indf2 = mus_make_env(fm_env,4,index2,0.0,1.0,dur,0,0,NULL);
+      indf3 = mus_make_env(fm_env,4,index3,0.0,1.0,dur,0,0,NULL);
+    }
+  pervib = mus_make_triangle_wave(pervibfrq,frq_scl * pervibamp,0.0);
+  ranvib = mus_make_rand_interp(ranvibfrq,frq_scl * ranvibamp);
+  if (noise_amount != 0.0) fmnoi = mus_make_rand(noise_frq,noise_amount * M_PI);
+  loc = mus_make_locsig(degree,distance,reverb_amount,1,(mus_output *)op,NULL);
+  for (i=beg;i<end;i++)
+    {
+      if (noise_amount != 0.0) fuzz = mus_rand(fmnoi,0.0);
+      if (frqf) vib = mus_env(frqf); else vib = 0.0;
+      vib += mus_triangle_wave(pervib,0.0) + mus_rand_interp(ranvib,0.0);
+      if (easy_case)
+        modulation = mus_env(indf1) * mus_polynomial(coeffs,mus_oscil(fmosc1,vib,0.0),npartials);
+      else
+        modulation = mus_env(indf1) * mus_oscil(fmosc1,(fuzz + fm1_rat * vib),0.0) +
+                     mus_env(indf2) * mus_oscil(fmosc2,(fuzz + fm2_rat * vib),0.0) +
+                     mus_env(indf3) * mus_oscil(fmosc3,(fuzz + fm3_rat * vib),0.0);
+      mus_locsig(loc,i,mus_env(ampf) * mus_oscil(carrier,vib + indfuzz * modulation,0.0));
+    }
+  mus_free(pervib);
+  mus_free(ranvib);
+  mus_free(carrier);
+  mus_free(fmosc1);
+  mus_free(ampf);
+  mus_free(indf1);
+  if (fmnoi) mus_free(fmnoi);
+  if (frqf) mus_free(frqf);
+  if (easy_case == 0)
+    {
+      mus_free(indf2);
+      mus_free(indf3);
+      mus_free(fmosc2);
+      mus_free(fmosc3);
+    }
+  else
+    FREE(partials);
+  mus_free(loc);
+}
+
+int main(int argc, char *argv[])
+{
+  mus_any *osc = NULL,*op = NULL;
+  initialize_sndlib();
+  init_mus_module();
+  op = mus_make_file_output("test.snd",22050,1,SNDLIB_16_LINEAR,NeXT_sound_file,"created by clmosc");
+  if (op)
+    {
+      fm_violin(0.0,20.0,440.0,.3,1.0,op);
+      mus_free(op);
+    }
+  return(0);
+}
+
+The CLM version is v.ins, the Scheme version can be found in examp.scm. This
+code can be run:
+
+cc v.c -o vc -O3 -lm io.o headers.o audio.o sound.o clm.o -DLINUX
+
+where clm.o was compiled with -DHAVE_SNDLIB.
+
+  ------------------------------------------------------------------------
+
+Other Examples
+
+The primary impetus for the sound library was the development of Snd and
+CLM, both of which are freely available.
+
+  ------------------------------------------------------------------------
+
+How to Make Sndlib and the examples
+
+The Sndlib files can be used as separate modules or made into a library. The
+following sequence, for example, builds the sndplay program from scratch on
+an SGI:
+
+cc -c io.c -O -DSGI
+cc -c headers.c -O -DSGI
+cc -c audio.c -O -DSGI
+cc -c sound.c -O -DSGI
+cc sndplay.c -o sndplay -O -DSGI audio.o io.o headers.o sound.o -laudio -lm
+
+To make a library out of the sndlib files, first compile them as above,
+then:
+
+ld -r audio.o io.o headers.o sound.o -o sndlib.a
+cc sndplay.c -o sndplay -O -DSGI sndlib.a -laudio -lm
+
+The full sequence in Linux:
+
+cc -c io.c -O -DLINUX
+cc -c audio.c -O -DLINUX
+cc -c headers.c -O -DLINUX
+cc -c sound.c -O -DLINUX
+cc sndplay.c -o sndplay -O -DLINUX audio.o io.o headers.o sound.o -lm
+
+ld -r audio.o io.o headers.o sound.o -o sndlib.a
+cc sndplay.c -o sndplay -O -DLINUX sndlib.a -lm
+
+And on a NeXT:
+
+cc -c io.c -O -DNEXT
+cc -c audio.c -O -DNEXT
+cc -c headers.c -O -DNEXT
+cc -c sound.c -O -DNEXT
+cc sndplay.c -o sndplay -O -DNEXT audio.o io.o headers.o sound.o
+
+ld -r audio.o io.o headers.o sound.o -o sndlib.a
+cc sndplay.c -o sndplay -O -DNEXT sndlib.a
+
+Some similar sequence should work on a Sun (-DSOLARIS) or in HP-UX (-DHPUX).
+On a Mac, you need to make a project in CodeWarrior or whatever that
+includes all the basic sndlib .c and .h files (io.c, audio.c headers.c,
+sound.c, sndlib.h) as source files. Add the main program you're interested
+in (say sndplay.c), and "Make" the project. When the project is "Run", a
+dialog pops up asking for the arguments to the program (in this case the
+name of the file to be played, as a quoted string). In Windoze, you can use
+the C IDE (a project builder as in the Mac case), or run the compiler from a
+DOS shell. In the latter case, (in Watcom C) cl io.c -c -DWINDOZE to create
+the object files (io.obj and so on), then
+
+cl sndplay sndplay.obj -DWINDOZE audio.obj io.obj headers.obj sound.obj
+
+or in MS C
+
+cl -c io.c -DWINDOZE
+(and so on)
+cl sndplay.c -DWINDOZE sndplay.obj audio.obj io.obj headers.obj sound.obj winmm.lib
+
+or in gcc (available via the cygwin project)
+
+gcc -c io.c -DWINDOZE -O2
+
+You can run the program from the DOS shell (sndplay oboe.snd or
+./sndplay.exe oboe.snd). On a Be, you can either build a project or use a
+makefile. The C compiler's name is mwcc. The tricky part here is that you
+have to find and include explicitly the Be audio library, libmedia.so --
+look first in beos/system/lib. Or
+
+make sndplay
+
+To make sndlib into a shared library,
+
+ld -shared io.o headers.o audio.o sound.o -o sndlib.so
+
+(in Linux), or (to include the CLM module),
+
+ld -shared io.o headers.o audio.o sound.o clm.o -o sndlib.so
+
+  ------------------------------------------------------------------------
+
+Current Status
+
+      System      SndSine  SndInfo Audinfo     SndPlay   SndRecord   CLM
+ NeXT 68k        ok       ok       ok       ok           ok        ok
+ NeXT Intel      ok       ok       ok       interruptionsruns (*)  untried
+ SGI old and new
+ AL              ok       ok       ok       ok           ok        ok
+ OSS (Linux et
+ al)             ok       ok       ok       ok           ok        ok
+ Be              ok       ok       ok       ok           ok        untried
+ Mac             ok       ok       ok       ok           ok        ok
+
+ Windoze         ok       ok       ok       ok           not       ok
+                                                         written
+ Sun             ok       ok       ok       ok           runs (*)  ok
+ HPUX            untested untested untested untested     untested  untried
+
+ MkLinux/LinuxPPCok       ok       ok       ok           untested  ok
+                                                         (**)
+ ALSA            untested untested untested untested     untested  untested
+
+(*) I can't find a microphone.
+(**) Last I looked, recording was still not supported in this OS.
+
+headers supported read/write
+     NeXT/Sun/DEC/AFsp
+     AIFF/AIFC
+     RIFF (Microsoft wave)
+     IRCAM (old style)
+     NIST-sphere
+     no header
+headers supported read-only
+     8SVX (IFF), IRCAM Vax float, EBICSF, INRS, ESPS,
+     SPPACK, ADC (OGI), AVR, VOC,
+     Sound Tools, Turtle Beach SMP, SoundFont 2.0,
+     Sound Designer I and II, PSION, MAUD, Kurzweil 2000,
+     Tandy DeskMate, Gravis Ultrasound, ASF,
+     Comdisco SPW, Goldwave sample, omf, quicktime
+     Sonic Foundry, SBStudio II, Delusion digital,
+     Digiplayer ST3, Farandole Composer WaveSample,
+     Ultratracker WaveSample, Sample Dump exchange,
+     Yamaha SY85, SY99, and TX16, Covox v8, SPL, AVI,
+
+Incomplete: OMF, AVI, ASF, QuickTime, SoundFont 2.0.
+Not handled: Esignal, ILS, HTK, DVSM, SoundEdit.
+Handled by Snd: Mus10, IEEE text, HCOM, various compression schemes.
+
+Lower Levels
+
+If you'd like to go below the "sound" interface described above, the
+following functions are exported from sndlib. You need to remember to call
+sndlib_initialize (or the underlying initializers) before using these
+functions (this is normally done for you by the various "sound_" functions).
+
+  int mus_read_header (char *name)
+  int mus_write_header (char *name, int type, int in_srate, int in_chans, int loc, int size, int format, char *comment, int len)
+  int mus_update_header (char *name, int type, int size, int srate, int format, int chans, int loc)
+  int mus_header_writable(int type, int format)
+
+These read and write a sound file's header. The loc parameter is normally 0
+(the data location depends on many things -- you'd normally write the
+header, then use mus_header_data_location to get the resultant data
+location). len is the length (bytes) of comment. mus_update_header is
+normally used only to set the file size after the sound has been written.
+mus_header_writable returns 1 if the given combination of header type and
+data format can be handled by sndlib. If you already have the file
+descriptor (as returned by open), the corresponding lower level calls are:
+
+  int mus_read_header_with_fd (int fd)
+  int mus_write_header_with_fd (int fd, int type, int in_srate, int in_chans, int loc, int size, int format, char *comment, int len)
+  int mus_update_header_with_fd (int fd, int type, int siz)
+
+Once mus_read_header has been called, the data in it can be accessed
+through:
+
+  int mus_header_samples (void)              samples
+  int mus_header_frames (void)               frames (samples / chans)
+  int mus_header_data_location (void)        location of data (bytes)
+  int mus_header_chans (void)                channels
+  int mus_header_srate (void)                srate
+  int mus_header_type (void)                 header type (i.e. aiff, wave, etc)  (see sndlib.h)
+  int mus_header_format (void)               data format (see sndlib.h)
+  int mus_header_distributed (void)          true if header info is scattered around in the file
+  int mus_header_comment_start (void)        comment start location (if any) (bytes)
+  int mus_header_comment_end (void)          comment end location
+  int mus_header_aux_comment_start (int n)   if multiple comments, nth start location
+  int mus_header_aux_comment_end (int n)     if multiple comments, nth end location
+  int mus_header_type_specifier (void)       original (header-specific) type ID
+  int mus_header_bits_per_sample (void)      sample width in bits
+  int mus_true_file_length (void)            true (lseek) file length
+  int mus_header_format2bytes (void)         sample width in bytes
+  int mus_header_aiff_p(void)                is header actually old-style AIFF, not AIFC
+  char *mus_header_type2string (int type)    sound_type_name
+  char *mus_header_data_format2string (int format) sound_format_name
+
+Various less useful header fields are accessible: see headers.c or sndlib.h
+for details. The next functions handle various IO calls:
+
+  int mus_open_read (char *arg)              open file read-only
+  int mus_probe_file (char *arg)             return 1 if file exists
+  int mus_open_write (char *arg)             open file read-write, creating it if necessary, else truncating
+  int mus_create (char *arg)                 create file
+  int mus_reopen_write (char *arg)           open file read-write without changing anything
+  int mus_close (int fd)                     close file
+  long mus_seek (int tfd, long offset, int origin)
+  int mus_seek_frame (int tfd, int frame)    go to a specific frame in file
+  int mus_read (int fd, int beg, int end, int chans, int **bufs)
+  int mus_read_chans (int fd, int beg, int end, int chans, int **bufs, int *cm)
+  int mus_read_any (int tfd, int beg, int chans, int nints, int **bufs, int *cm)
+  int mus_write_zeros (int tfd, int num)
+  int mus_write (int tfd, int beg, int end, int chans, int **bufs)
+  int mus_float_sound (char *charbuf, int samps, int charbuf_format, float *buffer)
+  int mus_unshort_sound (short *in_buf, int samps, int new_format, char *out_buf)
+  int sound_max_amp (char *ifile, int *vals)
+
+If you're trying to deal with various data types yourself, the following
+functions may be useful; they perform various byte-order-aware type
+conversions:
+
+  void mus_set_big_endian_int (unsigned char *j, int x)
+  int mus_big_endian_int (unsigned char *inp)
+  void mus_set_little_endian_int (unsigned char *j, int x)
+  int mus_little_endian_int (unsigned char *inp)
+  int mus_uninterpreted_int (unsigned char *inp)
+  void mus_set_big_endian_float (unsigned char *j, float x)
+  float mus_big_endian_float (unsigned char *inp)
+  void mus_set_little_endian_float (unsigned char *j, float x)
+  float mus_little_endian_float (unsigned char *inp)
+  void mus_set_big_endian_short (unsigned char *j, short x)
+  short mus_big_endian_short (unsigned char *inp)
+  void mus_set_little_endian_short (unsigned char *j, short x)
+  short mus_little_endian_short (unsigned char *inp)
+  void mus_set_big_endian_unsigned_short (unsigned char *j, unsigned short x)
+  unsigned short mus_big_endian_unsigned_short (unsigned char *inp)
+  void mus_set_little_endian_unsigned_short (unsigned char *j, unsigned short x)
+  unsigned short mus_little_endian_unsigned_short (unsigned char *inp)
+  double mus_little_endian_double (unsigned char *inp)
+  double mus_big_endian_double (unsigned char *inp)
+  void mus_set_big_endian_double (unsigned char *j, double x)
+  void mus_set_little_endian_double (unsigned char *j, double x)
+  unsigned int mus_big_endian_unsigned_int (unsigned char *inp)
+  unsigned int mus_little_endian_unsigned_int (unsigned char *inp)
+
+Finally, a couple functions are provided to read and write sound files to
+and from arrays:
+
+  int mus_file2array (char *filename, int chan, int start, int samples, int *array)
+  int mus_array2file (char *filename, int *ddata, int len, int srate, int channels)
+
+Sndlib and Guile
+
+Much of sndlib is accessible at run time in any program that has Guile; the
+modules sndlib2scm and clm2scm tie most of the library into Scheme making it
+possible to call the library functions from Guile. The documentation is
+scattered around, unfortunately: the clm side is in clm.html and extsnd.html
+with many examples in Snd's examp.scm. Most of these are obvious
+translations of the constants and functions described above into Scheme.
+
+  snd-16-linear   snd-16-linear-little-endian  snd-24-linear   snd-24-linear-little-endian
+  snd-32-float    snd-32-float-little-endian   snd-32-linear   snd-32-linear-little-endian
+  snd-64-double   snd-64-double-little-endian  snd-8-alaw      snd-8-linear
+  snd-8-mulaw     snd-8-unsigned               snd-16-unsigned snd-16-unsigned-little-endian
+
+  next-sound-file nist-sound-file aiff-sound-file ircam-sound-file raw-sound-file riff-sound-file
+
+  sndlib-default-device    sndlib-read-write-device   sndlib-line-out-device
+  sndlib-line-in-device    sndlib-microphone-device   sndlib-speakers-device
+  sndlib-dac-out-device    sndlib-adat-in-device      sndlib-aes-in-device
+  sndlib-digital-in-device sndlib-digital-out-device  sndlib-adat-out-device
+  sndlib-aes-out-device    sndlib-dac-filter-device   sndlib-mixer-device
+  sndlib-line1-device      sndlib-line2-device        sndlib-line3-device
+  sndlib-aux-input-device  sndlib-cd-in-device        sndlib-aux-output-device
+  sndlib-spdif-in-device   sndlib-spdif-out-device
+
+  sndlib-amp-field     sndlib-srate-field   sndlib-channel-field
+  sndlib-format-field  sndlib-device-field  sndlib-imix-field
+  sndlib-igain-field   sndlib-reclev-field  sndlib-pcm-field
+  sndlib-pcm2-field    sndlib-ogain-field   sndlib-line-field
+  sndlib-mic-field     sndlib-line1-field   sndlib-line2-field
+  sndlib-line3-field   sndlib-synth-field   sndlib-bass-field
+  sndlib-treble-field  sndlib-cd-field
+
+  sound-samples (filename)             samples of sound according to header (can be incorrect)
+  sound-frames (filename)              frames of sound according to header (can be incorrect)
+  sound-duration (filename)            duration of sound in seconds
+  sound-datum-size (filename)          bytes per sample
+  sound-data-location (filename)       location of first sample (bytes)
+  sound-chans (filename)               number of channels (samples are interleaved)
+  sound-srate (filename)               sampling rate
+  sound-header-type (filename)         header type (e.g. aiff-sound-file)
+  sound-data-format(filename)          data format (e.g. 16-linear)
+  sound-length (filename)              true file length (bytes)
+  sound-type-specifier (filename)      original header type identifier
+  sound-max-amp(filename)              returns a vector of max amps and locations thereof
+
+  sound-type-name (type)               e.g. "AIFF"
+  sound-format-name (format)           e.g. "16-bit big endian linear"
+  sound-comment (filename)             header comment, if any
+  sound-bytes-per-sample (format)      bytes per sample
+
+  audio-error ()                       returns error code indicated by preceding audio call
+  audio-error-name(err)                string decription of error code
+  describe-audio ()                    describe audio hardware state
+  report-audio-state()                 return audio hardware state as a string
+  set-oss-buffers (num size)           in Linux (OSS) sets the number and size of the OSS "fragments"
+  audio-outputs(speaker, headphones, line-out) On the Sun, cause output to go to the chosen devices
+
+  open-sound-input (filename)          open filename (a sound file) returning an integer ("fd" below)
+  open-sound-output (filename srate chans data-format header-type comment)
+                                       create a new sound file with the indicated attributes, return "fd"
+  reopen-sound-output (filename chans data-format header-type data-location)
+                                       reopen (without disturbing) filename, ready to be written
+  close-sound-input (fd)               close sound file
+  close-sound-output (fd bytes)        close sound file and update its length indication, if any
+  read-sound (fd beg end chans sdata)  read data from sound file fd from frame beg to end
+                                       sdata is a sound-data object that should be able to accomodate the read
+  write-sound (fd beg end chans sdata) write data to sound file fd
+  seek-sound (fd offset origin)        complicated -- see seek_sound above
+  seek-sound-frame (fd frame)          move to frame in sound file fd
+
+  open-audio-output (device srate chans format bufsize)
+                                       open audio port device ready for output with the indicated attributes
+  open-audio-input (device srate chans format bufsize)
+                                       open audio port device ready for input with the indicated attributes
+  write-audio (line sdata frames)      write frames of data from sound-data object sdata to port line
+  read-audio (line sdata frames)       read frames of data into sound-data object sdata from port line
+  close-audio (line)                   close audio port line
+  read-audio-state (device field channel vals)
+                                       read current state of device's field -- see read_audio_state above.
+  write-audio-state (device field channel vals)
+                                       write new state for device's field -- see write_audio_state above.
+  audio-systems ()                     returns how many separate "systems" (soundcards) it can find
+  save-audio-state ()                  write current audio state to .mixer or whatever
+  restore-audio-state ()               read previously stored audio state
+
+  make-sound-data (chans, frames)      return a sound-data object with chans arrays, each of length frames
+  sound-data-ref (obj chan frame)      return (as a float) the sample in channel chan at location frame
+  sound-data-set! (obj chan frame val) set obj's sample at frame in chan to (the float) val
+  sound-data? (obj)                    #t if obj is of type sound-data
+  sound-data-length (obj)              length of each channel of data in obj
+  sound-data-chans (obj)               number of channels of data in obj
+  sound-data->vct (sdobj chan vobj)    place sound-data channel data in vct
+  vct->sound-data (vobj sdobj chan)    place vct data in sound-data
+
+;;; this function prints header information
+(define info
+  (lambda (file)
+    (string-append
+     file
+     ": chans: " (number->string (sound-chans file))
+     ", srate: " (number->string (sound-srate file))
+     ", " (sound-type-name (sound-header-type file))
+     ", " (sound-format-name (sound-data-format file))
+     ", len: " (number->string
+                (/ (sound-samples file)
+                   (* (sound-chans file) (sound-srate file)))))))
+
+;;; this function reads the first 32 samples of a file, returning the 30th in channel 0
+(define read-sample-30
+  (lambda (file)
+    (let* ((fd (open-sound-input file))
+           (chans (sound-chans file))
+           (data (make-sound-data chans 32)))
+      (read-sound fd 0 31 chans data)
+      ;; we could use sound-data->vct here to return all the samples
+      (let ((val (sound-data-ref data 0 29)))
+        (close-sound-input fd)
+        val))))
+
+;;; here we get the microphone volume, then set it to .5
+  (define vals (make-vector 32))
+  (read-audio-state sndlib-microphone-device sndlib-amp-field 0 vals)
+  (vector-ref vals 0)
+  (vector-set! vals 0 .5)
+  (write-audio-state sndlib-microphone-device sndlib-amp-field 0 vals)
+
+;;; this function plays a sound (we're assuming that we can play 16-bit linear little-endian data)
+(define play-sound
+  (lambda (file)
+    (let* ((sound-fd (open-sound-input file))
+           (chans (sound-chans file))
+           (frames (sound-frames file))
+           (bufsize 256)
+           (data (make-sound-data chans bufsize))
+           (bytes (* bufsize chans 2)))
+      (read-sound sound-fd 0 (1- bufsize) chans data)
+      (let ((audio-fd (open-audio-output sndlib-default-device (sound-srate file) chans snd-16-linear-little-endian bytes)))
+        (do ((i 0 (+ i bufsize)))
+            ((>= i frames))
+          (write-audio audio-fd data bufsize)
+          (read-sound sound-fd 0 (1- bufsize) chans data))
+        (close-sound-input sound-fd)
+        (close-audio audio-fd)))))

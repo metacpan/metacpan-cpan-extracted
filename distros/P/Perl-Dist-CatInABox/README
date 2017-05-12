@@ -1,0 +1,81 @@
+NAME
+    Perl::Dist::CatInABox - Catalyst (and supporting modules) on top of
+    Strawberry perl for win32.
+
+DESCRIPTION
+    See Perl::Dist::Strawberry for details. This distribution installs the
+    following modules (and their dependencies) to cover common modules used
+    in Catalyst applications. To that end this distribution includes (on top
+    of the reqular Strawberry perl modules):
+
+    *   Catalyst::Devel
+
+    *   Template
+
+    *   DBIx::Class
+
+    *   DBIx::Class::EncodedColumn
+
+    *   DBIx::Class::Timestamp
+
+    *   DBIx::Class::InflateColumn::DateTime
+
+    *   DBIx::Class::Schema::Loader
+
+    *   Catalyst::View::TT
+
+    *   Catalyst::View::JSON
+
+    *   Catalyst::Model::DBIC::Schema
+
+    *   Catalyst::Model::DBIC::File
+
+    *   Catalyst::Plugin::Authentication
+
+    *   Catalyst::Authentication::Store::DBIx::Class
+
+    *   Catalyst::Authentication::Store::Htpasswd
+
+    *   Catalyst::Authentication::Credential::Password
+
+    *   Catalyst::Authentication::Credential::HTTP
+
+AUTHOR
+    Kieren Diment <zarquon@cpan.org>
+
+BUGS
+    Please report any bugs or feature requests to "bug-perl-dist-catinabox
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Perl-Dist-CatInABox>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Perl::Dist::CatInABox
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Dist-CatInABox>
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Perl-Dist-CatInABox>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Perl-Dist-CatInABox>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Perl-Dist-CatInABox>
+
+ACKNOWLEDGEMENTS
+    Adam Kennedy for his Strawberry Perl project. All the Catalyst
+    contributors (<http://catalystframework.org>).
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Kieren Diment.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

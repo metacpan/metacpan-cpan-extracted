@@ -1,0 +1,6 @@
+Revision history for Perl extension Perl6::Variables.
+
+0.01  Tue May 15 06:15:41 2001
+	- original version; created by h2xs 1.20 with options
+		-A -P -X -f -n Perl6::Variables
+

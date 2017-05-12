@@ -1,0 +1,108 @@
+=head1 v1.2
+
+=over
+
+=item Tue 16 Mar 2004
+
+Released Pod::DocBook 1.2
+
+Added missing test files
+
+=head1 v1.1
+
+=over
+
+=item Tue 16 Mar 2004
+
+Released Pod::DocBook 1.1
+
+=item Wed 3 Mar 2004
+
+F<README> is now pod format (seemed appropriate)
+
+=item Tue 2 Mar 2004
+
+F<Changes> is now pod format (seemed appropriate)
+
+fixed doc: C<=item *> yields C<< <itemizedlist> >>, not
+C<< <simplelist> >>
+
+fixed bug in C<< <orderedlist> >> output
+
+now uses MD5 hashes for fixed-length IDs (thanks to Jacques Supcik)
+
+added B<--no-header> option to B<pod2docbook> (thanks to Jacques
+Supcik)
+
+=item Thu 26 Feb 2004
+
+fixed bug with blank lines in C<=begin docbook> ... C<=end docbook>
+regions (thanks to Garry Williams)
+
+=back
+
+=head1 v1.0
+
+=over
+
+=item Thu 19 Feb 2004
+
+released Pod::DocBook 1.0
+
+=item Tue 30 Dec 2003
+
+started rewrite of Pod::DocBook
+
+specialize Pod::Parser instead of parsing directly
+
+emit formatted DocBook 4.2 SGML
+
+=back
+
+=head1  OLD -- Pod::DocBook 0.6 and earlier
+
+  0.0.6
+  =====
+
+      o Support for L<> style linking, includes new Id naming scheme
+
+      o additional styles, variable headx->secty mapping
+
+      o removed unneccessary <para></para> pairs
+
+      o fixed index building (but don't use this)
+
+      o general de-HTML-ization
+
+  0.0.5
+  =====
+
+      o Added an incremental fix from Pod::HTML which corrected bogus output
+        in C<0>, B<0> and so on tags.
+
+  0.0.4
+  =====
+
+      o Added handling for auto-tag generation
+
+  0.0.3
+  =====
+
+      o POD files such as:
+
+          =head1 Some Chapter Title
+
+          blah
+
+        will format the first =head1 tag as a <chapter> tag and automatically
+        fill in the final </chapter> for you when run with --no-header and
+        --no-footer
+
+      o =over/=item/=back handling cleaned up a bit to produce correct
+        <variablelist>, <orderedList> and <itemizedList> constructs
+
+      o Added basic auto-tagging handling.
+
+      o Added --root-id argument to specify the root tag id
+
+      o Removed <A> tags which were an overhang from pod2html

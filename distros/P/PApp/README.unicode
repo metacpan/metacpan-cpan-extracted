@@ -1,0 +1,22 @@
+This file contains some additional information about unicode usage in PApp.
+
+PRIVATE USE REGISTRY
+
+   PApp uses the following characters from the private use areas:
+
+      for fixups
+          fc00
+
+      for methods
+          fce0
+          fce1
+          fce2
+
+   Agni uses the following characters:
+
+      for objtags
+          10f101
+          10f102-10f1ed
+          10f1fe
+          
+

@@ -1,0 +1,26 @@
+---
+name: Palm-Keyring
+version: 0.95
+author:
+  - 'Andrew Fresh E<lt>andrew@cpan.orgE<gt>'
+abstract: Handler for Palm Keyring databases.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Palm::StdAppInfo: 0
+  perl: 5.6.1
+recommends:
+  Crypt::CBC: 0
+  Crypt::DES: 0
+  Digest::HMAC_SHA1: 0
+  Digest::MD5: 0
+  Digest::SHA1: 0
+provides:
+  Palm::Keyring:
+    file: lib/Palm/Keyring.pm
+    version: 0.95
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

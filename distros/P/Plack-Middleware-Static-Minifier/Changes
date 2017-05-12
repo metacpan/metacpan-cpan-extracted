@@ -1,0 +1,34 @@
+Revision history for Perl extension Plack::Middleware::Static::Minifier
+
+0.08    Sat Nov  2 15:08:50 JST 2013
+    [INCOMPATIBLE CHANGES]
+        - Minified CSS removes units on zero values ("0px" -> "0").
+            To depend on CSS::Minifier::XS 0.09 or later
+
+0.071   Sun Oct 28 00:37:00 JST 2012
+    [NO CODE CHANGES]
+        - added test: pod-coverage
+        - added files for travis-ci.org
+
+0.07    Sat Oct 27 22:49:00 JST 2012
+    [NO CODE CHANGES]
+        - fixed for kwalitee
+        - support travis-ci
+
+0.06    Sat Jun 11 17:03:00 JST 2011
+        - not minify with Content-Encoding
+
+0.05    Tue May  3 00:22:00 JST 2011
+        - added cache test
+
+0.04    Sun May  1 22:52:00 JST 2011
+        - fixed bug about cache option. don't use 0.03 that is broken.
+
+0.03    Sat Apr 30 00:29:00 JST 2011
+        - added cache option
+
+0.02    Sun Jan 30 12:00:00 JST 2011
+        - fixed dependency of modules in Build.PL
+
+0.01    Sat Jan 29 14:14:14 JST 2011
+        - original version

@@ -1,0 +1,36 @@
+Revision history for PBKDF2-Tiny
+
+0.005     2014-11-20 05:51:16-05:00 America/New_York
+
+    [FIXED]
+
+    - fixed verification bug if derived key length was not passed to
+      verify/verify_hex
+
+0.004     2014-10-06 11:18:07-04:00 America/New_York
+
+    [CHANGED]
+
+    - password and salt must be encoded as octets; if the internal UTF8
+      flag is on, an exception is thrown.
+
+    [DOCUMENTED]
+
+    - Fixed minor doc typo for 'hmac' function
+
+0.003     2014-09-29 10:21:45-04:00 America/New_York
+
+    [FIXED]
+
+    - Added 'hmac' and 'digest_fcn' to @EXPORT_OK.  Also documented that
+      nothing is exported by default.
+
+0.002     2014-09-26 16:27:40-04:00 America/New_York
+
+    [FIXED]
+
+    - Fixed dependencies in Makefile.PL for Perl 5.8 and earlier
+
+0.001     2014-09-26 16:21:44-04:00 America/New_York
+
+    - First release

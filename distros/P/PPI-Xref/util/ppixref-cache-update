@@ -1,0 +1,342 @@
+#!/usr/bin/env perl
+
+# Script for updating a ppixref cache directory based
+# on one or more git repositories.
+
+use strict;
+use warnings;
+
+use File::Basename qw[basename];
+our $ME = basename($0);
+
+use Getopt::Long;
+
+my %Opt = (
+    update  => 0,
+    rebuild => 0,
+    time_padding => 1.05,
+    pull => 1,
+    force => 0,
+    );
+
+# We pad the --since seconds because of processing overhead.
+# However, there's no point in padding too much, so let's have max.
+our $MAX_PAD_SEC = 6 * 3600;  # 6h
+our $MIN_PAD_SEC = 15;
+
+use PPI::Xref::Help;
+
+sub short_help {
+    PPI::Xref::Help::short_help($ME, *DATA);
+}
+
+sub man_help {
+    PPI::Xref::Help::man_help($ME, *DATA);
+}
+
+sub parse_since {
+    my $s = shift;
+    if ($s =~ m{^(\d+(?:\.\d+)?)\s*(h(?:(?:our)?rs)?|m(?:in(?:(?:ute)?s)?)?|s(?:ec(?:(?:ond)?s)?)?)$}) {
+        my $t = $1;
+        my $u = $2;
+        my $s = $u =~ /^h/ ? 3600 * $t : $u =~ /^m/ ? 60 * $s : $s;
+        my $pad_sec = int($s * ($Opt{time_padding} - 1.0));
+        $pad_sec = $MAX_PAD_SEC if $pad_sec > $MAX_PAD_SEC;
+        $pad_sec = $MIN_PAD_SEC if $pad_sec < $MIN_PAD_SEC;
+        $s += $pad_sec;
+        return "--since='$s seconds ago'";
+    } elsif ($s =~ m|^[0-9a-f]{6,}|) {
+        return "$s..HEAD";
+    } else {
+         die "$ME: Unexpected --since='$s'\n";
+    }
+}
+
+short_help()
+    unless GetOptions(
+        'since=s'           => \$Opt{since},
+        'time_padding=f'    => \$Opt{time_padding},
+        'pull'              => \$Opt{pull},
+        'cache_directory=s' => \$Opt{cache_directory},
+        'files_from_system' => \$Opt{files_from_system},
+        'files_from_cache'  => \$Opt{files_from_cache},
+        'update'            => \$Opt{update},
+        'rebuild'           => \$Opt{rebuild},
+        'process_verbose'   => \$Opt{process_verbose},
+        'recurse_verbose'   => \$Opt{recurse_verbose},
+        'cache_verbose'     => \$Opt{cache_verbose},
+        'force'             => \$Opt{force},
+        'help'              => \$Opt{help},
+        'man'               => \$Opt{man},
+    );
+short_help() if $Opt{help};
+man_help()   if $Opt{man};
+
+unless ($Opt{update} ^ $Opt{rebuild}) {
+    die "$ME: Need exactly one of --update and --rebuild\n";
+}
+
+if ($Opt{rebuild} && $Opt{since}) {
+    die "$ME: Specifying --since with --rebuild makes no sense\n";
+}
+
+if (!$Opt{rebuild} && $Opt{force}) {
+    die "$ME: Specifying --force without --rebuild makes no sense\n";
+}
+
+$Opt{since} //= '24 h';
+
+if ($Opt{time_padding} < 1.0 || $Opt{time_padding} > 2.0) {
+    die "$ME: Unexpected --time_padding=$Opt{time_padding}\n";
+}
+
+my $since = parse_since($Opt{since});
+
+unless ($Opt{rebuild}) {
+    print "$ME: since: $since\n";
+}
+
+use File::Find qw[find];
+
+my %Cache;
+
+my $cache_directory = $Opt{cache_directory};
+die "$ME: Must specify --cache_directory\n" unless defined $cache_directory;
+die "$ME: Cache directory '$cache_directory' is not a writeable directory\n"
+    unless -d $cache_directory&& -w $cache_directory;
+
+use PPI::Xref;
+my $xref = PPI::Xref->new({cache_directory => $cache_directory,
+                           process_verbose => $Opt{process_verbose},
+                           recurse_verbose => $Opt{recurse_verbose},
+                           cache_verbose => $Opt{cache_verbose},
+                           cache_portable_filenames =>
+                               $Opt{cache_portable_filenames},
+                          });
+
+$xref->find_cache_files(\%Cache);
+
+printf("$ME: found %d cache files in '$cache_directory'\n",
+       scalar keys %Cache);
+
+if ($Opt{rebuild} && $Opt{force}) {
+    print "$ME: Deleting all the cache files because --force\n";
+    for my $f (sort keys %Cache) {
+        my $c = $Cache{$f};
+        if ($xref->looks_like_cache_file($c)) {  # Paranoia.
+            unless (unlink($c)) {
+                warn "$ME: unlink $c failed: $!\n";
+            }
+        } else {
+            die "$ME: Suspicious cachefile '$c', aborting.\n";
+        }
+    }
+}
+
+use Cwd qw[getcwd];
+my $cwd = getcwd();
+
+if ($Opt{files_from_system}) {
+    unshift @ARGV,
+      grep { File::Spec->file_name_is_absolute($_) } @{ $xref->INC };
+}
+
+if ($Opt{files_from_cache}) {
+    # Friendly no-op, for consistency with ppixref.
+}
+
+for my $arg (@ARGV) {
+    my $dir;
+    my $git;
+    if ($arg =~ m{^git:(/.+)}) {
+        $dir = $1;
+        $git = 1;
+    } elsif ($arg =~ m{^/.+}) {
+        $dir = $arg;
+    } else {
+        warn "$ME: Skipping unexpected argument '$arg'\n";
+        next;
+    }
+
+    unless (chdir($dir)) {
+        warn "$ME: chdir('$dir') failed: $!\n";
+        next;
+    }
+
+    my %update;
+
+    if ($Opt{update}) {
+        if ($git) {
+            unless (-d ".git") {
+                warn "$ME: Skipping '$dir' since found no .git\n";
+                next;
+            }
+            my $pull = qq[git pull];
+            print "$ME: '$pull' in '$dir'\n";
+            unless (system($pull) == 0) {
+                warn "$ME: '$pull' failed in '$dir': $!\n";
+                next;
+            }
+            my $log = qq[git log --reverse --name-status --oneline $since];
+            print "$ME: '$log' in '$dir'\n";
+            my $log_fh;
+            unless (open($log_fh,  "$log |")) {
+                warn "$ME: open(..., '$log |') failed in '$dir': $!\n";
+                next;
+            }
+            while (<$log_fh>) {
+                if (/^([MAD])\s+(.+\.pm)$/) {
+                    $update{"$dir/$2"} = $1;
+                }
+            }
+        } else {
+            if (-d ".git") {
+                warn "$ME: Skipping '$dir' since found .git\n";
+                next;
+            }
+            find(
+                sub {
+                    my $name = $File::Find::name;
+                    if (exists $Cache{$name}) {
+                        $update{$name} = 'M';
+                    }
+                }, $dir);
+        }
+    } elsif ($Opt{rebuild}) {
+        find(
+            sub {
+                if (/\.pm$/) {
+                    my $name = $File::Find::name;
+                    $update{$name} = 'A';
+                }
+            }, $dir);
+    }
+
+    for my $f (sort keys %Cache) {
+        my $c = $Cache{$f};
+        unless (-f $c) {
+            $update{$c} = 'D';
+        }
+    }
+
+    my @M;
+    my @A;
+    my @D;
+    for my $f (sort keys %update) {
+        my $v = $update{$f};
+        if ($v eq 'M') {
+            push @M, $f;
+        } elsif ($v eq 'A') {
+            push @A, $f;
+        } elsif ($v eq 'D') {
+            push @D, $f;
+        } else {
+            die qq[$ME: Unexpected value '$v' for key '$f'\n"];
+        }
+    }
+
+    my $config = {
+        D => [ \@D, 'deleting',     'deleted',
+               sub { $xref->cache_delete(@_) } ],
+        A => [ \@A, 'processing',   'added',
+               sub { $xref->process(@_)      } ],
+        M => [ \@M, 'reprocessing', 'changed',
+               sub { $xref->process(@_)      } ],
+    };
+
+    for my $o (qw[D A M]) {
+        my $c = $config->{$o};
+        my @f = @{ $c->[0] };
+        if (scalar @f) {
+            if ($Opt{process_verbose}) {
+                for my $f (@f) {
+                    print "$o\t$f\n";
+                }
+                printf("$ME: Possibly $c->[1] %d files in '$arg'\n",
+                       scalar @f);
+            }
+            $c->[3]->(@f);
+        } else {
+            print "$ME: No files $c->[2] in '$arg'.\n";
+        }
+    }
+}
+
+chdir($cwd) or die "$ME: Failed to chdir back to $cwd: $!\n";
+
+printf("$ME: cache reads=%s writes=%s creates=%d updates=%d deletes=%s\n",
+       $xref->cache_reads   || 0,
+       $xref->cache_writes  || 0,
+       $xref->cache_creates || 0,
+       $xref->cache_updates || 0,
+       $xref->cache_deletes || 0);
+
+exit(0);
+
+__DATA__
+=pod
+
+=head1 NAME
+
+ppixref-cache-update
+
+=head2 Usage
+
+$ME --cache_directory=dir [--update|--rebuild [--force]] git:dir dir ...
+$ME [--since=[sha1|'n h'|'n min'|'n s']|--time_padding=1.05] git:dir
+$ME [--pull|--nopull] git:dir
+$ME --files_from_system
+$ME --process_verbose|--recurse_verbose|--cache_verbose ...
+$ME --help
+
+=head2 Description
+
+The directories must either be git repository roots:
+
+ git:/dir/...
+
+or a plain directory
+
+  /dir/...
+
+If the directory is a git directory, 'git pull' is executed in it
+before looking for changes, use --nopull not to.
+
+=over 4
+
+=item --since
+
+Examples:
+
+$ME --since=cafe0123
+$ME --since='24 h'
+$ME --since='3 min' --time_padding=1.0  # exactly 3 minutes
+
+The default is --since=$Opt{since}, but with the time padding that
+ends up being more.  The --since=time are first converted to seconds,
+and then multiplied by $Opt{time_padding}.
+
+At most the time padding increases the since value by $MAX_PAD_SEC seconds,
+and at least by $MIN_PAD_SEC seconds.
+
+The padding is done to paper over processing overlap, so that one can
+e.g. daily reprocess and not miss things.  This is obviously an ugly
+hack: for git repositories a better way is to use the exact checksums.
+
+By default only the files requiring attention are listed, with "R" for
+refreshes (modified or addded), and "D" for deletes.  To really update
+the ppixref cache you need
+
+--cache_directory=dir --update
+
+which will reprocess the modified files, process the added files, and
+remove the cache files of deleted files.
+
+=item *
+
+--files_from_system will add all the directories from the library
+directories, which default to the @INC.
+
+=back
+
+__EOU__

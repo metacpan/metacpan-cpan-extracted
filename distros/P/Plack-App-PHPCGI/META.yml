@@ -1,0 +1,47 @@
+---
+abstract: 'execute PHP script as CGI'
+author:
+  - 'Masahiro Nagano <kazeburo {at} gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Devel::CheckBin: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.1, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-App-PHPCGI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::App::PHPCGI:
+    file: lib/Plack/App/PHPCGI.pm
+    version: '0.05'
+  Plack::App::PHPCGIFile:
+    file: lib/Plack/App/PHPCGIFile.pm
+    version: '0.05'
+requires:
+  CGI::Emulate::PSGI: '0.15'
+  File::Spec: '0'
+  File::Which: '0'
+  Plack: '1.0013'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/kazeburo/Plack-App-PHPCGI/issues
+  homepage: https://github.com/kazeburo/Plack-App-PHPCGI
+  repository: git://github.com/kazeburo/Plack-App-PHPCGI.git
+version: '0.05'
+x_contributors:
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'

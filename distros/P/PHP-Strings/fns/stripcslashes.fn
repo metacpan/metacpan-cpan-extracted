@@ -1,0 +1,32 @@
+synopsis: | >
+    my $unslashed = stripcslashes( '\a\b\f\n\r\xae' );
+
+docs: |
+    Returns a string with backslashes stripped off. Recognizes
+    C-like C<\n>, C<\r> ..., octal and hexadecimal representation.
+
+code: |
+    sub stripcslashes
+    {
+        my ($string) = validate_pos( @_, STRING );
+
+        $string =~ s{
+                \\([abfnrtv\\?'"])
+                |
+                \\(\d\d\d)
+                |
+                \\(x[[:xdigit:]]{2})
+                |
+                \\(x[[:xdigit:]])
+        }{
+            if ( $+ eq 'v' ) {
+                "\013";
+            } elsif (length $+ == 1) {
+                eval qq{qq/\\$+/};
+            } else {
+                chr oct "0$+";
+            }
+        }exg ;
+
+        return $string;
+    }

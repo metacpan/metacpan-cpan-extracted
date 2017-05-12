@@ -1,0 +1,971 @@
+
+=encoding utf8
+
+=head1 NAME/НАИМЕНОВАНИЕ
+
+perlreguts - Описание машины регулярных выражений Perl.
+
+=head1 ОПИСАНИЕ
+
+Этот документ представляет собой попытку пролить свет на внутренность регекс
+машины и на то, как она работает. Регекс машина представляет собой значительный кусок
+перловой кодовой базы, но он относительно плохо понимаем. Этот документ - 
+это скудные попытки в урегулировании этой ситуации. Он является производным от
+опыта автора, комментариев в исходном коде, и других документов регекс машины
+, обратной связи на список рассылки perl5-портировщиков и других
+мест.
+
+B<ВНИМАНИЕ!> должно быть четко понято, что поведение и
+структуры, обсуждаемые в этом представлении состояние движка представлены так, как
+автор понимает это на момент написания. 
+Это B<Не> определение API, это руководство, посвященное исключительно внутреннему устройству, для тех, кто хочет разрабатывать движок регулярных выражений Perl, или понять, как он работает.
+ Читатели этот документа, как ожидается, понимают синтаксис регулярных выражений perl и 
+используют его в деталях. Если вы хотите узнать об основах регулярных выражений Perl
+, см L<perlre>. И, если вы хотите заменить регекс движок своим собственным, см L<perlreapi>.
+
+=head1 ОБЗОР
+
+=head2 Небольшое примечание о терминах
+
+Существует некоторая дискуссия о том, следует ли сказать "регексп" или "регекс". В этом
+документе, мы будем использовать термин "регекс", пока не будет особой причины
+ для другого, в этом случае мы будем объяснять почему.
+
+Когда мы говорим о регексах нам нужно различать их форму, как вневшнюю форму в виде исходного кода
+и внутреннюю форму. В настоящем документе мы будем использовать термин
+"паттерн", когда мы говорим о их текстовой форме исходного кода и термин
+"программа", когда мы говорим о их внутреннем представлении. Это
+соответствует условиям,  I<S-регкс> и I<B-регкс>, что Марк Джейсон Доминус
+ использует в своей статье о  "Rx"  ([1] в L</REFERENCES>).
+
+=head2 Что такое движок регулярных выражений?
+
+Движком регулярных выражений является программа, которая принимает набор правил
+, определенных на миниязыке, а затем применяет эти правила к
+целевой строке и определяет, удовлетворяет ли строка
+этим правилам. Смотрите L<perlre> для полного определения этого языка.
+
+В менее грандиозных терминах первая часть работы состоит из превращения паттерна в
+что-то, что компьютер можно эффективно использовать для поиска соответствия позиции в
+строке, а вторая часть выполняет сам поиск.
+
+Для этого нам необходимо подготовить программу для синтаксического анализа текста. Затем нам
+необходимо выполнить программу для нахождения позиции в строке.
+И мы должны сделать это эффективно.
+
+=head2 Структура Регексп программы
+
+=head3 Верхний уровень
+
+Хотя это выглядит немного запутанно, и некоторые люди возражают против такой терминологии, но
+стоит посмотреть на комментарий, который писался в F<regexp.h> на протяжении лет:
+
+I<Это по существу линейное кодирование недетерминированного
+конечного автомата (типа синтаксической диаграммы или or "железнодорожной нормальной формы" в технологии
+ парсинга).>
+
+Термин "железнодорожная нормальная форма" немного эзотеричен, с "синтаксисом схем/диаграмм", 
+или "железнодорожными диаграммами/графиками", будучи более общим термином.
+Тем не менее он обеспечивает полезный мысленный образ регекс программы: каждый
+узел можно рассматривать как единицу трассы, с одним входом и в
+большинстве случаев одной точкой выхода (есть части трассы, которые ветвятся, но
+статистически их не много), и целиком образует макет с
+одним входом и одной точкой выхода. Процесс сопоставления можно рассматривать
+,как автомобиль, который движется вдоль дорожки, с конкретным маршрутом через
+системы, определяемые характером чтения каждой возможной
+точки соединения. Автомобиль может упасть с трассы в любом пункте, 
+но он может продолжать двигаться, пока он попадает в след.
+
+Таким образом шаблон C</foo(?:\w+|\d+|\s+)bar/> можно рассматривать как
+следующую диаграмму:
+
+                      [start]
+                         |
+                       <foo>
+                         |
+                   +-----+-----+
+                   |     |     |
+                 <\w+> <\d+> <\s+>
+                   |     |     |
+                   +-----+-----+
+                         |
+                       <bar>
+                         |
+                       [end]
+
+Правда заключается в том, что регулярные выражения Perl в наши дни 
+гораздо сложнее, чем такого рода структуры, цель визуализация заключается в том, чтобы
+ помочь понять поведение, также эта диаграмма совпадает с текущей реализацией довольно близко.
+
+Чтобы быть более точным, мы будем говорить, что регкс программа является кодированным
+графом. Каждый узел в графе соответствует части
+оригинального регекс шаблона, например строковая константа или ветвление,
+и имеет указатель на узлы, представляющие следующий компонент
+для сравнения. Поскольку "узел" и "код операции" ("opcode") уже имеют другие значения в
+исходниках Perl, мы будем называть узлы в программе регекс "регопеация", "регопс", "regops".
+
+Программа  представлена массивом структур C<regnode>, одна или
+больше из которых представляют собой единый regop программы. Структура 
+ C<regnode> -это наименьшая из структур, которая нужна, она имеет структуру полей,
+ которые используются совместно с другими более крупными структурами.
+
+"Следующие" указатели на всех regops за исключением C<BRANCH> осуществляют сцепление; 
+"следующий" указатель с C<BRANCH> на обоих концах подключения две альтернативы. 
+[Здесь у нас есть одна из зависимостей от тонкого синтаксиса: отдельные C<BRANCH> 
+(в отличие от коллекции из них) никогда не сцепляются с что-нибудь из-за приоритета операторов.]
+
+Операнд некоторых видов regop является строковым литералом (строкой); для других,
+это regop ведущий в подпрограмму. В частности, операнд
+C<BRANCH> (C<ВЕТВЬ>) узла является первым regop ветви.
+
+B<ЗАМЕЧАНИЕ> (B<NOTE>): согласно метафоре железной дороги видно, это это B<не> древовидная 
+структура: хвост ветви(branch) подключается к следующему 
+набору C<ВЕТВЕЙ> (C<BRANCH>es). Это одноколейная линия железной дороги,
+ которая разбивается на станцию или железнодорожный вокзал и восстановливаеь соединение 
+на другой стороне.
+
+=head3 Regops
+
+Базовая структура regop определяется в F<regexp.h> следующим образом:
+
+    struct regnode {
+        U8  flags;    /* Различные цели, иногда переопределен */
+        U8  type;     /* Значение Опкода (Opcode), как указано в regnodes.h */
+        U16 next_off; /* Смещение на размер регноде (regnode) */
+    };
+
+Другие большие C<регнодо>-подобные структуры определяются в F<regcomp.h>. Они
+ почти как подклассы в том, что они имеют те же поля, что
+C<regnode>, а возможно и дополнительные поля в
+структуре и в некоторых случаях конкретное значение (и название)
+ некоторых из базовых полей переопределено. Ниже приведено более
+полное описание.
+
+=over 4
+
+=item C<regnode_1>
+
+=item C<regnode_2>
+
+C<regnode_1> структуры имеют тот же заголовок, за которым следует
+4 байтовый аргумент; C<regnode_2> структуры содержат два двухбайтовых
+аргумента вместо этого:
+
+    regnode_1                U32 arg1;
+    regnode_2                U16 arg1;  U16 arg2;
+
+=item C<regnode_string>
+
+За C<regnode_string> структурами, используемыми для строковых литералов, следует заголовок
+ длиной в один байт и затем строковые данные. Строки дополняются в конце  
+ нулевым байтом таким образом, чтобы общая длина узла делилась на четыре байта:
+
+    regnode_string           char string[1];
+                             U8 str_len; /* overrides flags */
+
+=item C<regnode_charclass>
+
+Классы символов представлены структурами C<regnode_charclass> ,
+которые имеют 4 байтовый аргумент, а затем растровое (bitmap) изображение 32-byte (256-бит)
+, которое указывает, какие символы включены в класс.
+
+    regnode_charclass        U32 arg1;
+                             char bitmap[ANYOF_BITMAP_SIZE];
+
+=item C<regnode_charclass_class>
+
+Существует также более крупные формы структура класса char, используемые для представления
+POSIX char классов под названием C<regnode_charclass_class>, которые имеют
+ дополнительные 4-байтовые (32-разрядные версии) точечных (bitmap) рисунков , указывающих какие классы 
+ POSIX char были включены.
+
+   regnode_charclass_class  U32 arg1;
+                            char bitmap[ANYOF_BITMAP_SIZE];
+                            char classflags[ANYOF_CLASSBITMAP_SIZE];
+
+=back
+
+F<regnodes.h> определяется массив под названием C<regarglen[]>, который дает размер
+каждой из операций (opcode) в единицах C<размера regnode> (4-байтные). Используется макрос,
+чтобы вычислить размер C<ТОЧНЫЙ> (C<EXACT>) узел (node), основанный на его поле C<str_len>.
+
+Операции (regops) определены в F<regnodes.h>, который генерится из
+F<regcomp.sym> скриптом F<regcomp.pl>. В настоящее время максимально возможное число
+из различных regops ограничено 256, и около четверти уже
+используется.
+
+Набор макросов делает доступ к полям
+проще и более последовательным. К ним относятся C<OP()>, который используется для определения
+тип C <regnode>-подобной структуры; C<NEXT_OFF()>, которая является смещением до
+следующего узла (подробнее об этом позже); C<ARG()>, C<ARG1()>, C<ARG2()>, C<ARG_SET()>,
+и эквивалентые для чтения и задания аргументов; и C<STR_LEN()>,
+C<STRING()> и C<OPERAND()> для манипулирования строками и типами операций (regop bearing types).
+
+=head3 Какие операции (regop) следующие
+
+Существует три различных понятия "следующих" ("next") в обработчике regex(regex engine), и
+важно понимать их ясно.
+
+=over 4
+
+=item *
+
+Существует "следующий regnode" от данного regnode, значение которого 
+редко полезно, за исключением, что иногда оно совпадает с точки зрения стоимости
+с одним из других и что иногда код предполагает, что это
+всегда будет так.
+
+(There is the "next regnode" from a given regnode, a value which is
+rarely useful except that sometimes it matches up in terms of value
+with one of the others, and that sometimes the code assumes this to
+always be so.)
+
+=item *
+
+Существует "следующий regop" от данного regop/regnode. Этот
+regop, физически расположен после текущего, так, как он определяется
+ по размеру текущего regop. Это часто полезно, например, при
+дампе структуры, которую мы используем в порядке прохода 
+( This is often useful, such as when dumping the structure we use this order to traverse.).
+Иногда код предполагает, что "следующий regnode" такой же, как и "следующий regop", или 
+другими словами, предполагается, что sizeof (размер) типа данного regop будет всегда
+ одной большой regnode.
+
+=item *
+
+Существует "regnext" от данного regop. Это regop который
+достигается путем прыжка вперед по значению C<NEXT_OFF()>,
+или в некоторых случаях для больших прыжков по полю  C<arg1>  структура C<regnode_1>.
+Подпрограммы C<regnext()> обрабатывает это прозрачно.
+Это является логическим преемником узла (node), который в некоторых случаях, как эта C<ВЕТКА>
+ (C<BRANCH>) regop, имеет особое значение.
+ (This is the logical successor of the node, which in some cases, like
+that of the C<BRANCH> regop, has special meaning.)
+
+=back
+
+=head1 Обзор процесса
+
+Вообще говоря, выполнение сопоставления строки с шаблоном
+включает в себя следующие шаги:
+
+=over 5
+
+=item A. Компиляция
+
+=over 5
+
+=item 1. Парсинг (Синтаксический анализ) для размера (Parsing for size)
+
+=item 2. Парсинг (Синтаксический анализ) конструкций (Parsing for construction)
+
+=item 3. Оптимизация на глаз и анализ (Peep-hole optimisation and analysis)
+
+=back
+
+=item B. Выполнение
+
+=over 5
+
+=item 4. Стартовая позиция и оптимизация без поиска (Start position and no-match optimisations)
+
+=item 5. Выполнение программы (Program execution)
+
+=back
+
+=back
+
+Где происходят эти действия фактическое выполнение perl-программы 
+определяется шаблоном, включая интерполяции любой строки переменных.
+Если интерполяция происходит, то компиляция происходит во время выполнения. Если нет,
+ то компиляция выполняется во время компиляции. (Модификатор C</o> изменяет это,
+как и делает это C<qr//> в определенной степени). Движок (engine) не волнуется слишком много об этом.
+
+=head2 Компиляция
+
+Этот код находится преимущественно в F<regcomp.c>, наряду с заголовочными файлами
+F<regcomp.h>, F<regexp.h> и F<regnodes.h>.
+
+Компиляция начинается с C<pregcomp()>, который является главным инициализатором
+оболочки (initialisation wrapper), который формирует работу для двух других подпрограмм для тяжелой обработки (heavy lifting):
+Во-первых это C<reg()>, который является стартовой точкой для парсинга; 
+Во-вторых, это C<study_chunk()>, которая отвечает за оптимизацию.
+
+Инициализация в C<pregcomp()> главным образом включает в себя создание и заполнение данными
+специальных структур, C<RExC_state_t> (определенных в F<regcomp.c>).
+Почти все внутренне используемые процедуры в F<regcomp.h> принимают указатель на одну
+из этих структур, как их первый аргумент с именем C<pRExC_state>.
+Эта структура используется для хранения состояния компиляции и содержит много
+полей. Также существует много макросов, которые работают с этой
+переменной: все, что выглядит как C<RExC_xxxx> - это макрос, который работает с
+этим указателем/структурой.
+
+=head3 Парсинг для размера (Parsing for size)
+
+На этом этапе шаблон ввода анализируется для того, чтобы рассчитать, сколько
+пространства необходимо для каждого regop, которое мы будем предоставлять ( we would need to emit). Размер
+ также используется для определения, требуются ли длинные прыжки ( long jumps) в программе.
+
+Этот этап управляется установкой макроса C<SIZE_ONLY>.
+
+Разбор продолжается почти точно так, как он делает во время
+фазы построения (construction phase), за исключением того, что большинство подпрограм коротко замкнуты на
+ изменение размера поля C<RExC_size> и не делают ничего больше.
+
+(The parse proceeds pretty much exactly as it does during the
+construction phase, except that most routines are short-circuited to
+change the size field C<RExC_size> and not do anything else.)
+
+=head3 Парсинг для построения. Синтаксический анализ для строительства (Parsing for construction)
+
+После того, как определен размер программы, шаблон обрабатывается
+ снова, но на этот раз для реальности. Теперь C<SIZE_ONLY> будет иметь значение false и
+фактическое построение  может произойти. (actual construction can occur.)
+
+C<reg()> является началом процесса анализа(parse process). Он отвечает за
+синтаксический анализ произвольного фрагмента шаблона либо до конца 
+строки, или до первой закрывающей скобки, с которыми она сталкивается в шаблоне.
+Это означает, что она может использоваться для разбора верхнего уровня регекса ( top-level regex) или любого раздела
+ внутри группирующих скобок . Он также обрабатывает "специальные скобки" ("special parens")
+ которые имеют perl регексы. Например при анализе C</x(?:foo)y/> C<reg()>
+в одной точке будет вызываться для разобора от символа "?"  до закрывающей скобки ")", включая её.
+
+Кроме того C<reg()> отвечает за синтаксический анализ одной или нескольких
+ветвей из шаблона и чтобы "прикончить их" ("finishing them off") правильно
+ устанавливая их указатели следующего элемента. Для того чтобы сделать парсинг (синтаксический анализ), он неоднократно
+вызывает  C<regbranch()>, который отвечает за обработку до первого символа C<|>, который он видит.
+
+C<regbranch()> в свою очередь вызывает C<regpiece()>, который
+обрабатывает(handles "things"), следующие после повторителя (квантификатора). 
+Для того, чтобы разобрать "вещи" ("things") вызывается C<regatom()>. Это низкоуровневая процедура, которая
+разбирает постоянные строки (constant strings), классы символов и
+различные специальные символы такие, как C<$>. Если C<regatom()> встречает символ"("
+, то он, в свою очередь, вызывает C<reg()>.
+
+Процедура C<regtail()> вызывается процедурами C<reg()> и C<regbranch()>
+для того, чтобы "установить указатель на хвост (конец)" ( "set the tail pointer") правильно. При выполнении и
+ получении конца ветки, нам нужно перейти к узлу, следующему за 
+группирующими скобками (grouping parens). При синтаксическом анализе (parsing), однако, мы не знаем, где будет конец
+ до тех пор, пока мы туда не доберемся, поэтому, когда мы делаем, мы должны вернуться назад и обновить
+смещения (offsets) в соответствующих случаях. C<regtail> используется, чтобы сделать это проще.
+
+Тонкости процесса синтаксического анализа означает, что регулярное выражение такое как C</foo/>
+первоначально преобразовывается альтернативу с одной ветвью. И только
+после этого оптимизатор преобразует одноветвенную альтернативу в
+простую форму.
+
+=head3 Анализ графа вызовов и грамматика (Parse Call Graph and a Grammar)
+
+Граф вызовов выглядит следующим образом:
+
+ reg()                        # разбора регкса верхнего уровня, или внутри
+                              # парных скобок
+     regbranch()              # разбор одной ветви чередования (alternation)
+         regpiece()           # разбор шаблона за которым следует повторитель (квантификатор)
+             regatom()        # разбор простого шаблона
+                 regclass()   #    используется для обработки класса (used to handle a class)
+                 reg()        #    используется для обработки круглы скобок (used to handle a parenthesized - ошибка в слове parenthesised)
+                              #    подшаблон (подмаска subpattern)
+                 ....
+         ...
+         regtail()            # окончание обработки ветси (finish off the branch)
+     ...
+     regtail()                # окончание последовательности веток. Свяжите каждую (finish off the branch sequence. Tie each)
+                              # ветвь хвост к хвосту (branch's tail to the tail of the)
+                              # последовательности (sequence)
+                              # (Новый) В режиме отладки это ((NEW) In Debug mode this is)
+                              # regtail_study().
+
+Грамматические формы могут быть какими-нибудь такими:
+
+    atom  : constant | class
+    quant : '*' | '+' | '?' | '{min,max}'
+    _branch: piece
+           | piece _branch
+           | nothing
+    branch: _branch
+          | _branch '|' branch
+    group : '(' branch ')'
+    _piece: atom | group
+    piece : _piece
+          | _piece quant
+
+=head3 Синтаксический анализ осложнений (Parsing complications)
+
+Вышеописанное подразумевается так, что шаблон, содержащий вложенные
+скобки, приведет к графу вызовов, который зацикливается через C<reg()>,
+C<regbranch()>, C<regpiece()>, C<regatom()>, C<reg()>, C<regbranch()> I<etc>
+несколько раз, пока не будет достигнут самый глубокий уровень вложенности. Все выше
+процедуры возвращают указатель на C<regnode>, который, как правило, последний regnode, 
+добавленный в программу. Однако одно осложнение — то, что reg() возвращает NULL
+для разбора  C<(?:)> синтаксиса для встроенных модификаторов, устанавливая флаг
+C<TRYAGAIN>. C<TRYAGAIN> распространяется вверх до тех пор, пока он захватил, в
+некоторых случаях, C<regatom()>, но в остальных безоговорочно C<regbranch()>.
+Поэтому он никогда не вернет C<regbranch()> для C<reg()>.
+Этот флаг позволяет шаблоны, таких как C<(?i)+> определять как
+ошибку (I<Повторители, которые идут за пустотой в регексе; обозначаются как <-- HERE in m/(?i)+
+<-- HERE />
+I<Quantifier follows nothing in regex; marked by <-- HERE in m/(?i)+
+<-- HERE />).
+
+Другое осложнение отличается, что представления, используемые для программы
+Если необходимо хранить Unicode, но это не всегда возможно точно знать
+ли она до середине синтаксического анализа. Представление в формате Юникод для
+Программа больше и не может быть сопоставлен как эффективно. (См. Л < / Unicode
+и поддержка локализации > ниже для более подробной информации о том, почему.) Если шаблон
+содержит литерала Юникода, очевидно, что программе необходимо хранить
+Unicode. В противном случае синтаксический анализатор оптимистически предполагает, что чем больше
+эффективное представление могут быть использованы и начинает калибровки на этой основе.
+Однако если затем обнаруживает что-то в шаблоне, которые должны быть сохранены
+как Юникод, например C <\x{...}> escape-последовательность, представляющая символ
+литерал, то это означает, что все ранее вычисляемые размеры должны быть
+переделать, используя значения для представления Unicode. В настоящее время,
+все конструкции регулярных выражений, которые могут вызвать это обрабатываются кодом
+в C <regatom()>.
+
+Another complication is that the representation used for the program differs
+if it needs to store Unicode, but it's not always possible to know for sure
+whether it does until midway through parsing. The Unicode representation for
+the program is larger, and cannot be matched as efficiently. (See L</Unicode
+and Localisation Support> below for more details as to why.)  If the pattern
+contains literal Unicode, it's obvious that the program needs to store
+Unicode. Otherwise, the parser optimistically assumes that the more
+efficient representation can be used, and starts sizing on this basis.
+However, if it then encounters something in the pattern which must be stored
+as Unicode, such as an C<\x{...}> escape sequence representing a character
+literal, then this means that all previously calculated sizes need to be
+redone, using values appropriate for the Unicode representation. Currently,
+all regular expression constructions which can trigger this are parsed by code
+in C<regatom()>.
+
+To avoid wasted work when a restart is needed, the sizing pass is abandoned
+- C<regatom()> immediately returns NULL, setting the flag C<RESTART_UTF8>.
+(This action is encapsulated using the macro C<REQUIRE_UTF8>.) This restart
+request is propagated up the call chain in a similar fashion, until it is
+"caught" in C<Perl_re_op_compile()>, which marks the pattern as containing
+Unicode, and restarts the sizing pass. It is also possible for constructions
+within run-time code blocks to turn out to need Unicode representation.,
+which is signalled by C<S_compile_runtime_code()> returning false to
+C<Perl_re_op_compile()>.
+
+The restart was previously implemented using a C<longjmp> in C<regatom()>
+back to a C<setjmp> in C<Perl_re_op_compile()>, but this proved to be
+problematic as the latter is a large function containing many automatic
+variables, which interact badly with the emergent control flow of C<setjmp>.
+
+=head3 Debug Output
+
+In the 5.9.x development version of perl you can C<< use re Debug => 'PARSE' >>
+to see some trace information about the parse process. We will start with some
+simple patterns and build up to more complex patterns.
+
+So when we parse C</foo/> we see something like the following table. The
+left shows what is being parsed, and the number indicates where the next regop
+would go. The stuff on the right is the trace output of the graph. The
+names are chosen to be short to make it less dense on the screen. 'tsdy'
+is a special form of C<regtail()> which does some extra analysis.
+
+ >foo<             1    reg
+                          brnc
+                            piec
+                              atom
+ ><                4      tsdy~ EXACT <foo> (EXACT) (1)
+                              ~ attach to END (3) offset to 2
+
+The resulting program then looks like:
+
+   1: EXACT <foo>(3)
+   3: END(0)
+
+As you can see, even though we parsed out a branch and a piece, it was ultimately
+only an atom. The final program shows us how things work. We have an C<EXACT> regop,
+followed by an C<END> regop. The number in parens indicates where the C<regnext> of
+the node goes. The C<regnext> of an C<END> regop is unused, as C<END> regops mean
+we have successfully matched. The number on the left indicates the position of
+the regop in the regnode array.
+
+Now let's try a harder pattern. We will add a quantifier, so now we have the pattern
+C</foo+/>. We will see that C<regbranch()> calls C<regpiece()> twice.
+
+ >foo+<            1    reg
+                          brnc
+                            piec
+                              atom
+ >o+<              3        piec
+                              atom
+ ><                6        tail~ EXACT <fo> (1)
+                   7      tsdy~ EXACT <fo> (EXACT) (1)
+                              ~ PLUS (END) (3)
+                              ~ attach to END (6) offset to 3
+
+And we end up with the program:
+
+   1: EXACT <fo>(3)
+   3: PLUS(6)
+   4:   EXACT <o>(0)
+   6: END(0)
+
+Now we have a special case. The C<EXACT> regop has a C<regnext> of 0. This is
+because if it matches it should try to match itself again. The C<PLUS> regop
+handles the actual failure of the C<EXACT> regop and acts appropriately (going
+to regnode 6 if the C<EXACT> matched at least once, or failing if it didn't).
+
+Now for something much more complex: C</x(?:foo*|b[a][rR])(foo|bar)$/>
+
+ >x(?:foo*|b...    1    reg
+                          brnc
+                            piec
+                              atom
+ >(?:foo*|b[...    3        piec
+                              atom
+ >?:foo*|b[a...                 reg
+ >foo*|b[a][...                   brnc
+                                    piec
+                                      atom
+ >o*|b[a][rR...    5                piec
+                                      atom
+ >|b[a][rR])...    8                tail~ EXACT <fo> (3)
+ >b[a][rR])(...    9              brnc
+                  10                piec
+                                      atom
+ >[a][rR])(f...   12                piec
+                                      atom
+ >a][rR])(fo...                         clas
+ >[rR])(foo|...   14                tail~ EXACT <b> (10)
+                                    piec
+                                      atom
+ >rR])(foo|b...                         clas
+ >)(foo|bar)...   25                tail~ EXACT <a> (12)
+                                  tail~ BRANCH (3)
+                  26              tsdy~ BRANCH (END) (9)
+                                      ~ attach to TAIL (25) offset to 16
+                                  tsdy~ EXACT <fo> (EXACT) (4)
+                                      ~ STAR (END) (6)
+                                      ~ attach to TAIL (25) offset to 19
+                                  tsdy~ EXACT <b> (EXACT) (10)
+                                      ~ EXACT <a> (EXACT) (12)
+                                      ~ ANYOF[Rr] (END) (14)
+                                      ~ attach to TAIL (25) offset to 11
+ >(foo|bar)$<               tail~ EXACT <x> (1)
+                            piec
+                              atom
+ >foo|bar)$<                    reg
+                  28              brnc
+                                    piec
+                                      atom
+ >|bar)$<         31              tail~ OPEN1 (26)
+ >bar)$<                          brnc
+                  32                piec
+                                      atom
+ >)$<             34              tail~ BRANCH (28)
+                  36              tsdy~ BRANCH (END) (31)
+                                     ~ attach to CLOSE1 (34) offset to 3
+                                  tsdy~ EXACT <foo> (EXACT) (29)
+                                     ~ attach to CLOSE1 (34) offset to 5
+                                  tsdy~ EXACT <bar> (EXACT) (32)
+                                     ~ attach to CLOSE1 (34) offset to 2
+ >$<                        tail~ BRANCH (3)
+                                ~ BRANCH (9)
+                                ~ TAIL (25)
+                            piec
+                              atom
+ ><               37        tail~ OPEN1 (26)
+                                ~ BRANCH (28)
+                                ~ BRANCH (31)
+                                ~ CLOSE1 (34)
+                  38      tsdy~ EXACT <x> (EXACT) (1)
+                              ~ BRANCH (END) (3)
+                              ~ BRANCH (END) (9)
+                              ~ TAIL (END) (25)
+                              ~ OPEN1 (END) (26)
+                              ~ BRANCH (END) (28)
+                              ~ BRANCH (END) (31)
+                              ~ CLOSE1 (END) (34)
+                              ~ EOL (END) (36)
+                              ~ attach to END (37) offset to 1
+
+Resulting in the program
+
+   1: EXACT <x>(3)
+   3: BRANCH(9)
+   4:   EXACT <fo>(6)
+   6:   STAR(26)
+   7:     EXACT <o>(0)
+   9: BRANCH(25)
+  10:   EXACT <ba>(14)
+  12:   OPTIMIZED (2 nodes)
+  14:   ANYOF[Rr](26)
+  25: TAIL(26)
+  26: OPEN1(28)
+  28:   TRIE-EXACT(34)
+        [StS:1 Wds:2 Cs:6 Uq:5 #Sts:7 Mn:3 Mx:3 Stcls:bf]
+          <foo>
+          <bar>
+  30:   OPTIMIZED (4 nodes)
+  34: CLOSE1(36)
+  36: EOL(37)
+  37: END(0)
+
+Here we can see a much more complex program, with various optimisations in
+play. At regnode 10 we see an example where a character class with only
+one character in it was turned into an C<EXACT> node. We can also see where
+an entire alternation was turned into a C<TRIE-EXACT> node. As a consequence,
+some of the regnodes have been marked as optimised away. We can see that
+the C<$> symbol has been converted into an C<EOL> regop, a special piece of
+code that looks for C<\n> or the end of the string.
+
+The next pointer for C<BRANCH>es is interesting in that it points at where
+execution should go if the branch fails. When executing, if the engine
+tries to traverse from a branch to a C<regnext> that isn't a branch then
+the engine will know that the entire set of branches has failed.
+
+=head3 Peep-hole Optimisation and Analysis
+
+The regular expression engine can be a weighty tool to wield. On long
+strings and complex patterns it can end up having to do a lot of work
+to find a match, and even more to decide that no match is possible.
+Consider a situation like the following pattern.
+
+   'ababababababababababab' =~ /(a|b)*z/
+
+The C<(a|b)*> part can match at every char in the string, and then fail
+every time because there is no C<z> in the string. So obviously we can
+avoid using the regex engine unless there is a C<z> in the string.
+Likewise in a pattern like:
+
+   /foo(\w+)bar/
+
+In this case we know that the string must contain a C<foo> which must be
+followed by C<bar>. We can use Fast Boyer-Moore matching as implemented
+in C<fbm_instr()> to find the location of these strings. If they don't exist
+then we don't need to resort to the much more expensive regex engine.
+Even better, if they do exist then we can use their positions to
+reduce the search space that the regex engine needs to cover to determine
+if the entire pattern matches.
+
+There are various aspects of the pattern that can be used to facilitate
+optimisations along these lines:
+
+=over 5
+
+=item * anchored fixed strings
+
+=item * floating fixed strings
+
+=item * minimum and maximum length requirements
+
+=item * start class
+
+=item * Beginning/End of line positions
+
+=back
+
+Another form of optimisation that can occur is the post-parse "peep-hole"
+optimisation, where inefficient constructs are replaced by more efficient
+constructs. The C<TAIL> regops which are used during parsing to mark the end
+of branches and the end of groups are examples of this. These regops are used
+as place-holders during construction and "always match" so they can be
+"optimised away" by making the things that point to the C<TAIL> point to the
+thing that C<TAIL> points to, thus "skipping" the node.
+
+Another optimisation that can occur is that of "C<EXACT> merging" which is
+where two consecutive C<EXACT> nodes are merged into a single
+regop. An even more aggressive form of this is that a branch
+sequence of the form C<EXACT BRANCH ... EXACT> can be converted into a
+C<TRIE-EXACT> regop.
+
+All of this occurs in the routine C<study_chunk()> which uses a special
+structure C<scan_data_t> to store the analysis that it has performed, and
+does the "peep-hole" optimisations as it goes.
+
+The code involved in C<study_chunk()> is extremely cryptic. Be careful. :-)
+
+=head2 Execution
+
+Execution of a regex generally involves two phases, the first being
+finding the start point in the string where we should match from,
+and the second being running the regop interpreter.
+
+If we can tell that there is no valid start point then we don't bother running
+interpreter at all. Likewise, if we know from the analysis phase that we
+cannot detect a short-cut to the start position, we go straight to the
+interpreter.
+
+The two entry points are C<re_intuit_start()> and C<pregexec()>. These routines
+have a somewhat incestuous relationship with overlap between their functions,
+and C<pregexec()> may even call C<re_intuit_start()> on its own. Nevertheless
+other parts of the perl source code may call into either, or both.
+
+Execution of the interpreter itself used to be recursive, but thanks to the
+efforts of Dave Mitchell in the 5.9.x development track, that has changed: now an
+internal stack is maintained on the heap and the routine is fully
+iterative. This can make it tricky as the code is quite conservative
+about what state it stores, with the result that two consecutive lines in the
+code can actually be running in totally different contexts due to the
+simulated recursion.
+
+=head3 Start position and no-match optimisations
+
+C<re_intuit_start()> is responsible for handling start points and no-match
+optimisations as determined by the results of the analysis done by
+C<study_chunk()> (and described in L<Peep-hole Optimisation and Analysis>).
+
+The basic structure of this routine is to try to find the start- and/or
+end-points of where the pattern could match, and to ensure that the string
+is long enough to match the pattern. It tries to use more efficient
+methods over less efficient methods and may involve considerable
+cross-checking of constraints to find the place in the string that matches.
+For instance it may try to determine that a given fixed string must be
+not only present but a certain number of chars before the end of the
+string, or whatever.
+
+It calls several other routines, such as C<fbm_instr()> which does
+Fast Boyer Moore matching and C<find_byclass()> which is responsible for
+finding the start using the first mandatory regop in the program.
+
+When the optimisation criteria have been satisfied, C<reg_try()> is called
+to perform the match.
+
+=head3 Program execution
+
+C<pregexec()> is the main entry point for running a regex. It contains
+support for initialising the regex interpreter's state, running
+C<re_intuit_start()> if needed, and running the interpreter on the string
+from various start positions as needed. When it is necessary to use
+the regex interpreter C<pregexec()> calls C<regtry()>.
+
+C<regtry()> is the entry point into the regex interpreter. It expects
+as arguments a pointer to a C<regmatch_info> structure and a pointer to
+a string.  It returns an integer 1 for success and a 0 for failure.
+It is basically a set-up wrapper around C<regmatch()>.
+
+C<regmatch> is the main "recursive loop" of the interpreter. It is
+basically a giant switch statement that implements a state machine, where
+the possible states are the regops themselves, plus a number of additional
+intermediate and failure states. A few of the states are implemented as
+subroutines but the bulk are inline code.
+
+=head1 MISCELLANEOUS
+
+=head2 Unicode and Localisation Support
+
+When dealing with strings containing characters that cannot be represented
+using an eight-bit character set, perl uses an internal representation
+that is a permissive version of Unicode's UTF-8 encoding[2]. This uses single
+bytes to represent characters from the ASCII character set, and sequences
+of two or more bytes for all other characters. (See L<perlunitut>
+for more information about the relationship between UTF-8 and perl's
+encoding, utf8. The difference isn't important for this discussion.)
+
+No matter how you look at it, Unicode support is going to be a pain in a
+regex engine. Tricks that might be fine when you have 256 possible
+characters often won't scale to handle the size of the UTF-8 character
+set.  Things you can take for granted with ASCII may not be true with
+Unicode. For instance, in ASCII, it is safe to assume that
+C<sizeof(char1) == sizeof(char2)>, but in UTF-8 it isn't. Unicode case folding is
+vastly more complex than the simple rules of ASCII, and even when not
+using Unicode but only localised single byte encodings, things can get
+tricky (for example, B<LATIN SMALL LETTER SHARP S> (U+00DF, E<szlig>)
+should match 'SS' in localised case-insensitive matching).
+
+Making things worse is that UTF-8 support was a later addition to the
+regex engine (as it was to perl) and this necessarily  made things a lot
+more complicated. Obviously it is easier to design a regex engine with
+Unicode support in mind from the beginning than it is to retrofit it to
+one that wasn't.
+
+Nearly all regops that involve looking at the input string have
+two cases, one for UTF-8, and one not. In fact, it's often more complex
+than that, as the pattern may be UTF-8 as well.
+
+Care must be taken when making changes to make sure that you handle
+UTF-8 properly, both at compile time and at execution time, including
+when the string and pattern are mismatched.
+
+The following comment in F<regcomp.h> gives an example of exactly how
+tricky this can be:
+
+    Two problematic code points in Unicode casefolding of EXACT nodes:
+
+    U+0390 - GREEK SMALL LETTER IOTA WITH DIALYTIKA AND TONOS
+    U+03B0 - GREEK SMALL LETTER UPSILON WITH DIALYTIKA AND TONOS
+
+    which casefold to
+
+    Unicode                      UTF-8
+
+    U+03B9 U+0308 U+0301         0xCE 0xB9 0xCC 0x88 0xCC 0x81
+    U+03C5 U+0308 U+0301         0xCF 0x85 0xCC 0x88 0xCC 0x81
+
+    This means that in case-insensitive matching (or "loose matching",
+    as Unicode calls it), an EXACTF of length six (the UTF-8 encoded
+    byte length of the above casefolded versions) can match a target
+    string of length two (the byte length of UTF-8 encoded U+0390 or
+    U+03B0). This would rather mess up the minimum length computation.
+
+    What we'll do is to look for the tail four bytes, and then peek
+    at the preceding two bytes to see whether we need to decrease
+    the minimum length by four (six minus two).
+
+    Thanks to the design of UTF-8, there cannot be false matches:
+    A sequence of valid UTF-8 bytes cannot be a subsequence of
+    another valid sequence of UTF-8 bytes.
+
+
+=head2 Base Structures
+
+The C<regexp> structure described in L<perlreapi> is common to all
+regex engines. Two of its fields that are intended for the private use
+of the regex engine that compiled the pattern. These are the
+C<intflags> and pprivate members. The C<pprivate> is a void pointer to
+an arbitrary structure whose use and management is the responsibility
+of the compiling engine. perl will never modify either of these
+values. In the case of the stock engine the structure pointed to by
+C<pprivate> is called C<regexp_internal>.
+
+Its C<pprivate> and C<intflags> fields contain data
+specific to each engine.
+
+There are two structures used to store a compiled regular expression.
+One, the C<regexp> structure described in L<perlreapi> is populated by
+the engine currently being. used and some of its fields read by perl to
+implement things such as the stringification of C<qr//>.
+
+
+The other structure is pointed to be the C<regexp> struct's
+C<pprivate> and is in addition to C<intflags> in the same struct
+considered to be the property of the regex engine which compiled the
+regular expression;
+
+The regexp structure contains all the data that perl needs to be aware of
+to properly work with the regular expression. It includes data about
+optimisations that perl can use to determine if the regex engine should
+really be used, and various other control info that is needed to properly
+execute patterns in various contexts such as is the pattern anchored in
+some way, or what flags were used during the compile, or whether the
+program contains special constructs that perl needs to be aware of.
+
+In addition it contains two fields that are intended for the private use
+of the regex engine that compiled the pattern. These are the C<intflags>
+and pprivate members. The C<pprivate> is a void pointer to an arbitrary
+structure whose use and management is the responsibility of the compiling
+engine. perl will never modify either of these values.
+
+As mentioned earlier, in the case of the default engines, the C<pprivate>
+will be a pointer to a regexp_internal structure which holds the compiled
+program and any additional data that is private to the regex engine
+implementation.
+
+=head3 Perl's C<pprivate> structure
+
+The following structure is used as the C<pprivate> struct by perl's
+regex engine. Since it is specific to perl it is only of curiosity
+value to other engine implementations.
+
+ typedef struct regexp_internal {
+         U32 *offsets;           /* offset annotations 20001228 MJD
+                                  * data about mapping the program to
+                                  * the string*/
+         regnode *regstclass;    /* Optional startclass as identified or
+                                  * constructed by the optimiser */
+         struct reg_data *data;  /* Additional miscellaneous data used
+                                  * by the program.  Used to make it
+                                  * easier to clone and free arbitrary
+                                  * data that the regops need. Often the
+                                  * ARG field of a regop is an index
+                                  * into this structure */
+         regnode program[1];     /* Unwarranted chumminess with
+                                  * compiler. */
+ } regexp_internal;
+
+=over 5
+
+=item C<offsets>
+
+Offsets holds a mapping of offset in the C<program>
+to offset in the C<precomp> string. This is only used by ActiveState's
+visual regex debugger.
+
+=item C<regstclass>
+
+Special regop that is used by C<re_intuit_start()> to check if a pattern
+can match at a certain position. For instance if the regex engine knows
+that the pattern must start with a 'Z' then it can scan the string until
+it finds one and then launch the regex engine from there. The routine
+that handles this is called C<find_by_class()>. Sometimes this field
+points at a regop embedded in the program, and sometimes it points at
+an independent synthetic regop that has been constructed by the optimiser.
+
+=item C<data>
+
+This field points at a reg_data structure, which is defined as follows
+
+    struct reg_data {
+        U32 count;
+        U8 *what;
+        void* data[1];
+    };
+
+Эта структура используется для обработки данных структур, которые обработчик регулярных выражений
+необходимо обрабатывать специально во время клонирования или бесплатные операции на скомпилированный
+продукт. Каждый элемент в массиве данных имеет соответствующий элемент
+какой массив. Во время компиляции regops, нужны специальные структуры хранится
+будет добавить элемент каждого массива с помощью процедуры add_data() и затем хранить
+Индекс в regop.
+This structure is used for handling data structures that the regex engine
+needs to handle specially during a clone or free operation on the compiled
+product. Each element in the data array has a corresponding element in the
+what array. During compilation regops that need special structures stored
+will add an element to each array using the add_data() routine and then store
+the index in the regop.
+
+=item C<программа>
+
+Скомпилированная программа. Встроенным в структуру так всей структуры может
+рассматривается как один BLOB-объект.
+
+=back
+
+=head1 СМОТРИТЕ ТАКЖЕ
+
+L<perlreapi>
+
+L<perlre>
+
+L<perlunitut>
+
+=head1 АВТОР
+
+Ив Ортон, 2006.
+
+С выдержками из Perl, вкладом и предложениями от
+Рональда Д. Кимболла, Дэйва Митчелла, Доминика Динлопа, Марка Джейсона Доминуса,
+Стефана Макканта и Давида Ландгрена.
+
+=head1 ЛИЦЕНЗИЯ
+
+На тех же условиях, что и Perl.
+
+=head1 ССЫЛКИ
+
+[1] L<http://perl.plover.com/Rx/paper/>
+
+[2] L<http://www.unicode.org>
+
+[3] L<https://www.facebook.com/nmishin/posts/10207602636370625?pnref=story>
+
+=head1 ПЕРЕВОДЧИКИ
+ 
+=over
+ 
+=item * Николай Мишин C<< <mishin@cpan.org> >>
+
+=item * Андрей Шитов
+
+=item * Дмитрий Анимимов
+
+=item * Андрей Варлашкин
+
+=item * Кирилл Флоренский
+
+=back

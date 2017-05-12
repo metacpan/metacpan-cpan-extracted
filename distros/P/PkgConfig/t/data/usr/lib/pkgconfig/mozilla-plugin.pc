@@ -1,0 +1,9 @@
+prefix=/usr
+sdkdir=/usr/lib/xulrunner-devel-1.9.1
+includedir=/usr/include/xulrunner-1.9.1
+
+Name: Mozilla Plug-In API
+Description: Mozilla Plug-In API
+Version: 1.9.1.16
+Requires: nspr
+Cflags: -I${includedir}/stable -DXP_UNIX -DOJI

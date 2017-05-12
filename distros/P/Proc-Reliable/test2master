@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+# test program for Proc::Reliable.
+# runs the 'test2slave' program as a subprocess.
+
+my($PROGRAMDIR, $PROGRAMFILE);  # dir/file executed by user
+BEGIN {
+    ($PROGRAMDIR = $0) =~ s/([^\/]+)$//;
+    $PROGRAMFILE = $1;
+    if($PROGRAMDIR eq "") {$PROGRAMDIR = "."}
+
+    unshift(@INC, $PROGRAMDIR);  # add program dir to module search path
+}
+
+
+use Proc::Reliable;
+
+$SIG{PIPE} = sub { print(STDERR "\n<SIGPIPE>\n"); };
+
+$myproc = Proc::Reliable->new(input_chunking => 1);
+for($i=0; $i<7; $i++) {
+    $stdin .= "test$i\n";
+}
+
+print("stdin size: ",length($stdin),"\n");
+($out, $err, $status, $msg) = $myproc->run("./test2slave", $stdin);
+
+print("OUT:\n$out\n");
+print("ERR:\n$err\n");
+print("STATUS:\n$status\n");
+print("MSG:\n$msg\n");
+

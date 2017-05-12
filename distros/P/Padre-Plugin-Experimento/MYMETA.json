@@ -1,0 +1,46 @@
+{
+   "abstract" : "Provides experimental features to Padre",
+   "author" : [
+      "Ahmad M. Zawawi <ahmad.zawawi@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Padre-Plugin-Experimento",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Locale::Msgfmt" : "0.15",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::String" : "1.08",
+            "Modern::Perl" : "1.20120130",
+            "Padre" : "0.94",
+            "Wx::Scintilla" : "0.3801"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}

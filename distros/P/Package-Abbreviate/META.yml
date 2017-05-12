@@ -1,0 +1,24 @@
+---
+abstract: 'shorten package names'
+author:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+  Test::UseAllModules: '0.10'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Package-Abbreviate
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  repository: https://github.com/charsbar/Package-Abbreviate
+version: '0.01'

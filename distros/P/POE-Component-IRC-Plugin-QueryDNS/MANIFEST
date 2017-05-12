@@ -1,0 +1,15 @@
+Changes
+Changes.old
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/synopsis.pl
+lib/POE/Component/IRC/Plugin/QueryDNS.pm
+t/00-compile.t
+t/01_querydns.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

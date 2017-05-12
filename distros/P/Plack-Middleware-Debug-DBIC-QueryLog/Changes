@@ -1,0 +1,43 @@
+Revision history for Perl extension Plack-Middleware-Debug-DBIC-QueryLog
+
+0.09    30 November 2011
+        - Updated incorrect documentation on how to hook up a querylog to
+          a DBIC schema instance.
+
+0.08    27 November 2011
+        - Fix for busted Makefile.PL in previous release
+
+0.07    26 November 2011
+        - (Broken Makefile.PL, removed from CPAN)
+        - Added missing dependencies
+        - use the interface to the PSGI querylog exposed by
+          Plack::Middleware::DBIC::QueryLog rather than build our own
+
+0.06    13 January 2011
+        - Update copyright info
+        - Fixed memory leak issue
+        - Increased minimum Moo requirement
+
+0.05    22 December 2010
+        - fixed some pod errors
+        - updated docs
+        - notices if you have an incompatible Catalyst::TraitFor::Model::DBIC::Schema::QueryLog::AdoptPlack
+          and says you should update.
+
+0.04    09 December 2010
+        - use Moo
+        - better tests
+        - example application
+        - documented above changes
+
+0.03    18 November 2010
+        - using SQL::Abstract:Tree for neater appearance
+        - and more css and html tweaks
+
+0.02    20 October 2010
+        - style changes
+        - correct title error
+        - get ready for the SQL::Abstract::Tree stuff
+
+0.01    9 September 2010
+        - First release, buyer beware.

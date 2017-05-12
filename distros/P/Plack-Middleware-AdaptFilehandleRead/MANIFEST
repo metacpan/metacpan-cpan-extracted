@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.mkdn
+dist.ini
+lib/Plack/Middleware/AdaptFilehandleRead.pm
+lib/Plack/Middleware/AdaptFilehandleRead/Proxy.pm
+t/basic.t
+t/proxy.t

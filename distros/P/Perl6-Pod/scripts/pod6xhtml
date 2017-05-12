@@ -1,0 +1,188 @@
+#!/usr/bin/perl
+#===============================================================================
+#
+#         FILE: pod6xhtml
+#
+#  DESCRIPTION:  save Perl 6 pod as pod6xhtml
+#       AUTHOR:  Aliaksandr P. Zahatski ,  <zag@cpan.org>
+#===============================================================================
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use IO::File;
+use open ':utf8';
+
+use Perl6::Pod::To::XHTML;
+my ( $help, $man, $doctype, $no_head, $css_file,  @libs, $command );
+$no_head = 0;
+my %opt = ( help => \$help, man => \$man, );
+GetOptions(
+    \%opt, 'help|?', 'man',
+    'doctype|t=s' => \$doctype,
+    'nohead|nh' => \$no_head,
+    'css=s' => \$css_file,
+    'module|M=s' =>\@libs,
+    'command|c=s' => \$command
+) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+my %args = (  doctype => $doctype );
+
+
+my $infile = shift;
+my $in_fd;
+if ($infile) {
+    $in_fd = new IO::File:: "< $infile" or die "$infile: $!";
+} elsif ( $command ) {
+    $in_fd = \"=begin pod \n$command\n=end pod";
+}
+else {
+    $in_fd = \*STDIN;
+}
+
+my $text;
+{
+    local $/;
+    $text = <$in_fd>
+}
+
+utf8::decode( $text ) unless utf8::is_utf8( $text );
+
+my $renderer = new Perl6::Pod::To::XHTML::
+  writer  => new Perl6::Pod::Writer( out => \*STDOUT,  escape=>'html');
+
+#parse tree
+    use Perl6::Pod::Utl;
+    my $tree = Perl6::Pod::Utl::parse_pod(ref($text) ? $$text : $text, default_pod=>1) || die "can't parse Pod";
+
+my $w = $renderer->w;
+unless ( $no_head ) {
+    #get title
+    my $title = "DEFAULT TITLE (need =TITLE or =NAME block)";
+    my @blocks = @{$tree};
+    while (my $node = shift @blocks ) {
+     if ( $node->name eq 'pod' ) {
+         push @blocks, @{ $node->childs } if $node->childs;
+         next;
+     }
+     if ($node->name =~ /^(TITLE|NAME)$/) {
+        $title = $node->childs->[0]->{content}->[0];
+        last;
+     }
+    }
+    my $css = '';
+    $w->raw('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">');
+    $w->raw(<<"HEAD");
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+    <title>${title}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+HEAD
+    if ($css_file) {
+     $w->raw(qq! <link rel="stylesheet" href="$css_file" type="text/css" />!);
+    }
+$w->raw(q!<meta name="description" content="DESC" />
+    </head>
+    <body>!);
+ }
+
+ $renderer->start_write;
+ $renderer->write($tree);
+ $renderer->end_write;
+
+unless ($no_head ) {
+    $w->raw('</body></html>')
+}
+
+
+##include libs ( see $Perl6::Pod::Lib::PERL6POD )
+#if (@libs) {
+#    my $use  = join "\n" => map { "=use $_" } @libs;
+#    $use .= "\n";
+#    $p->_parse_chunk(\$use);
+#
+
+
+exit;
+
+=head1 NAME
+
+    pod6xhtml  - convert Perl pod to XHTML
+
+=head1 SYNOPSIS
+
+  pod6xhtml < somefile.pod > somefile.xhtml
+  pod6xhtml somefile.pod  > somefile.xhtml
+  pod6xhtml -css main.css somefile.pod  > somefile.xhtml
+  pod6xhtml -M Perl6::Pod::Lib somefile.pod  > somefile.xhtml
+
+   options:
+    -doctype|t - set doc type . Default html;
+    -add_head|ah - If this option is set , pod6xhtml will emit a DOCTYPE as the first line of output.
+    -css <css_file> - add stylesheet link to head of xhtml file.
+    -module|M - add extensions for Pod ( could use multiple )
+    -command|c - set one line Pod text for processing (instead from STDIN)
+    -help  - print help message
+    -man   - print man page
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits
+
+=item B<-man>
+
+Prints manual page and exits
+
+=item B<-doctype>, B<-t>
+
+Set docbook type . Default html
+
+=item B<-no_head>,B<-nh>
+
+If this option is set , pod6xhtml will don't headers
+
+=item B<-css> cssfile 
+
+Add stylesheet link to head of xhtml file
+
+=item B<-M> package name 
+
+Add Perl6::Pod plugins
+
+=item B<-command>, B<-c>
+
+Set one line Pod text for processing (instead from STDIN).
+For example:
+
+  pod6xhtml -nh -t div -M Perl6::Pod::Lib -c '=Include test.pod' > out.xhtm
+
+=back
+
+=head1 DESCRIPTION
+
+  B<pod6xhtml>  - convert Perl pod to XHTML
+
+=head1 EXAMPLE
+
+  pod6xhtml < somefile.pod > somefile.xhtml
+
+
+=head1 AUTHOR
+
+Zahatski Aliaksandr, E<lt>zag@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009-2015 by Zahatski Aliaksandr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut
+

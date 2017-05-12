@@ -1,0 +1,127 @@
+#!perl -w
+
+# Copyright 2011 Kevin Ryde
+
+# This file is part of Pod-MinimumVersion.
+#
+# Pod-MinimumVersion is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# Pod-MinimumVersion is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Pod-MinimumVersion.  If not, see <http://www.gnu.org/licenses/>.
+
+use 5.004;
+use strict;
+use Getopt::Long;
+use Pod::MinimumVersion;
+
+use vars '$VERSION';
+$VERSION = 50;
+
+my $want_stdin = 1;
+my $want_all = 1;
+
+Getopt::Long::Configure ('no_ignore_case');
+Getopt::Long::GetOptions
+  ('all' => \$want_all,
+   'help|?'  => sub {
+     print <<'HERE';
+pod-minimumversion [--options] [filename...]
+  --help         print this help
+  --version      print program version number
+HERE
+     $want_stdin = 0;
+   },
+   'version' => sub {
+     print "pod-minimumversion $VERSION\n";
+     $want_stdin = 0;
+   },
+   '<>' => sub {
+     my ($arg) = @_;
+     report (filename => "$arg");
+     $want_stdin = 0;
+   },
+  )
+  or exit 1;
+
+if ($want_stdin) {
+  report (filehandle => \*STDIN, filename => '(stdin)');
+}
+
+sub report {
+  my $pmv = Pod::MinimumVersion->new (@_);
+  foreach my $report ($want_all
+                      ? $pmv->reports
+                      : $pmv->minimum_report) {
+    print "$report->{'filename'}:$report->{'linenum'}: $report->{'version'} for $report->{'why'}\n";
+  }
+}
+
+exit 0;
+
+__END__
+
+=for stopwords Ryde Pod-MinimumVersion pod-minimumversion
+
+=head1 NAME
+
+pod-minimumversion -- report minimum Perl version for given POD
+
+=head1 SYNOPSIS
+
+ pod-minimumversion [--options] [filename...]
+
+=head1 DESCRIPTION
+
+C<pod-minimumversion> reports the minimum Perl version required to process
+POD directives in given files, or the standard input if no files are given.
+
+=head1 OPTIONS
+
+=over
+
+=item --help, -?
+
+Print a summary of the options.
+
+=item --version
+
+Print the program version number.
+
+=back
+
+=head1 SEE ALSO
+
+L<Pod::MinimumVersion>
+
+L<perlver(1)>, L<Perl::MinimumVersion>
+
+=head1 HOME PAGE
+
+http://user42.tuxfamily.org/pod-minimumversion/index.html
+
+=head1 LICENSE
+
+Pod-MinimumVersion is Copyright 2009, 2010, 2011 Kevin Ryde
+
+Pod-MinimumVersion is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 3, or (at your option) any later
+version.
+
+Pod-MinimumVersion is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+You should have received a copy of the GNU General Public License along with
+Pod-MinimumVersion.  If not, see <http://www.gnu.org/licenses/>.
+
+=cut

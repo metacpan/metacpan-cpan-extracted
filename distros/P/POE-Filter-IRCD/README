@@ -1,0 +1,105 @@
+NAME
+    POE::Filter::IRCD - A POE-based parser for the IRC protocol
+
+VERSION
+    version 2.44
+
+SYNOPSIS
+        use POE::Filter::IRCD;
+
+        my $filter = POE::Filter::IRCD->new( debug => 1, colonify => 0 );
+        my $arrayref = $filter->get( [ $hashref ] );
+        my $arrayref2 = $filter->put( $arrayref );
+
+        use POE qw(Filter::Stackable Filter::Line Filter::IRCD);
+
+        my ($filter) = POE::Filter::Stackable->new();
+        $filter->push( POE::Filter::Line->new( InputRegexp => '\015?\012', OutputLiteral => "\015\012" ),
+                       POE::Filter::IRCD->new(), );
+
+DESCRIPTION
+    POE::Filter::IRCD provides a convenient way of parsing and creating IRC
+    protocol lines. It provides the parsing engine for
+    POE::Component::Server::IRC and POE::Component::IRC. A standalone
+    version exists as Parse::IRC.
+
+CONSTRUCTOR
+    "new"
+        Creates a new POE::Filter::IRCD object. Takes two optional
+        arguments:
+
+          'debug', which will print all lines received to STDERR;
+          'colonify', set to 1 to force the filter to always colonify the last param passed in a put(),
+                      default is 0. See below for more detail.
+
+METHODS
+    "get_one_start"
+    "get_one"
+    "get_pending"
+    "get"
+        Takes an arrayref which is contains lines of IRC formatted input.
+        Returns an arrayref of hashrefs which represents the lines. The
+        hashref contains the following fields:
+
+          prefix
+          command
+          params ( this is an arrayref )
+          raw_line
+
+        For example, if the filter receives the following line, the
+        following hashref is produced:
+
+          LINE: ':moo.server.net 001 lamebot :Welcome to the IRC network lamebot'
+
+          HASHREF: {
+                        prefix   => ':moo.server.net',
+                        command  => '001',
+                        params   => [ 'lamebot', 'Welcome to the IRC network lamebot' ],
+                        raw_line => ':moo.server.net 001 lamebot :Welcome to the IRC network lamebot',
+                   }
+
+    "put"
+        Takes an arrayref containing hashrefs of IRC data and returns an
+        arrayref containing IRC formatted lines. Optionally, one can specify
+        'colonify' to override the global colonification option. eg.
+
+          $hashref = {
+                        command => 'PRIVMSG',
+                        prefix => 'FooBar!foobar@foobar.com',
+                        params => [ '#foobar', 'boo!' ],
+                        colonify => 1, # Override the global colonify option for this record only.
+                      };
+
+          $filter->put( [ $hashref ] );
+
+    "clone"
+        Makes a copy of the filter, and clears the copy's buffer.
+
+    "debug"
+        With a true or false argument, enables or disables debug output
+        respectively. Without an argument the behaviour is to toggle the
+        debug status.
+
+SEE ALSO
+    POE
+
+    POE::Filter
+
+    POE::Filter::Stackable
+
+    POE::Component::Server::IRC
+
+    POE::Component::IRC
+
+    Parse::IRC
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Chris Williams and Jonathan
+    Steinert.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

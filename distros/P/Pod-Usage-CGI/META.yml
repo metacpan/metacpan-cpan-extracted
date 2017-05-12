@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Pod-Usage-CGI
+version:      1.010
+version_from: lib/Pod/Usage/CGI.pm
+installdirs:  site
+requires:
+    CGI:                           0
+    Log::Trace:                    0
+    Pod::Xhtml:                    1.41
+    Test::Assertions:              0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.25

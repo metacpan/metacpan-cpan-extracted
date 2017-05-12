@@ -1,0 +1,21 @@
+Revision history for Perl extension Path::Class::File::Stat.
+
+0.01  Thu Sep 21 13:41:48 2006
+	- original version; created by h2xs 1.23 with options
+		-XA -n Path::Class::File::Stat
+
+0.02    Fri Sep 22 09:44:36 CDT 2006
+    - turned internal $debug flag off (doh!)
+    - added some POD comparison to File::Modified
+    - changed() now returns old stat() object and restat()'s automatically
+    - fixed SYNOPSIS to reflect new changed() behaviour
+
+0.03    22 Dec 2010
+    - added use_md5() feature.
+
+0.04    11 June 2013
+    * refactor to use both md5 *and* stat() call in changed()
+    * add actual tests
+
+0.05    11 June 2013
+    * admin release only: move to github, redo Makefile.PL, refactor tests and internals

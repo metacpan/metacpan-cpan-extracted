@@ -1,0 +1,9 @@
+Revision history for Plack-Middleware-EasyHooks
+
+0.02    2012-12-13
+        - Added correct dependencies
+        - Enhanced test suite
+
+0.01    2012-12-12
+        First version, released on an unsuspecting world.
+

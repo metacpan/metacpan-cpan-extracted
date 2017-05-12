@@ -1,0 +1,23 @@
+xpcse client installation:
+
+   1. copy "xpcse" and "run-mailcap" to a directory included in $PATH
+      (if you install PApp, it will be copied automatically to $Config{sitebin}
+       so this step should not be needed in this case)
+   2. Add the "xpcse" helper application to your browser.
+      Mozilla:
+        Edit->Preferences->Helper Applications,
+          Name: xpcse
+          Extension: xpcse
+          MIME-Type: application/x-xpcse
+      Netscape:
+        Add
+          application/x-xpcse;xpcse "%s"
+        to ~/.mailcap
+   3. create a ~/mailcap.xpcse (private) or "/etc/mailcap.xpcse" (system-wide)
+      to fork applications that have a specific content-type. xpcse first
+      reads your .mailcap.xcpse and then your .mailcap.
+      Example (edit-method is used)
+      
+      image/gif; /usr/bin/gimp "%s"; edit=/usr/bin/gimp "%s"
+
+It should work now.

@@ -1,0 +1,26 @@
+---
+abstract: 'Inter-Kernel Communication for POE'
+author:
+  - 'Philip Gwyn <gwyn -at- cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.92, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-IKC
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dump: '1'
+  Devel::Size: '0.77'
+  POE: '1.311'
+  Scalar::Util: '1'
+  Test::More: '0.6'
+version: '0.2402'

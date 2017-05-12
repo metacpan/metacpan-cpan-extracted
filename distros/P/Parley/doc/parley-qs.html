@@ -1,0 +1,69 @@
+<html>
+    <head>
+        <title>Parley - Quick Start Guide</title>
+    </head>
+
+    <body>
+        <h1>Parley - Quick Start Guide</h1>
+
+        <p>This is a quick guide to getting Parley running on a machine using
+        the Catalyst testing/development server.</p>
+
+        <p><b>NOTE</b> v0.51 has missing dependencies in Makefile.PL. Save
+        yourself some pain and fetch v0.52 or later.</p>
+
+        <h2>Initial Installation</h2>
+        <blockquote><code>
+        mkdir -p ~/development<br />
+        cd ~/development<br />
+<br />
+        wget http://download.berlios.de/parley/Parley-0.52.tar.gz<br />
+        tar -zxvf Parley-0.52.tar.gz<br />
+        cd Parley-0.52/<br />
+<br />
+        perl Makefile.PL<br />
+        <em># install missing dependencies</em><br />
+        <em># 'sudo make' may work here</em><br />
+<br />
+        <em># you may need to tweak pg_hba.conf</em><br />
+        <em>## local   all  parley                trust</em><br />
+        <em>## host&nbsp;   all  parley  127.0.0.1/32  trust</em><br />
+        sudo -u postgres createuser -A -d parley<br />
+        createdb -U parley -E UTF8 parley<br />
+        psql -U parley -d parley -f db/parley.psql<br />
+        </code></blockquote>
+
+        <h2>Configuring</h2>
+
+        <p>If you're running Parley out of the box it should Just Work.</p>
+
+        <p>One problem can sometimes be with the database connection.
+        If you find you can't connect, make sure you've correctly configured
+        <code>pg_hba.conf</code> and that the <code>Model::ParleyDB</code>
+        section in <code>parley.yml</code> appears sane for your setup.</p>
+
+        <h2>Running the Server</h2>
+
+        <blockquote><code>
+        ./script/parley_server.pl
+        </code></blockquote>
+
+        <h2>Ubuntu Users</h2>
+
+        <p>There are others, but these are the key packages I'd recommend installing
+        with "sudo aptitude install ..."
+
+        <ul>
+            <li>libdbi-perl</li>
+            <li>libdbd-pg-perl</li>
+            <li>libfile-copy-recursive-perl</li>
+            <li>libtemplate-perl</li>
+            <li>libtemplate-timer-perl</li>
+            <li>libdatetime-perl</li>
+            <li>libdatetime-format-pg-perl</li>
+            <li>libdatetime-timezone-perl</li>
+            <li>liblist-moreutils-perl</li>
+        </ul>
+        </p>
+    </body>
+</html>

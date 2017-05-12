@@ -1,0 +1,1381 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html
+	PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US"><head><title>Stallion</title>
+</head><body>
+<br>
+<script type="text/javascript">
+//Stallion
+//Author Arthur Goldstein
+//Copyright 2008-9
+//Filename stallion.html
+//Version 0.1
+//Contact: arthur@acm.org
+//Translation of perl code, Parse::Stallion version 0.50,
+// see www.cpan.org for details
+//See below for examples, all leaf regexp's need the 'g' option.
+
+//Acknowledgements: Thanks to Alejandro Barrero, Seyhan Ersoy, Joon Sung
+
+
+//var trace_on;
+
+//var trace_window = window.open("","tracer","width=300,height=300,scrollbars=1,resizable=1");
+//trace_window.document.open()
+
+function type_of (a){
+  var x = typeof(a);
+  if (x == 'string') {return 'string'};
+  if (x == 'number') {return 'number'};
+  if (x == 'boolean') {return 'boolean'};
+  if (x == 'undefined') {return 'undefined'};
+  if (x == 'object') {
+    if (a == null) { return 'null'};
+    var y = a.constructor.toString();
+    if (y.match(/string/i)) {return 'string'};
+    if (y.match(/array/i)) {return 'array'};
+    if (y.match(/object/i)) {return 'object'};
+    if (y.match(/number/i)) {return 'number'};
+    if (y.match(/boolean/i)) {return 'boolean'};
+    if (y.match(/regexp/i)) {return 'regexp'};
+    return 'unknown object';
+  }
+  else if (x === 'function') {
+    var y = a.constructor.toString();
+    if (y.match(/Function/)) {return 'function'};
+    if (y.match(/regexp/i)) {return 'regexp'};
+    return 'unknown function';
+  }
+  return 'unknown type';
+}
+
+function stringify (tree, parameters){
+  if (parameters == null) {
+    parameters =  new Object();
+  }
+  var values = parameters.values || ['steps','name','parse_match'];
+  var spaces = parameters.spaces || '';
+  var value_separator = '|';
+  if (parameters.value_separator != null) {
+    value_separator = parameters.value_separator;
+  }
+  var line = spaces;
+
+  for (var i = 0; i < values.length; i++) {
+    var value = values[i];
+    if (tree[value] != null) {
+      line += tree[value] + value_separator;
+    }
+    else {
+      line += value_separator;
+    }
+  }
+  if (tree.parent != null) {
+    line += '| parent step : ' + tree.parent.steps;
+  }
+
+  line += "<br>\n";
+  for (var i = 0; i < tree.children.length; i++) {
+    var child = tree.children[i];
+    parameters.spaces = spaces + ' &nbsp';
+    line += stringify(child, parameters);
+  }
+
+  return line;
+}
+
+function OR()
+{
+  var to_return = new Array();
+  to_return[0] = 'OR';
+  for (var i=0;i<arguments.length;i++) {
+    to_return[1+i] = arguments[i];
+  }
+  return to_return;
+}
+
+function O(sub_in) {
+  return OR(sub_in);
+}
+
+function A()
+{
+  var to_return = new Array();
+  to_return[0] = 'AND';
+  for (var i=0;i<arguments.length;i++) {
+    to_return[1+i] = arguments[i];
+  }
+  return to_return;
+}
+
+function AND()
+{
+  var to_return = new Array();
+  to_return[0] = 'AND';
+  for (var i=0;i<arguments.length;i++) {
+    to_return[1+i] = arguments[i];
+  }
+  return to_return;
+}
+
+function multiple(args_in) {
+  var p = new Array();
+  var q = new Array();
+  for (var i=0;i<args_in.length;i++) {
+    var arg = args_in[i];
+    if ((type_of(arg) === 'array') &&
+     (arg[0] == 'EVAL' || arg[0] == 'UNEVAL')) {
+      q.push(arg);
+    }
+    else if (arg == 'match_min_first') {
+      var mmf = ['MATCH_MIN_FIRST'];
+      q.push(mmf);
+    }
+    else {
+      p.push(arg);
+    }
+  }
+  var to_return = ['MULTIPLE'];
+  if (p.length == 1) {
+    return to_return.concat(0, 0, [p[0]], q);
+  }
+  if (p.length == 3) {
+    return to_return.concat(p[1], p[2], [p[0]], q);
+  }
+  alert ('Malformed Multiple' + dump_value(args_in));
+  x.die();
+}
+
+function MULTIPLE() {
+  return multiple(arguments);
+}
+
+function M() {
+  return multiple(arguments);
+}
+
+function LEAF() {
+  var to_return = new Array();
+  to_return[0] = 'LEAF';
+  for (var i=0;i<arguments.length;i++) {
+    to_return[1+i] = arguments[i];
+  }
+  return to_return;
+}
+
+function L(sub_in) {
+  return LEAF(sub_in);
+}
+
+function UNEVALUATION(sub_in) {
+  var to_return = new Array();
+  to_return[0] = 'UNEVAL';
+  to_return[1] = sub_in;
+  return to_return;
+}
+
+function U(sub_in) {
+  return UNEVALUATION(sub_in);
+}
+
+function EVALUATION(sub_in) {
+  var to_return = new Array();
+  to_return[0] = 'EVAL';
+  to_return[1] = sub_in;
+  return to_return;
+}
+
+function E(sub_in) {
+  return EVALUATION(sub_in);
+}
+
+function dump_value(the_item, prefix)
+{
+  var to_return;
+  to_return = '';
+  var to = type_of(the_item);
+  if (prefix == null) {prefix = ''};
+  if (to === "string") {
+    to_return = prefix + "String: '" + the_item + "'";
+  }
+  else if (to === "number" ) {
+    to_return = prefix + "Number: " + the_item;
+  }
+  else if (to === "regexp") {
+    to_return = prefix + "RegExp: " + the_item.source;
+  }
+  else {
+    var i;
+    to_return = prefix + to + " Object: ";
+    for (var i in the_item) {
+      to_return = to_return + " <br>\n " + prefix + "Object element " + i + ":  " + dump_value(the_item[i], prefix + " ")
+    }
+  }
+  return to_return;
+}
+
+var x_parser = new Object();
+x_parser["rule"] = new Object();
+x_parser["unique_name_counter"] = new Object();
+var default_unevaluation_routine = new Function ("", "");
+
+function update_count(rule_type, rule_counts, subrule_name, subrule_count) {
+  subrule_count = subrule_count || 0;
+  if (rule_counts["rule_count"] == null) {
+    rule_counts["rule_count"] = new Object();
+  }
+  if (rule_type === 'MULTIPLE') {
+    rule_counts["rule_count"][subrule_name] = 2;
+//trace_window.document.write("multiple update to rule " + subrule_name);
+  }
+  else if (rule_type === 'AND') {
+    if (rule_counts["rule_count"][subrule_name] == null) {
+      rule_counts["rule_count"][subrule_name] = subrule_count;
+    }
+    else {
+      rule_counts["rule_count"][subrule_name] += subrule_count;
+    }
+//trace_window.document.write("and update to rule " + subrule_name + " src " + subrule_count + " rc " + rule_counts["rule_count"][subrule_name]);
+  }
+  else if (rule_type === 'OR' &&
+   ((rule_counts["rule_count"][subrule_name] == null) ||
+    (subrule_count > rule_counts["rule_count"][subrule_name]))) {
+    rule_counts["rule_count"][subrule_name] = subrule_count;
+//trace_window.document.write("or update to rule " + subrule_name);
+  }
+  else {
+//trace_window.document.write("no update to rule " + subrule_name);
+  }
+//trace_window.document.write("<br>");
+}
+
+function add_rule(parser, parameters) {
+  var rule_name = parameters["rule_name"] || croak ("Empty rule name");
+  var rule = parameters["rule_definition"];
+//if (trace_on) {trace_window.document.write('<br>add rule ' + rule_name);}
+//alert('add rule params ' + dump_value(parameters));
+  if (parser["rule"][rule_name]) {
+    alert ("Rule " + rule_name + " already exists");
+    x.die();
+    return;
+  }
+  parser["rule"][rule_name] = new Object();
+  parser["rule"][rule_name]["subrule_list"] = new Array();
+  parser["rule"][rule_name]["parsing_unevaluation"] =
+   default_unevaluation_routine;
+  if (type_of(rule) === "regexp") {
+    rule = LEAF(rule);
+  }
+  else if (type_of(rule) == 'string') {
+    rule = AND(rule);
+  }
+
+  if (type_of(rule) != 'array') {
+    alert ('Bad format of rule ' + type_of(rule) + ' and ' + typeof(rule) + ', cannot create ' + rule_name);
+    alert ('constructor string is ' +  a.constructor.toString() + ' rule type is ' + type_of(rule));
+    x.die();
+  }
+
+  var separator = parser.separator;
+  var base_rule = rule_name;
+  if (parameters["generated_name"]) {
+    parser["rule"][rule_name]["generated"] = 1;
+    base_rule = parameters["generated_name"];
+  }
+  else {
+    parser["unique_name_counter"][base_rule] = 0;
+    var result = rule_name.indexOf(separator);
+    if (result != -1 && result != null) {
+      alert ('Separator found in rule name, not allowed. rule: ' + rule_name);
+      alert (' result is ' + dump_value(result));
+      x.die();
+    }
+  }
+  var default_alias = '';
+  var copy_of_rule = new Array();
+  for (var i=0; i<rule.length; i++) {
+    var sub_rule = rule[i];
+    if (type_of(sub_rule)==='array') {
+      if (sub_rule[0] === 'EVAL') {
+        parser["rule"][rule_name]["parsing_evaluation"] = sub_rule[1];
+      }
+      else if (sub_rule[0] === 'UNEVAL') {
+        parser["rule"][rule_name]["parsing_unevaluation"] = sub_rule[1];
+        parser.do_evaluation_in_parsing = 1;
+      }
+      else if (sub_rule[0] === 'MATCH_MIN_FIRST') {
+        parser["rule"][rule_name]["minimize_children"] = 1;
+        parser["any_minimize_children"] = 1;
+      }
+      else if (sub_rule[0] === 'LEAF_DISPLAY') {
+        parser["rule"][rule_name]["leaf_display"] = sub_rule[1];
+      }
+      else if (sub_rule[0] === 'USE_PARSE_MATCH') {
+        parser["rule"][rule_name]["use_parse_match"] = 1;
+      }
+      else {
+        copy_of_rule.push(sub_rule);
+      }
+    }
+    else {
+      copy_of_rule.push(sub_rule);
+    }
+  }
+  var rule_type = parser["rule"][rule_name]["rule_type"] = copy_of_rule.shift();
+  parser["rule"][rule_name]["leaf_rule"] = 0;
+  parser["rule"][rule_name]["or_rule"] = 0;
+  parser["rule"][rule_name]["and_rule"] = 0;
+  if (rule_type ==='LEAF') {
+//if (trace_on) {trace_window.document.write('<br>leaf rule ' + rule_name);}
+    parser["rule"][rule_name]["leaf_info"] = copy_of_rule.shift();
+    if (!(parser["rule"][rule_name]["leaf_info"].global)) {
+      alert ('Regexp must be global, not on rule: ' + rule_name);
+      x.die();
+    }
+    parser["rule"][rule_name]["use_parse_match"] = 1;
+    parser["rule"][rule_name]["leaf_rule"] = 1;
+  }
+  else {
+//if (trace_on) {trace_window.document.write('<br>copy of rule ' + rule_name + ' rule type ' + rule_type + ' now '+dump_value(copy_of_rule));}
+    if (rule_type === 'AND') {
+      parser["rule"][rule_name]["and_rule"] = 1;
+    }
+    else if (rule_type === 'OR') {
+      parser["rule"][rule_name]["or_rule"] = 1;
+    }
+    else if (rule_type === 'MULTIPLE') {
+      var minimum_child =
+       parser["rule"][rule_name]["minimum_child"] = copy_of_rule.shift();
+      var maximum_child =
+       parser["rule"][rule_name]["maximum_child"] = copy_of_rule.shift();
+      if ((maximum_child && (minimum_child > maximum_child))
+       || (minimum_child < 0))
+       {
+        alert("Illegal bound(s) " + minimum_child + " and " +
+         maximum_child + " on " + rule_name);
+        x.die();
+      }
+    }
+    else {
+      alert("Bad rule type " + rule_type + " on rule " + rule_name);
+      x.die();
+    }
+    for (var j = 0; j < copy_of_rule.length; j++) {
+//if (trace_on) {trace_window.document.write('j is ' + j);}
+      var current_rule = copy_of_rule[j];
+      var alias = null;
+      var name = null;
+      if (type_of(current_rule) == 'object') {
+        var x = 0;
+        for (var k in current_rule) {alias = k; if (x++) { break}};
+        if (x != 1) {
+          alert("Not just one object parameter in rule of rule " + rule_name);
+          x.die();
+        }
+        current_rule = current_rule[alias];
+      }
+  //alert ("count j " + j + " type of " + type_of(current_rule));
+      if (type_of(current_rule) === 'string') {
+        if (alias == null) {
+          alias = current_rule;
+        }
+        name = current_rule;
+      }
+      else if (type_of(current_rule) === 'regexp') {
+        if (alias == null) {
+          alias = default_alias;
+        }
+        name = base_rule + separator +
+         ++parser["unique_name_counter"][base_rule];
+
+        var new_parameters = new Object();
+        new_parameters["rule_name"] = name;
+        new_parameters["rule_definition"] = LEAF(current_rule);
+        new_parameters["generated_name"] = base_rule;
+        
+        add_rule(parser, new_parameters);
+      }
+      else if (type_of(current_rule) === 'array') {
+        name = base_rule + separator +
+         ++parser["unique_name_counter"][base_rule];
+//if (trace_on) {trace_window.document.write('<br> creating ' + name);}
+        var new_parameters = new Object();
+        new_parameters["rule_name"] = name;
+        new_parameters["rule_definition"] = current_rule;
+        new_parameters["generated_name"] = base_rule;
+        add_rule(parser, new_parameters);
+        if (alias == null) {
+           if (parser["rule"][name]["rule_type"] === 'LEAF' ||
+            parser["rule"][name]["parsing_evaluation"] != null) {
+             alias = '';
+          }
+        }
+//if (trace_on) {trace_window.document.write('<br> done creating ' + name);}
+      }
+//if (trace_on) {trace_window.document.write('j now is ' + j);}
+      var subrule = new Object();
+      subrule.alias = alias;
+      subrule.name = name;
+//if (trace_on) {trace_window.document.write('<br> adding to ' + rule_name + ' a ' + alias + ' n ' +name);}
+      parser["rule"][rule_name]["subrule_list"].push(subrule);
+    }
+    parser["rule"][rule_name]["subrule_list_count"] =
+     parser["rule"][rule_name]["subrule_list"].length;
+//if (trace_on) {trace_window.document.write('<br> slc now ' + parser["rule"][rule_name]["subrule_list_count"]);}
+    for (var k=0; k<parser["rule"][rule_name]["subrule_list"].length; k++) {
+      var subrule = parser["rule"][rule_name]["subrule_list"][k];
+//if (trace_on) {trace_window.document.write('<br>k is ' + k );}
+//if (trace_on) {trace_window.document.write('srn ' + subrule.name + ' andsra ' + subrule.alias);}
+      if (subrule.alias) {
+        update_count(rule_type, parser["rule"][rule_name], subrule.alias, 1);
+//if (trace_on) {trace_window.document.write('<br>upconen ' + rule_name + dump_value(parser["rule"][rule_name]["rule_count"]));}
+      }
+      else {
+        for (var sub_alias in parser["rule"][subrule.name]["rule_count"]) {
+          update_count(rule_type, parser["rule"][rule_name], sub_alias,
+           parser["rule"][subrule.name]["rule_count"][sub_alias]);
+//if (trace_on) {trace_window.document.write('<br> subalias ' + sub_alias);}
+        }
+//if (trace_on) {trace_window.document.write('<br>saupconen ' + rule_name + dump_value(parser["rule"][rule_name]["rule_count"]));}
+      }
+    }
+//alert('kcrn ' + rule_name + " rule type " + rule_type);
+//alert('upcrn ' + rule_name + dump_value(parser["rule"][rule_name]["rule_count"]) + "<br>");
+//if (trace_on) {trace_window.document.write('<br> ii ' + rule_name);}
+//if (trace_on) {trace_window.document.write('<br>upcrn ' + rule_name + ' ' +dump_value(parser["rule"][rule_name]["subrule_list"]));}
+    parser["rule"][rule_name]["sub_rule_name"] =
+      parser["rule"][rule_name]["subrule_list"][0]["name"];
+    parser["rule"][rule_name]["sub_rule_alias"] =
+      parser["rule"][rule_name]["subrule_list"][0]["alias"];
+  }
+//if (trace_on) {trace_window.document.write('<br>done with rule ' + rule_name);}
+}
+
+
+function make_sure_all_rules_reachable (parser, start_rule) {
+  var rules_to_check = [start_rule];
+  var rules_checked = new Object();
+  rules_checked[start_rule] = 1;
+  var rule_to_check;
+  while (rule_to_check = rules_to_check.shift()) {
+    if (parser["rule"][rule_to_check] &&
+     parser["rule"][rule_to_check]["subrule_list"]) {
+      for (var i = 0;
+       i < parser["rule"][rule_to_check]["subrule_list"].length; i++) {
+        var rule_name_alias = parser["rule"][rule_to_check]["subrule_list"][i];
+        var rule_name = rule_name_alias.name;
+        if (rules_checked[rule_name] == null) {
+          rules_checked[rule_name] = 1;
+          rules_to_check.push(rule_name);
+        }
+      }
+    }
+  }
+  var unreachable = new Array();
+  for (var rule in parser.rule) {
+    if (rules_checked[rule] == null) {
+      unreachable.push("No path to rule " + rule);
+    }
+  }
+  return unreachable;
+}
+
+function make_sure_all_names_covered(parser) {
+  var list = new Array();
+  for (var rule in parser.rule) {
+    if (parser["rule"][rule]["subrule_list"]) {
+      for (var i=0; i<parser["rule"][rule]["subrule_list"].length; i++) {
+        var rule_name_alias = parser["rule"][rule]["subrule_list"][i];
+        var rule_name = rule_name_alias.name;
+        if (parser["rule"][rule_name] == null) {
+          list.push("Rule " + rule + " missing subrule " + rule_name);
+        }
+      }
+    }
+  }
+  return list;
+}
+
+
+
+function new_unevaluate_tree_node (parser, parameters) {
+  var node = parameters.node;
+  var object = parameters.object;
+  var rules_details = parser.rule;
+  var rule_name = node.name;
+  var subroutine_to_run = rules_details[rule_name]["parsing_unevaluation"];
+
+  subroutine_to_run(node.parameters, object);
+
+  var parent = node.parent;
+  if (parent) {
+    if (node.parse_match != null &&
+     (type_of(node.parse_match) == 'string')) {
+      var node_length = node.parse_match.length;
+      var parent_length = parent.parse_match.length;
+      parent.parse_match = parent.parse_match.slice(0,
+       parent_length - node_length);
+    }
+
+    if (node.passed_params) {
+      var param;
+      for (param in node.passed_params) {
+        var count = node["passed_params"][param];
+        if (count) {
+          var param_length = parent["parameters"][param].length;
+          if (count > param_length) {
+            alert("Unevaluation parameter miscount; routine in rule "
+             + rule_name);
+            x.die;
+          }
+          splice(parent["parameters"][param], 0, param_length - count);
+        }
+        else {
+          delete parent["parameters"][param];
+        }
+      }
+      delete node[passed_params];
+    }
+  }
+}
+
+function new_evaluate_tree_node(parser, parameters) {
+  var nodes = parameters.nodes;
+  var object = parameters.object;
+  var current_value = parameters.current_value;
+  var rules_details = parser.rule;
+  var results = new Object();
+
+  for (var i=0; i<nodes.length; i++) {
+    var node = nodes[i];
+    node.passed_params = new Object();
+    var rule_name = node.name;
+    var params_to_eval = node.parameters;
+    var rule = rules_details[rule_name];
+    var subroutine_to_run = rule.parsing_evaluation;
+    var alias = node.alias;
+
+//if (trace_on) {trace_window.document.write('<br> <br> rule name ' + rule_name + ' node step: ' + node.steps + ' pm ' + node.parse_match + ' alias: ' + node.alias);}
+    if (rule.use_parse_match) {
+//if (trace_on) {trace_window.document.write(' using parse match');}
+      params_to_eval = node.re_parse_match;
+      if (params_to_eval == null) {
+        params_to_eval = node.parse_match;
+      }
+    }
+
+    var cv;
+    if (subroutine_to_run) {
+//if (trace_on) {trace_window.document.write('sr '+subroutine_to_run + ' params to eval ' + dump_value(params_to_eval) + ' endparamstoeval');}
+      results = subroutine_to_run(params_to_eval, object,
+       current_value);
+      cv = results;
+//trace_window.document.write('results '+dump_value(results));
+    }
+    else {
+      var x;
+      var the_one;
+      if (type_of(params_to_eval) == 'object') {
+        for (var k in params_to_eval) {the_one = k; if (x++) { break}};
+      }
+      if (rule.generated) { // (|| $self->{do_not_compress_eval}) {}
+//if (trace_on) {trace_window.document.write('<br> rule generated');}
+        cv = params_to_eval;
+      }
+      else if ((type_of(params_to_eval) == 'object') && (x == 1)) {
+        cv = params_to_eval[the_one];
+      }
+      else if (params_to_eval != null) {
+        cv = params_to_eval;
+      }
+      else {
+        cv = '';
+      }
+    }
+    node.computed_value = cv;
+
+    var parent;
+    if (parent = node.parent) {
+      var parent_name = parent.name;
+//if (trace_on) {trace_window.document.write('<br> parent name is ' + parent_name + ' parent step: ' + parent.steps + ' cv is ' + dump_value(cv) + ' endcv');}
+      if (node.parse_match != null) {
+        if (parent.parse_match != null) {
+          parent.parse_match += node.parse_match;
+        }
+        else {
+          parent.parse_match = node.parse_match;
+        }
+      }
+    
+      if (parent["parameters"] == null) {
+        parent["parameters"] = new Object();
+      }
+      if (alias != null) {
+        if (rules_details[parent_name]["rule_count"][alias] > 1) {
+          if (parent["parameters"][alias] == null) {
+            parent["parameters"][alias] = new Array();
+          }
+          parent["parameters"][alias].push(cv);
+          node["passed_params"][alias] = 1;
+//if (trace_on) {trace_window.document.write('<br>onto alias ' + alias + ' pushed '+dump_value(cv));}
+        }
+        else {
+          parent["parameters"][alias] = cv;
+          node["passed_params"][alias] = 0;
+//if (trace_on) {trace_window.document.write('<br>set '+dump_value(cv) + ' alias ' + alias);}
+        }
+      }
+      else { // !defined alias
+        for (var key in cv) {
+          if (rules_details[rule_name]["rule_count"][key] > 1) {
+            if (type_of(cv[key]) === "array") {
+              if (parent["parameters"][key] == null) {
+                parent["parameters"][key] = new Array();
+              }
+//if (trace_on) {trace_window.document.write('<br> before pushconcat '+dump_value(parent["parameters"][key]));}
+              for (var l = 0; l< cv[key].length; l++) {
+                parent["parameters"][key].push(cv[key][l]); // (push array xyzzy)
+              }
+//if (trace_on) {trace_window.document.write('<br> after pushconcat '+dump_value(parent["parameters"][key]));}
+              node["passed_params"][key] = cv[key].length;
+//if (trace_on) {trace_window.document.write('<br> pushconcat ' + key + ' key set '+dump_value(cv[key]));}
+            }
+          }
+          else if (rules_details[parent_name]["rule_count"][key] > 1) {
+            if (parent["parameters"][key] == null) {
+              parent["parameters"][key] = new Array();
+            }
+            parent["parameters"][key].push(cv[key]); // (push value xyzzy)
+            node["passed_params"][key] = 1;
+//if (trace_on) {trace_window.document.write('<br>push key ' + key + ' noset '+dump_value(cv[key]));}
+          }
+          else {
+            parent["parameters"][key] = cv[key]; // (set value xyzzy)
+            node["passed_params"][key] = 0;
+//if (trace_on) {trace_window.document.write('<br>nopush key ' + key + ' noset '+ dump_value(cv[key]));}
+          }
+        }
+//if (trace_on) {trace_window.document.write('<br>done passing up generated subrule keys');}
+      }
+    }
+//trace_window.document.write("<br>");
+  }
+
+  return results;
+}
+
+function parse (parser, parameters) {
+  var start_node = parser.start_rule;
+  var max_steps = parameters.max_steps || 100000;
+  var results = parameters.parse_info;
+  if (results == null) {
+    results = new Object;
+  }
+  var no_max_steps = 0;
+  if (max_steps < 0) {
+    no_max_steps = 1;
+    max_steps = 1000000;
+  }
+  var rule = parser.rule;
+  var bottom_up_left_to_right = new Array();
+
+  var first_alias = 'b' + parser.separator + parser.separator;
+  var object_being_parsed = parameters.parse_this;
+  var parse_trace = parameters.parse_trace;
+  var object_length = object_being_parsed.length;
+
+  var current_value = 0;
+
+  var tree = new Object;
+  tree.name = start_node;
+  tree.steps = 0;
+  tree.alias = first_alias;
+  tree.value_when_entered = current_value;
+  tree.children = new Array();
+  tree.child_count = 0;
+  tree.ventured = new Object();
+  tree.passed_params = new Object();
+
+  var current_node = tree;
+  var moving_forward = 1;
+  var moving_down = 1;
+  var steps = 0;
+  var active_rules_values = new Object();
+  var message = 'Start of Parse';
+  var new_rule_name;
+  var new_alias;
+  var do_evaluation_in_parsing = parser.do_evaluation_in_parsing;
+
+  var node_completed = 0;
+  var create_child = 0;
+  var move_back_to_child = 0;
+  var remove_node = 0;
+  var blocked = new Object();
+  var new_rule;
+  var trace = parameters.trace;
+
+  while ((steps < max_steps) && (current_node != null)) {
+    while ((current_node != null) && (steps++ < max_steps)) {
+      var current_node_name = current_node.name;
+      var current_rule = rule[current_node_name];
+//if (trace_on) {trace_window.document.write ('cnn '+current_node_name, " cv ",current_value);}
+//if (trace_on) {trace_window.document.write ('  ');}
+//if (trace_on) {trace_window.document.write (' md ' + moving_down + ' mf ' + moving_forward);}
+//if (trace_on) {trace_window.document.write (' <br> ');}
+//if (trace_on) {trace_window.document.write (' <br> ' + stringify(tree));}
+
+      if (active_rules_values[current_node_name] == null) {
+        active_rules_values[current_node_name] = new Object();
+      }
+
+      if (parse_trace) {
+        var parent_step = 0;
+        if (current_node.parent != null) {
+          parent_step = current_node.parent.steps;
+        }
+        var new_trace = new Object;
+        new_trace.rule_name = current_node_name;
+        new_trace.moving_forward = moving_forward;
+        new_trace.moving_down = moving_down;
+        new_trace.value = current_value;
+        new_trace.node_creation_step = current_node.steps;
+        new_trace.parent_node_creation_step = parent_step;
+        new_trace.message = current_node_name;
+        new_trace.tree = stringify(tree);
+        parse_trace.push(new_trace);
+        message = '';
+      }
+      if (moving_forward) {
+        if (current_rule.or_rule) {
+          if (moving_down) {
+            new_rule = current_rule["subrule_list"][0];
+            new_rule_name = new_rule.name;
+            new_alias = new_rule.alias;
+            current_node.or_child_number = 0;
+            create_child = 1;
+          }
+          else {
+            node_completed = 1;
+          }
+        }
+        else if (current_rule.and_rule) {
+          if (current_node.child_count == current_rule.subrule_list_count) {
+            node_completed = 1;
+          }
+          else {
+            new_rule = current_rule["subrule_list"][current_node.child_count];
+            new_rule_name = new_rule.name;
+            new_alias = new_rule.alias;
+            create_child = 1;
+          }
+        }
+        else if (current_rule.minimize_children &&
+         current_rule.minimum_child <= current_node.child_count) {
+          node_completed = 1;
+        }
+        else if (current_rule.maximum_child &&
+         current_rule.maximum_child == current_node.child_count) {
+          node_completed = 1;
+        }
+        else {
+          new_rule_name = current_rule.sub_rule_name;
+          new_alias = current_rule.sub_alias;
+          create_child = 1;
+        }
+      }
+      else { // !moving_forward
+        if (current_rule.leaf_rule) {
+          current_value = current_node.value_when_entered;
+          remove_node = 1;
+        }
+        else if (current_rule.or_rule) {
+//if (trace_on) {trace_window.document.write('<br> or cn is ' + current_node.or_child_number + ' cr is ' + current_node_name + ' slc is ' + current_rule.subrule_list_count);}
+          if (moving_down) {
+            move_back_to_child = 1;
+          }
+          else if (++current_node.or_child_number <
+           current_rule.subrule_list_count) {
+//if (trace_on) {trace_window.document.write ('<br>crsl ' + dump_value(current_rule.subrule_list));}
+              new_rule = current_rule["subrule_list"][
+               current_node.or_child_number];
+              new_rule_name = new_rule.name;
+              new_alias = new_rule.alias;
+              create_child = 1;
+          }
+          else {
+            remove_node = 1;
+          }
+        }
+        else if (current_rule.and_rule) {
+          if (current_node.child_count == 0) {
+            remove_node = 1;
+          }
+          else {
+            move_back_to_child = 1;
+          }
+        }
+        else if (
+         !current_rule.minimize_children && !moving_down &&
+         (!current_rule.minimum_child ||
+         (current_rule.minimum_child <= current_node.child_count))) {
+          node_completed = 1;
+        }
+        else if (
+         current_rule.minimize_children && moving_down &&
+         (!current_rule.maximum_child ||
+         (current_rule.maximum_child > current_node.child_count))) {
+          new_rule_name = current_rule.sub_rule_name;
+          new_alias = current_rule.sub_alias;
+          create_child = 1;
+        }
+        else if (current_node.child_count) {
+          move_back_to_child = 1;
+        }
+        else {
+          remove_node = 1;
+        }
+      }
+
+      if (create_child) {
+        create_child = 0;
+//if (trace_on) {trace_window.document.write('<br> ccnrn ' + new_rule_name + ' xx<br>');}
+        var new_rule = rule[new_rule_name];
+        if (active_rules_values[new_rule_name] == null) {
+          active_rules_values[new_rule_name] = new Object();
+        }
+        if (blocked[new_rule_name] && blocked[new_rule_name][current_value]) {
+          message = "Rule " + new_rule_name + " blocked before on value " +
+            current_value;
+          moving_forward = 0;
+          moving_down = 0;
+        }
+        else if (new_rule.leaf_rule) {
+          var previous_value = current_value;
+          var xmatch = '';
+          var re_match = null;
+          var x = new_rule.leaf_info;
+          var found;
+          x.lastIndex = current_value;
+//if (trace_on) {trace_window.document.write("<br> x is ",dump_value(x));}
+          if (found = x.exec(object_being_parsed)) {
+              xmatch = RegExp.lastMatch;
+              re_match = found[1];
+//alert ('found is ' + dump_value(found));
+//if (trace_on) {trace_window.document.write("<br> string found but is it a match? " + xmatch + " pv " + previous_value + " li " + x.lastIndex);}
+              if (xmatch == null) {xmatch = ''};
+              if (previous_value + xmatch.length != x.lastIndex) {
+                moving_forward = 0;
+                moving_down = 0;
+                message += 'Leaf not matched';
+              }
+              else {
+                current_value = x.lastIndex;
+//if (trace_on) {trace_window.document.write("<br> match on ",xmatch, " ");}
+                var new_node = new Object();
+                new_node.name = new_rule_name;
+                new_node.alias = new_alias;
+                new_node.steps = steps;
+                new_node.parent = current_node;
+                new_node.value_when_entered = previous_value;
+                new_node.children = new Array();
+                new_node.child_count = 0;
+                new_node.parse_match = xmatch;
+                new_node.re_parse_match = re_match;
+                new_node.ventured = new Object();
+                new_node.passed_params = new Object();
+                current_node.children.push(new_node);
+                current_node.child_count++;
+                message += 'Leaf matched';
+                current_node = new_node;
+                node_completed = 1;
+            }
+          }
+          else {
+            moving_forward = 0;
+            moving_down = 0;
+            message += 'Leaf not matched';
+          }
+        }
+        else if (active_rules_values[new_rule_name][current_value]++) {
+           alert (new_rule_name + " duplicated in parse on same string");
+           x.die();
+        }
+        else {
+          message = "Creating child " + new_rule_name +
+           " for node created on step " + current_node.steps;
+          var new_node = new Object();
+          new_node.name = new_rule_name;
+          new_node.alias = new_alias;
+          new_node.steps = steps;
+          new_node.parent = current_node;
+          new_node.value_when_entered = current_value;
+          new_node.children = new Array();
+          new_node.child_count = 0;
+          new_node.ventured = new Object();
+          current_node.children.push(new_node);
+          current_node.child_count++;
+          moving_forward = 1;
+          moving_down = 1;
+          current_node = new_node;
+        }
+      }
+
+      if (node_completed) {
+        node_completed = 0;
+//trace_window.document.write(' <br> nccn ' + current_node.name);
+        if (current_node["ventured"][current_value]++) {
+          message += " Already ventured beyond this node at value";
+          moving_forward = 0;
+          moving_down = 1;
+        }
+        else {
+          var reject = null;
+          if (do_evaluation_in_parsing) {
+            var parameters = new Object();
+            parameters.nodes = [current_node];
+            parameters.object = object_being_parsed;
+            parameters.current_value = current_value;
+            new_evaluate_tree_node(parser, parameters);
+            reject = parameters.reject;
+          }
+          if (reject != null) {
+            moving_forward = 0;
+            moving_down = 1;
+            message += " Node rejected";
+          }
+          else {
+            bottom_up_left_to_right.push(current_node);
+            current_node.beyond = 1;
+            message += " Completed node created on step " + current_node.steps;
+            moving_down = 0;
+            moving_forward = 1;
+            current_node = current_node.parent;
+          }
+        }
+      }
+      else if (move_back_to_child) {
+        move_back_to_child = 0;
+        message += " Backtracking to child";
+        moving_down = 1;
+        moving_forward = 0;
+        bottom_up_left_to_right.pop();
+        current_node =
+         current_node["children"][current_node.child_count-1];
+        if (do_evaluation_in_parsing) {
+          var uneval_parameters = new Object();
+          uneval_parameters.node = current_node;
+          uneval_parameters.object = object_being_parsed;
+          new_unevaluate_tree_node(parser, uneval_parameters);
+        }
+      }
+      else if (remove_node) {
+        remove_node = 0;
+        moving_forward = 0;
+        moving_down = 0;
+        if (!current_node.beyond) {
+          if (!blocked[current_node_name]) {
+            blocked[current_node_name] = new Object();
+          }
+          blocked[current_node_name][current_value] = 1;
+        }
+        delete active_rules_values[current_node_name][current_value];
+        message += " Removed node created on step " + current_node.steps;
+        current_node = current_node.parent;
+        if (current_node) {
+          current_node.children.pop();
+          current_node.child_count--;
+        }
+      }
+    }
+    if (!current_node && moving_forward && (current_value != object_length)) {
+       moving_forward = 0;
+       moving_down = 1;
+       current_node = tree;
+       message += ' . At top of tree but did not parse entire object';
+       bottom_up_left_to_right.pop();
+    }
+    if (no_max_steps && steps == max_steps) {
+      steps = max_steps + 1000000;
+    }
+  }
+  if (steps >= max_steps) {
+    alert('Not enough steps to complete parse, max set at ' + max_steps);
+    x.die();
+  }
+  results.start_rule = start_node;
+  results.number_of_steps = steps;
+//trace_window.document.write(" <br> steps " + steps);
+  results.tree = tree;
+  results.bottom_up_left_to_right = bottom_up_left_to_right;
+  if (moving_forward) {
+    results.parse_succeeded = 1;
+//trace_window.document.write (" <br> mf and steps says ps <br> " );
+  }
+  else {
+//trace_window.document.write (" <br> mf and steps says NO ps <BR>" );
+    results.parse_succeeded = 0;
+  }
+  return results;
+}
+
+function parse_and_evaluate (parser, parse_this, parameters) {
+//alert ('in pand e');
+//if (trace_on) {trace_window.document.write('<br> in p and e');}
+  if (parameters == null) {
+    parameters = new Object();
+  }
+  parameters.parse_this = parse_this;
+//  my $parser = new Parse::Stallion::Parser($self);
+//  if (wantarray) {
+//    $parser->{trace} = 1; xyzzy
+//  }
+  var parser_results = parse(parser, parameters);
+  if (parameters.return_results) {
+    parameters.results = parser_results;
+  }
+  var to_return;
+  if (!parser_results.parse_succeeded) {
+//trace_window.document.write("<br>parse did not succeed<br>");
+    to_return = null;
+  }
+else {
+//trace_window.document.write("<br>parse succeed<br>");
+  var parameters = new Object();
+  parameters.nodes = parser_results.bottom_up_left_to_right;
+//if (trace_on) {trace_window.document.write("<br> bultr  ");}
+  for (var i = 0; i < parser_results.bottom_up_left_to_right.length; i++) {
+    var the_node = parser_results.bottom_up_left_to_right[i];
+  //if (trace_on) {trace_window.document.write('<br> ::' + the_node.steps + ':' + the_node.name);}
+  }
+//if (trace_on) {trace_window.document.write("<br> endbultr  ");}
+  if (!parser.do_evaluation_in_parsing) {
+    new_evaluate_tree_node(parser, parameters);
+  }
+  //trace_window.document.write('answer is ',parser_results.tree.computed_value,'<br>');
+ to_return = parser_results.tree.computed_value;
+}
+    return to_return;
+}
+
+x_parser.start_rule = 'expression';
+var rules = new Object();
+rules.expression = AND('number',/\s*\+\s*/g,'number',
+  EVALUATION(function(in_v){return in_v['number'][0] + in_v['number'][1]}));
+rules.number = LEAF(/\d+/g,EVALUATION(function(in_v){return parseInt(in_v);}));
+
+var rule_to_add = new Object();
+rule_to_add.rule_name = 'expression';
+rule_to_add.rule_definition = rules['expression'];
+
+add_rule(x_parser, rule_to_add);
+
+rule_to_add.rule_name = 'number';
+rule_to_add.rule_definition = rules['number'];
+
+add_rule(x_parser, rule_to_add);
+
+var t = dump_value(rules,"");
+//trace_window.document.write(t);
+//trace_window.document.write("<br> parser now");
+t = dump_value(x_parser,"");
+//trace_window.document.write(t);
+
+//var t = parse_and_evaluate(x_parser, '8 + 9');
+//trace_window.document.write('<br>');
+//trace_window.document.write('<br>');
+//trace_window.document.write('t is ' + t);
+//trace_window.document.write('<br>');
+//trace_window.document.write('<br>');
+
+
+var return_self_routine = new Function ("in_v", "return in_v");
+
+var new_generic_routine = new Function ("in_v",
+"  if (type_of(in_v) == 'object') { " +
+"    var x = 0; " +
+"    var prop; " +
+"    for (var i in in_v) {prop = i; if (x++) { break}}; " +
+"    if (x == 1) { " +
+"      return in_v[prop]; " +
+"    } " +
+"  } " +
+"  return in_v; ");
+
+function generate_evaluate_subroutines (parser) {
+  for (var rule_name in parser.rule) {
+  //if (trace_on) {trace_window.document.write('<br> looking at ges of ' + rule_name);}
+    rule = parser["rule"][rule_name];
+    if (rule.generated == null) {
+    //if (trace_on) {trace_window.document.write('<br> not generated ');}
+      if (rule.parsing_evaluation == null) {
+        if (rule.use_parse_match || parser.do_not_compress_eval) {
+          rule.parsing_evaluation = return_self_routine;
+        }
+        else {
+          //if (trace_on) {trace_window.document.write('<br> using generic ');}
+          rule.parsing_evaluation = new_generic_routine;
+        }
+      }
+    }
+  }
+}
+
+function Parser(rules, parameters) {
+  if (parameters != null) {
+    var start_rule = parameters.start_rule;
+    this.do_evaluation_in_parsing = parameters.do_evaluation_in_parsing;
+  }
+  this.rule = new Object();
+  this.unique_name_counter = new Object();
+  this.separator = '__XZ__';
+  for (var rule in rules) {
+//if (trace_on) {trace_window.document.write('<br> looking at ' + rule);}
+    var rule_to_add = new Object();
+    rule_to_add.rule_name = rule;
+    rule_to_add.rule_definition = rules[rule];
+    add_rule(this, rule_to_add);
+  }
+  generate_evaluate_subroutines(this);
+  if (start_rule == null) {
+    var covered_rule = new Object();
+    for (var rule_name in this.rule) {
+      for (var subrule in this["rule"][rule_name]["subrule_list"]) {
+        covered_rule[subrule.name] = 1;
+      }
+    }
+    FINDSTART: for (var rule_name in this.rule) {
+      if (covered_rule[rule_name] == null) {
+        this.start_rule = rule_name;
+        break FINDSTART;
+      }
+    }
+  }
+  else {
+    this.start_rule = start_rule;
+  }
+  var unreachable = make_sure_all_rules_reachable (this, this.start_rule);
+  if (unreachable.length > 0) {
+    alert('unreachable rules, including ' + unreachable[0]);
+    x.die();
+  }
+  var uncovered = make_sure_all_names_covered(this)
+  if (uncovered.length > 0) {
+    alert('uncovered rules, including ' + uncovered[0]);
+    x.die();
+  }
+//if (trace_on) {trace_window.document.write('<br>done adding rules');}
+}
+
+var calculator_rules = new Object();
+var calculator_rules = {
+ start_expression : AND(
+   {xx : 'expression'},
+   EVALUATION(function (in_v) {return in_v.xx})
+  )
+,
+ expression : AND(
+   'term', 
+    MULTIPLE(AND('plus_or_minus', 'term')), /\s*/g,
+   EVALUATION (function (in_v){var to_combine = in_v.term;
+    var plus_or_minus = in_v.plus_or_minus;
+//if (trace_on) {trace_window.document.write('<br> p or m is '+dump_value(plus_or_minus));}
+    var value = to_combine.shift();
+    for (var i = 0; i < to_combine.length; i++) {
+//if (trace_on) {trace_window.document.write('<br> i ' + i + ' p or m ofi is '+plus_or_minus[i]);}
+      if (plus_or_minus[i] == '+') {
+//if (trace_on) {trace_window.document.write('<br> adding');}
+        value += to_combine[i];
+      }
+      else {
+//if (trace_on) {trace_window.document.write('<br> subtracting');}
+        value -= to_combine[i];
+      }
+    }
+    return value;}
+   )) ,
+ term : AND(
+   'factor', 
+    MULTIPLE(AND('times_or_divide_or_modulo', 'factor')),
+   EVALUATION(function (in_v) {var to_combine = in_v.factor;
+    var times_or_divide_or_modulo = in_v.times_or_divide_or_modulo;
+//if (trace_on) {trace_window.document.write(' <br> term params in ' + dump_value(in_v));}
+//if (trace_on) {trace_window.document.write(' <br> toclne ' + to_combine.length);}
+    var value = to_combine.shift();
+//if (trace_on) {trace_window.document.write(' <br> tocl ' + to_combine.length);}
+    for (var i = 0; i < to_combine.length; i++) {
+      if (times_or_divide_or_modulo[i] == '*') {
+        value *= to_combine[i];
+      }
+      else if (times_or_divide_or_modulo[i] == '%') {
+        value %= to_combine[i];
+      }
+      else {
+//could check for zero
+        value /= to_combine[i];
+      }
+    }
+    return value;
+   }
+  )) ,
+ factor : AND( 'fin_exp', MULTIPLE( AND('power_of', 'fin_exp')),
+   EVALUATION (function (in_v) {var to_combine = in_v.fin_exp;
+    var value = to_combine.pop();
+    while (to_combine.length > 0 ) {
+      value = Math.pow(to_combine.pop(),value);
+    }
+    return value;
+   }
+  )) ,
+fin_exp : OR(
+    AND('left_parenthesis', 'expression', 'right_parenthesis',
+     EVALUATION(function (in_v) { return in_v.expression })),
+    AND('number',
+     EVALUATION(function (in_v) { return in_v.number })
+    )) ,
+number : LEAF(
+  /\s*[+-]?(\d+(\.\d*)?|\.\d+)\s*/g,
+  EVALUATION( function (in_v){ return parseFloat(in_v); }
+ )) ,
+left_parenthesis : LEAF( /\s*\(\s*/g) ,
+right_parenthesis : LEAF( /\s*\)\s*/g) ,
+power_of : LEAF( /\s*(\*\*)\s*/g) ,
+plus_or_minus : OR( 'plus', 'minus') ,
+plus : /\s*(\+)\s*/g,
+minus : LEAF( /\s*(\-)\s*/g) ,
+times_or_divide_or_modulo : OR( 'times', 'divided_by', 'modulo') ,
+modulo : /\s*(\%)\s*/g ,
+times : /\s*(\*)\s*/g ,
+divided_by : LEAF( /\s*(\/)\s*/g)
+};
+
+
+var c_parameters = {do_evaluation_in_parsing : 1};
+var calculator_parser = new Parser(calculator_rules, c_parameters);
+//calculator_parser.start_rule = 'start_expression';
+
+var t = parse_and_evaluate(calculator_parser, '17 + 84');
+//if (trace_on) {trace_window.document.write('<br> t is ' + t + '<br>');}
+function the_process(the_input)
+{
+  var t = parse_and_evaluate(calculator_parser, the_input);
+  if (t === null) {alert ("unable to parse")};
+//alert('looking at ' + the_input + ' got out ' + t);
+  return t;
+//  document.getElementById('the_output').innerHTML = t;
+  return;
+  return the_input.value;
+}
+//Stallion
+//Author Arthur Goldstein
+//Copyright 2008
+
+
+// TODO:
+// Javascript documentation
+// Object parsing a la Parse::Stallion?
+// Need suggestions for testing suite.
+// find xyzzy's
+// if separator in name, reject rule
+// do_not_compress_eval
+
+</script>
+<script type="text/javascript">
+// Dates
+var the_rules = {
+  start_date : AND(
+  'parsed_date', /\s*/g,
+  EVALUATION (function (in_v) {
+    var milliseconds = in_v.parsed_date;
+    var my_date = new Date(milliseconds);
+    var seconds = my_date.getSeconds();
+    var minutes = my_date.getMinutes();
+    var hours = my_date.getHours();
+    var mday = my_date.getDate();
+    var month = my_date.getMonth() + 1;
+    var year = my_date.getFullYear();
+    var to_return = '' + year;
+    if (month < 10) { to_return += '0';}
+    to_return += month;
+    if (mday < 10) { to_return += '0';}
+    to_return += mday;
+    if (hours < 10) { to_return += '0';}
+    to_return += hours;
+    if (minutes < 10) { to_return += '0';}
+    to_return += minutes;
+    if (seconds < 10) { to_return += '0';}
+    to_return += seconds;
+    return to_return;
+  }
+ )),
+ parsed_date : OR( 'date', 'date_operation'),
+ date_operation : OR('add_time', 'subtract_time'),
+ add_time : A('date', 'plus', 'time',
+  E(function (in_v){return in_v.date + in_v.time})),
+ subtract_time : A('date', 'minus', 'time',
+  E(function (in_v){return in_v.date - in_v.time})),
+ date : OR( 'standard_date', 'special_date'),
+ plus : /\s*\+\s*/g,
+ minus : /\s*\-\s*/g,
+ standard_date : LEAF(
+  /\d+\/\d+\/\d+/g,
+  E(function (in_date) {
+    return Date.parse(in_date);
+  }
+  )),
+ special_date : LEAF( /now/gi,
+  E(function (){var dd = new Date(); return dd.getTime();})),
+ time : OR('just_time', 'just_time_plus_list', 'just_time_minus_list'),
+ just_time_plus_list : AND(
+  'just_time', 'plus', 'time',
+  E(function (in_v) {return in_v.just_time + in_v.time})),
+ just_time_minus_list : AND(
+  'just_time', 'minus', 'time',
+  E(function (in_v) {return in_v.just_time - in_v.time})),
+ just_time : LEAF( /\d+\s*[hdms]/gi,
+  E(function (in_time) {
+    var time_re = /(\d+)\s*([hdms])/i
+    var a = time_re.exec(in_time);
+    var number = a[1];
+    var unit = a[2];
+    if (unit.toLowerCase() == 'h') {
+      return number * 60 * 60 * 1000;
+    }
+    if (unit.toLowerCase() == 'd') {
+      return number * 24 * 60 * 60 * 1000;
+    }
+    if (unit.toLowerCase() == 's') {
+      return number * 1000;
+    }
+    if (unit.toLowerCase() == 'm') {
+      return number * 60 * 1000;
+    }
+  })
+ )
+};
+
+var date_parser = new Parser(the_rules);
+date_parser.start_rule = 'start_date';
+
+function the_process2(the_input)
+{
+//  trace_on = 1;
+  var t = parse_and_evaluate(date_parser, the_input);
+  if (t === null) {alert('unable to parse the date')};
+  return t;
+}
+</script>
+<form method="post" action="/cgi-bin/arthurgoldstein/jstal/trytwo.pl" enctype="application/x-www-form-urlencoded" name="cform">
+
+Enter in something similar to: 1 + 2 ** 3 / 4 * 5 -6 and then click math expression.
+<BR>
+Enter in something similar to: now + 3d + 4h +5m -6s and then click date expression.  Can also try 9/9/2009 - 4h
+
+<BR>
+Input: <textarea name="the_input" rows="10" cols="80"></textarea>
+<BR>
+<input type="button" name="process" value="math expression" onclick="cform.the_output2.value = the_process(cform.the_input.value);" /><input type="button" name="process2" value="date expression" onclick="cform.the_output2.value = the_process2(cform.the_input.value);" />
+<BR>
+Output: <textarea name="the_output2" rows="10" cols="80"></textarea>
+<BR>
+</form></body></html>

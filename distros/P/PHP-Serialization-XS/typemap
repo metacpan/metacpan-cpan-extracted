@@ -1,0 +1,10 @@
+TYPEMAP
+self    T_PTROBJ_SELF
+
+INPUT
+T_PTROBJ_SELF
+	$var = C_SELF($arg, \"$var\");
+
+OUTPUT
+T_PTROBJ_SELF
+	sv_setref_pv($arg, \"PHP::Serialization:XS\", (void)*$var);

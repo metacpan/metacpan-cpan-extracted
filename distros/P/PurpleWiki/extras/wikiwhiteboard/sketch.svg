@@ -1,0 +1,164 @@
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN"
+	"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg width="100%" height="100%" onload="main(evt);"
+	onmousemove="mouseMove(evt);" 
+	onmousedown="mouseDown(evt);" 
+	onmouseup="mouseUp(evt);" onzoom="mouseIsDown=false" onkeypress="changeColour(evt)">
+	
+<script type="text/ecmascript"><![CDATA[
+
+// DOM Constants
+
+var ELEMENT_NODE = 1;
+var TEXT_NODE = 3;
+var CDATA_SECTION_NODE = 4;
+     	 		 
+var svgDocument;
+var sketch;
+var pathElement;
+var circleElement;
+var mouseIsDown;
+var pathData;
+var globalColourId;
+var globalColours=['red','green','blue']
+
+var accumulator;
+
+// Initialization
+
+function changeColour(e) {
+ for (i=0;i<globalColours.length;i++) {
+  if( globalColours[i].charCodeAt(0)==e.charCode) globalColourId=i
+ }
+}
+
+function main(evt) {
+	top.getSVG = getSVG;
+	SVGDoc = evt.target.ownerDocument;
+	sketch = SVGDoc.getElementById("sketch");
+}
+
+// Mouse event handling methods
+
+function mouseDown(e) {
+ x=e.clientX
+ y=e.clientY
+ scale = SVGDoc.documentElement.currentScale;
+ trans = SVGDoc.documentElement.currentTranslate;
+ var x = x/scale + (( 0.0 - trans.x ) / scale);
+ var y = y/scale + (( 0.0 - trans.y ) / scale);
+ if (!e.altKey && e.target.nodeName!='text') {
+ 	mouseIsDown = true;
+	 initPath(x, y);
+ } else {
+		if (e.altKey) {
+   txt=prompt('text','[http://jibbering.com/ Jim Ley]')
+ 		if (txt.match(/\[(.*?) (.*)\]/gim)) { 
+    SVGDoc.documentElement.appendChild(parseXML('<g><a xlink:href="'+RegExp.$1+'"><text x="'+x+'" y="'+y+'">'+RegExp.$2+'</text></a></g>',SVGDoc).firstChild)
+   } else
+   	if (txt.match(/([A-Z][a-z]+){2,}/gim)) { 
+       SVGDoc.documentElement.appendChild(parseXML('<g><a xlink:href="Wiki.jsp?page='+txt+'"><text x="'+x+'" y="'+y+'">'+txt+'</text></a></g>',SVGDoc).firstChild);
+ // alert(elementToString(parseXML('<g><a xlink:href="'+txt+'"><text x="'+x+'" y="'+y+'">'+txt+'</text></a></g>',SVGDoc).firstChild));	
+   	}else {
+    SVGDoc.documentElement.appendChild(parseXML('<g><text x="'+x+'" y="'+y+'">'+txt+'</text></g>',SVGDoc).firstChild)
+   }
+		}
+ }
+
+}
+
+function mouseMove(e) {
+	if (mouseIsDown) {
+   x=e.clientX
+   y=e.clientY
+   scale = SVGDoc.documentElement.currentScale;
+   trans = SVGDoc.documentElement.currentTranslate;
+   var x = x/scale + (( 0.0 - trans.x ) / scale);
+   var y = y/scale + (( 0.0 - trans.y ) / scale);
+		extendPath(x, y);
+	}
+}
+
+function mouseUp(evt) {
+	mouseIsDown = false;
+}
+
+// Drawing methods
+
+function initPath(x,y){
+	pathElement = SVGDoc.createElement("path");
+ pathElement.setAttributeNS(null,"stroke",globalColours[globalColourId])
+	pathData = "M " + x + " " + y + " L "; 
+	extendPath(x-0.5, y);
+	extendPath(x+0.5, y);
+	sketch.appendChild(pathElement);
+}
+
+function extendPath(x,y){
+	pathData += " " + x + " " + y; 
+	pathElement.setAttribute("d", pathData);
+}
+
+// XML Serialization methods
+
+function getSVG(){
+
+	var svgDocElement = SVGDoc.documentElement;
+	accumulator = "";
+	var content = elementToString(svgDocElement);
+	
+	return '<?xml version="1.0" ?>'
+		+ '<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">'
+		+ content;
+}
+
+function elementToString(element) {
+	if (element){
+      		var attribute;
+      		var i;
+      		accumulator += "<" + element.nodeName;
+      		for (i = element.attributes.length-1; i>=0; i--){
+         		attribute = element.attributes.item(i);
+			accumulator += " " + attribute.nodeName + '="' + attribute.nodeValue+ '"';
+     	 	}
+      		if (element.hasChildNodes()){
+      		var children = element.childNodes;
+         		accumulator += ">";
+         		for (i=0; i<children.length; i++){
+            			if (children.item(i).nodeType == ELEMENT_NODE){
+               				elementToString(children.item(i));
+               			} else if (children.item(i).nodeType == TEXT_NODE) {				
+					accumulator += escape(children.item(i).nodeValue);
+            			}
+            		else if (children.item(i).nodeType == CDATA_SECTION_NODE) {
+            			accumulator += "\x3c![CDATA["; 		// unescaped <
+            			accumulator += children.item(i).nodeValue;
+            			accumulator += "]]\x3e"; 		// unescaped >
+			}           
+         }
+         accumulator += "</" + element.nodeName + ">";
+      } else {
+         accumulator += " />";
+      }
+   }
+   return accumulator;
+}	
+
+function escape(markup){
+	markup = markup.replace(/&/g, "&amp;");
+	markup = markup.replace(/</g, "&lt;");
+	markup = markup.replace(/>/g, "&gt;");
+	return markup;
+}
+
+]]></script>
+
+<style type="text/css"><![CDATA[
+	.sketch { stroke: black; stroke-width:2; fill: none; }
+]]></style>
+
+<g id="sketch" class="sketch" >
+	<rect x="0" y="0" width="100%" height="100%" fill="white" />
+</g>
+</svg>
+

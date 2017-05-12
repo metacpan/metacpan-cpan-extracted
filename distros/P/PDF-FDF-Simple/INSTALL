@@ -1,0 +1,10 @@
+Installation is done via Module::Build:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install   (as root)
+
+There is a Makefile.PL for CPAN compatibility, 
+but you shouldn't use this manually.
+

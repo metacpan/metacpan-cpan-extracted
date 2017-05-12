@@ -1,0 +1,20 @@
+=head1 NAME
+
+    Perl6::Classes - First-class, concise classes in Perl5
+
+=head1 DESCRIPTION
+
+Perl6::Classes is a source filter that implements Perl 6-like
+(which are C++/Java-like) classes in Perl 5.  It is an experimental
+module and shouldn't be used in production code.
+
+See the documentation for more details.
+
+=head1 AUTHOR
+
+    Luke Palmer (fibonaci@babylonia.flatirons.org)
+
+=head1 LICENSE
+
+    This module is licensed under the same terms as Perl itself.
+    Copyright (C) 2003 Luke Palmer

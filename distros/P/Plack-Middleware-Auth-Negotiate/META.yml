@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Plack-Middleware-Auth-Negotiate
+version:            0.02
+abstract:           Negotiate authentication middleware (SPNEGO)
+author:
+    - Adrian Kreher <avuserow@cpan.org>
+license:            bsd
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    GSSAPI:             0
+    MIME::Base64:       0
+    Plack::Middleware:  0
+    Scalar::Util:       0
+    Test::More:         0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

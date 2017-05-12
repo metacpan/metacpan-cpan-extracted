@@ -1,0 +1,72 @@
+NAME
+    Plack::Middleware::Debug::CatalystPluginCache - Panel for monitoring
+    Catalyst::Plugin::Cache's
+
+VERSION
+    version 0.101
+
+SYNOPSIS
+        enable "Debug:CatalystPluginCache";
+
+    is equivalent to:
+
+        enable "Debug:CatalystPluginCache",
+            app_class => '...', # Catalyst class name is determined automatically
+            show_process_stats   => 1,
+            show_global_stats    => 0,
+            track_miss_locations => 0;
+
+DESCRIPTION
+  General
+    The default output consists of a summary of cache statistics, for each
+    of the caches configured for Catalyst::Plugin::Cache, for the current
+    request:
+
+        Cache   Get   Miss  Hit%  Set Compute Remove  Backend
+        default 11    10    9.09  11  0       0       Cache::Memcached::libmemcached=HASH(0xa682020)
+
+    This becomes more useful as more Catalyst::Plugin::Cache caches are
+    configured for different uses. You can then see more fine-grained
+    details of how effectively the different caches are being used.
+
+  track_miss_locations
+    If "track_miss_locations" is enabled then, for each cache that had one
+    or more misses, a summary of the subroutine call paths that encountered
+    the misses is displayed:
+
+        Call paths for misses in the default cache:
+        . Catalyst::Plugin::PageCache::Catalyst::Plugin::Cache::Curried::get@106 =>
+        . . Catalyst::Plugin::Static::Simple::Catalyst::Plugin::PageCache::dispatch@76 =>
+        . . . Catalyst::Engine::PSGI::Hello::dispatch@158 =>
+        . . . . Catalyst::Engine::PSGI::(eval)@156 =>
+        . . . . . Catalyst::Catalyst::Engine::PSGI::run@2386 =>
+        ...
+        . . . . . . . misses => 1
+
+    Some 'uninteresting' packages are filtered out to aid readability.
+
+  show_process_stats
+    If "show_process_stats" is enabled then a summary of the cache
+    statistics is shown, like "General" above, except the stats refer to the
+    lifetime of the server process which handled the request. Typically only
+    useful in development environments with a single Plack application
+    server process.
+
+  show_global_stats
+    If "show_global_stats" is enabled then the cache backend service is
+    queried for global stats before and after the request is processed and
+    the differences in counts are displayed. For example:
+
+        Cache    Global stats changes during time of request
+        default  bytes: +2, bytes_read: +65915, bytes_written: +1635, cmd_get: +11, cmd_set: +11,
+                 curr_items: +1, evictions: +1, get_hits: +1, get_misses: +10, total_connections: +2, total_items: +11
+
+    Currently only global stats fromCache::Memcached::libmemcached based
+    caches are supported. Others could be added easily. Note that these
+    backend cache server stats will obviously be affected by any other
+    clients using the cache services. They are most useful in development
+    environments with a dedicated backend cache server.
+
+SEE ALSO
+    Plack::Middleware::Debug, Cache::Memcached::libmemcached
+

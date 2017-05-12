@@ -1,0 +1,476 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<!-- Header : Start -->
+<html>
+    <head>
+        <title>Parley - Setup Guide</title>
+
+        <link rel="stylesheet" type="text/css" href="fonts-min.css" />
+
+        <style type="text/css">
+            body {
+                color:              #000;
+                background-color:   #fff;
+                font-family:        Verdana,Arial,Helvetica,sans-serif;
+            }
+            blockquote>code {
+                display:            block;
+                overflow:           auto;
+                border:             solid black 1px;
+                background:         #ccc;
+                font-family:        "courier new", courier, fixed;
+                color:              #000;
+                margin-left:        25px;
+                margin-top:         5px;
+                margin-bottom:      5px;
+                padding:            5px;
+                line-height:        1.5em;
+                white-space:        pre;
+            }
+
+        </style>
+    </head>
+
+    <body>
+        <h1>Parley - Setup Guide</h1>
+
+        <h2>Table of Contents</h2>
+
+        <ol>
+            <li><a href="#getting_parley">Getting Parley</a></li>
+            <li><a href="#initial_deployment">Initial Deployment</a></li>
+            <ol>
+                <li><a href="#location">Location</a></li>
+                <li><a href="#extract">Extract</a></li>
+                <li><a href="#database">Database</a></li>
+                <li><a href="#local_config">Local Configuration</a></li>
+                <li><a href="#testing">Testing</a></li>
+            </ol>
+            <li><a href="#launching">Launching the Application</a></li>
+            <li><a href="#email_engine">The Email Engine</a></li>
+            <li><a href="#using_parley">Using Parley</a></li>
+            <ul>
+                <li><a href="#site_usage_terms">Site Usage Terms</a></li>
+                <li><a href="#site_administration">Site Administration</a></li>
+                <ul>
+                    <li><a href="#services">services</a></li>
+                    <li><a href="#users">users</a></li>
+                    <li><a href="#ip_bans">ip bans</a></li>
+                </ul>
+                <li><a href="#additional_user_administration">Additional User Administration</a></li>
+            </ul>
+            <li><a href="#apache_fastcgi">apache + fastcgi</a></li>
+            <ul>
+                <li><a href="#apache_fastcgi_configure">configuring fastcgi</a></li>
+                <li><a href="#apache_fastcgi_troubleshooting">troubleshooting fastcgi</a></li>
+                <ul>
+                    <li><a href="#fastcgi_permission_denied">Permission Denied</a></li>
+                    <li><a href="#fastcgi_unable_to_store_upload">Unable to store upload</a></li>
+                </ul>
+            </ul>
+            <li><a href="#further_information">Further Information</a></li>
+        </ol>
+
+        <a id="getting_parley"></a>
+        <h2>Getting Parley</h2>
+
+        <p>You should get Parley by visiting the
+        <a href="http://developer.berlios.de/projcts/parley">project page at BerliOS</a>
+        or from
+        <a href="http://search.cpan.org/~chisel">the author's CPAN page</a>
+        </p>
+
+        <a id="initial_deployment"></a>
+        <h2>Initial Deployment</h2>
+
+
+        <a id="location"></a>
+        <h3>Location</h3>
+
+        <p>For the purposes of this guide we are assuming that there is a user
+        called "parley" [HOME=/home/parley/] who has never deployed the
+        application previously.</p>
+
+        <p>We'll keep as much of parley as possible inside its own directory
+        area:</p>
+
+        <blockquote><code>mkdir -p ~/parley_app/{dist,versions,user_files}
+cd ~/parley_app/</code></blockquote>
+
+        We'll use <code>dist/</code> to store any tarballs that we have
+        downloaded, to reduce clutter:
+
+        <blockquote><code>mv /.../Parley-1.x.y.tar.gz dist/</code></blockquote>
+
+
+        <a id="extract"></a>
+        <h3>Extract</h3>
+
+        Then extract our most recent copy [the only one currently]:
+
+        <blockquote><code>tar -C versions/ -zxf dist/Parley-1.x.y.tar.gz</code></blockquote>
+
+        Making a softlink to the current version makes navigation easier,
+        and will aid us later when we consider a full Apache based deployment:
+
+        <blockquote><code>ln -sv versions/Parley-1.x.y parley
+ln -sv $PWD/user_files parley/root/static/user_file
+chmod -R g+w user_files
+cd parley</code></blockquote>
+
+        <p>To prevent permission errors later on, you should ensure
+        that the user that runs the apache processes is in the <em>parley</em>
+        group.</p>
+
+        <a id="database"></a>
+        <h3>Database</h3>
+
+        Before we can run the application we need to setup the database:
+        <blockquote><code>sudo -u postgres createuser -A -d parley
+createdb -U parley -E UTF8 parley
+psql -U parley -d parley -f db/parley.psql</code></blockquote>
+
+        We can quickly check that we have created <em>something</em>:
+        <blockquote><code>psql -U parley -d parley -c '\dt'</code></blockquote>
+
+        <a id="local_config"></a>
+        <h3>Local Configuration</h3>
+
+        <p>There are some supplied configuration options that you may wish to
+        override. The recommended method for doing this, and one that will
+        preserve your changes after any application updates are as
+        follows:</p>
+
+        <blockquote><code>cd ~/parley_app/
+vim parley_local.conf</code></blockquote>
+
+        Add entries to this file. They will take precedence over values in
+        <code>parley.conf</code>
+
+        The following are examples of common areas requiring local overrides.
+
+        <h4>name</h4>
+
+        <p>It's likely that you will want to use a name other than Parley for
+        your deployment.</p>
+
+        <blockquote><code>name    Company Discussion</code></blockquote>
+
+        <h4>recaptcha</h4>
+
+        <p>reCAPTCHA is a great way of making sure you have humans (not bots,
+        or scripts) signing up for your copy of Parley. It's disabled by
+        default because you'll need a (free) key-pair for the domain you
+        intend to use it on.</p>
+
+        <p>You can sign up and generate reCAPTCHA keys at
+        <a href="http://recaptcha.net/">recaptcha.net</a></p>
+
+        <blockquote><code>&lt;recaptcha&gt;
+    enabled         = 1
+    pub_key         = 6Lem123456789012345678901234567890123456
+    priv_key        = 6Lemabcdefghijklmnopqrstuvwxyzabcdefghij
+&lt;/recaptcha&gt;</code></blockquote>
+
+        <h4>google_adsense</h4>
+
+        <p>You may wish to have some ads shown in your application. This is
+        disabled by default because you'll undoubtedly want to provide your
+        own adsense configuration, not the developer's.</p>
+
+        <blockquote><code>&lt;google_adsense&gt;
+    enabled                 = 1
+
+    # default language for ads
+    google_language         = "en";
+    # your adsense identifier
+    google_ad_client        = "pub-1234567890123456";
+
+    &lt;ad728_90&gt;
+        # 728x90, created 22/04/09
+        google_ad_slot      = "1234567890";
+        google_ad_width     = 728;
+        google_ad_height    = 90;
+    &lt;/ad728_90&gt;
+&lt;/google_adsense&gt;</code></blockquote>
+
+        <a id="testing"></a>
+        <h3>Testing</h3>
+
+        <p>Although coverage isn't as high as desired, it makes sense to run the
+        application tests to make sure there are no show-stopping issues:</p>
+
+        <blockquote><code>PARLEY_DEBUG=0 prove -lr t/</code></blockquote>
+
+        <p>All test should pass. If they don't you may run into problems
+        when using the application:</p>
+
+        <blockquote><code>All tests successful, 2 tests and 169 subtests skipped.
+Files=44, Tests=455, 54 wallclock secs (38.13 cusr +  2.59 csys = 40.72 CPU)</code></blockquote>
+
+        <a id="launching"></a>
+        <h2>Launching the Application</h2>
+
+        <p>Assuming that the tests passed, you should be in a position where
+        you can run and explore the application.</p>
+
+        </p>Although not recommended for a production deployment you can
+        run the application for testing and evaluation using
+        <code>script/parley_server.pl</code>.</p>
+
+        <p>In its most simple form you can start the application with:</p>
+
+        <blockquote><code>script/parley_server.pl</code></blockquote>
+
+        <p>If there are no problems you should see something similar to:
+
+        <blockquote><code>[info] Parley powered by Catalyst 5.7012
+You can connect to your server at http://localhost:3000</code></blockquote>
+
+        <p>View the URL in your browser and you should see the Forum List page
+        with three forums listed.</p>
+
+        <h3>Running under apache</h3>
+
+        <p>This is described in greater detail later in this document. At this
+        point in the process we just want to run the application and explore
+        it a little.</p>
+
+        <a id="email_engine"></a>
+        <h2>The Email Engine</h2>
+
+        <p>Parley emails will only be sent if the email engine is running. The
+        email engine is a stand-alone script that is launched and runs in the
+        background.</p>
+
+        <p>It polls a table for emails that need to be sent and performs the
+        required magic to send them.</p>
+
+        <p><u><strong>BEFORE</strong> you start the email engine, please edit
+        <code>parley.conf</code> and edit <code>from_name</code> and
+        <code>from_address</code> in the <code>alerts</code> section.</u></p>
+
+        <p>You can start the email engine with:</p>
+
+        <blockquote><code>./script/parley_email_engine.pl</code></blockquote>
+
+        <p>Because the script puts itself into the background you won't see
+        any output in your terminal. You can verify that the script is running
+        by doing the following:</p>
+
+        <blockquote><code>ps ax |grep parley_email</code></blockquote>
+
+        and you should see something similar to:
+
+        <blockquote><code>18061 ?        S      0:00 perl ./script/parley_email_engine.pl</code></blockquote>
+
+        <p>The email engine uses syslog to log messages, which means you may
+        be able to see further information in
+        <code>/var/log/messages</code>:</p>
+
+        <blockquote><code>$ grep parley_email_engine /var/log/messages
+Apr 21 19:07:26 wiggin parley_email_engine[18058]: script started 
+Apr 21 19:07:26 wiggin parley_email_engine[18061]: child process created</code></blockquote>
+
+        <a id="using_parley"></a>
+        <h2>Using Parley</h2>
+
+        <p>There isn't much you can do in a forum with no messages. Parley
+        comes with two users out of the box: <em>Top Dog</em>, an application
+        super-user, and <a>Normal Normal</a>, a user with no special powers at
+        all.</p>
+
+        <p>Top Dog's username is <code>topdog</code> and has a default
+        password of <code>k1tt3n</code>.</p>
+
+        <p>Norman's username is <code>norm</code> and also has a default
+        password of <code>k1tt3n</code>.</p>
+
+        <p>Both users can post, read posts, search, browse, etc. Top Dog also
+        has access to the <em>Site</em> menu in the menu-bar.</p>
+
+        <a id="site_usage_terms"></a>
+        <h3>Site Usage Terms</h3>
+
+        <p>One of the first tasks you may like to perform as Top Dog is adding
+        T&amp;Cs for the site. If Parley has T&amp;Cs defined all registered
+        users must agree to those terms to continue using the site. ('Guest'
+        users can use the site in read-only mode without needing to agree to
+        the T&amp;Cs).</p>
+
+        <p>If new T&amp;Cs are added, users must agree to those to continue
+        uing the site.</p>
+
+        <p>You can add new T&amp;Cs by clicking the <em>Add T&amp;Cs</em> item
+        in the <em>Site</em> menu.</p>
+
+        <a id="site_administration"></a>
+        <h3>Site Administration</h3>
+
+        <p>As a <em>site moderator</em> you will have access to the
+        "Site&rarr;Manage" menu.</p>
+
+        <p>This is the primary area for checking on the status of services,
+        managing users and also various ban types</p>
+
+        <a id="services"></a>
+        <h4>Services</h4>
+
+        <p>Lists known services (currently only the email-engine) and their
+        current status</p>
+
+        <a id="users"></a>
+        <h4>Users</h4>
+
+        <p>This section currently provides role-management functionality. It's
+        functional, but in the early phases of development - which means it
+        could be nicer to use.</p>
+
+        <p>Select the user you'd like to manage by typing the first part of
+        their name in the User Search field, then selecting the correct menu
+        item, and submitting the query.</p>
+
+        <p>You'll be presented with a list of roles and checkboxes. Select and
+        unselect the options to your heart's delight</p>
+
+        <p><b>Note:</b> you are not able to remove your own "Site Moderator"
+        role. Other site moderators can do it to you, you can do it to them.
+        Unless my brain is broken this means you'll always have a minimum of
+        one Site Moderator.</p>
+
+        <a id="ip_bans"></a>
+        <h4>IP Bans</h4>
+
+        <p>Unfortunately there will always be at least one bad apple. The IP
+        bans are one tool in your battle against the Bad Ones. Banning by IP
+        isn't a silver bullet for numerous reasons but it can stop or slow
+        down some abusers.</p>
+
+        <p>Click on the data area for the type of ban you'd like to edit and
+        edit the values in the text input area that appears. The items in the
+        list should be in CIDR format (<em>a.b.c.d/x</em>) format.</p>
+
+        <p>To remove bans, edit the field and remove the relevant entry.</p>
+
+        <p>The anticipated escalation level for bans is:
+        posting, sign-up, login, all
+        </p>
+
+        <a id="additional_user_administration"></a>
+        <h3>Additional User Administration</h3>
+
+        <p>Providing you have the required roles you will be able to perform
+        additional tasks from a user's profile page: <em>Suspend Account</em>
+        and <em>Forum Moderation</em>.</p>
+
+        <a id="apache_fastcgi"></a>
+        <h2>apache + fastcgi</h2>
+
+        <p>Any vaguely sane deployment of parley <strong>will not</strong> be
+        run using <i>script/parley_server.pl</i>.</p>
+
+        <p>A common (and Catalyst recommended) deployment method is to use
+        <em>apache + fastcgi</em>. The process is outlined in the
+        <a href="">Catalyst Cookbook</a></p>
+
+        <p>Before going too far down this route, please ensure that you have
+        mod_fastcgi installed:</p>
+        <blockquote><code>sudo aptitude install libapache2-mod-fastcgi</code></blockquote>
+
+        <a id="apache_fastcgi_configure"></a>
+        <h3>Configuring fastcgi</h3>
+
+        <p>To avoid permission issues with certain files it's recommended that
+        you edit <em>parley.conf</em> and change:</p>
+
+        <blockquote><code>COMPILE_DIR             /tmp/parley-ttcache
+
+# ...
+
+storage   /tmp/parley.session</code></blockquote>
+
+        <p>to:</p>
+
+        <blockquote><code>COMPILE_DIR             /tmp/parley-<b>fastcgi</b>.ttcache
+
+# ...
+
+storage   /tmp/parley.<b>fastcgi</b>.session</code></blockquote>
+
+        <p>Assuming you have a system with <em>a2ensite</em> installed on it
+        you can do the following:</p>
+
+        <blockquote><code>sudo cp config/parley.sites-available /etc/apache2/sites-available/parley.named_vhost
+sudo vim /etc/apache2/sites-available/parley.named_vhost <font color="green"># make appropriate changes</font>
+sudo a2ensite parley.named_vhost
+sudo /etc/init.d/apache2 reload</code></blockquote>
+
+        <p>If all went well, you should now be able to visit the VirtualHost
+        defined in <em>/etc/apache2/sites-available/parley.named_vhost</em>
+        and find a working instance of Parley.</p>
+
+        <a id="apache_fastcgi_troubleshooting"></a>
+        <h3>Troubleshooting fastcgi</h3>
+
+        <a id="fastcgi_permission_denied"></a>
+        <h4>Open of share file /tmp/parley.session failed: Permission denied</h4>
+
+        <p>Sometimes the fastcgi processes fail to start, and raise an error
+        similar to:</p>
+        
+        <blockquote><code>Open of share file /tmp/parley.session failed: Permission denied
+  at /usr/lib/perl5/Cache/FastMmap.pm line 574.</code></blockquote>
+
+        <p>This is usually caused by running the application as one user, then
+        later trying to run it as a different user. The second user will
+        usually discover that they don't have write access to the application
+        session file.</p>
+
+        <p>There are a number of resolutions for the issue:</p>
+        <ul>
+            <li>remove /tmp/parley.session and parley-ttcache</li>
+            <li>make the files world-writable</li>
+            <li>make the files group-writable, and put relevant users in the relevant group</li>
+        </ul>
+
+        <a id="fastcgi_unable_to_store_upload"></a>
+        <h4>Failed to create destination directory. Unable to store upload.</h4>
+
+        <p>If you see the above message when trying to upload a user avatar
+        it's usually a result of incorrect permissions. You will usually have
+        a corresponding message in the apache error log:</p>
+
+        <blockquote><code>/home/parley/parley_app/versions/Parley-1.0.0/root/static/user_file/0
+  - Permission denied</code></blockquote>
+
+        <p>This can be resolved (as can most file permission issues) in more
+        that one way.</p>
+
+        <p><strong>NOTE:</strong> because of the way the application was
+        deployed the "offending" directory is
+        <code>parley_app/user_files/</code></p> which we linked to as
+        <code>parley_app/versions/Parley-1.0.0/root/static/user_file</code>.
+
+        <p>One solution is to make the directory group-writeable and add the
+        apache process owner to that group:</p>
+
+        <blockquote><code>cd ~/parley_app/
+chmod -Rv g+w user_files
+sudo usermod -a -G parley <em>www-data</em>
+groups <em>www-data</em></code></blockquote>
+
+        <a id="further_information"></a>
+        <h2>Further Information</h2>
+
+        <p>
+        Please direct any further questions to the
+        <a href="">Parley user's mailing list</a>.
+
+        <!--
+            c&#104;iselwright&#64;users.be&#114;lios&#46;de
+        -->
+        </p>
+
+    </body>
+</html>

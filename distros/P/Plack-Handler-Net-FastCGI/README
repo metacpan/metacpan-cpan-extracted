@@ -1,0 +1,36 @@
+NAME
+    Plack::Handler::Net::FastCGI - FastCGI handler for Plack using
+    Net::FastCGI
+
+SYNOPSIS
+      # Run as a standalone daemon using TCP port
+      plackup -s Net::FastCGI --listen :9090
+
+DESCRIPTION
+    This is a handler module to run any PSGI application as a standalone
+    FastCGI daemon using Net::FastCGI
+
+  OPTIONS
+    listen
+            listen => ':8080'
+
+        Listen on a socket path, hostname:port, or :port.
+
+    port
+        listen via TCP on port on all interfaces (Same as "listen =>
+        ":$port"")
+
+SEE ALSO
+    Plack::Handler::FCGI
+
+AUTHORS
+    Christian Hansen "chansen@cpan.org"
+
+    Tatsuhiko Miyagawa "miyagawa@bulknews.net"
+
+COPYRIGHT
+    Copyright 2012 by Christian Hansen, Tatsuhiko Miyagawa.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

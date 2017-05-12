@@ -1,0 +1,28 @@
+---
+abstract: 'trivial key/value binary protocol'
+author:
+  - 'Tom Molesworth <cpan@entitymodel.com>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.48
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Protocol-ControlChannel
+recommends:
+  Sereal::Decoder: 0
+  Sereal::Encoder: 0
+requires:
+  Encode: 2.0
+  Storable: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Protocol-ControlChannel
+  homepage: http://search.cpan.org/dist/Protocol-ControlChannel/
+version: 0.003

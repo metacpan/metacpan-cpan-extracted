@@ -1,0 +1,71 @@
+---
+Case:
+  ID: A1234567
+  Ref_URL: http://www.contentowner.com/trackingid.asp?A1234567
+  Severity: Normal
+  Status: 'First Notice, Open'
+Complainant:
+  Address: '100 Anywhere Street, Anywhere, CA 90000'
+  Contact: John Doe
+  Email: antipiracy@contentowner.com
+  Entity: Content Owner Inc.
+  Phone: 555-555-1212
+Content:
+  Item:
+    - FileName: 8Mile.mpg
+      FileSize: 702453789
+      Hash:
+        Type: SHA1
+        _: EKR94KF985873KD930ER4KD94
+      Title: 8 Mile
+      Type: Movie
+      URL: ftp://guest:freepwd@168.1.1.145/media/8Mile/8mile.mpg
+    - Artist: Eminem
+      FileName: eminem_loseyourself.mp3
+      FileSize: 4235654
+      Hash:
+        Type: SHA1
+        _: B5A94KF93673KD930D21DFD94
+      Title: Lose Yourself
+      Type: SoundRecording
+      URL: ftp://guest:freepwd@168.1.1.145/media/8Mile/eminem_loseyourself.mp3
+History:
+  Notice:
+    - ID: 12321
+      TimeStamp: 2003-08-30T10:23:13Z
+      _: freeform text area
+    - ID: 19832
+      TimeStamp: 2003-08-30T11:03:00Z
+      _: freeform text area
+Notes: |-2
+  
+  		Open area for freeform text notes, filelists, etc...
+  		
+  		drwxr-xr-x   2 staff    ftp           4096 May 15 13:21 morestuff
+  		-rw-r--r--   1 staff    ftp      702453789 Mar 24 15:34 8Mile.mpg
+  		-rw-r--r--   1 staff    ftp        4235654 Mar 24 07:44 eminem_loseyourself.mp3
+  		-rw-r--r--   1 staff    ftp        3914249 Apr  4 07:53 xzibit_spitshine.mp3
+  		-rw-r--r--   1 staff    ftp        1525267 Feb 24 16:39 50cent_wanksta.mp3
+  		-rw-r--r--   1 staff    ftp          25188 Feb 24 16:42 coverart.jpg
+  	
+Service_Provider:
+  Address: '100 Anywhere Street, Anywhere, CA 90000'
+  Contact: John Doe
+  Email: dmca_agent@ispbroadband.net
+  Entity: ISP Broadband Inc.
+  Phone: 555-555-1212
+Source:
+  DNS_Name: pcp574.nshville.tn.ispbroadband.net
+  Deja_Vu: Yes
+  IP_Address: 168.1.1.145
+  IP_Block: '?????'
+  Login:
+    Password: freepwd
+    Username: guest
+  MAC_Address: 00-00-39-B6-00-A4
+  Number_Files: 324
+  Port: 21
+  TimeStamp: 2003-08-30T12:34:53Z
+  Type: FTP
+  URL_Base: ftp://guest:freepwd@168.1.1.145/media/8Mile/
+  UserName: guest

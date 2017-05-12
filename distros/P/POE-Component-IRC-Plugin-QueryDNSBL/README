@@ -1,0 +1,95 @@
+NAME
+    POE::Component::IRC::Plugin::QueryDNSBL - A POE::Component::IRC plugin
+    for IRC based DNSBL queries
+
+VERSION
+    version 1.04
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use POE qw(Component::IRC Component::IRC::Plugin::QueryDNSBL);
+
+      my $nickname = 'qdnsbl' . $$;
+      my $ircname = 'QueryDNSBL Bot';
+      my $ircserver = $ENV{IRCSERVER} || 'irc.bleh.net';
+      my $port = 6667;
+      my $channel = '#IRC.pm';
+
+      my $irc = POE::Component::IRC->spawn(
+            nick => $nickname,
+            server => $ircserver,
+            port => $port,
+            ircname => $ircname,
+            debug => 0,
+            plugin_debug => 1,
+            options => { trace => 0 },
+      ) or die "Oh noooo! $!";
+
+      POE::Session->create(
+            package_states => [
+                    'main' => [ qw(_start irc_001) ],
+            ],
+      );
+
+      $poe_kernel->run();
+      exit 0;
+
+      sub _start {
+        # Create and load our QueryDNSBL plugin
+        $irc->plugin_add( 'QueryDNSBL' =>
+            POE::Component::IRC::Plugin::QueryDNSBL->new() );
+
+        $irc->yield( register => 'all' );
+        $irc->yield( connect => { } );
+        undef;
+      }
+
+      sub irc_001 {
+        $irc->yield( join => $channel );
+        undef;
+      }
+
+DESCRIPTION
+    POE::Component::IRC::Plugin::QueryDNS is a POE::Component::IRC plugin
+    that provides DNSBL query facilities to the channels it occupies and via
+    private messaging.
+
+    It uses POE::Component::Client::DNSBL to do non-blocking DNSBL queries.
+    By default the plugin attempts to use POE::Component::IRC's internal
+    PoCo-Client-DNS resolver object, but will spawn its own copy. You can
+    supply your own resolver object via the constructor.
+
+CONSTRUCTOR
+    "new"
+        Creates a new plugin object. Takes some optional parameter:
+
+          'command', define the command that will trigger DNSBL queries, default is 'dnsbl';
+          'privmsg', set to a true value to specify that the bot should reply with PRIVMSG instead of
+                     NOTICE to privmsgs that it receives.
+          'resolver', specify a POE::Component::Client::DNS object that the plugin should use,
+                      the default is to try and use POE::Component::IRC's resolver;
+          'dnsbl', the DNSBL zone to send queries to, default zen.spamhaus.org;
+
+IRC USAGE
+    The bot replies to requests in the following form, when addressed:
+
+      dnsbl <ipv4_address>
+
+    Of course, if you changed the "command" in the constructor it will be
+    something different to "dns".
+
+SEE ALSO
+    POE::Component::Client::DNSBL
+
+    <http://en.wikipedia.org/wiki/DNSBL>
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

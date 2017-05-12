@@ -1,0 +1,84 @@
+PDF/Reuse version 0.39
+======================
+
+This module gives you a possibility to reuse PDF-files. You can use pages,
+images, fonts and Acrobat JavaScript from old PDF-files (if they
+were not encrypted), and rearrange the components, and add new graphics,
+texts etc.
+
+There is also support for graphics. In the tutorial there is a description of
+how to transform simple PDF-pages to graphic Perl objects with the help of
+programs based on this module.
+
+The module is fairly fast, so it should be possible to used it for mass
+production.
+
+Usage e.g. for a long list:
+
+   use PDF::Reuse;
+   use strict;
+
+   # Getting customer data in some way ...
+
+   my @custData = ( { firstName => 'Anders',
+                      lastName  => 'Wallberg' },
+                    { firstName => 'Nils',
+                      lastName  => 'Versen' },
+                    { firstName => 'Niclas',
+                      lastName  => 'Lindberg' },
+
+                    # and 10000 more records
+
+                    { firstName => 'Sten',
+                      lastName  => 'Wernlund' } );
+
+   prFile('myFile.pdf');
+
+   for my $customer (@custData)
+   {    prForm('letter.pdf');
+        prText(50, 750, "Dear $customer->{'firstName'}");
+        # ...
+        prPage();
+   }
+   prEnd();
+
+
+
+INSTALLATION
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+In a Windows environment you will probably meed nmake or dmake instead of make.
+(If you haven't got nmake, try to download it from Microsoft )
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+  Carp
+  Compress::Zlib
+  Digest::MD5
+  Exporter
+  AutoLoader
+
+If you want to use true type fonts and non-Latin1 Unicode characters you also
+need theese optional modules
+
+  Font::TTF
+  Text::PDF::TTFont0  (Part of Text::PDF distribution)
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 - 2004 Lars Lundberg, Solidez HB.
+Copyright (C) 2005 - 2007 Karin Lundberg. All rights reserved.
+Copyright (C) 2008 - 2010 Lars Lundberg, Solidez HB.
+Copyright (C) 2010 - 2016 Chris Nighswonger.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

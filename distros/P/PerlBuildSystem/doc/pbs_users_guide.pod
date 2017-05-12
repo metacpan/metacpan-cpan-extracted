@@ -1,0 +1,342 @@
+=pod
+
+=head1 pbs user's guide
+
+I<PBS> (Perl Build System) and I<pbs.pl>.
+
+=head1 DESCRIPTION
+
+I<PBS> - Set of perl modules to implement build utilities.
+
+I<pbs> - Front end to PBS  (an alias to pbs.pl, a perl script).
+
+I<pbs.pl> is a script that handles command line switches and starts PBS. It runs under Linux and in Cygwin.
+
+=head1 INTRODUCTION
+
+I<pbs> is a build utility in the same spirit as  I<make>. 
+Except for the spirit, I<pbs> and I<make> have nothing in common.
+I<PBS> is B<not> compatible with 'make' and B<works completely differently>!
+
+I<pbs> was developped to tackle the build of complex systems.
+
+I<pbs> neither tries to make the task easy nor fast but merely possible.
+
+I<pbs> is written in Perl and uses Perl exclusively for defining the system to build.
+
+
+I<pbs> has a full featured scripting language, Perl.
+
+
+I<pbs> only introduces a few new functions.
+
+When given a system description, I<pbs> constructs a dependency tree and checks which
+nodes in the tree need to be rebuild.
+
+I<pbs> and B<PBS> are still under development. No guaranties of any sort follow with this software. Your ideas, remarks and critics are very welcome.
+
+=head2 PBS strong points (compared to other build systems) are:
+
+=head4 Architecture
+
+=over 4
+
+=item * Pure perl, simple architecture, Humanly sized code.
+
+=item * Possibility to integrate PBS into other applications.
+
+=item * Makes easy things easy and complicated ones possible.
+
+=back
+
+=head4 Build system
+
+=over 4
+
+=item * Hierachical build.
+
+=item * Supports 'shadow' build directories.
+
+=item * Alternative source directories=head2 PBS strong points (compared to other build systems) are:
+
+=head4 Architecture
+
+=over 4
+
+=item * Pure perl, simple architecture, Humanly sized code.
+
+=item * Possibility to integrate PBS into other applications.
+
+=item * Makes easy things easy and complicated ones possible.
+
+=back
+
+=head4 Build system
+
+=over 4
+
+=item * Hierachical build.
+
+=item * Supports 'shadow' build directories.
+
+=item * Alternative source directories
+
+=item * A multum of switches to allow you to easily debug your build system.
+
+=item * User options can be passed to the build system, rules, dependers and builders.
+
+=item * Dynamic rules and variables.
+
+=back
+
+
+=item * A multum of switches to allow you to easily debug your build system.
+
+=item * User options can be passed to the build system, rules, dependers and builders.
+
+=item * Dynamic rules and variables.
+
+=back
+
+=head2 DO I NEED TO KNOW PERL TO USE I<pbs>?
+
+If you have used I<make> or other build systems before, 
+the examples in this documentation should get you going.
+
+A working knowledge of perl will allow you to use the advanced functionality of B<PBS>.
+The Reference manual details the innner working of B<PBS>.
+
+=head1 SYNOPSIS
+
+I<pbs> all
+
+I<pbs> -o --build_directory /somewhere/out --sd /sd1/ --sd /sd2 --bi --  all
+
+=head1 INPUT
+
+I<pbsl> takes switches and targets on the command line.
+
+I<pbsl> has a pletoria of switches; most are for debugging purpose (debugging of the build system). 
+
+I<pbsl> -h displays all the accepted switches and 
+a short description of what the switch does. Be ready for a long list.
+
+=head1 Pbsfile
+
+To drive B<PBS> you write a Pbsfile (in analogy to a Makefile). Pbsfiles are packageless perl scripts.
+
+Pbsfile can have any name you operating system supports. 
+If no Pbsfile is given on the command line through the --p switch, I<pbs> will load a file called I<Pbsfile.pl>.
+If no I<Pbsfile.pl> is found, I<pbs> exits with an error message.
+
+A Pbsfile contains configuration and rule definitions.
+It can also contain perl code, in fact a Pbsfile is a piece of valid perl code when run through I<pbs>.
+
+=head1 RULES
+
+=head2 B<NO BUILT-IN RULES!>
+
+Unlike other build systems (except xmake), PBS doesn't define any Built-in rule.
+It is very easy to define and use libraries of rules.
+
+The confusion brought by built-in rules is thereby avoided.
+
+=head2 Adding a rule
+
+Rules are the main way to control your build system. You use the function B<AddRule>
+in your Pbsfile to define the build system.
+
+B<AddRule> takes the following parameters:
+
+=over 2
+
+=item 0 Rule type (optional)
+
+=item 1 Rule name
+
+=item 2 Depender definition
+
+=item 3 Builder definition (optional)
+
+=item 4 Arguments to builder (optional)
+
+=back
+
+	Ex: AddRule 'exe', [exe => undef] ;
+
+This will add the user rule named 'exe' to your build system.
+
+=head3 Rule type (optional)
+
+A rule type can be passed to B<AddRule>.The type can be one of the following:
+=over 2
+
+=item * VIRTUAL, no file with a name matching the node should be found on the disk.
+
+=item * FORCED, the node is always build.
+
+=item * Other typed are discussed in the reference manual
+
+=back
+
+
+=head3 Rule name
+
+Each rule in the Pbsfile must be given a name. The name is used for debugging purpose.
+
+=head3 Depender definition
+
+This section describe the simplest form of a depender definition.
+Other definition types are described in the reference manual.
+
+	Pbsfile:
+	AddRule [VIRTUAL], 'all', ['all' => 'a.out'] ;
+	AddRule 'binary', ['a.out' => 'hello.o'] ;
+
+The above Pbsfile defines two rules, 'all' and 'binary'.
+
+Node 'all' is virtual, that is no file on your disk should match the name 'all'.
+Node 'all' id dependent on node 'a.out'.
+
+Node 'a.out' has no particular type and is expected to match a file on your hard disk.
+Node 'a.out' is dependent on node 'hello.o'.
+
+=head4 Defining the dependencies
+
+	Ex:
+	AddRule 'rule_name',
+		[
+		*/*.o => 
+			  '*.c'
+			, 'b.c'
+			, '/somewhere/a.c2'
+			, '[path]/subdir/prefix_[basename].c3'
+		] ;
+
+
+For I<'/path_to_a/a.o'>, the above depender definition will generate these dependencies :
+
+	'/path_to_a/a.c' 
+	'/path_to_a/b.c' 
+	'/somewhere/a.c2'
+	'/path_to_a/subdir/prefix_a.c3'
+
+=head4 Node without dependencies
+
+if your node has no dependencies use I<undef> as in the example bellow,.
+
+	AddRule [VIRTUAL], 'install',  [install => undef], \&Installer ;
+
+
+=head4 WARNING! All dependers are run!
+
+If multiple rules match a node, the sum of the dependencies returned by matching dependers will become the node dependencies.
+If the following rules:
+
+	AddRule 'o_c', ['*.o' => '*.c'] ;
+	AddRule 'o_s', ['*.o' => '*.s'] ;
+
+are used on file I<compress.c>, the dependers would generate the following dependencies: I<compress.c> B<and> I<compress.s>.
+
+=head1 Hello world!
+
+We will now go through examples, starting withh a very simple setup to a complicated one.
+
+=head2 A simple example
+
+A simple file named 'hello.c' contains the well known C program. We'll use the following Pbsfile:
+
+	AddRule [VIRTUAL], 'all', ['all' => 'a.out'] ;
+	AddRule 'binary', ['a.out' => 'hello.o'] ;
+
+
+Let's run I<pbs> with the following command line:
+
+	sh-2.05b$ pbs -tt -tno -tta all
+	No source directory! Using '/home/nadim/devel/modules/PBS/pbs_users_guide/1'.
+	No Build directory! Using '/home/nadim/devel/modules/PBS/pbs_users_guide/1'.
+	No user defined [PBS] Build(), using DefaultBuild() with [BuiltIn, User] rules and [BuiltIn, User] configs.
+	** Depending [PBS/0] **
+	
+	** Checking **
+	Tree for __PBS_root_pbs_._Pbsfile.pl:
+	`- ./all [H1]
+	   `- ./a.out [H2]
+	      `- ./hello.o [H3]
+	
+	** Building **
+	Number of nodes in the dependency tree: 3.
+	Skipping build.
+	Debug flag 'DEBUG_DISPLAY_TREE_NAME_ONLY' is set. Use --fb to force build.
+
+The switches --tt --tno --tta directed I<pbs> to display the dependency tree defined
+by our Pbsfile and abort. The output tells us we have 3 nodes in the dependency tree
+and their names. Note that the node 'hello.c' is not included in the dependency tree. 
+I<pbs> doesn't have any built-in rule to infere the dependency of a '.o' file on the
+matching '.c' file.
+
+Let's add a rule to define that dependency:
+
+	AddRule 'hello.o', ['hello.o' => 'hello.c'] ;
+
+And Run I<pbs>:
+	
+	sh-2.05b$ pbs all
+	...
+	** Building **
+	Number of nodes in the dependency tree: 4.
+	4 [1V] nodes scheduled for build.
+	#------------------------------------------------------------------------------
+	Node './hello.c' [/home/nadim/devel/modules/PBS/pbs_users_guide/1/hello.c] :
+	Building /home/nadim/devel/modules/PBS/pbs_users_guide/1/hello.c : BUILD_FAILED : No Builder.
+		__DIGEST_TRIGGERED (Digest file '/home/nadim/devel/modules/PBS/pbs_users_guide/1/hello.c.pbs_md5' not found)
+	
+	Build Done.
+
+I<pbs> tries to rebuild 'hello.c' because it can't find a digest file. I<pbs> verifies 
+files with the help of MD5 digest (see reference manual a complete discussion).
+'hello.c' also includes a header file but I<pbs> seems to ignore them. We need a
+set of rules to teach I<pbs> how to compile c files. Although I<pbs> does have any built-in
+rules, it comes with the rules needed to compile c files, those rules are complex and 
+explained in another section.
+
+=head3 Using the rules for c files
+
+I<pbs> uses the B<PbsUse> directive to 'include' sets of rules or configuration.
+Prepending the following line to your Pbsfile includes the set of rules needed to compile c files:
+	
+	PbsUse('Rules/C') ;
+
+Let's run I<pbs> with our new Pbsfile:
+	
+	sh-2.05b$ pbs all
+	...
+	** Depending [PBS/0] **
+	In Pbsfile : ./Pbsfile.pl, while at rule 4:hello.o, node './hello.o'
+	    ./hello.c already inserted by rule 0:o_cs_meta, Ignoring duplicate dependency.
+	Configuration variable 'CC' doesn't exist. Aborting.
+	Died at '/home/nadim/devel/modules/PBS/PBSLib/Rules/C_depender.pm' line 353.
+
+I<pbs> first complains about a duplicate dependency. 'hello.c' is defined as a dependency
+to 'hello.o' by the rule 'hello.o' and the rule 'o_cs_meta'. This is a warning. The set of rule
+we included automatically generates dependencies from '.o' file to '.c' files. We will
+eliminate the warning by removing our rule from the Pbsfile.
+
+I<pbs> then complains about the variable 'CC' not being defined. 'CC' is the standard variable
+used to point to the c compiler. You would declare that variable depending on what system
+you use. I<pbs> comes with a simple configuration file we can use.
+
+We add the following line in our Pbsfile and remove the 'hello.o' rule:
+	
+	PbsUse('Configs/gcc') ;
+	
+Running I<pbs> gives this output:
+
+=head1 AUTHOR 
+
+Khemir Nadim ibn Hamouda. <nadim@khemir.net>
+
+=head1 COPYRIGHT and LICENSE 
+
+=cut
+

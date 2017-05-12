@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use FindBin '$Bin';
+
+use Benchmark::Command;
+
+Benchmark::Command::run(0, {
+    'perl'           => [$^X, "-I$Bin/..lib", "-e1"],
+    'load_periswrap' => [$^X, "-I$Bin/..lib", "-MPerinci::Sub::Wrapper", "-e", 1],
+    'wrap_minimal'   => [$^X, "-I$Bin/..lib", "-MPerinci::Sub::Wrapper=wrap_sub", "-e", q!wrap_sub(sub=>sub{}, meta=>{v=>1.1})!],
+    'wrap_typical'   => [$^X, "-I$Bin/..lib", "-MPerinci::Sub::Wrapper=wrap_sub", "-e", q!wrap_sub(sub=>sub{}, meta=>{v=>1.1, summary=>"Some summary", args=>{a1=>{schema=>"int*", req=>1, pos=>0}, a2=>{schema=>"str"}, a3=>{schema=>"str*",}, a4=>{schema=>"str"}, a5=>{schema=>"str*"}}})!],
+});

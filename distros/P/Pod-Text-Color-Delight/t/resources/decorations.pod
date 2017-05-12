@@ -1,0 +1,6 @@
+=head1 headline
+
+B<foo>
+F<bar>
+I<baz>
+L<qux>

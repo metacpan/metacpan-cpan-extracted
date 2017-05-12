@@ -1,0 +1,83 @@
+################################################################################
+#
+# PML.pm (PML Markup Language)
+#
+################################################################################
+#
+# Copyright (C) 1999-2000 Peter J Jones (pjones@cpan.org)
+# All Rights Reserved
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. Neither the name of the Author nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+# DAMAGE.
+#
+################################################################################
+NAME
+    PML (PML Markup Lanuage)
+
+SYNOPSIS
+    use PML;
+
+    my $parser = new PML;
+
+    $parser->parse('/path/to/somefile');
+
+    my $output = $parser->execute;
+
+DESCRIPTION
+    PML is a powerful text preprocessor. It supports such things as
+    variables, flow control and macros. After preprocessing a text file it
+    returns the result to your Perl script. The power comes from the fact
+    that you can even embed Perl code into the file that is getting
+    processed.
+
+    PML was originaly designed to seperate a Perl CGI script and the HTML
+    that it generates. What sets PML apart from other similar solutions is
+    that it is not just a web solution using mod_perl. You can parse PML
+    files from the command line using the supplied pml script or from within
+    your Perl scripts using the PML Perl module.
+
+    If you do have mod_perl, you can use the supplied mod_pml Apache module
+    to parse PML files from within the Apache web server.
+
+EXAMPLE PML FILE
+            <html>
+                    <head>
+                            <title>${title}</title>
+                    </head>
+                    <body>
+                    @if(${title}) {
+                            <h1>${title}</h1>
+                    }
+                    </body>
+            </html>
+
+DOCUMENTATION
+    Documentation is supplied with this module, in the doc directory.
+
+          language.html: describes the language.
+
+       pml-modules.html: tells you how to write a PML module
+
+    pml-custom-app.html: tells you how to extend PML from within your

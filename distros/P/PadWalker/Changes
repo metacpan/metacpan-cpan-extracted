@@ -1,0 +1,187 @@
+Revision history for Perl extension PadWalker.
+
+0.01  Thu Nov  9 12:58:10 2000
+	- original version; created by h2xs 1.19
+
+Revision history between 0.01 and 0.03 has been lost in the mists
+of time. Sorry about that.
+
+0.03 was the first public release.
+
+0.04  Thu Jul 19 13:50:19 BST 2001
+	- Applied patch from Richard Soderberg to let it compile
+	  under ithreads
+
+0.05  Thu Jan 10 21:12:10 GMT 2002
+	- Experimental peek_sub routine
+
+0.06  Wed Mar  6 22:16:13 GMT 2002
+	- Proper test script
+	- Two bug fixes
+
+0.07  Thu Mar 14 19:56:29 GMT 2002
+	- Clean up POD documentation
+	- Behave properly with debugger
+	- Work under Perl 5.005
+
+0.08  Mon Mar 18 17:54:16 GMT 2002
+	- _upcontext() XSUB, for Richard Clamp
+	- work properly with recursion
+	- see past eval
+
+0.09  Wed May 21 17:24:32 BST 2003
+        - compile on threaded builds
+        - skip test 9 if we're on Perl 5.8. (Otherwise it fails.)
+
+0.10  Wed Jul 30 18:40:03 BST 2003
+	- accommodate the new versions of perl (5.8.1)
+	- acknowledge that test 9 fails because nested eval handling
+          is simply broken. (Fix in a future release.)
+
+0.11  Wed Aug 10 20:06:41 BST 2005 
+	- fix various nasty bugs, specifically:
+	 o peek_my(1) now works correctly in a sub called from the top level;
+	 o deal better with sub calls across source files
+	- don't return 'our' variables. (It is peek_my(), after all!
+	  And the values were never properly returned.)
+
+0.12  Tue Aug 16 15:40:04 BST 2005
+	- make it work (up to a point) with Perl 5.6.
+
+0.13  Mon Oct  3 11:54:23 BST 2005
+	- don't build a debugging build unless explicitly told to!
+
+0.14  Thu Oct  6 17:19:06 BST 2005
+	- Fix the bugs reported by Dave Mitchell:
+	 o if one variable masks another, make sure we return the
+	   appropriate one;
+	 o for a variable whose value has been lost, return undef
+	   rather than the name of the variable;
+	 o Don't die if PadWalker is called from a closure whose
+           containing scope has disappeared.
+
+0.99  Fri Oct  7 17:23:09 BST 2005
+	- Make peek_sub return the values, if possible,
+ 	  even when it's not in the call chain;
+	- Allow an our variable to mask a my variable,
+	  and vice versa;
+	- Add peek_our and closed_over routines.
+
+0.99_91  Thu Oct 13 17:35:11 BST 2005
+	- Make peek_my work correctly when called from a do "file";
+	- Add var_name routine;
+	- Add an :all EXPORT_TAG;
+	- Drop support for perl < 5.8;
+	- Eliminate compiler warnings (at least on gcc).
+
+0.99_92  Sat Oct 15 00:17:24 BST 2005
+	- Add license info to META.yml;
+	- Use tabs consistently in the Changes file...
+	- Don't use snprintf (apparently Bill Gates doesn't approve);
+	- ignore 'our' variables in closed_over();
+	- Eliminate more compiler warnings, this time on Win32.
+
+0.99_93  Fri Oct 28 13:18:20 BST 2005
+	- Change the sekrit undocumented second return value
+	  of closed_over() to something slightly different.
+
+1.0  Wed Nov  2 12:25:49 GMT 2005
+	- Bump version number to 1.0
+
+1.1  Sun Oct 22 16:13:40 BST 2006
+	- Accommodate change 27312 "Store the stash for our in magic slot"
+	  (See http://www.mail-archive.com/perl5-changes@perl.org/msg14073.html
+	  or http://public.activestate.com/cgi-bin/perlbrowse/27312)
+	
+	  See also http://public.activestate.com/cgi-bin/perlbrowse/27306
+
+1.2  Thu Nov 16 22:33:27 GMT 2006
+	- Change prerequisites to accurately reflect versions of Perl that
+	  PadWalker actually works with (i.e. 5.8.2 or later).
+	- Fix memory leak: thanks to Rocco Caputo
+
+1.3  Tue Jan  2 23:10:35 GMT 2007
+	- Accommodate changes 29629-29630 "Move the low/high cop sequences
+	  from NVX/IVX to a two U32 structure".
+
+1.4  Fri Jan  5 09:12:11 GMT 2007
+	- Accommodate change 29679 "Rename OURSTASH to SvOURSTASH and
+	  OURSTASH_set to SvOURSTASH_set". (Dear Nick, please stop
+	  breaking PadWalker. kthxbye.)
+
+1.5  Fri Jan  5 16:22:27 GMT 2007
+	- Fix egregrious bug in 1.4 :-(
+
+1.6  Mon Jan 14 10:48:09 GMT 2008
+	- Make _upcontext work in 64-bit architectures.
+	  (http://rt.cpan.org/Ticket/Display.html?id=32287)
+	  Thanks to Niko Tyni.
+
+1.7  Mon Feb  4 09:56:31 GMT 2008
+	- Keep up with changes in blead post-5.10 (@33030)
+
+1.8  Thu 25 Jun 2009 21:17:17 BST
+	- Apply patches from doy (#41710) and nothingmuch (set_closed_over).
+
+1.9  Fri 26 Jun 2009 10:01:17 BST
+	- Identical to 1.8, but with the bogus metadata ._ files removed
+	  from the distributed tar file.
+
+1.91  Wed 14 Jul 2010 01:07:05 BST
+	- Incorporate patches from Florian Ragwitz and Yuval Kogman
+          (see http://github.com/robinhouston/PadWalker/commits/master)
+
+1.92  Thu 15 Jul 2010 17:05:05 BST
+	- Remove "Jobsian dot file cruft" reported by Steve Mynott.
+	- Incorporate patch from Fuji, Goro, correcting earlier patch from Yuval Kogman.
+
+1.93  Sun  5 Feb 2012 15:52:57 GMT
+	- Correct the version number in META.yml
+	    (https://rt.cpan.org/Ticket/Display.html?id=59459)
+      Do this by using MakeMaker to auto-generate META.yml, to prevent
+      similar problems in future. This is possible because the new
+      MakeMaker parameter MIN_PERL_VERSION was added in MakeMaker 6.47_01;
+      the fact that this didn’t used to exist is the reason we managed META.yml
+      by hand till now.
+
+1.94  Tue 26 Jun 2012 09:51:27 BST
+	- Make one of the tests a bit more flexible, to accommodate a subtle
+	  change in behaviour caused by a recent change to perl
+	  (viz a0d2bbd5c47035a4f7369e4fddd46b502764d86e).
+
+1.95  Thu 23 Aug 2012 11:42:21 BST
+	- Pad changes in 5.17.4-to-be
+	  This is a patch from Father Chrysostomous.
+	  See https://rt.cpan.org/Public/Bug/Display.html?id=79154
+
+1.96  Fri 24 Aug 2012 13:03:31 BST
+	- Restore compatibility with Perl 5.8
+	  Thanks again to Father Chrysostomous
+
+1.97  Sun 27 Oct 2013 10:09:41 GMT
+    - Improve peek_sub error handling
+	  Thanks to Zefram for the bug report.
+	  See https://rt.cpan.org/Ticket/Display.html?id=89679
+
+1.98  Sun 27 Oct 2013 16:27:19 GMT
+	- Make new test compatible with old versions of perl.
+
+1.99  Tue 11 Nov 2014 15:01:37 CET
+    - Make it compatible with bleadperl.
+      Patch from Father Chrysostomous at https://rt.cpan.org/Public/Bug/Display.html?id=100262
+
+1.99_1  Tue 11 Nov 2014 19:38:17 CET
+    - Restore compatibility with perl 5.8
+      Patch from paul@city-fan.org at https://rt.cpan.org/Public/Bug/Display.html?id=100262#txn-1431869
+
+2.0  Mon  8 Dec 2014 13:45:37 GMT
+    - Restore compatibility with bleadperl
+      Patch from Dagfinn Ilmari Mannsåker at https://github.com/robinhouston/PadWalker/pull/3
+
+2.1  Fri 24 Apr 2015 20:29:12 BST
+    - Another bleadperl fix
+      https://rt.cpan.org/Public/Bug/Display.html?id=101037
+
+2.2  Fri 23 Oct 2015 17:55:31 BST
+    - Convert to PERL_NO_GET_CONTEXT
+      https://github.com/robinhouston/PadWalker/pull/2

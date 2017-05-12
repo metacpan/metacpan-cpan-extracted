@@ -1,0 +1,23 @@
+Revision history for Perl extension Pad::Tie
+
+0.006   2007-04-25 hdp
+        change Lexical::Persistence subclass to not set $arg_ variables;
+          just pass in @_ like a normal function
+
+0.005   2007-04-25 hdp
+        autovivify hash and array attrs
+        fix test collision
+
+0.004   2007-04-25 hdp
+        add array_attr, hash_attr, base hash object attr plugin
+        don't load plugins under Plugin::Base::
+
+0.003   2007-04-24 hdp
+        fix pod, add to TODO
+        add scalar_attr and unfortunate pre_call mechanism
+
+0.002   2007-04-24 hdp
+        'pod is so goofy' -- rjbs 
+
+0.001   2007-04-24 hdp
+        original version

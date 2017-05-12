@@ -1,0 +1,94 @@
+NAME
+       POE::Session::MessageBased - a message-based (not @_
+       based) POE::Session
+
+SYNOPSIS
+         use POE::Kernel;
+         use POE::Session::MessageBased;
+
+         POE::Session::MessageBased->create
+           ( inline_states =>
+             { _start => sub {
+                 my $message = shift;
+                 print "Started.\n";
+                 $message->kernel->yield( count => 2 );
+               },
+               count => sub {
+                 my ($message, $count) = @_;
+                 print "Counted to $count.\n";
+                 if ($count < 10) {
+                   $message->kernel->yield( count => ++$count );
+                 }
+               },
+               _stop => sub {
+                 print "Stopped.\n";
+               }
+             },
+           );
+
+         POE::Kernel->run();
+
+
+DESCRIPTION
+       POE::Session::MessageBased exists mainly to replace
+       @_[KERNEL, etc.]  with message objects that encapsulate
+       various aspects of each event.  It also exists as an exam-
+       ple of a subclassed POE::Session, in case someone wants to
+       create new callback or Session semantics.
+
+       People generally balk at the @_[KERNEL, etc.] calling con-
+       vention that POE uses by default.  The author defends the
+       position that this calling convention is a simple combina-
+       tion of common Perl features.  Interested people can read
+       http://poe.perl.org/?POE_FAQ/calling_convention for a more
+       detailed account.
+
+       Anyway, POE::Session::MessageBased subclasses POE::Session
+       and works almost identically to it.  The major change is
+       the way event handlers (states) are called.
+
+       Inline (coderef) handlers gather their parameters like
+       this.
+
+         my ($message, @args) = @_;
+
+       Package and object-oriented handlers receive an additional
+       parameter representing the package or object.  This is
+       part of the common calling convention that Perl uses.
+
+         my ($package, $message, @args) = @_;  # Package states.
+         my ($self, $message, @args) = @_;     # Object states.
+
+       The $message parameter is an instance of
+       POE::Session::Message, which is not documented elsewhere.
+       POE::Session::Message encapsulates every POE parameter and
+       provides accessors for them.
+
+         POE::Session             POE::Session::MessageBased
+         ------------------------ -----------------------------------
+         $_[OBJECT]               $package, or $self
+         $_[SESSION]              $message->session
+         $_[KERNEL]               $message->kernel
+         $_[HEAP]                 $message->heap
+         $_[STATE]                $message->state
+         $_[SENDER]               $message->sender
+         $_[CALLER_FILE]          $message->caller_file
+         $_[CALLER_LINE]          $message->caller_line
+         @_[ARG0..$#_]            $message->args (in list context)
+
+       You do not need to use POE::Session::Message yourself.  It
+       is included in POE::Session::MessageBased itself.
+
+BUGS
+       $message->args() always returns a list: @_[ARG0..$#_].  It
+       would be nice to return a list reference in scalar con-
+       text.
+
+AUTHOR & LICENSE
+       POE::Session::MessageBased is Copyright 2002-2010 by Rocco
+       Caputo.  All rights are reserved.  POE::Session::Message-
+       Based is free software; you may redistribute it and/or
+       modify it under the same terms as Perl itself.
+
+       The author may be contacted by e-mail via
+       rcaputo@cpan.org.

@@ -1,0 +1,25 @@
+---
+name: Postal-US-State
+version: v0.0.1
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: State names and codes
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Postal-US-State
+  homepage: http://scratchcomputing.com/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.scratchcomputing.com/Postal-US-State/trunk
+build_requires:
+  Module::Build: 0.34
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Postal::US::State:
+    file: lib/Postal/US/State.pm
+    version: v0.0.1
+generated_by: Module::Build version 0.350201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

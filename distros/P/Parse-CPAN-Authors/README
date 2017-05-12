@@ -1,0 +1,64 @@
+NAME
+    Parse::CPAN::Authors - Parse 01mailrc.txt.gz
+
+SYNOPSIS
+      use Parse::CPAN::Authors;
+
+      # must have downloaded
+      my $p = Parse::CPAN::Authors->new("01mailrc.txt.gz");
+      # either a filename as above or pass in the contents of the file
+      my $p = Parse::CPAN::Authors->new($mailrc_contents);
+
+      my $author = $p->author('LBROCARD');
+      # $a is a Parse::CPAN::Authors::Author object
+      # ... objects are returned by Parse::CPAN::Authors
+      print $author->email, "\n";   # leon@astray.com
+      print $author->name, "\n";    # Leon Brocard
+      print $author->pauseid, "\n"; # LBROCARD
+
+      # all the author objects
+      my @authors = $p->authors;
+
+DESCRIPTION
+    The Comprehensive Perl Archive Network (CPAN) is a very useful
+    collection of Perl code. It has several indices of the files that it
+    hosts, including a file named "01mailrc.txt.gz" in the "authors"
+    directory. This file contains lots of useful information on CPAN authors
+    and this module provides a simple interface to the data contained
+    within.
+
+    Note that this module does not concern itself with downloading this
+    file. You should do this yourself.
+
+METHODS
+  new()
+    The new() method is the constructor. It takes either the path to the
+    01mailrc.txt.gz file or its contents. It defaults to loading the file
+    from the current directory. You must download it yourself.
+
+      # must have downloaded
+      my $p = Parse::CPAN::Authors->new("01mailrc.txt.gz");
+      # either a filename as above or pass in the contents of the file
+      my $p = Parse::CPAN::Authors->new($mailrc_contents);
+
+  author()
+    The author() method returns a Parse::CPAN::Authors::Author object
+    representing a user:
+
+      my $author = $p->author('LBROCARD');
+
+  authors()
+    The authors() method returns a list of Parse::CPAN::Authors::Author
+    objects, for each author on CPAN:
+
+      my @authors = $p->authors;
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2004, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

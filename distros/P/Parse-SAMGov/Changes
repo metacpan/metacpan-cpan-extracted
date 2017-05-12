@@ -1,0 +1,32 @@
+0.106     2016-08-07 19:20:48-04:00 America/New_York
+
+0.106     2016-08-07 19:19:46-04:00 America/New_York
+
+    Adding an is_smallbiz() function to check for small business.
+    Adding a script to demonstrate streaming use of data
+
+0.105     2016-08-07 17:04:51-04:00 America/New_York
+
+    Fixing documentation error. Adding an example script
+
+0.104     2016-07-29 13:43:02-04:00 America/New_York
+
+    Fixing minor issues with PAUSE handling
+
+0.103     2016-07-28 17:28:30-04:00 America/New_York
+
+    Updating the parse_file() function to handle the code-ref parameter as a
+filter like grep
+
+0.102     2016-07-25 21:05:53-04:00 America/New_York
+
+    Updating the META.yml to have proper Github repo URLs and updating the pod
+to have proper links to the objects
+
+0.101     2016-07-25 14:39:05-04:00 America/New_York
+
+    Updating Initial release with versioning done better.
+
+0.100     2016-07-25 14:31:00-04:00 America/New_York
+
+    Initial release.

@@ -1,0 +1,14 @@
+Not in pod.
+
+=pod
+
+In pod.
+
+=cut
+
+Not in pod.
+
+=head1 POD
+
+More in pod.
+

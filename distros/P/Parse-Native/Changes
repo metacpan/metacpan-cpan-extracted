@@ -1,0 +1,6 @@
+Revision history for Perl extension Parse::Native.
+
+0.01  Sat Mar 13 16:15:58 2004
+	- original version; created by h2xs 1.23 with options
+		-X -n Parse::Native
+

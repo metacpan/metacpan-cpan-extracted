@@ -1,0 +1,119 @@
+==============================
+9999-99-99 99:99:99 +0000 HEAD
+==============================
+
+  commit e5afb6144d6c4960251dbb48a87d0f29a7db000a
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date:   Mon Oct 10 00:22:58 2011 +0200
+  
+    Oh dear, ok ok, version needs to be upgraded by hand, get it ;)
+
+  commit 5d542746af1237214b31c7bcee45caadd123b392
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date:   Mon Oct 10 00:22:06 2011 +0200
+  
+    Pointless commit to cheat CPAN
+
+  commit b7868e20f3530e11cbea7a5463099ab5ae883cb1
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date:   Sun Oct 9 23:34:56 2011 +0200
+  
+    Added .gitignore
+
+  commit 9049f78c923952e208385f029ec6d0ea4af82b00
+  Author: Treeki <treeki@gmail.com>
+  Date:   Sun Oct 9 22:32:14 2011 +0200
+  
+    calling Response->send explicitly no longer crashes after the handler
+    is done
+
+  commit 7b99c260f8120e0224c0f86fb0dfd2396ef99e62
+  Author: Treeki <treeki@gmail.com>
+  Date:   Sun Oct 9 21:51:18 2011 +0200
+  
+    "wrong version" warning now says that a request from a web browser
+    may cause it 
+
+==============================
+2011-05-25 09:35:54 +0100 0.18
+==============================
+
+  commit 6bb4c2edbddb7947657a29adf827978d9d727ec2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Wed May 25 09:35:54 2011 +0100
+  
+    Bump version to 0.18
+
+  commit 615caefeb459b6ffe8b541cd87c5fae1cc031abf
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Wed May 25 09:34:16 2011 +0100
+  
+    Remove trailing whitespace
+
+  commit ccb238889e16594b1239a86bb07c4816357b6e34
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Wed May 25 09:32:09 2011 +0100
+  
+    Make Changes be automagically generated from git history
+
+  commit e3f5e0a784f53bcfc624a1abe2ba71235c8ea929
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Wed May 25 09:28:57 2011 +0100
+  
+    Fix the tests after slight API change for ::Request
+
+  commit 2d2994af4c6c11636b4a3fe22f43076c100b462e
+  Author: Johan Ström <johan@stromnet.se>
+  Date:   Tue May 24 22:29:20 2011 +0200
+  
+    Added doc about shutdown event
+
+  commit 78786e5eaf5426994466ff86bfcfc136a7e5d518
+  Author: Johan Ström <johan@stromnet.se>
+  Date:   Tue May 24 22:22:39 2011 +0200
+  
+    Make sure wheels are dealt with from the correct session for proper
+    cleanup. If a event callback was used, and the external session
+    called write/send/close, the wheel was beeing worked on from the
+    wrong session. For regular write this was not a problem, but when
+    registering the FlushedEvent, the 'shutdown' event was sent to the
+    wrong session. This yielded a non-free'ed wheel. Also forcibly remove
+    circual references on cleanup, DESTROY get's called as it should now.
+
+  commit 2c010ae1328ba60cc1aba9d12fa5c85d722047c9
+  Author: Johan Ström <johan@stromnet.se>
+  Date:   Tue May 24 22:21:21 2011 +0200
+  
+    Expose public 'shutdown' event to properly shutdown server component.
+    Also added dummy _stop/_child methods to avoid warnings. 
+
+==============================
+2010-09-20 22:52:22 +0100 0.16
+==============================
+
+  commit 128aca8bca47d1e8826c2ebaa2ab05087b2ccf57
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Sep 20 22:52:22 2010 +0100
+  
+    Update Changes
+
+  commit 621bb4cccfd61ee00555a8bd9071eaea0b0ec934
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Sep 20 22:50:46 2010 +0100
+  
+    Apply a patch RT#61496 from symkat to add the content-length header
+    to responses. 
+
+==============================
+2010-08-26 00:17:45 +0100 0.14
+==============================
+
+  commit d12721becba90f58c932c68b370dc536a2e4b1f6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Aug 26 00:17:45 2010 +0100
+  
+    Make the use of POE::Session postbacks work again 
+
+====================================
+End of changes in the last 1825 days
+====================================

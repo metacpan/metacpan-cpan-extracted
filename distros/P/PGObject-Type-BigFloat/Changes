@@ -1,0 +1,17 @@
+Revision history for PGObject-Type-BigFloat
+
+1.0.1   2014-09-11
+        Minor documentation changes
+
+1.00	2014-02-20
+	Fixing Makefile Innacuracies
+
+0.03	2013-11-13
+	Added proper null handling for undef values.
+
+0.02	2013-11-12
+	Fixed test cases in routine installation.
+
+0.01    2013-11-11
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,56 @@
+Friday, 26 May 2000
+-------------------
+
+Description:
+------------
+	Pod::Pdf.pm translates the POD content of single files into Adobe
+	Portable Document Format.
+
+	The prime intention is a fast and simple utility for creating a 	
+	typographically good quality rendering of the POD text suitable for
+	screen viewing and printing via Acrobat 'Reader' to a wide variety of
+	printers including most low-cost non-postscript ink-jet printers. Text
+	blocks are justified at the right and left hand margins.
+
+	PDF Outlines (aka Bookmarks) are created from "=head" and "=item"
+	elements which also serve as the Table of Contents in the printed version. 	
+	Outlines are clickable on screen, and URI links are fully supported.
+	File links and other annotations are not supported in this version.
+	
+	The PDF file may be viewd on screen by a number of utilities, particularly
+	Acrobat 'Reader' (free from Adobe), GhostScript, AcrobatViewer (Java
+	Application) and for Apple users, directly on MacOS X. The PDF format
+	is to level 1.2.
+
+	The module is intended to function properly on all machine systems.
+	Any bug or problem reports and suggestions for improvement will be
+	welcomed by the author.
+
+Copying:
+--------
+    Copyright May 2000 Alan J. Fry. All rights reserved.
+
+    This program is free software distributed under the terms of the 
+    Perl Artistic Licence.
+    
+Prerequisites:
+--------------
+    perl 5.004
+    Adobe's 'Acrobat Reader' (see note above)
+
+Build/Installation:
+-------------------
+    Standard build/installation supported by ExtUtils::MakeMaker(3)...
+	perl Makefile.PL
+	make
+	make test
+	make install
+	
+	On MacOS it is best to have the CPAN module 'cpan-mac-0.40' installed.
+	However be prepared for a warning that ":scripts:MacOS:Pod2Pdf.dpl.bin"
+	is missing, because "tarzipme.plx" also unpacks the ".bin" file causing
+	a lexical discrepancy and a checksum mismatch.
+	
+Alan Fry
+mailto://ajf@afco.demon.co.uk
+http://www.afco.demon.co.uk

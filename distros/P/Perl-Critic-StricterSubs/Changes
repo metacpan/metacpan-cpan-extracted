@@ -1,0 +1,72 @@
+Revision history for Perl module Perl::Critic::StricterSubs
+
+0.05 2015-02-20
+
+    [Bug Fixes]
+    * Corrected dependencies listed in the META files. GH #1
+
+0.04 2015-02-18
+
+    [Bug Fixes]
+    * Fixed RT #72022. Uses of labels in next(), last() or redo() are no
+      longer seen by ProhibitCallsToUndeclaredSubs.
+
+    * Fixed RT #66863. Test::Deep not needed for testing.
+
+    * Fixed RT #62184. All subroutines imported in a quoted but
+      unparenthesized list are now seen by ProhibitCallsToUndeclaredSubs.
+
+    * Fixed RT #43314 and 44609. Modules::RequireExplicitInclusion now
+      allows __PACKAGE__->foo().
+
+    * Fixed RT #43310. Subroutines::ProhibitCallsToUndeclaredSubs now
+      handles imports that specify version number.
+
+    * Fixed RT #36783. Subroutines::ProhibitCallsToUndeclaredSubs now
+      handles qw{...} strings inside a list.
+
+    [Miscellaneous]
+    * Author-only tests have been moved to the xt/author directory.
+
+    * The repository for this code has been moved to GitHub.
+
+    * Modernized the format of this Changes log.
+
+    [Gratitude]
+    Thank you Tom Wyant for contributing all these patches. Thank you
+    Mark Gardner for motivating me to finally ship.
+
+0.03 2008-01-10
+
+     [Bug Fixes]
+     Fixed test failures due to incompatibility with newer
+     PPI versions.  This distro now requires PPI 1.2 vis-a-vi
+     Perl-Critic 1.080.  Thanks cpantesters!
+
+0.02 2007-07-01
+
+     [Enhancements]
+     * ProhibitCallsToUndeclaredSubs is now configurable to exempt specific
+       packages and subroutines.  See docs for details.
+
+     * Added support for blocks-of-constants in ProhibitCallsToUndeclaredSubs.
+       For example: use constant {FOO => 1, BAR => 2);
+
+     * RequireExplicitInclusion now considers all "include" statements.  So
+       a conditional or lexical "require" will now satisfy the policy, even
+       if that condition is never satisfied during run-time, or the package
+       is included in the wrong scope.
+
+     * Refactored common code into the StricterSubs::Utils module.
+
+     * Eliminated certain flavors of false-positives in several Policies.
+
+     * Improved caching gives performance boost when analyzing many files.
+
+     * Documented diagnostic messages.
+
+     * Now requires Perl-Critic-1.052+
+
+0.01 2007-04-12
+
+     Beta release.

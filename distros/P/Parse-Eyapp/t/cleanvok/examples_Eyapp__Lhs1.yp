@@ -1,0 +1,28 @@
+%right '=' 
+%left '-' '+' 
+%left '*' '/' 
+%left NEG 
+
+%%
+
+input:
+    | input line 
+;
+line:
+      '\n'
+    | exp '\n'
+    | error '\n' 
+;
+exp:
+      NUM
+    | VAR
+    | VAR '=' exp
+    | exp '+' exp
+    | exp '-' exp
+    | exp '*' exp
+    | exp '/' exp
+    | '-' exp %prec NEG
+    | '(' exp ')' 
+;
+
+%%

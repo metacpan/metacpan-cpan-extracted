@@ -1,0 +1,10 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libdivecomputer
+Description: A library for communication with various dive computers.
+Version: 0.0.0
+Libs: -L${libdir} -ldivecomputer
+Cflags: -I${includedir}/libdivecomputer

@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Parse/Tektronix/ISF.pm
+t/00-load.t
+t/01-read.t
+t/02-convert.t
+t/pod-coverage.t
+t/pod.t
+t/test.isf
+META.yml                                 Module meta-data (added by MakeMaker)

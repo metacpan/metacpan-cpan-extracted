@@ -1,0 +1,73 @@
+---
+abstract: 'Perl distro to aid in mod_perl1->PSGI migration'
+author:
+  - 'Chisel <chisel@chizography.net>'
+build_requires:
+  Data::Printer: '0'
+  FindBin::libs: '0'
+  Plack::Test: '0'
+  Pod::Coverage::TrustPod: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Pod::Coverage: '0'
+  Test::UseAllModules: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-App-FakeApache1
+provides:
+  Moose::APR::Table:
+    file: lib/Plack/App/FakeApache1/Request.pm
+    version: v0.0.5
+  Plack::App::FakeApache1:
+    file: lib/Plack/App/FakeApache1.pm
+    version: v0.0.5
+  Plack::App::FakeApache1::Constants:
+    file: lib/Plack/App/FakeApache1/Constants.pm
+    version: v0.0.5
+  Plack::App::FakeApache1::Handler:
+    file: lib/Plack/App/FakeApache1/Handler.pm
+    version: v0.0.5
+  Plack::App::FakeApache1::Request:
+    file: lib/Plack/App/FakeApache1/Request.pm
+    version: v0.0.5
+  Plack::App::FakeModPerl1:
+    file: lib/Plack/App/FakeModPerl1.pm
+    version: v0.0.5
+  Plack::App::FakeModPerl1::Dispatcher:
+    file: lib/Plack/App/FakeModPerl1/Dispatcher.pm
+    version: v0.0.5
+  Plack::App::FakeModPerl1::Server:
+    file: lib/Plack/App/FakeModPerl1/Server.pm
+    version: v0.0.5
+requires:
+  Apache::ConfigParser: '0'
+  Carp: '0'
+  Data::Dump: '0'
+  HTTP::Status: '0'
+  Moose: '0'
+  Package::DeprecationManager: '0'
+  Plack::Component: '0'
+  Plack::Request: '0'
+  Plack::Response: '0'
+  Plack::Util: '0'
+  Plack::Util::Accessor: '0'
+  Scalar::Util: '0'
+  Sub::Exporter: '0'
+  TryCatch: '0'
+  URI::URL: '0'
+  attributes: '0'
+  parent: '0'
+  perl: v5.10.1
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/chiselwright/Plack-App-FakeApache1/issues
+  repository: git://github.com/chiselwright/plack-app-fakeapache1.git
+version: 0.0.5

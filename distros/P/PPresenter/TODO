@@ -1,0 +1,28 @@
+
+Some wishes:
+
+- Adding TrueType-fonts support.  They may be nicer than scaling fonts.
+  When you use X11, they are available (just configure the correct
+  font-names), but they are not supported.
+
+- Full tutoral on the Markup formatter.  A short version is available.
+
+- Conversion program from the PPresenter's version of MarkUp into real HTML.
+
+- Dump screens to Postscript.
+  Works partially, but the question is whether ImageMagick, my printer, or
+  PPresenter is corrupting the output when slide-images are larger than
+  A5 (half of a4).  Might be solved by IM5.2 with large memory.
+
+- Slides can only be exported as images.  need to create a covertion from
+  Markup into real HTML to facilitate other exports.
+
+- Processing command-line arguments.  Command-line arguments should be
+  passed-on to the show-creation.
+
+- Documentation on XML.
+
+- Extention of XML.
+
+- Language corrections of the documentation.  Requires help, because I'm
+  not a native speaker.

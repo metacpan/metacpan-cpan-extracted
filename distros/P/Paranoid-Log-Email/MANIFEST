@@ -1,0 +1,13 @@
+Makefile.PL
+CHANGELOG
+README
+INSTALL
+MANIFEST
+LICENSE
+CREDITS
+lib/Paranoid/Log/Email.pm
+t/01_log_email.t
+t/98_pod_coverage.t
+t/99_pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

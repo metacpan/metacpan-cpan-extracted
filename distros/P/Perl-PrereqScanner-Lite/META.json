@@ -1,0 +1,96 @@
+{
+   "abstract" : "Lightweight Prereqs Scanner for Perl",
+   "author" : [
+      "moznion <moznion@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-PrereqScanner-Lite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Benchmark::Forking" : "0",
+            "Perl::PrereqScanner" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "autodie" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Meta::Requirements" : "2.125",
+            "Carp" : "0",
+            "Compiler::Lexer" : "0.22",
+            "Module::Path" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::PrereqScanner::Lite" : {
+         "file" : "lib/Perl/PrereqScanner/Lite.pm",
+         "version" : "0.26"
+      },
+      "Perl::PrereqScanner::Lite::Constants" : {
+         "file" : "lib/Perl/PrereqScanner/Lite/Constants.pm"
+      },
+      "Perl::PrereqScanner::Lite::Scanner::Moose" : {
+         "file" : "lib/Perl/PrereqScanner/Lite/Scanner/Moose.pm"
+      },
+      "Perl::PrereqScanner::Lite::Scanner::Version" : {
+         "file" : "lib/Perl/PrereqScanner/Lite/Scanner/Version.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/moznion/Perl-PrereqScanner-Lite/issues"
+      },
+      "homepage" : "https://github.com/moznion/Perl-PrereqScanner-Lite",
+      "repository" : {
+         "url" : "git://github.com/moznion/Perl-PrereqScanner-Lite.git",
+         "web" : "https://github.com/moznion/Perl-PrereqScanner-Lite"
+      }
+   },
+   "version" : "0.26",
+   "x_contributors" : [
+      "Kenichi Ishigaki <ishigaki@cpan.org>"
+   ]
+}

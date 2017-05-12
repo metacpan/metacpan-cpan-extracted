@@ -1,0 +1,26 @@
+0.91: Sun Jul  6 19:06:20 UTC 2008
+	- include makeztxt 1.62 with distribution.
+	- fix a few pod errors
+
+0.90: Thu Apr 15 01:12:13 UTC 2004
+	- rewrote most of the XS.
+	- Added  tests, yet still needs more.
+	- Wrote some documentation.
+	- Pretty close to finalizing the API.
+	- Rebranded as beta instead of alpha
+	- Bumped number from .3x to .9x to signify move from alpha to beta.
+	- Removed zlib api functions that should not be accessable form perl
+	  eg. process()/generate() [non-backwards compatible change]
+	  
+0.36 Mon Nov 24 04:00:00 UTC 2003
+	- Clean up remaing Ztxt_XS refrences from tests and XS files.
+	  Everthing tested fine, unless you tried to compile and make test
+	  on a system that never had Ztxt_XS installed
+
+0.35 Fri Sep 19 23:41:48 UTC 2003
+	- Implement Basic library functions. And simple interface
+
+0.01  Fri Sep 12 19:08:08 2003
+	- original version; created by h2xs 1.22 with options
+		-b5.6.1 --use-new-tests -cnPalm::Ztxt.
+

@@ -1,0 +1,16 @@
+=pod
+
+foo > <  &;
+
+    if( $x < 2 ) {
+    }
+
+---
+<pod_pod
+><pod_para
+>foo &gt; &lt;  &amp;;</pod_para
+><pod_preformated
+>    if( $x &lt; 2 ) {
+    }</pod_preformated
+></pod_pod
+>

@@ -1,0 +1,23 @@
+PostScript::CDCover module - create postscript for print a CD cover based on
+CD-ROM directory tree.
+============================================================
+
+The PostScript::CDCover module currently ships with a script that uses this
+module: pscdcover, which should be installed in a directory in your $PATH,
+along with its own manual page.
+
+pscdcover can make use of a configuration file, either /etc/pscdcoverrc or
+~/.pscdcoverrc. An example of such a file can be found in the source
+distribution of PostScript::CDCover.
+
+pscdcover supports a --mp3 command-line switch which enables it to print the
+song name instead of the file name when it encounters an MP3 file. To do so it
+needs the MP3::Info module to installed as well. Since one might want to use
+PostScript::CDCover for something else than MP3 files on CD, MP3::Info has not
+been included in the module's dependancies, so it will not be automatically
+installed by CPAN when you install PostScript::CDCover: you'll have to do it
+explicitely.
+
+Thank you for using PostScript::CDCover.
+
+Cédric Bouvier <cbouvi@cpan.org>

@@ -1,0 +1,18 @@
+Revision history for Pod-Weaver-Section-Template
+
+0.04  2014-06-21
+      Release by Christopher J. Madsen
+      - Fix tests to avoid "cannot remove path" warning
+
+0.03  2012-08-26
+      Release by Christopher J. Madsen
+      - Fix tests to work with Pod::Elemental::PerlMunger 0.093332
+
+0.02  2012-05-31
+      Improvements by new co-maintainer Christopher J. Madsen:
+      - Make $filename and $plugin available to templates
+      - Fix order-of-initialization bug
+      - Report errors in templates
+
+0.01  2010-06-13
+      - Initial release

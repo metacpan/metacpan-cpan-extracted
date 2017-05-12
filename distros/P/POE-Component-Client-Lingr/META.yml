@@ -1,0 +1,20 @@
+abstract: POE chat component for Lingr.com
+author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: POE-Component-Client-Lingr
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Data::Visitor::Callback: 0
+  HTTP::Request: 0
+  JSON::Syck: 0
+  POE: 0
+  POE::Component::Client::HTTP: 0
+  URI: 0
+version: 0.04

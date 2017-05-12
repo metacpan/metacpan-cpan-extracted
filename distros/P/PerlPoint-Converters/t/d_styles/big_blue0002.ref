@@ -1,0 +1,102 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!-- ZOOMSTOP -->
+
+<HTML>
+
+<!-- *** Created by pp2html, build 1.21 from PerlPoint-Converters 1.0202  -->
+
+<HEAD>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+
+<!-- ZOOMRESTART -->
+
+
+
+<TITLE>Another Page</TITLE>
+</HEAD>
+
+<!-- ************************************************************** -->
+<BODY bgcolor="#0000BB" text="yellow" link="white" vlink="white" alink="red">
+<!-- ---- Top Navigation Bar ------------------------------------- BEGIN 
+  $Id: big_blue-top.tpl,v 1.2 2001/12/06 21:38:12 lorenz Exp $
+-------------------------------------------------------------------- -->
+<!--
+  *** This text is included just below the BODY line in all HTML pages
+  $Id: big_blue-top.tpl,v 1.2 2001/12/06 21:38:12 lorenz Exp $
+  $Revision: 1.2 $
+  $Date: 2001/12/06 21:38:12 $
+-->
+<FONT SIZE=+6>
+
+<TABLE bgcolor="#FFFF99" WIDTH=100%  BORDER=0 CELLSPACING=0>
+<TR>
+  <TD bgcolor="#FFFF99" valign=center WIDTH=20% >
+     <a href="http://www.perlworkshop.de"><img src="karawane-50.gif" border=0></a>
+  </TD>
+  <TD align=center bgcolor="#FFFF99">
+     <FONT SIZE=+2 color=black><B>
+       Test of BigBlue
+     </B></FONT>
+  </TD>
+  <TD align=right WIDTH=20% bgcolor="#FFFF99">
+     2
+  </TD>
+</TR>
+</TABLE>
+<HR>
+
+<TABLE> 
+<TR>
+  <TD colspan=3 >
+    Weiter:  <a href="big_blue0003.htm">Last Page</a>
+    &nbsp;&nbsp;Zurück:  <a href="big_blue0001.htm">Test of Styles</a>
+     &nbsp;&nbsp;TOC: <a href="big_blue0000.htm">Inhaltsverzeichnis</a>
+  </td>
+</TR>
+</TABLE>
+<P>
+<!-- ---- Top Navigation Bar ---------------------------------- END -->
+<a name="Another Page"></a>
+<center>
+<H1>2 Another Page
+</H1></center>
+
+
+<P>
+This is <A name="index_2_2"></A>page 2
+</P>
+<!-- ---- Bottom Navigation Bar ---------------------------------- BEGIN 
+  $Id: big_blue-bot.tpl,v 1.2 2001/12/06 21:38:12 lorenz Exp $
+-------------------------------------------------------------------- -->
+<HR SIZE=8>
+
+</FONT>
+<TABLE WIDTH=100%  BORDER=0 CELLSPACING=0 CELLPADDING=2>
+<TR>
+
+  <TD  WIDTH=10%>
+     Weiter:<br>
+     Zurück:<br>
+     TOC:<br> 
+     Index:<br> 
+  </TD>
+  <TD >
+     <a href="big_blue0003.htm">Last Page</a><br>
+     <a href="big_blue0001.htm">Test of Styles</a><br>
+     <a href="big_blue0000.htm">Inhaltsverzeichnis</a><br> 
+     <a href="big_blue_idx.htm">Index</a><br> 
+  </TD>
+ <TD VALIGN=top ALIGN=right ><SMALL>
+    Copyright &copy; PerlPoint.Org
+    </SMALL>
+ </TD>
+
+</TR>
+</TABLE>
+<!-- ---- Bottom Navigation Bar -------------------------------- END -->
+</BODY>
+</HTML>

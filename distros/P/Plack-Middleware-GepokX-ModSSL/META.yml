@@ -1,0 +1,46 @@
+---
+abstract: 'roughly compatible with Plack::Middleware::Apache2::ModSSL'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+  - 'TOBYINK <tobyink@cpan.org>'
+build_requires:
+  Net::SSL: '0'
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::6 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-GepokX-ModSSL
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Plack::Middleware::GepokX::ModSSL:
+    file: lib/Plack/Middleware/GepokX/ModSSL.pm
+    version: '0.002'
+requires:
+  Crypt::X509: '0'
+  DateTime: '0'
+  Gepok: '0.20'
+  MIME::Base64: '0'
+  Net::SSLeay: '0'
+  Plack: '0'
+  base: '0'
+  strict: '0'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Plack-Middleware-GepokX-ModSSL/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Plack-Middleware-GepokX-ModSSL
+  homepage: https://metacpan.org/release/Plack-Middleware-GepokX-ModSSL
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-plack-middleware-gepokx-modssl.git
+version: '0.002'

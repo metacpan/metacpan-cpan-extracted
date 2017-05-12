@@ -1,0 +1,1680 @@
+=head1 NAME
+
+Prima::Drawable - 2-D graphic interface
+
+=head1 SYNOPSIS
+
+   if ( $object-> isa('Prima::Drawable')) {
+        $object-> begin_paint;
+	$object-> color( cl::Black);
+	$object-> line( 100, 100, 200, 200);
+	$object-> ellipse( 100, 100, 200, 200);
+        $object-> end_paint;
+   }
+
+=head1 DESCRIPTION
+
+Prima::Drawable is a descendant of Prima::Component.
+It provides access to the object-bound graphic context and canvas
+through its methods and properties. The Prima::Drawable
+descendants Prima::Widget, Prima::Image, Prima::DeviceBitmap
+and Prima::Printer are backed by system-dependent routines
+that allow drawing and painting on the system objects.
+
+=head1 USAGE
+
+Prima::Drawable, as well as its ancestors Prima::Component and
+Prima::Object, is never used directly, because Prima::Drawable class
+by itself provides only the interface. It provides a
+three-state object access - when drawing and painting is enabled,
+when these are disabled, and the information acquisition state. 
+By default, the object is created in paint-disabled state. To 
+switch to the enabled state, begin_paint() method is used. Once in the enabled state,
+the object drawing and painting methods apply to the object-bound canvas.
+To return to the disabled state, end_paint() method is called.
+The information state can be managed by using 
+begin_paint_info() and end_paint_info() methods pair. An object
+cannot be triggered from the information state
+to the enabled state ( and vice versa ) directly.
+These states differ on how do they apply to a graphic context and
+a canvas.
+
+=head2 Graphic context and canvas
+
+The graphic context is the set of variables, that control how exactly
+graphic primitives are rendered. The variable examples are color, font,
+line width, etc.
+Another term used here is 'canvas' - the graphic area of a certain extent,
+bound to the object, where the drawing and painting methods are applied to.
+
+In all three states a graphic context is allowed to be modified, but
+in different ways.
+In the disabled state the graphic context values form a template values;
+when a object enters the information or the enabled state, the values
+are preserved, but when the object is back to the disabled state,
+the graphic context is restored to the values last assigned before entering
+new state. The code example below illustrates the idea:
+
+   $d = Prima::Drawable-> create;
+   $d-> lineWidth( 5);
+   $d-> begin_paint_info;
+   # lineWidth is 5 here
+   $d-> lineWidth( 1);
+   # lineWidth is 1 
+   $d-> end_paint_info;
+   # lineWidth is 5 again
+
+( Note: C<::region>, C<::clipRect> and C<::translate> properties are exceptions. 
+They can not be used in the disabled state; their values are neither 
+recorded nor used as a template).
+
+That is, in disabled state any Drawable maintains only the graphic context.
+To draw on a canvas, the object must enter the enabled state by calling begin_paint().
+This function can be unsuccessful, because the object binds with system resources
+during this stage, and might fail. Only after the enabled state is entered, 
+the canvas is accessible:
+
+   $d = Prima::Image-> create( width => 100, height => 100);
+   if ( $d-> begin_paint) {
+      $d-> color( cl::Black);
+      $d-> bar( 0, 0, $d-> size);
+      $d-> color( cl::White);
+      $d-> fill_ellipse( $d-> width / 2, $d-> height / 2, 30, 30);
+      $d-> end_paint;
+   } else {
+      die "can't draw on image:$@";
+   }
+
+Different objects are mapped to different types of canvases -
+Prima::Image canvas pertains its content after end_paint(),
+Prima::Widget maps it to a screen area, which content is of 
+more transitory nature, etc.
+
+The information state is as same as the enabled state, but the changes to
+a canvas are not visible. Its sole purpose is to read, not to write information.
+Because begin_paint() requires some amount of system resources, there is
+a chance that a resource request can fail, for any reason. The begin_paint_info()
+requires some resources as well, but usually much less, and therefore
+if only information is desired, it is usually faster and cheaper to
+obtain it inside the information state. A notable example is
+get_text_width() method, that returns the length of a text string in pixels.
+It works in both enabled and information states, but code
+
+   $d = Prima::Image-> create( width => 10000, height => 10000);
+   $d-> begin_paint;
+   $x = $d-> get_text_width('A');
+   $d-> end_paint;
+
+is much more 'expensive' than 
+
+   $d = Prima::Image-> create( width => 10000, height => 10000);
+   $d-> begin_paint_info;
+   $x = $d-> get_text_width('A');
+   $d-> end_paint_info;
+
+for the obvious reasons.
+
+It must be noted that some information methods like get_text_width()
+work even under the disabled state; the object is switched to
+the information state implicitly if it is necessary.
+
+=head2 Color space
+
+Graphic context and canvas operations rely completely
+on a system implementation. The internal canvas color representation
+is therefore system-specific, and usually could not be described
+in standard definitions. Often the only information available 
+about color space is its color depth.
+
+Therefore, all color manipulations, including dithering and
+antialiasing are subject to system implementation, and can not
+be controlled from perl code. When a property is set in the object 
+disabled state, it is recorded verbatim; color properties 
+are no exception. After the object switched to the enabled
+state, a color value is transformed to a system color representation, 
+which might be different from Prima's. For example, if a display color depth is 15 bits,
+5 bits for every component, then white color value 0xffffff
+is mapped to
+
+ 11111000 11111000 11111000
+ --R----- --G----- --B-----
+
+that equals to 0xf8f8f8, not 0xffffff ( See L<Prima::gp-problems> for
+inevident graphic issues discussion ).
+
+The Prima::Drawable color format is RRGGBB, with each component
+resolution of 8 bit, thus allowing 2^24 color combinations. If the device color space
+depth is different, the color is truncated or expanded automatically. In
+case the device color depth is small, dithering algorithms might apply.
+
+Note: not only color properties, but all graphic context properties
+allow all possible values in the disabled state, which transformed into
+system-allowed values in the enabled and the information states. 
+This feature can be used to test if a graphic device is capable of 
+performing certain operations ( for example,
+if it supports raster operations - the printers usually do not ). Example:
+
+  $d-> begin_paint;
+  $d-> rop( rop::Or);
+  if ( $d-> rop != rop::Or) { # this assertion is always false without 
+     ...                      # begin_paint/end_paint brackets
+  }
+  $d-> end_paint;
+
+There are ( at least ) two color properties on each drawable -
+C<::color> and C<::backColor>. The values they operate are integers 
+in the discussed above RRGGBB format, however, the toolkit defines 
+some mnemonic color constants:
+
+  cl::Black
+  cl::Blue
+  cl::Green
+  cl::Cyan
+  cl::Red
+  cl::Magenta
+  cl::Brown
+  cl::LightGray
+  cl::DarkGray
+  cl::LightBlue
+  cl::LightGreen
+  cl::LightCyan
+  cl::LightRed
+  cl::LightMagenta
+  cl::Yellow
+  cl::White
+  cl::Gray
+
+As stated before, it is not unlikely that if a device color depth
+is small, the primitives plotted in particular colors
+will be drawn with dithered or incorrect colors. This usually happens
+on paletted displays, with 256 or less colors.
+
+There exists two methods that facilitate the correct color representation.
+The first way is to get as much information as possible about the device.
+The methods get_nearest_color() and get_physical_palette()
+provide possibility to avoid mixed colors drawing by obtaining 
+indirect information about solid colors, supported by a device.
+Another method is to use C<::palette> property. It works by inserting
+the colors into the system palette, so if an application
+knows the colors it needs beforehand, it can employ this method - however
+this might result in system palette flash when a window focus toggles.
+
+Both of these methods are applicable both with drawing routines and image output.
+An image desired to output with least distortion is advised to
+export its palette to an output device, because images usually are not 
+subject to automatic dithering algorithms. Prima::ImageViewer module
+employs this scheme.
+
+=head2 Gradients
+
+Prima offers primitive gradient services to draw gradually changing colors.
+A gradient is requested by setting of at least two colors and optionally
+a set of quadratic spline points that, when, projected, generate the transition curve
+between the colors.
+
+The example below fills a rectangle with a gradient calculated between a
+background color and its pre-lighted variant.
+
+    $canvas-> gradient_bar( $left, $bottom, $right, $top, {
+  	palette  => [ $self->prelight_color($back_color), $back_color ],
+    });
+
+Here are keys understood in the gradient request:
+
+=over
+
+=item palette @COLORS
+
+Each color is a C<cl::> value. The gradient is calculated as polyline where
+each its vertex corresponds to a certain blend between two neighbouring colors
+in the palette. F.ex. the simplest palette going from C<cl::White> to
+C<cl::Black> over a polyline C<0..1> (default), produces pure white color at
+the start and pure black color at the end, filling all available shades of gray
+in between, and changing monotonically.
+
+=item poly @VERTICES
+
+Set of 2-integer polyline vertexes where the first integer is a coordinate (x,
+y, or whatever required by the drawing primitive) between 0 and 1, and the
+second is the color blend value between 0 and 1.
+
+Default: ((0,0),(1,1))
+
+=item spline \@VERTICES, %OPTIONS
+
+Serving same purpose as C<poly> but vertexes are projected first to a B-spline
+curve using L<render_spline> and C<%OPTIONS>. The resulting polyline is treated
+as C<poly>.
+
+=item vertical BOOLEAN
+
+Only used in L<gradient_bar>, to set gradient direction.
+
+=back
+
+See also: L<gradient_bar>, L<gradient_realize3d> .
+
+=head2 Monochrome bitmaps
+
+A special case of C<put_image> is taken where the object to be drawn is a
+monochrome DeviceBitmap object. This object doesn't possess the color palette,
+and is by definition a bitmap, where there are only two values present, 0s and
+1s. When it is drawn, 0s are drawn with the color value of the target canvas
+C<color> property, and 1s with C<backColor>.
+
+This means that the following code
+
+    $bitmap-> color(0);
+    $bitmap-> line(0,0,100,100);
+    $target-> color(cl::Green);
+    $target-> put_image(0,0,$bitmap);
+
+produces a green line on C<$target>.
+
+When using monochrome bitmaps for logical operations, note that target colors
+should not be explicit 0 and 0xffffff, nor C<cl::Black> and C<cl::White>, but
+C<cl::Clear> and C<cl::Set> instead. The reason is that on paletted displays,
+system palette may not necessarily contain the white color under palette index
+(2^ScreenDepth-1). C<cl::Set> thus signals that the value should be "all ones",
+no matter what color it represents, because it will be used for logical
+operations.
+
+=head2 Fonts
+
+Prima maintains its own font naming convention, that
+usually does not conform to system's. Since its goal
+is interoperability, it might be so that some system fonts
+would not be accessible from within the toolkit. 
+
+Prima::Drawable provides property C<::font>, that accepts/returns a hash, 
+that represents the state of a font in the object-bound graphic context. 
+The font hash keys that are acceptable on set-call are:
+
+=over 4
+
+=item name
+
+The font name string. If there is no such font, 
+a default font name is used. To select default font,
+a 'Default' string can be passed with the same result
+( unless the system has a font named 'Default', of course).
+
+=item height
+
+An integer value from 1 to MAX_INT. Specifies the desired
+extent of a font glyph between descent and ascent lines in pixels.
+
+=item size
+
+An integer value from 1 to MAX_INT. Specifies the desired
+extent of a font glyph between descent and internal leading lines in 
+points. The relation between C<size> and C<height> is
+
+            height - internal_leading 
+  size =  --------------------------- * 72.27
+                 resolution
+
+That differs from some other system representations:
+Win32, for example, rounds 72.27 constant to 72.
+
+=item width
+
+A integer value from 0 to MAX_INT. If greater than 0, specifies the desired
+extent of a font glyph width in pixels. If 0, sets the default ( designed )
+width corresponding to the font size or height.
+
+=item style
+
+A combination of C<fs::> ( font style ) constants. The constants hight
+
+   fs::Normal 
+   fs::Bold
+   fs::Thin
+   fs::Italic
+   fs::Underlined
+   fs::StruckOut
+   fs::Outline
+
+and can be OR-ed together to express the font style. 
+fs::Normal equals to 0 and usually never used.
+If some styles are not supported by a system-dependent font subsystem,
+they are ignored.
+
+=item pitch
+
+A one of three constants:
+
+   fp::Default
+   fp::Fixed
+   fp::Variable
+
+fp::Default specifies no interest about font pitch selection.
+fp::Fixed is set when a monospaced (all glyphs are of same width) font 
+is desired. fp::Variable pitch
+specifies a font with different glyph widths. This key
+is of the highest priority; all other keys may be altered for
+the consistency of the pitch key.
+
+=item direction
+
+A counter-clockwise rotation angle - 0 is default, 90 is pi/2, 180 is pi, etc.
+If a font could not be rotated, it is usually substituted to the one that can.
+
+=item encoding
+
+A string value, one of the strings returned by 
+C<Prima::Application::font_encodings>. Selects desired font
+encoding; if empty, picks the first matched encoding, preferably
+the locale set up by the user.
+
+The encodings provided by different systems are different;
+in addition, the only encodings are recognizable by the system,
+that are represented by at least one font in the system.
+
+Unix systems and the toolkit PostScript interface usually 
+provide the following encodings:
+
+   iso8859-1
+   iso8859-2
+   ... other iso8859 ...
+   fontspecific
+
+Win32 returns the literal strings like
+
+   Western
+   Baltic
+   Cyrillic
+   Hebrew
+   Symbol
+
+=back
+
+A hash that C<::font> returns, is a tied hash, whose
+keys are also available as separate properties.
+For example, 
+
+   $x = $d-> font-> {style};
+
+is equivalent to
+
+   $x = $d-> font-> style;
+
+While the latter gives nothing but the arguable coding convenience, its
+usage in set-call is much more usable:
+
+   $d-> font-> style( fs::Bold);
+
+instead of
+
+   my %temp = %{$d-> font};
+   $temp{ style} = fs::Bold;
+   $d-> font( \%temp);
+
+The properties of a font tied hash are also accessible through set() call, 
+like in Prima::Object:
+
+   $d-> font-> style( fs::Bold);
+   $d-> font-> width( 10);
+
+is adequate to
+
+   $d-> font-> set(
+      style => fs::Bold,
+      width => 10,
+   );
+
+When get-called, C<::font> property returns a hash where
+more entries than the described above can be found. These keys
+are read-only, their values are discarded if passed to C<::font> 
+in a set-call.
+
+In order to query the full list of fonts available to
+a graphic device, a C<::fonts> method is used. This method is
+not present in Prima::Drawable namespace; it can be found in two
+built-in class instances, C<Prima::Application> and C<Prima::Printer>.
+
+C<Prima::Application::fonts> returns metrics for the fonts available to
+a screen device, while C<Prima::Printer::fonts> ( or its substitute Prima::PS::Printer )
+returns fonts for the printing device. The result of this method is an
+array of font metrics, fully analogous to these 
+returned by C<Prima::Drawable::font> method. 
+
+=over 4
+
+=item family
+
+A string with font family name. The family is a 
+secondary string key, used for distinguishing between
+fonts with same name but of different vendors ( for example,
+Adobe Courier and Microsoft Courier).
+
+=item vector
+
+A boolean; true if the font is vector ( e.g. can be scaled
+with no quality loss ), false otherwise. The false value
+does not show if the font can be scaled at all - the behavior
+is system-dependent. Win32 can scale all non-vector fonts;
+X11 only the fonts specified as the scalable.
+
+=item ascent
+
+Number of pixels between a glyph baseline and descent line.
+
+=item descent
+
+Number of pixels between a glyph baseline and descent line.
+
+=item internalLeading
+
+Number of pixels between ascent and internal leading lines.
+Negative if the ascent line is below the internal leading line.
+
+=item externalLeading
+
+Number of pixels between ascent and external leading lines.
+Negative if the ascent line is above the external leading line.
+
+
+=for podview <img src="leadings.gif" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/leadings.gif"><!--
+
+          ------------- external leading line
+
+     $    ------------- ascent line
+    $ $
+          ------------- internal leading line
+     $
+    $$$
+   $   $
+  $     $       $
+  $$$$$$$    $$$
+  $     $   $   $
+  $     $   $   $
+  $     $    $$$   ---- baseline
+                $
+                 $
+                 $
+             $$$$  ---- descent line
+
+=for html -->
+
+=for podview </cut>
+
+=item weight
+
+A font designed weight. Can be one of
+
+   fw::UltraLight
+   fw::ExtraLight
+   fw::Light
+   fw::SemiLight
+   fw::Medium
+   fw::SemiBold
+   fw::Bold
+   fw::ExtraBold
+   fw::UltraBold
+
+constants.
+
+=item maximalWidth
+
+Maximal extent of a glyph in pixels. Equals to B<width> in
+monospaced fonts.
+
+=item xDeviceRes
+
+Designed horizontal font resolution in dpi.
+
+=item yDeviceRes
+
+Designed vertical font resolution in dpi.
+
+=item firstChar
+
+Index of the first glyph present in a font.
+
+=item lastChar
+
+Index of the last glyph present in a font.
+
+=item breakChar
+
+Index of the default character used to divide words.
+In a typical western language font it is 32, ASCII space character.
+
+=item defaultChar
+
+Index of a glyph that is drawn instead of nonexistent
+glyph if its index is passed to the text drawing routines.
+
+=back
+
+=head2 Font ABC metrics
+
+Besides these characteristics, every font glyph has an ABC-metric,
+the three integer values that describe horizontal extents of a
+glyph's black part relative to the glyph extent:
+
+=for podview <img src="fontabc.gif" cut=1 >
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/fontabc.gif"><!--
+
+    .  .     .  .      .  .        .  .
+    .  .     $$$.      .  .        .  .
+    .  .   $$.  $      .  .        .  .
+    .  .   $$.  .      .  .     $$ .  .
+    . $$$$$$$$$$.      .  .$$$$$   .  .
+    .  .  $$ .  .      .  $    $$  .  .
+    .  . $$  .  .      .  .$$$$$   .  .
+    .  . $$  .  .      .  .    $$  .  .
+    .  .$$   .  .      .  . $$$ $$$.  .
+    $$ .$$   .  .      .  $       $$  .
+    .$$$     .  .      .  .$$$$$$$$.  .
+    .  .     .  .      .  .        .  .
+    <A>.     .<C>      <A>.        .<C>
+    .<-.--B--.->.      .  .<--B--->.  .
+
+      A = -3                A = 3
+      B = 13                B = 10
+      C = -3                C = 3
+
+=for html -->
+
+=for podview </cut>
+
+A and C are negative, if a glyphs 'hangs' over it neighbors, 
+as shown in picture on the left. A and C values are positive, if a glyph contains 
+empty space in front or behind the neighbor glyphs, like in picture on the right. 
+As can be seen, B is the width of a glyph's black part.
+
+ABC metrics returned by the get_font_abc() method.
+
+Corresponding vertical metrics, called in Prima C<DEF> metrics, are returned
+by the get_font_def() method.
+
+=head2 Raster operations
+
+A drawable has two raster operation properties: C<::rop> and C<::rop2>.
+These define how the graphic primitives are plotted. C<::rop> deals
+with the foreground color drawing, and C<::rop2> with the background.
+
+The toolkit defines the following operations:
+
+=for podview <img src="rop1.gif" cut=1 >
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/rop1.gif"><!--
+
+   rop::Blackness      #   = 0 
+   rop::NotOr          #   = !(src | dest) 
+   rop::NotSrcAnd      #  &= !src 
+   rop::NotPut         #   = !src 
+   rop::NotDestAnd     #   = !dest & src 
+   rop::Invert         #   = !dest 
+   rop::XorPut         #  ^= src 
+   rop::NotAnd         #   = !(src & dest) 
+   rop::AndPut         #  &= src 
+   rop::NotXor         #   = !(src ^ dest) 
+   rop::NotSrcXor      #     alias for rop::NotXor
+   rop::NotDestXor     #     alias for rop::NotXor
+   rop::NoOper         #   = dest 
+   rop::NotSrcOr       #  |= !src 
+   rop::CopyPut        #   = src 
+   rop::NotDestOr      #   = !dest | src 
+   rop::OrPut          #  |= src 
+   rop::Whiteness      #   = 1 
+
+=for html -->
+
+=for podview </cut>
+
+Usually, however, graphic devices support only a small part
+of the above set, limiting C<::rop> to the most important operations:
+Copy, And, Or, Xor, NoOp. C<::rop2> is usually even more restricted,
+supports only Copy and NoOp.
+
+The raster operations apply to all graphic primitives except SetPixel.
+
+Note for layering: using layered images and device bitmaps with
+C<put_image> and C<stretch_image> can only use C<rop::SrcCopy> and C<rop::SrcOver>
+raster operations on OS-provided surfaces. 
+
+Additionally, Prima implements extra features for compositing on images outside the
+begin_paint/end_paint brackets. It supports the following 12 Porter-Duff operators:
+
+=for podview <img src="rop2.gif" cut=1 >
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/rop2.gif"><!--
+
+   rop::Clear
+   rop::Xor
+   rop::SrcOver
+   rop::DstOver
+   rop::SrcCopy
+   rop::DstCopy
+   rop::SrcIn
+   rop::DstIn
+   rop::SrcOut
+   rop::DstOut
+   rop::SrcAtop
+   rop::DstAtop
+
+=for html -->
+
+=for podview </cut>
+
+and set of constants to apply a constant source and destination alpha to override the
+existing alpha channel, if any:
+
+   rop::SrcAlpha
+   rop::SrcAlphaShift 
+   rop::DstAlpha
+   rop::DstAlphaShift
+
+To override the alpha channel(s) combine the rop constant using this formula:
+
+   $rop = rop::XXX | 
+      rop::SrcAlpha | ( $src_alpha << rop::SrcAlphaShift ) |
+      rop::DstAlpha | ( $src_alpha << rop::DstAlphaShift ) 
+
+Also, function C<rop::blend($alpha)> creates a rop constant for simple blending of two images
+by the following formula:
+
+   $dst = ( $src * $alpha + $dst * ( 255 - $alpha ) ) / 255
+
+In addition to that, C<rop::AlphaCopy> operation is available for accessing
+alpha bits only.  When used, the source image is treated as alpha mask, and
+therefore it has to be grayscale.  It can be used to apply the alpha bits
+independently, without need to construct an Icon object.
+
+=head2 Coordinates
+
+The Prima toolkit employs a geometrical XY grid, where
+X ascends rightwards and Y ascends upwards. There, the (0,0)
+location is the bottom-left pixel of a canvas.
+
+All graphic primitives use inclusive-inclusive boundaries.
+For example,
+
+   $d-> bar( 0, 0, 1, 1);
+
+plots a bar that covers 4 pixels: (0,0), (0,1), (1,0) and (1,1).
+
+The coordinate origin can be shifted using C<::translate> property,
+that translates the (0,0) point to the given offset. Calls to
+C<::translate>, C<::clipRect> and C<::region> always use the 'physical'
+(0,0) point, whereas the plotting methods use the transformation result,
+the 'logical' (0,0) point.
+
+As noted before, these three properties can not be used in when an object 
+is in its disabled state. 
+
+=head1 API
+
+=head2 Graphic context properties 
+
+=over 4
+
+=item backColor COLOR
+
+Reflects background color in the graphic context. All drawing routines
+that use non-solid or transparent fill or line patterns use this property value.
+
+=item color COLOR
+
+Reflects foreground color in the graphic context. All drawing routines
+use this property value.
+
+=item clipRect X1, Y1, X2, Y2
+
+Selects the clipping rectangle corresponding to the physical canvas origin.
+On get-call, returns the extent of the clipping area, if it is not rectangular,
+or the clipping rectangle otherwise. The code
+
+   $d-> clipRect( 1, 1, 2, 2);
+   $d-> bar( 0, 0, 1, 1);
+
+thus affects only one pixel at (1,1).
+
+Set-call discards the previous C<::region> value.
+
+Note: C<::clipRect> can not be used while the object is in the paint-disabled state,
+its context is neither recorded nor used as a template 
+( see L<"Graphic context and canvas">).
+
+=item fillWinding BOOLEAN
+
+Affects filling style of complex polygonal shapes filled by C<fillpoly>.
+If 1, the filled shape contains no holes; otherwise, holes are present
+where the shape edges cross.
+
+=for podview <img src="windings.gif">
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/windings.gif">
+
+Default value: false
+
+=item fillPattern ( [ @PATTERN ] ) or ( fp::XXX )
+
+Selects 8x8 fill pattern that affects primitives that plot filled shapes:
+bar(), fill_chord(), fill_ellipse(), fillpoly(), fill_sector(), floodfill().
+
+Accepts either a C<fp::> constant or a reference to an array of 8 integers,
+each representing 8 bits of each line in a pattern, where the first integer
+is the topmost pattern line, and the bit 0x80 is the leftmost pixel in the line.
+
+There are some predefined patterns, that can be referred via C<fp::> constants:
+
+=for podview <img src="fills.gif" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/fills.gif"><!--
+
+  fp::Empty
+  fp::Solid
+  fp::Line
+  fp::LtSlash
+  fp::Slash
+  fp::BkSlash
+  fp::LtBkSlash
+  fp::Hatch
+  fp::XHatch
+  fp::Interleave
+  fp::WideDot
+  fp::CloseDot
+  fp::SimpleDots
+  fp::Borland
+  fp::Parquet
+
+=for html -->
+
+=for podview </cut>
+
+( the actual patterns are hardcoded in primguts.c )
+The default pattern is fp::Solid.
+
+An example below shows encoding of fp::Parquet pattern:
+
+   # 76543210  
+     84218421  Hex
+
+   0  $ $   $  51
+   1   $   $   22
+   2    $ $ $  15
+   3 $   $     88
+   4  $   $ $  45
+   5   $   $   22
+   6  $ $ $    54
+   7 $   $     88
+
+   $d-> fillPattern([ 0x51, 0x22, 0x15, 0x88, 0x45, 0x22, 0x54, 0x88 ]);
+
+On a get-call always returns an array, never a C<fp::> constant.
+
+=item font \%FONT
+
+Manages font context. FONT hash acceptable values are
+C<name>, C<height>, C<size>, C<width>, C<style> and C<pitch>. 
+
+Synopsis:
+
+   $d-> font-> size( 10);
+   $d-> font-> name( 'Courier');
+   $d-> font-> set(
+     style => $x-> font-> style | fs::Bold,
+     width => 22
+   );
+
+See L<"Fonts"> for the detailed descriptions.
+
+Applies to text_out(), get_text_width(), get_text_box(), get_font_abc(), get_font_def().
+
+=item lineEnd VALUE
+
+Selects a line ending cap for plotting primitives. VALUE 
+can be one of
+
+=for podview <img src="lineends.gif" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/lineends.gif"><!--
+
+  le::Flat
+  le::Square
+  le::Round
+
+=for html -->
+
+=for podview </cut>
+
+constants. le::Round is the default value.
+
+=item lineJoin VALUE
+
+Selects a line joining style for polygons. VALUE 
+can be one of
+
+=for podview <img src="linejoins.gif" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/linejoins.gif"><!--
+
+  lj::Round
+  lj::Bevel
+  lj::Miter
+
+=for html -->
+
+=for podview </cut>
+
+constants. lj::Round is the default value.
+
+=item linePattern PATTERN
+
+Selects a line pattern for plotting primitives. 
+PATTERN is either a predefined C<lp::> constant, or 
+a string where each even byte is a length of a dash,
+and each odd byte is a length of a gap.
+
+The predefined constants are:
+
+=for podview <img src="linepats.gif" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/linepats.gif"><!--
+
+    lp::Null           #    ""              /*              */
+    lp::Solid          #    "\1"            /* ___________  */
+    lp::Dash           #    "\x9\3"         /* __ __ __ __  */
+    lp::LongDash       #    "\x16\6"        /* _____ _____  */
+    lp::ShortDash      #    "\3\3"          /* _ _ _ _ _ _  */
+    lp::Dot            #    "\1\3"          /* . . . . . .  */
+    lp::DotDot         #    "\1\1"          /* ............ */
+    lp::DashDot        #    "\x9\6\1\3"     /* _._._._._._  */
+    lp::DashDotDot     #    "\x9\3\1\3\1\3" /* _.._.._.._.. */
+
+=for podview </cut>
+
+=for html -->
+
+Not all systems are capable of accepting user-defined line patterns,
+and in such situation the C<lp::> constants are mapped to the system-defined
+patterns. In Win9x, for example, lp::DashDotDot is much different from
+its string definition therefore.
+
+Default value is lp::Solid.
+
+=item lineWidth WIDTH
+
+Selects a line width for plotting primitives. 
+If a VALUE is 0, then a 'cosmetic' pen is used - the thinnest
+possible line that a device can plot. If a VALUE is greater than 0,
+then a 'geometric' pen is used - the line width is set in device units.
+There is a subtle difference between VALUE 0 and 1 in a way
+the lines are joined.
+
+Default value is 0.
+
+=item palette [ @PALETTE ]
+
+Selects solid colors in a system palette, as many as possible.
+PALETTE is an array of integer triplets, where each is R, G and B
+component. The call
+
+   $d-> palette([128, 240, 240]);
+
+selects a gray-cyan color, for example.
+
+The return value from get-call is the content of the previous set-call,
+not the actual colors that were copied to the system palette.
+
+=item region OBJECT
+
+Selects a clipping region applied to all drawing and painting routines. On setting, the
+OBJECT is either undef, then the clip region is erased ( no clip ), or a
+Prima::Image object with a bit depth of 1. The bit mask of OBJECT is applied to
+the system clipping region. Or, it is a L<Prima::Region> object.  If the OBJECT is
+smaller than the drawable, its exterior is assigned to clipped area as well.
+Discards the previous C<::clipRect> value; successive get-calls to
+C<::clipRect> return the boundaries of the region.
+
+On getting, OBJECT is either undef or Prima::Region object.
+
+Note: C<::region> can not be used while the object is in the paint-disabled state,
+its context is neither recorded nor used as a template 
+( see L<"Graphic context and canvas">).
+
+=item resolution X, Y
+
+A read-only property. Returns horizontal and vertical
+device resolution in dpi.
+
+=item rop OPERATION
+
+Selects raster operation that applies to foreground color plotting routines.
+
+See also: C<::rop2>, L<"Raster operations">.
+
+=item rop2 OPERATION
+
+Selects raster operation that applies to background color plotting routines.
+
+See also: C<::rop>, L<"Raster operations">.
+
+=item textOpaque FLAG
+
+If FLAG is 1, then text_out() fills the text background area
+with C<::backColor> property value before
+drawing the text. Default value is 0, when text_out() plots
+text only.
+
+See get_text_box().
+
+=item textOutBaseline FLAG
+
+If FLAG is 1, then text_out() plots text on a given Y coordinate
+correspondent to font baseline. If FLAG is 0, a Y coordinate is 
+mapped to font descent line. Default is 0. 
+
+=item translate X_OFFSET, Y_OFFSET
+
+Translates the origin point by X_OFFSET and Y_OFFSET.
+Does not affect C<::clipRect> and C<::region>. Not cumulative, 
+so the call sequence
+
+   $d-> translate( 5, 5);
+   $d-> translate( 15, 15);
+
+is equivalent to
+
+   $d-> translate( 15, 15);
+
+Note: C<::translate> can not be used while the object is in the paint-disabled state,
+its context is neither recorded nor used as a template 
+( see L<"Graphic context and canvas">).
+
+=back
+
+=head2 Other properties 
+
+=over 4
+
+=item height HEIGHT
+
+Selects the height of a canvas.
+
+=item size WIDTH, HEIGHT
+
+Selects the extent of a canvas.
+
+=item width WIDTH
+
+Selects the width of a canvas.
+
+=back
+
+=head2 Graphic primitives methods
+
+=over 4
+
+=item alpha ALPHA <X1, Y1, X2, Y2>
+
+Fills rectangle in the alpha channel, filled with ALPHA value (0-255) within (X1,Y1) - (X2,Y2) extents.
+Can be called without parameters, in this case fills all canvas area.
+
+Has only effect on layered surfaces.
+
+=item arc X, Y, DIAMETER_X, DIAMETER_Y, START_ANGLE, END_ANGLE
+
+Plots an arc with center in X, Y and DIAMETER_X and DIAMETER_Y axis
+from START_ANGLE to END_ANGLE.
+
+Context used: color, backColor, lineEnd, linePattern, lineWidth, rop, rop2
+
+=item bar X1, Y1, X2, Y2
+
+Draws a filled rectangle within (X1,Y1) - (X2,Y2) extents.
+
+Context used: color, backColor, fillPattern, rop, rop2
+
+=item bars @RECTS
+
+Draws a set of filled rectangles.
+RECTS is an array of integer quartets in format (X1,Y1,X2,Y2).
+
+Context used: color, backColor, fillPattern, rop, rop2
+
+=item chord X, Y, DIAMETER_X, DIAMETER_Y, START_ANGLE, END_ANGLE 
+
+Plots an arc with center in X, Y and DIAMETER_X and DIAMETER_Y axis
+from START_ANGLE to END_ANGLE and connects its ends with a straight line.
+
+Context used: color, backColor, lineEnd, linePattern, lineWidth, rop, rop2
+
+=item clear <X1, Y1, X2, Y2>
+
+Draws rectangle filled with pure background color within (X1,Y1) - (X2,Y2) extents.
+Can be called without parameters, in this case fills all canvas area.
+
+Context used: backColor, rop2
+
+=item draw_text CANVAS, TEXT, X1, Y1, X2, Y2, [ FLAGS = dt::Default, TAB_INDENT = 1 ]
+
+Draws several lines of text one under another with respect to align and break rules,
+specified in FLAGS and TAB_INDENT tab character expansion.
+
+C<draw_text> is a convenience wrapper around C<text_wrap> for drawing the wrapped
+text, and also provides the tilde ( ~ )- character underlining support.
+
+The FLAGS is a combination of the following constants:
+
+  dt::Left                  - text is aligned to the left boundary
+  dt::Right                 - text is aligned to the right boundary
+  dt::Center                - text is aligned horizontally in center
+  dt::Top                   - text is aligned to the upper boundary
+  dt::Bottom                - text is aligned to the lower boundary 
+  dt::VCenter               - text is aligned vertically in center
+  dt::DrawMnemonic          - tilde-escapement and underlining is used 
+  dt::DrawSingleChar        - sets tw::BreakSingle option to 
+                              Prima::Drawable::text_wrap call
+  dt::NewLineBreak          - sets tw::NewLineBreak option to 
+                              Prima::Drawable::text_wrap call 
+  dt::SpaceBreak            - sets tw::SpaceBreak option to 
+                              Prima::Drawable::text_wrap call  
+  dt::WordBreak             - sets tw::WordBreak option to 
+                              Prima::Drawable::text_wrap call 
+  dt::ExpandTabs            - performs tab character ( \t ) expansion
+  dt::DrawPartial           - draws the last line, if it is visible partially 
+  dt::UseExternalLeading    - text lines positioned vertically with respect to 
+                              the font external leading
+  dt::UseClip               - assign ::clipRect property to the boundary rectangle
+  dt::QueryLinesDrawn       - calculates and returns number of lines drawn 
+                              ( contrary to dt::QueryHeight )
+  dt::QueryHeight           - if set, calculates and returns vertical extension 
+                              of the lines drawn
+  dt::NoWordWrap            - performs no word wrapping by the width of the boundaries
+  dt::WordWrap              - performs word wrapping by the width of the boundaries 
+  dt::BidiText              - use bidirectional formatting, if available
+  dt::Default               - dt::NewLineBreak|dt::WordBreak|dt::ExpandTabs|
+                              dt::UseExternalLeading
+
+Context used: color, backColor, font, rop, textOpaque, textOutBaseline
+
+=item ellipse X, Y, DIAMETER_X, DIAMETER_Y
+
+Plots an ellipse with center in X, Y and DIAMETER_X and DIAMETER_Y axis.
+
+Context used: color, backColor, linePattern, lineWidth, rop, rop2
+
+=item fill_chord X, Y, DIAMETER_X, DIAMETER_Y, START_ANGLE, END_ANGLE 
+
+Fills a chord outline with center in X, Y and DIAMETER_X and DIAMETER_Y axis
+from START_ANGLE to END_ANGLE (see chord()).
+
+Context used: color, backColor, fillPattern, rop, rop2
+
+=item fill_ellipse X, Y, DIAMETER_X, DIAMETER_Y
+
+Fills an elliptical outline with center in X, Y and DIAMETER_X and DIAMETER_Y axis.
+
+Context used: color, backColor, fillPattern, rop, rop2
+
+=item fillpoly \@POLYGON
+
+Fills a polygonal area defined by POLYGON set of points.
+POLYGON must present an array of integer pair in (X,Y) format.
+Example:
+
+   $d-> fillpoly([ 0, 0, 15, 20, 30, 0]); # triangle
+
+Context used: color, backColor, fillPattern, rop, rop2, fillWinding
+
+Returns success flag; if failed, C<$@> contains the error.
+
+See also: polyline().
+
+=item fill_sector X, Y, DIAMETER_X, DIAMETER_Y, START_ANGLE, END_ANGLE 
+
+Fills a sector outline with center in X, Y and DIAMETER_X and DIAMETER_Y axis
+from START_ANGLE to END_ANGLE (see sector()).
+
+Context used: color, backColor, fillPattern, rop, rop2
+
+=item fill_spline \@VERTICES, %OPTIONS
+
+Fills a polygonal area defined by a curve, projected by applying B-spline curve
+based on set of VERTICES. VERTICES must present an array of integer pair in
+(X,Y) format.  Example:
+
+   $d-> fill_spline([ 0, 0, 15, 20, 30, 0]);
+
+Context used: color, backColor, fillPattern, rop, rop2 
+
+Returns success flag; if failed, C<$@> contains the error.
+
+See also: spline, render_spline
+
+=item flood_fill X, Y, COLOR, SINGLEBORDER = 1
+
+Fills an area of the canvas in current fill context. 
+The area is assumed to be bounded as specified by the SINGLEBORDER parameter. 
+SINGLEBORDER can be 0 or 1.
+
+SINGLEBORDER = 0: The fill area is bounded by the color specified by 
+the COLOR parameter.
+
+SINGLEBORDER = 1: The fill area is defined by the color that 
+is specified by COLOR. 
+Filling continues outward in all directions as long as the color 
+is encountered. This style is useful for filling areas with 
+multicolored boundaries.
+
+Context used: color, backColor, fillPattern, rop, rop2
+
+=item gradient_bar X1, Y1, X2, Y2, GRADIENT
+
+Draws a filled rectangle within (X1,Y1) - (X2,Y2) extents using a gradient (see L<Gradients>).
+
+Context used: fillPattern, rop, rop2
+
+=item gradient_ellipse X, Y, DIAM_X, DIAM_Y, GRADIENT
+
+Draws a filled ellipse with center in (X,Y) and diameters (DIAM_X,DIAM_Y) using a gradient (see L<Gradients>).
+
+Context used: , fillPattern, rop, rop2
+
+=item gradient_sector X, Y, DIAM_X, DIAM_Y, START_ANGLE, END_ANGLE, GRADIENT
+
+Draws a filled sector with center in (X,Y) and diameters (DIAM_X,DIAM_Y) from START_ANGLE to END_ANGLE (see sector())
+using a gradient (see L<Gradients>).
+
+Context used: fillPattern, rop, rop2
+
+=item gradient_realize3d BREADTH, GRADIENT
+
+Returns an array consisting of integer pairs, where the first one is
+a color value, and the second is the breadth of the color strip.
+L<gradient_bar> uses this information to draw a gradient fill, where
+each color strip is drawn with its own color. Can be used for implementing
+other gradient-aware primitives (see F<examples/f_fill.pl> )
+
+=item line X1, Y1, X2, Y2
+
+Plots a straight line from (X1,Y1) to (X2,Y2).
+
+Context used: color, backColor, linePattern, lineWidth, rop, rop2
+
+=item lines \@LINES
+
+LINES is an array of integer quartets in format (X1,Y1,X2,Y2).
+lines() plots a straight line per quartet.
+
+Context used: color, backColor, linePattern, lineWidth, rop, rop2
+
+Returns success flag; if failed, C<$@> contains the error.
+
+=item new_path
+
+Returns a new path object. See L<Prima::Drawable::Path> for usage and details.
+
+=item pixel X, Y, <COLOR>
+
+::pixel is a property - on set-call it changes the pixel value at (X,Y)
+to COLOR, on get-call ( without COLOR ) it does return a pixel value at (X,Y).
+
+No context is used.
+
+=item polyline \@POLYGON
+
+Draws a polygonal area defined by POLYGON set of points.
+POLYGON must present an array of integer pair in (X,Y) format.
+
+Context used: color, backColor, linePattern, lineWidth, lineJoin, lineEnd, rop, rop2
+
+Returns success flag; if failed, C<$@> contains the error.
+
+See also: fillpoly().
+
+=item put_image X, Y, OBJECT, [ ROP ]
+
+Draws an OBJECT at coordinates (X,Y). OBJECT must be Prima::Image,
+Prima::Icon or Prima::DeviceBitmap. If ROP raster operation is specified,
+it is used. Otherwise, value of C<::rop> property is used. 
+
+Returns success flag; if failed, C<$@> contains the error.
+
+Context used: rop; color and backColor for a monochrome DeviceBitmap 
+
+=item put_image_indirect OBJECT, X, Y, X_FROM, Y_FROM, DEST_WIDTH, DEST_HEIGHT, SRC_WIDTH, SRC_HEIGHT, ROP
+
+Copies a OBJECT from a source rectangle into a destination rectangle, 
+stretching or compressing the OBJECT to fit the dimensions of the 
+destination rectangle, if necessary.
+The source rectangle starts at (X_FROM,Y_FROM), and is SRC_WIDTH pixels wide
+and SRC_HEIGHT pixels tall.
+The destination rectangle starts at (X,Y), and is abs(DEST_WIDTH) pixels wide
+and abs(DEST_HEIGHT) pixels tall.
+If DEST_WIDTH or DEST_HEIGHT are
+negative, a mirroring by respective axis is performed.
+
+OBJECT must be Prima::Image, Prima::Icon or Prima::DeviceBitmap.
+
+No context is used, except color and backColor for a monochrome DeviceBitmap 
+
+Returns success flag; if failed, C<$@> contains the error.
+
+=item rect3d X1, Y1, X2, Y2, WIDTH, LIGHT_COLOR, DARK_COLOR, [ BACK_COLOR ] 
+
+Draws 3d-shaded rectangle in boundaries X1,Y1 - X2,Y2 with WIDTH line width
+and LIGHT_COLOR and DARK_COLOR colors. If BACK_COLOR is specified, paints
+an inferior rectangle with it, otherwise the inferior rectangle is not touched.
+
+Context used: rop; color and backColor for a monochrome DeviceBitmap
+
+=item rect_focus X1, Y1, X2, Y2, [ WIDTH = 1 ]
+
+Draws a marquee rectangle in boundaries X1,Y1 - X2,Y2 with WIDTH line width.
+
+No context is used.
+
+=item rectangle X1, Y1, X2, Y2
+
+Plots a rectangle with (X1,Y1) - (X2,Y2) extents.
+
+Context used: color, backColor, linePattern, lineWidth, rop, rop2
+
+=item sector X, Y, DIAMETER_X, DIAMETER_Y, START_ANGLE, END_ANGLE 
+
+Plots an arc with center in X, Y and DIAMETER_X and DIAMETER_Y axis
+from START_ANGLE to END_ANGLE and connects its ends and (X,Y) with 
+two straight lines.
+
+Context used: color, backColor, lineEnd, linePattern, lineWidth, rop, rop2
+
+=item spline \@VERTICES, %OPTIONS
+
+Draws a B-spline curve defined by set of VERTICES control points.  VERTICES
+must present an array of integer pair in (X,Y) format.  If the first and the
+last vertices point to the same point, draws closed spline shape ( Note - by
+adding degree minus two points to the set; this is important if C<weight> or
+C<knots> are specificed).
+
+The following options are supported:
+
+=over
+
+=item degree INTEGER = 2
+
+The B-spline degree. Default is 2 (quadratic). Number of points supplied must be
+at least degree plus one.
+
+=item knots \@INTEGERS
+
+Array of integers, number of points plus degree plus one, which makes the
+result a Bezier curve. By default, if the shape is opened (i.e. first and last
+points are different), is set to a clamped array, so that the first and last
+points of the final curve match the first and the last control points. If the
+shape is closed, set to an unclamped array, so that no control points lie directly
+on the curve.
+
+=item precision INTEGER = 24
+
+Defines number of steps to split the curve into. The value is multiplied to the number
+of points and the result is used as number of steps.
+
+=item weight \@INTEGERS = [ 1, 1, 1, ... ]
+
+Array of integers, one for each point supplied. Assigning these can be used to
+convert B-spline into a NURBS. By default set of ones.
+
+=back
+
+Context used: color, backColor, linePattern, lineWidth, lineEnd, rop, rop2
+
+See also: fill_spline, render_spline.
+
+=item stretch_image X, Y, DEST_WIDTH, DEST_HEIGHT, OBJECT, [ ROP ]
+
+Copies a OBJECT into a destination rectangle, stretching or compressing 
+the OBJECT to fit the dimensions of the destination rectangle, if necessary.
+If DEST_WIDTH or DEST_HEIGHT are negative, a mirroring is performed.
+The destination rectangle starts at (X,Y) and is DEST_WIDTH pixels wide
+and DEST_HEIGHT pixels tall.
+
+If ROP raster operation is specified, it is used. Otherwise, value of C<::rop>
+property is used. 
+
+OBJECT must be Prima::Image, Prima::Icon or Prima::DeviceBitmap.
+
+Returns success flag; if failed, C<$@> contains the error.
+
+Context used: rop
+
+=item text_out TEXT, X, Y
+
+Draws TEXT string at (X,Y). 
+
+Returns success flag; if failed, C<$@> contains the error.
+
+Context used: color, backColor, font, rop, textOpaque, textOutBaseline
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item begin_paint
+
+Enters the enabled ( active paint ) state, returns success flag; if failed,
+C<$@> contains the error.
+Once the object is in enabled state, painting and drawing 
+methods can perform write operations on a canvas.
+
+See also: C<end_paint>, C<begin_paint_info>, L<"Graphic context and canvas">
+
+=item begin_paint_info
+
+Enters the information state, returns success flag; if failed,
+C<$@> contains the error.
+The object information state is same as enabled state ( see C<begin_paint>),
+except painting and drawing methods do not change the object canvas.
+
+See also: C<end_paint_info>, C<begin_paint>, L<"Graphic context and canvas">
+
+=item end_paint
+
+Exits the enabled state and returns the object to a disabled state. 
+
+See also: C<begin_paint>, L<"Graphic context and canvas">
+
+=item end_paint_info
+
+Exits the information state and returns the object to a disabled state. 
+
+See also: C<begin_paint_info>, L<"Graphic context and canvas">
+
+=item font_match \%SOURCE, \%DEST, PICK = 1
+
+Performs merging of two font hashes, SOURCE and DEST.
+Returns the merge result. If PICK is true, matches the result
+with a system font repository.
+
+Called implicitly by C<::font> on set-call, allowing the following 
+example to work:
+
+   $d-> font-> set( size => 10);
+   $d-> font-> set( style => fs::Bold);
+
+In the example, the hash 'style => fs::Bold' does not overwrite
+the previous font context ( 'size => 10' ) but gets added to it ( by font_match()),
+providing the resulting font with both font properties set.
+
+=item fonts <FAMILY = "", ENCODING = "">
+
+Member of C<Prima::Application> and C<Prima::Printer>, does not
+present in C<Prima::Drawable>.
+
+Returns an array of font metric hashes for a given font FAMILY
+and ENCODING.  Every hash has full set of elements described in L<"Fonts">.
+
+If called without parameters, returns an array of same hashes
+where each hash represents a member of font family from every
+system font set. It this special case, each font hash contains
+additional C<encodings> entry, which points to an array of encodings
+available for the font.
+
+If called with FAMILY parameter set but no ENCODING is set, enumerates
+all combinations of fonts with all available encodings.
+
+If called with FAMILY set to an empty string, but ENCODING specified,
+returns only fonts that can be displayed with the encoding.
+
+Example:
+
+  print sort map {"$_->{name}\n"} @{$::application-> fonts};
+
+=item get_bpp
+
+Returns device color depth. 1 is for black-and-white monochrome,
+24 for true color, etc.
+
+=item get_font_abc FIRST_CHAR = -1, LAST_CHAR = -1, UNICODE = 0
+
+Returns ABC font metrics for the given range, starting at
+FIRST_CHAR and ending with LAST_CHAR. If parameters are -1,
+the default range ( 0 and 255 ) is assumed. UNICODE boolean flag
+is responsible of representation of characters in 127-255 range.
+If 0, the default, encoding-dependent characters are assumed.
+If 1, the U007F-U00FF glyphs from Latin-1 set are used.
+
+The result is an integer array reference, where every character
+glyph is referred by three integers, each triplet containing
+A, B and C values.
+
+For detailed explanation of ABC meaning, see L<"Font ABC metrics">;
+
+Context used: font
+
+=item get_font_def FIRST_CHAR = -1, LAST_CHAR = -1, UNICODE = 0
+
+Same as C<get_font_abc>, but for vertical mertics. Is expensive
+on bitmap fonts, because to find out the correct values Prima
+has to render glyphs on bitmaps and scan for black and white pixels.
+
+Vector fonts are not subject to this, and the call is as effective
+as C<get_font_abc>.
+
+=item get_font_ranges
+
+Returns array of integer pairs denoting unicode indices of glyphs covered by
+the currently selected font. Each pair is the first and the last index of a
+contiguous range.
+
+Context used: font
+
+=item get_nearest_color COLOR
+
+Returns a nearest possible solid color in representation
+of object-bound graphic device. Always returns same color
+if the device bit depth is equal or greater than 24.
+
+=item get_paint_state
+
+Returns paint state value on of ps:: constants - C<ps::Disabled> if the object is in the disabled state,
+C<ps::Enabled> for the enabled state, C<ps::Information> for the information state.
+
+For brevity, mb::Disabled is equal to 0 so this allows for simple boolean testing whether one can 
+get/set graphical properties on an object.
+
+See L<"Graphic context and canvas"> for more.
+
+=item get_physical_palette
+
+Returns an anonymous array of integers, in (R,G,B) format,
+every color entry described by three values, in range 0 - 255.
+
+The physical palette array is non-empty only on paletted graphic devices,
+the true color devices return an empty array.
+
+The physical palette reflects the solid colors currently available
+to all programs in the system. The information is volatile if 
+the system palette can change colors, since any other application
+may change the system colors at any moment.
+
+=item get_text_width TEXT, ADD_OVERHANG = 0
+
+Returns TEXT string width if it would be drawn using currently
+selected font.
+
+If ADD_OVERHANG is 1, the first character's absolute A value and the last
+character's absolute C value are added to the string if they are negative.
+
+See more on ABC values at L<"Font ABC metrics">.
+
+Context used: font
+
+=item get_text_box TEXT
+
+Returns TEXT string extensions if it would be drawn using currently
+selected font.
+
+The result is an anonymous array of 5 points ( 5 integer pairs  
+in (X,Y) format). These 5 points are offsets for the following string
+extents, given the string is plotted at (0,0):
+
+1: start of string at ascent line ( top left )
+
+2: start of string at descent line ( bottom left )
+
+3: end of string at ascent line ( top right )
+
+4: end of string at descent line ( bottom right )
+
+5: concatenation point
+
+The concatenation point coordinates (XC,YC) are coordinated passed to
+consequent text_out() call so the conjoint string would plot as if it was a
+part of TEXT. Depending on the value of the C<textOutBaseline> property, the
+concatenation point is located either on the baseline or on the descent line.
+
+Context used: font, textOutBaseline
+
+
+=for podview <img src="gettextbox.gif" cut=1>
+
+=for html <p><img src="https://raw.githubusercontent.com/dk/Prima/master/pod/Prima/gettextbox.gif"><!--
+
+      1      3         3         4
+         **               ****  
+           *               *  *
+         ***               ***
+        *  *               * 
+         ****               **
+      2       4         1        2
+
+=for podview </cut>
+
+=for html -->
+
+=item render_spline \@VERTICES, %OPTIONS
+
+Renders B-spline curve from set of VERTICES to a polyline with given options.
+
+The method is internally used by C<spline> and C<fill_spline>, and is provided
+for cases when these are insufficient. See description of options in L<spline>.
+
+=item text_wrap TEXT, WIDTH, OPTIONS, TAB_INDENT = 8
+
+Breaks TEXT string in chunks that would fit
+into WIDTH pixels wide box. 
+
+The break algorithm and its result are governed by OPTIONS integer value
+which is a combination of C<tw::> constants:
+
+=over 4
+
+=item tw::CalcMnemonic
+
+Use 'hot key' semantics, when a character preceded by ~ has
+special meaning - it gets underlined. If this bit is set, the first tilde character used
+as an escapement is not calculated, and never appeared in the result 
+apart from the escaped character.
+
+=item tw::CollapseTilde
+
+In addition to tw::CalcMnemonic, removes '~' character from
+the resulting chunks.
+
+=item tw::CalcTabs
+
+If set, calculates a tab ('\t') character as TAB_INDENT times space characters.
+
+=item tw::ExpandTabs
+
+If set, expands tab ('\t') character as TAB_INDENT times space characters.
+
+=item tw::BreakSingle
+
+Defines procedure behavior when the text cannot be fit in WIDTH,
+does not affect anything otherwise.
+
+If set, returns an empty array.
+If unset, returns a text broken by minimum number of characters per chunk.
+In the latter case, the width of the resulting text blocks B<will> exceed WIDTH.
+
+=item tw::NewLineBreak
+
+Forces new chunk after a newline character ('\n') is met.
+If UTF8 text is passed, unicode line break characters C<0x2028> and C<0x2029> 
+produce same effect as the newline character.
+
+=item tw::SpaceBreak
+
+Forces new chunk after a space character (' ') or a tab character ('\t') are met.
+
+=item tw::ReturnChunks
+
+Defines the result of text_wrap() function.
+
+If set, the array consists of integer pairs,
+each consists of a text offset within TEXT and a its length.
+
+If unset, the resulting array consists from text chunks.
+
+=item tw::ReturnLines
+
+Equals to 0, is a mnemonic to an unset tw::ReturnChunks.
+
+=item tw::WordBreak
+
+If unset, the TEXT breaks as soon as the chunk width exceeds WIDTH.
+If set, tries to keep words in TEXT so they do not appear in two
+chunks, e.g. breaks TEXT by words, not by characters.
+
+=item tw::ReturnFirstLineLength
+
+If set, C<text_wrap> proceeds until the first line is wrapped, either by
+width or ( if specified ) by break characters. Returns length of the
+resulting line. Used for efficiency when the reverse function to C<get_text_width>
+is needed.
+
+=back
+
+If OPTIONS has tw::CalcMnemonic or tw::CollapseTilde bits set,
+then the last scalar in the array result is a special hash reference.
+The hash contains extra information regarding the 'hot key' 
+underline position - it is assumed that '~' - escapement denotes
+an underlined character. The hash contains the following keys:
+
+=over 4
+
+=item tildeLine
+
+Chunk index that contains the escaped character.
+Set to undef if no ~ - escapement was found. 
+The other hash information is not relevant in this case.
+
+=item tildeStart
+
+Horizontal offset of a beginning of the line that underlines 
+the escaped character.
+
+=item tildeEnd
+
+Horizontal offset of an end of the line that underlines 
+the escaped character.
+
+=item tildeChar
+
+The escaped character.
+
+=back
+
+Context used: font
+
+=back
+
+=head1 AUTHOR
+
+Dmitry Karasik, E<lt>dmitry@karasik.eu.orgE<gt>.
+
+=head1 SEE ALSO
+
+L<Prima>, L<Prima::Object>, L<Prima::Image>, L<Prima::Region>, L<Prima::Drawable::Path>

@@ -1,0 +1,178 @@
+# French translations for Perinci-Sub-To-Text package.
+# Copyright (C) 2013 Steven Haryanto
+# This file is distributed under the same license as the Perinci-Sub-To-Text package.
+# Automatically generated, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Perinci-Sub-To-Text 0.30\n"
+"Report-Msgid-Bugs-To: stevenharyanto@gmail.com\n"
+"POT-Creation-Date: 2013-12-12 16:35+0700\n"
+"PO-Revision-Date: 2013-12-12 12:31+0700\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: lib/Perinci/To/Text.pm:33 lib/Perinci/To/POD.pm:40
+msgid "Name"
+msgstr "Nom"
+
+#: lib/Perinci/To/Text.pm:46 lib/Perinci/To/POD.pm:53
+msgid "Version"
+msgstr "Version"
+
+#: lib/Perinci/To/Text.pm:61 lib/Perinci/To/POD.pm:66
+msgid "Description"
+msgstr "Description"
+
+#: lib/Perinci/To/Text.pm:82 lib/Perinci/To/POD.pm:99
+msgid "Functions"
+msgstr "Fonctions"
+
+#: lib/Perinci/Sub/To/Text.pm:36 lib/Perinci/Sub/To/POD.pm:163
+msgid "Arguments"
+msgstr "Arguments"
+
+#: lib/Perinci/Sub/To/Text.pm:37 lib/Perinci/Sub/To/POD.pm:164
+msgid "'*' denotes required arguments"
+msgstr "'*' désigne arguments nécessaires"
+
+#: lib/Perinci/Sub/To/Text.pm:51 lib/Perinci/Sub/To/POD.pm:177
+#: lib/Perinci/Sub/To/POD.pm:207
+msgid "default"
+msgstr "défaut"
+
+#: lib/Perinci/Sub/To/Text.pm:67
+msgid "This function dies on error."
+msgstr "Cette fonction meurt en cas d'erreur."
+
+#: lib/Perinci/Sub/To/Text.pm:70 lib/Perinci/Sub/To/POD.pm:217
+msgid "Return value"
+msgstr "Valeur de retour"
+
+#: lib/Perinci/Sub/To/Text.pm:74
+msgid ""
+"Returns an enveloped result (an array).\n"
+"\n"
+"First element (status) is an integer containing HTTP status code\n"
+"(200 means OK, 4xx caller error, 5xx function error). Second element\n"
+"(msg) is a string containing error message, or 'OK' if status is\n"
+"200. Third element (result) is optional, the actual result. Fourth\n"
+"element (meta) is called result metadata and is optional, a hash\n"
+"that contains extra information."
+msgstr ""
+"Retourner un résultat enveloppé (un tableau).\n"
+"\n"
+"Premier élément (status) est un entier contenant le code d'état HTTP\n"
+"(200 moyens OK, erreur de l'appelant 4xx, erreur de fonction 5xx). Second "
+"élément\n"
+"(msg) est un message d'erreur contenant des cordes, ou 'OK' si l'état est\n"
+"de 200. Troisième élément (résultat) est facultative, le résultat réel. "
+"Quatrième\n"
+"élément (méta) est appelée méta-données du résultat et est facultatif, un "
+"hachage\n"
+"qui contient des informations supplémentaires."
+
+#: lib/Perinci/Sub/To/POD.pm:46
+msgid "Examples"
+msgstr "Examples"
+
+#: lib/Perinci/Sub/To/POD.pm:107
+#, fuzzy
+msgid "This function supports reverse operation."
+msgstr "Cette fonction permet l'opération inverse."
+
+#: lib/Perinci/Sub/To/POD.pm:110
+msgid "Pass -reverse=>1 to reverse operation."
+msgstr "Passez -reverse=>1 pour l'opération inverse."
+
+#: lib/Perinci/Sub/To/POD.pm:115
+#, fuzzy
+msgid "This function supports undo operation."
+msgstr "Cette fonction permet l'opération d'annulation."
+
+#: lib/Perinci/Sub/To/POD.pm:119
+msgid ""
+"To undo, pass -undo_action=>'undo' to function. You will also need to pass "
+"-undo_data. For more details on undo protocol, see L<Rinci::Undo>."
+msgstr ""
+"Pour annuler, passez -undo_action=>'undo' à la fonction. vous aurez également besoin de passer "
+"-undo_data. En savoir plus, voyez L<Rinci::Undo>."
+
+#: lib/Perinci/Sub/To/POD.pm:127
+msgid ""
+"Required if you pass -undo_action=>'undo'. For more details on undo "
+"protocol, see L<Rinci::function::Undo>."
+msgstr ""
+"nécessaire si vous passez x -undo_action=>'undo'. En savoir plus, "
+"voyez L<Rinci::function::Undo>."
+
+#: lib/Perinci/Sub/To/POD.pm:133
+#, fuzzy
+msgid "This function supports dry-run operation."
+msgstr "Cette fonction permet l'opération en mode simulation (dry-run)."
+
+#: lib/Perinci/Sub/To/POD.pm:136
+msgid "Pass -dry_run=>1 to enable simulation mode."
+msgstr "Passez -dry_run=>1 pour l'opération en mode simulation."
+
+#: lib/Perinci/Sub/To/POD.pm:139
+msgid "This function is pure (produce no side effects)."
+msgstr "Cette fonction est pure (produire aucun effet secondaire)."
+
+#: lib/Perinci/Sub/To/POD.pm:141
+msgid "This function is immutable (returns same result for same arguments)."
+msgstr "Cette fonction est immuable (retourner même résultat pour mêmes arguments)."
+
+#: lib/Perinci/Sub/To/POD.pm:144
+msgid ""
+"This function is idempotent (repeated invocations with same arguments has "
+"the same effect as single invocation)."
+msgstr ""
+"Cette fonction est idempotent (invocations répétées ayant les mêmes arguments ont "
+"le même effet que seule invocation)."
+
+#: lib/Perinci/Sub/To/POD.pm:151
+#, fuzzy
+msgid "This function supports transactions."
+msgstr "Cette fonction soutient les transactions."
+
+#: lib/Perinci/Sub/To/POD.pm:155
+msgid "For more information on transaction, see L<Rinci::Transaction>."
+msgstr "En savoir plus sur la transaction, voir L<Rinci::Transaction>."
+
+#: lib/Perinci/Sub/To/POD.pm:189
+#, fuzzy
+msgid "No arguments"
+msgstr "Sans arguments"
+
+#: lib/Perinci/Sub/To/POD.pm:194
+#, fuzzy
+msgid "Special arguments"
+msgstr "Arguments spéciaux"
+
+#: lib/Perinci/Sub/To/POD.pm:220
+#, fuzzy
+msgid ""
+"Returns an enveloped result (an array). First element (status) is an integer "
+"containing HTTP status code (200 means OK, 4xx caller error, 5xx function "
+"error). Second element (msg) is a string containing error message, or 'OK' "
+"if status is 200. Third element (result) is optional, the actual result. "
+"Fourth element (meta) is called result metadata and is optional, a hash that "
+"contains extra information."
+msgstr ""
+"Retourner un résultat enveloppé (un tableau).\n"
+"\n"
+"Premier élément (status) est un entier contenant le code d'état HTTP\n"
+"(200 moyens OK, erreur de l'appelant 4xx, erreur de fonction 5xx). Second "
+"élément\n"
+"(msg) est un message d'erreur contenant des cordes, ou 'OK' si l'état est\n"
+"de 200. Troisième élément (résultat) est facultative, le résultat réel. "
+"Quatrième\n"
+"élément (méta) est appelée méta-données du résultat et est facultatif, un "
+"hachage\n"
+"qui contient des informations supplémentaires."

@@ -1,0 +1,16 @@
+=head1 cookbook
+
+=head2 Simple usage
+
+Some Text
+
+=begin test
+
+  my $cc = 'cc' ;
+  my $expected_cc = 'cc' ;
+  
+  is($cc, $expected_cc, 'expected value') ;
+
+=end test
+
+=cut 

@@ -1,0 +1,18 @@
+.releaserc
+Changes
+examples/lib/MyMySQL.pm
+examples/lib/MyMySQL/Hello.pm
+examples/mymysql.pl
+lib/POE/Component/Proxy/MySQL.pm
+lib/POE/Component/Proxy/MySQL/Forwarder.pm
+Makefile.PL
+MANIFEST
+README
+t/lib/MyMySQL.pm
+t/lib/MyMySQL/Fortune.pm
+t/mymysql.pl
+t/pod-coverage.t
+t/pod.t
+t/POE-Component-Proxy-MySQL.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

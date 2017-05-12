@@ -1,0 +1,22 @@
+Revision history for Perl module Prima-Cairo
+
+1.06 2017-01-08
+ - Support ARGB bitmaps
+
+1.05 2016-09-27
+ - bump required Prima version
+
+1.04 2016-08-22
+ - add alpha layering support
+
+1.03 2016-03-20
+ - fixes for big-endian architecture
+
+1.02 2015-10-27
+ - merge system-specific code 
+
+1.01 2014-06-08 
+ - copy pixels between image surface and prima image; optimized raycaster
+
+1.00 2014-06-08
+ - Initial

@@ -1,0 +1,60 @@
+##############################################################################
+#      $URL$
+#     $Date$
+#   $Author$
+# $Revision$
+##############################################################################
+
+## --- Perl::Critic::Policy::Subroutines::ProhibitQualifiedSubDeclarations ---
+## name Basic passes
+## failures 0
+## cut
+
+sub foo;    # Forward declaration
+sub bar {}  # Empty declaraion
+
+# Single-line declaration
+sub baz { return uc @_; }
+
+# Multi-line declaration
+sub quux {
+
+        do_something( shfit );
+        return $something;
+}
+
+## --- Perl::Critic::Policy::Subroutines::ProhibitQualifiedSubDeclarations ---
+## name Basic failures
+## failures 4
+## cut
+
+sub Foo::foo;    # Forward declaration
+sub Foo::bar {}  # Empty declaraion
+
+# Single-line declaration
+sub Foo::Bar::baz { return uc @_; }
+
+# Multi-line declaration
+sub Foo::Bar::quux {
+
+        do_something( shfit );
+        return $something;
+}
+
+## --- Perl::Critic::Policy::Subroutines::ProhibitQualifiedSubDeclarations ---
+## name Anonymous subs
+## failures 0
+## cut
+
+my $sub = sub { do_something( $argument ) };
+
+
+##############################################################################
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab :

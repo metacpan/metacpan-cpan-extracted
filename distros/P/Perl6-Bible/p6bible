@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Perl6::Bible;
+
+Perl6::Bible->new->process(@ARGV);

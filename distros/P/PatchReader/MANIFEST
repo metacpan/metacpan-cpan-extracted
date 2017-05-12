@@ -1,0 +1,25 @@
+Changes
+lib/PatchReader.pm
+lib/PatchReader/AddCVSContext.pm
+lib/PatchReader/Base.pm
+lib/PatchReader/CVSClient.pm
+lib/PatchReader/DiffPrinter/raw.pm
+lib/PatchReader/DiffPrinter/template.pm
+lib/PatchReader/FilterPatch.pm
+lib/PatchReader/FixPatchRoot.pm
+lib/PatchReader/NarrowPatch.pm
+lib/PatchReader/PatchInfoGrabber.pm
+lib/PatchReader/Raw.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/001use.t
+t/002cvsdiff.t
+t/003fixroot.t
+t/004attic.t
+t/005doseol.t
+t/006plusminus.t
+t/007spaces.t
+t/008multifile.t
+t/Test/PatchReader.pm

@@ -1,0 +1,45 @@
+Revision history for HTML-FormHandlerX-JQueryRemoteValidator
+
+0.23    2016-01-13 23:55
+        Added missing dependency. 
+
+0.22    2016-01-13 11:45
+        Converted dist to use Dist::Zilla. Added Test::Lib to testing to try and
+        fix failures on cpantesters.
+
+0.21    2016-01-11 08:15
+        Doc tweaks.
+
+0.2     2016-01-11 07:45
+        Now validating repeatable fields. TODO: compound fields.
+        Removed 'skip_remote_validation_fields' attribute and using 'no_remote_validate'
+        tag instead.
+
+0.121   2016-01-10 17:30
+        Fixed typo.
+
+0.12    2016-01-10 16:30
+        Fixed handling of hidden fields - collect their data but don't
+        validate
+
+0.10    2016-01-09 01:30
+        Much more flexible option for providing JavaScript fragments to JQV,
+        and better docs explaining how to get a decent system up and running.
+
+0.06    2016-01-04 14:40
+        Added dependencies to build scripts.
+
+0.05    2016-01-04 09:15
+        Fixed js to work with multiple buttons on a form, see
+        https://github.com/jzaefferer/jquery-validation/issues/1559#issuecomment-168607367
+
+0.04    2016-01-04 00:05
+        Added 'js_apply_error_classes' and 'js_apply_success_classes'
+        attributes.
+
+0.03    2016-01-02 23:25
+        no_update is a flag, not a method
+
+0.02    2016-01-01 15:30
+        Fixed identifiers to work with multiple forms on the page.
+

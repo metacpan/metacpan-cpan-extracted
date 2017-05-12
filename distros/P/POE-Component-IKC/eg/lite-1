@@ -1,0 +1,15 @@
+#!/bin/perl
+
+use strict;
+use warnings;
+use Data::Denter;
+
+use POE::Component::IKC::ClientLite;
+my $poe = POE::Component::IKC::ClientLite->spawn(
+        port    => 6666,
+#        serialiser => 'POE::Component::IKC::Freezer' 
+    );
+die POE::Component::IKC::ClientLite::error() unless $poe;
+my $ret = $poe->post_respond("Service/event", {Hi=>"There"});
+
+warn "ret=", Denter $ret;

@@ -1,0 +1,191 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Panotools::Script;
+use Getopt::Long;
+use Pod::Usage;
+
+my $help = 0;
+my $positions = 0;
+my $roll = 0;
+my $pitch = 0;
+my $yaw = 0;
+my @r;
+my @p;
+my @y;
+my $translations;
+my @TrX;
+my @TrY;
+my @TrZ;
+my @Tpp;
+my @Tpy;
+my $view = 0;
+my $barrel = 0;
+my $centre = 0;
+my $vignetting = 0;
+my $vignetting_centre = 0;
+my $response = 0;
+my $exposure = 0;
+my $white_balance = 0;
+my $path_output;
+
+GetOptions ('positions' => \$positions,
+            'view' => \$view,
+            'barrel' => \$barrel,
+            'centre' => \$centre,
+            'positions' => \$positions,
+            'roll' => \$roll,
+            'pitch' => \$pitch,
+            'yaw' => \$yaw,
+            'r=i' => \@r,
+            'p=i' => \@p,
+            'y=i' => \@y,
+            'translations' => \$translations,
+            'TrX=i' => \@TrX,
+            'TrY=i' => \@TrY,
+            'TrZ=i' => \@TrZ,
+            'Tpp=i' => \@Tpp,
+            'Tpy=i' => \@Tpy,
+            'vignetting' => \$vignetting,
+            'vignetting-centre' => \$vignetting_centre,
+            'response' => \$response,
+            'exposure' => \$exposure,
+            'white-balance' => \$white_balance,
+            'o|output=s' => \$path_output,
+            'h|help' => \$help);
+
+pod2usage (-verbose => 2) if $help;
+
+my $path_pto = shift || pod2usage;
+die "Can't find $path_pto" unless -e $path_pto;
+$path_output = $path_pto unless defined $path_output;
+
+my $pto = new Panotools::Script;
+$pto->Read ($path_pto);
+
+my $variable = $pto->Variable;
+
+# FIXME assumes image 0 is anchor
+$variable->{0}->{v} = $view;
+
+$variable->{0}->{b} = $barrel;
+
+$variable->{0}->{d} = $centre;
+$variable->{0}->{e} = $centre;
+
+$variable->{0}->{Vb} = $vignetting;
+$variable->{0}->{Vc} = $vignetting;
+$variable->{0}->{Vd} = $vignetting;
+
+$variable->{0}->{Vx} = $vignetting_centre;
+$variable->{0}->{Vy} = $vignetting_centre;
+
+$variable->{0}->{Ra} = $response;
+$variable->{0}->{Rb} = $response;
+$variable->{0}->{Rc} = $response;
+$variable->{0}->{Rd} = $response;
+$variable->{0}->{Re} = $response;
+
+# FIXME assumes image 0 is anchor
+for my $index (1 .. scalar @{$pto->Image} -1)
+{
+    $variable->{$index}->{r} = $positions || $roll;
+    $variable->{$index}->{p} = $positions || $pitch;
+    $variable->{$index}->{y} = $positions || $yaw;
+
+    $variable->{$index}->{TrX} = $translations;
+    $variable->{$index}->{TrY} = $translations;
+    $variable->{$index}->{TrZ} = $translations;
+
+    $variable->{$index}->{Eev} = $exposure;
+
+    $variable->{$index}->{Er} = $white_balance;
+    $variable->{$index}->{Eb} = $white_balance;
+}
+
+$variable->{$_}->{r} = 1 for (@r);
+$variable->{$_}->{p} = 1 for (@p);
+$variable->{$_}->{y} = 1 for (@y);
+
+$variable->{$_}->{TrX} = 1 for (@TrX);
+$variable->{$_}->{TrY} = 1 for (@TrY);
+$variable->{$_}->{TrZ} = 1 for (@TrZ);
+
+$variable->{$_}->{Tpp} = 1 for (@Tpp);
+$variable->{$_}->{Tpy} = 1 for (@Tpy);
+
+$pto->Write ($path_output);
+
+__END__
+
+=head1 NAME
+
+ptovariable - prepare a pto project for typical optimisation tasks
+
+=head1 SYNOPSIS
+
+ptovariable [options] project.pto
+
+ Options:
+       --positions          Optimise positions
+       --roll               Optimise roll for all images except anchor if --positions not set
+       --pitch              Optimise pitch for all images except anchor if --positions not set
+       --yaw                Optimise yaw for all images except anchor if --positions not set
+       -r <num> <num> <..>  Optimise roll for specified images
+       -p <num> <num> <..>  Optimise pitch for specified images
+       -y <num> <num> <..>  Optimise yaw for specified images
+       --translations       Optimise XYZ mosaic translations for all images except anchor
+       -TrX <num> <..>      Optimise X translation for specified images
+       -TrY <num> <..>      Optimise Y translation for specified images
+       -TrZ <num> <..>      Optimise Z translation for specified images
+       --view               Optimise angle of view
+       --barrel             Optimise barrel distortion
+       --centre             Optimise optical centre
+       --vignetting         Optimise vignetting
+       --vignetting-centre  Optimise vignetting centre
+       --response           Optimise camera response EMoR parameters
+       --exposure           Optimise exposure (EV)
+       --white-balance      Optimise colour balance
+  -o | --output OUTFILE     Specify output file default is to overwrite input       
+  -h | --help               Outputs help documentation
+
+=head1 DESCRIPTION
+
+B<ptovariable> sets optimisation variable 'v' lines for a hugin .pto project.
+Usually this is a preparation for optimisation with autooptimiser or
+vig_optimize.
+
+=head1 EXAMPLES
+
+This performs the equivalent of the 'Positions, View and Barrel (y,p,r,v,b)'
+preset on the hugin Optimiser tab:
+
+  ptovariable --positions --view --barrel project.pto
+  autooptimiser -n -o project.pto project.pto
+
+This is the equivalent of the 'Low dynamic range' preset on the hugin Exposure
+tab:
+
+  ptovariable --vignetting --response --exposure project.pto
+  vig_optimize -o project.pto project.pto
+
+Additionally individual parameters can be set for particular photos:
+
+  ptovariable -r 1 2 3 4 -p 4 project.pto
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+=head1 AUTHOR
+
+Bruno Postle - April 2009.
+
+=cut

@@ -1,0 +1,571 @@
+#!/usr/bin/perl
+use 5.006;
+use strict;
+use warnings;
+our $VERSION = '0.14';
+
+require PAR::Repository;
+use Getopt::Long qw/GetOptions/;
+
+####
+# Getopt::Long option declarations
+####
+
+my %Opt = (
+    repository => [ 'repository|r=s' ],
+    force      => [ 'force' ],
+    file       => [ 'file|f=s' ],
+    dist_attr  => [
+        'distname|n=s', 'distversion|v=s', 'arch|a=s', 'perlversion|p=s'
+    ],
+    overwrite  => [ 'overwrite|o' ],
+    anys       => [
+        'any-arch|anyarch|any_arch', 'any-version|anyversion|any_version'
+    ],
+    verbose    => [ 'verbose+', 'verbosity=i' ],
+    no_scripts => [ 'no-scripts|no_scripts|noscripts' ],
+    arch       => [ 'arch|a=s' ],
+    fake_symlinks => [ 'fake_symlinks|fake-symlinks|fakesymlinks']
+);
+
+
+####
+# command subroutines
+####
+
+# implements "parrepo create"
+sub create_cmd {
+    my %o = (repository => 'repo', force => 0);
+    GetOptions( \%o, map {@$_} @Opt{qw/
+        verbose repository force fake_symlinks
+    /},);
+
+    $PAR::Repository::VERBOSE = defined($o{verbosity}) ? $o{verbosity} : $o{verbose} || 0; 
+
+    if (-e $o{repository} and not $o{force}) {
+        print "Repository path exists. Not overwriting without --force.\n";
+        exit(1);
+    }
+    elsif (-e $o{repository}) {
+        print "Removing old repository directory.\n";
+        require File::Path;
+        File::Path::rmtree($o{repository});
+    }
+
+    print "Creating new repository at '$o{repository}'.\n";
+    my $repo = PAR::Repository->new(
+      path => $o{repository},
+      ($o{fake_symlinks} ? (fake_symlinks => 1) : ()),
+    );
+    
+    return(1);
+}
+
+# implements "parrepo convert"
+sub convert_symlinks_cmd {
+    my %o = (repository => 'repo');
+    GetOptions( \%o, map {@$_} @Opt{qw/
+        verbose repository
+    /},);
+
+    $PAR::Repository::VERBOSE = defined($o{verbosity}) ? $o{verbosity} : $o{verbose} || 0; 
+
+    if (not -d $o{repository}) {
+        print "Error: Repository path does not exist.\n";
+        exit(1);
+    }
+
+    print "Converting repository to using no symlinks.\n";
+    my $repo = PAR::Repository->new(
+      path => $o{repository},
+      convert_symlinks => 1,
+    );
+    
+    return(1);
+}
+
+
+# implements "parrepo inject"
+sub inject_cmd {
+    my %o = (repository => 'repo');
+    GetOptions( \%o, map {@$_} @Opt{qw/
+        verbose repository dist_attr file overwrite anys no_scripts
+    /},);
+
+    $PAR::Repository::VERBOSE = defined($o{verbosity}) ? $o{verbosity} : $o{verbose} || 0;
+
+    if (not -d $o{repository}) {
+        print "Error: Repository path does not exist.\n";
+        exit(1);
+    }
+
+    my @files;
+    if (
+        not defined $o{file}
+    ) {
+        print "Error: Could not find distribution file. Use --file to specify it.\n";
+        exit(1);
+    }
+    elsif ($o{file} =~ /[\[\]{}*?~]/) {
+        # It's a glob. (see regex above, checking for meta-chars)
+        @files = glob($o{file});
+    }
+    elsif (not -f $o{file}) {
+        print "Error: Could not find distribution file. Use --file to specify it.\n";
+        exit(1);
+    }
+    else {
+        push @files, $o{file};
+    }
+    
+    if (not @files) {
+        print "Error: Could not find distribution file. Use --file to specify it.\n";
+        exit(1);
+    }
+
+    my $repo = PAR::Repository->new( path => $o{repository} );
+
+    foreach my $file (@files) {
+        print "Injecting file '$file' into repository.\n";
+        $repo->inject(
+            file => $file,
+            (defined $o{distname}      ? (distname    => $o{distname})      : ()),
+            (defined $o{distversion}   ? (distversion => $o{distversion})   : ()),
+            (defined $o{arch}          ? (arch        => $o{arch})          : ()),
+            (defined $o{perlversion}   ? (perlversion => $o{perlversion})   : ()),
+            (defined $o{'any-arch'}    ? (any_arch    => $o{'any-arch'})    : ()),
+            (defined $o{'any-version'} ? (any_version => $o{'any-version'}) : ()),
+            (defined $o{overwrite}     ? (overwrite   => $o{overwrite})     : ()),
+            (defined $o{no_scripts}    ? (no_scripts  => $o{no_scripts})    : ()),
+        );
+    }
+
+    return(1);
+}
+
+
+
+# implements "parrepo remove"
+sub remove_cmd {
+    my %o = (repository => 'repo');
+    GetOptions( \%o, map {@$_} @Opt{qw/
+        verbose repository dist_attr file 
+    /},);
+
+    $PAR::Repository::VERBOSE = defined($o{verbosity}) ? $o{verbosity} : $o{verbose} || 0;
+
+    if (not -d $o{repository}) {
+        print "Error: Repository path does not exist.\n";
+        exit(1);
+    }
+
+    my @files;
+    if (
+        not defined $o{file}
+        and (
+            not defined $o{distname}
+            or not defined $o{distversion}
+            or not defined $o{arch}
+            or not defined $o{perlversion}
+        )
+    ) {
+        print "Error: Could not find distribution file to remove. Use --file to specify it or supply the necessary individual bits of information (dist name, version, architecture, perl version).\n";
+        exit(1);
+    }
+    
+    my $repo = PAR::Repository->new( path => $o{repository} );
+
+    print "Removing file from repository.\n";
+    my $success = $repo->remove(
+        (defined $o{file}          ? (file        => $o{file})          : ()),
+        (defined $o{distname}      ? (distname    => $o{distname})      : ()),
+        (defined $o{distversion}   ? (distversion => $o{distversion})   : ()),
+        (defined $o{arch}          ? (arch        => $o{arch})          : ()),
+        (defined $o{perlversion}   ? (perlversion => $o{perlversion})   : ()),
+    );
+
+    print "Successfully removed file.\n" if $success;
+}
+
+
+# implements "parrepo query module"
+sub _module_query_cmd {
+    my $o = shift;
+    my $repo = shift;
+    my $what = shift;
+    
+    my @args;
+    if ($what =~ /^\/(.*?)\/$/) {
+        push @args, regex => $1;
+    }
+    else {
+        push @args, name => $what;
+    }
+    
+    my $match = $repo->query_module(
+        @args,
+        ($o->{arch} ? (arch => $o->{arch}) : ()),
+    );
+
+    if (not @$match) {
+        print "There were no matching modules in the repository.\n";
+    }
+    else {
+        print "Modules matching '$what' contained in the\nfollowing distributions:\n";
+        while (@$match) {
+            print shift(@$match) . ' (' . (shift(@$match)||'undef') . ")\n";
+        }
+    }
+    return(1);
+}
+
+
+# implements "parrepo query script"
+sub _script_query_cmd {
+    my $o = shift;
+    my $repo = shift;
+    my $what = shift;
+    
+    my @args;
+    if ($what =~ /^\/(.*?)\/$/) {
+        push @args, regex => $1;
+    }
+    else {
+        push @args, name => $what;
+    }
+    
+    my $match = $repo->query_script(
+        @args,
+        ($o->{arch} ? (arch => $o->{arch}) : ()),
+    );
+
+    if (not @$match) {
+        print "There were no matching scripts in the repository.\n";
+    }
+    else {
+        print "Scripts matching '$what' contained in the\nfollowing distributions:\n";
+        while (@$match) {
+            print shift(@$match) . ' (' . (shift(@$match)||'undef') . ")\n";
+        }
+    }
+    return(1);
+}
+
+
+# implements "parrepo query dist"
+sub _dist_query_cmd {
+    my $o = shift;
+    my $repo = shift;
+    my $what = shift;
+    
+    my @args;
+    if ($what =~ /^\/(.*?)\/$/) {
+        push @args, regex => $1;
+    }
+    else {
+        push @args, name => $what;
+    }
+    
+    my $match = $repo->query_dist(
+        @args,
+        ($o->{arch} ? (arch => $o->{arch}) : ()),
+    );
+
+    if (not @$match) {
+        print "There were no matching distributions in the repository.\n";
+    }
+    else {
+        print "Distributions matching '$what':\n";
+        while (@$match) {
+            my $dist = shift @$match;
+            my $modules = shift @$match;
+            print "$dist\n";
+            foreach my $mod (sort keys %$modules) {
+                print "  $mod (" . ($modules->{$mod}||'undef') . ")\n";
+            }
+            print "\n";
+        }
+    }
+    return(1);
+}
+
+
+# implements "parrepo query"
+sub query_cmd {
+    my %o = (repository => 'repo');
+    GetOptions( \%o, map {@$_} @Opt{qw/
+        verbose repository arch
+    /},);
+
+    # get subcommand
+    my $cmd = shift @ARGV;
+    $cmd = shift @ARGV if defined($cmd) and $cmd eq 'query';
+    # get module/dist/script/etc name
+    my $what = shift @ARGV;
+    
+    my %qcmds = (
+        module       => \&_module_query_cmd,
+        mod          => \&_module_query_cmd,
+        script       => \&_script_query_cmd,
+        dist         => \&_dist_query_cmd,
+        distro       => \&_dist_query_cmd,
+        distribution => \&_dist_query_cmd,
+    );
+    
+    if ( not defined $cmd or not defined $what ) {
+        print "Error: What are you querying? Supported queries:\n"
+            .join("\n", keys %qcmds)
+            ."\n";
+        exit(1);
+    }
+    
+    if ( not exists $qcmds{$cmd} ) {
+        print "Error: Unknown query command.\n";
+        exit(1);
+    }
+
+    $PAR::Repository::VERBOSE = defined($o{verbosity}) ? $o{verbosity} : $o{verbose} || 0;
+
+    if (not -d $o{repository}) {
+        print "Error: Repository path does not exist.\n";
+        exit(1);
+    }
+
+    my $repo = PAR::Repository->new( path => $o{repository} );
+
+    return $qcmds{$cmd}->(\%o, $repo, $what);
+}
+
+
+
+
+my %CMD = (
+    inject => \&inject_cmd,
+    create => \&create_cmd,
+    convert_symlinks => \&convert_symlinks_cmd,
+    remove => \&remove_cmd,
+    query  => \&query_cmd,
+);
+
+####
+# misc subs
+####
+
+sub print_help {
+    my $msg = shift;
+    $msg .= "\n\n" if defined $msg;
+    print $msg if defined $msg;
+    require Pod::Text;
+    my $parser = Pod::Text->new;
+    $parser->parse_from_filehandle(\*DATA);
+    exit(1);
+}
+
+####
+# this is actually run
+####
+
+my $cmd = shift @ARGV;
+
+print_help() if (not defined $cmd);
+
+if ($cmd =~ /^-/) {
+    unshift @ARGV, $cmd;
+    GetOptions(
+        'v|version' => sub {
+          print "This is parrepo version '$VERSION'.\n";
+          print "PAR::Repository version '$PAR::Repository::VERSION'.\n";
+          exit(1);
+        },
+        'h|help'    => sub { print_help() },
+    );
+    print_help("Missing command?");
+}
+
+print_help("Invalid command?") if not exists $CMD{$cmd};
+
+$CMD{$cmd}->();
+
+
+
+
+
+
+
+__DATA__
+
+=head1 NAME
+
+parrepo - Server side script for managing PAR repositories
+
+=head1 SYNOPSIS
+
+  parrepo --help | --version
+  parrepo COMMAND [command options]
+  parrepo create [-r REPODIR] [--force]
+  parrepo inject [-r REPODIR] filename.par
+
+=head1 DESCRIPTION
+
+This is a frontend script to the PAR::Repository module.
+It lets you create and manage PAR repositories.
+
+=head2 COMMANDS
+
+All commands take the I<--verbose> option to set the verbosity of
+error messages. Specifying that option multiple times (up to 4x)
+increases the verbosity even more.
+
+Instead of using the I<--verbose> option C<n> times, you can also
+use the I<--verbosity n> flag to set it to level C<n>.
+Using I<--verbosity> overrides any occurrances of I<--verbose>.
+
+=over 2
+
+=item create
+
+Creates a new repository. Defaults to using a subdirectory called
+C<repo>.
+
+Parameters:
+
+  -r or --repository
+    Specifies the repository path.
+  -f or --force
+    Overwrite the directory if it exists.
+  --fake-symlinks
+    Do not use symlinks. Default on platforms that don't support
+    symlinks. Necessary if you plan to move the repository to a
+    computer that doesn't support symlinks.
+
+=item inject
+
+Injects a PAR distribution into the repository. You need to
+specify a distribution file to inject using the C<--file>
+(or C<-f>) option.
+
+We need to find out which name
+and version the distribution has as well as which architecture
+and perl version it was compiled for. You can set all these
+using options (see below). If you do not, parrepo tries to
+infer this information from the file name. This works if the
+file name is of the following form:
+
+  WWW-Mechanize-1.32-x86_64-linux-gnu-thread-multi-5.8.6.par
+
+The command line options take precedence over file name parsing.
+
+If you specify the architecture name as I<any_arch>, the distribution
+will be put into the architecture agnostic portion of the
+repository. I<any_version> works similar for the perl version.
+
+Alternatively, you can use the C<--any-arch> and C<--any-version>
+switches for a similar effect. If you use the switches, only a symlink
+to the original distribution will be put into the C<any_*> section of
+the repository.
+
+Parameters:
+
+  -f or --file
+    The distribution file to inject. (mandatory)
+    parrepo will do a glob if the file name contains meta characters.
+    this works: --file => '*.par'
+  -r or --repository
+    Specifies the repository path.
+  -n or --distname
+  -v or --distversion
+  -a or --arch
+  -p or --perlversion
+    Set the necessary distribution information.
+  --any-arch or --anyarch or --any_arch
+    If set, a symlink to the distribution will be put into the
+    architecture agnostic portion of the repository.
+  --any-version or --anyversion or --any_version
+    Same for the perl version.
+  -o or --overwrite
+    Set this if you want to overwrite a distribution of the
+    same name in the repository.
+  --no-scripts or --noscripts or --no_scripts
+    Do not import any executables into the scripts database.
+
+=item remove
+
+Removes a distribution or a symlink from the repository.
+As with the inject command,
+you can specify a distribution (file) name using the C<-f> option or
+specify the separate pieces of information necessary to construct the
+distribution file name.
+
+Parameters:
+
+  -f or --file
+    The distribution file to remove.
+  -r or --repository
+    Specifies the repository path.
+  -n or --distname
+  -v or --distversion
+  -a or --arch
+  -p or --perlversion
+    Set the necessary distribution information.
+
+=item query module
+
+Queries the repository for modules. First argument should be
+a module name or regular expression. Examples:
+
+  parrepo query module Foo::Bar -r myrepo
+  parrepo query module /Bar/
+  parrepo query module /Bar/ --arch linux
+
+Parameters:
+
+  -a or --arch
+    Limits the query to architectures matching this regex.
+
+=item convert_symlinks
+
+Converts an existing repository that uses symlinks to one that does
+not. Will potentially increase the size of the repository.
+Useful before copying the repository to a host which does not support
+symlinks or transfering it with tools which don't.
+Not necessary if the repository was created on a platform that doesn't
+use symlinks. Once converted, the repository will never use symlinks
+again.
+
+Parameters:
+
+  -r or --repository
+    Specifies the repository path.
+
+=item query script
+
+Queries the repository for scripts. First argument should be
+a script name or regular expression. Examples:
+
+  parrepo query script some_script -r myrepo
+  parrepo query script /foo/
+  parrepo query script /foo/ --arch linux
+
+Parameters:
+
+  -a or --arch
+    Limits the query to architectures matching this regex.
+
+=item query dist
+
+Queries the repository for distributions. First argument should be
+a distribution name or regular expression. Examples:
+
+  parrepo query dist Foo-Bar-0.01-any_arch-5.8.8.par -r myrepo
+  parrepo query dist /Foo-Bar/
+  parrepo query dist /5.8.8.par$/ --arch linux
+
+Parameters:
+
+  -a or --arch
+    Limits the query to architectures matching this regex.
+
+=back
+
+=cut
+

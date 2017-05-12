@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" >
+<title>Authentification</title>
+
+<script type="text/javascript" src="../../lib/prototype.js"></script>
+<script type="text/javascript" src="../../lib/scriptaculous.js"></script>
+<script type="text/javascript" src="../../lib/unittest.js"></script>
+<script type="text/javascript" src="../../src/util.js"></script>
+<script type="text/javascript" src="../../src/pseudocombo.js"></script>
+
+<link rel="stylesheet" href="../test.css" type="text/css" />
+  
+</head>
+<body>
+<p>Test util.js</p>
+<!-- Log output -->
+<div id="testlog"> </div>
+
+<div id="Combos">
+
+<select name="telephones" id="SELECT_telephones">
+    <option value="123-123-1234">123-123-1234</option>
+    <option value="321-321-3213">321-321-3213</option>
+    <option value="819-123-1233">819-123-1233</option>
+</select>
+              
+
+<script type="text/javascript">
+combo1 = new PseudoCombo( 'telephones' );
+</script>
+
+<input type="submit" value="+" id="ADD_telephones" onclick="return combo1.add();" />
+<input type="submit" value="-" id="DEL_telephones" onclick="return combo1.del();" />
+<input type="text" value="HONK" size="15" name="TEMPORARY_telephones" id="TEMPORARY_telephones" style="display:none;" onchange="return combo1.on_change();" />
+<span id="MESSAGE_TEMPORARY_telephones" class="message" style="display:none;" onchange="return combo1.on_change();">Ex. 514-123-1234</span>
+<span id="ERROR_TEMPORARY_telephones" style="display: none;" class="error"> ! </span>
+<input type="hidden" value="" name="ADDITIONAL_telephones" id="ADDITIONAL_telephones" />
+
+
+
+<div Xstyle="display: none;" id="DOWN_message-client"><div class="pre" id="LIST_message-client"><div class="line0">2005/03/15 10H23 PAUL DIABATE          CLIENTS CANCEL DIT PAS D'ARGENT
+</div><div class="line1">2005/03/15 10H23 PAUL DIABATE
+</div><div class="line0">2005/04/15 10H23 PAUL DIABATE          CLIENTS CANCEL DIT PAS D'ARGENT
+</div></div></div>
+
+<script type="text/javascript">
+combo2 = new PseudoComboTextarea( "message-client",  "THIS IS THE LEADING" );
+</script>
+
+<input type="submit" value="Ajouter un message" id="ADD_message-client" onclick="return combo2.add();" />
+<input type="submit" value="Changer le message" id="MODIFY_message-client" onclick="return combo2.modify();" style="display: none;"/>
+<textarea name="TEMPORARY_message-client" id="TEMPORARY_message-client" onchange="return combo2.on_change();" rows="2" cols="60" style="display:none;" /></textarea>
+<input type="hidden" value="" name="ADDITIONAL_message-client" id="ADDITIONAL_message-client" />
+
+</div>
+
+<script type="text/javascript">
+
+// --------------------------------------------------------
+new Test.Unit.Runner( {
+    
+    // Loaded
+    test_loaded: function() { 
+        this.assertNotNull( PseudoCombo.prototype, "PseudoCombo class is defined" );
+        this.assertNotNull( PseudoComboTextarea.prototype.on_change, 
+                                    "PseudoComboTextarea class is defined" );
+    },
+    
+    // PseudoCombo
+    test_PseudoCombo: function() {
+        this.assertNotNull( combo1, "Created a PseudoCombo" );
+        
+        var ADD = $( 'ADD_telephones' );
+        this.assert( ADD );
+        var DEL = $( 'DEL_telephones' );
+        this.assert( DEL );
+        var SELECT = $( 'SELECT_telephones' );
+        this.assert( SELECT );
+        var TEMPORARY = $( 'TEMPORARY_telephones' );
+        this.assert( TEMPORARY );
+        var ADDITIONAL = $( 'ADDITIONAL_telephones' );
+        this.assert( ADDITIONAL );
+        var MESSAGE = $( 'MESSAGE_TEMPORARY_telephones' );
+        this.assert( MESSAGE );
+        
+        // -----------------
+        // initial state
+        this.assertEqual( '', ADDITIONAL.value );
+        this.assertEqual( 3, SELECT.options.length );
+
+        // -----------------
+        // Add a new value
+        ADD.click();
+        
+        this.assertEqual( TEMPORARY.value, '' );
+        this.assertVisible( MESSAGE );
+        this.assertVisible( TEMPORARY );
+
+        TEMPORARY.value = '999-999-9999';
+        TEMPORARY.onchange();
+        
+        this.assertEqual( 4, SELECT.options.length );
+        this.assertEqual( '999-999-9999', SELECT.options[3].value );
+        this.assertEqual( '\xAD+\xAD999-999-9999', ADDITIONAL.value );        
+
+        this.assertNotVisible( MESSAGE );
+        this.assertNotVisible( TEMPORARY );
+
+        // -----------------
+        // Remove a value
+        SELECT.options[1].selected = true;
+
+        DEL.click();
+
+        this.assertEqual( 3, SELECT.options.length );
+        this.assertEqual( '999-999-9999', SELECT.options[2].value );
+        this.assertEqual( '\xAD+\xAD999-999-9999\xAD-\xAD321-321-3213', 
+                            ADDITIONAL.value );        
+
+        this.assertNotVisible( MESSAGE );
+        this.assertNotVisible( TEMPORARY );
+    },
+
+    // PseudoComboTextarea
+    test_PseudoComboTextarea: function() {
+        this.assertNotNull( combo2, "Created a PseudoComboTextarea" );
+        
+        var ADD = $( 'ADD_message-client' );
+        this.assert( ADD );
+        var MODIFY = $( 'MODIFY_message-client' );
+        this.assert( MODIFY );
+        var LIST = $( 'LIST_message-client' );
+        this.assert( LIST );
+
+        var TEMPORARY = $( 'TEMPORARY_message-client' );
+        this.assert( TEMPORARY );
+        var ADDITIONAL = $( 'ADDITIONAL_message-client' );
+        this.assert( ADDITIONAL );
+        
+        // -----------------
+        // initial state
+        this.assertEqual( '', ADDITIONAL.value );
+        this.assertEqual( 3, LIST.childNodes.length);
+
+        // -----------------
+        // Add a new value
+        ADD.click();
+        
+        this.assertEqual( TEMPORARY.value, '' );
+        this.assertVisible( TEMPORARY );
+
+        TEMPORARY.value = 'HELLO WORLD';
+        TEMPORARY.onchange();
+        
+        this.assertEqual( 4, LIST.childNodes.length );
+        var last = LIST.childNodes[3];
+        this.assertEqual( 'THIS IS THE LEADINGHELLO WORLD', last.innerHTML );
+        this.assertEqual( '\xAD+\xADHELLO WORLD', ADDITIONAL.value );        
+
+        this.assertNotVisible( TEMPORARY );
+        this.assertNotVisible( ADD );
+        this.assertVisible( MODIFY );
+
+        // -----------------
+        // Modify that value
+        MODIFY.click();
+        
+        this.assertEqual( TEMPORARY.value, 'HELLO WORLD' );
+        this.assertVisible( TEMPORARY );
+
+        TEMPORARY.value = 'The world is my oyster';
+        TEMPORARY.onchange();
+        
+        this.assertEqual( 4, LIST.childNodes.length );
+        var last = LIST.childNodes[3];
+        this.assertEqual( 'THIS IS THE LEADINGThe world is my oyster', last.innerHTML );
+        this.assertEqual( '\xAD+\xADThe world is my oyster', ADDITIONAL.value );        
+
+        this.assertNotVisible( TEMPORARY );
+        this.assertNotVisible( ADD );
+        this.assertVisible( MODIFY );
+
+    },
+
+    test_last: function() {
+        Element.hide( $( "Combos" ) );
+        this.assertNotVisible( $( 'Combos' ) );
+    }
+    
+  }, "testlog" );
+
+
+    
+</script>
+</body>

@@ -1,0 +1,78 @@
+{
+   "abstract" : "Convert Dia class diagrams into SQL.",
+   "author" : [
+      "Andreas Faafeng <aff@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "keywords" : [
+      "Parse",
+      "Dia",
+      "SQL",
+      "DDL",
+      "RDBMS",
+      "DB2",
+      "Informix",
+      "Ingres",
+      "InnoDB",
+      "MyISAM",
+      "MySQL",
+      "Oracle",
+      "Postgres",
+      "SQLite3",
+      "Sas",
+      "Sybase"
+   ],
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parse-Dia-SQL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "CPAN::Meta" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Digest::MD5" : "0",
+            "Fatal" : "0",
+            "File::Find" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "Getopt::Long" : "0",
+            "HTML::Lint" : "0",
+            "IO::Uncompress::Gunzip" : "0",
+            "Log::Log4perl" : "0",
+            "POSIX" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Text::Table" : "0",
+            "XML::DOM" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/aff/Parse-Dia-SQL"
+      }
+   },
+   "version" : "0.29"
+}

@@ -1,0 +1,47 @@
+Revision history for Perinci-Sub-ConvertArgs-Array
+
+0.08    2015-12-29 (PERLANCAR)
+
+	- [Bugfix] Skip special arguments.
+
+
+0.07    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.06     2014-07-18 (SHARYANTO)
+
+         - Remove unused dependencies (Data::Sah, Log::Any).
+
+
+0.05     2014-07-18 (SHARYANTO)
+
+         - No functional changes.
+
+         - Update example in Synopsis.
+
+
+0.04     2012-02-09 (SHARYANTO)
+
+	 - Rename dist from Sub-Spec-ConvertArgs-Array to
+           Perinci-Sub-ConvertArgs-Array.
+
+
+0.03     2012-01-20 (SHARYANTO)
+
+         - No functional changes. Mark deprecation.
+
+
+0.02     2011-11-23 (SHARYANTO)
+
+         - No functional changes. Replace Data::Sah::Util with Data::Sah.
+
+
+0.01     2011-09-22 (SHARYANTO)
+
+         - First release.

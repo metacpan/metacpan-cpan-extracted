@@ -1,0 +1,35 @@
+format-version: 1.2
+data-version: 92
+date: 31:05:2012 15:34
+saved-by: chebi
+default-namespace: chebi_ontology
+remark: ChEBI subsumes and replaces the Chemical Ontology first
+synonymtypedef: IUPAC_NAME "IUPAC NAME"
+synonymtypedef: FORMULA "FORMULA"
+synonymtypedef: SMILES "SMILES"
+synonymtypedef: InChI "InChI"
+synonymtypedef: InChIKey "InChIKey"
+synonymtypedef: BRAND_NAME "BRAND NAME"
+synonymtypedef: INN "INN"
+remark: developed by Michael Ashburner & Pankaj Jaiswal.
+remark: Author: ChEBI curation team 
+remark: ChEBI Release version 92
+remark: For any queries contact chebi-help@ebi.ac.uk 
+ontology: chebi
+
+[Term]
+id: CHEBI:33853
+name: phenols
+alt_id: CHEBI:13664
+alt_id: CHEBI:2857
+alt_id: CHEBI:25969
+alt_id: CHEBI:13825
+def: "Compounds having one or more hydroxy groups attached to a benzene or other arene ring." []
+synonym: "arenols" RELATED [IUPAC:]
+synonym: "phenols" EXACT IUPAC_NAME [IUPAC:]
+synonym: "Aryl alcohol" RELATED [KEGG COMPOUND:]
+synonym: "aryl alcohol" RELATED [UniProt:]
+xref: KEGG COMPOUND:C15584 "KEGG COMPOUND"
+xref: MetaCyc:Aryl-Alcohol "MetaCyc"
+is_a: CHEBI:33822
+

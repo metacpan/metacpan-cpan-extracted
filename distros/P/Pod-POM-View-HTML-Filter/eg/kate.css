@@ -1,0 +1,22 @@
+/* 
+ * CSS rules for Syntax::Highlight::Engine::Kate
+ */
+.k-alert        {  }
+.k-basen        {  }
+.bstring        {  }
+.k-char         {  }
+.k-comment      { color: #228B22;                     } /* comment */
+.k-datatype     { color: #00688B;                     } /* ? */
+.k-decval       { color: #B452CD;                     } /* decimal ? */
+.k-error        {  }
+.k-float        { color: #B452CD;                     } /* float */
+.k-function     { color: #FF0000;  font-weight: bold; } /* function, subroutine */
+.k-istring      {  }
+.k-keyword      { color: #8B4513;  font-weight: bold; } /* keyword */
+.k-operator     { color: #8B4513;  font-weight: bold; } /* operator */
+.k-others       {  }
+.k-regionmarker {  }
+.k-reserved     {  }
+.k-string       { color: #CD5555;                     } /* string */
+.k-variable     { color: #00688B;                     } /* variable */
+.k-warning      {  }

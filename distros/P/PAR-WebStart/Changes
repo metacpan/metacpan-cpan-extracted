@@ -1,0 +1,43 @@
+April 4, 2011 - 0.20
+  - see if par(.pl) is really accessible during tests
+
+April 2, 2011 - 0.19
+  - new maintainer
+  - added PAR::Packer dependency
+
+June 30, 2005 - 0.18
+  - in make_par, remove existing par file of the same
+    name in the source directory (if it exists) before
+    making par archive
+  - perlws.pl tweaks in greeting
+
+June 18, 2005 - 0.17
+  - fix stupid compile-time error in make_par.pl
+  - use mkmanifest() to make MANIFEST in make_par() of
+    PAR::WebStart::Util
+  - add PerlSetVar option "no_sign" to turn off
+    Module::Signature checking within Apache2::WebStart
+  - some minor tweaks to the initial confirmation message
+    when invoking perlws.pl
+  - add PerlSetVar options "long_opts" and "short_opts"
+    within Apache2::WebStart to prepend '--' and '-',
+    respectively, to arguments passed to main script
+    (useful for use with Getopt::Long and Getopt::Std)
+
+June 14, 2005 - 0.15
+  - use PERL_VERSION, rather than api_version, to specify
+    a particular perl_version required.
+  - add Apache2::WebStart, a mod_perl-2 handler to generate
+    a PNLP file dynamically.
+
+June 8, 2005 - 0.11
+  - get functional interactive xterm session working on linux
+  - check PAR::WebStart version against that possibly specified
+    in the .pnlp file
+  - make notes in docs that the "icon" and "description" elements
+    of the .pnlp specification aren't completely implemented in
+    the perlws.pl script
+  - add notes about how to add file associations on linux
+
+May 31, 2005 - 0.1
+  - initial release

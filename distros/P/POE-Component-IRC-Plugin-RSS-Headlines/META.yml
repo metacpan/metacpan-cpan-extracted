@@ -1,0 +1,32 @@
+---
+abstract: 'A POE::Component::IRC plugin that provides RSS headline retrieval.'
+author:
+  - 'Chris Williams'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-IRC-Plugin-RSS-Headlines
+requires:
+  HTTP::Request: '0'
+  POE: '1.004'
+  POE::Component::Client::HTTP: '0.73'
+  POE::Component::IRC: '5.07'
+  POE::Component::IRC::Plugin: '0'
+  XML::RSS: '1.1'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/bingos/poe-component-irc-plugin-rss-headlines
+  repository: https://github.com/bingos/poe-component-irc-plugin-rss-headlines.git
+version: '1.10'
+x_serialization_backend: 'YAML::Tiny version 1.70'

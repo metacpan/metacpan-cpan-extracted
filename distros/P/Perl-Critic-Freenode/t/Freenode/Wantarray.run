@@ -1,0 +1,11 @@
+## name UseWantarray
+## failures 1
+## cut
+
+return wantarray ? () : undef;
+
+## name NoWantarray
+## failures 0
+## cut
+
+return undef;

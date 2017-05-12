@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use App::Twirc;
+
+my $app = App::Twirc->new_with_options();
+$app->run;

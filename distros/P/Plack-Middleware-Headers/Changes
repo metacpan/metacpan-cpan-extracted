@@ -1,0 +1,22 @@
+Revision history for Perl module Plack::Middleware::Headers
+
+0.11  Sat Mar 22 08:25 UTC 2014
+    - fixed bug #1 (Maurice Aubrey)
+
+0.10  Sat Sep 14 14:35 UTC 2013
+    - fork renamed to Plack::Middleware::Headers
+    - migrated to dzil
+    - added conditional argument 'when' (Jakob Voß) 
+    - added conditional argument 'code' (Wallace Reis)
+
+0.04  Thu Sep  9 06:30 UTC 2010
+    - support delayed response (thanks to Olaf Alders)
+
+0.03  Thu Dec 17 07:57 UTC 2009
+    - Added parent dependency
+
+0.02  Thu Dec 17 07:51 UTC 2009
+    - Added Plack::Middleware dependency
+
+0.01  Thu Dec  3 22:19 2009
+    - original version

@@ -1,0 +1,155 @@
+<div style="margin-top:10px;"></div>
+<div class="thread_header">
+    <a href="forum/view?forum=[% current_forum.id %]">[% ForumCode.escape(current_forum.name) %]</a>
+    &nbsp;:&nbsp;
+    [%l('Replying To')%]
+    &nbsp;:&nbsp;
+    [% ForumCode.escape(current_thread.subject) %]
+</div>
+
+[%# different action depending on whether we're adding to a thread or replying to a specific post %]
+[% IF current_post %]
+<form action="thread/reply?post=[% current_post.id %]" method="POST" name="new_thread">
+[% ELSE %]
+<form action="thread/reply?thread=[% current_thread.id %]" method="POST" name="new_thread">
+[% END %]
+
+<!-- The post we're replying to -->
+<div class="yui-gf" style="margin-top:10px;margin-bottom:10px;">
+	<div class="yui-u first">
+        <div style="text-align:right; vertical-align: top;">
+            <p class="post_creator">
+            [% responding_to_post.creator.forum_name %]
+            </p>
+            <p class="post_created">
+            [% nicedate(responding_to_post.created) %]
+            </p>
+        </div>
+	</div>
+	<div class="yui-u">
+        <div class="reply_post_message innerpost">
+            [% FILTER html_line_break %][% ForumCode.forumcode(responding_to_post.message) %][% END %]
+        </div>
+	</div>
+</div>
+
+[% IF messages %]
+<p>
+    <ul>
+        [% FOREACH message IN messages %]
+            <li>[% message %]</li>
+        [% END %]
+    </ul>
+</p>
+[% END %]
+
+<p style="padding:10px;">[%l('ENTER REPLY')%]:</p>
+
+<!-- replies may have their own subject line -->
+[% IF c.config.replies_have_own_subject %]
+<div class="yui-gf" style="margin-top:10px;margin-bottom:10px;">
+	<div class="yui-u first">
+        <div style="text-align:right; vertical-align: top;">
+            [%l('Topic')%]:
+        </div>
+	</div>
+	<div class="yui-u">
+        <input type="text" name="thread_subject" size="60" class="input_text" value="[% current_thread.subject %]" />
+	</div>
+</div>
+[% END %]
+
+<!-- possibly quoting an existing post -->
+[% IF quote_post %]
+  <input type="hidden" name="have_quoted_post" value="1" />
+  <input type="hidden" name="__post" value="[% quote_post.id %]" />
+<div class="yui-gf" style="margin-top:10px;margin-bottom:10px;">
+	<div class="yui-u first">
+        &nbsp;
+	</div>
+	<div class="yui-u">
+        <span class="post_creator">
+            [% quote_post.creator.forum_name %] [%l('said')%]:
+        </span>
+        <br />
+        <textarea name="quote_message" cols="60" rows="10" class="quoted_reply_textarea" />[% quote_post.message %]</textarea>
+	</div>
+</div>
+[% END %]
+
+<!-- the reply area -->
+<div class="yui-gf" style="margin-top:10px;margin-bottom:10px;">
+	<div class="yui-u first">
+        <div style="text-align:right; vertical-align: top;">
+            [%l('Message')%]:
+        </div>
+	</div>
+	<div class="yui-u">
+        <textarea name="thread_message" id="thread_message" cols="60" rows="20" class="input_text" /></textarea>
+	</div>
+</div>
+
+<!-- button row -->
+<div class="yui-g">
+	<div class="yui-g first">
+		<div class="yui-u first">
+			&nbsp;
+		</div>
+		<div class="yui-u" style="text-align:center;">
+            <input type="button" value="[%l('Preview')%]"   accesskey="P" name="post_reply" class="input_button" id="message_preview" />
+		</div>
+	</div>
+	<div class="yui-g">
+		<div class="yui-u first" style="text-align:center;">
+            <input type="submit" value="[%l('Add Reply')%]" accesskey="S" name="post_reply" class="input_button" />
+		</div>
+		<div class="yui-u">
+			&nbsp;
+		</div>
+	</div>
+</div>
+
+<!-- extra actions -->
+<div class="yui-g" style="margin-top:20px;">
+	<div class="yui-g first">
+		<div class="yui-u first">
+			&nbsp;
+		</div>
+		<div class="yui-u" style="text-align:center;">
+            [% IF moderator %]
+            <input type="checkbox" name="lock_thread" value="1" /> [%l('LOCK AFTER POSTING')%] 
+            [% ELSE %]
+            &nbsp;
+            [% END %]
+		</div>
+	</div>
+	<div class="yui-g">
+		<div class="yui-u first" style="text-align:center;">
+            <input type="checkbox" name="watch_on_post" value="1" [% IF authed_user.preference.watch_on_post %]checked="checked" [% END %]/>
+            [%l('ADD THREAD WATCH')%] 
+		</div>
+		<div class="yui-u">
+			&nbsp;
+		</div>
+	</div>
+</div>
+</form>
+
+<style type="text/css">
+	.yui-overlay { position:absolute;background:transparent;border:none;padding:none;margin:none; }
+</style>
+
+<!-- message preview majick -->
+<script type="text/javascript" src="[%c.uri_for('/static/MessagePreview-min.js')%]"></script>
+<script type="text/javascript">
+    var MessagePreview = new ParleyMessagePreview();
+
+    MessagePreview.config.label_preview = '[%l('Preview')%]';
+    MessagePreview.config.label_edit    = '[%l('Edit')%]';
+    MessagePreview.config.post_url      = "[%c.uri_for('/forumcode/preview')%]";
+
+    MessagePreview.init();
+</script>
+<!-- (end) message preview majick -->
+
+[% PROCESS shared/loading_please_wait %]

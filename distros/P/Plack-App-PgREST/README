@@ -1,0 +1,49 @@
+NAME
+    Plack::App::PgREST - http://postgre.st/
+
+SYNOPSIS
+      # install plv8 extension for pg first
+
+      # install pgrest with npm
+      % npm i pgrest
+      # bootstrap
+      % pgrest --db MYDB --boot
+
+      # start the server
+      % plackup -MPlack::App::PgREST -e 'pgrest q{db=MYDB}'
+
+DESCRIPTION
+    Plack::App::PgREST is:
+
+    *   a JSON document store
+
+    *   running inside PostgreSQL
+
+    *   working with existing relational data
+
+    *   capable of loading Node.js modules
+
+    *   compatible with MongoLab's REST API
+
+INSTALL
+    *   Install pgxn:
+
+          sudo easy_install pgxnclient
+
+    *   Install libv8 (for older distro (lucid, natty): sudo
+        add-apt-repository ppa:martinkl/ppa)
+
+          sudo apt-get install libv8-dev
+
+    *   Install plv8 pgxn:
+
+          sudo pgxn install plv8
+
+AUTHOR
+    Chia-liang Kao <clkao@clkao.org> Audrey Tang <audreyt@audreyt.org>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

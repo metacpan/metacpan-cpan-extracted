@@ -1,0 +1,365 @@
+Revision history for Perl extension PGXN::API
+
+0.16.5  2016-06-22T18:03:05Z
+      - Fixed a test failure on systems with a non-English locale, thanks to
+        Slaven Rezić (issue #25).
+      - Fixed test failures on Windows.
+
+0.16.4  2016-06-15T16:10:33Z
+      - Fixed a bug where v1.0.0 Semantic Versions were not matched in synced
+        file names and directories.
+      - Fixed a bug that tried to read an extension JSON file case-sentiively.
+      - Fixed test failures due to a change in the generation of JSONP
+        responses in Plack 1.0031.
+      - Fixed a bug where the "pgxnbod" ID of a cleaned HTML element could be
+        removed if the last element in the body was removed.
+
+0.16.3  2013-06-19T06:31:51Z
+      - Updated URI::Template to v0.16 for its support for `{+var}` and
+        dropped the nasty hack required to work around the lack of it in
+        earlier versions.
+      - Updated GitHub URLs to point to `/pgxn/` rather than `/theory/`.
+      - Fixed a bug on the HTML documentation table of contents generator
+        where it would choke on finding an `h1` after an `h3`.
+      - Fixed test failures due to a change in the API of Email::Sender.
+      - Removed the Pod tests from the distribution.
+      - Eliminated smartmatch warnings on Perl 5.18.
+
+0.16.2  2012-02-14T06:46:47Z
+      - Empty Documentation files are no longer indexed or displayed.
+      - All files extracted from distribution zip files into the source
+        directory are now globally readable. This behavior eliminates
+        permissions errors when the user that serves the files is different
+        than the one that unzipped them.
+      - Files specified in the `docfile` key are now ignored if Text::Markup
+        does not recognize them, since they cannot then be parsed for serving
+        as HTML.
+      - Worked around an [Archive::Zip
+        bug](https://rt.cpan.org/Ticket/Display.html?id=74255.) when reading
+        the README file for indexing.
+
+0.16.1  2012-01-10T04:30:02Z
+      - Added `version_string` class method to PGXN::API. It should always be
+        used for displaying the version.
+      - Added `Capfile` for capistrano deployment.
+      - Added `eg/debian_init`, an example init script for Debian that runs
+        PGXN::API on Starman.
+      - Added `eg/pgxn_sync`, an example shell script that syncs from a local
+        master mirror.
+
+0.16.0  2011-08-26T17:29:00Z
+      - Eliminated "Use of uninitialized value in subroutine entry" warning
+        when indexing a user with no associated URI.
+      - If an version of an extension is deleted from the mirror extension
+        JSON file, it will now also be deleted from the API doc root's
+        extension JSON file (Issue #8).
+      - Requiring Text::Markup 0.13, as it has an important fix for parsing
+        Pod.
+      - Upgraded from KinoSearch to Lucy.
+
+0.15.0  2011-05-12T18:40:43
+      - Changed the JSONP callback parameter from "jsonp" to "callback".
+
+0.14.1  2011-05-12T18:11:02
+      - Changed mentions of `pgxn_apid` to the correct `pgxn_api_server` in
+        `pgxn_api_server` docs.
+      - Backported to support Perl 5.10.
+
+0.14.0  2011-05-03T00:09:13
+      - Now require Plack 0.9977 to enable JSONP for all JSON file requests.
+      - Fixed test failures on systems where `rsync` is not in the path.
+      - Replaced `pgxn_api.psgi` with `pgxn_api_server`. The latter uses
+        proper command-line processing and includes all of the functionality
+        of `plackup`.
+
+0.13.0  2011-04-30T20:40:21
+      - The "name" and "user_name" fields are now full-text indexed in the
+        "docs", "dists", and "extensions" indexes. This will allow a search
+        such as `user:theory` to return results.
+
+0.12.9  2011-04-30T20:01:29
+      - Fixed a test failure in `t/indexer.t` on case-sensitive file systems.
+      - Removed use of `env perl` in the `t/bin/testrscync` script. Just use
+        `/usr/bin/perl -w` instead and let it be any Perl, not just 5.12.
+        Should prevent failures on systems that don't allow arguments to `env`
+        and where the system Perl is different than the installating Perl.
+      - Added Data::Dump to list of requirements. Was inadvertently omitted.
+
+0.12.8  2011-04-29T21:21:13
+      - Some documentation tweaks.
+      - First release to CPAN.
+
+0.12.7  2011-04-28T22:28:31
+      - Fixed a bug where an updated root `index.json` updated on the mirror
+        was not likewise getting updated in the API root.
+      - Moved the default `index.html` file so that it will be installed and
+        findable when PGXN::API is installed from CPAN.
+      - Added a link to the API docs to the default `index.html` file.
+      - Renamed the `{char}` variable in the `userlist` URI template to
+        `{letter}`, since it better describes the value (an ASCII letter a-z).
+      - Search parameters must be submitted via a GET request.
+
+0.12.6  2011-04-27T18:52:18
+      - Eliminated "Use of uninitialized variable in soubroutine" warning when
+        indexing extensions with no abstract.
+      - Allow an optional trailing backslash on search URLs (since the
+        template includes one).
+      - Add new "special files" to detect: INSTALL, LICENSE, COPYING, and
+        AUTHORS.
+      - Changed search results content type from `text/json` to
+        `application/json`.
+      - Enabled JSONP for search requests.
+      - Changed tests to use `.zip` ending for downloads instead of `.pgz`.
+
+0.12.5  2011-04-25T18:07:27
+      - The directory name in which browsable distribution source files are
+        unzipped is now always lowercase.
+      - Fixed the primary key in the for distributsions, docs and extension in
+        the search index to always be lowercased.
+      - Distribution names and versions are now always lowercase in verbose
+        outout.
+
+0.12.4  2011-04-25T16:59:36
+      - The prefix in zip files is now assumed to be lowercase, as
+        PGXN::Manager v0.12.4 enforces.
+
+0.12.3  2011-04-25T16:35:28
+      - When searching for "special files", the indexer now looks for files
+        ending in ".in" if it doesn't find them without the ".in". Suggested
+        by Daniele Varrazzo.
+      - Always user lowercase disttribution names, versions, extension names,
+        tags, and nicknames in in URI templates. They're still displayed with
+        case preserved inside files and the index.
+
+0.12.2  2011-04-22T18:51:42
+      - Changed the media type of many more files served from `src` to
+        text/plain. This is both for security reasons and so that files that
+        are plain text open in the browser rather than prompt to download.
+
+0.12.1  2011-04-20T23:41:26
+      - Fixed rsync log parsing to properly detect when a file has been
+        changed. Previously, the code was only noticing new files.
+
+0.12.0  2011-04-20T05:35:52
+      - Requests should now all be returned with an appropriate
+        `Content-Length` header.
+      - Added the `userlist` URI template and the code to generate the user
+        lists to Indexer. It's set off at the end of a sync.
+      - Now update user JSON files whenever they're updated on the mirror.
+        Previously, a user JSON file was only updated when the user released a
+        distribtion. But now user JSON files can be updated independently, and
+        for users with no distributions at all. So we notice updated user JSON
+        files and properly merge them into the doc root and update them in the
+        full text index.
+      - Renamed the `doc` URI template to `htmldoc`, in case we ever decide to
+        offer other doc formats via the API.
+      - Renamed the path to a doc from `doc` to `docpath` in the extension
+        JSON and the `provides` hashes. This better distinguishes it from the
+        `docfile` key in the `provides` section of the meta spec. The
+        `htmldoc` URI template gets its variable renamed to `docpath`, as
+        well.
+
+0.11.0  2011-04-13T02:25:37
+      - Fixed the search API to throw a 400 for invalid queries: Missing
+        query, or a query with a value of "*" or "?".
+      - Changed the search URI template from "/search" to "/search/{in}/", as
+        the thing to be searched is required in the URI.
+      - Made the regular expression matching stats URIs stricter. It now
+        matches `(?:dist|tag|user|extension|summary)` rather than `[^/]+?`.
+      - Added a `.html` version of the spec to the API doc root, parsed from
+        the MultiMarkdown `.txt` file copied from the mirror.
+
+0.10.0  2011-04-11T23:41:16
+      - Removed PGXN::API::Stats. The same data is now generated by
+        PGXN::Manager 0.11.0.
+      - Updated sync to properly copy the new stats files from the mirror root,
+        as well as the new spec file.
+      - Updated sync to update the root `index.json` only if it has changed.
+        It will of course also be created on the first sync to a new doc root.
+      - Changed sync to load templates from the mirror root instead of relying
+        on those loaded from the doc root by PGXN::API. This is because the
+        latter won't exist before we start parsing the `rsync` log file, and
+        may need updating even if it does exist.
+
+0.9.0   2011-04-06T04:18:53
+      - Requests for a dist, extension, user, or tag URI ending in "/" instead
+        or ".json" (as in "/tag/pair/" instead of "/tag/pair.json") now
+        returns the JSON file.
+      - Added PGXN::API::Stats. It's used during sync to generate stats for
+        all the objects managed by the API (distributions, users, extensions,
+        and tags).
+
+0.8.0   2011-04-02T20:32:02
+      - Documentation and README documents now have their white space
+        normalized to single spaces before indexing. This allows highlighting
+        to work better in result sets. Suggested by Marvin Humphrey.
+      - The PGXN::API::Searcher object used by the router is now maintained
+        across requests, rather than created a new for every call to the
+        /search API. This is because PGXN::API::Searcher v0.7.1 properly
+        reconnects in the event of a changed index, so we don't have to worry
+        about it here.
+      - Fixed the `uri` and `email` fields in the user search index so that
+        they are both stored *and* indexed. They were previously just indexed,
+        and so might be missing from search results.
+
+0.7.0   2011-03-31T20:55:51
+      - Added "search" URI template to the API server's `/index.json`.
+      - Added full documentation.
+      - The indexer now respects the `no_index` key in the meta file.
+        Specifically, it will ignore any documentation files that match the
+        no_index spec. They won't be indexed.
+      - Changed the default `mirror_root` subdirectory from "pgxn" to
+        "mirror".
+      - Added query parameter validation to the `/search` API. Any invalid
+        parameters now return 400.
+      - Restored required index specification to the search API path, rather
+        than a query parameter. So `/search` is now a 404. Use `/search/docs`
+        instead. Can also use `/search/dists`, `/search/extensions`,
+        `/search/users`, and `/search/tags`.
+      - To be in sync with the above, the search indexes now have plural names
+        rather than singular.
+      - Fixed "Cannot copy directory" errors in tests when run from a
+        distribution.
+
+0.6.9   2011-03-29T04:43:53
+      - Fixed option processing in `pgxn_api.psgi` so that it deals only with
+        the options we care about. Otherwise it fails to start when running
+        under Starman.
+
+0.6.8   2011-03-29T04:18:30
+      - Added X-PGXN-API-Version header to all HTTP responses.
+      - Added required `errors_to` and `errors_from` parameters to the router.
+      - Added required `errors_to` and `errors_from` options to
+        `pgxn_api.psgi`, as well as the `doc_root` option.
+      - Added the `--root` option to `pgxn_api_sync`.
+
+0.6.7   2011-03-29T02:18:01
+      - Moved the doc path in the extension JSON file under the release status
+        key.
+
+0.6.6   2011-03-29T01:13:48
+      - Changed `{+path}` in the doc URI template to `{+doc}`, since that
+        will be more meaningful in other contexts.
+      - Added the `doc` key to the `provides` hashes in the distribution
+        metadata. It contains the doc path (as used by the doc URI template)
+        to the doc with the same base name as the provided extension.
+      - Added the `doc` key to the extension search index, so it's easy to
+        link to the documentation page from extension search results.
+
+0.6.5   2011-03-28T03:57:52
+      - The search API no longer fails when only "q" query parameter is
+        passed.
+      - Added a 500 error handler that sends an email on error.
+
+0.6.4   2011-03-28T03:07:13
+      - Updated for PGXN::API::Searcher v0.6.1. 
+      - Now only one search URL, `/search`. The index is specified via the
+        `in` query parameter.
+
+0.6.3   2011-03-28T02:08:01
+      - Updated for new URI template names in PGXN::Manager v0.10.4.
+      - Updated tests for new default metadata URI template paths.
+
+0.6.2   2011-03-26T05:29:36
+      - Search requests go to /search instead of /by. The latter is used for
+        metadata files.
+      - Fixed another "Use of uninitialized value in subroutine entry" warning
+        from the indexer.
+
+0.6.1   2011-03-26T04:12:42
+      - Fixed error in indexer for distributions with no tags.
+      - Fixed "Use of uninitialized value in subroutine entry" warnings from
+        the full text indexer in PGXN::API::Indexer.
+      - Fixed user name in distribution full text index so that it's not the
+        same name for all users.
+
+0.6.0   2011-03-26T03:14:12
+      - The /src directory is now served with Plack::App::Directory, so that a
+        listing of the files in a directory will be presented. Elsewhere,
+        directory requests return a 404.
+      - Added full-text search indexing. Requests go to /by.
+
+0.5.5   2011-03-17T23:07:43
+      - Changed doc JSON to have a hash for each value: a title and an
+        abstract (if there is one).
+
+0.5.4   2011-03-17T00:08:30
+      - Updated to work with new default URI templates deployed in
+        PGXN::Manager 0.10.2.
+
+0.5.3  2011-03-16T03:16:27
+      - Changed doc template to use `{+path}` instead of `{doc}`, so that
+        slashes will not be encoded. This isn't strictly-speaking supported by
+        URI::Template yet, so for now we set the variable as `+path` and
+        prevent URI::Escape from escaping slashes.
+
+0.5.2   2011-03-15T22:23:56
+      - HTML documents are now properly written out at UTF-8, instead of as
+        raw bytes.
+      - The doc parser no longer autovivifies doc file names into the
+        "provides" has of the version metadata file.
+
+0.5.1   2011-03-15T21:44:07
+      - The sync code now updates the mirror meta after `rsync`ing but before
+        doing anything else. It was fetching a template first, and this caused
+        errors on the first sync because the `index.json` had not yet been
+        copied to the document root.
+
+0.5.0   2011-03-15T21:24:59
+      - The URI templates are now read from the doc root rather than the
+        mirror root, so that the API-specific templates stored there will be
+        visible to the app.
+      - Added documentation parsing. Docs are read by Text::Markup and
+        converted to HTML. The HTML is cleaned up, unwanted stuff removed, and
+        a table of contents added. They are then written to a file represented
+        by the new "doc" URI template. They are also listed in the versioned
+        distribution metadata, suitable for for formatting into a URI via the
+        template. README files are included in this formatting treatment.
+
+0.4.1   2011-03-11T23:42:38
+      - Fixed a bug introduced in 0.4.0 where the /by/user and /by/tag files
+        were overwriting release data from other distributions, thereby
+        removing their abstracts. We now update the release data only for the
+        currently-processing distribution.
+
+0.4.0   2011-03-11T23:23:12
+      - Added the "special_files" key to the distribution metadata file. It
+        includes paths to `README`, `META.json`, `Changes`, `Makefile`, and
+        other special files in the distribution.
+      - Moved unzipped source directories under a subdirectory named for the
+        distribution. That is, rather than `/src/pair-0.1.1/`, we now have
+        `/src/pair/pair-0.1.1/`.
+      - Make sure that the `/by/dist` file has the latest *stable* version
+        listed as the version. Only make it a testing version if there is no
+        stable version, and an unstabe version only if there is no stable or
+        testing version.
+      - Fixed bugs in release data merging in the `/by/user` and `/by/tag`
+        files. The old code had relied too much on what was in the
+        distribution. Since the only additional data point over the mirrored
+        original is an abstract, we can just rely on the mirror data to be
+        correct and add the abstract. This simplifies the code quite a bit, in
+        fact.
+
+0.3.2   2011-03-10T21:53:17
+      - Updated to work with PGXN::Manager 0.10.0 output. In particular,
+        "owners" are now known as "users" and "release_date" is now known as
+        "date". The relevant methods and data have been chagned to reflect
+        this change.
+
+0.3.1 2011-03-10T00:28:36
+      - Updated to work with PGXN::Manager 0.9.1 output.
+
+0.3.0 2011-03-09T22:18:16
+      - Updated to work with PGXN::Manager 0.9.0 output.
+
+0.2.0   2011-03-03T01:09:42
+      - No longer serve directory indexes.
+      - Added tests for the router.
+      - Serve distribution files with content-type application/zip.
+      - Added `var/index.html`, placeholder for a root-level HTML file.
+
+0.1.0   2011-03-02 23:58:41
+      - Initial version.
+      - Syncs to mirror.
+      - Merges metadata to API doc root.
+      - Has PSGI to serve static files from the doc root.

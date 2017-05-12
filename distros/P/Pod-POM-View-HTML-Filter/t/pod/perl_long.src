@@ -1,0 +1,30 @@
+=begin filter perl
+
+    # a longer piece of code
+    use strict;
+
+    my $A; # must declare
+
+    $A++;
+
+=end filter
+__RESULT__
++perl
+<html><body bgcolor="#ffffff">
+<pre>    <span class="c"># a longer piece of code</span>
+    <span class="k">use</span> <span class="w">strict</span><span class="sc">;</span>
+
+    <span class="k">my</span> <span class="i">$A</span><span class="sc">;</span> <span class="c"># must declare</span>
+
+    <span class="i">$A</span>++<span class="sc">;</span></pre>
+</body></html>
+__RESULT__
+-perl
+<html><body bgcolor="#ffffff">
+<pre>    # a longer piece of code
+    use strict;
+
+    my $A; # must declare
+
+    $A++;</pre>
+</body></html>

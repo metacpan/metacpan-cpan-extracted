@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+includedir=${prefix}/include
+pluginsdir=${exec_prefix}/lib/nautilus-sendto/plugins
+
+Name: nautilus-sendto
+Description: Extend nautilus-sendto through plugins
+Version: 2.28.4
+Requires: glib-2.0 gmodule-2.0 gtk+-2.0
+Cflags: -I${includedir}/nautilus-sendto

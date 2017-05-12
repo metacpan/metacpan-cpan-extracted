@@ -1,0 +1,6 @@
+name = "Plack-Middleware-Session-Simple-JWSCookie"
+# badges = ["travis"]
+authority="cpan:RITOU"
+
+module_maker="ModuleBuildTiny"
+

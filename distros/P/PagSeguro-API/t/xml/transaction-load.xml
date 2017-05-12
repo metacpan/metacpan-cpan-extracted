@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transaction>
+    <date>2014-01-23T14:36:01.000-02:00</date>
+    <code>00000000-0000-0000-0000-000000000000</code>
+    <reference>6C2F29</reference>
+    <type>11</type>
+    <status>3</status>
+    <lastEventDate>2014-01-23T14:36:17.000-02:00</lastEventDate>
+    <paymentMethod>
+        <type>1</type>
+        <code>101</code>
+    </paymentMethod>
+    <grossAmount>1.00</grossAmount>
+    <discountAmount>0.00</discountAmount>
+    <feeAmount>0.45</feeAmount>
+    <netAmount>0.55</netAmount>
+    <escrowEndDate>2014-02-06T14:36:15.000-02:00</escrowEndDate>
+    <installmentCount>1</installmentCount>
+    <itemCount>1</itemCount>
+    <items>
+        <item>
+            <id>001</id>
+            <description>PRODUCT NAME HERE</description>
+            <quantity>1</quantity>
+            <amount>1.00</amount>
+        </item>
+    </items>
+    <sender>
+        <name>Joe Doe</name>
+        <email>joe@doe.com</email>
+        <phone>
+            <areaCode>11</areaCode>
+            <number>12345678</number>
+        </phone>
+    </sender>
+    <shipping>
+        <address>
+            <street>Rua Foo</street>
+            <number>123</number>
+            <complement>apt 404</complement>
+            <district>Ipiranga</district>
+            <city>SÃO PAULO</city>
+            <state>SP</state>
+            <country>BRA</country>
+            <postalCode>12345000</postalCode>
+        </address>
+        <type>3</type>
+        <cost>0.00</cost>
+    </shipping>
+</transaction>
+

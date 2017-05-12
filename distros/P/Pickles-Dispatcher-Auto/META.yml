@@ -1,0 +1,31 @@
+---
+abstract: 'Pickles dispatcher without routes.pl'
+author:
+  - 'hirafoo <hirafoo atmk cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.87
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pickles-Dispatcher-Auto
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Load: 0
+  Module::Pluggable::Object: 0
+  Pickles: 0
+  String::CamelCase: 0
+  parent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/hirafoo/p5-Pickles-Dispatcher-Auto.git
+version: 0.03

@@ -1,0 +1,64 @@
+%{
+
+=head1 SYNOPSIS
+
+The main difference between this example and C<typicalrr.eyp>
+is that the rules for C<ws> and C<ns> have been changed to
+be right recursives
+
+Compile it with 
+
+            eyapp -b '' typicalrr2
+
+Execute it with:
+
+   ./typicalrr2.pm -d -t
+
+Try inputs C<4 5>,  C<a b> and C<4 5 a b>.
+
+
+=head1 SEE ALSO
+
+see  typicalrr.eyp, correcttypicalrr.eyp and typicalrr_fixed.eyp
+
+=cut
+
+use base q{RRTail}; 
+
+%}
+%token ID NUM 
+
+%tree
+
+%%
+s:
+      %name EMPTY
+      /* empty */
+    | %name LIST
+       s ws
+    |%name LIST
+       s ns 
+;
+
+ns:
+      %name EMPTYNUM
+      /* empty */
+    | %name NUMS
+      NUM ns 
+;
+
+ws:
+      %name EMPTYID
+      /* empty */
+    | %name IDS
+      ID ws 
+;
+
+%%
+
+unless (caller()) {
+  my $prompt = 'Try "4 5 a b 2 3" '.
+               '(press <CR><CTRL-D> to finish): ';
+  __PACKAGE__->main($prompt) 
+}
+

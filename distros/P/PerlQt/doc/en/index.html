@@ -1,0 +1,1081 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Programming PerlQt</title>
+<link rel="stylesheet" href="../css/pod.css" type="text/css" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#programming_perlqt">Programming PerlQt</a></li>
+	<li><a href="#introduction">Introduction</a></li>
+	<li><a href="#installation">Installation</a></li>
+	<ul>
+
+		<li><a href="#requirements">Requirements</a></li>
+		<li><a href="#compilation">Compilation</a></li>
+		<li><a href="#troubleshooting_and_configure_options">Troubleshooting and Configure Options</a></li>
+		<li><a href="#how_to_install_perlqt_with_user_rights">How to install PerlQt with user rights</a></li>
+	</ul>
+
+	<li><a href="#anatomy_of_perlqt">Anatomy of PerlQt</a></li>
+	<ul>
+
+		<li><a href="#hello_world">Hello World</a></li>
+		<li><a href="#inheritance_and_objects">Inheritance and Objects</a></li>
+		<ul>
+
+			<li><a href="#a_custom_widget">A Custom Widget</a></li>
+			<li><a href="#using_attributes">Using Attributes</a></li>
+		</ul>
+
+		<li><a href="#signals_and_slots">Signals and Slots</a></li>
+	</ul>
+
+	<li><a href="#rad_prototyping_with_qt_designer_and_puic">RAD prototyping with Qt Designer and Puic</a></li>
+	<ul>
+
+		<li><a href="#introduction">Introduction</a></li>
+		<li><a href="#embedding_images">Embedding Images</a></li>
+		<li><a href="#working_with_.ui_files">Working With <strong>.ui</strong> Files</a></li>
+	</ul>
+
+	<li><a href="#more_development_tools">More development tools</a></li>
+	<ul>
+
+		<li><a href="#pqtapi">pqtapi</a></li>
+		<li><a href="#pqtsh">pqtsh</a></li>
+	</ul>
+
+	<li><a href="#known_limitations">Known Limitations</a></li>
+	<li><a href="#credits">Credits</a></li>
+	<li><a href="#appendix_1_:_c++_conventions_and_their_perl_counterpart">Appendix 1 : C++ conventions and their Perl counterpart</a></li>
+	<li><a href="#appendix_2_:_internationalization">Appendix 2 : Internationalization</a></li>
+	<ul>
+
+		<ul>
+
+			<li><a href="#disabling_utf8">disabling utf-8</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#appendix_3_:_debugging_channels">Appendix 3 : Debugging Channels</a></li>
+	<li><a href="#appendix_4_:_marshallers">Appendix 4 : Marshallers</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="programming_perlqt">Programming PerlQt</a></h1>
+<p><strong>Germain Garand</strong></p>
+<p>This document describes a set of Perl bindings for the Qt toolkit. Contact
+the author at &lt;<a href="mailto:germain@ebooksfrance.com">germain@ebooksfrance.com</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="introduction">Introduction</a></h1>
+<p>PerlQt-3 is Ashley Winters' full featured object oriented interface to
+<a href="http://www.trolltech.com">Trolltech</a>'s C++ Qt toolkit v3.0.</p>
+<p>It is based on the
+<a href="http://webcvs.kde.org/cgi-bin/cvsweb.cgi/kdebindings/smoke">SMOKE</a>
+library, a language independent low-level wrapper generated from Qt headers by
+Richard Dale's
+<a href="http://webcvs.kde.org/cgi-bin/cvsweb.cgi/kdebindings/kalyptus">kalyptus</a>
+thanks to David Faure's module.</p>
+<p>This document describes the principles of PerlQt programming.
+It assumes you have some basic Perl Object Oriented programming knowledge.</p>
+<p>Some C++ knowledge is recommended but not required.
+It would mostly help you to find your way through <a href="http://doc.trolltech.com">Qt's excellent documentation</a> which is our
+ultimate and only reference.
+If Qt is installed on your system, then you most probably
+also have its documentation. Try the <code>$QTDIR/bin/assistant</code> program.</p>
+<p>
+</p>
+<hr />
+<h1><a name="installation">Installation</a></h1>
+<p>
+</p>
+<h2><a name="requirements">Requirements</a></h2>
+<p>To compile and use PerlQt, you'll need :</p>
+<ul>
+<li></li>
+a POSIX system
+<p></p>
+<li></li>
+GNU tools : automake(&gt;=1.5), autoconf (&gt;=2.13), aclocal...
+<p></p>
+<li></li>
+<a href="http://www.perl.org">Perl &gt;= v5.6.0</a>
+<p></p>
+<li></li>
+<a href="http://www.trolltech.com/developer/download/qtx11.html">Qt &gt;= v3.0</a>
+<p></p>
+<li></li>
+<a href="http://webcvs.kde.org/cgi-bin/cvsweb.cgi/kdebindings/smoke">SmokeQt 1.2.1</a>
+The SMOKE library (Scripting Meta Object Kompiler) is part of <a href="http://www.kde.org">KDE</a>'s <strong>kdebindings</strong> module.
+You may want to check if a precompiled version of this module exists for your
+system.
+PerlQt is packaged with its own copy, so you don't need to check it out.
+<p></p></ul>
+<p>Perl and Qt's installation is out of the scope of this document. Please refer
+to those projects' documentation.</p>
+<p>
+</p>
+<h2><a name="compilation">Compilation</a></h2>
+<p>PerlQt uses GNU's Autoconf framework. However, the standard ./configure script is preferably driven
+by the Makefile.PL wrapper. All options are forwarded to ./configure :</p>
+<pre>
+ perl Makefile.PL</pre>
+<p>If SMOKE is missing, <code>configure</code> will generate its sources.
+Then :</p>
+<pre>
+ make</pre>
+<pre>
+ make install</pre>
+<p>This will install PerlQt, Puic and Smoke (if needed), as well as the pqtsh and pqtapi utilities.</p>
+<p>The preferred install location for SMOKE and Puic is in the KDE3 file system.
+If you don't have KDE3 installed, specify a location with <code>configure</code>'s
+<code>--prefix</code> option. e.g:</p>
+<pre>
+ perl Makefile.PL --prefix=/usr</pre>
+<p>
+</p>
+<h2><a name="troubleshooting_and_configure_options">Troubleshooting and Configure Options</a></h2>
+<p>If Smoke's linking fails or your Qt library was built with very specific
+options, run Makefile.PL again with:</p>
+<pre>
+ perl Makefile.PL --with-threshold=0</pre>
+<p>When building smoke, configure will check for OpenGL and try to compile
+support for it if it is properly installed and supported by Qt.</p>
+<p>You may disable this checking with:</p>
+<pre>
+ --disable-GL</pre>
+<p>Also, default behaviour is to prefer the Mesa GL library over a proprietary
+implementation.
+If your system features a proprietary OpenGL library, and you'd like to use
+it, specify:</p>
+<pre>
+ --without-Mesa</pre>
+<p>
+</p>
+<h2><a name="how_to_install_perlqt_with_user_rights">How to install PerlQt with user rights</a></h2>
+<p>To install PerlQt without super-user rights, simply follow this procedure:</p>
+<ul>
+<li></li>
+Perform a normal configuration, specifying as prefix a directory where you have write permissions :
+<pre>
+ perl Makefile.PL --prefix=~</pre>
+<p>The above would install the Smoke library in ~/lib and the puic binary in ~/bin</p>
+<p></p>
+<li></li>
+Reconfigure the Perl module so that it doesn't target the standard perl hierarchy:
+<pre>
+ cd PerlQt
+ perl Makefile.PL PREFIX=~
+ cd ..</pre>
+<p>Beware : this is not the same Makefile.PL as above, but the one located in the ./PerlQt
+subdirectory</p>
+<p></p>
+<li></li>
+Compile and Install
+<pre>
+ make &amp;&amp; make install</pre>
+<p>In order to use such an installation, you must tell to Perl where to find this extern hierarchy.
+This can be done either on the command line:</p>
+<pre>
+ perl -Mlib=&quot;~/local/lib/perl/5.x.x&quot; program.pl</pre>
+<p>or at the top of your program:</p>
+<pre>
+ use lib qw( ~/local/lib/perl/5.x.x );</pre>
+<p>``5.x.x'' should be changed to whatever Perl version your system is running.</p>
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="anatomy_of_perlqt">Anatomy of PerlQt</a></h1>
+<p>A typical Qt program using GUI components is based on an event loop.</p>
+<p>This basically means that such a program is no more envisioned as a straight
+flow where you would need to handle yourself every single events (such as a
+mouse click or a key press).</p>
+<p>Instead, you just create an <strong>Application</strong> object, create the GUI components it
+uses,
+define what objects methods need to be called when an event occurs,
+and then start the main event loop.</p>
+<p>That's all!
+Qt will handle all events and dispatch them to the correct subroutine.</p>
+<p>Lets see how this process is implemented in a minimal PerlQt program.</p>
+<p>
+</p>
+<h2><a name="hello_world">Hello World</a></h2>
+<pre>
+ 1: use Qt;
+ 2: my $a = Qt::Application(\@ARGV);
+ 3: my $hello = Qt::PushButton(&quot;Hello World!&quot;, undef);
+ 4: $hello-&gt;resize(160, 25);
+ 5: $a-&gt;setMainWidget($hello);
+ 6: $hello-&gt;show;
+ 7: exit $a-&gt;exec;</pre>
+<br/>
+<div class='image'><img src="../images/ex1.png"/></div><p>This program first loads the Qt interface [line 1] and creates the application
+object, passing it a reference to the command line arguments array <code>@ARGV</code>
+[l.2].
+This application object is unique, and may later be accessed from
+anywhere through the <strong>Qt::app()</strong> pointer.</p>
+<p>At line 3, we create a PushButton, which has no parent (i.e : it won't be
+contained nor owned by another widget).
+Therefore, we pass to the constructor an <strong>undef</strong> value for the parent argument,
+which is PerlQt's way of passing a Null pointer.</p>
+<p>After some layouting at [l.4], we tell the application object that our main
+widget is this PushButton [l.5]... that way, it will know that closing the
+window associated with this widget means : <em>quit the application</em>.</p>
+<p>Now the last steps are to make this widget visible (as opposed to
+hidden, which is the default) by calling the <strong>show</strong> method on it [l.6] and
+to start the application loop [l.7].</p>
+<p><strong>Syntax elements summary :</strong></p>
+<ol>
+<li></li>
+All Qt classes are accessed through the prefix <strong>Qt::</strong>, which replaces the 
+initial <strong>Q</strong> of Qt classes.
+When browsing the <a href="http://doc.trolltech.com">Qt documentation</a>, you simply need to change the
+name of classes so that <strong>QFoo</strong> reads <strong>Qt::Foo</strong>.
+<p></p>
+<li></li>
+An object is created by calling the <strong>constructor</strong> of the class. It has the 
+same name as the class itself.
+<p>You don't need to say <code>new Qt::Foo</code> or <code>Qt::Foo-&gt;new()</code> as most Perl
+programmers would have expected.</p>
+<p>Instead, you just say :</p>
+<pre>
+ my $object = Qt::&lt;classname&gt;(arg_1, ..., arg_n);</pre>
+<p>If you don't need to pass any argument to the constructor, simply say :</p>
+<pre>
+ my $object = Qt::&lt;classname&gt;;</pre>
+<p></p>
+<li></li>
+Whenever you need to pass a Null pointer as an argument, use Perl's <strong>undef</strong> 
+keyword. Do not pass zero.
+ Beware: this is by far the most common error in PerlQt programs.
+<p>Pointers are arguments preceded by an <strong>*</strong> 
+character in Qt's documentation (e.g: ``<code>QWidget * widget</code>'').</p>
+<p></p></ol>
+<p>
+</p>
+<h2><a name="inheritance_and_objects">Inheritance and Objects</a></h2>
+<p>Before we can discuss how Perl subroutines can be called back from Qt, we need
+to introduce PerlQt's inheritance mechanism.</p>
+<p>PerlQt was designed to couple as tightly as possible Qt's simplicity and Perl's 
+power and flexibility.</p>
+<p>In order to achieve that goal, the classical Object Oriented Perl paradigm had 
+to be extended, much in the same way than Qt itself
+had to extend C++'s paradigm with <strong>metaobjects</strong>.</p>
+<p>
+</p>
+<h3><a name="a_custom_widget">A Custom Widget</a></h3>
+<p>Lets rewrite the ``Hello World!'' program, this time using a custom version 
+of PushButton:</p>
+<pre>
+  1: use strict;
+  2: 
+  3: package Button;
+  4: use Qt;
+  5: use Qt::isa qw(Qt::PushButton);
+  6: 
+  7: sub NEW
+  8: {
+  9:   shift-&gt;SUPER::NEW(@_[0..2]);
+ 10:   resize(130, 40);
+ 11: }
+ 12: 
+ 13: 1;
+ 14: 
+ 15: package main;
+ 16: 
+ 17: use Qt;
+ 18: use Button;
+ 19: 
+ 20: my $a = Qt::Application(\@ARGV);
+ 21: my $w = Button(&quot;Hello World!&quot;, undef);
+ 22: $a-&gt;setMainWidget($w);
+ 23: $w-&gt;show;
+ 24: exit $a-&gt;exec;</pre>
+<p>Here, we want to create our own version of the PushButton widget.
+Therefore, we create a new package for it [l.3] and import Qt [l.4].</p>
+<p>We now want to declare our widget as subclassing PushButton.
+This is done through the use of the <code>Qt::isa</code> pragma [l.5], which accepts a 
+list of one or more parent Qt classes.</p>
+<p>It is now time to create a <strong>constructor</strong> for our new widget.
+This is done by creating a subroutine called <strong>NEW</strong> <em>(note the capitalized 
+form, which differentate it from the usual ``new'' constructor. PerlQt's NEW 
+constructor is called </em><strong>implicitly</strong><em> as can be seen on line 21)</em>.</p>
+<p>Since we want our widget to call its parent's constructor first, we call the 
+<strong>superclass's constructor</strong> (here: Qt::PushButton) on line 9, passing it all 
+arguments we received.</p>
+<p>At this time, a class instance has been created and stored into a special 
+object holder named <strong>this</strong> (not <code>$this</code> but really just <code>this</code>).</p>
+<p>Each time you invoke a method from within your package, you may now 
+indifferently say <code>method()</code> or <code>this-&gt;method()</code>;</p>
+<p>
+</p>
+<h3><a name="using_attributes">Using Attributes</a></h3>
+<p>When building a new composite widget, you may just create its different 
+parts inside <strong>my</strong> variables, since widgets are only deleted by their parents 
+and not necessarily when their container goes out of scope.</p>
+<p>In other words, PerlQt performs clever reference counting to prevent 
+indesirable deletion of objects.</p>
+<p>Now, you'll often want to keep an access to those parts from anywhere inside 
+your package.
+For this purpose, you may use the <strong>this</strong> object's blessed hash, as is usual in Perl,
+but that isn't really convenient and you don't have any compile time
+checking...</p>
+<p>Here come <strong>Attributes</strong>. Attributes are data holders where you can 
+store any kind of properties for your object.</p>
+<p>Declaring new attributes is done through the <code>use Qt::attributes</code> pragma, as is 
+demonstrated in the following package implementation :</p>
+<pre>
+  1: use strict;
+  2:
+  3: package Button;
+  4: use Qt;
+  5: use Qt::isa qw(Qt::PushButton);
+  6: use Qt::attributes qw(
+  7:     itsTime
+  8:     pData
+  9: );
+ 10:
+ 11: sub NEW
+ 12: {
+ 13:   shift-&gt;SUPER::NEW(@_[0..2]);
+ 14:   itsTime = Qt::Time;
+ 15:   itsTime-&gt;start;   
+ 16:   pData = &quot; Foo &quot;;
+ 17: }
+ 18: 
+ 19: sub resizeEvent
+ 20: {
+ 21:    setText( &quot;w: &quot;. width() .&quot; h: &quot;. height() .
+ 22:             &quot;\nt: &quot;. itsTime-&gt;elapsed . pData );
+ 23: }
+ 24:
+ 25: 1;</pre>
+<br/>
+<div class='image'><img src="../images/ex2.png"/></div><p>An attribute itsTime is declared at line 7, and loaded with a <code>Qt::Time</code> object 
+at line 14.</p>
+<p>Since we reimplement the virtual function ``resizeEvent'' [l.19].
+each time the main widget is resized, this function will be triggered and 
+our Button's text updated with values coming from the object [l.21] and from the 
+attributes we defined [l.22].</p>
+<p><strong>Recapitulation</strong></p>
+<ul>
+<li></li>
+In order to inherit a Qt class, a package must contain a 
+<code>use Qt::isa</code> pragma.
+e.g:
+
+<pre>
+
+ use Qt::isa &quot;Qt::widget&quot;;</pre>
+<p></p>
+<li></li>
+The object constructor is named <strong>NEW</strong> and is implicitly called.
+Thus you should not say :
+<pre>
+ my $o = MyButton-&gt;NEW(&quot;Hello&quot;);</pre>
+<p>But say :</p>
+<pre>
+ my $o = MyButton(&quot;Hello&quot;);</pre>
+<p></p>
+<li></li>
+Within a package, the current instance can be accessed through the <strong>this</strong> 
+variable.
+<p>When a member function is called, arguments are loaded as usual in the <strong>@_</strong> 
+array, but <strong>without</strong> the object pointer itself.</p>
+<p>Hence, you shouldn't say :</p>
+<pre>
+ sub myMember
+ {
+   my $self = shift;
+   my $arg = shift;
+   $arg-&gt;doThat($self); 
+   $self-&gt;doIt;
+ }
+    
+But :</pre>
+<pre>
+ sub myMember
+ {
+   my $arg = shift;
+   $arg-&gt;doThat(this);
+   doIt;
+ }</pre>
+<p>Furthermore, if you want to call a base class method from a derived class,
+you'd use the specal attribute SUPER :</p>
+<pre>
+ sub example
+ {
+   print &quot;Now calling the base class\n&quot;;
+   SUPER-&gt;example(@_)
+ }</pre>
+<p>Note that the :</p>
+<pre>
+ this-&gt;SUPER::Example(@_);</pre>
+<p>construct is also available, but will pass the object as first argument.</p>
+<p></p>
+<li></li>
+Whenever you need to store a contained object in your package, you may define it 
+as an <strong>Attribute</strong> :
+<pre>
+ use Qt::attributes qw(
+        firstAttribute
+        ...
+        lastAttribute);</pre>
+<p>and then use it as a convenient accessor :</p>
+<pre>
+ firstAttribute = myContainedWidget( this );
+ firstAttribute-&gt;resize( 100, 100 );</pre>
+<p></p>
+<li></li>
+To reimplement a <strong>virtual function</strong>, simply create a <strong>sub</strong> with the 
+same name in your object.
+<p>Existing virtual functions are marked as such in Qt's documentation
+(they are prefixed with the ``virtual'' keyword).</p>
+<p>You can inspect what virtual function names are being called by Qt at runtime by
+putting a <code>use Qt::debug qw( virtual )</code> statement at the top of your program.</p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="signals_and_slots">Signals and Slots</a></h2>
+<p>We'll now learn how Qt objects can communicate with each other, 
+allowing an event occuring, for instance, in a given widget to trigger the 
+execution of one or several subroutines anywhere inside your program.</p>
+<p>Most other toolkits use callbacks for that purpose, but Qt has a much more 
+powerful and flexible mechanism called <strong>Signals and Slots</strong>.</p>
+<p>Signals and slots are used for communication between objects.</p>
+<p>This can be thought off as something similar to the wiring between several Hi-fI 
+components : an amplificator, for instance, has a set of output signals, wich are 
+emitted wether a listening device is connected to them or not. Also, a tape 
+recorder deck can start to record when it receives a signal wired to it's input 
+slot, and it doesn't need to know that this signal is also received by a CD 
+recorder device, or listened through headphones.</p>
+<p>A Qt component behaves just like that. It has several output <strong>Signals</strong> and 
+several input <strong>Slots</strong> - and each signal can be connected to an unlimited number 
+of listening slots of the same type, wether they are inside or outside the 
+component.</p>
+<p>The general syntax of this connection process is either :</p>
+<p>Qt::Object::connect( sender, SIGNAL 'mysignal(arg_type)', 
+receiver, SLOT 'myslot(arg_type)');</p>
+<p>or</p>
+<p>myObject-&gt;connect( sender, SIGNAL 'mysignal(arg_type)', SLOT 
+'myslot(arg_type)');</p>
+<p>This mechanism can be extended at will by the declaration of custom Signals and 
+Slots, through the <code>use Qt::signals</code> and <code>use Qt::slots</code> pragma
+(see also the other syntax, later on).</p>
+<p>Each declared slot will call the corresponding subroutine in your object, 
+each declared signal can be raised through the <strong>emit</strong> keyword.</p>
+<p><strong>As an example, lets rewrite again our Button package :</strong></p>
+<pre>
+  1: use strict;
+  2:
+  3: package Button;
+  4: use Qt;
+  5: use Qt::isa qw(Qt::PushButton);
+  6: use Qt::attributes qw(itsTime);
+  7: use Qt::slots 
+  8:     wasClicked =&gt; [],
+  9:     change     =&gt; ['int', 'int'];
+ 10: use Qt::signals
+ 11:     changeIt   =&gt; ['int', 'int'];
+ 12:
+ 13: sub NEW
+ 14: {
+ 15:   shift-&gt;SUPER::NEW(@_[0..2]);
+ 16:   itsTime = Qt::Time;
+ 17:   itsTime-&gt;start;   
+ 18:   this-&gt;connect(this, SIGNAL 'clicked()', SLOT 'wasClicked()');
+ 19:   this-&gt;connect(this, SIGNAL 'changeIt(int,int)', SLOT 'change(int,int)');
+ 20: }
+ 21: 
+ 22: sub wasClicked
+ 23: {
+ 24:    my $w = width();
+ 25:    my $h = height();
+ 26:    setText( &quot;w: $w h: $h\nt: &quot;. itsTime-&gt;elapsed );
+ 27:    emit changeIt($w, $h);          
+ 28: }
+ 29:
+ 30: sub change
+ 31: {
+ 32:    my ($w, $h) = @_;
+ 33:    print STDERR &quot;w: $w h: $h \n&quot;;
+ 34: }
+ 35:
+ 36: 1;</pre>
+<p>In this package, we define two extra slots and one extra signal.</p>
+<p>We know from the Qt Documentation that a clicked PushButton emits a <code>clicked()</code> 
+signal, so we connect it to our new slot at line 18.</p>
+<p>We also connect our signal <code>changeIt</code> to our own <code>change</code> slot- which is 
+quite stupid, but as an example.</p>
+<p>Now, whenever our Button is clicked, the <code>clicked()</code> signal is raised and 
+triggers the <code>wasClicked()</code> slot. <code>wasClicked</code> then proceeds to emit 
+the <code>changeIt(int,int)</code> signal [l.27], hence triggering the <code>change(int,int)</code> 
+slot with two arguments.</p>
+<p>Finally, since PerlQt-3.008, an alternative syntax can be used to declare Signals and Slots:</p>
+<pre>
+ sub a_slot : SLOT(int, QString)
+ { 
+        $int = shift;
+        $string = shift;
+        # do something
+ }</pre>
+<p>and</p>
+<pre>
+ sub a_signal : SIGNAL(QString);</pre>
+<p>This syntax is perfectly compatible with the traditional
+<code>use Qt::signals</code> and <code>use Qt::slots</code> declarations.</p>
+<p>Eventually, it can prove good programming practice to mix both syntaxes, by first declaring  
+Signals/Slots with <code>use Qt::slots/signals</code>, then repeat this declaration
+in the actual implementation with the second syntax.</p>
+<p>Declarations will be checked for consistency at compile time, and any mismatch
+in arguments would trigger a warning.</p>
+<p>
+</p>
+<hr />
+<h1><a name="rad_prototyping_with_qt_designer_and_puic">RAD prototyping with Qt Designer and Puic</a></h1>
+<p>
+</p>
+<h2><a name="introduction">Introduction</a></h2>
+<ul>
+<li><strong><a name="item_note%3a">Note:</a></strong><br />
+</li>
+As of PerlQt-3.008, a separate PerlQt plugin for Qt Designer is available,
+bringing full integration, syntax highlighting, code completion and allowing to run/debug your PerlQt project
+entirely from the Designer GUI. 
+Nevertheless, the below is still accurate with regard to puic command line interaction 
+and with regard to using Qt Designer <em>without</em> the specific plugin.
+<p></p></ul>
+<p>As efficient and intuitive as Qt can be, building a complete GUI from scratch 
+is often a tedious task.</p>
+<p>Hopefully, Qt comes with a very sophisticated GUI Builder named Qt 
+Designer, which is close to a complete integrated development environment.
+It features Project management, drag'n drop GUI building, a complete object 
+browser, graphical interconnection of signals and slots, and much much more.</p>
+<p>Qt Designer's output is XML which can be parsed by several command line tools,
+among whose is <strong>puic</strong> (the PerlQt User Interface Compiler).</p>
+<p>Assuming you have already built an interface file with the Designer, 
+translating it to a PerlQt program is simply a matter of issuing 
+one command :</p>
+<pre>
+ puic -x -o program.pl program.ui</pre>
+<p>This will generate the package defined in your ui file and a basic main package 
+for testing purposes.</p>
+<p>You may prefer :</p>
+<pre>
+ puic -o package.pm program.ui</pre>
+<p>This will only generate the package, which can then be used by a separate 
+program.</p>
+<p>
+</p>
+<h2><a name="embedding_images">Embedding Images</a></h2>
+<p>If you need to <strong>embed images or icons</strong>, it can be done in two ways
+:</p>
+<ul>
+<li><strong><a name="item_inline_embedding">Inline embedding</a></strong><br />
+</li>
+For this, you need to check the ``Edit-&gt;Form Settings-&gt;Pixmaps-&gt;Save inline'' 
+checkbox inside Qt Designer.
+Then : puic -x -o <em>program.pl</em> <em>program.ui</em>
+<p></p>
+<li><strong><a name="item_image_collection">Image Collection</a></strong><br />
+</li>
+This option is more complex but also far more powerful and clean.
+<p>puic -o <em>Collection.pm</em> -embed <em>unique_identifier</em> <em>image-1</em> ... <em>image-n</em></p>
+<p>Then add a <code>use Collection.pm</code> statement to your program's main package.</p>
+<p>If you've created a project file in Qt Designer, and added all images 
+you want to group (through ``Project-&gt;Image Collection''), you'll find all those 
+images inside the directory where your project file (*.pro) is stored, under 
+/images.
+You can then generate the corresponding image collection by issuing :</p>
+<p>puic -o <em>Collection.pm</em> -embed <em>identifier</em> ../images/*</p>
+<p>You can use as many image collections as you want in a program. Simply add a 
+<strong>use</strong> statement for each collection.</p>
+<p></p></ul>
+<p>
+</p>
+<h2><a name="working_with_.ui_files">Working With <strong>.ui</strong> Files</a></h2>
+<p>It will often happen that you need to regenerate your user interface -either
+because you changed your initial design, or you want to extend it.
+Thus writing your program's code straight in the auto-generated Perl file is
+quite a bad idea.
+You'd run constantly the risk of overwriting your handcrafted code, or end
+up doing lot of copy-paste.</p>
+<p>Instead, you may :</p>
+<ul>
+<li><strong><a name="item_write_slots_implementation_in_the_designer">Write slots implementation in the Designer</a></strong><br />
+</li>
+In Qt Designer, select the <em>Source</em> tab of the <strong>Object Explorer</strong>.
+There you can see a tree-like representation of your classes.
+Now if you double-click on the <em>Slots/public</em> entry,
+you are prompted with a dialog where you can create a new custom slot for
+your module.
+Once this is done, the new slot appear inside the <strong>Object Explorer</strong> tree and
+clicking on it will bring you to a <strong>&lt;Your Class&gt;.ui.h</strong> file where you can write
+the actual implementation of your slot.
+<p>Keeping all the defaults, it should look like this :</p>
+<pre>
+ void Form1::newSlot()
+ {
+ 
+ }</pre>
+<p>The slot declaration is actually C++ code, but simply ignore it and write
+your Perl code straight between the two braces, paying special attention to
+indent it at least by one space.</p>
+<pre>
+ void Form1::newSlot()
+ {
+     print STDERR &quot;Hello world from Form1::newSlot();
+     if(this-&gt;foo())
+     {
+         # do something
+     }
+ }</pre>
+<p>All Perl code written this way will be saved to the ui.h file, and <strong>puic</strong> will take care of
+placing it back in the final program.</p>
+<p>Here, after running <strong>puic</strong> on the Form1.ui file, you'd have:</p>
+<pre>
+ sub newSlot
+ {
+     print STDERR &quot;Hello world from Form1::newSlot();
+     if(this-&gt;foo())
+     {
+         # do something
+     }
+ }</pre>
+<p></p>
+<li><strong><a name="item_subclassing_your_gui">Subclassing your GUI</a></strong><br />
+</li>
+By using <strong>puic</strong>'s <em>-subimpl</em> option, you may generate a derived module
+inheriting your original user interface.
+<p>You'd typically generate the derived module once, and write any handcrafted
+code in this child.
+Then, whenever you need to modify your GUI module, simply regenerate the
+parent module, and your child will inherit those changes.</p>
+<p>To generate the base module :</p>
+<pre>
+ puic -o Form1.pm form1.ui</pre>
+<p>(do this as often as needed, never edit by hand)</p>
+<p>To generate the child :</p>
+<pre>
+ puic -o Form2.pm -subimpl Form2 form1.ui</pre>
+<p>or</p>
+<pre>
+ puic -o program.pl -x -subimpl Form2 form1.ui</pre>
+<p>(do this once and work on the resulting file)</p>
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="more_development_tools">More development tools</a></h1>
+<p>PerlQt comes bundled with two simple programs that can help you to find your way through
+the Qt API:</p>
+<p>
+</p>
+<h2><a name="pqtapi">pqtapi</a></h2>
+<p>pqtapi is a commandline driven introspection tool.</p>
+<pre>
+ usage: pqtapi [-r &lt;re&gt;] [&lt;class&gt;]</pre>
+<pre>
+ options:
+        -r &lt;re&gt; : find all functions matching regular expression/keyword &lt;re&gt;
+        -i : together with -r, performs a case insensitive search
+        -v : print PerlQt and Qt versions
+        -h : print this help message</pre>
+<p>e.g:</p>
+<pre>
+ $&gt;pqtapi -ir 'setpoint.* int'
+        void QCanvasLine::setPoints(int, int, int, int)
+        void QPointArray::setPoint(uint, int, int)</pre>
+<p>
+</p>
+<h2><a name="pqtsh">pqtsh</a></h2>
+<p><strong>pqtsh</strong> is a graphical shell that can be used to test the API interactively.
+It is fairly self explanatory and includes an interactive example (<code>Help-&gt;Example</code>)</p>
+<br/>
+<div class='image'><img src="../images/pqtsh.png"/></div><p>
+</p>
+<hr />
+<h1><a name="known_limitations">Known Limitations</a></h1>
+<p>Templated classes aren't available yet (classes derived from templated classes are).</p>
+<p>
+</p>
+<hr />
+<h1><a name="credits">Credits</a></h1>
+<p>PerlQt-3 is (c) 2002 Ashley Winters (and (c) 2003 Germain Garand)</p>
+<p>Kalyptus and the Smoke generation engine are (c) David Faure and Richard Dale</p>
+<p>Puic is (c) TrollTech AS., Phil Thompson and Germain Garand,</p>
+<p>The mentioned software is released under the GNU Public Licence v.2 or later.</p>
+<p>
+</p>
+<hr />
+<h1><a name="appendix_1_:_c++_conventions_and_their_perl_counterpart">Appendix 1 : C++ conventions and their Perl counterpart</a></h1>
+<p>Whenever you want to use a class/method described in Qt's
+<a href="http://doc.trolltech.com">documentation</a> (see also the 'assistant' program bundled with Qt)
+from PerlQt, you need to follow some simple translation rules.</p>
+<dl>
+<dt><strong><a name="item_classnames">Classnames</a></strong><br />
+</dt>
+<ul>
+<li></li>
+All classnames are changed from a <strong>Q</strong> prefix in Qt to a <strong>Qt::</strong> prefix
+in Perl.
+e.g: QComboBox is named Qt::ComboBox within PerlQt.
+<p></p></ul>
+<dt><strong><a name="item_functions">Functions</a></strong><br />
+</dt>
+<ul>
+<li></li>
+Functions referenced as <strong>static</strong> are accessed directly, and not through
+an object. Thus the static function Foo in class QBar would be accessed from
+PerlQt as
+<pre>
+ Qt::Bar::Foo( arg-1,...,arg-n);</pre>
+<p>The only notable exceptions are :</p>
+<pre>
+ qApp()     will map to Qt::app()
+ qVersion() will map to Qt::version() # not really needed anymore: we have qVersion(). See Global Functions below.</pre>
+<p></p>
+<li></li>
+Functions referenced as <strong>members</strong> or <strong>Signals</strong> are accessed through an object
+with the <strong>-&gt;</strong> operator.
+e.g:
+<pre>
+ $widget-&gt;show;</pre>
+<p>There are no fundamental differences between methods and signals, however PerlQt 
+provides the <strong>emit</strong> keyword as a convenient mnemonic, so that it is clear you 
+are emitting a signal :</p>
+<pre>
+ emit $button-&gt;clicked;</pre>
+<p></p></ul>
+<dt><strong><a name="item_arguments">Arguments</a></strong><br />
+</dt>
+<ul>
+<li><strong><a name="item_by_value">By value</a></strong><br />
+</li>
+When an argument isn't preceded by the <strong>&amp;</strong> or <strong>*</strong> character, it is passed by 
+value. For all basic types such as int, char, float and double, PerlQt will 
+automatically convert litteral and scalar values to the corresponding C++ type.
+<p>Thus for a constructor prototype written as follow in the documentation :</p>
+<pre>
+ QSize ( int w, int h )</pre>
+<p>You'd say :</p>
+<pre>
+ Qt::Size(8, 12);</pre>
+<p></p>
+<li><strong><a name="item_by_reference">By reference</a></strong><br />
+</li>
+When an argument is preceded by the <strong>&amp;</strong> character, it means a reference to an 
+object or to a type is expected. You may either provide a variable name or a 
+temporary object :
+<pre>
+ $keyseq = Qt::keySequence( &amp;Qt::CTRL + &amp;Qt::F3 );
+ $widget-&gt;setAccel( $keyseq );
+ 
+or</pre>
+<pre>
+ $widget-&gt;setAccel(Qt::keySequence( &amp;Qt::CTRL + &amp;Qt::F3 );</pre>
+<p>If the argument isn't qualified as <strong>const</strong> (constant), it means the passed
+object may be altered during the process - you must then provide a variable.</p>
+<p></p>
+<li><strong><a name="item_by_pointer">By pointer</a></strong><br />
+</li>
+When an argument is preceded by the <strong>*</strong> character, it means a 
+pointer to an object or to a type is expected. You may provide a variable 
+name or the Perl <strong>undef</strong> keyword for a Null pointer.
+<p>Similarly, if the argument isn't <strong>const</strong>, the passed object may be altered by
+the method call.</p>
+<p></p></ul>
+<dt><strong><a name="item_enumerations">Enumerations</a></strong><br />
+</dt>
+<dd>
+Enumerations are sort of named aliases for numeric values that would be hard to
+remember otherwise.
+</dd>
+<dd>
+<p>A C++ example would be :</p>
+</dd>
+<dd>
+<pre>
+ enum Strange { Apple, Orange, Lemon }</pre>
+</dd>
+<dd>
+<p>where <code>Strange</code> is the generic enumeration name, and <code>Apple</code>, <code>Orange</code>,
+<code>Lemon</code> its possible values, which are only aliases for numbers (here 0, 1
+and 2).</p>
+</dd>
+<dd>
+<p>Access to enumerations values in Perl Qt is very similar to a static function
+call. In fact, it <strong>is</strong> a static function call.</p>
+</dd>
+<dd>
+<p>Therefore, since you probably want to avoid some readability problems, we
+recommend the use of the alternate function call syntax : <code>&amp;function</code>.</p>
+</dd>
+<dd>
+<p>Lets now go back to our <code>Strange</code> example.</p>
+</dd>
+<dd>
+<p>If its definition was encountered in the class <code>QFruits</code>, you'd write from
+PerlQt :</p>
+</dd>
+<dd>
+<pre>
+ $apple_plus_orange = &amp;Qt::Fruit::Apple + &amp;Qt::Fruit::Orange;</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_operators">Operators</a></strong><br />
+</dt>
+<dd>
+Within PerlQt, <strong>operators overloading</strong> works transparently.
+If a given operator is overloaded in a Qt class (which means using it triggers a custom method)
+it will behave identically in PerlQt.
+Beware though that due to limitations of the Smoke binding library, not all overloaded operators are
+available in PerlQt.
+You can check the availability of a given operator by using the pqtapi program.
+Also, due to outstanding differences between C++'s and Perl's object paradigm, the copy constructor operator (a.k.a '=')
+has been disabled.
+</dd>
+<dd>
+<p>e.g-1: '+=' overload</p>
+</dd>
+<dd>
+<pre>
+ $p1 = Qt::Point(10, 10)
+ $p2 = Qt::Point(30,40)
+ $p2 += $p1; # $p2 becomes (40,50)
+ 
+e.g-2: '&lt;&lt;' overload</pre>
+</dd>
+<dd>
+<pre>
+ $f = Qt::File(&quot;example&quot;);
+ $f-&gt;open( IO_WriteOnly ); # see 'Constants' below
+ $s = Qt::TextStream( $f );
+ $s &lt;&lt; &quot;What can I do with &quot; &lt;&lt; 12 &lt;&lt; &quot; apples?&quot;;</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_constants">Constants</a></strong><br />
+</dt>
+<dd>
+Qt doesn't use many constants, but there is at least one place where they are used : for setting 
+Input/Output flags on files.
+In order to avoid the namespace pollution induced by global constants, PerlQt group them in the <strong>Qt::constants</strong> module.
+For instance, requesting the importation of all IO constants into the current namespace would be done with:
+</dd>
+<dd>
+<pre>
+ use Qt::constants;</pre>
+</dd>
+<dd>
+<p>You may also import specific symbols:</p>
+</dd>
+<dd>
+<pre>
+ use Qt::constants qw( IO_ReadOnly IO_WriteOnly );</pre>
+</dd>
+<p></p>
+<dt><strong><a name="item_global_functions">Global Functions</a></strong><br />
+</dt>
+<dd>
+Qt has also some utilitarian functions such as bitBlt, qCompress, etc.
+</dd>
+<dd>
+<p>Those were global scope functions and have been grouped in a common namespace:
+<code>Qt::GlobalSpace</code>.</p>
+</dd>
+<dd>
+<p>Hence, you shall access this namespace either with a fully qualified call:</p>
+</dd>
+<dd>
+<pre>
+ Qt::GlobalSpace::qUncompress( $buffer )</pre>
+</dd>
+<dd>
+<p>Or directly, after importation in the current namespace:</p>
+</dd>
+<dd>
+<pre>
+ use Qt::GlobalSpace;
+ qUncompress( $buffer )</pre>
+</dd>
+<dd>
+<p>Of course, you may selectively import a few functions:</p>
+</dd>
+<dd>
+<pre>
+ use Qt::GlobalSpace qw( qUncompress bitBlt )</pre>
+</dd>
+<dd>
+<p><strong>Note:</strong> GlobalSpace has also operators, such has the one performing an addition on two
+Qt::Point(). Those operators are called automatically.</p>
+</dd>
+<dd>
+<p>e.g:</p>
+</dd>
+<dd>
+<pre>
+ $p1 = Qt::Point(10, 10) + Qt::Point(20, 20)</pre>
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="appendix_2_:_internationalization">Appendix 2 : Internationalization</a></h1>
+<p>PerlQt handles internationalization by always converting <strong>QString</strong> back to <strong>utf8</strong> in Perl.</p>
+<p>Conversions from Perl strings to QStrings are made according to context :</p>
+<ul>
+<li><strong><a name="item_if_the_perl_string_is_already_utf8%2dencoded">If the Perl string is already utf8-encoded</a></strong><br />
+</li>
+then the string will be converted straight to QString.
+<p>This is the most convenient and seemless way of internationalizing your application. Typically, one would just enable
+the use of utf8 in source code with the <code>use utf8</code> pragma and write its application with an utf8 aware editor.</p>
+<p></p>
+<li><strong><a name="item_if_the_string_isn%27t_tagged_as_utf8%2c_and_the_us">If the string isn't tagged as utf8, and the <strong>use locale</strong> pragma is not set</a></strong><br />
+</li>
+then the string will be converted to QString's utf8 from <strong>ISO-Latin-1</strong>.
+<p></p>
+<li><strong><a name="item_if_the_string_isn%27t_tagged_as_utf8_and_the_use_l">If the string isn't tagged as utf8 and the <strong>use locale</strong> pragma is set</a></strong><br />
+</li>
+then the string will be converted to QString's utf8 according to the currently set <strong>locale</strong>.
+<p></p></ul>
+<p>Once a string contains utf8, you can convert it back to any locale by setting up <strong>converters</strong> :</p>
+<pre>
+ $tr1=Qt::TextCodec::codecForLocale(); # this one will use current locale
+ $tr2=Qt::TextCodec::codecForName(&quot;KOI8-R&quot;); # that one forces a specific locale (Russian)</pre>
+<pre>
+ print $tr1-&gt;fromUnicode(Qt::DateTime::currentDateTime()-&gt;toString).&quot;\n\n&quot;;
+ print $tr2-&gt;fromUnicode($my_utf8_string);</pre>
+<p>Or, with Perl &gt;= 5.8.0, you may use Perl's <strong>Encode</strong> modules (see <code>perldoc Encode</code>).</p>
+<p>
+</p>
+<h3><a name="disabling_utf8">disabling utf-8</a></h3>
+<p>Developers who don't want to use UTF-8 or want to temporarily disable UTF-8 marshalling
+for handling legacy programs may use the <strong>use bytes</strong> pragma (and the corresponding <strong>no bytes</strong>).</p>
+<p>Within the scope of this pragma, QStrings are marshalled back to ISO-Latin1 (default) or to your locale
+(if <strong>use locale</strong> has been set).</p>
+<p>Frivole use of this pragma is strongly discouraged as it ruins worldwide standardization efforts.</p>
+<p>
+</p>
+<hr />
+<h1><a name="appendix_3_:_debugging_channels">Appendix 3 : Debugging Channels</a></h1>
+<p>The <strong>Qt::debug</strong> module offers various debugging channels/features.</p>
+<pre>
+ use Qt::debug;</pre>
+<pre>
+ use Qt::debug qw|calls autoload verbose|;</pre>
+<p>With the simple <code>use Qt::debug</code> statement, the <strong>verbose</strong> and <strong>ambiguous</strong> channels are activated.
+If you specify a list of channels within the use statement, then only the specified channels will be enabled.</p>
+<p><strong>Available channels :</strong></p>
+<ul>
+<li><strong><a name="item_ambiguous">ambiguous</a></strong><br />
+</li>
+Check if method and function calls are ambiguous, and tell which of the alternatives
+was finally elected.
+<p></p>
+<li><strong><a name="item_verbose">verbose</a></strong><br />
+</li>
+Enable more verbose debugging.
+<p>Together with <strong>ambiguous</strong>, tell you the nearest matches in case
+a method or function call fails.
+e.g:</p>
+<pre>
+ use Qt;
+ use Qt::debug;
+ $a= Qt::Application(\@ARGV);
+ $a-&gt;libraryPath(&quot;foo&quot;);</pre>
+<pre>
+ --- No method to call for :
+        QApplication::libraryPath('foo')
+ Closer candidates are :
+        static void QApplication::addLibraryPath(const QString&amp;)
+        static QStringList QApplication::libraryPaths()
+        static void QApplication::removeLibraryPath(const QString&amp;)
+        static void QApplication::setLibraryPaths(const QStringList&amp;)</pre>
+<p></p>
+<li><strong><a name="item_calls">calls</a></strong><br />
+</li>
+For every call, tell what corresponding Qt method is called
+(detailing the arguments if <strong>verbose</strong> is on).
+<p></p>
+<li><strong><a name="item_autoload">autoload</a></strong><br />
+</li>
+Track the intermediate code between a method invocation in Perl
+and its resolution to either a Qt or Perl call.
+<p></p>
+<li><strong><a name="item_gc">gc</a></strong><br />
+</li>
+Give informations about garbage collection
+whenever a Qt object is deleted and/or a Perl object is destroyed
+<p></p>
+<li><strong><a name="item_virtual">virtual</a></strong><br />
+</li>
+Report whenever a virtual function tries to access its Perl
+reimplementation (wether it exists or not).
+<p></p>
+<li><strong><a name="item_all">all</a></strong><br />
+</li>
+Enable all channels
+<p></p></ul>
+<p>
+</p>
+<hr />
+<h1><a name="appendix_4_:_marshallers">Appendix 4 : Marshallers</a></h1>
+<p>A marshaller is a piece of ``glue code'' translating a given datatype to another.</p>
+<p>Within PerlQt, most Qt objects keep their object nature, so that one may invoke methods on them.
+However, some classes and datatypes map so naturally to some Perl types that keeping their object nature would
+would feel unnatural and clumsy.</p>
+<p>For instance, instead of returning a Qt::StringList object, which would require an iterator to retrieve its content,
+PerlQt will translate it to an array reference containing all the object's strings.</p>
+<p>In the other way, instead of providing a Qt::StringList object as an argument of a method, one would simply
+provide the reference to an array of Perl strings.</p>
+<p>Here is the list of Marshallers as of PerlQt-3.008 :</p>
+<pre>
+ -----------------------------------------------------------------
+ float, double                         &lt;=&gt;       Perl real (NV)
+ char, uchar, int, uint, enum
+ long, ulong, short, ushort            &lt;=&gt;       Perl integer (IV)
+ QString, -&amp;, -*                        =&gt;       Perl string (utf8)
+ QString, -&amp;, -*                       &lt;=        Perl string (utf8 or iso-latin1 or locale)
+ QCString, -&amp;, -*                      &lt;=&gt;       Perl string (utf8 or bytes, according to content or &quot;bytes&quot; pragma)
+ QByteArray, -&amp;, -*                    &lt;=&gt;       Perl string (bytes)
+ QStringList, -&amp;, -*                    =&gt;       Reference to an array of Perl strings (utf8)
+ QString, -&amp;, -*                        =&gt;       Perl string (utf8 or iso-latin1 or locale)
+ int&amp;, -*                              &lt;=&gt;       Perl integer (IV)
+ bool&amp;, -*                             &lt;=&gt;       Perl boolean
+ char*                                 &lt;=&gt;       Perl string (bytes)
+ char**                                &lt;=        Reference to an array of Perl strings (bytes)
+ uchar*                                &lt;=        Perl string (bytes)
+ QRgb*                                 &lt;=        Reference to an array of Perl integers (IV)
+ QCOORD*                               &lt;=        Reference to an array of Perl integers (IV)
+ void*                                 &lt;=&gt;       Reference to a Perl integer (IV)
+ QValueList&lt;int&gt;, - *, - &amp;             &lt;=&gt;       Reference to an array of Perl integers (IV)
+ QCanvasItemList, - *, - &amp;              =&gt;       Reference to an array of Qt::CanvasItem
+ QWidgetList, - *, - &amp;                 &lt;=&gt;       Reference to an array of Qt::Widget
+ QObjectList, - *, - &amp;                 &lt;=&gt;       Reference to an array of Qt::Object
+ QFileInfoList, - *, - &amp;               &lt;=&gt;       Reference to an array of Qt::FileInfo
+ QPtrList&lt;QTab&gt;, - *, - &amp;              &lt;=&gt;       Reference to an array of Qt::Tab
+ QPtrList&lt;QToolBar&gt;, - *, - &amp;          &lt;=&gt;       Reference to an array of Qt::ToolBar
+ QPtrList&lt;QNetworkOperation&gt;, - *, - &amp; &lt;=&gt;       Reference to an array of Qt::NetworkOperation
+ QPtrList&lt;QDockWindow&gt;, - *, - &amp;       &lt;=&gt;       Reference to an array of Qt::DockWindow
+ (QUObject*)
+
+</pre>
+
+</body>
+
+</html>

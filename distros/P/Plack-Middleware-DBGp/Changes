@@ -1,0 +1,53 @@
+Revision history for Plack-Middleware-DBGp
+
+0.13      2016-08-09 22:35:29 CEST
+
+    - Bump required modules version
+
+0.12      2016-08-01 11:03:07 CEST
+
+    - Test fixes for recent Devel::Debug::DBGp releases
+
+0.11      2016-07-31 17:23:07 CEST
+
+    - Allow passing multiple paths to debug_client_path
+
+0.10      2016-04-29 10:02:04 CEST
+
+    - Fix warning when numeric GID does not resolve to a name
+
+0.09      2015-12-21 14:36:05 CET
+
+    - Test fixes for threaded Perls (again)
+
+0.08      2015-12-20 16:12:38 CET
+
+    - Test fixes for threaded Perls
+
+0.07      2015-12-19 11:48:39 CET
+
+    - More test fixes
+
+0.06      2015-12-17 21:23:10 CET
+
+    - Fix Perl 5.10 compatibility
+    - Test fixes
+
+0.05      2015-12-15 20:18:20 CET
+
+    - Run tests using an Unix-domain socket on non-Windows platforms
+
+0.04      2015-12-06 23:01:05 CET
+
+    - Skip Enbugger test when Enbugger is not installed
+
+0.03      2015-12-06 20:12:53 CET
+
+    - Add Xdebug-compatible XDEBUG_SESSION cookie and
+      XDEBUG_SESSION_START/STOP parameters
+    - Keep executing the current request if the debugger disconnects
+    - Optionally use Enbugger to make all files debuggable
+
+0.02      2015-11-26 17:04:28 CET
+
+    - First public release

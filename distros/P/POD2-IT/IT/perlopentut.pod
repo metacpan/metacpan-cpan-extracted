@@ -1,0 +1,1076 @@
+=head1 NOME
+
+perlopentut - tutorial sull'aprir cose in Perl
+
+=head1 DESCRIZIONE
+
+Perl ha, integrati, due modi semplici per aprire il file: il sistema
+I<shell> per la comoditE<agrave>, ed il sistema C per la precisione. Il sistema
+I<shell> ha anche la forma a due e quella a tre argomenti, che hanno
+modalitE<agrave> differenti per quanto riguarda l'interpretazione del nome del
+file. A voi la scelta.
+
+=head1 Apertura E<agrave> la shell
+
+La funzione C<open> di Perl E<egrave> stata progettata per imitare il sistema
+di redirezione presente nella linea di comando della I<shell>. Ecco
+alcuni esempi di base:
+
+    $ mio_programma file1 file2 file3
+    $ mio_programma    <  inputfile
+    $ mio_programma    >  outputfile
+    $ mio_programma    >> outputfile
+    $ mio_programma    |  altro_programma 
+    $ altro_programma  |  mio_programma
+
+Ed ecco alcuni esempi un po' piE<ugrave> avanzati:
+
+    $ altro_programma      | mio_programma f1 - f2
+    $ altro_programma 2>&1 | mio_programma -
+    $ mio_programma     <&3
+    $ mio_programma     >&4
+
+I programmatori abituati a costrutti del genere saranno lieti di sapere
+che Perl supporta direttamente queste modalitE<agrave> familiari utilizzando
+praticamente la stessa sintassi della I<shell>.
+
+=head2 Aperture Semplici
+
+La funzione C<open> accetta due argomenti: il primo E<egrave> un I<filehandle>,
+il secondo E<egrave> una singola stringa che include sia ciE<ograve> che va aperto,
+sia come aprirlo. C<open> restituisce un valore vero quando va a buon
+fine, mentre quando fallisce restituisce un valore falso ed imposta la
+variabile speciale C<$!> per riportare l'errore di sistema. Se il
+I<filehandle> era giE<agrave> aperto verrE<agrave>, prima di tutto, chiuso implicitamente.
+
+Ad esempio:
+
+    open(INFO,      "datafile") || die("impossibile aprire datafile: $!");
+    open(INFO,   "<  datafile") || die("impossibile aprire datafile: $!");
+    open(RISULT ,">  runstats") || die("impossibile aprire runstats: $!");
+    open(LOG,    ">> logfile ") || die("impossibile aprire logfile:  $!");
+
+Se preferite la versione con meno punteggiatura, potete anche scrivere
+tutto ciE<ograve> come segue:
+
+    open INFO,   "<  datafile"  or die "impossibile aprire datafile: $!";
+    open RISULT ,">  runstats"  or die "impossibile aprire runstats: $!";
+    open LOG,    ">> logfile "  or die "impossibile aprire logfile:  $!";
+
+Vanno notate alcune cose. Prima di tutto, il segno di I<minore>
+all'inizio E<egrave> opzionale. Se omesso, Perl assume che volete aprire il 
+file in lettura.
+
+Osservate anche che nel primo esempio si utilizza l'operatore logico
+C<||>, mentre nel secondo si utilizza C<or>, che ha una precedenza inferiore.
+L'utilizzo di C<||> nel secondo caso in realtE<agrave> significherebbe
+
+    open INFO, ( "<  datafile"  || die "impossibile aprire datafile: $!" );
+
+che non E<egrave> sicuramente quel che volete.
+
+L'altra cosa importante da notare E<egrave> che, proprio come nella I<shell>,
+qualsiasi spazio prima o dopo il nome del file viene ignorato. Questo
+E<egrave> corretto, perchE<eacute> non vorreste comportamenti differenti
+dalle istruzioni che seguono: 
+
+    open INFO,   "<datafile"   
+    open INFO,   "< datafile" 
+    open INFO,   "<  datafile"
+
+Ignorare gli spazi di contorno aiuta anche quando leggete il nome di
+un file da un altro file, e vi dimenticate di eliminare gli spazi
+prima di aprire:
+
+    $nomefile = <INFO>;         # oops, \n e` rimasto
+    open(EXTRA, "< $nomefile") || die "impossibile aprire $nomefile: $!";
+
+Non si tratta di un I<bug>, ma di una caratteristica inserita
+appositamente. Visto che C<open> imita la I<shell> nel suo stile di utilizzare
+le frecce di redirezione per specificare come aprire il file, lo fa anche nel modo
+di considerare gli spazi bianchi aggiuntivi intorno al nome del file
+stesso. Per accedere a file con nomi fantasiosi vi rimandiamo alla
+sezione L<"Fugare il Dweomer">.
+
+Esiste anche una versione a tre parametri di C<open>, che vi consente
+di inserire i caratteri speciali di redirezione in un argomento apposito:
+
+    open( INFO, ">", $datafile ) || die "Impossibile creare $datafile: $!";
+
+In questo caso, il nome del file da aprire E<egrave> la stringa vera e propria
+nella variabile C<$datafile>, per cui non dovete preoccuparvi del fatto
+che C<$datafile> contenga o meno caratteri in grado di modificare la
+modalitE<agrave> di apertura, o dell'assorbimento degli spazi all'inizio del 
+nome del file come avverrebbe nella versione a due argomenti. Inoltre,
+qualsiasi riduzione di interpolazioni di stringhe non necessarie E<egrave>
+una buona cosa.
+
+=head2 I<Filehandle> Indiretti
+
+Il primo argomento di C<open> puE<ograve> essere un riferimento ad un I<filehandle>.
+A partire da perl 5.6.0, se l'argomento non E<egrave> inizializzato, Perl creerE<agrave>
+un I<filehandle> automaticamente e inserirE<agrave> un riferimento ad esso
+nel primo argomento, come segue:
+
+   open( my $in, $infile )   or die "Impossibile leggere $infile: $!";
+   while ( <$in> ) {
+      # fai qualcosa con $_
+   }
+   close $in;
+
+I I<filehandle> indiretti semplificano la gestione degli spazi dei
+nomi. PoichE<eacute> i I<filehandle> sono globali all'interno del pacchetto
+corrente, due subroutine che provino ad aprire C<INFILE> si scontrerebbero
+l'una con l'altra. Con due funzioni che aprono I<filehandle> indiretti
+come C<my $infile>, invece, non c'E<egrave> pericolo di scontro e nessun
+bisogno di preoccuparsi riguardo a possibili conflitti futuri.
+
+Un altro comportamento conveniente E<egrave> dato dal fatto che un I<filehandle>
+indiretto viene chiuso automaticamente quando va fuori visibilitE<agrave> o
+quando lo forzate su I<undef>:
+
+   sub prima_riga {
+      open( my $in, shift ) && return scalar <$in>;
+      # non e` richiesta alcuna close()
+   }
+
+=head2 Apertura di Pipe
+
+Nel linguaggio C, quando volete aprire un file utilizzando la libreria
+di I/O standard, utilizzate la funzione C<fopen>, ma quando volete
+aprire una I<pipe> utilizzate C<popen>. Nella shell, d'altro canto,
+utilizzate semplicemente un carattere di redirezione differente. Questa
+semplificazione si ha anche in Perl. La chiamata C<open> rimane
+la stessa -- cambiano solamente gli argomenti.
+
+Se il carattere iniziale E<egrave> un simbolo I<pipe> [il carattere "|", N.d.T.]
+C<open> fa partire un nuovo comando ed apre un I<filehandle> in sola
+scrittura che sfocia in quel comando. In tal modo vi E<egrave> consentito
+scrivere in questo I<handle> e fare in modo che ciE<ograve> che scrivete sia
+disponibile allo standard input del comando. Ad esempio:
+
+    open(STAMPANTE, "| lpr -Plp1")    || die "impossibile lanciare lpr: $!";
+    print STAMPANTE "bla bla bla\n";
+    close(STAMPANTE)                  || die "impossibile chiudere lpr: $!";
+
+Se il carattere finale E<egrave> un simbolo I<pipe>, viene lanciato un nuovo
+comando ed aperto un I<filehandle> in sola lettura che legge dall'uscita
+di tale comando. Questo vi consente di accedere in lettura, attraverso
+questo I<handle>, a tutto ciE<ograve> che il comando scrive sul proprio
+standard output. Ad esempio:
+
+    open(RETE, "netstat -i -n |")    || die "impossibile lanciare netstat: $!";
+    while (<RETE>) { }               # fai qualcosa con l'input
+    close(RETE)                      || die "impossibile chiudere netstat: $!";
+
+Cosa succede se provate ad aprire una pipe da o verso un comando che
+non esiste? Se possibile, Perl intercetterE<agrave> il fallimneto ed imposterE<agrave>
+C<$!> come di consueto. Ma se il comando contiene caratteri speciali
+per la shell, come C<E<gt>> o C<*>, noti anche come 'metacaratteri',
+Perl non eseguirE<agrave> il comando direttamente. Piuttosto, Perl lancia la
+shell, che a sua volta prova a lanciare il comando. CiE<ograve> implica che
+E<egrave> la shell che raccoglie l'indicazione di errore. In tal caso, la
+chiamata a C<open> indicherE<agrave> un fallimento solamente se Perl
+non riesce nemmeno a lanciare la shell. Consultate
+L<perlfaq8/"Come posso catturare STDERR da un comando esterno?"> per
+trovare una possibile soluzione a questo problema. Potete anche trovare
+una spiegazione in L<perlipc>.
+
+Se volete aprire una pipe bidirezionale, la libreria IPC::Open2 vi
+sarE<agrave> di aiuto. Consultate
+L<perlipc/"Comunicazione Bidirezionale con un Altro Processo">.
+
+=head2 Il File "Meno"
+
+Nuovamente, seguendo il corso delle utilitE<agrave> standard disponibili
+nella shell, la funzione C<open> di Perl tratta un file il cui nome
+E<egrave> un semplice "-" in modo particolare. Se aprite "meno" in lettura, in
+realtE<agrave> significa che accederete allo standard input. Se lo aprite in
+scrittura, in realtE<agrave> significa che accederete allo standard output.
+
+Se "meno" puE<ograve> essere usato come l'input o l'output di default, cosa
+succede se aprite una pipe verso o da "meno"? Qual E<egrave> il comando di
+default che verrE<agrave> lanciato? Beh, E<egrave> lo stesso script che state eseguendo!
+In realtE<agrave> c'E<egrave> una chiamata a C<fork> ben nascosta dietro la
+chiamata alla stessa C<open>. Consultate L<perlipc/"Aperture di Pipe Sicure">
+per i dettagli.
+
+=head2 Mischiare Letture e Scritture
+
+E<Egrave> possibile specificare l'accesso sia in lettura che in scrittura.
+Tutto ciE<ograve> che dovete fare E<egrave> mettere un simbolo "+" immediatamente
+prima del carattere di redirezione. Ma, come nella shell, utilizzare
+un "minore" su un file non ne crea mai uno nuovo: ne apre solo uno che
+giE<agrave> esiste. D'altro canto, utilizzare un "maggiore di" vi sporcherE<agrave>
+sempre qualsiasi file esistente (poichE<eacute> lo tronca a lunghezza zero),
+o ne crea uno nuovo di zecca se non ne esiste giE<agrave> uno. Aggiungendo
+un "+" per rendere la redirezione sia di lettura che di scrittura, non
+altera tali proprietE<agrave>: funzionerE<agrave> solo su file esistenti oppure
+vi sporcherE<agrave> sempre il file esistente.
+
+    open(WTMP, "+< /usr/adm/wtmp") 
+        || die "impossibile aprire /usr/adm/wtmp: $!";
+
+    open(SCREEN, "+> lkscreen")
+        || die "impossibile aprire lkscreen: $!";
+
+    open(LOGFILE, "+>> /var/log/applog"
+        || die "impossibile aprire /var/log/applog: $!";
+
+Il primo esempio non creerE<agrave> un nuovo file, mentre il secondo esempio
+vi sporcherE<agrave> sempre il file esistente. Il terzo esempio creerE<agrave> un nuovo
+file se necessario, e non sporcherE<agrave> un eventuale file preesistente,
+dandovi la possibilitE<agrave> di leggere da qualsiasi punto nel file,
+laddove perE<ograve> potrete solo scrivere aggiungendo dati alla fine del file.
+In breve, il primo caso E<egrave> sostanzialmente piE<ugrave> comune degli altri due,
+che si rivelano sbagliati nella maggior parte dei casi. (Se conoscete il
+linguaggio C, il "piE<ugrave>" nella C<open> di Perl E<egrave> storicamente derivato
+da quello nella funzione C C<fopen(3S)>, che viene chiamata dietro le
+quinte).
+
+Di fatto, quando occorre aggiornare un file, a meno che non stiate
+lavorando su un file binario come nel caso di WTMP esposto in
+precedenza, probabilmente non vorrete utilizzare questo approccio per
+effettuare gli aggiornamenti. Piuttosto, il parametro Perl a linea di
+comando B<-i> viene a darvi una mano. Il comando che segue prende
+tutti i file sorgente o di intestazione C, C++ o yacc, e cambia
+tutti i "pippo" in "pluto", lasciando la vecchia versione non
+modificata con il nome originale ed un'estensione ".orig" agganciata
+alla fine:
+
+    $ perl -i.orig -pe 's/\bpippo\b/pluto/g' *.[Cchy]
+
+Questa rappresenta una scorciatoia per effettuare alcuni giochetti
+di ridenominazione, che sono in realtE<agrave> il modo migliore per aggiornare
+i file di testo. Consultate anche la seconda domanda in L<perlfaq5>
+per maggiori dettagli.
+
+=head2 Filtri
+
+Uno degli usi piE<ugrave> comuni per C<open> E<egrave> uno del quale non vi
+accorgete nemmeno. Quando accedete il I<filehandle> C<< <ARGV> >>,
+in realtE<agrave> Perl effettua una chiamata ad C<open> implicita a ciascun
+file in C<@ARGV>. Per questo motivo, un programma chiamato come
+segue:
+
+    $ mioprogramma file1 file2 file3
+
+puE<ograve> ottenere tutti i file elencati aperti ed elaborati, uno alla volta,
+utilizzando un costrutto semplice come:
+
+    while (<>) {
+        # fai qualcosa con $_
+    } 
+
+Se C<@ARGV> E<egrave> vuota quando il ciclo comincia all'inizio, Perl finge
+che abbiate voluto aprire "meno", ossia l'input standard. C<$ARGV>,
+che rappresenta il file attualmente aperto durante l'elaborazione
+di C<< <ARGV> >>, E<egrave> persino impostato a "-" in queste circostante.
+
+Potete tranquillamente pre-elaborare l'array C<@ARGV> prima di entrare
+nel ciclo, per essere sicuri che sia di vostro gradimento. Una ragione
+per farlo potrebbe essere quella di rimuovere le opzioni a riga di comando
+che iniziano con un carattere "meno". Se da una parte potete sempre gestire
+le situazioni semplici "a mano", i moduli Getopts sono bravi proprio a
+far questo:
+
+    use Getopt::Std;
+
+    # -v, -D, -o ARG, imposta $opt_v, $opt_D, $opt_o
+    getopts("vDo:");            
+
+    # -v, -D, -o ARG, imposta $args{v}, $args{D}, $args{o}
+    getopts("vDo:", \%args);    
+
+Oppure il modulo standard Getopt::Long per consentirvi di utilizzare
+argomenti con nome:
+
+    use Getopt::Long;
+    GetOptions( "verboso"  => \$verboso,        # --verboso
+                "Debug"    => \$debug,          # --Debug
+                "output=s" => \$output );       
+	    # --output=qualcosa oppure --output qualcosa
+
+Un'altra ragione per effettuare la pre-elaborazione degli argomenti
+puE<ograve> essere quello di impostare per default la lista di tutti i file, nel
+caso la lista degli argomenti sia vuota:
+
+    @ARGV = glob("*") unless @ARGV;
+
+Potete persino filtrare via tutti quei file che non sono semplici file
+di testo. Il tutto E<egrave> piuttosto silenzioso, ovviamente, e potreste
+preferire di menzionare esplicitamente all'utilizzatore quando
+effettuate operazioni di esclusione come questa:
+
+    @ARGV = grep { -f && -T } @ARGV;
+
+Se state utilizzando le opzioni a riga di comando B<-n> o B<-p>, dovreste
+confinare i cambiamenti a C<@ARGV> in un blocco C<BEGIN{}>.
+
+Ricordate che una C<open> ha proprietE<agrave> speciali, nel senso che potrebbe
+chiamare C<fopen(3S)> oppure C<popen(3S)>, a seconda di quali sono i
+suoi parametri; questo E<egrave> il motivo per cui E<egrave> detta, a volte,
+"C<open> magica". Ecco un esempio:
+
+    $pwdinfo = `domainname` =~ /^(\(none\))?$/
+                    ? '< /etc/passwd'
+                    : 'ypcat passwd |';
+
+    open(PWD, $pwdinfo)                 
+                or die "impossibile aprire $pwdinfo: $!";
+
+Questo genere di cose entra in gioco nell'elaborazione di filtraggio.
+PoichE<eacute> l'elaborazione di C<< <ARGV> >> impiega la normale C<open> in
+stile shell di Perl, rispetta anche tutti i casi particolari che abbiamo
+giE<agrave> visto:
+
+    $ mioprogramma f1 "cmd1|" - f2 "cmd2|" f3 < tmpfile
+
+Questo programma leggerE<agrave> dal file F<f1>, dal processo F<cmd1>,
+da standard input (ossia, F<tmpfile> in questo caso), dal file F<f2>,
+dal comando F<cmd2> ed infine dal file F<f3>.
+
+SE<igrave>, tutto ciE<ograve> significa anche che se nella vostra
+directory avete file chiamati "-" (e
+cosE<igrave> via), questi non saranno elaborati da C<open> come
+nomi di file letterali. Avrete bisogno di passarli come
+"./-", proprio come dovreste fare per il programma I<rm>, o
+potreste in alternativa utilizzare la funzione C<sysopen> descritta
+piE<ugrave> avanti.
+
+Una delle applicazioni piE<ugrave> interessanti consiste nel cambiare 
+in pipe i file con un certo nome. Ad esempio, per auto-elaborare file
+compressi con I<gzip> o I<compress> utilizzando I<gzip>:
+
+    @ARGV = map { /^\.(gz|Z)$/ ? "gzip -dc $_ |" : $_  } @ARGV;
+
+O anche, se avete il programma I<GET> installato dal modulo LWP,
+potete scaricare dalle URL prima di elaborarle:
+
+    @ARGV = map { m#^\w+://# ? "GET $_ |" : $_ } @ARGV;
+
+Non a caso viene chiamata C<< <ARGV> >> magica. Carino, eh?
+
+=head1 Open E<agrave> la C
+
+Se volete la convenienza della shell, allora la funzione C<open> di
+Perl E<egrave> sicuramente la strada giusta da prendere. D'altra parte, se
+volete una precisione piE<ugrave> fine rispetto a quanto vi fornisce
+la semplice C<fopen(3S)>, dovreste rivolgervi alla funzione C<sysopen>,
+che E<egrave> un aggancio diretto alla chiamata di sistema C<open(2)>.
+CiE<ograve> significa che E<egrave> un tantino piE<ugrave> involuta,
+ma questo E<egrave> il prezzo della precisione.
+
+C<sysopen> accetta 3 o 4 argomenti.
+
+    sysopen HANDLE, PERCORSO, OPZIONI, [MASCHERA]
+
+Il parametro C<HANDLE> E<egrave> un I<filehandle> proprio come per C<open>.
+il C<PERCORSO> E<egrave> un percorso letterale, ossia nel quale non si presta
+attenzione alla presenza di caratteri "maggiore", "minore" o "pipe" o
+"meno", nE<eacute> si ignorano gli spazi. Se ci sta qualcosa, fa parte del
+percorso. L'argomento C<OPZIONI> contiene uno o piE<ugrave> valori derivati dal
+modulo Fcntl, che sono stati fusi insieme con un'operazione di or
+binario attraverso l'operatore "|". L'argomento finale, C<MASCHERA>,
+E<egrave> opzionale; se presente, viene combinato con la I<umask> corrente
+dell'utente per stabilire i bit di modo nella creazione del file. Di solito
+dovreste omettere questo parametro.
+
+Sebbene i valori tradizionali di sola-lettura, sola-scrittura e
+lettura-scrittura siano, rispettivamente, 0, 1 e 2, ciE<ograve> non E<egrave> vero su tutti
+i sistemi. E<Egrave> meglio, piuttosto, caricare le costanti giuste dal modulo
+Fcntl, che fornisce le seguenti opzioni standard:
+
+    O_RDONLY            Sola lettura
+    O_WRONLY            Sola scrittura
+    O_RDWR              Lettura e scrittura
+    O_CREAT             Crea il file se non esiste
+    O_EXCL              Fallisce se il file esiste
+    O_APPEND            Aggiunge al file
+    O_TRUNC             Tronca il file
+    O_NONBLOCK          Accesso non bloccante
+
+Alcune opzioni meno comuni che sono talvolta disponibili in alcuni
+sistemi operativi includono C<O_BINARY>, C<O_TEXT>, C<O_SHLOCK>, C<O_EXLOCK>,
+C<O_DEFER>, C<O_SYNC>, C<O_ASYNC>, C<O_DSYNC>, C<O_RSYNC>,
+C<O_NOCTTY>, C<O_NDELAY> e C<O_LARGEFILE>. Consultate la pagina di
+manuale di C<open(2)> o il suo equivalente locale per i dettagli.
+(Nota: a partire dalla versione 5.6 l'opzione C<O_LARGEFILE>, se
+disponibile, E<egrave> automaticamente aggiunta alle opzioni passate
+a C<sysopen()> perchE<eacute> i file grandi sono utilizzati di default).
+
+Ecco un esempio di come utilizzare C<sysopen> per emulare le semplici
+chiamate C<open> che abbiamo introdotto in precedenza. Ometteremo
+i controlli C<|| die $!> per maggiore chiarezza, ma assicuratevi
+di controllare sempre i valori restituiti nel codice reale. Essi non
+sono esattamente gli stessi, poichE<eacute> C<open> eliminerE<agrave>
+gli spazi all'inizio ed alla fine, ma potrete farvi un'idea.
+
+Per aprire un file in lettura:
+
+    open(FH, "< $percorso");
+    sysopen(FH, $percorso, O_RDONLY);
+
+Per aprire un file in scrittura, creando un file nuovo se necessario
+o altrimenti troncando un file pre-esistente:
+
+    open(FH, "> $percorso");
+    sysopen(FH, $percorso, O_WRONLY | O_TRUNC | O_CREAT);
+
+Per aprire un file per aggiungere alla fine, creandolo se necessario:
+
+    open(FH, ">> $percorso");
+    sysopen(FH, $percorso, O_WRONLY | O_APPEND | O_CREAT);
+
+Per aprire un file per aggiornamento, laddove il file deve necessariamente
+esistere:
+
+    open(FH, "+< $percorso");
+    sysopen(FH, $percorso, O_RDWR);
+
+Quelle che seguono, invece, sono le cose che potete fare con C<sysopen>
+ma che non potete fare con una C<open> regolare. Come avrete modo di vedere,
+E<egrave> solo una questione di controllare quali opzioni utilizzare nel terzo
+parametro.
+
+Per aprire un file in scrittura, creando un nuovo file che non deve
+esistere precedentemente:
+
+    sysopen(FH, $percorso, O_WRONLY | O_EXCL | O_CREAT);
+
+Per aprire un file in aggiunta, laddove il file deve giE<agrave> esistere:
+
+    sysopen(FH, $percorso, O_WRONLY | O_APPEND);
+
+Per aprire un file per aggiornamento, creando un nuovo file se
+necessario:
+
+    sysopen(FH, $percorso, O_RDWR | O_CREAT);
+
+Per aprire un file per aggiornamento, laddove il file non deve
+giE<agrave> esistere:
+
+    sysopen(FH, $percorso, O_RDWR | O_EXCL | O_CREAT);
+
+Per aprire un file in modalitE<agrave> non bloccante, creandone uno
+se necessario:
+
+    sysopen(FH, $percorso, O_WRONLY | O_NONBLOCK | O_CREAT);
+
+=head2 Permessi E<agrave> la mode
+
+Se omettete l'argomento C<MASCHERA> nella chiamata a C<sysopen>,
+Perl utilizza il valore ottale 0666. La normale C<MASCHERA> da utilizzare
+per gli eseguibili e le directory dovrebbe essere 0777, e 0666 per tutto
+il resto.
+
+PerchE<eacute> cosE<igrave> permissivo? Beh, in realtE<agrave> non E<egrave>
+proprio cosE<igrave>. La C<MASCHERA> verrE<agrave> modificata dalla C<umask>
+del processo corrente. Una C<umask> E<egrave> un numero che rappresenta i bit
+di permesso I<disabilitati>, ossia quei bit che non saranno impostati nel campo
+dei permessi dei file che vengono creati.
+
+Ad esempio, se la vostra C<umask> fosse 027, allora la parte 020
+disabiliterebbe la scrittura per il gruppo, e la parte 007 disabiliterebbe
+lettura, scrittura ed esecuzione per gli "altri". In queste condizioni,
+passando 0666 a C<sysopen> in realtE<agrave> creerebbe un file con modalitE<agrave>
+0640, poichE<eacute> C<0666 & ~027> E<egrave> appunto 0640.
+
+Dovreste aver bisogno di usare l'argomento C<MASCHERA> piuttosto di
+rado. In questo modo si preclude all'utente la libertE<agrave> di decidere
+quali permessi debbano avere i nuovi file. Negare la scelta E<egrave> quasi
+sempre una cosa sbagliata. Un'eccezione potrebbe esserci per casi
+nei quali vengono immagazzinati dati sensibili o privati, come nel caso
+di cartelle di email, file I<cookie> e file temporanei ad uso interno.
+
+=head1 Oscuri Trucchi di Apertura
+
+=head2 Ri-Aprire File (duplicati)
+
+A volte avete giE<agrave> un I<filehandle> aperto, e volete un altro I<handle> che
+ne sia un duplicato. Nella shell, mettiamo un carattere "&" immediatamente
+prima del numero del descrittore di file in fase di redirezione. Ad
+esempio, C<< 2>&1 >> fa sE<igrave> che il descrittore numero 2 (corrispondente
+a STDERR in Perl) sia rediretto nel descrittore numero 1 (che di solito
+corrisponde a STDOUT in Perl). Tutto ciE<ograve> rimane sostanzialmente invariato
+in Perl: un nome di file che inizi con un carattere "&" E<egrave> trattato alla
+stregua di un descrittore di file se si tratta di un numero, o come
+un I<filehandle> se si tratta di una stringa.
+
+    open(SALVAOUT, ">&SALVAERR") || die "impossibile duplicare SALVAERR: $!";
+    open(MHCONTEXT, "<&4")     || die "impossibile duplicare fd4: $!";
+
+Questo significa che se una funzione si aspetta di ricevere un nome
+di file, ma non volete fornirlo perchE<eacute> il file in questione E<egrave>
+giE<agrave> aperto, potete passare semplicemente il I<filehandle> precedendolo con un
+carattere "&". In ogni caso, E<egrave> meglio utilizzare un I<handle> pienamente
+qualificato, per tenere in conto il caso che la funzione si trovi in
+un I<package> differente:
+
+    una_qualche_funzione("&main::LOGFILE");
+
+In questo modo, se C<una_qualche_funzione()> vuole aprire il parametro
+passato, puE<ograve> riutilizzare l'I<handle> giE<agrave> aperto. Questo approccio E<egrave>
+differente dal passare semplicemente un I<handle>, perchE<eacute> con questo non
+potete aprire file. Qui avete un meccanismo che vi permette di passare
+qualcosa di accettabile per C<open()>.
+
+Se avete uno di quegli oggetti I/O strani ed avveniristici di cui la gente
+di C++ blatera tanto, questo approccio non funziona perchE<eacute> non sono
+dei I<filehandle> nativi veri e propri. In questo caso dovete
+utilizzare C<fileno()> e passare il numero di descrittore di file,
+sempre che sia possibile:
+
+    use IO::Socket;
+    $handle = IO::Socket::INET->new("www.perl.com:80");
+    $fd = $handle->fileno;
+    una_qualche_funzione("&$fd");  # non una chiamata indiretta di funzione
+
+PuE<ograve> risultare piE<ugrave> semplice (e di sicuro piE<ugrave> veloce) usare
+semplicemente I<filehandle> reali:
+
+    use IO::Socket;
+    local *REMOTO = IO::Socket::INET->new("www.perl.com:80");
+    die "impossibile connettersi" unless defined(fileno(REMOTO));
+    una_qualche_funzione("&main::REMOTO");
+
+Se il I<filehandle> o il numero di descrittore sono preceduti da una
+combinazione "&=" piuttosto che da un semplice "&", Perl non creerE<agrave> un
+descrittore aperto completamente nuovo utilizzando la chiamata di
+sistema C<dup(2)>: genererE<agrave> piuttosto un alias a quello esistente
+utilizzando la chiamata di libreria C<fdopen(3S)>. Questo approccio
+E<egrave> leggermente meno oneroso in termini di risorse di sistema, sebbene
+al giorno d'oggi questo non sia un grosso problema. Ecco un esempio:
+
+    $fd = $ENV{"MHCONTEXTFD"};
+    open(MHCONTEXT, "<&=$fd")   or die "errore di fdopen $fd: $!";
+
+Se state utilizzando l'input magico C<< <ARGV> >>, potete persino
+passare come parametro a linea di comando in C<@ARGV> qualcosa come
+C<"<&=$MHCONTEXTFD">, ma non abbiamo mai visto nessuno farlo.
+
+=head2 Fugare il Dweomer 
+
+Perl E<egrave> un linguaggio piE<ugrave> DWIMmico di altri tipo Java -- laddove DWIM
+E<egrave> un acronimo per "do what I mean" [letteralmente "fa quello che intendo",
+ossia cerca di capire le mie reali intenzioni da solo, N.d.T.]. Ma
+questo principio a volte porta ad un quantitativo di magia nascosta
+superiore a quella che uno sa di poter utilizzare. In questo senso, Perl
+E<egrave> anche i<dweomer>, una parola arcana che indica un sortilegio
+[Wikipedia: oggetto magico o magia prodotta dallo stesso, N.d.T.]. A volte,
+la DWIMmicitE<agrave> di Perl assomiglia un po' troppo ad un dweomer perchE<eacute> ci
+si possa sentire a posto.
+
+Se la C<open> magica E<egrave> un po' troppo magica per voi, non siete per forza
+costretti ad utilizzare C<sysopen>. Per aprire un file con caratteri
+arbitrariamente strani E<egrave> necessario proteggere qualunque spazio
+all'inizio ed alla fine. Gli spazi iniziali si proteggono inserendo
+un C<"./"> prima di un nome di file che inizia con uno spazio. Gli spazi
+in fondo si proteggono aggiungendo un byte ASCII NUL (C<"\0">) alla
+fine della stringa.
+
+    $file =~ s#^(\s)#./$1#;
+    open(FH, "< $file\0")   || die "impossibile aprire $file: $!";
+
+Si assume, chiaramente, che il vostro sistema consideri "." la
+directory di lavoro corrente, "/" il separatore delle directory,
+e che non ammetta degli ASCII NUL come carattere valido in un nome di file.
+La maggior parte dei sistemi si adattano a questa convenzione, inclusi
+tutti i sistemi POSIX cosE<igrave> come i sistemi proprietari Microsoft.
+L'unico sistema vagamente popolare che non funziona in questo modo
+E<egrave> il sistema Macintosh "Classic", che utilizza ":" laddove il resto delle
+persone utilizza "/". Forse C<sysopen> non E<egrave> proprio un'idea malvagia.
+
+Se volete utilizzare l'elaborazione di C<< <ARGV> >> in una maniera
+completamente noiosa e non magica, potete fare cosE<igrave>:
+
+    #   "Sam si sedette a terra e si prese la testa fra le mani.
+    #   'Vorrei non essere mai venuto qui, e non voglio vedere
+    #   altra magia', disse, e sprofondo` nel silenzio."
+    for (@ARGV) { 
+        s#^([^./])#./$1#;
+        $_ .= "\0";
+    } 
+    while (<>) {  
+        # ora si elabora $_
+    } 
+
+Ma attenzione che gli utenti non apprezzeranno il fatto di non poter
+utilizzare "-" per intendere l'input standard, per una convenzione standard.
+
+=head2 Percorsi come Aperture
+
+Avrete probabilmente notato che le funzioni C<warn> e C<die> possono
+produrre messaggi come:
+
+    Un qualche warning at scriptname line 29, <FH> line 7.
+
+Questo E<egrave> possibile perchE<eacute> avete aperto un I<filehandle> FH, e ci avete
+letto sette record. Ma qual era il nome del file, invece che l'I<handle>?
+
+Se non state lavorando con C<strict refs> attivi, o se li avete
+disabilitati momentaneamente, allora non dovete far altro che questo:
+
+    open($path, "< $path") || die "impossibile aprire $path: $!";
+    while (<$path>) {
+        # quello che serve
+    } 
+
+Visto che state utilizzando il percorso al file come I<handle>, otterrete
+dei messaggi piE<ugrave> simili a
+
+    Un qualche warning at scriptname line 29, </etc/motd> line 7.
+
+=head2 Apertura a Parametro Singolo
+
+Vi ricordate quando abbiamo detto che la C<open> di Perl accetta due
+parametri? Si trattava di un abuso. Vedete, in realtE<agrave> puE<ograve> accettare anche
+un parametro solamente. Se e solo se la variabile E<egrave> una variabile globale,
+e non lessicale, potete passare a C<open> un solo parametro, il
+I<filehandle>, e questo avrE<agrave> lo stesso percorso della variabile scalare
+globale che ha lo stesso nome.
+
+    $FILE = "/etc/motd";
+    open FILE or die "impossibile aprire $FILE: $!";
+    while (<FILE>) {
+        # quello che serve
+    } 
+
+PerchE<eacute> tutto questo? Qualcuno deve fare i conti con le consuetudini.
+E<Egrave> qualcosa che E<egrave> stato presente in Perl dall'inizio,
+se non prima.
+
+=head2 Giocare con STDIN e STDOUT
+
+Una mossa intelligente da fare con STDOUT E<egrave> chiuderlo esplicitamente
+quando il programma termina.
+
+    END { close(STDOUT) || die "impossibile chiudere stdout: $!" }
+
+Se non lo fate, ed il vostro programma riempie la partizione del
+disco per una redirezione della riga di comando, non vi segnalerE<agrave>
+l'errore di uscita con uno stato di errore.
+
+Non siete obbligati a piegarvi agli STDIN e STDOUT che vi vengono dati.
+Siete liberi di riaprirli a vostro piacimento.
+
+    open(STDIN, "< datafile")
+        || die "impossibile aprire datafile: $!";
+
+    open(STDOUT, "> output")
+        || die "impossibile aprire output: $!";
+
+In seguito, essi verranno utilizzati direttamente o passati ai
+sottoprocessi. E<Egrave> come se il programma fosse stato chiamato con queste
+redirezioni direttamente dalla linea di comando.
+
+Probabilmente E<egrave> piE<ugrave> interessante per connettersi alle pipe. Ad
+esempio:
+
+    $paginatore = $ENV{PAGER} || "(less || more)";
+    open(STDOUT, "| $paginatore")
+        || die "impossibile invocare un paginatore: $!";
+
+CiE<ograve> fa sE<igrave> che sembri che il vostro programma sia stato chiamato con
+il suo output standard rediretto giE<agrave> sul vostro programma di paginazione.
+Potete anche utilizzare questo approccio in congiunzione con una C<fork>
+esplicita. Potreste volerlo fare se preferite gestire l'elaborazione
+successiva nel vostro stesso programma, ma in un processo differente:
+
+    prime_righe(100);
+    while (<>) {
+        print;
+    } 
+
+    sub prime_righe {
+        my $righe = shift || 20;
+        return if $pid = open(STDOUT, "|-");       # esci se processo padre
+        die "errore in fork: $!" unless defined $pid;
+        while (<STDIN>) {
+            last if --$lines < 0;
+            print;
+        } 
+        exit;
+    } 
+
+Questa tecnica puE<ograve> essere applicata per inserire quanti filtri volete nel
+vostro stream di uscita.
+
+=head1 Altre Questioni di I/O
+
+Gli argomenti che seguono non riguardano esattamente C<open> o C<sysopen>,
+ma influiscono sul modo in cui aprite i file.
+
+=head2 Aprire File che Non-Sono-File
+
+Quand'E<egrave> che un file non E<egrave> un file? Beh, potreste dire quando esiste ma
+non E<egrave> un file puro e semplice. Controlliamo se E<egrave> un collegamento simbolico
+prima di tutto, tanto per sicurezza.
+
+    if (-l $file || ! -f _) {
+        print "$file non un file semplice\n";
+    } 
+
+Quali altri tipi di file ci sono oltre, ehm, i file? Le directory, i
+collegamenti simbolici, pipe con nome, socket Unix e dispositivi
+a blocchi ed a caratteri. Questi sono tutti file -- solo che non sono
+file I<semplici>. Non E<egrave> lo stesso problema del fatto che sia un file
+di testo o meno. Non tutti i file di solo testo sono file semplici.
+Come non tutti i file semplici sono file di solo testo. Ecco perchE<eacute> ci
+sono due test C<-f> e C<-T> distinti.
+
+Per aprire una directory, dovreste utilizzare la funzione C<opendir>,
+elaborandola con C<readdir>, avendo cura di inserire il nome della
+directory se necessario:
+
+    opendir(DIR, $nomedir) or die "errore di opendir su $nomedir: $!";
+    while (defined($file = readdir(DIR))) {
+        # utilizza "$nomedir/$file"
+    }
+    closedir(DIR);
+
+Se volete accedere ricorsivamente alle directory, E<egrave> meglio utilizzare
+il modulo File::Find. L'esempio che segue stampa ricorsivamente tutti
+i file ed aggiunge un carattere "/" se il file E<egrave> una directory.
+
+    @ARGV = qw(.) unless @ARGV;
+    use File::Find;
+    find sub { print $File::Find::name, -d && '/', "\n" }, @ARGV;
+
+Quest'altro trova tutti i collegamenti simbolici fasulli nell'albero,
+al di sotto di una determinata directory:
+
+    find sub { print "$File::Find::name\n" if -l && !-e }, $dir;
+
+Come potete vedere, con i collegamenti simbolici potete semplicemente
+far finta che si tratti del file a cui stanno puntando. O, se
+volete sapere a I<cosa> sta puntando un collegamento, allora entra
+in gioco C<readlink>:
+
+    if (-l $file) {
+        if (defined($dove = readlink($file))) {
+            print "$file punta a $dove\n";
+        } else {
+            print "$file non punta da nessuna parte: $!\n";
+        } 
+    } 
+
+=head2 Aprire Pipe con Nome
+
+Le pipe con nome sono un'altra faccenda. Basta far finta che si tratti
+di file regolari, ricordando perE<ograve> che le aperture sono normalmente
+bloccanti finchE<eacute> non ci siano sia un lettore che uno scrittore. Potete
+leggere di piE<ugrave> sull'argomento in L<perlipc/"Pipe con nome">. I socket
+Unix sono delle bestie piuttosto differenti; sono descritti in
+L<perlipc/"Client e Server TCP nel Dominio Unix">.
+
+Quando si tratta di aprire dispositivi, puE<ograve> essere sia facile che
+complicato. Assumeremo che se state aprendo un dispositivo a blocchi
+sappiate quello che state facendo. I dispositivi a caratteri sono
+piE<ugrave> interessanti. Tipicamente sono utilizzati per i modem, i mouse e
+qualche tipo di stampante. Il tutto E<egrave> descritto in
+L<perlfaq8/"Come leggo e scrivo su una porta seriale?">.
+Spesso E<egrave> sufficiente aprirli con una certa cautela:
+
+    sysopen(TTYIN, "/dev/ttyS1", O_RDWR | O_NDELAY | O_NOCTTY)
+		# (O_NOCTTY non e` piu` necessario nei sistemi POSIX)
+        or die "errore open /dev/ttyS1: $!";
+    open(TTYOUT, "+>&TTYIN")
+        or die "errore dup TTYIN: $!";
+
+    $ofh = select(TTYOUT); $| = 1; select($ofh);
+
+    print TTYOUT "+++at\015";
+    $risposta = <TTYIN>;
+
+Riguardo ai descrittori che non avete aperto con C<sysopen>, come nel caso dei
+socket, potete impostarli come non bloccanti utilizzando C<fcntl>:
+
+    use Fcntl;
+    my $vecchi_indicatori = fcntl($handle, F_GETFL, 0) 
+        or die "impossibile ottenere la configurazione attuale: $!";
+    fcntl($handle, F_SETFL, $vecchi_indicatori | O_NONBLOCK) 
+        or die "impossibile impostare come non bloccante: $!";
+
+Piuttosto che perdervi in una palude di C<ioctl> rotanti, tutte
+diverse fra loro, se dovete manipolare tty E<egrave> meglio fare chiamate
+al programma esterno C<stty(1)>, se l'avete, o altrimenti utilizzare
+l'interfaccia POSIX portabile. Per farvi un'idea precisa, avrete
+bisogno di leggere la pagina di manuale di C<termios(3)>, che descrive
+l'interfaccia POSIX per i dispositivi tty, e successivamente L<POSIX>,
+che descrive l'interfaccia Perl per POSIX. Esistono anche alcuni moduli
+di alto livello su CPAN per aiutavi con questi giochini. Date un'occhiata
+a Term::Readkey e a Term::Readline.
+
+=head2 Aprire Socket
+
+Che altro potete aprire? Per aprire una connessione utilizzando i socket,
+non potete utilizzare una delle due funzioni C<open>. Consultate
+L<perlipc/"Socket: Comunicazione Client/Server"> per capire come fare.
+Ecco comunque un esempio; una volta aperto, potete utilizzare FH come
+I<filehandle> bidirezionale.
+
+    use IO::Socket;
+    local *FH = IO::Socket::INET->new("www.perl.com:80");
+
+Per aprire una URL, il dottore ordina i moduli LWP presenti su CPAN.
+Non c'E<egrave> alcuna interfaccia tipo I<filehandle>, ma E<egrave> comunque facile
+ottenere il contenuto di un documento:
+
+    use LWP::Simple;
+    $doc = get('http://www.linpro.no/lwp/');
+
+=head2 File Binari
+
+Su certi sistemi piE<ugrave> obsoleti con modelli di I/O che si potrebbero
+pietosamente chiamare convoluti in fase terminale (altri direbbero rotti),
+un file non E<egrave> un file -- almeno per quanto riguarda la libreria I/O
+standard di C. Su questi vecchi sistemi le cui librerie (ma non
+i kernel) fanno distinzione fra stream di testo e stream binari, per
+far sE<igrave> che i file si comportino a modo, avrebbe bisogno di piegarvi
+al passato per evitare fastidiosi problemi. In tali sistemi
+infelici, i socket e le pipe sono giE<agrave> aperti in modalitE<agrave> binaria,
+e non c'E<egrave> al momento alcun modo per evitarlo. Con i file, avete piE<ugrave>
+opzioni.
+
+Un'altra opzione consiste nell'utilizzare la funzione C<binmode>
+sui I<filehandle> appropriati prima di effettuarci le regolari
+operazioni di I/O:
+
+    binmode(STDIN);
+    binmode(STDOUT);
+    while (<STDIN>) { print } 
+
+Si puE<ograve> anche passare un'opzione non standard a C<sysopen>, che aprirE<agrave>
+il file in modalitE<agrave> binaria nei sistemi che lo supportano. Questo
+equivale ad aprire il file normalmente, per poi chiamare C<binmode>
+sull'I<handle>.
+
+    sysopen(BINDAT, "record.dati", O_RDWR | O_BINARY)
+        || die "impossible aprire record.dati: $!";
+
+Ora potete utilizzare C<read> e C<print> sull'I<handle> senza dovervi
+preoccupare se librerie non standard di sistema corromperanno i vostri
+dati o meno. Non E<egrave> quello che si dice un bel quadro, ma si puE<ograve> dire
+raramente quando si parla di sistemi obsoleti. CP/M ci accompagnerE<agrave> fino
+alla fine dei nostri giorni, ed oltre.
+
+Su sistemi con sistemi di I/O esotici, si dE<agrave> il caso che, abbastanza
+stupefacentemente, persino l'I/O non bufferizzato utilizzando C<sysread>
+e C<syswrite> puE<ograve> portare a qualche insidiosa mutilazione di dati
+alle vostre spalle.
+
+    while (sysread(WHENCE, $buf, 1024)) {
+        syswrite(WHITHER, $buf, length($buf));
+    } 
+
+Dipendentemente dalle vicissitudini del vostro sistema a runtime, persino
+queste chiamate potrebbero aver bisogno di C<binmode> o C<O_BINARY>. Una
+lista di sistemi noti per essere liberi da queste difficoltE<agrave> include
+Unix, Mac OS, Plan 9 ed Inferno.
+
+=head2 Blocco di un File
+
+In un ambiente multitasking [ossia, in grado di eseguire piE<ugrave> compiti
+alla volta, N.d.T.] potreste aver bisogno di fare attenzione a non
+scontrarvi con altri processi che vogliono effettuare I/O sugli stessi
+file su cui state lavorando. Avrete spesso bisogno di I<lock>
+[blocchi, nel senso del verbo bloccare, N.d.T.] condivisi o esclusivi
+sui file per leggere e scrivere, rispettivamente. Potreste anche far
+finta che esistano solo lock esclusivi.
+
+Non utilizzate mai il test di esistenza di un file C<-e $file> come
+indicazione di bloccaggio, perchE<eacute> esiste una "race condition"
+["corsa critica" o "sezione critica", N.d.T.] tra il momento del test
+di esistenza del file e la sua creazione. E<Egrave> possibile che un altro
+processo crei un file in quel breve intervallo fra il vostro test di
+esistenza ed il vostro tentativo di creare il file. L'atomicitE<agrave> E<egrave> critica.
+
+L'interfaccia di blocco piE<ugrave> portabile in Perl E<egrave> attraverso la funzione
+C<flock>, la cui semplicitE<agrave> viene emulata sui sistemi che non la supportano
+direttamente come SysV e Windows. La semantica sottostante puE<ograve> influire
+su come funziona il tutto, quindi E<egrave> opportuno che impariate come
+sia stata implementata C<flock> nel porting di Perl sul vostro sistema.
+
+Il lock di un file I<non> impedisce ad un altro processo di fare I/O.
+Un lock di un file semplicemente blocca altri nel tentativo di
+ottenere un lock stesso, non i processi che provano a fare I/O. PoichE<eacute>
+il rispetto di questi lock non E<egrave> tassativo, se un processo utilizza
+questo meccanismo ed un altro no, tutti gli schemi saltano.
+
+Per default, la chiamata a C<flock> bloccherE<agrave> il processo finchE<eacute> non
+viene assegnato il lock. Una richiesta di un lock condiviso sarE<agrave>
+assegnata appena non ci siano piE<ugrave> lock esclusivi. Una richiesta di
+lock esclusivo sarE<agrave> assegnata solo quando non c'E<egrave> piE<ugrave> un lock di
+alcun tipo. I lock vengono posti sui descrittori di file, non sui
+nomi dei file. Non potete bloccare un file finchE<eacute> non lo aprite,
+e non potete tenere un lock su un file una volta chiuso.
+
+Ecco come ottenere un lock condiviso bloccante su un file, tipicamente
+utilizzato per la lettura:
+
+    use 5.004;
+    use Fcntl qw(:DEFAULT :flock);
+    open(FH, "< nomefile")  or die "impossibile aprire nomefile: $!";
+    flock(FH, LOCK_SH) 	    or die "impossibile bloccare nomefile: $!";
+    # ora leggi da FH
+
+Potete ottenere un lock non bloccante utilizzando C<LOCK_NB>.
+
+    flock(FH, LOCK_SH | LOCK_NB)
+        or die "impossibile bloccare nomefile: $!";
+
+CiE<ograve> puE<ograve> essere utile per ottenere un comportamento piE<ugrave> gentile con
+l'utente avvisando che state per bloccare:
+
+    use 5.004;
+    use Fcntl qw(:DEFAULT :flock);
+    open(FH, "< nomefile")  or die "impossibile aprire nomefile: $!";
+    unless (flock(FH, LOCK_SH | LOCK_NB)) {
+        $| = 1;
+        print "Aspetto il lock...";
+        flock(FH, LOCK_SH)  or die "impossibile bloccare nomefile: $!";
+        print "preso.\n"
+    } 
+    # ora leggi da FH
+
+Per ottenere un lock esclusivo, tipicamente utilizzato in scrittura,
+dovete prestare attenzione. Effettuiamo una C<sysopen> del file,
+in modo che possa essere bloccato prima che sia svuotato. Potete
+ottenere la versione non bloccante utilizzando C<LOCK_EX | LOCK_NB>.
+
+    use 5.004;
+    use Fcntl qw(:DEFAULT :flock);
+    sysopen(FH, "nomefile", O_WRONLY | O_CREAT)
+        or die "impossibile aprire nomefile: $!";
+    flock(FH, LOCK_EX)
+        or die "impossibile bloccare nomefile: $!";
+    truncate(FH, 0)
+        or die "impossibile troncare nomefile: $!";
+    # ora scrivi su FH
+
+Infine, per colpa di quei milioni che non possono essere distolti
+dal perdere cicli CPU su quei dispositivi di inutile vanitE<agrave> chiamati
+contatori di richieste di pagine web, ecco come incrementare un numero
+in un file in maniera sicura:
+
+    use Fcntl qw(:DEFAULT :flock);
+
+    sysopen(FH, "numfile", O_RDWR | O_CREAT)
+        or die "impossibile aprire numfile: $!";
+    # autoflush FH
+    $ofh = select(FH); $| = 1; select ($ofh);
+    flock(FH, LOCK_EX)
+        or die "impossibile bloccare numfile per la scrittura: $!";
+
+    $num = <FH> || 0;
+    seek(FH, 0, 0)
+        or die "impossibile tornare all'inizio di numfile : $!";
+    print FH $num+1, "\n"
+        or die "impossibile scrivere numfile: $!";
+
+    truncate(FH, tell(FH))
+        or die "errore di truncate su numfile: $!";
+    close(FH)
+        or die "impossibile chiudere numfile: $!";
+
+=head2 Strati IO
+
+In Perl 5.8.0 E<egrave> stato introdotto un nuovo ambiente di I/O chiamato
+"PerlIO". Si tratta di un nuovo "sistema idrico" per la gestione di
+tutto l'I/O in Perl; nella maggior parte dei casi funzionerE<agrave> tutto
+come prima, ma PerlIO introduce anche nuove caratteristiche come la
+possibilitE<agrave> di pensare l'I/O come una serie di "strati". Uno
+strato I/O puE<ograve>, oltre al semplice spostamento dei dati, effettuarvi
+delle trasformazioni. Queste trasformazioni includono compressione
+e decompressione, crittazione e decrittazione e la trasformazione
+fra le varie codifiche dei caratteri.
+
+Una discussione approfondita sulle caratteristiche di PerlIO E<egrave> fuori
+dagli obiettivi di questo tutorial, ma ecco come riconoscere gli
+strati in uso:
+
+=over 4
+
+=item *
+
+Viene utilizzata a forma di C<open> a tre (o piE<ugrave>) parametri ed il
+secondo argomento contiene qualcosa in piE<ugrave> rispetto ai soliti
+caratteri
+C<< '<' >>, C<< '>' >>, C<< '>>' >>, C<< '|' >> e relative varianti,
+ad esempio:
+
+    open(my $fh, "<:utf8", $fn);
+
+=item *
+
+Viene utilizzata la forma a due parametri di C<binmode>, ad esempio
+
+    binmode($fh, ":encoding(utf16)");
+
+=back
+
+Per una discussione piE<ugrave> dettagliata su PerlIO consultate L<PerlIO>;
+per una discussione piE<ugrave> dettagliata su Unicode e I/O consultate
+L<perluniintro>.
+
+=head1 CONSULTATE ANCHE
+
+Le funzioni C<open> e C<sysopen> in C<perlfunc(1)>;
+le pagine di manuale per le funzioni di sistema C<open(2)>, C<dup(2)>,
+C<fopen(3)> e C<fdopen(3)>;
+la documentazione POSIX.
+
+=head1 AUTORE e COPYRIGHT
+
+Copyright 1998 Tom Christiansen.  
+
+This documentation is free; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Irrespective of its distribution, all code examples in these files are
+hereby placed into the public domain.  You are permitted and
+encouraged to use this code in your own programs for fun or for profit
+as you see fit.  A simple comment in the code giving credit would be
+courteous but is not required.
+
+[Le note di copyright sono usualmente valide solo nella lingua
+originale, viste le implicazioni legali. Il testo corrisponde grosso
+modo a quanto segue:
+
+ Questa documentazione e` libera; potete ridistribuirla e/o modificarla
+ sotto gli stessi termini di Perl stesso.
+
+ Indipendentemente dalla sua distribuzione, tutti i codici di esempio
+ in questi file sono qui posti nel pubblico dominio. Vi e` consentito,
+ e siete anzi incoraggiati a farlo, utilizzare questo codice nei vostri
+ propri programmi per divertimento o per profitto, come vi sembra meglio.
+ Un semplice commento nel codice per dare credito sarebbe cortese ma non
+ e` richiesto.
+
+N.d.T.]
+
+=head1 STORIA
+
+Prima release: Sabato 9 Gennaio 1999, 08:09:11 MST
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlopentut
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Flavio Poletti.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

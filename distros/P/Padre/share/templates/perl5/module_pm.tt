@@ -1,0 +1,26 @@
+package [% module %];
+
+[% IF style.use_perl %]
+[% style.use_perl %]
+[% END %]
+[% IF style.use_strict %]
+use strict;
+[% END %]
+[% IF style.use_warnings %]
+use warnings;
+[% END %]
+[% IF style.version_line %]
+[% style.version_line %]
+[% ELSE %]
+
+our $VERSION = '0.01';
+[% END %]
+
+sub new {
+	my $class = shift;
+	my $self  = bless { @_ }, $class;
+
+	return $self;
+}
+
+1;

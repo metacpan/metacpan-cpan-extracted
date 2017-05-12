@@ -1,0 +1,340 @@
+WHAT IS Paths/Graph?
+
+This is Graph.pm, an easy for finding path in the graph.
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
+
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module not requires these other modules and libraries exept the some perl. 
+
+WHERE ARE THE EXAMPLES?
+
+A collection of examples demonstrating various utils features and
+techniques are in the directory "examples".  
+
+WHERE CAN I LEARN MORE?
+
+Books of Tree on techniques of structure programming.
+
+NAME
+
+Path::Graph - Generate paths from hash graph.
+
+SYNOPSIS
+
+#!usr/bin/perl
+
+my %graph = (
+                A => {B=>1,C=>4},
+                B => {A=>1,C=>2},
+                C => {A=>4,B=>2}
+
+);
+
+use Paths::Graph;
+my $g = Paths::Graph->new(-origin=>"A",-destiny=>"C",-graph=>\%graph);
+my @paths = $g->shortest_path();
+for my $path (@paths) {
+        print "Shortest Path:" . join ("->" , @$path) . " Cost:". $g->get_path_cost(@$path) ."\n";
+}
+
+
+RECOMMENDED
+
+Understanding the Graph's filosofy and how to trace it. 
+
+Reach for graph's books , also Dijkstra's algorithm.
+
+ABSTRACT
+
+This example cover all possibilities to find the graph's paths from Node A to Node C and the cost for itself.
+
+Graph
+
+			     (A)---4---(C)
+			    /   \     /   \
+			   2     1   2     6
+			  /       \ /       \
+			(G)---8---(B)---9---(F)
+			  \       / \       /
+			   3     1   5     2
+			    \   /     \   /
+			     (D)---7---(E)
+
+
+	Matriz costs nodes                    From A to C paths and costs
+
+	+---+---+---+---+---+---+---+---+     A->B->G->D->E->F->C = 27  
+	|   | A | B | C | D | E | F | G |     A->G->B->E->F->C    = 23 
+	+---+---+---+---+---+---+---+---+     A->G->B->C          = 12  
+	| A |   | 1 | 4 |   |   |   | 2 |     A->B->D->E->F->C    = 17
+	+---+---+---+---+---+---+---+---+     A->G->D->E->B->C    = 19 
+	| B | 1 |   | 2 | 1 | 5 | 9 | 8 |     A->C                = 4 
+	+---+---+---+---+---+---+---+---+     A->G->D->E->B->F->C = 28 
+	| C | 4 | 2 |   |   |   | 6 | 0 |     A->G->D->B->C       = 8
+	+---+---+---+---+---+---+---+---+     A->B->C             = 3 
+	| D |   | 1 |   |   | 7 |   | 3 |     A->G->D->B->F->C    = 21
+	+---+---+---+---+---+---+---+---+     A->B->F->C          = 16 
+	| E |   | 5 |   | 7 |   | 2 | 0 |     A->G->D->B->E->F->C = 19
+	+---+---+---+---+---+---+---+---+     A->G->D->E->F->C    = 18 
+	| F |   | 9 | 6 |   | 2 |   | 0 |     A->B->D->E->F->C    = 17 
+	+---+---+---+---+---+---+---+---+     A->G->B->D->E->F->C = 26 
+	| G | 2 | 8 |   | 3 |   |   | 0 |     A->G->D->E->F->B->C = 19
+	+---+---+---+---+---+---+---+---+     A->G->B->F->C       = 25 
+
+
+DESCRIPTION
+
+This package provides an object class which can be used to get diferents graph paths , with only pure perl code and I don't use other packet or module cpan.
+
+This class calculates the shortest path between two nodes in a graph and return in other method , vals in the execution time (free_path_event).
+
+Technically , the graph is composed of vertices (nodes) and edges (with optional weights) linked between them.
+
+The shortest path is found using the Dijkstra's algorithm. This algorithm is the fastest and requires all weights to be positive. 
+
+The object builds a help about this concept of the graph's , exist a method named debug().
+
+Three Case how to call Object and get a good performance as following:
+
+CASE 1 $obj->shortest_path
+
+	#!/usr/bin/perl
+
+	my %graph = (
+			A => {B=>1,C=>4,G=>2},
+			B => {A=>1,C=>2,D=>1,E=>5,F=>9,G=>8},
+			C => {A=>4,B=>2,F=>6},
+			D => {B=>1,E=>7,G=>3},
+			E => {B=>5,D=>7,F=>2},
+			F => {B=>9,C=>6,E=>2},
+			G => {A=>2,B=>8,D=>3}
+	);
+
+	use Paths::Graph;
+
+	my $obj = Paths::Graph->new(-origin=>"A",-destiny=>"F",-graph=>\%graph);
+	my @paths = $obj->shortest_path();
+	for my $path (@paths) {
+		print "Shortest Path:" . join ("->" , @$path) . " Cost:". $obj->get_path_cost(@$path) . "\n";
+	}
+
+CASE 2 $obj->free_path_event
+
+	#!/usr/bin/perl
+
+	my %graph = (
+			A => {B=>1,C=>4,G=>2},
+			B => {A=>1,C=>2,D=>1,E=>5,F=>9,G=>8},
+			C => {A=>4,B=>2,F=>6},
+			D => {B=>1,E=>7,G=>3},
+			E => {B=>5,D=>7,F=>2},
+			F => {B=>9,C=>6,E=>2},
+			G => {A=>2,B=>8,D=>3},
+	);
+
+	use Paths::Graph;
+	my $obj = Paths::Graph->new(-origin=>"A",-destiny=>"F",-graph=>\%graph,-sub=>\&get_paths);
+	$obj->free_path_event();
+	sub get_paths {
+		my ($self , @nodes) = @_;
+		print join("->",@nodes) . "\n";
+	}
+
+CASE 3 $obj->debug()
+
+	#!/usr/bin/perl
+
+	my %graph = (
+			A => {B=>1,C=>4,G=>2},
+			B => {A=>1,C=>2,D=>1,E=>5,F=>9,G=>8},
+			C => {A=>4,B=>2,F=>6},
+			D => {B=>1,E=>7,G=>3},
+			E => {B=>5,D=>7,F=>2},
+			F => {B=>9,C=>6,E=>2},
+			G => {A=>2,B=>8,D=>3},
+	);
+
+	use Paths::Graph;
+	my $obj = Paths::Graph->new(-origin=>"A",-destiny=>"F",-graph=>\%graph);
+	$obj->debug();
+
+PARAMETERS
+
+$obj->{graph}
+
+This object is the main element to resolve the trace graph problem.
+
+The following cases are options of how this hash operate.
+
+Note:It's not important the nodes's names  , it's only important the nodes's values. example.
+
+	my %g = ( 
+		Linux => {Perl=>10,Regex=>20}
+		CPAN  => {Modules=>1,Opensource=>100} 
+	);
+
+CASE 1 Directed Graph
+
+The directed graph are covered too.
+
+	my %g = (
+		A => {B=>10,C=>20,D=>1},
+		C => {B=>25,G=>1}
+	); 
+
+Fixed D and G do not exist , but it's fine.
+
+CASE 2 Jumper Graph
+
+	my %g = (
+		A => {B=>1,C=>1,D=>1},
+		C => {B=>1,G=>1}
+	); 
+
+Fixed D and G do not exist , but it's fine.
+
+or
+
+	my %g = (
+		A => {B=>1,C=>1},
+		B => {B=>1,C=>1},
+		C => {A=>1,B=>1}
+	); 
+
+CASE 3 Cost Graph 
+
+	my %graph = (
+			A => {B=>1,C=>4},
+			B => {A=>1,C=>2},
+			C => {A=>4,B=>2},
+	); 
+
+The cost from A->C=4 and C->A=4
+
+my %graph = (
+                A => {B=>1,C=>1},
+                B => {A=>1,C=>2},
+                C => {A=>4,B=>2},
+); 
+
+The cost from A->C=1 and C->A=4
+
+If the cost is distinct , it's not a problem.
+
+$obj->{origin} and $obj->{destiny}
+
+It's not important the order on the hash graph. 
+
+$obj->{origin} = "A";
+
+$obj->{destiny} = "B";
+
+or
+
+$obj->{origin} = "A";
+
+$obj->{destiny} = "A";
+
+Is not a problem if the origin and destiny nodes are equals. In this case the graph is traced from A to A.
+
+$obj->{sub}
+
+This method returns the parameters from the object:
+
+$self  = some object control.
+@nodes = vals of arrays.
+
+Note:The values's names do not have to be necesary equals , example;
+
+	$obj->{sub} = \&my_method;
+
+	sub my_method {
+
+		my ($obj,@nodes)  = @_ ; # good
+
+	}
+  
+The method described above assigned its values to the object (my_method).  
+
+$obj->shortest_path()
+
+This object's method find the shortest path and cost for the graph using the hash.  
+
+$obj->free_paths_event() 
+
+This method return a paths array during the execution time , it's generated a method to receive an array and the object with its methods and values.
+
+$obj->get_path_cost();
+
+This method returns the paths cost (nodes array). 
+
+Trace graph hash recurcive.   
+
+$obj->debug()
+
+Educational procedure traces and shows the algorithm during execution time ($obj->debug). This method shows how the algorithm is being deploy background. 
+
+
+DEBUGGING
+
+Implementation of educational procedure of the object to call the debug() method;
+
+GLOBAL PROCESSING
+
+Using the recursive technique in the object methods.
+
+EXPORT
+
+These methods are exported as follow: shortest_path() free_path_event() debug()
+
+SEE ALSO
+
+None by default. But can be exported if it's required.
+
+Please report bugs using: <cristian@codigolibre.cl>.
+
+Powerfull features in the future.
+
+HISTORY
+
+Update in 2008 problem found by Keunwan Park problem produced in search where node value is equal to '0'
+
+Thank , Keunwan Park will be contribute to perl comunity
+
+Solucionate by me ;) , update available in version 0.03
+
+
+AUTHOR
+
+      Cristian Vasquez Diaz
+      CPAN ID: CAVASQUEZ
+      cristian@codigolibre.cl
+      http://www.codigolibre.cl
+
+COPYRIGHT AND LICENSE
+
+Copyright 2004 by Cristian Vasquez Diaz
+
+This library is free software you can redistribute it and/or modify it under the same terms as Perl itself.
+

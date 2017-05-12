@@ -1,0 +1,674 @@
+##-*- Mode: CPerl -*-
+
+##======================================================================
+## Header Administrivia
+##======================================================================
+
+use PDL::VectorValued::Dev;
+my $VERSION = '1.23.3'; ##-- update with perl-reversion from Perl::Version module
+pp_setversion($VERSION);
+
+##------------------------------------------------------
+## pm headers
+pp_addpm({At=>'Top'},<<'EOPM');
+
+#use PDL::CCS::Version;
+use strict;
+
+=pod
+
+=head1 NAME
+
+PDL::CCS::Ufunc - Ufuncs for compressed storage sparse PDLs
+
+=head1 SYNOPSIS
+
+ use PDL;
+ use PDL::CCS::Ufunc;
+
+ ##---------------------------------------------------------------------
+ ## ... stuff happens
+
+=cut
+
+EOPM
+## /pm additions
+##------------------------------------------------------
+
+##------------------------------------------------------
+## Exports: None
+#pp_export_nothing();
+
+##------------------------------------------------------
+## Includes / defines
+pp_addhdr(<<'EOH');
+
+#include <math.h>
+
+#ifndef INFINITY
+# define INFINITY (1.0/0.0)
+#endif
+
+EOH
+
+##------------------------------------------------------
+## index datatype
+require "../Config.pm";
+our $INDX = $PDL::CCS::Config::ccsConfig{INDX_SIG};
+pp_addpm( $PDL::CCS::Config::ccsConfig{INDX_FUNCDEF} );
+pp_addhdr( $PDL::CCS::Config::ccsConfig{INDX_TYPEDEF} );
+
+
+##======================================================================
+## C Utilities
+##======================================================================
+# (none)
+
+##======================================================================
+## PDL::PP Wrappers
+##======================================================================
+
+
+##======================================================================
+## Operations: Accumulators (Ufuncs)
+##======================================================================
+#pp_addpm(<<'EOPM');
+#
+#=pod
+#
+#=head1 Ufuncs (Accumulators)
+#
+#=cut
+#
+#EOPM
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): Generic
+
+## %vvpp_def_hash = ccs_accum_hash($op_codename, $op_docname, %args)
+## + known %args
+##    out_type        => $pptype_or_undef,   ##-- set type of output $nzvals (default: match input $nzvals)
+##    out_type_perl   => $perlcode_or_undef, ##-- set output perl type
+##    max_type_perl   => $perlcode_or_undef, ##-- set maximum default output perl type (e.g. 'PDL::long()')
+##    init_missingOut => $ppcode_or_undef,   ##-- sets value missingOut: default: 'missingOut=$missing();'
+##    init_code       => $ppcode_or_undef,   ##-- misc initialization
+##    tmp_type        => $ppcode_or_undef,   ##-- default: $GENERIC(nzvalsOut)
+##    tmp_addmissing  => $ppcode_or_undef,   ##-- updates C var 'tmp' before insertion (may reference nMissing)
+##    #tmp_isgood     => $ppcode_or_undef,  ##-- if defined, checks whether C var (tmp) should be considered "good"
+##    tmp_addval      => $ppcode_or_undef,   ##-- add PP value $nzvalsIn(NnzIn=>nnzii) to tmp
+##    tmp_reset       => $ppcode_or_undef,   ##-- reset tmp on index change (default: tmp=$nzvalsIn(NnzIn=>nnzii)) --> QUITE USELESS
+##    doc_addmissing  => $addmissing_doc,    ##-- doc for 'addmissing'
+##    extra           => \%extraPPArgs,      ##-- extra args for vvpp_def()
+sub ccs_accum_hash {
+  my ($op_codename,$op_docname,%args) = @_;
+  return
+    (
+  Pars => ("\n    "
+	   .join(";\n    ",
+		 "$INDX ixIn(Ndims,NnzIn)",    ##-- sorted nz-indices of projected dimensions (1..Ndims), with repeats
+		 'nzvalsIn(NnzIn)',            ##-- all nz-values
+		 'missing()',                  ##-- missing value         (default: $PDL::undefval (0))
+		 "$INDX N()",                     ##-- size of 0th dimension (<=0 to ignore missing values)
+		 "$INDX\ [o]ixOut(Ndims,NnzOut)", ##-- unique indices of projected dimensions
+		 (
+		  ($args{out_type} ? ($args{out_type}.' ') : '   ').'[o]nzvalsOut(NnzOut)'
+		 ),		               ##-- unique nz-values of projected dims which contain >=1 input nz
+		 "$INDX\ [o]nOut()",           ##-- number of unique output index-vectors
+		 '')),
+     HandleBad => 1,
+     PMCode =>
+(q(
+ sub PDL::ccs_accum_).${op_codename}.q( {
+   my ($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut) = @_;
+   my ($ndims,@nnzIn) = $ixIn->dims;
+   my (@nnzOut);
+   if (defined($ixOut)) {
+     @nnzOut = $ixOut->dims;
+     shift(@nnzOut);
+   }
+).($args{max_type_perl} ? "
+   \$nzvalsIn = $args{max_type_perl}(\$nzvalsIn) if (\$nzvalsIn->type > $args{max_type_perl}()); ##-- max_type_perl=$args{max_type_perl}"
+   : "").q(
+   @nnzOut = $nzvalsOut->dims if (!@nnzOut && defined($nzvalsOut) && !$nzvalsOut->isempty);
+   @nnzOut = @nnzIn           if (!@nnzOut);
+   $ixOut  = PDL->zeroes(ccs_indx(), $ndims,@nnzOut)
+     if (!defined($ixOut)      || $ixOut->isempty);
+).'
+   $nzvalsOut = PDL->zeroes(('.($args{out_type_perl} ? "$args{out_type_perl}()" : '$nzvalsIn->type').'), @nnzOut)
+     if (!defined($nzvalsOut) || $nzvalsOut->isempty);
+'.q(
+   $nOut = PDL->pdl(ccs_indx(),0)                  if (!defined($nOut) || $nOut->isempty);
+   ##
+   ##-- guts
+   &PDL::_ccs_accum_).${op_codename}.q(_int($ixIn,$nzvalsIn, $missing,$N, $ixOut,$nzvalsOut,$nOut);
+   ##
+   ##-- auto-trim
+   $ixOut      = $ixOut->slice(",0:".($nOut->max-1));
+   $nzvalsOut  = $nzvalsOut->slice("0:".($nOut->max-1));
+   ##
+   ##-- return
+   return wantarray ? ($ixOut,$nzvalsOut,$nOut) : $nzvalsOut;
+ }
+)),
+	   Code =>
+(q(
+ CCS_Indx nnzii_prev=-1, nnzii=0, nnzoi=0;
+ CCS_Indx sizeNnzIn=$SIZE(NnzIn), sizeNnzOut=$SIZE(NnzOut), nMissing, nMissingInit;
+ CCS_Indx ival1,ival2;
+ int cmpval, carp_unsorted=0;
+ $GENERIC(nzvalsOut) missingOut;
+ $GENERIC(missing)   missingVal;
+ ).($args{decls}    ? $args{decls}    : '').q(
+ ).($args{tmp_type} ? $args{tmp_type} : '$GENERIC(nzvalsOut)').q( tmp;
+ //
+ //-- init
+ ).($args{init_code}||'').q(
+ ).($args{init_missingOut} || 'missingOut = $missing();').q(
+ missingVal   = $missing();
+ nMissingInit = $N()-1;
+ nMissing     = nMissingInit;
+ ).(defined($args{tmp_reset}) ? $args{tmp_reset} :  'tmp = $nzvalsIn(NnzIn=>0);').q( /* initialize tmp */
+ //
+ //-- loop
+ for (nnzii_prev=0,nnzii=1; nnzii<sizeNnzIn && nnzoi<sizeNnzOut; nnzii_prev=nnzii++) {
+   $CMPVEC('$ixIn(NnzIn=>nnzii)','$ixIn(NnzIn=>nnzii_prev)','Ndims','cmpval',var1=>'ival1',var2=>'ival2');
+   if (cmpval > 0) {
+     //-- CASE: ix > ix_prev : insert accumulated value
+     ).($args{tmp_addmissing}||"").q(
+     //-- always insert output value
+     loop (Ndims) %{ $ixOut(NnzOut=>nnzoi) = $ixIn(NnzIn=>nnzii_prev); %}
+     $nzvalsOut(NnzOut=>nnzoi) = tmp;
+     nnzoi++;
+     //
+     // ... and reset temps
+     ).(defined($args{tmp_reset}) ? $args{tmp_reset} :  'tmp = $nzvalsIn(NnzIn=>nnzii);').q( /* reset tmp */
+     nMissing = nMissingInit;
+   }
+   else if (cmpval <= 0) {
+     // CASE: ix >= ix_prev : accumulate to temps
+     ).($args{tmp_addval}||'').q(;
+     nMissing--;
+     if (cmpval < 0) { carp_unsorted=1; } /*-- CASE: ix < ix_prev : GARBAGE (treat as equal) --*/
+   }
+ }
+ //
+ //-- sanity check).'
+ if (nnzii<sizeNnzIn) {
+   warn("PDL::ccs_accum_'.${op_codename}.'(): too few output values provided: some input values were ignored");
+ }'.q(
+ //
+ //-- set final computed output values
+ ).($args{tmp_addmissing}||'').q(
+ loop (Ndims) %{ $ixOut(NnzOut=>nnzoi) = $ixIn(NnzIn=>nnzii_prev); %}
+ $nzvalsOut(NnzOut=>nnzoi) = tmp;
+ nnzoi++;
+ $nOut() = nnzoi;
+ //
+ //-- set any remaining output values to 0 (indices) or "N*missing" (values)
+ for ( ; nnzoi<sizeNnzOut; nnzoi++) {
+   loop (Ndims) %{ $ixOut(NnzOut=>nnzoi) = 0; %}
+   $nzvalsOut(NnzOut=>nnzoi) = missingOut;
+ }
+ //
+ //-- carp?).'
+ if (carp_unsorted) {
+   warn("PDL::ccs_accum_'.${op_codename}.'(): unsorted input vector list detected: output will be incorrect");
+ }'.q(
+ //-- END
+)),
+  CopyBadStatusCode => (
+q(
+  /* propagate badflag if inplace AND it has changed */
+  if ( $ISPDLSTATEBAD(nzvalsIn) || $ISPDLSTATEBAD(missing) ) {
+    $SETPDLSTATEBAD(nzvalsOut);
+  } else {
+    $SETPDLSTATEGOOD(nzvalsOut);
+  }
+  if ( $ISPDLSTATEBAD(ixIn) ) {
+    $SETPDLSTATEBAD(ixOut);
+  } else {
+    $SETPDLSTATEGOOD(ixOut);
+  }
+)),
+	   Doc =>
+(q(
+Accumulated ).${op_docname}.q( over values $nzvalsIn() associated with vector-valued keys $ixIn().
+On return,
+$ixOut() holds the unique non-"missing" values of $ixIn(),
+$nzvalsOut() holds the associated values,
+and
+$nOut() stores the number of unique non-missing values computed.
+
+).($args{doc_addmissing}||'').q(
+
+Returned PDLs are implicitly sliced such that NnzOut==$nOut().
+
+In scalar context, returns only $nzvalsOut().
+
+)),
+  ($args{extra} ? %{$args{extra}} : qw()),
+  ); ##--/ccs_accum_hash: return
+} ##--/ccs_accum_hash: sub
+
+sub ccs_accum_def {
+  vvpp_def(('ccs_accum_'.$_[0]), ccs_accum_hash(@_));
+}
+
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): prod
+ccs_accum_def('prod', 'product',
+	      init_missingOut=>'if ($N() > 0) { missingOut = pow(missingVal, $N()); } else { missingOut = missingVal; }',
+	      tmp_addmissing =>'if (nMissing > 0) { tmp *= pow(missingVal, nMissing); }',
+	      #tmp_isgood     =>'tmp != missingOut',
+	      tmp_addval     =>'tmp *= $nzvalsIn(NnzIn=>nnzii);',
+	      doc_addmissing => <<'EOMD',
+
+If $N() is specified and greater than zero, then the quantity:
+
+ $missing ** ($N - (rlevec($ixIn))[0])
+
+is multiplied into $nzvalsOut: this is probably What You Want if you are computing the product over a virtual
+dimension in a sparse index-encoded PDL (see PDL::CCS::Nd for a wrapper class).
+
+EOMD
+	     );
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): dprod
+ccs_accum_def('dprod', 'double-precision product',
+	      out_type       =>'double',
+	      out_type_perl  =>'PDL::double',
+	      init_missingOut=>'if ($N() > 0) { missingOut = pow(missingVal, $N()); } else { missingOut = missingVal; }',
+	      tmp_addmissing =>'if (nMissing > 0) { tmp *= pow(missingVal, nMissing); }',
+	      #tmp_isgood     =>'tmp != missingOut',
+	      tmp_addval     =>'tmp *= $nzvalsIn(NnzIn=>nnzii);',
+	      doc_addmissing => <<'EOMD',
+
+If $N() is specified and greater than zero, then the quantity:
+
+ $missing ** ($N - (rlevec($ixIn))[0])
+
+is multiplied into $nzvalsOut: this is probably What You Want if you are computing the product over a virtual
+dimension in a sparse index-encoded PDL (see PDL::CCS::Nd for a wrapper class).
+
+EOMD
+	     );
+
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): sum
+ccs_accum_def('sum', 'sum',
+	      init_missingOut=>'if ($N() > 0) { missingOut = $N() * missingVal; } else { missingOut = missingVal; }',
+	      tmp_addmissing =>'if (nMissing > 0) { tmp += nMissing * missingVal; }',
+	      #tmp_isgood     =>'tmp != missingOut',
+	      tmp_addval     =>'tmp += $nzvalsIn(NnzIn=>nnzii);',
+	      doc_addmissing => <<'EOMD',
+
+If $N() is specified and greater than zero, then the quantity:
+
+ $missing * ($N - (rlevec($ixIn))[0])
+
+is added to $nzvalsOut: this is probably What You Want if you are summing over a virtual
+dimension in a sparse index-encoded PDL (see PDL::CCS::Nd for a wrapper class).
+
+EOMD
+	     );
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): dsum
+ccs_accum_def('dsum', 'double-precision sum',
+	      out_type       =>'double',
+	      out_type_perl  =>'PDL::double',
+	      init_missingOut=>'if ($N() > 0) { missingOut = $N() * missingVal; } else { missingOut = missingVal; }',
+	      tmp_addmissing =>'if (nMissing > 0) { tmp += nMissing * missingVal; }',
+	      #tmp_isgood     =>'tmp != missingOut',
+	      tmp_addval     =>'tmp += $nzvalsIn(NnzIn=>nnzii);',
+	      doc_addmissing => <<'EOMD',
+
+If $N() is specified and greater than zero, then the quantity:
+
+ $missing * ($N - (rlevec($ixIn))[0])
+
+is added to $nzvalsOut: this is probably What You Want if you are summing over a virtual
+dimension in a sparse index-encoded PDL (see PDL::CCS::Nd for a wrapper class).
+
+EOMD
+	     );
+
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): or
+ccs_accum_def('or', 'logical "or"',
+	      extra          => {
+				 #GenericTypes => ['B','S','U','L',], ##-- 'Q', 'N'
+				 GenericTypes=>$PDL::CCS::Config::ccsConfig{INT_TYPE_CHRS},
+				},
+	      tmp_type       => 'char',
+	      init_missingOut=>'missingOut = missingVal;',
+	      tmp_addmissing =>'if (nMissing > 0) { tmp = tmp || missingVal; }   if (tmp) tmp=1; /* canonicalize */',
+	      tmp_addval     =>'tmp = tmp || $nzvalsIn(NnzIn=>nnzii);',
+	      doc_addmissing => <<'EOMD',
+
+If $N() is specified and greater than zero, $missing() is logically (or)ed
+into each result value at each output index with a run length of less than $N() in $ixIn().
+This is probably What You Want.
+
+EOMD
+	     );
+
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): and
+ccs_accum_def('and', 'logical "and"',
+	      extra          => {
+				 #GenericTypes => ['B','S','U','L',], ##-- 'Q', 'N'
+				 GenericTypes=>$PDL::CCS::Config::ccsConfig{INT_TYPE_CHRS},
+				},
+	      tmp_type       => 'char',
+	      init_missingOut=>'missingOut = missingVal;',
+	      tmp_addmissing =>'if (nMissing > 0) { tmp = tmp && missingVal; }   if (tmp) tmp=1; /* canonicalize */',
+	      tmp_addval     =>'tmp = tmp && $nzvalsIn(NnzIn=>nnzii);',
+	      doc_addmissing => <<'EOMD',
+
+If $N() is specified and greater than zero, $missing() is logically (and)ed
+into each result value at each output index with a run length of less than $N() in $ixIn().
+This is probably What You Want.
+
+EOMD
+	     );
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): bor
+ccs_accum_def('bor', 'bitwise "or"',
+	      extra          => {
+				 #GenericTypes => ['B','S','U','L',], ##-- 'Q', 'N'
+				 GenericTypes=>$PDL::CCS::Config::ccsConfig{INT_TYPE_CHRS},
+				},
+	      max_type_perl  => 'ccs_indx',
+	      init_missingOut=>'missingOut = missingVal;',
+	      tmp_addmissing =>'if (nMissing > 0) { tmp = tmp | missingVal; }',
+	      tmp_addval     =>'tmp |= $nzvalsIn(NnzIn=>nnzii);',
+	      doc_addmissing => <<'EOMD',
+
+If $N() is specified and greater than zero, $missing() is bitwise (or)ed
+into each result value at each output index with a run length of less than $N() in $ixIn().
+This is probably What You Want.
+
+EOMD
+	     );
+
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): band
+ccs_accum_def('band', 'bitwise "and"',
+	      extra          => {
+				 #GenericTypes => ['B','S','U','L',], ##-- 'Q', 'N'
+				 GenericTypes=>$PDL::CCS::Config::ccsConfig{INT_TYPE_CHRS},
+				},
+	      max_type_perl  => 'ccs_indx',
+	      init_missingOut=>'missingOut = missingVal;',
+	      tmp_addmissing =>'if (nMissing > 0) { tmp &= missingVal; }',
+	      tmp_addval     =>'tmp &= $nzvalsIn(NnzIn=>nnzii);',
+	      doc_addmissing => <<'EOMD',
+
+If $N() is specified and greater than zero, $missing() is bitwise (and)ed
+into each result value at each output index with a run length of less than $N() in $ixIn().
+This is probably What You Want.
+
+EOMD
+	     );
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): maximum
+ccs_accum_def('maximum', 'maximum',
+	      decls          =>'$GENERIC(nzvalsIn) curval;',
+	      init_missingOut=>'missingOut = missingVal;',
+	      tmp_addmissing =>'if (nMissing > 0 && missingVal > tmp) { tmp = missingVal; }',
+	      tmp_addval     =>'curval=$nzvalsIn(NnzIn=>nnzii); if (curval>tmp) tmp=curval;',
+	      doc_addmissing => <<'EOMD',
+
+If $N() is specified and greater than zero,
+and if $missing() is greater than any listed value for a vector key with a run-length
+of less than $N(), then $missing() is used as the output value for that key.
+This is probably What You Want.
+
+EOMD
+	     );
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): minimum
+ccs_accum_def('minimum', 'minimum',
+	      decls          =>'$GENERIC(nzvalsIn) curval;',
+	      init_missingOut=>'missingOut = missingVal;',
+	      tmp_addmissing =>'if (nMissing > 0 && missingVal < tmp) { tmp = missingVal; }',
+	      tmp_addval     =>'curval=$nzvalsIn(NnzIn=>nnzii); if (curval<tmp) tmp=curval;',
+	      doc_addmissing => <<'EOMD',
+
+If $N() is specified and greater than zero,
+and if $missing() is less than any listed value for a vector key with a run-length
+of less than $N(), then $missing() is used as the output value for that key.
+This is probably What You Want.
+
+EOMD
+	     );
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): maximum_nz_ind ~ maximum_ind
+ccs_accum_def('maximum_nz_ind', 'maximum_nz_ind',
+	      out_type       =>"$INDX",
+	      out_type_perl  => 'ccs_indx',
+	      decls          =>'$GENERIC(nzvalsIn) curval, bestval;',
+	      init_missingOut=>'missingOut = -1;',
+	      tmp_addmissing =>'if (nMissing > 0 && $ISGOOD(missing()) && missingVal > bestval) { tmp=missingOut; }',
+	      tmp_addval     =>'curval=$nzvalsIn(NnzIn=>nnzii); if (curval>bestval) { bestval=curval; tmp=nnzii; }',
+	      tmp_reset      =>'curval=$nzvalsIn(NnzIn=>nnzii); bestval=curval; tmp=nnzii;',
+	      doc_addmissing => <<'EOMD',
+
+Output indices index $nzvalsIn, -1 indicates that the missing value is maximal.
+
+EOMD
+	     );
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): minimum_nz_ind ~ minimum_ind
+ccs_accum_def('minimum_nz_ind', 'minimum_nz_ind',
+	      out_type       =>"$INDX",
+	      out_type_perl  => 'ccs_indx',
+	      decls          =>'$GENERIC(nzvalsIn) curval, bestval;',
+	      init_missingOut=>'missingOut = -1;',
+	      tmp_addmissing =>'if (nMissing > 0 && $ISGOOD(missing()) && missingVal < bestval) { tmp=missingOut; }',
+	      tmp_addval     =>'curval=$nzvalsIn(NnzIn=>nnzii); if (curval<bestval) { bestval=curval; tmp=nnzii; }',
+	      tmp_reset      =>'curval=$nzvalsIn(NnzIn=>nnzii); bestval=curval; tmp=nnzii;',
+	      doc_addmissing => <<'EOMD',
+
+Output indices index $nzvalsIn, -1 indicates that the missing value is minimal.
+
+EOMD
+	     );
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): nbad
+require PDL::Bad;
+ccs_accum_def('nbad', 'number of bad values',
+	      extra          =>{HandleBad=>1},
+	      out_type       =>'int+',
+	      max_type_perl  =>'ccs_indx',
+	      #init_missingOut=>'missingOut=$N();',
+	      init_missingOut=>'missingOut=missingVal;', ##-- not really right, but compatible
+	      ($PDL::Bad::Status
+	       ? (
+		  tmp_addmissing =>'if (nMissing > 0 && $ISBAD(missing())) { tmp += nMissing; } /* bad support available */',
+		  tmp_addval     =>'if ( $ISBAD(nzvalsIn(NnzIn=>nnzii)) ) tmp++;',
+		  tmp_reset      =>'tmp = ( $ISBAD(nzvalsIn(NnzIn=>nnzii)) ) ? 1 : 0;',
+		 )
+	       : (
+		  tmp_addmissing =>';/* NO bad support available */',
+		  tmp_addval     =>';',
+		  tmp_reset      =>'tmp = 0;',
+		 )
+	      ),
+	      doc_addmissing => <<'EOMD',
+
+Should handle missing values appropriately.
+
+EOMD
+	     );
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): ngood
+ccs_accum_def('ngood', 'number of good values',
+	      extra          =>{HandleBad=>1},
+	      out_type       =>'int+',
+	      max_type_perl  =>'ccs_indx',
+	      #init_missingOut=>'missingOut=$N();',
+	      init_missingOut=>'missingOut=missingVal;', ##-- not really right, but compatible
+	      ($PDL::Bad::Status
+	       ? (
+		  tmp_addmissing =>'if (nMissing > 0 && $ISGOOD(missing())) { tmp += nMissing; } /* bad support available */',
+		  tmp_addval     =>'if ( $ISGOOD(nzvalsIn(NnzIn=>nnzii)) ) tmp++;',
+		  tmp_reset      =>'tmp = ( $ISGOOD(nzvalsIn(NnzIn=>nnzii)) ) ? 1 : 0;',
+		 )
+	       : (
+		  tmp_addmissing =>';/* NO bad support available */',
+		  tmp_addval     =>'tmp++;',
+		  tmp_reset      =>'tmp=1;'
+		 )
+	      ),
+	      doc_addmissing => <<'EOMD',
+
+Should handle missing values appropriately.
+
+EOMD
+	     );
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): nnz
+ccs_accum_def('nnz', 'number of non-zero values',
+	      out_type       =>'int+',
+	      max_type_perl  =>'ccs_indx',
+	      #init_missingOut=>'missingOut=$N();',
+	      init_missingOut=>'missingOut=missingVal;', ##-- not really right, but compatible
+	      tmp_addmissing =>'if (nMissing > 0 && missingVal != 0) { tmp += nMissing; }',
+	      tmp_addval     =>'if ($nzvalsIn(NnzIn=>nnzii) != 0) tmp++;',
+	      tmp_reset      =>'tmp = ( $nzvalsIn(NnzIn=>nnzii) != 0 ) ? 1 : 0;',
+	      doc_addmissing => <<'EOMD',
+
+Should handle missing values appropriately.
+
+EOMD
+	     );
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): average
+ccs_accum_def('average', 'average',
+	      decls => 'CCS_Indx ntmp;',
+	      out_type => 'float+',
+	      init_missingOut=>'if ($N() > 0) { missingOut=missingVal; } else { missingOut=INFINITY; }',
+	      tmp_reset      =>'tmp  = $nzvalsIn(NnzIn=>nnzii); ntmp=1;',
+	      tmp_addval     =>'tmp += $nzvalsIn(NnzIn=>nnzii); ntmp++;',
+	      tmp_addmissing =>(
+				'if (nMissing > 0) { tmp += nMissing * missingVal; }
+				 if ($N() > 0) { tmp /= $N(); } else { tmp /= ntmp; }'
+			       ),
+	      doc_addmissing => <<'EOMD',
+
+If $N() is specified and greater than zero, then the quantity:
+
+ $missing * ($N - (rlevec($ixIn))[0]) / $N
+
+is added to $nzvalsOut: this is probably What You Want if you are averaging over a virtual
+dimension in a sparse index-encoded PDL (see PDL::CCS::Nd for a wrapper class).
+
+EOMD
+	     );
+
+##--------------------------------------------------------------
+## Operations: Accumulators (Ufuncs): NYI
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head1 TODO / NOT YET IMPLEMENTED
+
+=over 4
+
+=item extrema indices
+
+maximum_ind, minimum_ind: not quite compatible...
+
+=item statistical aggregates
+
+daverage, medover, oddmedover, pctover, ...
+
+=item cumulative functions
+
+cumusumover, cumuprodover, ...
+
+=item other stuff
+
+zcover, intover, minmaximum
+
+=back
+
+=cut
+
+EOPM
+
+##======================================================================
+## Footer Administrivia
+##======================================================================
+
+##------------------------------------------------------
+## pm additions: footer
+pp_addpm(<<'EOPM');
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+Perl by Larry Wall.
+
+PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
+
+=cut
+
+##----------------------------------------------------------------------
+=pod
+
+=head1 KNOWN BUGS
+
+Probably many.
+
+=cut
+
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head2 Copyright Policy
+
+Copyright (C) 2007-2013, Bryan Jurish. All rights reserved.
+
+This package is free software, and entirely without warranty.
+You may redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1), PDL(3perl)
+
+=cut
+
+EOPM
+
+
+# Always make sure that you finish your PP declarations with
+# pp_done
+pp_done();
+##----------------------------------------------------------------------

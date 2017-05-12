@@ -1,0 +1,49 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0',
+                                      'Test::PAUSE::Permissions' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Clone' => '0',
+                                      'Const::Fast' => '0',
+                                      'Hash::Merge' => '0',
+                                      'List::AllUtils' => '0',
+                                      'List::MoreUtils' => '0',
+                                      'Moo' => '0',
+                                      'Moose' => '0',
+                                      'Moose::Exporter' => '0',
+                                      'MooseX::MungeHas' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Type::Tiny' => '0',
+                                      'Types::Standard' => '0',
+                                      'experimental' => '0',
+                                      'overload' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::Exception' => '0',
+                                   'Test::More' => '0',
+                                   'perl' => 'v5.20.0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,0 +1,74 @@
+#! /usr/bin/perl -w
+
+use strict;
+#use English qw( -no_match_vars );
+
+use Fcntl qw(O_CREAT O_WRONLY O_TRUNC);
+use Parse::QTEDI qw($parser);
+
+=head1 DESCIPTION
+
+Parse specified CPP header file. Get all required information for
+marshalling interface.
+
+B<NOTE>: currently focus on typedef and class declaration mainly.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 by Dongxu Ma
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+See L<http://dev.perl.org/licenses/artistic.html>
+
+=cut
+
+sub usage {
+    print STDERR << "EOU";
+usage: $0 <path_to_qtedi_header.h> [<path_to_output_file.yaml>]
+EOU
+    exit 1;
+}
+
+sub main {
+    usage() unless @ARGV;
+    
+    my ( $in, $out ) = @ARGV;
+    die "file not found: $!" unless -f $in;
+    my $source;
+    local ( *OUT );
+    
+    {
+        local ( *IN );
+        open IN, '<', $in or die "cannot open file: $!";
+        local $/;
+        $source = <IN>;
+        close IN or warn "cannot close file: $!";
+    }
+    if (defined $out) {
+        sysopen OUT, $out, O_CREAT|O_WRONLY|O_TRUNC or 
+          die "cannot open file: $!";
+        select OUT;
+    }
+    else {
+        *OUT = *STDOUT;
+    }
+    
+    #print STDERR $source;
+    my $rc = $parser->begin($source);
+    
+    print STDERR "generated!\n" if defined $rc;
+    close OUT or warn "cannot write to file: $!" unless 
+      fileno(OUT) == fileno(STDOUT);
+    unlink $out if not defined $rc and defined $out and -f $out;
+    #print STDERR "passed!\n" if defined $rc;
+	if (defined $rc) {
+        exit 0;
+    }
+    else {
+        exit 2;
+    }
+}
+
+main(@ARGV);

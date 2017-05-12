@@ -1,0 +1,28 @@
+==================================================
+Changes from 2012-03-03 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.18 at 2017-03-02 18:33:50 +0000
+-----------------------------------------
+
+  Change: b69dc758005a39fbef263a5d06d140ffedf00795
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-03-02 18:33:50 +0000
+
+    Switch dist to Dist::Zilla 
+
+-----------------------------------------
+version 1.16 at 2017-03-02 18:25:26 +0000
+-----------------------------------------
+
+  Change: 1ce566b862a05375561108c34c85d276f89ae552
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-03-02 18:25:26 +0000
+
+    Update required version of POE::Filter::HTTP::Parser and remove
+    diagnostics output from tests 
+
+================================================
+Plus 3 releases after 2012-03-03 00:00:00 +0000.
+================================================

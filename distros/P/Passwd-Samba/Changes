@@ -1,0 +1,10 @@
+Revision history for Perl extension Passwd::Samba.
+
+0.142	Tue Jul 10 13:21:44 GMT 2012
+	- Addition of new parameter: smbpasswd_file.
+
+0.12	Mar 20 13:40:00 EDT 2008
+	- Fixed documentation.
+
+0.01	Sun Mar 17 9:10:19 EDT 2008
+	- First release.

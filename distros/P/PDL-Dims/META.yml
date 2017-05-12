@@ -1,0 +1,27 @@
+---
+abstract: 'Enhancement to PDL by using named dimensions. '
+author:
+  - 'Ingo Schmid <ingosch@gmx.at>'
+build_requires:
+  Test::More: '0'
+  Test::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDL-Dims
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '0'
+  PDL: '0'
+  PDL::NiceSlice: '0'
+  Scalar::Util: '0'
+  perl: '5.012'
+version: '0.013'

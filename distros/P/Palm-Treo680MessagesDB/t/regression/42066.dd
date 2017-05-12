@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1192120205,
+          'number' => '30029908784',
+          'time' => '17:30',
+          'date' => '2007-10-11',
+          'name' => 'Greg XXXXXXXXX (M)',
+          'phone' => '30029908784',
+          'device' => 'Treo 680',
+          'direction' => 'outbound',
+          'timestamp' => 1192120205,
+          'text' => 'When you get to the pub, grab an outsode table. I have cihars!',
+          'type' => '0x0000',
+          'category' => 0,
+          'id' => 7107243,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 42066
+        };

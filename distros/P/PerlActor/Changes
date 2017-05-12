@@ -1,0 +1,15 @@
+Revision history for Perl extension PerlActor.
+
+0.02  Mon Jun  6 14:50:00 2005
+	- Modified RunDir command to  execute scripts as it finds
+	  them, rather than first building up the entire tree of scripts.
+	  This should speed up things, for large directories of tests.
+	
+	- Added the beginnings of a web AT example.
+
+	- updated run_tests.pl to remove dependency on UNIX date command.
+
+0.01  Wed Apr  6 19:59:24 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -n PerlActor
+

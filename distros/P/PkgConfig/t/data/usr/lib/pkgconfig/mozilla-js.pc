@@ -1,0 +1,10 @@
+prefix=/usr
+sdkdir=/usr/lib/xulrunner-devel-1.9.1
+includedir=/usr/include/xulrunner-1.9.1
+
+Name: JavaScript
+Description: The Mozilla JavaScript Library
+Version: 1.9.1.16
+Requires: nspr
+Libs: -L${sdkdir}/lib -lmozjs
+Cflags: -I/usr/include/mozjs -DXP_UNIX -DJS_THREADSAFE

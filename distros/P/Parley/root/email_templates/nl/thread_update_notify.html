@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>Het Bericht van de Update van de draad</title>
+    </head>
+
+    <body>
+        <p>[% person.first_name %],</p>
+
+        <p>De draad "[% post.thread.subject %]"
+        een nieuw antwoord langs heeft ontvangen [% post.creator.forum_name %].</p>
+
+        <p>Kies ??n van de volgende acties:
+        <ul>
+            <li>
+            <a href="[% c.req.base %]thread/next_post?thread=[% post.thread.id %]">Blijf lezend "[% post.thread.subject %]" van uw laatste positie</a>
+            </li>
+            <li>
+            <a href="[% c.req.base %]post/view?post=[% post.id %]">Mening "[% post.thread.subject %]" van de nieuwe post</a>
+            </li>
+        </ul>
+        </p>
+
+        <p>Gelieve van nota te nemen: U <b>zal niet</b> ontvang om het even welke verdere berichten voor deze draad tot u hierboven de post of om het even welke posten bekijkt die na het worden gecreeerd.</p>
+
+        <p>Achting,</p>
+
+        <p>Het [% c.config.name %] team.</p>
+    </body>
+</html>

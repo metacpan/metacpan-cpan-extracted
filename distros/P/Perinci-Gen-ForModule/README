@@ -1,0 +1,20 @@
+SYNOPSIS
+
+    In Foo/Bar.pm:
+
+     package Foo::Bar;
+     sub sub1 { ... }
+     sub sub2 { ... }
+     1;
+
+    In another script:
+
+     use Perinci::Gen::FromModule qw(gen_meta_for_module);
+     gen_meta_for_module(module=>'Foo::Bar');
+
+    Now Foo::Bar has metadata stored in %Foo::Bar::SPEC.
+
+SEE ALSO
+
+    Perinci, Rinci
+

@@ -1,0 +1,18 @@
+; vim: syntax=dosini
+name    = Package-Strictures
+author  = Kent Fredric <kentnl@cpan.org>
+license = Perl_5
+copyright_holder = Kent Fredric <kentfredric@gmail.com>
+
+[@Author::KENTNL]
+:version = 2.025020
+bump_versions = 1
+; twitter_extra_hash_tags =
+toolkit          = eumm
+toolkit_hardness = soft
+normal_form      = numify
+mantissa         = 6
+copyfiles        = LICENSE
+
+[Prereqs]
+Config::INI::Reader = 0.014

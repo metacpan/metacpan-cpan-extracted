@@ -1,0 +1,90 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Control Slide Phase</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Control Slide Phase</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<A HREF=index.html>Viewport</A><BR>
+<A HREF=control.html>Control</A><BR>
+<B>Slide phase</B>
+<P>
+<A HREF=#options>Options</A>
+<P>
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.  <A HREF=../slide/index.html>Slides</A> may contain some
+<A HREF=../dynamic/index.html>dynamics</A>, which are converted into
+a <A HREF=../program/index.html>program</A> on the moment the slide is
+shown.<BR>
+One of the types of dynamic behaviour is spliting a phase into
+<EM>phases</EM>.  Usually, each next phase of a slide adds text to the
+slide.  You can have the number of phases still to be presented to
+complete the slide depicted in one of the corners of
+<A HREF=control.html>the control window</A>.
+<P>
+
+    </TD></TR>
+<TR><TD VALIGN=top>
+
+    </TD><TD VALIGN=top>
+
+    <H2><A NAME=options>Options</A></H2>
+    These options are supplied to the <A HREF=control.html>control viewport</A>.
+    <DL>
+    <DT><B>-showPhases =&gt;</B> <I>boolean</I>
+    <DD><CODE>true</CODE> (<CODE>1</CODE>, default) when you want to see how
+        many phases are left for the current slide.  This can be influenced
+        via the background menu.
+        <P>
+    <DT><B>-phaseLocation =&gt;</B> <I>location</I>
+    <DD>Put the phase symbols on the specified corner:
+        <CODE>nw</CODE>, <CODE>ne</CODE>, <CODE>se</CODE>, or <CODE>sw</CODE>.
+        <P>
+    <DT><B>-phaseDirection =&gt;</B> <I>direction</I>
+    <DD>In which direction the symbols are put.
+        Must be <CODE>'vertical'</CODE> (default) or <CODE>'horizontal'</CODE>.
+        <P>
+    <DT><B>-phaseSymbol =&gt;</B> <I>string</I>
+    <DD>The <I>string</I> describes the symbol to be used.
+        Currently implemented are:
+        <DL>
+        <DT><B>circle</B> <I>diameter color</I>
+        <DD>An open circle in the specified color.
+        <DT><B>bullet</B> <I>diameter color</I>
+        <DD>A filled circle in the specified color.
+        <DT><B>box</B> <I>diameter color</I>
+        <DD>An open rectangle in the specified color.
+        <DT><B>square</B> <I>diameter color</I>
+        <DD>An open rectangle in the specified color.
+        <DT><B>image</B> <I>file</I>
+        <DD>Use the image (found in the file) as symbol.
+        </DL>
+        <P>
+        The default diameter is <CODE>10</CODE> (pixels) and the
+        default color is <CODE>'yellow'</CODE>.  The whole default is
+        `<CODE>image pinkball.gif</CODE>'.
+        <P>
+    </DL>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

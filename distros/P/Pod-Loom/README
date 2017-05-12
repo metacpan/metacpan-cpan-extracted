@@ -1,0 +1,52 @@
+Pod-Loom version 0.08, released March 23, 2014
+
+
+Pod::Loom extracts all the POD sections from Perl code, passes the POD
+to a template that may reformat it in various ways, and then returns a
+copy of the code with the reformatted POD at the end.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+  Package                Minimum Version
+  ---------------------- ---------------
+  perl                    5.8.0
+  Carp                    
+  Encode                  
+  Exporter                
+  Moose                   0.65
+  Moose::Role             
+  PPI                     
+  Pod::Eventual           
+  String::RewritePrefix
+
+
+
+CHANGES
+    Here's what's new in version 0.08 of Pod-Loom:
+    (See the file "Changes" for the full revision history.)
+
+	- No functional changes
+	- Change 10-weave.t to work around bug in MetaCPAN indexer:
+	  https://github.com/CPAN-API/cpan-api/issues/307
+
+
+
+COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2014 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

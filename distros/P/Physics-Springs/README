@@ -1,0 +1,60 @@
+Physics::Springs version 1.01
+=============================
+
+This module is intended as an add-on to the Physics::Particles module
+and may be used to simulate particle dynamics including spring-like forces
+between any two particles you specify.
+
+As of version 1.00, Physics::Springs is no longer compatible with versions
+lower than 1.00. Furthermore, it is no longer compatible with versions lower
+than 1.00 of Physics::Particles and Physics::Springs::Friction.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+On platforms that don't support the "./" notation, that would be:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+If you wish, you may use the old MakeMaker style instead:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   pray
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Physics::Particles (Version 1.00 or newer)
+  Sub::Assert
+  Test::More
+  Data::Dumper
+
+SEE ALSO
+
+You may find the newest versions of this module on CPAN or
+http://steffen-mueller.net
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003-2005 Steffen Mueller
+
+Author can be reached at springs-module at steffen-mueller dot net.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

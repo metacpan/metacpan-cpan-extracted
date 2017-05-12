@@ -1,0 +1,53 @@
+setPage
+	1
+	RESET
+	appearL
+	dimRed, "-"
+	red, "-"
+	brightRed, "-"
+	red, "-"
+	dimRed, "-"
+	chain(2)
+
+setPage
+	2
+	RESET
+	condensed
+	appearL
+	dimRed, "-"
+	red, "-"
+	brightRed, "-"
+	orange, "-"
+	brightOrange, "-"
+	dimYellow, "-"
+	yellow, "-"
+	brightYellow, "-"
+	dimLime, "-"
+	lime, "-"
+	brightLime, "-"
+	brightGreen, "-"
+	green, "-"
+	dimGreen, "-"
+	chain(3)
+
+setPage
+	3
+	RESET
+	condensed
+	appearL
+	dimRed, "."
+	red, "."
+	brightRed, "."
+	orange, "."
+	brightOrange, "."
+	dimYellow, "."
+	yellow, "."
+	brightYellow, "."
+	dimLime, "."
+	lime, "."
+	brightLime, "."
+	brightGreen, "."
+	green, "."
+	dimGreen, "."
+	chain(1)
+

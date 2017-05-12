@@ -1,0 +1,11 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         POE-Filter-RecDescent
+version:      0.02
+version_from: RecDescent.pm
+installdirs:  site
+requires:
+    Parse::RecDescent:             0
+    POE:                           0.27
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

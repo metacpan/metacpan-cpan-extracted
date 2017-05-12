@@ -1,0 +1,12 @@
+prefix=/usr
+sdkdir=/usr/lib/xulrunner-devel-1.9.1
+includedir=/usr/include/xulrunner-1.9.1
+idldir=/usr/share/idl/xulrunner-1.9.1
+includetype=unstable
+
+Name: libxul
+Description: The Mozilla Runtime and Embedding Engine (unstable API)
+Version: 1.9.1.16
+Requires: nspr
+Libs: -L${sdkdir}/lib -lxpcomglue_s -lxul -lxpcom
+Cflags: -I${includedir}/${includetype} 

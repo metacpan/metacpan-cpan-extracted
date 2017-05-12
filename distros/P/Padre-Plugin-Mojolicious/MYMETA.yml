@@ -1,0 +1,33 @@
+---
+abstract: 'Mojolicious support for Padre'
+author:
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+  - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.6302
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.6302
+dynamic_config: 0
+generated_by: 'Module::Install version 1.04, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Padre-Plugin-Mojolicious
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  File::Basename: 0
+  Mojolicious: 2.34
+  Padre: 0.92
+  perl: 5.008
+resources:
+  bugtracker: http://padre.perlide.org/
+  homepage: http://padre.perlide.org/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-Mojolicious
+version: 0.06

@@ -1,0 +1,93 @@
+NAME
+    PAR::Dist::InstallPPD - Installs PPM packages the PAR way
+
+SYNOPSIS
+      use PAR::Dist::InstallPPD;
+  
+      # Creates a .par distribution of the Tk module in the
+      # current directory based on the Tk.ppd file from the excellent
+      # bribes.org PPM repository.
+      par_install_ppd(uri => 'http://www.bribes.org/perl/ppm/Tk.ppd');
+
+      # You could download the .ppd and .tar.gz files first and then do:
+      par_install_ppd(uri => 'Tk.ppd', verbose => 1);
+  
+DESCRIPTION
+    This module creates PAR distributions from PPD XML documents which are
+    used by ActiveState's "Perl Package Manager", short PPM. Then, it
+    installs these newly created temporary .par files in the default
+    location using PAR::Dist's "install_par" routine.
+
+    Yes, that means you can install packages for the PPM without PPM.
+
+    The module uses PAR::Dist::FromPPD to create the .par files.
+
+    Please note that this code *works for me* but hasn't been tested to full
+    extent.
+
+  EXPORT
+    By default, the "par_install_ppd" subroutine is exported to the caller's
+    namespace.
+
+SUBROUTINES
+    This is a list of all public subroutines in the module.
+
+  par_install_ppm
+    This routine takes the same arguments as "ppd_to_par" from
+    PAR::Dist::FromPPD except for the output directory. The details are
+    reproduced below.
+
+    The only mandatory parameter is an URI for the PPD file to parse.
+
+    Arguments:
+
+      uri         => 'ftp://foo/bar' or 'file:///home/you/file.ppd', ...
+      verbose     => 1/0 (verbose mode on/off)
+      distname    => Override the distribution name
+      distversion => Override the distribution version
+      perlversion => Override the distribution's (minimum?) perl version
+      arch        => Override the distribution's target architecture
+      selectarch  => Regular Expression.
+      selectperl  => Regular Expression.
+
+    "arch" may also be set to "any_arch" and "perlversion" may be set to
+    "any_version".
+
+    If a regular expression is specified using "selectarch", that expression
+    is matched against the architecture settings of each implementation. The
+    first matching implementation is chosen. If none matches, the
+    implementations are tried in order of appearance. Of course, this
+    heuristic is applied before any architecture overriding via the "arch"
+    parameter is carried out.
+
+    "selectperl" works the same as "selectarch", but operates on the
+    (minimum) perl version of an implementation. If both "selectperl" and
+    "selectarch" are present, "selectperl" operates on the implementations
+    matched by "selectarch". That means "selectarch" takes precedence.
+
+SEE ALSO
+    The PAR::Dist module is used to create .par distributions and install
+    them. The PAR::Dist::FromPPD module converts the PPD package
+    descriptions.
+
+    PAR has a mailing list, <par@perl.org>, that you can write to; send an
+    empty mail to <par-subscribe@perl.org> to join the list and participate
+    in the discussion.
+
+    Please send bug reports to <bug-par-dist-fromcpan@rt.cpan.org>.
+
+    The official PAR website may be of help, too: http://par.perl.org
+
+    For details on the *Perl Package Manager*, please refer to ActiveState's
+    website at <http://activestate.com>.
+
+AUTHOR
+    Steffen Mueller, <smueller at cpan dot org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6 or, at your
+    option, any later version of Perl 5 you may have available.
+

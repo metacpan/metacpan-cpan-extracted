@@ -1,0 +1,31 @@
+Revision history for perl module Plack::Middleware::TazXSLT
+
+0.55 2014-08-11
+
+     - register_element was added in XML::LibXSLT 1.72
+
+0.54 2014-08-07
+
+     - forget to include README in Manifest before uploading
+
+0.53 2014-08-07
+
+     - added README
+     - explicit return from prepare_app
+
+0.52 2013-08-26T16:38+02:00
+
+     - header-set is still used in production, reversed refactoring
+
+0.51 2013-08-23T15:37+02:00
+
+     - new xslt functions header and code
+     - added accessor for response and request
+
+0.50 2013-07-13T13:23+02:00
+
+     - test_requires was introduced in Module::Build 0.4004
+
+0.49 2013-08-12T15:52+02:00
+
+     - errors.t still used MockUserAgent in lib/ and not t/lib

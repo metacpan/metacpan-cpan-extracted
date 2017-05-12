@@ -1,0 +1,33 @@
+---
+abstract: "A bridge that supports Glib's event loop from POE"
+author:
+  - 'Martijn van Beers  <martijn@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+  POE::Test::Loops: 1.034
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3603'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Loop-Glib
+provides:
+  POE::Loop::Glib:
+    file: lib/POE/Loop/Glib.pm
+    version: 0.038
+recommends:
+  IO::Pty: 0
+  Socket6: 0
+  Term::Readkey: 0
+  Win32::Console: 0
+requires:
+  Glib: 1.222
+  POE: 1.288
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Loop-Glib
+  homepage: http://search.cpan.org/dist/POE-Loop-Glib
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/apocalypse/perl-poe-loop-glib
+version: 0.038

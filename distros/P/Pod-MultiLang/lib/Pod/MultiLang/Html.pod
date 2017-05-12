@@ -1,0 +1,206 @@
+=encoding utf-8
+
+=for stopwords
+	MultiLang-pod
+	addindex
+	buildhtml
+	buildtitle
+	escapeHtml
+	escapeUrl
+	html
+	langs
+	makelink
+	makelinkanchor
+	mlpod
+	plainize
+	poddir
+	resolveLink
+	resolvePodEscape
+	unescapeHtml
+	utf-8
+	verbmsg
+	xhtml
+
+=head1 NAME
+
+Pod::MultiLang::Html - turn MultiLang-pod into html
+
+
+=head1 SYNOPSIS
+
+ $parser = Pod::MultiLang::Html->new(%opts);
+ $parser->parse_from_file($infile,$outfile);
+
+=head1 DESCRIPTION
+
+Pod::MultiLang::Html translates pod into html.
+This inherits L<Pod::MultiLang> and it inherits L<Pod::Parser>, 
+usage is same as Pod::Parser.
+
+
+command/verbatim/textblock methods only do push paragraphs 
+into an array, and end_pod method do conversion.
+(these process is in Pod::MultiLang.)
+
+
+prepare (listing up headings, setup index words, etc.) at 
+$parser->rebuild(), and generate at $parser->output_html();
+
+
+generate html is xhtml 1.1 ^^;
+
+
+=head1 OPTIONS
+
+method new takes follow arguments:
+
+
+=over
+
+=item langs
+
+ langs => [qw(ja en)]
+
+inherited from Pod::MultiLang.
+pass to Pod::MultiLang->new(). 
+see L<Pod::MultiLang/new>.
+
+
+specify languages. 
+paragraphs which exist in mlpod document but not selected with
+C<langs> are ignored in result.
+
+
+=item made
+
+  made => 'mailto:example@example.com'
+
+embed into Z<><link rev="made" href="" />. 
+
+
+=item css
+
+  css => 'style/podstyle.css'
+
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="style/podstyle.css" />
+
+relative path between specified location and location that 
+output file is generated.
+
+
+=item poddir
+
+  poddir => [qw(html/pod html/pragma html/lib)]
+
+directories for existence check of file linked from pod.
+by array reference.
+
+
+=item missing_poddir
+
+used when no link target found in poddir and link target seems 
+perl core documents.
+
+
+if omitted then missing_dir is used.
+
+
+=item missing_pragmadir
+
+used when no link target found in poddir and link target seems 
+pragma documents.
+
+
+省略時には missing_dir が使われます.
+
+
+=item missing_dir
+
+used when no link target found in poddir.
+
+
+=item in_charset
+
+encoding for input document.
+default is utf-8. 
+
+
+=item out_charset
+
+encoding for output document.
+default is utf-8.
+
+
+and embed as 
+Z<><meta content="Content-Type" value="text/html; charset=" /> .
+
+
+=item default_lang
+
+language for outsize of JZ<><> interior sequence.
+
+
+=back
+
+=head1 METHODS
+
+=head2 new
+
+create new instance.
+
+
+=head1 OVERRIDES
+
+This module implements L<Pod::Parser>.
+
+
+=over 4
+
+=item begin_pod
+
+=item end_pod
+
+=item interior_sequence
+
+=back
+
+=head1 PRIVATE FUNCTIONS
+
+=over 4
+
+=item rebuild
+
+=item buildtitle
+
+=item buildhtml
+
+=item addindex
+
+=item output_html
+
+=item escapeHtml
+
+=item escapeUrl
+
+=item makelink
+
+=item makelinkanchor
+
+=item plainize
+
+=item resolveLink
+
+=item resolvePodEscape
+
+=item unescapeHtml
+
+=item verbmsg
+
+=back
+
+=head1 SEE ALSO
+
+L<Pod::MultiLang>
+
+

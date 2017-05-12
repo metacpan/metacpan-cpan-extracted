@@ -1,0 +1,12 @@
+=for filter=html <b>bold</b>
+__RESULT__
++html
+<html><body bgcolor="#ffffff">
+<pre><span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>bold<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span></pre>
+</body></html>
+__RESULT__
+-html
+<html><body bgcolor="#ffffff">
+<pre>&lt;b&gt;bold&lt;/b&gt;
+</pre>
+</body></html>

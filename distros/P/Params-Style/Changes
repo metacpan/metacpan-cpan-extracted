@@ -1,0 +1,25 @@
+# $Id: Changes,v 1.5 2005/11/29 12:09:10 mrodrigu Exp $
+
+Revision history for Perl extension Params::Style.
+
+0.06 2005-11-28
+    - added pod tests to MANIFEST (duh!)
+    - added the nostyle style (nostypeparams)
+
+0.05 2005-10-18
+    - doc fixes, added pod and pod coverage tests
+
+0.04 2003-12-07
+    - fixed a build problem
+
+0.03 2003-12-05
+    - added autotie so hashes can be declared as
+      my %opts : ParamsStyle( 'perl_style')= @_;
+
+0.02  2003-06-24
+    - added tied hash interface (suggestion of Bill Ward)
+
+0.01  2003-06-23
+	- original version; created by h2xs 1.22 with options
+		-X -n Params::Style
+

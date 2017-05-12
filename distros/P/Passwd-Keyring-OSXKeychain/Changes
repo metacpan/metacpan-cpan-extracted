@@ -1,0 +1,60 @@
+Revision history for Keyring-OSXKeychain
+
+0.3002	2016-11-13
+	Added missing Test::Most dependency (which caused various
+	cpantesters failures).
+
+0.3001	2016-11-05
+	Fixed typo on read_security_encoded_passwd() call (which simply
+    caused failures on any reads).
+
+    Replaced invalid command used to test for keychain availability
+    (now using "security list-keychains").
+
+0.30	2016-11-01
+	#1 Reasonable chances of better support for passwords containing
+    international characters. Technically: implemented decoding of
+    various encoded password cases, based on examples provided in the
+    issue, and Switched to using -w option of find-generic-password,
+    and that new password decoding algorithm.
+
+0.21    2016-11-01
+    #2 Fixing show-keychain-info command parameters so it doesn't emit
+    warnings during object construction.
+
+    #3 Removed -A option on add-generic-password call (it's generally
+    insecure and as issue author confirms, unnecessary)
+
+0.20	2015-02-10
+	Attempts to resolve failed attempts to read password
+	accourding to the observation, that password is sent
+        to stderr.
+
+0.1006	2015-01-09
+	Attempt to resolve errors faced on password not found,
+	like this:
+	http://www.cpantesters.org/cpan/report/2ec13f94-9773-11e4-bf65-4e3fdb2e34d7
+
+0.1005	2015-01-06
+	Added kwalitee tests
+
+0.1004	2013-07-04
+	(part of) #1 Documentation contained wrong example of using set_password
+
+0.1003	2012-12-19
+	Dropping taint from test scripts to avoid test errors on capturex call.
+
+0.1002	2012-12-02
+	Bugfix for invalid attribute name and missing import after
+        first OS/X report (
+	http://www.cpantesters.org/cpan/report/6cfd0882-3876-11e2-b143-6f392f08a87b)
+
+0.1001	2012-11-20
+	Fixed some reported test failures (added missing dependency on IPC::System::Simple).
+
+
+0.10	2012-11-11
+        Initial version. Written without access to Mac, according
+        to the man page and consulting python code from keyring and
+        keychain libraries.
+

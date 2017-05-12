@@ -1,0 +1,205 @@
+##############################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/Perl-Cr$
+#     $Date$
+#   $Author$
+# $Revision$
+##############################################################################
+
+## ----- Perl::Critic::Policy::Subroutines::RestrictToExportedSubs [ 3.0 ] ---
+## NOTE: We've decided to drop this test case, since Exporter.pm already
+## validates the import arguments at compile-time.
+
+package main;
+use Foo qw(foo);
+use Bar ('bar');  #Alternate form
+use Baz "baz";    #Alternate form
+
+package Foo; #In Foo.pm
+our @EXPORT = qw( quux );
+our @EXPORT = qw( &quux );      #Alternate form
+
+package Bar; #In Bar.pm
+our @EXPORT_OK = ( 'quux' );
+our @EXPORT_OK = ( "&quux" );   #Alternate form
+
+package Baz; #In Baz.pm
+# No EXPORTs at all
+
+## ----- Perl::Critic::Policy::Subroutines::RestrictToExportedSubs [ 3.1 ] ---
+## NOTE: We've decided to drop this test case, since Exporter.pm already
+## validates the import arguments at compile-time.
+
+package main;
+use Foo qw(foo);
+use Bar ('bar');  #Alternate form
+use Baz "baz";    #Alternate form
+
+package Foo; #In Foo.pm
+our @EXPORT = qw( foo );
+our @EXPORT = qw( &foo );      #Alternate form
+
+package Bar; #In Bar.pm
+our @EXPORT_OK = ( 'bar' );
+our @EXPORT_OK = ( "&bar" );   #Alternate form
+
+package Baz; #In Baz.pm
+our @EXPORT = ( 'baz' );
+our @EXPORT_OK = ( q{&bar} );
+
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUnexportedSubs [ 3.2 ] -
+## name Calling qualified function that is exported by other package
+## parms {at_inc_prefix => 't/tlib'}
+## failures 0
+## cut
+
+use HasExports;
+
+HasExports::sub1;                #No parens
+HasExports::sub1();              #No args
+HasExports::sub2( 'quux' );      #With args
+
+&HasExports::ok_sub1;            #With sigil, and no parens
+&HasExports::ok_sub1();          #With sigil, and no args
+&HasExports::ok_sub2( 'quux' );  #With sigil, and args
+
+#--------------------------------------
+# In HasExports.pm...
+#
+# package HasExports;
+#
+# use base 'Exporter';
+#
+# our @EXPORT = qw(
+#     &sub1
+#     sub2
+#     $scalar
+#     %hash
+#     @array
+# );
+#
+# our @EXPORT_OK = (
+#     '&ok_sub1',
+#     'ok_sub2',
+#     '$ok_scalar',
+#     '%ok_hash',
+#    '@ok_array'
+# );
+#---------------------------------------
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUnexportedSubs [ 3.3 ] -
+## name Calling qualified function that is not exported by other package
+## parms {at_inc_prefix => 't/tlib'}
+## failures 6
+## cut
+
+use HasExports;
+
+HasExports::quux;                #No parens
+HasExports::quux();              #No args
+HasExports::quux( 'quux' );      #With args
+
+&HasExports::quux;               #With sigil, and no parens
+&HasExports::quux();             #With sigil, and no args
+&HasExports::quux( 'quux' );     #With sigil, and args
+
+#--------------------------------------
+# In HasExports.pm...
+#
+# package HasExports;
+#
+# use base 'Exporter';
+#
+# our @EXPORT = qw(
+#     &sub1
+#     sub2
+#     $scalar
+#     %hash
+#     @array
+# );
+#
+# our @EXPORT_OK = (
+#     '&ok_sub1',
+#     'ok_sub2',
+#     '$ok_scalar',
+#     '%ok_hash',
+#    '@ok_array'
+# );
+#---------------------------------------
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUnexportedSubs [ 3.4 ] -
+## name Calling qualified function from package that has no exports
+## parms {at_inc_prefix => 't/tlib'}
+## failures 6
+## cut
+
+use NoExports;
+
+NoExports::sub1;                #No parens
+NoExports::sub1();              #No args
+NoExports::sub2( 'quux' );      #With args
+
+&NoExports::ok_sub1;            #With sigil, and no parens
+&NoExports::ok_sub1();          #With sigil, and no args
+&NoExports::ok_sub2( 'quux' );  #With sigil, and args
+
+#--------------------------------------
+# In NoExports.pm...
+#
+# package NoExports;
+# 1;
+#
+#--------------------------------------
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUnexportedSubs [ 3.5 ] -
+## name Calling qualified function that has empty export list
+## parms {at_inc_prefix => 't/tlib'}
+## failures 6
+## cut
+
+use EmptyExports;
+
+EmptyExports::sub1;                #No parens
+EmptyExports::sub1();              #No args
+EmptyExports::sub2( 'quux' );      #With args
+
+&EmptyExports::ok_sub1;            #With sigil, and no parens
+&EmptyExports::ok_sub1();          #With sigil, and no args
+&EmptyExports::ok_sub2( 'quux' );  #With sigil, and args
+
+#--------------------------------------
+# In EmptyExports.pm...
+#
+# package EmptyExports;
+#
+# use base 'Exporter';
+#
+# our @EXPORT = ();
+# our @EXPORT_OK;
+#
+# 1;
+#
+#--------------------------------------
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUnexportedSubs [ 3.6 ] -
+## name Calling qualified function from builtin package
+## parms {at_inc_prefix => 't/tlib'}
+## failures 0
+## cut
+
+CORE::die( 'a horrible death' );
+CORE::GLOBAL::open( my $fh, $some_file );
+UNIVERSAL::isa( $reference, $class );
+
+&main::foobar();
+&::foobar()
+
+##############################################################################
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab :

@@ -1,0 +1,285 @@
+SYNOPSIS
+
+      use strict;
+      use warnings;
+      use HTTP::Request::Common qw[GET];
+      use POE qw[Component::Curl::Multi];
+    
+      $!=1;
+    
+      my @urls = ( 'https://api.github.com/repos/git/git/tags',
+                   'http://this.is.made.up.stuff/',
+                   'http://www.cpan.org/',
+                   'http://www.google.com/', );
+    
+      my $curl = POE::Component::Curl::Multi->spawn(
+        Alias => 'curl',
+        FollowRedirects => 5,
+        Max_Concurrency => 10,
+      );
+    
+      POE::Session->create(
+        package_states => [
+          main => [qw(_start _response)],
+        ],
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+    
+      sub _start {
+        $poe_kernel->post( 'curl', 'request', '_response', GET($_) ) for @urls;
+        return;
+      }
+    
+      sub _response {
+        my ($request_packet, $response_packet) = @_[ARG0, ARG1];
+        use Data::Dumper;
+        local $Data::Dumper::Indent=1;
+        warn Dumper( $response_packet->[0] );
+        return;
+      }
+
+DESCRIPTION
+
+    POE::Component::Curl::Multi is an HTTP user-agent for POE. It lets
+    other sessions run while HTTP transactions are being processed, and it
+    lets several HTTP transactions be processed in parallel.
+
+    It uses Net::Curl internally to provide access to libcurl for fast
+    performance. It strives to be API compatible(ish) with
+    POE::Component::Client::HTTP.
+
+    It is inspired by AnyEvent::Curl::Multi.
+
+CONSTRUCTOR
+
+    spawn
+
+      Starts an instance of the component. Takes a number of options:
+
+      alias
+
+	Set an alias for this instance of the component. There is no
+	default.
+
+      timeout
+
+	Specifies a timeout, in seconds, for each request, defaults to 180.
+
+      followredirects
+
+	Specifies how many redirects (e.g. 302 Moved) to follow. If not
+	specified defaults to 0, and thus no redirection is followed.
+
+      agent
+
+	Can either be a string or an ARRAYREF of strings. This will be used
+	as UserAgent header in requests. If an ARRAYREF is provided one of
+	them will be picked randomly to send.
+
+	See
+	http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTUSERAGENT
+
+      proxy
+
+	Specify a proxy to use.
+
+	See
+	http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTPROXY
+
+      max_concurrency
+
+	Specify the maximum number of concurrent requests, a value of 0
+	means no limit will be imposed. The default is 0.
+
+      curl_debug
+
+	Enable libcurl's verbosity.
+
+	See
+	http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTVERBOSE
+
+      Returns an object that accepts some methods as documented below.
+
+ AVAILABLE METHODS
+
+    session_id
+
+      Takes no arguments. Returns the ID of the component's session.
+
+    shutdown
+
+      Responds to all pending requests with 408 (request timeout), and then
+      shuts down the component and all subcomponents.
+
+    pending_requests_count
+
+      Returns the number of requests currently being processed.
+
+    cancel
+
+      Cancel a specific HTTP request. Requires a reference to the original
+      request (blessed or stringified) so it knows which one to cancel.
+
+ACCEPTED EVENTS
+
+    Sessions communicate asynchronously with the component. They post
+    requests to it, and it posts responses back.
+
+ request
+
+    Requests are posted to the component's request state. They include an
+    HTTP::Request object which defines the request. For example:
+
+      $kernel->post(
+        'ua', 'request',            # http session alias & state
+        'response',                 # my state to receive responses
+        GET('http://poe.perl.org'), # a simple HTTP request
+        'unique id',                # a tag to identify the request
+        'progress',                 # an event to indicate progress
+        'http://1.2.3.4:80/'        # proxy to use for this request
+      );
+
+    This invocation is compatible with POE::Component::Client::HTTP.
+
+    You may also send either an arrayref or hashref to the request state
+    with the following parameters:
+
+    request
+
+      A HTTP::Request object which defines the request.
+
+    response
+
+      Either a string specifying the state in the sender session to receive
+      responses or, alternatively, a POE::Session postback that will be
+      invoked with responses.
+
+    tag
+
+      A tag to identify the request.
+
+    progress
+
+      An optional handler, if specified the component will provide progress
+      metrics (see sample handler below).
+
+    proxy
+
+      Specify a proxy to use. This overrides the proxy set with spawn, if
+      applicable.
+
+      See http://curl.haxx.se/libcurl/c/curl_easy_setopt.html#CURLOPTPROXY
+
+    session
+
+      Specify a POE::Session object, ID or alias to send responses to
+      instead of the sending session. If a postback is used for response,
+      this option will be ignored.
+
+ pending_requests_count
+
+    Returns the number of requests currently being processed. To receive
+    the return value, it must be invoked with $kernel->call().
+
+      my $count = $kernel->call('ua' => 'pending_requests_count');
+
+    This is also available as a method on the object returned by spawn
+
+      my $count = $curl->pending_requests_count();
+
+ shutdown
+
+    Responds to all pending requests with 408 (request timeout), and then
+    shuts down the component and all subcomponents.
+
+SENT EVENTS
+
+ response handler
+
+    In addition to all the usual POE parameters, HTTP responses come with
+    two list references:
+
+      my ($request_packet, $response_packet) = @_[ARG0, ARG1];
+
+    $request_packet contains a reference to the original HTTP::Request
+    object. This is useful for matching responses back to the requests that
+    generated them.
+
+      my $http_request_object = $request_packet->[0];
+      my $http_request_tag    = $request_packet->[1]; # from the 'request' post
+
+    $response_packet contains a reference to the resulting HTTP::Response
+    object.
+
+      my $http_response_object = $response_packet->[0];
+
+    Please see the HTTP::Request and HTTP::Response manpages for more
+    information.
+
+ progress handler
+
+    The example progress handler shows how to calculate a percentage of
+    download completion.
+
+      sub progress_handler {
+        my $gen_args  = $_[ARG0];    # args passed to all calls
+        my $call_args = $_[ARG1];    # args specific to the call
+    
+        my $req = $gen_args->[0];    # HTTP::Request object being serviced
+        my $tag = $gen_args->[1];    # Request ID tag from.
+        my $got = $call_args->[0];   # Number of bytes retrieved so far.
+        my $tot = $call_args->[1];   # Total bytes to be retrieved.
+    
+        my $percent = $got / $tot * 100;
+    
+        printf(
+          "-- %.0f%% [%d/%d]: %s\n", $percent, $got, $tot, $req->uri()
+        );
+    
+        return;
+      }
+
+STREAMING
+
+    This component does not (yet) support POE::Component::Client::HTTP's
+    streaming options.
+
+CLIENT HEADERS
+
+    POE::Component::Curl::Multi sets its own response headers with
+    additional information. All of its headers begin with "X-PCCH".
+
+ X-PCCH-Errmsg
+
+    POE::Component::Curl::Multi may fail because of an internal client
+    error rather than an HTTP protocol error. X-PCCH-Errmsg will contain a
+    human readable reason for client failures, should they occur.
+
+    The text of X-PCCH-Errmsg may also be repeated in the response's
+    content.
+
+ X-PCCH-Peer
+
+    This response header is not yet supported.
+
+ATTRIBUTION
+
+    POE::Component::Curl::Multi is based on both
+
+    POE::Component::Client::HTTP by Rocco Caputo, Rob Bloodgood and Martijn
+    van Beers
+
+    and
+
+    AnyEvent::Curl::Multi by Michael S. Fischer
+
+SEE ALSO
+
+    Net::Curl
+
+    AnyEvent::Curl::Multi
+
+    POE::Component::Client::HTTP
+

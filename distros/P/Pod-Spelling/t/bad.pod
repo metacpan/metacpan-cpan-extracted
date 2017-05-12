@@ -1,0 +1,11 @@
+=head1 bad.pod
+
+This POD has errors.
+
+=head1 HEADING
+
+Here is C<codx>, I<itolic>, B<bolld>, F<xxx.html>, and L<liink description|linkto.html>.
+
+=head1 AUTHOR
+
+Lee Goddard. Copyright (C) Lee Goddard. All Rights Reserved.

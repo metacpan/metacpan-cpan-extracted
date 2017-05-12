@@ -1,0 +1,17 @@
+Revision history for Perl extension Polycom::Contact::Directory
+
+0.01  Wed Jan 28 11:00:00 2010
+    - original version
+    
+0.02  Fri Feb 19 10:00:00 2010
+    - fixed some documentation, added delete() method to Contact
+
+0.03  Sun Feb 21 10:00:00 2010
+    - fixed some documentation, added more tests and XML entities support
+
+0.04  Tue Feb 23 10:00:00 2010
+    - fixed some documentation and added some example scripts
+    
+0.05  Mon Jul 05 10:00:00 2010
+    - added more unit tests and an example script for converting to CSV
+

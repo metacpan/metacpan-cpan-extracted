@@ -1,0 +1,236 @@
+=head1 NAME
+
+POE::Component::IKC -- POE Inter-Kernel Communication
+
+=head1 SYNOPSIS
+
+=head2 IKC server 
+
+    use POE::Component::IKC::Server;
+    # create all your sessions
+    POE::Component::IKC::Server->spawn(
+                port=>30, name=>'Server'
+        ); # more options are available
+    $poe_kernel->run();
+
+
+=head2 IKC client
+
+    use POE::Component::IKC::Client;
+
+    POE::Component::IKC::Client->spawn( 
+                host=>name, 
+                port=>30, 
+                name=>'Client',
+                on_connect=>\&build);
+    $poe_kernel->run();
+
+    sub build
+    {
+        # create sessions that depend on the foreign kernel.
+    }
+
+
+
+
+=head2 Post a state on a foreign kernel
+
+    $kernel->post('IKC', 'post', "poe://Server/session/state", $ONE_arg);
+
+=head2 The IKC is peer-to-peer.  
+
+Server can post to client.
+
+    $kernel->post('IKC', 'post', 'poe://Client/session/state', $ONE_arg);
+
+=head2 Call a state on a remote kernel
+
+Call semantics are impossible, because they would cause POE to block.  IKC
+call is a bit different.  It is a 'post', but with an extra RSVP parameter.
+
+    $kernel->post('IKC', 'call', 'poe://Server/hello/world', $ONE_arg, 
+                  'poe:callback');
+
+This will cause the returned value of the foreign state to be sent to state
+'callback' in the current session.  You may want the callback to be in
+another session, but I don't think this is a good idea.
+
+    $kernel->post('IKC', 'call', 'poe://Server/hello/world', $ONE_arg, 
+                  'poe:/elsewhere/hi');
+
+Note : if you use ->call('IKC'), it will return the number of foreign kernels 
+the state was sent to.  This is a handy way to find out if you are still
+connected to a foreign kernel.
+
+=head2 A little magic
+
+If a state is posted by a foreign kernel, $_[SENDER] is only valid during
+that state.  However, you will be able to post back to it.
+
+    $kernel->post($_[SENDER], 'something', 'the answer is foo');
+
+The remote caller MUST have published states for them to be callable, eh?
+
+=head2 Publish / Subscribe
+
+You must publish a session's interface for it to be available to remote
+kernels.
+
+If you subscribe to a remote session, you may access it as if it was a
+local session.
+
+First, a session publishes its interfaces:
+
+    $kernel->post('IKC', 'publish', 'session_alias',
+                        [qw(state1 state2 state3 state4)], );
+
+Then a foreign kernel subscribes to it:
+
+    # Look for a session on all known foreign kernels
+    $kernel->post('IKC', 'subscribe', [qw(poe://*/session_alias/)]);
+    # Look for a session on a specific foreign kernel
+    $kernel->post('IKC', 'subscribe', [qw(poe://Pulse/timeserver)]);
+    # Make sure the session has a given state
+    $kernel->post('IKC', 'subscribe', [qw(poe://*/timeserver/connect)]);
+
+After subscription, a proxy session is created that can be accessed like any
+old session, though ->call() acts the same as ->post() for obvious reasons:
+
+    $kernel->post('poe:/Pulse/timeserver', 'state', $arg1, $arg2...);
+
+Currently, the session alias used by post to the proxy session must be the
+same one as used when subscribing.  Because kernels have multiple names, if
+you are using '*' as the kernel name when subscribing, the session alias
+might not be what you think it is.  See L</Monitor> for details.
+
+Of course, attempting to post to a proxy session before it is created will
+be problematic.  To be alerted when the proxy session is created, a callback
+state may be specified, 
+
+    $kernel->post('IKC', 'subscribe', [qw(poe://*/timeserver)], 
+            'timeserver_subscribed');
+
+The callback will be called with a list of all the sessions that it managed
+to subscribe to.  You should check this list before continuing.  Better yet, 
+you could use the IKC monitor (see below).
+
+
+
+One can also let POE::Component::IKC::Client->spawn deal with all the
+details.
+
+    
+    POE::Component::IKC::Client->spawn(
+            port=>31337, name=>$name,
+            subscribe=>[qw(poe://*/timeserver)],
+            on_connect=>\&create_me,
+        );
+
+'on_connect' is only called when all the subscriptions have either been
+accepted.  If a subscription was refused, create_ikc_client will give up. 
+If multiple foreign kernels where quieried for a session (as is the case
+above), subscription is deemed to succeed if at least one foreign kernel
+accepts the subscription.
+
+To undo things :
+
+    $kernel->post(IKC=>'retract', 'session_alias'=>[qw(states)]);
+
+    $kernel->post(IKC=>'unsubscribe', [qw(poe://Pulse/timeserver)]);
+
+
+=head2 Monitor
+
+Say you wanted to monitor all remote kernels that connect to you:
+
+    $kernel->post(IKC=>'monitor', '*'=>{register=>'some_event'});
+
+    sub some_event
+    {
+        my($name, $real)=@_[ARG1, ARG2];
+        print "- Remote kernel ", ($real ? '' : "alias "), "$name connected\n";
+    }
+
+Later, you want to know when a given remote session disconnects:
+
+    $kernel->post(IKC=>'monitor', some_kernel=>{unregister=>'bye_bye'});
+
+Or maybe you think a session should clean up and leave whenever IKC
+does.
+
+    $kernel->post(IKC=>'monitor', '*'=>{shutdown=>'other_event'});
+
+    sub other_event
+    {
+        # kill wheels, alarms, selects and aliases here
+    }
+                    
+See L<POE::Component::IKC::Responder/monitor> for more details.
+
+
+=head2 Shutdown
+
+When you feel the time is right and you want to get rid of all IKC-related
+sessions, just do the following:
+
+    $kernel->post(IKC=>'shutdown');     
+
+And they should all disapear.  At worst, some will still have registered
+alises, but this won't prevent the kernel from exiting.
+
+
+=head2 The local kernel
+
+You can post to the local kernel as if it was remote:
+
+    $kernel->post(IKC=>'post', 
+                    "poe://$kernel->ID/session/state'=>$ONE_arg);
+
+However, you can't currently subscribe to local sessions.  I don't know how
+I'm going to resolve this.
+
+
+
+=head1 DESCRIPTION
+
+This is Inter-Kernel Communication for POE.  It is used to get events
+from one POE kernel to another
+
+=head1 SEE ALSO
+
+L<POE::Component::IKC::Responder> -- Heart of the system
+
+L<POE::Component::IKC::Server> -- Create a process that listens for other 
+kernels.
+
+L<POE::Component::IKC::Client> -- Create a process that connects to other 
+kernels.
+
+L<POE::Component::IKC::ClientLite> -- Light weight IKC implementation
+for places you can't use POE, such as mod_perl.
+
+L<POE::Component::IKC::Channel> -- Handle communcation with other kernels.
+
+L<POE::Component::IKC::Proxy> -- Proxy session that is created when you 
+subscribe to a remote session.
+
+L<POE::Component::IKC::Freezer> -- Pure-Perl serialization method.
+
+L<POE::Component::IKC::Specifier> -- Helper routines for parsing IKC
+specifiers.
+
+
+=head1 AUTHOR
+
+Philip Gwyn <perl-ikc at pied.nu>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 1999-2014 by Philip Gwyn.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+See L<http://www.perl.com/language/misc/Artistic.html>
+
+=cut

@@ -1,0 +1,179 @@
+NAME
+     Plugins::API - Inter-plugin callback API
+
+SYNOPSIS
+     use Plugins::API;
+
+     my $api = new Plugins::API;
+
+     $api->api( methodname1 => \%options1, methodname2 => \%options2, ... );
+
+     $api->plugins ($plugins_object);
+
+     @handlers = $api->handlers;
+
+     $api->invoke('methodname', @args);
+
+     $api->autoregister($self);
+
+     $api->register($self, [\%options], methodname1 => \&method1, methodname2 => \&method2, ...)
+
+     $api->disable('ClassName');
+     $api->disable($object);
+
+DESCRIPTION
+    Plugins::API provides a framework for modules to rendevous with each
+    other at runtime. It's designed to work with the Plugins module but it
+    does not depend upon Plugins and could be used without it.
+
+    The basic idea is that you describe a invocation interface with the
+    "api()" method and then you register methods for later callback. A
+    method callback requires an object (unless it's a class method) and when
+    you register a method, Plugins::API keeps a reference to the object for
+    use when making the callback.
+
+    A registered method is called a *handler* in the rest of this document.
+
+METHODS
+    Plugins::API objects are created with the "new()" method so that will be
+    documented first:
+
+    new([\%options,] [@api])
+        Options for "new()" are passed as a reference to a hash. It's
+        optional. Also option is an interface specification like what is
+        passed to the "api()" method (below).
+
+        The options supported are:
+
+        autoregister => $self
+                       Automaticlly register class methods (see
+                       "autoregister()" below).
+
+        plugins => $plugins
+                       Just like calling "plugins()" (below).
+
+    api(%interface)
+        The "api()" call creates the published interfaces that Plugins::API
+        users use to invoke each other.
+
+        Pass in key/value pairs. The key is the interface name and the value
+        is a refernece to a hash of options for that callback. The supported
+        options are:
+
+        first_only => 1
+            If there are handlers for this callback only call the first one
+            on the list.
+
+        first_defined => 1
+            If there are multiple handlers for this callback, call them in
+            sequence until one of them returns a value that is not undef.
+            This only works in scalar context.
+
+        combine_returns => 1
+            If there are multiple handlers for this callback, call them all
+            in sequence and return a flattened list of all the return
+            values.
+
+        array_returns => 1
+            When invoked, return an array whose elements are references to
+            arrays which are the return values from each of the handlers for
+            this callback.
+
+        exit_test => \&test_function
+            After each call to a handler for this callback, call the
+            test_function to see if we should stop invoking more handlers:
+
+             ($quit_if_true, @return_value) = test_function(
+                    \@last_handler_return, 
+                    \@array_of_handler_returns,
+                    \@flattend_array_of_handler_returns,
+                    wantarray)
+
+    autoregister($self)
+        Autoregister will compare the methods of $self to the callbacks
+        defined by "api()" and register $self's methods as handlers if any
+        of $self's methods have the same name as a callback.
+
+    register($self, [\%options,] %handlers)
+        Register binds methods to the interface. Pass in callback names as
+        keys and code references as values. It is not required that the API
+        method name was not previously defined.
+
+        If $self is undefined then the code references will be called as
+        functions rather than methods.
+
+        The options supported by "register()" are:
+
+        first     Normally new handlers are added to the end of the list of
+                  handlers for the callback. With this option, the handlers
+                  will be added to the beginning of the list.
+
+        replace   Normally new handlers are added to the end of the list of
+                  handlers for the callback. With this option, the handlers
+                  will replace the current list.
+
+    invoke($callback, [@args)
+        This causes all of the handlers for $callback to be called in turn
+        and the return value from the last handler to be returned. Some of
+        this behavior can be changed with calls to "api()".
+
+        Plugins::API has an "AUTOLOAD" function that hands off to
+        "invoke()". Thus all callbacks look like they're methods for
+        Plugins::API.
+
+    disable($object) =item disable('CLASS')
+        Handlers can be turned off with "disable()". Turning off a class
+        disables all objects in the class. There is no re-enable function at
+        this time.
+
+    plugins($plugins)
+        Plugins::API works with the Plugins module. If a Pluginss object has
+        been registered with "plugins()", then any "invoke()" of a callback
+        also do a "Plugins::invoke()" on the $plugins object.
+
+    handlers($callback)
+        This returns a list of the un-disabled handlers for a callback.
+        Handlers are objects in the Plugins::API::Handler class. They
+        support the following methods:
+
+        call(@args)
+            Call the function or method with @args.
+
+        object()
+            Return the object or class that the function is a method for.
+            Returns an empty list if there is no object or class.
+
+        method()
+            Returns a code reference for the function.
+
+EXAMPLES
+    See the code for SyslogScan::Daemon::SpamDetector.
+
+MEMORY LEAKS
+    Plugins::API uses "Scalar::Util::weaken()" on object referneces and on
+    $plugins so that it will not cause reference loops.
+
+RESERVED METHOD NAMES
+    Since Plugins::API uses "AUTOLOAD" so that you can say
+
+     $api->foobar()
+
+    where "foobar" is a callback, you need to avoid naming your callbacks
+    the same as Plugins::API methods. In addition to the methods documented
+    above, please don't have callbacks named:
+
+     callhandlers()
+     newhandler()
+
+SEE ALSO
+    Plugins
+
+THANK THE AUTHOR
+    If you find this module useful and wish to show your appreciation to the
+    author, please give me a Request-For-Quote on your next high-speed
+    internet pipe order. I have good pricing for T1s, T3s, OC3s etc.
+
+LICENSE
+    Copyright (C) 2006, David Muir Sharnoff <muir@idiom.com>. This module
+    may be used and redistributed on the same terms as Perl itself.
+

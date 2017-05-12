@@ -1,0 +1,86 @@
+#!/usr/bin/env perl
+
+use 5.018;
+use strict;
+use warnings;
+
+use HTTP::Tiny;
+use Try::Tiny;
+use JSON::MaybeXS;
+use Monitoring::Plugin;
+
+my $mp = Monitoring::Plugin->new(
+    usage     => "Usage: %s -U|--url=<status url> [--perfdata]",
+    shortname => 'Service Status',
+    url       => 'https://github.com/domm/Plack-App-ServiceStatus/',
+    version   => '0.009',
+    license   => 'This is free software; you can redistribute it and/or modify
+it under the same terms as the Perl 5 programming language system itself.'
+);
+
+$mp->add_arg(
+    spec     => 'url|U=s',
+    help     => 'URL where Plack::App::ServiceStatus is mounted',
+    required => 1
+);
+
+$mp->add_arg(
+    spec => 'perfdata',
+    help => 'Output service uptime as performance data'
+);
+
+$mp->getopts();
+
+my $response = HTTP::Tiny->new(
+    max_redirect => 0,
+    timeout      => $mp->opts->timeout
+)->get( $mp->opts->url );
+unless ( $response->{success} ) {
+    if ( defined $response->{content} ) {
+        $response->{content} =~ s{\n}{}gxms;
+    }
+    $mp->plugin_exit(
+        return_code => CRITICAL,
+        message     => 'Failed to fetch status: '
+          . $response->{reason}
+          . ( $response->{content} ? ', "' . $response->{content} . '"' : '' )
+    );
+}
+
+my $content_type = $response->{headers}->{'content-type'} // '';
+unless ( $content_type eq 'application/json' ) {
+    $mp->plugin_exit(
+        return_code => CRITICAL,
+        message     => 'Expected JSON, got "' . $content_type . '"'
+    );
+}
+
+my $data = try {
+    return decode_json( $response->{content} );
+}
+catch {
+    $mp->plugin_exit(
+        return_code => CRITICAL,
+        message     => 'Failed to parse JSON: ' . $_
+    );
+};
+
+if ( $mp->opts->perfdata ) {
+    $mp->add_perfdata(
+        label => "uptime",
+        value => $data->{uptime} // 0,
+        uom   => "s"
+    );
+}
+
+my $ok = 1;
+my @message;
+for my $check ( @{ $data->{checks} // [] } ) {
+    $ok &&= ( $check->{status} // '' ) eq 'ok';
+    push @message, ( $check->{name} // '' ) . ': ' . ( $check->{status} // '' );
+}
+
+$mp->plugin_exit(
+    return_code => $ok ? OK : WARNING,
+    message => join( ', ', @message )
+);

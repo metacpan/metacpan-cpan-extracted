@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b7f2b5d97cb6e928ce13d4ad30fb16b9fdd7d565 AUTHOR_PLEDGE
+SHA1 126db2ab827e54212b7cd1f5d76f9e7a562ec66d Build.PL
+SHA1 54d6d74e4c245ca66637af09c423cf139e397560 Changes
+SHA1 a1aabc151f9a542918a036ec15f86ec2ed577c73 CommitLog
+SHA1 c080293acfad34717ad4a4bc1e26f35f002b84d6 INSTALL
+SHA1 e6514e4bc5abd3d1a8c7bd2a782c2f8737b413e7 LICENSE
+SHA1 8d5c2a16ee63722cb14479e2760ac0a0e318af49 MANIFEST
+SHA1 69b8a0accb85effa4bd5f4ea93e4f2386d10ac8b MANIFEST.SKIP
+SHA1 1c8fbb32c238a1788869d882bc3821b53cf56814 META.json
+SHA1 bdd2fa4969d02179b20a3d966a5e4ab688799049 META.yml
+SHA1 ae54185acc585272a9958808781ba1015982a159 Makefile.PL
+SHA1 75cc4f5be1edf5c248329ee4ddad1674e87b8f4b README
+SHA1 357c09fe1bfa195df4d5bc198a999345f270676c cpanfile
+SHA1 ba724c6caabb9153a41e79497331b6eece7864d7 dist.ini
+SHA1 33b82d3903dcf42911f92ff1e695d396342418c6 doap.xml
+SHA1 33c43cecc0b75ed97156f90eae41b628d9d4951b examples/rsync.pl
+SHA1 83b9fa2f609a839f39f5591cb2d9df2a095b3751 lib/POE/Component/SmokeBox/Uploads/Rsync.pm
+SHA1 717a9e0922d64e77579368df6b213d6e3e7dbeff t/00-compile.t
+SHA1 f599c04c6c2248b0e080651a85cae00e95c86916 t/00-report-prereqs.dd
+SHA1 323fb2e19fb36aa10445f0f2cb149b50cde31ad6 t/00-report-prereqs.t
+SHA1 51adc46fb01f15bcf2c9fb291496762beece0b7f t/apocalypse.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRYc20ACgkQGfr7vsGKgxwyCwCfSK7pdWQjfcPQqGpHRD6tSjDt
+wu0An2DDJuq37pJ33LcycNP9m1C8PI/n
+=9DBr
+-----END PGP SIGNATURE-----

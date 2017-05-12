@@ -1,0 +1,10 @@
+Changes
+eg/pod2htmltree
+eg/simple.pl
+lib/Pod/HtmlTree.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/1.t
+META.yml                                 Module meta-data (added by MakeMaker)

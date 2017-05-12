@@ -1,0 +1,56 @@
+{
+   "abstract" : "An object to manage running things in parallel processes.",
+   "author" : [
+      "Chad Granum <exodist7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parallel-Runner",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception::LessClever" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Child" : "0.009",
+            "POSIX" : "0",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Parallel::Runner" : {
+         "file" : "lib/Parallel/Runner.pm",
+         "version" : "0.013"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/Parallel-Runner/issues"
+      },
+      "homepage" : "http://open-exodus.net/projects/parrallel-runner",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/exodist/Parallel-Runner"
+      }
+   },
+   "version" : "0.013"
+}

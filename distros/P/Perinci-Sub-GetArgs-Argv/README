@@ -1,0 +1,19 @@
+SYNOPSIS
+
+     use Perinci::Sub::GetArgs::Argv;
+    
+     my $res = get_args_from_argv(argv=>\@ARGV, meta=>$meta, ...);
+
+DESCRIPTION
+
+    This module provides get_args_from_argv(), which parses command line
+    arguments (@ARGV) into subroutine arguments (%args). This module is
+    used by Perinci::CmdLine. For explanation on how command-line options
+    are processed, see Perinci::CmdLine's documentation.
+
+FAQ
+
+SEE ALSO
+
+    Perinci
+

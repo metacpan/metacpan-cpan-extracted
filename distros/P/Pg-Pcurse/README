@@ -1,0 +1,81 @@
+Pg-Pcurse version 0.01
+======================
+
+These libraries support pcurse(1), the script that monitors a 
+Postgres database cluster, it shows statistics on tables, indexes,
+vacuuming, buffers, etc,. 
+
+USAGE
+
+Documentation for usage is described inside the USAGE file, or 
+in the pcurse(1) pod .
+
+INSTALLATION
+
+This module depends on Curses and Curses::Widgets . If you
+have problems installing them, it is probably you are
+missing the header files for libcurses. Debian-bases distributions
+will need the libncurses5-dev  package:
+
+$ apt-get install libncurses5-dev
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+This will also install the pcurse(1) script. The first thing you
+need to perform is to supply  the correct parameter to pcurse(1)
+in order to connect to your Postgres server, something like this:
+
+$ pcurse --host  localhost --user john --passwd apple ,
+or
+$ pcurse -h localhost --password apple 
+
+---------------------------------------------------------------------
+pcurse(1) must connect to the Postgres server in order to do anything.
+At startup, pcurse(1) tests if your login is valid before executing any
+graphics that might mess up the terminal.  I took great care not to
+mess up your screen; in the most unlikely event that the program exits 
+abnormally and fails to restore the screen, you can always reset your 
+terminal by typing 'reset'. 
+----------------------------------------------------------------------
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Carp::Assert
+Curses
+Curses::Widgets
+Getopt::Long
+DBIx::Abstract
+Data::Dumper
+File::Slurp
+User::pwent
+Log::Log4perl
+
+This module requires these modules for testing:
+
+Test::Pod
+Test::Pod::Coverage
+Test::HasVersion
+Test::CPAN::Meta
+Test::Exception
+Test::Distribution
+Test::Dependencies
+Test::MinimumVersion
+Test::Strict
+Test::Spelling
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Ioannis Tambouras
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of GPLv3.
+
+

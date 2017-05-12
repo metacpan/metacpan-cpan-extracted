@@ -1,0 +1,5 @@
+use Package::Tent sub {
+  package Foo;
+  use constant thing => 7;
+  __PACKAGE__;
+};

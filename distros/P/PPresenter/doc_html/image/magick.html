@@ -1,0 +1,139 @@
+
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; ImageMagick images</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>ImageMagick images</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<A HREF=index.html>Images</A><BR>
+<UL>
+<LI><A HREF=tkphoto.html>tkPhoto</A>
+<LI><B>Magick</B>
+</UL>
+<P>
+Options:
+<UL>
+<LI><A HREF=index.html#general>general</A>
+<LI><A HREF=#options>Magick</A>
+</UL>
+<A HREF=#functions>functions</A><BR>
+<A HREF=#examples>Examples</A>
+<P>
+
+    </TD><TD VALIGN=top>
+
+An important part of the design of
+<A HREF=../../index.html>Portable Presenter</A> is the requirement for
+screen-size independency; fonts and also images are scaled, dependent on
+the actual screen-size.
+<P>
+<BLOCKQUOTE>
+<CODE>\begin{commercial}</CODE><BR>
+<A HREF=http://wizards.dupont.com/cristy/ImageMagick/>ImageMagick</A> is an
+excelent package which is able to read, convert, modify, and write close
+to every type of image from script and from a graphical interface. Install it
+now!<BR>
+<CODE>\end{commercial}</CODE>
+</BLOCKQUOTE>
+PPresenter will automatically use Image::Magick when it is installed.  There is no
+performance reason to decide differently.
+<P>
+You can defined Image::Magick images in two ways:
+<UL>
+<LI>Implicit: use an image in your slide description, for instance
+    with
+<PRE>
+  $show->addSlide(-main =&gt; '&lt;IMG SRC=image.xpm&gt');
+</PRE>
+    In this case, you have created a Tk::Photo object via an Image::Magick
+    object, but are not able to control it.
+    Why not directly a <A HREF=tkphoto.html>Tk::Photo</A>?
+    Because now you can use <EM>any</EM> image format, and get very nice
+    scaling results for free!
+    <P>
+
+<LI>Explicit: define an image and refer to it later.  In contrary to
+    Tk::Photo objects, the Image::Magick objects are not window dependent
+    until displayed.
+</UL>
+The explicit way is demonstrated on this page. The implicit way is the
+same for Tk::Photo objects and Image::Magick object, which is described
+on the <A HREF=index.html>main image page</A>.
+
+<H2><A NAME=options>Magick options</A></H2>
+
+There are no special options for Image::Magick objects: the
+<A HREF=index.html#general>general options</A> define all.
+
+<H2><A NAME=functions>ImageMagick functions</A></H2>
+
+If you want to create images with ImageMagick, you do not need to read the
+documentation of PPresenter: they are not connected at all.  A small example to
+demonstrate:
+<PRE>
+   use PPresenter;
+   use Image::Magick;
+
+   my $image = Image::Magick-&gt;new;
+   $image-&gt;Read('image.tiff');
+   $image-&gt;Scale('25%x50%');
+   ...
+
+   my $show = PPresenter-&gt;new;
+   $show-&gt;image($image, -name =&gt; 'image');
+</PRE>
+On the moment you add the image to the show, the Magick structure is
+taken.  You should not try to change the object after this.
+
+<DL>
+<DT><B>$show-&gt;image(</B><I>image, ..., image, options</I> <B>)</B>
+<DD>Add one or more images to PPresenter.  Is equivalent to
+    <PRE>
+map {$show-&gt;image($_, <I>options</I>)}
+    <I>image, image, ...</I>;
+</PRE>
+</DL>
+
+<H2><A NAME=examples>Examples</A></H2>
+
+<H4>Example 1: Own symbols for unordered lists</H4>
+
+Usually, the dots used to precede a list-item in an unordered list (for
+instance used by the <A HREF=../formatter/markup.html>markup formatter</A>),
+is defined by the <A HREF=../decoration/index.html>decoration</A> option
+<CODE>-nestImages</CODE>.  The dots can be specified as filename or as
+objects.
+<P>
+<PRE>
+   use PPresenter;
+   use Image::Magick;
+
+   my $dots = Image::Magick-&gt;new;
+   $dots-&gt;Read('redball.gif', 'blueball.pct');
+
+   my $show = PPresenter-&gt;new;
+   my @p    = $show-&gt;image(@$dots);
+   $show-&gt;change( decoration  =&gt; 'ALL'
+                , -nestImages =&gt; [ undef, @p ] )
+</PRE>
+One Image::Magick can contain a list of images.
+
+<P>
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

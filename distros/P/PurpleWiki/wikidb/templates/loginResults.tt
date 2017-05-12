@@ -1,0 +1,11 @@
+[% INCLUDE common/header.tt
+           title = "Login Results"
+%]
+
+[% IF loginSuccess %]
+<p>Login for [% userName %] complete.</p>
+[% ELSE %]
+<p>Login for [% userName %] failed.</p>
+[% END %]
+
+[% INCLUDE common/footer.tt %]

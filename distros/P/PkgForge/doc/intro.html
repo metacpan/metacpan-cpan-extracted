@@ -1,0 +1,400 @@
+<html>
+<head>
+<title>PkgForge - Background and Design</title>
+</head>
+<body>
+
+<h1>Package Forge</h1>
+
+<p>This introduction provides the background and motivation for
+developing the Package Forge system. It also states the main
+requirements for the project and gives an overview of the design for
+the Package Forge. Here are quick links to the sections:</p>
+
+<ol>
+  <li><a href="#background">Background and Motivation</a></li>
+  <li><a href="#requirements">Requirements</a></li>
+  <li><a href="#design">Design Overview</a></li>
+</ol>
+
+<h2><a name="background">Background and Motivation</a></h2>
+
+<p>We have long recognised within the computing team of the University
+of Edinburgh School of Informatics that we need some mechanism for
+automatically building software from source on multiple platforms
+which requires minimal input and minimal effort from the user.</p>
+
+<p>Currently we are required to have multiple machines available to
+which computing officers (COs) have login access to enable them to
+build packages. Due to the effort required in switching from one
+platform to the next (e.g. SL5 to SL6), we typically have 2 supported
+platforms at any one time and we always support both i386 and x86_64
+architectures. This means that we normally need to have 4 build hosts
+available and in transition periods we may need 6. These servers need
+to all have the necessary set of development software packages either
+installed or ready to hand (e.g. installable by yum for Redhat
+systems). This creates a dependency on the availability of quite a few
+servers, it also adds a maintenance burden and, worst of all, it
+requires the CO to login up to 6 times, install their source code,
+build the software and then submit the results. This is a manual
+process which requires the CO to monitor the process for errors and
+provide regular interactive feedback to move it on to the next
+stage. To add to these problems, there are often subtle differences
+between platforms and environments which can be troublesome during the
+build process or result in broken packages being generated.</p>
+
+<p>At various times some COs have attempted to create scripts to
+workaround a lot of this overhead with varying degrees of success. It
+is relatively easy to have a script which can use ssh to login and
+work through the steps, checking for errors at each stage. Such a
+script can even be made to do the work in parallel across the build
+hosts to save waiting time. This certainly does lead to a more
+reliable and reproducible build process but it is not immune to issues
+such as a build host being unavailable. It also does not cope with the
+situation where a build host is already working flat-out to build some
+other piece of software. When something is not urgent it may be better
+to wait until sufficient resources become available. A further issue
+is that we regularly find platforms or specific architectures being
+missed by COs due to simple forgetfulness or a lack of
+awareness. Packages are often only built for the commonly used
+platforms or the results are only partially submitted to the central
+package repository with some sub-packages being lost in the
+process. Furthermore, even with a script to handle the multiple login
+issue, it still needs to be updated when new platforms are
+introduced. It would be much better if a single system existed which
+had the full knowledge of the supported platforms and could build the
+software appropriately.</p>
+
+<p>A number of systems (often referred to as &quot;build farms&quot;)
+already exist, such as Redhat's koji, which can achieve much of what
+we require. At the start of this project some time was spent
+investigating and evaluating these systems but none was found to
+successfully meet all of our requirements. It is not the aim of this
+document to discuss the ways in which they failed to meet our needs,
+the focus will solely be on the PkgForge system which was
+developed.</p>
+
+<p>One useful thing which came out of this initial investigation was
+the discovery of <em>mock</em>, the Redhat package build tool. This is
+used to manage a small chroot, build-requirements are automatically
+installed using yum and the source package is built using the standard
+rpmbuild tool. The mock tool helps to build packages in a reliable and
+reproducible fashion without the need for all the build dependencies
+to be already installed. It also permits the building of packages for
+different platforms and architectures on a single machine providing
+they are reasonably compatible. In practise this tends to means that a
+single x86_86 architecture machine can be used to build packages for
+both i386 and x86_64 for the current Redhat/Fedora platform and any
+other Redhat/Fedora platform which was released prior to the current
+platform. It is sometimes possible to build packages for newer
+platforms (e.g. F14 on F13) but there is little guarantee that this
+will work. In particular, we have encountered problems when important
+libraries such as rpmlib have API changes. One limitation of the mock
+system is that for any particular platform/architecture configuration
+it is only possible to have one build in operation at once. This means
+that although it is excellent for single users it is not so useful for
+multiple users who end up having to wait for previous users to
+complete their work. This is a fundamental issue related to the use of
+chroots. It can, of course, be worked around by each user having their
+own configurations and build directories but that returns the user to
+needing to maintain their own build environment configurations. This
+shows that some sort of automated queueing mechanism is essential. A
+CO should be able to fire off their source package to be built and
+forget about it until a final status report is issued. It should not
+require any sort of frequent, interactive, checking to see if the
+build system is idle and ready to do work. One further nice feature of
+mock is that it can generate a yum repository from the results of
+previous build runs. This means that it is possible to immediately use
+the results of one build to satisfy the build requirements of the next
+build. We often have to build large sets of software just to satisfy
+the build-requirements of one particular piece of software so this
+feature could be very useful.</p>
+
+<p>It is worth noting at this point the factors which limit the speed
+at which a package can be built on multiple platforms using mock. The
+main factor which limits the number of mock build processes which can
+be run concurrently on a single system is the number of
+processors/cores available. Ideally there has to be a processor per
+mock build process, anything less results in a very slow build. A
+secondary factor is the disk as the mock build process uses the disk
+rather intensively, this is mainly due to the various caching which is
+done. Building within a local disk is more-or-less essential to
+achieve a decent level of performance.  Also, having fast disks and
+possibly even a separate disk per build-process helps make build
+processes go a lot faster.</p>
+
+<p>Further to the investigations into koji and mock the build systems
+for other Linux distributions were examined to see what features they
+provided. The Debian build infrastructure is particularly of interest
+as it provides many of the features that we require. Although there
+did not appear to be much opportunity for code reuse it has provided a
+great deal of inspiration for the design of a distributed build system
+which handles many different architectures.</p>
+
+<p>For efficiency, the CO team in Informatics generally prefer to work
+from the command-line so appropriate tools will have to be
+provided. Many of the CO team regularly works from a variety of
+locations, including at home as well as in the office. This means that
+the tools should be installable and runnable from a wide variety of
+systems (preferably including non-RPM based systems such as
+Debian). There is also the need to be able to submit source packages
+across foreign networks. As well as providing the ability to submit
+from anywhere, an interface will be needed to provide feedback on the
+build results and access to the log files. This is probably best done
+through a web interface.</p>
+
+<p>Any system developed will need to be designed such that it can cope
+with builders for target platforms being unavailable for a period of
+time. Any source packages submitted during a period of builder
+unavailability should be queued until such time as the builder becomes
+available again. This should not require any explicit actions from the
+users. It should also be possible to continue to submit source
+packages even when the processing of new submissions is not
+active. Any submitted jobs should be stored for later processing and
+queueing when the master comes back online.</p>
+
+<p>To make the system sufficiently robust it should be designed so
+that it is not overly complex. Partially, this can be achieved by
+using existing infrastructure wherever applicable. For instance, the
+source packages can be simply submitted into a directory where the COs
+have write access rather than developing a bespoke submission system
+with its own protocol and file transmission system.</p>
+
+<p>Where possible the intention is very much that the design should
+make use of existing infrastructure and tools rather than completely
+re-inventing the wheel. In Informatics there are existing
+authentication systems (e.g. Kerberos and cosign for the web) and an
+existing network file-system (openafs) which can be utilised. As
+previously mentioned there are build tools such as mock which will do
+the bulk of the work. This does mean that some decisions will be made
+that do not suit external users but it is hoped that workarounds will
+always be possible. For example, AFS could be replaced with NFS or
+submission could be done only on a certain host into the local
+file-system. Going further, for example, the design should make it
+possible for a submission tool using sftp to be written.</p>
+
+<p>As well as utilising existing infrastructure the aim is to use
+existing software modules wherever possible. The bulk of the code will
+be written using Perl in an object-oriented style. For this, the
+current &quot;best practice&quot; recognised by the wider Perl
+community is to use Moose. In general, standard modules from CPAN will
+be sought whenever possible. The aim is that the code should also
+reach certain minimal quality standards. This can be achieved by
+standardising the formatting using perltidy and checking with
+perlcritic. To ensure that the code works as expected, and continues
+to do so as Perl and the various modules continue to develop, a
+comprehensive test suite will also be essential. As we are aiming to
+support a wide range of platforms the test suite will be an important
+part of porting to any new operating system where the versions of Perl
+and the required modules may differ quite substantially.</p>
+
+<p>Although the motivation for the development of the PkgForge system has
+come from with the computing team in the School of Informatics it has
+always been part of the considerations that the software developed
+should be useful to other external groups (both within the University
+and elsewhere). With this in mind the intention was that any system
+developed should be reasonably platform agnostic and extensible to
+suit the needs of others. Although we currently only use systems which
+are RPM-based it may well be that at some point in the future we need
+the ability to build software automatically on MacOSX or Debian so
+that possibility should not be deliberately excluded.</p>
+
+<h2><a name="requirements">Requirements</a></h2>
+
+<p>Having taken into account the background and motivation previously
+discussed a number of specific requirements where formulated. (These
+are not in any particular order of merit).</p>
+
+<ol>
+<li>It must be possible for the user to be able to submit source packages
+in a very simple and straightforward fashion which requires minimal
+effort. In particular, there must be command line submission tool
+which makes the setting of any options, etc., a trivial process.</li>
+
+<li>The build process must be totally automated and not require any
+interactive feedback from the user.</li>
+
+<li>If a build is successful then all build products must be automatically
+submitted to the correct location (the package &quot;bucket&quot; in Informatics
+terminology).</li>
+
+<li>The build environment must be consistent and the build process must be
+reliable and reproducible.</li>
+
+<li>It must be possible for a user to submit a job with little or no prior
+knowledge of the supported platforms (other than the type of package
+required, e.g. SRPM). However, it must also be possible to restrict
+the set of target platforms when it makes no sense (e.g. certain
+software will not build on the x86_64 architecture).</li>
+
+<li>It must be possible to have multiple machines servicing a single
+target platform. This is to allow the efficient handling of large
+scale rebuilds, in particular, this will be essential when Informatics
+ports all their local software to a new platform.</li>
+
+<li>The system should be extensible so that support can be added for
+platforms which do not use the RPM package format.</li>
+
+<li>It should be possible for external users to deploy the system with
+minimal effort. To achieve this all the configuration data must be in
+configuration files and nothing specific to the School of Informatics
+should be hardwired into the code.</li>
+
+<li>It should be possible to submit a set of source packages all at once
+for building as a single set. The results of building each piece of
+software in the set would then become available for the rest of the
+set. Only if all software in the set builds successfully would
+anything be submitted.</li>
+
+<li>Existing infrastructure should be used where possible to minimise the
+amount of new development work that needs to be done for the system.</li>
+
+<li>There must be a comprehensive test suite.</li>
+
+<li>The code must meet certain quality standards and be formatted in a
+standard way. The coding style should follow recognised Perl best
+practises.</li>
+
+<li>Wherever possible existing libraries should be used to aid portability
+and reduce the amount of new code which has to be developed and
+maintained.</li>
+</ol>
+
+<h2><a name="design">Design Overview</a></h2>
+
+<p>Based on the background, motivations and requirements which have
+already been discussed an outline design was developed. Each of these
+parts will be discussed in greater detail in subsequent sections. This
+is a simple high-lelevel overview of the system.</p>
+
+<h3>Build Jobs</h3>
+
+<p>Central to the design of the PkgForge system is the concept of
+a <em>build job</em> which is what the user submits. A build job has a
+unique identifier and consists of a set of, one or more, source
+packages and some instructions which tell the system how and where the
+packages should be built and submitted.</p>
+
+<p>A build job is submitted as a directory which contains all the
+source packages and a meta-data file. This directory is placed into a
+standard location in the filesystem where the user has write
+access. In Informatics the filesystem used is AFS so that a build job
+may be submitted from anywhere.</p>
+
+<h3>The Registry</h3>
+
+<p>
+The registry is used to store all the information necessary for
+scheduling tasks. It contains the information about the current set of
+supported platforms, the build daemons for the platforms and the list
+of jobs along with the associated tasks. The status of each task and
+job is tracked as it progresses through its lifecycle and logs are
+kept of when jobs have been attempted. It, deliberately, does not
+contain all the information which is submitted by the user which is in
+the job meta-data file. When a build daemon needs the extra
+information (such as obtaining the list of source packages to be
+built) it loads the job data from the file directly. This makes it
+possible to easily extend the set of information in the meta-data file
+whenever necessary without having to alter the database schema.
+</p>
+
+<p>
+The registry is stored in a PostgreSQL database. The incoming queue
+processor and build daemons communicate directly with this database,
+there is not a bespoke communication layer. It is unlikely that the
+system will work as it stands with any other database type. All of the
+access controls, the locking and some of the scheduling code are
+written in the pgsql language. A deliberate decision was made to
+utilise these features of the database as they are likely to be more
+reliable and more performant than any similar features which could be
+added to the PkgForge code.
+</p>
+
+<h3>Incoming Job Processor</h3>
+
+<p>There is a single daemon (which runs on the server often referred
+to as the <em>master</em>) which regularly checks the directory into
+which new jobs are submitted. Whenever a new job directory is detected
+the job is registered, processed and, if validated, transferred to a
+different secure location and queued for the builder daemons. Various
+validity checks are carried out, for example, with source RPMs they
+are first checked to ensure they are valid SRPMs.</p>
+
+<p>The queueing of a job is done by constructing the set of target
+platforms based on what is available and what the user has
+requested. Once the set of platforms is computed a separate <em>build
+task</em> is scheduled for the job on each platform. The job and the
+scheduled tasks are added to the central registry. Only the core
+information required for the scheduling of jobs/tasks is copied from
+the submitted job meta-data into the registry.</p>
+
+<h3>The Build Daemons</h3>
+
+<p>
+Each active target platform has a set of, zero or more, build
+daemons. The build daemons do the actual work of building packages
+from the submitted sources. When there are no build daemons in
+operation the new tasks will be queued awaiting the addition of a new
+daemon. Each build daemon must be entered into the registry before it
+can begin accepting tasks. An entry in the registry does not guarantee
+that the build daemon is in anyway live and operational, it is purely
+used to record which platform/architecture the build daemon supports.
+</p>
+
+<p>
+The task scheduling is very basic. Each time a check of the queue is
+made it is ordered according to submission date and time with the
+oldest task being selected. For the sake of sanity, during this process
+the table is locked so any other daemons for the same platform will
+have to wait to retrieve new tasks. If a builder does not complete a
+task (neither success or failure) it might put the task back onto the
+queue. A task may be attempted multiple times, by multiple build
+daemons and may even be retried after a build failure. The build log
+tracks every attempt to build a task.
+</p>
+
+<p>
+When a new task is accepted by a build daemon it goes through several
+phases. Initially the list of source packages is filtered to retrieve
+only those which are applicable (e.g. SRPMs for a builder that uses
+mock/rpmbuild). After that an attempt is made to build each source
+package in turn according to the original sequence specified by the
+submitter. The behaviour upon failure is controllable by the user, it
+can either be an immediate failure of the whole task or the source
+package can be put to the end of the list of sources and tried again
+later. The RPM builder uses the second approach by default so that it
+can try to handle a set of source packages having build-requirements
+upon each other. After the package building phase there is an optional
+checking stage, this is done to ensure the validity of the generated
+packages. Finally, if all source packages are built correctly and pass
+the checks, the packages will be submitted to the appropriate
+repository using pkgsubmit. In all cases after completion of a task
+the log files are stored in a central &quot;results&quot; directory
+which is accessible from the web interface. Optionally the build
+daemons can generate reports at the end of the build process (for
+example sending an email to the user who submitted the job).
+</p>
+
+<h3>The Web Interface</h3>
+
+<p>
+
+The first iteration of the web interface is fairly basic. It is used
+to display the list of jobs and associated tasks a user has submitted
+and the current status of each. For each task it is possible to
+retrieve log files and the generated packages (when a task has
+succeeded).
+</p>
+
+<p>
+In the future the web interface may gain the capability to modify the
+registry. This would allow a user to cancel and retry jobs and
+tasks. It may also gain a feature for uploading jobs which would be
+a very useful when a secure networked filesystem is not available.
+</p>
+
+</body>
+
+</html>
+
+

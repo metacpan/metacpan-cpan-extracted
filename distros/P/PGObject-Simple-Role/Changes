@@ -1,0 +1,67 @@
+Revision history for PGObject-Simple-Role
+
+
+1.13.2  2016-11-21
+        Fix minimum required dependency
+
+1.13.1  2016-11-21
+        Fix minimum required dependency
+
+1.13.0  2016-11-20
+        Fix issue #8: Let PGObject handle $value->to_db() calls
+        Fix issue #9: No special casing of BYTEA function arguments
+        Fix author tests
+
+1.12.1  2016-06-14
+        Properly handling null when explicitly set.
+        Doc fixes
+        Able to get registry through this package.
+
+1.12.0  2016-02-12
+        Fixing warning about unitialized value in subroutine entry
+
+1.11.0  2014-08-25
+        Now safe regarding memoized PGObject catalog lookups
+
+1.10.01 2014-05-01
+        Fixed wrong licensing reference in Makefile
+
+1.01    2014-02-25
+        Handling of per-class default schemas
+
+1.00    2014-02-18 
+        Correct handling of lazy attributes
+        Removed dbmethod() and documented why
+        Contextual return of results so scalars return first row.
+
+0.71    2014-02-15
+        Fixed Makefile.PL to ensure proper dependencies
+
+0.70    2014-02-15
+        dbmethod() refactored so it is usable by libraries other than this one,
+        is better tested, and more general.  Use of the export here is now 
+        deprecated.
+
+0.52    2014-01-14
+        Fixed funcprefix handling with call_procedure
+
+0.51    2013-11-20
+        Fixed inability to push funcprefix through to PGObject::Simple
+
+0.50    2013-11-13
+        Refactored to centralize logic in PGObject::Simple
+        Added dbmethod() for declaratively defining database methods.
+
+0.13    2013-11-06
+        Fixed test cases requiring Carp::Always, which was not in makefile.
+
+0.12    2013-11-05
+        call_procedure can now be called on subclasses by package name if 
+        desired.
+
+0.11    2013-05-31
+        Fixed an issue with the Makefile not reporting Moo::Role as a dependency
+
+0.10    2013-05-30
+        First version, released on an unsuspecting world.
+

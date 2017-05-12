@@ -1,0 +1,44 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Pod::LinkCheck' => '0',
+                                      'Test::Synopsis' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'IRC::Toolkit' => '0.07',
+                                      'Moo' => '2',
+                                      'MooX::Role::POE::Emitter' => '0',
+                                      'POE' => '1.3',
+                                      'POE::Filter::IRCv3' => '0',
+                                      'POEx::IRC::Backend' => '0.024002',
+                                      'Type::Tiny' => '0',
+                                      'perl' => '5.016',
+                                      'strictures' => '2'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

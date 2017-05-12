@@ -1,0 +1,114 @@
+Revision history for POE-Filter-SSL
+
+0.01    19.06.2010
+        First version, released on an unsuspecting world.
+
+0.02    19.06.2010
+	Fixed the incomplete package
+	Fixed the documentation
+
+0.03    20.06.2010
+        Fixed the documentation
+        Improved the handling in server mode
+        Client mode now included
+
+0.04    20.06.2010
+	Improved the documentation
+	Parameters now without reference
+
+0.05	20.06.2010
+	Fixed the documentation
+	Renamed clientcertrequest to clientcert
+
+0.06	20.06.2010
+	Fixed the documentation
+
+0.07	20.06.2010
+	Fixed the documentation
+
+0.08	20.06.2010
+	Fixed the documentation
+
+0.09    20.06.2010
+        Fixed the support of write bigger than 32KBytes to 65Kbytes
+
+0.10	20.06.2010
+	Fixed the support of write bigger than 65535 bytes to 65536 bytes
+
+0.11	21.06.2010
+	Fixed the support of write bigger than 65535 bytes by a new buffer
+	with a static BIO OpenSLL buffer of 16 Kbyte per connection
+
+0.12	03.07.2010
+	Fixed the documentation
+	Removed the own BIO implementation and using now BIO_s_mem of OpenSSL
+
+0.13	06.07.2010
+	Fixed the documentation
+	Allowing to use POE::Component::Server::TCP and
+        POE::Component::Client::TCP the Filter::SSL together with
+        Filter::HTTPD.
+
+0.14	06.07.2010
+	Improved the change of filters vi doHandshake().
+
+0.15	06.07.2010
+	Fixed bug in doHandshake().
+
+0.16	06.07.2010
+	Fixed the ADVANCED EXAMPLE
+
+0.17	06.07.2010
+	Removed die()s
+
+0.18	08.07.2010
+	Fixed the handling of big packets
+	Fixed and improved the documentation
+
+0.19	16.08.2010
+	Fixed typo in loading of certification files in server mode
+	Fixed endless loop if unexptected error came from OpenSSL
+	Fixed https client example
+
+0.20	25.08.2010
+	Added support for POE::Component::Server::HTTP
+	Found a solution for the use to make ssh handshake without
+        the hack in the input handler
+
+0.21	09.11.2010
+	Fixed documentation so Test::Coverage works now
+
+0.22	12.11.2010
+	Fixed prerequires so make test works on more machines
+
+0.23	01.06.2011
+	Fixed documentation bug in HTTPS Server demo
+	Added getCipher() function
+
+0.24	02.08.2011
+	Fixed a bug interacting to some other components
+        without SSL, e.g. POE::Component::Client::HTTP
+
+0.25	27.09.2013
+	Intermediate certificates as chain (chain parameter)
+	Diffie-Hellman for perfect forward secrecy (dhcert parameter)
+
+0.26	28.09.2013
+	Syntax error
+
+0.27	28.09.2013
+	-lssl is not enouth; -lcrypto -ldl added
+
+0.28	07.03.2014
+	Fixed major security error verifying client certifcates in clientCertValid()
+
+0.29	30.03.2016
+	Fixed fix spelling erros in manpage (#106512)
+	Fixed (D)DoS issues with malicious clients sending random data (#100602): New option errorhandler
+	Fixed fix pod in SSL.pm (#106511)
+	SSL_OP_CIPHER_SERVER_PREFERENCE by default
+	dhcertmem: Pass dhcertparam via scalar
+
+0.30	08.04.2016
+	Fixed bug passing dhparamem
+

@@ -1,0 +1,33 @@
+---
+abstract: 'include ditaa diagrams in your pod'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  Pod::Elemental: '0'
+  Pod::Elemental::Transformer::Pod5: '0'
+  Test::Differences: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Weaver-Plugin-Ditaa
+requires:
+  Capture::Tiny: '0'
+  IO::All: '0'
+  IPC::System::Simple: '0'
+  MIME::Base64: '0'
+  Moose: '0'
+  Pod::Elemental::Transformer: '0'
+  Pod::Weaver::Role::Dialect: '0'
+  namespace::clean: '0'
+  perl: '5.018'
+resources:
+  bugtracker: https://github.com/frioux/Pod-Weaver-Plugin-Ditaa/issues
+  homepage: https://github.com/frioux/Pod-Weaver-Plugin-Ditaa
+  repository: https://github.com/frioux/Pod-Weaver-Plugin-Ditaa.git
+version: '0.001006'

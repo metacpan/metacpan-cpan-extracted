@@ -1,0 +1,29 @@
+---
+abstract: 'build simple recursive-descent parsers'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parser-MGC
+provides:
+  Parser::MGC:
+    file: lib/Parser/MGC.pm
+    version: '0.16'
+  Parser::MGC::Examples::EvaluateExpression:
+    file: lib/Parser/MGC/Examples/EvaluateExpression.pm
+requires:
+  File::Slurp::Tiny: '0'
+  Scalar::Util: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.16'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

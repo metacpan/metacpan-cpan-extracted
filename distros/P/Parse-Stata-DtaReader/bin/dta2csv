@@ -1,0 +1,110 @@
+#!/usr/bin/env perl
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+  if 0;    # to go to perl if running under some shell
+
+=head1 NAME
+
+dta2csv - command-line tool to convert Stata 8 and Stata 10 .dta files to csv
+
+=head1 SYNOPSIS
+
+dta2csv I<file.dta> [I<otherfile.dta> ...]
+
+The result will be in I<file.csv> (or I<file-1.csv>, I<file-2.csv>, etc; no overwriting of existing files).
+
+=head1 BUGS
+
+Minimal documentation, error management and testing.
+All types of missing values in the .dta file are turned into blank cells in the CSV.
+Probably some other problems.
+
+=head1 NO WARRANTY
+
+This code comes with ABSOLUTELY NO WARRANTY of any kind.
+
+=head1 AUTHOR
+
+Copyright 2007, 2008, 2014 Reckon LLP and Franck Latrémolière.
+L<http://www.reckon.co.uk/staff/franck/>
+
+=head1 LICENCE
+
+This is free software; you can redistribute it and/or modify it under the same terms as Perl.
+
+=head1 SEE ALSO
+
+L<Parse::Stata::DtaReader> does the parsing.
+
+=cut
+
+use warnings;
+use strict;
+use Parse::Stata::DtaReader;
+
+unless (@ARGV) {
+    print STDERR "dta2csv: no input files\n";
+    print STDERR "Usage: dta2csv [-v] file.dta [otherfile.dta ...]\n";
+    print STDERR
+      " (Parse::Stata::DtaReader version $Parse::Stata::DtaReader::VERSION)\n";
+    exit 1;
+}
+
+sub dta2csv {
+    my $verbose = 0;
+    my $status  = 0;
+    for my $file (@_) {
+        if ( $file eq '-v' ) {
+            $verbose = 1;
+            next;
+        }
+        unless ( -e $file ) {
+            warn "$file: file not found";
+            ++$status;
+            next;
+        }
+        open DTA, '<', $file;
+        my $dta = Parse::Stata::DtaReader->new(*DTA);
+        if ( $dta->{ds_format} == 114 || $dta->{ds_format} == 113 ) {
+            print STDERR "$file: ";
+            print STDERR $dta->{ds_format} == 114 ? 'Stata 10' : 'Stata 8';
+            print STDERR $dta->{byteorder} == 1
+              ? ' big endian'
+              : ' little endian';
+            print STDERR ", $dta->{nvar} variable";
+            print STDERR 's' if $dta->{nvar} > 1;
+            print STDERR ", $dta->{nobs} observation";
+            print STDERR 's' if $dta->{nobs} > 1;
+            print STDERR "\n";
+
+            if ($verbose) {
+                require Data::Dumper;
+                print STDERR Data::Dumper::Dumper($dta);
+            }
+            ( my $name = $file ) =~ s/(\.dta)?$/.csv/;
+            my $no = '';
+            $name =~ s/-?$no\.csv$/'-' . ++$no . '.csv'/e while -e $name;
+            open CSV, '>', $name;
+            print CSV join( ',', @{ $dta->{varlist} } ) . "\n";
+
+            while ( my @a = $dta->readRow ) {
+                print CSV join(
+                    ',',
+                    map {
+                        if ( defined $_ ) { s/"/\\"/g; qq%"$_"%; }
+                        else              { ''; }
+                    } @a
+                ) . "\n";
+            }
+            close CSV;
+        }
+        else {
+            warn "$file: not a Stata 8 or 10 .dta file";
+            ++$status;
+        }
+        close DTA;
+    }
+    return $status;
+}
+
+exit dta2csv(@ARGV);

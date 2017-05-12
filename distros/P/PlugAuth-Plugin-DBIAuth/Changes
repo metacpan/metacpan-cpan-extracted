@@ -1,0 +1,19 @@
+Revision history for PlugAuth-Plugin-DBIAuth
+
+0.05      2015-12-01 07:25:42 -0500
+  - Silenced silly warnings due to crypt returning undef.
+  - Moved repository to clustericious org on github
+    (updated meta appropriately)
+
+0.04      2015-02-06 13:09:29 -0500
+  - Changed build (no external changes)
+
+0.03      2013-07-06 18:15:54 America/New_York
+  - documentation
+  - metadata updates
+
+0.02      2013-05-10 11:44:54 America/New_York
+  - documentation fixes
+
+0.01      2013-04-23 17:11:15 America/New_York
+  - initial version

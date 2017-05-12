@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/POD/Credentials.pm
+t/POD::Credentials.t

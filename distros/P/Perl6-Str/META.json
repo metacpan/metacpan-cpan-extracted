@@ -1,0 +1,49 @@
+{
+   "abstract" : "Perl 6 - like grapheme level string handling",
+   "author" : [
+      "Moritz Lenz"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl6-Str",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Test::More" : "0",
+            "Unicode::Normalize" : "0",
+            "charnames" : "0",
+            "perl" : "v5.8.3"
+         }
+      }
+   },
+   "provides" : {
+      "Perl6::Str" : {
+         "file" : "lib/Perl6/Str.pm",
+         "version" : "v0.0.5"
+      },
+      "Perl6::Str::Test" : {
+         "file" : "lib/Perl6/Str/Test.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.0.5"
+}

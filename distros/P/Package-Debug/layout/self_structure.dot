@@ -1,0 +1,7 @@
+strict digraph Perl {
+	graph [compound=1, concentrate=1, overlap=false, rankdir=LR, ranksep=1, smoothing=triangle, splines=spline];
+	node [label="\N", shape=record, style=dotted];
+	edge [minlen=1];
+	"Package::Debug" [label="{{<port1> exporter}|<port2> Package::Debug}"];
+	"Package::Debug::Object" [label="{{<port1> class}|<port2> Package::Debug::Object}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+}

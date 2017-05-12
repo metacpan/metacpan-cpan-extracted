@@ -1,0 +1,23 @@
+Changes
+lib/PHP/Include.pm
+lib/PHP/Include/Vars.pm
+Makefile.PL
+MANIFEST
+README
+t/000.load.t
+t/005.doublequotes.t
+t/006.singlequotes.t
+t/010.vars.t
+t/test.php
+META.yml
+t/hol.php
+t/011.hol.t
+t/lol.php
+t/012.lol.t
+t/hoh.php
+t/013.hoh.t
+t/loh.php
+t/014.loh.t
+t/deepstructure.php
+t/015.deepstructure.t
+META.json                                Module JSON meta-data (added by MakeMaker)

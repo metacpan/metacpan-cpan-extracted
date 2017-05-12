@@ -1,0 +1,175 @@
+NAME
+    Pushmi - Subversion repository replication tool
+
+SYNOPSIS
+      pushmi mirror /var/db/my-local-mirror http://master.repository/svn
+      pushmi sync /var/db/my-local-mirror
+
+DESCRIPTION
+    Pushmi provides a mechanism for bidirectionally synchronizing Subversion
+    repositories. The main difference between Pushmi and other replication
+    tools is that Pushmi makes the "slave" repositories writable by normal
+    Subversion clients.
+
+CONFIGURATION
+    Install and run memcached
+        We use memcached for better atomic locking for mirrors, as the
+        subversion revision properties used for locking in SVK is
+        insufficient in terms of atomicity.
+
+        You need to start memcached on the "authproxy_port" port specified
+        in pushmi.conf. For exmaple:
+
+          memcached -p 7123 -dP /var/run/memcached.pid
+
+    Set up your local repository
+        Create /etc/pushmi.conf and setup username and password. See
+        t/pushmi.conf for example.
+
+          pushmi mirror /var/db/my-local-mirror http://master.repository/svn
+
+    Bring the mirror up-to-date.
+          pushmi sync --nowait /var/db/my-local-mirror
+
+        Configure a cron job to run this command every 5 minutes.
+
+    Configure your local svn
+        Set up your svn server to serve /var/db/my-local-mirror at
+        "http://slave.repository/svn"
+
+    For your existing Subversion checkouts, you may now switch to the slave
+    using this command:
+
+      svn switch --relocate http://master.repository/svn http://slave.repository/svn
+
+    From there, you can use normal "svn" commands to work with your
+    checkout.
+
+    Setup auto-verify
+    You can optionally enable auto-verify after every commit by setting
+    revision property "pushmi:auto-verify" on revision 0 for the repository,
+    Which can also be done with:
+
+      pushmi verify --enable /path/to/repository
+
+    You will also need to specify the full path of verify-mirror utility in
+    the "verify_mirror" configuration option.
+
+    When the repository is in inconsistent state, users will be advised to
+    switch back to the master repository when trying to commit. The
+    inconsistent state is denoted by the "pushmi:inconsistent" revision
+    property on revision 0, and can be cleared with:
+
+      pushmi verify --correct /path/to/repository
+
+AUTHENTICATION
+    The above section describes the minimum setup without authentication and
+    authorisation.
+
+    For svn:// access
+        You can we svn:// access for Pushmi, but there are some limitations
+        for it as of the current implementation. First of all it will have
+        to be using the shared credential when committing to the master. So
+        you will need to make sure the user is allowed to write to the
+        master. And as a side-effect, the commits via the slave will be
+        committed by the shared user on the master. You can however use some
+        post-commit hook or other means to set the "svn:author" revision
+        property afterwards. You will need to make sure "use_shared_commit"
+        is enabled, and if you are using svn+ssh://, make sure the user
+        pushmi runs as has the correct ssh key to commit to the master.
+
+    For authz_svn-controlled master repository
+        You need to use an external mechanism to replicate the authz file
+        and add a "AuthzSVNAccessFile" directive in the slave's slave
+        "httpd.conf", along with whatever authentication modules and
+        configurations. You will need additional directives in "httpd.conf"
+        using mod_perl2:
+
+          # replace with your auth settings
+          AuthName "Subversion repository for projectX"
+          AuthType Basic
+          Require valid-user
+          # here are the additional config required for pushmi
+          PerlSetVar PushmiConfig /etc/pushmi.conf
+          PerlAuthenHandler Pushmi::Apache::AuthCache
+
+    For public-read master repository
+        You can defer the auth* to the master on write. Put the additional
+        config in "httpd.conf":
+
+          PerlSetVar SVNPath /var/db/my-local-mirror
+          PerlSetVar Pushmi /usr/local/bin/pushmi
+          PerlSetVar PushmiConfig /etc/pushmi.conf
+
+          PerlLoadModule Apache::AuthenHook # for apache 2.2
+
+          <LimitExcept GET PROPFIND OPTIONS REPORT>
+            AuthName "Subversion repository for projectX"
+            AuthType Basic
+            Require valid-user
+            # for apache 2.0
+            PerlAuthenHandler Pushmi::Apache::AuthCommit
+            # for apache 2.2
+            AuthBasicProvider Pushmi::Apache::RelayProvider
+          </LimitExcept>
+
+CONFIG FILE
+    "pushmi" looks for /etc/pushmi.conf or wherever "PUSHMI_CONFIG" in
+    environment points to. Available options are:
+
+    username
+        The credential to use for mirroring.
+
+    password
+        The credential to use for mirroring.
+
+    authproxy_port
+        The port memcached is running on.
+
+    use_cached_auth
+        If pushmi should use the cached subversion authentication info.
+
+    use_shared_commit
+        Use the "username" and "password" for committing to master.
+
+    verify_mirror
+        Path to verify-mirror.
+
+    Some mirror-related options are configurable in svk, in your
+    ~/.subversion/config's "[svk]" section:
+
+    ra-pipeline-delta-threshold
+        The size in bytes that pipelined sync should leave the textdelta in
+        a tempfile. Default is 2m.
+
+    ra-pipeline-buffer
+        The max number of revisions that pipelined sync should keep in
+        memory when it is still busy writing to local repository.
+
+LOGGING
+    "pushmi" uses Log::Log4perl as logging facility. Create
+    /etc/pushmi-log.conf. See t/pushmi-log.t as exmaple. See also
+    Log::Log4perl::Config for complete reference.
+
+LICENSE
+    Copyright 2006-2007 Best Practical Solutions, LLC.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+SUPPORT
+    To inquire about commercial support, please contact
+    sales@bestpractical.com.
+
+AUTHORS
+    Chia-liang Kao <clkao@bestpractical.com<gt>
+

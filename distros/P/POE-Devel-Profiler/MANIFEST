@@ -1,0 +1,10 @@
+Makefile.PL
+MANIFEST
+README
+t/POE-Devel-Profiler.t
+lib/POE/Devel/Profiler.pm
+lib/POE/Devel/Profiler/Parser.pm
+lib/POE/Devel/Profiler/Visualizer/BasicSummary.pm
+lib/POE/Devel/Profiler/Visualizer/BasicGraphViz.pm
+bin/poepp
+META.yml

@@ -1,0 +1,42 @@
+1.1.1    13.03.2017
+           - compile with all warnings enabled, fix warnings
+           - fix threaded perl build
+1.1.0    03.03.2017
+           C++ changes only
+           - move to new panda::string, string_view, etc
+           - misc optimizations
+           - encode/decode_uri_component no longer adds null-byte at the end
+1.0.8    26.01.2017
+           - added typemaps for FQN classes
+           - require Panda::Lib 1.2.1
+1.0.7    27.06.2016
+           - remove warnings when setting undef to scheme/host/location/path/query_string/raw_query/hash, trait it as if "" was set
+1.0.6    08.11.2015
+           - add hook for serializing via JSON::XS with convert_blessed enabled
+           - add cloning/serializing info to docs
+1.0.5    30.11.2015
+           - bugfix: in some rare cases query_string and query got out of sync after uri->clone()
+1.0.4    10.03.2015
+           - remove debug c++11 flag from makefile
+1.0.3    10.03.2015
+           - up-to-date with new Panda::XS
+1.0.2    05.02.2015
+           - changed panda-lib's clone hook CLONE -> HOOK_CLONE, this fixes thread->create under threaded perls
+1.0.1    03.02.2015
+           - bump version to require win32-friendly Panda::Lib/XS/Install
+1.0.0    31.01.2015
+           - fix threaded builds with NO_GET_CONTEXT
+           - bump version to release
+           - improve performance for perl's interface 'query' method
+0.1.3    09.12.2014
+           - fix a bug which could make query_string and query hash out of sync
+             after using param()/multiparam() methods
+0.1.2    05.12.2014
+           - remove debugging flag from Makefile.PL
+0.1.1    04.12.2014
+           - bugfix: corrupted url strings (with null bytes) might cause core dumps.
+             now null-bytes immediately stop parsing as if it was the end of the url string.
+           - added bool operator overloading, to prevent calling more expensive to_string()
+             in conditions like: if ($uri) {}
+0.1.0    26.11.2014
+           - first release

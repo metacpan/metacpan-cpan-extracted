@@ -1,0 +1,55 @@
+Revision history for POE-Component-NetSNMP-agent
+
+0.600 - 2016-05-16 - SAPER
+
+    [Distribution]
+    - Add missing prereq List::MoreUtils
+    - Converted the Changes file to CPAN::Changes::Spec format.
+
+
+0.500 - 2012-12-02 - SAPER
+
+    [Bugfix]
+    - Correctly check for defined-ness of values (Robert Lemmen).
+
+    [Documentation]
+    - Add a CAVEATS section to document the known problems.
+
+
+0.400 - 2012-11-14 - SAPER
+
+    [Bugfix]
+    - Work around a bad interaction between the way Perl handles lexicals
+      and the way NetSNMP::agent's setValue() tries to handle more than
+      one type of value.
+    - Fixed add_oid_tree.
+
+    [Feature]
+    - New, even simpler API.
+
+    [Tests]
+    - t/90-pod.t also makes use of Pod::Checker.
+
+
+0.300 - 2011-07-18 - SAPER
+
+    [Feature]
+    - Added Ping option to automatically recover from a lost connection
+      with the AgentX master.
+
+    [Distribution]
+    - Add missing prereq parent.pm
+
+
+0.200 - 2011-07-11 - SAPER
+
+    [BUGFIX] Rework the way communication sockets are managed to make
+    the module work with NetSNMP::agent 5.4
+    [FEATURE] Added Autohandle option, to provide an easy-to-use API
+    a la SNMP::Extension::PassPersist.
+
+
+0.100 - 2011-06-20 - SAPER
+
+    First version released.
+

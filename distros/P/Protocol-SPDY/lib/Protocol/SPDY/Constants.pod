@@ -1,0 +1,119 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::SPDY::Constants
+at lib/Protocol/SPDY/Constants.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Protocol::SPDY::Constants - constant definitions for the SPDY protocol
+
+=head1 VERSION
+
+version 1.001
+
+=head1 SYNOPSIS
+
+ use Protocol::SPDY::Constants ':all';
+
+=head1 DESCRIPTION
+
+Provides some constants.
+
+=head1 CONSTANTS
+
+=head2 FLAG_FIN
+
+Value for the FIN flag in control/data frames.
+
+=head2 FLAG_COMPRESS
+
+Compression flag - currently unused
+
+=head2 FLAG_UNI
+
+Unidirectional flag - used to mark a stream as not requiring a reply.
+
+=head2 HEADER_LENGTH
+
+Number of bytes required in order to work out how big a frame will be.
+
+=head2 ZLIB_DICTIONARY
+
+Initial compression dictionary for the zlib compression protocol used
+for name/value pair data.
+
+=head2 MAX_SUPPORTED_VERSION
+
+Highest version we know about.
+
+=head1 RST_STREAM CODES
+
+The following codes can be returned as values in a
+L<RST_STREAM|Protocol::SPDY::Frame::Control::RST_STREAM> frame. See
+the L<status_code|Protocol::SPDY::Frame::Control::RST_STREAM/status_code>
+and L<status_code_as_text|Protocol::SPDY::Frame::Control::RST_STREAM/status_code_as_text>
+methods.
+
+=head2 PROTOCOL_ERROR
+
+There was a protocol violation in something we've sent to the other side.
+
+=head2 INVALID_STREAM
+
+The requested stream is not valid (for example, when we receive a reply
+to a stream that we did not initiate).
+
+=head2 REFUSED_STREAM
+
+We do not want this stream.
+
+=head2 UNSUPPORTED_VERSION
+
+The protocol version requested is not supported by this library.
+
+=head2 CANCEL
+
+Used by the initiator to stop an active stream before normal completion.
+
+=head2 INTERNAL_ERROR
+
+Generic error when internal state is invalid.
+
+=head2 FLOW_CONTROL_ERROR
+
+We violated the expected window update behaviour.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Protocol::SPDY>
+
+=item * L<Protocol::SPDY::Frame>
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Exporter>
+
+L<as_heavy|Exporter/as_heavy>, L<export|Exporter/export>, L<export_fail|Exporter/export_fail>, L<export_ok_tags|Exporter/export_ok_tags>, L<export_tags|Exporter/export_tags>, L<export_to_level|Exporter/export_to_level>, L<import|Exporter/import>, L<require_version|Exporter/require_version>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2015. Licensed under the same terms as Perl itself.

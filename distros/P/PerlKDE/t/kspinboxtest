@@ -1,0 +1,108 @@
+#!/usr/bin/perl -w
+use KDE;
+import KDE::app;
+
+package BoolTest;
+use Qt::slots 'slotChangeValue()';
+
+@ISA = qw(Qt::Widget);
+
+sub new {
+    my $self = shift->SUPER::new(@_);
+    $sbpt = $self->{sbpt} = new KDE::SpinBox($self);
+
+    $sbpt->setValue("True");
+    $self->connect($sbpt, 'valueIncreased()', 'slotChangeValue()');
+    $self->connect($sbpt, 'valueDecreased()', 'slotChangeValue()');
+
+    return $self;
+}
+
+sub resizeEvent {
+    my($self, $e) = @_;
+    $self->{sbpt}->resize($e->size);
+}
+
+sub slotChangeValue {
+    my $self = shift;
+    my $sbpt = $self->{sbpt};
+
+    $sbpt->setValue($sbpt->getValue eq "True" ? "False" : "True");
+}
+
+package StringTest;
+use Qt::slots 'catchIncr()', 'catchDecr()';
+
+@ISA = qw(Qt::Object);
+
+sub catchIncr {
+    print "incr++\n";
+}
+
+sub catchDecr {
+    print "decr++\n";
+}
+
+package main;
+
+$top = new Qt::Widget;
+$top->resize(400, 350);
+
+$label1 = new Qt::Label("Plain KSpinBox Widget", $top);
+$label1->setGeometry(20, 20, 260, 25);
+$count1 = new KDE::SpinBox($top, "cnt", Qt::AlignCenter);
+$count1->setGeometry(300, 20, 75, 25);
+
+$label2 = new Qt::Label("KNumericSpinBox ([1 .. 50],step = 2)", $top);
+$label2->setGeometry(20, 60, 260, 25);
+
+$count2 = new KDE::NumericSpinBox($top, "num");
+$count2->setGeometry(300, 60, 50, 25);
+$count2->setStep(2);
+$count2->setRange(1, 50);
+$count2->setValue(17);
+
+$label3 = new Qt::Label("Sample for non derived Widget (see source)", $top);
+$label3->setGeometry(20, 100, 260, 25);
+
+$count3 = new BoolTest($top, "bool");
+$count3->setGeometry(300, 100, 50, 25);
+
+$label4 = new Qt::Label("Bool implemented trough KListSpinBox", $top);
+$label4->setGeometry(20, 140, 260, 25);
+
+$list = [ "true", "false" ];
+
+$count4 = new KDE::ListSpinBox($list, $top, "list");
+$count4->setGeometry(300, 140, 50, 25);
+
+$label5 = new Qt::Label("Select day of week (KListSpinBox)", $top);
+$label5->setGeometry(20, 180, 260, 25);
+
+$days = [ qw(Monday Tuesday Wednesday Thursday Friday Saturday Sunday) ];
+
+$count5 = new KDE::ListSpinBox($days, $top, "days");
+$count5->setGeometry(300, 180, 80, 25);
+
+$label6 = new Qt::Label("Select month (KListSpinBox)", $top);
+$label6->setGeometry(20, 220, 260, 25);
+
+$month = [ qw(January February March April May June July August September
+	      October November December ) ];
+
+$count6 = new KDE::ListSpinBox($month, $top, "month");
+$count6->setGeometry(300, 220, 80, 25);
+$count6->setIndex(5);
+
+$st = new StringTest;
+$st->connect($count6, 'valueIncreased()', 'catchIncr()');
+$st->connect($count6, 'valueDecreased()', 'catchDecr()');
+
+$pb = new Qt::PushButton($top);
+$pb->setGeometry(200, 300, 80, 30);
+$pb->setText("Quit");
+$app->connect($pb, 'clicked()', 'quit()');
+
+$top->show;
+$app->setMainWidget($top);
+$app->exec;

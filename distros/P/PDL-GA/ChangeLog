@@ -1,0 +1,24 @@
+v0.07 Thu, 26 Sep 2013 13:44:08 +0200 moocow
+	* use $Config{drand01} macro instead of drand48() directly
+	  - avoid errors like `GA.o:GA.c:(.text+0x137ae): undefined reference to `drand48''
+	    as in http://www.cpantesters.org/cpan/report/feef1a46-25bf-11e3-8778-8bb49a6ffe4e
+
+v0.06 Tue, 24 Sep 2013 13:59:55 +0200 moocow
+	* set PREREQ_PM{PDL}=CONFIGURE_REQUIRES{PDL}=0 for cpan-testers friendliness
+	* added support for PDL_Indx type (PDL >= v2.007)
+
+v0.05 Mon, 02 Jan 2012 13:15:14 +0100 moocow
+	* added pdlmaker.plm for cpan-friendly distribution
+
+v0.04 2009-10-20  moocow
+	* [r3544] GA.pd: + v0.03: fixes for stupid SuSE PDL with no
+	  bad-value support
+
+v0.03 2007-03-10  moocow
+	* [r1894] GA.pd: + fixed (?) bug in roulette, roulette_nr
+
+v0.02 2007-02-28  moocow
+	* [r1856] graveyard.pd: + modified graveyard.pd
+	* [r1849] GA.pd, graveyard.pd, testme.perl: + added ga_mak_uniqe()
+	  and _nr() variants of selection methods
+

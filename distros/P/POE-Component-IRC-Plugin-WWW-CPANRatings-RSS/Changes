@@ -1,0 +1,24 @@
+Revision history for POE-Component-IRC-Plugin-WWW-CPANRatings-RSS
+
+0.0106  2013-12-02
+        - Fixed a fatal bug due to _send_event no longer being
+          available in PoCo::IRC
+
+0.0105  2013-12-02
+        - Added autogeneration of README from POD
+        - Moved author tests to xt/
+
+0.0104  2013-10-24
+        - Fixed "Changes" file to comply with CPAN::Changes::Spec
+        - Fixed Kwalitee errors
+        - Fixed Kwalitee test to only run with RELEASE_TESTING
+
+0.0103  2008-08-03
+        - Changed the NON-utf rating to be outputed as '$x/5' format
+
+0.0102  2008-08-03
+        - Added {max_ratings} arguments
+
+0.0101  2008-08-03
+        - First version, released on an unsuspecting world.
+

@@ -1,0 +1,27 @@
+PerlX-Window
+============
+
+Created:      2014-04-28
+Home page:    <https://metacpan.org/release/PerlX-Window>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Window>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-16
+
+ [ Packaging ]
+ - Meaningful abstract for the distribution.
+
+0.003	2014-09-16
+
+ [ Packaging ]
+ - Add repo link.
+
+0.002	2014-05-18
+
+ [ Packaging ]
+ - Requires Perl 5.16.
+   Fixes RT#95741.
+   Slaven Rezic++
+   <https://rt.cpan.org/Ticket/Display.html?id=95741>
+
+0.001	2014-04-28	Initial release

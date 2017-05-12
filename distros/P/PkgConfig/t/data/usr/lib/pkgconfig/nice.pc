@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libnice
+Description: ICE library
+Requires: glib-2.0 >= 2.10.0
+Version: 0.0.12
+Libs: -L${libdir} -lnice -pthread -lgobject-2.0 -lgthread-2.0 -lrt -lglib-2.0  
+Cflags: -pthread -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include   -I${includedir} -I${includedir}/nice
+

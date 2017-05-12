@@ -1,0 +1,696 @@
+/**************************************************************
+   AUTHOR:  Pat Heard (fullahead.org)
+   DATE:    2006.03.19
+   PURPOSE: Controls the layout of the site and styles
+            the menus
+ **************************************************************/
+
+
+
+/**************************************************************
+   #content: Sets the width of the site.  Make changes here
+             to convert to a fixed width site.
+ **************************************************************/
+
+#all {
+  height: 100%;
+  min-height: 100%;
+  text-align: left;
+}
+
+#content,
+#width {
+  /* max-width hack for IE since it doesn't understand the valid css property */
+  width: expression(document.body.clientWidth > 1000 ? "1000px" : "94%");  
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+#content[id],
+#width[id] {
+  width: 94%;
+  height: auto;
+}
+
+
+/**************************************************************
+   #header: Holds the site title and header images
+ **************************************************************/
+
+#header {
+  position: relative;
+  height: 144px;
+}
+
+/* Holds the site title and subtitle */
+#header #title {
+  position: absolute;
+  z-index: 3;
+  top: 10px;
+  left: 130px;
+  visibility:hidden;
+
+  padding: 5px;
+  text-align: right;
+}
+
+#header h1 {
+  margin: 0;
+  padding: 0;
+
+  font: 700 4em "trebuchet ms", serif;
+  letter-spacing: -3px;
+  text-transform: lowercase;
+  color: #FFF;
+}
+
+#header h2 {
+  position: absolute;
+  top: 10px;
+  right: 5px;
+
+  margin: 0;
+  padding: 0;
+
+  font: 700 1em "trebuchet ms", serif;
+  text-transform: lowercase;
+  color: #00F0EC;
+}
+
+#header a img,
+.dists a img,
+.dist .meta img,
+#header a img:hover {
+  border: 0 !important;
+}
+
+/* Sets where the header images will go */
+#header img.left {
+  position: absolute;
+  z-index: 1;
+
+  top: 0;
+  left: 0;
+}
+
+#header img.right {
+  position: absolute;
+  z-index: 0;
+
+  top: 0;
+  right: 32px;
+}
+
+#header img.gear {
+  position: absolute;
+  z-index: 2;
+
+  top: 0;
+  left: 0;
+}
+
+/**************************************************************
+   #mainMenu: The top level site menu
+ **************************************************************/
+
+#mainMenu { 
+  float: left;
+  width: 100%;
+  clear: both;
+  height:50px;
+}
+
+#mainMenu ul {
+  margin: 0;
+  padding: 0;
+}
+
+#mainMenu li {
+  display: inline;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  float: left;
+  padding-top: 5px;
+}
+
+#mainMenu li a {
+  padding: 5px 0.5em;
+
+  font: 400 1.3em "trebuchet ms", serif;
+  text-decoration: none;
+  text-transform: lowercase;
+  color: #FFF;
+}
+
+#mainMenu li:hover,
+#mainMenu li.here {
+  border-top: 5px solid #000;
+  border-bottom: 0;
+}
+
+#mainMenu li.notmenu:hover {
+  border-top:0;
+}
+
+#mainMenu li:hover a,
+#mainMenu li.here a {
+  color: #65EBFF;
+}
+
+#mainMenu li a.last {
+  margin-right: 0;
+}
+
+#crumb li.sub:before {
+    content:"❯";
+}
+
+#loading {
+  padding-top: 10px;
+}
+
+/**************************************************************
+   #pgxntoc: The side bar documentation nav menu
+ **************************************************************/
+
+#pgxntoc {
+  background: #555;
+  margin-left:-21px;
+  padding-left:26px;
+  padding-bottom: 25px;
+}
+
+#pgxntoc ul.pgxntocroot {
+  margin-left: 8px;
+  padding: 0;
+}
+
+/* Override the margin from html.css. */
+#pgxntoc ul {
+  margin: 0;
+}
+
+#pgxntoc h3 {
+  margin-left:7px;
+}
+
+/**************************************************************
+   #founder: Logos of founding sponsors.
+ **************************************************************/
+#founders a {
+    padding-left:15px;
+}
+
+#founders img {
+    border:0;
+    width:200px;
+    height:52px;
+}
+
+#patrons img {
+    border:0;
+    width:32px;
+    height:32px;
+    vertical-align:text-bottom;
+}
+
+#founders a:hover img, #patrons a:hover img {
+    border:0 !important;
+}
+
+#patrons h3 {
+    padding-top:0;
+}
+
+#benefactors {
+    margin-top:0;
+}
+
+.hside {
+  margin-left:20px;
+  width:230px;
+  padding-bottom: 0;
+}
+
+.hsearch {
+  width:665px;
+  background: #555 url(../img/gradient.jpg) repeat-x bottom left;
+}
+
+.hside h3 {
+  padding-bottom: 0;
+}
+
+.hside dd {
+  padding: 0 0 1em 0;
+}
+
+/**************************************************************
+   #homesearch: The home page search form.
+ **************************************************************/
+
+#homesearch {
+  padding:50px 0;
+}
+
+#homesearch fieldset {
+  border:0;
+  text-align:center;
+}
+
+#resultsearch fieldset {
+  border:0;
+  display:inline;
+}
+
+#resultsearch fieldset.query input {
+  width: 250px;
+}
+
+#resultsearch fieldset {
+  padding:0;
+}
+
+.center {
+  margin-left: auto;
+  margin-right: auto;
+  clear:both;
+  padding-bottom: 4em;
+}
+
+/**************************************************************
+   .res: Search result.
+ **************************************************************/
+
+.res {
+  /* background: #555 url(../img/gradient.jpg) repeat-x top left;  */
+  background: url(../img/favicon.png) no-repeat 10px 19px;
+  padding:15px 15px 15px 35px;
+}
+
+.res:hover {
+  background-color:#444;
+  cursor:default;
+}
+ 
+.res p, .res h2 {
+    padding:0;
+    color:white;
+}
+
+.res ul {
+  padding:0;
+  margin:0;
+}
+
+.res ul li {
+  display: inline;
+}
+
+.res ul li.dist:after, .res ul li.date:after {
+   content:"■ ";
+}
+
+.res p strong {
+  font-size:105%;
+  color:#F8D766;
+}
+
+/**************************************************************
+   .sideMenu: The side bar menu
+ **************************************************************/
+
+ul.sideMenu {
+  margin: 0;
+  padding: 0;
+}
+
+.sideMenu li {
+  display: inline;
+  
+  /* Needed since IE fails when you give it list-style: none; */  
+  list-style-image: url(foo.gif);
+  font: 400 1.3em "trebuchet ms", serif;
+}
+
+#pgxntoc li a {
+  display: block;
+}
+
+#pgxntoc li a:hover {
+  display: block;
+  text-decoration: none;
+}
+
+.sideMenu li a {
+  display: block;
+  margin: 0.2em 0;
+  padding: 3px 5px;    
+  
+  text-decoration: none;
+  color: #FFF;
+} 
+
+.sideMenu li a:hover, #pgxntoc li a:hover {
+  color: #65EBFF;
+  background: #5F5F5F;
+}
+
+/* Active menu item */
+.sideMenu li.here {
+  display: block;  
+  padding: 5px;
+  color: #65EBFF;
+  background: #555;
+}
+
+/* Submenu of active menu item */
+.sideMenu li.here ul {
+  margin: 0;
+  padding: 0;
+}
+
+.sideMenu li.here ul li a {
+  padding-left: 35px;
+  font: 400 0.55em "trebuchet ms", serif;
+  color: #FFF;  
+  background: url(../img/bullet.gif) no-repeat 10px 0px;
+}
+
+.sideMenu li.here ul li a:hover {
+  color: #9FF3FF;
+  background: #5F5F5F url(../img/bullet.gif) no-repeat 10px 0px;
+}
+
+
+
+/**************************************************************
+   #page: Holds the main page content.
+ **************************************************************/
+
+#page,
+#homepage,
+#info {
+  float: left;
+  width: 100%;
+  clear: both;
+  
+  padding-bottom: 4em;
+}
+
+#homepage {
+  width:915px;
+}
+
+#info > div {
+  width:670px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/**************************************************************
+   #footer: The page footer - will stick to the bottom if not
+            enough content.
+ **************************************************************/
+
+#footer {
+  float: left;
+  width: 100%;
+  clear: both;
+  margin-top: -3.5em;
+  background: #000 url(../img/footer.jpg) repeat-x top left;
+}
+
+/* Sets the width of the footer content */
+#footer #width {
+  position: relative;
+  z-index: 3;
+  font-size: 0.85em;
+  padding-top: 27px;
+}
+
+
+
+/**************************************************************
+   Width classes used by the site columns
+ **************************************************************/
+
+.width100 {
+  width: 100%;
+}
+
+.width75, .doc #pgxnbod {
+  width: 74%;
+}
+
+.width50 {
+  width: 49.7%;
+}
+
+.width33 {
+  width: 32.7%;
+}
+
+.width25, .doc #pgxntoc {
+  width: 24.7%;
+}
+
+.width10 {
+  width: 9.7%;
+}
+
+.width90 {
+  width: 89%;
+}
+
+
+/**************************************************************
+   Alignment classes
+ **************************************************************/
+
+.floatLeft, .doc #pgxntoc {
+  float: left;
+}
+
+.floatRight, .doc #pgxnbod {
+  float: right;
+}
+
+.alignLeft {
+  text-align: left;
+}
+
+.alignRight {
+  text-align: right;
+}
+
+
+
+/**************************************************************
+   Generic display classes
+ **************************************************************/
+
+.clear {
+  clear: both;
+}
+
+.block {
+  display: block;
+}
+
+.small {
+  font-size: 0.8em;
+}
+
+.green {
+  color: #A1FF45;
+}
+
+.red {
+  color: #EA1B00;
+}
+
+.grey {
+  color: #666;
+}
+
+.grey a {
+  color: #999;
+}
+
+.grey a:hover {
+  color: #EEE;
+}
+
+.gradient, .doc #pgxnbod {
+  margin-bottom: 2em;
+  background: #555 url(../img/gradient.jpg) repeat-x bottom left; 
+}
+
+.error {
+    height: 500px;
+}
+
+/**************************************************************
+   Distribution display
+ **************************************************************/
+
+.dists {
+  padding:10px 15px;
+}
+
+.dists table {
+  width: 100%;
+  margin: 0;
+}
+
+.dists h3, .dists p.alas {
+  padding-left:0;
+}
+
+.dist .meta h1 {
+   clear:left;
+}
+
+.dist .meta dt {
+   text-align:right;
+   width: 8em;
+   float:left;
+}
+
+.dist .meta dt.other {
+   clear:both; /* Needed for some versions of FireFox */
+}
+
+.dist .meta dt:after {
+  content: ":";
+}
+
+.dist .meta dd {
+ margin-left: 5.5em;
+}
+
+.dist .meta dd ul {
+  margin:0;
+}
+
+.dist .meta .resources ul, .dist .meta .resources li,
+.dist .meta .files ul,     .dist .meta .files li,
+.dist .meta .tags ul,      .dist .meta .tags li
+{
+  display:inline;
+  padding-left:0;
+}
+
+.dist .meta .resources li:after,
+.dist .meta .files     li:after,
+.dist .meta .tags      li:after
+{
+   content:" ✦";
+}
+.dist .meta .resources li.last:after,
+.dist .meta .files     li.last:after,
+.dist .meta .tags      li.last:after {
+   content:"";
+}
+
+.dist .exts dt {
+   color:white;
+}
+
+table td, table th {
+   padding: 5px;
+}
+table tr {
+ vertical-align:text-top;
+}
+table tr a img {
+ vertical-align:top;
+}
+table tr:hover {
+  background:#222;
+}
+
+tr:nth-of-type(odd) {
+  background: #444;
+}
+tr:nth-of-type(even) {
+  background: #555;
+}
+th {
+  background:#111;
+}
+table .dist .name, table .dist .bday {
+  white-space:nowrap;
+}
+table .dist .name a {
+  display:block;
+  padding-left: 30px;
+  background: url(../img/favicon.png) no-repeat 4px 3px;
+}
+
+table code {background-color:transparent;}
+
+.dist .meta .controls {
+    float:right;
+}
+
+.dist .meta .download a, .dist .meta .browse a, .dist .meta a.avatar {
+  display:block;
+  margin:0;
+  padding:10px 10px 5px;
+  float: right;
+}
+.dist .meta .download a:hover, .dist .meta .browse a:hover, .dist .meta a.avatar:hover {
+  background:#202020;
+}
+
+.readme #pgxntoc {
+  display:none;
+}
+
+.donors h2 {
+  color: #F8D766;
+  padding-top:1em;
+}
+
+.license img, .license img:hover {border:0 !important;}
+
+#htmltagcloud {text-align: center;padding:0 20px;}
+#htmltagcloud span {white-space:nowrap;}
+#htmltagcloud span a { margin:4px; padding:4px; line-height:1.1em; }
+#htmltagcloud span a:hover{background-color:#444;}
+
+.tagcloud0 {font-size: 10pt;}
+.tagcloud0 a {color:white;}
+.tagcloud1 {font-size: 12pt;}
+.tagcloud1 a {color:white;}
+
+.tagcloud2 {font-size: 14pt;}
+.tagcloud2 a {color:9FF3FF;}
+.tagcloud3 {font-size: 16pt;}
+.tagcloud3 a {color:9FF3FF;}
+
+.tagcloud4 {font-size: 18pt;}
+.tagcloud4 a {color:#F8D766;}
+.tagcloud5 {font-size: 20pt;}
+.tagcloud5 a {color:#F8D766;}
+
+.tagcloud6 {font-size: 22pt;}
+.tagcloud6 a {color:#F39F01;}
+.tagcloud7 {font-size: 24pt;}
+.tagcloud7 a {color:#F39F01;}
+
+.tagcloud8 {font-size: 26pt;}
+.tagcloud8 a {color:#F17400;}
+.tagcloud9 {font-size: 28pt;}
+.tagcloud9 a {color:#F17400;}
+
+.tagcloud10 {font-size: 30pt;}
+.tagcloud10 a {color:#FF4B33;}
+.tagcloud11 {font-size: 32pt;}
+.tagcloud11 a {color:#FF4B33;}
+
+.tagcloud12 {font-size: 34pt;}
+.tagcloud12 a {color:#d30;}

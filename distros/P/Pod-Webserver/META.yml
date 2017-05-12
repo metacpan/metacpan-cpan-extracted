@@ -1,0 +1,39 @@
+---
+abstract: 'Minimal web server for local Perl documentation'
+author:
+  - 'Sean M. Burke C<sburke@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.06, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Webserver
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Spec: '0'
+  File::Spec::Unix: '0'
+  IO::Socket: '0'
+  Pod::Simple: '3.01'
+  Pod::Simple::HTML: '0'
+  Pod::Simple::HTMLBatch: '0'
+  Pod::Simple::Progress: '0'
+  Test::More: '1.001014'
+  Test::Pod: '1.48'
+  Test::TCP: '2.02'
+  Test::Version: '1.002003'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Webserver
+  license: http://opensource.org/licenses/Artistic-2.0
+  repository: https://github.com/ronsavage/Pod-Webserver
+version: '3.11'
+

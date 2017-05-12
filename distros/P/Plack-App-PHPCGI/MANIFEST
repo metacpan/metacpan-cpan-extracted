@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Plack/App/PHPCGI.pm
+lib/Plack/App/PHPCGIFile.pm
+minil.toml
+t/00_compile.t
+t/01_basic.t
+t/01_test.php
+t/01_test.txt
+t/02_phpcgifile.t
+META.yml
+MANIFEST

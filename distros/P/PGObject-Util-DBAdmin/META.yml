@@ -1,0 +1,29 @@
+---
+abstract: 'PostgreSQL Database Management Facilities for PGObject'
+author:
+  - 'Chris Travers <chris@efficito.com>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PGObject-Util-DBAdmin
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Capture::Tiny: '0'
+  DBD::Pg: '0'
+  DBI: '0'
+  Moo: '0'
+  perl: '5.008'
+resources:
+  repository: https://github.com/einhverfr/PGObject-Util-DBAdmin.git
+version: v0.100.0

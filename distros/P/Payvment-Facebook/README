@@ -1,0 +1,70 @@
+Payvment-Facebook-API version 0.01
+==================================
+
+For more details on payvment visit www.payvment.com
+You will need to create a database with a view and a table
+Details are as follows:
+
+SHOW CREATE TABLE `payvment_requests`
+
+CREATE TABLE `payvment_requests` (
+  `pr_id` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
+  `pr_responsecont` TEXT,
+  `pr_dated` DATETIME DEFAULT NULL,
+  `pr_type` VARCHAR(255) DEFAULT NULL,
+  PRIMARY KEY  (`pr_id`)
+) ENGINE=MYISAM DEFAULT CHARSET=latin1
+
+CREATE a VIEW of the following structure.
+mysql> DESC product_payvment_select_us;
++-----------------------+------------------+------+-----+----------+-------+
+| FIELD                 | TYPE             | NULL | KEY | DEFAULT  | Extra |
++-----------------------+------------------+------+-----+----------+-------+
+| pp_id                 | INT(10) UNSIGNED | NO   |     | 0        |       |
+| nsid                  | INT(11)          | NO   |     | 0        |       |
+| p_item_id             | VARCHAR(200)     | YES  |     | NULL     |       |
+| NAME                  | VARCHAR(255)     | YES  |     | NULL     |       |
+| description           | LONGTEXT         | YES  |     | NULL     |       |
+| p_specification       | TEXT             | YES  |     | NULL     |       |
+| price                 | FLOAT(12,2)      | YES  |     | NULL     |       |
+| qty                   | BIGINT(11)       | YES  |     | NULL     |       |
+| weight                | VARCHAR(20)      | YES  |     | NULL     |       |
+| client_category_name  | VARCHAR(255)     | YES  |     | NULL     |       |
+| currency              | VARCHAR(3)       | NO   |     |          |       |
+| enable_additional_qty | INT(1)           | NO   |     | 0        |       |
+| weight_unit           | VARCHAR(2)       | NO   |     |          |       |
+| sku                   | VARCHAR(10)      | NO   |     | NULL     |       |
+| new_state             | VARCHAR(3)       | NO   |     |          |       |
+| tags                  | TEXT             | YES  |     | NULL     |       |
+| is_taxable            | INT(1)           | NO   |     | 0        |       |
+| ppcategories          | VARCHAR(255)     | YES  |     | EE810C4E |       |
++-----------------------+------------------+------+-----+----------+-------+
+18 ROWS IN SET (0.12 sec)
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test
+  LWP::UserAgent
+  Data::Dumper
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Abhishek Jain
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

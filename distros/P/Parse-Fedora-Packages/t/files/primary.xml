@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata xmlns="http://linux.duke.edu/metadata/common" xmlns:rpm="http://linux.duke.edu/metadata/rpm" packages="4">
+<package type="rpm">
+  <name>esc</name>
+  <arch>i386</arch>
+  <version epoch="0" ver="1.0.0" rel="16.fc6"/>
+  <checksum type="sha" pkgid="YES">1037eee3785906eb87633f5d1bc03de8bc90edb4</checksum>
+  <summary>Enterprise Security Client Smart Card Client</summary>
+  <description>Enterprise Security Client allows the user to enroll and manage their
+cryptographic smartcards.</description>
+  <packager>Red Hat, Inc. &lt;http://bugzilla.redhat.com/bugzilla&gt;</packager>
+  <url>http://directory.fedora.redhat.com/wiki/CoolKey</url>
+  <time file="1160023686" build="1159739813"/>
+  <size package="8064743" installed="19716247" archive="19775508"/>
+  <location href="Fedora/RPMS/esc-1.0.0-16.fc6.i386.rpm"/>
+  <format>
+    <rpm:license>GPL</rpm:license>
+    <rpm:vendor>Red Hat, Inc.</rpm:vendor>
+    <rpm:group>Applications/Internet</rpm:group>
+    <rpm:buildhost>hs20-bc1-6.build.redhat.com</rpm:buildhost>
+    <rpm:sourcerpm>esc-1.0.0-16.fc6.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="440" end="37936"/>
+    <rpm:provides>
+      <rpm:entry name="esc" flags="EQ" epoch="0" ver="1.0.0" rel="16.fc6"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="dbus" flags="GE" epoch="0" ver="0.90"/>
+      <rpm:entry name="rpmlib(PayloadFilesHavePrefix)" flags="LE" epoch="0" ver="4.0" rel="1" pre="1"/>
+      <rpm:entry name="nspr"/>
+      <rpm:entry name="rpmlib(CompressedFileNames)" flags="LE" epoch="0" ver="3.0.4" rel="1" pre="1"/>
+      <rpm:entry name="nss"/>
+      <rpm:entry name="ifd-egate"/>
+      <rpm:entry name="pcsc-lite"/>
+      <rpm:entry name="zip"/>
+      <rpm:entry name="libnotify" flags="GE" epoch="0" ver="0.4.2"/>
+      <rpm:entry name="coolkey"/>
+      <rpm:entry name="/bin/sh" pre="1"/>
+    </rpm:requires>
+    <file>/usr/bin/esc</file>
+    <file>/etc/xdg/autostart/esc.desktop</file>
+  </format>
+</package>
+<package type="rpm">
+  <name>netpbm-devel</name>
+  <arch>i386</arch>
+  <version epoch="0" ver="10.35" rel="6.fc6"/>
+  <checksum type="sha" pkgid="YES">06da864b78934f162a5ddbcc2ea338b173276050</checksum>
+  <summary>Development tools for programs which will use the netpbm libraries.</summary>
+  <description>The netpbm-devel package contains the header files and static libraries,
+etc., for developing programs which can handle the various graphics file
+formats supported by the netpbm libraries.
+
+Install netpbm-devel if you want to develop programs for handling the
+graphics file formats supported by the netpbm libraries.  You'll also need
+to have the netpbm package installed.</description>
+  <packager>Red Hat, Inc. &lt;http://bugzilla.redhat.com/bugzilla&gt;</packager>
+  <url>http://netpbm.sourceforge.net/</url>
+  <time file="1160092811" build="1159804625"/>
+  <size package="170743" installed="377374" archive="381716"/>
+  <location href="Fedora/RPMS/netpbm-devel-10.35-6.fc6.i386.rpm"/>
+  <format>
+    <rpm:license>freeware</rpm:license>
+    <rpm:vendor>Red Hat, Inc.</rpm:vendor>
+    <rpm:group>Development/Libraries</rpm:group>
+    <rpm:buildhost>hs20-bc2-4.build.redhat.com</rpm:buildhost>
+    <rpm:sourcerpm>netpbm-10.35-6.fc6.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="440" end="20746"/>
+    <rpm:provides>
+      <rpm:entry name="netpbm-devel" flags="EQ" epoch="0" ver="10.35" rel="6.fc6"/>
+    </rpm:provides>
+    <rpm:obsoletes>
+      <rpm:entry name="libgr-devel"/>
+    </rpm:obsoletes>
+    <rpm:requires>
+      <rpm:entry name="rpmlib(PayloadFilesHavePrefix)" flags="LE" epoch="0" ver="4.0" rel="1" pre="1"/>
+      <rpm:entry name="rpmlib(CompressedFileNames)" flags="LE" epoch="0" ver="3.0.4" rel="1" pre="1"/>
+      <rpm:entry name="netpbm" flags="EQ" epoch="0" ver="10.35" rel="6.fc6"/>
+      <rpm:entry name="libnetpbm.so.10"/>
+    </rpm:requires>
+  </format>
+</package>
+<package type="rpm">
+  <name>perl-IO-Socket-INET6</name>
+  <arch>noarch</arch>
+  <version epoch="0" ver="2.51" rel="2.fc6"/>
+  <checksum type="sha" pkgid="YES">2bd89bfbb33a979ed0555c4def384dfe58d5f989</checksum>
+  <summary>Perl Object interface for AF_INET|AF_INET6 domain sockets</summary>
+  <description>Perl Object interface for AF_INET|AF_INET6 domain sockets</description>
+  <packager>Red Hat, Inc. &lt;http://bugzilla.redhat.com/bugzilla&gt;</packager>
+  <url>http://search.cpan.org/~mondejar/IO-Socket-INET6/</url>
+  <time file="1160093979" build="1152725912"/>
+  <size package="13579" installed="22457" archive="23524"/>
+  <location href="Fedora/RPMS/perl-IO-Socket-INET6-2.51-2.fc6.noarch.rpm"/>
+  <format>
+    <rpm:license>Artistic or GPL</rpm:license>
+    <rpm:vendor>Red Hat, Inc.</rpm:vendor>
+    <rpm:group>Development/Libraries</rpm:group>
+    <rpm:buildhost>ia64-1.build.redhat.com</rpm:buildhost>
+    <rpm:sourcerpm>perl-IO-Socket-INET6-2.51-2.fc6.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="440" end="3228"/>
+    <rpm:provides>
+      <rpm:entry name="perl(IO::Socket::INET6)" flags="EQ" epoch="0" ver="2.51"/>
+      <rpm:entry name="perl-IO-Socket-INET6" flags="EQ" epoch="0" ver="2.51" rel="2.fc6"/>
+    </rpm:provides>
+    <rpm:requires>
+      <rpm:entry name="perl(:MODULE_COMPAT_5.8.8)"/>
+      <rpm:entry name="rpmlib(PayloadFilesHavePrefix)" flags="LE" epoch="0" ver="4.0" rel="1" pre="1"/>
+      <rpm:entry name="perl(Exporter)"/>
+      <rpm:entry name="rpmlib(VersionedDependencies)" flags="LE" epoch="0" ver="3.0.3" rel="1" pre="1"/>
+      <rpm:entry name="perl(Socket6)"/>
+      <rpm:entry name="perl(Carp)"/>
+      <rpm:entry name="perl(IO::Socket)"/>
+      <rpm:entry name="perl(Errno)"/>
+      <rpm:entry name="rpmlib(CompressedFileNames)" flags="LE" epoch="0" ver="3.0.4" rel="1" pre="1"/>
+      <rpm:entry name="perl(Socket)"/>
+      <rpm:entry name="perl(strict)"/>
+    </rpm:requires>
+  </format>
+</package>
+<package type="rpm">
+  <name>kdeutils</name>
+  <arch>i386</arch>
+  <version epoch="6" ver="3.5.4" rel="5.fc6"/>
+  <checksum type="sha" pkgid="YES">ec0de39d95f98dbce21d4bdd243a7b17657f0bd1</checksum>
+  <summary>K Desktop Environment - Utilities</summary>
+  <description>Utilities for the K Desktop Environment.
+Includes: ark (tar/gzip archive manager); kcalc (scientific calculator);
+kcharselect (character selector); kdepasswd (change password);
+kdessh (ssh front end); kdf (view disk usage); kedit (simple text editor);
+kfloppy (floppy formatting tool); khexedit (hex editor); kjots (note taker);
+klaptopdaemon (battery monitoring and management for laptops);
+ksim (system information monitor); ktimer (task scheduler);
+kwikdisk (removable media utility)</description>
+  <packager>Red Hat, Inc. &lt;http://bugzilla.redhat.com/bugzilla&gt;</packager>
+  <url>http://www.kde.org</url>
+  <time file="1160071834" build="1159476477"/>
+  <size package="4011169" installed="9718676" archive="9815992"/>
+  <location href="Fedora/RPMS/kdeutils-3.5.4-5.fc6.i386.rpm"/>
+  <format>
+    <rpm:license>GPL</rpm:license>
+    <rpm:vendor>Red Hat, Inc.</rpm:vendor>
+    <rpm:group>Applications/System</rpm:group>
+    <rpm:buildhost>hs20-bc2-2.build.redhat.com</rpm:buildhost>
+    <rpm:sourcerpm>kdeutils-3.5.4-5.fc6.src.rpm</rpm:sourcerpm>
+    <rpm:header-range start="440" end="89319"/>
+    <rpm:provides>
+      <rpm:entry name="libkmilo.so.1"/>
+      <rpm:entry name="libkdeinit_ark.so"/>
+      <rpm:entry name="libkdeinit_irkick.so"/>
+      <rpm:entry name="libkdeinit_kcalc.so"/>
+      <rpm:entry name="libkbyteseditwidget.so"/>
+      <rpm:entry name="kmilo_asus.so"/>
+      <rpm:entry name="libksimcore.so.1"/>
+      <rpm:entry name="libkhexeditcommon.so.0"/>
+      <rpm:entry name="kcm_kdf.so"/>
+      <rpm:entry name="ksim_snmp.so"/>
+      <rpm:entry name="libarkpart.so"/>
+      <rpm:entry name="config(kdeutils)" flags="EQ" epoch="6" ver="3.5.4" rel="5.fc6"/>
+      <rpm:entry name="kmilo_kvaio.so"/>
+      <rpm:entry name="ark.so"/>
+      <rpm:entry name="kcalc.so"/>
+      <rpm:entry name="kedit.so"/>
+      <rpm:entry name="kded_kmilod.so"/>
+      <rpm:entry name="ksim_filesystem.so"/>
+      <rpm:entry name="ksim_disk.so"/>
+      <rpm:entry name="libkhexedit2part.so"/>
+      <rpm:entry name="kcm_kwallet.so"/>
+      <rpm:entry name="kcm_laptop.so"/>
+      <rpm:entry name="irkick.so"/>
+      <rpm:entry name="kded_klaptopdaemon.so"/>
+      <rpm:entry name="ksim_cpu.so"/>
+      <rpm:entry name="ksim_sensors.so"/>
+      <rpm:entry name="kcm_thinkpad.so"/>
+      <rpm:entry name="libkregexpeditorcommon.so.1"/>
+      <rpm:entry name="kcharselect_panelapplet.so"/>
+      <rpm:entry name="ksim_net.so"/>
+      <rpm:entry name="ksim_panelextension.so"/>
+      <rpm:entry name="kcm_kvaio.so"/>
+      <rpm:entry name="kmilo_delli8k.so"/>
+      <rpm:entry name="kdeutils" flags="EQ" epoch="6" ver="3.5.4" rel="5.fc6"/>
+      <rpm:entry name="kmilo_generic.so"/>
+      <rpm:entry name="libkregexpeditorgui.so"/>
+      <rpm:entry name="libkdeinit_kedit.so"/>
+      <rpm:entry name="kcm_kcmlirc.so"/>
+      <rpm:entry name="libkcmlaptop.so.0"/>
+      <rpm:entry name="kmilo_thinkpad.so"/>
+      <rpm:entry name="superkaramba"/>
+    </rpm:provides>
+    <rpm:obsoletes>
+      <rpm:entry name="kdeutils-laptop"/>
+      <rpm:entry name="ktimer"/>
+      <rpm:entry name="kdepasswd"/>
+      <rpm:entry name="kdessh"/>
+      <rpm:entry name="klpq"/>
+      <rpm:entry name="kcalc"/>
+      <rpm:entry name="kregexpeditor"/>
+      <rpm:entry name="kregexpeditor-devel"/>
+      <rpm:entry name="ark"/>
+      <rpm:entry name="superkaramba"/>
+      <rpm:entry name="kedit"/>
+      <rpm:entry name="kjots"/>
+      <rpm:entry name="kljettool"/>
+      <rpm:entry name="khexedit"/>
+      <rpm:entry name="kcharselect"/>
+      <rpm:entry name="kdf"/>
+      <rpm:entry name="klprfax"/>
+      <rpm:entry name="kfloppy"/>
+    </rpm:obsoletes>
+    <rpm:requires>
+      <rpm:entry name="libstdc++.so.6(CXXABI_1.3)"/>
+      <rpm:entry name="config(kdeutils)" flags="EQ" epoch="6" ver="3.5.4" rel="5.fc6"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.1.3)"/>
+      <rpm:entry name="libksimcore.so.1"/>
+      <rpm:entry name="libkdeprint.so.4"/>
+      <rpm:entry name="libknewstuff.so.1"/>
+      <rpm:entry name="libkparts.so.2"/>
+      <rpm:entry name="libX11.so.6"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.4)"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.1)"/>
+      <rpm:entry name="libkregexpeditorcommon.so.1"/>
+      <rpm:entry name="rpmlib(PayloadFilesHavePrefix)" flags="LE" epoch="0" ver="4.0" rel="1" pre="1"/>
+      <rpm:entry name="libkmilo.so.1"/>
+      <rpm:entry name="rtld(GNU_HASH)"/>
+      <rpm:entry name="libkdeinit_kcalc.so"/>
+      <rpm:entry name="libpthread.so.0"/>
+      <rpm:entry name="libpthread.so.0(GLIBC_2.2)"/>
+      <rpm:entry name="libXext.so.6"/>
+      <rpm:entry name="libkio.so.4"/>
+      <rpm:entry name="libkdefx.so.4"/>
+      <rpm:entry name="libDCOP.so.4"/>
+      <rpm:entry name="libpython2.4.so.1.0"/>
+      <rpm:entry name="libgmp.so.3"/>
+      <rpm:entry name="/bin/sh" pre="1"/>
+      <rpm:entry name="libgcc_s.so.1"/>
+      <rpm:entry name="libm.so.6"/>
+      <rpm:entry name="libkdesu.so.4"/>
+      <rpm:entry name="libm.so.6(GLIBC_2.0)"/>
+      <rpm:entry name="libnetsnmp.so.10"/>
+      <rpm:entry name="libkdeinit_kedit.so"/>
+      <rpm:entry name="libkdeui.so.4"/>
+      <rpm:entry name="libpthread.so.0(GLIBC_2.0)"/>
+      <rpm:entry name="libkcmlaptop.so.0"/>
+      <rpm:entry name="libkwalletclient.so.1"/>
+      <rpm:entry name="libstdc++.so.6"/>
+      <rpm:entry name="libgcc_s.so.1(GLIBC_2.0)"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.0)"/>
+      <rpm:entry name="libkhexeditcommon.so.0"/>
+      <rpm:entry name="libstdc++.so.6(GLIBCXX_3.4)"/>
+      <rpm:entry name="libkabc.so.1"/>
+      <rpm:entry name="rpmlib(CompressedFileNames)" flags="LE" epoch="0" ver="3.0.4" rel="1" pre="1"/>
+      <rpm:entry name="libkdecore.so.4"/>
+      <rpm:entry name="desktop-file-utils" pre="1"/>
+      <rpm:entry name="/sbin/ldconfig" pre="1"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.3.4)"/>
+      <rpm:entry name="libqt-mt.so.3"/>
+      <rpm:entry name="libc.so.6"/>
+      <rpm:entry name="libkdeinit_irkick.so"/>
+      <rpm:entry name="libz.so.1"/>
+      <rpm:entry name="libkutils.so.1"/>
+      <rpm:entry name="libc.so.6(GLIBC_2.2)"/>
+      <rpm:entry name="kdelibs" flags="GE" epoch="6" ver="3.5.4"/>
+      <rpm:entry name="libkdeinit_ark.so"/>
+      <rpm:entry name="libXtst.so.6"/>
+      <rpm:entry name="kdebase" flags="GE" epoch="6" ver="3.5.4"/>
+    </rpm:requires>
+    <file>/etc/pam.d/klaptop_acpi_helper</file>
+    <file>/etc/security/console.apps/klaptop_acpi_helper</file>
+    <file>/usr/bin/kcalc</file>
+    <file>/usr/bin/kjots</file>
+    <file>/usr/bin/kwikdisk</file>
+    <file>/usr/bin/kedit</file>
+    <file>/usr/bin/kgpg</file>
+    <file>/usr/bin/superkaramba</file>
+    <file>/usr/bin/khexedit</file>
+    <file>/usr/bin/kregexpeditor</file>
+    <file>/usr/bin/kwalletmanager</file>
+    <file>/usr/bin/kfloppy</file>
+    <file>/usr/bin/ark</file>
+    <file>/usr/bin/klaptop_acpi_helper</file>
+    <file>/usr/bin/kdf</file>
+    <file>/usr/bin/klaptop_check</file>
+    <file>/usr/sbin/klaptop_acpi_helper</file>
+    <file>/usr/bin/ktimer</file>
+    <file>/usr/bin/kdessh</file>
+    <file>/usr/bin/irkick</file>
+    <file>/usr/bin/kcharselect</file>
+  </format>
+</package>
+</metadata>

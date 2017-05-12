@@ -1,0 +1,4 @@
+<xml>
+  <input type="foo" petal:attributes="type nothing" />
+  <foo bar="baz" petal:attributes="bar string:0" />
+</xml>

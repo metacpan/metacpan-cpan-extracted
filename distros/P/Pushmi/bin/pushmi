@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+use Pushmi;
+use Pushmi::Command;
+use SVK::I18N;
+use Getopt::Long;
+
+$SIG{INT} = sub {
+    die loc("Interrupted.\n");
+};
+
+my $cmd = $ARGV[0];
+
+if (!$cmd or $cmd =~ /^-{0,2}[Hh](?:elp)?$/) {
+    $ARGV[0] = 'help';
+    undef $cmd;
+}
+
+{
+    my $show_version;
+    local *ARGV = [$ARGV[0] || ''];
+    GetOptions ('v|version' => \$show_version) or exit;
+
+    if ($show_version || ($cmd && $cmd eq 'version')) {
+	print loc("This is pushmi, version %1\n", $Pushmi::VERSION);
+	exit 0;
+    }
+}
+
+Pushmi::Command->dispatch;
+
+1;

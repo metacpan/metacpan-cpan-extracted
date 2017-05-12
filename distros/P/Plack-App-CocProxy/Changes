@@ -1,0 +1,22 @@
+2011-08-23  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.04:
+	Update dependencies.
+	Use Starlet instead of Twiggy for cocproxy command
+
+2011-05-20  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.02:
+	Install 'cocproxy' command.
+	Fix tests.
+	* 0.03:
+	Make custamizable command-line tool.
+	Do readlink on symlink.
+
+2011-05-19  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.01:
+	init
+
+
+vim:set ft=changelog:

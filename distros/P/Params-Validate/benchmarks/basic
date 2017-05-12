@@ -1,0 +1,76 @@
+use Params::Validate ();
+
+use Benchmark;
+
+use strict;
+
+my @a = ( 1,[ 1, 2, 3 ], bless {}, 'Foo' );
+my @h = ( a => 1, b => [ 1, 2, 3 ], c => (bless {}, 'Foo'), f => 99 );
+
+Benchmark::timethese( 50000,
+                     { array => \&array,
+                       hash  => \&hash,
+                       with  => \&with,
+                       sub1  => sub { sub1( x => 1 ) },
+                       sub2  => sub { sub2( x => 1 ) },
+                       sub3  => sub { sub3() },
+                       sub4  => sub { sub4(1) },
+                       sub5  => sub { sub5(1) },
+                       sub6  => sub { sub6() },
+                     }
+                    );
+
+sub array
+{
+    my %f =
+        eval { Params::Validate::validate_pos
+                   ( @a,
+                     { type => Params::Validate::SCALAR },
+                     { type => Params::Validate::ARRAYREF },
+                     { isa => 'Foo' },
+                     { default => {1=>2} },
+                   ); };
+    die $@ if $@;
+}
+
+sub hash
+{
+    my %f =
+        eval { Params::Validate::validate
+                   ( @h, { a => { type => Params::Validate::SCALAR },
+                           b => { type => Params::Validate::ARRAYREF },
+                           c => { isa => 'Foo' },
+                           d => { default => {1=>2} },
+                           e => { optional => 1 },
+                           f => 1,
+                         } ) };
+    die $@ if $@;
+}
+
+sub with
+{
+    my %f =
+        eval { Params::Validate::validate_with
+                   ( params => \@h,
+                     spec => { a => { type => Params::Validate::SCALAR },
+                               b => { type => Params::Validate::ARRAYREF },
+                               c => { isa => 'Foo' },
+                               d => { default => {1=>2} },
+                               e => { optional => 1 },
+                               f => 1,
+                             } ) };
+    die $@ if $@;
+}
+
+
+sub sub1 { Params::Validate::validate(@_, { x => 1 } ) }
+
+sub sub2 { my %p = Params::Validate::validate(@_, { x => 1 } ) }
+
+sub sub3 { my %p = Params::Validate::validate(@_, { x => { default => 1 } } ) }
+
+sub sub4 { Params::Validate::validate_pos(@_, 1) }
+
+sub sub5 { my @p = Params::Validate::validate_pos(@_, 1) };
+
+sub sub6 { my @p = Params::Validate::validate_pos(@_, { default => 1 } ) }

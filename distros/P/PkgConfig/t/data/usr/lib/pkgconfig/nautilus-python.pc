@@ -1,0 +1,7 @@
+Name: Nautilus-Python
+Description: Nautilus-Python Components
+Version: 0.6.1
+
+prefix=/usr
+libdir=${prefix}/lib
+pythondir=/usr/lib/nautilus/extensions-2.0/python

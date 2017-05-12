@@ -1,0 +1,11 @@
+
+=encoding euc-jp
+
+=over
+
+=item iC<te>m
+
+(アイテム)
+
+=back
+

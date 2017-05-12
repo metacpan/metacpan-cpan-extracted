@@ -1,0 +1,66 @@
+0.18  Fri Dec 14 19:28:52 GMT 2012
+    - Support irssi logs with "/set show_nickmode_empty off"
+
+0.17  Tue Apr 24 00:54:21 GMT 2012
+    - Add 'Replyrate' option for unsolicited replies
+
+0.16  Sun May 15 14:35:29 GMT 2011
+    - Fix --version, it was always returning "dev-git"
+
+0.15  Fri May 13 18:27:55 GMT 2011
+    - Allow the bot to respond with a CTCP ACTION (/me)
+
+0.14  Tue Sep 28 08:52:11 GMT 2010
+    - Update SYNOPSIS to reflect App-Pocoirc changes
+    - Fix $outdated VERSION in bin/irchailo-seed
+
+0.13  Thu Sep 9 06:34:00 GMT 2010
+    - Mention App::Pocoirc in the SYNOPSIS
+
+0.12  Mon Sep 6 04:17:07 GMT 2010
+    - Make the 'Channels' parameter actually do what it's supposed to
+
+0.11  Tue Aug 17 22:54:06 GMT 2010
+    - Use Dist::Zilla
+    - Make all warnings fatal
+
+0.11
+    - Support a 'Channels' parameter to limit the bot's attention
+
+0.10 Sun Mar 14 10:13:15 GMT 2010
+    - Support non-ASCII 'Own_channel' parameter
+
+0.09 Sun Mar 14 07:39:29 GMT 2010
+    - Encode our output before sending it. This avoids double encoding of
+      non-ASCII channel names.
+
+0.08 Wed Feb 24 02:38:15 GMT 2010
+    - Always decode bytes before we use them
+    - Fix parsing of pocoirc logs without date stamps
+
+0.07 Fri Feb 19 00:03:37 GMT 2010
+    - Read IRC lines as :bytes by default in irchailo-seed. This
+      avoids issues where PERL_UNICODE or the -C option is set to
+      something which tells perl to read STDIN in UTF-8 by default.
+    - Various Pod fixes
+
+0.06 Sun Feb 14 19:03:23 GMT 2010
+    - Tell the user when we don't know enough to generate a reply
+    - Use Hailo_args in SYNOPSIS example so that it works out of the box
+    - Don't ignore abusers, just don't reply to them
+    - Add META.yml to MANIFEST
+
+0.05 Thu Feb 11 21:06:49 GMT 2010
+    - Forgot to apply the aforementioned fix to irchailo-seed too
+
+0.04 Thu Feb 11 20:55:19 GMT 2010
+    - When we're addressed, trim some whitespace after the nickname
+
+0.03 Sun Jan 31 05:03:40 GMT 2010
+    - Just some Pod fixes
+
+0.02 Fri Jan 29 02:43:28 GMT 2010
+    - Remove call to decode(). It's not needed, so we were double-encoding
+
+0.01 Fri Jan 29 00:47:53 GMT 2010
+    - First CPAN release

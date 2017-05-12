@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+use 5.010;
+
+eval "use Kelp;";
+if ($@) {
+    die "Please make sure Kelp is successfully installed and try again\nError: $@";
+}
+
+die "Usage: <module>\n"
+    unless $ARGV[0];
+
+my $module = $ARGV[0];
+my $file   = $module;
+$file =~ s/::/\-/g;
+mkdir $file;
+chdir $file;
+system "Kelp $module";
+chdir $file;
+
+my @parts = split '-', $file;
+my $path = 'lib/' . join('/', @parts);
+say "=> Creating $path";
+mkdir $path;
+say "=> Creating $path/Route";
+mkdir "${path}/Route";
+say "=> Creating $path/Controller";
+mkdir "${path}/Controller";
+
+unlink "${path}.pm";
+
+open my $core, '+>', "${path}.pm" or die "Could not open ${path}.pm: $!";
+say $core "package ${module};\n";
+say $core "use Pulp;";
+say $core "maps ['Main'];";
+close $core;
+
+say "=> Wrote ${path}.pm";
+
+open my $route, '+>', "${path}/Route/Main.pm" or die "Could not open ${path}/Route/Main/pm: $!";
+say $route "package ${module}::Route::Main;\n";
+say $route "use Pulp::Route;\n";
+say $route "get '/' => 'Controller::Main::hello';";
+close $route;
+
+say "=> Wrote ${path}/Route/Main.pm";
+
+open my $cont, '+>', "${path}/Controller/Main.pm" or die "Could not open ${path}/Controller/Main.pm: $!";
+say $cont "package ${module}::Controller::Main;\n";
+say $cont "use Pulp::Controller;\n";
+say $cont "sub hello { 'Hello, world!' }";
+close $cont;
+
+say "=> Wrote ${path}/Controller/Main.pm";
+

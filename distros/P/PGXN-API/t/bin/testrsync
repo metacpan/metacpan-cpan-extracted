@@ -1,0 +1,4 @@
+#!/usr/bin/perl -w
+
+open my $fh, '>', 'test.tmp' or die "Cannot open test.tmp: $!\n";
+print $fh $_, $/ for @ARGV;

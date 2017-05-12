@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Plack::Middleware::Debug::TraceENV>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Plack-Middleware-Debug-TraceENV"><img src="https://secure.travis-ci.org/bayashi/Plack-Middleware-Debug-TraceENV.png?_t=1472963156"/></a> <a href="https://coveralls.io/r/bayashi/Plack-Middleware-Debug-TraceENV"><img src="https://coveralls.io/repos/bayashi/Plack-Middleware-Debug-TraceENV/badge.png?_t=1472963156&branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Plack::Middleware::Debug::TraceENV installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Plack::Middleware::Debug::TraceENV
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Plack::Middleware::Debug::TraceENV documentation is available as in POD. So you can do:
+
+    % perldoc Plack::Middleware::Debug::TraceENV
+
+
+=head1 REPOSITORY
+
+Plack::Middleware::Debug::TraceENV is hosted on github
+L<http://github.com/bayashi/Plack-Middleware-Debug-TraceENV>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

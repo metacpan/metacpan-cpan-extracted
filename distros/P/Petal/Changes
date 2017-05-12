@@ -1,0 +1,381 @@
+Revision history for Petal.
+
+2.24 Thu Feb 16 13:10:00 2013
+    - Add missing requirement to Makefile.PL
+
+2.23 Thu Aug 08 15:50:00 2013
+    - Fix Petal::Utils installation after regression caused by improved tal:repeat error message
+
+2.22 Sun Feb 24 12:15:00 2013
+    - Fix caching when specifying a language (RT #55692)
+    - Add LICENSE to Makefile.PL (RT #83585)
+
+2.21 Fri Dec 21 17:40:00 2012
+    - Improve error message for undef in tal:repeat variables
+    - Don't fail tests if CGI is not installed
+    - Don't run charset tests on Perl < 5.8
+    - Update TAL/TALES/METAL specification URIs in docs
+
+2.20 Thu Aug 25 13:05:00 2011
+    - Remove usage of Safe in taint mode to fix compatability with Perl 5.12. This may break existing
+      code and reduces security! But for now it seems better to have at least a working version. (Damyan Ivanov)
+    - Fix code using deprecated UNIVERSAL->import (Stefan Seifert)
+
+2.19 Fri Jun 16 15:22:00 2006
+    - alias false: modifier as not: to match TALES spec (Jonathan Vanasco)
+    - fix repeat/odd documentation bug and add to cookbook (Jonathan Vanasco)
+    - pod typos (sarabob)
+    - CACHE_ONLY option (Jonathan Vanasco)
+    - Add Digest::MD5 dependency (aaron)
+    - Allow passing arguments to coderefs
+    - Encoding support for gettext mo/po files (Andrew Rodland)
+
+2.18 Tue Jan 17 13:01:00 2006
+    - $Petal::CodeGenerator::PI_RE should be applied newline insensitively
+    - pod fixes
+    - Cookbook tal:repeat example (DSL)
+    - pod note that on-error isn't fully implemented
+    - defang html metacharacters in on-error output
+    - undo 2.16 $Petal::Hash::String::VARIABLE_RE_BRACKETS ${1} regression
+
+2.17 Wed Sep  7 15:30:00 2005
+    - test 041 check that &nbsp; becomes chr(160) not chr(194) (William McKee)
+    - Petal::Canonicalizer::XML Fix bug where \-escaped semicolons were not recognised (William McKee)
+    - test 090 for ${1} appearance when Petal::I18N->process
+    - pod fixes (Kurt Stephens, Tom Metro, Bruno Postle)
+
+2.16 Fri Mar 18 15:30:00 2005
+    - Added Cookbook.pod documentation and associated tests from William McKee
+    - Removed references to HTML::TreeBuilder and XML::Parser (William McKee)
+    - Skip test 071 when URI.pm not installed (William McKee)
+    - Added tests 085 & 086 demonstrating breakage when using {disk,mem} cache and multi-language includes
+    - $Petal::Hash::String::VARIABLE_RE_BRACKETS no longer treats ${1} as a variable
+    - Fix that adds language to the mix when generating cache keys
+    - tests 088 & 089 check for correct decode_charset behaviour
+    - Fix to allow decode_charset to be other than utf-8 (William McKee)
+
+2.15 Wed Jan  5 15:31:00 2005
+    - Fixed some 'used of uninitialized values' warnings
+    - Added support for non-alphanumeric xml attribute names in tal:attributes
+    - removed defunct email address
+
+2.14 Thu Sep  2 15:07:39 2004
+    - Fixed broken I18N attributes parsing
+    - Added I18N to string:
+
+2.13 Mon Aug  9 11:32:12 2004
+    - Stopped Petal doing I18N stuff for includes
+    - Fixed Petal::TranslationService::Gettext wrongly using noop
+
+2.12 Fri Aug  6 13:58:55 2004
+    - Added namespace support to Petal::I18N
+    - Added Petal::TranslationService::Noop
+    - Added Petal::TranslationService::Gettext
+    - Revamped Petal::I18N docs
+    - Added some I18N tests
+
+2.11 Fri Jul 23 13:10:30 2004
+    - Applied Warren Smith's dereferencing patch
+    - Fixed broken tests for I18N
+
+2.10 Thu Jul 22 15:12:51 2004
+    - Added experimental ZPT I18N support
+    - Updated documentation
+    - Added a bunch of tests
+    - Added a patch to get Petal to resolve SCALAR entities
+
+2.07 Thu Jun 24 13:13:57 2004
+    - Added metal:define-slot
+    - Added metal:fill-slot
+
+2.06 Fri Jun  4 14:41:58 2004
+    - Added HTML Errors mode
+    - Fixed Petal not encoding overloaded objects
+    - Made the canonicalizer strip declarations on included files
+
+2.05 Mon Apr  5 14:14:46 2004
+    - Fixed broken test
+
+2.04 Thu Mar 18 17:33:45 2004
+    - Added broken attributes parsing test
+    - Updated MKDoc::XML dependency
+ 
+2.03 Mon Mar 15 16:25:59 2004
+    - Don't ask me what happened with 2.02
+    - Added a test case for metal double include
+
+2.01 Wed Dec 10 15:21:35 2003
+    - Deprecated $Petal::ENCODE
+    - Petal now always returns in Perl's internal format 
+
+2.00 Thu Nov  6 12:05:13 2003
+    - This version *can* break backwards compatibility
+    - Simple re-release of 1.10_09 which seems stable
+
+1.10_09
+    - Fixed CodeGenerator not backslashing backslashes properly
+    - Fixed repeat/end bug
+    - Added warning in case of weird-looking 'attributes' statement
+
+1.10_08
+    - Fixed metal:use-macro not being parsed in XHTML output mode
+    - Fixed unnecessary warning
+
+1.10_07
+    - Added incomplete METAL implementation
+
+1.10_06
+    - Uncommented TAINT stuff (again!)
+    - Refactored to work with MKDoc::XML 0.60
+    - Changed CodeGenerator.om decode_backslash_semicolon mechanism
+    - Fixed Petal dying on <--! <?pi?> --> comments
+    - Fixed generate_events_comment incorrectly encoding entities
+
+1.10_05
+    - Changed the rules for when HTML entities are decoded
+
+1.10_04
+    - Fixed infinite recursion on non-existent modifiers
+ 
+1.10_03
+    - Fixed File::Spec use of uninitialized values
+    - Fixed somehow broken Petal::_process_absolutize_pathes() 
+    - Fixed entities test running nothing when using perl 5.6.x
+
+1.10_02
+    - Changed Petal to ignore Encode if Perl < 5.007
+    - Fixed a @BASE_DIR inconsistency in process()
+    - Fixed potential caching bug on non Unix platforms
+
+1.10_01
+    - Changed Petal's parsing backend to MKDoc::XML::TreeBuilder
+    - Added prefixes in path expressions, i.e. /foo/var:bar
+    - Refactored Petal's use of the Encode module
+
+1.06 Wed Aug 20 17:41:21 2003
+    - fixed omit-tag="" bug
+    - Include errors are now reported in HTML comments
+    - Fixed 'lots of includes' performance issues
+    - Fixed a bug pointed out by Fergal concerning entities
+
+1.05 Tue Aug 19 15:39:16 2003
+    - Fixed silly warning bug
+    - Added decoding HTML entities capability
+
+1.04 Sun Aug 17 19:57:40 2003
+    - Fixed repeat object and safe issues
+    - Added Test::Harness and Scalar::Util dependencies
+    - Fixed a bug in the way <?var is handled
+    - Fixed "\n" bug in _handle_error
+
+1.03 Tue Jul 29 12:34:36 2003
+    - Fixed broken loops
+    - Added tests for broken loops
+    - Fixed a petal cache warning when using wide characters
+
+1.02 Tue Jul 29 12:25:33 2003
+    - 1.01 loops are completely broken
+    - Emergency re-release of 1.00
+
+1.01 Mon Jul 28 14:06:09 2003
+    - "empty string" expression deleting attributes bugfix
+    - Applied Fergal's attr.patch
+    - Applied Fergal's die.patch
+    - Changed Petal::Hash::Var to evaluate coderefs
+    - Introduced repeat object
+    - Changed copyright notice 
+    - Updated documentation 
+
+1.00 Tue Jul 15 20:35:19 2003
+    - Applied Steve's 'error on undef' patch
+    - Happy Birthday Petal!
+
+0.96 Mon Jun 30 13:34:22 2003
+    - Fixed include + unicode + encode bug
+
+0.95 Fri Jun 27 15:44:12 2003
+    - Added $ENCODE_CHARSET and $DECODE_CHARSET options
+    - Changed the include mechanism to make faulty include non fatal
+    - Lengthy debug info is now written in tmp directory
+    - Patched with Fergal Daly's require.patch
+    - Refactored very slightly CodeGenerator.pm
+
+0.94 Thu Jun 19 11:58:52 2003
+    - Patched with Fergal Daly's indent.patch, expr.patch, warn.patch
+    - Patched with Steve Purkis' contributed tests
+    - Patched with Fergal Daly's contributed tests
+
+0.93 Thu Jun 05 11:06:33 2003
+    - Fixed petal:set and cached values bug
+    - Changed error handling so that it's subclassable
+    - Fixed Petal::Hash::VAR method invocation bug
+    - Added and modded Grant McLean's incredible patch!
+
+0.92 Tue Apr 22 14:01:56 2003
+    - Tweaked the multi-lingual mechanism a little bit
+    - Applied Fergal Daly's tests2.patch file
+    - Made Fergal's CodeGeneratorString the default
+    - Applied William's Hash.pm taintmode diff
+    - Did a lot of work on the docs based on Patrick's suggestions 
+
+0.91 Mon Apr 07 16:20:15 2003
+    - Added multi-lingual mode
+    - Added scoping to included templates
+    - Applied Fergal Daly's XML_Encode_Decode patch
+    - Revamped the documentation
+
+0.90 Wed Apr 02 14:02:27 2003
+    - Re-done plugin system
+
+0.89 Tue Mar 25 13:57:24 2003
+    - Fixed another critical bug due to changes in 0.87.
+
+0.88 Mon Mar 24 15:17:31 2003
+    - Fixed a critical bug due to changes in 0.87.
+
+0.87 Mon Mar 17 17:25:00 2003
+    - Rewrote / optimized Petal::Hash, which is now MUCH faster.
+
+0.86 Tue Feb 25 11:30:06 2003
+    - Fixed tags with hyphens being trunkated.
+
+0.85 Mon Feb 10 16:48:29 2003
+    - Made it so that code generator backend can be changed @ runtime.
+    - Fixed entities not being encoded in static attributes fix!
+    - Fixed minor documentation bugs
+    - Fixed string: semicolon escaping bug
+
+0.84 Wed Feb 05 14:12:08 2003
+    - Added 'use warnings' to all tests
+    - Fixed entities not being encoded in static attributes
+    - Fixed backwards compatibility include / xinclude bug
+    - Updated documentation
+
+0.83 Thu Jan 30 12:02:29 2003
+    - Fixed a minor method parameter bug
+    - Fixed XInclude relative path bug
+    - Fixed a minor namespace support bug (quotemeta)
+
+0.82 Mon Jan 27 15:03:21 2003
+    - Added limited support for XIncludes
+    - Added infinite recursion protection
+    - Fixed a documentation bug
+    - Fixed a omit-tag bug
+    - Added command line toy functions
+
+0.81 Wed Dec 11 14:19:24 2002
+    - Fixed silly documentation bug
+
+0.80 Wed Dec 11 14:19:24 2002
+    - This version breaks backward compatibility !!!
+    - Removed prefixes from processing instructions
+    - Implemented TAL's on-error statement
+    - Updated test suite
+
+0.77 Wed Dec 04 15:05:28 2002
+    - Implemented TAL's omit-tag statement
+
+0.76 Mon Oct 21 13:05:46 2002
+    - Fixed '"' being converted to '&quot;' by Petal::Parser::XMLWrapper
+
+0.75 Sun Oct 20 17:21:14 2002
+    - Added namespace support, i.e. xmlns:foo="http://purl.org/petal/1.0/"
+    - Added tests
+
+0.74 Mon Sep 30 14:35:25 2002
+    - Done some more optimization on Petal::Hash
+    - Fixed petal:set='foo string:"Hello"' bug
+    - Fixed double encoding on set + includes issue
+    - Added tests as always
+
+0.73 Wed Sep 25 12:05:01 2002
+    - Implemented TIED hash caching
+    - Implemented 'fresh' keyword for clearing cache when necessary
+    - Fixed petal:attributes bug
+
+0.72 Fri Sep 20 12:44:43 2002
+    - Fixed a variable interpolation bug ($align - $align_opposite)
+    - Fixed another loop scoping bug
+    - Fixed loop scoping bug
+
+0.71 Thu Sep 12 14:39:58 2002
+    - Fixed warning in Petal::Canonicalizer::XML.pm
+    - Updated documentation
+    - Added list of hashrefs test
+
+0.7 Sat Sep 07 19:19:42 2002
+    - Fixed inline interpolation ${expr} bug
+    - Everything is now XML encoded unless the 'structure' keyword is present
+    - Added coderefs modifiers
+    - Turned most modifiers into coderefs in Petal::Hash
+    - Added Lucas Saud's <lucas.marinho@uol.com.br> patch for code padding
+    - Fixed <?petal:repeat name="element list"?> bug
+
+0.64 Tue Sep 03 15:48:23 2002
+    - Fixed extra AUTOLOAD bug
+    - Fixed _split_expression critical bug 
+    - Added test
+    - Sorry for the broken 0.63 release :-(
+
+0.63 Mon Sep 02 17:01:23 2002
+    - Fixed petal:repeat documentation bug
+    - Changed Petal::Parser::HTMLWrapper to preserve ignorable whitespaces
+    - Fixed Petal stripping comments with Petal::Parser::HTMLWrapper
+    - Fixed Petal not invoking methods which are defined via AUTOLOAD
+    - Changed Petal::Canonicalizer::_split_expression to work with Perl 5.8.0
+    - Changed Petal::Canonicalizer::_split_expression to remove warnings
+
+0.62 Fri Aug 16 11:17:10 2002
+    - Fixed entity bug due to XML::Parser expanding entities
+    - Fixed method parameters bug
+    - Fixed another method parameters bug
+    - Fixed a couple of small documentation bugs
+    - Fixed an XML declaration bug
+    - Fixed '"' being converted to '&quot;' by Petal::Parser::HTMLWrapper
+ 
+0.61 Mon Aug 12 11:50:50 2002
+    - Fixed 'dummy content' closing tag bug
+    - Fixed <a petal:attr="href string:test.cgi?fn=$first_name"> bugfix bug!
+
+0.6 Sat Aug 10 14:59:53 2002
+    - Fixed <a petal:attr="href string:test.cgi?fn=$first_name"> bug
+    - Fixed declarations being striped out
+    - Fixed <some:tag> being turned into <some> bug
+    - Fixed petal:attributes="style nothing" does not delete 'style' *K*
+    - Fixed Petal::CodeGenerator bug
+    - Fixed a bug that prevented __is_last__ from being accessed
+    - Applied William's patch to reduce amount of issued warnings
+    - Changed the cache modules w/ new $Petal::INPUT and $Petal::OUTPUT
+    - Implemented $Petal::INPUT and $Petal::OUTPUT for XHTML
+
+0.5 Sat Aug 03 19:56:13 2002
+    - Modifiers are now 'modifier:' rather than ':modifier'
+    - Modifiers are now stackable (i.e. foo:bar:baz/buz)
+    - Implemented TALES-like slash '/' as an alias for dot '.'
+    - Rewrote Petal::Parser::HTMLWrapper using newest HTML::TreeBuilder
+    - Fixed more include bugs
+    - Amended documentation
+    - Implemented string: modifier
+
+0.4 Thu Jul 25 12:08:03 2002
+    - Added Petal::Hash::Encode_HTML contributed mod
+    - Fixed documentation bugs
+    - Fixed multiple includes bug
+    - Fixed Petal::Parser::HTMLWrapper includes
+    - Added warning for Petal statements with missing '?'
+
+0.3 Fri Jul 19 11:20:30 2002
+    - Fixed critical include bug
+    - Added version number to cached file names
+    - Added more tests
+    - Updated documentation
+    - Fixed wrong MANIFEST file
+    - Updated README file
+
+0.2 Tue Jul 16 11:54:55 2002
+    - Fixed critical bug in Petal::Canonicalizer
+    - Fixed documentation bug
+    - Added first test in /t
+
+0.1 Mon Jul 15 11:29:22 2002
+    - Initial release

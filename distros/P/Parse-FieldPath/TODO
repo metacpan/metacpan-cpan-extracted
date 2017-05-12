@@ -1,0 +1,6 @@
+* "a/*/b" should request fields named "b" from every sub-object of "a".
+* Figure out some comprimise for "all_fields()" and third-party objects.
+
+Possible:
+    * Seperate default fields from all_fields (some fields I want to get sometimes, but not often
+    * Completely overridable default representation (returns a string, for instance)

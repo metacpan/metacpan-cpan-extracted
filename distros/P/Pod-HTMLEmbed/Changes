@@ -1,0 +1,14 @@
+Revision history for Perl extension Pod::HTMLEmbed
+
+0.04  2011-09-05T16:49:26+09:00
+      - cleaner list html.
+        remove <p> tag when it is only element in <li> tag.
+
+0.03  2011-09-05T13:25:34+09:00
+      - fixed invalid usage of lazy_build
+
+0.02  2009-11-05T11:28:19+09:00
+      - remove weak_ref option from _context
+
+0.01  2009-11-04T17:45:06+09:00
+      - original version

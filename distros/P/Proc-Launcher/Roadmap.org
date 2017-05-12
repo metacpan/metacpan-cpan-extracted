@@ -1,0 +1,69 @@
+* cache pid of child process
+
+  - resolves a bug showing up intermittently in the test cases
+    - happens immediately after daemon started
+    - check_running returns false if run before daemon has written pidfile
+
+  - solution
+    - cache pid file in parent on fork()
+    - if pid cached, check cached pid first
+    - if cached pid is good and pidfile matches cached pid, empty cache
+    - if cached pid is bad, empty cache
+
+
+* check out Proc::PID::File::Fcntl
+
+  - use for writing pid files
+
+
+* manager method to get child status hash
+
+  - for each selected daemons
+    - is daemon running
+    - is daemon enabled
+    - pid
+    - process stats, e.g. cpu time & memory ?
+
+* receive data from child processes
+
+  - still under consideration
+
+  - option for manager to open a named pipe
+    - manager.cmd
+
+  - non-blocking reads
+
+  - child processes can write YAML/json data to manager
+    - not written to filesystem
+
+  - lock file?
+    - only one managing process can read data from the pipe at a time
+
+  - not reliable since there's no 'ack' for messages transmitted
+    - could be lost
+    - might get delivered to wrong manager process
+
+
+* add method: signal( $num )
+
+  - does: kill -$num $launcher->pid
+    - if $launcher->pid
+
+  - stop() and force_stop() use this
+
+  - hash signal names to numbers?  methods?
+    - $launcher->signal( 'HUP' )
+    - $launcher->HUP
+
+* make the supervisor less special
+
+  - supervisor is just another ordinary daemon
+
+  - shortcut to create the supervisor
+
+  - ensure supervisor is started last
+
+  - actions to operate only on supervisor
+
+  - supervisor waits a bit before calling start() the first time
+

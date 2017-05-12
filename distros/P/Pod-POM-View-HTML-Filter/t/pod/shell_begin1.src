@@ -1,0 +1,21 @@
+=begin filter shell
+
+    #!/bin/sh
+    ps | /usr/lib/sendmail -t
+    exit 0
+
+=end filter
+__RESULT__
++shell
+<html><body bgcolor="#ffffff">
+<pre>    <span class="s-cmt">#!/bin/sh</span>
+    ps <span class="s-mta">|</span> /usr/lib/sendmail -t
+    <span class="s-blt">exit</span> 0</pre>
+</body></html>
+__RESULT__
+-shell
+<html><body bgcolor="#ffffff">
+<pre>    #!/bin/sh
+    ps | /usr/lib/sendmail -t
+    exit 0</pre>
+</body></html>

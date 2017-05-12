@@ -1,0 +1,507 @@
+Revision history for Perinci-Access-Perl
+
+0.87    2016-06-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- [test] Replace File::Slurp::Tiny with File::Slurper.
+
+	- [dist] Bump prereq version Perinci::Sub::Normalize -> 0.18,
+	  Perinci::Sub::Wrapper -> 0.83.
+
+
+0.86    2016-02-04 (PERLANCAR)
+
+	- Fix regex for Perl package name (0-9 is allowed for subpackage
+	  prefix).
+
+
+0.85    2015-12-17 (PERLANCAR)
+
+	- Return original value of args_as and result_naked in
+	  _orig_args_as and _orig_result_naked respectively, for client
+	  libraries like Perinci::To::Doc which might need the information.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.84    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.83    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.82    2015-03-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add test for avoiding double wrapping.
+
+
+0.81    2015-03-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Fix key name, d'oh.
+
+
+0.80    2015-03-06 (PERLANCAR)
+
+	- Fix/tweak criteria of whether we should wrap (don't wrap if
+	  argument is already validated).
+
+	- Remove support for old attribute name x.perinci.sub.wrapper.log.
+
+	- Use good ol' ref() again instead of Scalar::Util::reftype(),
+	  because I'm no longer blessing Perinci::Sub::Wrapper-wrapped
+	  subroutines.
+
+
+0.79    2014-12-31 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add more helpful error message for 'No metadata for ...'.
+
+
+0.78    2014-12-11 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Forgot to update test regarding change to periscomp (now
+	  returns completion answer in hashform) [CT].
+
+
+0.77    2014-12-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use the new renamed module SHARYANTO::Package::Util ->
+	  Package::MoreUtil.
+
+
+0.76    2014-12-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch {SHARYANTO::Module::Path,Module::Path::More}.
+
+
+0.75    2014-12-02 (PERLANCAR)
+
+	- [Bugfix] Module prefix like Foo was not found if Foo.pm does not
+	  also exist, because we used Foo.pm.
+
+	- Document about x.hint.result_binary.
+
+
+0.74    2014-10-24 (PERLANCAR)
+
+	- Give hint in result metadata when result is binary (buf).
+
+
+0.73    2014-10-23 (PERLANCAR)
+
+	- No functional changes.
+
+	- Bump dependency version.
+
+
+0.72     2014-10-23 (PERLANCAR)
+
+         - Bump Riap support to 1.2 (no longer produces v=>1.1 keys on info
+           response). Note that we don't check riap.* keys on result metadata
+           because they are only supposed to be produced by (network) servers,
+           and this is an in-process (serverless) Riap client.
+
+         - Fix typo: unimplemented status is 501, not 502.
+
+
+0.71     2014-09-06 (PERLANCAR)
+
+         - No functional changes.
+
+         - Force upgrade to Perinci::Sub::Wrapper 0.62 (rename
+           x.perinci.wrapper.* metadata attributes).
+
+
+0.70     2014-08-24 (SHARYANTO)
+
+         - No functional changes.
+
+         - [Bugfix] Meta on /blah (non-package entity directly under /) should
+           return 404 status, not empty meta.
+
+
+0.69     2014-06-25 (SHARYANTO)
+
+         - No functional changes.
+
+         - Replace ModuleOrPrefix::Path with SHARYANTO::Module::Path (the
+           former's functionality has been included in the latter, thus the
+           former is removed from CPAN).
+
+
+0.68     2014-06-18 (SHARYANTO)
+
+         - Add action: complete_arg_elem (Riap 1.1.23).
+
+
+0.67     2014-05-17 (SHARYANTO)
+
+         - No functional changes.
+
+         - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.66     2014-04-30 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - meta action: Now uses Perinci::Sub::Normalize instead of
+           Perinci::Sub::Wrapper to reduce startup overhead in things like
+           Perinci::CmdLine's --help or autocompletion (which only request
+           'meta' action). In other words, we now decouple metadata
+           normalization and wrapping.
+
+         [REMOVED FEATURES]
+
+         - Remove 'extra_wrapper_args' option (it's not used so far, except for
+           turning off wrapping in Perinci::CmdLine in completion mode to reduce
+           startup overhead).
+
+         - meta action: Remove returning 'orig_meta' in result metadata (so far
+           it's only used by Perinci::To::Doc when wanting to know the original
+           value of 'result_naked' and 'args_as' properties). This can now be
+           done via the 'normalize_metadata'=>0 option.
+
+         [INCOMPATIBLE CHANGES]
+
+         - Rename option 'extra_wrapper_convert' to 'set_function_properties'
+           (the new name is more abstract and less low-level).
+
+
+0.65     2014-04-16 (SHARYANTO)
+
+         - Set 'entity_date' property from $DATE package variable.
+
+
+0.64     2014-04-15 (SHARYANTO)
+
+         - call action: accept 'argv' Riap request key. This is actually not
+           defined yet in specification, but useful in cases where an argument
+           has a cmdline_alias with coderef, where it will fail to be parsed at
+           the client-side because JSON doesn't transport the coderef.
+
+
+0.63     2014-03-30 (SHARYANTO)
+
+         [INTERNAL]
+
+         - Remove $self->{_actionmetas} and $self->{_typeaccts} cache. They are
+           per-object (instead of global) so a bit wasteful, they make patching
+           of adding new actions not work after the object is created, and they
+           are microoptimization anyway.
+
+
+0.62     2014-03-27 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Perinci::Sub::Wrapper 0.56.
+
+
+0.61     2014-03-26 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Die message from function got hidden.
+
+
+0.60     2014-03-20 (SHARYANTO)
+
+         [INTERNAL]
+
+         - Avoid using _get_code_and_meta() accept in get_code() and get_meta(),
+           for better subclassing (I'm currently hacking on
+           Perinci::Access::Schemeless::DBI).
+
+
+0.59     2014-03-07 (SHARYANTO)
+
+         - Skip wrapping function if already metadata tells that wrapped in
+           embed mode (see Dist::Zilla::Plugin::Rinci::Wrap).
+
+
+0.58     2014-03-06 (SHARYANTO)
+
+         - No functional changes. Adjust to Perinci::Sub::Wrapper 0.51.
+
+
+0.57     2013-12-21 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - On load=0, return error on request to package that does not exist (so
+           that things like list => /Existing/Sub_That_Doesnt_Exist/ can fail).
+
+
+0.56     2013-12-20 (SHARYANTO)
+
+         - Allow list action on parent of allowed paths (e.g. allow_paths=/a/b
+           then we allow list on / and /a but it will still show only the
+           allowed paths).
+
+
+0.55     2013-11-27 (SHARYANTO)
+
+         - Allow scheme '/' in Perinci::Access::Perl (for App::riap's
+           convenience).
+
+         - Bugfix: Fix matching against {allow,deny}_paths &
+           {allow,deny}_schemes.
+
+
+0.54     2013-11-27 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Now return relative URI's in list and child_metas, to be more
+           tree-like (preferred by App::riap).
+
+
+0.53     2013-11-04 (SHARYANTO)
+
+         [REMOVED FEATURES]
+
+         - Remove disk cache because I think it's inelegant, causes stale cache
+           problems and security issues; for reducing startup overhead, will
+           count on embedded wrapping (instead of on-the-fly/dynamic wrapping)
+           provided by the next version of Perinci::Sub::Wrapper.
+
+         [REFACTORING]
+
+         - Move complete_arg_val implementation routine to Perinci-Sub-Complete
+           so it is reusable outside the context of Riap.
+
+
+0.52     2013-10-03 (SHARYANTO)
+
+         - No functional changes. Avoid perl undef warning.
+
+
+0.51     2013-10-03 (SHARYANTO)
+
+         - wrap cache file: check for staleness.
+
+         - wrap cache file: create legal filename for Windows (no ':').
+
+         - wrap cache file: option to output UTF-8 ('use_utf8' attribute,
+           currently undocumented).
+
+
+0.50     2013-10-02 (SHARYANTO)
+
+         - use err().
+
+         - Add option: disk_cache (default: 0) to cache wrap result to disk.
+
+
+0.49     2013-09-08 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - 'meta' action returned empty orig_meta.
+
+
+0.48     2013-09-08 (SHARYANTO)
+
+         - Rename distribution from Perinci-Access-InProcess to
+           Perinci-Access-Perl, split Perinci::Access::InProcess to ::Perl and
+           ::Schemeless as its superclass. This clears up some things, mainly
+           that pl:/Foo/Bar/ must point to Foo::Bar perl package so things like
+           package_prefix are moved to Schemeless.
+
+
+0.47     2013-09-07 (SHARYANTO)
+
+         - Update to Rinci 1.1.36 (entity_version becomes entity_v).
+
+         [BUG FIXES]
+
+         - 'list', 'info', 'actions' actions now correctly check the existence
+           of entity first.
+
+         - Subsequent attempt at loading a failed module ($INC{foo} is undef) is
+           now correctly reported as error.
+
+
+0.46     2013-09-07 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - 'list' action should only ignore missing modules, not compile errors.
+
+         - Fix uri parsing: /foo should mean function 'foo', not package 'foo'.
+
+         [ENHANCEMENTS]
+
+         - Add PackagePrefix subclass (proof of concept).
+
+
+0.45     2013-09-05 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Fix regression: if package already exists (like 'main'), don't fail
+           the module loading. This broke a lot of scripts yesterday.
+
+
+0.44     2013-09-04 (SHARYANTO)
+
+         - 'meta' action on '/' now works.
+
+         - 'list' action now correctly lists prefixes, e.g. if there are only
+           foo::bar::baz and foo::bar::qux, 'list' action on '/foo/' correctly
+           lists '/foo/bar/' instead of returning empty.
+
+         - Observe {allow,deny}_paths in 'list' action.
+
+
+0.43     2013-08-22 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Rename option 'use_wrapped_sub' to 'wrap'.
+
+         [ENHANCEMENTS]
+
+         - Internal refactoring to make custom behavior easier to implement
+           (unfinished).
+
+         - Add options 'allow_paths' and 'deny_paths'.
+
+         [REMOVED FEATURES]
+
+         - Remove support for per-entity wrapping flag (via
+           _perinci.access.inprocess.use_wrapped_sub property) because it's
+           currently unused.
+
+         [ETC]
+
+         - Adjust to Perinci::Access::Base 0.29.
+
+
+0.42     2013-08-13 (SHARYANTO)
+
+         - Bug fix for parse_url().
+
+
+0.41     2013-08-13 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add parse_url() support.
+
+
+0.40     2013-08-13 (SHARYANTO)
+
+         [REMOVED FEATURES]
+
+         - Remove dependency on Perinci::Util::get_package_meta_accessor
+           (removed in 0.35). Thereby also removing the $PERINCI_META_ACCESSOR
+           feature (this variable in a package can point to another class which
+           tells people how to get the Rinci metadata for said package). This
+           feature is not that useful: we still need to load the module first.
+           There are cases where we might want to lookup metadata (or even map
+           Riap request uri -> Perl package) from the database without loading
+           .pm files. Thus we will rework this class to allow that.
+
+
+0.39     2012-11-02 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - 'list' action didn't work (fails to list subpackages) when requested
+           module does not exist.
+
+
+0.38     2012-11-02 (SHARYANTO)
+
+         - Add option: use_wrapped_sub (to make it possible to use call original
+           sub instead of wrapped version). Can also be set using
+           _perinci.access.inprocess.use_wrapped_sub in metadata. Currently I
+           don't have a need for this yet.
+
+
+0.37     2012-10-31 (SHARYANTO)
+
+         - Add option: cache_size (to make it possible to disable caching).
+           Currently used for testing/benchmarking overhead.
+
+         - Update to Perinci::Sub::Wrapper 0.33.
+
+
+0.36     2012-10-24 (SHARYANTO)
+
+         - Pass -progress special argument containing Progress::Any object to
+           functions which set 'progress' feature to true.
+
+
+0.35     2012-08-29 (SHARYANTO)
+
+         - Pass -dry_run => 1 to tx function in dry run mode, so the function
+           can detect dry run mode (and, say, display messages).
+
+
+0.34     2012-08-29 (SHARYANTO)
+
+         - Support '-tx_action_id' to tx function in dry run mode (Rinci
+           1.1.28).
+
+
+0.33     2012-08-29 (SHARYANTO)
+
+         - Support 'dry_run' in call action (Riap 1.1.19).
+
+
+0.32     2012-08-28 (SHARYANTO)
+
+         - Pass confirmation for actions 'undo' and 'redo' too (actually those
+           are the important ones).
+
+
+0.31     2012-08-28 (SHARYANTO)
+
+         - Implement confirmation (Rinci 1.1.27). Pass Riap request key
+           'confirm' => 1 to pass '-confirm' to function (via TM).
+
+
+0.30     2012-08-22 (SHARYANTO)
+
+         - Adjust to Rinci 1.1.25. No longer check transaction support of
+           functions (we'll just let TM do that). No longer provide
+           -undo_trash_dir to function to simplify things.
+
+
+0.29     2012-08-16 (SHARYANTO)
+
+         - Adjust to Rinci 1.1.23 and Perinci::Tx::Manager 0.22. No longer list
+           Perinci::Tx::Manager as dependency. Move transaction tests to
+           Perinci-Tx-Manager distribution.
+
+
+0.28     2012-08-10 (SHARYANTO)
+
+         - First release, split to make Perinci dist empty (that dist was a
+           growing mixed bag and caused headache in dependencies).

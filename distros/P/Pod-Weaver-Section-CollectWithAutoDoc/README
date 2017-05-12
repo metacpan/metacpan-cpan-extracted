@@ -1,0 +1,83 @@
+NAME
+    Pod::Weaver::Section::CollectWithAutoDoc - Section to gather specific
+    commands and add auto-generated documentation
+
+VERSION
+    version 1.100980
+
+SYNOPSIS
+    In "weaver.ini":
+
+        [CollectWithAutoDoc / METHODS]
+        command = method
+
+OVERVIEW
+    Given the configuration from the synopsis, this plugin will start off by
+    gathering and nesting any "=method" commands found in the document.
+    Those commands, along with their nestable content, will be collected
+    under a "=head1 METHODS" header and placed in the correct location in
+    the output stream. Their order will be preserved as it was in the source
+    document.
+
+    Additionally, this plugin can add auto-generated method documentation
+    collected via Sub::Documentation. Class::Accessor::Installer supports
+    Sub::Documentation, and Class::Accessor::Complex, for example, uses
+    Class::Accessor::Installer.
+
+    This auto-documentation is expected to be generated at run-time, when
+    the module is loaded. So this plugin loads the module that is being
+    documented, inspects the generated documentation, and adds them to the
+    appropriate "=method" elements.
+
+    This plugin subclasses Pod::Weaver::Section::Collect.
+
+METHODS
+  add_examples
+    FIXME
+
+  get_package_name
+    FIXME
+
+  pod_command
+    FIXME
+
+  pod_ordinary
+    FIXME
+
+  pod_verbatim
+    FIXME
+
+  prepare_input
+    FIXME
+
+FUNCTIONS
+  transform_document
+    Traverses the document and adds the auto-generated method documentation
+    to the appropriate "=method" nodes.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Section-Col
+    lectWithAutoDoc>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Pod-Weaver-Section-CollectWithAutoDoc/>.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

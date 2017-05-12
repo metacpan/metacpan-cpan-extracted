@@ -1,0 +1,7 @@
+
+- PNGs embedded in ui files and B&W pictures in external MimeSourceFactory remain untested
+ (and thus probably wrong)
+- PerlQt does not handle subclassing yet, so don't use the -subimpl option
+- database code needs more testing
+- ...
+

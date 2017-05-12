@@ -1,0 +1,9 @@
+Revision history for Perl extension Plack-Middleware-BetterStackTrace
+
+0.02 2013-08-23T09:37:36Z
+
+    - Move detailed trace infomation from javascript to HTML
+
+0.01
+
+    - original version

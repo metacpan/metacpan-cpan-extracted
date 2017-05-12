@@ -1,0 +1,125 @@
+Revision history for Perl module POE::Filter::IRCv3
+
+1.002002 2015-06-17
+
+  - Tag parsing fix for partial escapes (bare '\')
+
+  - Minor optimizations
+
+1.002001 2015-04-23
+
+  - Remove '\0' escaping in tags, per ircv3-specifications GH #128
+
+  - Drop fatal warnings
+
+  - Switch to 'cpanfile' packaging
+
+1.001001 2014-08-16
+
+  - Single trailing param starting with ':' should prepend a ':'
+    Related bug in JS 'irc-message' (derived from this dist):
+    https://github.com/expr/irc-message/pull/12
+
+  - Minor optimizations
+
+  - Happy CPAN Day!
+
+0.047002 2014-06-20
+
+  - Message tag escape/unescape optimizations
+
+0.047001 2014-06-20
+
+  - Escape message tag values per ircv3-specifications issue #71
+
+  - Test coverage improvements
+
+0.046000 2013-12-06
+
+  - Allow public access to the underlying parse function;
+    useful for faster standalone parsing or custom failure handling
+
+0.045004 2013-12-02
+
+  - Drop 'strictures' & 'parent' dependencies
+
+  - POD / test improvements
+
+0.045003 2013-10-26
+
+  - POE dependency is now optional
+
+0.045002 2013-08-10
+
+  - No code changes; fix 'Changes' to match CPAN::Changes::Spec
+
+0.045001 2013-06-15
+
+  - Minor optimizations.
+
+0.045000 2013-06-12
+
+  - Swap params parser implementations; slightly faster on strings containing
+    many middle parameters.
+
+  - Turn on ->debug(1) at construction time if env POE_FILTER_IRC_DEBUG is 
+    true.
+
+0.044000 2013-06-09
+
+  - Fix a bug in detecting invalid zero-length prefix; tests for same.
+
+0.043000 2013-06-09
+
+  - Fix a bug in detecting extraneous spaces between middle and trailing 
+    params.
+
+  - New test suite and improved helpers for same.
+
+0.042003 2013-06-08
+
+  - POD fixes; leftovers from ancient import (how did that get there?)
+
+0.042002 2013-06-08
+
+  - Fix trailing spaces in commands; previously returned an empty
+    string parameter in ->{params}
+
+0.042001 2013-06-07
+
+  - Fix per-event 'colonify =>' configurable; tests for same
+
+0.042000 2013-06-07
+
+  - Improved non-regex parser and tests for same.
+
+0.041001 2013-06-05
+
+  - Revert to previous parser until we have better tests
+
+0.041000 2013-06-05
+
+  - Switch to a non-regex get_one() implementation.
+    Benching shows this is faster in many cases.
+
+0.040001 2013-02-04
+
+  - Empty-string prefix should DWIM
+
+  - Switch to long-format semantic version
+
+0.04 2013-02-04
+
+  - Missing dep on parent . . . again.
+
+0.03 2013-02-1
+
+  - Fix a broken test (5.17 exposed hash order mistake)
+
+0.02 2013-01-31
+
+  - Missing dependency on 'parent'
+
+0.01 2013-01-27
+
+  - Initial release

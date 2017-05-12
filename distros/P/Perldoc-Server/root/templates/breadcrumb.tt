@@ -1,0 +1,12 @@
+<div id="breadCrumbs">
+  <a href="/">Home</a>
+  [% IF breadcrumbs %]
+    &gt;
+    [% FOREACH crumb IN breadcrumbs %]
+      <a href="[% crumb.url %]">[% crumb.name %]</a> &gt;
+    [% END %]
+  [% ELSE %]
+    &gt;
+  [% END %]
+  [% page_name OR title %]
+</div>

@@ -1,0 +1,18 @@
+SYNOPSIS
+
+     # in function metadata
+     memoize => 1,
+
+DESCRIPTION
+
+    This property implements a simple memoize. There are currently no
+    options yet.
+
+    See Memoize for more information and caveats about memoizing.
+
+SEE ALSO
+
+    Perinci
+
+    Memoize
+

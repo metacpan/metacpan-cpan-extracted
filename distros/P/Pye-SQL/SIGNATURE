@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 2c3a26d1f7ab1c8157f1c8b909e5788cb9a8eb83 Changes
+SHA1 f2494029affe20f6537ef0f692ee934c6d420800 INSTALL
+SHA1 43b9ff0e21a8504c73194bee2acdd52769627608 LICENSE
+SHA1 cca464140a2a1b9e4f9fe1321e28ff892b259a1c MANIFEST
+SHA1 d27e74e15a08c28c65cd1e54139ae93d0dc69595 MANIFEST.SKIP
+SHA1 76bcf1ecf9a01f9f35d48272d4275e9bdce5c806 META.json
+SHA1 cc2959f324f13d77c6f8749f79a226a14eecf1e3 Makefile.PL
+SHA1 ede560716fa44bcdb1fd5672d17b37575ecbebb8 README
+SHA1 9c2b8922b2bcf0c273755e01a5dbf3a2b0c16e4c dist.ini
+SHA1 2071baec347304da9f9b7f725f3dda3f2f273e3e lib/Pye/SQL.pm
+SHA1 71f42652f3e2194b2e7300cb362ef9d4f9b8c1fc t/00-load.t
+SHA1 1034c25f4afb2978f934d137c35abf66d16edd1b t/01-mysql.t
+SHA1 3baa0f8efd1c870829b4c23263c1900c98d39550 t/02-pgsql.t
+SHA1 ac51ca5102282e968e78f3185c0ccc5fc6643e47 t/03-sqlite.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iF4EAREIAAYFAlS/42wACgkQa4OHQAFM10ekyQD9GKVfOdvzdgMTTvJCPehP3AWQ
+rRKo7VqYfpnyVybdA/MA/izKqU/JfXyN8KXuBe6q3nQ6y56XVIpIC6rKqURlRBVl
+=PpsE
+-----END PGP SIGNATURE-----

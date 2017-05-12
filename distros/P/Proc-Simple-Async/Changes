@@ -1,0 +1,14 @@
+Revision history for Proc::Simple::Async
+
+0.03 Nov. 25, 2007
+    - Touched up the docs a bit more.
+
+0.02 Nov. 24, 2007
+    - Use a more ancient way of exporting functions so
+      that certain distributions using ancient versions
+      of perl will be able to use this module.
+    - Add some reasoning to the documentation.
+
+0.01 Oct. 31, 2007
+    - Initial revision.
+

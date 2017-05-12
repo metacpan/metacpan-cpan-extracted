@@ -1,0 +1,26 @@
+<Octothorpe>
+  <colon/>
+  <pipe dollar_sign="£">
+    <fishhooks>
+      <underscore>
+        <backslash>
+          <guillemets>slosh</guillemets> 
+          <guillemets>ouch_eth</guillemets>
+          <guillemets>blurp</guillemets>
+          <guillemets>eee_yow</guillemets>
+        </backslash>
+        <backslash>
+          <umlout>36</umlout>
+          <umlout>24</umlout>
+          <umlout>36</umlout>
+        </backslash>
+        <backslash>
+          <guillemets>thwacke</guillemets> 
+          <guillemets>swish</guillemets>
+          <guillemets>blurp</guillemets>
+          <umlout>17</umlout>
+        </backslash>
+      </underscore>
+    </fishhooks>
+  </pipe>
+</Octothorpe>

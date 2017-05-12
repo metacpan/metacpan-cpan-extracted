@@ -1,0 +1,30 @@
+Revision history for Perl extension PHP::Serialization::XS.
+
+0.01  Sat Oct 24 15:46:49 2009
+    - original version; created by h2xs 1.23 with options
+        -A -n PHP::Serialization::XS -b 5.8.8
+
+0.02  Sun Nov 15 16:21:35 2009
+    - added typemap to MANIFEST
+
+0.03  Mon Nov 16 09:35:00 2009
+    - added convert.c and convert.h to MANIFEST. Maybe I should test
+      the dist ?
+
+0.04  Mon Nov 16 22:20:00 2009
+    - I am very bad at this packaging thing. Fixed MANIFEST and included
+      required C and H files from phpserialize.
+
+0.05  Tue Mov 17 13:55:00 2009
+    - addressed RT #51590 (compilation on x86-64).
+
+0.06  Tue Nov 24 20:40:00 2009
+    - Bugfix for ->encode
+    - Added prefer_undef
+
+0.07  Sat May  9 18:31:17 CDT 2015
+    - Respect existing CCFLAGS
+
+0.08  Fri Mar 25 20:07:06 2016
+    - Mended an incorrect integer type, addressing errors on stricter systems.
+

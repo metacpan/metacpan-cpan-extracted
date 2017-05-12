@@ -1,0 +1,59 @@
+=head1 NAME
+
+This is a pod paragraph
+
+=begin wikidoc
+
+= DESCRIPTION
+
+Wikidoc paragraph
+
+=for private This is a comment
+
+=for private This is a comment
+across many lines
+
+=begin comment
+
+This is text in a Pod comment format
+
+=for private This is another comment
+
+=end comment
+
+== Subheading
+
+Level 2 paragraph
+
+=end wikidoc
+
+=cut
+#--------------------------------------------------------------------------#
+=pod
+
+=head1 NAME
+
+This is a pod paragraph
+
+=head1 DESCRIPTION
+
+Wikidoc paragraph
+
+=for private This is a comment
+
+=for private This is a comment
+across many lines
+
+=begin comment
+
+This is text in a Pod comment format
+
+=for private This is another comment
+
+=end comment
+
+=head2 Subheading
+
+Level 2 paragraph
+
+

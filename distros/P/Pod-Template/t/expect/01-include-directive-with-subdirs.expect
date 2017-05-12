@@ -1,0 +1,35 @@
+### Include directives with subdirs
+### Just specify them as 'lib => \@subdirs' in the new()
+### call to Pod::Template
+
+
+=pod
+
+=head1 NAME 
+
+Simple Include Directive
+
+=head2 Imported from Foo.pm:
+
+
+I am imported from Foo
+
+
+=head2 Imported from Bar.pm:
+
+
+I am imported from Bar
+
+
+=head1 AUTHOR
+
+This sample by Jos Boumans
+
+
+=head1 COPYRIGHT
+
+This library is free software;
+you may redistribute and/or modify it under the same
+terms as Perl itself.
+
+=cut

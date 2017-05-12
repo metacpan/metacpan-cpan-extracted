@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE chapter PUBLIC "-//CUSTOM//DOCKBOOK 4.4//EN" "../custom.dtd">
+<chapter id="chapter-usage">
+    <title>Usage</title>
+
+    <section id='usage.installation'>
+        <title>Instalation</title>
+
+        <para>Installing of &pod2docbook; should be as easy and streight
+        forward as executing <code>cpan -i Pod::2::DocBook</code>. This
+        will add <application>pod2docbook</application> script to the system.
+        See <xref linkend="dev.scripts" /> for description.
+        
+        <!-- FIXME replace above linkend by linking directly to the pod2docbook
+        section after text-ids branch is in the trunk  -->
+        </para>
+        
+    </section>
+    
+    <section>
+        <title>DocBook quick start guide</title>
+        
+        <para>In folder <filename>examples/pod2docbook-docbook/</filename> of
+        <ulink url="http://search.cpan.org/dist/Pod-2-DocBook/">&pod2docbook;</ulink>
+        is the source of this document. To generate the
+        <application>HTML</application> or <application>PDF</application>
+        version from
+        it you'll need: make, xmllint, xsltproc, fop and docbook xml+xsl.
+        </para>
+        
+        <para>For Debian: <command>apt-get install docbook-utils psutils
+        docbook-xml docbook-xsl xsltproc fop make</command>. To have images in the
+        PDF you need to get
+        <ulink url="http://java.sun.com/products/jimi/">jimi</ulink> and copy
+        <filename>jimi.jar</filename> to <filename>/usr/share/java/jimi-1.0.jar</filename>
+        </para>
+        
+        <para>Then just do <command>make</command> or <command>make Pod-2-DocBook.html</command>
+        or <command>make Pod-2-DocBook.pdf</command> to generate this "book".
+        </para>
+    </section>
+
+</chapter>

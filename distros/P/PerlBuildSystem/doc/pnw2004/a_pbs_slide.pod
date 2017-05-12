@@ -1,0 +1,2163 @@
+
+=slide PBS--------------------------------------------------
+
+=head1 PBS
+
+B<PBS> (Perl Build System) pronounced "peps".
+
+=begin html
+
+<img src="legend.png" align=center >
+
+=end html
+
+=cut
+
+=slide Introduction--------------------------------------------------
+
+=head1 Introduction
+
+=head2 History
+
+=over  0
+
+=item * Cons Mailing list
+
+=over  2
+
+=item * itchiness and irritations
+
+=item * Private communications
+
+=back
+
+=item * Daniel Pfeiffer:
+
+L<http://dapfy.bei.t-online.de/make.pl/>
+
+=back
+
+=head2 Authors
+
+=over  0
+
+=item * Nadim khemir. Teleca Mobile Technology.
+
+=item * Anders Lindgren. Anoto.
+
+=item * Ola Martensson. Cybercom.
+
+=back
+
+=head2 Project Start
+
+=over  0
+
+=item * Problems at hand
+
+=item * Fundings
+
+=item * Sudden stop
+
+=back
+
+
+=cut
+
+=slide Gmake's power--------------------------------------------------
+
+=head1 Gmake's power
+
+=over  0
+
+=item * Has been around for 20 years
+
+=item * Found most everywhere
+
+=item * Free
+
+=item * Fast and small
+
+=item * Compact rule syntax
+
+=item * Rule based
+
+=back
+
+=cut
+
+
+=slide Ending the reign--------------------------------------------------
+
+=head1 Who is this man?
+
+=begin html
+
+<img src="pmiller.jpg" align=center >
+
+=end html
+
+=begin html
+
+<br>
+
+=end html
+
+=over 0
+
+=item * Nice hair cut
+
+=item * Nice beard
+
+=item * Nice tie
+
+=item * Evenly sized ears
+
+=item * Sympathetics look
+
+=cut
+
+=slide Gmake's problems--------------------------------------------------
+
+=head1 Gmake's problems
+
+=over  0
+
+=item * Not for complex systems
+
+L<http://www.canb.auug.org.au/~millerp/rmch/recu-make-cons-harm.html>
+
+=item * Cryptic syntax
+
+=item * Crippled script language
+
+=item * Unclear (too smart) evaluation points
+
+=item * Monolithic and notoriously difficult to maintain
+
+=item * Needs an on site guru
+
+=item * Not (easily) found on windows, which is the main platform used by developers (like it or not)
+
+=item * Various slightly incompatible version of 'make'
+
+=item * Some built-in rules which are best disabled (-r option) (from Xmake documentation)
+
+=item * Will not automatically detect source files, dependencies or create rules unless you write the makefiles to do these things. (from Xmake documentation)
+
+=back
+
+B<Is make broken?>
+
+=cut
+
+=slide Other build systems--------------------------------------------------
+
+=head1 TMOWTDI
+
+Whether it's because of shortcomings in "gmake",  or simply because people want to try something new, lots of other build systems exists
+
+=over  0
+
+=item * Ant
+
+L<http://www.theserverside.com/news/thread.jsp?thread_id=23426>
+
+=item * Cook
+
+=item * Cons
+
+=item * Cmake
+
+=item * Scons
+
+=item * MakePP
+
+=item * Make.pl
+
+=item * Brazil
+
+=item * Jam
+
+=item * Odin	
+
+=item * SCons
+
+=item * Otto
+
+=item * Jake
+
+=item * Nmake 	
+
+=item * Xmake 	
+
+=item  ...
+
+=back
+
+=head3 Links:
+
+L<http://www.cbel.com/build_management/>
+
+L<http://www.linuxlinks.com/Software/Programming/Development/Tools/Make_Tools/>
+
+=cut
+
+=slide Rule based systems--------------------------------------------------
+
+=head1 Rule based systems
+
+  CC = gcc
+  
+  CFLAGS = -Wall                          \
+          -DG_DISABLE_DEPRECATED          \
+          -DGDK_DISABLE_DEPRECATED        \
+          -DGDK_PIXBUF_DISABLE_DEPRECATED \
+          -DGTK_DISABLE_DEPRECATED
+  
+  ttt_test: tictactoe.o ttt_test.o
+         $(CC) ttt_test.o tictactoe.o -o ttt_test `pkg-config --libs gtk+-2.0`
+  
+  ttt_test.o: ttt_test.c tictactoe.h
+          $(CC) -c ttt_test.c -o ttt_test.o $(CFLAGS) `pkg-config gtk+-2.0 --cflags`
+  
+  tictactoe.o: tictactoe.c tictactoe.h
+          $(CC) -c tictactoe.c -o tictactoe.o $(CFLAGS) `pkg-config gtk+-2.0 --cflags`
+  
+  clean:
+          rm -f *.o ttt_test
+
+=over  0
+
+=item * Low level access
+
+=item * Detail over exposure
+
+=item * Simple for simple tasks
+
+=item * Often developed and maintained by the same person
+
+=back
+
+=cut
+
+=slide "Smart" systems--------------------------------------------------
+
+=head1 "Smart" systems
+
+  Import qw( CONS BIN );
+  
+  InstallAs $CONS "$BIN/byacc_Fs.exe", 'byacc.exe' ;
+  
+  $CONS->Program
+  			(
+  			'byacc.exe'
+  			,qw
+  				(
+  				closure.c
+  				error.c
+  				lalr.c
+  				lr0.c
+  				main.c
+  				mkpar.c
+  				output.c
+  				reader.c
+  				skeleton.c
+  				symtab.c
+  				verbose.c
+  				warshall.c
+  				)
+  			) ;
+
+=over  0
+
+=item * Let you think at a higher level
+
+=item * Hide the mundane details
+
+=item * Sell "their" way of doing things
+
+=item * Not easy to get into the details
+
+=back
+
+L<http://www.dsmit.com/cons/stable/cons.html>
+
+=cut
+
+
+=slide Perl anyone?--------------------------------------------------
+
+=head1 Script language implementation anyone?
+
+More and more systems use scripted languages, B<Ruby>, B<Tcl>, B<Python> and B<Perl>.
+
+Many of the programs listed above use Perl.
+
+=over  0
+
+=item * make.pl (RIP)
+
+=item * Cons
+
+=item * Makepp
+
+=item * Otto
+
+=item * One or two modules on CPAN to handle dependencies
+
+=item * PBS
+
+=back
+
+
+=cut
+
+=slide Army of darkness--------------------------------------------------
+
+=head1 Army of darkness.
+
+=head2 Trapped in time
+
+=head2  Surrounded by evil
+
+=head2 Low on gas 
+
+=cut
+
+=slide Introduction to pbs. pbs is PBS is Perl is PBS--------------------------------------------------
+
+=head1 Introduction to pbs. pbs is PBS is Perl is PBS.
+
+=head3 Goals
+
+=over  0
+
+=item * Be readable by a human (no XML)
+
+=item * Be understandable by a human (no gmake or home grown syntax)
+
+=item * Be  easy to develop and extend (no C)
+
+=item * Be fun and powerful (Perl)
+
+=back
+
+=over  0
+
+=item * No 'veryclean' command
+
+=item * Low and High Level
+
+=item * No magic
+
+=item * Go where no  one has gone before
+
+Trigger, Documentation, debugging, visualization, user help, ...
+
+=back
+
+=head3 Result
+
+=over 0
+
+=item * PBS - Set of perl modules to implement build utilities.
+
+=item * pbs - one front end to PBS
+
+=item * pbs is a build utility in the same spirit as  I<gmake>. 
+
+=item * pbs was developed to tackle the build of complex systems.
+
+=item * pbs neither tries to make the task easy nor fast but merely possible.
+
+=item * pbs is written in Perl and uses Perl exclusively for defining the system to build.
+
+=item * I<pbs> has a full featured scripting language, Perl.
+
+=item * I<pbs> only introduces a few new functions.
+
+=back
+
+=cut
+
+=slide Architecture--------------------------------------------------
+
+=head1 Architecture
+
+=over  0
+
+=item * Simple, expandable, manageable
+
+=item * Not reinvent the wheel
+
+=item * 3 passes architecture/Process
+
+=over 2
+
+=item 1 Depend
+
+=item 2 Check
+
+=item 3 Build
+
+=back
+
+=back
+
+Each pass is implemented in a separate module, giving you the ability to depend and check a system without building it or building it 'manually'.
+
+  [nadim@khemir warp]$ pbs -tt -tno
+  
+  ** Depending [PBS/0] **
+  Depending './b1'  with sub pbs 'W1:./warp1.pl'
+     No user defined [W1] Build(), using DefaultBuild() with [BuiltIn, User] rules and [BuiltIn, User] configs.
+     ** Depending [W1/1] **
+  
+  ** Checking **
+  Tree for __PBS_warp_tree:
+  `- ./all [H1]
+     |- ./a1 [H2]
+     |- ./a2 [H3]
+     |- ./a3 [H4]
+     |- ./b0 [H5]
+     |- ./b1 [H6]
+     |  |- ./c1 [H7]
+     |  |  |- ./b0 [H8 -> H5]
+     |  |  |- ./d1 [H9]
+     |  |  |- ./f1.nad [H10]
+     |  |  |- ./f2.nad [H11]
+     |  |  |- ./f3.nad [H12]
+     |  |  |- ./f4.nad [H13]
+     |  |  `- ./f5.nad [H14]
+     |  `- ./c2 [H15]
+     |     `- ./d1 [H16 -> H9]
+     |- ./b2 [H17]
+     |- ./b3 [H18]
+     `- ./source [H19]
+  
+  ** Building **
+  Number of nodes in the dependency tree: 20.
+  2 [0V] nodes scheduled for build.
+  #------------------------------------------------------------------------------
+  Node './b1' [/home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/Pbsfiles/warp/out/b1] :
+  touch /home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/Pbsfiles/warp/out/b1
+  #------------------------------------------------------------------------------
+  Node './all' [/home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/Pbsfiles/warp/out/all] :
+  touch /home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/Pbsfiles/warp/out/all
+  Build Done.
+
+
+=cut
+
+=slide Switch extravaganza--------------------------------------------------
+
+=head1 Switch extravaganza
+
+  [nadim@khemir pnw2004]$ pbs -h | wc -l
+  PerlBuildSystem:
+  
+          PBS [-p Pbsfile[.pl]] [[-switch]...] target [target ...]
+  
+  switches:
+      152
+
+The switches can be categorized as follow:
+
+=over  0
+
+=item * Setup
+
+=over 2
+
+=item * Pbsfile
+
+=item * Repository
+
+=item * Defines
+
+=item * Verbosity
+
+=item * etc ..
+
+=back
+
+=item * Debugging
+
+=item * Visualization
+
+=back
+
+=cut
+
+=slide More environment control--------------------------------------------------
+
+=head1 More environment control
+
+=over 0
+
+=item * PRF
+
+=over 2
+
+=item * Anonymous prf (Pbs.prf)
+
+=item * User prf
+
+=back
+
+ -nh
+ -build_directory ./user_out
+ 
+ -sd .
+ -sd $NAILARA
+ 
+ all
+
+=item * PBS_FLAGS
+
+=item * PBS_LIB_PATH
+
+=back
+
+
+=cut
+
+=slide Pbsfile--------------------------------------------------
+
+=head1 Pbsfile
+
+I<Pbsfiles> are package B<'less'> perl scripts. Pbsfile can have any name you operating system supports. 
+
+If no I<Pbsfile> is given on the command line, I<pbs> will try:
+
+=over 2
+
+=item * Pbsfile.pl
+
+=item * pbsfile.pl
+
+=item * Pbsfile
+
+=item * pbsfile
+
+=back
+
+If no I<Pbsfile.pl> is found, I<pbs> exits with an error message.
+
+=head3 Evaluation order
+
+=over 0
+
+=item * Pbsfiles being perl scripts, they follow the order of evaluation any perl script follows.
+
+=over 2
+
+=item * code is parsed by perl
+
+=item * modules are loaded and compiled
+
+=item * code is evaluated
+
+=back
+
+=item * After perl evaluation, the build engine takes over
+
+=back
+
+=head3 Fiddling with namespaces
+
+You write I<Pbfiles> as package less scripts but PBS fiddles with you file.
+
+B<Original:>
+
+  AddRule [VIRTUAL], 'all', ['all' => 'file.o:1.0', 'file2.o:1.0'], "echo hi" ;
+
+B<Modified:>
+
+  #>>>>> start of file '/home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/pnw2004/examples/package_fiddle.pl'
+  
+  #line 0 '/home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/pnw2004/examples/package_fiddle.pl'
+  package PBS::Runs::PBS_1 ;
+  use strict ;
+  use warnings ;
+  use PBS::Constants ;
+  use PBS::Shell ;
+  use PBS::Output ;
+  use PBS::Rules ;
+  use PBS::Triggers ;
+  use PBS::PostBuild ;
+  use PBS::PBSConfig ;
+  use PBS::Config ;
+  use PBS::Check ;
+  use PBS::PBS ;
+  use PBS::Digest;
+  PBS::Digest::AddFileDependencies('PBSFILE:/home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/pnw2004/examples/package_fiddle.pl') ;
+  
+  
+  #line 1 '/home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/pnw2004/examples/package_fiddle.pl'
+  AddRule [VIRTUAL], 'all', ['all' => 'file.o:1.0', 'file2.o:1.0'], "echo hi" ;
+  
+  
+  
+  # load OK
+  1 ;
+  
+  #<<<<< end of file '/home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/pnw2004/examples/package_fiddle.pl'
+
+=over 0
+
+=item * makes a package of your Pbsfile
+
+=item * use strict and warnings
+
+=item * use many of the PBS modules
+
+=item * Adds a package dependency
+
+=item * sync the line numbering
+
+=item * returns success
+
+=back 
+
+=cut
+
+=slide PBS is Rule based--------------------------------------------------
+
+=head1 PBS is Rule based
+
+  AddRule [VIRTUAL], 'all', ['all' => 'ds_master.pdf'], BuildOk("Done.");
+  
+  AddRule 'tex2pdf', ['*.pdf' => '*.tex'],
+      '/usr/in/tex2pdf %FILE_TO_BUILD %DEPENDENCY_FILES' ;
+  
+  AddRule 'master', ['ds_master.tex' => @tex], \&BuildMaster;
+
+B<Rule Components:>
+
+=over  0
+
+=item * Type
+
+=item * Rule name
+
+=item * Depender
+
+=item * Builder
+
+=item * Arguments
+
+=back
+
+B<PBS is, obviously,  not compatibility with gmake. And that's good!>
+
+=cut
+
+=slide Dependers--------------------------------------------------
+
+=head1 Dependers
+
+=head3 Cumulative dependers
+
+If multiple rules match a node/file, the sum of the dependencies returned by matching dependers will become the node/file dependencies.
+
+  AddRule 'o_c', ['*.o' => '*.c'] ;
+  AddRule 'o_s', ['*.o' => '*.s'] ;
+
+are used on file I<compress.o>, the dependers would generate the following dependencies: I<compress.c> B<and> I<compress.s>.
+
+I<gmake> is, IMO, too magical in its way of handling your rules. I don't mean it is wrong but that it simply doesn't fit the I<pbs> way of 
+generating dependencies.
+
+ Node './nailara/os/rtos/rtos.objects' [/devel/nailara/projects/argus2_test/nadim_out/nailara/os/rtos/rtos.objects] :
+   Inserted at /devel/nailara/os/rtos/Pbsfile.pl [rtos]:__ROOT:PBS::Runs::rtos_1:BuiltIn:PBS_INTERNAL_/usr/local/lib/perl5/site_perl/5.8.0/PBS/PBS.pm:253.
+   dep:
+   ./nailara/os/rtos/rtos.o [/devel/nailara/projects/argus2_test/nadim_out/nailara/os/rtos/rtos.o]
+   ./nailara/os/rtos/irq.o [/devel/nailara/projects/argus2_test/nadim_out/nailara/os/rtos/irq.o]
+   ./nailara/os/rtos/critical.o [/devel/nailara/projects/argus2_test/nadim_out/nailara/os/rtos/critical.o]
+   ./nailara/os/rtos/reset.o [/devel/nailara/projects/argus2_test/nadim_out/nailara/os/rtos/reset.o]
+   ./nailara/os/rtos/device.o [/devel/nailara/projects/argus2_test/nadim_out/nailara/os/rtos/device.o]
+   ./nailara/os/rtos/context.o [/devel/nailara/projects/argus2_test/nadim_out/nailara/os/rtos/context.o]
+   ./nailara/os/rtos/exceptions.o [/devel/nailara/projects/argus2_test/nadim_out/nailara/os/rtos/exceptions.o]
+   ./nailara/os/rtos/irq_asm.o [/devel/nailara/projects/argus2_test/nadim_out/nailara/os/rtos/irq_asm.o]
+   ./nailara/os/rtos/os_init_argus2.o [/devel/nailara/projects/argus2_test/nadim_out/nailara/os/rtos/os_init_argus2.o]
+   ./nailara/os/rtos/exceptions_asm.o [/devel/nailara/projects/argus2_test/nadim_out/nailara/os/rtos/exceptions_asm.o]
+   
+  rebuild because of:
+        __SELF (Doesn't exist)
+ 
+ matching rule: #6[B] 'Object file list:PBS::Runs::rtos_1:User:/devel/nailara/Pbs/Rules/BuildSystem.pm:52'
+    => none
+    
+ matching rule: #7 'Object_files_0 @ '/devel/nailara/os/rtos/Pbsfile.pl':17 :PBS::Runs::rtos_1:User:/devel/nailara/Pbs/Rules/BuildSystem.pm:139'
+    => ./nailara/os/rtos/rtos.o ./nailara/os/rtos/irq.o ./nailara/os/rtos/critical.o ./nailara/os/rtos/reset.o ./nailara/os/rtos/device.o ./nailara/os/rtos/context.o ./nailara/os/rtos/exceptions.o ./nailara/os/rtos/irq_asm.o
+    
+ matching rule: #8 'Object_files_1 @ '/devel/nailara/os/rtos/Pbsfile.pl':29 :PBS::Runs::rtos_1:User:/devel/nailara/Pbs/Rules/BuildSystem.pm:139'
+    => ./nailara/os/rtos/os_init_argus2.o
+    
+ matching rule: #9 'Object_files_2 @ '/devel/nailara/os/rtos/Pbsfile.pl':70 :PBS::Runs::rtos_1:User:/devel/nailara/Pbs/Rules/BuildSystem.pm:139'
+    => ./nailara/os/rtos/exceptions_asm.o
+ 
+ Using builder: #6 'Object file list:PBS::Runs::rtos_1:User:/devel/nailara/Pbs/Rules/BuildSystem.pm:52'
+
+=cut
+
+=slide Depender Anatomy--------------------------------------------------
+
+=head1 Depender Anatomy
+
+A depender is a perl sub.
+
+  sub Depender
+  {
+  my ($dependent_to_check, $config, $tree, $inserted_nodes, $dependencies, $builder_override, $argument_override) = @_ ;
+  
+  my $build_directory    = $tree->{__PBS_CONFIG}{BUILD_DIRECTORY} ;
+  my $source_directories = $tree->{__PBS_CONFIG}{SOURCE_DIRECTORIES} ;
+  
+  my @my_dependencies ;
+  
+  if(defined $dependencies && @$dependencies && $dependencies->[0] == 1 && @$dependencies > 1)
+          {
+          # previous depender defined dependencies
+          unshift @my_dependencies, $dependencies->[1 .. -1] ;
+          }
+  
+  unshift @my_dependencies, 1 ;
+  
+  return(\@my_dependencies, $builder_override, $argument_override) ;
+  }
+
+
+=over  0
+
+=item * Dependers are chained
+
+=item * Dependers are powerful
+
+=item * Depender can be very complex
+
+=back
+
+=cut
+
+=slide Simplified Depender--------------------------------------------------
+
+=head1 Simplified Depender
+
+A depender is a perl sub but we can build the sub in different ways.
+
+=head3 AddRule to the rescue
+
+  AddRule 'a.o_rule name',
+  	['a.o' => \&SpecialDepender], ...
+  
+  AddRule 'a.o_rule name',
+  	['a.o' => 'a.c', '/path/file', \&SpecialDepender], ...
+  	
+  AddRule 'a.o_rule name',
+  	['a.o' => 'a.c', '/path/file'], ...
+ 
+  AddRule 'r4', ['a.h' => '[path]/[basename].[ext]'] ; # this is cyclic of course.
+
+=head3 globbing
+
+  AddRule 'r1', ['*/*.c' => '*.h'] ;
+  
+  AddRule 'r2', ['*/*.c' => 'somefile'] ;
+  
+  AddRule 'r3', ['*/*.c' => '/full_path/somefile'] ;
+
+=head3 Generating your own depender subs
+
+=cut
+
+=slide Enough! Give me perl back!--------------------------------------------------
+
+=head1 Enough! Give me perl back!
+
+If the dependent regexp is a regexp object or a sub, PBS (AddRule) considers the rule to be a pure perl rule.
+
+
+  AddRule 'rule_1', [qr<\./all$> => '$path/muu/all', '$path/f1', '$path/a.o', '$path/muu/xxxxx.o'] ;
+  
+  AddRule 'rule_2', [qr<\.o$> => '$path/$basename.c'] ;
+  
+  AddRule 'rule_3', 
+  	[	# creator
+  		[sub{return(@_[4 .. 6])}] =>		
+  		
+  		 #regexp
+  		 AndMatch(qr<\.c$>, NoMatch(qr/xx/)) => 
+  				 
+  		 		#dependencies
+  				
+  				  '$path/$basename.h' 
+  				  
+  				, [ # post depender
+  					sub
+  						{
+  						return([1, "hi_there2"], @_[5 .. 6])
+  						}
+  				  ]
+  				  
+  				, sub #depender
+  					{
+  					return([1, "hi_there1"], @_[5 .. 6])
+  					}
+  	] ;
+
+=over  0
+
+=item * Available variables:
+
+=over 2
+
+=item * $path
+
+=item * $basename
+
+=item * $name
+
+=item * $ext
+
+=back
+
+=item * Composite match
+
+=back
+
+  [nadim@khemir pnw2004]$ pbs -p ../Pbsfiles/pure_perl_rule/Pbsfile.pl -tta -tt -tno all
+    ...  
+  ** Checking **
+  Tree for __PBS_root_1_pbs_.._Pbsfiles_pure_perl_rule_Pbsfile.pl:
+  `- ./all [H1]
+     |- ./a.o [H2]
+     |  `- ./a.c [H3]
+     |     `- hi_there2 [H4]
+     |- ./f1 [H5]
+     |- ./muu/all [H6]
+     `- ./muu/xxxxx.o [H7]
+        `- ./muu/xxxxx.c [H8]
+
+=cut
+
+=slide Builders--------------------------------------------------
+
+=head1 Builders
+
+Single shell command:
+
+  AddRule 'rule_name',  ['X' => 'x1', 'x2'], "touch %FILE_TO_BUILD" ;
+
+Perl sub:
+
+  AddRule [VIRTUAL], 'rule_name', ['test' => 'all'], sub{ 1, "test OK\n"} ;
+
+Alternatively define your builders in a perl module.
+
+  use YourModule ;
+  #or
+  PbsUse 'YourPbsModule' ;
+  
+  AddRule 'rule_name',  ['X' => 'x1', 'x2'], \&YourBuilder ;
+
+Multiple commands:
+
+  AddRule [VIRTUAL], 'test', ['test' => 'all'],
+  	[
+  	"touch %FILE_TO_BUILD", # hmm!
+  	sub{ 1, "test OK\n"} ;
+  	]
+
+=head3 Variable interpolation
+
+  AddRule 'c_objects', [ '*.o' => '*.c' ],
+  	'%CC %CFLAGS -c -o %FILE_TO_BUILD %DEPENDENCY_LIST' ;
+
+=head3 BuildOK
+
+  AddRule [VIRTUAL], '1', [ 'test' => 'b'], BuildOk('Done', 1) ;
+
+=cut
+
+=slide Argument to builder--------------------------------------------------
+
+=head1 Argument to builder
+
+The last argument passed to AddRules is passed as an argument to the builder.
+
+  AddRule 'o_c', ['*.o' => '*.c'], \&BuildAnObject ;
+
+It is up to the builder to interpret the argument (a scalar that can point to other perl types if you want it to). The argument to builder allows to do something special on a specific node. For example, you'd like to compile a specific C file with a -O2 switch to the compiler. You could use the following rules:
+
+  # General rule to build object file
+  AddRule 'o_c', ['*.o' => '*.c'], \&BuildAnObject ;
+  
+  #specific rule 
+  AddRule 'special_o_file', ['special_file.o' => 'special_file.c'], undef, '-O2';
+
+All the .o files will be generated by BuildAnObject builder. When building 'special_file.o', BuildAnObject will be passed the argument '-O2'.
+
+=head3 What arguments are passed to the builders?
+
+The last defined argument for a node/file is passed to the builder. PBS will warn you if multiple arguments are selected.
+
+=cut
+
+=slide Re-using rules: PbsUse--------------------------------------------------
+
+=head1 Re-using rules: PbsUse
+
+PBS having no built-in rules, it would be cumbersome to have to redefine the rules you use in all the Pbsfiles. PBS support in include mechanism 
+that looks like perl's 'use'l. B<PbsUse> takes the name of a file which contains rules or configuration variables definitions.
+
+ File '.../Rules/C.pm':
+  AddRule 'exe', [exe => undef], \&BuildAnExe ;
+  AddRule 'O_to_C', ...
+  AddRule 'C_to_H', ...
+  ...
+
+You can then include it in you Pbsfile.
+
+  PbsUse('Rules/C') ; 
+
+B<PbsUse> will automatically append '.pm' at the end of the file name. If the file can't be found in the same
+directory as the Pbsfile, the environment variable B<PBS_LIB_PATH> will be used to point to the directories where the files are to be searched. 
+
+=over  0
+
+=item 
+
+=item 
+
+=item 
+
+=back
+
+=cut
+
+
+=slide Meta rules--------------------------------------------------
+
+=head1 Meta rules
+
+ AddRule 'c_objects', [ '*/*.o' => '*.c' ], ...
+ AddRule 'cpp_objects', [ '*/*.o' => '*.cpp' ], ...
+ AddRule 's_objects', [ '*/*.o' => '*.s' ], ...
+ 
+ AddRuleTo 'BuiltIn', [META_RULE], 'o_cs_meta',
+	[\&FirstAndOnlyOneOnDisk, ['cpp_objects', 'c_objects', 's_objects'], 'c_objects'] ;
+
+
+When you define the above 'o_meta' rule, B<PBS> removes the slave rules from it's rule list (in the current
+package only). I<FirstAndOnlyOneOnDisk> will be called with a reference to the slaves rules as arguments. This allows you 
+to define your own 'magic'. I<FirstAndOnlyOneOnDisk> source code can be found in the distribution.
+
+=cut
+
+=slide Built-in Rules void--------------------------------------------------
+
+=head1 Built-in Rules void
+
+=head2 B<NO BUILT-IN RULES!>
+
+Unlike other build systems, PBS doesn't define any Built-in rule. It is very easy to define and use libraries of rules.
+Those become I<your> Built-in rules.
+
+Why?
+
+=over  0
+
+=item * PBS team doesn't own a crystal ball
+
+=item * No rule collisions (except yours)
+
+=item * No magic (except yours)
+
+=back
+
+=cut
+
+=slide What about my C files?--------------------------------------------------
+
+=head1 What about my C files?
+
+=head3 Rules 
+
+L<file://home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/PBSLib/Rules/C.pm>
+
+=head3 Automatic dependencies
+
+=over 0
+
+=item * In Nailara, Rules/C_depender.pm implements a C file depender.
+
+=back
+
+ Depending './nailara/os/rtos/rtos.objects'  with sub pbs 'rtos:/devel/nailara/os/rtos/Pbsfile.pl'
+ 
+ Generating '/devel/nailara/os/rtos/critical.c' dependency file
+ './nailara/os/rtos/critical.c' Includes:
+ |- /devel/nailara/hal/argus2/argus2.h [H1]
+ |  `- /devel/nailara/hal/pagetable.h [H2]
+ |     `- /devel/nailara/hal/argus2/pagetable/pagetable.h [H3]
+ |- /devel/nailara/hal/argus2/cp15.h [H4]
+ |- /devel/nailara/hal/argus2/cpu.h [H5]
+ |  |- /devel/nailara/hal/argus2/argus2.h [H6 -> H1]
+ |  `- /devel/nailara/hal/argus2/cp15.h [H7 -> H4]
+ |- /devel/nailara/hal/argus2/pagetable/pagetable.h [H8 -> H3]
+ |- /devel/nailara/hal/cpu.h [H9]
+ |  `- /devel/nailara/hal/argus2/cpu.h [H10 -> H5]
+ |- /devel/nailara/hal/pagetable.h [H11 -> H2]
+ |- /devel/nailara/os/rtos/critical.h [H12]
+ |- /devel/nailara/os/rtos/prios.h [H13]
+ `- /devel/nailara/os/rtos/rtos.h [H14]
+    `- /devel/nailara/os/rtos/prios.h [H15 -> H13]
+
+=head3 digest file
+
+L<file://devel/nailara/projects/argus2_test/nadim_out/nailara/os/rtos/critical.c.depend>
+
+=cut
+
+=slide Dynamic rules definition--------------------------------------------------
+
+=head1 Dynamic rules definition
+
+=over  0
+
+=item * Remove rules
+
+=item * Replace rules
+
+ AddRule 'gnu asm stubs', [ '*/*.o' => '*.stub' ],
+    "%CC -x assembler-with-cpp %CFLAGS %CDEFINES %CFLAGS_INCLUDE -I%PBS_REPOSITORIES -o %FILE_TO_BUILD -c %DEPENDENCY_LIST" ;
+	
+ ReplaceRule [META_RULE], 'o_cs_meta', [\&FirstAndOnlyOneOnDisk, ['c_objects', 'gnu asm stubs'] , 'gnu asm stubs'] ;
+
+=item * create rules at run time
+
+=back
+
+=cut
+
+=slide Configuration--------------------------------------------------
+
+=head1 Configuration
+
+Adding configuration to your Pbsfile:
+
+=over 0
+
+=item * AddConfig
+
+=item * AddConditionalConfig
+
+=over 2
+
+=item * ConfigVariableNotDefined
+
+=item * ConfigVariableEmpty
+
+=item * ConfigVariableNotDefinedOrEmpty
+
+=back
+
+=item * Environment variables
+
+=item * Commend line variables
+
+=back
+
+  AddConfig 'a' => 1 ;
+  AddConfig 'a' => 2 ;
+  
+  AddConfig 'b:locked' => 1 ;
+  AddConfig 'b' => 2 ;
+
+Gives this when run:
+
+  [nadim@khemir pnw2004]$ pbs -p ../Pbsfiles/config/lock.pl -tta all
+  No source directory! Using '/home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/pnw2004'.
+  No Build directory! Using '/home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/pnw2004'.
+  Overriding config 'PBS::Runs::PBS_1::CURRENT::User::a' it is now:
+  |- ORIGIN [A1]
+  |  |- 0 [S2] = PBS::Runs::PBS_1:'../Pbsfiles/config/lock.pl':14 => 1
+  |  `- 1 [S3] = PBS::Runs::PBS_1:'../Pbsfiles/config/lock.pl':15 => 2
+  `- VALUE [S4] = 2
+  Configuration variable 'b' defined at PBS::Runs::PBS_1:'../Pbsfiles/config/lock.pl':18, wants to override locked variable:
+  PBS::Runs::PBS_1::CURRENT::User::b:
+  |- LOCKED [S1] = 1
+  |- ORIGIN [A2]
+  |  `- 0 [S3] = PBS::Runs::PBS_1:'../Pbsfiles/config/lock.pl':17 => 1
+  `- VALUE [S4] = 1
+  Died at /usr/local/lib/perl5/site_perl/5.8.0/PBS/Config.pm line 409.
+          ...propagated at /usr/local/lib/perl5/site_perl/5.8.0/PBS/PBS.pm line 483.
+
+
+Run Example:
+
+  time pbs -p ../Pbsfiles/config/force.pl -dc all
+
+=cut
+
+=slide Nodes--------------------------------------------------
+
+=head1 Nodes
+
+=head3 Node type
+
+=over  2
+
+=item * VIRTUAL
+
+=item * LOCAL
+
+=item * FORCED
+
+=item * IMMEDIATE_BUILD
+
+=back
+
+=head3 Note attributes
+
+  AddRule 'object1',['object.o' => 'object.c:4.2.0'] ;
+
+You can give attributes to the nodes, the attribute is declare by following the node name with a colon and a textual attribute (see the example bellow).
+When PBS finds such an attribute, it calls a user sub registrated via RegisterUserCheckSub.
+The user sub receives the following arguments:
+
+=over 0
+
+=item * The full name for the node (path and name)
+
+=item * The attribute declared in the rule
+
+=back
+
+The sub should return a file full name (path/name) this is most often the first argument it receives, or die with an error message.
+The node attribute could be used to, for example, verify the version of a node.
+
+=head3 Attributes checker
+
+  RegisterUserCheckSub
+  (
+  sub
+  	{
+  	my ($full_name, $user_attribute) = @_ ;
+  	#print "$full_name => $user_attribute\n" ;
+  	return($_[0]) ; # must return a file name
+  	}
+  ) ;
+
+=cut
+
+=slide Cyclic dependencies--------------------------------------------------
+
+=head1 Cyclic dependencies
+
+  AddRule 'all', [ all => '1', '2', 'cyclic'] ;
+  
+  AddRule 'cyclic',  [cyclic => 'cyclic2'] ;
+  AddRule 'cyclic2', [cyclic2 => 'cyclic3'] ;
+  AddRule 'cyclic3', [cyclic3 => 'cyclic'] ;
+
+=begin html
+
+<img src="cyclic.png" align="center ">
+
+=end html
+
+Example 2:
+
+  AddRule 'test1', ['all' => 'HERE', 'A'] ;
+  AddRule 'test2', ['HERE' => 'x.z'] ;
+  AddRule 'test3', ['A' => 'x.z'] ;
+  AddRule 'test4', ['this.lib' => 'HERE', 'lib.z'] ;
+  AddRule 'test5', ['all' => 'lib.h', 'HERE'] ;
+  AddRule 'test6', ['x.z' => 'all'] ;
+  AddRule 'test7', ['lib.h' => 'HERE'] ;
+
+Run example:
+
+  time pbs -p ../Pbsfiles/test1/cyclic.pl all and with -o and -dd switch
+
+=begin html
+
+<img src="cyclic2.png" align="center ">
+
+=end html
+
+=over 0
+
+=item * Only one cycle is show n in the generated graph!
+
+=item * Devel::Cycle is good
+
+=back
+
+=cut
+
+=slide Repositories--------------------------------------------------
+
+=head1 Repositories
+
+=over 0
+
+=item * Using B<--source_directory> or B<--sd>, you can direct B<PBS> to search for files in other source directories than the current 
+directory. 
+
+=item * You can specify multiple B<--sd> switches.
+
+=item * B<PBS> will search the directories in the order you specify them. 
+
+=back
+
+=head2 finding out what PBS found out
+
+ example in /devel/nailara/projects/argus2_test
+ try -dsd -dsi -daa
+
+=cut
+
+=slide Separating source from output--------------------------------------------------
+
+=head1 Separating source from output
+
+Using B<--build_directory>, you can have PBS place the generated files in a directory different from the current directory. 
+This allows you to separate your source files from the generated files.
+
+=head3 Default directories
+
+If no build or source directory is specified, B<PBS> will use the current directory. If you specify source directories, 
+B<PBS> will search exclusively in the specified directories. The current directory is not searched. If you want the 
+current directory and other directories to be searched, you must specify the current directory too.
+
+When no default build and/or source directory is given, I<pbs> will display an information line.
+
+ No source directory! Using '/devel/nailara/projects/argus2_test'.
+ No Build directory! Using '/devel/nailara/projects/argus2_test'.
+ No user defined [PBS] Build(), using DefaultBuild() with [BuiltIn, User] rules and [BuiltIn, User] configs.
+ ** Depending [PBS/0] **
+   Depending './nailara/nailara.objects'  with sub pbs 'NAILARA:/devel/nailara/Pbsfile.pl'
+
+=over 0
+
+=item * Debugging without rebuilding the world
+
+=item * --mandatory_build_directory and user PRF 
+
+=back
+
+=cut
+
+=slide Hierarchical builds--------------------------------------------------
+
+=head1 Hierarchical builds
+
+=head3 Rule definition for sub dependencies
+
+Within a pair of matching curly braquets'{}', list:
+
+=over 2
+
+=item * The node name 
+
+=item * The Pbsfile name.
+
+=item 2 The Package name (the sub package in which to run the sub build).
+
+=item 3 Optional. Extra variables you would like to set in the sub depend
+
+=back
+
+  AddRule 'sub_depend',
+  	{
+  	   NODE_REGEX => 'x.lib'
+  	 , PBSFILE  => './P2.pl'
+  	 , PACKAGE => 'LIB'
+  	 , BUILD_DIRECTORY => '/bd_P2'
+  	 , SOURCE_DIRECTORIES=> ['/sd_P2_2', '/sd_P2_1']
+  	 } ;
+
+B<Subpbsfiles  are Pbsfiles>.
+
+=head3 Rules
+
+B<No rule Inheritance. Period!>
+
+show example with -dur in any nailara project
+
+=head3 Configuration
+
+When B<PBS> starts a sub I<Pbsfile>, B<PBS> pushes (merges) the the parent configuration in the child Pbs. This is done automatically by B<PBS> just before
+calling the child B<Build()> sub or the B<default Build()> sub.
+
+=cut
+
+=slide Magnus Ladulås--------------------------------------------------
+
+=head1 Magnus Ladulås
+
+Magnus Ladulås, hertig, kung av Sverige 1275-1290, född 1240, död 18 december 1290 på Visingsö.
+
+L<http://sv.wikipedia.org/wiki/Magnus_Ladulås>
+
+=head2 Configuration  variable attributes
+
+=over 0
+
+=item * LOCKED
+
+=item * UNLOCKED
+
+=item * FORCE
+
+=item * OVERRIDE_PARENT
+
+=item * LOCAL
+
+=item * SILENT_OVERRIDE
+
+=back
+
+ [nadim@khemir PerlBuildSystem-0.25]$pbs -p Pbsfiles/config/parent.pl -no_build -tt -tno -dc -dpos parent
+
+=cut
+
+=slide Overriding--------------------------------------------------
+
+=head1 Overriding
+
+=over 0
+
+=item * Overriding a file
+
+=item * Overriding a Pbsfile
+
+=back
+
+ /devel/nailara
+ |-- Pbs
+ |-- communication
+ |-- ...
+ |-- hal
+ |   |-- argus
+ |   |-- argus2
+ |   |-- arguslt
+ |   |-- drivers
+ |   `-- pcb
+ |       |-- arguslt
+ |       |-- olympus
+ |       |-- olympus2
+ |       |   |-- P1
+ |       |   `-- bootinfo-headers
+ |       |       `-- testprograms
+ |       `-- olympuslt
+ |-- ...
+ |-- projects
+ |   |-- gdb_example
+ |   |   |-- nadim_out
+ |   |   |   `-- nailara
+ |   |   |       |-- hal
+ |   |   |       |   |-- argus
+ |   |   |       |   |   `-- pagetable
+ |   |   |       |   |-- drivers
+ |   |   |       |   |   |-- nand
+ |   |   |       |   |   `-- uart
+ |   |   |       |   `-- pcb
+ |   |   |       |       `-- olympus
+ |   |   |       `-- os
+ |   |   |           |-- debug
+ |   |   |           |-- fs
+ |   |   |           |   |-- nandfs
+ |   |   |           |   `-- vfs
+ |   |   |           |-- mem
+ |   |   |           |   `-- poolheap
+ |   |   |           |-- rtos
+ |   |   |           `-- utils
+ |   |   `-- nailara
+ |   |       |-- hal
+ |   |       |   `-- pcb
+ |   |       |       |-- nadim
+ |   |       |       `-- xxolympus
+ |   |       `-- os
+ |   |           `-- mem
+ |   |               `-- poolheap
+ |   `-- usbmass_demo
+ `-- utils
+
+(pbs -bi '*Bitmap*')
+
+(./gdb_example/nailara/hal/pcb/xxPbsfile.pl)
+
+=cut
+
+
+=slide Digests--------------------------------------------------
+
+=head1 Digest
+
+B<PBS> automatically generates digests when a node is build. Time Stamps are ignored(*).
+
+The digest contains the following elements:
+
+=over 0
+
+=item 1 The md5 of the Pbsfile that generated it
+
+=item 2 The md5 of the files that have been included through I<PbsUse>
+
+=item 3 Any element you have specified through the I<Add...Dependencies> functions
+
+=item 4 The md5 of the node's dependencies
+
+=item 5 The md5 of the generated node
+
+=back
+
+If all the elements needed to build the node are found in the file's digest, B<PBS> uses it, otherwise the node is rebuild.
+
+B<PBS> will expects a digest for all nodes/files. We have to tell B<PBS> how to make the difference between a generated file and
+a source file.
+
+I<ExcludeFromDigestGeneration()> allows you to exempt a certain type of files from the digest.
+
+  ExcludeFromDigestGeneration('c_files' => qr/\.c$/) ;
+
+The first argument is a description string, the second one a reference to a regexp object. Node names matching the regexp will be exempted.
+
+Some source files are automatically generated (ex by flex, yacc, your own generators, ...), I<ForceDigestGeneration()> can selectively
+re-impose a digest on a certain file that would have been exempted by I<ExcludeFromDigestGeneration>.
+
+  ForceDigestGeneration( 'a.c is generated' => qr/a\.c$/) ;
+
+Example of B<PBS> generated digest:
+
+  # This file is automaticaly generated by PBS (Perl Build System).
+  
+  # File: /devel/nailara/projects/argus2_test/nadim_out/main.o.pbs_md5
+  # Date: Tue Mar  9 20:34:25 2004 
+  # User: nadim @ khemir.net
+  # PBS_LIB_PATH: /home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/PBSLib/:/devel/nailara/Pbs/:/devel/nailara
+  # Pbsfile: ./Pbsfile.pl
+  
+  $digest = {
+             './main.o' => 'dc74f3b18b88e845027a683a68c88cbb',
+             '__NODE_VARIABLE:CDEFINES' => ' -DARCH_OLYMPUS2=1 -DARGUS2=1 -DCPU_ARGUS2=1 -DEXCEPTION_BASE=0x06000000 -DKERNEL=1 -DKHEAP_32BIT_POOL=1 -DKHEAP_SIZE=0x20000 -DPROC_MAX_PROCESSES=16 -DPROC_QUANTUM=1000000 -DROBASE=0x06000000 -DROBASE_PHYS=0x06000000 -DRWBASE=0x06100000 -DRWBASE_PHYS=0x06100000 -DRWLIMIT=0x08000000',
+             '__PBS_LIB_PATH/Builders/HostedBuilder.pm' => '080bac06fe0fc6338ccd64f6c02a75cb',
+             '__PBS_LIB_PATH/projects/argus2_test/Config.pm' => '28dc45bf0943c1a97745de98ba82b8b6',
+             '__PBS_LIB_PATH/Configs/Projects/Nailara.pm' => 'c85daa008b4d5eb2abbbff59abf5d6ca',
+             '__PBS_LIB_PATH/Configs/Compilers/gcc.pm' => '680336b56f1a9614a270114e3a03a6c9',
+             '__PBS_LIB_PATH/Dependers/Locator.pm' => '1695797f4dea0a29cd755606daf7af2b',
+             '__PBS_LIB_PATH/ShellConfig.pm' => '6cc04b44ec134dca90b6eddd13716550',
+             '__PBS_LIB_PATH/Rules/Nailara.pm' => 'ee2642a484fd63dcd657cdd9c2bc13e8',
+             './main.c' => '912c52d714d2edf8aa0d43601390ae7b',
+             '__PBS_LIB_PATH/Rules/C.pm' => '9a3e1eeef74aa887e723a1e6135ba876',
+             '__PBS_LIB_PATH/Configs/Compilers/compiler.pm' => 'ab5c5fba23b3b45f30bae03ac206e72f',
+             '__PBS_LIB_PATH/Rules/C_depender.pm' => 'deadefe169fa3ecb947d6211d796c5a2',
+             '__PBS_LIB_PATH/Configs/ConfigureProject.pm' => '6f692d3717eccef03452b3ac1882e2ce',
+             '__PBSFILE' => '425fbf4ed9c8e7f3034b6e0acde50e71',
+             '__PBS_LIB_PATH/MetaRules/FirstAndOnlyOneOnDisk.pm' => 'edc87f9805eec8a7dd61f33a70e770d0',
+             '__PBS_LIB_PATH/Rules/BuildSystem.pm' => '353e53811d6c757bae8f654b95fbae11'
+              };
+
+=cut
+
+=slide Tuning digests-----------------------------------------------------
+
+=head1 Tuning digests
+
+I<AddFileDependencies()> : B<PBS> will compute an md5 for each file in the list you pass as argument and add it to the digest.
+
+I<AddEnvironementDependencies()>: B<PBS> will add each environment variable you name in the list passed as argument. If the
+environment variable is not set, B<PBS> will add the variable to the digest and give it the empty string value.
+
+I<AddSwitchDependencies()> : : B<PBS> will add the variables and their values to the digest. Only Defined (-D) and User Defines (-u) can
+be added.
+	
+  AddSwitchDependencies('-D*') ; # depend on all command line defines 
+  AddSwitchDependencies('-u*') ; # depend on all user variables from the command line
+  AddSwitchDependencies('-u something', '-D debug', -D clean) ; # add only the given variables to the digest
+
+I<AddVariableDependency()> : This allows you to insert a variable name and it's value into the digest. For example, this could be used 
+if you are cross compiling for an embedded platform from different OSes. The cross compilers would have different md5 on the 
+OSes, so you can't add the cross compiler through I<AddFileDependencies()>.
+
+  my $compiler_version = GetCompilerNameAndVersion(...) ;
+  AddVariableDependency('compiler_version' => $compiler_version) ;
+
+=head3 Fine granularity control
+
+  AddNodeFileDependencies(qr/^.\/z0$/, 'pbs.html') ;
+  AddNodeFileDependencies(qr/c/, 'pbs.pod') ;
+  AddNodeVariableDependencies(qr/c/, 'a' => 1, 'b' => '2') ;
+
+=head3 What's not in the digest?
+
+=cut
+
+=slide Cross Compilation--------------------------------------------------
+
+=head1 Cross Compilation
+
+PBS can log into a remote computer through SSH or Telnet and execute a specific command.
+
+  use PBS::Shell_SSH ;
+  PbsUse('Builders/HostedBuilder') ;
+  
+  my $shell =  new PBS::Shell_SSH
+  		(
+  		  HOST_NAME        => 'localhost'
+  		, USER_NAME        => 'nadim'
+  		#~ , PROTOCOL         => 1 # default is SSH2
+  		#~ , REUSE_CONNECTION => 1
+  		) ;
+  
+  AddConfig  C_COMPILER_HOST => $shell ;
+  		
+  PbsUse('Rules/C') ;
+  PbsUse('Configs/gcc') ;
+  
+  AddRule [VIRTUAL], 'all', ['*/all' => qw(source.o source2.o source3.o)], BuildOk() ;
+
+In Rules/C:
+
+ $c_compiler_host = GetConfig('C_COMPILER_HOST') ;
+ 
+ AddRuleTo 'BuiltIn', 'c_objects', [ '*/*.o' => '*.c' ]
+  , HostedBuilder
+    (
+     'c_objects'
+    , $c_compiler_host
+    , "%CC %CFLAGS %CDEFINES %CFLAGS_INCLUDE -I%PBS_REPOSITORIES -o %FILE_TO_BUILD -c %DEPENDENCY_LIST" 
+    ) ;
+
+=cut
+
+=slide Parallel build--------------------------------------------------
+
+=head1 Parallel build
+
+=head3 IThreads
+
+B<PBS> didn't work nice with B<IThreads>.
+
+=over  0
+
+=item * PBS loads many modules
+
+=item * The monolitic data structure of PBS takes times to copy
+
+=back
+
+The net result was a systemt was much (order of magnitudes) faster with a single thread.
+
+=head3 Using fork while waiting for low level threads
+
+Low level threads with synchronisation responsibility placed on the application  would be B<PBS> favorit
+solution. In the mean time an experimental implementation using fork has been started.
+
+=cut
+
+=slide Triggers--------------------------------------------------
+
+=head1 Triggers
+
+Trigger is a sytem to  allow the current build to hook into other dependency trees. This can be used to 
+(for example) synchronize libraries. the details are located in the library Pbsfile.
+
+L<file://home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/Pbsfiles/trigger/Pbsfile.pl>
+
+L<file://home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/Pbsfiles/trigger/trigger.pl>
+
+=begin html
+
+<img src="trigger.png" align=center >
+
+=end html
+
+=cut
+
+=slide Other possible uses--------------------------------------------------
+
+=head1 Other possible uses
+
+=over  0
+
+=item * Simultaneous variant build
+
+=item * Post build Commands
+
+ AddPostBuildCommand 'post build', ['all', 'a', 'b'], \&PostBuildCommandTest, 'hi' ;
+ 
+ sub PostBuildCommandTest
+ {
+ my ($config, $name, $dependencies, $triggered_dependencies, $argument, $node) = @_ ;
+ 
+ ...
+ 
+ return(1, "PostBuildCommandTest OK.") ;
+ }
+
+=item * Using PBS from PBS
+
+L<file://home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/Pbsfiles/frontend>
+
+=back
+
+=cut
+
+=slide Boilerplate wizardry--------------------------------------------------
+
+=head1 Boilerplate wizardry
+
+  [nadim@khemir PerlBuildSystem-0.25]$ tree PBSLib/
+  PBSLib/
+  |-- Builders
+  |-- Configs
+  |-- Dependers
+  |-- MetaRules
+  |-- Rules
+  |-- UserBuild
+  `-- Wizards
+      |-- Breakpoint.pl
+      |-- BuilderSub.pl
+      |-- SimpleDependerSub.pl
+      |-- StandardPbsfile.pl
+      |-- Subpbs.pl
+      |-- menu.pl
+      `-- template.pl
+
+
+L<file://devel/nailara/Pbs/Wizards/nailara_project.pl>
+
+
+L<file:///devel/nailara/Pbs/Wizards/nailara.pl>
+
+ pbs -w nailara
+
+=cut
+
+=slide Documenting your build system--------------------------------------------------
+
+=head1 Documenting your build system
+
+=head3 Let there be POD!
+
+=over  0
+
+=item * On-line help
+
+ [nadim@khemir PerlBuildSystem-0.25]$ pbs -p Pbsfiles/test1/Pbsfile.pl -hu
+
+=item * HTML documentation for distribution
+
+L<file://devel/nailara/Pbs/Rules/Nailara.pm>
+
+L<file://devel/nailara/Pbs/Rules/Nailara.pm.html>
+
+=back
+
+=cut
+
+=slide Sensible output--------------------------------------------------
+
+=head1 Sensible output
+
+=head3 Coloring (PBS and User)
+
+=over  0
+
+=item * PrintError 
+
+=item * PrintWarning  or PrintWarning2 
+
+=item * PrintInfo or PrintInfo2 
+
+=item * PrintUser
+
+=item * PrintShell
+
+=item * PrintDebug
+
+=back
+
+Colors for these functions can be defined through the command line or PBS_FLAGS. The 
+"depend" step is indented. Output from user is also indented.
+
+=head3 Verbosity control
+
+  [nadim@khemir PerlBuildSystem-0.25]$ pbs -hs v
+  v|verbosity=s: Used in user defined modules.
+
+-- verbose is not used by PBS. It is intended for user defined modules.
+
+I recommend to use the following settings:
+
+=over 0
+
+=item 0 Completely silent (except for errors)
+
+=item 1 Display what is to be done
+
+=item 2 Display serious warnings
+
+=item 3 Display less serious warnings
+
+=item 4 Display display more information about what is to be done
+
+=item 5 Display detailed information
+
+=item 6 Not defined (yet)
+
+=item 7 Debug information level 1
+
+=item 8 Debug information level 2
+
+=item 9 All debug information
+
+=item 'string' => user defined verbosity level (ex 'my_module_9')
+
+=back
+
+B<Multiple> verbosity switches can be given, they are store in I<{__PBS_CONFIG}{ VERBOSITY}>.
+
+=head3 Coloring output from gcc
+
+C-Tech build system uses B<colorgcc>. L<http://www.mindspring.com/~jamoyers/software/colorgcc/>
+
+=cut
+
+=slide Taking control (if you dare)--------------------------------------------------
+
+=head1 Taking control (if you dare)
+
+=head3 User Build()
+
+B<PBS> is a three pass sytem.
+
+=over  0
+
+=item * You can take over after any pass you'd like to
+
+=item * With some work you can even fiddle with the build sequence
+
+=back
+
+Using default Build():
+
+ pbs -p Pbsfiles/user_build/user_build.pl -no_user_build -tt -tno -fb -no_digest x.lib
+
+Using your own Build():
+
+ pbs -p Pbsfiles/user_build/user_build.pl -tt -tno -no_digest -dbsno x.lib
+
+=head3 The dreaded ARM compiler
+
+=head4 Enter 'miners'
+
+ Rules ...
+ Rules ...
+  
+ #-------------------------------------------------------------------------------
+ PbsUse('UserBuild/BuildSequenceMiner') ;
+ PbsUse('UserBuild/Multiple_O_Compile') ;
+ 
+ sub Build
+ {
+ my ($build_result, $build_message) = BuildSequenceMiner
+ 			(
+ 			  [@_]
+ 			, [\&Multiple_O_Compile]
+ 			) ;
+ 			
+ PrintInfo("Build done.\n") ;
+ 
+ return($build_result, $build_message) ;
+ }
+
+=cut
+
+=slide Let's build--------------------------------------------------
+
+=head1 Let's build!
+
+ [nadim@khemir argus2_test]$ time pbs
+
+=over  0
+
+=item * uses PRF
+
+=item * verbose
+
+=item * speed
+
+=back
+
+=cut
+
+=slide Keep quiet--------------------------------------------------
+
+=head1 Ananova - Wife  pays man salary to keep quiet.
+
+Pbs offers switches to lower output verbosity.
+
+=over  0
+
+=item * No header: -nh
+
+=item * No step info: -nsi
+
+=item * Silent command: -sc
+
+=item * Silent command output: -sco
+
+=item * No build header: -nbh
+
+=item * Silent depend info: -sdi
+
+=back
+
+=cut
+
+=slide Debugging--------------------------------------------------
+
+=head1 Debugging
+
+One B<PBS> requirements was to help the PBsfile writer to find errors in the build system he defines. B<PBS> has an army of switches
+to help you get insight in how the dependency tree is constructed.
+
+=head3 Simple stuff takes you a long way
+
+=over  0
+
+=item * -display_pbsuse
+
+=item * -display_used_rules_name_only
+
+=item * -display_config
+
+=item * -display_dependencies, -a and -display_dependencies_regex
+
+=item * -text_tree and tree_node_triggered_reason
+
+=item * -display_build_sequence
+
+=back
+
+=head3 When things get stubborn.
+
+=over  0
+
+=item * -display_search_info
+
+=item * -display_rules -display_used_rules and -display_rule_definition
+
+=item * -display_dependency_regex
+
+=item * -display_digest
+
+=item * -f 
+
+=item * -ni, -bi and -bni
+
+=item * -o
+
+=back
+
+=head3 Logging
+
+=over 0
+
+=item * -create_log
+
+=item * -dump
+
+=back
+
+=cut
+
+=slide Serious Visualization--------------------------------------------------
+
+=head1 Serious Visualization
+
+=over  0
+
+=item * gtg
+
+=item * gtg_p
+
+L<file://home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/Pbsfiles/config/tree_package.png>
+
+=item * gtg_cn
+
+L<file://devel/nailara/projects/argus2_test/tree_cn.png>
+
+=item * gth_html and gtg_html_frame
+
+L<file://devel/nailara/projects/argus2_test/html/index.html>
+
+=item * gtg_tn
+
+=item * gtg_config and gtg_config_edge
+
+L<file://home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/Pbsfiles/config/tree_config.png>
+
+=item * gtg_pbs_config and gtg_pbs_config_edge
+
+=back
+
+=cut
+
+=slide How did I get there?--------------------------------------------------
+
+=head1 How did I get there?
+
+L<file://home/nadim/Dev/PerlModules/PerlBuildSystem-0.25/snapshots/00000.png>
+
+=cut
+
+=slide Debugging hooks--------------------------------------------------
+=for undone_slide
+
+=head1 Debugging Hooks
+
+=head3 Hooks
+
+  #DEBUG HOOK (see PBS::Debug)
+  my %debug_data = 
+  	(
+  	  TYPE                   => 'BUILD'
+  	, CONFIG                 => $file_tree->{__CONFIG}
+  	, NODE_NAME              => $file_tree->{__NAME}
+  	, NODE_BUILD_NAME        => $build_name
+  	, DEPENDENCIES           => \@dependencies
+  	, TRIGGERED_DEPENDENCIES => \@triggered_dependencies
+  	, ARGUMENTS              => \$arguments
+  	, NODE                   => $file_tree
+  	) ;
+  	
+  #DEBUG HOOK, jump into perl debugger is so asked
+  $DB::single = 1 if(PBS::Debug::CheckBreakpoint(%debug_data, PRE => 1)) ;
+
+=head3 Breakpoints
+
+ AddBreakpoint
+	(
+	  'hi'
+	, DEPEND => 1
+	, PRE => 1
+	#~ , USE_DEBUGGER => 1
+	#~ , ACTIVE => 1
+	, ACTIONS =>
+		[
+		sub
+			{
+			PrintDebug "Hi there.\n" ;
+			}
+		]
+	) ;
+
+types:
+
+=over 0
+
+=item * DEPEND
+
+=item * INSERT
+
+=item *  TREE
+
+=item * BUILD
+
+=item * POST_BUILD
+
+=item * Sub types
+
+=over 2
+
+=item * PRE
+
+=item * POST
+
+=item * TRIGGERED
+
+=back
+
+=back
+
+filters :
+
+=over 0
+
+=item * RULE_REGEX
+
+=item * NODE_REGEX
+
+=item * PACKAGE_REGEX
+
+=item * PBSFILE_REGEX
+
+=back
+
+=head3 Using the perl debugger
+
+=cut
+
+
+=slide Take us to Warp 1 Mr Sulu--------------------------------------------------
+
+=head1 Take us to Warp 1 Mr Sulu
+
+B<PBS> takes 6 seconds, in a test project,  to do nothing vs 0.2 for B<gmake>. OK,  B<gmake> doesn't do what B<PBS> does
+but for the day to day work, 6 seconds are just too much!
+
+=head3 Optimizing
+
+=over  0
+
+=item * We already try to not write unoptimal code
+
+=item *Optimizing research code is a non sense
+
+=item * Optimizing is long and dificult
+
+=item * A day of optimizing work saved 1 second! (a single line of code)
+
+=back
+
+=head3 Warp!
+
+ [nadim@khemir argus2_test]$ rm nadim_out/nisse/nisse.o
+ [nadim@khemir argus2_test]$ time pbs -warp
+
+=head4 Warp, is it possible?
+
+L<http://www.grc.nasa.gov/WWW/PAO/warp.html>	
+
+=cut
+
+=slide Warp 2?--------------------------------------------------
+
+=head1 Warp 2?
+
+What can be done to run faster?
+
+=over  0
+
+=item * Caching perl code generated by Pbsfiles
+
+=item * Partial sub tree regeneration
+
+=item * Parallel depend step
+
+=item * Build in the background while editing
+
+=item * <Your crazy ideas here>
+
+=back 
+
+=cut
+
+=slide Peeping at the code--------------------------------------------------
+
+=head1 Peeping at the code
+
+=over  0
+
+=item * size
+
+=item * number of modules
+
+=item * used modules
+
+ Cwd.pm 2.06
+ Devel/Cycle.pm 1.01
+ Devel/Size.pm 0.58
+ Digest/MD5.pm 2.27
+ File/Basename.pm 2.71
+ File/Copy.pm 2.05
+ File/MkTemp.pm 1.0.6
+ File/Path.pm 1.05
+ Getopt/Long.pm 2.32
+ List/Util.pm 1.07
+ Pod/Parser.pm 1.13
+ Scalar/Util.pm 1.07
+ Term/ANSIColor.pm 1.05
+ Term/Size.pm 0.2
+ Text/Balanced.pm 1.95
+ Text/Tabs.pm 98.112801
+ Text/Wrap.pm 2001.0929
+ Tie/Hash.pm 1.00
+ Tie/IxHash.pm 1.21
+ Time/HiRes.pm 1.2
+
+=back
+
+=cut
+
+=slide Future development--------------------------------------------------
+
+=head1 Future development
+
+=head3 Problems with PBS
+
+=over  0
+
+=item * License
+
+=item * OO/ re-entrency
+
+=item * Documentation / tests
+
+=item * Energy/ideas
+
+=back
+
+=head3 So what's next?
+
+
+=over  0
+
+=item * Find people interrested in PBS
+
+=item * Release
+
+=item * The fun stuff
+
+=over  2 
+
+=item * Parallel build
+
+=item * Distributed build in heterogene environment
+
+=item * Clustering
+
+=item * Configuration management
+
+=item * Centralized build point (web)
+
+=item * Warp 2
+
+=item * Distributed Pbsfiles
+
+=item * Tackle bigger build projects
+
+=item * Optimize code
+
+=item * More Perlishness
+
+=item * <Your ideas here>
+
+=back
+
+=back
+
+Contact: B<nadim@khemir.net>.
+
+=cut
+
+

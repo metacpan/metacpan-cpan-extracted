@@ -1,0 +1,41 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Exporter' => '0',
+                                      'Moo' => '0',
+                                      'Parallel::ForkManager' => '1.19',
+                                      'Proc::tored' => '0.15',
+                                      'Time::HiRes' => '0',
+                                      'Try::Tiny' => '0',
+                                      'Type::Library' => '0',
+                                      'Type::Tiny' => '0',
+                                      'Type::Utils' => '0',
+                                      'Types::Standard' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Path::Tiny' => '0.097',
+                                   'Test2::Bundle::Extended' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

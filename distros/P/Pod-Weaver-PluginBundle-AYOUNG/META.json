@@ -1,0 +1,73 @@
+{
+   "abstract" : "AYOUNG's default Pod::Weaver config",
+   "author" : [
+      "Alan Young <harleypig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102346, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Weaver-PluginBundle-AYOUNG",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Pod::Weaver::Config::Assembler" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Path::Class" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94",
+            "Test::Perl::Critic::Progressive" : 0,
+            "Try::Tiny" : 0,
+            "perl" : "5.004"
+         }
+      }
+   },
+   "provides" : {
+      "Pod::Weaver::PluginBundle::AYOUNG" : {
+         "file" : "lib/Pod/Weaver/PluginBundle/AYOUNG.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/harleypigs/pod-weaver-pluginbundle-ayoung/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/harleypig/pod-weaver-pluginbundle-ayoung.git",
+         "web" : "http://github.com/harleypig/pod-weaver-pluginbundle-ayoung"
+      }
+   },
+   "version" : "0.14"
+}
+

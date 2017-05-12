@@ -1,0 +1,172 @@
+#!perl
+
+=pod
+
+=head1 NAME
+
+pod2test - Convert embedded tests and code examples to .t files
+
+=head1 SYNOPSIS
+
+  pod2test [-Mmodule] [input [output]]
+
+=head1 DESCRIPTION
+
+B<pod2test> is a front-end for L<Pod::Tests> (formerly Test::Inline 1).
+It generates TAP-compatible .t testing scripts from embedded tests and
+code examples.
+
+If output is not specified, the resulting .t file will go to STDOUT.
+Otherwise, it will go to the given output file.  If input is not
+given, it will draw from STDIN.
+
+If the given file contains no tests or code examples, no output will
+be given, no output file will be created and pod2test will exit with
+1.
+
+The Test::More module is made available to the testing blocks using
+the 'no_plan' feature.  Any further modules which should be used are
+specified with -M. B<UNIMPLEMENTED>
+
+=cut
+
+use 5.005;
+use strict;
+use vars qw($VERSION);
+BEGIN {
+	$VERSION = '1.19';
+}
+
+use File::Spec ();
+use Pod::Tests ();
+use Symbol     ();
+
+my($infile, $outfile) = @ARGV;
+my($infh,$outfh);
+
+if( defined $infile ) {
+	$infh = Symbol::gensym();
+	open($infh, $infile) or 
+		die "Can't open the POD file $infile: $!";
+} else {
+	$infh = \*STDIN;
+}
+
+my $p = Pod::Tests->new;
+$p->parse_fh($infh);
+
+# XXX Hack to put the filename into the #line directive
+$p->{file} = $infile || '';
+
+my @tests    = $p->build_tests($p->tests);
+my @examples = $p->build_examples($p->examples);
+
+exit 1 unless @tests or @examples;
+
+
+if( defined $outfile) {
+	$outfh = Symbol::gensym();
+	open($outfh, ">$outfile") or
+		die "Can't open the test file $outfile: $!";
+} else {
+	$outfh = \*STDOUT;
+}
+
+
+my $perl = $^X;  # XXX eventually this will be smarter.
+print $outfh <<"TEST";
+#!$perl -w
+TEST
+
+my $original_file = File::Spec->abs2rel($infile);
+
+print $outfh sprintf <<'TEST', $original_file;
+
+use Test::More 'no_plan';
+
+package Catch;
+
+sub TIEHANDLE {
+	my($class, $var) = @_;
+	return bless { var => $var }, $class;
+}
+
+sub PRINT  {
+	my($self) = shift;
+	${'main::'.$self->{var}} .= join '', @_;
+}
+
+sub OPEN  {}    # XXX Hackery in case the user redirects
+sub CLOSE {}    # XXX STDERR/STDOUT.  This is not the behavior we want.
+
+sub READ {}
+sub READLINE {}
+sub GETC {}
+sub BINMODE {}
+
+my $Original_File = '%s';
+
+package main;
+
+# pre-5.8.0's warns aren't caught by a tied STDERR.
+$SIG{__WARN__} = sub { $main::_STDERR_ .= join '', @_; };
+tie *STDOUT, 'Catch', '_STDOUT_' or die $!;
+tie *STDERR, 'Catch', '_STDERR_' or die $!;
+
+TEST
+
+foreach my $test (@tests, @examples) {
+	print $outfh "$test\n";
+}
+
+=pod
+
+=head1 BUGS and CAVEATS
+
+This is a very simple rough cut.  It only does very rudimentary tests
+on the examples.
+
+=head1 SUPPORT
+
+This script has been superceded by C<inline2test> from the newer
+L<Test::Inline> 2. Most testing code that currently works with
+C<pod2test> should continue to work with the new version.
+
+The most notable exceptions are C<=for begin> and C<=for end>, which
+are deprecated in the newer version.
+
+After upgrading L<Test::Inline>, L<Pod::Tests> and C<pod2test> were split
+out to provide a compatibility package for legacy code.
+
+C<pod2test> will stay in CPAN, but should remain unchanged indefinately,
+with the exception of any minor bugs that will require squishing.
+
+Bugs in this dist should be reported via the following URL. Feature requests
+should not be submitted, as further development is now occuring in
+L<Test::Inline>.
+
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Pod-Tests>
+
+=head1 AUTHOR
+
+Michael G Schwern E<lt>schwern@pobox.comE<gt>
+
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<Pod::Tests>, L<Test::Inline>
+
+=head1 COPYRIGHT
+
+Copyright 2005 - 2008 Adam Kennedy.
+
+Copyright 2001 - 2003 Michael G Schwern.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=cut

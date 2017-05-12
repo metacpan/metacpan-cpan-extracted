@@ -1,0 +1,67 @@
+% Created by pp2latex, build 1.14 from PerlPoint-Converters 1.0201
+\documentclass [11pt] {article}   % 
+\usepackage{german}               % ISO-Latin-Zeichensatz (дцья)
+\usepackage{isolatin1}            % ISO-Latin-Zeichensatz (дцья)
+\parindent0pt                     % no indentation of first line
+\parskip1ex                       % white space between chapters
+\pagestyle{headings}     %
+\usepackage{epsf}
+\usepackage{makeidx}
+
+% setup for DIN A4
+\oddsidemargin3cm
+\evensidemargin3cm
+\setlength{\hoffset}{-1in}            % compensation of
+\setlength{\voffset}{-2cm}            % printer offset
+
+\textwidth15cm
+\topmargin1cm
+\headheight3ex
+\headsep12pt
+\textheight23cm
+\setlength{\footskip}{1.5cm}
+
+\makeindex
+
+\begin{document}
+
+\begin{flushleft}
+
+
+
+\section{First page}
+
+\begin{itemize}
+\item \label{index:0:1}\index{see}see also \pageref{p3} page three.
+\end{itemize}
+
+
+\section{Second page}
+
+And \label{index:1:2}\index{see}see also First page.
+
+Enter \label{index:1:3}\index{Test, Index} index test into index.
+
+
+\section{Third page}
+
+Text with \label{p3} an anchor on page three. Please refer to page \ref{Second page}.
+
+
+\section{Links to the web}
+
+Some URLS:
+
+\begin{itemize}
+\item {\scriptsize \begin{math} [URL: http://www.pixel.de] \end{math} } Pixel GmbH
+\item {\scriptsize \begin{math} [URL: http://www.mixed-mode.de] \end{math} } Mixed-Mode Asic Design GmbH
+\end{itemize}
+
+\printindex
+
+
+
+\end{flushleft}
+
+
+\end{document}

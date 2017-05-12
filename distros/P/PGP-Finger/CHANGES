@@ -1,0 +1,57 @@
+==================================================
+Changes from 2014-03-18 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 1.1 at 2015-03-18 20:34:30 +0000
+----------------------------------------
+
+  Change: 013f68c5ec6c5dd18d448a00dcd3b65456cbb418
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-03-18 21:32:53 +0000
+
+    file input and debian/rpm packaging 
+
+  Change: 797476500af3a9e1d5653a2279b39e739792cd62
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-03-18 09:52:28 +0000
+
+    fix some doc error in pgpfinger pod 
+
+----------------------------------------
+version 1.0 at 2015-03-16 13:10:53 +0000
+----------------------------------------
+
+  Change: d96d8e7a32ea32c9ef3da9b38e6feb903a5b2d8e
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-03-16 14:10:53 +0000
+
+    a lot of updates and new functionality 
+
+  Change: 9a14cf76adc05f51a3efebd8a76d3ce1600a5b88
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-03-16 09:30:28 +0000
+
+    Merge branch 'master' of https://github.com/benningm/pgpfinger 
+
+  Change: 40db1093ee0fefcb87fbe6f7209e2be23682216c
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-03-16 09:29:38 +0000
+
+    fix key armour 
+
+  Change: 3c29bcb2c4d427fe7c0731966c2b082577dcc9b1
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2015-03-15 14:31:26 +0000
+
+    Create README.md 
+
+  Change: fcdb5dd3aa487c46c3bfe4069c4599ae859cbb41
+  Author: Markus Benning <ich@markusbenning.de>
+  Date : 2015-03-15 14:25:22 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

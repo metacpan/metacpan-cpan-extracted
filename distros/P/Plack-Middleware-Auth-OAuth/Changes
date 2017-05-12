@@ -1,0 +1,22 @@
+Revision history for Perl extension Plack::Middleware::Auth::OAuth
+
+0.06    Thu Mar  7 11:01:59 2013
+        - add strict option
+        - add secret_resolver_cb feature
+
+0.05    Wed Jan 16 05:35:00 2012
+        - add validate only feature
+        - add unauthorized_cb feature
+        - assign $env->{"psgix.oauth_authorized"} when validating
+
+0.04    Thu Oct 18 05:56:12 2012
+        - assign psgix.oauth_realm and psgix.oauth_params into $env
+
+0.03    Mon Oct 01 15:26:48 2012
+        - RSA-SHA1 support
+
+0.02    Tue Jun 01 19:16:36 2010
+        - verify all values for the key (thanks to: tokuhirom)
+
+0.01    Mon Apr 26 21:30:24 2010
+        - original version

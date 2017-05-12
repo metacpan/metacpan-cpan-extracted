@@ -1,0 +1,22 @@
+.*~$
+.*\.(bak|old)$
+\.git/.*
+\.gitignore
+
+^Makefile$
+
+^blib/
+^pm_to_blib$
+
+Plack-Middleware-.*\.tar\.gz
+Plack-Middleware-.*v\d+\.\d+\.\d+/
+
+^MYMETA\.*
+
+# QA tests not needed for distribution
+
+^xt/
+
+# Travis-CI
+
+\.travis\.yml

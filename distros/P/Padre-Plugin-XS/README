@@ -1,0 +1,42 @@
+Padre-Plugin-XS
+
+This plugin is intended to extend Padre's support for editing XS
+and C-using-perlapi.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Padre::Plugin::XS
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Padre-Plugin-XS
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Padre-Plugin-XS
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Padre-Plugin-XS
+
+    Search CPAN
+        http://search.cpan.org/dist/Padre-Plugin-XS
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 Ahmad M. Zawawi
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

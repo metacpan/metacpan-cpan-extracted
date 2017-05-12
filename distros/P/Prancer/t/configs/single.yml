@@ -1,0 +1,11 @@
+foo: bar
+type: single
+
+listings:
+    - a
+    - b
+    - c
+
+channels:
+    foo: bar
+    baz: bat

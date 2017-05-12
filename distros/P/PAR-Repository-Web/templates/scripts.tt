@@ -1,0 +1,51 @@
+<html>
+<head>
+<title>[% c.config.name %]</title>
+<meta http-equiv="Content-Language" content="en" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style type="text/css">
+    [% INSERT inline.css %]
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <div class="heading"><h1>[% c.config.name %]</h1></div>
+       
+        <div class="content">
+          <form action="/repos/[% alias %]/script" method="post" class="selection">
+            <table>
+            <tr>
+                <td>Script name regular expression: </td>
+                <td><input name="name" type="text" size="30" maxlength="120" value="[% nameregexp %]"/></td>
+                <td><input type="submit" value="Select" style="margin-left: 2px"/></input></td>
+            </tr>
+            <tr>
+                <td>Architecture regular expression: </td>
+                <td><input name="arch" type="text" size="30" maxlength="120" value="[% archregexp %]"/></td>
+                <td><input type="checkbox" name="noanyarch" value="1" [% IF noanyarch %]checked[% END %]/> exclude <i>any_arch</i></td>
+            </tr>
+            </table>
+          </form>
+        </div>
+ 
+        <div class="content">
+        <table class="content">
+        <tr class="content">
+            <th class="content">Script Name</th><th class="content">Version</th>
+            <th class="content">Distribution</th>
+        </tr>
+        [% FOREACH r = rows %]
+        <tr>
+        <td class="content">[% r.name %]</td>
+        <td class="content">[% r.version %]</td>
+        <td class="content">[% r.dist %]</td>
+        [% END %]
+        </table>
+        </div>
+
+        <div class="credits"><p>PAR::Repository::Web implementing <i>[% c.config.name %]</i> using Catalyst 5.6902</p></div>
+    </div>
+    </div>
+</body>
+</html>

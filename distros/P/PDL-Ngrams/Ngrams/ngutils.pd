@@ -1,0 +1,268 @@
+##-*- Mode: CPerl -*-
+
+##======================================================================
+## Header Administrivia
+##======================================================================
+
+our $VERSION = '0.09';
+pp_setversion($VERSION);
+
+use PDL::VectorValued::Dev;
+my $INDX = (PDL::VectorValued::Dev->can('vv_indx_sig') || sub { 'int' })->();
+
+
+##------------------------------------------------------
+## pm additions
+pp_addpm({At=>'Top'},<<'EOPM');
+
+use strict;
+
+=pod
+
+=head1 NAME
+
+PDL::Ngrams::ngutils - Basic N-Gram utilities for PDL: low-level utilities
+
+=head1 SYNOPSIS
+
+ use PDL;
+ use PDL::Ngrams::ngutils;
+
+ ##---------------------------------------------------------------------
+ ## ... stuff happens
+
+=cut
+
+EOPM
+## /pm additions
+##------------------------------------------------------
+
+##------------------------------------------------------
+## Exports: None
+#pp_export_nothing();
+
+##------------------------------------------------------
+## Includes / defines
+pp_addhdr( (PDL::VectorValued::Dev->can('vv_indx_typedef') || sub { "typedef PDL_Long NG_Indx;\n" })->() );
+pp_addhdr(<<'EOH');
+#ifndef NG_Indx
+typedef PDL_Indx NG_Indx;
+#endif
+
+EOH
+
+
+##======================================================================
+## C Utilities
+##======================================================================
+# (none)
+
+##======================================================================
+## PDL::PP Wrappers
+##======================================================================
+
+##======================================================================
+## Delimiter Insertion and Removal
+##======================================================================
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head1 Delimiter Insertion and Removal
+
+=cut
+
+EOPM
+
+##------------------------------------------------------
+## ng_delimit()
+pp_def('ng_delimit',
+       Pars       => "toks(NToks); $INDX boffsets(NBlocks); delims(NDelims); [o]dtoks(NDToks)",
+       #OtherPars  => 'int ndtoks => NDToks',
+       PMCode=>
+<<'EOPC',
+sub PDL::ng_delimit {
+  my ($toks,$boffsets,$delims,$dtoks,$ndtoks) = @_;
+  barf('Usage: ng_delimit(toks(NToks), indx boffsets(NBlocks), delims(NDelims), [o]dtoks(NDToks), ndtoks=>NDToks)')
+    if (grep {!defined($_)} ($toks,$boffsets,$delims));
+  ##
+  ##-- basic data
+  my @tokdims  = $toks->dims;
+  my $NToks    = shift(@tokdims);
+  my $NBlocks  = $boffsets->dim(0);
+  my $NDelims  = $delims->dim(0);
+  ##
+  ##-- $ndtoks: maybe compute number of delimiters+tokens
+  $ndtoks = $NToks + ($NBlocks * $NDelims)
+    if ((!defined($dtoks) || $dtoks->isempty) && (!defined($ndtoks) || $ndtoks <= 0));
+  ##
+  ##-- $dtoks: maybe allocate
+  $dtoks  = $toks->zeroes($toks->type, $ndtoks,@tokdims)
+    if (!defined($dtoks) || $dtoks->isempty);
+  ##
+  ##-- underlying low-level call
+  &PDL::_ng_delimit_int($toks,$boffsets,$delims,$dtoks);
+  return $dtoks;
+}
+EOPC
+       Code =>
+<<'EOC',
+ NG_Indx szNToks=$SIZE(NToks), szNBlocks=$SIZE(NBlocks), szNDelims=$SIZE(NDelims), szNDToks=$SIZE(NDToks);
+ NG_Indx blocki=0,toki=0,dtoki=0,delimi;
+ NG_Indx nextBlockToki = $boffsets(NBlocks=>0);
+ while (toki < szNToks) {
+   while (toki==nextBlockToki) {
+     //-- block boundary: insert delimiters
+     for (delimi=0; delimi<szNDelims && dtoki<szNDToks; delimi++,dtoki++) {
+       $dtoks(NDToks=>dtoki) = $delims(NDelims=>delimi);
+     }
+     //-- lookup next block boundary
+     blocki++;
+     if (blocki < szNBlocks) { nextBlockToki = $boffsets(NBlocks=>blocki); } //-- usual case
+     else                    { nextBlockToki = szNToks; }                    //-- final block
+   }
+   //-- non-empty block: add tokens in this block
+   for (; toki<nextBlockToki && toki<szNToks && dtoki<szNDToks; toki++,dtoki++) {
+     $dtoks(NDToks=>dtoki) = $toks(NToks=>toki);
+   }
+ }
+ //-- end of tokens: set any remaining dtoks to cyclic delimiters, for consistency
+ for (delimi=0; dtoki<szNDToks; dtoki++,delimi++) {
+   delimi %= szNDelims;
+   $dtoks(NDToks=>dtoki) = $delims(NDelims=>delimi);
+ }
+EOC
+       Doc =><<'EOD',
+Add block-delimiters to a raw token vector
+
+Splices the vector $delims into the vector $toks starting at each index
+listed in $boffsets, returning the result as $dtoks.  Values in $boffsets
+should be in the range [0..N-1].
+
+For consistency, it should be the case that:
+
+  $NDToks == $NToks + $NBlocks * $NDelims
+
+EOD
+
+);
+
+##------------------------------------------------------
+## ng_undelimit()
+pp_def('ng_undelimit',
+       Pars       => "dtoks(NDToks); $INDX boffsets(NBlocks); int NDelims(); [o]toks(NToks);",
+       PMCode=>
+<<'EOPC',
+sub PDL::ng_undelimit {
+  my ($dtoks,$boffsets,$NDelims,$toks) = @_;
+  barf('Usage: ng_delimit(dtoks(NDToks), indx boffsets(NBlocks), NDelims(), [o]toks(NToks))')
+    if (grep {!defined($_)} ($dtoks,$boffsets,$NDelims));
+  ##
+  ##-- $toks: maybe allocate
+  if (!defined($toks) || $toks->isempty) {
+    $NDelims     = PDL->topdl($NDelims);
+    my @dtokdims = $dtoks->dims;
+    my $NDToks   = shift(@dtokdims);
+    my $NBlocks  = $boffsets->dim(0);
+    my $NToks    = $NDToks - ($NDelims->max * $NBlocks);
+    $toks        = zeroes($dtoks->type, $NToks,@dtokdims);
+  }
+  ##
+  ##-- underlying low-level call
+  &PDL::_ng_undelimit_int($dtoks,$boffsets,$NDelims, $toks);
+  return $toks;
+}
+EOPC
+       Code=>
+<<'EOC',
+ NG_Indx szNToks=$SIZE(NToks), szNBlocks=$SIZE(NBlocks), szNDToks=$SIZE(NDToks), szNDelims=$NDelims();
+ NG_Indx blocki=0,toki=0,dtoki=0,delimi;
+ NG_Indx nextBlockToki = $boffsets(NBlocks=>0);
+ while (dtoki < szNDToks) {
+   while (toki==nextBlockToki) {
+     //-- block boundary: skip delimiters
+     for (delimi=0; delimi<szNDelims && dtoki<szNDToks; delimi++,dtoki++) { ; }
+     //
+     //-- lookup next block boundary
+     blocki++;
+     if (blocki < szNBlocks) { nextBlockToki = $boffsets(NBlocks=>blocki); } //-- usual case
+     else                    { nextBlockToki = szNToks; }                    //-- final block
+   }
+   //-- non-empty block: add tokens in this block
+   for (; toki<nextBlockToki && toki<szNToks && dtoki<szNDToks; toki++,dtoki++) {
+     $toks(NToks=>toki) = $dtoks(NDToks=>dtoki);
+   }
+ }
+ //-- end of dtoks: set any remaining toks to 0
+ for (; toki<szNToks; toki++) {
+   $toks(NToks=>toki) = 0;
+ }
+EOC
+       Doc =><<'EOD',
+Remove block-delimiters from a delimited token vector.
+
+Removes chunks of length $delims from the vector $toks starting at each index
+listed in $boffsets, returning the result as $toks.  Values in $boffsets
+should be in the range [0..N-1].
+
+EOD
+);
+
+##======================================================================
+## Footer Administrivia
+##======================================================================
+
+##------------------------------------------------------
+## pm additions: footer
+pp_addpm(<<'EOPM');
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+Perl by Larry Wall.
+
+PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
+
+=cut
+
+##----------------------------------------------------------------------
+=pod
+
+=head1 KNOWN BUGS
+
+Probably many.
+
+=cut
+
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head2 Copyright Policy
+
+Copyright (C) 2007, Bryan Jurish. All rights reserved.
+
+This package is free software, and entirely without warranty.
+You may redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1), PDL(3perl)
+
+=cut
+
+EOPM
+
+
+# Always make sure that you finish your PP declarations with
+# pp_done
+pp_done();
+##----------------------------------------------------------------------

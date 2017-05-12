@@ -1,0 +1,42 @@
+POD2::IT version 0.13
+=====================
+
+POD2::IT - Italian translation of Perl core documentation.
+
+See 'perldoc POD2::IT' for more info.
+
+See pod2it.sf.net for more details about the project.
+
+CHANGES FROM PREVIOUS VERSION
+
+	+ Added perlreftut.pod [larsen, polettix, bepi]
+	! Fixes to perlfunc.pod, perlfaq2, perlfaq6 and perlfaq9 [dree]
+
+See 'Changes' file for complete history revisions.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module doesn't require other modules and libraries.
+
+AUTHORS
+
+pod2it is a larger translation project owned by larsen, dree, dada, arthas, 
+dakkar, bepi, shishii, frodo72, gmax, alberto-re, kral, osfameron, oha, 
+TheHobbit & others.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2009 Perl.it / Perl Mongers Italia
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

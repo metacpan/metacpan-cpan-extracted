@@ -1,0 +1,79 @@
+## name HasStrictWarnings
+## failures 0
+## cut
+
+use strict;
+use warnings;
+
+## name NoStrict
+## failures 1
+## cut
+
+use warnings;
+
+## name NoWarnings
+## failures 1
+## cut
+
+use strict;
+
+## name NoStrictWarnings
+## failures 1
+## cut
+
+1;
+
+## name Importer
+## failures 0
+## cut
+
+use Moose;
+
+## name IncompleteImporter
+## failures 1
+## cut
+
+use common::sense;
+
+## name VersionStrict1
+## failures 0
+## cut
+
+use 5.012;
+use warnings;
+
+## name VersionStrict2
+## failures 0
+## cut
+
+use v5.12.0;
+use warnings;
+
+## name VersionStrict3
+## failures 0
+## cut
+
+use 5.12.0;
+use warnings;
+
+## name VersionStrict4
+## failures 1
+## cut
+
+use 5.010001;
+use warnings;
+
+## name VersionStrict5
+## failures 1
+## cut
+
+use v5.10.1;
+use warnings;
+
+## name VersionStrict6
+## failures 1
+## cut
+
+use 5.10.1;
+use warnings;
+

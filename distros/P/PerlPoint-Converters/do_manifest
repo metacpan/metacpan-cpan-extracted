@@ -1,0 +1,11 @@
+#!/usr/bin/env perl
+
+# create MANIFEST file
+
+require ExtUtils::Manifest;
+
+ExtUtils::Manifest::mkmanifest();
+__END__
+ExtUtils::Manifest::skipcheck();
+
+__END__

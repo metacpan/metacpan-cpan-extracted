@@ -1,0 +1,99 @@
+   ____                          ____                _   
+  |  _ \ __ _ _ __   __ _  ___  / ___|___  _ __  ___| |_ 
+  | |_) / _` | '_ \ / _` |/ _ \| |   / _ \| '_ \/ __| __|
+  |  __/ (_| | | | | (_| | (_) | |__| (_) | | | \__ \ |_ 
+  |_|   \__,_|_| |_|\__, |\___/ \____\___/|_| |_|___/\__|
+                    |___/                                
+
+
+This is the README for PangoConst version 0.03.
+
+PangoConst is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains
+four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+PangoConst - the Pango constants without Glib / Gtk2
+
+This module copies the PANGO_* constants from "Gtk2::Pango" so that
+you can use them without having to import/install the whole of Glib
+and Gtk2.
+
+Don't ask me what the PANGO_* constants are doing in Gtk2 rather than
+in "Pango" itself. A quote from Gtk2::Pango's documentation: "This
+module shouldn't exist".
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?PangoConst
+    * http://metacpan.org/release/PangoConst
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc PangoConst
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.6.1 or later.
+
+To install the module from CPAN, use
+
+    cpan PangoConst
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm PangoConst
+
+To install the module from the source file, PangoConst-0.03.tar.gz, follow
+this sequence of commands:
+
+    tar xfz PangoConst-0.03.tar.gz
+    cd PangoConst-0.03
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/pangoconst/issues>,
+
+or if you want to alter the source code of PangoConst, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/pangoconst>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Sat Oct 15 11:14:39 2016.
+
+-----------------------------------------------------------------------------

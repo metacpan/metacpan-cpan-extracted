@@ -1,0 +1,17 @@
+Changes
+Changes.old
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/POE/Component/FastCGI.pm
+lib/POE/Component/FastCGI/Request.pm
+lib/POE/Component/FastCGI/Response.pm
+lib/POE/Component/FastCGI/Stream.pm
+lib/POE/Filter/FastCGI.pm
+t/fastcgi.t
+t/request.t
+t/response.t

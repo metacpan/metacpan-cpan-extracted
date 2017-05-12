@@ -1,0 +1,121 @@
+=pod
+
+=head1 NAME
+
+Perl::Dist::WiX::BuildPerl::PluginInterface - How to write a plugin to build a new version of Perl.
+
+=head1 DESCRIPTION
+
+This documentation describes how to build a plugin to build a new version of 
+perl.
+
+=head1 PLUGIN INTERFACE
+
+=head2 Subroutines
+
+=head3 _install_perl_plugin
+
+This routine is the one that actually builds perl and knows about what 
+files to patch.
+
+It checks to make sure that 'dmake' is installed, then gets the list of
+toolchain modules, creates a Perl asset object, and builds perl.
+
+It should be defined in the plugin as an 
+L<'around'|Moose::Manual::MethodModifiers/BEFORE, AFTER, AND AROUND> method 
+modifier that does not call the original routine that is passed in.
+
+The base routine is defined (to throw a PDWiX::Unimplemented exception) in 
+L<Perl::Dist::WiX::Mixin::BuildPerl|Perl::Dist::WiX::Mixin::BuildPerl>.
+
+=head3 _find_perl_file
+
+This routine is the one that, given the name of a file to patch as the first 
+parameter (relative to the perl source root directory), returns the 
+location of the patch file on disk.
+
+It should be defined in the plugin as an 
+L<'around'|Moose::Manual::MethodModifiers/BEFORE, AFTER, AND AROUND> method 
+modifier that either returns a value, or calls the 'original' routine that 
+is passed in.
+
+The base routine is defined to return undef (indicating that the file could 
+not be found) in 
+L<Perl::Dist::WiX::Mixin::BuildPerl|Perl::Dist::WiX::Mixin::BuildPerl>.
+
+=head2 Accessors
+
+These accessors only need defined in C<Perl::Dist::WiX::BuildPerl::*>
+plugins. Plugins for classes that override C<Perl::Dist::WiX> will use 
+the accessors defined from the base class plugins.
+
+=head3 perl_version_literal
+
+The C<perl_version_literal> accessor returns the literal (5.0xx00y) version 
+for the distribution.  For example, if perl 5.12.0 is being built, this
+accessor returns '5.012000'.
+
+=head3 perl_version_human
+
+The C<perl_version_human> accessor returns the "marketing" form (such as 
+"5.12.0") for the distribution.
+
+head3 _perl_version_arrayref
+
+The C<_perl_version_arrayref> accessor returns the three components of the
+version of perl being built, as an array reference.  For example, if perl
+5.12.0 is being built, this routine returns C<[5, 12, 0]>.
+
+Versions of perl being built off of a Git snapshot should answer with the 
+next development release of perl if built off of blead, or the next
+maintenance release if built off of a maintenance branch.
+
+head3 _perl_bincompat_version_arrayref
+
+The C<_perl_bincompat_version_arrayref> accessor also returns an array 
+reference, but of the last version of perl that is not binary-compatible
+with the version of perl being built.
+
+For 5.y.0 versions, the components returned are [5, y-1, 255].
+
+For 5.y.x versions, where x is non-zero and y is even, the components 
+returned are [5, y, 0], unless there was a specific bug that had to be
+fixed that broke XS binary compatibility.
+
+This should return the same thing as 
+L<_perl_version_arrayref()|/perl_version_arrayref> for versions 
+based off of a git snapshot, or of a development version of perl.
+
+head3 _is_git_snapshot
+
+The C<_is_git_snapshot> accessor returns a true value (specifically, the 
+first 7 digits of the SHA-1 that was used to generate this plugin, 
+prefixed with a 'g') if this is meant to build from a git snapshot.  
+
+Otherwise, it returns false - specifically, the empty string. 
+
+=head2 Roles
+
+=head3 Perl::Dist::WiX::Role::GitPlugin
+
+Plugins for git checkouts must compose this role (using 
+C<with "Perl::Dist::WiX::Role::GitPlugin";>) so that the
+L<git_describe()|Perl::Dist::WiX::Role::GitPlugin/git_describe> 
+accessor can be used, and that Perl::Dist::WiX can detect that this is a
+checkout-using plugin.
+
+=head1 AUTHORS
+
+Curtis Jewell E<lt>csjewell@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<Perl::Dist::WiX|Perl::Dist::WiX>, 
+L<http://ali.as/>, L<http://csjewell.comyr.com/perl/>
+
+=head1 COPYRIGHT AND LICENSE
+
+The license is the same as L<Perl::Dist::WiX|Perl::Dist::WiX>. 
+See that module for details.
+
+=cut

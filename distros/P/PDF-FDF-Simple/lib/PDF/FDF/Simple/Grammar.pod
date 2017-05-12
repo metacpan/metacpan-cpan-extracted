@@ -1,0 +1,41 @@
+=head1 NAME
+
+PDF::FDF::Simple::Grammar - Precompiled grammar for PDF::FDF::Simple
+
+=head1 DESCRIPTION
+
+This is the precompiled grammar. It is generated from
+
+  lib/auto/PDF/FDF/Simple/grammar
+
+using
+
+  ./Build grammar
+
+usually done by the maintainer or a developer.
+
+=head1 Developing without precompile
+
+You can avoid using the precompiled grammar and use the raw C<grammar>
+file by setting this environment variable to a true value:
+
+  export PDF_FDF_SIMPLE_IGNORE_PRECOMPILED_GRAMMAR=1
+
+This is useful if you want to work on the grammar without the need to
+precompile everytime.
+
+The path to the grammar file is determined using
+L<File::ShareDir|File::ShareDir> in the respective C<lib/auto/>
+subdirectory that belongs to the currently used module, depending on
+C<@INC>. So when you get confused, e.g., by seemingly non-working
+changes, check which grammar file it is using. Some typical different
+C<@INC>s are used with:
+
+  prove -l t/*.t               # ./lib/
+  prove -b t/*.t               # ./blib/
+  ./Build test                 # ./blib/
+  perl -MPDF::FDF::Simple ...  # perl's @INC
+
+
+
+

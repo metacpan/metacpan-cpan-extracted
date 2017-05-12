@@ -1,0 +1,40 @@
+Revision history for Perl extension Plack::Middleware::Profiler::KYTProf
+
+0.08  Mon Mar 25 03:27:00 2013
+    * Add test for xslate 
+
+0.071 Sun Mar 24 00:14:00 2013
+    * Fixed tests for Devel::KYTProf 0.04 API Incompatibilities.
+
+0.07  Sat Mar 23 23:29:00 2013
+    * Fixed for Devel::KYTProf 0.04 API Incompatibilities.
+
+0.061 Tue Mar 10 12:23:00 2013
+    * Fixed the custom profile test 
+
+0.06 Tue Mar 7 23:10:00 2013
+    * Fixed the custom profile test 
+
+0.052 Tue Mar 6 23:50:00 2013
+    * Add some debugging code to tests because some bugs 
+      aren't reproduced on the linux 
+
+0.051 Tue Mar 4 21:50:00 2013
+    * Fixed the test module dependency 
+
+0.04 Tue Feb 12 23:59:00 2013
+    * Renamed default profile modules.
+      DefaultProfile -> TemplateEngine, KVS
+    * Wrote pod.
+
+0.03 Mon Feb 11 23:00:00 2013
+    * Fixed manifest 
+
+0.021 Mon Feb 11 18:51:20 2013
+    * Add missing test module dependencies to Makefile.PL 
+
+0.02 Mon Feb 11 18:45:10 2013
+    * enable_profile -> enable_profile_if
+
+0.01 Mon Feb 11 02:42:21 2013
+	* original version

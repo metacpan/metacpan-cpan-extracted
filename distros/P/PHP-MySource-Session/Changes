@@ -1,0 +1,9 @@
+Revision history for Perl extension PHP::MySource::Session
+
+0.01  Thu Aug 21 15:30:00 2003
+	- original version
+0.02  Fri Aug 22 11:00:00 2003
+	- bug fix
+
+0.03  Fri Aug 22 15:30:00 2003
+	- added is_logged_in()

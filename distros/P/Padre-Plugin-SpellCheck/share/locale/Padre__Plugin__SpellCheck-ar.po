@@ -1,0 +1,79 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-SpellCheck\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-04-30 07:18+0200\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/SpellCheck.pm:31
+#: lib/Padre/Plugin/SpellCheck.pm:56
+msgid "Spell check"
+msgstr "تمت التهجئه"
+
+#: lib/Padre/Plugin/SpellCheck.pm:57
+msgid "Check spelling\tF7"
+msgstr "فحص التهجئه\tF7"
+
+#: lib/Padre/Plugin/SpellCheck.pm:58
+msgid "Preferences"
+msgstr "الاعدادات"
+
+#: lib/Padre/Plugin/SpellCheck.pm:80
+msgid "No document opened."
+msgstr "لا توجد أي وثيقة مفتوحة."
+
+#: lib/Padre/Plugin/SpellCheck.pm:97
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:292
+msgid "Spell check finished."
+msgstr "تمت التهجئه"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:43
+#, perl-format
+msgid "Spelling (%s)"
+msgstr "التهجئه (%s)"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:198
+msgid "Add to dictionary"
+msgstr "اضافه الى المعجم"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:199
+msgid "Replace"
+msgstr "تغيير"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:200
+msgid "Replace all"
+msgstr "تغيير الكل"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:201
+msgid "Ignore"
+msgstr "تجاهل"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:202
+msgid "Ignore all"
+msgstr "تجاهل الكل"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:203
+msgid "Close"
+msgstr "اغلاق"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:233
+msgid "Not in dictionary:"
+msgstr "ليس بالمعجم:"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:255
+msgid "Suggestions"
+msgstr "اقتراحات"
+
+#: lib/Padre/Plugin/SpellCheck/Preferences.pm:36
+msgid "Spelling preferences"
+msgstr "اعدادات التهجئه"
+
+#: lib/Padre/Plugin/SpellCheck/Preferences.pm:136
+msgid "Dictionary:"
+msgstr "المعجم:"
+

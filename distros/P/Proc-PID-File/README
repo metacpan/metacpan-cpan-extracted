@@ -1,0 +1,35 @@
+WHAT IS IT
+
+This Perl module is useful for writers of daemons and other processes that
+need to tell whether they are already running, in order to prevent multiple
+process instances.  The module accomplishes this via *nix-style I<pidfiles>,
+which are files that store a process identifier.
+
+HOW TO INSTALL
+
+Just type:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+...and you should be all set.
+
+HOW TO USE
+
+For usage, please consult the man page provided with this package, and
+make sure to read the warning!
+
+AVAILABILITY
+
+The module may be found on the CPAN whilst the RPM package lives at:
+
+	http://perl.arix.com/
+
+LICENCE
+
+This utility is free and distributed under GPL, the Gnu Public License.
+A copy of this license was included in a file called LICENSE. If for some
+reason, this file was not included, please see http://www.gnu.org/licenses/
+to obtain a copy of this license.

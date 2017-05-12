@@ -1,0 +1,31 @@
+---
+abstract: 'Search for CPAN distributions by cpanid or distribution name'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  Capture::Tiny: 0
+  Test::More: 0.88
+  blib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-SmokeBox-Dists
+requires:
+  CPAN::DistnameInfo: 0.06
+  File::Fetch: 0
+  File::Path: 0
+  File::Spec: 0
+  IO::Zlib: 0
+  POE: 1.004
+  Sort::Versions: 1.5
+  URI: 0
+  perl: 5.006
+resources:
+  homepage: https://github.com/bingos/poe-component-smokebox-dists
+  repository: https://github.com/bingos/poe-component-smokebox-dists.git
+version: 1.08

@@ -1,0 +1,12 @@
+Revision history for Perl extension Proc::PersistentControl.
+
+0.081 Tue Jun 24 12:12:12 2014
+	- added _timed_out to contents of "Info" hash
+
+0.08  Sun Jun 22 11:11:11 2014
+        - published after testing
+
+0.02  Tue Jun 10 14:40:25 2014
+	- original version; created by h2xs 1.23 with options
+		-AX -v 0.02 -b 5.0.0 Proc::PersistentControl
+

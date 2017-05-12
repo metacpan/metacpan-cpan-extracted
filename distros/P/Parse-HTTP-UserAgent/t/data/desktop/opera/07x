@@ -1,0 +1,11 @@
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; X11; Linux i686) Opera 7.21 [pl]
+
+'parser'           => 'opera_post',
+'os'               => 'Linux i686',
+'extras'           => ['X11'],
+'version_raw'      => '7.21',
+'lang'             => 'pl',
+'version'          => '7.210',
+'name'             => 'Opera'

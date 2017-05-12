@@ -1,0 +1,21 @@
+(no debugging symbols found)...[New Thread 1024 (LWP 1041)]
+0x4075dca9 in __wait4 () from /lib/libc.so.6
+#0  0x4075dca9 in __wait4 () from /lib/libc.so.6
+#1  0x407c6740 in __DTOR_END__ () from /lib/libc.so.6
+#2  0x403bf62e in waitpid (pid=1043, stat_loc=0xbfffea18, options=0)
+    at wrapsyscall.c:174
+#3  0x40518f58 in gnome_segv_handle () from /usr/lib/libgnomeui.so.32
+#4  0x403bd2c1 in pthread_sighandler (signo=11, ctx={gs = 0, __gsh = 0, 
+      fs = 0, __fsh = 0, es = 43, __esh = 0, ds = 43, __dsh = 0, 
+      edi = 136716544, esi = 136001512, ebp = 3221220280, esp = 3221220276, 
+      ebx = 12, edx = 1, ecx = 1081888800, eax = 0, trapno = 14, err = 4, 
+      eip = 135055369, cs = 35, __csh = 0, eflags = 2163202, 
+      esp_at_signal = 3221220276, ss = 43, __ssh = 0, fpstate = 0xbfffeb38, 
+      oldmask = 2147483648, cr2 = 8}) at signals.c:97
+#5  <signal handler called>
+#6  0x80cc809 in WelcomeDruid::Connected ()
+#7  0x808d08a in GabberWin::OnSessionConnected ()
+#8  0x81088f2 in SigC::ObjectSlot1_<void, judo::Tag const &, GabberWin>::callback ()
+#9  0x8114d10 in SigC::Signal1<void, judo::Tag const &, SigC::Marshal<void> >::emit ()
+#10 0x80e5892 in jabberoo::Session::IQHandler_Auth ()
+No symbol table info available.

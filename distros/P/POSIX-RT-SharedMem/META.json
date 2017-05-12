@@ -1,0 +1,79 @@
+{
+   "abstract" : "Create/open or unlink POSIX shared memory objects in Perl",
+   "author" : [
+      "Leon Timmermans <leont@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POSIX-RT-SharedMem",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "0",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "5.57",
+            "Fcntl" : "0",
+            "File::Map" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "POSIX" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.88",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "POSIX::RT::SharedMem" : {
+         "file" : "lib/POSIX/RT/SharedMem.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-posix-rt-sharedmem at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=POSIX-RT-SharedMem"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/posix-rt-sharedmem.git",
+         "web" : "https://github.com/Leont/posix-rt-sharedmem"
+      }
+   },
+   "version" : "0.10"
+}
+

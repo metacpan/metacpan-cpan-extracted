@@ -1,0 +1,62 @@
+Revision history for Perl extension Proc::Reliable
+
+1.16  2003/11/24 02:00:00 dan goldwater / rob canfield
+	- fixed bugs with cb_stdout and cb_stderr
+	- added test_intercept.pl
+
+1.15  2003/11/7 16:00:00 dan goldwater
+	- fixed 1.14 regression
+
+1.14  2003/10/9 14:00:00 dan goldwater / jason robertson
+	- fixed known bug of fast-exiting children not getting detected
+	- added option for stdout and stderr callbacks
+	- cleaned up '-w' warnings
+
+1.13  2003/3/14 01:50:00 dan goldwater
+	- added stdin_error_ok option
+	- fix bug with killing processes
+	- changed default wait time after killing
+	- check more return status
+
+1.10  2002/4/1 10:00:00 dan goldwater
+	- add input_chunking feature
+	- fix bug with stdin data processing
+	- add README file
+	- add test2 sample program
+
+1.04  2001/12/23 18:50:00 dan goldwater
+	- tweak docs
+
+1.03  2001/12/23 17:50:00 dan goldwater
+	- improve docs
+	- standardize packaging
+	- remove unused code
+
+1.02  2001/06/27 03:22:44 dan goldwater
+	- clean up pod docs
+
+1.01  2001/05/17 02:17:08 dan goldwater
+	- clean up options usage and defaults
+	- fix bug with failed exec()
+	- fix zombie bug
+	- fix several long-broken options
+
+1.00  2001/05/17 00:08:11 dan goldwater
+	- rewrite most of the module and run() function:
+	  - kill processes reliably and when specified
+	  - made signal handling more robust
+	  - improve spawning efficiency - only one fork.
+	- added several options controlling process killing
+	- fix method-style option syntax and new() usage
+	- make all input/output data accessable via object
+
+0.20  2001/03/07 21:11:00 dan goldwater
+	- fix deadlocking problem with subprocesses communication
+	- fixed return status code handling
+	- fixed bug handling signals
+
+0.10  2000/11/20 16:00:00 steven cope
+	- started with Proc::Short
+	- added capability to send input on STDIN
+	- added ability to separate or combine stdout and stderr streams
+

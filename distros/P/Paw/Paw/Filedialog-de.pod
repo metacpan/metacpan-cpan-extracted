@@ -1,0 +1,59 @@
+=head1 Filedialog
+
+B<$fd=Paw::Filedialog::new([$height], [$width], [$name], [$dir])>;
+
+B<Parameter>
+
+     $height    => Anzahl der Reihen [optional]
+
+     $width     => Anzahl der Spalten [optional]
+
+     $name      => Name des Widgets [optional]
+
+     $dir       => Das Verzeichnis in dem der Filedialog starten soll
+                   ("." default) [optional]
+
+Wen der Filedialog mit dem "Ok-Button" verlassen wird, so gibt er ein Array
+aller markierten Filenamen zurueck.
+
+B<Beispiel>
+
+     $fd=Paw::Filedialog::new(dir=>"/etc");
+
+=head2 set_dir($path)
+
+Setzt das Verzeichnis in dem der Filedialog starten soll
+
+B<Beisiel>
+
+     $fd->set_dir();       # start in "."
+     $fd->set_dir("/etc"); # start in "/etc"
+
+=head2 get_dir($scalar)
+
+Gibt den Pfad zurueck in dem sich die Filedialogbox befindet.
+
+B<Beispiel>
+
+     $path=$fd->get_dir();  #$path = "/etc" (for example).
+
+=head2 draw()
+
+Stellt die Filedialogbox am Schirm da. Wenn die Box ueber ``Ok'' geschlossen wird,
+so gibt sie ein Array aller markierten Filenamen (ohne Pfad) zurueck. Wird die Box
+ueber ``Cancel'' verlassen, erfolgt keine Rueckgabe der marktierten Files.
+
+B<Beispiel>
+
+     @files=$fd->draw();
+
+=head2 set_border([``shade''])
+
+aktiviert den Rahmen der Box. Optional auch mit Schatten. 
+
+B<Beispiel>
+
+     $box->set_border("shade"); or $win->set_border();
+
+=cut
+

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE chapter PUBLIC "-//CUSTOM//DOCKBOOK 4.4//EN" "../custom.dtd">
+<chapter id="chapter-appendix-a">
+    <title>Appendix A</title>
+
+    <section>
+        <title>some terms used in this book</title>
+
+        <variablelist>
+            <title>terms</title>
+	        <varlistentry>
+	            <term>POD</term>
+        	    <listitem><para>
+        	        Plain Old Documentation
+        	    </para></listitem>
+	        </varlistentry>
+	        <varlistentry>
+	            <term>DocBook</term>
+        	    <listitem><para>
+        	        &tbd;
+        	    </para></listitem>
+	        </varlistentry>
+        </variablelist>
+
+    </section>
+
+</chapter>

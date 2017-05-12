@@ -1,0 +1,32 @@
+---
+abstract: 'XML parsing for the POE framework'
+author:
+  - 'Nicholas R. Perez <nperez@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Filter-XML
+requires:
+  Carp: 0
+  Exporter: 0
+  Moose: 0
+  Moose::Object: 0
+  MooseX::InsideOut: 0
+  MooseX::NonMoose: 0
+  POE::Filter: 0
+  XML::LibXML: 0
+  XML::LibXML::Element: 0
+  XML::SAX::Base: 0
+  constant: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://nickandperla.net/pfx.git
+version: 1.140700

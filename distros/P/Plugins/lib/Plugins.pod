@@ -1,0 +1,502 @@
+
+=head1 NAME
+
+ Plugins - Generic plugins framework
+
+=head1 SYNOPSIS
+
+ use Plugins;
+
+ $plugins = Plugins->new context => $context;
+ $plugins->readconfig($config_file, self => $self);
+ $plugins->initialize();
+
+ $plugins->invoke($method, @args);
+
+ $plugins->invoke_until($method, sub { scalar(@_) }, @args);
+
+ my $iterator = $plugins->iterator();
+ while (@results = &$iterator(@args)) {
+ }
+
+ for my $plugin ($plugins->plugins()) {
+	$plugin->invoke($method);
+ }
+
+=head1 DESCRIPTION
+
+Plugins provides a simple way for a programs to be 
+assembled at runtime via configuration files.
+
+Generally, there are only a few ways that a module in a library
+can be customized for an application: (1) You can change the
+code of the module; (2) if it presents an object-oriented 
+interface you can subclass it; or (3) the module in question can
+have a configuration file that allows you to do what you need.
+Plugins makes it easier to allow behavior to be modified
+by a configuration file by allowing other code to be mixed in.
+
+Plugins allows plugins have plugins and for all the
+plugins to share a single configuration file.  This isn't required
+but sometimes it's nice to have everything in one place.
+
+Each plugin is implemented by a perl module.
+
+There can be more than one instance (object) for each plugin (class).
+
+The Plugins module itself isn't complete and must be subclassed. 
+An example subclass that completes Plugins is L<Plugins::Style1>.
+Plugins written for use with the Plugins module generally don't 
+need to know how Plugins has been subclassed
+because the C<$context> that is passed to a plugin allows it to use
+Plugins directly even if its ancestor did not.
+
+=head1 NAMING CONVENTION
+
+Since plugins can have plugins, some plugins will have 
+Plugins objects themselves.  Some won't.  We will term a
+user of Plugins to be I<requestor>.  
+A I<requestor> that is not itself a plugin will be termed 
+the I<root>.  A plugin will be termed a I<child> and
+the I<requestor> that invoked it will be termed the 
+I<parent>.  A plugin that has plugins is a I<child requestor>.
+
+=head1 CONSTRUCTION AND INITIALIAZATION
+
+While there are similarities, using Plugins for the first
+time (by the I<root>) is different than using it as a 
+plugin that has plugins (I<child requestor>).
+
+=head2 I<root> initialization.
+
+The I<root requestor> will need to create a plugins object.
+Since Plugins needs to be subclassed it will create
+the object using the subclass.  For example, L<Plugins::Style1>:
+
+ $plugins = Plugins::Style1->new(%args);
+ $plugins->readconfig($configfile, %args);
+ $plugins->initialize();
+
+=head2 I<child requestor> initialization
+
+There are three steps for a I<requestor> to take to 
+start using plugins.  Each step is a call to Plugins:
+
+ $plugins = Plugins->new(context => $context, %args);
+ $plugins->readconfig($configfile, %args);
+ $plugins->initialize();
+
+The most important argument for C<Plugins::new()> is
+C<context => $context>.  The C<$context> comes from
+the first argument to I<child>-E<gt>new() when
+Plugins creates plugin object instances.
+
+For I<child requestors>, no C<%args> are needed for new() 
+except for C<context => $context>.
+
+Likewise, no C<%args> are needed for C<readconfig()>.
+
+=head2 %args for new()
+
+There may be additional parameters depending on how
+Plugins is subclassed.
+
+The C<%args> that C<new()> userstands are:
+
+=over 4
+
+=item configfile =E<gt> "/config/file"
+
+Provide a configuration file name.  If this is done here
+then C<undef> can be passwd for the configfile to C<readconfig()>.
+
+=item api =E<gt> $api
+
+Provide a L<Plugins::API> object that will be passed to any
+plugins's C<new()> invocation.
+
+=back
+
+=head2 %args for readconfig()
+
+Readconfig has a positional argument: C<$configfile>:
+
+ $plugins->readconfig($configfile, %args);
+
+C<%args> for C<readconfig()> depend upon how Plugins is subclassed.
+
+=head1 USING PLUGINS
+
+Plugins provides the following methods for I<requestors>:
+
+=over 4
+
+=item invoke($method, @args)
+
+This calls each plugin in turn.  
+Plugins are called in the order in which they were configured.  
+No return value is defined. 
+The calls are not eval-wrapped so a C<die> in a plugin is fatal.
+
+=item invoke_until($method, $testfunc, @args)
+
+This calls each plugin in turn. 
+Plugins are called in the order in which they were configured.  
+After each call, the return value from the plugin method 
+invocation is evaluated with C<&$testfunc()>.
+If C<&$testfunc()> returns a true value, then the return value from
+the plugin method invocation is returned and no further calls are
+made.
+
+=item plugins()
+
+This returns the list of plugin objects.  This will be in the order
+in which the plugins were defined.
+
+=item iterator($method)
+
+This returns an anonymous function that when invoked will call
+the first plugin (C<$plugin->method(@args)).  Each successive call
+will call another plugin until it returns undef.  
+
+=item startconfig()
+
+This method can be used instead of C<readconfig()> to start the
+configuration process.  It does not read any configuration files.
+It is required prior to C<parseconfig()> or C<initialize()>.
+
+=item parseconfig($configfile, %args)
+
+This parses a configuration file.  Unlike C<readconfig()> it does
+not call C<startconfig()> first. 
+
+=item api($api)
+
+This will set an $api variable that will be passed to C<new()> when
+creating new plugin instances.  This is expected to be a L<Plugins::API>
+object.
+
+=back
+
+=head1 RE-CONFIGURATION
+
+The C<readconfig()> method may be called more than once.  Each time
+it is called, C<initialize()> may be called again.  When C<initialize()>
+is called a second time, it calls C<$plugin-E<gt>shutdown()> for each
+of the old plugins before calling C<$plugin-E<gt>new()> to create the new
+ones.
+
+Each call to C<readconfig()> starts fresh.  If you want to add to an
+existing set of plugins rather than replace them, use C<parseconfig()>
+instead of C<readconfig()>. 
+
+=head1 WRITING PLUGINS
+
+Plugins can be either a perl module that can be found
+by looking in C<@INC> or they can be files that are 
+wrapped and eval'ed by the Plugins module.
+
+For plugins that are files, they will be wrapped with a bit
+of code:
+
+	package Plugins::AutoGenerated::A_UNIQUE_GENERATED_VALUE;
+	our @ISA = qw(Plugins::Plugin);
+	use strict;
+	THE_CONTENTS_OF_THE_FILE
+
+This wrapping is done by C<file_plugin()> method.
+
+For plugins that are regular perl modules and thus not
+auto-wrapped, they should declare themselves to be 
+subclasses of C<Plugins::Plugin>.
+
+Plugin objects provide the following methods:
+
+=over 4
+
+=item invoke($method, @args)
+
+Basically this just does C<$plugin-E<gt>method(@args)>.  If 
+C<$method> does not exist, just return undef.
+
+=item new()
+
+The default C<new()> does the following:
+
+ sub new
+ {
+	my ($pkg, $pconfig, %args) = @_;
+	return bless { 
+		context	=> $pconfig->{context}, 
+		api	=> $pconfig->{api}, 
+		config	=> \%args 
+	}, $pkg;
+ }
+
+You'll often want to override C<new()>.  
+
+=back
+
+=head2 Plugin-defined methods
+
+Plugins will need to define methods to be called.  What methods need
+to be defined depends upon what they are a plugin for.  Plugins for
+programs that are a L<Daemon::Generic> will generally need 
+C<preconfig()> and C<postconfig()> methods.   Look at the documentation
+or code of the I<requestor>.
+
+The following methods are called directly by Plugins:
+
+=over 4
+
+=item new($pconfig, @args)
+
+Invoked to create an object instance of a plugin.  The C<@args> 
+come from the configuration file.  The C<$pconfig> is used to pass
+in plugin-related configuration data.  It's a reference to a hash
+and C<$pconfig-E<gt>{context}> needs to be passed to any
+I<child requestors> so that they can fit themselves in properly.
+
+=item shutdown()
+
+Called when a object instance is no longer needed due to a reconfig
+after the configuration file has been changed.  On a reconfiguration,
+all the old objects are destoryed and a new set are created.  The
+default C<shutdown()> doesn't do anything.
+
+=back
+
+=head2 AUTOLOAD with L<Plugins::API>
+
+The Plugins module has defines an C<AUTOLOAD> function in Plugins::Plugin
+base class to map unknown method invocations into C<invoke()>.  It does
+this through the L<Plugins::API> module.  Plugins that invoke a method 
+that isn't formally defined will have the attempted method invocation
+redirected through C<$self-E<gt>{myapi}-E<gt>invoke()> or 
+C<$self-E<gt>{api}-E<gt>invoke()>.
+
+The default C<new()> for plugins will capture a L<Plugins::API> object
+passed in from Plugins as C<$self-E<gt>{api}>.  Plugins that have plugins
+might want to name their L<Plugins::API> object C<$self-E<gt>{myapi}>
+(assuming they have one).
+
+
+=head2 Plugins with plugins
+	
+Plugins that themselves have plugins (I<child requestors>) will need to 
+invoke Plugins themselves.  If the overall program uses L<Daemon::Generic>, then
+doing this in a C<preconfig()> method is reccomended.  In other contexts
+this may need to be done in C<new()>.
+
+ sub new
+ {
+	my ($pkg, $pconfig, %args) = @_;
+	return bless { 
+		context	=> $pconfig->{context}, 
+		api	=> $pconfig->{api}, 
+		config	=> \%args 
+	}, $pkg;
+ }
+
+ sub preconfig
+ {
+	my ($self, $configfile) = @_;
+	my $config = $self->{config}{configfile} || $configfile;
+	$self->{plugins} = new Plugins %{$self->{context};
+	$self->{plugins}->readconfig($config, self => $self);
+	$self->{plugins}->initialize();
+	$self->{plugins}->invoke('preconfig', $config);
+ }
+
+It is expected that whichever subclass of Plugins is used by the I<parent> should
+also be used by the child.  The following snippet will supress this
+behavior.  This is probably a bad idea unless the I<child> uses a different
+configuration file than then I<parent>.
+
+ local($self->{context}{pkg_override}{$config});
+ $self->{plugins} = new Plugins context => $self->{context};
+ $self->{plugins}->readconfig($config, self => $self);
+
+=head1 SUBCLASSING 
+
+If you don't want to use an existing configuration file format, you
+don't have to.
+
+Subclass Plugins and override a couple of methods to change the 
+behavior.  
+
+In addition to the methods defined above in the L</USING PLUGINS>
+and in L</CONSTRUCTION AND INITIALIAZATION>
+that probably shoudn't be changed, Plugins defines the following
+methods:
+
+=over 4
+
+=item parseconfig($configfile, %args)
+
+This is the method that actually parses a config file.  This must
+be overridden as the default just calls C<die()>.
+
+The parameters come from either a direct call from the I<requestor>
+or are passed through unchanged from C<readconfig()>.
+
+=item post_initialize($context, $plugin)
+
+Called by C<initialize_plugin()> after new'ing up an instance.  The
+default behavior is to do nothing.  The C<$context> is the same context
+that is passwed to C<new()> and C<pkg_invoke()> and C<addplugin()>.
+
+=item genkey($context)
+
+This is called to generate a unique identifier for each plugin instance.
+Duplicate identifiers will result in a C<die()>.  The default C<genkey()>
+combines the configuration file name with the plugin package name and thus
+does not allow multiple instances of the same package.
+
+=item $pkg = file_plugin($file, %opts)
+
+This will look for C<$file> and then auto-wrap it with a
+package declaration to turn into a plugin perl module.
+The auto-generated package name is returned.
+
+C<%opts> can be:
+
+=over 4
+
+=item search_path
+
+If C<$file> isn't an absolute path, search for it in
+C<@{$opts{search_path}}>.  No search is done if unspecified.
+
+=item referenced
+
+Where was C<$file> referenced from?  (eg: "/some/config-file, line 33")
+Used in error messages only.
+
+=item prefile
+
+Code to insert in the eval just before the file's contents.
+
+=item postfile
+
+Code to insert in the eval just after the file's contents.
+
+=item isa
+
+The value for the generated plugin's C<@ISA>.  Defaults to 
+C<Plugins::Plugin>.
+
+=back 
+
+=item registerplugin(%context)
+
+This add a plugin to a configuration.  This is used after
+C<startconfig()> and before C<initialize()>.  
+This will C<require> the plugin unless the symbol table for the
+plugin already exists.   
+This method should not be overridden.
+
+=item addplugin(%context)
+
+This is used to bypass the entire C<startconfig()>, C<registerplugin()>,
+C<invoke()> process.  The plugin will be registered and initialized all
+at once.  This can be used after C<initialize()> to add additional
+plugins.
+This will C<require> the plugin unless the symbol table for the
+plugin already exists.
+Duplicate registrations of the same plugin will replace the old 
+plugin (C<shutdown()> will be called).
+This method should not be overridden.
+
+The C<%context> is the same as for C<%registerplugin()>
+
+=item pkg_invoke($pkg, [$method, @args])
+
+This method will C<require> a plugin and (optionally) call
+a class method.
+This method should not be overridden.
+
+=item initialize_plugin($self, $context)
+
+This is used by C<addplugin()> and C<initialize()> to create 
+plugin instances.  It calls C<new()> and then C<post_initialize()>.
+This method should not be overridden.
+
+=back
+
+=head2 %context for addplugin() and registerplugin()
+
+Most of the C<%context> has that is given to C<addplugin()> and C<registerplugin()>
+should (in theory) be passed as C<$context> to the plugin's C<new($context, %args)>
+and then as C<context =E<gt> $context> to C<Plugins::new()> if the is a
+I<child requestor>.
+
+The part that is not passed to C<Plugins::new()> is the part that defines the
+I<child> plugin:
+
+=over 4
+
+=item pkg =E<gt> 'Some::Plugin::Module'
+
+The perl package name for the plugin.
+
+=item new_args =E<gt> [@args]
+
+The C<@args> will be passed to the the plugin's C<new()>:
+
+ new $pkg (\%context, @args)
+
+=item requestor =E<gt> 'The::Parent::Module'
+
+The perl package name of the I<parent> module.  This will
+be found with C<caller()> if it isn't supplied.
+
+=item configfile =E<gt> "/some/file"
+
+Which configuration file referenced the plugin and caused it to be loaded.
+
+=item lineno =E<gt> 38
+
+The of where the plugin was registered in C<$configfile>.  Used for
+error messages.
+
+=back
+
+The rest will be passed to I<child> C<Plugins::new()> by way of C<$context>:
+
+=over 4
+
+=item pkg_override =E<gt> "Plugins::Subclass"
+
+Plugins has been subclassed, this the name of the subclass.  Subclassing
+should usually be inherited by I<child requestors> and this is the
+mechenism that makes it happen.
+
+=back
+
+=head2 Re-parsing the same configuration file
+
+The tricky part of subclassing Plugins is that if a configruation 
+file is shared between I<root requestors> and I<child requestors> 
+the C<parseconfig()> method will be invoked on the same file more than
+once. 
+
+Store extra things in C<%context> to work around this issue.
+
+=head1 SEE ALSO
+
+L<Plugins::Style1>
+L<Plugins::API>
+
+=head1 THANK THE AUTHOR
+
+If you find this module useful and wish to show your appreciation to the
+author, please give me a Request-For-Quote on your next high-speed 
+internet pipe order.  I have good pricing for T1s, T3s, OC3s etc.
+
+=head1 LICENSE
+
+Copyright (C) 2006, David Muir Sharnoff <muir@idiom.com>. 
+This module may be used and redistributed on the same terms as Perl
+itself.
+ 

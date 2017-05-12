@@ -1,0 +1,70 @@
+=pod
+
+=head1 NAME
+
+PDF::PDFUnit::Config - Creating a configuration file for PDF::PDFUnit
+
+=head1 DESCRIPTION
+
+PDF::PDFUnit needs to know where PDFUnit-Java is installed.
+For that purpose you need a small and simple configuration file
+with the following content:
+
+  pdfunit_java_home = <YOUR_PDFUNIT_JAVA_INSTALLATION_FOLDER>
+
+The value will be globbed, i.e. you can use OS-dependent wildcards like
+C<*> or C<~>.
+
+There are many possible locations where you can place this config file,
+also OS-dependent. I<The first one found "wins"!>
+
+=head2 Linux
+
+=over
+
+=item
+
+B<$PDFUNIT_PERL_CONFIG> (an environment variable)
+
+=item
+
+F<pdfunit-perl.cfg> (in the current directory)
+
+=item
+
+F<.pdfunit-perl.cfg> (in the home directory)
+
+=item
+
+F</etc/pdfunit-perl.cfg>
+
+=back
+
+
+=head2 Windows
+
+=over
+
+=item
+
+B<%PDFUNIT_PERL_CONFIG%> (an environment variable)
+
+=item
+
+F<pdfunit-perl.cfg> (in the current directory)
+
+=item
+
+F<%HOMEPATH%\.pdfunit-perl.cfg> (please note the dot!)
+
+=item
+
+F<%USERPROFILE%\.pdfunit-perl.cfg> (please note the dot!)
+
+=item
+
+F<%LOCALAPPDATA%\pdfunit-perl\pdfunit-perl.cfg>
+
+=back
+
+=cut

@@ -1,0 +1,37 @@
+Revision history for Plugtools
+
+1.3.0	2010-09-25/02:20
+		-userChangeShell added.
+		-Cleaned up 'plumod'.
+
+1.2.1	2009-09-18/03:10
+		-Correct a small error with the args passed to the plugin for 'deleteGroup'.
+
+1.2.0	2009-09-18/03:00
+		-Add plugin support for 'deleteUser' and 'deleteGroup'.
+
+1.1.0	2009-09-17/
+		-Add 'getUserEntry'.
+
+1.0.2	2009-09-14/
+		-Correct a undefined error when the config value does not exist.
+		-Correct the do requested for the plugin handling for userSetPass
+		-Remove unneeded print in the plugin method.
+		-Call update if needed for the userSetPass plugin stuff.
+
+1.0.1	2009-09-13/12:00
+		-Document Plugtools->new.
+		-Plugtools->new can now read other configs other than the default.
+		-Now call $self->errorblank every where it needs to be called. This fixes
+			the issue of errors being permanent.
+
+1.0.0	2009-09-11/16:20
+		-Add plugin support.
+
+0.1.0	2009-09-08/17:30
+		-Add 'bin/plumod'.
+		-'README' now has a useful description.
+
+0.0.0	2009-09-08/11:40
+		-Initial release.
+

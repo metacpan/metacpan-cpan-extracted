@@ -1,0 +1,10 @@
+Changes
+PalmDoc.pm
+Makefile.PL
+MANIFEST
+README
+test.pl
+examples/palmdoc1.pl
+examples/palmdoc2.pl
+examples/palmdoc3.pl
+examples/palmdoc4.pl

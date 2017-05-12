@@ -1,0 +1,40 @@
+1.102 Wed Jul 24 13:12:28 PDT 2013
+      - Add psgix.cleanup extension
+
+1.101 Sat Jul 21 15:01:20 PDT 2012
+      - Fix typos and formatting
+      - Mention CGI variables ala PEP 333
+
+1.10  Fri Mar  9 08:46:27 PST 2012
+      - Released as PSGI 1.1
+
+1.09_3 Wed Jun 22 13:48:31 PDT 2011
+      - Separated extensions into PSGI::Extensions
+      - Added psgix.harakiri and psgix.harakiri.commit
+      - Updated terminology section
+      - Clarified that body should be encoded byte strings and do not contain wide characters
+      - Clarified that header values must be defined
+
+1.09_2 Tue Jun  7 15:21:47 PDT 2011
+      - Fixed a dumb mistake about allowed characters in header values
+      - Updated FAQ document
+      - psgi.input MUST have seek() only if psgix.input.buffered is true
+
+1.09_1 Mon Mar 28 11:35:44 PDT 2011
+      - 1.1 beta
+      - Upped psgi.version to be [1,1]
+      - Lots of grammar and style fixes
+      - Removed poll_cb from writer spec
+      - Streaming interface now SHOULD be implemented, rather than MAY
+      - Promoted psgi.streaming, nonblocking and run_once keys to be MUST
+      - Added psgix.logger and psgix.session extensions
+      - Updated FAQ
+
+1.03  Tue Oct 27 13:44:01 PDT 2009
+      - Added an optional callback interface to allow delayed response and streaming
+
+1.02  Tue Oct 13 01:57:28 PDT 2009
+      - No spec changes. Just to let PAUSE index this stuff.
+
+1.01  Tue Oct 13 01:17:28 PDT 2009
+      - PAUSE distribution issue

@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                PAR-Indexer
+version:             0.91
+abstract:            Scan a PAR distro for packages and scripts
+license:             perl
+author:              
+    - Steffen Müller <smueller@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Cwd:                           0
+    ExtUtils::Manifest:            0
+    File::Path:                    0
+    File::Spec:                    0
+    PAR::Dist:                     0.31
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

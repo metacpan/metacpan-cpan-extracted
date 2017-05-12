@@ -1,0 +1,45 @@
+# NAME
+
+Plack::Middleware::Debug::W3CValidate - Validate your Response Content
+
+## SYNOPSIS
+
+    use Plack::Builder;
+
+    my $app = ...; ## Build your Plack App
+
+    builder {
+        enable 'Debug', panels =>['W3CValidate'];
+        $app;
+    };
+
+# DESCRIPTION
+
+Adds a debug panel that runs your response body through the W3C validator and
+returns a list of errors.
+
+# OPTIONS
+
+This debug panel defines the following options.
+
+## validator_uri
+
+Takes the url of the W3C validator.  Defaults to the common validator, but if
+you plan to pound this it would be polite to setup your own and point to that
+instead.  Please see [WebService::Validator::HTML::W3C](http://search.cpan.org/perldoc?WebService::Validator::HTML::W3C) for more.
+
+Since this panel needs to read and submit the response body to a POST service
+it will definitely increase the time it takes to load the page.
+
+# SEE ALSO
+
+[Plack::Middleware::Debug](http://search.cpan.org/perldoc?Plack::Middleware::Debug)
+
+# AUTHOR
+
+John Napiorkowski, `<jjnapiork@cpan.org>`
+
+# COPYRIGHT & LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

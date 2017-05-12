@@ -1,0 +1,30 @@
+Revision history for Pod-Index
+
+0.14  2005-10-15
+        - Improved portability, particularly for the tests.
+        - Make sure tests can run from any directory.
+        - Updated default filemap to look at @INC.
+
+0.13  2005-10-12
+        - Sort index by keyword,podname,line instead of keyword,line.
+        - Use File::Spec in tests instead of hardcoded slashes.
+
+0.12  2005-08-14
+        - Case-insensitive search option. NOTE: as a consequence, indexes 
+          built with previous versions are not likely to work with this one.
+          Also note that the keys for the hashref returned by
+          Pod::Index::Builder->pod_index are now normalized to lowercase.
+        - Added a 'keyword' property to Entry objects.
+        - Eliminate duplicate search results.
+        - Fixed some typos and documentation errors.
+
+0.11  2005-08-01
+        - Added context to the POD entries.
+        - Added subtopic support.
+        - Changed file format: now instead of file:line, it uses podname\tline
+        - The hashref returned by Pod::Index::Builder->pod_index now has 
+          Pod::Index::Entry as values.
+        - Various bug and typo fixes.
+
+0.10  2005-07-27
+        - First release

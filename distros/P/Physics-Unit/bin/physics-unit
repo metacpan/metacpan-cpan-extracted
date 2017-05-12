@@ -1,0 +1,90 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+use Getopt::Long;
+
+use Physics::Unit::Script qw/run_script/;
+
+my %opts;
+my $help;
+
+GetOptions(
+  types    => \$opts{types},
+  units    => \$opts{units},
+  export   => \$opts{export},
+  'help|?' => \$help,
+);
+
+pod2usage(0) if $help;
+
+run_script(\%opts);
+
+__END__
+
+=head1 NAME
+
+physics-unit - Helper script for the Physics::Unit Perl module
+
+=head1 SYNOPSIS
+
+  physics-unit meters            # Returns information about the unit 'meters'
+  physics-unit -e                # Exports lists of units as HTML
+  physics-unit --help/-h         # Shows a usage message
+
+=head1 DESCRIPTION
+
+L<Physics::Unit> is a Perl module for managing units and unit conversions. The C<physics-unit> script retrieves unit and type information from the main module for reference purposes. Do not use this script from your code, use the L<Physics::Unit> module instead. This script's interface is subject to change, the main module's API is much more stable.
+
+=head1 OPTIONS AND ARGUMENTS
+
+  physics-unit [options] [name(s)|expression(s)]
+
+  If reserved words, unit or type names, or unit expressions, are given on the
+  command line, this prints a block of information for each to STDOUT.  The
+  options -e, -t, and -u, on the other hand, cause comprehensive lists of
+  data to be dumped from the unit library.
+
+  -e
+  --export
+      Export a complete list of known units and types as HTML documents.
+      Prints the names of the created files to STDOUT, this allows:
+        firefox `physics-unit -e`
+
+  -h
+  --help
+      Shows a usage message and exits. Overrides all other options.
+
+  -t
+  --types
+      Print a list of types (one per line) to STDOUT.
+
+  -u
+  --units
+      Print a list of units (one per line) to STDOUT.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Physics::Unit>
+
+=back
+
+=head1 AUTHOR
+
+Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Joel Berger and Chris Maloney
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

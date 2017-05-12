@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:                Pod-Multi
+version:             0.09
+abstract:            pod2man, pod2text, pod2html simultaneously
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Data::Dumper:                  0
+    File::Basename:                0
+    File::Path:                    0
+    File::Save::Home:              0.03
+    File::Spec:                    0
+    IO::Capture:                   0.05
+    Pod::Html:                     0
+    Pod::Man:                      0
+    Pod::Text:                     0
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - James E Keenan (jkeenan@cpan.org)

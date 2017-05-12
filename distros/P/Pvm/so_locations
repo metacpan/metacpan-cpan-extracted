@@ -1,0 +1,4 @@
+./blib/arch/auto/Pvm/Pvm.so \
+		:st = .text 0x5ffc0000, 0x00030000:\
+		:st = .data 0x5fff0000, 0x00010000:\
+

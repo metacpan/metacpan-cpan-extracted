@@ -1,0 +1,69 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 007d9eadef38d89600c372861a631e950cadab7e .travis.yml
+SHA1 74b2e6b2bc6db17f93e77175ce9fe27711e14641 Changes
+SHA1 bf2d713ceca5b8ad3d680ed15baba1b89df7e149 LICENSE
+SHA1 87595feda062931577ce9f3ace5c412ba2ca0cd3 MANIFEST
+SHA1 f543cf96daf1c26643238e814ec48cbd09b74f3f META.json
+SHA1 30bc28275a77abc2bb0adabea5bcab1bf5287b2d META.yml
+SHA1 5f68782f9e75a138d6aea4420bcdbfa0e65f91eb Makefile.PL
+SHA1 3e664f8b131209f3156975200159d02bb586cbef README
+SHA1 e75b0e2e49a8bf57ade47eee35d25c4fd37021c3 cpanfile
+SHA1 b0498305d10df5756de34472e614660665e74d8d dist.ini
+SHA1 09dae4c8dd600d222274d10d831b6bca932e4560 lib/Pod/Weaver/Role/Section/Formattable.pm
+SHA1 c522c3928158e64bd97d34d20cbfe0b5305a7eb2 t/00-check-deps.t
+SHA1 19b29081b7460c6f8e9b59c4d4ae14c5ca82bf84 t/00-compile.t
+SHA1 a2788ea85511e978825f3db613a6128359bbb18e t/000-report-versions-tiny.t
+SHA1 6a3d79c2f962142ffe6fa7ed8cb8cec3a900c049 t/basic.t
+SHA1 1dc75f2148d10b2c38ced9b95a48145775508ec6 t/basic/in.pod
+SHA1 922da44f0e83ed33266bc2f95b0d9cef564ec0bd t/basic/out.pod
+SHA1 52f96cb445a8908e17712a4bb4753df572242bae t/basic/weaver.ini
+SHA1 171ecaec7aae908fa056523fbcaeb15443cd2606 t/funcs.pm
+SHA1 1fd8f35204271707fb23b3ba0e27cee2030c4572 t/lib/Pod/Weaver/Section/Test/Formatter.pm
+SHA1 9aa39f80d24b77b6f1bb26b51094fe84af9e50ae t/lib/Pod/Weaver/Section/Test/Formatter2.pm
+SHA1 1dc75f2148d10b2c38ced9b95a48145775508ec6 t/multi/in.pod
+SHA1 9792909a5872626d6a02620afa1d70aaa14e7b7d t/multi/out.pod
+SHA1 3c9aee9b2067217c9da35148c0a3f5d1382bea00 t/multi/weaver.ini
+SHA1 1dc75f2148d10b2c38ced9b95a48145775508ec6 t/section/source/in.pod
+SHA1 a80ea078d3e0e69f89ca42ed5b54e0d898d8593f t/section/source/out.pod
+SHA1 3c9aee9b2067217c9da35148c0a3f5d1382bea00 t/section/source/weaver.ini
+SHA1 354ee0b389d253f4fc74ac83d61346b63531a0db xt/author/no-tabs.t
+SHA1 a1efae739f0a272a3a543326d34d901ba927cb0e xt/author/pod-spell.t
+SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
+SHA1 eb0dfdc0d0b4fb11a40099637d5fec02c90ff364 xt/release/has-version.t
+SHA1 5ec58bf01586ec4087b5b6864a6efd4e646d67af xt/release/minimum-version.t
+SHA1 f7318f25f9007ef8816a8e926d7c979d55571854 xt/release/no-smart-comments.t
+SHA1 f63d082406fbad8e9f0eb57e5e671943e4f018f0 xt/release/pod-coverage.t
+SHA1 030dd9fb19c9aae1f90bdce5a886e366252a5fd9 xt/release/pod-linkcheck.t
+SHA1 494381df37f2cb2cdb3c7697746892393485a9eb xt/release/pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJVo0xfAAoJEJ/Rlq0N/NXWsx4P/ihwf3v6DpXnklQCyJcYtuDS
+vGOt84ZoHO45uS1PaxhSU7yjftUGpCfmZY1GV+wf80ZKqUR0eDJJwTP4JQYLUfMb
++H8gVQ+K6/GH6syoQLotNho3RpfPgozqXffSX7ZirVKeWecXQhdaF7Wf6dik7WKE
+5ANKHvFFxB5QeCQfcKCJsc49+OUZ39Gk7tWFtnE9FtQZb71q+7u/MLu8AxV40Zvh
+uM5hhZ2vjwZ6IbHg8FoHS6O1PuFNgWlcKpL1HJwc3bkaJomEAPDh8lf3G3Fm0svw
+M3P/Am29jgxrYkZY1V6WgC83kn2N9NoN6qsKxhqTVCgX+9AGhCFySsg0U395dElP
+kLzPa2/Ti4PYY0IzVauxCVFdKxb36Bq9vMduV+KkDVT625SfdJP9/EkuZ4N+fiBK
++k5sGfBjdmIPR/PujbZ2tp80XpIaCZV3X/8RRfHf4UI7EhStXKnJjIDwuybsWZ62
+N9qrW8H/T0Db5C+sVjlh5Arrlov71IMKxxPdk7P/w7E92rgBGtMCZEiJzyi5+1mw
+Tzl4jLqW/gfwEkG3MeoMulJudCQaH36LQTcWn6lJyxUTuu+KbGB4mGrlZKL1q777
+b6skXTbL6IeJk4F0e3pt++2uetCRT01vHplW4BgfwE3T9Q2YGV6Hq7NcA059CpZF
+Qv9aPoo6l2ONepMyff8c
+=rQfT
+-----END PGP SIGNATURE-----

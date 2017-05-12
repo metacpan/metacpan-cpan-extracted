@@ -1,0 +1,45 @@
+PDF/Reuse/Tutorial version 0.11
+===============================
+
+This is dummy module created only for the POD documentation
+
+INSTALLATION
+
+To install this module in a Windows environment:
+   
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+(If you haven't got nmake, try to download it via
+http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe)
+
+
+Under other operating systems try the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   
+   
+
+N.B.
+In the examples directory there is a zip file with PDF documents and generated
+modules. Unzip it. I had to put all these files like that, to hide them from
+the normal processing around the upload to CPAN.   
+   
+
+
+DEPENDENCIES
+
+This "module" is only meaningful together with PDF::Reuse
+ 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 - 2005 Lars Lundberg, Solidez HB
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

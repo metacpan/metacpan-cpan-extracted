@@ -1,0 +1,24 @@
+body {
+	width: 100%;
+	height: 100%;
+
+	> header {
+		height: 130px;
+		background-color: #000;
+	}
+
+	> article {
+		color: lighten('#fff', 100%); // a dumb way to get #000
+	}
+
+	> footer {
+		a {
+			color: #999;
+			text-decoration: none;
+
+			&:hover {
+				text-decoration: underline;
+			}
+		}
+	}
+}

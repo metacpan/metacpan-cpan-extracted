@@ -1,0 +1,6 @@
+Revision history for Perl extension PBS.
+
+0.01  Mon Jan 26 12:15:36 2004
+	- original version; created by h2xs 1.23 with options
+		-n PBS /usr/local/include/pbs_ifl.h
+

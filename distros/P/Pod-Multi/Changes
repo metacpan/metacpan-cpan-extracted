@@ -1,0 +1,21 @@
+#$Id: Changes 1202 2007-10-27 15:12:03Z jimk $
+Changes for Pod::Multi
+
+0.09 Sat Oct 27 11:09:57 EDT 2007
+    - Require 5.8.
+
+0.08 Fri Oct 26 20:25:59 EDT 2007
+    - Should not use 'defined' on aggregates such as %params.  Correct this in
+      lib/Pod/Multi.pm and adjust tests accordingly.
+
+0.07 Fri Oct 26 18:52:42 EDT 2007
+    - lib/Pod/Multi.pm:  Put filehandle in braces before Dumper.  Add t/13.
+
+0.02 Sun May 28 13:59:38 EDT 2006
+    - Rectified discrepancy between documentation and API.  pod2multi() no
+      longer takes HTML title tag directly.
+
+0.01 Mon May 22 20:15:55 2006
+    - original version; created by ExtUtils::ModuleMaker 0.47
+
+

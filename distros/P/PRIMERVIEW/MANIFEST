@@ -1,0 +1,15 @@
+Changes
+ignore.txt
+xt/boilerplate.t
+lib/PRIMERVIEW.pm
+LICENSE
+Makefile.PL
+MANIFEST			
+README
+README.md
+META.json
+sample_input/test_seqs.fasta
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

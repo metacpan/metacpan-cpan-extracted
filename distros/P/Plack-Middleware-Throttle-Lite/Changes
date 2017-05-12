@@ -1,0 +1,50 @@
+Revision history for Perl extension Plack::Middleware::Throttle::Lite.
+
+0.05    Tue Oct 22 14:11:05 2013 +0000
+
+    [ FEATURES ]
+    - Changes file using sections now.
+    - Github repo uses markdown README file instead of POD.
+    - Stop using Scalar::Util::reftype() due to error result for regexes
+      in perls v5.8 & v5.10
+
+    [ FIXES ]
+    - expire_in() wrongly calcs seconds to reset limits (GH#2)
+      Reported by github:shieldui.
+
+    [ TESTS ]
+    - added generic backend tests
+    - added testing against routes
+
+0.04    Sat Jun 29 18:04:15 2013 +0000
+
+    [ FEATURES ]
+    - set min perl version to 5.8.9
+
+    [ TESTS ]
+    - added more tests (measuring units)
+
+0.03    Mon Jun 3 14:31:05 2013 +0000
+
+    [ FEATURES ]
+    - added per-minute throttling (GH#1, thanks Moritz Lenz)
+    - in documentation Memcached backend mentioned
+
+    [ TESTS ]
+    - updated tests
+
+0.02    Fri Apr 5 15:43:31 2013 +0000
+
+    [ FEATURES ]
+    - added Retry-After header to list of injected to response headers
+    - change default response codes (from "503" to "403" for blacklisting and "503" to "429" for limiting)
+    - new configuration option 'header_prefix' added
+    - default values available via single method now
+    - in documentation Redis backend mentioned
+
+    [ TESTS ]
+    - now using Test::Exception
+
+0.01    Sun Mar 24 09:10:12 2013 +0000
+
+    - initial release

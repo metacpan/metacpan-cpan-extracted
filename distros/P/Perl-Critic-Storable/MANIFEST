@@ -1,0 +1,8 @@
+Changes
+lib/Perl/Critic/Storable.pm
+lib/Perl/Critic/Policy/Storable/ProhibitStoreOrFreeze.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/no-store-or-freeze.t

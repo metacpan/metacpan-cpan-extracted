@@ -1,0 +1,11 @@
+Revision history for Pod-Snippets
+
+0.14    Wed Oct 12 19:06:00 CEST 2007
+        Added "require 5.006;" as suggested by CPAN testers
+
+0.12    Wed Oct 10 22:27:12 CEST 2007
+        Suppressed dependency on File::Slurp to placate CPANTS
+
+0.11    Wed Oct 10 20:16:12 CEST 2007
+        First version.
+

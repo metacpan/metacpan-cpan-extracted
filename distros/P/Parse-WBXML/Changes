@@ -1,0 +1,23 @@
+Revision history for Parse-WBXML
+
+0.005     2012-01-08 07:18:12 Europe/London
+	Missing test dependencies (required for t/sample.t), including Test::More 0.94 to
+	support subtests.
+	Removed some debug statements left over from previous release.
+
+0.004     2012-01-02 09:13:04 Europe/London
+	Support DevInf 1.1, and a test to go through the samples/wbxml/*.wbxml
+	files to check whether we can extract the basic metadata (still need tests
+	for XML->WBXML->XML roundtrip handling).
+
+0.003     2012-01-02 08:55:04 Europe/London
+	SyncML 1.1 DTD support, and handle strtable lookups for character data.
+
+0.002     2012-01-02 08:19:41 Europe/London
+	Added some missing public IDs, several fixes around element and
+	attribute parsing, implemented initial termstr method for terminated
+	strings (incorrectly assumes \0 terminator but this is 'good enough'
+	for utf8 documents).
+
+0.001     2012-01-02 05:42:01 Europe/London
+	Initial CPAN release.

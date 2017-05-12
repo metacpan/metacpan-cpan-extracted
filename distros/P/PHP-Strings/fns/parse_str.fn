@@ -1,0 +1,3 @@
+docs: |
+    See instead the L<CGI> and L<URI> modules which handles that sort of
+    thing.

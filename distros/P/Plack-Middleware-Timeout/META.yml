@@ -1,0 +1,25 @@
+---
+abstract: 'Timeout long running requests'
+author:
+  - 'Tomasz Czepiel <tjmc@cpan.org>'
+build_requires:
+  HTTP::Message: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Timeout
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Plack: '0'
+  Scope::Guard: '0'
+  Time::HiRes: '0'
+version: '0.08'

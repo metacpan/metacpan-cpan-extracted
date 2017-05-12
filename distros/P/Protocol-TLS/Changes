@@ -1,0 +1,23 @@
+Revision history for Perl extension Protocol-TLS
+
+0.04 2015-11-18T15:35:25Z
+    - Implemented initial support for client certificate (client only)
+    - Support for record layer fragmentation
+
+0.03 2014-12-29T15:15:10Z
+    - Fixed pack for perl < 5.8.9
+    - Added tls client/server scripts examples
+    - Updated test suite
+    - Don't trace CLOSE_NOTIFY as error
+    - Setup context's session_id and tls_version on successful handshake
+
+0.02 2014-12-09T21:52:19Z
+    - Fixed bug with fraction time in P::T::Trace
+    - Implemented support for TLS session resuming
+    - Improved validation of handshake records
+    - Implemented HELLO_REQUEST decoder/encoder
+
+0.01 2014-12-08T21:38:39Z
+
+    - original version
+

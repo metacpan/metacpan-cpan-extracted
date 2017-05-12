@@ -1,0 +1,92 @@
+NAME
+    Parallel::QueueWorker - Simple worker support do jobs in parallel
+    processes.
+
+SYNOPSIS
+        use Parallel::QueueWorker;
+        my $worker = Parallel::QueueWorker->new(
+            # config file will load
+            configfile => "$FindBin::Bin/../etc/app.yml",
+            # callback/handler
+            # loop to prepare job queue
+            prepare_queue => sub {
+                my ($self) = @_;
+                $self->add_job({_id => $_ }) for (0..99);
+                $self->{done} = 1 unless $self->{done};
+                # if you return non-zero , the prepare_queue will loop next,
+                unless ($self->{done}) {
+                    $self->{done} = 1;
+                    return 100;
+                }
+                # this will flag no jobs queued anymore and break prepare_queue loop.
+                # but, not, this is invoke again!
+                return 0;
+            },
+            # before call work will run this. 
+            before_work = sub {
+                my ($self);
+                # If you want to open resource,like socket,dbi, should in here.
+            },
+            # work code
+            work => sub {
+                my ($self,$job) = @_;
+                $self->say("job id:",$job->{_id});
+            },
+        );
+
+DESCRIPTION
+METHODS
+run
+        $worker->run;
+
+    Start to process jobs , it will wait until all queued jobs done.
+
+  add_job($job)
+        # add job to queue
+        $worker->add_job({_id => 3,foo => 'bar'});
+
+    Add job to the internal job queue. You should call this on prepare_queue
+    callback.
+
+  before_work(CodeRref)
+    Callback will invoke before call work.
+
+  work(CodeRref)
+        work prototype => sub { my ($self,$job ) }
+
+    Your work code, this code will fork and parallel running to process job.
+
+  prepare_queue(CodeRref)
+    The code to feed jobs into queue. If return non-zero, this code will
+    invoke again after work, until it return 0, so you can make the code
+    loop run or just once.
+
+  say
+    A helpful function to output message handy, additional master or worker
+    PID.
+
+        $self->say('hello');
+        # in master, output,xxxx meant master PID
+        master xxxx >> hello
+        # in worker, output,xxxx meant worker(childen process) PID
+        worker xxxx >> hello
+
+  fork_work
+    Internal, fork workers and process queued jobs until jobs all done.
+
+  run
+        $worker->run;
+
+    Start to run, its will call prepare_queue code, if any job is queued,
+    then fork workers to process them in parallel.
+
+AUTHOR
+    Night Sailer(Pan Fan) < nightsailer{at}gmail dot com >
+
+COPYRIGHT
+    copyright nightsailer.com
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,167 @@
+{
+    'estimated_row_width' => '81',
+    'estimated_rows' => '11787',
+    'estimated_startup_cost' => '11787.13',
+    'estimated_total_cost' => '12081.81',
+    'is_analyzed' => 0,
+    'sub_nodes' => [
+        {
+            'estimated_row_width' => '81',
+            'estimated_rows' => '11787',
+            'estimated_startup_cost' => '11787.13',
+            'estimated_total_cost' => '11816.6',
+            'extra_info' => [
+                'Sort Key: t.user_id, i.email, t.enabled, t.admin, t.abonnement, t.actu, t.first_sbsc, t.thematique, t.creation_date'
+            ],
+            'is_analyzed' => 0,
+            'sub_nodes' => [
+                {
+                    'estimated_row_width' => '81',
+                    'estimated_rows' => '11787',
+                    'estimated_startup_cost' => '4303.35',
+                    'estimated_total_cost' => '10423.04',
+                    'extra_info' => [
+                        'Hash Cond: ((acl.account_id)::text = (s.account_id)::text)',
+                        'Filter: (s.account_id IS NULL)'
+                    ],
+                    'is_analyzed' => 0,
+                    'sub_nodes' => [
+                        {
+                            'estimated_row_width' => '92',
+                            'estimated_rows' => '12330',
+                            'estimated_startup_cost' => '2671.24',
+                            'estimated_total_cost' => '6316.24',
+                            'is_analyzed' => 0,
+                            'sub_nodes' => [
+                                {
+                                    'estimated_row_width' => '91',
+                                    'estimated_rows' => '5042',
+                                    'estimated_startup_cost' => '2671.24',
+                                    'estimated_total_cost' => '3742.1',
+                                    'extra_info' => [
+                                        'Hash Cond: ((u.id)::text = (t.user_id)::text)'
+                                    ],
+                                    'is_analyzed' => 0,
+                                    'sub_nodes' => [
+                                        {
+                                            'estimated_row_width' => '33',
+                                            'estimated_rows' => '5042',
+                                            'estimated_startup_cost' => '1422.12',
+                                            'estimated_total_cost' => '2047.04',
+                                            'extra_info' => [
+                                                'Hash Cond: ((i.email)::text = (u.email)::text)'
+                                            ],
+                                            'is_analyzed' => 0,
+                                            'sub_nodes' => [
+                                                {
+                                                    'estimated_row_width' => '23',
+                                                    'estimated_rows' => '5042',
+                                                    'estimated_startup_cost' => '0',
+                                                    'estimated_total_cost' => '266.42',
+                                                    'is_analyzed' => 0,
+                                                    'scan_on' => {
+                                                        'table_alias' => 'i',
+                                                        'table_name' => 'inrq_information_request'
+                                                    },
+                                                    'type' => 'Seq Scan'
+                                                },
+                                                {
+                                                    'estimated_row_width' => '37',
+                                                    'estimated_rows' => '26361',
+                                                    'estimated_startup_cost' => '886.61',
+                                                    'estimated_total_cost' => '886.61',
+                                                    'is_analyzed' => 0,
+                                                    'sub_nodes' => [
+                                                        {
+                                                            'estimated_row_width' => '37',
+                                                            'estimated_rows' => '26361',
+                                                            'estimated_startup_cost' => '0',
+                                                            'estimated_total_cost' => '886.61',
+                                                            'is_analyzed' => 0,
+                                                            'scan_on' => {
+                                                                'table_alias' => 'u',
+                                                                'table_name' => 'sbsc_user'
+                                                            },
+                                                            'type' => 'Seq Scan'
+                                                        }
+                                                    ],
+                                                    'type' => 'Hash'
+                                                }
+                                            ],
+                                            'type' => 'Hash Left Join'
+                                        },
+                                        {
+                                            'estimated_row_width' => '58',
+                                            'estimated_rows' => '26361',
+                                            'estimated_startup_cost' => '635.61',
+                                            'estimated_total_cost' => '635.61',
+                                            'is_analyzed' => 0,
+                                            'sub_nodes' => [
+                                                {
+                                                    'estimated_row_width' => '58',
+                                                    'estimated_rows' => '26361',
+                                                    'estimated_startup_cost' => '0',
+                                                    'estimated_total_cost' => '635.61',
+                                                    'is_analyzed' => 0,
+                                                    'scan_on' => {
+                                                        'table_alias' => 't',
+                                                        'table_name' => 'talend_users'
+                                                    },
+                                                    'type' => 'Seq Scan'
+                                                }
+                                            ],
+                                            'type' => 'Hash'
+                                        }
+                                    ],
+                                    'type' => 'Hash Left Join'
+                                },
+                                {
+                                    'estimated_row_width' => '21',
+                                    'estimated_rows' => '3',
+                                    'estimated_startup_cost' => '0',
+                                    'estimated_total_cost' => '0.47',
+                                    'extra_info' => [
+                                        'Index Cond: ((u.id)::text = (acl.user_id)::text)'
+                                    ],
+                                    'is_analyzed' => 0,
+                                    'scan_on' => {
+                                        'index_name' => 'ix_sbscaccntacl_usrid',
+                                        'table_alias' => 'acl',
+                                        'table_name' => 'sbsc_account_acl'
+                                    },
+                                    'type' => 'Index Scan'
+                                }
+                            ],
+                            'type' => 'Nested Loop Left Join'
+                        },
+                        {
+                            'estimated_row_width' => '11',
+                            'estimated_rows' => '40227',
+                            'estimated_startup_cost' => '932.27',
+                            'estimated_total_cost' => '932.27',
+                            'is_analyzed' => 0,
+                            'sub_nodes' => [
+                                {
+                                    'estimated_row_width' => '11',
+                                    'estimated_rows' => '40227',
+                                    'estimated_startup_cost' => '0',
+                                    'estimated_total_cost' => '932.27',
+                                    'is_analyzed' => 0,
+                                    'scan_on' => {
+                                        'table_alias' => 's',
+                                        'table_name' => 'sbsc_subscription'
+                                    },
+                                    'type' => 'Seq Scan'
+                                }
+                            ],
+                            'type' => 'Hash'
+                        }
+                    ],
+                    'type' => 'Hash Left Join'
+                }
+            ],
+            'type' => 'Sort'
+        }
+    ],
+    'type' => 'Unique'
+}

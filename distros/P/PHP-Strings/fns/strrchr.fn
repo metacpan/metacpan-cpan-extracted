@@ -1,0 +1,4 @@
+docs: |
+    See L<perlfunc/"rindex">. Note that all characters in
+    the C<$needle> are used: if you just want to find the
+    first character, then extract it.

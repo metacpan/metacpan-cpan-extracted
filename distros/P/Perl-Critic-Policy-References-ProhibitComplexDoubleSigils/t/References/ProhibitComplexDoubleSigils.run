@@ -1,0 +1,111 @@
+## name Simple array dereference.
+## failures 0
+## cut
+
+    my @array = @$arrayref;
+
+## name Simple array dereference with braces.
+## failures 0
+## cut
+
+    my @array = @{$arrayref};
+
+## name Simple hash dereference.
+## failures 0
+## cut
+
+    my %hash = %$hashref;
+
+## name Simple hash dereference with braces.
+## failures 0
+## cut
+
+    my %hash = %{$hashref};
+
+## name Simple scalar dereference.
+## failures 0
+## cut
+
+    my $scalar = $$scalarref;
+
+## name Simple scalar dereference with braces.
+## failures 0
+## cut
+
+    my $scalar = ${$scalarref};
+
+## name Simple array dereference inside for.
+## failures 0
+## cut
+
+    for (@$arrayref) {
+        ...
+    }
+
+## name Simple array dereference inside for with braces.
+## failures 0
+## cut
+
+    for (@{$arrayref}) {
+        ...
+    }
+
+## name Simple array dereference inside list.
+## failures 0
+## cut
+
+    my @array = (@$arrayref, @$arrayref2);
+
+## name Simple array dereference inside list with braces.
+## failures 0
+## cut
+
+    my @array = (@{$arrayref}, @{$arrayref2});
+
+## name Complex dereference 1.
+## failures 1
+## cut
+
+    my $string = $$arrayref[0];
+
+## name Complex dereference 1 with braces.
+## failures 0
+## cut
+
+    my $string = ${$arrayref}[0];
+
+## name Complex dereference 2.
+## failures 1
+## cut
+
+    my $string = $$arrayref->foo;
+
+## name Complex dereference 2 with braces.
+## failures 0
+## cut
+
+    my $string = ${$arrayref}->foo;
+
+## name Complex dereference 3.
+## failures 1
+## cut
+
+    my $string = $$hashref{foo};
+
+## name Complex dereference 3 with braces.
+## failures 0
+## cut
+
+    my $string = ${$hashref}{foo}
+
+## name Complex dereference 4.
+## failures 1
+## cut
+
+    &$foo(1, 2, 3);
+
+## name Complex dereference 4 with braces.
+## failures 0
+## cut
+
+    &{$foo}(1, 2, 3);

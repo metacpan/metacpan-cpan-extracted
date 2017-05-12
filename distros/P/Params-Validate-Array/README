@@ -1,0 +1,28 @@
+Params-Validate-Array version 0.0.3
+
+Params::Validate::Array supplies a version of validate() 
+from module Params::Validate which returns the arguments as an list,
+and not the hash which Params::Validate::validate() returns.
+
+The validate() routine is mostly a wrapper around the original
+Params::Validate::validate() routine, which does all the hard work.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+DEPENDENCIES
+
+Params::Validate
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013, Sam Brain
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

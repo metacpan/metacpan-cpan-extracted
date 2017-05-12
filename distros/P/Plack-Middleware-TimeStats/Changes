@@ -1,0 +1,12 @@
+Revision history for Perl extension Plack::Middleware::TimeStats
+
+0.03    Sat Dec 17 15:05:23 JST 2016
+        - move codes of after app into response_cb
+
+0.02    Sun May 26 12:45:35 JST 2013
+        - tiny fix for callback option (6a210a42)
+        - test enhancements
+        - POD enhancements
+
+0.01    Sun May 26 05:44:55 JST 2013
+        - original version

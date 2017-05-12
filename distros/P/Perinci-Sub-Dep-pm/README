@@ -1,0 +1,31 @@
+SYNOPSIS
+
+     # in function metadata
+     deps => {
+         ...
+         pm => 'Foo::Bar',
+     }
+    
+     # specify version requirement
+     deps => {
+         ...
+         pm => 'Foo::Bar >= 0.123',
+     }
+    
+     # specify multiple modules
+     deps => {
+         all => [
+             {pm => 'Foo'},
+             {pm => 'Bar >= 1.23'},
+             {pm => 'Baz'},
+         ],
+     }
+    
+     # specify alternatives
+     deps => {
+         any => [
+             {pm => 'Qux'},
+             {pm => 'Quux'},
+         ],
+     }
+

@@ -1,0 +1,89 @@
+The subversion project for Eyapp was started in orion. See instructions below.
+But now (January 2009) is in google-code and intend to be there for long.
+
+This is the result of 'svn info':
+
+/home/lusasoft/src/perl/Parse-Eyapp$ svn info
+Ruta: .
+URL: https://parse-eyapp.googlecode.com/svn/trunk
+Raíz del repositorio: https://parse-eyapp.googlecode.com/svn
+UUID del repositorio: a75ea6fe-dcac-11dd-8561-ef618b9164eb
+Revisión: 6
+Tipo de nodo: directorio
+Agendado: normal
+Autor del último cambio: casiano.rodriguez.leon
+Revisión del último cambio: 5
+Fecha de último cambio: 2009-01-07 12:35:02 +0000 (mié, 07 ene 2009)
+
+
+************************ ORION SVN INFO ************************+
+- SVN version info set in files with:
+
+  nereida:~/src/perl/YappWithDefaultAction/lib/Parse/Eyapp> svn propset svn:keywords "LastChangedDate LastChangedRevision" Driver.pm
+
+  svn propset svn:keywords "LastChangedDate LastChangedRevision" Eyapp.pm
+  propiedad 'svn:keywords' asignada en 'Eyapp.pm'
+  
+-  This project was created by Casiano with the command:
+
+  pl@nereida:~/src/perl/YappWithDefaultAction$ svn import -m 'Yapp extended with default actions' YappWithDefaultAction/ svn+ssh://casiano@orion.pcg.ull.es/var/svn/casiano/PL/YappWithDefaultAction
+
+-  And checked out with:
+  pl@nereida:~/src/perl/YappWithDefaultAction$ svn checkout svn+ssh://casiano@orion.pcg.ull.es/var/svn/casiano/PL/YappWithDefaultAction/trunk YappWithDefaultAction 
+
+-  Warning! Execute:
+  source etc/setperl5lib
+
+  or:
+
+  export PERL5LIB=/home/pl/src/perl/YappWithDefaultAction/lib/:$PERL5LIB
+
+  to be sure you are using the local version of Yapp
+
+
+-  The first tag created contains a version which extends Yapp with the "defaultaction" directive:
+
+  pl@nereida:~/src/perl$ svn copy svn+ssh://casiano@orion.pcg.ull.es/var/svn/casiano/PL/YappWithDefaultAction/trunk svn+ssh://casiano@orion.pcg.ull.es/var/svn/casiano/PL/YappWithDefaultAction/tags/defaultaction_only_1.0
+
+  Commit de la revisión 20.
+
+- The second tag includes the YYLhs method which returns the variable name in the left side of the current rule.
+
+  pl@nereida:~/src/perl$ svn copy svn+ssh://casiano@orion.pcg.ull.es/var/svn/casiano/PL/YappWithDefaultAction/trunk  svn+ssh://casiano@orion.pcg.ull.es/var/svn/casiano/PL/YappWithDefaultAction/tags/YYLhsMethod_2.0
+
+- The third tag includes the YYRule method which returns the index of the current rule
+
+  pl@nereida:~/src/perl/YappWithDefaultAction/examples$ svn copy svn+ssh://casiano@orion.pcg.ull.es/var/svn/casiano/PL/YappWithDefaultAction/trunk svn+ssh://casiano@orion.pcg.ull.es/var/svn/casiano/PL/YappWithDefaultAction/tags/YYRuleMethod_3.0
+
+  Commit de la revisión 28.
+
+*************************************************
+SVN HINTS:
+
+svn -vu status
+svn status -u | grep '\*
+
+A    Resource is scheduled for Addition
+D    Resource is scheduled for Deletion
+M    Resource has local Modifications
+C    Resource has Conflicts (changes have not been completely merged
+       between the repository and working copy version)
+X    Resource is eXternal to this working copy (may come from another
+       repository).  See the section called “Externals Definitions”
+?    Resource is not under version control
+!    Resource is missing or incomplete (removed by a tool other than
+       Subversion)
+*    A newer revision of the item exists on the server.
+
+If the --verbose option is passed, the last committed revision and last committed author are displayed next.
+
+See:
+http://svnbook.red-bean.com/en/1.5/svn-book.html#svn.ref.svn.c.status
+http://svnbook.red-bean.com/en/1.5/svn-book.html#svn.tour.cycle.examine.status
+
+- To see the differences between the working copy and the repository copy:
+
+					svn diff -r HEAD t/58standalone.t
+
+- To bring a file without including it in the svn
+					svn export -r HEAD t/58standalone.t

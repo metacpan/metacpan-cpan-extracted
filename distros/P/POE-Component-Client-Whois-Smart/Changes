@@ -1,0 +1,31 @@
+Revision history for POE::Component::Client::Whois::Smart
+
+0.05    Feb 20 2008
+        - First version released
+
+0.07    Feb 21 2008
+        - Test t/01-test.t fixed.
+
+0.08    Feb 26 2008
+        - Added whois-server for .VN (http)
+        - Fixed timeouts.
+
+0.09	Feb 29 2008
+	- Uses Net::Whois::Raw::Data and Net::Whois::Raw::Common 
+
+0.10	Mar 04 2008
+	- Improved cache mechanism
+
+0.11    Mar 12 2008
+        - Uses Net::Whois::Raw::Data and Net::Whois::Raw::Common internaly
+        
+0.12    Jun 17 2008 Sergey Kotenko, Pavel Odintsov
+        - Fixed retrieving whois from servers with non-unix newlines
+        - Added ability to handle server answer with "ReferralServer: rwhois" links
+        - Disabled additional checks response from the unknown whois servers (now $ Net:: Whois:: Raw:: CHECK_FAIL == 1),
+          in relation to rejecting the erroneous answers containing fields simultaneously "ReferralServer" and "Not found"
+0.13    Jul 31 2008 Pavel Odintsov
+        - Fixed HTTP post requests to www whois servers
+        - Add "validation" to www_whois requets
+        - Fix bug with referer tag in whois
+

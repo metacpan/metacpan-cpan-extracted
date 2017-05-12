@@ -1,0 +1,32 @@
+---
+abstract: 'Retrieve status and env of service under daemontools'
+author:
+  - 'HIROSE Masaaki <hirose31@gmail.com>'
+build_requires:
+  Devel::Cover: 0
+  Test::More: 0.88
+  Test::Time: 0.04
+configure_requires:
+  Module::Build::Tiny: 0.030
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-Daemontools-Service
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/hirose31/Parse-Daemontools-Service/issues
+  homepage: https://github.com/hirose31/Parse-Daemontools-Service
+  repository: https://github.com/hirose31/Parse-Daemontools-Service.git
+version: 0.03

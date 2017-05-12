@@ -1,0 +1,1229 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use bytes;
+
+# jpeg2qtvr, assembles six jpeg cube faces into a QTVR file
+# Copyright (C) 2006  Bruno Postle <bruno at postle dot net>
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+
+our $VERSION = 0.05;
+
+# http://wiki.multimedia.cx/index.php?title=Apple_QuickTime
+# http://developer.apple.com/documentation/QuickTime/InsideQT_QTVR/index.html
+# http://developer.apple.com/documentation/QuickTime/QTFF/index.html
+# http://www.geocities.com/xhelmboyx/quicktime/formats/qti-layout.txt
+# http://www.geocities.com/xhelmboyx/quicktime/formats/qtm-layout.txt
+
+my $opts = {};
+
+while (@ARGV)
+{
+    my ($key, $value) = split ('=', shift);
+    $opts->{$key} = $value;
+}
+
+my $date = $opts->{'--date'} || time;
+my $name = $opts->{'--name'} || "Cubic panorama created by jpeg2qtvr";
+my $width_window = $opts->{'--width'} || 1024;
+my $height_window = $opts->{'--height'} || 768;
+my $outfile = $opts->{'--outfile'} || undef;
+my $do_preview = $opts->{'--preview'} || undef;
+my $pan = $opts->{'--pan'} || 0.0;
+$pan += 360 if ($pan < 0);
+my $tilt = $opts->{'--tilt'} || 0.0;
+my $fov = $opts->{'--fov'} || 60.0;
+my $minfov = $opts->{'--min-fov'} || 10.0;
+my $maxfov = $opts->{'--max-fov'} || 120.0;
+my $prefix = $opts->{'--prefix'} or die
+
+"Usage: $0 [options] --prefix=PREFIX > OUTPUT
+
+eg. use --prefix=foo_ if the front, right, back, left, up and down JPEG tiles
+are named foo_0.jpg, foo_1.jpg, foo_2.jpg, foo_3.jpg, foo_4.jpg and foo_5.jpg
+
+Options
+
+  --date     date in seconds since January 1st 1970, defaults to current time
+  --name     title of the panorama
+  --width    preferred window width, defaults to 1024
+  --height   preferred window height, defaults to 768
+  --outfile  name for output mov file, otherwise result goes to STDOUT
+  --pan      initial pan (yaw), defaults to 0.0 degrees
+  --tilt     initial tilt (pitch), defaults to 0.0 degrees
+  --fov      initial vertical angle of view, defaults to 60 degrees
+  --min-fov  minimum vertical angle of view, defaults to 10 degrees
+  --max-fov  maximum vertical angle of view, defaults to 120 degrees
+  --preview  prefix for preview track JPEG tiles
+
+";
+
+# slurp in the JPEG data
+
+local ($/, *FH);
+
+open (FH, $prefix ."0.jpg") or die $!;
+binmode (FH, ':raw');
+my $image0 = <FH>;
+close FH;
+
+open (FH, $prefix ."1.jpg") or die $!;
+binmode (FH, ':raw');
+my $image1 = <FH>;
+close FH;
+
+open (FH, $prefix ."2.jpg") or die $!;
+binmode (FH, ':raw');
+my $image2 = <FH>;
+close FH;
+
+open (FH, $prefix ."3.jpg") or die $!;
+binmode (FH, ':raw');
+my $image3 = <FH>;
+close FH;
+
+open (FH, $prefix ."4.jpg") or die $!;
+binmode (FH, ':raw');
+my $image4 = <FH>;
+close FH;
+
+open (FH, $prefix ."5.jpg") or die $!;
+binmode (FH, ':raw');
+my $image5 = <FH>;
+close FH;
+
+my ($width_image, $height_image) = JPEGsize ($image0);
+die 'Can\'t determine JPEG dimensions' unless ($width_image == $height_image);
+print STDERR "Cubeface size: $width_image\n";
+
+my ($preview0, $preview1, $preview2, $preview3, $preview4, $preview5, $width_preview, $height_preview);
+
+if ($do_preview)
+{
+    open (FH, $do_preview ."0.jpg") or die $!;
+    binmode (FH, ':raw');
+    $preview0 = <FH>;
+    close FH;
+
+    open (FH, $do_preview ."1.jpg") or die $!;
+    binmode (FH, ':raw');
+    $preview1 = <FH>;
+    close FH;
+
+    open (FH, $do_preview ."2.jpg") or die $!;
+    binmode (FH, ':raw');
+    $preview2 = <FH>;
+    close FH;
+
+    open (FH, $do_preview ."3.jpg") or die $!;
+    binmode (FH, ':raw');
+    $preview3 = <FH>;
+    close FH;
+
+    open (FH, $do_preview ."4.jpg") or die $!;
+    binmode (FH, ':raw');
+    $preview4 = <FH>;
+    close FH;
+
+    open (FH, $do_preview ."5.jpg") or die $!;
+    binmode (FH, ':raw');
+    $preview5 = <FH>;
+    close FH;
+
+    ($width_preview, $height_preview) = JPEGsize ($preview0);
+    die 'Can\'t determine preview JPEG dimensions' unless ($width_preview == $height_preview);
+    print STDERR "Preview size: $width_preview\n";
+}
+
+# date is seconds since midnight, January 1, 1904
+
+$date = pack4B ($date + 2082844800);
+
+# pixel size of the view window
+
+$width_window = pack4B ($width_window);
+$height_window = pack4B ($height_window);
+
+# these will be filled later
+
+my $offsetA = '????';
+my $offsetB = '????';
+
+my $offset0 = '????';
+my $offset1 = '????';
+my $offset2 = '????';
+my $offset3 = '????';
+my $offset4 = '????';
+my $offset5 = '????';
+
+my $offset_preview0 = '????';
+my $offset_preview1 = '????';
+my $offset_preview2 = '????';
+my $offset_preview3 = '????';
+my $offset_preview4 = '????';
+my $offset_preview5 = '????';
+
+my $lengthA = '????';
+my $lengthB = '????';
+
+# build the mov data
+
+my $mov;
+
+for (0 .. 1)
+{
+
+$mov =
+
+#atom ('ftyp',
+#    "qt\x{20}\x{20}\x{20}\x{05}\x{03}\x{00}".
+#    "qt\x{20}\x{20}\x{00}\x{00}\x{00}\x{00}".
+#    "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}"
+#).
+
+atom ('moov',
+
+#[Subrecursing 'moov' atom]
+
+     atom ('mvhd',
+         "\x{00}\x{00}\x{00}\x{00}".
+         $date.$date.
+         "\x{00}\x{00}\x{0e}\x{10}".
+         "\x{00}\x{00}\x{0e}\x{10}".
+         "\x{00}\x{01}\x{00}\x{00}".
+         "\x{01}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}\x{00}\x{00}".
+         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}\x{00}\x{00}".
+         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+         "\x{00}\x{00}\x{00}\x{00}\x{40}\x{00}\x{00}\x{00}".
+         "\x{00}\x{00}\x{00}\x{00}".
+         "\x{00}\x{00}\x{0e}\x{10}".
+         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+         ($do_preview ? "\x{00}\x{00}\x{00}\x{05}" : "\x{00}\x{00}\x{00}\x{04}")
+     ).
+
+     atom ('trak',
+
+#    [Subrecursing 'trak' atom]
+
+         atom ('tkhd',
+             "\x{00}\x{00}\x{00}\x{0f}".
+             $date.$date.
+             "\x{00}\x{00}\x{00}\x{01}".  # track number
+             "\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{0e}\x{10}". # duration
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{00}\x{00}\x{01}\x{00}\x{00}\x{00}".
+             "\x{00}\x{01}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{01}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{40}\x{00}".
+             $width_window.$height_window.
+             "\x{00}\x{00}"
+         ).
+
+         atom ('edts',
+
+             atom ('elst',
+                 "\x{00}\x{00}\x{00}\x{00}".
+                 "\x{00}\x{00}\x{00}\x{01}".
+                 "\x{00}\x{00}\x{0e}\x{10}". # duration
+                 "\x{00}\x{00}\x{00}\x{00}".
+                 "\x{00}\x{01}\x{00}\x{00}"
+             )
+         ).
+
+         atom ('tref',
+
+             atom ('pano',
+                 "\x{00}\x{00}\x{00}\x{02}"
+             )
+         ).  
+
+         atom ('mdia',
+
+#        [Subrecursing 'mdia' atom]
+
+             atom ('mdhd',
+                 "\x{00}\x{00}\x{00}\x{00}".
+                 $date.$date.
+                 "\x{00}\x{00}\x{0e}\x{10}". # time scale
+                 "\x{00}\x{00}\x{0e}\x{10}". # duration
+                 "\x{00}\x{00}\x{00}\x{00}"
+             ).
+
+             atom ('hdlr',
+                 "\x{00}\x{00}\x{00}\x{00}".
+                 "mhlrqtvrappl".
+                 "\x{80}\x{00}\x{00}\x{01}\x{00}\x{01}\x{02}\x{a1}\x{12}".
+                 "QTVR Media Handler"
+             ).
+
+             atom ('minf',
+
+#            [Subrecursing 'minf' atom]
+
+                 atom ('gmhd', # base media header
+
+                     atom ('gmin', # base media info
+                         "\x{00}\x{00}\x{00}\x{00}".
+                         "\x{00}\x{40}".
+                         "\x{80}\x{00}\x{80}\x{00}\x{80}\x{00}".
+                         "\x{00}\x{00}".
+                         "\x{00}\x{00}"
+                     )
+                 ).
+
+                 atom ('hdlr',
+                     "\x{00}\x{00}\x{00}\x{00}dhlr".
+                     "alisappl".
+                     "\x{00}\x{00}\x{00}\x{01}\x{00}\x{01}\x{00}\x{2d}\x{18}".
+                     "Apple Alias Data Handler"
+                 ).
+
+                 atom ('dinf',
+
+#                [Subrecursing 'dinf' atom]
+
+                     atom ('dref',
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+
+                         atom ('alis',
+                             "\x{00}\x{00}\x{00}\x{01}"
+                         )
+                     )
+
+#                [End subrecurse 'dinf' atom]
+
+                 ).
+
+                 atom ('stbl',
+
+#                [Subrecursing 'stbl' atom]
+
+                     atom ('stsd',
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+
+                         atom ('qtvr',
+                             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+                             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                             "\x{00}\x{00}\x{00}\x{00}".
+
+                             atom ('sean',
+                                 "\x{00}\x{00}\x{00}\x{01}\x{00}\x{00}\x{00}\x{03}".
+                                 "\x{00}\x{00}\x{00}\x{00}".
+
+                                 atom ('vrsc',
+                                     "\x{00}\x{00}\x{00}\x{01}".
+                                     "\x{00}\x{00}\x{00}\x{00}".
+                                     "\x{00}\x{00}\x{00}\x{00}".
+                                     "\x{00}\x{02}\x{00}\x{00}".
+                                     "\x{00}\x{00}\x{00}\x{00}".
+                                     "\x{00}\x{00}\x{00}\x{01}".
+                                     "\x{00}\x{00}\x{00}\x{00}".
+                                     "\x{00}\x{00}\x{00}\x{00}".
+                                     "\x{00}\x{00}\x{00}\x{00}"
+                                 ).
+
+                                 atom ('imgp',
+                                     "\x{00}\x{00}\x{00}\x{01}\x{00}\x{00}\x{00}\x{02}".
+                                     "\x{00}\x{00}\x{00}\x{00}".
+
+                                     atom ('impn',
+                                         "\x{00}\x{00}\x{00}\x{01}\x{00}\x{00}\x{00}\x{00}".
+                                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{02}\x{00}\x{00}".
+                                         "\x{00}\x{00}\x{00}\x{02}\x{00}\x{00}\x{00}\x{03}".
+                                         "\x{00}\x{00}\x{00}\x{02}\x{00}\x{00}\x{00}\x{00}".
+                                         "\x{00}\x{00}\x{00}\x{01}\x{00}\x{00}\x{00}\x{00}".
+                                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                                         "\x{00}\x{00}\x{00}\x{00}"
+                                     ).
+
+                                     atom ('impn',
+                                         "\x{00}\x{00}\x{00}\x{02}\x{00}\x{00}\x{00}\x{00}".
+                                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{02}\x{00}\x{00}".
+                                         "\x{00}\x{00}\x{00}\x{01}\x{00}\x{00}\x{00}\x{03}".
+                                         "\x{00}\x{00}\x{00}\x{02}\x{00}\x{00}\x{03}\x{ff}".
+                                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                                         "\x{00}\x{00}\x{00}\x{00}"
+                                     )
+                                 ).
+
+                                 atom ('vrnp',
+                                     "\x{00}\x{00}\x{00}\x{01}\x{00}\x{00}\x{00}\x{01}".
+                                     "\x{00}\x{00}\x{00}\x{00}".
+
+                                     atom ('vrni',
+                                         "\x{00}\x{00}\x{00}\x{01}\x{00}\x{00}\x{00}\x{01}".
+                                         "\x{00}\x{00}\x{00}\x{00}".
+
+                                         atom ('nloc',
+                                             "\x{00}\x{00}\x{00}\x{01}\x{00}\x{00}\x{00}\x{00}".
+                                             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{02}\x{00}\x{00}".
+                                             "pano\x{00}\x{00}\x{00}\x{00}".
+                                             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                                             "\x{00}\x{00}\x{00}\x{00}"
+                                         )
+                                     )
+                                 )
+                             )
+                         )
+                     ).
+
+                     atom ('stts',
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{0e}\x{10}"
+                     ).
+
+                     atom ('stsc',
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{01}\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{01}"
+                     ).
+
+                     atom ('stsz',
+                         # ver  # flags
+                         "\x{00}\x{00}\x{00}\x{00}".
+                         # standard size
+                         $lengthA.
+                         # number of samples
+                         "\x{00}\x{00}\x{00}\x{01}"
+                     ).
+
+                     atom ('stco',
+                         # ver  # flags
+                         "\x{00}\x{00}\x{00}\x{00}".
+                         # number entries
+                         "\x{00}\x{00}\x{00}\x{01}".
+                         $offsetA
+                     )
+                 )
+
+#                [End subrecurse 'stbl' atom]
+
+             )
+
+#            [End subrecurse 'minf' atom]
+
+         )
+
+#        [End subrecurse 'mdia' atom]
+
+     ).
+
+#    [End subrecurse 'trak' atom]
+
+     atom ('trak',
+
+#    [Subrecursing 'trak' atom]
+
+         atom ('tkhd',
+             "\x{00}\x{00}\x{00}\x{0f}".
+             $date.$date.
+             "\x{00}\x{00}\x{00}\x{02}".  # track number
+             "\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{0e}\x{10}". # duration
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{01}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{01}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{40}\x{00}".
+             $width_window.$height_window.
+             "\x{00}\x{00}"
+         ).
+
+         atom ('load',
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}\x{00}"
+         ).
+
+         atom ('edts',
+
+             atom ('elst',
+                 "\x{00}\x{00}\x{00}\x{00}".
+                 "\x{00}\x{00}\x{00}\x{01}".
+                 "\x{00}\x{00}\x{0e}\x{10}". # duration
+                 "\x{00}\x{00}\x{00}\x{00}".
+                 "\x{00}\x{01}\x{00}\x{00}"
+             )
+
+         ).
+
+         atom ('tref',
+
+             atom ('imgt',
+                 ($do_preview ? "\x{00}\x{00}\x{00}\x{04}" : '').
+                 "\x{00}\x{00}\x{00}\x{03}"
+             )
+
+         ).
+
+         atom ('mdia',
+
+#        [Subrecursing 'mdia' atom]
+
+             atom ('mdhd',
+                 "\x{00}\x{00}\x{00}\x{00}".
+                 $date.$date. 
+                 "\x{00}\x{00}\x{0e}\x{10}". # time scale
+                 "\x{00}\x{00}\x{0e}\x{10}". # duration
+                 "\x{00}\x{00}\x{00}\x{00}"
+             ).
+
+             atom ('hdlr',
+                 "\x{00}\x{00}\x{00}\x{00}mhlrpanoappl".
+                 "\x{00}\x{00}\x{00}\x{01}\x{00}\x{01}\x{02}\x{99}\x{1b}".
+                 "QTVR Panorama Media Handler"
+             ).
+
+#            ReadAtom_HDLR:  We found the 'pano' media!
+
+             atom ('minf',
+
+#            [Subrecursing 'minf' atom]
+
+                 atom ('gmhd', # base media header
+
+                     atom ('gmin', # base media info
+                         "\x{00}\x{00}\x{00}\x{00}".
+                         "\x{00}\x{40}".
+                         "\x{80}\x{00}\x{80}\x{00}\x{80}\x{00}".
+                         "\x{00}\x{00}".
+                         "\x{00}\x{00}"
+                     )
+                 ).
+
+                 atom ('hdlr',
+                     "\x{00}\x{00}\x{00}\x{00}dhlralisappl".
+                     "\x{00}\x{00}\x{00}\x{01}\x{00}\x{01}\x{00}\x{2d}\x{18}".
+                     "Apple Alias Data Handler"
+                 ).
+
+                 atom ('dinf',
+
+#                [Subrecursing 'dinf' atom]
+
+                     atom ('dref',
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+
+                         atom ('alis',
+                             "\x{00}\x{00}\x{00}\x{01}"
+                         )
+                     )
+                 ).
+
+#                [End subrecurse 'dinf' atom]
+
+                 atom ('stbl',
+
+#                [Subrecursing 'stbl' atom]
+
+                     atom ('stsd',
+
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{10}\x{00}\x{00}\x{00}\x{00}".
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}"
+                     ).
+
+                     atom ('stts',
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{0e}\x{10}"
+                     ).
+
+                     atom ('stsc',
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{01}\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{01}"
+                     ).
+
+                     atom ('stsz',
+                         # ver  flags
+                         "\x{00}\x{00}\x{00}\x{00}".
+                         # standard size
+                         $lengthB.
+                         # number of items
+                         "\x{00}\x{00}\x{00}\x{01}"
+                     ).
+
+#                    'pano' sample size = : 192
+
+                     atom ('stco',
+                         # ver  # flags
+                         "\x{00}\x{00}\x{00}\x{00}".
+                         # number samples
+                         "\x{00}\x{00}\x{00}\x{01}".
+                         $offsetB
+
+#                    Chunk offset to 'pano' is : 2322
+
+#                    [Subrecursing pano 'stco' atom]
+#
+#                        QTAtom 0x0000091E  (0x000000B4)  sean child count: 2
+#
+#                        [Subrecursing 'sean' qt atom]
+#
+#                            QTAtom 0x00000932  (0x00000068)  pdat child count: 0
+#                            QTAtom 0x0000099A  (0x00000038)  cuvw child count: 0
+#
+#                        [End subrecursing 'sean' qt atom]
+
+                     )
+
+#                    [End subrecurse pano 'stco' atom]
+
+                 )
+
+#                [End subrecurse 'stbl' atom]
+
+             )
+
+#            [End subrecurse 'minf' atom]
+
+         )
+
+#        [End subrecurse 'mdia' atom]
+
+     ).
+
+#    [End subrecurse 'trak' atom]
+
+     ($do_preview ? atom ('trak',
+
+#    [Subrecursing 'trak' atom]
+
+         atom ('tkhd',
+             "\x{00}\x{00}\x{00}\x{0e}".
+             $date.$date.
+             "\x{00}\x{00}\x{00}\x{03}".  # track number
+             "\x{00}\x{00}\x{00}\x{00}".  # reserved
+             "\x{00}\x{00}\x{0e}\x{10}".  # duration
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}". # reserved
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{01}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{01}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{40}\x{00}".
+             pack4B ($width_preview).
+             pack4B ($width_preview).
+             "\x{00}\x{00}"
+         ).
+
+         atom ('edts',
+
+             atom ('elst',
+                 "\x{00}\x{00}\x{00}\x{00}".
+                 "\x{00}\x{00}\x{00}\x{01}".
+                 "\x{00}\x{00}\x{0e}\x{10}". # duration
+                 "\x{00}\x{00}\x{00}\x{00}".
+                 "\x{00}\x{01}\x{00}\x{00}"
+             )
+         ).
+
+         atom ('mdia',
+
+#        [Subrecursing 'mdia' atom]
+
+             atom ('mdhd',
+                 "\x{00}\x{00}\x{00}\x{00}".
+                 $date.$date.
+                 "\x{00}\x{00}\x{0e}\x{10}". # time scale
+                 "\x{00}\x{00}\x{0e}\x{10}". # duration
+                 "\x{00}\x{00}\x{00}\x{00}"
+             ).
+
+             atom ('hdlr',
+                 "\x{00}\x{00}\x{00}\x{00}mhlrvideappl".
+                 "\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}\x{00}\x{23}\x{19}".
+                 "Apple Video Media Handler"
+             ).
+
+#            ReadAtom_HDLR:  We found a 'vide' media!
+
+             atom ('minf',
+
+#            [Subrecursing 'minf' atom]
+
+                 atom ('vmhd',
+                     "\x{00}\x{00}\x{00}\x{01}\x{00}\x{40}\x{80}\x{00}".
+                     "\x{80}\x{00}\x{80}\x{00}"
+                 ).
+
+                 atom ('hdlr',
+                     "\x{00}\x{00}\x{00}\x{00}dhlralisappl".
+                     "\x{00}\x{00}\x{00}\x{01}\x{00}\x{01}\x{00}\x{2d}\x{18}".
+                     "Apple Alias Data Handler"
+                 ).
+
+                 atom ('dinf',
+
+#                [Subrecursing 'dinf' atom]
+
+                     atom ('dref',
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+
+                         atom ('alis',
+                             "\x{00}\x{00}\x{00}\x{01}"
+                         )
+                     )
+                 ).
+
+#                [End subrecurse 'dinf' atom]
+
+                 atom ('stbl',
+
+#                [Subrecursing 'stbl' atom]
+
+                     atom ('stsd',
+
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{56}jpeg".
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{00}appl".
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{02}\x{00}".
+
+                         pack2B ($width_preview). pack2B ($width_preview).
+
+                         "\x{00}\x{48}\x{00}\x{00}".
+                         "\x{00}\x{48}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                         "\x{00}\x{01}\x{0c}".
+                         "Photo - JPEG".
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                         "\x{00}\x{00}\x{00}\x{00}\x{18}\x{ff}\x{ff}"
+                     ).
+
+                     atom ('stts',
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{06}\x{00}\x{00}\x{02}\x{58}"
+                     ).
+
+                     atom ('stsc',
+                         "\x{00}\x{00}\x{00}\x{00}".
+
+                         "\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{01}"
+                     ).
+
+                     atom ('stsz',
+                         # ver  # flags
+                         "\x{00}\x{00}\x{00}\x{00}".
+                         # standard size
+                         "\x{00}\x{00}\x{00}\x{00}".
+                         # number of items
+                         "\x{00}\x{00}\x{00}\x{06}".
+                         pack4B (length $preview0).
+                         pack4B (length $preview1).
+                         pack4B (length $preview2).
+                         pack4B (length $preview3).
+                         pack4B (length $preview4).
+                         pack4B (length $preview5)
+                     ).
+
+                     atom ('stco',
+                         # ver  # flags 
+                         "\x{00}\x{00}\x{00}\x{00}".
+                         # number entries (2)
+                         "\x{00}\x{00}\x{00}\x{06}".
+                         $offset_preview0.
+                         $offset_preview1.
+                         $offset_preview2.
+                         $offset_preview3.
+                         $offset_preview4.
+                         $offset_preview5
+                     )
+
+#                [End subrecurse 'stbl' atom]
+
+                 )
+
+#            [End subrecurse 'minf' atom]
+
+             )
+
+#        [End subrecurse 'mdia' atom]
+
+         )
+
+#    [End subrecurse 'trak' atom]
+
+     ) : '').
+
+     atom ('trak',
+
+#    [Subrecursing 'trak' atom]
+
+         atom ('tkhd',
+             "\x{00}\x{00}\x{00}\x{0e}".
+             $date.$date.
+             ($do_preview ? "\x{00}\x{00}\x{00}\x{04}" : "\x{00}\x{00}\x{00}\x{03}").  # track number
+             "\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{0e}\x{10}". # duration
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{01}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{01}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+             "\x{40}\x{00}".
+             pack4B ($width_image). # width
+             pack4B ($width_image). # height
+             "\x{00}\x{00}"
+         ). # tkhd
+
+         atom ('edts',
+
+             atom ('elst',
+                 "\x{00}\x{00}\x{00}\x{00}".
+                 "\x{00}\x{00}\x{00}\x{01}".
+                 "\x{00}\x{00}\x{0e}\x{10}". # duration
+                 "\x{00}\x{00}\x{00}\x{00}". # start time
+                 "\x{00}\x{01}\x{00}\x{00}"  # rate
+             ) # elst
+         ). # edts
+
+         atom ('mdia',
+
+#        [Subrecursing 'mdia' atom]
+
+             atom ('mdhd',
+                 "\x{00}\x{00}\x{00}\x{00}".
+                 $date.$date.
+                 "\x{00}\x{00}\x{0e}\x{10}". # time scale
+                 "\x{00}\x{00}\x{0e}\x{10}". # duration
+                 "\x{00}\x{00}\x{00}\x{00}"
+             ). # mdhd
+
+             atom ('hdlr',
+                 "\x{00}\x{00}\x{00}\x{00}mhlrvideappl".
+                 "\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}\x{00}\x{23}\x{19}".
+                 "Apple Video Media Handler"
+             ). # hdlr
+
+#            ReadAtom_HDLR:  We found a 'vide' media!
+
+             atom ('minf',
+
+#            [Subrecursing 'minf' atom]
+
+                 atom ('vmhd',
+                     "\x{00}\x{00}\x{00}\x{01}\x{00}\x{40}\x{80}\x{00}".
+                     "\x{80}\x{00}\x{80}\x{00}"
+                 ). # vmhd
+
+                 atom ('hdlr',
+                     "\x{00}\x{00}\x{00}\x{00}dhlralisappl".
+                     "\x{00}\x{00}\x{00}\x{01}\x{00}\x{01}\x{00}\x{2d}\x{18}".
+                     "Apple Alias Data Handler"
+                 ). # hdlr
+
+                 atom ('dinf',
+
+#                [Subrecursing 'dinf' atom]
+
+                     atom ('dref',
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+
+                         atom ('alis',
+                             "\x{00}\x{00}\x{00}\x{01}"
+                         ) # alis
+                     ) # dref
+                 ). # dinf
+
+#                [End subrecurse 'dinf' atom]
+
+                 atom ('stbl',
+
+#                [Subrecursing 'stbl' atom]
+
+                     atom ('stsd',
+
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{56}jpeg".
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{00}appl".
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{02}\x{00}".
+
+                         pack2B ($width_image). # image width
+                         pack2B ($width_image). # image width
+
+                         "\x{00}\x{48}\x{00}\x{00}".
+                         "\x{00}\x{48}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                         "\x{00}\x{01}\x{0c}".
+                         "Photo - JPEG".
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+                         "\x{00}\x{00}\x{00}\x{00}\x{18}\x{ff}\x{ff}"
+                     ). # stsd
+
+                     atom ('stts',
+                         "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{06}\x{00}\x{00}\x{02}\x{58}"
+                     ). # stts
+
+                     atom ('stsc',
+                         "\x{00}\x{00}\x{00}\x{00}".
+
+                         "\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{01}".
+                         "\x{00}\x{00}\x{00}\x{01}"
+                     ). # stsc
+
+                     atom ('stsz',
+                         # ver  # flags
+                         "\x{00}\x{00}\x{00}\x{00}".
+                         # standard size
+                         "\x{00}\x{00}\x{00}\x{00}".
+                         # number of items
+                         "\x{00}\x{00}\x{00}\x{06}".
+                         pack4B (length $image0).
+                         pack4B (length $image1).
+                         pack4B (length $image2).
+                         pack4B (length $image3).
+                         pack4B (length $image4).
+                         pack4B (length $image5)
+                     ). # stsz
+
+                     atom ('stco',
+                         # ver  # flags 
+                         "\x{00}\x{00}\x{00}\x{00}".
+                         # number entries (6)
+                         "\x{00}\x{00}\x{00}\x{06}".
+                         $offset0.
+                         $offset1.
+                         $offset2.
+                         $offset3.
+                         $offset4.
+                         $offset5
+                     ) # stco
+
+#                [End subrecurse 'stbl' atom]
+
+                 ) # stbl
+
+#            [End subrecurse 'minf' atom]
+
+             ) # minf
+
+#        [End subrecurse 'mdia' atom]
+
+         ) # mdia
+
+#    [End subrecurse 'trak' atom]
+
+     ). # trak
+
+     atom ('udta',
+         atom ('ctyp',
+             # "none" for no controls
+             "qtvr"
+         ).
+         atom ("\x{a9}nam",
+             meta ("\x{00}\x{00}",
+                 $name
+             )
+         ).
+         atom ("\x{a9}swr",
+             meta ("\x{00}\x{00}",
+                 "jpeg2qtvr $VERSION"
+             )
+         ).
+         "\x{00}\x{00}\x{00}\x{00}"
+     )
+
+#[End subrecurse 'moov' atom]
+
+).
+
+# end of instructions
+
+atom ('free',
+    "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+    "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+    "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}"
+);
+
+$mov .=
+
+# follows is the actual movie data
+
+# this atom is optional, but useful to define the end of the file
+#Atom 0x000008AA  (0x001E29FC)  mdat
+
+atom ('wide', '').
+ 
+##"\x{00}\x{1e}\x{29}\x{fc}".  "mdat".
+atom ('wide', '').
+
+atom ('wide', '').
+
+"\x{00}\x{00}\x{00}\x{00}".  "mdat";
+
+my $A =
+
+"\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+
+atom ('sean',
+    "\x{00}\x{00}\x{00}\x{01}".
+    "\x{00}\x{00}\x{00}\x{01}".
+    "\x{00}\x{00}\x{00}\x{00}".
+
+    atom ('ndhd',
+        "\x{00}\x{00}\x{00}\x{01}\x{00}\x{00}\x{00}\x{00}".
+        "\x{00}\x{00}\x{00}\x{00}\x{00}\x{02}\x{00}\x{00}".
+        "pano\x{00}\x{00}\x{00}\x{01}".
+        "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+        "\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}"
+    )
+);
+
+my $B = 
+
+"\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}\x{00}".
+
+atom ('sean',
+    "\x{00}\x{00}\x{00}\x{01}".
+    ($do_preview ? "\x{00}\x{00}\x{00}\x{03}"
+    : "\x{00}\x{00}\x{00}\x{02}").
+    "\x{00}\x{00}\x{00}\x{00}".
+
+    atom ('pdat',
+        "\x{00}\x{00}\x{00}\x{01}".
+        "\x{00}\x{00}\x{00}\x{00}".
+        "\x{00}\x{00}\x{00}\x{00}".
+        "\x{00}\x{02}\x{00}\x{00}".
+        "\x{00}\x{00}\x{00}\x{01}".
+        "\x{00}\x{00}\x{00}\x{00}".
+        "\x{00}\x{00}\x{00}\x{00}".
+        "\x{43}\x{b4}\x{00}\x{00}".
+        "\x{c2}\x{34}\x{00}\x{00}".
+        "\x{42}\x{34}\x{00}\x{00}".
+        packfloat ($minfov). # minFieldOfView
+        "\x{42}\x{b4}\x{00}\x{00}".
+        packfloat ($pan).    # defaultPan
+        packfloat ($tilt).   # defaultTilt
+        packfloat ($fov).    # defaultFieldOfView
+        "\x{00}\x{00}\x{1e}\x{00}".
+        pack4B ($width_image).
+        "\x{00}\x{04}\x{00}\x{01}".
+        "\x{00}\x{00}\x{1e}\x{00}".
+        pack4B ($width_image).
+        "\x{00}\x{04}\x{00}\x{01}".
+        "\x{00}\x{00}\x{00}\x{01}".
+        "cube\x{00}\x{00}\x{00}\x{00}"
+    ).
+
+    ($do_preview ?
+    atom ('tref',
+        "\x{00}\x{00}\x{00}\x{01}".
+        "\x{00}\x{00}\x{00}\x{00}".
+        "\x{00}\x{00}\x{00}\x{00}".
+        "imgt".
+        "\x{80}\x{00}\x{00}\x{00}".
+        "\x{00}\x{02}"
+    )
+    : '').
+
+    atom ('cuvw',
+        "\x{00}\x{00}\x{00}\x{01}".
+        "\x{00}\x{00}\x{00}\x{00}".
+        "\x{00}\x{00}\x{00}\x{00}".
+        "\x{00}\x{00}\x{00}\x{00}".
+        "\x{43}\x{b4}\x{00}\x{00}".
+        "\x{c2}\x{b4}\x{00}\x{00}".
+        "\x{42}\x{b4}\x{00}\x{00}".
+        packfloat ($minfov). # minFieldOfView
+        packfloat ($maxfov). # maxFieldOfView
+        packfloat ($pan).    # defaultPan
+        packfloat ($tilt).   # defaultTilt
+        packfloat ($fov)     # defaultFieldOfView
+    )
+);
+
+$offsetA = pack4B (length $mov);
+
+$mov .= $A;
+
+$offsetB = pack4B (length $mov);
+
+$mov .= $B;
+
+$lengthA = pack4B (length $A);
+$lengthB = pack4B (length $B);
+
+if ($do_preview)
+{
+    $offset_preview0 = pack4B (length $mov);
+    $mov .= $preview0;
+
+    $offset_preview1 = pack4B (length $mov);
+    $mov .= $preview1;
+
+    $offset_preview2 = pack4B (length $mov);
+    $mov .= $preview2;
+
+    $offset_preview3 = pack4B (length $mov);
+    $mov .= $preview3;
+
+    $offset_preview4 = pack4B (length $mov);
+    $mov .= $preview4;
+
+    $offset_preview5 = pack4B (length $mov);
+    $mov .= $preview5;
+}
+
+$offset0 = pack4B (length $mov);
+$mov .= $image0;
+
+$offset1 = pack4B (length $mov);
+$mov .= $image1;
+
+$offset2 = pack4B (length $mov);
+$mov .= $image2;
+
+$offset3 = pack4B (length $mov);
+$mov .= $image3;
+
+$offset4 = pack4B (length $mov);
+$mov .= $image4;
+
+$offset5 = pack4B (length $mov);
+$mov .= $image5;
+
+}
+
+if ($outfile)
+{
+    open (OUTFILE, '>'. $opts->{'--outfile'});
+    binmode (OUTFILE, ':raw');
+    print OUTFILE $mov;
+    close OUTFILE;
+}
+else
+{
+    binmode (STDOUT, ':raw');
+    print STDOUT $mov;
+}
+
+sub pack4B
+{
+    return pack ('N', shift);
+}
+
+sub pack2B
+{
+    return pack ('n', shift);
+}
+
+sub packfloat
+{
+    my $bytes = pack ('f', shift);
+    $bytes =~ /(.)(.)(.)(.)/;
+    my $littleendian = $4.$3.$2.$1;
+    return $littleendian if (unpack("h*", pack("s", 1)) =~ /^1/);
+    return $bytes;
+}
+
+sub atom
+{
+    my ($type, $data) = @_;
+    return pack4B ((length $data) + 8) . $type . $data;
+}
+
+sub meta
+{
+    my ($lang, $data) = @_;
+    return pack2B (length $data) . $lang . $data;
+}
+
+sub JPEGsize
+{
+    my $image = shift;
+    $image =~ /.*?\x{ff}\x{c0}...(.)(.)(.)(.)/;
+    ((256 * ord ($3)) + ord ($4), (256 * ord ($1)) + ord ($2));
+}
+
+__END__
+
+=head1 NAME
+
+jpeg2qtvr - Assemble Quicktime QTVR files from JPEG cubefaces
+
+=head1 Synopsis
+
+  jpeg2qtvr --prefix=foo_ > my_panorama.mov
+
+=head1 DESCRIPTION
+
+This tool generates a cubic QTVR, consisting of six cube faces in JPEG format.
+JPEG input files must all be square with the same dimensions, eg: 1920x1920.
+
+Cubefaces must be specified in a standard sequence: front, right, back, left,
+up and down.
+
+=head1 Calling syntax
+
+  jpeg2qtvr [options] --prefix=PREFIX > OUTPUT
+
+eg. use --prefix=foo_ if the front, right, back, left, up and down JPEG tiles
+are named foo_0.jpg, foo_1.jpg, foo_2.jpg, foo_3.jpg, foo_4.jpg and foo_5.jpg
+
+Options:
+
+  --date     date in seconds since January 1st 1970, defaults to current time
+  --name     title of the panorama
+  --width    preferred window width, defaults to 1024
+  --height   preferred window height, defaults to 768
+  --outfile  name for output mov file, otherwise result goes to STDOUT
+  --pan      initial pan (yaw), defaults to 0.0 degrees
+  --tilt     initial tilt (pitch), defaults to 0.0 degrees
+  --fov      initial vertical angle of view, defaults to 60 degrees
+  --min-fov  minimum vertical angle of view, defaults to 10 degrees
+  --max-fov  maximum vertical angle of view, defaults to 120 degrees
+  --preview  prefix for preview track JPEG tiles
+
+=head1 License
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+=head1 See Also
+
+L<perl>, L<Panotools::Script>
+
+=head1 Author
+
+October 2006, Bruno Postle <bruno AT postle.net>
+

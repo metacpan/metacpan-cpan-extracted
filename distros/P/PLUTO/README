@@ -1,0 +1,33 @@
+$Id: README,v 1.2 2009-11-13 20:31:06 ubuntu Exp $
+
+PLUTO: Son of ODO (http://ibm-slrp.sourceforge.net/) - Ontologies, Databases, Optimization
+
+
+* NOTES: If you plan on modifying this distribution and you obtain the code from a repository 
+and NOT from CPAN, please make sure that you have Module::Install installed on your machine!
+
+* ABOUT
+
+This is a pure Perl semantic web library that implements an RDF parser, RDQL, SPARQL 
+query engine, persistent RDF datastore and an ontology framework for OWL and RDFS.
+
+This project is used best in small CGI applications or where it is necessary to glue 
+two applications together. 
+
+* BUGS
+
+Submit bug reports to http://rt.cpan.org/Public/Bug/Report.html?Queue=PLUTO
+
+* AUTHOR
+
+	IBM Corporation (initial and substantial contributions)
+	Edward Kawas    (maintainer, bug fixer, etc)
+
+* COPYRIGHT
+
+Copyright (c) 2004-2006 IBM Corporation.
+
+All rights reserved. This program and the accompanying materials
+are made available under the terms of the Eclipse Public License v1.0
+which accompanies this distribution, and is available at
+http://www.eclipse.org/legal/epl-v10.html

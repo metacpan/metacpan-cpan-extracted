@@ -1,0 +1,33 @@
+---
+name: Pod-Tidy
+version: 0.10
+author:
+  - 'Joshua Hoblitt C<jhoblitt@cpan.org>'
+abstract: a reformatting Pod Processor
+license: perl
+resources:
+  license: ~
+requires:
+  Encode: 0
+  Encode::Newlines: 0.03
+  File::Copy: 0
+  IO::String: 0
+  Pod::Find: 0
+  Pod::Simple: 0
+  Pod::Wrap: 0
+  Test::Cmd: 1.05
+  Text::Glob: 0.06
+  Text::Wrap: 0
+recommends:
+  Test::Distribution: 1.22
+provides:
+  Pod::Tidy:
+    file: lib/Pod/Tidy.pm
+    version: 0.10
+  Pod::Wrap::Pretty:
+    file: lib/Pod/Wrap/Pretty.pm
+    version: 0.03
+generated_by: Module::Build version 0.31012
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

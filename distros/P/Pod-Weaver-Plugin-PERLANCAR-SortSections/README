@@ -1,0 +1,12 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [-PERLANCAR::SortSections]
+
+SEE ALSO
+
+    Pod::Weaver::Plugin::SortSections, the generic/configurable version
+
+    Pod::Weaver::Role::SortSections
+

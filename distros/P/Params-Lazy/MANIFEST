@@ -1,0 +1,28 @@
+Changes
+Makefile.PL
+MANIFEST			This list of files
+README
+Lazy.xs
+lib/Params/Lazy.pm
+ppport.h
+t/00-load.t
+t/01-basics.t
+t/02-min.t
+t/03-Lazy.t
+t/04-die.t
+t/05-eval.t
+t/06-fakemap.t
+t/07-caller.t
+t/08-evil.t
+t/09-magicvars.t
+t/10-prototypes.t
+t/11-all.t
+t/12-caller-args.t
+t/13-toggle.t
+t/14-threads.t
+t/lib/lexical_topic_tests.pm
+t/author.t
+ignore.txt
+MANIFEST.SKIP
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

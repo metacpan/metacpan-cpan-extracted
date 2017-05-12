@@ -1,0 +1,7 @@
+Revision history for Perl extension PDF-Writer.
+
+0.06 Thu Dec  1 15:00:00 2005
+    - Fixed undef warning in PDF::Writer::pdflib
+
+0.01 Fri Dec  3 01:09:23 2004
+    - module created

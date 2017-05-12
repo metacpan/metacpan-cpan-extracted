@@ -1,0 +1,54 @@
+Palm/Ztxt version .38
+=========================
+
+INSTALLATION
+
+To install this module type the following:
+
+For right now Modify Makefile.PL and adjust the libs line to point to
+your zxtext libarary lib and include paths.
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+Ignore the following: TBD. :)
+if Makefile.PL is unable to determine the location of libztxt and its include
+files, you will be prompted for the names.  If you already know that
+Makefile.PL will not be able to find your libararies, or if you want to use
+a different set of libraries, you can specifiy the include and library 
+paths on the command line using "--libs='-L/path/to/libs -llibrary'" 
+and "--include='-I/path/to/includes'"
+
+For information on how to install this library in a non-standard location
+(your ISP does not give you admin rights, or your admin is the BOFH,
+for example), refer to the MakeMaker documentation, 
+'perldoc ExtUtils::MakeMaker'.
+
+
+DEPENDENCIES
+
+For the test to be run Test::More must be installed but is not required for 
+the reguar use of this module.
+
+The ztxt libraries that come as part of the Weasel book reader are required to
+build this module. If you do not already have the ztext libararies they are 
+distrubted with makeztext which you can find the Weasel Reader sourceforge 
+project download page:
+'http://sourceforge.net/project/showfiles.php?group_id=9595'.
+
+libz is also required, but this comes will all modern operating systems, so if
+if you are using anything remotely modern you will already have this installed
+(Unless, that is you rolled your own distro and somehow got by without 
+installing it).
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Rudolf Lippan All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,6 @@
+Pod::SAX
+========
+
+This module parses Pod files and generates SAX events.
+
+You may think that SAX was limited to processing XML, but you were wrong. :-)

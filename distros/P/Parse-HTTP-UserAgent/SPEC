@@ -1,0 +1,17 @@
+{
+    module_name    => 'Parse::HTTP::UserAgent',
+    requires       => {
+        'version'  => 0,
+    },
+    meta_merge => {
+        resources => {
+            repository => 'http://bitbucket.org/burak/cpan-parse-http-useragent/',
+        },
+    },
+    BUILDER => {
+        build_monolith                   => 1,
+        change_versions                  => 1,
+        copyright_first_year             => '2009',
+        add_pod_author_copyright_license => 1,
+    }
+}

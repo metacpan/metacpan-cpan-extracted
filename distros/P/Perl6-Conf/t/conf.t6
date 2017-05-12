@@ -1,0 +1,53 @@
+#!/usr/bin/perl6
+use v6;
+
+use Test;
+plan 9;
+
+use Perl6::Conf;
+ok(1, 'After loading the grammar');
+
+{
+	my %data = Perl6::Conf.from_string('').parse;
+	is(%data.perl, '{}', 'empty string');
+}
+{
+	my %data = Perl6::Conf.from_string('    ').parse;
+	is(%data.perl, '{}', 'spaces');
+}
+{
+	my %data = Perl6::Conf.from_string("     \n   \n   \n").parse;
+	is(%data.perl, '{}', 'empty lines');
+}
+
+{
+	my %data = Perl6::Conf.from_string("     \n # comment  \n   \n").parse;
+	is(%data.perl, '{}', 'empty lines and comment');
+}
+
+{
+	# TODO platform independent path
+	my $file = 't/files/names.ini';
+	my %data = Perl6::Conf.from_file($file).parse;
+	#my %data = {"names" => {"fname" => "foo", "lname" => "bar"}};
+	
+	# TODO for some reason this failes
+	# TODO even though this works:
+	#my %data = f();
+	#diag(%data.perl);
+	#is_deeply(%data, {"names" => {"fname" => "foo", "lname" => "bar"}}, $file);
+
+	is_deeply(%data.keys, ["names"]);
+	my @values = %data.values;
+	is(@values.elems, 1);
+	is_deeply(@values[0].keys.sort, ["fname", "lname"]);
+	is_deeply(@values[0].values.sort, ["bar", "foo"]);
+}
+
+sub f {
+	my %data;
+	%data{"names"} = {};
+	%data{"names"}{"fname"} = "foo";
+	%data{"names"}{"lname"} = "bar";
+	return %data;
+}

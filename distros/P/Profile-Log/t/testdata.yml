@@ -1,0 +1,71 @@
+
+suppress_doctype: 1
+
+title: "Boot chart for zerolap (Wed Jun 29 16:31:37 CEST 2005)"
+
+header:
+  - "uname: Linux 2.6.9 #4 Sun Mar 6 16:42:04 CET 2005 i686"
+  - "release: Debian GNU/Linux testing/unstable  "
+  - "CPU: Intel(R) Pentium(R) M processor 1.70GHz (1)"
+  - "kernel options: root=/dev/hda1 ro init=/sbin/bootchartd"
+  - "time: 0:41"
+
+data:
+  timescale:
+    min: 0
+    max: 2
+    tick: 0.1
+    stroke: 0.5
+
+ # comes from t/onetime.yml
+  log: {}
+
+classifications:
+  - { name: "Unclassified" }
+  -
+    name: "Setup"
+    actions:
+      - "read"
+      - "read_config"
+      - "valid_config"
+      - "fork"
+      - "init"
+      - "childspread"
+      - "new"
+  -
+    name: "Locking"
+    actions:
+      - "lockwait"
+  -
+    name: "Parsing"
+    actions:
+      - "parseXML"
+      - "parse"
+  -
+    name: "Spread"
+    actions:
+      - "send"
+  -
+    name: "Waiting"
+    actions:
+      - "srspapp3"
+      - "recv"
+  -
+    name: "Check PGP"
+    actions:
+      - "pgpv"
+      - "pgpv1"
+      - "keytext"
+  -
+    name: "Process"
+    actions:
+      - "process"
+  -
+    name: "Sign"
+    actions:
+      - "send"
+  -
+    name: "Respond"
+    actions:
+      - "respond"
+      - "hout"

@@ -1,0 +1,14 @@
+
+This is version 2.1.9 of the Perl Package Manager, PPM.
+
+See the POD contained in bin/ppm.pl for information on how to use the
+PPM client.
+
+See the POD contained in lib/PPM.pm for information on how to use the
+PPM library to write an alternative client.
+
+Any patches (particularly documentation and setup) that make it a
+more generally useful tool will be gratefully accepted.
+
+Murray Nesbitt <murray@cpan.org>
+

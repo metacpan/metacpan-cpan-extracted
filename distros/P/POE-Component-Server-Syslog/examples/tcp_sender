@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use IO::Socket::INET;
+
+my $sock = IO::Socket::INET->new(
+    PeerPort  => 4095,
+    PeerAddr  => 'localhost',
+    Proto     => 'tcp',
+)
+or die "Can't bind : $@\n";
+
+$sock->send("<1> sungo: pie");
+

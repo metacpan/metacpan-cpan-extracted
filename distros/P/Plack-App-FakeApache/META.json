@@ -1,0 +1,64 @@
+{
+   "abstract" : "Wrapping mod_perl2 applications in Plack",
+   "author" : [
+      "Peter Makholm, L<peter@makholm.net>",
+      "Override subrequest, more cgi.pm support and exit support by Kieren Diment L<zarquon@cpan.org>."
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-App-FakeApache",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "APR::Pool" : "0",
+            "APR::Table" : "0",
+            "CGI::Emulate::PSGI" : "0",
+            "Plack" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::App::FakeApache" : {
+         "file" : "lib/Plack/App/FakeApache.pm",
+         "version" : "0.06"
+      },
+      "Plack::App::FakeApache::Connection" : {
+         "file" : "lib/Plack/App/FakeApache/Connection.pm"
+      },
+      "Plack::App::FakeApache::Log" : {
+         "file" : "lib/Plack/App/FakeApache/Log.pm"
+      },
+      "Plack::App::FakeApache::Request" : {
+         "file" : "lib/Plack/App/FakeApache/Request.pm"
+      },
+      "Plack::App::FakeApache::Server" : {
+         "file" : "lib/Plack/App/FakeApache/Server.pm"
+      },
+      "Plack::App::FakeApache::Tie" : {
+         "file" : "lib/Plack/App/FakeApache.pm"
+      },
+      "Plack::App::WrapApacheReq" : {
+         "file" : "lib/Plack/App/WrapApacheReq.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/pmakholm/plack-app-wrapapachereq/tree/master"
+      }
+   },
+   "version" : "0.06"
+}

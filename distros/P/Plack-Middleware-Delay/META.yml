@@ -1,0 +1,29 @@
+---
+abstract: 'Put delays on your requests'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  AnyEvent::HTTP: 0
+  HTTP::Request::Common: 0
+  Module::Build: 0.3601
+  Test::More: 0
+  Test::TCP: 0
+  Time::HiRes: 0
+  Twiggy: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Delay
+requires:
+  Plack::Middleware: 0
+  perl: 5.8.8
+resources:
+  bugtracker: http://github.com/hoelzro/plack-middleware-delay/issues
+  homepage: http://github.com/hoelzro/plack-middleware-delay
+  repository: http://github.com/hoelzro/plack-middleware-delay
+version: 0.01

@@ -1,0 +1,253 @@
+# NAME
+
+Plack::Middleware::XSRFBlock - Block XSRF Attacks with minimal changes to your app
+
+# VERSION
+
+version 0.0.11
+
+# SYNOPSIS
+
+The simplest way to use the plugin is:
+
+    use Plack::Builder;
+
+    my $app = sub { ... };
+
+    builder {
+        enable 'XSRFBlock';
+        $app;
+    }
+
+You may also over-ride any, or all of these values:
+
+    builder {
+        enable 'XSRFBlock',
+            parameter_name          => 'xsrf_token',
+            cookie_name             => 'PSGI-XSRF-Token',
+            cookie_options          => {},
+            cookie_expiry_seconds   => (3 * 60 * 60),
+            token_per_request       => 0,
+            meta_tag                => undef,
+            inject_form_input       => 1,
+            header_name             => undef,
+            secret                  => undef,
+            blocked                 => sub {
+                                        return [ $status, $headers, $body ]
+                                    },
+        ;
+        $app;
+    }
+
+# DESCRIPTION
+
+This middleware blocks XSRF. You can use this middleware without any
+modifications to your application.
+
+# OPTIONS
+
+- parameter\_name (default: 'xsrf\_token')
+
+    The name assigned to the hidden form input containing the token.
+
+- cookie\_name (default: 'PSGI-XSRF-Token')
+
+    The name of the cookie used to store the token value.
+
+- cookie\_expiry\_seconds (default: 3\*60\*60)
+
+    The expiration time in seconds of the XSRF token
+
+- cookie\_is\_session\_cookie (default: 0)
+
+    If set to a true value, the XSRF token cookie will be set as a session cookie
+    and `cookie_expiry_seconds` will be ignored.
+
+- cookie\_options (default: {})
+
+    Extra cookie options to be set with the cookie.  This is useful for things like
+    setting `HttpOnly` to tell the browser to only send it with HTTP requests,
+    and `Secure` on the cookie to force the cookie to only be sent on SSL requests.
+
+        builder {
+            enable 'XSRFBlock', cookie_options => { secure => 1, httponly => 1 };
+        }
+
+- token\_per\_request (default: 0)
+
+    If this is true a new token is assigned for each request made (but see below).
+
+    This may make your application more secure, but more susceptible to
+    double-submit issues.
+
+    If this is a coderef, the coderef will be evaluated with the following arguments:
+
+    - The middleware object itself,
+    - The request,
+    - The environment
+
+    If the result of the evaluation is a true value, a new token will be assigned.
+    This allows fine-grained control, for example to avoid assigning new tokens when
+    incidental requests are made (e.g. on-page ajax requests).
+
+- meta\_tag (default: undef)
+
+    If this is set, use the value as the name of the meta tag to add to the head
+    section of output pages.
+
+    This is useful when you are using javascript that requires access to the token
+    value for making AJAX requests.
+
+- inject\_form\_input (default: 1)
+
+    If this is unset, hidden inputs will not be injected into your forms, and no
+    HTML parsing will be done on the page responses.
+
+    This can be useful if you only do AJAX requests, and can utilize headers
+    and/or cookies instead, and not need the extra overhead of processing
+    the HTML document every time.
+
+- header\_name (default: undef)
+
+    If this is set, use the value as the name of the response heaer that the token
+    can be sent in. This is useful for non-browser based submissions; e.g.
+    Javascript AJAX requests.
+
+- secret (default: undef)
+
+    Signs the cookie with supplied secret (if set).
+
+- blocked (default: undef)
+
+    If this is set it should be a PSGI application that is returned instead of the
+    default HTTP\_FORBIDDEN(403) and text/plain response.
+
+    This could be useful if you'd like to perform some action that's more in
+    keeping with your application - e.g. return a styled error page.
+
+# ERRORS
+
+The module emits various errors based on the cause of the XSRF detected. The
+messages will be of the form `XSRF detected [reason]`
+
+- form field missing
+
+    The request was submitted but there was no value submitted in the form field
+    specified by <C$self->parameter\_name> \[default: xsrf\_token\]
+
+- xsrf token missing
+
+    The application has been configured to accept an 'X-' header and no token
+    value was found in either the header or a suitable form field. \[default: undef\]
+
+- cookie missing
+
+    There is no cookie with the name specified by `$self-`cookie\_name> \[default:
+    PSGI-XSRF-Token\]
+
+- invalid token
+
+    The cookie token and form value were both submitted correctly but the values
+    do not match.
+
+- invalid signature
+
+    The cookies signature is invalid, indicating it was tampered with on the way
+    to the browser.
+
+## invalid\_signature($self, $value)
+
+## xsrf\_detected($self, $args)
+
+## log($self, $level, $msg)
+
+# EXPLANATION
+
+This module is similar in nature and intention to
+[Plack::Middleware::CSRFBlock](https://metacpan.org/pod/Plack::Middleware::CSRFBlock) but implements the xSRF prevention in a
+different manner.
+
+The solution implemented in this module is based on a CodingHorror article -
+[Preventing CSRF and XSRF Attacks](http://www.codinghorror.com/blog/2008/10/preventing-csrf-and-xsrf-attacks.html).
+
+The driving comment behind this implementation is from
+[the Felten and Zeller paper](https://www.eecs.berkeley.edu/~daw/teaching/cs261-f11/reading/csrf.pdf):
+
+    When a user visits a site, the site should generate a (cryptographically
+    strong) pseudorandom value and set it as a cookie on the user's machine.
+    The site should require every form submission to include this pseudorandom
+    value as a form value and also as a cookie value. When a POST request is
+    sent to the site, the request should only be considered valid if the form
+    value and the cookie value are the same.  When an attacker submits a form
+    on behalf of a user, he can only modify the values of the form. An
+    attacker cannot read any data sent from the server or modify cookie
+    values, per the same-origin policy.  This means that while an attacker can
+    send any value he wants with the form, he will be unable to modify or read
+    the value stored in the cookie. Since the cookie value and the form value
+    must be the same, the attacker will be unable to successfully submit a
+    form unless he is able to guess the pseudorandom value.
+
+## What's wrong with Plack::Middleware::CSRFBlock?
+
+[Plack::Middleware::CSRFBlock](https://metacpan.org/pod/Plack::Middleware::CSRFBlock) is a great module.
+It does a great job of preventing CSRF behaviour with minimal effort.
+
+However when we tried to use it uses the session to store information - which
+works well most of the time but can cause issues with session timeouts or
+removal (for any number of valid reasons) combined with logging (back) in to
+the application in another tab (so as not to interfere with the current
+screen/tab state).
+
+Trying to modify the existing module to provide the extra functionality and
+behaviour we decided worked better for our use seemed too far reaching to try
+to force into the existing module.
+
+## FURTHER READING
+
+- Preventing CSRF and XSRF Attacks
+
+    [http://www.codinghorror.com/blog/2008/10/preventing-csrf-and-xsrf-attacks.html](http://www.codinghorror.com/blog/2008/10/preventing-csrf-and-xsrf-attacks.html)
+
+- Preventing Cross Site Request Forgery (CSRF)
+
+    [https://www.golemtechnologies.com/articles/csrf](https://www.golemtechnologies.com/articles/csrf)
+
+- Cross-Site Request Forgeries: Exploitation and Prevention \[PDF\]
+
+    [https://www.eecs.berkeley.edu/~daw/teaching/cs261-f11/reading/csrf.pdf](https://www.eecs.berkeley.edu/~daw/teaching/cs261-f11/reading/csrf.pdf)
+
+- Cross-Site Request Forgery (CSRF) Prevention Cheat Sheet
+
+    [https://www.owasp.org/index.php/Cross-Site\_Request\_Forgery\_(CSRF)\_Prevention\_Cheat\_Sheet](https://www.owasp.org/index.php/Cross-Site_Request_Forgery_\(CSRF\)_Prevention_Cheat_Sheet)
+
+## SEE ALSO
+
+[Plack::Middleware::CSRFBlock](https://metacpan.org/pod/Plack::Middleware::CSRFBlock),
+[Plack::Middleware](https://metacpan.org/pod/Plack::Middleware),
+[Plack](https://metacpan.org/pod/Plack)
+
+## BUILD STATUS
+
+[![Build status](https://badge.buildkite.com/330e67514dd501f1827bcf33db423ccadf201caf5b2b563fbf.svg)](https://buildkite.com/chizography/plack-middleware-xsrfblock)
+
+# AUTHOR
+
+Chisel <chisel@chizography.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Chisel Wright.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+# CONTRIBUTORS
+
+- Chisel <chisel.wright@net-a-porter.com>
+- Chisel Wright <chisel@chizography.net>
+- Daniel Perrett <dp13@sanger.ac.uk>
+- Matthew Ryall <matt.ryall@gmail.com>
+- Matthias Zeichmann <matthias.zeichmann@gmail.com>
+- Michael Kröll <michael.kroell@geizhals.at>
+- Sebastian Willert <willert@gmail.com>
+- William Wolf <throughnothing@gmail.com>

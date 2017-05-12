@@ -1,0 +1,80 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f773fe8fccca0e59b6bd2318c60440737e894a51 Build.PL
+SHA1 bce3b6f21f5c5d2828bb7d349430a6b939d7ac30 Changes
+SHA1 23d9b9d252de7e22ba6aac2f1fe5681d6a9a0820 LICENSE
+SHA1 cdbc8766fb0ab9831ed20d45b9f8e750cdfc87ff MANIFEST
+SHA1 4fee95333c7d4287697cab05a1e422afb19baf09 MANIFEST.SKIP
+SHA1 5a8f5c69ca892978efc03b8348219f7c32c8c479 META.json
+SHA1 2705090eec89856f30ac1dae1fda3e130cf4de54 META.yml
+SHA1 4daa5249836cf07fcfb9e70267978ed10cc2ae6d Makefile.PL
+SHA1 060acf383fa8e43926938bdfc7c009ce651a825c README
+SHA1 b8a499faf0dd96e3e75285a48cef8f32d7b42748 README.md
+SHA1 f9bb2a8a2889c541c8dd268caac3ae3a02a41af7 examples/date-822.pl
+SHA1 c7d95e98de59a213b83e125f53bcbb45d157308f examples/date-850.pl
+SHA1 cce7ae2ee1d2f4afc6182a887c0b39d1c72d9a16 examples/date-8601.pl
+SHA1 87271d6feaa7a4725713bcced0f73fcdc30afcd0 examples/dump-all.pl
+SHA1 4b54b77650d4bcc9f8a172d435d769452ff3619d examples/strftime-all.pl
+SHA1 487126b355843d79d7d6139094671bab90f78a84 examples/strftime.pl
+SHA1 157fb27f4578aef3b85eecf107d8592f0025b820 inc/Module/Build/My.pm
+SHA1 78db845de0c5ab4b503f9cb1f05e0eafcdc55a80 lib/POSIX/strftime/GNU.pm
+SHA1 866e59cc0f9f47c3edb84563f603051530150919 lib/POSIX/strftime/GNU/PP.pm
+SHA1 8814167556b77f58a21113e3c169606fc6d751f7 lib/POSIX/strftime/GNU/XS.pm
+SHA1 b134c241eaaf24009f3610b2096ab507bfc719f4 t/010_use.t
+SHA1 e704658dbab40dca21d7a1c59111634f04abb3ac t/100_strftime.t
+SHA1 04b87d799ad37c99b24147e5b5815c467f3536e9 t/120_tmzone.pl
+SHA1 5c04dcc4d84aae08e02c55c7c593e1c27f925af4 t/120_tmzone.t
+SHA1 561c5fb0f6dc8632297fcd29e5675b48aa019ac0 t/140_isoweek.t
+SHA1 f5f78d8a05e47a983e2cd4a2341d5f4d6bf4d87b t/900_date-822.t
+SHA1 a2eeccda23cd3855ce524b6df017049f2130198e t/910_date-850.t
+SHA1 79a1863089499ea04870aff5bf3188b8a7e7500e xs/gnu_config.h
+SHA1 cc9bd7ee658d167a4d4c11c34027767bbbfcdbe4 xs/gnu_strftime.c
+SHA1 64d85ee9af654bad8b37fe3d01898c216e536970 xs/gnu_strftime.h
+SHA1 ebd1ab6416d3e75df43bab5a948810e81e4a4bff xs/portable_stdbool.h
+SHA1 2ca8fd0fd7cbf5681cc4b1ca11b31405c7ee9a87 xs/ppport.h
+SHA1 995728629b7f22c50670dfaa61279916ea012425 xs/strftime.xs
+SHA1 f16f6ce1a00e8943740d73e55f3338f300f6c2e3 xs/time_r.c
+SHA1 601f1846d7277759e131075659bfad3e964be046 xs/time_r.h
+SHA1 7aca45a7da0d150f4961af7fd945f391ad514458 xt/benchmark.pl
+SHA1 90353a99ac0f719b6f3e58029804d8556cedc2ab xt/check_changes.t
+SHA1 1c27e5840b0154e44120bc2edc02fbb507c76819 xt/consistent_version_numbers.t
+SHA1 e1fed43372474e7bd7df44edfd3ca242c218e022 xt/copyright.t
+SHA1 650dccfa9b6f5a98cf731c89041bea8935dbc623 xt/cover.pl
+SHA1 88601c7f543229c6a47c92ec14d4088b4db85385 xt/cpan_changes.t
+SHA1 4f8f90e1c421bfd592e6806ec4d0a75f3d56406a xt/cpan_meta.t
+SHA1 48a67f01c35122165bb633264cba72d984d7a89e xt/dist_manifest.t
+SHA1 f5aac658ae1888964274e68d179413782082b7ad xt/distribution.t
+SHA1 af47b82dbac975ba494dfe6849d17d1e02941ac6 xt/eol.t
+SHA1 0f31d18a6a5d14438f2b9748183c120449ce2f02 xt/kwalitee.t
+SHA1 6e7f9dde7560793bcb40acc41561e07d163ad6d1 xt/minimumversion.t
+SHA1 1a1cd76027c4cc73ec56beadaf56680bbac1fd4a xt/no_tabs.t
+SHA1 e8daa0c73cfc304c240fad2d2c2b1b628175a89d xt/perlcritic.t
+SHA1 b8af7873a01d2212941f5c4315b13bbccc163326 xt/perlcriticrc
+SHA1 46aa111935ff192343c30b72d28da1a71ef4abf0 xt/pod_coverage.t
+SHA1 bef7d46eb5cbc3e67956d4e823ec199f41ab9268 xt/pod_spell.t
+SHA1 020e97d6d5dab775fe36fa6633f9ec0c54538dd7 xt/pod_spellrc
+SHA1 87cb53d4ad0162a872d5c70013fc41719e030555 xt/pod_syntax.t
+SHA1 f2dd15ffc2836703f46f2622702e1676891eed21 xt/portability_files.t
+SHA1 e2cdce8b800351dd6c742c350673d0a91be459f9 xt/ppport.t
+SHA1 a38994922fda6d64e2ee75198fadc464a221fea9 xt/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRnpxMACgkQhMHHe8CxCluOoACgzvYAvh6EMyZN76hq52aC6Re3
+vo4An3kiQ8O5SJ3rcdBGiPrZHdhRR1Ad
+=GTjD
+-----END PGP SIGNATURE-----

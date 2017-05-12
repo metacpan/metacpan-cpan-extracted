@@ -1,0 +1,76 @@
+{
+   "abstract" : "IRC client or server backend",
+   "author" : [
+      "Jon Portnoy <avenj@cobaltirc.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POEx-IRC-Backend",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::LinkCheck" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "POE::Component::SSLify" : "1.006",
+            "POE::Filter::Zlib::Stream" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "IRC::Toolkit" : "0.091",
+            "Moo" : "2",
+            "MooX::TypeTiny" : "0",
+            "Net::IP::Minimal" : "0.04",
+            "POE" : "1.3",
+            "POE::Filter::IRCv3" : "0",
+            "POE::Filter::Line" : "0",
+            "POE::Filter::Stackable" : "0",
+            "POE::Wheel::ReadWrite" : "0",
+            "POE::Wheel::SocketFactory" : "0",
+            "Scalar::Util" : "0",
+            "Socket" : "2",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "1",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avenj/poex-irc-backend.git",
+         "web" : "https://github.com/avenj/poex-irc-backend"
+      }
+   },
+   "version" : "0.030003"
+}
+

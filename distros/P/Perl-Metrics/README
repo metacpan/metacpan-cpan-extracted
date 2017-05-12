@@ -1,0 +1,105 @@
+NAME
+    Perl::Metrics - The Perl Code Metrics System
+
+SYNOPSIS
+      # Load or create the metrics database
+      use Perl::Metrics '/var/cache/perl/metrics.sqlite';
+  
+      # Index and process a directory of code
+      Perl::Metrics->process_directory( '/home/adam/code/mycpan' );
+
+DESCRIPTION
+    The Perl Code Metrics System is a module which provides a Perl document
+    metrics processing engine, and a database in which to store the
+    resulting metrics data.
+
+    The intent is to be able to take a large collection of Perl documents,
+    and relatively easily parse the files and run a series of processes on
+    the documents.
+
+    The resulting data can then be stored, and later used to generate useful
+    information about the documents.
+
+  General Structure
+    Perl::Metrics consists of two primary components. Firstly, a
+    Class::DBI/SQLite database that stores the metrics informationg.
+
+    See Perl::Metrics::File and Perl::Metrics::Metric for the two data
+    classes stored in the database.
+
+    Secondly, a plugin structure for creating metrics packages that can
+    interoperate with the system, allowing it to take care of document
+    processing and data storage while the plugin can concentrate on the
+    actual generation of the metrics.
+
+    See Perl::Metrics::Plugin for more information.
+
+  Getting Started
+    "Perl::Metrics" comes with on default plugin,
+    Perl::Metrics::Plugin::Core, which provides a sampling of metrics.
+
+    To get started load the module, providing the database location as a
+    param (it will create it if needed). Then call the "process_directory"
+    method, providing it with an absolute path to a directory of Perl code
+    on the local filesystem.
+
+    "Perl::Metrics" will quitely sit there working away, and then when it
+    finishes you will have a nice database full of metrics data about your
+    files.
+
+    Of course, how you actually USE that data is up to you, but you can
+    query Perl::Metrics::File and Perl::Metrics::Metric for the data just
+    like any other Class::DBI database once you have collected it all.
+
+METHODS
+  index_file $absolute_path
+    The "index_file" method takes a single absolute file path and creates an
+    entry in the "files" index, referencing the file name to its "hex_id"
+    for later use.
+
+    Note that this does not execute any metrics on the file, merely allows
+    the system to "remember" the file for later.
+
+  index_directory $absolute_path
+    As for "index_file", the "index_directory" method will recursively scan
+    down a directory tree, locating all Perl files and adding them to the
+    file index.
+
+    Returns the number of files added.
+
+  process_index
+    The "process_index" method is the primary method for generating metrics
+    data. It triggering a metrics generation pass for all metrics on all
+    files currently in the index.
+
+  process_directory $absolute_path
+    The "process_directory" method is a convenience method. It runs an
+    "index_directory" call for the directory, and then triggers a
+    "process_index" call after the index has been populated.
+
+TO DO
+    - Provide a more useful set of default plugins
+
+    - Provide the option to process for a subset of plugins
+
+    - Implemented automatic integration with PPI::Cache
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Perl-Metrics>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2005 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

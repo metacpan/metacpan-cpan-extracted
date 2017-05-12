@@ -1,0 +1,9 @@
+Revision history for Perl extension HDB.
+
+2.0 2004-10-16
+     - Fixed memory leak for PLDelphi DLL.
+
+
+1.0  2004-10-2
+      - original version;
+

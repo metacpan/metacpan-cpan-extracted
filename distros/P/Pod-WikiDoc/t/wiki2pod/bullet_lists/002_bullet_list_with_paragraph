@@ -1,0 +1,22 @@
+* item one is very very
+long and spans more than one line
+* item two
+* item three
+#--------------------------------------------------------------------------#
+=over
+
+=item *
+
+item one is very very
+long and spans more than one line
+
+=item *
+
+item two
+
+=item *
+
+item three
+
+=back
+

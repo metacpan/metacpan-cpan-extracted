@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: gssdp-1.0
+Description: GObject-based SSDP library
+Version: 0.8.0
+Libs: -L${libdir} -lgssdp-1.0
+Cflags: -I${includedir}/gssdp-1.0
+Requires: gobject-2.0
+Requires.Private: libsoup-2.4

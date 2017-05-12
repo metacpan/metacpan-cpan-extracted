@@ -1,0 +1,84 @@
+NAME
+    PerlIO::fgets - Provides a "fgets()" like function for PerlIO file
+    handles
+
+SYNOPSIS
+        $octets = fgets(STDIN, 1024);
+        $octets = fgets(*STDIN, 1024);
+        $octets = fgets(\*STDIN, 1024);
+    
+        while ( ! eof($fh) ) {
+            defined( $_ = fgets($fh, 1024) ) or die "fgets failed: $!";
+            ...
+        }
+
+DESCRIPTION
+    Provides a "fgets()" like function for PerlIO file handles
+
+FUNCTIONS
+  fgets
+    Attempts to read a line from the given file handle $fh.
+
+    *Usage*
+
+        $octets = fgets($fh, $maximum);
+
+    *Arguments*
+
+    $fh The file handle to read from. Must be a PerlIO file handle.
+
+    $maximum
+        A positive integer containing the maximum number of octets to be
+        read from the file handle (including the trailing newline
+        character).
+
+    *Returns*
+
+    If "fgets" encounters end-of-file before a newline or $maximum octets
+    read before a newline, it returns the octets. If "fgets" reaches
+    end-of-file before reading any octets, it returns an empty string. If
+    unsuccessful, "fgets" returns "undef" and $! contains the I/O error.
+
+    *Note*
+
+    Unlike stdio's "fgets()", this implementation is not sensitive to input
+    containing null characters.
+
+EXPORTS
+    "fgets"
+
+LIMITATIONS
+    Current implementation has no understanding of Unicode (UTF-X), only
+    octets.
+
+PREREQUISITES
+  Run-Time
+    perl 5.8.1 or greater.
+    Exporter, core module.
+
+  Build-Time
+    In addition to Run-Time:
+
+    C compiler.
+    IO::File.
+    Test::More
+    Test::HexString.
+
+SEE ALSO
+    File::GetLineMaxLength.
+    File::fgets.
+
+SUPPORT
+    Please report any bugs or feature requests to
+    "bug-perlio-fgets@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PerlIO-fgets>
+
+AUTHOR
+    Christian Hansen "chansen@cpan.org"
+
+COPYRIGHT
+    Copyright 2010 by Christian Hansen.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,102 @@
+TODO LIST
+
+  - investigate "use base 'Catalyst::Controller'" and Class::C3
+  - don't show "Add Watch" if user is already watching the thread
+  - check "reply->post in thread" still works correctly
+  - refactor/tidy conf file(s)
+  - move search_dialog inline styles into CSS file
+  - fix "oversized image" bug
+  - local file permissions (for avatar uploads)
+  - 11:58 <marcus> btw did you consider packing the css and js to reduce the number of includes?
+    http://search.cpan.org/~pmichaux/JavaScript-Minifier-1.05/lib/JavaScript/Minifier.pm
+    http://search.cpan.org/~pmichaux/CSS-Minifier-0.01/lib/CSS/Minifier.pm
+  - Gravatar?
+  - OpenID?
+  - User Profile --> User Roles (for admins)
+  - use TheSchwartz
+  - forumcode "quickhelp" in posting screen(s)
+  - "Cancel" from post/edit
+  - "Cancel" from thread/reply
+  - Quick Reply
+  - login form doesn't submit onEnter
+  - TESTS, TESTS, TESTS!
+  - investigate in-application language preference/choice
+  - write some sensible T&Cs
+  - update avatar update response to force a No-Cache?
+  - proper moderator support/management
+     - forum creation
+     - abuse handling
+     - post editing (other users)
+     - IP/user reporting
+  - voting?
+  - 'smileys'?
+  - realtime time-format example update (my/prefs - tab_time)
+  - timezone menu usability
+  - posting page ForumCode help/tips
+  - database versioning
+  - ForumCode: thumbnail image, lightbox view?
+  - investigate: package Your::Schema; sub connect { do the check; next::method }
+  - investigate: DBIx::Class::Schema::Versioned
+  - investigate: t/model_Post.t / distinct count
+D - optional google ads
+D - update i18n from Advanced Search additions
+D - optional ReCAPTCHA during sign-up
+D - optional google analytics
+D - advanced search page
+D - fix "user information" CSS location
+D - skinning (user pref overrides CSS used?)
+D - skinning (config frile driven)
+D - use HTML::ForumCode::Cookbook::Recipe1 for message preview(s)
+D - fix <ul>/<ol> CSS
+D - setup guide; add mailing list details
+D - get latest i18n from DJ
+D - Parley::Version (a la SVK)
+D - login form flickers on IE7 page load
+D - [bug] user/profile doesn't show avatar
+D - add i18n for 'or'
+D - more visible Create New Thread
+D - [bug] can't logout
+D - styling: user prefs
+D - styling: user profile
+D - disabled menu items don't look disabled
+D - more visible Login/Register
+D - [bug] fix email notification for thread notification emails
+D - application logo
+D - styling: thread/reply
+D - styling: post/edit
+D - styling: user/login
+D - styling: thread/add
+D - post/edit: preview (message) code
+D - [bug] fix error when trying to post new thread with no subject line
+? - see if we can work out why 'make catalyst_par' is failing
+D - i18n Login and Cancel buttons in login_dialog
+D - fix CSS for <fieldset>s
+D - [bug] fix user's last post information (profile page)
+D - limit thread subject length on user profile page
+D - rename DB columns to be more sensible
+D - i18n email template files
+D - i18n help files
+D - setup/use ttcache
+D - add missing link to <img> tag to help/formatting_posts
+D - add missing link to BBCode to help/formatting_posts
+D - add license link to help/faq
+D - add T&C editor/updater
+D - add historic T&C view (for all users)
+D - Minimising clicks - After password reset
+D   "After the password reset has been accepted a page indicating that change
+D   was successful appears with link to login. How about triggering the usual
+D   enter password page saying the same thing so remove the need to click."
+D - add Message Preview to Create New Thread page (thread/add)
+D - show more forum/thread information
+D - see if it's possible to display the forum-name as the first
+D   entry for the popup menu
+D - show more info in the recently update threads page; number of views/posts
+D - sane T&C management
+D - extra forumcode markup: quote/pre/code
+D - message preview before posting
+D - proper/better validation error hadling for AJAX field updates
+D - user profile image uploads
+D - factor out error setting, handling and displaying
+D - install Proc::Daemon (etc) for email script
+D - factor out DFV "equality" functions
+D - factor out interval_ago() and _time_string()

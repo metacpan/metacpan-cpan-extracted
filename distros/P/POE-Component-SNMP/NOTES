@@ -1,0 +1,130 @@
+POE::Component::SNMP 0.90
+
+  Hi! I wanted to take a moment to explain how this version of this
+module came into being.  I intend to ramble a bit, and you do *not*
+need to read this to start using this module immediately.
+
+  In early May of 2004, I jumped on to the #POE channel on IRC, and
+merlyn (aka Randal Schwartz) was talking about a new POE script he was
+working on, to demonstrate POE combined with Tk.  merlyn and dngnand
+(aka Rocco Caputo, author of POE) were tossing variants back and forth
+like madmen, and while various versions were flying by in the channel,
+I grabbed one to see what the fuss was about.
+
+  The script in question worked as follows: Open a POE::Wheel::Run
+session, with this command: 
+
+ssh $hostname "while uptime; do sleep 3; done"
+
+Every 3 seconds, the host in question runs uptime(1), which, in
+addition to showing the number of days since the system's last reboot,
+also displays the system's load average over the last 1, 5, and 15
+minutes.  Send the output of this command to a POE event which parses
+the load averages out, and plot graphically using a Tk::Graph widget.
+
+  One of the variants the flew by that day was one called
+loadavg_multi.  It was capable of plotting the loads for multiple
+hosts simultaneously, in different colors.  Since I administer a
+network with roughly 30 or so active machines (with any number of
+domains and virtual domains), this was a great utility for me to
+monitor how they were doing, especially considering that part of my
+workstation's display was already dedicated to multiple xload(1)
+windows, showing exactly this data.
+
+  I added the program to my startup sequence, and was quite happy.  I
+even customized its output slightly to add an additional status report
+having to do with estimated network hits/day.  But after running it
+for a week or two, I noticed a problem: when the program's Tk window
+was closed, the ssh sessions it had opened had a tendency to *stay*
+open.  So the box I was running the graph on had a large number of
+stale ssh connections open, each running uptime(1) every 3 seconds,
+but none connected to any output.  This of course also included the
+resources consumed on the boxes being monitored, again by stale ssh
+sessions.
+
+  I looked for a different solution, and remembered that the NET-SNMP
+(formerly known as UCD-SNMP) daemon was capable of reporting system
+load average via a SNMP variable.  Ah-hah!  All I had to do was
+reconfigure the loadavg_multi program to use SNMP for its data instead
+of ssh, and I would have the best of both worlds!  And look, somebody
+had already written a POE::Component::SNMP... great!
+
+  So I updated the script so that it got its data via SNMP, but then I
+noticed something: the POE component (v0.01) had to be told explicitly
+to dispatch its SNMP calls.  After a closer look, it turned out that
+it didn't use POE's event loop at all, but instead blocked while
+dispatching its own events via the internal dispatcher within the
+Net::SNMP module.  Basically, the module's author had written a very
+thin wrapper over Net::SNMP so that it could was invoked via POE's
+events, but had not fully "POE-ized" the module.
+
+  So I looked at the problem field: It seems that Net::SNMP uses a
+singleton Dispatcher object to handle all of its scheduling and socket
+communication.  That seemed to have some potential, as that would mean
+that I might be able to simply replace that object with a POE-ized
+subclass of it, and not have to change anything else.  Additionally,
+dispatch seemed to be a sequence of listen/unlisten calls on UDP
+sockets, and basic time delays within its event queue.  So my job
+would be to intercept these calls to utilize POE's scheduling and
+select() behavior, and I shouldn't have to touch anything else.
+Great!
+
+  Over the course of the next 2 weeks or so, in between tasks at work
+and late at night at home, I subclassed Net::SNMP::Dispatcher as
+POE::Component::SNMP::Dispatcher.  So far I had managed to add
+behavior to POE-ize the POE SNMP component without having to touch the
+original at all.  I had only one cosmetic change I wanted to make, but
+could live without: when querying more than one host at a time, there
+was no internal method for determining which host had responded, when
+dispatching an event based on incoming SNMP data.  I had worked around
+it by adding the target's hostname to the list of variables I was
+querying for, but since I was experimenting privately, I could simply
+add the hostname to the list of variables returned to the event.
+
+  During this period, I had asked dngnand about a couple of POE
+details, and had suggested he load POE::Component::SNMP and look at a
+copy of my Dispatcher module to see what I was working on.  So dngnand
+went to load the component from CPAN, only to find that the original
+author had retired the module (which was now only available in the
+CPAN archives, and not the live network).
+
+  When I had completed the Dispatcher, I of course wanted to use it in
+the loadavg_multi script, to plot the load on multiple simultaneous
+hosts.  However, I found problem: Net::SNMP caches UDP socket handles
+based on the LOCAL address.  What this meant was, the same socket was
+being re-used for every query being made (regardless of how many
+target hosts), which meant that I couldn't listen for responses to
+more than one query (host) at a time.  Finally, I was now forced to
+modify the original POE::Component::SNMP module to pass parameters to
+Net::SNMP so that each SNMP session would get a different socket to
+listen on.  However, with this change the component was finally,
+truly, multiplexed and POE-ized.
+
+  (I've included my loadavg_multi_snmp version of merlyn's original
+script in the eg/ directory of the distribution.  If you find it
+useful, drop me a line!)
+
+  About this time, I contacted the module's original author, saying
+I'd like to revive the module and either send in my patches or inherit
+the module for myself.  I had to wait a few days (he was on vacation
+:-), but then he finally responded with his endorsement and permission
+for me to assume ownership of this POE component, for the good of the
+greater Perl (and POE) community.
+
+
+  So, with all that being said, I would like to publicly and profusely
+thank Todd Caine for his original work in wrapping and packaging the
+Net::SNMP module into the POE framework.  While his solution
+technically wasn't "complete", it did lay 95% of the groundwork for
+this module to reach the outside world.  I admit it, I'm great with
+back ends, and terrible with interfaces.  If I had been the originator
+of this module, the API would be clumsy and haphazard, and the
+usefulness of it to anybody else would have probably been severely
+limited.  As it was, I was able to extend this module without knowing
+*ANYTHING* about SNMP, my contributions to this module have been
+almost transparent to the user, and I've only added technical
+enhancement to what was already a well designed, well written, and
+well documented module.  Thank you, Todd!
+
+Rob Bloodgood
+June 10th, 2004

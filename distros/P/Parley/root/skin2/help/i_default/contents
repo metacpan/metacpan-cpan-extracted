@@ -1,0 +1,19 @@
+<h1>Help Contents</h1>
+
+<p>Obviously this page needs a bit more content, but we all have to start
+somewhere.</p>
+
+<h2>General Help</h2>
+<ol start="1">
+<li><a href="help/faq">Frequently Asked Questions</a></li>
+</ol>
+
+<h2>Posting</h2>
+<ol start="2">
+    <li><a href="help/formatting_posts">Adding (ForumCode) formatting to posts</a></li>
+</ol>
+
+<h2>General Information</h2>
+<ol start="3">
+    <li><a href="terms">Terms &amp; Conditions</a></li>
+</ol>

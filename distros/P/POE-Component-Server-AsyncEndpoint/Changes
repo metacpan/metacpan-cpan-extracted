@@ -1,0 +1,36 @@
+Revision history for Perl extension POE::Component::Server::AsyncEndpoint
+
+0.00  Mon Nov 26 11:59:07 2007
+	- original version; created by h2xs 1.23 with options
+		-XAn POE::Component::Server::AsyncEndpoint
+
+0.01  Wed Feb 13 23:40:00 2008 
+        - Publishing of first complete working version
+
+0.02  Thu Feb 14 08:17:00 2008 
+        - Fixed failed PAUSE indexer problem (put al files into a single dir)
+
+0.03  Sat Jun 21 06:50:00 2008 (never published)
+        - Created PoCo::Client::SOAP to wrap SOAP::Lite better
+                -Now handles reconnect exceptions
+                -Now wraps SOAP calls and errors in evals
+                -Optional endpoint shutdown on SOAP error
+                -Provides callbacks on important events
+        - Enhancements to PoCo::Server::AsyncEndpoint::ChannelAdapter::SOAP
+                -Now derives from PoCo::Client::SOAP
+                -Provides new init indicator (soc_stat)
+                -Backward compatible API
+        - TODO: Trapped IKC errors on death of endpoint
+
+0.10 Mon Oct 10 16:00:00 2008
+        - Removed integrated Web Server. New Web Server will be a
+          separate project. So will SNMP.
+        - Many enhancements and bug fixes
+        - Identified and removed most (if not all) leaks.
+        - Shutdown working
+        - MQ now uses file permanent storage
+        - Upgraded to work with latest releases of PoCo::MQ 
+          and PoCo::Client::Stomp
+        - Streamlined cleaner and simpler code for Endpoints
+
+

@@ -1,0 +1,16 @@
+0.03 2015-01-22 14:15:41
+      * Add SQL::Abstract reading facilities
+      * Add support for specifying keywords in weaver.ini file.
+
+0.0203 2015-01-20 17:12:44
+      * Add explicit Pod::Weaver dependency number
+      * Remove the use of Moose::Autobox
+
+0.0202 2015-01-13 10:49:04 2015 +0100
+      * Allow to have C<> parts in our documentation
+
+0.02  2014-12-29 12:55:01 UTC +2
+      * Use SQL::Statement in order to have complete SQL 'coloration'
+
+0.01  2014-12-23 16:31:07 UTC +2
+      * Initial idea to create and gather =sql command in pod

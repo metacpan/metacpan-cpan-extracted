@@ -1,0 +1,687 @@
+=head1 NAME
+
+PDL::FuncND - N dimensional version of functions
+
+
+=head1 SYNOPSIS
+
+    use PDL::FuncND;
+
+
+=head1 DESCRIPTION
+
+This module provides multi-dimensional implementations of common
+functions.
+
+=head1 FUNCTIONS
+
+=head2 cauchyND
+
+=for ref
+
+Evaluate the multi-variate Cauchy function on an N-dimensional grid or
+at a set of locations.
+
+
+=for usage
+
+  $a = cauchyND( [OPTIONAL TYPE], $nx, $ny, ..., \%options );
+  $b = cauchyND( $a, \%options );
+  cauchyND( inplace $a, \%options );
+  $a->inplace->cauchyND( \%options );
+
+
+B<cauchyND> can evaluate the function either on a grid or at discrete
+locations:
+
+=over
+
+=item * evaluation on a grid
+
+Either specify the output piddle dimensions explicitly,
+
+  $f = cauchyND( [ OPTIONAL TYPE], $nx, $ny, ..., \%options );
+
+or specify a template piddle I<without> specifying the C<vectors>
+option:
+
+  $f = cauchyND( $piddle, \%options );
+
+By default B<cauchyND> will evaluate the function at the I<indices> of
+the points in the input piddle.  These may be mapped to other values
+by specifying a transform with the C<transform> option.  B<cauchyND>
+is inplace aware, and will use B<$piddle> as the output piddle if its
+inplace flag is set.
+
+  cauchyND( inplace $f, \%options );
+  $f->inplace->cauchyND( \%options );
+
+=item * evaluation at a set of locations
+
+The input piddle should represent a set of vectors and should have a
+shape of (N,m), where C<m> is the number of vectors in the set. The
+C<vectors> option must also be set:
+
+  $piddle = pdl( [2,1], [3,1], [4,2]  );
+  $f = cauchyND( $piddle, { vectors => 1 } );
+
+The vectors may be transformed before use via the C<transform> option.
+
+=back
+
+The following options are available:
+
+=over
+
+=item C<center> | C<centre>
+
+The center of the distribution.  If not specified it defaults to the
+origin.
+
+This may take one of the following forms
+
+=over
+
+=item * A vector of shape (N).
+
+The location of the center. This may be either a Perl arrayref or a
+one dimensional piddle.  If the input coordinates are transformed,
+this is in the I<transformed> space.
+
+=item * the string C<auto>
+
+If the PDF is calculated on a grid, this will center the distribution on
+the grid. It is an error to use this for explicit locations.
+
+=item * An arrayref
+
+The first element of the array is a string indicating the meaning of
+the rest of the array.  The following are supported:
+
+=over
+
+=item * C<offset>
+
+The second element of the array is a piddle indicating an offset from
+an automatically generated center.  This allows easily accumulating
+multiple offset offsets.  For example:
+
+  $img  = cauchyND( double, 32, 32, { %attr, center => 'auto' } );
+  $img += moffatND( $img, { %moffat_attr,
+                            center => [ offset => [ 5.24, 0.3 ] ] } );
+
+
+=back
+
+
+=back
+
+=item C<transform>
+
+A PDL::Transform object to be applied to the input coordinates.
+
+=item C<scale>
+
+The scale. If the input coordinates are transformed
+via the C<transform> option, the units of scale are those in the
+I<transformed> space.  This may be specified as:
+
+=over
+
+=item * a scalar (Perl or piddle)
+
+This results in a symmetric distribution with the given scale along each
+coordinate.
+
+=item * a vector of shape (N) (piddle or Perl arrayref)
+
+This results in a distribution with the specified scales for each
+coordinate.
+
+=item * a matrix (piddle of shape (N,N))
+
+This should be a positive-definite matrix containing squared
+scales.
+
+=back
+
+=item C<theta> (Perl scalar)
+
+B<Only for 2D!> Applies a rotation (clockwise, e.g. +X
+rotates towards -Y) by the specified angle (specified in radians).
+
+=item C<log> (Boolean)
+
+If true, return the logarithm of the function. Defaults to false.
+
+=back
+
+=head2 gaussND
+
+=for ref
+
+Evaluate the sampled multi-dimensional Gaussian PDF on an
+N-dimensional grid or at a set of locations.
+
+=for usage
+
+  $f = gaussND( [OPTIONAL TYPE], $nx, $ny, ..., \%options );
+  $f = gaussND( $piddle, \%options );
+  gaussND( inplace $piddle, \%options );
+  $a->inplace->gaussND( \%options );
+
+
+B<gaussND> can evaluate the function either on a grid or at discrete
+locations:
+
+=over
+
+=item * evaluation on a grid
+
+Either specify the output piddle dimensions explicitly,
+
+  $f = gaussND( [ OPTIONAL TYPE], $nx, $ny, ..., \%options );
+
+or specify a template piddle I<without> specifying the C<vectors>
+option:
+
+  $f = gaussND( $piddle, \%options );
+
+By default B<gaussND> will evaluate the function at the I<indices> of
+the points in the input piddle.  These may be mapped to other values
+by specifying a transform with the C<transform> option.  B<gaussND> is
+inplace aware, and will use B<$piddle> as the output piddle if its
+inplace flag is set.
+
+  gaussND( inplace $f, \%options );
+  $f->inplace->gaussND( \%options );
+
+=item * evaluation at a set of locations
+
+The input piddle should represent a set of vectors and should have a
+shape of (N,m), where C<m> is the number of vectors in the set. The
+C<vectors> option must also be set:
+
+  $piddle = pdl( [2,1], [3,1], [4,2]  );
+  $f = gaussND( $piddle, { vectors => 1 } );
+
+The vectors may be transformed before use via the C<transform> option.
+
+=back
+
+The following options are available:
+
+=over
+
+=item C<center> | C<centre>
+
+The center of the distribution.  If not specified it defaults to the
+origin.
+
+This may take one of the following values:
+
+=over
+
+=item * A vector of shape (N).
+
+The location of the center. This may be either a Perl arrayref or a
+one dimensional piddle.  If the input coordinates are transformed,
+this is in the I<transformed> space.
+
+=item * the string C<auto>
+
+If the PDF is calculated on a grid, this will center the distribution on
+the grid. It is an error to use this for explicit locations.
+
+=back
+
+=item C<transform>
+
+A PDL::Transform object to be applied to the input coordinates.
+
+=item C<scale>
+
+The scale. If the input coordinates are transformed
+via the C<transform> option, the units of scale are those in the
+I<transformed> space.  This may be specified as:
+
+=over
+
+=item * a scalar (Perl or piddle)
+
+This results in a symmetric distribution with the given scale along each
+coordinate.
+
+=item * a vector of shape (N) (piddle or Perl arrayref)
+
+This results in a distribution with the specified scales for each
+coordinate.
+
+=item * the full covariance matrix (piddle of shape (N,N))
+
+This results in a distribution with correlated scales. At present this
+matrix is not verified to be a legitimate covariance matrix.
+
+=back
+
+=item C<theta> (Perl scalar)
+
+B<Only for 2D!> Applies a rotation (clockwise, e.g. +X
+rotates towards -Y) by the specified angle (specified in radians).
+
+=item C<log> (Boolean)
+
+If true, return the logarithm of the function. Defaults to false.
+
+=back
+
+=head2 lorentzND
+
+=for ref
+
+Evaluate the multi-dimensional Lorentz function on an
+N-dimensional grid or at a set of locations.
+
+=for usage
+
+  $f = lorentzND( [OPTIONAL TYPE], $nx, $ny, ..., \%options );
+  $f = lorentzND( $piddle, \%options );
+  lorentzND( inplace $piddle, \%options );
+  $a->inplace->lorentzND( \%options );
+
+
+The Lorentz function is usually defined in one dimension as.
+
+                       2
+                      g
+  f(x; x0, g) = --------------
+                       2    2
+                (x - x0)  + g
+
+
+where I<g> is the half-width at half-max (HWHM).  The two dimensional
+symmetric analogue (sometimes called the "radial Lorentz
+function") is
+
+                                    2
+                                   g
+  f(x, y; x0, y0, g) = --------------------------
+                               2           2    2
+                       (x - x0)  + (y - y0)  + g
+
+
+One can extend this to an asymmetric form by writing it as
+
+                            1
+  f(x; u, S) = ---------------------------
+                      T    -1
+               (x - u)  . S  . (x - u) + 1
+
+where I<x> is now a vector, I<u> is the expectation value of the
+distribution, and I<S> is a matrix describing the N-dimensional scale
+of the distribution akin to (but not the same as!) a covariance matrix.
+
+For example, a symmetric 2D Lorentz with HWHM of I<g> has
+
+       [  2     ]
+       [ g   0  ]
+  S =  [        ]
+       [      2 ]
+       [ 0   g  ]
+
+while an elliptical distribution elongated twice as much along the
+I<X> axis as the I<Y> axis would be:
+
+       [     2      ]
+       [ (2*g)   0  ]
+  S =  [            ]
+       [          2 ]
+       [ 0       g  ]
+
+
+B<lorentzND> extends the Lorentz function to N dimensions by treating
+I<x> and I<u> as vectors of length I<N>, and I<S> as an I<NxN> matrix.
+
+B<Please note!> While the one dimensional Lorentz function is
+equivalent to the one-dimensional Cauchy (aprt from, in this
+formulation, the normalization constant), this formulation of the
+multi-dimensional Lorentz function is B<not> equivalent to the
+multi-dimensional Cauchy!
+
+
+It can evaluate the function either on a grid or at discrete
+locations:
+
+=over
+
+=item * evaluation on a grid
+
+Either specify the output piddle dimensions explicitly,
+
+  $f = lorentzND( [ OPTIONAL TYPE], $nx, $ny, ..., \%options );
+
+or specify a template piddle I<without> specifying the C<vectors>
+option:
+
+  $f = lorentzND( $piddle, \%options );
+
+By default B<lorentzND> will evaluate the function at the I<indices> of
+the points in the input piddle.  These may be mapped to other values
+by specifying a transform with the C<transform> option.  B<lorentzND> is
+inplace aware, and will use B<$piddle> as the output piddle if its
+inplace flag is set.
+
+  lorentzND( inplace $f, \%options );
+  $f->inplace->lorentzND( \%options );
+
+=item * evaluation at a set of locations
+
+The input piddle should represent a set of vectors and should have a
+shape of (N,m), where C<m> is the number of vectors in the set. The
+C<vectors> option must also be set:
+
+  $piddle = pdl( [2,1], [3,1], [4,2]  );
+  $f = lorentzND( $piddle, { vectors => 1 } );
+
+The vectors may be transformed before use via the C<transform> option.
+
+=back
+
+The following options are available:
+
+=over
+
+=item C<center> | C<centre>
+
+The center of the distribution.  If not specified it defaults to the
+origin.
+
+This may take one of the following values:
+
+=over
+
+=item * A vector of shape (N).
+
+The location of the center. This may be either a Perl arrayref or a
+one dimensional piddle.  If the input coordinates are transformed,
+this is in the I<transformed> space.
+
+=item * the string C<auto>
+
+If the PDF is calculated on a grid, this will center the distribution on
+the grid. It is an error to use this for explicit locations.
+
+=back
+
+=item C<transform>
+
+A PDL::Transform object to be applied to the input coordinates.
+
+=item C<scale>
+
+The scale. If the input coordinates are transformed
+via the C<transform> option, the units of scale are those in the
+I<transformed> space.  This may be specified as:
+
+=over
+
+=item * a scalar (Perl or piddle)
+
+This results in a symmetric distribution with the given scale along each
+coordinate.
+
+=item * a vector of shape (N) (piddle or Perl arrayref)
+
+This results in a distribution with the specified scales for each
+coordinate.
+
+=item * a matrix (piddle of shape (N,N))
+
+This should be a positive-definite matrix containing squared
+scales.
+
+=back
+
+=item C<theta> (Perl scalar)
+
+B<Only for 2D!> Applies a rotation (clockwise, e.g. +X
+rotates towards -Y) by the specified angle (specified in radians).
+
+=back
+
+
+=head2 moffatND
+
+=for ref
+
+Evaluate the multi-dimensional Moffat distribution on an
+N-dimensional grid or at a set of locations.
+
+=for usage
+
+  $f = moffatND( [OPTIONAL TYPE], $nx, $ny, ..., \%options );
+  $f = moffatND( $piddle, \%options );
+  moffatND( inplace $piddle, \%options );
+  $a->inplace->moffatND( \%options );
+
+
+The Moffat distribution is usually defined in two dimensions as.
+
+                                                           2    2
+                                              2  -1       x  + y  -beta
+  f(x, y, alpha, beta) := (beta - 1) (pi alpha  )    (a + -------)
+                                                                2
+                                                           alpha
+
+
+In astronomy this is also known (confusingly) as the beta function, and is
+often expressed in radial form:
+
+                                               2
+                        2 r (beta - 1)        r    -beta
+  fr(r, alpha, beta) := -------------- (1 + ------)
+                                 2               2
+                            alpha           alpha
+
+One can extend the Cartesion expression to an n-dimensional asymmetric
+form by writing it as
+
+  fn(x, u, S, alpha, beta) :=
+
+       gamma(beta)        n/2    1/2  -1              T   -1         -beta
+    ----------------- ( pi    |S|    )    (1 + (x - u) . S . (x - u))
+          2 beta - n
+    gamma(----------)
+              2
+
+where I<n> is the number of dimensions, I<x> is now a vector, I<u> is
+the expectation value of the distribution, and I<S> is a matrix
+describing the N-dimensional scale of the distribution akin to (but
+not the same as!) a covariance matrix.
+
+Note that the integral of the distribution diverges for C<< beta <= n/2 >>.
+
+B<moffatND> extends the Moffat function to N dimensions by treating
+I<x> and I<u> as vectors of length I<N>, and I<S> as an I<NxN> matrix.
+
+It can evaluate the function either on a grid or at discrete
+locations:
+
+=over
+
+=item * evaluation on a grid
+
+Either specify the output piddle dimensions explicitly,
+
+  $f = moffatND( [ OPTIONAL TYPE], $nx, $ny, ..., \%options );
+
+or specify a template piddle I<without> specifying the C<vectors>
+option:
+
+  $f = moffatND( $piddle, \%options );
+
+By default B<moffatND> will evaluate the function at the I<indices> of
+the points in the input piddle.  These may be mapped to other values
+by specifying a transform with the C<transform> option.  B<moffatND> is
+inplace aware, and will use B<$piddle> as the output piddle if its
+inplace flag is set.
+
+  moffatND( inplace $f, \%options );
+  $f->inplace->moffatND( \%options );
+
+=item * evaluation at a set of locations
+
+The input piddle should represent a set of vectors and should have a
+shape of (N,m), where C<m> is the number of vectors in the set. The
+C<vectors> option must also be set:
+
+  $piddle = pdl( [2,1], [3,1], [4,2]  );
+  $f = moffatND( $piddle, { vectors => 1 } );
+
+The vectors may be transformed before use via the C<transform> option.
+
+=back
+
+The following options are available:
+
+=over
+
+=item C<beta>
+
+The Moffat I<beta> parameter. Required.
+
+=item C<center> | C<centre>
+
+The center of the distribution.  If not specified it defaults to the
+origin.
+
+This may take one of the following values:
+
+=over
+
+=item * A vector of shape (N).
+
+The location of the center. This may be either a Perl arrayref or a
+one dimensional piddle.  If the input coordinates are transformed,
+this is in the I<transformed> space.
+
+=item * the string C<auto>
+
+If the PDF is calculated on a grid, this will center the distribution on
+the grid. It is an error to use this for explicit locations.
+
+=back
+
+=item C<transform>
+
+A PDL::Transform object to be applied to the input coordinates.
+
+=item C<scale>
+
+The scale. If the input coordinates are transformed
+via the C<transform> option, the units of scale are those in the
+I<transformed> space.  This may be specified as:
+
+=over
+
+=item * a scalar (Perl or piddle)
+
+This results in a symmetric distribution with the given scale along each
+coordinate.
+
+=item * a vector of shape (N) (piddle or Perl arrayref)
+
+This results in a distribution with the specified scales for each
+coordinate.
+
+=item * a matrix (piddle of shape (N,N))
+
+This should be a positive-definite matrix containing squared
+scales.
+
+=back
+
+=item C<theta> (Perl scalar)
+
+B<Only for 2D!> Applies a rotation (clockwise, e.g. +X
+rotates towards -Y) by the specified angle (specified in radians).
+
+=back
+
+
+=head2 mahalanobis
+
+=for ref
+
+Calculate the Mahalanobis distance for one or more vectors
+
+=for sig
+
+  Signature: ( x(n,m), s(n,n), [o]d(m), \%options )
+
+=for usage
+
+  $d = mahalanobis( $v, $S, \%options );
+  mahalanobis( $v, $S, $d, \%options );
+
+The Mahalanobis distance of a multivariate vector (v) from a location
+(u) with a covariance matrix (S) is defined as
+
+  dm(x,u) = sqrt( (v-u)T S^-1 (v-u) )
+
+The input piddle representing the vectors (C<$v>) must have shape (N,m),
+where C<N> is the dimension of the vector space and C<m> is the number
+of vectors.
+
+The input covariance matrix (C<$S>) must have shape (N,N).  It is I<not>
+checked for validity.
+
+The available options are:
+
+=over
+
+=item C<center> | C<centre>
+
+The vector from which the distance is to be calculated.  It must have shape (N).
+It defaults to the origin.
+
+=item C<inverted>
+
+If true, the input matrix is the inverse of the covariance matrix.
+Defaults to false.
+
+=item C<squared>
+
+if true, the returned values are the distances squared.
+
+=back
+
+
+=head1 SEE ALSO
+
+PDL::Func.
+
+=head1 BUGS
+
+Please report bugs to https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-FuncND.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2010-2012 The Smithsonian Astrophysical Observatory
+
+PDL::FuncND is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+=head1 AUTHOR
+
+Diab Jerius  E<lt>djerius@cpan.orgE<gt>

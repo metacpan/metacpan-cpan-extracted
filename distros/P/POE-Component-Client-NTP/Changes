@@ -1,0 +1,126 @@
+==================================================
+Changes from 2010-02-13 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.14 at 2015-02-12 16:25:56 +0000
+-----------------------------------------
+
+  Change: 3efe47f492556b60d3c0e862db3cfe31f1ea5c4a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-02-12 16:25:56 +0000
+
+    Added hexadecimal timestamps for ref, org and trans 
+
+-----------------------------------------
+version 0.12 at 2015-01-17 12:25:13 +0000
+-----------------------------------------
+
+  Change: af08fa5d10f697920095621f95d2ad80f6af036a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-01-17 12:25:13 +0000
+
+    Integrated changes from Net::NTP
+
+    - Add calculated 'Offset' and 'Delay' to response
+
+    - Fix ntp originate timestamp to be NTP epoch's
+
+    - Minor tweaks to improve timeouts
+
+    - Lower default timeout to 5 seconds
+
+    - Tiny refactor; make sure Time::HiRes is loaded 
+
+-----------------------------------------
+version 0.10 at 2014-10-05 12:56:09 +0000
+-----------------------------------------
+
+  Change: 9839543ac1b5c9405eba117f0ec409e8ed9400bb
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-10-05 13:56:09 +0000
+
+    Should support IPv6 now 
+
+-----------------------------------------
+version 0.08 at 2013-11-09 16:13:25 +0000
+-----------------------------------------
+
+  Change: ea8beb5059970ac57d10cabfe60fadfebbd31061
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-11-09 16:13:25 +0000
+
+    Remove Net::IP prereq as it isn't used 
+
+-----------------------------------------
+version 0.06 at 2012-05-28 17:47:09 +0000
+-----------------------------------------
+
+  Change: b42a3ae65af9f0153f0eed613bedc4575109a893
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-05-28 18:47:09 +0000
+
+    Fix wording in POD that completely changes the meaning of the
+    sentence. Doh. 
+
+  Change: a47d87f3e9d4239d23bc3bfb4c875ffd16cc295d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-08-04 11:07:05 +0000
+
+    Bump version to 0.04 
+
+  Change: cae1c007cabbcb8b6037d4989a4a30778727111b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-08-04 11:07:05 +0000
+
+    Update tests for 'host' and 'context' responses 
+
+  Change: 215c397c109df56a8902dd4c1eb47ca70ed00a16
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-08-04 11:07:05 +0000
+
+    Pass the 'host' back in the response event 
+
+  Change: e39882f2a6f7c0017eeaf893c51ddc91ab5d90d6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-08-04 11:07:05 +0000
+
+    Convert distribution to Dist::Zilla 
+
+  Change: ae5aa507d1c108d70875605f42620939d56cf4c3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-08-04 10:50:44 +0000
+
+    Convert distribution to Dist::Zilla 
+
+-----------------------------------------
+version 0.04 at 2011-08-04 10:02:29 +0000
+-----------------------------------------
+
+  Change: c0e77a7b464f62e37829592996491c0687927b0a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-08-04 11:02:29 +0000
+
+    Bump version to 0.04 
+
+  Change: af7e66f875ee12ac9dd906f806384a72b1882f30
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-08-04 11:01:53 +0000
+
+    Update tests for 'host' and 'context' responses 
+
+  Change: 8d0079efd326fecf7b6cf15c48f0e0cf285cb6fc
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-08-04 10:57:36 +0000
+
+    Pass the 'host' back in the response event 
+
+  Change: 96144838b806be6d1b998b92194cbb5b7e54551e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-08-04 10:57:29 +0000
+
+    Convert distribution to Dist::Zilla 
+
+===============================================
+Plus 1 release after 2010-02-13 00:00:00 +0000.
+===============================================

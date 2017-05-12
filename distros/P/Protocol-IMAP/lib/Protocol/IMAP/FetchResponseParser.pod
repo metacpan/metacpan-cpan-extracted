@@ -1,0 +1,32 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::IMAP::FetchResponseParser
+at lib/Protocol/IMAP/FetchResponseParser.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+(key "value")
+(key {5}
+12345)
+(key {5}
+12345 key2 {6}
+123456 key3{3}
+123 key4{5}
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Parser::MGC>
+
+L<any_of|Parser::MGC/any_of>, L<at_eos|Parser::MGC/at_eos>, L<commit|Parser::MGC/commit>, L<expect|Parser::MGC/expect>, L<fail|Parser::MGC/fail>, L<fail_from|Parser::MGC/fail_from>, L<from_file|Parser::MGC/from_file>, L<from_reader|Parser::MGC/from_reader>, L<from_string|Parser::MGC/from_string>, L<generic_token|Parser::MGC/generic_token>, L<list_of|Parser::MGC/list_of>, L<maybe|Parser::MGC/maybe>, L<maybe_expect|Parser::MGC/maybe_expect>, L<new|Parser::MGC/new>, L<one_of|Parser::MGC/one_of>, L<pos|Parser::MGC/pos>, L<scope_level|Parser::MGC/scope_level>, L<scope_of|Parser::MGC/scope_of>, L<sequence_of|Parser::MGC/sequence_of>, L<skip_ws|Parser::MGC/skip_ws>, L<substring_before|Parser::MGC/substring_before>, L<token_float|Parser::MGC/token_float>, L<token_ident|Parser::MGC/token_ident>, L<token_int|Parser::MGC/token_int>, L<token_kw|Parser::MGC/token_kw>, L<token_number|Parser::MGC/token_number>, L<token_string|Parser::MGC/token_string>, L<where|Parser::MGC/where>
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+

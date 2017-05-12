@@ -1,0 +1,7 @@
+Revision history for Perl extension Parse::YARA.
+
+0.02 Sun Sep 01 01:55:00 UTC 2013
+    - Updated to resolve issues with hash ordering in perl >= 5.18
+
+0.01 Wed Jun 12 21:47:00 UTC 2013
+    - Initial build for testing

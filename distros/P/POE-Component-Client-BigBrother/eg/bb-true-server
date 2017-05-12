@@ -1,0 +1,72 @@
+#!perl
+use strict;
+use POE qw< Component::Server::BigBrother >;
+use Term::ANSIColor qw< :constants >;
+
+
+my %ansi = (
+    blue        => BLUE,
+    clear       => "",
+    green       => GREEN,
+    purple      => MAGENTA,
+    red         => RED,
+    yellow      => YELLOW,
+    reset       => RESET,
+);
+
+my $colors_re = "blue|green|purple|red|yellow";
+$Term::ANSIColor::AUTORESET = 1;
+
+POE::Component::Server::BigBrother->spawn(
+    alias   => "BigBrother",
+);
+
+POE::Session->create(
+    inline_states => {
+        _start      => sub {
+            print "listening on localhost:1984\n";
+            $_[KERNEL]->post(BigBrother => register => "all");
+        },
+
+        bb_status   => \&print_cmd,
+        bb_page     => \&print_cmd,
+        bb_enable   => \&print_cmd,
+        bb_disable  => \&print_cmd,
+        bb_event    => \&print_event,
+    },
+);
+
+POE::Kernel->run;
+
+
+sub print_cmd {
+    my $cmd = $_[ARG0];
+
+    # add colors
+    $cmd->{$_} =~ s/(^|&)($colors_re)/$ansi{$2}$1$2$ansi{reset}/g
+        for qw< color data >;
+
+    # indent the data
+    $cmd->{data} =~ s/^/    /gm;
+    $cmd->{data} = "\n$cmd->{data}";
+
+    print BOLD, "received ", YELLOW, $cmd->{command}, RESET,
+        BOLD(" command:"), "\n",
+        map { "  ".BOLD($_).": $cmd->{$_}\n" }
+            qw< host_name offset probe color data >;
+}
+
+sub print_event {
+    my $cmd = $_[ARG0];
+
+    # add colors
+    $cmd->{params} =~ s/&($colors_re)/$ansi{$1}&$1$ansi{reset}/g;
+
+    # indent the data
+    $cmd->{params} =~ s/^/    /gm;
+
+    print BOLD, "received ", YELLOW, $cmd->{command}, RESET,
+        BOLD(" command:"), "\n",
+        "  params:\n$cmd->{params}";
+}
+

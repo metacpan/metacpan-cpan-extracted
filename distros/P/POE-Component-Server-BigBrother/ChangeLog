@@ -1,0 +1,42 @@
+2010-04-13  Yves Blusseau  <yblusseau@cpan.org>
+
+	* Version 0.08 released
+	* lib/POE/Component/Server/BigBrother.pm (_start): Adapt to POE::Component::Server::TCP v1.020 new args
+
+2010-03-24  Yves Blusseau  <yblusseau@cpan.org>
+
+	* Version 0.07 released
+	* lib/POE/Component/Server/BigBrother.pm: Add new option to specify
+	max message size
+	Truncate too long messages
+
+2009-06-19  Yves BLUSSEAU  <yblusseau@cpan.org>
+
+	* Version 0.06 released
+	* Removing concurrency checks
+
+2009-06-19  Yves BLUSSEAU  <yblusseau@cpan.org>
+
+	* Version 0.05 released
+	* Add bind_addr argument so we can specify the bind address
+
+2009-06-15  Yves BLUSSEAU  <yblusseau@cpan.org>
+
+	* Version 0.04 released
+	* Add functions to parse BigBrother events
+
+2008-11-26  Yves BLUSSEAU  <yblusseau@cpan.org>
+
+	* Version 0.03 released
+	* lib/POE/Component/Server/BigBrother.pm (_on_client_input):
+	  fix a bug decoding enable messages
+
+2008-11-10  Yves BLUSSEAU  <yblusseau@cpan.org>
+
+	* Version 0.02 released
+	* lib/POE/Component/Server/BigBrother.pm (_on_client_input):
+	  retrieve period for enable/disable messages
+
+2008-06-24  Yves BLUSSEAU  <yblusseau@cpan.org>
+
+	* Version 0.01 released

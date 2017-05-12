@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Protocol/PerlDebugCLI.pm
+lib/Protocol/PerlDebugCLI/Request.pm
+t/00-pod.t
+t/00-use.t
+t/release-localbrew-dzil-clean-5.10.1.t
+t/release-localbrew-dzil-clean-5.12.4.t
+t/release-localbrew-dzil-clean-5.14.2.t
+t/release-localbrew-dzil-clean-5.8.9.t
+t/simple.t

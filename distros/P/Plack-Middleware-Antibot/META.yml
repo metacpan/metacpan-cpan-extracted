@@ -1,0 +1,51 @@
+---
+abstract: 'Prevent bots from submitting forms'
+author:
+  - 'Viacheslav Tykhanovskyi, <viacheslav.t@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Antibot
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::Antibot:
+    file: lib/Plack/Middleware/Antibot.pm
+    version: '0.02'
+  Plack::Middleware::Antibot::FakeField:
+    file: lib/Plack/Middleware/Antibot/FakeField.pm
+  Plack::Middleware::Antibot::FilterBase:
+    file: lib/Plack/Middleware/Antibot/FilterBase.pm
+  Plack::Middleware::Antibot::Static:
+    file: lib/Plack/Middleware/Antibot/Static.pm
+  Plack::Middleware::Antibot::TextCaptcha:
+    file: lib/Plack/Middleware/Antibot/TextCaptcha.pm
+  Plack::Middleware::Antibot::TooFast:
+    file: lib/Plack/Middleware/Antibot/TooFast.pm
+  Plack::Middleware::Antibot::TooSlow:
+    file: lib/Plack/Middleware/Antibot/TooSlow.pm
+requires:
+  Plack: '0'
+  Plack::Session: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/vti/plack-middleware-antibot/issues
+  homepage: https://github.com/vti/plack-middleware-antibot
+  repository: git://github.com/vti/plack-middleware-antibot.git
+version: '0.02'
+x_authority: cpan:VTI

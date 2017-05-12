@@ -1,0 +1,25 @@
+SYNOPSIS
+
+     use Perinci::CmdLine::Call qw(call_cli_script);
+    
+     # returns an enveloped response
+     my $res = call_cli_script(
+         script => "lcpan",
+         argv   => [qw/deps -R Text::ANSI::Util/],
+     );
+    
+     # sample result:
+     # [200, "OK", [
+     #     {author=>"PERLANCAR", module=>"Text::WideChar::Util", version=>"0.10"},
+     #     {author=>"NEZUMI"   , module=>"  Unicode::GCString" , version=>"0"},
+     #     {author=>"NEZUMI"   , module=>"    MIME::Charset"   , version=>"v1.6.2"},
+     # ]]
+
+DESCRIPTION
+
+SEE ALSO
+
+    Perinci::CmdLine, Perinci::CmdLine::Lite, Perinci::CmdLine::Classic
+
+    Rinci
+

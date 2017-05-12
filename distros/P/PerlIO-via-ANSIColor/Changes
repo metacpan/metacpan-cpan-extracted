@@ -1,0 +1,18 @@
+Revision history for PerlIO-via-ANSIColor
+
+0.01  Thu Jul 19 20:54:39 2007
+      Initial release.
+
+0.02  Fri Jul 20 19:26:17 2007
+      Changed t/perlctiric.t skip test when there is no Test::Perl::Critic.
+
+0.03  Mon Jul 23 10:43:15 2007
+      Updated POD document.
+      an example of Multiple STDOUT filehandles by
+        slaven <at> rezic <dot> de.
+
+0.04  Tue Aug 28 23:29:01 2007
+      Fixed bug at WRITE().
+
+0.05  Wed Oct 26 12:25:15 2011
+      Do not run test critic for normal users.

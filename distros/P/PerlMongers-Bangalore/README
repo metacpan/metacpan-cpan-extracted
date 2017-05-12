@@ -1,0 +1,75 @@
+NAME
+    PerlMongers::Bangalore - We are the Bangalore Perl Mongers
+
+VERSION
+    version 0.07
+
+SYNOPSIS
+        use PerlMongers::Bangalore qw(info);
+        
+        info();
+
+  WEBSITE
+    http://www.bangalore.pm.org
+
+  MEETUPS
+    http://bangalore.pm.org/meetups.html
+
+  DISCUSSION BOARD
+    http://bangalore.pm.org/forum.html
+
+  IRC Channel
+    irc.perl.org #bangalore.pm
+
+  MAILING LIST (SUBSCRIBE HERE)
+    http://mail.pm.org/mailman/listinfo/bangalore-pm
+
+  MAIL ARCHIVES
+    http://mail.pm.org/pipermail/bangalore-pm/
+
+    "Perl"
+
+METHODS
+  info
+    Returns information about the Bangalore Perl Mongers. At this time it
+    returns the perl pod of this module
+
+NAME
+    PerlMongers::Bangalore - We are the Bangalore Perl Mongers, find us at
+    all the places listed below! If you are in or around Bangalore near the
+    first week of a month, do drop by for our meetups listed at
+    bangalore.pm.org. Discuss this module at Bangalore.pm discussion page
+    for this module
+    <http://bangalore.pm.org/forum/6-module-plugins-frameworks-and-downloads
+    /52-perlmongersbangalore.html>
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through github at
+    <https://github.com/shantanubhadoria/perlmongers-bangalore/issues>. You
+    will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/shantanubhadoria/perlmongers-bangalore>
+
+      git clone git://github.com/shantanubhadoria/perlmongers-bangalore.git
+
+AUTHOR
+    Shantanu Bhadoria <shantanu at cpan dott org>
+
+CONTRIBUTORS
+    *   Shantanu <shantanu@cpan.org>
+
+    *   Shantanu Bhadoria <shantanu.bhadoria@gmail.com>
+
+    *   Shantanu Bhadoria <shantanu@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Shantanu Bhadoria.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

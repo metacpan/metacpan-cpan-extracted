@@ -1,0 +1,88 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre2It\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-27 15:33+0300\n"
+"PO-Revision-Date: 2010-12-06 23:59+0100\n"
+"Last-Translator: Burak Gürsoy <burak@cpan.org>\n"
+"Language-Team: Padre2It <simone.blandino@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Italian\n"
+"X-Poedit-Country: ITALY\n"
+
+#: lib/Padre/Plugin/Autodia.pm:37
+msgid "Autodia UML Support"
+msgstr "Autodia UML Desteği"
+
+#: lib/Padre/Plugin/Autodia.pm:59
+msgid "About"
+msgstr "Hakkında"
+
+#: lib/Padre/Plugin/Autodia.pm:60
+msgid "UML"
+msgstr "UML"
+
+#: lib/Padre/Plugin/Autodia.pm:61
+msgid "Class Diagram (This File)"
+msgstr "Sınıf Diyagramı (Bu Dosya)"
+
+#: lib/Padre/Plugin/Autodia.pm:62
+msgid "Class Diagram"
+msgstr "Sınıf Diyagramı"
+
+#: lib/Padre/Plugin/Autodia.pm:80
+msgid "Copyright 2010 Aaron Trevena"
+msgstr "Telif Hakkı 2010 Aaron Trevena"
+
+#: lib/Padre/Plugin/Autodia.pm:135
+msgid "JavaScript Files"
+msgstr "JavaScript Dosyaları"
+
+#: lib/Padre/Plugin/Autodia.pm:137
+msgid "Perl Files"
+msgstr "Perl Dosyaları"
+
+#: lib/Padre/Plugin/Autodia.pm:139
+msgid "PHP Files"
+msgstr "PHP Dosyaları"
+
+#: lib/Padre/Plugin/Autodia.pm:141
+msgid "Python Files"
+msgstr "Python Dosyaları"
+
+#: lib/Padre/Plugin/Autodia.pm:143
+msgid "Ruby Files"
+msgstr "Ruby Dosyaları"
+
+#: lib/Padre/Plugin/Autodia.pm:145
+msgid "SQL Files"
+msgstr "SQL Dosyaları"
+
+#: lib/Padre/Plugin/Autodia.pm:147
+msgid "Text Files"
+msgstr "Metin Dosyaları"
+
+#: lib/Padre/Plugin/Autodia.pm:149
+msgid "Web Files"
+msgstr "Ağ Dosyaları"
+
+#: lib/Padre/Plugin/Autodia.pm:162
+#, perl-format
+msgid "%s Files"
+msgstr "%s Dosyaları"
+
+#: lib/Padre/Plugin/Autodia.pm:164
+msgid "All Files"
+msgstr "Tüm Dosyalar"
+
+#: lib/Padre/Plugin/Autodia.pm:174
+msgid "Open File"
+msgstr "Dosya Aç"
+

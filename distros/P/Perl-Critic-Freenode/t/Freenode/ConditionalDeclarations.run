@@ -1,0 +1,15 @@
+## name ConditionalDeclarations
+## failures 3
+## cut
+
+my $foo = $bar if $baz;
+my ($foo, $bar) = @baz unless $abc;
+our $foo = $_ for @bar;
+
+## name UnconditionalDeclarations
+## failures 0
+## cut
+
+my $foo = $bar;
+$foo = $bar if $baz;
+our $bar = $baz ? 1 : 2;

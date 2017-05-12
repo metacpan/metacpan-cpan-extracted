@@ -1,0 +1,39 @@
+---
+name: POE-Devel-ProcAlike
+version: 0.02
+author:
+  - 'Apocalypse <APOCAL@cpan.org>'
+abstract: Exposing POE guts via FUSE
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Filesys::Virtual::Async::Dispatcher: 0
+  Filesys::Virtual::Async::inMemory: 0
+  Fuse: 0.09
+  POE: 1.003
+  POE::API::Peek: 0
+  POE::Component::AIO: 0
+  POE::Component::Fuse: 0.02
+  POE::Session::AttributeBased: 0
+  perl: 5.006
+build_requires:
+  Test::More: 0.86
+dynamic_config: 0
+provides:
+  POE::Devel::ProcAlike:
+    file: lib/POE/Devel/ProcAlike.pm
+    version: 0.02
+  POE::Devel::ProcAlike::ModuleInfo:
+    file: lib/POE/Devel/ProcAlike/ModuleInfo.pm
+    version: 0.02
+  POE::Devel::ProcAlike::POEInfo:
+    file: lib/POE/Devel/ProcAlike/POEInfo.pm
+    version: 0.02
+  POE::Devel::ProcAlike::PerlInfo:
+    file: lib/POE/Devel/ProcAlike/PerlInfo.pm
+    version: 0.02
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,30 @@
+Revision history for Perl extension Plack::Middleware::MethodOverride.
+
+0.15  2015-08-15T01:33:43Z
+      - Added the PATCH method. Contributed by Yuuki Furuyama.
+
+0.14  2015-03-24T00:26:56Z
+      - Implemented a consistent warnings policy, turning on most warnings
+
+0.13  2015-03-16T17:40:08Z
+      - Removed a bunch of cruft from the CPAN distribution.
+      - Fixed "Use of uninitialized value in uc" warning.
+
+0.12  2015-02-14
+      - Switched to Dist::Zilla and ExtUtils::MakeMaker
+      - Use Plack::Request rather than URI to parse query parameters
+
+0.11  2015-01-12T19:26:57Z
+      - Fixed broken link to GitHub issues in the documentation.
+      - Removed Test::Pod::Coverage recommendation from Build.PL. This
+        distribution never used it.
+
+0.10  2010-12-15T04:16:40
+      - Initial version.
+      - Merged code from Plack core.
+      - Added support for a query parameter to override the method.
+      - Method overriding allowed only via POST.
+      - All currently-supported HTTP methods are allowed.
+      - Original method available in the Plack environment hash under the
+        `plack.original_request_method` key.
+

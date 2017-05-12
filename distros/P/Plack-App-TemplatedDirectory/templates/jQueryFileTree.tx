@@ -1,0 +1,5 @@
+<ul class="jqueryFileTree" style="display: none;">
+: for $files -> $file {
+    <li class="<: if $file.mime_type == 'directory' { 'directory collapsed' } else { 'file ext_' ~ $file.ext } :>"><a href="#" rel="<: $file.url :>"><: $file.name :></a></li>
+: }
+</ul>

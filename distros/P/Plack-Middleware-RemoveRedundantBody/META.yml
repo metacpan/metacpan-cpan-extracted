@@ -1,0 +1,29 @@
+---
+abstract: "Plack::Middleware which sets removes body for HTTP response if it's not required"
+author:
+  - 'Upasana <me@upasana.me>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Plack::Builder: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-RemoveRedundantBody
+requires:
+  Plack::Middleware: '0'
+  Plack::Util: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Sweet-kid/Plack-Middleware-RemoveRedundantBody/issues
+  homepage: https://github.com/Sweet-kid/Plack-Middleware-RemoveRedundantBody
+  repository: https://github.com/Sweet-kid/Plack-Middleware-RemoveRedundantBody.git
+version: '0.05'

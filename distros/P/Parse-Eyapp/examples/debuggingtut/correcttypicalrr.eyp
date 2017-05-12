@@ -1,0 +1,12 @@
+# Simple solution to the conflicts in
+# typicalrr.eyp
+%token ID NUM 
+
+%%
+s:
+      /* empty */
+    | s ID
+    | s NUM 
+;
+
+%%

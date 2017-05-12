@@ -1,0 +1,37 @@
+Status:
+
+Second release of PGP::FindKey.  Suggestions/bug reports/patches
+greatly appreciated.
+
+Description:
+
+This perl module is an interface to the PGP WWW keyservers.  It allows
+an e-mail address to be passed to it, and will return a keyid and name
+if there is a distinct match for the address.
+
+Installation:
+
+This module needs the following modules, all available from CPAN:
+
+ HTTP::Request    (in the libwww-perl bundle)
+ LWP::UserAgent   (in the libwww-perl bundle)
+ URI::Escape
+
+Usual CPAN installation rules apply:
+
+        perl Makefile.PL 
+        make
+	make test
+        make install
+
+There is documentation - including sample usage - in FindKey.pm itself. 
+
+Copyright:
+
+Copyright (c) 2001 Chris J. Ball. All rights reserved.  This
+package is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+-- 
+Chris Ball.
+chris@cpan.org || http://printf.net/

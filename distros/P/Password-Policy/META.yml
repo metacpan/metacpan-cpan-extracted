@@ -1,0 +1,35 @@
+---
+abstract: 'Make managing multiple password strength profiles easy'
+author:
+  - 'Andrew Nelson <anelson@cpan.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0'
+  YAML: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Password-Policy
+requires:
+  Class::Load: '0'
+  Clone: '0'
+  Config::Any: '0'
+  String::Multibyte: '0'
+  Try::Tiny: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/holophrastic/password-policy/issues
+  homepage: https://github.com/holophrastic/password-policy
+  repository: https://github.com/holophrastic/password-policy.git
+version: '0.04'

@@ -1,0 +1,114 @@
+#!/usr/bin/env perl
+
+use warnings;
+use strict;
+
+use Getopt::Long;
+use Plack::App::MCCS;
+use Plack::Runner;
+
+my $defaults = {};
+
+# first, parse our own options
+Getopt::Long::Configure qw/no_ignore_case no_auto_abbrev pass_through/;
+Getopt::Long::GetOptions(
+	'no-minify'		=> \$defaults->{no_minify},
+	'no-compress'	=> \$defaults->{no_compress},
+	'no-etag'		=> \$defaults->{no_etag}
+);
+
+# now let Plack::Runner parse plackup options
+my $runner = Plack::Runner->new();
+$runner->parse_options(@ARGV);
+
+# after this, the root directory should be in $runner->{argv}
+my $root = $runner->{argv}->[0] || './';
+print "Serving files from $root\n";
+
+# create the Plack::App::MCCS app and start running it
+my %options = ( root => $root );
+foreach (qw/minify compress etag/) {
+	$options{defaults}->{$_} = 0
+		if $defaults->{"no_$_"};
+}
+$runner->run(Plack::App::MCCS->new(%options)->to_app);
+
+__END__
+=head1 NAME
+
+mccs - start a static file server using Plack::App::MCCS
+
+=head1 SYNOPSIS
+
+	# on the command line
+
+	# start serving current directory on port 5000
+	mccs
+
+	# start serving a directory on port 80 using Starman
+	mccs -s Starman --listen :80 /some/directory
+
+	# serve without minification, compression and etag creation
+	mccs --no-minify --no-compress --no-etag
+
+=head1 DESCRIPTION
+
+C<mccs> provides a quick and easy way to start serving files from a directory
+using L<Plack::App::MCCS>. It loads C<MCCS> with L<Plack::Runner>, so it works
+just like L<plackup> and accepts all options C<plackup> accepts. Use whatever
+Plack handler you like.
+
+Just like C<MCCS>, all options are turned on by default, so C<mccs> will attempt
+to minify and compress appropriate files, and create ETags. You can disable this
+with C<--no-minify>, C<--no-compress> and C<--no-etag>, respectively.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-Plack-App-MCCS@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Plack-App-MCCS>.
+
+=head1 SEE ALSO
+
+L<Plack::App::MCCS>, L<Plack::Middleware::MCCS>, L<Plack::Runner>, L<plackup>.
+
+=head1 AUTHOR
+
+Ido Perlmuter <ido@ido50.net>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2011-2016, Ido Perlmuter C<< ido@ido50.net >>.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself, either version
+5.8.1 or any later version. See L<perlartistic|perlartistic> 
+and L<perlgpl|perlgpl>.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

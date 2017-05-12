@@ -1,0 +1,61 @@
+# Extra type mappings for PDL::NetCDF
+# basic C types
+int *			T_PVI
+size_t *		T_PVI
+nc_type *		T_PVI
+nc_type			T_IV
+PDLchar *		T_PDL
+PDLuchar *		T_PDL
+PDLshort *		T_PDL
+PDLint *		T_PDL
+PDLlong *		T_PDL
+PDLfloat *		T_PDL
+PDLdouble *		T_PDL
+PDLushort *		T_PDL
+PDL_longlong *		T_PDL
+
+#############################################################################
+INPUT
+
+T_PVI
+	$var = ($type)SvPV($arg,PL_na)
+T_PDLB
+	$var = (unsigned char *)(PDL->SvPDLV($arg)->data)
+T_PDLS
+	$var = (short *)(PDL->SvPDLV($arg)->data)
+T_PDLUS
+	$var = (unsigned short *)(PDL->SvPDLV($arg)->data)
+T_PDLL
+	$var = (long *)(PDL->SvPDLV($arg)->data)
+T_PDL_LL
+	$var = (long long *)(PDL->SvPDLV($arg)->data)
+T_PDLF
+	$var = (float *)(PDL->SvPDLV($arg)->data)
+T_PDLD
+	$var = (double *)(PDL->SvPDLV($arg)->data)
+
+#############################################################################
+OUTPUT
+
+T_PVI	
+        sv_setiv((SV*)$arg, (IV)*$var);
+T_PDLB
+	PDL->SetSV_PDL($arg,$var);
+T_PDLS
+	PDL->SetSV_PDL($arg,$var);
+T_PDLUS
+	PDL->SetSV_PDL($arg,$var);
+T_PDLL
+	PDL->SetSV_PDL($arg,$var);
+T_PDL_LL
+	PDL->SetSV_PDL($arg,$var);
+T_PDLF
+	PDL->SetSV_PDL($arg,$var);
+T_PDLD
+	PDL->SetSV_PDL($arg,$var);
+
+
+
+
+
+

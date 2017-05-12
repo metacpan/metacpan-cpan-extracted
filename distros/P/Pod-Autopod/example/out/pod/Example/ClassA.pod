@@ -1,0 +1,45 @@
+=head1 NAME
+
+Example::ClassA - Example Class A
+
+
+=head1 SYNOPSIS
+
+
+ use ClassA;
+
+ print "hello world";
+
+ # Prints a welcome message
+
+
+
+
+=head1 DESCRIPTION
+
+Welcome to this example class
+
+
+
+=head1 HOWTO
+
+
+It is easy, you can also do 2 prints:
+
+ print "hello";
+ print " world";
+
+
+
+=head1 METHODS
+
+=head2 foo
+
+ foo();
+
+I am foo
+
+
+
+=cut
+

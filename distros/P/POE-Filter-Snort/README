@@ -1,0 +1,66 @@
+--------
+Abstract
+--------
+
+POE::Filter::Snort is a stream filter for POE.  It parses snort alert
+logs into hashes, one per alert.  Each hash's fields contain vital
+information about its parsed alert.
+
+It's used the way any other POE::Filter class would be.  See the
+SYNOPSIS for a complete working example.
+
+------------------
+Basic Installation
+------------------
+
+POE::Filter::Snort may be installed through the CPAN shell in the
+usual manner.  Typically:
+
+  $ perl -MCPAN -e 'install "POE::Filter::Snort"'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme POE::Filter::Snort
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install POE::Filter::Snort
+
+-------------------
+Manual Installation
+-------------------
+
+This module may be installed manually, in the usual fashion:
+
+1. Download and unpack the distribution.
+
+	Left as an exercise for the reader.
+
+2. Build and test it.
+
+  % perl Makefile.PL
+	...
+  % make test
+	...
+
+3. Install it if you're happy.  It's assumed you have privileges to
+create and write files in Perl's library.
+
+	% make install
+
+It should now be ready to use.
+
+-------------
+Bleeding Edge
+-------------
+
+This module is maintained in two public git repositories.  Patches and
+collaborators are welcome.
+
+	http://github.com/rcaputo/poe-filter-snort
+	http://gitorious.org/poe-filter-snort
+
+Thanks for reading!
+
+-- Rocco Caputo - http://poe.perl.org/

@@ -1,0 +1,26 @@
+package PGP;
+sub new
+sub Debug
+sub Exec
+sub Sign
+sub Encrypt
+sub Decrypt
+sub Document_Info
+package PGP::Keyring;
+sub new 
+sub Add_Key
+sub Remove_Key
+sub Extract_Key
+sub Generate_Key
+sub Revoke_Key
+sub List_Keys
+sub Find
+package PGP::Key;
+sub new
+sub Add_ID
+sub keyparse
+sub Trust
+subroutine is very much like PGP::Key::Trust. It also needs to be 
+sub Validity
+sub Fingerprint
+sub dump

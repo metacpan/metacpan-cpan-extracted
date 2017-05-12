@@ -1,0 +1,90 @@
+NAME
+    Package::MoreUtil - Package-related utilities
+
+VERSION
+    This document describes version 0.58 of Package::MoreUtil (from Perl
+    distribution Package-MoreUtil), released on 2014-12-05.
+
+SYNOPSIS
+     use Package::MoreUtil qw(
+         package_exists
+         list_package_contents
+         list_subpackages
+     );
+
+     print "Package Foo::Bar exists" if package_exists("Foo::Bar");
+     my %content   = list_package_contents("Foo::Bar");
+     my @subpkg    = list_subpackages("Foo::Bar");
+     my @allsubpkg = list_subpackages("Foo::Bar", 1); # recursive
+
+DESCRIPTION
+FUNCTIONS
+  package_exists($name) => BOOL
+    Return true if package "exists". By "exists", it means that the package
+    has been defined by "package" statement or some entries have been
+    created in the symbol table (e.g. "$Foo::var = 1;" will make the "Foo"
+    package "exist").
+
+    This function can be used e.g. for checking before aliasing one package
+    to another. Or to casually check whether a module has been loaded.
+
+  list_package_contents($name) => %res
+    Return a hash containing package contents. For example:
+
+     (
+         sub1  => \&Foo::Bar::sub1,
+         sub2  => \&Foo::Bar::sub2,
+         '%h1' => \%Foo::Bar::h1,
+         '@a1' => \@Foo::Bar::a1,
+         ...
+     )
+
+    This module won't list subpackages. Use list_subpackages() for that.
+
+  list_subpackages($name[, $recursive]) => @res
+    List subpackages, e.g.:
+
+     (
+         "Foo::Bar::Baz",
+         "Foo::Bar::Qux",
+         ...
+     )
+
+    If $recursive is true, will also list subpackages of subpackages, and so
+    on.
+
+FAQ
+  How to list all existing packages?
+    You can recurse from the top, e.g.:
+
+     list_subpackages("", 1);
+
+SEE ALSO
+    perlmod
+
+    Package::Util (currently empty/placeholder at the time of this writing)
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Package-MoreUtil>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Package-MoreUtil>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Package-MoreUtil>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

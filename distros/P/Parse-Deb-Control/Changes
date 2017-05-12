@@ -1,0 +1,15 @@
+Revision history for Parse-Deb-Control
+
+0.04     1 Mar 2010
+    * ->get_paras method added
+    * allow comments inside control files
+
+0.03    11 Feb 2010
+    * use IO::Any instead of custom guessing. solves some problems with
+      for example empty files and is more universal
+
+0.0x    see http://github.com/jozef/Parse-Deb-Control/commits/master/
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

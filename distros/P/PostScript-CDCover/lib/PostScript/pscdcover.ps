@@ -1,0 +1,600 @@
+%!PS-ADOBE-3.0
+% $Id: pscdcover.ps,v 1.26 2004/03/09 15:06:11 cbouvi Exp $
+%
+%  Copyright (C) 2004 Cédric Bouvier
+%
+%  This program is free software; you can redistribute it and/or modify it
+%  under the terms of the GNU General Public License as published by the Free
+%  Software Foundation; either version 2 of the License, or (at your option)
+%  any later version.
+%
+%  This program is distributed in the hope that it will be useful, but WITHOUT
+%  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+%  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+%  more details.
+%
+%  You should have received a copy of the GNU General Public License along with
+%  this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+%  Place, Suite 330, Boston, MA  02111-1307  USA
+%
+% $Log: pscdcover.ps,v $
+% Revision 1.26  2004/03/09 15:06:11  cbouvi
+% Uses ISO-8859-15 encoding instead of ISO-8859-1
+%
+% Revision 1.25  2004/02/25 15:12:35  cbouvi
+% Bugfix: empty title caused a division by zero
+%
+% Revision 1.24  2004/02/24 14:58:04  cbouvi
+% Long titles are now scaled down to fit in the page width
+%
+% Revision 1.23  2004/02/24 14:35:35  cbouvi
+% Added --cd-color and --folder-color to override icons default colors
+%
+% Revision 1.22  2004/02/24 13:51:30  cbouvi
+% Added support for --color
+%
+% Revision 1.21  2004/02/05 10:25:28  cbouvi
+% Fixed clipping on side labels (upside down title would overprint the icon)
+%
+% Revision 1.20  2004/02/05 10:15:50  cbouvi
+% Updated comments
+%
+% Revision 1.19  2004/02/04 16:55:11  cbouvi
+% Code cleanup
+%
+% Revision 1.18  2004/02/04 16:22:16  cbouvi
+% Prints one of the side label topsy-turvy. Code cleanup
+%
+% Revision 1.17  2004/02/04 12:44:09  cbouvi
+% Added switch --separator to add a column separator line
+%
+% Revision 1.16  2004/02/02 12:56:55  cbouvi
+% Added --minwidth to eliminate too narrow columns
+%
+% Revision 1.15  2004/02/02 12:23:53  cbouvi
+% Added switch --all to force printing even empty pages
+%
+% Revision 1.14  2004/02/02 10:10:07  cbouvi
+% --columns=0 means automatic column width
+%
+% Revision 1.13  2004/01/30 14:09:14  cbouvi
+% Code cleanup
+%
+% Revision 1.12  2004/01/30 13:51:05  cbouvi
+% Let clip of column extend to the right margin
+%
+% Revision 1.11  2004/01/30 09:47:43  cbouvi
+% Added --columns option
+%
+% Revision 1.10  2004/01/29 14:20:38  cbouvi
+% Added LICENSE
+%
+% Revision 1.9  2004/01/28 16:09:19  cbouvi
+% Reduced indenting of regular files
+%
+% Revision 1.8  2004/01/28 15:59:30  cbouvi
+% Reduced line spacing
+%
+% Revision 1.7  2004/01/28 15:10:08  cbouvi
+% Fixed a bug (second column was trespassing on title)
+%
+% Revision 1.6  2004/01/28 14:40:50  cbouvi
+% Added support for optional bounding boxes
+%
+% Revision 1.4  2004/01/28 14:34:03  cbouvi
+% Added variables to control layout
+%
+% Revision 1.3  2004/01/28 14:04:46  cbouvi
+% Added function to draw a rectangle
+%
+% Revision 1.2  2004/01/28 13:56:48  cbouvi
+% Added comments. Started implementing overflow on the back cover
+%
+%
+%%BeginSetup
+%
+%%BeginFeature: *PageSize A4
+<</PageSize [595 842] /ImagingBBox null>> setpagedevice
+%%EndFeature
+%%EndSetup
+
+% Copy standard ISO-8859-1 (Latin1) encoding to not-so-standard ISO-8859-15
+% (Latin9) encoding. Only Latin1 is included in standard PostScript
+/ISOLatin9Encoding ISOLatin1Encoding length array def
+ISOLatin1Encoding ISOLatin9Encoding copy pop
+
+% Change the 8 characters that differ between Latin9 and Latin1
+<<
+    164   /Euro     166   /Scaron   168   /scaron   180   /Zcaron
+    184   /zcaron   188   /OE       189   /oe       190   /Ydieresis
+>> { ISOLatin9Encoding 3 1 roll put } forall
+
+/F0
+/Helvetica findfont dup length dict begin
+    {
+        1 index /FID ne {def} {pop pop} ifelse
+    } forall
+    % Use our newly defined ISO-8859-15 (Latin9) encoding and enjoy euro signs,
+    % "E dans l'O" and the like.
+    /Encoding ISOLatin9Encoding def
+    currentdict
+end
+definefont pop
+/F0 findfont 10 scalefont setfont
+
+% all dimensions will be given in millimeters
+/mm { 25.4 div 72 mul } def
+
+% The page dimensions: this is valid for both the front sleeve and inner
+% sleeve. Both will actually be printed side by side on the first output A4.
+/page_height  120 mm def
+/page_width   120 mm def
+
+% The margins, or padding around each column. margin_top will be applied below
+% the CD title on the front page, and below the cover edge on the other pages.
+/margin_top     2 mm def
+/margin_left    1 mm def
+/margin_right   1 mm def
+
+% These parameters will s///ubstitued by the wrapper Perl program.
+/number_of_columns #COLUMNS# def
+/min_width         #MIN_WIDTH# mm def
+/separator         #SEPARATOR# def
+/force_all_pages   #FORCE_ALL_PAGES# def
+/cd_title_string   (#CD_TITLE#) def
+/color             #COLOR# def
+/cd_color          { #CD_COLOR# } def
+/folder_color      { #FOLDER_COLOR# } def
+
+%
+% Some helper functions
+%
+
+% the y coordinate of the bottom of the page. Since origin is top left, this is
+% a negative number.
+/page_bottom { page_height neg } def
+
+% the width of the current column, either a simple division if the number of
+% columns is fixed, or calculated based on the widest filename if it is
+% automatic.
+/column_width {
+    number_of_columns 0 eq {
+        right_most margin_right corner_x sub add
+    }
+    {
+        page_width number_of_columns div
+    } ifelse
+} def
+
+% counters
+/current_column 1 def  % current_column will reset to 1 at each new page.
+/current_page 1 def
+
+% rect_box
+% Creates a rectangular path
+/rect_box { % stack x y w h
+    newpath
+    /box_height exch def
+    /box_width exch def
+    moveto
+    0 box_height rlineto
+    box_width 0 rlineto
+    0 box_height neg rlineto
+    closepath
+} def
+
+% draw_page_frame
+% Draws a dim gray frame around the page.
+/draw_page_frame {
+    % #START_BOX# % will be skipped when wrapper program called with --nobox
+    gsave
+        .3 setlinewidth
+        .8 setgray
+        0 0 page_width page_bottom rect_box
+        stroke
+    grestore
+    % #STOP_BOX#
+} def
+
+% choose_color
+% calls setgray or setrgbcolor with the arguments, depending on the value of
+% /color
+/choose_color { % stack: gray r g b
+    color 0 eq {
+        pop pop pop
+        setgray
+    }
+    {
+        setrgbcolor
+        pop
+    }
+    ifelse
+} def
+
+% draw_cd
+% Draws a CD icon.
+/draw_cd { % stack: x y size
+    % (x,y) is the bottom left corner of the icon.
+    3 1 roll % stack: size x y
+    gsave
+        translate
+
+        % the drawing is done for a diameter of 12 mm. Let's scale to whatever
+        % size is asked for:
+        12 mm div dup scale
+
+        6 mm 6 mm translate % move to the center
+        1 setlinewidth
+        newpath
+        0 0 6 mm 0 360 arc  % outer circle
+        2 mm 0 moveto
+        0 0 2 mm 0 360 arc  % inner circle of the aluminum part
+        gsave
+            .8     % gray
+            cd_color % light yellow
+            choose_color
+            eofill          % aluminium filling
+        grestore
+        stroke
+        newpath
+        0 0 .75 mm 0 360 arc % hole in the center
+        stroke
+    grestore
+} def
+
+% draw_folder
+% Draws a Folder icon
+/draw_folder { % stack: x y size
+    3 1 roll
+    gsave
+        translate
+
+        % the drawing is done for a 12×12mm icon. Let's scale
+        12 mm div dup scale
+        1 setlinewidth
+
+        2.4 mm 2.2 mm translate
+
+        % far side rectangle, with thumb tab
+        newpath
+        0 0 moveto
+        0 7 mm rlineto
+        .8 mm 1.6 mm rlineto
+        3 mm 0 rlineto
+        .8 mm -1.6 mm rlineto
+        5 mm 0 rlineto
+        0 -7 mm rlineto
+        closepath
+        gsave
+            .7        % gray
+            folder_color % light blue
+            choose_color
+            fill
+        grestore
+        stroke
+
+        % front rectangle, 20° open
+        newpath
+        0 0 moveto
+        20 rotate
+        0 7 mm rlineto
+        -20 rotate
+        9.6 mm 0 rlineto
+        20 rotate
+        0 -7 mm rlineto
+        -20 rotate
+        closepath
+        gsave
+            .7        % gray
+            folder_color % light blue
+            choose_color
+            fill
+        grestore
+        stroke
+    grestore
+} def
+
+/force_fit { % stack: string max_width
+    exch stringwidth pop dup 0 eq {
+        pop pop
+    }
+    {
+        div dup 1 lt {
+            1 scale
+        }
+        {
+            pop
+        }
+        ifelse
+    }
+    ifelse
+} def
+
+% cd_title
+% Writes the CD title (with icon) and horizontal ruler.
+% The title is clipped to a 120×8 mm box.
+/cd_title { % stack: string x y (abs coord. of top-left corner)
+    gsave
+
+        % horizontal ruler
+        newpath
+        1 mm -8 mm moveto
+        119 mm -8 mm lineto
+        1 setlinewidth
+        stroke
+
+        % clip
+        newpath
+        moveto
+        120 mm 0 rlineto
+        0 -8 mm rlineto
+        -120 mm 0 rlineto
+        closepath
+        clip
+
+        % icon
+        1 mm -7 mm 6 mm draw_cd
+
+        % text
+        /F0 findfont 14 scalefont setfont
+        8 mm -6 mm moveto
+        dup 110 mm force_fit
+        show
+
+    grestore
+} def
+
+% first page
+/first_page {
+
+    % this centers the CD cover on an A4
+    45 mm 28.5 mm translate
+
+    % switch to landscape
+    90 rotate
+
+    draw_page_frame
+    cd_title_string 0 0 cd_title
+
+} def
+
+% second_page
+/second_page {
+
+    % move to the second page
+    page_width 0 translate
+    draw_page_frame
+
+    /corner_x 0 def
+    /corner_y 0 def
+} def
+
+/back_page {
+
+    % This centers the back cover on the first half of an A4. This allows to
+    % print two back covers on one sheet, by simply feeding the same sheet
+    % upside down into the printer.
+    30 mm 276 mm translate
+    /page_height 117 mm def
+    /page_width  138 mm def
+    /corner_x 0 def
+
+    % a function to print the side label, with icon and CD title
+    % Last parameter should be 1 to print the title upside down
+    /side_label {
+        /upside_down exch def
+        gsave
+            translate
+            -90 rotate % titles are printed vertically
+            0 0 page_height 6 mm rect_box
+            % #START_BOX# % will be skipped when wrapper program called with --nobox
+            gsave
+                .8 setgray
+                .3 setlinewidth
+                stroke
+            grestore
+            % #STOP_BOX#
+            
+            /F0 findfont 11 scalefont setfont
+
+            % draw the little icon
+            1 mm 1 mm 4 mm draw_cd
+
+            6 mm 0 page_height 8 mm sub 6 mm rect_box clip
+
+            % Prints the title
+            6 mm 1.5 mm
+            upside_down 0 eq {
+                % straight
+                moveto
+                cd_title_string dup page_height 8 mm sub force_fit
+                show
+            }{
+                % upside down
+                gsave
+                    translate
+                    % first go to where the string would end, reverse and print
+                    cd_title_string stringwidth pop dup page_height 8 mm sub gt {
+                        pop page_height 8 mm sub
+                    } if
+                    8.5 moveto
+                    180 rotate
+                    cd_title_string dup page_height 8 mm sub force_fit
+                    show
+                grestore
+
+            } ifelse
+        grestore
+    } def
+
+    % one side label on the left, upside down
+    0 0 1 side_label
+    % one side label on the right, straight
+    6 mm page_width add 0 0 side_label
+
+    6 mm 0 translate
+    draw_page_frame
+    /corner_x 0 def
+    /corner_y 0 def
+    gsave
+} def
+
+/next_page {
+
+    /current_page current_page 1 add def
+    /current_column 1 def
+    current_page 2 eq {
+        second_page
+    } if
+    current_page 3 eq {
+        grestore
+        showpage
+        back_page
+    } if
+
+} def
+
+% start_new_column
+% Creates a new clipping region. The rectangle will go down to the bottom of
+% the page, i.e., 120mm, regardless of the starting position.
+/start_new_column { % x y (abs coord. of top left corner)
+
+    % save the top-left corner so that we know where to start next column.
+    gsave
+    /corner_y exch def
+    /corner_x exch def
+
+    % draw a separator line if option is set and not on the first column.
+    separator 0 ne current_column 1 ne and {
+        newpath
+        corner_x corner_y moveto
+        corner_x page_bottom lineto
+        .3 setlinewidth
+        stroke
+    } if
+    % clipping
+    newpath
+    corner_x corner_y moveto
+
+    number_of_columns 0 ne {
+        % if column width is fixed, clip at the exact column width, so that
+        % long file names are truncated and do not trespass on the next column.
+        column_width 0 rlineto
+        currentpoint pop page_bottom lineto
+    }{
+        % if column width is automatic (number_of_columns == 0), clip at the
+        % very right of the page: the next column will start right after the
+        % longest filename).
+        page_width corner_y lineto
+        page_width page_bottom lineto
+    } ifelse
+    corner_x page_bottom lineto
+    closepath
+    clip
+} def
+
+% next_column
+% Starts another column, possibly on next page.
+/next_column {
+
+    grestore
+    /corner_x corner_x column_width add def
+    /current_column current_column 1 add def
+
+    % go to next page if the room left on the right is lower than the minimum
+    % allowed.
+    corner_x page_width min_width sub ge { next_page } if
+
+    corner_x corner_y start_new_column
+    corner_x margin_left add corner_y margin_top sub moveto
+    /right_most currentpoint pop def
+} def
+
+% check_column
+% Test whether bottom of current column is reached and jumps to the next one.
+/check_column { % stack: x y (rel coord.)
+
+    /delta_y exch def
+    /delta_x exch def
+    delta_x delta_y rmoveto % move attempt
+    currentpoint exch pop page_bottom lt { % test against bottom
+        next_column
+        delta_x delta_y rmoveto % move again from top of next column
+    } if
+} def
+
+% update_right_most
+% Update the right_most variable to the current x coordinate if it is greater
+% than the current right_most value. This is only useful for automatic column
+% width.
+/update_right_most {
+    currentpoint pop right_most gt {
+        /right_most currentpoint pop def
+    } if
+} def
+
+% folder_title
+% Displays a folder with its icon at a given indent
+/folder_title { % stack: text indent
+    % indent==0 means left most.
+    0 -10 check_column
+    gsave
+        4 mm mul currentpoint pop add dup currentpoint exch pop 10 draw_folder
+        5 mm add currentpoint exch pop 1 mm add moveto
+        /F0 findfont 8 scalefont setfont
+        show
+        update_right_most
+    grestore
+} def
+
+% file_title
+% Displays a filename at a given indent
+/file_title { % stack: text indent
+    % indent==0 means left most.
+    0 -8 check_column
+    gsave
+        1 sub 4 mm mul currentpoint pop add 5 mm add currentpoint exch pop 1 mm add moveto
+        /F0 findfont 6 scalefont setfont
+        show
+        update_right_most
+    grestore
+} def
+
+gsave
+first_page
+0 -8 mm start_new_column
+margin_left -10 mm moveto
+/right_most currentpoint pop def
+
+% The section below can be edited at will: the actual layout will be calculated
+% by the program above. One can add or remove lines without worrying about the
+% way they will be dispatched across pages and columns.
+%
+% Directory or file names are between (parentheses). Should one wish to include
+% parentheses within a directory or file name, they must be escape by preceding
+% them with a backslash: \( and \).
+% The number that follows the parentheses is the depth within the directory
+% tree, 0 being at the root.
+% folder_title draws a folder icon, while file_title draws nothing and uses a
+% smaller font size.
+%
+% #START_CONTENT#
+(Folder 1) 0 folder_title
+(Folder 1.1) 1 folder_title
+(file 1.1.1) 1 file_title
+(file 1.1.2) 1 file_title
+(file 1.1.3) 1 file_title
+(Folder 1.2) 1 folder_title
+(Folder 1.2.1) 2 folder_title
+(Folder 2) 0 folder_title
+% #STOP_CONTENT#
+
+% draws the missing pages if the directory listing was too short and the option
+% is set.
+force_all_pages 1 eq {
+    current_page 2 lt { grestore next_page gsave } if
+    current_page 3 lt { grestore next_page } if
+} if
+
+grestore
+showpage

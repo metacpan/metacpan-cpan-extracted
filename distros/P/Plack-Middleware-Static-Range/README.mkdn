@@ -1,0 +1,37 @@
+# NAME
+
+Plack::Middleware::Static::Range - Serve static files with support for Range requests
+
+# SYNOPSIS
+
+    use Plack::Builder;
+
+    builder {
+        enable 'Static::Range' => (
+            path => qr{^/(images|js|css)/},
+            root => './htdocs/'
+        );
+        $app;
+    };
+
+# DESCRIPTION
+
+This middleware is a subclass of [Plack::Middleware::Static](http://search.cpan.org/perldoc?Plack::Middleware::Static) with additional
+support for requests with `Range` headers.
+
+# SEE ALSO
+
+[Plack::Middleware::Static](http://search.cpan.org/perldoc?Plack::Middleware::Static), [Plack::App::File::Range](http://search.cpan.org/perldoc?Plack::App::File::Range)
+
+# AUTHORS
+
+唐鳳 <cpan@audreyt.org>
+
+# CC0 1.0 Universal
+
+To the extent possible under law, 唐鳳 has waived all copyright and related
+or neighboring rights to [Plack::Middleware::Static::Range](http://search.cpan.org/perldoc?Plack::Middleware::Static::Range).
+
+This work is published from Taiwan.
+
+[http://creativecommons.org/publicdomain/zero/1.0](http://creativecommons.org/publicdomain/zero/1.0)

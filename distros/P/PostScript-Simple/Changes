@@ -1,0 +1,113 @@
+Revision history for Perl extension PostScript::Simple.
+
+0.09 - 23 September 2014
+  Matthew Newton:
+    - add setcmykcolour method
+    - add err method to find last error
+    - internal data structure updates
+
+0.08 - 20 June 2014
+  Satoshi Azuma:
+    - remove Test::More module and make it a build dependency
+
+  Matthew Newton:
+    - fix test result failures on -Duselongdouble
+    - allow units to be specified for any distance
+    - add X-Windows colours, supplied by Steve Baldwin
+    - change all space-separated lists to arrays
+    - fix Begin/EndDocument handling in EPS file insertion
+
+0.07 - 13 January 2006
+  Matthew Newton:
+    - fix lack of newpath in arc
+
+0.06 - 24 June 2004
+  Matthew Newton:
+    - minor documentation changes
+
+0.06p4 - 1 April 2004
+  Matthew Newton:
+    - added /ll languagelevel check
+    - added setpagedevice for languagelevel >= 2
+
+0.06p3 - 29 March 2004
+  Matthew Newton:
+    - added geteps method
+    - added source argument to PostScript::Simple::EPS constructor
+    - added width() and height() to PostScript::Simple::EPS
+    - corrected some minor documentation errors
+
+0.06p2 - 16 March 2004
+  Matthew Newton:
+    - added get method
+
+0.06p1 - 8 November 2003
+  Eric Wilhelm:
+    - arc function
+
+  Matthew Newton:
+    - update/add some pod documentation
+    - added PostScript::Simple::EPS module
+    - tidy Changes file
+
+  Glen Harris:
+    - circletext function
+    - useful code for eps addition
+
+0.05 - 22 January 2003
+  Matthew Newton:
+    - fold all functions in the code to make it easier to read
+    - tidy up options to many functions (and probably break lots of stuff---sorry)
+    
+  Mark Withall
+    - fix error with number of pages in eps files
+
+  Vladi Belperchinov-Shabanski
+   - add text rotation
+   - modify interface to text alignment
+
+  Martin McCarthy
+   - curvextend typos
+   - lots of other stuff that will hopefully make it into a different module
+
+  Michael Tomuschat
+   - page origin
+   - co-ordinate direction
+
+0.04 - 19 February 2002
+  Matthew Newton:
+    - correct the definitions for dd and cc (I hope - still untested)
+    - tidy up the code a bit
+    - update the test suite
+
+  Flemming Frandsen:
+    - font encoding
+    - text alignment
+    - getlogin bugfix
+
+0.03 - 17 January 2002
+  Matthew Newton:
+    - Moved example.pl to a subdirectory so it doesn't get installed
+    - PostScript header now includes version of PostScript::Simple
+    - added dd and cc to the list of measurements, but they might not be correct
+
+  P Kent:
+    - Generate many tests in t/
+    - Simple.pm moved to lib/PostScript/Simple.pm to make life easier
+    - moveto and newpath given new methods
+    - curve and curvextend created for generating Bezier curves
+    - all functions now return 1 for OK or 0 for fail
+    - errors are written as () print flush in the PS output
+    - many paper sizes added
+    - other small tweaks
+
+0.02 - 12 January 2002
+  Matthew Newton:
+    - Fixed module to now use MakeMaker, i.e. perl Makefile.PL;
+      make; make install now works.
+    - Updated some documentation errors
+
+0.01 - 11 January 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n PostScript::Simple
+

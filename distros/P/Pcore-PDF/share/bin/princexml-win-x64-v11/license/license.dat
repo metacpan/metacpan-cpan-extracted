@@ -1,0 +1,10 @@
+<license id="0000001">
+    <name>Non-commercial License</name>
+    <vendor>YesLogic Pty. Ltd.</vendor>
+    <product>Prince</product>
+    <version>latest</version>
+    <end-user>Personal User</end-user>
+    <date>2015-02-10</date>
+    <signature>41ECB34A2B8DCB51B6122D7EFBFFDA8B</signature>
+    <option id="demo">yes</option>
+</license>

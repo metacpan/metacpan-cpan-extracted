@@ -1,0 +1,80 @@
+[AGENT]
+
+Mozilla/5.0 (Linux; U; Android 2.1-update1; de-de; HTC Desire 1.19.161.5 Build/ERE27) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17 
+
+'parser'      => 'android',
+'mobile'      => 1,
+'strength'    => 'U',
+'os'          => 'Android 2.1-update1 (ERE27)',
+'extras'      => ['KHTML, like Gecko', 'Safari/530.17'],
+'toolkit'     => ['AppleWebKit','530.17','530.170'],
+'version_raw' => '4.0',
+'lang'        => 'de-de',
+'version'     => '4.000',
+'name'        => 'Android',
+'device'      => 'HTC Desire 1.19.161.5',
+
+
+[AGENT]
+
+Mozilla/5.0 (Linux; U; Android 2.1-update1; en-us; ADR6300 Build/ERE27) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17
+
+'parser'      => 'android',
+'mobile'      => 1,
+'strength'    => 'U',
+'os'          => 'Android 2.1-update1 (ERE27)',
+'extras'      => ['KHTML, like Gecko','Safari/530.17'],
+'toolkit'     => ['AppleWebKit','530.17','530.170'],
+'version_raw' => '4.0',
+'lang'        => 'en-us',
+'version'     => '4.000',
+'name'        => 'Android',
+'device'      => 'ADR6300',
+
+[AGENT]
+
+Mozilla/5.0 (Linux; U; Android 1.6; en-us; WOWMobile myTouch 3G Build/unknown) AppleWebKit/528.5+ (KHTML, like Gecko) Version/3.1.2 Mobile Safari/525.20.1
+
+'parser'      => 'android',
+'mobile'      => 1,
+'strength'    => 'U',
+'os'          => 'Android 1.6 (unknown)',
+'extras'      => ['KHTML, like Gecko','Safari/525.20.1'],
+'toolkit'     => ['AppleWebKit','528.5+','528.500'],
+'version_raw' => '3.1.2',
+'lang'        => 'en-us',
+'version'     => '3.001002',
+'name'        => 'Android',
+'device'      => 'WOWMobile myTouch 3G',
+
+[AGENT]
+
+Mozilla/5.0 (Linux; U; Android 2.2; nl-nl; Desire_A8181 Build/FRF91) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+
+'parser'      => 'android',
+'mobile'      => 1,
+'strength'    => 'U',
+'os'          => 'Android 2.2 (FRF91)',
+'extras'      => ['KHTML, like Gecko','Safari/533.1'],
+'toolkit'     => ['AppleWebKit','533.1','533.100'],
+'version_raw' => '4.0',
+'lang'        => 'nl-nl',
+'version'     => '4.000',
+'name'        => 'Android',
+'device'      => 'Desire_A8181',
+
+[AGENT]
+
+HTC_Dream Mozilla/5.0 (Linux; U; Android 1.5; en-ca; Build/CUPCAKE) AppleWebKit/528.5+ (KHTML, like Gecko) Version/3.1.2 Mobile Safari/525.20.1
+
+'parser'      => 'android',
+'mobile'      => 1,
+'strength'    => 'U',
+'os'          => 'Android 1.5',
+'extras'      => ['KHTML, like Gecko','Safari/525.20.1'],
+'toolkit'     => ['AppleWebKit','528.5+','528.500'],
+'version_raw' => '3.1.2',
+'lang'        => 'en-ca',
+'version'     => '3.001002',
+'name'        => 'Android',
+'device'      => 'Build/CUPCAKE',

@@ -1,0 +1,25 @@
+SYNOPSIS
+
+     use Perinci::Easy qw(defsub);
+    
+     # define subroutine, with metadata
+     defsub
+         name        => 'myfunc',
+         summary     => 'Does foo to bar',
+         description => '...',
+         args        => {
+             ...
+         },
+         code        => sub {
+             my %args = @_;
+             ...
+         };
+
+DESCRIPTION
+
+    This module provides some easy shortcuts.
+
+SEE ALSO
+
+    Perinci
+

@@ -1,0 +1,2 @@
+#!/bin/bash
+perl -e "exec qw(docker exec -it child-process-leash bash -c ), join ' ', 'cd /web; ', @ARGV" $@

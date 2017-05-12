@@ -1,0 +1,37 @@
+---
+abstract: 'parallel processing using pipe(2) for communication and synchronization'
+author:
+  - 'Shoichi Kaji <skaji@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parallel-Pipes
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+  package:
+    - Parallel::Pipe::Here
+    - Parallel::Pipe::Impl
+    - Parallel::Pipe::Impl::NoFork
+    - Parallel::Pipe::There
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/skaji/Parallel-Pipes/issues
+  homepage: https://github.com/skaji/Parallel-Pipes
+  repository: https://github.com/skaji/Parallel-Pipes.git
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.70'
+x_static_install: 1

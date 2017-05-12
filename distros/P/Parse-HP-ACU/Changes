@@ -1,0 +1,11 @@
+Revision history for Parse-HP-ACU
+
+0.03    2010-02-05      Jeremy Cole <jeremy@jcole.us>
+        Add support for unassigned drives.
+
+0.02    2010-02-04      Jeremy Cole <jeremy@jcole.us>
+        A bunch of packaging fixes.
+
+0.01    2010-01-28      Jeremy Cole <jeremy@jcole.us>
+        Initial version.
+

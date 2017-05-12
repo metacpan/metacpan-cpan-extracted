@@ -1,0 +1,48 @@
+[%#
+#
+# Copyright (c) 2005 IBM Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+# 
+# File:        $Source: /var/lib/cvs/ODO/lib/ODO/Ontology/OWL/Lite/Templates/OWLLitePropertyAccessorMethod.tt,v $
+# Created by:  Stephen Evanchik( <a href="mailto:evanchik@us.ibm.com">evanchik@us.ibm.com </a>)
+# Created on:  03/02/2005
+# Revision:	$Id: OWLLitePropertyAccessorMethod.tt,v 1.1 2009-09-22 18:04:57 ubuntu Exp $
+# 
+# Contributors:
+#     IBM Corporation - initial API and implementation
+#
+%]
+sub [%- shortName -%] {
+	
+	my $self = shift;
+	my $[%- shortName -%] = shift;
+	
+	my $parent = $self->{'parent'};
+	unless($parent) {
+		die('Fatal error in property container: parent object is not defined!');
+	}
+	
+	if(UNIVERSAL::isa($[%- shortName -%], '[%- packageName -%]')) {
+	   
+		# The addition can not invalidate the minCardinality or maxCardinality
+		die('Adding [%- packageName -%] violates cardinality restriction')
+			unless($parent->canAddProperty('[%- packageName -%]'));
+		
+		
+		my $stmt_group = $[%- shortName -%]->to_statement_group();
+		my $property = ODO::Node::Resource->new( [%- packageName -%]->objectURI() );
+		
+		my $property_stmt = ODO::Statement->new($parent->subject(), $property, $stmt_group->subject());
+		
+		$parent->graph()->add($property_stmt);
+		$parent->graph()->addTripleGroup( $[%- shortName -%]->to_statement_group() );
+	}
+	else {
+		return $parent->getPropertyFromGraph('[%- packageName -%]');
+	}
+}
+

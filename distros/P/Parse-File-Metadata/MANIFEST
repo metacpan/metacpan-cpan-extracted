@@ -1,0 +1,18 @@
+Changes
+lib/Parse/File/Metadata.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/001_new.t
+t/002_process_metadata_and_proceed.t
+t/003_process_metadata_only.t
+t/amyfile.txt
+t/bmyfile.txt
+t/cmyfile.txt
+t/dmyfile.txt
+t/emyfile.txt
+t/xmyfile.txt
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

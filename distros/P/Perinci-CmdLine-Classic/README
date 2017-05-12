@@ -1,0 +1,108 @@
+SYNOPSIS
+
+    #RENDER_TEMPLATE: dist=>"Perinci-CmdLine-Lite",
+    dist_file=>"templates/synopsis.txt",
+    context=>{module=>"Perinci::CmdLine::Classic"}
+
+DESCRIPTION
+
+    #RENDER_TEMPLATE: dist=>"Perinci-CmdLine-Lite",
+    dist_file=>"templates/description.txt"
+
+    Perinci::CmdLine::Classic is the heavier backend implementation which
+    supports some extra features currently not supported by the default
+    backend implementation Perinci::CmdLine::Lite. These features come at
+    some startup overhead cost and more dependencies. You normally should
+    use Perinci::CmdLine::Any instead to be able to switch backend on the
+    fly.
+
+    Screenshots:
+
+REQUEST KEYS
+
+    See also Perinci::CmdLine::Base. Extra stuffs put by this module to the
+    $r hash/stash.
+
+      * format_options => hash
+
+ATTRIBUTES
+
+    All the attributes of Perinci::CmdLine::Base, plus:
+
+ log => BOOL (default: 1)
+
+    Whether to load Log::Any::App (enable logging output) by default. See
+    "LOGGING" for more details.
+
+ use_utf8 => BOOL
+
+    From Term::App::Role::Attrs (please see its docs for more details).
+    There are several other attributes added by the role.
+
+ undo => BOOL (optional, default 0)
+
+    Whether to enable undo/redo functionality. Some things to note if you
+    intend to use undo:
+
+      * These common command-line options will be recognized
+
+      --undo, --redo, --history, --clear-history.
+
+      * Transactions will be used
+
+      use_tx=>1 will be passed to Perinci::Access, which will cause it to
+      initialize the transaction manager. Riap requests begin_tx and
+      commit_tx will enclose the call request to function.
+
+      * Called function will need to support transaction and undo
+
+      Function which does not meet qualifications will refuse to be called.
+
+      Exception is when subcommand is specified with undo=>0, where
+      transaction will not be used for that subcommand. For an example of
+      disabling transaction for some subcommands, see bin/u-trash in the
+      distribution.
+
+ undo_dir => STR (optional, default ~/.<program_name>/.undo)
+
+    Where to put undo data. This is actually the transaction manager's data
+    dir.
+
+METHODS
+
+    All the methods of Perinci::CmdLine::Base, plus:
+
+RESULT METADATA
+
+    All those supported by Perinci::CmdLine::Base, plus:
+
+ x.hint.result_binary => bool
+
+    If set to true, then when formatting to text formats, this class won't
+    print any newline to keep the data being printed unmodified.
+
+ENVIRONMENT
+
+    All the environment variables that Perinci::CmdLine::Base supports,
+    plus:
+
+ PERINCI_CMDLINE_COLOR_THEME => STR
+
+    Can be used to set color_theme.
+
+ PROGRESS => BOOL
+
+    Explicitly turn the progress bar on/off.
+
+ COLOR => INT
+
+    Please see Term::App::Role::Attrs.
+
+ UTF8 => BOOL
+
+    Please see Term::App::Role::Attrs.
+
+SEE ALSO
+
+    Perinci::CmdLine::Any, Perinci::CmdLine::Lite.
+

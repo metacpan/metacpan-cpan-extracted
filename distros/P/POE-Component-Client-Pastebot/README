@@ -1,0 +1,178 @@
+NAME
+
+    POE::Component::Client::Pastebot - Interact with Bot::Pastebot web
+    services from POE.
+
+VERSION
+
+    version 1.18
+
+SYNOPSIS
+
+      use strict;
+      use POE qw(Component::Client::Pastebot);
+    
+      my $pastebot = 'http://sial.org/pbot/';
+    
+      my $pbobj = POE::Component::Client::Pastebot->spawn( alias => 'pococpb' );
+    
+      POE::Session->create(
+            package_states => [
+              'main' => [ qw(_start _got_paste _got_fetch) ],
+            ],
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+    
+      sub _start {
+    
+        seek( DATA, 0, 0 );
+        local $/;
+        my $source = <DATA>;
+    
+        $poe_kernel->post( 'pococpb', 'paste', 
+    
+            { event => '_got_paste', 
+              url   => $pastebot, 
+              paste => $source,
+              channel => '#perl',
+              nick => 'pococpb',
+              summary => 'POE::Component::Client::Pastebot synopsis',
+            },
+        );
+        undef;
+      }
+    
+      sub _got_paste {
+        my ($kernel,$ref) = @_[KERNEL,ARG0];
+        if ( $ref->{pastelink} ) {
+            print STDOUT $ref->{pastelink}, "\n";
+            $kernel->post( 'pococpb', 'fetch', { event => '_got_fetch', url => $ref->{pastelink} } );
+            return;
+        }
+        warn $ref->{error}, "\n";
+        $kernel->post( 'pococpb', 'shutdown' );
+        undef;
+      }
+    
+      sub _got_fetch {
+        my ($kernel,$ref) = @_[KERNEL,ARG0];
+        if ( $ref->{content} ) {
+            print STDOUT $ref->{content}, "\n";
+        }
+        else {
+            warn $ref->{error}, "\n";
+        }
+        $kernel->post( 'pococpb', 'shutdown' );
+        undef;
+      }
+
+DESCRIPTION
+
+    POE::Component::Client::Pastebot is a POE component that provides
+    convenient mechanisms to paste and fetch pastes from Bot::Pastebot
+    based web services.
+
+    It was inspired by http://sial.org/ pbotutil.
+
+CONSTRUCTOR
+
+    spawn
+
+      Starts a new POE::Component::Client::Pastebot session and returns an
+      object. Takes a number of arguments all are optional.
+
+        'alias', specify a POE Kernel alias for the component;
+        'options', a hashref of POE Session options to pass to the component's session;
+
+METHODS
+
+    session_id
+
+      Takes no arguments. Returns the POE Session ID of the component.
+
+    shutdown
+
+      Takes no arguments, terminates the component.
+
+INPUT EVENTS
+
+    What POE events our component will accept.
+
+    paste
+
+      Sends a paste request to a pastebot url. Accepts either a hashref of
+      the following values or a list of the same:
+
+        'event', the name of the event to send the reply to. ( Mandatory );
+        'url', the URL of the pastebot to paste to. ( Mandatory );
+        'paste', either a scalar or arrayref of data to paste, ( Mandatory );
+        'channel', the channel to annouce to;
+        'nick', the nickname to annouce from;
+        'summary', brief description of the paste;
+
+      You may also pass arbitary key/values in the hashref ( as
+      demonstrated in the SYNOPSIS ). Arbitary keys should have an
+      underscore prefix '_'.
+
+    fetch
+
+      Retrieves the text from a given paste url. Accepts either a hashref
+      of the following values or a list of the same:
+
+        'event', the name of the event to send the reply to. ( Mandatory );
+        'url', the paste URL to retrieve;
+
+      You may also pass arbitary key/values in the hashref ( as
+      demonstrated in the SYNOPSIS ). Arbitary keys should have an
+      underscore prefix '_'.
+
+    shutdown
+
+      Takes no arguments, terminates the component.
+
+OUTPUT EVENTS
+
+    The component will send an event in response to 'paste' and 'fetch'
+    requests. ARG0 of the event will be a hashref containing the key/values
+    of the original request ( including any arbitary key/values passed ).
+
+    Both request types will have the following common keys:
+
+      'error', if something went wrong with the request, this key will be defined
+               with a brief description of the error encountered;
+      'response', a HTTP::Response object as returned by LWP::UserAgent;
+
+    The following additional key/values will be present depending on the
+    type of request made:
+
+    paste
+
+        'pastelink', the URL of the paste that was made;
+
+    fetch
+
+        'content', the contents of the paste URL that was retrieved;
+
+SEE ALSO
+
+    POE
+
+    Bot::Pastebot
+
+    HTTP::Response
+
+    http://sial.org/code/perl/scripts/pbotutil.pl
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

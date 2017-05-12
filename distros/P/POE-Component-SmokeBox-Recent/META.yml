@@ -1,0 +1,37 @@
+---
+abstract: 'A POE component to retrieve recent CPAN uploads.'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  File::Spec: '0'
+  HTTP::Date: '0'
+  HTTP::Response: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+  Test::POE::Server::TCP: '0.14'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-SmokeBox-Recent
+requires:
+  CPAN::Recent::Uploads: '0.06'
+  HTTP::Request: '0'
+  Net::IP::Minimal: '0'
+  POE: '0.38'
+  POE::Component::Client::DNS: '1.02'
+  POE::Filter::HTTP::Parser: '1.06'
+  Test::POE::Client::TCP: '0.08'
+  URI: '0'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/bingos/poe-component-smokebox-recent
+  repository: https://github.com/bingos/poe-component-smokebox-recent.git
+version: '1.50'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,0 +1,17 @@
+######################################################################
+Revision history for Pod::Licensizer
+
+0.03  2011/07/13
+  (ms) Fixed simple/advance style parsing
+  (ms) Fixed eg/licensizer.yml example
+  (ms) Added test for eg/licensizer
+
+0.02  2011/06/04
+  (ms) Clear option (-c switch) removes sections for later re-application in
+       defined order.
+  (ms) Dryrun (-n switch) just displays what would be done.
+  (ms) eg/licensizer now installed in perl bin
+  (ms) author/license sections now optional
+
+0.01  2011/06/03
+  (ms) Where it all began.

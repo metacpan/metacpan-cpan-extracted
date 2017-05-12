@@ -1,0 +1,3 @@
+Mai 12 06:55:06 hathi sshd[1966]: error: Hm, dispatch protocol error: type 32 plen 4
+Jun  7 22:11:21 tardis-a1.ee.ethz.ch ftpd[14025]: FTPD: command: NOOP^M
+Dez  7 22:11:21 tardis-a1.ee.ethz.ch ftpd[14025]: FTPD: command: NOOP^M

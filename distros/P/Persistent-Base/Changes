@@ -1,0 +1,87 @@
+Revision history for the Persistent Base package.
+
+Changes in Persistent 0.52	25 Feb 2000
+
+  Thanks to Mike Blazer (blazer@mail.nevalink.ru), I was able to
+  modify DBM.pm and File.pm to work under Windows95/98 and other ports
+  of Perl that do not have a flock system call implemented.  The
+  following changes were made to allow this:
+
+  o Removed the use of POSIX.pm for the O_* constants and instead use
+    Fcntl.pm for these constants now.
+  o Put an eval block around all of the flock system calls to ignore
+    any errors related to flock not being implemented on that platform.
+    For example:
+
+      eval { flock(LOCK_FH, $flock_type) or
+        croak "Can't lock ($lock_type) $file.lock: $!";
+      }; undef $@;
+
+Changes in Persistent 0.51	22 Feb 2000
+
+  Fixed a problem with file locking related to the following platforms:
+
+    o hpux 10.20 PA-RISC1.1
+    o sco 3.2v5.0.4 i386-sco
+    o solaris 2.7 sun4-solaris
+
+  Now a shared lock is obtained using a read-only file handle and an
+  exclusive lock uses a write-only file handle.
+
+Changes in Persistent 0.50	07 Feb 2000
+
+  Alright, I'm lame.  I never got around to submitting Persistent to
+  CPAN.  So here goes...
+
+  This will be the first submission of Persistent to CPAN.  This release
+  will contain the following modules:
+
+      Persistent::Base
+      Persistent::DBM
+      Persistent::File
+      Persistent::Memory
+      Persistent::DataType::*
+
+  We'll also in parallel submit these additional and separate modules:
+
+      Persistent::LDAP
+      Persistent::DBI (required by the following database modules)
+      Persistent::MySQL
+      Persistent::mSQL
+      Persistent::Oracle
+      Persistent::Sybase (if we can find a Sybase database!)
+
+  Here are some actual changes in this release:
+
+  Base
+  ----
+  o renamed the register_field method to add_attribute
+
+  o merged methods: debug and ShowSQL attribute
+      now you can pass a 'SQL' and 'LDAP' argument to print out
+      their respective generated query statements
+
+  DBM
+  ---
+  o fixed possible problem: changed order of args for DBM datastore method
+      from: DBM->datastore($file, $type, $delimiter)
+      to:   DBM->datastore($file, $delimiter, $type)
+
+  o checked lock library that I was using
+      Some people complained that it was slow.
+
+Changes in Persistent 0.40	06 Aug 1999
+
+  First release of the Persistent classes to CPAN.  This initial release
+  of the base package consists of the Persistent::Base, Persistent::DBM,
+  Persistent::File, Persistent::Memory, and Persistent::DataType::*
+  classes.  All of the classes have been documented and there is also an
+  overview document for the Persistent classes, Persistent.pod.
+
+Changes in Persistent 0.30	24 Sep 1998
+
+  Modified Persistent classes to work in the format of a CPAN module.
+
+Changes in Persistent 0.01	02 Sep 1998
+
+  Original version created by h2xs 1.18

@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: thunar-vfs
+Description: ThunarVFS library
+Requires: exo-0.3 gthread-2.0
+Version: 1.0.2
+Libs: -L${libdir} -lthunar-vfs-1
+Cflags: -I${includedir}/thunar-vfs-1

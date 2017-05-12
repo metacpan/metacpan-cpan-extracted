@@ -1,0 +1,16 @@
+SYNOPSIS
+
+    In function Rinci metadata:
+
+     args => {
+         arg1 => {
+             ...,
+             'cmdline.chomp' => ...,
+         },
+     }
+
+DESCRIPTION
+
+    This property is to allow command-line-related attributes in argument
+    specification.
+

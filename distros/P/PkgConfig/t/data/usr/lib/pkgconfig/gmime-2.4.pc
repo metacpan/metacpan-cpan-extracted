@@ -1,0 +1,13 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+
+Name: GMime
+Version: 2.4.14
+Description: MIME parser and utility library
+Requires: glib-2.0,gobject-2.0
+Libs.private: -lz -lnsl
+Libs: -L${libdir} -lgmime-2.4
+Cflags: -I${includedir}/gmime-2.4 -D_LARGEFILE64_SOURCE

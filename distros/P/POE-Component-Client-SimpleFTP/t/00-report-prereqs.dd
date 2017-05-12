@@ -1,0 +1,45 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'Module::Build::Tiny' => '0.039',
+                                        'perl' => '5.006'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'DateTime::Format::Strptime' => '0',
+                                      'Exporter' => '0',
+                                      'Moose::Util::TypeConstraints' => '0',
+                                      'MooseX::POE::SweetArgs' => '0',
+                                      'POE' => '0',
+                                      'POE::Driver::SysRW' => '0',
+                                      'POE::Filter::Line' => '0',
+                                      'POE::Filter::Stream' => '0',
+                                      'POE::Wheel::ReadWrite' => '0',
+                                      'POE::Wheel::SocketFactory' => '0',
+                                      'Socket' => '0',
+                                      'parent' => '0',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::Deep' => '0',
+                                   'Test::More' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

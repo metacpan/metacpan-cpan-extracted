@@ -1,0 +1,10 @@
+=head1 NAME
+
+Basic Options Test
+
+=head1 DESCRIPTION
+
+This is a very basic test, with options passed to the viewer.
+
+=cut
+

@@ -1,0 +1,108 @@
+NAME
+
+    POE::Component::SmokeBox::Uploads::RSS - Obtain uploaded CPAN modules
+    via RSS.
+
+VERSION
+
+    version 1.04
+
+SYNOPSIS
+
+      use strict;
+      use POE qw(Component::SmokeBox::Uploads::RSS);
+    
+      $|=1;
+    
+      POE::Session->create(
+            package_states => [
+              'main' => [qw(_start upload)],
+            ],
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+    
+      sub _start {
+        POE::Component::SmokeBox::Uploads::RSS->spawn(
+            event => 'upload',
+        );
+        return;
+      }
+    
+      sub upload {
+        print $_[ARG0], "\n";
+        return;
+      }
+
+DESCRIPTION
+
+    POE::Component::SmokeBox::Uploads::RSS is a POE component that alerts
+    newly uploaded CPAN distributions. It obtains this information from
+    polling an RSS feed ( by default http://search.cpan.org/uploads.rdf.
+
+    POE::Component::RSSAggregator is used to handle the RSS feed monitoring
+    and POE::Component::Client::HTTP used to obtain the full author path
+    for each new upload.
+
+CONSTRUCTOR
+
+    spawn
+
+      Takes a number of parameters:
+
+        'event', the event handler in your session where each new upload alert should be sent, mandatory;
+        'session', optional if the poco is spawned from within another session;
+
+      The 'session' parameter is only required if you wish the output event
+      to go to a different session than the calling session, or if you have
+      spawned the poco outside of a session.
+
+      Returns an object.
+
+METHODS
+
+    session_id
+
+      Returns the POE::Session ID of the component.
+
+    shutdown
+
+      Terminates the component.
+
+INPUT EVENTS
+
+    shutdown
+
+      Terminates the component.
+
+OUTPUT EVENTS
+
+    An event will be triggered for each new CPAN upload. The event will
+    have ARG0 set to the path of the upload:
+
+      B/BI/BINGOS/POE-Component-SmokeBox-Uploads-RSS-0.01.tar.gz
+
+    Suitable for feeding to the smoke tester of your choice.
+
+SEE ALSO
+
+    POE
+
+    POE::Component::RSSAggregator
+
+    POE::Component::Client::HTTP
+
+    http://search.cpan.org/uploads.rdf
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

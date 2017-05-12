@@ -1,0 +1,29 @@
+---
+abstract: "Return default document with '200' instead of '404' error"
+author:
+  - 'Hiroshi Sakai <ziguzagu@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0.96
+configure_requires:
+  CPAN::Meta: 0
+  ExtUtils::MakeMaker: 6.36
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-DefaultDocument
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Plack: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ziguzagu/Plack-Middleware-DefaultDocument.git
+version: 0.02
+x_authority: ZIGUZAGU

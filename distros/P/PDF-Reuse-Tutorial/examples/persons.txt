@@ -1,0 +1,5 @@
+ Abdulla, Rahman,, Stora Gatan 65, 12345, Eskilstuna, Sverige
+ Barbro, Stor,, Nyvägen 14, 14567, Kalmar, Sverige
+ Cecilia, Grön,, Industrivägen 98, 89654, Piteå, Sverige
+ David, Axelsson,, Vintergatan 3, 89745, Luleå, Sverige
+ Erik, Svensson, c/o Hannes Vestin, Nydalavägen 18, 44678 Uddevalla   

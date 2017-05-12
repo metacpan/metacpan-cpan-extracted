@@ -1,0 +1,21 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Perl6/Slurp.pm
+demo/demo_list_context.pl
+demo/demo_squeeze.pl
+t/chomp.t
+t/errors.t
+t/filehandle.t
+t/filename.t
+t/ioderfile.t
+t/iofile.t
+t/ipc.t
+t/irs.t
+t/layers.t
+t/lexfilehandle.t
+t/string.t
+t/no_source.t
+t/filetemp.t
+META.yml                                 Module meta-data (added by MakeMaker)

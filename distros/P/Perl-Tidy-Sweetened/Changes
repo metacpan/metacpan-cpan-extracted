@@ -1,0 +1,204 @@
+Changes for Perl::Tidy::Sweetend
+
+1.12 - Tue Oct  4 15:56:53 EDT 2016
+    Add support to extend classes with :: (e.g, Object::Person).
+    Thanks to @pblaberge for the PR.
+    [Upgrade recommended.]
+
+1.11 - Fri Apr 15 09:29:03 EDT 2016
+    Sends Perl::Tidy errors during testing to a string instead of fs (GH#9)
+    - By default Perl::Tidy writes a perltidy.ERR file when it encounters
+      errors. Perl::Tidy::Sweetened tests remove the error file then check
+      to see if it is created after each test. This leads to a race
+      condition with running in parallel (ie, prove -j 9). This commit makes
+      Perl::Tidy write errors to a string buffer instead. Thanks @shlomif
+      for the bug report (GH#9).
+    [Only changes tests. No need to upgrade.]
+
+1.10 - Sun Mar 13 13:14:01 EDT 2016
+    Skips test that fails with Perl::Tidy 20160301 due to a Perl::Tidy bug
+    - Adds test-all script to run against multiple versions of Perl::Tidy
+    - Moves display of Perl::Tidy version to t/00-version.t
+    Fixes typo in cpan badge URL
+    [Only changes tests. No need to upgrade.]
+
+1.09 - Fri Mar 11 21:27:42 EST 2016
+    Converts from Module::Build to Module::Built::Tiny and the mbtiny tool
+    Adds perltidy-sweet script to distribution
+    Fixes issues with badges
+    [Optional upgrade]
+
+1.08 - Fri Mar 11 20:55:29 EST 2016
+    Updates tests to support Perl::Tidy 20160301 and later
+    - New version of Perl::Tidy has some support for new syntax. This is
+      great, but it has some minor impact on spacing in our tests.
+    [Upgrade recommended if you are using newer versions of Perl::Tidy]
+
+1.07 - Wed Jan 27 09:36:42 EST 2016
+    Adds new podweaver sections
+    - Bugs in pod now point to GH issues
+    - Adds contributors list to pod
+    - Adds link to github in pod
+    [No need to upgrade]
+
+1.06 - Tue Jan 26 17:21:34 EST 2016
+    Ignore 'method' functions (not pseudo-keywords) like those in
+      MooseX::Role::Parameterized (PR#6, RT#106464).
+    Use faster container-based infrastructure for Travis (PR#7).
+    Both of these patch were contributed by @oschwald. Thanks!
+    [Upgrade recommended if you use MooseX::Role::Parameterized]
+
+1.05 - Sat Aug 22 10:07:24 EDT 2015
+    Changes placeholder from comment at end of line, to munged sub/pkg name.
+    So, instead of turning:
+
+        method test_method_a ($self) {
+
+    into
+
+        sub test_method_a { # SUB1
+
+    we now turn it into
+
+        sub SUB1_method_a {
+
+    This eliminates issues with Perl::Tidy moving that trailing comment, and
+    attempts to preserve the length of the method name so any changes to
+    formatting due to name length will be consistent.
+
+    Bug fixes and improvements to tests:
+    - Bug fix: RT#106398 "long single line subs" should be handled correctly.
+    - Adds (failing) test for RT#106464
+    - Adds checks for creation of perltidy.ERR file as part of tests
+    - Adds simpler means of specifying TODO tests
+
+    TODO:
+    - Would like to preserve the *length* of the clauses in order to allow
+      Perl::Tidy to format them. This could probably be done with prototypes
+      for sub, but not sure what you do with packages.
+
+    [This upgrade is recommended if you are experiencing issues with
+    "# SUB_" comments being left in your code.]
+
+1.04 - Fri Mar 20 09:16:11 EDT 2015
+    This release fixes bug reported in RT#102815.
+    - We had been overwriting the result of the -sbl and -bl flags, which
+      control line breaks before opening subroutine brace.  Thanks to Serge
+      Colle for the bug report.
+    - This fix makes changes to the way the post_filter parses a line. Please
+      test this with your codebase and report any bugs.
+    [This upgrade is recommended if you use the -sbl or -bl flags.]
+
+1.03 - Sat Dec 20 16:53:27 EST 2014
+    Adds the perltidy-sweet command
+    - More clearly indicates how this differs from perltidy than perltidier.
+      Thanks to Dave Rolsky (autarch) for the suggestion.
+    - Keeps perltidier command as many users are already used to this.
+
+1.02 - Tue Dec  9 12:28:49 EST 2014
+    Fixes handling of 5.20 experimental signatures
+    - It looked like Perl::Tidy would handle the new 5.20 experimental
+      signatures, but it fails when you try to use an empty hash as a
+      default value (and maybe elsewhere).
+    - Have to add a block parse for "sub (...) {"
+    Adds test for anonymous sub routines for perl 5.20 signatures
+
+1.01 - Sat Aug 23 14:35:05 EDT 2014
+    Adds support/test for Moops
+
+1.00 - Sat Aug 16 09:57:05 EDT 2014
+    Bumps to version 1.00. Been stable for several years now.
+
+0.27 - Wed Aug  6 04:32:47 EDT 2014
+    Adds $TODO flag that works with newest version of Test::More.
+
+0.26 - Mon Aug  4 03:53:40 EDT 2014
+    Deals with MooseX::Delcare's "is" attribute for classes (GH#5)
+    Thanks to stratust for the bug report
+
+    Adds test to ensure we work with perl 5.20 signatures
+    It doesn't look like any changes are needed, but it's good to have the
+    tests in place to make sure.
+
+0.25 - Fri Jun  6 10:38:57 EDT 2014
+    Fixes (GH#3): Typo in documentation. Method::Signatures::Simple instead of
+    Method::Signature::Simple.
+    Thanks to aggrolite for the bug report and patch.
+
+0.24 - Thu Apr 24 07:27:09 EDT 2014
+    Fixes RT#94633: class WORD::WORD was not parsed correctly.
+    Thanks to Kent Fredric for the bug report.
+
+0.23 - Fri Jan  3 14:25:22 EST 2014
+    Re-uploads to try to fix metacpan.org indexing issue.
+
+0.22 - Fri Oct  4 08:11:50 EDT 2013
+    Removes extraneous files from release
+
+0.21 - Wed Oct  2 12:45:51 EDT 2013
+    Adds support for the new p5-mop syntax
+    - Introduces a plugin to support twigils
+    - Generalizes the SubSignature plugin to work with keywords that start
+      blocks
+    Further abstracts the creation of new subroutine filters
+    Builds on Kent Fredric's plugin abstraction to make the parameter list,
+    return type, and any other clause definable.
+
+0.20 - Mon May  6 11:16:28 EDT 2013
+    Significant refactoring (by Kent Fredric++) to make the filters pluggable.
+
+    - Fixes RT#85076 bug (support for returns() syntax)
+    - Switches to named captures to make the regex more clear (ok, since we
+      already require 5.010 for the balanced paranes)
+    - Stores signature (and any returns() declaration) externally rather
+      than in the code via comments. Nice idea Kent++.
+    - Adds a .perltidyrc file so all contributers style will be consistent
+
+0.19 - Fri Apr 26 10:20:13 EDT 2013
+    Removes unnecessary (?^:) wrapper around paren regex. Bumps req to 5.10
+    The (?^ cluster is causing failures on pre-5.14 version of perl. It does
+    not appear to be necessary given our use of the regex. On the other
+    hand, the use of (?-1) was added in 5.10, so let's bump the perl
+    requirement back to 5.10 (it is hard to imagine anyone using modern
+    method syntax on a pre-5.10 perl).
+
+0.18 - Fri Apr 26 09:43:24 EDT 2013
+    Fixes bug where balanced parens in the parameters list were not correctly
+    formatted (RT#84868).
+
+    Minor tweaks:
+    - Adds Perl::Tidy::Sweet as an alternate module name.
+    - Changes hash bang for the perltidier script so it is rewritten at install.
+    - Drops minimum perl version to 5.8
+    - Adds travis-ci config file
+
+0.17 - Mon Feb 25 15:53:33 EST 2013
+    Fixes RT#83511 - empty parameter list improperly rewritten
+    - Addresses a bug, reported by Kent Fredric, where "method for() {" was
+      converted to "method foo { ()"
+
+0.16 - Fri Feb  8 16:19:37 EST 2013
+    Bumps the perl version requirement
+    We want to use \K in our regexps. This was introduced in 5.10. Since
+    the purpose of this is to support modern Perl syntax, we'll just
+    assume users are using a modern version of perl.
+
+0.15 - Wed Nov 28 17:53:06 EST 2012
+    Adds missing prereq
+
+0.14 - Wed Sep  5 14:54:50 EDT 2012
+    Fixes lingering typos
+
+0.13 - Wed Sep  5 14:51:21 EDT 2012
+    Fixes lingering typos
+
+0.12 - Tue Sep  4 22:39:26 EDT 2012
+    Fixes typo in package name, adds pod and comments
+
+0.11 - Tue Sep  4 20:03:08 EDT 2012
+    Improves testing setup and implements formatting for "func"
+
+0.10 - Wed Aug 22 11:53:23 EDT 2012
+    Initial implementation. Much of the code and the idea come from
+    Jonathan Swartz's blog post: 
+    http://www.openswartz.com/2010/12/19/perltidy-and-method-happy-together/

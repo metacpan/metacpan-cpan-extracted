@@ -1,0 +1,22 @@
+%FDF-1.2%‚„œ”
+1 0 obj<< /FDF << /Fields [ 
+
+<< /T (uncomment) /V ( \\ ) >>
+<< /T (slash r) /V (x\rx) >>
+<< /T (slash n) /V (x\nx) >>
+<< /T (dM) /V (xx) >>
+
+<< /T (uncomment dM) /V (x\x) >>
+<< /T (uncomment slash r) /V (x\\rx) >>
+<< /T (uncomment slash n) /V (x\\nx) >>
+
+<< /T (uncomment newline n) /V (x\
+x) >>
+<< /T (newline n) /V (x
+x) >>
+
+
+] /F (file.eff)/ID [ <d725778e><7c40214f81e>] >> >> 
+endobj
+trailer
+<</Root 1 0 R >>%%EOF 

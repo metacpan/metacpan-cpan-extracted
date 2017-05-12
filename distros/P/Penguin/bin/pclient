@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+$codefile = "../misc/codefile";
+$name = "Detroit Q. Penguin";
+$title = "Example Code Fragment";
+$host = "localhost";
+$port = 8118;
+
+print("Type your PGP Password (echo disabled with 'stty -echo'):\n");
+system("stty -echo");
+chop($password = <STDIN>);
+system("stty echo");
+print("thanks (echo back on)\n");
+
+use Penguin::Trivial::Client;
+
+open(CODEFILE, "< $codefile")
+         or die "can't open $codefile to send it";
+{local $/ = undef; $codetosend = <CODEFILE>}
+close(CODEFILE);
+
+$penguinclient = new Penguin::Trivial::Client Code => $codetosend,
+                                          Host => $host,
+                                          Port => $port,
+                                          Password => $password,
+                                          Title => $title,
+                                          Name => $name;
+
+$retval = $penguinclient->run();
+
+print "returned value: $retval\n";
+

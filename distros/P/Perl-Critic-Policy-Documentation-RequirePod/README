@@ -1,0 +1,23 @@
+NAME
+
+    Perl::Critic::Policy::Documentation::RequirePod - file requires POD
+
+VERSION
+
+    version 0.005
+
+DESCRIPTION
+
+    This policy requires your code to contain POD.
+
+AUTHOR
+
+    Andreas Schröter <andreas.schroeter@autinity.de>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by afr-consulting GmbH.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

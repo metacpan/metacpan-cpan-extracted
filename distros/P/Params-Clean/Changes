@@ -1,0 +1,18 @@
+Revision history for Params-Clean
+
+0.9     2007-July-30
+        Initial public release!
+
+0.9.1   2007-August-2
+        Minor POD housekeeping for CPAN
+
+0.9.2   2007-August-3
+        POD again!
+        
+0.9.3 	2007-December-16
+		Added renaming of exported IDs
+		Added control over exceptions 
+		(NOTE: v0.9.3 does not warn of missing starting points for LISTs unless asked to. Previous versions always emitted such warnings.)
+
+0.9.4 	2007-December-17
+		Added ability to PARSE lists other than @_

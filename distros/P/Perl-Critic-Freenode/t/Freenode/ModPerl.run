@@ -1,0 +1,23 @@
+## name UseModPerl1
+## failures 4
+## cut
+
+use Apache;
+use Apache::Constants;
+use Apache::Registry;
+use Apache::Request;
+
+## name UseModPerl2
+## failures 4
+## cut
+
+use Apache2::Const;
+use ModPerl::Const;
+use ModPerl::Registry;
+use Apache2::Request;
+
+## name NoModPerl
+## failures 0
+## cut
+
+1;

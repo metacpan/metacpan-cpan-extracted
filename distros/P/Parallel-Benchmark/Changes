@@ -1,0 +1,36 @@
+Revision history for Perl extension Parallel::Benchmark
+
+0.10 2015-04-14T04:30:10Z
+        - Depends on Parallel::ForkManager 1.12
+
+0.09 2015-04-10T05:30:28Z
+        - Depends on Parallel::ForkManager 1.08
+          https://github.com/fujiwara/p5-Parallel-Benchmark/issues/1
+
+0.08 2013-10-01T14:17:31Z
+        - No code changes.
+        - switch to Minilla.
+
+0.07    Mon Jan 22 13:38:46 JST 2013
+        - use SIGALRM to wait timeout.
+        - When all child processes halted before timeout, finish benchmarking immediately.
+
+0.06    Mon Jan 21 15:43:50 JST 2013
+        - added halt() to exit child processes normally.
+
+0.05    Tue Oct 09 23:18:00 JST 2012
+        - depends on Parallel::ForkManager >= 0.7.6 (Songmu)
+
+0.04    Mon May 21 22:11:34 JST 2012
+        - use File::Temp to create temporary directory.
+
+0.03    Mon May 21 20:36:00 JST 2012
+        - add dependency Parallel::Scoreboard
+        - fix problem caused slow setup() on child.
+
+0.02    Fri May 04 12:16:31 2012
+        - avoid 'Illegal division by zero' (Carl Furst)
+
+0.01    Fri Feb 17 16:47:11 2012
+        - original version
+

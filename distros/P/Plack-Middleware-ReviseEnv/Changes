@@ -1,0 +1,11 @@
+0.004  2016-08-11 00:51:57 CEST
+   - add caching
+   - add 5.8 checks in Travis-CI
+
+0.002  2016-08-10 08:13:36 CEST
+   - add Travis-CI integration
+   - add HTML boilerplate in documentation
+   - release after CPAN Testers smoke check (thanks!)
+
+0.001001  2016-08-09 18:45:01 CEST
+   - first test release, contains most of the implementation hopefully

@@ -1,0 +1,20 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Params/Clean.pm
+t/00-load.t
+t/boilerplate.t
+t/pod.t
+t/tests.t
+t/expo.pm
+t/export.t
+t/examples.t
+t/synopsis.t
+t/lists.t
+t/misc.t
+t/renaming.t
+t/parse.t
+t/try.pm
+

@@ -1,0 +1,32 @@
+---
+abstract: 'A base class for creating plugin-enabled POE Components.'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+  - 'Apocalypse <perl@0ne.us>'
+  - 'Hinrik Örn Sigurðsson'
+  - 'Jeff Pinyan'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-Pluggable
+requires:
+  POE: '1.004'
+  Task::Weaken: '0'
+  constant: '1.17'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/bingos/poe-component-pluggable
+  repository: https://github.com/bingos/poe-component-pluggable.git
+version: '1.28'
+x_serialization_backend: 'YAML::Tiny version 1.70'

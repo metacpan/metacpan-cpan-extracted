@@ -1,0 +1,194 @@
+{
+   "abstract" : "Perl 5 implementation of Closure Templates",
+   "author" : [
+      "Zahatski Aliaksandr zag@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plosurin",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Server::Simple::WebDAO" : "0.01",
+            "Perl6::Pod" : "0.35",
+            "Perl6::Pod::Lib" : "0.07",
+            "Regexp::Grammars" : "1.014"
+         }
+      }
+   },
+   "provides" : {
+      "Exp::Digit" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Exp::String" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Exp::Var" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Exp::add" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Exp::base" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Exp::list" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Exp::mult" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Plo::File" : {
+         "file" : "lib/Plosurin.pm",
+         "version" : 0
+      },
+      "Plo::h_params" : {
+         "file" : "lib/Plosurin.pm",
+         "version" : 0
+      },
+      "Plo::template" : {
+         "file" : "lib/Plosurin.pm",
+         "version" : 0
+      },
+      "Plosurin" : {
+         "file" : "lib/Plosurin.pm",
+         "version" : "0.1"
+      },
+      "Plosurin::AbstractVisiter" : {
+         "file" : "lib/Plosurin/AbstractVisiter.pm",
+         "version" : 0
+      },
+      "Plosurin::Context" : {
+         "file" : "lib/Plosurin/Context.pm",
+         "version" : 0
+      },
+      "Plosurin::Grammar" : {
+         "file" : "lib/Plosurin/Grammar.pm",
+         "version" : 0
+      },
+      "Plosurin::HTTP" : {
+         "file" : "lib/Plosurin/HTTP.pm",
+         "version" : 0
+      },
+      "Plosurin::SoyTree" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Plosurin::To::Perl5" : {
+         "file" : "lib/Plosurin/To/Perl5.pm",
+         "version" : 0
+      },
+      "Plosurin::Utl::ExpMapVariables" : {
+         "file" : "lib/Plosurin/Utl/ExpMapVariables.pm",
+         "version" : 0
+      },
+      "Plosurin::Utl::SetLinePos" : {
+         "file" : "lib/Plosurin/Utl/SetLinePos.pm",
+         "version" : 0
+      },
+      "Plosurin::Writer::Perl5" : {
+         "file" : "lib/Plosurin/Writer/Perl5.pm",
+         "version" : 0
+      },
+      "Soy::Actions" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::Expression" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::Node" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::base" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::command_call" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::command_call_self" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::command_else" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::command_elseif" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::command_foreach" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::command_foreach_ifempty" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::command_if" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::command_import" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::command_param" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::command_param_self" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::command_print" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::expression" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      },
+      "Soy::raw_text" : {
+         "file" : "lib/Plosurin/SoyTree.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Plosurin"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/zag/p5-Plosurin.git"
+      }
+   },
+   "version" : "0.1"
+}

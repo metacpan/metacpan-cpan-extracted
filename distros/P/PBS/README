@@ -1,0 +1,38 @@
+PBS version 0.02
+================
+
+This is a simple interface to allow perl to access parts of the 
+PBS (Portable Batch System).  It has been tested against both
+OpenPBS and PBSPro.  It provides an object oriented interface for 
+accessing the batch_status and attrl data strucutres used by the 
+PBS api, and provides a wrapper for the querying functions of PBS.
+It does not currently provide an interface for submitting jobs.
+
+INSTALLATION
+
+To install this module type the following:
+
+   Edit Makefile.PL to point to the location of your pbs libraries
+       and header files.
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    perl 5.8 or higher, pbs libraries
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004 by Todd Merritt
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,30 @@
+Active Connections
+
+  Proto  Local Address          Foreign Address        State           PID
+  TCP    0.0.0.0:135            0.0.0.0:0              LISTENING       988
+  c:\windows\system32\WS2_32.dll
+  C:\WINDOWS\system32\RPCRT4.dll
+  c:\windows\system32\rpcss.dll
+  C:\WINDOWS\system32\svchost.exe
+  -- unknown component(s) --
+  [svchost.exe]
+
+  TCP    0.0.0.0:445            0.0.0.0:0              LISTENING       4
+  [System]
+
+  TCP    127.0.0.1:1027         0.0.0.0:0              LISTENING       1244
+  [alg.exe]
+
+  TCP    192.168.0.104:139      0.0.0.0:0              LISTENING       4
+  [System]
+
+  UDP    0.0.0.0:1025           *:*                                    1120
+  C:\WINDOWS\system32\mswsock.dll
+  c:\windows\system32\WS2_32.dll
+  c:\windows\system32\DNSAPI.dll
+  c:\windows\system32\dnsrslvr.dll
+  C:\WINDOWS\system32\RPCRT4.dll
+  [svchost.exe]
+
+  UDP    0.0.0.0:500            *:*                                    696
+  [lsass.exe]

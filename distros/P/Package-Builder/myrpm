@@ -1,0 +1,753 @@
+#!/usr/bin/perl 
+#
+# Myrpm.pl is distributed under the GPL v2 licence terms
+# Contact : Jean-Marie Renouard <jmrenouard at gmail.com>
+#
+# ENLIGHTMENT ROAD
+# FEA 13 : config from rpm --showrc
+# FEA 16 : autobuild list for install
+# FEA 17 : Make a CPAN module
+# FEA 18 : Pluginify the solution for other package system
+# FEA 19 : Purify the solution
+# FEA 20 : Objectify the solution massively
+
+use warnings;
+use strict;
+#use lib './lib';
+
+use Text::Template;
+use Archive::Tar;
+use File::stat;
+use File::Path;
+use Getopt::Long;
+use File::Find;
+use File::Basename;
+use File::Spec;
+use Cwd;
+
+use Package::Utils;
+use Package::Builder;
+
+sub printUsage($);
+sub printError($);
+
+my $version_number = $Package::Builder::VERSION;
+printError("Wrong parameter : -N, -V ,-R at least\n$0 -h for help")
+  unless ( $#ARGV >= 0 );
+
+my $topdir          = getParameterFromConfig( "_topdir", "/usr/src/redhat" );
+my $specDir         = $topdir . "/SPECS";
+my $srcDir          = $topdir . "/SOURCES";
+
+######
+# Misc declaration section
+######
+my $line      = "";
+my @files     = ();
+my @instFiles = ();
+my @instDirs  = ();
+
+my @defFiles     = ();
+my @defConfFiles = ();
+my @defDocFiles  = ();
+
+######
+# Command line option section
+######
+Getopt::Long::Configure('bundling');
+
+my (
+    $help,          $build,           $verbose,     $multi,
+    $templateName,  $root_dir,        $snap_dir,    $Name,
+    $Version,       $Release,         $Description, $Summary,
+    $ChangeLog,     $Packager,        $Vendor,      $VendorUrl,
+    $Archi,         $Distro,          $archive,     $requires_string,
+    $pre_script,    $build_script,    $post_script, $preun_script,
+    $postun_script, $exclude_pattern, $uid,         $gid,
+    $nodoc,         $noconf,          $nores
+);
+
+GetOptions(
+    "h"                => \$help,
+    "help"             => \$help,
+    "b"                => \$build,
+    "build"            => \$build,
+    "v"                => \$verbose,
+    "verbose"          => \$verbose,
+    "m"                => \$multi,
+    "multiple"         => \$multi,
+    "t=s"              => \$templateName,
+    "template=s"       => \$templateName,
+    "r=s"              => \$root_dir,
+    "root-directory=s" => \$root_dir,
+    "d=s"              => \$snap_dir,
+    "directory=s"      => \$snap_dir,
+    "x=s"              => \$exclude_pattern,
+    "exclude=s"        => \$exclude_pattern,
+    "a=s"              => \$archive,
+    "archive=s"        => \$archive,
+    "u=s"              => \$uid,
+    "uid=s"            => \$uid,
+    "g=s"              => \$gid,
+    "gid=s"            => \$gid,
+    "n"                => \$nodoc,
+    "nodoc"            => \$nodoc,
+    "c"                => \$noconf,
+    "noconfig"         => \$noconf,
+    "s"                => \$nores,
+    "noreserved"       => \$nores,
+    "N=s"              => \$Name,
+    "name=s"           => \$Name,
+    "V=s"              => \$Version,
+    "version=s"        => \$Version,
+    "R=s"              => \$Release,
+    "release=s"        => \$Release,
+    "C=s"              => \$ChangeLog,
+    "changelog=s"      => \$ChangeLog,
+    "D=s"              => \$Description,
+    "description=s"    => \$Description,
+    "S=s"              => \$Summary,
+    "summary=s"        => \$Summary,
+    "P=s"              => \$Packager,
+    "packager=s"       => \$Packager,
+    "O=s"              => \$Vendor,
+    "vendor=s"         => \$Vendor,
+    "U=s"              => \$VendorUrl,
+    "url-vendor=s"     => \$VendorUrl,
+    "A=s"              => \$Archi,
+    "architecture=s"   => \$Archi,
+    "T=s"              => \$Distro,
+    "distribution=s"   => \$Distro,
+    "requires=s"       => \$requires_string,
+    "pre-script=s"     => \$pre_script,
+    "post-script=s"    => \$post_script,
+    "preun-script=s"   => \$preun_script,
+    "postun-script=s"  => \$postun_script,
+    "build-script=s"   => \$build_script
+);
+
+printUsage($0) if defined $help;
+
+($templateName) || ( $templateName = shift ) || ( $templateName = "" );
+($root_dir)     || ( $root_dir     = shift ) || ( $root_dir     = "" );
+$root_dir =~ s/\/$//;
+
+($snap_dir) || ( $snap_dir = shift ) || ( $snap_dir = "" );
+$snap_dir =~ s/\/$//;
+
+($exclude_pattern) || ( $exclude_pattern = shift ) || ( $exclude_pattern = "" );
+
+($archive) || ( $archive = shift ) || ( $archive = undef );
+
+($uid) || ( $uid = shift ) || ( $uid = 0 );
+($gid) || ( $gid = shift ) || ( $gid = 0 );
+($Name) || ( $Name = shift ) || ( printError("Missing -N option : mandatory") );
+($Version)
+  || ( $Version = shift )
+  || ( printError("Missing -V option : mandatory") );
+($Release)
+  || ( $Release = shift )
+  || ( printError("Missing -R option : mandatory") );
+($ChangeLog)
+  || ( $ChangeLog = shift )
+  || ( $ChangeLog = "http://www.123solution.fr - RPM solution provider" );
+
+($Description)
+  || ( $Description = shift )
+  || ( $Description = "Package $Name-$Version-$Release" );
+($Summary)
+  || ( $Summary = shift )
+  || ( $Summary = "This package is used for $Name-$Version-$Release" );
+($Packager)
+  || ( $Packager = shift )
+  || ( $Packager =
+    getParameterFromConfig( "packager", "jmrenouard\@gmail.com" ) );
+($Vendor)
+  || ( $Vendor = shift )
+  || ( $Vendor = getParameterFromConfig( "vendor", "123Solution" ) );
+($VendorUrl)
+  || ( $VendorUrl = shift )
+  || ( $VendorUrl =
+    getParameterFromConfig( "vendor_url", "http://www.123solution.fr" ) );
+($Archi)
+  || ( $Archi = shift )
+  || ( $Archi = getParameterFromConfig( "_arch", "noarch" ) );
+($Distro)
+  || ( $Distro = shift )
+  || ( $Distro = getParameterFromConfig( "_dist", "Generic Red Hat" ) );
+
+($pre_script) || ( $pre_script = shift ) || ( $pre_script = "" );
+print "\n * pre : $pre_script" if defined $verbose;
+
+($preun_script) || ( $preun_script = shift ) || ( $preun_script = "" );
+print "\n * preun : $preun_script" if defined $verbose;
+
+($post_script) || ( $post_script = shift ) || ( $post_script = "" );
+print "\n * post : $post_script" if defined $verbose;
+
+($postun_script) || ( $postun_script = shift ) || ( $postun_script = "" );
+print "\n * postun : $postun_script" if defined $verbose;
+
+($build_script) || ( $build_script = shift ) || ( $build_script = "" );
+print "\n * install : $build_script" if defined $verbose;
+
+($requires_string) || ( $requires_string = shift ) || ( $requires_string = "" );
+print "\n * requires info : $requires_string" if defined $verbose;
+
+my @reqs = split( ',', $requires_string );
+
+######
+##
+######
+our @doc_pattern    = () if defined $nodoc;
+our @config_pattern = () if defined $noconf;
+our @reserved_dirs  = () if defined $nores;
+
+######
+# Checking arguments section
+######
+print "\t * Version : " . $version_number . "\n" if defined $verbose;
+
+my %lusers;
+my %lgroups;
+
+#Version
+printError("Wrong version format : XX.YY;ZZ, XX.YY, ...")
+  unless ( checkVersionFormat $Version );
+print "Checking version : $Version: OK\n" if defined $verbose;
+
+#Release
+printError("Wrong release format : X without dots")
+  unless ( checkReleaseFormat $Release );
+print "Checking release : $Release: OK\n" if defined $verbose;
+
+####
+# Handling archive mode
+####
+my $tmp_dir = undef;
+if ( defined $archive ) {
+
+    # check archive permissions
+    printError("Unable to read archive file $archive") unless -r $archive;
+
+    $snap_dir = extractArchive( $archive, $uid, $gid, $root_dir );
+
+    #Priority for archive option
+    $root_dir = $snap_dir;
+}
+
+#Checking directory
+my $current_dir = getcwd;
+$root_dir = trim $current_dir if ( $root_dir =~ /^\.$/ );
+print "Root directory : ==>$root_dir<==\n" if defined $verbose;
+printError("Root dir doesnt exists or is empty")
+  unless ( -d $root_dir || $root_dir eq "" );
+print "Checking root_dir OK\n" if defined $verbose;
+
+$snap_dir = trim $current_dir if ( $snap_dir =~ /^\.$/ );
+print "Snap directory : ==>$snap_dir<==\n" if defined $verbose;
+printError("Snapshot dir doesn t exist or is empty")
+  unless ( -d $snap_dir || $snap_dir eq "" );
+print "Checking snap_dir OK\n" if defined $verbose;
+
+my @inputFileList = getInputFileLine($snap_dir);
+
+# Pattern exclusion handling
+my @exclude_patterns = ();
+@exclude_patterns = split /,/, $exclude_pattern if ( $exclude_pattern ne "" );
+
+my %user_infos  = getUserMap();
+my %group_infos = getGroupMap();
+
+my %used_users     = ();
+my %used_groups    = ();
+my %symbolic_links = ();
+foreach (@inputFileList) {
+    my $line = $_;
+
+    # Removing empty line
+    next if ( $line eq "" );
+
+    printError("Unable to read item : $line") unless -r $line || -l $line;
+
+    #Translation of all line starting by a ./something into a absolute path
+    $line = File::Spec->rel2abs($line);
+
+    #The root dir is excluded
+    next if ( $line eq $root_dir );
+
+    my $pattern_found = 0;
+    foreach (@exclude_patterns) {
+        if ( $line =~ /$_/ ) {
+            $pattern_found = 1;
+            print "* Pattern found : $pattern_found for $line\n\n "
+              if defined $verbose;
+            last;
+        }
+    }
+
+    next if ( $pattern_found == 1 );
+
+    my $line_chrooted = $line;
+
+    # Removing root_dir entry
+    next if ( $line_chrooted eq $root_dir );
+
+    $line_chrooted =~ s/^$root_dir\///;
+    print "OK for $line_chrooted" if defined $verbose;
+
+    print "\n* Traitement de '$line'" if defined $verbose;
+
+    #Symbolic link handling
+    if ( -l $line ) {
+        my $pointedItem = File::Spec->rel2abs( readlink($line) );
+        $pointedItem =~ s/^$root_dir\///;
+        print "\n * Symbolic link detected : /$line_chrooted => $pointedItem"
+          if defined $verbose;
+
+        $symbolic_links{ "/" . $line_chrooted } = $pointedItem;
+        next;
+    }
+    die(" $line does nt exists") unless ( -e $line );
+
+    my $statFile = stat($line);
+    my $mode     = $statFile->mode;
+    my $uid      = $statFile->uid;
+    my $gid      = $statFile->gid;
+
+    print "\n* UID $uid GID : $gid" if defined $verbose;
+    $used_users{$uid}++;
+    $used_groups{$gid}++;
+
+    print "\n * USED USERS :",  join ',', keys %used_users  if defined $verbose;
+    print "\n * USED GROUPS :", join ',', keys %used_groups if defined $verbose;
+
+    print "\n* user=" . $user_infos{$uid}{'name'}   if defined $verbose;
+    print "\n* group=" . $group_infos{$gid}{'name'} if defined $verbose;
+
+    my $trueMode = sprintf( "%04o", $mode & 07777 );
+    push @files, "./$line_chrooted";
+    print "\n\t * $line into Tar ball....\n" if defined $verbose;
+    print "\t * $line and $line_chrooted into Spec file....\n"
+      if defined $verbose;
+
+    my $final_path = substituteAliasDir("/$line_chrooted");
+
+    my %tmpData = ();
+    $tmpData{mode}   = $trueMode;
+    $tmpData{file}   = escapeSpecialChars($line_chrooted);
+    $tmpData{path}   = escapeSpecialChars($final_path);
+    $tmpData{r_path} = $final_path;
+    $tmpData{uid}    = $user_infos{$uid}{'name'};
+    $tmpData{gid}    = $group_infos{$gid}{'name'};
+
+    #File case
+    if ( -f "$line" ) {
+        push @instFiles, \%tmpData;
+
+        my $isDoc    = isDocFile("/$line_chrooted");
+        my $isConfig = isConfigFile("/$line_chrooted");
+
+        # Fix bug if is config and is doc at the same time
+        #Choice to be a config file
+        $isDoc = 0 if ( $isDoc && $isConfig );
+
+        push @defFiles, \%tmpData if ( !$isDoc && !$isConfig );
+        push @defConfFiles, \%tmpData if ($isConfig);
+        push @defDocFiles,  \%tmpData if ($isDoc);
+    }
+
+    # Directory case
+    # Must not be a reserved directory
+    if ( -d "$line" ) {
+        $tmpData{comment} = 1 if isReservedDir("/$line_chrooted");
+        $tmpData{isDir} = 1;
+        push @instDirs, \%tmpData;
+
+        push @defFiles, \%tmpData if ( !isReservedDir("/$line_chrooted") );
+    }
+}
+
+print "\n * uniq uids :" . join ', ', keys %used_users  if defined $verbose;
+print "\n * uniq gids :" . join ', ', keys %used_groups if defined $verbose;
+
+#Handling group creation
+my @group_creation = ();
+foreach ( keys %used_groups ) {
+
+    #Avoid root group creation
+    next if ( $_ == 0 );
+    push @group_creation, $group_infos{$_};
+}
+
+#Handling user creation
+my @user_creation = ();
+foreach ( keys %used_users ) {
+
+    #avoid root account :)
+    #Avoid root user creation
+    next if ( $_ == 0 );
+    next if ( $_ < 500 );
+    next if ( $user_infos{$_}{'shell'} =~ /nologin/ );
+    print "\n*" . $user_infos{$_}{'name'} . " in users $_" if defined $verbose;
+
+    # For all non system account
+    # password is the same than user name
+    # WARNING : Security issues around this feature
+    $user_infos{$_}{init} = 1;
+    push @user_creation, $user_infos{$_};
+}
+
+my $pre_code = getScriptFileContent($pre_script);
+
+#Handling symbolic link replacement as post install code
+my $post_code = getScriptFileContent($post_script);
+
+my $templDef = getSpecTemplate($templateName);
+
+my $template = Text::Template->new(
+    SOURCE     => "$templDef",
+    TYPE       => 'STRING',
+    DELIMITERS => [ "<", ">" ]
+) or die "Couldn't construct template: $Text::Template::ERROR";
+
+my %vars = (
+    name              => "$Name",
+    version           => "$Version",
+    release           => "$Release",
+    summary           => "$Summary",
+    description       => "$Description",
+    reqs              => \@reqs,
+    packager          => "$Packager",
+    vendor            => "$Vendor",
+    vendor_url        => "$VendorUrl",
+    archi             => "$Archi",
+    distro            => "$Distro",
+    multiple_packages => defined $multi,
+    users             => \@user_creation,
+    groups            => \@group_creation,
+
+    #Pre_code must be list
+    pre_code => "$pre_code",
+
+    #Post_code must be list
+    post_code => "$post_code",
+
+    symbolic_links => \%symbolic_links,
+    preun_code     => getScriptFileContent($preun_script),
+
+    postun_code => getScriptFileContent($postun_script),
+
+    build_code => getScriptFileContent($build_script),
+
+    # must be information only
+    listOfFiles => \@defFiles,
+
+    # must be information only
+    listOfDocFiles => \@defDocFiles,
+
+    # must be information only
+    listOfConfFiles => \@defConfFiles,
+
+    instFiles => \@instFiles,
+    instDirs  => \@instDirs,
+
+    ChangeLog => $ChangeLog,
+
+    # must be information only
+    OldChangeLogs => getChangeLogs("$specDir/$Name.spec"),
+
+    #Avoid system call for portability
+    date => trim(`unset LANG && date +"%a %b %d %Y"`)
+);
+
+# for debug only
+if ( defined $verbose ) {
+    use Data::Dumper;
+    print Dumper(%vars);
+}
+
+my $result = $template->fill_in( HASH => \%vars );
+
+die "Couldn't fill in template: $Text::Template::ERROR"
+  unless ( defined $result );
+
+# Chrrooting in fact
+if   ( $root_dir eq "" ) { chdir("/") }
+else                     { chdir($root_dir); }
+
+#generate Tarball
+my $tar = Archive::Tar->new;
+foreach my $file (@files) {
+    $file =~ s/^\//\.\//;
+    print "\n$file to Archive..." if defined $verbose;
+    $tar->add_files($file);
+}
+
+$tar->write( "$srcDir/$vars{'name'}-$vars{'version'}.tar.gz", 1 );
+
+#Writing spec file
+open F, "> $specDir/$vars{'name'}.spec"
+  or printError(
+"Unable to open $specDir/$vars{'name'}.spec in write mode. please check permissions for this file or directory"
+  );
+print F $result if defined($result);
+print $result if ( defined($result) && $verbose );
+close F;
+
+# Cleaning archive tmp dir
+if ( defined $archive ) {
+
+    # Create temporary dir
+    my $tmp_dir = "/tmp/myrpm/$$";
+    eval { rmtree($tmp_dir) };
+    if ($@) {
+        print "Couldn't create $tmp_dir: $@";
+    }
+}
+
+#Compiling package
+
+#Avoid system call for portability
+my $cmd = "rpmbuild --quiet -ba --target=$Archi $specDir/$vars{'name'}.spec";
+
+print "\n#Executing to build package : $cmd\n" if ($verbose);
+print `$cmd`                                   if ($build);
+exit 0;
+
+sub printUsage($) {
+    print `perldoc $0`;
+    exit 0;
+}
+
+sub printError($) {
+    my $message = join( ' ', @_ );
+    print STDERR $message;
+
+    exit 1;
+}
+__END__
+
+=head1 Usage
+
+myrpm.pl [OPTION]
+
+myrpm.pl is a automatic spec file generator and builder.
+
+Myrpm allow you to install freely software on a rpm compliant system 
+and realize a binary package from a list of file. 
+
+This program manages rigths and users. It s a simple tool that simplify 
+packaging in chroot mode.
+
+=head1 General Options
+
+ -h, --help				: Print this help.
+ -v, --verbose				: Print debug information, verbose mode.
+ -m, --multiple				: Split into 3 packages : main, doc and config
+ -b, --build				: Build the package automatically at the end.
+ -a, --archive=filename			: RPM Creation based on a archive file
+ -u, --uid=user id or name		: User id for archive file
+ -g, --gid=user id or name		: Group id for archive file
+ -n, --nodoc				: Avoid documentation file detection
+ -c, --noconfig				: Avoid config file detection
+ -s, --noreserved			: Avoid reserved directory
+ -t, --template=filename		: Generate the spec skeleton from this template.
+ -x, --exclude="pattern1,pattern2"	: Exclude some file patterns.
+ -r, --root-directory=<directory>	: Root directory ( / by default ).
+ -d, --directory=<directory>		: Directory where is the tree to package
+                                  by default, list of files is build from the stdin data
+
+=head1 Package Options 
+
+ -N, --name=<name>			: Package name - This option is mandatory
+ -V, --version=<version>		: Package version - This option is mandatory
+ -R, --release=<release>		: Package release - This option is mandatory
+ -C, --changelog=<changelog>		: Package changeLog
+ -D, --description=<description>	: Package Description.
+ -S, --summary=<summary>		: Package Summary.
+ -P, --packager=<packager>		: Packager identity.
+ -U, --vendor-url=<vendor url>		: Vendor URL.
+ -O, --vendor=<vendor>			: Vendor name.
+ -A, --architecture=<archi>		: Target architecture.
+ -T, --distribution=<distro>		: Target distribution.
+ --requires=<dependency>,...		: Dependency list.
+ --build-script=<filename>		: Script filename to include in the %build session.
+ --pre-script=<filename>		: Script filename to include in the %pre session.
+ --post-script=<filename>		: Script filename to include in the %post session.
+ --preun-script=<filename>		: Script filename to include in the %preun session.
+ --postun-script=<filename>		: Script filename to include in the %postun session.
+
+=head1 Examples 
+
+=head2 Realize a kick rpm snapshot of /home/jmrenouard/myrpmBuildDir
+
+myrpm.pl -v -d /home/jmrenouard/myrpmBuildDir -r /home/jmrenouard/myrpmBuildDir -N toto -V 1.0 -R 1 -b
+
+=head2 An other version
+
+cd /home/jmrenouard/myrpmBuildDir && myrpm.pl -v -d . -r . -N toto -V 1.0 -R 1 -b
+
+=head2 The same with UNIX tools interaction
+
+cd /home/jmrenouard/myrpmBuildDir && find `pwd` -iname '*' -print | myrpm.pl -v -r /home/jmrenouard/myrpmBuildDir -N toto -V 1.0 -R 1 -b
+
+find /home/jmrenouard/myrpmBuildDir | myrpm.pl -r /home/jmrenouard/myrpmBuildDir -N toto -V 1.0 -R 1
+
+=head2 Explanations
+
+This script performs the following operations :
+
+Find build the list of all the files in /home/jmrenouard/myrpmBuildDir.
+
+myrpm.pl packages all the files /home/jmrenouard/myrpmBuildDir  in a package with toto as name.
+
+myrpm.pl consider /home/jmrenouard/myrpmBuildDir as the root of all the files so all this files will be installed from the root file system by the rpm program.
+
+
+=head2 Repackage existing configuration
+
+rpm -ql yum |  myrpm.pl -v -N yum -V 2.7 -R 1_jmr -b
+
+=head2 Explanations
+
+Rpm gives the list of the files in the yum package installed on the system.
+
+myrpm.pl packages all the files in a package with yum as name and 1_jmr as release.
+
+This is a new way to package modification on a installed system.
+
+
+=head1 Configuration file samples
+
+Myrpm tool is an ecology-friendly configurated.
+
+=head2 Standard $HOME/.rpmmacros sample
+
+ %_topdir	/home/jmrenouard/redhat
+ %packager	Jean-Marie Renouard<jmrenouard.externe at pagesjaunes.fr>
+ %vendor	Pages Jaunes
+ %vendor_url	http://www.pagesjaunes.fr
+ %distribution  Red Hat Enterprise 4
+ %dist_tag      .1
+ %_tmppath   	/var/tmp
+
+
+=head1 Help to improve this tool
+
+=head2 Submit bugs or remarks at http://code.google.com/p/myrpm/issues/list 
+
+=head2 You can also contact me at Jean-Marie Renouard <jmrenouard at gmail.com>
+
+=head1 Documentation française
+
+=head1 Usage
+
+myrpm.pl [OPTION]
+
+myrpm.pl est un générateur automatique de fichier spec prêt à l'emploi.
+
+Myrpm vous prmet d'installer des logiciel librement sur un système Linux compatible RPM 
+et de réaliser des paquets RPMs binaires depuis une liste de fichiers. 
+
+Ce programme gère les droits et les utilisaterus. C'est un outil simple qui simplifie le packaging
+en mode non privilégié.
+
+=head1 Options générales
+
+ -h, --help				: Affichage de l'aide en ligne.
+ -v, --verbose				: Mode verbeux, affichage d'information de deboggage.
+ -b, --build				: Compilation automatique du package.
+ -a, --archive=filename			: Création d'un RPM à partir d'une archive
+ -u, --uid=user id or name		: Identifiant utilisateur pour l'archive
+ -g, --gid=user id or name		: Identifiant de groupe pour l'archive
+ -n, --nodoc				: Annulation de la detection des fichiers de documentation 
+ -c, --noconfig				: Annulation de la detection des fichiers de configuration
+ -s, --noreserved			: Annulation de la detection des repertoires réservés
+ -m, --multiple 			: Séparation en 3 packets : principal, doc et config
+ -t, --template=filename		: Spécification d'un fichier template aternatif.
+ -x, --exclude="pattern1,pattern2"	: Exclusion de certaines formes de fichier.
+ -r, --root-directory=<directory>	: Répertoire racine  ( / par défaut ).
+ -d, --directory=<directory>		: Répertoire à packager.
+                  Par défaut, la liste de fichiers est construite depuis le flux d'entrée standard.
+
+
+=head1 Options du package RPM 
+
+ -N, --name=<name>			: Nom du package - Option obligatoire.
+ -V, --version=<version>		: Version du package - Option obligatoire.
+ -R, --release=<release>		: Release du package - Option obligatoire.
+ -C, --changelog=<changelog>		: ChangeLog du package
+ -D, --description=<description>	: Description du package.
+ -S, --summary=<summary>		: Résumé du package.
+ -P, --packager=<packager>		: Identité du packageur.
+ -U, --vendor-url=<vendor url>		: URL du fournisseur.
+ -O, --vendor=<vendor>			: Nom du fournisseur.
+ -A, --architecture=<archi>		: Architecture cible.
+ -T, --distribution=<distro>		: Distribution cible.
+ --requires=<dependency>,...		: Liste des dépendances.
+ --build-script=<filename>		: Nom du script à inclure dans la session %build.
+ --pre-script=<filename>		: Nom du script à inclure dans la session %pre.
+ --post-script=<filename>		: Nom du script à inclure dans la session %post.
+ --preun-script=<filename>		: Nom du script à inclure dans la session %preun.
+ --postun-script=<filename>		: Nom du script à inclure dans la session %postun.
+
+=head1 Exemples 
+
+=head2 Réalisation rapide d'une image du répertoire /home/jmrenouard/myrpmBuildDir
+
+myrpm.pl -v -d /home/jmrenouard/myrpmBuildDir -r /home/jmrenouard/myrpmBuildDir -N toto -V 1.0 -R 1 -b
+
+=head2 Une autre version
+
+cd /home/jmrenouard/myrpmBuildDir && myrpm.pl -v -d . -r . -N toto -V 1.0 -R 1 -b
+
+=head2 La même avec des interactions avec les outils UNIX
+
+cd /home/jmrenouard/myrpmBuildDir && find `pwd` -iname '*' -print | myrpm.pl -v -r /home/jmrenouard/myrpmBuildDir -N toto -V 1.0 -R 1 -b
+
+find /home/jmrenouard/myrpmBuildDir | myrpm.pl -r /home/jmrenouard/myrpmBuildDir -N toto -V 1.0 -R 1
+
+=head2 Explications
+
+Le script réalise les opérations suivantes :
+
+Find construit la liste de tous les fichiers contenus dans le répertoie /home/jmrenouard/myrpmBuildDir.
+
+myrpm.pl packages  tous les fichiers du répertoie /home/jmrenouard/myrpmBuildDir dans le package ayant toto comme nom, 1.0 comme version et 1 comme release.
+
+myrpm.pl considère /home/jmrenouard/myrpmBuildDir comme répertoire root ( / ) si bien que tous les fichiers seront installé à la racine par le programme rpm.
+
+
+=head2 Repackager une configuration existante
+
+rpm -ql yum |  myrpm.pl -v -N yum -V 2.7 -R 1_jmr -b
+
+=head2 Explications
+
+Rpm donne la liste des fichiers du package Yum installé sur le système.
+
+myrpm.pl packages tous les fichiers de ce package dans un nouveau package avec yum comme nom.
+
+Il s'agit d'un nouveau moyen de packager des modifications depuis un système installé.
+
+
+=head1 Exemple de fichier de configuration
+
+Myrpm utilise le fichier utilisateur pour configurer les valeurs par défaut.
+
+=head2 Exemples de $HOME/.rpmmacros standard
+
+ %_topdir	/home/jmrenouard/redhat
+ %packager	Jean-Marie Renouard<jmrenouard.externe at pagesjaunes.fr>
+ %vendor	Pages Jaunes
+ %vendor_url	http://www.pagesjaunes.fr
+ %distribution  Red Hat Enterprise 4
+ %dist_tag      .1
+ %_tmppath   	/var/tmp
+
+=head1 Aide à l'amélioration du produit
+
+=head2 Merci de soumettre les erreurs et les remarques sur http://code.google.com/p/myrpm/issues/list 
+
+=head2 Vous pouvez contactez Jean-Marie Renouard <jmrenouard at gmail.com> pour plus de détails.

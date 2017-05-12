@@ -1,0 +1,56 @@
+{
+   "abstract" : "Perl extension for blah blah blah",
+   "author" : [
+      "ioannis, <ioannis@macports.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.04, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pg-Corruption",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.62",
+            "Test::CPAN::Meta" : "0.12",
+            "Test::Dependencies" : "0.11",
+            "Test::HasVersion" : "0.012",
+            "Test::MinimumVersion" : "0.101080",
+            "Test::Pod" : "1.0",
+            "Test::Pod::Coverage" : "1.0",
+            "Test::Spelling" : "0.15"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.62"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::Pg" : "v2.10.7",
+            "Getopt::Compact" : "0.04",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

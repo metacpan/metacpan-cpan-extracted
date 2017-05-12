@@ -1,0 +1,647 @@
+=encoding utf8
+
+=head1 NAME
+
+perlmod - Módulos Perl (paquetes y tablas de símbolos)
+
+=head1 DESCRIPCIÓN
+
+=head2 ¿Es este el documento que buscaba?
+
+Hay otros documentos que pueden contener la información que está buscando:
+
+=over 2
+
+=item Este documento
+
+Paquetes de Perl, espacios de nombres e información sobre clases.
+
+=item L<perlnewmod>
+
+Tutorial sobre cómo crear un módulo nuevo.
+
+=item L<perlmodstyle>
+
+Procedimientos recomendados para crear un módulo nuevo.
+
+=back
+
+=head2 Paquetes
+X<package> X<paquete> X<namespace> X<espacio de nombres> X<variable, global> X<global, variable> X<global variable> X<variable global> X<global>
+
+Perl proporciona un mecanismo de espacios de nombres alternativos que evita
+colisiones entre variables de distintos paquetes. De hecho, en Perl no hay
+variables globales. La instrucción C<package> declara que la unidad de
+compilación está en el espacio de nombres especificado. El ámbito de la
+declaración de paquete abarca desde la declaración misma hasta el final del
+bloque, de la función C<eval> o del archivo actuales, lo que aparezca antes
+(es el mismo ámbito que el de los operadores my() y local()). Los
+identificadores dinámicos sin calificar estarán en este espacio de nombres,
+excepto los pocos identificadores que, de no estar calificados, corresponderán
+de manera predeterminada al paquete C<main> en lugar de al actual, como se
+indica a continuación. Una instrucción C<package> solo afecta a las variables
+dinámicas, incluidas aquellas en las que se usa local(); I<no> afecta a las
+variables léxicas creadas con my(). Normalmente será la primera declaración
+en un archivo, incluida por medio de los operadores C<do>, C<require> o C<use>.
+Puede cambiar a un paquete en más de un lugar; esto solo influye en la tabla
+de símbolos que el compilador usará para el resto del bloque. Puede hacer
+referencia a variables e identificadores de archivo en otros paquetes usando
+como prefijo del identificador el nombre del paquete y un doble signo de dos
+puntos: C<$Paquete::Variable>. Si se omite el nombre del paquete, se supondrá
+que es C<main>. Es decir, C<$::vela> equivale a C<$main::vela>.
+
+Anteriormente, el delimitador de paquete era una simple comilla, pero ahora se
+usa un doble signo de dos puntos, en parte porque es más legible para los
+humanos y también porque es más legible para las macros de B<emacs>. Además,
+hace que los programadores de C++ se sientan más cómodos (más que si se
+usara la comilla, que se parece más al estilo seguido por los programadores de
+Ada). Puesto que la sintaxis antigua todavía se admite por compatibilidad con
+las versiones anteriores, si intenta usar una cadena como C<"Vamos a cenar en
+$Gino's">, se accederá a C<$Gino::s>; es decir, la variable $s del paquete
+C<Gino>, que seguramente no sea lo que desea. Use llaves para eliminar
+ambigüedades: C<"Vamos a cenar en ${Gino}'s">. X<::> X<'>
+
+Los paquetes también pueden contener separadores, como en
+C<$EXTERIOR::INTERIOR::var>. Sin embargo, esto no implica nada sobre el orden
+de búsqueda de los nombres. No hay paquetes relativos: todos los símbolos
+deben ser locales con respecto al paquete actual o deben aparecer completamente
+calificados, comenzando por el paquete más externo. Por ejemplo, no hay
+ningún lugar dentro del paquete C<EXTERIOR> en el que la variable
+<$INTERIOR::var> pueda hacer referencia a C<$EXTERIOR::INTERIOR::var>.
+C<INTERIOR> es un paquete global totalmente independiente.
+
+En la tabla de símbolos de un paquete sólo se almacenarán los
+identificadores que comiencen por letras (o guiones bajos). Todos los demás
+símbolos se almacenarán en el paquete C<main>, incluidas todas las variables
+de puntuación, como $_. Además, cuando no se usan los nombres calificados,
+los identificadores STDIN, STDOUT, STDERR, ARGV, ARGVOUT, ENV, INC y SIG se
+almacenan en el paquete C<main>, incluso cuando se usan para propósitos
+distintos de los predefinidos. Si tiene un paquete llamado C<m>, C<s> o C<y>,
+no puede usar la forma calificada de un identificador, ya que podría
+interpretarse como una detección de patrones, una substitución o una
+transliteración. X<variable, punctuation> X<variable, puntuación>
+
+Las variables cuyo nombre comienza con un guión bajo se solían asignar al
+paquete C<main>, pero en su día decidimos que para los desarrolladores de
+paquetes era más útil poder usar guiones bajos iniciales para indicar nombres
+de variables y métodos privados. Sin embargo, aún se fuerza la asignación al
+paquete C<main> de los nombres de variables y funciones con un único guión
+bajo (C<_>), como $_ y C<sub_>. Vea también la sección "La sintaxis de los
+nombres de variables" de L<perlvar>.
+
+Las cadenas evaluadas con C<eval> se compilan en el paquete en que se compiló
+la función eval()  (sin embargo, las asignaciones a C<$SIG{}> suponen que el
+controlador de señal especificado está en el paquete C<main>;  califique el
+nombre del controlador de señal si desea que esté en un paquete). En el
+archivo F<perldb.pl> de la biblioteca de Perl encontrará un ejemplo.
+Inicialmente cambia al paquete C<DB>, de forma que el depurador no interfiera
+con las variables del programa que intenta depurar. Sin embargo, en varios
+puntos cambia temporalmente al paquete C<main> para evaluar diversas
+expresiones en este contexto (o en el contexto en el que esté trabajando). 
+Vea L<perldebug>.
+
+El símbolo especial C<__PACKAGE__> contiene el paquete actual, pero no puede
+usarse (fácilmente) para crear nombres de variables.
+
+Vea L<perlsub> para obtener información sobre otras cuestiones relativas al
+ámbito y relacionadas con my() y local(); vea L<perlref> para obtener
+información sobre las clausuras.
+
+=head2 Tabla de símbolos
+X<symbol table> X<tabla de símbolos> X<stash> X<%::> X<%main::> X<typeglob> X<glob> X<alias>
+
+La tabla de símbolos de un paquete se almacena en el hash cuyo nombre es el
+nombre del paquete con un doble signo de dos puntos anexado. Así, el nombre de
+la tabla de símbolos de C<main> es C<%main::>, y se puede abreviar como
+C<%::>. De la misma forma, el nombre de la tabla de símbolos del paquete
+anidado mencionado previamente sería C<%EXTERIOR::INTERIOR::>.
+
+Usamos la notación C<*nombre> para hacer referencia al valor de cada entrada
+del hash.
+
+    local *main::foo    = *main::bar;
+
+Puede usar esto para imprimir todas las variables del paquete, por ejemplo. La
+biblioteca estándar (aunque anticuada) F<dumpvar.pl> y el módulo
+Devel::Symdump de CPAN lo usan.
+
+El resultado de crear directamente nuevas entradas en la tabla de símbolos o
+de modificar cualquier entrada que no sea ya un I<typeglob> no está definido y
+puede estar sujeto a cambios entre versiones de Perl.
+
+Una asignación a un I<typeglob> realiza una operación de creación de alias.
+Por ejemplo:
+
+    *bea = *beatriz;
+
+hace que las variables, subrutinas, formatos e identificadores de archivos y
+directorios a los que se accede mediante el identificador C<beatriz> también
+sean accesibles mediante C<bea>. Si desea crear un alias de una sola variable o
+subrutina específica, debe asignar una referencia:
+
+    *bea = \$beatriz;
+
+Esto hace que $beatriz y $bea sean la misma variable; en cambio, @beatriz y
+@bea son arrays independientes. Es un poco lioso, ¿no?
+
+Existe una sutil diferencia entre las instrucciones siguientes:
+
+    *foo = *bar;
+    *foo = \$bar;
+
+C<*foo = *bar> hace que los I<typeglobs> sean sinónimos, mientras que C<*foo =
+\$bar> hace que las partes escalares de dos I<typeglobs> distintos se refieran
+al mismo valor escalar. Esto se puede ver en el siguiente ejemplo de código:
+
+    $bar = 1;
+    *foo = \$bar;       # Hace que $foo sea un alias de $bar
+
+    {
+        local $bar = 2; # Restringe los cambios al bloque
+        print $foo;     # Imprime '1'
+    }
+
+Se imprime '1', ya que C<$foo> contiene una referencia a la variable C<$bar>
+I<original>, la que fue reemplazada por C<local()> y que será restaurada
+cuando finalice el bloque. Como el acceso a las variables se realiza a través
+del I<typeglob>, puede usar C<*foo = *bar> para crear un alias que se pueda
+localizar (pero tenga en cuenta que esto significa que no puede disponer de
+C<@foo> y C<@bar> independientes, etc.).
+
+Lo que hace que todo esto sea importante es que el módulo Exporter usa alias
+de expansión como mecanismo de importación/exportación. Una variable
+exportada de un módulo se podrá localizar adecuadamente o no en función de
+cómo se haya exportado:
+
+    @EXPORT = qw($FOO); # Forma usual; no se puede localizar
+    @EXPORT = qw(*FOO); # Se puede localizar
+
+Puede evitar el primer caso usando el nombre completo (C<$Package::FOO>) donde
+necesite un valor local, o bien reemplazarlo mediante C<*FOO = *Package::FOO>
+en el script.
+
+El mecanismo C<*x = \$y> se puede usar para pasar y devolver referencias
+sencillas a (o desde) las subrutinas si no desea copiar el valor completo.
+Sólo funciona al asignar valores a variables dinámicas (no léxicas).
+
+    %mi_hash = ();			# no puede ser my()
+    *mi_hash = fn( \%otro_hash );
+    sub fn {
+	local *sim_hash = shift;
+	# ahora use %sim_hash de la forma usual y
+	# afectará al hash %otro_hash del autor de la llamada
+	my %nhash = (); # haga lo que desee
+	return \%nhash;
+    }
+
+Al volver, la referencia reemplazará la ubicación de hash ocupada en la tabla
+de símbolos especificada por el typeglob *mi_hash. Esta es una forma poco
+habitual de pasar referencias de forma sencilla, cuando no se desea tener que
+recordar cómo desreferenciar variables de forma explícita.
+
+Otro uso de la tabla de símbolos consiste en crear escalares "constantes".
+X<constant> X<constante> X<scalar, constant> X<escalar, constante>
+
+    *PI = \3.14159265358979;
+
+Ahora no puede modificar C<$PI>, lo que probablemente no sea mala idea. Esto no
+es lo mismo que una subrutina constante, que está sujeta a optimización en
+tiempo de compilación. Una subrutina constante es una subrutina cuyo prototipo
+no consume argumentos y devuelve una expresión constante. En L<perlsub>
+encontrará más información al respecto. El pragma C<use constant> es una
+abreviatura adecuada para estos casos.
+
+Puede usar C<*foo{PACKAGE}> y C<*foo{NAME}> para averiguar de qué nombre y
+paquete proviene la entrada *foo de la tabla de símbolos. Esto puede ser útil
+en una subrutina que recibe I<typeglobs> como argumentos:
+
+    sub identificar_typeglob {
+        my $glob = shift;
+        print 'He recibido ', *{$glob}{PACKAGE},
+            '::', *{$glob}{NAME}, "\n";
+    }
+    identificar_typeglob *foo;
+    identificar_typeglob *bar::baz;
+
+Esto imprime
+
+    Recibí main::foo
+    Recibí bar::baz
+
+También se puede usar la notación C<*foo{COSA}> para obtener referencias a
+los elementos individuales de *foo. Vea L<perlref>.
+
+Las definiciones de subrutinas (y las definiciones de declaraciones) no tienen
+por qué ubicarse en el paquete al que pertenece la tabla de símbolos en que
+aparecen. Es posible definir una subrutina fuera del paquete calificando
+explícitamente el nombre de la subrutina:
+
+    package main;
+    sub Un_paquete::foo { ... }   # &foo definida en Un_paquete
+
+Esto no es más que una forma abreviada de asignación de I<typeglob> en tiempo
+de compilación:
+
+    BEGIN { *Un_paquete::foo = sub { ... } }
+
+y I<no> es lo mismo que escribir:
+
+    {
+	package Un_paquete;
+	sub foo { ... }
+    }
+
+En las dos primeras versiones, el cuerpo de la subrutina se define en el
+paquete C<main>, I<no> en Un_paquete. De forma que el código siguiente:
+
+    package main;
+
+    $Un_paquete::nombre = "Pedro";
+    $main::nombre = "Pablo";
+
+    sub Un_paquete::foo {
+	print "en ", __PACKAGE__, ": \$nombre es '$nombre'\n";
+    }
+
+    Un_paquete::foo();
+
+imprime:
+
+    en main: $nombre es 'Pablo'
+
+en lugar de:
+
+    en Un_paquete: $nombre es 'Pedro'
+
+Esto también tiene implicaciones para el uso del calificador SUPER:: (vea
+L<perlobj>).
+
+=head2 BEGIN, UNITCHECK, CHECK, INIT y END
+X<BEGIN> X<UNITCHECK> X<CHECK> X<INIT> X<END>
+
+Hay cinco bloques de código con un nombre especial que se ejecutan al
+principio y final de la ejecución de un programa Perl. Son los bloques
+C<BEGIN>, C<UNITCHECK>, C<CHECK>, C<INIT> y C<END>.
+
+Estos bloques de código pueden usarse con el prefijo C<sub> para dar la
+apariencia de ser subrutinas (aunque esto no se recomienda). Debe tenerse en
+cuenta que estos bloques de código no existen realmente como subrutinas con
+nombres, aunque así lo parezca. Esto es así porque se puede incluir B<más de
+uno> de estos bloques de código en un programa y B<todos> ellos se ejecutarán
+en el momento adecuado. Por esta razón no puede ejecutar ninguno de estos
+bloques usando su nombre.
+
+Un bloque de código C<BEGIN> se ejecuta tan pronto como es posible, es decir,
+en el momento en que está completamente definido, incluso antes del análisis
+del resto del archivo (o cadena) que lo contiene. Es posible disponer de varios
+bloques C<BEGIN> en el mismo archivo (o cadena evaluada); se ejecutarán por
+orden de definición. Puesto que el bloque de código C<BEGIN> se ejecuta
+inmediatamente, puede obtener definiciones de subrutinas, etc. de otros
+archivos a tiempo para que sean visibles en tiempo de compilación y
+ejecución. Una vez ejecutado el bloque C<BEGIN>, pasa a estar no definido y el
+código usado se devuelve al banco de memoria de Perl.
+
+El bloque de código C<END> se ejecuta tan tarde como sea posible, es decir,
+una vez que Perl ha finalizado la ejecución del programa y justo antes de que
+se produzca la salida del intérprete, incluso si la salida se debe a la
+ejecución de la función die() (esto no ocurre si se transforma en otro
+programa mediante C<exec> o si se desencadena por una señal; el código debe
+encargarse de capturar esta señal, si es posible). Puede disponer de
+múltiples bloques C<END> en un mismo archivo; se ejecutarán en orden inverso
+al de la definición: es decir, siguiendo el orden "primero en llegar, último
+en salir" (LIFO, I<last in, first out>). Los bloques C<END> no se ejecutarán
+si se inicia perl con el modificador C<-c> o si se produce un error de
+compilación.
+
+Tenga en cuenta que los bloques de código C<END> B<no> se ejecutan al final de
+una evaluación C<eval()> de cadena: si se crea un bloque C<END> mediante una
+función C<eval()> de cadena, se ejecutará como cualquier otro bloque C<END>
+del mismo paquete en orden LIFO, justo antes de que se produzca la salida del
+intérprete.
+
+Dentro de un bloque de código C<END>, C<$?> contiene el valor que el programa
+va a pasar a C<exit()>. Puede modificar C<$?> para cambiar el valor de salida
+del programa. Evite cambiar C<$?> accidentalmente (por ejemplo, ejecutando algo
+mediante C<system>). X<$?>
+
+Dentro de un bloque C<END>, el valor de C<${^GLOBAL_PHASE}> es C<"END">.
+
+Los bloques C<UNITCHECK>, C<CHECK> e C<INIT> son útiles para capturar la
+transición entre la fase de compilación y la de ejecución del programa
+principal.
+
+Los bloques C<UNITCHECK> se ejecutan inmediatamente después de que se haya
+compilado la unidad que los definió. El archivo del programa principal y cada
+módulo que carga son unidades de compilación, como lo son los resultados de
+aplicar C<eval> a cadenas, el código compilado en tiempo de ejecución con la
+construcción C<(?{ })> en una expresión regular, las llamadas a C<do FILE>,
+C<require FILE>,  o el código que hay a continuación del modificador C<-e> en
+la línea de comandos.
+
+Los bloques C<BEGIN> y C<UNITCHECK> no están directamente relacionados con la
+fase del intérprete. Se pueden crear y ejecutar en cualquier fase.
+
+Los bloques de código C<CHECK> se ejecutan inmediatamente después de que
+finalice la fase B<inicial> de compilación de Perl y antes de que comience el
+tiempo de ejecución, en orden LIFO. Los bloques de código C<CHECK> se usan en
+el compilador de Perl para guardar el estado compilado del programa.
+
+Dentro de un bloque C<CHECK>, el valor de C<${^GLOBAL_PHASE}> es C<"CHECK">.
+
+Los bloques C<INIT> se ejecutan justo antes de iniciar el tiempo de ejecución
+de Perl, en orden "primero en entrar, primero en salir " (FIFO, I<first in,
+first out>).
+
+Dentro de un bloque C<INIT> el valor de C<${^GLOBAL_PHASE}> será C<"INIT">.
+
+Los bloques C<CHECK> e C<INIT> en código compilado por C<require> y en
+funciones C<do> o C<eval> de cadena no se ejecutarán si están después del
+final de la fase principal de compilación; esto puede suponer un problema en
+el entorno mod_perl y otros entornos permanentes que usan esas funciones para
+cargar código en tiempo de ejecución.
+
+Cuando se usan los modificadores B<-n> y B<-p> en Perl, C<BEGIN> y C<END>
+funcionan como lo harían en B<awk>, es decir, como un caso degenerado. Los
+bloques C<BEGIN> y C<CHECK> se ejecutan cuando se usa el modificador B<-c> para
+llevar a cabo únicamente una compilación de comprobación de la sintaxis,
+aunque no se ejecute el código principal.
+
+El programa B<begincheck> expone esto de forma clara (o eso esperamos):
+
+  #!/usr/bin/perl
+
+  # begincheck
+
+  print         "10. El código normal se ejecuta en tiempo de ejecución.\n";
+
+  END { print   "16.   Y este cuento se ha acabado.\n" }
+  INIT { print  " 7. Los bloques INIT se ejecutan en orden FIFO antes del tiempo de ejecución.\n" }
+  UNITCHECK {
+    print       " 4.   Y, por tanto, antes que los bloques CHECK.\n"
+  }
+  CHECK { print " 6.   Esta es la sexta línea.\n" }
+
+  print         "11.   Por supuesto, se ejecuta por orden.\n";
+
+  BEGIN { print " 1. Los bloques BEGIN se ejecutan en orden FIFO durante la compilación.\n" }
+  END { print   "15.   Lea perlmod para obtener más información.\n" }
+  CHECK { print " 5. Los bloques CHECK se ejecutan en orden LIFO tras la compilación.\n" }
+  INIT { print  " 8.   Volvemos a ejecutar esto, ahora con el modificador -c de perl.\n" }
+
+  print         "12.   Esto es lo contrario de código ofuscado.\n";
+
+  END { print   "14. Los bloques END se ejecutan en orden LIFO al finalizar.\n" }
+  BEGIN { print " 2.   Así que esta línea será la segunda.\n" }
+  UNITCHECK {
+   print " 3. Los bloques UNITCHECK se ejecutan en orden LIFO tras compilar cada archivo.\n"
+  }
+  INIT { print  " 9.   Verá la diferencia inmediatamente.\n" }
+
+  print         "13.   Puede que parezca lioso, pero no lo es en realidad.\n";
+
+  __END__
+
+=head2 Clases en Perl
+X<class> X<clase> X<@ISA>
+
+No hay una sintaxis especial para clases en Perl, pero un paquete puede actuar
+como una clase si proporciona subrutinas que se comportan como métodos.   Un
+paquete así también pueden derivar alguno de sus métodos de otra clase
+(paquete) especificando el nombre de este paquete en su array global @ISA, que
+debe ser una variable global (no léxica) del paquete.
+
+Encontrará más información en L<perlootut> y L<perlobj>.
+
+=head2 Módulos Perl
+X<module> X<módulo>
+
+Un módulo no es más que un conjunto de funciones relacionadas y ubicadas en
+un archivo de biblioteca, es decir, un paquete Perl con el mismo nombre que el
+archivo. Está diseñado específicamente para que otros módulos o programas
+lo puedan reutilizar. Para ello puede proporcionar un mecanismo que exporte
+algunos de sus símbolos a la tabla de símbolos de cualquier paquete que lo
+use, o puede funcionar como una definición de clase y hacer que su semántica
+esté disponible implícitamente mediante llamadas a métodos de la clase y sus
+objetos, sin exportar nada de forma explícita. También se pueden combinar
+ambos mecanismos.
+
+Por ejemplo, para empezar a desarrollar un módulo tradicional, no orientado a
+objetos, llamado Mi::Modulo, cree el archivo F<Mi/Modulo.pm> y use esta
+plantilla:
+
+    package Mi::Modulo;  # se supone que está en Mi/Modulo.pm
+
+    use strict;
+    use warnings;
+
+    BEGIN {
+        require Exporter;
+
+        # establecer la versión para la comprobación de versión
+        our $VERSION     = 1.00;
+
+        # heredar de Exporter para exportar funciones y variables
+        our @ISA         = qw(Exporter);
+
+        # funciones y variables que se exportan de forma predeterminada
+        our @EXPORT      = qw(func1 func2);
+
+        # funciones y variables que se exportan de forma opcional
+        our @EXPORT_OK   = qw($Var1 %Hash1 func3);
+    }
+
+    # las variables globales de paquete exportadas van aquí
+    our $Var1    = '';
+    our %Hash1  = ();
+
+    # las variables globales de paquete no exportadas van aquí
+    # (son accesibles mediante $Mi::Modulo::cosa)
+    our @otras    = ();
+    our $cosa   = '';
+
+    # las variables léxicas privadas del archivo van aquí, antes que las funciones que las usan
+    my $var_priv    = '';
+    my %hash_secreto = ();
+
+    # aquí va una función privada del archivo, como clausura
+    # puede llamarse mediante $func_priv->();
+    my $func_priv = sub {
+        ...
+    };
+
+    # incorpore todas sus funciones, exportadas o no;
+    # no olvide poner algo interesante entre {} 
+    sub func1      { ... }
+    sub func2      { ... }
+
+    # esta no se exporta, pero puede llamarse directamente
+    # mediante Mi::Modulo::func3()
+    sub func3      { ... }
+
+    END { ... }       # el código de limpieza del módulo va aquí (destructor global)
+
+    1;  # no olvide devolver un valor verdadero desde este archivo
+
+A continuación, puede declarar y usar sus variables en funciones sin
+calificarlas. Vea L<Exporter> y L<perlmodlib> para obtener más información
+sobre los mecanismos y las cuestiones de estilo de la creación de módulos.
+
+Para incluir un módulo Perl en un programa, escriba
+
+    use Modulo;
+
+o bien
+
+    use Modulo LISTA;
+
+Eso equivale exactamente a
+
+    BEGIN { require 'Modulo.pm'; 'Modulo'->import; }
+
+o bien
+
+    BEGIN { require 'Modulo.pm'; 'Modulo'->import(LISTA); }
+
+Como un caso especial
+
+    use Modulo ();
+
+equivale exactamente a
+
+    BEGIN { require 'Modulo.pm'; }
+
+Todos los archivos de módulo Perl tienen la extensión F<.pm>. El operador
+C<use> lo tiene en cuenta, para que no tenga que escribir "F<Modulo.pm>" entre
+comillas. Esto también ayuda a distinguir los módulos nuevos de los antiguos,
+que usaban la extensión F<.pl> o F<.ph>. Para los nombres de los módulos se
+utiliza mayúscula inicial en cada palabra, a no ser que funcionen como pragmas
+(que en realidad son directivas del compilador, y a veces se denominan
+"módulos pragmáticos" o incluso "pragmata", si lo suyo es el latín).
+
+Las dos instrucciones
+
+    require MiModulo;
+    require "MiModulo.pm";
+
+difieren en dos aspectos. En el primer caso, si el nombre del módulo contiene
+el símbolo "::" (por ejemplo, C<Mi::Modulo>), dicho símbolo se traducirá
+como el separador de directorios habitual (generalmente "/").   En el segundo
+caso no es así, y debe especificarse de forma literal. La otra diferencia
+consiste en que C<require> indica al compilador que se usa la sintaxis
+indirecta de objetos en relación a "MiModulo", de forma que las expresiones
+del estilo C<$ob = purge MiModulo> indican llamadas a métodos y no llamadas a
+funciones. (Sí, esto realmente puede suponer una diferencia).
+
+Como la instrucción C<use> implica la presencia de un bloque C<BEGIN>, la
+importación de semántica tiene lugar tan pronto como se haya compilado la
+instrucción C<use>, antes de que se compile el resto del archivo. Esto es lo
+que permite a un módulo funcionar como un mecanismo pragma y declarar
+subrutinas que están visibles incluso como operadores de lista o unarios para
+el resto del archivo actual. Pero no funcionará si usa C<require> en lugar de
+C<use>. Con C<require> puede producirse el siguiente problema:
+
+    require Cwd;		# hace Cwd:: accesible
+    $directorio = Cwd::getcwd();
+
+    use Cwd;			# importa nombres de Cwd::
+    $directorio = getcwd();
+
+    require Cwd;		# hace Cwd:: accesible
+    $directorio= getcwd(); 		# vaya... no existe main::getcwd()
+
+En general se recomienda usar C<use Module ()> en lugar de C<require Module>,
+ya que determina la disponibilidad del módulo en tiempo de compilación, y no
+durante la ejecución del programa. Puede producirse una excepción cuando dos
+módulos intentan usarse mutuamente mediante C<use> y a la vez cada uno llama a
+una función del otro módulo. En este caso debe usarse C<require>.
+
+Los paquetes Perl pueden anidarse dentro de otros nombres de paquete, por lo
+que los nombres de paquete pueden contener C<::>. Pero si se usa ese nombre de
+paquete directamente como nombre de archivo, la manipulación de este nombre de
+archivo podría resultar difícil (o incluso imposible) en otros sistemas.
+Así, si el nombre del módulo es, por ejemplo, C<Text::Soundex>, su
+definición se ubicará en el archivo de biblioteca F<Text/Soundex.pm>.
+
+Los módulos Perl siempre tienen un archivo F<.pm>, pero podrían tener
+asociados otros ejecutables vinculados dinámicamente (normalmente con la
+extensión F<.so>) o definiciones de subrutinas cargadas automáticamente
+(normalmente con extensión F<.al>). Si es así, esto será completamente
+transparente para el usuario del módulo. El archivo F<.pm> debe encargarse de
+cargar cualquier funcionalidad adicional (o producir la carga automática). Por
+ejemplo, aunque el módulo POSIX realiza tanto carga dinámica como carga
+automática, el usuario solo tiene que escribir C<use POSIX> para obtenerlo
+todo.
+
+=head2 Crear módulos seguros para hilos de ejecución
+X<threadsafe> X<thread safe> X<seguro para hilos de ejecución>
+X<module, threadsafe> X<module, thread safe> X<seguro para hilos de ejecución>
+X<CLONE> X<CLONE_SKIP> X<thread> X<hilo de ejecución> X<threads> X<hilos de ejecución> X<ithread> X<hilo de ejecución de intérprete>
+
+Perl ofrece un tipo de hilos de ejecución denominados hilos de ejecución de
+intérprete (ithreads). Estos hilos de ejecución se pueden usar de forma
+explícita o implícita.
+
+Los hilos de ejecución de intérprete clonan el árbol de datos de forma que
+no haya datos compartidos entre distintos hilos de ejecución. Estos hilos de
+ejecución pueden usarse con el módulo C<threads> o bien ejecutando fork() en
+win32 (en realidad, una simulación de fork()). Cuando se clona un hilo de
+ejecución, se clonan también todos los datos de Perl. Sin embargo, los datos
+que no pertenecen a Perl no se pueden clonar automáticamente. Desde la
+versión 5.8.0 de Perl se incluye la subrutina especial C<CLONE>. C<CLONE> le
+permite hacer todo lo que necesite, como controlar la clonación de datos que
+no sean de Perl, si es necesario. Se llamará a C<CLONE> como método de clase
+una vez por cada paquete en el que esté definido (o que lo herede). Se
+llamará en el contexto del nuevo hilo de ejecución, de forma que todas las
+modificaciones se realizarán en el nuevo espacio. Actualmente se llama a
+C<CLONE> sin más parámetros que el nombre del paquete que llama, pero esto
+podría cambiar; es probable que en el futuro se pasen parámetros adicionales
+para proporcionar más información sobre el estado de la clonación.
+
+Si desea ejecutar C<CLONE> sobre todos los objetos tendrá que hacer un
+seguimiento de los objetos correspondientes a cada paquete. Esto se hace de
+forma sencilla mediante un hash y Scalar::Util::weaken().
+
+En la versión 5.8.7 de Perl se incluyó la subrutina especial C<CLONE_SKIP>.
+Al igual que en el caso de C<CLONE>, se llama a C<CLONE_SKIP> una vez por
+paquete; sin embargo, en el caso de esta última, se llama justo antes de que
+comience la clonación, y en el contexto del hilo de ejecución primario. Si
+devuelve un valor verdadero, no se clonarán objetos de esa clase; o más bien,
+se copiarán como valores undef no bendecidos. Por ejemplo; si en el hilo
+primario hay dos referencias a un hash bendecido, en el hilo derivado habrá
+dos referencias a un valor escalar no definido. Esto proporciona un mecanismo
+sencillo para hacer que los hilos de ejecución de los módulos sean seguros;
+basta con agregar C<sub CLONE_SKIP { 1 }> al comienzo de la clase y se llamará
+a C<DESTROY()> una sola vez por cada objeto. Si el hilo derivado tuviera que
+usar los objetos, sería necesario un enfoque más sofisticado.
+
+Al igual que en el caso de C<CLONE>, el único parámetro usado en las llamadas
+a C<CLONE_SKIP> es el nombre del paquete que llama, aunque esto podría
+cambiar. De forma análoga, y teniendo en cuenta posibles ampliaciones futuras,
+el valor devuelto debería ser un solo valor C<0> ó C<1>.
+
+=head1 VEA TAMBIÉN
+
+En L<perlmodlib> encontrará información sobre cuestiones generales de estilo
+relacionadas con la creación de módulos y clases en Perl, así como
+descripciones de la biblioteca estándar y de CPAN; vea L<Exporter> para
+conocer cómo funciona el mecanismo estándar de exportación/importación; en
+L<perlootut> y L<perlobj> encontrará información detallada sobre la creación
+de clases; vea L<perlobj> para obtener información de referencia sobre
+objetos; en L<perlsub> podrá obtener información sobre cuestiones
+relacionadas con las funciones y el ámbito; por último, vea también
+L<perlxstut> y L<perlguts>, donde encontrará más detalles sobre la
+programación de módulos de extensión.
+
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Manuel Gómez Olmedo
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

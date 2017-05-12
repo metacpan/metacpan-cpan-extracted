@@ -1,0 +1,77 @@
+POE::Component::IRC::Service ============================
+
+1). Background:
+
+POE::Component::IRC::Service is a POE (Perl Object Environment) component which
+provides a convenient way for POE applications to create an IRC Service.
+
+Much of the code was based on POE::Component::IRC. If you are familiar with
+that module then you shouldn't have too many problems with this one :)
+
+2). Implementation:
+
+POE::Component::IRC::Service implements a POE session which connects to the IRC
+Network and sends all IRC traffic as events to each interested POE session
+which registers with it. Events are prefixed with 'irc_<protocol>_' where
+<protocol> is currently either 'hyb' or 'p10', supporting Hybrid-7.0+ and
+ircu2.10.11.04+. Other ircd protocols may be forthcoming, subject to suitable
+testing environments becoming available to me :)
+
+NOTE: Hybrid support is not fully supported yet and the wrapper module will
+choke if you try and invoke it. I hope to have this sorted soon.
+
+Hybrid: Tested with Hybrid-7.0 http://www.ircd-hybrid.org
+
+P10: Tested with asuka-1.06 http://dev-com.quakenet.org/
+
+The component will also track all IRC network events itself and keeps a record
+of the current IRC network "state" such as all users and channels. This
+information is stored in an object which is returned when the component is
+created. Public methods are available to query this information.
+
+As the component tracks IRC network state it acts like an ircd and uses network
+bursts to inform the uplink server on connection of its current users and
+channels. The component has been written in such a way that if there are any
+nickname collisions, the Service clients will always take precedence over
+existing clients. Also, Service clients will always be guaranteed to retain
+operator status on any channels they have joined. These are "features".
+
+3). Quirky Features :)
+
+The module will automatically deal with the following events:-
+
+irc_*_ping
+
+Automatically pongs the uplink in response to pings.
+
+irc_*_whois
+
+The module will automatically do the right thing with WHOIS requests. It will
+always report an idle time of 0 seconds.
+
+irc_*_stats
+
+The module will automatically deal with "u" STATS requests. Any other query is
+quietly ignored.
+
+Network Burst Management:-
+
+As soon as the component is created and started it is possible to add clients
+and join them to channels. When the component is requested to CONNECT to its
+uplink server it connects and receives the current network state from the
+uplink server. There are two circumstances where the component will "kludge":
+
+An incoming nickname matches one of the components nicknames ( ie. one of our
+service bots ). The component will adjust the timestamp of the existing
+nickname by subtracting 30 seconds. This means that when our clients are
+bursted to the uplink, the matching client will be KILLed.
+
+An incoming channel already exists in the components list of channels ( ie. one
+of our service bots is on a channel ). The component will adjust the timestamp
+of the existing channel so it is consistent with the IRC network. When we burst
+in our version of the channel, any service bots will retain their operator +o
+status.
+
+4). DISCLAIMER
+
+This module is provided "as is". No money back. No guarantees.

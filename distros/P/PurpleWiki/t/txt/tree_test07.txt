@@ -1,0 +1,5 @@
+'''Bold paragraph.'''
+
+Nested inline tags.  '''''Bold and italics (using quotes).'''''
+<b><i>Bold and italics (tagged)</i></b>.  <i><b>Italics and bold.</b></i>
+''ItalicsWikiWord.''

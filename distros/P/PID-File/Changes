@@ -1,0 +1,66 @@
+Revision history for PID-File
+
+0.32    fixing distribution
+
+0.31    fix closed sub wrapping reference
+
+0.30    remove flock dep
+
+0.29    add guard param to create()
+
+0.28    remove race conditions, auto guarding
+
+0.27    whitespace cleaning
+
+0.26    cleanup
+
+0.25    mitigate race conditions
+
+0.24    more tiny pod
+
+0.23    tiny POD changes
+
+0.22    POD updates
+
+0.21    Helper method merged with create
+
+0.20    Helper method for retries and sleep
+
+0.19    6 June 2012 - added pid() method to return pid in file (or undef)
+
+0.18    test exception is a dep
+
+0.17    tests to override the defensive checks
+
+0.16    3 June 2012 - Prevent removing and guarding pid files that weren't created by the current process
+
+0.15    guard can now set internally when using void context
+
+0.14    more tests for guard
+
+0.13    remove pod from guard
+
+0.12    guard takes sub ref
+
+0.11    should always call remove even when using the guard
+
+0.10    more tests on filename checking
+
+0.09    condensed examples
+
+0.08    yet more pod changes
+
+0.07    corrected guard pod
+
+0.06    better tests
+
+0.05    scope guard feature added
+
+0.04    extra example with a while loop
+
+0.03    more pod
+
+0.02    pod updates
+
+0.01    1 June 2012 - Released
+

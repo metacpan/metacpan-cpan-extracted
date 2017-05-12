@@ -1,0 +1,38 @@
+POE::Component::Client::NSCA
+============================
+
+0.16	Fri Jun 19 10:23:59 BST 2009
+	- Makefile.PL meta updates
+	- POD Tidying
+
+0.14	Mon Dec 15 12:30:24 GMT 2008
+	- [rt.cpan.org #41656] Blank password not allowed with XOR 'encryption'
+	  patch applied from JT Justman to fix this.
+
+0.12	Thu May 22 14:19:41 BST 2008
+	- changed minimum perl version to 5.8
+
+0.10	Wed May 21 10:53:13 BST 2008
+	- removed kwalitee test
+	- added additional license information
+
+0.08	Mon Mar 31 14:28:23 BST 2008
+	- Kwalitee fixes.
+
+0.06	Wed Jan  2 12:49:45 GMT 2008
+	- Made the 03_basic.t and 04_xor.t checksum tests TODO.
+
+0.05	Wed Dec 19 18:38:16 GMT 2007
+	- Changes to 03_basic.t and 04_xor.t to try and track down checksum mismatches
+
+0.04	Tue Dec 18 14:26:53 GMT 2007
+	- Refactored 03_basic.t and added 04_xor.t tests
+
+0.03	Mon Dec 17 16:57:08 GMT 2007
+	- Finally got the Mcrypt stuff working against the 'proper' NSCA daemon
+
+0.02	Mon Dec 17 13:27:16 GMT 2007
+	- Added a 'warn' to try and track down problem with Mcrypt encryption
+
+0.01	Fri Dec 14 16:01:17 GMT 2007
+	- Initial CPAN Release

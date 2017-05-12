@@ -1,0 +1,153 @@
+# NAME
+
+Password::Policy - Make managing multiple password strength profiles easy
+
+# VERSION
+
+version 0.04
+
+# UNICODE
+
+This module strives to handle Unicode characters in a sane way. The exception are the
+uppercase and lowercase rules, which obviously don't make sense in a Unicode setting.
+If you find a case where Unicode characters don't behave correctly, please let me know.
+
+# EXCEPTIONS
+
+This module tries to throw a well defined exception object when it encounters an
+error. Wrapping it in something like [Try::Tiny](https://metacpan.org/pod/Try::Tiny) is highly recommended, so that
+you can handle errors intelligently.
+
+# EXTENDING
+
+Password::Policy is a baseline - there's no conceivable way to plan for anything an
+administrator would like to do. To add a rule, you need a package that looks like this:
+
+    package Password::Policy::Rule::MyRule;
+
+    use strict;
+    use warnings;
+
+    use parent 'Password::Policy::Rule';
+
+    sub default_arg { return 42; }
+
+    sub check {
+        my $self = shift;
+        my $password = $self->prepare(shift);
+
+        ...your code goes here, and either throws an exception or doesn't...
+
+        return 1;
+    }
+
+    1;
+
+To add a new encryption type, you need a package that looks like this:
+
+    package Password::Policy::Encryption::MyEncryption;
+
+    use strict;
+    use warnings;
+
+    use parent 'Password::Policy::Encryption';
+
+    sub enc {
+        my $self = shift;
+        my $password = $self->prepare(shift);
+
+        ...your code goes here, and either throws an exception or doesn't...
+
+        return $encrypted_password;
+    }
+
+    1;
+
+# SYNOPSIS
+
+    use Password::Policy;
+
+    my $pp = Password::Policy->new(config => '/path/to/config');
+    $pp->process({ password => 'mypassword to check', profile => 'profile to check' });
+
+# DESCRIPTION
+
+Password::Policy is an easy way to manage multiple password strength/encryption profiles.
+The two most obvious use cases are:
+
+    - You are running multiple sites with a similar/shared backend, and they have different
+      policies for password strength
+
+    - You have multiple types of users, and want different password strengths for each of them,
+      It's ok for a regular user to have 'i like cheese' as a password, but an administrator's
+      password should be made of stronger stuff.
+
+The whole thing is driven by a configuration file, passed in on instantiation. It uses
+[Config::Any](https://metacpan.org/pod/Config::Any) internally, so the config file format can be whatever you would like. The
+examples all use YAML, but anything Config::Any understands will work.
+
+Assuming a configuration file looks like this:
+
+    ---
+    default:
+        length: 4
+        algorithm: "Plaintext"
+
+    site_moderator:
+        inherit: "default"
+        length: 8
+        uppercase: 1
+
+    site_admin:
+        inherit: "site_moderator"
+        length: 10
+        # will have uppercase: 1 from site_moderator
+        numbers: 2
+        algorithm: "ROT13"
+
+The default profile will encrypt with plaintext (no encryption!), and make sure the
+password is at least four characters long. If a site moderator is attempting to change
+his password, it will extend that length check to 8, and require at least one of
+those characters to be an uppercase ASCII character.
+
+The site\_admin profile will extend that length to 10, require two numbers, and
+change the encryption method to ROT-13 (secure!). It also keeps the one uppercase
+character requirement from site\_moderator.
+
+# METHODS
+
+## new
+
+Creates a new Password::Policy object. Takes at least one argument, config. Optionally
+can take a second argument, previous, that contains encypted passwords (the idea being
+that it's the user's old passwords, that can't be re-used).
+
+## process
+
+Process a password. Takes a hashref as an argument, with at least one argument,
+'password', that is the plaintext password. It also takes 'profile', which will
+refer to a profile in the configuration file. Rules will be checked in alphabetical order.
+
+    my $enc_passwd = $pp->process({ password => 'i like cheese', profile => 'site_admin' });
+
+## encrypt
+
+Encrypt a password. Takes a hashref with the algorithm to use, the plain text password
+to encrypt, and optionally any arguments you want to pass to the algorithm's module.
+
+    my $enc_passwd = $pp->encrypt({ password => 'i like cheese', algorithm =>'ROT-13' });
+
+# ACKNOWLEDGEMENTS
+
+The unit tests got a nice round of cleanup from StarLightPL. Thanks!
+
+# AUTHOR
+
+Andrew Nelson <anelson@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Andrew Nelson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

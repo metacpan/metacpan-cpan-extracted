@@ -1,0 +1,5 @@
+^\.git.*
+\.old$
+\.swp$
+\.tar\.gz$
+README\.md

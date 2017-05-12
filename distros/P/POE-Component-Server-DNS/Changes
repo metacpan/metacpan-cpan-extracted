@@ -1,0 +1,128 @@
+==================================================
+Changes from 2010-12-04 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.32 at 2015-12-03 12:41:21 +0000
+-----------------------------------------
+
+  Change: de4cb37bf1d4e4ee2cea6a6fcc3bdad5472196d0
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-12-03 12:41:21 +0000
+
+    Release 0.32 
+
+  Change: c5533abd61734f76f05e50c63491f08233fe0a0a
+  Author: NLnet Labs <NLNETLABS@cpan.org>
+  Date : 2015-12-03 12:39:54 +0000
+
+    [rt.cpan.org #108936] Tests fail (with Net::DNS 1.03?)
+
+    The failed test is because of a qr bit not being set in a
+    artificially created response. When creating answers packets, the QR
+    bit should be set to indicate that the answer is a response. Net::DNS
+    1.03 checks for this now. Attached a fix.
+
+    Signed-off-by: Chris 'BinGOs' Williams <chris@bingosnet.co.uk> 
+
+-----------------------------------------
+version 0.30 at 2013-04-23 21:55:56 +0000
+-----------------------------------------
+
+  Change: fe9e3b0fb741cac3e7834d9df8a9bb6d06fa3da2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-04-23 22:55:56 +0000
+
+    Rename socket_* handlers 
+
+  Change: 4b3204e6240bbf8717301e0601a023ed0162ea85
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-04-23 22:50:47 +0000
+
+    Bump version and update AUTHORS 
+
+  Change: edb91646bdefbf84a2f7eea321e8656c0b5a3948
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2013-04-23 13:00:12 +0000
+
+    Merge pull request #1 from warewolf/add-tcp-server
+
+    Add tcp server 
+
+  Change: 2e9a0c3d8cf5a59952100c1fa6f03c446bc961dd
+  Author: Richard Harman <richard@richardharman.com>
+  Date : 2013-03-20 10:56:49 +0000
+
+    Looks like this works now. 
+
+  Change: d22b51ba93b245e13a987bb01ccb232f691ed215
+  Author: Richard Harman <richard@richardharman.com>
+  Date : 2013-03-15 16:50:28 +0000
+
+    Add stephan48's code 
+
+-----------------------------------------
+version 0.28 at 2012-12-13 15:01:21 +0000
+-----------------------------------------
+
+  Change: 1260762f08d760d4d85a2249ade3d4a8cc261e2a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-12-13 15:01:21 +0000
+
+    Fix the no_client tests as Net::DNS::Resolver behaviour has changed
+
+    Also require a fixed recent version of PoCo-Client-DNS-Recursive 
+
+-----------------------------------------
+version 0.26 at 2012-10-08 20:43:22 +0000
+-----------------------------------------
+
+  Change: 9d5facc88a8abaa052af9a23938bbf05776c1ff3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-10-08 21:43:22 +0000
+
+    Remove the buffer from outgoing Net::DNS::Packet objects
+
+    This was making handlers basically non-worky 
+
+-----------------------------------------
+version 0.24 at 2012-10-05 21:11:41 +0000
+-----------------------------------------
+
+  Change: 0d5f44b3a7c6735de69a8c6a7523cd8779ad1d77
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-10-05 22:11:41 +0000
+
+    Fix the SYNOPSIS 
+
+-----------------------------------------
+version 0.22 at 2012-03-01 12:47:57 +0000
+-----------------------------------------
+
+  Change: e96e100504f96dda7a0d070be71fb4c88cd1242c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-03-01 12:47:57 +0000
+
+    Bump to version 0.22 
+
+  Change: 84b1b0b9ee7f4439fbd6db3df3ee482dd9ef42cb
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-03-01 12:47:12 +0000
+
+    Resolve no_clients test failures. 
+
+  Change: a28098a3f29784b34ae3d4f89fbe78327687142b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-03-01 12:36:06 +0000
+
+    Switched the distribution to Dist::Zilla 
+
+  Change: 8d423bc583042a1ff8d26b5fc35bca65ee49fca7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-02-29 23:11:48 +0000
+
+    Strip trailing whitespace 
+
+================================================
+Plus 2 releases after 2010-12-04 00:00:00 +0000.
+================================================

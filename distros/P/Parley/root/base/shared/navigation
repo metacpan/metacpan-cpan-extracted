@@ -1,0 +1,5 @@
+<!-- shared/navigation -->
+<p>
+    [% PROCESS shared/threadcrumbs %]
+<p>
+<!-- end : shared/navigation -->

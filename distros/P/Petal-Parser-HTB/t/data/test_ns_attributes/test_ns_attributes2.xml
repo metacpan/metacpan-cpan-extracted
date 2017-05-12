@@ -1,0 +1,4 @@
+<foo xmlns:petal_temp="http://purl.org/petal/1.0/">
+	<bar baz="default" petal_temp:attributes="baz baz_value" />
+	<buzz petal_temp:content="buzz_value">Default</buzz>
+</foo>

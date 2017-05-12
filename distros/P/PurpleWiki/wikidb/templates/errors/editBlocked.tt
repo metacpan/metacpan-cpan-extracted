@@ -1,0 +1,9 @@
+[% INCLUDE common/header.tt
+           title = "Editing Denied!"
+%]
+
+<p>Editing not allowed: user, ip, or network is blocked.  You may have
+to login to edit the page.  Contact the wiki administrator for more
+information.</p>
+
+[% INCLUDE common/footer.tt %]

@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Parse-CPinfo
+version:             0.882
+abstract:            Perl extension to parse output from cpinfo 
+license:             GPL
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Carp:                          0
+    IO::File:                      0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Matthew M. Lange <mmlange@cpan.org>

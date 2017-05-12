@@ -1,0 +1,16 @@
+Revision history for Perl extension Plack-Middleware-Session-Simple
+
+0.03 2014-10-20T14:20:03Z
+
+    - add serializer option
+
+0.02 2013-10-27T14:43:31Z
+
+    - [incompatible change] change default session id generator.
+      more compatibility with Plack-Middleware::Session
+    - add sid_generator and sid_validator options
+
+0.01 2013-10-25T05:17:21Z
+
+    - original version
+

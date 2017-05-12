@@ -1,0 +1,84 @@
+=head1 Radiobutton Widget
+
+B<$rb=Paw::Radiobutton::new(\@labels, [$direction], [$color], [$name], [\&callback]);>
+
+B<Parameter>
+
+     \@labels   => Die Label fuer die Buttons.
+                   Hiermit wird auch Anzahl der Buttons festgelegt.
+
+     $color     => Das Farbpaar (colorpair) muss mit
+                   Curses::init_pair(pair_nr, COLOR_fg, COLOR_bg)
+                   erzeugt werden[optional]
+
+     $name      => Name des Widgets [optional]
+
+     \&callback => Referenz auf Function die bei betaetigen des Radiobuttons
+                   angesprungen wird. [optional]
+
+     $direction => Richtung in der die Buttons liegen sollen "h" bzw. "v"
+                   (default) [optional]
+
+B<Beispiel>
+
+     @labels=("Red", "Green", "Blue");
+     $rb=Paw::Radiobutton::new(labels=>\@labels, direction=>"v");
+
+B<Callback>
+
+Ähnlich wie beim ``normalen'' Button wird bei Betaetigung des Radiobuttons die
+Callback Funktion angesprungen. (perldoc Paw::Button)
+
+=head2 set_button()
+
+Der aktive Button wird gesetzt/gedrueckt.
+
+B<Beispiel>
+
+     $rb->set_button();
+
+=head2 get_pressed()
+
+gibt die Nummer des Buttons zurueck der gedrueckt ist (Zaehlung beginnend bei 0).
+
+B<Beispiel>
+
+     $pushed_button=$rb->get_pressed();
+
+=head2 abs_move_widget($new_x, $new_y)
+
+Das Widget verschiebt sich auf die neue absolute Schirm Position.
+Wird nur einer der Parameter angegeben, so behaelt der andere seinen Wert bei.
+
+B<Beispiel>
+
+     $rb->abs_move_widget( new_x=>5 );      #y-pos is the same
+
+=head2 get_widget_pos()
+
+Gibt ein Array mit den beiden Wertde (x-Position, y-Position) zurueck.
+
+B<Beispiel>
+
+     ($xpos,$ypos)=$rb->get_widget_pos();
+
+=head2 set_color($color_pair)
+
+Setzt ein neues color_pair.
+
+B<Beispiel>
+
+     $box->set_color(3);
+
+=head2 set_border([``shade''])
+
+aktiviert den Rahmen der Box. Optional auch mit Schatten. 
+
+B<Beispiel>
+
+     $box->set_border("shade"); or $win->set_border();
+
+
+
+=cut
+

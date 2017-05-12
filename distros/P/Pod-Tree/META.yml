@@ -1,0 +1,34 @@
+---
+abstract: 'Create a static syntax tree for a POD'
+author:
+  - 'Steven McDougall (swmcd@world.std.com)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Path::Tiny: '0.068'
+  Test::Compile: v1.2.1
+  Test::More: '1'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Tree
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Find: '1'
+  HTML::Stream: '1.49'
+  IO::File: '1'
+  IO::String: '1'
+  Pod::Escapes: '1.02'
+  Text::Template: '1'
+resources:
+  bugtracker: http://github.com/szabgab/Pod-Tree/issues
+  homepage: http://metacpan.org/pod/Pod::Tree
+  repository: http://github.com/szabgab/Pod-Tree.git
+version: '1.25'

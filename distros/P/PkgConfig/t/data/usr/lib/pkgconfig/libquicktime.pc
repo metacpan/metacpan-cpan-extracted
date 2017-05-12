@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/lqt
+plugindir=/usr/lib/libquicktime1
+
+Name: libquicktime
+Description: library for reading and writing Quicktime files
+Version: 1.2.2
+Libs: -L${libdir} -lquicktime -lpthread -lm -lz -ldl 
+Cflags: -I${includedir} 

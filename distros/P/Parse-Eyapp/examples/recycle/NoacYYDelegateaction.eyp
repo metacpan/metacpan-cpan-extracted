@@ -1,0 +1,33 @@
+%left   '+'
+%left   '*'
+
+%defaultaction { 
+  goto &Parse::Eyapp::Driver::YYDelegateaction;
+}
+
+%%
+exp:        %name NUM
+              NUM 
+        |   %name PLUS
+              exp '+' exp         
+        |   %name TIMES
+              exp '*' exp         
+        |   '(' exp ')'
+              { $_[2] }
+;
+
+%%
+
+use base qw{CommonTail};
+
+=head1 SYNOPSIS
+
+Compile it with:
+
+        eyapp NoacYYDelegateaction.eyp
+
+Execute it with:
+
+      ./icalcu_and_ipost_yydel.pl
+
+=cut

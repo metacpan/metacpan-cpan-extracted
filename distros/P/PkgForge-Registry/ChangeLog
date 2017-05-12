@@ -1,0 +1,338 @@
+2011-05-09  SVN: new release
+
+	* Release: 1.3.0
+
+2011-05-09 08:12  squinney@INF.ED.AC.UK
+
+	* doc/manage_builders.html, doc/manage_platforms.html: Add docs on
+	  how to manage platforms and builders
+
+2011-05-04 10:34  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Registry release: 1.2.1
+
+2011-05-04 10:34  squinney@INF.ED.AC.UK
+
+	* doc/admin.html: Added note about required software
+
+2011-05-02 14:59  squinney@INF.ED.AC.UK
+
+	* doc/admin.html: corrected tiny error
+
+2011-05-02 14:55  squinney@INF.ED.AC.UK
+
+	* doc/client.html: tweaked client docs
+
+2011-05-02 14:53  squinney@INF.ED.AC.UK
+
+	* doc/client.html: Added docs on client configuration
+
+2011-05-02 12:53  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Registry release: 1.2.0
+
+2011-05-02 12:53  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/PkgForge/Registry/Schema/Result/BuildLog.pm.in,
+	  lib/PkgForge/Registry/Schema/Result/Builder.pm.in,
+	  lib/PkgForge/Registry/Schema/Result/Job.pm.in,
+	  lib/PkgForge/Registry/Schema/Result/Platform.pm.in,
+	  scripts/registry-setup.sql: Altered the build_log table so that
+	  it has fewer dependencies on other tables. This makes it possible
+	  to delete some things without losing the log info
+
+2011-05-02 11:51  squinney@INF.ED.AC.UK
+
+	* doc/admin.html: more work on the admin docs
+
+2011-05-02 10:42  squinney@INF.ED.AC.UK
+
+	* doc/admin.html: Added admin guide
+
+2011-05-02 10:42  squinney@INF.ED.AC.UK
+
+	* scripts/registry-setup.sql: Removed the 'create user' calls, now
+	  done separately in the registry-init script
+
+2011-05-02 10:41  squinney@INF.ED.AC.UK
+
+	* scripts/registry-init.sh: Added the creation of all roles
+
+2011-05-02 08:59  squinney@INF.ED.AC.UK
+
+	* doc/index.html: Small improvements to the introductory docs
+
+2011-04-01 04:52  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Registry release: 1.1.1
+
+2011-04-01 04:52  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/PkgForge/Registry.pm.in: small tweak to roles
+	  consumed
+
+2011-03-02 09:01  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/PkgForge/App/Platform.pm.in: Also display the new
+	  'auto' field for each platform in the list command
+
+2011-03-02 09:01  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/App/Builder.pm.in: permit the adding of builders for
+	  inactive platforms. This is useful when preparing new build
+	  platforms
+
+2011-03-01 08:43  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Registry release: 1.1.0
+
+2011-03-01 08:42  squinney@INF.ED.AC.UK
+
+	* PkgForge-Registry.spec, lcfg.yml,
+	  lib/PkgForge/App/Platform.pm.in, lib/PkgForge/Registry.pm.in,
+	  lib/PkgForge/Registry/Schema/Result/Platform.pm.in,
+	  scripts/registry-setup.sql: Added support for new 'auto' field in
+	  the platform table
+
+2011-03-01 06:03  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Registry.pm.in: Do more to ensure that tasks are
+	  only registered for active platforms
+
+2011-02-16 13:59  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Registry release: 1.0.3
+
+2011-02-16 13:58  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Registry.pm.in: Only register tasks for active
+	  platforms
+
+2011-01-26 15:05  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Registry release: 1.0.2
+
+2011-01-26 15:04  squinney@INF.ED.AC.UK
+
+	* PkgForge-Registry.spec: Added missing build-requires
+
+2011-01-26 14:40  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Registry release: 1.0.1
+
+2011-01-26 14:40  squinney@INF.ED.AC.UK
+
+	* PkgForge-Registry.spec: Added build-requires on PkgForge
+
+2011-01-26 14:40  squinney@INF.ED.AC.UK
+
+	* scripts/registry-setup.sql: fixed access to the job status table
+	  for pkgforge builders
+
+2011-01-22 18:32  squinney@INF.ED.AC.UK
+
+	* scripts/registry-setup.sql: handle the builder current task field
+	  being null
+
+2011-01-22 18:25  squinney@INF.ED.AC.UK
+
+	* scripts/registry-setup.sql: allow the builder user to update the
+	  job status and modtime
+
+2011-01-22 18:25  squinney@INF.ED.AC.UK
+
+	* scripts/registry-init.sh: Set --no-createdb and --no-superuser
+	  for the pkgforge admin user
+
+2011-01-10 13:15  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Registry release: 1.0.0
+
+2011-01-10 13:15  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Registry.pm.in: renamed some attributes to make them
+	  more consistent
+
+2010-12-20 07:39  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Registry release: 0.8.9
+
+2010-12-20 07:38  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Registry.pm.in,
+	  lib/PkgForge/Registry/Schema/Result/Job.pm.in: Added support for
+	  mapping in the new PkgForge::Job size attribute
+
+2010-12-16 15:41  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Registry release: 0.8.8
+
+2010-12-16 15:21  squinney@INF.ED.AC.UK
+
+	* doc/index.html: made a start on the registry docs
+
+2010-12-16 13:55  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, PkgForge-Registry.spec: Added some documentation of
+	  the DB schema
+
+2010-12-15 12:30  squinney@INF.ED.AC.UK
+
+	* doc/pkgforge.png: Added png as well for web page display
+
+2010-12-15 12:03  squinney@INF.ED.AC.UK
+
+	* NOTES.txt, doc/pkgforge.dia, doc/pkgforge.dot, doc/pkgforge.html,
+	  doc/pkgforge.neato, doc/pkgforge.ps, doc/pkgforge.xml,
+	  doc/pkgforge.zigzag.dia: added some diagrams of the sql schema
+
+2010-12-15 11:59  squinney@INF.ED.AC.UK
+
+	* doc: added doc dir
+
+2010-12-15 11:27  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/App/Builder.pm.in, lib/PkgForge/App/Platform.pm.in:
+	  Added more documentation
+
+2010-12-15 10:55  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Registry.pm.in: clean namespace earlier for safety
+
+2010-12-15 10:36  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Registry.pm.in, lib/PkgForge/Registry/Role.pm.in:
+	  Added more documentation
+
+2010-12-15 09:21  squinney@INF.ED.AC.UK
+
+	* NOTES.txt: Added some notes on how the schema classes were
+	  generated
+
+2010-12-15 09:20  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Registry/Schema/Result/Builder.pm.in: Added a
+	  has_many relationship between builder and build_logs
+
+2010-12-15 09:15  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Registry/Schema/Result/BuildLog.pm.in: Added schema
+	  result class for the new build_log table
+
+2010-12-13 18:38  squinney@INF.ED.AC.UK
+
+	* scripts/registry-setup.sql: Added trigger to update job status
+	  when task status changes
+
+2010-12-13 14:59  squinney@INF.ED.AC.UK
+
+	* README: Added README
+
+2010-12-13 12:20  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Registry release: 0.8.7
+
+2010-12-13 12:20  squinney@INF.ED.AC.UK
+
+	* PkgForge-Registry.spec: Added missing dependencies which are not
+	  picked up automagically
+
+2010-12-13 12:19  squinney@INF.ED.AC.UK
+
+	* MANIFEST: fixed manifest for State to TaskStatus switchover
+
+2010-12-13 12:16  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Registry release: 0.8.6
+
+2010-12-13 12:16  squinney@INF.ED.AC.UK
+
+	* PkgForge-Registry.spec: Marked config files so they do not get
+	  overwritten
+
+2010-12-13 12:05  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/App, lib/PkgForge/App/Builder.pm.in,
+	  lib/PkgForge/App/Platform.pm.in: Moved over the two registry apps
+
+2010-12-13 11:40  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Registry.pm.in,
+	  lib/PkgForge/Registry/Schema/Result/State.pm.in,
+	  lib/PkgForge/Registry/Schema/Result/Task.pm.in,
+	  lib/PkgForge/Registry/Schema/Result/TaskStatus.pm.in: The state
+	  table is now known as task_status. This results in a switch from
+	  the State module to TaskStatus
+
+2010-12-13 10:55  squinney@INF.ED.AC.UK
+
+	* META.yml.in, Makefile.PL: Added some more Perl module meta-data
+	  files
+
+2010-12-13 10:24  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Registry release: 0.8.5
+
+2010-12-13 10:24  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, PkgForge-Registry.spec, conf,
+	  conf/registry-builder.yml, conf/registry-incoming.yml,
+	  conf/registry-web.yml, conf/registry.yml, lcfg.yml: Added
+	  standard config files for DB access
+
+2010-12-13 10:23  squinney@INF.ED.AC.UK
+
+	* MANIFEST, MANIFEST.SKIP: Added manifest
+
+2010-12-13 10:01  squinney@INF.ED.AC.UK
+
+	* registry-init.sh, scripts/registry-init.sh: Moved to the scripts
+	  directory and made executable
+
+2010-12-13 09:59  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, registry-init.sh, registry-init.txt, registry-wipe.txt,
+	  registry.txt, scripts, scripts/registry-setup.sql,
+	  scripts/registry-wipe.sql: Added lots of documentation to the
+	  registry setup scripts
+
+2010-12-13 06:54  squinney@INF.ED.AC.UK
+
+	* t, t/00_load.t: Added basic load tests
+
+2010-12-13 06:42  squinney@INF.ED.AC.UK
+
+	* registry-init.txt, registry-wipe.txt, registry.txt: Added
+	  registry sql files
+
+2010-12-13 06:41  squinney@INF.ED.AC.UK
+
+	* README: Added README
+
+2010-12-13 06:40  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: Added changelog
+
+2010-12-13 06:38  squinney@INF.ED.AC.UK
+
+	* lcfg.yml: Added build tools file
+
+2010-12-13 06:36  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, PkgForge-Registry.spec: Added specfile and build
+	  script
+
+2010-12-13 06:25  squinney@INF.ED.AC.UK
+
+	* lib, lib/PkgForge, lib/PkgForge/Registry,
+	  lib/PkgForge/Registry.pm.in, lib/PkgForge/Registry/App.pm.in,
+	  lib/PkgForge/Registry/Role.pm.in, lib/PkgForge/Registry/Schema,
+	  lib/PkgForge/Registry/Schema.pm.in,
+	  lib/PkgForge/Registry/Schema/Result: Imported PkgForge::Registry
+	  code from the PkgForge project directory
+
+2010-12-13 06:19  squinney@INF.ED.AC.UK
+
+	* .: Added separate project directory for the Package Forge
+	  registry code
+

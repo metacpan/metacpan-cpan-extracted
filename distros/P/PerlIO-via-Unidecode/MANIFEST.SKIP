@@ -1,0 +1,14 @@
+#
+# Last Modified Time-stamp: "2014-07-26 01:47:11 MDT sburke@cpan.org"
+#
+\.bak$
+\.old$
+Makefile$
+~$
+.tar.gz$
+~
+CACHEDIR.TAG
+_*00_ABOUT_THIS_DIR.txt
+MYMETA.*
+SMB_.*
+/[0-9]{1,3}$

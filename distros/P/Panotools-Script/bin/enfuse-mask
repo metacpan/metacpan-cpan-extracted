@@ -1,0 +1,119 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use File::Temp qw/tempdir/;
+use File::Spec;
+
+my @parameters;
+my @files;
+my $tempdir = tempdir (CLEANUP => 1);
+
+while (@ARGV)
+{
+    my $arg = shift @ARGV;
+    if ($arg =~ /-o/)
+    {
+        push @parameters, $arg;
+        push @parameters, shift @ARGV;
+        next;
+    }
+    if ($arg =~ /\.[[:alnum:]]+$/i) {push @files, $arg}
+    else {push @parameters, $arg}
+}
+
+my $index = 0;
+
+for my $file (@files)
+{
+    $file = File::Spec->rel2abs ($file);
+    my $tempfile = File::Spec->catfile ($tempdir, "$index.tif");
+    my $mask = $file;
+    $mask =~ s/\.[[:alnum:]]+$/_mask.tif/i;
+    my $svg = $file;
+    $svg =~ s/\.[[:alnum:]]+$/.svg/i;
+    $file = $svg if (-e $svg);
+    if (-e $mask)
+    {
+        print STDERR "Using mask $mask\n";
+        my $mask_old = File::Spec->catfile ($tempdir, 'mask_old.tif');
+        my $mask_new = File::Spec->catfile ($tempdir, 'mask_new.tif');
+        # extract existing alpha mask
+        system ('convert', $file, '-channel', 'matte', '-negate', '-separate', $mask_old);
+        # merge existing mask with file mask to create new mask
+        system ('composite', $mask_old, $mask, $mask, $mask_new);
+        # insert new mask into existing image
+        system ('composite', '-compose', 'CopyOpacity', $mask_new, $file, $tempfile);
+        push @parameters, $tempfile;
+    }
+    elsif ($file !~ /\.tif$/i)
+    {
+        print STDERR "Converting $file to TIFF\n";
+
+        # deal with imagemagick brokenness
+        my $curdir = File::Spec->curdir ();
+        $curdir = File::Spec->rel2abs ($curdir);
+        my ($v, $d, $f) = File::Spec->splitpath ($file);
+        my $basedir = File::Spec->catpath ($v, $d, '');
+        chdir $basedir;
+
+        system ('convert', '-background', 'transparent', $file, $tempfile);
+        chdir $curdir;
+        push @parameters, $tempfile;
+    }
+    else
+    {
+        push @parameters, $file;
+    }
+    $index++;
+}
+
+system ('enfuse', @parameters);
+
+__END__
+
+=head1 NAME
+
+enfuse-mask - Wrapper around enfuse for managing external masks
+
+=head1 Synopsis
+
+  enfuse-mask [options] -o OUTPUT INPUTS
+
+=head1 DESCRIPTION
+
+Wrapper around enfuse.  Usage is exactly the same as for enfuse,
+except that if files named '<prefix>_mask.tif' exist, they are
+inserted as alpha masks before fusing.
+
+Some examples of valid image pairs:
+
+  image0000.tif image0000_mask.tif
+  foo.jpg foo_mask.tif
+
+Note masks can be any bit depth, but must have no alpha channel.  Black
+indicates areas to be ignored, any other colour indicates areas that may be
+fused.
+
+Note also that only masks need to be TIFF files, input images can be any
+filetype supported by ImageMagick.
+
+Requires enfuse and ImageMagick.
+
+L<http://enblend.sourceforge.net/>
+
+=head1 License
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 See Also
+
+L<perl>, L<Panotools::Script>
+
+=head1 Author
+
+October 2006, Bruno Postle <bruno AT postle.net>
+

@@ -1,0 +1,79 @@
+=head1 NAME
+
+Process::Results::Holder - methods for objects that hold Process::Results
+objects.
+
+=head1 SYNOPSIS
+
+ package MyClass;
+ use strict;
+ use base 'Process::Results::Holder';
+ 
+ my $object = MyClass->new
+ my $results = MyClass->results;
+ 
+ $object->error('error-id')
+
+=head1 OVERVIEW
+
+It's often convenient for an object to hold a Process::Results object.
+Process::Results::Holder provides methods for handling a contained results
+object. To add these methods to your class, simply extend
+Process::Results::Holder:
+
+ use base 'Process::Results::Holder';
+
+The methods that are added to your class assume that you have or will put a
+results object in the 'results' property of the object.
+
+=head1 METHODS
+
+=head2 results()
+
+C<results()> returns the Process::Results object that is held by the holder.
+
+ $results = $object->results();
+
+If the results object exists in the 'results' property:
+
+ $object->{'results'}
+
+then it is returned. If it does not exist, then one is created, stored in the
+'results' object, then returned.
+
+=head2 error(), warning(), note()
+
+These methods do that same thing as their Process::Results counterparts: they
+store messages in the results object. If the results object doesn't exist, it
+is created.
+
+=head2 results_class()
+
+This method returns the class name to use to create the results object. By
+default it returns 'Process::Results'. Override this class if you would like
+to use a custom results class.
+
+=head1 TERMS AND CONDITIONS
+
+Copyright (c) 2016 by Miko O'Sullivan. All rights reserved. This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself. This software comes with NO WARRANTY of any kind.
+
+=head1 AUTHOR
+
+Miko O'Sullivan
+F<miko@idocs.com>
+
+=head1 VERSION
+
+Version: 0.01
+
+=head1 HISTORY
+
+=over 4
+
+=item * Version 0.02 Aug 15, 2016
+
+Adding Process::Results::Holder to Process::Results.
+
+=back
+

@@ -1,0 +1,29 @@
+---
+name: Perl-Critic-Compatibility
+version: 1.001
+author:
+  - 'Elliot Shank <perl@galumph.com>'
+abstract: Policies for Perl::Critic concerned with compatibility with various versions of Perl.
+license: perl
+resources:
+  MailingList: http://perlcritic.tigris.org/servlets/SummarizeList?listName=users
+  Repository: http://perlcritic.tigris.org/svn/perlcritic/trunk/Perl-Critic-Compatibility/
+  homepage: http://perlcritic.com
+  license: http://dev.perl.org/licenses/
+requires:
+  Perl::Critic: 1.083_001
+  version: 0
+build_requires:
+  Test::More: 0
+dynamic_config: 0
+provides:
+  Perl::Critic::Compatibility:
+    file: lib/Perl/Critic/Compatibility.pm
+    version: 1.001
+  Perl::Critic::Policy::Compatibility::ProhibitThreeArgumentOpen:
+    file: lib/Perl/Critic/Policy/Compatibility/ProhibitThreeArgumentOpen.pm
+    version: 1.001
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

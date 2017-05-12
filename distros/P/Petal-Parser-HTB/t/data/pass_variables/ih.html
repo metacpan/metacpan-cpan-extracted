@@ -1,0 +1,15 @@
+<html>
+<body>
+	<!-- pass vars back to the templating engine in petal:set statements: -->
+	<span petal:set="t1 test/object_type foo">
+		Object 1: $t1
+	</span>
+	<span petal:set="t2 test/object_type foo/bar">
+		Object 2: $t2
+	</span>
+	<?var name="set: t3 test/object_type foo"?>
+		Object 3: $t3
+	<?var name="set: t4 test/object_type foo/bar"?>
+		Object 4: $t4
+</body>
+</html>

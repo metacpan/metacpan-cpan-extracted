@@ -1,0 +1,32 @@
+<html>
+<head>
+<title>[% c.config.name %]</title>
+<meta http-equiv="Content-Language" content="en" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style type="text/css">
+    [% INSERT inline.css %]
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <div class="heading"><h1>[% c.config.name %]</h1></div>
+        
+        <div class="content">
+          <p>
+            This is the main page of an instance of the PAR::Repository::Web repository viewer.
+          </p>
+          <p>
+            There is a list of <a href="repos">monitored repositories</a>.
+          </p>
+          <p>
+            The software implementing this can be found on <a href="http://search.cpan.org/dist/PAR-Repository-Web">CPAN</a>.
+          </p>
+        </span>
+        </div>
+
+        <div class="credits"><p>PAR::Repository::Web implementing <i>[% c.config.name %]</i> using the Catalyst web framework</p></div>
+    </div>
+    </div>
+</body>
+</html>

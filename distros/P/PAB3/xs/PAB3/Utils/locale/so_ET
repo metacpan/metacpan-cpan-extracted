@@ -1,0 +1,57 @@
+grp:3;3
+fd:2
+ifd:2
+dp:.
+ts:,
+cs:$
+ics:ETB
+csa:l
+css:0
+ns:-
+ps:+
+dtf:%A, %B %e, %Y %r %Z
+df:%d/%m/%Y
+tf:%l:%M:%S
+apf:%l:%M:%S %p
+amu:SUBAXNIMO
+pmu:GALABNIMO
+aml:subaxnimo
+pml:galabnimo
+lm1:Bisha Koobaad
+lm2:Bisha Labaad
+lm3:Bisha Saddexaad
+lm4:Bisha Afraad
+lm5:Bisha Shanaad
+lm6:Bisha Lixaad
+lm7:Bisha Todobaad
+lm8:Bisha Sideedaad
+lm9:Bisha Sagaalaad
+lm10:Bisha Tobnaad
+lm11:Bisha Kow iyo Tobnaad
+lm12:Bisha Laba iyo Tobnaad
+sm1:Kob
+sm2:Lab
+sm3:Sad
+sm4:Afr
+sm5:Sha
+sm6:Lix
+sm7:Tod
+sm8:Sid
+sm9:Sag
+sm10:Tob
+sm11:KIT
+sm12:LIT
+ld1:Axad
+ld2:Isniin
+ld3:Salaaso
+ld4:Arbaco
+ld5:Khamiis
+ld6:Jimco
+ld7:Sabti
+sd1:Axa
+sd2:Isn
+sd3:Sal
+sd4:Arb
+sd5:Kha
+sd6:Jim
+sd7:Sab

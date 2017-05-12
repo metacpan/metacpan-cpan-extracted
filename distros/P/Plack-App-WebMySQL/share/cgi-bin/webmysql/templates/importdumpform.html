@@ -1,0 +1,21 @@
+		<!--menu-->
+		<p>Please select a dump file to import.</p>
+		<p>Make sure that the filename only contains the following characters:</p>
+		<ul>
+			<li>Alphanumeric</li>
+			<li>Full stop (.)</li>
+			<li>Underscore (_)</li>
+			<li>Dash (-)</li>
+		</ul>
+		<p>Unless specified, the <b><!--database--></b> database will be used.</p>
+		<form action="<!--self-->" method="POST" enctype="multipart/form-data">
+			<input type="hidden" name="key" value="<!--key-->">
+			<input type="hidden" name="action" value="importdump">
+			<table class="inputtable">
+				<tr><td>File</td><th><input type="file" name="dumpfile"></th></tr>
+			</table>
+			<br>
+			<table class="inputtable">
+				<tr><td><input type="submit" value="Continue"></td></tr>
+			</table>
+		</form>

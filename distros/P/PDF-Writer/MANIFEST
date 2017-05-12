@@ -1,0 +1,12 @@
+Build.PL
+Changes
+MANIFEST
+README
+Makefile.PL
+lib/PDF/Writer.pm
+lib/PDF/Writer/pdfapi2.pm
+lib/PDF/Writer/pdflib.pm
+lib/PDF/Writer/mock.pm
+t/000_interface.t
+t/998_pod.t
+META.yml

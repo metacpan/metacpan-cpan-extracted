@@ -1,0 +1,11 @@
+DESCRIPTION
+
+    This distribution contains example scripts in bin/ which use
+    Perinci::CmdLine::Any.
+
+SEE ALSO
+
+    Perinci::Examples::Bin::Classic
+
+    Perinci::Examples::Bin::Lite
+

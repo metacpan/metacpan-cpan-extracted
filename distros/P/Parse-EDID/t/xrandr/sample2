@@ -1,0 +1,56 @@
+Screen 0: minimum 320 x 200, current 3200 x 1200, maximum 8192 x 8192
+LVDS1 connected 1280x800+0+0 (normal left inverted right x axis y axis) 261mm x 163mm
+	EDID:
+		00ffffffffffff0006af14a100000000
+		01120103901a10780a50c59858528e27
+		25505400000001010101010101010101
+		010101010101ea1a007e502010303020
+		360005a31000001aea1a007e50201030
+		3020360005a31000001a000000fe0059
+		37343744804231323145573000000000
+		00000000000000000001010a202000a5
+	BACKLIGHT: 4 (0x00000004)	range:  (0,15)
+	Backlight: 4 (0x00000004)	range:  (0,15)
+	scaling mode:	Full aspect
+		supported: None         Full         Center       Full aspect 
+   1280x800       60.1*+
+   1024x768       60.0  
+   800x600        60.3     56.2  
+   640x480        59.9  
+VGA1 connected 1920x1200+1280+0 (normal left inverted right x axis y axis) 546mm x 352mm
+	EDID:
+		00ffffffffffff0022f0f62601010101
+		181401036e362378eece50a3544c9926
+		0f5054a56b8081408180a900a940b300
+		d10001010101283c80a070b023403020
+		360022602100001a000000fc00485020
+		4c5032343735770a2020000000fd0030
+		551e5e15000a202020202020000000ff
+		00434e43303234303343500a20200085
+   1920x1200      60.0*+
+   1600x1200      60.0  
+   1680x1050      60.0  
+   1600x1000      60.0  
+   1280x1024      75.0     60.0  
+   1280x960       60.0  
+   1152x864       75.0  
+   1024x768       75.1     60.0  
+   832x624        74.6  
+   800x600        75.0     60.3  
+   640x480        75.0     60.0  
+   720x400        70.1  
+HDMI1 disconnected (normal left inverted right x axis y axis)
+	Broadcast RGB:	Full
+		supported: Full         Limited 16:2
+	audio:	auto
+		supported: off          auto         on          
+DP1 disconnected (normal left inverted right x axis y axis)
+	Broadcast RGB:	Full
+		supported: Full         Limited 16:2
+	audio:	auto
+		supported: off          auto         on          
+DP2 disconnected (normal left inverted right x axis y axis)
+	Broadcast RGB:	Full
+		supported: Full         Limited 16:2
+	audio:	auto
+		supported: off          auto         on          

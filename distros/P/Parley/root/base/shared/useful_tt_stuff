@@ -1,0 +1,31 @@
+[% USE HTML %]
+[% USE ForumCode %]
+
+[% SET row_styles = ['row_odd', 'row_even'] %]
+
+[%- MACRO nicedate(d) BLOCK %]
+    [%# if a person has preferences, and there's a timezone option set, use it to
+        set the TZ used to display the time in nicedate
+    %]
+    [% IF authed_user.preference.timezone %]
+        [% CALL d.set_time_zone(authed_user.preference.timezone) %]
+    [% ELSE %]
+        [% CALL d.set_time_zone('UTC') %]
+    [% END %]
+
+    [% IF authed_user.preference.time_format %]
+        [% d.strftime(authed_user.preference.time_format.time_string) %]
+    [% ELSE %]
+        [% d.strftime('%c') %]
+    [% END %]
+
+    [% IF    authed_user.preference.show_tz
+        || ! authed_user.preference.show_tz.defined
+    %]
+        [% d.time_zone_short_name() %]
+    [% END %]
+[% END %]
+
+[% MACRO l(text, args) BLOCK;
+    c.i18nise (text, args);
+END; %]

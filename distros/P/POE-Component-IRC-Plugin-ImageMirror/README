@@ -1,0 +1,87 @@
+NAME
+    POE::Component::IRC::Plugin::ImageMirror - A PoCo-IRC plugin which
+    uploads select images to a mirror service
+
+SYNOPSIS
+    To quickly get an IRC bot with this plugin up and running, you can use
+    App::Pocoirc:
+
+     $ pocoirc -s irc.perl.org -j '#bots' -a ImageMirror
+
+    Or use it in your code:
+
+     use POE::Component::IRC::Plugin::ImageMirror;
+
+     # mirror all images from 4chan.org
+     $irc->plugin_add(ImageMirror => POE::Component::IRC::Plugin::ImageMirror->new(
+         URI_match => [
+             qr{4chan\.org/\w+/src/.*(?i:jpe?g|gif|png)$},
+         ],
+     ));
+
+DESCRIPTION
+    POE::Component::IRC::Plugin::ImageMirror is a POE::Component::IRC
+    plugin. It looks for image URLs in the channel log and uploads the
+    images to Imageshack and Imgur, then prints a short description of the
+    image along with the new URLs.
+
+     <avar> http://images.4chan.org/b/src/1267339589262.gif
+     -MyBot:#channel- gif (318 x 241) - http://imgur.com/RWcSE.gif - http://img535.imageshack.us/img535/9685/1267339589262.gif
+
+    This plugin makes use of POE::Component::IRC::Plugin::URI::Find. An
+    instance will be added to the plugin pipeline if it is not already
+    present.
+
+METHODS
+  "new"
+    Takes the following optional arguments:
+
+    'Channels', an array reference of channels names. If you don't supply
+    this, images will be mirrored in all channels.
+
+    'URI_match', an array reference of regex objects. Any url found must
+    match at least one of these regexes if it is to be uploaded. If you
+    don't supply this parameter, a default regex of
+    "qr/(?i:jpe?g|gif|png)$/" is used.
+
+    'URI_subst', an hash reference of regex/string pairs. These
+    substitutions will be done on the accepted URIs before they are
+    processed further.
+
+    Example:
+
+     # always fetch 7chan images via http, not https
+     URI_subst => [
+         qr{(?<=^)https(?=://(?:www\.)?7chan\.org)} => 'http',
+     ]
+
+    'URI_title', whether or not to include a title produced by URI::Title.
+    Defaults to true.
+
+    'Imgur_user', an Imgur username. If provided, the images uploaded to
+    Imgur will be under this account rather than anonymous.
+
+    'Imgur_pass', an Imgur account password to go with 'ImgurUser'.
+
+    'Method', how you want messages to be delivered. Valid options are
+    'notice' (the default) and 'privmsg'.
+
+    'Eat', when enabled, will prevent further processing of
+    "irc_urifind_uri" events by other plugins for URIs which this plugin
+    mirrors. False by default.
+
+    Returns a plugin object suitable for feeding to POE::Component::IRC's
+    "plugin_add" method.
+
+AUTHOR
+    Hinrik Örn Sigurðsson, hinrik.sig@gmail.com
+
+    Imageshack-related code provided by Ævar Arnfjörð Bjarmason
+    <avar@cpan.org>.
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Hinrik Örn Sigurðsson
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

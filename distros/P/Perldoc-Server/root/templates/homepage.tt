@@ -1,0 +1,12 @@
+<h1>Perldoc::Server - local Perl documentation</h1>
+<p>
+  This site contains local Perl documentation for <strong>[% c.config.perl %]</strong>
+</p>
+<h2>Search path:</h2>
+<p>
+  <ul>
+    [% FOREACH directory IN search_path %]
+      <li>[% directory %]
+    [% END %]
+  </ul>
+</p>

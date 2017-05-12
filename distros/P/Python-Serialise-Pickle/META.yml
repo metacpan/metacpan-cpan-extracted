@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name: Python-Serialise-Pickle
+version: 0.01
+license: perl
+distribution_type: module
+requires:
+  Test::More: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Python::Serialise::Pickle:
+    file: lib/Python/Serialise/Pickle.pm
+    version: 0.01
+generated_by: Module::Build version 0.18

@@ -1,0 +1,17 @@
+0.05 Wed, 29 Aug 2012 17:54:40 +0200
+  - Improved documentation.
+
+0.04  Tue, 28 Aug 2012 15:13:09 +0200
+  - Add a blessed method.
+
+0.03  Mon, 27 Aug 2012 22:32:12 +0200
+  - Restore compatibility with perl 5.14.
+
+0.02  Sun, 26 Aug 2012 16:59:52 +0200
+  - Add tests for overloading.
+  - Add more convenience functions for generating and installing globs into
+    stashes.
+  - Implement the isa method in C instead of in Perl.
+
+0.01  Tue, 15 Nov 2011 17:08:28 +0000
+  - Initial release.

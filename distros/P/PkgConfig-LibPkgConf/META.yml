@@ -1,0 +1,29 @@
+---
+abstract: 'Perl bindings for libpkgconf'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PkgConfig-LibPkgConf
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.008001'
+resources:
+  IRC: irc://irc.perl.org/#native
+  MailingList: https://groups.google.com/forum/#!forum/perl5-alien
+  bugtracker: http://github.com/plicease/PkgConfig-LibPkgConf/issues
+  homepage: https://metacpan.org/pod/PkgConfig-LibPkgConf
+  repository: http://github.com/plicease/PkgConfig-LibPkgConf.git
+version: '0.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

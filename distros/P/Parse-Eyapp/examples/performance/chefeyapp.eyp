@@ -1,0 +1,180 @@
+
+%strict
+%token Bbork
+%token an
+%token An
+%token au
+%token Au
+%token ax
+%token Ax
+%token en
+%token ew
+%token edone
+%token ex
+%token Ex
+%token f
+%token ir
+%token i
+%token ow
+%token o
+%token O
+%token xo
+%token the
+%token The
+%token th
+%token tion
+%token u
+%token U
+%token v
+%token V
+%token w
+%token W
+%token NW
+%token WC
+%token NL
+%token EOS
+%start chef
+%{
+open OUT, ">parserchefeyapp";
+%}
+
+%%
+
+chef : token +
+     ;
+
+token : EOS
+        { print OUT $_[1] . "Bork Bork Bork!\n" }
+      | Bbork
+		{ print OUT $_[1] }
+      | an
+		{ print OUT 'un' }
+      | An
+		{ print OUT 'Un' }
+	  | au
+		{ print OUT 'oo' }
+	  | Au
+		{ print OUT 'Oo' }
+      | ax
+		{ print OUT 'e' }
+      | Ax
+		{ print OUT 'E' }
+	  | en
+		{ print OUT 'ee' }
+      | ew
+		{ print OUT 'oo' }
+	  | edone
+		{ print OUT 'e-a' }
+      | ex
+		{ print OUT 'i' }
+      | Ex
+		{ print OUT 'I' }
+	  | f
+		{ print OUT 'ff' }
+	  | ir
+		{ print OUT 'ur' }
+      | i
+		{ print OUT 'ee' }
+      | ow
+		{ print OUT 'oo' }
+	  | o
+		{ print OUT 'oo' }
+	  | O
+		{ print OUT 'Oo' }
+	  | xo
+		{ print OUT 'u' }
+      | the
+		{ print OUT 'zee' }
+      | The
+		{ print OUT 'Zee' }
+      | th
+		{ print OUT 't' }
+	  | tion
+		{ print OUT 'shun' }
+      | u
+		{ print OUT 'oo' }
+      | U
+		{ print OUT 'Oo' }
+      | v
+		{ print OUT 'f' }
+      | V
+		{ print OUT 'F' }
+      | w
+		{ print OUT 'v' }
+      | W
+		{ print OUT 'V' }
+      | NW
+		{ print OUT $_[1] }
+	  | WC
+		{ print OUT $_[1] }
+      | NL
+		{ print OUT $_[1] }
+      ;
+
+%%
+
+package main;
+my $niw = 0;
+my $i_seen = 0;
+my $File;
+my $t = Run();
+close OUT;
+
+sub lexical_analyse {
+	my $WC = qr/[A-Za-z']/;
+	my $NW = qr/[^A-Za-z']/;
+	for ($File) {
+		!$niw and m{\G([Bb]ork)(?=$NW)}gc         and do { return ('Bbork',$1) };
+		m{\G(an)}gc                               and do { $niw = 1; return ($1,$1) };
+		m{\G(An)}gc                               and do { $niw = 1; return ($1,$1) };
+		m{\G(au)}gc                               and do { $niw = 1; return ($1,$1) };
+		m{\G(Au)}gc                               and do { $niw = 1; return ($1,$1) };
+		m{\G(a)(?=$WC)}gc                         and do { $niw = 1; return ('ax',$1) };
+		m{\G(A)(?=$WC)}gc                         and do { $niw = 1; return ('Ax',$1) };
+		m{\G(en)(?=$NW)}gc                        and do { $niw = 1; return ($1,$1) };
+	    $niw and m{\G(ew)}gc                      and do { $niw = 1; return ($1,$1) };
+		$niw and m{\G(e)(?=$NW)}gc                and do { $niw = 1; return ('edone',$1) };
+		!$niw and m{\G(e)}gc                      and do { $niw = 1; return ('ex',$1) };
+		!$niw and m{\G(E)}gc                      and do { $niw = 1; return ('Ex',$1) };
+		$niw and m{\G(f)}gc                       and do { $niw = 1; return ($1,$1) };
+		$niw and m{\G(ir)}gc                      and do { $niw = 1; return ($1,$1) };
+		($niw and !$i_seen) and m{\G(i)}gc        and do { $niw = 1; $i_seen = 1; return ($1,$1) };
+		!$niw and m{\G(ow)}gc                     and do { $niw = 1; return ($1,$1) };
+		!$niw and m{\G(o)}gc                      and do { $niw = 1; return ($1,$1) };
+		!$niw and m{\G(O)}gc                      and do { $niw = 1; return ($1,$1) };
+		$niw and m{\G(o)}gc                       and do { $niw = 1; return ('xo',$1) };
+		m{\G(the)}gc                              and do { $niw = 1; return ($1,$1) };
+		m{\G(The)}gc                              and do { $niw = 1; return ($1,$1) };
+		m{\G(th)(?=$NW)}gc                        and do { $niw = 1; return ($1,$1) };
+		$niw and m{\G(tion)}gc                    and do { $niw = 1; return ($1,$1) };
+		$niw and m{\G(u)}gc                       and do { $niw = 1; return ($1,$1) };
+		$niw and m{\G(U)}gc                       and do { $niw = 1; return ($1,$1) };
+		m{\G(v)}gc                                and do { $niw = 1; return ($1,$1) };
+		m{\G(V)}gc                                and do { $niw = 1; return ($1,$1) };
+		m{\G(w)}gc                                and do { $niw = 1; return ($1,$1) };
+		m{\G(W)}gc                                and do { $niw = 1; return ($1,$1) };
+		m{\G([.?!]+\s+)}gc                        and do { $niw = 0; $i_seen = 0; return ('EOS',$1) };
+		m{\G($WC)}gc                              and do { $niw = 1; return ('WC',$1) };
+		m{\G($NW)}gc                              and do { $niw = 0; $i_seen = 0; return ('NW',$1) };
+		m{\G(/\n/)}gc                             and do { $niw = 0; $i_seen = 0; return ('NL',$1) };
+		# m{\G(/\Z/)}gc                             and do { return ('NS',$1) };
+		return ('',undef);
+	}
+}
+
+sub yyerror {
+	my $parser = shift;
+	my $expected = $parser->YYExpect;
+	my $got = $parser->YYCurtok;
+	die "Parse Error: Expected $expected, got $got\n";
+}
+
+sub Run {
+	my $parser = new chefeyapp();
+	local $/;
+	undef $/;
+	while (<>) {
+		$File = $_;
+		$parser->YYParse( yylex => \&lexical_analyse, yyerror => \&yyerror );
+	}
+}

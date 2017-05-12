@@ -1,0 +1,86 @@
+NAME
+    `Protocol::Matrix' - Helper functions for the Matrix protocol
+
+DESCRIPTION
+    This module provides some helper functions for implementing a matrix
+    client or server. Currently it only contains a few base-level functions
+    to assist with signing and verifying signatures on federation-level
+    events.
+
+FUNCTIONS
+  encode_json_for_signing
+       $json = encode_json_for_signing( $data )
+
+    Encodes a given HASH reference as Canonical JSON, having removed the
+    `signatures' and `unsigned' keys if present. This is the first step
+    towards signing it or verifying an embedded signature in it. The hash
+    referred to by `$data' remains unmodified by this function.
+
+  encode_base64_unpadded
+       $base64 = encode_base64( $bytes )
+
+    Returns a character string containing the Base-64 encoding of the given
+    bytes, with no internal linebreaks and no trailing padding.
+
+  decode_base64
+       $bytes = decode_base64( $base64 )
+
+    Returns a byte string containing the bytes obtained by decoding the
+    given character string. This is re-exported from MIME::Base64 for
+    convenience.
+
+  sign_json
+       sign_json( $data, secret_key => $key, origin => $name, key_id => $id )
+
+    Modifies the given HASH reference in-place to add a signature. This
+    signature is created from the given key, and annotated as being from the
+    given origin name and key ID. Existing signatures already in the hash
+    are not disturbed.
+
+    The `$key' should be a plain byte string or Data::Locker object obtained
+    from Crypt::NaCl::Sodium::sign's `keypair' method.
+
+  signed_json
+       my $data = signed_json( $data, ... )
+
+    Returns a new HASH reference by cloning the original and applying
+    sign_json to it. The originally-passed data is unmodified. Takes the
+    same arguments as sign_json.
+
+  verify_json_signature
+       verify_json_signature( $data, public_key => $key, origin => $name, key_id => $id )
+
+    Inspects the given HASH reference to check that it contains a signature
+    from the named origin, with the given key ID, and that it is actually
+    valid.
+
+    This function does not return an interesting value; all failures are
+    indicated by thrown exceptions. If no exception is thrown, it can be
+    presumed valid.
+
+  redact_event
+       redact_event( $event )
+
+    Modifies the given HASH reference in-place to apply the transformation
+    given by the Matrix Event Redaction specification.
+
+  sign_event_json
+       sign_event_json( $data, secret_key => $key, origin => $name, key_id => $id )
+
+    Modifies the given HASH reference in-place to add a hash and signature,
+    presuming it to be a Matrix event structure. This operates in a fashion
+    analogous to sign_json.
+
+  signed_event_json
+       my $event = signed_event_json( $event, ... )
+
+    Returns a new HASH reference by cloning the original and applying
+    sign_event_json to it. The originally-passed data is unmodified. Takes
+    the same arguments as sign_event_json.
+
+  verify_event_json_signature
+       verify_event_json_signature( $event, public_key => $key, origin => $name, key_id => $id )
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

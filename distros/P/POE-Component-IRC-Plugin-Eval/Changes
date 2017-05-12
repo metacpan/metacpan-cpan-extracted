@@ -1,0 +1,24 @@
+Revision history for POE-Component-IRC-Plugin-Eval
+
+0.07  Fri Apr 8 12:32:40 GMT 2011
+    - Skip all tests if JSON::Any can't be loaded
+
+0.06  Fri Apr 1 23:27:39 GMT 2011
+    - Make the colors slightly less annoying
+
+0.05  Tue Sep 28 08:50:48 GMT 2010
+    - Update SYNOPSIS to reflect App-Pocoirc changes
+
+0.04  Thu Sep 9 06:38:13 GMT 2010
+    - Forgot to mention the BotCommand requirement in the SYNOPSIS
+
+0.03  Thu Sep 9 06:23:27 GMT 2010
+    - Mention App::Pocoirc in the SYNOPSIS
+
+0.02  Mon Sep 6 04:08:11 GMT 2010
+    - Remove some debugging print statements
+    - Make all warnings fatal
+    - Make the 'Channels' parameter actually do something
+
+0.01  Wed Sep 1 04:37:31 GMT 2010
+    - Initial release

@@ -1,0 +1,57 @@
+Pod::Snippets
+-------------
+
+A module to parse POD and retreive pieces of verbatim text in it, so
+as to treat it as data or code (eg for unit testing those
+SYNOPSISes).  Snippets can be named using custom POD markup.  It
+goes like this:
+
+  =head1 NAME
+
+  Foo - My module that goes beep
+
+  =head1 SYNOPSIS
+
+  =for example "synopsis" begin
+ 
+    my $foo = new Foo;
+
+  =for example "synopsis" end
+
+Meanwhile, in the test script :
+
+  use Foo;
+  use Test::More tests => 1;
+  use Pod::Snippets;
+
+  my $snips = Pod::Snippets->load
+      ($INC{"Foo.pm"}, -markup => "example", -named_snippets => "strict");
+ 
+  my $foo = eval $snips->named("synopsis")->as_code; die $@ if $@;
+
+  is(ref($foo), "Foo");
+
+If you prefer, you could use "=for tests", "=for Pod::Snippets" or
+even "=for great justice" instead of "=for example".  There are more
+examples in eg/.
+
+Pod::Snippets is designed to be easy to re-use: its code consists of a
+single Perl file with no dependencies besides what a stock Perl
+provides (5.6 or later).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Dominique QUATRAVAUX
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

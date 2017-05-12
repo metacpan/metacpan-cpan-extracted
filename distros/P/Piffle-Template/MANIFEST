@@ -1,0 +1,11 @@
+lib/Piffle/Template.pm
+lib/Piffle/Template.pod
+t/00basics.t
+t/10loop.t
+t/20include.t
+t/50err.t
+t/testinclude.txt
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml                                 Module meta-data (added by MakeMaker)

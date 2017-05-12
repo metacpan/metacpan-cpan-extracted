@@ -1,0 +1,164 @@
+#!/usr/bin/perl -lw
+use KDE;
+import KDE::app;
+
+package KConfigTestView;
+use KDE;
+import KDE::app;
+
+use Qt::slots
+    'appConfigEditReturnPressed()',
+    'groupEditReturnPressed()',
+    'keyEditReturnPressed()',
+    'writeButtonClicked()';
+
+@ISA = qw(Qt::Dialog);
+
+sub new {
+    my $self = shift->SUPER::new(@_);
+
+    $self->setCaption("KConfig test");
+
+    # Label and edit for the app config file
+    my $pAppFileLabel = $self->{pAppFileLabel} =
+	new Qt::Label($self, "appconfiglabel");
+    $pAppFileLabel->setText("Application config file:");
+    $pAppFileLabel->setGeometry(20, 20, 200, 20);
+
+    my $pAppFileEdit = $self->{pAppFileEdit} =
+	new Qt::LineEdit($self, "appconfigedit");
+    $pAppFileEdit->setGeometry(240, 20, 160, 20);
+    $self->connect($pAppFileEdit, 'returnPressed()',
+		   'appConfigEditReturnPressed()');
+
+    # Label and edit for the group
+    my $pGroupLabel = $self->{pGroupLabel} =
+	new Qt::Label($self, "grouplabel");
+    $pGroupLabel->setText("Group:");
+    $pGroupLabel->setGeometry(20, 60, 80, 20);
+
+    my $pGroupEdit = $self->{pGroupEdit} =
+	new Qt::LineEdit($self, "groupedit");
+    $pGroupEdit->setGeometry(120, 60, 100, 20);
+    $self->connect($pGroupEdit, 'returnPressed()',
+		   'groupEditReturnPressed()');
+
+    my $pKeyEdit = $self->{pKeyEdit} =
+	new Qt::LineEdit($self, "keyedit");
+    $pKeyEdit->setGeometry(20, 100, 80, 20);
+    $self->connect($pKeyEdit, 'returnPressed()',
+		   'keyEditReturnPressed()');
+
+    my $pEqualsLabel = $self->{pEqualsLabel} =
+	new Qt::Label($self, "equalslabel");
+    $pEqualsLabel->setGeometry(105, 100, 20, 20);
+    $pEqualsLabel->setText("=");
+
+    my $pValueEdit = $self->{pValueEdit} =
+	new Qt::LineEdit($self, "valueedit");
+    $pValueEdit->setGeometry(120, 100, 100, 20);
+    $pValueEdit->setText("---");
+
+    my $pWriteButton = $self->{pWriteButton} = 
+	new Qt::PushButton($self, "writebutton");
+    $pWriteButton->setGeometry(20, 140, 80, 20);
+    $pWriteButton->setText("Write entry");
+    $self->connect($pWriteButton, 'clicked()', 'writeButtonClicked()');
+
+    # Labels for the info line
+    my $pInfoLabel1 = $self->{pInfoLabel1} =
+	new Qt::Label($self, "infolabel1");
+    $pInfoLabel1->setGeometry(20, 200, 60, 20);
+    $pInfoLabel1->setText("Info:");
+
+    my $pInfoLabel2 = $self->{pInfoLabel2} =
+	new Qt::Label($self, "infolabel2" );
+    $pInfoLabel2->setGeometry(100, 200, 300, 20);
+    $pInfoLabel2->setFrameStyle(Qt::Frame::Panel | Qt::Frame::Sunken);
+
+    # Quit button
+    my $pQuitButton =
+	new Qt::PushButton($self, "quitbutton");
+    $pQuitButton->setText("Quit");
+    $pQuitButton->setGeometry(340, 60, 60, 60);
+    $app->connect($pQuitButton, 'clicked()', 'quit()');
+
+    # create a default KConfig object in order to be able to start right away
+    $self->{pConfig} = new KDE::Config;
+
+    return $self;
+}
+
+sub appConfigEditReturnPressed {
+    my $self = shift;
+
+    $self->{pConfig} = new KDE::Config($self->{pAppFileEdit}->text)
+	if length $self->{pAppFileEdit}->text;
+
+    $self->{pInfoLabel2}->setText("New config object created.");
+}
+
+sub groupEditReturnPressed {
+    my $self = shift;
+    my $pConfig = $self->{pConfig};
+
+    $pConfig->setGroup($self->{pGroupEdit}->text);
+    my $aText = sprintf("Group set to %s",
+	length($pConfig->group) ? $pConfig->group : "<default>");
+    $self->{pInfoLabel2}->setText($aText);
+}
+
+sub keyEditReturnPressed {
+    my $self = shift;
+    my $pConfig = $self->{pConfig};
+    my $aValue = $pConfig->readEntry($self->{pKeyEdit}->text);
+    if($pConfig->hasKey($self->{pKeyEdit}->text)) {
+	$self->{pInfoLabel2}->setText("Key found!");
+	$self->{pValueEdit}->setText($aValue);
+    } else {
+	$self->{pInfoLabel2}->setText("Key not found!");
+	$self->{pValueEdit}->setText("---");
+    }
+}
+
+sub writeButtonClicked {
+    my $self = shift;
+    $self->{pConfig}->writeEntry(
+	$self->{pKeyEdit}->text, $self->{pValueEdit}->text);
+    $self->{pInfoLabel2}->setText("Entry written");
+}
+
+package main;
+
+$w = new KConfigTestView;
+$app->setMainWidget($w);
+$w->show;
+printf STDERR "Autosave name for %s is %s\n",
+	"/home/kalle/text/mytext.txt",
+	$app->tempSaveName("/home/kalle/text/mytext.txt");
+
+$bRecoverFile = 0;
+$pRecoverFile = $app->checkRecoverFile("/home/kalle/text/mytext.txt", $bRecoverFile);
+if($bRecoverFile) {
+    print STDERR "Recover file exists and is at $pRecoverFile";
+} else {
+    print STDERR "Recover file does not exist, use $pRecoverFile";
+}
+
+$sc = new KDE::SimpleConfig("/tmp/sc.cfg");
+$sc->writeBoolEntry("boolEntry1", 1);
+$sc->writeBoolEntry("boolEntry2", 0);
+$sc->writeEntry("rectEntry", new Qt::Rect(10, 23, 5321, 12));
+$sc->writeEntry("pointEntry", new Qt::Point(4351, 1234));
+
+$b1 = $sc->readBoolEntry("boolEntry1");
+$b2 = $sc->readBoolEntry("boolEntry2");
+$rect = $sc->readRectEntry("rectEntry");
+$point = $sc->readPointEntry("pointEntry");
+
+print STDERR "b1 is " . ($b1 ? "true" : "false");
+print STDERR "b2 is " . ($b2 ? "true" : "false");
+printf STDERR "rect is (%d,%d,%d,%d)\n", $rect->left, $rect->top,
+	$rect->width, $rect->height;
+printf STDERR "point is (%d,%d)\n", $point->x, $point->y;
+$app->exec;

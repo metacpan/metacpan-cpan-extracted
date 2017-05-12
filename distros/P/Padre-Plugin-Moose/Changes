@@ -1,0 +1,183 @@
+Changes for Padre-Plugin-Moose
+
+0.21  2012.3.15
+    - Fix segfault when new files are open without any open files (AZAWAWI,
+      Reported by El_Che)
+    - Updated Padre Italian translation (SBLANDIN)
+    - Unload P:P:Moose when the plugin is disabled (BOWTIE)
+    - Focus on the class and role tab after showing the error message: You can 
+      only add X to a class or role (AZAWAWI)
+    - Less code in Makefile.PL (AZAWAWI)
+
+0.20  2012.3.10 (AZAWAWI)
+    - Added missing README
+    - Highlight the current editor. This is needed when a plugin is enabled for 
+      the first time
+    - Added more button accelerator + Perl tidy
+    - Rename NeedsSaveAsEvent to NeedsPluginEvent
+
+0.19  2012.3.10 (AZAWAWI)
+    - Moved TextMate-style TAB-completion feature into Padre::Plugin::Snippet.
+    - No need to provide a Perl document subclass to Padre therefore no problems
+      with other Perl document subclassing plugins.
+    - In MooseX::Declare, around modifier has $self and $orig predefined
+    - Documentation updates.
+    - No more "Enable Snippets" in preferences dialog.
+    - One can choose between the namespace::clean or the purist approach to
+      using Moose and Mouse.
+
+0.18  2012.3.7 (AZAWAWI)
+    - Perfected TextMate-style TAB-completion feature.
+      Thanks for BOWTIE++ for throughly testing it.
+    - Added perl snippets that are on by default regardless of current
+      code generator type
+
+0.17  2012.3.3
+    - Perl tidy and fix missing updated Changes.
+      Must have been sleeping when I released 0.16 (AZAWAWI)
+
+0.16  2012.3.3
+    - Removing the static box sizers from the design for a cleaner look (ADAMK)
+    - Added missing $VERSION to ClassMember (ADAMK)
+    - Completed plugin dependencies (ADAMK)
+    - Added modal preferences dialog (AZAWAWI)
+    - Renamed the dialog to "Moose Assistant" (AZAWAWI)
+    - Added MooseX::Declare keyword syntax highlighting (AZAWAWI)
+    - Added MooseX::Declare and Mouse snippets (AZAWAWI)
+    - Added more documentation (AZAWAWI)
+    - Switch from YAML::Tiny to YAML for stopping the leading whitespace loss 
+      (AZAWAWI)
+    - Added t/eol.t author test (AZAWAWI)
+    - Snippets YAML files is divided by type: Moose, Mouse and MooseX::Declare
+      (AZAWAWI)
+    - Added snippets checkbox to toggle functionality (AZAWAWI)
+
+0.15  2012.2.29 (AZAWAWI)
+    - Add Moose keywords highlighting
+    - Add YAML-based TextMate-style Moose keyword snippet
+      completion (Thanks for El_Che and perigrin)
+    - Added basic constructor/destructor support
+    - Switch order of members tab to be most used first: attributes,
+      methods, subtypes, constructor and then destructor.
+    - Inspector is now bigger since it is a scrolled window.
+    - Fix q{editable inspector in Program node at startup} TODO
+    - Dialog is no longer cramped (width is 750 instead of 640 pixels)
+
+0.14  2012.2.27 (AZAWAWI)
+    - Added MooseX::Declare code generation
+    - Code generation options UI
+    - Minimum dialog size is 640x480 and it is now resizable (bowtie++)
+    - Ability to change generation code target (Moose, Mouse or MooseX::Declare)
+      via a combo box
+    - Fixed immutable/namespace::clean order (GabrielVieira++ for the bug
+      report)
+    - Perl tidy + Makefile.PL now includes plugin homepage as wiki page
+      (bowtie++)
+
+0.13  2012.2.27 (AZAWAWI)
+    - Add Mouse support
+    - Added method modifiers list completion
+    - Added support for class attributes via MooseX::ClassAttribute
+    - Added support for singletons via MooseX::Singleton
+    - Inspector is now a scrolled window
+    - Added to attributes the following options: coerce, does, weak_ref, 
+      lazy, builder, default, clearer, predicate, documentation.
+
+0.12  2012.2.26 (AZAWAWI)
+    - Delete key and right-click (context menu) now work on the delete option. 
+      No actual deletion is done at the moment
+    - Add the UI/event hooks for constructor/destructor buttons.
+      No code generation at the moment
+    - Choice combo list is now in inspector. (bowtie++ for the idea)
+
+0.11  2012.2.24 (AZAWAWI)
+    - New polished dialog UI :)
+    - Added method modifiers (around, before, after)
+    - Removed About button and moved its information to the dialog title
+
+0.10  2012.2.24 (AZAWAWI)
+    - Fixed future timestamp for recently released 0.09. Stupid old dev VM
+      image :)
+
+0.09  2012.2.24 (AZAWAWI)
+    - Escape regular expression while positioning the preview editor
+    - Current editor theme is always applied. 
+    - No need to hide controls. Let us do the right way and validate each
+      action (bowtie++).
+    - Use Moose sugar 'blessed' instead of Scalar::Util::blessed - which is the
+      same but cooler :)
+    - Fixed ellipsis in plugin manager (bowtie++)
+    - Stop doing that grid focus automatically. It screws up navigation
+    - Various POD updates regarding methods.
+    - Clicking on a tree element scrolls to the first line of its generated code
+      instead of the Padre-default centerize
+    - About dialog is reusing ->message() and is modal friendly
+    - ::Main now does('Padre::Wx::Role::Dialog'). Alias++
+    - ::Role::CanHandleInspector now requires 'get_grid_data'. No global
+      %INSPECTOR in ::Main
+    - has 'attribute'; # is now supported, no default values. Just the basics :) 
+      Better attribute/subtype code generation
+    - Each tree element knows how to handle the inspector via
+      ::Role::CanHandleInspector
+    - Various name refactoring and more roles in ::Role namespace
+
+0.08  2012.2.23 (AZAWAWI)
+    - Refactored the dialog to be modal and improved its UI
+    - The dialog is resident until the plugin is disabled.
+    - Generate closes the dialog but does not destroy your work. Added "reset"
+      button
+    - Class members can be added now when inside a class/role. There is no need
+      to click on the parent again as before.
+    - Disable adding class members when you're over Program node
+    - Added q{ my $self = shift } to generated method body.
+    - Subtype has now a base type and is usable now.
+
+0.07  2012.2.22
+    - Show the generated code that is related the currently selected element
+      (AZAWAWI)
+    - Added keyboard button accelerators and "Insert code" is now "Generate"
+      (BOWTIE, AZAWAWI)
+    - Added a simple inspector help text field that explains the current element
+      (AZAWAWI)
+    - The code generator is now called at startup  (AZAWAWI)
+    - The buttons are shown/hidden instead of enabled/disabled  (AZAWAWI)
+    - Inside Program elements, you can create class/role  (AZAWAWI)
+    - Inside Class/Role elements, you can create attribute, subtype or method
+      (AZAWAWI)
+
+0.06  2012.2.22  (HOTFIX to 0.05)
+    - Tree item selection is now done in EVT_IDLE lifecycle to prevent deep
+      recursion when editing (AZAWAWI)
+
+0.05  2012.2.22
+    - Added Inspector edit mode (AZAWAWI)
+    - Fixed Recommended order for namespace::clean (AZAWAWI)
+    - Install share directory with MO files (AZAWAWI)
+    - Add q{use Moose::Util::TypeConstraint} when needed (AZAWAWI)
+    - q{Add Method} implemented (AZAWAWI)
+    - Added Padre::Plugin::Moose::CodeGen role. Less POD cruft. Lazy loading.
+      (AZAWAWI)
+
+0.04  2012.2.21
+    - Added namespace::clean as a dependency (AZAWAWI)
+    - Fixed a role code generation bug (AZAWAWI)
+    - Added Program Inspector (AZAWAWI)
+    - Added Program Outline (AZAWAWI)
+    - Basic Attribute/Subtype code generation (AZAWAWI)
+
+0.03  2012.2.21
+    - Fixed dialog not properly closing on non-win32 platforms (BOWTIE, AZAWAWI) 
+    - Refactor variable names (AZAWAWI)
+    - Sample code is now correct (AZAWAWI)
+    - q{Moose} is now q{Moose...} :) (BOWTIE, AZAWAWI) 
+
+0.02  2012.2.20
+    The following feature list is here: (AZAWAWI)
+        - Added Moose website/manual/cookbook hyperlinks
+        - Added "Add class/role/attribute/subtype" tabs
+        - Added code generation readonly preview editor
+        - Added comments/main code generation checkboxes
+        - Added insert code
+
+0.01  2012.2.15
+    - Initial release to CPAN (AZAWAWI)

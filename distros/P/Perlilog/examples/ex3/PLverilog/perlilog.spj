@@ -1,0 +1,9 @@
+[Files]
+0=top.v
+1=test.v
+2=adder.v
+3=logic.v
+4=single_master_wb_controller.v
+
+[Settings]
+Mode=Debug

@@ -1,0 +1,27 @@
+---
+abstract: 'POE and IKC based queue server.'
+author:
+  - 'Yuji Suzuki <yujisuzuki@mail.arbolbell.jp>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POEIKC-Plugin-GlobalQueue
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  POE: 0
+  POE::Component::IKC::ClientLite: 0
+  POE::Sugar::Args: 0
+  POEIKC::Client: 0
+  POEIKC::Daemon: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.00_01

@@ -1,0 +1,72 @@
+NAME
+    Padre::Plugin::YAML - YAML support for Padre, The Perl IDE.
+
+VERSION
+    This document describes Padre::Plugin::YAML version 0.10
+
+DESCRIPTION
+    YAML support for Padre, the Perl Application Development and Refactoring
+    Environment.
+
+    Syntax highlighting for YAML is supported by Padre out of the box. This
+    plug-in adds some more features to deal with YAML files.
+
+  Example
+    Example is not revelant as this is a Padre::Plugin
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+METHODS
+    *     menu_plugins_simple
+
+    *     padre_interfaces
+
+    *     plugin_enable
+
+    *     plugin_disable
+
+    *     plugin_name
+
+    *     registered_documents
+
+    *     show_about
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Padre::Plugin::YAML
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Padre-Plugin-YAML>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Padre-Plugin-YAML>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Padre-Plugin-YAML>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Padre-Plugin-YAML/>
+
+AUTHOR
+    Zeno Gantner <zenog@cpan.org>
+
+CONTRIBUTORS
+    Kevin Dawson <bowtie@cpan.org>
+
+    Ahmad M. Zawawi <ahmad.zawawi@gmail.com>
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2011-2012, Zeno Gantner <zenog@cpan.org>. All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

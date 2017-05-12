@@ -1,0 +1,35 @@
+Perl-Critic-PetPeeves-JTRAMMELL
+
+This module contains my Perl::Critic policies.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+   perldoc Perl::Critic::PetPeeves::JTRAMMELL
+
+You can also look for information at:
+
+   Github, where this project's code is available:
+      http://github.com/trammell/perl-critic-petpeeves-jtrammell
+
+   Search CPAN
+      http://search.cpan.org/dist/Perl-Critic-PetPeeves-JTRAMMELL
+
+   CPAN Request Tracker:
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Critic-PetPeeves-JTRAMMELL
+
+   AnnoCPAN, annotated CPAN documentation:
+      http://annocpan.org/dist/Perl-Critic-PetPeeves-JTRAMMELL
+
+   CPAN Ratings:
+      http://cpanratings.perl.org/d/Perl-Critic-PetPeeves-JTRAMMELL

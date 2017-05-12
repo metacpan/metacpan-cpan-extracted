@@ -1,0 +1,210 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::IMAP::Server
+at lib/Protocol/IMAP/Server.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Protocol::IMAP::Server - server support for the Internet Message Access Protocol.
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+ package Example::IMAP::Server;
+ use parent qw{Protocol::IMAP::Server};
+
+ package main;
+ Example::IMAP::Server->new;
+
+=head1 DESCRIPTION
+
+=head1 IMPLEMENTING SUBCLASSES
+
+The L<Protocol::IMAP> classes only provides the framework for handling IMAP data. Typically you would need to subclass these to get a usable IMAP implementation.
+
+The following methods are required:
+
+=over 4
+
+=item * write - called at various points to send data back across to the other side of the IMAP connection
+
+=back
+
+and just about anything relating to the storage and handling of messages.
+
+=head2 new
+
+=head2 read_command
+
+Read a command from a single line input from the client.
+
+If this is a supported command, calls the relevant request_XXX method with the following data as a hash:
+
+=over 4
+
+=item * tag - IMAP tag information for this command, used for the final response from the server
+
+=item * command - actual command requested
+
+=item * param - any additional parameters passed after the command
+
+=back
+
+=head2 request_capability
+
+Request a list of all capabilities provided by the server.
+
+These will be returned in a single untagged response, followed by the usual status response.
+
+Note that the capabilities may vary depending on the state of the connection - for example, before STARTTLS negotiation
+all login types may be disabled via LOGINDISABLED capability.
+
+=head2 request_starttls
+
+Instructs the client to begin STARTTLS negotiation.
+
+All implementations should provide this.
+
+=head2 request_authenticate
+
+Requests SASL authentication. Didn't need it, haven't written it yet.
+
+=head2 is_authenticated
+
+Returns true if we are authenticated, false if not.
+
+=head2 request_login
+
+Process a login request - this will be delegated to the subclass L<validate_user> method.
+
+=head2 request_logout
+
+Process a logout request.
+
+=head2 request_noop
+
+Handle a NOOP, which leaves state unchanged other than resetting any timers (as handled by the L<read_command> method).
+
+=head2 request_select
+
+Select a mailbox.
+
+=head2 C<send_mailbox_info>
+
+Return untagged information about the selected mailbox.
+
+=head2 request_examine
+
+Select a mailbox, in readonly mode.
+
+=head2 request_create
+
+Create a new mailbox.
+
+=head2 request_delete
+
+Delete a given mailbox.
+
+=head2 request_rename
+
+Request renaming a mailbox to something else.
+
+=head2 request_subscribe
+
+Ask to subscribe to a mailbox.
+
+=head2 request_unsubscribe
+
+Ask to unsubscribe from a mailbox.
+
+=head2 request_list
+
+List mailboxes matching a specification.
+
+=head2 request_lsub
+
+List subscriptions matching a spec - see L<request_list> for more details on how this is implemented.
+
+=head2 on_multi_line
+
+Called when we have multi-line data (fixed size in characters).
+
+=head2 on_single_line
+
+Called when there's more data to process for a single-line (standard mode) response.
+
+=head2 configure
+
+Set up any callbacks that were available.
+
+=head2 add_capability
+
+Add a new capability to the reported list.
+
+=head2 validate_user
+
+Validate the given user and password information, returning true if they have logged in successfully
+and false if they are invalid.
+
+=head2 select_mailbox
+
+Selects the given mailbox.
+
+Expects a hashref indicating mailbox information, e.g.:
+
+ my $mailbox = {
+ 	name => $args{mailbox},
+ 	exists => 17,
+ 	recent => 2,
+ };
+ return $mailbox;
+
+=head2 create_mailbox
+
+Creates the given mailbox on the server.
+
+=head2 delete_mailbox
+
+Deletes the given mailbox.
+
+=head2 rename_mailbox
+
+Renames the given mailbox.
+
+=head2 subscribe_mailbox
+
+Adds the given mailbox to the active subscription list.
+
+=head2 unsubscribe_mailbox
+
+Removes the given mailbox from the current user's subscription list.
+
+=head2 list_mailbox
+
+List mailbox information given a search spec.
+
+=head2 list_subscription
+
+List subscriptions given a search spec.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Protocol::IMAP>
+
+L<Authenticated|Protocol::IMAP/Authenticated>, L<ConnectionClosed|Protocol::IMAP/ConnectionClosed>, L<ConnectionEstablished|Protocol::IMAP/ConnectionEstablished>, L<Logout|Protocol::IMAP/Logout>, L<NotAuthenticated|Protocol::IMAP/NotAuthenticated>, L<STATE_HANDLERS|Protocol::IMAP/STATE_HANDLERS>, L<Selected|Protocol::IMAP/Selected>, L<ServerGreeting|Protocol::IMAP/ServerGreeting>, L<debug|Protocol::IMAP/debug>, L<in_state|Protocol::IMAP/in_state>, L<state|Protocol::IMAP/state>, L<state_id|Protocol::IMAP/state_id>, L<write|Protocol::IMAP/write>
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back

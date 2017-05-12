@@ -1,0 +1,14 @@
+Revision history for POE-Component-IRC-Plugin-WWW-Weather-US
+
+0.04  2014-01-24 15:16:09 PST
+        - Cache weather results for 1 hour with Cache::Memory::Simple
+
+0.03  2013-06-13 14:44:01 PDT
+        - Silly mojo and their missing versions
+
+0.02  2013-06-12 21:59:54 PDT
+        - Do all web extraction with Mojo::UserAgent
+        - fix abstract
+
+0.01  2013-05-10 15:25:07 PDT
+        - Initial release

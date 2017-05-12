@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="https://www.sisow.nl/Sisow/WebService" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" targetNamespace="https://www.sisow.nl/Sisow/WebService" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="https://www.sisow.nl/Sisow/WebService">
+      <s:element name="GetIssuers">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="test" type="s:boolean" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetIssuersResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetIssuersResult" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="issuers" type="tns:ArrayOfString" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfString">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="string" nillable="true" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="GetStatus">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="transaction" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="merchantid" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="merchantkey" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetStatusResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetStatusResult" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="status" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTransaction">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="transaction" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="merchantid" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="merchantkey" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetTransactionResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetTransactionResult" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="status" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="stamp" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="amount" type="s:double" />
+            <s:element minOccurs="0" maxOccurs="1" name="account" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="city" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="purchaseid" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="description" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="message" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetURL">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="merchantid" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="merchantkey" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="payment" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="issuerid" type="s:string" />
+            <s:element minOccurs="1" maxOccurs="1" name="amount" type="s:long" />
+            <s:element minOccurs="0" maxOccurs="1" name="purchaseid" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="description" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="entrancecode" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="returnurl" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="cancelurl" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="callbackurl" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="notifyurl" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="GetURLResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="GetURLResult" type="s:int" />
+            <s:element minOccurs="0" maxOccurs="1" name="trxid" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="issuerurl" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="GetIssuersSoapIn">
+    <wsdl:part name="parameters" element="tns:GetIssuers" />
+  </wsdl:message>
+  <wsdl:message name="GetIssuersSoapOut">
+    <wsdl:part name="parameters" element="tns:GetIssuersResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetStatusSoapIn">
+    <wsdl:part name="parameters" element="tns:GetStatus" />
+  </wsdl:message>
+  <wsdl:message name="GetStatusSoapOut">
+    <wsdl:part name="parameters" element="tns:GetStatusResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetTransactionSoapIn">
+    <wsdl:part name="parameters" element="tns:GetTransaction" />
+  </wsdl:message>
+  <wsdl:message name="GetTransactionSoapOut">
+    <wsdl:part name="parameters" element="tns:GetTransactionResponse" />
+  </wsdl:message>
+  <wsdl:message name="GetURLSoapIn">
+    <wsdl:part name="parameters" element="tns:GetURL" />
+  </wsdl:message>
+  <wsdl:message name="GetURLSoapOut">
+    <wsdl:part name="parameters" element="tns:GetURLResponse" />
+  </wsdl:message>
+  <wsdl:portType name="sisowSoap">
+    <wsdl:operation name="GetIssuers">
+      <wsdl:input message="tns:GetIssuersSoapIn" />
+      <wsdl:output message="tns:GetIssuersSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetStatus">
+      <wsdl:input message="tns:GetStatusSoapIn" />
+      <wsdl:output message="tns:GetStatusSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetTransaction">
+      <wsdl:input message="tns:GetTransactionSoapIn" />
+      <wsdl:output message="tns:GetTransactionSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="GetURL">
+      <wsdl:input message="tns:GetURLSoapIn" />
+      <wsdl:output message="tns:GetURLSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="sisowSoap" type="tns:sisowSoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetIssuers">
+      <soap:operation soapAction="https://www.sisow.nl/Sisow/WebService/GetIssuers" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetStatus">
+      <soap:operation soapAction="https://www.sisow.nl/Sisow/WebService/GetStatus" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTransaction">
+      <soap:operation soapAction="https://www.sisow.nl/Sisow/WebService/GetTransaction" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetURL">
+      <soap:operation soapAction="https://www.sisow.nl/Sisow/WebService/GetURL" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="sisowSoap12" type="tns:sisowSoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="GetIssuers">
+      <soap12:operation soapAction="https://www.sisow.nl/Sisow/WebService/GetIssuers" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetStatus">
+      <soap12:operation soapAction="https://www.sisow.nl/Sisow/WebService/GetStatus" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetTransaction">
+      <soap12:operation soapAction="https://www.sisow.nl/Sisow/WebService/GetTransaction" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="GetURL">
+      <soap12:operation soapAction="https://www.sisow.nl/Sisow/WebService/GetURL" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="sisow">
+    <wsdl:port name="sisowSoap" binding="tns:sisowSoap">
+      <soap:address location="https://www.sisow.nl/Sisow/sisow.asmx" />
+    </wsdl:port>
+    <wsdl:port name="sisowSoap12" binding="tns:sisowSoap12">
+      <soap12:address location="https://www.sisow.nl/Sisow/sisow.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

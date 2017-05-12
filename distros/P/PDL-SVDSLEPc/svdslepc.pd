@@ -1,0 +1,805 @@
+##-*- Mode: CPerl -*-
+
+##======================================================================
+## Header Administrivia
+##======================================================================
+
+our $VERSION = "0.003";
+pp_setversion($VERSION);
+
+do "./Config.cache";
+if ($@) {
+  warn("$0: could not load cache data from './Config.cache': $@");
+}
+
+##------------------------------------------------------
+## Header: index type
+require PDL::Core;
+my ($INDX,$INDX_P,$INDX_C);
+if ($cconfig{PETSC_USE_64BIT_INDICES}) {
+  if (defined(&PDL::indx)) {
+    ##-- use this to support 64-bit indices with PDL_Indx (but which() and friends don't return them!)
+    #print STDERR "PDL >= v2.007 detected : using built-in PDL_Indx type\n";
+    $INDX   = 'indx';
+    $INDX_P = 'indx';
+    $INDX_C = 'PDL_Indx';
+ } else {
+    $INDX   = 'longlong';
+    $INDX_P = 'longlong';
+    $INDX_C = 'PDL_LongLong';
+  }
+} else {
+  $INDX   = 'int';
+  $INDX_P = 'long';
+  $INDX_C = 'PDL_Long';
+}
+
+
+##------------------------------------------------------
+## Header: packages
+pp_addpm({At=>'Top'},<<'EOPM');
+
+use Carp qw(confess);
+use strict;
+
+EOPM
+
+##------------------------------------------------------
+## Header: pods
+pp_addpm({At=>'Top'},<<'EOPM');
+
+=pod
+
+=head1 NAME
+
+PDL::SVDSLEPc - PDL interface to SLEPc sparse singular value decomposition
+
+=head1 SYNOPSIS
+
+ use PDL;
+ use PDL::SVDSLEPc;
+
+ ##---------------------------------------------------------------------
+ ## Input matrix (dense)
+ 
+ $m = 100;                    ##-- number of rows
+ $n = 50;                     ##-- number of columns
+ $a = random(double,$m,$n);   ##-- random matrix
+
+ ##---------------------------------------------------------------------
+ ## Input matrix (sparse)
+ 
+ use PDL::CCS;
+ $a  *= ($a->random>0.9);      ##-- make sparse
+ $ccs = $a->toccs();           ##-- encode as PDL::CCS::Nd object
+ 
+ ##-- get Harwell-Boeing encoding triple
+ $ptr    = $ccs->ptr(0);
+ $colids = $ccs->_whichND->slice("(1),");
+ $nzvals = $cccs->_nzvals;
+
+ ##---------------------------------------------------------------------
+ ## SLEPc Singular Value Decomposition
+ 
+ slepc_svd_help();            ##-- print available options to STDOUT
+ 
+ ($u,$s,$v) = slepc_svd($ccs, ['-svd_nsv'=>32]);                 ##-- from PDL::CCS::Nd object
+ ($u,$s,$v) = slepc_svd($ptr,$colids,$nzvals, ['-svd_nsv'=>32]); ##-- from Harwell-Boeing encoding
+
+
+=head1 DESCRIPTION
+
+PDL::SVDSLEPc provides a PDL interface to the SLEPc singular value decomposition solver(s).
+SLEPc itself is available from L<http://slepc.upv.es/>.
+
+=cut
+
+EOPM
+## /pm additions
+##------------------------------------------------------
+
+##------------------------------------------------------
+## Exports: None
+#pp_export_nothing();
+
+
+##------------------------------------------------------
+## Includes / defines
+pp_addhdr(<<'EOH');
+
+#include <petscsys.h>
+#include <petscmat.h>
+
+#include <slepcversion.h>
+#include <slepcsvd.h>
+
+#define SVDSLEPC_USE_DLOPEN
+#ifdef SVDSLEPC_USE_DLOPEN
+#include <dlfcn.h>
+void *svdslepc_libmpi_handle=NULL;
+#endif
+
+/*#define SVDSLEPC_DEBUG 1*/
+#ifdef SVDSLEPC_DEBUG
+# define SVDDEBUG(x) x
+#else
+# define SVDDEBUG(x)
+#endif
+
+//-- SLEPc API isn't too stable: detect version stuff
+#if SLEPC_VERSION_MAJOR>3 || (SLEPC_VERSION_MAJOR==3 && SLEPC_VERSION_MINOR>=4)
+#define SLEPC_V3_4 1
+#endif
+
+#if SLEPC_VERSION_MAJOR>3 || (SLEPC_VERSION_MAJOR==3 && SLEPC_VERSION_MINOR>=2)
+#define SLEPC_V3_2 1
+#endif
+
+//-- lifted from slepc4py : does this really do anything at all?
+#define MPICH_SKIP_MPICXX 1
+#define OMPI_SKIP_MPICXX 1
+
+EOH
+
+##======================================================================
+## C Utilities
+##======================================================================
+
+pp_addhdr(<<'EOH');
+
+void svdslepc_init(int argc, const char **argv, const char *help)
+{
+#if SLEPC_HAVE_V3_4
+  SlepcInitializeNoPointers(argc, (char**)argv, NULL, help);
+#else
+  SlepcInitialize(&argc, (char***)&argv, NULL, help);
+#endif
+}
+
+/* PAIN AND ANGUISH:
+ * + passing in char *args gives garbage for all but the 1st element if we NUL-terminate on the perl side
+ * + if we \n-terminate, we need to duplicate *args
+ */
+void svdslepc_init_func(const char *func, AV *args, const char *help, int *pargc, const char ***pargv)
+{
+  int ai, nopts=1+av_len(args);
+
+  //-- allocate argv
+  *pargc = 1+nopts;
+  *pargv = (const char**)malloc((*pargc)*sizeof(char*));
+  (*pargv)[0] = func;
+  SVDDEBUG(fprintf(stderr,"init_func: argv[0/%d] = %s\n", nopts, (*pargv)[0]);)
+  for (ai=0; ai < nopts; ++ai) {
+    (*pargv)[ai+1] = SvPV_nolen(*av_fetch(args, ai, 0));
+    SVDDEBUG(fprintf(stderr,"init_func: argv[%d/%d] = %s\n", ai+1, nopts, (*pargv)[ai+1]);)
+  }
+
+  //-- call underlying init function
+  svdslepc_init(*pargc, *pargv, help);
+}
+
+void svdslepc_finish()
+{
+  SlepcFinalize();
+}
+
+void svdslepc_finish_func(int argc, const char **argv)
+{
+  svdslepc_finish();
+  if (argv) free(argv);
+}
+
+EOH
+
+##======================================================================
+## Bootstrap code: MPI stuff
+
+pp_add_boot(<<'EOB');
+ #ifdef SVDSLEPC_USE_DLOPEN
+  //-- dlopen() openmpi library using RTLD_GLOBAL, to avoid 'unable to open' errors for plugins
+  svdslepc_libmpi_handle = dlopen("libmpi.so", RTLD_NOW | RTLD_GLOBAL);
+ #endif
+  MPI_Init(0,NULL);
+EOB
+
+##--------------------------------------------------------------
+## Wrappers: END
+pp_addxs('',<<'EOXS');
+
+void
+_svdslepc_END()
+CODE:
+  MPI_Finalize();
+#ifdef SVDSLEPC_USE_DLOPEN
+  if (svdslepc_libmpi_handle != NULL) dlclose(svdslepc_libmpi_handle);
+#endif
+
+EOXS
+
+pp_addpm(<<'EOPM');
+END { _svdslepc_END(); }
+EOPM
+
+##======================================================================
+## PDL::PP Wrappers
+##======================================================================
+
+##======================================================================
+## Constants
+pp_addpm(<<'EOPM');
+
+use strict;
+
+=pod
+
+=head1 CONSTANTS
+
+PDL::SVDSLEPc provides access to the following SLEPc constants:
+
+
+EOPM
+
+##--------------------------------------------------------------
+## Constants: slepc_version
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 PDL::SVDSLEPc::slepc_version()
+
+Returns a string representing the SLEPc library version
+this module was compiled with.
+
+=cut
+
+EOPM
+
+pp_addxs('','
+
+char *
+slepc_version()
+INIT:
+  char buf[PETSC_MAX_PATH_LEN];
+CODE:
+  SlepcGetVersion(buf,PETSC_MAX_PATH_LEN);
+  RETVAL = buf;
+OUTPUT:
+  RETVAL
+
+');
+
+##--------------------------------------------------------------
+## Constants: petsc_version
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 PDL::SVDSLEPc::petsc_version()
+
+Returns a string representing the PETSc library version
+this module was compiled with.
+
+=cut
+
+EOPM
+
+pp_addxs('','
+
+char *
+petsc_version()
+INIT:
+  char buf[PETSC_MAX_PATH_LEN];
+CODE:
+  PetscGetVersion(buf,PETSC_MAX_PATH_LEN);
+  RETVAL = buf;
+OUTPUT:
+  RETVAL
+
+');
+
+##--------------------------------------------------------------
+## Constants: library_version
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 PDL::SVDSLEPc::library_version()
+
+In list context returns a pair C<(slepc_version(),petsc_version())>,
+in scalar context returns a string with both versions separated
+with a semicolon.
+
+=cut
+
+sub library_version {
+  my @v = (slepc_version(),petsc_version());
+  return wantarray ? @v : join('; ', @v);
+}
+
+EOPM
+
+##--------------------------------------------------------------
+## Constants: MPI_Comm_size
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 PDL::SVDSLEPc::MPI_Comm_size()
+
+Returns the number of MPI processes available.
+Using multiple MPI processes with mpiexec behaves strangely with perl at the moment,
+so this should generally return 1.
+
+=cut
+
+EOPM
+
+pp_addxs('','
+
+int
+MPI_Comm_size()
+PREINIT:
+  PetscErrorCode ierr;
+  PetscMPIInt size;
+  const char *argv[] = {"PDL::SVDSLEPc::MPI_Comm_size"};
+CODE:
+  svdslepc_init(1,argv,NULL);
+  ierr = MPI_Comm_size(PETSC_COMM_WORLD,&size);CHKERRV(ierr);
+  RETVAL = size;
+OUTPUT:
+  RETVAL
+CLEANUP:
+  svdslepc_finish();
+
+');
+
+
+##======================================================================
+## SVD Utilities
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head1 SVD UTILITIES
+
+The following functions are provided as quick and dirty wrappers
+for the SLEPc L<SVD|http://slepc.upv.es/documentation/current/docs/manualpages/SVD/index.html>
+solver class.
+
+=cut
+
+EOPM
+
+##------------------------------------------------------
+## slepc_svd_help() : help string for svd routine
+
+pp_add_exported('','slepc_svd_help');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 slepc_svd_help
+
+Prints a help message with all supported SLEPc SVD options to STDOUT.
+Really just a wrapper for
+
+ slepc_svd(null,null,null, 0,0,0, ['-help']);
+
+=cut
+
+sub slepc_svd_help {
+  slepc_svd(null,null,null, 0,0,0, ['-help']);
+}
+
+EOPM
+
+##------------------------------------------------------
+## slepc_svd_help() : help string for svd routine
+
+pp_add_exported('','slepc_svd');
+pp_addpm(<<"EOPM");
+
+=pod
+
+=head2 slepc_svd
+
+=for sig
+
+  Signature: (
+	      $INDX  rowptr(mplus1);
+	      $INDX  colids(nnz);
+	      double nzvals(nnz);
+	      double [o]u(d,n);         # optional
+	      double [o]s(d);           # optional
+	      double [o]v(d,m);         # optional
+              int    M=>d;              # optional
+              int    N=>n;              # optional
+              int    D=>d;              # optional
+              \\\@options;                # optional
+             )
+EOPM
+pp_addpm(<<'EOPM');
+
+Compute the (truncated) singular value decomposition of a sparse matrix
+using a L<SLEPc SVD solver|http://slepc.upv.es/documentation/current/docs/manualpages/SVD/>.
+The sparse input matrix with logical (row-primary) dimensions ($m,$n)
+is passed in encoded in Harwell-Boeing sparse format in the input parameters
+$rowptr(), $colids(), and $nzvals().  See L<PDL::CCS> for a way to acquire these parameters
+from a dense input matrix, but note that for this function, the
+row-pointer $rowptr() is of size ($m+1)
+for a dense matrix $a with $m rows,
+where $rowptr($m)==$nnz is the total number of nonzero
+values in $a.
+As an alternative, a single L<PDL::CCS::Nd|PDL::CCS::Nd> object can be passed
+in place of of $rowptr, $colids, and $nzvals.
+
+The left singular components are returned in the matrix $u(),
+the singular values themselved in the vector $s(), and the
+right singular components in the matrix $v().
+These output piddles, as well as the
+logical dimensions ($m,$n) of the input matrix and the
+size $d of the truncated SVD to be computed may be specified explicitly in the call,
+but otherwise will be estimated from $rowptr(), $colids(), and/or \@options.
+If $d==min($m,$n) [the default], then a full decomposition
+will be computed, and on return, $u() and $v() should be
+variants (up to sign and specified error tolerance)
+of the matrices returned by L<PDL::MatrixOps::svd()|PDL::MatrixOps/svd>.
+
+Additional options to the underlying SLEPc and PETSc code can be passed
+command-line style in the ARRAY-ref C<\@options>; see the output of
+L<slepc_svd_help()|/slepc_svd_help> for a list of available options.
+In particular, the option C<-svd_nsv> can be used to specify the
+number of singular values to be returned ($d) if you choose to omit
+both the $d paramter and nontrivial output piddles.
+For example, in order to compute a truncated SVD using with 32 singular values using
+the Thick-restart Lanczos method with at
+most 128 iterations and a tolerance of 1e-5, you could call:
+
+ ($u,$s,$v) = slepc_svd($rowptr,$colids,$nzvals,
+                        [qw(-svd_type trlanczos
+                            -svd_nsv 32
+                            -svd_max_it 128
+                            -svd_tol 1e-5)]);
+
+... or if you already have a L<PDL::CCS::Nd|PDL::CCS::Nd> object $ccs handy:
+
+  ($u,$s,$v) = $ccs->slepc_svd([-svd_type=>'trlanczos', -svd_nsv=>32, -svd_max_it=>128, -svd_tol=>1e-5]);
+
+=cut
+
+BEGIN { *PDL::CCS::Nd::slepc_svd = \&slepc_svd; }
+sub slepc_svd {
+  my ($rowptr,$colids,$nzvals, @usv,@dims,@opts);
+  if (UNIVERSAL::isa($_[0],"PDL::CCS::Nd")) {
+    my $ccs = shift->to_physically_indexed();
+    $rowptr = $ccs->ptr(0);
+    $colids = $ccs->_whichND->slice("(1),");
+    $nzvals = $ccs->_nzvals;
+    @dims   = $ccs->dims;
+  } else {
+    ($rowptr,$colids,$nzvals) = splice(@_,0,3);
+  }
+
+  ##-- parse arguments into @pdls=($u,$s,$v), @dims=($m,$n,$d), @opts=(...)
+  foreach my $arg (@_) {
+    if (@usv < 3 && UNIVERSAL::isa($arg,'PDL')) {
+      ##-- output pdl
+      push(@usv,$arg);
+    }
+    elsif (@dims < 3 && ((UNIVERSAL::isa($arg,'PDL') && $arg->nelem==1) || !ref($arg))) {
+      ##-- dimension argument
+      push(@dims, UNIVERSAL::isa($arg,'PDL') ? $arg->sclr : $arg);
+    }
+    elsif (UNIVERSAL::isa($arg,'ARRAY')) {
+      ##-- option array
+      push(@opts,@$arg);
+    }
+    elsif (UNIVERSAL::isa($arg,'HASH')) {
+      ##-- option hash: pass boolean flags as ("-FLAG"=>undef), e.g. "-svd_view"=>undef
+      push(@opts, map {((/^\-/ ? $_ : "-$_"),(defined($arg->{$_}) ? $arg->{$_} : qw()))} keys %$arg);
+    }
+    else {
+      ##-- extra parameter: warn
+      warn(__PACKAGE__ . "::slepc_svd(): ignoring extra parameter '$arg'");
+    }
+  }
+
+  ##-- extract -svd_nsv ($d) option
+  my $nsv = undef;
+  foreach (0..($#opts-1)) {
+    $nsv = $opts[$_+1] if ($opts[$_] eq '-svd_nsv');
+  }
+
+  ##-- extract arguments
+  my ($u,$s,$v) = @usv;
+  my ($m,$n,$d) = @dims;
+  $m = defined($v) && !$v->isempty ? $v->dim(1) : $rowptr->nelem-1  if (!defined($m));
+  $n = defined($u) && !$u->isempty ? $u->dim(1) : $colids->max+1 if (!defined($n));
+  $d = (defined($u) && !$u->isempty ? $u->dim(0)
+	: (defined($s) && !$s->isempty ? $s->dim(0)
+	   : (defined($v) && !$v->isempty ? $v->dim(0)
+	      : (defined($nsv) ? $nsv
+		 : $m < $n ? $m : $n))))
+    if (!defined($d));
+
+  ##-- create output piddles
+  $u = zeroes(double, $d,$n) if (!defined($u) || $u->isempty);
+  $s = zeroes(double, $d)    if (!defined($s) || $s->isempty);
+  $v = zeroes(double, $d,$m) if (!defined($v) || $v->isempty);
+
+  ##-- call guts
+  _slepc_svd_int($rowptr,$colids,$nzvals, $u,$s,$v, $m,$n,$d, \@opts);
+  return ($u,$s,$v);
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## _slepc_svd_int() : guts
+
+pp_add_exported('','_slepc_svd_int');
+pp_def
+  ('_slepc_svd_int',
+   Pars => join("\n    ",
+		'',
+		qq($INDX  rowptr(mplus1);),
+		qq($INDX  colids(nnz);),
+		qq(double nzvals(nnz);),
+		qq(double [o]u(d,n);),
+		qq(double [o]s(d);),
+		qq(double [o]v(d,m);),
+                '',
+	       ),
+   OtherPars => join("\n    ",
+                     '',
+                     q(int M=>m;),
+                     q(int N=>n;),
+                     q(int D=>d;),
+                     q(IV optsArray;),
+                     '',
+                    ),
+   Code =>
+('
+  int argc;
+  const char **argv;
+  PetscErrorCode ierr;
+  PetscBool      flg_help, flg_nsv,flg_ncv,flg_mpd;
+  PetscInt       i, nsv,ncv,mpd, nconv; //-- svd params
+  Mat A;
+  SVD svd;
+  Vec uvec,vvec;
+  PetscReal sigma;
+
+  SVDDEBUG(fprintf(stderr,"sizeof(PetscInt)=%d; sizeof($INDX='.$INDX.')=%d; sizeof(PetscScalar)=%d; sizeof(double)=%d\n", sizeof(PetscInt), sizeof($GENERIC(rowptr)), sizeof(PetscScalar), sizeof(double));fflush(stderr);)
+
+  //-- initialize
+  SVDDEBUG(fprintf(stderr, "_slepc_svd_int:init (m=%d, n=%d, nnz=%d, d=%d)\n", $SIZE(m), $SIZE(n), $SIZE(nnz), $SIZE(d));fflush(stderr);)
+  svdslepc_init_func("PDL::SVDSLEPc::_slepc_svd_int",INT2PTR(AV*, $COMP(optsArray)),NULL, &argc,&argv);
+  ierr = PetscOptionsHasName(NULL,"-help",&flg_help);CHKERRV(ierr);
+
+  //-- setup (dummy) input matrix
+  if ($SIZE(nnz)==0) {
+    SVDDEBUG(fprintf(stderr, "setup input matrix (dummy)\n");fflush(stderr);)
+#if SLEPC_HAVE_V3_4
+    ierr = MatCreateSeqAIJFromTriple(MPI_COMM_WORLD, 1,1, NULL,NULL,NULL, &A,0,PETSC_FALSE);CHKERRV(ierr);
+#else
+    ierr = MatCreateSeqAIJ(MPI_COMM_WORLD, 1,1,0, NULL, &A);CHKERRV(ierr);
+#endif
+    loop(d) %{
+      $s() = 0;
+      loop(n) %{ $u() = 0; %}
+      loop(m) %{ $v() = 0; %}
+    %}
+  } else {
+    SVDDEBUG(fprintf(stderr, "setup input matrix (real)\n");fflush(stderr);)
+    ierr = MatCreateSeqAIJWithArrays(MPI_COMM_WORLD, $SIZE(m),$SIZE(n), $P(rowptr),$P(colids),$P(nzvals), &A);CHKERRV(ierr);
+#ifdef SVDSLEPC_DEBUG
+    {
+      PetscViewer view;
+      ierr = PetscViewerBinaryOpen(PETSC_COMM_SELF,"svddebug.petsc",FILE_MODE_WRITE,&view);CHKERRV(ierr);
+      ierr = MatView(A,view);CHKERRV(ierr);
+      ierr = PetscViewerDestroy(&view);CHKERRV(ierr);
+    }
+#endif
+  }
+
+  //-- setup svd
+  SVDDEBUG(fprintf(stderr, "setup svd object\n");fflush(stderr);)
+  ierr = SVDCreate(PETSC_COMM_WORLD,&svd);CHKERRV(ierr);
+  ierr = SVDSetOperator(svd,A);CHKERRV(ierr);
+  ierr = SVDSetFromOptions(svd);CHKERRV(ierr);
+
+  //-- setup #/singular values from input piddles
+  SVDDEBUG(fprintf(stderr, "setup #/values\n");fflush(stderr);)
+  ierr = PetscOptionsGetInt(NULL,"-svd_nsv",&nsv,&flg_nsv);CHKERRV(ierr);
+  if (!flg_nsv || nsv != $SIZE(d)) {
+    SVDDEBUG(fprintf(stderr, "set nsv=SIZE(d)=%d\n", $SIZE(d));fflush(stderr);)
+    nsv = $SIZE(d);
+    ierr = PetscOptionsGetInt(NULL,"-svd_ncv",&ncv,&flg_ncv);CHKERRV(ierr);
+    ierr = PetscOptionsGetInt(NULL,"-svd_mpd",&mpd,&flg_mpd);CHKERRV(ierr);
+    if (!flg_ncv) ncv = PETSC_DECIDE;
+    if (!flg_mpd) mpd = PETSC_DECIDE;
+    ierr = SVDSetDimensions(svd,nsv,ncv,mpd);CHKERRV(ierr);
+  }
+  ierr = SVDGetDimensions(svd,&nsv,&ncv,&mpd);CHKERRV(ierr);
+
+  //-- svd guts
+  SVDDEBUG(fprintf(stderr, "compute (nsv=%d, ncv=%d, mpd=%d)\n", nsv, ncv, mpd);fflush(stderr);)
+  ierr = SVDSolve(svd);CHKERRV(ierr);
+
+  //-- allocate output vectors
+  SVDDEBUG(fprintf(stderr, "get output data (m=%d, n=%d, d=%d)\n", $SIZE(m), $SIZE(n), $SIZE(d));fflush(stderr);)
+  //ierr = MatCreateVecs(A,&u,&v);CHKERRV(ierr);    //-- documented in petsc-3.6.2, does NOT exist in 3.4.2 (debian wheezy)
+  ierr = MatGetVecs(A,&uvec,&vvec);CHKERRV(ierr);
+#ifdef SVDSLEPC_DEBUG
+  {
+    PetscInt nu,nv;
+    ierr = VecGetSize(uvec,&nu);CHKERRV(ierr);
+    ierr = VecGetSize(vvec,&nv);CHKERRV(ierr);
+    fprintf(stderr,"got uvec(%d~n=%d), vvec(%d~m=%d), d=%d\n", nu,$SIZE(n), nv,$SIZE(m), $SIZE(d));fflush(stderr);
+  }
+#endif
+
+  //-- get number of converged values
+  ierr = SVDGetConverged(svd,&nconv);CHKERRV(ierr);
+  if (nconv > nsv) nconv = nsv;
+
+  for (i=0; i < nconv; ++i) {
+    PetscScalar *uvals,*vvals;
+    ierr = SVDGetSingularTriplet(svd,i,&sigma,vvec,uvec);CHKERRV(ierr);
+
+    $s(d=>i) = sigma;
+
+    ierr = VecGetArray(uvec,&uvals);CHKERRV(ierr);
+    loop(n) %{ $u(d=>i) = PetscRealPart(uvals[n]); %}
+    ierr = VecRestoreArray(uvec,&uvals);CHKERRV(ierr);
+
+    ierr = VecGetArray(vvec,&vvals);CHKERRV(ierr);
+    loop(m) %{ $v(d=>i) = PetscRealPart(vvals[m]); %}
+    ierr = VecRestoreArray(vvec,&vvals);CHKERRV(ierr);
+  }
+
+  //-- zero output piddle slots for unconverged values (if any)
+  for ( ; i < nsv; ++i) {
+    $s(d=>i) = 0;
+    loop(n) %{ $u(d=>i) = 0; %}
+    loop(m) %{ $v(d=>i) = 0; %}
+  }
+
+  //-- cleanup
+  SVDDEBUG(fprintf(stderr, "cleanup\n");fflush(stderr);)
+  ierr = VecDestroy(&uvec);CHKERRV(ierr);
+  ierr = VecDestroy(&vvec);CHKERRV(ierr);
+  ierr = SVDDestroy(&svd);CHKERRV(ierr);
+  ierr = MatDestroy(&A);CHKERRV(ierr);
+  svdslepc_finish_func(argc,argv);
+'),
+   Doc =>
+q(
+Guts for L<slepc_svd()|/slepc_svd> with stricter calling conventions:
+The input matrix must be passed as a Harwell-Boeing triple
+C<($rowptr,$colids,$nzvals)>,
+and the size parameters C<M>, C<N>, and C<D> and options array C<optsArray> are all mandatory.
+),
+
+);
+
+
+
+
+##======================================================================
+## Footer Administrivia
+##======================================================================
+
+##------------------------------------------------------
+## footer: pm additions
+pp_addpm(<<'EOPM');
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+Perl by Larry Wall.
+
+PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
+
+SLEPc by Carmen Campos, Jose E. Roman, Eloy Romero, and Andres Tomas.
+
+=cut
+
+##----------------------------------------------------------------------
+=pod
+
+=head1 KNOWN BUGS
+
+=head2 no abstract interface
+
+There should really be a more general and abstract PDL interface to SLEPc/PETsc.
+
+
+=head2 OpenMPI Errors "mca: base: component find: unable to open ..."
+
+You might see OpenMPI errors such as the following when trying to use this module:
+
+ mca: base: component find: unable to open /usr/lib/openmpi/lib/openmpi/mca_paffinity_hwloc: perhaps a missing symbol, or compiled for a different version of Open MPI? (ignored)
+
+If you do, you probably need to configure your runtime linker to pre-load the OpenMPI libraries, e.g. with
+
+ export LD_PRELOAD=/usr/lib/libmpi.so
+
+or similar.  An alternative is to build OpenMPI with the C<--disable-dlopen> option.
+See L<http://www.open-mpi.org/faq/?category=troubleshooting#missing-symbols> for details.
+
+=head2 OpenMPI warnings "... unable to find any relevant network interfaces ... (openib)"
+
+This OpenMPI warning has been observed on Ubuntu 14.04; it can be suppressed by setting the OpenMPI
+MCA C<btl> ("byte transfer layer") parameter to exclude the C<openib> module.
+This can be
+accomplished in various ways, e.g.:
+
+=over 4
+
+=item via command-line parameters to C<mpiexec>:
+
+Call your program as:
+
+ $ mpiexec --mca btl ^openib PROGRAM...
+
+=item via environment variables
+
+You can set the OpenMPI MCA paramters via environment variables, e.g.:
+
+ $ export OMPI_MCA_btl="^openib"
+ $ PROGRAM...
+
+=item via configuration files
+
+You can set OpenMPI MCA parameters via F<$HOME/.openmpi/mac-params.conf>:
+
+ ##-- suppress annoying warnings about missing openib
+ btl = ^openib
+
+=back
+
+See L<http://www.open-mpi.de/faq/?category=tuning#setting-mca-params> for more details.
+
+
+=cut
+
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2015, Bryan Jurish.  All rights reserved.
+
+This package is free software, and entirely without warranty.
+You may redistribute it and/or modify it under the same terms
+as Perl itself, either version 5.20.2 or any newer version of Perl 5
+you have available.
+
+=head1 SEE ALSO
+
+L<perl(1)|perl>,
+L<PDL(3perl)|PDL>,
+L<PDL::CCS(3perl)|PDL::CCS>,
+L<PDL::SVDLIBC(3perl)|PDL::SVDLIBC>,
+the SLEPc documentation at L<http://slepc.upv.es/documentation/current/docs/index.html>.
+
+=cut
+
+EOPM
+
+
+# Always make sure that you finish your PP declarations with
+# pp_done
+pp_done();
+##----------------------------------------------------------------------

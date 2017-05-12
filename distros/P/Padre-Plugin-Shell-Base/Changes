@@ -1,0 +1,13 @@
+Revision history for Padre-Plugin-Shell-Base
+
+0.13    Wed Nov 30 23:05:59 CST 2011
+        - Fix for bug rt.cpan.org #70293
+0.12    
+        - Testing fix.
+
+0.11    
+        - Documentation fix.
+
+0.10    Thu Nov  5 22:19:30 CST 2009
+        First version, released on an unsuspecting world.
+

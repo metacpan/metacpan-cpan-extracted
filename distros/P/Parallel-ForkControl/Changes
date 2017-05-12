@@ -1,0 +1,23 @@
+Revision history for Perl extension Parallel::ForkControl.
+
+0.05 Mon Jun  4  13:15 EDT 2007
+	- Allow run() to take a subroutine reference
+	  as the first argument.
+
+0.04 Wed Mar 14  4:30 EST 2007
+	- More Kwalitee fixes
+
+0.03 Sun Oct  1 21:30 EST 2006
+	- Kwalitee Improvements
+	- Process accounting started.
+	- Perl Best Practices rewrite start.
+
+0.02  Fri Jan  9 19:18:19 EST 2004
+	- Updated documentation.
+	- Added a test suite that actually tests the module.
+	- Fixed a bug with process creation
+
+0.01  Wed Nov 12 16:07:28 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n Parallel::ForkControl
+

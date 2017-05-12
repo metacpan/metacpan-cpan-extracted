@@ -1,0 +1,85 @@
+---
+abstract: 'Flexible, iterable pipeline engine with automatic batching'
+author:
+  - 'Mary Ehlers <ehlers@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  blib: '1.01'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Piper
+no_index:
+  directory:
+    - t
+    - xt
+provides:
+  Piper:
+    file: lib/Piper.pm
+    version: '0.04'
+  Piper::Config:
+    file: lib/Piper/Config.pm
+    version: '0.04'
+  Piper::Instance:
+    file: lib/Piper/Instance.pm
+    version: '0.04'
+  Piper::Logger:
+    file: lib/Piper/Logger.pm
+    version: '0.04'
+  Piper::Path:
+    file: lib/Piper/Path.pm
+    version: '0.04'
+  Piper::Process:
+    file: lib/Piper/Process.pm
+    version: '0.04'
+  Piper::Queue:
+    file: lib/Piper/Queue.pm
+    version: '0.04'
+  Piper::Role::Logger:
+    file: lib/Piper/Role/Logger.pm
+    version: '0.04'
+  Piper::Role::Queue:
+    file: lib/Piper/Role/Queue.pm
+    version: '0.04'
+  Piper::Role::Segment:
+    file: lib/Piper/Role/Segment.pm
+    version: '0.04'
+requires:
+  Carp: '0'
+  Data::Dump: '0'
+  List::AllUtils: '0'
+  List::UtilsBy: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Scalar::Util: '0'
+  Types::Common::Numeric: '0'
+  Types::Common::String: '0'
+  Types::LoadableClass: '0'
+  Types::Standard: '0'
+  namespace::clean: '0'
+  overload: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/regina-verbae/Piper/issues
+  homepage: http://metacpan.org/release/Piper/
+  repository: git://github.com/regina-verbae/Piper.git
+version: '0.04'
+x_authority: cpan:EHLERS
+x_contributors:
+  - 'Tim Heaney <oylenshpeegul@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

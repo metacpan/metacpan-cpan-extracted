@@ -1,0 +1,47 @@
+*) How do I use it from the command line?
+
+	Take a look at the pml script. You can say
+	
+		pml <some_pml_file>
+		
+	and it will output the processed text to standard out.
+	
+*) How do I use it from a perl script?
+
+	use PML;
+	
+	my $pml = new PML;
+	
+	$pml->parse("/path/to/some/file.pml");
+	my $text = $pml->execute;
+	
+*) How about something that is not so simple?
+
+	Here is a sample PML file...
+	
+		<html>
+		<head><title> ${title} </title></head>
+		<body><h1> ${title} </h1></body>
+		</html>
+	
+	And here is a sample perl script...
+	
+		use PML;
+		
+		my $pml = new PML;
+		
+		$pml->parse("my_pml_file.pml");
+		my $text = $pml->execute({title => 'This is a test'});
+		
+	When you run this script this is what gets put into $text...
+	
+		<html>
+		<head><title> This is a test </title></head>
+		<body><h1> This is a test </h1></body>
+		</html>
+
+*) How do I get Apache to parse files that end in .pml?
+	
+	Take a look in the Apache subdirectory. There you will find
+	some more information and the mod_pml Apache Module
+

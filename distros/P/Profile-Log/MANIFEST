@@ -1,0 +1,30 @@
+bin/times2svg
+lib/Profile/Log.pm
+lib/Profile/Log/Config.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/01-profile-log.t
+t/02-profile-config.t
+t/03-times2svg.t
+t/04-templates.t
+t/05-rounding-error.t
+t/06-parse-syslog.t
+t/onetime.log
+t/onetime.svg
+t/onetime.yml
+t/profiler.conf
+t/testdata-orig.svg
+t/testdata-test.svg
+t/testdata.svg
+t/testdata.yml
+t/times.log
+t/times.svg
+t/XMLCompare.pm
+t/zerolap-java.svg
+templates/log.svg.tt
+templates/profile.svg.tt
+templates/timeline.svg.tt
+META.yml                                 Module meta-data (added by MakeMaker)

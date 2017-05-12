@@ -1,0 +1,44 @@
+Revision history for Package-Variant
+
+1.003002 - 2015-07-25
+  - also switch the tests to strictures 2 (aaaaaaaaaaaaaaaaaaaaaaaaaa)
+
+1.003001 - 2015-07-25
+  - also switch the documentation to strictures 2 (slow clap for mst there)
+
+1.003000 - 2015-07-25
+  - switch to strictures 2
+  - add make_variant_package_name optional method
+
+1.002002 - 2014-08-21
+  - fix license in metadata
+
+1.002001 - 2014-08-16
+  - specify perl prerequisite on metadata
+  - documentation fixes and clarifications
+
+1.002000 - 2013-12-10
+  - add build_variant method on variable packages, to allow avoiding
+    importing a generator sub
+  - fix pragmas applied by modules listed in "importing" from leaking out
+    into unexpected scopes
+
+1.001004 - 2013-05-04
+  - fix documentation of "build_variant_of" method (RT#84554 -- thanks,
+    Scott Miller!)
+
+1.001003 - 2013-03-25
+  - fix NAME in Makefile.PL (RT#84209)
+
+1.001002 - 2012-09-19
+  - Declare the Test::Fatal build dependency
+
+1.001001 - 2012-05-12
+  - Actually declare the Import::Into dependency (stupid mst)
+
+1.001000 - 2012-05-12
+  - Switch to Import::Into for exporting other things
+  - Use Sub::Name to name installed things if available
+
+1.000000 - 2012-01-23
+  - initial release

@@ -1,0 +1,84 @@
+Revision history for Plack-Middleware-XSRFBlock
+
+0.0.11    2015-09-07 16:44:57+00:00 UTC
+
+ - Allow coderefs in token (pull-request #16)
+
+0.0.10    2015-07-18 23:03:26+01:00 Europe/London
+ - add scripts for BuildKite testing
+ - dzil: Replace NoTabsTests with Test::NoTabs
+ - fix #15: Use magic comment to crowbar in an essential dependency
+ - add magic comments for other author dependencies that aren't auto-detected
+ - Add *skeleton* POD for methods
+   This is a shockingly lazy way for me to get my dist to pass Pod::Coverage tests
+ - re-arrange POD in file; so method POD appears in a sensible location
+ - add (markdown) section of POD for build status to show (in github/README.mkdn)
+
+0.0.9     2014-10-13 10:15:38+00:00 UTC
+ - Optionally allow signed cookies escape token injected into html (pull #14)
+
+0.0.8     2014-09-18 08:01:40+00:00 UTC
+ - Add option to set XSRF token cookie as a session cookie (pull #13)
+
+0.0.7     2014-08-28 16:51:04+00:00 UTC
+ - Set cookie once we know we have HTML (issue #12)
+ - Update POD docs with inject_form_input field docs (pull #10)
+
+0.0.6     2014-08-05 20:47:11+00:00 UTC
+ - Pass app() to 'blocked' sub (pull #8)
+ - Allow bypassing form input injection (pull #9)
+
+0.0.5     2014-07-22 15:28:43+00:00 UTC
+ - stop requiring end-users have Pod::Weaver::Section::Contributors
+   This was a mistake with the dist.ini Prereqs on my part
+   Raised by tomhukins in issue #7
+   Changed BuildRequires -> DevelopRequires
+
+0.0.4     2014-07-09 12:44:03+00:00 UTC
+ - Add PSGI env to xsrf_detected arguments
+   [mryall: pull #6]
+
+0.0.3     2014-06-24 15:01:07+00:00 UTC
+ - Prevent a warning for forms with no action
+   [willert: pull #5]
+
+0.0.2     2014-03-28 11:33:16+00:00 UTC
+ - Add cookie_options setting [github:throughnothing]
+ - add and use Dist::Zilla::Plugin::ContributorsFromGit
+
+0.0.1     2013-10-21 15:35:10 UTC
+ - Add header_name / X-* header feature
+ - Add Git Commit and Push to end of dist.ini
+ - Add improved 'undef' handling in some checks
+ - Add POD explaining the error messages in more detail
+ - Specify main_module in dist.ini
+
+0.0.0_05  2013-06-24 00:29:09 Europe/London
+
+ - add test(s) for 'meta_tag' option
+ - add test(s) for 'blocked' option
+ - add 'cookie_expiry_seconds' option
+ - add documentation for 'blocked' option
+
+0.0.0_04  2013-06-21 16:03:08 Europe/London
+
+ - add FURTHER READING to documentation
+ - add missing test module dependency
+
+0.0.0_03  2013-06-21 15:47:42 Europe/London
+
+ - extend and refactor tests
+
+0.0.0_02  2013-06-21 15:07:06 Europe/London
+
+ - fix content modification so we don't throw most of it away
+ - fix broken input field
+ - allow meta_tag value to be set/over-ridden
+ - add 'token_per_request' feature
+ - factor out some common test functions
+   and update tests to use Test::XSRFBlock::Util
+ - extend documentation
+
+0.0.0_01  2013-06-20 12:00:04 Europe/London
+
+ - Initial release

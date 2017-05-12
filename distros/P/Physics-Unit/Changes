@@ -1,0 +1,109 @@
+Revision history for Perl extension Physics::Unit
+See github repository for detailed revision history:
+https://github.com/Klortho/Physics-Unit
+
+
+0.54 2016-07-01
+  - Added overlooked mm shortcut (djerius)
+  - Fix exponent operator bug (Timo Grodzinski)
+  - Improved Changes file
+  - Improved build system
+
+0.52 2012-05-19
+  - Minor pod tweaks
+
+0.51 2012-05-17
+  - Fix documentation auto-generation and linking (github #26)
+
+0.05 2012-05-13
+  - Use Module::Build rather than ExtUtils::MakeMaker
+  - Added physics-unit utility script
+
+0.04 2003-03-20
+  - Changed several tests in unit.t to use RE matches instead of exact
+    numerical equality for floating point numbers.  This should fix the
+    failures that I got from some of the Perl testers on other
+    platforms.
+  - Took out "print 'Howdy!'" from Unit.pm:  ooops!  I had put that
+    in there to make sure that when developing, I was using the correct
+    copy of the module.
+  - Removed the example script MultiTypes.pl.  It didn't really do
+    anything unique.
+  - Simplified eg/UnitSimple.pl, and moved some of its test code into
+    t/unit.t.
+  - Created eg/UnitDebug.pl, which turns on debugging when given the
+    '-d' command-line option.  I took this feature out of UnitSimple.pl,
+    in order to make the latter as simple as possible.
+  - Similarly, I created eg/VectorDebug.pl, and simplified
+    eg/VectorSimple.pl.
+  - Ditto for eg/ScalarDebug.pl and eg/ScalarSimple.pl.
+  - Fixed eg/ScalarMethods.pl - changed "lb" to "lbm" in the mass.
+  - Added lots of tests to t/scalar.t:  everything that was in
+    eg/ScalarMethods.pl and eg/ScalarSimple.pl.
+  - I took all the test statements out of the examples:  things like
+    "die if ...".  This cleans up the examples.  Wherever it made sense,
+    I moved those tests into the test scripts, and converted them to use
+    the Test::More functions.
+  - Added an example of automagic determination of a scalar type to the
+    Scalar.pm documentation.
+  - I fixed the automatic generation of scalar type.  This example from
+    the Scalar.pm documentation:
+      $d = new Physics::Unit::Scalar('3m');
+    now correctly produces a Physics::Unit::Distance object.
+  - That resulted in the VectorSimple.pl example script working now.
+  - Changed the header of one of the sections in the Scalar.pm
+    documentation from "IMPLEMENTATION NOTES" to "UNITS ASSOCIATED
+    WITH SCALARS".
+  - Added UnitsByName.html and UnitsByType.html to the MANIFEST.  These
+    are generated automagically by the UnitGenDoc.pl example script.
+
+0.02 2003-03-19
+  - Added the prefixes "semi" and "demi", for 0.5.
+  - Added the binary prefixes; see
+    http://physics.nist.gov/cuu/Units/binary.html
+  - Added 'revolution', 'revolutions', and 'rpm'.
+  - Added 'cycle' and 'cycles'.
+  - Added 'degrees-rankine'
+  - Removed some old code that was commented out.
+  - Moved implementation-specific comments, including private method
+    documentation, into UnitImpl.pm.
+  - Added the "EXPRESSION GRAMMAR" section to Unit.pm.
+  - Moved documentation about Scalar.pm private methods into
+    ScalarImpl.pm.
+
+  - Added "pica" and "point" units to Unit.pm
+  - Also added "stone" and "stones"
+  - Also added jeweler's units 'carat', 'carats', 'karat', 'karats',
+    and 'j-point'.
+  - Added a section to the Unit.pm documentation:  "Naming Conflicts
+    and Resolution".  This describes all of the instances of units
+    names that have multiple definitions (e.g. "point") and how each
+    is resolved in this library.
+  - Improved the documentation of the unit expression grammar.
+  - Re-organized, slightly, the documentation of private methods in the
+    Unit.pm module.
+  - Re-organized, slightly, the documentation in the Scalar.pm module.
+  - Changed *all* the files' newline format from DOS to Unix.
+  - Updated the README file.
+
+  - Unit.pm Documentation
+    - Removed the "COMPILE-TIME STUFF" header and the associated
+      paragraph.
+    - InitBaseUnit() is showing up both under "Class Data" and
+      "Public Utility Functions".  I removed it from the former.
+    - Ditto for InitPrefix(), InitTypes(), InitUnit(), and
+      GetUnit().  Gene:  was there some reason that I'm not seeing for
+      including these under "Class Data"?
+    - Added some of the grammar back into the documentation for the
+      Parser methods.
+
+  - Scalar.pm Documentation
+    - I added the header "IMPLEMENTATION NOTES" two paragraphs after
+      the "DEBUG OPTION" header, since the following paragraphs there
+      aren't related to the debug option.
+    - I took the ScalarFactory() function out of "PUBLIC METHODS", and
+      put it under "PUBLIC UTILITY FUNCTIONS" (a new heading).0.04 2003-03-21
+
+0.01 2003-03-16
+  - Initial release
+

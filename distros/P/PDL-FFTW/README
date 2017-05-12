@@ -1,0 +1,23 @@
+PDL-FFTW
+========
+
+The the PDL::FFTW module provides bindings to the FFTW
+version 2.x library (the original API) which is now obsolete.
+PDL::FFTW3 provides the bindings to the current FFTW3 API.
+
+This distribution only exists to inform potential users of
+this fact and to direct them to versions of the module on
+BackPAN at http://backpan.perl.org/authors/id/C/CH/CHM/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 1999 Christian Pellegrin, 2000 Christian Soeller,
+and 2015 Chris Marshall.
+
+All rights reserved. There is no warranty.  This library is free
+software; you can redistribute it and/or modify it under the same
+terms as Perl itself, either Perl version 5.008 or, at your option,
+any later version of Perl 5 you may have available.
+
+

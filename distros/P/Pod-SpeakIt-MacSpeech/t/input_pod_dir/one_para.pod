@@ -1,0 +1,7 @@
+=pod
+
+=head1 This is a heading
+
+Buster Bean, come here, I need you!
+
+=cut

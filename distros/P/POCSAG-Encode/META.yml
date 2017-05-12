@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                POCSAG-Encode
+version:             1.00
+abstract:            A perl module for encoding messages in the POCSAG binary protocol.
+license:             perl
+author:              
+    - Heikki Hannikainen <hessu@hes.iki.fi>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Device::SerialPort:            1.04
+    Test::More:                    0.1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

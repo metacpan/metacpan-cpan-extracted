@@ -1,0 +1,4 @@
+Perl-Unsafe-Signals v0.02
+=========================
+
+Allows to enable unsafe signal delivery just for a short period of time.

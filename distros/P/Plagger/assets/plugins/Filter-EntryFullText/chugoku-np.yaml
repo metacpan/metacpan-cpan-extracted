@@ -1,0 +1,7 @@
+# upgrade Google News Sports feeds
+# The site has Last-Modified header and thus no need to capture date
+author: Tatsuhiko Miyagawa
+handle: http://www\.chugoku-np\.co\.jp/.*\.html
+extract: <td width="100%" style="font-size:16px;"><b>(.*?)</b></td>.*?<td class="small" valign=top width=100%>(.*?)</address>
+extract_capture: title body
+

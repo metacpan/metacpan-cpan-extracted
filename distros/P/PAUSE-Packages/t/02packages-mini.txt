@@ -1,0 +1,6 @@
+File:        02packages-mini.txt
+Description: an extract of a snapshot of 06perms.txt, for testing
+
+N/NE/NEILB/Module-Path-0.09.tar.gz [["Module::Path","0.09"]]
+N/NE/NEILB/PAUSE-Permissions-0.04.tar.gz [["PAUSE::Permissions","0.04"],["PAUSE::Permissions::Module","0.04"]]
+T/TO/TOMC/scripts/CS-Talk/source/dstructs/ties/Tie/RevRefHash.pm.gz [["Tie::RevRefHash","undef"]]

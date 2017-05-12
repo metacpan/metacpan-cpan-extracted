@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/PerlIO-via-Bzip2.t
+t/ipsum_large.bz2
+t/ipsum_large.txt
+t/ipsum_small.bz2
+t/ipsum_small.txt
+lib/PerlIO/via/Bzip2.pm
+META.yml                                 Module meta-data (added by MakeMaker)

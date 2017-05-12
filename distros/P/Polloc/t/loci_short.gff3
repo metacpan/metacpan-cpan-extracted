@@ -1,0 +1,4 @@
+###gff-version 3
+
+Scaffold3	trf	VNTR	697	764	91	+	0	ID=VNTR:3.1;organism_name=repeats;Note=Period%3D7,Exponent%3D9.7,Score%3D91,Error%3D5;Name=VNTR%20repeat
+Scaffold3	trf	VNTR	667	765	87	+	0	ID=VNTR:3.2;organism_name=repeats;Note=Period%3D7,Exponent%3D13.7,Score%3D87,Error%3D18;Name=VNTR%20repeat

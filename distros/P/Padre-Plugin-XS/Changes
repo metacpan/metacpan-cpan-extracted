@@ -1,0 +1,43 @@
+This is the change log for the Padre::Plugin::XS module:
+
+0.12 2013-12-17
+ - fix mislaid README from last release (BOWTIE)
+
+0.11 2013-12-16
+ - Remove MYMETA and fox a typo (BOWTIE)
+
+0.10 2013-12-14
+ - Added Dutch translation (ddn123456 - Dirk De Nijs)
+ - Added Brazilian Portuguese translation (GARU)
+ - Tweak pp-xs so that it will load under pp api 2.2 (BOWTIE)
+
+0.09 2010-12-06
+ - Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+
+0.08 2010-10-29
+ - Removed Test::NeedsDisplay dependency (AZAWAWI)
+
+0.07 2010-10-27
+ - [@PadrePlugin] replaced cruft in dist.ini (AZAWAWI)
+
+0.06 2010-10-27
+ - t/00-load.t is magically injected by [@PadrePlugin] via [LoadTests]
+   (AZAWAWI)
+
+0.05 2010-10-22
+ - Re-uploaded 0.04 as 0.05 to satisfy the indexer (AZAWAWI)
+
+0.04 2010-10-22
+ - Switched to Dist::Zilla (AZAWAWI)
+ - Fixed 00-load.t failure when $ENV{DISPLAY} is not set (AZAWAWI)
+
+0.03 2010-10-20
+ - Compatibility with the latest Padre (AZAWAWI, CHORNY)
+ - Added i18n support (AZAWAWI)
+ - Added Arabic translation (AZAWAWI)
+
+0.02 2010-04-18
+ - Bump dependency on Perl::APIReference for 5.12.0 support.
+
+0.01 2009-11-21
+ - First version unleashed on the unsuspecting world.

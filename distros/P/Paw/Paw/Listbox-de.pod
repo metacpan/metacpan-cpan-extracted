@@ -1,0 +1,104 @@
+=head1 Listbox
+
+B<$lb=Paw::Listbox::new($height, $width, [$colored], [$name]);>
+
+B<Parameter>
+
+     $height  => Anzahl der Reihen
+
+     $width   => Anzahl der Spalten
+
+     $colored => 1 schaltet den Farbmodus ein
+                 (siehe Methode add_row) default=0 [optional]
+
+     $name    => Name des Widgets [optional]
+
+B<Beispiel>
+
+     $lb=Paw::Listbox::new(width=>10, height=>15, colored=>1);
+
+=head2 clear_listbox()
+
+entfernt alle Eintraege aus der Listbox
+
+B<Beispiel>
+
+     $listbox->clear_listbox();
+
+=head2 add_row($data, $color), add_row(\@data);
+
+packt eine Zeile in die Listbox. Wenn der Farbmodus aktiv ist, kann noch ein Farbpaar als weiterer Parameter uebergeben werden.
+Wird eine Referenz auf ein Array uebergeben, so werden nach und nach alle Elemente des Arrays in die Listbox gepackt.
+Ist hier der Colormodus aktiv, so B<muss> jedes zweite Element eine Farbpaar Nummer sein.
+
+B<Beispiel>
+
+     $listbox->add_row("Test", 3);
+
+=head2 del_row($number)
+
+entfernt die Zeile mit der Nummer $number
+
+B<Beispiel>
+
+     $listbox->del_row(4);
+
+=head2 change_rows($first, $second);
+
+tauscht die beiden Zeilen in der Listbox
+
+B<Beispiel>
+
+     $listbox->change_rows($lower, $upper);
+
+=head2 number_of_data()
+
+gibt die Anzahl der Reihen in der Listbox zurueck.
+
+B<Beispiel>
+
+     $data=$listbox->number_of_data();
+
+=head2 get_pushed_rows("data"), get_pushed_rows("linenumbers");
+
+gibt ein Array mit allen aktiven Reihen der Listbox zurueck. Entweder die Zeilennummer(linenumber) oder direkt den Inhalt (data)
+
+B<Beispiel>
+
+     @data_rows=$listbox->get_pushed_rows("linenumbers");
+
+=head2 get_all_rows();
+
+gibt ein Array mit dem kompletten Inhalt der Listbox zurueck.
+
+B<Beispiel>
+
+     @full_data=$listbox->get_all_rows();
+
+=head2 abs_move_widget($new_x, $new_y)
+
+Das Widget verschiebt sich auf die neue absolute Schirm Position.
+Wird nur einer der Parameter angegeben, so behaelt der andere seinen Wert bei.
+
+B<Beispiel>
+
+     $listbox->abs_move_widget( new_x=>5 );      #y-pos is the same
+
+=head2 get_widget_pos()
+
+Gibt ein Array mit den beiden Wertde (x-Position, y-Position) zurueck. 
+
+B<Beispiel>
+
+     ($xpos,$ypos)=$listbox->get_widget_pos();
+
+=head2 set_border([``shade''])
+
+aktiviert den Rahmen der Box. Optional auch mit Schatten. 
+
+B<Beispiel>
+
+     $box->set_border("shade"); or $win->set_border();
+
+=cut
+

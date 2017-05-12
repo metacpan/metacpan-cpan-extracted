@@ -1,0 +1,42 @@
+## no critic (ProhibitHardTabs, RequireRcsKeywords)
+## name Basic failures
+## failures 8
+## cut
+
+ print;
+
+	 print;
+
+ 	print;
+
+	 	print;
+ print;
+	 print;
+ 	print;
+	 	print;
+#-----------------------------------------------------------------------------
+
+## name Basic passing
+## failures 0
+## cut
+
+print;
+	print;
+				print;
+
+#-----------------------------------------------------------------------------
+
+## name Heredoc
+## failures 0
+## cut
+
+my $var = <<END;
+	var
+ 	var
+	 var
+
+ 	var
+
+	 var
+END
+

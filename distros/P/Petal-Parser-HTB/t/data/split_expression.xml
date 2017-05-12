@@ -1,0 +1,5 @@
+<body>
+  <p petal:if="foo; bar">
+    Hello, World
+  </p>
+</body>

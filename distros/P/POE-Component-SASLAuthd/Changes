@@ -1,0 +1,16 @@
+Revision history for POE-Component-SASLAuthd
+
+0.04	2015-11-28
+	META.yml and META.json.
+
+0.03	2011-10-30
+	Some cleanup in POD.
+
+0.02	2011-01-17
+	Make description format consistent across modules.
+
+0.01    2008-04-09
+        First version, released on an unsuspecting world. The release is
+	inspired by Michael Schwern's talk at the GoOpen conference earlier
+	today and a chat with Nadim Khemir a couple of days before that.
+

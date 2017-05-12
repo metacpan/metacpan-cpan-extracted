@@ -1,0 +1,19 @@
+================================
+2013-08-21 19:27:26 -0400 v1_306
+================================
+
+  commit a1ad8bd9642a98161457be3494b679d8e899ffc2
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Wed Aug 21 19:23:58 2013 -0400
+  
+    Freshen up Makefile.PL and the docs.
+
+  commit 58275001414f98ab86d98071de83e1da0d8f471b
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Sep 7 22:07:20 2010 -0400
+  
+    Promote polo-gtk files to top leve. 
+
+==============
+End of Excerpt
+==============

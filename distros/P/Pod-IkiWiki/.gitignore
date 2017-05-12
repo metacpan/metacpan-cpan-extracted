@@ -1,0 +1,9 @@
+*.bak
+*.orig
+*.swp
+*.ptkdb
+Build
+*.gz
+_build/
+blib/
+Pod-IkiWiki*

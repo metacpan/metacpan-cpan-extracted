@@ -1,0 +1,19 @@
+Pod::POM::View::DocBook provides a DocBook XML view of a Pod Object Model.
+
+Pod::POM, Text::Wrap and List::MoreUtils are prerequisites.
+
+For testing you will also need:
+
+  Test::More
+  Test::Differences
+  XML::LibXML
+  Class::Accessor
+
+The code is not yet complete - mapping of basic Pod formatting commands is done, but I haven't
+looked at the link stuff yet.
+
+Comments and suggestions welcome.
+
+-- Andrew Ford <A.Ford@ford-mason.co.uk>
+
+$Id: README 4097 2009-02-24 22:16:02Z andrew $

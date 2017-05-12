@@ -1,0 +1,60 @@
+{
+   "abstract" : "Perl module to manage the PDF imposition",
+   "author" : [
+      "Marco Pessotto <melmothx@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDF-Imposition",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Try::Tiny" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Module::Load" : "0",
+            "Moo" : "0",
+            "PDF::API2" : "2.027",
+            "PDF::Cropmarks" : "0.11",
+            "Pod::Usage" : "0",
+            "Type::Tiny" : "1",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://amusewiki.org",
+      "repository" : {
+         "url" : "https://github.com/melmothx/pdf-imposition-perl"
+      },
+      "x_IRC" : "irc://chat.freenode.net/#amusewiki",
+      "x_WebIRC" : "https://webchat.freenode.net/?channels=#amusewiki"
+   },
+   "version" : "0.24"
+}

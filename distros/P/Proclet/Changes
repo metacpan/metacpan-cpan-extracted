@@ -1,0 +1,112 @@
+Revision history for Perl extension Proclet
+
+0.35 2014-07-24T05:31:01Z
+
+       - add opt to disable exec message
+
+0.34 2014-04-10T15:33:21Z
+
+       - support cron like job in Declare (EXPERIMENTAL)
+
+0.33 2014-03-12T15:20:48Z
+
+       - add start and exec message
+
+0.32 2013-12-27T04:39:01Z
+
+        - support cron like job (EXPERIMENTAL)
+
+0.31 2013-06-20T08:10:24Z
+
+        - support comment line in Procfile (thanks! soh335)
+
+0.30 2013-06-18T03:01:51Z
+
+        - support $PORT assignment in Procfile
+        - re-packaging with Minilla
+
+0.25    Wed Feb 20 1:05:14 2013
+        - use which("bash") instead of absolute path.
+          some *BSD system install bash to /usr/bin
+
+0.24    Mon Feb 18 10:21:21 2013
+        - fixed test. bug in checking size
+
+0.23    Thu Feb 14 11::06:48 2013
+        - added enable_log_worker flag. for disable worker for formating logs
+
+0.22    Tue Feb 12 12:33:01 2013
+        - bug fixed, select loop around logger
+        - fixed test. check logfile size instead of sleeping 
+
+0.21    Fri Feb 1 17:14:17 2013
+        - supports String and ArrayRef service in Proclet.pm
+
+0.20    Wed Jan 30 23:43:23 2013
+        - use Log::Minimal env_debug
+          requires Log::Minimal 0.14
+
+0.19    Tue Dec 11 16:31:33 2012
+        - start services by defined order
+
+0.18    Sat Nov 17 1:12:30 2012
+        - start up logworker at first
+
+0.17    Fri Nov 16 15:04:44 2012
+        - use /bin/bash for exec command.
+          ubuntu symlink /bin/sh to /bin/dash, /bin/dash does not clean up child processes.
+        - wait to finish log process until other process exit
+        - fixed test. unlink tmp files.
+
+0.16    Fri Nov 16 9:56:52 2012
+        - Fixed test. not use infinite loop in test.
+          https://github.com/kazeburo/Proclet/issues/2
+
+0.15    Tue Oct 16 15:02:30 2012
+        - hide Log::Minimal debug message if LM_DEBUG is true
+          use PROCLET_DEBUG to show debug message
+
+0.14    Tue Sep 18 14:03:20 2012
+        - Added process arg to exec a specified service
+          proclet start [options] [process]
+
+0.13    Fri Sep 14 10:26:01 2012
+        - Added requires 'parent' 
+          http://www.cpantesters.org/cpan/report/e10f00ac-fdfe-11e1-bdcc-373e3b6b8117
+
+0.12    Thu Sep 13 2:19:33 2012
+        - Added Proclet::Declare
+
+0.11    Tue Sep 11 13:50:23 2012
+        - Added proclet command. foreman for perl
+
+0.10    Fri Aug 31 15:28:31 2012
+        - Added logger opt
+
+0.09    Fri Aug 31 12:27:15 2012
+        - Supports formating stdout,stderr from services
+
+0.08    Mon Aug 6 23:24:11 2012
+        - fixed test. using Parallel::Scoreboard
+          some platform doesn't support rename proc title
+
+0.07    Thu Jun 15 02:09:20 2012
+        - fixed test. for kfreebsd-gnu
+
+0.06    Mon Jul 23 15:47:15 2012
+        - added spawn_interval and err_respawn_interval attributes
+
+0.05    Fri Jun 15 15:33:11 2012
+        - fixed test. using ps -A instead of '-e'. -e means 'print enviroment value' in FreeBSD
+
+0.04    Thu Jun 15 02:09:20 2012
+        - fixed test. remove whitespaces at begining of a line
+
+0.03    Thu Jun 15 02:09:20 2012
+        - More fixed test.
+
+0.02    Thu Jun 14 23:13:17 2012
+        - Fixed test. Check `ps`
+
+0.01    Thu Jun 14 00:40:41 2012
+        - original version

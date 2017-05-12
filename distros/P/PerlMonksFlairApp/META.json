@@ -1,0 +1,55 @@
+{
+   "abstract" : "A neat way to share your achievements on perlmonks.org",
+   "author" : [
+      "Gideon Israel Dsouza <gideon@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PerlMonksFlairApp",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "1.3116",
+            "GD" : "2.5",
+            "HTML::TokerParser" : "3.69",
+            "Test::More" : "0",
+            "WWW::Mechanize" : "1.73",
+            "YAML" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gideondsouza/perlmonksflair/issues/new"
+      },
+      "homepage" : "http://www.perlmonksflair.com",
+      "repository" : {
+         "url" : "https://github.com/gideondsouza/perlmonksflair"
+      }
+   },
+   "version" : "0.2"
+}

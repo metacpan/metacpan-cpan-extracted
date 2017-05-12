@@ -1,0 +1,21 @@
+Format: 1.7
+Date: Tue, 18 Sep 2007 17:07:42 +0200
+Source: ack
+Binary: ack
+Architecture: source i386
+Version: 1.66-1
+Distribution: unstable
+Urgency: low
+Maintainer: Esteban Manchado Velázquez <estebanm@estebanm-desktop>
+Changed-By: Esteban Manchado Velázquez <estebanm@estebanm-desktop>
+Description: 
+ ack        - A grep-like program specifically for large source trees
+Changes: 
+ ack (1.66-1) unstable; urgency=low
+ .
+   * Initial Release.
+Files: 
+ dc5185449a8d0c4f8df46d72a77b65a8 365 perl optional ack_1.66-1.dsc
+ cce6c9a07d05f606563ac7ff4215912e 42093 perl optional ack_1.66.orig.tar.gz
+ 46af714ccb82972b7da29b13930654b1 1713 perl optional ack_1.66-1.diff.gz
+ 522fc4b1e4c32eb5a0b61f3af281417d 27974 perl optional ack_1.66-1_i386.deb

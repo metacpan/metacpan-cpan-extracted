@@ -1,0 +1,15 @@
+0.05 Sat Aug 16 11:50:23 PDT 2014
+ - Meta 0.0.2
+
+0.04 Fri Aug 15 20:20:05 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.03 Mon Aug  4 00:03:51 PDT 2014
+ - Remove (c) from Copyright
+
+0.02 Wed Jul 23 14:31:34 PDT 2014
+ - Inline text and grammar into Grammar class.
+
+0.01 Tue Jul 22 19:04:24 PDT 2014
+ - First release
+

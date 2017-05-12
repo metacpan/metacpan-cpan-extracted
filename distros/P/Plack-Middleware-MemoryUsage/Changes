@@ -1,0 +1,12 @@
+Revision history for Plack::Middleware::MemoryUsage
+
+0.03  2013-04-04
+  * Enable to filter by package name
+    (thanks tohae)
+
+0.02  2013-01-17
+  * Use B::Size2 instead of B::Size
+
+0.01  2013-01-15
+  * Initial version
+

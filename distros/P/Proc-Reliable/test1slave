@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+#print(STDOUT "hello1\n");
+#print(STDERR "hello2\n");
+#print(STDOUT "hello3\n");
+#print(STDERR "hello4\n");
+#print(STDOUT "hello5\n");
+#print(STDERR "hello6\n");
+for($i=0; $i<7; $i++) {
+    $stdout .= "this is a test of the stdout transmission system $i\n";
+}
+print("stdout size: ",length($stdout),"\n");
+print(STDOUT $stdout);
+
+for($i=0; $i<9; $i++) {
+    $stderr .= "this is a test of the stderr transmission system $i\n";
+}
+print("stderr size: ",length($stderr),"\n");
+print(STDERR $stderr);
+
+#$SIG{TERM} = sub { while(1) {}; };
+
+#sleep(10);
+
+while(<>) {
+  print("STDIN: $_");
+}
+
+#sleep(10);
+
+#$SIG{ALRM} = sub {die "alarm!"};
+#    alarm(5);
+#system("sleep 10");
+
+exit(1);
+

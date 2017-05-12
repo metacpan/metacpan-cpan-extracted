@@ -1,0 +1,24 @@
+Build.PL
+Changes
+font/LICENSE
+font/MTLmr3m.ttf
+lib/Plack/Middleware/Image/Dummy.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00_compile.t
+t/01_basic.t
+t/02_parse_params.t
+t/03_without_map_path.t
+t/04_without_font_path.t
+t/05_parse_color.t
+t/06_param_filter.t
+t/07_max_width_and_height.t
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/04_minimum_version.t
+xt/05_cpan_meta.t
+xt/06_meta_author.t

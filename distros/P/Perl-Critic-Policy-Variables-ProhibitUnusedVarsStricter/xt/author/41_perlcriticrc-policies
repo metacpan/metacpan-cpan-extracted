@@ -1,0 +1,18 @@
+##############################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/distributions/Perl-Critic/xt/author/41_perlcriticrc-policies $
+#     $Date: 2008-12-31 19:35:14 -0500 (Wed, 31 Dec 2008) $
+#   $Author: clonezone $
+# $Revision: 2929 $
+##############################################################################
+
+profile-strictness = fatal
+severity = 1
+only = 1
+verbose = %f: %m at line %l, column %c.  %e.  (Severity: %s, %p)\n
+
+#-----------------------------------------------------------------------------
+
+[Variables::ProhibitUnusedVarsStricter]
+
+#[Documentation::RequirePodSections]
+#lib_sections = NAME|AFFILIATION|DESCRIPTION|CONFIGURATION|AUTHOR|COPYRIGHT

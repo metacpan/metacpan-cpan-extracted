@@ -1,0 +1,55 @@
+NAME
+    Pod::Text::Ansi - Convert POD to ANSI-colored text
+
+SYNOPSIS
+        use Pod::Text::Ansi;
+        my $parser = Pod::Text::Ansi->new (sentence => 0, width => 78);
+
+        # Read POD from STDIN and write to STDOUT.
+        $parser->parse_from_filehandle;
+
+        # Read POD from file.pod and write to file.txt.
+        $parser->parse_from_file ('file.pod', 'file.txt');
+
+DESCRIPTION
+    Pod::Text::Ansi is a simple subclass of Pod::Text that highlights output
+    text using ANSI color escape sequences. Apart from the color, it in all
+    ways functions like Pod::Text. See Pod::Text for details and available
+    options.
+
+SEE ALSO
+    Pod::Text::Color, Pod::Text, Pod::Simple
+
+AUTHOR
+    Hinrik Örn Sigurðsson, hinrik.sig@gmail.com
+
+    Based on Pod::Text::Color by Russ Allbery rra@stanford.edu.
+
+CAVEATS
+    *   It currently doesn't respect some forms of nesting.
+
+        Example:
+
+         I<'italic', C<'italic code'>, 'italic'>.
+
+        Contrary to what the three terms above say, they will be rendered as
+        italic only, then code only, then normal, respectively.
+
+        Non-overlapping nesting such as the following does work, though:
+
+         I< C<italic code> >
+
+    *   The wrapping code isn't perfect.
+
+        Some formatting codes that stretch over multiple lines will break.
+        One example would be an "L<>" code that's too long to fit on one
+        line.
+
+LICENSE AND COPYRIGHT
+    Copyright 1999, 2001, 2004, 2006 by Russ Allbery rra@stanford.edu.
+
+    Copyright (c) 2009, Hinrik Örn Sigurðsson hinrik.sig@gmail.com.
+
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

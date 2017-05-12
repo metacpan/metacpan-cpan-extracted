@@ -1,0 +1,26 @@
+v2.013006 Sun Aug 30 15:33:09 BST 2015
+ - further tweak to how $VERSION recorded/used
+
+v2.013005 Sun Aug 30 03:43:01 BST 2015
+ - minor tweak to how $VERSION recorded/used
+
+v2.013004 Sun Aug 30 03:00:57 BST 2015
+ - PDLA::Core to separate distro and repo
+
+v2.013003 Sat Aug 29 22:28:17 BST 2015
+ - fixup $VERSION in PDLA::Core more
+
+v2.013002 Sat Aug 29 21:58:05 BST 2015
+ - fixup $VERSION in PDLA::Core
+ - "make core[test]" now can do parallel build which will be quicker
+ - use Alien::HDF4
+ - big test cleanup
+ - improve PDLA::Graphics::PGPLOT build robustness
+
+v2.013001 2015-08-29 19:00:00+01:00
+ - TODO fragile t/lut.t test
+ - stop claiming packages C::StructObj C::StructType C::Type C::Var Inline::MakePdlppInstallable Inline::Pdlpp SymTab Win32::DDE::Netscape XS
+
+v2.013-PDLA 2015-08-29 04:00:00+01:00
+ - fork from PDL
+ - rename all PDL -> PDLA

@@ -1,0 +1,16 @@
+Revision history for Perinci-Sub-Convert-default_lang
+
+0.02    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.01     2014-04-30 (SHARYANTO)
+
+         - First release. Extracted from Perinci-Sub-Wrapper to make
+           Perinci-Sub-Wrapper stay lean (and this functionality is seldom
+           needed anyway).

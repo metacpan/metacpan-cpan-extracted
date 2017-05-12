@@ -1,0 +1,212 @@
+#!/usr/bin/env perl
+
+use 5.021;
+use strict;
+use warnings;
+use Getopt::Long qw(:config posix_default no_ignore_case gnu_compat);
+use Pgtools;
+use Pgtools::Kill;
+
+our $VERSION = Pgtools->VERSION;
+$| = 1; # auto-flush STDOUT
+
+my $opt = {
+    "help"                   => 0,
+    "ignore_match_query"     => '',
+    "ignore_match_state"     => '',
+    "kill"                   => '',
+    "match_query"            => '',
+    "match_state"            => '',
+    "print"                  => 0,
+    "run_time"               => 0,
+    "version"                => 0,
+};
+
+GetOptions(
+    'help|h'                     => \$opt->{help},
+    "ignore_match_query|imq=s"   => \$opt->{ignore_match_query},
+    "ignore_match_state|ims=s"   => \$opt->{ignore_match_state},
+    'kill'                       => \$opt->{kill},
+    'match_query|mq=s'           => \$opt->{match_query},
+    'match_state|ms=s'           => \$opt->{match_state},
+    'print|pr'                   => \$opt->{print},
+    'run_time|r=i'               => \$opt->{run_time},
+    'version|v'                  => \$opt->{version},
+);
+
+# show help
+if($opt->{help}){
+    &print_help;
+    exit;
+}
+if($opt->{version}){
+    print "Version: ".$VERSION."\n";
+    exit;
+}
+
+if (@ARGV != 1) {
+    die "Invalid arguments.\nPlease check pg_kill -help\n";
+}
+
+my $s = Pgtools::Kill->new($opt);
+$s->exec($ARGV[0]);
+
+
+sub print_help {
+    print <<'OUT';
+    pg_kill -help | [-(options below)]
+
+    pg_kill shows the specified queries during execution by regular expression and the other options.
+    And also kill these specifid queries by -kill option.
+
+  Options:
+    -db  database:       set the database name
+    -h   host:           host (localhost)
+    -help:               show this help
+    -ignore_match_query: except matching query
+    -ignore_match_state: except matching state
+    -kill:               kill query which matched condition
+    -mq  match_query:    query match
+    -ms  match_state:    state match
+    -pr  print:          print killed queries info
+    -p   passward:       set password
+    -port:               port number
+    -r   run_time:       execute time
+    -u   user:           Postgres user name
+    -v   version:        version
+
+    (Example)
+
+    Print option just shows matched query.
+
+    $ pg_kill -print -mq '.*' "192.168.32.12,5432,postgres,,dvdrental"
+    -------------------------------
+    pid       : 11493
+    start_time: 2016-03-20 16:11:17.57228+00
+    state     : idle
+    query     : SELECT * FROM actor WHERE last_name like '%a%';
+    -------------------------------
+    pid       : 11492
+    start_time: 2016-03-20 16:08:07.762289+00
+    state     : idle
+    query     : select * from actor where actor_id < 200;
+
+
+    You can kill the matched query with -kill option.
+    Be careful to kill queries!!
+    Please test on your environments. And exec this in your responsibility.
+
+    $ pg_kill -kill -print -mq "like\s'\%.*\%'" "192.168.32.12,5432,postgres,,dvdrental"
+    -------------------------------
+    Killed-pid: 11590
+    At        : 2016/03/21 01:32:29
+    Query     : SELECT * FROM actor WHERE last_name like '%a%';
+    Killed matched queries!
+
+OUT
+}
+
+
+__END__
+
+
+=head1 NAME
+
+Pgtools::pg_kill - kill the postgresql processes with option 
+
+=head1 SYNOPSIS
+
+    pg_kill shows the specified queries during execution by regular expression and other options.
+    And also kill these specifid queries by -kill option.
+
+  Options:
+    -db  database:       set the database name
+    -h   host:           host (localhost)
+    -help:               show this help
+    -ignore_match_query: except matching query
+    -ignore_match_state: except matching state
+    -kill:               kill query which matched condition
+    -mq  match_query:    query match
+    -ms  match_state:    state match
+    -pr  print:          print killed queries info
+    -p   passward:       set password
+    -port:               port number
+    -r   run_time:       execute time 
+    -u   user:           Postgres user name 
+    -v   version:        version
+
+    (Example)
+
+    Print option just shows matched query.
+
+    $ pg_kill -print -mq '.*' "192.168.32.12,5432,postgres,,dvdrental"
+    -------------------------------
+    pid       : 11493
+    start_time: 2016-03-20 16:11:17.57228+00
+    state     : idle
+    query     : SELECT * FROM actor WHERE last_name like '%a%';
+    -------------------------------
+    pid       : 11492
+    start_time: 2016-03-20 16:08:07.762289+00
+    state     : idle
+    query     : select * from actor where actor_id < 200;
+
+
+    You can kill the matched query with -kill option.
+    Be careful to kill queries!!
+    Please test on your environments. And exec this in your responsibility.
+
+    $ pg_kill -kill -print -mq "like\s'\%.*\%'" "192.168.32.12,5432,postgres,,dvdrental"
+    -------------------------------
+    Killed-pid: 11590
+    At        : 2016/03/21 01:32:29
+    Query     : SELECT * FROM actor WHERE last_name like '%a%';
+    Killed matched queries!
+
+
+=head1 AUTHOR
+
+Tomoaki Otsuka, C<< <otsuka.tt at gmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to the Github page.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Pgtools::pg_kill
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=./>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/./>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/./>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/.//>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016 Tomoaki Otsuka.
+
+This program is free software;
+=cut
+
+1; # End of Pgtools::pg_kill

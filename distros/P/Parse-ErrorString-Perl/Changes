@@ -1,0 +1,84 @@
+Revision history for Parse-ErrorString-Perl
+
+0.22    2015.12.01
+        * fix bug caused by changes in perl 5.22
+
+0.21    2014.09.10
+        * Moved to GitHub
+
+0.20    2013.10.05
+        * Add back copyright and license information
+          and POD headers (RT #89233 by Florian) 
+
+0.19    2013.08.06
+        * Fix the missing Test::Differences dependency (AZAWAWI)
+        * Reformatted Changes file (AZAWAWI)
+
+0.18    2013.08.05
+        * Fix the missing =head1 NAME (AZAWAWI)
+
+0.17    2013.08.05
+        * Emergency release to fix the Changes file (AZAWAWI)
+
+0.16    2013.08.05
+        * Convert to Module::Install (SZABGAB)
+        * Fix RT #87458 "This has become very noisy of late"
+          (BOWTIE, Karl Williamson, AZAWAWI)
+
+0.15    2010.11.29
+        * Bumped Pod::POM dependency to version 0.27 to fix
+          RT #54062 "Test failure on perl 5.11.4" (AZAWAWI)
+
+0.14    2010.11.29
+        * Switched to Dist::Zilla (AZAWAWI)
+        * Refactored the packages into separate files and
+          reorganized POD (AZAWAWI)
+        * Fixed q{near "package;"} regex bug (AZAWAWI)
+        * Added "use strict; use warnings;" to all of the tests (AZAWAWI)
+
+0.13    9 February 2009
+        * Try to fix test script for diagnostic text in perl = 5.8.9
+          version again...
+
+0.12    8 February 2009
+        *  Fix test script for diagnostic text in perl = 5.8.9 version
+
+0.11    2 January 2009
+        * Moved definition of transmo() to allow
+          Parse::ErrorString::Perl->new to be called within a
+          threads context (required by Padre::Task::ErrorParser)
+
+0.10    2 January 2009
+        * Fix test script for diagnostic text in perl < 5.10 version
+        * some code and test refactoring (Gabor Szabo)
+
+0.09    31 Dec 2008
+        * Fixed Makefile.pl to properly build on unix (Gabor Szabo)
+        * Fixed t/06-short_filename.t to run properly under unix
+          (Gabor Szabo, Breno G. de Oliveira)
+        * Fixed typos in the documentation (Breno G. de Oliveira)
+
+0.08    26 Dec 2008
+        * Minor bug fixes
+
+0.07    24 Dec 2008
+        * Properly parse error messages messed with by "diagnostics"
+        * Properly parse errors with "near" or "at" info at the end
+        * Properly parse errors in eval
+        * Provide information about the error type
+        * Callstack for fatal errors if "use diagnostics" is in force
+        * Support for curtailed file paths
+        * Fall back to default perldiag if localized does not provide
+          info about an error message
+        * Added script "check_perlidag" to check a localized perldiag
+          for consistency
+
+0.03    2008.12.16
+        * Test fixes
+
+0.02    2008.12.15
+        * Added support for diagnostic messages
+
+0.01    2008.12.12
+        * First release. Only message, file_path and line are
+          currently supported. Tests need to be added.

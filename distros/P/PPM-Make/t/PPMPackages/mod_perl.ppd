@@ -1,0 +1,11 @@
+<SOFTPKG NAME="mod_perl" VERSION="2,0,2,0">
+	<TITLE>mod_perl</TITLE>
+        <ABSTRACT>Embed a Perl interpreter in the Apache/2.0 HTTP server</ABSTRACT>
+	<AUTHOR>Philippe M. Chiasson &lt;gozer@cpan.org&gt;</AUTHOR>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+		<INSTALL EXEC="PPM_PERL" HREF="http://theoryx5.uwinnipeg.ca/ppms/scripts/install_modperl">install_modperl</INSTALL>
+		<CODEBASE HREF="http://theoryx5.uwinnipeg.ca/ppms/x86/mod_perl.tar.gz" />
+	</IMPLEMENTATION>
+</SOFTPKG>

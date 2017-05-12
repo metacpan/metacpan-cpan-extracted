@@ -1,0 +1,20 @@
+abstract: Installs PPM packages the PAR way
+author: Steffen Mueller (smueller@cpan.org)
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: PAR-Dist-InstallPPD
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Cwd: 0
+  File::Path: 0
+  File::Spec: 0
+  File::Temp: 0
+  Getopt::Long: 0
+  PAR::Dist: 0.20
+  PAR::Dist::FromPPD: 0.01
+  perl: 5.6.0
+version: 0.02

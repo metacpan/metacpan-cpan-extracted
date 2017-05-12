@@ -1,0 +1,13 @@
+Changes
+lib/Params/Profile.pm
+lib/Params/Profile/Data_FormValidator.pm
+lib/Params/Profile/Params_Check.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+META2.yml
+README
+t/01_Params-Profile.t
+t/02_Params-Profile-Functions.t
+t/03_Params-Profile-Examples.t
+META.json                                Module JSON meta-data (added by MakeMaker)

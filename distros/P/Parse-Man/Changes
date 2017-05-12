@@ -1,0 +1,13 @@
+Revision history for Parse-Man
+
+0.02    CHANGES:
+         * Nicer method for handling chunks 
+            + just provide one chunk method, it takes options
+            + represent font vs. size as two different options
+         * Recognise two-character font names like \f(CW
+         * Ensure that man-to-html.pl handles \f(CW as <tt>
+         * Optionally create an index of manpages
+         * Allow 'also' aliasing of manpages
+
+0.01    First version, released on an unsuspecting world.
+

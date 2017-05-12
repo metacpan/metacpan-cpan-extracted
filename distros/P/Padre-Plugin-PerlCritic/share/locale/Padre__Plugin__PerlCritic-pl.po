@@ -1,0 +1,28 @@
+#
+# Cezary Morga <cm@therek.net>, 2009.
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-PerlCritic\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-11 20:26+0300\n"
+"PO-Revision-Date: 2009-05-13 20:24+0200\n"
+"Last-Translator: Cezary Morga <cm@therek.net>\n"
+"Language-Team: Polish <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 0.3\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: lib/Padre/Plugin/PerlCritic.pm:31
+msgid "Run PerlCritic"
+msgstr "Uruchom PerlCritic"
+
+#: lib/Padre/Plugin/PerlCritic.pm:43
+msgid "Document is not a Perl document"
+msgstr "Bieżący dokument nie jest dokumentem Perl"
+
+#: lib/Padre/Plugin/PerlCritic.pm:43
+msgid "Error"
+msgstr "Błąd"
+

@@ -1,0 +1,30 @@
+Revision history for Postgres-Handler-HTML
+
+ v1.0 - May 2008
+      Attach to Postgres::Handler via use base() construct
+
+ v0.9 - January 2006
+      GROUP option on Pulldown()
+                Added some docs, minor code cleanup
+
+ v0.8 - September 2005
+                PREADD option on Pulldown()
+
+ v0.7 - August 2005
+      minor updates
+
+ v0.6 - Jun 13 2005
+      added script option to checkbox type
+                added no label option to checkbox type
+
+ v0.5 - Jun 09 2005
+      moved under Postgres::Handler:: namespace
+                initial CPAN release
+
+ v0.4 - Apr 28 2005
+                pod updates
+                Updated CheckBox() w/ default 'checked' option
+                Added ShowThe() method
+
+ v0.1 - Dec/2004
+      Initial private release

@@ -1,0 +1,119 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Plack\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-12-24 10:38-0500\n"
+"PO-Revision-Date: 2010-05-17 22:28+0200\n"
+"Last-Translator: Burak Gürsoy <burak@cpan.org>\n"
+"Language-Team: Turkish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Turkish\n"
+"X-Poedit-Country: TURKEY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: lib/Padre/Plugin/Plack.pm:34
+msgid "New PSGI App"
+msgstr "Yeni PSGI Uygulaması"
+
+#: lib/Padre/Plugin/Plack.pm:48
+msgid "Online References"
+msgstr "Çevrimiçi Başvuru Kaynakları"
+
+#: lib/Padre/Plugin/Plack.pm:60
+msgid "Plack Advent Calendar"
+msgstr "Plack Varış Takvimi"
+
+#: lib/Padre/Plugin/Plack.pm:68
+msgid "About"
+msgstr "Hakkında"
+
+#: lib/Padre/Plugin/Plack.pm:87
+#, perl-format
+msgid "Failed to open template file %s"
+msgstr "Şablon dosyası %s açılırken hata oluştu"
+
+#: lib/Padre/Plugin/Plack.pm:158
+msgid "'Sorry Dave, I can't do that - you need to close the corresponding file tab to close this panel"
+msgstr "'Üzgünüm Dave, bunu yapamam - bu paneli kapatabilmek için, ilişkili dosya sekmesini kapatmalısın"
+
+#: lib/Padre/Plugin/Plack.pm:191
+#: lib/Padre/Plugin/Plack.pm:213
+#, perl-format
+msgid "Expected a PSGI document, but instead got: %s"
+msgstr "Bir PSGI belgesi beklenirken, bunun yerine %s alındı"
+
+#: lib/Padre/Plugin/Plack.pm:226
+msgid "PSGI/Plack support for Padre"
+msgstr "Padre için PSGI/Plack desteği"
+
+#: lib/Padre/Plugin/Plack.pm:227
+msgid "by"
+msgstr "ile"
+
+#: lib/Padre/Plugin/Plack.pm:229
+msgid "This system is running Plack version"
+msgstr "Bu dizgede çalışan Plack sürümü"
+
+#: lib/Padre/Plugin/Plack.pm:288
+#: lib/Padre/Plugin/Plack.pm:473
+msgid "Let plackup guess"
+msgstr "plackup tahmin etsin"
+
+#: lib/Padre/Plugin/Plack.pm:300
+msgid "plackup command not found, please check your Plack installation and $PATH"
+msgstr "plackup komutu bulunamadı. Lütfen Plack kurulumunuzu ve PATH çevre değişkenini denetleyin"
+
+#: lib/Padre/Plugin/Plack.pm:367
+#, perl-format
+msgid ""
+"Wx::Perl::ProcessStream is version %s which is known to cause problems. Get at least 0.20 by typing\n"
+"cpan Wx::Perl::ProcessStream"
+msgstr ""
+"Wx::Perl::ProcessStream sürümünüz %s için bilinen uyumluluk sorunları mevcut. Şu komutu girerek en azından 0.20 sürümünü kurun\n"
+"cpan Wx::Perl::ProcessStream"
+
+#: lib/Padre/Plugin/Plack.pm:429
+#, perl-format
+msgid "Failed to start server via '%s'"
+msgstr "Sunucuyu '%s' ile başlatma girişimi başarısız oldu"
+
+#: lib/Padre/Plugin/Plack.pm:429
+msgid "Error"
+msgstr "Hata"
+
+#: lib/Padre/Plugin/Plack.pm:475
+msgid "Server"
+msgstr "Sunucu"
+
+#: lib/Padre/Plugin/Plack.pm:481
+msgid "Port"
+msgstr "Kapı numarası"
+
+#: lib/Padre/Plugin/Plack.pm:487
+msgid "Options"
+msgstr "Seçenekler"
+
+#: lib/Padre/Plugin/Plack.pm:493
+msgid "Auto-Restart"
+msgstr "Otomatik Yeniden Başlat"
+
+#: lib/Padre/Plugin/Plack.pm:506
+#: lib/Padre/Plugin/Plack/Panel.pm:33
+msgid "Start"
+msgstr "Başlat"
+
+#: lib/Padre/Plugin/Plack.pm:518
+msgid "View in Browser"
+msgstr "Tarayıcıda Göster"
+
+#: lib/Padre/Plugin/Plack/Panel.pm:27
+msgid "Stop"
+msgstr "Durdur"
+

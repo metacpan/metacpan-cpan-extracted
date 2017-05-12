@@ -1,0 +1,22 @@
+Todo list v1.0:
+
+* if-modified header handling for statichandler
+
+* more configurable request logging.
+
+* Better doco
+
+* Better/more thorough tests
+
+* multipart request handling
+
+* ParameterParseHandler: multivalued params
+
+* figure out where socketfactory::ssl is, and how it works
+
+* put $VERSION in all mods
+
+* CGI handler
+
+* figure out how to unblock on long requests?
+

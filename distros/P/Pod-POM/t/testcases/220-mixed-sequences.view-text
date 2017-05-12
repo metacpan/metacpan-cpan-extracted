@@ -1,0 +1,14 @@
+NAME
+    220-mixed-sequences
+
+TESTCASES
+    This is *bold and _bold italic_*.
+
+    This is _italic and *bold italic*_.
+
+    This is code with a replacable text as italic: 'function(_argument_)'.
+
+    This is an bold with embedded escapes: *bold & bold*.
+
+    Code within non-breaking space sequence: 'code code code'
+

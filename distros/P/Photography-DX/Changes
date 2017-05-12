@@ -1,0 +1,7 @@
+Revision history for Photography-DX
+
+0.02      2016-12-01 14:48:11 -0500
+  - Added contacts method to return BOTH rows.
+
+0.01      2015-06-10 16:13:01 -0600
+  - initial version

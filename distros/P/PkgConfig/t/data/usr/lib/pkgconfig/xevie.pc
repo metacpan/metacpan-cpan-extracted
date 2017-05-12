@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: Xevie
+Description: X Event Interceptor Library
+Version: 1.0.2
+Requires: xproto
+Requires.private: x11, xext
+Cflags: -I${includedir}
+Libs: -L${libdir} -lXevie

@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+# GUI wrapper around ptoinfo. Requires zenity
+# Jan 2008 Bruno Postle <bruno@postle.net>
+
+use strict;
+use warnings;
+
+my $cwd = `cat \$HOME/.ptoinfo-gui` || $ENV{'HOME'};
+chomp $cwd;
+
+unless (`which ptoinfo`)
+{
+    `zenity --error --text='ptoinfo not found in your \$PATH'`;
+    exit 1;
+}
+
+my $file;
+
+if (@ARGV)
+{
+    $file = shift @ARGV;
+}
+else
+{
+    $file = `zenity --file-selection \\
+                    --filename=$cwd/ \\
+                    --title='Select hugin .pto project to query'` || exit 0;
+    chomp $file;
+}
+
+$file = quotemeta ($file);
+my $title = "PTO project information";
+`ptoinfo $file | \\
+ zenity --text-info \\
+        --title='$title'`;
+$cwd = $file;
+$cwd =~ s/\/[^\/]*$//;
+$cwd =~ s/\\\//\//g;
+`echo '$cwd' > \$HOME/.ptoinfo-gui` if ($cwd =~ /^\//);
+
+exit 0;

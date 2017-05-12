@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1189763921,
+          'number' => '+440200814254',
+          'time' => '10:58',
+          'date' => '2007-09-14',
+          'name' => 'John XXXX (M)',
+          'phone' => '+440200814254',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1189763921,
+          'text' => 'Downloaded an album that was only available as .flac files. VLC plays them but itunes don\'t. Is there anyway to convert them to mp3\'s?  ',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7107169,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 35158
+        };

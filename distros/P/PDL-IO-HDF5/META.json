@@ -1,0 +1,68 @@
+{
+   "abstract" : "PDL Interface to the HDF5 Data Format",
+   "author" : [
+      "Chris Marshall <chm@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Chris Marshall, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDL-IO-HDF5",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "PDL" : "2.007",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "PDL" : "2.004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "2.004"
+         }
+      }
+   },
+   "provides" : {
+      "PDL::IO::HDF5" : {
+         "file" : "hdf5.pd",
+         "version" : "0.73"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=PDL-IO-HDF5"
+      },
+      "homepage" : "http://pdl.perl.org/",
+      "license" : [
+         "http://cpansearch.perl.org/src/CHM/PDL-IO-HDF5-0.73/COPYRIGHT"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.code.sf.net/p/pdl/pdl-io-hdf5",
+         "web" : "http://sourceforge.net/p/pdl/pdl-io-hdf5/ci/master/tree/"
+      }
+   },
+   "version" : "0.73",
+   "x_meta_spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   }
+}

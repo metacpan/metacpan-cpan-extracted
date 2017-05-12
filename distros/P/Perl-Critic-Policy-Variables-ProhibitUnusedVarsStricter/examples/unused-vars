@@ -1,0 +1,121 @@
+#!/trw/local/perl/default/bin/perl 
+
+use 5.006001;
+
+use strict;
+use warnings;
+
+use File::Spec;
+use Getopt::Long 2.33;
+use Perl::Critic::Command;
+use Pod::Usage;
+
+our $VERSION = '0.100';
+
+my %opt;
+
+Getopt::Long::Configure( qw{ pass_through } );
+
+GetOptions( \%opt,
+    qw{ single-policy=s },
+    'profile=s' => sub { $opt{profile} = $_[1] },
+    'noprofile' => sub { $opt{profile} = undef },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+$opt{'single-policy'}
+    and warn "--single-policy ignored\n";
+
+if ( ! exists $opt{profile} ) {
+    my $pf = File::Spec->catfile( $ENV{HOME}, '.perlcritic-unused-vars' );
+    -f $pf
+	and $opt{profile} = $pf;
+}
+
+exists $opt{profile}
+    and splice @ARGV, 0, 0, defined $opt{profile} ?
+	( '--profile', $opt{profile} ) :
+	( '--noprofile' );
+splice @ARGV, 0, 0, qw{ --single ProhibitUnusedVarsStricter };
+
+Perl::Critic::Command::run();
+
+__END__
+
+=head1 TITLE
+
+unused-vars - Find unused variables in Perl code
+
+=head1 SYNOPSIS
+
+ unused-vars .
+ unused-vars lib/
+ unused-vars -help
+ unused-vars -version
+
+=head1 OPTIONS
+
+The following options are parsed by this script. All options not
+specifically mentioned below are passed to Perl-Critic.
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -noprofile
+
+This option specifies that no profile be used. It specifically prevents
+the use of the default profile.
+
+=head2 -profile profile_file
+
+This option specifies the profile file to use.
+
+=head2 -single-policy policy_name
+
+This option exists simply to intercept any attempt to specify a policy
+other than C<Variables::ProhibitUnusedVarsStricter>.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script wraps the rogue Perl::Critic policy
+Variables::ProhibitUnusedVarsStricter. This is a variant of
+Variables::ProhibitUnusedVariables that actually has some teeth.
+
+If no arguments are passed, the contents of the F<MANIFEST> are scanned
+-- at least, those which appear to be Perl files.
+
+Almost all F<perlcritic> options are simply passed through. However:
+
+C<-profile> and C<-noprofile> are intercepted by this script so that if
+neither is specified it can supply its own default, which is
+F<~/.perlcritic-unused-vars>.
+
+C<-single-policy> is intercepted by this script to prevent it being
+passed to Perl-Critic. A warning is issued if this option is actually
+found.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2016 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

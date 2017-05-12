@@ -1,0 +1,6 @@
+00-load.t - Can we use the class without explosion?
+10-demo.t - The shortest possible use case (100% defaults)
+20-demo.t - Reproduction of http://rick.measham.id.au/pdf-api2/
+            But using PDF::TextBlock objects
+30-demo.t - Demonstration of bolding every other word in a text block.
+            This is not easy via any other CPAN library I'm aware of.

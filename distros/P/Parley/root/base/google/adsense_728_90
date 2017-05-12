@@ -1,0 +1,17 @@
+[% gad = c.config.google_adsense.ad728_90 IF (c.config.google_adsense.enabled == 1) %]
+[% IF gad %]
+<div class="googlead_728_90">
+    <script type="text/javascript"><!--
+    google_ad_width = 728;
+    google_ad_height = 90;
+    google_language = "en"; 
+
+    google_ad_client = "pub-2964145353238376";
+    google_ad_slot = "4846354265";
+    //-->
+    </script>
+    <script type="text/javascript"
+    src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+    </script>
+</div>
+[% END %]

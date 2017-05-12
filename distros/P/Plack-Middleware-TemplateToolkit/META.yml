@@ -1,0 +1,46 @@
+---
+abstract: 'Serve files with Template Toolkit and Plack'
+author:
+  - 'Leo Lapworth'
+  - 'Jakob Voss'
+build_requires:
+  File::Spec: '0'
+  HTTP::Request: '0'
+  HTTP::Request::Common: '0'
+  Plack::Builder: '0'
+  Plack::Middleware::ErrorDocument: '0'
+  Plack::Test: '0'
+  Test::More: '0.98'
+  Test::Warn: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-TemplateToolkit
+requires:
+  Carp: '0'
+  Encode: '0'
+  Exporter: '0'
+  HTTP::Status: '0'
+  Plack::MIME: '0'
+  Plack::Middleware: '0'
+  Plack::Middleware::Debug::Base: '0'
+  Plack::Middleware::Debug::Timer: '0'
+  Plack::Request: '0.994'
+  Plack::Util::Accessor: '0'
+  Scalar::Util: '0'
+  Template: '2'
+  Time::HiRes: '0'
+  parent: '0'
+  perl: 5.008_001
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/ranguard/Plack-Middleware-TemplateToolkit/issues
+  repository: https://github.com/ranguard/Plack-Middleware-TemplateToolkit
+version: '0.28'

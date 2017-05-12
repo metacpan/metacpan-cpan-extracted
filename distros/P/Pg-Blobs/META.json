@@ -1,0 +1,49 @@
+{
+   "abstract" : "Manage Postgresql blobs from any DBI (dbh) capable object.",
+   "author" : [
+      "Jerome Eteve <jerome.eteve@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.035, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Pg-Blobs",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose::Role" : "2.0401"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBI" : "0",
+            "Moose" : "0",
+            "Test::Exception" : "0.31",
+            "Test::More" : "0.98",
+            "Test::PostgreSQL" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jeteve/Pg-Blobs.git",
+         "web" : "https://github.com/jeteve/Pg-Blobs"
+      }
+   },
+   "version" : "0.003"
+}
+

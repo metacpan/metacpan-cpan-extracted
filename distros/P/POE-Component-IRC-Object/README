@@ -1,0 +1,5 @@
+POE::Component::IRC::Object
+===========================
+
+An OO interface to PoCo::IRC with facilities to dispatch the same method
+to multiple objects.

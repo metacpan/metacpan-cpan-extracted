@@ -1,0 +1,76 @@
+==================================================
+Changes from 2013-10-25 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.003 at 2014-10-25 22:12:43 +0000
+------------------------------------------
+
+  Change: 1fda35c9e8833ab79e113fce0d7f1fd8f6587f79
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 15:11:49 +0000
+
+    Merge branch 'master' of
+    github.com:apocalypse/perl-pod-weaver-section-seealso 
+
+  Change: 179f307e24514d9988c0a3d10d8fca4dddb0ff83
+  Author: Apocalypse <apocalypse@users.noreply.github.com>
+  Date : 2014-10-25 15:11:07 +0000
+
+    Merge pull request #2 from shlomif/master
+
+    Correct some typos. 
+
+  Change: dbcf1f298ba46aa67d82e2593141b9602695dcb1
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 15:09:07 +0000
+
+    add manual perlcriticrc file because of damned
+    [Documentation::ProhibitVerbatimMarkup] 
+
+  Change: 16a7eeb6d79fc2391285009b50ab4faedaf854ee
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 14:40:26 +0000
+
+    rename example link to a real module on CPAN so we don't fail
+    LinkCheck :( 
+
+  Change: f82c9ed54faeda05a3ef34b599e902f8586d4844
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 14:30:18 +0000
+
+    update gitignore 
+
+  Change: d4fd58c64e9f1fd27a3b69f007cbd69b49533e82
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 14:29:57 +0000
+
+    update Changes to new format 
+
+  Change: 21c9986fdc278a3486f1a6cb94be9b404a0d4428
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 14:28:22 +0000
+
+    add mailmap 
+
+  Change: d5e137c4b290079ebfa7dcddd80a169644b0a830
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 14:28:06 +0000
+
+    add support for multiple #SEEALSO lines 
+
+  Change: 56c4ed7b0c7263a6003b803303b862834e3b4444
+  Author: Shlomi Fish <shlomif@shlomifish.org>
+  Date : 2012-12-22 13:11:57 +0000
+
+    Correct some typos. 
+
+  Change: d88abc4e193ffbd2639bb1eb2cf729c3a0bf9e16
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2011-02-21 21:15:52 +0000
+
+    add note about multiple SEEALSO lines in pod 
+
+================================================
+Plus 7 releases after 2013-10-25 00:00:00 +0000.
+================================================

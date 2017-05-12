@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Papery;
+
+# basic command-line options
+my %option;
+GetOptions( \%option, 'help', 'manual', 'version',  )
+    or pod2usage( -verbose => 0 );
+print "papery version $Papery::VERSION\n" and exit if $option{version};
+pod2usage( -verbose => 1 ) if $option{help};
+pod2usage( -verbose => 2 ) if $option{manual};
+
+# generate the site
+Papery->new( @ARGV )->generate();
+
+__END__
+
+=head1 NAME
+
+papery - Front-end to the Papery static web site generator
+
+=head1 SYNOPSIS
+
+papery [ options ] source destination
+
+=head1 DESCRIPTION
+
+=head1 AUTHOR
+
+Philippe Bruhat (BooK), C<< <book at cpan.org> >>
+
+=head1 COPYRIGHT
+
+Copyright 2010 Philippe Bruhat (BooK), all rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut
+
+

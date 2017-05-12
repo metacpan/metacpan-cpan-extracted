@@ -1,0 +1,83 @@
+Revision history for Perinci-CmdLine-Any
+
+0.13    2016-07-20 (PERLANCAR)
+
+	- No functional changes.
+
+        - [dist] Bump prereq versions to force upgrades: Perinci::CmdLine::Lite
+          to 1.56, Perinci::CmdLine::Classic to 1.71.
+
+
+0.12    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.11    2015-06-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Perinci::CmdLine::Inline.
+
+
+0.10    2015-04-12 (PERLANCAR)
+
+	- Split peri-run to App-PerinciUtils.
+
+
+0.09    2015-02-06 (PERLANCAR)
+
+	- Adjust to Perinci::CmdLine -> Perinci::CmdLine::Classic, ::Lite
+	  is now the default preferred version.
+
+
+0.08    2014-12-31 (PERLANCAR)
+
+	- Allow 'lite' and 'classic' in PERINCI_CMDLINE_ANY, as shortcut.
+
+
+0.07     2014-12-29 (PERLANCAR)
+
+         - Add completion for bin/peri-run.
+
+
+0.06     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - Add -prefer_lite.
+
+
+0.05     2014-07-23 (SHARYANTO)
+
+         - Add script: peri-run (moved from Perinci-CmdLine). UPDATE 2015-04-12:
+           peri-run now moved to App-PerinciUtils.
+
+
+0.04     2014-07-18 (SHARYANTO)
+
+         - Introduce PERINCI_CMDLINE_ANY to let you override class to use.
+
+
+0.03     2014-07-18 (SHARYANTO)
+
+         - Instead of subclassing (which is problematic in Perinci::CmdLine due
+           to color theme role searching in <CLASS>::ColorTheme::*), create a
+           new() proxy instead. But subclassing should be okay once
+           SHARYANTO::Role::ColorTheme searches superclasses too.
+
+
+0.02     2014-07-16 (SHARYANTO)
+
+         - No functional changes.
+
+         - Minor revise of POD.
+
+         - Typos/copy-paste mistakes.
+
+
+0.01     2014-07-16 (SHARYANTO)
+
+         - First release.

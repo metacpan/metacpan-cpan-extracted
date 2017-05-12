@@ -1,0 +1,21 @@
+v2.013006 Sun Aug 30 16:01:47 BST 2015
+ - split out of PDLA, dep on PDLA::Core
+ - use Alien::HDF4 which has code that was in this
+ - use Test::More
+ - use Github Travis CI
+
+v2.0 Sun Mar 27 12:00:00 BST 2006
+ - taken over by Judd Taylor, judd@marine.usf.edu
+ - "Chunking" added: HDF internal tiling and compression on the SD datasets
+ - defuncted several functions with strange (perhaps French) spellings
+ - fortran array dim order -> C order
+ - migrated all failure codes to return 'undef'
+ - migrated all of the perl hashes to anonymous hashes.
+ - removed and internally doc'd possible buffer overflows
+ - moved constants over to 'use constant'
+ - added constants MAX_NC_NAME MAX_VAR_DIMS VNAMELENMAX FAIL
+ - moved all of the tests over to 'use Test'
+ - added tests for the SDS chunking features.
+
+v1.0 Sun Feb 13 12:00:00 BST 2001
+ - original version

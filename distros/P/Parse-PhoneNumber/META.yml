@@ -1,0 +1,28 @@
+---
+abstract: 'Parse Phone Numbers'
+author:
+  - 'Casey West <F<casey@geeknest.com>>'
+  - 'Maintained by Tim Wilde <F<cpan@krellis.org>>'
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-PhoneNumber
+provides:
+  Parse::PhoneNumber:
+    file: lib/Parse/PhoneNumber.pm
+    version: 1.9
+  Parse::PhoneNumber::Number:
+    file: lib/Parse/PhoneNumber.pm
+    version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/twilde/Parse-PhoneNumber
+version: 1.9

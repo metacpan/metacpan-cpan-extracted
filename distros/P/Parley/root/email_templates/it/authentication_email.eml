@@ -1,0 +1,10 @@
+[% person.first_name %],
+
+Grazie di esserti registrato con [% c.config.name %]
+Per completare la registrazione clicca sul link sottostante.
+
+  [% c.request.base %]user/authenticate/[% regauth.id %]
+
+e segui le istruzioni sullo schermo.
+
+Il team [% c.config.name %].

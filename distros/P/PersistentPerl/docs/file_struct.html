@@ -1,0 +1,408 @@
+<head><title>PersistentPerl - Temp File Structure</title></head>
+<h1>
+PersistentPerl Temp File Structure
+</h1>
+<ul>
+    <li><a href="#overview">Overview</a>
+    <li><a href="#header">Header</a>
+    <li><a href="#slot array">SlotArray</a>
+    <ul>
+	<li><a href="#free slot">Free Slot</a>
+	<li><a href="#group">Group</a>
+	<li><a href="#script">Script</a>
+	<li><a href="#backend">Backend</a>
+	<li><a href="#frontend">Frontend</a>
+	<li><a href="#group name">Group Name</a>
+    </ul>
+</ul>
+<h2>
+<a name="overview">
+Overview
+</a>
+</h2>
+<p>
+The perperl temp file contains in this order:
+<ul>
+	<li><a href="#header">a header</a>
+	<li><a href="#slot array">an array of slots</a>
+</ul>
+Below is a a graphical view of the file structure:
+<table border=2 cellpadding=7><tr>
+<td bgcolor=white><img src="file_struct.gif" border=0></td>
+</tr></table>
+<a href="graph_notes.html">How to edit this image</a>
+<p>
+<h2>
+<a name="header">
+Header
+</a>
+</h2>
+The header of the file is located at byte-0 within the file.  It contains:
+<p>
+<table>
+<tr>
+    <td rowspan=20>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>
+	create_time
+    </td>
+    <td rowspan=20>&nbsp;&nbsp</td>
+    <td>
+	Time when file was created.
+    </td>
+</tr>
+<tr>
+    <td>
+	group_head
+    </td>
+    <td>
+	Pointer to a linked list of groups
+    </td>
+</tr>
+<tr>
+    <td>
+	slot_free
+    </td>
+    <td>
+	Pointer to a linked list of free slots
+    </td>
+</tr>
+<tr>
+    <td>
+	slots_alloced
+    </td>
+    <td>
+	Number of slots in the slot array.
+    </td>
+</tr>
+<tr>
+    <td>
+	file_corrupt
+    </td>
+    <td>
+	Boolean - is this file corrupt?  This is true if a process locked
+	this file, but exited or was killed before unlocking it.
+    </td>
+</tr>
+<tr>
+    <td>
+	file_removed
+    </td>
+    <td>
+	Boolean - has this file been removed from the filesystem?
+    </td>
+</tr>
+</table>
+<p>
+Slots can either be allocated by increasing the slots_alloced and
+increasing the file size if necessary, or by grabbing a free slot from
+the slot_free linked list.
+
+
+<h2>
+<a name="slot array">
+Slot Array
+</a>
+</h2>
+This array is located in the file immediately following the header, and occupies
+the rest of the file.  The number of slots alloced in this array so far is
+recorded in header slots_alloced field.
+<p>
+Each slot is a union that can contain one of the following types of records:
+<ul>
+	<li><a href="#free slot">Free Slot</a>
+	<li><a href="#group">Group</a>
+	<li><a href="#script">Script</a>
+	<li><a href="#backend">Backend</a>
+	<li><a href="#frontend">Frontend</a>
+	<li><a href="#group name">Group Name</a>
+</ul>
+Most records are arranged into linked lists of slots.
+Each slot is identified by its index within the array, starting at 1.
+Slot-0 represents the "null" slot and is used to terminate linked lists.
+
+<h2>
+<a name="free slot">
+Free Slot
+</a>
+</h2>
+This is a slot that is free and can be re-used.  It contains:
+<p>
+<table>
+<tr>
+    <td rowspan=20>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>
+	next_slot
+    </td>
+    <td rowspan=20>&nbsp;&nbsp</td>
+    <td>
+	Pointer to the next free slot in the linked list
+    </td>
+</tr>
+</table>
+
+<h2>
+<a name="group">
+Group
+</a>
+</h2>
+Each group represents some set of perl scripts that can be executed
+by the same set of perl interpreters.  The user can group together CGI scripts
+by giving them the same PersistentPerl group name.  If no group name is
+specified, then the group represents a single perl script.
+<p>
+A group record contains:
+<p>
+<table>
+<tr>
+    <td rowspan=20>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>
+	next_slot		
+    </td>
+    <td rowspan=20>&nbsp;&nbsp</td>
+    <td>
+	Pointer to the next group in the linked list
+    </td>
+</tr>
+<tr>
+    <td>
+	script_head		
+    </td>
+    <td>
+	Pointer to the list of scripts within this group
+    </td>
+</tr>
+<tr>
+    <td>
+	name		
+    </td>
+    <td>
+	If using a group name, this will point to
+    	a Group Name slot.
+    </td>
+</tr>
+<tr>
+    <td>
+	be_head		
+    </td>
+    <td>
+	Linked list of all backends that are executing
+    	as part of this group, no matter what their state.
+    </td>
+</tr>
+<tr>
+    <td>
+	be_wait		
+    </td>
+    <td>
+	Linked list of backends that are waiting for
+    	a connection from a frontend.
+    </td>
+</tr>
+<tr>
+    <td>
+	fe_wait		
+    </td>
+    <td>
+	Linked list of frontend processes that are waiting
+	for a connection from a backend.
+    </td>
+</tr>
+<tr>
+    <td>
+	fe_tail		
+    </td>
+    <td>
+	Pointer to the last slot in the fe_wait linked list.
+    </td>
+</tr>
+</table>
+
+<h2>
+<a name="script">
+Script
+</a>
+</h2>
+This represents a perl script in the filesystem.
+It contains:
+<p>
+<table>
+<tr>
+    <td rowspan=20>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>
+	next_slot
+    </td>
+    <td rowspan=20>&nbsp;&nbsp</td>
+    <td>
+	Pointer to the next script in the linked list
+    </td>
+</tr>
+<tr>
+    <td>
+	dev_num
+    </td>
+    <td>
+	The st_dev field from the unix stat structure
+    </td>
+</tr>
+<tr>
+    <td>
+	ino_num
+    </td>
+    <td>
+	The st_ino field from the unix stat structure.
+    </td>
+</tr>
+<tr>
+    <td>
+	mtime
+    </td>
+    <td>
+	The st_mtime field from the unix stat structure.
+    </td>
+</tr>
+</table>
+
+<h2>
+<a name="backend">
+Backend
+</a>
+</h2>
+This represents a backend unix process running a perl interpreter.
+It contains:
+<p>
+<table>
+<tr>
+    <td rowspan=20>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>
+	next_slot
+    </td>
+    <td rowspan=20>&nbsp;&nbsp</td>
+    <td>
+	Pointer to the next proc in the linked list.  This is used for
+	all proc lists except be_wait.
+    </td>
+</tr>
+<tr>
+    <td>
+	prev_slot
+    </td>
+    <td>
+	Pointer to the previous proc in the linked list.  This is used for
+	all proc lists except be_wait.
+    </td>
+</tr>
+<tr>
+    <td>
+	pid
+    </td>
+    <td>
+	The unix process id.
+    </td>
+</tr>
+<tr>
+    <td>
+	be_wait_next
+    </td>
+    <td>
+	Pointer to the next proc in the be_wait linked list.
+    </td>
+</tr>
+<tr>
+    <td>
+	be_wait_prev
+    </td>
+    <td>
+	Pointer to the previous proc in the be_wait linked list.
+    </td>
+</tr>
+<tr>
+    <td>
+	maturity
+    </td>
+    <td>
+	Represents how mature this process is:
+	<table>
+	    <tr>
+	    <td>0</td>
+	    <td>-</td>
+	    <td>Process is spawning - hasn't started a perl interpreter yet.</td>
+	    </tr>
+	    <tr>
+	    <td>1</td>
+	    <td>-</td>
+	    <td>Has not yet handled a request.</td>
+	    </tr>
+	    <tr>
+	    <td>2</td>
+	    <td>-</td>
+	    <td>Has handled one or more requests.</td>
+	    </tr>
+	</table>
+    </td>
+</tr>
+</table>
+
+<h2>
+<a name="backend">
+Frontend
+</a>
+</h2>
+This represents a frontend process.  It contains:
+<p>
+<table>
+<tr>
+    <td rowspan=20>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>
+	next_slot
+    </td>
+    <td rowspan=20>&nbsp;&nbsp</td>
+    <td>
+	Pointer to the next proc in the linked list.
+    </td>
+</tr>
+<tr>
+    <td>
+	prev_slot
+    </td>
+    <td>
+	Pointer to the previous proc in the linked list.
+    </td>
+</tr>
+<tr>
+    <td>
+	pid
+    </td>
+    <td>
+	The unix process id.
+    </td>
+</tr>
+<tr>
+    <td>
+	sent_sig
+    </td>
+    <td>
+	Boolean - has this frontend been sent an alarm signal?
+    </td>
+</tr>
+</table>
+
+<h2>
+<a name="group name">
+Group Name
+</a>
+</h2>
+Contains the a group name, if the user has specified one for this group.
+Unnamed groups do not have this record.  Contains:
+<p>
+<table>
+<tr>
+    <td rowspan=20>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+    <td>
+	name
+    </td>
+    <td rowspan=20>&nbsp;&nbsp</td>
+    <td>
+	Array of characters containing the group name.
+    </td>
+</tr>
+</table>

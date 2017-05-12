@@ -1,0 +1,191 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+BEGIN {
+    unshift(@INC, "lib") if -f "lib/PerlBench.pm";
+}
+
+use PerlBench::Utils qw(sec_f num_f);
+use PerlBench::Stats qw(calc_stats);
+use PerlBench::Results;
+use Getopt::Long qw(GetOptions);
+
+my $resdir = "perlbench-results";
+my $merge;
+my $filter_activeperl;
+my $filter_gcc;
+my $filter_nogcc;
+my $filter_static;
+my @filter_version;
+my @filter_dir;
+my $show_dir;
+my $show_path;
+GetOptions(
+   'result-dir=s' 	=> \$resdir,
+   'merge' 		=> \$merge,
+   'filter-activeperl' 	=> \$filter_activeperl,
+   'filter-gcc' 	=> \$filter_gcc,
+   'filter-nogcc' 	=> \$filter_nogcc,
+   'filter-static' 	=> \$filter_static,
+   'filter-version=s' 	=> \@filter_version,
+   'filter-dir=s' 	=> \@filter_dir,
+   'show-dir' 		=> \$show_dir,
+   'show-path' 		=> \$show_path,
+) || usage();
+
+my $cmd = shift || usage();
+$cmd =~ s/-/_/g;
+$cmd = "cmd_$cmd";
+usage() unless defined &$cmd;
+
+my $res = PerlBench::Results->new($resdir);
+die "No results found in $resdir.\n" unless $res;
+
+{
+    no strict 'refs';
+    &$cmd(@ARGV);
+}
+
+sub cmd_list_hosts {
+    for my $h ($res->hosts) {
+	print $h;
+	if (my @perls = $res->perls($h)) {
+	    my $t = 0;
+	    for my $p (@perls) {
+		$t += @{$p->{t}};
+	    }
+	    my $n = @perls;
+	    printf " (%d result%s for %d perl%s)",
+		$t, ($t == 1 ? "" : "s"),
+		$n, ($n == 1 ? "" : "s");
+	}
+	print "\n";
+    }
+}
+
+sub _filter_perl {
+    my $perl = shift;
+    return 0 if $filter_activeperl && !($perl->{name} =~ /ActivePerl/);
+    return 0 if $filter_gcc && !$perl->{config}{gccversion};
+    return 0 if $filter_nogcc && $perl->{config}{gccversion};
+    return 0 if $filter_static && $perl->{config}{useshrplib} eq "true";
+    if (@filter_version) {
+	return 0 unless grep $perl->{version} =~ /^\Q$_\E(\.|$)/, @filter_version;
+    }
+    if (@filter_dir) {
+	return 0 unless grep $perl->{dir} eq $_, @filter_dir;
+    }
+    return 1;
+}
+
+sub cmd_list_results {
+    my @hosts = @_;
+    my @perls = grep _filter_perl($_), $res->perls(@hosts);
+    unless (@perls) {
+	print "No results to report!\n";
+	return;
+    }
+
+    if ($merge) {
+	for my $p (@perls) {
+	    my @t = @{$p->{t}};
+	    my %t;
+	    for (@t) {
+		push(@{$t{$_->{test}}}, $_);
+	    }
+	    @t = ();
+	    for (values %t) {
+		if (@$_ > 1) {
+		    my %res = %{$_->[0]};
+		    for my $f (qw(min med max avg)) {
+			$res{$f} = calc_stats([map $_->{$f}, @$_])->{$f};
+		    }
+		    delete $res{loop_overhead};
+		    delete $res{std_dev};  # XXX can it be merged?
+		    push(@t, \%res);
+		}
+		else {
+		    die unless @$_;
+		    push(@t, $_->[0]);
+		}
+	    }
+	    $p->{t} = \@t;
+	}
+    }
+
+    my %minmed;
+    my %minmed_min;
+    for my $p (@perls) {
+	for my $t (@{$p->{t}}) {
+	    my $name = $t->{test};
+	    if (!defined($minmed{$name}) || $minmed{$name} > $t->{med}) {
+		$minmed{$name} = $t->{med};
+		$minmed_min{$name} = $t->{min};
+	    }
+	}
+    }
+
+    for my $p (@perls) {
+	print "$p->{name}\n";
+	print "    \@$p->{host}\n" unless @hosts == 1;
+        print "    # resdir = $p->{dir}\n" if $show_dir;
+        print "    # path = $p->{path}\n" if $show_path;
+    CONFIG:
+	for my $ck (sort keys %{$p->{config} || {}}) {
+	    my $v = $p->{config}{$ck};
+	    for my $p2 (@perls) {
+		if ($v ne $p2->{config}{$ck}) {
+		    $v = remove_common_words($v, map $_->{config}{$ck}, @perls)
+			if $ck eq "ccflags" || $ck eq "optimize";
+		    print "    # $ck = $v\n";
+		    next CONFIG;
+		}
+	    }
+	}
+	for my $t (sort {$b->{med} <=> $a->{med}} @{$p->{t}}) {
+	    my($name) = split(' ', $t->{test});
+	    $name =~ s,^benchmarks/,,;
+	    $name =~ s,\.b$,,;
+
+	    printf "    %-35s %-18s ", $name,
+		sec_f($t->{med}, $t->{med} - $t->{min});
+
+	    my $minmed = $minmed{$t->{test}};
+	    my $minmed_min = $minmed_min{$t->{test}};
+	    if ($minmed == $t->{med} && $minmed_min == $t->{min}) {
+		print "-";
+	    }
+	    else {
+		my $minmed_max = $minmed + ($minmed - $minmed_min);
+
+		my $p_max = ($t->{med} + ($t->{med} - $t->{min}) - $minmed_min) / $minmed_min;
+		my $p_min = ($t->{min} - $minmed_max) / $minmed_max;
+		my $p_avg = ($p_max + $p_min) / 2;
+
+		print num_f($p_avg * 100, ($p_avg - $p_min) * 100, "%");
+	    }
+	    print "\n";
+	}
+    }
+}
+
+sub remove_common_words {
+    my $w = $_[0];
+    my %w;
+    for (@_) {
+	my %w2;
+	for (split(' ')) {
+	    $w2{$_}++;
+	}
+	for (keys %w2) {
+	    $w{$_}++;
+	}
+    }
+    return join(" ", grep $w{$_} != @_, split(' ', $w));
+}
+
+sub usage {
+    (my $progname = $0) =~ s,.*/,,;
+    die "Usage: $progname [options] <cmd> [cmd-options]\n";
+}

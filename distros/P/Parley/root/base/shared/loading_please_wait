@@ -1,0 +1,35 @@
+<!-- shared/loading_please_wait -->
+<div id="loading"></div>
+<script type="text/javascript">
+    YAHOO.namespace("parley.loading");
+
+    function loading_init() {
+        var content = document.getElementById("loading");
+        content.innerHTML = "";
+
+        if (!YAHOO.parley.loading.wait) {
+            // Initialize the temporary Panel to display while waiting for external content to load
+            YAHOO.parley.loading.wait = 
+                new YAHOO.widget.Panel(
+                    "wait",  
+                    {
+                        width:          "240px", 
+                        fixedcenter:    true, 
+                        close:          false, 
+                        draggable:      false, 
+                        modal:          true,
+                        zindex:         4,
+                        visible:        false
+                    } 
+                )
+            ;
+    
+            YAHOO.parley.loading.wait.setHeader("[%l('Loading, please wait')%]...");
+            YAHOO.parley.loading.wait.setBody("<img src=\"static/images/rel_interstitial_loading.gif\"/>");
+            YAHOO.parley.loading.wait.render(document.body);
+        }
+    }
+
+    loading_init();
+</script>
+<!-- (end) shared/loading_please_wait -->

@@ -1,0 +1,83 @@
+# Chinese translations for Padre-Plugin-Perl package.
+# Copyright (C) 2009 THE Padre-Plugin-Perl'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Padre-Plugin-Perl package.
+# BlueT - Matthew Lien <BlueT@bluet.org>, 2009.
+# 
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Perl6\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-19 02:21+0800\n"
+"PO-Revision-Date: 2009-05-19 02:32+0800\n"
+"Last-Translator: BlueT - Matthew Lien - 練喆明<BlueT@bluet.org> <BlueT@BlueT.org>\n"
+"Language-Team: Chinese (traditional) <bluet@ubuntu-tw.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit"
+
+#: lib/Padre/Task/Outline/Perl6.pm:191
+msgid "Outline"
+msgstr "線上"
+
+#: lib/Padre/Task/Outline/Perl6.pm:224
+msgid "Open &Documentation"
+msgstr "開啟文件(&D)"
+
+#: lib/Padre/Plugin/Perl6.pm:62
+msgid "Show Perl6 Help\tF2"
+msgstr "顯示 Perl6 幫助\tF2"
+
+#: lib/Padre/Plugin/Perl6.pm:77
+msgid "Enable Auto Coloring"
+msgstr "啟動自動上色功能"
+
+#: lib/Padre/Plugin/Perl6.pm:90
+msgid "Export Full HTML"
+msgstr "匯出完整 HTML"
+
+#: lib/Padre/Plugin/Perl6.pm:95
+msgid "Export Simple HTML"
+msgstr "匯出精簡 HTML"
+
+#: lib/Padre/Plugin/Perl6.pm:100
+msgid "Export Snippet HTML"
+msgstr "匯出片段 HTML"
+
+#: lib/Padre/Plugin/Perl6.pm:109
+msgid "Cleanup STD.pm Lex Cache"
+msgstr "清除 STD.pm Lex 快取"
+
+#: lib/Padre/Plugin/Perl6.pm:118
+msgid "Preferences"
+msgstr "偏好"
+
+#: lib/Padre/Plugin/Perl6.pm:127
+msgid "About"
+msgstr "關於"
+
+#: lib/Padre/Plugin/Perl6.pm:174
+msgid "Cannot find STD.pm lex cache"
+msgstr "找不到 STD.pm Lex 快取"
+
+#: lib/Padre/Plugin/Perl6/Preferences.pm:28
+msgid "Perl6 preferences"
+msgstr "Perl6 偏好"
+
+#: lib/Padre/Plugin/Perl6/Preferences.pm:121
+msgid "Syntax Highlighter:"
+msgstr "文法醒目器:"
+
+#: lib/Padre/Plugin/Perl6/Preferences.pm:152
+msgid "Pick mildew Directory"
+msgstr "選擇 mildew 目錄"
+
+#: lib/Padre/Plugin/Perl6/Preferences.pm:179
+msgid "Pick rakudo Directory"
+msgstr "選擇 rakudo 目錄"
+
+#: lib/Padre/Document/Perl6.pm:334
+#, perl-format
+msgid "%s is Perl 6 %s "
+msgstr "%s 是 Perl6 %s "
+

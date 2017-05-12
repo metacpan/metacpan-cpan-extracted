@@ -1,0 +1,15 @@
+Changes
+lib/PDL/DSP/mkwindows.not_a_perl_suffix
+lib/PDL/DSP/Windows.pm
+Makefile.PL
+LICENSE
+MANIFEST			This list of files
+META.yml
+README.pod
+README
+TODO
+examples/testplot.pl
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/1-windows.t

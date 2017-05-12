@@ -1,0 +1,86 @@
+2011-09-16
+
+   * Removed test files.
+
+2009-07-31 13:42  cvs
+
+	* INSTALL, INSTALL.dev.pod, dev.notes, lib/PDF/OCR2/INSTALL.pod:
+	  Added helpful instructions for installing from scratch.  These
+	  ocr like modules have a lot of depencencies, I believe the
+	  INSTALL file will help a lot.
+
+2009-07-29 14:50  cvs
+
+	* INSTALL, lib/PDF/OCR2/INSTALL.pod: Added useful installation
+	  document.  I've corresponded a lot about how to install this, and
+	  this answers most of any problems people have.
+
+2009-06-22 14:12  cvs
+
+	* bin/pdfcheck, lib/PDF/OCR2.pod, lib/PDF/OCR2/Base.pm,
+	  t/93_badxref.t, t/99_cleanup.t: A major change here.	This is to
+	  help with pdf files that have bad xref tables.  PDF::OCR2 can
+	  check a pdf with an eval to PDF::API2.  We now check a pdf *by
+	  default*.  Before, the option was there, but the default was to
+	  be off.
+
+	  There is also a flag to attempt to repair the pdf to a temporary
+	  file.  By default it is off.
+
+2009-06-22 10:24  cvs
+
+	* bin/pdfcheck: fixed abs path resolution in pdfcheck
+
+2009-05-19 15:50  cvs
+
+	* lib/PDF/OCR2.pm, lib/PDF/OCR2/Page.pm, t/89_PDF-OCR2.t: made so
+	  if PDF::OCR2::CHECK_PDF flag is on, we try to open with PDF::API2
+	  or return undef
+
+2009-05-19 12:02  cvs
+
+	* bin/: pdfcheck, pdfocrtest: moved pdfocrtest to pdfcheck instead.
+	  This program is useful to check what is wrong in a pdf in
+	  general. I made it so testing for PDF::Burst and PDF::OCR2 is
+	  optional, with the -b flag.  Also , the target file is copied to
+	  a temp directory, that we we dont have residue in the target doc
+	  dir.
+
+2009-04-20 22:42  cvs
+
+	* bin/pdfocrtest, lib/PDF/OCR2.pm,
+	  t/problemdocs/nguyen_doc_396.pdf: added bin/pdfocrtest to help in
+	  updating the module, if you think a file should pass ocr but does
+	  not, use this util to contact the author with the output
+
+2009-04-20 10:46  cvs
+
+	* lib/PDF/OCR2.pm: added documentation, if PDF::API2 fails on  a
+	  pdf saying it is corrupt, how to tell the code to use CAM::PDF
+	  instead
+
+2009-04-20 10:42  cvs
+
+	* t/: 91_long_nguyen_problemfile.t,
+	  problemdocs/long_nguyen_problemfile.pdf: added problem file by
+	  long nguyen
+
+2009-01-06 11:08  cvs
+
+	* lib/PDF/OCR2.pm: made so if you cant instance page object,
+	  properly tells so
+
+2008-09-24 15:21  cvs
+
+	* MANIFEST, Makefile.PL, t/88_PDF-OCR2-Page.t, t/89_PDF-OCR2.t,
+	  t/99_cleanup.t, t/leodocs/SFX6D.pdf,
+	  t/leodocs/blackhawk-receipt.pdf, t/leodocs/file1.pdf,
+	  t/leodocs/frakemmet.pdf, t/leodocs/hdreceipt.pdf,
+	  t/leodocs/led.pdf, t/leodocs/magscans.pdf,
+	  t/leodocs/paycheck.pdf, t/leodocs/tuition.pdf, lib/PDF/OCR2.pm,
+	  lib/PDF/OCR2/Page.pm, t/leodocs/dev.dyer/file1.pdf,
+	  t/leodocs/dev.dyer/file1ap.pdf, t/leodocs/dev.dyer/file2.pdf,
+	  t/leodocs/dev.dyer/file2ap.pdf, t/leodocs/dev.dyer/file3.pdf,
+	  t/leodocs/dev.dyer/file4.pdf, t/leodocs/dev.dyer/file5ap.pdf:
+	  Initial revision
+

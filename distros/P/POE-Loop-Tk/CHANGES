@@ -1,0 +1,40 @@
+================================
+2013-08-21 21:38:31 -0400 v1_305
+================================
+
+  commit bee132638d02a74c2307603caad7e99652f70dc5
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Wed Aug 21 21:38:31 2013 -0400
+  
+    Bump version for release.
+
+  commit d04814c23d282343673cb8ec514490306f3ad38b
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Wed Aug 21 19:31:42 2013 -0400
+  
+    Freshen up Makefile.PL and the documentation.
+
+  commit 658b10e8c9a9d62155bae9eed75eb7504f788e20
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sun Aug 11 22:09:01 2013 -0400
+  
+    Remove vestigial runtime statistics call.
+
+    Instrumenting that could would have failed. The method it's calling
+    no longer exists.
+
+  commit 1c62375b1407988d6c59020847c8669446c3a31c
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Sep 7 22:08:29 2010 -0400
+  
+    Promote subproject files to top level.
+
+  commit c340f2cbcec378e6e87b61c079755e2abe34d4c4
+  Author: Larwan Berke <larwan@0ne.us>
+  Date:   Wed Apr 7 16:03:43 2010 -0400
+  
+    Typo fix in POD, reported by jawnsy@irc 
+
+==============
+End of Excerpt
+==============

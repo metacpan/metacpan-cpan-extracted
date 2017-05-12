@@ -1,0 +1,316 @@
+---
+abstract: 'Parser for paths'
+author:
+  - 'Brendan Byrd <bbyrd@cpan.org>'
+build_requires:
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::CheckDeps: 0.006
+  Test::More: 0.94
+  Test::Most: 0.01
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.130880'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-Path
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+provides:
+  Parse::Path:
+    file: lib/Parse/Path.pm
+    version: 0.92
+  Parse::Path::DZIL:
+    file: lib/Parse/Path/DZIL.pm
+    version: 0.92
+  Parse::Path::File::Unix:
+    file: lib/Parse/Path/File/Unix.pm
+    version: 0.92
+  Parse::Path::File::Win32:
+    file: lib/Parse/Path/File/Win32.pm
+    version: 0.92
+  Parse::Path::PerlClass:
+    file: lib/Parse/Path/PerlClass.pm
+    version: 0.92
+  Parse::Path::PerlClassUTF8:
+    file: lib/Parse/Path/PerlClassUTF8.pm
+    version: 0.92
+  Parse::Path::Role::Path:
+    file: lib/Parse/Path/Role/Path.pm
+    version: 0.92
+requires:
+  List::AllUtils: 0.01
+  Module::Runtime: 0.006
+  Moo: 0.009001
+  String::Escape: 2010.002
+  Sub::Name: 0.03
+  Types::Standard: 0.001
+  namespace::clean: 0.06
+  perl: v5.10.1
+  sanity: 0.91
+resources:
+  X_irc: irc://irc.perl.org/#web-simple
+  bugtracker: https://github.com/SineSwiper/Parse-Path/issues
+  homepage: https://github.com/SineSwiper/Parse-Path/wiki
+  repository: git://github.com/SineSwiper/Parse-Path.git
+version: 0.92
+x_Dist_Zilla:
+  perl:
+    version: 5.014002
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::ReportPhase
+      name: '@Author::BBYRD/ReportPhase'
+      version: 0.03
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Author::BBYRD/MakeMaker'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@Author::BBYRD/Git::NextVersion'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::GatherDir
+      name: '@Author::BBYRD/Git::GatherDir'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: '@Author::BBYRD/OurPkgVersion'
+      version: 0.005000
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@Author::BBYRD/PodWeaver'
+      version: 3.101642
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Author::BBYRD/PruneCruft'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::GitFmtChanges
+      name: '@Author::BBYRD/GitFmtChanges'
+      version: 0.005
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Author::BBYRD/ManifestSkip'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Author::BBYRD/Manifest'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Author::BBYRD/License'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@Author::BBYRD/ReadmePodInRoot'
+      version: 0.131500
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@Author::BBYRD/ReadmeTextInBuild'
+      version: 0.131500
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@Author::BBYRD/ReadmeHTMLInBuild'
+      version: 0.131500
+    -
+      class: Dist::Zilla::Plugin::InstallGuide
+      name: '@Author::BBYRD/InstallGuide'
+      version: 1.200000
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Author::BBYRD/ExecDir'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::BBYRD/PodSyntaxTests'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      name: '@Author::BBYRD/RunExtraTests'
+      version: 0.011
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      name: '@Author::BBYRD/NoTabsTests'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      name: '@Author::BBYRD/Test::EOL'
+      version: 0.08
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
+      name: '@Author::BBYRD/Test::CPAN::Meta::JSON'
+      version: 0.003
+    -
+      class: Dist::Zilla::Plugin::Test::CheckDeps
+      name: '@Author::BBYRD/Test::CheckDeps'
+      version: 0.007
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      name: '@Author::BBYRD/Test::Portability'
+      version: 2.000005
+    -
+      class: Dist::Zilla::Plugin::Test::Synopsis
+      name: '@Author::BBYRD/Test::Synopsis'
+      version: 2.000004
+    -
+      class: Dist::Zilla::Plugin::Test::ReportPrereqs
+      name: '@Author::BBYRD/Test::ReportPrereqs'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::Test::CheckManifest
+      name: '@Author::BBYRD/Test::CheckManifest'
+      version: 0.04
+    -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: '@Author::BBYRD/Test::DistManifest'
+      version: 2.000004
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@Author::BBYRD/Test::Version'
+      version: 0.002004
+    -
+      class: Dist::Zilla::Plugin::CheckPrereqsIndexed
+      name: '@Author::BBYRD/CheckPrereqsIndexed'
+      version: 0.009
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Author::BBYRD/MetaConfig'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Author::BBYRD/MetaJSON'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Author::BBYRD/MetaYAML'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: '@Author::BBYRD/MetaNoIndex'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      name: '@Author::BBYRD/MetaProvides::Package'
+      version: 1.14000003
+    -
+      class: Dist::Zilla::Plugin::MetaResourcesFromGit
+      name: '@Author::BBYRD/MetaResourcesFromGit'
+      version: 1.103620
+    -
+      class: Dist::Zilla::Plugin::ContributorsFromGit
+      name: '@Author::BBYRD/ContributorsFromGit'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromBuild
+      name: '@Author::BBYRD/CopyFilesFromBuild'
+      version: 0.103510
+    -
+      class: Dist::Zilla::Plugin::TravisYML
+      name: '@Author::BBYRD/TravisYML'
+      version: 1.04
+    -
+      class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
+      name: '@Author::BBYRD/Git::CheckFor::CorrectBranch'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::Git::CommitBuild
+      name: '@Author::BBYRD/Git::CommitBuild'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@Author::BBYRD/@Git/Check'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Author::BBYRD/@Git/Commit'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Author::BBYRD/@Git/Tag'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@Author::BBYRD/@Git/Push'
+      version: 2.014
+    -
+      class: Dist::Zilla::Plugin::GitHub::Update
+      name: '@Author::BBYRD/GitHub::Update'
+      version: 0.35
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Author::BBYRD/TestRelease'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::BBYRD/ConfirmRelease'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Author::BBYRD/UploadToCPAN'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::InstallRelease
+      name: '@Author::BBYRD/InstallRelease'
+      version: 0.008
+    -
+      class: Dist::Zilla::Plugin::Clean
+      name: '@Author::BBYRD/Clean'
+      version: 0.07
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::MinimumPrereqs
+      name: MinimumPrereqs
+      version: 0.92
+    -
+      class: Dist::Zilla::Plugin::PrereqsClean
+      name: PrereqsClean
+      version: 0.92
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: Test::Compile
+      version: 2.029
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300038
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300038
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300038

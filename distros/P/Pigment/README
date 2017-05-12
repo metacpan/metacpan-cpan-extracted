@@ -1,0 +1,71 @@
+NAME
+    Pigment - User interfaces with embedded multimedia
+
+SYNOPSIS
+    See the "examples/" directory.
+
+DESCRIPTION
+    Pigment allows building of user interfaces with embedded multimedia
+    components. It is designed with portability in mind and its plugin
+    system will select a particular underlying graphical API on each
+    platform. This module binds the pigment library to perl.
+
+INITIALISATION
+  Pigment->init
+    Initializes Pigment. Automatically parses @ARGV, stripping any options
+    known Pigment. This is called implicitly by "use Pigment;" unless the
+    "-no_init" option is specified.
+
+  boolean = Pigment->init_check
+    Checks if initialization is possible. Returns a true value if so.
+
+  Pigment->deinit
+    Deinitializs Pigment.
+
+MAINLOOP
+  Pigment->main
+    Runs the mainloop. Will not return until terminated with "main_quit".
+
+  Pigment->main_quit
+    Quits running the mainloop.
+
+  boolean = Pigment->events_pending
+    Checks if there are events that weren't processed by the mainloop yet.
+    Blocks until at least one event was processed.
+
+  Pigment->main_iteration
+    Run one iteration of the mainloop, then return.
+
+  Pigment->main_iteration_do ($blocking)
+    *   $blocking (boolean)
+
+    Run one iteration of the mainloop, then return. Same as
+    "main_iteration", but allows passing a false value as the only argument
+    to prevent blocking if there are no events to be processed.
+
+VERSION CHECKING
+  (major, minor, micro, nano) = Pigment->version
+    Returns the version information of the Pigment library this module was
+    compiled against.
+
+  string = Pigment->version_string
+    Returns a textual description of the pigment library version.
+
+SEE ALSO
+    Pigment::index
+        List of automatically generated documentation.
+
+    <https://code.fluendo.com/pigment/trac>
+        Pigment library's website.
+
+LICENSE
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+
+AUTHOR
+    Florian Ragwitz <rafl@debian.org>
+
+COPYRIGHT
+    Copyright (c) 2009 Florian Ragwitz
+

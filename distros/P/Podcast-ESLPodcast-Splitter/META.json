@@ -1,0 +1,42 @@
+{
+   "abstract" : "Split ESLPodcast into fast, slow and explanation dialogs.",
+   "author" : [
+      "Yohei Yamaguchi <joker13meister@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Podcast-ESLPodcast-Splitter",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : 0,
+            "version" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Podcast::ESLPodcast::Splitter" : {
+         "file" : "lib/Podcast/ESLPodcast/Splitter.pm",
+         "version" : "v0.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "v0.0.1"
+}

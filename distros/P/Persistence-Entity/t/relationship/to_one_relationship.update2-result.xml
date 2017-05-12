@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset load_strategy="INSERT_LOAD_STRATEGY">
+
+    <seq_generator />
+    
+    
+    <dept deptno="1" dname="dept1" loc="loc1" />
+    <dept deptno="2" dname="dept2" loc="loc2" />
+    <dept deptno="3" dname="dept3" loc="loc3" />
+    <dept deptno="4" dname="dept4" loc="loc4" />
+    <dept deptno="5" dname="dept5" loc="Warsaw" />
+    <dept deptno="50" dname="dept50" loc="loc50" />
+    
+    <emp empno="1" ename="emp1" deptno="3" />
+    <emp empno="2" ename="emp2" deptno="" job="Manager" />
+    <emp empno="3" ename="emp3" deptno="4" />
+    <emp empno="4" ename="emp4" deptno="3" />
+    
+    <emp empno="21" ename="emp21" deptno="50" />
+    
+</dataset>

@@ -1,0 +1,16 @@
+Changes
+examples/circles.pl
+examples/functions.pl
+examples/graph_with_function.pl
+examples/histogram.pl
+examples/select.yaml
+examples/simple_plot.pl
+examples/variable_vs_time.pl
+lib/PGPLOT/Simple.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01use.t
+t/02pod.t
+t/03podcoverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

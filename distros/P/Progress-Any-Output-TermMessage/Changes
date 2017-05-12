@@ -1,0 +1,12 @@
+Revision history for Progress-Any-Output-TermMessage
+
+0.02    2013-09-03 (SHARYANTO)
+
+        - Add option: single_line_task.
+
+        - Update to Progress::Any 0.10.
+
+
+0.01    2013-05-17 (SHARYANTO)
+
+        First release.

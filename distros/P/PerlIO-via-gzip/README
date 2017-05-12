@@ -1,0 +1,13 @@
+PerlIO::via::gzip - PerlIO layer for gzip (de)compression
+
+PerlIO::via::gzip uses the Compress::Zlib module to read and write
+gzip files. The zlib library is required.
+
+Thanks for downloading!
+
+To install, simply:
+
+perl Build.PL
+./Build
+./Build test
+./Build install

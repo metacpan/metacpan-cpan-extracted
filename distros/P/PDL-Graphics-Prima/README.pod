@@ -1,0 +1,101 @@
+=head1 PDL::Graphics::Prima
+
+A PDL plotting library using the Prima toolkit.
+
+This collection of modules provides a PDL-centric 2D plotting library that
+is fast, intelligent, multi-platform and highly interactive. Fast because
+it's built on the L<PDL::Drawing::Prima> bindings, which make use of the
+L<PDL> threading engine to quickly execute large sets of drawing operations.
+Intelligent because I have put a lot of thought into important behavior like
+autoscaling and smart tick marking and they Do The Right Thing almost every
+time, without the need for manual manipulation. Multi-platform and highly
+interactive because it is built upon Prima, the Perl-centric multi-platform
+set of drawing functions and GUI toolkit, and because interactive behavior
+like panning and zooming are built right into the widget.
+
+For more information, see the documentation for L<PDL::Graphics::Prima>. If
+you're new, you should check out the documentation for
+L<PDL::Graphics::Prima::Simple>.
+
+=head1 INSTALLATION
+
+There are a number of ways to install this distribution. The simplest is to
+install it using CPAN:
+
+  cpan PDL::Graphics::Prima
+
+or using cpanm:
+
+  cpanm PDL::Graphics::Prima
+
+If you have your hands on the actual source code (from the git repository
+listed below, or by C<look>ing at this distribution from the CPAN shell), you
+would do the following:
+
+  # Unix-like systems       Windows systems
+  perl Build.PL             perl Build.PL
+  ./Build                   Build
+  ./Build test              Build test
+  ./Build install           Build install
+
+Users of Unix-like systems may need to invoke superuser privileges for the
+installation phase if you install the distribution to your system Perl. Most
+Perl folks these days avoid tinkering with their system Perl by using
+L<local::lib> or L<App::perlbrew>.
+
+Note that there are almost no tests for this distribution at the moment.
+Frankly, I'm not sure exactly how to go about testing this sort of
+distribution. One thought of mine is to write an interactive series of tests
+that asks the user to verify that the generated plots "look right," but I
+have not yet implemented any such tests. Patches welcome! However, there are
+a number of examples (and as such, test scripts) in the F<examples> directory
+in the source distribution if you want to take the library for a spin.
+
+=head1 DEPENDENCIES
+
+This distribution depends on L<PDL::Drawing::Prima>, which has an important and
+nontrivial list of dependencies. However, if you have that distribution
+installed, this one should work.
+
+L<PDL::Graphics::Prima> requires Perl 5.8. If you don't have that version of
+Perl, I recommend installing Strawberry Perl if you're on Windows, or using
+perlbrew if you're on Linux or Mac.
+
+=head1 DEVELOPMENT STATUS AND REPOSITORY
+
+This project is being actively developed at Github. Find the latest at
+L<https://github.com/run4flat/PDL-Graphics-Prima>.
+
+This project is currently in alpha. I say this not because the software is
+unstable to execute but because the API is likely to undergo some
+substantial revisions under this name. The interface will have settled when
+the distribution hits v 1.00, at which point any API changes will coincide
+with an increment in the major version number.
+
+In other words, please play around with this library and use it if you like.
+However, if you use it in production code, be sure to pay close attention to
+the PDL mailing list for updates regarding incompatible changes to the
+library. If you find yourself using the library quite a bit, you should
+follow it on Github and contribute your thoughts as it progresses.
+
+=head1 COPYRIGHT AND LICENCE
+
+Unless otherwise stated, all contributions in code and documentation are
+copyright (c) their respective authors, all rights reserved.
+
+Portions of this distribution's code are copyright (c) 2011 The Board of
+Trustees at the University of Illinois.
+
+Portions of this distribution's code are copyright (c) 2011-2013 Northwestern
+University.
+
+Portions of this distribution's code are copyright (c) 2013-2014 Dickinson
+College.
+
+This distribution's documentation are copyright (c) 2011-2014 David Mertens.
+
+This distribution is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Primary Author: David Mertens <dcmertens.perl@gmail.com>
+

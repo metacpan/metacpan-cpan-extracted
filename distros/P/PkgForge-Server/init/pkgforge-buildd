@@ -1,0 +1,163 @@
+#!/usr/bin/pagsh
+#
+# pkgforge-buildd  This shell script takes care of starting and stopping
+#                    the Package Forge build daemons
+#
+# chkconfig: 2345 10 99
+# description: Package Forge is a software build farm, this is the build daemon part of the suite
+
+### BEGIN INIT INFO
+# Provides: $pkgforge_buildd
+# Required-Start: $local_fs $network
+# Required-Stop: $local_fs $network
+# Default-Start:
+# Default-Stop: 0 1 2 3 4 5 6
+# Short-Description: start|stop|status|restart PkgForge Build Daemon
+# Description: control PkgForge Build Daemon
+### END INIT INFO
+
+[ -f /etc/init.d/functions ] && . /etc/init.d/functions
+[ -f /etc/sysconfig/pkgforge-buildd ] && . /etc/sysconfig/pkgforge-buildd
+
+RETVAL=0
+
+KRB5_KEYTAB=${KRB5_KEYTAB:-/etc/pkgforge/pkgforge_builder.keytab}
+KRB5_CCACHE=${KRB5_CCACHE:-/var/lib/pkgforge/krb5cache-buildd}
+PIDFILE=${PIDFILE:-/var/run/pkgforge/k5start-buildd.pid}
+SCRIPT=${SCRIPT:-/usr/sbin/pkgforge-buildd}
+RUNAS=${RUNAS:-pkgforge}
+
+if [ "$NAMES" = '' ]; then
+    echo "You must specify the names of the build daemon(s)"
+    exit 1
+fi
+
+start() {
+
+    echo -n $"Starting k5start for PkgForge build daemons"
+
+    export KRB5CCNAME=$KRB5_CCACHE
+
+    /sbin/runuser $RUNAS -c "/usr/bin/k5start\
+                         -f $KRB5_KEYTAB\
+                         -U -K10 -t\
+                         -k $KRB5_CCACHE\
+                         -b -p $PIDFILE"
+
+    RETVAL=$?
+    if [ "$RETVAL" -eq 0 ]; then
+        echo_success
+    else
+        echo_failure
+    fi
+
+    echo
+
+    if [ "$RETVAL" -ne 0 ]; then
+        return
+    fi
+
+    sleep 3
+
+    any_ok=0
+    for name in $NAMES; do
+        echo -n $"Starting PkgForge Build Daemon $name: "
+
+        CONFFILE="/etc/pkgforge/buildd-$name.yml"
+
+        /sbin/runuser $RUNAS -c "$SCRIPT start --configfile +$CONFFILE"
+        result=$?
+
+        if [ "$result" -eq 0 ] ; then
+            echo_success
+            any_ok=1
+        else
+            echo_failure
+            RETVAL=1
+        fi
+
+        echo
+
+    done
+
+    # If they all failed then kill the k5start daemon
+
+    if [ "$any_ok" -eq 0 ]; then
+        killproc -p $PIDFILE
+    fi
+
+}
+
+stop() {
+
+    for name in $NAMES; do
+        echo -n $"Stopping PkgForge Build Daemon $name: "
+
+        CONFFILE="/etc/pkgforge/buildd-$name.yml"
+
+        $SCRIPT stop --configfile +$CONFFILE
+
+        if [ "$?" -eq 0 ] ; then
+            echo_success
+        else
+            echo_failure
+            RETVAL=1
+        fi
+
+        echo
+    done
+
+    # Stop the k5start daemon
+
+    echo -n $"Stopping the PkgForge k5start daemon"
+
+    killproc -p $PIDFILE
+
+    echo
+
+}
+
+restart() {
+    stop
+    start
+}
+
+status() {
+
+    for name in $NAMES; do
+
+        CONFFILE="/etc/pkgforge/buildd-$name.yml"
+
+        $SCRIPT status --configfile +$CONFFILE
+
+        if [ "$?" -ne 0 ]; then
+            RETVAL=1
+        fi
+
+    done
+
+}
+
+
+# See how we were called.
+case "$1" in
+        start)
+                start
+                ;;
+        stop)
+                stop
+                ;;
+        status)
+                status;
+                ;;
+        restart)
+                restart
+                ;;
+        *)
+                echo $"Usage: $0 {start|stop|status|restart}"
+                [ "x$1" = "x" ] && exit 0
+                exit 2
+esac
+
+exit $RETVAL
+

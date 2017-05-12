@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<papp-public-license>
+<preamble>
+
+PApp is not in the public domain. To legally use it, you must own a
+license. The exact conditions under which you might use PApp are given
+below in the PApp Public License. In less legally encumbered language: You
+might use PApp free-of-charge unless you use it for profit, in which case
+you need to buy a copy from us. Private and University use, for example,
+is free but might require registration with us.
+
+You can, of course, evaluate this software before you buy or register it.
+
+We alternatively offer a version of PApp under the General Public
+License. Please contact papp@nethype.de for more info on pricing (to cover
+our development costs we expect around €100000 for the GPL version).
+
+</preamble>
+<hr>----------------------------------------------------------------------</hr>
+<license alt="legally binding part of the license">
+
+
+	     PApp Public License - 2005-09-04 nethype GmbH
+
+
+Definitions. The following terms will be used in this document as defined
+here:
+
+	- The term NETHYPE is used for the nethype GmbH, 74078 Heilbronn,
+	  Franz-Werfel-Str. 11, Germany
+
+	- The term SOFTWARE is used for the PApp distribution as provided
+	  with this license document.
+
+	- The term APPLICATION is used for code which requires the SOFTWARE
+	  to run and/or was developed using the SOFTWARE.
+
+Preamble. NETHYPE reserves all rights to the SOFTWARE except for those
+rights explicitly granted in this license. The SOFTWARE is protected by
+international intellectual property treaties. All intellectual rights to
+the SOFTWARE and related documentation are held by NETHYPE. This license
+does in no way transfer any ownership of the code to the licensee. It
+grants a non-exclusive license for limited use of the SOFTWARE only.
+
+Licensing. This license grants you the following rights:
+
+	- Installation and use. This license grants you the right to
+	  install and run this SOFTWARE on exactly one computer. 
+	  
+	- Access. This license grants you the right to offer commercial or
+	  other services based on the SOFTWARE installation mentioned above.
+
+	- This license allows you to modify the SOFTWARE itself, provided
+	  that you send a copy of the modified version of the SOFTWARE
+	  to NETHYPE and agree to license any modifications you made to
+	  NETHYPE without compensation and free of any limitations.
+
+	- This license grants you the right to use and create APPLICATIONs
+	  with the SOFTWARE.
+
+	- This license doesn't grant you any trademark rights or services
+	  by NETHYPE.
+
+Documentation.
+
+        - Documentation is provided in electronic form. The creation of
+          hardcopies of the electronic documentation included with the
+          SOFTWARE is allowed as long as it is not changed.
+
+Copying.
+
+        - This SOFTWARE may be copied (but not modified) freely by any
+          person or organization, as long as the fee is no larger than the
+          expenses for physical copying. This includes redistributability
+          on software compilations such as CPAN, its mirrors, wether on
+          the internet or other media such as CD-ROMs.
+
+Sale of rights.
+
+	- You are allowed to transfer all your rights to this software
+	  permanently. Time limited transfer of rights is not allowed.
+
+	- You are not allowed to lease, rent or lend out the SOFTWARE.
+
+Termination of the license.
+
+	- Should you break any of the terms of this license, the license
+	  agreement ends immediately.
+
+	- Should the license be terminated for any reason then the
+	  licensee has to delete the SOFTWARE and destroy all related
+	  documentation and backup copies.
+
+        - Should any part of this license be invalid in the licensee's
+          home country, it has no effect on the validity of the remaining
+          license.
+
+Support.
+
+	- This license does not include any rights to updates or
+	  support. If you desire either, please contact NETHYPE.
+
+Licensees.
+
+	- Not-for-profit organizations are granted the right to use the
+	  SOFTWARE free of charge provided they register its use with
+	  NETHYPE and do not use the SOFTWARE for for-profit projects.
+
+	- Universities, if not covered by above point, may also use
+	  the SOFTWARE free of charge, as long as it is not used for
+	  for-profit projects.
+
+	- Use of the SOFTWARE by private persons for not-for-profit
+	  purposes is also free of charge.
+
+	- All other parties need an invoice from NETHYPE about the
+	  purchase of the right to use the SOFTWARE for this license to be
+	  valid.
+
+Limited Warranty.
+
+        - NETHYPE guaranties for 90 days that the SOFTWARE works within
+          reasonable limits as advised in the documentation supplied with
+          the SOFTWARE. This warranty extends only to commercial customers
+          of NETHYPE.
+
+        - Use of the SOFTWARE by parties who are not commercial customers
+          of NETHYPE, is at their own risk. No warranty of any kind is
+          provided to them. Damages resulting from them using the SOFTWARE
+          do not result in any claims towards NETHYPE.
+
+        - NETHYPE's entire liability and your exclusive remedy shall be,
+          at NETHYPE's option, either return of the price paid for the
+          SOFTWARE or replacement of the SOFTWARE. This limited warranty
+          is void if failure of the SOFTWARE can be attributed to abuse,
+          accident, or misapplication. Exchange of the SOFTWARE won't
+          extend the warranty time.
+
+	- NETHYPE won't provide any other kind of warranty safe for those
+	  required by your national laws.
+
+        - NETHYPE does not assume warranty for damages resulting from the
+          use of the SOFTWARE, if the law of your country does not require
+          that. In any case NETHYPE doesn't assume any costs exceeding the
+          actual costs of the damages.
+
+Place of Court.
+
+	- Any legal action concerning the SOFTWARE and NETHYPE have to be
+	  resolved in court in the state of Baden-Württemberg, Germany. If
+	  legally possible the place of court has to be Heilbronn,
+	  Germany.
+
+</license>
+<hr>----------------------------------------------------------------------</hr>
+<postamble>
+Thanks for threading through all this ;)
+</postamble>
+
+</papp-public-license>

@@ -1,0 +1,27 @@
+Pry
+===
+
+Created:      2014-08-30
+Home page:    <https://metacpan.org/release/Pry>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Pry>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003001	2014-10-05
+
+ [ Documentation ]
+ - Promote the 'Package Variable' heading to =head2.
+
+0.003000	2014-10-05
+
+ - Include `our` variables as well as `my`.
+ - Provide Pry::Dump() and $Pry::Dumper.
+ - pry() now accepts a list of variable names as parameters.
+
+0.002000	2014-08-30	First release
+
+0.001_001	2014-08-30
+
+ - Improved chatting.
+ - Prevent Pry from being re-invoked from within the REPL.
+
+0.001_000	2014-08-30	Preview release

@@ -1,0 +1,79 @@
+{
+    "name" : "Parse-CPAN-Distributions",
+    "version" : "0.14",
+    "abstract" : "Provides an index for current CPAN distributions",
+    "author" : [
+        "Barbie <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "The Hand of Barbie 1.0",
+    "keywords" : [
+        "cpan",
+        "index",
+        "releases"
+    ],
+
+    "no_index" : {
+        "directory" : [
+            "t",
+            "examples"
+        ]
+    },
+
+    "prereqs" : {
+        "build" : {
+            "requires" : {
+                "ExtUtils::MakeMaker" : "0"
+            }
+        },
+        "test" : {
+            "requires" : {
+                "Test::More" : "0.70"
+            },
+            "recommends" : {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        },
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "CPAN::DistnameInfo" : "0",
+                "File::Basename" : "0",
+                "File::Path" : "0",
+                "File::Slurp" : "0",
+                "File::Temp" : "0",
+                "IO::File" : "0",
+                "IO::Zlib" : "0",
+                "LWP::UserAgent" : "0",
+                "version" : "0"
+            }
+        }
+    },
+
+    "provides" : {
+        "Parse::CPAN::Distributions" : {
+            "file" : "lib/Parse/CPAN/Distributions.pm",
+            "version" : "0.14"
+        }
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Parse-CPAN-Distributions" },
+        "repository": {
+            "url": "git://github.com/barbie/Parse-CPAN-Distributions.git",
+            "web": "http://github.com/barbie/parse-cpan-distributions",
+            "type": "git"
+        }
+    }
+}

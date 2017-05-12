@@ -1,0 +1,29 @@
+Perl-Critic-Compatibility version 1.001.
+
+This distribution provides several Perl::Critic policies related to
+compatibility with older versions of Perl.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+NON-STANDARD BUILD TARGETS
+
+    ./Build authortest
+
+Runs extra tests that might not pass anywhere other than the author's computer.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c)2008, Elliot Shank.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

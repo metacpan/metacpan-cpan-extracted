@@ -1,0 +1,11 @@
+Revision history for Plack-App-Hash
+
+1.000 Mon 05 Jan 2015
+	- Now has actual docs
+	- Now has actual tests
+
+0.002 Thu 22 Jan 2013
+	- New auto_type option
+
+0.001 Thu 13 Sep 2012
+	- Initial release

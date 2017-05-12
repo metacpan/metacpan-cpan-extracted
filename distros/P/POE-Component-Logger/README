@@ -1,0 +1,7 @@
+POE::Component::Logger
+======================
+
+A highly flexible logger component for POE that uses
+Log::Dispatch and Log::Dispatch::Config for ultimate
+flexibility and power.
+

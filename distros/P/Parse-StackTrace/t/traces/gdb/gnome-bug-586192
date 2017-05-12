@@ -1,0 +1,16 @@
+[Switching to Thread 0x7fde5f3f1950 (LWP 1029)]
+0x00007fde625a0fb5 in raise () from /lib/libc.so.6
+(gdb) bt
+#0  0x00007fde625a0fb5 in raise () from /lib/libc.so.6
+#1  0x00007fde625a2bc3 in abort () from /lib/libc.so.6
+#2  0x00007fde625e0228 in ?? () from /lib/libc.so.6
+#3  0x00007fde625e5cb8 in ?? () from /lib/libc.so.6
+#4  0x00007fde625e8276 in free () from /lib/libc.so.6
+#5  0x0000000000444978 in load_encrypted_key (data=0x8b7e00 "... yeah, like I'm
+going to post that ..." ... )
+#6  0x0000000000444ad4 in parsed_pem_block
+#7  0x000000000047402d in egg_openssl_pem_parse (
+#8  0x0000000000444f9d in gck_ssh_openssh_parse_private_key (
+#9  0x0000000000443211 in unlock_private_key
+#10 0x00000000004434d5 in realize_and_take_data
+#11 0x0000000000443ce9 in gck_ssh_private_key_parse

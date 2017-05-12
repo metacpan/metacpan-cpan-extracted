@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Physics-Lorentz
+version:             0.01
+abstract:            Package for 4-vectors and transformations
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Params::Util:                  0
+    PDL:                           0
+    Test::LectroTest:              0.3500
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Steffen Müller <tsee@>

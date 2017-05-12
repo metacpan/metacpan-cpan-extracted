@@ -1,0 +1,67 @@
+
+
+Parse::Nibbler - Parse huge files using grammars written in pure perl.
+Copyright (C) 2001  Greg London
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+contact the author via http://www.greglondon.com
+
+
+Parse::Nibbler is a  parser that allows you to write grammars in pure perl.
+
+It is a parser designed to parse HUGE files, a little bit at a time.
+Basically, it nibbles at a file while it parses.
+
+Grammars are written in pure perl using subroutines defined
+in the Parse::Nibbler package. 
+
+
+installation instructions are:
+gunzip (tarball).tar.gz
+tar -xf (tarball).tar
+cd Parse
+cd Nibbler
+perl Makefile.PL
+make
+make test
+make install
+
+
+After you've done the install, you can cd into the 
+t/ subdirectory and take a look at the test examples.
+
+The main documentation is POD at the end of the 
+Parse::Nibbler.pm file itself.
+
+Contained in the t/ subdirectory is a grammar for
+parsing gate level verilog netlists, VerilogGrammar.pm.
+The test t/big_verilog.t runs a benchmarking test which
+times how long it takes to parse a large piece of verilog
+gate level code. 6000 lines of verilog in test file. 
+
+On a P3 @ 750 MHZ, it currently parses gate level verilog at about 
+
+*** 1420 *** lines per second.
+
+
+Current state of package: Alpha
+
+Any of the interfaces to the package may change at 
+the next version. I've swapped from object oriented
+to subroutine calls, so nothing is sacred at this point.
+Hope things will settle down at some point though...
+trying to get the speediest approach possible, then
+I'll iron out the details.

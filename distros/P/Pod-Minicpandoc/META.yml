@@ -1,0 +1,32 @@
+---
+abstract: "perldoc that works for modules you don't have installed"
+author:
+  - 'Shawn M Moore C<sartak@gmail.com> (original implementation), Rob Hoelz C<rob@hoelz.ro> (minicpan support)'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Minicpandoc
+no_index:
+  directory:
+    - inc
+requires:
+  Archive::Tar: 0
+  Archive::Zip: 0
+  File::Spec: 0
+  HTTP::Tiny: 0
+  IO::Uncompress::Gunzip: 0
+  JSON::PP: 0
+  perl: 5.8.1
+resources:
+  homepage: git://github.com/hoelzro/pod-minicpandoc
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hoelzro/pod-minicpandoc
+version: 0.15

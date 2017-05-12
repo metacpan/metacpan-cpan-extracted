@@ -1,0 +1,26 @@
+
+timeit (timeit.pl test.pl)
+
+    Basic timing test.  Persistent should be around 10x or better than perl
+    on this test.  If not, there may be a problem.
+
+
+check_syms
+
+    Used by the makefile to check .o files for symbols that shouldn't
+    be exported.  Almost all exported symbols should start with "perperl"
+
+
+build_package (build_rpms build_solpkg build_bsdpkg)
+    
+    Build binary packages.
+
+
+build_index
+
+    Build index.html for the binary packages.
+
+
+perlvars
+
+    Builds definitions used in perperl_perl.c for accessing perl variables.

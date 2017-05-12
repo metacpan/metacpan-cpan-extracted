@@ -1,0 +1,37 @@
+---
+abstract: 'sub { shift; @_ }'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.61'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PerlX-ArraySkip
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  PerlX::ArraySkip:
+    file: lib/PerlX/ArraySkip.pm
+    version: '0.004'
+requires:
+  perl: '5.002'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/PerlX-ArraySkip/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=PerlX-ArraySkip
+  homepage: https://metacpan.org/release/PerlX-ArraySkip
+  license: http://creativecommons.org/publicdomain/zero/1.0/
+  repository: git://github.com/tobyink/p5-perlx-arrayskip.git
+version: '0.004'

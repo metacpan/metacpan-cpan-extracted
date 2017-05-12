@@ -1,0 +1,113 @@
+=encoding iso-8859-1
+
+=head1 NAME/NOM
+
+perlcheat - Anti-sèche Perl 5
+
+=head1 DESCRIPTION
+
+Cette anti-sèche est une carte de référence pensée pour les programmeurs
+débutants en Perl. Tout n'y est pas mais plus de 194 fonctionnalités y sont
+déjà présentées.
+
+=head2 L'anti-sèche
+
+  CONTEXTES SIGILS             TABLEAUX       HACHAGES
+  vide      $scalaire    tout: @tableau       %hachage
+  scalaire  @tableau  tranche: @tableau[0, 2] @hachage{'a', 'b'}
+  liste     %hachage  élément: $tableau[0]    $hachage{'a'}
+            &sub
+            *glob   VALEURS SCALAIRES
+                    nombre, chaîne, référence, glob, undef
+  RÉFÉRENCES
+  \     références         $$foo[1]       equiv. $foo->[1]
+  $@%&* déréférence        $$foo{bar}     equiv. $foo->{bar}
+  []    ref.tableau anon.  ${$$foo[1]}[2] equiv. $foo->[1]->[2]
+  {}    ref.hachage anon.  ${$$foo[1]}[2] equiv. $foo->[1][2]
+  \()   liste de références
+                          NOMBRES ou CHAÎNES             LIENS
+  PRIORITÉ DES OPÉRATEURS =          =         perl.plover.com
+  ->                      +          .         search.cpan.org
+  ++ --                   == !=      eq ne            cpan.org
+  **                      < > <= >=  lt gt le ge        pm.org
+  ! ~ \ u+ u-             <=>        cmp               tpj.com
+  =~ !~                                            perldoc.com
+  * / % x                 SYNTAXE
+  + - .                   for    (LISTE) { }, for (a;b;c) { }
+  << >>                   while  ( ) { },     until ( ) { }
+  uops nommé              if     ( ) { } elsif ( ) { } else { }
+  < > <= >= lt gt le ge   unless ( ) { } elsif ( ) { } else { }
+  == != <=> eq ne cmp     for équivalent à foreach (TOUJOURS)
+  &
+  | ^              META-CARACTÈRES DE REGX     MODIF. DE REGEX
+  &&               ^     début chaîne          /i insens. casse
+  ||               $     fin chaîne (avant \n) /m ^$ multilignes
+  .. ...           +     un ou plus            /s . inclut \n
+  ?:               *     zéro ou plus          /x ignore blancs
+  = += -= *= etc.  ?     zéro ou un            /g global
+  , =>             {3,7} intervalle de répétition
+  ops de liste     ()    capture           CLASSES DE CAR. REGEX
+  not              (?:)  sans capture      .  == [^\n]
+  and              []    classe caractères \s == [\x20\f\t\r\n]
+  or xor           |     choix             \w == [A-Za-z0-9_]
+                   \b    limite de mot     \d == [0-9]
+                   \z    fin de chaîne     complément par \S,
+                                           \W et \D 
+  UTILISEZ
+  use strict;        N'UTILISEZ PAS                        LIENS
+  use warnings;      "$foo"                             perl.com
+  my $var;           $$nom_variable                perlmonks.org
+  open() or die $!;  `$saisie_utilisateur`          use.perl.org
+  use Modules;       /$saisie_utilisateur/       perl.apache.org
+                                                  parrotcode.org
+  FONCTIONS RETOURNANT DES LISTES
+  stat      localtime    caller         VARIABLES SPÉCIALES
+   0 dev    0 seconde    0 package      $_    variable par défaut
+   1 ino    1 minute     1 nomfichier   $0    nom du programme
+   2 mode   2 heure      2 ligne        $/    séparateur d'entrée
+   3 nlink  3 jour       3 subroutine   $\    séparateur de sortie
+   4 uid    4 mois-1     4 avec args    $|    autoflush
+   5 gid    5 annee-1900 5 wantarray    $!    erreur appel sys/lib
+   6 rdev   6 j/semaine  6 eval texte   $@    erreur eval
+   7 size   7 j/anne     7 is_require   $$    ID du processus
+   8 atime  8 heure été  8 hints        $.    numero ligne
+   9 mtime               9 bitmask      @ARGV args ligne commande
+  10 ctime  just use                    @INC  chemin inclusion
+  11 blksz  POSIX::      3..9 only      @_    args subroutine
+  12 blcks  strftime!    with EXPR      %ENV  environnement
+
+=head1 REMERCIEMENTS
+
+La première version de document est paru sur Perl Monks. Plusieurs personnes y
+ont fait de bonnes suggestions. Merci aux "Perl Monks".
+
+Un remerciement spécial à Damian Conway qui, en plus de proposer des
+changements importants, a pris le temps de compter le nombre de
+fonctionnalités présentées et d'en faire une version Perl 6 pour montrer que
+Perl restera Perl.
+
+=head1 AUTEUR
+
+Juerd Waalboer <juerd@cpan.org>, avec l'aide de nombreux "Perl Monks".
+
+=head1 VOIR AUSSI
+
+ http://perlmonks.org/?node_id=216602      le document PM original
+ http://perlmonks.org/?node_id=238031      la version Perl 6 de Damian Conway
+ http://juerd.nl/site.plp/perlcheat        le site de l'anti-sèche
+
+=head1 TRADUCTION
+
+=head2 Version
+
+Cette traduction française correspond à la version anglaise distribuée avec
+perl 5.8.8.  Pour en savoir plus concernant ces traductions, consultez
+L<http://perl.enstimac.fr/>.
+
+=head2 Traducteur
+
+... parfois approximative par Paul Gaborit (Paul.Gaborit at enstimac.fr).
+
+=head2 Relecture
+
+Personne pour l'instant.

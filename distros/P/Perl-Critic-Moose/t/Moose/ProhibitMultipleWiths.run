@@ -1,0 +1,127 @@
+## name Moose with one role
+## failures 0
+## cut
+
+use Moose;
+
+with 'Foo';
+
+## name Moose with two roles
+## failures 0
+## cut
+
+use Moose;
+
+with 'Foo', 'Bar';
+
+## name Moose with two parameterized roles
+## failures 0
+## cut
+
+use Moose;
+
+with Foo => { blarch => 1 },
+     Bar => { brazil => 2 };
+
+## name Basic failure for Moose
+## failures 1
+## cut
+
+use Moose;
+
+with 'Foo';
+with 'Bar';
+
+## name Moose::Role with one role
+## failures 0
+## cut
+
+use Moose::Role;
+
+with 'Foo';
+
+## name Moose::Role with two roles
+## failures 0
+## cut
+
+use Moose::Role;
+
+with 'Foo', 'Bar';
+
+## name Moose::Role with two parameterized roles
+## failures 0
+## cut
+
+use Moose::Role;
+
+with Foo => { blarch => 1 },
+     Bar => { brazil => 2 };
+
+## name Basic failure for Moose::Role
+## failures 1
+## cut
+
+use Moose::Role;
+
+with 'Foo';
+with 'Bar';
+
+## name Non-Moose passing
+## failures 0
+## cut
+
+with 'Foo';
+with 'Bar';
+
+## name One Moose, one non-Moose
+## failures 0
+## cut
+
+use Moose;
+
+package Blargle;
+
+with 'Foo';
+with 'Bar';
+
+## name Two Moose passing
+## failures 0
+## cut
+
+use Moose;
+
+with 'Foo';
+
+
+package Blargle;
+
+use Moose::Role;
+
+with 'Bar';
+
+## name Two Moose failing
+## failures 2
+## cut
+
+use Moose;
+
+with 'Foo';
+with 'Thingy';
+
+
+package Blargle;
+
+use Moose::Role;
+
+with 'Bar';
+with 'Thingy';
+
+## name Failure for custom module.
+## failures 1
+## parms { equivalent_modules => 'Bleu' }
+## cut
+
+use Bleu;
+
+with 'Foo';
+with 'Bar';

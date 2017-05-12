@@ -1,0 +1,17 @@
+<html xmlns:tal="http://purl.org/petal/1.0/">
+	<body>
+		<p>
+			<!--? Loop through hash keys/values using 'Each' -->
+			<ul>
+				<li tal:repeat="item each: $each_hash_ref"><span tal:replace="item/key">key</span> =&gt; <span tal:replace="item/val">value</span></li>
+			</ul>
+
+			<!--? Loop through hash keys using 'Keys'-->
+			<ul>
+				<!--? NOTE: Petal can't do dynamic keys, so the values shouldn't appear here: -->
+				<li tal:repeat="key keys: $keys_hash_ref"><span tal:replace="key">key</span> =&gt; <span tal:replace="keys_hash_ref/$key">value</span></li>
+			</ul>
+		</p>
+	</body>
+</html>
+

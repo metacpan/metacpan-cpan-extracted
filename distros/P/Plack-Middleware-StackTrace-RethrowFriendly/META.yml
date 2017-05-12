@@ -1,0 +1,43 @@
+---
+abstract: 'Display the original stack trace for rethrown errors'
+author:
+  - 'TOYAMA Nao <nanto@moon.email.ne.jp>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-StackTrace-RethrowFriendly
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::StackTrace::RethrowFriendly:
+    file: lib/Plack/Middleware/StackTrace/RethrowFriendly.pm
+    version: '0.03'
+requires:
+  Plack::Middleware::StackTrace: '0'
+  Try::Tiny: '0'
+resources:
+  bugtracker: https://github.com/tarao/perl5-Plack-Middleware-StackTrace-RethrowFriendly/issues
+  homepage: https://github.com/tarao/perl5-Plack-Middleware-StackTrace-RethrowFriendly
+  repository: git://github.com/tarao/perl5-Plack-Middleware-StackTrace-RethrowFriendly.git
+version: '0.03'
+x_authority: cpan:TARAO
+x_contributors:
+  - 'tarao <tarao.gnn@gmail.com>'

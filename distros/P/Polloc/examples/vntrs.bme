@@ -1,0 +1,87 @@
+###################################################################################
+# The current file defines different parameters for the analysis of VNTR loci
+# using Polloc (Perl package `Bio::Polloc`).  This format is interpreted by the
+# Perl module `Bio::Polloc::Polloc::Config`.
+###################################################################################
+
+# This a variable not used by Polloc, but used in the construction of other vars
+root = "biome-project/thebio.me/"
+
+# This variable tells Polloc where to look (alternatively) for software exacutables
+path = "${.root}bins/"
+
+
+[ rule ]
+# This tells Polloc to use 'VNTR' as the base of the locus IDs.
+glob prefix_id='VNTR'
+
+# Define the VNTR variable, containing the parameters to detect VNTR.
+VNTR = "-minsize 30 -maxsize 1000 -minperiod 5 -maxperiod 9 -exp 6 -res 2 -minscore 50 -maxscore 0 -minsim 80 -maxsim 100 -match 2 -mismatch 3 -indels 5 -pm 80 -pi 20"
+
+# Register the VNTR variable as a Rule of type 'tandemrepeat' called 'VNTR repeat'.
+# Use 'Repeat' instead of 'TandemRepeat' in order to use 'mreps' instead of 'TRF'.
+add TandemRepeat:VNTR as 'VNTR repeat'
+
+# Turn execution on for the VNTR variable (rule)
+set VNTR executable = 'Yes'
+
+
+[ GroupCriteria ]
+# Create the variable simLimit, later used as minimum similarity for grouping
+var num simLimit = 0.9
+
+# Extract flanking sequences (500 nt up- and downstream)
+var seq left1 = FEAT1 at [-1, -500..0]
+var seq left2 = FEAT2 at [-1, -500..0]
+var seq right1 = FEAT1 at [1, 500..0]
+var seq right2 = FEAT2 at [1, 500..0]
+
+# Compare flanking sequences
+var num leftSim = left1 aln-sim with left2
+var num rightSim = right1 aln-sim with right2
+var num leftSimR = left1 aln-sim with right2
+var num rightSimR = right1 aln-sim with left2
+
+# Evaluate if similarity is above the minimum
+var bool leftSame = leftSim > simLimit
+var bool rightSame = rightSim > simLimit
+var bool leftSameR = leftSimR > simLimit
+var bool rightSameR = rightSimR > simLimit
+
+# Boolean operations for different orientation cases
+var bool same = leftSame | rightSame
+var bool sameR = leftSameR | rightSameR
+var bool isPair = same | sameR
+
+# Tells Polloc to use 'VNTR' as source loci, and compares them against 'VNTR'
+glob source = 'VNTR'
+glob target = 'VNTR'
+
+# Register isPair variable as the criterion of equivalency (isPair must be boolean)
+eval isPair
+
+
+[ GroupExtension ]
+# Create context variable containing parameters of the extension (identification of additional loci)
+context = "-function context -upstream 500 -downstream 500 -detectstrand 1 -feature 0 -maxlen 500 -similarity 0.9 -algorithm blast -consensusperc 60 -e 1e-5 -score 200 -p blastn"
+
+# Register context variable as criterion for the groups extension
+eval context
+
+
+[ Typing ]
+# Maximum amplicon size
+maxSize = 2000
+
+# Minimum amplicon size
+minSize = 1
+
+# Minimum conservation for primer design
+primerConservation = 0.9
+
+# Length of primers
+primerSize = 20
+
+# Define bandingPatter::amplification as the typing class
+eval banding::ampl
+

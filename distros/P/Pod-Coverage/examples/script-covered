@@ -1,0 +1,27 @@
+#!/usr/bin/perl -w
+use strict;
+
+my $file = shift || die "need something to test";
+my $code;
+
+open F, $file;
+{
+    local $/;
+    $code = <F>;
+}
+close F;
+
+eval qq{
+package testme;
+
+$code;
+
+1;
+};
+$INC{'testme.pm'} = 1;
+
+print testme::foo();
+
+require Pod::Coverage;
+Pod::Coverage->import(pod_from => $file,
+                      package  => 'testme');

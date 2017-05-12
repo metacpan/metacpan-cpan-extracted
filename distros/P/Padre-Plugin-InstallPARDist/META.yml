@@ -1,0 +1,30 @@
+---
+name: Padre-Plugin-InstallPARDist
+version: 0.01
+author:
+  - Steffen Mueller
+abstract: Installation of .par archives into the system
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+configure_requires:
+  Padre::PluginBuilder: 0.12
+requires:
+  Carp: 0
+  Cwd: 0
+  Data::Dumper: 0
+  ExtUtils::InferConfig: 1.03
+  ExtUtils::InstallPAR: 0.03
+  LWP::Simple: 0
+  Padre: 0.12
+  perl: 5.008
+build_requires:
+  Test::More: 0.47
+provides:
+  Padre::Plugin::InstallPARDist:
+    file: lib/Padre/Plugin/InstallPARDist.pm
+    version: 0.01
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

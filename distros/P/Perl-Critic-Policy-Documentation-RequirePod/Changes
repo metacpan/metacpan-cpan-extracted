@@ -1,0 +1,20 @@
+0.005     2016-08-11 11:50:13+02:00 Europe/Berlin
+
+Added Dist::Zilla::Plugin::AutoPrereqs
+
+0.004     2016-08-10 15:40:18+02:00 Europe/Berlin
+
+Removed duplicate NAME pod.
+
+0.003     2016-08-10 15:30:14+02:00 Europe/Berlin
+
+Added PodWeaver.
+
+0.002     2016-08-10 15:20:36+02:00 Europe/Berlin
+
+Kwalitee fixes.
+
+0.001     2016-08-10 15:16:42+02:00 Europe/Berlin
+
+Initial release.
+

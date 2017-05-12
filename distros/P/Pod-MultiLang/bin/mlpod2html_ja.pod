@@ -1,0 +1,115 @@
+=encoding utf-8
+
+=head1 名前
+
+mlpod2html_ja - 多言語 pod を html に変換
+
+=head1 概要
+
+ mlpod2html [options] podfile > htmlfile
+
+=head1 説明
+
+L<Pod::MultiLang::Html> に対する実行形式へのラッパーです.
+
+=head1 オプション
+
+引数のうち - で始まるものがオプション設定として扱われます. 
+-- 以降は - で始まっていてもファイルとして扱われます.
+
+=head2 Pod::MultiLang::Html から継承しているオプション
+
+指定されたオプションは大半はそのまま Pod::MultiLang::Html->new に
+渡されます.  指定できるオプションについては 
+L<Pod::MultiLang::Html> を参照してください.
+
+ただし指定の仕方がシェル風に C<--key-name="option value"> 
+の様になります. 最初の -- は取り除かれ, 
+キーの - は _ に変換されます.
+
+この例では Pod::MultiLang::Html-E<gt>new に対して
+C<< key_name =E<gt> 'option value' >> と指定することになります.
+
+Z<>="option value" が省略されキーだけが指定されたときには, 
+特に記述がなければその値として 1 が指定されたものとして
+扱われます.
+
+配列を受け取るオプションに対しては, カンマもしくはコロン区切りで
+渡してください.
+
+同じオプションを複数回設定した結果は未定義です.
+
+複数のファイルを指定したときには mlpod2html 側でループして
+１つの Pod::MultiLang::Html に対して $parser->parse_from_file 
+を呼び出します.
+
+=head2 追加オプション
+
+Pod::MultiLang::Html のオプション以外に
+mlpod2html が使うオプションもあります.
+
+=over
+
+=item --outfile
+
+  --outfile="filename"
+
+出力先を標準出力ではなく指定したファイルにします.
+複数の入力ファイルがあるときにこのオプションを指定した結果は
+未定義です.
+
+=item --auto-out
+
+=item --auto-html
+
+真であれば指定された入力ファイル名から出力するhtmlファイル名を
+自動的に生成します.
+
+=back
+
+=head2 ショートネームオプション
+
+利便性から短いオプション名がいくつかあります.
+
+=over
+
+=item -o "filename"
+
+--outfile="filename" のエイリアスです.
+
+=back
+
+=head1 環境変数
+
+=over
+
+=item MLPOD_LANGS
+
+--langs 指定と同等です. 
+--langs が明示的に指定されていればそちらが優先されます.
+
+=back
+
+=head1 今後の予定
+
+=over
+
+=item --conffile=""
+
+オプションをまとめて指定.
+
+=item ディレクトリの再帰処理
+
+ディレクトリを指定したら再帰的に処理. 
+出力先は --out-dir="".
+
+=back
+
+=head1 履歴
+
+L<Pod::MultiLang> 参照.
+
+=head1 関連項目
+
+L<Pod::MultiLang::Html>
+

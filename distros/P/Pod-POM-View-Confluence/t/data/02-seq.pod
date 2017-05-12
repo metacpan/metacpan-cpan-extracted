@@ -1,0 +1,7 @@
+=head1 Some formatting sequences
+
+Some XE<lt>E<gt> sequences:
+B<bold>, I<italics>, C<code>, F<file>.
+
+Some non entities: E<z>, E<0>.
+

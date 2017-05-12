@@ -1,0 +1,127 @@
+NAME
+    PkgConfig::LibPkgConf - Interface to .pc file interface via libpkgconf
+
+SYNOPSIS
+     use PkgConfig::LibPkgConf;
+ 
+     if(pkgconf_exists('libarchive'))
+     {
+       my $version = pkgconf_version('libarchive');
+       my $cflags  = pkgconf_cflags('libarchive');
+       my $libs    = pkgconf_libs('libarchive');
+     }
+
+DESCRIPTION
+    Many libraries in compiled languages such as C or C++ provide ".pc"
+    files to specify the flags required for compiling and linking against
+    those libraries. Traditionally, the command line program "pkg-config" is
+    used to query these files. This module provides a Perl level API using
+    "libpkgconf" to these files.
+
+    This module provides a simplified interface for getting the existence,
+    version, cflags and library flags needed for compiling against a
+    package, using the default compiled in configuration of "pkgconf". For a
+    more powerful, but complicated interface see
+    PkgConfig::LibPkgConf::Client. In addition, PkgConfig::LibPkgConf::Util
+    provides some useful utility functions that are also provided by
+    "pkgconf".
+
+FUNCTIONS
+  pkgconf_exists
+     my $bool = pkgconf_exists $package_name;
+
+    Returns true if the package is available.
+
+    Exported by default.
+
+  pkgconf_version
+     my $version = pkgconf_version $package_name;
+
+    Returns the version of the package, if it exists. Will throw an
+    exception if not found.
+
+    Exported by default.
+
+  pkgconf_cflags
+     my $cflags = pkgconf_cflags $package_name;
+
+    Returns the compiler flags for the package, if it exists. Will throw an
+    exception if not found.
+
+    Exported by default.
+
+  pkgconf_cflags_static
+     my $cflags = pkgconf_cflags_static $package_name;
+
+    Returns the static compiler flags for the package, if it exists. Will
+    throw an exception if not found.
+
+  pkgconf_libs
+     my $libs = pkgconf_libs $package_name;
+
+    Returns the linker library flags for the package, if it exists. Will
+    throw an exception if not found.
+
+    Exported by default.
+
+  pkgconf_libs_static
+     my $libs = pkgconf_libs_static $package_name;
+
+    Returns the static linker library flags for the package, if it exists.
+    Will throw an exception if not found.
+
+SUPPORT
+    IRC #native on irc.perl.org
+
+    Project GitHub tracker:
+
+    <https://github.com/plicease/PkgConfig-LibPkgConf/issues>
+
+    If you want to contribute, please open a pull request on GitHub:
+
+    <https://github.com/plicease/PkgConfig-LibPkgConf/pulls>
+
+SEE ALSO
+    The best entry point to the low level "pkgconf" interface can be found
+    via PkgConfig::LibPkgConf::Client.
+
+    Alternatives include:
+
+    PkgConfig
+        Pure Perl implementation of "pkg-config" which can be used from the
+        command line, or as an API from Perl. Does not require pkg-config in
+        your path, so is a safe dependency for CPAN modules.
+
+    ExtUtils::PkgConfig
+        Wrapper for the "pkg-config" command line interface. This module
+        will fail to install if "pkg-config" cannot be found in the "PATH",
+        so it is not safe to use a dependency if you want your CPAN module
+        to work on platforms where "pkg-config" is not installed.
+
+    Alien::Base
+        Provides tools for building non-Perl libraries and making them
+        dependencies for your CPAN modules, even on platforms where the
+        non-Perl libraries aren't already installed. Includes hooks for
+        probing "pkg-config" ".pc" files using either "pkg-config" or
+        PkgConfig.
+
+ACKNOWLEDGMENTS
+    Thanks to the "pkgconf" developers for their efforts:
+
+    <https://github.com/pkgconf/pkgconf/graphs/contributors>
+
+AUTHOR
+    Graham Ollis
+
+    Contributors:
+
+    A. Wilcox (awilfox)
+
+    Petr Pisar (ppisar)
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2016 Graham Ollis.
+
+    This is free software; you may redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

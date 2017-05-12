@@ -1,0 +1,15 @@
+Revision history for Path-Dispatcher-Declarative
+
+0.03  2010-11-02
+        Improve reinstatement of $1, $2 so they don't leak outside of the
+            scope of your blocks
+
+        Remove a couple stray references to named rules
+
+0.02  2010-10-24
+        Reinstate the back-compat that Path-Dispatcher 1.00 broke by setting
+            $1, $2, etc. for you
+
+0.01  2010-03-16
+        Factored out of Path-Dispatcher
+

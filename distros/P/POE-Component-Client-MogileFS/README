@@ -1,0 +1,44 @@
+POE-Component-Client-MogileFS
+
+This is a POE Client for using MogileFS.  It's based on 
+POE::Component::Wheel::Run (I stole large chunks of it directly from the
+cookbook) and should allow you to use most of the MogileFS::Client api in
+a non blocking fashion from POE.  You should probably read the MogileFS::Client
+as well as these if you plan to use it.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc POE::Component::Client::MogileFS
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/POE-Component-Client-MogileFS
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-Client-MogileFS
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/POE-Component-Client-MogileFS
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/POE-Component-Client-MogileFS
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 RJ Research, Inc
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

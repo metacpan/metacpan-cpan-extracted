@@ -1,0 +1,19 @@
+[Changes for 0.04 - 1 Mar, 2005]
+
+Fix tests for non-C locales.
+
+[Changes for 0.04 - 31 Jan, 2005]
+
+Fix tests on Solaris.
+
+[Changes for 0.03 - 10 Nov, 2004]
+
+Skip tests on win32.
+
+[Changes for 0.02 - 9 Aug, 2004]
+
+Support reading symlink.
+
+[Changes for 0.01 - 20 Jul, 2004]
+
+Initial release.

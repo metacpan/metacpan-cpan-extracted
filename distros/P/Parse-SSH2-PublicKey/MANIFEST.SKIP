@@ -1,0 +1,12 @@
+\.git
+.DS_Store
+Parse-SSH2-PublicKey-*
+blib/
+Makefile.old
+pm_to_blib
+Makefile$
+_build$
+Build$
+_build
+^Makefile.PL
+^MYMETA.yml$

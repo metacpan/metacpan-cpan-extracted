@@ -1,0 +1,218 @@
+Revision history for Perl module Perl::MinimumVersion
+
+1.38 2014-08-22
+    - The doc for Perl::MinimumVersion now mentions perlver in both
+      the DESCRIPTION and SEE ALSO sections. RT#98262 from pagenyon++.
+    - Added mention of Perl::MinimumVersion::Fast to SEE ALSO.
+
+1.37 2014-05-11
+    - Removed the check for "stacked labels" that I added in 1.36, as it appears
+      that I misinterpreted what the 5.14 change was, and broke at least one dist.
+      Commented out the check in MinimumVersion.pm, and the specific subtests.
+      Apologies to HMBRAND and all others affected
+    - The way I was comparing versions in one of the new tests in 1.36 wasn't portable
+      across old versions of Perl. Thanks to Paul Howarth for RT#95528.
+
+1.36 2014-05-09
+    - CHECK block requires 5.6.2
+    - UNITCHECK block requires 5.10.0
+    - Stacked labels on the same statement requires 5.14.0
+
+1.35 2014-05-02
+    - 'state' requires perl 5.10.0, even if you don't also see
+      "use feature 'state'", because you can also write "use 5.010" to
+      enable 'state'. RT#67626
+    - Dropped the rule that said "use base 'Exporter'" should make a
+      dependency on Perl 5.008+ RT#89173
+    - Improved the fix for RT#95023. Thanks again to Paul Howarth.
+
+1.34 2014-04-24
+    - The perlver script wasn't getting installed, because it's in
+      a script/ directory. RT#95023, fix from ETHER.
+    - t/02_main.t was failing on older versions of perl, because
+      a min version is getting reported as '5.01301' on Perl 5.010 and later,
+      but as '5.013010' on earlier Perls. RT#95023. I need to understand this
+      better, but want to get a passing release out.
+
+1.33 2014-04-24
+    - Internals::SvREADONLY requires perl 5.8.0
+    - handle features upto lexical_subs, which requires 5.18.0
+      state, switch, unicode_strings, unicode_eval, evalbytes,
+      current_sub, array_base, fc, lexical_subs
+    - deprecate.pm requires perl 5.12 (Alexandr Ciornii)
+    - require new version of PPIx::Regexp
+    - detect while(readdir $dh) (Alexandr Ciornii)
+    - Switched to Dist::Zilla
+    - Added required versions of modules when use'ing them
+    - Reformatted Changes as per CPAN::Changes::Spec
+
+1.32 2013-01-16
+    - require new version of PPIx::Regexp
+    - skip sub named keys/each/values in _each_argument() (Pedro Melo, RT#82718)
+    - detect open with reference to scalar (Alexandr Ciornii)
+
+1.31 2012-12-04
+    - sort $subref requires perl 5.6 (Alexandr Ciornii)
+
+1.30 2012-11-28
+    - 'each % { $foo }' incorrectly required perl 5.14 (RT#81505)
+    - 02_main.t fails in rare cases (RT#81487)
+
+1.29 2012-11-27
+    - "Use of uninitialized value in null operation" fix.
+    - Adding test for "utf8::is_utf" 5.8.1 special case
+    - Recognize all versions in "use feature" bundle (Alexandr Ciornii)
+    - Support regexes (Alexandr Ciornii)
+    - detect changes in each/keys/values in 5.12 and 5.14 (Yasutaka ATARASHI, Alexandr Ciornii)
+    - 2-arg binmode (Alexandr Ciornii)
+    - postfix when (Alexandr Ciornii)
+    - exists(&sub) (Kevin Ryde, Alexandr Ciornii)
+    - _bugfix_magic_errno will return element (Alexandr Ciornii)
+    - add 'encoding' to 5.8 pragmas (Alexandr Ciornii)
+    - private methods _set_checks2skip and _set_collect_all_reasons for
+      Perl::Critic::Policy::Compatibility::PerlMinimumVersionAndWhy (Alexandr Ciornii)
+    - temp file with open requires 5.8 (Alexandr Ciornii)
+
+1.28 2011-03-02
+    - The ->isa in the 5.10 operator and magic variable tests were
+      back the front, breaking both. Fixed (ADAMK)
+    - Magic variable rules now check using ->symbol method instead of
+      ->content so that $+{foo} are correctly treated like %+ (ADAMK)
+    - Removed -w from tests to allow testing with Tainting on (ADAMK)
+
+1.27 2011-02-26
+    - Updating to Module::Install::DSL 1.00
+    - Updating copyright year
+    - Fix detection of binary numbers (Alexandr Ciornii)
+    - Add check for variables added in 5.5 (Alexandr Ciornii)
+    - Correct detection of different cases of '...' (Alexandr Ciornii)
+    - Detection of bareword that ends with double colon (Alexandr Ciornii)
+
+1.26 2010-07-21
+    - Detect "package NAME VERSION" in 5.12. (Steffen Mueller)
+    - Detect "..." (yada yada yada) in 5.12. (Steffen Mueller)
+    - Detect "use feature ':5.12';" in 5.12. (Steffen Mueller)
+
+1.25 2010-05-08
+    - Error in minimum_syntax_reason discovered by perl 5.12 (Alexandr Ciornii)
+
+1.24 2010-01-21
+    - The previous changes seem to work well in practice now,
+      switching to prod release. (ADAMK)
+
+1.23_03 2010-01-21
+    - The --blame output now prints actually shows which file (ADAMK)
+
+1.23_02 2010-01-21
+    - The --blame option now works in the perlver script (ADAMK)
+
+1.23_01 2010-01-14
+    - Reworked the internals to capture the version, rule and PPI
+      element responsible for each limitation as P:MV:Reason (ADAMK)
+    - Added first experimental version of the new _reason API (ADAMK)
+    - Adding 5.8 dependency for "use Carp version ()" (ADAMK)
+    - module Errno requires perl 5.5 (Alexandr Ciornii)
+    - PPI is no longer compatible with perl 5.5, so P::MV can also
+      depend on 5.6 (Alexandr Ciornii)
+    - Bumping File::Find::Rule dependency to 0.32 because we break with
+      0.31 (ADAMK)
+
+1.22 2009-11-25
+    - Negative length in 'splice' requires perl 5.5 (Alexandr Ciornii)
+    - 'mkdir' with one argument requires perl 5.6 (Alexandr Ciornii)
+    - 'substr' will not be checked if it is a method name (Alexandr Ciornii)
+    - better tests and fix for 3-arg 'open' (Alexandr Ciornii)
+
+1.21 2009-11-24
+    - Add 'bytes' to 5.6 pragma (Alexandr Ciornii)
+    - Add support for "version numbers" like "v1.1.1" (Alexandr Ciornii)
+    - Reimplement _three_argument_open, more tests (Alexandr Ciornii)
+      Now check for 3-arg open is working.
+    - Check 4-arg substr that requires perl 5.5 (Alexandr Ciornii)
+    - Postfix foreach requires perl 5.004.05 (Alexandr Ciornii)
+    - Scalar::Util::weaken requires perl 5.006 (Alexandr Ciornii)
+    - P::MV itself found incompatibility in 02_main.t with 5.5 (Alexandr Ciornii)
+
+1.20 2009-04-03
+    - Change 5.005_03 to 5.005.05 (ADAMK)
+    - 5.8 and 5.6 pragmas (Alexandr Ciornii)
+    - Fixed error in perlver/find (Alexandr Ciornii)
+    - CPAN::Exception should not trigger dependency on 5.5 (Alexandr Ciornii)
+    - Added undocumented option 'explain' in perlver (Alexandr Ciornii)
+    - CHECK blocks (Alexandr Ciornii)
+    - First implementation of _three_argument_open and tests (Alexandr Ciornii)
+
+1.19 2008-09-15
+    - Updating PPI and several other dependencies to get a more
+      accurate parse on which to run the analysis.
+    - Add a dependency on File::Find::Rule::Perl instead of using
+      a duplicate (worse) copy of the code for it.
+    - If perlver is run in a CPAN-style distribution don't parse
+      blib or _build directories (but DO parse inc)
+
+1.18 2008-08-23
+    - Moving bin/perlver to more correct script/perlver
+    - Adding test for localising soft references (BDFOY)
+    - Updating to Module::Install 0.77
+
+0.16 2008-05-10
+    - Adding rules for mro.pm and feature.pm (Alexandr Ciornii)
+    - Adding rules for 5.10.0 operators and magic variables (Adam Kennedy)
+    - Internal fixes for 5.10.0 (read: 5.010) support (Ricardo Signes)
+    - Add version_analysis for complete (slow) analysis (Ricardo Signes)
+    - Adding a 5.005_03 dependency on qr// (Adam Kennedy)
+
+0.15 2007-07-17
+    - No functional changes
+    - Updating List::Util dependency to 1.19 to resolve Win32 memory leak
+    - Adding rule for "use base 'Exporter';" (some old versions don't export import)
+    - Correcting the behaviour of minimum_syntax_version when provided a filter
+
+0.14 2007-03-05
+    - Adding support for checking the 5.8 dep "use constant { ... };"
+    - Moderning the tests a little
+    - Push the version.pm dependency again to 0.70 to avoid
+      a number of edge case and legacy API issues that bit us earlier.
+    - Upgraded to Module::Install 0.65_01
+
+0.13 2006-04-22
+    - No functional changes
+    - Moved over from SourceForge CVS to new collaborative SVN repository
+    - Upgraded to Module::Install 0.62
+
+0.12 2005-12-30
+    - Removed some Perl 5.8isms and coded one back in as a rule :)
+    - Upgraded to newer Module::Install
+    - Pushed version deps on some critical things
+
+0.11 2005-11-09
+    - Added missing File::Find::Rule dependency
+
+0.10 2005-10-06
+    - Fixed utf8 pragma
+    - Switched from qv() to version->new()  due to bugs
+    - Please ignore perlver for now :)
+    - Updated dependencies to cover recent bugs and changes
+
+0.09_01 2005-09-11
+    - Added the perlver application
+    - Added some more minor optimisation
+
+0.05 2005-09-03
+    - Added support for explicit versions
+    - Added minimum_syntax_version method
+    - Added minimum_explicit_version method
+    - Updated PPI dependency to 1.000
+
+0.04 2005-05-31
+    - Added another chunk of checking methods
+
+0.03 2005-06-08
+    - Updated to handle API change at PPI 0.990
+
+0.02 2005-04-25
+    - Added tests for attributes, utf8 and a few other pragmas
+
+0.01 2005-04-20
+    - Created the initial implementation
+

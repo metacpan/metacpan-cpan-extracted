@@ -1,0 +1,47 @@
+NAME
+    Parse::SQLOutput - Parse SQL table output
+
+SYNOPSIS
+        use Parse::SQLOutput;
+
+        my $sql_table_output = ...
+        my $data = Parse::SQLOutput->new(<options>)->parse($sql_table_output);
+
+DESCRIPTION
+    This module can parse the pretty printed tables you get from SQL
+    queries, into Perl data structures. There are a few options depending on
+    how you want the data to be formatted.
+
+    NOTE: This has only been tested with simple MySQL output so far. Patches
+    welcome.
+
+OPTIONS
+    This parser can return your data in various forms depending on your
+    needs:
+
+    "->new(as => 'hoh'|'hol'|'loh'|'lol')"
+        Specify the form that the result should be formatted in.
+        Hash-of-hash, hash-of- list, list-of-hash or list-of-list. Default
+        is 'hoh'.
+
+    "->new(header => 0|1)"
+        Specify whether the header values should be returned. Default is 0.
+        If the result is a hash, the header will be in the key of '' (empty
+        string).
+
+    "->new(key => 'key-name')"
+        If the result is a 'hash', specify which column to use as the key of
+        the hash. The default is '', which means to use the first column's
+        name.
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2012-2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

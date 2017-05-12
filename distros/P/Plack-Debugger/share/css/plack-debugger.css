@@ -1,0 +1,504 @@
+/* Plack-Debugger CSS Reset, 
+    ... adapted from Plack-Middelware-Debug's CSS Reset, 
+        ... adapted from Eric Meyer's CSS Reset */
+#plack-debugger {
+    color      : #999999;
+    background : #ffffff;
+}
+#plack-debugger, 
+#plack-debugger div, 
+#plack-debugger span, 
+#plack-debugger applet, 
+#plack-debugger object, 
+#plack-debugger iframe,
+#plack-debugger h1, 
+#plack-debugger h2, 
+#plack-debugger h3, 
+#plack-debugger h4, 
+#plack-debugger h5, 
+#plack-debugger h6, 
+#plack-debugger p, 
+#plack-debugger blockquote, 
+#plack-debugger pre,
+#plack-debugger a, 
+#plack-debugger abbr, 
+#plack-debugger acronym, 
+#plack-debugger address, 
+#plack-debugger big, 
+#plack-debugger button, 
+#plack-debugger cite, 
+#plack-debugger code,
+#plack-debugger del, 
+#plack-debugger dfn, 
+#plack-debugger em, 
+#plack-debugger font, 
+#plack-debugger img, 
+#plack-debugger ins, 
+#plack-debugger kbd, 
+#plack-debugger q, 
+#plack-debugger s, 
+#plack-debugger samp,
+#plack-debugger small, 
+#plack-debugger strike, 
+#plack-debugger strong, 
+#plack-debugger sub, 
+#plack-debugger sup, 
+#plack-debugger tt, 
+#plack-debugger var,
+#plack-debugger b, 
+#plack-debugger u, 
+#plack-debugger i, 
+#plack-debugger center,
+#plack-debugger dl, 
+#plack-debugger dt, 
+#plack-debugger dd, 
+#plack-debugger ol, 
+#plack-debugger ul, 
+#plack-debugger li,
+#plack-debugger fieldset, 
+#plack-debugger form, 
+#plack-debugger label, 
+#plack-debugger legend,
+#plack-debugger table, 
+#plack-debugger caption, 
+#plack-debugger tbody, 
+#plack-debugger tfoot, 
+#plack-debugger thead, 
+#plack-debugger tr, 
+#plack-debugger th, 
+#plack-debugger td {
+    margin         : 0;
+    padding        : 0;
+    border         : 0;
+    outline        : 0;
+    font-size      : 12px;
+    line-height    : 1.5em;
+    color          : #999999;
+    vertical-align : baseline;
+    background     : transparent;
+    font-family    : sans-serif;
+    text-align     : left;
+}
+
+#plack-debugger code,
+#plack-debugger pre {
+    font-family : monospace;
+}
+
+/* Collapsed Toolbar */
+
+#plack-debugger .pdb-collapsed {
+    background    : #333333;
+    z-index       : 100000000;
+    position      : fixed;
+    top           : 0;
+    right         : 0;
+
+}
+
+#plack-debugger .pdb-collapsed .pdb-open-button {
+    padding     : 5px;
+    color       : #999999;
+    font-size   : 2.5em;
+    line-height : 1.0em;
+}
+
+#plack-debugger .pdb-collapsed .pdb-open-button:hover {
+    cursor : pointer;
+    color  : #ffffff;
+}
+
+/* Toolbar */
+
+#plack-debugger .pdb-toolbar {
+    background    : #666666;    
+    width         : 300px;
+    z-index       : 100000000;
+    position      : fixed;
+    top           : 0;
+    bottom        : 0;
+    right         : 0;
+    display       : none;
+    border-left   : 1px solid #ffffff;
+}
+
+#plack-debugger .pdb-toolbar .pdb-header {
+    border-bottom : 1px solid #ffffff;
+}
+
+#plack-debugger .pdb-toolbar .pdb-header .pdb-close-button {
+    background  : #333333;
+    padding     : 5px;
+    color       : #999999;
+    font-size   : 2.5em;
+    line-height : 1.0em;  
+    text-align  : right;
+}
+
+#plack-debugger .pdb-toolbar .pdb-header .pdb-close-button:hover {
+    cursor : pointer;
+    color  : #ffffff;
+}
+
+#plack-debugger .pdb-toolbar .pdb-loading {
+    color       : #ffffff;
+    font-size   : 1.2em;
+    text-align  : center;
+    font-style  : oblique;
+    font-weight : normal !important;
+}
+
+#plack-debugger .pdb-toolbar .pdb-buttons .pdb-button {
+    background    : #333333;
+    border-bottom : 1px solid #ffffff;
+    color         : #999999;
+    min-height    : 35px;
+}
+
+#plack-debugger .pdb-toolbar .pdb-buttons .pdb-button:hover {
+    background : #666666;   
+    cursor     : pointer;
+}
+
+#plack-debugger .pdb-toolbar .pdb-buttons .pdb-button .pdb-notifications {
+    margin-right  : 10px;
+}
+
+#plack-debugger .pdb-toolbar .pdb-buttons .pdb-button .pdb-notifications .pdb-badge {
+    float         : right;    
+    font-weight   : bold;
+    margin-top    : 5px;
+    margin-left   : 5px;
+    padding       : 2px 5px;
+    border-radius : 10px;
+    border        : 1px solid #ffffff;
+}
+
+/* Panel Content */
+
+#plack-debugger .pdb-panels {
+    z-index  : 99999999;
+    position : fixed;
+    top      : 0;
+    left     : 0;
+    right    : 300px;
+    height   : 100%;
+    display  : none;
+}
+
+#plack-debugger .pdb-panels .pdb-panel {
+    background : #333333;
+    height     : 100%;
+    display    : none; 
+    overflow   : auto;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-header {
+    background    : #666666;
+    position      : fixed;
+    top           : 0;
+    left          : 0;   
+    right         : 300px; 
+    height        : 70px;
+    border-bottom : 1px solid #333333;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-header .pdb-close-button {
+    float         : right;
+    font-size     : 3.5em;
+    padding-right : 30px;
+    color         : #333333;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-header .pdb-close-button:hover {
+    cursor : pointer;
+    color  : #ffffff;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-header .pdb-title {
+    color     : #ffffff;    
+    font-size : 2.5em;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-header .pdb-subtitle {
+    color     : #ffffff;
+    font-size : 1em;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-notifications {
+    margin-right  : 100px;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-notifications .pdb-badge {
+    float         : right;    
+    margin-top    : 22px;
+    margin-left   : 5px;    
+    padding       : 2px 5px;
+    border-radius : 5px;
+    border        : 1px solid #ffffff;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-content {
+    padding-left   : 10px;
+    padding-bottom : 10px;
+    padding-right  : 10px;
+    padding-top    : 80px;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-content h1 {
+    padding   : 5px;
+    font-size : 1.5em;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-content table {
+    margin : 0px;
+    border : 1px solid #666666;
+    width  : 100%;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-content table td {
+    border  : 1px solid #666666;
+    margin  : 0px;
+    padding : 5px;
+    color   : #dddddd;
+}
+
+/* sub-requests */
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest {
+    border        : 5px solid #555555;
+    margin-bottom : 5px;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest .pdb-subrequest-details {
+    padding : 5px;
+    cursor  : pointer;    
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest .pdb-subrequest-details strong {
+    font-size   : 1.5em;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest .pdb-subrequest-details small {
+    font-size    : 0.9em;
+    margin-left  : 10px;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest .pdb-notifications {
+    margin-right  : 5px !important;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest .pdb-notifications .pdb-badge {
+    float         : right;
+    margin-top    : 0px;
+    margin-left   : 5px;    
+    padding       : 2px 5px;
+    border-radius : 5px;
+    border        : 1px solid #ffffff;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest .pdb-subrequest-results {
+    margin  : 5px;
+    padding : 0px 5px 10px 5px;    
+    border  : 1px solid #666666;
+    display : none;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest .pdb-subrequest-results .pdb-subrequest-header {
+    border-bottom : 1px solid #666666;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest .pdb-subrequest-results .pdb-subrequest-header .pdb-title {
+
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest .pdb-subrequest-results .pdb-subrequest-header .pdb-title:hover {
+    cursor : pointer;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest .pdb-subrequest-results .pdb-subrequest-header .pdb-subtitle {
+    display: none;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest .pdb-subrequest-results .pdb-subrequest-header .pdb-notifications {
+    margin-right  : 5px !important;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest .pdb-subrequest-results .pdb-subrequest-header .pdb-notifications .pdb-badge {
+    float         : right;
+    margin-top    : 3px;    
+    padding       : 2px 5px;
+    border-radius : 5px;
+    border        : 1px solid #ffffff;
+    font-size     : 0.8em;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest .pdb-subrequest-results .pdb-subrequest-result {
+    margin : 5px;
+}
+
+#plack-debugger .pdb-panels .pdb-panel .pdb-subrequest .pdb-subrequest-results .pdb-subrequest-result-data {
+    display : none;
+}
+
+/* formatter styles */
+
+#plack-debugger table.pdb-key-value-pairs {
+    margin : 0px;
+    border : 5px solid #555555 !important;
+}
+
+#plack-debugger table.pdb-key-value-pairs td.pdb-key {
+    font-weight : bold;
+    color       : #ffffff;
+    background  : #666666;
+    text-align  : right;
+    width       : 20%;
+}
+
+#plack-debugger table.pdb-key-value-pairs td.pdb-value {
+    
+}
+
+#plack-debugger table.pdb-item-list {
+    margin : 0px;
+    border : 5px solid #555555 !important;
+}
+
+#plack-debugger table.pdb-item-list td.pdb-item {
+
+}
+
+#plack-debugger table.pdb-data-table {
+    margin : 0px;
+    border : 5px solid #555555 !important;
+}
+
+#plack-debugger table.pdb-data-table > thead > tr > th {
+    font-weight : bold;
+    color       : #ffffff;
+    background  : #666666;
+    padding     : 3px;
+    text-align  : center;
+}
+
+#plack-debugger table.pdb-data-table td {
+    
+}
+
+#plack-debugger table.pdb-item-list {
+    margin : 0px;
+    border : 5px solid #555555 !important;
+}
+
+#plack-debugger table.pdb-item-list td.pdb-item {
+
+}
+
+
+#plack-debugger ul.pdb-ulist {
+    list-style-type: none;
+}
+
+#plack-debugger ul.pdb-ulist li.pdb-ulist-item {
+    margin-left : 25px;
+}
+
+#plack-debugger ul.pdb-ulist li.pdb-ulist-item span.pdb-key {
+    color  : #ffffff;
+    cursor : pointer;
+}
+
+#plack-debugger ul.pdb-ulist li.pdb-ulist-item span.pdb-key:after {
+    content      : '=';
+    margin-left  : 5px;
+    margin-right : 5px;
+}
+
+#plack-debugger ul.pdb-ulist li.pdb-ulist-item span.pdb-value {
+
+}
+
+#plack-debugger ul.pdb-ulist li.pdb-ulist-item span.pdb-value:before {
+    content : '{';
+    margin-right: 3px;
+}
+
+#plack-debugger ul.pdb-ulist li.pdb-ulist-item span.pdb-value:after {
+    content : '}';
+    margin-left: 3px;
+}
+
+/* generic */
+
+#plack-debugger .pdb-controls {
+    margin : 3px;
+}
+
+#plack-debugger .pdb-controls>.pdb-control:first-child {
+    border-top-left-radius    : 4px;
+    border-bottom-left-radius : 4px;
+}
+
+#plack-debugger .pdb-controls>.pdb-control:last-child {
+    border-top-right-radius    : 4px;
+    border-bottom-right-radius : 4px;
+}
+
+#plack-debugger .pdb-controls button.pdb-control {
+    border-radius : 0px;
+    margin-left   : -1px;
+    cursor        : pointer; 
+    padding       : 2px 5px;
+    color         : #ffffff;
+    background    : #aaaaaa;    
+}
+
+#plack-debugger .pdb-controls button.pdb-control:disabled {
+    color         : #333333;
+    background    : #666666;
+}
+
+#plack-debugger .pdb-badge span {
+    color : inherit;
+}
+
+#plack-debugger .pdb-error {
+    background : #d9534f;
+    color      : #ffffff;
+}
+
+#plack-debugger .pdb-warning {
+    background : #f0ad4e;
+    color      : #ffffff;
+}
+
+#plack-debugger .pdb-has-warnings {
+    background : #f0ad4e !important;
+    color      : #ffffff !important;
+ }
+
+#plack-debugger .pdb-has-errors {
+    background : #d9534f !important;
+    color      : #ffffff !important;
+}
+
+#plack-debugger .pdb-success {
+    background : #5cb85c;
+    color      : #ffffff;
+}
+
+#plack-debugger .pdb-title {
+    font-size    : 1.5em;
+    padding-left : 10px;
+    padding-top  : 2px;
+    color        : inherit;
+}
+
+#plack-debugger .pdb-subtitle {
+    font-size    : 0.9em;
+    font-style   : oblique;
+    padding-left : 20px;
+    color        : inherit;
+}
+

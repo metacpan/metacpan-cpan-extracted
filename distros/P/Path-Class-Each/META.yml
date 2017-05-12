@@ -1,0 +1,24 @@
+---
+abstract: 'Iterate lines in a file'
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Path-Class-Each
+provides:
+  Path::Class::Each:
+    file: lib/Path/Class/Each.pm
+    version: 0.03
+requires:
+  Path::Class: 0.18
+  Test::More: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Path-Class-Each
+  license: http://dev.perl.org/licenses/
+  repository: 'git://github.com/AndyA/Path-Class-Each.git (fetch)'
+version: 0.03

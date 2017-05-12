@@ -1,0 +1,70 @@
+    eval 'exec perl -S $0 "$@"'
+        if 0;
+#
+# pod2hlb 1-MAY-1999 pvhp@best.com
+#
+
+=head1 NAME
+
+pod2hlb - pod library to VMS help library converter.
+
+=head1 SYNOPSIS
+
+edit pod2hlb.
+perl pod2hlb
+
+=head1 DESCRIPTION
+
+This is an extremely simple program that merely
+converts the PERL_ROOT:[lib.pod]*.pod files into
+*.hlp files using the Pod::Hlp module.  It then 
+adds all the resultant .hlp files to a PERL.HLB 
+library in the DEFAULT directory.  You are strongly
+encouraged to modify the code to suit your personal
+preferences and/or local pod locations.
+
+Since this program invokes the LIBRARIAN it
+is unlikely to work on non-VMS systems.  For that
+reason is uses RMS style file specifications internally.
+
+=head1 AUTHOR
+
+Copyright (c) 1999 Peter Prymmer.  This program
+may be used under the same terms as Perl.
+Peter Prymmer pvhp@best.com 1-MAY-1999.
+First released with Pod2Hlp1.00 Aug 19 1996.
+
+=cut
+
+use Pod::Hlp;  # this module should be in perl_root:[lib.pod]Hlp.pm
+
+my(@podlib,$hlp_file);
+
+@podlib = <perl_root:[lib.pod]*.pod>;
+#print join("\n",@podlib,"");
+system("library/create/help", "perl.hlb");
+for (@podlib) { 
+    $hlp_file = &pod2hlp($_);
+    print "$hlp_file\n";
+    system("library/help/replace", "perl.hlb", "$hlp_file");
+}
+
+sub pod2hlp {
+
+    my($infile, $tmp, $pod, $hlp_level);
+    $tmp = $infile = $_[0];
+    $tmp =~ s/perl\_root\:\[lib\.pod\]//;
+    $tmp =~ s/\..*//i;
+    $pod = $tmp;
+    $tmp = $tmp . ".hlp";
+
+    if ($_[1]) { $hlp_level = $_[1]; } else { $hlp_level = '1'; }
+
+    open(TMP,">$tmp");
+    print TMP "$hlp_level $pod\n$pod\n";
+    Pod::Hlp::pod2hlp($infile,$hlp_level,*TMP);
+    close(TMP);
+
+    # print "output is in file $tmp\n";
+    return $tmp;
+}

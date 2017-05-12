@@ -1,0 +1,35 @@
+---
+abstract: 'Parse 02packages.details.txt.gz'
+author:
+  - 'Leon Brocard <acme@astray.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parse-CPAN-Packages
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Archive::Peek: '0'
+  CPAN::DistnameInfo: '0'
+  Compress::Zlib: '0'
+  File::Slurp: '0'
+  Moo: '0'
+  PPI: '0'
+  Path::Class: '0'
+  Test::InDistDir: '0'
+  Test::More: '0'
+  Type::Utils: '0'
+  Types::Standard: '0'
+  version: '0'
+resources:
+  repository: https://github.com/wchristian/parse-cpan-packages.git
+version: '2.40'

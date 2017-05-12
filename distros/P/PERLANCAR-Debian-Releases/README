@@ -1,0 +1,21 @@
+SYNOPSIS
+
+     use PERLANCAR::Debian::Releases;
+     my $res = list_debian_releases(detail=>1);
+     # raw data is in $PERLANCAR::Debian::Releases::data;
+
+DESCRIPTION
+
+    This module contains list of Debian releases. Data source is currently
+    at: https://github.com/perlancar/gudangdata (table/debian_release).
+
+    This release is made while waiting for the new release of
+    Debian::Releases which was promised in 2014 and will contain extra data
+    as well.
+
+SEE ALSO
+
+    Ubuntu::Releases
+
+    Debian::Releases
+

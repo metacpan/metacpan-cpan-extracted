@@ -1,0 +1,25 @@
+---
+abstract: 'XS implementation of a Hilbert Path algorithm'
+author:
+  - 'Gonzalo Diethelm <gonzus@cpan.org>'
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.133380'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Path-Hilbert-XS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: 0
+resources:
+  repository: git://github.com/p5pclub/path-hilbert-xs.git
+version: 0.003

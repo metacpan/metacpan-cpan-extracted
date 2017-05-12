@@ -1,0 +1,32 @@
+Plack-Middleware-Session-Serialized
+
+This is a package working like Plack::Middleware::Session::Cookie.
+This module provide a convenient way to customize the serializer
+when storing the session data in the cookie.
+
+See the individual module documentation for more information
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Plack
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Cindy Wang (CindyLinz)
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

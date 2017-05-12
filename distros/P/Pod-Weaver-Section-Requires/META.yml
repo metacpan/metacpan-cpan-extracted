@@ -1,0 +1,31 @@
+---
+abstract: 'Add Pod::Weaver section with all used modules from package excluding listed ones'
+author:
+  - 'Milan Sorm <sorm@is4u.cz>'
+build_requires:
+  Module::Build: '0.28'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Weaver-Section-Requires
+requires:
+  Class::Inspector: '0'
+  Module::Extract::Use: '0'
+  Module::Load: '0'
+  Moose: '0'
+  Pod::Elemental::Element::Nested: '0'
+  Pod::Elemental::Element::Pod5::Command: '0'
+  Pod::Weaver::Role::Section: '0'
+  aliased: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/milsorm/pod-weaver-section-requires.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

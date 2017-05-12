@@ -1,0 +1,298 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use Scriptalicious
+     -progname => "times2svg";
+#use Template;
+use FindBin qw($Bin);
+
+# a little hack for the test suite
+BEGIN {
+    if ( $ENV{HACK_TIME} ) {
+	no strict 'refs';
+	no warnings;
+	*Profile::Log::time = sub { $ENV{HACK_TIME} };
+    }
+}
+
+use Profile::Log;
+use Profile::Log::Config;
+use Set::Object qw(set);
+use List::Util qw(max min);
+use POSIX qw(ceil);
+
+our $VERSION = "1.00";
+
+my $input = \*STDIN;
+my $output_fn;
+my $output = \*STDOUT;
+my ($multi, $multi_num, $multi_timeout, $yaml_out, $yaml_in);
+my ($storable_in, $storable_out, $tvar_extra, $time_is);
+
+getopt getconf("i|input=s" => sub {
+		   shift;
+		   my $fn = shift;
+		   open($input, "<$fn")
+		       or barf "failed to open $input for reading; $!";
+	       },
+	       "o|output=s" => \$output_fn,
+	       "m|multi=s" => \$multi,
+	       "n|multi-number=i" => \$multi_num,
+	       "M|multi-timeout=i" => \$multi_timeout,
+	       "yo|yaml-out" => \$yaml_out,
+	       "yi|yaml-in" => \$yaml_in,
+	       "t|tvars=s" => \$tvar_extra,
+	       #"so|storable-out" => \$storable_out,
+	       #"si|storable-in" => \$storable_in,
+	      );
+
+abort "not understood: @ARGV" if @ARGV;
+abort "need filename base for output" if $multi and !$output_fn and !$yaml_out;
+
+my $tt;
+unless ( $yaml_out ) {
+    eval "use Template";
+    if ( $@ ) {
+	abort "must output to YAML (--yo) without Template Toolkit installed";
+    }
+    $tt = Template->new ( INCLUDE_PATH => $Profile::Log::Config::TT_INSTDIR,
+			  OUTPUT => $output );
+}
+
+my $open_output = sub {
+    my $filename = shift;
+    open $output, ">$filename"
+	or barf "failed to open $filename for writing; $!";
+};
+$open_output->($output_fn) if $output_fn;
+
+require 'YAML.pm' if $yaml_out or $yaml_in;
+#require 'Storable' if $storable_out or $storable_in;
+
+# this holds ID => [ @times ]
+my %times;
+# this should really be a priority queue, instead is treated as simple FIFO
+my @times;
+my $times = set();
+
+# what we do with output
+my $multi_file_count = 1;
+my $show = sub {
+    my ($id, $times_a);
+    if ( ref $_[0] ) {
+	$times_a = shift;
+    } else {
+	$id = shift;
+	$times_a = delete $times{$id};
+	@times = grep { $_ ne $id } @times;
+	$times->delete($id);
+    }
+
+    shift @$times_a unless ref $times_a->[0];
+
+    if ( $yaml_out ) {
+	print $output YAML::Dump($times_a);
+    } else {
+	if ( $multi ) {
+	    my $ofn = $output_fn;
+	    $ofn .= ".$id.svg";
+	    $open_output->($ofn);
+	}
+	my $tvars = { title => "Profile display".($id ? " for ".$id : ""),
+		      header => [ map { $_->logline }
+				  sort { $a->zero <=> $b->zero }
+				  @$times_a ],
+		      data => prepare_data($times_a)
+		    };
+
+	if ( $tvar_extra ) {
+	    my $tve = YAML::LoadFile $tvar_extra;
+	    while ( my ($key, $value) = each %$tve ) {
+		$tvars->{$key} = $value;
+	    }
+	}
+	$tt->process("profile.svg.tt", $tvars)
+	    or barf "error processing template: ".$tt->error;
+    }
+};
+
+# how we read pre-correlated input
+if ( $yaml_in ) {
+    my $buffer;
+    my $time;
+    while ( defined(my $line = <$input>) ) {
+	if ( $line =~ /^---/ and $buffer ) {
+	    $show->(YAML::Load $buffer);
+	    $buffer = "";
+	}
+	else {
+	    $buffer .= $line;
+	}
+    }
+    $show->(YAML::Load $buffer) if $buffer;
+}
+else {
+
+    # how we correlate log lines
+ line:
+    while ( defined(my $line = <$input>) ) {
+	next line unless $line =~ m{\S};
+	chomp($line);
+	my ($id, $time);
+	if ( $time = Profile::Log->new_from_syslog($line) ) {
+
+	    if ( $multi ) {
+		unless ( $id = $time->tag($multi) ) {
+		    mutter "skipping time ".$time->zero." - no '$multi' tag";
+		    next line;
+		}
+	    } else {
+		$id = "x";
+	    }
+	    if ( $times->insert($id) ) {
+		$times{$id} = [ $time->zero ];
+		push @times, $id;
+	    }
+	    push @{ $times{$id} }, $time;
+	    if ( $times{$id}[0] > $time->zero ) {
+		$times{$id}[0] = $time->zero;
+	    }
+	} else {
+	    moan "line does not match form - `$line'";
+	    next line;
+	}
+
+	# sort list if we're using timeout
+	@times = sort { $times{$a}[0] <=> $times{$b}[0] } @times
+	    if $multi_timeout;
+
+	# check whether we've got enough to display on the current
+	if ( $multi_num and @{ $times{$id} }-1 >= $multi_num ) {
+	    $show->($id);
+	}
+
+	# maybe the oldest one is now too old
+	while ( $multi_timeout and
+		($time->end - $times{$times[0]}->zero) > $multi_timeout ) {
+	    $show->($times[0]);
+	}
+    }
+
+    # show everything left over
+    $show->($times[0]) while @times;
+}
+
+sub prepare_data {
+    my $times = shift;
+
+    my $start_time = min map { $_->zero } @$times;
+    my $end_time   = max map { $_->end }  @$times;
+
+    my $range = ceil( ( $end_time - $start_time ) * 10 ) / 10;
+    my ($tick, $stroke);
+    if ($range < 1)      { $tick = 0.05; $stroke = 0.25; }
+    elsif ($range < 5)   { $tick = 0.20; $stroke = 1; }
+    elsif ($range < 20)  { $tick = 1; $stroke = 5; }
+    elsif ($range < 60)  { $tick = 5; $stroke = 10; }
+    elsif ($range < 300) { $tick = 10; $stroke = 60; }
+    else                 { $tick = 60; $stroke = 300; }
+
+    return { timescale => { min => 0,
+			    max => $range,
+			    tick => $tick,
+			    stroke => $stroke,
+			  },
+	     log => [(sort { $a->zero <=> $b->zero } @$times )],
+	   };
+}
+
+__END__
+
+=head1 NAME
+
+times2svg - convert profiling numbers to SVG
+
+=head1 SYNOPSIS
+
+ times2svg [options] -i input.log -o output.svg
+
+=head1 DESCRIPTION
+
+This script converts timing information, as extracted from log files,
+into a bootchart-style diagram of the chart.
+
+=head2 EXAMPLE INPUT
+
+ Sep 28 06:03:22 srssweb2 SrsFrontEnd-srsdev[5465]: FE Times: ID=4,463603; type=RunLogCreate; 0=06:03:20.169630; tot=2.639; read=0.001; parseXML=0.006; send=0.002; recv=2.630; respond=0.000
+ Sep 28 06:03:23 srssweb2 FeRep-srsdev[3945]: Times: ID=4,463604; 0=06:03:23.171035; tot=0.566; read_config=0.002; valid_config=0.000; fork=0.001; read=0.002; init=0.000; lock=0.004; m0:spread=0.035; m0:send=0.004; m0:srspapp3=0.518; check=0.001; respond=0.000; check2=0.000
+ Sep 28 06:03:23 srssweb2 SrsFrontEnd-srsdev[5701]: FE Times: ID=4,463604; type=ScheduleUpdate; 0=06:03:23.162061; tot=0.580; read=0.001; parseXML=0.006; send=0.003; recv=0.569; respond=0.000
+
+=head1 COMMAND LINE OPTIONS
+
+=over
+
+=item B<-i, --input=FILE>
+
+Specify where to read log lines from.  Defaults to standard input.
+
+=item B<-o, --output=FILE>
+
+Specify where to write output SVG to.  Defaults to standard output.
+
+=item B<-m, --multi=TAG>
+
+Specify a tag to correlate multiple related log messages on in a mixed
+input stream.  In this case, the output filename is taken to be a base
+name for writing output SVG files to.
+
+=item B<-n, --multi-number=NUM>
+
+Specify the maximum number of log lines expected for each correlatable
+log message.
+
+=item B<-M, --multi-timeout=SECONDS>
+
+Specify the longest time over which log messages are to be correlated.
+
+=item B<--yo, --yaml-out>
+
+Only perform parsing and correlation, and output a multi-document YAML
+stream, one combined set of profiles per document.
+
+=item B<--yi, --yaml-in>
+
+Only perform the template processing part of the process.  A stream is
+expected on input as produced by C<--yo>
+
+=item B<-t, --tvars=FILE>
+
+Specify a YAML file that contains extra template parameters to
+override the defaults.  Use to specify a file containing report title,
+headers, styles, etc.
+
+=item B<-h, --help>
+
+Display a program usage screen and exit.
+
+=item B<-V, --version>
+
+Display program version and exit.
+
+=item B<-v, --verbose>
+
+Verbose command execution, displaying things like the
+commands run, their output, etc.
+
+=item B<-q, --quiet>
+
+Suppress all normal program output; only display errors and
+warnings.
+
+=item B<-d, --debug>
+
+Display output to help someone debug this script, not the
+process going on.
+
+=back
+

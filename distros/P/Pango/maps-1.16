@@ -1,0 +1,6 @@
+#
+# this file defines mappings only for types that existed in pango 1.16.x
+#
+
+PANGO_TYPE_GRAVITY	PangoGravity		GEnum	Pango::Gravity
+PANGO_TYPE_GRAVITY_HINT	PangoGravityHint	GEnum	Pango::GravityHint

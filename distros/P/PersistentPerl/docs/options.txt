@@ -1,0 +1,118 @@
+/*
+ * Copyright (C) 2003  Sam Horrocks
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ */
+
+Required functionality for each major component of PersistentPerl:
+
+Apache Module:
+    - Set options from the httpd.conf file (set)
+    - Set options from the environment (init)
+    - Use the OPTVAL values
+    - Set the the script's argv (set_script)
+
+Persistent Command-Line
+    - Set options from argv and environment (init)
+    - Use the OPTVAL values
+
+Frontend:
+    - Possibly read values from the #! line in the script file. (read_shbang)
+    - Get the script argv (script_argv)
+    - Use the OPTVAL values
+    - Call the perperl backend (exec_argv and exec_envp)
+
+Backend:
+    - Get perl/perperl options from the command line (init)
+    - Get the script argv (script_argv)
+    - Use the OPTVAL values
+    - Set options from calls via PersistentPerl (set_byname)
+    - Call perl with the correct argv (perl_argv)
+    - Call the perperl backend (exec_argv and exec_envp)
+
+
+Functionality for the perperl_opt module:
+
+Inputs:
+    - The #! line in the script
+    - Argv to the perperl-frontend
+    - Argv to the perperl-backend
+    - Unix environment variables
+    - Settings in the httpd.conf file
+    - Script argv
+    - Settings in the backend made by the perl program
+
+Outputs:
+    - Argv for perperl_backend
+	- For mod_persistentperl, use:
+	    - Settings from the httpd.conf file
+	    - The script argv set by the code
+	- For others:
+	    - Original argv from program
+    - Environment for perperl_backend
+	- Original env from program
+    - The script argv
+	- For mod_persistentperl, must use the previously input argv
+	- For others, get from the program's argv
+    - Argv for perl
+	- Arg0 must be path from #! line in script
+	- Perl options from original argv
+	- Perl options from the #! line
+	- Perl options from the PerlArgs option
+	- Current value of the script argv
+    - OPTVAL values
+	- Settings from httpd.conf file
+	- Settings from environment
+	- Options from the program argv
+	- Options from the #! line
+
+Program design:
+
+Globs:
+    exec_argv, exec_envp, script_argv, perl_argv
+
+void perperl_opt_init(const char * const *argv, const char * const *envp);
+    - Take the argv and split it into perl args, perperl args and script args
+    - Append to the perperl args any options that were changed prior to
+      this call.
+    - Set our OptRec values based on the perperl args
+    - Append to the perl args the value of the PerlArgs option, if set
+    - Store into exec_argv the perl args plus, perperl args and the script args
+    - Point script_argv to a location inside exec_argv
+    - Copy the envp into exec_envp
+    - Set our OptRec values based on the environment
+
+void perperl_opt_read_shbang();
+    - Split the #! line into arg0, perl args and perperl options
+    - Put arg0 into perl_argv[0]
+    - Append the other perl args to the end of perl_argv
+    - Set our OptRec values based on the perperl args
+
+void perperl_opt_set_script_argv(const char * const *argv);
+    - Replace the existing script_argv with a copy of this argv
+
+const char * const *perperl_opt_script_argv();
+    - Return the existing script_argv
+
+char **perperl_opt_perl_argv();
+    - If not called before, append the script argv to the end of perl_argv
+    - Return the perl_argv
+
+const char * const *perperl_opt_exec_argv();
+    - Return the exec_argv
+
+const char * const *perperl_opt_exec_envp();
+    - Return the existing exec_envp

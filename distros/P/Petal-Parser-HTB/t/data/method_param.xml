@@ -1,0 +1,9 @@
+<xml>
+  <input type="hidden" name="mbox" petal:attributes="value cgi/param 'mbox'" />
+  <input type="hidden" name="mbox" petal:attributes='value cgi/param "mbox"' />
+  ${cgi/param --t 'foo'}
+  ${cgi/param --b 'foo'}
+  ${cgi/param --ta 'foo'}
+  ${cgi/self_url}
+  ${foo/bar/baz --t -hello}
+</xml>

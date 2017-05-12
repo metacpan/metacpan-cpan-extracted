@@ -1,0 +1,77 @@
+=head1 NAME
+
+PerlGSL::Integration::MultiDim - A Perlish Interface to the GSL Monte Carlo Integration Library
+
+=head1 SYNOPSIS
+
+ use PerlGSL::Integration::MultiDim qw/int_multi/;
+ my ($piby4, $error) = 
+   int_multi( sub { ($_[0]**2 + $_[1]**2) < 1 }, [0,0], [1,1], {calls => 1e6});
+
+=head1 DESCRIPTION
+
+This module is an interface to the GSL's Monte Carlo multidimensional numerical integration routines. So far only the MISER routine is implemented, the VEGAS routine is planned.
+
+=head1 FUNCTIONS
+
+No functions are exported by default.
+
+=over 4
+
+=item int_multi
+
+This is the main interface provided by the module. It takes three required arguments and an (optional) options hash. The first argument is a subroutine reference defining the integrand. The next two are array references defining the lower and upper bound of integration; these should each be of the same length and in the same order as the dimesions of the system (and thus the number of arguments taken by the subroutine reference).
+
+The options hash reference accepts the following keys:
+
+=over 4
+
+=item *
+
+calls - The number of points sampled in the function space. The default is 500000.
+
+=back
+
+In scalar context the result is returned, in list context the result and the standard deviation (error) are returned.
+
+=back
+
+=head1 INSTALLATION REQUIREMENTS
+
+This module needs the GSL library installed and available. The C<PERLGSL_LIBS> environment variable may be used to pass the C<--libs> linker flags; if this is not specified, the command C<gsl-config --libs> is executed to find them. Future plans include using an L<Alien> module to provide the GSL in a more CPAN-friendly manner.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<PerlGSL>
+
+=item *
+
+L<PerlGSL::Integration::SingleDim>
+
+=item *
+
+L<http://www.gnu.org/software/gsl/manual/html_node/Monte-Carlo-Integration.html>
+
+=back
+
+=head1 SOURCE REPOSITORY
+
+L<http://github.com/jberger/PerlGSL-Integration-MultiDim>
+
+=head1 AUTHOR
+
+Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 by Joel Berger
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+The GSL is licensed under the terms of the GNU General Public License (GPL)
+

@@ -1,0 +1,80 @@
+digraph Network {
+#    size="20,20";
+    fontname=arial;
+    fontsize=12; 
+    rankdir=TB;
+
+    node [fontname=arial, fontsize=12, style=filled, color=orange ];
+    edge [fontname=arial, weight=10, color=blue, fontsize=12, decorate=0 ];
+
+
+    node [ shape=ellipse ];
+
+    daemon_pause    [ label="signal: daemon_pause" ];
+    daemon_child    [ label="signal: daemon_child" ];
+    daemon_resume   [ label="signal: daemon_resume" ];
+    daemon_shutdown [ label="signal: daemon_shutdown" ];
+    shutdown        [ label="event: shutdown" ];
+
+    node [ shape=polygon, sides=4, skew=.4  ];
+
+    is_fork      [ label="Forking Daemon" ];
+    grand_parent [ label="Grand-parent process" ];
+    parent       [ label="Parent process" ];
+    child        [ label="Child process" ];
+
+
+    node [ shape=circle ];
+    
+    w [ label="w"];
+    f [ label="f"];
+    F [ label="F"];
+    r [ label="r"];
+    e [ label="e"];
+    l [ label="l"];
+
+    node [ shape=box ];
+
+    is_fork -> startup;
+
+    startup -> grand_parent [ label="detach" ];
+    grand_parent -> parent;
+
+
+    parent -> check_scoreboard -> parent ;
+
+    check_scoreboard -> too_many -> daemon_pause -> pause;
+    check_scoreboard -> paused -> daemon_resume -> resume;
+
+    pause [ label="pause\n(->pause_accept)" ];
+    resume [ label="ready\n(->resume_accept)" ];
+
+
+    parent -> accept;
+
+    accept -> r1 [ label="update_status: req" ];
+
+    r1 [ label="New request" ];
+
+    r1 -> F -> fork -> f -> child -> daemon_child;
+
+    daemon_child -> r;
+
+    r -> do_req;
+    do_req -> done;
+
+    r -> l [ label="update_status: long"];
+
+    l -> long_req -> done;
+    done -> w [ label="update_status: done"];
+
+    w -> shutdown;
+    shutdown -> e;
+    shutdown -> daemon_shutdown;
+
+    long_req [ label="Handle long request" ];
+    do_req   [ label="Handle request" ];
+
+    too_many [ label="Too many children?" ];
+    paused   [ label="Previously paused?" ];
+}

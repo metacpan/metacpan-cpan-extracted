@@ -1,0 +1,48 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Alarm\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-11 20:03+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Breno G. de Oliveira <garu@cpan.org>\n"
+"Language-Team: brazilian portuguese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/Alarm.pm:44
+msgid "Time (eg: 23:55):"
+msgstr "Hora (exemplo : 23:55) :"
+
+#: lib/Padre/Plugin/Alarm.pm:48
+msgid "Frequency:"
+msgstr "Frequência:"
+
+#: lib/Padre/Plugin/Alarm.pm:58
+msgid "Set Alarm Time"
+msgstr "Escolha a Hora do Alarme"
+
+#: lib/Padre/Plugin/Alarm.pm:91
+msgid "Possible Value Format: \\d:\\d\\d or \\d\\d:\\d\\d like 6:13 or 23:55"
+msgstr "Formatos possíveis: \\d:\\d\\d ou \\d\\d:\\d\\d como 6:13 or 23:55"
+
+#: lib/Padre/Plugin/Alarm.pm:91
+msgid "Wrong Alarm Time"
+msgstr "Hora de alarme incorreta"
+
+#: lib/Padre/Plugin/Alarm.pm:127
+msgid "All Alarms are stopped"
+msgstr "Todos os alarmes estão desativados"
+
+#: lib/Padre/Plugin/Alarm.pm:127
+msgid "Stop Alarm"
+msgstr "Desativar Alarme"
+
+#: lib/Padre/Plugin/Alarm.pm:146
+msgid "All Alarms are cleared"
+msgstr "Todos os Alarmes foram cancelados"
+
+#: lib/Padre/Plugin/Alarm.pm:146
+msgid "Clear Alarm"
+msgstr "Cancelar Alarme"
+

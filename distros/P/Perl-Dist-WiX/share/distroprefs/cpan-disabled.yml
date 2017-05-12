@@ -1,0 +1,17 @@
+---
+comment: |
+
+  Distributions that just will NOT pass tests that are otherwise required 
+  for building Strawberry Perl.
+
+match:
+  distribution: |
+    ^(?x:
+    .^   # never matches, only purpose is to let things align nicely
+    |ADAMK/Archive-Zip-1.28.tar.gz              # Causes other modules to fail tests
+    |ABW/Template-Toolkit-2.21.tar.gz           # Does not pass tests.
+    |JESSE/Locale-Maketext-Simple-0.19.tar.gz   # Does not have Makefile.PL.
+    |JESSE/Locale-Maketext-Simple-0.20.tar.gz   # Does not pass tests.
+    |BLM/Win32API-Registry-0.31.tar.gz          # Does not have Makefile.PL.
+    )|
+disabled: 1

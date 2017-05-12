@@ -1,0 +1,15 @@
+After installing mod_pml, add the following lines to your
+Apache config file to get PML files parsed:
+
+AddType text/html .pml
+
+<Files ~ "\.pml$">
+	SetHandler 	perl-script
+	PerlHandler	Apache::mod_pml
+</Files>
+
+To build this module..
+
+	perl Makefile.PL
+	make
+	make install

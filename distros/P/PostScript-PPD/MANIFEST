@@ -1,0 +1,24 @@
+MANIFEST
+Makefile.PL
+Changes
+README
+eg/check
+lib/PostScript/PPD.pm
+t/00_coverage.t
+t/01_pod.t
+t/02_pod_coverage.t
+t/10_main.t
+t/20_more.t
+t/30_difficult.t
+t/ChkUtil.pm
+t/ppd/Generic-PCL_5_Printer-gimp-print-ijs.ppd
+t/ppd/HP-LaserJet_4L-hpijs.ppd
+t/ppd/LJ4L.ppd
+t/ppd/lj4515.ppd
+t/ppd/pcl-4l.ppd.gz
+t/ppd/postscript.ppd.gz
+t/ppd/zebraep2.ppd.gz
+t/00_info.t
+t/ppd/lj4515.ppd
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

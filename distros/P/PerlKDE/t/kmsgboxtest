@@ -1,0 +1,91 @@
+#!/usr/bin/perl -w
+use KDE;
+import KDE::app;
+
+package TopLevel;
+use KDE;
+import KDE::app;
+
+use Qt::slots 'okPressed()', 'tabChanged(int)',
+	      'doMsgBox()',  'showMsgBox(int)';
+
+@ISA = qw(Qt::Widget);
+
+sub new {
+    my $self = shift->SUPER::new(@_);
+    $self->setCaption("KDE::MsgBox Test");
+    $self->setMinimumSize(300, 200);
+
+    #
+    # add a tabctrl widget
+    #
+
+    my $ok = $self->{'ok'} =
+	new Qt::PushButton("Click me to quit", $self, "_bt1");
+    $self->connect($ok, 'clicked()', 'okPressed()');
+    $ok->adjustSize();
+    my $e = $self->{'e'} = new Qt::ListBox($self, "_listbox");
+    $e->insertItem("Box with stop sign", -1);
+    $e->insertItem("Box with question mark", -1);
+    $e->insertItem("Box with one button and information sign", -1);
+    $e->insertItem("Box with two buttons and exclamation", -1);
+    $self->connect($e, 'selected(int)', 'showMsgBox(int)');
+    $self->adjustSize();
+
+    return $self;
+}
+
+sub resizeEvent {
+    my $self = shift;
+    $self->{'ok'}->move($self->width - 110, $self->height - 30);
+    $self->{'e'}->setGeometry(10, 10, $self->width - 20,
+			      $self->height - 70);
+}
+
+sub tabChanged {
+    my $self = shift;
+    my $newpage = shift;
+    print "tab number $newpage selected\n";
+    $self->{'e'}->setFocus if $newpage == 1;
+}
+
+sub okPressed {
+    $app->quit;
+}
+
+sub doMsgBox {}
+
+sub showMsgBox {
+    my $self = shift;
+    my $item = shift;
+
+    if($item == 0) {
+	print "Result: " .
+	    KDE::MsgBox::yesNoCancel(undef, "Save",
+		"This file has been modified.\n" .
+		"Do you want to save it ?", KDE::MsgBox::STOP) . "\n";
+    } elsif($item == 1) {
+	KDE::MsgBox::yesNo(undef, "Hello",
+	    "Did you crash your Windows today ?",
+	    KDE::MsgBox::QUESTION | KDE::MsgBox::DB_SECOND);
+    } elsif($item == 2) {
+        KDE::MsgBox::message(undef, "This sucks",
+	    "I know, where I want to go today",
+	    KDE::MsgBox::INFORMATION, "Oops");
+    } elsif($item == 3) {
+	KDE::MsgBox::yesNo(undef, "Hi",
+	    "Check your power supply, it's broken",
+	    KDE::MsgBox::EXCLAMATION, "Arrgh");
+    }
+}
+
+package main;
+
+$default_font = new Qt::Font("Helvetica", 12);
+
+Qt::Application::setFont($default_font);
+$toplevel = new TopLevel(undef, "_ktabctl_test");
+
+$toplevel->show;
+$app->setMainWidget($toplevel);
+$app->exec;

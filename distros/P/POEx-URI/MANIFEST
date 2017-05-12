@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/URI/poe.pm
+lib/POEx/URI.pm
+t/00_syntax.t
+t/01_pod.t
+t/02_pod_coverage.t
+t/10_uri.t
+t/11_sparse.t
+t/12_absrel.t
+t/13_canonical.t
+t/15_array.t
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,14 @@
+abstract: PAR filter for reducing code size
+author: Steffen Mueller (smueller@cpan.org)
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: PAR-Filter-Squish
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  PAR: 0.94
+  Perl::Squish: 0.02
+version: 0.02

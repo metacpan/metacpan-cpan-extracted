@@ -1,0 +1,23 @@
+Revision history for Params-Validate-Aggregated
+
+0.05
+
+* work around bad interaction between Data::Alias and Perl >= 5.12
+  which caused compilation failures
+
+0.04
+
+* Makefile.PL: wrong license, missing requirement on parent module
+
+0.03
+
+* rename everything (again!) to Params::Validate::Aggregated::pv_disagg.
+
+0.02
+
+* change name of validate_agg to deagg_pars, as the former implies that
+  validation was occuring, which it is not
+
+0.01
+
+* Initial release.

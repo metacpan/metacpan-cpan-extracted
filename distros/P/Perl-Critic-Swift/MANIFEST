@@ -1,0 +1,22 @@
+Build.PL
+Changes
+lib/Perl/Critic/Policy/CodeLayout/RequireUseUTF8.pm
+lib/Perl/Critic/Policy/Documentation/RequirePODUseEncodingUTF8.pm
+lib/Perl/Critic/Swift.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/author/consistent_version_numbers.t
+t/author/copyright.t
+t/author/distribution.t
+t/author/kwalitee.t
+t/author/pod_coverage.t
+t/author/pod_spelling.t
+t/author/pod_syntax.t
+t/author/README
+t/CodeLayout/RequireUseUTF8.run
+t/Documentation/RequirePODUseEncodingUTF8.run
+t/perlcriticrc
+t/policies.t
+t/self_conformance.t

@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 85444d60288e08bbd01f690324b5670cd0b40f12 CHANGES
+SHA1 b921d4c0b5e4202050e79dddcbab1e0f6c48e17c MANIFEST
+SHA1 47196876f1450b0f0e91e88c4ac636f7836b5325 META.yml
+SHA1 d7d19ede6c7aba0b4fd67966f67b5530b55f9d41 Makefile.PL
+SHA1 bfbcb8279d026bcc34978f3857c60a165eec02b0 README
+SHA1 43be5597cc046b89f35d329b0c79959a207d569e dynamic.pm
+SHA1 5b52cbdabc56a44e4c0a90a3f5a5609a90d26f84 inc/ExtUtils/AutoInstall.pm
+SHA1 06c410f05488c1612ed66b06d3a86b2580581e4a inc/Module/AutoInstall.pm
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 61ab1dd37e33ddbe155907ce51df8a3e56ac8bbf inc/Module/Install/AutoInstall.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 66d3d335a03492583a3be121a7d888f63f08412c inc/Module/Install/Include.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 9b74492a537b62db702e0168e734a1091d4d829a t/1use.t
+SHA1 ddb2d82e1d42ffe92d215827855c4884c06230fb t/2basic.t
+SHA1 5c782845392f975b9069ba51aabc4a47b1d55397 t/3gc.t
+SHA1 e44e0463f05cde23df8b345f664fd6cfe180ac73 t/4gc-array.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlCVwecACgkQMflWJZZAbqAU7ACfWF3yYesWJt1csbLUvu1jTHkL
+GcoAoIJXstse+onneI3usifJTPETFL+a
+=iS3x
+-----END PGP SIGNATURE-----

@@ -1,0 +1,13 @@
+
+Changelog
+MANIFEST
+Makefile.PL
+README
+
+pod2pp
+
+lib/Pod/PerlPoint.pm
+lib/PerlPoint/Import/POD.pm
+
+t/all.t
+META.yml                                 Module meta-data (added by MakeMaker)

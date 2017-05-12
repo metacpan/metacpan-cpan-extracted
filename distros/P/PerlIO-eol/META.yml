@@ -1,0 +1,34 @@
+---
+abstract: 'PerlIO layer for normalizing line endings'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PerlIO-eol
+provides:
+  PerlIO::eol:
+    file: lib/PerlIO/eol.pm
+    version: '0.16'
+requires:
+  Exporter: '0'
+  XSLoader: '0'
+  perl: '5.007003'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PerlIO-eol
+  repository: https://github.com/shlomif/perl-PerlIO-eol.git
+version: '0.16'

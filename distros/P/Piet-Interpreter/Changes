@@ -1,0 +1,24 @@
+Revision history for Perl extension Piet::Interpreter.
+
+0.01  Mon Oct 29 03:58:29 2001
+
+    Original version; created by h2xs 1.21 with options 
+    -X Piet::Interpreter 
+
+    Much optimization, reorganization, modularization, documentation, 
+    testing, and general cleaning up needs done, but it works, sorta.
+
+0.02  Sun Nov 11 01:18:58 2001
+      
+    As much as I love Class::Struct, I'm pulling stuff out into
+    methods.  Sigh.  Refactored and remodularized the PVM (Piet
+    Virtual Machine), and added basic stepping functionality.
+    
+    Added a ton of documentation, and cleaned up the code
+    considerably.  I think this may be ready for public consumption -
+    consider this the "beta" release. 
+
+0.03  Wed Nov 21 05:11:23 2001
+
+    Added Image::Magick to PREREQ_PM list in Makefile.PL for testing.
+    Reformatted the perldoc to avoid making eyes bleed.

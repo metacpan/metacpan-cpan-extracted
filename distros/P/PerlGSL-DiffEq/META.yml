@@ -1,0 +1,30 @@
+---
+abstract: 'A Perlish Interface to Solving ODEs using GSL v1.15+'
+author:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+build_requires:
+  ExtUtils::CBuilder: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PerlGSL-DiffEq
+no_index:
+  file:
+    - README.pod
+provides:
+  PerlGSL::DiffEq:
+    file: lib/PerlGSL/DiffEq.pm
+    version: 0.08
+requires:
+  parent: 0
+  perl: 5.008
+resources:
+  bugtracker: http://github.com/jberger/PerlGSL-DiffEq/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/PerlGSL-DiffEq
+version: 0.08

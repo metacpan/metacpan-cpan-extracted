@@ -1,0 +1,34 @@
+global:
+  plugin_path:
+    - plugins
+  timezone: Asia/Tokyo
+  log:
+    level: error
+
+plugins:
+  - module: Subscription::Config
+    config:
+      feed:
+        - http://plagger.org/trac.cgi/timeline?milestone=on&ticket=on&changeset=on&wiki=on&max=50&daysback=90&format=rss
+        - http://unknownplace.org/cpanrecent/rss/Plagger
+
+  - module: Aggregator::Simple
+
+#  - module: Filter::TracTicketTitle
+
+  - module: Filter::Rule
+    rule:
+      - module: Deduped
+        path: /home/miyagawa/svn/plagger/irc.db
+
+  - module: Notify::IRC
+    config:
+      daemon_port: 9991
+      nickname: plaggerbot
+      server_host: chat.freenode.net
+      server_port: 6667
+      server_channels:
+        - #plagger-ja
+        - #plagger 
+      charset: iso-2022-jp
+      announce: action

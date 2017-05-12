@@ -1,0 +1,10 @@
+severity = harsh
+
+# RequireArgUnpacking
+#     Doesn't allow for using shift to get $self and then using @_ with named params
+# ProhibitImplicitNewlines
+#     Doesn't let me do qq|| blocks.
+# ProhibitConstantPragma
+#     Constants are used for compatibility reasons.
+exclude = RequireArgUnpacking ProhibitImplicitNewlines
+

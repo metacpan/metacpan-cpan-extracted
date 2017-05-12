@@ -1,0 +1,4 @@
+<xml>
+  This is a test
+  <foo bar="buz" baz="booze">with some tag in there</foo>
+</xml>

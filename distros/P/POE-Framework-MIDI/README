@@ -1,0 +1,130 @@
+POE::Framework::MIDI 
+
+SYNOPSIS
+
+A framework for algorithmic MIDI composition using POE
+
+DESCRIPTION
+
+POE::Framework::MIDI is a suite of modules which aim to provide a generalized
+framework for writing programs to algorithmically generate MIDI music using Perl 
+and POE
+
+The Conductor object creates Musician objects which generate MIDI event streams
+and run them through rules and transformations.  The Conductor then renders the
+events down to perl code that MIDI::Simple can handle, and then runs that code
+to write a .mid file
+
+REQUIREMENTS
+
+POE
+Midi::Simple
+
+USAGE
+
+use POE::Framework::MIDI::POEMusician; 
+
+# ... include your musician objects here ...
+# see the example scripts for more info
+
+POE::Framework::MIDI::POEConductor->spawn(
+{
+	bars => 30,
+	verbose => 1,
+	debug => 1,
+	filename => 'test_output.mid',
+	musicians =>
+  [
+	{
+	name => 'frank',
+	
+	# specify which module you want to have "play" this track. 
+	# 
+	# the only real requirement for a musician object is
+	# that it define a 'make_bar' method.  ideally that should
+	# return (at least) POE::Framework::MIDI::Bar( { number => $barnum } );
+	# or a ::Phrase( { number => $barnum } );  See the example scripts
+	# for more info.
+	
+	# set the package you want to generate events on this channel
+	package => 'POE::Framework::MIDI::Musician::Your::Musicians::GuitarFreak',
+	
+	# which MIDI channel should these events end up on?	
+	channel => 1,
+	
+	# which MIDI patch should we use?  frank likes the jazz guitar sound.
+	patch => '27',
+	},
+
+	{
+	name => 'ike',
+	package => 'POE::Framework::MIDI::Musician::Your::Musicians::MyOrganPlayer',
+	channel => 2,
+	patch => '60',
+	},
+	{
+	name => 'terry',
+	package => 'POE::Framework::MIDI::Musician::Your::Musicians::MyFunkyDrummer',
+	channel => 9, # drum channel - zero based
+	patch => '58',
+	},
+  ],
+}); 
+
+$poe_kernel->run; # this is exported by POE. 
+
+BUGS
+
+Probably lots.  Since Gene and I are the only ones who've used the code, it might
+not work so well across different platforms.  who knows :)  Give it a shot and
+tell us what happens. 
+
+EXAMPLES
+
+You can find some other example code for musician objects at 
+http://justsomeguy.com/code/POE/POE-Framework-MIDI/examples/
+
+
+SUPPORT
+
+comments/questions/queries: steve@justsomeguy.com
+
+AUTHORS
+
+Steve McNabb
+CPAN ID: SMCNABB 
+steve@justsomeguy.com
+http://justsomeguy.com
+
+Gene Boggs - ology@ology.net
+http://ology.net
+CPAN ID: GENE
+
+Thanks:
+
+Rocco Caputo
+Gene Boggs
+Sean Burke
+Phillip Gwynn
+Artur Bergman
+
+rhizomatic #perl, #poe  and #tempura kooks one and all
+
+COPYRIGHT
+
+Copyright (c) 2003 Steve McNabb and Gene Boggs.  All rights reserved.
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+SEE ALSO
+
+perl(1). POE, MIDI-Perl
+
+1;
+
+
+
+

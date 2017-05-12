@@ -1,0 +1,219 @@
+# French translations for Perinci-CmdLine package.
+# Copyright (C) 2013 Steven Haryanto
+# This file is distributed under the same license as the Perinci-CmdLine package.
+# Automatically generated, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Perinci-CmdLine 0.96\n"
+"Report-Msgid-Bugs-To: perlancar@cpan.org\n"
+"POT-Creation-Date: 2015-09-18 14:39+0700\n"
+"PO-Revision-Date: 2013-12-13 13:20+0700\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: lib/Perinci/CmdLine/Classic.pm:123
+#, perl-format
+msgid "Enter %s:"
+msgstr "Entrez %s:"
+
+#: lib/Perinci/CmdLine/Classic.pm:184
+msgid "Equivalent to --format=json-pretty"
+msgstr "Equivalent à --format=json-pretty"
+
+#: lib/Perinci/CmdLine/Classic.pm:188
+msgid "When outputing as JSON, strip result envelope"
+msgstr "Lors de la sortie en JSON, dépouiller l'enveloppe de résultat"
+
+#: lib/Perinci/CmdLine/Classic.pm:192
+msgid "Pass options to formatter"
+msgstr "Passer des options au formateur"
+
+#: lib/Perinci/CmdLine/Classic.pm:238
+msgid "List actions history"
+msgstr "Énumérer historique des actions"
+
+#: lib/Perinci/CmdLine/Classic.pm:248
+msgid "Clear actions history"
+msgstr "Effacer historique des actions"
+
+#: lib/Perinci/CmdLine/Classic.pm:258
+msgid "Undo previous action"
+msgstr "Annuler l'action précédente"
+
+#: lib/Perinci/CmdLine/Classic.pm:268
+msgid "Redo previous undone action"
+msgstr "Refaire l'action annulée"
+
+#: lib/Perinci/CmdLine/Classic.pm:353
+msgid "Run in simulation mode (also via DRY_RUN=1)"
+msgstr "Fonctionner en mode simulation (également via DRY_RUN=1)"
+
+#: lib/Perinci/CmdLine/Classic.pm:572
+msgid "There are no subcommands"
+msgstr "Il n'y a pas de sous-commandes"
+
+#: lib/Perinci/CmdLine/Classic.pm:602
+#, perl-brace-format
+msgid "{category} subcommands"
+msgstr "Sous-commandes de la catégorie '{category}'"
+
+#: lib/Perinci/CmdLine/Classic.pm:603
+msgid "main"
+msgstr "principal"
+
+#: lib/Perinci/CmdLine/Classic.pm:633 lib/Perinci/CmdLine/Classic.pm:642
+#: lib/Perinci/CmdLine/Classic.pm:654 lib/Perinci/CmdLine/Classic.pm:663
+#, perl-brace-format
+msgid "{program} version {version}"
+msgstr "{program} version {version}"
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:135
+msgid "--cmd=<other-subcommand> [options]"
+msgstr "--cmd=<autre-sous-commande> [options]"
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:138
+msgid "<subcommand> [options]"
+msgstr "<sous-commande> [options]"
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:146
+msgid "Usage"
+msgstr "Utilisation"
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:183
+msgid "Options"
+msgstr "Options"
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:185
+#, perl-brace-format
+msgid "{category} options"
+msgstr "Options avec catégorie '{category}'"
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:278
+msgid "Popular subcommands"
+msgstr "Sous-commandes populaires"
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:278
+msgid "Subcommands"
+msgstr "Sous-commandes"
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:316
+msgid "For more complete help, use '--help --verbose'"
+msgstr "Pour de l'aide plus complète, utilisez '--help --verbose'"
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:320
+msgid "To see all available subcommands, use '--subcommands'"
+msgstr ""
+"Pour voir toutes les sous-commandes disponibles, utilisez '--subcommands'"
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:335
+msgid "Description"
+msgstr "Description"
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:347
+msgid "Examples"
+msgstr "Examples"
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:414
+msgid "Result"
+msgstr "Résultat"
+
+#~ msgid "--version (or -v)"
+#~ msgstr "--version (ou -v)"
+
+#~ msgid "Show version"
+#~ msgstr "Afficher la version"
+
+#, fuzzy
+#~ msgid "--help (or -h, -?) [--verbose]"
+#~ msgstr "--help (ou -h, -?) [--verbose]"
+
+#~ msgid "Display this help message"
+#~ msgstr "Afficher ce message d'aide"
+
+#~ msgid "Choose output format, e.g. json, text"
+#~ msgstr "Choisir le format de sortie, par exemple json, text"
+
+#~ msgid "Equivalent to --format=yaml"
+#~ msgstr "Equivalent à --format=yaml"
+
+#~ msgid "Equivalent to --format=perl"
+#~ msgstr "Equivalent à --format=perl"
+
+#, fuzzy
+#~ msgid "--subcommands"
+#~ msgstr "--subcommands"
+
+#~ msgid "List available subcommands"
+#~ msgstr "Énumérer des sous-commandes disponibles"
+
+#~ msgid "Set path to configuration file"
+#~ msgstr "Fixer le chemin de fichier de configuration"
+
+#~ msgid "Do not use any configuration file"
+#~ msgstr "Ne pas utiliser aucun ficher de configuration"
+
+#~ msgid "Set configuration profile to use"
+#~ msgstr "Fixer le profil de configuration à utiliser"
+
+#~ msgid "Set log level to quiet"
+#~ msgstr "Fixer le niveau de logging au quiet"
+
+#~ msgid "Set log level to verbose"
+#~ msgstr "Fixer le niveau de logging au verbose"
+
+#~ msgid "Set log level to debug"
+#~ msgstr "Fixer le niveau de logging au debug"
+
+#~ msgid "Set log level to trace"
+#~ msgstr "Fixer le niveau de logging au trace"
+
+#~ msgid "Set log level"
+#~ msgstr "Fixer le niveau de logging"
+
+#~ msgid "[options]"
+#~ msgstr "[options]"
+
+#~ msgid "Common options"
+#~ msgstr "Options communes"
+
+#~ msgid "required"
+#~ msgstr "nécessaire"
+
+#~ msgid "or as argument #{index}"
+#~ msgstr "ou comme argument #{index}"
+
+#~ msgid "from stdin"
+#~ msgstr "à partir de stdin"
+
+#~ msgid "from stdin/files"
+#~ msgstr "ou à partir de stdin/des fichiers"
+
+#~ msgid "value in"
+#~ msgstr "valeur est l'une des"
+
+#~ msgid "Undo options"
+#~ msgstr "Options d'annuler"
+
+#~ msgid "from file"
+#~ msgstr "à partir de fichier"
+
+#~ msgid "Links"
+#~ msgstr "Liens"
+
+#~ msgid "Argument %1 must be set to '-' which means from stdin"
+#~ msgstr "Argument %1 doit être mis à '-', ce qui signifie à partir de stdin"
+
+#~ msgid "Select subcommand"
+#~ msgstr "Sélectionner une sous-commande"
+
+#~ msgid "For general help, use '%1'"
+#~ msgstr "Pour de l'aide générale, utilisez '%1'"
+
+#~ msgid "For help on a subcommand, use '%1'"
+#~ msgstr "Pour de l'aide sur une sous-commande, utilisez '%1'"

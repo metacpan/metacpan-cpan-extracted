@@ -1,0 +1,21 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Msgfmt.pm
+inc/Module/Install/Share.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Padre/Plugin/Experimento.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+MYMETA.json
+MYMETA.yml
+README
+share/locale/Padre__Plugin__Experimento-ar.po
+t/00-compile.t
+t/01-eol.t

@@ -1,0 +1,11 @@
+t/01-shared.t .. 
+Dubious, test returned 1 (wstat 256, 0x100)
+Failed 1/4 subtests 
+
+Test Summary Report
+-------------------
+t/01-shared.t (Wstat: 256 Tests: 4 Failed: 1)
+  Failed test:  1
+  Non-zero exit status: 1
+Files=1, Tests=4,  0 wallclock secs ( 0.03 usr  0.01 sys +  0.38 cusr  0.09 csys =  0.51 CPU)
+Result: FAIL

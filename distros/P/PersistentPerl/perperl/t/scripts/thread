@@ -1,0 +1,24 @@
+# Simple test of threaded perl
+
+use strict;
+use Config;
+use Thread;
+
+if ($ARGV[0] == 1) {
+    # Just report if threads are available.
+    die unless $Config{usethreads};
+    print "ok\n";
+    exit(0);
+}
+
+# Next test runs some threads.
+
+sub sub1 {
+    print "x\n";
+}
+
+my $thr1 = Thread->new(\&sub1);
+my $thr2 = Thread->new(\&sub1);
+
+$thr1->join;
+$thr2->join;

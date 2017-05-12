@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+LICENSE.txt
+t/Parse-Native.t
+t/g_anchor_in_list_context.t
+t/simple_export.t
+lib/Parse/Native.pm
+lib/Parse/Native/Mode/Startup.pm
+META.yml                                 Module meta-data (added by MakeMaker)

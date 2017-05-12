@@ -1,0 +1,9 @@
+0.03
+	- Use Any::Moose instead of Squirrel (Squirrel is deprecated)
+
+0.02
+	- Output newlines at the end of each message for improved compatibility
+	- Depend on newer JSON (incremental parser fixes)
+
+0.01
+	- Initial release

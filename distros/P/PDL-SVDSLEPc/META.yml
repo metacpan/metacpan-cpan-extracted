@@ -1,0 +1,25 @@
+---
+abstract: 'PDL interface to SLEPc sparse singular value decomposition'
+author:
+  - 'Bryan Jurish'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Data::Dumper: '0'
+  Devel::CheckLib: '0'
+  ExtUtils::MakeMaker: '0'
+  PDL: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDL-SVDSLEPc
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  PDL: '0'
+version: '0.003'

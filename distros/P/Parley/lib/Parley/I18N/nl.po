@@ -1,0 +1,895 @@
+msgid "%1 wrote:"
+msgstr "%1 schreef:"
+
+msgid "%quant(%1,post)"
+msgstr "%quant(%1,post,posten)"
+
+msgid "%quant(%1,Forum)"
+msgstr "%quant(%1,Forum,Forums)"
+
+msgid "%quant(%1,Reply)"
+msgstr "%quant(%1,Antwoord,Antwoorden)"
+
+msgid "%quant(%1,reply)"
+msgstr "%quant(%1,antwoord,antwoorden)"
+
+msgid "%quant(%1,View)"
+msgstr "%quant(%1,Mening,Meningen)"
+
+msgid "%quant(%1,view)"
+msgstr "%quant(%1,mening,meningen)"
+
+msgid "404 Not Found"
+msgstr "404 vinden niet"
+
+msgid "ACCEPT TERMS"
+msgstr "U moet de Voorwaarden het ermee instemmen hieronder blijven gebruikend de plaats"
+
+msgid "Access Denied"
+msgstr "Ontkende toegang"
+
+msgid "Access to this application is not permitted from %1"
+msgstr "De toegang tot deze toepassing wordt niet toegelaten van %1"
+
+msgid "Activate Your %s Registration"
+msgstr "Activeer Uw  %s Registratie"
+
+msgid "Active"
+msgstr "Actief"
+
+msgid "ADD THREAD WATCH"
+msgstr "Voeg een Horloge van de Draad toe"
+
+msgid "Add Reply"
+msgstr "Voeg Antwoord toe"
+
+msgid "Add T-and-Cs"
+msgstr "Voeg T&amp;Cs toe"
+
+msgid "Add Watch"
+msgstr "Voeg Horloge toe"
+
+msgid "ADMIN LOCK POST"
+msgstr "Sluit deze post"
+
+msgid "ADMIN SPECIFY LOCK THREAD"
+msgstr "U moet de te sluiten draad specificeren"
+
+msgid "ADMIN SPECIFY STICK THREAD"
+msgstr "U moet de te plakken draad specificeren"
+
+msgid "Administration"
+msgstr "Beleid"
+
+msgid "ago"
+msgstr "geleden"
+
+msgid "All Forums"
+msgstr "Alle Forums"
+
+msgid "All Rights Reserved"
+msgstr "Alle Voorgebe houde Rechten"
+
+msgid "An email has been sent to"
+msgstr "Een e-mail is verzonden naar"
+
+msgid "An error has occurred"
+msgstr "Een fout is voorgekomen"
+
+msgid "AUTHENTICATION FAILED"
+msgstr "Onbekwaam om de geleverde login geloofsbrieven voor authentiek te verklaren"
+
+msgid "Avatar"
+msgstr "Avatar"
+
+msgid "Cancel"
+msgstr "Annuleer"
+
+msgid "CHANGE AVATAR"
+msgstr "Verander uw avatar beeld door een dossier te selecteren en de Upload hieronder knoop te klikken"
+
+msgid "Click on the login link to continue"
+msgstr "Klik op de login verbinding om verder te gaan"
+
+msgid "Close"
+msgstr "Sluit"
+
+msgid "Comment"
+msgstr "Commentaar"
+
+msgid "Confirm Password"
+msgstr "Bevestig Wachtwoord"
+
+msgid "Contents"
+msgstr "Inhoud"
+
+msgid "Continue"
+msgstr "Ga verder"
+
+msgid "Continue reading"
+msgstr "Blijf lezend"
+
+msgid "Create New Thread"
+msgstr "Creëer Nieuwe Draad"
+
+msgid "created by"
+msgstr "langs gecreeerd"
+
+msgid "created by (%1)"
+msgstr "langs gecreeerd %1"
+
+msgid "Current Avatar"
+msgstr "Huidige Avatar"
+
+msgid "Current Forum"
+msgstr "Huidig Forum"
+
+msgid "Current User"
+msgstr "Huidige Gebruiker"
+
+msgid "DATABASE CRITERIA MISSING"
+msgstr "Ontbrekende criteria in gegevensbestandraadpleging"
+
+msgid "DATABASE TOO MANY RECORDS"
+msgstr "De gegevensbestandraadpleging keerde teveel verslagen terug"
+
+msgid "Default"
+msgstr "Gebrek"
+
+msgid "DFV FIELDS MISSING"
+msgstr "??n of meerdere vereiste gebieden missen."
+
+msgid "DFV FIELDS INVALID"
+msgstr "??n of meerdere gebieden zijn ongeldig."
+
+msgid "DFV FILL REQUIRED"
+msgstr "U moet alle vereiste gebieden invullen."
+
+msgid "EDIT LOCKED POST"
+msgstr "U kunt gesloten posten uitgeven niet."
+
+msgid "EDIT LOGIN REQUIRED"
+msgstr "U moet worden ingelogd alvorens u uw posten kunt uitgeven."
+
+msgid "EDIT OWN POSTS ONLY"
+msgstr "U kunt posten slechts uitgeven u hebt gemaakt."
+
+msgid "Edit"
+msgstr "Geef uit"
+
+msgid "Edited"
+msgstr "Uitgegeven"
+
+msgid "Email Address"
+msgstr "E-mail Adres"
+
+msgid "Email Engine"
+msgstr "E-mail Motor"
+
+msgid "EMAIL FAILED STORE"
+msgstr "Droevig, kunnen wij momenteel niet uw informatie opslaan. Gelieve te proberen opnieuw later."
+
+msgid "EMAIL IN USE (%1)"
+msgstr "E-mail richt u heeft gekozen is reeds in gebruik.<br />Gelieve te proberen verschillende, of te gebruik <a href=\"%1\">Vergeten Wachtwoord</a> pagina."
+
+msgid "EMAIL SEND PROBLEM"
+msgstr "Er was een probleem verzendend een e-mail van het systeem"
+
+msgid "EMAIL MISSING SUBJECT"
+msgstr "Het onderworpen Missen van de Lijn"
+
+msgid "ENTER REPLY"
+msgstr "Gelieve te gaan uw antwoord in de hieronder vorm in"
+
+msgid "FILE NOT IMAGE"
+msgstr "Het geuploade dossier schijnt geen beelddossier te zijn"
+
+msgid "FILE NEWDIR FAILED"
+msgstr "Slaagde er niet in om bestemmingsfolder tot stand te brengen. Onbekwaam op te slaan uploaden."
+
+msgid "FILE STORE FAILED"
+msgstr "Slaagde op te slaan er niet in uploaden."
+
+msgid "FILE TOO LARGE"
+msgstr "Te grote de grootte van het dossier. Het dossier moet neen groter zijn dan 20K."
+
+msgid "First"
+msgstr "Eerst"
+
+msgid "First Name"
+msgstr "Voornaam"
+
+msgid "Forgotten Password"
+msgstr "Vergeten Wachtwoord"
+
+msgid "Forum"
+msgstr "Forum"
+
+msgid "Forums"
+msgstr "Forums"
+
+msgid "Forum List"
+msgstr "De Lijst van het forum"
+
+msgid "Forum Moderators"
+msgstr "De Moderatoren van het forum"
+
+msgid "Forum Name"
+msgstr "De Naam van het forum"
+
+msgid "Forum Summary"
+msgstr "De Samenvatting van het forum"
+
+msgid "FORUMNAME IN USE"
+msgstr "Het forum noemt u heeft gekozen is reeds in gebruik. Gelieve te proberen verschillende."
+
+msgid "FORUMNAME USED"
+msgstr "reeds is gebruikt door een andere gebruiker."
+
+msgid "General"
+msgstr "Algemeen"
+
+msgid "Guest User"
+msgstr "De Gebruiker van de gast"
+
+msgid "Go"
+msgstr "Ga"
+
+msgid "Help"
+msgstr "Hulp"
+
+# Search for [....] _in_ [......]
+msgid "in"
+msgstr "in"
+
+msgid "Incomplete authentication URL"
+msgstr "Onvolledige authentificatie URL"
+
+msgid "Incomplete URL"
+msgstr "Onvolledig URL"
+
+# e.g. Invalid user-id
+msgid "Invalid %1"
+msgstr "Ongeldig %1"
+
+msgid "Invalid requested value"
+msgstr "Ongeldige gevraagde waarde"
+
+msgid "IP Bans"
+msgstr "IP Verboden"
+
+msgid "IP Information"
+msgstr "IP-Informatie"
+
+msgid "IP Logged"
+msgstr "IP Geregistreerd"
+
+msgid "Last"
+msgstr "Duur"
+
+msgid "Last Modified"
+msgstr "Duur Gewijzigd"
+
+msgid "Last Name"
+msgstr "Laatste Naam"
+
+msgid "Last Post"
+msgstr "Laatste Post"
+
+msgid "last post by"
+msgstr "laatste post langs"
+
+msgid "last post by (%1)"
+msgstr "laatste post langs %1"
+
+msgid "Last Viewed"
+msgstr "Duur Bekeken"
+
+msgid "LOCK AFTER POSTING"
+msgstr "De draad van het slot na het posten"
+
+msgid "Lock Thread"
+msgstr "De Draad van het slot"
+
+msgid "Locked"
+msgstr "Gesloten"
+
+msgid "Locked Post"
+msgstr "Gesloten Post"
+
+msgid "LOGIN ADD REPLY"
+msgstr "U moet worden ingelogd alvorens u een antwoord kunt toevoegen."
+
+msgid "LOGIN NEW TOPIC"
+msgstr "U moet worden ingelogd om een nieuw onderwerp toe te voegen."
+
+msgid "LOGIN REQUIRED"
+msgstr "U moet worden ingelogd alvorens u tot dit gebied kunt toegang hebben."
+
+msgid "LOGIN THREAD CONTINUE"
+msgstr "U moet worden ingelogd alvorens u de functie van de draadvoortzetting kunt gebruiken."
+
+msgid "LOGIN USE NEW"
+msgstr "Tevreden log-in die uw gebruikersbenaming gebruikt en uw <u>nieuw</u> wachtwoord."
+
+msgid "LOGIN VIEW WATCHES"
+msgstr "U moet worden ingelogd alvorens u uw gelete op draden kunt bekijken."
+
+msgid "LOGIN WATCH TOPIC"
+msgstr "U moet worden ingelogd alvorens u op een onderwerp kunt letten."
+
+msgid "Logged in as"
+msgstr "Ingelogd zoals"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Login Not Allowed"
+msgstr "Toegestaan niet login"
+
+msgid "Logins are not permitted from %1"
+msgstr "Logins wordt niet toegelaten van %1"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "Manage"
+msgstr "Leid"
+
+msgid "Manage user roles"
+msgstr "Beheren rollen van gebruikers"
+
+msgid "Me"
+msgstr "Me"
+
+msgid "Main Page"
+msgstr "Hoofd Pagina"
+
+msgid "Message"
+msgstr "Bericht"
+
+msgid "Moderate"
+msgstr "Matig me"
+
+msgid "My Preferences"
+msgstr "Mijn Voorkeur"
+
+msgid "My Profile"
+msgstr "Mijn Profiel"
+
+msgid "My Watched Threads"
+msgstr "Mijn Gelete op Draden"
+
+msgid "Name"
+msgstr "Naam"
+
+msgid "Never Posted"
+msgstr "Nooit Gepost"
+
+msgid "New Password"
+msgstr "Nieuw Wachtwoord"
+
+msgid "Next"
+msgstr "Daarna"
+
+msgid "Nickname"
+msgstr "Bijnaam"
+
+msgid "No"
+msgstr "Nr"
+
+msgid "No posts"
+msgstr "Geen posten"
+
+msgid "No reason given"
+msgstr "Geen gegeven reden"
+
+msgid "NO MATCHING USERS"
+msgstr "Er zijn geen gebruikers die die informatie aanpassen"
+
+msgid "NO RECENT THREADS"
+msgstr "Geen recente draden aan vertoning"
+
+msgid "NO SEARCH RESULTS"
+msgstr "Geen resultaten gevonden passende gespecificeerde voorwaarden"
+
+msgid "NO SITE TERMS"
+msgstr "Deze plaats heeft geen Voorwaarden Aan mening"
+
+msgid "No Such Form"
+msgstr "Geen Dergelijke Vorm"
+
+msgid "No User Avatar"
+msgstr "Geen Avatar van de Gebruiker"
+
+msgid "No User Specified"
+msgstr "Geen Gespecificeerde Gebruiker"
+
+msgid "non-integer forum id passed"
+msgstr "Overgegaane het forumidentiteitskaart van het niet-geheel"
+
+msgid "non-integer post id passed"
+msgstr "Post overgegaane identiteitskaart van het niet-geheel"
+
+msgid "non-integer thread id passed"
+msgstr "Overgegaane de draadidentiteitskaart van het niet-geheel"
+
+msgid "non-integer user id passed"
+msgstr "Overgegaane de gebruikersidentiteitskaart van het niet-geheel"
+
+msgid "None"
+msgstr "Niets"
+
+msgid "No Moderators"
+msgstr "Niets"
+
+msgid "Notifications"
+msgstr "Berichten"
+
+msgid "Not Authenticated"
+msgstr "Voor authentiek verklaard niet"
+
+msgid "of"
+msgstr "van"
+
+msgid "or"
+msgstr "of"
+
+msgid "Page"
+msgstr "Pagina"
+
+msgid "Page %1 of %2"
+msgstr "Pagina %1 van %2"
+
+msgid "PASSWORD DETAILS SENT"
+msgstr "U zou een e-mail in de volgende notulen met verdere instructies moeten ontvangen om uw wachtwoord terug te stellen."
+
+msgid "PASSWORD EMAIL SEND FAILED"
+msgstr "De toepassing slaagde er niet in om het wachtwoordterugstellen e-mail te verzenden."
+
+msgid "PASSWORD ENTER DETAILS"
+msgstr "Gelieve te gaan uw gebruikersbenaming en wachtwoord in"
+
+msgid "PASSWORD GAIN"
+msgstr "Om tot uw rekening toegang te krijgen kan uw wachtwoord worden teruggesteld, en een authentificatie e-mail genomen kwalijk."
+
+msgid "PASSWORD IMPOSSIBLE"
+msgstr "Dit maakt het onmogelijk om u aan uw huidig wachtwoord te herinneren."
+
+msgid "PASSWORD PROCEED"
+msgstr "Als u alstublieft wenst te werk te gaan ga de gebruikersbenaming of e-mailadres in u omhoog met ondertekende."
+
+msgid "PASSWORD RESET"
+msgstr "Om uw wachtwoord terug te stellen ga uw gebruikersbenaming en uw gewenst wachtwoord hieronder op de gebieden in, dan klik <em>stel mijn wachtwoord terug</em> knoop om te werk te gaan."
+
+msgid "PASSWORD RESET ID BOGUS"
+msgstr "Valse identiteitskaart van het wachtwoordterugstellen"
+
+msgid "PASSWORD RESET SUCCESS"
+msgstr "Uw wachtwoord is geplaatst aan de waarde u inging."
+
+msgid "PASSWORD RESET URL INCOMPLETE"
+msgstr "Het onvolledige wachtwoordterugstellen URL."
+
+msgid "PASSWORD STORES"
+msgstr "slaat een gecodeerd exemplaar van uw wachtwoord of e-mailadres op u omhoog met ondertekende."
+
+msgid "Password"
+msgstr "Wachtwoord"
+
+msgid "Password Reminder"
+msgstr "De Herinnering van het wachtwoord"
+
+msgid "Password Reminder"
+msgstr "De Herinnering van het wachtwoord"
+
+msgid "person"
+msgstr "persoon"
+
+msgid "Please choose a language"
+msgstr "Gelieve te kiezen een taal"
+
+msgid "Please enter suspension information"
+msgstr "Gelieve te gaan opschortingsinformatie in"
+
+msgid "Please enter your information"
+msgstr "Gelieve te gaan uw informatie in"
+
+msgid "Please enter your username and password"
+msgstr "Gelieve te gaan uw gebruikersbenaming en wachtwoord in"
+
+msgid "people"
+msgstr "mensen"
+
+msgid "posted by"
+msgstr "langs gepost"
+
+msgid "Posting is not permitted from %1"
+msgstr "Het posten wordt niet toegelaten van %1"
+
+msgid "Posting Not Allowed"
+msgstr "Toegestaan niet posten"
+
+msgid "Post Edited By: %1"
+msgstr "Post Uitgegeven door: %1"
+
+msgid "Posted from %1"
+msgstr "Gepost van %1"
+
+msgid "Posts"
+msgstr "Posten"
+
+msgid "posts"
+msgstr "posten"
+
+msgid "Posts Made"
+msgstr "Gemaakte posten"
+
+msgid "PREFS ADD WATCHES"
+msgstr "Voeg automatisch horloges voor nieuwe posten toe"
+
+msgid "PREFS DESIRED LOCATION"
+msgstr "Selecteer uw gewenste plaats. Dit zal aan vertoningstijden worden gebruikt gebruikend uw lokale timezone."
+
+msgid "PREFS EMAIL NOTIFICATION"
+msgstr "Ontvang e-mailbericht voor gelete op draden"
+
+msgid "Preview"
+msgstr "Voorproef"
+
+msgid "Previous"
+msgstr "Vorig"
+
+msgid "PROFILE NOT FOUND"
+msgstr "Kan van een profiel voor de gevraagde gebruiker de plaats bepalen niet."
+
+msgid "Post New Terms"
+msgstr "Post Nieuwe Termijnen"
+
+msgid "Post New Topic"
+msgstr "Post Nieuw Onderwerp"
+
+msgid "Quote"
+msgstr "Citaat"
+
+msgid "Reason for suspension"
+msgstr "Reden voor opschorting"
+
+msgid "Recently Updated Threads"
+msgstr "Onlangs Bijgewerkte Draden"
+
+msgid "Register"
+msgstr "Register"
+
+msgid "Registration Complete"
+msgstr "Volledige registratie"
+
+msgid "Registrations are not permitted from %1"
+msgstr "De registratie wordt niet toegelaten van %1"
+
+msgid "Registration Not Allowed"
+msgstr "Toegestane niet registratie"
+
+msgid "Remove Watch"
+msgstr "Verwijder Horloge"
+
+msgid "REPLY LOCKED THREAD"
+msgstr "U kunt op een gesloten draad antwoorden niet."
+
+msgid "Reply"
+msgstr "Antwoord"
+
+msgid "Replying To"
+msgstr "Het antwoorden op"
+
+msgid "Reset My Password"
+msgstr "Stel Mijn Wachtwoord terug"
+
+msgid "Return to"
+msgstr "Terugkeer aan"
+
+msgid "Return to the forum"
+msgstr "Terugkeer naar het forum"
+
+msgid "Reset Your %s Password"
+msgstr "Stel Uw terug %s Wachtwoord"
+
+msgid "said"
+msgstr "gezegd"
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Search For"
+msgstr "Zoek naar"
+
+msgid "Search Results"
+msgstr "De Resultaten van het onderzoek"
+
+msgid "Searching for"
+msgstr "Het zoeken naar"
+
+msgid "Select Zone"
+msgstr "Selecteer Streek"
+
+#msgid "Select Zone"
+#msgstr "Kies Tijdzone"
+
+msgid "Service"
+msgstr "De dienst"
+
+msgid "Services"
+msgstr "De diensten"
+
+msgid "Show timezone"
+msgstr "Toon timezone"
+
+msgid "Sign Up"
+msgstr "Teken omhoog"
+
+msgid "SIGNUP COMPLETE FORM"
+msgstr "Voltooi hieronder de vorm om een nieuwe gebruikersrekening tot stand te brengen."
+
+msgid "SIGNUP EMAIL"
+msgstr "Uw E-mailadres"
+
+msgid "SIGNUP EMAIL CONFIRM"
+msgstr "Bevestig E-mailadres"
+
+msgid "SIGNUP EMAIL USAGE"
+msgstr "Uw e-mailadres zal niet doorgegeven worden aan enige derden. Het zal worden gebruikt om een activeringsverbinding voor de nieuwe rekening te verzenden. Als u om het alarm verzoekt van de draadupdate zal dit adres ook gebruikt worden voor het bericht e-mail."
+
+msgid "SIGNUP ERRORS"
+msgstr "De volgende fouten werden gevonden in uw voorlegging"
+
+msgid "SIGNUP FORUMNAME"
+msgstr "De Naam van het forum"
+
+msgid "SIGNUP FORUMNAME DESCRIPTION"
+msgstr "Uw <em>De Naam van het forum</em> zal met alle het posten worden getoond u op de forums maakt. De namen zijn uniek allen van het forum, zodat wanneer twee het "John Smith"s register, slechts zoals zal verschijnen \"John Smith\" wanneer het posten. (Droevige andere John Smith!)"
+
+msgid "SIGNUP PASSWORD"
+msgstr "Gewenst Wachtwoord"
+
+msgid "SIGNUP PASSWORD CONFIRM"
+msgstr "Bevestig wachtwoord"
+
+msgid "SIGNUP USERNAME"
+msgstr "Gewenste Gebruikersbenaming"
+
+msgid "SITE MODERATOR REQUIRED"
+msgstr "U moet een plaatsmoderator zijn om tot deze sectie van de plaats toegang te hebben."
+
+msgid "Site"
+msgstr "Plaats"
+
+msgid "Snippet"
+msgstr "Snippet"
+
+msgid "Start"
+msgstr "Begin"
+
+msgid "Start A New Topic"
+msgstr "Begin een Nieuw Onderwerp"
+
+msgid "Stick Thread"
+msgstr "De Draad van de stok"
+
+msgid "Sticky"
+msgstr "Kleverig"
+
+msgid "Sticky Topic"
+msgstr "Kleverig Onderwerp"
+
+msgid "Stop"
+msgstr "Einde"
+
+msgid "Subject"
+msgstr "Onderwerp"
+
+msgid "Summary of Changes"
+msgstr "Samenvatting van Veranderingen"
+
+msgid "Suspend Account"
+msgstr "Schort Rekening op"
+
+msgid "Suspended"
+msgstr "Opgeschort"
+
+msgid "TERMS ADD NEW"
+msgstr "Voeg het de Nieuwe Voorwaarden Van de Plaats toe"
+
+msgid "TERMS AGREE"
+msgstr "Ik ga hierboven met de termijnen akkoord"
+
+msgid "TERMS REJECT"
+msgstr "Ik ga niet hierboven met de termijnen akkoord"
+
+msgid "Terms and Conditions"
+msgstr "Voorwaarden"
+
+msgid "Thanks for signing up"
+msgstr "Dank voor omhoog het ondertekenen"
+
+msgid "The following error message was returned by the application"
+msgstr "De volgende foutenmelding was teruggekeerd door de toepassing"
+
+msgid "There is no current forum to view"
+msgstr "Er is geen huidig forum aan mening"
+
+msgid "There is no current thread to view"
+msgstr "Er is geen huidige draad aan mening"
+
+msgid "THREAD NO INFORMATION"
+msgstr "Geen informatie bestaat voor de draad of post u probeert om te antwoorden op."
+
+msgid "THREAD NO POSTS"
+msgstr "U probeert om op een draad zonder posten daarin te antwoorden."
+
+msgid "THREAD WATCH FAILED"
+msgstr "Slaagde er niet in om een horloge voor de gevraagde draad toe te voegen."
+
+msgid "Thread"
+msgstr "Draad"
+
+msgid "threads"
+msgstr "draden"
+
+msgid "Thread Locked"
+msgstr "Gesloten draad"
+
+msgid "Time"
+msgstr "Tijd"
+
+msgid "Time formatting example"
+msgstr "Het formatteren van de tijd voorbeeld"
+
+msgid "Topic"
+msgstr "Onderwerp"
+
+msgid "Unauthorized!"
+msgstr "Toestemming geweigerd!"
+
+msgid "Unknown field name"
+msgstr "Onbekende gebiedsnaam"
+
+msgid "Unlock Thread"
+msgstr "Open Draad"
+
+msgid "Unread posts"
+msgstr "Ongelezen posten"
+
+msgid "Unstick Thread"
+msgstr "De Draad van Unstick"
+
+msgid "Update"
+msgstr "Update"
+
+msgid "Update Reply"
+msgstr "Het Antwoord van de update"
+
+msgid "Upload"
+msgstr "Upload"
+
+msgid "Use UTC"
+msgstr "Gebruik UTC"
+
+msgid "USER ACTIVATE"
+msgstr "Om uw rekening te activeren klik op de verbinding in e-mail"
+
+msgid "USER ALMOST THERE"
+msgstr "Bijna daar..."
+
+msgid "USER AUTHENTICATED"
+msgstr "Uw registratie is voor authentiek verklaard"
+
+msgid "User has never posted"
+msgstr "Geen berichten van deze gebruiker"
+
+msgid "User Profile"
+msgstr "Het Profiel van de gebruiker"
+
+msgid "USERNAME IN USE"
+msgstr "De gebruikersbenaming u hebt gekozen is reeds in gebruik. Gelieve te proberen verschillende."
+
+msgid "USERNAME INCORRECT"
+msgstr "Onjuiste Geleverde Gebruikersbenaming."
+
+msgid "Username"
+msgstr "Gebruikersbenaming"
+
+msgid "Users"
+msgstr "Gebruikers"
+
+msgid "User Roles"
+msgstr "De Rollen van de gebruiker"
+
+msgid "View"
+msgstr "Mening"
+
+msgid "view"
+msgstr "mening"
+
+msgid "View all"
+msgstr "Bekijk allen"
+
+msgid "views"
+msgstr "meningen"
+
+msgid "View Threads"
+msgstr "De Draden van de mening"
+
+msgid "Watch this thread"
+msgstr "Let op deze draad"
+
+msgid "watching this thread"
+msgstr "het letten van op deze draad"
+
+msgid "We're not in Kansas any more"
+msgstr "Wij zijn niet in Kansas enige meer"
+
+msgid "Users"
+msgstr "Gebruikers"
+
+msgid "wrote"
+msgstr "schreef"
+
+msgid "Yes"
+msgstr "Ja"
+
+msgid "You are not watching any threads"
+msgstr "U let op geen draden"
+
+msgid "You are watching this thread"
+msgstr "U let op deze draad"
+
+msgid "You don't have the required privileges to do that"
+msgstr "U hebt niet de vereiste voorrechten om dat te doen"
+
+msgid "Your Details"
+msgstr "Uw Details"
+
+msgid "Your Preferences"
+msgstr "Uw Voorkeur"
+
+msgid "Your %s Username"
+msgstr "Uw %s Gebruikersbenaming"
+
+
+# UNITS OF TIME
+
+msgid "second"
+msgstr "seconde"
+
+msgid "seconds"
+msgstr "seconden"
+
+msgid "minute"
+msgstr "notulen"
+
+msgid "minutes"
+msgstr "notulen"
+
+msgid "hour"
+msgstr "uur"
+
+msgid "hours"
+msgstr "uren"
+
+msgid "day"
+msgstr "dag"
+
+msgid "days"
+msgstr "dagen"
+
+msgid "month"
+msgstr "maand"
+
+msgid "months"
+msgstr "maanden"
+
+msgid "year"
+msgstr "jaar"
+
+msgid "years"
+msgstr "jaren"

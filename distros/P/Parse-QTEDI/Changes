@@ -1,0 +1,66 @@
+Revision history for Perl extension Parse::QTEDI.
+
+0.18    20100720
+    - operator member function and expression logic revamp
+0.16    20090806
+    - strip comment between enum values
+0.15    20090724
+    - function parameter with namespace
+0.13    20080823
+    - 'const' property on function and function pointer
+
+0.12    20070528
+	- fix on qt/kde macro which ends with optional ';'
+
+0.11    20070513
+	- fix on template type output by bin/format_qtedi_production
+
+0.10    20070429
+	- fix on formatting template type
+
+0.05    20070423
+	- function attribute stripped
+
+0.04    20070420
+	- fix on treating operator() as a function pointer 
+
+0.03    20070419
+	- function pointer detection fix
+    - update of bin/format_qtedi_production
+
+0.02    20070328
+	- destructor function name fix
+
+0.02_02 20070324
+	- operator() with parameter fix
+	- typedef function pointer fix
+	- function pointer return structure update
+
+0.02_01 20070321
+	- function parameter parsing loop integration
+
+0.01    20070315
+	- enum/class forward declaration and typedef fix
+    - first release
+
+0.01_07 20070312
+	- operator() fix
+
+0.01_06 20070309
+	- new line strip fix
+
+0.01_05 20070309
+    - extern body fix
+	- function body fix
+
+0.01_04 20070308
+    - extern/namespace body fix
+
+0.01_03 20070308
+    - enum fix
+
+0.01_02 20070206
+    - docu update
+
+0.01_01  Fri Feb  2 21:26:45 2007
+	- original version

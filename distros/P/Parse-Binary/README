@@ -1,0 +1,52 @@
+This is the README file for Parse::Binary, a module for unpacking
+binary data structures into object hierarchies.
+
+Please type "perldoc Parse::Binary" after installation to see
+the module usage information.
+
+* Installation
+
+Parse::Binary uses the standard perl module install process:
+
+cpansign -v		# optional; see SIGNATURE for details
+perl Makefile.PL
+make			# or 'nmake' on Win32
+make test
+make install
+
+* Copyright
+
+The Parse::Binary module is under the following license:
+
+Copyright 2004-2009 by Audrey Tang <cpan@audreyt.org>.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+(See the "Artistic" file included in this distribution.)
+
+* Copyright for derived works
+
+Two modules included in this distribution, Parse::Binary::FixedFormat
+and Parse::Binary::FixedFormat::Variants, are derived from the
+Data::FixedFormat module, also available from CPAN.  They are under
+the following license:
+
+Copyright 2004-2009 by Audrey Tang <cpan@audreyt.org>.
+Copyright (C) 2000,2002 Thomas Pfau.  All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.
+
+This library is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software Foundation,
+Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+(See the "COPYING" file included in this distribution.)

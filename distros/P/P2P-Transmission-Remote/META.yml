@@ -1,0 +1,26 @@
+---
+abstract: 'Control Transmission using its Remote API'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@cpan.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: P2P-Transmission-Remote
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  JSON::XS: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  URI: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

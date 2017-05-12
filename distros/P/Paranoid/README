@@ -1,0 +1,38 @@
+Paranoid
+========
+
+NOTICE:  One might wonder how we've jumped from 0.x releases to 2.x.  I've
+decided to skip the 1.x releases to make it (hopefully) more obvious that
+the API has changed and is not compatible with the 0.x series.  My fear was
+that the average devmight see 0.x to 1.x and assume that I was simply
+declaring the API stable.  While 2.x is a stable API it is not compatible
+with 0.x.
+
+In addition to the API change there is also a packaging change in that I am
+no longer shipping modules with the core distribution that were essentially
+non-functioning unless you had additional modules installed (outside of the
+mandatory prerequisites).  Those modules will still be available, but only
+as their own distributions on CPAN.
+
+With that out of the way I present to you, with no further ado, Paranoid
+v2.0.
+
+--
+
+  The Paranoid suite of modules intend to provide an application framework
+that's designed for secure programming.  It has internally consistent
+debugging and tracing capabilities and is tested for use in applications
+with taint-mode enabled in addition to the normal strict and warnings modes.
+  The focus of these modules is to make secure programming convenient and
+easy enough that it becomes the developer's default development target, not
+just a feature of special software.
+  To that end you will find APIs for a multitude of common tasks, from
+process management to input handling.  There are also compatiblity modules
+(like Paranoid::Network::Socket) that can make IPv6 programming
+seemless, regardless of the version of Perl running or its incremental level
+of support for IPv6.
+  Each module has its own documentation.  You can find a complete list of
+modules in this suite from the Paranoid POD.
+
+  Please send bugs, requests, and flames to Arthur Corliss
+<corliss@digitalmages.com>.

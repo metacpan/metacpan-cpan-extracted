@@ -1,0 +1,53 @@
+#!/usr/bin/python
+
+import os
+import sys
+import imp
+
+if len(sys.argv) == 1:
+    print "You need to specify a config option to query"
+    sys.exit(2)
+
+config_key = sys.argv.pop()
+
+# Most of the useful functions are hidden in the script itself
+mymock = imp.load_source('mymock','/usr/sbin/mock')
+
+# Most of this is stolen from the mock main()
+
+unprivUid = os.getuid()
+
+config_opts = {}
+mymock.setup_default_config_opts(config_opts, unprivUid)
+(options, args) = mymock.command_parse(config_opts)
+
+if options.printrootpath:
+    options.verbose = 0
+
+# config path -- can be overridden on cmdline
+config_path = mymock.MOCKCONFDIR
+if options.configdir:
+    config_path = options.configdir
+
+# array to save config paths
+config_opts['config_paths'] = []
+
+# Read in the config files: default, and then user specified
+for cfg in ( os.path.join(config_path, 'site-defaults.cfg'), '%s/%s.cfg' % (config_path, options.chroot)):
+    if os.path.exists(cfg):
+        config_opts['config_paths'].append(cfg)
+        execfile(cfg)
+    else:
+        print("Could not find required config file: %s" % cfg)
+        if options.chroot == "default":
+            print("  Did you forget to specify the chroot to use with '-r'?")
+        sys.exit(1)
+
+# The query bit
+
+if config_key in config_opts:
+    print config_opts[config_key]
+else:
+    print("Could not find config option: %s" % config_key)
+    sys.exit(1)
+

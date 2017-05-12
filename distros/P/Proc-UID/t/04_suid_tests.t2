@@ -1,0 +1,59 @@
+#!/usr/bin/perl -wT
+use strict;
+use lib 'blib/lib';
+use lib 'blib/arch';
+
+# These tests are intended to be executed with set-uid privileges.
+
+use Test;
+BEGIN {
+	if ($> == 0 or $< == 0) {
+		print "1..0 # Skipped, this file must not run directly as root.\n";
+		exit 0;
+	} elsif ($< == $>) {
+		print "1..0 # Skipped, this file must run setuid.\n";
+		exit 0;
+	}
+	plan tests => 18;
+}
+
+use Proc::UID qw(
+	geteuid getruid getsuid $EUID $RUID $SUID
+	drop_uid_temp drop_uid_perm restore_uid
+);
+
+# Basic sanity checking.
+ok(1);	# Loaded module.
+ok($<==$RUID,1,'$< is not $RUID');
+ok($>==$EUID,1,'$> is not $EUID');
+ok($<==getruid(),1,'$< and getruid() disagree');
+ok($>==geteuid(),1,'$> and geteuid() disagree');
+ok($SUID,geteuid(),"\$SUID and geteuid() are not same at startup ($SUID $EUID).");
+
+# Find a gid that we can't change to.
+my $bad_uid = 0;
+while ($bad_uid == $EUID or $bad_uid == $RUID or $bad_uid == $SUID) {
+	$bad_uid++;
+}
+
+# Let's try to change to a bad uid.
+eval {drop_uid_temp($bad_uid);};
+ok($@,qr/Could not/,"Appeared to drop privs to $bad_uid");
+
+# Drop privs temporarily.
+ok(eval {drop_uid_temp($RUID); "ok";},"ok","Could not drop UID temporarily.");
+ok($RUID,$EUID,"New UID not assumed");
+ok($EUID==$>,1,'$> appears not to have been updated.');
+
+# Restore privs
+ok(eval {restore_uid(); "ok";},"ok","Could not restore UID");
+ok($EUID,$SUID,"Did not restore old UID.");
+ok($EUID==$>,1,'$> appears not to have been updated.');
+
+# Drops privs permanently.
+ok(eval {drop_uid_perm($RUID); "ok";},"ok","Could not drop GID permanently.");
+ok($RUID,$SUID,"Real and saved UIDs do not match.");
+ok($RUID,$EUID,"Real and effective UIDs do not match.");
+ok($<==$RUID,1,'$< and $RUID disagree');
+ok($>==$EUID,1,'$> and $EUID disagree');
+

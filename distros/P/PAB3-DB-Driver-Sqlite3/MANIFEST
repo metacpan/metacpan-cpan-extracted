@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Sqlite3.pm
+Sqlite3.xs
+my_sqlite3.c
+my_sqlite3.h
+install_files.PL
+t/00_sqlite3_basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

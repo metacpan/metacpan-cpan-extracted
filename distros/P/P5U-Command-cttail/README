@@ -1,0 +1,34 @@
+NAME
+    P5U::Command::cttail - grep through the last 1000 cpan testers reports
+
+SYNOPSIS
+     $ p5u cttail --author=TOBYINK
+
+     $ p5u cttail --reporter=TOBYINK
+
+     $ p5u cttail -d Moose -f '%(grade)s for %(perlversion)s on %(platform)s'
+
+DESCRIPTION
+    Simple tool to grep <http://metabase.cpantesters.org/tail/log.txt>.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=P5U-Command-cttail>.
+
+SEE ALSO
+    p5u, P5U::Command::Testers.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

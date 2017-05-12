@@ -1,0 +1,35 @@
+=head1 NAME
+
+120-verbatim-paragraphs
+
+=head1 EXAMPLES
+
+=head2 Simple Verbatim Section Content
+
+    First line
+
+    Second line
+    (note blank line with one space and empty line follow)
+ 
+
+    Third line
+
+=head2 Verbatim Interspersed with Normal Text
+
+Text before verbatim paragraph.
+
+    Verbatim paragraph
+
+Text between verbatim paragraphs
+
+    Two line
+    verbatim paragraph
+
+Text between verbatim paragraphs
+
+    Verbatim paragraph
+
+    More text after a blank line
+
+[EOF]
+

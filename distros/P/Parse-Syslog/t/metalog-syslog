@@ -1,0 +1,3 @@
+Oct  1 11:30:56 [amavis] (23837-08) TIMING [total 1101 ms] - SMTP EHLO: 1 (0%), SMTP pre-MAIL: 0 (0%)
+Oct  1 11:30:56 [postfix/smtp] 5FC753D3A6: to=<blabla@fwef>
+Oct  1 11:30:59 [postfix/smtpd] disconnect from x

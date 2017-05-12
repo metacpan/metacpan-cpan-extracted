@@ -1,0 +1,27 @@
+<html>
+    <head>
+        <title>Notifica di Aggiornamento di Thread</title>
+    </head>
+
+    <body>
+        <p>[% person.first_name %],</p>
+
+        <p>Il thread "[% post.thread.subject %]"
+        ha ricevuto una nuova risposta scritta da [% post.creator.forum_name %].</p>
+
+        <p>Scegliere una delle seguenti azioni:
+        <ul>
+            <li>
+            <a href="[% c.req.base %]thread/next_post?thread=[% post.thread.id %]">Continuare a leggere "[% post.thread.subject %]" dal punto dove è stato lasciato</a>
+            </li>
+            <li>
+            <a href="[% c.req.base %]post/view?post=[% post.id %]">Vedere "[% post.thread.subject %]" dal nuovo messaggio</a>
+            </li>
+        </ul>
+        </p>
+
+        <p>NB: <b>Non verranno</b> ricevute altre notificazioni per questo thread finché non sarà stato visto il messaggio sovrastante o un messaggio più recente.</p>
+
+        <p>Il team [% c.config.name %].</p>
+    </body>
+</html>

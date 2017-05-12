@@ -1,0 +1,7 @@
+Revision history for Parse-Log-Smbd
+
+0.02	2010/06/22
+	Include a sample log file and basic test for it
+
+0.01    2010/06/18
+        First version.

@@ -1,0 +1,100 @@
+{
+   "abstract" : "Translates PSGI application by using WOVN.io.",
+   "author" : [
+      "Minimal Technologies, Inc."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-WOVN",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : "0",
+            "HTML::HTML5::Parser" : "0",
+            "HTML::HTML5::Writer" : "0",
+            "JSON" : "0",
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Mojo::URL" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Util" : "0",
+            "Plack::Util::Accessor" : "0",
+            "URI::Escape" : "0",
+            "XML::LibXML" : "0",
+            "parent" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "URI" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::WOVN" : {
+         "file" : "lib/Plack/Middleware/WOVN.pm",
+         "version" : "0.09"
+      },
+      "Plack::Middleware::WOVN::Headers" : {
+         "file" : "lib/Plack/Middleware/WOVN/Headers.pm"
+      },
+      "Plack::Middleware::WOVN::Lang" : {
+         "file" : "lib/Plack/Middleware/WOVN/Lang.pm"
+      },
+      "Plack::Middleware::WOVN::Store" : {
+         "file" : "lib/Plack/Middleware/WOVN/Store.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/masiuchi/p5-Plack-Middleware-WOVN/issues"
+      },
+      "homepage" : "https://github.com/masiuchi/p5-Plack-Middleware-WOVN",
+      "repository" : {
+         "url" : "git://github.com/masiuchi/p5-Plack-Middleware-WOVN.git",
+         "web" : "https://github.com/masiuchi/p5-Plack-Middleware-WOVN"
+      }
+   },
+   "version" : "0.09",
+   "x_contributors" : [
+      "Masahiro Iuchi <iuchi@wovn.io>",
+      "Masahiro Iuchi <masahiro.iuchi@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

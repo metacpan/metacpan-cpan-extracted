@@ -1,0 +1,3 @@
+docs: |
+    This is a godawful function. You should be using regular expressions
+    instead. See L<perlretut> and L<perlre>.

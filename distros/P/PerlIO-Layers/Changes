@@ -1,0 +1,43 @@
+Revision history for PerlIO-Layers
+
+0.011     2014-03-07 15:20:03CET+0100 Europe/Amsterdam
+          Got rid of natatime/List::MoreUtils
+          Remove problematic test on Windows
+
+0.010     2012-04-05 15:20:18 Europe/Amsterdam
+          Prevent segfault that happened on some systems
+
+0.009     2012-04-04 22:56:42 Europe/Amsterdam
+          Fixed fatal error on Windows on perl 5.14+
+          Added get_buffer_sized method
+          Added line_buffered and autoflush checks
+          Increased minimal perl version to 5.8.1, as that's when PerlIO::get_layers was introduced.
+
+0.008     2011-05-01 22:40:59 Europe/Bucharest 
+          No longer assume :raw can't be can_crlf for perl 5.14 compatibility
+          Converted to Dist::Zilla
+
+0.007   2010-12-21
+        Made layer type queryable
+        Made layer 'kinds' queryable
+        Added lots of tests
+
+0.006   2010-12-12
+        Added mappable and mapped tests
+        Added unit tests
+
+0.005   2010-09-08
+        Fixed unit tests on Windows
+
+0.004   2010-09-06
+        Added get_layers()
+
+0.003   2010-06-12
+        Skip some tests on automated testers, as stdin/stdout/stderr may not be open
+
+0.002   2010-06-04
+        Removed dependency on namespace::clean.
+
+0.001   2010-06-03
+        First version, released on an unsuspecting world.
+

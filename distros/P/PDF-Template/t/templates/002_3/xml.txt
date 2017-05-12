@@ -1,0 +1,9 @@
+<pdftemplate pagesize="Letter" h='8'>
+  <pagedef>
+    <font face="Times-Roman">
+      <row>
+        <textbox w="100%">Hello, World!</textbox>
+      </row>
+    </font>
+  </pagedef>
+</pdftemplate>

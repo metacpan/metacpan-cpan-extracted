@@ -1,0 +1,25 @@
+---
+abstract: 'Convert POD to trac wiki markup'
+author:
+  - 'Kevin L. Esteb <kevin@kesteb.us>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4001, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-POM-View-Trac
+provides:
+  Pod::POM::View::Trac:
+    file: lib/Pod/POM/View/Trac.pm
+    version: 0.02
+requires:
+  Pod::POM: 0
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

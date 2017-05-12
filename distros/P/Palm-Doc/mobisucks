@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+#
+# $Id: mobisucks,v 1.7 2005/02/14 03:50:53 cpb Exp $
+
+use strict;
+use HTML::TreeBuilder;
+use HTML::FormatText;
+use Palm::PDB;
+use Palm::Doc;
+use HTML::Entities;
+
+my $doc = new Palm::PDB;
+$doc->Load( $ARGV[0] );
+
+my $text = $doc->text();
+if( (not defined $text) or $text !~ /^<[a-z]+>/i ) {
+	print STDERR "$ARGV[0] doesn't look like a Mobireader document\n";
+	exit 1;
+}
+
+my $tree = HTML::TreeBuilder->new_from_content( $text );
+my $formatter = HTML::FormatText->new( leftmargin => 0, rightmargin => 80 );
+my $text = $formatter->format( $tree );
+
+decode_entities($text); # convert HTML entities to 8859-1
+
+# decode_entities is great, except for entities that can't be
+# represented in 8859-1. Strip those out or, if it's something we're
+# aware of, do a quick and dirty conversion
+$text =~ s/&\#821[12];?/-/g;
+$text =~ s/&\#821[678];?/'/g;
+$text =~ s/&\#822[012];?/"/g;
+
+# strip out the rest
+$text =~ s/&\#\d+;?/?/g;
+$text =~ s/&\#[xX][\da-fA-F]+;?/?/g;
+$text =~ s/&\w+;?/?/g;
+
+# FormatText's margins aren't really appropriate for PDA reading. Better to
+# remove them entirely and let the reader handle that stuff. We really should
+# just write our own formatter around HTML::TreeBuilder...
+$text =~ s!([^\n])\n([^\n])!\1 \2!sg;
+
+$doc->text( $text );
+$doc->Write( $ARGV[0] );
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+mobisucks - convert Mobipocket reader files to regular text Palm Docs.
+
+=head1 SYNOPSIS
+
+	mobisucks <database>
+
+=head1 DESCRIPTION
+
+I hate Mobipocket reader, but it's used by quite a few ebook providers
+(http://www.baen.com/library/, http://www.blackmask.com/, etc) rather than
+a more useful format like straight PalmDoc, Ztxt, or even Plucker. This
+little script converts Mobipocket to bog-standard PalmDoc text.
+
+=head1 BUGS
+
+Doesn't handle every Mobipocket book, nor is the output always
+great. Overall, it's a bit of a hack.
+
+=head1 AUTHOR
+
+Christophe Beauregard E<lt>cpb@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+Palm::Doc(3)
+

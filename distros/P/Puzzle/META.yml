@@ -1,0 +1,44 @@
+---
+abstract: 'A Web framework '
+author:
+  - 'Emiliano Bruni <info@ebruni.it>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Puzzle
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Apache2::Cookie: '0'
+  Apache::DBI: '0'
+  Apache::Session::MySQL: '0'
+  Class::Container: '0'
+  DBIx::Class::Schema: '0'
+  DBIx::Class::Schema::Loader: '0'
+  Data::Dumper: '0'
+  File::Spec: '0'
+  HTML::Entities: '0'
+  HTML::Mason: '0'
+  HTML::Template::Pro::Extension: '0'
+  HTTP::BrowserDetect: '0'
+  I18N::AcceptLanguage: '0'
+  JSON::Any: '0'
+  Log::Any::Adapter: '0'
+  Mail::Sendmail: '0'
+  Params::Validate: '0'
+  Scalar::Util: '0'
+  Text::CSV::Slurp: '0'
+  Time::HiRes: '0'
+  XML::Simple: '0'
+  YAML: '0'
+  mod_perl2: '1.999022'
+version: '0.21'

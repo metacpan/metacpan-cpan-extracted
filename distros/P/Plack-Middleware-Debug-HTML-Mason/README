@@ -1,0 +1,60 @@
+NAME
+
+    Plack::Middleware::Debug::HTML::Mason - Debug info for old HTML::Mason
+    apps.
+
+VERSION
+
+    version 0.3
+
+SYNOPSIS
+
+            # add this to your mason configuration
+            plugins => ['Plack::Middleware::Debug::HTML::Mason::Plugin']
+            
+            # and then enable the middleware
+            enable 'Debug::HTML::Mason';
+
+DESCRIPTION
+
+    Provides a call tree and some basic configuration information for a
+    request processed by HTML::Mason. To use this panel the included plugin
+    Plack::Middleware::Debug::HTML::Mason::Plugin must be called by Mason.
+    If this panel is enabled, the psgi.middleware.debug.htmlmason key will
+    be set in the psgi environment. This might be useful if you want load
+    the plugin as needed:
+
+                    if ($env->{'psgi.middleware.debug.htmlmason'}) {
+                            $handler->interp->plugins(['Plack::Middleware::Debug::HTML::Mason::Plugin']);
+                    }
+                    else {
+                            $handler->interp->plugins([]);
+                    }
+                    
+                    ...
+
+TODO
+
+      * The docs are pretty middling at the moment.
+
+AUTHORS
+
+        Chris Reinhardt
+        crein@cpan.org
+    
+        David Hand
+        cogent@cpan.org
+        
+
+COPYRIGHT
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+
+    Plack::Middleware::Debug, HTML::Mason, perl(1)
+

@@ -1,0 +1,35 @@
+POE::Component::Client::Ident ============================
+
+1). Background:
+
+POE::Component::Client::Ident is a POE (Perl Object Environment) component which
+provides a convenient way for POE applications to perform non-blocking Ident (auth/tap)
+protocol remote username lookups.
+
+The component will mainly of use to the authors of server daemons and server components 
+which sometimes have a requirement to confirm the username provided by the client and,
+therefore, use the Ident protocol to query the remote host.
+
+For example, the IRC protocol.
+
+2). Implementation:
+
+The component implements a brokering service for other components and POE sessions. The 
+component is spawned and given a kernel alias. Components and POE sessions post request 
+events to the component, which in turn spawns helper agents ( implemented as a separate 
+component, see below ) that undertake the messy business of connecting to the remote
+host and asking the right questions to obtain a valid username, a denial, some other 
+information or a metaphorical shrug symbolised by an error.
+
+The helper agents are implemented as a sub component ( POE::Component::Client::Ident::
+Agent ), which performs a one shot Ident query using the parameters that are passed to 
+it at startup, and passes any response for good or evil back to the session that 
+spawned it. This component is ideal if all you require are these kind of lookups, 
+especially if you don't want the slightly additional overhead added by the broker
+component.
+
+4). DISCLAIMER
+
+This module is provided "as is". 
+No Income Tax. No V.A.T.
+No money back. No guarantee.

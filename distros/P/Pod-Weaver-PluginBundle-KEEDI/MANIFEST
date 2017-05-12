@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+cpanfile
+dist.ini
+lib/Pod/Weaver/PluginBundle/KEEDI.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+weaver.ini

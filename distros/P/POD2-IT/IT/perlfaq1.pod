@@ -1,0 +1,450 @@
+=head1 NOME
+
+perlfaq1 - Domande Generali Sul Perl ($Revision: 1.20 $, $Date: 2006/02/09 04:30:02 $)
+
+=head1 DESCRIZIONE
+
+Questa sezione delle FAQ fornisce risposta a domande sul Perl molto
+generali, di alto livello.
+
+=head2 Cos'E<egrave> il Perl?
+
+Il Perl E<egrave> un linguaggio di programmazione ad alto eclettico, 
+scritto da Larry Wall e altre migliaia dipersone. Deriva dall'onnipresente linguaggio C
+e in misura minore da sed, awk, la shell Unix e almeno una dozzina di altri strumenti e linguaggi.
+Le capacitE<agrave> di Perl nella manipolazione di processi, file e testo,
+lo rendono particolarmente adatto per compiti che coinvolgono prototipizzazione
+rapida, utilitE<agrave> di sistema, strumenti software, compiti di gestione di
+sistema, accesso a basi di dati, programmazione grafica, gestione di reti e
+la programmazione web. Questi punti di forza lo rendono popolare soprattutto
+tra amministratori di sistema e autori di script CGI ma usano Perl anche
+matematici, genetisti, giornalisti ed anche manager. Forse dovreste farlo
+anche voi.
+
+=head2 Chi supporta Perl? Chi lo sviluppa? PerchE<eacute> E<egrave> libero?
+
+La cultura originale dell'Internet pre-popolare e le credenze profondamente
+radicate dell'autore del Perl, Larry Wall, diedero vita alla politica di
+distribuzione libera ed aperta del Perl. Il Perl E<egrave> supportato dai suoi
+utenti. Il nucleo, la libreria standard Perl, i moduli opzionali, e la
+documentazione che state leggendo adesso sono tutti stati scritti da
+volontari. Per maggiori dettagli, si veda la nota personale alla fine del
+file README nella distribuzione sorgente del Perl. Consultate L<perlhist>
+(nuova nella versione 5.005) per le release "pietre miliari" del Perl.
+
+In particolare, il gruppo di sviluppo centrale (conosciuto come i Perl Porters)
+E<egrave> costituito da un insieme eterogeneo di individui altamente altruisti, 
+impegnati nel produrre gratuitamente software migliore di quello che si
+puE<ograve> sperare di avere pagando. 
+E<Egrave> possibile curiosare sugli sviluppi correnti attraverso gli archivi a
+http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/ 
+e http://archive.develooper.com/perl5-porters@perl.org/ oppure attraverso il
+news gateway nntp://nntp.perl.org/perl.perl5.porters o la sua interfaccia
+web a http://nntp.perl.org/group/perl.perl5.porters, oppure leggendo le faq
+a http://simon-cozens.org/writings/p5p-faq, oppure iscrivendosi alla mailing
+list inviando una richiesta di iscrizione (un messaggio vuoto senza oggetto
+va bene) a perl5-porters-request@perl.org.
+
+BenchE<eacute> il progetto GNU includa Perl nelle sue distribuzioni, non esiste 
+'GNU Perl'. 
+Perl non E<egrave> nE<eacute> prodotto nE<eacute> mantenuto dalla Free Software 
+Foundation. Inoltre, i termini di licenza di Perl sono piE<ugrave> aperti di quanto 
+quelli del software GNU tendano ad essere.
+
+Se lo desiderate, E<egrave> possibile ottenere supporto commerciale per il
+Perl, benchE<eacute> per la maggior parte degli utenti il supporto informale
+sia piE<ugrave> che sufficiente. Consultate la risposta a "Dove posso acquistare
+versioni commerciali di Perl?" per maggiori informazioni.
+
+=head2 Quale versione di Perl devo usare?
+
+(contributo di brian d foy)
+
+E<Egrave> spesso una questione opinabile e di gusto e non c'E<egrave> una sola 
+risposta che va bene a tutti. In generale, dovreste usare o la versione stabile 
+corrente oppure la versione stabile immediatamente prima ad essa. Al momento, 
+queste sono rispettivamente perl5.8.x e perl5.6.x.
+
+Al di lE<agrave> di questo, dovete considerare diverse cose e decidere quale 
+sia la migliore per voi.
+
+=over 4
+
+=item *
+
+Se le cose funzionano, aggiornare il perl potrebbe renderle non funzionanti 
+(o perlomeno dare origine a nuovi warning).
+
+=item *
+
+Le ultime versioni del perl hanno un maggior numero di bug corretti.
+
+=item *
+
+La comunitE<agrave> Perl E<egrave> attrezzata al supporto delle versioni 
+piE<ugrave> recenti, dunque troverete piE<ugrave> facilmente dell'aiuto 
+per queste versioni.
+
+=item *
+
+Le versioni precedenti al perl5.004 hanno seri problemi di sicurezza con i 
+buffer overflow e in alcuni casi hanno dei CERT advisory [Avvisi di sicurezza del CERT, NdT] 
+(per esempio http://www.cert.org/advisories/CA-1997-17.html ).
+
+=item *
+
+Le versioni piE<ugrave> recenti sono probabilmente le meno utilizzate e testate a fondo, 
+dunque se siete maldisposti a rischiare, potreste preferir aspettare qualche mese dopo il loro rilascio 
+e vedere quali problemi ha dato ad altri.
+
+=item *
+
+Le versioni immediatamente precedenti (cioE<egrave> perl5.6.x) di solito vengono mantenuti per un certo 
+periodo di tempo, benchE<eacute> non allo stesso livello delle versioni correnti.
+
+
+=item *
+
+Nessuno sta supportando attivamente perl4.x. Cinque anni fa era 
+una carcassa di cammello morto (secondo questo documento). Ora E<egrave> 
+a malapena uno scheletro per via delle sue ossa imbiancate o erose.
+
+=item *
+
+Non ci sarE<agrave> un perl6.x per il prossimo paio d'anni. Restate sintonizzati, 
+ma non abbiate timore di dover cambiare presto la versione di maggior importanza del 
+Perl (cioE<egrave> prima del 2006).
+
+=item *
+
+Ci sono davvero due vie dello sviluppo del perl: una versione di manutenzione ed una 
+versione sperimentale. Le versioni di manutenzione sono stabili ed hanno un numero 
+pari quale numero di versione minore (cioE<egrave> perl5.8.x, dove 8 E<egrave> la 
+versione di second'ordine). Le versioni sperimentali possono includere caratteristiche 
+che non E<egrave> detto saranno presenti nelle versioni stabili ed hanno un numero dispari quale numero 
+di versione minore (cioE<egrave> perl5.9.x, dove 9 E<egrave> la versione di second'ordine).
+
+=back
+
+
+=head2 Cosa sono perl4 e perl5?
+
+(contributo di brian d foy)
+
+In breve, perl4 E<egrave> il passato, perl5 il presente e perl6 il futuro.
+
+Il numero dopo perl (cioE<egrave> il 5 dopo perl5) E<egrave> la versione piE<ugrave> 
+importante dell'interprete perl cosE<igrave> come la versione del linguaggio.
+Ogni versione di maggiore importanza ha delle differenze significative che le versioni 
+precedenti non supportano.
+
+La versione di maggior importanza del Perl E<egrave> perl5 e fu rilasciata nel 1994.
+PuE<ograve> eseguire script della precedente versione principale, perl4 (Marzo 1991), 
+ma ha differenze significative. Introduce il concetto dei riferimenti, strutture dati 
+complesse e moduli. L'interprete perl5 fu una completa riscrittura dei precedenti 
+codici sorgenti del perl.
+
+Perl6 E<egrave> la successiva versione di maggior importanza ma E<egrave> ancora in 
+sviluppo, sia per quanto riguarda la sintassi quanto per il design. I lavori sono partiti 
+nel 2002 e sono ancora in corso. Molte delle caratteristiche piE<ugrave> interessanti sono 
+state messe in luce nelle ultime versioni di perl5 e alcuni moduli per perl5 vi permettono di 
+utilizzare parte della sintassi di Perl6 nei vostri programmi. Potete saperne di piE<ugrave> 
+sul Perl6 su http://dev.perl.org/perl6/ .
+
+Consultate L<perlhist> per la storia delle versioni del Perl.
+
+=head2 Cos'E<egrave> Ponie?
+
+Alla O'Reilly Open Source Software Convention nel 2003, Artur
+Bergman, Fotango e The Perl Foundation hanno annunciato un progetto per 
+far eseguire perl5 sulla macchina virtuale Parrot, chiamato Ponie. Ponie sta per 
+Perl On New Internal Engine (Perl su un nuovo motore interno). SarE<agrave> usata 
+per Ponie l'implementazione del linguaggio Perl 5.10 e non vi saranno differenze 
+a livello di linguaggio tra perl5 e ponie. Ponie non E<egrave> una completa riscrittura 
+del perl5.
+
+=head2 Cos'E<egrave> perl6?
+
+Alla seconda O'Reilly Open Source Software Convention, Larry Wall ha
+annunciato che lo sviluppo di Perl6 sarebbe iniziato sul serio. Perl6
+era un termine spesso utilizzato per il progetto di Chip Salzenberg,
+denominato Topaz, per la riscrittura di Perl in C++. Topaz ha fornito
+intuizioni utili per la prossima versione del Perl e per la sua
+implementazione, ma alla fine E<egrave> stato abbandonato.
+
+Se si desidera saperne di piE<ugrave> su Perl6, o si desidera aiutare nella
+crociata per fare di Perl un luogo migliore, allora si legga attentamente
+la pagina per gli sviluppatori di Perl6 a http://dev.perl.org/perl6/
+e fatevi coinvolgere.
+
+Il rilascio di Perl6 non E<egrave> ancora stato programmato, e Perl5
+sarE<agrave> supportato per un bel po' dopo il suo rilascio. Non attendete
+Perl6 per fare ciE<ograve> che dovete fare.
+
+"Siamo molto seri nel reinventare qualsiasi cosa che abbia bisogno di
+essere reinventata." --Larry Wall
+
+=head2 Quanto E<egrave> stabile il Perl?
+
+Le distribuzioni di produzione, che incorporano bug fix e nuove
+funzionalitE<agrave>, sono largamente testate prima del rilascio. Dalla
+distribuzione 5.000, abbiamo in media all'incirca una sola distribuzione
+di produzione all'anno.
+
+Larry e il gruppo di sviluppo compiono occasionalmente delle modifiche al
+nucleo interno del linguaggio, ma vengono compiuti tutti gli sforzi possibili
+a favore della compatibilitE<agrave> all'indietro. BenchE<eacute> non proprio tutti gli
+script in perl4 vengono eseguiti senza pecche sotto perl5, un aggiornamento
+del perl non dovrebbe quasi mai invalidare un programma scritto per una
+versione di perl piE<ugrave> recente (esclusi bug fix fortuiti e le rare nuove
+keyword).
+
+=head2 Il Perl E<egrave> difficile da imparare?
+
+No, il Perl E<egrave> facile da imparare all'inizio--ed E<egrave> facile
+continuare ad impararlo. Assomiglia a molti linguaggi di programmazione con
+i quali avrete giE<agrave>fatto esperienza, cosE<igrave> se avete scritto
+almeno un programma in C, uno script awk, uno script di shell o anche un
+programma BASIC, qui vi troverete a vostro agio.
+
+Molti compiti richiedono solo un piccolo sottoinsieme del linguaggio Perl.
+Uno dei motti guida per lo sviluppo in Perl E<egrave> "therE<eacute>s more
+than one way to do it" ["c'E<egrave> piE<ugrave> di una maniera per fare le
+cose", NdT] (TMTOWTDI, talvolta pronunciato "tim toady"). La curva di
+apprendimento del Perl E<egrave> dunque poco ripida (facile da imparare) e
+lunga (c'E<egrave> un mucchio di cose da fare se davvero lo si vuole).
+
+Infine, visto che il Perl E<egrave> frequentemente (ma non sempre e certamente
+non per definizione) un linguaggio interpretato, potete scrivere e testare
+i vostri programmi senza passi di compilazione intermedi, permettendoti di
+sperimentare e testare/fare debug in maniera veloce e facile. Questa
+facilitE<agrave> di sperimentazione appiattisce ulteriormente la curva di
+apprendimento.
+
+Cose che rendono il Perl piE<ugrave> facile da imparare: esperienza di Unix,
+qualsiasi esperienza di programmazione, una comprensione delle espressioni 
+regolari e l'abilitE<agrave> a comprendere il codice delle altre persone. 
+Se c'E<egrave> qualcosa di cui avete bisogno, allora E<egrave>
+probabile che sia giE<agrave> stata fatta e un esempio funzionante E<egrave>
+di solito disponibile gratuitamente. Da non dimenticare inoltre, i moduli
+perl piE<ugrave> recenti. Vengono discussi nella Parte 3 di questa FAQ,
+assieme a CPAN che viene discusso nella Parte 2.
+
+=head2 Come regge il confronto il Perl con altri linguaggi come Java, Python, REXX, Scheme, o Tcl?
+
+Favorevolmente in certi settori, sfavorevolmente in altri. Per essere
+esatti, quali settori siano buoni e quali siano cattivi E<egrave> spesso
+una scelta personale, nel porre dunque questa domanda su usenet si corre
+un forte rischio di iniziare un'improduttiva guerra di religione.
+
+Probabilmente, la cosa migliore da fare E<egrave> cercare di scrivere codice
+equivalente per affrontare un insieme di compiti. Questi linguaggi hanno i propri 
+newsgroup nei quali E<egrave> possibile impararli (ma con buone speranze di non 
+discuterne).
+
+Alcuni documenti di confronto possono essere trovati su 
+http://language.perl.com/versus/ se davvero non potete fermarvi.
+
+=head2 Posso fare [questo lavoro] in Perl?
+
+Perl E<egrave> flessibile ed estensibile a sufficienza per essere utilizzato 
+virtualmente per qualsiasi lavoro, da compiti di una linea per manipolare
+file fino a grandi, elaborati sistemi. Per molte persone, Perl E<egrave> un
+ottimo sostituto per lo scripting shell. Per altri, costituisce un
+rimpiazzo, conveniente e di alto livello, per molto di ciE<ograve> che essi
+programmano in linguaggi di basso livello come il C o il C++. In definitiva,
+E<egrave> a discrezione vostra (e forse della vostra organizzazione)
+scegliere per quali lavori usare Perl e per quali non usarlo.
+
+Se avete una libreria che fornisce una API, potete far si che ogni
+componente di essa sia disponibile come qualsiasi altra variabile o funzione
+Perl, usando un'estensione per il Perl scritta in C o C++ e collegata
+dinamicamente al vostro interprete perl principale. Potete anche andare
+nell'altra direzione, e scrivere il vostro programma principale in C o C++,
+e poi collegarci del codice Perl al volo, per creare potenti applicazioni.
+Si veda L<perlembed>.
+
+Detto questo, ci saranno sempre linguaggi piccoli, mirati, specializzati 
+dedicati ad un insieme di problemi specifici che sono semplicemente piE<ugrave>
+convenienti per certi tipi di problemi. Perl prova ad essere tutto per
+tutti, ma niente di speciale per nessuno. Esempi di linguaggi specializzati
+che vengono in mente includono prolog e matlab.
+
+=head2 Quando non dovrei programmare in Perl?
+
+Quando il vostro dirigente ve l'ha proibito--ma si prenda in considerazione
+l'idea di sostituirlo :-).
+
+In effetti, una buona ragione E<egrave> quando si ha giE<agrave>
+un'applicazione esistente scritta in un altro linguaggio, che fa giE<agrave>
+tutto (e lo fa bene), oppure si ha a disposizione un linguaggio applicativo
+specifico, disegnato per un determinato compito (es. prolog, make).
+
+Per diverse ragioni, Perl non E<egrave> probabilmente adatto per i sistemi
+embedded real-time, lavori di sviluppo a basso livello per sistemi operativi
+come driver di periferica o codice context-switching, applicazioni complesse
+multi-thread a memoria condivisa, oppure applicazioni estremamente grandi.
+Si noti che perl stesso non E<egrave> scritto in Perl.
+
+Il nuovo compilatore di codice nativo per il Perl potrebbe eventualmente
+ridurre di qualche grado le limitazioni fornite nel capoverso precedente,
+ma capite che il Perl rimane in sostanza un linguaggio tipato
+dinamicamente e non uno tipato staticamente. 
+Non si verrE<agrave> di certo puniti se con esso non si farE<agrave> codice 
+per la sicurezza di impianti nucleari o per il controllo di neurochirurgia. 
+Inoltre Larry dormirE<agrave> tranquillamente--i programmi per Wall Street 
+invece non sono un problema. :-)
+
+=head2 Qual E<egrave> la differenza tra "perl e "Perl"?
+
+Un bit. Ah, non parlavate in ASCII? :-) Larry ora usa "Perl" per indicare
+il linguaggio vero e proprio, e "perl" per l'implementazione di esso,
+cioE<egrave> l'interprete corrente. Da ciE<ograve> deriva la battuta di Tom
+"Nulla tranne perl puE<ograve> effettuare il parsing di Perl." Potete
+scegliere o meno di aderire a questo uso. 
+Per esempio, "awk e perl" e "Python e Perl" sono OK, mentre "awk e Perl" e 
+"Python e perl" non lo sono.
+Ma non scrivete mai "PERL", poichE<eacute> perl non E<egrave> un acronimo,
+nonostante il folklore apocrifo e le espansioni post-facto.
+
+=head2 E<Egrave> un programma Perl o uno script Perl?
+
+A Larry non importa proprio. Dice (in parte scherzando) che "uno script
+['copione' in italiano, NdT] E<egrave> ciE<ograve> che si dE<agrave>
+agli attori. Un programma E<egrave> ciE<ograve> che si dE<agrave> al pubblico."
+
+Originariamente, uno script era una sequenza predefinata di comandi
+di solito interattivi--dunque, un chat script. Rende bene l'idea qualcosa come un chat
+script UUCP o PPP oppure un expect script, come rendono l'idea gli
+script di configurazione eseguiti da un programma alla sua partenza come per esempio 
+F<.cshrc> o F<.ircrc> . I chat script erano semplicemente dei driver per programmi 
+esistenti, non programmi propriamente a sE<eacute> stanti.
+
+Un informatico spiegherE<agrave> correttamente che tutti i programmi sono
+interpretati e che l'unica questione E<egrave> a quale livello essi lo sono.
+Ma se lo chiedete a qualcuno che non E<egrave> un informatico, potrebbero
+dirvi che un I<programma> E<egrave> stato compilato in codice macchina una
+volta e che puE<ograve> poi essere eseguito piE<ugrave> volte, mentre uno
+I<script> deve essere tradotto da un programma ogni volta che viene usato.
+
+I programmi Perl non sono (di solito) nE<eacute> strettamente compilati nE<eacute>
+strettamente interpretati. Possono essere compilati in una forma di
+byte-code (qualcosa come una macchina virtuale Perl) o in linguaggi
+completamente diversi, come C o assembly. Non potete dire, semplicemente
+guardando il programma, se il sorgente E<egrave> destinato ad un interprete
+puro, ad un interprete parse-tree, ad un interprete byte-code, ad un
+compilatore in codice nativo, e dunque E<egrave> difficile offrire qui una
+risposta definitiva.
+
+Ora che "script" e "scripting" sono termini di cui si sono impadroniti
+personaggi di marketing ignoranti o senza scrupoli per i loro scopi
+nefasti, essi hanno iniziato ad assumere significati strani e spesso
+peggiorativi, come "non serio" o "non vera programmazione". Di conseguenza,
+alcuni programmatori Perl preferiscono evitarli del tutto.
+
+=head2 Cos'E<egrave> un JAPH?
+
+Sono quelle firme "just another perl hacker" ["solamente un altro hacker
+perl", NdT] con cui diverse persone firmano i loro messaggi. Le ha rese
+famose Randal Schwartz. Circa 100 dei piE<ugrave> recenti sono disponibili su
+http://www.cpan.org/misc/japh .
+
+
+=head2 Where can I get a list of Larry Wall witticisms?
+
+Over a hundred quips by Larry, from postings of his or source code,
+can be found at http://www.cpan.org/misc/lwall-quotes.txt.gz .
+
+=head2 Come posso convincere il mio amministratore di sistema/supervisore/dipendenti ad usare la versione 5/5.6.1/Perl al posto di qualche altro linguaggio?
+
+Se il proprio dirigente o i dipendenti sono diffidenti verso il software non
+supportato, oppure verso il software che non viene ufficialmente fornito con
+il sistema operativo, si puE<ograve> provare ad appellarsi al loro interesse
+personale. Se i programmatori possono essere piE<ugrave> produttivi usando e
+sfruttando i costrutti, le funzionalitE<agrave>, la semplicitE<agrave> e la
+potenza del Perl, allora il tipico dirigente/supervisore/dipendente
+puE<ograve> essere persuaso. A proposito dell'utilizzo di Perl in generale,
+a volte E<egrave> di aiuto anche far notare che i tempi di consegna possono
+essere ridotti utilizzando Perl a differenza di altri linguaggi.
+
+Se si ha un progetto che presenta un collo di bottiglia, soprattutto in
+termini di traduzione o testing, Perl quasi sicuramente fornirE<agrave> una
+soluzione attuabile e rapida. In congiunzione con qualsiasi sforzo di
+persuasione, non si dovrebbe tralasciare di far notare che Perl E<egrave>
+usato, piuttosto estensivamente, e con risultati estremamente affidabili
+e validi, in molte grandi compagnie di computer hardware e software
+sparse per il mondo. In realtE<agrave>, molti venditori di Unix ora forniscono
+Perl di default. 
+Il supporto E<egrave> solitamente ottenibile tramite un messaggio in un newsgroup, 
+se non vi E<egrave> stato possibile trovare la risposta nell'esauriente 
+documentazione, inclusa questa FAQ.
+
+Si veda http://www.perl.org/advocacy/ per maggiori informazioni.
+
+Se vi trovate di fronte a della riluttanza nell'aggiornare una versione vecchia
+di Perl, allora fate notare che la versione 4 E<egrave> completamente non
+mantenuta e non supportata dal Perl Development Team. Un altro grande
+punto a favore di Perl5 E<egrave> il vasto numero di moduli ed estensioni che
+riducono drasticamente il tempo di sviluppo per qualsiasi dato compito.
+Si menzioni inoltre che la differenza tra la versione 4 e la 5 di Perl
+E<egrave> come la differenza tra awk e C++. (Beh, OK, forse non E<egrave>
+proprio cosE<igrave> grande, ma rende l'idea). Se si desidera supporto ed
+una ragionevole garanzia che ciE<ograve> che si sviluppa continuerE<agrave>
+a funzionare in futuro, E<egrave> necessario utilizzare la versione
+supportata. Al Gennaio 2003, ciE<ograve> probabilmente significa usare o
+la versione 5.6.1 (rilasciata nell'Aprile 2001) oppure la 5.005_03 (rilasciata
+nel Marzo 1999), anche se la 5.004_5 non E<egrave> tanto male se si ha
+B<assolutamente> bisogno di una versione cosE<igrave> vecchia (rilasciata
+nell'Aprile 1999) per ragioni di stabilitE<agrave>. Qualsiasi cosa piE<ugrave>
+vecchia della 5.004_05 non deve essere usata.
+
+Di particolare rilevanza E<egrave> la massiccia caccia ai bug causa di
+buffer overflow che fu fatta nella versione 5.004. Tutte le versioni
+precedenti a quella, incluso Perl4, sono considerate insicure e devono
+essere aggiornate il prima possibile.
+
+Nell'Agosto del 2000, in tutte le distribuzioni di Linux era stato
+trovato un nuovo problema di sicurezza nell'opzionale 'suidperl' (non compilato
+o installato di default) in tutte le ramificazioni 5.6, 5.005, e 5.004,
+si veda http://www.cpan.org/src/5.0/sperl-2000-08-05/ 
+Nelle versioni di manutenzione 5.6.1 e 5.8.0 questo buco di sicurezza E<egrave> stato chiuso.
+La maggior parte, se non tutte, le distribuzioni Linux hanno delle patch
+disponibili per questa vulnerabilitE<agrave>, si veda
+http://www.linuxsecurity.com/advisories/ , ma la via raccomandata E<egrave>
+quella di aggiornare almeno a Perl 5.6.1.
+
+=head1 AUTORE E COPYRIGHT
+
+Copyright (c) 1997-2006 Tom Christiansen, Nathan Torkington e altri autori menzionati.
+Tutti i diritti riservati.
+
+Questa documentazione E<egrave> libera; potete ridistribuirla e/o modificarla
+secondo gli stessi termini applicati al Perl.
+
+Indipendentemente dalle modalitE<agrave> di distribuzione, tutti gli esempi di
+codice in questo file sono rilasciati al pubblico dominio. Siete autorizzati e 
+incoraggiati a utilizzare il presente codice o qualunque forma
+derivata da esso nei vostri programmi per divertimento o per profitto.
+Un semplice commento nel codice che dia riconoscimento alle FAQ sarebbe
+cortese ma non E<egrave> obbligatorio. 
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlfaq1
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Michele Beltrame.
+
+=head2 Revisore
+
+Revisione a cura di Marco Allegretti.
+
+=cut

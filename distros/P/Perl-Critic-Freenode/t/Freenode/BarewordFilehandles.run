@@ -1,0 +1,85 @@
+## name BarewordOpen1
+## failures 1
+## cut
+
+open FILE;
+
+## name BarewordOpen2
+## failures 1
+## cut
+
+open FILE, "<$filename";
+
+## name BarewordOpen3
+## failures 1
+## cut
+
+open FILE, '<', $filename;
+
+## name BarewordOpenParentheses
+## failures 1
+## cut
+
+open(FILE, '<', $filename);
+
+## name BarewordOpenBuiltin
+## failures 0
+## cut
+
+open STDOUT;
+open STDIN, "<$filename";
+open(STDERR, '>', $filename);
+
+## name LexicalOpen
+## failures 0
+## cut
+
+open my $fh, '<', $filename;
+
+## name LexicalOpenParentheses
+## failures 0
+## cut
+
+open(my $fh, '<', $filename);
+
+## name BarewordPipe1
+## failures 1
+## cut
+
+pipe READ, my $write;
+
+## name BarewordPipe2
+## failures 1
+## cut
+
+pipe my $read, WRITE;
+
+## name BarewordPipe3
+## failures 2
+## cut
+
+pipe READ, WRITE;
+
+## name BarewordPipeParentheses
+## failures 2
+## cut
+
+pipe(READ, WRITE);
+
+## name BarewordPipeBuiltin
+## failures 1
+## cut
+
+pipe DATA, WRITE;
+
+## name LexicalPipe
+## failures 0
+## cut
+
+pipe my $read, my $write;
+
+## name LexicalPipeParentheses
+## failures 0
+## cut
+
+pipe(my $read, my $write);

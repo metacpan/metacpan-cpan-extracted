@@ -1,0 +1,158 @@
+=head1 NAME
+
+HTML::SocialMeta - Module to generate Social Media Meta Tags, 
+
+=head1 VERSION
+
+Version 0.6
+
+=head1 SYNOPSIS
+
+    use HTML::SocialMeta;
+    # summary or featured image card setup
+    my $social = HTML::SocialMeta->new(
+        site => '',
+        site_name => '',
+        title => '',
+        description => '',
+        image   => '',
+        fb_app_id => '',
+    url  => '',  # optional
+        ... => '',
+        ... => '',
+    );
+
+    # returns meta tags for all providers   
+    # additional options 'featured_image',  'app', 'player'   
+    my $meta_tags = $social->create('summary');
+
+    # returns meta tags specificly for a single provider
+    my $twitter_tags = $social->twitter;
+    my $opengraph_tags = $social->opengraph;
+
+    my $twitter = $social->twitter;
+    my $twitter->create('summary');
+    
+    # Alternatively call a card directly
+    my $summary_card = $meta_tags->twitter->create_summary;
+    
+    ....
+    # You then need to insert these meta tags in the head of your html, 
+    # one way of implementing this if you are using Catalyst and Template Toolkit would be ..
+    
+    # controller 
+    $c->stash->{meta_tags} = $meta_tags;
+    
+    # template
+    [% meta_tags | html %]
+
+=head1 DESCRIPTION
+
+This module generates social meta tags.
+
+i.e  $social->create('summary') will generate:
+    
+    <meta name="twitter:card" content="summary"/>
+    <meta name="twitter:site" content="@example_twitter"/>
+    <meta name="twitter:title" content="You can have any title you wish here"/>
+    <meta name="twitter:description" content="Description goes here may have to do a little validation"/>
+    <meta name="twitter:image" content="www.urltoimage.com/blah.jpg"/>
+    <meta property="og:type" content="thumbnail"/>
+    <meta property="og:title" content="You can have any title you wish here"/>
+    <meta property="og:description" content="Description goes here may have to do a little validation"/>
+    <meta property="og:url" content="www.someurl.com"/>
+    <meta property="og:image" content="www.urltoimage.com/blah.jpg"/>
+    <meta property="og:site_name" content="Example Site, anything"/>
+    <meta property="fb:app_id" content="123433223543"/>'
+
+It allows you to optimize sharing on several social media platforms such as Twitter, Facebook, Google+ 
+and Pinerest by defining exactly how titles, descriptions, images and more appear in social streams.
+
+It generates all the required META data for the following Providers:
+
+    * Twitter
+    * OpenGraph
+
+This module currently allows you to generate the following meta cards:
+
+    $social->create()  $twitter->create_       $opengraph->create_      
+    summary            summary                 thumbnail            
+    featured_image     summary_large_image     article               
+    player             player                  video                
+    app                app                     product                               
+
+=head1 SUBROUTINES/METHODS
+
+=head2 Constructor
+
+Returns an instance of this class. Requires C<$url> as an argument;
+
+=over
+
+=item card
+
+OPTIONAL - if you always want the same card type you can set it 
+
+=item site
+
+The Twitter @username the card should be attributed to. Required for Twitter Card analytics. 
+
+=item site_name
+
+This is Used by Facebook, you can just set it as your organisations name.
+
+=item title
+
+The title of your content as it should appear in the card 
+
+=item description
+
+A description of the content in a maximum of 200 characters
+
+=item image
+
+A URL to a unique image representing the content of the page
+
+=item url
+
+OPTIONAL OPENGRAPH - allows you to specify an alternative url link you want the reader to be redirected 
+
+=item player
+
+HTTPS URL to iframe player. This must be a HTTPS URL which does not generate active mixed content warnings in a web browser
+
+=item player_width
+
+Width of IFRAME specified in twitter:player in pixels
+
+=item player_height
+
+Height of IFRAME specified in twitter:player in pixels
+
+=item operating_system
+
+IOS or Android 
+
+=item app_country      
+
+UK/US ect
+
+=item app_name   
+
+The applications name
+
+=item app_id 
+
+String value, and should be the numeric representation of your app ID in the App Store (.i.e. 307234931)
+
+=item app_url 
+
+Application store url - direct link to App store page
+
+=item fb_app_id
+
+This field is required to use social meta with facebook, you must register your website/app/company with facebook.
+They will then provide you with a unique app_id.
+
+=back
+

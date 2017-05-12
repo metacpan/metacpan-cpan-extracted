@@ -1,0 +1,59 @@
+{
+   "abstract" : "Install missing modules explicitly",
+   "author" : [
+      "Michael F. Covington, <mfcovington@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4206",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-PrereqInstaller",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Getopt::Long" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Pod::Markdown" : "0"
+         },
+         "requires" : {
+            "App::cpanminus" : "0",
+            "Carp" : "0",
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "Getopt::Long" : "0",
+            "Perl::PrereqScanner" : "0",
+            "Text::Wrap" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::PrereqInstaller" : {
+         "file" : "lib/Perl/PrereqInstaller.pm",
+         "version" : "v0.6.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.6.2"
+}

@@ -1,0 +1,183 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'lib';
+
+use Getopt::Long;
+
+my %opts = map { $_ => undef } qw/
+  mom_title
+  mom_subtitle
+  mom_author
+  mom_copyright
+  mom_cover
+  mom_toc
+  /;
+
+GetOptions(
+    "title=s"     => \$opts{mom_title},
+    "subtitle=s"  => \$opts{mom_subtitle},
+    "author=s"    => \$opts{mom_author},
+    "copyright=s" => \$opts{mom_copyright},
+    "cover"       => \$opts{mom_cover},
+    "toc"         => \$opts{mom_toc},
+    "stdtoc"      => \my $stdtoc,
+    "parser=s"    => \my $parse_class,
+    "ps!"         => \my $make_ps,
+);
+
+$parse_class ||= 'Pod::Parser::Groffmom';
+eval "use $parse_class";
+if ( my $error = $@ ) {
+    die "Could not use ($parse_class): $error";
+}
+
+foreach my $key ( keys %opts ) {
+    delete $opts{$key} unless defined $opts{$key};
+}
+$opts{mom_toc} = $stdtoc if defined $stdtoc;
+
+my $file = shift or die "makemom podfile";
+my $mom = $file;
+unless ( $mom =~ s/\.\w$/.mom/ ) {
+    $mom = "$mom.mom";
+}
+
+my $parser = $parse_class->new( \%opts );
+open my $fh, '<', $file or die "Cannot open ($file) for reading: $!";
+$parser->parse_from_filehandle($fh);
+open my $out, '>', $mom or die "$!";
+print $out $parser->mom;
+
+exit if not $make_ps;
+my $ps = $mom;
+$ps =~ s/\.mom$/.ps/;
+
+my $command = "groff -mom > $ps $mom";
+print $command, $/;
+system($command) == 0 or die $?;
+
+if ( $opts{mom_toc} && !$stdtoc ) {
+    # XXX yeah, I know this is a really, really nasty hack, rewriting the
+    # postscript on the fly, but mom does not support tables of contents
+    # except at the end of the document.
+
+    open $fh, '<', $ps or die "Cannot open ($ps) for reading: $!";
+    my $postscript = do { local $/; <$fh> };    # can be expensive!
+    close $fh;
+    my $toc_page = find_toc_page($postscript);
+    if ( $opts{mom_cover} ) {
+        if ($postscript =~ s{
+            \n%%Page:  \s+ 1         \s+ 1 (.+)          # page 1
+            (\n%%Page: \s+ 2         \s+ 2 .+ )          # page 2 up to
+            \n%%Page:  \s+ $toc_page \s+ $toc_page (.+)  # TOC
+            (\n%%Trailer.+)
+        }{\n%%Page: 0 0 $1\n%%Page: 1 1$3$2$4}sx
+          )
+        {
+            open $fh, '>', $ps or die "Cannot open ($ps) for writing $!";
+            print $fh $postscript;
+        }
+        else {
+            die "Could not move the TOC to the front of $ps";
+        }
+    }
+    else {
+        if ($postscript =~ s{
+            (\n%%Page:  \s+ 1          \s+ 1         .+)   # page 1 up to
+            (\n%%Page:  \s+ $toc_page  \s+ $toc_page .+)   # TOC
+            (\n%%Trailer.+)
+        }{$2$1$3}sx
+          )
+        {
+            open $fh, '>', $ps or die "Cannot open ($ps) for writing $!";
+            print $fh $postscript;
+        }
+        else {
+            die "Could not move the TOC to the front of $ps";
+        }
+    }
+}
+
+sub find_toc_page {
+    my $postscript = shift;
+
+    # contents start with something like this, but we use a heuristic to
+    # figure out if we really have contents because a previous page might have
+    # 'Contents' as the header, so we look for the last one.
+
+    # %%Page: 57 57
+    # %%BeginPageSetup
+    # BP
+    # %%EndPageSetup
+    # /F0 16/Helvetica-Bold@0 SF(Contents)72 90 Q/F1 12.5 
+
+    my @lines = split "\n" => $postscript;
+    my $page;
+
+    for my $i (0..$#lines - 4) {
+        my ( $line, $header ) = @lines[ $i, $i+4 ];
+        next unless $line =~ /^%%Page: (\d+)/;
+        my $page_num = $1;
+        if ( $header =~ /\QSF(Contents)/ ) {
+            $page = $page_num;
+        }
+    }
+    return $page;
+}
+
+__END__
+
+=head1 NAME
+
+pod2mom - Turn POD into mom
+
+=head1 USAGE
+
+ pod2mom [options] file_with_pod
+
+=head1 OPTIONS
+
+All options will override any options inferred from the POD document.
+
+Boolean options:
+
+ --cover        Create a cover page
+ --toc          Create a table of contents
+ --stdtoc       "mom" standard table of contents page (at end of document)
+ --ps           Create a Postscript file (requires groff in your path)
+ --nops         Don't create a Postscript file
+
+Options that take arguments:
+
+ --title        Title of document
+ --subtitle     Subtitle of document
+ --copyright    Copyright info (only displayed with --cover)
+ --author       Author of document
+ --parser       Alternate parser to use (subclass from Pod::Parser::Groffmom)
+
+This script turns a standard POD file into a "mom" document.  If the C<--ps>
+option is present, attempts to create a Postscript document with the same name
+as the original document, but with a C<.ps> extension.  This is suitable for
+opening with Ghostview (gv), Preview.app (on Mac OS X) or anything else which
+can open Postscript files.
+
+Note that "mom" limits you to having the table of contents at the end of the
+document.  If you specify C<--toc> and not C<--stdtoc>, we attempt to rewrite
+the Postscript document on the fly to reposition the table of contents.  If
+Postscript generation is not requested, C<--toc> and C<--stdtoc> are the same
+(the Table of Contents is at the end of the document).
+
+=for mom newpage
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Pod::Parser::Groffmom>
+
+=item * C<man groff_mom>
+
+=back

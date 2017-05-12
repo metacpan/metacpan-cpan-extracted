@@ -1,0 +1,2720 @@
+Changes for Perl Application Development and Refactoring Environment
+NOTE: Do NOT "tidy" or change the indenting here, or we break svn annotate
+
+Padre version numbers follow an odd/even pattern, where the even numbers are
+used for the production releases of the distribution. The even versions below
+details visible changes or bug fixes for the Padre IDE.
+
+The odd versions are used during development and the change entries for them
+list API changes that may break compatibility for components of Padre, most
+notably for plugins. This allows plugins to update compatibility before the
+next production release, and synchronise their release to the Padre schedule.
+
+Changes which do not break API compatibility for plugins should be listed in
+the even version for the release, even during development.
+
+1.00 2013.11.09
+ - Applied Patch in #1488 comment:7 itcharlie++ (BOWTIE)
+ - Apply patch for #1504 dod++ (BOWTIE)
+ - Apply patch2 from #1459 bojinlund++ (BOWTIE)
+ - Update Makefile.PL with new versions (BOWTIE)
+ - Add Patch for cut n paste adam++ #1312 (BOWTIE)
+ - Fix Debug ip hanging, use 127.0.0.1 instead of localhost (BOWTIE)
+ - fix some unwanted background noise from debug raw (BOWTIE)
+ - Apply patch from #1508 itcharlie++ (BOWTIE)
+ - Add refresh_breakpoint_panel to Wx::Main (BOWTIE)
+ - Add correct comment for PerlXS (BOWTIE)
+
+0.98 2013.02.19
+    - Changed to use current internal hashes instead of asking perl5db for 
+      value, this also gets around a bug with 'File::HomeDir has tied 
+      variables' clobbering x @rray giving an empty array (BOWTIE)
+    - Update variables/values upon check box click (BOWTIE)
+    - Clicking on item in Breakpoint Panel now takes you to file and line (BOWTIE)
+    - Dot in Debugger also sets focus in editor (BOWTIE)
+    - Add (broken) to Convert Encodings in Edit menu dod+ (BOWTIE)
+    - Remove double spacing caused by a stray has with no value (BOWTIE)
+    - Commented out Tools -> Module Tools see #1433 (BOWTIE)
+    - Tweak test 14 to skip php elseif, make cpanm happy #1393 (BOWTIE)
+    - Run script in native terminal in OsX #1434 (BENNIE)
+    - Reapplied r19056 translator _EviL_ to About using wxFormBuilder (BOWTIE)
+    - Continuity in page titles (BOWTIE)
+    - Improve the error mesages in dialog patch (BOWTIE)
+    - Some tweaks and POD to utils (BOWTIE)
+    - Fix Recreation of deleted file #1447 mj41++ (BOWTIE)
+    - Bug stopping reload all in #1447 mj41++ nice catch (BOWTIE)
+    - Fix Reload of more than one file regression #1405 mj41++ (BOWTIE)
+    - Update french translation (DOLMEN)
+    - Uncommented file.print to re-enable printing #1443 (BOWTIE)
+    - Update internal Padre::Plugin::My to API v2 (BOWTIE)
+    - Commented out, as it kills padre, only used in p-p-Git, see #1448 Manfred++ (BOWTIE)
+    - Use Debug-Client 0.21 with several Debugger fixes (BOWTIE)
+    - Bumped PPIx::EditorTools to 0.17 for enhanced Moose Outline support #1435
+      buff3r++ dod++ (BOWTIE)
+    - As per dod++ request keep outline attributes open by default (BOWTIE)
+    - Add padre icon to My Plugin (BOWTIE)
+    - As per dod++ request keep outline attributes open by default (BOWTIE)
+    - Add padre icon to My Plug-in (BOWTIE)
+    - Updated Plug-in Manager (BOWTIE)
+    - Fix possible Padre crash in Padre::PluginManager::reload_plugin (BOWTIE)
+    - Tweak Schwartzian transform to work on class names, makes more sense (BOWTIE)
+    - Tests now pass on Strawberry Portable again (ADAMK)
+    - Due to changes Padre::Util::run_in_dir_2 bumped $COMPATIBLE = 0.97 (BOWTIE)
+    - Add wx-SplitterWindow to Plugin Manager #1359 
+    - Add backin Perl Distribution... this is the skeloton, dialog, with out function #1324
+      (BOWTIE)
+    - Added back Perl Distribution using module-starter like before (BOWTIE)
+    - Comment out unsupported m::s licences (BOWTIE)
+    - Fix ticket #1316 "Ctrl+click do not open Perl module if clicked on full method/sub name"
+      mj41++ (BOWTIE)
+    - Deal with multiple cvs module names in Perl Distribution... (BOWTIE)
+    - Add default values locale_perldiag for #1382 (BOWTIE)
+    - Removing unused locale_perldiag and related code (ADAMK)
+    - Fixed several serious bugs in the Key Bindings section of the Preferences
+      dialog (ADAMK)
+    - Added Perl Help (Japanese) for YAPC::Asia (ADAMK)
+    - Added documentation for more methods in Padre::Document (ADAMK)
+    - Padre::Task::Diff no longer crashes on documents without a project (ADAMK) 
+    - Bump Module::Install -> 1.06 (BOWTIE)
+    - UpDate My Plug-in so that it reloads (BOWTIE)
+    - Tweak Splash for type PNG (BOWTIE)
+    - Replace <eval "require $class"> by a safer and faster code
+      (no eval string) (DOLMEN)
+    - Added a little time out to stop MARKER_NOT_BREAKABLE from wrongly happing (BOWTIE)
+    - this is just a quick fix, to stop menu bar Fup's from happing (BOWTIE)
+    - Added Debug-Launch-Options wxStatic text to Debugger-Output (BOWTIE)
+    - Add method debug_launch_options to Debugget-Output (BOWTIE)
+    - F5 'Run Script' uses perl parameters from #! line if it finds them (SDOWIDEIT)
+    - Add Debug-Launch-Options dialog (SDOWIDEIT)
+    - fix to toggling of breakpoints while debugger is running (SDOWIDEIT)
+    - fix for -> stop dumping the following on console 
+      'Use of uninitialized value in string eq' (BOWTIE)
+    - Hack for svn 1.7 esp Padre trunk to reenable VCS feature (BOWTIE)
+    - Fix error of missing { in QuickFix.pm from r19585 (BOWTIE)
+    - Remove Subroutine prototypes Browser.pm (BOWTIE)
+    - Fix PerlSub.pm eol and missing $VERSION (BOWTIE)
+    - Set Copyright 2008-2013 (BOWTIE)
+    - Add some more support for svn 1.7.x (BOWTIE)
+    - Remove some old cruff and comments from debug testing (BOWTIE)
+    - Diff now working against svn 1.7.x and 1.6.x (BOWTIE)
+    - FIXME Find out why EVT_CONTEXT_MENU doesn't work on Ubuntu - commeted out 
+      as workas against Ubuntu 12.10, this is cool for lot's of Methods only (BOWTIE)
+    - add PPIx::EditorTools to About Info (BOWTIE)
+    - add an icon to CPAN Explorer panel tab (BOWTIE)
+    - attempt to fix paste-buffer-clear-bug #1312 (SEWI)
+    - s/Update/update/ #1429 bennie++ (BOWTIE)
+    - Bumped Debug-Client dependancy to 0.24 waxhead++ (BOWTIE)
+
+0.96 2012.04.19
+    - The "Todo" or "To Do" or "To-do" or "TODO" list has always been a
+      problem when it comes to naming. Renamed to "Task List" to align
+      with Microsoft Visual Studio's solution to this problem (ADAMK)
+    - Removed borders from the Outline tool elements (ADAMK)
+    - Clicking a file in the Replace in Files output opens the file (ADAMK)
+    - Added Padre::Wx::Role::Idle and moved all tree ctrl item activate
+      events to use it to evade a item_activated event bug (ADAMK)
+    - Added Padre::Wx::Role::Context and changed most panel tools to use
+      it for generating context menus (ADAMK)
+    - Update Debug2 to use SQL parameter markers (tome, BOWTIE)
+    - disable Debug2 tool-bar icons against unsaved files (tome, BOWTIE)
+    - Debug2 now shows margin_marker breakpoints on file load (tome, BOWTIE)
+    - tweaked on load to include reload and only once (BOWTIE)
+    - Debug2 now checks for perl files more thoroughly (BOWTIE)
+    - Added proper POD documentation for Padre::Cache (ADAMK)
+    - Delay clearing the outline content so it doesn't flicker so heavily
+      all of the time (ADAMK)
+    - Added a dozen or so new file types to Padre::MIME, including
+      several that we explicitly do not support (ADAMK)
+    - Added Padre::Comment to hold a registry and abstraction for the
+      different comment styles in supported documents (ADAMK)
+    - Added display variable data from click in debugger panel (BOWTIE)
+    - The Evaluate Expression dialog now has a "Watch" feature (ADAMK)
+    - Added Padre::SLOC for calculating Source Lines of Code metrics (ADAMK)
+    - Completed right click relocation of panels for the main tools (ADAMK)
+    - Added Padre::Locale::Format for localising the display of numbers,
+      and datetime values (ADAMK)
+    - Inlined the small amount of code we use from Format::Human::Bytes and
+      remove the dependency (ADAMK)
+    - Switching to the thread-safe Wx::PostEvent when sending events from
+      the background, which should dramatically reduce segfaults (DOOTSON)
+    - Added COCOMO modelling to the project statistics dialog (ADAMK)
+    - Added BASH support to default.txt theme (BOWTIE)
+    - Variable data now shown in corresponding colour (BOWTIE)
+    - Migrating to new ORLite 2.0 API (ADAMK)
+    - Padre::Plugin::unload(@packages) now works (AZAWAWI)
+    - Padre::PluginHandel was only checking for error, 
+      not handling return = 0, it is now (BOWTIE)
+    - Re-enable outline panel to display MooseX::Declare Method modifiers
+      (BOWTIE)
+    - Convert p-p-xx-yy -> p-p-xx in P-Plugin making getting config easy 
+      (BOWTIE)
+    - Require 5.010 as an experiment. (SZABGAB)
+    - Update Debugger, tests and dependencies to use Debug::Client 0.18 as this
+      is now Perl 5.16.0 ready (BOWTIE)
+    - Notify plugins when either a save-as (possible mime-type change) or new
+      document event occurs (AZAWAWI)
+    - Update German translation (ZENOG)
+    - Make show_local_variables default in Debug2 (BOWTIE) reverting
+    - perl5db.pl needs to be given absolute filenames (BOWTIE)
+    - Debug2 now shows display_value on selection (BOWTIE)
+    - change Status-Bar 'R/W' to 'Read Write' (BOWTIE)
+    - add +1 to Current Line so % is display correctly in Status-Bar (BOWTIE)
+    - bumped Debug-Client requirement to 0.20 (BOWTIE)
+    - 
+
+    - Moved Padre::Wx::Role::Dwell to ::Timer as scope expanded (ADAMK)
+    - Removed Padre::Wx::Role::Form which was intended as a replacement for
+      Padre::Wx::Dialog but was never used by anyone for anything (ADAMK)
+    - Removed Padre::Document::get_comment_line_string (ADAMK)
+    - Padre::Util::humanbytes is not Padre::Locale::Format::bytes (ADAMK)
+
+0.94 2012.01.22
+    - Redesigned the Preferences dialog (ADAMK)
+    - Completed the Padre::Delta module for applying document updates, diffs or
+      other small automated changes to a document without moving the scroll
+      position or cursor (ADAMK)
+    - Converted the FindFast panel to wxFormBuilder (ADAMK)
+    - Converted the Replace dialog to wxFormBuilder (ADAMK)
+    - Converted the Plugin Manager dialog to wxFormBuilder (ADAMK)
+    - Converted the Document Statistics dialog to wxFormBuilder (ADAMK)
+    - The modification indicator on the notebook tab is now set correctly even
+      during automated mass document changes (ADAMK)
+    - Removed Padre::DB::SyntaxHighlighter as the need for custom highlighting
+      plugins is greatly reduced now we have Wx::Scintilla (ADAMK)
+    - Move back from badly conceived "Smart" gettext usage to a more regular
+      usage at the urging of the translation team (ADAMK)
+    - Moved Wx::Scintilla specific lexer and highlighter registration out of
+      Padre::MimeTypes and into Padre::Wx::Scintilla so we can use
+      Padre::MimeTypes in background threads (ADAMK)
+    - Rewrote MIME support as Padre::MIME, which does not rely on Padre::Config
+      and can be loaded and used in background threads more easily (ADAMK)
+    - Added Debug2 interface, you will need Debug::Client 0.16, please view wiki
+      for more information (BOWTIE)
+    - Force upgrades to DBD::SQLite 1.35 and ORLite 1.51 for major performance
+      improvements which should make Padre block a bit less (ADAMK)
+    - In addition to VACUUM on shutdown, also ANALYZE for a further small
+      performance improvement (ADAMK)
+    - Removed redundant Module Tools/Install CPAN Module (AZAWAWI)
+    - Spanish tramslation from atylerrice (GCI student)
+    - Added watch items to Debug2 interface, requires Debug::Client 0.16, also
+      reintroduced S for loaded please view wiki for more information (BOWTIE)
+    - Moved rarely used "Dupliate" and "Delete" file menu options to
+      "new" and "close" submenus (SEWI)
+    - Try to avoid failing silently when there are major load-time failures
+      and on Win32 ask if we can reset configuration directory (ADAMK)
+    - Fixed detection of XML files with non-.xml extensions (ADAMK)
+    - Moved Wx-specific code out of Padre::Util into Padre::Wx::Util (ADAMK)
+    - Moving the _T function to the dedicated Padre::Locale::T (ADAMK)
+    - The Replace dialogs don't use Find Fast term unless visible (ADAMK)
+    - Search results now match correctly at the first position (ADAMK)
+    - Search match caret is now at the start of the match selection (ADAMK)
+    - Added MIME type and content detection for wxFormBuilder files (ADAMK)
+    - Scintilla lexer selection now obeys MIME type inheritance (ADAMK)
+    - Added shared Padre::Wx::ComboBox::FindTerm widget for search dialogs,
+      that will hint when the search term is an illegal regex (ADAMK)
+    - Hitting F3 after a find or replace dialog is closed repeats the last
+      search with all settings (regex, etc) retained until the user changes a
+      document or moves the selection off the previous selected result (ADAMK)
+    - Added main window deactivation hook to hide Find Fast panel (ADAMK)
+    - Added main window activation hook to rescan the directory tree, rerun
+      syntax checking, and rerun vcs indicators (ADAMK)
+    - Hitting enter in the Function List search box will clear the search after
+      you have been taken to the first function (ADAMK)
+    - When Find Fast is closed, return scroll and selection to the original
+      location (ADAMK)
+    - Syntax check status is reflected in the label for the Syntax Check output
+      so you can see the result when it is not at the front (ADAMK)
+    - When syntax check fails, only show markers for the errors in the file that
+      is being displayed in the editor (ADAMK)
+    - The replace_term history combobox class no longer prepopulates with an
+      assumed replace term you probably don't want (ADAMK)
+    - Recursive search and replace dialogs support type filtering (ADAMK)
+    - Hex/decimal conversion: make error message generic (ZENOG)
+    - Plugin manager: complete translation (ZENOG)
+    - Update German translation (ZENOG)
+    - HTML for Padre::Wx::HtmlWindow is rendered in the background (ADAMK)
+    - Clicking on a result from a Find in Files search will now find the
+      correct line even if it has moved since the search was run (ADAMK)
+    - The context menu now correctly appears at the cursor on Win32 (ADAMK)
+    - Changed the order of the context menu entries to more closely match
+      the typical ordering of other editors (ADAMK)
+    - Refactored the comment logic to allow sloppier smart selection (ADAMK)
+    - Migrated the Function List tool to use the Padre::Search internals (ADAMK)
+    - Hide the experimental command line feature in advanced preferences (ADAMK)
+    - Padre::Search::editor_replace_all now uses Padre::Delta (ADAMK)
+    - Padre::Search::matches now supports submatch option (ADAMK)
+    - Added basic tests for Debugger panels (BOWTIE)
+    - Save All is much faster and won't flicker or defocus cursors (ADAMK)
+    - The Reload actions now restore cursor position (more) correctly and
+      don't defocus the current editor (ADAMK)
+    - The location of most tools can now be configured (ADAMK)
+    - The bloat reduction features can now be configured (ADAMK)
+    - Fixed Ticket #1377 Search dialog claims unsuccessful search even
+      though it was successful (ADAMK)
+    - Fixed Ticket #1298 Changing font in preferences is not applied to
+      existing editors (ADAMK)
+    - Fixed Ticket #1294 Space in text field for pref
+      "editor_right_margin_colum" stops Padre (ADAMK)
+    - Fixed Ticket #1363 Miss depend - File::Slurp (ADAMK)
+    - The editor style preview now correctly updates in real time (ADAMK)
+    - Migrate the vertical align feature to Padre::Delta (ADAMK)
+    - Function List sort order can be changed via right click menu (ADAMK)
+    - Added support for the R statistics programming language (ADAMK)
+
+    - The Padre::Wx::Main method ->pages was removed (ADAMK)
+    - Padre::MimeTypes replaced by Padre::MIME and Padre::Wx::Scintilla (ADAMK)
+    - Padre::Project::headline method now returns the relative path, with the
+      full path version moved to Padre::Project::headline_path (ADAMK)
+    - Padre::Search changes relating to "Replace" and "Count All" logic (ADAMK)
+    - The long-deprecated gettext_label method has been deleted (ADAMK)
+    - The old search function Padre::Util::get_matches has beedn deleted (ADAMK)
+    - Refactored most _show methods into a single show_view method (ADAMK)
+    - Removed the unused Padre::Config versioning system (ADAMK)
+
+0.92 2011.11.11
+    - Wx::Scintilla is now stable and replaces Wx::STC in Padre (AZAWAWI)
+    - New Task 3.0 which fixes bidirectional communication and thus enables
+      services that run indefinitely in reserved threads (ADAMK)
+    - New Style 2.0 which simplifies implementations, adds style localisation
+      and allows styling of the GUI (ADAMK)
+    - Added fine-grained Wx locking mechanism so that high frequency asyncronous
+      GUI code doesn't create high frequency asyncronous flickering. Padre
+      flickers much less now on Win32 (ADAMK)
+    - Added Replace in Files using matching logic to Find in Files (ADAMK)
+    - Added plugin compatibility tracking to Padre::Search (ADAMK)
+    - Wx doesn't seem to let us change the PaneBorder setting after pane
+      creation, so leave it off and have an empty area rather than have a
+      double-width border (ADAMK)
+    - Wx constants are now Wx::FOO instead of Wx::wxFOO... and these ones are
+      actually constants instead of strange AUTOLOAD weirdness (ADAMK)
+    - We now SetEndAtLastLine(0) on editor panels so you can scroll one page
+      past the end of the document and type into relaxing clear space (ADAMK)
+    - Tabs without filename now also backed up (SEWI)
+    - The syntax highligher spawns the perl -c call with the unsaved file as
+      STDIN rather than by filename. This seems to make things that rely on
+      FindBin like Module::Install Makefile.PL files work properly (ADAMK)
+    - Some tools are more thorough about indicating they are not used (ADAMK)
+    - Added support for task parents and owners being notified when a task has
+      started running in the background (ADAMK)
+    - Task owners can now hijack status bar messages if they wish to (ADAMK)
+    - The task manager can now run without the need for threads. However,
+      every task will block the foreground and makes Padre unusable, so this
+      feature is reserved for profiling Padre's performance (ADAMK)
+    - The advanced setting threads_stacksize allows the tuning of the
+      thread stack size. On Win32 the default is dropped to 4meg (ADAMK)
+    - The advanced setting threads_maximum allows the tuning of the
+      maximum number of background worker threads (ADAMK)
+    - Padre::Wx::App will use Wx internal singleton logic instead of duplicating
+      it again for itself (ADAMK)
+    - Add more _ shortcuts in menus. Sorry to translators (DOLMEN)
+    - Only show the GTL splash screen once per version change on GTK (ADAMK)
+    - Fix freeze when opening an empty *saved* Perl script while the syntax
+      checker is active (AZAWAWI)
+    - #1207: PluginHooks not removed after plugin reload/disable (MJFO)
+    - Padre::File::HTTP: less colloquial English (ZENOG)
+    - update_pot_file.pl: add --verbose and --nocleanup for easier debugging
+      (ZENOG)
+    - #1313: Search previous button acts as next (KAARE)
+    - regex editor: insert m// operator when replace field is not visible (ZENOG)
+    - regex editor: highlight matched text in blue instead of red, not avoid
+      confusion with warnings (ZENOG)
+    - improved messages in Menu/File.pm, Goto.pm and ActionLibrary.pm (ZENOG)
+    - FindFast.pm: 'Case insensitive'->'Case sensitive' to match actual behavior
+      of the checkbox (ZENOG)
+    - Update German translation (ZENOG)
+    - Directory tree search result rendering is now throttled to four updates
+      per second. This prevents tree updates exhausting all resources and
+      strangling user input, and seems to actually get the results onto screen
+      faster because there's less lock/render passes (ADAMK)
+    - During shutdown, call view_stop early on all tools that support it so they
+      won't waste time rendering after we have hidden the main window (ADAMK)
+    - #1317 'Padre 0.90 hangs and then segfaults on i .t file' (AZAWAWI)
+    - Find in Files search result rendering is now throttled to four updates
+      per second, for similar reasons as with the directory tree search (ADAMK)
+    - 'Open in Command line' is now shown in the right click menu in win32 (AZAWAWI)
+    - 'Open in Command line' and 'Open in default system editor' are only shown
+      on win32 (AZAWAWI)
+    - Smart highlight is now hidden when a printable character is added or changed
+      in the editor (AZAWAWI)
+    - Syntax checker tasks should now return a hash containing an issues array
+      reference and stderr string keys instead of the old issues array reference
+      (AZAWAWI)
+    - Fix TODO list double click not working regression on win32 (AZAWAWI)
+    - Italic text was not being set correctly in a Padre style (AZAWAWI)
+    - "Show Standard Error" in Syntax check pane now displays in output
+      pane the syntax checker results (AZAWAWI)
+    - Moved Ctrl-Shift-R shortcut from Open Resource to Replace in Files to
+      provide symmetry with the Find in Files shortcut (ADAMK)
+    - Upgrade the syntax highlighter panel to wxFormBuilder (ADAMK)
+    - New leading and trailing space deletion that is faster and won't move
+      the editor window around (ADAMK)
+    - Added 'Solarized Light' theme contributed by Anton Ukolov ('sugar' on irc)
+      (AZAWAWI)
+    - Open resources dialog is now triggered by Ctrl-Alt-R instead of Ctrl-Shift-R
+      which is now reserved for 'Replace in Files' functionality (ADAMK, AZAWAWI)
+    - Find In Files match accounting works, and no longer hides files when we
+      only do a single render pass for files because there's only a few (ADAMK)
+    - Replaced references to wxStyledTextCtrl documentation with the original
+      Scintilla website documentation (AZAWAWI)
+    - Added how much time does syntax checking take (AZAWAWI)
+    - Added realtime VCS or local document difference calculation margin feature
+      (AZAWAWI)
+    - Added a differences popup window that can traverse differences in a document
+      and revert back changes (AZAWAWI)
+    - Added 'Next Difference' to edit menu (AZAWAWI)
+    - Plugin manager is now modal (BOWTIE, AZAWAWI)
+    - Add Patch to editor menu and removed Diff Tools (BOWTIE)
+    - Update Italian translation (SBLANDIN)
+    - Padre::Project vcs strings are now constants (AZAWAWI)
+    - "Filter through Perl" back into core (SEWI)
+    - Added a generic version control panel that provides minimal project
+      subversion/git support with the ability to view normal/unversioned and ignored
+      files (AZAWAWI)
+    - #1126 'TODO list: does not immediately show items' (AZAWAWI)
+    - Added identity_location config setting so collaborative functions such as
+      Swarm can disambiguate multiple Padre instances of the same user by
+      named locations such as "Home" or "Work" (ADAMK)
+    - Refactored the generation of templated skeleton code into a pure
+      Padre::Template generator, and IDE-aware code that wraps around it (ADAMK)
+    - Require Wx 0.9901 on all platforms to fix ticket #1184: Perl help browser
+      suppresses linebreaks (AZAWAWI)
+    - Upgrade the find in files panel to wxFormBuilder (AZAWAWI)
+    - Find in files has repeat, stop search, expand and collapse all buttons
+      (AZAWAWI)
+    - Move the key bindings dialog to the preferences dialog (AZAWAWI)
+    - Removed the bin_diff configuration parameter and the external tools panel
+      from the preferences dialog (AZAWAWI)
+    - Fix quick menu access stability bugs on Ubuntu (AZAWAWI)
+    - Fix #1318: Padre freeze? (AZAWAWI)
+    - Added SQL, C/C++, C#, XS, Python, Ruby, PHP, HTML, CSS, JavaScript, Ada,
+      COBOL, Haskell, Pascal, ActionScript, VBScript and YAML keyword
+      highlighting (AZAWAWI)
+    - Major refactoring of the editor setup and configuration code (ADAMK)
+    - Scintilla numeric resources such as margins, markers and indicators are
+      now managed in Padre::Constant (ADAMK)
+    - Recalculate the line number margin width after various events to ensure
+      the numbers always show correctly (ADAMK)
+    - Tools and panels that are hidden across a AUI geometry change recalculate
+      their layout properly when displayed again (ADAMK)
+    - Add out-of-the-box comment support for HTML, XML, LISP, Fortran, Forth,
+      Pascal, VBScript, DOS batch files, ActionScript, Tcl, COBOL, Haskell
+      (ZENOG)
+    - MATLAB source file extension is .m, not .mat (ZENOG)
+    - Add syntax checking comments pragmas. To disable Padre syntax
+      check, please type '## no padre_syntax_check' and to enable again type 
+      '## use padre_syntax_check' in your source code (AZAWAWI)
+    - Added lang_perl6_auto_detection which enables Padre to detect Perl 6 files
+      in Perl 5 files. Please note that this is not an accurate method of
+      detecting Perl 6 files (disabled by default). The previous behavior was to
+      enable it when the Perl 6 plugin is enabled (AZAWAWI)
+    - Added "Language Perl 6" tab to preferences (AZAWAWI)
+    - Ruby and Python scripts can be now be executed (AZAWAWI)
+    - Ruby, Python, Java, and C# are supported in the function list
+      (AZAWAWI, ZENOG)
+    - Ported the timeline class mechanism back to ORLite::Migrate, and switch
+      from our custom inlined version back to depending on CPAN.
+      [Removed Padre::DB::Migrate*] (ADAMK)
+    - Fix Outline focus and paint bugs that caused other right panels to 
+      misbehave when Outline is enabled (BOWTIE, AZAWAWI)
+    - Upgrade the Outline panel to wxFormBuilder (AZAWAWI)
+    - Outline panel is searchable now (AZAWAWI)
+    - Fix #1050: Window menu is confusing (ZENOG, AZAWAWI)
+    - Remove swap_ctrl_tab_alt_right configuration parameter (AZAWAWI)
+    - Added CPAN explorer that reuses MetaCPAN.org API for searching for a module
+      and uses App::cpanminus for package installation. It can list the most
+      recent and favorite CPAN releases, view their POD documentation
+      and if there is a SYNOPSIS section, one can insert it from within Padre.
+      (AZAWAWI)
+    - Fix #1291 'Code folding icons missing' (AZAWAWI)
+    - Code folding markers are now theme-able (AZAWAWI)
+    - Find and Find in Files dialogs hide the Fast Find panel (ADAMK)
+    - Hide editor objects during their (potentially long) setup so that we
+      don't see a half-formed editor in a weird position (ADAMK)
+    - Add povray mimetype and keyword lists (BRAMBLE)
+    - Fix AUTOMATED_TESTING=1 t/ errors automatically set by cpanm (AZAWAWI)
+    - Fix bad assumption in 93_padre_filename_win.t (AZAWAWI)
+
+    - Task 3.0 breaks almost all task code (ADAMK)
+    - Style 2.0 breaks all existing styles (ADAMK)
+    - Wx constants change from Wx::wxCONSTANT to Wx::CONSTANT (ADAMK)
+    - Rename internal language code 'fr-fr' to 'fr' (and .po files) for
+      consistency with other softwares, breaking old fr-fr files (DOLMEN)
+    - on_right_click becomes on_context_menu as a first step to support the
+      context menu key or Shift+F10 as alternatives (DOLMEN)
+    - Removed the comment basis for Padre::Document subclassing (ADAMK)
+    - Renaming of all methods involved in setting up an editor object (ADAMK)
+    - Removed the experimental Padre wizard API (AZAWAWI)
+
+0.90 2011.08.16
+    - Return task instance from Padre::Role::Task::tast_request (BRAMBLE)
+    - Add 'Solarized Dark' theme contributed by Anton Ukolov ('sugar' on irc)
+      (BRAMBLE)
+    - Improved fast find text entry colours #1290 (BRAMBLE)
+    - Improved preferences colours for 'dark' themed desktops #1290 (BRAMBLE)
+    - Added feature_devel_endstats (disabled by default) which makes Padre
+      run scripts with -MDevel::EndStats=<feature_devel_endstats_options>
+      to show various statistics when your program terminates (AZAWAWI)
+    - Fixed "Open in File Browser" under Windows 7 (AZAWAWI)
+    - The functions and syntax check windows needs to be cleared when the
+      document does not provide any functions or syntax checker tasks (AZAWAWI)
+    - The syntax checker is now more accurate when typing faster (AZAWAWI)
+    - Added a change dwell mechanism to the editor panels, which gives any tools
+      based on editor content an opportunity to auto-refresh (ADAMK)
+    - Added dwell-refresh to the function list, so new functions are added as
+      they are being typed or pasted (ADAMK)
+    - Converted syntax checker from timer polling with hash shortcutting to the
+      new dwell-refresh mechanism (ADAMK)
+    - Converted outline from timer polling with length shortcutting to the new
+      dwell-refresh mechanism (ADAMK)
+    - Fixed #1287: Find in files crashing (SEWI)
+    - Auto-backup is working again #105 (SEWI)
+    - Fixed #1286: Too many newlines being inserted (SEWI)
+    - Only allow PNG and ICO images by default, saving 4meg of RAM (ADAMK)
+    - Handle crash when File/Delete is called on an Unsaved document (AZAWAWI)
+    - File Reload All/Some was not working as expected (AZAWAWI)
+    - Add a xt test for open blocker tickets (SEWI)
+    - Underline the syntax warning/error line with an orange or red squiggle
+      indicator (AZAWAWI)
+    - TRACE() calls now use epoch microsecond timestamps instead of localtime
+      to make subsecond temporal relationships more obvious (ADAMK)
+    - When the syntax checker is rescanning after a document change, clear the
+      window but do not change the margin (ADAMK)
+    - Add _ shortcuts in menus. Still to do. Sorry to translators (DOLMEN)
+    - Add ... to menus leading to dialogs. Sorry to translators (DOLMEN)
+    - Fix blurry app icon on Ubuntu with Unity desktop (DOLMEN)
+    - Fixed failing thread test (SEWI)
+    - Added feature_devel_traceuse (disabled by default) which makes Padre
+      run scripts with -d:TraceUse=<feature_devel_traceuse_options>
+      to show the modules that your program loads recursively (AZAWAWI)
+    - Checked menu actions may be called form other events but the menu
+      event (SEWI)
+    - Stop ignoring syntax checking errors without an actual type (AZAWAWI)
+    - The editor change dwell time (the time between when you stop typing and
+      when tools like function list and syntax update) is now configurable as
+      editor_dwell in Advanced Preferences (ADAMK)
+    - Replaced Dump... menu in the Developer Plugin with a more general Dump
+      Expression tool so you can explore the internals of Padre incrementally
+      instead of selecting a menu every time (ADAMK)
+    - Added experimental config setting feature_style_gui to allow major GUI
+      tools such as the function list and directory tree to inherit their
+      foreground and background colouring from the active editor style (ADAMK)
+    - Update German translation (ZENOG)
+
+    - Heavily refactored function search in Padre::Document, breaking compat.
+      Moved function locating code to Padre::Editor as find_function,
+      has_function and goto_function. Padre::Document now just has a single 
+      "functions" method which does the work via the task class (ADAMK)
+    - In Padre::Editor the smart highlight methods are how smart_highlight_show
+      and smart_highlight_hide (ADAMK)
+
+0.88 2011.08.09
+    - Thread Slave Mastering now works for Task 2.0. This removes thread spawn
+      foreground blocking, reducing per-thread costs by at least 10meg, and can
+      reduce total memory overhead by 50+meg (ADAMK)
+    - The directory tree supports relocale correctly (ADAMK)
+    - The notebook supports relocale correctly for "Unsaved X" files (ADAMK)
+    - Catch a crash (#1268 workaround) (SEWI)
+    - "Run -> Run this test" now use -l as suggested by BOWTIE (SZABGAB)
+    - Header files (.h) are now recognized as a C document (AZAWAWI)
+    - Updated wxWidgets documentation links to 2.8.12 in Padre developer tools
+      internal plugin (AZAWAWI)
+    - Updated generated Padre::Wx::FBP::* modules to FBP::Perl 0.59, which will
+      hopefully fix Layout/Fit logic on Mac (ADAMK)
+    - Padre::DB::Migrate now has a method-based timeline that is even smaller
+      again than the class-based timeline that replaced the script-based
+      timeline, removing the unsightly Padre::DB::Patch123 modules (ADAMK)
+    - Turn off Win32::SetChildShowWindow so that ordinary system() calls 
+      won't generate short-lived command line windows (ADAMK)
+    - Removed Module::Starter integration, it generates evil distros (ADAMK)
+    - Added write/PUT support to Padre::File::HTTP (SEWI)
+    - Fix #1244: Refresh recent open files list on close (SEWI)
+    - #105: Backup unsaved files to disk (SEWI)
+    - While closing all files during shutdown, don't spawn a background task
+      to update the recent files list (ADAMK)
+    - Perl Projects now ignore Makefile.old files (ADAMK)
+    - Upgraded the Insert Special Value dialog to wxFormBuilder (ADAMK)
+    - Upgraded the Insert Snippet dialog to wxFormBuilder (ADAMK)
+    - Removing the deprecated Padre::Wx::Dialog now that all dialogs have been
+      ported away from it to wxFormBuilder (ADAMK)
+    - Fix #1099: Ctrl-Shift-T to get the last closed tab (ZENOG, AZAWAWI)
+    - Scintilla word characters are now set up per document type (ADAMK)
+    - Removed the regex option in fast find as it doesn't make much sense to
+      incrementally fast type a regexp (ADAMK)
+    - Searches done in fast find are now remembered by Padre so they can be
+      repeated by F3 with no find dialogs open (ADAMK)
+    - Stop Mac OSX crashes on save due to tailing pipe in FileDialog (TOME)
+    - Highlight Perl keywords using Scintilla (AZAWAWI)
+    - Optional feature configuration settings are now compiled into the new
+      dedicated namespace Padre::Feature so feature code can be compiled out
+      entirely rather than just being skipped (ADAMK)
+    - The Function List now recognises *function = sub { } in Perl code (ADAMK)
+    - The Function List will interleave private methods with public ones
+      when set to "Alphaetical" sort (ADAMK)
+    - Background worker threads that receive a 'cancel' message while they are
+      not running a task will no longer silently exit their worker loop, which
+      fixes the massive thread leak we've had since Task 2.0 landed! (ADAMK)
+    - Properly enable Perl 6 Wx::Scintilla support (AZAWAWI)
+    - Properly handle File/New/Copy of current file when there is no current
+      document (AZAWAWI)
+    - Require open editor for File/New/Copy menu option (SEWI)
+    - Handle Padre crash when a triple right click is performed on the project
+      pane's empty space (NILSONSFJ, AZAWAWI)
+    - Fix #1176: Preferences 2.0 screen is too big (BOWTIE, AZAWAWI)
+    - Fix #1231: Add scroll bar to xterm (BOWTIE, AZAWAWI)
+    - Remove Win32::API dependency on win32 by introducing built-in
+      Padre::Util::Win32 XS wrapper (MARKD)
+    - Partial fix #913: almost no syntax highlighting for C/C++ code; also fix
+      for C#, Java and JavaScript (ZENOG)
+    - Save changed preferences (instead of throw changes away) 
+      when Advanced is clicked in the Preferenced dialog. (NXADM)
+    - Added LICENSE file to fix #1224 (NXADM)
+    - Fix #1243: Error message when plugin overrides document class/document
+      class lost after plugin deactivation (ZENOG)
+    - Add out-of-the-box comment support for ADA, ASM, BibTeX, C, C++, C#,
+      Eiffel, Java, LaTeX, Lua, Makefile, Matlab, Perl 6, PHP, Python, Ruby,
+      shell script, SQL; introduce Padre::Document classes HashComment,
+      PercentComment, DoubleDashComment, DoubleSlashComment, get rid of class
+      Config (ZENOG)
+    - Fix #1232: "modified" display ("*") is not updated with Wx::Scintilla (MARKD)
+    - Fix #1237: Wx::Scintilla does not always update line/column numbers in the
+      status bar (MARKD)
+    - Fix #1242: Autoindent broken when using Wx::Scintilla (MARKD)
+    - Update 'About' dialog information once instead of twice at startup (AZAWAWI)
+    - Fix #1245: Info missing for Wx::Scintilla in Padre System About (AZAWAWI)
+    - Padre::Plugin::menu_plugins can now return a single Wx::MenuItem so that
+      plugins are no longer forced to have a submenu (ADAMK)
+    - Padre::Project::Perl can now do basic intuition of the probable distribution
+      name and headline module for a Perl project (ADAMK)
+    - Bump File::HomeDir dependency to 0.98 on Windows to pick up a fix for a bug
+      that caused Padre to hang for several seconds periodically when the user's
+      My Documents directory is on a UNC-addressed network share. UGH! (ADAMK)
+    - Abort directory browse tasks for UNC shares, as opendir() won't work on them
+      and thus running the task would be pointless. The directory browser still
+      won't work for UNC shares, but at least now it won't work faster (ADAMK)
+    - Fixed a race condition crash in the Win32-only AuiNotebook sizing workaround
+      logic during global destruction (ADAMK)
+    - Save the window geometry on Maximize, Iconize or ShowFullScreen so that we
+      retain the same geometry across a Padre restart while in any of the normal
+      non-windowed states (ADAMK)
+    - Adding Padre::Config "locking" to Padre::Locker to enabled automatic
+      write on scope exit in a way that prioritised correctly with the other lock
+      types and shares a single database commit with any database locks (ADAMK)
+    - Tuned the locking implementation to reduce code complexity, reduce
+      lock memory consumption, and make lock releasing slightly faster (ADAMK)
+    - Added Thumbs.db to the files ignored by default on Windows (ADAMK)
+    - The project manager now caches null projects correctly (ADAMK)
+    - The directory browser now caches null project tree data correctly (ADAMK)
+    - When reverting to the default root path, the directory browse now uses
+      a null project rather than just a plain root path so that the default
+      platform-specific ignore/skip rules are used the expected way (ADAMK)
+    - Perl projects now correctly ignore nytprof directories, not just
+      nytprof.out files (ADAMK)
+    - Update session description. (BOWTIE)
+    - In project browser Right click on directories as well. (SZABGAB)
+    - Allow renaming file and directory in project browser. (SZABGAB)
+    - Update German translation (ZENOG)
+    - Stop creating automatic sessions. If no session is defined 
+      while auto-session-save is in effect use padre-last (SZABGAB)
+    - Fix View/Show Document As menu #1246 (SZABGAB)
+    - Eliminate crash caused by directory browser. #1248 (SZABGAB)
+    - Add Perl menu entry to deparse selected code using B::Deparse (SZABGAB)
+    - Added directory deletion to the file tree, although it doesn't use the
+      file operation task, so it could be slow and block (ADAMK)
+    - Labels for directory tree menu commands are now localised to the prefered
+      operating system terms, on Win32 at least to start with (ADAMK)
+    - Because the directory tree "Refresh" operation only actually works by
+      refreshing the entire tree, move it to the top search box menu (ADAMK)
+    - Padre::DB::Migrate now has class-based migration scripts instead of file
+      based migration scripts. This results in vastly inferior encapsulation,
+      but is much more reliable and works from inside PAR and friends (ADAMK)
+    - The Padre Preferences Sync client now works, but requires you to enable
+      the config value feature_sync until we work some bugs out of it (BRAMBLE)
+    - The main window search_next method will now explicitly not open a find
+      dialog rather than accidentally not open one, and the search_previous
+      method now does the same as search_next instead of crashing Padre (ADAMK)
+    - The birthday easter egg now only comes up once a year, and we will never
+      bug the user about any other nth popup on our birthday (ADAMK)
+    - Renamed startup_count config setting to nth_startup in line with the
+      other config stuff relating to the Nth start mechanism (ADAMK)
+    - Adding a preliminary (broken) implementation of Replace in Files, hidden
+      behind the feature_replaceinfiles config setting (ADAMK)
+    - A significant number of the editor preferences in the view menu can now
+      support being changed by Preference Sync (ADAMK)
+    - The right margin/edge is now enabled correctly at startup (ADAMK)
+    - Ensure the .pod files are recognized as POD documents (SZABGAB)
+    - Update french translation (but still much to do) (DOLMEN)
+    - Added a slightly odd but working workaround for a bug where
+      ->SetValue('foo') would automatically set 'foo bar' instead if 'foo bar'
+      was in the visible history of the combo box (ADAMK)
+    - Removed the --with-plugin command line option used by one of the author
+      tests as the implementation violated encapsulation badly (ADAMK)
+    - Moved Bookmarks from View to Search menu in line with other
+      several other editors (ADAMK)
+    - Added feature_folding to allow the removal of code folding support (ADAMK)
+
+    - The majority of the on_toggle_xxxx methods have now been changed to
+      editor_xxxx names to more accurately reflect that they act on the set of
+      open editors. As no plugins should be changing these anyway, the compat
+      version for Padre::Wx::Main will not changed (ADAMK)
+    - Removed unused methods for adding customer view menu elements. If plugins
+      are going to add to the view menu the submenus should be pulled from the
+      plugin and not pushed from the plugin (ADAMK)
+
+0.86 2011.06.18
+    - Fix #1124: 'Description' column not displayed when all descriptions empty
+      (ZENOG)
+    - Open Resources: do not match path for .t files (ZENOG, found by SZABGAB)
+    - Handle corrupt padre.db in SessionManager (SEWI)
+    - Migration of Style Settings from Menu to Preferences window (CLAUDIO)
+    - Add list of escape characters to the Regex Editor (SZABGAB)
+    - Add a test plugin and first tests using that plugin (SEWI)
+    - Add plugin hooks (SEWI)
+    - Regex Editor: Substitution can be toggled and it is off by default (SZABGAB)
+    - Extent Ctrl-left-mouse-click to modules and files with path (SEWI)
+    - Fix #1122: Save intuition recognizes more tests (SEWI)
+    - Fix #1138: Padre single instance server not working (MJ41)
+    - Fix #510, #704, #1178 Closing DocBrowser crashing Padre (SZABGAB)
+    - Add File->Delete menu option (#1179) (SEWI)
+    - Avoid running pointless syntax checks for unused documents (ADAMK)
+    - No longer need a different editor class for the Preferences dialog (ADAMK)
+    - Move Outline building to PPIx::EditorTools::Outline 0.12 (SZABGAB)
+    - Add menu options in View to Fold All and Unfold All (SZABGAB)
+    - Add menu option to Fold/Unfold where the cursor is now (SZABGAB)
+    - Move the standard PPILexer to PPIx::EditorTools::Lexer 0.13 (SZABGAB)
+    - Fix #1182: Crash when enabling a plugin (SEWI)
+    - Reverted commit 13860 which tried to fix ticker #1141 but broken the
+      directory list at startup at the same time (ADAMK)
+    - The Preferences dialog now translates options in drop-down boxes (ADAMK)
+    - Update German translation (ZENOG)
+    - Moved various Perl 5 related config options into a unified config
+      namespace lang_perl5_* (ADAMK)
+    - Moved various Perl 5 Preferences dialog elements into a single Perl 5
+      specific tab in preparation for additional future tabs (ADAMK)
+    - Fixed bug where the Function List scanner was incorrectly matching
+      __DATA__ or __END__ anywhere in any statement (ADAMK)
+    - Config file entries referring to values which are not in the valid option
+      list for a setting will use the default, but not overwrite (ADAMK)
+    - Upgraded Padre::Wx::Dialog::Text to wxFormBuilder (ADAMK)
+    - Find and Find in Files now save search options again (ADAMK)
+    - PluginManager now checks for a defined ->VERSION in plugins to help
+      make sure they are real modules and don't have mismatching package
+      statements or similar weird problems (ADAMK)
+    - Allow spaces in the path and filename of Perl script and still
+      be able to run them. #1219 (SZABGAB)
+    - Upgraded Padre::Wx::Dialog::Bookmarks to wxFormBuilder (ADAMK)
+    - Shrunk the code needed to support the "Convert Encoding" commands and
+      moved it to Padre::Wx::Main, removing the need for a dedicated
+      "Convert Encoding" dialog (ADAMK)
+    - Moved all Module::Starter options into module_starter_* (ADAMK)
+    - "toggle comments" button doesn't require text selection (GARU)
+    - A bug in the EOL Mode setup when opening Windows-mode text documents
+      while the default line endings are set to Unix was resulting in the
+      corruption of documents into mixed newline (ADAMK)
+    - Ctrl-F launches the quick search (bottom pane), 2nd time Ctrl-F
+      launches regular search and 3rd time Ctrl-F launches find in files
+      which will loose it's own shortcut Ctrl-Shift-F in the future #1223 (SEWI)
+    - Expanding the coverage of "apply" handlers in Padre::Config in
+      preparation for Padre Sync (ADAMK)
+    - Updated perlopquick.pod (Perl 5 operator quick reference) to latest
+      version (COWENS, AZAWAWI)
+    - Fixed wxWidgets 2.8.12 wxAuiNoteBook bug: the window will not carry
+      updates while it is frozen (MARKD, AZAWAWI, ADAMK)
+    - Bumped Wx dependency to 0.9901 to fix the Wx::Button::GetDefaultSize
+      build bug (AZAWAWI)
+    - Padre can now use Wx::Scintilla if feature_wx_scintilla is enabled.
+      This fixes #257: Backport Scintilla Perl lexer for wxWidgets 2.8.10?
+      (AZAWAWI)
+    - About dialog displays now the Wx::Scintilla version if it is being used
+      by Padre (AZAWAWI)
+    - Unify terminology for the Firefox-like search box to "Find Fast" (ADAMK)
+    - Set focus to editor window if search bar is closed (SEWI)
+    - Set focus to editor after switching panes/tabs (SEWI)
+    - Add File -> New -> Copy of current document (SEWI)
+    - Fix "last update" timestamp for sessions (SEWI)
+    - Fast Find resets term correctly across multiple uses (ADAMK)
+    - Padre::Project::Perl detects project-wide version correctly (ADAMK)
+    - Padre can use Wx::Scintilla's built-in Perl 6 lexer if Wx::Scintilla
+      is being used by Padre (AZAWAWI)
+    - Disable overlay scrollbars on linux (CLAUDIO)
+    - Share one search termin between FindFast (panel), Find (dialog) and
+      Find in files (SEWI)
+    - ESC now closes the find dialog (1st ESC) and the output window (2nd) (SEWI)
+
+    - wxVSCROLL flag in FindInFiles tree control was causing the nodes to be 
+      editable if clicked after selection. Keyboard scrolling was broken as a
+      result (AZAWAWI)
+    - Padre::Wx::Main::find_editor_of_file renamed to editor_of_file and
+      Padre::Wx::Main::find_id_of_editor renamed to editor_id to clean out the
+      method namespace find* for use with search related functionality (ADAMK)
+
+0.84 2011.03.10
+    - Function and TODO list: also handle Esc when focus is on the list (ZENOG)
+    - Function and TODO list: remove unnecessary EVT_KILL_FOCUS handler (ZENOG)
+    - Outline: simplify method 'select_line_in_editor' (ZENOG)
+    - Fix #967: Reset Focus (ZENOG)
+    - Added Padre::Task::File to allow non-blocking deletion of temporary
+      directories in the background once they are of no further use (ADAMK)
+    - The Recent Files menu now supports UNC paths on Windows (ADAMK)
+    - The Recent Files menu is now generated in a background task to prevent
+      long IDE blocking, such as when checking -f over a network mount (ADAMK)
+    - Fix #1140: RegEx editor reversed flags when inserting (SEWI)
+    - Padre::PluginHandle will parse_variable the version of crashed or
+      incompatible plugins rather than return '???' (ADAMK)
+    - The PluginManager dialog can now correctly distinguish between broken
+      plugins and merely incompatible plugins (ADAMK)
+    - The ProjectManager won't shortcut the file->project detection for
+      previously intuited projects without secondary evidence such as a 
+      padre.yml file or a Makefile.PL (ADAMK)
+    - Padre crashed on error in TODO list regex, fixed (FENDERSON, SEWI)
+    - Eliminate crash in PPI Standard Syntax highlighter #1109 (SZABGAB)
+    - Eliminate crash when opening recent file #1148 (SZABGAB)
+    - Stop jumping to first character when Goto "string" #1149 (SZABGAB)
+    - After the making changes in the Advanced Preference Editor
+      apply those changes. (fixing #1150) (SZABGAB)
+    - Fix #1153: %p, %f, etc. do not work for in window title (ZENOG)
+    - Add configuration option main_statusbar_template to allow the
+      user to fine tune the status bar #1104 (SZABGAB)
+    - Center the highlighted search term so that the context is visible (ZENOG)
+    - Find the cpanm also if it is "only" in the PATH. 
+      e.g. when using local::lib (SZABGAB)
+    - Fixed #1136: The syntax checker often marks the wrong line in a package
+      (AZAWAWI)
+    - Add tooltips to "Open Resource" dialog (ZENOG)
+    - Fix #1078: 'Open Resource' should find things like 'Wx::Dialog' (ZENOG)
+    - 'Open Resource': set focus to text field on character input in the list
+      box, fix tab order (ZENOG)
+    - Rename 'Open Resource' to 'Open Resources' to reflect the fact that it
+      can open several files at once (ZENOG)
+    - Remove unnecessary file deletion in Document::Perl::Syntax - this is done
+      automagically by File::Temp (ZENOG)
+    - Update German translation (ZENOG)
+
+    - No incompatible API changes during the 0.84 release cycle
+
+0.82 2011.02.15
+    - Remove methods that are not used any more: check_syntax_in_background and
+      check_syntax (ZENOG)
+    - Fixed a stupid bug in the save file as check for a file extension.  Hardly
+      worth noting, however it's here in case anyone was caught by such a silly
+      bug and wondered if they were going mad (PLAVEN)
+    - Make sure that default buttons like "OK" and "Cancel" are displayed
+      when locale is set to something different than the system locale (ZENOG)
+    - Padre::TaskManager now rigourously avoids the assumption that it is
+      implemented using threads. Of course, it always IS implemented with
+      thread at present, but these changes purify and simplify the Task Manager
+      and allows someone else (NOT me) to write a non-thread backend (ADAMK)
+    - Fixed incosistent use of both $COMPATIBLE and $BACKCOMPATIBLE, which was
+      potentially returning false positive plugin compatibility (ADAMK)
+    - Ignore .build directories in "Open Resource" dialog (ZENOG)
+    - Many more classes now have $COMPATIBLE tracking (ADAMK)
+    - Fix #1100: "Dies when hitting F3" (ZENOG)
+    - Search: when there is no match, also give out the search term (ZENOG)
+    - Update German translation (ZENOG)
+    - Show the 'help' field of the configuration options in the advanced
+      config dialog and one sample 'help' entry (SZABGAB)
+    - First version of "filter through Perl source" (SEWI)
+    - translate error message in Main.pm (ZENOG)
+    - fix swapping of window title and content strings for "New Perl Module"
+      name prompt (ZENOG)
+    - Remove Remove menu item Perl/Automatic Bracket Completion #1102 (SZABGAB)
+    - Intuit project root from version control checkout directories and
+      classify them as an ordinary vanilla Padre::Project, before we give up
+      and treat something as a Null projects (ADAMK)
+    - Getting the project for a document was accidentally path-searching for
+      Makefile.PL-etc and destroying/creating the project object every single
+      time. Fixed project caching, and files now path-match to opened projects
+      before touching the filesystem. Many operations much faster (ADAMK)
+    - Added the internals for a proper Project Manager abstraction to replace
+      the current ad-hoc storage in the main IDE object (ADAMK)
+    - Added version control system intuition via the ->vcs method in
+      Padre::Project (ADAMK)
+
+    - Padre::TaskManager now uses the term "worker" exclusively in API methods
+      instead of "thread" (e.g. start_thread becomes start_worker). This
+      future-proofs the API against potential alternative task manager backend
+      implementations that do not use threads. All existing Padre::Task code
+      should continue to work, but plugin authors may be impacted by the
+      $COMPATIBLE bump. An unchanged new release with the dependency version
+      updated to 0.81 should resolve the incompatibility (ADAMK)
+    - A number of methods relating to GUI and visualisation were moved from
+      Padre::Document to Padre::Editor. This may impact some language
+      plugins. (ADAMK)
+    - Padre::Util::get_project_dir was deprecated (ADAMK)
+    - Padre::Util::get_project_rcs was deprecated (ADAMK)
+    - Padre::Document::project_find was deleted (ADAMK)
+
+0.80 2011.01.29
+    - use Text::FindIndent 0.10 to eliminate some warnings #1089 (SZABGAB)
+    - Update German translation (ZENOG)
+    - Added a dwell timer via Padre::Wx::Role::Timer (ADAMK)
+    - The directory tree search box now has a 1/3rd second dwell (ADAMK)
+    - Find in Files results convert tabs to 4 spaces to avoid the ugly
+      squares in the results (ADAMK)
+    - Delay loading some modules and removed some other entirely, reducing
+      startup memory cost and IO by 10-15% when few features are on (ADAMK)
+    - Upgraded Plugin compatibility detection to avoid having to load the
+      dependencies and read variables from the files instead. Saves 2-3meg
+      of RAM and allows better scaling of the plugin system (ADAMK) 
+    - Fixed Padre::Util::parse_variable so we no longer need to make use
+      of ExtUtils::MakeMaker and ExtUtils::MM_Unix->parse_version (ADAMK)
+    - Support for more extensive Padre::DB customisation via ORLite 1.48
+      and its new shim => 1 option (ADAMK)
+    - Completed first-generation Portable Perl support for Padre (ADAMK)
+    - Add support in Padre::Project for intuiting project versions (ADAMK)
+    - Prevent history boxes writing a history entry for every character
+      instead of every search in Find/FindInFiles dialogs (ADAMK)
+    - Port the Find Dialog as is to wxFormBuilder (ADAMK)
+    - Prevent directory tasks running on bad or missing paths (ADAMK)
+    - Found a workaround to weird Win32 window Raise/Lower bugs, so now
+      Padre always raises to the foreground correctly when using the
+      single instance server (ADAMK)
+    - Save Intuition is disabled in null projects to prevent creating files
+      like ".../My Documents/lib/Foo/Bar.pm" (ADAMK)
+    - The Task Manager will now attempt to maximise background worker
+      specialisation so we need to load less total modules, hopefully
+      reducing memory consumption (ADAMK)
+    - Closing files is faster (and the task manager is stressed less) as
+      we no longer accidentally do a full refresh twice when closing
+      documents other than the last one (ADAMK)
+    - Enhancement, ticket #1027 When saving a file without a file extension 
+      you are now prompted and provided a list of suitable extensions to 
+      name your file. (PLAVEN)
+    - Restored radio select indicator to Style and View Document As...
+      menus, they were lost in the move to the ActionLibrary (ADAMK)
+    - Fixed #1093. The natural zoom of a scintilla window is around the wrong
+      way, hijack ctrl-scroll and reverse it to the right way (ADAMK)
+    - Find in Files directory recursion now happens ordered (ADAMK)
+
+    - Padre::Util::parse_version is now Padre::Util::parse_variable (ADAMK)
+
+0.78 2011.01.14
+    - The nytprof.out and nytprof HTML report directories are added to the
+      default ignore logic for Perl project (ADAMK)
+    - Fix a rare crash condition when TaskHandle had no task (SEWI)
+    - Fix #833: Syntax error crash padre when trying to debug (AZAWAWI)
+    - Perl error diagnostics is properly shown in a help panel instead
+      of being a child of an issue (AZAWAWI)
+    - On a slow filesystem where the directory browser is slow to fill
+      directory expansion controls, the fill will no longer be aborted if
+      you quickly expand a subdirectory. Both will occur in parallel (ADAMK)
+    - FindInFiles was using path objects incorrectly when communicating
+      between the task and the parent (ADAMK)
+    - FindInFiles was trying to use a directory node, but wasn't merging the
+      file nodes together under it. Removed directory nodes until a better
+      implementation is written (ADAMK)
+    - Created Padre::Wx::TreeCtrl::ScrollLock to abstract the workaround
+      you need to use to update trees without them snapping to nodes
+      that you ->Expand, and applied it to the directory tree and
+      the Find in Files result tree (ADAMK)
+    - When closing panels that do background tasks, do a last-minute task
+      reset operation to cancel any active background tasks (ADAMK)
+    - The Find in Files and directory tree background tasks now supports
+      cancel messages properly, both per-directory and per-file (ADAMK)
+    - The directory tree background search now correctly clears the status
+      bar when it is cancelled (ADAMK)
+    - Additional fixes for maximise-at-startup issues on Windows, which
+      now should FINALLY work properly everywhere (ADAMK)
+    - When shutting down the task manager, force-empty the queue early and
+      send a 'cancel' message to any workers still actively running before
+      we send the final 'stop' message (ADAMK)
+    - Fixed a massive performance bug in directory tree ->refill method,
+      which was triggering one background thread for every expanded tree
+      node. This was leading to thread storms, major leakage, and hanging
+      of the editor when changing between projects (ADAMK)
+    - When exiting directory tree search mode, we now restore the tree
+      correctly from the stashed results instead of scanning again (ADAMK)
+    - Open selection can now find executable programs in the current PATH
+      (AZAWAWI)
+    - Update German translation (ZENOG)
+    - If open selection finds a Module/Name.pm in the lib of your current
+      project, it stops looking for other possibilities since the version
+      in your project is almost certainly the one you want. (ADAMK)
+    - Updated the Copyright notice to reflect the new year. (PLAVEN)
+    - Added additional test to copyright.t to check all copyright notices
+      have the current year. (PLAVEN)
+
+    - No incompatible API changes during the 0.78 release cycle
+
+0.76 2010.12.08
+    - Fix #636: Filter too strict (Padre CPAN module installer) (ZENOG)
+    - Fix #1032: Regex Editor: Escape sequences don't work in
+      "Result from replace" (ZENOG)
+    - Next/previous file now use Ctrl-Page Down/Up instead of Alt-Right/Left
+      (AZAWAWI)
+    - Find in Files results panel now uses a tree instead of a text area and
+      clicking n a result opens the file at the specified line number
+      as expected (AZAWAWI)
+    - Updated the experimental Padre wizard API and integrated it with the
+      wizard selector dialog. This is still disabled by default and can be
+      enabled by the 'feature_wizard_selector' configuration setting (AZAWAWI)
+    - Fix the bug of lost user selection when searching a big project directory
+      and typing fast in "Open Resource" dialog (AZAWAWI)
+    - Fixed "Open Resource" and "Quick Menu Access" dialogs to display recently-
+      used resources by last usage being first instead by filename (AZAWAWI)
+    - consider script and interpreter parameters when debugging Perl scripts
+      (ZENOG)
+    - Fix #814: Find-in-files result window, clicking on filename does not do
+      anything (ZENOG)
+    - Document::get_command now has two named arguments: 'trace' for diagnostic
+      output, and 'debug' for enabling a debugger. Plug-ins that use
+      get_command(1) need to change this call to get_command({ trace => 1})
+      (ZENOG)
+    - remove configuration option 'find_quick' (not used any more) (ZENOG)
+    - Fixed #881 "Find In Files" results window should be prettier 
+      (AZAWAWI, ZENOG)
+    - As the user types the search term in the "Find in Files" dialog, make
+      sure the find button enabled status is correct (AZAWAWI)
+    - Fix #1051: Syntax checker does not return the correct error message 
+      (AZAWAWI)
+    - By removing -Mdiagnostics (which enabled 'use warnings') from syntax
+      checker, we now get a more correct syntax checking behavior (AZAWAWI)
+    - Removed custom parsing of Perl's standard error in syntax checker and
+      reused Parse::ErrorString::Perl to get better error parsing and diagnostic
+      information via perldiag (AZAWAWI)
+    - "Error List" window has been removed since it is redundant to
+      "Syntax Check" window (AZAWAWI)
+    - In "Open Resource" and "Quick Menu Access" UP arrow shifts focus to
+      the results list when the focus is on the filter field (AZAWAWI)
+    - Moved from the simple 0 and 1 age of error 'severity' to the actual way
+      Perl classifies errors as in perldiag. The syntax task now passes upon
+      completion a reference an array of Parse::ErrorString::Perl::ErrorItem
+      objects (AZAWAWI)
+    - "Syntax Check" window is now a tree instead of a list. First-level nodes
+      represent the error/warning messages and the second-level nodes are the
+      perldiag diagnostics for them (if available) (AZAWAWI)
+    - "Select Next Problem" is now working again after it was broken since Padre
+      0.57. Removed Copy Selected/All features until requested again (AZAWAWI)
+    - Removed "Errors" window and moved its only useful feature: Perl
+      diagnostics help to "Syntax Check" window (AZAWAWI)
+    - Removed tooltip from margin error markers as it was broken since Padre
+      0.65+ (AZAWAWI)
+    - Fix #957: Syntax Check should use perl given in Preferences (ZENOG)
+    - Fix #1059: Padre 0.74 build failure on 5.8.9 (AZAWAWI)
+    - Regex editor: insert complete substitution operator, including modifiers;
+      underline match results so that matching whitespaces are also highlighted;
+      add tooltips to modifiers; only update regex description if visible (avoid
+      require if not necessary) (ZENOG)
+    - Fix #922: Regex editor keeps first language after language change (ZENOG)
+    - Update German translation (ZENOG)
+    - Update Italian translation (SBLANDIN)
+    - Update Dutch and Spanish translation (CLAUDIO)
+    - Update Russan translation (Vladimir)
+    - Fix #1064: Build failures on Padre 0.74 Perl 5.8.9 (AZAWAWI, ADAMK, MARKD)
+    - Added feature_restart_hung_task_manager configuration setting to enable
+      automatic restart of the currently hung task manager. This is enabled by
+      default (AZAWAWI)
+    - Fix #1068: Padre Task manager fails to run tasks after stress testing it
+      (AZAWAWI)
+    - No more redirecting words under the cursor that are Perl symbols to
+      perldata help topic (AZAWAWI)
+    - Changes or Changelog files are now detected as text instead of CSS files
+      (AZAWAWI)
+    - In F2 help search, core module since-Perl-version string is now a v-string
+      (e.g. v5.8.9 instead of v5.008009) (AZAWAWI)
+    - Correctly start up maximized if we were closed maximized (ADAMK)
+
+    - No incompatible API changes during the 0.76 release cycle
+
+0.74 2010.11.14
+    - Fix #926 completely: Esc key does not always work in regex editor (ZENOG)
+    - automagic MIME type detection: check first for XHTML, then XML, then
+      HTML; more flexible XML detection (ZENOG)
+    - Fix #1023: Outline view creates multiple "main" on Windows (AZAWAWI)
+    - Added Perl 6 Outline support (AZAWAWI)
+    - Directory tree right-click refresh now triggers a "rebrowse" task to
+      synchronise all filesystem changes from disk to the tree (ADAMK)
+    - The plug-in menu is properly refreshed after closing the key bindings
+      dialog (AZAWAWI)
+    - Added the experimental wizard selector dialog which is enabled by
+      the 'feature_wizard_selector' configuration setting (AZAWAWI)
+    - Fix #1029: '"delete trailing spaces" puts the cursor to the start of
+      the document' (ZENOG)
+    - Find in Files sets the default search text properly (ADAMK)
+    - Quick fix feature is now disabled until it is stable again. You can
+      enable it again by using the 'feature_quick_fix' configuration setting
+      in the Tools/Preferences/Advanced dialog and then restart Padre (AZAWAWI)
+    - The default editor font should be Consolas 10pt on Vista and Windows 7
+      (AZAWAWI)
+    - Fix #982: '"open file" from directory window has no effect' (ZENOG)
+    - Directory tree: "browse" after creating directories and deleting files
+      (ZENOG)
+    - Updated wxwidgets.pod to include a copyright and license section for
+      Debian compatibility (AZAWAWI)
+    - Bumped Locale::Msgfmt dependency to 0.15 (AZAWAWI)
+    - Moved wxwidgets.pod to Padre::Plugin::WxWidgets. Please install it if you
+      need such support (AZAWAWI)
+    - Added win32 version information to padre.exe. This enables the task manager
+      to display a better descriptive name of the padre.exe process. (AZAWAWI)
+    - Padre version is now patched into the win32 executable's manifest and
+      resource files during build time (AZAWAWI)
+    - Directory tree: support deletion of directories (ZENOG)
+    - Update German translation (ZENOG)
+
+    - No incompatible API changes during the 0.74 release cycle
+
+0.72 2010.10.10
+    - 'Quick Menu Access' and 'Advanced Preferences' dialogs now completely
+      translated (ZENOG)
+    - The directory tree search now prints each directory it is
+      searching in the status bar. This helps you see where the
+      search is up to, and identify when it is finished (ADAMK)
+    - Recognize XML files by their content, without knowing the filename
+      extension (ZENOG)
+    - Fix #749: Recognize shell/Python/Ruby/Tcl scripts from shebang (ZENOG)
+    - Fix #898: "Find in Files" dialog: buttons too small (ZENOG)
+    - Fix #1007: Output window buffering issues (GARU)
+    - Fix #947: Toggling comments does not work for XML (ZENOG)
+    - Fix #579: (Un)commenting comments the last unselected line (ZENOG)
+    - Fix: deactivate menu entry "File->Save as" when there are not open
+      files (ZENOG)
+    - Fix #988: Recent files menu contains currently opened files (ZENOG)
+    - Fix #1010: Grey out comment toggling in menu if necessary (ZENOG)
+    - Bumped PPIx::Regexp to 0.011 removing 2 dependencies (ADAMK)
+    - Bumped Format::Human::Bytes to 0.07 removing 8 dependencies (ADAMK)
+    - Fix #926: Escape key does not always work in the regex editor (ZENOG)
+    - Fixed keyboard (tab) navigation in the regex editor (ZENOG)
+    - Fix #452: focus order in Replace dialog (ZENOG)
+    - Updated German translation (ZENOG)
+    - Mime type for C# added (CHORNY)
+    - The help search dialog now uses the latest perlopquick.pod instead
+      of the old perlopref.pod (AZAWAWI)
+    - Additional refactoring shortcut: Change the style of a given variable
+      lexically from/to CamelCase with two clicks. (SMUELLER)
+    - Fixed crash when closing the debugger panel (AZAWAWI)
+    - Fixed crash of "Join Lines" feature on an empty document (AZAWAWI)
+    - Fixed #1002: "Quick fix" feature on plain text document leads to
+      error output on console (AZAWAWI)
+    - Fixed #1006: F2 help does not know about 'given' (AZAWAWI)
+    - Fixed key bindings dialog to remember cursor position when setting,
+      deleting or resetting a shortcut (AZAWAWI)
+    - Fixed key bindings dialog to highlight overriden shortcuts with a
+      bold font (AZAWAWI)
+    - Always load the shortcut from its configuration setting otherwise we
+      will have false duplicate shortcut warnings (AZAWAWI)
+    - Reflect both changed key shortcuts when overridden (AZAWAWI)
+    - Removed the extra warning about duplicate keyboard shortcuts for a
+      Padre action (AZAWAWI)
+    - Fixed the shortcut overriding logic to actually work as
+      expected (AZAWAWI)
+    - Upgraded Find in Files to use Task 2.0, replacing the original
+      ack-based implementation (ADAMK)
+    - Removed ack dependency, and related File::Next dependency (ADAMK)
+    - Purged all code and mention of ack from the Padre codebase. Thanks
+      a ton for getting us through our first couple of years Andy, but
+      we've outgrown it now (ADAMK)
+    - Fixed an "Open Session" crash when there is not any session (AZAWAWI)
+    - Make the use of external window for running scripts the default. (SZABGAB)
+    - Save Intuition now understands that modules named t::Foo are for
+      testing, and will save them into your t/ directory (ADAMK)
+    - Find in Files now integrates with Project Intuition. The same
+      manifest/ignore/skip logic used to generate the directory tree is
+      also used to prevent Find in Files searching into your version
+      control, build/make/blib files, and anywhere else your project
+      doesn't like. (ADAMK)
+    - Add "Create directory" and "remove file" to the directory browser. (SZABGAB) 
+    - Aff "Goto Last position" (SZABGAB)
+
+    - No incompatible API changes during the 0.72 release cycle
+
+0.70 2010.09.09
+    - The Task 2.0 API now supports full birectional communication for all
+      task classes out the box. (ADAMK)
+    - Directory search now runs incrementally via background task (ADAMK)
+    - Directory browse no longer infinitely recurses (ADAMK)
+    - Directory tasks all support cancellation, preventing expensive tasks
+      building up and killing your Padre instance (ADAMK)
+    - Subroutines declared using syntax provided by Method::Signatures
+      ("func", "method"), MooseX::Method::Signatures ("method"), and
+      MooseX::Declare ("method") are now supported in the Outline and
+      Functions view (DAPATRICK)
+    - Updated German translation (ZENOG)
+    - Updated Italian translation (SBLANDIN)
+    - Fixed typos in share/languages/perl5/perl5.yml (ZENOG)
+    - Added keyboard shortcuts to refactoring features "rename variable"
+      and "extract subroutine" (ZENOG)
+    - Fixed small translation problem in ActionLibrary (ZENOG)
+    - Fix #411: working version of the keyboard shortcut editor (ZENOG)
+    - The startup splash is now disabled by default. Padre starts up very
+      quickly these days, and delaying image loading should reduce the
+      per-thread memory cost more (ADAMK)
+    - Fix MIME type setting via menu (ZENOG)
+    - mark nl_be as not supported (ZENOG)
+    - partial fix for #452: 'focus order in Replace dialog' (ZENOG)
+    - Fix focus order in Find dialog (ZENOG)
+    - Close replace dialog on Escape key in all cases (ZENOG)
+
+0.69 2010.08.17
+    - Landed ConfigSync branch (MATTP)
+    - Task 2.0 restores support for having tasks send unlimited messages
+      back to the main application while they are running (ADAMK)
+    - Added Padre::Task::Run for background process execution with STDOUT
+      lines streaming as events back to the main window. (ADAMK)
+    - Fixed test failure in t/93-padre-filename-win.t under win32 (SEWI)
+    - Devel plugin now has the option to dump the Task Manager (GARU)
+    - Refactored, reskinned and polished ConfigSync functionality (ADAMK)
+    - Added ->status to ::Main to allow rapid transient messages to be
+      presented in the status bar, as fast as 100/sec (ADAMK)
+    - Fixed the file-changed-on-disk dialog: Show "Reload" button instead
+      of "Close" (SEWI)
+    - Adding a ton of additional $BACKCOMPATIBLE variables so that every
+      class consumed by the current family of plugins has them (ADAMK)
+    - Nudging up the default background thread count now that we will
+      start to see long-running threads looking after background
+      processes (ADAMK)
+    - Allow the opening of files exceeding the editor_file_size_limit of
+      500_000. The file is opened if the user answers Yes to the
+      dialog (MULANDER)
+    - The Task Manager now records per-worker statistics on which tasks they
+      have run in the past. This is needed to support various worker
+      optimisation strategies to be implemented in the future (ADAMK)
+    - Added a simple initial Task Manager optimisation strategy to favour
+      workers which have run a task at least once before (ADAMK)
+    - "Find method declaration" will not find forward-declaration (CHORNY)
+    - Task manager now has separate maximum and minimum thread counts (ADAMK)
+    - Minimum thread count set to zero. Padre starts up 600ms faster, at the
+      cost of the directory tree appearing 200ms slower if you use it (ADAMK)
+    - Command line switch to select locale (CHORNY)
+    - Added configuration option to modify the cursor blink rate in Padre
+      as requested via the padre-dev mailing list closes ticket number
+      983 (PLAVEN)
+    - Added Padre::Task::Daemon for bidirectional communication support in
+      tasks. When the task is launched, messages to the chlid can be sent
+      down the worker thread's message queue, and they will be tunneled
+      through to the task, which can retrieve them Erlang-style via a
+      dequeue method (ADAMK)
+    - Don't re-scan a project dir while changing tabs within one
+      project (SEWI)
+    - Show the file-changed-dialog only once per file update (SEWI)
+
+0.68 2010.07.28 - Unstable - Post Birthday Hackathon Weekend
+    - Fixed rare bug in t/23_task_chain.t (CHORNY)
+    - Refactored the Action subsystem into a simpler model. The old layout
+      artificially broke it up based on menu structure. The new layout
+      also makes it simpler to do further refactorings (ADAMK)
+    - Removed half the usages of Wx::Perl::Dialog (ADAMK)
+    - Use a hyphen to a separate the current vs native names of the languages
+      in the View menu, as the bracing looked weird with the bracing of some
+      of the languages themselves (ADAMK, ZENOG)
+    - Don't show a additional translated string for the language that is
+      currently active (ADAMK, ZENOG)
+    - When the advanced setting "feature_fontsize" is disabled, Padre will
+      remove the Font Size menu, disable Ctrl-+ and Ctrl--, and (most
+      importantly) will not change the font size in an editor on
+      Ctrl-Scroll (ADAMK)
+    - Added integration with the PPI::Transform API for modifying Perl
+      documents, so the transform objects can modify Padre documents (ADAMK)
+    - Added the "Move POD to __END__" refactoring that lets you extract all
+      the POD scattered through a document, merge it together, and move it
+      to the bottom of the file after an __END__ statement (ADAMK)
+    - If the Open Selection expression only matches one file, immediately
+      open it without showing a pointless dialog (ADAMK)
+    - Removed Wx::Perl::Dialog by inlining it into Padre::Wx::Dialog, this
+      will remove the need to import ':everything', saving 50-100k (ADAMK)
+    - Actions now only need to be declared once, and are all declared in one
+      place in advance (ADAMK)
+    - Directory Tree sort order is now (advanced) configurable between
+      directory-first and directory-mixed (ADAMK)
+    - Moved the Padre::Action* classes to Padre::Wx::Action* as they are now
+      much more tightly dependant on Wx (ADAMK)
+    - Plugins will now do full compatibility testing, which means that when we
+      change an internal API we can just update $COMPATIBLE in that package
+      and any impacted plugins will be automatically disabled until they do a
+      new release. That is far better than "They just crash blindly" (ADAMK)
+    - Create a new main_directory_root settting distinct from the existing
+      default_projects_directory one, specifically for setting the default
+      root of the directory tree. It will continue to be pointed to
+      my_documents by default (the original may change) (ADAMK)
+    - Made Padre::Wx::Dialog::ModuleStart configuration translation-safe (ZENOG)
+    - Updated German translation (ZENOG)
+    - Add Java and BibTeX to MIME types (ZENOG)
+    - Ack ("find in files") output is now more 'clickable', but still not
+      perfect (ZENOG)
+    - Fix File::Open3::open3() call to be IPC::Open3::open3() (BRICAS)
+    - Fix #969: crash when switching language after using Ack (ZENOG)
+    - Remove unnecessary Wx::gettext calls from Padre::Wx::Dialog::Preferences
+      that lead to missing translations (ZENOG)
+    - Description field is hidden by default in the regex editor dialog.
+      A checkbox now optionally toggles its visibility (AZAWAWI)
+    - Padre::Wx::FindResult: Get rid of global variable, shorter column
+      titles, both columns now wxLIST_AUTOSIZE (ZENOG)
+    - Call relocale() for all elements of the Bottom panel (ZENOG)
+    - Remember sorting order in session manager (SEWI) 
+    - Nicer workflow for renaming variables: Now we check for some conditions
+      before prompting the user for a name; renamed function
+      'lexical_variable_replacement' to 'rename_variable' (ZENOG)
+    - Simplify the code for the Bottom pane a bit (-1 method), no warnings
+      any more (ZENOG)
+    - Fixed #970: Switching language removes plugin menus (ZENOG)
+    - Padre::MimeTypes: Fixed some Wx::gettext handling problems, switched
+      keys of menu_view_mimes() so that the names (not the MIME types) of
+      file types are shown in the View menu (ZENOG)
+    - Documentation of Padre::Current (SEWI)
+    - Include only changed files in changed-file-list (SEWI)
+    - Added wxwidgets.pod which contains the method documentation of all Wx
+      classes (AZAWAWI)
+    - Padre has wxWidgets method documentation in F2 help search (AZAWAWI)
+    - Added Padre::Wx::Nth to group first/nth-time startup magic (ADAMK)
+    - Fixed #781 : Unicode should not be used for accessing file system on
+      Win32 (CHORNY)
+    - The New Installation Survey now only appears on the third time that
+      Padre starts, so it doesn't confuse people with locale issues (ADAMK)
+    - Split Padre::Wx::Dialog::WhereFrom into main and FBP classes to try
+      out the designer-based approach experimentally (ADAMK)
+    - Tab width is configurable for opened file too (CHORNY)
+
+0.67 2010.07.27
+    - 0.67 never made it to public release.  All changes listed for 0.68 are what 0.67
+      would have had.
+
+0.66 2010.07.01
+    - Improved the quality and integration of the default window size (ADAMK)
+    - The non-blocking IO upgrade in 0.65 meant that Padre could no longer
+      open files on Windows. Fixed (ADAMK)
+    - Minor improvements to the About dialog (ADAMK)
+
+0.65 2010.07.01
+    - Task 2.0 API landed on trunk (and everything breaks) (ADAMK)
+    - Converted the FunctionList GUI component to work via a task (ADAMK)
+    - Padre::Role::Task role added to allow any object in Padre
+      to be the "owner" of task and automatically handle which
+      tasks are still relevant to the UI state at the time the task
+      is completed, and ignore the ones that aren't (ADAMK)
+    - New compulsory Padre::Wx::Role::View for editor GUI componants
+      that want to live in the left/right/bottom tool panels (ADAMK)
+    - Renamed a number of classes to simpler names. Because we are
+      breaking everything anyway, this is an opportune time to lump
+      in these low-importance changes (ADAMK)
+    - Padre::DocBrowser --> Padre::Browser (ADAMK)
+    - Padre::Wx::DocBrowser --> Padre::Wx::Browser (ADAMK)
+    - Padre::Wx::Role::MainChild --> Padre::Wx::Role::Main (ADAMK)
+    - Language-specific task sub-classes now live under the document class
+      instead of under the Padre::Task tree, to encourage concentration
+      of language-specific code within the document tree (ADAMK)
+    - Padre::Task::Perl::Syntax --> Padre::Document::Perl::Syntax (ADAMK)
+    - Padre::Task::Perl::Outline --> Padre::Document::Perl::Outline (ADAMK)
+    - Startup config file now uses a custom hyper-minimalist format
+      which avoids the need to load YAML::Tiny before the first thread
+      spawn, saving about 400k per thread (ADAMK)
+    - Padre::Logger now allows the PADRE_DEBUG environment variable to be
+      set to a specific class name, enabling logging only for that class.
+      This simplies tracing around a specific problem now that the number
+      of classes with debugging hooks is getting large (ADAMK)
+    - Moved the startup tool enabling of the syntax check and error list
+      from the startup timer to the constructor, and prevent them from
+      writing back to the config. We no longer need to write the config
+      at all during startup, making startup faster (ADAMK)
+    - Scroll the output window down on outputs (kthakore)
+    - Directory browser rewritten to operate in the background (ADAMK)
+    - Improved directory tree search to take advantage of new background
+      file scanning. It is now instantaneously quick (ADAMK)
+    - Added the PPI::Cache API to provide a simple common mechanism for
+      stashing GUI model data such that all cache data can be cleaned up in
+      one go when the relevant project or document is released (ADAMK)
+    - Fixing some new bugs or adding temporary workarounds for them (SEWI)
+    - Rebuild History using non-blocking IO on Padre start (SEWI)
+
+0.64 2010.06.12
+    - Last Stable before merge of new Task 2.0 API
+    - zh-cn translation updated (jagd)
+
+0.63 2010.06.02
+    - Autocomplete "sub new" for Perl modules (SEWI)
+    - fixed ticket #956: crashes if Outline is active (ZENOG)
+
+0.62 2010.05.21
+    - Any 3 column table layout in the preferences dialog now has a 
+      stretched middle column. (PLAVEN)
+    - Add a warning for versions of Wx.pm with broken HTML rendering
+      (ZENOG)
+    - Mousing over a sub/method name with ctrl pressed now highlights it
+      to indicate it can be clicked on (Sam Crawley) 
+    - Regex editor: Support global flag for substitute (ZENOG)
+    - Updated Turkish translation (Burak Gürsoy)
+ 
+0.61 2010.05.12
+    - MIME types: added a few C++ file extensions, added LaTeX .sty files
+      (Zeno Gantner)
+    - About dialog: increase height of the window so that the translated
+      licensing terms also fit in without a scrollbar (Zeno Gantner)
+    - Debugger: improved variable detection in the document (Zeno Gantner)
+    - Menu: More consistent capitalization of menu entries (Zeno Gantner)
+    - Updated German translation (Zeno Gantner)
+    - fixed ticket #538: "outline view info takes too long to refresh" by
+      adding an outline cache (Zeno Gantner)
+    - fixed ticket #541: "wrong outline can get displayed for a document"
+      (Zeno Gantner)
+    - fixed ticket #940: "crashes when right clicking in code editing area"
+      (Zeno Gantner)
+    - fixed ticket #878: "Tabs like 'Outline', 'Functions'... should have
+      a close button, just like the documents tabs" (Zeno Gantner)
+    - fixed behaviour of the close button for the bottom tabs (Output,
+      Errors, Syntax Check): closing a tab now toggles the corresponding
+      menu and config items (Zeno Gantner)
+    - Updated German translation (Zeno Gantner)
+    - Updated Chinese translation (Chuanren Wu)
+    - fixed ticket #939: "Padre 'help' depends on POD2-Base on Strawberry
+      Perl on Windows XP" (ADAMK)
+    - Updated Italian translation (SBLANDIN)
+    - Updated Brazilian Portuguese translation (GARU)
+    - Updated Dutch translation (Dirk De Nijs)
+    - Updated Spanish translation (ENELL)
+
+0.60 2010.04.20
+    - Add FTP connection caching/sharing (SEWI)
+    - Add interactive template functions (SEWI)
+    - Fixed ticket #900: opening binary files may crash Padre (Zeno Gantner)
+    - Improved some menu entries: added missing "...", better labels, better
+      comments (Zeno Gantner)
+    - Clearer error message if debugger is not started yet (Zeno Gantner)
+    - Complete language/locale switch on Unix platforms: also correctly
+      translate the Wx default labels (Zeno Gantner)
+    - Fixed ticket #921: regex syntax error in Regex Editor
+      (reported by leprevost)
+    - Updated German and Turkish translation (Zeno Gantner, SEWI and Burak
+      Gürsoy)
+    - Added licensing information to About dialog (Zeno Gantner)
+    - Skip '.' when indexing installed modules in @INC (dam)
+    - Fixed bug related to search history (Sam Crawley)
+    - Added file type filter "script file" (which includes Unix shell scripts
+      and Windows .bat files) to the Open dialog (Zeno Gantner)
+    - MIME types: added .mo to the list of binary file extensions, 
+      improved/gettext-ified some descriptions, changed LaTeX extension from
+      latex to tex (Zeno Gantner)
+    - Autocomplete no longer displays the dialog when only one option is
+      available (unless 'Autocomplete while typing' is on) (Sam Crawley - #927)
+
+0.59 2010.03.31 
+    - Don't crash open file list dialog on unsaved files or without
+      files (SEWI)
+    - Added a small survey for new Padre installation (SEWI)
+    - Resolved the clash between threads and SQLite by temporarily
+      disconnecting from SQLite during a thread spawn (ADAMK)
+    - Slave master quick-spawning in Padre::Startup, so that
+      we get smaller thread spawn memory penalty from the
+      interpreter copy. On Win32 the per-thread cost drops from
+      34.1meg to 20meg with a reduction in total memory use for a
+      typical user of about 20% (ADAMK)
+    - Add language names/translated texts to select_language list (SEWI)
+    - Fixed ticket #865 Wrong document type in View Document As (PLAVEN)
+    - New Padre::Wx::Display screen geometry library for handling multiple
+      screens, weird geometry setups and other weird stuff that coders
+      have on their development setups. Padre's main window uses this to
+      calculate an elegant golden-ratio uniform-margin default position
+      and size (ADAMK)
+    - When showing a toolbar panel for the first time, make sure it's lock
+      state is consistent with the main_lockinterface config setting (ADAMK)
+    - Local file and remote file installation switched from pip to
+      cpanm (ADAMK)
+    - Completed the 'Insert Special Value' functionality (Zeno Gantner)
+    - Updated German translation (Zeno Gantner)
+    - When refresh_windowlist was sped up, sorting regressed. Fixed (ADAMK)
+    - Fixed ticket #889: Padre saves non-ASCII characters as \x{XXXX} (AZAWAWI)
+    - New Win32 launcher #677: the Padre process is now named "padre.exe"
+      in the Task Manager (instead of wperl.exe) and it embeds the Perl
+      interpreter instead of being just a launcher (DOLMEN)
+    - On Win32 the manifest file (which tells Windows to use new Vista/7
+      styles on such systems) is now embedded as a resource in the binary, so
+      any wperl.exe.manifest containing the string 'name="Padre"' is obsolete
+      and must be removed (DOLMEN)
+    - Fixed ticket #904: Win32 taskbar icon is only 16x16 (Windows 7 may uses
+      48x48) (AZAWAWI)
+    - Small improvements/fixes to some dialogs: Refactoring, Open URL, Goto,
+      Save as, Preferences, Insert File, New Perl Distribution (Zeno Gantner)
+    - New document statistics dialog, faster computation of document statistics
+      (Zeno Gantner)
+    - Added missing File::pushd Padre dependency (AZAWAWI)
+    - Fixed ticket #894: search for non-ASCII characters (Zeno Gantner)
+
+0.58 2010.03.08  **WARNING Still not stable**
+    - Fixed "Open File In Existing Padre" for non-win32 (PDONELAN)
+    - In advanced preferences, display the storage backend name when it is
+      default and 'User' is now called 'Overriden' (AZAWAWI)
+    - In advanced preferences, display preferences options for non-boolean
+      settings (AZAWAWI) 
+    - In advanced preferences, display a True/False radio button for boolean
+      settings (AZAWAWI)
+    - Fixed an incorrect default value display bug in advanced preferences
+      when it is toggled (AZAWAWI)
+    - In advanced preferences, hide bottom controls at startup (AZAWAWI)
+    - In advanced preferences, Set button is hidden when it is a boolean. 
+      True/false radio buttons handle the switch instead (AZAWAWI)
+    - Fixed ticket #858 Recent files does not display anything on Padre startup
+      (AZAWAWI)
+    - Refresh all menus at startup. This prevents "nothing" open mode (i.e. no
+      document) from incorrectly showing an enabled menubar (AZAWAWI)
+    - Padre::Util::share() can now get the name of a plugin (e.g. 'Perl6') and
+      return the share directory of that plugin (SZABGAB)
+    - Removed the unused concept of user-configurable menus, which was slowing
+      down a ton of different operations that needed a menu refresh (ADAMK)
+    - Removed ->refresh calls during the initial menu construction, as we
+      will be refresh'ing again anyway at the end of the startup, and thus
+      any work done in the menus is completely wasted CPU (ADAMK)
+    - Removed the very expensive window list refresh code from the main menu
+      refresh method into it's own dedicated refresh method. We can fire
+      this directly in the limited number of situations that the notebook
+      adds, removed, or renamed documents (ADAMK)
+    - Speed up status bar updates (ADAMK, SEWI)
+    - Warning editor markers are now actually orange on win32 (AZAWAWI)
+    - Landed new and much much faster refresh_windowlist (ADAMK)
+    - Fixed ticket #860: Configurable key bindings dialog (AZAWAWI)
+    - Added Browse Buttons to External Tools Preference Dialog (PLAVEN)
+    - Fixed ticket #863: Continous warnings or prints kill Padre
+      (AZAWAWI, KTHAKORE)
+    - Bumped Wx::Perl::ProcessStream version requirement to 0.25 (AZAWAWI)
+    - Added promised PPI lexer configurable max-length limit for azawawi (ADAMK)
+    - Fixed ticket #867: Padre dies when hitting Ctrl-. (AZAWAWI)
+    - Fixed ticket #807: F2 is broken (AZAWAWI)
+    - Fixed ticket #835: Function list not populated on initial panel showing
+      (karl.forner)
+    - Added Turkish translation.
+
+0.57 2010.02.18 - **WARNING Contains new threading code**
+    - Spawn a master thread very early in the startup process. Use that
+      master to create worker threads as necessary. Cuts down on memory
+      usage and fixes the "Leaked Scalars" warning (BRAMBLE, SMUELLER)
+    - Fix pluginmanager error dialog for plugin-event failure (BRAMBLE)
+    - Add status messages for Padre::File operations (SEWI)
+    - Select some files to close (SEWI)
+    - Select some files to reload (SEWI)
+    - GotoLine is now called Goto dialog (AZAWAWI)
+    - Goto dialog is now non-modal lazy single instance dialog (AZAWAWI)
+    - Goto dialog has a current positon/line number field (AZAWAWI)
+    - Regex editor dialog is now more compact and it includes regex helper
+      buttons (AZAWAWI)
+    - Regex editor dialog can now highlight matched text (AZAWAWI)
+    - Regex editor dialog can now display regex description (AZAWAWI)
+    - Implemented Replace (aka substitution) in Regex editor (AZAWAWI)
+    - Right click "Edit with Regex Editor" now works on user-selected
+      text (AZAWAWI)
+    - Added "headline" method to Padre::Project, which allows a project
+      to try and intuit the "primary" file in the project (for a CPAN
+      distribution of Foo::Bar this will be lib/Foo/Bar.pm) (ADAMK)
+    - Removed the final usage of the "Provider" phrasing, and made more
+      of the modules used by the Perl help provider run-time loaded (ADAMK)
+    - Moved padre.exe build from bin to win32-loader folder since bin is a
+      bad path for putting the Padre win32 launcher code (SMUELLER, AZAWAWI)
+    - Added "Open in File Browser" in the File and right-click menu (AZAWAWI)
+    - Added "Find in Files" to right-click menu (AZAWAWI)
+    - No need to launch a command shell to execute explorer.exe on
+      win32 (AZAWAWI)
+    - Added "Open with Default System Editor" in "File -> Open..." (AZAWAWI)
+    - Implemented padre --reset to flush and reset the current Padre
+      configuration in otherwise unrecoverable situations, such as now
+      when the Swarm plugin causes the slave-driver code to instantly
+      segfault at startup (ADAMK)
+    - Add mimetype detection for Template::Toolkit and CSS files (SEWI)
+    - Added plugin menu refreshing to the resource locking system (ADAMK)
+    - Fixed three cases where code was still manually calling ->Freeze
+      and ->Thaw on the main window, breaking the resource locked (ADAMK)
+    - Fixed ticket #847: "Implement Mozilla-style about:config for Padre"
+      (AZAWAWI)
+    - Fixed ticket #845: Fix relative filenames from commandline (SEWI)
+    - Added "Open In Command Line" to File menu (AZAWAWI)
+    - Renamed Plugins menus to Tools and moved Preferences into it (ADAMK)
+    - Re-implemented the mechanism for generating a human-oriented list of
+      window names (ADAMK)
+
+0.56 2010.02.01
+    - Plugins may now add their GUI elements to the view menu (SEWI)
+    - Padre now displays a dynamic to-do list generated from comments
+      in your source code (CORION)
+    - Landed new Padre::Startup module which is dramatically faster
+      when loading files into an existing Padre via the single instance
+      server, and finally provides a mechanism for allowing configuration
+      to disable the startup splash image (ADAMK)
+    - Changed a few configuration settings to create a more consistent
+      naming pattern for them (ADAMK)
+    - Audited dependencies and updated a variety of them (ADAMK)
+    - Ctrl-Shift-W is now bound to "Close This Project" (ADAMK)
+    - Added an option for traceing Padre subroutine calls to the
+      developer plugin (SEWI)
+    - Uses correct make from Config.pm for the run menu item -> Build and
+      run tests (KTHAKORE)
+    - Speedup and less false-shows for autocomplete (SEWI)
+    - Speedup while changing tabs (use the correct project dir) (SEWI)
+    - Simple refocus on document after command run (KTHAKORE)
+    - Fixed ticket #822: main window could be off screen on start (BLAKEW)
+    - padre-client allows you to use Padre for commit messages and other
+      synchronous edit events (CORION)
+    - WIN32, Converted the --desktop registry code to Win32::TieRegistry 
+      and removed hardcoded strawberry paths (AZAWAWI)
+    - WIN32, padre.exe will run with the same UAC privileges as same as
+      the invoker (AZAWAWI)
+    - Disable debugger menu items when there is no document (AZAWAWI)
+    - Fixed a Padre debugger crash when unsaved document is debugged (AZAWAWI)
+    - Fixed Padre no-document crash with Find Next/Find Previous functionality
+      (AZAWAWI)
+    - Make sure that windows context key shows the refactor menu 
+      items in the right-click pop-up menu (AZAWAWI)
+    - Used Module::CoreList::is_deprecated to display deprecated CORE modules
+      in help search title (AZAWAWI)
+    - Padre::Util::Win32::ExecuteProcessAndWait doesn't automatically inherit
+      the same Cwd as the parent process. Added support for explicit cwd
+      parameter and make the syntax checker pass the cwd to it. Syntax checking
+      of test scripts and such should now work as intended on Win32(ADAMK)
+    - Audit uses of Padre::Util::Win32 to only load it via require. Added a
+      TRACE warning to verify it never gets loaded on non-Win32 (ADAMK)
+    - Tuned the locking for ->close_where, which should make a variety of
+      functions like "Close This Project" and "Close Other Projects"
+      noticably faster (ADAMK)
+    - Changed func_foo config variables to feature_foo, in anticipation of
+      of a future equivalent to the Mozilla "about:config" control (ADAMK)
+    - Added feature_cursormemory to allow disabling of Padre's feature to
+      remember the location in the file you were scrolled to (ADAMK)
+    - Added a fast ascii shortcut to the very slow encode detector. Opening
+      files all of a sudden gets much faster if you have ascii files (ADAMK)
+    - Bumped ORLite to 1.38 to get faster ARRAY object support and
+      Class::XSAccessor acceleration support. If they cause problems,
+      these changes can be safely backed out. (ADAMK)
+    - Fixed the mass-error-popups on mimetypes without help provider (SEWI)
+    - During DB locks (which are the most likely place for things to make
+      changes to the database) disable synchronous SQLite writes. This will
+      reduce the time that Padre blocks, at the risk of config.db corruption
+      if there is a hardware failure or operating system crash. (ADAMK)
+    - Fixed ticket #837: padre.exe should be able to be placed in
+      c:\strawberry\perl\site\bin (AZAWAWI)
+    - Improved "Goto Line" dialog to be smarter with better validation/error
+      messages (AZAWAWI)
+    - Open Resource can now display Perl package names for matching resources
+      (AZAWAWI)
+    - Fixed #838: Author tests should all check RELEASE_TESTING and/or
+      AUTOMATED_TESTING (RHEBUS, AZAWAWI)
+    - Fixed Regex Editor dialog destruction bug where multiple ->Show and
+      ->Destroy could lead to a Padre crash on WIN32 (AZAWAWI)
+    - Project detection differentiates between four different subclasses
+      of Perl build systems (three of those correctly) (ADAMK)
+    - Function List has resource locking around it and properly triggers a
+      refresh when we show it for an already open document (ADAMK)
+    - "Goto Line" dialog now supports going to lines and positions (AZAWAWI)
+    - Fixed perl to refactor action prefix for refactor menu for 
+      consistency (AZAWAWI)
+    - Fixed ticket #841: Quick Menu Access should show the location of the 
+      menu item on the menu system (AZAWAWI)
+
+0.55 2010.01.21
+    - Add full list of file types to the View Document As menu (SZABGAB)
+    - dist-zilla projects detection finally fixed (#489) (JQUELIN)
+    - The directory tree refresh method will shortcut if nothing has
+      changed, which should fix a number of bugs relating to the
+      directory tree "doing things" when it shouldn't be (ADAMK)
+    - Saving files to somewhere other than the current project will now
+      correctly flush the document project state, and triggers a directory
+      tree flush so that we communicate the change in project (ADAMK)
+    - Cloned ORLite::Migrate to a private version as Padre::DB::Migrate
+      so we have a better chance of fixing bug #796 (ADAMK)
+    - Tentatively fixed #796 by spawning migration scripts in a manner which
+      does NOT assume the pre-existance of STDOUT. This is at best a
+      short-term hack, because this STDOUT problem is going to come back and
+      bite us in other ways in the future, for sure (ADAMK)
+    - Tuned the directory tree refresh logic to improve startup speed when
+      launching Padre with specific named files to open (ADAMK)
+    - Tuned the creation and management of tool widgets to remove the need
+      to load or construct tools at startup time that are turned off in the
+      user's configuration.
+    - Tuned lock-release refresh execution to remove low-level refresh
+      methods that are also contained in higher level refresh methods.
+    - Removed a superfluous AUI Update from the refresh method (ADAMK)
+    - Delay loading some additional GUI classes and objects until they
+      definitely needed (ADAMK)
+    - Suppress warnings that occur during plugin loading (ADAMK)
+    - 'Simple' possible fix for #331 to update the tabs when 'save all' is 
+      run in Padre. (PLAVEN)
+    - Fixed #819: Don't crash on missing project dir (SEWI)
+    - Upgrading --desktop option from VBScript to a new Win32::Shortcut-based
+      Padre::Desktop. Desktop link creation works on Vista and newer
+      operating systems again (ADAMK)
+    - Tuned menubar refresh to only fire if we change document mimetype,
+      which saves a ton of CPU and seems to reduce flicker (ADAMK)
+
+0.54 2010.01.07
+    - Added experimental support for clickable filenames in Output panel.
+      Currently only matches: <error> at <file> line 5. (PDONELAN)
+    - If all files are closed, the function list would ->Hide itself
+      permanently and never come back. Resolved (ADAMK)
+    - Fix perl interpreter selection (SZABGAB)
+    - Updated DBD::SQLite dependency to 1.27 and ORLite dependency to 1.30.
+      This should now correctly throw an exception on a corrupt padre.db file
+      which will cause an immediate crash at startup with a SQLite-related
+      error message instead of a secondary error message complaining about
+      missing Padre::DB classes (ADAMK)
+    - Moved Padre::HelpProvider::Perl to Padre::Document::Perl::Help to
+      prevent plugin classes from being scattered all over the namespace
+      tree (ADAMK)
+    - Moved Padre::QuickFixProvider::Perl to Padre::Document::Perl::QuickFix
+      to prevent plugin classes from being scattered all over the namespace
+      tree (ADAMK)
+    - During shutdown, be more precise about the order in which we clean up
+      and be more careful to ensure that ->Update is NOT disabled, to prevent
+      segfaults on Windows from the "disabled update at exit" bug (ADAMK)
+    - Added the first PROJECT-backend config_perltidy setting, so that
+      projects can for the first time define a project tidy policy. This
+      project-specific policy isn't being used by the plugin itself yet,
+      but this change clears the way for that kind of functionality (ADAMK)
+    - Added config_perlcritic configuration setting, so that projects can
+      define perlcritic policies (ADAMK)
+    - All tests now run without the need for a visible Padre window (ADAMK)
+    - Ticket #756: Wx::Perl::ProcessStream 0.24 solved this issue
+      Changed the dependency to 0.24 (SEWI)
+
+0.53 2009.12.23
+    - Add initial version of a debugger using Debug::Client (SZABGAB)
+    - Fix crashes when running refactor actions when there
+      is no document (AZAWAWI)
+    - Open resource searches now for user selections (AZAWAWI)
+    - The Open resource's OK button is disabled when the 
+      search results list is empty (AZAWAWI)
+    - Help search (F2) now supports *ALL* installed CPAN modules (AZAWAWI)
+    - Fixed "Syntax Check" focus loss bug while switching tabs quickly
+      and a syntax error is in one of them (AZAWAWI)
+    - Help search does not block when loading a long help topics
+      list (AZAWAWI)
+    - Ticket #787: Add a test for breakpoints to testsuite (SEWI)
+    - Fixed missing mime type guessing that caused new Padre documents to
+      default always to Scintilla (AZAWAWI)
+    - Landed new multi-resource locking subsystem. Many operations are now
+      prevented from refreshing the GUI multiple times. Startup, shutdown,
+      open and close multiple files, session changing all much faster (ADAMK)
+    - In Open resource, path is now cleaned from slashes on win32 (AZAWAWI)
+    - Fixed Padre crash when closing a Perl 5 script tab quickly while syntax
+      check is on (AZAWAWI)
+    - Added "No errors/warnings to $project-relative-filename" to syntax
+      checker. (AZAWAWI)
+    - Quick Menu access now displays Padre action label, name and comments
+      in an HTML window instead of a static label (AZAWAWI)
+    - Make the focus on "Find in files" work when called from Quick menu 
+      access dialog (AZAWAWI)
+    - Help Search dialog is now bigger in size and fonts. (AZAWAWI)
+    - HTML output in help search dialog for Perl variables and functions has now
+      bigger bold fonts for title (AZAWAWI)
+    - Fixed #758: Autocomplete now also works with backspace (SEWI)
+    - Ctrl-Tab behaviour is now configurable (SEWI)
+    - Rename Padre::Debug to Padre::Logger (SZABGAB)
+    - Reuse the comment field of the menu actions and show them in
+      the toolbar (SZABGAB)
+    - Add comment field to all the menu items that did not have yet (SZABGAB)
+    - Integrated Padre::DB into the Padre::Locker API, so that we can do
+      (very basic) nested transactions (ADAMK)
+    - Audited the startup process for database operations that either weren't
+      being done in a transaction, or were doing crazy bizarre things. Startup
+      is now noticably faster (ADAMK)
+    - Added Preference setting to control autocomplete when editting a
+      script rather than a Module. (PLAVEN)      
+
+0.52 2009.12.14
+    - Add a plugin hook on change of current editor tab (SEWI)
+    - Show the svn revision of Padre's start time at the title bar&about dialog,
+      not the current one (SEWI)
+    - Fixed: Padre command line arguments work again when using dev.pl (SEWI)
+    - Fixed: Menu options get disabled/enabled as needed again, this also
+      fixed ticket #742, #762, #764 and #771 (SEWI)
+    - Alt-Left and Alt-Right switch to the neighbor panels which Ctrl-Tab
+      uses the last-used order (SEWI)
+    - Fix: Double click on the function list jumps to the sub (again) now (SEWI)
+    - Added "Save Intution" to the File menu, to automatically save a new
+      file wherever Padre is confident it is appropriate (ADAMK)
+    - New file creation is now driven by Template Toolkit templates (using
+      Template::Tiny). This should allow even basic new file creation to be
+      somewhat adaptive to the user or project context (ADAMK)
+    - Padre speedup: Limit number of menu bar refreshs (SEWI)
+    - Fixed ticket #790: Ctrl + Caps Lock reduces font size (AZAWAWI)
+    - Re-enabled toggle status bar on win32 (AZAWAWI)
+    - Fixed ticket #750: Ctrl-Tab works again (PLAVEN, SEWI)
+    - Fixed Padre crash in Module Tools/Install Locale/Module/CPAN config (AZAWAWI)
+    - Open Resource restarts search now when project directory or Padre's 
+      current directory changes (AZAWAWI)
+
+0.51 2009.12.06
+    - Find all option showing all matches in bottom tab (CODE4PAY)
+    - Improved FTP error handling (SEWI)
+    - Open URLs from command line (SEWI)
+    - Configurable location of the 'perltags' file for autocompletion (SEWI)
+    - Fixed ticket #419: find variable declaration does not work at the end of
+      a variable (PATRICKAS)
+    - Fixed ticket #654: Lexical Rename of Variable - Can't highlight the
+      whole variable (PATRICKAS)
+    - Improved "Find Method Declaration" based on perltags (SMUELLER)
+    - Basic XS-Document support as needed for the full monty in a plugin (SMUELLER)
+    - XS (perlapi) calltips based on the perlapi of 5.10.1 
+      by default. Can be configured to show the perlapi of any release of
+      perl back to 5.6.0 if Padre::Plugin::XS is installed. (SMUELLER)
+    - Padre::Action::Queue for auto-processing of Padre actions (SEWI)
+    - Perl autocompletion is much more configurable now (SEWI)
+    - Indentation auto-detection now skips POD for ::Perl documents (SMUELLER)
+    - Find in Files now has a checkbox that shows files that do not match (GARU)
+    - Tests which are not needed for end-user installation now in xt (ADAMK)
+    - Added a test for actions (SEWI)
+    - Re-enabled the beginner error check tests (SEWI)
+    - Better focus transitions during search/replace, which should make
+      them easier to work with quickly (ADAMK)
+    - Rolled back function list improvements that were causing regressions (ADAMK)
+    - Added project sub-path intuition when saving new files (ADAMK)
+    - Fixed a number of search/replace related bugs (ADAMK)
+    - Fixed ticket #421: crash: no documents, F3/F4 (AZAWAWI)
+    - Fixed ticket #678: VACUUM the configuration database at shutdown 
+      to keep it small and fast (AZAWAWI)
+    - Fixed ticket #714: [Windows] Have a script to make binary. (AZAWAWI)
+    - Styles now allow configuring of the selected text (ADAMK)
+    - Upgraded tracing to new Padre::Debug that compiles out when not
+      being used. (ADAMK)
+    - Make Capture::Tiny a test prereq in order to eliminate a strange 
+      test failure (SZABGAB).  
+    - Added an initial simplistic mime-type + detector for Template Toolkit (ADAMK)
+    - Change Directory label to Project to hint to the user that Padre does
+      actually understand the concept of a project, it's just subtle (ADAMK)
+
+0.50 2009.11.08
+    - Fixed #686 DocBrowser launching Padre help (BRAMBLE)
+    - Add initial version of a regex editor. (SZABGAB)
+    - Fixed ticket #728: Changing locale crashes Padre (AZAWAWI)
+    - Menubar is now configurable but still lacks a dialog for this (SEWI)
+    - Beginner error checks are now configurable (turn each single one on
+      or off) (SEWI)
+    - Fixed ticket #710: share/doc/perlopref.pod missing author/license (AZAWAWI)
+    - Added basic FTP-remote-editing capability (SEWI)
+    - Initial version of "Find Method Declaration" (SZABGAB)
+    - Timeouts an other options for Padre::File::HTTP and ::FTP are now
+      configurable (SEWI)
+
+0.49 2009.11.02
+    - Fixed #691: Extract subroutine does not work for a script without
+      subroutines (PLAVEN)
+    - Bugfix: The split-beginner-error check got false positives (SEWI)
+    - Moved more menu actions to independent actions (SEWI)
+    - Added a readonly flag to the taskbar (AGN)
+    - Fixed #698: Syntax checker leaks files in tmpdir (SEWI)
+    - Syntax checker now also shows a successful check (SEWI)
+    - Added menu option to reload all open files (SEWI)
+    - The current selection or document may be filtered through an external
+      command now (SEWI)
+    - Low-priority popup messages could be moved to the status bar by setting
+      a preferences option (SEWI)
+    - require IPC::Open2 and IPC::Open3 as they are both used in the code (SZABGAB)
+    - Improved autocomplete (always) results (SEWI)
+    - Run make and TDD-tests in one step (KTHAKORE)
+    - Padre is now an XP-themed win32 application (AZAWAWI)
+    - Auto-save session state is now possible (SEWI)
+    - Auto completion usability fixes (AZAWAWI)
+    - Padre syntax images are now 16x16 transparent PNG images instead of 14x7 
+      (AZAWAWI)
+    - Fixed ticket:372 "window list should be sorted alphabetically" (AZAWAWI)
+    - Added "shorten common path in window list" to preferences (AZAWAWI)
+    - Fixed ticket:709 "Show editor window listed by project, then project-
+      relative path" (AZAWAWI)
+    - Added a test to run Padre's beginner error checks on the Padre source (SEWI)
+    - Config option for auto-cleanup of files during save for supported
+      document types (SEWI)
+    - Modules/Plugins could now add their panels to the global preferences (SEWI)
+    - Workaround for Test::NoWarnings hiding issue which lead to missing
+      prerequisites or upgrades (#646 SZABGAB)
+
+0.48 2009.10.12
+    - "Last session" now restores the last state even if Padre crashed and not
+      the last stated saved by a planned exit (SEWI)
+    - Fixed Wx::Perl::ProcessStream installation failure on vista/win7 by
+      upgrading to 0.16 (AZAWAWI, Mark Dootson - MARKD)
+    - Fixed the error dialog so that it displays the error icon (AZAWAWI)
+    - Fixed ticket #292: "Split window" command does not work by removing
+      the non-working feature (AZAWAWI)
+    - Added examples for Perl newbies (SEWI)
+    - Added a search field for functions list accessible via ALT-N (AZAWAWI)
+    - Added random instance ID (SEWI)
+    - Added multiple events per action (SEWI)
+    - Fixed win32's context menu key to work exactly as the right click behavior 
+      or ALT-/ (AZAWAWI)
+    - Fixed ticket #598: CTRL-L kills clipboard (AZAWAWI)
+    - Case sensitive was labeled case insensitive in replace, fixed. (SEWI)
+    - Windows filename test doesn't run on darwin (Mac) any longer and runs as TODO
+      because a failure must not stop the Padre installation. (SEWI)
+    - Padre::File::HTTP uses environment settings for proxy (SEWI)
+    - First real working version of the PopularityContest - module (SEWI)
+    - Smart highlighting works now in realtime as you select text (AZAWAWI)
+    - Fixed ticket #611: File | Open does not support UNC path (AZAWAWI)
+    - Save session now suggest the name of the last opened session for saving (SEWI)
+    - Fixed ticket #627: Suggestion: Make it possible to copy 'Syntax Check'
+      messages (AZAWAWI)
+    - Require version 0.20 of Wx::Perl::ProcessStream to fix #628 (AZAWAWI, SZABGAB)
+    - Fixed ticket #493: splash image license not suitable for Debian (AZAWAWI)
+    - Fixed t/86-service.t to work again on win32 (AZAWAWI)
+    - Fixed ticket #314: Padre broken on MS Vista when starting with no file
+      to be opened (AZAWAWI)
+    - Added a 'padre --desktop' option that improves Padre-Windows integration.
+      This creates a desktop shortcut and an "Edit with Padre" in the shell 
+      context menu (AZAWAWI)
+    - Made beginner error checks report the line where an error was located (SEWI)
+    - Fixed: Syntax checker now only shows errors from current file (SEWI)
+    - padre --version displays a MessageBox under wperl.exe (AZAWAWI)
+    - Option to continue on beginner errors (SEWI)
+    - Made title bar configurable (SEWI)
+    - Autocomplete on every char (enable it in the preferences) (SEWI)
+    - Add logfile so the developer debugger of padre will print there
+      and not on STDERR. (SZABGAB)
+    - Show file size on disk in statistics (SEWI)
+    - Under Linux and BSD, 'padre --desktop' adds a Padre.desktop inside
+      /usr/share/applications (AZAWAWI)
+    - When saving a module for the first time, Padre will attempt to guess the
+      name of the file so you don't need to type it (ADAMK)
+    - Added "Dump Expression" to Developer Plugin to evaluate and dump a single
+      expression within the Padre context (ADAMK)
+    - Perl interpreter for running scripts is now configurable (SEWI)
+    - Added MIME type count to PopularityContest, but it's still not sending
+      anything (SEWI)
+    - Added a runnable-flag to Padre::File and it's current modules (SEWI)
+    - Syntax check now doesn't slow down typing (SEWI)
+    - Add autocomplete feature for new methods (SEWI)
+    - Update directory tree on load session (SEWI)
+    - New Padre launcher for Windows (DOLMEN)
+    - Fixed Open Resource status text display on Linux (AZAWAWI)
+    - Added configuration version checking and prepared auto-config-upgrades (SEWI)
+    - The Perl help search (F2) destroyed the code refernce calling it, so F2
+      was usable only once per Padre start, may also apply to other actions.
+      Fixed. (SEWI)
+    - Ticket #660 - Moved Perl Refactoring tools to it's own Refactor Menu (PLAVEN)
+    - Added the ability to select where to place the "extracted subroutine" in the current
+      document (PLAVEN)
+
+0.47 2009.09.25
+    - Bundled more Perl Operators documentation [perlopref.pod] (AZAWAWI, COWENS)
+    - Fixed crash when inserting a special value without any document (AZAWAWI)
+    - Improved StatusBar - speed (SEWI)
+    - Fixed ticket #573 ESC does not close About window (AZAWAWI)
+    - Fixed ticket #578 Padre's Splash screen should not get in the way (AZAWAWI)
+    - Fixed ticket #579 Commenting/uncommenting comments the last unselected 
+      line (AZAWAWI)
+    - Fixed ticket #576 common (beginner) error check has no feedback if no
+      errors found (AZAWAWI)
+    - Added Padre::File as a API for all operations on edited files (SEWI)
+    - Added 13-eol.t to detect non-UNIX EOL-ed files in Padre (AZAWAWI)
+    - Added "Open URL" menu option (SEWI)
+    - Added Padre::File::HTTP (SEWI)
+    - No more "WIN32" as a line ending indicator only "WIN" (AZAWAWI)
+    - The status bar provides more space to display longer mime-type names (AZAWAWI)
+    - The status bar reflects now the current document's line endings as
+      follows (AZAWAWI):
+        - WIN (CR/LF), MAC (CR), UNIX (LF)
+        - Mixed, a mixture of the above which is usually an error
+        - None which is a one-liner/empty script
+    - Beautified the about dialog so that it is includes the splash image. (AZAWAWI)
+    - Fixed ticket #589 Pasting in a UNIX document in win32 corrupts it to
+      MIXEd (AZAWAWI)
+    - Added more beginner-error-checks (SEWI)
+    - Improved Perl menu to be more consistent (AZAWAWI)
+    - Fixed ticket #504 and ticket #586 which are basically about being able to
+      lexically rename a variable when the cursor is over its declaration (AZAWAWI)
+    - Added "Dump PPI Document" to "Padre Developer Tools" core plugin (AZAWAWI)
+    - Added Run/Stop icons to the toolbar per ticket #529 (AZAWAWI)
+    - Fixed ticket #595 F6 (Stop Executing of script) doesnt work with Output
+      window in Windows (AZAWAWI)
+    - Fixed ticket #597: Merged OS detection in Padre::Constant (SEWI)
+    - Fixed ticket #594: F1 key doesn't work (SEWI)
+    - Fixed ticket #593: On Windows, files with / and \ are now the same
+      and files are treated case-insensitive (AZAWAWI, SEWI)
+    - Fixed ticket #591: Save/Save as decision was corrupt (SEWI)
+    - Fixed ticket #582: Run this test/Run Tests are broken on win32 when there
+      is a space in the test file (AZAWAWI)
+    - Fixed ticket #553: Directory browser's "Move to trash" feature is not
+      working on Vista/win32 (AZAWAWI)
+    - Massive refactoring of Plugin Manager. Looks almost exactly the same
+      but now the status information actually updates properly (ADAMK)
+    - Added a padre.exe launcher on win32 (SEWI, GETTY, AZAWAWI)
+    - Reformat filenames to correct OS-dependend syntax (AZAWAWI, SEWI)
+    - Moved add Win32 API functions to one module (AZAWAWI, SEWI)
+    - Fixed ticket #488: allow script to recognize when executed by Padre (AZAWAWI)
+    - Padre now uses cperl() console instead perl() for compatiblity with
+      wperl (AZAWAWI)
+    - Added Perl version, uptime and process information to about box (SEWI)
+    - Fixed ticket #603: Background tasks fail to work under wperl win32 (AZAWAWI)
+    - Added option to open a saved session on startup (SEWI)
+    - Fixed ticket #580: On win32, Perl 5 syntax checker is invoked in strange 
+      situations (AZAWAWI)
+    - Padre now warns about the running process at exit and asks whether to kill 
+      it and exit or cancel the shutdown (AZAWAWI)
+    - Removed false warnings about duplicated actions/shortcuts when changing 
+      Padre's language (AZAWAWI)
+    - Fixed ticket #394: Close DocBrowser with Escape key (AZAWAWI)
+
+0.46 2009.09.13
+    - Fixed Smart highlighting to show a pale green round box instead of an 
+      ugly squiggle (AZAWAWI)
+    - Run script waits now after completion for key to continue when run in an
+      external win32 window (AZAWAWI).
+    - Padre now supports the following extensions:
+        - For Perl 5, .pmc and .plx (AZAWAWI, SZABGAB)
+        - For Perl 6, .pl6, .pm6, .p6l and .p6m (AZAWAWI)
+    - Help search handles now http:// and perldoc:// links (AZAWAWI)
+    - Enabled "Syntax Check" tab is now shown when there is a problem without
+      losing editor focus (AZAWAWI)
+    - Handle "Recent files" Padre crash when it is called with a file that no 
+      longer exists. The entry is deleted and a message box is shown (AZAWAWI)
+    - Added a "extract subroutine" function (RHEBUS)
+    - Handle "Open all Recent Files" Padre crash when setup_editor is called 
+      with a file that no longer exists (AZAWAWI)
+    - Fixed ticket #536 Padre auto converts EOLs automatically (AZAWAWI)
+    - Pod::Perldoc 3.15 is required now. Allowing help on $. and similar. (AZAWAWI)
+    - Fixed Arabic/Hebrew developer/translator names in Padre's about box (AZAWAWI)
+    - Bundled more Perl Operators documentation [perlopref.pod] (AZAWAWI, COWENS)
+    - Made beginner-error-checks work (SEWI)
+
+0.45 2009.09.02
+    - Disabled 'Test Plugin From Local Dir' menu option until it's properly fixed (GARU)
+    - Fixed PluginManager Pod glitch for deprecated Perl5 plugin (ADAMK)
+    - Fixed various open bugs which exist on Gnome but not on Windows (SEWI)
+    - Several translation updates (thanks to all translators!)
+
+0.44 2009.08.24
+    - Help Search now supports perlopref.pod parsing - Perl operator reference 
+      (AZAWAWI)
+    - Fixed various "Help Search" dialog bugs for perlvars and CORE modules 
+      (AZAWAWI)
+    - "Directory Browser" stability fixes (AZAWAWI)
+    - Refactored "Help Search" to use document help providers. This will make it
+      faster (AZAWAWI)
+    - Help Search looks up words selected or under the cursor (AZAWAWI)
+    - allow the use of $main->open_file_dialog($dir) (SZABGAB)
+    - Moved Ecliptic's Quick Fix to Padre core under the Edit menu (AZAWAWI)
+    - Enable the F12 Save as shortcut again (SZBAGAB)
+    - Added Perl 5 Quick Fix for 'use strict; use warnings;' (AZAWAWI)
+    - Added Insert submenu and dialog, moved snippets into insert submenu (TEEJAY)
+
+0.43 2009.08.16
+    - Revised nice splash screen slightly. Move original artwork
+      to Padre-Artwork (BRAMBLE)
+    - Added a (hopefully) nice splash screen for Padre (GARU)
+    - Added a Padre::Perl API for discovering the location of the system
+      Perl in a way smart enough to handle people that specifically need a
+      command line Perl, or specifically need a windowing Perl (ADAMK)
+    - Temporarily remove PAR support (ADAMK)
+    - Upgrade the plugin internals to support arbitrary class names,
+      simplifying the implementation and clearing the way for
+      Acme::Padre::Plugin::* modules. (ADAMK)
+    - Updated PPI dependencies. Padre now supports 5.10 syntax in PPI-based
+      features (ADAMK)
+    - Find dialog now uses the Padre::Search API. (ADAMK)
+    - New multiple-tabbed About box (ADAMK)
+    - F3 with sub-line selected text converts it directly into an active
+      search without needing to invoke the Find dialog (ADAMK)
+    - Moved Perl 6 Help dialog to Padre core as "Help/Help Search" (AZAWAWI)
+    - Help/Help Search now supports Perl 5 (AZAWAWI)
+    - Moved Ecliptic's Open Resource to Padre core as "Search/Open Resource" 
+      (AZAWAWI)
+    - Moved Ecliptic's Quick Menu Access to Padre core as "Search/Quick Menu 
+      Access" (AZAWAWI)
+    - Fixed run command in a separate window bug on win32 (AZAWAWI)
+    - Moved Ecliptic's "Open in file browser" to Padre core as "File/Open in 
+      File Browser" and integrated it with Directory browser (AZAWAWI)
+    - Moved functionality in Perl 5 plugin to Plugins -> Module Tools (ADAMK)
+    - Implemented "Edit / Next Problem" (AZAWAWI)
+    - Force setting of document (MIME) type when using New->Perl 5 test 
+      (#476) (KARL.FORNER) (SZABGAB)
+    - Make sure coloring is update when save-as file or when opening a new
+      file from template. (SZABGAB)
+
+0.42 2009.07.31
+    - Fixed a bug that crashed Padre while moving panels with outline
+      enabled (GARU)
+    - The Directory browser hidden files support now automatically
+      recognises intermediate directories (blib etc) in Perl distributions,
+      and correctly ignores them (ADAMK)
+    - Various performance improvements to directory tree (ADAMK)
+    - New search engine coupled to directory tree with some regex
+      characters support (GABRIELMAD)
+    - Initial Padre actions support which means an action can be re-used 
+      by anything running on Padre. Keyboard shortcut conflict warnings are
+      implemented (AZAWAWI)
+    - Added the "Artistic" and "COPYING" (GPLv1) files as well a note to the
+      "README" about licensing per the request of the 
+      http://directory.fsf.org/ maintainers. (SHLOMIF)
+    - Added a "right margin" option which will show a line at the specified
+      column (BRICAS)
+    - Now new files belong to the project from where they were created till
+      they are saved (GABRIELMAD)
+    - Directory Tree shows the project directory or if none file is opened
+      the default projects directory (configurable in Preferences > Behavior
+    - none configured, default is user's documents directory) (GABRIELMAD)
+    - Install some of the examples in the share directory and add an
+      Open Example menu option (SZABGAB)
+    - Adding Padre::Wx->add_pane_info convenience method to prevent the need
+      for the stupid ugly Wx::AuiPaneInfo method chaining (ADAMK)
+    - Create the Left panel and moved the Directory tool into it (ADAMK)
+    - Upgrade Wx tree navigation to handle detached floating panels (ADAMK)
+    - Implemented Smart Highlighting. Double click on a word to select it
+      and a green squiggle will be shown for each matching word (AZAWAWI)
+    - Now users can choose which is the project directory that Directory
+      Tree must show (GABRIELMAD)
+    - Moved close operations into Close... submenu (ADAMK)
+    - Added "Close This Project" to close all open files in the same project
+      as the current file (ADAMK)
+    - Added "Close Other Projects" to close all open files in projects other
+      than the project of the current file (ADAMK)
+    - Changed a bunch of documentation from using items or comma-separation
+      to using =head3 pod entries (ADAMK)
+    - Adding new Blue Morpho logo (ADAMK)
+    - Removed dependency on prefork.pm, it was only there to shut up the dev.pl
+      DIE: warnings (ADAMK)
+    - Removed dependency on Test::Most, and with it about 5-10 other excessive
+      test-related dependencies (ADAMK)
+
+0.41 2009.07.23
+    - Remove Experimental mode.
+    - Fixed a bug in Plugin config_write where ->selectrow_array was used 
+      instead of ->do to SQL update (Thanks to tlbdk++). (AZAWAWI)
+    - run_command in a separate window now works in win32 to support 
+      prompt('...') in Perl 6 and <STDIN> in Perl 5. (AZAWAWI)
+    - Now Padre can find/replace inside selections (GARU)
+    - New Syntax highlighter configuration system. Plugins now can add more
+      syntax highlighters and users can pick one per mime-type. (SZABGAB)
+    - Directory browser new artwork and drag and drop support (GABRIELMAD)
+
+0.40 2009.07.17
+    - Removed about 10 dependencies, including several with lots of FAIL
+      reports in CPAN Testers (ADAMK)
+    - Complete refactoring of the Directory Browser, gaining a lot of 
+      performance improvements and new features such as sorted output
+      and context menu options (GABRIELMAD)
+
+0.39 2009.07.09
+    - Some of the refactoring code was moved to PPIx-EditorTools (MGRIMES)
+    - Detection of Moose attributes in Outline view (JQUELIN)
+    - Detection of MooseX::POE events in Outline view (JQUELIN)
+    - Added keywords to META.yml (via Makefile.PL.) (SHLOMIF)
+    - Bumped the required Test::More version to 0.88 - needed for note().
+      (SHLOMIF)
+    - Open Selection (ctrl-Shift-O) now displays all the files it finds
+      and lets the user select (SZABGAB)
+    - Eliminate crash when pressing F3/F4 while there are no open
+      files (#421) (SZABGAB)
+    - Enable/Disable Window menu options when there are (no) open
+      files. (#417) (SZABGAB)
+    - For Cut/Copy/Paste/Select All, use the focused textctrl instead
+      of the editor textctrl (RSN)
+    - Autoupgrade ascii files to be utf-8 on save if user types in wide
+      characters (#304) (SZABGAB)
+    - Allow the user to use external (xterm) to run the scrips. (SZABGAB)
+    - Add menu option to show selection as hexa or as
+      decimal. (#36) (SZABGAB)
+    - Switch to Locale::Msgfmt and generate the .mo files at install
+      time (RSN)
+    - Add number of lines to GoTo line dialog (#439) (SZABGAB)
+
+0.38 2009.06.27
+
+    - Replace regex that needs 5.10 by a split (SZABGAB)
+
+0.37 2009.06.25
+    - "Introduce Temporary Variable" refactoring tool (SMUELLER)
+    - Added a friendly icon on the toolbar to toggle comments (GARU)
+    - Crazy Win32::API AllowSetForegroundWindow hack to allow the
+      Single Instance Server to correctly foreground itself (ADAMK)
+    - Added Padre::Search search and replace API (ADAMK)
+    - Switching to last edited file is now Ctrl-Shift-p (SZABGAB)
+    - Be compatible with older version of File::Path (RYAN52)
+    - Links to Mibbit were replaced by links to our irc.html (SZABGAB)
+    - Merged the code of Padre::Plugin::Encode into Padre (SZABGAB)
+    - Update directory only when switching to new editor (SZABGAB)
+
+0.36 2009.05.30
+    - DocBrowser::POD resolver is now Pod::PerlDoc with benefits
+      DocBrowser attempts to use current padre locale as language hint
+      DocBrowser reuses tabs for same/similar documents (#323) (Andrew Bramble)
+    - Make DocBrowser suck less. Quieter and faster (#322) (Andrew Bramble)
+    - Output should be blank by default at startup (#351) (JQUELIN)
+    - No padre version in window title (#349) (JQUELIN)
+    - Added generic HTTP task support with Padre::Task::LWP (ADAMK)
+    - Implemented first-generation Popularity Contest task (ADAMK)
+    - Reorganized and differentiated Find and Replace dialogs (#348) (THEREK)
+    - Add a set of filename wildcards to filter directory listing in Open File dialog (#343) (THEREK)
+    - Add Chinese (Traditional) translation (BLUET)
+    - Show Perl menu on a Project as well as Document basis (ADAMK)
+    - Disable all Perl 6 code unless the Perl 6 plugin is enabled (ADAMK)
+    - Reshuffle and relabel of some menus to improve asthetics (ADAMK)
+    - Fix no_refresh during multi-file operations (ADAMK)
+    - Added mibbit.com "Live Support" entries to the Help menu (ADAMK)
+    - Removed the use of Class::Autouse, it was slowing down PPI (ADAMK)
+    - Various performance improvements, load cost down by 12Mb (ADAMK)
+    - Fixed the cut/copy/paste problem (#332) (ADAMK)
+
+0.35 2009.05.08
+    - Add Japanese translation (ISHIGAKI)
+    - Implemented experimental Single Instance support (#117) (ADAMK)
+    - Implemented context-sensitive right-click menu for Perl documents (SMUELLER)
+    - Ctrl-left-click on a Perl variable will jump to its definition (SMUELLER)
+    - Ctrl-left-click on a Perl function callwill jump to its definition (SMUELLER)
+    - Left-clicks into documents can now be hooked by the document class (SMUELLER)
+    - Fix to the thread-status display (SMUELLER)
+    - Fixed ticket #300: disabled EVT_SET_FOCUS in preview (THEREK)
+    - Fixed ticket #289: Scrolling in preference window (PZSCHMIDT)
+    - Fixed ticket #301: Fix wx assertion failures (JQUELIN, SMUELLER)
+    - Launching a browser now happens in the background (ADAMK)
+    - Add Czech translation
+
+0.34 2009.04.28
+    - Fix crash in plugin manager when changing locale while window opened (#298) (JQUELIN)
+    - Support for plugin l10n in place (JQUELIN)
+    - Added Preferences->Run Parameters panel instead of Perl->Run Parameters menu option. (THEREK)
+    - Stop refreshing the menues on every keystroke. Instead when the menu is being accessed. (SZABGAB)
+    - Sessions support (#123) (JQUELIN)
+    - Enable tooltips on the toolbar on Windows as well (SZABGAB)
+    - Fix localization change in the Syntax window (#198) (SZABGAB)
+    - Plugin manager correctly localized at startup (JQUELIN)
+    - Plugin manager displaying full plugin names (JQUELIN)
+    - Set file size limit to 500_000 to avoid loading too big files. (#186) (SZABGAB)
+    - Double-clicking on an error now selects the line (#214) (JQUELIN)
+
+0.33 2009.04.04
+    - Fix bug in relative path showing in the Windows menu. (GARU)
+    - Fix the swicthing between ppi mode and none-ppi mode (SZABGAB)
+    - Stop forking at startup. (SZABGAB) 
+    - Skip the win32 subtests if the locale is not English. (SZABGAB)
+    - Added debug logging that can be turned on/off via the Developer plugin. (SZABGAB)
+    - Simplified Chinese translation turned on. (FAYLAND, SZABGAB)
+    - Added Polish translation. (THEREK)
+    - Revamped plugin manager. (JQUELIN)
+
+0.32 2009.03.29
+    - Trying to fix again the skipping of Padre::CPAN under the CPAN shell.
+
+0.31 2009.03.29
+    - Avoid creating the ~/.padre during testing by two more tests. (SZABGAB, thanks to AYILMAZ)
+    - Skip testing Padre::CPAN as it cannot be loaded under CPAN. (SZABGAB, thanks to AYILMAZ)
+    - Fix the Directory browser to switch between projects. (SZABGAB)
+    - Add "Run Tests" menu options to, err run tests. (SZABGAB)
+    - Work around painful segmentation faults from multiply freeing
+      AuiManagers (SMUELLER)
+    - Lexical variable replace works for arrays and hashes in all their
+      ugly incantations now (SMUELLER)
+    - Re-enable the taskmanager tests after fixing them. (SMUELLER)
+
+0.30 2009.03.27
+    - Remove Test::Compile from the prereqs as well as it is not in use. (SZABGAB)
+    - New GUI for selecting and installing CPAN modules. (SZABGAB)
+    - CPAN related menu items moved to new Perl5 plugin (SZABGAB)
+    - (Re-)Storing cursor position in file (#206) (JQUELIN)
+    - Reload file keeps cursor position (#220) (JQUELIN)
+    - Preferences windows title should match its menu invocation (#270) (JQUELIN)
+    - Fix error if passed a non-existent filename on command-line (#155) (JQUELIN)
+    - New task_warn/task_print methods in background tasks to easily
+      print to the output pane (SMUELLER)
+    - Fix bug in lexical variable declaration search that would prevent
+      it from finding variables declared in the main doc scope (SMUELLER)
+    - Lexical variable replace works for foreach my $foo too. (SMUELLER)
+
+0.29 2009.03.13
+    - Initial support for directory browser based on the Outline code (SZABGAB)
+    - Improving Padre::Util::get_project_dir (SZABGAB)
+    - Eliminate a test failure on non-English locale. (SZABGAB)
+    - Internal cleanups & documentation for configuration subsystem (JQUELIN)
+    - Require Test::Most for the testing and bail_on compilation errors. (SZABGAB)
+    - Eliminated a huge memory leak by not updating the plugin menu on every keystroke. (SZABGAB)
+
+0.28 2009.03.04
+    - Move Wx::Perl::Dialog back to the Padre tree. (SZABGAB)
+    - Allow the shortening of the the file list in the Window menu. (SZABGAB)
+    - Fix Ctrl-TAB and Ctrl-Shift-TAB. (SZABGAB)
+    - List the available perldiag translations and allow the user to change. (SZABGAB)
+    - Fix a few missed cases of the API change. (SZABGAB)
+    - Some sharedir improvement. (SMUELLER)
+    - List of available perldiag translations. (SZABGAB)
+    - Add prompt method to be used by plugins as well. (SZABGAB)
+
+0.27 2009.02.10
+    - Copyright changed to "The Padre development team as listed in Padre.pm." (SZABGAB)
+    - Some fixes in the search menu.
+    - Improve file type (Perl 5 / Perl 6 ) recognition. (SZABGAB)
+    - Fix the Windows menu to be able to jump to files. (SZABGAB)
+    - Statusbar visibility kept accross startup (#200). (JQUELIN)
+
+0.26 2009.02.01
+    - On X11 based platforms, selecting text using the mouse and pasting it
+      via middle mouse button now works (HJANSEN)
+    - Unifying Padre->inst and Padre->ide (ADAMK)
+    - Complete rewrite of the configuration layer. All access to configuration
+      data is now via methods so that we can add support for project-level
+      customisation of the interface. (ADAMK)
+    - Completely refactored all of the config setting names (ADAMK)
+    - Added first-class configuration support for Plugins (ADAMK)
+    - Moved config data on bookmarks, plugins and historical search/replace
+      strings out of the config file and into the database. (ADAMK)
+    - The output window now understands the color and font-face
+      related ANSI control sequences (SMUELLER)
+    - The long-awaited MainWindow.pm -> Main.pm (ADAMK)
+    - Heavily modified many variables and method names to bring a greater
+      simplicity and consistency to various APIs. Only possible because
+      we were already breaking the config system and Main.pm (ADAMK)
+    - Removed some classes and other code that had (astonishingly for such a
+      young application) become useless and bit-rotten (ADAMK)
+    - Added styles for text/x-patch, text/x-makefile, text/x-yaml,
+      text/css, text/plain(apache conf) file types (KEEDI)
+    - Now style config file supports foreground, background, bold,
+      italic, eolfilled, underline properties (KEEDI)
+    - Output window now uses mono-spaced font by default (SMUELLER)
+    - The 'Crashed' button in the plugin manager dialog is now
+      clickable if an explanation for the failure is
+      available (SMUELLER)
+
+0.25 2009.01.09
+    - Added Chinese (Simplified) translation (FAYLAND)
+    - Various subtle tweaks to the look and feel of the toolbar and
+      the panels. The GUI now looks noticably "sharper" (ADAMK)
+    - Expanded the variety and depth of functionality available in the
+      bundled "Padre Developer Tools" plugin (ADAMK)
+    - Our unattributed redistribution of tango was probably illegal,
+      and made us incompatible with Debian. Switch to gnome for
+      now. They are as ugly as sin, but at least they're legal (ADAMK)
+    - All big MainWindow gui elements are now in their own classes,
+      which should help us spread out feature logic properly (ADAMK)
+    - Moved Padre::Plugin::CPAN functionality into the core so that
+      we can do various sorts of tighter CPAN integration (ADAMK)
+    - Padre::Wx::DocBrowser now uses Padre::Task::DocBrowser (let's 
+      hope properly) (Andrew Bramble)
+    - Class correction Padre::Wx::Menu -> Padre::Wx::Menubar (ADAMK)
+    - Class correction Padre::Wx::Submenu -> Padre::Wx::Menu (ADAMK)
+    - Now that Padre::DocBrowser has landed, delete the Padre::Pod
+      family of modules (ADAMK)
+    - Automatic indentation style detection now the default (SMUELLER)
+    - User interface now "locked" by default (SMUELLER)
+    - Updated Italian translation (SBLANDIN)
+    - Addition of contextual (un-) commenting (CLAUDIO)
+
+0.24 2009.01.06
+    - Double-clicking an entry in the function list now faithfully
+      matches the behaviour of the Ultraedit implementation (ADAMK)
+    - Updated German translation (HJANSEN)
+    - Replace Padre::Pod::Frame with Padre::Wx::DocBrowser, hopefully
+      making help more helpful. (Andrew Bramble)
+    - Moving to the glorious RFC4646-based second-generation Padre::Locale
+      implementation. "Portugese" is no longer Brazilian :) (ADAMK)
+    - Added a friendly icon to the ToolBar that displays the status
+      (idle, running, high load) of the background tasks (SMUELLER)
+    - Created Padre::Current, which should simplify everything that needs
+      to know about the current whatever (ADAMK)
+    - Used Padre::Current to kill off the slightly out of place non-class
+      Padre::Documents (ADAMK)
+    - View Document As... (FAYLAND)
+
+0.23 2009.01.04
+    - Updated Italian transation.
+    - Refactored the plugin state hash out into a standalone
+      Padre::PluginHandle class (ADAMK)
+    - Add naive way to locate some of the annoying errors beginners
+      might make that perl does not catch. (SZABGAB)
+    - Makefile.PL tricks EU:MM into not loading every single dependency,
+      making our dependency-heavy Makefile.PL far saner (ADAMK)
+    - Portuguese (Brazilian) translation added (GARU)
+    - Spanish translation added (PacoLinux)
+    - Shutdown process now delays saving the session until after the
+      interface phase (ADAMK)
+    - Shutdown process now disables all the plugins, so they have a
+      change to shut down elegantly too (ADAMK)
+    - Plugins now reload correctly (ADAMK)
+    - Created a basic stub Padre::Manual and moved the information in
+      HACKING.txt into Padre::Manual::Hacking and
+    - Padre::Manual::Translation (ADAMK)
+    - Moved more bits of GUI code out of MainWindow and into their own
+      classes (ADAMK)
+
+0.22 2008.12.23
+    - Various Perl6 and Parrot related snippets of code and
+      functionality have been moved to the respective
+      plugins (SZABGAB and others)
+    - Extended preference dialog with tabs (HJANSEN)
+    - Syntax checker now running in the background (SMUELLER)
+    - Background Tasks can now prevent execution in the prepare
+      hook (SMUELLER)
+    - Added interface for passing events from worker threads to the
+      main thread (SMUELLER)
+    - Added simple example of a Task that sends events to the
+      main thread (SMUELLER)
+    - Tab/Space conversion only converts at the start of each
+      line now (SMUELLER)
+    - Improved comment/uncomment_lines for HTML/XML (FAYLAND)
+    - Rewrote Padre::Wx::Dialog::PluginManager to interact directly with
+      Padre::PluginManager (and not talk to Padre::Config) (ADAMK)
+    - Migrated Padre::DB to use ORLite::Migrate instead of the
+      (increasingly slow) ->setup method (ADAMK)
+    - Allow several coloring styles, add style called 'night' (SZABGAB)
+    - Right-click menu in margin column for code folding now
+      allows to fold/unfold all foldable areas (HJANSEN)
+    - Error list window for run-time errors and diagnostics (PSHANGOV)
+    - Arabic translation added (AZAWAWI)
+    - Italian translation updated (SBLANDIN)
+    - Improved Ack (FAYLAND)
+    - Allow selection of editor font and current line background 
+      color (HJANSEN)
+    - Hebrew translation updated (SHLOMIF)
+    - Upped Encode requirement to 2.26, fixes some fatal errors with unicode (TEEJAY)
+    - binmode fix for File::Temp" in SyntaxChecker.pm (TEEJAY)
+
+0.21 2008.12.14
+    - Note: If you are having issues running Padre after upgrading to 0.21,
+      ("Gtk-CRITICAL **: gtk_window_set_modal: assertion `GTK_IS_WINDOW (window)' failed")
+      try moving or deleting your $HOME/.padre directory and check
+      whether that fixes the issues. YMMV and let us know about any
+      problems.
+    - Now using Module::Install for building (ADAMK, SMUELLER, SZABGAB)
+    - Fixed bookmark-related crash (#172) (SvenDowideit)
+    - Fixed syntax-checker related focus glitch (#173) (SvenDowideit)
+    - Removed JavaScript plugin from the main distribution (SZABGAB)
+    - Major menu refactoring. Each menu is now implemented in a separate
+      class, with independant ->refresh methods and much improved
+      encapsulation as a result. (ADAMK)
+    - Rewrote the Padre bootstrap sequence. Not only does Padre start in
+      a more sane order, but with some additional tweaks using
+      ->Show, ->Freeze and ->Thaw, Padre LOOKS like it starts up
+      and shuts down much much faster (ADAMK)
+    - Reorganised the order and seperators for the View menu (ADAMK)
+    - The Plugins menu no longer shows separators that don't separate
+      anything (ADAMK)
+    - Padre's lib directory now passes all of the rules in Perl::Critic's
+      default Severity 5 policy. (ADAMK)
+    - Changed the names of a number of Padre::Wx::*** classes to more-closely
+      match the underlying Wx::*** classes that they subclass. (ADAMK)
+    - Option to always auto-detect indentation style and adapt for each
+      open document. (SMUELLER)
+    - Default to showing functions in alphabetical order. (SMUELLER)
+    - Option to show functions in alphabetical order, except private methods
+      go last. (SMUELLER)
+    - A bunch of autoindentation fixes. (SMUELLER)
+    - AUI updates to the syntax-checker/output-window GUI elements (HJANSEN)
+    - Various portability and miscellaneous fixes to the syntax checker
+      (ADAMK, HJANSEN)
+    - Add new Perl-specific feature: "Jump to variable declaration"
+      and the experimental "replace lexical variable". (SMUELLER)
+    - The Perl-specific "find unmatched brace" feature now processes
+      the document in the background. (SMUELLER)
+    - Generic Padre::Task::PPI class with tools for PPI-related
+      background tasks. (SMUELLER)
+    - Experimental implementation of the Padre::TaskManager thread pool
+      and Padre::Task background-task-interface for running blocking
+      tasks in additional threads. (SMUELLER)
+    - Italian translation (SBLANDIN)
+    - Show methods in abc order. Allow user to set preference to 'abc' or 'original'
+      ordering of methods. (#163) (SZABGAB)
+    - Open selection prompts user if nothing selected. (#143) (JQUELIN)
+    - Russian translation added (Andrew Shitov)
+    - Dutch translation added (Dirk De Nijs)
+    - Lots and lots of encoding tweaks.
+
+0.20 2008.12.02
+    - Separate tab-width from indentation-level preference (SMUELLER)
+    - Expend auto-detection of indentation style to include the
+      indentation level (SMUELLER)
+    - Apply automatic tab-compression if tab-indentation is used with
+      an indentation-width != tab-width (SMUELLER)
+    - Reworked the autoindentation: Now with auto-de-indentation on
+      closing brace (SMUELLER)
+    - Now using Class::XSAccessor for generating accessors (SMUELLER)
+    - Moved the syntax checker from Main.pm into
+      Padre::Wx::SyntaxChecker (SMUELLER)
+    - Small improvement to startup time by not refreshing the plugin
+      menu after loading each plugin (SMUELLER)
+    - French translation added (JQUELIN)
+    - Some refactoring, (SZABGAB)
+    - Display error when reload file failed. (SZABGAB)
+    - Korean updates. (KEEDI)
+    - Hungarian updates. (GYU)
+    - Fix the "cannot save new file bug". (TEEJAY)
+    - Save files under Mac. #160 (ChrisDolan)
+    - Restore inner window layout through restart. (HJANSEN)
+
+0.19 2008.11.28
+    - Korean translation added (KEEDI)
+    - Hungarian translation added (GYU)
+    - Hebrew translation added (Omer Zak)
+    - Improvement in vi Plugin (SZABGAB)
+    - Locale switching no longer needs a restart (HJANSEN)
+    - Moved syntax checking out from experimental state (HJANSEN)
+    - Prototype of printing support (HJANSEN)
+    - Adding support for document type registration (ADAMK)
+    - Adding plugin_name to the Padre::Plugin API (ADAMK)
+    - Advancing the version numbers of some prereqs (ADAMK)
+    - Save files in the same encoding as they were read.
+
+0.18 2008.11.23
+    - Added a few more directories to the no_index list in Build.PL (ADAMK)
+    - Implement a reusable Padre::Pod2HTML class so that Padre can develop
+      a specific look and feel for all HTML generated from Pod. (ADAMK)
+    - Aggresively bump the Pod::Simple dependency so that the generated
+      HTML contains support for all the latest developments. (ADAMK)
+    - Add explicit dependency on HTML::Entities because Pod::Simple
+      has now made the dependency optional. (ADAMK)
+    - Aggressivly bump the HTML::Parser dependency so that we have
+      better support for our Unicode-needing users (ADAMK)
+    - Recognize when file is changed on disk (#55) (JQUELIN)
+    - Un/Comment now filetype-dependant (#26) (JQUELIN)
+    - Moving the vi keybinding code to a Plugin (SZABGAB)
+    - Jump to the last open window using menu or Ctrl-6 (#137) (SZABGAB)
+    - Hide the margin of the syntax checker when it is not in use. (SZABGAB)
+    - Save-as updates the window menu (#145) (JQUELIN)
+    - Drag and drop file(s) open them (#42) (SZABGAB,JQUELIN)
+    - padre --index no longer crashes (#79) (JQUELIN)
+    - Incremental, non-intrusive search a-la Firefox (#60) (JQUELIN)
+    - New Plug-in system, incompatible with the previous one.
+    - Plug-in manager dialog.
+    - Rename Padre::Plugin::MY to Padre::Plugin::My.
+
+0.17 2008.11.17
+    - Optional highlighting of current line (via background color) (HJANSEN)
+    - Code folding (#61) (HJANSEN)
+    - Word Wrap and "Default word wrap on for each file" in Preferences (FAYLAND)
+    - Show/Hide Output or Functions (FAYLAND)
+    - Fix the failing plugin manager test. (SZABGAB)
+    - Add configuration option to the autoindentation (no, same_level, deep). (SZABGAB)
+    - Switch to File::ShareDir::PAR 0.03. (SZABGAB)
+    - Allow opening multiple files at once (#43) (JQUELIN)
+    - Add Padre::Plugin::MY and set it to be a prefered plugin. (SZABGAB)
+    - Join lines with Ctrl+J (#128) (JQUELIN)
+    - Full screen view (#131) (JQUELIN)
+    - Hide/show white spaces and tabs (#132) (JQUELIN)
+    - Check minimum App::Ack version (#104). (JQUELIN)
+    - Selection markers to ease selection (#133) (JQUELIN)
+    - Drag-n-drop files from Filer Explorer (CORION)
+    - Add experimantal and basic vi mode. (SZABGAB)
+    - Fix Shift-TAB (#141) (SZABGAB)
+    - Add the beginning of second generation plugin support. (ADAMK)
+    - Limit the plugin names to one deep only. Second level
+      namespaces are saved for the implementation details. (SZABGAB)
+    - Experimental perl -c based syntax checking. (HJANSEN)
+    - Clean recent files list (#126). (FAYLAND)
+    - Open all recent files (#125). (FAYLAND)
+    - Alt-1, Alt-2, etc removed. (#122) (SZABGAB)
+    - Initial Javascript support. (FAYLAND)
+    - Enable/Disable the subs window via View menu (#100).
+    - Move between the editor, the output window
+      and the subs window with some hot-key (#14) (SZABGAB)
+
+0.16 2008.11.09
+    - Fix New on the Toolbar (SZABGAB)
+    - Add Diff menu item to show changes in file. (SZABGAB)
+    - Change windowing system to AUI solving several requests: (SZABGAB)
+      Split view
+      Tab reordering
+      Tab close button
+    - Localization and German translation. (HJANSEN)
+    - Move the content of Padre::Wx::Dialog to Wx::Perl::Dialog 0.02 (SZABGAB)
+    - Change back the new-file hot-key to be Ctr-N again. (SZABGAB)
+    - Add experimental PPI based Perl5 syntax highlighting (FAYLAND, SZABGAB)
+    - Save cursor position between runs of Padre. (FAYLAND)
+    - Tab/space conversion menu items. (FAYLAND)
+    - Upper/Lower case conversion menu items. (FAYLAND)
+    - New icons on the toolbar adding undo/redo/cut/cop/paste/select all. (HJANSEN)
+    - Also put cut/copy/paste/select all in the edit menu and in the right click menu. (HJANSEN)
+    - Move Parrot plugin to separate distribution. (SZABGAB)
+    - Enable switching between German and English. (SZABGAB)
+
+0.15 2008.11.02
+    - Don't let opening file that is already open. (SZABGAB)
+    - Start UTF-8 support. (SZABGAB)
+    - Switch to File::ShareDir::PAR (SMUELLER)
+    - Start using File::Which to locate the perl interpreter
+      (if padre is running from a par archive). (SZABGAB)
+    - Fix the Split Window menu option to really work. (SZABGAB)
+    - Adding "Close All but Current" menu option. (SZABGAB)
+    - Add autoindentation. (SZABGAB)
+    - Set focus on windows. (SZABGAB)
+    - Before saving, check if file has changed on disk. (SZABGAB)
+    - New menu option: "Reload file". (SZABGAB)
+    - Move style definition to external yaml file. (SZABGAB)
+    - Separate highlighting definition for PASM files. (SZABGAB)
+    - Reorganize Menus (make the Perl menu really only perl specific). (SZABGAB)
+    - Allow the execution of PASM files using parrot if PARROT_PATH
+      is defined. (SZABGAB)
+    - Load Parrot::Embed if it is available. (SZABGAB)
+    - Add Padre::Plugin::Parrot to show how to use pir for plugin writing. (SZABGAB)
+    - Allow execution of Perl 6 code using Rakudo. (SZABGAB)
+    - Add copyright/license to all the .pm files as per Debian request. (SZABGAB)
+    - Ctrl-T is the default new file hot-key just as in Firefox. (ADAMK)
+    - Dialog cleanups. (SMUELLER, ADAMK, SZABGAB)
+    - Replace the toolbar icons with icons from the Tango project. (SZABGAB)
+
+0.14 2008.10.27
+    - Skip the Test::Compile test if the module is not installed. (SZABGAB)
+    - Make the add/remove Perl menu work without warnings. (ADAMK + SZABGAB)
+    - Make brace matching (Ctrl-1) jump to the matching brace. (SZABGAB)
+    - Allow preference to use tabs (or spaces) when pressing TAB. (SZABGAB)
+    - Add automatic brace highlighting during. (SZABGAB)
+
+0.13 2008.10.26
+    - fix warning when closing Padre with no files open (BRICAS)
+    - close lone unused document when opening a recent file (now works the same
+      as file->open) (BRICAS)
+    - SplitWindow widgets are now used properly (ADAMK)
+    - Show Output nows correctly hides away the output window when non-visible (ADAMK)
+    - Refactored out output window to Padre::Wx::Output (ADAMK)
+    - General refactoring pass over Padre::Wx (ADAMK)
+    - Padre::Wx forces all the Wx::wxCONSTANT values to be populated,
+      so that we don't need all the use Wx qw{ wxCONSTANT } imports (ADAMK)
+    - Make it clear in the main window title if running from SVN checkout (ADAMK)
+    - Add Padre::PluginBuilder for Padre plugins with extra build targets (SMUELLER)
+    - Create dialog abstraction in Padre::Wx::Dialog. (SZABGAB)
+    - Lots of refreshing related fixes. (SZABGAB)
+    - Create Padre::Documents to return the current or any other document object. (SZABGAB)
+    - Stop importing Wx directly in the Padre::Wx:: modules. (SZABGAB)
+    - Compile all modules if Test::Compile is available during tests. (SZABGAB)
+    - Save button on toolbar is working now when the current document needs saving. (SZABGAB)
+    - Use binmode :raw in order to help Windows when opening and writing files
+      fixing the bug that we used to change the newline types whem editing on Windows. (SZABGAB)
+    - Run Script did not work bug fixed #76 (SZABGAB)
+    - chdir to directory to be executed with Run Script #69 (SZABGAB)
+
+0.12 2008.10.23
+    - All changes below this point by SZABGAB unless noted.
+    - Stupid bugs left in 0.11 reported by Brian Cassidy.
+
+0.11 2008.10.23
+    - Updated ORLite dependency to 0.14 for create => 1 support (ADAMK)
+    - Rewrote Padre::DB to auto-configure directly from Padre::Config (ADAMK)
+    - All Padre.pm DBI code converted to Padre::DB calls (ADAMK)
+    - Removed minor use of Class::Accessor to reduce memory overhead,
+      namespace pollution and dependency count (ADAMK)
+    - Removed some superfluous code from the PIR/PASM/Perl6 documents (ADAMK)
+    - Cleaned up (and shrunk the code for) the bootstrap sequence (ADAMK)
+    - Moved the "recent files" internal state into the database (ADAMK)
+    - Removed index pointers unrelated to the IDE from Padre.pm (ADAMK)
+    - Transaction-wrap exiting to make it much much faster (ADAMK)
+    - Adding shortcut methods for popup messages/errors (ADAMK)
+    - Optimised away the non-Wx non-class Padre::Wx::Execute (ADAMK)
+    - Created Padre::Wx::History::TextDialog so we can have a dialog
+      box that defaults to whatever the last answer was. (ADAMK)
+    - Some clean up in the FindDialog window with abstraction.
+    - Add support to Module::Starter and make it to be a prereq.
+    - Add all the perl functions to the Calltip keyword list and move
+      it to a yaml file.
+    - Fix several bugs that were probably introduced after 0.10.
+    - Turn the color definition of the syntax highlighting into a hash
+      for easier maintenance.
+    - Lots of code refactoring.
+
+0.10 2008.09.22
+    - Improve the search tool (include backward search).
+    - Allow keeping the search window open (or close it and use F3).
+    - Shift-F3 to jump backwards.
+    - Add Search and Replace and global search and replace.
+    - Setup mapping of file extensions to mime-types and to color coding.
+    - Clean up the MainWindow module, move code to Document and Document::Perl.
+    - Implement an experimental PASM, PIR and Perl 6 highlighting.
+    - Allow experimental code to allow the user to execute code within Padre.
+    - Report if file could not be saved and keep it in unsaved state (bug #74).
+    - Separate the Padre::Install module from Build.PL.
+    - Set default mime-type of new files to be perl.
+    - Change mime-type when saving file to the appropriate new mime-type.
+
+0.09 2008.09.17
+    - Move various relevant menu items into a "Window" menu (ADAMK)
+    - Rename "Enable CallTip" to "Show Call Tips" for consistency (ADAMK)
+    - Adding more menu seperators to improve the visual look (ADAMK)
+    - Always show status bar on Win32, as removing it breaks (ADAMK)
+    - Added experimental Padre::Document::Perl (ADAMK)
+    - Added experimental PPI intergration (ADAMK)
+    - Experimental menu refresh closer to being usable (ADAMK)
+    - Split out Wx-related utility functions into Padre::Wx (ADAMK)
+    - Adding common platform-detection logic to Padre::Util (ADAMK)
+    - If we start with a new file and then open another one,
+      implicitly close the unused new file (ADAMK)
+    - Some dialog cleanups.
+    - Make sure we can build stand alon executable for Linux.
+    - Remove Ctrl-Shift-Z from redo as Ctrl-Y already works.
+
+0.08 2008.09.11
+    - Add Ctrl-Shift-O to open a file based on the selection in the current window.
+    - Enable ack integration even though it is not nice yet but it is working.
+    - Use real Wx:AboutDialogInfo for the about box.
+    - Hide method names (in the method window) when they don't start on the first column.
+    - Add menu option to close all buffers.
+    - Escape $ signs by default so they will not interpolate during search.
+    - Open file now opens in the directory where the current file is.
+    - Add Bookmarks.
+    - Add toolbar with several icons. Tested on Windows as well.
+    - Add icon for the application.
+    - Enable/disable regex in search.
+    - Add menu option to convert line endings.
+    - Replace relative path with full path on the command line.
+    - Implement basic CallTips and add menu option to enable/disable them.
+
+0.07 2008.09.04
+    - Allow the user to change the width ot TABs as they are displayed.
+    - Separate the code to show the preferences window to the Padre::Wx::Preferences module
+    - Separate code to Padre::Wx::Menu, Padre::Wx::Execute, Padre::Wx::Help
+    - Allow spliting windows to see two parts of the same document
+    - Add Zoom-in/Zoom-out/Zoom-reset menu options to change the zoom on all documents
+    - Allow the use of PAR files as plugins (SMUELLER)
+    - Stop jumping on selection movement in the list of methods frame.
+    - Remove Padre::Demo and distribute it separately as Wx::Perl::Dialog. Make Padre depend on it.
+    - Update the status when the mouse is moved
+    - Update status works on Windows now.
+    - Require threaded perl as there is experimental code in Padre to use ack.
+    - Depend on App::Ack.
+    - Depend on PAR.
+    - Clean up the par generation.
+    - Lots of code cleanup.
+
+0.06 2008.08.28
+    - Add some "new file" templates
+    - Temporarily remove the toolbar
+    - Change behavior of Padre::Demo, add wxer command line interface
+    - Remove Demo::App
+    - Padre::Demo add dir_selector() and password()
+    - Update list of methods on save as well #54 (vincent)
+    - Change the list of subs on the right hand side to be sorted
+    - Set Alt-S to jump to the subs list
+    - Deal with newlines in files
+    - Lots of refactoring (ADAMK)
+    - Remember that application was maximized (ADAMK)
+    - Better choice of default size (ADAMK)
+    - Adding a separate compilation test script (ADAMK)
+    - Adding a ORLite interface to the database Padre::DB (ADAMK)
+    - Include authors tests for Perl critic and POD in xt/ directory
+    - Make commenting out and uncommenting out atomic in the undo buffer
+    - Replace string search by regex search, change the GUI
+    - Add case insensitive search
+    - Limit the max number of recent files to 20
+
+0.05 2008.08.17
+    - First stab at autocompletition using Ctrl-P. (SZABGAB)
+    - Allow opening files without extensions (on non-ms-windows systems). (SZABGAB)
+    - Cleaning up to comply with perlcritic default settings. (ADAMK)
+    - Adding basic "project" support. (ADAMK)
+    - Adding Module::Inspector as prereq. (ADAMK)
+    - Replace YAML with YAML::Tiny (ADAMK)
+    - Moved bin/padre to script/padre. (ADAMK)
+    - Moving all globals into a unified object tree. (ADAMK)
+    - Created standalone Padre::Config (ADAMK)
+    - Show the filetpe in the status bar. (SZABGAB)
+    - remove Devel::PerlySense as prereq for now. (SZABGAB)
+    - List functions of the current file on the right panel. (SZABGAB)
+    - Syntax highlighting of more file types (PATSPAM)
+
+0.04 2008.08.08
+    - Add Devel::PerlySense as prereq
+    - Stop checking for wx version for now
+    - Change the create_makefile_pl to passthrough as the traditional did
+      not do the extra work done by Build.PL
+    - Mark the buffer that is unsaved with a star.
+    - Stop saving the content of the loaded file and use GetModify
+      to find out if the file has been modifyed since last save
+    - Replace the search_term by search_terms in the config file
+    - Allow remembering of search terms
+    - Replace the text dialog by a full dialog box and a Wx::ComboBox
+    - Setup http://padre.perlide.org/ using trac
+    - Move the repository to http://svn.perlide.org/padre/
+
+0.03_02 2008.08.03
+    - Add experimental code for plugins
+    - Add experimental version of Padre::Plugin::PAR
+    - Fix the shortcuts of some of the menues in windows, thanks to Octavian Rasnita
+    - Replace the AppendSubMenu calls by Append calls to support older version of wxWidgets
+
+0.03_01 2008.07.31
+    - Experimental code in Build.PL to avoid test failures when wxWidgets is too old.
+    - Added ToolBar
+    - Experimental code to install non-perl files and then use find them using File::ShareDir
+
+0.03 2008.07.28
+    - Fix many issues reported by Octavian Rasnita
+    - Rename some internal modules to get full indexing
+
+0.02 2008.07.26
+    - First public release under the name Padre
+    - Slow improvements
+    - Nothing special or ground breaking to mention
+
+0.01 2008.07.20
+    - First version

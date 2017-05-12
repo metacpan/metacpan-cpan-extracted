@@ -1,0 +1,3 @@
+1.3
+
+  - Removed Module::Build system in favor of EU::MM.

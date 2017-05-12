@@ -1,0 +1,12 @@
+name:               Parse-Yapp-KeyValue
+version:            0.10
+abstract:           parser for simple key/value pairs
+license:            perl
+version_from:       lib/Parse/Yapp/KeyValue.pm
+installdirs:        site
+build_requires:     Parse::Yapp
+requires:           Parse::Lex
+distribution_type:  module
+generated_by:       Mike Eldridge <diz@cpan.org>
+author:
+  - Mike Eldridge <diz@cpan.org>

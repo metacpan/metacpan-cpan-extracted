@@ -1,0 +1,25 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<pod xmlns="http://axkit.org/ns/2000/pod2xml">
+<head>
+<title></title>
+</head>
+<sect1>
+<title>Random test of character escaping</title>
+<para>
+This is a test to see whether or not &quot;special&quot; characters &amp; (or
+should the be &amp;?) 'quotable' characters are escaped propery!
+</para>
+<para>
+Aacute should be C1 - &#xC1;
+</para>
+<para>
+HEX &#xBB;, should be &amp;#xBB;
+OCTAL &#x3d;, should be &amp;#x3D;
+DECIMAL &#xb5;, should be &amp;#xB5;
+</para>
+<para>
+But remember! &lt; (or &lt;) and &gt; (or &gt;) must be escaped! As &amp;lt; and
+&amp;gt; respectively
+</para>
+</sect1>
+</pod>

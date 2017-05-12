@@ -1,0 +1,125 @@
+Revision history for Perl extension Puzzle.
+
+
+0.21 Tue Aug 11 12:13:17 CEST 2015
+	- Add MasonErrorMode and MasonStaticSource to MasonHandler.pm to control Mason behaviour via httpd.conf
+	- Add linkback parameter to exceptions
+
+0.20 Wed Jul 09 15:34:00 CEST 2013
+	- Sync Crud with changes in relationship introduced in 0.18
+	- Solved a problem in Args filter when value is a Resultset
+	- Solved a bug in Crud which not save changes while updating a resultset
+	- In Crud.pm now default callback is called also when create and update records
+	- Add a linkback parameter passed to exception template file
+
+0.19 Tue Sep 10 17:06:24 CEST 2013
+	- Add dependence for Log::Any::Adapter
+	- BREAK COMPATIBILITY. In $puzzle->args->set(..) the fourth arg must be an hashref of params. Replace relship with {relship => ...}
+
+0.18 Thu Jun 13 13:20:01 CEST 2013
+	- Add support for export data structure in CSV/Excel
+	- Correct a bug that print pages without frames
+	- Add a debug_path parameter to configuration
+	- Now you can use Puzzle->log to log info to debug_path file if defined
+	- Add support for conversion of DBIx::Class::Row in template
+	- Add a component for CRUD DB operations
+	- db is now an alias for dbh
+	- Rename Puzzle::Template::DBIxClassConverter into Puzzle::DBIx::ClassConverter
+	- Now it's possible to select which DBIx::Class relationship to add automatically to args
+	- Solved a bug in Args and Post
+	- Add a global static instance method to retrieve current Puzzle instance from outside components.
+	- Now isGid template function works.
+
+0.17 Wed Jan  2 16:33:16 CET 2013
+	- Fix a static error code. Now Puzzle::Exception used.
+	- In Puzzle::Args, now we accept key => DBIx::Class::Resultset where key superset default table name key
+	- We now follow db relationships in creating template args.
+
+0.16 Fri Dec 21 12:02:43 CET 2012
+    - Some optimization in building parameters for template
+	- Puzzle::Args::set now accept only permitted structure (scalar, hashref,...)
+	- Puzzle::Args::set now accept DBIx::Class::Resultset and DBIx::Class::Row using Template converter to automatically convert it in a template complatible structure
+	- Add a return 0 to raise exception function
+	- Some optimization in Puzzle::Template::DBIxClassConverter
+
+0.15 Wed Dec 19 15:24:56 CET 2012
+    - Add a Template Converter to automatically include DBIx::Class resultset and rows in the Template.
+	- Solved a bug in Template.pm
+
+0.14 Tue dic 18 18:21:18 CET 2012
+	- Add exception_file configuration parameter to set a default web page to print exceptions
+	- Some optimization in language selection manager
+	- Compatibility problem in yaml translation language file. Now translations MUST BE hashs of "t" key. Add t: to you previous yaml file and indent all keys.
+	- Add Puzzle::Exception to raise html errors.
+
+0.13 Tue Dec 18 11:38:16 CET 2012
+	- All Mason parameters are now configurable by httpd.conf
+	- Solved a bug in language files.
+
+0.12 Mon Dec 17 12:35:00 CET 2012
+	- Add support to detect mobile browser and support for .mobile.htt file
+	- Add support to yaml translation language file
+
+0.11 Wed Dec 12 10:50:30 CET 2012
+	- Add support for http-equiv="refresh" meta tag that now it's added in building page if present in a block
+
+0.10
+	- Add schema in configuration file for supporting dumping schema in DBIx::Class::Schema::Loader.
+
+0.09
+	- Add rs2hash() that return an hashref where every key is the primary key value or a contatenation of primary keys and value is an hashref with record elements
+	- Now row2hash and rs2aoh has a new optional parameter to include virtual or aliases columns
+
+0.08  Sun Mar 13 22:40:56 CET 2011
+	- Remove class Puzzle::Loader. Included its functions in Puzzle::DBI.
+
+0.07  Wed Feb  9 16:36:45 CET 2011
+	- Add an optional parameter to Puzzle::Template::printct and sprintct to force
+		return a serialize type also with another content-type to return, as an
+		example, a JSON structure also if content-type is text/html
+	- Removed a bug that makes it think there is a mason error when it's not true.
+
+0.06  Mon Jan 31 19:55:52 CET 2011
+	- Add a script to create folders and files minimum structure
+	- Change httpd.conf documentation to deny access to internal files
+	- In config.yaml mail parameter is now optional.
+	- SessionFake.pm renamed in Session/Fake.pm
+
+0.05  Mon Jan 31 15:21:49 CET 2011
+	- Now database connection is not a mandatory. You can use Puzzle without
+		a database connection configure db.enabled new config.yaml parameter
+		to 0. Default is 1 for compatibility mode.
+	- Logic for disconnecting to database has been included at the end of 
+		process_request according to enabled and persistent connection 
+		settings in config.yaml
+	- Add a placeholder Puzzle root namespace module.
+
+0.04  Mon Jan 31 00:35:12 CET 2011
+	- When uploaded previous version to CPAN we found that CPAN found a conflict
+		in local package HTML::Mason::Cammands. To avoid we create a simple 
+		replacement to HTML::Mason::Request and use this as local package in
+		Puzzle::MasonHandler
+
+0.03  Sun Jan 30 23:38:10 CET 2011
+    - BREAK COMPATIBILITY. Now, in your template, the content of the loaded
+		page must be called "%frame_center%" where you have "%body%"
+	- BREAK COMPATIBILITY. Now, in your template, if you want debug 
+		debug information, you need to add "%frame_debug%" instead of
+		"%debug%"
+	- Add a sample folder with examples css and js for debug frame layout.
+	- Add module dump in debug module
+	- Now all frames have visibility of the title of the center page.
+	- BREAK COMPATIBILITY. The config parameters for frames template path 
+	  	has now called frame_top_file, frame_right_file and so on.
+	- Now base template has visibility on all framework template parameters.
+	- BREAK COMPATIBILITY. Change the parameter name in config.yaml to set a 
+		pseudoframes website or not. Name changes from italian "cornice" into
+		"frames".
+
+0.02  Sat Jan 29 20:47:11 CET 2011
+ 	- first public distribution.
+
+0.01  Mon Dec  6 11:42:05 2010
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Puzzle
+

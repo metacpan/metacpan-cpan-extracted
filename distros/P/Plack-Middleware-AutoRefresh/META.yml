@@ -1,0 +1,35 @@
+---
+abstract: 'Reload pages in browsers when files are modified'
+author:
+  - 'Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.011, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-AutoRefresh
+provides:
+  Plack::Middleware::AutoRefresh:
+    file: lib/Plack/Middleware/AutoRefresh.pm
+    version: '0.09'
+requires:
+  AnyEvent: '0'
+  AnyEvent::Filesys::Notify: '0'
+  File::ShareDir: '0'
+  File::Slurp: '0'
+  JSON::Any: '0'
+  Plack: '0'
+  Readonly: '0'
+resources:
+  bugtracker: http://github.com/mvgrimes/Plack-Middleware-AutoRefresh/issues
+  repository: http://github.com/mvgrimes/Plack-Middleware-AutoRefresh.git
+version: '0.09'
+x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

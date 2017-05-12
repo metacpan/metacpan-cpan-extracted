@@ -1,0 +1,7 @@
+$Header: /Users/matisse/Desktop/CVS2GIT/matisse.net.cvs/Perl-Metrics-Simple/EXAMPLES,v 1.1 2007/05/20 16:02:27 matisse Exp $
+
+Examples of using  Perl::Metrics::Simple
+
+See the  countperl  script in the bin/ directory of this
+distribution. It will be automatically installed when you
+install this distro. (See the INSTALL file.)

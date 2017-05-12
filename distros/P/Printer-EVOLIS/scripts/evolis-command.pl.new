@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use POSIX;
+use Data::Dump qw(dump);
+
+my $dev = '/dev/usb/lp0';
+my $debug = 0;
+
+$|=1;
+print "command> ";
+while(<STDIN>) {
+	chomp;
+
+	open( my $parallel, $dev ) || die "$dev: $!";
+
+	my $send = "\e$_\r";
+
+	warn "#>> ",dump($send),$/ if $debug;
+	print $parallel $send;
+#	warn "# short write $l < ", length($send) if $l < length($send);
+	$parallel->sync;
+
+	# FIXME we need to reopen parallel port between send and receive?
+
+	my $response;
+	my $byte;
+	while( sysread $parallel, $byte, 1 ) {
+#		last if $byte eq "\x00";
+		$response .= $byte;
+		warn "#<< ",dump($byte),$/ if $debug;
+	}
+	close($parallel);
+
+	print "<answer ",dump($response),"\ncommand> ";
+
+}
+

@@ -1,0 +1,33 @@
+Revision history for PERLANCAR-Module-List
+
+0.003005 2016-03-17 (PERLANCAR)
+
+	- [Bugfix] Make module work under perl < 5.10.
+
+
+0.003004 2016-03-15 (PERLANCAR)
+
+	- Add option: all.
+
+	- [Bugfix] Didn't return path when return_path=>1 and list_pod=>1 &
+	  use_pod_dir=>1.
+
+	- Support 5.006 back.
+
+
+0.003003 2016-01-21 (PERLANCAR)
+
+         - [Bugfix] Don't assign to result multiple times, overriding the first
+           path found (when 'return_path' is true).
+
+         - Bump minimum perl version to 5.10.1 because defined-or is easy.
+
+
+0.003002 2016-01-20 (PERLANCAR)
+
+         - First release.
+
+
+0.003001 2015-08-11 (PERLANCAR)
+
+         - First release.

@@ -1,0 +1,57 @@
+Revision history for Perl module Proc::Pidfile
+
+1.06 2014-07-07 NEILB
+    - getppid() not supported on Win32 and RISC OS, so now we check if
+      we're running those OSes, and don't don't it if we are.
+    - Two of the tests loop looking for free or used PIDs. But in some
+      situations they can loop infinitely, so now guard against this.
+      I think this will prevent the hang on Windows in RT#96998,
+      but dealing with this properly needs more investigation and work.
+
+1.05 2014-07-06 NEILB
+    - The testsuite was trying to create files with 'Proc::Pidfile' in the
+      name, which Windows didn't like. CPAN Testers++
+
+1.04 2014-07-05 NEILB
+    - Testsuite was still using Proc::ProcessTable, which meant that the
+      change in 1.02 would result in failed tests if you didn't already
+      have Proc::ProcessTable installed. Refactored testsuite.
+
+1.03 2014-07-05 NEILB
+    - Check whether operations on the pid file (read, write, lock, close)
+      are successful, and croak if not.
+      Thanks to John Tantalo for RT#67589.
+
+1.02 2014-07-04 NEILB
+    - Use kill(0,$pid) to check whether process is still running,
+      rather than using Proc::ProcessTable. Apart from on RISC OS.
+      DEPESZ++ for RT#56630.
+
+1.01 2014-07-02 NEILB
+    - Moved Pidfile.pm to lib/Proc/Pidfile.pm
+    - Reformatted this file as per CPAN::Changes::Spec
+    - Changed used of die() to croak(), apart from inside DESTROY,
+      since in 5.14+, die inside DESTROY doesn't work how you might expect.
+      RT#66873
+    - Switched to Dist::Zilla
+    - Added github repo to pod
+
+1.005 2006-09-27 AWRIGLEY
+    - added pidfile to "already running" message
+
+1.004 2004-06-21 AWRIGLEY
+    - use Proc::ProcessTable instead of kill 0
+
+1.003 2004-04-01 AWRIGLEY
+    - 1 char change to POD talk about minimal release!
+
+1.002 2004-04-01 AWRIGLEY
+    - minor POD changes, and fixed test that was checking for exit status
+
+1.001 2003-10-21 AWRIGLEY
+    - added README and Changes
+    - changed default pidfile to /var/run or $tmpdir
+
+1.000 2003-10-21 AWRIGLEY
+    - First release to CPAN
+

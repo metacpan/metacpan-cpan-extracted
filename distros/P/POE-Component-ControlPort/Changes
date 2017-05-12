@@ -1,0 +1,162 @@
+------------------------------------------------------------------------
+r265 | sungo | 2004-05-09 22:20:03 -0400 (Sun, 09 May 2004) | 1 line
+
+add tests for network functionality
+------------------------------------------------------------------------
+r263 | sungo | 2004-05-09 18:27:04 -0400 (Sun, 09 May 2004) | 1 line
+
+remove test permission marker if Makefile.PL is run a second time and permission is not given
+------------------------------------------------------------------------
+r262 | sungo | 2004-05-09 18:01:34 -0400 (Sun, 09 May 2004) | 1 line
+
+add beginning of full function tests by adding the big global skip block
+------------------------------------------------------------------------
+r261 | sungo | 2004-05-09 17:58:03 -0400 (Sun, 09 May 2004) | 1 line
+
+avoid warnings
+------------------------------------------------------------------------
+r260 | sungo | 2004-05-09 17:56:43 -0400 (Sun, 09 May 2004) | 1 line
+
+finish off constructor tests
+------------------------------------------------------------------------
+r256 | sungo | 2004-05-08 22:33:40 -0400 (Sat, 08 May 2004) | 1 line
+
+beginning of create tests
+------------------------------------------------------------------------
+r255 | sungo | 2004-05-08 22:33:30 -0400 (Sat, 08 May 2004) | 1 line
+
+record number of tests
+------------------------------------------------------------------------
+r252 | sungo | 2004-05-07 23:06:57 -0400 (Fri, 07 May 2004) | 1 line
+
+tests for DebugShell command loading
+------------------------------------------------------------------------
+r248 | sungo | 2004-05-03 21:57:00 -0400 (Mon, 03 May 2004) | 1 line
+
+tests for help output
+------------------------------------------------------------------------
+r244 | sungo | 2004-05-02 21:08:15 -0400 (Sun, 02 May 2004) | 1 line
+
+add in Changes files and rebuild meta files
+------------------------------------------------------------------------
+r242 | sungo | 2004-04-27 21:43:46 -0400 (Tue, 27 Apr 2004) | 1 line
+
+add tests for status and the beginnings of tests for help
+------------------------------------------------------------------------
+r241 | sungo | 2004-04-27 20:11:22 -0400 (Tue, 27 Apr 2004) | 1 line
+
+clean up command tests a little bit
+------------------------------------------------------------------------
+r240 | sungo | 2004-04-26 22:40:51 -0400 (Mon, 26 Apr 2004) | 1 line
+
+add Command::run() tests
+------------------------------------------------------------------------
+r239 | sungo | 2004-04-25 22:42:11 -0400 (Sun, 25 Apr 2004) | 1 line
+
+beginnings of tests
+------------------------------------------------------------------------
+r238 | sungo | 2004-04-25 20:28:45 -0400 (Sun, 25 Apr 2004) | 1 line
+
+always say Done. after a cmd for an easy eof marker. yay for parseability.
+------------------------------------------------------------------------
+r237 | sungo | 2004-04-25 18:25:16 -0400 (Sun, 25 Apr 2004) | 1 line
+
+ask about running network based tests. drop file on disk to indicate we should run these tests if user says so.
+------------------------------------------------------------------------
+r236 | sungo | 2004-04-25 17:39:45 -0400 (Sun, 25 Apr 2004) | 1 line
+
+add in a less basic example. remove placeholder file
+------------------------------------------------------------------------
+r235 | sungo | 2004-04-25 17:31:05 -0400 (Sun, 25 Apr 2004) | 1 line
+
+use defined instead of truth to figure out if the user asked us to print out something
+------------------------------------------------------------------------
+r234 | sungo | 2004-04-25 16:23:23 -0400 (Sun, 25 Apr 2004) | 1 line
+
+add documentation about how to print stuff out to the user
+------------------------------------------------------------------------
+r233 | sungo | 2004-04-25 16:23:05 -0400 (Sun, 25 Apr 2004) | 1 line
+
+remove crappy old use lib from example
+------------------------------------------------------------------------
+r232 | sungo | 2004-04-25 14:57:32 -0400 (Sun, 25 Apr 2004) | 1 line
+
+more documentation.
+------------------------------------------------------------------------
+r230 | sungo | 2004-04-25 11:49:02 -0400 (Sun, 25 Apr 2004) | 1 line
+
+some version number corrections. add docs about creating commands in controlports
+------------------------------------------------------------------------
+r225 | sungo | 2004-04-24 17:03:13 -0400 (Sat, 24 Apr 2004) | 1 line
+
+switch the version numbers all over to use svn kewords. this will probably cause some cpan pain this once but after this all should be well
+------------------------------------------------------------------------
+r224 | sungo | 2004-04-24 16:44:16 -0400 (Sat, 24 Apr 2004) | 1 line
+
+switch everythign back to Makemaker. generate META.yml files. some general polishing of dist files
+------------------------------------------------------------------------
+r222 | sungo | 2004-04-24 13:55:11 -0400 (Sat, 24 Apr 2004) | 2 lines
+
+add keyword interpolation
+
+------------------------------------------------------------------------
+r221 | sungo | 2004-04-24 13:42:25 -0400 (Sat, 24 Apr 2004) | 2 lines
+
+test cia with a little whitespace commit
+
+------------------------------------------------------------------------
+r220 | sungo | 2004-04-24 13:39:22 -0400 (Sat, 24 Apr 2004) | 2 lines
+
+update poe version in makefile
+
+------------------------------------------------------------------------
+r219 | sungo | 2004-04-24 13:26:23 -0400 (Sat, 24 Apr 2004) | 2 lines
+
+add .svn to all skip lists
+
+------------------------------------------------------------------------
+r216 | sungo | 2004-04-03 21:44:27 -0500 (Sat, 03 Apr 2004) | 2 lines
+
+fix the debug commands call
+
+------------------------------------------------------------------------
+r215 | sungo | 2004-04-03 21:36:06 -0500 (Sat, 03 Apr 2004) | 2 lines
+
+add some more docs. extract the poe::api::peek commands into the DefaultCommands module
+
+------------------------------------------------------------------------
+r214 | sungo | 2004-04-03 19:31:24 -0500 (Sat, 03 Apr 2004) | 2 lines
+
+update debug shell version to actually released dist number
+
+------------------------------------------------------------------------
+r212 | sungo | 2004-03-06 23:37:16 -0500 (Sat, 06 Mar 2004) | 2 lines
+
+update manifest
+
+------------------------------------------------------------------------
+r211 | sungo | 2004-03-06 23:36:38 -0500 (Sat, 06 Mar 2004) | 2 lines
+
+add some docs
+
+------------------------------------------------------------------------
+r210 | sungo | 2004-03-06 21:27:38 -0500 (Sat, 06 Mar 2004) | 2 lines
+
+add license
+
+------------------------------------------------------------------------
+r207 | sungo | 2004-03-06 20:21:11 -0500 (Sat, 06 Mar 2004) | 2 lines
+
+add code folds. add poe debug ability if the right version of POE::Component::DebugShell exists
+
+------------------------------------------------------------------------
+r204 | sungo | 2004-03-06 19:27:34 -0500 (Sat, 06 Mar 2004) | 2 lines
+
+yay working code.
+
+------------------------------------------------------------------------
+r192 | sungo | 2004-02-26 19:07:35 -0500 (Thu, 26 Feb 2004) | 2 lines
+
+Initial revision
+
+------------------------------------------------------------------------

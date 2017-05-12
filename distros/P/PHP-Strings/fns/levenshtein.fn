@@ -1,0 +1,6 @@
+docs: |
+    I have no idea why PHP has this function.
+
+    See L<Text::Levenshtein>, L<Text::LevenshteinXS>, L<String::Approx>,
+    L<Text::PHraseDistance> and probably any number of other modules on
+    CPAN.

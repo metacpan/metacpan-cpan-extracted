@@ -1,0 +1,17 @@
+Revision history for POE-Component-NonBlockingWrapper-Base
+
+1.001002   2015-03-09
+        - Modified POD to mention the GitHub repo and new preferred
+            bug tracker
+
+1.001001   2015-03-09
+        - Converted to Dist::Zilla and made some cosmetic changes
+          to dist packaging and code. No functional changes.
+
+0.002   2008-03-25
+        - Changed some things to be more ergonomic in
+          "DOCUMENTATION FOR YOUR MODULE" section of the docs
+
+0.001   2008-03-22
+        - First version, released on an unsuspecting world.
+

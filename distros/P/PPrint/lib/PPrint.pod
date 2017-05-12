@@ -1,0 +1,166 @@
+# -*- cperl -*-
+
+=head1 NAME
+
+PPrint - Programmable sprintf. Allows you to associate functions to
+directives and supplies fairly powerful default directives.
+
+=head1 SYNOPSIS
+
+  use PPrint;
+
+  pprint("~2r", 8) => "1000"
+
+=head1 DESCRIPTION
+
+=head1 DIRECTIVES
+
+PPrint provides a number of default directives.
+
+=head2 R
+
+C<~RADIX,MINCOL,PADCHAR,COMMAINTERVAL,COMMCHAR:;!R>
+
+Generic integer formating.
+
+Parameters:
+
+=over 4
+
+=item C<RADIX>
+
+Specifies the radix to use, values between 1 and 36 (inclusive) are
+allowed. Defaults to 10.
+
+=item <MINCOL>
+
+Minimum numbers of columns to use. Defaults to 0.
+
+=item <PADCHAR>
+
+If the length of the number is less than C<MINCOL> extra C<PADCHAR>
+chars will be added to the left of the string in order to make it
+C<MINCOL> columns long. Defaults to '0'.
+
+=item <COMMAINTERVAL>
+
+Specifies how many chars should be between commas. Default is 3.
+
+=item C<COMMACHAR>
+
+Specifies which character to use instead of ',' when splitting a large
+number. Default is ','.
+
+=back
+
+Flags:
+
+=over 4
+
+=item C<:>
+
+Seperate the number using C<COMMACHAR> chars at intervals
+C<COMMAINTERVAL> chars.
+
+=item C<;>
+
+Always put the sign of the number. The effect of this flag is to add a
+'+' to positive numbers.
+
+=item C<!>
+
+Add padding chars to the right instead of the left.
+
+=back
+
+=head2 D
+
+C< ~MINCOL,PADCHAR,COMMAINTERVAL,COMMACHAR:;!D>
+
+Same as C<R> directive with C<RADIX = 10>.
+
+=head2 O
+
+C< ~MINCOL,PADCHAR,COMMAINTERVAL,COMMACHAR:;!O>
+
+Same as C<R> directive with C<RADIX = 8>.
+
+=head2 X
+
+C< ~MINCOL,PADCHAR,COMMAINTERVAL,COMMACHAR:;!X>
+
+Same as C<R> directive with C<RADIX = 16>.
+
+=head2 B
+
+C<~MINCOL,PADCHAR,COMMAINTERVAL,COMMACHAR:;!X>
+
+Same as C<R> directive with C<RADIX = 2>.
+
+=head2 n
+
+C<~REPEAT,TYPEn>
+
+Prints newlines.
+
+Note that this directive consumes no elements from the arg list,
+unless C<'v> is used for C<REPEAT> or C<TYPE> of course.
+
+Parameters:
+
+=over 4
+
+=item C<REPEAT>
+
+Specifes how many newlines to write. Default is 1.
+
+=item C<TYPE>
+
+Specifes which type of newline to write. C<'u> => unix (chr 0x0A), C<'d>
+=> dos (chr(x0D) . chr(0x0A)), "m" => mac (chr 0x0D).
+
+=back
+
+=head2 ~
+
+C<~REPEAT~>
+
+Prints tilde chars.
+
+Parameter:
+
+=over 4
+
+=item C<REPEAT>
+
+Speciifes the number of tilde chars to print. Default is 1.
+
+=back
+
+=head2 S
+
+C<~S>
+
+Printing strings, just like sprintf("%s", $arg);
+
+=head2 A
+
+C<~INDENT_STYLE,PURITY,USEQQ,TERSE,DEEPCOPY,QUOTEKEYS,MAXDEPTH A>
+
+Print with Data::Dumper. see the Data::Dumper man page for what the
+various options mean.
+
+=head1 WRITING DIRECTIVES
+
+One of the main reasons C<PPrint> was written was to provide a way to
+customize how data should be printed, to this end PPrint can be
+extended to understand new directives.
+
+FIXME: Describe it here. In the mean time look at the tilde and n
+directives.
+
+=head1 CREDITS
+
+Ideas liberally taken from Common Lisp's format directive.
+
+=cut

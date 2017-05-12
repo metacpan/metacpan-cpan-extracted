@@ -1,0 +1,28 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [-Sah::Schemas]
+
+DESCRIPTION
+
+    This plugin is used when building a Sah::Schemas::* distribution. It
+    currently does the following to lib/Sah/Schemas/* .pm files:
+
+      * Create "SAH SCHEMAS" POD section from list of Sah::Schema::*
+      modules in the distribution
+
+      * Mention some modules in See Also section
+
+      e.g. Sah and Data::Sah.
+
+    It does the following to "Sah/Schema/*" in lib .pm files:
+
+      * Add "DESCRIPTION" POD section schema's description
+
+SEE ALSO
+
+    Sah and Data::Sah
+
+    Dist::Zilla::Plugin::Sah::Schemas
+

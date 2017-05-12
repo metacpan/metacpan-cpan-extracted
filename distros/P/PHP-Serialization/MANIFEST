@@ -1,0 +1,16 @@
+Changes
+lib/PHP/Serialization.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01use.t
+t/02basic.t
+t/03largeints.t
+t/04arraysRT21218.t
+t/05RT24441.t
+t/06bool_deserializeRT45024.t
+t/07croak.t
+t/08incompletestringRT44700.t
+t/09floatindexRT42029.t
+t/10intRT48594.t
+META.yml                                 Module meta-data (added by MakeMaker)

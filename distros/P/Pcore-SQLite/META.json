@@ -1,0 +1,54 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "zdm <zdm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "CPAN::Meta version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "version" : 2
+   },
+   "name" : "Pcore-SQLite",
+   "no_index" : {
+      "directory" : [
+         "share",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "v0.39.0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "v1.51.0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "Pcore" : "v0.22.2",
+            "Pcore::DBH" : "v0.1.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/softvisio/pcore-sqlite/issues?status=new&status=open"
+      },
+      "homepage" : "https://bitbucket.org/softvisio/pcore-sqlite/overview",
+      "repository" : {
+         "type" : "hg",
+         "url" : "https://bitbucket.org/softvisio/pcore-sqlite",
+         "web" : "https://bitbucket.org/softvisio/pcore-sqlite/overview"
+      }
+   },
+   "version" : "v0.8.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

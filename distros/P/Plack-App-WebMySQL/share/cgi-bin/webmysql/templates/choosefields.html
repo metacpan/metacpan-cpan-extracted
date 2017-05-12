@@ -1,0 +1,29 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="/webmysql-<!--version-->/main.css" title="Main">
+		<title>WebMySQL: Chose fields</title>
+	</head>
+	<body>
+		<table align="center" bgcolor="#8899DD" width="100%" border="1">
+			<tr>
+				<th><a href="<!--self-->?key=<!--key-->&amp;action=query">Query</a></th>
+				<th><a href="<!--self-->?key=<!--key-->&amp;action=managetables">Manage tables</a></th>
+				<th><a href="<!--self-->?key=<!--key-->&amp;action=managedatabases">Manage databases</a></th>
+				<th><a href="<!--self-->?key=<!--key-->&amp;action=serverinfo">Server information</a></th>
+				<th><a href="<!--self-->?key=<!--key-->&amp;action=logout">Logout</a></th>
+			</tr>
+		</table>
+		<p>Please select the fields you wish the query to return.</p>
+		<form action="<!--self-->" method="POST">
+			<input type="hidden" name="key" value="<!--key-->">
+			<input type="hidden" name="action" value="choosecriteria">
+			<table border="1" align="center" bgcolor="#8899DD">
+				<!--fieldlist-->
+			</table>
+			<br>
+			<table align="center" bgcolor="#8899DD" border="1">
+				<tr><td><input type="submit" value="Continue"></td></tr>
+			</table>
+		</form>
+	</body>
+</html>

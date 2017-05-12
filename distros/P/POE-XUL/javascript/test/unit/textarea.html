@@ -1,0 +1,377 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title> Unit test file</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <script src="../../lib/prototype.js" type="text/javascript"></script>
+  <script src="../../src/util.js" type="text/javascript"></script>
+  <script src="../../src/formated.js" type="text/javascript"></script>
+  <script src="../../src/formatedinput.js" type="text/javascript"></script>
+  <script src="../../src/formatedarea.js" type="text/javascript"></script>
+  <script src="../../lib/unittest.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="../test.css" type="text/css" />
+</head>
+<body>
+
+<h1>FormatedInput input Unit Tests</h1>
+
+<!-- Log output -->
+<div id="testlog"> </div>
+
+<div id="formated">
+<form>
+<textarea id="hello" cols="50" rows="10"></textarea>
+</form>
+
+<!-- Tests follow -->
+<script type="text/javascript" language="javascript" charset="utf-8">
+//<![CDATA[
+
+var area1 = { C: [ { cols: 20, format: '{2x20}', full_re: '.{0,20}\n.{0,20}\n',
+                     leading: '', length: 42, rows: 2 
+                 } ] 
+            };
+var area2 = { C: [ { cols: 30, format: '{4x30}', full_re: '.{0,30}\n.{0,30}\n.{0,30}\n',
+                     leading: '', length: 63, rows: 3, streamlines: 1
+                 } ] 
+            };
+
+function mk_event ( key ) {
+    return { charCode: key.charCodeAt( 0 ) };
+}
+
+new Test.Unit.Runner({
+    // --------------------------------------------------------------
+    testArea: function() { with(this) {
+
+        var fi = new FormatedArea( 'hello', area1 );
+        assert( fi );
+        assertInstanceOf( FormatedArea, fi );
+
+        var E = fi.input();
+        assertNotNull( E, "Got the input" );
+
+        // --------------------------------------------
+        E.value = '';
+        E.selectionStart = E.selectionEnd = 0;
+
+        var e = mk_event( 'H' );
+        var def = fi.keypress( e );
+        assert( !def, "FI did it" );
+        assertEqual( 'H', E.value, "One key" );
+
+        e = mk_event( '0' );
+        def = fi.keypress( e );
+        assert( !def, "FI did it" );
+        assertEqual( 'H0', E.value, "Two key" );
+
+        e = mk_event( 'h' );
+        def = fi.keypress( e );
+        assert( !def, "FI did it" );
+        assertEqual( 'H0h', E.value, "Red key" );
+
+        e = mk_event( ' ' );
+        fi.keypress( e );
+        assertEqual( 'H0h ', E.value, "Blue key" );
+
+        e = mk_event( '0' );
+        fi.keypress( e );
+        assertEqual( 'H0h 0', E.value, "Blue key" );
+
+        e = mk_event( 'H' );
+        fi.keypress( e );
+        assertEqual( 'H0h 0H', E.value, "More key" );
+
+        e = mk_event( '0' );
+        fi.keypress( e );
+        assertEqual( 'H0h 0H0', E.value, "Last key" );
+
+
+        e = mk_event( "\n" );
+
+        fi.keypress( e );
+        assertEqual( 'H0h 0H0\n', E.value, "Enter key" );
+
+        e = mk_event( "b" );
+        fi.keypress( e );
+        assertEqual( 'H0h 0H0\nb', E.value, "Next line" );
+
+        e = mk_event( "o" );
+        fi.keypress( e );
+        assertEqual( 'H0h 0H0\nbo', E.value, "Next line" );
+
+        e = mk_event( "n" );
+        fi.keypress( e );
+        assertEqual( 'H0h 0H0\nbon', E.value, "Next line" );
+
+        e = mk_event( "k" );
+        fi.keypress( e );
+        assertEqual( 'H0h 0H0\nbonk', E.value, "Next line" );
+
+        e = mk_event( "\n" );
+        fi.keypress( e );
+        assertEqual( 'H0h 0H0\nbonk', E.value, "No more lines" );
+
+        e = mk_event( "\n" );
+        fi.keypress( e );
+        assertEqual( 'H0h 0H0\nbonk', E.value, "No more lines" );
+
+        // --------------------------------------------
+        E.value = "01234567890123456789";
+
+        e = mk_event( "0" );
+        fi.keypress( e );
+        assertEqual( '01234567890123456789\n0', E.value, "Line limit" );
+        
+        fi.keypress( e );
+        assertEqual( '01234567890123456789\n00', E.value, "End of the line" );
+
+        e = mk_event( "1" );
+        fi.keypress( e );
+        assertEqual( '01234567890123456789\n001', E.value, "New line" );
+
+        // --------------------------------------------
+        E.value = "012345678901234567890\n";
+
+        e = mk_event( "0" );
+        fi.keypress( e );
+        assertEqual( '012345678901234567890\n0', E.value, "New line (edge case)" );
+
+        // --------------------------------------------
+        E.value = "01234567890123456789\n0123456789012345678";
+
+        e = mk_event( "0" );
+        fi.keypress( e );
+        assertEqual( '01234567890123456789\n01234567890123456780', E.value, "Last char" );
+
+        fi.keypress( e );
+        assertEqual( '01234567890123456789\n01234567890123456780', E.value, "Already full" );
+
+
+        // --------------------------------------------
+        E.value = "012345678901234567890\n01234567890123456789";
+
+        E.selectionStart = E.selectionEnd = 5;
+        e = mk_event( "0" );
+        fi.keypress( e );
+        assertEqual( '012340567890123456789\n01234567890123456789', E.value, "Insert into full line" );
+
+        // --------------------------------------------
+        // insert
+        E.value =    "012345678901234567890";
+        E.selectionStart = E.selectionEnd = 5;
+        
+        e = mk_event( "0" );
+        fi.keypress( e );
+        assertEqual( '012340567890123456789', E.value, "Full line" );
+
+        E.selectionStart = 5;
+        E.selectionEnd = 6;
+        
+        e = mk_event( "x" );
+        def = fi.keypress( e );
+        assert( !def, "Don't bubble up" );
+        assertEqual( '01234x567890123456789', E.value, "Substitute one" );
+
+        E.selectionStart = 5;
+        E.selectionEnd = 11;
+        
+        e = mk_event( "y" );
+        def = fi.keypress( e );
+        assert( !def, "Don't bubble up" );
+        assertEqual( '01234y0123456789', E.value, "Substitute one" );
+
+        // --------------------------------------------
+        E.value = "012345678901234567890\n012345678901234567890";
+
+        E.selectionStart = E.selectionEnd = 5;
+        e = mk_event( "\n" );
+        fi.keypress( e );
+        assertEqual( '012345678901234567890\n012345678901234567890', E.value, "Insert into full line" );
+
+        E.selectionStart = 5;
+        E.selectionEnd = 10;
+
+        def = fi.keypress( e );
+        assert( !def, "Don't bubble up" );
+        assertEqual( '012345678901234567890\n012345678901234567890', E.value, "Insert into full line" );
+
+        E.selectionStart = 15;
+        E.selectionEnd = 25;
+
+        def = fi.keypress( e );
+        assert( !def, "Don't bubble up" );
+        assertEqual( '012345678901234567890\n012345678901234567890', E.value, "Insert into full line" );
+
+        e = mk_event( "0" );
+        E.selectionStart = 15;
+        E.selectionEnd = 25;
+
+        def = fi.keypress( e );
+        assert( !def, "Don't bubble up" );
+        assertEqual( '0123456789012340\n012345678901234567890', E.value, "Insert into full line" );
+
+        // --------------------------------------------
+        // insert newline
+        E.value = "012345678901234567890";
+        E.selectionStart = E.selectionEnd = 5;
+        
+        e = mk_event( "\n" );
+        fi.keypress( e );
+        assertEqual( '01234\n5678901234567890', E.value, "Insert newline" );
+
+        E.value = "012345678901234567890";
+        E.selectionStart = 5;
+        E.selectionEnd = 6;
+        
+        e = mk_event( "\n" );
+        fi.keypress( e );
+        assertEqual( '01234\n678901234567890', E.value, "Insert newline" );
+        fi.keypress( e );
+        assertEqual( '01234\n678901234567890', E.value, "But only one" );
+
+
+        // --------------------------------------------
+        // insert char
+        E.value = "012345678901234567890";
+        E.selectionStart = E.selectionEnd = 5;
+        
+        e = mk_event( "e" );
+        fi.keypress( e );
+        assertEqual( '01234e567890123456789', E.value, "Insert char" );
+
+
+        // --------------------------------------------
+        // backspace
+        e = mk_event( "\b" );
+
+        E.value = "1234 1234\n1234 1234";
+        E.selectionStart = E.selectionEnd = 10;
+        var ret = fi.keypress( e );
+        assertEqual( true, ret, E.value, "Remove a newline; normal" );
+
+        E.value = "1234 6789 1234\n4321 1234 1234";
+        E.selectionStart = E.selectionEnd = 15;
+        ret = fi.keypress( e );
+        assertEqual( false, ret, "We handled it" );
+        assertEqual( "1234 6789 12344321\n 1234 1234",
+                     E.value, "Remove a newline; joined" );
+
+        assertEqual( 14, E.selectionStart, " ... before newline" );
+
+        ret = fi.keypress( e );
+        assertEqual( true, ret, " ... which would be a normal backspace" );
+
+        E.selectionStart = E.selectionEnd = 0;
+        ret = fi.keypress( e );
+        assertEqual( true, ret, "Backspace at begining" );
+
+        // backspace + deleting
+        E.value = "1234 6789 1234\n4321 1234 1234";
+        E.selectionStart = 15;
+        E.selectionEnd = 20;
+        ret = fi.keypress( e );
+        assertEqual( false, ret, "We handled it" );
+        assertEqual( "1234 6789 1234\n1234 1234",
+                     E.value, "Remove a newline; drop + joined" );
+
+        // backspace + deleting
+        E.value = "1234 9876\n4321 honk 1234";
+        E.selectionStart = 8;
+        E.selectionEnd = 16;
+        ret = fi.keypress( e );
+        assertEqual( false, ret, "We didn't handle it" );
+        assertEqual( "1234 9876\nonk 1234",
+                     E.value, "Remove a newline; drop + joined" );
+
+        // --------------------------------------------
+        // Delete
+        e = mk_event( " " );
+        e.charCode = 0;
+        e.which = 0;
+        e.keyCode = Event['DOM_VK_DELETE']
+        assertNotEqual( 0, e.keyCode, "DOM_VK_DELETE" );
+
+        E.value = "1234 1234\n1234 1234";
+        E.selectionStart = E.selectionEnd = 5;
+        ret = fi.keypress( e );
+        assertEqual( "1234 234\n1234 1234",
+                     E.value, "Delete after" );
+
+        E.value = "1234 6789\nhonk zipr";
+        E.selectionStart = 5;
+        E.selectionEnd = 9;
+        ret = fi.keypress( e );
+        assertEqual( "1234 \nhonk zipr",
+                     E.value, "Delete block" );
+
+        E.value = "1234 6789\nhonk zipr";
+        E.selectionStart = 5;
+        E.selectionEnd = 12;
+        ret = fi.keypress( e );
+        assertEqual( "1234 6789\nnk zipr",
+                     E.value, "Delete across lines" );
+
+    }},
+
+    // --------------------------------------------------------------
+    testStreamlines: function() { with(this) {
+        fb_log( 'testStreamlines' );
+        var fi = new FormatedArea( 'hello', area2 );
+        assert( fi );
+        assert( fi.streamlines );
+        assertInstanceOf( FormatedArea, fi );
+
+        var E = fi.input();
+        assertNotNull( E, "Got the input" );
+
+        var e = mk_event( "\b" );
+
+        E.value = "1234 1234\n1234 1234";
+        E.selectionStart = E.selectionEnd = 10;
+        fi.keypress( e );
+        assertEqual( '1234 12341\n234 1234', E.value, "Streamlines remove a newline" );
+        assertEqual( 9, E.selectionStart, " ... and positioned before it" );
+        var ret = fi.keypress( e );
+        assertEqual( true, ret, " ... which would be a normal backspace" );
+
+        E.selectionStart = E.selectionEnd = 11;
+        fi.keypress( e );
+        assertEqual( '1234 123412\n34 1234', E.value, "Streamlines shifts the newline" );
+
+        E.selectionStart = E.selectionEnd = 12;
+        fi.keypress( e );
+        assertEqual( '1234 1234123\n4 1234', E.value, "Streamlines shifts the newline" );
+
+        E.selectionStart = E.selectionEnd = 13;
+        fi.keypress( e );
+        assertEqual( '1234 12341234\n 1234', E.value, "Streamlines shifts the newline" );
+
+        E.selectionStart = E.selectionEnd = 14;
+        fi.keypress( e );
+        assertEqual( '1234 12341234 \n1234', E.value, "Streamlines shifts the newline" );
+
+
+        E.value = "1234 6789 1234 6789 1234 67890\nhonk";
+        E.selectionStart = E.selectionEnd = 31;
+        fi.keypress( e );
+        assertEqual( "1234 6789 1234 6789 1234 67890\nhonk", E.value, "Streamlines didn't do anything" );
+
+
+
+    }},
+
+    // --------------------------------------------------------------
+    test_last: function() {
+        Element.hide( $( "formated" ) );
+        this.assertNotVisible( $( 'formated' ) );
+    }
+
+});
+//]]></script>
+
+
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+-------------------------1-------------------------
+<span petal:repeat="num array_of_nums">
+  num=[$num]
+  <span petal:repeat="chr array_of_chars">
+    + num=[$num] chr=[$chr]
+    <span petal:repeat="stf array_of_stuff">
+      num=[$num] chr=[$chr] stf=[$stf]
+    </span>
+    - num=[$num] chr=[$chr]
+  </span>
+</span>
+-------------------------2-------------------------
+<span petal:repeat="num array_of_nums2">
+  num=[$num]
+  <span petal:repeat="chr array_of_chars2">
+    + num=[$num] chr=[$chr]
+    <span petal:repeat="stf array_of_stuff">
+      num=[$num] chr=[$chr] stf=[$stf]
+    </span>
+    - num=[$num] chr=[$chr]
+  </span>
+</span>
+-------------------------3-------------------------
+<span petal:repeat="num array_of_nums3">
+  num=[$num]
+  <span petal:repeat="chr array_of_chars3">
+    + num=[$num] chr=[$chr]
+    <span petal:repeat="stf array_of_stuff">
+      num=[$num] chr=[$chr] stf=[$stf]
+    </span>
+    - num=[$num] chr=[$chr]
+  </span>
+</span>

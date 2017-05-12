@@ -1,0 +1,11 @@
+---
+pod_spelling_system:
+  stopwords:
+    - PlugAuth.conf
+    - PlugAuth
+    - conf
+    - hypnotoad
+
+pod_coverage:
+  private:
+    - PlugAuth::Plugin::.*#init

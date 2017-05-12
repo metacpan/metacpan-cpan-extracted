@@ -1,0 +1,59 @@
+{
+   "abstract" : "a POE Component that implements send_nsca functionality",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "POE-Component-Client-NSCA",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "POE" : "0.38",
+            "POE::Filter::Stream" : "0",
+            "POE::Wheel::ReadWrite" : "0",
+            "POE::Wheel::SocketFactory" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/poe-component-client-nsca",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/poe-component-client-nsca.git",
+         "web" : "https://github.com/bingos/poe-component-client-nsca"
+      }
+   },
+   "version" : "0.18",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0233"
+}
+

@@ -1,0 +1,66 @@
+NAME
+    Process::Backgroundable - A Process::Storable object that can be
+    backgrounded
+
+SYNOPSIS
+      # Background a finite length process
+      MyCacheCleaner->new( dir => '...', maxsize => '10 meg' )->background;
+  
+      # Background an infinite length process
+      MyWebServer->new( dir => '...' )->background;
+
+DESCRIPTION
+    "Process::Backgroundable" extends Process::Storable for the purpose of
+    create process objects that can be run in the background and detached
+    from the main process.
+
+    It adds a "background" method that (rather than fork), launches a new
+    copy of Perl, passing the Process to it using Process::Launcher, which
+    will load and execute the process.
+
+    Please note that both the "STDOUT" and "STDERR" for the backgrounded
+    process will be sent to /dev/null (or your equivalent) so there is no
+    way to recieve any output from the background process, and you will not
+    be notified if it exits.
+
+    If you want to add logging or locks or some other feature to your
+    backgrounded process, that is your responsibility, and you set them up
+    in the "prepare" method.
+
+METHODS
+    This method inherits all the normal methods from Process and in addition
+    inherits the strict seperation of responsibility described in
+    Process::Storable. You should be aware of both of these.
+
+  background
+    The "background" is provided by default, and will start another instance
+    of the same Perl you are current running, although not necesarily with
+    the same environment.
+
+    This allows you to use "Process::Backgroundable" in very large
+    applications that may contain other data that will not be so amenable to
+    normal forking.
+
+BUGS
+    This is implemented with IPC::Run3 calls for now, but we might have to
+    move to Proc::Background for more robustness later on.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Process-Backgroundable>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2006 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

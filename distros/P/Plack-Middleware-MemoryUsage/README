@@ -1,0 +1,42 @@
+Plack::Middleware::MemoryUsage
+========================
+
+ABSTRACT
+------------------------
+
+This is Perl module Plack::Middleware::MemoryUsage.
+
+INSTALLATION
+------------------------
+
+Plack::Middleware::MemoryUsage installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Plack::Middleware::MemoryUsage
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+DOCUMENTATION
+------------------------
+
+Plack::Middleware::MemoryUsage documentation is available as in POD. So you can do:
+
+    % perldoc Plack::Middleware::MemoryUsage
+
+to read the documentation online with your favorite pager.
+
+
+LICENSE
+------------------------
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

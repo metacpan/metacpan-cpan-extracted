@@ -1,0 +1,49 @@
+---
+abstract: 'A fully event driven IRC Services module'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.18'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-IRC-Service
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+provides:
+  POE::Component::IRC::Service:
+    file: lib/POE/Component/IRC/Service.pm
+    version: '0.998'
+  POE::Component::IRC::Service::Hybrid:
+    file: lib/POE/Component/IRC/Service/Hybrid.pm
+    version: '0.998'
+  POE::Component::IRC::Service::P10:
+    file: lib/POE/Component/IRC/Service/P10.pm
+    version: '0.998'
+  POE::Filter::CTCP::Hybrid:
+    file: lib/POE/Filter/CTCP/Hybrid.pm
+  POE::Filter::CTCP::P10:
+    file: lib/POE/Filter/CTCP/P10.pm
+  POE::Filter::IRC::Hybrid:
+    file: lib/POE/Filter/IRC/Hybrid.pm
+    version: '0.998'
+  POE::Filter::IRC::P10:
+    file: lib/POE/Filter/IRC/P10.pm
+    version: '0.998'
+requires:
+  POE: 0.0607
+resources:
+  homepage: https://github.com/bingos/poe-component-irc-service/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bingos/poe-component-irc-service.git
+version: '0.998'

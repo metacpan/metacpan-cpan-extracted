@@ -1,0 +1,62 @@
+---
+abstract: unknown
+author:
+  - 'Anton Petrusevich'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PEF-Front
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cache::FastMmap: '0'
+  Carp: '0'
+  DBIx::Connector: '0.52'
+  Data::Dumper: '0'
+  Digest::SHA: '0'
+  Encode: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  FindBin: '0'
+  GD::SecurityImage: '0'
+  GDBM_File: '0'
+  Geo::IPfree: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Locale::PO: '0'
+  MLDBM: '0'
+  MLDBM::Sync: '0.30'
+  POSIX: '0'
+  Regexp::Common: '0'
+  Scalar::Util: '0'
+  Socket: '0'
+  Storable: '0'
+  Sub::Name: '0'
+  Template::Alloy: '0'
+  Time::Duration::Parse: '0.06'
+  Time::HiRes: '0'
+  URI: '0'
+  URI::Escape: '0'
+  XML::Simple: '2'
+  YAML::XS: '0.38'
+  perl: '5.014000'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/jef-sure/pef-front-psgi-dist/issues
+  repository: https://github.com/jef-sure/pef-front-psgi-dist.git
+version: '0.16'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

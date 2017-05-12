@@ -1,0 +1,67 @@
+{
+   "abstract" : "Uses Log::Dispatchouli to configure the PSGI logger",
+   "author" : [
+      "Thomas Sibley <trsibley@uw.edu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-LogDispatchouli",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Log::Dispatchouli" : "1.008",
+            "Plack::Middleware" : "0",
+            "Plack::Util::Accessor" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Log::Dispatch::Array" : "0",
+            "Plack::Test" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Plack-Middleware-LogDispatchouli@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Plack-Middleware-LogDispatchouli"
+      },
+      "homepage" : "https://metacpan.org/pod/Plack::Middleware::LogDispatchouli"
+   },
+   "version" : "0.01"
+}
+

@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use opts;
+use Plack::Handler::Starlet;
+use Plack::App::CocProxy;
+use lib 'lib';
+
+opts my $root => { isa => Str => default => '.' },
+     my $host => { isa => Str => default => '127.0.0.1' },
+     my $port => { isa => Num => default => 5432 };
+
+my $server = Plack::Handler::Starlet->new(
+	host => $host,
+	port => $port,
+);
+print "Proxy running at $host:$port\n";
+$server->run(Plack::App::CocProxy->new(root => $root)->to_app);
+
+

@@ -1,0 +1,30 @@
+---
+abstract: 'Proxy Various URLs to Various Remotes'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-ProxyMap
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - example
+requires:
+  Plack::App::Proxy: '0'
+  Plack::Middleware: '0'
+  Plack::Util::Accessor: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/plack-middleware-proxymap-pm/issues
+  homepage: https://github.com/ingydotnet/plack-middleware-proxymap-pm
+  repository: https://github.com/ingydotnet/plack-middleware-proxymap-pm.git
+version: '0.20'

@@ -1,0 +1,40 @@
+---
+abstract: 'Form Based Authentication for Plack (think L<CatalystX::SimpleLogin> but on Plack level)'
+author:
+  - 'Zbigniew Lukasiak <zby@cpan.org>'
+build_requires:
+  Data::Dumper: 0
+  File::Spec: 0
+  HTTP::Message::PSGI: 0
+  HTTP::Request: 0
+  Plack::Builder: 0
+  Plack::Middleware::Lint: 0
+  Plack::Util: 0
+  Test::More: 0
+  Test::WWW::Mechanize::PSGI: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Auth-Form
+no_index:
+  directory:
+    - t/lib
+    - examples
+    - extensions
+requires:
+  Carp: 0
+  Plack::Middleware: 0
+  Plack::Middleware::Session: 0
+  Plack::Request: 0
+  Plack::Util::Accessor: 0
+  Scalar::Util: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources: {}
+version: 0.012

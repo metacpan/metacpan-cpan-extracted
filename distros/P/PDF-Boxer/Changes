@@ -1,0 +1,20 @@
+Revision history for PDF-Boxer
+
+0.004   22/02/12
+        - added hborder & vborder attributes to grid (SatoshiSasaki++)
+
+0.003   10/11/11
+        - doc additions
+        - lazy build doc
+        - doc doesn't require file
+
+0.002   09/11/11
+        - width of border edges can now be set individually
+        - let dzil do git stuff for release.
+        - added more docs.
+        - build pdf->gfx object before text object so text shows over graphics.
+        - enable multi-page documents to be specified in markup.
+
+0.01    04/11/11
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,12 @@
+File:        06perms.txt
+Description: CSV file of upload permission to the CPAN per namespace
+    best-permission is one of "m" for "modulelist", "f" for
+    "first-come", "c" for "co-maint"
+Columns:     package,userid,best-permission
+Line-Count:  245721
+Written-By:  PAUSE version 1.005
+Date:        Sat, 25 May 2013 19:41:13 GMT
+
+PkgA,JOE,f
+PkgA,BOB,c
+PkgB,SUE,m

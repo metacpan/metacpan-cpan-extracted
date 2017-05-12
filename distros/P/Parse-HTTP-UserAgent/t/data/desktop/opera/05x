@@ -1,0 +1,11 @@
+[AGENT]
+
+Opera/v5.12 (EPOC; U) [en]
+
+'parser'           => 'opera_pre',
+'strength'         => 'U',
+'os'               => 'EPOC',
+'version_raw'      => 'v5.12',
+'lang'             => 'en',
+'version'          => '5.012000',
+'name'             => 'Opera'

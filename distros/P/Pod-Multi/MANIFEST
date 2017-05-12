@@ -1,0 +1,29 @@
+#$Id: MANIFEST 1201 2007-10-27 01:22:17Z jimk $
+Changes
+lib/Pod/Multi.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+scripts/pod2multi
+t/01_load.t
+t/02_bad_args.t
+t/03_pm.t
+t/04_no_suffix.t
+t/05_html_options.t
+t/06_text_width.t
+t/07_command.t
+t/08_text_margin.t
+t/09_bad_personal_defaults.t
+t/10_text_outputpath.t
+t/11_html_no_options.t
+t/12_make_defaults.t
+t/13_empty_options.t
+t/lib/.pod2multirc.bad
+t/lib/Pod/Multi/Auxiliary.pm
+t/lib/s1.pod
+t/lib/s2.pod
+t/lib/s3.pm
+t/lib/s4
+META.yml                                 Module meta-data (added by MakeMaker)

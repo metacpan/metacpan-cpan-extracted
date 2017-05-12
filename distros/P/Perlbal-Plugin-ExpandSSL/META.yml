@@ -1,0 +1,28 @@
+---
+abstract: "Add a custom header according to the SSL of a\nservice"
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  Test::More: 0
+  Test::Warn: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perlbal-Plugin-ExpandSSL
+provides:
+  Perlbal::Plugin::ExpandSSL:
+    file: lib/Perlbal/Plugin/ExpandSSL.pm
+    version: 0.02
+requires:
+  Crypt::X509: 0
+  File::Slurp: 0
+  MIME::Base64: 0
+  Perlbal: 0
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

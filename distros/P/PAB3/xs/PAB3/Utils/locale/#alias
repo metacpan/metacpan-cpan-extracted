@@ -1,0 +1,104 @@
+# Locale name alias data base.
+# Copyright (C) 1996-2001,2003,2007 Free Software Foundation, Inc.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+# Note: This file is obsolete and is kept around for the time being for
+# backward compatibility.  Nobody should rely on the names defined here.
+# Locales should always be specified by their full name.
+
+bokmal		nb_NO.UTF-8
+catalan		ca_ES.UTF-8
+croatian	hr_HR.UTF-8
+czech		cs_CZ.UTF-8
+danish          da_DK.UTF-8
+dansk		da_DK.UTF-8
+deutsch		de_DE.UTF-8
+dutch		nl_NL.UTF-8
+eesti		et_EE.UTF-8
+estonian	et_EE.UTF-8
+finnish         fi_FI.UTF-8
+french		fr_FR.UTF-8
+galego		gl_ES.UTF-8
+galician	gl_ES.UTF-8
+german		de_DE.UTF-8
+greek           el_GR.UTF-8
+hebrew          he_IL.UTF-8
+hrvatski	hr_HR.UTF-8
+hungarian       hu_HU.UTF-8
+icelandic       is_IS.UTF-8
+italian         it_IT.UTF-8
+japanese	ja_JP.UTF-8
+japanese.euc	ja_JP.UTF-8
+ja_JP.ujis	ja_JP.UTF-8
+japanese.sjis	ja_JP.UTF-8
+korean		ko_KR.UTF-8
+korean.euc 	ko_KR.UTF-8
+ko_KR		ko_KR.UTF-8
+lithuanian      lt_LT.UTF-8
+norwegian       nb_NO.UTF-8
+nynorsk		nn_NO.UTF-8
+polish          pl_PL.UTF-8
+portuguese      pt_PT.UTF-8
+romanian        ro_RO.UTF-8
+russian         ru_RU.UTF-8
+slovak          sk_SK.UTF-8
+slovene         sl_SI.UTF-8
+slovenian       sl_SI.UTF-8
+spanish         es_ES.UTF-8
+swedish         sv_SE.UTF-8
+thai		th_TH.UTF-8
+turkish         tr_TR.UTF-8
+
+# locale alias table
+# alias			locale
+
+# -- german --
+de				de_DE.UTF-8
+de.UTF-8		de_DE.UTF-8
+
+# -- english --
+en				en_US
+en.UTF-8		en_US
+en_US.UTF-8		en_US
+en_EN			en_US
+en_EN.UTF-8		en_US
+
+# -- spanish --
+es				es_ES.UTF-8
+es.UTF-8		es_ES.UTF-8
+
+# -- french --
+fr				fr_FR.UTF-8
+fr.UTF-8		fr_FR.UTF-8
+
+# -- italian --
+it				it_IT.UTF-8
+it.UTF-8		it_IT.UTF-8
+
+# -- japanese --
+ja				ja_JP.UTF-8
+ja.UTF-8		ja_JP.UTF-8
+ja_JP			ja_JP.UTF-8
+
+# -- russian --
+ru				ru_RU.UTF-8
+ru.UTF-8		ru_RU.UTF-8
+ru_RU			ru_RU.UTF-8
+
+# -- chinese --
+zh				zh_CN.UTF-8
+zh.UTF-8		zh_CN.UTF-8
+zh_CN			zh_CN.UTF-8

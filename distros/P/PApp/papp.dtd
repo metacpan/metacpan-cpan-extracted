@@ -1,0 +1,208 @@
+<!--
+   DTD for PApp-files
+   has never been tested!
+   (c)2000 Marc Lehmann <schmorp@schmorp.de>
+-->
+
+<!ENTITY % version    "2.02">
+
+<!ENTITY % control    "(translate|state|domain)">
+<!ENTITY % perlcode   "(perl|xperl|phtml|pxml|%control;)*">
+
+<!ENTITY % sourceref  "src CDATA">
+<!ENTITY % yesno      "(yes|no)">
+
+<!ENTITY % modulebody "(module|import|callback|macro|description|%perlcode;)*">
+
+<!-- a distinct package (application) -->
+<!ELEMENT package (%modulebody;|define-group|database|description|style|nosession)+>
+<!ATTLIST package
+    name      CDATA #REQUIRED
+    src       CDATA #IMPLIED -- optional source file to load --
+    surlstyle CDATA "url"    -- one of url or get --
+>
+
+<!-- signifies a translation domain (very coarse!) -->
+<!ELEMENT domain     ANY>
+<!ATTLIST domain
+    name  CDATA #IMPLIED -- default is application name --
+    lang  CDATA #IMPLIED -- might be a list --
+>
+
+<!--
+   specifies a stylesheet to apply to child nodes containing pxml code
+
+   apply=onload   apply the stylesheet at parsetime
+   apply=onexec   apply the stylesheet before execution (NYI)
+   apply=output   apply the stylesheet to the output (default)
+
+   src=file       use given file OR
+   expr=xxx       use given expression that returns a PApp::XSLT at runtime
+
+   eval=onload    execute the pxml at parsetime (NYI)
+   eval=onexec    execute the pxml for every request (default)
+
+   type=pxml      treat the stylesheet as pxml rather than as xml
+-->
+
+<!ELEMENT style     ANY>
+<!ATTLIST style
+    src   CDATA #IMPLIED -- diskfile --
+    expr  CDATA #IMPLIED -- variable/perl expression yielding PApp::XSLT-object --
+    type  (pxml|xml)       "pxml"
+    eval  (onload|onexec)  "onexec"
+    apply (onload|output)  "output"
+>
+
+<!-- a description describes the application or module it is found in.
+     only <application>-description elements are currently supported -->
+<!ELEMENT description>
+<!ATTLIST description
+    lang  CDATA #IMPLIED
+>
+
+<!--
+   each web-page is a seperate "module".
+
+   name		the published page name (in the url)
+   nosession	in case no valid session existed, redirect to this module instead
+-->
+<!ELEMENT module   (%modulebody;)>
+<!ATTLIST module
+    name NMTOKEN      #REQUIRED	-- might be "*", designating the wildcard module --
+    nosession NMTOKEN #IMPLIED
+>
+
+<!--
+   modules wrapped in a nosession-element will not accept new sessions.
+   instead, when a new session begins with sich a module it will be
+   redirected to the target page.
+-->
+<!ELEMENT nosession ANY>
+<!ATTLIST nosession
+    target NMTOKEN #REQUIRED
+>
+
+<!-- the standard include mechanism -->
+<!ELEMENT include EMPTY>
+<!ATTLIST include
+    %sourceref;       #REQUIRED
+>
+
+<!-- import is similar to perl's use, but works on .papp-files
+     <import src="macro/admin"/>
+     <import pm="PApp::Admin"/>            == use PApp::Admin;
+     <import pm="PApp::Admin">()</import>  == use PApp::Admin ();
+     <import pm="PApp::Admin">a b</import> == use PApp::Admin qw(a b);
+     <import pm="PApp::Admin xxx"/>        == use PApp::Admin xxx;
+-->
+<!ELEMENT import   CDATA>
+<!ATTLIST import
+    %sourceref;    #REQUIRED
+    pm     CDATA   #IMPLIED -- perl module name --
+    export %yesno; "no" -- no longer supported!! --
+>
+
+<!-- import is similar to application, but embeds full application files -->
+<!ELEMENT embed   EMPTY>
+<!ATTLIST embed
+    %sourceref;    #IMPLIED
+    name NMTOKEN   #REQUIRED
+>
+
+<!--
+   callbacks
+
+   if type attr is specified, this specifies a generic event callback:
+   init		post-config, pre-forking				A1
+   childinit	at server-start (per-process) NYI!			A
+   childexit	at server-end (per-process) NYI!			A
+   request	just before each request				P
+   cleanup	end of request (probably to be removed in the future)	P
+   newuser	initialize a new user (%state is almost empty)		P
+   newsession	initialize a new session (%state is %user, augment it!)	P
+
+   if name is specified, this creates a new callback using the
+   PApp::Callback module, relative to either the current module or the
+   current package (see PApp::Package::refer and PApp::Module::refer).
+   args works the same as in a macro.
+-->
+<!ELEMENT callback %perlcode;>
+<!ATTLIST callback
+    type (init|childinit|childexit|request|cleanup|newsession|newuser) #IMPLIED
+    name NMTOKEN                                                       #IMPLIED
+    args CDATA                                                         #IMPLIED
+>
+
+<!--
+   the different ways to embed perl
+   perl		plain perl code (better use <![CDATA[ code... ]]>
+   xperl	extended perl (with autoexport!)
+   phtml	html (or anything else) with embedded perl code
+   pxml		xml with embedded perl code
+-->
+<!ELEMENT perl     (#PCDATA)>
+<!ELEMENT xperl    (#PCDATA)>
+<!ELEMENT phtml    (#PCDATA)>
+<!ELEMENT pxml     (#PCDATA)>
+
+<!-- embed a perl macro -->
+<!-- args is a whitespace seperated list of parameter names -->
+<!-- attrs is a whitespace seperated list of subroutine attributes -->
+<!ELEMENT macro    %perlcode;>
+<!ATTLIST macro
+    name  CDATA #REQUIRED
+    args  CDATA #IMPLIED
+    attrs CDATA #IMPLIED
+>
+
+<!-- define a group access right used in this applikation
+-->
+<!ELEMENT define-group  EMPTY>
+<!ATTLIST define-group
+    name     CDATA #REQUIRED
+>
+
+<!-- set default database for the sql_* family of commands -->
+<!-- the body can consist of the  sql-commands needed to re-create
+     the database if neccessary -->
+<!ELEMENT database  EMPTY>
+<!ATTLIST database
+    dsn      CDATA #REQUIRED
+    username CDATA #IMPLIED
+    password CDATA #IMPLIED
+>
+
+<!--
+    translate a single field (columns) of a database. lang is the
+    (optional) language tag. "style" is either 'plain' (the whole field is
+    to be translated) or 'code' (the field is scanned like it were a phtml
+    section). 'auto' can be used to select either plain or code, depending
+    on wether __"xx" can be found.
+-->
+<!ELEMENT translate  EMPTY>
+<!ATTLIST translate
+    fields   CDATA #REQUIRED
+    lang     CDATA #IMPLIED -- might be a list --
+    style    (plain|code|auto) "plain"
+>
+
+<!--
+   type'ify state keys
+   preference	this is a preference item ("durable")
+   import	import from insecure places
+   local	mark this var as local to this module
+-->
+<!ENTITY % statetypes "(preference|session)">
+<!ELEMENT state EMPTY>
+<!ATTLIST state
+    keys    NMTOKENS    #REQUIRED
+    preference %yesno;  "no"
+    import  %yesno;     "no"
+    local   %yesno;     "no"
+>
+
+<!-- helper elements -->
+<!-- can be used to store fragments properly, has no semantic value -->
+<!ELEMENT fragment ANY>
+

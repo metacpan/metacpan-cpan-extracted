@@ -1,0 +1,144 @@
+=head1 Allgemeines
+
+Neben dieser Dokumentation befinden sich auch noch dokumentierte Beispiele
+für einige Widgets im Unterverzeichnis example, sowie ein komplettes Beispiel
+für die Oberfläche eines Setup Programms (app2.pl).
+
+=head2 Widget handling
+
+Ein neues Widget wird immer mit
+
+     $WIDGET_REFERENCE=Paw::WIDGETNAME::new(PARAMETERNAME=>VALUE).
+
+erzeugt. Dabei müssen die PARAMETER immer als HASH übergeben werden
+Diese Regel gilt auch wenn nur ein Parameter übergeben wird. Die Reihenfolge in
+der die PARAMETER übergeben werden ist dabei egal.
+Die Methoden eines Widgets werden mit
+
+     $WIDGET_REFERENCE->METHOD(PARAMETER)
+     $WIDGET_REFERENCE->METHOD(PARAMETER1=>VALUE1, PARAMETER2=>VALUE2)
+
+aufgerufen. Wenn einen Methode nur einen oder keinen Parameter erlaubt, wird auf
+die Benennung des Parameters verzichtet
+
+     $window->put($widget).
+
+Sollten mehr als 1 Parameter möglich sein, so muss wieder jeder Parameter
+benannt werden, wobei auch hier die Reihenfolge der Parameter egal ist.
+
+     $window->abs_move_curs(new_x=>5, new_y=>6) #is okay,
+     $window->abs_move_curs(5)                  # is not okay
+     $window->put_dir("h")                      # is quite permitted.
+
+=head2 Initialisierung
+
+Jedes Programm, welches dieses Modul einsetzt, beginnt im Grunde gleich :
+
+     #!/usr/bin/perl
+     use Curses;
+     use widget;
+     ($columns, $rows)=Paw::init_widgetset();
+
+die Variablen $columns und $rows enthalten die Breite und Höhe des Terminals und können
+z.B. verwendet werden, um die Grösse weiterer Fenster in Abhängigkeit von der Terminalgrösse
+zu berechnen.
+
+     $main_win=Paw::Window::new(abs_x=>1, abs_y=>1,
+                                height=$rows-3, width=>$columns-2,
+                                color=>1, statusbar=>1);
+
+=head2 Farben
+
+Beim initialisieren des Widgetsets werden einige Color_Pairs bereits gesetzt.
+Dazu gehören:
+
+     init_pair(1, COLOR_WHITE, COLOR_BLUE);   #default colors
+     init_pair(31, COLOR_BLACK, COLOR_BLACK); #shadow
+     init_pair(30, COLOR_BLACK, COLOR_CYAN);  #pulldown menu
+     init_pair(29, COLOR_BLACK, COLOR_BLUE);  #filedialog
+
+Als Farben stehen black, red, green, yellow, blue, magenta, cyan, und white zur Verfügung.
+Neue color_pairs können mit
+
+     init_pair(pair, foreground_color, background_color);
+
+erzeugt werden.
+Für weitere Informationen zum Farbmodell empfehle ich die Dokumentation der
+Curses Lib (man ncurses, bzw. man init_color und perldoc Curses).
+
+=head2 Widgetpacker
+
+Es gibt zwei Möglichkeiten Widgets in ein Fenster zu bekommen.
+Zum einen kann man direkt die put Funktion des Fensters nehmen,
+zum anderen kann man den Umweg über Boxen nehmen.
+Zuerst mal ohne Boxen :
+
+     #put the $label2 into the window
+     $win2->put($label2);                      
+     #tell to packer to put the next widget horizontally to the $label2
+     $win2->put_dir("h");   # horizontal packen    
+     #keep on putting widgets ...
+     $win2->put($butt1);    # Button for Faktor 2 
+     $win2->put($label3);   # Faktor 3             
+     $win2->put($butt2);    # Button for Faktor 3 
+     $win2->put($label4);   # Faktor 4             
+     $win2->put($butt3);    # Button for Faktor 4
+     #switch the packer to vertikal-mode...
+     $win2->put_dir("v");
+     #...to get the label under the other widgets.
+     $win2->put($label5);   # "Ergebnis : ..."
+
+Man bekommt dann
+
+     $label2 $butt1 $label3 $butt2 $label4 $butt3                                        
+     $label5
+
+bzw.
+
+     Faktor 2 [ ] Faktor 3 [ ] Faktor 4 [ ]
+     Ergebnis : 200
+
+Diese Art Widgets zu packen ist für kleinere Oberflächen zwar eine schnelle Lösung, man stösst aber auch
+ebenso schnell an die Grenzen der Möglichkeiten. Hier kommen dann die Boxen zum Zuge.
+
+Eine Box nimmt mehrere Widgets auf und packt diese immer entweder horizontal oder vertikal.
+Der Clou an der Sache ist aber das eine Box auch eine andere Box aufnehmen kann. Es ist also möglich
+ein horizontale Box in eine vertikale Box zu packen und das in beliebiger Tiefe. Auf diese Art
+lässt sich nahezu alles realisieren. Wer den Widgetpacker von GTK oder TK kennt, der weiss auch
+wie es hier funktioniert.
+
+
+     ###########################################
+     # 7 Buttons building an H
+     ###########################################
+
+     $vbox0->put($b1);
+
+     $hbox1->put($b2);
+     $hbox1->put($b3);
+
+     $vbox0->put($hbox1);
+     $vbox0->put($b4);
+
+     $hbox0->put($vbox0);
+
+     $vbox1->put($b5);
+     $vbox1->put($b6);
+     $vbox1->put($b7);
+
+     $hbox0->put($vbox1);
+
+     $win->put($hbox0);
+
+Man bekommt dann:
+
+     [1]   [5]
+     [2][3][6]
+     [4]   [7]
+
+=head1 COPYRIGHT
+
+Copyright (c) 1999 SuSE GmbH, Nuernberg, Germany. All rights reserved.
+
+=cut
+

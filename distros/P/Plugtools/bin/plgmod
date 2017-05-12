@@ -1,0 +1,228 @@
+#!/usr/bin/perl
+#Copyright (c) 2009, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Plugtools;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "plgmod 0.0.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+		      "-g <group name>  - The group to act on.\n".
+			  "-a <action>  - The action to perform.\n".
+			  "-u <user>  - The user to use.\n".
+			  "-G <gid>  - The GID to use.\n".
+			  "-l  - This dumps change changed LDAP entry.\n".
+			  "-U <userUpdate>  - When doing the gid action, correct any user with it as their primary GID.\n".
+			  "\n".
+			  "Both -g and -a are required. Then additional ones may be required on what is specified.\n".
+			  "\n".
+			  "actions:\n".
+			  "add - This adds a user to a group.\n".
+			  "remove -  This removes a user from a group.\n".
+			  "gid - Change the GID of a group to the specified GID.\n".
+			  "\n".
+			  "requirements:\n".
+			  "add - -g, -u\n".
+			  "remove - -g, -u\n".
+			  "gid - -g, -G\n".
+			  "\n".
+			  "For more info, see the the perldocs for Plugtools and plgmod...\n".
+			  "perldoc plgmod\n".
+			  "perldoc Plugtools\n";
+}
+
+#gets the options
+my %opts=();
+getopts('g:u:a:G:l', \%opts);
+
+if (!defined($opts{g})) {
+	warn('plgadd:254: No group name specified');
+	exit 254;
+}
+
+if (!defined($opts{a})) {
+	warn('plgadd:253: No action specified');
+	exit 25;
+}
+
+my $pt=Plugtools->new;
+if ($pt->{error}) {
+	warn('plgadd: Failed to initialize the Plugtools object');
+	exit $pt->{error};
+}
+
+#process add requests
+if ($opts{a} eq 'add') {
+	$pt->groupAddUser({
+					   user=>$opts{u},
+					   group=>$opts{g},
+					   dump=>$opts{l},
+					   });
+	if ($pt->{error}) {
+		warn('plgmod: groupAddUser errored');
+		exit $pt->{error};
+	}
+}
+
+#process remove requests
+if ($opts{a} eq 'remove') {
+	$pt->groupAddUser({
+					   user=>$opts{u},
+					   group=>$opts{g},
+					   dump=>$opts{l},
+					   });
+	if ($pt->{error}) {
+		warn('plgmod: groupAddUser errored');
+		exit $pt->{error};
+	}
+}
+
+#process remove requests
+if ($opts{a} eq 'gid') {
+	$pt->groupGIDchange({
+					   gid=>$opts{G},
+					   group=>$opts{g},
+					   dump=>$opts{l},
+					   });
+	if ($pt->{error}) {
+		warn('plgmod: groupGIDchange errored');
+		exit $pt->{error};
+	}
+}
+
+exit 0;
+
+=head1 NAME
+
+plgmod - Modify a group setup in LDAP.
+
+=head1 SYNOPSIS
+
+plgmod B<-g> <group> B<-a> add [B<-u> <user>] [B<-l>]
+plgmod B<-g> <group> B<-a> remove [B<-u> <user>] [B<-l>]
+plgmod B<-g> <group> B<-a> gid [B<-G> <gid>] [B<-l>] [B<-U> (0|1)]
+
+=head1 SWITCHES
+
+=head2 -g <group>
+
+This specifies the group to modify.
+
+=head2 -a <action>
+
+The action to perform. Only one of these will be done at a time.
+
+=head3 add
+
+Add a user to a group.
+
+=head3 gid
+
+Change the GID of a group.
+
+=head3 remove
+
+Remove a user from a group.
+
+=head2 -l
+
+If this is specified, any modified LDAP entry is printed to STDOUT.
+
+=head2 -u <user>
+
+The user to add or remove from a group.
+
+=head2 -g <gid>
+
+The new GID for a group.
+
+=head2 -U (0|1)
+
+This is a boolean value indicating if the users should be checked and possibly
+updated if the GID of a group is changed.
+
+=head1 EXIT CODES
+
+If the exit code is not listed below, it is what was the error code returned by Plugtools.
+
+=head2 254
+
+No group specified.
+
+=head2 253
+
+No action specified.
+
+=head1 AUTHOR
+
+Copyright (c) 2009, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+xFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 SCRIPT CATEGORIES
+
+UNIX : System_administration
+
+=head1 OSNAMES
+
+any
+
+=head2 SEE ALSO
+
+Plugtools
+
+=head1 README
+
+plgmod - Modify a group setup in LDAP.
+
+=cut

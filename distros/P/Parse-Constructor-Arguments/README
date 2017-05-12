@@ -1,0 +1,12 @@
+
+
+This archive contains the distribution Parse-Constructor-Arguments, version
+0.091570:
+
+  A PPI based module for parsing Moose-style constructor arguments
+
+This software is copyright (c) 2009 by Nicholas Perez.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as perl itself.
+

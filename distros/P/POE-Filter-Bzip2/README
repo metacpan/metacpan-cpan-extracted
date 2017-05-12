@@ -1,0 +1,77 @@
+NAME
+
+    POE::Filter::Bzip2 - A POE filter wrapped around Compress::Bzip2
+
+VERSION
+
+    version 1.60
+
+SYNOPSIS
+
+        use POE::Filter::Bzip2;
+    
+        my $filter = POE::Filter::Bzip2->new();
+        my $scalar = 'Blah Blah Blah';
+        my $compressed_array   = $filter->put( [ $scalar ] );
+        my $uncompressed_array = $filter->get( $compressed_array );
+    
+        use POE qw(Filter::Stackable Filter::Line Filter::Bzip2);
+    
+        my ($filter) = POE::Filter::Stackable->new();
+        $filter->push( POE::Filter::Bzip2->new(),
+                       POE::Filter::Line->new( InputRegexp => '\015?\012', OutputLiteral => "\015\012" ),
+
+DESCRIPTION
+
+    POE::Filter::Bzip2 provides a POE filter for performing
+    compression/decompression using Compress::Bzip2. It is suitable for use
+    with POE::Filter::Stackable.
+
+CONSTRUCTOR
+
+    new
+
+      Creates a new POE::Filter::Bzip2 object. Takes one optional argument,
+      'level': the level of compression to employ. Consult Compress::Bzip2
+      for details.
+
+METHODS
+
+    get =item get_one =item get_one_start
+
+      Takes an arrayref which is contains lines of compressed input.
+      Returns an arrayref of decompressed lines.
+
+    put
+
+      Takes an arrayref containing lines of uncompressed output, returns an
+      arrayref of compressed lines.
+
+    clone
+
+      Makes a copy of the filter, and clears the copy's buffer.
+
+    level
+
+      Sets the level of compression employed to the given value. If no
+      value is supplied, returns the current level setting.
+
+SEE ALSO
+
+    POE
+
+    Compress::Bzip2
+
+    POE::Filter::Stackable
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,31 @@
+pod
+  head1
+    @title
+      "NAME"
+    text
+      @text
+        "160-begin-block"
+  head1
+    @title
+      "EXAMPLES"
+    begin
+      @format
+        "text"
+      text
+        @text
+          "This is a text-only block"
+    begin
+      @format
+        "html"
+      text
+        @text
+          "<p>This is an HTML-only block</p>"
+    begin
+      @format
+        "obscure"
+      text
+        @text
+          "This is an obscure block"
+    text
+      @text
+        "[EOF]"

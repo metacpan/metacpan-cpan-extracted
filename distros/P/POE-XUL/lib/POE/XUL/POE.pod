@@ -1,0 +1,130 @@
+# Copyright 2007-2008 by Philip Gwyn.  All rights reserved;
+
+=head1 NAME
+
+POE::XUL::POE - A POE::XUL application that doesn't use POE::XUL::Application
+
+=head1 SYNOPSIS
+
+    use POE;
+    use POE::Component::XUL;
+
+    POE::Component::XUL->spawn( { apps => {   
+                                        Test => 'My::App',
+                                        # ....
+                                } } );
+    $poe_kernel->run();
+
+    ##########
+    package My::App;
+    use POE::XUL::Node;
+
+    sub spawn
+    {
+        my( $package, $event ) = @_;
+        my $self = bless { SID=>$event->SID }, $package;
+        POE::Session->create(
+            object_states => [ $self => 
+                [ qw( _start boot Click shutdown other_state ) ] ],
+        );
+    }
+
+    #####
+    sub _start {
+        my( $self, $kernel ) = @_[ OBJECT, KERNEL ];
+        $kernel->alias_set( $self->{SID} );
+    }
+
+
+    #####
+    sub boot {
+        my( $self, $kernel, $event, $app ) = @_[ OBJECT, KERNEL, ARG0, ARG1 ];
+        $self->{D} = Description( "do the following" );
+        $self->{W} = Window( HBox( $self->{D}, 
+                                   Button( label => "click me", 
+                                           Click => 'Click' ) ) );
+        $event->finish;
+    }
+
+    #####
+    sub Click {
+        my( $self, $kernel, $event ) = @_[ OBJECT, KERNEL, ARG0 ];
+        $event->done( 0 );
+        $kernel->yield( 'other_state', $event );
+    }
+
+    sub other_state {
+        my( $self, $kernel, $event ) = @_[ OBJECT, KERNEL, ARG0 ];
+        $event->wrap( sub {
+                $self->{D}->textNode( 'You did it!' );
+                $self->{W}->firstChild->appendChild( $self->{B2} );
+            } );
+        $event->finished;
+    }
+
+=head1 DESCRIPTION
+
+=head2 The application
+
+POE::XUL applications generaly have one L<POE::session> per application
+instance.  This POE session is spawned when a boot request is recieved from
+the client.  The session then must handle a 'boot' event, where-in it
+creates a C<Window> element and its children.  The application session is
+kept active, handling the user events it has defined, until the users stops
+using it, that is a period of inactivity.  The session is then sent a
+'timeout' event followed by a 'shutdown' event.
+
+=head2 spawn
+
+    sub spawn {
+        my ( $package, $event ) = @_;
+        # must create a session
+        POE::Session->create( 
+                inline_states => { _start => \&_start }
+                args => [ $event->SID ]
+            );
+    }
+
+    # That session must have the SID as an alias
+    sub _start {
+        my( $kernel, $SID ) = @_;
+    }
+
+It B<must> set the session's alias
+to the application's SID, available via C<$event-E<gt>SID>.  
+All furthur communication with the application instance happens by 
+posting POE events to the SID.
+
+
+
+=head2 POE::XUL::Event and POE::XUL::ChangeManager
+
+Only changes that are wrapped in an Event will be seen by the ChangeManager
+and be mirrored in the client. L<POE::XUL::Event> will wrap the initial
+event and call it with L<POE::Kernel/call>.  If you wish to post further POE
+events, you must set the Event's done to 0, and wrap any node changes with
+L<POE::XUL::Event/wrap>.  You must call L<POE::XUL::Event/finished> to
+complete the request.
+
+L<POE::XUL::Event/wrap> also provides error handling;  if your code dies,
+the error message will be displayed in the browser.
+
+=head1 AUTHOR
+
+Philip Gwyn E<lt>gwyn-at-cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2007-2008 by Philip Gwyn.  All rights reserved;
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+=head1 SEE ALSO
+
+perl(1), L<POE::XUL::Node>, L<POE::XUL::Event>, L<POE::XUL::Controler>,
+L<POE::XUL::Application>,
+L<http://www.prototypejs.org/>.
+
+=cut

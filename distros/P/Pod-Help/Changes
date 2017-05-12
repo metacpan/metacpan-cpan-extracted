@@ -1,0 +1,17 @@
+HISTORY
+    0.99    Original version; created by h2xs 1.23 with options
+
+              -A
+                    -C
+                    -X
+                    -b
+                    5.6.0
+                    -n
+                    Pod::Help
+                    --use-new-tests
+                    --skip-exporter
+                    -v
+                    0.99
+
+    1.00    Updated packaging for newer standards. No changes to the coding.
+

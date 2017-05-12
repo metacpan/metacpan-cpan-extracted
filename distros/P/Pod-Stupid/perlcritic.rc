@@ -1,0 +1,14 @@
+# note the policy causing each warning, so they can be turned off more easily
+verbose  = [%p] %m at %f line %l, near '%r'\n
+
+# no warnings if non-existant policies are mentioned in the config.
+profile-strictness = quiet
+
+# allow the strictures module to take the place of 'use strict'
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = strictures Moose perl5i Modern::Perl
+
+# turn off some checks I think are unnecessary
+[-Modules::RequireVersionVar]
+[-ErrorHandling::RequireUseOfExceptions]
+

@@ -1,0 +1,159 @@
+Revision history for Path-Class-Rule
+
+0.018     2013-01-24 07:27:28 America/New_York
+
+  [DOCUMENTATION]
+
+    - Added PERFORMANCE section with caveats
+
+0.017     2013-01-23 14:44:04 America/New_York
+
+  [CHANGES]
+
+    - Updated for internal changes to Path::Iterator::Rule 0.002
+
+0.016     2013-01-22 06:28:03 America/New_York
+
+  [CHANGES]
+
+    - Reimplmented as a thin subclass of Path::Iterator::Rule
+
+0.015     2013-01-21 14:21:33 America/New_York
+
+  [DOCUMENTATION]
+
+    - Oops.  Left off a doc fix from the master repo.  Merged now.
+
+0.014     2013-01-21 14:19:04 America/New_York
+
+  [OPTIMIZATION]
+
+    - Use Path::Class's basename() internally,, resulting in a 50%
+      speedup on a test case of finding all .pm files in @INC; requires
+      Path::Class 0.20.
+
+0.013     2012-12-13 11:08:42 America/New_York
+
+  [DOCUMENTATION]
+
+    - The method for all perl file types is 'perl_file', not 'perl_files'
+      [rt.cpan.org #81945]
+
+0.012     2012-10-26 21:51:27 America/New_York
+
+  [BUG FIXES]
+
+    - Rule cloning now does deep clone with Data::Clone [rt.cpan.org #80426]
+
+0.011     2012-03-15 09:55:33 EST5EDT
+
+  [BUG FIXES]
+
+    - Fixed major bugs in depth-first traversal relating to proper ordering
+      and incorrectly returning directories that didn't match search
+      criteria
+
+0.010     2011-12-03 20:17:55 EST5EDT
+
+  [OTHER]
+
+    - Removed 'parent' and 'File::Copy' as dependencies.  Former wasn't
+      really needed and latter was causing problems on 5.10.0.
+
+0.009     2011-12-02 04:38:05 EST5EDT
+
+  [BUG FIXES]
+
+    - Fix t/error_handler.t regex to prevent errors from backslashes in
+      paths on Windows
+
+0.008     2011-11-30 09:54:03 EST5EDT
+
+  [DOCUMENTATION]
+
+    - Added File::Set to "See Also" section
+
+  [OTHER]
+
+    - Removed namespace::autoclean as a dependency because it pulls in
+      the whole Moose stack.  [rt.cpan.org #72841, patch by Lars Dɪᴇᴄᴋᴏᴡ]
+
+0.007     2011-10-26 23:50:57 America/New_York
+
+  [BUG FIXES]
+
+    - Fixed Win32 test failures
+
+    - Fixed regexp handling on Perl 5.10
+
+0.006     2011-10-19 21:40:01 America/New_York
+
+  [BUG FIXES]
+
+    - Fixed incompability with Perl < v5.14 [rt.cpan.org #71400]
+
+  [DOCUMENTATION]
+
+    - Clarified caveats about taint mode.  Path::Class::Rule runs under
+      taint mode; it offers no options to automatically untaint data
+
+0.005     2011-09-14 16:58:25 America/New_York
+
+  [NEW FEATURES]
+
+    - Added 'iname' rule method for case insensitive name matching
+
+    - Added 'skip' logic method for easy custom pruning
+
+    - Added 'error_handler' option to iteration method
+
+    - Added lexical warnings category
+
+  [BUG FIXES]
+
+    - Directories that are not readable will warn and continue instead
+      of throwing an error
+
+  [DOCUMENTATION]
+
+    - Various clarifications and typo fixes
+
+0.004     2011-09-14 06:48:13 America/New_York
+
+  [DOCUMENTATION]
+
+    - Added additional modules to SEE ALSO commentary
+
+0.003     2011-09-13 21:05:43 America/New_York
+
+  [NEW FEATURES]
+
+    - Added 'skip_vcs' (and individual VCS skipping rule methods)
+
+    - Added 'perl_files' (and similar rule methods)
+
+    - Added 'shebang' rule method
+
+0.002     2011-09-12 14:17:13 America/New_York
+
+  [NEW FEATURES]
+
+    - Added 'min_depth' and 'max_depth' rule methods
+
+    - Added 'dangling' rule method to match dangling symlinks
+
+    - Added 'loop_safe' option to control infinite loop protection
+      (default is true)
+
+    - Rule callbacks receive a hash reference for storing optional state
+
+  [BUG FIXES]
+
+    - Bumped Number::Compare prerequisite version to 0.02 to
+      avoid uninitialized warnings when comparing numbers without
+      a magnitude.
+
+0.001     2011-09-11 22:40:44 America/New_York
+
+    - Initial release
+

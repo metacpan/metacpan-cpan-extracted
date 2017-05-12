@@ -1,0 +1,181 @@
+#!perl
+use Pod::Usage;
+use Pod::Classdoc;
+use Cwd;
+use Getopt::Long qw(:config no_ignore_case permute);
+use File::Path;
+
+use strict;
+use warnings;
+
+our $VERSION = '1.01';
+
+my $pwd = getcwd();
+
+my $home;
+my $csspath;
+my $jspath;
+my $imgpath;
+my $closeimg = 'closedbook.gif';
+my $container = 'index.html';
+my $help = 0;
+my $openimg = 'openbook.gif';
+my $path = './classdocs';
+my $projpod = 0;
+my $rootimg = 'globe.gif';
+my $title = '';
+my $verbose = 0;
+my $noicons = 0;
+my $jstoc = 0;
+my $root = undef;
+my $writeall = 1;
+my $order;
+
+my @srclibs = ();
+
+GetOptions(
+	'a|writeall'    => \$writeall,
+	'c|closeimg=s'	=> \$closeimg,
+ 	'f|file=s'		=> \$container,
+    'h|help'		=> \$help,
+    'H|home=s'		=> \$home,
+    'i|imgpath=s'	=> \$imgpath,
+    'j|jspath=s'	=> \$jspath,
+    'J|jstoc'		=> \$jstoc,
+    'O|openimg=s'	=> \$openimg,
+    'o|output=s'	=> \$path,
+    'p|project'		=> \$projpod,
+	'r|rootimg=s'	=> \$rootimg,
+	'R|root=s',		=> \$root,
+	's|csspath=s'   => \$csspath,
+    't|title=s'		=> \$title,
+    'v|verbose'		=> \$verbose,
+    'y|order=s'		=> \$order,
+    'z|noicons'		=> \$noicons,
+    '<>'			=> sub { push @srclibs, @_; }
+);
+
+pod2usage(1) if $help;
+
+die "No source libraries specified."
+	unless @srclibs;
+
+if ($jstoc) {
+	eval 'require HTML::ListToTree;';
+	die $@ if $@;
+}
+
+$root ||= $title || 'Classdocs';
+
+my @order = ();
+@order = split /\s*,\s*/, $order
+	if $order;
+
+mkpath $path;
+
+my $classdocs = Pod::Classdoc->new($path, $title, $verbose);
+
+$classdocs->openProject(@srclibs) or die $@;
+
+$classdocs->writeClassdocs or die $@;
+
+#
+#	generate index and container frame doc unless project docs specified
+#
+unless ($projpod) {
+	if ($jstoc) {
+		$jspath ||= "js/dtree.js";
+		$csspath ||= "css/dtree.css";
+		$imgpath ||= "img";
+		my $toc = $classdocs->getTOC(@order);
+		($toc) = ($toc=~/^.*?<\!-- INDEX BEGIN -->(.+)<\!-- INDEX END/is);
+		my $tree = HTML::ListToTree->new(Text => $root, Link => $home, Source => $toc)
+			or die $@;
+		my $widget = $tree->render(
+			CloseIcon => $closeimg,
+			CSSPath => $csspath,
+			IconPath => $imgpath,
+			JSPath => $jspath,
+			UseIcons => (!$noicons),
+			OpenIcon => $openimg,
+			RootIcon => $rootimg,
+			) or die $@;
+		
+		die "Can't open $path/toc.html: $!"
+			unless open(OUTF, ">$path/toc.html");
+		print OUTF $widget;
+		close OUTF;
+#
+#	if writeall, then generate supporting directories/files
+#
+		if ($writeall) {
+			my ($jsfile, $cssfile);
+			($jspath, $jsfile) = ($jspath=~/^(.*)[\/\\]([^\/\\]+)$/);
+			($csspath, $cssfile) = ($csspath=~/^(.*)[\/\\]([^\/\\]+)$/);
+			mkpath "$path/$jspath";
+			mkpath "$path/$csspath";
+			mkpath "$path/$imgpath";
+			die $@ 
+				unless $tree->writeJavascript("$path/$jspath/$jsfile") && 
+					$tree->writeCSS("$path/$csspath/$cssfile") && 
+					$tree->writeIcons("$path/$imgpath");
+		}
+	}
+	else {
+		$classdocs->writeTOC or die $@;
+	}
+	$classdocs->writeFrameContainer($container, $home) or die $@;
+}
+
+=pod
+
+=head1 NAME
+
+pod2classdocs
+
+=head1 SYNOPSIS
+
+pod2classdocs [options] <source-path> [ <source-path> ... ]
+
+ Options:
+    -a|-writeall            write all Javascript, CSS, and icons for
+                                a Javascript tree TOC
+    -c|-closeimg <filename> image file used for HTML::ListToTree closed 
+                                nodes; default 'closedbook.gif'
+    -f|-file                output filename for root document; 
+                                default 'index.html'
+    -h|-help                display this help and exit
+    -H|-home <path>         path to a root document added to the index tree
+    -i|-imgpath <path>      path to image directory for ProjectDocs and 
+                                HTML::ListToTree; default <output root>/img
+    -j|-jspath <path>       path to Javascript files for HTML::ListToTree;
+                                default <output root>/js/dtree.js
+    -J|-jstoc               use Javascript tree for table of contents (via
+                                HTML::ListToTree); default is HTML list
+    -O|-openimg <filename>  image file used for HTML::ListToTree open
+                                nodes; default 'openbook.gif'
+    -o|-out|-output <path>  target root directory path for generated 
+                                documents; default './classdocs'
+    -p|-project             output is part of project docs (via 
+                                Pod::Classdoc::Project)
+    -r|-rootimg <filename>  image file used for root of HTML::ListToTree 
+                                tree; default is openimg
+    -R|-root <name>         name of tree root node
+    -s|-csspath <path>      path to CSS files for HTML::ListToTree;
+                                default <output root>/css/dtree.css
+    -t|-title <title>       project title
+    -v|-verbose             enable diagnostic messages
+    -y|-order "<pkglist>"	specify order of packages in TOC; <pkglist> is 
+                                comma separated list of names, e.g.,
+                                "DBI,DBD::_::dr,DBD::_::db,DBD::_::st"
+    -z|-noicons             no icons in HTML::ListToTree tree widget;
+                                default is icons on
+
+Multiple source library directories can be specified:
+
+  pod2classdocs -o /path/to/outputdir /path/to/lib1 /path/to/lib2
+
+=head1 DESCRIPTION
+
+Generates classdocs via L<Pod::Classdoc> output with an L<HTML::ListToTree> index.
+

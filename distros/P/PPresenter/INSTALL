@@ -1,0 +1,63 @@
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+- INSTALL
+
+Portable Presenter is a fully Perl/Tk compliant package, so as
+long as you have compiled a recent Perl and Tk, it should work
+`out the box'.
+
+** What do you need?
+
+Install the following packages.  The version-numbers are indications;
+it might be that earlier versions work too.
+- Perl 5.005_02 or higher
+  You can best use the latest stable version, which is located at
+  http://www.CPAN.org/src/stable.tar.gz
+- Perl/Tk 800.015 or higher  (obligatory)
+  http://www.CPAN.org/modules/by-module/Tk/Tk800.015.tar.gz
+  Versions 800.016-800.019 are less stable.
+- X11::Protocol v0.04        (optional)
+  http://www.CPAN.org/modules/by-module/X11/X11-Protocol-0.04.tar.gz
+
+For ImageMagick:       (optional)
+http://www.ImageMagick.org
+- ImageMagick v4.2.9 and PerlMagick v4.29   Other version will work
+  too, as long as the ImageMagick and PerlMagick versions match!  This
+  is wrong for some Linux Distributions.
+  Newer versions of ImageMagick will work too.
+
+You can best compile Perl and Perl/Tk yourself (best chance that it will
+work together).  For ImageMagick, the binary distribution is linked to
+most image libraries: that's quite a lot of work to collect yourself.
+
+You may want to have a look at the manual how to improve your X-fonts:
+    http://www.linuxdoc.org/HOWTO/mini/FDU/
+
+** Installing this package.
+
+Unpack the package (hey! you did of course, otherwise you wouldn't
+be able to read this messsage) with, and install:
+
+   gzip -d < PPresenter-v*.tar.gz | tar xf -
+   cd PPresenter-v?.??
+   perl Makefile.PL
+   make install
+
+This package does not contain any binaries.  You can install, upgrade
+or remove the other packages without the need to reinstall PPresenter.
+
+** Warning
+
+WARNING:
+   Do not run PPresenter files which you have downloaded from the Net: they
+   are Perl programs, hence can perform any task on your system without
+   you noticing it.
+   Presentation should be distrubed as websites or postscript.  See the
+   export facilities on how to create them.
+
+** Questions?
+
+For questions, bug reports, and contributions mail to: info@ppresenter.org
+
+Mark Overmeer
+http://mark.overmeer.net

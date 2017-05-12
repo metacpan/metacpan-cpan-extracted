@@ -1,0 +1,18 @@
+strict digraph Perl {
+	graph [compound=1, concentrate=1, overlap=false, rankdir=LR, ranksep=1, smoothing=triangle, splines=spline];
+	node [label="\N", shape=record, style=dotted];
+	edge [minlen=1];
+	subgraph cluster_1 {
+		graph [label="Path::IsDev::",
+			rank=max];
+		subgraph cluster_2 {
+			graph [label="Path::IsDev::HeuristicSet::"];
+			"Path::IsDev::HeuristicSet::FromConfig" [label="{{<port1> single_class}|<port2> Path::IsDev::HeuristicSet::FromConfig}", shape=Mrecord, style=solid, color="#0343df", fontsize=7, height="0.1"];
+			"Path::IsDev::HeuristicSet::FromConfig::Loader" [label="{{<port1> class}|<port2> Path::IsDev::HeuristicSet::FromConfig::Loader}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+		}
+		"Path::IsDev::Role::HeuristicSet::Simple" [label="<port1> Path::IsDev::Role::HeuristicSet::Simple"];
+		"Path::IsDev::Role::HeuristicSet::Simple" -> "Path::IsDev::HeuristicSet::FromConfig" [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", samehead=head, tailclip=1, weight=5];
+	}
+	"Class::Tiny::Object" [label="<port1> Class::Tiny::Object"];
+	"Class::Tiny::Object" -> "Path::IsDev::HeuristicSet::FromConfig::Loader" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", samehead=head, tailclip=1, weight=10];
+}

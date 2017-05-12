@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         PDF-ReportWriter
+version:      1.5
+version_from: lib/PDF/ReportWriter.pm
+installdirs:  site
+requires:
+    Image::Size:                   2
+    PDF::API2:                     0.3
+    XML::Simple:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

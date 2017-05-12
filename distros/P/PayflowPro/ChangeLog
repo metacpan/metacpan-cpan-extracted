@@ -1,0 +1,31 @@
+2016-01-21  Vivek Khera  <vivek@vk-dev.int.kcilink.com>
+
+	* test.pl: use charnames to shut up all the CPAN tester failures
+	for ancient perls. No functional differences from prior version.
+
+2016-01-18  Vivek Khera  <vivek@khera.org>
+
+	* PayflowPro.pm: ensure no "wide" utf-8 characters are given to
+	the HTTP::Message object, which will die.
+	* test.pl: The test script does not always need all four
+	credential parts to run.
+
+2011-04-04  Vivek Khera  <vivek@khera.org>
+
+	* PayflowPro.pm: allow configuring the timeout of the request to
+	the Payflow servers.  Pass key TIMEOUT to the pfpro() function
+	call with a value in seconds for the timeout. Default is 30.
+	Patch from Mike Burns <mike.burns@liquidation.com> with minor
+	tweaks.
+
+2009-07-01  Vick Khera  <vivek@khera.org>
+
+	* PayflowPro.pm: when generating the unique request ID for the
+	API, avoid undef warnings when INVNUM is not set (as it is not
+	required for referenced credits.)  Fix from bhk@bhent.com.
+
+2009-06-22  Vivek Khera  <vivek@khera.org>
+
+	* PayflowPro.pm: fixed typo in error message from failure to
+	connect to server.
+

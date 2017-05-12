@@ -1,0 +1,25 @@
+---
+abstract: 'log when a process is killed'
+author:
+  - 'Robert Rothenberg <rrwo@thermeon.com>'
+build_requires:
+  Capture::Tiny: '0'
+  HTTP::Request::Common: '0'
+  Plack: '0'
+  Test::More: '0.90'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-LogHarakiri
+requires:
+  Plack::Middleware: '0'
+  Process::SizeLimit::Core: '0'
+  parent: '0'
+  perl: v5.8.8
+resources:
+  bugtracker: https://github.com/robrwo/Plack-Middleware-LogHarakiri/issues
+  repository: git://github.com/robrwo/Plack-Middleware-LogHarakiri.git
+version: '0.0301'

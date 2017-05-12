@@ -1,0 +1,15 @@
+Revision history for Padre-Plugin-NYTProf
+
+0.04   2010.12.06
+	- Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+
+0.03   2010.10.29
+	- Removed Test::NeedsDisplay dependency (AZAWAWI)
+
+0.02   2010.10.27
+	- t/00-load.t is magically injected by [@PadrePlugin] via [LoadTests] (AZAWAWI)
+
+0.01   2010.10.23
+
+	- First version, released on an unsuspecting world.
+

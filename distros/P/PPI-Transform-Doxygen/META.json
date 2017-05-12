@@ -1,0 +1,57 @@
+{
+   "abstract" : "Transform POD documentation to doxygen compatible format",
+   "author" : [
+      "Thomas Kratz <tomk@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PPI-Transform-Doxygen",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PPI" : "1.220",
+            "Pod::POM" : "2.01",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {}
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tomk3003/ppi-transform-doxygen/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/tomk3003/ppi-transform-doxygen"
+      }
+   },
+   "version" : "0.2",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,55 @@
+README for Pod::Webserver
+                                   Time-stamp: "2004-05-25 18:22:38 ADT"
+
+			    Pod::Webserver
+
+Pod::Webserver -- minimal web server to serve local Perl documentation
+
+
+SYNOPSIS
+
+(Running from a prompt)
+  % podwebserver
+  You can now point your browser at http://localhost:8020/
+
+
+DESCRIPTION
+
+This module can be run as an application that works as a
+minimal web server to serve local Perl documentation.  It's like
+L<perldoc> except it works through your browser.
+
+Run "podwebserver -h" for a list of runtime options.
+
+
+
+INSTALLATION
+
+You install this module-suite, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of this module-suite in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL PREFIX=~/perl
+
+See perldoc perlmodinstall for more information on installing modules.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for this
+module should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of this module is available from the Comprehensive
+Perl Archive Network (CPAN).  Visit <http://www.perl.com/CPAN/> to
+find a CPAN site near you.

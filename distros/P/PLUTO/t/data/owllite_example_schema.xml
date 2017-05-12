@@ -1,0 +1,191 @@
+<rdf:RDF
+	xmlns:base="http://jastor.adtech.ibm.com/testonts/"
+	xmlns:preds="http://jastor.adtech.ibm.com/testonts/predicates#"
+	xmlns:classes="http://jastor.adtech.ibm.com/testonts/classes#"
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#" 
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:dc="http://purl.org/dc/elements/1.1/">
+	
+	<owl:Ontology rdf:about="http://jastor.adtech.ibm.com/testonts/Ski">
+		<rdfs:label>Ski Ontology</rdfs:label>
+		<dc:creator>Ben Szekely</dc:creator>
+		<dc:contributor>Joe Betz</dc:contributor>
+		<owl:versionInfo>0.1</owl:versionInfo>
+		<rdfs:comment>Ontology for skis</rdfs:comment>
+	</owl:Ontology>
+	
+	<owl:Class rdf:about="http://jastor.adtech.ibm.com/testonts/classes#Ski">
+		<rdfs:comment>This class represents the base ontology class for describing skis</rdfs:comment>
+		<rdfs:label>Ski Class</rdfs:label>
+		<rdfs:seeAlso rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#TwinTip" />
+		<rdfs:seeAlso rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#PowderSki" />
+		<dc:title>Ski Title</dc:title>
+		<dc:creator>Ben Szekely</dc:creator>
+		<dc:contributor>Joe Betz</dc:contributor>
+		<owl:versionInfo>1.0</owl:versionInfo>
+		<rdfs:subClassOf>
+			<owl:Restriction owl:cardinality="1">
+				<owl:onProperty>					
+					<owl:DatatypeProperty rdf:about="http://jastor.adtech.ibm.com/testonts/predicates#manufacturer">
+						<rdfs:comment>This property indicates the manufacturer of the ski</rdfs:comment>
+						<rdfs:label>Manufacturer</rdfs:label>
+						<dc:title>Manufacturer Title</dc:title>
+						<dc:creator>Ben Szekely</dc:creator>
+						<dc:contributor>Joe Betz</dc:contributor>
+						<owl:versionInfo>1.0</owl:versionInfo>
+						<rdfs:domain rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#Ski"/>
+						<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+					</owl:DatatypeProperty>
+				</owl:onProperty>
+			</owl:Restriction>
+		</rdfs:subClassOf>
+		<rdfs:subClassOf>
+			<owl:Restriction owl:cardinality="1">
+				<owl:onProperty>
+					<owl:DatatypeProperty rdf:about="http://jastor.adtech.ibm.com/testonts/predicates#model">
+						<rdfs:domain rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#Ski"/>
+						<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+					</owl:DatatypeProperty>
+				</owl:onProperty>
+			</owl:Restriction>
+		</rdfs:subClassOf>
+		<rdfs:subClassOf>
+			<owl:Restriction owl:cardinality="1">
+				<owl:onProperty>
+					<owl:DatatypeProperty rdf:about="http://jastor.adtech.ibm.com/testonts/predicates#coreConstruction">
+						<rdfs:domain rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#Ski"/>
+						<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+					</owl:DatatypeProperty>
+				</owl:onProperty>
+			</owl:Restriction>
+		</rdfs:subClassOf>
+		<rdfs:subClassOf>
+			<owl:Restriction owl:minCardinality="1">
+				<owl:onProperty>
+					<owl:DatatypeProperty rdf:about="http://jastor.adtech.ibm.com/testonts/predicates#availableLength">
+						<rdfs:domain rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#Ski"/>
+						<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+					</owl:DatatypeProperty>
+				</owl:onProperty>
+			</owl:Restriction>
+		</rdfs:subClassOf>
+		
+		<rdfs:subClassOf>
+			<owl:Restriction owl:minCardinality="0">
+				<owl:onProperty>
+					<owl:ObjectProperty rdf:about="http://jastor.adtech.ibm.com/testonts/predicates#competesWith">
+						<rdfs:domain rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#Ski"/>
+						<rdfs:range rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#Ski"/>
+					</owl:ObjectProperty>
+				</owl:onProperty>
+			</owl:Restriction>
+		</rdfs:subClassOf>
+		
+		<rdfs:subClassOf>
+			<owl:Restriction owl:cardinality="1">
+				<owl:onProperty>
+					<owl:ObjectProperty rdf:about="http://jastor.adtech.ibm.com/testonts/predicates#mostSimilarTo">
+						<rdfs:domain rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#Ski"/>
+						<rdfs:range rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#Ski"/>
+					</owl:ObjectProperty>
+				</owl:onProperty>
+			</owl:Restriction>
+		</rdfs:subClassOf>
+		
+		<rdfs:subClassOf>
+			<owl:Restriction owl:cardinality="1">
+				<owl:onProperty>
+					<owl:DatatypeProperty rdf:about="http://jastor.adtech.ibm.com/testonts/predicates#attribute">
+						<rdfs:domain rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#Ski"/>
+					</owl:DatatypeProperty>
+				</owl:onProperty>
+			</owl:Restriction>
+		</rdfs:subClassOf>
+		
+		<rdfs:subClassOf>
+			<owl:Restriction owl:cardinality="1">
+				<owl:onProperty>
+					<owl:ObjectProperty rdf:about="http://jastor.adtech.ibm.com/testonts/predicates#identifier">
+						<rdfs:domain rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#Ski"/>
+						<rdfs:range rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#SomeUnknownType"/>
+					</owl:ObjectProperty>
+				</owl:onProperty>
+			</owl:Restriction>
+		</rdfs:subClassOf>
+			
+	</owl:Class>
+	
+	
+	
+	<owl:Class rdf:about="http://jastor.adtech.ibm.com/testonts/classes#TwinTip">
+		<rdfs:subClassOf rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#Ski" />
+		<rdfs:subClassOf>
+			<owl:Restriction owl:minCardinality="0" owl:maxCardinality="1">
+				<owl:onProperty>
+					<owl:DatatypeProperty rdf:about="http://jastor.adtech.ibm.com/testonts/predicates#pipeOrPark">
+						<rdfs:domain rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#TwinTip"/>
+						<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#string"/>
+					</owl:DatatypeProperty>
+				</owl:onProperty>
+			</owl:Restriction>
+		</rdfs:subClassOf>		
+		<rdfs:subClassOf>
+			<owl:Restriction>
+				<owl:onProperty rdf:resource="http://jastor.adtech.ibm.com/testonts/predicates#competesWith" />
+				<owl:allValuesFrom rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#TwinTip" />
+			</owl:Restriction>
+		</rdfs:subClassOf>		
+	</owl:Class>
+	
+	<owl:Class rdf:about="http://jastor.adtech.ibm.com/testonts/classes#PowderSki">
+		<rdfs:subClassOf rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#Ski" />
+		<rdfs:subClassOf>
+			<owl:Restriction owl:cardinality="1">
+				<owl:onProperty>
+					<owl:DatatypeProperty rdf:about="http://jastor.adtech.ibm.com/testonts/predicates#flotation">
+						<rdfs:domain rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#PowderSki"/>
+						<rdfs:range rdf:resource="http://www.w3.org/2001/XMLSchema#int"/>
+					</owl:DatatypeProperty>
+				</owl:onProperty>
+			</owl:Restriction>
+		</rdfs:subClassOf>
+		<rdfs:subClassOf>
+			<owl:Restriction>
+				<owl:onProperty rdf:resource="http://jastor.adtech.ibm.com/testonts/predicates#competesWith" />
+				<owl:allValuesFrom rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#PowderSki" />
+			</owl:Restriction>
+		</rdfs:subClassOf>		
+	</owl:Class>	
+	
+	<owl:Class rdf:about="http://jastor.adtech.ibm.com/testonts/classes#FatTwin">
+		<rdfs:subClassOf rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#PowderSki" />
+	    <rdfs:subClassOf rdf:resource="http://jastor.adtech.ibm.com/testonts/classes#TwinTip" />
+	    <rdfs:subClassOf>
+			<owl:Restriction>
+				<owl:onProperty rdf:resource="http://jastor.adtech.ibm.com/testonts/predicates#pipeOrPark" />
+				<owl:hasValue>park</owl:hasValue>					
+			</owl:Restriction>
+		</rdfs:subClassOf>
+	</owl:Class>
+	
+	<owl:Class rdf:about="http://jastor.adtech.ibm.com/testonts/classes#SpecialtySki">
+		<owl:unionOf rdf:parseType="Collection">
+		    <owl:Class rdf:about="http://jastor.adtech.ibm.com/testonts/classes#PowderSki"/>
+		    <owl:Class rdf:about="http://jastor.adtech.ibm.com/testonts/classes#TwinTip"/>
+ 		</owl:unionOf>
+	</owl:Class>	
+	
+	<owl:Class rdf:about="http://jastor.adtech.ibm.com/testonts/classes#PipeSki">
+		<owl:intersectionOf rdf:parseType="Collection">
+		    <owl:Class rdf:about="http://jastor.adtech.ibm.com/testonts/classes#TwinTip"/>
+		    <owl:Restriction>
+				<owl:onProperty rdf:resource="http://jastor.adtech.ibm.com/testonts/predicates#pipeOrPark" />
+				<owl:hasValue>pipe</owl:hasValue>					
+			</owl:Restriction>
+ 		</owl:intersectionOf>
+	</owl:Class>
+		
+	
+</rdf:RDF>

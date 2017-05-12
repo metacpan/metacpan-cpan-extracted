@@ -1,0 +1,15 @@
+=begin NONSENSE
+
+This block is nonsense and should not appear in the output XML.
+
+=end
+
+=head1 NAME
+
+Testing for =begin stripping.
+
+=head1 WHY?
+
+Because we must!
+
+=cut

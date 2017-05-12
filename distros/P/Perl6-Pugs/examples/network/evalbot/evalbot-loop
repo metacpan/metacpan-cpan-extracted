@@ -1,0 +1,94 @@
+#!/usr/bin/perl
+
+use strict;
+
+my ($nick_base, @channels) = @ARGV;
+my $svn = ((-e '.svn') ? 'svn' : 'svk');
+
+unless (`$svn info` =~ /\/pugs$/m) {
+    die "This should be run from the root directory of a pugs $svn checkout\n";
+}
+
+chomp(my $PUGSHOME = `pwd`);
+
+$nick_base ||= "evalbot";
+@channels = ('#perl6') unless @channels;
+
+my $pid = 0;
+
+$ENV{PUGS_EMBED} = 'perl5';
+$ENV{PERL6LIB} = "$PUGSHOME/blib6/lib";
+
+my $pipe = "evalbot_nick";
+
+sub update_pugs {
+    print STDERR "*** Updating repository...\n";
+    system "$svn update";
+    my $revision;
+    if ($svn eq 'svn') {
+        my $info = `$svn info`;
+        ($revision) = $info =~ /^Revision: (\d+)/m;
+    }
+    else { # SVK here
+        my @info = qx/svk info/;
+        if (my ($line) = grep /(?:file|svn|https?)\b/, @info) {
+            ($revision) = $line =~ / (\d+)$/;
+        } elsif (my ($source_line) = grep /^(Copied|Merged) From/, @info) {
+            if (my ($source_depot) = $source_line =~ /From: (.*?), Rev\. \d+/) {
+                $source_depot = '/'.$source_depot; # convert /svk/trunk to //svk/trunk
+                if (my @info = qx/svk info $source_depot/ and $? == 0) {
+                    if (my ($line) = grep /(?:file|svn|https?)\b/, @info) {
+                        ($revision) = $line =~ / (\d+)$/;
+                    }
+                }
+            }
+        }
+    }
+
+    print STDERR "*** Updated to revision $revision\n";
+    return $revision;
+}
+
+sub build_pugs {
+    print STDERR "*** Rebuilding pugs\n";
+    unlink 'src/Pugs/pugs_version.h';
+    system 'perl Makefile.PL';
+    system 'make';
+}
+
+sub start_pugs {
+    my ($nick) = @_;
+    
+    print STDERR "*** Starting $nick\n";
+    set_nick($nick);
+
+    if ($pid = fork) {
+        return;
+    }
+    else {
+        exec "./pugs examples/network/evalbot/evalbot.pl " .
+             "'=$pipe' chat.freenode.net 900 " . join(' ', map { "'$_'" } @channels)
+                or exit;
+    }
+}
+
+sub set_nick {
+    my ($nick) = @_;
+
+    print STDERR "*** Resetting $nick\n";
+    open my $fh, '>', $pipe;
+    print $fh $nick;
+}
+
+my $rev = update_pugs;
+build_pugs;
+start_pugs "$nick_base\_r$rev";
+while (1) {
+    sleep 300;
+    my $newrev = update_pugs;
+    if ($newrev > $rev) {
+        build_pugs;
+        $rev = $newrev;
+        set_nick "$nick_base\_r$rev";
+    }
+}

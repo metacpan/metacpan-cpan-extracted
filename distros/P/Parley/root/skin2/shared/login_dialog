@@ -1,0 +1,83 @@
+<!-- LOGIN DIALOG -->
+<script type="text/javascript">
+YAHOO.namespace("parley.login");
+
+function login_dialog_init() {
+	// Define various event handlers for Dialog
+	var handleSubmit = function() {
+		this.submit();
+	};
+	var handleCancel = function() {
+		this.cancel();
+	};
+	var handleSuccess = function(o) {
+	};
+	var handleFailure = function(o) {
+		alert("Submission failed: " + o.status);
+	};
+
+	// Instantiate the Dialog
+	YAHOO.parley.login.login_dialog = new YAHOO.widget.Dialog(
+        'login_dialog', 
+        {
+            postmethod:             'form',
+            fixedcenter:            true,
+            visible:                false, 
+            modal:                  false,
+            constraintoviewport:    true,
+            width:                  '450px',
+            buttons : [
+                { text:'[%l('Login')%]',  handler:handleSubmit, isDefault:true },
+                { text:'[%l('Cancel')%]', handler:handleCancel }
+            ]
+        }
+    );
+	
+	// Validate the entries in the form to require that both first and last name are entered
+	YAHOO.parley.login.login_dialog.validate = function() {
+		var data = this.getData();
+		if (data.username == "" || data.password == "") {
+			alert("[%l('Please enter your username and password')%].");
+			return false;
+		}
+        else {
+			return true;
+		}
+	};
+
+	// Wire up the success and failure handlers
+	YAHOO.parley.login.login_dialog.callback = {
+        success: handleSubmit,
+        failure: handleFailure
+    };
+	
+	// Render the Dialog
+	YAHOO.parley.login.login_dialog.render();
+	//YAHOO.parley.search.search_dialog.show();
+}
+
+YAHOO.util.Event.onDOMReady(login_dialog_init);
+</script>
+
+<div id="login_dialog" style="visibility:hidden;">
+    <div class="hd">
+        [%l('Please enter your information')%]
+    </div>
+    <div class="bd">
+        <form action="user/login" method="post" name="login_form"
+            class="login_dialog_form_">
+            <fieldset>
+                <label for="username"><b>[%l('Username')%]:</b></label>
+                <input type="text" id="username" name="username" style="width: 16em;" class="input_text" />
+                <br />
+                <label for="password"><b>[%l('Password')%]:</b></label>
+                <input type="password" id="password" name="password" style="width: 15em;" class="input_text" />
+
+                <p align="right">
+                <a href="user/password/forgotten">[%l('Forgotten Password')%]</a>
+                </p>
+            </fieldset>
+        </form>
+    </div>
+</div>
+<!-- LOGIN DIALOG -->

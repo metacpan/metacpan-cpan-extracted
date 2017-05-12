@@ -1,0 +1,13 @@
+=head1 NAME
+
+Panda::Install::ParseXS - Adds new features for TYPEMAPS and XS code
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

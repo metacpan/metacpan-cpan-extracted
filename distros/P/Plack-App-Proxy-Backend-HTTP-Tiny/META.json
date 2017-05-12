@@ -1,0 +1,53 @@
+{
+   "abstract" : "backend for Plack::App::Proxy",
+   "author" : [
+      "Piotr Roszatycki <dexter@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-App-Proxy-Backend-HTTP-Tiny",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Tiny" : "0",
+            "Plack" : "0",
+            "Plack::App::Proxy" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::App::Proxy::Backend::HTTP::Tiny" : {
+         "file" : "lib/Plack/App/Proxy/Backend/HTTP/Tiny.pm",
+         "version" : "0.0100"
+      },
+      "Plack::App::Proxy::Backend::HTTP::Tiny::PreserveHeaders" : {
+         "file" : "lib/Plack/App/Proxy/Backend/HTTP/Tiny.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/dex4er/perl-Plack-App-Proxy-Backend-HTTP-Tiny/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/dex4er/perl-Plack-App-Proxy-Backend-HTTP-Tiny"
+      }
+   },
+   "version" : "0.0100"
+}

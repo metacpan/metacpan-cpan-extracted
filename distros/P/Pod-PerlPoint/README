@@ -1,0 +1,99 @@
+
+
+INTRO
+
+This distribution provides a module Pod::PerlPoint to transform POD
+documents into the PerlPoint format, and a script pod2pp that makes
+such conversion simple, in the tradition of the various pod2...
+utilities around.
+
+
+INSTALLATION
+
+As usual, unpack the distribution file and call
+
+ make test install distclean
+
+After that, you should be able to call pod2pp directly.
+
+ pod2pp
+
+Please use option -help to display a short usage message. 
+
+
+DOCUMENTATION
+
+Documentation is provided both with the module and the script
+- inline and in POD format ;-)
+
+As Pod::PerlPoint subclasses Pod::Simple (from version 0.02 on),
+most documentation about this module might be find in the docs
+of Pod::Simple or Pod::Simple::Methody, respectively.
+
+
+LIMITS
+
+Due to the definitions of indentation in POD and Perlpoint, list
+nesting is currently not supported. All lists are translated,
+but nesting is ignored. This might change in a future version.
+
+
+
+SUPPPORT
+
+A PerlPoint mailing list is set up to discuss usage, ideas,
+bugs, suggestions and translator development. To subscribe,
+please send an empty message to perlpoint-subscribe@perl.org.
+
+If you prefer, you can contact me via perl@jochen-stenzel.de
+as well.
+
+
+
+CREDITS
+
+Thanks to Sean M. Burke for the Pod::Simple modules which made
+it simple to write this package and already provided most
+of the functionality needed.
+
+
+AUTHOR
+
+Copyright (c) Jochen Stenzel (perl@jochen-stenzel.de), 2002-2004.
+All rights reserved.
+
+This distribution is free software, you can redistribute it and/or modify it
+under the terms of the Artistic License distributed with Perl version
+5.003 or (at your option) any later version. Please refer to the
+Artistic License that came with your Perl distribution for more
+details.
+
+The Artistic License should have been included in your distribution of
+Perl. It resides in the file named "Artistic" at the top-level of the
+Perl source tree (where Perl was downloaded/unpacked - ask your
+system administrator if you dont know where this is).  Alternatively,
+the current version of the Artistic License distributed with Perl can
+be viewed on-line on the World-Wide Web (WWW) from the following URL:
+http://www.perl.com/perl/misc/Artistic.html.
+
+
+DISCLAIMER
+
+This software is distributed in the hope that it will be useful, but
+is provided "AS IS" WITHOUT WARRANTY OF ANY KIND, either expressed or
+implied, INCLUDING, without limitation, the implied warranties of
+MERCHANTABILITY and FITNESS FOR A PARTICULAR PURPOSE.
+
+The ENTIRE RISK as to the quality and performance of the software
+IS WITH YOU (the holder of the software).  Should the software prove
+defective, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR
+CORRECTION.
+
+IN NO EVENT WILL ANY COPYRIGHT HOLDER OR ANY OTHER PARTY WHO MAY CREATE,
+MODIFY, OR DISTRIBUTE THE SOFTWARE BE LIABLE OR RESPONSIBLE TO YOU OR TO
+ANY OTHER ENTITY FOR ANY KIND OF DAMAGES (no matter how awful - not even
+if they arise from known or unknown flaws in the software).
+
+Please refer to the Artistic License that came with your Perl
+distribution for more details.
+

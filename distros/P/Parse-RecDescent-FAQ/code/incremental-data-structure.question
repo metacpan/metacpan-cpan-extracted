@@ -1,0 +1,14 @@
+I have a data structure which is
+
+a hash of entries
+where
+an entry is a list/array of sets
+
+I have also a grammar that can parse the syntax of the text files that
+contain the data I want to fill this structure with. Until here
+everything is ok.
+
+Problem: I cannot figure out how to actually FILL the parsed data into
+the structure. I can only decide if a string is grammatically correct
+or not.
+

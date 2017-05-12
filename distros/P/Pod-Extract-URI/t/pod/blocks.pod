@@ -1,0 +1,43 @@
+# command tests
+
+=head1 FTP URI in command para ftp://www.example.com/command
+
+=head1 FTP URI L int seq in command para L<ftp://www.example.com/command/intseq>
+
+=head1 HTTP URI in command para http://www.example.com/command
+
+=head1 HTTP URI L int seq in command para L<http://www.example.com/command/intseq>
+
+=head1 Schemeless URI in command para www.example.com/command
+
+=head1 Schemeless URI L int seq in command para L<www.example.com/command/intseq>
+
+=head1 Non-URI L int seq in command para L<foo>
+
+=head1 Non-L int seq in command para C<foo>
+
+# verbatim tests
+
+    FTP URI in verbatim para ftp://www.example.com/verbatim
+
+    HTTP URI in verbatim para http://www.example.com/verbatim
+
+    Schemeless URI in verbatim para www.example.com/verbatim
+
+# textblock tests
+
+FTP URI in textblock para ftp://www.example.com/textblock
+
+FTP URI L int seq in textblock para L<ftp://www.example.com/textblock/intseq>
+
+HTTP URI in textblock para http://www.example.com/textblock
+
+HTTP URI L int seq in textblock para L<http://www.example.com/textblock/intseq>
+
+Schemeless URI in textblock para www.example.com/textblock
+
+Schemeless URI L int seq in textblock para L<www.example.com/textblock/intseq>
+
+Non-URI L int seq in textblock para L<foo>
+
+Non-L int seq in textblock para C<foo>

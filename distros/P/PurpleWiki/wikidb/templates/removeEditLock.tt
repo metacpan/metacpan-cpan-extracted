@@ -1,0 +1,11 @@
+[% INCLUDE common/header.tt
+           title = "Removing edit lock"
+%]
+
+[% IF forcedUnlock %]
+<h2>Forced Unlock</h2>
+[% ELSE %]
+<h2>Normal Unlock</h2>
+[% END %]
+
+[% INCLUDE common/footer.tt %]

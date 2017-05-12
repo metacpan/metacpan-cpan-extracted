@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+program_path=${prefix}/lib/icon-naming-utils
+
+Name: icon-naming-utils
+Description: Utilities for mapping legacy GNOME and KDE icon names to the new Icon Naming Specification
+Version: 0.8.90
+Requires: 
+Libs: 
+Cflags: 

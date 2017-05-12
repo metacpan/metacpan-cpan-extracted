@@ -1,0 +1,69 @@
+---
+abstract: 'Add (or append) a section with badges'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  Badge::Depot: '0.0104'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Tester: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::pushd: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  PPI: '0'
+  Path::Tiny: '0.072'
+  Pod::Elemental: '0'
+  Pod::Weaver: '0'
+  Syntax::Feature::Qi: '0.2004'
+  Test::DZil: '0'
+  Test::Differences: '0'
+  Test::More: '0.96'
+  syntax: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Iller version 0.1407, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Weaver-Section-Badges
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Pod::Weaver::Section::Badges:
+    file: lib/Pod/Weaver/Section/Badges.pm
+    version: '0.0402'
+  Pod::Weaver::Section::Badges::PluginSearcher:
+    file: lib/Pod/Weaver/Section/Badges/PluginSearcher.pm
+    version: '0.0402'
+  Pod::Weaver::Section::Badges::Utils:
+    file: lib/Pod/Weaver/Section/Badges/Utils.pm
+    version: '0.0402'
+requires:
+  List::Util: '1.42'
+  Module::Pluggable: '4.7'
+  Moose: '2.1405'
+  MooseX::AttributeDocumented: '0.1003'
+  PerlX::Maybe: '1.001'
+  Pod::Weaver::Role::AddTextToSection: '0'
+  Pod::Weaver::Role::Section: '0'
+  Types::Standard: '1.000005'
+  namespace::autoclean: '0.22'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/Csson/p5-Pod-Weaver-Section-Badges/issues
+  homepage: https://metacpan.org/release/Pod-Weaver-Section-Badges
+  repository: https://github.com/Csson/p5-Pod-Weaver-Section-Badges.git
+version: '0.0402'
+x_authority: cpan:CSSON
+x_contributors:
+  - 'Mark Grimes <mgrimes@cpan.org>'

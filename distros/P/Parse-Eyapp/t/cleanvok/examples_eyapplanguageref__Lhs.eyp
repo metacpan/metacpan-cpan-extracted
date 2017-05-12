@@ -1,0 +1,36 @@
+%right '=' 
+%left '-' '+' 
+%left '*' '/' 
+%left NEG 
+%token NUM =
+%token VAR =
+
+%%
+
+input:
+    | input line  
+;
+line:
+      '\n'
+    | exp '\n'
+    | exp ''  
+;
+exp:
+      NUM
+    | VAR
+    | %name ASSIGN
+      VAR '=' exp
+    | %name PLUS
+      exp '+' exp
+    | %name MINUS
+      exp '-' exp
+    | %name TIMES
+      exp '*' exp
+    | %name DIV
+      exp '/' exp
+    | %name UMINUS
+      '-' exp %prec NEG
+    | '(' exp ')' 
+;
+
+%%

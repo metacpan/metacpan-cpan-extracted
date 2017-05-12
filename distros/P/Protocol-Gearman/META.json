@@ -1,0 +1,66 @@
+{
+   "abstract" : "abstract base class for both client and worker",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Protocol-Gearman",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::HexString" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future" : "0",
+            "IO::Socket::IP" : "0",
+            "Struct::Dumb" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Net::Gearman" : {
+         "file" : "lib/Net/Gearman.pm",
+         "version" : "0.04"
+      },
+      "Net::Gearman::Client" : {
+         "file" : "lib/Net/Gearman/Client.pm",
+         "version" : "0.04"
+      },
+      "Net::Gearman::Worker" : {
+         "file" : "lib/Net/Gearman/Worker.pm",
+         "version" : "0.04"
+      },
+      "Protocol::Gearman" : {
+         "file" : "lib/Protocol/Gearman.pm",
+         "version" : "0.04"
+      },
+      "Protocol::Gearman::Client" : {
+         "file" : "lib/Protocol/Gearman/Client.pm",
+         "version" : "0.04"
+      },
+      "Protocol::Gearman::Worker" : {
+         "file" : "lib/Protocol/Gearman/Worker.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04"
+}

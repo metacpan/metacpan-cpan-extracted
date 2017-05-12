@@ -1,0 +1,11 @@
+
+This is a simple wrapper for fork.  It will wait for there
+to be a process available.  It will fork off a perl function.
+
+To build/install it, use 
+
+	perl Makefile.PL
+	make 
+	make test
+	make install
+

@@ -1,0 +1,49 @@
+---
+abstract: 'Resize jpeg and png images on the fly'
+author:
+  - 'Panu Ervamaa <pnu@cpan.org>'
+build_requires:
+  Class::MOP: '0'
+  Data::Dumper: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Response: '0'
+  IO::File: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Imager: '0'
+  Plack::Builder: '0'
+  Plack::Middleware::Static: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+  blib: '1.01'
+  lib: '0'
+  perl: '5.006'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Image-Scale
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Image::Scale: '0'
+  List::Util: '0'
+  Moose: '0'
+  Plack::MIME: '0'
+  Plack::Middleware: '0'
+  Plack::Util: '0'
+  Try::Tiny: '0'
+  perl: '5.006'
+  strict: '0'
+resources:
+  repository: git://github.com/pnu/Plack-Middleware-Image-Scale.git
+version: '0.011'
+x_authority: cpan:PNU

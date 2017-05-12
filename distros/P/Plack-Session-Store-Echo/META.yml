@@ -1,0 +1,29 @@
+---
+abstract: 'Echo store for Plack::Middleware::Session'
+author:
+  - 'Denis Ibaev <dionys@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Session-Store-Echo
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Plack::Middleware::Session: 0
+  parent: 0
+  perl: 5.008000
+resources:
+  bugtracker: http://github.com/dionys/plack-session-store-echo/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/dionys/plack-session-store-echo
+version: 1.00

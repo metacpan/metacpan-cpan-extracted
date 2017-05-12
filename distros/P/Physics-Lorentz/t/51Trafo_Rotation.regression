@@ -1,0 +1,20 @@
+# Sun Nov 26 17:30:32 2006
+# perl v5.8.8 built for x86_64-linux-gnu-thread-multi
+["check that euler angle rotation is correct",{"x3" => "-0.0260463795247965","gamma" => "0.377954109629359","x2" => "0.873124539575613","alpha" => "1.07357695395468","beta" => "0.972694248096744","x1" => "-1.47745077180366","t" => "1.17913452818978"}]
+
+# Sun Nov 26 17:38:42 2006
+# perl v5.8.8 built for x86_64-linux-gnu-thread-multi
+["check that the rotation to the z axis is correct",{"y" => "-0.240821347533341","x" => "-0.420715679193552","z" => "-0.215662503732883"}]
+
+# Tue Dec  5 19:26:11 2006
+# perl v5.8.8 built for x86_64-linux-gnu-thread-multi
+["check that rotation around z axis is correct for simple cases",{"y" => "0.72375401371507","x" => "-0.640599686100174","z" => "0.36857848865521","t" => "1.33999541376715"}]
+
+# Tue Dec  5 19:28:09 2006
+# perl v5.8.8 built for x86_64-linux-gnu-thread-multi
+["check that rotation around y axis is correct for simple cases",{"y" => "-0.630510466548127","x" => "0.193587090890261","z" => "1.32612574777452","t" => "0.562494203264887"}]
+
+# Wed Dec  6 14:18:15 2006
+# perl v5.8.8 built for x86_64-linux-gnu-thread-multi
+["check that rotation around x axis is correct for simple cases",{"y" => "1.39300225616754","x" => "0.389605356884573","z" => "1.42868936368253","t" => "-1.22941706260916"}]
+

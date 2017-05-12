@@ -1,0 +1,34 @@
+Revision history for Perl extension Plack::Middleware::XSLT
+
+0.30  2014-10-18
+        - Support PSGI streaming
+        - Remove dependency on HTTP::Exception
+        - Remove dependency on Plack::Response
+        - Remove dependency on Test::Deep
+        - Minor cleanups
+
+0.20002  2013-05-31
+        - Fix tests on Windows
+        - Document HTTP::Exception feature
+
+0.20001  2013-05-24
+        - Improve startup speed
+        - Allow absolute stylesheet paths
+        - Use File::Spec for path operations
+
+0.20000  2012-08-24
+        - Major rewrite
+        - Use XML::LibXML::Cache for stylesheet cache
+
+0.10003
+        - Fix prereqs for Plack < 0.99
+
+0.10002
+        - Add Test::Deep to TestRequires
+
+0.10001
+        - Fix caching bug
+
+0.10000
+        - Initial release
+

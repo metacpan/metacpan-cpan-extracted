@@ -1,0 +1,125 @@
+#!/usr/bin/perl
+#===============================================================================
+#
+#         FILE: pod6docbook
+#
+#  DESCRIPTION:  save Perl pod as docbook
+#       AUTHOR:  Aliaksandr P. Zahatski ,  <zag@cpan.org>
+#===============================================================================
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Perl6::Pod::To::DocBook;
+use Perl6::Pod::Writer;
+my ( $help, $man, $doctype, $add_head, $custom_formatter, %use_block );
+my %opt = ( help => \$help, man => \$man, );
+GetOptions(
+    \%opt, 'help|?', 'man',
+    'doctype|t=s'   => \$doctype,
+    'add_head|ah'   => \$add_head,
+    'formatter|f=s' => \$custom_formatter,
+    'use_block=s'   => \%use_block
+) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+my $infile = shift;
+my $in_fd;
+if ($infile) {
+    $in_fd = new IO::File:: "< $infile" or die "$infile: $!";
+}
+else {
+    $in_fd = \*STDIN;
+}
+my $text;
+{
+    local $/;
+    $text = <$in_fd>
+}
+my $renderer = new Perl6::Pod::To::DocBook::
+  writer  => new Perl6::Pod::Writer( out => \*STDOUT ),
+  doctype => $doctype,
+  header  => $add_head;
+$renderer->parse( \$text, default_pod => 1 );
+
+exit;
+
+=head1 NAME
+
+    pod6docbook  - convert Perl pod to DocBook
+
+=head1 SYNOPSIS
+
+  pod6docbook < somefile.pod > somefile.xml
+  pod6docbook somefile.pod  > somefile.xml
+
+
+   options:
+    -doctype|t - set docbook type ( ie chapter, article, book ...). Default chapter;
+    -add_head|ah - If this option is set , pod6docbook will emit a DOCTYPE as the first line of output.
+    -formatter|f - set output formatter class, default Perl6::Pod::To::DocBook
+    -use_block MOD_NAME=Block_name  - set module for handle Block_name. Equivalent for:
+         =begin pod
+         =use MOD_NAME Block_name
+         =end pod
+
+    -help  - print help message
+    -man   - print man page
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits
+
+=item B<-man>
+
+Prints manual page and exits
+
+=item B<-doctype>, B<-t>
+
+Set docbook type ( ie chapter, article, book ...). Default chapter
+
+=item B<-add_head>,B<-ah>
+
+If this option is set , pod6docbook will emit a DOCTYPE as the first line of output
+
+=item B<-formatter>, B<-f>
+
+Set output formatter class, default Perl6::Pod::To::DocBook
+
+=item B<-use_block>
+
+Set module for handle Block_name Equivalent for B<=use> direcive :
+
+         =begin pod
+         =use MOD_NAME Block_name
+         =end pod
+
+=back
+
+=head1 DESCRIPTION
+
+  B<pod6docbook>  - convert Perl pod to DocBook
+
+=head1 EXAMPLE
+
+  pod6docbook < somefile.pod > somefile.xml
+
+
+=head1 AUTHOR
+
+Zahatski Aliaksandr, E<lt>zag@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009-2015 by Zahatski Aliaksandr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut
+

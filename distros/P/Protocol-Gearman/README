@@ -1,0 +1,148 @@
+NAME
+    `Protocol::Gearman' - abstract base class for both client and worker
+
+DESCRIPTION
+    This base class is used by both Protocol::Gearman::Client and
+    Protocol::Gearman::Worker. It shouldn't be used directly by end-user
+    implementations. It is documented here largely to explain what methods
+    an end implementation needs to provide in order to create a Gearman
+    client or worker.
+
+    For implementing a Gearman client or worker, see the modules
+
+    * Protocol::Gearman::Client
+
+    * Protocol::Gearman::Worker
+
+    For a simple synchronous Gearman client or worker module for use during
+    testing or similar, see
+
+    * Net::Gearman::Client
+
+    * Net::Gearman::Worker
+
+REQUIRED METHODS
+    The implementation should provide the following methods:
+
+  $f = $gearman->new_future
+    Return a new Future subclass instance, for request methods to use. This
+    instance should support awaiting appropriately.
+
+  $gearman->send( $bytes )
+    Send the given bytes to the server.
+
+  $h = $gearman->gearman_state
+    Return a HASH reference for the Gearman-related code to store its state
+    on. If not implemented, a default method will be provided which uses
+    `$gearman' itself, for the common case of HASH-based objects. All the
+    Gearman-related state will be stored in keys whose names are prefixed by
+    `gearman_', to avoid clashes with other object state.
+
+INTERNAL METHODS
+    These methods are provided for the client and worker subclasses to use;
+    it is unlikely these will be of interest to other users but they are
+    documented here for completeness.
+
+  ( $type, $body ) = $gearman->pack_packet( $name, @args )
+    Given a name of a packet type (specified as a string as the name of one
+    of the `TYPE_*' constants, without the leading `TYPE_' prefix; case
+    insignificant) returns the type value and the arguments for the packet
+    packed into a body string. This is intended for passing directly into
+    `build_packet' or `send_packet':
+
+     send_packet $fh, pack_packet( SUBMIT_JOB => $func, $id, $arg );
+
+  ( $name, @args ) = $gearman->unpack_packet( $type, $body )
+    Given a type code and body string, returns the type name and unpacked
+    arguments from the body. This function is the reverse of `pack_packet'
+    and is intended to be used on the result of `parse_packet' or
+    `recv_packet':
+
+    The returned `$name' will always be a fully-captialised type name, as
+    one of the `TYPE_*' constants without the leading `TYPE_' prefix.
+
+    This is intended for a `given/when' control block, or dynamic method
+    dispatch:
+
+     my ( $name, @args ) = unpack_packet( recv_packet $fh );
+
+     $self->${\"handle_$name"}( @args )
+
+  ( $name, @args ) = $gearman->parse_packet_from_string( $bytes )
+    Attempts to parse a complete message packet from the given byte string.
+    If it succeeds, it returns the type name and arguments. If it fails it
+    returns an empty list.
+
+    If successful, it will remove the bytes of the packet form the `$bytes'
+    scalar, which must therefore be mutable.
+
+    If the byte string begins with some bytes that are not recognised as the
+    Gearman packet magic for a response, the function will immediately throw
+    an exception before modifying the string.
+
+  ( $name, @args ) = $gearman->recv_packet_from_fh( $fh )
+    Attempts to read a complete packet from the given filehandle, blocking
+    until it is available. The results are undefined if this function is
+    called on a non-blocking filehandle.
+
+    If an IO error happens, an exception is thrown. If the first four bytes
+    read are not recognised as the Gearman packet magic for a response, the
+    function will immediately throw an exception. If either of these
+    conditions happen, the filehandle should be considered no longer valid
+    and should be closed.
+
+  $bytes = $gearman->build_packet_to_string( $name, @args )
+    Returns a byte string containing a complete packet with the given
+    fields.
+
+  $gearman->send_packet_to_fh( $fh, $name, @args )
+    Sends a complete packet to the given filehandle. If an IO error happens,
+    an exception is thrown.
+
+  $gearman->send_packet( $typename, @args )
+    Packs a packet from a list of arguments then sends it; a combination of
+    `pack_packet' and `build_packet'. Uses the implementation's `send'
+    method.
+
+  $gearman->on_recv( $buffer )
+    The implementation should call this method when more bytes of data have
+    been received. It parses and unpacks packets from the buffer, then
+    dispatches to the appropriately named `on_*' method. A combination of
+    `parse_packet' and `unpack_packet'.
+
+    The `$buffer' scalar may be modified; if it still contains bytes left
+    over after the call these should be preserved by the implementation for
+    the next time it is called.
+
+  $gearman->on_ERROR( $name, $message )
+    Default handler for the `TYPE_ERROR' packet. This method should be
+    overriden by subclasses to change the behaviour.
+
+  $gearman->echo_request( $payload ) ==> ( $payload )
+    Sends an `ECHO_REQ' packet to the Gearman server, and returns a future
+    that will eventually yield the payload when the server responds.
+
+PROTOTYPICAL OBJECTS
+    An alternative option to subclassing to provide the missing methods, is
+    to use `Protocol::Gearman' (or rather, one of the client or worker
+    subclasses) as a prototypical object, passing in CODE references for the
+    missing methods to a special constructor that creates a concrete object.
+
+    This may be more convenient to use in smaller one-shot cases (like unit
+    tests or small scripts) instead of creating a subclass.
+
+     my $socket = ...;
+
+     my $client = Protocol::Gearman::Client->new_prototype(
+        send       => sub { $socket->print( $_[1] ); },
+        new_future => sub { My::Future::Subclass->new },
+     );
+
+  $gearman = Protocol::Gearman->new_prototype( %methods )
+    Returns a new prototypical object constructed using the given methods.
+    The named arguments must give values for the `send' and `new_future'
+    methods.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

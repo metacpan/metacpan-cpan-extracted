@@ -1,0 +1,7 @@
+Revision history for Perl extension Plack::Handler::SCGI
+
+0.02  Sun Mar 21 01:38:37 PDT 2010
+        - Set psgix.input.buffered which is actually false
+
+0.01  Sun Jan 31 04:46:55 2010
+        - original version

@@ -1,0 +1,131 @@
+#!/usr/local/ymir/perl/bin/perl -w
+## ----------------------------------------------------------------------------
+#  mlpod2pod
+#    convert mlpod into normal pod.
+# -----------------------------------------------------------------------------
+# Mastering programed by YAMASHINA Hio
+#
+# Copyright 2003 YMIRLINK,Inc.
+# -----------------------------------------------------------------------------
+# $Id: mlpod2pod,v 1.4 2004/08/14 09:00:31 hio Exp $
+# -----------------------------------------------------------------------------
+package Mlpod2pod;
+use strict;
+
+use Pod::MultiLang::Pod;
+BEGIN
+{
+  if( 0 )
+  {
+    # for debug
+    eval
+    {
+      require Diehook;
+      Diehook->addhook();
+      #Diehook->addwarnhook();
+    };
+  }
+}
+
+my @arraykeys = qw( langs );
+my @paramkeys = qw( default-lang auto-out );
+
+# -----------------------------------------------------------------------------
+# startup.
+#
+if( !caller() )
+{
+  __PACKAGE__->do_work(@ARGV);
+}
+
+# -----------------------------------------------------------------------------
+# process.
+#
+sub do_work
+{
+  my $pkg = shift;
+  my %opt;
+  my @files;
+  while(@_)
+  {
+    $_ = shift;
+    if( $_ eq '--' )
+    {
+      push(@files,@_);
+      last;
+    }
+    if( $_ eq '-o' )
+    {
+      my $v = shift;
+      $opt{outfile} = ($v=~/(.*)/)[0];
+    }elsif( $_ =~ /^(-h|--help)$/ )
+    {
+      (my $prog = $0) =~ s/.*\///;
+      print qq/usage:\n/;
+      print qq/  $prog [-h|--help]\n/;
+      print qq/  $prog --langs=ja,en [-o outfile] infile \n/;
+      return;
+    }elsif( /^--([\w-]+)(=?)(.*)$/ )
+    {
+      my ($k,$set,$v) = ($1,$2,$3);
+      if( !$set )
+      {
+	$v = 1;
+      }
+      if( grep{$_ eq $k}@arraykeys )
+      {
+	$v = [split(/[:,]/,$v)];
+      }elsif( grep{$_ eq $k}@paramkeys )
+      {
+      }else
+      {
+	warn "unknown key [$k]\n";
+      }
+      $k =~ tr/-/_/;
+      $opt{$k} = $v;
+    }elsif( /^-/ )
+    {
+      warn "ignore option [$_[0]]\n";
+    }else
+    {
+      push(@files,$_);
+    }
+  }
+  if( !$opt{langs} && $ENV{MLPOD_LANGS} )
+  {
+    $opt{langs} = [split(/[:,]/,$ENV{MLPOD_LANGS})];
+  }
+  
+  ## Create a parser object and have it parse file whose name was
+  ## given on the command-line (use STDIN if no files were given).
+  my $parser = new Pod::MultiLang::Pod(%opt);
+  
+  if( @files==0 )
+  {
+    $parser->parse_from_file('-',$opt{outfile}||'-');
+  }else
+  {
+    foreach (@files)
+    {
+      -d $_ and die "[$_] is directory.";
+      my $outfile = $opt{outfile};
+      if( $outfile )
+      {
+        $parser->parse_from_file($_,$outfile);
+      }elsif( $opt{auto_out} )
+      {
+	($outfile = $_)=~s/\.(pl|pm|mlpod)$/.pod/ or $outfile = $_.'.pod';
+        $parser->parse_from_file($_,$outfile);
+      }else
+      {
+	$parser->parse_from_file($_);
+      }
+    } # foreach
+  }
+}
+
+1;
+__END__
+# -----------------------------------------------------------------------------
+# End of File.
+# -----------------------------------------------------------------------------

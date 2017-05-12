@@ -1,0 +1,11 @@
+lib/POE/Loop/Prima.pm
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/counter
+t/01_load.t
+t/98_pod.t
+t/99_pod_coverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

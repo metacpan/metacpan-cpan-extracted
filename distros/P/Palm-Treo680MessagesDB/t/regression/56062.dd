@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1195234629,
+          'number' => '+440076247089',
+          'time' => '17:37',
+          'date' => '2007-11-16',
+          'name' => 'Jonathan XXXXX (M)',
+          'phone' => '+440076247089',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1195234629,
+          'text' => 'You\'ve got a picture message from +440076247089. View it once within 14 days at http://www.t-mobile.co.uk/pmcollect with your number and the password: 3kwa64cf',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7107406,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 56062
+        };

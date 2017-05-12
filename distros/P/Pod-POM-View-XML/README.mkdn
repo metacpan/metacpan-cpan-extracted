@@ -1,0 +1,84 @@
+# NAME
+
+Pod::POM::View::XML - XML view of a Pod Object Model
+
+# VERSION
+
+version 0.0.2
+
+# SYNOPSIS
+
+    use Pod::POM;
+    use Pod::POM::View::XML;
+
+    my $parser = Pod::POM->new;
+    my $pom = $parser->parse_text( $some_pod );
+
+    my $xml = Pod::POM::View::XML->print($pom);
+
+# DESCRIPTION
+
+`Pod::POM::View::XML` is a view that aims at
+producing a direct XML rendition of the POD.
+
+## new(%options)
+
+The constructor `new()` accepts the following options.
+
+- prefix
+
+    Prefix added to all tags. Defaults to `pod` (so the 
+    xml tags will be `pod_pod`, `pod_section`, `pod_para`, etc).
+    For no prefix, set to `undef`. 
+
+    The global default value can be set via `$Pod::POM::View::XML::TAG_PREFIX`.
+
+- tags
+
+    Mapping of the POD keywords to the xml tags. Tags that aren't
+    defined here will use the default mapping as given below.
+
+    The global defaults can also be set via `%Pod::POM::View::XML::TAGS`.
+
+    The defaults (without prefix) are:
+
+            POD              XML
+            ----------       ---------
+            pod              pod
+
+            head*n*          section
+            head*n*_title    title
+            
+            over             over
+            item             item
+            item_title       title
+            
+            for              div
+            begin            div
+            
+            textblock        para
+            verbatim         preformated
+
+            b                bold
+            i                italic
+            c                code
+            f                file
+            l                link
+
+            index            index
+
+# SEE ALSO
+
+- [Pod::POM](https://metacpan.org/pod/Pod::POM)
+- [Pod::POM::View::DocBook](https://metacpan.org/pod/Pod::POM::View::DocBook)
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

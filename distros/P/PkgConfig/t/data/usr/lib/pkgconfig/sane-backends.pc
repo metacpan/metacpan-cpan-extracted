@@ -1,0 +1,14 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+ldflags=
+libs=
+
+Name: SANE Backends
+Description: Backends for SANE, the universal scanner interface
+Version: 1.0.21
+Requires:
+Libs: -L${libdir} -lsane
+Libs.private: ${ldflags} $(libs)
+Cflags: -I${includedir}

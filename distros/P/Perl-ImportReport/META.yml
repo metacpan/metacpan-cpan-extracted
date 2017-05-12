@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Perl-ImportReport
+version:             0.1
+abstract:            Find data on symbols being imported by Perl code
+license:             ~
+author:              
+    - Daniel Muey <http://drmuey.com/cpan_contact.pl>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    PPI:                           0
+    PPI::Util:                     0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

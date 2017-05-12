@@ -1,0 +1,4 @@
+Revision history for POE-Component-IRC-Plugin-MultiProxy
+
+0.01  Sat Oct 9 21:39:34 GMT 2010
+    - Initial release. A pocoirc plugin port of App::Bondage.

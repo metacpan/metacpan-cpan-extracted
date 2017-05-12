@@ -1,0 +1,377 @@
+#!/usr/bin/perl
+#
+# Dump a SMS PDB database.
+#
+# This code is provided "as is" with no warranty.  The exact terms
+# under which you may use and (re)distribute it are detailed
+# in the GNU General Public License, in the file COPYING.
+#
+# Copyright (C) 2005 Free Software Foundation, Inc.
+#
+# Written by Lorenzo Cappelletti <lorenzo.cappelletti@email.it>
+#
+#
+# $Id: smsdump,v 1.1 2009/01/10 16:17:59 drhyde Exp $
+
+use strict;
+use warnings;
+use Getopt::Long qw(:config bundling);
+use Pod::Usage;
+use Date::Format;       # time2str()
+use File::Basename;     # basename()
+use Text::Wrap;         # wrap()
+
+use Palm::PDB;
+use Palm::SMS;          # Load handler
+
+my $VERSION = 0.03;
+
+##############################################################################
+#
+# Init
+#
+$Text::Wrap::break = '[\s:.!?]';
+my $progname    = basename($0);         # that's me!
+my $pdb         = new Palm::PDB;        # PDB reference
+my $backend     = "backend_";           # what output format?
+my $input;                              # input file
+
+my $date_format = "%a %b %e %T %%Z %Y";
+my $filter      = 1;
+my $help        = 0;
+my $output      = "-";
+my $text_format = q{
+    $record->{device} eq 'Treo 680' ? (
+        $record->{type} ne 'unknown' ? (
+            ($record->{direction} eq 'outbound' ? 'From: ' : 'To: ').
+    	    $record->{name}.' ('.$record->{phone}.")\n".
+	    "$text\n\n"
+	) : ()
+    ) : (
+        ($folder==0?"From":                       # folder
+        ($folder==1?"To":
+        ($folder==2?"To (pending)":"(Uh?)"))).
+        " ".
+        ($name?"$name ":"").                      # name
+        ($firstName?"$firstName ":"").            # firstName
+        ($name||$firstName?"($phone)":"$phone").  # phone
+        " ".
+        $timestamp.                               # timestamp
+        "\n".
+        $text.                                    # text
+        "\n\n"
+    )
+};
+my $type        = "txt";
+my $version     = 0;
+
+##############################################################################
+#
+# Command line parsing
+#
+GetOptions("date-format|d=s"    => \$date_format,
+           "filter|F=s"         => \$filter,
+           "help|h"             => \$help,
+           "output|o=s"         => \$output,
+           "text-format|f=s"    => \$text_format,
+           "type|t=s"           => \$type,
+           "version"            => \$version,
+           )
+  or pod2usage(2);
+
+# help
+pod2usage(1)
+  if $help;
+
+# version
+print << "EOV"
+$progname $VERSION (Palm::SMS)
+Written by Lorenzo Cappelletti <lorenzo.cappelletti\@email.it>
+
+Copyright (C) 2005 Free Software Foundation, Inc.
+This program comes with NO WARRANTY, to the extent permitted by law.
+You may redistribute it under the terms of the GNU General Public
+License; see the file named COPYING for details.
+EOV
+  and exit 0
+  if $version;
+
+# type
+$type =~ m/^(txt|raw)$/i
+  or die "$progname: invalid format type: $type\n";
+$backend .= $type;
+
+# input file
+$#ARGV >= 0
+  or die "$progname: missing input file\n";
+$input = $ARGV[0];
+-f $input
+  or die "$progname: not a plain file: $input\n";
+
+##############################################################################
+#
+# Main
+#
+open(STDOUT, ">$output")
+  or die "can't write to \"$output\": $!\n";
+
+$pdb->Load($input);
+{ # Checks went well. We're safe now.
+  no strict "refs";
+  &{$backend}($pdb);
+};
+
+END {
+  # Reports error if cannot write for any reason (e.g., disk full)
+  close(STDOUT)
+    or die "$progname: can't close output: $!\n";
+}
+
+##############################################################################
+#
+# TXT backend
+#
+sub backend_txt ($) {
+  my $pdb;      # PDB reference
+
+  $pdb = shift;
+
+  for (my $i = 0; $i <= $#{$pdb->{records}}; $i++) {
+    my $record;         # record reference
+                        # Record fields:
+    my $name;           #
+    my $firstName;      #
+    my $phone;          #
+    my $timestamp;      #
+    my $folder;         #
+    my $text;           #
+
+    $record = $pdb->{records}[$i];
+
+    next
+      if filter($record);
+
+    $folder     = $record->{folder};
+    $name       = $record->{name} || "";
+    $firstName  = $record->{firstName} || "";
+    $phone      = $record->{phone};
+    $timestamp  = time2str(time2str($date_format,
+                                    $record->{timestamp},
+                                    'GMT'),
+                           $record->{timestamp});
+    $text       = wrap("", "", $record->{text});
+
+    print eval $text_format;
+
+  }
+
+}
+
+##############################################################################
+#
+# RAW backend
+#
+sub backend_raw ($) {
+  my $pdb;      # PDB reference
+  my @fields;   # reported record fields
+
+  $pdb = shift;
+  @fields = qw(id folder firstName name phone timestamp text);
+
+  # header
+  print join("\0", @fields), "\n";
+
+  for (my $i = 0; $i <= $#{$pdb->{records}}; $i++) {
+    my $record;         # record reference
+    my @values;         # record values
+    my $line;           # formatted line
+
+    $record = $pdb->{records}[$i];
+
+    next
+      if filter($record);
+
+    foreach my $field (@fields) {
+      push @values, $record->{$field};
+    }
+    $line = join("\0", @values);
+
+    # escape
+    $line =~ s/\\/\\\\/g;
+    $line =~ s/\n/\\n/g;
+
+    print $line, "\n";
+  }
+
+}
+
+
+##############################################################################
+#
+# Message filter
+#
+sub filter ($) {
+  my $record = shift;
+
+  my $id         = $record->{id};
+  my $folder     = $Palm::SMS::folders[$record->{folder}];
+  my $firstName  = $record->{firstName} || "";
+  my $name       = $record->{name} || "";
+  my $phone      = $record->{phone};
+  my $timestamp  = $record->{timestamp};
+  my $text       = $record->{text};
+
+  return not eval $filter;
+}
+
+__END__
+
+=head1 NAME
+
+smsdump - converter for SMS PDBs to human readable formats
+
+=head1 SYNOPSIS
+
+smsdump
+[ B<-F filter-expr> ]
+[ B<-d date-format> ]
+[ B<-f txt-expr> ]
+[ B<-o file> ]
+[ B<-t raw|txt> ]
+B<file>
+
+smsdump B<--help>
+
+smsdump B<--version>
+
+=head1 OPTIONS
+
+=over
+
+=item B<-F> EXPR, B<--filter>=EXPR
+
+EXPR is a Perl expression (default: C<1>) that will be eval()'ed
+against record field values.  If EXPR is true, record is process,
+otherwise it is skipped.
+
+=item B<-d> FORMAT, B<--date-format>=FORMAT
+
+Specify how to convert message timestamp using conventions described in
+L<Date::Format>.  Note that conversion is applied twice, to allow
+corret C<%Z> handling (see B<timestamp> field explanation in
+L<Palm::SMS(3) Fields|Palm::SMS/Fields> section).  Default is C<%a %b %e
+%T %%Z %Y>.
+
+=item B<-h>, B<--help>
+
+Print a brief help message and exit.
+
+=item B<-f> EXPR, B<--text-format>=EXPR
+
+EXPR is a Perl expression that will be eval()'ed in order to obtain the
+B<txt> type output.
+
+=item B<-o> FILE, B<--output>=FILE
+
+Write output to C<FILE> instead of standard output.
+
+=item B<-t> TYPE, B<--type>=TYPE
+
+Define which type of format the output should be written in.
+Possible values are C<txt> (default) and C<raw>.  See L<smsdump(1)
+Description|smsdump/DESCRIPTION> section for further explanations.
+
+=item B<--version>
+
+Print program version number and copyleft information.
+
+=back
+
+=head1 DESCRIPTION
+
+B<smsdump> is a small utility written in Perl.  It is shipped with and
+makes use of L<Palm::SMS> Perl module in order to provide an easy
+and quick way to extract your SMS messages out of a Palm PDB database
+file and convert them to a human readable format.  The PDB format
+understood is that of L<Palm::SMS>'s.
+
+B<smsdump> output format can be chosen via switch C<--type> among
+several possibilities enlisted below.
+
+=over 6
+
+=item B<txt>
+
+This is the B<default> format.  It writes the SMS messages as plain
+text.  The output is obtained by setting B<--text-format> option to
+(you can cut-and-paste the following lines into your bash prompt):
+
+  --text-format '
+  ($folder==0?"From":                           # folder
+  ($folder==1?"To":
+  ($folder==2?"To (pending)":"(Uh?)"))).
+  " ".
+  ($name?"$name ":"").                          # name
+  ($firstName?"$firstName ":"").                # firstName
+  ($name||$firstName?"($phone)":"$phone").      # phone
+  " ".
+  $timestamp.                                   # timestamp
+  "\n".
+  $text.                                        # text
+  "\n\n"'
+
+=item B<raw>
+
+This format is meant for further processing of your messages when you
+can not or do not want to use Perl and L<Palm::SMS>.  Each line of the
+output represents a message from the input PDB file.  A line consists
+of a NULL (e.g., C<\0>) separated list of values where new lines
+(e.g., C<\n>) and backslashes (e.g., C<\>) have been escaped with two
+plain characters, C<\n> and C<\\> rispectively.
+
+=back
+
+=head2 FILTERING
+
+C<--filter=EXPR> option allows to include only certain messages in the
+output.  C<EXPR> can be any valid Perl expression which is evaluated
+for each PDB record.  Only B<$id>, B<$folder> (converted to string),
+B<$firstName>, B<$name>, B<$phone>, B<$timestamp>, and B<$text> (see
+L<Palm::SMS(3) Fields|Palm::SMS/Fields> section) are valid variables,
+others leading to unpredictable results.  If C<EXPR> returned value is
+true, message is processed, otherwise it is skipped.
+
+For example, in order to print out all the message sent to Jo and
+John, the switch should be set to something like:
+
+  --filter='$name =~ /^Jo/ and $folder eq "Inbox"'
+
+=head1 SEE ALSO
+
+L<Palm::SMS>, L<Palm::PDB>, L<smssync>
+
+L<Palm::Treo680MessagesDB>, L<treo680smsdump>
+
+=head1 AUTHOR
+
+B<smsdump> is written and maintained by Lorenzo Cappelletti
+E<lt>lorenzo.cappelletti@email.itE<gt>.
+
+=head1 COPYRIGHT AND DISCLAIMER
+
+This program is Copyright 2005 by Lorenzo Cappelletti.  This program
+is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free
+Software Foundation, either version 2 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111, USA.
+
+=cut

@@ -1,0 +1,4 @@
+Changelog for Plakc::Middleware::REST. See also http://github.com/nichtich/Plack-Middleware-REST/issues
+
+0.10  2015-04-06 09:11:57 CEST
+  - support HEAD, OPTIONS, and PATCH requests (Chris Kirke)

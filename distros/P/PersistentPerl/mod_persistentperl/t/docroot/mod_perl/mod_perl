@@ -1,0 +1,3 @@
+#!/usr/bin/perl
+use CGI;
+print CGI->new()->header(), "mod_perl ";

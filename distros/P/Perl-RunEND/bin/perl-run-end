@@ -1,0 +1,59 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+perl-run-end - execute the Perl code within __END__ for the file/module/code passed.
+
+=cut
+
+use warnings;
+use strict;
+use Carp qw/croak/;
+use Pod::Usage;
+use Perl::RunEND;
+
+unless (@ARGV and $ARGV[0]) {
+    pod2usage(
+        -msg => 'Full Path to Module is required as an argument',
+        -i  =>  'path to add to @INC (i.e. perl -I /include/path)',
+        -exitval => 2,
+    );
+}
+
+Perl::RunEND->run($ARGV[0]);
+
+=head1 SYNOPSIS
+
+perl-run-end [options]
+
+    pass the full path for the perl file you wish to run.
+
+Options:
+        -i /include/path  path to add to @INC 
+
+        (i.e. perl -I /include/path)
+
+Example:
+
+    perl-run-end ~/perl/misc/script.pl
+
+    perl-run-end -i=/opt /opt/Module/Whatever/YourModule.pm
+
+
+=head1 DESCRIPTION
+
+C<perl-run-end> is a command-line interface to L<Perl::RunEND>, which it
+uses to exectue the Perl code below __END__ 
+
+=cut
+
+=head1 ACKNOWLEDGEMENTS
+
+This module copied it's general bin flow idea from Module-Starter
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 David Wright, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

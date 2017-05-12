@@ -1,0 +1,15 @@
+CREDITS FOR PHP::Strings 0.28
+
+Andy Lester (PETDANCE) for taking care of Iain Truskett's modules.
+
+Iain Truskett (SPOON), the previous maintainer of PHP::Strings, for 
+all the time and effort that he has put into this module.
+
+CREDITS FOR PHP::Strings 0.27
+
+Juerd Waalboer (JUERD) for suggesting a link, and the assorted regex
+functions.
+
+Matthew Persico (PERSICOM) for the idea of having the
+functions give their documentation as their error.
+

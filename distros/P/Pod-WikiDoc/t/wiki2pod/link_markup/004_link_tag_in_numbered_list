@@ -1,0 +1,10 @@
+0 this text should be a link to [Pod::WikiDoc] here
+#--------------------------------------------------------------------------#
+=over
+
+=item 1.
+
+this text should be a link to L<Pod::WikiDoc> here
+
+=back
+

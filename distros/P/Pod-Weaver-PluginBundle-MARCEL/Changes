@@ -1,0 +1,24 @@
+Revision history for Perl extension Pod-Weaver-PluginBundle-MARCEL
+
+1.102460  2010-09-03 12:27:44 Europe/Vienna
+    - removed Pod::Weaver::Section::Availability and ::BugsAndLimitations,
+      since they will live in their own distributions now
+
+1.102340  2010-08-22 20:07:24 Europe/Vienna
+    - made Availability plugin use dist metadata info (nigelm)
+
+1.101520  2010-06-01 12:40:24 Europe/Vienna
+    - METHODS use Collect, not CollectWithAutoDoc
+    - fix "Bugs and Limitations" section to work with Dist::Zilla v3 and
+      CPAN::Meta::Converter
+
+1.100980  2010-04-08 16:35:10 Europe/Vienna
+    - [Availability]: remove information on GitHub
+
+1.100950  2010-04-05 00:24:28 Europe/Vienna
+    - added [BugsAndLimitations]
+    - added [Availability]
+    - methods are now collected with [CollectWithAutoDoc]
+
+1.100690  2010-03-10 17:11:59 Europe/Vienna
+    - initial version

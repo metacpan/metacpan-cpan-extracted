@@ -1,0 +1,37 @@
+---
+abstract: 'generate dummy box image for web development'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  HTTP::Headers: 0
+  HTTP::Request::Common: 0
+  MIME::Base64: 0
+  Plack::Test: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-App-DummyBox
+provides:
+  Plack::App::DummyBox:
+    file: lib/Plack/App/DummyBox.pm
+    version: 0.041
+requires:
+  Carp: 0
+  HTTP::Date: 0
+  HTTP::Status: 0
+  Image::Empty: 0
+  Imager: 0
+  Plack::Component: 0
+  Plack::Request: 0
+  Plack::Util: 0
+  Plack::Util::Accessor: 0
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Plack-App-DummyBox
+version: 0.041

@@ -1,0 +1,14 @@
+Revision history for Perl extension PHP::Functions::File.
+
+0.04  May 11 2012
+   - Some more bug fix.
+
+0.03  May 11 2012
+   - Bug fix. Thanks for ANDK.
+   - Add more information in manual
+
+0.02  May 11 2012
+	- Add zlib compression support.
+
+0.01  May 6 2012
+	- Release

@@ -1,0 +1,27 @@
+---
+abstract: 'Do SAML-based sign-in to Postini services'
+author:
+  - 'Robert Norris <rob@eatenbyagrue.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200014, CPAN::Meta::Converter version 2.110930'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Postini-SAML
+requires:
+  Crypt::OpenSSL::RSA: 0
+  Data::Random: 0
+  Date::Format: 0
+  Digest::SHA1: 0
+  MIME::Base64: 0
+  XML::CanonicalizeXML: 0
+  XML::Spice: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Postini-SAML
+  repository: git://github.com/robn/Postini-SAML.git
+version: 0.001

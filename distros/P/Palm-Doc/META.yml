@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Palm-Doc
+version:      1.19
+version_from: Doc.pm
+installdirs:  site
+requires:
+    Encode:                        0
+    Getopt::Std:                   0
+    HTML::Entities:                0
+    HTML::FormatText:              0
+    HTML::TreeBuilder:             0
+    Palm::PDB:                     1
+    Palm::Raw:                     1
+    Test::More:                    0.46
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

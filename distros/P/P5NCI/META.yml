@@ -1,0 +1,27 @@
+---
+name: P5NCI
+version: 0.31
+author: []
+abstract: Perl extension for loading shared libraries and their functions
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Test::Exception: 0.19
+  Test::Simple: 0.47
+build_requires:
+  ExtUtils::CBuilder: 0.03
+provides:
+  P5NCI:
+    file: lib/P5NCI.pm
+    version: 0.31
+  P5NCI::Declare:
+    file: lib/P5NCI/Declare.pm
+    version: 0.31
+  P5NCI::Library:
+    file: lib/P5NCI/Library.pm
+    version: 0.31
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

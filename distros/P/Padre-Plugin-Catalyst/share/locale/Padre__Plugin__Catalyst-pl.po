@@ -1,0 +1,150 @@
+#
+# Cezary Morga <cm@therek.net>, 2009.
+msgid ""
+msgstr ""
+"Project-Id-Version: padre-plugin-catalyst\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-30 15:40-0300\n"
+"PO-Revision-Date: 2009-06-03 17:22+0200\n"
+"Last-Translator: Cezary Morga <cm@therek.net>\n"
+"Language-Team: Polish <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 0.3\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: lib/Padre/Plugin/Catalyst.pm:47
+msgid "New Catalyst Application"
+msgstr "Nowa aplikacja Catalyst"
+
+#: lib/Padre/Plugin/Catalyst.pm:52
+msgid "Create new..."
+msgstr "Utwórz nowy..."
+
+#: lib/Padre/Plugin/Catalyst.pm:53
+msgid "Model"
+msgstr "Model"
+
+#: lib/Padre/Plugin/Catalyst.pm:57
+msgid "View"
+msgstr "Widok"
+
+#: lib/Padre/Plugin/Catalyst.pm:61
+msgid "Controller"
+msgstr "Kontroler"
+
+#: lib/Padre/Plugin/Catalyst.pm:67
+msgid "Start Web Server"
+msgstr "Uruchom serwer WWW"
+
+#: lib/Padre/Plugin/Catalyst.pm:68
+msgid "Stop Web Server"
+msgstr "Zatrzymaj serwer WWW"
+
+#: lib/Padre/Plugin/Catalyst.pm:70
+msgid "Catalyst Online References"
+msgstr "Dokumentacja Catalyst online"
+
+#: lib/Padre/Plugin/Catalyst.pm:71
+msgid "Beginner's Tutorial"
+msgstr "Podręcznik początkującego"
+
+#: lib/Padre/Plugin/Catalyst.pm:72
+msgid "Overview"
+msgstr "Przegląd"
+
+#: lib/Padre/Plugin/Catalyst.pm:75
+msgid "1. Introduction"
+msgstr "1. Wprowadzenie"
+
+#: lib/Padre/Plugin/Catalyst.pm:78
+msgid "2. Catalyst Basics"
+msgstr "2. Podstawy Catalyst"
+
+#: lib/Padre/Plugin/Catalyst.pm:81
+msgid "3. More Catalyst Basics"
+msgstr "3. Więcej o podstawach Catalyst"
+
+#: lib/Padre/Plugin/Catalyst.pm:84
+msgid "4. Basic CRUD"
+msgstr "4. Podstawy CRUD"
+
+#: lib/Padre/Plugin/Catalyst.pm:87
+msgid "5. Authentication"
+msgstr "5. Uwierzytelnianie"
+
+#: lib/Padre/Plugin/Catalyst.pm:90
+msgid "6. Authorization"
+msgstr "6. Autoryzacja"
+
+#: lib/Padre/Plugin/Catalyst.pm:93
+msgid "7. Debugging"
+msgstr "7. Debugowanie"
+
+#: lib/Padre/Plugin/Catalyst.pm:96
+msgid "8. Testing"
+msgstr "8. Testowanie"
+
+#: lib/Padre/Plugin/Catalyst.pm:99
+msgid "9. Advanced CRUD"
+msgstr "9. Zaawansowane zagadnienia CRUD"
+
+#: lib/Padre/Plugin/Catalyst.pm:102
+msgid "10. Appendices"
+msgstr "10. Dodatki"
+
+#: lib/Padre/Plugin/Catalyst.pm:106
+msgid "Catalyst Cookbook"
+msgstr "Książka kucharska Catalyst"
+
+#: lib/Padre/Plugin/Catalyst.pm:109
+msgid "Recommended Plugins"
+msgstr "Zalecane wtyczki"
+
+#: lib/Padre/Plugin/Catalyst.pm:112
+msgid "Catalyst Community Live Support"
+msgstr "Wsparcie techniczne społeczności Catalyst"
+
+#: lib/Padre/Plugin/Catalyst.pm:115
+msgid "Examples"
+msgstr "Przykłady"
+
+#: lib/Padre/Plugin/Catalyst.pm:118
+msgid "Catalyst Wiki"
+msgstr "Wiki Catalyst"
+
+#: lib/Padre/Plugin/Catalyst.pm:121
+msgid "Catalyst Website"
+msgstr "Strona WWW Catalyst"
+
+#: lib/Padre/Plugin/Catalyst.pm:126
+msgid "About"
+msgstr "O wtyczce"
+
+#: lib/Padre/Plugin/Catalyst.pm:144
+#, perl-format
+msgid ""
+"Catalyst development web server not found at\n"
+"%s\n"
+"\n"
+"Please make sure the active document is from your Catalyst project."
+msgstr ""
+"Nie odnaleziono serwera WWW Catalyst pod adresem\n"
+"%s\n"
+"\n"
+"Upewnij się, że aktywny dokument należy do Twojego projektu Catalyst."
+
+#: lib/Padre/Plugin/Catalyst.pm:147
+msgid "Server not found"
+msgstr "Nie odnaleziono serwera"
+
+#: lib/Padre/Plugin/Catalyst.pm:167
+msgid "Web server appears to be running. Launch web browser now?"
+msgstr "Serwer WWW zdaje się działać. Czy uruchomić teraz przeglądarkę WWW?"
+
+#: lib/Padre/Plugin/Catalyst.pm:168
+msgid "Start Web Browser?"
+msgstr "Uruchomić przeglądarkę WWW?"
+

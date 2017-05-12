@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE chapter PUBLIC "-//CUSTOM//DOCKBOOK 4.4//EN" "../custom.dtd">
+<chapter id="chapter-intro">
+    <title>Introduction</title>
+
+    <section id='intro.overview'>
+        <title>Overview</title>
+
+        <note><para>This document refers to
+        <ulink url="http://search.cpan.org/dist/Pod-2-DocBook/">&pod2docbook;</ulink>
+        version
+        <ulink url="http://search.cpan.org/~jkutej/Pod-2-DocBook-0.01/">0.01</ulink>.
+        </para></note>
+
+        <para>&pod2docbook; Perl module helps to convert existing pod documentation
+        to docbook xml format. For a full reasoning and detail description see
+        <xref linkend="chapter-dev"/>.
+        </para>
+
+        <warning><para>not complete, as any other documentation ;-)</para></warning>
+        
+    </section>
+
+</chapter>

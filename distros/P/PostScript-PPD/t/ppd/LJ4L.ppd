@@ -1,0 +1,397 @@
+*PPD-Adobe: "4.3"
+*%
+*% For information on using this, and to obtain the required backend
+*% script, consult http://www.linuxprinting.org/
+*%
+*% This file is published under the GNU General Public License
+*%
+*% PPD-O-MATIC (3.0.0 or newer) generated this PPD file. It is for use with 
+*% all programs and environments which use PPD files for dealing with
+*% printer capability information. The printer must be configured with the
+*% "foomatic-rip" backend filter script of Foomatic 3.0.0 or newer. This 
+*% file and "foomatic-rip" work together to support PPD-controlled printer
+*% driver option access with arbitrary free software printer drivers and
+*% printing spoolers.
+*%
+*% To save this file on your disk, wait until the download has completed
+*% (the animation of the browser logo must stop) and then use the
+*% "Save as..." command in the "File" menu of your browser or in the 
+*% pop-up manu when you click on this document with the right mouse button.
+*% DO NOT cut and paste this file into an editor with your mouse. This can
+*% introduce additional line breaks which lead to unexpected results.
+*%
+*% You may save this file as 'HP-LaserJet_4L-ljet4.ppd'
+*%
+*%
+*FormatVersion:	"4.3"
+*FileVersion:	"1.1"
+*LanguageVersion: English 
+*LanguageEncoding: ISOLatin1
+*PCFileName:	"LJET4.PPD"
+*Manufacturer:	"HP"
+*Product:	"(LaserJet 4L)"
+*cupsVersion:	1.0
+*cupsManualCopies: True
+*cupsModelNumber:  2
+*cupsFilter:	"application/vnd.cups-postscript 0 foomatic-rip"
+*%pprRIP:        foomatic-rip other
+*ModelName:     "HP LaserJet 4L"
+*ShortNickName: "HP LaserJet 4L ljet4"
+*NickName:      "HP LaserJet 4L Foomatic/ljet4 (recommended)"
+*PSVersion:	"(3010.000) 550"
+*PSVersion:	"(3010.000) 651"
+*PSVersion:	"(3010.000) 652"
+*PSVersion:	"(3010.000) 653"
+*PSVersion:	"(3010.000) 704"
+*PSVersion:	"(3010.000) 705"
+*PSVersion:	"(3010.000) 800"
+*LanguageLevel:	"3"
+*ColorDevice:	False
+*DefaultColorSpace: Gray
+*FileSystem:	False
+*Throughput:	"1"
+*LandscapeOrientation: Plus90
+*TTRasterizer:	Type42
+
+
+
+
+*VariablePaperSize: False
+
+*FoomaticIDs: HP-LaserJet_4L ljet4
+*FoomaticRIPCommandLine: "gs -q -dBATCH -dPARANOIDSAFER -dNOPAUSE -sDE&&
+VICE=ljet4%B%A%Z -sOutputFile=- - | perl -p -0033 -e &quot; s/^&amp;l\&&
+d+[aA]/$&amp;%E/; &quot; "
+*End
+
+*OpenGroup: General/General
+
+*OpenUI *PageSize/Page Size: PickOne
+*OrderDependency: 100 AnySetup *PageSize
+*DefaultPageSize: Letter
+*PageSize Letter/US Letter: "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageSize A4/A4: "<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*PageSize 11x17/11x17: "<</PageSize[792 1224]/ImagingBBox null>>setpagedevice"
+*PageSize A3/A3: "<</PageSize[842 1191]/ImagingBBox null>>setpagedevice"
+*PageSize A5/A5: "<</PageSize[421 595]/ImagingBBox null>>setpagedevice"
+*PageSize B5/B5 (JIS): "<</PageSize[516 729]/ImagingBBox null>>setpagedevice"
+*PageSize Env10/Envelope #10: "<</PageSize[297 684]/ImagingBBox null>>setpagedevice"
+*PageSize EnvC5/Envelope C5: "<</PageSize[459 649]/ImagingBBox null>>setpagedevice"
+*PageSize EnvDL/Envelope DL: "<</PageSize[312 624]/ImagingBBox null>>setpagedevice"
+*PageSize EnvISOB5/Envelope B5: "<</PageSize[499 709]/ImagingBBox null>>setpagedevice"
+*PageSize EnvMonarch/Envelope Monarch: "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
+*PageSize Executive/Executive: "<</PageSize[522 756]/ImagingBBox null>>setpagedevice"
+*PageSize Legal/US Legal: "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageSize
+
+*OpenUI *PageRegion: PickOne
+*OrderDependency: 100 AnySetup *PageRegion
+*DefaultPageRegion: Letter
+*PageRegion Letter/US Letter: "<</PageSize[612 792]/ImagingBBox null>>setpagedevice"
+*PageRegion A4/A4: "<</PageSize[595 842]/ImagingBBox null>>setpagedevice"
+*PageRegion 11x17/11x17: "<</PageSize[792 1224]/ImagingBBox null>>setpagedevice"
+*PageRegion A3/A3: "<</PageSize[842 1191]/ImagingBBox null>>setpagedevice"
+*PageRegion A5/A5: "<</PageSize[421 595]/ImagingBBox null>>setpagedevice"
+*PageRegion B5/B5 (JIS): "<</PageSize[516 729]/ImagingBBox null>>setpagedevice"
+*PageRegion Env10/Envelope #10: "<</PageSize[297 684]/ImagingBBox null>>setpagedevice"
+*PageRegion EnvC5/Envelope C5: "<</PageSize[459 649]/ImagingBBox null>>setpagedevice"
+*PageRegion EnvDL/Envelope DL: "<</PageSize[312 624]/ImagingBBox null>>setpagedevice"
+*PageRegion EnvISOB5/Envelope B5: "<</PageSize[499 709]/ImagingBBox null>>setpagedevice"
+*PageRegion EnvMonarch/Envelope Monarch: "<</PageSize[279 540]/ImagingBBox null>>setpagedevice"
+*PageRegion Executive/Executive: "<</PageSize[522 756]/ImagingBBox null>>setpagedevice"
+*PageRegion Legal/US Legal: "<</PageSize[612 1008]/ImagingBBox null>>setpagedevice"
+*CloseUI: *PageRegion
+
+*DefaultImageableArea: Letter
+*ImageableArea Letter/US Letter: "0 0 612 792"
+*ImageableArea A4/A4: "0 0 595 842"
+*ImageableArea 11x17/11x17: "0 0 792 1224"
+*ImageableArea A3/A3: "0 0 842 1191"
+*ImageableArea A5/A5: "0 0 421 595"
+*ImageableArea B5/B5 (JIS): "0 0 516 729"
+*ImageableArea Env10/Envelope #10: "0 0 297 684"
+*ImageableArea EnvC5/Envelope C5: "0 0 459 649"
+*ImageableArea EnvDL/Envelope DL: "0 0 312 624"
+*ImageableArea EnvISOB5/Envelope B5: "0 0 499 709"
+*ImageableArea EnvMonarch/Envelope Monarch: "0 0 279 540"
+*ImageableArea Executive/Executive: "0 0 522 756"
+*ImageableArea Legal/US Legal: "0 0 612 1008"
+
+*DefaultPaperDimension: Letter
+*PaperDimension Letter/US Letter: "612 792"
+*PaperDimension A4/A4: "595 842"
+*PaperDimension 11x17/11x17: "792 1224"
+*PaperDimension A3/A3: "842 1191"
+*PaperDimension A5/A5: "421 595"
+*PaperDimension B5/B5 (JIS): "516 729"
+*PaperDimension Env10/Envelope #10: "297 684"
+*PaperDimension EnvC5/Envelope C5: "459 649"
+*PaperDimension EnvDL/Envelope DL: "312 624"
+*PaperDimension EnvISOB5/Envelope B5: "499 709"
+*PaperDimension EnvMonarch/Envelope Monarch: "279 540"
+*PaperDimension Executive/Executive: "522 756"
+*PaperDimension Legal/US Legal: "612 1008"
+
+*OpenUI *InputSlot/Media Source: PickOne
+*FoomaticRIPOption InputSlot: enum CmdLine E
+*OrderDependency: 100 AnySetup *InputSlot
+*DefaultInputSlot: Default
+*InputSlot Default/Printer default: "%% FoomaticRIPOptionSetting: InputSlot=Default"
+*FoomaticRIPOptionSetting InputSlot=Default: ""
+*InputSlot Tray1/Tray 1: "%% FoomaticRIPOptionSetting: InputSlot=Tray1"
+*FoomaticRIPOptionSetting InputSlot=Tray1: "\x1b&amp;l8H"
+*InputSlot Tray2/Tray 2: "%% FoomaticRIPOptionSetting: InputSlot=Tray2"
+*FoomaticRIPOptionSetting InputSlot=Tray2: "\x1b&amp;l1H"
+*InputSlot Tray3/Tray 3: "%% FoomaticRIPOptionSetting: InputSlot=Tray3"
+*FoomaticRIPOptionSetting InputSlot=Tray3: "\x1b&amp;l4H"
+*InputSlot Tray4/Tray 4: "%% FoomaticRIPOptionSetting: InputSlot=Tray4"
+*FoomaticRIPOptionSetting InputSlot=Tray4: "\x1b&amp;l5H"
+*InputSlot Envelope/Envelope Feeder: "%% FoomaticRIPOptionSetting: InputSlot=Envelope"
+*FoomaticRIPOptionSetting InputSlot=Envelope: "\x1b&amp;l3H"
+*InputSlot Manual/Manual Feeder: "%% FoomaticRIPOptionSetting: InputSlot=Manual"
+*FoomaticRIPOptionSetting InputSlot=Manual: "\x1b&amp;l2H"
+*CloseUI: *InputSlot
+
+*OpenUI *Manualfeed/Manual Feed of Paper: PickOne
+*FoomaticRIPOption Manualfeed: enum JCL A
+*OrderDependency: 100 AnySetup *Manualfeed
+*DefaultManualfeed: Off
+*Manualfeed Off/Off: "%% FoomaticRIPOptionSetting: Manualfeed=Off"
+*FoomaticRIPOptionSetting Manualfeed=Off: "SET MANUALFEED=OFF"
+*Manualfeed On/On: "%% FoomaticRIPOptionSetting: Manualfeed=On"
+*FoomaticRIPOptionSetting Manualfeed=On: "SET MANUALFEED=ON"
+*CloseUI: *Manualfeed
+
+*OpenUI *Resolution/Resolution: PickOne
+*OrderDependency: 110 AnySetup *Resolution
+*DefaultResolution: 300x300dpi
+*Resolution 75x75dpi/75 DPI: "<</HWResolution[75 75]>>setpagedevice"
+*Resolution 150x150dpi/150 DPI: "<</HWResolution[150 150]>>setpagedevice"
+*Resolution 300x300dpi/300 DPI: "<</HWResolution[300 300]>>setpagedevice"
+*CloseUI: *Resolution
+
+*OpenUI *Economode/Toner Saving: PickOne
+*FoomaticRIPOption Economode: enum JCL A
+*OrderDependency: 100 AnySetup *Economode
+*DefaultEconomode: Off
+*Economode Off/Off: "%% FoomaticRIPOptionSetting: Economode=Off"
+*FoomaticRIPOptionSetting Economode=Off: "SET ECONOMODE=OFF"
+*Economode On/On: "%% FoomaticRIPOptionSetting: Economode=On"
+*FoomaticRIPOptionSetting Economode=On: "SET ECONOMODE=ON"
+*CloseUI: *Economode
+
+*OpenUI *Copies/Number of Copies: PickOne
+*FoomaticRIPOption Copies: int JCL A
+*FoomaticRIPOptionPrototype Copies: "SET COPIES=%s"
+*FoomaticRIPOptionRange Copies: 1 100
+*OrderDependency: 100 AnySetup *Copies
+*DefaultCopies: 1
+*FoomaticRIPDefaultCopies: 1
+*Copies 1/1: "%% FoomaticRIPOptionSetting: Copies=1"
+*Copies 2/2: "%% FoomaticRIPOptionSetting: Copies=2"
+*Copies 3/3: "%% FoomaticRIPOptionSetting: Copies=3"
+*Copies 4/4: "%% FoomaticRIPOptionSetting: Copies=4"
+*Copies 5/5: "%% FoomaticRIPOptionSetting: Copies=5"
+*Copies 6/6: "%% FoomaticRIPOptionSetting: Copies=6"
+*Copies 7/7: "%% FoomaticRIPOptionSetting: Copies=7"
+*Copies 8/8: "%% FoomaticRIPOptionSetting: Copies=8"
+*Copies 9/9: "%% FoomaticRIPOptionSetting: Copies=9"
+*Copies 10/10: "%% FoomaticRIPOptionSetting: Copies=10"
+*Copies 11/11: "%% FoomaticRIPOptionSetting: Copies=11"
+*Copies 12/12: "%% FoomaticRIPOptionSetting: Copies=12"
+*Copies 13/13: "%% FoomaticRIPOptionSetting: Copies=13"
+*Copies 14/14: "%% FoomaticRIPOptionSetting: Copies=14"
+*Copies 15/15: "%% FoomaticRIPOptionSetting: Copies=15"
+*Copies 16/16: "%% FoomaticRIPOptionSetting: Copies=16"
+*Copies 17/17: "%% FoomaticRIPOptionSetting: Copies=17"
+*Copies 18/18: "%% FoomaticRIPOptionSetting: Copies=18"
+*Copies 19/19: "%% FoomaticRIPOptionSetting: Copies=19"
+*Copies 20/20: "%% FoomaticRIPOptionSetting: Copies=20"
+*Copies 21/21: "%% FoomaticRIPOptionSetting: Copies=21"
+*Copies 22/22: "%% FoomaticRIPOptionSetting: Copies=22"
+*Copies 23/23: "%% FoomaticRIPOptionSetting: Copies=23"
+*Copies 24/24: "%% FoomaticRIPOptionSetting: Copies=24"
+*Copies 25/25: "%% FoomaticRIPOptionSetting: Copies=25"
+*Copies 26/26: "%% FoomaticRIPOptionSetting: Copies=26"
+*Copies 27/27: "%% FoomaticRIPOptionSetting: Copies=27"
+*Copies 28/28: "%% FoomaticRIPOptionSetting: Copies=28"
+*Copies 29/29: "%% FoomaticRIPOptionSetting: Copies=29"
+*Copies 30/30: "%% FoomaticRIPOptionSetting: Copies=30"
+*Copies 31/31: "%% FoomaticRIPOptionSetting: Copies=31"
+*Copies 32/32: "%% FoomaticRIPOptionSetting: Copies=32"
+*Copies 33/33: "%% FoomaticRIPOptionSetting: Copies=33"
+*Copies 34/34: "%% FoomaticRIPOptionSetting: Copies=34"
+*Copies 35/35: "%% FoomaticRIPOptionSetting: Copies=35"
+*Copies 36/36: "%% FoomaticRIPOptionSetting: Copies=36"
+*Copies 37/37: "%% FoomaticRIPOptionSetting: Copies=37"
+*Copies 38/38: "%% FoomaticRIPOptionSetting: Copies=38"
+*Copies 39/39: "%% FoomaticRIPOptionSetting: Copies=39"
+*Copies 40/40: "%% FoomaticRIPOptionSetting: Copies=40"
+*Copies 41/41: "%% FoomaticRIPOptionSetting: Copies=41"
+*Copies 42/42: "%% FoomaticRIPOptionSetting: Copies=42"
+*Copies 43/43: "%% FoomaticRIPOptionSetting: Copies=43"
+*Copies 44/44: "%% FoomaticRIPOptionSetting: Copies=44"
+*Copies 45/45: "%% FoomaticRIPOptionSetting: Copies=45"
+*Copies 46/46: "%% FoomaticRIPOptionSetting: Copies=46"
+*Copies 47/47: "%% FoomaticRIPOptionSetting: Copies=47"
+*Copies 48/48: "%% FoomaticRIPOptionSetting: Copies=48"
+*Copies 49/49: "%% FoomaticRIPOptionSetting: Copies=49"
+*Copies 50/50: "%% FoomaticRIPOptionSetting: Copies=50"
+*Copies 51/51: "%% FoomaticRIPOptionSetting: Copies=51"
+*Copies 52/52: "%% FoomaticRIPOptionSetting: Copies=52"
+*Copies 53/53: "%% FoomaticRIPOptionSetting: Copies=53"
+*Copies 54/54: "%% FoomaticRIPOptionSetting: Copies=54"
+*Copies 55/55: "%% FoomaticRIPOptionSetting: Copies=55"
+*Copies 56/56: "%% FoomaticRIPOptionSetting: Copies=56"
+*Copies 57/57: "%% FoomaticRIPOptionSetting: Copies=57"
+*Copies 58/58: "%% FoomaticRIPOptionSetting: Copies=58"
+*Copies 59/59: "%% FoomaticRIPOptionSetting: Copies=59"
+*Copies 60/60: "%% FoomaticRIPOptionSetting: Copies=60"
+*Copies 61/61: "%% FoomaticRIPOptionSetting: Copies=61"
+*Copies 62/62: "%% FoomaticRIPOptionSetting: Copies=62"
+*Copies 63/63: "%% FoomaticRIPOptionSetting: Copies=63"
+*Copies 64/64: "%% FoomaticRIPOptionSetting: Copies=64"
+*Copies 65/65: "%% FoomaticRIPOptionSetting: Copies=65"
+*Copies 66/66: "%% FoomaticRIPOptionSetting: Copies=66"
+*Copies 67/67: "%% FoomaticRIPOptionSetting: Copies=67"
+*Copies 68/68: "%% FoomaticRIPOptionSetting: Copies=68"
+*Copies 69/69: "%% FoomaticRIPOptionSetting: Copies=69"
+*Copies 70/70: "%% FoomaticRIPOptionSetting: Copies=70"
+*Copies 71/71: "%% FoomaticRIPOptionSetting: Copies=71"
+*Copies 72/72: "%% FoomaticRIPOptionSetting: Copies=72"
+*Copies 73/73: "%% FoomaticRIPOptionSetting: Copies=73"
+*Copies 74/74: "%% FoomaticRIPOptionSetting: Copies=74"
+*Copies 75/75: "%% FoomaticRIPOptionSetting: Copies=75"
+*Copies 76/76: "%% FoomaticRIPOptionSetting: Copies=76"
+*Copies 77/77: "%% FoomaticRIPOptionSetting: Copies=77"
+*Copies 78/78: "%% FoomaticRIPOptionSetting: Copies=78"
+*Copies 79/79: "%% FoomaticRIPOptionSetting: Copies=79"
+*Copies 80/80: "%% FoomaticRIPOptionSetting: Copies=80"
+*Copies 81/81: "%% FoomaticRIPOptionSetting: Copies=81"
+*Copies 82/82: "%% FoomaticRIPOptionSetting: Copies=82"
+*Copies 83/83: "%% FoomaticRIPOptionSetting: Copies=83"
+*Copies 84/84: "%% FoomaticRIPOptionSetting: Copies=84"
+*Copies 85/85: "%% FoomaticRIPOptionSetting: Copies=85"
+*Copies 86/86: "%% FoomaticRIPOptionSetting: Copies=86"
+*Copies 87/87: "%% FoomaticRIPOptionSetting: Copies=87"
+*Copies 88/88: "%% FoomaticRIPOptionSetting: Copies=88"
+*Copies 89/89: "%% FoomaticRIPOptionSetting: Copies=89"
+*Copies 90/90: "%% FoomaticRIPOptionSetting: Copies=90"
+*Copies 91/91: "%% FoomaticRIPOptionSetting: Copies=91"
+*Copies 92/92: "%% FoomaticRIPOptionSetting: Copies=92"
+*Copies 93/93: "%% FoomaticRIPOptionSetting: Copies=93"
+*Copies 94/94: "%% FoomaticRIPOptionSetting: Copies=94"
+*Copies 95/95: "%% FoomaticRIPOptionSetting: Copies=95"
+*Copies 96/96: "%% FoomaticRIPOptionSetting: Copies=96"
+*Copies 97/97: "%% FoomaticRIPOptionSetting: Copies=97"
+*Copies 98/98: "%% FoomaticRIPOptionSetting: Copies=98"
+*Copies 99/99: "%% FoomaticRIPOptionSetting: Copies=99"
+*Copies 100/100: "%% FoomaticRIPOptionSetting: Copies=100"
+*CloseUI: *Copies
+
+*CloseGroup: General
+
+*OpenGroup: Adjustment/Adjustment
+
+*OpenUI *HalftoningAlgorithm/Halftoning Algorithm: PickOne
+*OrderDependency: 1000 PageSetup *HalftoningAlgorithm
+*DefaultHalftoningAlgorithm: Standard
+*HalftoningAlgorithm Accurate/Accurate: "
+      << /UseWTS false >> setuserparams
+      <<
+        /AccurateScreens true
+        /HalftoneType 1
+        /HalftoneName (Round Dot Screen)
+        /SpotFunction { 180 mul cos exch 180 mul cos add 2 div}
+        /Frequency 137
+        /Angle 37
+      >> sethalftone
+    "
+*End
+*HalftoningAlgorithm Standard/Standard: ""
+*HalftoningAlgorithm WTS/Well-Tempered Screening: "
+      << /UseWTS true >> setuserparams
+      <<
+        /AccurateScreens true
+        /HalftoneType 1
+        /HalftoneName (Round Dot Screen)
+        /SpotFunction { 180 mul cos exch 180 mul cos add 2 div}
+        /Frequency 137
+        /Angle 37
+      >> sethalftone
+    "
+*End
+*CloseUI: *HalftoningAlgorithm
+
+*OpenUI *REt/REt Setting: PickOne
+*FoomaticRIPOption REt: enum JCL A
+*OrderDependency: 100 AnySetup *REt
+*DefaultREt: Medium
+*REt Dark/Dark: "%% FoomaticRIPOptionSetting: REt=Dark"
+*FoomaticRIPOptionSetting REt=Dark: "SET RET=DARK"
+*REt Light/Light: "%% FoomaticRIPOptionSetting: REt=Light"
+*FoomaticRIPOptionSetting REt=Light: "SET RET=LIGHT"
+*REt Medium/Medium: "%% FoomaticRIPOptionSetting: REt=Medium"
+*FoomaticRIPOptionSetting REt=Medium: "SET RET=MEDIUM"
+*REt Off/Off: "%% FoomaticRIPOptionSetting: REt=Off"
+*FoomaticRIPOptionSetting REt=Off: "SET RET=OFF"
+*CloseUI: *REt
+
+*OpenUI *TonerDensity/Toner Density: PickOne
+*FoomaticRIPOption TonerDensity: enum JCL A
+*OrderDependency: 100 AnySetup *TonerDensity
+*DefaultTonerDensity: 3
+*TonerDensity 1/1: "%% FoomaticRIPOptionSetting: TonerDensity=1"
+*FoomaticRIPOptionSetting TonerDensity=1: "SET DENSITY=1"
+*TonerDensity 2/2: "%% FoomaticRIPOptionSetting: TonerDensity=2"
+*FoomaticRIPOptionSetting TonerDensity=2: "SET DENSITY=2"
+*TonerDensity 3/3: "%% FoomaticRIPOptionSetting: TonerDensity=3"
+*FoomaticRIPOptionSetting TonerDensity=3: "SET DENSITY=3"
+*TonerDensity 4/4: "%% FoomaticRIPOptionSetting: TonerDensity=4"
+*FoomaticRIPOptionSetting TonerDensity=4: "SET DENSITY=4"
+*TonerDensity 5/5: "%% FoomaticRIPOptionSetting: TonerDensity=5"
+*FoomaticRIPOptionSetting TonerDensity=5: "SET DENSITY=5"
+*CloseUI: *TonerDensity
+
+*CloseGroup: Adjustment
+
+
+*% Generic boilerplate PPD stuff as standard PostScript fonts and so on
+
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-Demi: Standard "(001.007S)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(001.007S)" Standard ROM
+*Font Bookman-Demi: Standard "(001.004S)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(001.004S)" Standard ROM
+*Font Bookman-Light: Standard "(001.004S)" Standard ROM
+*Font Bookman-LightItalic: Standard "(001.004S)" Standard ROM
+*Font Courier: Standard "(002.004S)" Standard ROM
+*Font Courier-Bold: Standard "(002.004S)" Standard ROM
+*Font Courier-BoldOblique: Standard "(002.004S)" Standard ROM
+*Font Courier-Oblique: Standard "(002.004S)" Standard ROM
+*Font Helvetica: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Oblique: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(001.009S)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(001.007S)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(001.007S)" Standard ROM
+*Font Palatino-Bold: Standard "(001.005S)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Italic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Roman: Standard "(001.005S)" Standard ROM
+*Font Symbol: Special "(001.007S)" Special ROM
+*Font Times-Bold: Standard "(001.007S)" Standard ROM
+*Font Times-BoldItalic: Standard "(001.009S)" Standard ROM
+*Font Times-Italic: Standard "(001.007S)" Standard ROM
+*Font Times-Roman: Standard "(001.007S)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
+*Font ZapfDingbats: Special "(001.004S)" Standard ROM
+

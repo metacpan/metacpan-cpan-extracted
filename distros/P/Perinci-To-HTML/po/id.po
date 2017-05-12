@@ -1,0 +1,37 @@
+# Indonesian translations for Perinci-To-HTML package.
+# Copyright (C) 2013 Steven Haryanto
+# This file is distributed under the same license as the Perinci-To-HTML package.
+# Automatically generated, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Perinci-To-HTML 0.01\n"
+"Report-Msgid-Bugs-To: stevenharyanto@gmail.com\n"
+"POT-Creation-Date: 2013-12-13 17:59+0700\n"
+"PO-Revision-Date: 2013-12-13 17:59+0700\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Perinci/To/HTML.pm:68 lib/Perinci/To/HTML.pm:119
+msgid "Name"
+msgstr "Nama"
+
+#: lib/Perinci/To/HTML.pm:78 lib/Perinci/To/HTML.pm:127
+msgid "Summary"
+msgstr "Ringkasan"
+
+#: lib/Perinci/To/HTML.pm:102 lib/Perinci/To/HTML.pm:136
+msgid "Description"
+msgstr "Deskripsi"
+
+#: lib/Perinci/To/HTML.pm:144
+msgid "Parameters"
+msgstr "Parameter"
+
+#: lib/Perinci/To/HTML.pm:156
+msgid "default"
+msgstr "bawaan"

@@ -1,0 +1,32 @@
+Revision history for Perl module Plugin::Loader
+
+0.05 2014-10-05 NEILB
+    - Noted in the doc that this is now being maintained under the new
+      name of Module::Loader, and that Plugin::Loader will eventually be
+      removed from CPAN.
+    - Changed "use lib 't/lib';" to more OS-portable version -- some tests were
+      failing on Win32.
+
+0.04 2014-10-04 NEILB
+    - Added Module::Pluggable and Module::Pluggable::Ordered to SEE ALSO.
+    - Code tidy-up
+
+0.03 2014-10-04 NEILB
+    - Clarification in the doc on the use of max_depth.
+    - Tidied up the find_modules() method.
+    - Added testsuite for find_modules() method: t/02-find-modules.t
+    - Added testsuite for load() method: t/03-load.t
+    - Refactored load() method: running Devel::Cover helped me realised
+      I was expecting incorrect behaviour from require_module.
+    - The code and SYNOPSIS had a 'load()' method, but the pod called
+      it 'load_module()'. Changed the latter to 'load'.
+
+0.02 2014-10-03 NEILB
+    - Added a max_depth attribute, so you can control whether you want
+      all modules within the namespace, or only to a given search depth
+      (typically 1, if anything).
+    - Expanded SEE ALSO, with a description of each module.
+
+0.01 2014-09-30 NEILB
+    - First release to CPAN
+

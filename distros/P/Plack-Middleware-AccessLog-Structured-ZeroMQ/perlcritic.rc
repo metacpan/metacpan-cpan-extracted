@@ -1,0 +1,7 @@
+severity = 3
+verbose  = 9
+
+# Required since PkgVersion adds a BEGIN-block just after the package definition,
+# so there are no strictures and warnings enabled, yet...
+[-TestingAndDebugging::RequireUseStrict]
+[-TestingAndDebugging::RequireUseWarnings]

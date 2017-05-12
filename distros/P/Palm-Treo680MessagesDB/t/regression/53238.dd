@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1194531226,
+          'number' => '',
+          'time' => '14:13',
+          'date' => '2007-11-08',
+          'name' => 'MoneyAlert',
+          'phone' => '',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1194531226,
+          'text' => 'Take advantage of your new MBNA Credit Card limit of £20900. Call 31333189350 and transfer balances at 0.0% p.a. until your Jul 08 statement date',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7107374,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 53238
+        };

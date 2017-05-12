@@ -1,0 +1,4 @@
+name = "Plack-Middleware-HatenaOAuth"
+authority="cpan:TARAO"
+module_maker="ModuleBuildTiny"
+badges = ['travis']

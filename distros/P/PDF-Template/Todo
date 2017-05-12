@@ -1,0 +1,7 @@
+TODO list for Perl module PDF::Template
+
+- Abstract out the rendering engine from the templating engine. This will allow
+  for other renderers than just PDFLib
+- Improve and finish tests
+- Provide Excel::Template-like formatting, such as a <bold> tag and the like.
+

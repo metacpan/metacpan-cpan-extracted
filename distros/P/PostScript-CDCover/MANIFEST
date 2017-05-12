@@ -1,0 +1,13 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+LICENSE
+README
+pscdcoverrc
+bin/pscdcover
+lib/PostScript/CDCover.pm
+lib/PostScript/pscdcover.ps
+t/00basic.t
+t/01attr.t
+t/02helperfunc.t
+t/03dir.t

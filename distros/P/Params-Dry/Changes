@@ -1,0 +1,43 @@
+Revision history for Params::Dry
+
+1.20.03 2014-09-18
+ - fix in documentation
+1.20.02 2014-09-18
+ - fix error display to show correct place
+1.20.01 2014-03-19    
+ - temporary removing Ref::IO type from standard types
+1.20 2014-03-18    
+ - add multitypes support like Int|String
+1.10.01 2014-03-17    
+ - fix main parameters bug
+1.10 2014-03-17    
+ - add Params::Dry::Types::(String, Nubmer, Object, Ref, DateTime)
+ - add Defined and Value functions
+ - extends Float to support second parameter
+ - extends Ref to support all ref types
+1.09 2014-03-14    
+ - add shorten tag (tdef)
+ - extending documentation (typedef)
+1.08 2014-03-07    
+ - kwalitee: version fix
+1.07 2014-03-07    
+ - kwalitee: consistent version
+ - kwalitee: LICENSE file META.yml
+ - use parent instead of directly use of @ISA and Exporter
+1.06 2013-07-31    
+ - fix comments
+ - fixing Changes RT#87453
+1.05 2013-07-25    
+ - updating pod documentation
+1.04 2013-07-24 
+ - initial changes (manifest)
+1.03 2013-07-24    
+ - fighting with dir structure
+1.02 2013-07-24    
+ - updating readm
+1.01 2013-07-24    
+ - moving tests to right place, updating renaming
+1.00 2013-07-24    
+ - First version, released on an unsuspecting world.
+
+

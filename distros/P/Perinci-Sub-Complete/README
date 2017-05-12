@@ -1,0 +1,13 @@
+SYNOPSIS
+
+    See Perinci::CmdLine or Perinci::CmdLine::Lite or App::riap which use
+    this module.
+
+DESCRIPTION
+
+SEE ALSO
+
+    Complete, Complete::Getopt::Long
+
+    Perinci::CmdLine, Perinci::CmdLine::Lite, App::riap
+

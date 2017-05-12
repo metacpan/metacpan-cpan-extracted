@@ -1,0 +1,46 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: padre-plugin-perlcritic\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-25 02:34+0800\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Breno G. de Oliveira <garu@cpan.org>\n"
+"Language-Team: Brazilian Portuguese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/PAR.pm:42
+msgid "Create Standalone Exe"
+msgstr "Criar Executável"
+
+#: lib/Padre/Plugin/PAR.pm:43
+msgid "About"
+msgstr "Sobre"
+
+#: lib/Padre/Plugin/PAR.pm:86
+msgid "Currently we only support exe generation from .pl files"
+msgstr "Atualmente suportamos apenas geração de exe a partir de arquivos .pl"
+
+#: lib/Padre/Plugin/PAR.pm:86
+msgid "Cannot create"
+msgstr "Não foi possível criar"
+
+#: lib/Padre/Plugin/PAR.pm:92
+#, perl-format
+msgid "Error generating '%s': %s"
+msgstr "Erro gerando '%s': %s"
+
+#: lib/Padre/Plugin/PAR.pm:92
+msgid "Failed"
+msgstr "Falhou"
+
+#: lib/Padre/Plugin/PAR.pm:94
+#, perl-format
+msgid "%s generated"
+msgstr "%s gerado"
+
+#: lib/Padre/Plugin/PAR.pm:94
+msgid "Done"
+msgstr "Concluído"
+

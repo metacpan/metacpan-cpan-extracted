@@ -1,0 +1,142 @@
+# file: GeneratorE.eyp
+# compile with: eyapp -C '' GeneratorE.eyp
+# then run: ./GeneratorE.pm
+%strict
+%token NUM VARDEF VAR
+
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%right  '^'
+
+%defaultaction {
+  my $parser = shift;
+
+  return join '', @_;
+}
+
+%{
+use base q{Parse::Eyapp::TokenGen};
+%}
+
+%%
+
+stmts:
+    stmt
+      {
+        $_[0]->deltaweight(VAR => +2); # At least one variable is defined now
+        $_[1];
+      }
+  | stmts ';' { "\n" } stmt 
+;
+
+stmt:
+    $VARDEF '=' $exp  
+      {
+        my $parser = shift;
+
+        my $res = EVALUATE($exp);
+        return '' if $res =~ /^error/;
+
+        $parser->defined_variable($VARDEF, $exp, $res); 
+
+        "$VARDEF=$exp";
+      }
+;
+exp:
+    NUM                
+  | VAR
+  | exp '+' exp        
+  | exp '-' exp        
+  | exp '*' exp        
+  | exp '/' exp        
+  | exp '^' exp        
+  | '('   { $_[0]->pushdeltaweight('(' => -1, ')' => +1, '+' => +1, ); } 
+      exp 
+    ')'
+      {
+         $_[0]->popweight; 
+         "($_[3])"
+      }
+;
+
+%%
+
+my $prefix = "no warnings; no strict;\n";
+
+use Getopt::Long;
+use Test::LectroTest::Generator qw(:all);
+
+my %st; # Symbol Table
+sub defined_variable {
+  my ($parser, $var, $exp, $value) = @_;
+
+  $st{$var} = { exp => $exp, value => $value};
+  $prefix .= '$'."$var = $value;\n";
+}
+
+sub EVALUATE { # if possible
+  my $perlexp = shift;
+
+  $perlexp =~ s/\b([a-zA-Z])/\$$1/g; # substitute A by $A everywhere 
+  $perlexp =~ s/\^/**/g;             # substitute power operator: ^ by **
+
+  my $program = "$prefix$perlexp";
+  #print "***program***\n$program\n****\n";
+  my $res = eval $program;
+  if ($@) {
+    $@ =~ m{(.{1,10})}; 
+    $res = "error. $1"; 
+  }
+
+  $res;
+}
+
+
+use Data::Dumper;
+sub main {
+  my $package = shift;
+
+  my $debug = shift || 0;
+  my $numtimes = shift || 1;
+  my $result = GetOptions (
+    "debug!" => \$debug,  
+    "times=i" => \$numtimes,  
+  );
+
+  $debug = 0x1F if $debug;
+
+  # LexerGen receives the parser object and the pairs 
+  #   token => [weight, generator] or token => weight
+  # and returns a generator subroutine
+  my $gen = $package->new(); 
+  $gen->LexerGen(
+          NUM => [ 2, Int(range=>[0, 9], sized=>0)],
+          VAR => [
+                    0,  # At the beginning, no variables are defined
+                    Gen {
+                      return  Elements(keys %st)->generate if keys %st;
+                      return Int(range=>[0, 9], sized=>0)->generate;
+                    },
+                  ],
+          VARDEF => [ 
+                      2,  
+                      String( length=>[1,2], charset=>"A-NP-Z", size => 100 )
+                    ],
+          '=' => 2, '-' => 1, '+' => 2, 
+          '*' => 4, '/' => 2, '^' => 0.5, 
+          ';' => 3, '(' => 1, ')' => 2, 
+          ''  => 2, 'error' => 0,
+  );
+  for (1..$numtimes) {
+    my $exp = $gen->generate( 
+        yydebug => $debug, # 0x1F
+      );
+
+    my $res = EVALUATE($exp);
+
+    print "\n# result: $res\n$exp\n";
+    #print "$_ = ".Dumper($st{$_})."\n" for keys(%st);
+  }
+}
+

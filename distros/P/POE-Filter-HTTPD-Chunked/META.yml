@@ -1,0 +1,22 @@
+---
+name: POE-Filter-HTTPD-Chunked
+version: 0.9
+author: []
+abstract: Drop-in replacement for POE::Filter::HTTPD that also support HTTP1.1 chunked transfer-encoding.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  HTTP::Request: 0
+  HTTP::Response: 0
+  POE::Filter: 0
+provides:
+  HTTP::Request::Chunked:
+    file: lib/POE/Filter/HTTPD/Chunked.pm
+  POE::Filter::HTTPD::Chunked:
+    file: lib/POE/Filter/HTTPD/Chunked.pm
+    version: 0.9
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

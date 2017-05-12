@@ -1,0 +1,28 @@
+---
+abstract: 'Push layers conditionally'
+author:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+build_requires:
+  ExtUtils::CBuilder: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.28
+  PerlIO::Layers: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.28
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PerlIO-if
+requires:
+  XSLoader: 0
+  perl: 5.008
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=PerlIO-if
+  repository: git://github.com/Leont/perlio--if.git
+version: 0.003

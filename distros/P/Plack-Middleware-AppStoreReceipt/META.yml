@@ -1,0 +1,31 @@
+---
+abstract: 'The Plack::Middleware that verifies Apple App Store Receipts for In-App Purchases'
+author:
+  - 'zdk <zdk@cpan.org>'
+build_requires:
+  HTTP::Request::Common: 0
+  Plack::Test: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-AppStoreReceipt
+requires:
+  Furl: 0
+  JSON: 0
+  Plack::Middleware: 0
+  Plack::Request: 0
+  Plack::Util::Accessor: 0
+  Try::Tiny: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/zdk/plack-middleware-appstorereceipt
+  repository: https://github.com/zdk/plack-middleware-appstorereceipt.git
+version: 0.003

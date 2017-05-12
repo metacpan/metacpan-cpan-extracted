@@ -1,0 +1,48 @@
+NAME
+    POE::TIKC - Transparent Inter-Kernel Communication (IKC)
+
+SYNOPSIS
+            use POE qw(TIKC);
+
+            POE::TIKC->create_server({
+                    address => '127.0.0.1', # default
+                    port => '2021',                 # default
+            });
+
+    # You can now assume all connected clients' aliases are available #
+    AFTER...you check if $POE::TIKC::connected == 1 before starting.
+
+DESCRIPTION
+    This module connects many clients to one server and creates proxy
+    sessions in the client and the server for all aliases. When you post to
+    a proxied session, it is sent to the right client and reposted there.
+
+BUGS
+    Probably, its not fully tested. So use this at your own risk of life and
+    data.
+
+FEATURES
+    You can't post globs
+
+    You can't use session ids
+
+    You must check $POE::TIKC::connected == 1 before posting events until I
+    can fix this by queueing the posts until a connection is made
+
+    You must make sure Storable is the same version on all machines using
+    TIKC
+
+    Using $_[SENDER] for anything would be bad
+
+    Using call() instead of post will not return usefull info from the
+    remote kernel
+
+AUTHOR
+    David Davis <xantus@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2004 by David Davis and Teknikill Software
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

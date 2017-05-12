@@ -1,0 +1,1217 @@
+=head1 NOME
+
+perlthrtut - tutorial sui thread in Perl
+
+=head1 DESCRIZIONE
+
+B<NOTA>: questo tutorial descrive il nuovo modo di gestire i thread in Perl
+introdotto con il Perl 5.6.0, i cosiddetti thread dell'interprete
+o B<ithreads> per brevitE<agrave>. In questo modello ogni thread viene eseguito
+nel suo personale interprete Perl, e ogni convidisione di dati tra
+i thread deve essere esplicita.
+
+C'E<egrave> un altro stile di threading, chiamato il modello 5.005, che, 
+come E<egrave> facile immaginare, appartiene alla versione 5.005 del Perl, ed
+E<egrave> dunque piE<ugrave> vecchio. Questo vecchio modello ha dei problemi,
+E<egrave> sconsigliato, e sarE<agrave> probabilmente rimosso intorno alla
+versione 5.10. Siete fortemente incoraggiati a migrare qualsiasi codice
+esistente basato sui thread 5.005 al nuovo modello il prima possibile.
+
+Potete vedere quale stile di threading avete (se lo avete) lanciando
+C<perl -V> e guardando nella sezione C<Platform>.
+Se avete C<useithreads=define> allora avete ithread,
+se avete C<use5005threads=define> allora avete i thread 5.005.
+Se non avete nessuno dei due, il vostro interprete Perl non E<egrave>
+compilato con alcun supporto per i thread. Se avete entrambi, siete nei guai.
+
+L'interfaccia utente dei thread 5.005 si serviva della classe L<Threads>,
+mentre gli ithread usano la classe L<threads>. Notate il cambiamento da
+maiuscolo a minuscolo [della prima lettera, NdT].
+
+=head1 Stato
+
+Il codice degli ithread E<egrave> disponibile sin dal Perl 5.6.0, ed E<egrave>
+considerato stabile. L'interfaccia utente agli ithread (le classi L<threads>)
+E<egrave> apparsa nella versione 5.8.0, ed al momento E<egrave> considerata stabile,
+anche se andrebbe maneggiata con cura come tutte le nuove caratteristiche.
+
+=head1 Comunque, Cos'E<egrave> Un Thread?
+
+Un thread E<egrave> un flusso di controllo attraverso un programma con un
+singolo punto di esecuzione.
+
+Suona molto simile ad un processo, no? Beh, deve. I thread sono uno dei pezzi
+di uno processo. Ogni processo ha almeno un thread e, fino adesso, ogni
+processo in cui veniva eseguito Perl aveva solo un thead. Con la versione 5.8,
+tuttavia, potete creare dei thread aggiuntivi. Ora vi diremo come,
+quando, e perchE<eacute>.
+
+=head1 Modelli Di Programma Threaded [che utilizza i thread, NdT]
+
+Ci sono tre modi fondamentali in cui potete strutturare un programma
+threaded. Il modello che sceglierete dipende da cosa vi serve che
+il vostro programma faccia. Per molti programmi threaded non banali
+dovrete scegliere diversi modelli per le diverse parti del vostro
+programma.
+
+=head2 Capo/Operaio
+
+Il modello capo/operaio ha solitamente un thread "capo" e uno o piE<ugrave>
+thread "operai". Il thread capo raccoglie o genera i compiti che devono essere
+fatti, e poi consegna quei compiti al thread operaio appropriato.
+
+Questo modello E<egrave> comune in programmi che fanno da server o che
+creano una GUI, nei quali un thread principale attende per qualche evento
+e poi trasmette tale avento al thread operaio appropriato affinchE<eacute>
+venga processato. Una volta che l'evento E<egrave> stato trasmesso, il thread
+capo torna ad attendere un altro evento.
+
+Il thread capo lavora relativamente poco. Mentre i compiti non sono
+per forza eseguiti piE<ugrave> velocemente che con un qualsiasi altro metodo,
+questo tende ad avere i migliori tempi di risposta all'utente.
+
+=head2 Gruppo di Lavoro
+
+Nel modello del gruppo di lavoro, vengono creati svariati thread che
+essenzialmente fanno la stessa cosa su dati diversi. Assomiglia da
+vicino all'elaborazione parallela classica ed ai processori vettoriali,
+dove un grande array di processori fa esattamente la stessa cosa
+su molti dati diversi.
+
+Questo modello E<egrave> particolarmente utile se il sistema su cui viene
+eseguito il programma distribuisce i vari thread su diversi processori.
+PuE<ograve> inoltre essere utile in motori di ray tracing o di rendering,
+dove i thread individuali possono trasmettere risultati intermedi per
+fornire all'utente un riscontro visivo.
+
+=head2 Pipeline
+
+Il modello a pipeline divide un compito in una serie di passi, e
+trasmette i risultati di un passo al thread che si occupa di quello
+successivo. Ogni thread fa una cosa a ciascun dato e trasmette i
+risultati al successivo thread sulla linea.
+
+Questo modello ha senso soprattutto se si hanno a disposizione piE<ugrave>
+processori, cosicchE<eacute> uno o piE<ugrave> thread verranno eseguiti in
+parallelo, anche se spesso ha senso anche in altri contesti. Questo modello
+tende a mantenere i compiti indivisuali piccoli e semplici, e a
+permettere ad alcune parti della pipeline di bloccarsi (ad esempio
+per via dell'I/O o di chiamate di sistema) mentre altre parti continuano
+la loro esecuzione. Se fate eseguire diverse parti della pipeline su
+processori diversi potete anche avvantaggiarvi della cache di ciascun
+processore.
+
+Questo modello E<egrave> inoltre comodo per una forma di programmazione
+ricorsiva dove, anzichE<eacute> avere una subroutine che chiama se stessa,
+se ne ha una che crea un altro thread. Sia i generatori di numeri primi
+che quelli di serie di Fibonacci si avvantaggiano molto di questo
+modello a pipeline. (PiE<ugrave> tardi verrE<agrave> presentato un programma
+che genera numeri primi).
+
+=head1 Che tipo di thread sono i thread del Perl?
+
+Se avete esperienza con altre implementazioni dei thread, potreste
+notare che le cose non sono esattamente come ve le aspettavate. Quando
+si lavora con i thread in Perl, E<egrave> molto importante ricordare che
+i Thread Perl Non Sono I Thread X, qualunque valore X possa assumere.
+Non sono thread POSIX, o DecThreads, o i thread Green di Java, o thread
+Win32. Ci sono affinitE<agrave>, ed il concetto generale E<egrave> lo stesso,
+ma se iniziate a cercare i dettagli dell'implementazione rimarrete
+delusi oppure confusi. Probabilmente entrambe le cose.
+
+CiE<ograve> non significa che i thread Perl sono completamente differenti
+da qualsiasi cosa esistita prima--non lo sono. Il modello di threading
+del Perl deve molto ad altri modelli, soprattutto il POSIX. Tuttavia,
+cosE<igrave> come Perl non E<egrave> C, i thread Perl non sono thread POSIX.
+Dunque, se vi ritrovate a cercare mutex, o prioritE<agrave> dei thread,
+E<egrave> il momento di tornare un po' indietro e pensare a cosa volete
+fare e a come Perl puE<ograve> farlo.
+
+E<Egrave> in ogni caso importante ricordare che i thread Perl non possono
+fare le cose magicamente a meno che i thread del vostro sistema
+operativo non lo permettano. Quindi, se il vostro sistema blocca
+l'intero processo in caso di chiamata a sleep(), di solito cosE<igrave>
+farE<agrave> anche il Perl.
+
+I Thread Perl Sono Diversi.
+
+=head1 Moduli Thread-Safe [compatibili con il threading, NdT]
+
+L'aggiunta dei thread ha cambiato sostanzialmente gli internal del Perl.
+CiE<ograve> porta a conseguenze per le persone che scrivono moduli con
+codice XS per librerie esterne. Comunque, dato che i dati del perl non sono
+condivisi di default tra i thread, i moduli Perl hanno una grossa
+chance di essere thread-safe o di poterlo diventare facilmente. I moduli
+non marcati come thread-safe devono essere testati oppure riveduti prima di
+essere usati nel codice da rilasciare.
+
+Non tutti i moduli che potreste usare sono thread-safe, e dovreste
+sempre assumere che un modulo non lo sia, a meno che la documentazione
+non dica diversamente. Questa considerazione include i moduli
+distribuiti direttamente con l'interprete. I thread sono una
+caratteristica nuova, e persino alcuni dei moduli standard non sono
+thread-safe.
+
+Anche se un modulo E<egrave> thread-safe, ciE<ograve> non significa che
+esso sia ottimizzato per lavorare bene con i thread. Un modulo potrebbe essere
+riscritto per utilizzare le nuove caratteristiche disponibili nel
+Perl threaded cosE<igrave> da aumentare le prestazioni in un ambiente
+threaded.
+
+Se per qualche ragione state usando un modulo non thread-safe, potete
+proteggervi utilizzandolo unicamente da un thread. Se avete bisogno
+di piE<ugrave> thread da cui accedere a tale modulo, potete utilizzare i
+semafori e molta disciplina di programmazione per controllare l'accesso
+ad esso. I semafori sono trattati in L</"Semafori semplici">.
+
+Consultate inoltre L</"Thread-Safety Delle Librerie Di Sistema">.
+
+=head1 Concetti Di Base Sui Thread
+
+Il modulo L<threads>, distribuito assieme a perl, fornisce le funzioni di
+base necessarie per scrivere programmi threaded. Nelle prossime sezioni
+tratteremo i concetti di base, spiegandovi di cosa avete bisogno per creare
+un programma threaded. Fatto questo, passeremo alle caratteristiche
+del modulo L<threads> che rendono la programmazione threaded piE<ugrave>
+facile.
+
+=head2 Supporto Di Base Ai Thread
+
+Il supporto ai thread E<egrave> un'opzione di compilazione del Perl - E<egrave>
+qualcosa che E<egrave> che attivato o disattivato quando il Perl E<egrave>
+compilato sul vostro sistema, piuttosto che quando i vostri programmi sono
+compilati. Se il vostro Perl non E<egrave> stato compilato con il supporto
+ai thread attivato, allora qualsiasi tentativo di usare i thread
+fallirE<agrave>.
+
+I vostri programmi possono servirsi del modulo Config per controllare
+se i thread sono attivati. Se il vostro programma non puE<ograve> funzionare
+senza di essi, potete tentare qualcosa come:
+
+    $Config{useithreads} or die "Ricompila il Perl con i thread per eseguire questo programma.";
+
+Un programma forse-threaded che usa un modulo forse-threaded puE<ograve>
+avere codice come questo:
+
+    use Config;
+    use MyMod;
+
+    BEGIN {
+        if ($Config{useithreads}) {
+           # Abbiamo i thread
+           require MyMod_threaded;
+           import MyMod_threaded;
+        } else {
+           require MyMod_unthreaded;
+           import MyMod_unthreaded;
+        }
+    }
+
+Dato che il codice che viene eseguito sia con i thread che senza E<egrave> di
+solito piuttosto confuso, E<egrave> meglio isolare il codice specifico per
+i thread in un suo modulo. Nel nostro esempio qua sopra, questo E<egrave>
+il motivo per cui MyMod_threaded esiste, ed E<egrave> importato solo se
+il programma E<egrave> in esecuzione su un Perl threaded.
+
+=head2 Una Nota Sugli Esempi
+
+BenchE<eacute> il supporto ai thread sia considerato stabile, ci sono ancora
+alcune bizzarrie che possono sorprendervi quando provate uno degli
+esempi riportati sotto. In una situazione reale E<egrave> necessario
+assicurarsi che tutti i thread abbiano terminato l'esecuzione prima di uscire
+dal programma. In questi esempi <B>non ci si E<egrave> assicurati di
+ciE<ograve>, a favore di una maggiore semplicitE<agrave>. L'esecuzione di
+questi esempi "cosE<igrave> come sono" produrrE<agrave> messaggi di errore,
+solitamente causati dal fatto che ci sono ancora thread in esecuzione quando
+il programm esce. Non dovrete allarmarvi di ciE<ograve>. Versioni future
+del Perl potrebbero correggere questo errore.
+
+=head2 Creazione Di Thread
+
+Il package L<threads> fornisce gli strumenti necessari per creare
+nuovi thread. Come per qualsiasi altro modulo, dovete dire al Perl
+che lo volete usare; C<use threads> importa tutti i pezzi di cui avete
+bisogno per creare thread di base.
+
+La via piE<ugrave> breve e semplice per creare un thread prevede l'uso
+di new():
+
+    use threads; 
+
+    $thr = threads->new(\&sub1);
+
+    sub sub1 { 
+        print "Nel thread\n"; 
+    }
+
+Il metodo new() prende un riferimento ad una subroutine e crea un nuovo
+thread, che inizia l'esecuzione nella subroutine passata. Il controllo
+poi passa sia alla subroutine che al chiamante.
+
+Se ne avete bisogno, il vostro programma puE<ograve> passare parametri alla
+subroutine come parte dell'avvio del thread. E<Egrave> sufficiente includere
+la lista dei parametri come parte della chiamata a C<threads::new>,
+come di seguito:
+
+    use threads; 
+
+    $Param3 = "foo"; 
+    $thr = threads->new(\&sub1, "Param 1", "Param 2", $Param3); 
+    $thr = threads->new(\&sub1, @ParamList); 
+    $thr = threads->new(\&sub1, qw(Param1 Param2 Param3));
+
+    sub sub1 { 
+        my @InboundParameters = @_; 
+        print "Nel thread\n"; 
+        print "parametri ricevuti >", join("<>", @InboundParameters), "<\n"; 
+    }
+
+
+L'ultimo esempio illustra un'altra caratteristica dei thread. Potete
+creare molti thread utilizzando la stessa subroutine. Ogni thread
+esegue la stessa subroutine, ma in un thread diverso con ambiente
+diverso e parametri potenzialmente diversi.
+
+C<create()> E<egrave> un sinonimo di C<new()>.
+
+=head2 Attendere L'Uscita Di Un Thread
+
+Dato che i thread sono anche subroutine, possono restituire dei valori.
+Per attendere l'uscita di un thread e per estrarre i valori che potrebbe
+restituire, potete usare il metodo join:
+
+    use threads; 
+
+    $thr = threads->new(\&sub1);
+
+    @DatiRestituiti = $thr->join; 
+    print "Il thread ha restituito @DatiRestituiti"; 
+
+    sub sub1 { return "Venti-sei", "pippo", 2; }
+
+Nell'esempio qui sopra, il metodo join() ritorna quando il thread
+finisce. Oltre ad attendere la fine del thread e raccogliere i valori
+che esso potrebbe aver restituito, join() effettua anche le operazioni
+di pulizia del sistema operativo necessario per il thread. Tale
+pulizia puE<ograve> essere importante, specialmente per programmi di lunga
+esecuzione che creano molti thread. Se non desiderate i valori restituiti
+e non volete attendere la fine del thread, dovete chiamare invece il metodo
+detach(), come spiegato di seguito.
+
+=head2 Ignorare Un Thread
+
+join() fa tre cose: attende l'uscita di un thread, effettua le necessarie
+operazioni di pulizia dopo l'uscita, e ritorna qualsiasi dato che il thread
+puE<ograve> aver prodotto. Ma se non siete interessati ai valori restituiti,
+e non vi interessa quando il thread finisce? Tutto ciE<ograve> che volete
+E<egrave> che vengano effettuate le operazioni di pulizia quando l'esecuzione
+E<egrave> finita.
+
+In questo caso, dovete usare il metodo detach(). Una volta che un thread
+E<egrave> detached [separato, NdT], sarE<agrave> eseguito sino alla fine,
+e poi Perl effettuerE<agrave> automaticamente le operazioni di pulizia.
+
+    use threads; 
+
+    $thr = threads->new(\&sub1); # Crea il thread
+
+    $thr->detach; # Ora ufficialmente non ci interessa piu`
+
+    sub sub1 {
+        $a = 0; 
+        while (1) { 
+            $a++; 
+            print "\$a e` $a\n"; 
+            sleep 1; 
+        } 
+    }
+
+Una volta che un thread E<egrave> separato, non puE<ograve> piE<ugrave>
+essere unito chiamando join(), ed ogni dato restituito che esso possa
+aver prodotto (come se fosse stato fatto ed in attesa di essere unito)
+viene perso.
+
+=head1 Thread E Dati
+
+Ora che abbiamo trattato le basi dei thread, E<egrave> ora del nostro
+nuovo argomento: i dati. I thread introducono un paio di complicazioni
+per quanto riguarda l'accesso ai dati, di cui i programmi non-threaded
+non hanno mai bisogno di preoccuparsi.
+
+=head2 Dati Condivisi E Non Condivisi
+
+La piE<ugrave> grande differenza tra gli ithreads di Perl ed il vecchio
+threading 5.005 o, se E<egrave> per questo, la maggior parte degli altri
+sistemi di threading disponibili, E<egrave> che di default nessun dato
+viene condiviso. Quando viene creato un nuovo thread perl, tutti i dati
+associati al thread corrente vengono copiati in quello nuovo, e diventano
+privati per il nuovo thread!
+Questo comportamente E<egrave> simile a quello che si ha con il fork dei
+processi sotto UNIX, tranne che in questo caso i dati sono semplicemente
+copiati in una diversa zona della memoria appartenente allo stesso
+processo invece che abbia luogo un vero forking.
+
+Per usare il threading, comunque, di solito si desidera che i thread
+condividano almeno alcuni dati tra loro. CiE<ograve> si ottiene con il modulo
+L<threads::shared> e l'attributo C< : shared>.
+
+    use threads;
+    use threads::shared;
+
+    my $pippo : shared = 1;
+    my $pluto = 1;
+    threads->new(sub { $pippo++; $pluto++ })->join;
+
+    print "$pippo\n";  #stampa 2 poiche' $pippo e` condiviso
+    print "$pluto\n";  #stampa 1 poiche' $pluto non e` condiviso
+
+Nel caso di un array condiviso, tutti i suoi elementi vengono condivisi,
+e per un hash condiviso, tutto le chiavi ed i valori vengono condivisi.
+CiE<ograve> pone delle restrizioni a cosa puE<ograve> essere assegnato agli
+elementi di un array e di un hash condiviso: sono permessi solo valori semplici
+o riferimenti a variabili condivise - questo E<egrave> necessario in modo che
+una variabile privata non possa diventare condivisa per errore. Un
+assegnamento errato causerE<agrave> la morte del thread. Per esempio:
+
+    use threads;
+    use threads::shared;
+
+    my $var           = 1;
+    my $svar : shared = 2;
+    my %hash : shared;
+
+    ... crea alcuni thread ...
+
+    $hash{a} = 1;	# tutti i thread vedono exists($hash{a}) e $hash{a} == 1
+    $hash{a} = $var	# okay - copia-per-valore: stesso effetto di prima
+    $hash{a} = $svar	# okay - copia-per-valore: stesso effetto di prima
+    $hash{a} = \$svar	# okay - un riferimento ad una variabile condivisa
+    $hash{a} = \$var	# Questo causa la morte del thread
+    delete $hash{a}	# okay - tutti i thread vedranno !exists($hash{a})
+
+Va notato che una variabile condivisa garantisce che se due o piE<ugrave> thread
+tentano di modificarla nello stesso momento, lo stato interno della
+variabile non subirE<agrave> danni. Comunque, non ci sono garanzie a parte
+questa, come speigato nella prossima sezione.
+
+=head2 Insidie dei Thread: Race [Race condition, corsa critica, NdT]
+
+Sebbene i thread portino una serie di nuovi ed utili strumenti, portano
+anche un certo numero di insidie. Una di esse E<egrave> la race condition:
+
+    use threads; 
+    use threads::shared;
+
+    my $a : shared = 1; 
+    $thr1 = threads->new(\&sub1); 
+    $thr2 = threads->new(\&sub2); 
+
+    $thr1->join;
+    $thr2->join;
+    print "$a\n";
+
+    sub sub1 { my $pippo = $a; $a = $pippo + 1; }
+    sub sub2 { my $pluto = $a; $a = $pluto + 1; }
+
+Cosa pensate che conterrE<agrave> $a? La risposta, sfortunatamente, E<egrave>
+"dipende". Sia sub1() che sub2() accedono alla variabile globale
+$a, una volta per leggerla ed una volta per scriverla. In base a
+dei fattori che vanno dall'algoritmo di scheduling [programmazione temporale, NdT]
+dell'implementazione dei vostri thread alle fasi della luna, $a puE<ograve> valere 2 o 3.
+
+Le race condition sono causate da un accesso non sincronizzato ai
+dati condivisi. Senza esplicita sincronizzazione, non c'E<egrave> modo di
+essere sicuri che non sia successo niente ai dati condivisi, nel tempo
+trascorso tra quando si accede ad essi e quando li si aggiorna.
+Persino questo semplice frammento di codice puE<ograve> essere soggetto
+all'errore:
+
+    use threads; 
+    my $a : shared = 2;
+    my $b : shared;
+    my $c : shared;
+    my $thr1 = threads->create(sub { $b = $a; $a = $b + 1; }); 
+    my $thr2 = threads->create(sub { $c = $a; $a = $c + 1; });
+    $thr1->join;
+    $thr2->join;
+
+I due thread accedono entrambi a $a. Ciascun thread puE<ograve>
+essere potenzialmente interrotto a qualsiasi punto, o eseguito in
+qualsiasi ordine. Alla fine, $a potrebbe contenere 3 o 4, e sia $b
+che $c possono contenere 2 o 3.
+
+Non E<egrave> nemmeno garantito che C<$a += 5> o C<$a++> siano
+operazioni atomiche.
+
+Ogniqualvolta il vostro programma accede a dati o risorse che possono essere
+acceduti da altri thread, dovete prendere delle misure per coordinare
+tale accesso, o rischierete dati inconsistenti e race condition. Va notato
+che Perl protegge i suoi meandri dalle vostre race condition, ma non vi
+proteggerE<agrave> da voi stessi.
+
+=head1 Sincronizzazione e controllo
+
+Perl fornisce una serie di meccanismi per coordinare le interazioni
+tra loro stessi ed i loro dati, per evitare race condition e cose simili.
+Alcuni di questi sono progettati per somigliare alle tecniche comuni
+usate nelle librerie di thread come C<pthreads>; altri sono specifici
+del Perl. Spesso, le tecniche standard sono mal costruite e difficili
+da utilizzare correttamente (come ad esempio le attese su una condizione).
+Ove possibile, E<egrave> solitamente piE<ugrave> facile usare le tecniche
+specifiche del Perl, come le code, che rimuovono parte del duro lavoro
+che ne E<egrave> implicato.
+
+=head2 Controllare l'accesso: lock()
+
+La funzione lock() prende una variabile condivisa e mette un lock
+[lucchetto, NdT] su di essa. Nessun altro thread puE<ograve> mettere un lock
+sulla variabile finchE<eacute> il thread che ha messo il primo lock non
+lo toglie. Il lock viene tolto automaticamente quando il thread
+che lo ha messo esce dal blocco piE<ugrave> esterno contenente la funzione
+C<lock()>. L'uso di lock() E<egrave> semplice: in questo esempio ci sono molti
+thread che svolgono alcuni calcoli in parallelo, ed occasionalmente
+aggiornano un totale corrente:
+
+    use threads;
+    use threads::shared;
+
+    my $totale : shared = 0;
+
+    sub calc {
+	for (;;) {
+	    my $risultato;
+	    # (... esegue alcuni calcoli ed imposta $risultato ...)
+	    {
+		lock($totale); # blocca finche' non otteniamo il lock
+		$totale += $risultato;
+	    } # lock rilasciato implicitamente a fine scope
+	    last if $risultato == 0;
+	}
+    }
+
+    my $thr1 = threads->new(\&calc);
+    my $thr2 = threads->new(\&calc);
+    my $thr3 = threads->new(\&calc);
+    $thr1->join;
+    $thr2->join;
+    $thr3->join;
+    print "totale=$totale\n";
+
+lock() blocca il thread fino a quando la variabile su cui si vuole
+porre il lock non E<egrave> disponibile. Quando lock() ritorna, il vostro
+thread puE<ograve> essere sicuro che nessun altro thread puE<ograve> mettere
+un lock su quella variabile finchE<eacute> il blocco piE<ugrave> esterno
+contenete lock() esce.
+
+E<Egrave> importante notare che i lock non prevengono l'accesso alla variabile
+in questione, ma solo i tentativi di metterci un lock. Questo E<egrave>
+in accordo con la lunga tradizione del Perl di programmazione
+cortese, e con il lock di file consultivo che flock() vi offre.
+
+CosE<igrave> come sugli scalari, potete mettere il lock anche su array ed
+hash. Mettere il lock su un array, tuttavia, non bloccherE<agrave> successivi
+lock sugli elementi dell'array, ma solo sull'array stesso.
+
+I lock sono ricorsivi, il che significa che ad un thread E<egrave> permesso
+effettuare il lock di una variabile piE<ugrave> di una volta. Il lock
+durerE<agrave> finchE<eacute> il lock() piE<ugrave> esterno sulla variabile
+non va fuori dallo scope. Per esempio:
+
+    my $x : shared;
+    doit();
+
+    sub fatelo {
+	{
+	    {
+		lock($x); # attende il lock
+		lock($x); # NESSUNA OPERAZIONE - abbiamo gia` il lock
+		{
+		    lock($x); # NESSUNA OPERAZIONE
+		    {
+			lock($x); # NESSUNA OPERAZIONE
+			fateneillock_ancora();
+		    }
+		}
+	    } # *** qui unlock implicito ***
+	}
+    }
+
+    sub fateneillock_ancora {
+	lock($x); # NESSUNA OPERAZIONE
+    } # qui non succede nulla
+
+Va notato che non esiste alcuna funzione unlock() - l'unico modo per
+togliere il lock da una variabile e di permettergli di finire fuori
+dallo scope.
+
+Un lock puE<ograve> essere usato sia per proteggere i dati contenuti nella
+variabile su cui E<egrave> posto, oppure puE<ograve> essere utilizzato
+proteggere qualcos'altro, come una sezione di codice. In quest'ultimo caso,
+la variabile in questione non contiene alcun dato utile, ed esiste solo
+perchE<eacute> vi sia posto il lock. In questo caso, la variabile si comporta
+come i mutex ed i semafori semplici delle librerie di thread tradizionali.
+
+=head2 Un'Insidia Dei Thread: Stallo
+
+I lock sono un pratico strumento per sincronizzare l'accesso ai dati,
+ed utilizzarli correttamente E<egrave> la chiave verso dei dati condivisi in
+maniera sicura. Sfortunatamente, i lock non sono privi di loro pericoli,
+specialmente quando sono coinvolti lock multipli. Considerate il
+seguente codice:
+
+    use threads; 
+
+    my $a : shared = 4; 
+    my $b : shared = "foo"; 
+    my $thr1 = threads->new(sub { 
+        lock($a); 
+        threads->yield; 
+        sleep 20; 
+        lock($b); 
+    }); 
+    my $thr2 = threads->new(sub { 
+        lock($b); 
+        threads->yield; 
+        sleep 20; 
+        lock($a); 
+    });
+
+Questo programma probabilmente si bloccherE<agrave> finchE<eacute> non lo
+uccidete. L'unico caso in cui non si bloccherE<agrave> E<egrave> se uno dei
+thread riesce ad ottenere entrambi i lock per primo. Una versione della quale
+il bloccarsi sia garantito E<egrave> piE<ugrave> complessa, ma il principio
+E<egrave> lo stesso.
+
+Il primo thread pone un lock su $a e poi, dopo una pausa durante la
+quale il secondo thread ha probabilmente avuto il tempo di fare del
+lavoro, prova a porre un lock su $b. Nel frattempo, il secondo
+thread pone un lock su $b, e piE<ugrave> tardi prova a porne uno su $a. Per
+entrambi i thread, il secondo tentativo di lock causa il loro
+blocco, in quanto ciascuno attende che l'altro tolga il proprio lock.
+
+Questa condizione E<egrave> chiamata stallo, e capita quando due o piE<ugrave>
+thread cercano di ottenere dei lock su risorse che appartengono
+agli altri. Ogni thread si blocca, attendendo che l'altro tolga
+il lock su una risorsa. CiE<ograve> in realtE<agrave> non accade mai,
+poichE<eacute> il thread con la risorsa E<egrave> esso stesso in attesa del
+rilascio di un lock.
+
+Ci sono alcune vie per gestire questo tipo di problema. La migliore
+E<egrave> quella di far si che tutti i thread acquisiscano i lock nello
+stesso identico ordine. Se, per esempio, ponete i lock su $a, $b
+e $c, ponete sempre il lock prima su $a che su $b, e prima su $b
+che su $c. E<Egrave> anche meglio tenere i lock per un breve periodo
+di tempo, cosE<igrave> da minimizzare il rischio di stallo.
+
+The altre primitive di sincronizzazione, descritte di seguito,
+possono soffrire di problemi simili.
+
+=head2 Code: Passare I Dati In Giro
+
+Una coda E<egrave> uno speciale oggetto thread-safe che permette di inserire
+dei dati in una sua estremitE<agrave> e di estrarli dall'altra senza bisogno
+di preoccuparsi di questioni di sincronizzazione. L'uso delle code E<egrave>
+piuttosto semplice, e si presenta cosE<igrave>:
+
+    use threads; 
+    use Thread::Queue;
+
+    my $CodaDeiDati = Thread::Queue->new; 
+    $thr = threads->new(sub { 
+        while ($ElementoDeiDati = $CodaDeiDati->dequeue) { 
+            print "Estratto $ElementoDeiDati dalla coda\n";
+        } 
+    }); 
+
+    $CodaDeiDati->enqueue(12); 
+    $CodaDeiDati->enqueue("A", "B", "C"); 
+    $CodaDeiDati->enqueue(\$thr); 
+    sleep 10; 
+    $CodaDeiDati->enqueue(undef);
+    $thr->join;
+
+Anzitutto create la coda con C<new Thread::Queue>. Fatto ciE<ograve>,
+potete aggiungervi liste di scalari alla fine con enqueue(), ed estrarli
+dalla testa con dequeue(). Una coda non ha una dimensione fissa,
+e puE<ograve> crescere quanto necessario per contenere qualsiasi cosa venga
+accodata.
+
+Se la coda E<egrave> vuota, dequeue() rimane bloccato finchE<eacute> un altro
+thread accoda qualcosa. Questo rende le code ideali per cicli di eventi ed
+altre comunicazioni tra thread.
+
+=head2 Semafori: Sincronizzare L'Accesso Ai Dati
+
+I semafori sono una sorta di meccanismo generico di locking. Nella
+loro forma piE<ugrave> semplice, essi si comportano molto come scalari su
+cui E<egrave> possibile mettere un lock, tranne che per il fatto che non
+possono contenere dati, e che il lock deve essere tolto esplicitamente.
+Nella loro forma avanzata, essi funzionano come una specie di contatore,
+e possono permettere a piE<ugrave> thread di averne il 'lock' nello stesso
+momento.
+
+=head2 Semafori semplici
+
+I semafori dispongono di due metodi, down() e up(): down() decrementa il
+contatore, mentre up() lo incrementa. Le chiamate a down causeranno
+il blocco se il contatore del semaforo scende sotto lo zero. Il
+seguente programma fornisce una veloce dimostrazione:
+
+    use threads;
+    use Thread::Semaphore; 
+
+    my $semaforo = new Thread::Semaphore; 
+    my $VariabileGlobale : shared = 0;
+
+    $thr1 = new threads \&sub_desempio, 1; 
+    $thr2 = new threads \&sub_desempio, 2; 
+    $thr3 = new threads \&sub_desempio, 3;
+
+    sub sub_desempio { 
+        my $NumeroDellaSub = shift @_; 
+        my $ContatoreDiProva = 10; 
+        my $CopiaLocale; 
+        sleep 1; 
+        while ($ContatoreDiProva--) { 
+            $semaforo->down; 
+            $CopiaLocale = $VariabileGlobale; 
+            print "Mancano $ContatoreDiProva tentativi per la sub $NumeroDellaSub (\$VariabileGlobale e` $VariabileGlobale)\n"; 
+            sleep 2; 
+            $CopiaLocale++; 
+            $VariabileGlobale = $CopiaLocale; 
+            $semaforo->up; 
+        } 
+    }
+
+    $thr1->join;
+    $thr2->join;
+    $thr3->join;
+
+Le tre chiamate alla subroutine operano in sincornia. Il semaforo,
+tuttavia, fa sE<igrave> che solo un thread alla volta acceda alla variabile
+globale.
+
+=head2 Semafori Avanzati
+
+Di norma, i semafori si comportano come i lock, permettendo solo
+ad un thread alla volta di chiamare un down() su di essi. Tuttavia,
+ci sono altri usi per i semafori.
+
+Ogni semaforo ha un contatore incluso in esso. Normalmente, i semafori
+vengono creati con il contatore impostato a uno, down() lo decrementa
+di una unitE<agrave>, up() lo incrementa di una unitE<agrave>. E<Egrave>
+tuttavia possibile forzare questi valori di default semplicemente passando
+valori diversi:
+
+    use threads;
+    use Thread::Semaphore;
+    my $semaforo = Thread::Semaphore->new(5);
+                    # Crea un sefamoro con il contatore impostato a 5
+
+    $thr1 = threads->new(\&sub1);
+    $thr2 = threads->new(\&sub1);
+
+    sub sub1 {
+        $semaforo->down(5); # Decrementa il contatore di 5
+        # Qua si fa qualcosa
+        $semaforo->up(5); # Incrementa il contatore di 5
+    }
+
+    $thr1->detach;
+    $thr2->detach;
+
+Se down() tenta di decrementare il contatore sotto lo zero, si blocca
+fino a che il contatore non E<egrave> grande abbastanza. Si noti che, mentre
+E<egrave> possibile creare un semaforo con un contatore iniziale impostato
+a zero, qualsiasi chiamata a up() o down() cambia il contatore di almeno
+una unitE<agrave>, e dunque $semaphore->down(0) E<egrave> uguale a
+$semaphore->down(1).
+
+La questione, naturalmente, E<egrave> perchE<eacute> si dovrebbe desiderare un
+comportamento del genere? PerchE<eacute> creare un semaforo con un contatore
+con valore iniziale diverso da uno, o perchE<eacute> decrementare/incrementare
+per piE<ugrave> di una unitE<agrave>? La risposta E<egrave> nella
+disponibilitE<agrave> delle risorse. Molte delle risorse di cui volete
+gestire l'accesso possono essere usate in modo sicuro da piE<ugrave> di
+un thread alla volta.
+
+Per esempio, prendiamo un programma che utilizzi una interfaccia grafica. Esso
+dispone di un semaforo che usa per sincronizzare l'accesso al display,
+cosicchE<eacute> solo un thread alla volta possa disegnare. Comodo, ma ovviamente
+non vorrete che qualche thread inizi a disegnare prima che le cose non
+siano state impostate correttamente. In questo caso, potete creare un
+semaforo con un contatore impostato a zero, e alzarlo quando E<egrave> tutto
+pronto affinchE<eacute> i thread siano pronti a disegnare.
+
+I semafori con un contatore impostato ad un valore piE<ugrave> grande di uno
+sono, tra l'altro, utili per definire le quota. Ponete, ad esempio,
+di avere un certo numero di thread che possono fare I/O simultaneamente.
+Tuttavia, non vorrete che tutti questi thread leggano o
+scrivano nello stesso momento, poichE<eacute> ciE<ograve> potrebbe
+potenzialmente impantanare i vostri canali di I/O, o esaurire la quota
+di filehandle del vostro processo. Potete utilizzare un semaforo
+inizializzato al numero di richieste di I/O concorrenti (o file aperti)
+che desiderate avere simultaneamente, e far sE<igrave> che
+i vostri thread si blocchino e sblocchino tranquillamente da soli.
+
+Incrementi o decrementi piE<ugrave> grandi sono comodi in quei casi in cui
+un thread ha bisogno di controllare o di restituire un certo numero
+di risorse contemporaneamente.
+
+=head2 cond_wait() e cond_signal()
+
+Queste due funzioni possono essere usate assieme ai lock per notificare
+ai thread cooperanti che una risorsa E<egrave> divenuta disponibile. Esse, per
+quanto riguarda l'uso, sono molto simili alle funzioni che si trovano
+in C<pthreads>. Comunque, per la maggior parte degli scopi, le code
+sono piE<ugrave> semplici da usare e piE<ugrave> intuitive. Consultate
+L<threads::shared> per ulteriori dettagli.
+
+=head2 Cedere il controllo
+
+Ci sono momenti in cui puE<ograve> essere utile far sE<igrave> che un thread
+ceda esplicitamente la CPU ad un altro. Ppotreste trovarvi a fare qualche cosa
+di processor-intensive [che occupa molto tempo del processore, NdT] e
+quindi volete assicurarvi che il thread dell'interfaccia utente sia
+chiamato frequentemente. In ogni caso, ci sono momenti in cui
+potreste desiderare che un thread ceda il processore.
+
+A questo scopo il package di threading del Perl fornisce la funzione
+yield(). yield() E<egrave> piuttosto semplice, e funziona cosE<igrave>:
+
+    use threads; 
+
+    sub ciclo {
+	    my $thread = shift;
+	    my $pippo = 50;
+	    while($pippo--) { print "nel thread $thread\n" }
+	    threads->yield;
+	    $pippo = 50;
+	    while($pippo--) { print "nel thread $thread\n" }
+    }
+
+    my $thread1 = threads->new(\&ciclo, 'primo');
+    my $thread2 = threads->new(\&ciclo, 'secondo');
+    my $thread3 = threads->new(\&ciclo, 'terzo');
+
+E<Egrave> importante ricordare che yield() E<egrave> solamente un
+suggerimento a cedere la CPU. CiE<ograve> che accade realmente dipende dal
+vostro hardware, sistema operativo e librerie di threading. E<Egrave>
+pertanto importante notare che non bisognerebbe costruire lo scheduling
+dei thread attorno alle chiamate a yield(). Potrebbe funzionare sul vostro
+sistema ma non funzionerE<agrave> su un altro.
+
+=head1 Routine Di UtilitE<agrave> Generale Per I Thread
+
+Abbiamo trattato le parti fondamentali del package di threading del
+Perl, e con questi strumenti dovreste essere ampiamente in grado di
+scrivere codice e package threaded. Ci sono alcune piccole parti che
+non trovavano veramente posto da altre parti.
+
+=head2 In Quale Thread Mi Trovo?
+
+Il metodo della classe C<< threads->self >> fornisce al vostro programma un
+modo per ottenere un oggetto che rappresenta il thread in cui ci si trova
+al momento. Potete usare questo oggetto nello stesso modo degli altri
+restituiti al momento della creazione dei thread.
+
+=head2 ID Dei Thread
+
+tid() E<egrave> un metodo dell'oggetto thread che ritorna l'ID del thread che
+l'oggetto rappresenta. Gli ID dei thread sono numeri interi, ed il
+thread principale di un programma ha ID 0. Allo stato attuale Perl assegna
+un tid unico a ciascun thread creato nel vostro proramma, assegnando il
+tid 1 al primo thread creato, ed aumentando il tid di 1 per ciascun nuovo
+thread che viene creato.
+
+=head2 Questi Due Oggetti Sono Lo Stesso Thread?
+
+Il metodo equal() prende come argomenti due oggetti thread e ritorna
+vero se essi rappresentano lo stesso thread, o falso in caso contrario.
+
+Gli oggetti thread dispongono anche di una comparazione == su cui E<egrave>
+stato compiuto un overload, e quindi la si puE<ograve> usare per compararli
+cosE<igrave> come si fa con i normali oggetti.
+
+=head2 Quali Thread Sono In Esecuzione?
+
+C<< threads->list >> restituisce una lista di oggetti thread, uno per ciascun
+thread in esecuzione al momento, e non detached. E<Egrave> comodo per una serie
+di cose, incluse le operazioni di pulizia al termine del vostro programma:
+
+    # Loop attraverso tutti i thread
+    foreach $thr (threads->list) { 
+        # Non unite il thread principale o quello corrente
+        if ($thr->tid && !threads::equal($thr, threads->self)) { 
+            $thr->join; 
+        } 
+    }
+
+Se alcuni thread non hanno ancora terminato l'esecuzione quando il thread
+Perl principale finisce, Perl vi avvertirE<agrave> di questo fatto e
+morirE<agrave>, poichE<eacute> per il Perl E<egrave> impossibile effetturare
+operazioni di pulizia su se stesso mentre altri thread sono in esecuzione.
+
+=head1 Un Esempio Completo
+
+Siete ancora confusi? E<Egrave> ora di un programma di esempio che mostri
+alcuni degli argomenti che abbiato trattato. Questo programma trova
+i numeri primi utilizzando i thread.
+
+    1  #!/usr/bin/perl -w
+    2  # prime-pthread, per cortesia di Tom Christiansen
+    3
+    4  use strict;
+    5
+    6  use threads;
+    7  use Thread::Queue;
+    8
+    9  my $stream = new Thread::Queue;
+    10 my $figlio = new threads(\&controlla_num, $stream, 2);
+    11
+    12 for my $i ( 3 .. 1000 ) {
+    13     $stream->enqueue($i);
+    14 } 
+    15
+    16 $stream->enqueue(undef);
+    17 $figlio->join;
+    18
+    19 sub controlla_num {
+    20     my ($upstream, $cur_prime) = @_;
+    21     my $figlio;
+    22     my $downstream = new Thread::Queue;
+    23     while (my $num = $upstream->dequeue) {
+    24         next unless $num % $cur_prime;
+    25         if ($figlio) {
+    26            $downstream->enqueue($num);
+    27          	} else {
+    28            print "Trovato il numero primo $num\n";
+    29	              $figlio = new threads(\&controlla_num, $downstream, $num);
+    30         }
+    31     } 
+    32     $downstream->enqueue(undef)	if $figlio;
+    33     $figlio->join		if $figlio;
+    34 }
+
+Questo programma usa il modello a pipeline per generare numeri primi.
+Ogni thread della pipeline ha una coda di input che fornisce i numeri
+da controllare, un numero di primo di cui E<egrave> responsabile, ed una
+coda di output in cui accoda i numeri che hanno fallito il controllo.
+Se il thread ha un numero che ha fallito il proprio controllo e non c'E<egrave>
+un thread figlio, allora il thread deve aver trovato un nuovo numero
+primo. In questo caso, un nuovo thread figlio viene creato per il
+numero primo e aggiunto alla fine della pipeline.
+
+Probabilmente questo appare un pE<ograve> piE<ugrave> confuso di quanto
+realmente sia, quindi analizziamo questo programma pezzo per pezzo e vediamo
+cosa fa realmente. (Per quelli di voi che stanno cercando di ricordare
+cosa sia esattamente un numero primo, si tratta di un numero che
+E<egrave> divisibile solamente per se stesso e per 1)
+
+Il grosso del lavoro E<egrave> compiuto dalla subroutine controlla_num(), che
+prende un riferimento alla sua coda di input ed un numero primo di
+cui E<egrave> responsabile. Dopo aver ottenuto la coda di input ed il
+numero primo che la subroutine sta controllando (linea 20), creiamo
+una nuova coda (linea 22) e riserviamo uno scalare per il thread
+che probabilmente creeremo in seguito (linea 21).
+
+I ciclo while dalla linea 23 alle linea 31 prende uno scalare dalla
+coda di input e lo confronta con il primo di cui questo thread E<egrave>
+resposabile. La linea 24 controlla se c'E<egrave> un resto quando calcoliamo
+il modulo del numero nei confronti del nostro numero primo. Se c'E<egrave>,
+il numero non E<egrave> divisibile per il nostro primo, e dunque dobbiamo
+passarlo al prossimo thread se ne abbiamo creato uno (linea 26) o
+creare un nuovo thread se non l'abbiamo fatto prima.
+
+La creazione del nuovo thread E<egrave> alla linea 29. Passiamo ad esso un
+riferimento alla coda che abbiamo creato, ed il numero primo trovato.
+
+Infine, quando il ciclo termina (poichE<eacute> abbiamo trovato uno 0 o
+undef nella coda, che serve come avviso per terminare), se abbiamo
+creato un thread figlio gli passiamo tale notifica e poi attendiamo che
+esso termini la sua esecuzione (linee 32 e 37).
+
+Nel frattempo, nel thread principale, creiamo una coda (linea 9)
+ed il primo thread figlio (linea 10), e gli passiamo il primo numero
+primo: 2. Fatto ciE<ograve>, accodiamo tutti i numeri da 3 a 1000
+affinchE<eacute> vengano controllati (linee 12-14), poi accodiamo un
+avviso che permetta al ciclo di terminare (linea 16) ed aspettiamo che il
+primo thread figlio abbia terminato (linea 17). Siccome un
+thread figlio non uscirE<agrave> finchE<eacute> il suo thread figlio non
+E<egrave> uscito, sappiamo che avremo finito la ricerca quando la chiamata
+a join ritorna.
+
+Questo E<egrave> tutto per quanto riguarda il funzionamento del programma.
+E<Egrave> piuttosto semplice; come accade per molti programmi Perl, la
+spiegazione E<egrave> molto piE<ugrave> lunga del programma stesso.
+
+=head1 Differenti implementazioni dei thread
+
+Ecco un inquadramento sulle implementazioni dei thread da un punto
+di vista del sistema operativo. Ci sono tre categorie di base per i
+thread: thread utente, thread del kernel, e thread del kernel multiprocessore.
+
+I thread utente sono thread che vivono interamente in un programma
+e nelle sue librerie. Con questo modello, il Sistema Operativo non
+sa nulla dei thread. Per quanto lo riguarda, il vostro processo
+E<egrave> semplicemente un processo.
+
+Questa E<egrave> la via piE<ugrave> semplice per implementare i thread, ed
+E<egrave> la via che imboccano molti sistemi operativi. Il grande svantaggio
+E<egrave> che, siccome il sistema operativo non conosce nulla dei thread,
+se uno di essi si blocca allora si bloccano tutti. Le tipiche attivitE<agrave>
+di blocco includono la maggior parte delle chiamate di sistema, la
+quasi totalitE<agrave> dell'I/O, e cose come sleep().
+
+I thread del kernel costituiscono il passo successivo nell'evoluzione
+dei thread. Il sistema sperativo E<egrave> a conoscenza dei thread del
+kernel, e fa concessioni ad essi. La differenza principale tra un
+thread del kernel e uno utente E<egrave> il blocco. Con i thread del kernel,
+ciE<ograve> che blocca un singolo thread non blocca gli altri. Non E<egrave>
+questo il caso con i thread utente, dove il kernel blocca a livello di
+processo e non a livello di thread.
+
+Questo E<egrave> un grande passo in avanti, e puE<ograve> fornire ad un
+programma threaded un bell'incremento prestazionale rispetto ai programmi
+non threaded. I thread che si bloccano poichE<eacute> fanno dell'I/O, ad
+esempio, non bloccano i thread che stanno facendo altro. Tuttavia,
+ogni processo ha comunque un thread alla volta in esecuzione,
+indipendentemente da quante CPU un sistema puE<ograve> avere.
+
+Dal momento che il threading del kernel puE<ograve> interrompere un thread
+in qualsiasi momento, verranno allo scoperto alcune delle assunzioni
+implicite relative al locking che potreste fare nei vostri programmi.
+Ad esempio, qualcosa di semplice come C<$a = $a + 2> puE<ograve> comportarsi
+in maniera imprevedibile con i thread del kernel se $a E<egrave> visibile
+agli altri thread, in quanto un altro thread puE<ograve> aver cambiato
+$a nel tempo compreso tra quando il suo valore E<egrave> stato ottenuto nella
+parte destra dell'espressione e quando il nuovo valore E<egrave> stato
+memorizzato.
+
+I thread del kernel multiprocessore rappresentano in passo finale nel
+supporto ai thread. Con i thread del kernel multiprocessore, su una
+macchina con CPU multiple, il sistema operativo puE<ograve> programmare
+uno o piE<ugrave> thread affinchE<eacute> vengano eseguiti contemporaneamente
+su CPU diverse.
+
+CiE<ograve> puE<ograve> fornire un importante incremento di prestazioni al
+vostro programma threaded, dato che piE<ugrave> di un thread verrE<agrave>
+eseguito nello stesso momento. Come pegno da pagare, tuttavia, faranno la
+loro tragica comparsa tutte quelle fastidiose questioni di sincronizzazione
+che potevano non essersi presentate con i normali thread del kernel.
+
+In aggiunta ai diversi livelli in cui i thread sono coinvolti nei sistemi
+operativi, differenti sistemi operativi (e diverse implementazioni dei
+thread per un particolare sistema operativo) assegnano ai thread dei cicli
+di CPU in modi differenti.
+
+I sistemi con multitasking cooperativo ["cooperative", senza prelazione, NdT]
+richiedono che i thread cedano il controllo se accade qualcosa. Se un thread
+chiama una funzione yield, cede il controllo. Lo cede anche se fa qualcosa che
+ne causerebbe il blocco, come fare dell'I/O. In un'implementazione
+cooperativa del multitasking, un thread, se lo desidera, puE<ograve> causare
+una mancanza di risorse a tutti gli altri per quanto riguarda il tempo della CPU.
+
+I sistemi con multitasking preemptive [con prelazione, NdT] interrompono i thread
+ad intervalli regolari mentre il sistema decide quale sarE<agrave> il prossimo
+thread a dover eseguire. In un sistema di multitasking preemptive,
+di solito un thread non monopolizza la CPU.
+
+Su alcuni sistemi, ci possono essere thread cooperativi e preemptive
+che vengono eseguiti simultaneamente. (I thread con prioritE<agrave> real time
+[in tempo reale, NdT] spesso si comportano in maniera cooperativa, per esempio,
+mentre i thread con normali prioritE<agrave> si comportano come preemptive).
+
+=head1 Considerazioni sulle prestazioni
+
+La cosa principale da tenere a mente quando si confrontano gli ithread
+con altri modelli di thread E<egrave> il fatto che, per ciascun nuovo thread
+creato, deve essere fatta una copia completa di tutte le variabili e dei
+dati del thread genitore. Questa creazione del thread puE<ograve> essere
+alquanto costosa, sia in termini di memoria che di tempo. Il modo ideale
+per ridurre questi costi e di avere un numero relativamente piccolo
+di thread con una vita lunga, tutti creati prima che il thread di base
+abbia accumulato troppi dati. Chiaramente, ciE<ograve> puE<ograve> non
+essere sempre possibile, quindi E<egrave> necessario scendere a dei
+compromessi. Comunque, dopo che un thread E<egrave> stato creato, le sue
+prestazioni e l'utilizzo di memoria dovrebbero essere un po' diverse rispetto
+al consueto codice.
+
+Tenete inoltre a mente che, nell'implementazione corrente, le variabili
+condivise usano un po' di memoria in piE<ugrave> e sono un po' piE<ugrave>
+lente rispetto alle variabili normali.
+
+=head1 Cambiamenti A Livello Di Processo
+
+Va notato che, sebbene i thread siano separati l'uno
+dall'altro, ed i dati del Perl siano privati a livello di thread
+(a meno che non siano condivisi esplicitamente), i thread possono
+effettuare cambiamenti a livello di processo, influenzando tutti
+i thread.
+
+L'esempio piE<ugrave> comune di questo aspetto E<egrave> il cambiamento della
+directory di lavoro corrente tramite chdir(). Un thread chiama chdir(), e
+la directory di lavoro di tutti i thread cambia.
+
+Un esempio persino piE<ugrave> drastico di cambiamento a livello di processo
+E<egrave> chroot(): la directory principale di tutti i thread cambia,
+e nessun thread puE<ograve> annullare tale cambiamento (a differenza di
+chdir()).
+
+Ulteriori esempi di di cambiamenti a livello di processo includono
+umask() ed il cambiamento di uid/gid.
+
+State pensando di mescolare fork() ed i thread? Per favore mettetevi
+comodi ed attendate finchE<eacute> non ve ne passa la voglia. State attenti
+che la semantica del fork() varia tra le piattaforme. Per esempio, alcuni
+sistemi UNIX copiano tutti i thread correnti nel processo figlio, mentre
+altri copiano solo il thread che ha invocato la fork(). Siete stati
+avvisati!
+
+In maniera simile, mescolare segnali e thread E<egrave> un'operazione che non
+andrebbe tentata. Le implementazioni dipendono dal sistema, e persino
+le semantiche POSIX possono non essere quelle che vi attendete (e Perl
+non vi offre nemmeno l'API POSIX completa).
+
+=head1 Thread-Safety Delle Librerie Di Sistema
+
+Se le varie chiamate alle librerie siano thread-safe o meno E<egrave> fuori
+dal controllo del Perl. Le chiamate che in molti casi non sono thread-safe
+includono: localtime(), gmtime(), get{{gr,host,net,proto,serv,pw}*(),
+readdir(), rand(), e srand() -- in generale, tutte le chiamate che
+dipendono da una situazione globale esterna.
+
+Se il sistema in cui Perl E<egrave> stato compilato dispone di varianti
+thread-safe di tali chiamate, esse verrano usate. A parte quello,
+Perl E<egrave> alla mercE<eacute> della thread-safety o thread-unsafety delle
+chiamate. Consultate la documentazione delle chiamate della vostra
+liberia C.
+
+In alcuni sistemi le intefacce thread-safe possono non funzionare
+se il buffer per il risultato E<egrave> troppo piccolo (per esempio
+
+the user group databases may
+be rather large, and the reentrant interfaces may have to carry around
+a full snapshot of those databases).  Perl will start with a small
+buffer, but keep retrying and growing the result buffer
+until the result fits.  If this limitless growing sounds bad for
+security or memory consumption reasons you can recompile Perl with
+PERL_REENTRANT_MAXSIZE defined to the maximum number of bytes you will
+allow.
+
+
+
+=head1 Conclusioni
+
+Un tutorial completo sui thread puE<ograve> riempire un libro (e lo ha fatto,
+molte volte) ma, con ciE<ograve> che abbiamo trattato in questa introduzione,
+dovreste essere ampiamente in grado di diventare esperti di Perl
+threaded.
+
+=head1 Bibliografia
+
+Ecco una breve bibliografia, per cortesia di Jürgen Christoffel:
+
+=head2 Testi Introduttivi
+
+Birrell, Andrew D. An Introduction to Programming with
+Threads. Digital Equipment Corporation, 1989, DEC-SRC Research Report
+#35 disponibile online su
+http://gatekeeper.dec.com/pub/DEC/SRC/research-reports/abstracts/src-rr-035.html
+(fortemente raccomandato)
+
+Robbins, Kay. A., e Steven Robbins. Practical Unix Programming: A
+Guide to Concurrency, Communication, and
+Multithreading. Prentice-Hall, 1996.
+
+Lewis, Bill, e Daniel J. Berg. Multithreaded Programming with
+Pthreads. Prentice Hall, 1997, ISBN 0-13-443698-9 (una introduzione
+ai thread ben scritta).
+
+Nelson, Greg (editore). Systems Programming with Modula-3.  Prentice
+Hall, 1991, ISBN 0-13-590464-1.
+
+Nichols, Bradford, Dick Buttlar, e Jacqueline Proulx Farrell.
+Pthreads Programming. O'Reilly & Associates, 1996, ISBN 156592-115-1
+(tratta i thread POSIX).
+
+=head2 Riferimenti Relativi Ai Sistemi Operativi
+
+Boykin, Joseph, David Kirschen, Alan Langerman, e Susan
+LoVerso. Programming under Mach. Addison-Wesley, 1994, ISBN
+0-201-52739-1.
+
+Tanenbaum, Andrew S. Distributed Operating Systems. Prentice Hall,
+1995, ISBN 0-13-219908-4 (grandioso libro di testo).
+
+Silberschatz, Abraham, e Peter B. Galvin. Operating System Concepts,
+4th ed. Addison-Wesley, 1995, ISBN 0-201-59292-4
+
+=head2 Altri Riferimenti
+
+Arnold, Ken e James Gosling. The Java Programming Language, 2nd
+ed. Addison-Wesley, 1998, ISBN 0-201-31006-6.
+
+le FAQ di comp.programming.threads,
+L<http://www.serpentine.com/~bos/threads-faq/>
+
+Le Sergent, T. e B. Berthomieu. "Incremental MultiThreaded Garbage
+Collection on Virtually Shared Memory Architectures" in Memory
+Management: Proc. of the International Workshop IWMM 92, St. Malo,
+France, September 1992, Yves Bekkers and Jacques Cohen, eds. Springer,
+1992, ISBN 3540-55940-X (applicazioni pratiche sui thread).
+
+Artur Bergman, "Where Wizards Fear To Tread", June 11, 2002,
+L<http://www.perl.com/pub/a/2002/06/11/threads.html>
+
+=head1 Ringraziamenti
+
+Grazie (in nessun ordine particolare) a Chaim Frenkel, Steve Fink, Gurusamy
+Sarathy, Ilya Zakharevich, Benjamin Sugard, Jurgen Chrisoffel, Joshua
+Pritikin, e Alan Burlison, per il loro aiuto nel controllo e
+nell'affinamento di questo articolo. Molte grazie a Tom Christiansen
+per la sua riscrittura del generatore di numeri primi.
+
+=head1 AUTORE
+
+Dan Sugalski E<lt>dan@sidhe.orgE<gt>
+
+Leggermente modificato da Arthur Bergman per adattarlo al nuovo modello/modulo
+dei thread.
+
+Rielaborato lievemente da Jörg Walter E<lt>jwalt@cpan.orgE<gt> affinchE<eacute>
+la parte sulla thread-safety del codice perl risultasse piE<ugrave> concisa.
+
+Lievemente risistemato da Elizabeth Mattijsen E<lt>liz@dijkmat.nl<gt> per
+porre minore enfasi su yield().
+
+=head1 Copyright
+
+La versione originale di questo articolo E<egrave> apparsa originariamente
+in The Perl Journal #10, ed il copyright E<egrave> di The Perl Journal (1998).
+Appare qui per cortesia di Jon Orwant e di The Perl Journal. Questo
+documento puE<ograve> essere distribuito sotto la stessa licenza del Perl
+stesso.
+
+Per maggiori informazioni si vedano L<threads> and L<threads::shared>.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlthrtut
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Michele Beltrame.
+
+=head2 Revisore
+
+Revisione a cura di Michele Beltrame e dree.
+
+=cut

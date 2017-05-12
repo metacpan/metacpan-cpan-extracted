@@ -1,0 +1,17 @@
+Tested
+======
+
+Test the code in your POD and generates POD.
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

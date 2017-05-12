@@ -1,0 +1,42 @@
+0.08 2015-10-14T11:21:19+02:00
+ - Add SEE ALSO section to doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.07 2014-12-22T01:14:11+01:00
+ - Fix LICENSE file.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Process =begin text ... =end section from examples.
+ - Remove =begin html ... =end section from examples.
+ - Update Module::Install to 1.14 version.
+
+0.06 2014-08-01T10:21:00+02:00
+ - Fix ERRORS section in doc.
+ - Improve doc.
+ - Update Module::Install to 1.10 version.
+
+0.05 2013-11-12
+ - Add 'readme_from' directive to Makefile.PL.
+ - Add LICENSE.
+ - Add dependency for perl (based on Error::Pure).
+
+0.04 2013-09-21
+ - Add SIGNATURE.
+ - Add Test::NoWarnings to tests.
+ - Rename CHANGES to Changes.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.03 2012-07-16
+ - New version of build system.
+ - Implement sections() subroutine.
+ - Add examples/ directory.
+ - Fix Makefile.PL to META 1.4.
+
+0.02 2011-08-01
+ - Add check for noexistent Perl module. Add test for it.
+ - Rewrite 03-pod.t to better version for Perl 5.6.
+ - Remove "(3pm)" from pod doc.
+
+0.01 2011-07-15
+ - First version.

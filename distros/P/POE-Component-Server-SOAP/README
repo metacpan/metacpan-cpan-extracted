@@ -1,0 +1,489 @@
+NAME
+    POE::Component::Server::SOAP - publish POE event handlers via SOAP over
+    HTTP
+
+SYNOPSIS
+            use POE;
+            use POE::Component::Server::SOAP;
+
+            POE::Component::Server::SOAP->new(
+                    'ALIAS'         =>      'MySOAP',
+                    'ADDRESS'       =>      'localhost',
+                    'PORT'          =>      32080,
+                    'HOSTNAME'      =>      'MyHost.com',
+            );
+
+            POE::Session->create(
+                    'inline_states' =>      {
+                            '_start'        =>      \&setup_service,
+                            '_stop'         =>      \&shutdown_service,
+                            'Sum_Things'    =>      \&do_sum,
+                    },
+            );
+
+            $poe_kernel->run;
+            exit 0;
+
+            sub setup_service {
+                    my $kernel = $_[KERNEL];
+                    $kernel->alias_set( 'MyServer' );
+                    $kernel->post( 'MySOAP', 'ADDMETHOD', 'MyServer', 'Sum_Things' );
+            }
+
+            sub shutdown_service {
+                    $_[KERNEL]->post( 'MySOAP', 'DELMETHOD', 'MyServer', 'Sum_Things' );
+            }
+
+            sub do_sum {
+                    my $response = $_[ARG0];
+                    my $params = $response->soapbody;
+                    my $sum = 0;
+                    while (my ($field, $value) = each(%$params)) {
+                            $sum += $value;
+                    }
+
+                    # Fake an error
+                    if ( $sum < 100 ) {
+                            $_[KERNEL]->post( 'MySOAP', 'FAULT', $response, 'Client.Add.Error', 'The sum must be above 100' );
+                    } else {
+                            # Add the content
+                            $response->content( "Thanks.  Sum is: $sum" );
+                            $_[KERNEL]->post( 'MySOAP', 'DONE', $response );
+                    }
+            }
+
+ABSTRACT
+            An easy to use SOAP/1.1 daemon for POE-enabled programs
+
+DESCRIPTION
+    This module makes serving SOAP/1.1 requests a breeze in POE.
+
+    The hardest thing to understand in this module is the SOAP Body. That's
+    it!
+
+    The standard way to use this module is to do this:
+
+            use POE;
+            use POE::Component::Server::SOAP;
+
+            POE::Component::Server::SOAP->new( ... );
+
+            POE::Session->create( ... );
+
+            POE::Kernel->run();
+
+    POE::Component::Server::SOAP is a bolt-on component that can publish
+    event handlers via SOAP over HTTP. Currently, this module only supports
+    SOAP/1.1 requests, work will be done in the future to support SOAP/1.2
+    requests. The HTTP server is done via
+    POE::Component::Server::SimpleHTTP.
+
+  Starting Server::SOAP
+    To start Server::SOAP, just call it's new method:
+
+            POE::Component::Server::SOAP->new(
+                    'ALIAS'         =>      'MySOAP',
+                    'ADDRESS'       =>      '192.168.1.1',
+                    'PORT'          =>      11111,
+                    'HOSTNAME'      =>      'MySite.com',
+                    'HEADERS'       =>      {},
+            );
+
+    This method will die on error or return success.
+
+    This constructor accepts only 7 options.
+
+    "ALIAS"
+        This will set the alias Server::SOAP uses in the POE Kernel. This
+        will default to "SOAPServer"
+
+    "ADDRESS"
+        This value will be passed to POE::Component::Server::SimpleHTTP to
+        bind to.
+
+        Examples: ADDRESS => 0 # Bind to all addresses + localhost ADDRESS
+        => 'localhost' # Bind to localhost ADDRESS => '192.168.1.1' # Bind
+        to specified IP
+
+    "PORT"
+        This value will be passed to POE::Component::Server::SimpleHTTP to
+        bind to.
+
+    "HOSTNAME"
+        This value is for the HTTP::Request's URI to point to. If this is
+        not supplied, POE::Component::Server::SimpleHTTP will use
+        Sys::Hostname to find it.
+
+    "HEADERS"
+        This should be a hashref, that will become the default headers on
+        all HTTP::Response objects. You can override this in individual
+        requests by setting it via $response->header( ... )
+
+        The default header is: Server => 'POE::Component::Server::SOAP/' .
+        $VERSION
+
+        For more information, consult the HTTP::Headers module.
+
+    "MUSTUNDERSTAND"
+        This is a boolean value, controlling whether Server::SOAP will check
+        for this value in the Headers and Fault if it is present. This will
+        default to true.
+
+    "SIMPLEHTTP"
+        This allows you to pass options to the SimpleHTTP backend. One of
+        the real reasons is to support SSL in Server::SOAP, yay! To learn
+        how to use SSL, please consult the
+        POE::Component::Server::SimpleHTTP documentation. Of course, you
+        could totally screw up things, just use this with caution :)
+
+        You must pass a hash reference as the value, because it will be
+        expanded and put in the Server::SimpleHTTP->new() constructor.
+
+  Events
+    There are only a few ways to communicate with Server::SOAP.
+
+    "ADDMETHOD"
+                This event accepts four arguments:
+                        - The intended session alias
+                        - The intended session event
+                        - The public service name       ( not required -> defaults to session alias )
+                        - The public method name        ( not required -> defaults to session event )
+
+                Calling this event will add the method to the registry.
+
+                NOTE: This will overwrite the old definition of a method if it exists!
+
+    "DELMETHOD"
+                This event accepts two arguments:
+                        - The service name
+                        - The method name
+
+                Calling this event will remove the method from the registry.
+
+                NOTE: if the service now contains no methods, it will also be removed.
+
+    "DELSERVICE"
+                This event accepts one argument:
+                        - The service name
+
+                Calling this event will remove the entire service from the registry.
+
+    "DONE"
+                This event accepts only one argument: the SOAP::Response object we sent to the handler.
+
+                Calling this event implies that this particular request is done, and will proceed to close the socket.
+
+                The content in $response->content() will be automatically serialized via SOAP::Lite's SOAP::Serializer
+
+                NOTE: This method automatically sets some parameters:
+                        - HTTP Status = 200 ( if not defined )
+                        - HTTP Header value of 'Content-Type' = 'text/xml'
+
+                To get greater throughput and response time, do not post() to the DONE event, call() it!
+                However, this will force your program to block while servicing SOAP requests...
+
+    "RAWDONE"
+                This event accepts only one argument: the SOAP::Response object we sent to the handler.
+
+                Calling this event implies that this particular request is done, and will proceed to close the socket.
+
+                The only difference between this and the DONE event is that the content in $response->content() will not
+                be serialized and passed through intact to the SOAP envelope. This is useful if you generate the xml yourself.
+
+                NOTE:
+                        - The xml content does not need to have a <?xml version="1.0" encoding="UTF-8"> header
+                        - In SOAP::Lite, the client sees '<foo>54</foo><bar>89</bar>' as '54' only!
+                                The solution is to enclose the xml in another name, i.e. '<data><foo>54</foo><bar>89</bar></data>'
+                        - If the xml is malformed or is not escaped properly, the client will get terribly confused!
+
+                It will be inserted here:
+                        ...<soap:Body><namesp4:TestResponse xmlns:namesp4="http://localhost:32080/">YOURSTUFFHERE</namesp4:TestResponse></soap:Body>...
+
+    "FAULT"
+                This event accepts five arguments:
+                        - the HTTP::Response object we sent to the handler
+                        - SOAP Fault Code       ( not required -> defaults to 'Server' )
+                        - SOAP Fault String     ( not required -> defaults to 'Application Faulted' )
+                        - SOAP Fault Detail     ( not required )
+                        - SOAP Fault Actor      ( not required )
+
+                Again, calling this event implies that this particular request is done, and will proceed to close the socket.
+
+                Calling this event will generate a SOAP Fault and return it to the client.
+
+                NOTE: This method automatically sets some parameters:
+                        - HTTP Status = 500 ( if not defined )
+                        - HTTP Header value of 'Content-Type' = 'text/xml'
+                        - HTTP Content = SOAP Envelope of the fault ( overwriting anything that was there )
+
+    "RAWFAULT"
+                This event accepts only one argument: the SOAP::Response object we sent to the handler.
+
+                Calling this event implies that this particular request is done, and will proceed to close the socket.
+
+                The only difference between this and the FAULT event is that you are given freedom to create your own xml for the
+                fault. It will be passed through intact to the SOAP envelope. Be sure to read the SOAP specs :)
+
+                This is very similar to the RAWDONE event, so go read the notes up there!
+
+                It will be inserted here:
+                        ...<soap:Body>YOURSTUFFHERE</soap:Body>...
+
+    "CLOSE"
+                This event accepts only one argument: the SOAP::Response object we sent to the handler.
+
+                Calling this event will proceed to close the socket, not sending any output.
+
+    "STARTLISTEN"
+                Starts the listening socket, if it was shut down
+
+    "STOPLISTEN"
+                Simply a wrapper for SHUTDOWN GRACEFUL, but will not shutdown Server::SOAP if there is no more requests
+
+    "SHUTDOWN"
+                Without arguments, Server::SOAP does this:
+                        Close the listening socket
+                        Kills all pending requests by closing their sockets
+                        Removes it's alias
+
+                With an argument of 'GRACEFUL', Server::SOAP does this:
+                        Close the listening socket
+                        Waits for all pending requests to come in via DONE/FAULT/CLOSE, then removes it's alias
+
+  Processing Requests
+    if you're new to the world of SOAP, reading the documentation by the
+    excellent author of SOAP::Lite is recommended! It also would help to
+    read some stuff at http://www.soapware.org/ -> they have some excellent
+    links :)
+
+    Now, once you have set up the services/methods, what do you expect from
+    Server::SOAP? Every request is pretty straightforward, you just get a
+    Server::SOAP::Response object in ARG0.
+
+            The Server::SOAP::Response object contains a wealth of information about the specified request:
+                    - There is the SimpleHTTP::Connection object, which gives you connection information
+                    - There is the various SOAP accessors provided via Server::SOAP::Response
+                    - There is the HTTP::Request object
+
+            Example information you can get:
+                    $response->connection->remote_ip()      # IP of the client
+                    $response->soaprequest->uri()           # Original URI
+                    $response->soapmethod()                 # The SOAP method that was called
+                    $response->soapbody()                   # The arguments to the method
+
+    Probably the most important part of SOAP::Response is the body of the
+    message, which contains the arguments to the method call. The data in
+    the body is a hash, for more information look at SOAP::Lite ->
+    SOAP::Deserializer.
+
+    I cannot guarantee what will be in the body, it is all up to the SOAP
+    serializer/deserializer. I can provide some examples:
+
+            NOTE: It is much easier to play around with parameters if they are properly encoded.
+            If you are using SOAP::Lite, make extensive use of SOAP::Data->name() to create parameters :)
+
+            Calling a SOAP method with no arguments:
+                    print SOAP::Lite
+                            -> uri('http://localhost:32080/')
+                            -> proxy('http://localhost:32080/?session=MyServer')
+                            -> Sum_Things()
+                            -> result
+
+            The body will look like this:
+                    $VAR1 = undef;
+
+            Calling a SOAP method with multiple arguments:
+                    print SOAP::Lite
+                            -> uri('http://localhost:32080/')
+                            -> proxy('http://localhost:32080/?session=MyServer')
+                            -> Sum_Things( 8, 6, 7, 5, 3, 0, 9, 183 )
+                            -> result
+
+            The body will look like this:
+                    $VAR1 = {
+                            'c-gensym17' => '183',
+                            'c-gensym5' => '6',
+                            'c-gensym13' => '0',
+                            'c-gensym11' => '3',
+                            'c-gensym15' => '9',
+                            'c-gensym9' => '5',
+                            'c-gensym3' => '8',
+                            'c-gensym7' => '7'
+                    };
+
+                    NOTE: The original array ordering can be received by sorting on the keys.
+
+            Calling a SOAP method with an arrayref
+                    print SOAP::Lite
+                            -> uri('http://localhost:32080/')
+                            -> proxy('http://localhost:32080/?session=MyServer')
+                            -> Sum_Things(
+                                    [ 8, 6, 7, 5, 3, 0, 9, 183 ]
+                                    )
+                            -> result
+
+            The body will look like this:
+                    $VAR1 = {
+                            'Array' => [
+                                    '8',
+                                    '6',
+                                    '7',
+                                    '5',
+                                    '3',
+                                    '0',
+                                    '9',
+                                    '183'
+                            ]
+                    };
+
+            Calling a SOAP method with a hash:
+                    print SOAP::Lite
+                            -> uri('http://localhost:32080/')
+                            -> proxy('http://localhost:32080/?session=MyServer')
+                            -> Sum_Things(  {
+                                    'FOO'   =>      'bax',
+                                    'Hello' =>      'World!',
+                            }       )
+                            -> result
+
+            The body will look like this:
+                    $VAR1 = {
+                            'c-gensym21' => {
+                                    'Hello' => 'World!',
+                                    'FOO' => 'bax',
+                            }
+                    };
+
+            Calling a SOAP method using SOAP::Data methods:
+                    print SOAP::Lite
+                            -> uri('http://localhost:32080/')
+                            -> proxy('http://localhost:32080/?session=MyServer')
+                            -> Sum_Things(
+                                    SOAP::Data->name( 'Foo', 'harz' ),
+                                    SOAP::Data->name( 'Param', 'value' ),
+                            )-> result
+
+            The body will look like this:
+                    $VAR1 = {
+                            'Param' => 'value',
+                            'Foo' => 'harz'
+                    };
+
+    Simply experiment using Data::Dumper and you'll quickly get the hang of
+    it!
+
+    When you're done with the SOAP request, stuff whatever output you have
+    into the content of the response object.
+
+            $response->content( 'The result is ... ' );
+
+    The only thing left to do is send it off to the DONE event :)
+
+            $_[KERNEL]->post( 'MySOAP', 'DONE', $response );
+
+    If there's an error, you can send it to the FAULT event, which will
+    convert it into a SOAP fault.
+
+            # See this website for more details about what "SOAP Fault" is :)
+            # http://www.w3.org/TR/2000/NOTE-SOAP-20000508/#_Toc478383507
+
+            $_[KERNEL]->post( 'MySOAP', 'FAULT', $response, 'Client.Authentication', 'Invalid password' );
+
+  Server::SOAP Notes
+    This module is very picky about capitalization!
+
+    All of the options are uppercase, to avoid confusion.
+
+    You can enable debugging mode by doing this:
+
+            sub POE::Component::Server::SOAP::DEBUG () { 1 }
+            use POE::Component::Server::SOAP;
+
+    In the case you want to see the raw xml being received/sent to the
+    client, set DEBUG to 2.
+
+    Yes, I broke a lot of things in the release ( 1.01 ), but Rocco agreed
+    that it's best to break things as early as possible, so that development
+    can move on instead of being stuck on legacy issues.
+
+  Using SSL
+    So you want to use SSL in Server::SOAP? Here's a example on how to do
+    it:
+
+            POE::Component::Server::SOAP->new(
+                    ...
+                    'SIMPLEHTTP'    =>      {
+                            'SSLKEYCERT'    =>      [ 'public-key.pem', 'public-cert.pem' ],
+                    },
+            );
+
+            # And that's it provided you've already created the necessary key + certificate file :)
+
+    Ah, to use SSL in SOAP::Lite, simply use https://blah.com instead of
+    http://blah.com
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc POE::Component::Server::SOAP
+
+  Websites
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/POE-Component-Server-SOAP>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/POE-Component-Server-SOAP>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-Server-SOAP>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/POE-Component-Server-SOAP>
+
+  Bugs
+    Please report any bugs or feature requests to
+    "bug-poe-component-server-soap at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-Server-SOA
+    P>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SEE ALSO
+    The examples directory that came with this component.
+
+    POE
+
+    HTTP::Response
+
+    HTTP::Request
+
+    POE::Component::Server::SOAP::Response
+
+    POE::Component::Server::SimpleHTTP
+
+    SOAP::Lite
+
+    POE::Component::SSLify
+
+AUTHOR
+    Apocalypse <apocal@cpan.org>
+
+    I took over this module from Rocco Caputo. Here is his stuff:
+
+            POE::Component::Server::SOAP is Copyright 2002 by Rocco Caputo.  All
+            rights are reserved.  POE::Component::Server::SOAP is free software;
+            you may redistribute it and/or modify it under the same terms as Perl
+            itself.
+
+            Rocco may be contacted by e-mail via rcaputo@cpan.org.
+
+COPYRIGHT AND LICENSE
+    Copyright 2009 by Apocalypse
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

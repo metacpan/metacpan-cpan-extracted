@@ -1,0 +1,16 @@
+lib/Parallel/Queue.pm
+MANIFEST
+Changes
+Makefile.PL
+t/00-usable.t
+t/01-export-name.t
+t/02-debug-mode.t
+t/03-fork.t
+t/04-nonzero-exit.t
+t/05-nonzero-with-finish.t
+t/06-iterator-package-nofork.t
+t/07-iterator-package-fork.t
+t/08-iterator-objects-nofork.t
+t/09-iterator-objects-fork.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,14 @@
+For some help:
+./demo_geda-usch.pl -h
+
+Try this:
+./demo_geda-usch.pl -update_xref -v demo*.sch
+
+See log file in:
+demo_geda-usch.log
+
+Then see the backup files in ./bak:
+ls bak/
+
+And see how xref attributes get updated:
+gschem demo*.sch

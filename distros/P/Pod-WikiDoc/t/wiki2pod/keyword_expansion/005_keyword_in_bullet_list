@@ -1,0 +1,15 @@
+* this text should be %%VERSION%% here
+* this text should also be %%VERSION%%
+#--------------------------------------------------------------------------#
+=over
+
+=item *
+
+this text should be 3.14 here
+
+=item *
+
+this text should also be 3.14
+
+=back
+

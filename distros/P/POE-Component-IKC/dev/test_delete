@@ -1,0 +1,37 @@
+#!/usr/bin/perl -w
+
+use strict;
+use POE qw(Session);
+
+my $foo=new POE::Session 
+(
+    _start=>sub { print "foo start\n"; 
+        #          $_[KERNEL]->alias_set('foo');
+                },
+    _stop=>sub {print "foo stop\n"; },
+    'delete'=>sub {
+#        $_[KERNEL]->alias_remove(); 
+        print "foo delete\n";
+        $_[KERNEL]->post($_[SENDER], 'hello');
+    },
+);
+
+new POE::Session
+(
+    _start=>sub { print "bar start\n"; $_[KERNEL]->alias_set('bar');
+                $_[KERNEL]->post($foo, 'delete')},
+    _stop=>sub {print "bar stop\n"; },
+    hello=>sub {print "bar: Hello world\n";
+                $_[KERNEL]->post('biff', 'hello');
+                }
+);
+
+new POE::Session
+(
+    _start=>sub { print "biff start\n"; $_[KERNEL]->alias_set('biff');},
+    _stop=>sub {print "biff stop\n"; },
+    hello=>sub {print "biff: Hello world\n" }
+);
+
+
+$poe_kernel->run();

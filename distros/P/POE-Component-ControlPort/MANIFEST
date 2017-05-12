@@ -1,0 +1,17 @@
+Changes
+ex/basic.pl
+ex/simple.pl
+lib/POE/Component/ControlPort.pm
+lib/POE/Component/ControlPort/Command.pm
+lib/POE/Component/ControlPort/DefaultCommands.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+t/00-compile.t
+t/01-command.t
+t/02-defaultcommands.t
+t/03-create.t
+t/04-use.t
+VERSION

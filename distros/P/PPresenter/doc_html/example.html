@@ -1,0 +1,65 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Example</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Example</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=index.html>PPresenter</A><BR>
+<A HREF=manual.html>Manual</A><BR>
+Example<P>
+
+    </TD><TD VALIGN=top>
+
+<EM>Portable Presenter</EM> is a package designed to give presentations.
+It is written in <A HREF=http://www.perl.org>Perl</A>/Tk only, which is
+available for UNIX and for Windows.
+<P>
+A brief implementational example often tells more than millions of words,
+so here it is (file <CODE>ppr/demo/simple</CODE>);
+<PRE>
+    use PPresenter;
+    use strict;
+    
+    my $show = new PPresenter
+    ( -name     =&gt; 'A very simple show'
+    );
+    
+    $show-&gt;addSlide
+    ( -title    =&gt; 'first slide'
+    , -main     =&gt; &lt;&lt;MAIN
+        &lt;CENTER&gt;
+           &lt;BIG COLOR=red&gt;My Show&lt;/BIG&gt;
+        &lt;/CENTER&gt;
+    
+        Hi, welcome to PPresenter.  This package
+        helps you creating presentations using
+        Perl and Tk.
+    MAIN
+    );
+    
+    $show-&gt;run;
+</PRE>
+
+Many other examples can be found in the source tree in directories
+<CODE>ppr/demo</CODE> and <CODE>xml/demo</CODE>.  Furthermore, you may
+try the tutorials, or read the other manual-pages ;)
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

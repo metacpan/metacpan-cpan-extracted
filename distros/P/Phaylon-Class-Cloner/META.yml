@@ -1,0 +1,15 @@
+---
+name: Phaylon-Class-Cloner
+version: 0.01
+author:
+  - Robert Sedlacek <phaylon@dunkelheit.at>
+abstract: Experimental Customizable Cloning Device
+license: perl
+requires:
+  Carp: 0
+  Storable: 0
+provides:
+  Phaylon::Class::Cloner:
+    file: lib/Phaylon/Class/Cloner.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611

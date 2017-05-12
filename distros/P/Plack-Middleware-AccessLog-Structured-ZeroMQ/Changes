@@ -1,0 +1,12 @@
+Revision history for Plack-Middleware-AccessLog-Structured-ZeroMQ
+
+0.001001  2016-12-10 19:06:16+01:00 Europe/Zurich
+
+ - Fix tests when using newer versions of Message-Passing-ZeroMQ which depends
+   on ZMQ-FFI now
+ - Provide a cpanfile
+ - Add TravisCI testing
+
+0.001000  2012-11-24 17:10:42 Europe/Zurich
+
+ - Initial release

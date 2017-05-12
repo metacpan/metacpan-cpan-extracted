@@ -1,0 +1,22 @@
+bin/physics-unit
+Build.PL
+Changes
+eg/ScalarDocExamples.pl
+eg/ScalarMethods.pl
+eg/ScalarSimple.pl
+eg/UnitDocExamples.pl
+eg/UnitLists.pl
+lib/Physics/Unit.pm
+lib/Physics/Unit/GenUnitsByName.pod.PL
+lib/Physics/Unit/GenUnitsByType.pod.PL
+lib/Physics/Unit/Implementation.pod
+lib/Physics/Unit/Scalar.pm
+lib/Physics/Unit/Scalar/Implementation.pod
+lib/Physics/Unit/Script.pm
+lib/Physics/Unit/Script/GenPages.pm
+MANIFEST			This list of files
+README
+t/scalar.t
+t/unit.t
+META.yml
+META.json

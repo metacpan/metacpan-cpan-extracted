@@ -1,0 +1,11 @@
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+pm_to_blib
+blib/
+Plack-Middleware-Pod-*.tar.gz
+Plack-Middleware-Pod-*/
+.releaserc
+cover_db
+MYMETA.*

@@ -1,0 +1,47 @@
+Revision history for Perl extension POE::Component::Server::Bayeux
+
+0.04 - Wed, 16 Dec 2009 08:10:52 -0700
+
+ - Added 'Connection: close' to all request headers
+   Fixes "Too many files open" error which may occur after a while
+
+0.03 - Tue, 06 Oct 2009 09:48:15 -0600
+
+ - If $ENV{POE_DEBUG}, will turn on POE debug and trace options for all POE::Sessions
+
+ - If $ENV{DEBUG} while running tests, will durn on server and client debug
+
+ - Added testbin/cli_client.pl, a command line client using POE::Component::DebugShell
+
+ - Improved 'shutdown' support but is still not ideal
+
+ - Added 'ClientMaxConnections' and 'ContentHandler' options to server
+
+ - Added class 'POE::Component::Server::Bayeux::Logger' for easy dumping of datastructures
+
+ - Support for 'reconnect' in the Client
+ 
+ - Various improvements
+
+0.02 - Thu, 26 Jun 2008 17:49:50 -0600
+
+ - Fixed dependency issue
+ 
+ - Support text/json client requests
+
+ - Support for json-comment-filtered server responses
+
+ - Added PostHandle server callback
+
+ - Added Log::Log4perl for the client
+
+ - Allowed more than one client to connect to the server (not overwriting
+   the 'complete_request' delay per client)
+
+ - Added check_timeouts to server
+
+ - Added Callback and client_push server feature
+
+ - Don't timeout a client if it's polling
+
+ - Added Service _handler catchall

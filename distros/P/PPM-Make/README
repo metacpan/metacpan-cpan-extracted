@@ -1,0 +1,60 @@
+NAME
+    PPM::Make - Make a ppm package from a CPAN distribution
+
+SYNOPSIS
+      my $ppm = PPM::Make->new( [options] );
+      $ppm->make_ppm();
+
+DESCRIPTION
+
+    This module automates somewhat some of the steps needed to make a ppm
+    (Perl Package Manager) package from a CPAN distribution. It attempts to
+    fill in the ABSTRACT and AUTHOR attributes of Makefile.PL, if these
+    are not supplied, and also uses pod2html to generate a set of html
+    documentation. It also adjusts CODEBASE of package.ppd to reflect
+    the generated package.tar.gz or package.zip archive, and can add
+    a post-install script via the <INSTALL> field to the ppd file. 
+    Such packages are suitable both for local installation via
+
+      C:\.cpan\build\package_src> ppm install
+
+    and for distribution via a repository.
+
+    The module may be used either within a locally installed
+    source distribution or else it can fetch and build remote
+    distributions.
+
+    As well, there are some helper modules that may be useful
+    for maintaining a ppm repository: PPM::Make::RepositorySummary,
+    for generating various summary files for a repository, and
+    PPM::Make::Bundle, for making a zipped ppm bundle consisting
+    of a distribution and all of its prerequisities.
+
+REQUIREMENTS
+    Needed software for unpacking and making .tar.gz and
+    .zip archives, and a make program, is required. Information
+    on authors, as well as a mapping between module and distribution
+    names, is obtained from a remote SOAP server - if this is
+    unavailable, CPAN.pm and associated indices will be tried,
+    for which prior configuration is assumed.
+
+    The software needed for the remote SOAP server is available
+    in the CPAN-Search-Lite distribution on CPAN - see
+    http://www.cpan.org/authors/id/R/RK/RKOBES/.
+
+PPM PACKAGE
+    A Win32 ppm package, suitable for use with ActivePerl
+    compatible Perl packages, is available at
+      http://theoryx5.uwinnipeg.ca/ppmpackages/
+    for ActivePerl 6xx,
+      http://theoryx5.uwinnipeg.ca/ppms/
+    for ActivePerl 8xx, and
+      http://cpan.uwinnipeg.ca/PPMPackages/10xx/
+    for ActivePerl 10xx.
+ 
+
+COPYRIGHT
+    This program is copyright, 2002, 2004, 2006, by Randy Kobes
+    <r.kobes@uwinnipeg.ca>. It is distributed under the
+    same terms as Perl itself.
+

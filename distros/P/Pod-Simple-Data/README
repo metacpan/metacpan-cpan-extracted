@@ -1,0 +1,54 @@
+NAME
+
+    Pod::Simple::Data -- retrieve the data inlined in Pod
+
+SYNOPSIS
+
+      perl -MPod::Simple::Data -e \
+       "exit Pod::Simple::Data->new('stuff', 'xstuff')->parse_file(shift)->any_errata_seen" \
+       thingy.pod
+
+DESCRIPTION
+
+    This class is that for retrieving data from =begin/=for/=end sections.
+    The constructor accepts a list of identifier, the default is '*' which
+    allows to retrieve all data.
+
+    This is a subclass of Pod::Simple and inherits all its methods.
+
+CALLING FROM THE COMMAND LINE
+
+      perl -MPod::Simple::Data -e \
+       "exit Pod::Simple::Data->new()->parse_file(shift)->any_errata_seen" \
+       thingy.pod
+
+CALLING FROM PERL
+
+ Minimal code
+
+      use Pod::Simple::Data;
+      my $p = Pod::Simple::Data->new();
+      $p->output_string(\my $data);
+      $p->parse_file('path/to/Module/Name.pm');
+      open my $out, '>', 'out.dat' or die "Cannot open 'out.dat': $!\n";
+      print $out $data;
+
+SEE ALSO
+
+    Pod::Simple, "About Data Paragraphs" in perlpodspec, Travis CI
+    <https://travis-ci.org/fperrad/Pod-Simple-Data>, Coveralls
+    <https://coveralls.io/r/fperrad/Pod-Simple-Data>
+
+AUTHOR
+
+    Francois Perrad <francois.perrad@gadz.org>
+
+COPYRIGHT
+
+    Copyright 2014 Francois Perrad
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,63 @@
+Revision history for Perl extension POD2::FR.
+
+   + = new feature
+   ! = updated feature/bug fix
+   * = incompatible changes
+   - = removed feature
+
+0.3  Wed Apr  1 09:14:53 2009
+
+	+ Add Test::Pod in tests.
+
+        ! Updated or new translated pods for 5.10.0: perl,
+          perlartistic, perlbook, perlboot, perlbot, perldata,
+          perldebtut, perldsc, perlhist, perlintro, perllol,
+          perlnumber, perlobj, perlopentut, perlpod, perlreftut,
+          perlrequick, perlsec, perlstyle, perltie, perltooc,
+          perltoot, perltrap.
+
+        ! Replaced header 'NOM' by 'NAME/NOM' as first head for all
+          old translated pods.
+
+	! Updated translated perldiag ('package' instead of
+          'paquetage' in error messages).
+
+	! Minor changes in some translated pods.
+
+0.2  Tue Sep 26 09:07:51 2006
+
+        + Added perlnumber.pod
+
+        ! Updated translated pods from 5.8.5 to 5.8.8: perl,
+          perlartistic, perlbook, perlboot, perlbot, perlcheat,
+          perldsc, perlintro, perllol, perlobj, perlrequick,
+          perlstyle, perltooc.
+            
+        ! Updated translated pods from 5.8.0 to 5.8.8: perlreftut,
+          perlvar.
+
+        ! Updated translated pods from 5.6.1 to 5.8.8: perldebtut,
+          perlretut.
+
+        ! Updated translated pods from 5.6.0 to 5.8.8: perldata,
+          perlfaq, perlfaq1, perlfaq2, perlfaq3, perlfaq4, perlfaq5,
+          perlfaq6, perlfaq7, perlfaq8, perlfaq9, perlpod, perlsec,
+          perlsub, perlsyn, perltoot, perltrap.
+
+        ! Updated translated pods from 5.00502 to 5.8.8: perlref.
+
+        ! Updated translated pods of perlfaq{,1,2,3,4,5,6,7,8,9}.pod,
+          perlpod.pod, perlsec.pod and perlsub.pod from 5.6.0 to
+          5.8.8.
+
+        ! Remplaced header NOM with NAME/NOM as first head for all new
+          or updated translated pods.
+
+        ! Files and directories of distribution are reorganized
+          (simplified).
+
+0.01  Mon Oct 17 13:42:00 2005
+
+        - original version; created by h2xs 1.23 with options
+                -b 5.6.1 -A -X -n POD2::FR 'by Paul Gaborit'
+

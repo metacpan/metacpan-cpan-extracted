@@ -1,0 +1,35 @@
+--- #YAML:1.0
+name:       PidFile
+version:    1.04
+abstract:   simple read / write pidfile
+author:
+    - Lukasz Romanowski (lroman@cpan.org)
+generated_by: Lukasz Romanowski
+license:
+    - perl_5
+dynamic_config: 0
+prereqs:
+    runtime:
+        requires:
+            Carp:                   0
+            FindBin:                0
+            File::Basename:         0
+            File::Slurp:            0
+            MooseX::Declare:        0
+            MooseX::ClassAttribute: 0
+    test:
+        requires:
+            Test::Most: 0
+no_index:
+    directory:
+        - t
+distribution_type: module
+release_status: stable
+provides:
+    PidFile:
+        file: lib/PidFile.pm
+        version: 1.04
+meta-spec:
+    version: 2
+    url: http://search.cpan.org/perldoc?CPAN::Meta::Spec
+

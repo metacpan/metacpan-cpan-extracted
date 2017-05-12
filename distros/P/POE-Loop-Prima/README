@@ -1,0 +1,17 @@
+NAME
+    POE::Loop::Prima - a bridge that supports Prima event loop from POE
+
+SYNOPSIS
+    See POE::Loop.
+
+DESCRIPTION
+    This class is an implementation of the abstract POE::Loop interface. It
+    follows POE::Loop's public interface exactly. Therefore, please see
+    POE::Loop for its documentation.
+
+SEE ALSO
+    POE, POE::Loop, Prima
+
+AUTHORS & LICENSING
+    Dmitry Karasik, <dmitry@karasik.eu.org>.
+

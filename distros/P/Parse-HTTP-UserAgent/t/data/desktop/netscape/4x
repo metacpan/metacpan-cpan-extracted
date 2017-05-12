@@ -1,0 +1,87 @@
+[AGENT]
+
+Mozilla/4.06 [en] (Win98; I ;Nav)
+
+'parser'           => 'netscape',
+'strength'         => 'I',
+'os'               => 'Windows 98',
+'extras'           => ['Nav'],
+'version_raw'      => '4.06',
+'lang'             => 'en',
+'version'          => '4.060',
+'name'             => 'Netscape'
+
+[AGENT]
+
+Mozilla/4.5 [en] (X11; I; FreeBSD 2.2.7-RELEASE i386)
+
+'parser'           => 'netscape',
+'strength'         => 'I',
+'os'               => 'FreeBSD 2.2.7-RELEASE i386',
+'extras'           => ['X11'],
+'version_raw'      => '4.5',
+'lang'             => 'en',
+'version'          => '4.500',
+'name'             => 'Netscape'
+
+[AGENT]
+
+Mozilla/4.79 [en] (Win95; U)
+
+'parser'           => 'netscape',
+'strength'         => 'U',
+'os'               => 'Windows 95',
+'version_raw'      => '4.79',
+'lang'             => 'en',
+'version'          => '4.790',
+'name'             => 'Netscape'
+
+[AGENT]
+
+Mozilla/4.08 [en] (WinNT; I ;Nav)
+
+'parser'           => 'netscape',
+'os'               => 'Windows NT',
+'extras'           => ['Nav'],
+'version_raw'      => '4.08',
+'lang'             => 'en',
+'strength'         => 'I',
+'version'          => '4.080',
+'name'             => 'Netscape'
+
+[AGENT]
+
+Mozilla/4.8 (Macintosh; U; PPC)
+
+'parser'           => 'netscape',
+'strength'         => 'U',
+'os'               => 'Macintosh',
+'extras'           => ['PPC'],
+'version_raw'      => '4.8',
+'version'          => '4.800',
+'name'             => 'Netscape'
+
+[AGENT]
+
+Mozilla/4.79 [en] (X11; U; Linux 2.4.18-4GB i686)
+
+'parser'           => 'netscape',
+'strength'         => 'U',
+'os'               => 'Linux 2.4.18-4GB i686',
+'extras'           => ['X11'],
+'version_raw'      => '4.79',
+'lang'             => 'en',
+'version'          => '4.790',
+'name'             => 'Netscape'
+
+[AGENT]
+
+Mozilla/4.79 [en]C-CCK-MCD {SillyDog} (Windows NT 5.0; U)
+
+'parser'           => 'netscape',
+'strength'         => 'U',
+'os'               => 'Windows 2000',
+'version_raw'      => '4.79',
+'lang'             => 'en',
+'version'          => '4.790',
+'name'             => 'Netscape'

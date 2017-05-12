@@ -1,0 +1,96 @@
+Revision history for Pod-Elemental
+
+0.103004  2014-12-26 22:31:16-05:00 America/New_York
+        - fix a regression in 0.103003, in which Nonpod paragraphs were not
+          converted into Pod5::Nonpod paragraphs by the Pod5 transformer
+
+0.103003  2014-12-23 21:11:26-05:00 America/New_York
+        - remove use of Moose::Autobox
+
+0.103002  2014-10-27 21:12:54-04:00 America/New_York
+        - make classes immutable to improve runtime speed
+
+0.103001  2014-05-20 20:45:43-04:00 America/New_York
+        - load Class::Load, which older Moose does not automatically load
+
+0.103000  2014-01-12 09:03:06-05:00 America/New_York
+          Pod::Elemental::Document only adds leading =pod or trailing =cut if
+          they are not already present
+
+0.102364  2013-11-28 07:27:08 America/New_York
+          stop using deprecated Class::MOP::load_class
+
+0.102363  2013-10-09 17:15:13 America/New_York
+          update bugtracker and repo metadata
+
+0.102362  2012-05-04 22:42:29 America/New_York
+          do not fail to nestify elements at the end of a sequence just because
+          they couldn't get any new children; it can break things down the
+          line; q.v., [rt.cpan.org #69189]
+
+0.102361  2011-08-05 10:32:02 America/New_York
+          the Pod5 transformer no longer loses vertical whitespace after Data
+          paragraphs
+
+0.102360  2010-08-24 07:52:09 America/New_York
+          avoid a deprecation in Moose 1.10 by using new-style "-excludes"
+
+0.101620  2010-06-11 19:39:05 America/New_York
+          no longer throws exception on empty regions (RT #57834)
+
+0.100220  2010-01-22 10:31:46 America/New_York
+          Autochomp workaround for the loss of "has '+attr'" in roles in new
+          Moose
+
+0.093280  2009-11-24 18:37:04 America/New_York
+          emit a =begin/=end pair instead of =for in more cases where required
+
+0.093000  2009-10-27
+          correct a regex is format region parsing to allow multiline =for
+
+0.092970  2009-10-24
+          fix the loss of newlines when combining verbatim paragraphs
+          minor documentation fixes
+
+0.092941  2009-10-21
+          Pod5 elements now "Autochomp" so their content has no trailing newlin
+
+0.092940  2009-10-21
+          relatively extensive documentation added
+          improve behavior of =for/=begin/=end stringification
+          no longer convert many subsequent Pod5::Ordinary paras into one
+
+0.092930  2009-10-20
+          introduce Pod5::Nonpod for self-=cut-enclosing nonpod sections
+          improved output of as_debug_string methods
+
+0.092920  2009-10-19
+          introduce Pod::Elemental::Transformer::Gatherer
+          refine the criteria for emitting =for instead of =begin/=end
+          pod5 transformer can convert =for into a Region
+
+0.092910  2009-10-18
+          transformers now operate on nodes, not documents
+          introduce Pod::Elemental::Transformer::Nester
+          introduce Pod::Elemental::Selectors
+          remove more dead code and modules (region-related, mostly)
+
+0.092901  2009-10-17
+          improve vertical whitespace handling
+          improve as_debug_string
+
+0.092900  2009-10-17
+          Pod5 support is, at least tentatively, complete
+
+0.092500  2009-09-07
+          major restructure
+          lots of features removed, but they'll come back
+
+0.091470  2009-05-27 20:43:28 UTC
+          temporary workaround for new Pod::Eventual's "blank" events
+
+0.003     2009-01-31
+          experimental Document class
+
+0.002     2008-10-25
+          first release with documentation worth mentioning

@@ -1,0 +1,44 @@
+POE-Component-WWW-Pastebin-Bot-Pastebot-Create
+
+The module is a L<POE> based non-blocking wrapper around
+L<WWW::Pastebin::Bot::Pastebot::Create> module which provides interface
+to create new pastes on pastebin sites powered by L<Bot::Pastebot>.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc POE::Component::WWW::Pastebin::Bot::Pastebot::Create
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-WWW-Pastebin-Bot-Pastebot-Create
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/POE-Component-WWW-Pastebin-Bot-Pastebot-Create
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/POE-Component-WWW-Pastebin-Bot-Pastebot-Create
+
+    Search CPAN
+        http://search.cpan.org/dist/POE-Component-WWW-Pastebin-Bot-Pastebot-Create
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Zoffix Znet
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

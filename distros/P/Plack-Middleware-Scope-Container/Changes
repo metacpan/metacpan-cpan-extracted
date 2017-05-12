@@ -1,0 +1,15 @@
+Revision history for Perl extension Plack::Middleware::Scope::Container
+
+0.04 2013-07-19T06:22:11Z
+
+        - repackaging with Minilla
+        - faster response for normal PSGI $res
+
+0.03    Tue Aug 7 17:00:14 2012
+        - fixed for streaming response (Thank you motemen-san)
+
+0.02    Mon Mar 19 17:55:28 2012
+        - fixed for callback response
+
+0.01    Fri Nov  5 16:53:39 2010
+        - original version

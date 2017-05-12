@@ -1,0 +1,8 @@
+Revision history for Perl extension Plack::Middleware::Curlizer
+
+0.02    Sat Aug 27 14:03:20 JST 2016
+        - set default callback
+        - switch modules for escaping command-line(String::ShellQuote to ShellQuote::Any)
+
+0.01    Wed Jul 6 22:41:53 JST 2016
+        - original version

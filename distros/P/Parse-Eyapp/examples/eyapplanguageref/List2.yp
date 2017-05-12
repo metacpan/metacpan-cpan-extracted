@@ -1,0 +1,27 @@
+%{
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+%}
+%semantic token 'a' 'b' 'c'
+%tree
+%%
+S:   
+      (%name AS 'a' S )'b' 
+         { 
+            print "S -> ('a' S )'b'\n";
+            print "Attribute of the first symbol:\n".Dumper($_[1]);
+            print "Attribute of the second symbol: $_[2]\n"; 
+            $_[0]->YYBuildAST(@_[1..$#_]);
+         } 
+    | 'c'   
+        { 
+          print "S -> 'c'\n"; 
+          my $r = Parse::Eyapp::Node->new(qw(C(TERMINAL)), sub { $_[1]->attr('c') }) ;
+          print Dumper($r);
+          $r;
+        }          
+;
+%%
+
+# eyapp -C List2.yp
+# ./List2.pm -c 'aacbb'

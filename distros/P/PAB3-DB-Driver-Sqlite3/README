@@ -1,0 +1,24 @@
+PAB3::DB::Driver::Sqlite3
+=========================
+
+This module is a Perl5 wrapper to sqlite3 and a driver for the PAB3::DB class.
+It has been tested on linux and darwin platforms.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL [options]
+   make
+   make test
+   make install
+
+Use "perl Makefile.PL --help" to get a list of avaiable options.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Christian Mueller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

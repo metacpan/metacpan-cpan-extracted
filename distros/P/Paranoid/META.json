@@ -1,0 +1,48 @@
+{
+   "abstract" : "General function library for safer, more secure programming",
+   "author" : [
+      "Arthur Corliss <corliss@digitalmages.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Paranoid",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Socket6" : "0.23"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Errno" : "0",
+            "Fcntl" : "0",
+            "File::Glob" : "0",
+            "POSIX" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "2.05"
+}

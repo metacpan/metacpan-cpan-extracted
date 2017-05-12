@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+
+use 5.010;
+use strict;
+use warnings;
+use Perinci::CmdLine;
+use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
+
+our %SPEC;
+
+my $countries = [
+    ['cn', 'China', 'Cina', [qw/panda/], 1400],
+    ['id', 'Indonesia', 'Indonesia', [qw/bali tropical/], 230],
+    ['sg', 'Singapore', 'Singapura', [qw/tropical/], 8],
+    ['us', 'United States of America', 'Amerika Serikat', [qw//], 400],
+];
+
+my $res = gen_read_table_func(
+    name => 'list_countries',
+    table_data => $countries,
+    table_spec => {
+        summary => 'List of countries',
+        fields => {
+            id => {
+                schema => 'str*',
+                summary => 'ISO 2-letter code for the country',
+                index => 0,
+                sortable => 1,
+            },
+            en_name => {
+                schema => 'str*',
+                summary => 'English name',
+                index => 1,
+                sortable => 1,
+            },
+            id_name => {
+                schema => 'str*',
+                summary => 'Indonesian name',
+                index => 2,
+                sortable => 1,
+            },
+            tags => {
+                schema => 'array*',
+                summary => 'Keywords/tags',
+                index => 3,
+                sortable => 0,
+            },
+            population => {
+                schema => 'int*',
+                summary => 'Population, in millions',
+                index => 4,
+                sortable => 1,
+             },
+        },
+        pk => 'id',
+    },
+);
+die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
+
+Perinci::CmdLine->new(url=>'/main/list_countries')->run;

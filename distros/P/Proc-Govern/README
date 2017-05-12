@@ -1,0 +1,176 @@
+SYNOPSIS
+
+    To use via command-line (in most cases):
+
+     % govproc \
+           --timeout 3600 \
+           --log-stderr-dir        /var/log/myapp/ \
+           --log-stderr-size       16M \
+           --log-stderr-histories  12 \
+       /path/to/myapp
+
+    To use directly as Perl module:
+
+     use Proc::Govern qw(govern_process);
+     govern_process(
+         name       => 'myapp',
+         command    => '/path/to/myapp',
+         timeout    => 3600,
+         log_stderr => {
+             dir       => '/var/log/myapp',
+             size      => '16M',
+             histories => 12,
+         },
+     );
+
+DESCRIPTION
+
+    Proc::Govern is a child process manager. It is meant to be a convenient
+    bundle (a single parent/monitoring process) for functionalities
+    commonly needed when managing a child process. It comes with a
+    command-line interface, govproc.
+
+    Background story: I first created this module to record STDERR output
+    of scripts that I run from cron. The scripts already log debugging
+    information using Log::Any to an autorotated log file (using
+    Log::Dispatch::FileRotate, via Log::Any::Adapter::Log4perl, via
+    Log::Any::App). However, when the scripts warn/die, or when the
+    programs that the scripts execute emit messages to STDERR, they do not
+    get recorded. Thus, every script is then run through govproc. From
+    there, govproc naturally gets additional features like timeout,
+    preventing running multiple instances, and so on.
+
+    Currently the following governing functionalities are available:
+
+      * logging of STDOUT & STDERR output to an autorotated file
+
+      * execution time limit
+
+      * preventing multiple instances from running simultaneously
+
+      * load watch
+
+      * autorestart
+
+    In the future the following features are also planned or contemplated:
+
+      * CPU time limit
+
+      * memory limit
+
+      With an option to autorestart if process' memory size grow out of
+      limit.
+
+      * other resource usage limit
+
+      * fork/start multiple processes
+
+      * set (CPU) nice level
+
+      * set I/O nice level (scheduling priority/class)
+
+      * limit STDIN input, STDOUT/STDERR output?
+
+      * trap/handle some signals for the child process?
+
+      * set UID/GID?
+
+      * provide daemon functionality?
+
+      * provide network server functionality?
+
+      Inspiration: djb's tcpserver.
+
+      * set/clean environment variables
+
+EXIT CODES
+
+    Below is the list of exit codes that Proc::Govern uses:
+
+      * 124
+
+      Timeout. The exit code is also used by timeout.
+
+      * 202
+
+      Another instance is already running (when single_instance option is
+      true).
+
+ENVIRONMENT
+
+ DEBUG => bool
+
+    If set to true, will display debugging output to STDERR, e.g. when
+    stopping/starting a process.
+
+FAQ
+
+ Why use Proc::Govern?
+
+    The main feature this module offers is convenience: it creates a single
+    parent process to monitor child process. This fact is more pronounced
+    when you need to monitor lots of child processes. If you use, on the
+    other hand, separate parent/monitoring process for timeout and then a
+    separate one for CPU watching, and so on, there will potentially be a
+    lot more processes running on the system. Compare for example:
+
+     % govproc --timeout 10 --load-watch CMD
+
+    which only creates one monitoring process, versus:
+
+     % timeout 10s loadwatch CMD
+
+    which will create two parent processes (three actually, loadwatch
+    apparently forks first).
+
+CAVEATS
+
+    Not yet tested on Win32.
+
+SEE ALSO
+
+    Proc::Govern uses IPC::Run at its core.
+
+    IPC::Cmd also uses IPC::Run (as well as IPC::Open3 on systems that do
+    not have IPC::Run installed or on some archaic systems that do not
+    support IPC::Run) and its run_forked() routine also has some of
+    Proc::Govern's functionalities like capturing stdout and stderr,
+    timeout, hiding (discarding) output. If you only need those
+    functionalities, you can use IPC::Cmd as it is a core module.
+
+    Proc::Govern attempts (or will attempt, some day) to provide the
+    functionality (or some of the functionality) of the
+    builtins/modules/programs listed below:
+
+      * Starting/autorestarting
+
+      djb's supervise, http://cr.yp.to/daemontools/supervise.html
+
+      * Pausing under high system load
+
+      loadwatch. This program also has the ability to run N copies of
+      program and interactively control stopping/resuming via Unix socket.
+
+      cPanel also includes a program called cpuwatch.
+
+      * Preventing multiple instances of program running simultaneously
+
+      Proc::PID::File, Sys::RunAlone
+
+      * Execution time limit
+
+      timeout.
+
+      alarm() (but alarm() cannot be used to timeout external programs
+      started by system()/backtick).
+
+      Sys::RunUntil
+
+      * Logging
+
+      djb's multilog, http://cr.yp.to/daemontools/multilog.html
+
+    Although not really related, Perinci::Sub::Wrapper. This module also
+    bundles functionalities like timeout, retries, argument validation, etc
+    into a single function wrapper.
+

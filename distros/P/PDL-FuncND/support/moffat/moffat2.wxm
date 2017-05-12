@@ -1,0 +1,53 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 0.8.5 ] */
+
+/* [wxMaxima: comment start ]
+Simplified 2D Moffat
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+f2s2(x2,x1,alpha,beta) := ( 1 + (x1^2 + x2^2)/ alpha ^2 )^(-beta);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+f2s1(x1,alpha,beta) := defint( f2s2(x2,x1,alpha,beta), x2, -inf, inf );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+f2s0(alpha,beta) := defint( f2s1(x1,alpha,beta), x1, -inf, inf );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+norm(alpha, beta) := factor(makegamma(ratsimp(f2s0(alpha,beta))));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+killcontext(initial); assume( alpha > 0, beta > 0, beta < 0.5 ); norm(alpha,beta);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+killcontext(initial); assume( alpha > 0, equal(beta,0.5)); norm(alpha,beta);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+killcontext(initial); assume( alpha > 0, beta > 0.5, beta < 1 ); norm(alpha,beta);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+killcontext(initial); assume( alpha > 0, equal(beta,1)); norm(alpha,beta);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+killcontext(initial); assume( alpha > 0, beta > 1, beta < 3 ); norm(alpha,beta);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+killcontext(initial); assume( alpha > 0, equal(beta,3) ); norm(alpha,beta);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+killcontext(initial); assume( alpha > 0, beta > 3 ); norm(alpha,beta);
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

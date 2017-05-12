@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                POD2-FR
+version:             0.03
+abstract:            French translation of Perl core documentation
+license:             ~
+author:              
+    - Paul GABORIT <gaborit@enstimac.fr>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:                    
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,74 @@
+# Extra type mappings for PDL::NetCDF
+# basic C types
+I8 *			T_PVI
+int *			T_PVI
+size_t *		T_PVI
+hid_t 			T_IV
+hid_t *			T_PVI
+hsize_t *		T_PVI
+hsize_t 		T_IV
+herr_t *		T_PVI
+herr_t 			T_IV
+htri_t			T_IV
+H5T_class_t		T_IV
+H5G_obj_t               T_IV
+H5R_type_t              T_IV
+PDLchar *		T_PDL
+PDLuchar *		T_PDL
+PDLshort *		T_PDL
+PDLint *		T_PDL
+PDLlong *		T_PDL
+PDLllong *		T_PDL
+PDLfloat *		T_PDL
+PDLdouble *		T_PDL
+hbool_t			T_IV
+hssize_t *              T_PVI
+
+#############################################################################
+INPUT
+
+T_PVI
+	$var = ($type)SvPV($arg,PL_na)
+T_PDLB
+	$var = (unsigned char *)(PDL->SvPDLV($arg)->data)
+T_PDLS
+	$var = (short *)(PDL->SvPDLV($arg)->data)
+T_PDLUS
+	$var = (unsigned short *)(PDL->SvPDLV($arg)->data)
+T_PDLL
+	$var = (long *)(PDL->SvPDLV($arg)->data)
+T_PDLLL
+	$var = (long long *)(PDL->SvPDLV($arg)->data)
+T_PDLF
+	$var = (float *)(PDL->SvPDLV($arg)->data)
+T_PDLD
+	$var = (double *)(PDL->SvPDLV($arg)->data)
+
+#############################################################################
+OUTPUT
+# T_PVI typemap copies the data in $var to $arg, up to the
+#  length of length($arg). This differs from the T_PV typemap
+#   where the data is copied up to a Null char (string terminator)
+#  T_PVI's will be used for getting raw data blocks out of the C-code
+T_PVI	
+        sv_setpvn((SV*)$arg, (char *) $var, SvCUR($arg));
+T_PDLB
+	PDL->SetSV_PDL($arg,$var);
+T_PDLS
+	PDL->SetSV_PDL($arg,$var);
+T_PDLUS
+	PDL->SetSV_PDL($arg,$var);
+T_PDLL
+	PDL->SetSV_PDL($arg,$var);
+T_PDLLL
+	PDL->SetSV_PDL($arg,$var);
+T_PDLF
+	PDL->SetSV_PDL($arg,$var);
+T_PDLD
+	PDL->SetSV_PDL($arg,$var);
+
+
+
+
+
+

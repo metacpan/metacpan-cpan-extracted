@@ -1,0 +1,45 @@
+NAME
+
+Plack::Session::Store::Echo - Echo store for Plack::Middleware::Session.
+
+DESCRIPTION
+
+Sometimes you want only mark new client with cookie and don't want to store
+something in your sessions, so you can use this one. For any session identifier
+this store tells that the session exists.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc
+command.
+
+    perldoc Plack::Session::Store::Echo
+
+You can also look for information at:
+
+    Repository
+        http://github.com/dionys/plack-session-store-echo
+    Bug tracker
+        http://github.com/dionys/plack-session-store-echo/issues
+    MetaCPAN
+        http://metacpan.org/release/Plack-Session-Store-Echo
+
+AUTHOR
+
+Denis Ibaev, dionys@cpan.org.
+
+LICENSE
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+See http://dev.perl.org/licenses/ for more information.

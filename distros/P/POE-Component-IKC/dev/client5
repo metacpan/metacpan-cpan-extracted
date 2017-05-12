@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w
+use strict;
+
+use lib qw(blib/lib blib/arch);
+
+use POE qw(Session);
+use POE::Component::IKC::Client;
+
+my $name="Client$$";
+
+### Send a request to the time-server
+sub server_io
+{
+    my($kernel, $msg)=@_;
+}
+
+### Called when we connect to the time server
+sub create_me
+{
+    print "Creating session...\n";
+    POE::Session->new(
+        _start=>sub 
+        {
+            my($kernel)=$_[KERNEL];
+            warn "_start";
+            $kernel->sig('USR1', 'hup');
+            $kernel->alias_set('me');
+
+            $kernel->post('poe://*/timeserver', 'connect', 
+                            "poe://$name/me/pulse");
+            $kernel->post('IKC', 'publish', 'me', [qw(pulse)]);
+        },
+        hup=>sub
+        {
+            my($kernel)=$_[KERNEL];
+            print "Got USR1\n";
+            $kernel->post('poe://Pulse/timeserver', 'disconnect', 
+                          "poe://$name/me/pulse");
+            return 1;
+        },
+
+        # output a . when the pulse is sent
+        # output a + if it took longer then a second to get from 
+        # the timerserver
+        pulse=>sub { print ($_[ARG0] eq localtime() ? '.' : '+'); },
+
+    );
+}
+
+$|++;
+POE::Component::IKC::ClientLite->spawn(
+            port=>31337,
+            name=>$name,
+            subscribe=>[qw(poe://*/timeserver)],
+            on_connect=>\&create_me,
+);
+
+print "Running client...\n";
+$poe_kernel->run();
+

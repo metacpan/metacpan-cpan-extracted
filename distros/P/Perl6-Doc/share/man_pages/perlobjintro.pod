@@ -1,0 +1,154 @@
+=begin pod
+
+=for NAME
+perlobjintro - Introduction to Perl 6 objects
+
+=begin DESCRIPTION
+
+    class Point {
+        has $.x;
+        has $.y is rw;
+
+        method clear () { $.x = 0; $.y = 0; }
+    }
+
+    my $point = Point.new(x => 2, y => 3);
+
+    $a = $point.y;      # okay
+    $point.y = 42;      # okay
+
+    $b = $point.x;      # okay
+    $point.x = -1;      # illegal, default is read-only
+
+    $point.clear;       # reset to 0,0
+
+The above features a class, C<Point>, and some code that creates an
+I<instance> (C<$point>) of it then calls some of its methods.
+
+The immediately obvious differences from Perl 5 is that we now use a
+C<class> keyword to declare classes. In the example above, one could have
+written C<class Point;> instead, then the rest of the file would contain
+the definition for that class.
+
+Inside a class definition, you may declare attributes with C<has>, and
+methods with C<method>.
+
+=head2 Attributes
+
+Inside a C<class> definition, certain declarators may be used. The first
+one we've seen used is C<has>. It sets up the object's attributes. It
+creates accessor/mutator methods for us if we want it to. As you can see,
+the attributes have an extra symbol after the C<$> sigil. The dot (C<.>)
+there is appropriately named a I<twigil>, and it affects the visibility of
+an attribute. It creates a read-only accessor by default:
+
+    has $.foo;          # accessor $obj.foo is read-only
+    has $.bar is rw;    # $obj.bar is read-write
+    has $!baz;          # private attribute, no accessor
+
+=head2 Methods
+
+Similarly, methods are created with the C<method> keyword:
+
+    method crunch ($a, $b, $b) {
+        # let's do some number-crunching
+        ...
+    }
+
+As you can see, a parameter list may appear inside parentheses after the
+name. A lot of setup tasks can be accomplished with this that previously
+had to be done manually. Now that parameter lists are part of a method's
+signature, the compiler can also dispatch to the right method depending on
+the type of parameters. This is how Perl does overloading.
+
+    method crunch (Rat $a, Rat $b, Int $b = 5) {...}
+
+The above is a more specific version of C<.crunch>, which takes two
+mandatory rational numbers and an optional integer (with a default value of
+5). The compiler will choose the one that fits best depending on the
+parameters
+
+You can declare a private method by prefacing the name with C<!>, much as
+with attributes:
+
+    method !crunch () {...}
+
+Inside a method, the default I<invocant> is the object itself:
+
+    method foo ($a, $b) {
+        .bar()      # call method on our object
+    }
+
+You can explicitly name the invocant in the parameter list:
+
+    method foo ($object: $a, $b) {
+        $bar.foo()  # same thing as before
+    }
+
+=head2 Object construction
+
+All classes inherit a default C<new> constructor from C<Object>. It expects
+all arguments to be named parameters initializing attributes of the same
+name.
+
+    my $obj = FooClass.new(:attr1<Foo>, attr2<Bar);
+
+For most purposes, this will do fine, but you can 
+
+=head2 Method calls
+
+Most of the time, working with an object means calling methods on it, and
+there are a few different ways of doing that.
+
+Most method call looks look like C<$obj.foo($arg)>, but there are other
+ways:
+
+    # use indirect object notation
+    foo $obj: $arg1, $arg2;
+
+    # method calls on the current topic, $_
+    for @objects {
+        .foo($arg1, $arg2);
+    }
+
+Inside the object (say, in a method body), you can call the object by the
+name C<self>:
+
+    self.foo($arg);     # calls public method foo
+    self!foo($arg);     # calls private method foo
+
+=head2 Inheritance
+
+Among the many ways of composing classes, Perl both single and multiple
+inheritance.
+
+    class Dog is Mammal {...}
+
+Mulitple inheritance is specified with multiple C<is> modifiers:
+
+    class Dog is Mammal is Pet {...}
+
+You may put these inside as well:
+
+    class Dog {
+        is Mammal;
+        is Pet;
+        ...
+    }
+
+=head2 Roles
+
+Using roles in object composition looks much like inheriting, except we use
+the C<does> keyword.
+
+    class Dog is Mammal does Pettable {...}
+
+For more information on roles, see L<doc:perlroles>.
+
+=head2 Introspection
+
+TODO
+
+=end DESCRIPTION
+=comment vim:filetype=perl6
+=end pod

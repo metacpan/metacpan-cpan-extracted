@@ -1,0 +1,27 @@
+
+# Argv[0] is the file created by the shutdown handler
+# Argv[1] means:
+#	0	Set up handler with add_shutdown_handler and exit
+#	1	Set up handler with set_shutdown_hander and exit
+#	2	Set up a handler and call shutdown_next_time
+#	3	Set up a handler and call shutdown_now
+#
+use PersistentPerl;
+
+my $pp = PersistentPerl->new;
+
+my $method = ($ARGV[1] == 1) ? 'add_shutdown_handler' : 'set_shutdown_handler';
+$pp->$method(sub {open(F, ">$ARGV[0]")});
+
+BEGIN {
+    $SIG{TERM} = IGNORE;
+}
+
+if ($ARGV[1] == 2) {
+    $pp->shutdown_next_time();
+}
+elsif ($ARGV[1] == 3) {
+    $pp->shutdown_now();
+}
+
+print $$;

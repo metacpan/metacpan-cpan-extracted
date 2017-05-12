@@ -1,0 +1,289 @@
+
+#Time-stamp: "2001-05-25 21:29:02 MDT"
+
+=head1 NAME
+
+Pod::PXML -- pxml2pod, pod2pxml
+
+=head1 SYNOPSIS
+
+  use Pod::PXML;
+  
+  # Take from a file...
+  open(XMLOUT, ">foo.xml") || die "can't wropen foo.xml: $!";
+  binmode(XMLOUT);
+  print XMLOUT Pod::PXML::pod2xml('foo.pod');
+  close(XMLOUT);
+  
+  # Take from a file, going the other way:
+  open(PODOUT, ">foo.pod") || die "can't wropen foo.pod: $!";
+  binmode(PODOUT);
+  print PODOUT Pod::PXML::xml2pod('foo.xml');
+  close(PODOUT);
+  
+  # Or take from STDIN:
+  print '', Pod::PXML::pod2xml(\join '', <STDIN>);
+  # Or the other way;
+  print '', Pod::PXML::xml2pod(\join '', <STDIN>);
+
+=head1 DESCRIPTION
+
+Perl's documention is conventionally expressed in
+Plain Old Documentation.
+
+POD-format is a wonderfully concise text format, but it is quite
+idiosyncratic.  This module seeks to make it easier to turn
+text that's in POD-format into XML, and to turn text that's in
+XML into POD-format.
+
+=head1 WARNING
+
+This module is experimental!!  It works right on almost all data,
+but there are a few oddities left -- mostly in the handling of odd
+LE<lt>...E<gt> syntax.  Some of these are because of bugs in
+the current Pod::Tree version (1.06), and some of these are because
+of basic conceptual problems in perlpod.  Both of these should
+be cleared up eventually.  If you get strange results from this
+module, do email me.
+
+=head1 FUNCTIONS
+
+=over
+
+TODO: document options?
+
+TODO: allow treating comment blocks outside paragrapms as <!-- ... -->?
+
+=item $xml_text = Pod::PXML::pod2xml($filename);
+
+=item $xml_text = Pod::PXML::pod2xml(\$content);
+
+Returns XML content that represents the POD-format text that was input.
+
+=item $pod_text = Pod::PXML::xml2pod($filename);
+
+=item $pod_text = Pod::PXML::xml2pod(\$content);
+
+Returns POD-format content that represents the PXML text that was input.
+
+=back
+
+=head1 WARNING
+
+This module and the PXML DTD are still in the EXPERIMENTAL stage.
+If you don't like the way something works, or if you think something's
+broken, email me sooner rather than later!
+I mean for this module to be actually useful to people in their
+XMLificational PODulatory document doings.
+
+=head1 ABOUT THE XML DOCUMENT TYPE
+
+This module's idea of XML isn't just I<any> sort of XML, but is XML
+complying to a DTD.  "PXML" is what I call the document type
+that my DTD declares.
+
+The design goals of PXML are to be a 1:1 representation of all I<meaningful
+distinctions> you can make in valid POD-format -- if it's a meaningful
+distinction you can validly express in POD-format, I want to be able to convert
+that to isomorphic PXML.  Moreover, I want to be able to write
+PXML that can represent any meaningful distinction in valid POD-format,
+once I convert it to POD-format.
+
+So, whether you write "$aE<gt>$b" in POD-format as "$aEE<lt>ltE<gt>$b"
+or as "$aEE<lt>60E<gt>$b" is I<not> a meaningful distinction, because
+"EE<lt>ltE<gt>" or as "EE<lt>60E<gt>" represent the same character.
+However, the difference between "=head1" and "=head2" is meaningful,
+and the difference between "CE<lt>...E<gt>" and "FE<lt>...E<gt>" is
+meaningful, and so these distinctions should be present in the PXML
+representation of the POD.
+
+A secondary design goal is that PXML be as minimal as possible; specifically,
+there shouldn't be anything in PXML (whether element or attribute)
+that doesn't correspond I<directly> to some part of POD-format.
+
+So, while you might want to represent this:
+
+  =item Foo
+  
+  Bar
+
+as this:
+
+  <item>
+    <label>Foo</label>
+    <p>Bar</p>
+  </item>
+
+or while you might want to represent this:
+
+  =head1 Foo
+  
+  Bar
+
+as this:
+
+  <section1>
+    <head1>Foo</head1>
+    <p>Bar</p>
+  </section1>
+
+...those are  I<not> the way
+I do it, even tho I considered both.  Why did I decide against
+those?  Because there's no "label" or "section1" in POD-format.
+
+Instead, I do:
+
+  <item>Foo</item>
+  <p>Bar</p>
+
+and
+
+  <head1>Foo</item>
+  <p>Bar</p>
+  
+Moreover:
+
+=over
+
+For any valid POD-format input you provide, this module should emit XML
+that conforms to the PXML DTD.  For any XML input that you feed in that
+comforms to the PXML DTD, this module should emit valid POD.
+
+=back
+
+=head2 POD-format / PXML Correspondences
+
+The PXML DTD is still not entirely nailed down, but once it is, then
+this section should be rather more verbose.
+
+  POD-format  -------------------------------  PXML
+
+  A normal paragraph:
+  Hummina hummina?                  =    <p>Hummina hummina?
+  Woozle wuzzle.                         Woozle wuzzle.</p>
+
+--
+
+  A verbatim paragraph:             =    <pre>
+    while(1) {                             while(1) {
+      print "Matanga!!\n";                   print "Matanga!!\n";
+    }                                      }
+                                         </pre>
+
+--
+
+  =head1 DEMANDS
+                                    =    <head1>DEMANDS</head1>
+  My list of demands:                    <p>My list of demands:</p>
+
+(ditto for head2, head3, head4)
+
+--
+
+  =over 5
+                                         <list indent="5">
+  =item 1.                          =    <item>1.</item>
+                                         <p>I like pie.</p>
+  I want pie.                            </list>
+  
+  =back
+
+--
+
+  Mmmmmmm.                               <p>Mmmmmmm.
+  Glorious I<italic pie>,                Glorious <i>italic pie</i>,
+  C<codic pie>, F<filed pie>,       =    <c>codic pie</c>, <f>filed pie</f>,
+  B<boldened pie>, and even              <b>boldened pie</b>, and even
+  even X<indexed pie>.                   even <x>indexed pie</x>.</p>
+  
+  And even S<nested unbroken        =    And even <s>nested unbroken
+  I<italic B<boldened                    <i>italic <b>boldened
+  C<codic pie>>>>!                       <c>codic pie</c></b></i></s>!
+  
+  See also L<rhubarb pie            =    <link page="Pie::Filling"
+  filling|Pie::Filling/"Rhubarb">.       section="Rhubarb"
+                                         >rhubarb pie filling</link>
+
+(Formatting of LE<lt>...E<gt> elements where there's no
+LE<lt>text|...E<gt> is inconsistent across different POD
+renderers.  I strongly advise that you always use
+the LE<lt>text|...E<gt> style.)
+
+If you're unsure about a particular POD-format construct, run pod2pxml
+on it, and see what happens.  Be sure to report any oddities to me.
+
+Note that XML PIs and comments are currently ignored by translation
+to POD.  If you want comments that survive round-tripping pxml2pod2pxml,
+then you'd probably better put them in a
+
+  <for target="comments">Comments Here</for>
+
+block.  And remember that those can't occur in the middle of
+paragraphs.
+
+=head1 TODO
+
+There should be a Pod::Tree/Pod::Parser subclass that will deal
+with:
+
+  =begin pxml
+  
+  [...pxml...]
+  
+  =end pxml
+
+and parse it as if it were POD-format, transparently.
+
+Conversely, there should be improved facility for
+reading POD-format transparently as PXML.
+
+Smarter support for EE<lt>...E<gt> in pxml2pod -- currently
+most high-bit characters just end up as EE<lt>numberE<gt>.
+
+Make the XML output indented?
+
+(Optionally?) Collapse non-verbatim whitespace in
+pxml2pod?  Also (optionally?) re-wrap?
+
+Handling of XML namespaces?  At least for skipping foreign-namespace
+elements?  Tell me what you want.
+
+Handling of different encodings?  Allow specifying UTF-8 / Latin-1
+POD to/from UTF-8 / Latin-1 PXML?
+
+=head1 SEE ALSO
+
+L<perlpod|perlpod> documents POD-format.
+
+L<Pod::Tree|Pod::Tree> is the class that I use for parsing POD-format.
+
+L<XML::Parser|XML::Parser> is the class that I use for parsing XML.
+
+L<Pod::Parser|Pod::Parser> is a different POD-format parser class.
+
+L<Pod::XML|Pod::XML> is Matt Sergeant's approach to this, and it
+has a quite different doctype.
+
+I once wrote L<Pod::HTML2POD|Pod::HTML2POD>, which is much much
+crazier inside than this module is.  After I while, I figure that
+if I could (effectively!) convert HTML into POD, why not XML?
+And seeing Matt Sergeant's Pod::XML module got me going.
+
+=head1 COPYRIGHT AND DISCLAIMER
+
+Copyright (c) 2001 Sean M. Burke.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=head1 AUTHOR
+
+Sean M. Burke, sburke@cpan.org
+
+=cut
+
+# "If the funk ain't broke, 'en don't try to fix it!" -- Bootsy Collins

@@ -1,0 +1,18 @@
+&{{
+    0=>sub {
+	exit(0);
+    },
+    1=>sub {
+	exit(1);
+    },
+    2=>sub {
+	kill(15, $$);
+    },
+    3=>sub {
+	kill(9, $$);
+    },
+    4=>sub {
+	kill(9, getppid());
+	kill(9, $$);
+    },
+}->{$ARGV[0]}};

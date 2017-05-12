@@ -1,0 +1,14 @@
+
+
+This archive contains the distribution Plack-Middleware-ExtractUriLanguage,
+version 0.004:
+
+  Cuts off language tags out of the request's PATH_INFO to simplify internationalization route handlers.
+
+This software is Copyright (c) 2013 by BURNERSK.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+

@@ -1,0 +1,93 @@
+NAME
+    Package::Base - An abstract base for implementation classes to inherit
+    from
+
+SYNOPSIS
+      #don't use this module directly, but rather inherit from it.
+      package My::Package;
+      use base qw(Package::Base);
+
+      #define a couple of get/setters
+      sub slot1 {
+        my($self,$val) = @_;
+        $self->{'slot1'} = $val if defined($val);
+        return $self->{'slot1'};
+      }
+
+      sub slot2 {
+        my($self,$val) = @_;
+        $self->{'slot2'} = $val if defined($val);
+        return $self->{'slot2'};
+      }
+
+      package main:
+      my $object = My::Package->new(slot1 => 'value1', slot2 => 'value2', slot3 => 'value3');
+      #slot3 => 'value3' is silently ignored
+
+      $self->slot1; #returns 'value1'
+      $self->slot2; #returns 'value2'
+
+DESCRIPTION
+    Package::Base is an abstract base class, meaning it isn't intended to be
+    used directly, but rather inherited from by an instantiable class. In
+    fact, attempting to instantiate a Package::Base object directly will
+    result in an error.
+
+    Q: So why would you want to inherit from Package::Base?
+
+    A: Because it provides some nice functionality:
+
+    * a built-in new() method that does instantiation of a hash based object
+
+    * new() accepts an anonymous hash as arguments (a list of key/value
+    pairs, essentially). and sets attributes appropriately within your
+    object if methods of the same name as the keys are found.
+
+    * Package::Base::Devel is a subclass specifically designed for debugging
+    Perl classes is bundled with Package::Base, and the inherited interface
+    works the same way. This means that while developing/debugging a module,
+    you can do:
+
+      package My::Package;
+      use base qw(Package::Base::Devel);
+
+      #...
+
+    and have nice Log::Log4perl logging about what your method is doing sent
+    to a file, filehandle, email, database... whatever (see Log::Log4perl
+    for details about this amazing logging API). Then, when you're ready to
+    ship, just change the line:
+
+      package My::Package;
+      -use base qw(Package::Base::Devel);
+      +use base qw(Package::Base);
+
+    and the heavy debugging toll paid for the debug logging vanishes.
+
+    * Package::Base comes with a pstub, a drop-in replacement for h2xs if
+    you're writing a module that doesn't rely on Perl XS or C files.
+
+    Now to be "fair and balanced" :)
+
+    Q: Why might Package::Base not be right for me?
+
+    A: It does some things you might not like for stylistic reasons:
+
+    * Package::Base currently only works for hash-based objects. This may be
+    extended to support array-based objects in the future.
+
+    * Package::Base assumes you have methods overloaded to act as
+    accessors/mutators. e.g. calling "$obj-"foo(1)> sets object's foo
+    attribute to 1, and calling "$obj-"foo()> retrieves object's foo
+    attribute's value. See Class::Accessor for an easy way to set these up.
+
+    * Package::Base tries to initialize slots for all passed key/value
+    pairs, instead of allowing the constructor, new(), to filter out only
+    those it wants. Class::Base allows filtering like this.
+
+AUTHOR
+    Allen Day, <allenday@ucla.edu>
+
+SEE ALSO
+    For another way to do it, see Class::Base,
+    Class::Accessor.

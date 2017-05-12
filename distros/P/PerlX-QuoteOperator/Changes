@@ -1,0 +1,42 @@
+Revision history for PerlX-QuoteOperator
+
+0.08  2015-04-02 19:52:41 BST
+        - Added section to pod that shows how to create your own module
+          defining a custom quote operator.
+          (Neil Bowers : https://github.com/draegtun/PerlX-QuoteOperator/pull/2)
+
+0.07  2015-02-27 20:20:53 GMT
+        - Minor cpanfile & pod changes
+
+0.06  2015-02-23 18:06:26 GMT
+        - Fixed copyright year and released to CPAN
+
+0.05  2015-02-23 17:22:12 GMT
+        - Removed PerlX::QuoteOperator::URL into separate CPAN module (dist)
+        - Switched to using Dist::Milla for cpan release
+        - Close RT...
+            - https://rt.cpan.org/Public/Bug/Display.html?id=81393
+            - https://rt.cpan.org/Public/Bug/Display.html?id=81392
+
+0.04	Sat 24th December, 2011
+	* Added patch from TobyInkster:
+	  - Uses Text::Balanced for [], {}, <>, nesting
+	  - See: https://rt.cpan.org/Public/Bug/Display.html?id=72822
+	
+0.03	Weds 30th November, 2011
+	* Prompted by rt72822 from TobyInkster todo:
+	  - Improved CAVEATS part of docs
+	  - Amended alternative parser to also work with () & {}
+	  - Closed - https://rt.cpan.org/Public/Bug/Display.html?id=72822
+
+
+0.02	Sat March 6, 2009
+	* Fixed qo-URL.t failing test on Windows due to issues with how I used Directory::Scratch.
+	  - Thanks to Lionel Mehl (http://search.cpan.org/~blade/) for finding and help fixing this.
+	  - https://rt.cpan.org/Public/Bug/Display.html?id=54531
+	
+
+0.01    Sat December 16, 2009
+	* First version, released on CPAN.
+	
+

@@ -1,0 +1,18 @@
+=begin filter html
+
+<b>escaped</b>
+B<bold>
+
+=end filter
+__RESULT__
++html
+<html><body bgcolor="#ffffff">
+<pre><span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>escaped<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>
+B<span class="h-ab">&lt;</span><span class="h-tag">bold</span><span class="h-ab">&gt;</span></pre>
+</body></html>
+__RESULT__
+-html
+<html><body bgcolor="#ffffff">
+<pre>&lt;b&gt;escaped&lt;/b&gt;
+B&lt;bold&gt;</pre>
+</body></html>

@@ -1,0 +1,5 @@
+libpostfix-contentfilter-perl (1.12) unstable; urgency=low
+
+  * Initial Release.
+
+ -- David Zurborg <zurborg@cpan.org>  Thu, 18 Sep 2014 15:33:53 +0200

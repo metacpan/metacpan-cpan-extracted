@@ -1,0 +1,19 @@
+[1.1.0]  Released on 2010-12-01
+
+    Add support for Const::Fast to PPIx::Utilities::Statement.
+
+
+[1.0.1]  Released on 2010-03-14.
+
+    Add to no_index to META.yml.
+
+
+[1.0.0]  Released on 2010-03-14.
+
+    Initial version.
+
+
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/distributions/Task-Perl-Critic/Changes $
+#     $Date: 2009-05-31 20:20:42 -0500 (Sun, 31 May 2009) $
+#   $Author: clonezone $
+# $Revision: 3341 $

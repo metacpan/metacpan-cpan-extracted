@@ -1,0 +1,33 @@
+%FDF-1.2
+%‚„œ”
+1 0 obj
+<< 
+/FDF << /Fields [ << /T (root)/Kids [ << /V /OFF /T (checkbox1)>> << /T (checkbox2) /V /ON >>
+<< /Kids [ << /V (valueA_A)/T (kidA_A)>> ] /T (parentA) >>
+<< /T (parentB)/Kids[<</V(valueB_A)/T (kidB_A)>><</T (kidB_B)/V(valueB_B)>> ] >> 
+<< /T (data)/Kids [ << /V ()/T ()>> << /V (info@doo.de)/T (email)>> 
+<< /V (some company Inc)/T (name)>> << /V (Dresden)/T (ort)>> 
+<< /V (01069)/T (plzort)>>  ] >>
+<< /T (specials) /Kids [
+<< /T (hexa) /V (zuf#E4l\\lig) >>
+<< /T (hexb) /V /zuf#E4llig >>
+<< /T (spaces) /V (  2x space at start and end  ) >>
+<< /T (rhomb) /V (#) >>
+<< /T (parenthesize) /V ( \(parenthesize\) ) >>
+<< /T (backspace) /V ( \\ ) >>
+<< /T (slash) /V ( / ) >>
+
+] >>
+<< /V (Gro\337e B\344ume :-\))/T (auftragsart)>> 
+] >> 
+] 
+/F (bauauftrag.eff) /UF (bauauftrag.pdf)/ID [ <45607b9e><750eda6>
+] >> 
+>> 
+endobj
+trailer
+<<
+/Root 1 0 R 
+
+>>
+%%EOF

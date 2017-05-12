@@ -1,0 +1,56 @@
+{
+   "abstract" : "A simple to use POE SMTP Server.",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-Server-SimpleSMTP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Email::Address" : "1.886",
+            "Email::MessageID" : "1.4",
+            "Email::Simple" : "1.998",
+            "Email::Simple::Creator" : "1.41",
+            "POE" : "1.294",
+            "POE::Component::Client::DNS" : "0.99",
+            "POE::Component::Client::DNSBL" : "0.08",
+            "POE::Component::Client::SMTP" : "0.18",
+            "POE::Component::Pluggable" : "0.03",
+            "POE::Filter::Line" : 0,
+            "POE::Filter::Transparent::SMTP" : 0,
+            "POE::Wheel::ReadWrite" : 0,
+            "POE::Wheel::SocketFactory" : 0,
+            "POSIX" : 0,
+            "Socket" : 0,
+            "Storable" : 0,
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/bingos/poe-component-server-simplesmtp/tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bingos/poe-component-server-simplesmtp.git",
+         "web" : "http://github.com/bingos/poe-component-server-simplesmtp/tree"
+      }
+   },
+   "version" : "1.50"
+}
+

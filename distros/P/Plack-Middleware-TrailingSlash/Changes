@@ -1,0 +1,10 @@
+Changelog for Plack::Middleware::TrailingSlash
+
+0.002     2015-12-08 17:34:00 Europe/Helsinki
+
+    * Properly mark author tests for authors only.
+
+0.001     2015-12-06 10:54:00 Europe/Helsinki
+
+    * Initial release.
+

@@ -1,0 +1,20 @@
+=pod
+
+Some text.
+
+=begin html
+
+<hr>
+<p>HTML paragraph</p>
+
+=end html
+
+=begin confluence
+
+h1. title 1
+Confluence paragrah.
+
+=end confluence
+
+Some other text.
+

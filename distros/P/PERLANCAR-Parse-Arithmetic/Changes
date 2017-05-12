@@ -1,0 +1,26 @@
+Revision history for PERLANCAR-Parse-Arithmetic
+
+0.004   2016-06-18 (PERLANCAR)
+
+        - Add Pegex version.
+
+
+0.003   2016-06-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Forgot to add version numbers.
+
+
+0.002   2016-06-18 (PERLANCAR)
+
+	- Fix/optimize Marpa version (make right associativity work).
+
+	- Add module PERLANCAR::Parse::Arithmetic::NoHash.
+
+	- [optimize] No need to initialize match hash.
+
+
+0.001   2016-06-18 (PERLANCAR)
+
+        - First release.

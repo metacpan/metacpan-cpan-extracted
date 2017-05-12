@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<library>
+   <book isbn="978-0-59-600173-5">
+      <title>Perl Best Practices</title>
+      <author>Damian Conway</author>
+      <pages>544</pages>
+      <published year="2005" month="07" day="12" />
+   </book>
+</library>

@@ -1,0 +1,8 @@
+=pod
+
+http://www.example.com/
+https://www.example.com/
+ftp://www.example.com/
+mailto:joe@example.com
+
+=cut

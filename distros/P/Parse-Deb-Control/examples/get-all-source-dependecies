@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+xxx - desc
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=cut
+
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use File::Find::Rule;
+use File::Spec;
+use Parse::Deb::Control;
+use List::MoreUtils 'uniq';
+
+exit main();
+
+sub main {
+    my $help;
+    my $prefix = q{};
+    GetOptions(
+        'help|h'     => \$help,
+        'prefix|p=s' => \$prefix,
+    ) or pod2usage;
+    pod2usage if $help;
+    
+    my $package_name = shift @ARGV;
+    pod2usage if not $package_name;
+    
+    my @to_download = ($package_name);
+    my %seen        = ();
+    while (my $pkg = shift @to_download) {
+        next
+            if $seen{$pkg};
+        $seen{$pkg} = 1;
+        
+        next if package_exists($prefix.$pkg);
+
+        my $folder = pkg_folder($pkg);
+        if (not $folder) {
+            my @cmd = ('apt-get', 'source', $pkg);
+            # if apt-get source failed
+            if (system(@cmd)) {
+                # check if the package is not inside another package
+                if (`apt-cache show $pkg` eq '') {
+                    warn $pkg.' is part of another package, skipping';
+                    next;
+                }
+
+                die 'failed to execute "'.join(' ', @cmd).'"';
+            }
+            $folder = pkg_folder($pkg);
+            die 'apt-get failed to get source of "'.$pkg.'"'
+                if (not $folder);
+        }
+        if ($folder) {
+            my $parser = Parse::Deb::Control->new(File::Spec->catfile($folder, 'debian', 'control'));
+            foreach my $dep_line ($parser->get_keys(qw{ Build-Depends Build-Depends-Indep Depends })) {
+                my $value = ${$dep_line->{'value'}};
+                while ($value =~ m/\b(lib[^\s]+?-perl)(\b|,)/xmsg) {
+                    push @to_download, $1;
+                }
+            }
+            @to_download = uniq @to_download;
+        }
+    }
+    
+    return 0;
+}
+
+sub pkg_folder {
+    my $pkg = shift;
+    my ($source_pkg) = map { $1 if m/^Source: ([\w]+)\s/ } grep { m/^Source: / } `apt-cache show "$pkg" 2> /dev/null`;
+    $source_pkg ||= $pkg;
+    my ($folder) = File::Find::Rule
+        ->directory
+        ->maxdepth(1)
+        ->name(qr/^$source_pkg-[.0-9]+/)
+        ->in('.');
+    return $folder;
+}
+
+sub package_exists {
+    my $pkg = shift;
+    die if not $pkg;
+
+    my @dsc = `apt-cache show "$pkg" 2> /dev/null`;
+    return scalar @dsc;
+}

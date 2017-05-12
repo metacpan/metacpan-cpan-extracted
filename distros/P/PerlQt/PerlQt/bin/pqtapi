@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+# Note: this program is part of PerlQt and makes use of its internal functions.
+#       You should not rely on those in your own programs.
+
+use Getopt::Std;
+use strict 'vars';
+
+our (%o, @x, $h);
+getopts('r:hvimp', \%o);
+
+package Qt::_internal;
+use Qt;
+
+exists $o{'v'} and do{ print "PerlQt-$Qt::VERSION using Qt-".&Qt::version."\n" and exit 0 };
+exists $o{'h'} and do{ print $h and exit 0 };
+exists $o{'m'} and do{      # interactive mode for driving the Qt Designer Plugin
+    select(STDOUT); $| = 1; # unbuffered
+    while(<STDIN>)
+    {
+        chomp;
+        s/^Q(?=[A-Z])/Qt::/;
+        my $i = find_pclassid( $_ );
+        print "__START__\n";
+        if ($i)
+        {
+            my $a = findAllMethods( $i );
+            my $t = dumpCandidates( [map {@{ $$a{$_} }} sort keys %$a] );
+            getAllParents($i, \my @sup);
+            for my $s(@sup)
+            {
+                $a = findAllMethods( $s );
+                $t.= dumpCandidates( [map {@{ $$a{$_} }} sort keys %$a] );
+            }
+            $t =~ s/\t//gs;
+            print $t;
+        }
+        print "__END__\n";
+    }
+};
+(my $c = $ARGV[0]) =~ s/^Q(?=[A-Z])/Qt::/;
+my $i = $c ? find_pclassid( $c ) : 1;
+my $r = exists $o{'r'} ? (exists $o{'i'} ? qr|$o{'r'}|i : qr|$o{'r'}|) : 0;
+my $d = "";
+
+while ($i)
+{
+   my $a=findAllMethods($i);
+   last unless keys %$a;
+   @x=map {@{ $$a{$_} }} sort keys %$a;
+   $d = dumpCandidates(\@x);
+   if($c and $i and exists $o{'p'})
+   {
+        getAllParents($i, \my @sup);
+        for my $s(@sup)
+        {
+            $a = findAllMethods( $s );
+            $d.= dumpCandidates( [map {@{ $$a{$_} }} sort keys %$a] );
+        }
+   }
+   if($r)
+   {
+       map { print "$_\n" if $_=~$r } split("\n", $d);
+   }
+   else
+   {
+       print $d
+   }
+   $c and last;
+   $i++
+}
+
+BEGIN {
+    $h = "pqtapi - a PerlQt introspection tool\t(c) Germain Garand 2003 <germain\@ebooksfrance.org>\n\n".
+         "usage: pqtapi [-r <re>] [<class>]\n\n".
+         "options:\n". 
+         "\t-r <re> : find all functions matching regular expression/keyword <re>\n".
+         "\t-i : together with -r, performs a case insensitive search\n".
+         "\t-p : display also inherited methods for <class>.\n".
+         "\t-v : print PerlQt and Qt versions\n".
+         "\t-h : print this help message\n";
+}

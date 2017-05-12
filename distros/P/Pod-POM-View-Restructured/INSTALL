@@ -1,0 +1,15 @@
+Copyright (c) 2010 Don Owens
+
+See the COPYRIGHT section in lib/Pod/POM/View/Restructured.pm for usage and distribution
+rights.
+
+INSTALLATION
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+    or
+
+        cpan Pod::POM::View::Restructured

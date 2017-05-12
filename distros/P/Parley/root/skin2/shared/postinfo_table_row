@@ -1,0 +1,78 @@
+<!-- post-info table row -->
+[% toggler = (1 - (toggler||0)) %]
+<tr class="row [% row_styles.$toggler %]">
+    <td width="36" style="padding-top:5px;">
+        <!-- interesting things about the thread; sticky, locked, etc -->
+        [%- IF thread.sticky %]
+        <img src="static/images/icons/attach.png" alt="Sticky" title="Sticky Topic" width="16" height="16" />
+        [%- END %]
+        [%- IF thread.locked %]
+        <img src="static/images/icons/lock.png" alt="Locked" title="Locked Topic" width="16" height="16" />
+        [%- END %]
+    </td>
+
+    <td>
+        <div class="thread_subject">
+            <a href="[%c.uri_for('/thread/view',{'thread'=>thread.id})%]" class="topic_link">[% ForumCode.escape(thread.subject) |truncate(55) %]</a>
+        </div>
+        [%- IF show_forum_name %]
+        <div class="thread_recent_forum">
+            <a href="[%c.uri_for('/forum/view',{'forum'=>thread.forum.id})%]">[% thread.forum.name %]</a>
+        </div>
+        [% END %]
+        <div class="forum_mini_pager">
+            [%- IF authed_user || mini_pager %]
+            [
+                [%- IF authed_user %]
+                <a href="[%c.uri_for('/thread/next_post',{'thread'=>thread.id})%]">Continue</a>
+                [%- END %]
+            ]
+            [%- END %]
+        </div>
+    </td>
+
+    [% IF (search_post = show_search_data) %]
+    <td style="">
+        <div class="search_match_context">
+            [% context = search_post.match_context(search_terms.raw) %]
+            [% context %]
+        </div>
+        <div class="forum_mini_pager">
+            [
+            <a href="[%c.uri_for('/post/view',{'post'=>search_post.id})%]">Go to post</a>
+            ]
+        </div>
+    </td>
+    [% END %]
+
+    <td class="info_column">
+        <div class="topic_creator">
+            [% l('last post by ([_1])', thread.last_post.creator.forum_name) %]
+        </div>
+        <div class="thread_lastpost">
+            [% thread.last_post.interval_ago %]
+            [%l('ago')%]
+        </div>
+    </td>
+
+    <td class="info_column">
+        <div class="topic_creator">
+            [% l('created by ([_1])', thread.creator.forum_name) %]
+        </div>
+        <div class="thread_lastpost">
+            [% nicedate(thread.created) %]
+        </div>
+    </td>
+
+    <td class="info_column_counts">
+        <div class="forum_postcount">
+            [%# number of replies is one less than the number of posts %]
+            [% SET tpc = (thread.post_count - 1) %]
+            [%l('[quant,_1,reply]',tpc)%]
+        </div>
+        <div class="forum_postcount">
+            [%l('[quant,_1,view]',thread.post_count)%]
+        </div>
+    </td>
+</tr>
+<!-- (end) post-info table row -->

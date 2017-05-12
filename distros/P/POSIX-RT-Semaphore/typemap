@@ -1,0 +1,4 @@
+Mode_t              T_NV
+POSIX::RT::Semaphore::_base    T_PTROBJ
+POSIX::RT::Semaphore::Unnamed    T_PTROBJ
+POSIX::RT::Semaphore::Named    T_PTROBJ

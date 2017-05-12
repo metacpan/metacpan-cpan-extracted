@@ -1,0 +1,25 @@
+---
+abstract: 'Solve the IE8 / IE9 XDomainRequest Missing or Invalid Content-Type Bug'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  HTTP::Message::PSGI: 0
+  HTTP::Request: 0
+  HTTP::Response: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-FixIEXDomainRequestBug
+requires:
+  Plack::Middleware: 0
+resources:
+  bugtracker: https://github.com/jjn1056/Plack-Middleware-FixIEXDomainRequestBug/issues
+  homepage: https://github.com/jjn1056/Plack-Middleware-FixIEXDomainRequestBug
+  repository: https://github.com/jjn1056/Plack-Middleware-FixIEXDomainRequestBug.git
+version: 0.001

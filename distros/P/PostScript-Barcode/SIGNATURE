@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ab9536f319e96044fbc6dc4762ca9e78e8b5b2cb AUTHORS
+SHA1 b60d535fe4c98404de4a8e7a92065cf38626a4a4 Build.PL
+SHA1 0d530bbb4571122d46eccd2c0b3aa355290ba53d Changes
+SHA1 b7f5d0487a16ce97dd1d244a985b92b5524d4658 MANIFEST
+SHA1 6bec347e8c5b2f364c6a22b120efe7aa9a6143ae MANIFEST.SKIP
+SHA1 64ac63966c3d5056d05884aa41b76eb1e699b4bc META.yml
+SHA1 17c8af0b103a27c2967645b200be3d8fe1bae104 README
+SHA1 11e937e3a299a7c1e853f1f40c19ef8dd5277a15 lib/PostScript/Barcode.pm
+SHA1 7de9539b9ae27074bc3aeb2784ff8597e4204a12 lib/PostScript/Barcode/GSAPI/Singleton.pm
+SHA1 d5d98190901f2989c449881c750e0b257bc07880 lib/PostScript/Barcode/Meta/Types.pm
+SHA1 dd4c178afa1b05d137605f134df0495af24e8872 lib/PostScript/Barcode/azteccode.pm
+SHA1 8f09790521fe07f8c5883898bf3b5a0609438f69 lib/PostScript/Barcode/datamatrix.pm
+SHA1 e5be95750728870e43f5586bf688aa83d62e504d lib/PostScript/Barcode/qrcode.pm
+SHA1 c43ff62e34b7f5fb0a6c0c71c7d8ebb34661976b t/00-load.t
+SHA1 cbd24a07795c5f48d9426cd07f1a491672feb8ef t/10-exception.t
+SHA1 753328028124b23a8bbaa31129880f9982803f2c t/10-interface.t
+SHA1 ae77b9fbe2acbf6101bccdad8dcf818405a1c791 t/20-bug-empty-data-string.t
+SHA1 c0c01ddb650a09ca4ad070f65c5714ab80ae6793 t/20-bug-memleak.t
+SHA1 bd0d7806e2389f3a008d9555b1ccfb008dea4bbb t/20-bug-multiple-constructor.t
+SHA1 3dd2afeae90573ed3d7064418ceae50fe83952e1 t/20-bug-regression1.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.12 (GNU/Linux)
+
+iEUEARECAAYFAkwxpMkACgkQFtlTdOX00HpSIACXTGdeR4efZRsF+W74Qvb/DuU3
+ggCgjZSemavhltkOUIo93vGICJTC25E=
+=qZ3s
+-----END PGP SIGNATURE-----

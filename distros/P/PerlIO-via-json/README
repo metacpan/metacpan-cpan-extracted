@@ -1,0 +1,40 @@
+PerlIO::via::json
+=================
+
+This package implements a PerlIO layer. Opening an XML file, e.g.
+
+  open my $fh, '<:via(json)', 'file.xml' or die ....;
+
+the XML is transformed into JSON with XML::XML2JSON:
+
+  my $json = <$fh>;
+
+Going the other way, you can write JSON and it becomes XML:
+
+  open my $fh, '>:via(json)', 'file.xml' or die ....;
+  my $json = '....';
+  print $fh $json;
+
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install  (probably as root)
+
+
+DEPENDENCIES
+
+This module runs only with perl 5.8.1 or higher with perlio enabled.
+It requires XML::XML2JSON.
+
+
+COPYRIGHT AND LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Copyright (C) 2009,2017 Scott Lanning <slanning@cpan.org>

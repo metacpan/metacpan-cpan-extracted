@@ -1,0 +1,34 @@
+Parallel-Fork-BossWorkerAsync version 0.03
+==========================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+There is an extra test that's not in the MANIFEST, called t/large_return.t. You may wish
+to include it. The reason it's not part of the default build is that on BSD systems it
+takes well over five minutes to execute (9 minutes on Darwin 12.4.0 Mountain Lion). The
+problem is the 8k limit on 
+the socket read buffer, enforced by the OS. It's only an issue on BSD, and if you're
+passing megabyte chunks of data between processes. More details in the man page.
+
+To avoid the test, simply move t/large_return.t to another directory.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Data::Dumper, Carp, IO::Select, Socket, Fcntl, POSIX
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by joe vannucci, <jvann.cpan@gmail.com>
+
+All rights reserved.  This library is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+

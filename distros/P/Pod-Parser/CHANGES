@@ -1,0 +1,814 @@
+ATTENTION!
+
+Before using this for any _new_ software, please consider using Pod::Simple,
+it is a modern replacement for this module.
+
+ 10-Feb-2015           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.63
+ + CPAN#101847: [PATCH] Bump $VERSION in module changed since Pod-Parser-1.60
+   increased VERSION in all *.pm files
+ + CPAN#98610: Pod::Find should skip also object directories of modern vc
+   systems (.git, .hg)
+   implemented in Pod::Find
+ Thanks for the reports and patches!
+
+ 02-Feb-2014           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.62
+ + CPAN#87891: More sanity checks in podselect()
+   documentation patches by florent.angly@gmail.com, and a bit of stricter
+   checking what clients pass to podselect()
+
+ 01-Jun-2013           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.61
+ + CPAN#85656 fix typos in comments
+
+
+ 31-Jan-2013           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.60
+ + removed Pod::Checker and Pod::Usage from this distribution - they are now
+   separate distros and are subjects to be refactored, to be based upon
+   Pod::Simple. Thanks to rjbs for reminding me of this.
+
+
+ 25-Jan-2012           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.51
+ + CPAN#74271: Pod::Parser should not flag L<text|hyperlink>
+   undo change CPAN#47473: L<alt text|URL> _is_ allowed (see discussion on
+   pod-people and p5p); confirmed by blead change; references:
+   http://code.activestate.com/lists/perl-pod-people/1690/
+   http://code.activestate.com/lists/perl-pod-people/1393/
+   http://perl5.git.perl.org/perl.git/commit/f6e963e4dd62b8e3c01b31f4a4dd57e47e104997
+ + bump all module versions (except Pod::PlainText) to 1.51
+ + update META.yml (thanks rjbs for the hint)
+
+
+ 16-Jan-2012           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.50
+ + fix whitespace (esp. CR [\r] related) issues with different Perl versions
+   on Windows (with Perl 5.8.8 [Activestate], and 5.6.1 [SUA])
+ + merge latest core (5.14.x) changes to this distro
+ + CPAN#73446: fix minor POD error in InputObjects.pm
+ + CPAN#43955: podchecker fails to detect superfluous =cut directive:
+   implemented (and extended by a check for superfluous =pod commands) and
+   documented in Pod::Checker; also added a note in the POD of all modules
+   that they are part of the Pod::Parser distribution
+ + CPAN#46695: use consistent version (1.50) for distribution and all Pod::
+   modules in this distro (except for Pod::PlainText, which stays at 2.05)
+ + CPAN#52086: mismatch between distro and module version:
+   same as above
+ + CPAN#55121: correction for Pod::Find and t/pod/find.t on VMS
+ + CPAN#47473: podchecker on L<> url with alt text
+   ... causes an error in Pod::Checker now
+ + CPAN#57954: Pod::Usage does not find perldoc when perl is relocatable
+   ... use $Config{scriptdirexp} instead of scriptdir
+ + CPAN#61223: podchecker notice missing blank line before command
+   implemented with more tests in poderrs.t and self test of all *.pms
+ + CPAN#66614: parse of no final newline vs perl -w
+   ... a rare case, but fixed nevertheless
+ + CPAN#68157: Pod-Parser-1.38/lib/Pod/Usage.pm question/bug
+   ... pass through formatting options to Pod::Text
+ + CPAN#70771: mishandles symbolic links in @INC
+   ... fixed by making the paths in @INC absolute, using Cwd::abs_path()
+ + CPAN#71139: 3 possible optimisations
+   ... applied
+ + several other rt.cpan.org tickets processed and closed
+
+
+ 09-Feb-2008           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.38
+ + missed one (important) line from one of the patches below in pod2usage2.t
+   No change in the *.pm files
+
+
+ 04-Feb-2008           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.37
+ + fixed resource links in META.yml
+ + address CPAN#42695 with a minor change in PlainText, although not solving
+   it completely; the 'loose' option now applies to all =headN headings
+ + address failures of find.t on Win32 (cpantesters) - root cause was a 
+   mismatch of directory names like "Progra~1" (short/long file names)
+ + include the following bleadperl changes:
+   * Blank lines "between" verbatim sections are now acceptible:
+     http://perl5.git.perl.org/perl.git/commitdiff/caa547d
+   * Be less picky about what constitutes "numeric lists" in Pod:
+     http://perl5.git.perl.org/perl.git/commitdiff/4df4f5d
+   * Changes made to contains_pod.t when upgrading to 1.34:
+     http://perl5.git.perl.org/perl.git/commitdiff/fb59f97
+   * Fix paths on new pod2usage2 tests to work in the core.
+     http://perl5.git.perl.org/perl.git/commitdiff/222046efb22c183703fea2b30db76296ab782e89
+   * Make t/pod/pod2usage2.t work on case insensitive file systems.
+     http://perl5.git.perl.org/perl.git/commitdiff/767c16ab361d1225fb153423fb22b590c1e0c7ea
+   Thanks to Nicholas Clark, Steve Hay, Jerry D. Hedden for the patches
+ + removed \r from t/pod/usage2.pod
+
+
+ 19-Jan-2008           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.36
+ - Did I say this package is dead, and there won't be any updates?
+   This release is fixing all open CPAN RT issues, hopefully this is the
+   last version forever...
+ + Ironed out the most severe issues reported by perlcritic, updated
+   META.yml
+ + Adapted Makefile.PL such that CPAN should recognize dependencies better
+ + CPAN#30672: Merged the minor change (recognize =encoding) from 5.10.0,
+   along with a few test improvements - thanks Adriano Ferreira for the patch
+ + Assimilated changes from 5.8.9 on podchecker.PL
+ + CPAN#23618: replace $Config{privlib} with privlibexp to avoid problems
+   with installation paths like ~user. Thanks clonezone for the patch
+ + CPAN#24983: document that parse_from_file() accepts also file handle
+   references and objects that support the regular IO interfaces
+ + added a little tweaking of Test::Builder to pod2usage2.t, which 
+   should solve the problem with older Perls (5.005)
+ + CPAN#29749: applied patch to squelch noise from older blib
+   versions. Thanks SREZIC
+ + CPAN#29978: fixed insecure argument for running perldoc from
+   pod2usage() in -T scripts
+ + CPAN#30043: add =cut as an indentifier for POD in Pod::Find.
+   Thanks NATERAJJ for the patch
+ + CPAN#33020: Pod::Usage will by default look for both SYNOPSIS and
+   USAGE - since SYNOPSIS is the traditional section name, while USAGE
+   is suggested by perlcritic
+ + CPAN#33150: made sure that pod2usage(-message=>'...') always
+   appears, even when using perldoc
+ + CPAN#35514: add some documentation and a test to demonstrate how
+   pod2usage works together with Pod::Find::pod_where to show module PODs
+ + CPAN#38648: pod2usage(-verbose => 1) now accepts whitespace after
+   SYNOPSIS. Thanks dwierenga AT valueclick DOT com for the patch
+ + CPAN#38747: two important bug fixes and one improvement, all around
+   pod2usage(-sections). Many thanks David DOT Purdie AT erggroup DOT com
+   for the patches and suggestions. This fixes also CPAN#41136
+ + CPAN#41135: allow subheadings in OPTIONS/ARGUMENTS and 
+   pod2usage(-verbose => 1) - they are now printed as well
+ + CPAN#42141: find.t fix for VMS in UNIX compatible mode. Thanks a lot
+   malmberg AT Encompasserve org for the patch
+ + Fixed inconsistencies between Pod::PlainText and Pod::Text regarding
+   selection of sections; now both should work according to the docs of
+   Pod::Usage
+ + verified on perl 5.8.8, 5.8.7, 5.6.1, 5.005.03 on Solaris 8 (Sparc),
+   perl 5.6.1, 5.8.7 on RedHat Linux 7.2,
+   perl 5.10.0 on Windows 2000,
+   perl 5.8.0, 5.6.1, 5.8.7, 5.8.8 on RedHat Enterprise Linux 3.0,
+   perl 5.8.5, 5.6.1, 5.8.7, 5.8.8 on RedHat Enterprise Linux 4.0
+   with various combinations of Pod::Text, Test::More etc.
+
+
+ 27-Oct-2005           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.35
+ + Did I say this package is dead?
+ + Make version of distro equal Pod::Parser::VERSION on popular
+   request - although this is IMHO not a prerequisite (CPAN#17069)
+ + Check for core changes to this module dist - there are none
+ + Added support for =head3 in Pod::PlainText - who on earth is
+   using that one? Thanks David Wheeler dwheelerATcpanDOTorg (CPAN#17515)
+ + Added support even for =head4 in Pod::PlainText (CPAN#15989)
+ + Allow Pod::Usage to work with new and old versions of Pod::Text
+   Thanks steveiATfisharerojoDOTorg for the patch (CPAN#16368)
+ + fall back to $PAGER|more if perldoc fails in Pod::Usage (CPAN#16901)
+ + CPAN#17202 is somehow solved in this release
+ + try to address CPAN#16959 by removing all extra line end characters
+   in line comparisons in test
+ + added test to catch CPAN#17997, should it ever be a problem
+ + address CPAN#19137 by a CAVEAT in Pod::Parser
+ + CPAN#19933: PATCH to support L<Weblink|http://www.whatver.site>
+   thanks LGODDARD
+ + CPAN#21010: Calling parse_from_file twice causes errors
+   my (...) = ... if(...); # is no good - had to split that
+ + CPAN#15718: Documentation: -section argument should be -sections
+ + minor change in Select.pm to solve an issue on Cygwin with ^M
+ + CPAN#17997: Regression: -input no longer works with __DATA__ with -verbose => 2
+   thanks CLOTHO for the patch
+ + ran a rough POD spell check
+ + fixed test failure on Windows in pod2usage.t (CPAN#14928)
+
+
+ 04-Oct-2005           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.34
+ + yi luo luoyi.ly at gmail.com noticed that -x _ does not do the right
+   thing on Windoze with *.bat files, where -x $file does
+ + JHOBLITT at cpan.org sent a patch to make contains_pod accept files that
+   start with =head on the first line. Test integrated with slight modifications
+   (to avoid dependency on File::Temp and others) (CPAN#14871)
+ + applied http://public.activestate.com/cgi-bin/perlbrowse?patch=25588
+   (thanks H.Merijn Brand and Rafael Garcia-Suarez)
+ Neverending story...
+
+ 05-Sep-2005           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.33
+ + CPAN#14194: I<> in Pod::Usage overridden to just show the text, no ** around
+ + CPAN#14195: wrong exit value for pod2usage(0)
+ + CPAN#14315: allow for arbitrary URLs
+ I hope this will do now - Pod-Parser is DEAD!
+
+
+ 15-Jun-2005           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.32
+ + applied patch by radek at pld-linux dot org that fixes a regression of
+   broken support of Pod::Parser input from objects (CPAN#13203)
+ 
+
+ 01-Jun-2005           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.31
+ + applied patch suggested by ITUB AT cpan.org (remove spurious setting of
+   $_), which significantly reduces runtime (CPAN#12327)
+ + fixed regression in podselect.PL and pod2usage.PL reported by Steve Peters 
+   steve AT fisharerojo.org; no change in the actual code, just the build
+   script; the fix in Pod::Usage was already in
+ + downgraded error about nested styles (e.g. C<...C<...>...>) to a warning
+   (CPAN#12240)
+ + added the brackets to gensym() to make use strict happy in Perls < 5.006
+   (CPAN#5613)
+ + pod2usage() is more tolerant wrt. =head1 SYNOPSIS\s* (CPAN#6329)
+ + require at least File::Spec 0.82 as suggested in CPAN#8709
+ + include the -noperldoc option in Pod::Usage as suggested in CPAN#11525
+   This is the last time an enhancement was implemented! >:->
+ + fixed the test t/pod/find.t to not depend on perlfunc (CPAN#6679);
+   now the test also uses t/pod/testpods/lib/Pod/Stuff.pm;
+   this implicitely fixes also CPAN#8742
+ + slightly updated META.yml
+ + made sure that CPAN#7486 is _really_ integrated
+ + make -quiet DWIM in Pod::Checker (CPAN#11884)
+
+
+ 12-Mar-2005           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.30
+ + changed dist name to Pod-Parser
+ + pushed versions of .pm files to 1.30 as far as CPAN permits, i.e. don't
+   decrease existing versions > 1.30
+ + added end of support announcement
+ + cross-checked this version with the Perl5 core version and merged a
+   couple of changes
+
+
+ 08-Feb-2005           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.29 - not released
+ + integrated patch by tony at irational dot org to support printing of
+   custom sections in Pod::Usage
+ + integrate change 22886 on Pod::Find (Rafael Garcia-Suarez and
+   Alan Burlison): Pod::Find should ignore SCM files and dirs
+ + integrate a patch by Russ Allbery rra at stanford dot edu to support
+   Pod::Usage together with Pod::Text based on Pod::Simple or Pod::Parser
+ + integrated #23327 (CPAN#7486) (fix warnings with NOEXIT)
+ + integrated patch by Radoslaw Zielinski radek at karnet dot pl that
+   allows to specify IO::String objects as output file handles
+
+
+ 08-May-2004           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.28
+ + bumped version of ParseUtils to make CPAN indexer happy
+
+
+ 08-May-2004           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.27
+ + reviewed a bunch of rather old emails and verified that all that is in
+ + added patch by Michael G Schwern schwernATpobox.com to suppress spurious
+   warning about / and | in L<> hyperlinks
+
+
+ 
+ 24-Nov-2003           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.26
+ + bumped version of Pod::Parser on request by Jarkko Hietaniemi
+ + included a patch by Peter Prymmer PPrymmerATfactset.com to fix
+   the expansion of the scripts on VMS
+ + included fix to support PodParser as core module from 5.6.0 on
+   (Autrijus Tang autrijusATautrijus.org)
+ + updated README and other files to reflect change in maintenance,
+   in consequence updated Pod::PlainText and some t/...xr
+
+
+ 27-Aug-2003           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.25 - not released
+ + Merged bleadperl-5.8.1 into this distribution. Added a couple of
+   if($ENV{PERL_CORE}) statements to ease the maintenance of core/module.
+
+
+ 26-Aug-2003           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.24
+ + removed the "BETA STAGE" from Pod::Checker - it is now stable
+ + added patch by Micheal Schwern schwernATpobox.com to silence Pod::Checker
+   (the module) and let podchecker (the script) print the diagnostics. Added
+   note in the Pod::Checker documentation.
+ + Tom Wyant twyant4ATcomcast.net reported that Cygwin also has the
+   core pods in pods/ - fixed in Pod::Find
+ + changed the logic in Pod::InputObjects a bit to speed up the parser,
+   based on a suggestion by Mark Jason Dominus mjdATplover.com. The
+   original proposal was however too much of a revolution to the existing
+   behaviour.
+ + Some minor performance improvements in Pod::Parser (profile analysis)
+
+
+ 12-Jun-2003           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.23
+ + fixed a bug in Usage.pm, spotted by Kees Cook keesATosdl.org:
+   the special value 'NOEXIT' has not been treated appropriately
+ + added INSTALLDIRS=perl as suggested by M. Schwern
+
+
+ 23-Apr-2003           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.22
+ + fixed a bug in Usage.pm, spotted by Harry Felder harryATrentec.com:
+   the path to perldoc is $Config{scriptdir}, not (always) $Config{bin}
+
+
+ 07-Nov-2002           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.21
+ + fixed a bug in the find.t test
+ + make test work ok on MacOS/darwin, which strangely enough has its
+   perlfunc.pod in a "pods" directory, rather than "pod"
+
+
+ 31-Oct-2002           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.20
+ + Merged changes of perl-5.8.0 core back into this distribution:
+   - MacOS specific changes
+   - english orthography corrections
+   - adaptations to perlpodspec (e.g. =over does not require argument)
+ + Adapt the link text to perlpodspec (drop extra text like
+   `elsewhere in this document', `the ... manpage' etc.)
+ + Allow dashes in Pod hyperlinks, e.g. L<Inline::C-Cookbook>
+   (on request by Slaven Rezic and Mark Overmeer)
+
+
+ 29-Aug-2002           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.19
+ + Changed t/pod/testp2pt.pl to always choose Pod::PlainText for the tests,
+   do not rely on Pod::Text, which is not included in this package
+   (as suggested by Richard Clamp <richardc@unixbeard.net>)
+ + Fixed spurious warning in Pod::ParseUtils reported by Rafael Garcia-Suarez 
+   <rgarciasuarez@free.fr>: Inside "" the characters | and / are ok
+ + Added a num_warnings method to Pod::Checker - requested by
+   brian d foy <comdog@panix.com>
+ + Added a warning if =head2 comes before a =head1 - one TODO item less!
+
+ 01-Sep-2000           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.18
+ + Fixed error in failing recognize empty C<<  >> sequences
+ + Modified pod2usage to use perldoc if ultra-verbose mode is set
+   and input is a filename and output is STDOUT (so now it doesnt just
+   print the manpage, it pretty prints it and paginates it)
+ + Allowed -exitval => NOEXIT to be given to pod2usage to instruct it
+   NOT to exit the running script.
+ + Applied VMS patches from Tim Jennes to t/pod/find.t and lib/Pod/Find.pm
+
+ 25-Jul-2000           Marek Rouchal      <marek@saftsack.fs.uni-bayreuth.de>
+ -----------------------------------------------------------------------------
+ Version 1.17
+ + included small fixes by Tim Jenness <t.jenness@jach.hawaii.edu> to
+   Pod::Find and t/pod/find.t
+ + extended logic in Pod::Find to search for pod/ subdirectories in all
+   given subdirectories (in pod_where function) to find e.g. "perlfunc".
+   Thus pod_where could be used by perldoc.
+ + added check for recent File::Spec version in Makefile.PL
+ + updated Makefile.PL, CHANGES, README
+
+ 07-Jul-2000           Marek Rouchal      <marek@saftsack.fs.uni-bayreuth.de>
+ -----------------------------------------------------------------------------
+ Version 1.16
+ + included two subs suggested by Tim Jenness <t.jenness@jach.hawaii.edu>
+   in Pod::Find (pod_where and contains_pod) and included a test in
+   t/pod/find.t
+ + updated Makefile.PL, CHANGES and TODO
+
+
+ 03-Jul-2000           Marek Rouchal      <marek@saftsack.fs.uni-bayreuth.de>
+ -----------------------------------------------------------------------------
+ Version 1.15
+ + introduced -quiet option for Pod::Checker to suppress diagnostic
+   output when Pod::Checker is used to eat POD and output text.
+ + improved documentation in Pod::Checker
+ + improved code coverage of t/pod/poderrs.t
+ + updated TODO
+
+
+ 04-Jun-2000           Marek Rouchal      <marek@saftsack.fs.uni-bayreuth.de>
+ -----------------------------------------------------------------------------
+ Version 1.14
+ + fixed wrong value in Pod::Parser concerning whitespace lines
+ + added check in podchecker whether argument is a directory
+ + introduce additional warning level: this suppresses the complaints
+   about unescaped <>, but the check is enabled when the wrning level is
+   increased: podchecker -warn -warn
+   adapted documentation appropriately
+ + Pod::Hyperlink now parses L<open(2)> again, but gives a warning. The
+   calling programs have to check themselves for what to do with pages
+   like open(2).
+ + Changed POD of several modules so that they conform to podchecker :-)
+
+
+ 14-Mar-2000           Marek Rouchal      <marek@saftsack.fs.uni-bayreuth.de>
+ 16-Mar-2000           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.13
+ + Improved support of Win32 and OS/2 platforms by using File::Spec in
+   Pod::Find
+ + strip .bat and .cmd on Win32 and OS/2, respectively
+ + removed all tabs from Pod::Find and reviewed POD documentation
+ + finally fixed t/pod/ptestpchk.pl to ignore any and all non-word-chars
+   in pathnames. No more special casing filenames for MacOS, NT, VMS, etc
+   just for the sake of passing the t/pod/poderrs.t test!
+
+
+ 11-Mar-2000           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.12
+ + Sync-up with patches from the 5.6 core distribution
+ + Require perl5.005 instead of 5.004 now that 5.6 is almost out
+ + Removed the t/pod/xtra tests from the distribution
+ + Ignore [\n\r] when looking for non-empty blank lines in Pod::Parser
+ + Added VMS file-unixification to test scripts
+
+
+ 23-Feb-2000           Brad Appleton                   <bradapp@enteract.com>
+                       Marek Rouchal      <marek@saftsack.fs.uni-bayreuth.de>
+ -----------------------------------------------------------------------------
+ Version 1.11
+ + Fixed Pod::Parser warnings about non-empty blank lines in code
+ + added note about extraction capabilities of Pod::Checker to README
+ + added collection of index entries X<...> (Pod::Checker)
+ + extended internal hyperlink node uniqueness check (Pod::Checker)
+ + added documentation in Pod::Checker for built-in methods
+   (nodes, hyperlinks, X<...> entries) 
+ + minor cleanups (find_node in Pod::Cache::Item) and changed priority
+   in parsing L<...> (Pod::ParseUtils)
+
+ 22-Feb-2000           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.10
+ + bump up the version number to avoid confusion with a short-lived
+   version of 1.093-beta
+
+ 21-Feb-2000           Brad Appleton                   <bradapp@enteract.com>
+                       Marek Rouchal      <marek@saftsack.fs.uni-bayreuth.de>
+ -----------------------------------------------------------------------------
+ Version 1.093
+ + Pod::Parser now warns about non-empty blank lines matching /^\s+$/
+ + got rid of special handling of '=>' and '=>' inside C<..> and instead
+   implemented the more general rules posted by Larry Wall on P5P allowing
+   /[A-Z]<...>/ and /[A-Z]<[<:]\s+...\s+[:>]>/ to deal with things like
+   embedded '->' and '=>' using whitespace, as in: C<< <=> >> and I<< <> >>.
+ + added proposals by Wolfgang Laun to Pod::Checker (more errors and 
+   warnings):
+    - removed qr// so that code runs with Perl 5.004 
+    - POD files can include '.' in the name.
+    - L<DBI(3)> now causes an error, correct is: L<DBI>
+
+
+ 03-Jan-2000           Marek Rouchal      <marek@saftsack.fs.uni-bayreuth.de>
+ -----------------------------------------------------------------------------
+ Version 1.092
+ + added the Pod::Cache and Pod::Cache::Item code to Pod::ParseUtils.
+ + modified the README file.
+
+ 15-Dec-1999           Marek Rouchal      <marek@saftsack.fs.uni-bayreuth.de>
+ -----------------------------------------------------------------------------
+ Version 1.091
+ + cleaned up Pod::Checker, especially documentation, updated test
+ + moved helper code to new module Pod::ParseUtils, added documentation
+ + added Pod::Find, along with a test
+
+
+ 22-Oct-1999           Marek Rouchal      <marek@saftsack.fs.uni-bayreuth.de>
+ -----------------------------------------------------------------------------
+ Version 1.090
+ + Added several additional checks to Pod::Checker
+ + Pod::Checker detects files with no POD
+ + Pod::Checker prints warnings about inproper style
+ + Modified podchecker to use the -warnings option and the "empty POD"
+   status
+ + Added Pod::Hyperlink (internal in Pod::Checker for now) that parses
+   the L<> sequence into alttext, page and section
+ + Updated documentation
+ + Started adding callbacks so that Pod::Checker can be used also for
+   single-pass POD translators in the future
+
+ 25-Sep-1999           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.085
+ + Added a section on tree-based parsing to the PODs for Pod::Parser
+ + Added '-expand_text" callback-option to Pod::Parser::parse_text()
+ + Added ability to specify contents for Pod::InteriorSequence::new
+ + Added the notion of "parse-options" to enable/disable certain
+   parsing behaviors  (see the section on "PARSING OPTIONS"
+   in the documentation for Pod::Parser)
+ + Added Pod::Parser::parseopts()
+ + Added the '-want_nonPODs' parse-option
+ + Added the '-process_cut_cmd' parse-option
+ + Fixed the '*child2parent*' functions in InputObjects so that they
+   dont invoke "can" or "isa" for unblessed scalar-refs.
+
+ 03-Sep-1999           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.084
+ + Added Russ Allbery's Pod::PlainText re-write
+ + Added some tests contributed by Russ Allbery
+ + Fixed Makefile.PL to install the supplied scripts
+ + Updated copyright messages
+ + Added an error/warning callback function to Pod::Parser. When specified,
+   it will call the user-provided function instead of "warn" when printing
+   error messages (This makes it easier for things like Pod::Checker to
+   capture and/or redirect error output). See Pod::Parser::errorsub().
+
+ 28-Jun-1999           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.083
+ + Fixed problem with not defaulting to STDIN in parse_from_filehandle
+   (thanks to Russ Allbery for the patch)
+ + Fixed problem with != and -= (and <op>= in general) processing
+   inside of C<...> (thanks to Russ Allbery for this patch too)
+
+ 28-Apr-1999           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.082
+ + Fixed portability problems with Makefile.PL on MSWin32 systems
+   (thanks to Jan Dubois for showing how to do this!)
+
+ 08-Apr-1999           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.081
+ + Fixed warning message in Pod::Parser::parse_text when $expand_seq is undef.
+ + Fixed another problem with ignoring the contents of an interior sequence
+   if it was nothing but ')' inside the angle brackets (e.g. C<0>).
+ + Moved test files under t/ to t/pod, and added a subdirectory t/pod/xtra
+   for the extra tests that involve "included" files and processing its
+   own source (the "xtra" files are *not* part of what comes with the CORE
+   in Perl 5.006)
+ + Munged the Makefile.PL to be able to set TEST_FILES to t/pod/*.t and
+   t/pod/xtra/*.t (if it exists). This requires File::Spec so now you
+   need either File::Spec or Perl 5.005 or later to install this.
+
+
+ 01-Mar-1999           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.08
+ + Fixed a bug in obtaining options-hash in pod2usage()
+ + Modified test suite & tools to run as expected on more platforms
+   (the .t scripts now do a zero-exit if $ENV{ACTIVE_HARNESS} is set)
+ + Some more portability fixes for searching file-paths in Pod::Usage
+   (thanks to Chris Nandor)
+ + Changed the distribution directory structure a little bit. Instead
+   of all the scripts and modules at the top level directory, the scripts
+   are now in the 'scripts/' subdirectory and the modules are now in the
+   'lib/Pod/' subdirectory.
+
+
+ 16-Jan-1999           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.07
+ + Added Pod::Checker and podchecker.PL
+ + Fixed line-counting errors in Pod::Parser::parse_from_filehandle()
+ + Added raw_text method for Pod::ParseTree
+ + Documented optional hash-ref arg to Pod::Parser::parse_text and replaced
+   '-expand' with '-expand_seq' and '-expand_ptree'
+ + parse_text now has sequences point to the parents they are nested inside
+   of as soon as they are created (instead of after they are appended to
+   the parent, which may occur *after* expansion)
+ + Added the regression test-suite to the distribution in the t/ subdirectory.
+   Its not very exhaustive, but its a start.
+ + Now uses File::Spec, which is bundled with perl 5.005 and later, but if
+   you have perl 5.004 you may need to download File::Spec from CPAN
+ 
+
+ 09-Nov-1998           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.061
+ + Minor additions to v1.06
+   * Pod::InteriorSequence::nested was buried inside POD directives.
+     I had to add the `=cut' between the subroutine docs and its code.
+
+   * Removed some of the documentation for things in Pod::Parser and
+     Pod::Input object that the user probably doesnt need to know.
+
+   * Split out "CHANGES" and "TODO" into separate files from the README
+
+
+ 22-Oct-1998           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.06
+ + SIGNIFICANT CHANGES (POSSIBLE BACKWARD INCOMPATIBILITIES)
+   * Pod::InputObjects::ParseTree object ADDED. This object corresponds
+     to a parse-tree of parsed pod paragraph text. Every node in the
+     parse-tree is either a text-string, or a Pod::InteriorSequence
+     that has yet to be expanded.
+
+   * Pod::Parser::parse_text ADDED!!! This routine parses some pod input
+     text and returns a parse-tree as the result. This is VERY useful for
+     people who cant rely on strict bottom-up expansion of interior
+     sequences. Now they can get the parse-tree and expand sequences
+     themselves in whatever order they require.
+
+   * Pod::Parser::interpolate PARAMETER CHANGE, it *no* *longer* takes a
+     regexp as its second parameter!!!  It used to accept a regular
+     expression signifying the end of parsing conditions and pass it to
+     _interpolate_bottom_up.  It now takes a line-number as the second
+     arg.
+
+   * Pod::Parser::_interpolate_bottom_up has been *REMOVED*!! Pod::Parser
+     no longer uses a recursive routine to parse interior sequences.
+
+   * The following Pod::Parser subroutines now take the current line-number
+     as an ADDITIONAL PARAMETER: command, textblock, verbatim, interpolate,
+     preprocess_line, preprocess_paragraph, parse_paragraph.
+
+   * REMOVED the Pod::Parser::total_lines method
+
+   * ADDED the nested() method to Pod::InteriorSequence
+
+   * REMOVED the following methods from Pod::InputSource: num_lines,
+     file_line, and ADDED the method filename instead.
+
+   * REMOVED the _CMD_SEQUENCES data-field and sequences() method from
+     Pod::Parser.  If you need to know the parent of a nested interior
+     sequence, then invoke the nested() method of that sequence.
+
+ + OTHER CHANGES
+   - Added the "-pathlist" options to Pod::Usage and pod2usage
+   - Made Pod::Usage a tad more portable for DOS and MSWin32
+   - Got rid of a rogue '#' in podselect that was in front of a needed
+     "use" statement.
+   - Fixed a bug in Pod::Parser::_interpolate_bottom_up that made it stop
+     interpolating interior sequences after the first line of a paragraph.
+
+ 12-Feb-1998           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.05
+ - Fixed a bug in Pod::Usage (it was using an obsolete name to access an
+   attribute instead of using the new access method).
+ - Removed the use of $`, $&, and $' throughout all modules in this package.
+ 
+ Version 1.04
+ 22-Dec-1997           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.04
+ + SIGNIFICANT CHANGES
+   * Created a Pod/InputObjects.pm and moved the details of input streams
+     and interior sequences into appropriately named objects defined
+     in this file.
+   * Pod::PlainText now handles =for and =begin/=end
+   * Added the curr_headings() method to Pod::Select
+   * Fixed a few very simple but very stupid errors with improper version
+     numbers in the .pm files.
+   * Pod::PlainText now inherits from Pod::Select (instead of Pod::Parser)
+     because it needs to use the curr_headings() method.
+
+
+ 24-Sep-1997           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.03 (major revision)
+ + SIGNIFICANT CHANGES
+   * If a POD directive begins with '==' instead of '=', then that line
+     is considered a paragraph by itself (you dont need a blank line
+     before you begin the next paragraph). NOTE that this only works
+     for the *beginning* of a paragraph!! If the '==' begins a line
+     in the *middle* of a paragraph, then it receives no special treatment
+     and is not considered to be the beginning of a new POD directive.
+     If this added convenience seems confusing at first, just remember the
+     following phrases:
+        "LESS IS MORE" -- LESS equals signs need MORE newlines!
+        "MORE IS LESS" -- MORE equals signs need LESS newlines!
+     As long as you dont forget that the '=' on a POD directive always
+     comes *before* the newline that ends the paragraph (so the '=' is
+     associated with the first word of each phrase) you should be fine.
+
+   * The '=pod' command *IS* *NOW* *PASSED* TO Pod::Parser::command()!
+
+   * ALL INSTANCE DATA FIELDS HAVE BEEN RENAMED! Rather than using the new
+     field names, you should use the newly provided field access methods to
+     get/set private instance data. These are as follows:
+
+         Accessor Method           Old Field Name
+       -------------------      -------------------
+         cutting()                   CUTTING
+         output_file()               OUTFILE
+         output_handle()             OUTPUT
+         input_file()                INFILE
+         input_handle()              INPUT
+         total_lines()               LINE
+         total_paragraphs()          PARAGRAPH
+         input_streams()             INPUT_STACK
+         top_stream()                INPUT_TOP
+         sequence_commands()         SEQUENCES
+
+   * The last parameter passed to the command() and interior_sequence()
+     methods has changed. Please see the documentation!
+
+   * The stack of interior sequences being processed is NO LONGER an
+     array of text-strings. It is now an array of hash-refs!
+
+   * Renamed my version of Pod::Text to Pod::PlainText to avoid some nasty
+     problems it caused for CPAN.
+
+   * The method Pod::Parser::interpolate() NO LONGER MODIFIES its first
+     argument (which means the argument doesnt have to be an l-value)!
+     This method is now a wrapper which invokes the new method named
+     _interpolate_bottom_up(). This new method *is* recursive and *does*
+     modify its first argument.
+
+   * _interpolate_bottom_up() contains a small but ugly *hack* to allow
+     '->' and '=>' to remain untouched inside of C<...> (without having
+     to use the E<gt> escape sequence) PROVIDED THAT there is something
+     to the left of it OTHER THAN another '-' or '='.
+
+   * The 'select()' and 'want_section()' methods have moved from Pod::Parser
+     into Pod::Select.
+
+   * All callback and callback-related methods have moved into the new
+     module Pod:::Callbacks (which is NOT YET FINISHED for this release).
+
+ 22-May-1997           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.02
+ - Added the ability to register callbacks for =xxxx paragraphs and other
+   paragraphs. This means that one could (for example) register a temporary
+   callback after =item is seen to handle the very next paragraph and then
+   unregister itself. The methods added were add_callbacks and rm_callbacks.
+   Also, a private method invoke_callbacks was added to go about the business
+   of invoking callbacks. The callback mechanism Ive implemented is extremely
+   flexible and also way more complex than Id like (and hence requires lots
+   more documentation than I would like). Also, the interfaces to add_callbacks
+   and rm_callbacks tries to be very flexible in the number and type of
+   arguments you can give it. This is probably too flexible to the point
+   of being too difficult to figure out how to use. My callback mechanism
+   is very powerful but I think the interface to it is lousy and far too
+   complex. I am desperately in search of a way to make it smaller and
+   simpler without removing too much functionality. If you have any ideas
+   about how to do this PLEASE SHARE THEM WITH ME!
+
+ - Got rid of =pod pragmas. P5P has decided to use =for, and =begin/=end
+   instead and Ill just handle those like regular commands. NOTE THAT THIS
+   MEANS THE command() METHOD SHOULD NOW EXPECT TO BE PASSED =pod COMMANDS.
+
+ - Expanded the documentation for Pod::Usage to be (hopefully) a little less
+   confusing regarding the various different invocation styles. Many thanks
+   to Steven McDougall <swmcd@world.std.com> for spending many hours of
+   assistance toward this goal.
+
+ - Fixed Pod::Text to use the proper indentation for nested '=item' lists
+   and to handle consecutive =item paragraphs. (Thank you to Diab Jerious
+   <djerius@cfa.harvard.edu> for helping me with this one.)
+
+ - Fixed a bug in Pod::Parser that was causing the argument to =over to be
+   a newline instead of the empty string when no "over count" was given.
+
+ 05-Sep-1996           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.01
+ - Commented out "use diagnostics" in all modules
+ - Made use of "use vars"
+ - Added the instance variables $self->{INPUT_STACK} and $self->{INPUT_TOP}
+   to Pod::Parser and made it possible to use the parse_from_file() and
+   parse_from_filehandle methods() to process "included" files (in addition
+   to normal pods that dont "include" other files).
+ - Added MSG option/key to pod2usage().
+
+ 19-Aug-1996           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Version 1.00 (first "official" release):
+  - Renamed Pod::Filter to Pod::Parser at Kenneth Albanowski's recommendation.
+  - Moved podselect() into its own separate module Pod::Select to avoid
+    unnecessary namespace pollution in Pod::Parser.
+  - Renamed several methods and added another preprocessing method in
+    Parser.pm.
+  - Pod::Parser now keeps track of the current line and paragraph number
+    and the current input and output file names.
+  - Fixed parse_from_filehandle() to recognize a line matching /^\s+$/ as a
+    paragraph terminator.
+  - Included Pod::Usage and Pod::Text as part of the PodParser distribution
+    rather then packing and releasing each module separately.
+  - Removed pod2text.PL and added pod2usage.PL
+
+
+ 07-Aug-1996           Brad Appleton                   <bradapp@enteract.com>
+ -----------------------------------------------------------------------------
+ Initial release of version 0.01 to garner some feedback. This release was
+ actually three separate "initial" releases of Pod::Parser, Pod::Text, and
+ Pod::Usage which were originally named Pod::Filter, Pod::PlainText, and
+ Pod::Usage (respectively).
+
+

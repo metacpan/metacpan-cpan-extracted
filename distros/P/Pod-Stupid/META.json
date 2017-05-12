@@ -1,0 +1,81 @@
+{
+   "abstract" : "The simplest, stupidest 'pod parser' possible",
+   "author" : [
+      "Stephen R. Scaffidi <sscaffidi@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Stupid",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Data::Dumper" : 0,
+            "English" : 0,
+            "Scalar::Util" : 0,
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Basename" : 0,
+            "File::Slurp" : 0,
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Pod::Stupid" : {
+         "file" : "lib/Pod/Stupid.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-pod-stupid at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Stupid"
+      },
+      "homepage" : "http://github.com/Hercynium/Pod-Stupid/tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Hercynium/Pod-Stupid.git",
+         "web" : "http://github.com/Hercynium/Pod-Stupid/tree"
+      }
+   },
+   "version" : "0.005",
+   "x_BuiltWith" : {
+      "modules" : {
+         "Carp" : "1.11",
+         "Data::Dumper" : "2.126",
+         "English" : "1.04",
+         "ExtUtils::MakeMaker" : "6.56",
+         "File::Basename" : "2.77",
+         "File::Slurp" : "9999.13",
+         "Module::Build" : "0.3607",
+         "Scalar::Util" : "1.23",
+         "Test::More" : "0.96"
+      },
+      "perl" : "5.010001",
+      "platform" : "linux"
+   }
+}
+

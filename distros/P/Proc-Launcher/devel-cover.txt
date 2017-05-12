@@ -1,0 +1,50 @@
+Deleting database /export/home/wu/projects/Proc-Launcher/Proc-Launcher-0.0.25/cover_db
+cp lib/Proc/Launcher/Manager.pm blib/lib/Proc/Launcher/Manager.pm
+cp lib/Proc/Launcher/Roles/Launchable.pm blib/lib/Proc/Launcher/Roles/Launchable.pm
+cp lib/Proc/Launcher.pm blib/lib/Proc/Launcher.pm
+cp lib/Proc/Launcher/Supervisor.pm blib/lib/Proc/Launcher/Supervisor.pm
+cp bin/panctl blib/script/panctl
+/usr/local/bin/perl -MExtUtils::MY -e 'MY->fixin(shift)' -- blib/script/panctl
+PERL_DL_NONLAZY=1 /usr/local/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+t/00.load.t ....................... ok
+t/10_launcher_sleeper.t ........... ok
+t/10_launcher_sleeper_class.t ..... ok
+t/15_launcher_cleanexit.t ......... ok
+t/15_launcher_errorexit.t ......... ok
+t/20_launcher_stubborn.t .......... ok
+t/25_launcher_exec.t .............. ok
+t/30_restart.t .................... ok
+t/40_launcher_class.t ............. ok
+t/40_launcher_class_context.t ..... ok
+t/50_launch_manager.t ............. ok
+t/51_launch_manager_noregister.t .. ok
+t/52_launch_tail.t ................ ok
+t/60_disable_enable.t ............. ok
+t/70_pidfile.t .................... ok
+t/80_launcher_locking.t ........... ok
+t/90_launcher_named_pipe.t ........ ok
+t/critic.t ........................ ok
+t/kwalitee.t ...................... ok
+t/meta.t .......................... ok
+t/no_tabs.t ....................... ok
+t/release-pod-coverage.t .......... ok
+t/release-pod-syntax.t ............ ok
+All tests successful.
+Files=23, Tests=168, 114 wallclock secs ( 0.41 usr  0.38 sys + 52.52 cusr  7.03 csys = 60.34 CPU)
+Result: PASS
+Reading database from /export/home/wu/projects/Proc-Launcher/Proc-Launcher-0.0.25/cover_db
+
+
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+File                           stmt   bran   cond    sub    pod   time  total
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+blib/lib/Proc/Launcher.pm      88.0   68.2    n/a   95.8  100.0   52.2   83.6
+.../Proc/Launcher/Manager.pm   97.4   72.2   33.3  100.0  100.0   47.8   94.0
+...ncher/Roles/Launchable.pm  100.0    n/a    n/a  100.0    n/a    0.0  100.0
+...oc/Launcher/Supervisor.pm   70.6    n/a    n/a   80.0  100.0    0.0   73.9
+Total                          90.8   68.9   33.3   96.3  100.0  100.0   87.1
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+
+Writing HTML output to /export/home/wu/projects/Proc-Launcher/Proc-Launcher-0.0.25/cover_db/coverage.html ...
+done.

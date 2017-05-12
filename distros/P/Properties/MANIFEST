@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Properties.t
+t/props
+t/neq_props
+lib/Properties.pm
+META.yml                                 Module meta-data (added by MakeMaker)

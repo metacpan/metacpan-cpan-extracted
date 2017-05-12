@@ -1,0 +1,48 @@
+# Chinese translations for PACKAGE package.
+# Copyright (C) 2009 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Matthew Lien <BlueT@bluet.org>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-CSS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-18 23:57+0800\n"
+"PO-Revision-Date: 2009-05-18 23:57+0800\n"
+"Last-Translator: BlueT - Matthew Lien - 練喆明 <BlueT@bluet.org>\n"
+"Language-Team: Chinese (traditional) <bluet@ubuntu-tw.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/CSS.pm:25
+msgid "CSS Minifier"
+msgstr "CSS 縮減"
+
+#: lib/Padre/Plugin/CSS.pm:26
+msgid "Validate CSS"
+msgstr "驗證 CSS"
+
+#: lib/Padre/Plugin/CSS.pm:38
+msgid "No Code"
+msgstr "沒有程式碼"
+
+#: lib/Padre/Plugin/CSS.pm:38
+msgid "Error"
+msgstr "錯誤"
+
+#: lib/Padre/Plugin/CSS.pm:47
+msgid "CSS is valid\n"
+msgstr "CSS 合法\n"
+
+#: lib/Padre/Plugin/CSS.pm:49
+msgid "CSS is not valid\n"
+msgstr "CSS 不合法\n"
+
+#: lib/Padre/Plugin/CSS.pm:50
+msgid "Errors:\n"
+msgstr "錯誤:\n"
+
+#: lib/Padre/Plugin/CSS.pm:60
+msgid "Failed to validate the code\n"
+msgstr "驗證失敗\n"

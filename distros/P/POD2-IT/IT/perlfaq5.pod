@@ -1,0 +1,1194 @@
+=head1 NOME
+
+perlfaq5 - File e Formati ($Revision: 1.25 $, $Date: 2008/03/31 21:14:13 $)
+
+=head1 DESCRIZIONE
+
+Questa sezione tratta l'I/O e tutto ciE<ograve> che inizia per "f": filehandle,
+flushing, formati, e footer.
+
+=head2 Come faccio a terminare le operazioni di I/O in corso o a privare del buffer un filehandle di output? PerchE<eacute> devo fare questo?
+X<flush> X<buffer> X<unbuffer> X<autoflush>
+
+Il Perl non supporta esattamente l'output privo di buffer (salvo nel caso
+in cui possiate eseguire C<syswrite(OUT, $char, 1)>) benchE<eacute> supporti
+il "command buffering" [utilizzo del buffer a comando, NdT], nel quale una
+scrittura fisica viene eseguita dopo ogni comando di output.
+
+La libreria standard di I/O del C (stdio) di solito utilizza il buffer per i
+caratteri inviati alle periferiche cosicchE<eacute> non ci sia una chiamata
+di sistema per ogni byte. In molte implementazioni di stdio, il tipo di
+output con buffer e la dimensione del buffer variano a seconda del tipo
+di periferica. Le funzioni Perl print() e write() di solito hanno l'output
+con buffer, mentre syswrite() evita del tutto l'uso del buffer.
+
+Se volete che il vostro output venga immediatamente inviato quando eseguite
+print() o write() (per esempio, per alcuni protocolli di rete), dovete
+settare il flag di terminazione automatica delle operazioni di I/O in corso
+dell'handle. Questo flag E<egrave> costituito dalla variabile Perl $| 
+e quando viene impostata ad un valore vero, il Perl svuoterE<agrave> il buffer 
+dell'handle dopo ogni print() o write(). Impostare $| influenza l'uso del buffer 
+solo per il filehandle di default attualmente selezionato. Scegliete questo
+handle con la chiamata select() ad un argomento (vedete L<perlvar/$|>
+e L<perlfunc/select>).
+
+Usate select() per scegliere l'handle desiderato, poi impostate le sue
+variabili per filehandle.
+
+    $vecchio_fh = select(OUTPUT_HANDLE);
+    $| = 1;
+    select($vecchio_fh);
+
+Alcune espressioni idiomatiche possono gestirlo in una singola istruzione:
+
+    select((select(OUTPUT_HANDLE), $| = 1)[0]);
+    $| = 1, select $_ for select OUTPUT_HANDLE;
+
+Alcuni moduli offrono un accesso orientato agli oggetti agli handle e alle
+loro variabili, sebbene possa essere eccessivo se questa E<egrave> l'unica
+cosa per cui li usate. Potete usare IO::Handle:
+
+    use IO::Handle;
+    open(DEV, ">/dev/printer");   # ma E<egrave> questa?
+    DEV->autoflush(1);
+
+oppure IO::Socket:
+
+    use IO::Socket;          # questa E<egrave> tipo una pipe?
+    my $sock = IO::Socket::INET->new( 'www.esempio.com:80' );
+    $sock->autoflush();
+
+=head2 Come si cambia una riga di un file/cancella una riga di un file/inserisce una riga nel mezzo di un file/aggiunge all'inizio di un file?
+X<file, editing>
+
+Usate il modulo Tie::File, che E<egrave> incluso nella distribuzione
+standard fin dal Perl 5.8.0.
+
+=head2 Come si conta il numero di righe di un file?
+X<file, contare righe> X<righe> X<riga>
+
+Un modo efficente ed elegante E<egrave> quello di contare i caratteri di
+ritorno a capo nel file. Il seguente programma usa una caratteristica di
+tr///, come viene documentata in L<perlop>. Se le righe del vostro file di
+testo non terminano con il ritorno a capo, il file non E<egrave>
+propriamente un file di testo, quindi il programma potrebbe restiruire
+meno righe di quello che vi aspettereste.
+
+    $linee = 0;
+    open(FILE, $nomefile) or die "Non posso aprire '$nomefile': $!";
+    while(sysread FILE, $buffer, 4096) {
+        $linee += ($buffer =~ tr/\n//);
+    }
+    close FILE;
+
+Questo presuppone che non si facciano giochetti con l'uso di tr sul ritorno
+a capo.
+
+=head2 Come posso usare l'opzione del Perl C<-i> dall'interno di un programma?
+X<-i> X<in-place>
+
+C<-i> imposta il valore della variabile Perl C<$^I>, che a sua volta influisce 
+sul comportamento di C<< <> >>; consultate L<perlrun> per maggiori dettagli.
+Modificando direttamente le variabili appropriate, potete ottenere lo stesso comportamento 
+all'interno di un grosso programma. Per esempio:
+
+     # ...
+     {
+        local($^I, @ARGV) = ('.orig', glob("*.c"));
+        while (<>) {
+           if ($. == 1) {
+               print "Questa linea dovrebbe apparire in cima ad ogni file\n";
+           }
+           s/\b(p)earl\b/${1}erl/i;        # Corretto un errore di battitura, mantiene le maiuscole/minuscole
+           print;
+           close ARGV if eof;              # Reimposta $.
+        }
+     }
+     # $^I e @ARGV qua ritornano ai loro vecchi valori
+
+Questo blocco modifica tutti i file C<.c> nella directory corrente, 
+lasciando una copia del dato originale da qualunque file in un nuovo 
+file C<.c.orig>.
+
+=head2 Come posso copiare un file?
+X<copy> X<file, copy>
+
+(contributo di brian d foy)
+
+Usate il modulo File::Copy. E<Egrave> disponibile con il Perl e puE<ograve> 
+fare una copia effettiva attraverso i filesystem e fa la sua magia in maniera 
+portabile.
+
+	use File::Copy;
+
+	copy( $originale, $nuova_copia ) or die "Copia fallita: $!";
+
+Se non potete usare File::Copy, dovrete farlo voi stessi: aprire 
+il file originale, aprire il file di destinazione, poi scrivere 
+sul file di destinazione quello che avete letto nell'originale.
+
+=head2 Come si crea un file temporaneo?
+X<file, temporaneo>
+
+Se non vi serve conoscere il nome del file, potete usare C<open()> con 
+C<undef> al posto del nome del file. La funzione C<open()> crea un file 
+temporaneo anonimo.
+
+	open my $tmp, '+>', undef or die $!;
+	
+Altrimenti, potete usare il modulo File::Temp.
+
+  use File::Temp qw/ filetemp dirtemp /;
+
+  $dir = dirtemp( CLEANUP => 1 );
+  ($fh, $nomefile) = filetemp( DIR => $dir );
+
+  # oppure, se non avete bisogno del nome del file
+
+  $fh = filetemp( DIR => $dir );
+
+File::Temp E<egrave> un modulo standard fin dal Perl 5.6.1. Se avete 
+installato un Perl abbastanza recente, usate il metodo di classe
+C<new_tempfile> dal modulo IO::File per ottenere un file aperto in
+lettura e scrittura. Usate quanto segue se non avete la necessitE<agrave> 
+di sapere il nome del file:
+
+    use IO::File;
+    $fh = IO::File->new_tmpfile()
+        or die "Impossibile creare un nuovo file temporaneo: $!";
+
+Se siete costretti a creare un file temporaneo a mano, usate l'ID
+del processo e/o il valore dell'ora corrente. Se avete bisogno di
+piE<ugrave> file temporanei in un unico processo, usate un contatore:
+
+    BEGIN {
+        use Fcntl;
+        my $dir_temp = -d '/tmp' ? '/tmp' : $ENV{TMPDIR} || $ENV{TEMP};
+        my $nome_base = sprintf("%s/%d-%d-0000", $dir_temp, $$, time());
+        sub file_temp {
+            local *FH;
+            my $conta = 0;
+            until (defined(fileno(FH)) || $conta ++ > 100) {
+                $nome_base =~ s/-(\d+)$/"-" . (1 + $1)/e;
+                # O_EXCL e` richiesto per ragioni di sicurezza. 
+                sysopen(FH, $nome_base, O_WRONLY|O_EXCL|O_CREAT);
+            }
+            if (defined(fileno(FH))) {
+                return (*FH, $nome_base);
+            } else {
+                return ();
+            }
+        }
+    }
+
+=head2 Come posso manipolare file contenenti record a lunghezza fissa?
+X<lunghezza fissa> X<file, record a lunghezza fissa>
+
+Il modo piE<ugrave> efficiente E<egrave> usare pack() e unpack(). E<Egrave>
+piE<ugrave> veloce rispetto all'uso di substr() quando si ricevono molte,
+molte stringhe. E<Egrave> piE<ugrave> lento se se ne ricevono poche.
+
+Ecco un pezzo di codice d'esempio per dividere in pezzi e poi rimettere
+insieme alcune linee di input in formato fisso, in questo caso dall'output
+di un normale ps stile Berkeley:
+
+    # esempio di linea in input
+    #   15158 p5  T      0:00 perl /home/larsen/script/
+    my $PS_T = 'A6 A4 A7 A5 A*';
+    open my $ps, '-|', 'ps';
+    print scalar <$ps>;
+    my @campi = qw( pid tt stat time command );
+    while (<$ps>) {
+        my %processo;
+        @processo{@campi} = unpack($PS_T, $_);
+	for my $campo ( @campi ) {
+	    print "$campo: <$processo{$campo}>\n";
+	}
+	print 'line=', pack($PS_T, @processo{@campi} ), "\n";
+    }
+
+Abbiamo usato uno hash slice in maniera da manipolare facilmente i campi di ogni 
+riga. Immagazzinare le chiavi in un array significa che E<egrave> facile operarvi 
+come gruppo oppure interarvi con un for. Evita anche di inquinare il programma con 
+variabili globali e l'utilizzo di riferimenti simbolici.
+
+=head2 Come posso rendere un filehandle locale ad una subroutine? Come faccio a passare filehandle tra subroutine? Come faccio a creare un array di filehandle?
+X<filehandle, locale> X<filehandle, passare> X<filehandle, riferimento>
+
+Con la versione 5.6 di perl, open() crea automaticamente handle per file e
+directory sotto forma di riferimenti se gli viene passata una variabile
+scalare non inizializzata. Potete poi passare tali riferimenti come qualunque
+altro scalare, e usarli al posto degli handle dotati di nome.
+
+	open my    $fh, $nome_file;
+
+	open local $fh, $nome_file;
+
+	print $fh "Salve Mondo!\n";
+
+	processa_file( $fh );
+
+Prima della versione 5.6, dovevate avere a che fare con vari idiomi che
+usavano i typeglob e che potete vedere nel codice meno recente.
+
+	open FILE, "> $nomefile";
+	processa_typeglob(   *FILE );
+	processa_riferimento( \*FILE );
+
+	sub processa_typeglob    { local *FH = shift; print FH  "Typeglob!" }
+	sub processa_riferimento { local $fh = shift; print $fh "Riferimento!" }
+
+Se volete creare molti handle anonimi, dovreste controllare i moduli Symbol
+e IO::Handle.
+
+=head2 Come posso utilizzare un filehandle in maniera indiretta?
+X<filehandle, indiretta>
+
+Utilizzare un filehandle in maniera indiretta significa usare qualcosa di
+diverso da un simbolo in un luogo dove E<egrave> richiesto un filehandle
+Di seguito sono riportati alcuni modi per ottenere un filehandle indiretto:
+
+    $fh =   UN_FH;       # parola senza virgolette; e` ostile a strict subs
+    $fh =  "UN_FH";      # e` ostile a strict-refs; solo nello stesso package
+    $fh =  *UN_FH;       # typeglob
+    $fh = \*UN_FH;       # reference ad un typeglob (bless-abile)
+    $fh =  *UN_FH{IO};   # IO::Handle blessed dal typeglob *UN_FH
+
+Oppure potete servirvi del metodo C<new> da uno dei moduli IO::* per creare
+un filehandle anonimo, memorizzarlo in una variabile scalare, ed utilizzarlo
+come se fosse un normale filehandle.
+
+    use IO::Handle;                     # 5.004 o superiore
+    $fh = IO::Handle->new();
+
+Usate poi uno di quelli come fareste con un normale filehandle. Ovunque
+Perl si aspetti un filehandle, al suo posto puE<ograve> essere utilizzato
+un filehanle indiretto. Un filehandle indiretto E<egrave> semplicemente
+una variabile scalare che contiene un filehandle. Funzioni quali C<print>,
+C<open>, C<seek>, o l'operatore C<< <FH> >> accetteranno sia un filehandle
+vero e proprio che una variabile scalare che ne contenga uno:
+
+    ($ifh, $ofh, $efh) = (*STDIN, *STDOUT, *STDERR);
+    print $ofh "Scrivilo: ";
+    $ottenuto = <$ifh>;
+    print $efh "Cos'era quello: $ottenuto";
+
+Se state passando un filehandle ad una funzione, potete scrivere tale
+funzione in due modi:
+
+    sub accetta_fh {
+        my $fh = shift;
+        print $fh "Sto inviando ad un filehandle indiretto\n";
+    }
+
+Oppure potete localizzare un typeglob ed utilizzare direttamente il filehandle:
+
+    sub accetta_fh {
+        local *FH = shift;
+        print  FH "Sto inviando ad un filehandle localizzato\n";
+    }
+
+Entrambi gli stili funzionano sia con oggetti che con typeglob che con
+filehandle reali. (Potrebbero anche funzionare con stringhe in alcune
+circostanze, ma la cosa E<egrave> rischiosa.)
+
+    accept_fh(*STDOUT);
+    accept_fh($handle);
+
+Negli esempi sopra riportati, abbiamo assegnato il filehandle ad una variabile
+scalare prima di utilizzarlo. CiE<ograve> accade perchE<eacute> solo le
+semplici variabili scalari, e non espressioni o elementi di hash oppure
+array, possono essere usati con le funzioni integrate come C<print> e
+C<printf>, o con l'operatore diamante [<FH>, NdT]. L'utilizzo di qualcosa
+di diverso da una semplice variabile scalare come filehandle non E<egrave>
+consentito, ed il programma non compilerE<agrave> nemmeno:
+
+    @fd = (*STDIN, *STDOUT, *STDERR);
+    print $fd[1] "Scrivilo: ";                          # ERRATO
+    $ottenuto = <$fd[0]>;                               # ERRATO
+    print $fd[2] "Cos'era quello: $ottenuto";           # ERRATO
+
+Con C<print> e C<printf> potete aggirare ciE<ograve> servendovi di un blocco
+ed un'espressione al posto del filehandle:
+
+    print  { $fd[1] } "cose carine\n";
+    printf { $fd[1] } "Peccato per la povera %x.\n", 3_735_928_559;
+    # Peccato per la povera deadbeef. [convenzionalmente, uno schema esadecimale utilizzato per riempire parole di memoria, NdT]
+
+Questo blocco E<egrave> un blocco valido come qualsiasi altro, quindi potete
+inserire codice piE<ugrave> complesso al suo interno. Il codice di seguito
+riportato invia il messaggio in uno dei due posti:
+
+    $ok = -x "/bin/cat";
+    print { $ok ? $fd[1] : $fd[2] } "cat stat $ok\n";
+    print { $fd[ 1+ ($ok || 0) ]  } "cat stat $ok\n";
+
+Questo approccio, consistente nel trattare C<print> e C<printf> come chiamate
+a metodi di un oggetto, non funziona con l'operatore diamante. CiE<ograve>
+accade perchE<eacute> esso E<egrave> un vero operatore, non solo una funzione
+con argomenti non separati da virgola. Ponendo che abbiate memorizzato i
+tyeglob nella vostra struttura come indicato in precedenza, potete utilizzare
+la funzione integrata C<readline> per leggere un record allo stesso modo
+in cui fa C<< <> >>. Posta l'inizializzazione indicata prima per @fd,
+ciE<ograve> dovrebbe funzionare, ma solo perchE<eacute> readline() richiede
+un typeglob. Non funziona con oggetti o stringhe, il che potrebbe essere un
+bug che non abbiamo ancora corretto.
+
+    $ottenuto = readline($fd[0]);
+
+Va notato che la debolezza dei filehandle indiretti non E<egrave> collegata
+al fatto che essi siano stringhe, typeglob, oggetti, o qualsiasi altra cosa.
+E<egrave> la sintassi degli operatori fondamentali. Il gioco degli oggetti
+non vi E<egrave> di alcun aiuto qui.
+
+=head2 Come posso impostare un formato di fine pagina da utilizzare con write()?
+X<footer>
+
+Non c'E<egrave> un modo predefinito per fare ciE<ograve>, ma L<perlform>
+contiene un paio di tecniche che rendono la cosa possibile all'hacker
+intrepido.
+
+=head2 Come posso scrivere su una stringa con write()?
+X<write, su una stringa>
+
+Per una funzione swrite(), consultate L<perlform/"Accessing Formatting
+Internals">.
+
+=head2 Come posso mostrare dei numeri con l'aggiunta delle virgole?
+X<number, commify>
+
+(contributo di brian d foy e Benjamin Goldberg)
+
+[a differenza dell'Italia, nei paesi anglosassoni, il separatore delle
+migliaia E<egrave> la virgola mentre quello dei decimali E<egrave> il
+punto, NdT]
+
+Potete utilizzare L<Number::Format> per separare il numero in porzioni piE<ugrave> piccole. 
+Gestisce correttamente il locale, per quelli fra voi che vogliano inserire dei punti 
+(o qualsiasi altra cosa vi chiedano di usare, veramente).
+
+Questa subroutine aggiungerE<agrave> le virgole al vostro numero:
+
+	sub virgolante {
+	   local $_  = shift;
+	   1 while s/^([-+]?\d+)(\d{3})/$1,$2/;
+	   return $_;
+	   }
+
+Questa espressione regolare di Benjamin Goldberg, aggiungerE<agrave> virgole ai numeri:
+
+    s/(^[-+]?\d+?(?=(?>(?:\d{3})+)(?!\d))|\G\d{3}(?=\d))/$1,/g;
+
+E<Egrave> piE<ugrave> semplice vederla con i commenti:
+
+    s/(
+        ^[-+]?            # l'inizio del numero.
+        \d+?              # la prima cifra prima della prima virgola
+        (?=               # seguita da, (ma non incluso nel match):
+           (?>(?:\d{3})+) # alcuni multipli positivi di tre cifre.
+           (?!\d)         # un multiplo *esatto*, non x * 3 + 1 o quant'altro.
+        )
+       |                  # oppure:
+        \G\d{3}           # dopo l'ultimo gruppo, prendi 3 cifre
+        (?=\d)            # ma devono avere altre cifre dopo di loro.
+    )/$1,/xg;
+
+=head2 Come posso tradurre le tilde (~) nel nome di un file?
+X<tilde> X<tilde espansione>
+
+Utilizzate l'operatore (glob()) <>, documentato in L<perlfunc>. Le vecchie
+versioni di Perl richiedono che abbiate installato una shell che espande
+le tilde. Le versioni piE<ugrave> recenti di Perl contengono direttamente questa
+caratteristica al loro interno. Il modulo File::KGlob (disponibile da CPAN)
+offre una funzionalitE<agrave> di glob piE<ugrave> portabile.
+
+All'interno di Perl, potete utilizzare direttamente questo codice:
+
+	$nomefile =~ s{
+	  ^ ~             # trova una tilde ad inizio stringa
+	  (               # salva in $1
+	      [^/]        # un carattere diverso da slash
+	            *     # ripetuto una o piu` volte (0 significa se stessi)
+	  )
+	}{
+	  $1
+	      ? (getpwnam($1))[7]
+	      : ( $ENV{HOME} || $ENV{LOGDIR} )
+	}ex;
+
+=head2 Come mai quando apro un file in lettura e scrittura il suo contenuto viene eliminato?
+X<clobber> X<lettura-scrittura> X<clobbering> X<truncate> X<truncating>
+
+PerchE<eacute> state utilizzando qualcosa di simile a quanto di seguito
+indicato, che tronca il file e I<poi> vi consente l'accesso ad esso in
+lettura e scrittura:
+
+    open(FH, "+> /percorso/nome");	# SBAGLIATO (quasi sempre)
+
+Ops. Dovete invece utilizzare questo, che causerE<agrave> un errore se
+il file non esiste.
+
+   open(FH, "+< /percorso/nome");  	# apre per aggiornare
+
+L'utilizzo di ">" cancella il contenuto in ogni caso, o crea il file.
+L'utilizzo di "<" non fa mai nessuna delle due cose. Il "+" non cambia
+questo comportamento.
+
+Di seguito sono riportati degli esempi di vari tipi di apertura di file.
+Quelli che utilizzano sysopen() presuppongono:
+
+    use Fcntl;
+
+Per aprire un file in lettura:
+
+    open(FH, "< $percorso")                                || die $!;
+    sysopen(FH, $percorso, O_RDONLY)                       || die $!;
+
+Per aprire un file in scrittura, creando se necessario il nuovo file
+oppure troncando quello vecchio:
+
+    open(FH, "> $percorso") || die $!;
+    sysopen(FH, $percorso, O_WRONLY|O_TRUNC|O_CREAT)       || die $!;
+    sysopen(FH, $percorso, O_WRONLY|O_TRUNC|O_CREAT, 0666) || die $!;
+
+Per aprire un file in scrittura, creando un nuovo file che non deve
+giE<agrave> esistere:
+
+    sysopen(FH, $percorso, O_WRONLY|O_EXCL|O_CREAT)         || die $!;
+    sysopen(FH, $percorso, O_WRONLY|O_EXCL|O_CREAT, 0666)   || die $!;
+
+Per aprire un file per aggiungere dati, creandolo se necessario:
+
+    open(FH, ">> $percorso") || die $!;
+    sysopen(FH, $percorso, O_WRONLY|O_APPEND|O_CREAT)       || die $!;
+    sysopen(FH, $percorso, O_WRONLY|O_APPEND|O_CREAT, 0666) || die $!;
+
+Per aprire un file, che deve giE<agrave> esistere, per aggiungere dati:
+
+    sysopen(FH, $percorso, O_WRONLY|O_APPEND)                || die $!;
+
+Per aprire un file, che deve giE<agrave> esistere, per aggiornarlo:
+
+    open(FH, "+< $percorso")                                 || die $!;
+    sysopen(FH, $percorso, O_RDWR)                           || die $!;
+
+Per aprire un file per aggiornarlo, creandolo se necessario:
+
+    sysopen(FH, $percorso, O_RDWR|O_CREAT)                   || die $!;
+    sysopen(FH, $percorso, O_RDWR|O_CREAT, 0666)             || die $!;
+
+Per aprire un file, che non deve giE<agrave> esistere, per aggiornarlo:
+
+    sysopen(FH, $percorso, O_RDWR|O_EXCL|O_CREAT)           || die $!;
+    sysopen(FH, $percorso, O_RDWR|O_EXCL|O_CREAT, 0666)     || die $!;
+
+Per aprire un file senza bloccare, creandolo se necessario:
+
+    sysopen(FH, "/tmp/unfile", O_WRONLY|O_NDELAY|O_CREAT)
+	    or die "non riesco ad aprire /tmp/unfile: $!":
+
+Sappiate che nE<eacute> la creazione nE<eacute> la cancellazione dei file
+sono garantite essere operazioni atomiche quando si lavora su NFS. Due
+processi potrebbero infatti creare o cancellare lo stesso file con successo!
+Dunque O_EXCL non E<egrave> cosE<igrave> esclusivo come potreste volere.
+
+Consultate anche anche il nuovo L<perlopentut> se ne siete in possesso
+(nuovo nella versione 5.6).
+
+=head2 Come mai a volte ottengo un "Argument list too long" [lista degli argomenti troppo lunga, NdT] quando uso E<lt>*E<gt>?
+X<argument list too long>
+
+L'operatore C<< <> >> effettua un'operazione di globbing [espansione degli 
+argomenti, NdT] (guardate sopra). Nelle versioni di Perl precedenti alla
+5.6.0, l'operatore interno glob() effettua un fork di csh(1) per compiere
+la reale espansione degli argomenti, ma csh non puE<ograve> gestire
+piE<ugrave> di 127 elementi e quindi ritorna il messaggio di errore
+C<Argument list too long>. Chi ha installato tcsh al posto di csh non
+soffre di questo problema, ma gli utenti potrebbero essere sorpresi di
+ciE<ograve>.
+
+Per aggirare questo problema, aggiornate a Perl v5.6.0 o successivo, oppure
+effettuate voi stessi l'espansione con readdir() e le espressioni regolari,
+oppure servitevi di un modulo come File::KGlob, che non usa la shell per
+effettuare l'espansione.
+
+=head2 C'E<egrave> un bug/leak [perdita di memoria, NdT] in glob()?
+X<glob>
+
+A causa dell'attuale implementazione su alcuni sistemi operativi, quando
+utilizzate in contesto scalare la funzione glob() o il suo alias costituito
+dalle parentesi angolari, potreste causare una perdita di memoria e/o un
+comportamento imprevedibile. E<Egrave> dunque meglio utilizzare glob()
+solamente in contesto di lista.
+
+=head2 Come posso aprire un file contenente un ">" all'inizio o degli spazi alla fine?
+X<filename, caratteri speciali>
+
+(contributo di Brian McCauley)
+
+La speciale forma a due argomenti della funzione open() del Perl 
+ignora gli spazi posti alla fine dei nomi dei file, ed
+interpreta in maniera speciale alcuni caratteri posti all'inizio (oppure
+un "|" posto alla fine). Nelle vecchie versioni di Perl questa era la sola
+versione di open() e dunque essa E<egrave> assai comune in codice e libri datati.
+
+A meno di non aver un particolare motivo per usare la forma a due argomenti,
+dovreste usare la forma di open() a tre argomenti che non tratta alcun
+carattere nel filename come speciale.
+
+	open FILE, "<", "  file  ";  # il nome del file e` "   file   "
+	open FILE, ">", ">file";     # il nome del file e` ">file"
+
+=head2 Come posso rinominare in modo efficace un file?
+X<rename> X<mv> X<move> X<file, rename> X<ren>
+
+Se il vostro sistema operativo supporta una valida utility mv(1) oppure
+il suo equivalente funzionale, quanto segue funziona:
+
+    rename($vecchio, $nuovo) or system("mv", $vecchio, $nuovo);
+
+PuE<ograve> risultare piE<ugrave> portabile l'utilizzo del modulo File::Copy.
+Copiate semplicemente il nuovo file con il nuovo nome (controllando i valori
+di ritorno), e poi cancellate quello vecchio. Semanticamente, ciE<ograve>
+non E<egrave> equivalente all'utilizzo di rename(), che preserva
+metainformazioni quali permessi, dati, informazioni sull'inode, ecc.
+
+Le nuove versioni di File::Copy esportano una funzione move().
+
+=head2 Come si puE<ograve> fare il lock di un file?
+X<lock> X<file, lock> X<flock>
+
+La funzione integrata in Perl, flock() (vedete L<perlfunc> per i dettagli),
+chiamerE<agrave> flock(2) se esiste, fcntl(2) se non esiste (sulle versioni
+perl 5.004 e successive) e lockf(3) se non esiste nessuna delle due
+precedenti chiamate di sistema. Su alcuni sistemi, potrebbe anche usare
+una differente forma di locking nativo. Ecco alcune cose da sapere sul
+flock() del Perl:
+
+=over 4
+
+=item 1
+
+Produce un errore fatale se non esiste alcuna delle tre chiamate di sistema
+(o loro strette equivalenti).
+
+=item 2
+
+lockf(3) non prevede il locking condiviso e richiede che il filehandle sia
+aperto per la scrittura (o per l'append, o per la lettura/scrittura).
+
+=item 3
+
+Alcune versioni di flock() non possono fare il lock di file in rete (ad
+esempio su file system NFS) dunque si dovrebbe forzare l'uso di fcntl(2)
+quando si fa il build del Perl. Ma persino questo E<egrave> dubbio, nel
+migliore dei casi. Vedete la voce flock in L<perlfunc> e il file F<INSTALL>
+nella distribuzione sorgente per le informazioni su come fare il build del
+Perl per farlo.
+
+Due sematiche di flock potenzialmente non ovvie ma tradizionali, sono il
+fatto che esso aspetta indefinitamente fino a che il lock non venga assegnato
+e che i suoi lock siano I<soltanto consultivi>. Tali lock discrezionali
+sono piE<ugrave> flessibili, ma offrono poche garanzie. Questo significa
+che i file su cui E<egrave> stato fatto un lock con flock() possono essere
+modificati anche da programmi che non usano flock(). Le automobili che si
+fermano con il semaforo rosso vanno d'accordo tra loro ma non con le
+automobili che non si fermano con il semaforo rosso. Per i dettagli vedete
+perlport, la specifica documentazione del vostro port oppure le vostre
+manpage locali, specifiche per il sistema. E<Egrave> meglio che si assuma
+un comportamento tradizionale se si stanno scrivendo programmi portabili
+(Se non lo si sta facendo, ci si dovrebbe sentire, come sempre, perfettamente
+liberi di scriversi le proprie idiosincrasie di sistema (a volte chiamate 
+"caratteristiche"). L'aderenza alle faccende di portabilitE<agrave> senza
+originalitE<agrave> non dovrebbe influenzare la maniera con cui portate a
+termine il vostro lavoro).
+
+Per maggiori informazioni sul lock dei file vedete anche
+L<perlopentut/"File Locking"> se ce l'avete (nuovo per il 5.6).
+
+=back
+
+=head2 PerchE<eacute> non si puE<ograve> fare solamente open(FH, ">file.lock")?
+X<lock, lockfile race condition>
+
+Una parte comune di codice B<DA NON USARE> E<egrave> questa:
+
+    sleep(3) while -e "file.lock";   # PER FAVORE NON SI USI
+    open(LCK, "> file.lock");        # QUESTO CODICE NON CORRETTO
+
+Questa E<egrave> una classica race condition: si impiegano due passi per
+fare qualcosa che deve essere fatto in uno. Questo E<egrave> il motivo
+per cui l'hardware dei computer fornisce una istruzione atomica di
+test-and-set. In teoria, questo "dovrebbe" funzionare:
+
+    sysopen(FH, "file.lock", O_WRONLY|O_EXCL|O_CREAT)
+        or die "non posso aprire  file.lock: $!":
+
+eccetto che, deplorevolmente, la creazione di file (e la cancellazione)
+non E<egrave> atomica su NFS, dunque questo non funzionerE<agrave> (non
+tutte le volte, almeno) in rete. Sono stati suggeriti vari schemi che
+coinvolgono link(), ma questi tendono a implicare del busy-wait, anch'esso
+poco desiderabile.
+
+=head2 Non riesco ancora ad ottenere il lock. Voglio solo incrementare un numero nel file. Come faccio?
+X<contatore> X<file, contatore>
+
+Non vi ha mai detto nessuno che i contatori di accesso sulle pagine web
+sono inutili? Non contano gli accessi reali, sono una perdita di tempo e
+servono solo ad alimentare la vanitE<agrave> di chi li utilizza. Meglio
+prendere un numero casuale. E<Egrave> piE<ugrave> realistico.
+
+Ad ogni modo, questo E<egrave> quello che potete fare se proprio non potete
+farne a meno:
+
+    use Fcntl qw(:DEFAULT :flock);
+    sysopen(FH, "numfile", O_RDWR|O_CREAT) 	 or die "impossibile aprire numfile: $!";
+    flock(FH, LOCK_EX) 				 or die "impossibile eseguire flock su numfile: $!";
+    $num = <FH> || 0;
+    seek(FH, 0, 0) 				 or die "impossibile tornare all'inizio di numfile: $!";
+    truncate(FH, 0) 				 or die "impossibile troncare numfile: $!";
+    (print FH $num+1, "\n")			 or die "impossibile scrivere numfile: $!";
+    close FH 					 or die "impossibile chiudere numfile: $!";
+
+Ecco un contatore di accessi alla pagina decisamente migliore :
+
+    $accessi = int( (time() - 850_000_000) / rand(1_000) );
+
+Se il numero di accessi non fa colpo sui vostri amici, potete provare ad
+impressionarli con il codice. :-)
+
+=head2 Tutto ciE<ograve> che voglio fare E<egrave> aggiungere un po' di testo alla fine di un file. Devo comunque usare i lock?
+X<append> X<file, append>
+
+Se vi trovate su un sistema che implementa correttamente flock() ed
+utilizzate il codice di esempio per aggiungere dati ad un file da
+"perldoc -f flock", andrE<agrave> tutto bene anche se il sistema operativo
+su cui siete non implementa l'aggiunta ai file in maniera corretta
+(ponendo che un tale sistema esista.) Dunque, se vi va bene limitarvi a
+sistemi operativi che implementano flock() (e non si tratta poi di una
+grande restrizione), allora quanto detto E<egrave> ciE<ograve> che dovete fare.
+
+Se sapete che utilizzerete solamente un sistema che implementa l'aggiunta
+ai file correttamente (ad es. non Win32), allora potete omettere seek()
+dal codice sopra indicato.
+
+Se sapete che state scrivendo codice che girerE<agrave> solamente su un
+sistema operativo e su un filesystem che implementano l'aggiunta ai file
+correttamente (ad esempio un filesystem locale su un moderno Unix), e
+tenete il file in modo block-buffered e scrivete una quantitE<agrave>
+inferiore alla grandezza di un buffer tra ogni flush [completamento
+delle operaziono di I/O, NdT] manuale, allora ciascun contenuto del buffer
+E<egrave> garantito che verrE<agrave> scritto alla fine del file in una volta sola,
+senza che l'output di qualcun altro possa interferire. Potete anche
+utilizzare la funzione syswrite(), che altro non E<egrave> che un wrapper
+attorno alla chiamata di sistema write() del vostro sistema.
+
+Teoreticamente, rimane comunque una piccola possibilitE<agrave> che un
+segnale interrompa l'operazione di write() a livello di sistema prima che
+essa sia completata. C'E<egrave> anche la possibilitE<agrave> che alcune
+implementazioni di STDIO chiamino piE<ugrave> di una write() a livello di
+sistema anche se il buffer iniziale era vuoto. Ci potrebbero essere alcuni
+sistemi dove questa probabilitE<agrave> E<egrave> ridotta a zero.
+
+=head2 Come modifico, accedendovi in maniera casuale, un file binario?
+X<file, binary patch>
+
+Se state semplicemente tentando di modificare una parte di un file binario,
+in molti casi qualcosa di semplice come ciE<ograve> che segue funziona:
+
+    perl -i -pe 's{window manager}{window mangler}g' /usr/bin/emacs
+
+Comunque, se i vostri record sono di lunghezza fissa, potreste preferire
+qualcosa di questo tipo:
+
+    $DIMREC = 220;  # dimensione del record, in byte
+    $numerc = 37;   # record da aggiornare
+    open(FH, "+<qualcosa") || die "non posso aggiornare qualcosa: $!";
+    seek(FH, $numrec * $DIMREC, 0);
+    read(FH, $numrec, $DIMREC) == $DIMREC || die "non posso leggere $numrec: $!";
+    # sovrascrivi questo record
+    seek(FH, -$DIMREC, 1);
+    print FH $record;
+    close FH;
+
+Il locking e la gestione degli errori sono lasciati come esercizi al
+lettore. Non dimenticatevene o ve ne pentirete.
+
+=head2 Come faccio ad ottenere il timestamp [1] di un file, in perl?
+X<timestamp> X<file, timestamp>
+
+Se volete sapere quando E<egrave> stata l'ultima volta in cui il file
+E<egrave> stato letto, scritto o ha subito una modifica dei suoi meta-dati
+(proprietario, ecc.), usate le operazioni di test dei file B<-A>, B<-M> o
+B<-C>, che sono documentate in L<perlfunc>. Esse recuperano l'etE<agrave>
+del file in giorni, espressa con un numero in virgola mobile (misurata dal
+momento di inizio del vostro programma). Alcune piattaforme potrebbero non
+disporre di queste informazioni. Consultate perlport per i dettagli. Per
+conoscere il tempo "nudo e crudo" sotto forma di secondi passati dal momento,
+dovreste chiamare la funzione stat, quindi usare localtime(), gmtime()
+oppure POSIX::strftime() per convertirlo in una forma leggibile da esseri
+umani. 
+
+Ecco un esempio:
+
+    $ultima_scrittura_in_secondi = (stat($file))[9];
+    printf "il file %s e` stato aggiornato il %s\n", $file,
+     scalar localtime($ultima_scrittura_in_secondi);
+
+Se preferite qualcosa di piE<ugrave> leggibile, usate il modulo File::stat
+(parte della distribuzione standard nelle versioni 5.004 e successive):
+
+    # il controllo degli errori e` lasciato al lettore come esercizio
+    use File::stat;
+    use Time::localtime;
+    $stringa_data = ctime(stat($file)->mtime);
+    print "il file $file e` stato aggiornato il $stringa_data\n";
+
+L'approccio di POSIX::strftime() ha il vantaggio di essere, in teoria,
+indipendente dalle impostazioni di locali correnti. Consultate L<perllocale>
+per dettagli.
+
+[1] Con il termine 'timestamp' si intende in generale l'orario di qualcosa:
+in questo caso, come viene spiegato nel testo della FAQ, l'orario di accesso,
+scrittura o modifica dei metadati, NdT
+
+=head2 Come si imposta il timestamp [1] di un file, in perl?
+X<timestamp> X<file, timestamp>
+
+Usate la funzione utime() documentata in L<perlfunc/utime>. A titolo di
+esempio, ecco un piccolo programma che copia gli istanti di lettura e
+scrittura dal suo primo argomento a tutti i restanti.
+
+    if (@ARGV < 2) {
+        die "usate: cptimes file_del_timestamp altri_file ...\n";
+    }
+    $timestamp = shift;
+    ($atime, $mtime) = (stat($timestamp))[8,9];
+    utime $atime, $mtime, @ARGV;
+
+Il controllo degli errori E<egrave>, al solito, lasciato come esercizio per
+il lettore.
+
+Per utime, perldoc ha anche un esempio che ha lo stesso effetto di touch(1) 
+sui che I<esistono giE<agrave>>.
+
+Alcuni filesystem hanno una limitata abilitE<agrave> di immagazzinare gli 
+istanti di un file al livello di precisione che ci si aspetta. Per esempio, 
+i filsystem FAT e HPFS non sono in grado di creare le date sui file con una 
+granularitE<agrave> piE<ugrave> fine di due secondi. Questa E<egrave> una 
+limitazione dei filesystem, non di utime().
+
+[1] Con il termine 'timestamp' si intende in generale l'orario di qualcosa:
+in questo caso, come viene spiegato nel testo della FAQ, l'orario di accesso,
+scrittura o modifica dei metadati, NdT
+
+=head2 Come faccio a stampare piE<ugrave> di un file alla volta?
+X<print, su molteplici file>
+
+Per connettere un filehandle a diversi filehandle di output, potete usare i
+moduli IO::Tee o Tie::FileHandle::Multiplex.
+
+Se dovete farlo una volta sola, potete stampare su ogni filehandle uno alla
+volta.
+
+    for $fh (FH1, FH2, FH3) { print $fh "qualsiasi cosa\n" }
+
+=head2 Come posso leggere un intero file tutto in una volta?
+X<slurp> X<file, slurping>
+
+Potete usare il modulo File::Slurp per fare questo in un solo passo.
+
+	use File::Slurp;
+
+	$tutto_quanto = read_file($nomefile); # l'intero file in uno scalare
+    	@tutte_le_linee = read_file($nomefile); # una linea per elemento
+
+L'approccio proprio del Perl per svolgere un'operazione su tutte le linee
+di un file, consiste nel farlo una linea alla volta:
+
+    open (INPUT, $file)     || die "non posso aprire $file: $!";
+    while (<INPUT>) {
+        chomp;
+        # fai qualcosa con $_
+    }
+    close(INPUT)            || die "non posso chiudere $file: $!";
+
+Questo E<egrave> tremendamente piE<ugrave> efficiente del leggere l'intero
+file in memoria come un array di linee e poi svolgere l'operazione su di esso
+un elemento alla volta, che E<egrave> spesso--se non quasi sempre--l'approccio
+sbagliato. Tutte le volte che vedete questo:
+
+    @linee = <INPUT>;
+
+dovreste pensare a lungo e accuratamente sul perchE<eacute> avete bisogno di
+avere tutto caricato in una volta. E<Egrave> semplicemente una soluzione
+non scalabile. Potreste anche trovare piE<ugrave> divertente l'uso del
+modulo standard Tie::File, o i binding $DB_RECNO del modulo DB_File, che
+vi permettono di legare un array ad un file in maniera tale che accedendo
+ad un elemento dell'array di fatto si acceda alla linea corrispondente
+nel file.
+
+Potete leggere l'intero contenuto del filehandle in uno scalare
+
+    {
+        local(*INPUT, $/);
+        open (INPUT, $file)     || die "non posso aprire $file: $!";
+        $variabile = <INPUT>;
+    }
+
+Quel codice rende temporaneamente indefinito il vostro separatore di record,
+e chiuderE<agrave> automaticamente il file all'uscita del blocco. Se il
+file E<egrave> giE<agrave> aperto, limitatevi ad usare questo:
+
+    $variabile = do { local $/; <INPUT> };
+
+Per i file ordinari potete inoltre usare la funzione read.
+
+    read( INPUT, $variabile, -s INPUT );
+
+Il terzo argomento verifica la dimensione in byte dei dati sul filehandle
+INPUT e legge quel numero di byte nel buffer $variabile.
+
+=head2 Come posso leggere un file per paragrafi?
+X<file, leggere per paragrafi>
+
+Usate la varaibile C<$/> (vedete L<perlvar> per i dettagli). Potete sia
+impostarla a C<""> per eliminare i paragrafi vuoti (C<"abc\n\n\n\ndef">,
+per esempio, viene trattato come se fossero due paragrafi e non tre),
+oppure a C<"\n\n"> per accettare paragrafi vuoti.
+
+Notate che una linea vuota non deve contenere spazi. Dunque
+S<C<"fred\n \nvariecose\n\n">> E<egrave> un paragrafo, ma C<"fred\n\nvariecose\n\n">
+sono due.
+
+=head2 Come posso leggere un singolo carattere da un file? E dalla tastiera?
+X<getc> X<file, leggere un singolo carattere alla volta>
+
+Per la maggior parte dei filehandle potete usare la funzione integrata
+C<getc()>, ma essa non funzionerE<agrave> (facilmente) per il terminale.
+Per STDIN, usate il modulo Term::ReadKey da CPAN oppure il codice d'esempio
+in L<perlfunc/getc>.
+
+Se il vostro sistema supporta l'interfaccia portabile per la programmazione
+del sistema operativo (portable operating system programming
+interface: POSIX), potete usare il codice seguente, che come potete
+notare oltretutto disattiva l'echo dei caratteri.
+
+    #!/usr/bin/perl -w
+    use strict;
+    $| = 1;
+    for (1..4) {
+        my $preso;
+        print "premi un tasto: ";
+        $preso = getone();
+        print "--> $preso\n";
+    }
+    exit;
+
+    BEGIN {
+        use POSIX qw(:termios_h);
+
+        my ($term, $oterm, $echo, $noecho, $fd_stdin);
+
+        $fd_stdin = fileno(STDIN);
+
+        $term     = POSIX::Termios->new();
+        $term->getattr($fd_stdin);
+        $oterm     = $term->getlflag();
+
+        $echo     = ECHO | ECHOK | ICANON;
+        $noecho   = $oterm & ~$echo;
+
+        sub cbreak {
+            $term->setlflag($noecho);
+            $term->setcc(VTIME, 1);
+            $term->setattr($fd_stdin, TCSANOW);
+        }
+
+        sub cooked {
+            $term->setlflag($oterm);
+            $term->setcc(VTIME, 0);
+            $term->setattr($fd_stdin, TCSANOW);
+        }
+
+        sub getone {
+            my $tasto = '';
+            cbreak();
+            sysread(STDIN, $tasto, 1);
+            cooked();
+            return $tasto;
+        }
+
+    }
+
+    END { cooked() }
+
+Il modulo Term::ReadKey di CPAN potrebbe risultare piE<ugrave> semplice
+da usare. Versioni recenti includono inoltre il supporto per sistemi specifici.
+
+    use Term::ReadKey;
+    open(TTY, "</dev/tty");
+    print "Premi un tasto: ";
+    ReadMode "raw";
+    $tasto = ReadKey 0, *TTY;
+    ReadMode "normal";
+    printf "\nHai premuto %s, il cui numero E<egrave> %03d\n",
+        $tasto, ord $tasto;
+
+=head2 Come posso sapere se c'E<egrave> un carattere in attesa di essere ricevuto da un filehandle?
+
+La prima cosa da fare E<egrave> ottenere l'estensione Term::ReadKey da CPAN.
+Come giE<agrave> accennato sopra, ora ha anche un limitato supporto per 
+sistemi non portabili (ossia: sistemi non aperti, chiusi, proprietari, non
+POSIX, non Unix, etc.).
+
+Si dovrebbe anche controllare nell'elenco delle Frequently Asked Questions
+sui newsgroup comp.unix.* per cose simili: la risposta E<egrave>
+sostanzialmente la stessa. Dipende molto dal sistema operativo. Di
+seguito si riporta una soluzione che funziona su sistemi BSD:
+
+    sub key_ready {
+        my($rin, $nfd);
+        vec($rin, fileno(STDIN), 1) = 1;
+        return $nfd = select($rin,undef,undef,0);
+    }
+  
+Per sapere quanti caratteri sono in attesa, si puE<ograve> utilizzare anche
+la chiamata ioctl FIONREAD. Il programma I<h2ph> che viene distribuito con
+il Perl prova a convertire i file include del C in codice Perl, che
+puE<ograve> essere utilizzato con il comando C<require>. FIONREAD
+E<egrave> definita come funzione nel file I<sys/ioctl.ph>:
+
+    require 'sys/ioctl.ph';
+
+    $dim = pack("L", 0);
+    ioctl(FH, FIONREAD(), $dim)    or die "Errore in ioctl: $!\n";
+    $dim = unpack("L", $dim);
+
+Se I<h2ph> non E<egrave> installato o non funziona, si puE<ograve> effettuare
+un I<grep> manuale sui file include:
+
+    % grep FIONREAD /usr/include/*/*
+    /usr/include/asm/ioctls.h:#define FIONREAD      0x541B
+
+Oppure scrivere un piccolo programma C, utilizzando il miglior editor in
+circolazione:
+
+    % cat > fionread.c
+    #include <sys/ioctl.h>
+    main() {
+        printf("%#08x\n", FIONREAD);
+    }
+    ^D
+    % cc -o fionread fionread.c
+    % ./fionread
+    0x4004667f
+
+E poi inserire direttamente il valore nel vostro programma, lasciando la
+portabilitE<agrave> come esercizio per i vostri posteri.
+
+    $FIONREAD = 0x4004667f;         # XXX: dipendente dal sistema operativo
+
+    $dim = pack("L", 0);
+    ioctl(FH, $FIONREAD, $dim)     or die "Errore in ioctl: $!\n";
+    $dim = unpack("L", $dim);
+
+FIONREAD richiede che il filehandle sia connesso ad un flusso, ossia socket,
+pipe, e periferiche tty funzionano, ma semplici file I<no>.
+
+=head2 Come posso realizzare C<tail -f> in perl?
+X<tail>
+
+Per prima cosa provate
+
+    seek(GWFILE, 0, 1);
+
+L'istruzione C<seek(GWFILE, 0, 1)> non modifica la posizione corrente, ma
+cancella la condizione di end-of-file sull'handle, in maniera tale che il
+prossimo <GWFILE> farE<agrave> in modo che Perl provi di nuovo a leggere.
+
+Se ciE<ograve> non funziona (si basa su caratteristiche della vostra
+implementazione di stdio), allora vi serve piE<ugrave> qualcosa del genere:
+
+    for (;;) {
+      for ($pos_curs = tell(GWFILE); <GWFILE>; $pos_curs = tell(GWFILE)) {
+        # cerca qualcosa e mettilo da parte
+      }
+      # aspetta un po'
+      seek(GWFILE, $curpos, 0);  # torniamo nel punto in cui eravamo
+    }
+
+Se ancora non funziona, guardate il modulo POSIX. POSIX definisce il metodo 
+learerr(), che puE<ograve> rimuovere la condizione di end-of-file su un
+filehandle. Il metodo legge fino alla fine del file, chiama clearerr(),
+legge un altro po'. Insaponare, risciacquare, ripetere.
+
+C'E<egrave> inoltre un modulo File::Tail su CPAN.
+
+=head2 Come faccio a dup()licare un filehandle in Perl?
+X<dup>
+
+Se controllate L<perlfunc/open>, vedrete che svariati dei modi in cui si
+puE<ograve> chiamare open() dovrebbero andare bene. Ad esempio:
+
+    open(LOG, ">>/tmp/filedilog");
+    open(STDERR, ">&LOG"); 
+
+O anche con un descrittore letterale numerico:
+
+   $fd = $ENV{MHCONTEXTFD};
+   open(MHCONTEXT, "<&=$fd"); # like fdopen(3S)
+
+Notate che "<&STDIN" crea una copia, ma "<&=STDIN" crea un alias. Questo
+significa che se chiudete un handle del quale E<egrave> stato creato un
+alias, tutti gli alias diventano inaccessibili. Questo non E<egrave> vero
+per un handle sottoposto a copia.
+
+Il controllo degli errori, come sempre, E<egrave> lasciato al lettore come
+esercizio.
+
+=head2 Come faccio a chiudere un descrittore di file tramite numero?
+X<file, chiudere dei descrittori di file>
+
+Dovrebbe essere raramente necessario, visto che per i file handle creati
+dal Perl bisogna usare la funzione close(), anche quando sono ottenuti per
+duplicazione da descrittori numerici, come MHCONTEXT visto sopra [nella faq
+precedente, NdT]. Ma se proprio dovete farlo, potete fare cosE<igrave>:
+
+     require 'sys/syscall.ph';
+     $rc = syscall(&SYS_close, $fd + 0);  # deve forzare il numerico
+     die "non posso fare un sysclose di $fd: $!" unless $rc == -1;
+
+Oppure, usate la funzionalitE<agrave> fdopen(3S) della funzione open():
+
+     {
+        local *F;
+        open F, "<&=$fd" or die "Non posso riaprire fd=$fd: $!";
+        close F;
+     }
+
+=head2 PerchE<eacute> non posso usare "C:\temp\fanfaluca" nei path DOS? PerchE<eacute> "C:\temp\fanfaluca.exe" non funziona?
+X<nomefile, questioni DOS>
+
+Ops! Avete appena messo un carattere di tabulazione e un form-feed 
+[avanzamento di linea, NdT] nel nome di quel di file! Ricordate che 
+all'interno di stringhe delimitate da doppi apici ("come\questa") il 
+backslash ('\') E<egrave> un carattere di escape. 
+Una lista completa sta in L<perlop/Quote and Quote-like Operators>
+[Virgolette e operatori simili, NdT]. Non E<egrave> sorprendente che 
+non abbiate un file chiamato "c:(tab)emp(formfeed)anfaluca" oppure 
+"c:(tab)emp(formfeed)anfaluca.exe" sul vostro vecchio filesystem DOS.
+
+Scrivete le vostre stringhe tra apici singoli, oppure (E<egrave> preferibile)
+usate slash "in avanti" C</>. Dal momento che tutte le versioni di DOS e
+Windows a partire da MS-DOS 2.0 o simili hanno trattato C</> e C<\> allo
+stesso modo nei path, dovreste usare il carattere che non crea problemi a
+Perl -- o alla shell POSIX, ANSI C e C++, awk, Tcl, Java, oppure a Python,
+tanto per menzionarne qualcuno. Inoltre, i path POSIX sono piE<ugrave>
+portabili. 
+
+=head2 PerchE<eacute> glob("*.*") non ottiene tutti i file?
+X<glob>
+
+PerchE<eacute> anche nelle versioni per sistemi non-Unix, la funzione glob
+di Perl segue gli standard Unix per la semantica del "globbing". Dovete
+usare C<glob("*")> per ottenere tutti i file (non nascosti). Questo rende
+glob() portabile anche sui vecchi sistemi. La versione per il vostro
+sistema potrebbe includere anche funzioni proprietarie per fare il
+globbing. Controllatene la documentazione per dettagli.
+
+=head2 PerchE<eacute> il Perl mi permette di cancellare file di sola lettura? PerchE<eacute> -i sovrascrive i file protetti? Non E<egrave> un bug del Perl?
+
+Questo E<egrave> minuziosamente e coscienziosamente descritto nell'articolo
+F<file-dir-perms> nella collezione "Far More Than You Ever Wanted To Know"
+[Ben piE<ugrave> di quello che avreste sempre voluto sapere, NdT] in
+http://www.cpan.org/misc/olddoc/FMTEYEWTK.tgz .
+
+Riassunto sulle cose da fare: imparate come funziona il vostro filesystem.
+I permessi su un file dicono cosa puE<ograve> succedere ai dati in quel
+file. I permessi su una directory dicono cosa puE<ograve> accadere alla
+lista dei file in quella directory. Se cancellate un file, state rimuovendo
+il suo nome dalla directory (dunque l'operazione dipende dai permessi della
+directory, non del file). Se cercate di scrivere sul file, i permessi del
+file sono quelli che comandano, se siete autorizzati a farlo.
+
+=head2 Come posso prendere una riga a caso da un file?
+X<file, prendere una riga a caso>
+
+Ecco un algoritmo tratto dal Camel Book:
+
+        srand;
+        rand($.) < 1 && ($line = $_) while <>;
+
+CiE<ograve> ha un significativo vantaggio in termini di spazio rispetto 
+alla lettura in memoria dell'intero file. Potete trovare una dimostrazione di 
+questo metodo su I<The Art of Computer Programming>, Volume 2, Sezione 3.4.2, di Donald E. Knuth.
+
+Potete usare anche il modulo File::Random che fornisce una funzione per 
+quell'algoritmo:
+
+	use File::Random qw/random_line/;
+	my $linea = random_line($nomefile);
+
+Un altro modo E<egrave> quello di usare il modulo Tie::File che tratta l'intero file 
+come un array. Accedete semplicemente in maniera casuale ad un elemento dell'array.
+
+=head2 PerchE<eacute> ottengo degli strani spazi quando stampo un array di linee?
+
+Dire
+
+    print "@linee\n";
+
+collega gli elementi di C<@linee> con uno spazio tra di essi. Se C<@linee>
+fosse C<("piccole", "soffici", "nuvole")> allora l'istruzione precedente
+stamperebbe
+
+    piccole soffici nuvole
+
+ma se ogni elemento di C<@linee> fosse una linea di testo che termina con
+un carattere di nuova linea C<("piccole\n", "soffici\n", "nuvole\n")>
+allora stamperebbe:
+
+   piccole
+    soffici
+    nuvole
+
+Se il vostro array contiene delle linee, stampatele e basta:
+
+    print @linee;
+
+=head1 AUTORE E COPYRIGHT
+
+Copyright (c) 1997-2006 Tom Christiansen, Nathan Torkington e altri autori menzionati.
+Tutti i diritti riservati.
+
+Questa documentazione E<egrave> libera; potete ridistribuirla e/o modificarla
+secondo gli stessi termini applicati al Perl.
+
+Indipendentemente dalle modalitE<agrave> di distribuzione, tutti gli esempi di
+codice in questo file sono rilasciati al pubblico dominio. Potete, e siete
+incoraggiati a farlo, utilizzare il presente codice o qualunque forma
+derivata da esso nei vostri programmi per divertimento o per profitto.
+Un semplice commento nel codice che dia riconoscimento alle FAQ sarebbe
+cortese ma non E<egrave> obbligatorio.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlfaq5
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Michele Beltrame.
+
+=head2 Revisore
+
+Revisione a cura di Marco Allegretti.
+
+=cut

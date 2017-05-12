@@ -1,0 +1,95 @@
+/TATE/File-Glob-Windows-
+/PETDANCE/File-Next-
+/PETDANCE/ack-\d
+/ADAMK/Class-Adapter-
+/ADAMK/Class-Inspector-
+/ILMARI/Class-Unload-
+/SMUELLER/AutoXS-Header-
+/SMUELLER/Class-XSAccessor-\d
+/ADAMK/Devel-Dumpvar-
+/DMUEY/File-Copy-Recursive-
+/ADAMK/File-ShareDir-\d
+/SMUELLER/File-ShareDir-PAR-
+/ADAMK/Test-Object-
+/ADAMK/Config-Tiny-
+/ADAMK/Test-ClassAPI
+/RDF/Clone-
+/CHORNY/Hook-LexWrap-
+/ADAMK/Test-SubCalls-
+/VPARSEVAL/List-MoreUtils-
+/ADAMK/Task-Weaken-
+/ADAMK/PPI-\d
+/JESSE/Module-Refresh-
+/ANDK/Devel-Symdump-
+/RCLAMP/Pod-Coverage-
+/PETDANCE/Test-Pod-Coverage-
+/PETDANCE/Module-Starter-
+/ADAMK/ORLite-\d
+/ADAMK/ORLite-Migrate-
+/ADAMK/Text-Diff-
+/OVID/Test-Differences-
+/DROLSKY/File-Slurp-
+/ANDREWF/Pod-POM-
+/SZABGAB/Parse-ErrorString-Perl-
+/SMUELLER/Text-FindIndent-
+/BLILBURNE/Pod-Abstract-
+/DROLSKY/Devel-StackTrace-
+/TMTM/Class-Data-Inheritable-
+/DROLSKY/Exception-Class-
+/OVID/Test-Most-
+/SMUELLER/Class-XSAccessor-Array-
+/SMUELLER/Parse-ExuberantCTags-
+/RJBS/CPAN-Mini-
+/ADAMK/Portable-
+/CHORNY/Win32API-File-
+/DAGOLDEN/Capture-Tiny-
+/TYEMQ/Algorithm-Diff-
+/PETDANCE/Test-Pod-
+/ADAMK/prefork-
+/SZABGAB/PPIx-EditorTools-
+/INGY/Test-Base-
+/INGY/Spiffy-\d
+/SMUELLER/ExtUtils-XSpp-
+
+/SZABGAB/Locale-Msgfmt-
+/DCONWAY/Perl6-Perldoc-
+/HINRIK/Perl6-Perldoc-To-Ansi-
+/HINRIK/Perl6-Doc-
+/BBC/Log-Trace-
+/BBC/Test-Assertions-
+/BBC/Pod-Xhtml-
+/HINRIK/Pod-Text-Ansi-
+/BDFOY/IO-Interactive-
+# App::Grok does not require Win32-Console-Ansi as of 1.14
+# nor does it require Perl::Critic and Perl::Tidy
+# I'm only being cautious about Readonly.
+/ROODE/Readonly-\d
+/ROODE/Readonly-XS-\d
+# /JJORE/B-Keywords-
+# /DARREN/String-Format-
+# /SHANCOCK/Perl-Tidy-
+# /PINYAN/Regexp-Parser-
+# /JDB/Win32-Pipe-
+# /ELLIOTJS/Perl-Critic-\d
+# /THALJEF/Test-Perl-Critic-
+# /JLMOREL/Win32-Console-ANSI-
+/HINRIK/grok-
+/RJBS/Data-OptList-
+/RJBS/Sub-Install-
+/RJBS/Sub-Exporter-
+/CHOCOLATE/Scope-Guard-
+/NUFFIN/Devel-GlobalDestruction-
+/XMATH/Sub-Name-
+/FLORA/Algorithm-C3-
+/FLORA/Class-C3-
+/FLORA/MRO-Compat-
+/AUDREYT/YAML-Syck-
+/DROLSKY/Class-MOP-
+/DROLSKY/Moose-
+/AZAWAWI/Syntax-Highlight-Perl6
+/AZAWAWI/Perl6-Refactor-
+
+/MBARBON/Wx-\d
+/MDOOTSON/Wx-Perl-ProcessStream-
+/(?:GARU|SZABGAB)/Padre-\d
+/AZAWAWI/Padre-Plugin-Perl6-

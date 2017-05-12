@@ -1,0 +1,51 @@
+{
+   "abstract" : "safer+easier [s]print[f], & say all-in-1",
+   "author" : [
+      "LA Walsh <LAWALSH@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "P",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.82",
+            "PerlIO" : "1.03",
+            "Test::Simple" : "0.44",
+            "Types::Core" : "v0.1.8",
+            "Xporter" : "v0.1.2",
+            "mem" : "v0.4.3",
+            "perl" : "v5.8.5",
+            "version" : "0.77"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "version" : "0.77"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Types::Core" : "v0.1.8",
+            "Xporter" : "v0.1.2",
+            "mem" : "v0.4.5"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.1.37",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

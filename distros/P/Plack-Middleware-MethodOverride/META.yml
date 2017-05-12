@@ -1,0 +1,34 @@
+---
+abstract: 'Override REST methods to Plack apps via POST'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'David E. Wheeler <david@justatheory.com>'
+  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+  URI: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-MethodOverride
+requires:
+  Plack::Middleware: '0'
+  Plack::Request: '0'
+  Plack::Util::Accessor: '0'
+  parent: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/theory/plack-middleware-methodoverride/issues
+  repository: git://github.com/theory/plack-middleware-methodoverride.git
+version: '0.15'

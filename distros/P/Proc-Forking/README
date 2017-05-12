@@ -1,0 +1,49 @@
+Proc::Forking 
+
+It is an Object Oriented insterface to fork()
+It allow to fork a function with change of UID, GID, ROOT
+Creation of PID files is possible
+It is possible to set a LOAD 1 min. limit to prevent forking if the computer is to busy
+It is possible to limit the maximal number of process to launch.
+It is possible to put a minimal memory free before forking
+It is possible to put an expiration time (automatic or by request)
+A daemonize function allow to put the parent  process in daemon mode.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ POSIX
+ IO::File
+ Cwd
+ Sys::Load
+ 
+LICENSE
+       Under the GNU GPL2
+
+           This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public
+           License as published by the Free Software Foundation; either version 2 of the License,
+           or (at your option) any later version.
+
+           This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+           without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+           See the GNU General Public License for more details.
+
+           You should have received a copy of the GNU General Public License along with this program;
+           if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+           Proc::Forking    Copyright (C) 2004 DULAUNOY Fabrice  Proc::Forking comes with ABSOLUTELY NO WARRANTY;
+           for details See: L<http://www.gnu.org/licenses/gpl.html>
+           This is free software, and you are welcome to redistribute it under certain conditions;
+
+

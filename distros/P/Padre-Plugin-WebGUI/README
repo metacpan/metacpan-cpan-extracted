@@ -1,0 +1,52 @@
+NAME
+    Padre::Plugin::WebGUI - Developer tools for WebGUI
+
+VERSION
+    version 1.002
+
+SYNOPSIS
+    cpan install Padre::Plugin::WebGUI;
+
+    Then use it via Padre, The Perl IDE.
+
+DESCRIPTION
+    This plugin adds a "WebGUI" item to the Padre plugin menu, with a bunch
+    of WebGUI-oriented features.
+
+METHODS
+  plugin_name
+    The plugin name to show in the Plugin Manager and menus
+
+  padre_interfaces
+    Declare the Padre interfaces this plugin uses
+
+  registered_documents
+    Register the document types that we want to handle
+
+  plugin_directory_share
+  plugin_enable
+    called when the plugin is enabled
+
+  plugin_disable
+  menu_plugins
+  online_resources
+  show_about
+  ping
+  toggle_asset_tree
+    Toggle the asset tree panel on/off N.B. The checkbox gets checked
+    *before* this method runs
+
+  asset_tree
+  TRACE
+SEE ALSO
+    WebGUI - http://webgui.org
+
+AUTHOR
+    Patrick Donelan <pdonelan@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Patrick Donelan.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

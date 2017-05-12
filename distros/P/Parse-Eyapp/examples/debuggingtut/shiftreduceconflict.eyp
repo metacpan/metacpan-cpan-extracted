@@ -1,0 +1,12 @@
+%token IF THEN ELSE EXPR OTHERSTMT
+%%
+stmt:
+          IF expr THEN stmt
+        | IF expr THEN stmt ELSE stmt
+        | OTHERSTMT
+        ;
+expr: 
+       EXPR
+    ;
+   
+%%

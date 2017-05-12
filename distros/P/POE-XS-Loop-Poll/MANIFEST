@@ -1,0 +1,14 @@
+alloc.c
+alloc.h
+Changes
+lib/POE/XS/Loop/Poll.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+poexs.h
+poexs.c
+Poll.xs
+README
+typemap
+
+META.yml                                 Module meta-data (added by MakeMaker)

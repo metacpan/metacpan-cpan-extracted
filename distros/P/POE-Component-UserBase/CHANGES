@@ -1,0 +1,27 @@
+$Id: CHANGES,v 1.2 2000/11/26 02:33:43 jgoff Exp $
+
+============
+Things to do
+============
+
+Nothing at the moment.
+
+=============================================
+Revision history for POE::Component::UserBase
+=============================================
+
+Changes marked with "(!!!)" may break backward compatibility.  Changes
+marked with "(???)" are just information.
+
+Note to self: Don't forget to tag the version after a new distribution
+is released.  For example: `cvs tag -Rc v1_00 .'
+
+---------------
+0.09 2000.09.04
+---------------
+
+Initial release.
+
+===========================
+EOF: Thank you for reading.
+===========================

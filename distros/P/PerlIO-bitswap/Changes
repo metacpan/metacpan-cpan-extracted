@@ -1,0 +1,27 @@
+version 0.002; 2011-07-12
+
+  * restore portability to Perl versions preceding 5.8.8, which was
+    broken by compiler warning avoidance code
+
+version 0.001; 2011-07-11
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * jump through hoops to avoid compiler warnings
+
+  * remove extraneous dependencies from Build.PL
+
+  * remove extraneous variables from C code
+
+  * use full stricture in test suite
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.000; 2010-07-17
+
+  * initial released version

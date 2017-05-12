@@ -1,0 +1,62 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; X11 Scaling Fonts</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>X11 Scaling Fonts</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<A HREF=index.html>Fontsets</A><BR>
+<B>XScaling</B>
+<P>
+<A HREF=#options>options</A>
+
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> has a few fontsets,
+which are used to show text on the slides.  Fontsets are <B>not optimally
+implemented</B> (yet).  The best implemented fonts are these scalable
+X11 fonts.
+<P>
+To find out which scalable fonts are available on your system, you can
+use <CODE>xlsfonts&nbsp;'*-0-0-0-0-*'</CODE>  This module requires
+module <B><FONT COLOR=green>X11::Protocol</FONT></B>, available from
+<A HREF=http://www.cpan.org>CPAN</A>.
+<P>
+You can only use these fonts writing left-to-write.  Help is required to
+teach the formatter to handle other directions.
+
+<H2><A NAME=options>X11 Scalable Fonts Options</A></H2>
+
+<DL>
+<DT><B>-fixedFont =&gt;</B> <EM>string</EM>
+<DD>Name of the font to be used for the <TT>teletype</TT> characters.
+    <P>
+    In most cases, this is a courier font.  You can specify
+    `foundry-family' (for instance `adobe-courier'), or only
+    `foundry (`adobe').  If you specify a scalable font which is not
+    available then the module will choose one for you.
+    <P>
+<DT><B>-proportionalFont =&gt;</B> <EM>string</EM>
+<DD>Name of the font to be used for the normal, proportional characters:
+    normal running text.  Usage as with the above flag.
+    <P>
+</DL>
+
+<P>
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

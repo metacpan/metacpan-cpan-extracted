@@ -1,0 +1,726 @@
+#!/usr/local/bin/perl
+
+# PerlVision - A class library for text-mode user interface widgets.
+# By Ashish Gulhati (hash@netropolis.org)
+# V.0.2.0
+#
+# Copyright (c) Ashish Gulhati, 1995. All Rights Reserved.
+#
+# You may use and distribute this code under the same terms as Perl itself.
+
+
+# RAP (Rap Ain't Pico) is a small text editor provided as an example
+# of how to code using PerlVision and what PerlVision programs look
+# like. If you'd like to provide rap as an editor on your system for
+# inexperienced users, just great! They'll get used to emacs keybindings
+# for basic stuff and won't find it intimidating to move to the mother
+# of all editors later. ;-) I use rap as a pico replacement on my
+# system.
+
+require 5.000;
+use Curses;
+use PV;
+
+package MY_Editor;
+use Curses;
+use PV;
+@ISA = (PV::Editbox);
+
+sub new {			# A better mousetrap
+    my $type=shift;		# MY_Editor (margin,text,index,filename);
+    my @params=(@_);
+    my $self=new PV::Editbox (1,3,78,22,@params[0..2],0);
+    move (23,0);
+    attron (COLOR_PAIR(7));
+    addstr("  <Esc>-H for Help             <Esc>-X for Menu");
+    $$self[12]=0;		# Mark position
+    $$self[13]="INS  TOP";	# status
+    $$self[14]="";		# status shown
+    $$self[15]=$params[3];	# filename
+    $$self[16]="";		# Kill buffer
+    $$self[17]=0;		# Kill buffer clear toggle
+    ($$self[15] =~/^~/) && (substr ($$self[15],0,1)=(getpwuid ($<))[7]);
+    bless $self;
+}
+
+sub statusbar {
+    my $self=shift;
+    substr ($$self[13],0,3) = ($$self[11] ? "OVT" : "INS");
+    if ($$self[13] ne $$self[14]) {
+	move (23,70);
+	addstr($$self[13]);
+	refresh();
+	$$self[14]=$$self[13];
+    }
+}
+
+sub cursor {
+    my $self=shift;
+    my $total = $#{$$self[9]};
+    my @ret=$self->PV::Editbox::cursor();
+    if ($$self[8]==0) {
+	if ($total < 18) {
+	    substr ($$self[13],5) = "ALL";
+	}
+	else {
+	    substr ($$self[13],5) = "TOP";
+	}
+    }
+    elsif (($$self[8]+18) > $total) {
+	substr ($$self[13],5) = "BOT";
+    }
+    else {
+	my $percent = $ret[1]/$total*100;
+	substr ($$self[13],5)=sprintf("%2d%",$percent);
+    }
+    return @ret;
+}
+
+sub help {
+    my $helptext="Help for RAP? You want help for RAP???
+
+Just kidding. RAP is a very basic editor that uses
+emacs-like keystrokes for most things. Here's a
+summary:
+
+Keystroke sequences are presented in the Emacs format: 
+C-<key> means hold down 'CONTROL' and type <key>. 
+M-<key> means hold down 'ALT' and type <key>, or 
+alternately, press 'ESCAPE' and then press <key>.
+
+Movement Commands:
+
+Arrow keys, Page Up, Page Down should work. If not, 
+there are alternates:
+
+C-f         Move forward one character
+C-b         Move back one character
+C-n         Move down one line
+C-p         Move up one line
+
+C-v         Move down a page
+M-v         Move up a page
+
+C-a         Move to beginning of line
+C-e         Move to end of line
+
+M-<         Move to beginning of text
+M->         Move to end of text
+
+
+Editing Commands:
+
+Typing any printable character inserts it into your 
+text. Del, backspace, and insert should work. If not,
+there are alternates:
+
+M-i         Toggles insert/overwrite mode
+C-h         Backspace
+C-d         Delete
+
+M-d         Delete word forward
+C-k         Delete to end of line
+
+C-k behaves the way it does in Emacs. The first time 
+around, it kills everything on the line. The second
+time around, it kills the line itself.
+
+Any text killed with C-k or M-d is inserted into the
+'cut buffer', and can be pasted back into your text
+at the same or a different location with a C-y. See
+below.
+
+
+Block Commands:
+
+Any command that kills more than one character of text
+adds that to the 'cut buffer'. The first time you kill
+multiple characters, the cut buffer is started afresh,
+and subsequent kills keep adding to it, until you do 
+something that is not a multi-character kill.
+
+All the text in the cut buffer can be pasted back into 
+your text with a 
+
+C-y         Paste cut buffer into text
+
+This doesn't clear the cut buffer, and you can paste
+as many times as you like. Other commands that operate
+on blocks:
+
+C-<space>   Sets 'mark' at current cursor position.
+
+C-w         Kills all text between 'mark' and current
+            cursor position.
+
+M-w         Copy all text between 'mark' and current 
+            cursor position to the cut buffer, but
+            don't kill it.
+
+With these commands you can go to some point in your
+text, set 'mark', then go to some other position, and
+use C-w or M-w to either kill the region or copy it to
+the cut buffer without killing it. Now it's ready to be
+pasted back into your text wherever you like.
+
+RAP doesn't, and never will, support a kill-ring like 
+Emacs.
+
+
+File Commands:
+
+C-x C-f     Opens a file for editing
+C-x C-i     Inserts another file into your text
+C-x s       Saves the file you are editing
+C-x C-w     Write editor text out to some other file
+C-x k       Forget current file and clear the editor
+C-x C-c     Quits the editor
+
+
+Miscellaneous Commands:
+
+M-x         Gets you to the menu
+M-h         Does something very dangerous. DO NOT USE!
+
+
+The menu bar:
+
+A number of the things mentioned above can also be done
+from the menu bar, but that's really just there because
+it looks pretty. Everything can be accomplished much
+faster using the right keystrokes.
+
+Two things that can be accessed only from the menu bar
+are the RAP 'About Box' and the Preferences dialog
+(which has a lot of useful options you can set to
+customize your RAP editing environment just like with
+Emacs lisp ;-)
+
+
+Shareware Terms & Emacs:
+
+If after 10 days of using RAP you find it useful you
+must either switch to Emacs and delete RAP from your
+disk, or send me \$1,000,000 at:
+
+140 Sunder Nagar,
+New Delhi - 110003,
+India.
+
+Please send only A/C payee checks made out to 'Ashish
+Gulhati' and write your name and email address at the
+back of the check.
+
+Shareware only works if authors have the support of
+users like yourself. Please don't ignore these shareware
+terms.  Thank you!
+
+
+
+                   _/_/_/      _/ _/_/_/
+                  _/   _/   _/_/ _/   _/ 
+                 _/_/_/  _/_/_/ _/_/_/  
+                _/_/  _/_/_/_/ _/       
+               _/  _/_/_/_/_/ _/    
+                    _/
+                     _/
+     
+                     RAP Ain't Pico
+                (C) 1995, Ashish Gulhati";
+
+    my $help1 = new PV::Viewbox (2,1,62,12,$helptext,0);
+    my $help2 = new PV::Pushbutton (" OK ",28,13);
+    my $help = new PV::Dialog ("",8,5,72,21,1,1,
+			  $help1,0,0,0,0,1,1,2,0,
+			  $help2,1,2,2,1,2,3,1,0);
+    $help->activate;
+}
+
+sub options {
+    my $fun0 = new PV::Static ("On Startup:",2,1,40,9);
+    my $fun1 = new PV::Checkbox ("Mail president\@whitehouse.gov",2,3,0,1);
+    my $fun2 = new PV::Checkbox ("Play a Rush song:",2,4,0,1);
+    my $fun3 = new PV::Listbox ("Song",4,6,22,11,
+			       "Force Ten",0,
+			       "The Trees",0,
+			       "Kid Gloves",0,
+			       "Tom Sawyer",0,
+			       "Tai Shan",0,
+			       "2112",0,
+			       "Red Sector A",0,
+			       "Freewill",0,
+			       "Anthem",0);
+    my $fun4 = new PV::Radio ("Lo Volume",24,6,0,1);
+    my $fun5 = new PV::Radio ("Hi Volume",24,7,1,1);
+    my $fun6 = new PV::RadioG ($fun4, $fun5);
+    my $fun7 = new PV::Pushbutton ("Yes",27,9);
+    my $options = new PV::Dialog ("",20,8,59,20,1,1,
+				 $fun1,1,2,2,1,1,1,2,0,
+				 $fun2,1,3,3,1,2,2,3,0,
+				 $fun3,0,0,4,2,3,3,4,4,
+				 $fun4,2,5,5,3,4,4,5,0,
+				 $fun5,4,6,6,3,5,5,6,0,
+				 $fun7,5,6,6,3,6,6,1,0,
+				 $fun0,0,0,0,0,0,0,0,0);
+    $options->activate;
+}
+
+sub readfile {
+    my $filename=shift;
+    my $text="";
+    ($filename =~/^~/) && (substr ($filename,0,1)=(getpwuid ($<))[7]);
+    open (INPUT, $filename) || return (0);
+    foreach (<INPUT>) {
+	$text.=$_;
+    }
+    close INPUT;
+    return (1,$text);
+}
+
+sub dirty {
+    my $self=shift;
+    my $dirty = ($$self[6] eq "\n") ? 0 : 1;
+    if ($$self[15]) {
+	my @origfile = readfile ($$self[15]);
+	if ($origfile[0]) {
+	    $origfile[1].="\n";
+	    ($origfile[1] eq $$self[6]) && ($dirty = 0);
+	}
+    }
+    return $dirty;
+}
+
+sub findfile {
+    my $self=shift;
+    if ($self->dirty) {
+	return 0 unless (PV::PVD::yesno ("Sure you want to abandon this file?",40,1));
+    }
+    my $newfile = new PV::Entryfield (2,23,50,0,"Find File:","");
+    $newfile->display; $newfile->activate;
+    my $filename = ($newfile->stat);
+    undef $newfile;
+    move (23,0);
+    attron (COLOR_PAIR(7));
+    addstr("  <Esc>-H for Help             <Esc>-X for Menu                  ");
+    refresh();
+    if ($filename) {
+	my ($ret, $initial) = readfile ($filename);
+	if ($ret) {
+	    $$self[6]=$initial."\n";
+	    $$self[7]=0;
+	    $$self[15]=$filename;
+	    ($$self[15] =~/^~/) && (substr ($$self[15],0,1)=(getpwuid ($<))[7]);
+	    $self->justify(1);
+	    $self->rfsh();
+	}
+	else {
+	    PV::PVD::message ("Error: Couldn't open file.",30,1);
+	}
+    }
+    $self->cursor;
+    refresh();
+}
+
+sub insertfile {
+    my $self=shift;
+    my $newfile = new PV::Entryfield (2,23,48,0,"Insert File:","");
+    $newfile->display; $newfile->activate;
+    my $filename = ($newfile->stat);
+    undef $newfile;
+    move (23,0);
+    attron (COLOR_PAIR(7));
+    addstr("  <Esc>-H for Help             <Esc>-X for Menu                  ");
+    refresh();
+    if ($filename) {
+	my ($ret, $initial) = readfile ($filename);
+	if ($ret) {
+	    substr ($$self[6],$$self[7],0)=$initial;
+	    $self->justify(1);
+	    $self->rfsh();
+	}
+	else {
+	    PV::PVD::message ("Error: Couldn't open file.",30,1);
+	}
+    }
+    $self->cursor;
+    refresh();
+}
+
+sub saveas {
+    my $self=shift;
+    my $savefile = new PV::Entryfield (2,23,52,0,"Save As:",$$self[15]);
+    $savefile->display; $savefile->activate;
+    my $filename = ($savefile->stat);
+    ($filename =~/^~/) && (substr ($filename,0,1)=(getpwuid ($<))[7]);
+    undef $savefile;
+    move (23,0);
+    attron (COLOR_PAIR(7));
+    addstr("  <Esc>-H for Help             <Esc>-X for Menu                  ");
+    refresh();
+    if ($filename) {
+	if (-e $filename) {
+	    return unless (PV::PVD::yesno ("File exists. Overwrite?",30,1));
+	}
+	$$self[15]=$filename;
+	$self->savefile;
+    }
+    $self->cursor;
+    refresh();
+}
+
+sub savefile {
+    my $self=shift;
+    if ($$self[15]) {
+	if ($self->dirty) {
+	    open (SAVE, ">$$self[15]") || do {
+		PV::PVD::message ("Error: Couldn't open file.",40,12);
+		return;
+	    };
+	    chop $$self[6];
+	    print SAVE $$self[6];
+	    close (SAVE);
+	    $$self[6].="\n";
+	}
+    }
+    else {
+	$self->saveas();
+    }
+}
+
+sub killfile {
+    my $self=shift;
+    if ($self->dirty) {
+	return 0 unless (PV::PVD::yesno ("Sure you want to abandon this file?",40,1));
+    }
+    $$self[6]="\n";
+    $$self[7]=0;
+    $$self[15]="";
+    $self->justify(1);
+    $self->rfsh();
+    return 1;
+}
+
+sub word {
+    my $self=shift;
+    my $dir=shift;
+    my $chars="";
+    if ($dir) {
+	$chars = substr ($$self[6],$$self[7]);
+	$chars =~ s/(\W*\w+).*/$1/s;
+    }
+    else {
+	$chars = substr ($$self[6],0,$$self[7]);
+	$chars =~ s/.*\W(\w)/$1/s;
+    }
+    return (length ($chars));
+}
+
+sub wordforward {
+    my $self=shift;
+    $$self[7]+=$self->word(1);
+    $$self[7]==length($$self[6]) && $$self[7]--;
+    $self->cursor;
+    refresh();
+}
+
+sub wordback {
+    my $self=shift;
+    $$self[7]-=$self->word(0);
+    $self->cursor;
+    refresh();
+}
+
+sub wordkill {
+    my $self=shift;
+    my $chars = $self->word(1);
+    $$self[7]+$chars==length($$self[6]) && $chars--;
+    $$self[17] && ($$self[16].=substr ($$self[6],$$self[7],$chars));
+    $$self[17] || ($$self[16]=substr ($$self[6],$$self[7],$chars));
+    $$self[17] = 1;
+    substr ($$self[6],$$self[7],$chars) = "";
+    $self->justify();
+    $self->rfsh;
+    $self->cursor;
+    refresh();
+}
+
+sub linekill {
+    my $self=shift;
+    my $chars = substr ($$self[6],$$self[7]);
+    $chars =~ s/\n.*/\n/s;
+    if ($chars eq "\n") {
+	$chars = 1;
+    }
+    else {
+	$chars = length ($chars)-1;
+    }
+    $$self[7]+$chars==length($$self[6]) && $chars--;
+    $$self[17] && ($$self[16].=substr ($$self[6],$$self[7],$chars));
+    $$self[17] || ($$self[16]=substr ($$self[6],$$self[7],$chars));
+    $$self[17] = 1;
+    substr ($$self[6],$$self[7],$chars) = "";
+    $self->justify();
+    $self->rfsh;
+    $self->cursor;
+    refresh();
+}
+
+sub setmark {
+    my $self=shift;
+    $$self[12]=$$self[7];
+    move (23,0);
+    attron (COLOR_PAIR(3));
+    addstr("  Mark Set                                     ");
+    refresh();
+    sleep (1);
+    move (23,0);
+    attron (COLOR_PAIR(7));
+    addstr("  <Esc>-H for Help             <Esc>-X for Menu");
+    $self->cursor;
+    refresh();
+}
+
+sub regionkill {
+    my $self=shift;
+    my $reallykill=shift;
+    my $start = (($$self[12] > $$self[7]) ? $$self[7] : $$self[12]);
+    my $chars = (($$self[12] > $$self[7]) ? $$self[12] : $$self[7]) - $start;
+    $$self[17] && ($$self[16].=substr ($$self[6],$start,$chars));
+    $$self[17] || ($$self[16]=substr ($$self[6],$start,$chars));
+    $$self[17] = 1;
+    if ($reallykill) {
+	$$self[7]=$start;
+	substr ($$self[6],$start,$chars) = "";
+	$self->justify();
+	$self->rfsh;
+	$self->cursor;
+	refresh();
+    }
+}
+
+sub yank {
+    my $self=shift;
+    substr ($$self[6],$$self[7],0)=$$self[16];
+    $$self[7]+=length($$self[16]);
+    $self->justify(1);
+    $self->rfsh();
+    $self->cursor;
+    refresh();
+}
+
+sub beginning {
+    my $self=shift;
+    $$self[7]=0;
+    $self->cursor;
+    refresh();
+}
+
+sub end {
+    my $self=shift;
+    $$self[7]=length($$self[6])-1;
+    $self->cursor;
+    refresh();
+}
+
+sub process_key {
+    my $self=shift;
+    my @key=(@_);
+    if ($key[1]==14) {
+	$self->wordkill;
+	return (2);
+    }
+    elsif ((!$key[1]) && ($key[0] eq "")) {
+	$self->linekill;
+	return (2);
+    }
+    elsif ((!$key[1]) && ($key[0] eq "")) {
+	$self->regionkill(1);
+	return(2);
+    }
+    elsif ($key[1]==22) {
+	$self->regionkill(0);
+	return(2);
+    }
+    $$self[17]=0;
+    (($key[1]==200) && ($key[0] eq "\t")) && (return (2)); # Override TAB
+    if ((!$key[1]) && ($key[0] eq " ")) {
+	$self->setmark;
+	return(2);
+    }
+    if ((!$key[1]) && ($key[0] eq "")) { # ^X begins most commands
+	@key=PV::getkey();
+	((!$key[1]) && ($key[0] eq "")) && (return (1)); # Quit
+	((!$key[1]) && ($key[0] eq "")) && do {          # Find file
+	    $self->findfile();
+	    $self->cursor();
+	    refresh();
+	    return (2);
+	};
+	(($key[1]==200) && ($key[0] =~ /[iI]/)) && do {    # Insert file
+	    $self->insertfile();
+	    return (2);
+	};
+	((!$key[1]) && ($key[0] eq "")) && do {          # Save file
+	    $self->savefile;
+	    $self->cursor();
+	    refresh();
+	    return (2);
+	};
+	(($key[1]==200) && ($key[0] =~ /[sS]/)) && do {    # Save file
+	    $self->savefile;
+	    $self->cursor();
+	    refresh();
+	    return (2);
+	};
+	((!$key[1]) && ($key[0] eq "")) && do {          # Write file
+	    $self->saveas;
+	    $self->cursor();
+	    refresh();
+	    return (2);
+	};
+	(($key[1]==200) && ($key[0]=~/[Kk]/)) && do {      # Abandon file
+	    $self->killfile;
+	    $self->cursor();
+	    refresh();
+	    return (2);
+	};
+	return (3,@key);
+    }
+    elsif ($key[1]==20) {
+	$self->wordforward;
+	return (2);
+    }
+    elsif ($key[1]==13) {
+	$self->wordback;
+	return (2);
+    }
+    elsif ($key[1]==16) {
+	$self->beginning;
+	return (2);
+    }
+    elsif ($key[1]==17) {
+	$self->end;
+	return (2);
+    }
+    elsif ((!$key[1]) && ($key[0] eq "")) {
+	$self->yank;
+	return (2);
+    }
+    else {
+	return 0;
+    }
+}
+
+package main;
+
+sub readfile {
+    my $filename=shift;
+    my $text="";
+    ($filename =~/^~/) && (substr ($filename,0,1)=(getpwuid ($<))[7]);
+    open (INPUT, $filename) || return (0);
+    foreach (<INPUT>) {
+	$text.=$_;
+    }
+    close INPUT;
+    return (1,$text);
+}
+
+$initial="";
+
+$COPYRIGHT = "
+RAP (RAP ain't Pico) Copyright (C) 1995, Ashish Gulhati.
+A simple text editor for newcomers to Unix, with Emacs-like
+keybindings to ease the upgrade path ;-)
+
+";
+
+$ABOUT="
+           _/_/_/      _/ _/_/_/
+          _/   _/   _/_/ _/   _/ 
+         _/_/_/  _/_/_/ _/_/_/  
+        _/_/  _/_/_/_/ _/       
+       _/  _/_/_/_/_/ _/    
+            _/
+             _/
+     
+             RAP Ain't Pico
+        (C) 1995, Ashish Gulhati
+";
+
+(($#ARGV >0) || ($ARGV[0] =~/^-/)) && die ($COPYRIGHT."Usage:\nrap [filename]\n\n");
+if ($#ARGV == 0) {
+    ($ret, $initial) = readfile ($ARGV[0]);
+    $ret || die ($COPYRIGHT."Couldn't open $ARGV[0]\n\n");
+    undef $ret;
+}    
+
+PV::init();
+
+attron (COLOR_PAIR(1));
+move (0,0); hline(" ",80);
+move (1,0); hline(" ",80);
+move (2,0); hline(" ",80);
+attron (COLOR_PAIR(3));
+move (3,0); vline(" ",20);
+move (3,79); vline(" ",20);
+move (23,0); hline(" ",80);
+
+$menu = new PV::Menubar("File",18,9,
+		       "Open    C-x C-f",0,
+		       "Insert    C-x i",0,
+		       "Save      C-x s",0,
+		       "Save As C-x C-w",0,
+		       "Abandon   C-x k",0,
+		       "Quit    C-x C-c",0,
+		       "Help        M-h",0,
+		       "About          ",0);
+$menu->add("Edit",20,8,
+	   "Set Mark  C-<Spc>",0,
+	   "Cut Region    C-w",0,
+	   "Copy Region   M-w",0,
+	   "Paste         C-y",0,
+	   "Del Word      M-d",0,
+	   "Del Line      C-k",0,
+	   "Preferences      ",0);
+
+$editor = new MY_Editor(60,$initial,0,$ARGV[0]);
+$editor->display;
+$menu->display;
+
+while (true) {
+    $ret=$editor->activate();
+    if ($ret == 8) {
+	@menuselect = (8, "File:Quit    C-x C-c");
+    }
+    elsif ($ret == 5) {
+	@menuselect = (8, "File:Help        M-h");
+    }
+    else {
+	@menuselect=($menu->activate);
+    }
+    if ($menuselect[0] == 5) {
+	@menuselect = (8, "File:Help        M-h");
+    }
+    if ($menuselect[0] == 8) {
+	($menuselect[1] eq "Edit:Cut Region    C-w") && ($editor->regionkill(1));
+	($menuselect[1] eq "Edit:Copy Region   M-w") && ($editor->regionkill(0));
+	($menuselect[1] eq "Edit:Del Word      M-d") && ($editor->wordkill);
+	($menuselect[1] eq "Edit:Del Line      C-k") && ($editor->linekill);
+	$$editor[16]=0;
+
+	($menuselect[1] eq "File:Open    C-x C-f") && ($editor->findfile);
+	($menuselect[1] eq "File:Insert    C-x i") && ($editor->insertfile);
+	($menuselect[1] eq "File:Save      C-x s") && ($editor->savefile);
+	($menuselect[1] eq "File:Save As C-x C-w") && ($editor->saveas);
+	($menuselect[1] eq "File:Abandon   C-x k") && ($editor->killfile);
+	($menuselect[1] eq "File:Quit    C-x C-c") && ($editor->killfile && last);
+	($menuselect[1] eq "File:Help        M-h") && ($editor->help);
+	($menuselect[1] eq "File:About          ") && (PV::PVD::message ($ABOUT,40,11));
+
+	($menuselect[1] eq "Edit:Set Mark  C-<Spc>") && ($editor->setmark);
+	($menuselect[1] eq "Edit:Preferences      ") && ($editor->options);
+	($menuselect[1] eq "Edit:Paste         C-y") && ($editor->yank);
+    }
+}
+
+endwin();

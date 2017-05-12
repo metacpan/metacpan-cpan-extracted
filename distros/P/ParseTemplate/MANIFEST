@@ -1,0 +1,28 @@
+Changes
+examples/delegation2.pl
+examples/derived.pl
+examples/die.pl
+examples/error.pl
+examples/html_generator.pl
+examples/html_generator2.pl
+examples/html_template.pl
+examples/includes.pl
+examples/inheritance.pl
+examples/recursive.pl
+examples/synopsis.pl
+examples/synopsis_bis.pl
+lib/Parse/Template.pm
+Makefile.PL
+MANIFEST
+README
+t/debug.t
+t/rt_58128.t
+t/test1.t
+t/test2.t
+t/test3.t
+t/test4.t
+t/test5.t
+t/test6.t
+t/W.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

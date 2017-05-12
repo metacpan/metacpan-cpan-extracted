@@ -1,0 +1,70 @@
+NAME
+    Pgreet - Perl modules to support the ecard application:
+			 Penguin Greetings.
+
+
+DESCRIPTION
+    The Perl modules: Pgreet (Pgreet.pm,) Pgreet::Config
+    (Pgreet/Config.pm,) Pgreet::Error (Pgreet/Error.pm,)
+    Pgreet::CGIUtils (Pgreet/CGIUtils.pm,) Pgreet:DaemonUtils
+    (Pgreet/DaemonUtils.pm,) Pgreet::ExecEmbperl
+    (Pgreet/ExecEmbperl.pm,) and Pgreet::ExecMason
+    (Pgreet/ExecMason.pm) provide shared functionality for the
+    application of the Penguin Greetings ecard application.  Also
+    included in this distribution are the files associated with
+    Pgreet::I18N (Pgreet/I18N/*.pm) which provide localization for
+    most of the Penguin Greetings secondary ecard sites via the Perl
+    module: Locale::Maketext.  None of this modules are intended to be
+    used by other applications in general.  You can
+    learn more about Penguin Greetings (pgreet) at its SourceForge
+    site:
+
+		http://pgreet.sourceforge.net/
+
+	POD module documentation is provided for those who might wish
+	either to work on Penguin Greetings or adapt these modules to some
+	other purpose.
+
+PREREQUISITES
+	This module requires the following Perl modules to be installed in
+	addition to those included in Perl 5.8.x: Apache::Htpasswd,
+	Config::General, Date::Pcalc, Digest::MD5, Embperl,
+	I18N::AcceptLanguage, Log::Dispatch, MIME::Lite, String::Checker.
+	These are required in order to attempting installing the module at
+	all.  There are two other modules that may be needed depending on
+	your application: Locale::Maketext and HTML::Mason.  The
+	Locale::Maketext is used in all but one of the bilingual Penguin
+	Greetings sites, and HTML::Mason is needed for any Penguin
+	Greetings sites that use Mason instead of Embperl, such as the
+	PgSeattle site.  If you wish to use the test suite to confirm
+	functionality of Pgreet module with these two CPAN modules, you
+	will need to install them before running the test suite.
+	Otherwise the test suite will skip those tests.
+
+INSTALLATION
+	Installing these modules to support Penguin Greetings follows
+	standard Perl conventions.  One can install the library by running
+	the following commands:
+
+	   perl Makefile.PL
+	   make
+       make test
+	   make install
+
+	The "make install" command must be run as superuser (root.)  
+
+COPYRIGHT
+    Copyright (c) 2003-2005 Edouard Lagache
+
+    This software is released under the GNU General Public License, Version
+    2. For more information, see the COPYING file included with this
+    software or visit: http://www.gnu.org/copyleft/gpl.html
+
+BUGS
+    No known bugs at this time.
+
+AUTHOR
+    Edouard Lagache <pgreetdev@canebas.org>
+
+VERSION
+    1.0.0

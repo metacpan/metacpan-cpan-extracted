@@ -1,0 +1,79 @@
+==================================================
+Changes from 2008-06-11 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 2.44 at 2013-06-10 13:21:56 +0000
+-----------------------------------------
+
+  Change: ae253101da7958777a572271f901e894ae20de05
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-06-10 14:21:56 +0000
+
+    Convert the distribution to dzil 
+
+  Change: 2f3bfa5c4a97ca061c2f87d4f4706e0bb0376f43
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2013-06-10 06:08:52 +0000
+
+    Merge pull request #1 from avenj/messagetags
+
+    IRCv3.2 message tag support, tests for same. 
+
+  Change: 31a1c9aeab4120e626af130d73b0f1a58a77d46e
+  Author: Jon Portnoy <avenj@cobaltirc.org>
+  Date : 2013-06-07 13:03:16 +0000
+
+    Add IRCv3.2 message tag support, tests for same. 
+
+-----------------------------------------
+version 2.42 at 2009-12-11 18:40:43 +0000
+-----------------------------------------
+
+  Change: 444e9f0f70357d303fc494abcbc2800d12baf888
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-12-11 18:40:43 +0000
+
+    Updated for CPAN release 
+
+  Change: c058f8b8470518dfd3904ffa49a7c18f58b47266
+  Author: Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>
+  Date : 2009-12-11 02:06:38 +0000
+
+    Allow 005 numerics with more than 13 parameters.
+
+    The RPL_ISUPPORT draft says you're only allowed to send 005 numerics
+    with 13 parameters, but some IRC servers (including dancer-ircd) seem
+    to stuff as many parameters in there as they can. 
+
+  Change: 7d720a1323f31d0bbf5b4689b470acf00ce9bed3
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-10-21 21:48:31 +0000
+
+    Updates to Makefile.PL 
+
+  Change: 9bbf1c4303d3387312c4b8dba519226dd4f8e08d
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-05-01 12:34:13 +0000
+
+    Forgot to add AutoLicense to the MANIFEST 
+
+-----------------------------------------
+version 2.40 at 2009-05-01 11:27:39 +0000
+-----------------------------------------
+
+  Change: 7594b5781e35d3b021cf0069d18a55e091ab4d5b
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-05-01 12:27:39 +0000
+
+    Changed to AutoLicense, tidied up the POD. 
+
+  Change: 23d561a1761f1997d1e0568c2b35b7644cccbcce
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-03-10 20:52:49 +0000
+
+    Initial git commit 
+
+================
+End of releases.
+================

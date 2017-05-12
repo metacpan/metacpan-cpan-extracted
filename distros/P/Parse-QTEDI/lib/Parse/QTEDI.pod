@@ -1,0 +1,203 @@
+=pod
+
+=head1 NAME
+
+Parse::QTEDI - Parse QT/KDE preprocessed headers
+
+=head1 SYNOPSIS
+
+  use Parse::QTEDI qw($parser);
+  defined $parser->begin($in) or warn "parse failed";
+
+=head1 COMMANDLINE USAGE
+
+  $cp header.h header.h.bak                                 # backup
+  $sed -i -e 's/#include/ d' -e 's/#error/ d' header.h      # strip
+  $gcc -E -imacros config.h -DBLAH_BLAH header.h > header.i # pre-process
+  $parse_qtedi_header header.i > production.qtedi           # parse
+  # optional 
+  # format into a binding-make-specific spec
+  $format_qtedi_production production.qtedi > formatted.txt # format
+
+=head1 DESCRIPTION
+
+Parse QT/KDE preprocessed headers to generate interface information.
+
+=head1 WHAT IS INPUT
+
+input stream should be the output of a preprocessor like `gcc -E
+-DBLAH_BLAH'.  
+
+B<NOTE>: Normally one should strip #include and #error directives
+before invoking preprocessor, or else preprocessor will expand all
+include directives encountered and croak on error progma.
+
+=head1 WHAT IS OUTPUT
+
+YAML-ish output to STDOUT; 
+debug info to STDERR if $DEBUG defined.
+
+=head1 WHY IS PREPROCESSED
+
+To solve macro, basically. There are both arch-specific and
+feature-specific macros. One should decide which feature-specific ones
+to enable. Besides, modern libtool normally records compile-time
+commandline options for later reference. 
+
+=head1 HOW TO DEBUG
+
+Defining $Parse::QTEDI::DEBUG to true will enable parse-level debug
+information to STDERR.
+
+B<NOTE>: set at the BEGIN section of your code before using this
+module. 
+
+=head1 WHAT ABOUT THE NAME
+
+QTEDI is QT and QT-basEd Desktop environment Interface ;-)
+
+=head1 EXPORT
+
+An instance of Parse::RecDescent on demand
+
+=head1 PITFALL
+
+1. Performance... Slower than before since function parameter parsing
+loop involved. Precompile could help a little bit; 
+
+2. 'spin' rule which has two subrules, both of them are optional. This
+will cause a similar case as waiting a spin lock; 
+
+=head1 BUG AND TODO
+
+1. Handle of __attribute__ pragma in expression;
+
+2. Handle of escaped token;
+
+=head1 OUTPUT SPEC
+
+  # NOTE: field such as name/variable might be optional
+
+  # a QT/KDE-specific macro/property
+  ---
+     - type    : macro
+     - subtype : 1/2/3
+                 [ subtype 1 has no parameter, subtype 2 has just one, subtype 3 has > 1. ]
+     - name    : [ macro/property name ]
+     - value   : [ the parameter(s) of macro which is of subtype 2/3 ]
+  
+  # a typedef line
+  ---
+     - type     : typedef
+     - body     : [ content of typedef, could be of enum/class/struct/union/fpointer/simple type. ]
+                  [ will be a complete hashref entry in case of enum/class/struct/union/fpointer, 
+                    refer to spec of those types below.                                           ]
+  
+  # a standard C++ one-line comment
+  # multiline style comment (/* */) is stripped by C++ preprocessor
+  ---
+     - type : comment
+     - value: [ content of comment line without '#' ]
+  
+  # an enum entry
+  ---
+     - type     : enum
+     - name     : [ enum name                                               ]
+                  [ possibly with prefix such as macro or other C++ keyword ]
+     - value    : [ arrayref of the enum value list ]
+     - variable : [ declared variables ] 
+  
+  # a template class/struct/enum/function declaration
+  ---
+     - type     : template
+     - body     : [ template body                                  ]
+                  [ an arrayref of all possible code blocks inside ]
+     - typename : [ template type/class declaration ]
+  
+  # an extern reference declaration
+  # C/function/expression/class/struct/union/enum 
+  ---
+     - type    : extern
+     - subtype : C/class/struct/union/enum/function/expression
+     - body    : [ an arrayref of all code blocks inside ]
+  
+  # an namespace declaration
+  ---
+     - type : namespace
+     - name : [ namespace name ] 
+     - body : [ an arrayref of all code blocks inside ] 
+  
+  # a complete class/struct/union declaration
+  # they are treated as a similar way
+  ---
+     - type     : class/struct/union
+     - name     : [ class/struct/union name                                 ] 
+                  [ possibly with prefix such as macro or other C++ keyword ]
+     - body     : [ class/struct/union body unless a forward declaration                ]
+                  [ an arrayref of all code blocks inside                               ]
+                  [ class visibility and QT signal/slot keywords are standalone entries ]
+     - property : [ an arrayref of properties (friend etc.) ]
+     - inheritance : [ class inheritance declaration ] 
+     - variable    : [ declared variables ] 
+  
+  # a class accessibility entry
+  # this includes both class visibility keywords (public/private/protected) 
+  # and QT-specific signal/slot keywords (Q_SIGNALS/Q_SLOTS)
+  # future might have KDE-specific ones
+  # here takes another type name to differentiate with visibility
+  ---
+     - type : accessibility
+     - value: [ accessibility keyword name ]
+  
+  # a complete function declaration
+  ---
+     - type     : function
+     - name     : [ function name with return type                          ]
+                  [ possibly with prefix such as macro or other C++ keyword ]
+     - property : [ c++/QT/KDE-specific keywords (const and like)           ] 
+     - parameter: 
+         - name    : [ parameter name with type               ]
+                     [ could be a hashref of another 
+                       { name => '', parameter => [] } entry 
+                       for recursive function pointer such as 
+                       int ((*signal)(int))(int)              ]
+           subtype : simple/fpointer/template
+           default : [default value declared                  ]
+         ...
+  
+  # a function pointer declaration
+  ---
+     - type     : fpointer
+     - name     : [ function pointer name prefixed with '*'       ]
+     - property : [ similar as in function                        ]
+     - parameter: [ similar as in function                        ] 
+     
+  # a code expression entry
+  ---
+     - type : expression
+     - value: [ expression body ]
+
+=head1 SEE ALSO
+
+L<Parse::RecDescent|Parse::RecDescent> 
+
+output spec and other dev info
+L<http://code.google.com/p/dongxu/wiki/QTEDI> 
+
+my Perl QT4 binding project page 
+L<http://code.google.com/p/dongxu/wiki/PerlQT> 
+
+=head1 AUTHOR
+
+Dongxu Ma, E<lt>dongxu.ma@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 by Dongxu Ma <dongxu@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+See L<http://dev.perl.org/licenses/artistic.html>
+
+=cut

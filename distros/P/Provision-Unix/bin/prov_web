@@ -1,0 +1,146 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use English;
+use Getopt::Long;
+use Pod::Usage;
+
+use lib 'lib';
+use Provision::Unix;
+use Provision::Unix::Web;
+
+my $prov = Provision::Unix->new (debug=>0);
+my $web = Provision::Unix::Web->new( prov=> $prov, debug=>0);
+
+my ( $action, $vals );
+
+# process command line options
+GetOptions(
+
+    'create'  => \$action->{'create'},
+    'modify'  => \$action->{'modify'},
+    'destroy' => \$action->{'destroy'},
+
+    'disable' => \$action->{'disable'},
+    'enable'  => \$action->{'enable'},
+
+    'show'   => \$action->{'show'},
+    'repair' => \$action->{'repair'},
+    'test'   => \$action->{'test'},
+
+    "vhost=s"        => \$vals->{'vhost'},
+    "ip=s"           => \$vals->{'ip'},
+    "serveralias=s"  => \$vals->{'serveralias'},
+    "serveradmin=s"  => \$vals->{'serveradmin'},
+    "documentroot=s" => \$vals->{'documentroot'},
+    "redirect=s"     => \$vals->{'redirect'},
+    "options=s"      => \$vals->{'options'},
+    "cgi=s"          => \$vals->{'cgi'},
+    "ssl"            => \$vals->{'ssl'},
+    "sslcert=s"      => \$vals->{'sslcert'},
+    "sslkey=s"       => \$vals->{'sslkey'},
+    "customlog=s"    => \$vals->{'customlog'},
+    "customerror=s"  => \$vals->{'customerror'},
+    "awstats"        => \$vals->{'awstats'},
+    "phpmyadmin"     => \$vals->{'phpmyadmin'},
+    "verbose"        => \$vals->{'debug'},
+
+    "help"           => \my $help,
+    "version"        => \my $version,
+
+) or die "erorr parsing command line options";
+
+pod2usage( { -verbose => 3 } ) if $help;
+$prov->get_version() and exit if $version;
+
+die "\n$0 must be run as root!\n\n" if $EFFECTIVE_USER_ID != 0;
+
+  $action->{'create'}  ? $web->create(  request => $vals, prompt=>1 )
+: $action->{'destroy'} ? $web->destroy( request => $vals, prompt=>1 )
+: $action->{'enable'}  ? $web->enable(  request => $vals )
+: $action->{'disable'} ? $web->disable( request => $vals )
+: pod2usage( { -verbose => $vals->{'debug'} } );
+
+# future functions....
+#: $action->{'modify'}  ? $web->modify ( request=>$vals )
+#: $action->{'show'}    ? $web->show   ( request=>$vals )
+#: $action->{'repair'}  ? $web->repair ( request=>$vals )
+#: $action->{'test'}    ? $web->test   ( request=>$vals )
+
+=head1 NAME 
+
+prov_web - a command line interface for provisioning web accounts
+
+=head1 SYNOPSIS
+
+  	prov_web --action [--vhost example.com]
+
+Action is one of the following:
+
+  --create   - creates a new system user
+  --modify   - make changes to an existing user
+  --destroy  - remove a user from the system
+  --disable  - disable an account
+  --enable   - enable an account
+
+required arguments:
+
+ -vhost          $vhost        
+
+optional arguments:
+
+ -ip             - IP address to listen on (default *)
+ -serveralias    - list of aliases, comma separated
+ -serveradmin    - email address of server admin
+ -documentroot   - full path to html directory
+ -redirect       - url to redirect site to
+ -options        - server options ex. FollowSymLinks MultiViews Indexes ExecCGI Includes
+ -ssl            - ssl enabled ? 
+ -sslcert        - path to ssl certificate
+ -sslkey         - path to ssl key
+ -cgi            - basic | advanced | custom
+ -customlog      - custom logging directive
+ -customerror    - custom error logging directive
+ -awstats        - include alias for awstats
+ -phpmyadmin     - include alias for phpMyAdmin
+
+
+=head1 USAGE
+ 
+ prov_web --create --vhost=www.example.com
+ prov_web --destroy --vhost=www.example.com
+ prov_web --modify  --vhost=www.example.com --options='Indexes ExecCGI'
+
+
+=head1 DESCRIPTION
+ 
+prov_web is a command line interface to the Provision::Web provisioning modules. 
+
+ 
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+ 
+  Config::Tiny
+  Getopt::Long
+  Params::Validate
+  Digest::MD5 
+  LWP::UserAgent
+
+=head1 AUTHOR
+ 
+Matt Simerson, C<< <matt at tnpi.net> >>
+ 
+ 
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2008 The Network People, Inc. (info@tnpi.net)
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

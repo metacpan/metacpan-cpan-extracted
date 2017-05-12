@@ -1,0 +1,28 @@
+---
+abstract: 'L<Pod::Coverage> extension for L<Method::Signatures>'
+author:
+  - 'Darian Anthony Patrick <dap@darianpatrick.com>'
+build_requires:
+  Method::Signatures: 20100730
+  Test::More: 0.92
+  Test::Output: 0.16
+configure_requires:
+  Module::Build: 0.360300
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Coverage-MethodSignatures
+provides:
+  Pod::Coverage::MethodSignatures:
+    file: lib/Pod/Coverage/MethodSignatures.pm
+    version: 0.02
+requires:
+  Pod::Coverage: 0.20
+  perl: v5.8.1
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pod::Coverage::MethodSignatures
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/dap/Pod-Coverage-MethodSignatures/tree
+version: 0.02

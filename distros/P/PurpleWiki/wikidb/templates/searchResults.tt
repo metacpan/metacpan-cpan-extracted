@@ -1,0 +1,7 @@
+[% INCLUDE common/header.tt
+           title = "Search for: $keywords"
+%]
+
+[% INCLUDE lib/searchResults.tt %]
+
+[% INCLUDE common/footer.tt %]

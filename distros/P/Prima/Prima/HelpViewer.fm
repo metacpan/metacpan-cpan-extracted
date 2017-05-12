@@ -1,0 +1,135 @@
+# VBForm version file=1.1 builder=0.1
+# [preload] Prima::ComboBox
+sub
+{
+	return (
+	'LinkColor' => {
+		class   => 'Prima::ColorComboBox',
+		module  => 'Prima::ColorDialog',
+		profile => {
+			origin => [ 5, 57],
+			name => 'LinkColor',
+			owner => 'Form1',
+			size => [ 56, 18],
+	}},
+	'Form1' => {
+		class   => 'Prima::Window',
+		module  => 'Prima::Classes',
+		parent => 1,
+		profile => {
+			width => 402,
+			name => 'Form1',
+			text => 'Appearance settings',
+			bottom => 303,
+			originDontCare => 0,
+			origin => [ 557, 303],
+			height => 112,
+			left => 557,
+			sizeDontCare => 0,
+			size => [ 402, 112],
+			borderStyle => bs::Dialog,
+	}},
+	'CodeColor' => {
+		class   => 'Prima::ColorComboBox',
+		module  => 'Prima::ColorDialog',
+		profile => {
+			origin => [ 6, 12],
+			name => 'CodeColor',
+			owner => 'Form1',
+			size => [ 56, 18],
+	}},
+	'Label1' => {
+		class   => 'Prima::Label',
+		module  => 'Prima::Label',
+		siblings => [qw(focusLink)],
+		profile => {
+			origin => [ 5, 80],
+			name => 'Label1',
+			owner => 'Form1',
+			size => [ 100, 20],
+			text => '~Link color',
+			focusLink => 'LinkColor',
+	}},
+	'Label2' => {
+		class   => 'Prima::Label',
+		module  => 'Prima::Label',
+		siblings => [qw(focusLink)],
+		profile => {
+			origin => [ 5, 35],
+			name => 'Label2',
+			owner => 'Form1',
+			size => [ 100, 20],
+			text => '~Code color',
+			focusLink => 'CodeColor',
+	}},
+	'OkButton' => {
+		class   => 'Prima::Button',
+		module  => 'Prima::Buttons',
+		profile => {
+			origin => [ 294, 57],
+			name => 'OkButton',
+			size => [ 96, 36],
+			onClick => Prima::VB::VBLoader::GO_SUB('my $self = $_[0];        
+$self-> owner-> ok;','OkButton', 'onClick'),
+			owner => 'Form1',
+			default => 1,
+			text => '~OK',
+	}},
+	'CancelButton' => {
+		class   => 'Prima::Button',
+		module  => 'Prima::Buttons',
+		profile => {
+			origin => [ 294, 12],
+			name => 'CancelButton',
+			size => [ 96, 36],
+			onClick => Prima::VB::VBLoader::GO_SUB('my $self = $_[0];      
+$self-> owner-> cancel;','CancelButton', 'onClick'),
+			owner => 'Form1',
+			text => 'Cancel',
+	}},
+	'FixFont' => {
+		class   => 'Prima::ComboBox',
+		module  => 'Prima::ComboBox',
+		profile => {
+			origin => [ 112, 12],
+			name => 'FixFont',
+			style => cs::DropDown,
+			size => [ 170, 19],
+			owner => 'Form1',
+	}},
+	'Label3' => {
+		class   => 'Prima::Label',
+		module  => 'Prima::Label',
+		siblings => [qw(focusLink)],
+		profile => {
+			origin => [ 112, 35],
+			name => 'Label3',
+			size => [ 170, 20],
+			owner => 'Form1',
+			text => '~Fixed font',
+			focusLink => 'FixFont',
+	}},
+	'VarFont' => {
+		class   => 'Prima::ComboBox',
+		module  => 'Prima::ComboBox',
+		profile => {
+			origin => [ 112, 57],
+			style => cs::DropDown,
+			name => 'VarFont',
+			owner => 'Form1',
+			size => [ 170, 18],
+	}},
+	'Label4' => {
+		class   => 'Prima::Label',
+		module  => 'Prima::Label',
+		siblings => [qw(focusLink)],
+		profile => {
+			origin => [ 112, 80],
+			name => 'Label4',
+			owner => 'Form1',
+			size => [ 170, 21],
+			text => '~Variable font',
+			focusLink => 'VarFont',
+	}},
+	);
+}

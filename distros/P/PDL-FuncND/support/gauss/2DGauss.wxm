@@ -1,0 +1,74 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+
+/* [wxMaxima: input   start ] */
+x : matrix( [cos(t)^2/(sx^2) + sin(t)^2/(sy^2),-sin(2*t)/(2*sx^2) + sin(2*t)/(2*sy^2)],
+  [-sin(2*t)/(2*sx^2) + sin(2*t)/(2*sy^2),sin(t)^2/(sx^2) + cos(t)^2/(sy^2)]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+xinv : trigsimp(trigexpand(trigreduce(invert(x))));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+tex(matrix([sin(t)^2/sy^2+cos(t)^2/sx^2,sin(2*t)/(2*sy^2)-sin(2*t)/(2*sx^2)],[sin(2*t)/(2*sy^2)
+ -sin(2*t)/(2*sx^2),sin(t)^2/sx^2+cos(t)^2/sy^2]))$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+text(xinv);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+help text;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+ascii(xinv);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+xinv;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+print(xinv);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+display(inv);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+display(xinv);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+ldisplay(xinv);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+string(xinv);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+x;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+set_display('ascii)$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+xinv;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+x;
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

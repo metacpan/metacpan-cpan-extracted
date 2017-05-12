@@ -1,0 +1,193 @@
+Revision history for Perinci-Sub-To-CLIDocData
+
+0.28    2016-10-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Bump prereq version Perinci::Sub::GetArgs::Argv to 0.75 to
+	  grok 'hidden' & 'hidden-cli' argument spec tags.
+
+
+0.27    2016-10-25 (PERLANCAR)
+
+	- [ux] Show main options first before the other categories.
+
+
+0.26    2016-10-25 (PERLANCAR)
+
+	- [ux] Don't put argument options to 'Other options' category
+	  because they are less prominent, put them instead in 'Main
+	  options'.
+
+
+0.25    2016-09-26 (PERLANCAR)
+
+	- [ux] Use singular form when showing greedy argument in usage.
+
+
+0.24    2015-12-17 (PERLANCAR)
+
+	- Use use_pos=>1 option when converting args to argv of examples to
+	  get a nicer command line.
+
+
+0.23    2015-09-23 (PERLANCAR)
+
+	- [Bugfix] Don't modify (quote) the original argv in Rinci
+	  metadata.
+
+
+0.22    2015-09-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.21    2015-07-04 (PERLANCAR)
+
+	- Replace option category with categories to allow putting an
+	  option to multiple categories (multiple 'category:Foo' tags), the
+	  old 'category' key is still supported for sometime.
+
+
+0.20    2015-04-07 (PERLANCAR)
+
+	- Forgot to include common_opt in each common option.
+
+
+0.19    2015-04-07 (PERLANCAR)
+
+	- Include common_opt_spec in common option for more detailed
+	  information about (e.g. for building Configuration POD section).
+
+
+0.18    2015-04-07 (PERLANCAR)
+
+	- Tweak categories: also categorize common option according to its tag,
+          add 'option_categories' and 'example_categories' key which currently
+          contain the ordering of each category.
+
+
+0.17    2015-04-02 (PERLANCAR)
+
+	- For bool option which we show the positive, use
+	  summary.alt.bool.yes if available (otherwise fallback to
+	  summary).
+
+
+0.16    2015-04-02 (PERLANCAR)
+
+	- Adjust to DefHash 1.0.9 (rename alt.numnoun.* ->
+	  alt.plurality.*).
+
+	- Tweak: include x.schema.{entity,element_entity} from common
+	  option's spec.
+
+
+0.15    2015-03-19 (PERLANCAR)
+
+        - [ux] Make common option nicer: 1) also show --no-OPT instead of --OPT
+          for boolean common option which has a true default; 2) put default
+          value.
+
+
+0.14    2014-12-09 (PERLANCAR)
+
+	- Add key 'schema' (currently only for common opt).
+
+	- Add 'alias_spec' key for aliases.
+
+
+0.13    2014-12-04 (PERLANCAR)
+
+        - [Bugfix] Fix endless loop problem when producing usage line.
+
+
+0.12    2014-12-03 (PERLANCAR)
+
+        - No functional changes.
+
+        - [pod] Insert sample metadata and result in Synopsis.
+
+
+0.11    2014-12-02 (PERLANCAR)
+
+        - Rename dist from Perinci-Sub-To-CLIOptSpec to the more descriptive and
+          extensive Perinci-Sub-To-CLIDocData.
+
+        - Select and format examples.
+
+
+0.10    2014-12-02 (PERLANCAR)
+
+	- [ux] For --array-of-str option, show singular summary
+          (summary.alt.numnoun.singular) if available.
+
+        [INCOMPATIBLE CHANGES]
+
+        - Change searching negative summary from in 'summary.alt.neg' to
+          'summary.alt.bool.not' to comply to DefHash 1.0.8.
+
+
+0.09    2014-12-02 (PERLANCAR)
+
+	- Add 'opt_parsed' key for each opt.
+
+
+0.08    2014-11-30 (PERLANCAR)
+
+	- Add key 'orig_opt' for each option.
+
+
+0.07    2014-11-21 (PERLANCAR)
+
+	- Handle case when each tag is a defhahs.
+
+
+0.06    2014-11-21 (PERLANCAR)
+
+        - Add 'main_opt' in alias/base64/json/yaml options to be able to link
+          back to its main/canonical option.
+
+
+0.05    2014-11-21 (PERLANCAR)
+
+        - No functional changes.
+
+        - [Bugfix] Fix stupid bug/typo.
+
+
+0.04    2014-11-21 (PERLANCAR)
+
+        - Add more information to CLI option spec: each option now include
+          arg/fqarg/arg_spec/links/tags/raw_category.
+
+        - A couple of minor fixes.
+
+
+0.03    2014-11-20 (PERLANCAR)
+
+        - Accept and pass per_arg_json & per_arg_yaml arguments to
+          Perinci::Sub::Args::Argv.
+
+        - Add arg/fqarg/is_base64/is_json/is_yaml to each opt
+
+        - [ux] Don't add required mark '*' for base64/json/yaml version.
+
+
+0.02    2014-11-20 (PERLANCAR)
+
+	- Add arg_spec for each opt (to show e.g. values of 'in' clause
+	  from schema, etc).
+
+	- Add 'default' for each opt.
+
+
+0.01     2014-11-20 (PERLANCAR)
+
+         - First release. This is part of an effort to refactor Perinci-To-Doc.
+           This distribution is separated so it can have minimal dependencies
+           (e.g. to be used by Perinci-CmdLine-Lite).

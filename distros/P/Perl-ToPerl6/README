@@ -1,0 +1,676 @@
+NAME
+    Perl::ToPerl6 - Critique Perl source code for best-practices.
+
+SYNOPSIS
+        use Perl::ToPerl6;
+        my $file = shift;
+        my $mogrify = Perl::ToPerl6->new();
+        my @transformations = $mogrify->transform($file);
+        print @transformations;
+
+DESCRIPTION
+    Perl::ToPerl6 is an extensible framework for creating and applying
+    coding standards to Perl source code. Essentially, it is a static source
+    code analysis engine. Perl::ToPerl6 is distributed with a number of
+    Perl::ToPerl6::Transformer modules that attempt to enforce various
+    coding guidelines. Most Transformer modules are based on Damian Conway's
+    book Perl Best Practices. However, Perl::ToPerl6 is not limited to PBP
+    and will even support Transformers that contradict Conway. You can
+    enable, disable, and customize those Polices through the Perl::ToPerl6
+    interface. You can also create new Transformer modules that suit your
+    own tastes.
+
+    For a command-line interface to Perl::ToPerl6, see the documentation for
+    perlmogrify. If you want to integrate Perl::ToPerl6 with your build
+    process, Test::Perl::ToPerl6 provides an interface that is suitable for
+    test programs. Also, Test::Perl::ToPerl6::Progressive is useful for
+    gradually applying coding standards to legacy code. For the ultimate
+    convenience (at the expense of some flexibility) see the mogrification
+    pragma.
+
+    If you'd like to try Perl::ToPerl6 without installing anything, there is
+    a web-service available at <http://perlmogrify.com>. The web-service
+    does not yet support all the configuration features that are available
+    in the native Perl::ToPerl6 API, but it should give you a good idea of
+    what it does.
+
+    Also, ActivePerl includes a very slick graphical interface to
+    Perl-ToPerl6 called "perlmogrify-gui". You can get a free community
+    edition of ActivePerl from <http://www.activestate.com>.
+
+INTERFACE SUPPORT
+    This is considered to be a public class. Any changes to its interface
+    will go through a deprecation cycle.
+
+CONSTRUCTOR
+    "new( [ -profile => $FILE, -necessity => $N, -detail => $N, -theme =>
+    $string, -include => \@PATTERNS, -exclude => \@PATTERNS, -top => $N,
+    -in_place => $B, -only => $B, -profile-strictness =>
+    $PROFILE_STRICTNESS_{WARN|FATAL|QUIET}, -force => $B, -verbose => $N ],
+    -color => $B, -pager => $string, -mogrification-fatal => $B)"
+    "new()"
+        Returns a reference to a new Perl::ToPerl6 object. Most arguments
+        are just passed directly into Perl::ToPerl6::Config, but I have
+        described them here as well. The default value for all arguments can
+        be defined in your .perlmogrifyrc file. See the "CONFIGURATION"
+        section for more information about that. All arguments are optional
+        key-value pairs as follows:
+
+        -profile is a path to a configuration file. If $FILE is not defined,
+        Perl::ToPerl6::Config attempts to find a .perlmogrifyrc
+        configuration file in the current directory, and then in your home
+        directory. Alternatively, you can set the "PERLMOGRIFY" environment
+        variable to point to a file in another location. If a configuration
+        file can't be found, or if $FILE is an empty string, then all
+        Transformers will be loaded with their default configuration. See
+        "CONFIGURATION" for more information.
+
+        -necessity is the minimum necessity level. Only Transformer modules
+        that have a necessity greater than $N will be applied. Necessity
+        values are integers ranging from 1 (least severe transformations) to
+        5 (most severe transformations). The default is 5. For a given
+        "-profile", decreasing the "-necessity" will usually reveal more
+        Transformer transformations. You can set the default value for this
+        option in your .perlmogrifyrc file. Users can redefine the necessity
+        level for any Transformer in their .perlmogrifyrc file. See
+        "CONFIGURATION" for more information.
+
+        If it is difficult for you to remember whether necessity "5" is the
+        most or least restrictive level, then you can use one of these named
+        values:
+
+            NECESSITY NAME   ...is equivalent to...   NECESSITY NUMBER
+            --------------------------------------------------------
+            -necessity => 'gentle'                     -necessity => 5
+            -necessity => 'stern'                      -necessity => 4
+            -necessity => 'harsh'                      -necessity => 3
+            -necessity => 'cruel'                      -necessity => 2
+            -necessity => 'brutal'                     -necessity => 1
+
+        The names reflect how severely the code is mogrified: a "gentle"
+        mogrification reports only the most severe transformations, and so
+        on down to a "brutal" mogrification which reports even the most
+        minor transformations.
+
+        -theme is special expression that determines which Transformers to
+        apply based on their respective themes. For example, the following
+        would load only Transformers that have a 'bugs' AND 'core' theme:
+
+          my $mogrify = Perl::ToPerl6->new( -theme => 'bugs && core' );
+
+        Unless the "-necessity" option is explicitly given, setting "-theme"
+        silently causes the "-necessity" to be set to 1. You can set the
+        default value for this option in your .perlmogrifyrc file. See the
+        "POLICY THEMES" section for more information about themes.
+
+        -include is a reference to a list of string @PATTERNS. Transformer
+        modules that match at least one "m/$PATTERN/ixms" will always be
+        loaded, irrespective of all other settings. For example:
+
+            my $mogrify = Perl::ToPerl6->new(-include => ['layout'] -necessity => 4);
+
+        This would cause Perl::ToPerl6 to apply all the "CodeLayout::*"
+        Transformer modules even though they have a necessity level that is
+        less than 4. You can set the default value for this option in your
+        .perlmogrifyrc file. You can also use "-include" in conjunction with
+        the "-exclude" option. Note that "-exclude" takes precedence over
+        "-include" when a Transformer matches both patterns.
+
+        -exclude is a reference to a list of string @PATTERNS. Transformer
+        modules that match at least one "m/$PATTERN/ixms" will not be
+        loaded, irrespective of all other settings. For example:
+
+            my $mogrify = Perl::ToPerl6->new(-exclude => ['strict'] -necessity => 1);
+
+        This would cause Perl::ToPerl6 to not apply the "RequireUseStrict"
+        and "ProhibitNoStrict" Transformer modules even though they have a
+        necessity level that is greater than 1. You can set the default
+        value for this option in your .perlmogrifyrc file. You can also use
+        "-exclude" in conjunction with the "-include" option. Note that
+        "-exclude" takes precedence over "-include" when a Transformer
+        matches both patterns.
+
+        -single-transformer is a string "PATTERN". Only one transformer that
+        matches "m/$PATTERN/ixms" will be used. Transformers that do not
+        match will be excluded. This option has precedence over the
+        "-necessity", "-theme", "-include", "-exclude", and "-only" options.
+        You can set the default value for this option in your .perlmogrifyrc
+        file.
+
+        -top is the maximum number of Transformations to return when ranked
+        by their necessity levels. This must be a positive integer.
+        Transformations are still returned in the order that they occur
+        within the file. Unless the "-necessity" option is explicitly given,
+        setting "-top" silently causes the "-necessity" to be set to 1. You
+        can set the default value for this option in your .perlmogrifyrc
+        file.
+
+        -in_place is a boolean value. If set to a true value, Perl::ToPerl6
+        will replace the existing Perl source with its transformed
+        equivalent. This of course overwrites the file's contents, and
+        should be done sparingly, if at all. If set to a false value (which
+        is the default), then Perl::ToPerl6 creates a new file, adding
+        '.pl6' to the existing filename. You can set the default value for
+        this option in your .perlmogrifyrc file.
+
+        -only is a boolean value. If set to a true value, Perl::ToPerl6 will
+        only choose from Transformers that are mentioned in the user's
+        profile. If set to a false value (which is the default), then
+        Perl::ToPerl6 chooses from all the Transformers that it finds at
+        your site. You can set the default value for this option in your
+        .perlmogrifyrc file.
+
+        -profile-strictness is an enumerated value, one of
+        "$PROFILE_STRICTNESS_WARN" in Perl::ToPerl6::Utils::Constants (the
+        default), "$PROFILE_STRICTNESS_FATAL" in
+        Perl::ToPerl6::Utils::Constants, and "$PROFILE_STRICTNESS_QUIET" in
+        Perl::ToPerl6::Utils::Constants. If set to
+        "$PROFILE_STRICTNESS_FATAL" in Perl::ToPerl6::Utils::Constants,
+        Perl::ToPerl6 will make certain warnings about problems found in a
+        .perlmogrifyrc or file specified via the -profile option fatal. For
+        example, Perl::ToPerl6 normally only "warn"s about profiles
+        referring to non-existent Transformers, but this value makes this
+        situation fatal. Correspondingly, "$PROFILE_STRICTNESS_QUIET" in
+        Perl::ToPerl6::Utils::Constants makes Perl::ToPerl6 shut up about
+        these things.
+
+        -detail can be an integer (from 0 to 5). If set to a non-zero value,
+        all transformations of a necessity equal to or less than -detail
+        will be reported on. You can set the default value for this option
+        in your .perlmogrifyrc file.
+
+        -force is a boolean value that controls whether Perl::ToPerl6
+        observes the magical "## no mogrify" annotations in your code. If
+        set to a true value, Perl::ToPerl6 will analyze all code. If set to
+        a false value (which is the default) Perl::ToPerl6 will ignore code
+        that is tagged with these annotations. See "BENDING THE RULES" for
+        more information. You can set the default value for this option in
+        your .perlmogrifyrc file.
+
+        -verbose can be a positive integer (from 1 to 11), or a literal
+        format specification. See Perl::ToPerl6::Transformation for an
+        explanation of format specifications. You can set the default value
+        for this option in your .perlmogrifyrc file.
+
+        -color and -pager are not used by Perl::ToPerl6 but is provided for
+        the benefit of perlmogrify.
+
+        -mogrification-fatal is not used by Perl::ToPerl6 but is provided
+        for the benefit of mogrification.
+
+        -color-necessity-highest, -color-necessity-high, -color-necessity-
+        medium, -color-necessity-low, and -color-necessity-lowest are not
+        used by Perl::ToPerl6, but are provided for the benefit of
+        perlmogrify. Each is set to the Term::ANSIColor color specification
+        to be used to display transformations of the corresponding
+        necessity.
+
+        -files-with-transformations and -files-without-transformations are
+        not used by Perl::ToPerl6, but are provided for the benefit of
+        perlmogrify, to cause only the relevant filenames to be displayed.
+
+METHODS
+    "transform( $source_code )"
+        Runs the $source_code through the Perl::ToPerl6 engine using all the
+        Transformers that have been loaded into this engine. If $source_code
+        is a scalar reference, then it is treated as a string of actual Perl
+        code. If $source_code is a reference to an instance of
+        PPI::Document, then that instance is used directly. Otherwise, it is
+        treated as a path to a local file containing Perl code. This method
+        returns a list of Perl::ToPerl6::Transformation objects for each
+        transformation of the loaded Transformers. The list is sorted in the
+        order that the Transformations appear in the code. If there are no
+        transformations, this method returns an empty list.
+
+    "apply_transform( -transformer => $transformer_name, -params =>
+    \%param_hash )"
+        Creates a Transformer object and loads it into this ToPerl6. If the
+        object cannot be instantiated, it will throw a fatal exception.
+        Otherwise, it returns a reference to this ToPerl6.
+
+        -transformer is the name of a Perl::ToPerl6::Transformer subclass
+        module. The 'Perl::ToPerl6::Transformer' portion of the name can be
+        omitted for brevity. This argument is required.
+
+        -params is an optional reference to a hash of Transformer
+        parameters. The contents of this hash reference will be passed into
+        to the constructor of the Transformer module. See the documentation
+        in the relevant Transformer module for a description of the
+        arguments it supports.
+
+    " transformers() "
+        Returns a list containing references to all the Transformer objects
+        that have been loaded into this engine. Objects will be in the order
+        that they were loaded.
+
+    " config() "
+        Returns the Perl::ToPerl6::Config object that was created for or
+        given to this ToPerl6.
+
+    " statistics() "
+        Returns the Perl::ToPerl6::Statistics object that was created for
+        this ToPerl6. The Statistics object accumulates data for all files
+        that are analyzed by this ToPerl6.
+
+FUNCTIONAL INTERFACE
+    For those folks who prefer to have a functional interface, The
+    "transform" method can be exported on request and called as a static
+    function. If the first argument is a hashref, its contents are used to
+    construct a new Perl::ToPerl6 object internally. The keys of that hash
+    should be the same as those supported by the "Perl::ToPerl6::new()"
+    method. Here are some examples:
+
+        use Perl::ToPerl6 qw(transform);
+
+        # Use default parameters...
+        @transformations = transform( $some_file );
+
+        # Use custom parameters...
+        @transformations = transform( {-necessity => 2}, $some_file );
+
+        # As a one-liner
+        %> perl -MPerl::ToPerl6=transform -e 'print transform(shift)' some_file.pm
+
+    None of the other object-methods are currently supported as static
+    functions. Sorry.
+
+CONFIGURATION
+    Most of the settings for Perl::ToPerl6 and each of the Transformer
+    modules can be controlled by a configuration file. The default
+    configuration file is called .perlmogrifyrc. Perl::ToPerl6 will look for
+    this file in the current directory first, and then in your home
+    directory. Alternatively, you can set the "PERLMOGRIFY" environment
+    variable to explicitly point to a different file in another location. If
+    none of these files exist, and the "-profile" option is not given to the
+    constructor, then all the modules that are found in the
+    Perl::ToPerl6::Transformer namespace will be loaded with their default
+    configuration.
+
+    The format of the configuration file is a series of INI-style blocks
+    that contain key-value pairs separated by '='. Comments should start
+    with '#' and can be placed on a separate line or after the name-value
+    pairs if you desire.
+
+    Default settings for Perl::ToPerl6 itself can be set before the first
+    named block. For example, putting any or all of these at the top of your
+    configuration file will set the default value for the corresponding
+    constructor argument.
+
+        necessity  = 3                                     #Integer or named level
+        in_place   = 0                                     #Zero or One
+        only       = 1                                     #Zero or One
+        force      = 0                                     #Zero or One
+        detail     = 0                                     #Integer or named level
+        verbose    = 4                                     #Integer or format spec
+        top        = 50                                    #A positive integer
+        theme      = (pbp || security) && bugs             #A theme expression
+        include    = NamingConventions ClassHierarchies    #Space-delimited list
+        exclude    = Variables  Modules::RequirePackage    #Space-delimited list
+        mogrification-fatal = 1                            #Zero or One
+        color               = 1                            #Zero or One
+        pager               = less                         #pager to pipe output to
+
+    The remainder of the configuration file is a series of blocks like this:
+
+        [Perl::ToPerl6::Transformer::Category::TransformerName]
+        necessity = 1
+        set_themes = foo bar
+        add_themes = baz
+        arg1 = value1
+        arg2 = value2
+
+    "Perl::ToPerl6::Transformer::Category::TransformerName" is the full name
+    of a module that implements the transformer. The Transformer modules
+    distributed with Perl::ToPerl6 have been grouped into categories
+    according to token type. For brevity, you can omit the
+    'Perl::ToPerl6::Transformer' part of the module name.
+
+    "necessity" is the level of importance you wish to assign to the
+    Transformer. All Transformer modules are defined with a default
+    necessity value ranging from 1 (least severe) to 5 (most severe).
+    However, you may disagree with the default necessity and choose to give
+    it a higher or lower necessity, based on your own coding philosophy. You
+    can set the "necessity" to an integer from 1 to 5, or use one of the
+    equivalent names:
+
+        NECESSITY NAME ...is equivalent to... NECESSITY NUMBER
+        ----------------------------------------------------
+        gentle                                             5
+        stern                                              4
+        harsh                                              3
+        cruel                                              2
+        brutal                                             1
+
+    The names reflect how severely the code is mogrified: a "gentle"
+    mogrification reports only the most severe transformations, and so on
+    down to a "brutal" mogrification which reports even the most minor
+    transformations.
+
+    "set_themes" sets the theme for the Transformer and overrides its
+    default theme. The argument is a string of one or more
+    whitespace-delimited alphanumeric words. Themes are case-insensitive.
+    See "POLICY THEMES" for more information.
+
+    "add_themes" appends to the default themes for this Transformer. The
+    argument is a string of one or more whitespace-delimited words. Themes
+    are case- insensitive. See "POLICY THEMES" for more information.
+
+    The remaining key-value pairs are configuration parameters that will be
+    passed into the constructor for that Transformer. The constructors for
+    most Transformer objects do not support arguments, and those that do
+    should have reasonable defaults. See the documentation on the
+    appropriate Transformer module for more details.
+
+    Instead of redefining the necessity for a given Transformer, you can
+    completely disable a Transformer by prepending a '-' to the name of the
+    module in your configuration file. In this manner, the Transformer will
+    never be loaded, regardless of the "-necessity" given to the
+    Perl::ToPerl6 constructor.
+
+    A simple configuration might look like this:
+
+        #--------------------------------------------------------------
+        # I think these are really important, so always load them
+
+        [TestingAndDebugging::RequireUseStrict]
+        necessity = 5
+
+        [TestingAndDebugging::RequireUseWarnings]
+        necessity = 5
+
+        #--------------------------------------------------------------
+        # I think these are less important, so only load when asked
+
+        [Variables::ProhibitPackageVars]
+        necessity = 2
+
+        [ControlStructures::ProhibitPostfixControls]
+        allow = if unless  # My custom configuration
+        necessity = cruel   # Same as "necessity = 2"
+
+        #--------------------------------------------------------------
+        # Give these transformers a custom theme.  I can activate just
+        # these transformers by saying `perlmogrify -theme larry`
+
+        [Modules::RequireFilenameMatchesPackage]
+        add_themes = larry
+
+        [TestingAndDebugging::RequireTestLables]
+        add_themes = larry curly moe
+
+        #--------------------------------------------------------------
+        # I do not agree with these at all, so never load them
+
+        [-NamingConventions::Capitalization]
+        [-ValuesAndExpressions::ProhibitMagicNumbers]
+
+        #--------------------------------------------------------------
+        # For all other Transformers, I accept the default necessity,
+        # so no additional configuration is required for them.
+
+    For additional configuration examples, see the perlmogrifyrc file that
+    is included in this examples directory of this distribution.
+
+    Damian Conway's own Perl::ToPerl6 configuration is also included in this
+    distribution as examples/perlmogrifyrc-conway.
+
+THE POLICIES
+    A large number of Transformer modules are distributed with
+    Perl::ToPerl6. They are described briefly in the companion document
+    Perl::ToPerl6::TransformerSummary and in more detail in the individual
+    modules themselves. Say ""perlmogrify -doc PATTERN"" to see the perldoc
+    for all Transformer modules that match the regex "m/PATTERN/ixms"
+
+    There are a number of distributions of additional transformers on CPAN.
+    If Perl::ToPerl6 doesn't contain a transformer that you want, some one
+    may have already written it. See the "SEE ALSO" section below for a list
+    of some of these distributions.
+
+POLICY THEMES
+    Each Transformer is defined with one or more "themes". Themes can be
+    used to create arbitrary groups of Transformers. They are intended to
+    provide an alternative mechanism for selecting your preferred set of
+    Transformers. For example, you may wish disable a certain subset of
+    Transformers when analyzing test programs. Conversely, you may wish to
+    enable only a specific subset of Transformers when analyzing modules.
+
+    The Transformers that ship with Perl::ToPerl6 have been broken into the
+    following themes. This is just our attempt to provide some basic logical
+    groupings. You are free to invent new themes that suit your needs.
+
+        THEME             DESCRIPTION
+        --------------------------------------------------------------------------
+        core              All transformers that ship with Perl::ToPerl6
+        pbp               Transformers that come directly from "Perl Best Practices"
+        bugs              Transformers that that prevent or reveal bugs
+        maintenance       Transformers that affect the long-term health of the code
+        cosmetic          Transformers that only have a superficial effect
+        complexity        Transformers that specificaly relate to code complexity
+        security          Transformers that relate to security issues
+        tests             Transformers that are specific to test programs
+
+    Any Transformer may fit into multiple themes. Say "perlmogrify -list" to
+    get a listing of all available Transformers and the themes that are
+    associated with each one. You can also change the theme for any
+    Transformer in your .perlmogrifyrc file. See the "CONFIGURATION" section
+    for more information about that.
+
+    Using the "-theme" option, you can create an arbitrarily complex rule
+    that determines which Transformers will be loaded. Precedence is the
+    same as regular Perl code, and you can use parentheses to enforce
+    precedence as well. Supported operators are:
+
+        Operator    Alternative    Example
+        -----------------------------------------------------------------
+        &&          and            'pbp && core'
+        ||          or             'pbp || (bugs && security)'
+        !           not            'pbp && ! (portability || complexity)'
+
+    Theme names are case-insensitive. If the "-theme" is set to an empty
+    string, then it evaluates as true all Transformers.
+
+BENDING THE RULES
+    Perl::ToPerl6 takes a hard-line approach to your code: either you comply
+    or you don't. In the real world, it is not always practical (nor even
+    possible) to fully comply with coding standards. In such cases, it is
+    wise to show that you are knowingly violating the standards and that you
+    have a Damn Good Reason (DGR) for doing so.
+
+    To help with those situations, you can direct Perl::ToPerl6 to ignore
+    certain lines or blocks of code by using annotations:
+
+        require 'LegacyLibaray1.pl';  ## no mogrify
+        require 'LegacyLibrary2.pl';  ## no mogrify
+
+        for my $element (@list) {
+
+            ## no mogrify
+
+            $foo = "";               #Violates 'ProhibitEmptyQuotes'
+            $barf = bar() if $foo;   #Violates 'ProhibitPostfixControls'
+            #Some more evil code...
+
+            ## use mogrify
+
+            #Some good code...
+            do_something($_);
+        }
+
+    The "## no mogrify" annotations direct Perl::ToPerl6 to ignore the
+    remaining lines of code until a "## use mogrify" annotation is found. If
+    the ""## no mogrify"" annotation is on the same line as a code
+    statement, then only that line of code is overlooked. To direct
+    perlmogrify to ignore the ""## no mogrify"" annotations, use the
+    "--force" option.
+
+    A bare "## no mogrify" annotation disables all the active Transformers.
+    If you wish to disable only specific Transformers, add a list of
+    Transformer names as arguments, just as you would for the "no strict" or
+    "no warnings" pragmas. For example, this would disable the
+    "ProhibitEmptyQuotes" and "ProhibitPostfixControls" transformers until
+    the end of the block or until the next "## use mogrify" annotation
+    (whichever comes first):
+
+        ## no mogrify (EmptyQuotes, PostfixControls)
+
+        # Now exempt from ValuesAndExpressions::ProhibitEmptyQuotes
+        $foo = "";
+
+        # Now exempt ControlStructures::ProhibitPostfixControls
+        $barf = bar() if $foo;
+
+        # Still subjected to ValuesAndExpression::RequireNumberSeparators
+        $long_int = 10000000000;
+
+    Since the Transformer names are matched against the "## no mogrify"
+    arguments as regular expressions, you can abbreviate the Transformer
+    names or disable an entire family of Transformers in one shot like this:
+
+        ## no mogrify (NamingConventions)
+
+        # Now exempt from NamingConventions::Capitalization
+        my $camelHumpVar = 'foo';
+
+        # Now exempt from NamingConventions::Capitalization
+        sub camelHumpSub {}
+
+    The argument list must be enclosed in parentheses and must contain one
+    or more comma-separated barewords (e.g. don't use quotes). The "## no
+    mogrify" annotations can be nested, and Transformers named by an inner
+    annotation will be disabled along with those already disabled an outer
+    annotation.
+
+    Some Transformers like "Subroutines::ProhibitExcessComplexity" apply to
+    an entire block of code. In those cases, the "## no mogrify" annotation
+    must appear on the line where the transformation is reported. For
+    example:
+
+        sub complicated_function {  ## no mogrify (ProhibitExcessComplexity)
+            # Your code here...
+        }
+
+    Transformers such as "Documentation::RequirePodSections" apply to the
+    entire document, in which case transformations are reported at line 1.
+
+    Use this feature wisely. "## no mogrify" annotations should be used in
+    the smallest possible scope, or only on individual lines of code. And
+    you should always be as specific as possible about which Transformers
+    you want to disable (i.e. never use a bare "## no mogrify"). If
+    Perl::ToPerl6 complains about your code, try and find a compliant
+    solution before resorting to this feature.
+
+THE Perl::ToPerl6 PHILOSOPHY
+    Coding standards are deeply personal and highly subjective. The goal of
+    Perl::ToPerl6 is to help you write code that conforms with a set of best
+    practices. Our primary goal is not to dictate what those practices are,
+    but rather, to implement the practices discovered by others. Ultimately,
+    you make the rules -- Perl::ToPerl6 is merely a tool for encouraging
+    consistency. If there is a transformer that you think is important or
+    that we have overlooked, we would be very grateful for contributions, or
+    you can simply load your own private set of transformers into
+    Perl::ToPerl6.
+
+EXTENDING THE MOGRIFIER
+    The modular design of Perl::ToPerl6 is intended to facilitate the
+    addition of new Transformers. You'll need to have some understanding of
+    PPI, but most Transformer modules are pretty straightforward and only
+    require about 20 lines of code. Please see the Perl::ToPerl6::DEVELOPER
+    file included in this distribution for a step-by-step demonstration of
+    how to create new Transformer modules.
+
+    If you develop any Transformer modules, feel free to add a pull request
+    on GitHub, <http://github.com/drforr/Perl-Mogrify.git>.
+
+PREREQUISITES
+    Perl::ToPerl6 requires the following modules:
+
+    B::Keywords
+
+    Config::Tiny
+
+    Exception::Class
+
+    File::HomeDir
+
+    File::Spec
+
+    File::Spec::Unix
+
+    File::Which
+
+    IO::String
+
+    List::MoreUtils
+
+    List::Util
+
+    Module::Pluggable
+
+    PPI
+
+    Pod::PlainText
+
+    Pod::Select
+
+    Pod::Usage
+
+    Readonly
+
+    Scalar::Util
+
+    String::Format
+
+    Task::Weaken
+
+    Term::ANSIColor
+
+    Text::ParseWords
+
+    version
+
+CONTACTING THE DEVELOPMENT TEAM
+    You are encouraged to subscribe to the mailing list; send a message to
+    <mailto:users-subscribe@perlmogrify.tigris.org>. To prevent spam, you
+    may be required to register for a user account with Tigris.org before
+    being allowed to post messages to the mailing list. See also the mailing
+    list archives at
+    <http://perlmogrify.tigris.org/servlets/SummarizeList?listName=users>.
+    At least one member of the development team is usually hanging around in
+    <irc://irc.perl.org/#perlmogrify> and you can follow Perl::ToPerl6 on
+    Twitter, at <https://twitter.com/perlmogrify>.
+
+BUGS
+    Scrutinizing Perl code is hard for humans, let alone machines. If you
+    find any bugs, particularly false-positives or false-negatives from a
+    Perl::ToPerl6::Transformer, please submit them at
+    "/github.com/Perl-ToPerl6 /Perl-ToPerl6/issues" in https:. Thanks.
+
+CREDITS
+    Adam Kennedy - For creating PPI, the heart and soul of Perl::ToPerl6.
+
+    Chris Dolan - For contributing the best features and Transformer
+    modules.
+
+    Andy Lester - Wise sage and master of all-things-testing.
+
+    Elliot Shank - The self-proclaimed quality freak.
+
+    Giuseppe Maxia - For all the great ideas and positive encouragement.
+
+    Thanks also to the Perl Foundation for providing a grant to support
+    Chris Dolan's project to implement twenty PBP transformers.
+    <http://www.perlfoundation.org/april_1_2007_new_grant_awards>
+
+AUTHOR
+    Jeffrey Goff <drforr@pobox.com>
+
+AUTHOR Emeritus
+    Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>
+
+COPYRIGHT
+    Copyright (c) 2015 Jeffrey Goff. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. The full text of this license can
+    be found in the LICENSE file included with this module.
+

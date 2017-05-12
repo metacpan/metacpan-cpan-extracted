@@ -1,0 +1,67 @@
+#!/bin/perl -w
+
+#	This makes use of the nice flatfile addressbook program to be found
+#	at http://www.red.roses.de/~clemens/addressbook/
+#	or
+#	http://addressbook.home.pages.de/ 
+
+#	Open addressbook, select subset, and print
+
+use PostScript::MailLabels 2.0;
+use AddressBook;
+
+$labels = PostScript::MailLabels->new;
+
+#	Open address book and select addresses to print
+
+my $book = "$ENV{HOME}/addresses_private";
+
+my $addr = AddressBook->new($book);
+
+my $data = $addr->getaddresses('Xmas list','Yes');
+
+#	Prepare mailing labels (assume you've already calibrated them)
+
+	$labels->labelsetup( Units => 'english',
+	                    Font => 'Helvetica',
+						Printable_Left		=> 0.25,
+						Printable_Right		=> 0.25,
+						Printable_Top		=> 0.0,
+						Printable_Bot		=> 0.55,
+						
+						Output_Top		=> 0.5, 
+						Output_Width	=> 2.625, 
+						Output_Height	=> 1.0, 
+						X_Gap			=> 0.16,
+						Y_Gap			=> 0.0,
+						Number			=> 30,
+
+						#	Adjustments for printer idiosyncracies
+
+						X_Adjust		=> 0.05,
+						Y_Adjust		=> 0.05,
+
+	                   );
+
+my @addresses; 
+# address array elements are : first, last, street_addr, city, state, zip
+
+#	Build array of addresses
+foreach (sort {$a->[1] cmp $b->[1]} @{$data}) {
+	if ($_->[3]) {
+		push @addresses,[$_->[0],$_->[1],$_->[3],$_->[5],$_->[6],$_->[7]];
+	}
+	else {
+		push @addresses,[$_->[0],$_->[1],$_->[4],$_->[5],$_->[6],$_->[7]];
+	}
+}
+
+#	Create labels
+
+my $output = $labels->makelabels(\@addresses);
+
+open (UT,">labels_out.ps") || die "Warning, cannot write labels_out.ps, $!\n";
+print UT $output;
+close UT;
+
+print "\n******** View labels_out.ps with ghostscript ********\n";

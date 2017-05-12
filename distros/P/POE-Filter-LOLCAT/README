@@ -1,0 +1,53 @@
+NAME
+    POE::Filter::LOLCAT - POE FILTR T SPEKK LIEK LOLCATZ. KTHNX!
+
+SYNOPSIZ
+      my $filter = POE::Filter::LOLCAT->new();
+
+      $arrayref_of_logical_chunks =
+        $filter->get($arrayref_of_raw_chunks_from_driver);
+
+DESCRIPSHUN
+    POE::Filter::LOLCAT is a POE::Filter for translating lines of text into
+    "LOLCAT", using the excellent Acme::LOLCAT. KTHNX!
+
+    It is intended to be used in a stackable filter, POE::Filter::Stackable,
+    with POE::Filter::Line.
+
+CONSTRUCTOR
+    "new"
+        Creates a new POE::Filter::LOLCAT object.
+
+METHODZ
+    "get"
+    "get_one_start"
+    "get_one"
+        TAKEZ AN ARRAYREF WHICH AR TEH CONTAINZ LINEZ OF TEXT, RETURNZ AN
+        ARRAYREF OV LOLCAT TRANSLATED TEXT. KTHX.
+
+    "get_pending"
+        RETURNZ TEH FILTRZ PARTIAL INPUT BUFFR
+
+    "put"
+        TEH PUT METHOD AR TEH NOT IMPLEMENTED. KTHNX!
+
+    "clone"
+        MAKEZ COPY OV TEH FILTR, AND CLEARZ TEH COPYZ BUFFR. KTHX.
+
+AUTHOR
+    Chris "BinGOs" Williams <chris@bingosnet.co.uk>
+
+LICENSE
+    Copyright © 2008 Chris Williams
+
+    THIZ MODULE MAY BE USED, MODIFIED, AND DISTRIBUTED UNDR TEH SAME TERMZ
+    AZ PERL ITSELF. PLEEZ SEE TEH LICENSE THAT CAME WITH YORE PERL
+    DISTRIBUSHUN FOR DETAILZ. KTHX.
+
+SEE ALSO
+    Acme::LOLCAT
+
+    POE::Filter::Stackable
+
+    POE::Filter::Line
+

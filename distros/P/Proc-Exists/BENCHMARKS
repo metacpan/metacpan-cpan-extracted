@@ -1,0 +1,98 @@
+NOTE: these benchmarks are very outdated at this point. all tests were
+      done with a version of Proc::Exists between versions 0.04 and 0.05
+
+NOTE: pexists/C is only marginally (5-12%) faster than pexists/PP 
+in this case, but there are other cases where the C implementation is
+a factor of 2 faster (scroll down)... This test shows the advantage
+of a straight pexists call to parsing Proc::ProcessTable output.
+
+all tests were done 3 times and averaged (test scripts below)
+      pexists/C   pexists/PurePerl   ptable/cache_ttys   ptable/uncached
+lap:   15830806           13940630                3803              3769
+imac:   1137529            1046094                 557               552
+hub:    2308826            2189815                1517              1512
+
+pexists/C / pexists/PurePerl (module is rebuilt for the two tests)
+sleep 60 & \
+   ( sleep .5 ; pid=$! ; time perl -e \
+      'my $wpid="'$pid'"; use Proc::Exists qw(pexists); $i=0;
+      while(pexists($wpid)) { ++$i }; print "$i\n" '
+   )
+
+ptable/cache_ttys
+sleep 60 & \
+   ( sleep .5 ; pid=$! ; time perl -e \
+      'my $wpid="'$pid'"; use Proc::ProcessTable; $i=0;
+      $p = new Proc::ProcessTable( "cache_ttys" => 1 );
+      while(grep { $_->pid eq $wpid } @{$p->table}) { ++$i };
+      print "$i\n" '
+   )
+
+ptable/uncached
+sleep 60 & \
+   ( sleep .5 ; pid=$! ; time perl -e \
+      'my $wpid="'$pid'"; use Proc::ProcessTable; $i=0;
+      $p = new Proc::ProcessTable();
+      while(grep { $_->pid eq $wpid } @{$p->table}) { ++$i };
+      print "$i\n" '
+   )
+
+... and now as promised, tests highlighting the difference between the 
+C and pureperl implementations...
+
+      1yes-1no/C   1yes-1no/PurePerl    2yes/C   2yes/PurePerl
+lap:    13411479             6077823  12475458         5800595
+imac:     989762              477005    931743          465103
+hub:     1926110             1160990   1803996         1138647
+
+1yes-1no:
+sleep 60 & \
+   ( sleep .5 ; pid=$! ; time perl -e \
+      'my $wpid="'$pid'"; use Proc::Exists qw(pexists); $i=0;
+      while(pexists($wpid, 99999)) { ++$i }; print "$i\n" '
+   )
+
+2yes:
+#don't check $wpid twice in a row, b/c then you have to back to back
+#signal latency to the same process to deal with - ie you have to
+#wait for the other process to eat the signal before you send another
+#numbers via XS: lap: 12539305, imac: 908734, hub: 1720115
+sleep 60 & \
+   ( sleep .5 ; pid=$! ; time perl -e \
+      'my $wpid="'$pid'"; use Proc::Exists qw(pexists); $i=0;
+      while(2==pexists($wpid, 1)) { ++$i }; print "$i\n" '
+   )
+
+
+NOTE: the behavior of perl/select under linux is essentially the 
+following: For sleep values down to 1/Hz setting, sleep for 
+approximately the time indicated. For values below that, sleep 1/Hz 
+seconds instead. For values *WAY* below that, don't even give up 
+control! So if you use this to poll if another process is ready (not to 
+be used as a substitute for a proper lock, only as an 
+adjunct/optimization!), don't make the mistake of sleeping for 0 or even 
+0.0000001 seconds, figuring that will give up control to another 
+process. it won't! this behavior may or may not be different on other 
+unix variants.
+
+INTERVAL=0.01; sleep 60 &
+   ( sleep .5 ; pid=$! ; time perl -e \
+      'my $wpid="'$pid'"; use Proc::Exists qw(pexists); $i=0;
+      while(pexists($wpid)) {
+         ++$i; select(undef, undef, undef, '$INTERVAL');
+      } print "$i\n" '
+   )
+
+interval\iter/cpu%: imac         hub           lap
+1                   60/<0.01%    60/<0.01%     60/<0.01%
+0.1                 599/<0.01%   600/<0.01%    600/<0.01%
+0.01                4974/0.01%   5999/0.01%    4995/<0.01%
+0.001               14909/0.02%  5998/0.01%    14965/<0.01%
+0.0001              14898/0.02%  5998/0.01%    14963/<0.01%
+0.00001             14904/0.02%  5999/0.01%    14980/<0.01%
+0.000001            14911/0.02%  2023672/100%  14955/<0.01%
+0.0000001           881039/100%  2024237/100%  12431092/100%
+imac = 300MHz G3 PPC,       linux 2.6.20, Hz=250
+hub  = 750MHz P3 x86,       linux 2.4.26, Hz=100
+lap  = 2.3GHz core2 x64_64, linux 2.6.22, Hz=250
+

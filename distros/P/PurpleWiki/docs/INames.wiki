@@ -1,0 +1,102 @@
+= i-name Support in PurpleWiki =
+
+i-names are global identifiers that allow you to login to different
+web sites with one username and password.  More importantly, they
+allow you to share personal profile data across different web sites,
+giving you full control over who gets accessed to your data and the
+conditions for using it.
+
+i-names are part of the [http://www.idcommons.net/ Identity Commons]
+project and use the OASIS XRI standard.  PurpleWiki v0.93 was the
+first Wiki to support i-names, which [http://www.blueoxen.org/ Blue
+Oxen Associates] demonstrated at the 2003 PlaNetwork Conference in San
+Francisco.
+
+= Technical Architecture =
+
+The three components of the i-names architecture are:
+
+* identity brokers (or i-brokers)
+* service providers
+* the i-names themselves
+
+I-brokers know three things:
+
+* how to authenticate you
+* where your personal data is stored (without necessarily
+  storing your data themselves)
+* who has rights to access your data and under what conditions
+
+Service providers host applications that allow you to login and that
+may want access to some of your personal data.  Anyone who hosts an
+application that requires a username could be considered a service
+provider.
+
+i-names are resolvable addresses, similar to DNS.  When an application
+resolves an i-name, it receives the i-broker with which that i-name is
+associated.
+
+With i-names, you never give your password to a service provider.
+Only your i-broker knows your password.  When you attempt to login to
+a service provider, it figures out your i-broker, then sends you there
+for authentication.  Once authenticated, the i-broker redirects you
+back to the service provider.
+
+== Example ==
+
+{{{
+User enters "@blueoxen*eekim"
+as i-name.
+   |    +-------------------+
+   +--> | PurpleWiki        | --> resolves "@blueoxen*eekim" to get
+    +-> | (service provider |     i-broker, which is 2idi.  Redirects
+    |   +-------------------+     to http://2idi.com/.
+    |                                                  |
+    |                                                  |
+    |  i-broker authenticates   +-----------------+    |
+    +- user.  If successful,    | 2idi (i-broker) | <--+
+       redirects to PurpleWiki, +-----------------+
+       which logs in the user.
+}}}
+
+= Enabling i-names in PurpleWiki =
+
+Because i-names are very new and require some special libraries, they
+are turned off by default in PurpleWiki.  If you want to use them, you
+need the following libraries (available from CPAN):
+
+* XRI
+* XDI::SPIT
+
+XRI is the XRI resolver, which is where most of the trickery lies.
+The resolver figures out the i-broker associated with an i-name.
+
+XDI::SPIT (which stands for Service Provider Interface Toolkit)
+contains the single-sign on logic and will eventually contain the data
+sharing logic.
+
+To allow people to log in with an i-name, first uncomment "UseINames"
+in the wikidb/config file.
+
+Next, edit wikidb/templates/common/header.tt to use navbarInames.tt
+instead of navbar.tt.  If you look in navbarInames.tt, you'll notice
+that there is no password field.  That's because the user will be
+redirected to the i-broker for authentication.
+
+If you are a service provider that owns an organizational i-name, and
+you want to allow your users to register for one, uncomment and fill
+out the fields in wikidb/config:
+
+* ServiceProviderName
+* ServiceProviderKey
+* ReturnUrl
+
+You'll get the first two values from the registry that manages your
+organizational i-name.  Also, edit wikidb/templates/common/header.tt
+to use navbarInamesRegister.tt instead of navbarInames.tt.
+
+= References =
+
+For more information, visit Identity Common's
+[http://www.idcommons.net/ web site] and [http://wiki.idcommons.net/
+Wiki].

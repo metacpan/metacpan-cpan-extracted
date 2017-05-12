@@ -1,0 +1,24 @@
+Build.PL
+ChangeLog
+examples/J14Component
+examples/J2Component
+examples/LegacyClient
+examples/XMPPClient
+lib/POE/Component/Jabber.pm
+lib/POE/Component/Jabber/Events.pm
+lib/POE/Component/Jabber/J14.pm
+lib/POE/Component/Jabber/J2.pm
+lib/POE/Component/Jabber/Legacy.pm
+lib/POE/Component/Jabber/Protocol.pm
+lib/POE/Component/Jabber/ProtocolFactory.pm
+lib/POE/Component/Jabber/XMPP.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_basic.t
+t/02_xmpp.t
+t/03_legacy.t
+t/04_j14.t
+t/05_j20.t

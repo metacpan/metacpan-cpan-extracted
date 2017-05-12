@@ -1,0 +1,17 @@
+#!/bin/sh -u
+
+files=${*-*.o}
+status=0
+
+for f in $files; do
+    bad=`
+	nm $f |
+	awk '$2 == "T" || $2 == "C" || $2 == "D" || $2 == "B" { print $3; }' |
+	egrep -v '^_*(perperl|main$|xs_init$|(m|re)alloc$|free$|my_perl$)'
+    `
+    if test "$bad" != ""; then
+	echo Error in ${f}: exporting symbols $bad
+	status=1
+    fi
+done
+exit $status

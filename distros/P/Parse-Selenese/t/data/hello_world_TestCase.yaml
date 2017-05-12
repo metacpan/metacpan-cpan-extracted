@@ -1,0 +1,48 @@
+--- 
+base_url: http://www.google.com/
+short_name: hello_world_TestCase
+commands:
+  - values:
+      - storeText
+      - //*
+      - a
+  - values:
+      - store
+      - Hello World
+      - search_query
+  - values:
+      - open
+      - /
+      - ''
+  - values:
+      - waitForPageToLoad
+      - 30000
+      - ''
+  - values:
+      - waitForElementPresent
+      - btnG
+      - ''
+  - values:
+      - type
+      - q
+      - ${search_query}
+  - values:
+      - comment
+      - this is a comment
+      - ''
+  - values:
+      - clickAndWait
+      - btnG
+      - ''
+  - values:
+      - verifyText
+      - 'link=Hello world program - Wikipedia, the free encyclopedia'
+      - 'Hello world program - Wikipedia, the free encyclopedia'
+  - values:
+      - clickAndWait
+      - 'link=Hello world program - Wikipedia, the free encyclopedia'
+      - ''
+file_path_parts:
+  - t
+  - data
+  - hello_world_TestCase.html

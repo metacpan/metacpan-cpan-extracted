@@ -1,0 +1,32 @@
+#!/bin/sh
+
+# Sample results:
+# Number of Runs: 600
+# Timing command ../perperl/perperl
+# 1.69user 1.24system 0:03.99elapsed 73%CPU (0avgtext+0avgdata 0maxresident)k 0inputs+0outputs (68057major+14470minor)pagefaults 0swaps
+# Timing command perl
+# 66.66user 4.16system 1:10.82elapsed 99%CPU (0avgtext+0avgdata 0maxresident)k 0inputs+0outputs (160457major+119470minor)pagefaults 0swaps
+
+if test "$PERPERL_BACKENDPROG" = ""; then
+    PERPERL_BACKENDPROG=`pwd`/../perperl_backend/perperl_backend
+fi
+export PERPERL_BACKENDPROG
+
+if test ! -f $PERPERL_BACKENDPROG; then
+    echo Warning! Cannot locate $PERPERL_BACKENDPROG
+fi
+
+PERPERL_MAXRUNS=0
+export PERPERL_MAXRUNS
+
+numruns=600
+
+echo Number of Runs: $numruns
+
+for cmd in ../perperl/perperl perl; do
+    # Do a couple runs to get thing in memory
+    perl ./timeit.pl $cmd 5
+
+    echo Timing command $cmd
+    time perl ./timeit.pl $cmd $numruns
+done

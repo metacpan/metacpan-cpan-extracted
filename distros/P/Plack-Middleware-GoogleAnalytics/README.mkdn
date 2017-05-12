@@ -1,0 +1,37 @@
+# SYNOPSIS
+
+    use Plack::Builder;
+
+    builder {
+        enable "Plack::Middleware::GoogleAnalytics", ga_id => 'UA-214112-11';
+        $app;
+    };
+
+# DESCRIPTION
+
+[Plack::Middleware::GoogleAnalytics](http://search.cpan.org/perldoc?Plack::Middleware::GoogleAnalytics) will insert the standard google analytics 
+Javascript at the end of a text/html document. It places this boilerplate code at the
+end of the document.
+
+# ARGUMENTS
+
+This middleware accepts the following arguments.
+
+## ga_id
+
+This is the id that is supplied by Google. This is a required argument.
+
+# SEE ALSO
+
+[Plack](http://search.cpan.org/perldoc?Plack), [Plack::Middleware](http://search.cpan.org/perldoc?Plack::Middleware), [Moo](http://search.cpan.org/perldoc?Moo) 
+
+# AUTHOR
+
+Logan Bell, `<logie@cpan.org>`
+
+# COPYRIGHT & LICENSE
+
+Copyright 2012, Logan Bell
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

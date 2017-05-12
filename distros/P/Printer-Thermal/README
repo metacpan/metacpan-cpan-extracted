@@ -1,0 +1,432 @@
+NAME
+
+    Printer::Thermal - Interface for Thermal and some dot-matrix and
+    inkjet Printers that support ESC-POS specification (Deprecated) - Use
+    Printer::ESCPOS instead
+
+VERSION
+
+    version 0.29
+
+SYNOPSIS
+
+       use Printer::Thermal;
+     
+       #For Network Printers $port is 9100 in most cases but might differ depending on how you have configured your printer
+       $printer = Printer::Thermal->new(device_ip=>$printer_ip,device_port=>$port);
+     
+       #These commands won't actually send anything to the printer but it will store all the merged data including control codes to send to printer in $printer->print_string variable.
+       $printer->write("Blah Blah \nReceipt Details\nFooter");
+       $printer->bold_on();
+       $printer->write("Bold Text");
+       $printer->bold_off();
+       $printer->print(); ##Sends the above set of code to the printer. Clears the buffer text in module.
+     
+       #For local printer connected on serial port, check syslog(Usually under /var/log/syslog) for what device file was created for your printer when you connect it to your system(For plug and play printers).
+       my $path = '/dev/ttyACM0';
+       $printer = Printer::Thermal->new(serial_device_path=$path);
+       $printer->write("Blah Blah \nReceipt Details\nFooter");
+       $printer->bold_on();
+       $printer->write("Bold Text");
+       $printer->bold_off();
+       $printer->print();
+     
+       #For local printer connected on usb port, check syslog(Usually under /var/log/syslog) for what device file was created for your printer when you connect it to your system(For plug and play printers).
+       my $path = '/dev/usb/lp0';
+       $printer = Printer::Thermal->new(usb_device_path=$path);
+       $printer->write("Blah Blah \nReceipt Details\nFooter");
+       $printer->bold_on();
+       $printer->write("Bold Text");
+       $printer->bold_off();
+       $printer->print();
+
+DESCRIPTION
+
+    This Module is deprecated in favour of Printer::ESCPOS, which is the
+    shiny new successor to this module. Printer::Thermal will continue to
+    work and might receive occasional support and bug fixes but no new
+    features. Read the See Also section for reasons on why I deprecated
+    Printer::Thermal in favour of a new namespace instead of upgrading
+    the existing module. For those who are already using
+    Printer::Thermal, have simple needs and are happy with what this
+    module provides, they can avoid the switch to Printer::ESCPOS as that
+    module does not have a interface compatible with Printer::Thermal and
+    might involve some work switching over. If you are starting a new
+    project or if you want the support for brand new features like
+    printing logos etc., then you must use Printer::ESCPOS.
+
+    For ESC-P codes refer the guide from Epson
+    http://support.epson.ru/upload/library_file/14/esc-p.pdf
+
+ATTRIBUTES
+
+ usb_device_path
+
+    This variable contains the path for the printer device file when
+    connected as a usb device on UNIX-like systems. I haven't added
+    support for Windows and it probably wont work in doz as a local
+    printer without some modifications. Feel free to try it out and let
+    me know what happens. This must be passed in the constructor
+
+ serial_device_path
+
+    This variable contains the path for the printer device file when
+    connected as a serial device on UNIX-like systems. I haven't added
+    support for Windows and it probably wont work in doz as a local
+    printer without some modifications. Feel free to try it out and let
+    me know what happens. This must be passed in the constructor
+
+ device_ip
+
+    Contains the IP address of the device when its a network printer. The
+    module creates IO:Socket::INET object to connect to the printer. This
+    can be passed in the constructor.
+
+ device_port
+
+    Contains the network port of the device when its a network printer.
+    The module creates IO:Socket::INET object to connect to the printer.
+    This can be passed in the constructor.
+
+ baudrate
+
+    When used as a local serial device you can set the baudrate of the
+    printer too. Default (38400) will usually work, but not always.
+
+    This param may be specified when creating printer object to make sure
+    it works properly.
+
+    $printer = Printer::Thermal->new(serial_device_path =>
+    '/dev/ttyACM0', baudrate => 9600);
+
+ read_char_time
+
+    *DECRECATED*
+
+ read_const_time
+
+    *DECRECATED*
+
+ black_threshold
+
+    Black ink threshold, This param may be specified when creating the
+    printer object. Default is 48.
+
+ alpha_threshold
+
+    Alpha threshold, This param may be specified when creating the
+    printer object. Default is 127.
+
+ heatTime
+
+    Heating time to set for Supported Thermal Printers, this affects dot
+    intensity.
+
+    This param may be specified when creating the printer object. Default
+    is 120
+
+ heatInterval
+
+    This param may be specified when creating the printer object. Default
+    is 50
+
+ heatingDots
+
+    This param may be specified when creating the printer object. Default
+    is 7
+
+ printer
+
+    This is the direct device handle to the printer, You must almost
+    never use this. Unless you are hacking through the module. If you are
+    using this you must send me a bug report on why you had to use this.
+
+    You can access it with $printer->printer
+
+ print_string
+
+    This contains the string in the module buffer that will be sent to
+    the printer when you call $printer->print();
+
+    my $print_string = $printer->print_string
+
+ font
+
+    Set ESC-POS Font
+
+ underline
+
+    Set/unset underline property
+
+ emphasized
+
+    Set/unset emphasized property
+
+ double_height
+
+    set unset double height property
+
+ double_width
+
+    set unset double width property
+
+METHODS
+
+ print
+
+    $printer->print() Sends the accumulated commands to the printer. All
+    commands below need to be followed by a print() to send the data from
+    buffer to the printer. You may call more than one printer command and
+    then call print to send them all to printer together. The following
+    bunch of commands print a text to a printer, move down one line, and
+    cut the receipt paper.
+
+        $printer->write("hello Printer\n");
+        $printer->linefeed();
+        $printer->cutpaper();
+        $printer->print(); # Sends the all the commands before this to the printer in one go. 
+
+ write
+
+    $printer->write("some text\n") Writes a bunch of text that you pass
+    here to the module buffer. Note that this will not be passed to the
+    printer till you call $printer->print()
+
+ left_margin
+
+    $printer->left_margin($nl,$nh) Sets the left margin code to the
+    printer. takes two single byte parameters, $nl and $nh. To determine
+    the value of these two bytes, use the INT and MOD conventions. INT
+    indicates the integer (or whole number) part of a number, while MOD
+    indicates the remainder of a division operation. For example, to
+    break the value 520 into two bytes, use the following two equations:
+    nH = INT 520/256 nL = MOD 520/256
+
+ reset
+
+    Resets the printer
+
+ right_side_character_spacing
+
+    Takes a one byte number, spacing as a parameter
+
+ horiz_tab
+
+    Adds a horizontal tab character like a \t to the print string.
+
+ line_spacing
+
+    Allows you to set the line spacing for the printer.
+
+ linefeed
+
+    Sends a new line character, i.e carriage return and line feed
+
+ justify
+
+    $alignment can be either 'L','C' or 'R' for left center and right
+    justified printing
+
+ bold_off
+
+    Turns bold printing off
+
+ bold_on
+
+    Turns bold printing on
+
+ doublestrike_off
+
+    Turns doublestrike on characters off
+
+ doublestrike_on
+
+    Turns doublestrike on characters on
+
+ emphasize_off
+
+    Turns off emphasize(read ESC-POS documentation)
+
+ emphasize_on
+
+    Turns on emphasize(read ESC-POS documentation)
+
+ font_size
+
+    Defined Region 0 <= n <= 255 However, 1 <= vertical direction
+    magnification ratio <= 8, 1 <= horizontal direction magnification
+    ratio <= 8 Initial Value n=0 Function Specifies the character size
+    (magnification ratio in the vertical and horizontal directions).
+
+ font_size_esc
+
+    Set ESC specified font size
+
+        $printer->font_size_esc($size);
+
+ font_b
+
+    Switches printing to font b
+
+ font_a
+
+    Switches printing to font a
+
+ underline_off
+
+    Switches off underline
+
+ underline_on
+
+    Switches on underline
+
+ inverse_off
+
+    Switches off inverse text
+
+ inverse_on
+
+    Switches on inverse text
+
+ barcode_height
+
+    Sets barcode height
+
+ print_barcode
+
+    $printer->print_barcode($type,$string) Prints barcode
+
+ print_text
+
+    $printer->print_text($msg,$chars_per_line); Prints some text defined
+    by msg. If chars_per_line is defined, inserts newlines after the
+    given amount. Use normal '\n' line breaks for empty lines.
+
+ print_bitmap
+
+    To be done: This function is not implemented yet.
+
+ color_1
+
+    Prints in first color for dual color printers
+
+ color_2
+
+    Prints in second color for dual color printers
+
+ cutpaper
+
+    Cuts the paper. Most Thermal receipt printers support the facility to
+    cut the receipt using this command once printing is done.
+
+ open_cash_drawer
+
+    Opens the Cash Drawer connected to the thermal printer.
+
+ test
+
+    Prints a bunch of test strings to see if your printer is working
+    fine/connected properly. Don't worry if some things like emphasized
+    and double strike looks the same, it happened with my printer too.
+
+NOTES
+
+      * If the printer prints out garbled characters instead of proper
+      text, try specifying the baudrate parameter when creating printer
+      object when you create the printer object(not for network or USB
+      printers)
+
+         $printer = Printer::Thermal->new(serial_device_path => '/dev/ttyACM0', baudrate => 9600);
+
+USAGE
+
+      * This Module offers a object oriented interface to ESC-POS
+      Printers.
+
+      * Create a printer object by providing parameters for one of the
+      three types of printers supported.
+
+      * then call formatting options or write() text to printer object in
+      sequence.
+
+      * Then call the print() method to dispatch the sequences from the
+      module buffer to the printer.
+
+    Note: While you may call print() after every single command code,
+    this is not advisable as some printers tend to choke up if you send
+    them too many commands too quickly.
+
+SEE ALSO
+
+    Printer::ESCPOS is the new module that will take over the Perl
+    support for ESC-POS receipt printers. Why did I choose to deprecate
+    Printer::Thermal for Printer::ESCPOS instead of upgrading it? Read on
+    if you are curious
+
+      * When I started writing Printer::Thermal I was working with
+      Thermal printers for my own requirements and wanted to write
+      something that would work with all Thermal Printers. As I
+      discovered after a couple of releases of Printer::Thermal, the
+      ESC-POS specification is a broad command specification for POS
+      printers and it has nothing to do with the print technology itself
+      thermal or others, so the name of the module was a big misnomer and
+      it led to lot of confusion as to question of what the module was
+      actually for.
+
+      * Printer::Thermal module was only intended for supporting thermal
+      printers but it worked quiet well with other printer types. The way
+      receipt printers work there was no reason to have a module
+      specifically for thermal printers. So this Printer::Thermal name
+      started to make me uneasy.
+
+      * There are those have minimal printing needs from their POS
+      printers, they are already using Printer::Thermal and are happy
+      with it. There is no reason for them to switch over unless they
+      start a new project. For newer users it makes sense to start with a
+      module that will have future supports and adds a wider range of
+      flexible functions for ESC-POS Printers.
+
+      * Last but not the least important reason, I wanted to make two
+      things user-expandable: Printer connection(USB, Serial, Network
+      etc.) and Printer Model Profiles(As I discovered that while most
+      printer had more or less common command codes, They all had their
+      own feature sets which borrowed most commands from a subset of
+      ESCPOS. So I wanted users to be able to create their own profiles
+      of supported commands to allow community effort for expansion of
+      module functionality. Adding these two to existing module would
+      have broken backward compatibility. Printer::ESCPOS will have
+      better interfaces for users to add their own connection types and
+      printer profiles.
+
+SUPPORT
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through github at
+    https://github.com/shantanubhadoria/perl-printer-thermal/issues. You
+    will be notified automatically of any progress on your issue.
+
+ Source Code
+
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    https://github.com/shantanubhadoria/perl-printer-thermal
+
+      git clone git://github.com/shantanubhadoria/perl-printer-thermal.git
+
+AUTHOR
+
+    Shantanu Bhadoria (shantanu@cpan.org)
+
+CONTRIBUTOR
+
+    Shantanu Bhadoria <shantanu att cpan dott org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Shantanu Bhadoria.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

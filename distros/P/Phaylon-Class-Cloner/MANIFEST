@@ -1,0 +1,10 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Phaylon/Class/Cloner.pm
+t/001_load.t
+Build.PL
+Makefile.PL
+META.yml

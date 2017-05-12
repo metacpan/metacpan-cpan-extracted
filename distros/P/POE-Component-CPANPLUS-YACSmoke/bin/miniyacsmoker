@@ -1,0 +1,289 @@
+#!perl
+# PODNAME: miniyacsmoker
+#ABSTRACT: Example script for POE::Component::CPANPLUS::YACSmoke
+use strict;
+use File::Spec;
+BEGIN { eval "use Event;"; }
+use POE qw(Component::CPANPLUS::YACSmoke Wheel::ReadWrite);
+use Getopt::Long;
+
+$|=1;
+
+my ($perl, $jobs, $appdata, $indices, $version, $reverse, $package, $author, $nogrpkill, $logdir);
+my $debug = 0;
+
+GetOptions( 'perl=s' => \$perl, 'jobs=s' => \$jobs, 'debug' => \$debug, 'appdata' => \$appdata, 'indices' => \$indices, 'version' => \$version, 'reverse' => \$reverse, 'author=s' => \$author, 'package=s' => \$package, 'nogrpkill' => \$nogrpkill, 'logdir=s' => \$logdir );
+
+if ( $version ) {
+  print "$0 - version ", $POE::Component::CPANPLUS::YACSmoke::VERSION, "\n";
+  exit 0;
+}
+
+$ENV{APPDATA} = $appdata if $appdata;
+$ENV{PERL5_MINIYACSMOKER} = $POE::Component::CPANPLUS::YACSmoke::VERSION;
+
+die "'$logdir' doesn\'t exist or isn't a directory\n" if $logdir and not -d $logdir;
+
+my @pending;
+if ( $jobs ) {
+  open my $fh, "<$jobs" or die "$jobs: $!\n";
+  while (<$fh>) {
+        chomp;
+        push @pending, $_;
+  }
+  close($fh);
+}
+
+my $smoker = POE::Component::CPANPLUS::YACSmoke->spawn( alias => 'smoker', debug => $debug, options => { trace => 0 }, perl => $perl, no_grp_kill => $nogrpkill );
+
+POE::Session->create(
+	package_states => [
+	   'main' => [ qw(_start _start_smoking _stop _results _recent _check _indices _search _kill_log _kill_flush _kill_error) ],
+	],
+	heap => { perl => $perl, pending => \@pending, indices => $indices },
+);
+
+$poe_kernel->run();
+exit 0;
+
+sub _start {
+  my ($kernel,$heap) = @_[KERNEL,HEAP];
+  $kernel->post( 'smoker', 'check', { event => '_check', debug => $debug } );
+  undef;
+}
+
+sub _check {
+  my ($kernel,$heap,$job) = @_[KERNEL,HEAP,ARG0];
+  unless ( $job->{status} == 0 ) {
+     my $perl = $heap->{perl} || $^X;
+     warn "$perl doesn't have CPANPLUS::YACSmoke installed. Aborting\n";
+     return;
+  }
+  if ( $heap->{indices} ) {
+    $kernel->post( 'smoker', 'indices', { event => '_indices', debug => $debug } );
+    return;
+  }
+  $kernel->yield('_start_smoking');
+  undef;
+}
+
+sub _indices {
+  $poe_kernel->yield('_start_smoking');
+  return;
+}
+
+sub _start_smoking {
+  my ($kernel,$heap) = @_[KERNEL,HEAP];
+  $heap->{_start_time} = time();
+  if ( @{ $heap->{pending} } ) {
+    $kernel->post( 'smoker', 'submit', { event => '_results', module => $_, debug => $debug } ) 
+	for @{ $heap->{pending} };
+  }
+  elsif ( $author ) {
+    $kernel->post( 'smoker', 'author', { event => '_search', search => $author, debug => $debug } );
+  }
+  elsif ( $package ) {
+    $kernel->post( 'smoker', 'package', { event => '_search', search => $package, debug => $debug } );
+  }
+  else {
+    $kernel->post( 'smoker', 'recent', { event => '_recent', debug => $debug } );
+  }
+  undef;
+}
+
+sub _stop {
+  my $heap = $_[HEAP];
+  my $finish = time();
+  my $cumulative = $finish - $heap->{_start_time};
+  my @stats = $smoker->statistics;
+  eval {
+	require Time::Duration;
+  };
+  unless ($@) {
+	$cumulative = Time::Duration::duration_exact( $cumulative );
+	$stats[$_] = Time::Duration::duration_exact( $stats[$_] ) for 2 .. 4;
+  }
+  $poe_kernel->call( 'smoker', 'shutdown' );
+  print STDOUT "$0 started at: \t", scalar localtime($heap->{_start_time}), "\n";
+  print STDOUT "$0 finished at: \t", scalar localtime($finish), "\n";
+  print STDOUT "$0 ran for: \t", $cumulative, "\n";
+  print STDOUT "$0 tot jobs:\t", $stats[1], "\n";
+  print STDOUT "$0 avg run: \t", $stats[2], "\n";
+  print STDOUT "$0 min run: \t", $stats[3], "\n";
+  print STDOUT "$0 max run: \t", $stats[4], "\n";
+  undef;
+}
+
+sub _results {
+  my $job = $_[ARG0];
+  $poe_kernel->yield( '_kill_log', $job->{log} )
+    if $logdir and ( $job->{excess_kill} or $job->{idle_kill} );
+  return if $debug;
+  print STDOUT "Module: ", $job->{module}, "\n";
+  print STDOUT "$_\n" for @{ $job->{log} };
+  undef;
+}
+
+sub _search {
+  my ($kernel,$heap,$job) = @_[KERNEL,HEAP,ARG0];
+  $kernel->post( 'smoker', 'submit', { event => '_results', module => $_, debug => $debug } )
+    for @{ $job->{results} };
+  undef;
+}
+
+sub _recent {
+  my ($kernel,$heap,$job) = @_[KERNEL,HEAP,ARG0];
+  if ( $reverse ) {
+    $kernel->post( 'smoker', 'submit', { event => '_results', module => $_, debug => $debug } )
+	for reverse @{ $job->{recent} };
+  }
+  else {
+    $kernel->post( 'smoker', 'submit', { event => '_results', module => $_, debug => $debug } )
+	for @{ $job->{recent} };
+  }
+  undef;
+}
+
+sub _kill_log {
+  my ($heap,$log) = @_[HEAP,ARG0];
+  my @data = @{ $log };
+  my $filename = File::Spec->catfile( $logdir, join('', time(), $$, '.log') );
+  open my $fh, '>', $filename or die "$!\n";
+  my $wheel = POE::Wheel::ReadWrite->new(
+        Handle => $fh,
+        FlushedEvent => '_kill_flush',
+        ErrorEvent => '_kill_error',
+  );
+  $heap->{kill_logs}->{ $wheel->ID() } = { wheel => $wheel, log => \@data };
+  $wheel->put( shift @data );
+  return;
+}
+
+sub _kill_flush {
+  my ($heap,$wheel_id) = @_[HEAP,ARG0];
+  my $wheel = $heap->{kill_logs}->{ $wheel_id }->{wheel};
+  my $data = shift @{ $heap->{kill_logs}->{ $wheel_id }->{log} };
+  unless ( $data ) {
+     $wheel->shutdown_input();
+     $wheel->shutdown_output();
+     delete $heap->{kill_logs}->{ $wheel_id };
+     return;
+  }
+  $wheel->put( $data );
+  return;
+}
+
+sub _kill_error {
+  my ($heap, $operation, $errnum, $errstr, $wheel_id) = @_[HEAP,ARG0..ARG3];
+  warn "Wheel $wheel_id generated $operation error $errnum: $errstr\n";
+  delete $heap->{kill_logs}->{ $wheel_id };
+  return;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+miniyacsmoker - Example script for POE::Component::CPANPLUS::YACSmoke
+
+=head1 VERSION
+
+version 1.64
+
+=head1 SYNOPSIS
+
+  miniyacsmoker --perl /path/to/smoke/perl --jobs /path/to/file/with/jobs
+
+=head1 DESCRIPTION
+
+miniyacsmoker is an example script for L<POE::Component::CPANPLUS::YACSmoke>, a L<POE> based component
+that provides L<CPANPLUS::YACSmoke> services to other components and sessions.
+
+It spits out the results of each smoke to STDOUT.
+
+=head1 SWITCHES
+
+=over
+
+=item --version
+
+Prints the version number on STDOUT and exits.
+
+=item --perl
+
+Specify the path to a perl executable to run the smoke testing with. This perl should have L<CPANPLUS>
+and L<CPANPLUS::YACSmoke> installed and configured accordingly.
+
+=item --jobs
+
+Specify a file with modules to be smoked, eg.
+
+  C/CH/CHROMATIC/Acme-Incorporated-1.00.tar.gz
+  B/BI/BINGOS/POE-Component-IRC-5.12.tar.gz
+
+If a job file is not provided the script obtains a list of recently uploaded modules and processes
+them.
+
+=item --author
+
+Specify the cpanid of an CPAN author. This will determine the list of modules that the script will smoke.
+
+=item --package
+
+Specify a string representing a package search criteria to use. The list of modules generated will then
+be smoked.
+
+=item --debug 
+
+Spews out whatever is happening in the component as it happens.
+
+=item --appdata
+
+Specify a path to where L<CPANPLUS> can find your .cpanplus folder. This sets the APPDATA environment
+variable.
+
+=item --indices
+
+Specify if the L<CPANPLUS> should reload its indices before proceeding with the smoke.
+
+=item --reverse
+
+If specified reverses the processing of recently uploaded modules.
+
+=item --logdir
+
+Specify a directory location ( it must exist ) where C<miniyacsmoker> will write logs for the smoke jobs that it
+forcefully terminates due to excessive idle or run time.
+
+=back
+
+=head1 ENVIRONMENT
+
+C<miniyacsmoker> sets the environment variable C<PERL5_MINIYACSMOKER> to the version that is running.
+
+=head1 SEE ALSO
+
+L<POE::Component::CPANPLUS::YACSmoke>
+
+L<POE>
+
+L<CPANPLUS>
+
+L<CPANPLUS::YACSmoke>
+
+=head1 AUTHOR
+
+Chris Williams <chris@bingosnet.co.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Chris Williams.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

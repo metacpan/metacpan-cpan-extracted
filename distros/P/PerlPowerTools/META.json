@@ -1,0 +1,62 @@
+{
+   "abstract" : "BSD utilities written in pure Perl",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PerlPowerTools",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::a2p" : "0",
+            "DB_File" : "0",
+            "MIME::Parser" : "0",
+            "Make" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "Test::Trap" : "v0.3.2"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/PerlPowerTools/issues"
+      },
+      "homepage" : "https://www.perlpowertools.com/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/PerlPowerTools.git",
+         "web" : "https://github.com/briandfoy/PerlPowerTools"
+      }
+   },
+   "version" : "1.012",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

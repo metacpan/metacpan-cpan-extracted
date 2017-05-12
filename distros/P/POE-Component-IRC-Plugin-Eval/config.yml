@@ -1,0 +1,13 @@
+nick: foobar1234
+username: foobar
+lib: [lib]
+
+networks:
+  - name:     freenode
+    server:   irc.freenode.net
+    # override default local plugins
+    local_plugins:
+      - [AutoJoin, { Channels: ['#foodsfdsf'] } ]
+      - [BotCommand]
+      - [Eval, { Channels: ['#foodsfdsf'] }]
+# vim: sw=2

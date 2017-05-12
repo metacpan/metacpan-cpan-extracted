@@ -1,0 +1,29 @@
+Readme for the PostScript package...
+
+Version 0.06
+8/10/99
+
+REQUIRED COMPONENTS
+===================
+
+Well, you really should have some sort of PostScript interpreter such as
+GhostScript, but it actually isn't necessary if you're just going to create
+PostScript files with this package. You just won't be able to look at them.
+
+
+NOTES
+=====
+
+Documentation is contained within the individual modules in pod format;
+when you issue the installation commands, you should then be able to type:
+
+  man PostScript::TextBlock 
+
+or:
+
+  perldoc PostScript::TextBlock
+
+
+Shawn Wallace
+shawn@as220.org
+

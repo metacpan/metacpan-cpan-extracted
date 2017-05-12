@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Parallel-MapReduce
+version:             0.09
+abstract:            MapReduce Infrastructure, multithreaded
+license:             ~
+author:              
+    - Robert Barta <drrho@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Cache::Memcached:              1.24
+    IPC::Run:                      0.8
+    Log::Log4perl:                 1.16
+    Test::More:                    0.72
+    Test::Pod:                     1.26
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

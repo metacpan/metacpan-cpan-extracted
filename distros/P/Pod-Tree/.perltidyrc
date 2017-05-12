@@ -1,0 +1,8 @@
+-pbp
+-nst
+-et=4
+--maximum-line-length=120
+
+# Break a line after opening/before closing token.
+-vt=0
+-vtc=0

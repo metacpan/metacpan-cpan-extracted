@@ -1,0 +1,56 @@
+
+<!-- START OF HEADER & TOP NAV .............................................. -->
+		<?var name="set: search_page like: request/uri search.html"?>
+		<?var name="set: editor_page like: request/uri edit/"?>
+		<table bgcolor="#BEDCEC" border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+				<td align="center" valign="middle" height="35">
+					<a class="header" href="/index.html">Pangloss</a>
+					<span class="header" petal:if="true: search_page"> : <a class="header" href="/search.html">Search</a></span>
+					<span class="header" petal:if="true: editor_page"> : <a class="header" href="/edit/index.html">Editor</a></span>
+				</td>
+			</tr>
+		</table>
+		<table border="0" cellpadding="0" cellspacing="0" width="100%"
+					 petal:if="true: editor_page">
+			<?var name="set: selected   string: nav-selected"?>
+			<?var name="set: unselected string: nav-unselected"?>
+			<tr>
+				<td width="15" align="left">     </td>
+
+				<td width="18%" valign="middle" align="center" class="nav-unselected">
+					<a href="/search.html" class="nav">Search</a>
+				</td>
+
+				<td width="15">     </td>
+
+				<td width="18%" valign="middle" align="center"
+						petal:attributes="class if: true: like: request/uri categor(?:y)|(?:ies).html then: $selected else: $unselected">
+					<a href="/edit/categories.html" class="nav">Categories</a>
+				</td>
+
+				<td width="15">     </td>
+
+				<td width="18%" valign="middle" align="center"
+						petal:attributes="class if: true: like: request/uri concepts?.html$ then: $selected else: $unselected">
+					<a href="/edit/concepts.html" class="nav">Concepts</a>
+				</td>
+
+				<td width="15">     </td>
+
+				<td width="18%" valign="middle" align="center"
+						petal:attributes="class if: true: like: request/uri languages?.html$ then: $selected else: $unselected">
+					<a href="/edit/languages.html" class="nav">Languages</a>
+				</td>
+
+				<td width="15">     </td>
+
+				<td width="18%" valign="middle" align="center"
+						petal:attributes="class if: true: like: request/uri users?.html$ then: $selected else: $unselected">
+					<a href="/edit/users.html" class="nav">Users</a>
+				</td>
+
+				<td width="15" align="right">     </td>
+			</tr>
+		</table>
+<!-- END OF HEADER & TOP NAV ................................................ -->

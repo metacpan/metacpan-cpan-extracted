@@ -1,0 +1,5 @@
+- keep 3 pococm-conn, one for each of pococm-gen, pococm-coll and pococm-pl.
+  this way, long operations in pococm-coll will not forbids small & fast
+  commands (such as status) to be sent in time...
+
+- $COLLECTION -> all_songs

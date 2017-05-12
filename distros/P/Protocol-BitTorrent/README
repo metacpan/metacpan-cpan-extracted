@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Protocol-BitTorrent,
+version 0.004:
+
+  abstract implementation of the bittorrent p2p protocol
+
+This software is copyright (c) 2011 by Tom Molesworth.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

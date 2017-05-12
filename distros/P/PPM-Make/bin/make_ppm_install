@@ -1,0 +1,123 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Long qw(:config no_ignore_case auto_version auto_help);
+use PPM::Make::CPAN;
+use Pod::Usage;
+$main::VERSION = $PPM::Make::VERSION;
+
+my %opts = ();
+GetOptions(\%opts,
+           'area:s',
+           'force',
+           'nodeps',
+           'no-cfg',
+          ) or pod2usage(2);
+
+my $ppm = PPM::Make::CPAN->new(%opts);
+$ppm->make_ppm_install;
+
+1;
+
+__END__
+
+=head1 NAME
+
+make_ppm_install - install a distribution within CPAN.pm via ppm
+
+=head1 SYNOPSIS
+
+   make_ppm_install [options]
+
+Options:
+
+ [ --no-cfg ]         : do not read a .ppmcfg configuration file
+ [ --force  ]         : force ppm to install a package
+ [ --nodeps ]         : ignore dependencies when installing a package
+ [ --area area ]      : install package into the specified area
+
+=head1 DESCRIPTION
+
+This is an experimental feature which requires version 1.92_56
+or greater of L<CPAN>.
+
+C<make_ppm_install> is an interface to the C<PPM::Make> module,
+and is used to build a PPM (Perl Package Manager) distribution
+from a CPAN source distribution and install it via the
+C<ppm> utility. See L<PPM::Make> for a
+discussion of how the ppm package is made.
+
+Although this script can be run from the command line
+inside a CPAN distribution directory for which the
+C<perl Makefile.PL>, C<$MAKE>, and C<$MAKE test> commands have
+been carried out, it is mainly intended for use within
+L<CPAN> as a substitute for C<$MAKE install>. This can be done
+by specifying C<make_ppm_install> as the C<make_install_make_command>
+and the C<mbuild_install_build_command> of C<CPAN::Config>:
+
+  cpan> o conf make_install_make_command make_ppm_install
+  cpan> o conf mbuild_install_build_command make_ppm_install
+
+Options to the ppm install command can be passed via 
+C<make_install_arg> and C<mbuild_install_arg>; at present, these can
+be:
+
+=over
+
+=item [ --no-cfg ]
+
+Do not read a .ppmcfg configuration file specifying options to
+pass to L<PPM::Make>.
+
+=item [ --force  ]
+
+If the package or module requested is already installed, PPM
+installs nothing. The C<--force> option can be used to make PPM install
+a package even if it's already present. With C<--force> PPM resolves
+file conflicts during package installation or upgrade by allowing
+files already installed by other packages to be overwritten and
+ownership transferred to the new package. This may break the package
+that originally owned the file. This is available within PPM4 only.
+
+=item [ --nodeps ]
+
+The C<--nodeps> option makes PPM attempt to install the package without
+resolving any dependencies the package might have. This is available
+within PPM4 only.
+
+=item [ --area area ]
+
+By default, new packages are installed in the "site" area, but if
+the "site" area is read only, and there are user-defined areas set
+up, the first user-defined area is used as the default instead. Use
+the C<--area> option to install the package into an alternative
+location.
+
+=back
+
+Also, when invoked from the command line, the following
+options are understood:
+
+=over
+
+=item [--help]
+
+This prints out a short help screen and exits.
+
+=item [--version]
+
+This prints out some version information and exits.
+
+=back
+
+=head1 COPYRIGHT
+
+This program is copyright, 2008, by Randy Kobes 
+E<lt>r.kobes@uwinnipeg.caE<gt>.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<PPM::Make>.
+
+=cut

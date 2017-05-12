@@ -1,0 +1,14 @@
+Changes for Plack::App::ServiceStatus
+
+0.902   2016-11-21T14:42:21
+     - Add Icinga/Nagios check script (mstock)
+     - Add Net::Stomp connection check (mstock)
+
+
+0.901   2016-06-18T17:46:43
+    - better / more docs
+
+
+0.900   2016-06-13T15:02:50
+    - first release
+

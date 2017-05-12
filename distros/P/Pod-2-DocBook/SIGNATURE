@@ -1,0 +1,106 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 cf421e7152e131e496e9321282266a57e02c52a3 Build.PL
+SHA1 aa883fd6f237b9a3c32ef0b5a9c534f5e91506a2 Changes
+SHA1 1aca33c203779f2b2c739df4fcb90d4aa4c93640 MANIFEST
+SHA1 2861205cec931366c5fc8499cc3c7a3fe2769b4e META.yml
+SHA1 6813836f34679c5889b4f90963d80be1b5c2931d Makefile.PL
+SHA1 8c09cfe114aad4e918f8fd52d714c6425f5201ad README
+SHA1 67f2e4b37762f178008ed5379fce24ca449037ab doc/Pod-2-DocBook.html
+SHA1 212c6952540af848f50cb889ed454e7a1bf2d9cd doc/Pod-2-DocBook.pdf
+SHA1 a7661645db2095e29ebde300886b1a2ae87e325b doc/docbook.css
+SHA1 6235b2afa1721de5d194d7455f5138667a77fa30 examples/pod2docbook-docbook/.gitignore
+SHA1 cab8468a603ec5b8d0db8346002107427f71f5a0 examples/pod2docbook-docbook/Makefile
+SHA1 b12990063b4e0a666ec546a04c53774de763a72a examples/pod2docbook-docbook/book.xml
+SHA1 53a8e66ae7c270ee108457d0af7452f2d224b427 examples/pod2docbook-docbook/catalog.xml
+SHA1 7615e6c51ed6fc35f9cb77ff677beb74a015ade4 examples/pod2docbook-docbook/chapters/appendix-a.xml
+SHA1 595ade17a551f2de9c1ce3b470ff3b0874752987 examples/pod2docbook-docbook/chapters/development.xml
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 examples/pod2docbook-docbook/chapters/examples/empty
+SHA1 327aeb0168e307025ec0d0be693aa23afbb0bc6f examples/pod2docbook-docbook/chapters/introduction.xml
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 examples/pod2docbook-docbook/chapters/pod/.placeholder
+SHA1 7a0de8267baf5d49ddd0a52e4ba4e07c45846011 examples/pod2docbook-docbook/chapters/usage.xml
+SHA1 c67213f7651ff71198fce9a9226409e8271c1622 examples/pod2docbook-docbook/code/DocBook.pm
+SHA1 907624503872082dc8356880a44a5153d2969834 examples/pod2docbook-docbook/code/pod2docbook
+SHA1 2ba50d2cf711debe16c572ffb6c6e31a17b4a077 examples/pod2docbook-docbook/custom.dtd
+SHA1 a7661645db2095e29ebde300886b1a2ae87e325b examples/pod2docbook-docbook/docbook.css
+SHA1 00061b9e91eba6ee896b42b87b22fdddbf8d4949 examples/pod2docbook-docbook/entities.mod
+SHA1 4aa46e74dfbdb610e0b0b2bd75a98904c1aa7fc2 examples/pod2docbook-docbook/images/draft.png
+SHA1 55779b91b1f3faf8c5037e1223bfc2363106c476 examples/pod2docbook-docbook/images/draft.svg
+SHA1 2c41b33c63835022680518326bf168312d7f3f0c examples/pod2docbook-docbook/images/note.png
+SHA1 669364718285082670bf1e16347bd717f5934c2f examples/pod2docbook-docbook/images/note.svg
+SHA1 fa61be8935532c4b2b37d3d3e18e69f5c0c69cad examples/pod2docbook-docbook/images/warning.png
+SHA1 1b53e4cd84ede8267477cee6168efce3fef5c8b8 examples/pod2docbook-docbook/images/warning.svg
+SHA1 ea1fab12c887b8edd139b793fe9b26307331f7eb examples/pod2docbook-docbook/xinclude.mod
+SHA1 5f261b0ef300c56c2fe9aa0f1fb3d04a2a753b0c lib/Pod/2/DocBook.pm
+SHA1 837356391907a68bb83d0a56f136bd1101b09eae pod2docbook
+SHA1 605f05a5336cc37a476bb10b218f5ad1a2bd340d t/00-compile.t
+SHA1 4d2709e5fdc6d4fd185efc37258922c12fdeb02a t/02-Pod-2-DocBook-make_id.t
+SHA1 076a69f45d57c793ea467d43da679e5864f868d8 t/Pod-2-DocBook.t
+SHA1 41533fbd463e42d2ecf1e119eca910c16809d13e t/distribution.t
+SHA1 3b5a173c28fc02ab9285bb25421e551a1e04870e t/docbook.pod
+SHA1 cfb0724564a8b19b5c48a20a31651364e334c589 t/docbook.sgml
+SHA1 8ae09c390ecc8a7b4b086e9f4874634f2bbbcb2c t/e_colspec.pod
+SHA1 90dbfe5ce4b0ecb2c19420d40cbf5374ce120225 t/e_colspec.sgml
+SHA1 86fa7a3ef9d595d761f819b6befdadb5ac389752 t/e_command.pod
+SHA1 763a4fb761567f2754b53c9439ffed736cfebc96 t/e_command.sgml
+SHA1 d000546447127ec36f6fc2f58d5287ad743410df t/e_empty_l.pod
+SHA1 df3179bd0cd95f561ee806cc4149d2775cb0780f t/e_empty_l.sgml
+SHA1 eae7568c6524e5104df6ec832d8901a0f3b74937 t/e_escape.pod
+SHA1 57e17cd89d46598d21e7244b1fcf63091c463228 t/e_escape.sgml
+SHA1 b8438150c2ceac79d122ab8fe73023038c1f7be8 t/e_item.pod
+SHA1 03f4169fba297edbd088255fd0428feaebf5d0fc t/e_item.sgml
+SHA1 db02bc52c62cbe102a9d73b6a398ee8a8b8641ec t/e_mismatched_end.pod
+SHA1 45b8487a125c5a8a12edf341cdb23196c4b7fc29 t/e_mismatched_end.sgml
+SHA1 0bf7ae2965b34096063d1e1c6ca879a5a36c4eb8 t/e_nested_fc.pod
+SHA1 e722a3481ccfbe044cc448d18312ed549171721c t/e_nested_fc.sgml
+SHA1 515a059d9c0c62f132c4ca8d2e33936743fc7816 t/e_no_end.pod
+SHA1 d487edb39f8ea79b07720412da3496f242ad3282 t/e_no_end.sgml
+SHA1 97022192cf0c7605792c2bace7763f787c7f454b t/e_unknown_fc.pod
+SHA1 550327858acd9544c69c17316b4c60534e079aec t/e_unknown_fc.sgml
+SHA1 2405c4385dc40c2e78dfa56cd11ae831dfc72455 t/for.pod
+SHA1 f0a5c0787cb9572135e24a638a3335aa7233bfe1 t/for.sgml
+SHA1 09995acec1da0d303828ccf75c40f27a8a0f1e66 t/formatting_codes.pod
+SHA1 e183ba5766b088020c87651ec895f2146e8207d9 t/formatting_codes.sgml
+SHA1 8b7fbde8a1418fc8676dbbe87651f452c58fa61d t/head.pod
+SHA1 5f247b3a0f13e05a1d6b82884751dbe9113cdae3 t/head.sgml
+SHA1 d8680657894d4ea7929a8360ad66a44a5d70f36e t/indent.pod
+SHA1 754ead1b97ef0e16c204e0c2d49e86aa15ca77a2 t/indent.sgml
+SHA1 8e448d60d31c172bc5246c90625400583651f079 t/lists.pod
+SHA1 ef8865f3fe9f996061362b0d01279617007c6e43 t/lists.sgml
+SHA1 d8622106dce894fc17f9e1892e5b603b295bb2e7 t/make_id.t
+SHA1 ec7be9548d281ed0686799a7c2fec4bbb25ade31 t/no_header.pod
+SHA1 f435a48ffb0b7c9000ccd9fb3dcb5886c0333465 t/no_header.sgml
+SHA1 ec7be9548d281ed0686799a7c2fec4bbb25ade31 t/paragraphs.pod
+SHA1 137637eba8890e500115589c2c80526639a8613a t/paragraphs.sgml
+SHA1 491d4b09cb94c1e722f7437445a1b5353c52e07c t/perlcritic.t
+SHA1 aa3b8c1b81de9de8b414daf97e9f98e8cab12a7e t/perlcriticrc
+SHA1 5aa1ab0c95f16a7e29e92898ee97e9dccf15a9b7 t/perltidy.conf
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 t/pod-coverage.t
+SHA1 469afd9049b94527619a02194b0ccde0824f6c0a t/pod-spell.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 t/pod.t
+SHA1 a5a7a6c165a8c56f9ab5619282a31eace11a5f2f t/refentry.t
+SHA1 4aeb184c9bed26ab6c3be1ebdb8470c0cb353b1f t/signature.t
+SHA1 8a09a3cf846e5209a7c0c13a3b30782c5ede809f t/table.pod
+SHA1 6515e07637410104d02f090e59a38a64d9b8013b t/table.sgml
+SHA1 0991a2f92c844fea6528d30c5a09d985fb9d9fbb t/valid_xml.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkn8TjYACgkQC0OgUPgL2SfRCwCfaT1jEGUWa0ZaxdE93PiZPAd+
+6rIAoKXh/MxskIFXu+eUrHQ2sGjLYf4x
+=dfL7
+-----END PGP SIGNATURE-----

@@ -1,0 +1,78 @@
+######################################################################
+    Perl::Installed 0.01
+######################################################################
+
+NAME
+    Perl::Installed - Get meta information of a perl installation
+
+SYNOPSIS
+        use Perl::Installed;
+
+        my $perl = Perl::Installed->new( prefix => "/usr/local" );
+
+            # Retrieve all files and symlinks
+        my @files = $perl->files();
+
+            # Retrieve configuration parameters
+        my $cfg = $perl->config();
+        print "$cfg->{version} on $cfg->{osname}\n";
+
+DESCRIPTION
+    When you point "Perl::Installed" to a perl installation by telling it
+    the prefix (e.g. "/usr" or "/usr/local"), it will provide meta data,
+    like the files the installation consists of or the $Config hash it uses.
+
+    This way, you can bundle up perl installations for package management
+    systems like Redhat's RPM or Debian's dpkg. Note that the perl
+    installation you're using to perform the bundling isn't necessarily
+    identical with the perl installation you're bundling up.
+
+METHODS
+    new( prefix => "..." )
+        Constructor, takes the prefix of the perl installation as a
+        mandatory parameter. Usually the prefix of a perl installation is
+        either "/usr" (perl therefore being at /usr/bin/perl) or
+        "/usr/local".
+
+    files()
+        Looks at the installation's .packlist and returns the files therein.
+        It returns a reference to an array with an element for each
+        file/symlink. Every array element is a reference to a hash with the
+        following entries:
+
+            path - Path to the file/symlink
+            type - "file" or "link"
+            from - If 'path' is a symlink, this entry tells where it's pointing
+                   to (usually where the corresponding file is).
+
+        Example:
+
+            my @files = $perl->files();
+
+            for my $file (@files) {
+
+                if( $file->{type} eq "file" ) {
+                    print "File: $file->{path}\n";
+                } elsif( $file->{type} eq "link" ) {
+                    print "Link: $file->{path} -> $file->{from}\n";
+                }
+            }
+
+    config()
+        Returns a reference to the perl installation's $Config hash, just as
+        if you had said "use Config" and used %Config afterwards. Note that
+        the perl installation you're using to perform the bundling isn't
+        necessarily identical with the perl installation you're bundling up,
+        so it will
+
+    packlistfile()
+        Return the path to the packlist file of the perl core.
+
+LEGALESE
+    Copyright 2007 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2007, Mike Schilli <m@perlmeister.com>
+

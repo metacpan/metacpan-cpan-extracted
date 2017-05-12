@@ -1,0 +1,19 @@
+v0.04 2012.05.21
+  Move author tests to xt/
+
+v0.03 2012.05.17
+
+  Use Text::CSV instead of Text::CSV_XS
+  reuqire instead of use in test
+
+v0.02 2012.05.16
+
+  Move to github
+  replace Module::Build by ExtUtils::MakeMaker
+  fixto work with Pipe 0.03 and later
+
+v0.01 2006.04.24
+
+  Initial release
+
+

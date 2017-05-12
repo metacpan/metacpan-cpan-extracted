@@ -1,0 +1,9 @@
+perl-version: 5.12.2
+install-prefix: /usr/local
+perl-config-options: -ders
+
+modules:
+- module: YAML::XS
+- module: Template::Toolkit::Simple
+  prereqs:
+  - Template

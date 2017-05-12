@@ -1,0 +1,105 @@
+%{
+=head1 SYNOPSIS
+
+Packrat parsers cannot recognize some unambiguous grammars, such as the following 
+Example taken from Bryan Ford (2002): 
+I<Functional Pearl: Packrat Parsing: Simple, Powerful, Lazy, Linear Time>
+
+    S : x' S 'x' | 'x'
+
+In fact, neither LL(k) nor LR(k) parsing algorithms are capable of recognizing this example.
+
+This grammar is a more complex variant of  the former. 
+
+Compile this grammar with:
+
+        eyapp -C nopackrat2.eyp
+
+Run the program with s.t. like:
+
+        ./nopackrat2.pm -t -m 1 -i -c '2*3; 4+2; a+1; 2; a;'
+
+=head1 SEE ALSO
+
+=over 2 
+
+=item * File C<nopackrat.eyp>
+
+=item *  http://en.wikipedia.org/wiki/Parsing_expression_grammar,
+         entry 'Parsing expression grammar' in the Wikipedia
+
+=item * Bryan Ford (2002). Functional Pearl: Packrat Parsing: Simple, Powerful, Lazy, Linear Time
+        http://pdos.csail.mit.edu/~baford/packrat/icfp02/packrat-icfp02.pdf
+
+=item * "Packrat Parsers Can Support Left Recursion". PEPM '08.
+        January 2008. http://www.vpri.org/pdf/tr2007002_packrat.pdf. Retrieved
+        2009-08-04.
+
+=back
+
+=cut
+
+my $count = 0;
+
+%}
+
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+
+%tree
+
+%lexer {
+  /\G\s+/gc;
+
+  /\G([0-9]+(?:\.[0-9]+)?)/gc   and return('NUM',$1);
+  /\G([A-Za-z][A-Za-z0-9_]*)/gc and return('VAR',$1);
+  /\G(.)/gc                     and return($1,$1);
+}
+
+%conflict isInTheMiddle {
+  $count++;
+  # nested parsing of the remain of the input ...
+  my $r = substr($_, pos($_));
+
+  my $nrsc = ($r =~ tr/;//); # count the number of remaining ';'
+  # just for debugging ...
+  print "count = $count r = '$r' nrsc = $nrsc\n";
+
+  if ($count == $nrsc+1) { $self->YYSetReduce([ 'NUM', 'VAR', '(', '-' ], 'MIDexp' ) }
+  else { $self->YYSetShift([ 'NUM', 'VAR', '(', '-' ]) }
+}
+
+%tree 
+
+%%
+
+s: 
+    %name exp_s_exp
+    exp ';'              %PREC isInTheMiddle
+        s exp ';' 
+  | %name MIDexp
+    exp ';'              %PREC isInTheMiddle
+;
+
+exp:      %name NUM   
+            NUM 
+	| %name VAR  
+          VAR 
+	| %name ASSIGN        
+          VAR '=' exp 
+	| %name PLUS 
+          exp '+' exp 
+	| %name MINUS       
+          exp '-' exp 
+	| %name TIMES   
+          exp '*' exp 
+	| %name DIV     
+          exp '/' exp 
+	| %name UMINUS
+          '-' exp %prec NEG 
+        |   '(' exp ')'  { $_[2] } /* Let us simplify a bit the tree */
+;
+
+%%

@@ -1,0 +1,44 @@
+=head1 NAME
+
+Parse::Perl::CopHintsHash - reified cop_hints_hash structure
+
+=head1 DESCRIPTION
+
+This is a class used internally by L<Parse::Perl> to represent part of
+a lexical environment.  It is not meant to be touched by users directly.
+See L<Parse::Perl::Environment> for the class that represents the whole
+lexical environment.
+
+An object of this class is a Perl-manipulable handle onto a C<struct
+refcounted_he>, which is the structure that Perl (from version 5.9.4
+onwards) uses to store a runtime-accessible form of the compile-time
+C<%^H> lexical hints hash.  The structures are reference-counted, but
+because they are not in the C<SV> format they can't directly participate
+in the usual reference counting of Perl objects.  This class is a shim
+layer to allow the structures to be referenced from Perl objects in a
+way that propagates reference counting semantics.
+
+The C<refcounted_he> structure is only accessible from C code.  This class
+does not provide any Perl-level interface to its content.
+
+On versions of Perl that don't have C<struct refcounted_he>, this class
+still exists, but represents nothing and should never be encountered.
+
+=head1 SEE ALSO
+
+L<Parse::Perl>,
+L<Parse::Perl::Environment>
+
+=head1 AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2009, 2010, 2011, 2012
+Andrew Main (Zefram) <zefram@fysh.org>
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

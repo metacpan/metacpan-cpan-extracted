@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Pod-Elemental-Transformer-PPIHTML,
+version 0.093581:
+
+  convert "=begin perl" and shebang-marked blocks to XHTML
+
+This software is copyright (c) 2013 by Ricardo SIGNES.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,32 @@
+---
+abstract: 'Wrapper for the pspp command-line interface'
+author:
+  - 'Patrick Donelan, C<< <pdonelan at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Spec: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.87'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PSPP-Wrapper
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Carp: 0
+  Cwd: 0
+  File::Temp: 0
+  IPC::Run: 0
+  Text::CSV_XS: 0
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

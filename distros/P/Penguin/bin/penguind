@@ -1,0 +1,56 @@
+#!/usr/bin/perl 
+
+#
+#  This is a very simple example Penguin daemon which uses
+#  the 'Trivial::Server' class.  Obviously, to do anything
+#  real with it, you'd probably want to subclass from
+#  Penguin::Trivial::Server and install your own hooks
+#  (including sharing compartments, etc.) into the mix.
+#
+
+print("Type your PGP Password (echo disabled with 'stty -echo'):\n");
+system("stty -echo");
+chop($password = <STDIN>);
+system("stty echo");
+print("thanks (echo back on)\n");
+
+use Penguin::Trivial::Server;
+
+print("listening for clients...\n");
+
+$shareref = [ 'notify', 'alert', 'message' ];
+
+my $penguinserver = new Penguin::Trivial::Server Port => 8118,
+                                                 Password => $password,
+                                                 Share => $shareref;
+
+$penguinserver->serve();
+
+sub notify {
+    print "hello, world!  Notification is happening!\n";
+}
+
+sub alert {
+    print "Warning, alert!  Alert!  Danger will robinson!\n";
+}
+
+sub message { # note that this uses backticks, which are normally
+              # executed with extreme prejudice by Safe.  However,
+              # since we explicitly shared this, it executes.
+    print "the time is " . `date` . "\n";
+}
+
+# NOTE: guestbook is not shared by default, because it's
+# not 100% safe (it's vulnerable to denial-of-service
+# attacks against your filesystem).
+
+sub guestbook { # this one demonstrates a semisafe guestbook.
+    my $text = shift;
+
+    if (! open(GUESTBOOK, ">>guestbook")) {
+        warn "whups, can't open the guestbook for appending";
+        return "sorry, the guestbook is unavailable right now";
+    }
+    print GUESTBOOK $text if length($text) < 100; # no spam please
+    close GUESTBOOK;
+}

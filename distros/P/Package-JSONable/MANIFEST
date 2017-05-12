@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+cpanfile
+dist.ini
+lib/Package/JSONable.pm
+t/00-compile.t
+t/01-basic.t
+t/02-exception.t
+t/03-direct.t
+t/lib/Class.pm

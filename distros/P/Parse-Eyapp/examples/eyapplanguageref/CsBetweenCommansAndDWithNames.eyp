@@ -1,0 +1,29 @@
+%semantic token 'c' 'd' 
+
+%{
+sub TERMINAL::info {
+  $_[0]->attr;
+}
+%}
+%tree
+%%
+Start: S      
+;
+S: 
+    ('c' <%name Cs * ','> 'd') %name Cs_and_d *   
+      { 
+         print "\nNode\n";
+         print $_[1]->str."\n"; 
+         print "\nChild 0\n";
+         print $_[1]->child(0)->str."\n"; 
+         print "\nChild 1\n";
+         print $_[1]->child(1)->str."\n"; 
+         $_[1] 
+      }
+;
+
+%%
+
+# Try:
+# modulino code: compile with: eyapp -C CsBetweenCommansAndDWithNames.eyp
+#  ./CsBetweenCommansAndDWithNames.pm -c 'c,c,cd c,c, cd'

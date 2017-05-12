@@ -1,0 +1,176 @@
+## -*- Mode: CPerl -*-
+##
+## File: pdlmaker.plm
+## Author: Bryan Jurish <moocow@cpan.org>
+## Description: hacks for CPAN-friendly PDL module distribution
+##
+## Usage:
+##  + optionally set the variable $MY::README (boolean); default is
+##      $MY::README = grep {-e $_} (<README.txt>,<README.pod>,<README.rpod>)
+##  + read this file in top-level Makefile.PL:
+##      require "pdlmaker.plm";
+##  + call pdlmaker_init([$pdfile, $pmbase, $module]) as for pdlpp_stdargs()
+##    - will actually call pdlpp_stdargs() and return that hash if called in list context
+##  + call WriteMakefile() as usual
+##  + omit the pdlpp_postamble() call from MY::postamble()
+##    (you still need to 'use PDL::Core::Dev' though)
+##
+## Effects:
+##  + clobbers sub ExtUtils::MakeMaker::WriteMakefile()
+##    - unlinks all @pdpm files before calling "real" WriteMakefile()
+##  + clobbers/appends MY::depend (appends)
+##    - adds @pdpm dependencies to dist,distcheck,create_distdir
+##    - also adds README.txt dependencies if README.txt or README.rpod is present
+##  + clobbers/appends MY::special_targets (appends)
+##    - adds (pm|pod|rpod) -> (txt|html) rules
+##  + clobbers/appends MY::postamble (appends)
+##    - adds pdlpp_postamble($package) if $package is specified
+
+package MY;
+use ExtUtils::MakeMaker qw();
+use ExtUtils::Manifest qw();
+use Cwd qw(cwd abs_path);
+use File::Basename qw(dirname basename);
+use strict;
+
+##----------------------------------------------------------------------
+sub pdlmaker_init {
+  my $package = shift;
+  my @pdpm = $package ? "$package->[1].pm" : qw();
+
+  my $cwd   = cwd();
+  my $label = "pdlmaker_init [DIR=$cwd]";
+  #print STDERR "$label\n";
+
+  ##----------------------------
+  ## read manifest @pdpm (for user info message)
+  my @manipm = qw();
+  if (-r 'MANIFEST') {
+    my $mani = ExtUtils::Manifest::maniread();
+    my ($pd,$pm);
+    foreach $pd (grep {/\.pd$/i} keys %$mani) {
+      if ($mani->{$pd}) {
+	($pm=$mani->{$pd}) =~ s/^[\#\s]*(?:pm=)?//;
+	if ($pm) {
+	  push(@manipm,$pm);
+	  next;
+	}
+      }
+      ($pm=$pd)=~s/\.pd$/\.pm/i;
+      push(@manipm,$pm);
+    }
+    print STDERR "Info: ignore any warnings about missing $_\n" foreach (@manipm);
+  }
+  elsif (0 && $package) {
+    print STDERR "Info: ignore any warnings about missing $package->[1].pm\n";
+    ;
+  }
+
+  ##----------------------------
+  ## $MY::README
+  if (!defined($MY::README)) {
+    $MY::README = grep {-e $_} map {glob("README.$_")} qw(txt pod rpod);
+  }
+
+  ##----------------------------
+  ## unlink @pdpm files here
+  foreach (@pdpm) {
+    #print STDERR "$label: UNLINK $_\n";
+    unlink($_) if (-e $_);
+  }
+
+  ##----------------------------
+  ## @missed = ExtUtils::Manifest::manicheck()
+  ##  + ignore @pdpm files in manicheck
+  my %manipm = (map {($_=>undef)} @manipm,@pdpm);
+  my $_manicheck0 = \&ExtUtils::Manifest::manicheck;
+  my $_manicheck1 = sub {
+    grep {!exists($manipm{$_})} $_manicheck0->(@_);
+  };
+  *ExtUtils::Manifest::manicheck = $_manicheck1;
+
+  ##----------------------------
+  ## depend()
+  ##  + add @pdpm, README.txt
+  my $depend0 = MY->can('depend') || sub {''};
+  my $depend = sub {
+    my $inherited  = $depend0->(@_) . shift->SUPER::depend(@_);
+    my $deps = join(' ', ($MY::README ? 'README.txt' : qw()), sort keys %manipm);
+    return $inherited if (!$deps);
+    return $inherited .<<EOF;
+
+dist: $deps
+
+distcheck: $deps
+
+create_distdir: $deps
+
+EOF
+  };
+  *MY::depend = $depend;
+
+  ##----------------------------
+  ## special_targets()
+  ##  + add .SUFFIXES, (pm|pod|rpod)->(txt|html)
+  my $special_targets0 = MY->can('special_targets') || sub {''};
+  my $special_targets = sub {
+    my $inherited = $special_targets0->(@_) . shift->SUPER::special_targets(@_);
+    $inherited .= <<EOF;
+
+.SUFFIXES: .pm .pod .rpod .txt .html
+
+.pm.html:
+	pod2html --outfile \$@ \$<
+
+.pm.txt:
+	pod2text \$< \$@
+
+.pod.html:
+	pod2html --outfile \$@ \$<
+
+.pod.txt:
+	pod2text \$< \$@
+
+.rpod.html:
+	pod2html --outfile \$@ \$<
+
+.rpod.txt:
+	pod2text \$< \$@
+
+EOF
+
+    foreach (sort keys %manipm) {
+      my ($dir,$base) = (dirname($_),basename($_));
+      if ($dir ne '.') {
+	$inherited .= "$_:\n\t\$(MAKE) -C $dir $base\n\n";
+      }
+    }
+
+    return $inherited;
+  };
+  *MY::special_targets = $special_targets;
+
+  ##----------------------------
+  ## postamble()
+  ##  + add pdlpp postamble if available
+  my $postamble0 = MY->can('postamble') || sub {''};
+  my $postamble = sub {
+    my $inherited = $postamble0->(@_) . shift->SUPER::postamble();
+    if (defined($package) && UNIVERSAL::can('PDL::Core::Dev','pdlpp_postamble')) {
+      $inherited .= PDL::Core::Dev::pdlpp_postamble($package);
+    }
+    $inherited;
+  };
+  *MY::postamble = $postamble;
+
+  ##---------------------------
+  ## returning list context? --> call pdlpp_stdargs()
+  return ::pdlpp_stdargs($package,@_) if ($package && wantarray && UNIVERSAL::can('main','pdlpp_stdargs'));
+}
+
+##----------------------------------------------------------------------
+package main;
+*pdlmaker_init = \&MY::pdlmaker_init;
+
+
+1; ##-- be happy

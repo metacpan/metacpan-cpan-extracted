@@ -1,0 +1,30 @@
+Revision history for Pid-File-Flock
+
+0.08    2010-11-19
+        Switched to Module::Install
+
+0.07    2010-11-08
+        Fixed bugs under MSWin32.
+
+0.06    2010-10-28
+        New option ('raise') implemented.
+        Intended for usage from eval block.
+        Thanks to Jozef Kutej and Vladimir Timofeev.
+
+0.05    2010-10-07
+        Fixed potential race condition.
+        Thanks to Jozef Kutej.
+
+0.04    2010-07-13
+        Added 'abandon' method special for using
+        in forking applications.
+
+0.03    2009-04-21
+        Explicitly die in Makefile.PL under cygwin.
+
+0.02    2009-04-15
+        POSIX compliance file locking semantic
+
+0.01    2009-04-13
+        Source imported
+

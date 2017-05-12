@@ -1,0 +1,24 @@
+Revision history for Perl extension Python::Bytecode.
+2.7   Sat Jul 17 23:58:05 2004
+    - Added in some missing info retrieval bits
+    - Added in some display formatting for longs, strings, and undef in the
+      disassembly text form to make it easier to read and make the tests pass
+
+2.6   Thu Jul 15 23:23:03 2004
+    - All returned constants are now blessed into some Python::Bytecode
+      class for easy identification
+
+2.0   Tue Oct  8 14:38:04 2002
+    - Much more OO
+    - Supports multiple P::B objects
+    - Support for multiple versions of Python bytecode
+
+1.01  Thu Dec 13 14:39:30 2001
+    - name should be called opname
+    - added "raw" option so that constants etc. come out as
+      objects, giving them typing information.
+
+0.01  Thu Dec 13 11:43:18 2001
+	- original version; created by h2xs 1.21 with options
+		-XA -n Python::Bytecode
+

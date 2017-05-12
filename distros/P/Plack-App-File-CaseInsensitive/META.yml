@@ -1,0 +1,25 @@
+---
+abstract: 'Serve static files with case insensitive paths'
+author:
+  - "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+build_requires:
+  HTTP::Request::Common: 6
+  Plack: 1.0016
+  Test::More: 1.001002
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-App-File-CaseInsensitive
+requires:
+  File::Find: 0
+  Plack: 1.0016
+  perl: 5.009005
+resources:
+  homepage: https://github.com/frioux/Plack-App-File-CaseInsensitive
+  repository: https://github.com/frioux/Plack-App-File-CaseInsensitive.git
+version: 0.001000

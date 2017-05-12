@@ -1,0 +1,4 @@
+Revision history for Perl extension Plack::Middleware::Devel::ForceResponse
+
+0.01    Fri Apr 29 10:38:5 JST 2016
+        - original version

@@ -1,0 +1,24 @@
+PerlX-ArraySkip
+===============
+
+Created:      2012-09-05
+Home page:    <https://metacpan.org/release/PerlX-ArraySkip>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-ArraySkip>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-18
+
+ [ Packaging ]
+ - Add LICENSE file.
+ - Drop dependency on Perl 5.006; ought to work with Perl 5.002.
+
+0.003	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.002	2013-05-14
+
+ - Use XS backend if available.
+
+0.001	2012-09-05	Initial release

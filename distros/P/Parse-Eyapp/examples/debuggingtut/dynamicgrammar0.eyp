@@ -1,0 +1,52 @@
+%{
+=head1 SYNOPSIS
+
+Compile it with:
+
+    eyapp -C dynamicgrammar0.eyp 
+
+and see the C<dynamicgrammar.output> file. 
+By default, right associativity is always chosen. Run it with
+
+    $ ./dynamicgrammar0.pm -f input_for_dynamicgrammar.txt 
+
+=head1 SEE ALSO 
+
+    This grammar has a conflict that is solved in file
+    C<examples/debuggintut/dynamicgrammar.eyp>
+
+=cut
+
+my $reduce = 1;
+%}
+
+%lexer {
+    m{\G(\s*)(?:#.*)?(\s*)}gc and $self->tokenline("$1$2" =~ tr{\n}{});
+    m{\G(LEFT|RIGHT)\b}gic         and return (uc($1), uc($1));
+    m{\G([0-9]+)}gc                and return ('NUM', $1);
+    m{\G(.)}gc                     and return ($1,    $1);
+}
+
+%%
+p:  
+      /* empty */     {}
+    | p c             {}
+;
+
+c:
+      $expr { print "$expr\n" }
+    | RIGHT { $reduce = 0}
+    | LEFT  { $reduce = 1}
+
+;
+
+expr: 
+      '(' $expr ')'  { $expr } 
+    | %name :MINUS
+      expr.left  '-' expr.right   
+         { $left - $right }
+
+    | NUM
+;
+
+%%

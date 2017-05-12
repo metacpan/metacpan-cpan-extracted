@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+examples/hello_world
+examples/psconvert
+lib/PostScript/Convert.pm
+t/00-all_prereqs.t
+t/00-load.t
+xt/release/perlcritic.t
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

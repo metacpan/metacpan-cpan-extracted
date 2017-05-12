@@ -1,0 +1,5 @@
+=pod
+
+This is a simple paragraph.
+
+=cut

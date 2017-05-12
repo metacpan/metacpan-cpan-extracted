@@ -1,0 +1,13 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Package/New.pm
+lib/Package/New/Dump.pm
+t/001_load.t
+t/002_base.t
+t/003_dump.t
+perl-Package-New.spec
+META.yml                                 Module meta-data (added by MakeMaker)

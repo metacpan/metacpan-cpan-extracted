@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 68266a9d429e42207689ceba8208620e4cc30b07 Changes
+SHA1 28defdd86ba92346f338593327743fb6f52009a4 INSTALL
+SHA1 509f655780fe2a934ad8515fa15921b96a6de84c LICENSE
+SHA1 61ff40f9689a7151308429999b7a41cf01f8cefe MANIFEST
+SHA1 5caecb9673605801c3678298bae777e54413f7d8 META.json
+SHA1 326419ad3c357422fa5ca6eda38341b210b63cda META.yml
+SHA1 4eb26ae6630f9f5ef345f13bfe758a2f630deff2 Makefile.PL
+SHA1 a9c2701c58fa3041e48b3bfada75a5c800cb4ac0 README
+SHA1 251a45af2b235007cb27311d0fd1de9f73a68fc9 cpanfile
+SHA1 9675b010306a6fe564e5c629637786ec26f50f36 dist.ini
+SHA1 49a050beec44f59ef07bb4450c88ef22a0a345c3 examples/bench.pl
+SHA1 e725347b4ddafd20a73153b120a15cf0eddea694 examples/synopsis.pl
+SHA1 84d0efaa33ee5e3d01d246a72a8cd0c3eeac8553 lib/Protocol/UWSGI.pm
+SHA1 ee76662ae1996b32b55d3fc4cf9636fc6e133c81 lib/Protocol/UWSGI.pod
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 006e42c8a428fa5c9230f04e8808dd1f0a4c5af0 t/00-compile.t
+SHA1 226f8a9114f49880900fcaa49ff50b44f0231abf t/build.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJT6PexAAoJEFKElMNpjtyDDh0H/1X2z48nMdD0IKTQn1ytXTdK
+w6EjoNBacSYrtZLVIfnGBRSExg3xqPnSyTmRsGLZTLUBDwAHjt8TeSN5NuvezqSD
+SIu0EAbp2DbAoRSu32zjftF7tRk+u0uBPT7KEQ7Ymf+ploiBuqcJNCoWsIn2MspT
+WuJPjA6ZiBivXyvyeeDCx0psUkH3gCS9DqT3InE7UVCdM8gYpDOdeqV/4hx+VnRk
+3MsqTtV108rTJ/GkkFqyCQQFW2DWfsl35FpA4dE4Lb2mQ/e79E7Za/t+PHi8NxkO
+zJ8EldNNxrEcOnxfWXyTrU17b6WFZqQmUTSgKx4W4uIfxFKIxC7e3seBstBj8JY=
+=fHhn
+-----END PGP SIGNATURE-----

@@ -1,0 +1,126 @@
+NAME
+
+    POE::Component::Metabase::Relay::Server - A Metabase relay server
+    component
+
+VERSION
+
+    version 0.36
+
+SYNOPSIS
+
+      use strict;
+      use warnings;
+    
+      use POE qw[Component::Metabase::Relay::Server];
+    
+      my $test_httpd = POE::Component::Metabase::Relay::Server->spawn(
+        port    => 8080,
+        id_file => shift,
+        dsn     => 'dbi:SQLite:dbname=dbfile',
+        uri     => 'https://metabase.example.foo/',
+        debug   => 1,
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+
+DESCRIPTION
+
+    POE::Component::Metabase::Relay::Server is a relay server for Metabase.
+    It provides a listener that accepts connections from
+    Test::Reporter::Transport::Socket based CPAN Testers and relays the
+    Storable serialised data to Metabase using
+    POE::Component::Metabase::Client::Submit.
+
+    POE::Component::Client::HTTP is used to submit reports usually, but if
+    version 0.06 of POE::Component::Curl::Multi is found to be installed,
+    this will be used in preference. You can disable this usage using the
+    no_curl option to spawn.
+
+NAME
+
+    POE::Component::Metabase::Relay::Server - A Metabase relay server
+    component
+
+VERSION
+
+    version 0.34
+
+CONSTRUCTOR
+
+    spawn
+
+      Spawns a new component session and creates a SQLite database if it
+      doesn't already exist.
+
+      Takes a number of mandatory parameters:
+
+        'id_file', the file path of a Metabase ID file;
+        'dsn', a DBI DSN to use to store the submission queue;
+        'uri', the uri of metabase server to submit to;
+
+      and a number of optional parameters:
+
+        'address', the address to bind the listener to, defaults to INADDR_ANY;
+        'port', the port to listen on, defaults to 0, which picks a random port;
+        'username', a DSN username if required;
+        'password', a DSN password if required;
+        'db_opts', a hashref of DBD options that is passed to POE::Component::EasyDBI;
+        'debug', enable debugging information;
+        'multiple', set to true to enable the Queue to use multiple PoCo-Client-HTTPs, default 0;
+        'no_relay', set to true to disable report submissions to the Metabase, default 0;
+        'no_curl',  set to true to disable automatic usage of POE::Component::Curl::Multi, default 0;
+        'submissions', an int to control the number of parallel http clients ( used only if multiple == 1 ), default 10;
+        'session', a POE::Session alias or session ID to send events to;
+        'recv_event', an event to be triggered when reports are received by the relay;
+
+      address may be either an simple scalar value or an arrayref of
+      addresses to bind to.
+
+      If recv_event is specified an event will be sent for every report
+      received by the relay server. Unless session is specified this event
+      will be sent to the parent session of the component.
+
+OUTPUT EVENTS
+
+    If recv_event is specified to spawn, an event will be sent with the
+    following:
+
+    ARG0 will be a HASHREF with the following keys:
+
+     osversion
+     distfile
+     archname
+     textreport
+     osname
+     perl_version
+     grade
+
+    ARG1 will be the IP address of the client that sent the report.
+
+    If queue_event is specified to spawn, an event will be sent for
+    particular changes in queue status
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

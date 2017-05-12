@@ -1,0 +1,77 @@
+Provision-Unix
+
+Provision::Unix is a suite of provisioning scripts used to create, modify
+and destroy accounts on Unix systems. The types of accounts that can be
+provisioned are organized by class with each class including a standard
+set of operations. All classes support a minimum of the following 
+operations: create and destroy.  Additional common operations in many
+classes are: modify, suspend, restore.
+
+Classes are organized into general modules which contain the dispatch 
+logic for sub-methods within that class. The structure looks
+like this:
+
+ Provision::Unix
+   |- DNS
+   |   |- BIND
+   |   |- NicTool
+   |   |- tinydns
+   |- User
+   |   |- Darwin
+   |   |- FreeBSD
+   |   |- Linux
+   |- VirtualOS
+   |   |- FreeBSD
+   |   |   |- Ezjail
+   |   |   |- Jail
+   |   |- Linux
+   |   |   |- OpenVZ
+   |   |   |- Virtuozzo
+   |   |   |- Xen
+   |   |- Xen
+   |- Web
+   |   |- Apache
+   |   |- lighttpd
+
+There is not yet an API for Provision::Unix but a command line interface exists. In the bin directory are prov_* applications (prov_dns, prov_user, prov_mail, etc) that can be used to provision accounts and services. 
+
+The general classes are dispatchers that send your provision requests to the appropriate modules, based on the environment and settings in provision.conf. Provision::Unix::VirtualOS contains all the general methods for performing operations on virtual private servers. Subclasses contain implementation specific information such as how to provision an VPS for xen, openvz, or freebsd jails. New subclasses can be easily added by following the example of a completed one.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Provision::Unix
+
+You can also look for information at:
+
+    Issue Tracker
+        https://github.com/msimerson/provision-unix/issues
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Provision-Unix
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Provision-Unix
+
+    Search CPAN
+        http://search.cpan.org/dist/Provision-Unix
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Matt Simerson
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

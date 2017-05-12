@@ -1,0 +1,5 @@
+#!/bin/sh -x
+
+pod2html FAQ.pm FAQ.html
+pod2text FAQ.pm > FAQ.text
+mv FAQ.html ~/Documents/perl

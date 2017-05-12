@@ -1,0 +1,27 @@
+Revision history for Perl module Parse::File::Metadata
+
+0.01 Sun Jan 17 14:17:07 2010
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+0.02 Mon Jan 18 21:01:01 2010
+    - Change return value of two methods so that $exception returns
+      reference to array holding labels of all rules where metadata failed.
+
+0.03 Sat Jan 23 20:23:30 2010
+    - Create methods get_metadata() and get_exception() to explicitly
+      get data out of object.  process_metadata_and_proceed() and
+      process_metadata_only() no longer provide return values.
+
+0.04 Fri Jan 29 21:36:00 2010
+    - In tests, use 'File::Spec->catfile()' to create paths for files used
+      in testing (in hope that we get better CPANtesters results on Win32).
+
+0.05 Thu May  6 21:00:19 EDT 2010
+    - Account for DOS line endings.
+
+0.06 Fri May  7 07:11:16 EDT 2010
+    - Eliminate use of Tie::File; just do regular 'open'.  Substitute test
+      file.
+
+0.07 Fri May 14 21:32:58 EDT 2010
+    - Correct misleading documentation, per suggestion of Preston Cody.

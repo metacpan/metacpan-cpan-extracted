@@ -1,0 +1,6 @@
+Changes                                  Changelog
+Makefile.PL                              Makefile.PL
+MANIFEST                                 MANIFEST
+README                                   README
+MAC48.pm                                 MAC48 module
+t/base.t                                 Module base tests

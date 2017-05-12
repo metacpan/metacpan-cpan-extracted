@@ -1,0 +1,114 @@
+Revision history for Perl extension PostScript::MailLabels.
+
+2.32 Tue Oct  2 19:26:09 CDT 2012
+    Update from Lee Hart to fix dawn of time bug of not honoring metric units!
+
+2.30 Mon Nov 17 20:36:36 CST 2008
+    Apply patch from brian d foy to add
+    dymo labels
+
+2.27 Mon Oct 20 20:09:09 CDT 2008
+    Patch had an error - repaired.
+    Add META.yml
+
+2.26 Sun Oct 19 16:22:56 CDT 2008
+    Add Userdefined as an option for papersize at request of Jim Albert
+    Apply patch from brian d foy for Avery 8923 labels, plus a documentation adjustment
+
+2.25 Tue Jul  4 14:37:34 CDT 2006
+	Escape open and close parens in postscript code at request of Thomas
+	Byström
+
+2.24 Wed Jan  4 19:57:57 CST 2006
+	Patch from Robert Harris to make output 7-bit clean
+
+2.23 Tue Nov 29 20:55:38 CST 2005
+	Added Avery 5526 labels per request of Wallace Winfrey
+
+2.22 Sat Nov 26 14:25:39 CST 2005
+	A small patch correcting the encoding for all fonts, with this patch you
+	can use different fonts with IsoLatin encoding. Supplied by Ing. Juan 
+	Manuel Calvo, Director del Centro de Cómputos, Universidad del CEMA
+
+2.21 Sat Aug 13 17:43:36 CDT 2005
+	Minor repairs to fix what patches broke (ISOLatin1Encoding), update docs
+		and examples.
+
+2.20 Sat Aug 13 16:39:54 CDT 2005
+	Applied patches from Jonathan Kamens
+	1) Add support for No. 9 and No. 6 3/4 envelopes.
+
+	2) Add 5160 to the list of Avery product codes for the layout code 5160
+	   (since 5160 is the product code that appeared on the box of labels that
+       I bought).
+
+	3) Add a new "orientation" setup option which can be set to "portrait"
+	   or "landscape", with "portrait" being the default.
+
+	4) Modify the generated PostScript code so that if we're in landscape
+	   mode, we rotate and translate appropriately.
+
+	5) Wrap the generated PostScript code in "gsave ... grestore" so that
+	   the translation and rotation is protected (this way, e.g., you can
+	   have both a calibration page and a label test page in the same
+	   PostScript file without over-rotating and over-translating).
+
+	6) Don't hard-code the list of valid paper sizes in MailLabels.pm;
+	   instead, get it from BasicData.pm.
+
+	7) To support the new landscape stuff, add a new parameter to the
+	   papersize() function, "logical", to indicate whether the caller
+	   wants the physical page size or the logical one.  The logical page
+	   size has the width and height flipped when in landscape mode.
+	   Modify calls to papersize() when appropriate to use the logical
+	   rather than physical page size.
+
+	8) Fix a typo in a comment.
+
+2.11 Sat Nov 13 14:42:37 CST 2004
+	Put in a trap to catch empty fields and set them to blank with a
+	warning (Joe Zacky found this one). Also update docs to explain the 
+	barcode stuff, since if you look closely, it can be confusing.
+
+2.10 Sun Aug 29 14:00:53 CDT 2004
+	Added parameters for 5167 Avery (tm) stock - thanks to Daniel J McDonald
+	for supplying the parameters.
+
+	Also added many new Avery (tm) parameters. Thanks to Summer Misherghi
+	who pointed me to http://www.worldlabel.com/Pages/pageaverylabels.htm
+
+	Added new parameter set 'freetype', to allow the user to place a text 
+	string anywhere they want. Particular use is for numbering the pages.
+
+	Code now escapes special PostScript characters (){}[]<>/% in the
+	input so that they will print properly and not crash the PS interpreter.
+
+2.03 Fri Sep 28 07:26:27 CDT 2001
+	Changed to honor user-defined number of columns - thanks to Allan 
+	Engelhardt for supplying a patch.
+
+2.02 Fri Jan 12 22:07:12 CST 2001
+        Added y_gap tp Avery(tm) labels
+        Updated calibration plot in BasicData to arbitrary paper size
+        Minor repairs to test routine
+
+2.00  Mon Jan  1 14:50:37 CST 2001
+	Major revision. Added all of the component and label definition stuff. 
+	Thanks to "Andrew Smith" <asmith at wpequity.com> for suggesting
+	additional fields and inspiring the generalization.
+	Thanks to Nuno Faria for assisting with the "Europeanization" of
+	the code - it now works for Portuguese, and hopefully for other
+	alphabets as well.
+	Added pagesize so that various paper sizes are actually handled correctly.
+	Minor bug fixes to PostScript::MailLabels::BasicData, now at version 1.01.
+
+
+1.01  Fri Dec 29 10:00:07 CST 2000
+	- bug fix version. 
+		- added parameter checking and also lowercase parameters to reduce errors.
+		- fixed PostScript code for boxes to work with newer ghostscript interpreters
+		- added new URL's for addressbook homepage.
+
+1.00  Wed Nov 10 21:32:53 1999
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,9 @@
+SYNOPSIS
+
+     use Perinci::Sub::Convert::v qw(convert_property_v);
+     convert_property_v(meta => $meta);
+
+SEE ALSO
+
+    Rinci
+

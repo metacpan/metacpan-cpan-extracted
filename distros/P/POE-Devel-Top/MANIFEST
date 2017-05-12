@@ -1,0 +1,12 @@
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Build.PL
+Makefile.PL
+Changes
+README
+lib/POE/Devel/Top.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,32 @@
+
+# $Id$
+
+severity = 1
+verbose  = 8
+
+#------------------------------------------------------------------------------
+
+#https://metacpan.org/module/Perl::Critic::Policy::CodeLayout::RequireTidyCode
+[CodeLayout::RequireTidyCode]
+
+#https://metacpan.org/module/Perl::Critic::Policy::Documentation::RequirePodSections
+[Documentation::RequirePodSections]
+lib_sections    = NAME|AFFILIATION|VERSION|DESCRIPTION|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES AND REQUIREMENTS|INCOMPATIBILITIES|BUGS AND LIMITATIONS|BUG REPORTING|TEST AND QUALITY|SEE ALSO|AUTHOR|LICENSE AND COPYRIGHT
+
+#https://metacpan.org/module/Perl::Critic::Policy::CodeLayout::ProhibitHardTabs
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+#https://metacpan.org/module/Perl::Critic::Policy::ValuesAndExpressions::ProhibitConstantPragma
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+#https://metacpan.org/module/Perl::Critic::Policy::NamingConventions::Capitalization
+[-NamingConventions::Capitalization]
+
+#https://metacpan.org/module/Perl::Critic::Policy::Documentation::RequirePodLinksIncludeText
+[-Documentation::RequirePodLinksIncludeText]
+
+#https://metacpan.org/module/Perl::Critic::Policy::InputOutput::RequireCheckedSyscalls
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print

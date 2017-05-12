@@ -1,0 +1,50 @@
+{
+   "abstract" : "CONNECT method",
+   "author" : [
+      "Piotr Roszatycki <dexter@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Proxy-Connect-IO",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack" : "0",
+            "Plack::App::Proxy" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::Proxy::Connect::IO" : {
+         "file" : "lib/Plack/Middleware/Proxy/Connect/IO.pm",
+         "version" : "0.0200"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/dex4er/perl-Plack-Middleware-Proxy-Connect-IO/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/dex4er/perl-Plack-Middleware-Proxy-Connect-IO"
+      }
+   },
+   "version" : "0.0200",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

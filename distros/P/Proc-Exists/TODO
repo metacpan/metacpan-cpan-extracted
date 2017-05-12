@@ -1,0 +1,77 @@
+- errno 9 (Bad file descriptor) was the result on these pids: 0
+  from: http://www.cpantesters.org/cpan/report/6530781
+  how do we handle this? we should throw an error if its an illegal pid?
+  ... also read more cpants results from 1.00 and look for anything suspect
+- pull CFLAGS from environment if they exist?
+- should eval { require warnings; }; be inside BEGIN?
+- it'd be nice if we could emit a custom error message if make fails
+  ie, "try setting cc or cflags explicitly via Makefile.PL arguments"
+  perhaps use a bin/cc-exec.pl that calls system cc using $ENV{PATH} 
+  and emits that message if cc failed? note: system's behavior wrt
+  failing commands is weird -- be careful
+- check if this works with perl <5.5 (all the way back to 5.0 might work
+  except that Config came around in 5.3). then set META.yml as well as 
+  Makefile.PL to the version we really want: use 5.005 or whatever.
+  see http://wiki.cpantesters.org/wiki/CPANAuthorNotes for Makefile.PL info
+- migrate to Module::Build
+- add activeperl/win32 to the stuff we test? (is there free msvc stuff?)
+- it's time for a better api...
+- VMS: PIDs can be hex(?) e.g. 2341B053.
+  see VMS::Process and see how they do things... perldoc perlvms too...
+  mmk test fails like so:
+GEIN $ mmk test
+MCR $3$dqa0:[bin.perl-587_root]perl.exe "-MExtUtils::Command::MM" "-e" "test_har
+ness(0, '[.blib.lib]', '[.blib.arch]')" t/*.t
+t/00-info.....
+# WARNING: ignore all warnings from this test ;-)
+# osname: VMS
+# perl cc: DEC 60590001
+# perl version: 5_8_7
+# POSIX::uname: OpenVMS - GEIN - 0 - V7.3-1 - AlphaServer_DS10L_466_MHz
+# tested by a person
+# errno 22 (invalid argument) was the result on these pids: 0, 1, 2, 3, 4, 5, 6,
+ 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27
+, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47
+, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67
+, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87
+, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100
+ok
+t/01-load.....
+# Testing Proc::Exists 0.99_01, pureperl implementation
+# EPERM: 1, ESRCH: 3
+ok
+t/02-usage....
+unknown numeric $!: (0): , pureperl, OS: VMS at blib/lib/Proc/Exists.pm line 70.
+# Looks like your test died just after 12.
+%SYSTEM-F-ABORT, abort
+dubious
+	Test returned status 44 (wstat 1024, 0x400)
+		(VMS status is 44)
+	after all the subtests completed successfully
+Failed Test  Stat Wstat Total Fail  Failed  List of Failed
+-------------------------------------------------------------------------------
+t/02-usage.t   44  1024    12    0   0.00%  ??
+Failed 1/3 test scripts, 66.67% okay. 0/14 subtests failed, 100.00% okay.
+%SYSTEM-F-ABORT, abort
+%MMK-F-ERRUPD, error status %X0000002C occurred when updating target TEST_DYNAMIC
+- there must be some way to do a windows/pure perl implementation...
+  see if there is a pureperl win possibility via Win32.pm or
+  Win32::Process. Win32::API is probably the best bet, as we can
+  just sort of port the XS code over into perl-land, but it'll never
+  be as good as XS. it also might be a win just to pull those in if they
+  exist and have something relevant, for people who use activeperl and 
+  don't have a functional cc setup, for example.
+- unify _{scalar|list}_pexists into one XS sub
+- get rid of the pureperl parts of the xs pexists sub
+- win32: use a process snapshot when we ask about a lot of PIDs,
+  heuristically choose at runtime which code to run based on #pids
+
+for better test coverage of pureperl stuff via cpants, make a test 
+script that (for information purposes only) runs pureperl tests
+seperately? this would break win32/{strawberry|activeperl}, so we'd have 
+to check $^O and skip in that case...
+
+Perl::Critic and Kwalitee info:
+  http://www.slideshare.net/kcowgill/testing-code-and-assuring-quality/
+  http://cpants.perl.org/kwalitee.html
+

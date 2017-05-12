@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $cwd = `cat \$HOME/.tif2svg-gui` || $ENV{'HOME'};
+chomp $cwd;
+
+unless (`which tif2svg`)
+{
+    `zenity --error --text='tif2svg not found in your \$PATH'`;
+    exit 1;
+}
+
+my @files;
+
+if (@ARGV)
+{
+    @files = @ARGV;
+}
+else
+{
+    my $result = `zenity --file-selection \\
+                         --filename=$cwd/ \\
+                         --title='Select TIFF files to assemble to SVG' \\
+                         --multiple` || exit 0;
+    chomp $result;
+    @files = split ('\|', $result);
+}
+
+my $index = 1;
+
+@files = map (quotemeta, @files);
+my $files = join ' ', @files;
+`tif2svg $files`;
+
+$cwd = $files[0];
+$cwd =~ s/\/[^\/]*$//;
+$cwd =~ s/\\\//\//g;
+`echo '$cwd' > \$HOME/.tif2svg-gui` if ($cwd =~ /^\//);
+
+my $title = scalar (@files) . ' layers added to SVG';
+my $text = join ("\n", @files);
+
+`zenity --info \\
+        --title='$title' \\
+        --text='$text'`;
+
+exit 0;

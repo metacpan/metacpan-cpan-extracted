@@ -1,0 +1,40 @@
+2009-10-27  Dave Cross <dave@dave.org.uk>
+
+  * Build.PL: Removed version defintion (use one from .pm)
+
+  * lib/Parse/RPM/Spec.pm, t/parse-rpm-spec.t: Version 0.04. Handle BuildArch
+  definition. Thanks to Steve Goldner for pointing out the omission.
+
+2009-08-30  Dave Cross <dave@dave.org.uk>
+
+  * Build.PL, lib/Parse/RPM/Spec.pm: Add Moose as a requirement. Bump version
+  number to 0.03 for release.
+
+2009-07-25  Dave Cross <dave@dave.org.uk>
+
+  * lib/Parse/RPM/Spec.pm: Made file attribute mandatory.
+
+  * MANIFEST, t/Parse-RPM-Spec.t, t/parse-rpm-spec.t: Renamed test file.
+
+  * t/pod.t, t/pod_coverage.t: Added pod tests.
+
+  * Build.PL: Bump version number.
+
+  * Changes: Removed generated file.
+
+  * README, README.xml: Changed README to text file.
+
+  * t/Parse-RPM-Spec.t: Changes to support the Moose version.
+
+  * lib/Parse/RPM/Spec.pm: Switch to using Moose.
+
+2008-08-25  Dave Cross <dave@dave.org.uk>
+
+  * README, README.xml: Removed README and added README.xml
+
+  * MANIFEST: Various changes
+
+  * lib/Parse/RPM/Spec.pm: Added documentation
+
+  * Build.PL, Changes, MANIFEST, README, lib/Parse/RPM/Spec.pm,
+  t/Parse-RPM-Spec.t, t/file.spec: Initial revision

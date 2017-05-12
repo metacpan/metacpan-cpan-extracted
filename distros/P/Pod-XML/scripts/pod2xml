@@ -1,0 +1,43 @@
+#!/usr/bin/perl -w
+
+# $Id: pod2xml,v 1.2 2000/11/27 11:39:06 matt Exp $
+
+=pod
+
+=head1 NAME
+
+pod2xml - convert POD to XML
+
+=head1 SYNOPSIS
+
+  pod2xml [--encoding foobar] [infile [outfile]]
+
+=head1 DESCRIPTION
+
+Takes the file specified on the command line and converts its POD
+contents to XML.
+
+=head1 SEE ALSO
+
+L<Pod::Parser>, L<Pod::XML>
+
+=cut
+
+use Pod::XML;
+use Getopt::Long;
+
+my $encoding;
+GetOptions ( "encoding=s" => \$encoding );
+
+my %options;
+$options { 'Encoding' } = $encoding if $encoding;
+my $parser = Pod::XML->new ( %options );
+
+if ( @ARGV )
+{
+  $parser->parse_from_file ( @ARGV );
+}
+else
+{
+  $parser->parse_from_filehandle ( \*STDIN );
+}

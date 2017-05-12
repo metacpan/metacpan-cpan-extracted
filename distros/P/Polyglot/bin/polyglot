@@ -1,0 +1,10 @@
+#!/usr/bin/perl
+use Polyglot;
+
+package Polyglot;
+
+use vars qw( $polyglot );
+
+$polyglot = Polyglot->new();
+
+$polyglot->run;

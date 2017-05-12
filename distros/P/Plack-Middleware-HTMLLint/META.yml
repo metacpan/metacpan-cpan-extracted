@@ -1,0 +1,51 @@
+---
+abstract: "check syntax with HTML::Lint for PSGI application's response HTML"
+author:
+  - 'Kenta Sato <karupa@cpan.org>'
+build_requires:
+  HTTP::Request: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-HTMLLint
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::HTMLLint:
+    file: lib/Plack/Middleware/HTMLLint.pm
+    version: '0.03'
+  Plack::Middleware::HTMLLint::Pluggable:
+    file: lib/Plack/Middleware/HTMLLint/Pluggable.pm
+    version: '0.03'
+requires:
+  HTML::Escape: '0'
+  HTML::Lint: '0'
+  HTML::Lint::Pluggable: '0'
+  Plack::Builder: '0'
+  Plack::Middleware: '0'
+  Plack::Util: '0'
+  Plack::Util::Accessor: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/karupanerura/p5-Plack-Middleware-HTMLLint/issues
+  homepage: https://github.com/karupanerura/p5-Plack-Middleware-HTMLLint
+  repository: git://github.com/karupanerura/p5-Plack-Middleware-HTMLLint.git
+version: '0.03'
+x_authority: cpan:KARUPA

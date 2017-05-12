@@ -1,0 +1,30 @@
+PAR-Indexer
+===========
+
+This module contains code for scanning PAR distributions
+(i.e. files with the .par extension) for the namespaces
+and scripts they contain.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires other modules and libraries. They are listed in
+the Makefile.PL file with associated versions.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2008 by Steffen Müller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

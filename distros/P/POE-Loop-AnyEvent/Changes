@@ -1,0 +1,79 @@
+==================================================
+Changes from 2008-06-06 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version .004 at 2013-06-05 20:41:43 +0000
+-----------------------------------------
+
+  Change: 0c1c858f12c30fce6c8626e7334b81a739c8deb9
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-06-05 21:41:43 +0000
+
+    Fix the META in Makefile.PL and set dynamic_config to 1 
+
+-----------------------------------------
+version .002 at 2011-10-25 12:20:53 +0000
+-----------------------------------------
+
+  Change: 77588ef495f22ffd7143ace6b981463f35c948d7
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-10-25 08:20:53 +0000
+
+    Fix some typos. 
+
+  Change: f87a6dc5c287ef4d52cfe18d05b530562743fe64
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-10-25 11:48:37 +0000
+
+    Remove redundant comments in the code 
+
+  Change: 2e444f6944582a1eb574b845d411c0c209c495c6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-10-25 10:15:45 +0000
+
+    Correct the Makefile.PL and update authors. 
+
+  Change: 6a7aac1c5d3734f5f6ad73e4b3921e8d5e895d62
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-10-24 21:52:34 +0000
+
+    Rewrite the documentation.
+
+    Explain what the module does. Explain the conflict between this
+    module and AnyEvent::Impl::POE. Explain how it affects AnyEvent's
+    support of Wx and Prima. Explain how to receive POE events from
+    AnyEvent callbacks. Explain where to find the private API
+    documentation and POE::Test::Loops in case people want to write other
+    loop bridges. 
+
+  Change: 7788bf45dd5de928aa0bc22659bd808cd5265f19
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-10-24 19:52:19 +0000
+
+    Avoid AnyEvent creating a circular dependency on POE.
+
+    POE will not automatically load AnyEvent---a programmer must do that
+    explicitly. So the presence of POE::Loop::AnyEvent in a program
+    indicates a conscious choice by a program's developer.
+
+    We must ensure that AnyEvent doesn't subsequently auto-detect and use
+    POE as its own back end. If we allow AnyEvent to do this, then a
+    circular dependency and infinite recursion ensue.
+
+    Removing AnyEvent::Impl::POE from the list of available models seems
+    to be the only way to prevent the circular dependency. This change
+    implements that.
+
+    If someone knows how to do this without breaking AnyEvent's
+    encapsulation, advice and patches are always welcome. 
+
+  Change: 0ce5c1659995e05914e412ba4609c24b946ca27f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-10-24 21:31:21 +0000
+
+    Heh 
+
+================
+End of releases.
+================

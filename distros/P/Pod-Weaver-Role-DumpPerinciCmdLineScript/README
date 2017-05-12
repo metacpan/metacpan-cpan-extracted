@@ -1,0 +1,8 @@
+METHODS
+
+ $obj->dump_perinci_cmdline_script($input)
+
+SEE ALSO
+
+    Dist::Zilla::Role::DumpPerinciCmdLineScript
+

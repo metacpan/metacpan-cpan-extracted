@@ -1,0 +1,114 @@
+NAME
+    Perl6::GatherTake - Perl 6 like "gather { take() }" for Perl 5
+
+SYNOPSIS
+        use Perl6::GatherTake; 
+
+        my $powers_of_two = gather {
+            my $i = 1;
+            for (;;) {
+                take $i;
+                $i *= 2;
+            }
+        };
+
+        print $powers_of_two->[3], "\n";
+        # output: 8
+
+DESCRIPTION
+    Perl6::GatherTake implements an API for producing partial computation
+    results on the fly, storing them in a lazy list.
+
+    A word of warning: This module tries to explore some language concepts.
+    It is not suitable for any productive work.
+
+    A "gather { ... };" block returns a reference to a (tied) array. Each
+    call to "take" inside the block pushes its arguments to that array. The
+    block is only run as needed to produce results (but see "BUGS AND
+    LIMITATIONS" below), which means that you can put infinite loops inside
+    the "gather" block as long as it calls "take" on a regular basis.
+
+    Instead of this common construct:
+
+        my @results;
+        for (@data){
+            # computations here
+            if ($result =~ m/super regex/){
+                push @results, $result;
+            }
+        }
+
+    You can now write
+
+        my $results = gather {
+            for (@data){
+                # computations here
+                if ($result =~ m/super regex/){
+                    take $result;
+                }
+            }
+        };
+
+    It has the nice side effect that the computations are only executed as
+    the array elements are accessed, so if the end of the array is never
+    used you can save much time here.
+
+    Nested "gather { take };" blocks are supported, a "take" always supplies
+    data to the innermost "gather" block.
+
+    Note that if a "gather" block is an infinite loop, you're responsible
+    for not accessing all elements. If you do something stupid like
+    iterating over all items, joining them or copying the array ("my @other
+    = @$array_ref") you have an infinite loop (until you run out of memory).
+
+    Assigning to an array element triggers evaluation until the index of the
+    changed item is reached.
+
+BUGS AND LIMITATIONS
+    This is a prototype module and is neither stable nor well-tested at the
+    moment.
+
+    * Due to the Coro based implementation (and the author's missing
+      understanding of Coro's concepts) the lazyness is limited:
+      "gather"-blocks might be run up to the first occurance of "take"
+      before a element is fetched from the associated array.
+
+    * "scalar @$array_ref" doesn't return "the right" value for an array
+      reference that is returend by a gather-take block. More precisely it
+      returns the number of already computed values plus one (unless the
+      gather block is exhausted). This means that iterating over "for
+      (@$list)" will result in an undefined element at the end if the block
+      returns only a finite number of elements.
+
+    * This module consumes much more resources than desirable: for each
+      gather-take-block it (currently) maintains a tied array (which is
+      implemented as a blessed hash) which holds all the computed values so
+      far, a "Coro" and a "Coro::Channel" object.
+
+    * "take" doesn't default to $_.
+
+    * More advanced array operations (like slices, "splice" etc.) aren't
+      tested yet.
+
+LICENSE
+    This package is free software, you can use it under the same terms as
+    Perl itself.
+
+    All example and test code in this distribution is "Public Domain" (*),
+    i.e. you may use it in any way you want.
+
+    (*) German copyright laws always grant the original author some rights,
+    so I can't really place things in the "Public Domain". But don't let
+    that bother you.
+
+AUTHOR
+    Moritz Lenz, <http://perlgeek.de/>, <http://perl-6.de/>. E-Mail
+    <moritz@faui2k3.org>.
+
+DEVELOPMENT
+    You can obtain the latest development version via subversion:
+
+        svn co https://faui2k3.org/svn/moritz/cpan/Perl6-GatherTake
+
+    Patches and comments are welcome.
+

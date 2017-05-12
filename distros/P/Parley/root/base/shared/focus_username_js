@@ -1,0 +1,27 @@
+<!-- we don't easy have access to the body tag, so we have to put it after the form
+so that the form exists when we try to set focus -->
+<!--
+	MAKE SURE THE FORM HAS A NAME IF YOU WANT THIS TO WORK
+-->
+<script language="JavaScript">
+	<!-- Begin
+	function usernameFocus() {
+		// if we have any forms (we should)
+		if (document.forms.length > 0) {
+			// loop through all forms on the page
+			for (i=0; i<document.forms.length; i++) {
+				// store the form name
+				name = document.forms[i].name;
+				// if the form has a username field
+				if (document.forms[name].username) {
+					// give it focus and don't check any more forms
+					document.forms[name].elements['username'].focus();
+					break;
+				}
+			}
+		}
+	}
+	// End -->
+
+	usernameFocus();
+</script>

@@ -1,0 +1,267 @@
+NAME
+
+    POE::Component::Client::FTP - Implements an FTP client POE Component
+
+VERSION
+
+    version 0.24
+
+SYNOPSIS
+
+      use POE::Component::Client::FTP;
+    
+      POE::Component::Client::FTP->spawn (
+         Alias      => 'ftp',
+         Username   => 'test',
+         Password   => 'test',
+         RemoteAddr => 'localhost',
+         Events     => [ qw( authenticated put_connected put_error put_closed
+                           get_connected get_data get_done size ) ]
+      );
+    
+      # we are authenticated
+      sub authenticated {
+         $poe_kernel->post('ftp', 'command', 'args');
+      }
+    
+      # data connection is ready for data
+      sub put_connected {
+         my ($status, $line, $param) = @_[ARG0..ARG3];
+    
+         open FILE, "/etc/passwd" or die $!;
+         $poe_kernel->post('ftp', 'put_data', $_) while (<FILE>);
+         close FILE;
+         $poe_kernel->post('ftp', 'put_close');
+      }
+    
+      # something bad happened
+      sub put_error {
+         my ($error, $param) = @_[ARG0,ARG1];
+    
+         warn "ERROR: '$error' occured while trying to STOR '$param'";
+      }
+    
+      # data connection closed
+      sub put_closed {
+         my ($param) = @_[ARG0];
+      }
+    
+      # file on the way...
+      sub get_connected {
+         my ($filename) = @_[ARG0];
+      }
+    
+      # getting data from the file...
+      sub get_data {
+         my ($data, $filename) = @_[ARG0,ARG1];
+    
+      }
+    
+      # and its done
+      sub get_done {
+         my ($filename) = @_[ARG0];
+      }
+    
+      # response to a size command
+      sub size {
+         my ($code, $size, $filename) = @_[ARG0,ARG1,ARG2];
+    
+         print "$filename was $size";
+      }
+    
+      $poe_kernel->run();
+
+    Latest version and samples script can be found at:
+    http://www.wush.net/poe/ftp
+
+DESCRIPTION
+
+    POE::Component::Client::FTP is a POE component that implements an
+    non-blocking FTP client. One spawns an FTP poco from within one's own
+    POE session, asking to receive particular events.
+
+CONSTRUCTOR
+
+    spawn
+
+      Creates a new POE::Component::Client::FTP session. Takes a number of
+      named parameters:
+
+        Alias          - session name
+      
+        Username       - account username
+      
+        Password       - account password
+      
+        ConnectionMode - FTP_PASSIVE (default) or FTP_ACTIVE  
+      
+        Transfermode   - FTP_MANUAL (default), FTP_ASCII, or FTP_BINARY
+                         If set to FTP_ASCII OR FTP_BINARY, will use specified
+                         before every file transfer.  If not set, you are
+                         responsible to manually post the mode.
+                         NOTE: THIS IS UNIMPLEMENTED AT THE TIME
+      
+        Filters        - a hashref matching signals with POE::Filter's
+                         If unspecified, reasonable selections will be made.
+                         Only filter currently useful is for ls, which parses
+                         common ls responses.  See samples/list.pl for example.
+      
+        LocalAddr      - interface to listen on in active mode
+      
+        LocalPort      - port to listen on in active mode
+      
+        RemoteAddr     - ftp server
+      
+        RemotePort     - ftp port
+      
+        Timeout        - timeout for connection to server
+      
+        BlockSize      - sets the recieve buffer size.  see BUGS
+      
+        Events         - events you are interested in receiving.  See OUTPUT.
+      
+        TLS        - Set to true for TLS supporting servers.
+      
+        TLSData            - Set to true for TLS supporting servers of data connections.
+
+      TLS support requires the POE::Component::SSLify module to be
+      installed.
+
+INPUT EVENTS
+
+    These are commands which the poco will accept events for:
+
+    cd [path]
+
+    cdup
+
+    delete [filename]
+
+    dir
+
+    get [filename]
+
+    ls
+
+    mdtm [filename]
+
+    mkdir [dir name]
+
+    mode [active passive]
+
+    noop
+
+    pwd
+
+    rmdir [dir name]
+
+    site [command]
+
+    size [filename]
+
+    stat [command]
+
+    syst
+
+    type [A|I]
+
+    quit
+
+    quot [command]
+
+    put_data
+
+      After receiving a put_connected event you can post put_data events to
+      send data to the server.
+
+    put_close
+
+      Closes the data connection. put_closed will be emit when connection
+      is flushed and closed.
+
+OUTPUT EVENTS
+
+    Output for connect consists of "connected" upon successful connection
+    to server, and "connect_error" if the connection fails or times out.
+    Upon failure, you can post a "connect" message to retry the connection.
+
+    Output for login is either "authenticated" if the login was accepted,
+    or "login_error" if it was rejected.
+
+    Output is for "simple" ftp events is simply "event". Error cases are
+    "event_error". ARG0 is the numeric code, ARG1 is the text response, and
+    ARG2 is the parameter you made the call with. This is useful since
+    commands such as size do not remind you of this in the server response.
+
+    Output for "complex" or data socket ftp commands is creates
+    "event_connection" upon socket connection, "event_data" for each item
+    of data, and "event_done" when all data is done being sent.
+
+    Output from put is "put_error" for an error creating a connection or
+    "put_connected". If you receive "put_connected" you can post "put_data"
+    commands to the component to have it write. A "put_done" command closes
+    and writes. Upon completion, a "put_closed" or "put_error" is posted
+    back to you.
+
+SEE ALSO
+
+    the POE manpage, the perl manpage, the Net::FTP module, RFC 959
+
+TODO
+
+    High level functions
+
+      High level put and get functions which would accept filenames or
+      filehandles. This may simplify creation of an ftp client or batch
+      script.
+
+    Improve local queueing of send data
+
+    More sample scripts and documentation
+
+      Eventually a graphical ftp client might be interesting. Please email
+      me if you decide to attempt this.
+
+    More complete test cases
+
+    "Meta" functions
+
+      Allow get/put functions to be given filenames or filehandles instead
+      of requiring the calling script to do standard file io in handlers.
+
+    Implement TransferMode setting
+
+BUGS
+
+    BlockSize
+
+      To do the blocksize, I simply rely on the BlockSize parameter in the
+      Wheel::ReadWrite. Although it is honored for receiving data, sending
+      data is done as elements in the array. Possibly change Driver::SysRW
+      or submit to the Wheel in proper sizes. Do not count on receive
+      blocks coming in proper sizes.
+
+    TransferMode
+
+      FTP_ASCII and FTP_BINARY are not implemented. Use the 'type' command.
+
+    Active transfer mode
+
+      PORT does not know what ip address it is listening on. It gets
+      0.0.0.0. Use LocalAddr in the constructor and it all works fine.
+
+    Please report any other bugs through
+    bug-POE-Component-Client-FTP@rt.cpan.org
+
+AUTHOR
+
+    Michael Ching <michaelc@wush.net>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Michael Ching and Chris
+    Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

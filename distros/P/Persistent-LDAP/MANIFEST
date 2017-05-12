@@ -1,0 +1,18 @@
+Changes					Log of changes
+LOGIN					User/Passwd file for test scripts
+MANIFEST				This file
+Makefile.PL				Makefile generator
+README					Document to get you going
+ToDo					Stuff I need to do
+examples/Person.pm			Example subclass
+examples/instance.pl			Example instantiation script
+examples/netscape_people.pl		Example script
+examples/subclass.pl			Example subclass script
+lib/Persistent/LDAP.pm			Persistent subclass
+t/00pre.t				Test script
+t/10insert.t				Test script
+t/20delete.t				Test script
+t/30update.t				Test script
+t/40copy.t				Test script
+t/90post.t				Test script
+t/common.pl				Test library

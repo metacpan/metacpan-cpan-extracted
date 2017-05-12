@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         POE-Component-Server-HTTP
+version:      0.09
+version_from: lib/POE/Component/Server/HTTP.pm
+installdirs:  site
+requires:
+    File::Spec:                    0
+    HTTP::Date:                    0
+    HTTP::Status:                  0
+    POE:                           0.3007
+    POE::API::Peek:                0
+    YAML:                          0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

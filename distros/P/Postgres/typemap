@@ -1,0 +1,7 @@
+# map types for Postgres interface
+# $Id: typemap,v 1.1 1996/10/17 18:46:31 khera Exp $
+TYPEMAP
+PGconn *	T_PTROBJ
+QUERY *		T_PTROBJ
+Oid		T_U_INT
+

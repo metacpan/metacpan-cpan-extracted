@@ -1,0 +1,9 @@
+%strict 
+
+%%
+
+expr:
+      NUM 
+;
+
+%%

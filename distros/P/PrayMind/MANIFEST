@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+PrayMind.pm
+README
+test.pl
+example/ContinentsList.pl
+example/CountriesList.pl
+example/CitiesList.pl
+example/CityTimes.pl

@@ -1,0 +1,28 @@
+# Sun Nov 26 17:37:42 2006
+# perl v5.8.8 built for x86_64-linux-gnu-thread-multi
+["check that the rotation to the z axis is correct",{"y" => "-0.301405311989214","x" => "-0.112036458461251","z" => "0.118562310350544"}]
+
+# Sun Nov 26 17:45:50 2006
+# perl v5.8.8 built for x86_64-linux-gnu-thread-multi
+["check that the boosts along z axis are correct",{"y" => "-0.114241996975728","x" => "1.46410786721245","v" => "0.699821967954875","z" => "0.970802431146918","t" => "0.269183800776783"}]
+
+# Tue Dec  5 19:06:15 2006
+# perl v5.8.8 built for x86_64-linux-gnu-thread-multi
+["check that a boost() in z-dir is the same as boost_z()",{"v" => "-0.535220261795389"}]
+
+# Wed Dec  6 14:49:25 2006
+# perl v5.8.8 built for x86_64-linux-gnu-thread-multi
+["check that the boosts along x axis are correct",{"y" => "0.882623735386765","x" => "1.25838030187734","v" => "-0.492343661194337","z" => "-1.35907715567078","t" => "0.615702927100767"}]
+
+# Wed Dec  6 14:49:25 2006
+# perl v5.8.8 built for x86_64-linux-gnu-thread-multi
+["check that the boosts along y axis are correct",{"y" => "0.198548744639293","x" => "0.490109275683842","v" => "0.412234368076234","z" => "-1.07925661472632","t" => "-1.02833359297078"}]
+
+# Wed Dec  6 14:49:25 2006
+# perl v5.8.8 built for x86_64-linux-gnu-thread-multi
+["check that a boost() in y-dir is the same as boost_y()",{"v" => "0.592790641388644"}]
+
+# Wed Dec  6 14:49:25 2006
+# perl v5.8.8 built for x86_64-linux-gnu-thread-multi
+["check that a boost() in x-dir is the same as boost_x()",{"v" => "-0.489022058919513"}]
+

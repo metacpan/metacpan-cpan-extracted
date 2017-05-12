@@ -1,0 +1,540 @@
+=head1 NOME
+
+Il brevissimo tutorial di Mark a proposito dei riferimenti
+
+=head1 Descrizione
+
+Una delle piE<ugrave> importanti nuove caratteristiche di Perl 5 era 
+la capacitE<agrave> di gestire strutture dati complesse come gli array
+o le hash annidate. Per consentirlo, Perl 5 ha introdotto una 
+nuova feature chiamata 'riferimento', e l'uso dei riferimenti
+E<egrave> la chiave per gestire, con Perl, dati complessi e strutturati.
+Sfortunatamente, c'E<egrave> un sacco di sintassi bizzarra da imparare,
+e la pagina principale del manuale puE<ograve> risultare difficile da
+seguire. Il manuale E<egrave> piuttosto completo, e a volte la gente 
+trova che questo sia un problema, poichE<eacute> puE<ograve> essere difficile
+comunicare cosa E<egrave> importante e cosa non lo E<egrave>.
+
+Fortunatamente, avete bisogno solo di un 10% di quanto viene
+detto nella pagina principale, per avere il 90% del beneficio.
+Questa pagina vi mostrerE<agrave> quel 10%.
+
+=head1 Chi ha bisogno di strutture dati complesse?
+
+Un problema che saltava fuori spesso con Perl 4 era come 
+rappresentare una hash i cui valori fossero liste. Perl 4
+aveva le hash, naturalmente, ma i valori dovevano essere scalari,
+non potevano essere liste.
+
+PerchE<eacute> si dovrebbe volere una hash di liste? Prendiamo un semplice
+esempio: avete un file contenente nomi di cittE<agrave> e nomi di paesi,
+come questo:
+
+	Chicago, USA
+	Francoforte, Germania
+	Berlino, Germania
+	Washington, USA
+	Helsinki, Finlandia
+	New York, USA  
+
+E volete produrre un output come queste, con ogni paese menzionato
+una sola volta, e poi una lista delle cittE<agrave> presenti in quel paese,
+in ordine alfabetico:
+
+	Finlandia: Helsinki.
+	Germania: Berlino, Francoforte.
+	USA: Chicago, New York, Washington.
+
+La maniera naturale per fare ciE<ograve> E<egrave> avere una hash le cui chiavi siano
+i nomi dei paesi. Associata ad ogni nome di paese c'E<egrave> una lista con le
+cittE<agrave> presenti in quel paese. Ogni volta che si legge una linea dell'input,
+la si spezza (C<split>) in un paese e in una cittE<agrave>, si consulta la lista
+di cittE<agrave> giE<agrave> registrate come appartenenti ad un paese, e si appende la 
+nuova cittE<agrave> alla lista. Una volta finito con l'input, si itera sulla hash
+come al solito, ordinando ogni lista di cittE<agrave> prima di stamparla.
+
+Se i valori della hash non possono essere liste, avete perso.
+In Perl 4, i valori delle hash non possono essere liste; possono soltanto 
+essere stringhe. Avete perso. Dovreste probabilmente combinare in qualche
+modo tutti i nomi di cittE<agrave> in una singola stringa, e poi, quando viene il
+momento di scrivere l'output, dovreste spezzare la stringa in una lista,
+ordinare la lista e ritrasformarla in una stringa. E<Egrave> un lavoraccio, e
+soggetto ad errori. Ed E<egrave> frustrante, poichE<eacute> il Perl ha giE<agrave> le liste,
+del tutto adatte, che potrebbero risolvere il problema se soltanto 
+poteste usarle.
+
+=head1 La soluzione
+
+Nel tempo in cui Perl 5 nasceva, eravamo giE<agrave> impantanati in questo
+design: i valori delle hash devono essere scalari. La soluzione sono i
+riferimenti.
+
+Un riferimento E<egrave> un valore scalare che I<si riferisce> ad un intero
+array oppure ad un'intera hash (o a qualunque altra cosa). I nomi 
+sono tipi di riferimento con cui probabilmente avete giE<agrave> familiaritE<agrave>.
+Pensate al Presidente degli Stati Uniti: una complicata e scomoda massa
+di carne e ossa. Ma per parlare di lui, o per rappresentarlo in un
+programma, tutto ciE<ograve> di cui c'E<egrave> bisogno E<egrave> la facile e comoda stringa
+"George Bush".
+
+I riferimenti in Perl sono come i nomi per gli array e le hash.
+Sono i nomi interni, privati, del Perl, quindi potete stare sicuri che
+non sono ambigui. A differenza di "George Bush", una reference fa
+riferimento ad una cosa sola, e sapete sempre a cosa si riferisce.
+Se avete un riferimento ad un array, da esso potete ottenere l'intero array.
+Se avete un riferimento ad una hash, potete ottenere l'intera hash.
+Ma il riferimento rimane un semplice scalare.
+
+Non potete avere una hash i cui valori siano array; i valori in una hash
+possono solo essere scalari. Da qui non ci smuoviamo. PerE<ograve> un singolo
+riferimento puE<ograve> referenziare un intero array, e i riferimenti sono scalari,
+quindi potete avere una hash di riferimenti ad array, e sarE<agrave> utile quanto
+una hash di array.
+
+Torneremo al problema paesi-cittE<agrave> piE<ugrave> tardi, dopo che avremo visto
+un po' di sintassi per gestire i riferimenti.
+
+=head1 Sintassi
+
+Ci sono solo due modi per costruire un riferimento, e solo due modi per 
+usarne uno una volta che lo avete.
+
+=head2 Costruire riferimenti
+
+=head3 B<Primo modo>
+
+Se mettete un C<\> di fronte alla variabile, ottenete un riferimento
+a quella variabile.
+
+	$arif = \@array;  # $arif ora contiene un riferimento ad @array
+	$hrif = \%hash;   # $hrif ora contiene un riferimento ad %hash
+
+Una volta che il riferimento E<egrave> memorizzato in una variabile come
+$aref o $href, potete copiarlo o memorizzarlo cosE<igrave> come qualunque
+altro scalare.
+
+    $xy = $aref;    # $xy contiene una reference ad @array  
+    $p[3] = $href;  # $p[3] contiene una reference ad %hash
+    $z = $p[3];     # $z cotiene una reference ad %hash
+
+Questi esempi mostrano come costruire riferimenti a variabili 
+usandone i nomi. A volte puE<ograve> capitare che vogliate fare un array
+o una hash senza nome. E<Egrave> un caso analogo all'usare la stringa "\n"
+o il numero 80 senza che esso sia memorizzato prima in una variabile. 
+
+=head3 B<Secondo modo>
+
+C<[ ELEMENTI ]> crea un nuovo array anonimo, e restituisce un riferimento
+ad esso. C<{ ELEMENTI }> crea una nuova hash anonima, ritornando un riferimento
+a tale hash.
+
+    $aref = [1, "pippo", undef, 13];
+    # $aref contiene un riferimento all'array
+
+    $href = { APR => 4, AUG => 8 };
+    # $href contiene un riferimento alla hash
+
+I riferimenti ottenuti nel secondo modo sono dello stesso tipo di quelli
+ottenuti nel primo modo:
+
+	# Questo...
+	$aref = [1, 2, 3];
+
+	# ... ha lo stesso effetto di questo
+	@array = (1, 2, 3);
+	$aref = \@array;
+
+La prima linea E<egrave> un'abbreviazione delle altre due, eccetto per il fatto che 
+non crea la variabile C<@array>, che E<egrave> superflua.
+
+Se scrivete semplicemente C<[]> ottenete un nuovo array anonimo, vuoto.
+Se scrivete semplicemente C<{}> ottenete una nuova hash anonima, vuota.
+
+=head2 Usare i riferimenti
+
+Che cosa si puE<ograve> fare con un riferimento una volta che ne avete uno?
+E<Egrave> un valore scalare, e abbiamo visto che potete memorizzarlo come uno scalare, 
+e ripescarlo esattamente come uno scalare. Ma ci sono un altro paio di modi
+per usarlo:
+
+=head3 B<Primo metodo>
+
+Se C<$aref> contiene un riferimento ad un array, allora si puE<ograve> mettere C<{$aref}>
+ovunque avreste normalmente messo il nome di un array. Ad esempio, C<@{$aref}>
+anzichE<eacute> C<@array>.
+
+Ecco alcuni esempi:
+
+Array:
+
+	@a				@{$aref}			Un array
+	reverse @a		reverse @{$aref}	Inverte l'array
+	$a[3]			${$aref}[3]			Un elemento dell'array
+	$a[3] = 17;		${$aref}[3] = 17	Assegnare un elemento
+
+In ogni linea ci sono due espressioni che fanno la stessa cosa. La versione a
+sinistra opera sull'array C<@a>, mentre la versione a destra opera sull'array
+che E<egrave> referenziato da C<$aref>, ma una volta che hanno trovato l'array 
+sul quale stanno lavorando, faranno le stesse cose ai rispettivi array.
+
+L'uso di un riferimento ad hash E<egrave> esattamente la stessa cosa:
+
+	%h				%{$href}				Una hash
+	keys %h			keys %{$href}			Prende le chiavi dalla hash
+	$h{'red'}		${$href}{'red'}			Un elemento della hash
+	$h{'red'} = 17	${$href}{'red'} = 17	Assegna un elemento
+
+Qualsiasi cosa vogliate fare con un riferimento, il B<Primo metodo> vi dice
+come farlo. E<Egrave> sufficiente che scriviate il codice Perl che avreste scritto
+per fare la stessa identica cosa con un normale array o hash, e poi
+sostituire C<{$reference}> al nome dell'array o dell'hash. "Come faccio un
+ciclo su un array quando tutto quel che ho E<egrave> un riferimento?" Beh, per fare
+un ciclo su un array regolare, dovreste scrivere
+
+   for my $elemento (@array) {
+      ...
+   }
+
+quindi rimpiazzate il nome dell'array, C<array>, con il riferimento fra
+parentesi graffe:
+
+   for my $elemento (@{$riferimento_ad_array}) {
+      ...
+   }
+
+"Come faccio a stampare il contenuto di una hash quando tutto ciE<ograve> che ho
+E<egrave> un riferimento?" Prima scrivete il codice per stampare una hash generica:
+
+   for my $chiave (keys %hash) {
+      print "$chiave => $hash{$chiave}\n";
+   }
+
+e successivamente rimpiazzate il nome della hash con il riferimento fra
+parentesi graffe:
+
+   for my $chiave (keys %{$riferimento_ad_hash}) {
+      print "$chiave => ${$riferimento_ad_hash}{$chiave}\n";
+   }
+
+=head3 B<Secondo metodo>
+
+Il B<Primo metodo> di utilizzo E<egrave> tutto ciE<ograve> di cui avete veramente bisogno, perchE<eacute>
+vi dice come fare qualunque cosa di cui possiate mai avere bisogno. Ma l'operazione
+piE<ugrave> comune su un array o su una hash E<egrave> l'estrazione di un singolo elemento, e
+la sintassi del B<Primo metodo> E<egrave> involuta. Per questo motivo esistono delle
+abbreviazioni.
+
+C<${$aref}[3]> E<egrave> troppo difficile da leggere; al suo posto potete usare 
+C<< $aref->[3] >>.
+
+C<${$href}{red}> E<egrave> troppo difficile da leggere; al suo posto potete usare
+C<< $href->{red} >>.
+
+Se C<$aref> E<egrave> un riferimento ad array, allora C<< $aref->[3] >> E<egrave> il quarto
+elemento dell'array. Non confondetelo con $aref[3], che E<egrave> il quarto elemento
+di un array del tutto diverso, ingannevolmente chiamato C<@aref>.
+C<$aref> e C<@aref> non hanno alcun rapporto tra loro, cosE<igrave> come non lo hanno
+C<$item> e C<@item>.
+
+Analogamente, C<< $href->{'red'} >> E<egrave> parte della hash referenziata dalla
+variabile scalare C<$href>, forse addirittura di una hash anonima.
+C<$href{'red'}> E<egrave> parte della hash dall'ingannevole nome C<$href>. E<Egrave> facile
+dimenticarsi il C<<->>>, e se lo fate, otterrete bizzarri risultati quando
+il vostro programma prenderE<agrave> elementi da array ed hash totalmente inaspettati,
+che non sono quelli che volevate usare.
+
+=head2 Un esempio
+
+Vediamo un esempio di come questo sia utile.
+
+Per prima cosa, ricordate che C<[1, 2, 3]> crea un array anonimo contenente
+C<(1, 2, 3)> e restituisce una reference a tale array.
+
+Ora pensate a 
+
+   @a = ( [1, 2, 3],
+          [4, 5, 6],
+          [7, 8, 9]
+        );
+
+C<@a> E<egrave> un array di tre elementi, ognuno dei quali E<egrave> un riferimento ad un
+altro array.
+
+C<$a[1]> E<egrave> uno di questi riferimenti. Referenzia un array, l'array contenente
+C<(4, 5, 6)>, e poichE<eacute> E<egrave> un riferimento ad un array, la B<> dice che possiamo
+scrivere C<< $a[1]->[2] >> per ottenere il terzo elemento da tale array.
+C<< $a[1]->[2] >> E<egrave> 6. Allo stesso modo, C<< $a[0]->[1] >> E<egrave> 2. Quello che 
+abbiamo E<egrave> come un array bidimensionale; si puE<ograve> scrivere C<< $a[RIGA]->[COLONNA] >>
+per avere (o modificare) l'elemento nella riga e colonna desiderate.
+
+La notazione pare ancora poco maneggevole, quindi c'E<egrave> ancora un'altra abbreviazione.
+
+=head2 La regola della freccia
+
+Tra due B<indici>, la freccia E<egrave> opzionale.
+
+Al posto di C<< $a[1]->[2] >>, si puE<ograve> scrivere C<$a[1][2]>; vuol dire la stessa
+cosa. AnzichE<eacute> C<< $a[0]->[1] >>, si puE<ograve> scrivere C<$a[0][1]>; E<egrave> la stessa cosa.
+
+Ora sembrano davvero array bidimensionali!
+
+Potete rendervi conto del perchE<eacute> le freccie sono importanti. Senza di esse, 
+dovremmo scrivere C<${$a[1]}[2]> anzichE<eacute> C<$a[1][2]>. Per array tridimensionali,
+la freccia consente di scrivere $x[2][3][5] anzichE<eacute> C<${${$x[2]}[3]}[5]>:
+illeggibile.
+
+=head1 La soluzione
+
+Ed ecco la risposta al problema che avevo posto prima, riformattare un file 
+contenente nomi di cittE<agrave> e paesi.
+
+    1   my %tabella;
+
+    2   while (<>) {
+    3    chomp;
+    4     my ($citta, $nazione) = split /, /;
+    5     $tabella{$nazione} = [] unless exists $tabella{$nazione};
+    6     push @{$tabella{$nazione}}, $citta;
+    7   }
+
+    8   foreach $nazione (sort keys %tabella) {
+    9     print "$nazione: ";
+   10     my @le_citta = @{$tabella{$nazione}};
+   11     print join ', ', sort @le_citta;
+   12     print ".\n";
+   13 }
+
+Il programma E<egrave> costituito da due parti. Le linee 2--7 leggono l'input e 
+costruiscono la struttura dati, e le linee 8--13 analizzano i dati e stampano
+il rapporto. Otterremo una hash, C<%tabella>, le cui chiavi sono i nomi delle
+nazioni, ed i cui valori sono riferimenti ad array contenenti i nomi delle
+cittE<agrave>. La struttura dati avrE<agrave> piE<ugrave> o meno questo aspetto:
+
+           %tabella
+        +-----------+---+
+        |           |   |   +-------------+---------+
+        | Germania  | *---->| Francoforte | Berlino |
+        |           |   |   +-------------+---------+
+        +-----------+---+
+        |           |   |   +----------+
+        | Finlandia | *---->| Helsinki |
+        |           |   |   +----------+
+        +-----------+---+
+        |           |   |   +---------+------------+----------+
+        |    USA    | *---->| Chicago | Washington | New York |
+        |           |   |   +---------+------------+----------+
+        +-----------+---+
+
+Per cominciare, ci concentreremo sull'uscita. Supponendo di avere giE<agrave> questa
+struttura dati, come la stampiamo?
+
+    8   foreach $nazione (sort keys %tabella) {
+    9     print "$nazione: ";
+   10     my @le_citta = @{$tabella{$nazione}};
+   11     print join ', ', sort @le_citta;
+   12     print ".\n";
+   13 }
+
+C<%tabella> E<egrave> una comune hash, da cui otteniamo la lista delle chiavi, le
+ordiniamo e facciamo un ciclo su di esse, come al solito. L'unico utilizzo
+di un riferimento E<egrave> alla riga 10. C<$tabella{$nazione}> cerca la chiave
+C<$nazione> nella hash e trova il valore corrispondente, che E<egrave> un riferimento
+ad un array di cittE<agrave> in quella determinata nazione. Il B<Primo metodo> ci dice
+che possiamo arrivare all'array con l'espressione C<@{$tabella{$nazione}}>. La
+riga 10 E<egrave> del tutto analoga a
+
+   @le_citta = @array;
+
+eccetto che il nome C<array> E<egrave> stato rimpiazzato dal riferimento (fra parentesi
+graffe) C<{$table{$country}}>. Il sigillo C<@> dice a Perl di prendere l'intero
+array. Una volta presa la lista delle cittE<agrave>, la ordiniamo e la stampiamo come di
+consueto.
+
+Le righe 2--7 hanno la responsabilitE<agrave> di costruire la struttura dati di partenza.
+Ecco di nuovo i riferimenti:
+
+    2   while (<>) {
+    3    chomp;
+    4     my ($citta, $nazione) = split /, /;
+    5     $tabella{$nazione} = [] unless exists $tabella{$nazione};
+    6     push @{$tabella{$nazione}}, $citta;
+    7   }
+
+Le righe 2--4 acquisiscono il nome di una cittE<agrave> e della nazione in cui si trova.
+La riga 5 verifica se il nome della nazione E<egrave> giE<agrave> presente come chiave nella
+hash. Se non E<egrave> cosE<igrave>, il programma utilizza la notazione C<[]> (in linea con il
+B<Secondo modo> di generare un riferimento ad array) per costruire un nuovo array
+anonimo (e vuoto) per contenere i nomi delle cittE<agrave>, e installa un riferimento
+a questo array nella hash, sotto la chiave corrispondente alla nazione.
+
+La riga 6 isntalla il nome della cittE<agrave> nell'array piE<ugrave> appropriato.
+C<$tabella{$nazione}> ora contiene un riferimento all'array delle cittE<agrave> viste
+fino ad ora nella determinata nazione. La riga 6 E<egrave> esattamente come
+
+   push @array, $citta;
+
+ad eccezione del fatto che il nome C<array> E<egrave> stato sostituito dal riferimento
+fra parentesi graffe C<{$tabella{$nazione}}>. La chiamata alla funzione C<push>
+aggiunge il nome della cittE<agrave> in fondo all'array "puntato" dal riferimento.
+
+Ho saltato un aspetto sottile. La riga 5 non E<egrave> strettamente necessaria, e possiamo
+sbarazzarcene.
+
+    2   while (<>) {
+    3    chomp;
+    4     my ($citta, $nazione) = split /, /;
+    5   ####  $tabella{$nazione} = [] unless exists $tabella{$nazione};
+    6     push @{$tabella{$nazione}}, $citta;
+    7   }
+
+Se giE<agrave> esiste un elemento in C<%tabella> per la C<$nazione> corrente non cambia
+niente. La riga 6 individuerE<agrave> il valore in C<$tabella{$nazione}>, che E<egrave> un
+riferimento ad un array, ed aggiungerE<agrave> il nome della cittE<agrave> in coda all'array
+stesso. Ma cosa fa quando C<$nazione> contiene il nome di una chiave, poniamo
+C<Grecia>, che ancora non esiste in C<%tabella>?
+
+Stiamo parlando di Perl, per cui fa la cosa giusta. In particolare, Perl si
+accorge che volete inserire C<Atene> in un array che non esiste, e si rende
+utile creando un nuovo array anonimo e vuoto al posto vostro, installandolo
+all'interno di C<%tabella>; successivamente, effettua l'inserimento di
+C<Atene>. Questo comportamento E<egrave> chiamato `autovivificazione'--portare le
+cose in vita automaticamente. Perl nota che la chiave non E<egrave> presente nella
+hash, per cui crea un nuovo elemento automaticamente. Per osserva che
+volete utilizzare il valore contenuto nella hash come se fosse un riferimento
+ad array, per cui crea un nuovo array (vuoto) ed installa un riferimento ad
+esso all'interno della hash, automaticamente. E, come di consueto, Perl
+allunga l'array di una posizione, per tenere traccia del nuovo nome di cittE<agrave>.
+
+=head1 Il Resto
+
+Ho promesso di darvi il 90% dei benefici con il 10% dei dettagli. Il che vuol
+dire che ho tralasciato il 90% dei dettagli. Ora che avete una panoramica delle
+parti importanti, dovrebbe risultare facile la lettura di L<perlref>, che
+parla del 100% dei dettagli.
+
+Alcuni punti importanti di L<perlref>:
+
+=over 4
+
+=item *
+
+Si possono costruire riferimenti a qualunque cosa, compresi scalari, funzioni
+e altri riferimenti.
+
+=item *
+
+Nel B<Primo metodo> di costruzione, si possono omettere le parentesi graffe
+quando ciE<ograve> che contengono E<egrave> una variabile scalare atomica come C<$aref>. 
+Ad esempio, C<@$aref> E<egrave> uguale a C<@{$aref}>, e C<$$aref[1]> E<egrave> lo stesso
+che C<${$aref}[1]>.
+Se state cominciando, magari potreste adottare l'abitudine di usare sempre le
+parentesi graffe.
+
+=item *
+
+Quanto segue non effettua una copia dell'array sottostante:
+
+   $rif_array2 = $rif_array1;
+
+Tutto ciE<ograve> che ottenete sono due riferimenti allo stesso array. Se modificate
+C<< $rif_array1->[23] >> vedrete che anche C<< $rif_array2->[23] >> E<egrave> cambiato.
+
+Per copiare l'array, usate
+
+   $rif_array2 = [@{$rif_array1}];
+
+In questo modo viene utilizzata la notazione C<[...]> per creare un nuovo
+array anonimo, un riferimento al quale viene assegnato a C<$rif_array2>.
+Il nuovo array E<egrave> inizializzato con il contenuto dell'array riferito da
+C<rif_array1>.
+
+Similmente, per copiare una hash anonima potete utilizzare
+
+   $rif_hash2 = {${$rif_hash1}};
+
+=item *
+
+Per vedere se una variabile contiene un riferimento, si puE<ograve> usare la funzione
+`ref'. Restituisce un valore vero se l'argomento E<egrave> un riferimento. In effetti, E<egrave>
+ancora meglio: restituisce la stringa C<HASH> per i riferimenti ad hash, 
+e la stringa C<ARRAY> per i riferimenti ad array.
+
+=item *
+
+Se provate ad usare un riferimento come una stringa, otterrete stringhe quali
+
+	ARRAY(0x80f5dec)   o    HASH(0x826afc0)
+
+Se vi dovesse mai capitare di vedere una stringa simile, sappiate di aver stampato
+per sbaglio un riferimento.
+
+Un effetto collaterale di questa rappresentazione E<egrave> il fatto che si puE<ograve> usare
+C<eq> per vedere se due riferimenti referenziano la stessa cosa (ma E<egrave> meglio
+usare C<==>, che E<egrave> piE<ugrave> veloce.)
+
+=item *
+
+Potete usare una stringa come se fosse un riferimento. Se usate la stringa 
+"foo" come un riferimento ad array, E<egrave> trattato come un riferimento all'array
+C<@foo>. E<Egrave> chiamato I<soft reference> o I<riferimento simbolico>. La
+dichiarazione C<use strict 'refs';> [o anche C<use strict;> e basta, NdT] 
+disabilita questa caratteristica, che puE<ograve> causare ogni sorta di guaio se
+la usate per sbaglio.
+
+=back
+
+Forse preferirete proseguire con L<perllol>, anzichE<eacute> L<perlref>; parla, in 
+dettaglio, di liste di liste e di array multidimensionali. Poi, potreste passare
+a L<perldsc>; E<egrave> il "Ricettario delle Strutture Dati",
+che mostra le ricette per stampare array di hash, hash di array e altri tipi
+di dato.
+
+=head1 In sintesi
+
+Ognuno ha bisogno di strutture dati composte, e in Perl il modo di ottenerle 
+sono i riferimenti. Ci sono quattro regole importanti per gestire i riferimenti.
+Due per creare riferimenti e due per usarli. Una volta imparate queste regole
+potete fare la maggior parte delle cose importanti che si fanno con i riferimenti.
+
+=head1 Crediti
+
+Autore: Mark Jason Dominus, Plover Systems (C<mjd-perl-ref+@plover.com>)
+
+Questo articolo E<egrave> apparso in origine in I<The Perl Journal>
+( http://www.tpj.com/ ) volume 3, numero 2. Ristampato dietro permesso.
+
+Il titolo originale dell'articolo E<egrave> I<Comprendere i Riferimento Oggi>.
+
+=head2 Condizioni di Distribuzione
+
+Copyright 1998 The Perl Journal.
+
+Questa documentazione E<egrave> libera, potete redistribuirla e/o modificarla negli
+stessi termini di Perl stesso.
+
+Indipendentemente dalla modalitE<agrave> di distribuzione, tutti gli esempi di
+codice in questi file sono qui dichiarati di dominio pubblico. Vi E<egrave> consentito
+(ed anzi siete incoraggiati a farlo) di usare questo codice nei vostri programmi
+per divertimento e profitto, come vi sembra meglio. Un semplice commento nel
+codice per dare credito sarebbe cortese ma non E<egrave> richiesto.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlreftut
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di larsen, con adeguamenti di Flavio Poletti.
+
+=head2 Revisore
+
+Revisione a cura di bepi.
+
+=cut

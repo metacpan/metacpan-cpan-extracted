@@ -1,0 +1,12 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         POE-Component-Growl
+version:      1.00
+version_from: Growl.pm
+installdirs:  site
+requires:
+    POE:                           0.31
+    Test::More:                    0
+    Mac::Growl:                    0.65
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

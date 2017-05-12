@@ -1,0 +1,56 @@
+Changelog for Plack::Middleware::Image::Scale
+
+0.011     2016-02-04 12:50:50+02:00 Europe/Helsinki
+
+    * Fixes RT#90946 Class::MOP::load_class deprecation (Zoffix Znet)
+    * Cleanup whitespaces and various warnings
+    * Update build system, rename README -> README.md, fix synopsis
+
+0.010     2012-11-07 12:26:00 Europe/Helsinki
+
+    * Also match jpeg file extension.
+
+0.009     2012-08-29 14:03:12 Europe/Helsinki
+
+    * Experimental and optional PDF support, requires
+      Image::Magick::Thumbnail::PDF.
+
+0.008     2011-08-24 13:46:16 Europe/Helsinki
+
+    * Implement new flag "fit", additional documentation in doc directory.
+    * Do not try to process empty bodies.
+
+0.007     2011-04-11 21:09:42 Europe/Helsinki
+
+    * Changes to matching logic. See README for overview.
+    * Cleanup documentation.
+    * Learn any_ext attribute (default "image").
+    * Use $self->response_cb instead of Plack::Util::response_cb.
+    * Better test coverage.
+
+0.006     2011-04-05 19:02:18 Europe/Helsinki
+
+    * Size matching can read HashRef of HashRefs for easy
+      Config::General style configuration data support.
+
+0.005     2011-04-04 17:37:41 Europe/Helsinki
+
+    * Add examples for using a CodeRef for path parameter.
+
+0.004     2011-04-04 00:51:31 Europe/Helsinki
+
+    * Override width, height and flags with optional module attributes.
+    * Easier to extend: "match_*" replaced with "path" Regexp/CodeRef.
+
+0.003     2011-04-01 21:59:11 Europe/Helsinki
+
+    * Documentation changes. First non-trial release.
+
+0.002     2011-03-31 09:52:21 Europe/Helsinki
+
+    * Documentation changes.
+
+0.001     2011-03-30 21:29:17 Europe/Helsinki
+
+    * Initial release.
+

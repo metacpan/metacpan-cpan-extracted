@@ -1,0 +1,217 @@
+NAME
+    POE::Component::Basement
+
+SYNOPSIS
+      package POE::MyComponent;
+
+      #  use as base
+      use base qw/ POE::Component::Basement /;
+  
+      #  where the initializations happen (see Class::Std)
+      sub BUILD { ... }
+  
+      #  see also Class::Std and Class::Data::Inheritable also 
+      #  for accessor creation etc.
+  
+      #  define states
+      sub state_one   : State( :inline<_start> ) { ... }
+      sub state_two   : State( :object<foo> ) { ... }
+      sub state_three : State( :package<bar> ) { ... }
+  
+      #  combined
+      sub state_multi : State( :inline<foobar> :package<snafoo> ) { ... }
+      ...
+
+      #  chained events
+      sub first : State( :object<foo> :chained<bar> ) { ... }
+      sub second : State( :object<bar> ) { ... }
+      ...
+
+      #  calling in a row
+      sub first : State( :object<foo> :next<bar> ) { ... }
+      sub second : State( :object<bar> ) { ... }
+      ...
+  
+      #  usage
+      my $comp = POE::MyComponent->new ({
+  
+          #  single alias or array reference for multiple
+          aliases => [qw/ mycomp shub_niggurath /],
+
+          ...  #  your specific init_arg's.
+      });
+
+DESCRIPTION
+    Provides Class::Std and base POE component functionality. This module is
+    still kinda experimental.
+
+CLASS AND INSTANCE DATA
+  Setting "session_class"
+    Determines on which class the session should be built on. To use, for
+    instance, POE::Session::MessageBased, set the option like this:
+
+      MyComponent->session_class( 'POE::Session::MessageBased' );
+
+    The default is POE::Session.
+
+  Option "aliases"
+    Can be a single value to be set as alias, or an array reference. If the
+    latter, POE::Kernel's "alias_set" is called for each of it's elements.
+    This must be supplied as argument to the "new" method. See SYNOPSIS for
+    examples.
+
+ATTRIBUTES
+    This module just uses the attribute "State" and delegates all other
+    attribute handling to Class::Std. Parameters can multiple, separated by
+    spaces. They look like those of Class::Std to be coherent. As an
+    example:
+
+      sub start_event : State( :inline<_start> ) {
+          ...
+      }
+
+    This would create an "inline_state" for our session, named "_start".
+
+  inline, package and object
+    Create "inline_states", "package_states" or "object_states" in your
+    session. Multiple specifications of these parameters cause multiple
+    events to be defined. Have a look at POE for more information.
+
+  chained
+      sub first : State( :inline<_start> :chained<end> ) { 
+          print "Called first.\n";
+          return 23;
+      }
+  
+      sub end : State( :inline<end> ) {
+          my $last_return = $_[ARG0];
+          print "Called second. First returned $last_return\n";
+      }
+
+    Specifies with which event the current state should be chained. If you
+    use "chained", the given event will be triggered after the sub has
+    completed. It's return values will be passed to the chained event.
+
+  next
+      #  the event gets triggered
+      POE::Kernel->yield( foo => 333 );
+
+      sub first : State( :inline<foo> :next<bar> ) {
+          my ( $nr ) = $_[ARG0];
+          ...
+      }
+  
+      sub second : State( :inline<bar> ) {
+          my ( $nr ) = $_[ARG0];
+          ...
+      }
+  
+    An event that was specified with "next" is triggered right after
+    completion of the current subroutine. The "next" event gets the same
+    parameters as the current.
+
+  error
+      sub first : State( :inline<foo> :error<error_occured> ) {
+          die "in the name of Cthulhu";
+      }
+
+      sub second : State( :inline<error_occured> ) {
+          my $error = $_[ARG0];
+          print 'An Error has occured: ' . $error;
+      }
+
+    If an "error" handling state is defined, "PCB" will build an "eval"
+    block around the subroutine call and emit the event specified with
+    "error". First argument is the error message.
+
+INHERITANCE
+    Currently, you can overload the called methods in package and object
+    states. Though you have to do this without specifying a new "State()"
+    attribute. The new method has the same attributes as the overriden. The
+    latter can also be called with NEXT. This basic way works like:
+
+      #  the original
+      package Original;
+      sub whatever : State( :package<_start> ) { ... }
+      ...
+  
+      #  the new one
+      package NewOne;
+      use base qw/ Original /;
+      sub whatever { ... }
+
+    But for information, I'm planning the possibility to override specific
+    events.
+
+METHODS
+    Methods starting with an underline ("_") is thought as internal to
+    POE::Component::Basement and should therefore not be called directly.
+
+  _parse_attributes
+      ( $name, $param ) = _parse_attribute( $attribute )
+  
+    Takes an attribute and tries to split it into name and parameters.
+    Returns undef if nothing usable found.
+
+  new
+    Constructor. See SYNOPSIS for usage. This overrides the "new" method
+    provided by Class::Std.
+
+  MODIFY_CODE_ATTRIBUTES
+    This is an internal sub that's responsible for building your state-map,
+    as it is called on specification of an attribute. See perldoc's
+    attributes for more information about this subject. This is an *internal
+    function*, do not call directly.
+
+  _create_modified_state
+      $code = _create_modified_state( \&coderef, \%params );
+
+    Does the wrapping for the more enhanced attributes. Internal, do not
+    call.
+
+  register_states
+      void register_states( $class, $coderef, { state_name => 'type' } );
+
+    Registers states corresponding to a specific code reference. Accepted
+    state names are "inline", "package" and "object". Internal, do not call.
+
+  _flatten_inheritance
+      @classes_in_family = _flatten_inheritance( $rootclass )
+
+    Returns an array with names of classes used in the specified $rootclass'
+    inheritance tree. This is internal, do not call.
+
+  get_states
+      \%struct = $comp->get_states()
+
+    Returns a structure containing the defined inline, package and object
+    states ready to use for POE::Sessions constructor. Internal and
+    restricted, do not call.
+
+  _get_symbol_name
+      $subname = _get_symbol_name( $class, $coderef );
+
+    Searches for a code reference in the symbol table of a class and returns
+    the sub's name if found. Otherwise undef. Do not call.
+
+  _parse_parameters
+      %parameters = _parse_parameters( $parameter_string )
+
+    This function looks for parameters formed like :name<value> and returns
+    them in ( name => value, .. ) like pairs. Dies on malformed or unknown
+    parameters. Internal method, do not call.
+
+SEE ALSO
+    POE, Class::Std, Class::Data::Inheritable
+
+REQUIRES
+    POE, Class::Std, Carp, Scalar::Util, NEXT, Sub::Installer,
+    Class::Data::Inheritable
+
+AUTHOR
+    Robert Sedlacek <phaylon@dunkelheit.at>
+
+LICENSE
+    You can copy and/or modify this module under the same terms as perl
+    itself.
+

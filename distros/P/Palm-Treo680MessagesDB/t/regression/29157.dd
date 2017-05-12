@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1188899063,
+          'number' => '1003',
+          'time' => '10:44',
+          'date' => '2007-09-04',
+          'name' => '',
+          'phone' => '1003',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1188899063,
+          'text' => 'Jon XXXX ere-Can u mail a link to any old 700mb torrent that i can upload to XXXX?Been too busy!Got 10 hrs!Gimme a call from www.orange.co.uk by 30200814254',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7107091,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 29157
+        };

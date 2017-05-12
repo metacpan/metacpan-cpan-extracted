@@ -1,0 +1,9 @@
+# verbatim paragraphs options
+---
+notes: >
+  Verbatim paragraphs consist of lines that are indented.
+  A blank line between two indended lines will initially be seen
+  as separating the verbatim paragraphs, but the parser will 
+  note that the second verbatim paragraphs follows the first
+  and will coalesce the paragraphs into a single verbatim block,
+  preserving the whitespace on the separating lines.

@@ -1,0 +1,174 @@
+NAME
+    Proc::BackOff
+
+SYNOPSIS
+    Usage:
+
+     use Proc::BackOff::Linear;
+
+     my $obj = Proc::BackOff::Linear->new( { slope => 5 } );
+
+     while ( 1 ) {
+         # delay will return
+         #      0 : No delay needed.
+         #      N : or the number of seconds until back off is completed.
+
+         sleep $obj->delay() if $obj->delay();
+             # or
+             $obj->sleep();
+
+         if ( do_attempt() ) {
+             # success
+             $obj->success(); # passing success to Proc::BackOff will reset
+                              # Proc::BackOff
+         } else {
+             # failure
+             $obj->failure(); # passing failure will instruct Proc::BackOff to
+                              # increment the time to back off
+         }
+
+         # 100 failures in a row, time to exit
+         die "complete failure" if $obj->failure_count() > 100;
+     }
+
+     $obj->reset(); # reset back the same state as it was new.
+
+DESCRIPTION
+    Proc::BackOff is a base module meant to be directly inherited from and
+    then modified by overloading the calculate_back_off object method.
+
+    Use: Proc::BackOff::Linear, Proc::BackOff::Random, or
+    Proc::BackOff::Exponential.
+
+    Any success "$obj->success()" will result, in the back off being
+    removed.
+
+METHODS
+  new()
+    This is for internal use only.
+
+    Do not call this function, call new from: Proc::BackOff::Linear,
+    Proc::BackOff::Random, or Proc::BackOff::Exponential.
+
+  delay()
+    Delay will return the following
+
+        > 0, number of seconds until the delay is over
+        0 delay is up.  Meaning that you should do your next attempt.
+
+  sleep()
+    This is a short cut for:
+
+        sleep $obj->delay() if $obj->delay();
+
+  success()
+    Success will clear Proc::BackOff delay.
+
+  reset()
+    Simply just resets $obj back to a state in which no "backing off"
+    exists.
+
+  failure()
+    Failure will indicicate to the object to increment the current BackOff
+    time.
+
+    The calculate_back_off function is called to get the time in seconds to
+    wait.
+
+    The time waited is time+calculated_back_off time, however it is capped
+    by $self->max_timeout().
+
+  valid_number_check()
+    Is this a number we can use?
+
+    1 1.234 'count'
+
+    are valid values.
+
+  calculate_back_off()
+    Returns the new back off value.
+
+    This is the key function you want to overload if you wish to create your
+    own BackOff library.
+
+    The following functions can be used.
+
+    * $self->failure_count()
+        The current number of times, that failure has been sequentially
+        called.
+
+    * $self->failure_start()
+        When as reported by time in seconds from epoch was failure first
+        called
+
+    * $self->failure_time()
+        When was the last failure reported ie, $self->failure() called.
+
+    * $self->failure_over()
+        When in time since epoch will the failure be over.
+
+  backOff_in_progress()
+    returns 1 if a back off is in progress
+
+    returns 0 if a back off is not in progress.
+
+    The difference between backOff_in_progress and delay() > 0, is that at
+    the end of a timeout, delay() will return 0, while the backoff will
+    still be in progress.
+
+  max_timeout()
+    Subroutine automatically created by mk_accessors.
+
+    Get $obj->max_timeout()
+
+    Set $obj->max_timeout( 60*60 ) ; # 60 * 60 seconds = 1 hour
+
+    The Maximum amount of time to wait.
+
+    A max_timeout value of zero, means there is no Maximum.
+
+  failure_time()
+    Subroutine automatically created by mk_accessors.
+
+    When was $obj->failure() last called? Time in seconds since epoch.
+
+    Get $obj->failure_time()
+
+    This variable is not meant to be set by the end user. This variable is
+    set when $obj->failure() is called.
+
+  failure_over()
+    When in seconds since epoch is the failure_over()?
+
+    This is used internally by object method delay();
+
+Inheritance
+    I have included an exponential, linear, and random back off. You can use
+    any of these sub classes to make a new back off library. Please consider
+    sending me any additional BackOff functions, so that I may include it
+    for others to use.
+
+Notes
+    Please send me any bugfixes or corrections. Even spelling correctins :).
+
+    Please file any bugs with:
+
+     L<http://rt.cpan.org/Public/Dist/Display.html?Name=Proc-BackOff>
+
+Changes
+     0.02   2007-08-12 -- Daniel Lo
+            - Documentation fixes.  No code changes.
+
+     0.01   2007-04-17 -- Daniel Lo
+            - Initial version
+
+AUTHOR
+    Daniel Lo <daniel_lo@picturetrail.com>
+
+LICENSE
+    Copyright (C) PictureTrail Inc. 1999-2007 Santa Clara, California,
+    United States of America.
+
+    This code is released to the public for public use under Perl's
+    Artisitic licence.
+

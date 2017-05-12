@@ -1,0 +1,19 @@
+SYNOPSIS
+
+     % perl -MPerinci::CLI=/URL/To/Your/Function
+
+    which is a shortcut for:
+
+     use Perinci::CmdLine::Any -prefer_lite=>1;
+     Perinci::CmdLine::Any->new(url => '/URL/To/Your/Function')->run;
+
+    To specify options/arguments to your CLI:
+
+     % perl -MPerinci::CLI=/URL/To/Your/Function -E1 -- --opt1 val arg
+
+DESCRIPTION
+
+SEE ALSO
+
+    Perinci::CmdLine::Any
+

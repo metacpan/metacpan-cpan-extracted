@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01-exit.t
+t/01-manager.t
+t/01-sub-fork.t
+t/01-task.t
+t/01-wrong-usage.t
+t/02-task-timeout.t
+t/Tsemaphore.pm
+lib/Parallel/SubFork.pm
+lib/Parallel/SubFork/Task.pm
+examples/simple.pl
+examples/progress.pl
+examples/impatient.pl
+examples/concurrent.pl
+commands
+META.yml                                 Module meta-data (added by MakeMaker)

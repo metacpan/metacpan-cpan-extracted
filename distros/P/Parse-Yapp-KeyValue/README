@@ -1,0 +1,48 @@
+Parse-Yapp-KeyValue version 0.02
+================================
+
+SYNOPSIS
+
+How many times do we all run across a situation where we have some
+data or could use some data that follows the form key=value?  HTTP
+parameters, perhaps?  Maybe you need a configuration file for your
+application and don't need the complexity and overhead of XML+XPath.
+Perhaps you are searching for a very simple command-line parser for
+your application and are burdened with the choices and complexity of
+all the Getopt modules out there on CPAN.
+
+Parse::Yapp::KeyValue has a simple interface and returns a reference
+to a hash containing the key/value pairs it parses out of the input it
+receives.  It correctly handles quoted strings by virtue of being a
+LALR parser.  It handles multiple keys with the same name by promoting
+that key's value to an array reference.
+
+For more information on what Parse::Yapp::KeyValue can and cannot do,
+please see the module's POD.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Parse::Yapp
+  Parse::Lex
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+AUTHOR
+
+Mike Eldridge <diz@cpan.org>
+

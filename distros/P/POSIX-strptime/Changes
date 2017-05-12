@@ -1,0 +1,31 @@
+Revision history for Perl extension POSIX::strptime.
+
+0.13 Tue Nov 10 22:57:29 EST 2015
+    - Add tm_isdst field
+
+0.12 Tue Nov 10 14:30:03 EST 2015
+    - Fix Module::Signature breakeage (RT62734)
+
+0.11 Tue Nov 10 11:01:35 EST 2015
+    - Fix bug in handling dates in year 1899
+      (thanks to Matt Jeffery for the patch)
+
+0.10 Fri Jul 16 15:51:26 EDT 2010
+    - Handle unitialized fields better and document them 
+      (thanks to Diab Jerius for the bug report)
+      (thanks to Paul Evans for the fix)
+
+0.08 Mon Mar 19 12:32:35 PDT 2007
+    - fix Exporter bug
+
+0.07 Sun Mar 18 23:38:59 PDT 2007
+    - use Exporter
+
+0.06  Sun Jan  8 21:35:51 PST 2006
+    - return undef for atoms unset by the underlying strptime(3)
+        (thanks to Bjarne Büchmann for suggesting this fix)
+
+0.01  Tue Mar  1 10:54:16 2005
+	- original version; created by h2xs 1.23 with options
+		-b 5.0.0 -A -c -n POSIX::strptime
+

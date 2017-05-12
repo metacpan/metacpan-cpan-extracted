@@ -1,0 +1,1173 @@
+
+#
+# GENERATED WITH PDL::PP! Don't modify!
+#
+package PDL::IO::HDF5;
+
+@EXPORT_OK  = qw(  );
+%EXPORT_TAGS = (Func=>[@EXPORT_OK]);
+
+use PDL::Core qw/ barf/;
+use PDL::Exporter;
+use DynaLoader;
+
+
+
+   $PDL::IO::HDF5::VERSION = '0.73';
+   @ISA    = ( 'PDL::Exporter','DynaLoader' );
+   push @PDL::Core::PP, __PACKAGE__;
+   bootstrap PDL::IO::HDF5 $VERSION;
+
+
+
+
+
+use PDL::Lite;
+use PDL::Char;
+
+
+
+# Require needed here becuase dataset uses some of the XS 
+#  calls that are defined in PDL::IO::HDF5 (like PDL::IO::HDF5::H5T_NATIVE_CHAR() )
+#  Doing a 'use' would make use of the calls before they are defined.
+#
+require PDL::IO::HDF5::Group;
+require PDL::IO::HDF5::Dataset;
+
+
+use Carp;
+
+sub AUTOLOAD {
+    # This AUTOLOAD is used to 'autoload' constants from the constant()
+    # XS function.  If a constant is not found then control is passed
+    # to the AUTOLOAD in AutoLoader.
+
+    my $constname;
+    ($constname = $AUTOLOAD) =~ s/.*:://;
+    croak "& not defined" if $constname eq 'constant';
+    my $val = constant($constname, @_ ? $_[0] : 0);
+    if ($! != 0) {
+	if ($! =~ /Invalid/) {
+	    $AutoLoader::AUTOLOAD = $AUTOLOAD;
+	    goto &AutoLoader::AUTOLOAD;
+	}
+	else {
+		croak "Your vendor has not defined hdf5 macro $constname";
+	}
+    }
+    *$AUTOLOAD = sub { $val };
+    goto &$AUTOLOAD;
+}
+
+
+
+
+
+
+
+
+=head1 NAME
+
+PDL::IO::HDF5 - PDL Interface to the HDF5 Data Format.
+
+
+=head1 DESCRIPTION
+
+This package provides an object-oriented interface for L<PDL>s to
+the HDF5 data-format. Information on the HDF5 Format can be found
+at the HDF Group's web site at http://www.hdfgroup.org .
+
+=head2 LIMITATIONS
+
+Currently this interface only provides a subset of the total HDF5 library's
+capability. 
+
+=over 1
+
+=item *
+
+Only HDF5 Simple datatypes are supported. No HDF5 Compound datatypes are supported since PDL doesn't
+support them.
+
+=item *
+
+Only HDF5 Simple dataspaces are supported.
+
+=back
+
+=head1 SYNOPSIS
+
+  use PDL::IO::HDF5;
+
+  # Files #######
+  my $newfile = new PDL::IO::HDF5("newfile.hdf");        # create new hdf5 or open existing file.
+  my $attrValue = $existingFile->attrGet('AttrName');    # Get attribute value for file
+  $existingFile->attSet('AttrName' => 'AttrValue');      # Set attribute value(s) for file
+
+  # Groups ######
+  my $group = $newfile->group("/mygroup");               # create a new or open existing group
+  my @groups = $existingFile->groups;      	         # get a list of all the groups at the root '/'
+					                 # level.
+  my @groups = $group->groups;             	         # get a list of all the groups at the "mygroup"
+					                 # level.
+  my $group2 = $group->group('newgroup');                # Create/open a new group in existing group "mygroup"
+
+  $group->unlink('datasetName');                         # Delete a dataset from a group
+
+  $group->reference($dataset,'refName',\@start,\@count); # Create a scalar reference to a subregion of a
+                                                         # dataset, with specified start index and count.
+
+  my $attrValue = $group->attrGet('AttrName');           # Get attribute value for a group
+  $group->attrSet('AttrName' => 'AttrValue');            # Set attribute value(s) for a group
+  $group->attrDel('AttrName1', 'AttrName2');             # Delete attribute(s) for a group
+  @attrs = $group->attrs;                                # Get List of attributes for a group
+
+  # Data Sets ########
+  my $dataset = $group->dataset( 'datasetName');         # create a new or open existing dataset
+						         #  in an existing group
+  my $dataset = $newfile->dataset( 'datasetName');       # create a new or open existing dataset
+						         #  in the root group of a file
+
+  my $dataset2 = $newfile->dataset( 'datasetName');      # create a new or open existing dataset
+						         # in the root group.
+  my @datasets =  $existingFile->datasets;               # get a list of all datasets in the root '/' group
+  my @datasets =  $group->datasets;                      # get a list of all datasets in a group
+  @dims = $dataset->dims;                                # get a list of dimensions for the dataset
+  $pdl = $dataset->get();                                # Get the array data in the dataset
+  $pdl = $dataset->get($start,$length,$stride);          # Get a slice or hyperslab of the array data in the dataset
+  $dataset->set($pdl, unlimited => 1);                   # Set the array data in the dataset
+  my $attrValue = $dataset->attrGet('AttrName');         # Get attribute value for a dataset
+  $dataset->attSet('AttrName' => 'AttrValue');           # Set attribute value(s) for a dataset
+
+=head1 MEMBER DATA
+
+=over 1
+
+=item ID
+
+ID number given to the file by the HDF5 library
+
+=item filename
+
+Name of the file.
+
+=item accessMode
+
+Access Mode?? ( read /write etc????)
+
+
+=item attrIndex
+
+Quick lookup index of group names to attribute values. Autogenerated as-needed by the 
+L<allAttrValues>, L<allAttrNames>, L<getGroupByAttr> methods. Any attribute writes or group
+creations will delete this data member, because it will no longer be valid.
+
+The index is of this form:
+
+  {
+    groupName1  =>  { attr1 => value, attr2 => value }.
+    groupName2  =>  { attr1 => value, attr3 => value }.
+   .
+   .
+   .
+  }
+
+For the purposes of indexing groups by their attributes, the attributes are 
+applied hierarchically. i.e. any attributes of the higher level groups are assumed to be 
+apply for the lower level groups.
+
+=item groupIndex
+
+Quick lookup index of attribute names/values group names. This index is used by the 
+L<getGroupByAttr> method to quickly find any group(s) that have attribute that match a 
+desired set. 
+
+The index is of this form:
+
+  { "attr1\0attt2" => { "value1\0value2' => [ group1, group2, ...],
+                        "value3\0value3' => [ groupA ],
+			.
+			.
+			.
+		      },
+		      
+     "att1"        => { "value1' =>         [ group1, group2, ...],
+                        "value3' =>         [ groupA ]
+			.
+			.
+			.
+		      },
+       .
+       .
+       .
+  }	      
+   
+   
+The first level of the index maps the attribute name combinations that have
+indexes built to their index. The second level maps the corresponding attribute values
+with the group(s) where these attributes take on these values.
+
+    groupName1  =>  { attr1 => value, attr2 => value }.
+    groupName2  =>  { attr1 => value, attr3 => value }.
+   .
+   .
+   .
+  }
+
+For the purposes of indexing groups by their attributes, the attributes are 
+applied hierarchically. i.e. any attributes of the higher level groups are assumed to be 
+apply for the lower level groups.
+
+=back
+
+=head1 METHODS
+
+=head2 new
+
+=for ref
+
+PDL::IO::HDF5 constructor - creates PDL::IO::HDF5 object for reading or 
+writing data.
+
+B<Usage:>
+
+=for usage
+
+   $a = new PDL::IO::HDF5( $filename );
+   
+Arguments:  
+1) The name of the file.
+
+If this file exists and you want to write to it, 
+prepend the name with the '>' character:  ">name.nc"
+
+Returns undef on failure.
+
+B<Example:>
+
+=for example
+
+	$hdf5obj = new PDL::IO::HDF5( "file.hdf" );
+
+=cut
+
+
+
+sub new {
+  my $type = shift;
+  my $file = shift;
+
+  my $self = {};
+  my $rc;
+  my $write;
+
+  if (substr($file, 0, 1) eq '>') { # open for writing
+    $file = substr ($file, 1);      # chop off >
+    $write = 1;
+  }
+  
+  my $fileID; # HDF file id
+    
+  if (-e $file) {    # Existing File
+
+    if ($write) {
+
+      $fileID = H5Fopen($file, H5F_ACC_RDWR(), H5P_DEFAULT());        
+      if( $fileID < 0){  
+	carp("Can't Open Existing HDF file '$file' for writing\n");
+        return undef;
+      }
+ 
+      $self->{accessMode} = 'w';
+
+    } else { # Open read-only
+                      
+      $fileID = H5Fopen($file, H5F_ACC_RDONLY(), H5P_DEFAULT());        
+      
+      if( $fileID < 0){  
+	carp("Can't Open Existing HDF file '$file' for reading\n");
+        return undef;
+      }
+      
+      $self->{accessMode} = 'r';
+
+
+    }
+  }
+  else{  # File doesn't exist, create it:
+   
+      $fileID = H5Fcreate($file, H5F_ACC_TRUNC(), H5P_DEFAULT(), H5P_DEFAULT());        
+      if( $fileID < 0){  
+	carp("Can't Open New HDF file '$file' for writing\n");
+        return undef;
+      }
+      
+            
+      $self->{accessMode} = 'w';
+  }
+  
+  # Record file name, ID
+  $self->{filename} = $file;
+  $self->{ID} = $fileID;
+
+  $self->{attrIndex}  = undef; # Initialize attrIndex
+  $self->{groupIndex} = undef; # Initialize groupIndex
+
+  bless $self, $type;
+}
+
+
+
+=head2 filename
+
+=for ref
+
+Get the filename for the HDF5 file
+
+
+B<Usage:>
+
+=for usage
+
+   my $filename = $HDFfile->filename;
+   
+   
+=cut
+
+sub filename {
+	my $self = shift;
+
+	return $self->{filename};
+
+}
+
+=head2 group
+
+=for ref
+
+Open or create a group in the root "/" group (i.e. top level)
+of the HDF5 file.
+
+
+B<Usage:>
+
+=for usage
+
+   $HDFfile->group("groupName");
+   
+   
+Returns undef on failure, 1 on success.
+
+
+
+=cut
+
+sub group {
+	my $self = shift;
+
+	my $name = $_[0]; # get the group name
+	
+	my $parentID = $self->{ID};
+	my $parentName = '';
+	
+	my $group =  new PDL::IO::HDF5::Group( 'name'=> $name, parent => $self,
+					 fileObj => $self  );
+
+}
+
+
+=head2 groups
+
+=for ref
+
+Get a list of groups in the root "/" group (i.e. top level)
+of the HDF5 file.
+
+
+B<Usage:>
+
+=for usage
+
+   @groups = $HDFfile->groups;
+   
+
+=cut
+
+sub groups {
+	my $self = shift;
+	
+	my @groups = $self->group("/")->groups;
+		
+	return @groups;
+	
+
+}
+
+
+=head2 unlink
+
+=for ref
+
+Unlink an object from the root "/" group (i.e. top level)
+of the HDF5 file.
+
+
+B<Usage:>
+
+=for usage
+
+   $HDFfile->unlink($name);
+   
+
+=cut
+
+sub unlink {
+	my $self    = shift;
+	my $name    = $_[0];
+
+	$self->group("/")->unlink($name);
+	return 1;
+}
+
+
+=head2 dataset
+
+=for ref
+
+Open or create a dataset in the root "/" group (i.e. top level)
+of the HDF5 file.
+
+
+B<Usage:>
+
+=for usage
+
+   $HDFfile->dataset("groupName");
+   
+   
+Returns undef on failure, 1 on success.
+
+Note: This is a convienence method that is equivalent to:
+
+  $HDFfile->group("/")->dataset("groupName");
+
+=cut
+
+sub dataset {
+	my $self = shift;
+
+	my $name = $_[0]; # get the dataset name
+	
+	return $self->group("/")->dataset($name);
+}
+
+
+=head2 datasets
+
+=for ref
+
+Get a list of all dataset names in the root "/" group.
+
+
+B<Usage:>
+
+=for usage
+
+   @datasets = $HDF5file->datasets;
+
+Note: This is a convienence method that is equivalent to:
+
+  $HDFfile->group("/")->datasets;
+
+=cut
+
+sub datasets{
+	my $self = shift;
+
+	my $name = $_[0]; # get the dataset name
+	
+	return $self->group("/")->datasets;
+}
+
+
+
+=head2 attrSet
+
+=for ref
+
+Set the value of an attribute(s) in the root '/' group of the file.
+
+Currently attribute types supported are null-terminated strings and
+any PDL type.
+
+B<Usage:>
+
+=for usage
+
+   $HDFfile->attrSet( 'attr1' => 'attr1Value',
+   		    'attr2' => 'attr2 value', 
+                    'attr3' => $pdl,
+		    .
+		    .
+		    .
+		   );
+
+Returns undef on failure, 1 on success.
+
+Note: This is a convienence method that is equivalent to:
+
+  $HDFfile->group("/")->attrSet( 'attr1' => 'attr1Value',
+				 'attr2' => 'attr2 value', 
+                                 'attr3' => $pdl,
+				 .
+				 .
+				 .
+				);
+
+
+=cut
+
+sub attrSet {
+	my $self = shift;
+
+	my %attrs = @_; # get atribute hash
+	
+	
+	return $self->group("/")->attrSet(%attrs);
+}
+
+
+
+=head2 attrGet
+
+=for ref
+
+Get the value of an attribute(s) in the root '/' group of the file.
+
+Currently the attribute types supported are null-terminated strings
+and PDLs.
+
+B<Usage:>
+
+=for usage
+
+   @attrValues = $HDFfile->attrGet( 'attr1', 'attr2' );
+
+
+=cut
+
+sub attrGet {
+	my $self = shift;
+
+	my @attrs = @_; # get atribute hash
+	
+	
+	return $self->group("/")->attrGet(@attrs);
+}
+
+
+
+=head2 attrDel
+
+=for ref
+
+Delete attribute(s) in the root "/" group of the file.
+
+B<Usage:>
+
+=for usage
+
+ $HDFfile->attrDel( 'attr1', 
+      		    'attr2',
+		    .
+		    .
+		    .
+		   );
+
+Returns undef on failure, 1 on success.
+
+Note: This is a convienence method that is equivalent to:
+
+  $HDFfile->group("/")->attrDel( 'attr1', 
+				 'attr2',
+				 .
+				 .
+				 .
+				);
+
+
+=cut
+
+sub attrDel {
+	my $self = shift;
+
+	my @attrs = @_; # get atribute names
+	
+	return $self->group("/")->attrDel(@attrs);
+
+}
+
+
+=head2 attrs
+
+=for ref
+
+Get a list of all attribute names in the root "/" group of the file.
+
+
+B<Usage:>
+
+=for usage
+
+   @attrs = $HDFfile->attrs;
+
+Note: This is a convienence method that is equivalent to:
+
+  $HDFfile->group("/")->attrs
+
+=cut
+
+sub attrs {
+	my $self = shift;
+
+	return $self->group("/")->attrs;
+
+ }
+
+=head2 reference
+
+=for ref
+
+Create a reference to part of a dataset in the root "/" group of the file.
+
+
+B<Usage:>
+
+=for usage
+
+   $HDFfile->reference;
+
+Note: This is a convienence method that is equivalent to:
+
+  $HDFfile->group("/")->reference($referenceName,$datasetObj,@regionStart,@regionCount);
+
+Create a reference named $referenceName within the root group "/" to a subroutine of
+the dataset $datasetObj. The region to be referenced is defined by the @regionStart
+and @regionCount arrays.
+
+=cut
+
+sub reference {
+	my $self = shift;
+	my $datasetObj    = shift;
+	my $referenceName = shift;
+	my @regionStart   = shift;
+	my @regionCount   = shift;
+
+	return $self->group("/")->reference($datasetObj,$referenceName,\@regionStart,\@regionCount);
+
+ }
+
+=head2 _buildAttrIndex
+
+=for ref
+
+Internal Method to build the attribute index hash
+for the object
+
+
+B<Usage:>
+
+=for usage
+
+   $hdf5obj->_buildAttrIndex;
+
+
+ Output:
+    Updated attrIndex data member
+
+
+=cut
+
+sub _buildAttrIndex{
+
+	my ($self) = @_;
+	# Take care of any attributes in the current group
+	my @attrs = $self->attrs;
+	
+	my @attrValues = $self->attrGet(@attrs);
+	
+	my $index = $self->{attrIndex} = {};
+	
+	my %indexElement; # element of the index for this group
+	
+	@indexElement{@attrs} = @attrValues;
+	
+	$index->{'/'} = \%indexElement;
+	
+	my $topLevelAttrs = { %indexElement }; 
+	 
+	# Now Do any subgroups: 
+	my @subGroups = $self->groups;
+	my $subGroup;
+	
+	foreach $subGroup(@subGroups){
+		$self->group($subGroup)->_buildAttrIndex($index,$topLevelAttrs);
+	}
+	
+}
+
+
+=head2 clearAttrIndex
+
+=for ref
+
+Method to clear the attribute index hash
+for the object. This is a mostly internal method that is
+called whenever some part of the HDF5 file has changed and the
+L<attrIndex> index is no longer valid.
+
+
+B<Usage:>
+
+=for usage
+
+   $hdf5obj->clearAttrIndex;
+
+=cut
+
+sub clearAttrIndex{
+
+	my $self = shift;
+	$self->{attrIndex} = undef;
+	
+}
+
+=head2 _buildGroupIndex
+
+=for ref
+
+Internal Method to build the groupIndex hash
+for the object
+
+
+B<Usage:>
+
+=for usage
+
+   $hdf5obj->_buildGroupIndex(@attrs);
+   
+   where:
+     @attrs   List of attribute names to build
+              a group index on.
+	      
+ Output:
+    Updated groupIndex data member
+
+
+=cut
+
+sub _buildGroupIndex{
+
+	my ($self,@attrs) = @_;
+
+
+	@attrs = sort @attrs; # Sort the attributes so the order won't matter
+	
+	# Generate attrIndex if not there yet
+	defined( $self->{attrIndex}) || $self->_buildAttrIndex;
+
+	my $attrIndex = $self->{attrIndex};
+
+	my $groupIndexElement = {};  # Element of the group index that we will build
+	my $group;
+	my $attrIndexElement;        # Attr index for the current group
+	my @attrValues;              # attr values corresponding to @attrs for the current group
+	my $key;                     # group index key
+	
+	# Go Thru All Groups
+	foreach $group(sort keys %$attrIndex){
+	
+		$attrIndexElement = $attrIndex->{$group};
+		
+		@attrValues = map defined($_) ? $_ : '_undef_',   @$attrIndexElement{@attrs}; # Groups with undefined attr will get a '_undef_' string for the value
+		
+
+		# Use multi-dimensional array emulation for the hash
+		#  key here because it should be quicker.
+		if( defined( $groupIndexElement->{$key = join($;,@attrValues)}) ) { # if already defined, add to the list
+			push @{$groupIndexElement->{$key}}, $group;
+		}
+		else{  # not already defined create new element
+			$groupIndexElement->{$key} = [ $group ];
+		}	
+	}
+	
+	# initialize group index if it doesn't exist.
+	unless( defined $self->{groupIndex} ){ $self->{groupIndex} = {} }; 
+
+	# Use multi-dimensional array emulation for the hash
+	#  key here because it should be quicker.	
+	$self->{groupIndex}{join($;,@attrs)} =  $groupIndexElement;
+
+}
+
+
+=head2 clearGroupIndex
+
+=for ref
+
+Method to clear the group index hash
+for the object. This is a mostly internal method that is
+called whenever some part of the HDF5 file has changed and the
+L<groupIndex> index is no longer valid.
+
+
+B<Usage:>
+
+=for usage
+
+   $hdf5obj->clearGroupIndex;
+
+=cut
+
+sub clearGroupIndex{
+
+	my $self = shift;
+	$self->{groupIndex} = undef;
+	
+}
+
+=head2 getGroupsByAttr
+
+=for ref
+
+Get the group names which attributes match a given set of values. This method
+enables database-like queries to be made. I.e. you can get answers to 
+questions like 'Which groups have attr1 = value1, and attr3 = value2?'.
+
+B<Usage:>
+
+=for usage
+
+ @groupNames = $hdf5Obj->getGroupsByAttr( 'attr1' => 'value1', 
+ 					  'attr2' => 'value2' );
+ 
+
+=cut
+
+sub getGroupsByAttr{
+
+	my $self = shift;
+	
+	my %attrHash = @_;
+	
+	my @keys = sort keys %attrHash;
+	
+	# Use multi-dimensional array emulation for the hash
+	#  key here because it should be quicker.	
+	my $compositeKey = join($;, @keys);
+	
+	
+	# Generate groupIndex if not there yet
+	defined( $self->{groupIndex}{$compositeKey} ) || $self->_buildGroupIndex(@keys);
+
+	$groupIndex = $self->{groupIndex}{$compositeKey};
+
+	my @values = @attrHash{@keys};
+	
+	my $compositeValues = join($;, @values);
+		
+	if( defined($groupIndex->{$compositeValues} )){
+		return @{$groupIndex->{$compositeValues}};
+	}
+	else{
+		return ();
+	}
+	
+}
+		
+
+=head2 allAttrValues
+
+=for ref
+
+Returns information about group attributes defined in the HDF5 datafile.
+
+B<Usage:>
+
+=for usage
+
+ # Single Attr Usage. Returns an array of all 
+ #   values of attribute 'attrName' in the file.
+ $hdf5obj->allAttrValues('attrName');
+ 
+ # Multiple Attr Usage. Returns an 2D array of all 
+ #   values of attributes 'attr1', 'attr2' in the file.
+ #   Higher-Level
+ $hdf5obj->allAttrValues('attr1', 'attr2');
+
+=cut
+
+sub allAttrValues{
+
+	my $self = shift;
+	
+	my @attrs = @_;
+	
+	# Generate attrIndex if not there yet
+	defined( $self->{attrIndex}) || $self->_buildAttrIndex;
+	
+	my $attrIndex = $self->{attrIndex};
+
+	if( @attrs == 1) { # Single Argument Processing
+		my $attr = $attrs[0];
+
+
+		my $group;
+
+		my @values;
+		my $grpAttrHash;  # attr hash for a particular group
+
+		# Go thru each group and look for instances of $attr
+		foreach $group( keys %$attrIndex){
+
+			$grpAttrHash = $attrIndex->{$group};
+
+			if( defined($grpAttrHash->{$attr})){
+				push @values, $grpAttrHash->{$attr};
+			}
+		}
+
+		return @values;
+	}
+	else{ # Multiple argument processing
+	
+		my $group;
+
+		my @values;
+		my $grpAttrHash;  # attr hash for a particular group
+		
+		my $attr; # individual attr name
+		my $allAttrSeen; # flag = 0 if we have not seen all of the 
+				 # desired attributes in the current group
+				 
+		my $value;       # Current value of the @values array that we
+		                 #  will return
+
+		# Go thru each group and look for instances of $attr
+		foreach $group( keys %$attrIndex){
+
+			$grpAttrHash = $attrIndex->{$group};
+
+			# Go thru each attribute
+			$allAttrSeen = 1;  # assume we will se all atributes, set to zero if we don't
+			$value = [];
+			foreach $attr(@attrs){
+				
+				if( defined($grpAttrHash->{$attr})){
+					push @$value, $grpAttrHash->{$attr};
+				}
+				else{
+					$allAttrSeen = 0;
+				}
+		
+			}
+			push @values, $value if $allAttrSeen; #add to values array if we got anything
+		}
+
+		return @values;
+	}
+
+		
+}
+
+=head2 allAttrNames
+
+=for ref
+
+Returns a sorted list of all the group attribute names that are defined
+in the file.
+
+B<Usage:>
+
+=for usage
+
+ my @attrNames = $hdf5obj->allAttrNames;
+
+=cut
+
+sub allAttrNames{
+
+	my $self = shift;
+	
+
+	# Generate attrIndex if not there yet
+	defined( $self->{attrIndex}) || $self->_buildAttrIndex;
+	
+	my $attrIndex = $self->{attrIndex};
+
+
+
+	my $group;
+
+	my %names;
+	my $grpAttrHash;  # attr hash for a particular group
+
+	my @currentNames;
+	# Go thru each group and look for instances of $attr
+	foreach $group( keys %$attrIndex){
+
+		$grpAttrHash = $attrIndex->{$group};
+		@currentNames = keys %$grpAttrHash;
+		@names{@currentNames} = @currentNames;
+		
+		
+	}
+
+	return sort keys %names;
+
+		
+}
+
+=head2 IDget
+
+=for ref
+
+Returns the HDF5 library ID for this object
+
+B<Usage:>
+
+=for usage
+
+ my $ID = $hdf5obj->IDget;
+
+=cut
+
+sub IDget{
+
+	my $self = shift;
+	
+	return $self->{ID};
+		
+}
+
+=head2 nameGet
+
+=for ref
+
+Returns the HDF5 Group Name for this object. (Always '/', i.e. the
+root group for this top-level object)
+
+B<Usage:>
+
+=for usage
+
+ my $name = $hdf5obj->nameGet;
+
+=cut
+
+sub nameGet{
+
+	my $self = shift;
+	
+	return '/';
+		
+}
+
+
+=head2 DESTROY
+
+=for ref
+
+PDL::IO::HDF5 Desctructor - Closes the HDF5 file
+
+B<Usage:>
+
+=for usage
+
+   No Usage. Automatically called
+
+=cut
+
+
+sub DESTROY {
+  my $self = shift;
+
+  if( H5Fclose($self->{ID}) < 0){
+	warn("Error closing HDF5 file ".$self->{filename}."\n");
+  }
+
+}
+
+# 
+# Utility function (Not a Method!!!)
+#  to pack a perl list into a binary structure
+#  to be interpereted as a C array of long longs. This code is build
+#  during the make process to do the Right Thing for big and little
+#  endian machines
+sub packList{
+
+	my @list = @_;
+	
+	if(ref($_[0])){
+		croak(__PACKAGE__."::packList is not a method!\n");
+	}
+	
+
+
+	@list = map (( $_,0 ), @list); # Intersperse zeros to make 64 bit hsize_t
+
+	my $list = pack ("L*", @list);
+	
+	return $list;
+}
+
+
+
+# 
+# Utility function (Not a Method!!!)
+#  to unpack a perl list from a binary structure
+#  that is a C array of long longs. This code is build
+#  during the make process to do the Right Thing for big and little
+#  endian machines
+sub unpackList{
+	
+
+	if(ref($_[0])){
+		croak(__PACKAGE__."::unpackList is not a method!\n");
+	}
+
+	my ($binaryStruct) = (@_); # input binary structure
+	my $listLength = length($binaryStruct) / 8;  # list returned will be the
+						    # number of bytes in the input struct/8, since
+						    # the output numbers are 64bit.
+	
+
+
+	my $unpackString = "Lxxxx" x $listLength; # 4 xxxx used to toss upper 32 bits
+
+	my @list = unpack( $unpackString, $binaryStruct );
+	
+	return @list;
+}
+
+=head1 AUTHORS
+
+John Cerney, j-cerney1@raytheon.com
+
+Andrew Benson, abenson@obs.carnegiescience.edu
+
+=cut
+
+
+
+;
+
+
+
+# Exit with OK status
+
+1;
+
+		   

@@ -1,0 +1,35 @@
+=head1 test
+
+This I<is> B<a> L<test> F<about>
+C<character> X<sequences>.
+
+B<I<really important>>
+---
+<pod_pod
+><pod_section head_level="1"
+><pod_title
+>test</pod_title
+><pod_para
+>This <pod_italic
+>is</pod_italic
+> <pod_bold
+>a</pod_bold
+> <pod_link
+>test</pod_link
+> <pod_file
+>about</pod_file
+>
+<pod_code
+>character</pod_code
+> <pod_index
+>sequences</pod_index
+>.</pod_para
+><pod_para
+><pod_bold
+><pod_italic
+>really important</pod_italic
+></pod_bold
+></pod_para
+></pod_section
+></pod_pod
+>

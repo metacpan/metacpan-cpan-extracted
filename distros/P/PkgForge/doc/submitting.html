@@ -1,0 +1,301 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <title>PkgForge - Submitting Packages</title>
+  <meta name="author" content="Stephen Quinney">
+</head>
+
+<body>
+
+<h1>PkgForge - Submitting Packages</h1>
+
+<p>The entire purpose of the Package Forge system is to make it easy
+for a user to submit a set of software source packages and have them
+built on multiple platforms with the products being copied into the
+central repositories. Parts of this process are complex but from the
+user point of view it can be considered fairly simplistically. After a
+job has been submitted it is transformed into a set of tasks, one per
+target platform, and they placed into queues for the package
+builders. The builders select the jobs in the order of submission,
+attempt the build and then run through any checks (such as running
+rpmlint). If the build was successful and the checks have all passed
+then the generated packages are submitted into the central package
+repository. At the end of the process any requested reports are
+generated. Full details of each job are always viewable through the
+web interface.</p>
+
+<p>The source packages are submitted using the <code>pkgforge</code>
+command-line tool by invoking the <em>submit</em> command. There are a
+number of options which can be used, the only obligatory option is
+the <em>bucket</em> (explained below). For example:</p>
+
+<pre>
+pkgforge submit --bucket lcfg foo-1-2.src.rpm
+</pre>
+
+<p>It is possible to submit more than one source package as part of a
+job. The builds will be attempted in the order in which they are
+specified by the user. The RPM builder can use the generated packages
+from building one source package as the build-dependencies for
+subsequent source packages within the same build job. Further to this,
+if a package fails to build then it will be put onto the back of the
+queue in the hope that the error was due to missing build-dependencies
+which can be satisfied within the current build job. The builder will
+continue attempting to build source packages within a job until all
+are successful or no more can be built. This makes it possible to
+build large sets of source packages without knowing the correct
+ordering required.</p>
+
+<p>Validity checks will be carried out on each file before the build
+job is submitted. This includes checking that the SRPM is valid and
+that it contains a specfile with the <code>.spec</code> suffix.</p>
+
+<h2>Getting Help</h2>
+
+<p>If you do not know the the name of the command you require, then
+the <code>pkgforge</code> tool can be invoked without any command and
+it will print to the screen a list of all available commands with
+short details on each. For example:</p>
+
+<pre>
+% pkgforge
+Available commands:
+
+  commands: list the application's commands
+      help: display a command's help screen
+
+    submit: Submit a set of source packages for building
+
+</pre>
+
+<p>The <em>help</em> command can be used to get a full list of options
+for any particular command. For example:</p>
+
+<pre>
+% pkgforge help submit
+Required option missing: bucket
+pkgforge submit [-?aBcpr] [long options...]
+	-c --configfile     The configuration file for this application
+	--target            Location into which jobs should be submitted
+	--id                The unique identifier for this job
+	-? --usage --help   Prints this usage information.
+	-p --platforms      The platforms on which packages should be built
+	-a --archs          The architectures for which packages should be
+	                    built
+	-B --bucket         The bucket to which the packages will be
+	                    submitted.
+	-r --report         Email addresses to which build reports will be
+	                    sent
+	--verbose           Verbose output
+</pre>
+
+<p>Most options have a single-character short-form prefixed with a
+single-dash or alternatively can be reduced to the shortest unique
+string prefixed with a double-dash. For example, <code>--plat</code>
+is acceptable.</p>
+
+<p>If there is an option for which you want to specify the same value
+every time the command is invoked (e.g. the email address for reports)
+then it is better added into the configuration file (see below for
+details).</p>
+
+<p>The options which are most likely to be regularly useful
+are <code>--platforms</code>, <code>--archs</code>, <code>--bucket</code>
+and <code>--report</code> and each is explained in greater detail
+below. One further option that can occasionally be useful
+is <code>--id</code>. If the job identifier is not specified then a
+UUID is generated but it can be useful to use an ID string which is
+more meaningful to the individual (i.e. contains the user name or a
+package name). Note that the ID MUST not have been used previously,
+MUST be no more than 50 characters long and MUST only contain
+characters in the <code>A-Za-z0-9_.-</code> set. Also beware that
+there is nothing stopping other users also generating jobs using your
+chosen naming scheme...</p>
+
+<h2>Selecting the Bucket</h2>
+
+<p>The <em>bucket</em> is only option which must be specified for each
+build job. It is LCFG terminology for the repository into which a
+package is stored. Typically there are different buckets for packages
+with different license restrictions. Taking the School of Informatics
+as an example we have:</p>
+
+<dl>
+  <dt>lcfg</dt>
+  <dd>Packages which globally distributable and part of the LCFG project.</dd>
+  <dt>world</dt>
+  <dd>Other packages which are globally distributable.</dd>
+  <dt>uoe</dt>
+  <dd>Packages which can only be distributed within the University of Edinburgh.</dd>
+  <dt>inf</dt>
+  <dd>Packages which can only be distributed with the School of Informatics.</dd>
+  <dt>devel</dt>
+  <dd>Development code. Nothing in this bucket is distributed and it is regularly swept to remove old packages.</dd>
+</dl>
+
+<p>It is important that a package submitted into a particular bucket
+does not have dependencies which can only be satisfied by packages in
+a different bucket with a more restrictive license. For example, a
+package in the <em>world</em> bucket cannot depend on packages in
+the <code>inf</code> bucket. To achieve this goal the set of buckets
+available for satisfying build-dependencies is different depending on
+the target bucket. In the School of Informatics the sets of buckets
+used in build configurations are:</p>
+
+<table border="1" cellpadding="2" cellspacing="2">
+  <tr>
+    <th align="left">Target</th>
+    <th align="left">Available Buckets</th>
+  </tr>
+  <tr>
+    <th align="left">lcfg</th>
+    <td align="left">base, updates, epel, lcfg</td>
+  </tr>
+  <tr>
+    <th align="left">world</th>
+    <td align="left">base, updates, epel, lcfg, world</td>
+  </tr>
+  <tr>
+    <th align="left">uoe</th>
+    <td align="left">base, updates, epel, lcfg, world, uoe</td>
+  </tr>
+  <tr>
+    <th align="left">inf</th>
+    <td align="left">base, updates, epel, lcfg, world, uoe, inf</td>
+  </tr>
+  <tr>
+    <th align="left">devel</th>
+    <td align="left">base, updates, epel, lcfg, world, uoe, devel</td>
+  </tr>
+</table>
+
+<h2>Selecting the Platform</h2>
+
+<p>If no platform is specified then tasks will be registered for the
+default set of platforms. The PkgForge system has two different
+pre-defined groups of platforms which can be requested, these
+are <code>auto</code> and <code>all</code>. The default set of
+platforms is the <code>auto</code> group. Tasks can be scheduled for
+any platform which is marked in the registry as <em>active</em> but it
+may well be that not all active platforms are marked
+as <em>auto</em>. As suggested by the name, the <em>all</em> group
+selects all active platforms.</p>
+
+<p>A job can be submitted for all active platforms like this:</p>
+
+<pre>
+% pkgforge submit -B lcfg --platforms all foo-1-2.src.rpm
+</pre>
+
+<p>If a set of source packages will only build on particular platforms
+then it is worthwhile restricting the target set. Any number of
+platform names can be specified in a comma-separate list. For example:</p>
+
+<pre>
+% pkgforge submit -B lcfg --platforms 'f13,sl6' foo-1-2.src.rpm
+</pre>
+
+<p>Note that it is not a problem for the PkgForge system if a package
+is submitted for a platform and it fails to build. It is down to the
+individual user to decide on whether or not a build failure is
+important.</p>
+
+<p>If a platform name is requested which is not active or not
+supported then no tasks will be registered for that platform. Any
+other platforms will be registered as normal, the overrall job
+submission will not fail. The PkgForge web interface will flag up
+build jobs which reference inactive or unsupported platforms.</p>
+
+<h2>Selecting the Architecture</h2>
+
+<p>Further to the possibility of restricting the target platforms it
+is possible to restrict to particular architectures. Any architecture
+restrictions are applied after the platform list has been
+calculated. This means that it is not possible, in a single build job,
+to target different architectures on different platforms
+(e.g. just <code>f13/i386</code> and <code>sl6/x86_64</code> is not
+possible).</p>
+
+<p>By default all architectures are selected, this normally
+means <code>i386</code> and <code>x86_64</code>. Selecting a specific
+architecture can be done like this:</p>
+
+<pre>
+% pkgforge submit -B lcfg --arch i386 foo-1-2.src.rpm
+</pre>
+
+<h2>Feedback</h2>
+
+<p>Once a job has been submitted full feedback on the progress can be
+obtained from the PkgForge web interface. It is also possible to get
+email reports.</p>
+
+<h3>Email Reports</h3>
+
+<p>Email reports can be selected by passing in an email address to
+the <code>--report</code> option or by setting it permanently in the
+configuration file (see below).</p>
+
+<p>The email reports will be sent by the individual builders after
+each task has completed (either success or failure). This means that
+if the job is submitted for 3 platforms and 2 architectures for each
+platform the user will receive 6 email reports.</p>
+
+<p>As well as the subject and details in the body of the message, the
+following email headers will be added to each report email to make it
+easy to do filtering.</p>
+
+<ul>
+  <li><code>X-PkgForge-Status</code> - either <code>success</code> or <code>fail</code></li>
+  <li><code>X-PkgForge-Builder</code> - the name of the builder</li>
+  <li><code>X-PkgForge-ID</code> - the original job ID</li>
+</ul>
+
+<h2>Configuration</h2>
+
+<p>Typically the pkgforge submit command will already have been
+configured on a system-wide basis in
+the <code>/etc/pkgforge/pkgforge.yml</code>
+and <code>/etc/pkgforge/submit.yml</code> files. If the LCFG pkgforge
+component is being used then this can be done using
+the <code>lcfg/options/pkgforge.h</code> header. Typically the only
+option which must be set is the <em>target</em> directory, which is
+the location of the directory into which new jobs should be
+submitted. If a networked filesystem is being used then this will
+usually be the same as the setting for
+the <code>pkgforge.incoming</code> resource.</p>
+
+<p>The primary pkgforge configuration file
+(<code>/etc/pkgforge/pkgforge.yml</code>) should look something like:</p>
+
+<pre>
+--- 
+"accepted": '/afs/example.org/pkgs/pkgforge/accepted/'
+"incoming": '/afs/example.org/pkgs/pkgforge/incoming/'
+"results": '/afs/example.org/pkgs/pkgforge/results/'
+"website": 'https://pkgforge.example.org/'
+</pre>
+
+<p>and the submit-specific configuration file should look something like:</p>
+
+<pre>
+--- 
+"target": '/afs/example.org/pkgs/pkgforge/incoming/'
+</pre>
+
+<p>Further to this the user can override any settings using a
+configuration file named <code>submit.yml</code> which is stored in
+the <code>.pkgforge</code> directory within the user's home
+directory. In particular this is useful for permanently setting
+the <em>report</em> option, like this:</p>
+
+<pre>
+report: user1@example.org
+</pre>
+
+<p>It can also be useful for permanently setting defaults for the
+bucket, platform and architecture options. All settings can still be
+overridden at any time from the command-line.</p>
+
+</body>
+</html>

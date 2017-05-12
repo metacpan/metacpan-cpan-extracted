@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+bin/irctor-queue
+dist.ini
+lib/POE/Component/IRC/Plugin/RTorrentStatus.pm
+t/01_compile.t
+t/02_load.t

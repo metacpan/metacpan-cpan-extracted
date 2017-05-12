@@ -1,0 +1,8 @@
+MYMETA.yml
+Makefile
+blib/
+cover_db/
+local/
+pm_to_blib
+*.bak
+*.sw[op]

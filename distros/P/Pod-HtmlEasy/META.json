@@ -1,0 +1,71 @@
+{
+   "abstract" : "The purpose of this module is to generate HTML data from POD in a easy and personalized mode. By default the HTML generated is similar to the CPAN site style for module documentation.",
+   "author" : [
+      "Geoffrey Leach <geoff@hughes.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4206",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-HtmlEasy",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "IPC::Run" : "0.80",
+            "Test::More" : "0.94"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4206"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "English" : "0",
+            "Exporter::Easy" : "0.16",
+            "File::Slurp" : "9999.13",
+            "Getopt::Auto" : "1.009006",
+            "HTML::EasyTags" : "0",
+            "List::MoreUtils" : "0",
+            "Pod::Escapes" : "1.04",
+            "Pod::ParseLink" : "1.06",
+            "Pod::Parser" : "1.37",
+            "Readonly" : "1.03",
+            "Regexp::Common" : "2.120",
+            "Regexp::Common::Email::Address" : "1.01",
+            "Uniq" : "0",
+            "feature" : "1.16",
+            "perl" : "v5.6.3",
+            "version" : "0.82"
+         }
+      }
+   },
+   "provides" : {
+      "Pod::HtmlEasy" : {
+         "file" : "lib/Pod/HtmlEasy.pm",
+         "version" : "v1.1.11"
+      },
+      "Pod::HtmlEasy::Data" : {
+         "file" : "lib/Pod/HtmlEasy/Data.pm",
+         "version" : "v1.1.11"
+      },
+      "Pod::HtmlEasy::Parser" : {
+         "file" : "lib/Pod/HtmlEasy/Parser.pm",
+         "version" : "v1.1.11"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.1.11"
+}

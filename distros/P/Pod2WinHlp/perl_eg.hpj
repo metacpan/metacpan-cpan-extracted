@@ -1,0 +1,15 @@
+; This file is maintained by HCW. Do not modify this file directly.
+
+; This file was generatyed by Pod2WinHlp
+
+[OPTIONS]
+HCW=0
+LCID=0x409 0x0 0x0 ;English (United States)
+REPORT=Yes
+CONTENTS=Perl
+TITLE=Perl Help
+COPYRIGHT=Version 0.01
+HLP=.\perl_eg.hlp
+
+[FILES]
+perl.rtf

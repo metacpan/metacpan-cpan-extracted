@@ -1,0 +1,71 @@
+==================================================
+Changes from 2015-12-02 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.006 at 2016-12-01 07:13:09 +0000
+------------------------------------------
+
+  Change: 1c9deab995aeb64fdc611775ee30a2edf3f9c305
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-12-01 08:12:07 +0000
+
+    s/proc/Proc and bumped up libvas dependency requirement 
+
+------------------------------------------
+version 0.005 at 2016-11-29 11:24:14 +0000
+------------------------------------------
+
+  Change: 27d898cee062554a71f820ae8d0ec86d58e805a5
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-11-29 12:24:14 +0000
+
+    Added dependency on Inline::C
+
+    Strangely, wasn't auto detected. 
+
+------------------------------------------
+version 0.004 at 2016-11-22 02:42:16 +0000
+------------------------------------------
+
+  Change: 27322f4bedcaaec50fe23ed1caffd8d675e572c6
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-11-22 03:42:16 +0000
+
+    Added dependency on libvas for configure and build stage 
+
+------------------------------------------
+version 0.003 at 2016-11-22 01:14:13 +0000
+------------------------------------------
+
+  Change: 5f0767fbe595b8e6453be1ba995711c769bec3bf
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-11-22 02:14:13 +0000
+
+    Now depends on Alien::libvas 
+
+------------------------------------------
+version 0.002 at 2016-11-12 22:17:47 +0000
+------------------------------------------
+
+  Change: 631fbf142ede89cec60c7939bcbf45f7ee58ae61
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-11-12 23:17:47 +0000
+
+    Changed dist name
+
+    Memory::Process is already taken :-( 
+
+------------------------------------------
+version 0.001 at 2016-11-12 21:30:51 +0000
+------------------------------------------
+
+  Change: 2c6d94b54a71a9f83b1679b8f8c7586f5afc1571
+  Author: Ahmad Fatoum <ahmad@a3f.at>
+  Date : 2016-11-12 22:30:51 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

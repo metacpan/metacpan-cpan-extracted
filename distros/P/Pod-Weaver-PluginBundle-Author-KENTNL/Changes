@@ -1,0 +1,30 @@
+Release history for Pod-Weaver-PluginBundle-Author-KENTNL
+
+0.001003 2017-03-09T11:16:59Z 3a2d47e
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001002, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +14 ↑4 -3 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -1 (recommends: +1)
+ - test: +1 ↓1 (recommends: ↑1 ↓1)
+
+0.001002 2014-08-22T19:55:54Z
+ [Trivial]
+ - Add function and pfunction defaults
+
+0.001001 2014-08-22T08:27:58Z
+ [Bugfix]
+ - Declare all dependencies directly ( short term fix )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - runtime: +11
+ - test: +1
+
+ [Tests]
+ - Make sure all modules are tested
+
+0.001000 2014-08-21T12:38:54Z
+ - First version

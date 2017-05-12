@@ -1,0 +1,128 @@
+#!/usr/bin/perl -w
+use strict;
+
+use lib qw(blib/lib blib/arch);
+
+use POE qw(Session);
+use POE::Component::IKC::Server;
+use POE::Component::IKC::Specifier;
+
+# Very simple time pulse session
+# Foreign sessions connect to it via 'connect' events and
+# disconect with 'disconnect'.
+# Every 10 seconds, a 'pulse' event is sent to connected sessions.
+
+
+POE::Component::IKC::Server->spawn(
+    port=>31337,                # elite--
+    name=>'Pulse');       
+
+POE::Session->new
+(
+    _start=>\&time_start,
+#    _stop=>\&time_stop,
+    'connect'=>\&time_connect,
+    'disconnect'=>\&time_disconnect,    
+    'pulse'=>\&time_pulse,
+    'time'=>\&time_time,
+    'kernel_unregister'=>\&kernel_unregister,
+    'debug_register'=>\&debug_register,
+    'debug_unregister'=>\&debug_unregister,
+);
+
+print "Running server...\n";
+$poe_kernel->run();
+print "Server exited...\n";
+
+#############################################
+sub time_start
+{
+    my($kernel, $heap)=@_[KERNEL, HEAP];
+    $heap->{listeners}={};
+    $kernel->alias_set('timeserver');
+    $kernel->delay('pulse', 10-(time%10));
+    $kernel->call('IKC', 'publish',  'timeserver',
+            [qw(connect disconnect time)]);
+    $kernel->call('IKC', 'monitor', '*', {
+            register=>'debug_register',
+            unregister=>'debug_unregister'});
+}
+
+#############################################
+sub time_stop
+{
+    my($heap)=$_[HEAP];
+    $heap->{listeners}={};
+}
+
+#############################################
+sub time_connect
+{
+    my($kernel, $heap, $dest)=@_[KERNEL, HEAP, ARG0];
+    my $name=specifier_name($dest);
+    print "Connected $name ($dest)\n";
+    $heap->{listeners}->{$name}=$dest;
+    $kernel->call('IKC', 'monitor', $name, {
+            unregister=>'kernel_unregister'});
+}
+
+#############################################
+sub time_disconnect
+{
+    my($kernel, $heap, $dest)=@_[KERNEL, HEAP, ARG0];
+    my $name=specifier_name($dest);
+    print "Disconnected $name\n";
+    delete $heap->{listeners}->{$name};
+    $kernel->post('IKC', 'monitor', $name);
+}
+
+#############################################
+sub kernel_unregister
+{
+    my($heap, $name, $real_name)=@_[HEAP, ARG0, ARG1];
+    warn "$name == $real_name\n";
+    print "Remote kernel $real_name went bye-bye *snif*\n";
+    delete $heap->{listeners}{$name};    
+}
+
+
+
+
+#############################################
+sub debug_unregister
+{
+    my($heap, $name, $real)=@_[HEAP, ARG1, ARG2];
+    print "Remote kernel ", ($real ? '' : "alias "), "$name went bye-bye\n";
+}
+
+#############################################
+sub debug_register
+{
+    my($heap, $name, $real)=@_[HEAP, ARG1, ARG2];
+    print "Remote kernel ", ($real ? '' : 'alias '), "$name went HELLO!\n";
+}
+
+
+
+#############################################
+sub time_pulse
+{
+    my($kernel, $heap)=@_[KERNEL, HEAP];
+    my $now=localtime;
+    $kernel->delay('pulse', 10-(time%10));
+
+    while(my($name, $dest)=each %{$heap->{listeners}})
+    {
+        print "$name -- $now\n";
+        $kernel->call('IKC', 'post', $dest, $now)
+                or $kernel->yield('disconnect', $dest);
+    }
+    return;
+}
+
+#############################################
+sub time_time
+{
+    print "Sending time...\n";
+    return ''.localtime();
+}

@@ -1,0 +1,309 @@
+NAME
+    Parse::YARA - Parse and create YARA rules
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+            use Parse::YARA;
+        
+            my $rule_string = 'rule sample_rule : sample
+            {
+                meta:
+                    info = "sample rule"
+        
+                strings:
+                    $ = "anon1"
+                    $ = "anon2"
+                    $test_string = "test_string"
+        
+                condition:
+                    any of them
+            }';
+            my $rule_string_obj = Parse::YARA->new();
+            $rule_string_obj->parse($rule_string);
+            $rule_string_obj->add_string_modifier('sample_rule', '$test_string', 'all');
+            print $rule_string_obj->as_string;
+        
+            my $rule_element_hashref = { 
+                                        modifier => 'private',
+                                        rule_id => 'sample_hash_rule',
+                                        tag => [
+                                                'tag1',
+                                                'tag2'
+                                               ],  
+                                        meta => {
+                                                 'info' => 'sample hash rule',
+                                                 'site' => 'http://search.cpan.org/~moofu/'
+                                                },  
+                                        strings => {
+                                                    '$' => {
+                                                            value => 'anon1',
+                                                            type => 'text',
+                                                           },  
+                                                    '$$' => {
+                                                             value => 'anon2',
+                                                             type => 'text'
+                                                            },  
+                                                    '$test_string' => {
+                                                                       value => 'test_string',
+                                                                       type => 'text'
+                                                                      },  
+                                                    '$test_hex_string' => {
+                                                                           value => '{ AA BB CC DD }',
+                                                                           type => 'hex'
+                                                                          },  
+                                                    '$test_regex_string' => {
+                                                                             value => '/.*/',
+                                                                              type => 'regex'
+                                                                            },  
+                                                   },  
+                                        condition => 'true'
+                                       };
+            my $rule_hash_obj = Parse::YARA->new(rulehash => $rule_element_hashref);
+            print $rule_hash_obj->as_string;
+        
+            my $rule_file = '/path/to/rules.yar';
+            my $rule_file_obj = Parse::YARA->new(file => $rule_file);
+        
+            my $rule_obj = Parse::YARA->new();
+            $rule_obj->set_rule_modifier('new_rule', 'global');
+            $rule_obj->set_condition('new_rule', 'one of them');
+            $rule_obj->add_tag('new_rule', 'test_only');
+            $rule_obj->add_meta('new_rule', 'author', 'Leigh');
+            $rule_obj->add_meta('new_rule', 'site', 'http://search.cpan.org/~moofu/');
+            $rule_obj->add_anonymous_string('new_rule', 'anonymous', 'text');
+            $rule_obj->add_string('new_rule', '$string1', 'A test string', 'text');
+            $rule_obj->add_string('new_rule', '$string2', 'Another example', 'text');
+            $rule_obj->add_string_modifier('new_rule', '$string1', 'ascii');
+            print $rule_obj->as_string;
+        
+            $rule_obj->modify_meta('new_rule', 'author', 'Leigh Thompson');
+            $rule_obj->modify_string('new_rule', '$string1', 'An example string');
+            print $rule_obj->as_string;
+        
+            $rule_obj->remove_string_modifier('new_rule', '$string1', 'ascii');
+            $rule_obj->remove_tag('new_rule', 'test_only');
+            $rule_obj->remove_meta('new_rule', 'site');
+            $rule_obj->remove_anonymous_string('new_rule', 'anonymous');
+            $rule_obj->remove_string('new_rule', '$string2');
+            print $rule_obj->as_string;
+
+NOTE FOR PERL >= 5.18
+    Hash order will not be guaranteed so the use of Tie::IxHash is required
+    for passing hashes into the module if order within the YARA rule is
+    required.
+
+    For the example given above, the following steps would need to be taken:
+
+        use Tie::IxHash;
+        my $rule_element_hashref;
+        my $rule_element_hashref_knot = tie(%{$rule_element_hashref}, 'Tie::IxHash');
+        my $meta_hashref;
+        my $meta_hashref_knot = tie(%{$meta_hashref}, 'Tie::IxHash');
+        my $strings_hashref;
+        my $strings_hashref_knot = tie(%{$strings_hashref}, 'Tie::IxHash');
+        $meta_hashref->{info} = 'sample hash rule';
+        $meta_hashref->{site} = 'http://search.cpan.org/~moofu/';
+        $strings_hashref->{'$'} = { value => 'anon1', type => 'text' };
+        $strings_hashref->{'$$'} = { value => 'anon2', type => 'text' };
+        $strings_hashref->{'$test_string'}= { value => 'test_string', type => 'text' };
+        $strings_hashref->{'$test_hex_string'} = { value => '{ AA BB CC DD }', type => 'hex' };
+        $strings_hashref->{'$test_regex_string'} = { value => '/.*/', type => 'regex' };
+        $rule_element_hashref = { 
+                                 modifier => 'private',
+                                 rule_id => 'sample_hash_rule_tied',
+                                 tag => [
+                                         'tag1',
+                                         'tag2'
+                                        ],  
+                                 meta => $meta_hashref,
+                                 strings => $strings_hashref,
+                                 condition => 'true'
+                                }; 
+
+METHODS
+    These are the object methods that can be used to read, add or modify any
+    part of a YARA rule.
+
+    new()
+        Create a new `Parse::YARA' object, and return it. There are a couple
+        of options when creating the object:
+
+        new(disable_includes => 0, $verbose => 0)
+            Create an unpopulated object, that can be filled in using the
+            individual rule element methods, or can be populated with the
+            read_file method.
+
+        new(rule => $rule, disable_includes => 0, $verbose => 0)
+            Create an object by providing a YARA rule as a string value.
+
+        new(file => $file, $disable_includes => 0, $verbose => 0)
+            Parse a file containing one or more YARA rules and create
+            objects for each rule.
+
+            The include option is turned on by default, this will ensure
+            that all files included in the file being parsed are read in by
+            the parser. Turn this off by setting disable_includes => 1.
+
+        new(rulehash => $rule_element_hashref, $disable_includes => 0,
+        $verbose => 0)
+            Create an object based on a prepared hash reference.
+
+                my $rule_element_hashref = { 
+                                            modifier => 'global',
+                                            rule_id => 'sample_hash_rule',
+                                            tag => [
+                                                    'tag1',
+                                                    'tag2'
+                                                   ],  
+                                            meta => {
+                                                     'info' => 'sample hash rule',
+                                                     'site' => 'http://search.cpan.org/~moofu/'
+                                                    },  
+                                            strings => {
+                                                        '$' => {
+                                                                value => 'anon1',
+                                                                type => 'text',
+                                                               },  
+                                                        '$$' => {
+                                                                 value => 'anon2',
+                                                                 type => 'text'
+                                                                },  
+                                                        '$test_string' => {
+                                                                           value => 'test_string',
+                                                                           type => 'text'
+                                                                          },  
+                                                        '$test_hex_string' => {
+                                                                               value => '{ AA BB CC DD }',
+                                                                               type => 'hex'
+                                                                              },  
+                                                        '$test_regex_string' => {
+                                                                                 value => '/.*/',
+                                                                                 type => 'regex'
+                                                                                },  
+                                                       },  
+                                            condition => 'all of them'
+                                           };
+
+    parse($rule_string)
+        Reads in a string of one or more rules and parses it into a hashref
+        that can be manipulated by the other functions.
+
+    read_file ( $file )
+        Reads in a YARA rules file and any included files (if not disabled)
+        and calls $self->parse() on the contents of the file.
+
+    set_rule_modifier($rule_id, $modifier)
+        Set a modifier on a rule. The value for modifier must be one of the
+        following strings: private global
+
+        If modifier is set to undef the current modifier (if any) will be
+        removed.
+
+    set_condition($rule_id, $condition)
+        Sets the value of the condition to $condition.
+
+    add_tag($rule_id, $tag)
+        Adds a tag to the rule.
+
+    add_meta($rule_id, $meta_name, $meta_val)
+        Adds a meta name/value pair to the rule.
+
+    add_string_modifier($rule_id, $str_name, $modifier)
+        Set a modifier on a string. The value for the modifier must be one
+        of the following strings: wide nocase ascii fullword
+
+        Use of the keyword 'all' will set all modifiers on a string.
+
+    remove_string_modifier($rule_id, $str_name, $modifier)
+        Remove a modifier on a string. The value for the modifier must be
+        one of the following strings: wide nocase ascii fullword
+
+        Use of the keyword 'all' will remove all modifiers from a string.
+
+    add_anonymous_string($rule_id, $str_val, $str_type)
+        Allows the addition of anonymous strings
+
+    add_string($rule_id, $str_name, $str_val, $str_type)
+        Allows the addition of a new string name/value pair.
+
+    remove_tag($rule_id, $tag)
+        Removes a tag from the rule as identified by $tag.
+
+    remove_meta($rule_id, $meta_name)
+        Removes a meta name/value pair as identified by $meta_name.
+
+    remove_anonymous_string($rule_id, $str_val)
+        Removes an anonymous string with the value specified.
+
+    remove_string($rule_id, $str_name)
+        Removes a string name/value pair, but only if it contains a single
+        value.
+
+    modify_meta($rule_id, $meta_name, $meta_val)
+        Modifies the value of $meta_name and sets it to $meta_val.
+
+    modify_string($rule_id, $str_name, $str_val)
+        Modifies the value of a string name/value pair, but only if it
+        contains a single value.
+
+        Sets the value of $str_name to $str_val.
+
+    as_string()
+        Can take zero or one argument. With no arugments this return all
+        rules within the rule hashref as a string.
+
+        as_string($rule_id)
+            Extracts a single rule from the hashref and returns it as a
+            string value.
+
+    get_referenced_rule($rule_id)
+        Check to see if $rule_id references any other rules and return any
+        matched rule ID's as an array.
+
+    position_rule($rule_id, $position, $relative_rule_id)
+        Position a rule before or after another rule where:
+
+            $rule_id is the rule_id of the rule to be moved
+            $position is either before or after
+            $relative_rule_id is the rule_id of the rule to move this rule around
+
+DESCRIPTION
+    Module for parsing and generating YARA rules.
+
+TODO
+    Add error checking for the validity of regex and hex strings.
+
+    Add methods to allow the addition of comments to each element of a rule.
+
+    Fix the parser to extract rather than strip comments from rules passed
+    as strings or form a file and assign them to the appropriate element of
+    the rule.
+
+    Add methods to allow the re-ordering of strings and meta elements.
+
+SEE ALSO
+    For information about YARA see: http://code.google.com/p/yara-project/
+
+AUTHOR
+    Leigh Thompson, <moofu at cpan.org>
+
+DEPENDENCIES
+    Carp, Tie::IxHash, File::Basename
+
+COPYRIGHT AND LICENSE
+    Copyright 2013 Leigh Thompson
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+

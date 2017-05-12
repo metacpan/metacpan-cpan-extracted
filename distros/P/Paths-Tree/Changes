@@ -1,0 +1,5 @@
+Revision history for Perl extension Paths::Tree
+0.01  Tue Oct 12 09:25:49 2004 
+        - Inicial release
+0.02  Wed Jan 13 18:06:09 2010
+        - No loop in hash keys equal

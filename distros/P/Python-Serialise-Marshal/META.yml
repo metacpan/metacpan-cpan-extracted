@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name: Python-Serialise-Marshal
+version: 0.02
+license: perl
+distribution_type: module
+requires:
+  File::Binary: 1.0
+  Math::Complex: 0
+  Test::More: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Python::Serialise::Marshal:
+    file: lib/Python/Serialise/Marshal.pm
+    version: 0.02
+  Python::Serialise::None:
+    file: lib/Python/Serialise/Marshal.pm
+    version: ~
+generated_by: Module::Build version 0.18

@@ -1,0 +1,43 @@
+Pod-Parser-Groffmom
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+See also the C<examples/makemom> script in this distribution.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Pod::Parser::Groffmom
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pod-Parser-Groffmom
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Pod-Parser-Groffmom
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Pod-Parser-Groffmom
+
+    Search CPAN
+        http://search.cpan.org/dist/Pod-Parser-Groffmom/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Curtis "Ovid" Poe
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

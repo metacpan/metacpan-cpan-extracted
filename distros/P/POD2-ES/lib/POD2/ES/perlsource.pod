@@ -1,0 +1,251 @@
+=encoding utf8
+
+=for comment
+Para aplicar un formato uniforme a este archivo, use:
+  perl ./Porting/podtidy pod/perlsource.pod
+
+=head1 NAME
+
+perlsource - Guía del árbol de código fuente de Perl
+
+=head1 DESCRIPCIÓN
+
+En este documento se describe el contenido del árbol de código fuente de
+Perl. En él encontrará toda la información necesaria para «hackear» el
+núcleo de Perl.
+
+=head1 ORIENTACIÓN
+
+El árbol de código fuente de Perl es frondoso. Contiene cosas como:
+
+=head2 Código C
+
+La mayor parte del código C y los archivos de encabezado se encuentran en el
+directorio raíz del árbol de código fuente. Hay algunos directorios
+específicos de la plataforma que contienen código C. Además, algunos de los
+módulos distribuidos con Perl incluyen código C o XS.
+
+En L<perlinterp> encontrará más información sobre los archivos que integran
+el intérprete de Perl y detalles sobre el funcionamiento del intérprete.
+
+=head2 Módulos integrados en el núcleo
+
+Los módulos distribuidos como parte del núcleo de Perl se encuentran en
+cuatro subdirectorios. Dos de estos directorios contienen módulos integrados
+en el núcleo y los otros dos contienen módulos que además se publican en
+CPAN. Los módulos que se pueden publicar en CPAN se denominan módulos de
+«evolución dual».
+
+=over 4
+
+=item * F<lib/>
+
+Este directorio contiene módulos programados en Perl puro que solo se publican
+como parte del núcleo. A diferencia de otros módulos del núcleo, este
+directorio contiene I<todos> los módulos y sus pruebas.
+
+=item * F<ext/>
+
+Al igual que F<lib/>, este directorio contiene módulos que solo se publican
+como parte del núcleo. Sin embargo, a diferencia de F<lib/>, un módulo de
+F<ext/> suele tener una estructura de directorios y archivos estilo CPAN, así
+como su propio archivo F<Makefile.PL>. No se espera que un módulo de F<ext/>
+pueda trabajar con versiones anteriores de Perl 5. Por esta razón, estos
+módulos pueden beneficiarse de las mejoras sintácticas y de otro tipo
+incluidas en la rama C<blead> de Perl 5.
+
+=item * F<dist/>
+
+Este directorio contiene módulos de evolución dual en los que la versión
+canónica es la del código fuente de la rama B<blead>. Tenga en cuenta que es
+posible que algunos de los módulos de este directorio aún no se hayan
+publicado por separado en CPAN. Los módulos de F<dist/> deberían poder
+trabajar con versiones anteriores de Perl 5.
+
+=item * F<cpan/>
+
+Este directorio contiene módulos de evolución dual en los que el módulo de
+CPAN es la versión canónica. No debe aplicar parches a estos módulos
+directamente. Los cambios realizados en estos módulos deben enviarse al
+mantenedor del módulo de CPAN. Cuando se hayan aplicado y publicado estos
+cambios, la nueva versión del módulo se incorporará al núcleo.
+
+=back
+
+Para algunos módulos de evolución dual aún no se ha determinado si la
+versión canónica es la de CPAN o la del código fuente de la rama I<blead>.
+Mientras no se determine, estos módulos deben estar en F<cpan/>.
+
+=head2 Pruebas
+
+Existe un completo conjunto de pruebas del núcleo de Perl. Si agrega pruebas
+nuevas (o módulos nuevos con pruebas), es posible que tenga que actualizar el
+archivo F<t/TEST> para que se ejecuten.
+
+=over 4
+
+=item * Pruebas de módulos
+
+Las pruebas de los módulos del núcleo del directorio F<lib/> se encuentran
+junto al módulo correspondiente. Por ejemplo, tenemos F<lib/strict.pm> y
+F<lib/strict.t>.
+
+Las pruebas de los módulos de F<ext/> y los módulos de evolución dual están
+en los subdirectorios F<t/> de cada módulo, como en una distribución de CPAN
+estándar.
+
+=item * F<t/base/>
+
+Pruebas de funcionalidad básica de Perl. Incluyen pruebas de C<if>,
+operaciones básicas de lectura y escritura, expresiones regulares sencillas,
+etc. Son las primeras que se ejecutan del conjunto de pruebas; si no se supera
+alguna de estas pruebas, significa que hay un problema grave.
+
+=item * F<t/cmd/>
+
+Pruebas de estructuras de control básicas, C<if/else>, C<while>, subrutinas,
+etc.
+
+=item * F<t/comp/>
+
+Pruebas de problemas básicos relacionados con la manera en que Perl se analiza
+y compila.
+
+=item * F<t/io/>
+
+Pruebas de funciones de E/S predefinidas, incluidos los argumentos de línea de
+comandos.
+
+=item * F<t/mro/>
+
+Pruebas de las implementaciones de orden de resolución de métodos de perl
+(vea L<mro>).
+
+=item * F<t/op/>
+
+Pruebas de funciones predefinidas de perl que no se corresponden con ninguno de
+los demás directorios.
+
+=item * F<t/opbasic/>
+
+Pruebas de funciones predefinidas de perl que, al igual que las de F<t/op/>, no
+se corresponden con ninguno de los demás directorios y que, además, no pueden
+usar F<t/test.pl>, ya que ese programa depende de funcionalidad que el mismo
+archivo de prueba está comprobando.
+
+=item * F<t/re/>
+
+Pruebas de funciones o comportamientos relacionados con expresiones regulares
+(antes estaban en t/op).
+
+=item * F<t/run/>
+
+Pruebas de las características de funcionamiento de perl, incluidos los
+códigos de salida y el control de las variables de entorno PERL*.
+
+=item * F<t/uni/>
+
+Pruebas de compatibilidad básica con Unicode.
+
+=item * F<t/win32/>
+
+Pruebas específicas de Windows.
+
+=item * F<t/porting/>
+
+Pruebas que detectan diversos errores comunes en el árbol de código fuente.
+Por ejemplo, comprueban que todas las personas que figuran en el registro de
+git tienen una entrada correspondiente en el archivo F<AUTHORS>.
+
+=item * F<t/lib/>
+
+Antiguo directorio de las pruebas de módulos. No debe colocar nada aquí. Aún
+quedan cosas que deben moverse a otra parte. ¿Se anima a moverlas? Se lo
+agradeceremos...
+
+=back
+
+=head2 Documentación
+
+Toda la documentación principal para usuarios finales se encuentra en F<pod/>.
+En general, los módulos individuales de F<lib/>, F<ext/>, F<dist/> y F<cpan/>
+tienen su propia documentación, ya sea en el archivo F<Módulo.pm> o en un
+archivo F<Módulo.pod> adjunto.
+
+Por último, la documentación para programadores del núcleo de Perl se
+encuentra en el directorio F<Porting/>.
+
+=head2 Herramientas y documentación para «hackear»
+
+El directorio F<Porting> contiene un conjunto de fragmentos de código y
+documentación que pueden servir de ayuda a los mantenedores de Perl. Algunos
+elementos destacados son:
+
+=over 4
+
+=item * F<check*>
+
+Scripts que detectarán en el código fuente cosas como infracciones de ANSI C,
+problemas de codificación de POD, etc.
+
+=item * F<Maintainers>, F<Maintainers.pl> y F<Maintainers.pm>
+
+En estos archivos se indica quién mantiene cada módulo. Ejecute C<perl
+Porting/Maintainers -M Nombre::Módulo> para obtener más información sobre un
+módulo de evolución dual.
+
+=item * F<podtidy>
+
+Ordena un archivo pod. Tras aplicar un parche a un archivo pod, es recomendable
+ejecutar este programa.
+
+=back
+
+=head2 Sistema de compilación
+
+El sistema de compilación de Perl empieza por el script F<Configure> del
+directorio raíz.
+
+Las partes del sistema de compilación que son específicas de la plataforma se
+encuentran en directorios específicos de plataforma, como F<win32/>, F<vms/>,
+etc.
+
+El script F<Configure> se encarga de generar un archivo F<Makefile>.
+
+Perl usa un sistema de compilación denominado metaconfig. El mantenimiento de
+este sistema se realiza por separado del mantenimiento del núcleo de Perl.
+
+El sistema metaconfig tiene su propio repositorio git. Consulte el archivo
+README (en L<http://perl5.git.perl.org/metaconfig.git/>) para obtener
+información detallada.
+
+El directorio F<Cross> contiene varios archivos relacionados con la
+compilación multiplataforma de Perl. Puede ver más detalles en
+F<Cross/README>.
+
+=head2 F<AUTHORS>
+
+En este archivo figuran todas las personas que han contribuido a Perl. Si
+envía un parche, debe agregar su nombre a este archivo como parte del parche.
+
+=head2 F<MANIFEST>
+
+El archivo F<MANIFEST> del directorio raíz del árbol de código fuente
+contiene una lista de todos los archivos incluidos en el núcleo de Perl, así
+como una breve descripción de cada archivo.
+
+Puede ver una descripción general de todos los archivos con el siguiente
+comando:
+
+  % perl -lne 'print if /^[^\/]+\.[ch]\s+/' MANIFEST
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

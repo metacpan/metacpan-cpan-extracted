@@ -1,0 +1,216 @@
+#!/usr/bin/perl -w
+# $Id: preforking 760 2011-05-18 18:14:30Z fil $
+use strict;
+
+# use Religion::Package qw(1 1);
+use POE;
+use POE::Component::Daemon;
+use POE::Wheel::SocketFactory;
+use POE::Driver::SysRW;
+use POE::Filter::Line;
+use POE::Wheel::ReadWrite;
+use POSIX qw(EADDRINUSE);
+use Socket qw(inet_ntoa sockaddr_in);
+use FindBin;
+
+sub DEBUG () { 0 }
+
+my $port=shift;
+die "Usage: $0 port" unless defined $port;
+
+my $logfile = "$FindBin::Dir/log_preforking";
+
+# $DB::fork_TTY='/dev/pts/4';
+
+#########################
+POE::Session->create(
+inline_states=>{
+    _start=>sub {
+            my($kernel, $heap)=@_[KERNEL, HEAP];
+            $heap->{wheel}=POE::Wheel::SocketFactory->new(
+                BindPort    => $port,
+                Reuse       => 'on',                # Lets the port be reused
+                BindAddress => '127.0.0.1',
+                SuccessEvent => 'accept',  
+                FailureEvent => 'error',
+            );
+            if( $port == 0 ) {
+                $port = ( sockaddr_in($heap->{wheel}->getsockname()) )[0];
+                print "PORT=$port\n";
+            }
+            else {
+                warn "$$: Listening on port $port";
+            }
+            $heap->{wheel}->pause_accept(); # is resumed in started
+
+            $kernel->sig('daemon_child'=>'daemon_child');
+            $kernel->sig('daemon_parent'=>'daemon_parent');
+            $kernel->sig('daemon_accept'=>'daemon_accept');
+
+            $kernel->sig('daemon_shutdown'=>'daemon_shutdown');
+
+            $heap->{parent} = 0;
+            $heap->{rid}=0;
+    },
+
+    error=>sub {
+        my ($heap, $operation, $errnum, $errstr) = @_[HEAP, ARG0, ARG1, ARG2];
+        if( 0==$errnum and $operation eq 'read' ) {
+                                       # EOF
+            $heap->{done}=1;
+            return;
+        }
+        warn "$$: $operation:$errnum: $errstr";
+        if($errnum==EADDRINUSE) {       # EADDRINUSE
+            Daemon->shutdown();     # THIS IS IMPORTANT
+        }
+        delete $heap->{wheel};
+        delete $heap->{wheel_client};
+        Daemon->shutdown();
+    },   
+
+    ###############
+    ## Called when we switch to a child process
+    daemon_child=>sub {
+        my($kernel, $heap)=@_[KERNEL, HEAP];
+        DEBUG and 
+            warn "Started (parent=$heap->{parent})";
+        $kernel->post(Daemon=>'update_status', 'wait');
+        return;
+    },
+
+    ###############
+    ## Called when a child process set status to 'wait'
+    daemon_accept=>sub {
+        my($kernel, $heap)=@_[KERNEL, HEAP];
+        DEBUG and 
+            warn "Accepting (parent=$heap->{parent})";
+        $heap->{wheel}->resume_accept();    # was paused in _start and accept
+        return;
+    },
+
+    ###############
+    ## PoCo::Daemon's daemon_parent.  We are a parent process, after the
+    ## initial children are forked off.
+    daemon_parent=>sub {
+        my($kernel, $heap)=@_[KERNEL, HEAP];
+        DEBUG and warn "PARENT";
+        $heap->{parent} = $$;
+    },
+
+
+    ###############
+    # SocketFactory got a connection handle it here
+    accept=>sub {       
+        my ($heap, $handle, $peer, $port, $id)=@_[HEAP, ARG0..ARG3];
+
+        $peer=inet_ntoa($peer);
+        # DEBUG and 
+            warn "Connection id=$id from $peer:$port";
+    
+        $heap->{wheel}->pause_accept(); # is resumed in started 
+        my $info={handle=>$handle, peer=>$peer, port=>$port, id=>$id};
+        Daemon->update_status('req');
+
+        $heap->{done} = 0;
+
+        $heap->{wheel_client} = POE::Wheel::ReadWrite->new(
+                Handle=>$info->{handle},
+                Driver=> new POE::Driver::SysRW, # using sysread and syswrite
+                Filter=> POE::Filter::Line->new(), # use a line filter for negociati
+                InputEvent => 'input',
+                FlushedEvent => 'flushed',
+                ErrorEvent => 'error'
+            );
+    },
+
+    ###############
+    ## ReadWrite's InputEvent
+    input => sub {
+        my($heap, $line)=@_[HEAP, ARG0];
+        # DEBUG and 
+            warn "Received $line";
+
+        $line = uc $line;
+
+        if($line eq 'PID') {
+            $heap->{wheel_client}->put($$);
+        }
+        elsif($line eq 'PING') {
+            $heap->{wheel_client}->put('PONG');
+        }
+        elsif($line eq 'PARENT') {
+            $heap->{wheel_client}->put( $heap->{parent} );
+        }
+        elsif($line eq 'PEEK') {
+            $heap->{wheel_client}->put( split "\n", Daemon->peek( 1 ) );
+            $heap->{wheel_client}->put( "DONE" );
+        }
+        elsif($line eq 'STATUS') {
+            $heap->{wheel_client}->put( split "\n", Daemon->status );
+            $heap->{wheel_client}->put( "DONE" );
+        }
+        elsif($line eq 'DONE') {
+            $heap->{wheel_client}->put('OK');
+            $heap->{done} = 1;
+        }
+        elsif($line eq 'LOGFILE') {
+            $heap->{wheel_client}->put( $logfile );
+        }
+        else {
+            $heap->{wheel_client}->put('???');
+        }
+        $heap->{pending}=1;
+    },
+
+    ###############
+    ## ReadWrite's FlushedEvent
+    flushed=>sub {
+        my($heap)=$_[HEAP];
+        $heap->{pending}=0;
+
+        return unless $heap->{done};
+
+        DEBUG and warn "DONE";
+        delete $heap->{wheel_client};
+        $poe_kernel->post(Daemon=>'update_status', 'done');
+    },
+
+    ################
+    ## daemon_shutdown signal.  Sent when we get at TERM or INT, or when
+    ## we handle enough requests to be recycled.
+    daemon_shutdown => sub {
+        my($heap)=$_[HEAP];
+
+        DEBUG and warn "$$: daemon_shutdown\n";
+
+        delete $heap->{wheel};
+        delete $heap->{wheel_client};
+        return;
+    }
+
+});      
+
+#########################
+POE::Component::Daemon->spawn(
+            alias   => 'Daemon',
+            logfile => $logfile,
+            detach  => 1,
+            verbose => 1,
+            start_children  => 1,
+            requests        => 1,
+            min_spare       => 2,
+            max_children    => 10,
+        );
+
+
+
+
+
+
+#########################
+$poe_kernel->run();
+
+warn "$$: Exiting";
+1;
+

@@ -1,0 +1,11 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+lib/POSIX/Util.pm
+lib/POSIX/Util.pod
+t/01use.t
+t/10fdio.t
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

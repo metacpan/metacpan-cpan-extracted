@@ -1,0 +1,37 @@
+<!-- shared/small_loading_please_wait -->
+<div id="small_loading"></div>
+<script type="text/javascript">
+    YAHOO.namespace("parley.small_loading");
+
+    function small_loading_init() {
+        var content = document.getElementById("small_loading");
+        content.innerHTML = "";
+
+        if (!YAHOO.parley.small_loading.wait) {
+            // Initialize the temporary Panel to display while waiting for external content to load
+            YAHOO.parley.small_loading.wait = 
+                new YAHOO.widget.Overlay(
+                    "loader_wait",  
+                    {
+                        fixedcenter:    false, 
+                        close:          false, 
+                        draggable:      false, 
+                        zindex:         4,
+                        x: 30,
+                        y: 15,
+                        visible:        false
+                    } 
+                )
+            ;
+    
+            YAHOO.parley.small_loading.wait.setBody(
+                "<img src=\"static/images/loader.gif\"/>"
+            );
+            YAHOO.parley.small_loading.wait.render(document.body);
+        }
+    }
+
+    small_loading_init();
+    //YAHOO.parley.small_loading.wait.show();
+</script>
+<!-- (end) shared/small_loading_please_wait -->

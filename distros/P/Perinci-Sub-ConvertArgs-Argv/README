@@ -1,0 +1,14 @@
+SYNOPSIS
+
+     use Perinci::Sub::ConvertArgs::Argv qw(convert_args_to_argv);
+    
+     my $res = convert_args_to_argv(args=>\%args, meta=>$meta, ...);
+
+SEE ALSO
+
+    Perinci::CmdLine, which uses this module for presenting command-line
+    examples.
+
+    Perinci::Sub::GetArgs::Argv which does the reverse: converting
+    command-line arguments to hash.
+

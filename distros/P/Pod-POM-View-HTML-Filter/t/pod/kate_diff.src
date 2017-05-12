@@ -1,0 +1,51 @@
+=begin filter kate Diff
+
+    Index: lib/Pod/POM/View/HTML/Filter.pm
+    ===================================================================
+    --- lib/Pod/POM/View/HTML/Filter.pm	(revision 168)
+    +++ lib/Pod/POM/View/HTML/Filter.pm	(working copy)
+    @@ -6,7 +6,7 @@
+     use strict;
+     use Carp;
+     
+    -our $VERSION = '0.06';
+    +our $VERSION = '0.07';
+     
+     my %filter;
+     my %builtin = (
+
+=end filter
+__RESULT__
++kate
+<html><body bgcolor="#ffffff">
+<pre>    Index: lib/Pod/POM/View/HTML/Filter.pm
+    ===================================================================
+    <span class="k-keyword">--- lib/Pod/POM/View/HTML/Filter.pm	(revision 168)</span><span class="k-keyword">
+    </span><span class="k-keyword">+++ lib/Pod/POM/View/HTML/Filter.pm	(working copy)</span><span class="k-keyword">
+    </span><span class="k-datatype">@@ -6,7 +6,7 @@</span><span class="k-datatype">
+    </span> use strict;
+     use Carp;
+     
+    <span class="k-others">-our $VERSION = '0.06';</span><span class="k-others">
+    </span><span class="k-string">+our $VERSION = '0.07';</span><span class="k-string">
+    </span> 
+     my %filter;
+     my %builtin = (</pre>
+</body></html>
+__RESULT__
+-kate
+<html><body bgcolor="#ffffff">
+<pre>    Index: lib/Pod/POM/View/HTML/Filter.pm
+    ===================================================================
+    --- lib/Pod/POM/View/HTML/Filter.pm	(revision 168)
+    +++ lib/Pod/POM/View/HTML/Filter.pm	(working copy)
+    @@ -6,7 +6,7 @@
+     use strict;
+     use Carp;
+     
+    -our $VERSION = '0.06';
+    +our $VERSION = '0.07';
+     
+     my %filter;
+     my %builtin = (</pre>
+</body></html>

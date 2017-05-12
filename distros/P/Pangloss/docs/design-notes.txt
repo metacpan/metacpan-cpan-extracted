@@ -1,0 +1,129 @@
+=======================
+ Pangloss Design Notes
+=======================
+
+
+1. Object Persistency
+
+Pixie is currently used for object persistency.
+This means we can store objects with references to other objects, and not
+really worry about database schemas.
+
+Objects are loaded in a lazy fashion, so breaking encapsulation is strictly
+NOT ALLOWED!
+
+Currently we do NULL LOCKING on objects.  This may well prove to be a problem.
+If so, another locking strategy will have to be devised.
+
+If some data needs to make it into a database, Class::DBI can be investigated
+as an alternative to Pixie.  Otherwise I would suggest using the various
+$obj->px_***() methods available to store relevant info in the database.
+
+
+2. Business Objects, Collections and Editors
+
+Seeing as we'll have collections of Users, Languages, Terms, Concepts and
+Categories, it makes sense to encapsulate these as classes.  Ideally, these
+classes will not know about the object store.
+
+The editor application classes will be responsible for manipulating these
+collections (and other business objects, if necessary).  This means they will
+also be responsible for managing the Pixie store.
+
+Business objects will be able to validate themselves, but the editors will be
+responsible for validating them.
+
+The editors should maintain referential integrity across the business objects.
+But, for ease of use business objects will not contain hard references to their
+counterparts.  So in saying:
+
+	$priv->add_translate_lang( $lang );
+
+$priv will *not* store a reference to $lang, but use $lang's key instead.  If
+this key ever changes, it is the editor's responsibility to update $priv.
+
+(PS: I'm still not 100% sure about this decision)
+
+Editors will present cloned versions of their business objects that when
+modified do not affect the stored objects without passing through the editors
+again.
+
+
+3. Application Views
+
+A view of current state of the application is passed to the presentation layer
+for display.  It contains a heirarchy of objects organized by their associated
+actions:
+
+  view/user       the currently selected user
+  view/add/user   the added user
+
+See Pangloss::Application::View for more details.
+
+
+4. Errors
+
+Errors are always attached to an object, and are available in the presentation
+layer as follows:
+
+  view/errors          a list of all errors
+  view/user/error      error associated with a user
+  view/add/term/error  error associated with adding a term
+
+In this fashion we always know where an error came from.  Errors double as
+error flags that can be localized in the presentation layer:
+
+  IF user/error/isInvalid THEN
+    ...
+  ELSIF user/error/isExists THEN
+    ...
+  ENDIF
+
+In the backend, errors are exceptions thrown via the Error module, and
+collected by the Application::* classes.
+
+
+5. Authorization
+
+Ensuring that the user has authorization to perform certain actions is done by
+the controller (ie: pipeline segments), not the model.
+
+A further level of access restriction may be done with Apache authentication
+handlers.
+
+
+6. Localization
+
+Localization of messages will be done in the presentation layer, or if not
+possible, the controller.  This means that the model is limited to using flags
+to convey messages.
+
+
+7. Controller Segments
+
+The pipeline controller segments configured in /conf/config.yaml glue together
+the functionality of the application.  Multiple actions per request are allowed
+and are in fact relied upon by the controller itself.  For example:
+
+     If a user is loaded by the editor, then it makes sense to load all
+     the languages available so that the administrator can update the
+     languages the user can translate and proofread.
+
+
+8. Searching & Filters
+
+Searching through Pangloss terms is done with a set of Pangloss::Search::Filter
+objects that are applied to each term.  See Pangloss::Search for more details.
+
+
+9. Style Sheets
+
+The style sheets define the layout of Pangloss pages.
+
+Things such as colour for search results Languages can be done at this level
+(ie: .search-result-lang-en), though the stylesheets would have to be updated
+as new languages are added.
+
+
+__
+EOF

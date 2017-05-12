@@ -1,0 +1,42 @@
+Simple instructions for apache 2.0.48 && mod_perl-1.99_12
+
+
+httpd-2.0.48> ./configure --prefix=/usr/local/apache2 --enable-expires \
+                          --enable-ssl --enable-deflate \
+                          --enable-rewrite --enable-headers \
+                          --enable-logio
+httpd-2.0.48> make && make install
+
+mod_perl-1.99_12> perl Makefile.PL MP_APXS=/usr/local/apache2/bin/apxs
+mod_perl-1.99_12> make test
+mod_perl-1.99_12> make install
+
+httpd.conf as usual, except PApp::Apache2 instead of PApp::Apache:
+
+in short:
+
+LoadModule perl_module modules/mod_perl.so
+PerlModule PApp::Apache2
+
+<Perl>
+  configure PApp (
+       checkdeps => 1,
+       pappdb_user => "root",
+       delayed => 1,
+       onerr => 'vas',
+       #onerr => 'h',
+  );
+  mount_appset PApp default;
+</Perl>
+
+at the end:
+
+<Perl>
+   configured PApp;
+</Perl>
+
+(early testing stage, don't use in production)
+
+
+
+

@@ -1,0 +1,4 @@
+template:
+    cache: 0
+    module:
+        - Data::Dumper

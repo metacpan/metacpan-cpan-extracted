@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+net-ssleay-patch
+lib/POE/Component/SSLify/NonBlock.pm
+lib/POE/Component/SSLify/NonBlock/ServerHandle.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

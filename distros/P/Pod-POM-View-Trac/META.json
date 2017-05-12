@@ -1,0 +1,47 @@
+{
+   "abstract" : "Convert POD to trac wiki markup",
+   "author" : [
+      "Kevin L. Esteb <kevin@kesteb.us>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-POM-View-Trac",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Pod::POM" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Pod::POM::View::Trac" : {
+         "file" : "lib/Pod/POM/View/Trac.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

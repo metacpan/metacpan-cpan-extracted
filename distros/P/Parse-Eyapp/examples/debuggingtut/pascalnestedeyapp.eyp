@@ -1,0 +1,111 @@
+%{
+use 5.0010;
+use feature 'state';
+my $is_enum = 0;
+
+sub rangeORenum {
+  my $self = shift; 
+
+  require Range;
+  state $rp = Range->new( yyerror => sub {});
+
+  my $pos = pos(${$self->input});
+  $rp->input($self->input);
+  my $t = $rp->Run;
+  print "After nested parsing\n";
+  $is_enum = $rp->YYNberr;
+  pos(${$self->input}) = $pos;
+}
+
+%}
+
+%conflict rangeORenum {
+  if ($is_enum) { $self->YYSetReduce([',', ')'], 'ID:ENUM' ); }
+  else { $self->YYSetReduce([',', ')'], 'ID:RANGE' ); }
+} 
+
+%token ID  = /([A-Za-z]\w*)/
+%token NUM = /(\d+)/
+
+%left   ','
+%left   '-' '+'
+%left   '*' '/'
+
+%expect-rr 2
+
+%%
+
+type_decl : 'type' ID '=' type ';'
+;
+
+type : 
+      %name ENUM
+      PRErangeORenum '(' id_list ')'
+    | %name RANGE
+      PRErangeORenum expr '..' expr
+;
+
+PRErangeORenum:
+   /* empty */  
+     {
+       goto &rangeORenum;
+     }
+;
+
+id_list : 
+      %name ID:ENUM
+      ID                      %PREC rangeORenum
+    | id_list ',' ID
+;
+
+expr : '(' expr ')'   { $_[2] } /* bypass */
+    | %name PLUS     expr '+' expr
+    | %name MINUS    expr '-' expr
+    | %name TIMES    expr '*' expr
+    | %name DIV      expr '/' expr
+    | %name COMMA    expr ',' expr
+    | %name ID:RANGE
+      ID                     %PREC rangeORenum
+    | %name NUM      NUM
+;
+
+%%
+
+=head1 SYNOPSIS
+
+See 
+
+=over 2
+
+=item * File C<userange.pl>.
+
+=item * File C<Range.eyp>.
+
+=item * File pascalenumeratedvsrange.eyp in examples/debuggintut/
+
+=item * The Bison manual L<http://www.gnu.org/software/bison/manual/html_mono/bison.html>
+
+=back
+
+Compile it with:
+
+      eyapp Range.eyp
+      eyapp -TC pascalnestedeyapp.eyp
+
+Run it with this options:
+
+    $ ./pascalnestedeyapp.pm -t -i -m 1 -c 'type e = (x, y, z);'
+    $ perl5.10.0 ./pascalnestedeyapp.pm -t -i -m 1 -c 'type e = (x, @, z);'
+
+Try also these inputs:
+
+                type e = (x) .. (y);
+                type r = (x) ..  y ;
+                type r = (x+2)*3 ..  y/2 ;
+                type e = (x, y, z);
+                type e = (x);
+                type e = (x, y, z) .. (u+v);
+
+
+=cut
+

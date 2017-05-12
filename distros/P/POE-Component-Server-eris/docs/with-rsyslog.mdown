@@ -1,0 +1,63 @@
+# Using eris with rsyslog
+
+## Background
+
+[rsyslog](http://www.rsyslog.com) is an open source syslog daemon with an
+impressive feature set.  It does not provide the neat program functionality
+that syslog-ng does, but it does provide encryption, and disk-assisted
+message queues and support for RELP.  This makes it the default syslog
+daemon for most modern Linux distributions
+
+## Benefits
+
+ * Supports encrypted log transfer
+ * Disk-assisted Message Queues
+ * RELP Support
+ * Flexible Input and Output
+
+## Setting up the eris dispatcher
+
+The eris-dispatcher-tcp.pl in the examples directory demonstrates one way to
+handle messages from rsyslog via it's TCP output module.  You may want to
+tweak the eris-dispatcher-tcp.pl script to handle errors and log various
+events.
+
+You'll need to start up the eris-dispatcher-tcp.pl server.  If you use a PID
+file, you can use something like monit to startup and maintain the
+eris-dispatcher-tcp.pl server.  It shouldn't crash, but if it does, we'll
+setup disk-assisted queues to make sure no event are dropped.
+
+## Configuring rsyslog to work with eris
+
+If you've enabled central logging on your network with rsyslog and are using
+versions 4+, you're using rulesets to accomplish your remote loggers traffic.
+You can read more about that
+[here](http://www.rsyslog.com/doc/multi_ruleset.html).
+
+    # Remote Logging Profile
+    $RuleSet remote
+    # Archival Storage
+    *.* ?RemoteHost
+    
+    # Forward to eris Connector with Queueing Enabled
+    $ActionQueueType LinkedList
+    $ActionQueueFileName eris-queue
+    $ActionResumeRetryCount -1
+    $ActionQueueSaveOnShutdown on
+    *.info @@localhost:9513
+
+You can tweak the ports to send to your PoCo::Server::TCP Session's port for
+incoming syslog messages in eris-dispatcher-tcp.pl.
+
+Once you restart rsyslog, you should be able to connect to your eris
+dispatch server and test:
+
+    $ nc localhost 9514
+    EHLO Streamer (KERNEL: dev.example.com-4ec4c1d4-000047fc-00000001:11)
+    sub dhcpd
+    Subscribed to : dhcpd
+    <30>Nov 17 20:05:01 1.2.3.4 dhcpd DHCPDISCOVER from 00:00:00:7a:00:9d via bge0
+    unsub dhcpd
+    Subscription removed for : dhcpd
+
+## El Fin.

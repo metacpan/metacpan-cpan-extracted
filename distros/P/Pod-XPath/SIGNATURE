@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.27.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1220e773630c0f74d309cdba67429ec373b1e2ec Changes
+SHA1 d4f71c2977ca036e7a82d5cc1ef420f294503220 MANIFEST
+SHA1 5b662aa37d4dc77e37257eb5565a89bf7cde03cf MANIFEST.SKIP
+SHA1 855265689f7440dea03598e6652414ae2d5a0bc5 META.yml
+SHA1 d46537048749863f3fe5b0e24c16f02ae27236e9 Makefile.PL
+SHA1 0b79586ec569f80f2fbaa727737527ce17c2848b README
+SHA1 81b01d35738b1754f7cec449ad1e0c0708da9172 lib/Pod/XPath.pm
+SHA1 e39b4fe7f9d89e5be7097580a1dcbdfe59463bf5 t/00load.t
+SHA1 13cad91846a2fe9ebb6b1b86bc8aaded7b7a1751 t/01pod.t
+SHA1 1bfcc990d166da8389dcd2402abe47bede6e1dcc t/03xpaths.t
+SHA1 0616b9dd329dbee3f05457ce68fa54576768d9e7 t/04module.t
+SHA1 feba184956cf5bfe124dc196f913da1e2a14800d t/data/urifind.pod
+SHA1 94fd969de91d3b3329e298bd6e62df70454545b7 t/data/xml.pod
+SHA1 802969b9d5a2652e67e1ac5231d95e95ce728fcb t/data/xml.xml
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+Comment: This message is digitally signed and can be verified for authenticity.
+
+iD8DBQE/cuFWzsinjrVhZaoRAo48AJ47OinNS+57Q7CUDma4kvor2njdmACfT11Y
+Jh+4q8KuADZBGQ/nRd7r1b0=
+=YWZO
+-----END PGP SIGNATURE-----

@@ -1,0 +1,21 @@
+severity = harsh
+
+# RequireArgUnpacking
+#     Doesn't allow for using shift to get $self and then using @_ with named params
+# ProhibitImplicitNewlines
+#     Doesn't let me do qq|| blocks.
+# ProhibitConstantPragma
+#     Constants are used for compatibility reasons.
+exclude = RequireArgUnpacking ProhibitImplicitNewlines ProhibitConstantPragma
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs
+
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = redefine
+
+[NamingConventions::ProhibitAmbiguousNames]
+forbid = close last
+
+[Modules::ProhibitExcessMainComplexity]
+max_mccabe = 30

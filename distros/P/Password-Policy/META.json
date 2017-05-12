@@ -1,0 +1,66 @@
+{
+   "abstract" : "Make managing multiple password strength profiles easy",
+   "author" : [
+      "Andrew Nelson <anelson@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Password-Policy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "Clone" : "0",
+            "Config::Any" : "0",
+            "String::Multibyte" : "0",
+            "Try::Tiny" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "YAML" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/holophrastic/password-policy/issues"
+      },
+      "homepage" : "https://github.com/holophrastic/password-policy",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/holophrastic/password-policy.git",
+         "web" : "https://github.com/holophrastic/password-policy"
+      }
+   },
+   "version" : "0.04"
+}
+

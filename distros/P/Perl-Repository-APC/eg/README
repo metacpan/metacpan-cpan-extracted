@@ -1,0 +1,43 @@
+All scripts in this directory are for demonstration only. Use with
+care, which means, read the source before use.
+
+Makefile
+
+    this is what I have in the build directory above APC. One call to
+    make(1) fetches the latest patches for the branches I want to
+    watch and builds bleading perl. The cleanup procedure at the end
+    is quite interesting, it uses rm-rf-allbutlatest.pl,
+    thinnercache.pl and trimtrees.pl
+
+configdiff.pl
+
+    Takes as argument two perls and shows the difference in their
+    Config.pm files.
+
+rm-rf-allbutlatest.pl
+
+    Removes all build but the latest directories used by buildaperl in
+    the current directory.
+
+test_full_apc.pl
+
+    I used this to test if I can at least patch up to any version we
+    have in the repository. I didn't configure and compile them all
+    though. This would take a whole day or more.
+
+thinnercache.pl
+
+    Removes perls from the cache in stalled-perls/. Scans the cache
+    and suggests to remove the perls first that are close to each
+    other, historically. Has the --max option to run as a batch job.
+
+trimtrees.pl
+
+    Replaces identical files in the cache with hard links. Of course
+    it only works where hard links work.
+
+zgrep-all-diffs.pl
+
+    On my system the maximum argument list is exceeded when I say
+    C<APC/**/diffs/*.gz>. So I wrote this small perl script to quickly
+    zgrep all diff files.

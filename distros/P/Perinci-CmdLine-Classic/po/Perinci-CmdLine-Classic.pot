@@ -1,0 +1,123 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR perlancar@cpan.org
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Perinci-CmdLine-Classic 1.57\n"
+"Report-Msgid-Bugs-To: perlancar@cpan.org\n"
+"POT-Creation-Date: 2015-09-18 14:39+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Perinci/CmdLine/Classic.pm:123
+#, perl-format
+msgid "Enter %s:"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic.pm:184
+msgid "Equivalent to --format=json-pretty"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic.pm:188
+msgid "When outputing as JSON, strip result envelope"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic.pm:192
+msgid "Pass options to formatter"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic.pm:238
+msgid "List actions history"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic.pm:248
+msgid "Clear actions history"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic.pm:258
+msgid "Undo previous action"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic.pm:268
+msgid "Redo previous undone action"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic.pm:353
+msgid "Run in simulation mode (also via DRY_RUN=1)"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic.pm:572
+msgid "There are no subcommands"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic.pm:602
+#, perl-brace-format
+msgid "{category} subcommands"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic.pm:603
+msgid "main"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic.pm:633 lib/Perinci/CmdLine/Classic.pm:642
+#: lib/Perinci/CmdLine/Classic.pm:654 lib/Perinci/CmdLine/Classic.pm:663
+#, perl-brace-format
+msgid "{program} version {version}"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:135
+msgid "--cmd=<other-subcommand> [options]"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:138
+msgid "<subcommand> [options]"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:146
+msgid "Usage"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:183
+msgid "Options"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:185
+#, perl-brace-format
+msgid "{category} options"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:278
+msgid "Popular subcommands"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:278
+msgid "Subcommands"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:316
+msgid "For more complete help, use '--help --verbose'"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:320
+msgid "To see all available subcommands, use '--subcommands'"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:335
+msgid "Description"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:347
+msgid "Examples"
+msgstr ""
+
+#: lib/Perinci/CmdLine/Classic/Role/Help.pm:414
+msgid "Result"
+msgstr ""

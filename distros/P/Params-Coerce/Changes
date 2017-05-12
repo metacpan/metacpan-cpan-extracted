@@ -1,0 +1,50 @@
+Revision history for Perl extension Param::Coerce
+
+0.14 Tue 10 Oct 2006
+	- Moving from old CVS to new SVN repository
+	- Cleaning up tests to remove the File::Spec dependency
+	- Upgrading to Module::Install 0.64
+
+0.13 Fri Jun 10 2005
+	- Converting a number of dies to Carp::croak (like they should be)
+
+0.12 Fri Jun 10 2005
+	- Made ->from work sanely with sub-classes
+
+0.11 Sun Jun  5 2005
+	- Added the ->from constructor to be imported
+	- Converted to Params::Util
+
+0.10 Sat Apr 23 2005
+	- Allowing param coercion methods to also work as functions
+
+0.09 Fri Apr 22 2005
+	- Updating the author email to that META.yaml doesn't break
+
+0.08 Fri Apr 22 2005
+	- Moved to Params::Coerce in line with other similar modules
+
+0.07 Tue Feb 15 2005
+	- Removing braindead Build.PL
+
+0.06  Mon Oct 11 2004
+	- Fixed a class loading bug
+
+0.05  Wed Oct  6 2004
+	- Moved to a more flexible hint format
+
+0.04  Sun Oct  4 2004
+	- Added support for __from methods
+	- Cut load overhead down to 52k
+
+0.03  Sat Oct  3 2004
+	- Cut load overhead down to 56k
+
+0.02  Sat Oct  3 2004
+	- Tried to make the documentation a bit more readable
+
+0.01  Sat Oct  2 2004
+	- Completed the first implementation
+
+0.01_01 Sat Oct  2 2004
+	- Create the specification for the module

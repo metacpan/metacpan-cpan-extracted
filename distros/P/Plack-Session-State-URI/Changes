@@ -1,0 +1,16 @@
+Revision history for Perl extension Plack::Session::State::URI
+
+0.06 2013-10-01T03:52:14Z
+        - added metayml_declares_perl_version
+
+0.05 2013-10-01T03:35:21Z
+        - minil migrate
+
+0.04 2013-07-30T06:33:45Z
+        - remove MYMETA and .gitignore (charsbar)
+
+0.03 2013-02-27T02:46:17Z
+        - fix bug 'tempdir' can't be called as a method at t/01_uri.t line 12.
+
+0.01 2011-12-07T10:43:42Z
+        - original version

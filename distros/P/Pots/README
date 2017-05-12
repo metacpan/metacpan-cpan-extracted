@@ -1,0 +1,26 @@
+README for Pots - Perl ObjectThreads
+
+This module collection aims to provide an object-oriented way
+of working with Perl ithreads.
+
+Current features are:
+
+- Inter-thread communication through messages and message-queues
+- A simple "MethodServer" class that exposes a standard class to
+  other threads. Method calls are automatically handled.
+  (Kind of RPC for threads)
+
+******
+IMPORTANT NOTE:
+You must have at least Perl 5.8.0 compiled with interpreter threads.
+These modules have only been tested on Perl 5.8.3.
+
+******
+Copyright (c) 2004 Remy Chibois <rchibois@free.fr>. All rights reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+******
+Required modules:
+    Storable
+

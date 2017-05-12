@@ -1,0 +1,25 @@
+=pod
+
+=head1 This is a lovely example
+
+I have some text up in here, I think people really need to hear this message.
+
+It is sure to make them happier overall
+
+=head2 It is up to you
+
+The way to change things is to go out and change them.
+
+=head2 People will help you
+
+After a while, a good message can be seen to be good, and people will be willing to chip in.
+
+=head2 Your numbers will grow
+
+The more people see your message for what it is, the more people will join.
+
+=head1 you are the same decaying organic matter as the rest of us
+
+... but that's ok.
+
+=cut

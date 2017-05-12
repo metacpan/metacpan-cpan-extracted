@@ -1,0 +1,13 @@
+---
+comment: |
+
+  Crypt::IDEA needs a patch to install in gcc4 Strawberry Perl (RT# 55158)
+
+match:
+  distribution: |
+    ^(?x:
+    .^   # never matches, only purpose is to let things align nicely
+    |DPARIS/Crypt-IDEA-1.08.tar.gz          # Needs a patch to install.
+    )|
+patches:
+    - "Crypt-IDEA-1.08.patch"

@@ -1,0 +1,14 @@
+# ------------------------------------------------------------------------------
+# .shipit
+# ------------------------------------------------------------------------------
+steps = FindVersion, ChangeVersion, CheckChangeLog, Manifest, DistTest, Commit, Tag, MakeDist, DistClean
+
+#       FindVersion, ChangeVersion, CheckChangeLog, CheckVersionsMatch, DistTest, Commit, Tag, MakeDist, DistClean
+
+git.tagpattern = %v
+git.push_to = origin
+
+CheckChangeLog.files = Changes
+# ------------------------------------------------------------------------------
+# End of file
+# ------------------------------------------------------------------------------

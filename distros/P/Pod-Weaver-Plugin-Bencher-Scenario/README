@@ -1,0 +1,106 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [-Bencher::Scenario]
+     ;exclude_module=Foo
+
+DESCRIPTION
+
+    This plugin is to be used when building Bencher::Scenario::*
+    distribution. Currently it does the following:
+
+    For each lib/Bencher/Scenario/* module files:
+
+      * Add a Synopsis section (if doesn't already exist) containing a few
+      examples on how to use the scenario
+
+      * Add a description about Bencher in the Description section
+
+      * Add a Benchmark Participants section containing list of
+      participants from the scenario
+
+      * Add a Sample Benchmark Results containing result from a bencher run
+
+      Both normal benchmark and a separate module startup benchmark (if
+      eligible) are run and shown.
+
+      * Add a Benchmarked Modules section containing list of benchmarked
+      modules (if any) from the scenario and their versions
+
+      * Create lib/Bencher/ScenarioR/* module files that contain sample
+      benchmark result data
+
+      These module files contain the raw data, while the Sample Benchmark
+      Results POD section of the scenario module contains the formatted
+      result. The raw data might be useful later. For example I'm thinking
+      of adding a utility later, perhaps in the form of an lcpan
+      subcommand, that can guess whether a module is relatively fast or
+      slow (compared to similar implementations, which are other
+      participants on benchmark scenarios). The utility can then suggest
+      faster alternatives.
+
+    For each lib/Bencher/Scenario/* module files:
+
+      * Add list of scenario modules at the beginning of Description
+      section
+
+CONFIGURATION
+
+ include_module+ => str
+
+    Filter only certain scenario modules. Can be specified multiple times.
+
+ exclude_module+ => str
+
+    Exclude certain scenario modules. Can be specified multiple times.
+
+ sample_bench+ => hash
+
+    Add a sample benchmark. Value is a hash which can contain these keys:
+    title (specify title for the benchmark), args (hash arguments for
+    bencher()) or file (instead of running bencher(), use the result from
+    JSON file). Can be specified multiple times.
+
+ bench => bool (default: 1)
+
+    Set to 0 if you do not want to produce any sample benchmarks (including
+    module startup benchmark).
+
+ bench_startup => bool (default: 1)
+
+    Set to 0 if you do not want to produce module startup sample benchmark.
+
+ gen_html_tables => bool (default: 0)
+
+ result_split_fields => str
+
+    If specified, will split result table into multiple tables using the
+    specified fields (comma-separated). For example:
+
+     result_split_fields = dataset
+
+    or:
+
+     result_split_fields = participant
+
+    Note that module startup benchmark result is not split.
+
+ chart => bool (default: 0)
+
+    Whether to produce chart or not. The chart files will be stored in
+    share/images/bencher-result-N.png where N is the table number.
+
+    Note that this plugin will produce this snippets:
+
+     # IMAGE: share/images/bencher-result-N.png
+
+    and you'll need to add the plugin Dist::Zilla::Plugin::InsertDistImage
+    to convert it to actual HTML.
+
+SEE ALSO
+
+    Bencher
+
+    Dist::Zilla::Plugin::Bencher::Scenario
+

@@ -1,0 +1,66 @@
+############################################################
+#
+#   $Id: Examples.pm 756 2006-08-24 22:30:54Z nicolaw $
+#   Parse::DMIDecode::Examples - Examples using Parse::DMIDecode::Examples
+#
+#   Copyright 2007 Nicola Worthington
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+############################################################
+# vim:ts=4:sw=4:tw=78
+
+=pod
+
+=head1 NAME
+
+Parse::DMIDecode::Examples - Examples using Parse::DMIDecode::Examples
+
+=head1 EXAMPLES
+
+=head2 Example 1: Find the Number of Physical CPUs
+
+ use strict;
+ use Parse::DMIDecode qw();
+ 
+ my $dmi = Parse::DMIDecode->new( nowarnings => 1 );
+ $dmi->probe;
+ 
+ my $physical_cpus = 0;
+ for my $handle ($dmi->get_handles(group => "processor")) {
+     my $type = ($handle->keyword("processor-type") or "");
+     next unless $type =~ /Central Processor/i;
+ 
+     # Check the status of the cpu
+     my $status = ($handle->keyword("processor-status") or "");
+     if ($status !~ /Unpopulated/i) {
+         $physical_cpus++;
+     }
+ }
+ 
+ printf("There %s %d physical %s in this machine.\n",
+         ($physical_cpus == 1 ? "is" : "are"),
+         $physical_cpus,
+         ($physical_cpus == 1 ? "CPU" : "CPUs"),
+     );
+
+=head1 COPYRIGHT
+
+Copyright 2007 Nicola Worthington.
+
+This software is licensed under The Apache Software License, Version 2.0.
+
+L<http://www.apache.org/licenses/LICENSE-2.0>
+
+=cut
+

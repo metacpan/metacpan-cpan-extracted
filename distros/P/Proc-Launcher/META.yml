@@ -1,0 +1,32 @@
+---
+abstract: 'yet another forking process controller'
+author:
+  - 'Alex White <VVu@geekfarm.org>'
+build_requires:
+  File::Temp: '0'
+  IO::File: '0'
+  Test::More: '0.88'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Proc-Launcher
+requires:
+  Carp: '0'
+  File::Path: '0'
+  File::Tail: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::Types::MooseLike::Base: '0'
+  POSIX: '0'
+  Privileges::Drop: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: http://github.com/wu/Proc-Launcher
+version: 0.0.37

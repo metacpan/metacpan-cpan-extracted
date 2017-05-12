@@ -1,0 +1,56 @@
+Changes file for Perl::Critic::Policy::logicLAB::ProhibitShellDispatch
+
+0.05 2015-08-20
+
+- Upgraded from artistic license 1.0 to artistic license 2.0
+
+- Migrated from Module::Build to Dist::Zilla
+
+- Updated coverage report
+
+- Fixed bug in URL pointing to bug reporting facility [PCPLPSD-10]
+
+  https://logiclab.jira.com/browse/PCPLPSD-10
+
+
+0.04 2014-01-24
+
+- Specified minimum version of Perl (5.8.0) in Build.PL for meta consumption
+  and kwalitee (cpants gaming)
+
+- Changed repository to Github
+
+
+0.03 2013-12-27 Bug fix release, update recommended
+
+- Specified minimum version of Perl (5.8.0)
+
+- Addressed bug report: RT:91542, Net::OpenSSH's system method would trigger a violation [PCPLPSD-7]
+
+  https://rt.cpan.org/Public/Bug/Display.html?id=91542
+  https://logiclab.jira.com/browse/PCPLPSD-8
+
+- Added changes.t automatic assertion of the integrity of the Changes file, 
+  see also PCPLPSD-5 [PCPLPSD-6]
+
+  https://logiclab.jira.com/browse/PCPLPSD-6
+
+
+0.02 2013-07-25 Maintenance release, update not required
+
+- Changes Perl::Critic theme to logicLAB as default [PCPLPSD-3]
+
+  https://logiclab.jira.com/browse/PCPLPSD-3
+
+- Adding a Changes file as part of my Questhub quest adhering to the standard
+  described in: CPAN::Changes::Spec [PCPLPSD-5]
+
+  Quest: http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
+  Spec: https://metacpan.org/module/CPAN::Changes::Spec
+  
+  https://logiclab.jira.com/browse/PCPLPSD-5
+
+
+0.01 2011-04-11 Initial release
+
+- Initial release

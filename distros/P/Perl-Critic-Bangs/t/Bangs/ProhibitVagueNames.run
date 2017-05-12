@@ -1,0 +1,44 @@
+## name basic completeness
+## failures 5
+## cut
+
+my $data = 'foo';
+my $obj = bless {}, 'Class::Name';
+my $target_user = "Named well";
+my $tmp = 12;
+my $temp = $a;
+my $var = "Duh, it's a var.";
+my $data2 = "This will not fail, but will be picked up by ProhibitNumberedNames";
+
+#-----------------------------------------------------------------------------
+
+## name all forms
+## failures 3
+## cut
+
+my $var = 'crap';
+my @var = qw( crap crap );
+my %var = ( crap => 'crap' );
+
+#-----------------------------------------------------------------------------
+
+## name add from config
+## failures 2
+## parms { add_names => 'unspecific vague mumbly' }
+## cut
+
+my $unspecific = 'crap';
+my $data = 'bonzo';
+
+#-----------------------------------------------------------------------------
+
+## name replace from config
+## failures 1
+## parms { names => 'unspecific vague mumbly' }
+## cut
+
+my $unspecific = 'crap';
+my $data = 'bonzo';
+
+#-----------------------------------------------------------------------------
+

@@ -1,0 +1,37 @@
+Changes for PDL::IO::DBI
+
+0.012   2016/12/19
+        - handle numeric timezones west of Greenwich + numeric timezones
+          with non-integral number of hours (contibuted by Christian Carey)
+
+0.011   2016/12/16
+        - Makefile.PL tuning
+
+0.010   2016/05/15
+        - support for fetching rows chunk by chunk (new param: reuse_sth)
+
+0.009   2015/10/16
+        - fixed uselongdouble troubles
+        - require PDL 2.014 (otherwise some longlong related tests fail)
+
+0.008   2015/10/16
+        - rdbi1D: stores column names to output piddles as $pdl->hdr->{col_name}
+        - rdbi1D: PDL::DateTime support, type=>'datetime' + autodetection via type=>'auto'
+
+0.007   2015/09/10
+        - support for DATETIME, TIMESTAMP, DATE
+        - require PDL 2.006 as we need unpdl()
+
+0.006   2014/11/26
+        - perl 5.8.9 compatibility
+
+0.005   2014/11/26
+        - doc improvements
+        - replace die() with croak()
+        - better warnings for perls without 64bitint
+
+0.004   2014/11/25
+        - documentation changes
+
+0.003   2014/11/24
+        - first public release

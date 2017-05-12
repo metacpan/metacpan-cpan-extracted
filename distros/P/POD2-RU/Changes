@@ -1,0 +1,341 @@
+Revision history for POD2-RU
+
+5.18.0.1.83  2016-07-04 00:45:03 MSK
+
+           * change irc to #ru.pm
+5.18.0.1.82  2015-08-27 10:43:30 MSK
+
+           * перевел perlmod
+           * через месяц к #cpanday
+           * было не просто и полезно
+5.18.0.1.81  2015-07-30 00:33:34 MSK
+
+           * закончил перевод 
+           * perlpodstyle - Руководство по стилю Perl POD
+5.18.0.1.80  2015-07-26 13:55:34 MSK
+
+           * поправил явные ляпы в perlunitut
+5.18.0.1.79  2015-07-26 13:05:25 MSK
+
+           * закончил перевод perlunitut
+5.18.0.1.78  2015-07-08 02:49:41 MSK
+
+           * поправил заголовки и причесал дистрибутив
+5.18.0.1.77  2015-07-07 18:58:33 MSK
+           * закончил перевод perldebtut.pod
+           * есть варианты для его улучшеня, сообщить Ричарду Фоли
+           * поправил хэш, который выдает функция pod_info,
+           * синхронизировав его с текущими файлами
+5.18.0.1.76  2015-07-01 00:59:31 MSK
+
+           * поприветствуем нового переводчика
+           * Андрея Асякина C<< <asan999 at gmail.com> >>
+           * он помог перевести perlootut
+5.18.0.1.75  2015-06-29 02:32:46 MSK
+
+           * для https://twitter.com/backendsecret
+           * делаю новый релиз, перевожу perlootut
+5.18.0.1.74  2015-06-25 00:39:49 MSK
+
+           * перевел perlreftut
+           * добавил новых переводчиков
+5.18.0.1.73  2015-06-21 23:47:15 MSK
+
+           * удалил непереведенные pod файлы
+           * добавил 
+           * - perlootut - Object-Oriented Programming in Perl Tutorial
+           * - perlopentut - simple recipes for opening files and pipes in Perl
+           * - perlreftut - Mark's very short tutorial about references
+           * - perlpacktut - tutorial on pack and unpack
+           * - perldebtut - Perl debugging tutorial
+           * - perlthrtut - Tutorial on threads in Perl
+           * - perlhacktut - Walk through the creation of a simple C code patch
+           * http://mail.pm.org/pipermail/moscow-pm/2015-June/019810.html
+5.18.0.1.72  2015-06-13 15:14:55 MSK
+
+           * закончил перевод perlre, нужно думать, что переводить дальше
+5.18.0.1.71  2015-06-08 21:39:11 MSK
+
+           * уже 80% perlre перевел, осталось чуть-чуть
+           * добавил доки с юникодом, это нужно будет перевести в 
+           * ближайшем будущем
+5.18.0.1.70  2015-05-23 04:54:57 MSK
+
+           * уже 50% perlre перевел, но этого мало
+           * perl -E "say sprintf('%02d%%',1/(2562/1320)*100)"
+           * 70-й релиз, с 70-й годовщиной победы в 
+           * Великой Отечественной Войне
+5.18.0.1.69  2015-05-20 00:53:27 MSK
+
+           * теперь будет нормальное оглавление модулей
+           * perlre перевожу, вперед YAPC Russia 2015
+5.18.0.1.68  2015-05-14 07:57:09 MSK
+
+           * perlre перевожу, вперед YAPC Russia 2015
+           * http://event.yapcrussia.org/yr2015/
+           * вперед Паша Щербинин
+           * мою презентацию перенесли на 17 мая - отлично!!
+5.18.0.1.67  2015-05-04 02:08:58 MSK
+
+           * perlre перевалил за 1000, Ура!!
+5.18.0.1.66  2015-04-29 00:32:54 MSK
+
+           * удалил ненужные зависимости
+           * попереводил perlre
+5.18.0.1.65  2015-04-27 23:17:55 MSK
+
+           * удалил ненужные тесты
+           * добавил для будущего перевода perlglossary.pod
+5.18.0.1.64  2015-04-17 00:22:21 MSK
+           * правил cpanfile пока не прошел build в travis ci
+5.18.0.1.63  2015-04-16 23:31:28 MSK
+           * предыдущий трюк не помог, будем 
+           * setlocale(LC_CTYPE, "en_US.UTF-8") or skip("no such locale", 1) if langinfo(CODESET) ne 'UTF-8';
+5.18.0.1.62  2015-04-16 22:19:21 MSK
+           * похоже поборол тесты 
+           * use POSIX qw(setlocale LC_CTYPE); 
+           * my $locale ='ru_RU.UTF-8';# "Russian_Russia.1251";
+           * setlocale (LC_CTYPE, $ENV{LC_CTYPE} = $locale) or plan skip_all => "cannot set locale to $locale";
+5.18.0.1.61  2015-04-16 00:16:01 MSK
+           * поправил тесты в борьбе с utf8 и "\x{0435}" does not map to iso-8859-1
+5.18.0.1.60  2015-04-14 23:03:41 MSK
+           * удалил тесты utf из-за них падают тесты на некоторых юниксах
+           * юбилейный 60-й релиз
+5.18.0.1.59  2015-04-12 04:24:23 MSK
+           * поправил версию Test::Warn
+5.18.0.1.58  2015-04-12 04:11:30 MSK
+           * coverage 100% done!
+5.18.0.1.57  2015-04-12 03:33:17 MSK
+
+           * добавил в travis
+           * PERL5OPT=-MDevel::Cover=-coverage,statement,branch,condition,path,subroutine prove -lrsv t;
+           * cover -ignore_re '[.]t$|prove'
+5.18.0.1.56  2015-04-12 03:24:07 MSK
+
+           * добил покрытие pod и тестов до 100%
+5.18.0.1.55  2015-04-09 21:39:21 MSK
+
+           * добавил тесты
+5.18.0.1.54  2015-04-09 01:20:07 MSK
+
+           * make milla perltidy
+5.18.0.1.53  2015-04-09 01:10:40 MSK
+
+           * добавил ссылку в badge kwlitee
+5.18.0.1.52  2015-04-09 00:53:02 MSK
+
+           * добавил переносы строк после =item
+5.18.0.1.51  2015-04-09 00:36:00 MSK
+           * спасибо zoffixznet исправил перевод perlreref
+           * насчет применения буквы m в регексах
+           * красиво отформатировал участников проекта
+           * исправил perlreref про происк с m и без
+           * добавил test scripts for 100% coverage
+5.18.0.1.50  2015-04-06 01:33:36 MSK
+
+           * перезалил тесты, как у https://github.com/oklahomer/p5-Facebook-OpenGraph
+           * переводил perlre
+5.18.0.1.49  2015-03-30 04:04:36 MSK
+
+           * удалил ненужные =for HTML
+5.18.0.1.48  2015-03-30 03:58:12 MSK
+
+           * add cpants badge thanks to FAYLAND++
+5.18.0.1.47  2015-03-30 02:31:47 MSK
+
+           * перевел еще 1 страницу perlre
+5.18.0.1.46  2015-03-29 03:20:23 MSK
+
+           * поправил html бейджика покрытия тестами ;)
+5.18.0.1.45  2015-03-29 03:13:25 MSK
+
+           * add coverage badge! Waw also add to travis.yml
+5.18.0.1.44  2015-03-29 02:50:53 MSK
+
+           * play with travis
+5.18.0.1.43  2015-03-26 12:35:42 MSK
+
+           * добавил ссылку на irc moscowpm
+5.18.0.1.42  2015-03-25 19:39:48 MSK
+
+           * начинаю править безобразный (собственный) перевод perlrun
+5.18.0.1.41  2015-03-25 03:22:21 MSK
+
+           * put badges to top
+5.18.0.1.40  2015-03-25 03:16:51 MSK
+
+           * Try to use
+           * Dist::Zilla::Plugin::GitHubREADME::Badge - Dist::Zilla - add badges to github README.md
+5.18.0.1.39  2015-03-25 02:56:28 MSK
+
+           * Fighting with git:
+           * Updates were rejected because the tag already exists in the remote.
+5.18.0.1.38  2015-03-25 02:52:21 MSK
+
+           * correct badges in readme
+5.18.0.1.37  2015-03-25 02:38:53 MSK
+
+           * add .travis.yml and play with badges ;)
+           * add .perlcritic
+5.18.0.1.36  2015-03-23 22:22:13 MSK
+
+           * add test::Pod to build prereq 
+           * translate perlre 10 lines
+5.18.0.1.35  2015-03-22 01:33:34 MSK
+
+           * Change tag L
+
+5.18.0.1.34  2015-03-22 01:20:57 MSK
+
+           * Change code for perlcritic -1 -verbose 1
+
+5.18.0.1.33  2015-03-20 00:36:52 MSK
+
+           * Translate some perlre, so I want to make new release
+5.18.0.1.32  2015-03-19 04:46:15 MSK
+           * Add author test dependencies to cpanfile
+
+5.18.0.1.31  2015-03-18 21:45:25 MSK
+
+           * Change Changes date format so it's validated http://changes.cpanhq.org/validate ok!
+           * I want to get there http://changes.cpanhq.org/hof (Hall of Fame)
+
+5.18.0.1.30  2015-03-16 23:29:12 MSK
+           * Translate half a page from perlre due to Unicode
+           * Add format to pod
+
+5.18.0.1.29  2015-03-15 22:02:52 MSK
+
+           * Change additions Authors to Contributors
+
+5.18.0.1.28  2015-03-15 20:11:20 MSK
+
+           * Change Synopsis due to test synopsys.yt ok
+
+5.18.0.1.27  2015-03-15 02:08:51 MSK
+
+           * Add Test::Pod as prereq 
+           * according to http://cpants.cpanauthors.org/dist/POD2-RU/errors
+
+5.18.0.1.26  2015-03-15 01:16:57 MSK
+
+           * Продолжаю перевод perlre
+           * Изменил ссылку на проект github в Readme
+
+
+5.18.0.1.25  2015-03-13 23:59:38 MSK
+
+           * Change cpanfile add build section
+
+5.18.0.1.24  2015-03-12 21:40:39 MSK
+
+           * Поправил perlnewmod, добавил тег L<ссылка> вокруг названий модулей
+
+5.18.0.1.23  2015-03-12 21:32:38 MSK
+
+           * Доперевел perlnewmod, хоть эта документация и устарела
+
+5.18.0.1.22  2015-03-12 00:18:23 MSK
+           [Spec Changes]
+           * Исправил 1 букву в Changes
+
+5.18.0.1.21  2015-03-11 23:34:39 MSK
+
+           * Улучшил перевод у
+           * a2p.pod
+           * perl.pod
+           * perlbook.pod
+           * perlcheat.pod
+           * perldoc.pod
+           * перевел Acme Transmogrifier
+           * как Акме Трансмогрифиер 
+           * (Acme Transmogrifier, Acme - выдуманная мультяшная компания, Transmogrifier - преобразователь меча в Diablo 2)
+           * в perlintro.pod
+	
+5.18.0.1.20  2015-03-09 23:42:40 MSK
+
+           * Добавил отсутствующие зависимости по pull request 
+           * https://github.com/mishin/POD-to-RU/issues/1
+
+5.18.0.1.19  2015-03-09 23:17:41 MSK
+
+           * Поправил merge конфликт
+           
+5.18.0.1.18  2015-03-09 23:13:41 MSK
+
+           * Поправил pod разметку в разделе АВТОРЫ
+
+5.18.0.1.17  2015-03-09 21:52:46 MSK
+
+           * Перевел ABSTRACT на русский язык
+
+5.18.0.1.16  2015-03-09 20:41:14 MSK
+
+           * Figth with Dist::Milla
+           * Finished translate perlretut
+
+5.18.0.1.15  2015-02-23 20:11:20 MSK
+
+           * Convert to Dist::Milla
+           * perlretut translating finished
+      
+5.18.0.1.14  2014-10-21 20:11:20 MSK
+ 
+           * Added translation perlsecret.pod
+
+5.18.0.1.13  2014-10-01 20:11:20 MSK
+ 
+           * Added translation perlreref.pod
+           
+5.18.0.1.12  2014-09-23 20:11:20 MSK
+ 
+           * Russian language (utf8) is not not possible in readme
+           * Minor changes
+           * Format of Changes changed ;)
+
+5.18.0.1.11  2014-09-22 20:11:20 MSK
+ 
+           * Added translation perlrequick.pod
+           
+5.18.0.1.10  2013-09-24 20:11:20 MSK
+           [Spec Changes]
+           * Add correct distribution version
+ 
+5.18.0.1.9  2013-09-24 20:11:20 MSK
+           [Spec Changes]
+           * Change file Changes according to CPAN::Changes
+
+5.18.0.1.8  2013-09-02 20:11:20 MSK
+
+           * Added new thanks, 01pod.t 
+           * Test pod documentation
+
+5.18.0.1.7  2013-07-28 20:11:20 MSK
+
+           * Add POD2::ES to see also, it's my fault, my sincere apologies to Enrique Nell
+
+5.18.0.1.6  2013-07-28 20:11:20 MSK
+
+           * Add changes from Anton Nikishaev<me@lelf.lu>
+
+5.18.0.1.5  2013-07-28 20:11:20 MSK
+
+           * Remove russian language from Build.PL
+
+5.18.0.1.4  2013-07-28 20:11:20 MSK
+
+           * Add link to Makefile.PL git repository  https://github.com/mishin/perldoc-ru.git
+
+5.18.0.1.3  2013-07-28 20:11:20 MSK
+
+           * Move to Build.PL    http://blogs.perl.org/users/chorny/2011/07/how-to-get-rid-of-withoutworldwriteables.html
+
+5.18.0.1.2  2013-07-27 20:11:20 MSK
+
+           * Added  perlcheat.pod
+           * Added  perlnewmod.pod
+
+5.18.0.1.1  2013-07-02 20:11:20 MSK
+
+           * Initial release
+           * Anatoliy Sharifullin agreed that i can use already translated code from https://github.com/sharifulin/pod2-ru/blob/master/RU.pm

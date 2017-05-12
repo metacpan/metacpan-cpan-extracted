@@ -1,0 +1,108 @@
+
+=0.40
+
+
+=Preface
+
+These are just \I<ideas>. Possibly not everything in this list
+will be implemented, and probably these notes do not describe
+all features which might be on the way ;-). Further ideas are welcome.
+
+If you you like an idea especially, please let us now to accelerate
+implementation if possible. If you like it so much that you want to
+implement it yourself, this might be possible - please contact us.
+
+
+=General
+
+* Bodyless macro call before a new chapter inserts an additional headline (delayed "=")
+  when the macro opens an included file and produces additional paragraphs.
+
+* add tests for the \C<_cnd>_ option (both for generic tags declared by modules and the builtin
+  ones like \C<\\INCLUDE>, \C<\\EMBED> and \C<\\TABLE>)
+
+* publish a collection of example filters
+
+* publish a collection of example code
+
+* improve the SourceForge project homepage, include areas for user provides macros, filters,
+  code, examples etc.
+
+* The Emacs 19.x lisp file does not work under Emacs 21.x. I made a workaround, but it
+  still produces an error message. Check if it still works with older Emacs versions, and
+  try to remove the error message.
+
+
+=pp2pod
+
+* complete? (may be sufficient enough as a demonstration ...)
+
+* apply interface to pp2sdf;
+
+
+=pp2pp
+
+* find out why a first transformation of this TODO file
+  differs from subsequent ones by a trailing whitespace;
+
+* complete target mode 3;
+
+* implement target modes 2 and 1;
+
+* apply interface to pp2sdf;
+
+
+=pp2sdf
+
+* add index (based on \\INDEX);
+
+* add documentation in PerlPoint format;
+
+* include tests;
+
+
+=Parser: Cache
+
+* old cache typically delays processing (with lots of dynamisation), remove it
+
+* implement a new file based cache, store
+
+>
+
+* stat() data
+
+* path
+
+* entry checksums for all dynamic parts: macros, code, variables, filters, ... (read exception list in old cache doc)
+
+* stream
+
+* updated dynamic parts if they changed (new macros, filters, ... etc.)
+
+<
+
+* exclude
+
+>
+
+* files using \\INCLUDE (ooops!) - this means that only leaves are cached - or can we split up files automatically, virtually building container
+  documents?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

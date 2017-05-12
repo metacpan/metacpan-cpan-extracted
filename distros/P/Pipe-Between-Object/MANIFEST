@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Pipe-Between-Object.t
+lib/Pipe/Between/Object.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,157 @@
+NAME
+    POE::Component::Client::DNSBL - A component that provides non-blocking
+    DNSBL lookups
+
+VERSION
+    version 1.08
+
+SYNOPSIS
+      use strict;
+      use POE qw(Component::Client::DNSBL);
+
+      die "Please provide at least one IP address to lookup\n" unless scalar @ARGV;
+
+      my $dnsbl = POE::Component::Client::DNSBL->spawn();
+
+      POE::Session->create(
+            package_states => [
+                'main' => [ qw(_start _stop _response) ],
+            ],
+            heap => {
+                      addresses => [ @ARGV ],
+                      dnsbl => $dnsbl
+            },
+      );
+
+      $poe_kernel->run();
+      exit 0;
+
+      sub _start {
+         my ($kernel,$heap) = @_[KERNEL,HEAP];
+         $heap->{dnsbl}->lookup(
+            event => '_response',
+            address => $_,
+         ) for @{ $heap->{addresses} };
+         return;
+      }
+
+      sub _stop {
+         my ($kernel,$heap) = @_[KERNEL,HEAP];
+         $kernel->call( $heap->{dnsbl}->session_id(), 'shutdown' );
+         return;
+      }
+
+      sub _response {
+         my ($kernel,$heap,$record) = @_[KERNEL,HEAP,ARG0];
+         if ( $record->{error} ) {
+            print "An error occurred, ", $record->{error}, "\n";
+            return;
+         }
+         if ( $record->{response} eq 'NXDOMAIN' ) {
+            print $record->{address}, " is okay\n";
+            return;
+         }
+         print join( " ", $record->{address}, $record->{response}, $record->{reason} ), "\n";
+         return;
+      }
+
+DESCRIPTION
+    POE::Component::Client::DNSBL is a POE component that provides
+    non-blocking DNS blacklist lookups to other components and POE sessions.
+    It uses POE::Component::Client::DNS to perform the requested queries.
+
+    Only IPv4 lookups and URI/RHS lookups are supported and unless a DNSBL
+    zone is specified the component will use zen.spamhaus.org.
+
+CONSTRUCTOR
+    "spawn"
+        Takes a number of parameters:
+
+          'alias', set an alias that you can use to address the component later;
+          'options', a hashref of POE session options;
+          'dnsbl', the DNSBL zone to send queries to, default zen.spamhaus.org;
+          'resolver', optionally provide a POE::Component::Client::DNS to use;
+
+        Returns an object.
+
+METHODS
+    "session_id"
+        Takes no arguments. Returns the ID of the component's session.
+
+    "shutdown"
+        Terminates the component.
+
+    "lookup"
+        Performs a DNSBL lookup. Takes a number of parameters:
+
+          'event', the name of the event to send the reply to. ( Mandatory );
+          'address', the IPv4 address or domain to lookup ( Mandatory );
+          'session', send the resultant event to an alternative session, ( default is the sender );
+
+        You may also pass arbitary key/values. Arbitary keys should have an
+        underscore prefix '_'.
+
+        "event" may also be a POE::Session postback.
+
+INPUT EVENTS
+    "shutdown"
+        Terminates the component.
+
+    "lookup"
+        Performs a DNSBL lookup. Takes a number of parameters:
+
+          'event', the name of the event to send the reply to. ( Mandatory );
+          'address', the IPv4 address or domain to lookup ( Mandatory );
+          'session', send the resultant event to an alternative session, ( default is the sender );
+          'dnsbl', optionally override the configured DNSBL for this particular lookup;
+
+        You may also pass arbitary key/values. Arbitary keys should have an
+        underscore prefix '_'.
+
+        "event" may also be a POE::Session postback.
+
+OUTPUT EVENTS
+    The component will send an event in response to "lookup" requests.
+    "ARG0" will be a hashref containing the key/values of the original
+    request ( including any arbitary key/values passed ).
+
+    If a POE::Session postback was specified, then the hashref will be the
+    first parameter of the arrayref given as "ARG1"
+
+      'response', the status returned by the DNSBL, it will be NXDOMAIN if the address given was okay;
+      'reason', if an address is blacklisted, this may contain the reason;
+      'error', if something goes wrong with the DNS lookup the error string will be contained here;
+      'dnsbl', the DNSBL that was used for this request;
+
+AUTHOR
+    Chris "BinGOs" Williams <chris@bingosnet.co.uk>
+
+LICENSE
+    Copyright © Chris Williamss.
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.
+
+SEE ALSO
+    <http://en.wikipedia.org/wiki/DNSBL>
+
+    <http://www.spamhaus.org/zen/>
+
+    <http://www.spamhaus.org/dbl/>
+
+    POE
+
+    POE::Session
+
+    POE::Component::Client::DNS
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

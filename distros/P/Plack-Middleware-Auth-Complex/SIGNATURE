@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 744bb92d193d4721e13ca822d982cbced605b9d6 Changes
+SHA1 2bb207c0461455de5ec04822edfc5102c331415b MANIFEST
+SHA1 5ff185f08027575680d052e8103ead375b696b86 META.json
+SHA1 b6b57c464523c0805ff912ac9fade86c64b6f68d META.yml
+SHA1 4a5ea75757a29ba958f0423edbe9ee8938e65d0a Makefile.PL
+SHA1 c122ee05853d808509b1bd747b358690b5f1ffa0 README
+SHA1 1309341574bb591f57379789677d7d8de513092e authcomplex-passwd
+SHA1 a7af727eead8813af5673bbb79e3711a6369a68c lib/Plack/Middleware/Auth/Complex.pm
+SHA1 b53787d3cfd481df7da3233ca6749053ae4a2cac t/Plack-Middleware-Auth-Complex.t
+SHA1 fa4cca04d35b71b2c9a4d04e5977efb3868f88aa t/perlcritic.t
+SHA1 668d19b0b69a3c41e94bd95235c649e86888549b t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+
+iQJEBAEBCgAuFiEErVNvYICb0H7KK/jxygQ1vl7Bs2IFAljWwVcQHG1hcml1c0Bp
+ZXZhbC5ybwAKCRDKBDW+XsGzYiGOD/9mhxo2JJySiweG8XhwdBOwFpkJlIPJ4JCl
+o9bmb1vXjlXrclwC3azDmLaKRPt7p53fkilhWFcRrPimK8sJbwWt00VUxQlYvIXn
+CbDK6tgO4+vf7Piw+RUxXBgs8hc00/tx8J3QSHi+6M9kSjdE848N1ggYo77tHlS1
++L1J3ggE2R7CJ8MIWQnFJR2cODHEn2pyQXsrawzksWr9DcUgf3HQa0NbkorhCHh8
+8hPpMBjjXoy/ya64yMnfdjMUEotUD71ZWHiFthttfPA0kfzB2GtQVcbOBidSJCst
+80HTY5yrAhyI2+a+SocWIrfCXbV1WK4J6EyZ8QwC2v7K/fxt8TV2RArQSKwqtIHy
+BM4EyqPo4+pC16pm8ZH52MGcjgwI1RrZ5u2TfZGPuz/62yoA0bSCLeMhWHdLsgNK
+tDikooLkLk43gZs5y+3hwFqY+/8xi2+ykzmycjGuZP8n96Jc5QP88dUgmop+3nj5
+94JGLP8KxxQ5b4PAEdt73LMRq4bax0FxlKlhHdJBNMS1lVJs2t1hMvD1OVEm4hHW
+0UIVz7iKttJbA888TNWxDsivHOC/ISTe29yNz/MmhSj2eP9Yfj/5IjC3zWk8LLMU
+GLaF6h0xcZo0TdSrVYJYbmNV1wSQ7DklzTlrrc485KrwYB48Yv/1qux6GMvvkiy3
+EqpznJS5nw==
+=nYU+
+-----END PGP SIGNATURE-----

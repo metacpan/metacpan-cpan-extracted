@@ -1,0 +1,176 @@
+=head1 NAME
+
+PPM::ppd - PPD (Perl package descriptor) file format
+
+=head1 DESCRIPTION
+
+A file format for PPD data files and a class structure to be able to access
+and maniuplate them.
+
+PPD data files are an extended version of the OSD file format.  Being a
+derivative of OSD, PPD files are XML documents.  This document will describe
+the extensions that have been added for PPD as well as show some examples of
+what these files will contain.  Extensions have been added in through the use
+of XML namespaces.
+
+As part of PPM, this module will use the PPM::xml module for parsing the PPD
+files themselves.  For information on what limitations are imposed by that
+module and how PPD files differ from XML documents, please refer to the
+PPM::xml documentation.
+
+=head1 FILE FORMAT
+
+The following tags have been added as PPD extensions to OSD:
+
+B<FILELIST>
+
+The FILELIST element is used to list the files that are present for the
+given package and state where they should be copied.  The file list
+itself can either be given as an attribute ('HREF') of the element, or as
+the data contained within the element.  The format for the file list is:
+
+    from/over/here  to/over/here
+
+Each file that is to be copied 'from' will be the name of the file contained
+within the <CODEBASE> archive.  The path of the file within the archive
+should be given.  The destination of where the file is to be copied to should
+be given as a directory local to the LIB directory for this given Perl
+installation.
+
+Only one FILELIST element may be present for a given IMPLEMENTATION.  Required.
+
+=over 4
+
+=item Attributes
+
+HREF=<URL> - URL pointing to the document which is the file list
+
+=item Child of
+
+IMPLEMENTATION
+
+=back
+
+B<INSTALLSCRIPT>
+
+The INSTALLSCRIPT element is used to define how to install a given package
+of software once it has been obtained and files have been copied to their
+appropriate locations.  The INSTALLSCRIPT element is to be used for
+packages that require some other form of installation beyond simply a
+file copy.  For those packages where copying of files is sufficient, an
+INSTALLSCRIPT is not required.  Note that the INSTALLSCRIPT will be run by
+PPM B<after> files have been copied to their appropriate locations.  The
+script required for installation can either be given as an attribute
+('HREF') of the element, as the data contained within this element, or as
+the name of a file contained within the <CODEBASE> element for this
+installation.  Only one INSTALLSCRIPT element may be present for a
+given implementation.  Optional.
+
+=over 4
+
+=item Attributes
+
+HREF=<URL> - URL to the script used for installation of this package. (optional)
+
+EXEC=<string> - Shell/program to use to execute the script. (required)
+
+CODEBASEFILE=<filename> - File to use as an installation script, which is to be
+found inside the <CODEBASE> file.
+
+=item Child of
+
+IMPLEMENTATION
+
+=back
+
+B<UNINSTALLSCRIPT>
+
+The UNINSTALLSCRIPT element is used to define how to un-install a given
+package of software after it has already been installed.  The UNINSTALLSCRIPT
+element is to be used for packages that require some other form of
+uninstallation beyond simply removing the appropriate files.  For those packages
+where removal of files is sufficient, an UNINSTALLSCRIPT is not required.  Note
+that the UNINSTALLSCRIPT will be run by PPM B<before> any files are removed.
+The script required for this removal can either be given as an attribute
+('HREF') of the element, as the data contained within this element, or as the
+name of a file contained within the <CODEBASE> element for this installation.
+Only one UNINSTALLSCRIPT element may be present for a given implementation.
+Currently unsupported.
+
+=over 4
+
+=item Attributes
+
+HREF=<URL> - URL to the script used for installation of this package. (optional)
+
+EXEC=<string> - Shell/program to use to execute the script. (required)
+
+CODEBASEFILE=<filename> - File to use as an installation script, which is to be
+found inside the <CODEBASE> file.
+
+=item Child of
+
+IMPLEMENTATION
+
+=back
+
+B<AUTHOR>
+
+The AUTHOR element is used to provide the name and e-mail address of the
+author of the package.  This information is required when working with signed
+packages.  Multiple AUTHOR elements may be present for a given package.
+
+=over 4
+
+=item Attributes
+
+NAME=<string> - Full name of author. (required)
+
+EMAIL=<email> - E-mail address of author. (required)
+
+=item Child of
+
+SOFTPKG
+
+=back
+
+=head1 EXAMPLE
+
+<SOFTPKG NAME="PPM::ppm" VERSION="1,0,0,0">
+    <TITLE>PPM::ppm</TITLE>
+    <ABSTRACT>Perl package manager file format</ABSTRACT>
+    <LICENSE HREF="http://www.ActiveState.com/ppm/ppm.html" />
+    <AUTHOR NAME="Dick Hardt" EMAIL="dick_hardt@ActiveState.com" />
+    <AUTHOR NAME="Graham TerMarsch" EMAIL="graham@dotcom.bc.ca" />
+
+    <!-- This is incomplete!!!  This is only the distribution and
+    installation for Unix-type systems.  We're going to need
+    to have a look at how to handle different OSs; do we have
+    different IMPLEMENTATIONs for each, with different INSTALL
+    scripts (some using 'cp', some using 'copy', etc.) or do
+    we do some processing of the installation script internally
+    to determine how to install the software. -->
+
+    <IMPLEMENTATION>
+        <IMPLTYPE VALUE="Perl" />
+        <LANGUAGE VALUE="en" />
+        <CODEBASE HREF="http://www.ActiveState.com/ppm/ppm.pm" />
+
+        <!-- We're dependant on the XML parser -->
+        <DEPENDENCY>
+            <CODEBASE HREF="http://www.ActiveState.com/ppm/xml.ppm" />
+        </DEPENDENCY>
+
+        <!-- Installation for Unix type systems using a remote script -->
+        <INSTALL SCRIPT="http://www.ActiveState.com/ppm/inst.ppm.pm" EXEC="sh" />
+
+        <!-- Uninstallation for Unix type systems using inlined script -->
+<!-- Can we assume that this script will run in the /usr/lib/perl5 directory??? -->
+        <UNINSTALL EXEC="sh">
+            rm PPM/ppm.pm
+        </UNINSTALL>
+    </IMPLEMENTATION>
+</SOFTPKG>
+
+=head1 DTD
+

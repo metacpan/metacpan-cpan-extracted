@@ -1,0 +1,21 @@
+off_t      T_IV
+size_t     T_UV
+ssize_t    T_IV
+time_t     T_IV
+clockid_t  T_IV
+gid_t      T_UV
+uid_t      T_UV
+pid_t      T_IV
+dev_t      T_UV
+mode_t     T_UV
+id_t       T_UV
+int *      T_OPAQUEPTR
+nl_catd    T_PTR
+SysRet0    T_SYSRET0
+
+######################
+OUTPUT
+T_SYSRET0
+    if ($var != -1) {
+        sv_setiv($arg, (IV)$var);
+    }

@@ -1,0 +1,40 @@
+---
+abstract: 'Plack middleware which turns application/json responses into HTML'
+author:
+  - 'Manfred Stock <mstock@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  HTTP::Request::Common: 0
+  Module::Build: 0.3601
+  Plack::Test: 0
+  Plack::Util: 0
+  Test::Class: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-JSON-ForBrowsers
+no_index:
+  file:
+    - perlcritic.rc
+requires:
+  Carp: 0
+  Encode: 0
+  HTML::Entities: 0
+  JSON: 0
+  List::MoreUtils: 0
+  MRO::Compat: 0
+  Plack::Middleware: 0
+  Plack::Util::Accessor: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/mstock/Plack-Middleware-JSON-ForBrowsers.git
+version: 0.002000

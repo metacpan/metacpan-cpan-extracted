@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transactionSearchResult>
+    <date>2014-01-30T01:09:21.000-02:00</date>
+    <transactions>
+        <transaction>
+            <date>2014-01-20T16:37:22.000-02:00</date>
+            <code>00000000-0000-0000-0000-000000000000</code>
+            <recoveryCode>000000000000000000000000000000000000000000000000</recoveryCode>
+            <type>1</type>
+            <grossAmount>1.00</grossAmount>
+        </transaction>
+        <transaction>
+            <date>2014-01-20T16:37:22.000-02:00</date>
+            <code>00000000-0000-0000-0000-000000000000</code>
+            <recoveryCode>000000000000000000000000000000000000000000000000</recoveryCode>
+            <type>1</type>
+            <grossAmount>1.00</grossAmount>
+        </transaction>
+    </transactions>
+    <resultsInThisPage>2</resultsInThisPage>
+    <currentPage>1</currentPage>
+    <totalPages>1</totalPages>
+</transactionSearchResult>

@@ -1,0 +1,10 @@
+Changelog for Prophet-Devel
+
+0.001 2013-05-20T02:52:27
+ [Ioan Rogers <ioanr@cpan.org>]
+ - Added a bootstrap script and basic docs. Don't run xt yet, too many
+   failures
+
+ - Initial commit sets up the Dist::Zilla bundle
+
+

@@ -1,0 +1,119 @@
+<HTML>
+<HEAD>
+<TITLE>present - run a Portable Presenter presentation.</TITLE>
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; present(1)</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>present-ppr(1)</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<A HREF=index.html>PPR</A><BR>
+<B>present&nbsp;(1)</B><BR>
+<P>
+<A HREF=present-ppr1.html>present-ppr(1)</A><BR>
+<A HREF=../xml/present-xml1.html>present-xml(1)</A><BR>
+
+    </TD><TD VALIGN=top>
+
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>present - run a Portable Presenter presentation.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<P><STRONG>present</STRONG> [ <STRONG>-help</STRONG>|<STRONG>-h</STRONG>|<STRONG>-?</STRONG> ] [ <STRONG>-ppr</STRONG>|<STRONG>-xml</STRONG> ] [ <EM>file</EM> ]</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Portable Presenter (PPresenter) is a package designed to give presentations.
+It is written in Perl/Tk only, which is available for UNIX and for Windows.</P>
+<P>The key features of PPresenter are: projection on multiple screens at
+the same time; scales with the size of the display; fully object-oriented,
+which means flexible and extensible.  You can write your slides in a
+perl-program (for maximum flexability), or supply the data in xml.</P>
+<P><CODE>present</CODE> starts a helper program, which depends on the type of input
+you supply.  Portable Presenter presentations can be written in
+Perl (with PPresenter as library) or in XML.</P>
+<P>If you start <CODE>present</CODE> with a filename ending on <CODE>.ppr</CODE>, it is
+considered a perl-program.  When the filename ends with <CODE>.xml</CODE>, it
+is a XML-description of a presentation.  Flags <STRONG>-ppr</STRONG> and <STRONG>-xml</STRONG>
+overrule the filename extentions.  If the type cannot be determined,
+the <CODE>ppr</CODE> extention will be presumed.</P>
+<P>When no filename is supplied, then the standard-input is
+read.</P>
+<DL>
+<DT><STRONG><A NAME="item_%2Dhelp_%5Btype%5D">-help [type]</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%2Dh_%5Btype%5D">-h [type]</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%2D%3F_%5Btype%5D">-? [type]</A></STRONG><BR>
+<DD>
+Show the command-line options.  If you do not specify any type, you will
+get the options of the <CODE>present</CODE> command.  If you specify a type
+flag (<CODE>-ppr</CODE> or <CODE>-xml</CODE>) or when a type can be derived from an
+supplied filename, you get the flags supported for that type of input.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dppr_%5Boptions%5D_%5Bfile%5D">-ppr [options] [file]</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_%5Boptions%5D_file%5B%2Eppr%5D">[options] file[.ppr]</A></STRONG><BR>
+<DD>
+The file contains a PPresenter presentation written as a perl-program.
+You can also start this presentation directly, without use of <CODE>present</CODE>.
+See the manual-page <CODE>present-ppr(1)</CODE> for the options.
+<P>If <CODE>present</CODE> is supplied with a filename without extention, the file is
+considered to be a perl-program.</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dxml_%5Boptions%5D_%5Bfile%5D">-xml [options] [file]</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_file%2Exml">file.xml</A></STRONG><BR>
+<DD>
+The file contains a presentation written in XML.  See the manual-page
+<CODE>present-xml(1)</CODE> for the options.
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>A full documentation in html is included in the package, and available
+on the website: <CODE>http://ppresenter.org</CODE>.</P>
+<P><CODE>present-ppr(1)</CODE>, <CODE>present-xml(1)</CODE>.</P>
+
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

@@ -1,0 +1,5 @@
+TODO list for Perl module POE::Component::Client::LDAP
+
+- See TODO markers in the code
+- Document more callback semantics
+- Implement connection canceling

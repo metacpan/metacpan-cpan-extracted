@@ -1,0 +1,34 @@
+---
+abstract: "Test your application's warnings"
+author:
+  - 'Shawn M Moore C<sartak@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  HTTP::Request::Common: 0
+  Plack::Request: 0
+  Plack::Test: 0
+  Scalar::Util: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Test-StashWarnings
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Plack: 0
+  Storable: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bestpractical/plack-middleware-test-stashwarnings
+version: 0.08

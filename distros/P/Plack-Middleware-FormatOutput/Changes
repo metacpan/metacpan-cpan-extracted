@@ -1,0 +1,35 @@
+Revision history for Plack-Middleware-FormatOutput
+
+0.10  2016-04-11 15:31:02 CEST
+	Added support for websocket
+	Added support for footer
+
+0.09  2016-04-09 17:52:33 CEST
+	Added utf8 encoding
+
+0.08  2016-04-08 10:03:49 CEST
+	Fixed prerequisite
+
+0.07  2016-04-08 00:18:12 CEST
+	Set utf8 encoding for html output
+	Decode query params
+
+0.06  2015-08-28 16:32:58 CEST
+	Set Accept as optional
+
+0.05  2015-04-02 10:18:24 CEST
+	Fixed global mime_type variable
+
+0.04  2015-03-24 02:11:38 CET
+        Switch to Milla
+        Update API to App-REST
+
+0.03    5. Mar 2015
+        Add accept for */*
+
+0.02    10. Feb 2015
+        Fixed accept header
+
+0.01    22. Jan 2015
+        First version.
+

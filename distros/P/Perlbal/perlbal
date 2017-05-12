@@ -1,0 +1,104 @@
+#!/usr/bin/perl -w
+#
+
+=head1 NAME
+
+Perlbal - Reverse-proxy load balancer and webserver
+
+=head1 DESCRIPTION
+
+For now, see example configuration files in conf/ from the CPAN tarball
+
+http://search.cpan.org/dist/Perlbal/
+
+=head1 AUTHORS
+
+ Brad Fitzpatrick, <brad@danga.com>
+ Mark Smith, <marksmith@danga.com>
+
+=head1 SEE ALSO
+
+ http://www.danga.com/perlbal/
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2004, Danga Interactive, Inc.
+Copyright 2005-2007, Six Apart, Ltd.
+
+You can use and redistribute Perlbal under the same terms as Perl itself.
+
+=cut
+
+
+use strict;
+use warnings;
+use lib 'lib';
+use Perlbal;
+
+my $opt_daemonize;
+my $opt_config;
+my $opt_help;
+my $opt_version;
+usage(1) unless
+    Getopt::Long::GetOptions(
+                             'daemon'   => \$opt_daemonize,
+                             'config=s' => \$opt_config,
+                             'help'     => \$opt_help,
+                             'version'  => \$opt_version,
+               );
+
+my $default_config = "/etc/perlbal/perlbal.conf";
+$opt_config = $default_config if ! $opt_config && -e $default_config;
+
+usage(0) if $opt_help;
+
+sub usage {
+    my $rv = shift;
+    print STDERR <<USAGE;
+Usage: perlbal [OPTS]
+  --help           This usage info
+  --version        Print perlbal release version
+  --config=[file]  Specify Perlbal config file
+                   (default: /etc/perlbal/perlbal.conf)
+  --daemon         Daemonize
+USAGE
+
+    exit($rv);
+}
+
+if ($opt_version) {
+    print STDOUT "Perlbal version $Perlbal::VERSION\n";
+    exit 0;
+}
+
+# load user config
+if ($opt_config && ! Perlbal::load_config($opt_config, sub { print STDOUT "$_[0]\n"; })) {
+    die "Error starting up.\n";
+}
+
+# FIXME: warn harder if web_server services are enabled
+if ($Perlbal::AIO_MODE eq "none") {
+    print STDERR "WARNING:  AIO mode disabled or not available.  \n".
+                 "          Perlbal will run slowly under load if you're doing any\n".
+                 "          disk operations. (e.g. web_server mode).\n".
+                 "          Install IO::AIO for better performance.\n";
+}
+
+unless (Perlbal::Socket->WatchedSockets() > 0) {
+    die "No services or management port configured.  Nothing to do.  Stopping.\n";
+}
+
+if ($opt_daemonize) {
+    Perlbal::daemonize();
+} else {
+    print "Running.\n";
+}
+
+exit 0 if Perlbal::run();
+exit 1;
+
+# Local Variables:
+# mode: perl
+# c-basic-indent: 4
+# indent-tabs-mode: nil
+# End:

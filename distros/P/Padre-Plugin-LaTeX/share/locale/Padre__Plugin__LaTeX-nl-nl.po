@@ -1,0 +1,71 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-LaTeX\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-03 14:08+0100\n"
+"PO-Revision-Date: \n"
+"Last-Translator: ddn <ddn123456 at gmail.com>\n"
+"Language-Team: ddn <ddn123456 at gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Dutch\n"
+"X-Poedit-Country: Nederland - België\n"
+
+#: lib/Padre/Plugin/LaTeX.pm:12
+msgid "LaTeX"
+msgstr "LaTeX"
+
+#: lib/Padre/Plugin/LaTeX.pm:27
+msgid "About"
+msgstr "Omtrent"
+
+#: lib/Padre/Plugin/LaTeX.pm:28
+msgid "Create/Update PDF"
+msgstr "Maak/Update PDF"
+
+#: lib/Padre/Plugin/LaTeX.pm:29
+msgid "View PDF"
+msgstr "Toon PDF"
+
+#: lib/Padre/Plugin/LaTeX.pm:30
+msgid "Run BibTeX"
+msgstr "Voer BibTeX uit"
+
+#: lib/Padre/Plugin/LaTeX.pm:47
+msgid "LaTeX Plug-in"
+msgstr "LaTeX Plug-in"
+
+#: lib/Padre/Plugin/LaTeX.pm:50
+#, perl-format
+msgid ""
+"LaTeX support for Padre\n"
+"\n"
+"For syntax highlighting of BibTeX files install the Kate plugin: Padre::Plugin::Kate\n"
+"\n"
+"Copyright 2010 %s\n"
+"This plug-in is free software; you can redistribute it and/or modify it under the same terms as Padre.\n"
+msgstr ""
+"LaTeX support voor Padre\n"
+"\n"
+"Voor visuele syntax opmaak van BibTeX bestanden, installeer de Kate plugin: Padre::Plugin::Kate\n"
+"\n"
+"Copyright 2010 %s\n"
+"This plug-in is free software; you can redistribute it and/or modify it under the same terms as Padre.\n"
+
+#: lib/Padre/Plugin/LaTeX.pm:76
+msgid "Creating PDF files is only supported for LaTeX documents."
+msgstr "Het maken van PDF bestanden is alleen ondersteund voor LaTeX documenten."
+
+#: lib/Padre/Plugin/LaTeX.pm:102
+msgid "Running BibTeX is only supported for LaTeX documents."
+msgstr "Het uitvoeren van BibTeX is alleen ondersteund voor LaTeX documenten."
+
+#: lib/Padre/Plugin/LaTeX.pm:122
+msgid "Viewing PDF files is only supported for LaTeX documents."
+msgstr "Het tonen van PDF bestanden is alleen ondersteund voor LaTeX documenten."
+

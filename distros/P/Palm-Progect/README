@@ -1,0 +1,286 @@
+NAME
+    progconv - convert between .txt, .csv and Palm Progect's PDB format.
+
+SYNOPSIS
+    Export from a .pdb database to a text representation:
+
+        perl progconv lbPG-MyProgect.pdb MyProgect.txt
+
+    Convert a text tree back into a database:
+
+        perl progconv MyProgect.txt lbPG-MyProgect.pdb
+
+    You can convert to/from CSV files:
+
+        perl progconv lbPG-MyProgect.pdb MyProgect.csv
+        perl progconv MyProgect.csv MyProgect.txt
+        perl progconv MyProgect.csv lbPG-MyProgect.pdb
+
+    You can convert between various Progect database versions:
+
+        perl progconv --output-format=23 MyOldProgect.pdb MyNewProgect.pdb
+
+DESCRIPTION
+    "progconv" is a program you run on your desktop computer to allow you to
+    import to and export from Palm Progect database files.
+
+    For its text format, it uses a layout very similar to the one used by
+    Progect's own built-in converter:
+
+        [x] Level 1 Todo item
+            [10%] Child (progress)
+                . Child of Child (informational)
+
+        [80%] (31/12/2001) Progress item
+            [ ] Unticked action item
+
+    Almost all of Progect's fields are supported using this format,
+    including categories, ToDo links and notes.
+
+    See below under "PROGCONV TEXT FORMAT"
+
+    For its CSV format it uses a simple table of records, with indent level
+    being one of the fields. See below under "PROGCONV CSV FORMAT".
+
+    This program was written on Linux (Redhat 7.1). It was tested on Windows
+    98 with perl 5.005 and perl 5.6.1, and on Linux (Redhat 7.1) with perl
+    5.6.0 and perl 5.6.1.
+
+OPTIONS
+  General Options
+    --quiet
+        Suppress informational messages
+
+  Conversion Options
+    --input-format=auto|pdb|text|csv
+        The format "progconv" should import from. Either "auto", "pdb",
+        "text", or "csv".
+
+        When "auto" is selected, then "progconv" will guess the file's type
+        based on its extension.
+
+        The default is "auto".
+
+    --output-format=auto|pdb|text|csv
+        The format "progconv" should export to. Either "auto", "pdb",
+        "text", or "csv".
+
+        When "auto" is selected, then "progconv" will guess the file's type
+        based on its extension.
+
+        The default is "auto".
+
+    --input-version=n
+        Ignore the version number stored in the source database, and import
+        it as version "n".
+
+        Currently supported versions are 18 (for Progect database version
+        0.18) and 23 (for Progect database version 0.23).
+
+        Progect database version 0.18 was used all the way up until Progect
+        version 0.22, so if you saved a database with Progect 0.22, the
+        database will be a version 0.18 database.
+
+    --output-version=n
+        Write the output database in version "n".
+
+        Currently supported versions are 18 (for Progect database version
+        0.18) and 23 (for Progect database version 0.23).
+
+        Progect database version 0.18 was used all the way up until Progect
+        version 0.22, so if you saved a database with Progect 0.22, the
+        database will be a version 0.18 database.
+
+  Text Conversion Options
+    --tabstop=n
+        Treat tabs as n columns wide (default is 8)
+
+    --use-spaces
+        By default, "progconv" uses tabs to indent records. With this
+        "--use-spaces" option, it will use spaces instead, using "--tabstop"
+        spaces per indent level.
+
+    --date-format
+        The input and output format for dates. You can have any text here so
+        long as it includes some combination of dd, mm, yy, yyyy. Using
+        words for months at this point is NOT supported.
+
+        The default is yyyy/mm/dd, so nobody can accuse me of being Y2K
+        non-complient. If you want to use dd/mm/yy (which is how the Progect
+        program itself seems to currently export things on my Palm), then
+        you can use:
+
+            --date-format=dd/mm/yy
+
+    --columns=n
+        For multiline descriptions and notes, progect will wrap text to fit
+        the screen. Use this option to tell how wide the screen is. The
+        default is 80. To disable wrapping, use "--columns=0"
+
+  CSV Conversion Options
+    --csv-sep=c
+        Use character "c" as the csv separator (defaults to ";")
+
+    --csv-eol-pc
+        Use "\r\n" as the csv line terminator (the default)
+
+    --csv-eol-unix
+        Use "\n" as the csv line terminator
+
+    --csv-eol-mac
+        Use "\r" the csv line terminator
+
+    --csv-quote-char=c
+        Use character "c" as the csv quote char (defaults to """)
+
+    --csv-date-format
+        The input and output format for dates in csv files. See
+        --date-format
+
+PROGCONV TEXT FORMAT
+    Here is a summary of the various types of records:
+
+        [ ] action type
+        [x] completed action type
+        < > action type with todo link
+        <x> completed action type with todo link
+
+        [80%] progress type
+        [4/5] numeric type
+
+        . info type
+
+        [ ] [5] action type with priority
+        [ ] (15/7/2001) action type with date
+
+        [80%] [5] (15/7/2001) {category} progress type with priority and date and category
+
+        [80%] [5] (15/7/2001) {category} progress type with priority and date and category <<
+            Multi-Line note
+            for this item
+            >>
+
+PROGCONV CSV FORMAT
+    The CSV format allows for basic import/export with spreadsheet programs.
+    The CSV file does not look like a tree structure; instead, there is a
+    "level" column, which indicates the indent level for the current row.
+
+    The columns in the format are:
+
+    level
+        The indent level of the record.
+
+    description
+    priority
+        The priority of the record from 1 to 5, or 0 for no priority.
+
+    isAction
+    isProgress
+    isNumeric
+    isInfo
+        Any record can have one (and only one) of the above types.
+
+        If you are going to change the type of a record, remember to set all
+        the other types to false:
+
+            isAction isProgress isNumeric isInfo
+            0        0          0         1
+
+    completed
+        Completed has different values depending upon the type of record.
+        For action items, it is either 1 or 0, for complete or not complete.
+
+        For Progress items, it is a number between 1 and 100, indicating a
+        percentage.
+
+        For Numeric items it is a number between 1 and 100 indicating the
+        the integer percentage of the "numericActual" value divided by the
+        "numericLimit" value.
+
+    numericActual
+        The numerator of a numeric record. If the numeric value of a record
+        is "4/5", then the "numericActual" value is 4.
+
+    numericLimit
+        The denominator of a numeric record. If the numeric value of a
+        record is "4/5", then the "numericLimit" value is 5.
+
+    DateDue
+        This is a date in the format specified on the command line with the
+        "--csv-date-format" option
+
+    category
+    opened
+    description
+    note
+
+    Additionally, see the --csv-sep, --csv-eol-pc, --csv-eol-unix,
+    --csv-eol-mac and --csv-quote-char options.
+
+BUGS and CAVEATS
+  Categories
+    "progconv" reads and writes categories properly from and to Progect
+    "PDB" files. As of version 0.25, Progect itself can read these
+    categories properly. (However version 0.25 has problems with preferences
+    - see below)
+
+    Versions of Progect earlier than 0.25 may have problems reading the
+    categories as saved by "progconv".
+
+    This is due to the fact that "progconv" does not write the preferences
+    block correctly.
+
+    As a result, when you load into an older version of Progect a database
+    that you created with "progconv", You will get a warning that "Your
+    preferences have been deleted".
+
+    Progect will then reset the category list.
+
+    However, all of the records will still keep their references to the
+    deleted categories.
+
+    So, if you select "Edit Categories..." and recreate the categories in
+    the exact same order as they were before, the records will magically
+    return to their proper categories.
+
+    Again, these steps are only required when you are using a version of
+    Progect that is older than version 0.25.
+
+  Preferences
+    Preferences are not handled properly yet. They cannot be imported or
+    exported, and they are not read from the Progect database file.
+
+    Additionally, in Progect version 0.23 and earlier, when you load a
+    database created by "progconv" into Progect, you will get a warning that
+    "Your preferences have been deleted". The preferences for the database
+    will be reset to sensible defaults.
+
+    In Progect version 0.25, you will not get this warning.
+
+  Two-digit Dates
+    Using a two digit date format will fail for dates before 1950 or after
+    2049 :).
+
+AUTHOR
+    Michael Graham <mag-perl@occamstoothbrush.com>
+
+    Copyright (C) 2001 Michael Graham. All rights reserved. This program is
+    free software. You can use, modify, and distribute it under the same
+    terms as Perl itself.
+
+    The latest version of this program can be found on
+    http://www.occamstoothbrush.com/perl/
+
+SEE ALSO
+    http://progect.sourceforge.net/
+
+    Palm::Progect
+
+    Palm::Progect::Converter::Text
+
+    Palm::Progect::Converter::CSV
+
+    Palm::PDB
+
+    Text::CSV_XS
+

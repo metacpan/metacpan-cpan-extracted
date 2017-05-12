@@ -1,0 +1,46 @@
+Revision history for Parse-Number-EN
+
+0.07    2016-06-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Replace Exporter::Lite with Exporter.
+
+
+0.06    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.05    2014-10-03 (PERLANCAR)
+
+        - No functional changes.
+
+        - Produce non /x version of regex string instead of /x regexp object in
+          $Pat.
+
+
+0.04    2012-06-26 (SHARYANTO)
+
+        - No functional changes. Tweak Rinci metadata.
+
+
+0.03    2012-03-23 (SHARYANTO)
+
+        - No functional changes. Remove dependency to old module Sub::Spec.
+
+
+0.02    2011-10-18 (SHARYANTO)
+
+        - Add parse_number_en().
+
+        - Some fixes.
+
+
+0.01    2011-10-17 (SHARYANTO)
+
+        - First release.

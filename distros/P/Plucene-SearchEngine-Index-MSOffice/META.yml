@@ -1,0 +1,38 @@
+---
+abstract: 'an unmaintained set of Plucene backends for indexing Microsoft Office formats'
+author:
+  - 'Sopan Shewale <sopan.shewale@gmail.com>'
+  - 'Mike Doherty <doherty@pythian.com>'
+build_requires:
+  File::Find: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plucene-SearchEngine-Index-MSOffice
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+requires:
+  File::Temp: 0
+  IPC::Run3: 0
+  Plucene::SearchEngine::Index::Base: 0
+  Plucene::SearchEngine::Index::HTML: 0
+  Plucene::SearchEngine::Index::Text: 0
+  Spreadsheet::ParseExcel: 0
+  parent: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/doherty/Plucene-SearchEngine-Index-MSOffice/issues
+  repository: git://github.com/doherty/Plucene-SearchEngine-Index-MSOffice.git
+version: 0.001

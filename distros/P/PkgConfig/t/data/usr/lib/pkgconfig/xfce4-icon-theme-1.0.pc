@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: xfce4-icon-theme
+Description: A collection of icons used as the basis for Xfce4 themes
+Requires: 
+Version: 4.4.2
+Libs:
+Cflags:

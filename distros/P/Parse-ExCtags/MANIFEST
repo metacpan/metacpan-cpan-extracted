@@ -1,0 +1,8 @@
+ChangeLog
+lib/Parse/ExCtags.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/0.parse.t
+tags

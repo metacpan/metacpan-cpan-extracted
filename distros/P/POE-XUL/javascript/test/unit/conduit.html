@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" >
+<title>Conduit</title>
+
+<script type="text/javascript" src="../../lib/prototype.js"></script>
+<script type="text/javascript" src="../../lib/unittest.js"></script>
+<script type="text/javascript" src="../../src/util.js"></script>
+<script type="text/javascript" src="../../src/Conduit.js"></script>
+
+<link rel="stylesheet" href="../test.css" type="text/css" />
+  
+</head>
+<body>
+<p>Test Conduit.js</p>
+<!-- Log output -->
+<div id="testlog"> </div>
+
+<script type="text/javascript">//<![CDATA[
+
+// --------------------------------------------------------
+new Test.Unit.Runner( {
+    test_eventURI: function () { with(this) {
+        var conduit = new POEXUL_Conduit ('/xul');
+        assert( conduit, "Built a POEXUL_Conduit" );
+        
+        var uri = conduit.eventURI( { type: 'XUL-from', 
+                                      bonk: "ht&tp://",
+                                      source_id: "honk honk" } );
+        assertEqual( "/xul?type=XUL-from&bonk=ht%26tp%3A%2F%2F&source_id=honk%20honk", uri );
+    }}
+  }, "testlog" );
+
+
+//]]></script>
+</body>

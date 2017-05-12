@@ -1,0 +1,15 @@
+Changes
+lib/Plucene/SearchEngine/Index/Base.pm
+lib/Plucene/SearchEngine/Index/File.pm
+lib/Plucene/SearchEngine/Index/HTML.pm
+lib/Plucene/SearchEngine/Index/PDF.pm
+lib/Plucene/SearchEngine/Index/Text.pm
+lib/Plucene/SearchEngine/Index/URL.pm
+lib/Plucene/SearchEngine/Index.pm
+lib/Plucene/SearchEngine/Query.pm
+lib/Plucene/SearchEngine.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/Plucene-SearchEngine.t

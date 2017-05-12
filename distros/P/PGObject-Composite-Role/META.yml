@@ -1,0 +1,26 @@
+---
+abstract: 'A Moo role interface for PGObject::Composite'
+author:
+  - 'Chris Travers <chris@efficito.com>'
+build_requires:
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PGObject-Composite-Role
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moo::Role: 0
+  PGObject: v1.402.5
+  PGObject::Composite: 0
+  PGObject::Type::Composite: 0
+  perl: 5.008
+resources:
+  repository: https://github.com/ledgersmb/PGObject-Composite-Role.git
+version: 0.02

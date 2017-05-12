@@ -1,0 +1,203 @@
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; Q312461; .NET CLR 1.0.3705; .NET CLR 1.1.4322; Alexa Toolbar)
+
+'parser'           => 'msie',
+'os'               => 'Windows XP',
+'extras'           => ['Q312461','Alexa Toolbar'],
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.0.3705','1.1.4322'],
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; AOL 9.0; Windows NT 5.1; YComp 5.0.0.0; .NET CLR 1.0.3705)
+
+'parser'           => 'msie',
+'os'               => 'Windows XP',
+'extras'           => ['AOL 9.0','YComp 5.0.0.0'],
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.0.3705'],
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; AOL 9.0; Windows NT 5.1; .NET CLR 1.0.3705)
+
+'parser'           => 'msie',
+'os'               => 'Windows XP',
+'extras'           => ['AOL 9.0'],
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.0.3705'],
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; Google Wireless Transcoder;)
+
+'parser'           => 'msie',
+'os'               => 'Windows 2000',
+'extras'           => [ 'Google Wireless Transcoder' ],
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; Tesco; .NET CLR 1.0.3705; .NET CLR 1.1.4322; Media Center PC 4.0; .NET CLR 2.0.50727)
+
+'parser'           => 'msie',
+'os'               => 'Windows XP',
+'extras'           => [ 'SV1', 'Tesco', 'Media Center PC 4.0' ],
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+'dotnet'           => [ '1.0.3705', '1.1.4322', '2.0.50727' ],
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; Supplied by Tesco.net; YPC 3.2.0; SV1; yplus 5.3.04b)
+
+'parser'           => 'msie',
+'os'               => 'Windows XP',
+'extras'           => ['Supplied by Tesco.net','YPC 3.2.0','SV1','yplus 5.3.04b'],
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; Supplied by Tesco.net)
+
+'parser'           => 'msie',
+'os'               => 'Windows XP',
+'extras'           => ['Supplied by Tesco.net'],
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 4.0; .NET CLR 1.0.3705)
+
+'parser'           => 'msie',
+'os'               => 'Windows NT 4.0',
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.0.3705'],
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; .NET CLR 1.0.3705; .NET CLR 1.1.4322)
+
+'parser'           => 'msie',
+'os'               => 'Windows 2000',
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.0.3705','1.1.4322'],
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)
+
+'parser'           => 'msie',
+'os'               => 'Windows XP',
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322)
+
+'parser'           => 'msie',
+'os'               => 'Windows XP',
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.1.4322'],
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; America Online Browser 1.1; Windows NT 5.1; SV1; YPC 3.2.0)
+
+'parser'      => 'msie',
+'os'          => 'Windows XP',
+'extras'      => ['America Online Browser 1.1','SV1','YPC 3.2.0'],
+'version_raw' => '6.0',
+'version'     => '6.000',
+'name'        => 'MSIE',
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0)
+
+'parser'      => 'msie',
+'os'          => 'Windows 2000',
+'version_raw' => '6.0',
+'version'     => '6.000',
+'name'        => 'MSIE',
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; Deepnet Explorer 1.5.0; .NET CLR 1.0.3705)
+
+'parser'      => 'msie',
+'os'          => 'Windows XP',
+'extras'      => ['Deepnet Explorer 1.5.0'],
+'version_raw' => '6.0',
+'version'     => '6.000',
+'name'        => 'MSIE',
+'dotnet'      => ['1.0.3705'],
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; YPC 3.0.2; .NET CLR 1.1.4322; yplus 4.4.02b)
+
+dotnet      => [ '1.1.4322' ],
+extras      => [ 'SV1', 'YPC 3.0.2', 'yplus 4.4.02b' ],
+name        => 'MSIE',
+os          => 'Windows XP',
+parser      => 'msie',
+version     => '6.000',
+version_raw => '6.0',
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; acc=jocker)
+
+extras      => [ 'SV1', 'acc=jocker' ],
+name        => 'MSIE',
+os          => 'Windows XP',
+parser      => 'msie',
+version     => '6.000',
+version_raw => '6.0',
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; sbcydsl 3.12; InfoPath.1)
+
+extras      => [ 'sbcydsl 3.12', 'InfoPath.1' ],
+name        => 'MSIE',
+os          => 'Windows XP',
+parser      => 'msie',
+version     => '6.000',
+version_raw => '6.0',
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; {0B6660AB-643B-4F5D-8ECF-2DA8B9759F4C}; .NET CLR 1.1.4322)
+
+dotnet      => [ '1.1.4322' ],
+extras      => [ '{0B6660AB-643B-4F5D-8ECF-2DA8B9759F4C}' ],
+name        => 'MSIE',
+os          => 'Windows XP',
+parser      => 'msie',
+version     => '6.000',
+version_raw => '6.0',

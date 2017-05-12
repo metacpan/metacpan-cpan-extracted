@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset load_strategy="INSERT_LOAD_STRATEGY">
+   
+   <photo id="0" name="photo0">
+        <blob_content file="t/bin/data1.bin" size_column="doc_size" />
+    </photo>
+    <photo id="1" name="photo1" >
+        <blob_content size_column="doc_size" ></blob_content>
+    </photo>
+   <photo id="10" name="photo10">
+        <blob_content file="t/bin/data2.bin" size_column="doc_size" />
+    </photo>
+    
+</dataset>

@@ -1,0 +1,91 @@
+Revision history for Perl-Critic-Bangs
+
+1.10    Mon Aug 20 14:26:07 CDT 2012
+====================================
+[ENHANCEMENTS]
+Added ProhibitDebuggingModules.  Thanks to Mike Doherty for the code,
+and to Breno G. de Oliveira, Joel Berger and Jeffrey Thalhammer for
+helping with implementation details.
+
+
+1.08    Mon Jun 20 11:56:49 CDT 2011
+====================================
+Official release, no changes from 1.07_02
+
+
+1.07_02 Tue May 17 11:06:41 CDT 2011
+====================================
+[ENHANCEMENTS]
+The list of bitwise operators prohibited is now:
+
+    & | ^ ~ &= |= ^=
+
+
+1.07_01 Mon May 16 23:48:20 CDT 2011
+====================================
+As of 1.07_01, Perl::Critic::Bangs is released under Artistic License 2.0,
+rather than dual-licensed with the GPL.
+
+[ENHANCEMENTS]
+Added a new policy, ProhibitBitwiseOperators.  Usually when you see
+a bitwise operator like | or & in a Perl program, it's a mistake that
+should have been || or &&.  It also checks for ^ and ~ as bitwise ops.
+Thanks to Mike O'Regan.
+
+[FIXES]
+Remove use of Perl::Critic::Utils::PPIRegexp, which has been removed
+from the Perl-Critic distribution, with calls to native PPI methods. This
+allows P::C::Bangs to install when using perl 5.14.  Thanks, Elliot Shank.
+
+
+1.06    Sun May 23 00:56:49 CDT 2010
+====================================
+[ENHANCEMENTS]
+ProhibitFlagComments now checks POD for XXXes and the like, not just
+comments.  Thanks to Matt Boyle.
+
+
+1.04    Sat Apr 17 11:13:42 CDT 2010
+====================================
+[FIXED]
+Fixed a problem with dereferencing a node in ProhibitRefProtoOrProto.
+Thanks to Mike Hind.
+
+
+1.02    Sat Mar  7 14:40:38 CST 2009
+====================================
+No new features.
+
+Updated the licensing to be explicitly GPLv3 or Artistic 2.0.
+
+Removed incorrect tests for compatibility with Perl::Critic 1.098.
+
+
+1.00    Mon May 26 19:10:40 CDT 2008
+====================================
+Updated to work with modern Perl::Critic 1.084.  Thanks to
+Elliot Shank for making that happen.
+
+[FIXES]
+Fixed bug in ProhibitCommentedOutCode which prevented custom
+configuration from working.
+
+[ENHANCEMENTS]
+Added utf8 to the list of exceptions in ProhibitNumberedNames.
+The exceptions are also now case-insensitive.
+
+Added ProhibitUselessRegexModifiers.pm policy switched to testing
+method that Perl::Critic uses.
+
+
+0.22    Sun Jul 16 22:09:10 CDT 2006
+====================================
+[FIXES]
+$1 no longer runs afoul of ProhibitNumberedNames
+
+
+0.20    Fri Jul 14 22:36:09 CDT 2006
+====================================
+First real working version that you'd want to install.
+
+

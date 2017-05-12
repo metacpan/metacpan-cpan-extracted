@@ -1,0 +1,126 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Portable Presenter</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<B>Intro</B><BR>
+<A HREF=#features>Features</A><BR>
+<A HREF=#not>What&nbsp;is&nbsp;not&nbsp;in</A>
+<P>
+<BIG><A HREF=manual.html>Manual</A></BIG><BR>
+<BIG><A HREF=http://ppresenter.org/download/index.html>Download</A></BIG><BR>
+<BIG><A HREF=example.html>Example</A></BIG><BR>
+
+    </TD><TD VALIGN=top>
+
+<P><EM>Portable Presenter</EM> is a package designed to give presentations.
+It is written in <A HREF=http://www.perl.org>Perl</A>/Tk only, which is
+available for UNIX and for Windows.
+<EM>Portable Presenter</EM> is brought to you under the same licences as
+Perl, which is GPL and the Artistic Licence.</P>
+
+<P>PPresenter is not really for the week of heart.  The results are limited
+to what Tk can deliver, but that is quite a lot.  You can write presentations
+using Perl (do you know Perl?) and XML (so how hard can it be?)
+Please contribute.</P>
+
+<P>The current version is v1.17 (published 2002/08/12).  My advice
+is to use this in combination with Tk800.022, which seems stable for
+some time now.</P>
+
+<H2>Main <A NAME=features>features</A></H2>
+Are you also frustrated by the massive amount of images and menus which
+most WYSIWYG presentation programs show you?  Do you prefer LaTeX over
+M$-Word and you are not affraid to type?  Then this program may be
+the thing you were waiting for.
+<P>
+PPresenter features:
+<UL>
+<LI>Write your presentation (slides) in Object Oriented Perl: you write it
+    as a perl program, which runs <FONT COLOR=green><B>equivalent on any UNIX
+    and Windows32</B></FONT>, however, not all facilities are available under
+    Windows.
+    <P>
+<LI><TABLE CELLSPACING=0>
+    <TR><TD VALIGN=top COLSPAN=2>You can design (company)
+        <FONT COLOR=green><B>styles</B></FONT>, combining the key elements
+        of a slide:</TD>
+        <TD ROWSPAN=6 ALIGN=right><IMG SRC=screen_small.jpg
+            WIDTH=300 HEIGHT=225></TD></TR>
+    <TR><TD VALIGN=top><FONT COLOR=green><B>Decoration</B></FONT></TD>
+        <TD VALIGN=top>background, text-color, images;</TD></TR>
+    <TR><TD VALIGN=top><FONT COLOR=green><B>Dynamics</B></FONT></TD>
+        <TD VALIGN=top>How to move from one slide to the other.</TD></TR>
+    <TR><TD VALIGN=top><FONT COLOR=green><B>Fontset</B></FONT></TD>
+        <TD VALIGN=top>which type of fonts are used;</TD></TR>
+    <TR><TD VALIGN=top><FONT COLOR=green><B>Formatter</B></FONT></TD>
+        <TD VALIGN=top>the way you like to enter the content;</TD></TR>
+    <TR><TD VALIGN=top><FONT COLOR=green><B>Template</B></FONT></TD>
+        <TD VALIGN=top>how the screen is divided into parts;</TD></TR>
+    </TABLE>
+    <P>
+<LI><TABLE CELLSPACING=0>
+    <TR><TD COLSPAN=2 VALIGN=top>Extended control during your presentation:</TD>
+        <TD VALIGN=top ROWSPAN=5 ALIGN=right><IMG SRC=timing_small.jpg
+            WIDTH=300 HEIGHT=218></TD></TR>
+    <TR><TD VALIGN=top><FONT COLOR=green><B>Timing&nbsp;&nbsp;</B></FONT></TD>
+        <TD VALIGN=top>follow the progress of your presentation, per slide and
+        as a whole;</TD></TR>
+    <TR><TD VALIGN=top><FONT COLOR=green><B>Phasing&nbsp;&nbsp;</B></FONT></TD>
+        <TD VALIGN=top>dynamics in the content of one slide during the
+        presentation;</TD></TR>
+    <TR><TD VALIGN=top><FONT COLOR=green><B>Tagging&nbsp;&nbsp;</B></FONT></TD>
+        <TD VALIGN=top>select sub-sets of slides when your talk should
+        be shorter;</TD></TR>
+    <TR><TD VALIGN=top><FONT COLOR=green><B>Callbacks&nbsp;&nbsp;</B></FONT></TD>
+        <TD VALIGN=top>Hooks to start (external) programs during the
+        presentation;</TD></TR>
+    </TABLE>
+    <BR CLEAR=ALL><P>
+    <IMG SRC=control_small.jpg WIDTH=300 HEIGHT=225 ALIGN=right HSPACE=0>
+<LI>If you prefer, put the <FONT COLOR=green><B>control on a separate
+    screen</B></FONT>, so invisible for the audience.
+    <P>
+<LI>From one program, you can also control <FONT COLOR=green><B>multiple
+    screens</B></FONT>.
+    <P>
+<LI>Text <FONT COLOR=green><B>scales</B></FONT> to your screen-size: test it
+    on your high-resolution screen and run it on 640x480.  Scaling of
+    images is to be implemented.
+    <P>
+<LI><FONT COLOR=green><B>Export</B></FONT> to images, postscript, or web-site.
+    <BR CLEAR=ALL>
+</UL>
+For detailed information, read the <A HREF=manual.html>manual</A>.
+
+<H2>What is <A NAME=not>NOT</A> in</H2>
+<EM>Portable Presenter</EM> is limited to the functionality of Perl/Tk.
+Although Tk is very well suited for most jobs, some features which are
+possible with fully C-written applications are not implemented.  In some
+cases, the performance would be too low to give an acceptable result.
+<UL>
+<LI>No fading in/out or fading from one into the next slide;
+<LI>... ehhh... must be more, but most is solvable (i.e. to be solved),
+    one way or the other.
+</UL>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

@@ -1,0 +1,14 @@
+SYNOPSIS
+
+     # in function metadata
+     hide_args => [qw/arg1 arg2/],
+
+DESCRIPTION
+
+    This property can hide some arguments from function, so they are
+    assumed to not exist.
+
+SEE ALSO
+
+    Perinci
+

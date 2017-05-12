@@ -1,0 +1,17 @@
+* This {sub {}} should render as {code}
+* So should 
+{$a > $b} in this multiline 
+#--------------------------------------------------------------------------#
+=over
+
+=item *
+
+This C<<< sub {} >>> should render as C<<< code >>>
+
+=item *
+
+So should 
+C<<< $a > $b >>> in this multiline 
+
+=back
+

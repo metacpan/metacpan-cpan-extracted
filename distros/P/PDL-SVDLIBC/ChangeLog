@@ -1,0 +1,73 @@
+ChangeLog for perl/PDL module PDL::SVDLIBC
+
+v0.17 Thu, 17 Dec 2015 16:24:33 +0100 moocow
+	+ fixed wrongly succeeding bogus tests with unary ok()
+	  - tests now use Test::More and re-factored common test subroutines
+	+ pdlmaker.plm doesn't distribute generated PM files any more (PDL now does this for us)
+
+v0.16 Tue, 24 Nov 2015 09:44:58 +0100 moocow
+	+ cpantesters win32 builds now failing with "svdutil.o:svdutil.c:(.text+0xabd): undefined reference to `htonl'"
+	+ replacing netinet/in.h htonl() and ntohl() calls with dummy macros, since they're not really used here (--> win32 builds succeed!)
+
+v0.15 Thu, 19 Nov 2015 14:28:15 +0100 moocow
+	+ still no joy with v0.14 cpan smoker hacks on win32
+	  - see http://www.cpantesters.org/cpan/report/6e49170d-6bf5-1014-a25c-daa0d353e6bb (UNKNOWN)
+	+ packaging patched SVDLIBC sources (BSD-like license) into perl distro
+	+ added svdindexND(), svdindexNDt(), svdindexccs() for fast decoding of large sparse SVD-encoded matrices
+	+ added svderror() for precision checking (slow but memory-friendly)
+
+v0.14 Tue, 17 Nov 2015 14:52:16 +0100 moocow
+	+ v0.13 inet.h patch strategy seems still not to be catching
+	  - see e.g. http://www.cpantesters.org/cpan/report/6c6dcdff-6c03-1014-8ce0-5f22b8efd73c
+	  - test disabling Config.cache and local SVDLIBC source directories in Config.PL
+	+ added whichND()-style interface svdlas2w(), svdlas2aw()
+	  - should be slightly less memory-intensive than pdl-side ccsencode() + svdlas2()
+	+ added tests for convenience wrappers and reduced svd (d<n)
+
+v0.13 Mon, 03 Aug 2015 09:22:03 +0200 moocow
+	+ patch upstream svdutil.c to disable #include <netinet/inet.h>
+	  - allowcpantesters win32 builds
+	  - it's totally unclear why <inet.h> is included in the first place
+
+v0.12 Sat, 01 Aug 2015 12:02:13 +0200 moocow
+	+ Config.PL don't quote typename macros (e.g. -D__SVDLIBC_LONG='PDL_Long'), for cpantesters/win32
+
+v0.11 Thu, 30 Jul 2015 09:37:16 +0200 moocow
+	+ Config.PL set binmode() on archive filehandle for LWP::UserAgent method (for win32)
+
+v0.10 Tue, 28 Jul 2015 09:13:34 +0200 moocow
+	+ Makefile calls to hack-int-types.perl tweaked for BSD variants
+	  - some cpantesters builds failed with 'Using $< in a non-suffix rule context is a GNUmake idiom (Makefile:367)'
+	  - see http://cpantesters.org/cpan/report/18c0b8a6-3263-11e5-a85a-e28fcaadd3a7
+	+ unlink any stale sources when unpacking upstream archive in Config.PL
+	+ disabled lwp-request fetch method in Config.PL (binary redirection doesn't work for win32)
+
+v0.09 Fri, 24 Jul 2015 12:38:03 +0200 moocow
+	+ added las2.patch for upstream SVDLIBC sources
+	  - disable implicit matrix transposition in svdLAS2() at SVDLIBC/las2.c:373-378
+
+v0.08 Thu, 26 Sep 2013 12:13:31 +0200 moocow
+	+ added auto-download and -unpack of SVDLIBC source to Config.PL
+	+ use ExtUtils::MakeMaker::prompt() for user prompts (fix RT #88972)
+
+v0.07 Tue, 24 Sep 2013 14:30:46 +0200 moocow
+	+ PREREQ_PM{PDL}=CONFIGURE_REQUIRES{PDL}=0 for cpan-testers friendliness
+	+ added (DISABLED) support for PDL_Indx datatype (PDL >= v2.007)
+	  - disabled by default since which(), whichND(), & co. don't return PDL_Indx in devel PDL-2.006_90
+	  - to enable, set $cconfig{ENABLE_PDL_INDX}=1 in Config.PL, run make realclean && perl Makefile.PL && ...
+
+v0.06 2013-06-19  moocow
+	+ include $Config{ccflags} explicitly to avoid errors like
+	  "t/00_basic.t .. Not a CODE reference at /usr/lib/perl/5.14/DynaLoader.pm line 207."
+	+ added pdlmaker.plm for CPAN indexing
+
+v0.05 2009-10-30  moocow
+	+ removed DEBUG flags
+	+ should now compile & run on both 32- and 64-bit
+
+v0.04 Tue, 27 Feb 2007 18:58:12 +0100
+	+ replaced PDL 'longlong' specs with 'int', jives again with SVDLIBC 'long'
+	+ there's got to be a better way to do this...
+
+v0.01 Mon, 20 Jun 2005 23:59:20 +0200
+	+ initial version

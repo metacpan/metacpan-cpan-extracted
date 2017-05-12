@@ -1,0 +1,69 @@
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+Packages:
+
+MAIN PACKAGES
+
+PPresenter.pm          Controls the interface to the user.
+PPresenter/
+    Object.pm          Base-class.
+    Show.pm            Controls the showing of all slides.
+    Viewport.pm        One screen (possibly more per show).
+    Viewport/
+        BackgroundMenu.pm  Popup menu behind button 3.
+        Control.pm         One screen with controls (one per show)
+        Neighbours.pm      Displays previous and next slide's names.
+        Phases.pm          Phases in slide display.
+        ProgressBar.pm     Line showing progress of show.
+        SlideControl.pm    Slide timing display.
+        SlideButtonBar.pm  Row of buttons representing slides.
+        TagControl.pm      Slide selection control
+    Slide.pm           One slide.
+    SlideView.pm       The presentation of one slide on one screen.
+    Program.pm         Manages the runtime transition inside a slide.
+    tkTimerLabel.pm    Tk::Label showing a time-stamp.
+
+    Image.pm           Image manipulation
+    Image/
+        Magick.pm          When Image::Magick is installed.
+        tkPhoto.pm         Primitive Tk images.
+
+STYLE-ELEMENTS
+    StyleElem.pm       Extends Object with functions on all style-elements.
+
+    Style.pm           Represents a style: collection of lists of other
+                       style elemens.
+    Style/
+        Default.pm         Normal style.
+        SlideNotes.pm      Style specific to slide-notes.
+
+    Decoration.pm      Backgrounds and such.
+    Decoration/
+        Solid.pm           Solid (one colour) backgrounds.
+
+    Dynamic.pm         How to display a slide.
+    Dynamic/
+        Default.pm
+
+    Fontset.pm         Fonts which can be used.
+    Fontset/
+        TkFonts.pm         The Tk portable (and awful) fontset.
+        XScaling.pm        Scaling X11 fonts.
+
+    Formatter.pm       How text is displayed.
+        Markup.pm          HTML-like text formatter with support modules:
+            Markup_html.pm, Markup_parser.pm, Markup_placer.pm
+        Plain.pm           Markup with default pre-formatted.
+        Simple.pm          Markup with simple lists.
+
+    Template.pm        Organizing layout.
+        Default.pm
+
+EXPORT
+    Export.pm          Extends Object and provides contact between GPP and
+                       the exporter modules.
+        Website/HTML.pm           Convert into website.
+        Images/ImageMagick.pm     Screen-dumps to image with Image::Magick.
+        Handouts/IM_PostScript.pm Export to postscript document with Image::Magick.
+        Handouts/PostScript.pm    Tk postscript dump of screen (very poor result)
+

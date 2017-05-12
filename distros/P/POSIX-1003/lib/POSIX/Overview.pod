@@ -1,0 +1,1170 @@
+=encoding utf8
+
+=head1 NAME
+
+POSIX::Overview - POSIX in Perl
+
+=head1 DESCRIPTION
+
+The I<POSIX standard> defines access to the operating system.  Most
+operating systems (not limited to the UNIX family) provide at least a
+part of this standard, sometimes as optional or commercial extension
+package.
+
+POSIX describes how C-programmers can access the operation system. Perl's
+core and additional modules on CPAN together, offer most of the POSIX
+functionality, although usually in a more powerful way. This manual-page
+tries to explain where you can find POSIX features in the Perl language.
+
+=head2 The specification
+
+The I<Single UNIX Specification: Authorized Guide to Version 4> published
+by I<The Open Group> is a huge specification. Issue 7 (March 2010) lists
+nearly 1200 functions. A large part of these functions are defined by
+POSIX 1003.1-2008, which gives the name to this module.
+
+This manual page does not explain what the functions do in detail,
+because the official POSIX manuals do a much better job.  On UNIX,
+those manuals are usually available as set C<3p>.
+
+=head2 WARNINGS
+
+POSIX is a standard with a long history, deeply tied into the Operating
+System. This means that you will encounter (sometimes large, often small)
+differences when used on different platforms.  Perl's core and modules
+often attempt to hide differences, but is not always succesful.
+
+Be warned that we refer to many modules which are not distributed with
+Perl's CORE, so are maintained by separate people which have their own
+responsibility, programming practices, and choice of license.
+
+This manual-page attempts to be correct and complete, but might contain
+mistakes or lack some references.  Please contribute!
+
+=head2 How to use this manual page
+
+For each of the POSIX functions, we try to direct you to the best
+documentation on how to get related functionality in Perl.  Even the
+most simple functions will have differences.  We do not explain
+the POSIX functions because the standard POSIX manuals do a much
+better job. And, of course, we do not attempt to explain core
+functionality or CPAN modules.
+
+Some references are to F<POSIX.pm>, which means that it is provided in
+by the POSIX module distributed with Perl itself.  In all cases, when
+C<undef> is returned it means failure.  In that case, C<$!> is set.
+
+A number of references are made to modules in the L<POSIX::1003>
+name-space, often abbreviated to the last name-space component.
+For instance, C<::FdIO> stands for L<POSIX::1003::FdIO>. Those
+modules give you access to all the useful POSIX.xs routine. Read
+L<POSIX::1003> for more.
+
+Often, the description will refer you to L<perlfunc>, which means
+that there is a perl core function which does similar things as the
+POSIX function.  On most platforms you can easily find the perlfunc
+descriptions via L<perldoc>.  For instance:
+
+  perldoc -f open
+
+Another important source for Operating System facts are global variables.
+Those are described in the L<perlvar> manual.  Those variables have
+extremely short names (like C<< $$ >> for process-id) but also longer
+names (C<$PID> and C<$PROCESS_ID>).  The latter are only available when
+you load the C<English> module.  Names defined by the L<awk> programming
+language are amongst the long alternative names.
+
+Finally, the tables often refer to modules which implement comparable
+functionality.  In most cases, they offer a pure Perl (so portable)
+alternative.
+
+=head1 FUNCTIONS
+
+The functions are categorized as listed in chapter 3.3 of the book of
+the Open Group, with the exception of those sections which only list
+unsupported features.
+
+Nothing related to threads, scheduling and tracing control is provided
+by Perl.  See L<perlthrtut> on the thread implementation of Perl.
+
+=over 4
+
+=item * functions beginning with C<posix_> are not supported
+
+=item * functions beginning with C<sched_> are not supported
+
+=item * functions beginning with C< pthread_> are not supported
+
+=item * thread-safe functions, ending on C<_r>, are not supported
+
+=back
+
+=head2 Asynchronous Input and Output Interfaces
+
+These functions are provided by L<IO::AIO>:
+
+  aio_cancel, aio_error, aio_fsync, aio_read, aio_return, aio_suspend,
+  aio_write
+
+Not supported:
+
+  lio_listio
+
+=head2 Jump Interfaces
+
+These functions are used to handle error conditions.  In Perl, you cannot
+handle these errors at such a low level.
+
+  longjmp perlfunc/die
+  setjmp  perlfunc/eval
+
+=head2 Maths Library Interfaces
+
+The accuracy of floating point numbers depends on compilation flags
+of Perl.  At the C level, there are many versions of these functions, but
+only one is listed in this section.
+
+L<Math::Trig> provides pure perl implementations for all sine,
+cosine and tangent functions and their hyperbolic and reverse
+variants.  L<Math::Complex> provides their complex variants.  In both
+modules, the names of the functions sometimes differ slightly from
+the POSIX names.
+
+The modules L<Math::BigInt> and L<Math::BigFloat> offer a wide range
+of mathematical functions with flexible precission.
+
+These are specified in POSIX:
+
+  acosh                           Math::Trig
+  acos                            ::Math
+  asinh                           Math::Trig
+  asin                            ::Math
+  atan2       perlfunc            ::Math
+  atanh                           Math::Trig
+  atan                            ::Math
+  ceil                            ::Math
+  cosh                            ::Math
+  cos         perlfunc            ::Math
+  exp         perlfunc            ::Math
+  fabs        perlfunc/abs        ::Math/abs
+  floor                           ::Math
+  fmax                            List::Util/min
+  fmin                            List::Util/max
+  fmod                            ::Math
+  frexp                           ::Math
+  isgreaterequal  perlop/>=
+  isgreater       perlop/>
+  islessequal     perlop/<=
+  islessgreater   perlop/!=
+  isless          perlop/<
+  ldexp                           ::Math
+  log10                           ::Math
+  log         perlfunc            ::Math
+  modf                            ::Math
+  pow         perlop/**           ::Math
+  rint                            ::Math
+  sinh                            ::Math
+  sin         perlfunc            ::Math
+  sqrt        perlfunc            ::Math
+  tanh                            ::Math
+  tan                             ::Math
+
+Complex numbers only in Perl with L<Math::Complex>:
+
+  cabs, cacos, cacosh, carg, casin, casinh, catan, catanh, cbrt,
+  ccos, ccosh, cexp, cimag, clog, conj, cpow, cproj, creal, csin,
+  csinh, csqrt, ctan, ctanh
+
+Probably not supported:
+
+  copysign, erf, erfc, exp2, expm1, fdim, fma, fpclassify, hypot,
+  ilogb, isfinite, isinf, isnan, isnormal, isunordered, lgamma,
+  llround, log1p, log2, logb, lround, nan, nearbyint, nextafter,
+  nexttoward, remainder, remquo, round, scalbln, scalbn, signbit,
+  tgamma, trunc
+
+=head2 General ISO C Library Interfaces
+
+=head3 convert strings to values and back
+
+All C<strto*>, C<atof>, C<atoi> and friends functions are usually
+not needed in Perl programs: the integer and float types are at their
+largest size, so when a string is used in numeric context it will get
+converted automatically.
+
+Still, L<POSIX::1003::Math> does provide a few of those functions,
+which are sometimes more accurate in number parsing for large numbers.
+
+  strtod                          ::Math
+  strtol                          ::Math
+  strtoul                         ::Math
+
+=head3 String handling
+
+Perl knows about latin1 strings are utf-8 strings.  Most complications
+of character-sets are hidden for the user, as long as the user provides
+encoding details at all entry and exit points of the program.  See
+L<perlunicode>, L<Encode> and L<encoding>.
+
+  strcat      perlop/.=
+  strchr      perlfunc/index
+  strcmp      perlop/cmp perlop/eq
+  strcpy      perlop/=
+  strcspn     $a =~ m/^([^$b]*)/ && length $1
+  strerror    perlvar/$ERRNO      ::Errno   "$!"
+  strlen      perlvar/length
+  strncat     $a .= substr $b, 0, $n;
+  strncmp     (substr $a, 0, $n) eq (substr $b, 0, $n)
+  strncpy     $a = substr $b, 0, $n;
+  strpbrk     $a =~ m/(.*?)[$b]/ && length $1
+  strrchr     $a =~ m/(.*)$b/    && length $1
+  strspn      $a =~ m/^([$b]*)/  && length $1
+  strstr      perlop/index
+  strtok      perlfunc/split
+  tolower     perlfunc/lc      "\L$str\E"  "\l$str"
+  toupper     perlfunc/uc      "\U$str\E"  "\u$str"
+
+B<Warning:> C<POSIX.pm> provides functions named C<tolower> and
+C<toupper>, which simply call C<lc> and C<uc> respectively. They take
+their parameter as string, maybe even ut8-string, not raw ascii bytes.
+
+=head3 sprintf and scanf
+
+The C<sprintf> function is provided by L<perlfunc>, with many
+extensions to the POSIX format specification.  Perl has powerful
+string interpolation features which reduce the need for sprintf.
+
+  snprintf    not needed
+  sprintf     perlfunc/sprintf
+  sscanf      use regular expressions or perlfunc/unpack
+  vsnprintf   not needed
+  vsprintf    not needed
+  vsscanf     not needed
+
+=head3 Characters
+
+C<POSIX.pm> provides handlers of property groups, which are affected by
+the locale setting as long as all the characters are only single bytes.
+We recommend that you use regular expressions, which are more flexible.
+This table shows the alternative expressions.
+
+  isalnum     [[:alnum:]]   \p{Alnum}
+  isalpha     [[:alpha:]]   \p{Alpha}   \pL
+  isascii     [[:ascii:]]   \p{Ascii}
+  isblank     [[:blank:]]   \p{Blank}            \h
+  iscntrl     [[:cntrl:]]   \p{Control} \p{Cc}
+  isdigit     [[:digit:]]   \p{Digit}   \p{Nd}   \d
+  isgraph     [[:graph:]]   \p{Graph}
+  islower     [[:lower:]]   \p{Lower}   \p{Ll}
+  isprint     [[:print:]]   \p{Print}
+  ispunct     [[:punct:]]   \p{Punct}   \pP
+  isspace     [[:space:]]   \p{Space}
+  isupper     [[:upper:]]   \p{Upper}   \p{Lu}
+  isxdigit    [[:xdigit:]]  \p{XDigit}  \p{Hex}  [0-9a-fA-F]
+              [[:word:]]    \p{Word}             \w
+
+C<\p{PerlSpace}> (C<\s>) is close to the ASCII subdomain of C<\p{Space}>.
+The C<\p{Word}> character class is a Perl specific extension.  There are
+hundreds more character classes and extensions.  See L<perlunicode>
+and L<perluniprops>.
+
+The C<isascii> function is defined by XSI, not POSIX.
+
+=head3 Locale
+
+Locales describe national and language specific facts.
+See L<perllocale> for the details.
+
+  setlocale                       ::Locale
+  localeconv                      ::Locale
+  strcoll                         POSIX.pm
+  strxfrm                         POSIX.pm
+
+The functions C<strcoll> and C<strxfrm> are not useful in Perl, which
+automatically resolves character set problems.
+
+=head3 Math
+
+  abs          perlfunc           ::Math
+  div                             ::Math
+  rand         perlfunc           ::Math
+  srand        perlfunc           ::Math
+
+Integers which overflow will automatically upgrade into floats, so all
+C<abs>, C<labs>, C<llabs>, C<imaxabs> are implemented by L<perfunc/abs>.
+Division via C<div>, C<ldiv>, C<lldiv>, and C<imaxdiv> are also
+equivalent.
+
+The following functions where first defined by C99, and describe
+the handling of floating-point rounding and exceptions.  They are
+not supported:
+
+  feclearexcept, fegetenv, fegetexceptflag, fegetround, feholdexcept,
+  feraiseexcept, fesetenv, fesetexceptflag, fesetround, fetestexcept,
+  feupdateenv
+
+=head3 Time
+
+The L<POSIX::1003::Time> code provides access to all time functions.
+The result depends on the locale setting of the timezone.  See also
+L</Timer Interfaces>.
+
+L<Date::Format> contains pure Perl implementations for the other functions
+of this section.  Those are fully portable, which cannot always be said
+for POSIX library implementations.  Also L<Date::Calc> may be very
+userful.
+
+Use L<Time::HiRes> if you need to handle timestamps with better
+resolution than seconds.
+
+  asctime                         ::Time Date::Format
+  ctime                           ::Time Date::Format
+  difftime                        ::Time Time::HiRes/tv_interval
+  gmtime      perlfunc            ::Time Date::Calc/Gmtime
+  localtime   perlfunc            ::Time Date::Calc/Localtime
+  mktime                          ::Time Date::Calc/Mktime
+  strftime                        ::Time Date::Format
+  tzname                          ::Time  
+  tzset                           ::Time  
+
+=head3 Sorting
+
+  qsort       perlfunc/sort
+  bsearch                         POSIX::bsearch Search::Dict
+                                  Tree Tree::Binary
+
+The Quick Sort implemented by C<qsort> was used in L<perlfunc/sort>
+uptil release 5.6.  Later, it became more flexible.  See the manual
+page about the sort pragma: sort(3pm).
+
+=head3 Memory management
+
+Perl uses its own reference counting memory management (of course
+based on the POSIX interface).  Only when you write XS code, you
+will use abstractions of these: C<calloc>, C<free>, C<malloc>
+and C<realloc>.
+
+  memchr      perlfunc/index
+  memcmp      perlop/cmp perlop/eq
+  memcpy      perlop/=
+  memmove     perlop/substr
+  memset      perlop/x         $a = 'A' x 100;
+  offsetof    perlfunc/unpack  # removed from POSIX standard
+
+=head3 Var-args
+
+All functions in Perl can handle a variable list of arguments, so
+
+  va_arg      not needed
+  va_copy     not needed
+  va_end      not needed
+  va_start    not needed
+
+=head2 Wide-Character ISO C Library Interfaces
+
+The L<POSIX> module does define wide-character functions. I<Wide>
+refers to multiples bytes per character: strings able to use more than
+256 different characters in an unspecified encoding. Perl itself has both
+single byte Latin1 and utf-8 strings, covering all needs: pick compact
+or powerful. One may need to use wide-characters to implement certain
+interface specifications, but that is getting rare.
+
+  btowc                           POSIX.pm
+  mblen                           POSIX.pm
+  mbrlen                          POSIX.pm
+  mbrtowc                         POSIX.pm
+  mbstowcs                        POSIX.pm
+  mbtowc                          POSIX.pm
+  wcstombs                        POSIX.pm
+  wctomb                          POSIX.pm
+
+Not provided are all function wide versions of character classes, like
+C<iswalnum>, all functions which start with C<tow>, C<wcs>, C<wct> or
+C<wmem>.  Additionally, missing are
+
+  mbsrtowcs, mbsinit, swprintf, swscanf, vswprintf, vswscanf, wcrtomb
+  mbsnrtowcs, wcpcpy, wcpncpy
+
+Also, L<i18n::Langinfo::Wide> and L<POSIX::Wide> offer some extras.
+
+=head2 General C Library Extension Interfaces
+
+Function C<fnmatch> can usually be avoided using L<perlfunc/glob>
+for collecting filenames in the file system.  When you already have
+a filename in a string, you need to rewrite the pattern into a
+regular expression.
+
+  my @scripts = glob "*.pl";
+  my @scripts = grep /\.pl$/, @filenames;
+
+Process your command-line options with C<Getopt::Std> or C<Getopt::Long>,
+which are more platform indepent and more flexible than the POSIX version
+(therefore they are missing)
+  getopt, getsubopt, optarg, opterr, optind, optopt
+
+Some string functions have simple Perl work-arounds:
+
+  strcasecmp  lc($a) cmp lc($b)
+  strdup      $b = $a
+  strncasecmp substr($a,$n) cmp substr($b,$n)
+  strndup     $b = substr($a, $n)
+  strnlen     length substr($a, $n)
+  stpcpy      perlop/=
+  stpncpy     $b = substr $a, 0, $l
+  strfmon                         PAB3::Utils
+
+=head2 Clock Selection Interfaces
+
+  clock_nanosleep                 Time::HiRes
+
+=head2 Device Input and Output Interfaces
+
+=head3 File-descriptor based
+
+See C<perlopentut> section "Open a la C".
+
+  close       perlfunc/close (!)  ::FdIO/closefd
+  open        perlfunc/sysopen    ::FdIO/openfd
+  read        perlfunc/sysread    ::FdIO/readfd
+  write       perlfunc/syswrite   ::FdIO/writefd
+  pread       not supported
+  pwrite      not supported
+
+=head3 File-handle based
+
+  clearerr                        IO::Handle
+  fclose      perlfunc/close      IO::Handle/close
+  fdopen      perlfunc/open       ::FdIO
+  feof        perlfunc/eof        IO::Handle/eof
+  ferror      perlvar/$ERRNO      IO::Handle/error     $!+0
+  fflush                          IO::Handle/flush
+  fgetc       perlfunc/getc       IO::Handle/getc  perlfunc/read
+  fgets       perlfunc/readline   IO::Handle/gets      <FH>
+  fileno      perlfunc            IO::Handle
+  fopen       perlfunc/open       IO::Handle/open
+  fprintf     perlfunc/printf     IO::Handle/printf
+  fputc       perlfunc/print      IO::Handle/print
+  fputs       perlfunc/print      perlfunc/say  IO::Handle/say
+  fread       perlfunc/read
+  freopen     perlopentut/Re-Opening Files
+  fscanf      use regular expressions
+  fwrite      perlfunc/syswrite   IO::Handle/write
+  getchar     perlfunc/getc       IO::Handle/getc
+  getc        perlfunc            IO::Handle
+  gets        perlfunc/readline   IO::Handle/readline  <STDIN>
+  printf      perlfunc
+  putchar     perlfunc/print
+  putc        perlfunc/print
+  puts        perlfunc/print      perlfunc/say
+  scanf       use regular expressions
+  setbuf                          IO::Handle
+  setvbuf                         IO::Handle
+  ungetc                          IO::Handle
+  perror      perlfunc/warn  perlvar/$ERRNO  POSIX.pm  "$!"
+  stderr      *STDERR             POSIX.pm
+  stdin       *STDIN              POSIX.pm
+  stdout      *STDOUT             POSIX.pm
+
+=head3 Event driven
+
+Event loops require a considerable amount of file handle
+administration.  Therefore, there are a large number of module
+available to support the basic calls.  For instance L<AnyEvent>,
+L<POE>, L<IO::Multiplex>, ...and many more
+
+  poll                            IO::Poll
+  pselect                         POSIX::pselect
+  select      perlfunc            ::Events IO::Select
+  FD_CLR                          ::Events
+  FD_ISSET                        ::Events
+  FD_SET                          ::Events
+  FD_ZERO                         ::Events
+
+=head2 Extended Device Input and Output Interfaces
+
+Where Perl always uses flexible lists, the followin are not adding
+anything. See L<perlfunc/open>
+
+  vfprintf       perlfunc/printf
+  vprintf        (same)
+  vfscanf        use regex
+  vscanf         (same)
+  dprintf        write $fd, sprintf $fmt, @data
+  vdprint        (same)
+  fmemopen       open $fh, '>', \$buffer;
+  open_memstream (same)
+
+=head2 General Terminal Interfaces
+
+Most terminal interface functions are provided by the separate
+L<POSIX::1003::Termios> module, which is the same as the C<POSIX::Termios>
+component in C<POSIX.pm>  See its manpage for the usage.
+
+  cfgetispeed                     ::Termios
+  cfgetospeed                     ::Termios
+  cfsetispeed                     ::Termios
+  cfsetospeed                     ::Termios
+  ctermid                         ::Proc
+  isatty         perlfunc/-X flag -t
+  tcdrain                         ::Termios
+  tcflow                          ::Termios
+  tcflush                         ::Termios
+  tcgetattr                       ::Termios/getattr
+  tcsendbreak                     ::Termios
+  tcsetattr                       ::Termios/setattr
+  ttyname                         ::Termios
+
+=head2 Dynamic Linking Interfaces
+
+The loading of shared libraries in organized by its XS wrapper.  The
+module L<XSLoader> opens both the wrapper and the wrapped library.
+Therefore, there is no need for
+
+  dlclose, dlerror, dlopen, dlsym
+
+=head2 File Descriptor Management Interfaces
+
+Although the name of this section suggests differently, actually
+most of these functions use a file handle, not a descriptor.
+
+On file handles:
+
+  fcntl       perlfunc            ::Fcntl Fcntl.pm
+  fgetpos     perlfunc/tell       IO::Seekable/getpos
+  fseek       perlfunc/seek       IO::Seekable/seek
+  fseeko      perlfunc/seek       IO::Seekable/seek
+  fsetpos     perlfunc/seek       IO::Seekable/setpos
+  ftell       perlfunc/tell       IO::Seekable/tell
+  ftello      perlfunc/tell       IO::Seekable/tell
+  truncate    perlfunc/truncate   IO::Handle/truncate
+  rewind                          POSIX.pm
+
+Using file-descriptors
+
+  dup         perlopentut/<&=     ::FdIO/dupfd
+  dup2                            ::FdIO/dup2fd
+  lseek                           ::FdIO/seekfd       
+  ftruncate                       ::FdIO/truncfd
+                                  ::FdIO/rewindfd
+                                  ::FdIO/tellfd
+
+=head2 FIFO Interfaces
+
+  mkfifo                          ::FS
+  mkfifoat    not supported
+  mknodat     not supported
+
+=head2 File Attribute Interfaces
+
+Perl's C<chown> and C<chmod> accept both file names and file handles.  Be
+warned that the order of the parameters is different!
+
+  chmod       perlfunc
+  chown       perlfunc
+  fchmod      perlfunc/chmod
+  fchown      perlfunc/chown
+  umask       perlfunc
+  fchmodat    not supported
+  fchownat    not supported
+
+The symbolic constants for C<chmod> are provided by L<Fcntl> (and
+POSIX.pm)
+
+=head2 Thread-Safe Stdio Locking Interfaces
+
+Perl does support the non-portable flock (see L<perlfunc/flock>)
+in core, but the POSIX C<flockfile> mechanism is unsupported by
+the PerlIO layers:
+
+  flockfile, ftrylockfile, funlockfile, getc_unlocked,
+  getchar_unlocked, putc_unlocked, putchar_unlocked
+
+=head2 File System Interfaces
+
+  access      filetest            ::FS
+  chdir       perlfunc      
+  closedir    perlfunc            IO::Dir/close
+  creat       perlfunc/sysopen    ::FdIO/creatfd
+  fchdir      perlfunc         
+  fpathconf                       ::Pathconf
+  fstat       perlfunc/stat       ::FdIO/statfd File::stat POSIX.pm
+  fstatvfs                        Filesys::statvfs
+  getcwd                          Cwd/getcwd
+  link        perlfunc         
+  mkdir       perlfunc         
+  mkstemp                         File::Temp/mkstemp
+  opendir     perlfunc            IO::Dir/open
+  pathconf                        ::Pathconf
+  readdir     perlfunc            IO::Dir/read
+  remove                          File::Remove  POSIX.pm
+  rename      perlfunc         
+  rewinddir   perlfunc            IO::Dir/rewind
+  rmdir       perlfunc
+  stat        perlfunc            File::stat
+  statvfs                         Filesys::statvfs
+  tmpfile                         File::Temp IO::File/new_tmpfile
+  tmpnam      (insecure!)         File::Temp POSIX.pm
+  truncate    perlfunc
+  unlink      perlfunc       
+  utime       perlfunc            ::FS POSIX.pm
+
+B<Warning:>
+
+  POSIX::utime($filename, $atime, $mtime);
+  CORE::utime($atime, $mtime, @filenames);
+
+The symbolic constants needed to understand the result of C<stat>
+are provided by L<Fcntl>.
+
+=head2 File System Extension Interfaces
+
+  alphasort   perlfunc/sort
+  getdelim    perlvar/$INPUT_RECORD_SEPARATOR
+  getline     $a = <FH>           IO::Handle
+  glob        perlfunc/glob       File::Glob
+  globfree    never needed
+  mkdtemp     File::Temp/mkdtemp
+  scandir     perlfunc/glob
+  dirfd       not supported
+  fdopendir   not supported
+
+None of the functions of the 'at' interface is supported: they provide
+a way to use paths relative to a file-descriptor.  This POSIX module only
+supports their absolute brothers:
+
+  faccessat, fstatat, linkat, mkdirat, openat, renameat,
+  unlinkat, utimensat
+
+=head2 Internationalization Interfaces
+
+  nl_langinfo                     I18N::Langinfo/langinfo
+
+This interface is far to simple to really translate messages into various
+languages.  You may have a look at various implementations of C<gettext>.
+
+  catclose                        Locale::Msgcat
+  catgets                         Locale::Msgcat
+  catopen                         Locale::Msgcat
+
+An Object Oriented wrapper to the iconv interface is provided
+by L<Text::Iconv>.  Better have a look at the L<Encode> first.
+
+  iconv                           Text::Iconv/convert
+  iconv_open                      Text::Iconv/new
+  iconv_close                     Text::Iconv/DESTROY
+
+=head2 Job Control Interfaces
+
+  setpgid                         ::Proc
+  tcgetpgrp                       ::Proc
+  tcsetpgrp                       ::Proc
+  tcgetsid    not supported
+
+=head2 Memory Interfaces
+
+Memory management is done by the language.  It is difficult to allocate
+data structures on specific locations, although there are various mmap
+interfaces.
+
+  mmap                            Sys::Mmap   Mmap
+  munmap                          Sys::Mmap   Mmap
+  mprotect                        IO::AIO/aio_mprotect
+
+=head2 Multiple Concurrent Locale Interfaces
+
+The functions C<newlocale>, C<uselocale>, C<duplocale>, and C<freelocale>
+are not supported.  Neither are all of the functions which relate to is,
+all ending on C<_l>, like C<isalnum_l()>.
+
+=head2 Multiple Process Interfaces
+
+  _Exit                           ::Proc/_exit
+  _exit                           ::Proc
+  assert        Carp/croak        POSIX.pm
+  atexit        perlsub/END{} block
+  clock                           ::Time Time::HiRes
+  exec*         perlfunc
+  exit          perlfunc
+  fork          perlfunc          Windows::perlfork
+  getpgrp       perlfunc    
+  getpgid                         ::Proc
+  getpid        perlvar/$PID  $$
+  getppid       perlvar/$PPID
+  getsid        not supported
+  setsid                          ::Proc
+  sleep         perlfunc          POSIX.pm (see warning)
+  times         perlfunc          ::Proc/times5
+  wait          perlfunc          ::Proc
+  waitid        not supported
+  waitpid       perlfunc          ::Proc
+  fexecve       not supported
+
+B<Warning,> different return parameters for POSIX.pm
+
+          ($user, $sys, $cuser, $csys) = CORE::times();
+ ($elapse, $user, $sys, $cuser, $csys) = POSIX::times();
+ ($elapse, $user, $sys, $cuser, $csys) = ::Proc::times5();
+
+B<Warning,> different return value for POSIX.pm
+
+  $slept = CORE::sleep(10);
+  $early = POSIX::sleep(10); # $slept+$early=10
+
+  $pid   = waitpid(-1, WNOHANG);
+
+=head2 Networking Interfaces
+
+=head3 handling sockets
+
+Most code uses the Object Oriented approach via L<IO::Socket::INET>.
+
+  accept      perlfunc            IO::Socket
+  bind        perlfunc            IO::Socket
+  connect     perlfunc            IO::Socket::INET
+  getsockname perlfunc            IO::Socket/sockname
+  getpeername perlfunc            IO::Socket/peername
+  getsockopt  perlfunc            IO::Socket/sockopt
+  setsockopt  perlfunc            IO::Socket/sockopt
+  shutdown    perlfunc            IO::Socket
+  socket      perlfunc            IO::Socket
+  sockatmark                      IO::Socket/atmark
+  socketpair  perlfunc            IO::Socket
+  listen      perlfunc            IO::Socket
+  recv        perlfunc            IO::Socket
+  recvfrom    perlfunc/rev        IO::Socket/recv
+  recvmsg     not supported
+  send        perlfunc            IO::Socket
+  sendmsg     not supported
+  sendto      perlfunc/send       IO::Socket/send
+
+If you use the right functions of L<IO::Socket::INET> you will not
+need these.  Otherwise, you should take a look at L<perlfunc/pack>
+and C<unpack>.
+
+  htonl, htons, ntohl, ntohs
+  inet_addr, inet_ntoa, inet_ntop, inet_pton
+
+=head3 network configuration
+
+Most network configuration functions are provided in CORE.  There
+are also object wrappers in various C<Net::> modules.
+
+  getaddrinfo      perlfunc       Net::addrinfo
+  gethostbyaddr    perlfunc       Net::hostent
+  gethostbyname    perlfunc       Net::hostent
+  gethostent       perlfunc       Net::hostent
+  gethostname                     Sys::Hostname
+  getnameinfo      perlfunc
+  getnetbyaddr     perlfunc       Net::netent
+  getnetbyname     perlfunc       Net::netent
+  getnetent        perlfunc       Net::netent
+  getprotobyname   perlfunc       Net::protoent
+  getprotobynumber perlfunc       Net::protoent
+  getprotoent      perlfunc       Net::protoent
+  getservbyname    perlfunc       Net::servent
+  getservbyport    perlfunc       Net::servent
+  getservent       perlfunc       Net::servent
+  sethostent       perlfunc       Net::hostent
+  setnetent        perlfunc       Net::netent
+  setprotoent      perlfunc       Net::protoent
+  setservent       perlfunc       Net::servent
+
+Never needed, memory automatically freed:
+
+  endhostent, endnetent, endprotoent, endservent, freeaddrinfo,
+  if_freenameindex
+
+Not supported:
+
+  gai_strerror, if_indextoname, if_nameindex, if_nametoindex
+
+=head2 Pipe Interfaces
+
+The C<pipe> has an implementation in POSIX.pm, which uses file
+descriptors.  The CORE version of pipe uses file handles.
+
+  pipe        perlfunc            ::FdIO/pipefd
+
+B<Warning,> different return parameters for POSIX.pm
+
+  my ($r_fh, $w_fh) = CORE::pipe();
+  my ($r_fd, $w_fd) = POSIX::pipe();
+  my ($r_fd, $w_fd) = ::FdIO::pipefd();
+
+=head2 Realtime Signal Interfaces
+
+  sigqueue                        POSIX::RT::Signal
+  sigtimedwait                    POSIX::RT::Signal
+  sigwaitinfo                     POSIX::RT::Signal
+
+=head2 Regular Expression Interfaces
+
+Perl's regular expressions are much more powerful.  See L<perlre>.
+
+  regcomp     qr//
+  regerror    not needed
+  regexec     perlop/=~
+  regfree     not needed
+
+=head2 Semaphore Interfaces
+
+POSIX semaphores are supported by L<POSIX::RT::Semaphore>:
+
+  sem_close                       POSIX::RT::Semaphore/close
+  sem_destroy                     POSIX::RT::Semaphore/destroy
+  sem_getvalue                    POSIX::RT::Semaphore/getvalue
+  sem_init                        POSIX::RT::Semaphore/init
+  sem_open                        POSIX::RT::Semaphore/open
+  sem_post                        POSIX::RT::Semaphore/post
+  sem_timedwait                   POSIX::RT::Semaphore/timedwait
+  sem_trywait                     POSIX::RT::Semaphore/trywait
+  sem_unlink                      POSIX::RT::Semaphore/unlink
+  sem_wait                        POSIX::RT::Semaphore/wait
+
+=head2 Shell and Utilities Interfaces
+
+  pclose       perlfunc/close
+  popen        perlfunc/open ('|-' or '-|')  perlfunc/qx
+  system       perlfunc
+  wordexp      perlfunc/glob
+  wordfree     never needed
+
+=head2 Signal Interfaces
+
+Signal handling is provided via L<POSIX::1003:SigAction> and
+L<POSIX::SigSet>. Take a look at those manuals.
+
+  abort        perlvar/%SIG
+  alarm        perlfunc
+  kill         perlfunc           ::Signals
+  pause                           ::Signals
+  psiginfo     not supported
+  psignal      not supported
+  raise                           ::Signals
+  sigaction                       ::Signals
+  sigaddset                       ::Signals
+  sigdelset                       ::Signals
+  sigemptyset                     ::Signals
+  sigfillset                      ::Signals
+  sigismember                     ::Signals
+  signal       perlvar/%SIG       ::Signals
+  sigpending                      ::Signals
+  sigprocmask                     ::Signals
+  sigsuspend                      ::Signals
+  sigwait      not supported
+  strsignal                       ::Signals
+
+B<Warning>, parameter order in POSIX.pm
+
+  CORE::kill($signal, $pid);
+  ::Signals::kill($signal, $pid);
+  POSIX::kill($pid, $signal);
+
+=head2 Single Process Interfaces
+
+  confstr                         ::Confstr
+  environ     perlvar/%ENV
+  errno       perlvar/$ERRNO      $!+0
+  getenv      perlvar/%ENV        $ENV{PATH}
+  setenv      perlvar/%ENV        $ENV{HOME} = '/tmp'
+  sysconf                         ::Sysconf
+  uname                           ::OS
+  unsetenv    perlvar/%ENV        delete $ENV{PS1}
+
+The error constants are provided by Errno.
+
+=head2 Symbolic Link Interfaces
+
+  lchown                          ::FS
+  lstat       perlfunc
+  readlinkat  not supported
+  readlink    perlfunc
+  symlinkat   not supported
+  symlink     perlfunc
+
+B<Warning,> POSIX.pm accepts only one filename
+
+  CORE::chown($uid, $gid, @filename);
+  ::FS::lchown($uid, $gid, @symlinks);
+  POSIX::lchown($uid, $gid, $symlink); # !!!
+
+=head2 System Database Interfaces
+
+  getgrgid    perlfunc            User::grent
+  getgrnam    perlfunc            User::grent
+  getpwnam    perlfunc            User::pwent
+  getpwuid    perlfunc            User::pwent
+
+=head2 Timer Interfaces
+
+  clock_getres                    Time::HiRes POSIX::RT::Clock
+  clock_gettime                   Time::HiRes POSIX::RT::Clock
+  clock_settime                   Time::HiRes POSIX::RT::Clock
+  nanosleep                       Time::HiRes POSIX::RT::Clock
+  timer_create                    POSIX::RT::Timer
+  timer_delete                    POSIX::RT::Timer
+  timer_getoverrun                POSIX::RT::Timer
+  timer_gettime                   POSIX::RT::Timer
+  timer_settime                   POSIX::RT::Timer
+
+=head2 User and Group Interfaces
+
+Expect portability issues on this subject.  Better B<not use any of
+these>, but use the abstract L<POSIX::1003::User> instead!
+
+  cuserid                         ::Proc
+  getegid     perlvar/$EGID $)    ::User
+  geteuid     perlvar/$EUID $>    ::User
+  getgid      perlvar/$GID  $(    ::User
+  getgroups   perlvar/$GID  $(    ::User
+  getlogin    perlfunc            ::User
+  getuid      perlvar/$UID  $<    ::User    # warning
+  setegid     perlvar/$EGID $)    ::User    # warning
+  seteuid     perlvar/$EUID $>    ::User    # warning
+  setgid      perlvar/$GID  $(    ::User    # warning
+  setuid      perlvar/$UID  $<    ::User    # warning
+
+B<Warning:> The special variables for user- and group-ids try to be smart:
+they are implemented using C<getreuid> and/or friends.  POSIX.pm provides
+C<setuid> and C<setgid> which simply call the special variables. So:
+both do not offer access to the system functions with that name.
+
+=head2 Wide Character Device Input and Output Interfaces
+
+No useful support for wide characters, so no
+
+  fgetwc, fgetws, fputwc, fputws, fwide, fwprintf, fwscanf,
+  getwc, getwchar, putwc, putwchar, ungetwc, vfwprintf, vfwscanf,
+  vwprintf, vwscanf, wprintf, wscanf
+
+=head2 Process CPU-Time Clocks Interfaces
+
+Probably unsupported:
+
+  clock_getcpuclockid             POSIX::RT::Clock/get_cpuclock
+
+=head2 File Synchronization Interfaces
+
+  fsync                           IO::Handle/sync File::Sync
+
+=head2 Memory Locking Interfaces
+
+  mlockall                        IO::AIO
+  munlockall                      IO::AIO
+  mlock                           IO::AIO
+  munlock                         IO::AIO
+
+=head2 Message Passing Interfaces
+
+  mq_close                        POSIX::RT::MQ
+  mq_getattr                      POSIX::RT::MQ
+  mq_notify                       POSIX::RT::MQ
+  mq_open                         POSIX::RT::MQ
+  mq_receive                      POSIX::RT::MQ
+  mq_send                         POSIX::RT::MQ
+  mq_setattr                      POSIX::RT::MQ
+  mq_timedreceive                 POSIX::RT::MQ
+  mq_timedsend                    POSIX::RT::MQ
+  mq_unlink                       POSIX::RT::MQ
+
+=head2 Shared Memory Objects Interfaces
+
+  shm_open                        POSIX::RT:SharedMem
+  shm_unlink                      POSIX::RT:SharedMem
+
+=head2 Synchronized Input and Output Interfaces
+
+  fdatasync                       IO::AIO/aio_fdatasync
+  msync                           IO::AIO/aio_msync
+
+=head2 Trace Event Filter Interfaces
+
+No tracing support on POSIX level via C<posix_trace>.  There are
+various ways to debug Perl, however.  For instance try
+
+  perl -s script.pl
+
+=head2 XSI General C Library Interfaces
+
+Comparible functionality for functions which never made it into POSIX:
+
+  a64l                            MIME::Base64/encode
+  daylight                        ::Time/tzname
+  ffs          perlfunc/vec
+  getdate                         ::Time/strftime
+  isascii      perlre/ [[:ascii:]]  \p{Ascii}
+  l64a                            MIME::Base64/decode
+  memccpy      $b = $1 if $a =~ m/(.*{,n}?)(?:c|$)/
+  signgam      math, probably not supported
+  strptime                        Time::Piece
+  swab         ($b,$a) = ($a,$b)
+  timezone                        ::Time/tzname
+  toascii      $c & 0x7f
+  _tolower     perlfunc/lc
+  _toupper     perlfunc/lu
+
+No support for alternative random generators
+
+  drand48, erand48, jrand48, lcong48, lrand48, mrand48, nrand48,
+  seed48, srand48, initstate, random, setstate, srandom
+
+Perl supports HASHes by itself, so no need for
+
+  hcreate, hdestroy, hsearch
+
+No need for double linked lists and table management
+
+  insque, remque, lfind, lsearch
+
+Binary trees are less efficient than HASHes, which are much simpler to
+use as well.  You may take a look at L<Tree> or L<Tree::Binary>, because
+these are missing:
+
+  tdelete, tfind, tsearch, twalk
+
+=head2 XSI Database Management Interfaces
+
+Some simple database which probably no-one uses anymore.  See C<DBI>,
+for instance L<DBI::DBM>.
+
+  dbm_clearerr, dbm_close, dbm_delete, dbm_error, dbm_fetch,
+  dbm_firstkey, dbm_nextkey, dbm_open, dbm_store
+
+=head2 XSI Device Input and Output Interfaces
+
+  fmtmsg                          Sys::Syslog
+
+Probably not supported:
+
+  grantpt, posix_openpt, ptsname, readv, unlockpt, write
+
+=head2 XSI File System Interfaces
+
+  basename                        File::Basename
+  dirname                         File::Basename
+  ftw                             File::Find/find
+  lockf        			  File::lockf
+  mknod                           ::FS Unix::Mknod Mknod
+  nftw                            File::Find/find
+  realpath                        File::Spec/canonpath
+  seekdir      perlfunc           IO::Dir/seek
+  sync                            File::Sync
+  telldir      perlfunc           IO::Dir/tell
+  tempnam      (insecure!)        File::Temp
+
+=head2 XSI Interprocess Communication Interfaces
+
+  ftok                            IPC::SysV IPC::SharedMem
+  msgctl                          IPC::Msg
+  msgget                          IPC::Msg
+  msgrcv                          IPC::Msg
+  msgsnd                          IPC::Msg
+  semctl                          IPC::Semaphore
+  semget                          IPC::Semaphore
+  semop                           IPC::Semaphore
+  shmat                           IPC::SysV IPC::SharedMem
+  shmctl                          IPC::SysV IPC::SharedMem
+  shmdt                           IPC::SysV IPC::SharedMem
+  shmget                          IPC::SysV IPC::SharedMem
+
+=head2 XSI Jump Interfaces
+
+No C<_longjmp> nor C<_setjmp>.
+
+=head2 XSI Maths Library Interfaces
+
+No C<j0>, C<j>1, C<jn>, C<y>0, C<y>1, C<yn>
+
+=head2 XSI Multiple Process Interfaces
+
+  getpriority  perlfunc           BSD::Resource
+  getrlimit                       ::Limit BSD::Resource
+  getrusage                       Unix::Getrusage BSD::Resource
+  nice                            ::Proc
+  setpgrp      perlfunc           ::Proc
+  setpriority  perlfunc           BSD::Resource
+  setrlimit                       ::Limit BSD::Resource
+  ulimit                          ::Limit
+
+=head2 XSI Signal Interfaces
+
+The XSI signal interface is not supported, so no
+
+  killpg, sigaltstack, sighold, sigignore, siginterrupt, sigpause,
+  sigrelse, sigset
+
+=head2 XSI Single Process Interfaces
+
+  gethostid    not supported
+  gettimeofday                    Time::HiRes
+  putenv       perlvar/%ENV
+
+=head2 XSI System Logging Interfaces
+
+  closelog                        Sys::Syslog
+  openlog                         Sys::Syslog
+  setlogmask                      Sys::Syslog
+  syslog                          Sys::Syslog
+
+See also the many logging frameworks, like Log::Log4perl,
+Log::Dispatch, or Log::Report.
+
+=head2 XSI Timer Interfaces
+
+  getitimer                       Time::HiRes
+  setitimer                       Time::HiRes
+
+=head2 XSI User and Group Interfaces
+
+  endgrent     not needed
+  endpwent     not needed
+  endutxent                       User::Utmp
+  getgrent     perlfunc           User::grent
+  getpwent     perlfunc           User::pwent
+  getutxent                       User::Utmp
+  getutxid                        User::Utmp
+  getutxline                      User::Utmp
+  pututxline                      User::Utmp
+  setgrent     perlfunc           User::grent
+  setpwent     perlfunc           User::pwent
+  setregid     perlvar/$GID,$EGID ::User
+  setreuid     perlvar/$UID,$EUID ::User
+  setutxent                       User::Utmp
+
+Non-standard, but commonly available.  See also L<POSIX::1003::User|POSIX::1003::User>.
+
+  getresgid                       ::User
+  getresuid                       ::User
+  setresgid                       ::User
+  setresuid                       ::User
+
+=head2 XSI STREAMS Interfaces
+
+  ioctl        perlfunc
+
+Streams are not supported.  So no:
+
+  fattach, fdetach, getmsg, getpmsg, isastream, putmsg, putpmsg
+
+=head1 CONSTANTS
+
+POSIX also defines zillions of constants. They are listed in
+(and available via) the C<POSIX::1003> modules. The C<_POSIX_>
+constants can be read via L<POSIX::1003::Properties>.
+
+=head1 SEE ALSO
+
+This module is part of POSIX-1003 distribution version 0.98,
+built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights 2011-2013 on the perl code and the related documentation
+ by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

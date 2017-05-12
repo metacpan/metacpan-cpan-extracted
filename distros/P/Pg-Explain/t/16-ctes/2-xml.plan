@@ -1,0 +1,92 @@
+                           QUERY PLAN                            
+-----------------------------------------------------------------
+ <explain xmlns="http://www.postgresql.org/2009/explain">       +
+   <Query>                                                      +
+     <Plan>                                                     +
+       <Node-Type>Result</Node-Type>                            +
+       <Startup-Cost>0.02</Startup-Cost>                        +
+       <Total-Cost>0.06</Total-Cost>                            +
+       <Plan-Rows>2</Plan-Rows>                                 +
+       <Plan-Width>4</Plan-Width>                               +
+       <Actual-Startup-Time>0.006</Actual-Startup-Time>         +
+       <Actual-Total-Time>0.010</Actual-Total-Time>             +
+       <Actual-Rows>2</Actual-Rows>                             +
+       <Actual-Loops>1</Actual-Loops>                           +
+       <Plans>                                                  +
+         <Plan>                                                 +
+           <Node-Type>Result</Node-Type>                        +
+           <Parent-Relationship>InitPlan</Parent-Relationship>  +
+           <Subplan-Name>CTE cte_1</Subplan-Name>               +
+           <Startup-Cost>0.00</Startup-Cost>                    +
+           <Total-Cost>0.01</Total-Cost>                        +
+           <Plan-Rows>1</Plan-Rows>                             +
+           <Plan-Width>0</Plan-Width>                           +
+           <Actual-Startup-Time>0.001</Actual-Startup-Time>     +
+           <Actual-Total-Time>0.001</Actual-Total-Time>         +
+           <Actual-Rows>1</Actual-Rows>                         +
+           <Actual-Loops>1</Actual-Loops>                       +
+         </Plan>                                                +
+         <Plan>                                                 +
+           <Node-Type>Result</Node-Type>                        +
+           <Parent-Relationship>InitPlan</Parent-Relationship>  +
+           <Subplan-Name>CTE cte_2</Subplan-Name>               +
+           <Startup-Cost>0.00</Startup-Cost>                    +
+           <Total-Cost>0.01</Total-Cost>                        +
+           <Plan-Rows>1</Plan-Rows>                             +
+           <Plan-Width>0</Plan-Width>                           +
+           <Actual-Startup-Time>0.001</Actual-Startup-Time>     +
+           <Actual-Total-Time>0.002</Actual-Total-Time>         +
+           <Actual-Rows>1</Actual-Rows>                         +
+           <Actual-Loops>1</Actual-Loops>                       +
+         </Plan>                                                +
+         <Plan>                                                 +
+           <Node-Type>Append</Node-Type>                        +
+           <Parent-Relationship>Outer</Parent-Relationship>     +
+           <Startup-Cost>0.00</Startup-Cost>                    +
+           <Total-Cost>0.04</Total-Cost>                        +
+           <Plan-Rows>2</Plan-Rows>                             +
+           <Plan-Width>4</Plan-Width>                           +
+           <Actual-Startup-Time>0.005</Actual-Startup-Time>     +
+           <Actual-Total-Time>0.008</Actual-Total-Time>         +
+           <Actual-Rows>2</Actual-Rows>                         +
+           <Actual-Loops>1</Actual-Loops>                       +
+           <Plans>                                              +
+             <Plan>                                             +
+               <Node-Type>CTE Scan</Node-Type>                  +
+               <Parent-Relationship>Member</Parent-Relationship>+
+               <CTE-Name>cte_1</CTE-Name>                       +
+               <Alias>cte_1</Alias>                             +
+               <Startup-Cost>0.00</Startup-Cost>                +
+               <Total-Cost>0.02</Total-Cost>                    +
+               <Plan-Rows>1</Plan-Rows>                         +
+               <Plan-Width>4</Plan-Width>                       +
+               <Actual-Startup-Time>0.005</Actual-Startup-Time> +
+               <Actual-Total-Time>0.006</Actual-Total-Time>     +
+               <Actual-Rows>1</Actual-Rows>                     +
+               <Actual-Loops>1</Actual-Loops>                   +
+             </Plan>                                            +
+             <Plan>                                             +
+               <Node-Type>CTE Scan</Node-Type>                  +
+               <Parent-Relationship>Member</Parent-Relationship>+
+               <CTE-Name>cte_2</CTE-Name>                       +
+               <Alias>cte_2</Alias>                             +
+               <Startup-Cost>0.00</Startup-Cost>                +
+               <Total-Cost>0.02</Total-Cost>                    +
+               <Plan-Rows>1</Plan-Rows>                         +
+               <Plan-Width>4</Plan-Width>                       +
+               <Actual-Startup-Time>0.001</Actual-Startup-Time> +
+               <Actual-Total-Time>0.002</Actual-Total-Time>     +
+               <Actual-Rows>1</Actual-Rows>                     +
+               <Actual-Loops>1</Actual-Loops>                   +
+             </Plan>                                            +
+           </Plans>                                             +
+         </Plan>                                                +
+       </Plans>                                                 +
+     </Plan>                                                    +
+     <Triggers>                                                 +
+     </Triggers>                                                +
+     <Total-Runtime>0.093</Total-Runtime>                       +
+   </Query>                                                     +
+ </explain>
+(1 row)
+

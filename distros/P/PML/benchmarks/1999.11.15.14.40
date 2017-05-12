@@ -1,0 +1,6 @@
+The following benchmark was taken before I decided to change the
+PML object from a hash ref to an array ref.
+
+-- Peter
+
+100 calls to PML took: 15 wallclock secs ( 6.92 usr  0.04 sys +  0.00 cusr  0.06 csys =  0.00 CPU)

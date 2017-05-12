@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
+<!--*- mode: xml -*-->
+<glade-interface>
+  <widget class="GtkWindow" id="window2">
+    <property name="visible">True</property>
+    <property name="title" translatable="yes">window2</property>
+    <signal name="delete_event" handler="on_delete"/>
+    <child>
+      <widget class="GtkButton" id="button2">
+        <property name="visible">True</property>
+        <property name="can_focus">True</property>
+        <property name="label" translatable="yes">button2</property>
+        <property name="use_underline">True</property>
+        <property name="response_id">0</property>
+        <signal name="clicked" handler="on_button1_clicked"/>
+      </widget>
+    </child>
+  </widget>
+</glade-interface>

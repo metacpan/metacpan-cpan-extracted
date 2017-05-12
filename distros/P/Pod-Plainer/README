@@ -1,0 +1,36 @@
+Pod-Plainer version 1.04
+========================
+
+This was a core module in the Perl distribution to aid adoption
+of extended POD featues.  It is no longer needed in the Perl
+distribution and is being migrated to CPAN.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Pod::Parser
+
+RECENT CHANGES
+
+1.04 Added META.json; use Test::More
+1.03 Removed C<use if ... deprecate>
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, 2010, 2014 by Robin Barker
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

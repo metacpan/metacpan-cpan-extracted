@@ -1,0 +1,19 @@
+					<div petal:if="view/term/error" style="color: red; border: solid 1px red;">
+						<?if name="view/term/error/isInvalid"?>
+							Validation Error:
+							<ul>
+								<li petal:if="view/term/error/isNameRequired">Term name required!</li>
+								<li petal:if="view/term/error/isCreatorRequired">Term creator required!</li>
+								<li petal:if="view/term/error/isDateRequired">Term date required!</li>
+								<li petal:if="view/term/error/isConceptRequired">Term concept required!</li>
+								<li petal:if="view/term/error/isLangugeRequired">Term languge required!</li>
+							</ul>
+						<?else?>
+						  Error:
+							<ul>
+								<li petal:if="view/term/error/isExists">A term named &quot;$view/term/error/term/name&quot; already exists!</li>
+								<li petal:if="view/term/error/isNonExistent">No term named &quot;$view/term/error/term/name&quot; exists!</li>
+							</ul>
+						<?end?>
+					</div>
+

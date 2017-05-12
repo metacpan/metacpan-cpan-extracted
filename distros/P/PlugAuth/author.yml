@@ -1,0 +1,62 @@
+---
+pod_spelling_system:
+  stopwords:
+    - PlugAuth
+    - plugins
+    - ie
+    - Ctrl-C
+    - user.txt
+    - resource.txt
+    - quickstart
+    - ldap
+    - PlugAuth.conf
+    - IP
+    - alice
+    - bob
+    - plugin's
+    - pluggable
+    - nginx
+    - lighttpd
+    - hostname
+    - hypnotoad
+    - RESTful
+    - API
+    - Clustericious
+    - Plack
+    - APIs
+    - Kragen
+    - SSL
+    - Sitaker
+    - auth
+    - authz
+    - http
+    - ocreate
+    - optimus
+    - primus
+    - url
+    - wget
+    - pam-http
+    - namespace
+    - FlatAuth
+    - FlatAuthz
+    - JSON
+    - YAML
+    - autodata
+    - ok
+    - GSFC
+    - plugauth
+    - conf
+    - plugauthclient
+    - plugauthpasswd
+
+pod_coverage:
+  private:
+    - PlugAuth::Role::Flat
+    - PlugAuth::(Role|Plugin)::.*#new
+    - PlugAuth::(Rold|Plugin)::.*#init
+    - PlugAuth::Plugin::DisableGroup#check_credentials
+    - PlugAuth#startup
+    - PlugAuth#plugin
+    - Clustericious::Plugin::SelfPlugAuth
+    - PlugAuth::Plugin::Test
+    - PlugAuth::Plugin::Audit#log_filename

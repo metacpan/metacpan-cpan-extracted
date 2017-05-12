@@ -1,0 +1,107 @@
+=================================================
+
+system
+    help
+    status
+    config reload
+    config commit
+
+program provisioning
+    program list
+    program settings <name>
+    program add <name> { json..config..here }
+        - verified if existing binary
+    program remove <name>
+        - error if running, stop first
+    program update <name> { updated..fields..json..config..here }
+        - error if running, stop first
+
+process management
+    program status-all
+    program start-all
+    program stop-all
+    program status <name>
+    program start <name>
+    program stop <name>
+    program force-stop <name>
+
+
+=================================================
+
+system
+    shell
+
+provisioning
+
+    info-all
+    info <name>
+    add <name> { json..config.. }
+    remove <name>
+    commit
+
+process management
+
+    status-all
+    status <name>
+    start <name>
+    stop <name>
+    
+
+
+=================================================
+
+    safetynetd v0.03 at hostname (ip)
+
+client> program list
+    {
+        'result' : [
+            'activemq',
+            'msp01',
+            'mqbridged'
+        ]
+    }
+
+client> program settings activemq
+    {
+        "name"          : "activemq",
+        "command"       : "/usr/bin/activemq",
+        "autorestart"   : 1,
+    }
+
+client> unknowncommandheretypoxxx
+    
+    !error command "..."
+
+client> program status-all
+    [
+        {
+        activemq        running
+        msp01           dead (scheduled for restart)
+        mqbridged       running
+
+client> program update activemq { "autorestart" : 0 }
+    unable to update 
+
+client> program update activemq { "autorestart" : 0 }
+    configuration altered
+
+client> program settings activemq
+    {
+        "name"          : "activemq",
+        "command"       : "/usr/bin/activemq",
+        "autorestart"   : 0,
+    }
+    
+client> program stop activemq
+    activemq stopped
+
+client> program status-all
+    activemq        dead (scheduled for restart)
+    msp01           running
+    mqbridged       running
+
+client> program stop activemq
+    failure: activemq not running
+
+client> config commit
+

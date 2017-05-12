@@ -1,0 +1,87 @@
+{
+    'actual_loops'           => '1',
+    'actual_rows'            => '2',
+    'actual_time_first'      => '0.005',
+    'actual_time_last'       => '0.008',
+    'estimated_row_width'    => '4',
+    'estimated_rows'         => '2',
+    'estimated_startup_cost' => '0.02',
+    'estimated_total_cost'   => '0.06',
+    'is_analyzed'            => 1,
+    'cte_order'              => [ 'cte_1', 'cte_2' ],
+    'ctes'                   => {
+        'cte_1' => {
+            'actual_loops'           => '1',
+            'actual_rows'            => '1',
+            'actual_time_first'      => '0.001',
+            'actual_time_last'       => '0.001',
+            'estimated_row_width'    => '0',
+            'estimated_rows'         => '1',
+            'estimated_startup_cost' => '0',
+            'estimated_total_cost'   => '0.01',
+            'is_analyzed'            => 1,
+            'type'                   => 'Result'
+        },
+        'cte_2' => {
+            'actual_loops'           => '1',
+            'actual_rows'            => '1',
+            'actual_time_first'      => '0',
+            'actual_time_last'       => '0',
+            'estimated_row_width'    => '0',
+            'estimated_rows'         => '1',
+            'estimated_startup_cost' => '0',
+            'estimated_total_cost'   => '0.01',
+            'is_analyzed'            => 1,
+            'type'                   => 'Result'
+        },
+    },
+    'sub_nodes' => [
+        {
+            'actual_loops'           => '1',
+            'actual_rows'            => '2',
+            'actual_time_first'      => '0.005',
+            'actual_time_last'       => '0.008',
+            'estimated_row_width'    => '4',
+            'estimated_rows'         => '2',
+            'estimated_startup_cost' => '0',
+            'estimated_total_cost'   => '0.04',
+            'is_analyzed'            => 1,
+            'sub_nodes'              => [
+                {
+                    'actual_loops'           => '1',
+                    'actual_rows'            => '1',
+                    'actual_time_first'      => '0.004',
+                    'actual_time_last'       => '0.004',
+                    'estimated_row_width'    => '4',
+                    'estimated_rows'         => '1',
+                    'estimated_startup_cost' => '0',
+                    'estimated_total_cost'   => '0.02',
+                    'is_analyzed'            => 1,
+                    'type'                   => 'CTE Scan',
+                    'scan_on' => {
+                        'cte_name' => 'cte_1',
+                        'cte_alias' => 'cte_1',
+                    },
+                },
+                {
+                    'actual_loops'           => '1',
+                    'actual_rows'            => '1',
+                    'actual_time_first'      => '0.001',
+                    'actual_time_last'       => '0.001',
+                    'estimated_row_width'    => '4',
+                    'estimated_rows'         => '1',
+                    'estimated_startup_cost' => '0',
+                    'estimated_total_cost'   => '0.02',
+                    'is_analyzed'            => 1,
+                    'type'                   => 'CTE Scan',
+                    'scan_on' => {
+                        'cte_name' => 'cte_2',
+                        'cte_alias' => 'cte_2',
+                    },
+                }
+            ],
+            'type' => 'Append'
+        }
+    ],
+    'type' => 'Result'
+}

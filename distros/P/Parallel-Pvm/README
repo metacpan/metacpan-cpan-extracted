@@ -1,0 +1,71 @@
+NEWS
+----
+
+PERL-PVM
+--------
+
+This is a perl extension for the parallel virtual machine
+(PVM) message-passing system.   Before you begin installation
+you must have already installed PVM (the most recent version of
+PVM may be found at http://www.csm.ornl.gov/pvm/).
+
+You must also set the environment variables
+
+        setenv PVM_ROOT <pvm root directory>
+        setenv PVM_ARCH `$PVM_ROOT/lib/pvmgetarch`
+
+For a correct installation you will also need perl5.005
+or greater.
+
+Once all the preliminaries have been done, the installation
+sequence is as follows:
+
+        tar xvf Parallel-Pvm-1.4.0.tar
+        cd Parallel-Pvm-1.4.0
+
+Have a look into Makefile.PL to see if you have to make any
+changes.  Afterwhich do
+
+        perl5 Makefile.PL
+        make
+        make test
+        make install
+
+Please read the man page, ie.
+
+        perldoc Parallel::Pvm
+
+Any questions, critisims or suggestions are welcome.
+
+- eddie
+
+Copyright (c) 1996 Edward Walker (c) 2000-2005 Denis Leconte
+          (c) 2006 Ernst Rohlicek
+All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+-------------------------------------------------------------
+
+Current maintainer: 
+
+Ernst Rohlicek
+Email: ernst.rohlicek@inode.at
+
+
+Custodian:
+
+Denis Leconte
+Email: denis_leconte@yahoo.com
+WWW: http://www.experiment4.com/
+
+
+Original author:
+
+Dr Edward Walker
+National Supercomputing Research Centre
+81, Science Park Drive
+Singapore 0511
+
+Email: edward@nsrc.nus.sg
+WWW: http://www.nsrc.nus.sg/STAFF/edward
+

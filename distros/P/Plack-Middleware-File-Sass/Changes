@@ -1,0 +1,10 @@
+Revision history for Perl extension Plack::Middleware::File::Sass
+
+0.03  Sun Feb 13 19:40:10 PST 2011
+        - Use 'sass' gem executable if installed.
+
+0.02  Fri Feb 11 19:01:42 PST 2011
+        - Supported SCSS with the new option 'syntax'
+
+0.01  Sat Feb  6 01:33:23 2010
+        - original version

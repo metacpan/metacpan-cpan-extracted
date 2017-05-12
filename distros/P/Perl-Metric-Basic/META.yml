@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Perl-Metric-Basic
+version: 0.31
+author:
+  - Leon Brocard <acme@astray.com>
+abstract: Provide basic software metrics
+license: perl
+generated_by: Module::Build version 0.2612, without YAML.pm

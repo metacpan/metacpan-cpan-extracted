@@ -1,0 +1,78 @@
+NAME
+
+    POE::Filter::IASLog - A POE Filter for Microsoft IAS-formatted log
+    entries.
+
+VERSION
+
+    version 1.10
+
+SYNOPSIS
+
+      my $filter = POE::Filter::IASLog->new();
+    
+      $arrayref_of_logical_chunks =
+        $filter->get($arrayref_of_raw_chunks_from_driver);
+
+DESCRIPTION
+
+    POE::Filter::IASLog is a POE::Filter for parsing lines of text that are
+    formatted in Microsoft Internet Authentication Service (IAS) log
+    format, where attributes are logged as attribute-value pairs.
+
+    It is intended to be used in a stackable filter,
+    POE::Filter::Stackable, with POE::Filter::Line.
+
+CONSTRUCTOR
+
+    new
+
+      Creates a new POE::Filter::IASLog object. Takes one optional
+      parameter:
+
+        'enumerate', set to a false value to disable the enumeration of known
+                     attribute values, default is 1;
+
+METHODS
+
+    get
+
+    get_one_start
+
+    get_one
+
+      Takes an arrayref which is contains lines of IAS-formatted text,
+      returns an arrayref of IAS hashref records, see Parse::IASLog for
+      details of what a record will contain.
+
+    get_pending
+
+      Returns the filter's partial input buffer.
+
+    put
+
+      The put method is not implemented.
+
+    clone
+
+      Makes a copy of the filter, and clears the copy's buffer.
+
+SEE ALSO
+
+    Parse::IASLog
+
+    POE::Filter::Stackable
+
+    POE::Filter::Line
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

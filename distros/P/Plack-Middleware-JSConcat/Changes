@@ -1,0 +1,7 @@
+Revision history for Perl extension Plack::Middleware::JSConcat
+
+0.29  Fri Nov 13 09:49:07 CST 2009
+        - Fix typo in tests.
+
+0.28  Thu Nov 12 20:51:41 CST 2009
+        - original version

@@ -1,0 +1,45 @@
+Pod::Peapod
+======================
+
+Pod::Peapod is a base class for Pod parsers.
+
+Pod::Peapod::Tkpeapod is a base class implementing
+	a POD viewer using Tk widgets.
+	(see t/peapod)
+
+Pod::Peapod::Text is a base class implementing
+	a POD to text converter.
+	(see t/text)
+
+Yes, there are other POD viewers available on CPAN,
+and I recommend you use them for viewing POD.
+Peapod will eventually (hopefully) support some
+features that extends POD beyond its standard definition.
+
+Stay tuned.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Tk
+  Pod::Simple
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2003 Greg London
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

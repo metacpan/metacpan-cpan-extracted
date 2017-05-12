@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Parse-EventLog.t
+lib/Parse/EventLog.pm

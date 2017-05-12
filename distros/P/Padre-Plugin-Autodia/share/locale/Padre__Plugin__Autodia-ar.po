@@ -1,0 +1,82 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Autodia\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-27 15:33+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"Language-Team: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Arabic\n"
+
+#: lib/Padre/Plugin/Autodia.pm:37
+msgid "Autodia UML Support"
+msgstr "برنامج Autodia لدعم UML"
+
+#: lib/Padre/Plugin/Autodia.pm:59
+msgid "About"
+msgstr "عن"
+
+#: lib/Padre/Plugin/Autodia.pm:60
+msgid "UML"
+msgstr "لغة النمذجة الموحدة UML"
+
+#: lib/Padre/Plugin/Autodia.pm:61
+msgid "Class Diagram (This File)"
+msgstr "رسم بياني لClass  (هذا الملف)"
+
+#: lib/Padre/Plugin/Autodia.pm:62
+msgid "Class Diagram"
+msgstr "رسم بياني لClass"
+
+#: lib/Padre/Plugin/Autodia.pm:80
+msgid "Copyright 2010 Aaron Trevena"
+msgstr "حقوق الطبع محفوظة 2010 Aaron Trevena"
+
+#: lib/Padre/Plugin/Autodia.pm:135
+msgid "JavaScript Files"
+msgstr "ملفات جافاسكربت"
+
+#: lib/Padre/Plugin/Autodia.pm:137
+msgid "Perl Files"
+msgstr "ملفات Perl"
+
+#: lib/Padre/Plugin/Autodia.pm:139
+msgid "PHP Files"
+msgstr "ملفات PHP"
+
+#: lib/Padre/Plugin/Autodia.pm:141
+msgid "Python Files"
+msgstr "ملفات Python"
+
+#: lib/Padre/Plugin/Autodia.pm:143
+msgid "Ruby Files"
+msgstr "ملفات Ruby"
+
+#: lib/Padre/Plugin/Autodia.pm:145
+msgid "SQL Files"
+msgstr "ملفات SQL"
+
+#: lib/Padre/Plugin/Autodia.pm:147
+msgid "Text Files"
+msgstr "ملفات نصية"
+
+#: lib/Padre/Plugin/Autodia.pm:149
+msgid "Web Files"
+msgstr "ملفات ويب"
+
+#: lib/Padre/Plugin/Autodia.pm:162
+#, perl-format
+msgid "%s Files"
+msgstr "%s ملفات"
+
+#: lib/Padre/Plugin/Autodia.pm:164
+msgid "All Files"
+msgstr "كل الملفات"
+
+#: lib/Padre/Plugin/Autodia.pm:174
+msgid "Open File"
+msgstr "فتح ملف"
+

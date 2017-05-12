@@ -1,0 +1,48 @@
+Revision history for Perl extension PerlIO::subfile.
+
+0.01  Sun Feb 18 17:16:25 2001
+	- original version; created by h2xs 1.21 with options
+		-A -n PerlIO::subfile
+
+0.02  Sat Apr 21 17:39:11 BST 2001
+      Change to use the modified layer API of 5.7.1
+      As the pushed argument is now an SV, allow an SV that is an IV/UV
+      (but not a PV) is treated as a relative end value. (which will make
+      things easier for ex::lib::zip
+
+0.03  Sun Aug 26 12:05:12 BST 2001
+      By 5.7.2 it seems that the pushed argument is passed in as &sv_undef
+      rather than NULL. I wasn't testing SvOK() and was getting use of
+      uninitialized value errors.
+      Changed tests to use Test::More, set $!=0 whenever we report it on !ok().
+      Fixed test "Binmode should take us to the start of the subfile" to
+      actually test tell(), rather than another needless seek.
+      Fixed => to => in two of the assertions. Fixed a bug in another assertion.
+      Looks like I'd not built against a -g perl for a while.
+
+0.04  Sat Sep  1 12:25:23 BST 2001
+      Uncommented :subfile-on-a-pipe tests. They now work. (perlio improved).
+      Loop through the tests for 3 layers.
+      Mon Oct 29 20:28:38 GMT 2001
+      perlio.c layer API has changed again with the addition of a dup()
+      function for cloning layers across. (both within and across ithreads)
+
+0.05  Mon Mar 18 21:03:52 GMT 2002
+      Catch up with the 5.7.3 perlio API changes.
+
+0.06  Thu Jul 11 20:31:28 GMT 2002
+      Catch up with the 5.8.0-RC1 perlio API changes.
+      The perlio layer now reports a file position on unseekable streams,
+      which messes things up when pushing a subfile onto (say) a pipe.
+      Mark the test as a TODO, as it doesn't affect ex::lib::zip
+      And I had a bug. Which valgrind found for me straight away.
+      Use valgrind. http://developer.kde.org/~sewardj/
+      It's far more effective than coffee.
+
+0.07  Fri Jul  4 22:52:08 BST 2003
+      Wow! It seems that I never tested this with a threaded perl build.
+      How lax. Neither did CPAN testers. And strangely, PerlIO-gzip had been
+      tested with a threaded build, because all the macros are correct there.
+
+0.08  Mon Mar 13 23:06:51 GMT 2006
+      It seems that 5.9.x doesn't like me unless I use () for XSLoader::load

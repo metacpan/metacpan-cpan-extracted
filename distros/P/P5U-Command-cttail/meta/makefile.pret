@@ -1,0 +1,11 @@
+# This file provides instructions for packaging.
+
+`P5U-Command-cttail`
+	perl_version_from m`P5U::Command::cttail`;
+	version_from      m`P5U::Command::cttail`;
+	readme_from       m`P5U::Command::cttail`;
+	requires p`LWP::Simple 0`;
+	requires p`P5U 0`;
+	requires p`Text::sprintfn 0`;
+	.
+

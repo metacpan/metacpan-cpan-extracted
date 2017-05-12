@@ -1,0 +1,20 @@
+#!/bin/csh -f
+
+rm -f .depends
+
+# generate dependencies:
+
+set xx = PPDOC/FAQ-pp2html/slide0000.htm
+foreach f (`find faq-pp2html -name \*.pp`)
+  echo "${xx}: $f" >> .depends
+end
+
+set xx = PPDOC/FAQ-Parser/slide0000.htm
+foreach f (`find faq -name \*.pp`)
+  echo "${xx}: $f" >> .depends
+end
+
+set xx = PPDOC/REF-pp2html/slide0000.htm
+foreach f (`find tags -name \*.pp`)
+  echo "${xx}: $f" >> .depends
+end

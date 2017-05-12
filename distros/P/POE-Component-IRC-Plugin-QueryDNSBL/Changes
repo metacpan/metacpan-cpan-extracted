@@ -1,0 +1,29 @@
+==============================
+2011-11-17 21:53:51 +0000 1.04
+==============================
+
+  commit 8766b664aa5d36b0375958b6f5c5a57b9330b1f8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Nov 17 21:52:36 2011 +0000
+  
+    Use Net::IP::Minimal instead of Net::IP 
+
+==============================
+2011-05-02 14:26:19 +0100 1.02
+==============================
+
+  commit de27d7d05a368d314e6bc966800a5c9d570d2637
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon May 2 14:26:19 2011 +0100
+  
+    Dzilify the distribution
+
+  commit 7b246fe23f739cf757177cf0ee56dea7d00d33d1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon May 2 14:20:56 2011 +0100
+  
+    Switch to using Net::IP's ip_is_ver4 function 
+
+====================================
+End of changes in the last 1825 days
+====================================

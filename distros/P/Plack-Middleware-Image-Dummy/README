@@ -1,0 +1,96 @@
+NAME
+    Plack::Middleware::Image::Dummy - Dummy image responser for Plack
+
+SYNOPSIS
+        ## example.psgi
+
+        builder {
+            # basic
+            enable 'Image::Dummy', map_path => '/', font_path => './font/MTLmr3m.ttf';
+
+            # map path with regex
+            enable 'Image::Dummy', map_path => qr/^\//, font_path => './font/MTLmr3m.ttf';
+
+            # change max_width and max_height
+            enable 'Image::Dummy', map_path => '/', font_path => './font/MTLmr3m.ttf',
+              max_width => 100, max_height => 200;
+
+            # with param_filter
+            enable 'Image::Dummy', map_path => '/', font_path => './font/MTLmr3m.ttf', param_filter => sub {
+                my $params = shift;
+                if ($ENV{PLACK_ENV} eq 'production') {
+                    print STDERR "Do not show under production environment.\n";
+                    undef;
+                } else {
+                    $params->{text} .= ':D';
+                    $params;
+                }
+            };
+
+            $app;
+        };
+
+DESCRIPTION
+    Plack::Middleware::Image::Dummy is dummy image responser for Plack like
+    http://dummyimage.com/.
+
+CONFIGURATION
+  map_path
+    URI path mapped to this module.
+
+  font_path
+    Font path.
+
+  max_width
+    Max width of image. Default is 2048.
+
+  max_height
+    Max height of image. Default is 2048.
+
+  param_filter
+    A code reference. The code called with one HashRef contains parsed
+    parameters. Evaluated value is used in image creation.
+
+URI
+    You can get a image detailed in URI like below.
+
+        http://host:port#{map_path}/#{width}x#{height}.#{ext}?param=value&...
+
+  path
+    You can specify width, height and file type (ex. png, gif, jpg) in path
+    of URI.
+
+  text
+    You can specify text written in the center of the image. Default is
+    #{width}x#{height}.
+
+  color
+    You can specify text color with 'RRGGBB'. ex.) ff0000 is red.
+
+  bgcolor
+    You can specify background color with 'RRGGBB'. ex.) 00ff00 is green.
+
+  minsize
+    You can specify minimum size of font.
+
+AUTHOR
+    Tasuku SUENAGA a.k.a. gunyarakun <tasuku-s-cpan ATAT titech.ac>
+
+REPOSITORY
+    https://github.com/gunyarakun/p5-Plack-Middleware-Image-Dummy
+
+        git clone git://github.com/gunyarakun/p5-Plack-Middleware-Image-Dummy.git
+
+SEE ALSO
+    Imager
+
+    Imager::File::GIF
+
+LICENSE
+    Files in 'font' directory are licensed under the Apache License 2.0.
+
+    Copyright (C) Tasuku SUENAGA a.k.a. gunyarakun
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. =cut
+

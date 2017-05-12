@@ -1,0 +1,20 @@
+[% person.first_name %],
+
+De draad "[% post.thread.subject %]"
+een nieuw antwoord langs heeft ontvangen [% post.creator.forum_name %].
+
+Klik hier blijven lezend de draad:
+
+ [% c.req.base %]thread/next_post?thread=[% post.thread.id %]
+
+Klik hier om de recentste post in de draad te bekijken:
+
+ [% c.req.base %]post/view?post=[% post.id %]
+
+Gelieve van nota te nemen: U zult geen verdere berichten voor deze draad
+ontvangen tot u hierboven de post of om het even welke posten bekijkt
+die na het worden gecreeerd.
+
+Achting,
+
+Het [% c.config.name %] team.

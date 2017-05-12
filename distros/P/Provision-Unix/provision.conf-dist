@@ -1,0 +1,91 @@
+
+system_config_dir              = /etc
+#system_config_dir              = /usr/local/etc
+
+
+[User]
+# If using FreeBSD, set up system defaults in /etc/pw.conf.
+shell_default       = /sbin/nologin
+home_base           = /home
+quota_enable        = 1
+quota_fs            = /usr
+quota_default       = 250
+quota_inodes_soft   = 50000
+quota_inodes_hard   = 90000
+archive_deletes     = 1
+
+[Web]
+server       = apache
+#server      = lighttpd
+
+
+[DNS]
+server           = tinydns
+#server           = nictool
+zone_ttl         = 86400
+zone_refresh     = 16384
+zone_retry       =  2048
+zone_expire      = 1048576
+zone_minimum     =  2560
+zone_template    = basic-spf
+ttl              =  3600
+weight           =    10
+
+[VirtualOS]
+id_min                 = 50000
+id_max                 = 
+xen_template_dir       = /templates
+virtuozzo_template_dir = /vz/template
+ovz_template_dir       = /vz/template/cache
+ezjail_template_dir    = /usr/jails/flavours
+
+[NicTool]
+server_host = 127.0.0.30
+server_port = 8082
+protocol    = soap
+username    = demo@test.com
+password    = test
+nameservers = 1,2
+template    = basic-spf
+ip          = 208.75.177.111
+mailip      = 208.75.177.101
+
+[tinydns]
+#service_dir = /var/supervise/tinydns
+service_dir = ./t/tinydns
+
+[Mail]
+
+
+[Apache]
+
+# etc, vhosts, and sslcerts will have default settings, dependent
+# on the OS.
+# 
+# Linux
+#etc      = /etc/httpd
+#vhosts   = /etc/httpd/conf.d
+#sslcerts = /etc/httpd/ssl
+
+# Darwin/Mac OS X 
+#etc      = /etc/apache2
+#vhosts   = /etc/apache2/extra/httpd-vhosts.conf
+#sslcerts = /etc/apache2
+
+# FreeBSD
+#etc         = /usr/local/etc/apache2
+#vhosts      = /usr/local/etc/apache2/vhosts
+#sslcerts    = /usr/local/etc/apache2/certs
+
+# if you don't set a documentroot for a vhost, it will be generated for you
+# based on the following settings. The default settings of:
+#     vdoc_root   = /home
+#     vdoc_suffix = html
+# will result in this documentroot:  /home/example.com/html
+vdoc_root   = /space 
+vdoc_suffix = html              
+
+# subdirectories within each documentroot
+stats       = stats
+logs        = logs
+

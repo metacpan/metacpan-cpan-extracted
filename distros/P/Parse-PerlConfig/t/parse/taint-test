@@ -1,0 +1,14 @@
+use Parse::PerlConfig;
+
+my($conf_file, $taint_clean) = (shift, shift);
+
+my %config;
+
+Parse::PerlConfig::parse(
+    File        =>  $conf_file,
+    Handler     =>  \%config,
+    Taint_Clean =>  $taint_clean,
+);
+
+
+die("Parse apparently failed.\n") unless $config{'success'};

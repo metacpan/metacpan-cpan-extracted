@@ -1,0 +1,10 @@
+#
+# Copyright (C) 2004 by the gtk2-perl team (see the file AUTHORS)
+#
+# Licensed under the LGPL, see LICENSE file for more information.
+#
+
+TYPEMAP
+
+PangoGlyph		T_UV
+PangoRectangle *	T_GPERL_GENERIC_WRAPPER

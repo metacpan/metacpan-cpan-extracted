@@ -1,0 +1,12 @@
+Revision history for Perl module PerlIO::via::gzip
+0.03 Fri May 5 20:17:51 EDT 2017
+    - Remove PerlIO::Util dep (thanks Pavel)
+0.021 Thu Oct 29 12:53:00 2009
+    - Include PerlIO::Util requirement in Build.PL
+0.02 Wed Oct 28 15:31:00 2009
+    - fix perl requirement in Build.PL
+    - refactor using IO::Compress::Gzip & IO::Uncompress::Gunzip
+    - use the patented FILENO open hook trick
+    - this version should be more perlio-stack friendly
+0.01 Fri Oct 23 10:37:17 2009
+    - original version; created by ExtUtils::ModuleMaker 0.51

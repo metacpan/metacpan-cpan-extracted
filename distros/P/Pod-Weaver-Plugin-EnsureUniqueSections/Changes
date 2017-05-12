@@ -1,0 +1,34 @@
+Revision history for Perl extension Pod-Weaver-Plugin-EnsureUniqueSections
+
+0.163250  2016-11-19 23:15:36-08:00 America/Los_Angeles
+    - Log content of duplicated sections to aid debugging
+
+0.121550  2012-06-03 12:21:31 America/Los_Angeles
+    - Fixed order-dependence in weaver.ini: Previously it was possible
+      that plugins (specifically plugins doing the
+      Pod::Weaver::Role::Finalizer role) could add more sections after
+      EnsureUniqueSections had finished its checking. Obviously, such
+      sections were not checked for duplicates. Unfortunately, the
+      Leftovers plugin was liable to do this, and was also the most
+      likely source of duplicate sections. Now [-EnsureUniqueSections]
+      can be anywhere in weaver.ini and it should have the same
+      effect. ( https://rt.cpan.org/Public/Bug/Display.html?id=77526 )
+    - Added a test suite.
+    - Switched to using the logger for error messages instead of using
+      "croak"
+
+0.111220  2011-05-01 20:23:46 PST8PDT
+    - Fixed a bug: Module no longer produces cryptic errors when
+      encountering unknown POD elements (fix contributed by
+      apocalypse)
+    - Minor documentation formatting fixes that you won't notice
+
+0.103531  2010-12-19 02:13:42 EST5EDT
+    - More detailed documentation
+    - No code changes
+
+0.103520  2010-12-17 23:32:01 EST5EDT
+    - Updated attr documentation to match code
+
+0.103510  2010-12-17 15:38:47 EST5EDT
+    - Initial CPAN release

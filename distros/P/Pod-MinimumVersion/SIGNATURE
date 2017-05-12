@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 351dadb766f5f9af91aad73451f8337d2031cfce Changes
+SHA1 c56e716f9e7e60a836b040b44d5154839c0be58b MANIFEST
+SHA1 f42e495e55aa5c6fa78de6ca47938b84cd7015b2 MANIFEST.SKIP
+SHA1 913c4e56d3ea2748800eb2aeeb420f95aa102cd6 META.yml
+SHA1 f610fe914e693ff599a210c9a1acac2c49ec4d0c Makefile.PL
+SHA1 6148aa095786f646345bef3d0e2cc66679eafb73 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 d3b030d15305257889acfb1c2ac78f6a144a5efa debian/control
+SHA1 6b2745e510af08187a454f30ae06e085a5801788 debian/copyright
+SHA1 f522c9df11531b41d03e50a2b25446b60003a01c debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 37f58be17294a6a26f50c8fbe7838009169c8acb debian/watch
+SHA1 667864d1d5bae1448e3e48a778475f59bbd1a7ea devel/run.pl
+SHA1 bf443c3e4bc114cc301d217c60dc68355227948d inc/MyMakeMakerExtras.pm
+SHA1 7a988b2aa7ed09f1cb9029a1ef3f0e2139dca0cf inc/my_pod2html
+SHA1 63f4857636afa8a1a9a1de8a7cb2d50b92032eb3 lib/Pod/MinimumVersion.pm
+SHA1 68a0d5a452968f90b36765cd8ff10392d53b219c lib/Pod/MinimumVersion/Parser.pm
+SHA1 cebe855b8cbfaf43cb88bd5189cc1c05499dd111 lib/Pod/MinimumVersion/Report.pm
+SHA1 a6655aba49011c6841a03334f424b34514139a15 pod-minimumversion
+SHA1 bd4edb2622a226dd37223d208ee13c0067784123 t/MinimumVersion-load.t
+SHA1 c342729c118022a40833847e477d7e0f4097f6ed t/MinimumVersion.t
+SHA1 51456d64ca8f20d6808f6f3c8aa1f4f2553cb78d t/MyTestHelpers.pm
+SHA1 7aa51325e92d27796f1656db7e6e8ae6920c5ceb t/Parser.t
+SHA1 e75d91bf935e0212dd98ad029be150b9e7a56a91 t/Report.t
+SHA1 0279c9310ec528d10a2a14e602bf98f1c776cce1 xt/0-META-read.t
+SHA1 219395eb91b03829e6f14db4ebd57d88ea972e61 xt/0-Test-ConsistentVersion.t
+SHA1 8a5e0f34131de34e584fbb1939c191a152566155 xt/0-Test-DistManifest.t
+SHA1 cc04a5fe5d8b8b38bfd56453d5d2686c8ea58783 xt/0-Test-Pod.t
+SHA1 8cc52e23427a82cfef5802bf512b13c65de2687a xt/0-Test-Synopsis.t
+SHA1 4c14845872d6eb4280e12f862d6ba2c343358c60 xt/0-Test-YAML-Meta.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iD8DBQFNliHJLFMCIV9q3ToRAjGrAJ9cWP7WK3ykTMIm/5vR1a6MjNACIACfX22o
+YzGjwyoZgVzgV9thphpRQ7U=
+=JREQ
+-----END PGP SIGNATURE-----

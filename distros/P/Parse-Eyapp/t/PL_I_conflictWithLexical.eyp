@@ -1,0 +1,72 @@
+%{
+=head1 SYNOPSIS
+
+This grammar deals with the famous ambiguous PL/I phrase:
+
+                if then=if then if=then
+
+The (partial) solution uses C<YYExpect> in the lexical analyzer to predict the token
+that fulfills the parser expectatives.
+
+Compile it with:
+
+               eyapp -C PL_I_conflictWithLexical.eyp
+
+Run it with:
+
+               ./PL_I_conflictWithLexical.pm -t -c 'if if=then then then=if'
+
+for more detail:
+
+               ./PL_I_conflictWithLexical.pm -deb -t -c 'if if=then then then=if'
+
+and also
+
+               ./PL_I_conflictWithLexical.pm -t -i -c 'if then=if then if=then'
+
+Also try:
+
+                ./PL_I_conflictWithLexical.pm -t -c 'if then=if then if a=b then c=d'
+
+=cut
+
+%}
+
+%strict
+
+%token then =  { $self->expects('then') and /\Gthen\b/gc     and return ('then', 'then'); }
+%token if   =  { $self->expects('if')   and /\Gif(?!\s*=)/gc and return ('if', 'if'); }
+%token ID  = /([a-zA-Z_]\w*)/
+
+%tree bypass
+%%
+stmt: 
+    ifstmt 
+  | assignstmt
+;
+
+ifstmt: 
+     %name IF
+    if expr then stmt
+;
+
+assignstmt: 
+    %name ASSIGN
+    id '=' expr
+;
+
+expr:
+    %name EQ
+    id '=' id
+  | id
+;
+
+id: 
+    %name ID
+    ID
+;
+
+%%
+
+
+

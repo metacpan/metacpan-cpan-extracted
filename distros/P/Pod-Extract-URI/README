@@ -1,0 +1,24 @@
+Pod::Extract::URI
+-----------------
+
+This is the README file for Pod::Extract::URI, a Perl module for
+extracting URIs from Perl's Plain Old Documentation files.
+
+Documentation for Pod::Extract::URI is available online at
+
+    http://search.cpan.org/perldoc?Pod::Extract::URI
+
+or by doing
+
+    perldoc Pod::Extract::URI
+
+at the command line.
+
+
+Installation
+------------
+
+    perl Makefile.PL
+    make
+    make test
+    make install

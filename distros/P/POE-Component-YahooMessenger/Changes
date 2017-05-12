@@ -1,0 +1,27 @@
+Revision history for Perl extension POE::Component::YahooMessenger
+
+0.05  Mon Dec  2 21:17:20 JST 2002
+	* Fixed bug in goes_online on logon
+
+0.04  Mon Dec  2 19:01:43 JST 2002
+	- Fixed hostname typo.
+	* Added socket_error handler when you can't connect to YM server
+	* Added add_buddy, delete_buddy API
+	- Added change_normal_status handler
+	- Supported multivalue message body
+	- Added cookie, group message body
+
+0.03  Wed Sep 18 11:57:33 JST 2002
+	- Renamed new_friend_alert to new_buddy_alert
+	- Fixed bug in _is_buddy()
+	* Added receive_file event (only works when sender is HTTP accessible)
+	- Changed buddies API
+	* Fixed typo in Constants.pm
+	  (Thanks to Warren Lindsey <wlindsey@ponvia.com>)
+
+0.02  Tue Sep 17 12:45:54 JST 2002
+	* Fixed logon goes_online events
+	- Added null message handling in receive_message
+
+0.01  Wed Sep 11 21:24:31 2002
+	- original version

@@ -1,0 +1,35 @@
+# Lhs.eyp
+%right '=' 
+%left '-' '+' 
+%left '*' '/' 
+%left NEG 
+
+%%
+
+input:
+      /* empty */
+    | input line  
+;
+line:
+      '\n'
+    | exp '\n'  
+;
+exp:
+      NUM
+    | VAR
+    | %name ASSIGN
+      VAR '=' exp
+    | %name PLUS
+      exp '+' exp
+    | %name MINUS
+      exp '-' exp
+    | %name TIMES
+      exp '*' exp
+    | %name DIV
+      exp '/' exp
+    | %name UMINUS
+      '-' exp %prec NEG
+    | '(' exp ')' 
+;
+
+%%

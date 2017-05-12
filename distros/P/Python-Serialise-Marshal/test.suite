@@ -1,0 +1,150 @@
+#####
+#
+# Input file for test suite generation
+# for Python::Serialise::Marshal
+# (c) Simon Wistow <simon@thegestalt.org>, 2003
+# Released under the same terms as Perl itself
+#
+# Format is :
+#
+# =<new section>
+# input to python
+# expected output from P:S:M
+# the name of the test
+#
+#####
+
+=int
+1
+1
+one
+
+-1
+-1
+minus one
+
+256
+256
+two-five-six
+
+-256
+-256
+minus two-five-six
+
+1024
+1024
+one-oh-two-four
+
+-1024
+-1024
+minus one-oh-two-four
+
+=long
+#long("4294967295")
+#4294967295
+#long 4294967295
+
+
+
+=float
+1.234
+1.234
+float 1.234
+
+-1.234
+-1.234
+minus float 1.234
+
+0.1
+0.1
+float 0.1
+
+-0.1
+-0.1
+minus float 0.1
+
+=complex
+2+4j
+"2.0+4.0i"
+simple complex number
+
+=string
+"string"
+"string"
+a string
+
+'string'
+'string'
+another string
+
+"string with spaces"
+"string with spaces"
+a string with spaces
+
+'string with spaces'
+'string with spaces'
+another string with spaces
+
+"string with\nnewline"
+"string with\nnewline"
+newlines a-go-go
+
+'string with\nnewline'
+"string with\nnewline"
+again with the new lines
+
+=tuple
+(1,2,3,4)
+[1,2,3,4]
+a simple tuple
+
+("a","b","c")
+["a","b","c"]
+a not so simple tuple
+
+(1,2,3,"a","b")
+[1,2,3,"a","b"]
+a mixed tuple
+
+(1,2,3,("a","b","c"))
+[1,2,3,["a","b","c"]]
+a nested tuple
+
+=list
+[1,2,3,4]
+[1,2,3,4]
+a simple list
+
+["a","b","c"]
+["a","b","c"]
+a not so simple list
+
+[1,2,3,"a","b"]
+[1,2,3,"a","b"]
+a mixed list
+
+[1,2,3,["a","b","c"]]
+[1,2,3,["a","b","c"]]
+a nested list
+
+=dict
+{1:2,3:4}
+{1=>2,3=>4}
+a simple dict
+
+{"a":"b","c":"d"}
+{"a"=>"b","c"=>"d"}
+a not so simple dict
+
+{"go":"to","from":"here"}
+{"go"=>"to","from"=>"here"}
+a long dict
+
+=mixed
+{"a":["some","stuff","in here"]}
+{"a"=>["some","stuff","in here"]}
+some mixed dicts
+
+["a", "list", "with", {1:2,3:4,5:6}]
+["a", "list", "with", {1=>2,3=>4,5=>6}]
+some mixed list

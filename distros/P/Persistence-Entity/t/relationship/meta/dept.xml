@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity name="dept" alias="d">
+    <primary_key>deptno</primary_key>
+    <columns>
+        <column name="deptno" />
+        <column name="dname"  unique="1" />
+        <column name="loc" />
+    </columns>
+    <to_many_relationships>
+        <relationship target_entity="emp" order_by="deptno, empno">
+            <join_column>deptno</join_column>
+        </relationship>
+    </to_many_relationships>
+</entity>
+

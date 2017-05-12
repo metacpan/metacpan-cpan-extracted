@@ -1,0 +1,81 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!-- ZOOMSTOP -->
+
+<HTML>
+
+<!-- *** Created by pp2html, build 1.21 from PerlPoint-Converters 1.0202  -->
+
+<HEAD>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+
+<!-- ZOOMRESTART -->
+
+
+
+<TITLE>Version 1.0202  19/11/2003</TITLE>
+</HEAD>
+
+<!-- ************************************************************** -->
+<BODY bgcolor="#FFFFFF" text="#000000" link="#0000CC" vlink="#AAAAAA" alink="#FF0000">
+<a name="Version 1.0202  19/11/2003"></a>
+
+<H1>Version 1.0202  19/11/2003
+</H1>
+
+<UL>
+<LI>Patches 10 - 20 from Jochen Stenzel (JSTENZEL)</LI>
+</UL>
+<UL>
+
+<UL>
+<LI>Option <CODE>includelib</CODE></LI>
+<LI>Option <CODE>author</CODE></LI>
+<LI>Option <CODE>description</CODE></LI>
+<LI>Option <CODE>charset</CODE></LI>
+<LI>Option <CODE>norobots</CODE></LI>
+<LI>Option <CODE>nosmarttags</CODE></LI>
+<LI>Option <CODE>linknavigation</CODE></LI>
+<LI>Option <CODE>bootstrapaddress</CODE></LI>
+<LI>Option <CODE>validate</CODE></LI>
+<LI>Option <CODE>startaddress</CODE></LI>
+<LI>Option <CODE>no_html_header</CODE></LI>
+<LI>Option <CODE>no_html_bodytags</CODE></LI>
+</UL>
+</UL>
+
+<UL>
+<LI>Option <CODE>--reverse_order</CODE> for reverse order numbering of slides.</LI>
+<LI>Test-Suite changed. Use .ref files in HTML Format instead of md5 checksums. This needs more space, but it's much easier to maintain. (Escpecially if you are looking for errors, because now you have the reference files available to look into ...)</LI>
+<LI>\X tag is now basic tag of PerlPoint (--&gt; require PerlPoint::Parser 0.39)</LI>
+<LI>New FAQ questions for pp2html</LI>
+<LI>Enhanced test suite</LI>
+<LI>Included 9 patches for <CODE>pp2html</CODE> from Jochen Stenzel</LI>
+<LI>--mv2targetdir Option: Images are moved to target dir</LI>
+<LI>Documentation in <CODE>./doc/PPDOC</CODE> is now self-contained, i. e. it is possible to move this directory somewhere else. There are no longer references pointing to ../../.. (in the last version the tree_applet sources were shared by all documents but the source base was not a subdirectory of PPDOC ...)</LI>
+<LI>\PAGE_COLORS{fg=&quot;#xxxxxx&quot; bg=&quot;#xxxxxx&quot;} Tag in PerlPoint::Tags::HTML</LI>
+<LI>Option --contents_indent=m<BR>
+ The option --no_contents_indent is now obsolete. You get the same result with --contents_indent=0 (which is the default). You must now use a value &gt; 0 if you want to have the table of contents indented. <BR>
+ The new option influences the table of contents also in the case of tree_applet. In previous releases the tree applet TOC was not indented in any case.</LI>
+<LI>Bugfix in handling of \LOCALTOC: Had problems with sub chapters of same name in different main chapters (e.g. Chapter1|Overview,  Chapter2|Overview)</LI>
+<LI>Function <CODE>relative_path</CODE> in Converters.pm, used for finding relative path from slide dir to image dir and applet source dir.</LI>
+<LI>New style: <CODE>mixed-mode</CODE> as an example for Presentations</LI>
+<LI>Keyword HEADLINE is expanded to page headline when used in template files. This is useful for top teplates, see <CODE>mixed-mode</CODE> style.</LI>
+<LI>new option <CODE>--bullets_align_middle</CODE>. Normally bullets will be aligned to top, but this does not look very well when the font size is large. In this case you might use C&lt;--bullets_align_middle&gt; ...</LI>
+<LI>pp2latex: patches from Robert Inder included (thanks a lot :-)</LI>
+</UL>
+<UL>
+
+<UL>
+<LI>use prolog file if necessary</LI>
+</UL>
+</UL>
+
+<UL>
+<LI>__loaderpath__ removed: check if image has absolute path or is relative to cwd</LI>
+</UL>
+</BODY>
+</HTML>

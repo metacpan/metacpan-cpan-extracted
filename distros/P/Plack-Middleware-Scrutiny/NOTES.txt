@@ -1,0 +1,38 @@
+
+Ideas for invocation / usage:
+
+* query param _scrutinize=1
+** Debugger UI for that request
+** Step, break, eval, etc
+** At exit display output from execution
+
+* /_scrutiny/ injected URL
+** List current stopped sessions
+** Select a session to debug
+** Add global breakpoints
+*** Breakpoints on specific code lines
+*** Breakpoints on watch variable
+*** Breakpoints based on URL
+** List URLs for easy selecting for breaking
+** Code browser for setting breakpoints
+
+* Inline with in-code breakpoint
+** Code calls Scrutiny::break()
+** Show debugger UI
+** could also turn die() into break?
+
+UI
+* Code browser
+** Numbered lines
+** Breakpoint set / show
+** Roll-over / click to view variable values?
+** Highlight current execution line
+* REPL
+** Interactively execute code
+** Interactively inspect
+* Watch Log
+** view log of watched variable changes
+* Execution log
+** View log of lines-executed
+** Walk forward/backward over lines
+

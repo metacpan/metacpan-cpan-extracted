@@ -1,0 +1,38 @@
+port wbport wbs clk_i:wb_clk_i, rst_i:wb_rst_i, cyc_i:wb_cyc_i,
+                stb_i:wb_stb_i, we_i:wb_we_i, ack_o:wb_ack_o,
+                adr_i:wb_adr_i, dat_i:wb_dat_i, dat_o:wb_dat_o;
+
+module rom(wb_clk_i, wb_rst_i, rst_i, wb_adr_i, wb_dat_i, wb_dat_o, 
+	   wb_we_i, wb_stb_i, wb_cyc_i, wb_ack_o);
+
+   input        wb_clk_i, wb_rst_i, wb_we_i, wb_stb_i, wb_cyc_i;
+   input [:] 	wb_adr_i;     // lower address bits
+   input [:] 	wb_dat_i;   
+   output [:] wb_dat_o;  
+   reg [:] 	wb_dat_o;
+
+   output 	wb_ack_o;
+
+   assign wb_ack_o = wb_cyc_i && wb_stb_i; // Always single clock cycles
+   
+   always @(wb_adr_i)
+      case (wb_adr_i)
+CASES
+	default: wb_dat_o = 0;
+      endcase
+endmodule
+
+perl
+  $c = 0;
+  $cases = "";
+
+  foreach ($self->get('romdata')) {
+    $val = $_ + 0;
+    $cases.="        $c: wb_dat_o = $val;\n";
+    $c++;
+  }
+  chomp $cases;
+  $code = $self->get('verilog');
+  $code =~ s/CASES/$cases/;
+  $self->set('verilog', $code);
+endperl

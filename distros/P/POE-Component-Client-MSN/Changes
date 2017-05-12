@@ -1,0 +1,13 @@
+Revision history for Perl extension POE::Component::Client::MSN
+
+0.03  Wed Dec 29 09:35:00 2004
+	- preparing to release to CPAN
+	- changed the email in the examples
+
+0.02  Mon Oct 20 14:59:43 2003
+	- lots of testing code added, will be removed
+	- file transfers added, but not finished
+	- some callbacks added, callback names WILL change
+
+0.01  Fri Sep 13 19:09:31 2002
+	- original version

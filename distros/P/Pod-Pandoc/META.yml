@@ -1,0 +1,39 @@
+---
+abstract: 'process Plain Old Documentation format with Pandoc'
+author:
+  - 'Jakob Voß'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0.96'
+  Test::Output: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Pandoc
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  IPC::Run3: '0'
+  Pandoc: v0.6.0
+  Pandoc::Elements: '0.29'
+  Pod::Simple: '3.08'
+  Pod::Usage: '0'
+  perl: '5.014'
+resources:
+  bugtracker: https://github.com/nichtich/Pod-Pandoc/issues
+  homepage: https://github.com/nichtich/Pod-Pandoc
+  repository: https://github.com/nichtich/Pod-Pandoc.git
+version: 0.4.0
+x_contributors:
+  - 'Jakob Voß <jakob.voss@gbv.de>'

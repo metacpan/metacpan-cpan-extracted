@@ -1,0 +1,13 @@
+SYNOPSIS
+
+     use Perinci::Sub::To::FishComplete qw(gen_fish_complete_from_meta);
+     my $res = gen_fish_complete_from_meta(meta => $meta);
+     die "Failed: $res->[0] - $res->[1]" unless $res->[0] == 200;
+     say $res->[2];
+
+SEE ALSO
+
+    This module is used by Perinci::CmdLine.
+
+    Complete::Fish::Gen::FromGetoptLong.
+

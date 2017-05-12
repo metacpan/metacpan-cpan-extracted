@@ -1,0 +1,25 @@
+Changes for Perl extension POE-Declare-HTTP-Client
+
+0.05 Sat 16 Apr 2011
+	- The MaxRedirect count is now actually obeyed
+
+0.04 Fri 15 Apr 2011
+	- Move from always using URI to the weird global $HTTP::URI_CLASS
+	- Add support for relative Location: headers by copying LWP::UserAgent
+	- Add some defenses against weird URIs in requests
+
+0.03 Fri 15 Apr 2011
+	- Added support for handling redirect responses
+	- Added useragent header to requests
+	- Requests now sent as HTTP/1.0 instead of default HTTP/0.9
+	- Increased POE::Declare dependency to 0.54
+	- Added missing explicit dependency on URI
+
+0.02 Wed 9 Mar 2011
+	- Added PUT method
+	- Added HEAD method
+	- Added DELETE method
+	- Added support for parsing responses without a Content-Length
+
+0.01 Tue 8 Mar 2011
+	- Creating the initial release

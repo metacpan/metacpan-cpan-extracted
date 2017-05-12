@@ -1,0 +1,81 @@
+NAME
+    POE::Component::Lingua::Translate - A non-blocking wrapper around
+    Lingua::Translate
+
+SYNOPSIS
+     use POE;
+     use POE::Component::Lingua::Translate;
+
+     POE::Session->create(
+         package_states => [
+             main => [ qw(_start translated) ],
+         ],
+     );
+
+     $poe_kernel->run();
+
+     sub _start {
+         my $heap = $_[HEAP];
+         $heap->{trans} = POE::Component::Lingua::Translate->new(
+             alias => 'translator',
+             back_end => 'Babelfish',
+             src      => 'en',
+             dest     => 'de',
+         );
+     
+         $poe_kernel->post(translator => translate => 'This is a sentence');
+         return;
+     }
+
+     sub translated {
+         my $result = $_[ARG0];
+         # prints 'Dieses ist ein Satz'
+         print $result . "\n";
+     }
+
+DESCRIPTION
+    POE::Component::Lingua::Translate is a POE component that provides a
+    non-blocking wrapper around Lingua::Translate. It accepts "translate"
+    events and emits "translated" events back.
+
+CONSTRUCTOR
+    "new"
+        Arguments
+
+        'alias', an optional alias for the component's session.
+
+        Any other arguments will be passed verbatim to Lingua::Translate's
+        constructor.
+
+METHODS
+    "session_id"
+        Takes no arguments. Returns the POE Session ID of the component.
+
+INPUT
+    The POE events this component will accept.
+
+    "translate"
+        The first argument should be a string containing some text to
+        translate. The second argument (optional) can be a hash reference
+        containing some context information. You'll get this hash reference
+        back with the "translated" event.
+
+    "shutdown"
+        Takes no arguments, terminates the component.
+
+OUTPUT
+    The POE events emitted by this component.
+
+    "translated"
+        ARG0 is the translated text. ARG1 is the context hashref from
+        "translate". If there was an error, ARG2 will be the error string.
+
+AUTHOR
+    Hinrik Örn Sigurðsson, hinrik.sig@gmail.com
+
+LICENSE AND COPYRIGHT
+    Copyright 2008 Hinrik Örn Sigurðsson
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

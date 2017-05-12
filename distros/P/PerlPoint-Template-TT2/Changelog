@@ -1,0 +1,15 @@
+
+// -- macro declarations: start reading with first headline
++BC:\B<\C<__body__>>
+
+// -- end of "preface"
+
+=0.02
+
+\C<Template> was not listed as a dependency.
+	
+
+=0.01
+
+New. Released as a beta due to missing tests and doc.
+

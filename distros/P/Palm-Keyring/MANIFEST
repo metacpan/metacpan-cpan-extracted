@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/Palm/Keyring.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+scripts/example1.pl
+scripts/example2.pl
+scripts/example3.pl
+t/keyring.t
+t/keyring5-samples.t
+t/keyring5.t
+t/Keys-3DES.pdb
+t/Keys-AES.pdb
+t/Keys-AES256.pdb
+t/Keys-None.pdb
+t/pod-coverage.t
+t/pod.t
+TODO

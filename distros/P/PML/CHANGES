@@ -1,0 +1,240 @@
+----------------------------
+revision 1.26
+date: 2000/07/28 18:19:28;  author: pjones;  state: Exp;  lines: +285 -152
+o new now clones a PML object if used as a method
+o register can now be used as a method and it will only register
+  a callback for that object instead of the whold module.
+o New use_stderr method to control the USE_STDERR flag
+----------------------------
+revision 1.25
+date: 2000/07/18 14:39:02;  author: pjones;  state: Exp;  lines: +513 -373
+o Changed MEMBER_ constants to PML_
+----------------------------
+revision 1.24
+date: 2000/06/30 14:36:53;  author: pjones;  state: Exp;  lines: +14 -5
+o You can use the LABEL to a foreach instead of '.' as the loop variable
+o function_block_no_parse now does not look for quotes in the block
+----------------------------
+revision 1.23
+date: 2000/06/09 00:39:47;  author: pjones;  state: Exp;  lines: +15 -3
+o Fixed bug. Loops were not using the new Loop counter.
+----------------------------
+revision 1.22
+date: 2000/06/09 00:35:51;  author: pjones;  state: Exp;  lines: +309 -72
+o New POD for the README file
+o New Loop Counters to tell if we are in a loop
+o New die message holder to check for next, redo and last
+o Added @next, @redo, @last
+o Added Loop labels
+o Fixed bug, gut now ignores quotes when parsing blocks
+----------------------------
+revision 1.21
+date: 2000/06/07 00:18:55;  author: pjones;  state: Exp;  lines: +471 -120
+o New PML::Token package and objects
+o MEMBER_* constants now start at 0
+o New PML::Token Constants
+o New CONTEXT_* constants
+o New FILE_LOC_* contstants
+o Using qr// again
+o Updated all subs to use new PML::Token
+o Fixed bug that would prevent the use of a hash in pml space
+o Added append method to appened one PML object to another
+o Added public object_directory to get/set a dir for creating objects,
+  this is used by PML::Storable but could be used by some other storing
+  module.
+o New PML::Storable Module for Perl space to store a parsed object
+o token_foreach now stores away his ${.} before parsing the block
+  which lets a foreach in a foreach work now!
+o tokens_execute works a little better
+o token_perl now evals in list context, then checks the context of the
+  token to know what to return
+o Added blank DESTORY sub becuase of the new AUTOLOAD sub
+----------------------------
+revision 1.20
+date: 2000/06/01 22:12:52;  author: pjones;  state: Exp;  lines: +406 -233
+o Added recursive preventive measures
+o Removed pure support for _ALL_ but still have backwards support
+  via a ref to the new ARGV array
+o New ARGV pml array to hold arguments
+o Tweaked the regexes
+o Made the warning method return the warning flag
+o Removed the token_execute method and rewrote the tokens_execute
+  method so that it can do both jobs.
+o Updated parse_arguments so it works right with embeded
+  variables and functions. Started to add support for =>
+o Made the error from gut more verbose
+o Total rewrote replace_variable to now except varables with variables
+  and inserted recursive count to prevent deep recursion
+o Set function does not need a value to set anymore
+o Token_eval and Token_Variable use a new method to find variables
+o Fixed bug in token_skip, but it is still broken
+  because we are looking for ' and " in blocks which should end
+----------------------------
+revision 1.19
+date: 2000/05/23 01:49:26;  author: pjones;  state: Exp;  lines: +658 -830
+o Added POD
+o Removed 'use Storable' and added 'use Text:Wrap' for the wrap function
+o Added skip, wrap, rib, while and unless functions
+o Removed support for changing the marker
+o Started using new brace style
+o Added support to start parsing after a regex matches the text
+  This is used by the pml script to parse after __END__ for parsing
+  the test files.
+o The v method now returns all variable names if you do not give one
+o Complete rewrite of parse_one_line, parse_arguments and parse_block.
+o slow_gut renamed gut and old gut removed
+o Bug fixes in next_line
+o Removed support for using a backslash at the end of a line to suck the
+  next line in and concat them
+o Complete rewrite of peek, peek API is totaly different
+o New method, error_syntax for reporting syntax errors and dying
+o Complete rewrite of parse_if, now uses gut and supports unless
+o Removed parse_setif and friends and made parse_set more robost to
+  handle all the set* functions
+o Cleaned up token_eval
+o Added TOKEN_NOT to negate a token, used by unless and until
+----------------------------
+revision 1.18
+date: 2000/04/18 20:18:31;  author: pjones;  state: Exp;  lines: +97 -54
+*) Renamed the hashes that hold the pointers to the parsers.
+*) Changed the default variable VERSION to PMLVERSION
+*) Fixed a bug that would replace all variables with the ones that you
+   pass into the parse method. Now they are just added.
+*) Added a new v method to set and return variables.
+*) Fixed bug where the text before a marker (@) would not be removed
+   from the current line if it contained charters that are special to
+   Perl's regular expression engine. (Basicly we now call quotemeta)
+*) Moved the perl method to a new class of functions called
+   function_block_no_parse, so if in the future we need to do something
+   like what the perl sub does.
+*) Perl function no longer calls gut, because of the previous line.
+*) parse_arguments will no longer except any charter except a '('
+   as the first charater. It also does not have to use the peak function
+   anymore.
+*) When a PML module is loaded it calls a function 'init' to allow
+   the module to get ready. We are no longer keeping track if a module
+   was already loaded. This will change though.
+*) Fixed a bug in @prepend and @append. They now work with an array
+   if you are prepending/appending only one element. You still need to
+   use @set to make sure that these are arrays first, or they will be
+   used as strings. Maybe we will create a convert/brand function to
+   tell PML if a variable is an array or string or hash. prepend/append
+   should also check to see if the variable is a hash.
+*) Used a local $^W in some places to quite -w messages.
+----------------------------
+revision 1.17
+date: 2000/04/05 00:16:42;  author: pjones;  state: Exp;  lines: +277 -210
+Added new function concat to append without the space.
+
+Started to rename the constats so they make sence.
+
+Macros and includes are now stored in the pml object instead of in
+global variables.
+----------------------------
+revision 1.16
+date: 2000/03/28 17:44:23;  author: pjones;  state: Exp;  lines: +13 -3
+trying to remove some warnings
+----------------------------
+revision 1.15
+date: 2000/03/22 05:05:37;  author: pjones;  state: Exp;  lines: +5 -4
+fixed more bugs with the _ALL_ tag
+----------------------------
+revision 1.14
+date: 2000/03/20 17:55:40;  author: pjones;  state: Exp;  lines: +21 -8
+Fixed some more bugs with parse_block. added a new tag called _ALL_. When used
+in a arguments list, _ALL_ will suck all arguments into the ${_ALL_} variable.
+----------------------------
+revision 1.13
+date: 2000/03/17 00:37:30;  author: pjones;  state: Exp;  lines: +45 -21
+Variables and macros (and subs) can now have a first char of an underscore.
+
+Fixed a bug in parse_block where only the first line in a block was getting
+parsed.
+
+magic_newline now keeps track of what line it started on so that it can
+tell the user after it has exusted the array of lines
+
+added warn_error sub for printing an error
+----------------------------
+revision 1.12
+date: 2000/03/09 16:23:55;  author: pjones;  state: Exp;  lines: +13 -3
+fixed bug where the output would be repeated many times (collector not cleared) and fixed bug where only the first line in a block was read
+----------------------------
+revision 1.11
+date: 2000/03/07 14:09:52;  author: pjones;  state: Exp;  lines: +32 -7
+Working on fixing some more "magic space" bugs
+----------------------------
+revision 1.10
+date: 2000/03/02 18:07:49;  author: pjones;  state: Exp;  lines: +295 -63
+Major changes, and bug fixes. Rewrote gut routine. The replacement
+is still called slow_gut because I am going to wait a little before I
+rename it gut. Also fixed part of the bug where functions would leave
+spaces in their place. Also added the new \T backslash commad to remove
+all tabs before the \T. This makes it eaiser to line things up.
+
+There are a few new subs called magic_*. These are the subs that will
+try to remove the spaces where functions are. The sub magic_tab
+was an attempt to remove the first tab on each line inside a block.
+It just does not seem to intutive to use so I have it turned off.
+
+Also started to generalise the error code. Created a fatal parse error
+routine called error. This will probably change to parse_error.
+----------------------------
+revision 1.9
+date: 1999/11/15 22:26:50;  author: pjones;  state: Exp;  lines: +15 -13
+Added some cvs variables
+Added some tabs
+----------------------------
+revision 1.8
+date: 1999/11/15 22:22:08;  author: pjones;  state: Exp;  lines: +120 -120
+Changed internal PML object from a hash reference to an array reference.
+----------------------------
+revision 1.7
+date: 1999/11/04 17:32:18;  author: pjones;  state: Exp;  lines: +60 -11
+Applied patch from home that removes the use of File::PathConvert.
+Now PML does not need any non-standard Perl Modules.
+----------------------------
+revision 1.6
+date: 1999/10/15 22:28:55;  author: pjones;  state: Exp;  lines: +8 -8
+Changed the prefix function to the prepend function.
+
+I think that this makes a lot more sence (cents)?
+----------------------------
+revision 1.5
+date: 1999/10/15 22:04:11;  author: pjones;  state: Exp;  lines: +1 -1
+Fixed bug in parse_argumets where a double quote was being sent to
+gut even when it should have been a single quote.
+----------------------------
+revision 1.4
+date: 1999/10/15 21:57:10;  author: pjones;  state: Exp;  lines: +32 -4
+parse_arguments will now except numbers without requiring them to have
+quotes wrapped around them.
+
+When gut can't find the closing delimiter and dies with an error, the error
+message will now wrap the delimiter in either single or double
+quotes depending on the delimiter.
+
+Using a variable as if it were an array when it is not now only
+produces an error if warnings are turned on.
+
+Better checking for a valid variable name in token_set.
+----------------------------
+revision 1.3
+date: 1999/10/15 19:30:13;  author: pjones;  state: Exp;  lines: +1 -1
+Fixed bug in gut, when removing a quoted string from within another string
+gut will now call itself with the correct delimiter.
+----------------------------
+revision 1.2
+date: 1999/10/15 19:01:58;  author: pjones;  state: Exp;  lines: +1 -1
+Fixed bug in parse_arguments that would cause an infinite loop when
+it saw a PML marker inside the arguments to another PML function.
+----------------------------
+revision 1.1
+date: 1999/10/15 18:26:17;  author: pjones;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 1999/10/15 18:26:17;  author: pjones;  state: Exp;  lines: +0 -0
+Initial Import
+=============================================================================

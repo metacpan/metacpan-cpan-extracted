@@ -1,0 +1,58 @@
+{
+   "abstract" : "Perl::Critic policies implemented and used by logicLAB",
+   "author" : [
+      "Jonas B. Nielsen (jonasbn), <jonasbn@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Critic-logicLAB",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic::Policy::logicLAB::ModuleBlacklist" : "0",
+            "Perl::Critic::Policy::logicLAB::ProhibitShellDispatch" : "0",
+            "Perl::Critic::Policy::logicLAB::ProhibitUseLib" : "0",
+            "Perl::Critic::Policy::logicLAB::RequirePackageNamePattern" : "0",
+            "Perl::Critic::Policy::logicLAB::RequireParamsValidate" : "0",
+            "Perl::Critic::Policy::logicLAB::RequireSheBang" : "0",
+            "Perl::Critic::Policy::logicLAB::RequireVersionFormat" : "0",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::logicLAB" : {
+         "file" : "lib/Perl/Critic/logicLAB.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Critic-logicLAB"
+      },
+      "homepage" : "http://logiclab.jira.com/wiki/display/PCLL/Home",
+      "license" : [
+         "http://opensource.org/licenses/artistic-license.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jonasbn/pcll"
+      },
+      "x_projectChangelog" : "http://logiclab.jira.com/browse/PCLL#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel",
+      "x_projectSite" : "http://logicLAB.jira.com/browse/PCLL",
+      "x_projectWiki" : "http://logiclab.jira.com/wiki/display/PCLL/Home"
+   },
+   "version" : "0.09"
+}

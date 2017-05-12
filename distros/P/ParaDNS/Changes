@@ -1,0 +1,41 @@
+ParaDNS Changes
+
+2.0
+    - Implemented DNS 0x20
+
+1.9
+	- Fixed bug when duplicate IDs are given
+
+1.8
+	- CNAME recursion
+	- Added PARADNS_NO_CACHE env var support
+	- Fixed cache to support multiple answers
+	
+1.7
+    - Settable nameservers
+
+1.6
+    - Performance improvements
+
+1.5
+    - Improved tests
+    - Better code for when XS interface is available
+
+1.4
+    - Add ttl to passed parameters to callbacks
+    - Unified the cache hash
+	
+1.3
+    - Change cache to be global instead of per-resolver
+    - Separate cache and resolver cleanups
+    - Make timeouts and repeaters configurable
+
+1.2
+    - Support for ParaDNS::XS
+
+1.1
+
+    - Cache NXDOMAIN lookups according to RFC 2308
+    - Allow timeout to be set ($ParaDNS::TIMEOUT)
+    - Drop per-resolver timeout to 10 seconds
+

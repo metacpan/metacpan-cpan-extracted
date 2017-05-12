@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include/silc
+
+Name: silc-toolkit (client library)
+Description: SILC Client Library
+Version: 1.1.10
+Requires: silc = 1.1.10
+Libs: -L${libdir} -lsilcclient  -ldl -lpthread
+Cflags: -I${includedir}
+

@@ -1,0 +1,8 @@
+<body>
+  <span petal:if="something" petal:content="somestuff">
+    <a href="dummy">dummy</a>
+  </span>
+  <span petal:if="something" petal:replace="somestuff">
+    <a href="dummy">dummy</a>
+  </span>
+</body>

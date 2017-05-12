@@ -1,0 +1,77 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9f8d298860f1d467399a1b6c5675b7e831674f7b COPYRIGHT
+SHA1 31e26f26d5e0f709e285ac21c24227f13acbf532 CREDITS
+SHA1 58b707aa87fd73b0b52ee2374d2ba0d5acf57fb8 Changes
+SHA1 937d452c5c4069f4cda9ffaf45a33f1eb5f060e8 LICENSE
+SHA1 2166905d12182cea17a363fef6fcb527f389b9cc MANIFEST
+SHA1 305189d2f4d446891df281b5e087422a050e2998 META.ttl
+SHA1 cdda8c5680608b4e5f4aec1fcc7c47998421b75c META.yml
+SHA1 7150e5e086ef493e1e527a1eeec44a8344b80db6 Makefile.PL
+SHA1 efd1b109c97ed66e6662e3bb00ec92c035f804d6 README
+SHA1 a357506e1e49e01ab813922cf7e836b259fe87e1 TODO
+SHA1 9018b1f87203663176da6321d6d3d19a63bae840 bin/p5u
+SHA1 06c410f05488c1612ed66b06d3a86b2580581e4a inc/Module/AutoInstall.pm
+SHA1 8a924add836b60fb23b25c8506d45945e02f42f4 inc/Module/Install.pm
+SHA1 61ab1dd37e33ddbe155907ce51df8a3e56ac8bbf inc/Module/Install/AutoInstall.pm
+SHA1 c04f94f91fa97b9f8cfb5a36071098ab0e6c78e3 inc/Module/Install/AutoManifest.pm
+SHA1 2d0fad3bf255f8c1e7e1e34eafccc4f595603ddc inc/Module/Install/Base.pm
+SHA1 f0e01fff7d73cd145fbf22331579918d4628ddb0 inc/Module/Install/Can.pm
+SHA1 9e4cc10c7f138a3f2c60d9ee1f34261f0d8c5aae inc/Module/Install/Contributors.pm
+SHA1 7328966e4fda0c8451a6d3850704da0b84ac1540 inc/Module/Install/Fetch.pm
+SHA1 66d3d335a03492583a3be121a7d888f63f08412c inc/Module/Install/Include.pm
+SHA1 b62ca5e2d58fa66766ccf4d64574f9e1a2250b34 inc/Module/Install/Makefile.pm
+SHA1 1aa925be410bb3bfcd84a16985921f66073cc1d2 inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 4d793c044726e06fe35d8d129b76da2803377f92 inc/Module/Install/Scripts.pm
+SHA1 41f76ff6b39368a65da86377e43b34bacc2fb0eb inc/Module/Install/TrustMetaYml.pm
+SHA1 e4196994fa75e98bdfa2be0bdeeffef66de88171 inc/Module/Install/Win32.pm
+SHA1 c3a6d0d5b84feb3280622e9599e86247d58b0d18 inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 5a2f84a7a82eee0d1e5ed3628fe503a608efc10f inc/Module/Package/Dist/RDF.pm
+SHA1 feb933cefe2e3762e8322bd6071a2499f3440da1 inc/YAML/Tiny.pm
+SHA1 e10c4e1e35f838009b09cfa82a48d07a7c0fa3b0 lib/P5U.pm
+SHA1 cf05547e549d1619362dd5837b67b515aa6cee77 lib/P5U/Command.pm
+SHA1 835c8582653332f698361ea62ad61b7be4b841ed lib/P5U/Command/About.pm
+SHA1 ce259396a8e39edea5def827cf7d11daa33f807b lib/P5U/Command/Aliases.pm
+SHA1 d557dfb78a2f564b9850ed9ea7edcc25e4b608e9 lib/P5U/Command/AutoProve.pm
+SHA1 4e3a90d68c566ec6ac7a0d0e84684ab67b59717f lib/P5U/Command/Commands.pm
+SHA1 0a297df4d92db25fd7f9416e88a6f6f0896bcaf8 lib/P5U/Command/DebianRelease.pm
+SHA1 0f68a515af1f8013b064dfa40a69268ba002cc3f lib/P5U/Command/Reprove.pm
+SHA1 7ffba29480dbde2a3929338f917b124ec6e22a34 lib/P5U/Command/TestPod.pm
+SHA1 db81e4dafd0739159d38d4453585e3778c6f06bb lib/P5U/Command/Testers.pm
+SHA1 2acdf2e642997b693246c2a707aaf778c676c5af lib/P5U/Command/Version.pm
+SHA1 c9c2f7fa7531533743b8d70ffde3bdc26686035a lib/P5U/Command/Whois.pm
+SHA1 f91eab9db0243fb0717ae884b5072b24a0dbd72b lib/P5U/Lib/AutoProve.pm
+SHA1 0d903114ce7f39b12ea6e4dbe97b6496175487e3 lib/P5U/Lib/DebianRelease.pm
+SHA1 3fadff2cc7f5393bbcb53bc13bf861b9559e85ed lib/P5U/Lib/Reprove.pm
+SHA1 a573f12a95bf858e22eaedeef6ddcec46a06c0b0 lib/P5U/Lib/TestPod.pm
+SHA1 31c9447a59ae71090db7ff08d6cf275eba69fb58 lib/P5U/Lib/Testers.pm
+SHA1 18330fe220affd47ead2795d228e7a41ab12a8fb lib/P5U/Lib/Version.pm
+SHA1 b9996f9a995020d1ae02711f9ad317fc312b2c93 lib/P5U/Lib/Whois.pm
+SHA1 212dbea1171d4908762aa20de4240a2b5c8cfc58 lib/P5U/Tutorial/Development.pod
+SHA1 ed78b233760d412d460a3c7edc7bcd3e61886193 meta/changes.ttl
+SHA1 8574e739853421499117b8a67eb8739b18843e01 meta/doap.ttl
+SHA1 8f5904feb69210a83fe644a1317a7468fbdd1630 meta/makefile.ttl
+SHA1 c91a041cceaafb04b17655614f5357d7069f5645 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlGfbHcACgkQzr+BKGoqfTleIQCfaFTBpqOPlZbxzEIGO2ShzyND
+9mkAoLSS2VZX26c+j2t02VDA8NEmM4FP
+=7VUs
+-----END PGP SIGNATURE-----

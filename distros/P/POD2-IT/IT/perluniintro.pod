@@ -1,0 +1,984 @@
+=head1 NOME
+
+perluniintro - introduzione a Unicode in Perl
+
+=head1 DESCRIZIONE
+
+Questo documento fornisce un'idea generale di Unicode e di come usarlo
+in Perl.
+
+=head2 Unicode
+
+Unicode E<egrave> uno standard per la codifica dei caratteri che
+progetta di codificare tutti i metodi di scrittura del mondo, e molti
+altri simboli ancora.
+
+Unicode e ISO/IEC 10646 sono due standard coordinati che forniscono
+"code point" per ciascun carattere di praticamente tutti gli standard
+di codifica carattere moderni, coprendo oltre 30 sistemi di scrittura
+e centinaia di linguaggi, inclusi tutti i linguaggi moderni di
+importanza commerciale. Sono codificati anche tutti i caratteri dei
+voluminosi dizionari cinesi, giapponesi e coreani. Lo standard
+arriverE<agrave> a coprire sostanzialmente tutti i caratteri di oltre
+250 sistemi di scrittura e di migliaia di linguaggi. Unicode 1.0
+E<egrave> stato rilasciato in Ottobre 1991, e la 4.0 in Aprile 2003.
+
+Un I<carattere> Unicode E<egrave> un'entitE<agrave> astratta. Non
+E<egrave> limitato da alcuna particolare dimensione dei tipi interi,
+in particolare non E<egrave> limitato al C<char> del linguaggio
+C. Unicode E<egrave> indipendente dal linguaggio e dall'aspetto
+grafico: non codifica la lingua del testo e non definisce font o altri
+dettagli di rappresentazione grafica. Unicode si occupa di caratteri e
+di testi composti da tali caratteri.
+
+Unicode definisce caratteri come C<LATIN CAPITAL LETTER A> (``lettera
+A latina maiuscola'', NdT), o C<GREEK SMALL LETTER ALPHA> (``lettera
+alpha greca minuscola'', NdT), e numeri univoci per tali caratteri, in
+questo caso 0x0041 e 0x03B1, rispettivamente. Questi numeri univoci
+sono chiamati I<code point> ("punti codice", NdT).
+
+Lo standard Unicode preferisce usare la notazione esadecimale per i
+code point. Se numeri come C<0x0041> vi sono poco familiari, date
+un'occhiata alla sezione L</"Notazione esadecimale">, piE<ugrave>
+sotto.  Lo standard Unicode usa la notazione C<U+0041 LATIN CAPITAL
+LETTER A>, per indicare il code point esadecimale e il nome normativo
+del carattere.
+
+Unicode definisce altresE<igrave> svariate I<proprietE<agrave>> dei
+caratteri, come "maiuscolo" o "minuscolo", "cifra decimale", o
+"punteggiatura"; queste proprietE<agrave> sono indipendenti dal nome
+dei caratteri. Inoltre, alcune operazioni sui caratteri, come
+conversioni tra maiuscole e minuscole, e "collazione" (ordinamento),
+sono definite dallo standard.
+
+Un carattere Unicode puE<ograve> cosistere di un singolo code point,
+oppure di un I<carattere base> (ad esempio C<LATIN CAPITAL LETTER A>),
+seguito da uno o piE<ugrave> I<modificatori> (ad esempio C<COMBINING
+ACUTE ACCENT> "accento acuto da combinare"). Questa sequenza di
+carattere base e modificatori viene chiamata I<sequenza di caratteri
+combinati> ("I<combining character sequence>" in inglese, NdT).
+
+Se chiamare o no queste sequenze "caratteri" dipende dal vostro punto
+di vista. Se siete un programmatore, probabilmente tenderete a vedere
+ciascun elemento della sequenza come una unitE<agrave> distinta, o
+"carattere". D'altro canto, l'intera sequenza puE<ograve> essere vista
+come "carattere" dal punto di vista dell'utente, poichE<eacute>
+probabilmente viene considerata tale nel contesto della sua lingua.
+
+Secondo questa visione dei caratteri come "l'intera sequenza", il
+numero totale di caratteri E<egrave> un concetto poco chiaro. Ma
+nell'idea del programmatore, "ciascuna unitE<agrave> E<egrave> un
+carattere", il concetto di "carattere" E<egrave> molto piE<ugrave>
+deterministico. In questo documento, assumiamo questo secondo punto di
+vista: un "carattere" E<egrave> un code point Unicode, sia un
+carattere base o un carattere da combinare.
+
+Per alcune combinazioni, esistono caratteri I<precombinati>.  C<LATIN
+CAPITAL LETTER A WITH ACUTE> ("lettera A latina maiuscola con accento
+acuto", NdT), ad esempio, E<egrave> definito come singolo code
+point. Questi caratteri precombinati, comunque, esistono solo per
+alcune combinazioni, e sono previsti principalmente per supportare
+conversioni avanti-e-indietro tra Unicode e standard precedenti (come
+ad esempio i vari ISO 8859). Nel caso generale, il metodo di
+composizione E<egrave> piE<ugrave> estendibile. Per supportare
+conversioni tra i vari modi di comporre i caratteri, sono state
+definite varie I<forme di normalizzazione> ("I<normalization forms>"
+in inglese, NdT) per produrre rappresentazioni uniformi.
+
+Per mantenere la compatibilitE<agrave> con le codifiche precedenti,
+l'idea di "un numero unico per ciascun carattere" non si realizza del
+tutto: invece, c'E<egrave> "almeno un numero per ciascun
+carattere". Lo stesso carattere potrebbe essere rappresentato in modo
+diverso in diverse codifiche. Neppure l'inverso E<egrave> sempre vero:
+alcuni code point non hanno un corrispondente carattere assegnato. In
+primo luogo, esistono code point non allocati all'interno di blocchi
+altrimenti usati. In secondo luogo, ci sono speciali caratteri di
+controllo Unicode che non rappresentano veri e propri "caratteri".
+
+Un'idea diffusa relativamente a Unicode sostiene che sia "a 16 bit",
+ovvero, che Unicode sia rappresentato da C<0x10000> (ovvero 65536)
+caratteri, da C<0x0000> a C<0xFFFF>. B<< CiE<ograve> E<egrave>
+falso. >> A partire dalla versione 2.0 (Luglio 1996), Unicode
+E<egrave> stato definito fino a 21 bit (C<0x10FFFF>), e dalla versione
+3.1 (Marzo 2001) sono stati definiti caratteri oltre C<0xFFFF>. I
+primi C<0x10000> caratteri sono chiamati il I<Piano 0>, o I<Basic
+Multilingual Plane> (BMP). Con Unicode 3.1, sono definiti in totale 17
+piani, anche se ancora non sono affatto pieni di caratteri definiti.
+
+Un'altra idea diffusa E<egrave> che i blocchi di 256 caratteri abbiamo
+qualcosa a che vedere con le lingue -- che ciascun blocco definisca i
+caratteri usati in una lingua o insieme di lingue.  B<< Neanche questo
+E<egrave> vero. >> La divisione in blocchi esiste, ma E<egrave> quasi
+del tutto accidentale -- un effetto collaterale del modo con cui i
+caratteri sono stati, e sono ancora, allocati. Invece, esiste il
+concetto di I<script>, che E<egrave> molto piE<ugrave> utile:
+c'E<egrave> lo script C<Latin>, lo script C<Greek>, et cetera.  Gli
+script di solito coprono varie parti di diversi blocchi. Per maggiori
+informazioni, leggete L<Unicode::UCD>.
+
+I code point Unicode sono soltanto numeri, astratti. Per essere
+comunicati, questi numeri devono essere I<codificati> ("I<encoded>" in
+inglese, NdT) o I<serializzati> in qualche modo. Unicode definisce
+svariate I<forme di codifica dei caratteri>, di cui I<UTF-8> E<egrave>
+forse la piE<ugrave> nota.  UTF-8 E<egrave> una codifica a lunghezza
+variabile che rappresenta i caratteri Unicode come sequenze da 1 a 6
+byte (se ci si limita ai caratteri attualmente definiti ne bastano
+4). Altre codifiche sono UTF-16 e UTF-32, e le loro varianti
+big-endian e little-endian (UTF-8 E<egrave> invariante). Lo standard
+ISO/IEC 10646 definisce le forme UCS-2 e UCS-4.
+
+Per ulteriori informazioni sulle codifiche -- ad esempio, per sapere
+cosa sono i I<surrogati> e i I<byte order marks> (BOM) -- leggete
+L<perlunicode>.
+
+=head2 Il supporto Unicode in Perl
+
+A partire da Perl 5.6.0, Perl ha avuto la capacitE<agrave> di gestire
+nativamente Unicode. Ad ogni modo, Perl 5.8.0 E<egrave> la minima
+versione raccomandata per lavorare seriamente con Unicode. La versione
+di manutenzione 5.6.1 ha corretto molti dei problemi della prima
+implementazione di Unicode, ma ad esempio le espressioni regolari
+ancora non funzionano con Unicode nella 5.6.1.
+
+B<< A partire da Perl 5.8.0, l'uso di C<use utf8> non E<egrave>
+piE<ugrave> necessario. >> In versione precedenti la direttiva C<utf8>
+era usata per dichiarare che le operazioni del blocco o file corrente
+avrebbero dovuto tener conto di Unicode. Si E<egrave> scoperto che
+questo modello era sbagliato, o quantomeno scomodo: la
+"UnicoditE<agrave>" E<egrave> ora associata ai dati, anzichE<eacute>
+alle operazioni. Resta solo un caso in cui serve un esplicito C<use
+utf8>: se il vostro stesso script Perl E<egrave> codificato in UTF-8,
+potete usare caratteri Unicode negli identificatori, nelle costanti
+stringa e nelle espressioni regolari, scrivendo C<use utf8>. Questo
+non E<egrave> il comportamento predefinito perchE<eacute> script
+salvati in altre codifiche a 8 bit (ad esempio ISO 8859-1)
+provocherebbero errori. Cfr. L<utf8>.
+
+=head2 Il modello Unicode di Perl
+
+Perl supporta sia stringhe di caratteri nativi a 8 bit, come prima
+della 5.6, che stringhe di caratteri Unicode. Il principio E<egrave>
+che Perl tenta di mantenere i dati come byte piE<ugrave> a lungo
+possibile, ma quando non E<egrave> piE<ugrave> possibile evitare la
+"UnicoditE<agrave>", i dati vengono automaticamente convertiti in
+Unicode.
+
+Internamente, al momento, Perl usa la codifica a 8 bit nativa della
+piattaforma (ad esempio Latin-1), qualunque essa sia, usando UTF-8 per
+codificare le stringhe Unicode. In particolare, se tutti i code point
+nella stringa sono minori di C<0xFF>, Perl usa la codifica a 8 bit
+nativa. Altrimenti usa UTF-8.
+
+Un utente di Perl normalmente non deve preoccuparsi di come Perl
+codifichi internamente le stringhe, ma ciE<ograve> diventa rilevante
+quando si scrivono stringhe Unicode in un canale ("stream", NdT) senza
+uno strato PerlIO -- un canale con la codifica predefinita. In questo
+caso, i byte della codifica interna (quella nativa, o UTF-8, a seconda
+della stringa), vengono usati pari pari, e verrE<agrave> emesso un
+avvertimento di "Wide character" se tali stringhe contengono caratteri
+oltre C<0xFF>.
+
+Ad esempio,
+
+      perl -e 'print "\x{DF}\n", "\x{0100}\x{DF}\n"'              
+
+produce una mistura piuttosto inutile di byte in codifica nativa e
+UTF-8, oltre che un avvertimento:
+
+     Wide character in print at ...
+
+Per emettere UTF-8, usate lo strato C<:utf8>. Inserendo
+
+      binmode(STDOUT, ":utf8");
+
+prima di C<print> in questo programma di esempio ci si assicura che
+l'output sia interamente UTF-8, e si elimina l'avvertimento.
+
+Potete abilitare l'interpretazione automatica in UTF-8 dei filehandle
+standard e di C<@ARGV>, e l'uso di UTF-8 come strato implicito nelle
+C<open()>, fornendo il parametro a linea di comando C<-C> o la
+variabile d'ambiente C<PERL_UNICODE>; leggete L<perlrun> per la
+documentazione del parametro C<-C>.
+
+Notare che ciE<ograve> implica che Perl si aspetta che tutti gli altri
+programmi facciano altrettanto: se Perl E<egrave> portato a credere
+che C<STDIN> sia in UTF-8, ma i dati che arrivano da un altro
+programma su C<STDIN> non sono in UTF-8, Perl si lamenterE<agrave> che
+gli sta arrivando UTF-8 malformato.
+
+Tutte le funzionalitE<agrave> che combinano Unicode e I/O richiedono
+l'uso della nuova caratteristica PerlIO. Praticamente tutte le
+piattaforme di Perl 5.8, comunque, usano PerlIO: potete controllare se
+la vostra lo usa eseguendo "C<perl -V>" e cercando
+"C<useperlio=define>".
+
+=head2 Unicode e EBCDIC
+
+Perl 5.8.0 supporta Unicode anche sulle piattaforme EBCDIC. Su di
+esse, il supporto Unicode E<egrave> alquanto piE<ugrave> complesso da
+implementare poichE<eacute> sono nessarie conversioni aggiuntive a
+ogni passo. Restano alcuni problemi, leggete L<perlebcdic> per i
+dettagli.
+
+Ad ogni modo, il supporto Unicode sulle piattaforme EBCDIC E<egrave>
+migliore che nella serie 5.6, che in pratica non funzionava affatto.
+Sulle piattaforme EBCDIC la codifica interna E<egrave> UTF-EBCDIC,
+anzichE<eacute> UTF-8. La differenza sta nel fatto che, come UTF-8
+E<egrave> "ASCII-safe" nel senso che i caratteri ASCII hanno una
+codifica identica in UTF-8, UTF-EBCDIC E<egrave> "EBCDIC-safe".
+
+=head2 Creare Unicode
+
+Per creare caratteri Unicode nelle costanti per code point oltre
+C<0xFF>, usate la notazione C<\x{...}> all'interno di stringhe con
+virgolette doppie:
+
+    my $sorriso = "\x{263a}";
+
+Potete fare altrettanto nelle espressioni regolari costanti:
+
+    $sorriso =~ /\x{263a}/;
+
+A tempo di esecuzione potete usare C<chr()>:
+
+    my $alef_ebraica = chr(0x05d0);
+
+Leggete le L</"Ulteriori risorse"> per sapere come trovare tutti
+questi codici numerici.
+
+Naturalmente, C<ord()> esegue l'operazione inversa: trasforma un
+carattere in un code point.
+
+Notate che C<\x..> (senza C<{}> e con solo due cifre esadecimali),
+C<\x{...}> e C<chr(...)> con argomenti minore di C<0x100> (256 in
+decimale) producono caratteri a 8 bit per compatibilitE<agrave>
+all'indietro con versioni precedenti di Perl. Per argomenti maggiori o
+uguali a C<0x100>, vengono sempre prodotti caratteri Unicode. Se
+volete forzare la produzione di caratteri Unicode indipendentemente
+dal valore numerico, usate C<pack("U", ...)> anzichE<eacute> C<\x..>,
+C<\x{...}> e C<chr()>.
+
+Potete anche usare la direttiva C<charnames> per chiamare i caratteri
+per nome nelle stringhe con virgolette doppie:
+
+    use charnames ':full';
+    my $alef_araba = "\N{ARABIC LETTER ALEF}";
+
+E, come detto prima, potete usare C<pack()> per convertire numeri in
+caratteri Unicode:
+
+   my $an_georgiana  = pack("U", 0x10a0);
+
+Notate che sia C<\x{...}> che C<\N{...}> sono costanti stringa risolte
+a tempo di compilazione: non potete metterci dentro delle
+variabili. Se volete funzionalitE<agrave> simili a tempo di
+esecuzione, usate C<chr()> e C<charnames::vianame()>.
+
+Se volete forzare la produzione di caratteri Unicode, usate lo
+speciale prefisso C<"U0">. Non consuma argomenti, ma forza il
+risultato ad essere composto di caratteri Unicode, anzichE<eacute> di
+byte:
+
+   my $caratteri = pack("U0C*", 0x80, 0x42);
+
+Allo stesso modo, potete forzare la produzione di byte usando lo
+speciale prefisso C<"C0">.
+
+=head2 Gestire Unicode
+
+Nella maggior parte dei casi, gestire Unicode E<egrave> trasparente:
+usate semplicemente le stringhe come sempre. Funzioni come C<index()>,
+C<length()> e C<substr()> lavorano sui caratteri Unicode, cosE<igrave>
+come le espressioni regolari (leggete L<perlunicode> e L<perlretut>).
+
+Ricordate che Perl considera i componenti delle sequenze di caratteri
+combinati come caratteri separati, per cui ad esempio
+
+    use charnames ':full';
+    print length("\N{LATIN CAPITAL LETTER A}\N{COMBINING ACUTE ACCENT}"), "\n";
+
+scriverE<agrave> 2, non 1. L'unica eccezione E<egrave> che le
+espressioni regolari hanno C<\X> che fa match con una sequenza di
+caratteri combinati.
+
+La gestione non E<egrave> proprio cosE<igrave> trasparente, ad ogni
+modo, quando si lavora con altre codifiche, I/O, e alcuni casi
+speciali.
+
+=head2 Altre codifiche
+
+Quando combinate dati Unicode e dati in codifiche precedenti, questi
+ultimi devono essere trasformati in Unicode. Normalmente viene assunto
+che i dati non-Unicode siano codificati secondo ISO 8859-1 (o EBCDIC,
+sulle opportune piattaforme). Potete aggirare questa assunzione usando
+la direttiva C<encoding>, ad esempio:
+
+    use encoding 'latin2'; # ISO 8859-2
+
+nel qual caso le costanti (stringhe o espressioni regolari), C<chr()>
+e C<ord()> in tutto il vostro script produrranno caratteri Unicode a
+partire da code point in ISO 8859-2. Notate che la corrispondenza dei
+nomi delle codifiche E<egrave> lasca: invece che C<latin2> potreste
+aver scritto C<Latin 2> o C<iso8859-2>, o altre varianti. Dicendo
+soltanto
+
+    use encoding;
+
+la codifica viene estratta dalla variabile di ambiente
+C<PERL_ENCODING>. Se tale variabile non E<egrave> impostata, la
+direttiva fallirE<agrave>.
+
+Il modulo C<Encode> sa trattare molte codifiche e fornisce interfacce
+per convertire tra tali codifiche:
+
+    use Encode 'decode';
+    $data = decode("iso-8859-3", $data); # converte da latin-3 a utf-8
+
+=head2 I/O in Unicode
+
+Normalmente, scrivendo su file dati Unicode
+
+    print FH $qualche_stringa_in_unicode, "\n";
+
+si ottengono i byte che Perl usa internamente per rappresentare la
+stringa Unicode. La codifica interna del Perl dipende sia dal sistema
+che da quali caratteri sono presenti al momento nella stringa. Se
+qualcuno dei caratteri ha code point C<0x100> o maggiore, otterrete un
+avvertimento. Per essere sicuri che l'output venga prodotto nella
+codifica che volete -- ed evitare gli avvertimenti -- aprite il canale
+specificando la codifica. Alcuni esempi:
+
+    open FH, ">:utf8", "file";
+
+    open FH, ">:encoding(ucs2)",      "file";
+    open FH, ">:encoding(UTF-8)",     "file";
+    open FH, ">:encoding(shift_jis)", "file";
+
+e su canali giE<agrave> aperti, usate C<binmode()>:
+
+    binmode(STDOUT, ":utf8");
+
+    binmode(STDOUT, ":encoding(ucs2)");
+    binmode(STDOUT, ":encoding(UTF-8)");
+    binmode(STDOUT, ":encoding(shift_jis)");
+
+La corrispondenza dei nomi di codifica E<egrave> lasca: maiuscole e minuscole
+sono uguali, e molte codifiche hanno svariati sinonimi. Notare che lo
+strato C<:utf8> deve essere sempre specificato esattamente in quel
+modo; I<non> viene trattato come gli altri nomi di codifica.
+
+Leggete L<PerlIO> per lo strato C<:utf8>, L<PerlIO::encoding> e
+L<Encode::PerlIO> per lo strato C<:encoding()>, e
+L<Encoding::Supported> per le tante codifiche supportate dal modulo
+C<Encode>.
+
+Leggere da un file di cui conoscete la codifica non trasforma
+magicamente i dati in Unicode per quanto riguarda Perl. Per farlo,
+specificato l'opportuno strato all'apertura del file:
+
+    open(my $fh,'<:utf8', 'file_in_utf8');
+    my $linea_in_unicode = <$fh>;
+
+    open(my $fh,'<:encoding(Big5)', 'file_in_Big5');
+    my $linea_in_unicode = <$fh>;
+
+Gli strati di I/O possono essere anche specificati con la direttiva
+C<open>. Leggete L<open>, o analizzate l'esempio seguente.
+
+    use open ':utf8'; # gli strati di input e output di default saranno UTF-8
+    open X, ">file";
+    print X chr(0x100), "\n";
+    close X;
+    open Y, "<file";
+    printf "%#x\n", ord(<Y>); # dovrebbe scrivere 0x100
+    close Y;
+
+Con la direttiva C<open> potete usare lo strato C<:locale>
+
+    BEGIN { $ENV{LC_ALL} = $ENV{LANG} = 'ru_RU.KOI8-R' } 
+    # :locale controllera` le variabili di ambiente come LC_ALL
+    use open OUT => ':locale'; # russki parusski
+    open(O, ">koi8");
+    print O chr(0x430); # Unicode CYRILLIC SMALL LETTER A = KOI8-R 0xc1
+    close O;
+    open(I, "<koi8");
+    printf "%#x\n", ord(<I>), "\n"; # dovrebbe scrivere 0xc1
+    close I;
+
+oppure potete usare anche lo strato C<:encoding(...)>
+
+    open(my $epic,'<:encoding(iso-8859-7)','iliad.greek');
+    my $linea_in_unicode = <$epic>;
+
+Questi metodi installano un filtro trasparente sui canali di I/O che
+converte i dati dalla codifica specificata quando vengono letti dal
+canale. Il risultato E<egrave> sempre in Unicode.
+
+La direttiva L<open> influisce su tutte le chiamate a C<open()> dopo
+la direttiva, impostando gli strati di default. Se volete influenzare
+solo certi canali, usate gli strati esplicitamente nella chiamata a
+C<open()>.
+
+Potete cambiare la codifica di un canale giE<agrave> aperto usando
+C<binmode>; leggete L<perlfunc/binmode>.
+
+Lo strato C<:locale> al momento (Perl 5.8.0) non fusnziona con
+C<open()> e C<binmode()>, solo con la direttiva C<open>. Gli strati
+C<:utf8> e C<:encoding(...)> funzionano con tutte, C<open()>,
+C<binmode()> e la direttiva C<open>.
+
+In modo analogo, potete usare questi strati di I/O sui canali di
+uscita per convertire automaticamente Unicode nelle codifiche
+specificate quando i dati vengono scritti sul canale. Ad esempio, il
+frammento seguente copia il contenuto del file "testo.jis" (codificato
+secondo ISO 2022-JP, noto anche come JIS) nel file "testo.utf8",
+codificato in UTF-8:
+
+    open(my $nihongo, '<:encoding(iso-2022-jp)', 'testo.jis');
+    open(my $unicode, '>:utf8',                  'testo.utf8');
+    while (<$nihongo>) { print $unicode $_ }
+
+La denominazione delle codifiche, sia per C<open()> che per la
+direttiva C<open>, E<egrave> analoga a quella della direttiva
+C<encoding> in quanto permette di usare sinonimi: C<koi8-r> e C<KOI8R>
+verranno riconosciuti entrambi.
+
+Vengono riconosciute molte codifiche comuni definite da ISO, MIME,
+IANA e svariate altre organizzazioni di standard; per un'elenco
+piE<ugrave> dettagliato leggere L<Encode::Supported>.
+
+C<read()> legge caratteri e restituisce il numero di caratteri.
+C<seek()> e C<tell()> lavorano contando i byte, cosE<igrave> pure
+C<sysread()> e C<sysseek()>.
+
+Fate attenzione che, a causa del fatto che non viene effettuata alcuna
+conversione in lettura se non c'E<egrave> nessuno strato di default,
+E<egrave> facile sbagliarsi e scrivere codice che continua ad
+allungare un file codificando ripetutamente i dati:
+
+    # ATTENZIONE CODICE SBAGLIATO
+    open F, "file";
+    local $/; ## legge l'intero file come caratteri a 8 bit
+    $t = <F>;
+    close F;
+    open F, ">:utf8", "file";
+    print F $t; ## scrive convertendo in UTF-8
+    close F;
+
+Se eseguite questo codice due volte, il contenuto del F<file>
+verrE<agrave> codificato in UTF-8 due volte. Si puE<ograve> evitare il
+problema scrivendo C<use open ':utf8'>, oppure aprendo esplicitamente
+il F<file> in lettura in UTF-8.
+
+B<NOTA>: C<:utf8> e C<:encoding> funzionano solo se il vostro
+interprete Perl E<egrave> stato compilato con le nuove
+funzionalitE<agrave> PerlIO (che vengono compilate di default nella
+maggior parte dei sistemi).
+
+=head2 Mostrare Unicode Come Testo
+
+Certe volte potreste voler mostrare scalari Perl contenenti Unicode
+come semplice testo ASCII (o EBCDIC). La subroutine seguente converte
+i suoi argomenti in modo che i caratteri Unicode con code point
+maggiore di 255 vengano mostrati come C<\x{...}>, i caratteri di
+controllo (come C<\n>) vengano mostrati come C<\x..>, e gli altri
+caratteri non subiscano trasformazioni:
+
+   sub nice_string {
+       join("",
+         map { $_ > 255 ?                  # se carattere esteso...
+               sprintf("\\x{%04X}", $_) :  # \x{...}
+               chr($_) =~ /[[:cntrl:]]/ ?  # altrimenti, se controllo...
+               sprintf("\\x%02X", $_) :    # \x..
+               quotemeta(chr($_))          # altrimenti identici
+         } unpack("U*", $_[0]));           # unpack caratteri Unicode
+   }
+
+Ad esempio,
+
+   nice_string("foo\x{100}bar\n")
+
+restituisce la stringa:
+
+   'foo\x{0100}bar\x0A'
+
+pronta per essere stampata.
+
+=head2 Casi Particolari
+
+=over 4
+
+=item *
+
+Operatori di complemento di bit C<~> e C<vec()>
+
+L'opertatore di complemento di bit C<~> puE<ograve> produrre risultati
+inattesi se usato su stringhe contenenti caratteri con valori ordinali
+superiore a 255. In questi casi, i risultati sono consistenti con la
+codifica interna dei caratteri, ma non con molto altro. Per cui non
+fatelo. In maniera simile, con C<vec()> stareste lavorando con le
+sequenze di bit della rappresentazione interna dei caratteri Unicode,
+non sui valori dei code point, e molto probabilmente non E<egrave>
+quello che volete.
+
+=item *
+
+Sbirciare nella codifica interna di Perl
+
+I normali utenti di Perl non dovrebbero mai preoccuparsi di come Perl
+codifichi internamente le stringhe Unicode (perchE<eacute> i metodi
+normali di accedere a tali stringhe -- tramite input e output --
+dovrebbero avvenire sempre attraverso strati di I/O definiti
+esplicitamente). Ma se proprio volete, ci sono due modi di guardare
+dietro le quinte.
+
+Un modo consiste nell'usare C<unpack("C*", ...)> per ottenere i byte,
+o C<unpack("H*", ...)> per mostrare i byte:
+
+    # stampa  c4 80  dati i byte UTF-8 0xc4 0x80
+    print join(" ", unpack("H*", pack("U", 0x100))), "\n";
+
+L'altro modo consiste nell'usare il modulo Devel::Peek:
+
+    perl -MDevel::Peek -e 'Dump(chr(0x100))'
+
+Questo mostra in FLAGS il flag C<UTF8> e in C<PV> sia i byte UTF-8 sia
+i caratteri Unicode. Leggete anche piE<ugrave> avanti in questo
+documento la descrizione della funzione C<utf8::is_utf8>.
+
+=back
+
+=head2 Argomenti avanzati
+
+=over 4
+
+=item *
+
+Equivalenza di stringhe
+
+La definizione di equivalenza tra stringhe diventa piuttosto complessa
+in Unicode: cosa si intende per "uguali"?
+
+(C<LATIN CAPITAL LETTER A WITH ACUTE> E<egrave> uguale a C<LATIN
+CAPITAL LETTER A>?)
+
+La risposta semplice E<egrave> che per default Perl decide
+l'equivalenza (C<eq>, C<ne>) basandosi solo sui code point dei
+caratteri. Nel caso di cui sopra, la risposta E<egrave> no
+(poichE<eacute> 0x00C1 != 0x0041). Ma certe volte, tutte le CAPITAL
+LETTER A dovrebbero essere considerate uguali, o forse anche le A
+minuscole.
+
+La risposta completa E<egrave> che dovete considerare i problemi di
+normalizzazione e conversione maiuscole/minuscole: leggete
+L<Unicode::Normalize>, Unicode Technical Reports ("Rapporti Tecnici"
+NdT) numero 15 e 21, I<Unicode Normalization Forms> ("Forme di
+normalizzazione Unicode" NdT) e I<Case Mappings> ("Corrispondenze
+maiuscole/minuscole" NdT),
+L<http://www.unicode.org/unicode/reports/tr15/> e
+L<http://www.unicode.org/unicode/reports/tr21/>
+
+Da Perl 5.8.0, viene implementato il case-folding "Full" definito in
+I<Case Mappings/SpecialCasing>.
+
+=item *
+
+Ordinamento di stringhe
+
+Molti vorranno vedere le loro stringhe belle ordinate -- o, in
+terminologia Unicode, "collazionate" ("collated" NdT). Ma di nuovo,
+cosa si intende per "ordinare"?
+
+(C<LATIN CAPITAL LETTER A WITH ACUTE> viene prima o dopo C<LATIN
+CAPITAL LETTER A WITH GRAVE>?)
+
+La risposta semplice E<egrave> che per default Perl confronta le
+stringhe (C<lt>, C<le>, C<cmp>, C<ge>, C<gt>) basandosi solo sui code
+point dei caratteri. Nel caso di cui sopra, la risposta E<egrave>
+"dopo", poichE<eacute> C<0x00C1> E<gt> C<0x00C0>.
+
+La risposta completa E<egrave> "dipende", e una buona definizione non
+puE<ograve> essere fornita senza conoscere (quanto meno) la lingua cui
+ci si riferisce. Leggete L<Unicode::Collate>, e I<Unicode Collation
+Algorithm> ("Algoritmi di collazione Unicode" NdT)
+L<http://www.unicode.org/unicode/reports/tr10/>
+
+=back
+
+=head2 Varie
+
+=over 4
+
+=item *
+
+Intervalli e classi di caratteri
+
+Gli intervalli di caratteri nelle classi di caratteri delle
+espressioni regolari (C</[a-z]/>) e nell'operatore C<tr///> (noto
+anche come C<y///>) non sono magicamente dipendenti da
+Unicode. CiE<ograve> significa che C<[A-Za-z]> non indicherE<agrave>
+magicamente "tutti i caratteri alfabetici"; in effetti non lo indica
+neppure per i caratteri a 8 bit: dovreste usare C<[[:alpha:]]> in quel
+caso.
+
+Per specificare classi di caratteri come queste nelle espressioni
+regolari, potete usare le varie proprietE<agrave> Unicode -- C<\pL>, o
+forse C<\p{Alphabetic}>, in questo caso. Potete usare code point
+Unicode come estremi degli intervalli, ma non c'E<egrave> nessuna
+magia particolare associata alla specifica di un certo intervallo. Per
+maggiori informazioni -- esistono dozzine di classi di caratteri
+Unicode -- leggete L<perlunicode>.
+
+=item *
+
+Conversioni da stringa a numero
+
+Unicode definisce svariati altri caratteri decimali -- e numerici --
+in aggiunta alle familiari cifre da 0 a 9, come ad esempio le cifre
+arabe e indiane.  Perl non supporta convesioni da stringa a numero per
+cifre diverse dai caratteri ASCII da 0 a 9 (e da 'a' a 'f' per
+l'esadecimale).
+
+=back
+
+=head2 Domande e risposte
+
+=over 4
+
+=item *
+
+I miei vecchi programmi continueranno a funzionare?
+
+Molto probabilmente sE<igrave>. Tranne nel caso che stiate generando
+in qualche modo caratteri Unicode, tutte le vecchie
+funzionalitE<agrave> dovrebbero essere conservate. Probabilmente
+l'unica che E<egrave> cambiata e che potrebbe cominciare a generare
+Unicode E<egrave> il fatto che C<chr()> quando riceveva un argomento
+maggiore di 255 restituiva il carattere modulo 256. C<chr(300)>, ad
+esempio, era uguale a C<chr(45)>, o "-" (in ASCII); ora E<egrave>
+C<LATIN CAPITAL LETTER I WITH BREVE>.
+
+=item *
+
+Come faccio a far funzionare i miei programmi con Unicode?
+
+Dovrebbe essere necessario ben poco lavoro, poichE<eacute> non cambia
+nulla finchE<eacute> non generate dati Unicode. La cosa piE<ugrave>
+importante E<egrave> ottenere l'input in Unicode; per far ciE<ograve>,
+leggete la precedente discussione sull'I/O.
+
+=item *
+
+Come faccio a sapere se la mia stringa E<egrave> in Unicode?
+
+Non dovreste preoccuparvene. No, davvero: lasciate stare. Davvero.  Se
+dovete -- a parte i casi visti prima -- vuol dire che non abbiamo reso
+il supporto Unicode abbastanza trasparente.
+
+Va bene, se proprio insistete:
+
+    use Encode 'is_utf8';
+    print utf8::is_utf8($string) ? 1 : 0, "\n";
+
+Ma notate che questo non significa necessariamente che i caratteri
+nella stringa siano codificati in UTF-8, o che i caratteri abbiano
+code point maggiori di 0xFF (255) e neppure 0x80 (128), o che la
+stringa contenga alcun carattere. Tutto quello che fa la funzione
+C<is_utf8()> E<egrave> di restituire il valore del flag interno di
+"utf8sitE<agrave>" associato a C<$string>. Se il flag E<egrave> a
+zero, i byte nella stringa vengono interpretati secondo una qualche
+codifica a singolo byte. Se il flag E<egrave> a uno, i byte vengono
+interpretati come la codifica (a byte multipli, a lunghezza variabile)
+in UTF-8 dei code point dei caratteri. I byte aggiunti a una stringa
+codificata in UTF-8 sono automaticamente convertiti in UTF-8. Se
+vengono mescolati scalari UTF-8 e non (interpolazione dentro vigolette
+doppie, concatenazione esplicita, e sostituzione di parametri in
+printf/sprintf), il risultato sarE<agrave> codificato in UTF-8 come se
+le copie delle stringhe non in UTF-8 fossero state convertite: ad
+esempio, in
+
+    $a = "ab\x80c";
+    $b = "\x{100}";
+    print "$a = $b\n";
+
+la stringa stampata sarE<agrave> C<ab\x80c = \x{100}\n> codificata in
+UTF-8, ma notate che C<$a> continuerE<agrave> ad essere interpretata
+come stringa di byte.
+
+Qualche volta potreste davvero voler conoscere la lunghezza in byte di
+una stringa, anzichE<eacute> la sua lunghezza in caratteri. Per questo
+potete usare la funzione C<Encode::encode_utf8()> o la direttiva
+C<bytes> e la sua unica funzione definita C<length()>:
+
+    my $unicode = chr(0x100);
+    print length($unicode), "\n"; # stampa 1
+    require Encode;
+    print length(Encode::encode_utf8($unicode)), "\n"; # stampa 2
+    use bytes;
+    print length($unicode), "\n"; # stampa di nuovo 2
+                                  # (i 0xC4 0x80 dell'UTF-8)
+
+=item *
+
+Come rilevo dati non validi in una particolare codifica?
+
+Usate il modulo C<Encode> per provare a convertirli. Ad esempio,
+
+    use Encode 'decode_utf8';
+    if (decode_utf8($stringa_di_byte_che_penso_sia_utf8)) {
+        # valido
+    } else {
+        # non valido
+    }
+
+Solo nel caso di UTF-8, potete usare:
+
+    use warnings;
+    @chars = unpack("U0U*", $stringa_di_byte_che_penso_sia_utf8);
+
+Se i dati non sono validi, verrE<agrave> prodotto un avvertimento
+C<Malformed UTF-8 character (byte 0x##) in unpack> ("carattere UTF-8
+malformato (byte 0x##) in unpack" NdT) Quel "U0" significa "aspettati
+Unicode codificato esattamente secondo UTF-8". Senza, C<unpack("U*",
+...)> accetterebbe anche cose come C<chr(0xFF)>, come il C<pack> che
+abbiamo visto prima.
+
+=item *
+
+Come faccio a convertire dati binari in una codifica particolare, o
+vice versa?
+
+Probabilmente non E<egrave> cosE<igrave> utile come
+pensate. Normalmente, non dovreste averne bisogno.
+
+In un certo senso, la domanda non ha molto senso: le codifiche sono
+per i caratteri, e i dati binari non sono "caratteri", per cui
+convertire "dati" in qualche codifica non ha senso, tranne nel caso in
+cui sappiate che i "dati" siano in una certa codifica per un certo
+insieme di caratteri, nel qual caso perE<ograve> non sarebbero
+soltanto dati binari, vero?
+
+Se avete una sequenza di byte che volete sia interpretata secondo una
+certa codifica, potete usare C<Encode>:
+
+    use Encode 'from_to';
+    from_to($data, "iso-8859-1", "utf-8"); # da latin-1 a utf-8
+
+La chiamata a C<from_to()> cambia i byte in C<$data>, ma niente di
+rilevante E<egrave> cambiato riguardo alla natura della stringa dal
+punto di vista di Perl. Sia prima che dopo la chiamata, la stringa
+C<$data> contiene soltanto una sfilza di byte. Per quanto riguarda
+Perl, la codifica della stringa resta "sequenza di byte".
+
+Potete correlare questo fatto al funzionamento di un ipotetico modulo
+'Traduci':
+
+   use Traduci;
+   my $frase = "Si`";
+   Traduci::from_to($frase, 'italiano', 'english');
+   ## $frase ora contiene "Yes"
+
+Il contenuto della stringa cambia, ma non la natura della
+stringa. Perl, sia prima che dopo la chiamata, non sa che il contenuto
+della stringa indica un'affermazione.
+
+Torniamo alle conversioni di dati. Se avete (o volete) dati nella
+codifica 8 bit nativa del vostro sistema (es. Latin-1, EBCDIC, etc.)
+potete usare pack/unpack per convertire da/verso Unicode.
+
+    $stringa_nativa  = pack("C*", unpack("U*", $stringa_Unicode));
+    $stringa_Unicode = pack("U*", unpack("C*", $stringa_nativa));
+
+Se avete una sequenza di byte che B<sapete> essere UTF-8 valido, ma
+Perl non lo sa ancora, potete convincerlo:
+
+    use Encode 'decode_utf8';
+    $Unicode = decode_utf8($bytes);
+
+Potete convertire UTF-8 ben formato in una sequenza di byte, ma se
+volete convertire dati binari a caso in UTF-8, non potete. B<Non tutte
+le sequenze casuali di byte sono UTF-8 ben formato>. Potete usare
+C<unpack("C*", $stringa)> per la prima operazione, e potete creare
+dati Unicode ben formati con C<pack("U*", 0xff, ...)>.
+
+=item *
+
+Come mostro Unicode? Come inserisco Unicode?
+
+Leggete L<http://www.alanwood.net/unicode/> e
+L<http://www.cl.cam.ac.uk/~mgk25/unicode.html>
+
+=item *
+
+Come si comporta Unicode con i "locale"?
+
+In Perl, non molto bene. Evitate di usare i "locale" tramite la
+direttiva C<locale>. Usate solo uno dei due: o Unicode, o i
+"locale". Ma leggete L<perlrun> per la descrizione del parametro C<-C>
+e la sua controparte variabile d'ambiente C<$ENV{PERL_UNICODE}> per
+scoprire come attivare varie funzionalitE<agrave> Unicode, ad esempio
+usando le impostazioni di "locale".
+
+=back
+
+=head2 Notazione esadecimale
+
+Lo standard Unicode preferisce usare la notazione esadecimale
+perchE<eacute> mostra piE<ugrave> chiaramente la divisione dei code
+point in blocchi da 256. L'esadecimale E<egrave> anche piE<ugrave>
+breve del decimale. Potete anche usare la notazione decimale, ma
+imparando a usare l'esadecimale farete molta meno fatica con lo
+standard Unicode. La notazione C<U+HHHH>, ad esempio, E<egrave> in
+esadecimale.
+
+Il prefisso C<0x> indica un numero esadecimale, le cifre sono 0-9 I<e>
+a-f (o A-F, non fa differenza). Ciascuna cifra rappresenta quattro
+bit, ovvero mezzo byte. C<print 0x..., "\n"> mostra numeri esadecimali
+in decimale, e C<printf "%x\n",$decimale> fa l'inverso. Se avete solo
+le "cifre esadecimali" di un numero, potete usare la funzione
+C<hex()>.
+
+    print 0x0009, "\n";    # 9
+    print 0x000a, "\n";    # 10
+    print 0x000f, "\n";    # 15
+    print 0x0010, "\n";    # 16
+    print 0x0011, "\n";    # 17
+    print 0x0100, "\n";    # 256
+
+    print 0x0041, "\n";    # 65
+
+    printf "%x\n",  65;    # 41
+    printf "%#x\n", 65;    # 0x41
+
+    print hex("41"), "\n"; # 65
+
+=head2 Ulteriori risorse
+
+=over 4
+
+=item *
+
+Consorzio Unicode
+
+    http://www.unicode.org/
+
+=item *
+
+Domande comuni su Unicode
+
+    http://www.unicode.org/unicode/faq/
+
+=item *
+
+Glossario Unicode
+
+    http://www.unicode.org/glossary/
+
+=item *
+
+Risorse utili per Unicode
+
+    http://www.unicode.org/unicode/onlinedat/resources.html
+
+=item *
+
+Supporto Unicode e multi-lingua in HTML, font, browser web e altre
+applicazioni
+
+    http://www.alanwood.net/unicode/
+
+=item *
+
+Domande comuni su UTF-8 e Unicode per Unix/Linux
+
+    http://www.cl.cam.ac.uk/~mgk25/unicode.html
+
+=item *
+
+Insiemi di caratteri precedenti a Unicode
+
+    http://www.czyborra.com/
+    http://www.eki.ee/letter/
+
+=item *
+
+I file di supporto a Unicode si trovano all'interno dell'installazione
+Perl nella directory
+
+    $Config{installprivlib}/unicore
+
+in Perl 5.8.0 o successivi, e
+
+    $Config{installprivlib}/unicode
+
+in Perl 5.6. (Il cambio di nome in F<lib/unicore> E<egrave> stato
+fatto per evitare conflitti con F<lib/Unicode> in file system che non
+distinguono tra maiuscole e minuscole). Il file di dati Unicode
+principale E<egrave> F<UnicodeData.txt> (o F<Unicode.301> in Perl
+5.6.1.)  Potete trovare la directory C<$Config{installprivlib}>
+eseguendo
+
+    perl "-V:installprivlib"
+
+Potete esplorare le varie informazioni provenienti dai file di dati
+Unicode usando il modulo C<Unicode::UCD>.
+
+=back
+
+=head1 UNICODE IN PERL PRECEDENTI
+
+Se non potete aggiornare a Perl 5.8.0 o successivi, potete comunque
+fare un po' di elaborazione Unicode usando i moduli
+C<Unicode::String>, C<Unicode::Map8>, e C<Unicode::Map>, disponibili
+da CPAN.  Se avete installato il programma GNU recode, potete anche
+usare il modulo C<Convert::Recode> per le conversioni tra codifiche.
+
+Queste sono rapide conversioni da byte ISO 8859-1 (Latin-1) a byte
+UTF-8 e viceversa. Il codice funziona anche con versioni precedenti di
+Perl 5.
+
+    # da ISO 8859-1 a UTF-8
+    s/([\x80-\xFF])/chr(0xC0|ord($1)>>6).chr(0x80|ord($1)&0x3F)/eg;
+
+    # da UTF-8 a ISO 8859-1
+    s/([\xC2\xC3])([\x80-\xBF])/chr(ord($1)<<6&0xC0|ord($2)&0x3F)/eg;
+
+=head1 VEDI ANCHE
+
+L<perlunicode>, L<Encode>, L<encoding>, L<open>, L<utf8>, L<bytes>,
+L<perlretut>, L<perlrun>, L<Unicode::Collate>, L<Unicode::Normalize>,
+L<Unicode::UCD>
+
+=head1 RINGRAZIAMENTI
+
+Grazie ai gentili lettori delle liste perl5-porters@perl.org,
+perl-unicode@perl.org, linux-utf8@nl.linux.org, e unicore@unicode.org
+per i loro preziosi commenti.
+
+=head1 AUTORE, COPYRIGHT, E LICENZA
+
+Copyright 2001-2002 Jarkko Hietaniemi E<lt>jhi@iki.fiE<gt>
+
+Questo documento puE<ograve> essere distribuito secondo gli stessi
+termini del Perl.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perluniintro
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Gianni Ceccarelli.
+
+=head2 Revisore
+
+Revisione a cura di Michele Beltrame.
+
+=cut

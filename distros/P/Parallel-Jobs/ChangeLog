@@ -1,0 +1,101 @@
+2013-04-18  Jonathan Kamens  <jik@kamens.us>
+
+	* Jobs.pm: Increase version to 0.09.
+
+	* Makefile.PL: Add license to CPAN package.
+
+	* Jobs.pm: Bug fix from Greg Lindahl <greg@blekko.com>: Allow
+	output from processes to be the number 0 without falsely
+	concluding that the process has reached EOF.
+
+	* Jobs.pm, MANIFEST: Merge relevant README content into POD
+	documentation and get rid of README.
+
+2013-01-15  Jonathan Kamens  <jik@kamens.brookline.ma.us>
+
+	* Increase version to 0.08.
+
+	* Fix a bug: sometimes an event was being lost when two jobs
+	exited at the same time.
+
+2012-12-05  Jonathan Kamens  <jik@kamens.brookline.ma.us>
+
+	* Jobs.pm: Increase version to 0.07.
+
+	Fix bug: "nohang" wasn't working when process output was not being
+	captured.
+
+2012-05-16  root  <root@jik2.kamens.brookline.ma.us>
+
+	* Jobs.pm: Increase version to 0.06.
+
+	Support "nohang" argument to watch_jobs.
+
+	Add copyright 2012 to myself.
+
+	* Jobs.pm, Makefile: Update my email address.
+
+	* 1.t: Make perl 5.15 happy by not using the unquoted word "plan"
+	in a test case.
+
+2007-10-18  Jonathan Kamens  <jik@jik2.kamens.brookline.ma.us>
+
+	* Jobs.pm: Increase version to 0.05.
+
+	Fix file descriptor leaks.
+
+	Wait for everything we can every time we go through watch_jobs, to
+	prevent resource starvation.  Queue events that we haven't
+	returned yet and return them when there's nothing else to wait
+	for.
+
+	Delete a paragraph from the doc that is no longer true about
+	delayed returns when mixing captured and non-captured jobs.
+
+2003-03-21  Jonathan Kamens  <jik@jik2.kamens.brookline.ma.us>
+
+	* Jobs.pm: Use File::Temp for generating temporary file during
+	tests.
+
+2003-03-18  Jonathan Kamens  <jik@kamens.brookline.ma.us>
+
+	* Jobs.pm: Bump version number to 0.04.
+
+	* README, Jobs.pm (start_job): Allow "-" to be specified as the
+	command if IPC::Open3 supports it.  Contributed by Adam Spiers
+	<perl@adamspiers.org>.
+
+2002-12-08  Jonathan Kamens  <jik@kamens.brookline.ma.us>
+
+	* Jobs.pm: Mention that you can get output events after the exit
+	event.
+
+2002-10-31  Jonathan Kamens  <jik@kamens.brookline.ma.us>
+
+	* Jobs.pm: Bump version number to 0.03.
+
+	* Jobs.pm: Bug fixes from Paul GABORIT <gaborit@enstimac.fr> --
+	read output and close file handles from children who have already
+	exited, to avoid running out of file descriptors or missing output
+	when a child exits before we've had time to read its output.
+
+2002-06-13  Jonathan Kamens  <jik@kamens.brookline.ma.us>
+
+	* Jobs.pm: Increase version number to 0.02.
+
+	The documentation should say to call Parallel::Jobs functions as
+	functions, not methods.
+
+	Document that start_job and watch_jobs can be exported.
+
+	Be resilient to the possibility of being called incorrectly as a
+	method rather than a function.
+
+2002-06-13  Jonathan Kamens  <jik@kamens.brookline.ma.us>
+
+	* 1.t: Call Parallel::Jobs::test as a function, not a method.
+
+2002-06-13  Jonathan Kamens  <jik@kamens.brookline.ma.us>
+
+	* Initial release, version 0.01.
+

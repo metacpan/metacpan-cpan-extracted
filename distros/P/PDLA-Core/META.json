@@ -1,0 +1,87 @@
+{
+   "abstract" : "Perl Data Language",
+   "author" : [
+      "PerlDL Developers (pdl-general@lists.sourceforge.net)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDLA-Core",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::ParseXS" : "3.01",
+            "File::Path" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Carp" : "1.2",
+            "Devel::CheckLib" : "1.01",
+            "ExtUtils::MakeMaker" : "6.56",
+            "File::Path" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Astro::FITS::Header" : "0",
+            "Carp" : "0",
+            "Config" : "0",
+            "Convert::UU" : "0",
+            "Data::Dumper" : "2.121",
+            "English" : "0",
+            "ExtUtils::MakeMaker" : "6.56",
+            "ExtUtils::Manifest" : "0",
+            "Fcntl" : "0",
+            "File::Basename" : "0",
+            "File::Find" : "0",
+            "File::Map" : "0.57",
+            "File::Path" : "0",
+            "File::Spec" : "0.6",
+            "File::Temp" : "0",
+            "Filter::Simple" : "0.88",
+            "Filter::Util::Call" : "0",
+            "Inline" : "0.68",
+            "Inline::C" : "0.62",
+            "Module::Compile" : "0.23",
+            "Pod::Parser" : "0",
+            "Pod::Select" : "0",
+            "Scalar::Util" : "0",
+            "Storable" : "1.03",
+            "Text::Balanced" : "1.89",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "CPAN::Meta" : "2.120900",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://pdlporters.github.io",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/pdla-core",
+         "web" : "https://github.com/PDLPorters/pdla-core"
+      }
+   },
+   "version" : "2.013006"
+}

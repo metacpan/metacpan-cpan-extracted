@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Stopwatch.pm
+t/1_norm.t
+t/2_lap.t
+t/3_burst.t

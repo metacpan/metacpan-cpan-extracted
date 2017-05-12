@@ -1,0 +1,145 @@
+=head1 NAME
+
+P5U::Tutorial::Development - so, you want to write your own p5u command...
+
+=head1 GENERAL DESIGN PRINCIPLES
+
+Keep command modules (P5U::Command::Foo) lean. Each time p5u is executed,
+B<every> command module is loaded; not just the one being used. One
+technique is to split your code into two modules, a workhorse (typically
+called something like P5U::Lib::Foo), and the command module. The command
+module only loads the workhorse when it's actually needed.
+
+There are some modules that you can use without worrying about performance
+(because App::Cmd or P5U has already loaded them). These include
+L<Class::Load>, L<JSON> and L<Path::Tiny>.
+
+If you need OO, then use L<Moo> (but do it in a workhorse module that's
+loaded on demand), L<Types::Standard> and L<namespace::clean>. If you need
+the web, then use L<LWP::UserAgent> or L<LWP::Simple>. If you need to do
+stuff with the file system, use L<Path::Tiny> and L<Path::Iterator::Rule>.
+These are good modules, and they're already listed as P5U dependencies, so
+there's no reason to avoid them.
+
+=head2 TEMPLATE
+
+ package P5U::Command::Foo;
+ 
+ use 5.010;
+ use strict;
+ use utf8;
+ use P5U-command;  # important!
+ 
+ # Metadata
+ BEGIN {
+    $P5U::Command::Foo::AUTHORITY = 'cpan:JOEBLOGGS'; 
+    $P5U::Command::Foo::VERSION   = '0.001';
+ };
+ 
+ # These are used when generating help information
+ use constant {
+    abstract    => q[do some foo],
+    usage_desc  => q[%c foo %o],
+ };
+ 
+ # The first command name is the preferred name.
+ # Subsequent ones are aliases.
+ sub command_names
+ {
+    qw( foo fu );
+ }
+ 
+ # See Getopt::Long::Descriptive
+ sub opt_spec
+ {
+    return (
+       [ "bar|b"  => "foobar" ],
+       [ "baz"    => "foobaz" ],
+    );
+ }
+ 
+ # This is where the magic happens!
+ sub execute
+ {
+    require P5U::Lib::Foo;  # load workhorse
+    
+    my ($self, $opt, $args) = @_;
+    # $opt is a hashref of options
+    # $args is an arrayref of non-option arguments
+    
+    # do stuff
+ }
+ 
+ 1;
+
+Note that P5U is based on L<App::Cmd>, so all P5U command modules are
+subclasses of L<App::Cmd::Command>. Thus there are a bunch of other
+useful methods available for your subclassing pleasure. One in particular
+that you should be aware of is C<< $self->usage_error($msg) >> to die
+with an error message. (But not all errors are usage errors. For example,
+an error communicating with a server is not a usage error, but a failure
+for the user to specify which server to communicate with is.)
+
+=head1 UTILITY METHODS
+
+P5U command modules are also subclasses of L<P5U::Command> which provides
+some utility methods for loading and saving config files, and so on. These
+are:
+
+=over
+
+=item C<< $self->get_tempdir >>
+
+Each time this is called returns a new empty directory as a L<Path::Tiny>
+object. When this object goes out of scope, the directory and its contents
+will be deleted.
+
+=item C<< $self->get_cachedir >>
+
+Returns a L<Path::Tiny> object representing a directory where the command
+can cache data. In the current version, this cache is not automatically
+purged, but in future versions it will be.
+
+=item C<< $self->get_datadir >>
+
+Returns a L<Path::Tiny> object representing a directory where the command
+can keep long-lived data.
+
+=item C<< $self->get_config >>
+
+Returns a hashref of configuration data.
+
+=item C<< $self->save_config($hashref) >>
+
+Save a hashref of configuration data.
+
+=back
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=P5U>.
+
+=head1 SEE ALSO
+
+L<P5U>,
+L<App::Cmd>,
+L<Getopt::Long::Descriptive>.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012-2013 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

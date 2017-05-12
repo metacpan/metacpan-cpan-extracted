@@ -1,0 +1,106 @@
+NAME
+    Params::PatternMatch - Pattern match-based argument binding for Perl.
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+      use Carp ();
+      use Params::PatternMatch qw/as case match otherwise rest then/;
+  
+      sub sum {
+        match @_ => as {
+          my ($n, @rest);
+          case +() => then { 0 };
+          case $n, rest(@rest) => then { $n + sum(@rest) };
+        };
+      }
+  
+      say sum(1 .. 10);  # 55
+  
+      sub factorial {
+        match @_ => as {
+          my $n;
+          case 0 => then { 1 };
+          case $n => then { $n * factorial($n - 1) };
+          otherwise { Carp::croak('factorial: requires exactly 1 argument.') };
+        };
+      }
+  
+      say factorial(5);  # 120
+      say factorial(1 .. 10);  # Error
+
+DESCRIPTION
+    This extension provides keywords for pattern match-based argument
+    binding like functional languages, such as Scala or ML.
+
+  CAVEAT
+    Note that the implementation is not tail call-optimized; Unlike real
+    functional languages, you cannot use recursive "match" instead of loop.
+
+FUNCTIONS
+    None of them liseted below are exported by default. So you need to
+    "import" explicitly.
+
+  as(\&block), then(\&block)
+    Synonyms for "sub".
+
+  case(@pattern, \&then)
+    Returns evaluation value for &then if the @pattern matched with
+    "match"'s arguments.
+
+  match(@arguments, \&patterns)
+    Returns evaluation value for &patterns. @arguments is passed as @_ to
+    "case"/"otherwise" blocks.
+
+  otherwise(\&block)
+    Returns evaluation value for &block without pattern match.
+
+  rest(@slurped)
+    Slurps all the rest unbound arguments.
+
+PATTERN MATCH RULE
+    Now I'll describe how the pattern match performs. "match"'s arguments
+    are element-wise-compared with "case"'s pattern.
+
+    If an element in pattern is:
+
+    an lvalue (i.e., a variable)
+        Always matches (except if no corresponding argument exists.)
+        Corresponding argument will be assigned as its value.
+
+    "rest"
+        Always matches. All the rest arguments will be slurped.
+
+    an rvalue (i.e., an immediate value)
+        The value will be compared with corresponding argument using
+        Data::Compare.
+
+    The "Data::Compare" instance used for rvalue comparison is stored in
+    $Params::PatternMatch::COMPARATOR. You can override match rule by
+    "local"ize the comparator:
+
+      {
+        local $Params::PatternMatch::COMPARATOR = Data::Compare->new(...);
+        # Or anything having Cmp() method:
+        package MyComparator {
+          sub new { ... }
+      
+          # Returns 1 if the given $x and $y are equivalent, 0 otherwise.
+          sub Cmp { my ($self, $x, $y) = @_; ... }
+        }
+        local $Params::PatternMatch::COMPARATOR = MyComparator->new(...);
+    
+        match @_ => as { ... };
+      }
+
+AUTHOR
+    Koichi SATOH <sato@seesaa.co.jp>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by Koichi SATOH.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+

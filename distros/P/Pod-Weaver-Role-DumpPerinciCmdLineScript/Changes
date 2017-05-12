@@ -1,0 +1,33 @@
+Revision history for Pod-Weaver-Role-DumpPerinciCmdLineScript
+
+0.06    2016-05-20 (PERLANCAR)
+
+	- [Bugfix] Use encoded_content() instead of content().
+
+
+0.05    2016-01-10 (PERLANCAR)
+
+	- [Bugfix] Use Data::Dmp to log result dump instead of passing
+	  directly to dzil's logger (which uses JSON to dump references).
+
+
+0.04    2015-12-31 (PERLANCAR)
+
+	- Also set DZIL=1, like in DZR:DumpPerinciCmdLineScript.
+
+
+0.03    2015-07-07 (PERLANCAR)
+
+	- Handle modified DZF:OnDisk object.
+
+	- Mention DZR:DumpPerinciCmdLineScript.
+
+
+0.02    2014-12-26 (PERLANCAR)
+
+	- [Bugfix] Forgot to require File::Temp.
+
+
+0.01    2014-12-21 (PERLANCAR)
+
+        - First release.

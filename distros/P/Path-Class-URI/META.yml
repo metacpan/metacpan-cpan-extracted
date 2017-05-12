@@ -1,0 +1,41 @@
+---
+abstract: 'Serializes and deserializes Path::Class objects as file:// URI'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@cpan.org>'
+build_requires:
+  Module::Build::Tiny: 0.039
+  Test::Base: 0
+  Test::More: 0
+configure_requires:
+  Module::Build::Tiny: 0.039
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Path-Class-URI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Exporter::Lite: 0
+  Module::Build::Tiny: 0.039
+  Path::Class: 0.29
+  Scalar::Util: 0
+  Test::Base: 0
+  Test::More: 0
+  URI: 0
+resources:
+  bugtracker: https://github.com/zmughal/p5-Path-Class-URI/issues
+  homepage: https://github.com/zmughal/p5-Path-Class-URI
+  repository: https://github.com/zmughal/p5-Path-Class-URI.git
+version: 0.08
+x_contributors:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Zakariyya Mughal <zaki.mughal@gmail.com>'

@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:                Persistence-Entity
+version:             0.07
+author:
+  - 'Adrian Witas <adrian@webapp.strefa.pl>'
+abstract: Persistence API for perl classes.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+generated_by:        ExtUtils::MakeMaker version 6.3201
+distribution_type:   module
+requires:
+    perl:                          5.6.1    
+    Abstract::Meta::Class:         0.1
+    Carp:                          0
+    DBIx::Connection:              0.06
+    Simple::SAX::Serializer:       0.04
+    SQL::Entity:                   0.05
+    Storable:                      0
+    Test::DBUnit:                  0.07
+    Test::Pod:                     0
+    Test::Pod::Coverage:           0
+tests: t/*.t t/*/*.t
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

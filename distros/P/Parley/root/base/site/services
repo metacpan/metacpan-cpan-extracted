@@ -1,0 +1,35 @@
+<h1>[%l('Services')%]</h1>
+
+<table class="service_list">
+    <thead>
+        <tr>
+            <th>[%l('Service')%]</th>
+            <th>[%l('Active')%]</th>
+            <th>[%l('Comment')%]</th>
+            <th>[%l('Start')%]/[%l('Stop')%]</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr class="row row_odd">
+            <td>[%l('Email Engine')%]</td>
+            <td>
+                [% IF email_engine.pid %]
+                [%l('Yes')%] 
+                [% ELSE %]
+                [%l('No')%] 
+                [% END %]
+            </td>
+            <td>
+                [% IF email_engine.pid %]
+                pid=[%email_engine.pid%]
+                [% ELSE %]
+                &nbsp;
+                [% END %]
+            </td>
+            <td>
+                &nbsp;
+            </td>
+        </tr>
+    </tbody>
+</table>

@@ -1,0 +1,28 @@
+---
+name: Proc-BackOff
+version: 0.02
+author:
+  - 'Daniel Lo <daniel_lo@picturetrail.com>'
+abstract: 'Random, Exponential, and Linear back off objects.'
+license: artistic
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+requires:
+  Class::Accessor: 0
+provides:
+  Proc::BackOff:
+    file: lib/Proc/BackOff.pm
+    version: 0.02
+  Proc::BackOff::Exponential:
+    file: lib/Proc/BackOff/Exponential.pm
+    version: 0.01
+  Proc::BackOff::Linear:
+    file: lib/Proc/BackOff/Linear.pm
+    version: 0.02
+  Proc::BackOff::Random:
+    file: lib/Proc/BackOff/Random.pm
+    version: 0.02
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

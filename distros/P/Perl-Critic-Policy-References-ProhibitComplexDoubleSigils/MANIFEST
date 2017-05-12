@@ -1,0 +1,10 @@
+Changes
+lib/Perl/Critic/Policy/References/ProhibitComplexDoubleSigils.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/load.t
+t/policy.t
+t/References/ProhibitComplexDoubleSigils.run
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

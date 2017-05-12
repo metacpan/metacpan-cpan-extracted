@@ -1,0 +1,12 @@
+Revision history for PPI-Transform-Sequence
+
+v0.0.3    2012-11-12 22:41:56 Asia/Tokyo
+    [Non-functional changes]
+        * Avoid each ARRAY to loosen minimum perl requirement.
+        * Use DZP::Twitter for release notification.
+
+v0.0.2    2012-11-03 07:32:09 Asia/Tokyo
+    * Add missing TestRequires prereqs.
+
+v0.0.1    2012-11-03 02:37:01 Asia/Tokyo
+    * Initial release.

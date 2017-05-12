@@ -1,0 +1,31 @@
+{
+    'type'                   => 'GroupAggregate',
+    'estimated_startup_cost' => 265935.63,
+    'estimated_total_cost'   => 285867.54,
+    'estimated_rows'         => 137462,
+    'estimated_row_width'    => 26,
+    'is_analyzed'            => 0,
+    'extra_info'             => [ 'Filter: (count(*) > 1)' ],
+    'sub_nodes'              => [
+        {
+            'estimated_startup_cost' => '265935.63',
+            'estimated_rows'         => '1374614',
+            'type'                   => 'Sort',
+            'estimated_total_cost'   => '269372.16',
+            'estimated_row_width'    => '26',
+            'is_analyzed'            => 0,
+            'extra_info'             => [ 'Sort Key: latitude_decimal, longitude_decimal' ],
+            'sub_nodes' => [
+                {
+                    'scan_on'                => { 'table_name' => 'temp_city', },
+                    'estimated_startup_cost' => '0',
+                    'estimated_rows'         => '1374614',
+                    'type'                   => 'Seq Scan',
+                    'estimated_total_cost'   => '27121.14',
+                    'estimated_row_width'    => '26',
+                    'is_analyzed'            => 0,
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,6 @@
+=pod
+
+E<lt>http://www.example.comE<gt>
+L<http://www.example.com?foo=barE<amp>blat=baz>
+
+=cut

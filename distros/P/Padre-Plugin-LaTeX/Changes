@@ -1,0 +1,73 @@
+Changes for Padre-Plugin-LaTeX
+
+0.13   2011.09.01
+	- bugfix release: only change is to require Padre 0.89 or later at
+          installation time (ZENOG)
+
+0.12   2011.09.01
+        - add interface dependency to Wx::Main (BOWTIE)
+        - add menu_disable method (BOWTIE, ZENOG)
+        - compatibility with Padre 0.89 and later (ZENOG)
+        - support more commands and environments (ZENOG)
+
+0.11   2011.06.21
+	- include Padre::Task::Syntax in the syntax checker (ZENOG)
+	- added Brazilian Portuguese translation (GARU)
+        - change config value perl_autocomplete_min_chars to
+          lang_perl5_autocomplete_min_chars (ZENOG)
+        - autocompletion: offer 'begin' and 'begin'...'end' for environments,
+          not only 'begin'...'end' (ZENOG)
+
+0.10   2011.03.09
+	- check for different PDF viewers (ZENOG)
+	- compatibility to Padre 0.81 and later (ZENOG)
+	- add icon (ZENOG)
+	- create temporary file/directory for syntax check (ZENOG)
+	- update German translation (ZENOG)
+
+0.09   2011.02.07
+        - add Dutch translation (ddn123456 - Dirk De Nijs)
+	- add autocompletion support for LaTeX: complete commands, packages,
+	  environments, internal references, and citations (ZENOG)
+	- add autocompletion support for BibTeX (ZENOG)
+	- 'Changes' format more like in Padre's (ZENOG)
+	- add link to Detexify to the menu (ZENOG)
+	- define get_command method for LaTeX documents so that they can be 'run'
+	  from the menu (ZENOG)
+	- fix syntax checking (ZENOG)
+
+0.08   2010.12.06
+	- restore missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+	- add hint about BibTeX highlighting in Kate plugin (ZENOG)
+	- add BibTeX support (commenting in and out) (ZENOG)
+	- update German translation (ZENOG)
+	- fix problem with dist.ini: multiple values for copyright_holder (ZENOG)
+
+0.07   2010.10.29
+	- remove Test::NeedsDisplay dependency (AZAWAWI)
+
+0.06   2010.10.27
+	- t/00-load.t is magically injected by [@PadrePlugin] via [LoadTests] (AZAWAWI)
+
+0.05   2010.10.26
+	- update Arabic translation since it was not working (AZAWAWI)
+
+0.04   2010.10.26
+	Nothing... Simply a reupload of 0.03 (AZAWAWI)
+
+0.03   2010.10.26
+	- Syntax checking still crashes; will improve later (ZENOG)
+	- Added Italian translation (SBLADIN)
+	- Switched to Dist::Zilla (AZAWAWI)
+	- Added Arabic translation (AZAWAWI)
+	- Compatibility with latest Padre (AZAWAWI)
+
+0.02    2010.07.23
+	- Compatibility to newer Padre versions
+	- added preliminary i18n support (does not work correctly)
+	- new features: create+view PDF, run BibTeX
+
+0.01    2010.05.11
+	First version, released on an unsuspecting world.
+	- Only feature: toggle comments
+

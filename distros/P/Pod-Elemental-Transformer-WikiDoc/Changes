@@ -1,0 +1,22 @@
+Revision history for Pod-Elemental-Transformer-WikiDoc
+
+0.093004  2015-03-26 22:56:58-04:00 America/New_York
+
+    - stop using Moose::Autobox
+    - transfer to DAGOLDEN
+
+0.093003  2013-10-12 22:27:36 America/New_York
+
+    - update bugtracker and repository
+
+0.093002  2011-10-15 18:17:54 Asia/Tokyo
+
+    - repackage to add META.yml
+
+0.093001  2009-10-27
+
+    - fix fencepost error that prevent last-position region from working
+
+0.093000  2009-10-27
+
+    - first release

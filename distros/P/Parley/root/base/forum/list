@@ -1,0 +1,46 @@
+<h1>[%l('Forum List')%]</h1>
+
+<table class="forum_list">
+    <tbody>
+        [% WHILE (forum = forum_list.next) %]
+        [% toggler = (1 - (toggler||0)) %]
+        <tr class="row [% row_styles.$toggler %]">
+            <td width="50%">
+                <div class="forum_name">
+                    <a href="[%c.uri_for('/forum/view',{'forum'=>forum.id})%]" class="forum_link">[% HTML.escape(forum.name) %]</a>
+                </div>
+                <div class="forum_description">
+                    [% HTML.escape(forum.description) %]
+                </div>
+            </td>
+            <td width="40%">
+                <div class="forum_lastpost">
+                [% IF forum.last_post %]
+                <div class="forum_lastpost_subject">
+                    <a href="[%c.uri_for('/thread/view',{thread=>forum.last_post.thread_id})%]" class="topic_link">[% HTML.escape(forum.last_post.thread.subject) |truncate(55) %]</a>
+                </div>
+                <div class="topic_creator">
+                    [%l('posted by')%]
+                    [% HTML.escape(forum.last_post.creator.forum_name) %]
+                </div>
+                <div class="topic_lastpost_created">
+                    [% forum.last_post.interval_ago %]
+                    [%l('ago')%]
+                </div>
+                [% ELSE %]
+                <div class="topic_creator">
+                    [%l('No posts')%]
+                </div>
+                [% END %]
+                </div>
+            </td>
+            <td width="10%">
+                <div class="forum_postcount">
+                    [% forum.post_count %]
+                    [%l('posts')%]
+                </div>
+            </td>
+        </tr>
+        [% END %]
+    </tbody>
+</table>

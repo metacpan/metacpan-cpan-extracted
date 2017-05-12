@@ -1,0 +1,52 @@
+---
+abstract: 'A STOMP based message queue server'
+author:
+  - 'David Snopek (http://www.hackyourlife.org)'
+  - 'Paul Driver <frodwith@gmail.com>'
+  - 'Daisuke Maki <daisuke@endeworks.jp>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-MessageQueue
+requires:
+  Best: '0'
+  Carp: '0'
+  DBD::SQLite: '1.13'
+  DBI: '0'
+  Data::Dumper: '0'
+  Data::UUID: '0'
+  Event::Notify: '0'
+  Exception::Class::DBI: '0'
+  Exception::Class::TryCatch: '0'
+  File::Temp: '0'
+  Heap: '0.80'
+  Heap::Fibonacci: '0.80'
+  IO::File: '0'
+  IO::String: '0'
+  Moose: '2.0201'
+  MooseX::MultiInitArg: '0'
+  Net::Stomp: '0'
+  POE: '0.38'
+  POE::Component::Generic: '0.1001'
+  POE::Component::Logger: '0'
+  POE::Component::Server::TCP: '0'
+  POE::Filter::Stomp: '0.04'
+  POE::Wheel::ReadWrite: '0'
+  Test::Exception: '0'
+  Test::MockObject: '0'
+  Test::More: '0'
+  YAML: '0'
+resources:
+  bugtracker: http://github.com/ironcamel/POE-Component-MessageQueue/issues
+  repository: git://github.com/ironcamel/POE-Component-MessageQueue.git
+version: '0.3003'

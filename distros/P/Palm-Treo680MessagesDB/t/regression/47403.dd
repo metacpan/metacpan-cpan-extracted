@@ -1,0 +1,25 @@
+$VAR1 = {
+          'epoch' => 1192866259,
+          'number' => '+440270800592',
+          'time' => '08:44',
+          'date' => '2007-10-20',
+          'name' => 'Ed XXXX (M)',
+          'phone' => '+440270800592',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1192866259,
+          'text' => 'A range of muslim books are now available, titles include: "Finding a Job", by Asif,
+"Cooking curry", by Ahmed Astink,
+"Easy DIY", by Mahroof Isfukd,
+"Inbreeding", by Shahag Misistah
+and my personal favourite ...
+"Culling the muslims", by Shahoot Dapak Hee ....',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7107303,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 47403
+        };

@@ -1,0 +1,13 @@
+[AGENT]
+
+Mozilla/9.876 (X11; U; Linux 2.2.12-20 i686, en) Gecko/25250101 Netscape/5.432b1 (C-MindSpring)
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'lang'             => 'en',
+'os'               => 'Linux 2.2.12-20 i686',
+'extras'           => ['X11','C-MindSpring'],
+'version_raw'      => '5.432b1',
+'version'          => '5.432',
+'name'             => 'Netscape',
+'toolkit'          => ['Gecko','25250101','25250101.000']

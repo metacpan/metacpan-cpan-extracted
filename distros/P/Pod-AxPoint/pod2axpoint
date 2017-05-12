@@ -1,0 +1,128 @@
+#!/usr/bin/perl
+package Pod::AxPoint::Script;
+
+$Pod::AxPoint::Script::VERSION = 0.04;
+
+use Pod::AxPoint;
+
+my $file = shift || die "Usage $0 <file.pod>\n";
+
+
+open POD, "<$file" or die "Could not load $file: $!\n";
+my $pod = join "", <POD>;
+close POD;
+
+my $ax = new Pod::AxPoint;
+print $ax->process($pod);
+
+__END__
+
+=head1 NAME
+
+pod2axpoint
+
+=head1 SYNOPSIS
+
+ pod2axpoint inputfile.pod > outputfile.xml
+
+=head1 DESCRIPTION
+
+B<pod2axpoint> converts POD input to AxPoint XML, which
+can be used to generate HTML Slideshows.
+
+There is another script for this purpose on cpan,
+L<podslides-ax-magicpoint-0.01>, but this creates a xslt
+transformation and doesn't support everything of AxPoint.
+That's why I wrote my own.
+
+=head1 POD
+
+Beside the known L<perlpod> markup some exceptions has been made:
+
+=over
+
+=item
+
+Only the title B<=head1> is supported currently.
+
+=item
+
+Images can be included using the tag B<GE<lt>>image.pngB<E<gt>>.
+
+=item
+
+Plain XML code can be included using the B<xml> formatter, eg:
+
+ =begin xml
+ 
+ <title>Blah</title>
+ 
+ =end xml
+
+This way you add the required B<metadata> block to your slide.
+
+=back
+
+
+=head1 DEPENDENCIES
+
+B<AxPoint> is required. I used the FreeBSD port:
+
+ /usr/ports/print/axpoint (axpoint-1.50)
+
+Beside axpoint you need L<Pod::Tree> for parsing POD.
+
+B<AxPoint> itself has a lot of dependencies, here are all the
+(FreeBSD) packages were installed:
+
+ axpoint-1.50                   XML Based Presentations
+ docbook-xml-4.2_1              XML version of the DocBook DTD
+ expat-2.0.0_1                  XML 1.0 parser written in C
+ fontconfig-2.3.2_6,1           An XML-based font configuration API for X Windows
+ libxml2-2.6.27                 XML parser library for GNOME
+ p5-XML-Filter-BufferText-1.01  Filter to put all characters() in one event
+ p5-XML-Filter-XSLT-0.03        XSLT as a SAX Filter
+ p5-XML-LibXML-1.62001          Interface to Gnome libxml2 library
+ p5-XML-LibXML-Common-0.13      Routines and Constants common for XML::LibXML and XML::GDOM
+ p5-XML-LibXSLT-1.59            Perl interface to the GNOME XSLT library
+ p5-XML-NamespaceSupport-1.09_1 A simple generic namespace support class
+ p5-XML-Parser-2.34_2           Perl extension interface to James Clark's XML parser, expat
+ p5-XML-SAX-0.15                Simple API for XML
+ p5-XML-SAX-Expat-0.38          Simple API for XML
+ p5-XML-SAX-Writer-0.50         SAX2 XML Writer
+ sdocbook-xml-1.1,1             "Simplified" DocBook XML DTD
+ xmlcatmgr-2.2                  SGML and XML catalog manager
+
+If you're not on FreeBSD try cpan or install all the
+stuff manually - which is annoying.
+
+Last but not least: try FreeBSD.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2007 Thomas Linden
+
+This tool is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 BUGS AND LIMITATIONS
+
+See rt.cpan.org for current bugs, if any.
+
+=head1 INCOMPATIBILITIES
+
+None known.
+
+=head1 DIAGNOSTICS
+
+To debug pod2axpoint use B<debug()> or the perl debugger, see L<perldebug>.
+
+=head1 AUTHOR
+
+Thomas Linden <tlinden |AT| cpan.org>
+
+=head1 VERSION
+
+0.04
+
+=cut

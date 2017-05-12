@@ -1,0 +1,495 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"postalcode_",
+				"postalcodes_fixtures"
+			],
+			[
+				"postalcode",
+				"postalcodes_fixtures"
+			],
+			[
+				"postalc",
+				"postalcodes_fixtures"
+			],
+			[
+				"Post",
+				"Postalcode"
+			],
+			[
+				"Ex",
+				"Exporter  (module)"
+			],
+			[
+				"test",
+				"testmethod	Function"
+			],
+			[
+				"perl",
+				"perlcritic"
+			],
+			[
+				"no_",
+				"no_of_violations"
+			],
+			[
+				"no",
+				"no_of_patterns"
+			],
+			[
+				"s",
+				"sibling"
+			],
+			[
+				"for",
+				"fore	Loop"
+			],
+			[
+				"use",
+				"strictures  (module)"
+			],
+			[
+				"requie",
+				"requirement"
+			],
+			[
+				"st",
+				"stats"
+			],
+			[
+				"file",
+				"filename"
+			],
+			[
+				"cl",
+				"cli"
+			],
+			[
+				"wf",
+				"wf_class"
+			],
+			[
+				"sor",
+				"sorted_incidents"
+			],
+			[
+				"SERVICE_WINDOW_MAY",
+				"SERVICE_WINDOW_MAY2013_UP"
+			],
+			[
+				"iso",
+				"iso_8859_1_encoded_domain"
+			],
+			[
+				"id",
+				"idn_domain"
+			],
+			[
+				"di",
+				"idn_domain"
+			],
+			[
+				"dkhm",
+				"dkhmencode"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 47.0,
+		"selected_items":
+		[
+			[
+				"qui",
+				"Git: Quick Commit"
+			],
+			[
+				"space",
+				"Trailing Spaces: Delete Trailing Spaces"
+			],
+			[
+				"perl",
+				"Set Syntax: Perl"
+			],
+			[
+				"q",
+				"Git: Quick Commit"
+			],
+			[
+				"qu",
+				"Git: Quick Commit"
+			],
+			[
+				"quick",
+				"Git: Quick Commit"
+			],
+			[
+				"syntax perl",
+				"Set Syntax: Perl"
+			],
+			[
+				"commit",
+				"Git: Quick Commit"
+			],
+			[
+				"git comm",
+				"Git: Commit"
+			],
+			[
+				"git",
+				"Git: Commit"
+			],
+			[
+				"lc",
+				"Convert Case: Lower Case"
+			],
+			[
+				"synta",
+				"Set Syntax: Perl"
+			],
+			[
+				"trai",
+				"Trailing Spaces: Delete Trailing Spaces"
+			],
+			[
+				"sort",
+				"Sort Lines"
+			],
+			[
+				"syn",
+				"Set Syntax: Perl"
+			],
+			[
+				"synta pe",
+				"Set Syntax: Perl"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"install ",
+				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: install package",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: install ",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 476.0
+	},
+	"console":
+	{
+		"height": 0.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/jonasbn/develop/github/pcpmrvf/lib/Perl/Critic/Policy/logicLAB/RequireVersionFormat.pm",
+		"/Users/jonasbn/develop/github/pcpmrvf/Changes",
+		"/Users/jonasbn/develop/github/pcpmrvf/.gitignore",
+		"/Users/jonasbn/develop/github/bdkpst/.gitignore",
+		"/Users/jonasbn/develop/github/perl-Business-GL-Postalcode/lib/Business/GL/Postalcode.pm",
+		"/Users/jonasbn/develop/github/perl-Business-GL-Postalcode/Changes",
+		"/Users/jonasbn/develop/github/perl-Business-GL-Postalcode/lib/Class/Business/GL/Postalcode.pm",
+		"/Users/jonasbn/develop/github/perl-Business-GL-Postalcode/.gitignore",
+		"/Users/jonasbn/develop/github/perl-Business-GL-Postalcode/Build.PL",
+		"/Users/jonasbn/develop/github/perl-Business-GL-Postalcode/t/Test/Class/Business/GL/Postalcode.pm",
+		"/Users/jonasbn/develop/github/perl-Business-GL-Postalcode/t/Test/Class/Class/Business/GL/Postalcode.pm",
+		"/Users/jonasbn/develop/github/perl-Business-FO-Postalcode/lib/Business/FO/Postalcode.pm",
+		"/Users/jonasbn/develop/github/perl-Business-FO-Postalcode/lib/Class/Business/FO/Postalcode.pm",
+		"/Users/jonasbn/develop/github/perl-Business-FO-Postalcode/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bdkpst/lib/Business/DK/Postalcode.pm",
+		"/Users/jonasbn/develop/github/perl-Business-GL-Postalcode/t/get_all_data.t",
+		"/Users/jonasbn/develop/github/bglpst/lib/Class/Business/DK/Postalcode.pm",
+		"/Users/jonasbn/develop/github/cpan-changes/.travis.yml",
+		"/Users/jonasbn/develop/github/cpan-changes/lib/CPAN/Changes/Release.pm",
+		"/Users/jonasbn/develop/github/cpan-changes/lib/CPAN/Changes.pm",
+		"/Users/jonasbn/develop/github/cpan-changes/lib/CPAN/Changes/Spec.pod",
+		"/Users/jonasbn/develop/github/cpan-changes/t/read_timestamp.t",
+		"/Users/jonasbn/develop/github/cpan-changes/t/read_multiple_releases_with_hints.t",
+		"/Users/jonasbn/develop/github/cpan-changes/t/corpus/multiple_releases_with_hints.changes",
+		"/Users/jonasbn/develop/github/cpan-changes/t/corpus/multiple_releases.changes",
+		"/Users/jonasbn/develop/github/cpan-changes/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/cpan-changes/t/corpus/basic.changes",
+		"/Users/jonasbn/develop/github/testt/Build.PL",
+		"/Users/jonasbn/develop/github/testt/t/kwalitee.t",
+		"/Users/jonasbn/develop/github/testt/lib/Test/Timer/TimeoutException.pm",
+		"/Users/jonasbn/develop/github/testt/lib/Test/Timer.pm",
+		"/Users/jonasbn/develop/github/testt/Changes",
+		"/Users/jonasbn/develop/github/testt/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/testt/t/boilerplate.t",
+		"/Users/jonasbn/develop/github/testt/t/time_nok.t",
+		"/Users/jonasbn/develop/github/testt/t/time_ok.t",
+		"/Users/jonasbn/develop/github/testt/t/critic.t",
+		"/Users/jonasbn/develop/github/testt/README.mkdn",
+		"/Users/jonasbn/develop/github/testt/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/testt/MANIFEST",
+		"/Users/jonasbn/develop/github/testt/t/00-load.t",
+		"/Users/jonasbn/develop/github/testt/.gitignore",
+		"/Users/jonasbn/develop/github/testt/Test-Timer-0.07.tar.gz",
+		"/Users/jonasbn/develop/github/bdkcpr/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bdkcpr/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bdkcvr/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bdkcvr/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bdkfi/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bdkfi/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bdkphn/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bdkphn/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bdkpo/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bdkpo/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bdkpst/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bdkpst/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bjonasbn/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bjonasbn/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bopcc/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bopcc/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/dand/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/dand/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/mbb/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/mbb/.gitignore",
+		"/Users/jonasbn/develop/github/mbb/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/mts/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/mts/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/nikepub/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/nikepub/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/pcll/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/pcll/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/pcplpsd/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/pcplpsd/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/pcplrpnp/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/pcplrpnp/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/pcplrpv/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/pcplrpv/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/pcplrsb/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/pcplrsb/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/pcpmpul/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/pcpmpul/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/pcpmrvf/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/pcpmrvf/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/perl-workflow/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/perl-workflow/MANIFEST.SKIP",
+		"/Users/jonasbn/.bash_profile",
+		"/Users/jonasbn/develop/github/tjenkins/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/tjenkins/MANIFEST.SKIP",
+		"/Users/jonasbn/.smartcd/templates/git_status",
+		"/tmp/smartcd-edit.zyECwn",
+		"/tmp/smartcd-edit.fS1CdA",
+		"/tmp/smartcd-edit.lGzmiT",
+		"/tmp/smartcd-edit.PSthbc",
+		"/tmp/smartcd-edit.PjqaSI",
+		"/tmp/smartcd-edit.0sgORA",
+		"/tmp/smartcd-edit.PHuNKJ",
+		"/tmp/smartcd-edit.XNrZON",
+		"/tmp/smartcd-edit.N8TvGE",
+		"/Users/jonasbn/develop/github/bdkcpr/.travis.yml",
+		"/Users/jonasbn/develop/github/bdkcpr/Build.PL",
+		"/Users/jonasbn/Desktop/package.json",
+		"/Users/jonasbn/develop/github/SublimeText-Perl-Test-More/README.md",
+		"/Users/jonasbn/develop/github/SublimeText-Perl-Test-Class/README.md",
+		"/Users/jonasbn/develop/github/package_control_channel/repository/p.json",
+		"/Users/jonasbn/develop/github/SublimeText-Perl-Test-More/package.json",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/User/Perl/Test-More-isa_ok.sublime-snippet",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/User/Perl/Test-More-BAIL_OUT.sublime-snippet",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/User/Perl/Test-More-isnt.sublime-snippet",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/User/Perl/Test-More-diag.sublime-snippet",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/User/Perl/Test-More-like.sublime-snippet",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/User/Perl/Test-More-cmp_ok.sublime-snippet",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/User/Perl/Test-More-unlike.sublime-snippet",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/User/Perl/Test-More-can_ok.sublime-snippet",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/AdvancedNewFile/Default (OSX).sublime-keymap",
+		"/Users/jonasbn/Desktop/helloworld.pl",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/SublimeLinter/SublimeLinter.sublime-settings",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/User/SublimeLinter.sublime-settings",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/User/JSON.sublime-settings",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/SublimeLinter/Default (OSX).sublime-keymap",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/User/Perl.sublime-settings",
+		"/Users/jonasbn/Library/Application Support/Sublime Text 2/Packages/SublimeLinter/README.md",
+		"/Users/jonasbn/bin/svn-authors.sh",
+		"/Users/jonasbn/Desktop/authors.sh",
+		"/Users/jonasbn/Dropbox/Files/Bash/profile",
+		"/Users/jonasbn/Dropbox/Files/Bash/gitprofile.1",
+		"/Users/jonasbn/Dropbox/Files/Bash/gitprofile",
+		"/Users/jonasbn/.gitconfig",
+		"/tmp/smartcd-edit.z2wJ0y"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"=head1 DESCRIPTION",
+			"DEP",
+			"|/",
+			"perl",
+			"â€“",
+			"â€˜",
+			"â€™",
+			"â€",
+			"branches",
+			"run_command(\"git checkout \\\"#{branch}\\\"\")",
+			"TODO",
+			"Dumper",
+			"PCPLPSD",
+			"PCPLPSDD",
+			"+",
+			"Use specified requirement for package naming",
+			"Package naming is not complying with required standard",
+			"left",
+			"running",
+			"Devel::Cover",
+			"-",
+			"-\\d+\\.\\d+",
+			"noegleindehaver",
+			"sub _auth",
+			"createKey",
+			"Dumper",
+			"validate",
+			"server",
+			"check",
+			"clearRedelRequest",
+			"email",
+			"bashrc",
+			"perlbrew"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"\";\n",
+			"World",
+			"print",
+			"--",
+			"'",
+			"\"",
+			"DAND",
+			"PCPLPSD",
+			"",
+			"Use specified requirement for package naming for This::Is::A::Test",
+			"Package name: This::Is::A::Test is not complying with required standard",
+			"::",
+			""
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 30.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.git":
+	{
+		"height": 94.0
+	},
+	"output.sftp":
+	{
+		"height": 94.0
+	},
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 194.0,
+	"status_bar_visible": true
+}

@@ -1,0 +1,23 @@
+POE/Component/Server/HTTP
+=========================
+
+This is a module to handler HTTP keep-alive connections.
+
+It is designed to work with both POE::Component::Server::HTTP and
+POE::Component::Server::SimpleHTTP
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Released under the same terms as POE
+
+Copyright (C) 2007-2011 Philip Gwyn
+

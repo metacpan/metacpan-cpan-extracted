@@ -1,0 +1,778 @@
+Backtrace was generated from '/usr/bin/ekiga'
+
+[Thread debugging using libthread_db enabled]
+[New Thread 0x7f8d1004f910 (LWP 755)]
+[New Thread 0x7f8d126f1910 (LWP 754)]
+[New Thread 0x7f8cded8d910 (LWP 753)]
+[New Thread 0x7f8d12732910 (LWP 749)]
+[New Thread 0x7f8d12773910 (LWP 748)]
+[New Thread 0x7f8d11a83910 (LWP 742)]
+[New Thread 0x7f8d12484910 (LWP 739)]
+[New Thread 0x7f8d127b4910 (LWP 735)]
+[New Thread 0x7f8d127f5910 (LWP 734)]
+[New Thread 0x7f8d12836910 (LWP 733)]
+[New Thread 0x7f8d12877910 (LWP 732)]
+[New Thread 0x7f8d128b8910 (LWP 731)]
+[New Thread 0x7f8d128f9910 (LWP 730)]
+0x00000030610d4f73 in *__GI___poll (fds=<value optimized out>, 
+    nfds=<value optimized out>, timeout=5000)
+    at ../sysdeps/unix/sysv/linux/poll.c:87
+87        int result = INLINE_SYSCALL (poll, 3, CHECK_N (fds, nfds), nfds,
+timeout);
+Current language:  auto; currently minimal
+#0  0x00000030610d4f73 in *__GI___poll (fds=<value optimized out>, 
+    nfds=<value optimized out>, timeout=5000)
+    at ../sysdeps/unix/sysv/linux/poll.c:87
+#1  0x000000306840a041 in send_dg (statp=0x306136c3a0, 
+    buf=<value optimized out>, buflen=<value optimized out>, buf2=0x0, 
+    buflen2=<value optimized out>, ansp=<value optimized out>, 
+    anssizp=0x7fff9f0ef2a0, terrno=0x7fff9f0ef248, ns=0, 
+    v_circuit=0x7fff9f0ef244, gotsomewhere=0x7fff9f0ef24c, anscp=0x0, 
+    ansp2=0x0, anssizp2=0x0, resplen2=0x0) at res_send.c:1046
+#2  0x000000306840bef4 in __libc_res_nsend (statp=0x306136c3a0, 
+    buf=<value optimized out>, buflen=<value optimized out>, buf2=0x0, 
+    buflen2=<value optimized out>, ans=0x7fff9f0f0240 "p\361\16\220\377\177", 
+    anssiz=512, ansp=0x0, ansp2=0x0, nansp2=0x0, resplen2=0x0)
+    at res_send.c:557
+#3  0x0000003068408755 in *__GI___libc_res_nquery (statp=0x306136c3a0, 
+    name=<value optimized out>, class=<value optimized out>, 
+    type=<value optimized out>, answer=0x7fff9f0f0240 "p\361\16\220\377\177", 
+    anslen=<value optimized out>, answerp=0x0, answerp2=0x0, nanswerp2=0x0, 
+    resplen2=0x0) at res_query.c:225
+#4  0x0000003068408f14 in __libc_res_nquerydomain (
+    statp=<value optimized out>, name=<value optimized out>, 
+    domain=<value optimized out>, class=<value optimized out>, 
+    type=<value optimized out>, answer=<value optimized out>, 
+    anslen=<value optimized out>, resplen2=<value optimized out>, 
+    nanswerp2=<value optimized out>, answerp2=<value optimized out>, 
+    answerp=<value optimized out>, statp=<value optimized out>, 
+    name=<value optimized out>, domain=<value optimized out>, 
+    class=<value optimized out>, type=<value optimized out>, 
+    answer=<value optimized out>, anslen=<value optimized out>, 
+    answerp=<value optimized out>, answerp2=<value optimized out>, 
+    nanswerp2=<value optimized out>, resplen2=<value optimized out>)
+    at res_query.c:576
+#5  0x000000306840932f in __libc_res_nsearch (statp=0x306136c3a0, 
+    name=0x2b1eaa0 "_sip._udp.fedoraproject.org", 
+    class=<value optimized out>, type=<value optimized out>, 
+    answer=0x7fff9f0f0240 "p\361\16\220\377\177", anslen=512, 
+    resplen2=<value optimized out>, nanswerp2=<value optimized out>, 
+    answerp2=<value optimized out>, answerp=<value optimized out>)
+    at res_query.c:377
+#6  0x00007f8d1b17ab62 in DnsQuery_A(char const*, unsigned short, unsigned int,
+_IP4_ARRAY*, DnsRecord**, void*) () from /usr/lib64/libpt.so.2.6.2
+#7  0x00007f8d1b176087 in bool PDNS::Lookup<33u, PDNS::SRVRecordList,
+PDNS::SRVRecord>(PString const&, PDNS::SRVRecordList&) ()
+   from /usr/lib64/libpt.so.2.6.2
+#8  0x00007f8d1b17afc3 in PDNS::LookupSRV(PString const&, unsigned short,
+std::vector<PIPSocketAddressAndPort, std::allocator<PIPSocketAddressAndPort>
+>&) ()
+   from /usr/lib64/libpt.so.2.6.2
+#9  0x00007f8d1b17b32a in PDNS::LookupSRV(PString const&, PString const&,
+unsigned short, std::vector<PIPSocketAddressAndPort,
+std::allocator<PIPSocketAddressAndPort> >&) () from /usr/lib64/libpt.so.2.6.2
+#10 0x00007f8d1bd8ff47 in SIPURL::AdjustToDNS(int) ()
+   from /usr/lib64/libopal.so.3.6.2
+#11 0x00007f8d1bd9397f in SIPTransaction::Start() ()
+   from /usr/lib64/libopal.so.3.6.2
+#12 0x00007f8d1bdaa627 in SIPHandler::WriteSIPHandler(OpalTransport&) ()
+   from /usr/lib64/libopal.so.3.6.2
+#13 0x00007f8d1b9bb382 in OpalTransportUDP::WriteConnect(bool
+(*)(OpalTransport&, void*), void*) () from /usr/lib64/libopal.so.3.6.2
+#14 0x00007f8d1bdb387d in SIPHandler::SendRequest(SIPHandler::State) ()
+   from /usr/lib64/libopal.so.3.6.2
+#15 0x00007f8d1bd6a2af in SIPEndPoint::Publish(SIPSubscribe::Params const&,
+PString const&, PString&) () from /usr/lib64/libopal.so.3.6.2
+#16 0x00007f8d1bd6a512 in SIPEndPoint::Publish(PString const&, PString const&,
+unsigned int) () from /usr/lib64/libopal.so.3.6.2
+#17 0x0000000000544cf6 in Opal::Sip::EndPoint::publish(Ekiga::PersonalDetails
+const&) ()
+#18 0x00000000004e1b2e in
+Ekiga::PresenceCore::publish(gmref_ptr<Ekiga::PersonalDetails>) ()
+#19 0x00000000004e1e99 in
+Ekiga::PresenceCore::on_registration_event(gmref_ptr<Ekiga::Bank>,
+gmref_ptr<Ekiga::Account>, Ekiga::Account::RegistrationState, std::string,
+gmref_ptr<Ekiga::PersonalDetails>) ()
+#20 0x00000000004e7252 in sigc::internal::slot_call4<sigc::bind_functor<-1,
+sigc::bound_mem_functor5<void, Ekiga::PresenceCore, gmref_ptr<Ekiga::Bank>,
+gmref_ptr<Ekiga::Account>, Ekiga::Account::RegistrationState, std::string,
+gmref_ptr<Ekiga::PersonalDetails> >, gmref_ptr<Ekiga::PersonalDetails>,
+sigc::nil, sigc::nil, sigc::nil, sigc::nil, sigc::nil, sigc::nil>, void,
+gmref_ptr<Ekiga::Bank>, gmref_ptr<Ekiga::Account>,
+Ekiga::Account::RegistrationState,
+std::string>::call_it(sigc::internal::slot_rep*, gmref_ptr<Ekiga::Bank> const&,
+gmref_ptr<Ekiga::Account> const&, Ekiga::Account::RegistrationState const&,
+std::string const&) ()
+#21 0x000000000051027e in
+Ekiga::AccountCore::on_registration_event(gmref_ptr<Ekiga::Bank>,
+gmref_ptr<Ekiga::Account>, Ekiga::Account::RegistrationState, std::string) ()
+#22 0x000000000051081b in sigc::internal::slot_call3<sigc::bind_functor<0,
+sigc::bound_mem_functor4<void, Ekiga::AccountCore, gmref_ptr<Ekiga::Bank>,
+gmref_ptr<Ekiga::Account>, Ekiga::Account::RegistrationState, std::string>,
+gmref_ptr<Ekiga::Bank>, sigc::nil, sigc::nil, sigc::nil, sigc::nil, sigc::nil,
+sigc::nil>, void, gmref_ptr<Ekiga::Account>, Ekiga::Account::RegistrationState,
+std::string>::call_it(sigc::internal::slot_rep*, gmref_ptr<Ekiga::Account>
+const&, Ekiga::Account::RegistrationState const&, std::string const&) ()
+#23 0x00000000005374bb in
+Ekiga::BankImpl<Opal::Account>::on_registration_event(Ekiga::Account::RegistrationState,
+std::string, gmref_ptr<Opal::Account>) ()
+#24 0x0000000000539bc1 in sigc::internal::slot_call2<sigc::bind_functor<-1,
+sigc::bound_mem_functor3<void, Ekiga::BankImpl<Opal::Account>,
+Ekiga::Account::RegistrationState, std::string, gmref_ptr<Opal::Account> >,
+gmref_ptr<Opal::Account>, sigc::nil, sigc::nil, sigc::nil, sigc::nil,
+sigc::nil, sigc::nil>, void, Ekiga::Account::RegistrationState,
+std::string>::call_it(sigc::internal::slot_rep*,
+Ekiga::Account::RegistrationState const&, std::string const&) ()
+#25 0x000000000054c240 in
+Opal::Sip::EndPoint::registration_event_in_main(std::string,
+Ekiga::Account::RegistrationState, std::string) ()
+#26 0x000000000054f553 in sigc::internal::slot_call0<sigc::bind_functor<-1,
+sigc::bound_mem_functor3<void, Opal::Sip::EndPoint, std::string,
+Ekiga::Account::RegistrationState, std::string>, std::string,
+Ekiga::Account::RegistrationState, std::string, sigc::nil, sigc::nil,
+sigc::nil, sigc::nil>, void>::call_it(sigc::internal::slot_rep*) ()
+#27 0x0000000000502082 in ?? ()
+#28 0x0000000000502168 in ?? ()
+#29 0x0000003fd843920e in g_main_context_dispatch ()
+   from /lib64/libglib-2.0.so.0
+#30 0x0000003fd843c8e8 in ?? () from /lib64/libglib-2.0.so.0
+#31 0x0000003fd843cd45 in g_main_loop_run () from /lib64/libglib-2.0.so.0
+#32 0x0000003e30144387 in gtk_main () from /usr/lib64/libgtk-x11-2.0.so.0
+#33 0x00000000004b8a5c in main ()
+
+Thread 14 (Thread 0x7f8d128f9910 (LWP 730)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 ()
+    at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+No locals.
+#1  0x00007f8d1b20831b in PSyncPoint::Wait() () from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#2  0x0000000000518595 in Ekiga::VideoInputCore::VideoPreviewManager::Main()
+    ()
+No symbol table info available.
+#3  0x00007f8d1b205fba in PThread::PX_ThreadStart(void*) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#4  0x0000003061c0686a in start_thread (arg=<value optimized out>)
+    at pthread_create.c:297
+        __res = <value optimized out>
+        pd = 0x7f8d128f9910
+        unwind_buf = {cancel_jmp_buf = {{jmp_buf = {140243878517008, 
+                -1952052942191522133, 140735861953728, 0, 0, 3, 
+                2013899780493348523, -1979286192460722517}, 
+              mask_was_saved = 0}}, priv = {pad = {0x0, 0x0, 0x0, 0x0}, 
+            data = {prev = 0x0, cleanup = 0x0, canceltype = 0}}}
+        not_first_call = <value optimized out>
+#5  0x00000030610de25d in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+No locals.
+#6  0x0000000000000000 in ?? ()
+No symbol table info available.
+
+Thread 13 (Thread 0x7f8d128b8910 (LWP 731)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 ()
+    at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+No locals.
+#1  0x00007f8d1b20831b in PSyncPoint::Wait() () from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#2  0x0000000000570227 in Ekiga::AudioEventScheduler::Main() ()
+No symbol table info available.
+#3  0x00007f8d1b205fba in PThread::PX_ThreadStart(void*) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#4  0x0000003061c0686a in start_thread (arg=<value optimized out>)
+    at pthread_create.c:297
+        __res = <value optimized out>
+        pd = 0x7f8d128b8910
+        unwind_buf = {cancel_jmp_buf = {{jmp_buf = {140243878250768, 
+                -1952052942191522133, 140735861953696, 0, 0, 3, 
+                2013899745596739243, -1979286192460722517}, 
+              mask_was_saved = 0}}, priv = {pad = {0x0, 0x0, 0x0, 0x0}, 
+            data = {prev = 0x0, cleanup = 0x0, canceltype = 0}}}
+        not_first_call = <value optimized out>
+#5  0x00000030610de25d in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+No locals.
+#6  0x0000000000000000 in ?? ()
+No symbol table info available.
+Current language:  auto; currently asm
+
+Thread 12 (Thread 0x7f8d12877910 (LWP 732)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 ()
+    at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+No locals.
+#1  0x00007f8d1b20831b in PSyncPoint::Wait() () from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#2  0x00000000005bdded in GMVideoOutputManager::Main() ()
+No symbol table info available.
+#3  0x00007f8d1b205fba in PThread::PX_ThreadStart(void*) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#4  0x0000003061c0686a in start_thread (arg=<value optimized out>)
+    at pthread_create.c:297
+        __res = <value optimized out>
+        pd = 0x7f8d12877910
+        unwind_buf = {cancel_jmp_buf = {{jmp_buf = {140243877984528, 
+                -1952052942191522133, 140735861953872, 0, 0, 3, 
+                2013899856729018027, -1979286192460722517}, 
+              mask_was_saved = 0}}, priv = {pad = {0x0, 0x0, 0x0, 0x0}, 
+            data = {prev = 0x0, cleanup = 0x0, canceltype = 0}}}
+        not_first_call = <value optimized out>
+#5  0x00000030610de25d in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+No locals.
+#6  0x0000000000000000 in ?? ()
+No symbol table info available.
+
+Thread 11 (Thread 0x7f8d12836910 (LWP 733)):
+#0  sem_wait () at ../nptl/sysdeps/unix/sysv/linux/x86_64/sem_wait.S:85
+No locals.
+#1  0x00007f8d1b2078a9 in PSemaphore::Wait() () from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#2  0x00007f8d1b22a977 in PReadWriteMutex::InternalStartRead() ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#3  0x00007f8d1b232de9 in PSafeObject::LockReadOnly() const ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#4  0x00007f8d1b233b75 in
+PSafePtrBase::EnterSafetyMode(PSafePtrBase::EnterSafetyModeOption) () from
+/usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#5  0x00007f8d1bd68b08 in SIPEndPoint::GarbageCollection() ()
+   from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#6  0x00007f8d1b96f9cd in OpalManager::GarbageCollection() ()
+   from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#7  0x00007f8d1b96fa4f in OpalManager::GarbageMain(PThread&, long) ()
+   from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#8  0x00007f8d1b205fba in PThread::PX_ThreadStart(void*) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#9  0x0000003061c0686a in start_thread (arg=<value optimized out>)
+    at pthread_create.c:297
+        __res = <value optimized out>
+        pd = 0x7f8d12836910
+        unwind_buf = {cancel_jmp_buf = {{jmp_buf = {140243877718288, 
+                -1952052942191522133, 140735861952288, 0, 0, 3, 
+                2013899821832408747, -1979286192460722517}, 
+              mask_was_saved = 0}}, priv = {pad = {0x0, 0x0, 0x0, 0x0}, 
+            data = {prev = 0x0, cleanup = 0x0, canceltype = 0}}}
+        not_first_call = <value optimized out>
+#10 0x00000030610de25d in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+No locals.
+#11 0x0000000000000000 in ?? ()
+No symbol table info available.
+
+Thread 10 (Thread 0x7f8d127f5910 (LWP 734)):
+#0  pthread_cond_timedwait@@GLIBC_2.3.2 ()
+    at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_timedwait.S:220
+No locals.
+#1  0x00007f8d1b2083f6 in PSyncPoint::Wait(PTimeInterval const&) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#2  0x00007f8d1b226a60 in PInterfaceMonitor::UpdateThreadMain() ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#3  0x00007f8d1b205fba in PThread::PX_ThreadStart(void*) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#4  0x0000003061c0686a in start_thread (arg=<value optimized out>)
+    at pthread_create.c:297
+        __res = <value optimized out>
+        pd = 0x7f8d127f5910
+        unwind_buf = {cancel_jmp_buf = {{jmp_buf = {140243877452048, 
+                -1952052942191522133, 140735861952080, 0, 0, 3, 
+                2013899374618939051, -1979286192460722517}, 
+              mask_was_saved = 0}}, priv = {pad = {0x0, 0x0, 0x0, 0x0}, 
+            data = {prev = 0x0, cleanup = 0x0, canceltype = 0}}}
+        not_first_call = <value optimized out>
+#5  0x00000030610de25d in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+No locals.
+#6  0x0000000000000000 in ?? ()
+No symbol table info available.
+
+Thread 9 (Thread 0x7f8d127b4910 (LWP 735)):
+#0  0x0000003061c0e9dd in __libc_waitpid (pid=8300, 
+    stat_loc=<value optimized out>, options=0)
+    at ../sysdeps/unix/sysv/linux/waitpid.c:41
+        _a3 = 0
+        _a1 = 8300
+        resultvar = <value optimized out>
+        _a4 = 0
+        _a2 = 140243877180528
+        oldtype = 0
+        result = <value optimized out>
+#1  0x0000003fd846ffd9 in g_spawn_sync () from /lib64/libglib-2.0.so.0
+No symbol table info available.
+#2  0x0000003fd84702e9 in g_spawn_command_line_sync ()
+   from /lib64/libglib-2.0.so.0
+No symbol table info available.
+#3  0x00007f8d1467cdb9 in ?? ()
+   from /usr/lib64/gtk-2.0/modules/libgnomebreakpad.so
+No symbol table info available.
+#4  <signal handler called>
+No locals.
+#5  0x0000003e2daf61f0 in vtable for __cxxabiv1::__si_class_type_info ()
+   from /usr/lib64/libstdc++.so.6
+No symbol table info available.
+#6  0x00007f8d1bd8cf65 in SIP_PDU::Write(OpalTransport&, OpalTransportAddress
+const&, PString const&) () from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#7  0x00007f8d1bd8d811 in SIPTransaction::SendPDU(SIP_PDU&) ()
+   from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#8  0x00007f8d1bd92773 in SIPTransaction::OnRetry(PTimer&, long) ()
+   from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#9  0x00007f8d1b22ca86 in PTimer::Process(PTimeInterval const&, PTimeInterval&)
+() from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#10 0x00007f8d1b22e611 in PTimerList::Process() ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#11 0x00007f8d1b20882c in PHouseKeepingThread::Main() ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#12 0x00007f8d1b205fba in PThread::PX_ThreadStart(void*) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#13 0x0000003061c0686a in start_thread (arg=<value optimized out>)
+    at pthread_create.c:297
+        __res = <value optimized out>
+        pd = 0x7f8d127b4910
+        unwind_buf = {cancel_jmp_buf = {{jmp_buf = {140243877185808, 
+                -1952052942191522133, 140735861951984, 0, 0, 3, 
+                2013899339722329771, -1979286192460722517}, 
+              mask_was_saved = 0}}, priv = {pad = {0x0, 0x0, 0x0, 0x0}, 
+            data = {prev = 0x0, cleanup = 0x0, canceltype = 0}}}
+        not_first_call = <value optimized out>
+#14 0x00000030610de25d in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+No locals.
+#15 0x0000000000000000 in ?? ()
+No symbol table info available.
+
+Thread 8 (Thread 0x7f8d12484910 (LWP 739)):
+#0  0x00000030610d4f73 in *__GI___poll (fds=<value optimized out>, 
+    nfds=<value optimized out>, timeout=-1)
+    at ../sysdeps/unix/sysv/linux/poll.c:87
+        resultvar = <value optimized out>
+        _a3 = -1
+        _a2 = 1
+        _a1 = 140243097356512
+        oldtype = 0
+        result = <value optimized out>
+#1  0x0000003fd843c6cc in ?? () from /lib64/libglib-2.0.so.0
+No symbol table info available.
+#2  0x0000003fd843cd45 in g_main_loop_run () from /lib64/libglib-2.0.so.0
+No symbol table info available.
+#3  0x00007f8d1c4390ad in ?? () from /usr/lib64/libebook-1.2.so.9
+No symbol table info available.
+#4  0x0000003fd8461de4 in ?? () from /lib64/libglib-2.0.so.0
+No symbol table info available.
+#5  0x0000003061c0686a in start_thread (arg=<value optimized out>)
+    at pthread_create.c:297
+        __res = <value optimized out>
+        pd = 0x7f8d12484910
+        unwind_buf = {cancel_jmp_buf = {{jmp_buf = {140243873843472, 
+                -1952052942191522133, 140735861953248, 140243873843472, 0, 3, 
+                2013899176513572523, -1979286192460722517}, 
+              mask_was_saved = 0}}, priv = {pad = {0x0, 0x0, 0x0, 0x0}, 
+            data = {prev = 0x0, cleanup = 0x0, canceltype = 0}}}
+        not_first_call = <value optimized out>
+#6  0x00000030610de25d in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+No locals.
+#7  0x0000000000000000 in ?? ()
+No symbol table info available.
+Current language:  auto; currently minimal
+
+Thread 7 (Thread 0x7f8d11a83910 (LWP 742)):
+#0  0x00000030610d4f73 in *__GI___poll (fds=<value optimized out>, 
+    nfds=<value optimized out>, timeout=-1)
+    at ../sysdeps/unix/sysv/linux/poll.c:87
+        resultvar = <value optimized out>
+        _a3 = -1
+        _a2 = 9
+        _a1 = 140243164465408
+        oldtype = 0
+        result = <value optimized out>
+#1  0x0000003fd843c6cc in ?? () from /lib64/libglib-2.0.so.0
+No symbol table info available.
+#2  0x0000003fd843cd45 in g_main_loop_run () from /lib64/libglib-2.0.so.0
+No symbol table info available.
+#3  0x0000003fe0047d20 in link_io_thread_fn (data=<value optimized out>)
+    at linc.c:396
+No locals.
+#4  0x0000003fd8461de4 in ?? () from /lib64/libglib-2.0.so.0
+No symbol table info available.
+#5  0x0000003061c0686a in start_thread (arg=<value optimized out>)
+    at pthread_create.c:297
+        __res = <value optimized out>
+        pd = 0x7f8d11a83910
+        unwind_buf = {cancel_jmp_buf = {{jmp_buf = {140243863353616, 
+                -1952052942191522133, 140735861952672, 0, 0, 3, 
+                2013893403540655787, -1979286192460722517}, 
+              mask_was_saved = 0}}, priv = {pad = {0x0, 0x0, 0x0, 0x0}, 
+            data = {prev = 0x0, cleanup = 0x0, canceltype = 0}}}
+        not_first_call = <value optimized out>
+#6  0x00000030610de25d in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+No locals.
+#7  0x0000000000000000 in ?? ()
+No symbol table info available.
+
+Thread 6 (Thread 0x7f8d12773910 (LWP 748)):
+#0  0x00000030610d6fa2 in select () from /lib64/libc.so.6
+No symbol table info available.
+#1  0x00007f8d1b1fc049 in PSocket::Select(PSocket::SelectList&,
+PSocket::SelectList&, PSocket::SelectList&, PTimeInterval const&) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#2  0x00007f8d1b21d86f in PSocket::Select(PSocket::SelectList&, PTimeInterval
+const&) () from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#3  0x00007f8d1b227396 in
+PMonitoredSockets::ReadFromSocket(PSocket::SelectList&, PUDPSocket*&, void*,
+int, PIPSocket::Address&, unsigned short&, int&, PTimeInterval const&) () from
+/usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#4  0x00007f8d1b2279a1 in PMonitoredSocketBundle::ReadFromBundle(void*, int,
+PIPSocket::Address&, unsigned short&, PString&, int&, PTimeInterval const&) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#5  0x00007f8d1b9bc703 in OpalListenerUDP::Accept(PTimeInterval const&) ()
+   from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#6  0x00007f8d1b9bdbfd in OpalListener::ListenForConnections(PThread&, long)
+    () from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#7  0x00007f8d1b205fba in PThread::PX_ThreadStart(void*) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#8  0x0000003061c0686a in start_thread (arg=<value optimized out>)
+    at pthread_create.c:297
+        __res = <value optimized out>
+        pd = 0x7f8d12773910
+        unwind_buf = {cancel_jmp_buf = {{jmp_buf = {140243876919568, 
+                -1952052942191522133, 140735861952416, 0, 0, 3, 
+                2013899442264673963, -1979286192460722517}, 
+              mask_was_saved = 0}}, priv = {pad = {0x0, 0x0, 0x0, 0x0}, 
+            data = {prev = 0x0, cleanup = 0x0, canceltype = 0}}}
+        not_first_call = <value optimized out>
+#9  0x00000030610de25d in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+No locals.
+#10 0x0000000000000000 in ?? ()
+No symbol table info available.
+
+Thread 5 (Thread 0x7f8d12732910 (LWP 749)):
+#0  0x00000030610d6fa2 in select () from /lib64/libc.so.6
+No symbol table info available.
+#1  0x00007f8d1b2057d8 in PThread::PXBlockOnIO(int, int, PTimeInterval const&)
+    () from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#2  0x00007f8d1b1ff158 in PChannel::PXSetIOBlock(PChannel::PXBlockType,
+PTimeInterval const&) () from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#3  0x00007f8d1b1f9e6a in PSocket::os_accept(PSocket&, sockaddr*, int*) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#4  0x00007f8d1b21bc10 in PTCPSocket::Accept(PSocket&) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#5  0x00007f8d1b9bfac3 in OpalListenerTCP::Accept(PTimeInterval const&) ()
+   from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#6  0x00007f8d1b9bdbfd in OpalListener::ListenForConnections(PThread&, long)
+    () from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#7  0x00007f8d1b205fba in PThread::PX_ThreadStart(void*) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#8  0x0000003061c0686a in start_thread (arg=<value optimized out>)
+    at pthread_create.c:297
+        __res = <value optimized out>
+        pd = 0x7f8d12732910
+        unwind_buf = {cancel_jmp_buf = {{jmp_buf = {140243876653328, 
+                -1952052942191522133, 140735861952336, 0, 0, 3, 
+                2013899407368064683, -1979286192460722517}, 
+              mask_was_saved = 0}}, priv = {pad = {0x0, 0x0, 0x0, 0x0}, 
+            data = {prev = 0x0, cleanup = 0x0, canceltype = 0}}}
+        not_first_call = <value optimized out>
+#9  0x00000030610de25d in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+No locals.
+#10 0x0000000000000000 in ?? ()
+No symbol table info available.
+
+Thread 4 (Thread 0x7f8cded8d910 (LWP 753)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 ()
+    at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+No locals.
+#1  0x00007f8d1b20831b in PSyncPoint::Wait() () from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#2  0x00007f8d1bd6c2b4 in SIPEndPoint::SIP_PDU_Thread::Main() ()
+   from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#3  0x00007f8d1b205fba in PThread::PX_ThreadStart(void*) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#4  0x0000003061c0686a in start_thread (arg=<value optimized out>)
+    at pthread_create.c:297
+        __res = <value optimized out>
+        pd = 0x7f8cded8d910
+        unwind_buf = {cancel_jmp_buf = {{jmp_buf = {140243010902288, 
+                -1952052942191522133, 140243876915312, 0, 0, 3, 
+                2013486718456106667, -1979286192460722517}, 
+              mask_was_saved = 0}}, priv = {pad = {0x0, 0x0, 0x0, 0x0}, 
+            data = {prev = 0x0, cleanup = 0x0, canceltype = 0}}}
+        not_first_call = <value optimized out>
+#5  0x00000030610de25d in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+No locals.
+#6  0x0000000000000000 in ?? ()
+No symbol table info available.
+
+Thread 3 (Thread 0x7f8d126f1910 (LWP 754)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 ()
+    at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+No locals.
+#1  0x00007f8d1b20831b in PSyncPoint::Wait() () from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#2  0x00007f8d1bd6c2b4 in SIPEndPoint::SIP_PDU_Thread::Main() ()
+   from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#3  0x00007f8d1b205fba in PThread::PX_ThreadStart(void*) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#4  0x0000003061c0686a in start_thread (arg=<value optimized out>)
+    at pthread_create.c:297
+        __res = <value optimized out>
+        pd = 0x7f8d126f1910
+        unwind_buf = {cancel_jmp_buf = {{jmp_buf = {140243876387088, 
+                -1952052942191522133, 140243876915312, 0, 0, 3, 
+                2013899509910408875, -1979286192460722517}, 
+              mask_was_saved = 0}}, priv = {pad = {0x0, 0x0, 0x0, 0x0}, 
+            data = {prev = 0x0, cleanup = 0x0, canceltype = 0}}}
+        not_first_call = <value optimized out>
+#5  0x00000030610de25d in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+No locals.
+#6  0x0000000000000000 in ?? ()
+No symbol table info available.
+Current language:  auto; currently asm
+
+Thread 2 (Thread 0x7f8d1004f910 (LWP 755)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 ()
+    at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+No locals.
+#1  0x00007f8d1b20831b in PSyncPoint::Wait() () from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#2  0x00007f8d1bd6c2b4 in SIPEndPoint::SIP_PDU_Thread::Main() ()
+   from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#3  0x00007f8d1b205fba in PThread::PX_ThreadStart(void*) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#4  0x0000003061c0686a in start_thread (arg=<value optimized out>)
+    at pthread_create.c:297
+        __res = <value optimized out>
+        pd = 0x7f8d1004f910
+        unwind_buf = {cancel_jmp_buf = {{jmp_buf = {140243835877648, 
+                -1952052942191522133, 140243876915312, 0, 0, 3, 
+                2013894329106108075, -1979286192460722517}, 
+              mask_was_saved = 0}}, priv = {pad = {0x0, 0x0, 0x0, 0x0}, 
+            data = {prev = 0x0, cleanup = 0x0, canceltype = 0}}}
+        not_first_call = <value optimized out>
+#5  0x00000030610de25d in clone ()
+    at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+No locals.
+#6  0x0000000000000000 in ?? ()
+No symbol table info available.
+
+Thread 1 (Thread 0x7f8d1a1917d0 (LWP 728)):
+#0  0x00000030610d4f73 in *__GI___poll (fds=<value optimized out>, 
+    nfds=<value optimized out>, timeout=5000)
+    at ../sysdeps/unix/sysv/linux/poll.c:87
+        resultvar = <value optimized out>
+        _a3 = 5000
+        _a2 = 1
+        _a1 = 140735861944672
+        oldtype = 0
+        result = <value optimized out>
+#1  0x000000306840a041 in send_dg (statp=0x306136c3a0, 
+    buf=<value optimized out>, buflen=<value optimized out>, buf2=0x0, 
+    buflen2=<value optimized out>, ansp=<value optimized out>, 
+    anssizp=0x7fff9f0ef2a0, terrno=0x7fff9f0ef248, ns=0, 
+    v_circuit=0x7fff9f0ef244, gotsomewhere=0x7fff9f0ef24c, anscp=0x0, 
+    ansp2=0x0, anssizp2=0x0, resplen2=0x0) at res_send.c:1046
+        orig_anssizp = 512
+        nsap = <value optimized out>
+        pfd = {{fd = 59, events = 1, revents = 0}}
+        from = {sin6_family = 0, sin6_port = 0, sin6_flowinfo = 0, 
+          sin6_addr = {__in6_u = {
+              __u6_addr8 = "\251\361\ra0\0\0\0\0\b\0\0\1\0\0", __u6_addr16 = {
+                61865, 24845, 48, 0, 2048, 0, 1, 0}, __u6_addr32 = {
+                1628303785, 48, 2048, 1}}}, sin6_scope_id = 1630969472}
+        resplen = 0
+        n = <value optimized out>
+        seconds = <value optimized out>
+        single_request = false
+        save_gotsomewhere = 0
+        need_recompute = 0
+        nwritten = 1
+        recvresp1 = 0
+        recvresp2 = 1
+        __PRETTY_FUNCTION__ = "send_dg"
+#2  0x000000306840bef4 in __libc_res_nsend (statp=0x306136c3a0, 
+    buf=<value optimized out>, buflen=<value optimized out>, buf2=0x0, 
+    buflen2=<value optimized out>, ans=0x7fff9f0f0240 "p\361\16\220\377\177", 
+    anssiz=512, ansp=0x0, ansp2=0x0, nansp2=0x0, resplen2=0x0)
+    at res_send.c:557
+        gotsomewhere = 0
+        terrno = 110
+        try = 0
+        v_circuit = 0
+        resplen = <value optimized out>
+        ns = 0
+        n = <value optimized out>
+#3  0x0000003068408755 in *__GI___libc_res_nquery (statp=0x306136c3a0, 
+    name=<value optimized out>, class=<value optimized out>, 
+    type=<value optimized out>, answer=0x7fff9f0f0240 "p\361\16\220\377\177", 
+    anslen=<value optimized out>, answerp=0x0, answerp2=0x0, nanswerp2=0x0, 
+    resplen2=0x0) at res_query.c:225
+        hp = 0x7fff9f0f0240
+        n = 45
+        use_malloc = 0
+        oflags = 0
+        bufsize = 272
+        buf = 0x7fff9f0ef2d0 "\304X\1"
+        query1 = 0x7fff9f0ef2d0 "\304X\1"
+        nquery1 = 5000
+        query2 = 0x0
+        nquery2 = 0
+        __PRETTY_FUNCTION__ = "__libc_res_nquery"
+        hp2 = <value optimized out>
+#4  0x0000003068408f14 in __libc_res_nquerydomain (
+    statp=<value optimized out>, name=<value optimized out>, 
+    domain=<value optimized out>, class=<value optimized out>, 
+    type=<value optimized out>, answer=<value optimized out>, 
+    anslen=<value optimized out>, resplen2=<value optimized out>, 
+    nanswerp2=<value optimized out>, answerp2=<value optimized out>, 
+    answerp=<value optimized out>, statp=<value optimized out>, 
+    name=<value optimized out>, domain=<value optimized out>, 
+    class=<value optimized out>, type=<value optimized out>, 
+    answer=<value optimized out>, anslen=<value optimized out>, 
+    answerp=<value optimized out>, answerp2=<value optimized out>, 
+    nanswerp2=<value optimized out>, resplen2=<value optimized out>)
+    at res_query.c:576
+        nbuf =
+"\360d\347\2\0\0\0\0`\2\17\237\377\177\0\0\20'p\2\0\0\0\0\4\31\34\33\215\177\0\0@\365\16\237\377\177\0\0\200\365\16\237\377\177\0\0\304\23\0\0\0\0\0\0\310\4\17\237\377\177\0\0\200\371\16\237\377\177\0\0\225$\206->\0\0\0\304\23\0\0\0\0\0\0
+\4\17\237\377\177\0\0
+\4\17\237\377\177\0\0U\335\33\33\215\177\0\0\200\371\16\237\377\177\0\0x\365\16\237\377\177\0\0\200\207Q\33\215\177\0\0\0\0\0\0\0\0\0\0\1\0\0\0\0\0\0\0à¨²\2\0\0\0\0\1\24\257-\3\0\0\0\350}Q\33\215\177\0\0\0\0\0\0\0\0\0\0\70~Q\33\215\177\0\0p\23\257->\0\0\0\6",
+'\0' <repeats 15 times>, "\2\20\0\0\0\0\0\0\1\0\0\0\377\177", '\0' <repeats 154
+times>, "\b\0\0\0\377\177\0\0\300\365\16\237\377\177\0\0\0\260"...
+        n = 26
+#5  0x000000306840932f in __libc_res_nsearch (statp=0x306136c3a0, 
+    name=0x2b1eaa0 "_sip._udp.fedoraproject.org", 
+    class=<value optimized out>, type=<value optimized out>, 
+    answer=0x7fff9f0f0240 "p\361\16\220\377\177", anslen=512, 
+    resplen2=<value optimized out>, nanswerp2=<value optimized out>, 
+    answerp2=<value optimized out>, answerp=<value optimized out>)
+    at res_query.c:377
+        cp = 0xfffffffffffffdfc <Address 0xfffffffffffffdfc out of bounds>
+        tmp =
+"\1\0\0\0\377\177\0\0\20\241\255\2\0\0\0\0\1\203Q\33\215\177\0\0\300\373\16\237\377\177\0\0\200\207Q\33\215\177\0\0\0\0\0\0\0\0\0\0\1",
+'\0' <repeats 15 times>,
+"\1\373\16\237\377\177\0\0<\244#\33\215\177\0\0\60\373\16\237\377\177\0\0\27\373\330\33\215\177\0\0\240\62\260\2\0\0\0\0\200\236\66a0\0\0\0\260\62\260\2\0\0\0\0\0\254\354\2\0\0\0\0\240\62\260\2\377\377\377\177\220\5\17\237\377\177\0\0\270\5\17\237\377\177\0\0\220\372\16\237\377\177\0\0\1\0\0\0\0\0\0\0\f\0\0\0\0\0\0\0\20\0\0\0\0\0\0\0\"\253#\33\215\177\0\0\0\374\16\237\377\177\0\0\340\373\16\237\377\177\0\0\220\372\16\237\377\177\0\0&\244#\33\215\177\0\0\220\372\16\237\377\177\0\0JPJ\0\0\0\0\0\340\373\16\237\377\177\0\0@\376\16\237\377\177\0\0\340\373\16\237\377\177\0\0\337\314!\33\215\177\0\0p\207Q\33\215\177\0\0<\244#\33\215\177\0\0\200"...
+        dots = 3
+        trailing_dot = <value optimized out>
+        ret = <value optimized out>
+        saved_herrno = -1
+        got_nodata = 0
+        got_servfail = 0
+        root_on_list = 458327936
+        tried_as_is = 0
+#6  0x00007f8d1b17ab62 in DnsQuery_A(char const*, unsigned short, unsigned int,
+_IP4_ARRAY*, DnsRecord**, void*) () from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#7  0x00007f8d1b176087 in bool PDNS::Lookup<33u, PDNS::SRVRecordList,
+PDNS::SRVRecord>(PString const&, PDNS::SRVRecordList&) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#8  0x00007f8d1b17afc3 in PDNS::LookupSRV(PString const&, unsigned short,
+std::vector<PIPSocketAddressAndPort, std::allocator<PIPSocketAddressAndPort>
+>&) ()
+   from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#9  0x00007f8d1b17b32a in PDNS::LookupSRV(PString const&, PString const&,
+unsigned short, std::vector<PIPSocketAddressAndPort,
+std::allocator<PIPSocketAddressAndPort> >&) () from /usr/lib64/libpt.so.2.6.2
+No symbol table info available.
+#10 0x00007f8d1bd8ff47 in SIPURL::AdjustToDNS(int) ()
+   from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#11 0x00007f8d1bd9397f in SIPTransaction::Start() ()
+   from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#12 0x00007f8d1bdaa627 in SIPHandler::WriteSIPHandler(OpalTransport&) ()
+   from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#13 0x00007f8d1b9bb382 in OpalTransportUDP::WriteConnect(bool
+(*)(OpalTransport&, void*), void*) () from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#14 0x00007f8d1bdb387d in SIPHandler::SendRequest(SIPHandler::State) ()
+   from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#15 0x00007f8d1bd6a2af in SIPEndPoint::Publish(SIPSubscribe::Params const&,
+PString const&, PString&) () from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#16 0x00007f8d1bd6a512 in SIPEndPoint::Publish(PString const&, PString const&,
+unsigned int) () from /usr/lib64/libopal.so.3.6.2
+No symbol table info available.
+#17 0x0000000000544cf6 in Opal::Sip::EndPoint::publish(Ekiga::PersonalDetails
+const&) ()
+No symbol table info available.
+#18 0x00000000004e1b2e in
+Ekiga::PresenceCore::publish(gmref_ptr<Ekiga::PersonalDetails>) ()
+No symbol table info available.
+#19 0x00000000004e1e99 in
+Ekiga::PresenceCore::on_registration_event(gmref_ptr<Ekiga::Bank>,
+gmref_ptr<Ekiga::Account>, Ekiga::Account::RegistrationState, std::string,
+gmref_ptr<Ekiga::PersonalDetails>) ()
+No symbol table info available.
+#20 0x00000000004e7252 in sigc::internal::slot_call4<sigc::bind_functor<-1,
+sigc::bound_mem_functor5<void, Ekiga::PresenceCore, gmref_ptr<Ekiga::Bank>,
+gmref_ptr<Ekiga::Account>, Ekiga::Account::RegistrationState, std::string,
+gmref_ptr<Ekiga::PersonalDetails> >, gmref_ptr<Ekiga::PersonalDetails>,
+sigc::nil, sigc::nil, sigc::nil, sigc::nil, sigc::nil, sigc::nil>, void,
+gmref_ptr<Ekiga::Bank>, gmref_ptr<Ekiga::Account>,
+Ekiga::Account::RegistrationState,
+std::string>::call_it(sigc::internal::slot_rep*, gmref_ptr<Ekiga::Bank> const&,
+gmref_ptr<Ekiga::Account> const&, Ekiga::Account::RegistrationState const&,
+std::string const&) ()
+No symbol table info available.
+#21 0x000000000051027e in
+Ekiga::AccountCore::on_registration_event(gmref_ptr<Ekiga::Bank>,
+gmref_ptr<Ekiga::Account>, Ekiga::Account::RegistrationState, std::string) ()
+No symbol table info available.
+#22 0x000000000051081b in sigc::internal::slot_call3<sigc::bind_functor<0,
+sigc::bound_mem_functor4<void, Ekiga::AccountCore, gmref_ptr<Ekiga::Bank>,
+gmref_ptr<Ekiga::Account>, Ekiga::Account::RegistrationState, std::string>,
+gmref_ptr<Ekiga::Bank>, sigc::nil, sigc::nil, sigc::nil, sigc::nil, sigc::nil,
+sigc::nil>, void, gmref_ptr<Ekiga::Account>, Ekiga::Account::RegistrationState,
+std::string>::call_it(sigc::internal::slot_rep*, gmref_ptr<Ekiga::Account>
+const&, Ekiga::Account::RegistrationState const&, std::string const&) ()
+No symbol table info available.
+#23 0x00000000005374bb in
+Ekiga::BankImpl<Opal::Account>::on_registration_event(Ekiga::Account::RegistrationState,
+std::string, gmref_ptr<Opal::Account>) ()
+No symbol table info available.
+Current language:  auto; currently minimal
+The program is running.  Quit anyway (and detach it)? (y or n) [answered Y;
+input not from terminal]

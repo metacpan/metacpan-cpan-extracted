@@ -1,0 +1,205 @@
+0.63 Sat Jan 14 09:31:43 PST 2017
+ - Fixed colors on older perls. TINITA++
+ - Changed on/off to always/never. TINITA++
+
+0.62 Fri Jan 13 22:37:55 PST 2017
+ - Debug color and indent options added by TINITA++
+ - Recursion controls. Apply PR/46 by @pdl++ (refactored)
+ - Support Perl regex look-behind assertions
+
+0.61 Mon Jun 13 18:10:24 PDT 2016
+ - Performance improvements by @agentzh++
+ - See PR/52
+
+0.60 Wed Jan 28 10:44:38 PST 2015
+ - Added EMPTY atom
+ - Fix small bug in a helper function. Issue
+ - Update docs and Meta for 2015
+
+0.59 Sun Dec 28 14:25:13 PST 2014
+ - Release with new TestML-0.52
+
+0.58 Fri Dec 12 11:10:16 PST 2014
+ - Fix test for windows (issue
+ - Share Pegex grammar for Pegex
+
+0.57 Mon Oct  6 14:30:28 CEST 2014
+ - Added 'rule' helper method to Pegex::Receiver
+ - Refactored the calculator examples to be dry
+
+0.56 Fri Oct  3 22:55:58 CEST 2014
+ - Upgrade Mo to 0.39
+ - Fix problems with %
+ - Fix whitespace matching at start of regex
+
+0.55 Sun Aug 24 10:03:26 PDT 2014
+ - Doc tweak
+
+0.54 Sat Aug 16 14:14:34 PDT 2014
+ - Remove =travis section
+
+0.53 Sat Aug 16 11:55:44 PDT 2014
+ - Meta 0.0.2
+
+0.52 Sat Aug 16 02:33:53 PDT 2014
+ - Eliminate File::Basename from test/
+
+0.51 Fri Aug 15 20:26:26 PDT 2014
+ - Remove Pegex::Mo
+ - Add t/000-compile-modules.t
+
+0.50 Fri Aug 15 09:30:56 PDT 2014
+ - Fixed a Mo bug directly
+ - Added regression test
+ - Mo still needs fix
+ - See https://github.com/ingydotnet/jsony-pm/issues/2
+
+0.49 Tue Aug 12 11:01:28 PDT 2014
+ - Add `receiver` accessor back into parser
+ - Other modules use it
+ - Add test for it
+
+0.48 Sun Aug 10 18:18:35 PDT 2014
+ - Refactor Pegex.pm to match CafeScript
+
+0.47 Sat Aug  9 12:00:13 PDT 2014
+ - Refactor to match CafeScript
+ - https://github.com/ingydotnet/pegex-cafe
+
+0.46 Fri Aug  8 19:29:32 PDT 2014
+ - Fix swim errors
+
+0.45 Mon Aug  4 00:17:27 PDT 2014
+ - Remove (c) from Copyright
+ - Doc fixes
+
+0.44 Tue Jul 29 16:35:34 PDT 2014
+ - Some Parser refactoring.
+ - Add a new example parser called `self-parser.pl`
+ - Get the devel tests working again
+
+0.43 Wed Jul 23 14:21:29 PDT 2014
+ - Add inlining support for text to Pegex::Grammar
+ - Add a line_column method to Pegex::Parser
+
+0.42 Mon Jul 21 17:25:50 PDT 2014
+ - Fix copyright year stuff
+
+0.41 Thu Jul 17 10:28:16 PDT 2014
+ - ZD put an incorrect dep on TestML. @rurban++
+
+0.40 Mon Jul 14 09:56:50 PDT 2014
+ - Fix Meta and add Contributing file
+
+0.39 Tue Jul  1 10:05:51 PDT 2014
+ - Support a maxparse debugging option
+
+0.38 Sun Jun 29 16:02:50 PDT 2014
+ - Fix issue#12. Make trace work on outermost rule.
+
+0.37 Sat Jun 28 09:52:45 PDT 2014
+ - More doc change for Pegex::Module. ggl++
+
+0.36 Sat Jun 28 09:45:54 PDT 2014
+ - Doc change for Pegex::Module. ggl++
+
+0.35 Fri Jun 27 20:55:38 PDT 2014
+ - Kwim to Swim
+
+0.34 Mon Jun 23 16:02:08 PDT 2014
+ - Fix for issue#13
+
+0.33 Mon Jun 16 13:45:07 PDT 2014
+ - Change VERSION dist strategy.
+
+0.32 Sat Jun 14 12:26:36 PDT 2014
+ - New badge syntax
+
+0.31 Sat May 17 23:43:00 PDT 2014
+ - Add doc badges.
+ - Switch to Zilla::Dist
+ - Fix a bug in Pegex::Parser
+
+0.30 Sat May 17 23:43:00 PDT 2014
+ - Major release.
+ - New cleaner syntax.
+ - Slight breakage of backwards compatability.
+ - Grammar authors can get help on
+
+0.25 Sat Feb  8 14:14:59 PST 2014
+ - Support 5.8.1+
+
+0.24 Thu Feb  6 22:56:23 PST 2014
+ - tweak some dzil settings
+
+0.23 Thu Feb  6 17:16:39 PST 2014
+ - https://rt.cpan.org/Ticket/Display.html?id=82587
+ - Doc and example fixes
+ - Add 2014 to all copyrights
+
+0.22 Wed Feb  5 11:26:05 PST 2014
+ - Release under dzil (thanks frew++!!)
+ - travis testing (frew++)
+
+0.21 Thu Nov  8 10:47:42 PST 2012
+ - A massive refactoring release.
+ - 8-10 times faster parsing speed!
+ - Support a b | c precedence in Pegex grammars.
+ - Complete documenatation.
+ - Examples and Tutorials
+ - New receivers, Pegex::Tree and Pegex::Tree::Wrap
+ - API becomes more solidified.
+
+0.20 Thu Aug 30 00:06:30 PDT 2012
+ - Refactored Pegex to make API less flexible but more sensible,
+   explainable and maintainable.
+
+0.19 Sat Nov  5 01:16:15 PDT 2011
+ - Fixed Test::Differences missing.
+
+0.18 Fri Sep 30 00:44:35 CEST 2011
+ - Use Mo 0.25
+ - Support advanced quantifiers and %/%%
+ - Rename classes
+ - Make AST class use unwrap events and be much simpler.
+
+0.17 Wed Sep 21 23:42:00 CEST 2011
+ - Complete refactoring of everything.
+ - This hard fought gem was released from Liz++ and Wendy++'s TV room.
+
+0.16 Fri Sep  9 14:51:38 CEST 2011
+ - Changed AST model to be faster and simpler.
+
+0.15 Wed Sep  7 10:17:11 BST 2011
+ - With this release of Pegex, I do declare the true birthday of Acmeism.
+   THis release was performed from the living room of Leon "Acme" Brocard.
+   How fitting. His daughter Lara was present to witness her first ever
+   CPAN release.
+
+0.14 Sat Aug 20 18:19:20 CEST 2011
+ - Fix TestML dep with new version of Module::Package
+
+0.13 Fri Aug 19 20:51:18 EEST 2011
+ - Use updated version of TestML with updated version of Pegex!
+ - Switch Mouse back to Gloom
+
+0.12 Sun Aug 14 17:27:13 EEST 2011
+ - Switch OO to Mouse
+
+0.11 Fri Sep 10 10:41:30 PDT 2010
+ - Add manifest_skip and readme_from to Makefile.PL
+
+0.10 Thu Sep  9 10:41:30 PDT 2010
+ - Changes supporting TestML 0.20
+
+0.05 Sat Aug 14 17:11:17 PDT 2010
+ - Add REPOSITORY and COMMUNITY info to doc.
+
+0.04 Sat Aug 14 17:11:17 PDT 2010
+ - Use new Gloom for base OO.
+
+0.02 Tue Aug 10 01:15:58 PDT 2010
+ - Changed name from Parse::Pegex to Pegex.
+
+0.01 Tue Aug  3 02:42:29 PDT 2010
+ - Initial version.

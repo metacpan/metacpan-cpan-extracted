@@ -1,0 +1,7 @@
+Revision history for Perl extension PerlIO-via-ToFirePHP
+
+1.100860  2010-03-27 14:11:48 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.01 Wed Jun 10 17:46:31 CEST 2009 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

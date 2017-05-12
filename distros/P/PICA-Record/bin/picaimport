@@ -1,0 +1,350 @@
+#!/usr/bin/perl
+#PODNAME: picaimport
+#ABSTRACT: Import or delete PICA+ records in a L<PICA::Store>
+
+use strict;
+use warnings;
+
+
+use PICA::Record;
+use PICA::Parser;
+use PICA::Store;
+use PICA::Source;
+use Getopt::Long;
+use Pod::Usage;
+use IO::File;
+use Data::Dumper;
+use POSIX qw(strftime);
+
+my ($configfile, $outfile, $fromfile, $movemode, $help, $man, $quiet, $ppnmode,
+    $delete, $force, $allmode, $writemode, $version, $getmode);
+
+GetOptions(
+    'all' => \$allmode,
+    'config:s' => \$configfile,
+    'from:s' => \$fromfile, 
+    'get' => \$getmode,
+    'log:s' => \$outfile,
+    'move' => \$movemode,
+    'man' => \$man,
+    'delete' => \$delete,
+    'ppn'  => \$ppnmode,
+    'force' => \$force,
+    'help|?' => \$help,
+    'quiet' => \$quiet,
+    'version' => \$version,
+    'writemode' => \$writemode,
+) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-verbose => 2)  if $man;
+print "picaimport version $VERSION\n" and pod2usage(1)
+    if $version;
+pod2usage("Please provide EITHER file(s) on the command line OR the -from option")
+    unless (defined $fromfile xor scalar @ARGV);
+
+$writemode = 1 if $getmode;
+
+$fromfile = '-' unless defined $fromfile or @ARGV;
+
+my $store = PICA::Store->new( config => $configfile );
+
+# print some information about this store
+print $store->about() . "\n" unless $quiet;
+
+# Support TODO output to STDOUT *and* to a file (-verbose)
+$outfile = "-" unless defined $outfile;
+if ( $outfile eq '-' ) {
+    *OUT = *STDOUT;
+} else {
+    print "Resulting mappings are appended to $outfile\n" unless $quiet;
+    open OUT, ">>$outfile" or die("Failed to open $outfile");
+}
+
+if ( $getmode ) {
+    *handle = *record_get;
+} elsif ( $delete ) {
+    *handle = *record_delete;
+} else {
+    *handle = *record_import;
+}
+
+if (@ARGV) {
+    if ( $delete ) {
+        betterask("Do you really want to delete " . @ARGV . " records?");
+    } else {
+        #print "Importing " . @ARGV . " records\n" unless $quiet;
+    }
+    while (@ARGV) {
+        handle(shift);
+    }
+} else {
+    betterask("Do you really want to delete records?") if $delete;
+    if ( $fromfile eq "-" ) {
+        print "Please provide a filename or PPN and filename (seperated by space) each line!\n"
+            unless $quiet;
+        while(<STDIN>) {
+            chomp;
+            exit if $_ eq '';
+            handle($_);
+        }
+    } else {
+        my $purpose = $delete ? " for deleting" : "";
+        print "Reading from $fromfile$purpose\n" unless $quiet;
+        open FROM, $fromfile or die("Error opening $fromfile");
+        while(<FROM>) {
+            chomp;
+            handle($_);
+        }
+    }
+}
+
+sub betterask {
+    return if $force;
+    print $_[0] . " Then type 'Y'!\n";
+    my $answer = readline(STDIN);
+    exit unless $answer =~ /^y$/i;
+}
+
+sub import_multiple {
+    # TODO: import all records from a given file
+}
+
+sub delete_multiple {
+    # TODO: delete all records with PPNs in a given file
+}
+
+sub record_get {
+    my $file = shift;
+    my $ppn;
+
+    if ( $file =~ /^([0-9]*[0-9X])((\s+|\s*=\s*)([\s]+))?/i ) {
+        ($ppn, $file) = ($1, $3);
+    }
+
+    return unless defined $file or $ppn;
+    $file = '-' unless defined $file and $file ne '';
+
+    if ( $ppnmode ) {
+        my $record = readpicarecord( $file );
+        $ppn = $record->ppn;
+    }
+
+    if (not $ppn) {
+        print STDERR "PPN needed to get a record\n";
+        return;
+    }
+
+    my %result = $store->get( $ppn );
+
+    if ( $result{id} ) {
+        my $writeerror = 0;
+        if ( $writemode and $file ne '-' ) {
+            if ( writepicarecord( $result{record}, $file ) ) {
+                print OUT join(' ', $result{id}, $file, timestamp()) . "\n";
+            } else {
+                print STDERR "Failed to write file $file\n";
+                print OUT join(' ', $result{id}, $file, timestamp(), "failed") . "\n";
+            }
+        } else {
+            # error because no UTF-8?
+            # writepicarecord( $result{record}, \*STDOUT );
+            print $result{record} . "\n";
+        }
+    } else {
+        my $err = $result{errormessage};
+        $err =~ s/\n/ /gm;
+        print STDERR "failed to get $ppn=$file: $err\n";
+        print OUT join(' ', '-', $file, timestamp(), "failed") . "\n";
+        return;
+    }  
+}
+
+sub record_import {
+    my $file = shift;
+    my $ppn;
+
+    if ( $file =~ /^([0-9]*[0-9X])((\s+|\s*=\s*)([\s]+))?/i ) {
+        ($ppn, $file) = ($1, $3);
+    }
+    $file = '' unless defined $file;
+
+    # ignore blank lines
+    return unless defined $file and $file ne '';
+
+    my (%result, $cmd, $op);
+
+    my $record = readpicarecord( $file );
+
+    if ( not $record or $record->empty ) {
+        print STDERR "Failed to read PICA+ record from $file\n";
+        return;
+    }
+
+    $ppn = $record->ppn if not $ppn and $ppnmode;
+
+    if ( $ppn ) {
+        $cmd = "update";
+        %result = $store->update( $ppn, $record );
+    } else {
+        $cmd = "import";
+        %result = $store->create( $record );
+    }
+
+    if ( $result{id} ) {
+        my $error = 0;
+        if ( $writemode ) { # TODO: what if record read from STDIN?
+            $error = writepicarecord( $result{record}, $file )
+        } elsif( $movemode ) {
+            unlink $file; # TODO: check error
+        }
+        if ( $error ) {
+            print STDERR "Failed to write file $file\n";
+            print OUT join(' ', $result{id}, $file, timestamp(), 'failed') . "\n";
+        } else {
+            print OUT join(' ', $result{id}, $file, timestamp()) . "\n";
+        }
+    } else {
+        my $err = $result{errormessage};
+        $err =~ s/\n/ /gm;
+        print STDERR "failed to $cmd $file: $err\n";
+        print OUT join(' ', '-', $file, timestamp()) . "\n";
+        return;
+    }    
+}
+
+sub record_delete {
+    my $line = shift;
+    return unless defined $line and $line ne '';
+
+    my ($ppn, $file);
+    if ( $line =~ /^([0-9]*[0-9X])((\s+|\s*=\s*)([\s]+))?/i ) {
+        ($ppn, $file) = ($1, $3);
+    } else {
+        print STDERR "This is not a valid PPN: $line\n";
+        return;
+    }
+    $file = '' unless defined $file;
+
+    # TODO: support $writemode
+
+    my %result = $store->delete( $ppn );
+
+    if ( $result{id} ) {
+        # TODO support download on delete
+        # TODO: add timestamp
+        print OUT join(' ', $result{id}, $file, timestamp(), "deleted") . "\n";
+    } else {
+        my $err = $result{errormessage};
+        $err =~ s/\n/ /gm;
+        print STDERR "failed to delete $ppn: $err\n";
+        print OUT join(' ', $ppn, $file, timestamp(), "failed") . "\n";
+    }    
+}
+
+sub timestamp {
+    return strftime("%Y-%m-%dT%H:%M:%S", localtime());
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+picaimport - Import or delete PICA+ records in a L<PICA::Store>
+
+=head1 VERSION
+
+version 0.585
+
+=head1 SYNOPSIS
+
+  picaimport [options] [file]*
+
+=head1 OPTIONS
+
+ -help          this brief help message
+ -man           show detailed documentation with examples
+ -config FILE   read configuration from a file (default: picastore.conf)
+ -delete        delete records instead of importing them
+ -force         do not ask before deleting
+ -from FILE     read files to import from a file (default: - for STDIN)
+ -get           download records instead of uploading (implies -write)
+ -move          remove imported files on success
+ -log FILE      print import information to a file (default: - for STDIN)
+ -quiet         suppress additional status messages and output
+ -ppn           update with the PPN of a record if no PPN is given
+ -version       print version of this script and exit
+ -write         write back the resulting record
+
+=head1 DESCRIPTION 
+
+This script can be used to import or delete PICA records in a L<PICA::Store>,
+for instance via webcat (L<PICA::SOAPClient>) or into a SQLite database
+(L<PICA::SQLiteStore>). By default only the first PICA record of each file
+that you specify is imported. 
+
+The PICA+ files to be imported can be specified either as command line 
+parameters or listed in another file (option -from) or you type in the
+file names on request. It is recommended to delete sucessfully imported
+files (with option -move) so you do not import them twice. If options are
+read from another file, you must specify PPN and filename seperated by 
+space (update) or just a filename on each line. To update via command line
+you must specify a PPN (with option -ppn) and a record file or state
+with option -update that the PPN is taken from the record. 
+
+On import or update picaimport prints the PPN and filename of each record
+in one line - you can use this output format as input format with option
+-from to later update the records.
+
+To connect to a PICA store you must provide a config file via the -config
+parameter or the PICASTORE environment variable - or name it C<picastore.conf>
+and put it in the current directory. The config file can contain all 
+parameters that may be provided to the L<PICA::Store> constructor.
+At least there must be one of the following parameters:
+
+  webcat = URL
+  SQLite = FILE
+
+Other known configuration parameters include dbsid, userkey, password,
+and language.
+
+=head1 EXAMPLES
+
+Import the first PICA+ record in C<myrecord.pica> to the store specified in 
+the default configuration file (C<picastore.conf>).
+
+  picaimport myrecord.pica
+
+Update record C<000073067> in the store specified in the default configuration
+file with the first PICA+ record in C<myrecord.pica>.
+
+  picaimport -conf mydb.conf 000073067=title1.pica
+
+Get the record C<000073067> from the default store and write it to C<down.pica>
+
+  picaimport -get 000073067=down.pica
+
+Import the first PICA+ record in C<myrecord.pica> to the default store and
+write back the resulting record to myrecord.pica.
+
+  picaimport -write myrecord.pica
+
+Import all files listed in C<newrecords> and delete imported files on success
+
+  picaimport -from newrecords -move
+
+=head1 AUTHOR
+
+Jakob Voß <voss@gbv.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Verbundzentrale Goettingen (VZG) and Jakob Voss.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

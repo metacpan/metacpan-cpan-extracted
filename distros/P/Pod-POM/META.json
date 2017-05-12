@@ -1,0 +1,64 @@
+{
+   "abstract" : "POD Object Model",
+   "author" : [
+      "Andy Wardley <abw@kfs.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Pod-POM",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "Getopt::Std" : "0",
+            "Text::Wrap" : "0",
+            "constant" : "0",
+            "lib" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Slurper" : "0.004",
+            "Scalar::Util" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0",
+            "Text::Diff" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Pod-POM",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Pod-POM.git",
+         "web" : "https://github.com/neilb/Pod-POM"
+      }
+   },
+   "version" : "2.01"
+}
+

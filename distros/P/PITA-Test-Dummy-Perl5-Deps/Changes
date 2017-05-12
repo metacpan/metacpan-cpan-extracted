@@ -1,0 +1,10 @@
+Revision history for PITA-Test-Dummy-Perl5-Deps
+
+1.03 Sun  1 Jul 2007
+	- Updating for the PITA 0.40 release
+
+1.01 Tue  2 Jan 2007
+	- Removed 99_author.t that was dependant on Test::More
+
+1.00 Sat 17 Jun 2006
+	- First (and probably only) version

@@ -1,0 +1,53 @@
+---
+abstract: 'Injects content from textfiles transformed with Stenciller'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Pod::Elemental: '0'
+  Pod::Elemental::Transformer::Pod5: '0'
+  Test::Differences: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Iller version 0.1300, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Elemental-Transformer-Stenciller
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Pod::Elemental::Transformer::Stenciller:
+    file: lib/Pod/Elemental/Transformer/Stenciller.pm
+    version: '0.0300'
+requires:
+  Carp: '0'
+  Module::Load: '0'
+  Moose: '2.1400'
+  MooseX::AttributeDocumented: '0.1003'
+  Path::Tiny: '0'
+  Pod::Elemental::Transformer: '0'
+  Stenciller: '0.1302'
+  Stenciller::Utils: '0'
+  Types::Path::Tiny: '0'
+  Types::Standard: '1.000000'
+  Types::Stenciller: '0'
+  namespace::autoclean: '0.24'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/Csson/p5-Pod-Elemental-Transformer-Stenciller/issues
+  homepage: https://metacpan.org/release/Pod-Elemental-Transformer-Stenciller
+  repository: https://github.com/Csson/p5-Pod-Elemental-Transformer-Stenciller.git
+version: '0.0300'

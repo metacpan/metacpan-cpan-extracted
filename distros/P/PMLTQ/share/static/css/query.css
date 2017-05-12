@@ -1,0 +1,458 @@
+pre, textarea {
+  font-family: "Lucida Console", "Monospace", "Bitstream Vera Sans Mono"
+}
+
+body {
+  font-family: Arial, Sans Serif, sans;
+  font-size: 10pt;
+  padding: 2pt 5pt 10pt 5pt;
+}
+
+body.tree-results {
+  overflow: hidden; /* no scrollbars */
+}
+
+.query {
+  text-align: center;
+}
+
+.query-area {
+    width: 100%;
+    display:block;
+    float: none;
+}
+
+fieldset {
+    border: 0pt;
+    padding: 0pt;
+}
+
+.query-area textarea {
+    width: 98%;
+    padding: 5pt;
+    border: 3px solid #cccccc;
+    padding: 5px;
+}
+
+.query-area textarea:focus {
+    border: 3px solid #aaaaff;
+}
+
+.toolbar {
+  clear: both;
+  width: 100%;
+  background: #f7f7ff; /* #eeeeff; */
+  padding: 0pt;
+  margin-bottom: 0pt;
+  border: #aaaaff solid 1px;
+}
+
+.toolbar table {
+  width: 100%;
+}
+
+.results table {
+  max-width: 100%;
+}
+
+
+.toolbar-controls {
+  width: 100%;
+  margin: 2pt;
+}
+
+.results {
+    margin-top: 10pt;
+    text-align: left;
+    width: 100%;
+}
+
+.zoom-buttons {
+    margin-left: 6pt;
+}
+
+.qnodes {
+  font-size: 8pt;
+  font-family: "Arial Narrow", inherit;
+  margin: 3pt 0pt 5pt 0pt;
+  line-height: 17pt;
+}
+
+.qnode, .qnode-current {
+  white-space: nowrap;
+  color: #ffffff;
+  background: #ccccff;
+  font-weight: bold;
+  padding: 1pt 3pt 1pt 3pt;
+  margin: 0pt 1pt 0pt 0pt;
+  border: #aaaaff solid 1px;
+}
+
+.qnode a {
+  color: gray;
+  text-decoration: none;
+}
+
+.qnode-current {
+  color: black;
+}
+.qnode-current a {
+  color: blue;
+  text-decoration: underline;
+}
+
+h1,h2,h3,h4 {
+  text-align: center;
+  font-weight: bold;
+}
+
+h1 {
+    margin: 0pt 0pt 2pt 0pt;
+    font-size: 14pt;
+}
+h2 {
+    font-size: 11pt;
+}
+h3 {
+    font-size: 10.5pt;
+}
+h4 {
+    font-size: 10pt;
+}
+
+.subtitle {
+  font-size: 11pt;
+  font-weight: bold;
+}
+
+
+.top {
+  text-align: left;
+  width: 100%;
+  margin-top: 6pt;
+  margin-bottom: 6pt;
+}
+
+a img {
+  border: none;
+}
+
+.top a {
+  color: darkblue;
+  font-weight: bold;
+  text-decoration: none;
+  padding: 1pt 3pt 2pt 3pt;
+  background: #eeeeff;
+  border: #aaaaff solid 1px;
+}
+
+.subtitle a {
+  color: black;
+  text-decoration: none;
+  border: none;
+  padding: 0pt;
+  background: none;
+}
+
+.past_queries, .service {
+  padding: 6pt 3pt 5pt 3pt;
+  background: #f7f7ff;
+  border: #aaaaff solid 1px;
+  margin-top: 1pt;
+  margin-bottom: 5pt;
+}
+.content {
+  margin-top: 0pt;
+  clear: both;
+}
+
+.service * {
+  text-align: left;
+  margin: 0pt;
+}
+
+.service .abstract {
+  margin-top: 5pt;
+}
+
+.past_queries_head {
+  margin-bottom: 6pt;
+}
+
+.past_queries pre, .abstract {
+  background: #fefefe;
+  padding: 5pt;
+  margin: 0pt;
+  border: #aaaaff solid 1px;
+}
+
+.past_queries a, .service a {
+  color: darkblue;
+  font-weight: bold;
+  text-decoration: none;
+  margin-right: 3pt;
+  padding: 1pt 3pt 2pt 3pt;
+  background: #eeeeff;
+  border: #aaaaff solid 1px;
+}
+
+
+.abstract a {
+  color: darkblue;
+  font-weight: normal;
+  margin: 0pt;
+  padding: 0pt;
+  border: none;
+  background: inherit;
+}
+
+.abstract a:hover {
+  text-decoration: underline;
+}
+
+#tooltip, .tooltip {
+  text-align: left;
+  visibility: hidden;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 10px;
+  background: #ffffbb;
+  border: black solid 1pt;
+  z-index: 200;
+}
+
+.tree {
+ text-align: left;
+ background: white;
+ /*    overflow: auto; */
+ border: black solid 1px; /* Note: unfortunatelly, this makes Konqueror 4 hide text in SVG due to a bug */
+}
+
+.desc {
+    font-family: Arial Unicode MS, Arial, Sans Serif, sans;
+    font-style: italic;
+}
+
+#desc-content {
+  max-height: 80pt;
+  overflow: auto;
+}
+
+.svg-title {
+  color: darkblue;
+  direction: ltr;
+  unicode-bidi: bidi-override;
+  color: #a0a0a0;
+}
+
+.result-info {
+    text-align: left;
+    padding: 0 5pt 6pt 5pt;
+}
+
+.result-info a {
+    text-decoration: none;
+}
+
+.zoom-button {
+ /* width: 12pt;
+  height: 12pt; */
+  font-size: 8pt;
+}
+
+.qmenubar {
+  padding: 0pt;
+  margin: 0pt;
+}
+
+.tree {
+    position: relative;
+}
+.loading {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    vertical-align: bottom;
+    text-align: center;
+    z-index: 2;
+}
+.loading-bar {
+    position: absolute;
+    left: 20pt;
+    top: 64px;
+    vertical-align: bottom;
+    z-index: 2;
+}
+
+/* hide and show */
+
+.hs .hbody, .hs .hide, .hh .show { display: inline }
+.hh .hbody, .hh .hide, .hs .show { display: none }
+.service .hide, .service .show {
+  color: black;
+  font-weight: normal;
+  text-decoration: none;
+  margin: 0pt;
+  padding: 0pt;
+  background: inherit;
+  border: none;
+}
+
+#lang-tools-menu {
+  font-size: 7pt;
+}
+
+.handle {
+    text-align:right;
+    background-color: #aaaaff;
+    padding-right: 6pt;
+    padding-bottom: 2pt;
+}
+
+.handle a {
+    color:white;
+    font-family: "monospace";
+    text-decoration: none;
+    font-weight: bold;
+}
+
+#query_tree iframe {
+  border: none;
+  padding: 10px;
+}
+
+#query_tree {
+  position: absolute;
+  z-index: 150;
+  display: block;
+  border: #aaaaff solid 3pt;
+  padding: 0px;
+  background: white;
+}
+
+.framed, .note , .warning, .tip{ 
+   background-color: #ffffcc;
+   border: dashed 1pt;
+   padding: 6pt 12pt 6pt 12pt;
+   margin: 0 0 0 0;
+}
+
+h2 {
+	color: #020293; /* 1-4 */
+}
+
+.programlisting {
+	color: #050530;
+	background: #d5dee6;
+        padding: 4pt 4pt 4pt 4pt;
+}
+
+#quick_intro h2 {
+    text-align: left;
+    font-size: 18pt;
+}
+#quick_intro h3 {
+    text-align: left;
+}
+#quick_intro {
+    max-width: 560pt;
+}
+#quick_intro a {
+	color: #0E6161; /* 3-1 *//* vyjimka-blizsi */
+	text-decoration: none;
+}
+
+#quick_intro a:hover {
+	background: #C8FFE8; /* 3-3 */
+}
+
+#n2p-dlg {
+  /* position: relative;  */
+  display: none;
+  text-align: left;
+  padding: 10px;
+/*  left: 10%;
+  top: 10px;
+  width: 80%; */
+  background: #eaeaea;
+  border: 3px solid #cccccc;
+  z-index: 200;
+}
+
+.n2p-col-cb {
+  width: 0pt;
+}
+.odd-row {
+  background: #f0f0f0;
+}
+#n2p-query {
+  padding: 10px;
+  border: 1px solid #cccccc;
+  background: white;
+  max-height: 160pt;
+  overflow: auto;
+}
+#n2p-hint {
+    padding: 10px;
+}
+#n2p-hint p {
+    padding: 0px;
+    margin: 0px;
+}
+#n2p-buttons{
+  padding: 10px;
+}
+.n2p-disabled {
+  color: gray;
+}
+
+.n2p-normal {
+  color: black;
+}
+
+a.checkbox, a.uncheckbox {
+  cursor: default;
+  text-decoration: none;    
+  color: black;
+  font-weight: bold;
+  text-decoration: none;
+  /* padding: 1pt 1pt 1pt 1pt */
+  margin-right: 6pt;
+  line-height: 105%;
+  background: #eeeeff;
+  border: #aaaaff solid 1px;
+}
+a.uncheckbox {
+  color: #eeeeff;
+}
+
+span.guibutton {
+  color: black;
+  background: #f0f0f0;
+  border: 1px solid;
+  border-color: #d0d0d0 #505050  #606060 #c0c0c0;
+  font-size: 85%;
+  padding: 1pt;
+  line-height: 200%;
+  vertical-align: middle;
+}
+
+span.guimenu, span.guimenuitem {
+  background-color: #eeeeff;
+  border: #aaaaff solid 1px;
+  color: darkblue;
+  padding: 1pt;
+  line-height: 200%;
+}
+
+div.error {
+  background-color: #ffccaa;
+  margin-left: 10%;
+  margin-right: 10%;
+  margin-top: 10pt;
+  padding: 8pt 16pt 16pt 16pt;
+}
+div.error > hr {
+  display: none;
+}

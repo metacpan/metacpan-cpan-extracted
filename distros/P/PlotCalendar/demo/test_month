@@ -1,0 +1,151 @@
+#!/usr/bin/perl -w
+
+#		test Month.pm
+
+	#push (@INC, '/home/ajackson/bin/lib/'); # include my personal modules
+
+	use strict;
+	use Carp;
+	use POSIX;
+
+	require PlotCalendar::Month;
+
+	my ($mon, $year) = (3,1998);
+
+#---------------------------------------- normal month
+
+	my $month = PlotCalendar::Month->new($mon, $year);
+
+	#	 These are values with default settings, so these are optional
+
+	# global values, to be applied to all cells
+
+	$month -> size(700,700); # width, height in pixels
+	$month -> font('14','10','8');
+	$month -> cliptext('yes');
+	$month -> firstday('Sun'); # First column is Sunday
+	#$month -> artwork('/home/ajackson/public_html/cgi-bin/Calendar/Calendar_art3/'); 
+
+	#	arrays of values, if not an array, apply to all cells, if an array
+	#  apply to each cell, indexed by day-of-month
+
+	my @text;
+	my @daynames;
+	my @nameref;
+	my @bgcolor;
+	my @colors = ('WHITE','#33cc00','#FF99FF','#FF7070','#FFB0B0',);
+	my (@textcol,@textsize,@textstyle,@textref);
+	my @style = ('i','u','b',);
+	my @url;
+
+
+	for (my $i=1;$i<=31;$i++) {
+		$daynames[$i] = "Day number $i";
+		$nameref[$i] = "<A HREF=\"http://www.$i.ca\">";
+		$bgcolor[$i] = $colors[$i%5];
+		@{$text[$i]} = ("Text 1 for $i","Second $i text","$i bit of text",);
+		@{$textref[$i]} = ("<A HREF=\"http://www.$i.com/\">","Second $i text","<A HREF=\"http://www.$i.net/\">",);
+		@{$textcol[$i]} = ($colors[($i+1)%5],$colors[($i+2)%5],$colors[($i+3)%5]);
+		@{$textsize[$i]} = ("8","10","8",);
+		@{$textstyle[$i]} = @style;
+		@style = reverse(@style);
+		$url[$i] = '<A href="http://some.org/name_number_' . $i . '">';
+	}
+
+	$month -> fgcolor('BLACK',); #  Global foreground color
+	$month -> bgcolor(@bgcolor); # Background color per day
+	$month -> styles('b','bi','ui',); # Global text styles
+
+	#	Comments
+
+	my @prefs = ('before','after','after');
+	my @comments = (['Comment one'],["Comment two","and so on"],['Comment three']);
+	my @comcol = qw(b g b);
+	my @comstyle = qw(n b bi);
+	my @comsize = qw(8 10 14);
+
+	$month->comments(\@prefs,\@comments,\@comcol,\@comstyle,\@comsize);
+
+	#$month -> htmlref(@url);
+
+	#my @fgcolor = $month->fgcolor;
+	#my @bgcolors = $month->bgcolor;
+	#print "@fgcolor\n";
+	#print "@bgcolors\n";
+
+	$month -> dayname(@daynames);
+	$month -> nameref(@nameref);
+	#my @dayn = $month -> dayname;
+	#print "@dayn\n";
+
+	$month -> text(@text);
+	$month -> textcolor(@textcol);
+	$month -> textsize(@textsize);
+	$month -> textstyle(@textstyle);
+	$month -> textref(@textref);
+	#my @txt = $month -> text;
+	#foreach my $txt (@txt) {
+	#	 print @{$txt},"\n";
+	#}
+
+	#	global HTML only options
+	
+	#$month -> htmlexpand('yes');
+
+	#	These values are defaulted to blank
+
+	#	Split the thing in two?
+
+	#$day -> split('yes');
+
+	#	So, what do we have now?
+
+	my $text = $month -> getascii;
+
+	my $html = $month -> gethtml;
+
+	#my $tk = $month -> gettk;
+
+	print "<HTML><BODY>\n";
+	#print "<TABLE BORDER=1><TR>\n";
+	print $html;
+	#print $text;
+	#print "</TR></TABLE>\n";
+
+#---------------------------------------- tiny month
+
+	my $tinymonth = PlotCalendar::Month->new($mon, $year);
+
+	#	 These are values with default settings, so these are optional
+
+	# global values, to be applied to all cells
+
+	$tinymonth -> size(80,80); # width, height in pixels
+	$tinymonth -> font('8','6','6');
+	$tinymonth -> cliptext('yes');
+	$tinymonth -> firstday('Mon'); # First column is Monday
+
+	#	arrays of values, if not an array, apply to all cells, if an array
+	#  apply to each cell, indexed by day-of-month
+
+	@colors = ('WHITE','#33cc00','#FF99FF','#FF7070','#FFB0B0',);
+
+	for (my $i=1;$i<=31;$i++) {
+		$nameref[$i] = "<A HREF=\"http://www.$i.ca\">";
+		$bgcolor[$i] = $colors[$i%5];
+		$url[$i] = '<A href="http://some.org/name_number_' . $i . '">';
+	}
+
+	$tinymonth -> fgcolor('BLACK',); #  Global foreground color
+	$tinymonth -> bgcolor(@bgcolor); # Background color per day
+
+	$tinymonth -> htmlref(@url);
+	$tinymonth -> monthref('<A HREF="http://www.lookithere.org/the_whole_month">');
+
+	#	So, what do we have now?
+
+	$html = $tinymonth -> gethtml;
+
+	print "<HR>\n";
+	print $html;
+

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Perl bindings for libpkgconf",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PkgConfig-LibPkgConf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/plicease/PkgConfig-LibPkgConf/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/PkgConfig-LibPkgConf",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/plicease/PkgConfig-LibPkgConf.git",
+         "web" : "http://github.com/plicease/PkgConfig-LibPkgConf"
+      },
+      "x_IRC" : "irc://irc.perl.org/#native",
+      "x_MailingList" : "https://groups.google.com/forum/#!forum/perl5-alien"
+   },
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.27400_01"
+}

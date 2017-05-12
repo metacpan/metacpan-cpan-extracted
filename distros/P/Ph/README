@@ -1,0 +1,20 @@
+
+    Ph.pm.
+    Copyright 1998 Garrett D'Amore <garrett@yavin.org>
+
+    This package is distributed under the terms of the perl
+    Artistic License, a copy of which is included in this distribution.
+
+    This is a module for accessing CCSO-style Ph nameservers.
+    These directory servers are common at many universities, and
+    certain nameless mail applications come with builtin clients.
+
+    This module should install pretty much like any other Perl5 module.
+    No compiler is required.
+
+    1) run "perl Makefile.PL"
+    2) run "make"
+    3) run "make install"
+    4) see the internal pod documentation for details about using Ph.pm.
+     
+    Garrett D'Amore

@@ -1,0 +1,44 @@
+Padre-Plugin-Moose
+
+This plugin enables Padre to syntax highlight Moose, Mouse and MooseX::Declare
+keywords. It also features a user-friendly assistant dialog to generate code for
+classes, roles and their members. The dialog contains also Moose online
+references.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Padre::Plugin::Moose
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Padre-Plugin-Moose
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Padre-Plugin-Moose
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Padre-Plugin-Moose
+
+    Search CPAN
+        http://search.cpan.org/dist/Padre-Plugin-Moose
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 Ahmad M. Zawawi
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,29 @@
+---
+name: Padre-Plugin-HTML
+version: 0.09
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+abstract: L<Padre> and HTML
+license: perl
+resources:
+  homepage: http://padre.perlide.org/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-HTML/
+build_requires:
+  HTML::Lint: 0
+  HTML::Tidy: 0
+  Padre: 0.26
+  Test::More: 0
+  WebService::Validator::HTML::W3C: 0
+  XML::XPath: 0
+provides:
+  Padre::Document::HTML:
+    file: lib/Padre/Document/HTML.pm
+    version: 0.23
+  Padre::Plugin::HTML:
+    file: lib/Padre/Plugin/HTML.pm
+    version: 0.09
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

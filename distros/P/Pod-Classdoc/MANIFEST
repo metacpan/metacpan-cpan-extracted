@@ -1,0 +1,15 @@
+Changes.txt
+TODO.txt
+Makefile.PL
+MANIFEST
+t/01load.t
+t/02classdoc.t
+t/03project.t
+t/lib/DBI.pm
+t/lib/DBI.pod
+lib/Pod/Classdoc.pm
+lib/Pod/Classdoc.pod
+lib/Pod/Classdoc/Project.pm
+lib/Pod/Classdoc/Project.pod
+bin/mkprojdocs
+bin/pod2classdocs

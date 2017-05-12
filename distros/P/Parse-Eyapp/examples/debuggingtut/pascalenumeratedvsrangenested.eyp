@@ -1,0 +1,112 @@
+#obsolete
+%{
+  my $ID = qr{[A-Za-z][A-Za-z0-9_]*};         
+  my ($PREFIX, $POSTFIX);
+  {
+     use Regexp::Grammars;
+     qr{
+         <grammar: ConflictSolver>
+
+         <rule: Prefix>  TYPE ID = \( ID$
+         <rule: Postfix> \G ( , <id> )* \) ;
+         <token: id>     [A-Za-z_][A-Za-z0-9_]*
+     }x;
+
+    $PREFIX = qr{
+         <Prefix>
+         <extends: ConflictSolver>
+    }x;
+
+    $POSTFIX = qr{
+         <Postfix>
+         <extends: ConflictSolver>
+    }x;
+  }
+%}
+
+%conflict rangeORenum {
+  my $pre = join '', $self->YYSymbolStack("TYPE",-1);
+  if ($pre =~ /$PREFIX$/ && /$POSTFIX/) { $self->YYSetReduce([',', ')'], 'ID:ENUM' ); }
+  else { $self->YYSetReduce([',', ')'], 'ID:RANGE' ); }
+}
+
+%token TYPE = /type/
+%token ID   = /([A-Za-z][A-Za-z0-9_]*)/
+%token NUM  = /(\d+)/
+
+%left   ','
+%left   '-' '+'
+%left   '*' '/'
+
+%expect-rr 2
+
+%%
+
+type_decl : TYPE ID '=' type ';'
+;
+
+type : 
+      %name ENUM
+      '(' id_list ')'
+    | %name RANGE
+      expr '..' expr
+;
+
+id_list : 
+      %name ID:ENUM
+      ID                      %PREC rangeORenum
+    | id_list ',' ID
+;
+
+expr : '(' expr ')'   { $_[2] } /* bypass */
+    | %name PLUS     expr '+' expr
+    | %name MINUS    expr '-' expr
+    | %name TIMES    expr '*' expr
+    | %name DIV      expr '/' expr
+    | %name COMMA    expr ',' expr
+    | %name ID:RANGE
+      ID                     %PREC rangeORenum
+    | %name NUM      NUM
+;
+
+%%
+
+=head1 SYNOPSIS
+
+See 
+
+=over 2
+
+=item * File pascalenumeratedvsrange.eyp in examples/debuggintut/
+
+=item * The Bison manual L<http://www.gnu.org/software/bison/manual/html_mono/bison.html>
+
+=back
+
+Compile it with something like:
+
+      eyapp -TC pascalenumeratedvsrangenested.eyp
+
+if your Perl version is higher than 5.10, otherwise:
+
+      eyapp -T -b '/usr/bin/env perl5.10.1' -B '' pascalenumeratedvsrangenested.eyp
+
+Substitute the perl5.10.1 part 
+for whatever you have, but be sure 
+you use a version of the Perl nterpreter equal or higher than 5.10. 
+Be also sure to have installed the last version of L<Regexp::Grammars>.
+Run it with this options:
+
+    $ ./pascalenumeratedvsrangenested.pm -t -i -m 1 -c 'type e = (x, y, z);'
+
+Try also these inputs:
+
+                type e = (x) .. (y);
+                type r = (x) ..  y ;
+                type r = (x+2)*3 ..  y/2 ;
+                type e = (x, y, z);
+                type e = (x);
+                type e = (x, y, z) .. (u+v);
+
+=cut
+

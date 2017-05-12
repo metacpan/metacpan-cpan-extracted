@@ -1,0 +1,50 @@
+/**
+* Foo - The Foo class
+*
+* Synopsis:
+*     import Foo;
+*     var foo:Foo = new Foo();
+* 
+* @license
+* 
+* WTFPL - http://sam.zoy.org/wtfpl/
+* 
+* @author Joe Blow <joe@example.com>
+* 
+* @see Bar
+* 
+*/
+class Foo {
+
+/**
+* Property 1
+*/
+  var spam:Object;
+/**
+* Property 2
+*/
+  var ham:String = "1";
+/**
+* Property 3
+*/
+  var jam:String = 2;
+/**
+* Property 4
+*/
+  private static var splunge:Array;
+
+/**
+* Constructor
+*/
+   function Foo() {}
+
+/**
+* Test function
+* @param p1   a string
+* @param p2   a num
+* @returns a value
+*/
+   private static function Bar(p1:String, p2:Number):Object
+   {
+   }
+}

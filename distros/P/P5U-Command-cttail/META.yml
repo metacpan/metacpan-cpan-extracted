@@ -1,0 +1,34 @@
+---
+abstract: 'grep through the last 1000 cpan testers reports'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: P5U::Command::cttail
+name: P5U-Command-cttail
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  LWP::Simple: 0
+  P5U: 0
+  Text::sprintfn: 0
+  perl: 5.10.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=P5U-Command-cttail
+  homepage: https://metacpan.org/release/P5U-Command-cttail
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/tobyink/p5-p5u-pommand-cttail
+version: 0.001

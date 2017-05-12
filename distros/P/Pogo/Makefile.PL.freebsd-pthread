@@ -1,0 +1,21 @@
+# When you compiled GOODS using makefile.freebsd, use this.
+use ExtUtils::MakeMaker;
+
+my $argdef = '';
+for my $arg(@ARGV) {
+	$argdef .= "$arg " if $arg =~ /^-D/;
+}
+
+WriteMakefile(
+    'NAME'	=> 'Pogo',
+    'VERSION_FROM' => 'Pogo.pm', # finds $VERSION
+    'CC'	=> 'g++',
+    'CCFLAGS'	=> '-pthread',
+    'LD'	=> '$(CC)',
+    'LDDLFLAGS' => '-shared -pthread -L/usr/local/lib',
+    'LIBS'	=> '-lc_r -lg++ -lstdc++ -lgcc -L/usr/local/goods/lib -lclient',
+    'DEFINE'	=> '$argdef -DPTHREADS -D_THREAD_SAFE',
+    'INC'	=> '-I/usr/local/goods/inc',
+    'XSPROTOARG'	=> '-noprototypes',
+    'OBJECT'	=> 'Pogo.o pogomain.o pogogcls.o pogocall.o nstring.o',
+);

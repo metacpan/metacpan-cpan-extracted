@@ -1,0 +1,76 @@
+NAME
+    Perl6::Perl - $obj->perl just like $obj.perl in Perl 6
+
+SYNOPSIS
+      # As UNIVERSAL method
+      use Perl6::Perl;
+      use Foo::Bar;
+      my $baz  = Foo::Bar->new();
+      my $bazz = eval( $baz->perl ); # $bazz is a copy of $baz
+
+      # As subroutine so you can apply to non-objects
+      use Perl6::Perl qw/perl/; # explicitly import
+      perl $scalar;
+      perl \@array;
+      perl \%hash;
+      perl \*GLOB;
+      perl sub{ $_[0] + 1 };
+
+      # Ruby's p
+
+      p $complex_object;
+
+DESCRIPTION
+    In Perl 6, everything is an object and every object comes with the
+    ".perl" method that returns the "eval()"uable representation thereof.
+    This module does just that.
+
+    Since Perl 5 is already shipped with Data::Dumper, this module makes use
+    of it; In fact "$obj->perl" is just a wrapper to "Dumper($obj)" with
+    options slightly different from Data::Dumper's default.
+
+  p as in Ruby.
+    This module also comes with "p", which is analogous to that of ruby; It
+    is simply " sub p{ print perl(@_), "\n" }". But you save a lot of key
+    strokes -- even more concise than " say @_.perl ".
+
+    Though p is not Perl6's spec, I couldn't resist adding this to this
+    module because so many people envy Ruby for it :).
+
+  Data::Dumper options
+    Perl6::Perl uses the following values as default:
+
+    Deparse
+      1 so you can serialize coderef.
+
+    Terse
+      1 so no "$VAR1 = " appears.
+
+    Useqq
+      1 so you can safely inspect binary data as well as Unicode characters.
+
+    Indent
+      2 if the object is a coderef, 0 otherwise.
+
+    You can override these by feeding Data::Dumper options as follows;
+
+      $obj->perl(purity => 1); # if the object contains circular reference.
+
+    Note you can use all lowercaps here.
+
+  EXPORT
+    None by default. "perl" and "p" are exported on demand.
+
+SEE ALSO
+    Data::Dumper, <http://dev.perl.org/perl6/>
+
+AUTHOR
+    Dan Kogai, <dankogai@dan.co.jp>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Dan Kogai
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

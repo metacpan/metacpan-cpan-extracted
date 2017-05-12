@@ -1,0 +1,108 @@
+NAME
+
+    Plugin::Simple - Load plugins from files or modules.
+
+SYNOPSIS
+
+        use Plugin::Simple;
+    
+        # load a plugin module from a file
+    
+        @plugins = plugins('/path/to/MyModule.pm');
+    
+        # load all modules under '__PACKAGE__::Plugin' namespace
+    
+        my @plugins = plugins(); # call in scalar context to retrieve the first one
+    
+        # load all plugins under a specific namespace (note the trailing ::)
+    
+        @plugins = plugins('Any::Namespace::');
+    
+        # load/return only the plugins that can perform specific functions
+    
+        @plugins = plugins(can => ['foo', 'bar]); # foo and bar
+    
+        # instead of importing 'plugins()', change the name:
+    
+        use Plugin::Simple sub_name => 'foo';
+        @plugins = foo(...);
+    
+        # set a default fallback plugin if searching turns up nothing
+    
+        use Plugin::Simple default => 'My::Module::Plugin::DefaultPlugin'
+    
+        # do something with the plugins
+    
+        for my $plugin (@plugins){
+            $plugin->plugin_func(@args);
+        }
+    
+        # works in OO modules too simply by using it
+    
+        my @plugins = $self->plugins();
+
+DESCRIPTION
+
+    There are many plugin modules available on the CPAN, but I wrote this
+    one just for fun. It's very simple, extremely lightweight, and is
+    extremely minimalistic in what it does.
+
+    It searches for modules in installed packages or non-installed files,
+    and loads them (without string eval). You can optionally have us return
+    only the plugins that can() perform a specific task.
+
+LOAD OPTIONS
+
+    By default, we force plugins() into your namespace. To change this
+    name:
+
+        use Plugin::Simple sub_name => 'other_name';
+
+    If searching fails, you can ensure a default known plugin gets loaded:
+
+        use Plugin::Simple default => 'My::Plugin';
+
+    To use both options, simply separate them with a comma.
+
+FUNCTIONS/METHODS
+
+    None. We simply install a plugin() function within the namespace of the
+    package that used us.
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+ CONTRIBUTING
+
+    Any and all feedback and help is appreciated. A Pull Request is the
+    preferred method of receiving changes
+    (https://github.com/stevieb9/p5-plugin-simple), but regular patches
+    through the bug tracker, or even just email discussions are welcomed.
+
+BUGS
+
+    https://github.com/stevieb9/p5-plugin-simple/issues
+
+SUPPORT
+
+    You can find documentation for this script and module with the perldoc
+    command.
+
+        perldoc Plugin::Simple;
+
+SEE ALSO
+
+    There are far too many plugin import modules on the CPAN to mention
+    here.
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2016 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

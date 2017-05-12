@@ -1,0 +1,247 @@
+<HTML>
+<HEAD>
+<TITLE>PlugIn - Create and Access TAR.GZ files containing executible Perl code for dynamic execution</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#ABSTRACT">ABSTRACT</A>
+	<LI><A HREF="#CREDITS">CREDITS</A>
+	<LI><A HREF="#HISTORY">HISTORY</A>
+	<LI><A HREF="#INSTALLATION">INSTALLATION</A>
+	<LI><A HREF="#DEPENDENCIES">DEPENDENCIES</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#RETURN_VALUES">RETURN VALUES</A>
+	<LI><A HREF="#FUNCTIONS">FUNCTIONS</A>
+	<UL>
+
+		<LI><A HREF="#PlugIn_Open">PlugIn::Open</A>
+		<LI><A HREF="#PlugIn_OpenEval">PlugIn::OpenEval</A>
+		<LI><A HREF="#PlugIn_Read">PlugIn::Read</A>
+		<LI><A HREF="#PlugIn_Write">PlugIn::Write</A>
+		<LI><A HREF="#PlugIn_WriteEval">PlugIn::WriteEval</A>
+		<LI><A HREF="#PlugIn_EvalIt">PlugIn::EvalIt</A>
+	</UL>
+
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="SYNOPSIS">SYNOPSIS</A></H1>
+<P>
+<PRE>  use PlugIn;
+  my $fileswritten = Write('prog.dat', 'prog1.pl', 'prog2.pl');
+  print &quot;$fileswritten files written...\n&quot;;
+  my %filesread = Read('prog.dat', 1);
+  Open('prog.dat', 1);
+  OpenEval('prog.dat');
+</PRE>
+<P>
+<HR>
+<H1><A NAME="ABSTRACT">ABSTRACT</A></H1>
+<P>
+PlugIn is a convienient way to store 'required' perl scripts in a single
+accessible file. It is also a way to obscure source code from prying eyes
+by adding your own encryption or obscurement routines.
+
+<P>
+Since 'required' modules are accessed at run-time, PlugIn can also be used
+to dynamically configure perl scripts that have been compiled using one of
+the commercial Perl compilers. This gives you the ability to create a
+free-standing EXE, but keep it dynamically configurable through the use of
+a plug-in data file without the need for re-compilation and distribution!
+
+<P>
+The current version of PlugIn is available at:
+
+<P>
+<PRE>  <A HREF="http://home.earthlink.net/~bsturner/perl/index.html">http://home.earthlink.net/~bsturner/perl/index.html</A>
+</PRE>
+<P>
+<HR>
+<H1><A NAME="CREDITS">CREDITS</A></H1>
+<P>
+Thanks go to Indy Singh of WWW.DEMOBUILDER.COM for providing the 'eval'
+source to obscure run-time compiler messages.
+
+<P>
+<HR>
+<H1><A NAME="HISTORY">HISTORY</A></H1>
+<P>
+<PRE>  0.01 First release
+</PRE>
+<P>
+<HR>
+<H1><A NAME="INSTALLATION">INSTALLATION</A></H1>
+<P>
+This module is shipped as a basic PM file that should be installed in your
+site\lib dir. This module should work in any Perl port that has the
+Archive::Tar module.
+
+<P>
+<HR>
+<H1><A NAME="DEPENDENCIES">DEPENDENCIES</A></H1>
+<P>
+Archive::Tar must be installed for this module to function. Archive::Tar is
+used as the principle method for the creation and reading of data files.
+
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<P>
+To use this module put the following line at the beginning of your script:
+
+<P>
+<PRE>        use PlugIn;
+</PRE>
+<P>
+Any one of the functions can be referenced by:
+
+<P>
+<PRE>        var = PlugIn::function
+</PRE>
+<P>
+<HR>
+<H1><A NAME="RETURN_VALUES">RETURN VALUES</A></H1>
+<P>
+Unless otherwise specified, all functions return undef if unsuccessful and
+non-zero data if successful.
+
+<P>
+<HR>
+<H1><A NAME="FUNCTIONS">FUNCTIONS</A></H1>
+<P>
+The following functions are available, but not exported.
+
+<P>
+<HR>
+<H2><A NAME="PlugIn_Open">PlugIn::Open</A></H2>
+<P>
+<PRE>        PlugIn::Open($file, $optswitch);
+</PRE>
+<P>
+Opens a data file (TAR.GZ), requires it, and then deletes the extracted
+files by default. The code in each required file is automatically executed
+and included subroutines are available.
+
+<P>
+<PRE>        $file is the filename of the data file to be opened
+        $optswitch is an optional boolean switch to prevent deletion of the extracted files
+</PRE>
+<P>
+<HR>
+<H2><A NAME="PlugIn_OpenEval">PlugIn::OpenEval</A></H2>
+<P>
+<PRE>        PlugIn::OpenEval($file, $optswitch);
+</PRE>
+<P>
+Opens a data file (TAR.GZ), evaluates it, and then deletes the extracted
+files by default. The code in each required file is automatically executed
+and included subroutines are available. The evaluation routine should hide
+run-time compiler messages.
+
+<P>
+<PRE>        $file is the filename of the data file to be opened
+        $optswitch is an optional boolean switch to prevent deletion of the extracted files
+</PRE>
+<P>
+<HR>
+<H2><A NAME="PlugIn_Read">PlugIn::Read</A></H2>
+<P>
+<PRE>        %hash = PlugIn::Read($file, $optswitch);
+</PRE>
+<P>
+Opens a data file (TAR.GZ), extracts the contents, and then deletes them by
+default. The code is returned in the specified hash.
+
+<P>
+<PRE>        %hash is the returned data with the keys listed as the extracted filename
+        $hash{filename} is the contents of the specified extracted file
+</PRE>
+<P>
+<PRE>        $file is the filename of the data file to be opened
+        $optswitch is an optional boolean switch to prevent deletion of the extracted files
+</PRE>
+<P>
+Read is provided as an accessor method if you want to add your own
+processing to the data before requiring it. The data could be encrypted or
+otherwise obscured.
+
+<P>
+<HR>
+<H2><A NAME="PlugIn_Write">PlugIn::Write</A></H2>
+<P>
+<PRE>        @list = PlugIn::Write($datfile, @files);
+        $files = PlugIn::Write($datfile, @files);
+</PRE>
+<P>
+Creates a new data file (TAR.GZ), with the specified list of files.
+
+<P>
+<PRE>        @list - in list context it returns the names of files added to the data file
+        $files - in scalar context it returns the number of files added to the data file
+</PRE>
+<P>
+<PRE>        $datfile is the name of the data file to be created
+        @files is the list of file to be added to the archive
+</PRE>
+<P>
+If you wish to store encrypted or obscured code, the input files must
+already be in this condition.
+
+<P>
+<HR>
+<H2><A NAME="PlugIn_WriteEval">PlugIn::WriteEval</A></H2>
+<P>
+<PRE>        @list = PlugIn::WriteEval($datfile, @files);
+        $files = PlugIn::WriteEval($datfile, @files);
+</PRE>
+<P>
+Before the data file is created, each file in the filelist is first
+evaluated for errors. If all files evaluate successfully then a new data
+file (TAR.GZ) is created. Files are evaluated through the use of the
+PlugIn::EvalIt function.
+
+<P>
+<PRE>        @list - in list context it returns the names of files added to the data file
+        $files - in scalar context it returns the number of files added to the data file
+</PRE>
+<P>
+<PRE>        $datfile is the name of the data file to be created
+        @files is the list of file to be added to the archive
+</PRE>
+<P>
+<HR>
+<H2><A NAME="PlugIn_EvalIt">PlugIn::EvalIt</A></H2>
+<P>
+<PRE>        PlugIn::EvalIt(@files);
+</PRE>
+<P>
+The passed data is evaluated using Perl's 'eval' function and returns true
+only if all data passes. While this serves to provide some quality
+assurance, it also servers to hide run-time compiler messages in the
+commercial Perl to EXE compilers.
+
+<P>
+<PRE>        @files is the list of files to be evaluated
+</PRE>
+<P>
+Based on code by Indy Singh of WWW.DEMOBUILDER.COM (Perl2EXE)
+
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+Brad Turner ( <EM>bsturner@sprintparanet.com</EM> ).
+
+</BODY>
+
+</HTML>

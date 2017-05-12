@@ -1,0 +1,45 @@
+
+
+{ sub consumer {
+         my $text = shift;
+         my $closure = sub { substr $text, 0, length($text) - 
+length($_[0]) }
+} }
+
+start : entry(s) { $::res }
+
+entry :
+           comment
+         | def
+         | <error>
+
+def : <rulevar: local $p_cons>
+def : <rulevar: local $p_text>
+
+# The // skips initial whitespace so it won't end up in $p_text
+
+def :
+     // { $p_cons = consumer($text) } phrase { $p_text = 
+$p_cons->($text) }
+     '=' meanings ';'
+     { $::res->{$p_text} = $item{meanings} }
+
+comment : /#.*(?=\n)/m
+
+phrase  : ident(s)
+
+ident   : /[\w&\.'-]+/
+
+meanings : meaning(s /:/)
+
+meaning : <rulevar: local $m_cons>
+meaning : // { $m_cons = consumer($text) } element(s /,?/) 
+{ $m_cons->($text) }
+
+element : alternation(s /\|/)
+
+alternation : expr(s /[+>]/)
+
+expr : /!?/ term
+
+term : ident '(' meaning ')' | ident

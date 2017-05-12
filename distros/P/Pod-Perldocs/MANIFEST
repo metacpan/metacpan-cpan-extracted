@@ -1,0 +1,10 @@
+bin/perldocs
+INSTALL
+lib/Pod/Perldocs.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+Changes
+Build.PL
+t/use.t
+META.yml                                 Module meta-data (added by MakeMaker)

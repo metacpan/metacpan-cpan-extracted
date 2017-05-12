@@ -1,0 +1,84 @@
+## name DefaultAssignment
+## failures 3
+## cut
+
+while (<$fh>) {}
+while (<DATA>) {}
+while (<<>>) {}
+
+## name DefaultAssignmentModifier
+## failures 3
+## cut
+
+1 while <$fh>;
+1 while <DATA>;
+1 while <<>>;
+
+## name DefaultAssignmentFor
+## failures 3
+## cut
+
+for (;<$fh>;) {}
+for (;<DATA>;) {}
+for (;<<>>;) {}
+
+## name DefaultAssignmentReadline
+## failures 8
+## cut
+
+while (readline $fh) {}
+while (readline($fh)) {}
+while (readline DATA) {}
+while (readline(DATA)) {}
+1 while readline $fh;
+1 while readline($fh);
+1 while readline DATA;
+1 while readline(DATA);
+
+## name DefaultAssignmentReaddir
+## failures 8
+## cut
+
+while (readdir $dh) {}
+while (readdir($dh)) {}
+while (readdir DIR) {}
+while (readdir(DIR)) {}
+1 while readdir $dh;
+1 while readdir($dh);
+1 while readdir DIR;
+1 while readdir(DIR);
+
+## name DefaultAssignmentEach
+## failures 4
+## cut
+
+while (each %hash) {}
+while (each(%hash)) {}
+1 while each %hash;
+1 while each(%hash);
+
+## name ExplicitAssignment
+## failures 0
+## cut
+
+while (my $line = <$fh>) {}
+for (;my $line = <$fh>;) {}
+1 while $line = <$fh>;
+while (my $line = <DATA>) {}
+for (;my $line = <DATA>;) {}
+1 while $line = <DATA>;
+while (my $line = <<>>) {}
+for (;my $line = <<>>;) {}
+1 while $line = <<>>;
+while (my $line = readline $fh) {}
+while (my $line = readline($fh)) {}
+1 while $line = readline $fh;
+1 while $line = readline($fh);
+while (my $dir = readdir $dh) {}
+while (my $dir = readdir($dh)) {}
+1 while $dir = readdir $dh;
+1 while $dir = readdir($dh);
+while (my $key = each %hash) {}
+while (my $key = each(%hash)) {}
+1 while $key = each %hash;
+1 while $key = each(%hash);

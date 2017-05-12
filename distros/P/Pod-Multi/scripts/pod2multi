@@ -1,0 +1,32 @@
+#!/usr/local/bin/perl
+#$Id#
+# pod2multi:  command-line utility implementing Pod::Multi::pod2multi()
+eval 'exec /usr/local/bin/perl  -S $0 ${1+"$@"}'
+  if 0;    # not running under some shell
+require 5.006001;
+use strict;
+use warnings;
+our $VERSION = 0.03;
+use Pod::Multi;
+use Carp;
+
+croak "Must supply at least one command-line argument (file containing documentation in POD format) to pod2multi"
+    unless @ARGV;
+my @args = @ARGV;
+my $pod = shift(@args);
+croak "File $pod cannot be located" unless -f $pod;
+my ($htmltitle, $rv);
+$htmltitle = scalar(@args) ? join q{ }, @args : undef;
+if (defined $htmltitle) {
+    $rv = pod2multi(
+        source => $pod,
+        options => {
+            html => {
+                title => $htmltitle,
+            },
+        },
+    );
+} else {
+    $rv = pod2multi(source => $pod);
+}
+

@@ -1,0 +1,10 @@
+PerlKDE requires KDE 1.1.1 and PerlQt-2.101 with Qt-1.4x to be installed.
+
+Look at Makefile.PL and make sure the values are reasonable. The QTDIR
+environment variable should be properly set.
+
+perl Makefile.PL
+make
+make install
+
+Good luck!

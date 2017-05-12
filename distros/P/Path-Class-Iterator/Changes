@@ -1,0 +1,21 @@
+Revision history for Perl extension Path::Class::Iterator.
+
+0.01  Tue Sep 19 22:45:52 2006
+	- original version; created by h2xs 1.23 with options
+		-XA -n Path::Class::Iterator
+
+0.03  real first CPAN release (first two had build issues)
+
+0.04  made Data::Dump optional on package $debug flag
+      added 'depth' feature
+      added P::C::I::Dir and P::C::I::File classes for next() values
+      POD cleanup
+
+0.05  * include t/05depth.t (which failed to make MANIFEST for 0.04)
+      * cleaned up tests to be more portable
+
+0.06  31 May 2013
+      * fix number of tests in t/05
+
+0.07  04 June 2013
+      * revert test change from 0.06

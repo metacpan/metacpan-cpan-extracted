@@ -1,0 +1,13 @@
+lib/Pragmatic.pm
+t/01load.t
+t/02simple.t
+t/03args.t
+t/04complex.t
+t/05isa.t
+t/06export.t
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)

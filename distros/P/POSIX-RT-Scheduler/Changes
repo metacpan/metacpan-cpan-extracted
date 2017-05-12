@@ -1,0 +1,10 @@
+Revision history for POSIX-RT-Scheduler
+
+0.003     2012-06-18 14:17:49 Europe/Amsterdam
+          Only do thread scheduling when it's available
+
+0.002     2012-04-14 11:09:14 Europe/Amsterdam
+          Add Devel::CheckLib to configure requirements
+
+0.001     2012-04-14 00:05:35 Europe/Amsterdam
+          Initial version

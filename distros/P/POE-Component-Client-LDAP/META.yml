@@ -1,0 +1,25 @@
+abstract: subclass of Net::LDAP which uses POE to speak via sockets in async mode.
+author: Jonathan Steinert
+distribution_type: module
+generated_by: Module::Install version 0.54
+license: perl
+name: POE-Component-Client-LDAP
+no_index:
+  directory:
+    - scripts
+    - inc
+    - t
+requires:
+  Convert::ASN1: 0
+  Net::LDAP: 0.31
+  Net::LDAP::ASN: 0
+  POE: 0
+  POE::Driver::SysRW: 0
+  POE::Filter::Stream: 0
+  POE::Kernel: 0
+  POE::Session: 0
+  POE::Wheel::Null: 0
+  POE::Wheel::ReadWrite: 0
+  POE::Wheel::SocketFactory: 0
+  perl: 5.6.0
+version: 0.04

@@ -1,0 +1,56 @@
+Revision history for Perl extension Plack-Middleware-Assets-RailsLike
+
+0.13 2013-09-09T08:22:21Z
+    - Updates Text::Sass::XS@0.10
+
+0.12 2013-09-09T08:09:43Z
+    - Updates POD.
+
+0.11 2013-08-05T02:10:28Z
+    - Adds shebang to ./bin/assets-railslike-precompiler.pl.
+
+0.10 2013-08-04T14:27:18Z
+    - Adds a precompiler script.
+    - Formats POD.
+
+0.09 2013-07-01T14:23:25Z
+    - Uses Text::Sass::XS.
+    - Disables caching if PLACK_ENV equals "development" and didn't pass a cache object.
+
+0.08 2013-06-12T09:45:13Z
+    - Removes an unused variable.
+    - Uses Errno::ENOENT instead of %! for speed.
+    - Creates max_age in constructor.
+    - Adds the expires option as extra argument when contents stored.
+
+0.07 2013-06-11T10:17:37Z
+    - Updates POD.
+
+0.06 2013-06-10T10:26:35Z
+    - Supports Sass and LESS files.
+
+0.05 2013-06-09T14:12:23Z
+    - Sets cache's auto purge option true.
+
+0.04 2013-06-09T10:13:26Z
+    - Updates dependencies in POD.
+    - Changes manifest file syntax. 
+
+0.03 2013-06-07T09:46:47Z
+    - Uses prepare_app method to set default values.
+    - Adds Cache-Control header to the HTTP response.
+    - Removes no strict 'refs'.
+    - Adds version string support.
+    - Adds Etag support.
+
+0.02 2013-06-06T08:50:56Z
+
+    - Adds default configuration values.
+    - Adds search_path option.
+    - Adds Expires header to the HTTP response.
+    - Enables minifier by default.
+
+0.01 2013-06-04T14:46:04Z
+
+    - original version
+

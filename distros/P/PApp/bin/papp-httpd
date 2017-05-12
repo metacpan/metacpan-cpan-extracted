@@ -1,0 +1,457 @@
+#!/opt/bin/perl
+
+# This is a very very very very very simple httpd
+# it does break the http specification in a lot of small
+# details
+
+BEGIN {
+   sub usage {
+      print <<EOF;
+$0 options....
+        --browser <path>
+	--appset <name>
+        --app <name>
+        --docroot <path>
+        --bind <hostname>[:<port>]
+EOF
+
+      exit(1);
+   }
+
+   usage unless @ARGV;
+}
+
+use IO::Socket::INET;
+
+use PApp;
+use PApp::CGI;
+
+$BUFSIZE = 16384;
+$DOCROOT = "/dev/null/";
+$BIND    = "127.0.0.1";
+
+sub mount {
+   my ($name, $handler) = @_;
+   $papp{"/$name"} = $handler;
+   $initial = $name;
+}
+
+PApp::config_eval {
+   configure PApp
+      onerr => 'va',
+      checkdeps => 1,
+      delayed => 1,
+   ;
+
+   use Getopt::Long;
+
+   Getopt::Long::Configure ("bundling", "no_auto_abbrev", "no_ignore_case");
+
+   GetOptions(
+      "appset|s:s" => sub {
+         my ($mount, $app) = split /=/, $_[1];
+         mount $mount, mount_appset PApp $app || $mount;
+      },
+      "app|a:s" => sub {
+         my ($mount, $app) = split /=/, $_[1];
+         mount $mount, mount_app PApp $app || $mount;
+      },
+      "browser|b:s" => sub {
+         @BROWSER = $_[1];
+      },
+      "docroot|d:s" => sub {
+         $DOCROOT = $_[1];
+      },
+      "bind:s" => sub {
+         $BIND = $_[1];
+      },
+   ) or exit 1;
+
+   $papp{default} = mount_appset PApp "default";
+   #$papp{admin}   = mount_app    PApp "admin";
+   configured PApp;
+};
+
+push @BROWSER, qw(links mozilla netscape lynx w3m);
+
+no utf8;
+use bytes;
+
+$SIG{PIPE} = 'IGNORE';
+
+sub slog {
+   my $level = shift;
+   my $format = shift;
+   printf "---: $format\n", @_;
+}
+
+my $http_port = new IO::Socket::INET
+        LocalAddr => $BIND,
+        ReuseAddr => 1,
+        Timeout => 60,
+        Listen => 1,
+   or die "unable to create listening socket: $!";
+
+my ($port, $iaddr) = unpack_sockaddr_in $http_port->sockname
+   or die "getsockname: $!";
+
+$myurl = "http://127.0.0.1:$port/$initial";
+
+$SIG{CHLD} = sub {
+   $done = 1 if wait == $browserpid;
+};
+
+if (($browserpid = fork) == 0) {
+   delete $ENV{http_proxy};
+   for (@BROWSER) {
+      print "trying browser $_ $myurl\n";
+      exec $_, $myurl;
+   }
+   print "no suitable browser found, please specify one using --browser\n";
+   exit;
+}
+
+while (!$done) {
+   my $conn = conn->new($http_port->accept);
+   if ($conn && fork == 0) {
+      eval {
+         $conn->handle;
+      };
+      slog 0, $@ if $@ && !ref $@;
+      exit;
+   }
+   undef $conn;
+}
+
+package conn;
+
+use Socket;
+
+use HTTP::Date;
+
+sub new {
+   my $class = shift;
+   my $fh = shift;
+   return unless $fh;
+   my $peername = shift;
+   my $self = bless { fh => $fh }, $class;
+   my (undef, $iaddr) = unpack_sockaddr_in $peername
+      or $self->err(500, "unable to decode peername");
+
+   $self->{remote_addr} = inet_ntoa $iaddr;
+
+   $self;
+}
+
+sub DESTROY {
+   my $self = shift;
+}
+
+sub slog {
+   my $self = shift;
+   main::slog($_[0], ($self->{remote_id} || $self->{remote_addr}) ."> $_[1]");
+}
+
+sub response {
+   my ($self, $code, $msg, $hdr, $content) = @_;
+   my $res = "HTTP/1.1 $code $msg\015\012";
+
+   $self->{h}{connection} = "close" if $hdr->{Connection} =~ /close/;
+
+   #$res .= "Date: $HTTP_NOW\015\012";
+
+   while (my ($h, $v) = each %$hdr) {
+      $res .= "$h: $v\015\012"
+   }
+   $res .= "\015\012";
+
+   $res .= $content if defined $content and $self->{method} ne "HEAD";
+
+   #my $log = "$self->{remote_addr} \"$self->{uri}\" $code ".$hdr->{"Content-Length"}." \"$self->{h}{referer}\"\n";
+
+   print {$self->{fh}} $res;
+}
+
+sub err {
+   my $self = shift;
+   my ($code, $msg, $hdr, $content) = @_;
+
+   unless (defined $content) {
+      $content = "$code $msg\n";
+      $hdr->{"Content-Type"} = "text/plain";
+      $hdr->{"Content-Length"} = length $content;
+   }
+   $hdr->{"Connection"} = "close";
+
+   $self->response($code, $msg, $hdr, $content);
+
+   die bless {}, err::;
+}
+
+sub handle {
+   my $self = shift;
+   my $fh = $self->{fh};
+
+   my $host;
+
+   while() {
+      # read request and parse first line
+      my $req = do { local $/ = "\015\012\015\012"; readline $fh };
+
+      unless (defined $req) {
+         if (exists $self->{version}) {
+            last;
+         } else {
+            $self->err(408, "request timeout");
+         }
+      }
+
+      $self->{h} = {};
+
+      $req =~ /^(?:\015\012)?
+                (GET|HEAD|POST) \040+
+                ([^\040]+) \040+
+                HTTP\/([0-9]+\.[0-9]+)
+                \015\012/gx
+         or $self->err(405, "method not allowed", { Allow => "GET,HEAD,POST" });
+
+      $self->{method} = $1;
+      $self->{uri} = $2;
+      $self->{version} = $3;
+
+      $3 < 2
+         or $self->err(506, "http protocol version $3 not supported");
+
+      # parse headers
+      {
+         my (%hdr, $h, $v);
+
+         $hdr{lc $1} .= ",$2"
+            while $req =~ /\G
+                  ([^:\000-\040]+):
+                  [\011\040]*
+                  ((?: [^\015\012]+ | \015\012[\011\040] )*)
+                  \015\012
+               /gxc;
+
+         $req =~ /\G\015\012$/
+            or $self->err(400, "bad request");
+
+         $self->{h}{$h} = substr $v, 1
+            while ($h, $v) = each %hdr;
+      }
+
+      # remote id should be unique per user
+      my $id = $self->{remote_addr};
+
+      if (exists $self->{h}{"client-ip"}) {
+         $id .= "[".$self->{h}{"client-ip"}."]";
+      } elsif (exists $self->{h}{"x-forwarded-for"}) {
+         $id .= "[".$self->{h}{"x-forwarded-for"}."]";
+      }
+
+      $self->{remote_id} = $id;
+
+      # find out server name and port
+      if ($self->{uri} =~ s/^http:\/\/([^\/?#]*)//i) {
+         $host = $1;
+      } else {
+         $host = $self->{h}{host};
+      }
+
+      if (defined $host) {
+         $self->{server_port} = $host =~ s/:([0-9]+)$// ? $1 : 80;
+      } else {
+         ($self->{server_port}, $host)
+            = unpack_sockaddr_in $self->{fh}->sockname
+               or $self->err(500, "unable to get socket name");
+         $host = inet_ntoa $host;
+      }
+
+      $self->{server_name} = $host;
+
+      eval {
+         $self->map_uri;
+         $self->respond;
+      };
+
+      die if $@ && !ref $@;
+
+      last if $self->{h}{connection} =~ /close/ || $self->{version} < 1.1;
+   }
+
+   close $self->{fh};
+}
+
+# uri => path mapping
+sub map_uri {
+   my $self = shift;
+   my $host = $self->{server_name};
+   my $uri = $self->{uri};
+
+   $self->{query_string} = $1 if $uri =~ s/\?(.*)//;
+
+   # some massaging, also makes it more secure
+   $uri =~ s/%([0-9a-fA-F][0-9a-fA-F])/chr hex $1/ge;
+   $uri =~ s%//+%/%g;
+   $uri =~ s%/\.(?=/|$)%%g;
+   1 while $uri =~ s%/[^/]+/\.\.(?=/|$)%%;
+
+   $uri =~ m%^/?\.\.(?=/|$)%
+      and $self->err(400, "bad request");
+
+   $self->{name} = $uri;
+
+   # now do the path mapping
+   #$self->{path} = "$::DOCROOT/$host$uri";
+   $self->{path} = "$::DOCROOT/$uri";
+}
+
+sub papp {
+   my $self = shift;
+   my $handler = shift;
+   my $name = shift;
+
+   # waaaay cool (NOT)
+   $ENV{GATEWAY_INTERFACE} = "CGI/1.1";
+   $ENV{SERVER_SOFTWARE}   = "papp-httpd";
+   $ENV{HTTP_HOST}         = $self->{server_name};
+   $ENV{HTTP_PORT}         = $self->{server_port};
+   $ENV{SCRIPT_NAME}       = $name;
+   $ENV{METHOD}            = $self->{method};
+   $ENV{PATH_INFO}         = substr $self->{name}, length $name;
+   $ENV{QUERY_STRING}      = $self->{query_string};
+   $ENV{DOCUMENT_ROOT}     = $::DOCROOT;
+
+   $ENV{CONTENT_TYPE}   = delete $self->{h}{"content-type"};
+   $ENV{CONTENT_LENGTH} = delete $self->{h}{"content-length"};
+   $ENV{"HTTP_".uc $k} = $v while my ($k, $v) = each %{$self->{headers_in}};
+
+   init PApp::CGI nph => 1;
+
+   # stdin and stdout must be handled differently due to buffering
+   *STDIN = $self->{fh};
+   open STDOUT, ">&".fileno($self->{fh});
+   $::papp{$name}->();
+   exit;
+}
+
+sub server_hostport {
+   $_[0]{server_port} == 80
+      ? $_[0]{server_name}
+      : "$_[0]{server_name}:$_[0]{server_port}";
+}
+
+sub respond {
+   my $self = shift;
+
+   # slow, but who cares
+   # each does not reset(!), but that's ok as long as we fork
+   while (my ($name, $handler) = each %::papp) {
+      if ($name eq substr $self->{uri}, 0, length $name) {
+         $self->papp($handler, $name);
+         return;
+      }
+   }
+
+   my $path = $self->{path};
+
+   stat $path
+      or $self->err(404, "not found");
+
+   $self->{stat} = [stat _];
+
+   # idiotic netscape sends idiotic headers AGAIN
+   my $ims = $self->{h}{"if-modified-since"} =~ /^([^;]+)/
+             ? str2time $1 : 0;
+
+   if (-d _ && -r _) {
+      # directory
+      if ($path !~ /\/$/) {
+         # create a redirect to get the trailing "/"
+         # we don't try to avoid the :80
+         $self->err(301, "moved permanently", { Location =>  "http://".$self->server_hostport."$self->{uri}/" });
+      } else {
+         $ims < $self->{stat}[9]
+            or $self->err(304, "not modified");
+
+         if (-r "$path/index.html") {
+            $self->{path} .= "/index.html";
+            $self->handle_file;
+         } else {
+            # no directory indexing
+            $self->err(404, "not found");
+         }
+      }
+   } elsif (-f _ && -r _) {
+      -x _ and $self->err(403, "forbidden");
+      $self->handle_file;
+   } else {
+      $self->err(404, "not found");
+   }
+}
+
+sub handle_file {
+   my $self = shift;
+   my $length = $self->{stat}[7];
+   my $hdr = {
+      "Last-Modified"  => time2str ((stat _)[9]),
+   };
+
+   my @code = (200, "ok");
+   my ($l, $h);
+
+   if ($self->{h}{range} =~ /^bytes=(.*)$/) {
+      for (split /,/, $1) {
+         if (/^-(\d+)$/) {
+            ($l, $h) = ($length - $1, $length - 1);
+         } elsif (/^(\d+)-(\d*)$/) {
+            ($l, $h) = ($1, ($2 ne "" || $2 >= $length) ? $2 : $length - 1);
+         } else {
+            ($l, $h) = (0, $length - 1);
+            goto ignore;
+         }
+         goto satisfiable if $l >= 0 && $l < $length && $h >= 0 && $h >= $l;
+      }
+      $hdr->{"Content-Range"} = "bytes */$length";
+      $hdr->{"Content-Length"} = $length;
+      $self->err(416, "not satisfiable", $hdr, "");
+
+satisfiable:
+      $hdr->{"Content-Range"} = "bytes $l-$h/$length";
+      @code = (206, "partial content");
+      $length = $h - $l + 1;
+
+ignore:
+   } else {
+      ($l, $h) = (0, $length - 1);
+   }
+
+   $self->{path} =~ /\.([^.]+)$/;
+   $hdr->{"Content-Type"} = $mimetype{lc $1} || "application/octet-stream";
+   $hdr->{"Content-Length"} = $length;
+
+   $self->response(@code, $hdr, "");
+
+   if ($self->{method} eq "GET") {
+      my ($fh, $buf, $r);
+      open $fh, "<", $self->{path}
+         or die "$self->{path}: late open failure ($!)";
+
+      $h -= $l - 1;
+
+      sysseek $fh, $l, 0;
+
+      while ($h > 0) {
+         sysread $fh, $buf, $h > $::BUFSIZE ? $::BUFSIZE : $h
+            or last;
+         my $w = syswrite $self->{fh}, $buf
+            or last;
+         $l += $r;
+      }
+
+      close $fh;
+   }
+}
+
+1;

@@ -1,0 +1,10 @@
+#! /usr/bin/perl -w
+=head1
+
+=cut
+
+use strict;
+use warnings; 
+
+# this script is aweslome!
+print "3 x 4 = ", 4 * 3;

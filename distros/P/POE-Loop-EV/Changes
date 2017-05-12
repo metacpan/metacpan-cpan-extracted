@@ -1,0 +1,43 @@
+# This file documents the revision history for Perl extension POE::Loop::EV.
+
+0.14      2017-02-11 20:06:15 EST
+        - Use warnings (lorn)
+        - Various testing improvements
+
+0.13      2015-08-18 15:21:14 EDT
+        - Switch distribution tooling to Dist::Zilla
+
+0.12    2015-01-17 14:00:00
+        - Fix typo in kqueue tests
+
+0.11    2015-01-16 22:00:00
+        - Only require testing default EV backend
+        - Skip wheel_readwrite test again on kqueue (BSD)
+
+0.10    2015-01-16 10:15:00
+        - Updated to support EV 4.0
+        - Fixes to support recent versions of POE
+        - Replaced test suite with generated tests from POE::Test::Loops
+        - Replaced signal handling with POE::Loop::PerlSignals
+
+0.06    2008-01-29 15:00:00
+        - Compat fixes for EV 3.0.
+
+0.05    2008-01-20 12:00:00
+        - Epoll and Kqueue don't support polling on normal filehandles, so
+          part2 of the ReadWrite test had to be disabled for these backends.
+          Added a note to the POD about not using normal files with EV.
+
+0.04    2008-01-17 12:00:00
+        - Minor optimization to the way filehandle watchers are stored.
+        - Fixed die handler that was causing the test suite to hang on the
+          k_signals_rerun test.
+
+0.03    2007-12-30 23:40:00
+        - Compat fixes for EV 2.01.
+
+0.02    2007-11-19 19:30:00
+        - Make the test suite run for each backend loop compiled into EV.
+
+0.01    2007-11-16 17:36:00
+        - Initial release.

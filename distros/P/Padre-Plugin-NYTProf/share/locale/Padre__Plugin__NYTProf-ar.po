@@ -1,0 +1,36 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-NYTProf\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-23 11:08+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"Language-Team: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Arabic\n"
+
+#: lib/Padre/Plugin/NYTProf.pm:16
+msgid "NYTProf - Perl Profiler"
+msgstr "برنامج NYTProf - محلل برامج Perl"
+
+#: lib/Padre/Plugin/NYTProf.pm:28
+msgid "Run Profiling"
+msgstr "تشغيل تحليل البرنامج"
+
+#: lib/Padre/Plugin/NYTProf.pm:29
+msgid "Generate Profiling Report"
+msgstr "توليد تقرير التحليل"
+
+#: lib/Padre/Plugin/NYTProf.pm:30
+msgid "Show Generated Profiling Report"
+msgstr "اظهار تقرير التحليل المولد"
+
+#: lib/Padre/Plugin/NYTProf.pm:34
+msgid "About"
+msgstr "عن البرنامج"
+
+#: lib/Padre/Plugin/NYTProf.pm:116
+msgid "This system is running NYTProf version "
+msgstr "يشغل هذا النظام برنامج NYTProf نسخة"

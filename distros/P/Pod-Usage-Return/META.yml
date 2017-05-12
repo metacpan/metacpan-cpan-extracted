@@ -1,0 +1,26 @@
+---
+abstract: 'pod2usage that returns instead of exits'
+author:
+  - 'Doug Bell <preaction@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Module::Build: '0.3601'
+  Test::Compile: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Usage-Return
+requires:
+  Pod::Usage: '1.36'
+resources:
+  bugtracker: https://github.com/preaction/Pod-Usage-Return/issues
+  homepage: https://github.com/preaction/Pod-Usage-Return
+  repository: https://github.com/preaction/Pod-Usage-Return.git
+version: '0.003'

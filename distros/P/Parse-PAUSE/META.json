@@ -1,0 +1,27 @@
+{
+   "resources" : {
+      "homepage" : "http://github.com/afoxson/parse-pause",
+      "repository" : "git://github.com/afoxson/parse-pause.git",
+      "bugtracker" : "http://github.com/afoxson/parse-pause/issues",
+      "license" : "http://dev.perl.org/licenses/"
+   },
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "Dist::Zilla::Plugin::MetaJSON version 1.091480",
+   "version" : "1.001",
+   "name" : "Parse-PAUSE",
+   "author" : [
+      "Adam J. Foxson"
+   ],
+   "license" : "perl",
+   "requires" : {
+      "Scalar::Util" : "0",
+      "Module::Pluggable" : "0",
+      "Encode::Newlines" : "0",
+      "Encode" : "0",
+      "Moose" : "0"
+   },
+   "abstract" : "Parses CPAN upload emails sent by PAUSE"
+}

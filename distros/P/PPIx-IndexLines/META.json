@@ -1,0 +1,73 @@
+{
+   "abstract" : "Given a line number, returns some basic information about where in the perl document you are",
+   "author" : [
+      "Alan Young <harleypig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PPIx-IndexLines",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PPI" : 0,
+            "Scalar::Util" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Path::Class" : 0,
+            "Test::More" : "0.94",
+            "Test::Perl::Critic::Progressive" : 0,
+            "Try::Tiny" : 0,
+            "perl" : "5.004"
+         }
+      }
+   },
+   "provides" : {
+      "PPIx::IndexLines" : {
+         "file" : "lib/PPIx/IndexLines.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/harleypigs/ppix-indexlines/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/harleypig/ppix-indexlines.git",
+         "web" : "http://github.com/harleypig/ppix-indexlines"
+      }
+   },
+   "version" : "0.05"
+}
+

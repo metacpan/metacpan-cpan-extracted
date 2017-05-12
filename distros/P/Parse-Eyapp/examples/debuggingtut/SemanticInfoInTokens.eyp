@@ -1,0 +1,152 @@
+# See: Tieins.eyp
+# See: http://www.gnu.org/software/bison/manual/html_mono/bison.html#Lexical-Tie_002dins
+# for a more detailed explanation.
+
+%strict
+
+%token ID INT INTEGER 
+
+%syntactic token HEX
+
+%{
+my %st;
+%}
+
+%lexer  {
+    my $hexflag = $self->{HEXFLAG};
+
+    m{\G\s*(\#.*)?}gc;
+
+    m{\G(HEX\b|INT\b)}igc and return (uc($1), $1);
+
+    m{(\G\d+)}gc and return ('INTEGER', $hexflag? hex($1) : $1);
+
+
+    m{\G([a-zA-Z_]\w*)}gc and do {
+        my $match = $1;
+        $hexflag and !exists($st{$match}) and $match =~ m{^([A-F0-9]+$)}gc and return ('INTEGER', hex($match)); 
+        return ('ID', $1);
+    };
+
+    m{\G(.)}gc and return ($1, $1);
+
+    return('',undef);
+  }
+
+%right '='
+%left '+'
+
+%tree bypass alias
+
+%%
+stmt:
+    decl <* ';'> expr <%name EXPS + ';'>
+      {
+        # make the symbol table an attribute 
+        # of the root node
+        $_[2]->{st} = { %st };
+        $_[2];
+      }
+;
+
+decl:
+    INT ID <+ ','>
+      {
+        # insert identifiers in the symbol table
+        $st{$_->{attr}} = 1 for $_[2]->children();
+      }
+;
+
+expr:
+    %name ID
+    ID
+  | %name NUM
+    INTEGER
+  | %name HEX
+    HEX '(' { $_[0]->{HEXFLAG} = 1; } $expr ')'
+      { 
+        $_[0]->{HEXFLAG} = 0; 
+        $expr;
+      }
+  | %name ASSIGN
+    id '=' expr 
+  | %name PLUS
+    expr '+' expr
+;
+
+id : ID
+;
+
+%%
+
+# Context-dependant lexer
+
+=head1 SYNOPSIS
+
+Compile it with:
+
+                   $ eyapp -C SemanticInfoInTokens.eyp
+
+Run it with:
+
+                  $ ./SemanticInfoInTokens.pm -t -i -f inputforsemanticinfo.txt
+
+try also:
+
+            ./SemanticInfoInTokens.pm -t -i -f inputforsemanticinfo2.txt
+
+=head1 THE TYPENAME-IDENTIFIER PROBLEM WHEN PARSING THE C<C> LANGUAGE
+
+The C language has a context dependency: the way an identifier is used depends
+on what its current meaning is. For example, consider this:
+
+  T(x);
+
+This looks like a function call statement, but if C<T> is a typedef name, then
+this is actually a declaration of C<x>. How can a parser for C decide how to
+parse this input?
+
+Here is another example:
+
+  {
+    T * x;
+    ...
+  }
+
+What is this, a declaration of C<x> as a pointer to C<T>, 
+or a void multiplication of the variables C<T> and C<x>?
+
+The usual method to solve this problem is to have two different token types, C<ID> and C<TYPENAME>.
+When the lexer finds an identifier, it looks up in the symbol table 
+the current declaration of the identifier in order to 
+decide which token type to return: C<TYPENAME> if the
+identifier is declared as a typedef, C<ID> otherwise.
+
+=head1 THIS EXAMPLE
+
+One way to handle context-dependency is the lexical tie-in: a flag which is set
+by the semantic actions, whose purpose is to alter the way tokens are parsed.
+
+In this "Calc"-like example we have a language with a special construct C<hex
+(hex-expr)>. After the keyword C<hex> comes an C<expression> in parentheses in
+which all integers are hexadecimal. In particular, strings in C</[A-F0-9]+/>
+like C<A1B> must be treated as an hex integer unless they were previously
+declared.
+
+Here the lexer looks at the value of the hexflag attribute; when it is nonzero,
+all integers are parsed in hexadecimal, and tokens starting with letters are
+parsed as integers if possible.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *  File: Tieins.eyp
+
+=item * L<http://www.gnu.org/software/bison/manual/html_mono/bison.html#Lexical-Tie_002dins>
+
+=item * L<http://en.wikipedia.org/wiki/The_lexer_hack>
+
+=item * L<http://eli.thegreenplace.net/2007/11/24/the-context-sensitivity-of-cs-grammar/>
+
+=back

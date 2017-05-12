@@ -1,0 +1,13 @@
+Changes
+COPYING
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+lib/Pod/Usage/CGI.pm
+t/cgi_usage.t
+t/test_pod_usage.cgi
+t/test_pod_usage.out
+t/pod.t
+t/pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

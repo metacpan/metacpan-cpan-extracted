@@ -1,0 +1,35 @@
+---
+abstract: 'Generate (possibly exuberant) Ctags style tags for Perl sourcecode'
+author:
+  - 'and LICENSE, osfameron'
+build_requires:
+  Capture::Tiny: 0
+  Data::Dumper: 0
+  ExtUtils::MakeMaker: 6.36
+  Test::Builder: 0.42
+  Test::Exception: 0
+  Test::LongString: 0
+  Test::More: 0.42
+  Test::Strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.57_05'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perl-Tags
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Find::Rule: 0
+  File::Spec: 0
+  File::Temp: 0
+  Module::Locate: 0
+  Path::Tiny: 0
+  parent: 0
+version: 0.32

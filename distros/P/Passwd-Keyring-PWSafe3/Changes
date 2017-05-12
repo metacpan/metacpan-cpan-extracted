@@ -1,0 +1,65 @@
+Revision history for Passwd::Keyring::PWSafe3
+
+0.61	2015-01-31
+
+	Better reports from tests.
+        Bumping number a bit, module seems rather stable.
+
+0.21	2015-01-12
+
+        Doc tweaks (including note about alternative guis).
+
+        Bumped Crypt::PwSafe3 version (to avoid issues related to the
+        way it created temporary files before 1.15).
+
+        Using File::HomeDir to calculate default password file location.
+
+0.2006  2015-01-09
+
+        Minor doc tweaks.
+
+0.2005  2015-01-08
+
+        Minor doc fixes.
+
+0.2004 2015-01-03 
+
+        Bump required Crypt::PWSafe3 version (attempts to use 0.07
+        cause my tests to fail due to error in that version of
+        Crypt::PWSafe3).
+
+0.2003  2013-07-04
+
+        Bump required perl version (this is in fact Crypt::PWSafe3 dependency,
+        but as log as this module does not specify it, I get error reports...)
+
+        (#1) Documentation contained wrong example of using set_password
+
+0.2002  2012-11-26
+
+        A few (non-critical) test fixes.
+        Improved example name, installing example in share dir.
+
+0.2001  2012-11-21
+
+        Minor documentation fixes.
+
+0.20    2012-11-20
+
+        Dependencies, comments, test skips etc updated to work with 
+        Crypt::PWSafe3 v0.7, which resolves performance problems.
+        Module is now reasonably fast and usable (once Crypt::PWSafe3
+        >=0.7, and Bytes::Random::Secure are installed)
+
+        Updated example, some test fixes.
+
+0.1001  2012-11-18
+
+        Fixed a few test errors (like bad plans).
+
+0.10    2012-11-15
+
+        Initial release. Works and implements full keyring API,
+        although limited performance of Crypt::PWSafe3 seriously
+        limits usefulness of save operations.
+

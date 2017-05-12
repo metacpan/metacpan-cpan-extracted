@@ -1,0 +1,7 @@
+#!/bin/sh
+
+while [ "$1" ] ; do
+    echo "# $1" >&2
+    shift
+done
+echo "LAST" >&2

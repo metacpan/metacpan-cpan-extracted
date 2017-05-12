@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               POE-Session-AttributeBased
+version:            0.10
+abstract:           POE::Session syntax sweetener
+author:
+    - Chris Fedde <cfedde at cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Attribute::Handlers:  0
+    POE:                  0
+    POE::Session:         0
+    Test::More:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

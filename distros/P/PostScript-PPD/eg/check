@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use PostScript::PPD;
+use File::Basename;
+
+$|++;
+my $ppd = PostScript::PPD->new;
+
+foreach my $file ( @ARGV ) {
+    eval {$ppd->load( $file );};
+    if( $@ ) {
+        warn "$file: $@";
+    }
+    else {
+        print join ' ', basename($file), $ppd->Manufacturer, $ppd->ModelName;
+        print "\n";
+    }
+}

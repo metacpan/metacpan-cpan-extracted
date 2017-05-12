@@ -1,0 +1,158 @@
+
+v1.17:   Mon Aug 12 08:54:38 CEST 2002
+* Fix for PPresenter::Object::isNamed(), where -aliases option is only
+  one argument, not ref-array. [F(r)eddy SpierenBU(r)G]
+* ImageMagick changed interface (again): 'compress' --> 'compression'
+  in PPresenter/Image/Magick.pm line 109. [F(r)eddy SpierenBU(r)G]
+* xml/present-xml passed the aliases of a slide name as single scalar,
+  but from now on as ref to an array. [Ann Barcomb/Johan Vromans]
+* Added tiny manual page to PPresenter.pm
+
+v1.16
+* Fix for image-alias bug on non-UNIX in PPresenter/Image.pm
+  by [Slavan Rezic]
+* $ENV{TEMP} is used when $ENV{TMPDIR} does not exists, and has a different
+  default on Win*.  Problem reported by [Slavan Rezic]
+* [Johnathan Burchill] implemented <SUB> and <SUP> in
+  PPresenter/Formatter/Markup_place.pm
+* [Stephen Riehm] scripts present(-xml|-ppr)? search more thoroughly
+  for the libraries.
+
+v1.15 2001/02/17
+* Changed the interface to Image::Magick somewhat, because that package
+  gave some problems (core-dumps and such like).  Now, transport between
+  Image::Magick and Tk::Photo objects is done by a base64'd gif i.s.o
+  a xpm.
+
+v1.14 2000/10/24
+* Removed some `local @_' warnings.
+* Moved to PPresenter.org domain.
+
+v1.13  2000/7/4  (one year's celebration)
+* Added XML handling, by Johan Vromans <jvromans@squirrel.nl>
+* Command present installed from subdir ppr.  Demo's for using PPresenter
+  as library moved to ppr/demo.
+* Command present-xml installed from subdir xml.  Demo's for XML implementation
+  based on the PPresenter library are located in xml/demo.
+* Removed demo directory, because the demo's are split based on their type.
+* Added some images in PPresenter/images.
+* Manual-pages for present, present-ppr, present-xml, but they need more
+  detail.
+
+v1.11
+* Fixed use of tkPhoto images instead when Image::Magick is not installed.
+
+v1.10
+* Excellent logo by Phil Regnauld <regnauld@ftf.net>
+* Renamed Presenter::TRACE into the correct PPresenter::TRACE.
+* Added -exportPhases (Dynamic)
+* Added -callbacks (Slide)
+* Added -enableCallbacks (show->new)
+* Redesigned the way that slides can be exported on the lower level.
+  Interfaces to website creation and image-production changed only
+  very little.
+* Changed Export::Website into Export::Website::HTML to give some namespace
+  to new formats, such as XML.
+* Change interface to some of the functions in Export::Website::HTML such that
+  more than one phase of the same slide can be included in website.
+* Changed Export::IM_Images into Export::Images::ImageMagick.
+* Fixed slide-exports to images.
+
+v1.07
+Thanks to Johan Vromans <jvromans@squirrel.nl>:
+* PPresenter/Dynamic/Default.pm: Strict vertical moves (to/from s and
+  to/from n) did not work.
+* PPresenter/Formatter/Markup_parser.pm: Logical markups are not
+  matched case-insensitive.
+* PPresenter/Formatter/Markup_parser.pm: Allow attribute values to be
+  placed between single quotes as well as double quotes.
+* Miscelleneous fixes for Perl 5.6 (5.5.670beta)
+  Mostly eliminate warnings for 'use constant defaults' and defined
+  (@array) tests.
+
+Other changes:
+* Changes all functions getXyzAbc() into xyzAbc() to improve abstraction.
+  Bad idea about `get' in names was taken from Java, but only troubles
+  the readability.
+* Implemented complex decoration, including page footers.
+* changed implementation of templates to work with new decoration
+  techniques.
+* Renamed doc to doc_html
+* Created bin/present which can start *.ppr and *.xml files.
+* Created doc_pod/present.pod for present.1
+* Place-holders for PPresenter::Import::XML and PPresenter::Import::MagicPoint,
+  which will implement translations between those two formats and PPresenter.
+* Resizing images with Image::Magick does not work properly on the
+  border of transparent and normal pixels.  Also, conversion from an
+  Image::Magick pixels to a tkPhoto does not work properly.  Created a
+  work-around to create nicer results.
+* Added Markup tags FOOTER (markup for footer-texts), N (switch to normal
+  font), and PROP (select proportional font).
+* Added callbacks for slides, which are code-hooks into the display process
+  of a slide.
+
+v1.00
+Thanks to Slaven Rezic:
+* Removed dependency from Time::Hires because Tk defines (but does document)
+  a timeofday(), with the same functionality.
+* PPresenter/Image/tkPhoto.pm line 88: splice 5 i.s.o 6 fixed again :((
+* PPresenter/Image.pm: sameSource works for non-UNIX too (now).
+* Runs on M$Win32!
+
+Other changes:
+* Added start of a faq in doc/faq/*
+* Added link to options.html (general option index) in doc/manual.html
+* Added demo/simple
+* Added doc/example.html
+
+v0.97
+* PPresenter/Images.pm line 176 findImage() fixed.
+* PPresenter/Images.pm line 128 create image accepts image name when
+  this is an already defined image.
+* PPresenter/Viewport/TagControl.pm and PPresenter/Viewport/SlideControl.pm
+  added scrollbars when the menu get too large.
+* PPresenter/Export/HTML.pm replace by PPresenter/Export/Website.pm.
+* PPresenter/Export/Website.pm created, which creates a website.  Some other
+  modules are extended to make this prossible.
+* PPresenter/Export/IM_Images.pm improved.
+* doc/export/website.html added.
+* doc/export/im_images.html added.
+* doc/export/index.html extended with option doc.
+
+v0.96  1999/10/31
+* PPresenter/Show.pm called 'after()' on non-window object.
+  did work for perl 5.005_02, not for perl 5.005_3.
+* PPresenter/Image/tkPhoto.pm line 88: splice 5 i.s.o 6
+
+v0.95  1999/10/28
+* GNU-style changelogs started (with more details, I promise)
+* Added copyright-statements where needed for FSF.
+* Tutorial for beginners: doc/tutorial/beginners*.
+* Tutorial about difference HTML-Markup: doc/tutorial/html2markup/*.
+* Folded PPresenter/Template/Default/* inside PPresenter/Template/Default.pm
+* PPresenter/StyleElem.pm INCLUDES do not load modules when already known.
+
+v0.94  1999/09/26
+* Few fixes.
+* Shows phases to go for a slide.
+* Exporting slides to images works (requires ImageMagick).
+
+v0.93 1999/09/08
+* Few fixes.
+* Introduction of special characters in markup-language.
+* Initial code to dump slides to postscript, images and HTML.
+
+v0.92 1999/08/12
+* Implemented (and documented) scaling of images
+* optional use of Image::Magick
+
+v0.91 1999/08/02
+* Documented all the features.
+* fixed some things.
+* Closing in to version 1
+
+v0.28 1999/07/28
+* Full rewrite to allow multiple screens in one show.
+
+v0.21 1999/07/04
+* The first public version is available.

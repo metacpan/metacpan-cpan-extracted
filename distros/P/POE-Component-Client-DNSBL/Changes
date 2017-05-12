@@ -1,0 +1,61 @@
+==============================
+2011-11-17 22:28:28 +0000 1.08
+==============================
+
+  commit f2d193f6a77ec8246e3457ec13ffed32af09beae
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Nov 17 22:25:36 2011 +0000
+  
+    Update dist to dzil
+
+  commit b2768a5ff0884ba8544d56e07ae6bc52d80edb1a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Nov 17 22:19:30 2011 +0000
+  
+    Use Net::IP::Minimal instead of Net::IP 
+
+==============================
+2011-05-01 09:18:51 +0100 1.06
+==============================
+
+  commit 35f85e608c6380e5137bedcdd783bad27c8d6af7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sun May 1 09:18:51 2011 +0100
+  
+    Update to 1.06 version and set Changes
+
+  commit 12f0b5042fee762c2a8feb0d2f10167ccf2880b8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sun May 1 09:16:55 2011 +0100
+  
+    Refine the DBL tests 
+
+==============================
+2011-04-27 22:10:44 +0100 1.04
+==============================
+
+  commit 936c5c9f0eb5a0904a22ebdfb06636f012e7add7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Wed Apr 27 22:10:44 2011 +0100
+  
+    Bump version and update Changes
+
+  commit 4a3ce3d5ce737f988284c13f033133aef1aee298
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Wed Apr 27 22:09:20 2011 +0100
+  
+    Add support for domain blocklists 
+
+==============================
+2009-05-19 10:35:28 +0100 1.02
+==============================
+
+  commit 4c0371221384119eea0ed365dd2a9437a2876e40
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Tue May 19 10:35:28 2009 +0100
+  
+    Added postback functionality 
+
+====================================
+End of changes in the last 1825 days
+====================================

@@ -1,0 +1,250 @@
+NAME
+
+    POE::Component::Server::SimpleContent - The easy way to serve web
+    content with POE::Component::Server::SimpleHTTP.
+
+VERSION
+
+    version 1.16
+
+SYNOPSIS
+
+      # A simple web server
+      use POE qw(Component::Server::SimpleHTTP Component::Server::SimpleContent);
+    
+      my $content = POE::Component::Server::SimpleContent->spawn( root_dir => '/blah/blah/path' );
+    
+      POE::Component::Server::SimpleHTTP->new(
+            ALIAS => 'httpd',
+            ADDRESS => '6.6.6.6',
+            PORT => 8080,
+            HANDLERS => [
+                    {
+                      DIR => '.*',
+                      EVENT => 'request',
+                      SESSION => $content->session_id(),
+                    },
+            ],
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+
+DESCRIPTION
+
+    POE::Component::Server::SimpleContent is a companion POE component to
+    POE::Component::Server::SimpleHTTP ( though it can be used standalone
+    ), that provides a virtualised filesystem for serving web content. It
+    uses Filesys::Virtual::Plain to manage the virtual file system.
+
+    As demonstrated in the SYNOPSIS, POE::Component::Server::SimpleContent
+    integrates with POE::Component::Server::SimpleHTTP. General usage
+    involves setting up your own custom handlers *before* a catchall
+    handler which will route HTTP requests to SimpleContent.
+
+    The component generates a minimal 404 error page as a response if the
+    requested URL does not exist in the virtual filesystem. It will
+    generate a minimal 403 forbidden page if 'auto_index' is set to 0 and a
+    requested directory doesn't have an 'index_file'
+
+    Directory indexing is supported by default, though don't expect
+    anything really fancy.
+
+    One may also specify handlers for particular extension types.
+
+CONSTRUCTOR
+
+    spawn
+
+      Requires one mandatory argument,
+
+       'root_dir', the file system path which will become the root of the virtual filesystem.
+
+      Optional arguments are:
+
+       prefix_path  specify a path within the virtual filesystem that will be prefixed to
+                    the url path to find the real path for content;
+       alias_path - specify a path that will be removed from the front of url path to find
+                    the real path for content within the virtual filesystem;
+       alias      - the POE::Kernel alias to set for the component's session;
+       options    - a hashref of POE::Session options to pass to the component's session;
+       index_file - the filename that will be used if someone specifies a directory path,
+                    default is 'index.html';
+       auto_index - whether directory indexing is performed, default is 1;
+       blocking   - specify whether blocking file reads are to be used, default 0 non-blocking
+                    ( this option is ignored on Win32, which does not support non-blocking ).
+       handlers   - a hashref of file extension handlers.
+
+      File extension handlers are a hashref keyed on file extension (
+      without the preceeding dot '.' ), of further hashrefs, with the keys
+      'SESSION' for the POE::Session to that will be handling this file
+      extension and 'EVENT' for the event to trigger in that session.
+
+        handlers => {
+                      pl  => { SESSION => 'foobar', EVENT => 'foo' },
+                      cgi => { SESSION => 3, EVENT => 'cgi_handler' },
+        },
+
+      See OUTPUT EVENTS below for what gets sent to your event handlers.
+
+      Returns an object on success.
+
+      Example:
+
+       my $content = POE::Component::Server::SimpleContent->spawn(
+              root_dir   => '/blah/blah/path',
+              options    => { trace => 1 },
+              index_file => 'default.htm',
+              auto_index  => 0,
+       );
+
+METHODS
+
+    session_id
+
+      Takes no arguments. Returns the POE::Session ID of the component's
+      session.
+
+        my ($session_id) = $content->session_id();
+
+    shutdown
+
+      Takes no arguments, shuts down the component's session.
+
+        $content->shutdown();
+
+    request
+
+      Requires two arguments, a HTTP::Request object and HTTP::Response
+      object. See OUTPUT for what is returned by this method.
+
+        $content->request( $request_obj, $response_obj );
+
+    auto_index
+
+      No parameter specified returns whether 'auto_index' is enabled or
+      not. If a true or false value is specified, enables or disables
+      'auto_index', respectively.
+
+    index_file
+
+      No parameter specified, returns the current setting of 'index_file'.
+      If a parameter is specified, sets 'index_file' to that given value.
+
+    get_handlers
+
+      Returns an arrayref of the current handlers.
+
+    set_handlers
+
+      Accepts an arrayref of handler hashrefs ( see spawn() for details ).
+
+INPUT
+
+    These are the events that the component will accept.
+
+    request
+
+      Requires two arguments, a HTTP::Request object and HTTP::Response
+      object. See OUTPUT for what is returned by this method.
+
+        $kernel->post( $content->session_id() => request => $request_obj => $response_obj );
+
+    shutdown
+
+      Takes no arguments, shuts down the component's session.
+
+        $kernel->post( $content->session_id() => 'shutdown' );
+
+OUTPUT
+
+    The component returns the following event to the sessions that issued a
+    'request', either via the object API or the session API. The event is
+    'DONE' to maintain compatibility with
+    POE::Component::Server::SimpleHTTP.
+
+    DONE
+
+      ARG0 will be a HTTP::Response object.
+
+    File extension handler events will have a hashref as ARG0 with the
+    following keys:
+
+      'request', the HTTP::Request object;
+      'response', the HTTP::Response object;
+      'session', the POE::Session that sent the request to us;
+      'script_name', the virtual path to the file that was requested;
+      'script_filename', the full system path to the file that was requested;
+
+    After the target session has processed the request in whatever shape or
+    form it must post the 'response' object back to the original session as
+    given in 'session', using the 'DONE' event.
+
+      $kernel->post( $session, 'DONE', $response );
+
+EXPORTED FUNCTIONS
+
+    The following functions are exported:
+
+    generate_301
+
+      Takes two mandatory arguments, a path and a HTTP::Response object.
+
+      Returns the HTTP::Response object with the content applicable for a
+      301 HTTP response.
+
+    generate_403
+
+      Takes one mandatory argument, a HTTP::Response object.
+
+      Returns the HTTP::Response object with the content applicable for a
+      403 HTTP response.
+
+    generate_404
+
+      Takes one mandatory argument, a HTTP::Response object.
+
+      Returns the HTTP::Response object with the content applicable for a
+      404 HTTP response.
+
+CAVEATS
+
+    This module is designed for serving small content, ie. HTML files and
+    jpegs/png/gifs. There is a good chance that the component might block
+    when attempting to serve larger content, such as MP3s, etc.
+
+TODO
+
+    Use POE::Wheel::Run to provide full non-blocking content serving.
+
+    More comprehensive HTTP error handling, with the ability to specify
+    custom 404 error pages.
+
+    More 'fancy' directory listing.
+
+KUDOS
+
+    Scott McCoy for pestering me with patches, for non-blocking file reads.
+    :)
+
+    Apocal for writing POE::Component::Server::SimpleHTTP.
+
+    Xantus for Filesys::Virtual::Plain
+
+    Those cheeky chaps at #PoE @ irc.perl.org for ever helpful suggestions.
+
+SEE ALSO
+
+    HTTP::Request, HTTP::Request, POE::Component::Server::SimpleHTTP, POE.
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

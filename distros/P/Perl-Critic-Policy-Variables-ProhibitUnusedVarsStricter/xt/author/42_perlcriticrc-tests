@@ -1,0 +1,14 @@
+##############################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/distributions/Perl-Critic/xt/author/42_perlcriticrc-tests $
+#     $Date: 2009-02-15 17:42:21 -0500 (Sun, 15 Feb 2009) $
+#   $Author: clonezone $
+# $Revision: 3142 $
+##############################################################################
+
+profile-strictness = fatal
+severity = 1
+# theme = core
+verbose = %f: %m at line %l, column %c.  %e.  (Severity: %s, %p)\n
+
+#-----------------------------------------------------------------------------
+

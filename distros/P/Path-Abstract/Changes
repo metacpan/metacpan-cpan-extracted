@@ -1,0 +1,113 @@
+TODO:
+    - Integrate File::Spec-like UNIX tests
+    - Add more Path::Class-style convenience methods (mkpath, contains, subsumes, etc.)
+    - Make ->list more like Path::Class::Dir::list
+    - Document differences between Path::Abstract and Path::Class
+    
+0.096 Thursday May 13 13:35:10 PDT 2010:
+    - Conversion to Dist::Dzpl
+    
+0.095 Friday November 14 13:38:16 PST 2008:
+    - Documentation tweak and release
+
+0.094_2 Wednesday November 12 17:37:11 PST 2008:
+    - Moved documentation out of ::Underload
+    - Added some documentation
+
+0.094_1 Friday November 07 16:28:42 PST 2008:
+    - Added ->at
+    - Added ->beginning
+    - Added ->ending
+    - ->first && ->last now return '' instead of undef
+    - Fixed bug where 'a.html.tar.gz'->pop = 'a'
+    - Changed ->list: now returns the empty list if $path is '/' 
+    - Changed ->list: does not return leading a leading slash '/a'->list = ('a')
+    - Changed ->split: an alternative to old ->list
+    - Changed ->first
+    - Changed ->last
+    - Added ->append
+    - Added ->extension
+    - Added greediness ('^', '$', '', & '*') to ->pop and ->up
+    - '' now considered a branch
+
+0.093 Friday August 15 20:14:42 PDT 2008:
+    - Deprecating Path::Abstract::Fast (into Path::Abstract::Underload)
+
+0.092 Thursday August 07 12:06:48 PDT 2008:
+    - More test silliness; should be fixed now
+
+0.091 Wednesday August 06 19:14:47 PDT 2008:
+    - Testing bug fix
+
+0.090 Wednesday August 06 16:00:14 PDT 2008:
+    - Fix for double file/double dir bug
+
+0.089 Wednesday August 06 02:02:30 PDT 2008:
+    - Moved U::PA into it's own distribution
+    - You can now pass an ARRAY reference into the pathing routines (which will dereference properly)
+
+0.088 Monday August 04 10:40:55 PDT 2008:
+    - Removed Path::Abstract::URI (made U::PA the real deal)
+    - Check for URI presence when testing
+    - Some documentation tweaks
+
+0.087 Sunday August 03 21:56:01 PDT 2008:
+    - Added URI::PathAbstract as a facade for Path::Abstract::URI (namespace is more relevant)
+    - Some documentation fixes
+
+0.085 Sunday August 03 14:03:21 PDT 2008:
+    - Added Path::Abstract::URI
+    - Some documentation tweaks
+
+0.083 Monday June 09 11:11:39 PDT 2008:
+    - Update to Path::Abstract::Fast::_canonize to ensure correctness
+
+0.081 Sunday June 08 18:27:36 PDT 2008:
+    - Improvement in Path::Abstract::Fast::_canonize: halved execution speed (I hope :)
+      by taking out blessed && ->isa
+    - Switch to using Module::Install
+
+0.080 Tuesday February 19 22:20:32 PST 2008:
+    - Added Path::Abstract::Fast without "use overload ..." to enable a hefty speedup! 
+      Credit to Joshua ben Jore, Max Kanat-Alexander, and Scott McWhirter for the discovery
+
+0.071 Saturday August 04 20:03:41 PDT 2007:
+    - Include "t/01-Path-Abstract.t" in MANIFEST
+
+0.07 Monday July 30 11:23:26 PDT 2007:
+    - Discard empty ('') positions in the path before joining with a slash
+
+0.07 2007-07-18:
+    - Retain trailing slash, if any
+
+0.06 Monday July 09 20:00:44 PDT 2007:
+    - Name change from Path::Lite to Path::Abstract
+    - Path::Lite is in stasis indefinitely
+
+0.05 Monday July 09 18:33:18 PDT 2007:
+    - More robust pop() and up()
+    - Possible fix for pop() error under perl 5.9.5
+
+0.04 Sunday July 01 14:09:30 PDT 2007:
+    - Using Sub::Exporter to export the 'path' instantiation routine
+    - Added 'path' as an alias to 'get' and 'stringify'
+    - Using Test::Lazy for testing
+
+0.03 Saturday June 30 09:27:01 PDT 2007:
+    - Changed behavior of 'pop' to modify path AND return the last (popped) path part
+    - Added tests
+
+0.02 Tuesday June 26 20:10:10 PDT 2007:
+    - Added SYNOPSIS
+    - Made Path::Class optional in Build.PL
+
+0.01 Tuesday June 26 19:03:31 PDT 2007:
+    - Added testing and documentation
+    - Wrote Set_test and Set_check testing routines
+    - Added 'to_branch' and 'to_tree'
+
+0.01 Thursday June 14 21:06:06 PDT 2007:
+    - Added some documentation
+
+0.01 June 2007:
+    - Initial release

@@ -1,0 +1,24 @@
+--output-line-ending="unix"            #-ole=s
+
+# moose perltidy... converted short arg to long
+# if I modify, then moose's values are listed as comment
+#
+--maximum-line-length=80                             #moose: 78
+--indent-columns=4                     #-i=n
+--continuation-indentation=2           #-ci=n        #moose:  4
+--standard-error-output                #-se
+--backup-and-modify-in-place           #-b
+--opening-brace-always-on-right        #-bar
+--break-at-old-comma-breakpoints       #-boc
+--vertical-tightness=0                 #-vt=n
+--vertical-tightness-closing=0         #-vtc=n
+--closing-token-indentation=0          #-cti=n
+--paren-tightness=0                    #-pt=n       #moose:  1
+--brace-tightness=0                    #-bt=n       #moose:  1
+--square-bracket-tightness=0           #-sbt=n      #moose:  1
+--block-brace-tightness=0              #-bbt=n      #moose:  1
+--no-outdent-long-lines                #-nolq
+--no-profile                           #-npro
+--no-space-for-semicolon               #-nsfs
+--want-break-before="% + - * / x != == >= <= =~ !~ < > | & >= < = **= += *= &= <<= &&= -= /= |= >>= ||= .= %= ^= x="  #-wbb=s
+

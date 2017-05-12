@@ -1,0 +1,2 @@
+requires 'Pcore',    v0.25.0;
+requires 'CAM::PDF', v1.60.0;

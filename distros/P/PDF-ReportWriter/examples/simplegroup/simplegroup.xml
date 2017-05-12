@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    First group example
+    Author: Cosimo Streppone <cosimo@cpan.org>
+    Date: 2006-03-14
+    $Id: simplegroup.xml,v 1.1 2006/03/14 17:14:25 cosimo Exp $
+-->
+<report>
+    
+    <definition>
+        <name>A simple report with a group</name>
+        <destination>simplegroup.pdf</destination>
+        <paper>A4</paper>
+        <orientation>portrait</orientation>
+        <font>Helvetica</font>
+        <font>Courier</font>
+        <default_font>Helvetica</default_font>
+        <default_font_size>10</default_font_size>
+        <x_margin>28.346</x_margin><!-- 10 mm -->
+        <y_margin>28.346</y_margin>
+    </definition>
+    
+    <data>
+        
+        <cell_borders>1</cell_borders>
+        
+        <!-- 10 postscript points @ 72 dpi = 3.52 mm -->
+        <field_headers_upper_buffer>10</field_headers_upper_buffer>
+        
+        <headings>
+            <background shape="box" colour="#408060"/>
+        </headings>
+        
+        <page>
+            
+            <header>
+                <cell index="0">
+                    <image path="simplegroup.png"/>
+                    <percent>20</percent>
+                    <align>right</align>
+                </cell>
+                <cell index="1">
+                    <text>Simple Report with Group by Year</text>
+                    <percent>80</percent>
+                    <font_size>20</font_size>
+                    <colour>green</colour>
+                    <align>center</align>
+                </cell>
+            </header>
+            
+        </page>
+        
+        <groups>
+            
+            <!-- This first group will sum up incomes, expenses and taxes by year
+                 We must define an `aggregate_function' in the Year field -->
+            <group>
+                
+                <name>GroupByYear</name>
+                <!-- Which column you want to group by? (starts from 0) -->
+                <data_column>0</data_column>
+                
+                <header>
+                    <cell>
+                        <index>0</index>
+                        <percent>100</percent>
+                        <align>left</align>
+                        <!-- `?' will be replaced with actual year value -->
+                        <text>Year ?</text>
+                        <font>Helvetica</font>
+                        <font_size>15</font_size>
+                        <colour>darkgreen</colour>
+                    </cell>
+                </header>
+                
+                <!-- Show result of sum operation in group footer -->
+                <footer>
+                    
+                    <cell>
+                        <index>0</index>
+                        <percent>80</percent>
+                        <align>right</align>
+                        <!-- `?' will be replaced with actual year value -->
+                        <font>Helvetica</font>
+                        <font_size>15</font_size>
+                        <text>Balance for year ?</text>
+                        <colour>white</colour>
+                        <background shape="box" colour="darkgreen"/>
+                    </cell>
+                    
+                    <cell>
+                        <index>0</index>
+                        <percent>20</percent>
+                        <align>right</align>
+                        <font>Courier</font>
+                        <font_size>12</font_size>
+                        <!-- Amount column (3rd) is the aggregate result source
+                             Column numbering starts from 0 -->
+                        <aggregate_source>2</aggregate_source>
+                        <colour>white</colour>
+                        <background shape="ellipse" colour="#B87F40"/>
+                    </cell>
+                    
+                </footer>
+                
+            </group>
+            
+        </groups>
+        
+        <fields>
+            <field>
+                <name>Year</name>
+                <index>0</index>
+                <percent>20</percent>
+                <background shape="box" colour="#509060"/>
+                <colour>white</colour>
+                <font>Courier</font>
+                <font_size>12</font_size>
+                <align>center</align>
+                <header_colour>white</header_colour>
+            </field>
+            
+            <field>
+                <name>Note</name>
+                <index>1</index>
+                <percent>50</percent>
+                <font>Helvetica</font>
+                <font_size>12</font_size>
+                <align>left</align>
+                <header_colour>white</header_colour>
+            </field>
+            
+            <field>
+                <name>Amount</name>
+                <index>2</index>
+                <percent>30</percent>
+                <font_size>12</font_size>
+                <align>right</align>
+                <font>Courier</font>
+                <format>
+                    <separate_thousands>1</separate_thousands>
+                </format>
+                <header_colour>white</header_colour>
+                <!-- This is necessary for the group to work correctly -->
+                <aggregate_function>sum</aggregate_function>
+            </field>
+        </fields>
+        
+    </data>
+    
+</report>

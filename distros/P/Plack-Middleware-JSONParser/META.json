@@ -1,0 +1,79 @@
+{
+   "abstract" : "It's new $module",
+   "author" : [
+      "Yosuke Furukawa <yosuke.furukawa@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.12.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-JSONParser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Hash::MultiValue" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Request" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::JSONParser" : {
+         "file" : "lib/Plack/Middleware/JSONParser.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yosuke-furukawa/Plack-Middleware-JSONParser/issues"
+      },
+      "homepage" : "https://github.com/yosuke-furukawa/Plack-Middleware-JSONParser",
+      "repository" : {
+         "url" : "git://github.com/yosuke-furukawa/Plack-Middleware-JSONParser.git",
+         "web" : "https://github.com/yosuke-furukawa/Plack-Middleware-JSONParser"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Yosuke Furukawa <furukawa.yosuke@dena.jp>"
+   ]
+}

@@ -1,0 +1,189 @@
+
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Manual</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Portable Presenter<BR>Manual</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=index.html>PPresenter</A><BR>
+<B>Manual</B>
+<P>
+<A HREF=http://ppresenter.org/download/index.html>Download</A></BR>
+<A HREF=example.html>Example</A><BR>
+<P>
+    </TD><TD VALIGN=top>
+
+<A HREF=index.html>Portable Presenter</A> is a package designed to give
+presentations.
+<EM>PPresenter</EM> is brought to you under a
+<A HREF=http://www.gnu.org>GNU</A> licence, what makes it free to be used
+and extended.
+
+<P>
+The software and the manual-pages are ready to be tested and used.
+These 61 pages of documentation describe version
+PPresenter v1.17 (published 2002/08/12).  It contains description of
+the functionality, and a few tutorials.
+<P>
+Please contribute to this document.
+You can see what kind of information is lacking.
+Maybe someone is willing to correct my English (it's not my native language,
+as you may have guessed).
+<P>&nbsp;
+
+    </TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=#PerlTk>Perl/Tk</A><BR>
+<A HREF=#running>Running</A><BR>
+<A HREF=#show>A show</A><BR>
+<A HREF=tutorial/index.html>Tutorials</A><BR>
+<A HREF=download/index.html>Download</A><BR>
+<A HREF=export/index.html>Exporters</A><BR>
+<A HREF=faq/index.html>FAQ</A><BR>
+<A HREF=#missing>Missing</A><BR>
+<A HREF=#questions>Questions?</A><BR>
+
+    </TD><TD VALIGN=top>
+
+<UL>
+<LI><A NAME=PerlTk>Perl/Tk</A>
+    <UL>
+    <LI>How to get Perl for UNIX or Window32.
+    <LI>Learning Perl
+    <LI>Optional packages for PPresenter.
+    </UL>
+    <P>
+
+<LI><A NAME=running><B><FONT COLOR=green>Running a presentation</B></FONT></A>.<BR>
+    There are three ways to run a presentation:
+    <UL>
+    <LI>Write a runnable perl-program using the PPresenter modules.
+    <LI>Run the same perl-program with the command
+        <A HREF=ppr/present1.html><CODE>present(1)</CODE></A>.
+    <LI><B><A HREF=xml/index.html><FONT COLOR=green>XML</FONT></A></B>: Write the presentation in xml,
+        and run it with the <CODE>present</CODE> command.
+    </UL>
+    <P>
+
+<LI><A HREF=show/index.html><B><FONT COLOR=green>Structure of a show</FONT></B></A>.<BR>
+    Read this to start understanding how the library is structured.<BR>
+    <A NAME=show>A show has</A>
+    <UL>
+    <LI>initiation via
+        command-line options or the show's creation method
+        <A HREF=show/new.html>new()</A>.
+    <LI>a list of <A HREF=slide/index.html><B><FONT COLOR=green>slides</FONT></B></A>
+        <UL>
+        <LI>which have for each viewport a
+            <A HREF=slideview/index.html>slide-view</A>.  Each view is
+            written in a certain
+            <A HREF=style/index.html><B><FONT COLOR=green>style</FONT></B></A>,
+            contain the style-elements:
+            <UL>
+            <LI><A HREF=decoration/index.html>Decoration</A>:
+                <A HREF=decoration/solid.html>Solid</A>.
+            <LI><A HREF=dynamic/index.html>Dynamics</A>:
+                <A HREF=dynamic/default.html>default</A>.
+            <LI><A HREF=fontset/index.html>Fontset</A>:
+                <A HREF=fontset/tkfonts.html>Tk-fonts</A>,
+                <A HREF=fontset/xscaling.html>Scalable X-fonts</A>.
+            <LI><A HREF=formatter/index.html>Formatter</A>:
+                <A HREF=formatter/plain.html>Plain</A>,
+                <A HREF=formatter/simple.html>Simple</A>,
+                <A HREF=formatter/markup.html>Markup</A>.
+            <LI><A HREF=template/index.html>Template</A>:
+                <A HREF=template/default.html>Default</A></B>.
+            </UL>
+            and, at runtime
+            <UL>
+            <LI>for each view a <A HREF=slide/program.html>program</A>
+                to be played.
+            </UL>
+            <A HREF=function/find.html>find</A>,
+            <A HREF=function/select.html>select</A>, or
+            <A HREF=function/change.html>change</A>
+            style elements.<BR>
+            Debugging,
+            designing, and
+            creation of styles.
+        </UL>
+    <LI><A HREF=image/index.html><B><FONT COLOR=green>Images</FONT></B></A>
+        created with
+        <A HREF=image/tkphoto.html>Tk::Photo</A> or
+        <A HREF=image/magick.html>Image::Magick</A>.
+    <LI>a list of
+        <A HREF=viewport/index.html><B><FONT COLOR=green>viewports</FONT></B></A>
+        showing slides.
+    <LI>one <A HREF=viewport/control.html><B><FONT COLOR=green>control viewport</FONT></B></A>,
+        which shows
+        slide notes,
+        names of the neighbouring slides,
+        a slide-buttons bar, and
+        a progress bar.
+    <LI>a <B><FONT COLOR=green>background menu</FONT></B> is hidden behind the
+        right mouse-button in a viewport with controls.
+    <LI>via a <A HREF=viewport/popup.html><B><FONT COLOR=green>popup
+        window</FONT></B></A>,
+        or via the controling viewport,
+        you can control the timing of the show,
+        <A HREF=viewport/popup.html#slidecontrol>selecting slides</A>, and
+        <A HREF=viewport/popup.html#tagcontrol>manage tagged slides</A>.
+    </UL>
+    Sorted index of <A HREF=options.html>all options</A>.
+    <P>
+<LI><A HREF=tutorial/index.html><B><FONT COLOR=green>Tutorials:</FONT></B></A>
+    <UL>
+    <LI>Brief <A HREF=tutorial/file.html>presentation description</A>.
+    <LI>Possibilities to <A HREF=tutorial/notation.html>denote</A>
+        strings in Perl.
+    <LI>Detailed guide how to <A HREF=tutorial/beginners/index.html>create
+        a presentation</A> and how to use PPresenter for it.
+    <LI>Differences between <A HREF=tutorial/html2markup/index.html>HTML
+        and the Markup</A> formatter.
+    </UL>
+    <P>
+
+<LI><A HREF=export/index.html><B><FONT COLOR=green>Export slides</FONT></B></A>
+    to various formats:
+    <UL>
+    <LI>Convert slides into <A HREF=export/images/imagemagick.html>images</A>.
+    <LI>Convert slides into postscript document.
+    <LI>Convert presentation <A HREF=export/website/index.html>into a website</A>.
+    </UL>
+    <P>
+<LI><A HREF=faq/index.html><B><FONT COLOR=green>FAQ</FONT></B></A> (Frequently
+    asked questions)
+    <P>
+<LI><A NAME=missing>Missing</A>:
+    <UL>
+    <LI>Handling of fonts other than ISO-8859-1,
+    <LI>Mailing-lists.
+    </UL>
+</UL>
+    <P>&nbsp;
+    </TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+    <H2><A NAME=questions>Questions?</A></H2>
+    For questions or contributions, you can email
+    <TT><A HREF=mailto:ask@ppresenter.org>ask@ppresenter.org</A></TT>.
+    <P>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

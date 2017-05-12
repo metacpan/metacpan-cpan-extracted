@@ -1,0 +1,46 @@
+---
+abstract: 'mod_expires for plack'
+author:
+  - 'Masahiro Nagano <kazeburo {at} gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Expires
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::Expires:
+    file: lib/Plack/Middleware/Expires.pm
+    version: '0.06'
+requires:
+  HTTP::Date: '0'
+  HTTP::Status: '0'
+  Plack: '0.9937'
+  Try::Tiny: '0.06'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/kazeburo/Plack-Middleware-Expires/issues
+  homepage: https://github.com/kazeburo/Plack-Middleware-Expires
+  repository: git://github.com/kazeburo/Plack-Middleware-Expires.git
+version: '0.06'
+x_contributors:
+  - 'Lee Aylward <lee@laylward.com>'
+  - 'Kjetil Kjernsmo <kjetil@kjernsmo.net>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'

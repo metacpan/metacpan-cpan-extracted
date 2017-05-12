@@ -1,0 +1,235 @@
+#!/usr/bin/perl -w
+
+# Iouri Ivliev 2008
+
+use strict;
+use Getopt::Std;
+use Panotools::Script;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+our $VERSION = "0.0.2 (using Panotools::Script $Panotools::Script::VERSION)";
+our ($opt_D,$opt_d,$opt_o,$opt_r,$opt_x,$opt_y,$opt_O,$opt_B,$opt_b) = 
+    (64,    3,     undef, 0xa1  ,12,    9,     0,     0,     0);
+getopts 'D:d:o:p:r:x:y:O:B:b:';
+(HELP_MESSAGE(\*STDERR),die "No input script\n") if $#ARGV<0;
+(HELP_MESSAGE(\*STDERR),die "Only one input script allowed\n") if $#ARGV>0;
+
+sub HELP_MESSAGE {
+    my $h = shift;
+    my ($cmd) = ($0 =~ m,([^/\\]+)$,);
+    my $r = sprintf '0x%04x',$opt_r;
+    my $O = sprintf '0x%02x',$opt_O;
+    print $h <<EOM
+Usage: $cmd [options] <script>
+Options are:
+    -B - HFOV bounds size [$opt_B]
+    -b - VFOV bounds size [$opt_b]
+    -D - max distance [$opt_D]
+    -d - min distance [$opt_d]
+    -O - verbosity flags [$O]
+        0x01 - script info
+        0x02 - panorama info
+        0x04 - images info
+        0x08 - control points info
+        0x10 - overall statistics
+        0x20 - cluster statistics
+    -o - output script [undef]
+    -r - remove control points mask [$r]
+        0x0001 - (point distance) > (max distance)
+        0x0002 - (point distance) > (overall avg distance) + (overall stddev)
+        0x0020 - (point distance) > (cluster avg distance) + (cluster stddev)
+        0x0040 - (cluster avg distance) > (min distance) 
+            and (point distance) - (cluster avg distance) > (cluster stddev)
+        0x0080 - (point distance) > (min distance) 
+            and (point direction) != (point direction of more then half 
+                    of points in cluster)
+        0x2000 - control point near of panorama FOV bounds
+        0x4000 - control point haven't corresponding morph control point,
+            probubly out of panorama FOV bounds
+        0x8000 - "line" control point
+    -x - number of buckets on width [$opt_x]
+    -y - number of buckets on height [$opt_y]
+EOM
+}
+
+sub VERSION_MESSAGE {
+    my $h = shift;
+    my ($cmd) = ($0 =~ m,([^/\\]+)$,);
+    print $h <<EOM
+$cmd $VERSION
+Panorama Tools Script control points clustreing filter
+EOM
+}
+
+$opt_O = 0xff unless $opt_O or $opt_o;
+sub verbose {
+    my $vf = shift;
+    printf STDOUT @_ if $vf & $opt_O;
+}
+
+$opt_r = eval $opt_r;
+$opt_O = eval $opt_O;
+
+use constant PI => 4*atan2(1,1);
+
+my $p = new Panotools::Script;
+verbose 0x01,"Loading $ARGV[0]\n";
+$p->Read($ARGV[0]);
+my ($i,$c,$C) = ($p->Image,$p->Control,$p->ControlMorph);
+my ($in,$cn,$Cn) = (1+$#{$i},1+$#{$c},1+$#{$C});
+my ($W,$H,$V) = ($p->Panorama->{w},$p->Panorama->{h},$p->Panorama->{v});
+verbose 0x02,"Output panorama: %dx%d (HFOV: %d)\n",$W,$H,$V;
+verbose 0x02,"Input images ('i'): $in\n";
+verbose 0x02,"Control points ('c'): $cn; Morph ('C'): $Cn\n";
+
+my $NM = ($Cn and defined($C->[0]->{c})); # output of patched PToptimiser
+
+# overall statistics
+my (@D,@F);
+my ($MD,$mD,$aD,$aD2,$n,$N) = (-100000,100000,0,0,0,0);
+my %ip;
+CP:
+for (my ($ci,$Ci)=(0,0); $ci<$cn; ++$ci) {
+    $c->[$ci]->{FLG} = 0x8000;
+    # skip "line" control points
+    next if $c->[$ci]->{t};
+    ++$n;
+    $c->[$ci]->{FLG} = 0x4000;
+    $D[$ci] = 0;
+    $F[$ci] = 0;
+    # out of morph num or corresponding control point num greater (if defined)
+    next unless $Ci<$Cn and (not $NM or $C->[$Ci]->{c}==$ci);
+    #print "$Ci: ",join(':',%{$C->[$Ci]},"\n");
+    ++$N;
+    $c->[$ci]->{FLG} = 0;
+    my $x = $C->[$Ci]->{x};
+    my $y = $C->[$Ci]->{y};
+    my $X = $C->[$Ci+1]->{x};
+    my $Y = $C->[$Ci+1]->{y};
+    my ($dx,$dy,$d);
+    if ($NM) { # patched PToptimiser - using distancies from morph control point line
+        $dx = $C->[$Ci]->{Dx};
+        $dy = $C->[$Ci]->{Dy};
+        $d = $C->[$Ci]->{D};
+    } else { # original PToptimiser - using orthogonal as difference between morph (highly approximately) and distance as control point error.
+        $dx = $X-$x;
+        $dy = $Y-$y;
+        #$d = sqrt($dx*$dx+$dy*$dy);
+        $d = $c->[$ci]->Distance($p);
+    }
+    $Ci+=2;
+    if ($x<$opt_B or $y<$opt_b or $x>$W-$opt_B or $y>$H-$opt_b 
+     or $X<$opt_B or $Y<$opt_b or $X>$W-$opt_B or $Y>$H-$opt_b) {
+        $c->[$ci]->{FLG} = 0x2000;
+        --$n;
+        --$N;
+        next CP;
+    }
+    my ($ipn,$ipN) = @{$c->[$ci]}{qw(n N)};
+    my $ipk = sprintf '%04d/%04d',$ipn,$ipN;
+    ($ip{$ipk}->{n},$ip{$ipk}->{N}) = ($ipn,$ipN) unless exists $ip{$ipk};
+    push @{$ip{$ipk}->{c}},$ci;
+    $D[$ci] = $d;
+    $F[$ci] = int(atan2($dx,$dy)*4/PI+.5)+4;
+    $MD = $d if $MD < $d;
+    $mD = $d if $mD > $d;
+    $aD += $d;
+    $aD2 += $d*$d;
+}
+verbose 0x10,"Normal control point(s) found: $n\n";
+verbose 0x10,"Morph control point pairs(s) found: $N\n";
+die "No control points\n" unless $n;
+# overall stddev
+$aD2 = sqrt(($aD2-$aD*$aD/$n)/$n);
+# overall avg distance
+$aD /= $n;
+verbose 0x10,"Overall distance (min/avg/max stddev): %1.4f/%1.4f/%1.4f %1.4f\n",
+    $mD,$aD,$MD,$aD2;
+die "No morph control points\n" unless $N;
+die <<EOM
+Each normal control point MUST have 2 morph control points (2*$n != $Cn)
+Try to enlarge panorama HFOV ('v' variable) and/or height ('h' variable) 
+and run PToptimiser again
+EOM
+    unless $NM or $N == $n;
+
+# cluster statistics
+foreach my $ipk (sort keys %ip) {
+    my ($ii,$Ii) = @{$ip{$ipk}}{qw(n N)};
+    my ($w,$h) = ($i->[$ii]->{w},$i->[$ii]->{h});
+    my ($cw,$ch) = ($w/$opt_x,$h/$opt_y);
+    verbose 0x04,"Input images pair %d/%d: %dx%d/%dx%d; cluster size: %1.2fx%1.2f\n", 
+        $ii,$Ii,$w,$h,$i->[$Ii]->{w},$i->[$Ii]->{h},$cw,$ch;
+    for (my $yi=0; $yi<$opt_y; ++$yi) {
+    for (my $xi=0; $xi<$opt_x; ++$xi) {
+        my ($x,$y) = ($xi*$cw,$yi*$ch);
+        my ($X,$Y) = ($x+$cw,$y+$ch);
+        verbose 0x04,"Cluster: (%1.2f,%1.2f)-(%1.2f,%1.2f)\n",$x,$y,$X,$Y;
+        my @cc = ();
+        foreach my $ci (@{$ip{$ipk}->{c}}) {
+            # out of this cluster
+            next if $c->[$ci]->{x}<$x or $c->[$ci]->{x}>=$X 
+                 or $c->[$ci]->{y}<$y or $c->[$ci]->{y}>=$Y;
+            # distance too big
+            if ($D[$ci]>$opt_D) {
+                $c->[$ci]->{FLG} |= 0x0001;
+                verbose 0x08,"%d\t0x%04x\t%1.4f %d%s\n", 
+                    $ci,$c->[$ci]->{FLG},$D[$ci],$F[$ci],($c->[$ci]->{FLG} & $opt_r)?' *':'';
+            }
+            # don't use for cluster statistics
+            next if $c->[$ci]->{FLG} & 0x0001;
+            push @cc,$ci;
+        }
+        $n = @cc;
+        verbose 0x08,"Control points found: %d\n",$n;
+        next if $n<1;
+        my ($cMD,$cmD,$caD,$caD2) = (-1000000,1000000,0,0);
+        my @ff = (undef,0,0,0,0,0,0,0,0);
+        foreach my $ci (@cc) {
+            $cMD = $D[$ci] if $cMD < $D[$ci];
+            $cmD = $D[$ci] if $cmD > $D[$ci];
+            $caD += $D[$ci];
+            $caD2 += $D[$ci]*$D[$ci];
+            ++$ff[$F[$ci]];
+        }
+        # cluster stddev
+        $caD2 = sqrt(($caD2-$caD*$caD/$n)/$n);
+        # cluster avg distance
+        $caD /= $n;
+        verbose 0x20,"Cluster statistics:\n";
+        verbose 0x20," distance (min/avg/max stddev): %1.4f/%1.4f/%1.4f %1.4f\n",
+            $cmD,$caD,$cMD,$caD2;
+        #cluster direction
+        my ($f,$fn) = (0,0);
+        foreach my $fi (1..8) {
+            if ($ff[$fi]>$fn) {
+                $f = $fi;
+                $fn = $ff[$fi];
+            }
+        }
+        verbose 0x20," direction (val num/tot): %d %d/%d\n",$f,$fn,$n;
+        foreach my $ci (@cc) {
+            $c->[$ci]->{FLG} |= 0x0002 if $D[$ci]>$aD+$aD2*1.01;
+            $c->[$ci]->{FLG} |= 0x0020 if $D[$ci]>$caD+$caD2*1.01;
+            $c->[$ci]->{FLG} |= 0x0040 
+                if $caD>$opt_d and abs($D[$ci]-$caD)>$caD2*1.01;
+            $c->[$ci]->{FLG} |= 0x0080 
+                if $D[$ci]>$opt_d and $F[$ci]>0 and $fn>$n/2 and $F[$ci]!=$f;
+            verbose 0x08,"%d\t0x%04x\t%1.4f %d%s\n", 
+                $ci,$c->[$ci]->{FLG},$D[$ci],$F[$ci],($c->[$ci]->{FLG} & $opt_r)?' *':'';
+        }
+    }}
+}
+
+exit 0 unless defined $opt_o; 
+
+verbose 0x01,'Removing bad control points:';
+for (my $ci=$cn; $ci--; ) {
+    (delete $c->[$ci]->{FLG},next) unless $c->[$ci]->{FLG} & $opt_r;
+    verbose 0x01," $ci";
+    splice @$c,$ci,1;
+}
+verbose 0x01,"\n";
+
+verbose 0x01,"Saving $opt_o\n";
+$p->Write($opt_o);

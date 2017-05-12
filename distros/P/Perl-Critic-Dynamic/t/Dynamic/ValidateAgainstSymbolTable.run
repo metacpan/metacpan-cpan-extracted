@@ -1,0 +1,396 @@
+##############################################################################
+#      $URL: iables/ProhibitLocalVars.run $
+#     $Date: 2006-11-27 01:10:30 -0800 (Mon, 27 Nov 2006) $
+#   $Author: thaljef $
+# $Revision: 975 $
+##############################################################################
+
+## name Forgot to "use Carp", from inside main
+## failures 4
+## cut
+
+print $Carp::VERSION;
+print @Carp::EXPORT;
+
+carp("I died");
+&carp("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Forgot to "use Carp", from inside a package
+## failures 4
+## cut
+
+package Foo;
+
+print $Carp::VERSION;
+print @Carp::EXPORT;
+
+carp("I died");
+&carp("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Misspelled package name, from inside main
+## failures 4
+## cut
+
+use Carp;
+
+print $Crap::VERSION;
+print @Crap::EXPORT;
+
+Crap::carp("I died");
+&Crap::crap("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Misspelled package name, from inside a package
+## failures 4
+## cut
+
+package Foo;
+
+use Carp;
+
+print $Crap::VERSION;
+print @Crap::EXPORT;
+
+Crap::crap("I died");
+&Crap::carp("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Misspelled sub name, from inside main
+## failures 2
+## cut
+
+use Carp;
+
+Carp::crap("I died");
+&Carp::crap("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Misspelled sub name, from inside a package
+## failures 2
+## cut
+
+package Foo;
+
+use Carp;
+
+Carp::crap("I died");
+&Carp::crap("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Automatic import succeds, from inside main
+## failures 0
+## cut
+
+use Carp;
+
+carp "I died";
+carp("I died");
+&carp("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Automatic import succeds, from inside a package
+## failures 0
+## cut
+
+package Foo;
+
+use Carp;
+
+carp "I died";
+carp("I died");
+&carp("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Explicit import succeds, from inside main
+## failures 0
+## cut
+
+use Carp qw(carp);
+
+carp "I died";
+carp("I died");
+&carp("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Explicit import, from inside a package
+## failures 0
+## cut
+
+package Foo;
+
+use Carp qw(carp);
+
+carp "I died";
+carp("I died");
+&carp("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Import disabled, from inside main
+## failures 2
+## cut
+
+use Carp ();
+
+carp("I died");
+&carp("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Import disabled, from inside a package
+## failures 2
+## cut
+
+package Foo;
+
+use Carp ();
+
+carp("I died");
+&carp("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Using fully-qualified name, from inside main
+## failures 0
+## cut
+
+use Carp ();
+
+Carp::carp "I died";
+&Carp::carp("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Using fully-qualified name, from inside a package
+## failures 0
+## cut
+
+package Foo;
+
+use Carp ();
+
+Carp::carp "I died";
+&Carp::carp("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Do not recurse into dependencies, from inside main
+## failures 5
+## cut
+
+use CGI;  #also uses Carp
+
+print $Carp::VERSION;
+print @Carp::EXPORT;
+
+carp("I died");
+Carp::carp "I died";
+&Carp::carp("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Do not recurse into dependencies, from inside a package
+## failures 5
+## cut
+
+package Foo;
+
+use CGI;  #also uses Carp
+
+print $Carp::VERSION;
+print @Carp::EXPORT;
+
+carp("I died");
+Carp::carp "I died";
+&Carp::carp("I died");
+
+#-----------------------------------------------------------------------------
+
+## name Things in hash keys are ignored
+## failures 0
+## cut
+
+use Carp;
+
+%hash = (carp => 1);
+$hash{carp} = 1;
+
+#-----------------------------------------------------------------------------
+
+## name Global functions are ignored
+## failures 0
+## cut
+
+
+UNIVERSAL::isa( $obj, $class );
+UNIVERSAL::can( $obj, $method );
+CORE::die("A horrible death");
+
+#-----------------------------------------------------------------------------
+
+## name Lexical variables are ignored
+## failures 0
+## cut
+
+
+print %hash;
+print @array;
+print $scalar;
+
+#-----------------------------------------------------------------------------
+
+## name When a local sub is defined
+## failures 0
+## cut
+
+print foo();
+sub foo {};
+
+#-----------------------------------------------------------------------------
+
+## name When a local subs is not defined
+## failures 1
+## cut
+
+
+print foo();
+
+#-----------------------------------------------------------------------------
+
+## name Syntax oddities
+## failures 0
+## cut
+
+package Foo;
+
+sub ::foo{}
+sub main::baz{};
+
+print ::foo();
+print &::foo();
+print &main::foo();
+
+print ::baz();
+print &::baz();
+print &main::baz();
+
+#-----------------------------------------------------------------------------
+
+## name Included module not in path
+## error /Child process had errors/
+## failures 1
+## cut
+
+use FooBar;
+
+#-----------------------------------------------------------------------------
+
+## name at_inc configuration
+## parms { at_inc => 'tlib' }
+## failures 0
+## cut
+
+use FooBar;
+
+#-----------------------------------------------------------------------------
+
+## name at_inc_prefix configuration
+## parms { at_inc_prefix => 'tlib' }
+## failures 0
+## cut
+
+use FooBar;
+
+#-----------------------------------------------------------------------------
+
+## name Inner packages
+## parms { at_inc_prefix => 'tlib', max_recursion => 1 }
+## failures 0
+## cut
+
+use FooBar;  # Has inner package called "InnerFooBar"
+
+InnerFooBar::inner_subroutine();
+&InnerFooBar::inner_subroutine();
+
+#-----------------------------------------------------------------------------
+
+## name at_inc_suffix configuration
+## parms { at_inc_suffix => 'tlib' }
+## failures 0
+## cut
+
+use FooBar;
+
+#-----------------------------------------------------------------------------
+
+## name AUTOLOADers ignored by default
+## failures 0
+## cut
+
+use CGI;  # Has 'sub AUTOLOAD {...}'
+
+CGI::FooBar();
+
+#-----------------------------------------------------------------------------
+
+## name AUTOLOADers inspected on request
+## parms { inspect_autoloaders => 1 }
+## failures 1
+## cut
+
+use CGI;  # Has 'sub AUTOLOAD {...}'
+
+CGI::FooBar();
+
+
+#-----------------------------------------------------------------------------
+
+## name require'd modules are ignored by default
+## failures 1
+## cut
+
+require Carp;
+Carp::croak( "I died" );
+
+#-----------------------------------------------------------------------------
+
+## name require'd modules are inpsected on request
+## parms { inspect_required_modules => 1 }
+## failures 0
+## cut
+
+require Carp;
+Carp::croak( "I died" );
+
+#-----------------------------------------------------------------------------
+
+## name Cannot detect symbols imported at run time
+## parms { inspect_required_modules => 1 }
+## failures 1
+## cut
+
+require Carp;
+Carp->import( "croak" );
+croak( "I died" );
+
+##############################################################################
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab :

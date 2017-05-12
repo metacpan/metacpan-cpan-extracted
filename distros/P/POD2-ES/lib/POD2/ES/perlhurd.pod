@@ -1,0 +1,70 @@
+=encoding utf8
+
+Puede leer este archivo en cualquier editor de texto (verá algunos caracteres
+extraños, pero puede ignorarlos). Está escrito en formato POD (vea
+pod/perlpod.pod), un formato diseñado específicamente para ser legible tal
+cual.
+
+=head1 NAME
+
+perlhurd - Perl versión 5 en Hurd
+
+=head1 DESCRIPCIÓN
+
+Si desea usar Perl en Hurd, la distribución recomendada es Debian GNU/Hurd
+(visite http://www.debian.org/ ), aunque aún no existe una versión oficial
+estable. Con toda seguridad habrá más problemas en la distribución binaria
+anterior, "gnu-0.2".
+
+=head2 Problemas conocidos de Perl en Hurd 
+
+El conjunto de pruebas de Perl podría detectar errores en Hurd. Es muy
+probable que no se superen las pruebas "lib/anydbm" y "pragma/warnings". En
+realidad, estos errores no son específicos de Hurd (como parece indicar el
+resultado del conjunto de pruebas).
+
+Si la red no está configurada, las pruebas de sockets pueden generar errores.
+Debe establecer "/hurd/pfinet" como traductor de "/servers/socket/2",
+suministrándole los argumentos correctos. Pruebe "/hurd/pfinet --help" para
+obtener más información.
+
+Estas son las estadísticas correspondientes a Perl 5.005_62 en mi sistema:
+
+ Failed Test  Status Wstat Total Fail  Failed  List of failed
+ -----------------------------------------------------------------------
+ lib/anydbm.t                 12    1   8.33%  12
+ pragma/warnings             333    1   0.30%  215
+
+ 8 tests and 24 subtests skipped.
+ Failed 2/229 test scripts, 99.13% okay. 2/10850 subtests failed,
+     99.98% okay.
+
+En muchos sistemas los resultados obtenidos son peores...
+
+Sin embargo, como estoy ejecutando una instantánea muy reciente de Hurd, en la
+que se han corregido muchos de los errores expuestos por el conjunto de pruebas
+de Perl, es posible que otros usuarios encuentren más errores. Los candidatos
+probables son: "op/stat", "lib/io_pipe", "lib/io_sock", "lib/io_udp" y
+"lib/time".
+
+En cualquier caso, si ve más errores que los mencionados en este documento,
+debería actualizar a la versión más reciente de Hurd antes de notificar los
+errores.
+
+=head1 AUTOR
+
+Mark Kettenis <kettenis@gnu.org>
+
+Última actualización: viernes, 29 de octubre de 1999 22:50:30 +0200
+
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

@@ -1,0 +1,35 @@
+
+Hints for users of gvim
+=======================
+
+This package includes the following files:
+
+* Session.vim
+* Project.vim
+* Start-Edit.bat
+
+The purpos of these files is to provide a convenient development environment
+for editing and testing. Double click on the "Start-Edit.bat" icon in the
+windows Explorer starts gvim with project.vim active.
+
+Unix users should start "gvim" and then type:
+
+  :Project Project.vim
+
+You will need the project.vim Extension from the gvim homepage.
+Get and install projects.vim from
+   http://vim.org/
+
+And you must adopt some pathnames in Session.vim.
+
+Adaptions for Windows Users
+---------------------------
+find the "cd" command in Session.vim and adopt the pathname.
+Change the pathname at the beginning of Project.vim.
+
+Adaptions for UNIX users
+------------------------
+Change the pathname at the beginning of Project.vim.
+
+
+Enjoy :-)

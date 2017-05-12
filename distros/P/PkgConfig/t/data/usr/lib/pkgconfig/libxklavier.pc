@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libxklavier
+Description: libxklavier library
+Requires: libxml-2.0
+Version: 5.1
+Libs: -L${libdir} -lxklavier -pthread -lgobject-2.0 -lgthread-2.0 -lrt -lglib-2.0   -lxml2  
+Cflags: -I${includedir} -pthread -I/usr/include/glib-2.0 -I/usr/lib/glib-2.0/include  

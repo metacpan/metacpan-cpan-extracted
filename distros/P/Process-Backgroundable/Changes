@@ -1,0 +1,13 @@
+Changes for Perl Extension Process-Backgroundable
+
+0.21 Thu 10 Jul 2008
+	- No functional changes
+	- Updating to Module::Install 0.76
+	- Removed the use of base
+	- Updated to File::Remove 1.42
+
+0.20 Sun  1 Jul 2007
+	- Unlike the rest of the Process family, Process::Backgroundable
+	  does not work properly on Windows. So it is being seperated out
+	  into a distribution on its own to prevent imposing a limitation
+	  on the main collection of Process modules.

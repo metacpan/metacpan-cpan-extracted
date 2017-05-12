@@ -1,0 +1,86 @@
+
+// -- macro declarations: start reading with first headline
++BC:\B<\C<__body__>>
+
+// -- end of "preface"
+
+=0.07
+
+* nested lists: removed wrapping list point;
+	
+=0.06
+
+* added INDEXCLOUD support to PP::Generator::XHTML;
+	
+=0.05
+
+* nested lists: the wrapping list point got CSS for
+  "list-style-type: none";
+	
+=0.04
+
+Several improvements, focussed on more valid XHTML output:
+	
+* the <embedded-(x)html> tags included for embedded parts
+  made the produced XHTML invalid, deleted;
+	
+* index now produced as better XHTML;
+
+* in XHTML strict, <a> has an \I<id> attribute, but no name;
+
+* in XHTML strict, <u> is no valid tag, so now CSS is used for \C<\\U>;
+
+* nested lists are wrapped into list points, for correct XHTML;
+
+* \C<LOCALTOC>: nested list wrapped in list points as well;
+
+* anchors now built as simple strings on base of MD5
+  checksums, to get valid XHTML addresses;
+
+* index relation <div> now has an own class, "_ppIndexRelated",
+  for easier CSS access;
+
+* building filenames we use File::Spec::catfile() now;
+
+* headlines in paged output do not need anchors (as each chapter
+  has its own page), deleted;
+
+
+=0.03
+
+* Bugfix: first link on a page could point to a label
+  on the same page, instead to the real target.
+
+* More portable pathes: built with File::Path now.
+	
+
+=0.02
+
+* added the template support the previous version was
+  documented to have;
+	
+* removed attribute targethandle - with templates, files
+  can be opened by the template engine, so a general
+  handling is not always appropriate;
+
+* added buildFilename() to allow generalized algorithms
+  to work - code in this class must work for child
+  classes as well;
+
+* added buildTargetLink() to build link targets in one
+  place;
+
+* fixed a letter case error - sequence anchor tags were
+  written uppercased;
+  
+* now storing an array reference for each page in the
+  slides attribute, allowing using code (like template
+  engines) to distinguish pages;
+
+* nested tables now supported;
+
+* added first tests (POD tests only);
+	
+=0.01
+
+New.

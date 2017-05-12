@@ -1,0 +1,11 @@
+Revision history for POE-Component-WWW-XKCD-AsText
+
+0.002   2013-12-15
+        - Fixed failing tests
+        - Minor fixes to comply with the specs and Kwalitee game
+        - Added autogeneration of README from POD
+        - Moved author tests to xt/
+
+0.001   2008-03-07
+        - First version, released on an unsuspecting world.
+

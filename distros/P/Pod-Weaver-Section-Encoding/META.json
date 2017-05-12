@@ -1,0 +1,31 @@
+{
+   "resources" : {
+      "repository" : null
+   },
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "version" : "0.100830",
+   "name" : "Pod-Weaver-Section-Encoding",
+   "author" : [
+      "Keedi Kim - \u00ea\u00b9\u0080\u00eb\u008f\u0084\u00ed\u0098\u0095 <keedi@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "requires" : {
+      "Test::More" : "0",
+      "Pod::Elemental::Element::Pod5::Ordinary" : "0",
+      "Pod::Elemental::Element::Pod5::Command" : "0",
+      "Pod::Weaver::Role::Section" : "0",
+      "Moose::Autobox" : "0",
+      "Pod::Elemental::Element::Nested" : "0",
+      "Moose" : "0"
+   },
+   "abstract" : "add a encoding pod tag with encoding (for your Perl module)",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

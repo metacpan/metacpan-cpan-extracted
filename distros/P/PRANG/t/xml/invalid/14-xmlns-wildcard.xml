@@ -1,0 +1,12 @@
+<!-- error: /unexpected element.*parsing: <X:single_quotes/ -->
+<Octothorpe xmlns:A="uri:type:A" xmlns:B="uri:type:B" xmlns:X="uri:type:X">
+  <colon/>
+  <A:section_mark>
+    <A:section_mark>
+      <interrobang/>
+      <A:single_quotes/>
+    </A:section_mark>
+    <interrobang/>
+    <X:single_quotes/>
+  </A:section_mark>
+</Octothorpe>

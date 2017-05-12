@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 fef39ae2b2732aff2fa0a14fa23cb31a3cc729bf Build.PL
+SHA1 b77f64d7bda678b582e8c19eb47ac50887118c9c Changes
+SHA1 6edf39d2927ee6fd2d7b326a5b230ac99add2a8d MANIFEST
+SHA1 37a4ce6229066cfcb4c16ecf16393ac8f795f1da META.yml
+SHA1 9ba5f2de6bc180a4e40ba9b568c68c3b3c55d2ed README
+SHA1 8b6d3934dca8305ac628c209560a7451b43abb9c ignore.txt
+SHA1 21e739c77a8bc7879a23f59b8c6561f1e61e1daa lib/Pod/Weaver/Role/SectionReplacer.pm
+SHA1 fe3fb7c69577e6ed9223d6c0f5463f1da8aa1c03 t/00-load.t
+SHA1 43faf2d1f9ac54c8d8587ee94153c49728e407d6 t/50-weave.t
+SHA1 57db22b18a2045d4776a6434e6b106922ef3a319 t/90-check-changes.t
+SHA1 dcf6c7fef5befbc5b8f754de3da707c0fbc22ae9 t/91-fixme.t
+SHA1 98cdccf1120f3c9b445d6bcfaa10339a9c821d54 t/92-hasversion.t
+SHA1 e6efcfd6a7173a136748ef560e913465fe03a854 t/93-meta.t
+SHA1 9f074af0f75805df778e06a6b2c0221aa9ae6a1f t/94-minimumversion.t
+SHA1 bae7f6978d6b9099f6f5b3321598871503e78781 t/95-manifest.t
+SHA1 8c57f2b89f12c54fd975c39ded1c100796ab5f17 t/98-pod.t
+SHA1 49835efe20e87aef3f67d9fdd75a6593acf811d2 t/99-pod-coverage.t
+SHA1 7507861822d6399f57ab24c7d92fa7475b327d0a t/inc/Pod/Weaver/Section/TestSectionReplacer.pm
+SHA1 7b24c6fb9b482a9c90c04f0f7dad8e35c3253c4f t/test_files/50-weave.ini
+SHA1 a751b1751645ac9c2bf7d461d514e1bf3bb417f2 t/test_files/pod_with_multiple_test_section.in.pod
+SHA1 32939b30d37e243afb08dab864d51b1b6a1b2ce9 t/test_files/pod_with_multiple_test_section.out.pod
+SHA1 2a11f3b2488ed08a71a67bb9a76bdfc8ba1a1c6d t/test_files/pod_with_test_section.in.pod
+SHA1 900ff3b6ce9b81a56c533f9749d6e16385325377 t/test_files/pod_with_test_section.out.pod
+SHA1 ec86b027845aa2fbeadab890a20e9397b7584440 t/test_files/pod_with_test_section_alias.in.pod
+SHA1 900ff3b6ce9b81a56c533f9749d6e16385325377 t/test_files/pod_with_test_section_alias.out.pod
+SHA1 8ad03dd91b449180455cbd5a91a957b22843d2da t/test_files/pod_with_test_section_and_alias.in.pod
+SHA1 1e63dce93c35c06c56815bd87af894f38290ae24 t/test_files/pod_with_test_section_and_alias.out.pod
+SHA1 4623a125b4f7eaa1fe6d74fdfe98f89088a1a60c t/test_files/pod_without_test_section.in.pod
+SHA1 4623a125b4f7eaa1fe6d74fdfe98f89088a1a60c t/test_files/pod_without_test_section.out.pod
+SHA1 d3a27c06642cb35d91b841bfd703ae2779089031 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkyQiH0ACgkQk0asf7iG0tTRCACfRVmZLXb2H+XJWJzaqBKsIy+w
+Z78AmQGwmXof7okXk4FULMf5XtbCxhw7
+=7Bvx
+-----END PGP SIGNATURE-----

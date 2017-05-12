@@ -1,0 +1,60 @@
+=head1 NAME
+
+Foo - The Foo class
+
+=head1 DESCRIPTION
+
+Synopsis:
+    import Foo;
+    var foo:Foo = new Foo();
+
+B<See Also:> Bar
+
+=head1 LICENSE
+
+WTFPL - http://sam.zoy.org/wtfpl/
+
+=head1 AUTHOR
+
+Joe Blow <joe@example.com>
+
+=head1 API
+
+=over
+
+=item spam
+
+Property 1
+
+=item ham
+
+Property 2
+
+B<Default value:> "1"
+
+=item jam
+
+Property 3
+
+B<Default value:> 2
+
+=item splunge
+
+Property 4
+
+=item Foo
+
+Constructor
+
+=item Bar p1, p2
+
+B<p1>: a string
+
+B<p2>: a num
+
+Test function
+
+B<Returns:> a value
+
+=back
+

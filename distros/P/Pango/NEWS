@@ -1,0 +1,69 @@
+Overview of changes in Pango 1.227
+==================================
+
+* Ensure word separation in linker arguments with pkg-config >= 0.29
+
+Overview of changes in Pango 1.226
+==================================
+
+* LICENSE: updated FSF address
+* Update license terms, refer to main LICENSE file
+* README: group project contact addresses/links together
+* Makefile.PL: added Twitter URL to resources block
+
+Overview of changes in Pango 1.225
+==================================
+
+* Fix bug report email address
+
+Overview of changes in Pango 1.224
+==================================
+
+* Ignore MYMETA.*
+* Hush a few compiler warnings
+* Add gitweb link to old ChangeLog
+* Created %meta_merge which follows v2 of CPAN Meta Spec
+  - %meta_merge is used for generating metadata via
+    ExtUtils::MakeMaker/CPAN::Meta
+
+Overview of changes in Pango 1.223
+==================================
+
+* Fix a test failure in t/PangoCairo.t
+
+Overview of changes in Pango 1.222
+==================================
+
+* Don't leak Pango::Attribute objects.
+* Fix a few test failures.
+
+Overview of changes in Pango 1.221
+==================================
+
+* Properly export all our public symbols so that linking against us works on
+  MSWin32.  (GNOME #576373)
+
+Overview of changes in Pango 1.220
+==================================
+
+ Compared to the bindings in Gtk2 1.20x
+ --------------------------------------
+ * Wrap pango_layout_get_baseline.
+ * Allow passing undef to Gtk2::Pango::Layout::set_attributes().
+
+ Since 1.211
+ -----------
+  * Nada.
+
+Overview of changes in Pango 1.211
+==================================
+
+* Wrap pango_layout_get_baseline.
+* Allow passing undef to Gtk2::Pango::Layout::set_attributes().
+
+Overview of changes in Pango 1.210
+==================================
+
+* Initial standalone release.
+* Add an example demonstrating how to use Pango in conjunction with Cairo and
+  Gtk2.

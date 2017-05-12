@@ -1,0 +1,8 @@
+Revision history for Pod-PluginCatalog
+
+0.02   2015-01-03
+	- no functional changes
+	- release tests moved to xt/
+
+0.01   2012-07-28
+	- Initial release

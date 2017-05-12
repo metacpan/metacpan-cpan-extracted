@@ -1,0 +1,35 @@
+---
+abstract: 'Plack session store backed by a Catmandu::Store'
+author:
+  - 'Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>'
+build_requires:
+  Test::More: '0.99'
+  Test::Pod: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Session-Store-Catmandu
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Catmandu: '1.0'
+  Plack::Session::Store: '0.15'
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/LibreCat/Plack-Session-Store-Catmandu/issues
+  homepage: https://github.com/LibreCat/Plack-Session-Store-Catmandu
+  repository: https://github.com/LibreCat/Plack-Session-Store-Catmandu.git
+version: '0.03'
+x_contributors:
+  - 'Nicolas Steenlant <nicolas.steenlant@ugent.be>'

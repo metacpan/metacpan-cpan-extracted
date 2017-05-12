@@ -1,0 +1,159 @@
+=head1 NAME
+
+An overly complicated POD to test out the indexing system when both lists and
+various head sections are involved.
+
+=head1 SYNOPSIS
+
+	Foo bar.
+
+=head1 DESCRIPTION
+
+Description.
+
+=head1 METHODS
+
+=over 4
+
+=item I should be included
+
+This should be included
+
+=over 4
+
+=item *
+
+These should not be included.
+
+=item *
+
+These should not be included
+
+=back
+
+=item This should be included
+
+Foo foo foo.
+
+=item As should this
+
+Foo foo foo.
+
+=back
+
+=head2 TOP
+
+This should NOT reference #TOP, unless the top of the page has had its id
+changed, somehow, for some reason.
+
+=head2 EXAMPLE
+
+This is the first example block.
+
+=over 4
+
+=item I should be included
+
+This should be included
+
+=over 4
+
+=item *
+
+These should not be included.
+
+=item *
+
+These should not be included
+
+=back
+
+=item This should be included
+
+Foo foo foo.
+
+=item As should this
+
+Foo foo foo.
+
+=back
+
+=head1 ATTRIBUTES
+
+=over 4
+
+=item Lorem
+
+Lorem ipsum dolor sit amet consectueur adipscing elit. Sed diam nomumny.
+
+=item Ipsum
+
+Lorem ipsum dolor sit amet consectueur adipscing elit. Sed diam nomumny.
+
+=item Dolor( $foo )
+
+Lorem ipsum dolor sit amet consectueur ..Z<>.. elit. Sed diam nomumny.
+
+=back
+
+=head2 EXAMPLE
+
+This is the second example block.
+
+=head1 ISSUES
+
+=head2 KNOWN ISSUES
+
+There are some issues known about. Lorem ipsum dolor sit amet consectueur adipscing elit. Sed diam nomumny.
+Lorem ipsum dolor sit amet consectueur adipscing elit. Sed diam nomumny. S<SPACES   ARE  IMPORTANT>
+
+=head2 UNKNOWN ISSUES
+
+There are also some issues not known about. Lorem ipsum dolor sit amet consectueur adipscing elit. Sed diam nomumny.
+Lorem ipsum dolor sit amet consectueur adipscing elit. Sed diam nomumny.
+
+=head3 EXAMPLE
+
+This is the third example block.
+
+=over 4
+
+=item *
+
+I will NOT be included.
+
+=over 4
+
+=item I should be included
+
+This should be included
+
+=over 4
+
+=item *
+
+These should not be included.
+
+=item *
+
+These should not be included
+
+=back
+
+=item This should be included
+
+Foo foo foo.
+
+=item As should this
+
+Foo foo foo.
+
+=back
+
+=item *
+
+Not I!
+
+=back
+
+=cut

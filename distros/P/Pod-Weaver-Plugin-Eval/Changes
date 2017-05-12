@@ -1,0 +1,17 @@
+Revision history for Pod-Weaver-Plugin-Eval
+
+0.03    2016-10-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add deprecation notice.
+
+
+0.02    2013-04-20 (SHARYANTO)
+
+        - To be more generic, no longer loads modules for you.
+
+
+0.01    2013-04-20 (SHARYANTO)
+
+        - First release.

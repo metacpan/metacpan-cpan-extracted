@@ -1,0 +1,33 @@
+---
+abstract: 'Serve static files with support for Range requests'
+author:
+  - '唐鳳 <cpan@audreyt.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Plack::Middleware::Static::Range
+name: Plack-Middleware-Static-Range
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  HTTP::Message: 0
+  PerlIO::subfile: 0
+  Plack::Middleware: 0
+  parent: 0
+  perl: 5.8.1
+resources:
+  homepage: http://github.com/audreyt/plack-middleware-static-range/tree
+  repository:
+    type: git
+    url: git://github.com/audreyt/plack-middleware-static-range.git
+    web: http://github.com/audreyt/plack-middleware-static-range/tree
+version: 0.01

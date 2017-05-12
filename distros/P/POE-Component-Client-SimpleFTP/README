@@ -1,0 +1,969 @@
+NAME
+
+    POE::Component::Client::SimpleFTP - A simple FTP client library for POE
+
+VERSION
+
+      This document describes v0.004 of POE::Component::Client::SimpleFTP - released November 04, 2014 as part of POE-Component-Client-SimpleFTP.
+
+SYNOPSIS
+
+            # A simple FTP client logging in to a server
+            use POE qw( Component::Client::SimpleFTP );
+    
+            POE::Session->create(
+                    inline_states => {
+                            _start => sub {
+                                    POE::Component::Client::SimpleFTP->new(
+                                            alias => "ftp",
+                                            remote_addr => "invalid.addr",
+                                            username => "myuser",
+                                            password => "mypassword",
+                                    );
+                                    return;
+                            },
+                            authenticated => sub {
+                                    print "LOGGED ON!\n";
+                                    $_[KERNEL]->post( "ftp", "quit" );
+                                    return;
+                            }
+                    },
+            );
+            POE::Kernel->run;
+
+DESCRIPTION
+
+    This is a simple FTP client to use in a POE application. It's a
+    complete rewrite of the old POE::Component::Client::FTP codebase and
+    makes it easier to use. Most of the API/event flow is compatible, so
+    you should have few problems porting your code to this module.
+
+    You start by creating the ftp object and wait for it to send you
+    events. By default the caller session will get all the events directed
+    to it, no need to "register" for events or anything like that. Events
+    are sent to you in the generic form of $command or ${command}_error
+    events. This module will parse the FTP reply codes and determine if it
+    is an error or not, and dispatch it to the appropriate event.
+
+    An important thing to keep in mind is that there is no command queueing
+    done in this module. It is up to the user to know what state they are
+    in and to dispatch events at the right time. If a command is sent while
+    this module is processing one, an exception will be thrown.
+    Fortunately, due to the way events are named, it should be easy to keep
+    track of the event flow.
+
+ Initial Connection
+
+    When the object is created, it attempts to make a connection to the
+    server specified in the attributes. It will automatically login with
+    the provided credentials. Additionally, it will enable TLS mode if you
+    enabled the attributes "tls_cmd" and "tls_data". There is a timeout
+    timer on the initial connection that you can tweak via setting
+    "timeout".
+
+    The following events may be sent to your session:
+
+  connected
+
+    This event is sent when the initial connection to the server is
+    established. The connection is not yet finalized, so you aren't able to
+    send commands yet!
+
+    The first argument is the string banner that the server sent, if any.
+
+  authenticated
+
+    This event is sent when the entire login procedure is done. At this
+    point you can send commands to the server.
+
+    The first argument is the string banner that the server sent, if any.
+
+  connect_error
+
+    This event is sent when there's an error connecting to the server. The
+    component will automatically destroy itself at this point, so if you
+    want to retry the connection, you have to make a new object.
+
+    The first argument is the error code, and the 2nd argument is the error
+    string.
+
+    The code "0" is used here, because we never got a reply from the
+    server. However, it is nice to have consistency with the other event
+    handlers, so it is supplied.
+
+    Example code: 0
+
+    Example reply: timedout
+
+  login_error
+
+    This event is sent when there's an error trying to login to the server.
+    The component will automatically destroy itself at this point, so if
+    you want to retry the connection, you have to make a new object.
+
+    The first argument is the error code, and the 2nd argument is the error
+    string.
+
+    Example code: 530
+
+    Example reply: Login incorrect.
+
+ Simple Commands
+
+    This is a class of commands that can be sent to the server after
+    receiving the "authenticated" event. They perform identically, and will
+    send the same replies back to your session. Some commands require
+    arguments, others don't.
+
+    Normally the events will include at least 2 arguments: the FTP return
+    code and the actual reply line from the server. If the command included
+    arguments, it will be supplied in the event to make identifying actions
+    easier.
+
+    Some commands is an alias for the actual command ( cd vs cwd ) but the
+    event name will follow the aliased command. If a cwd event is sent, the
+    error event is cwd_error. If a cd event is sent, the error event is
+    cd_error.
+
+            # send the cd command in an event handler somewhere
+            $ftp->yield( 'cd', '/foobar' );
+    
+            # handler for the resulting event received from this component
+            sub cd {
+                    my( $code, $reply, $path ) = @_[ ARG0 .. ARG2 ];
+    
+                    # $code probably is 250
+                    # $reply probably is "Directory successfully changed."
+                    # $path will be "/foobar"
+            }
+    
+            sub cd_error {
+                    my( $code, $reply, $path ) = @_[ ARG0 .. ARG2 ];
+    
+                    # $code probably is 550
+                    # $reply probably is "Failed to change directory."
+                    # $path will be "/foobar"
+            }
+
+  cwd
+
+    Changes the working directory.
+
+    Arguments: the path to change to ( required )
+
+    Example code: 250
+
+    Example reply: Directory successfully changed.
+
+  cd
+
+    An alias for "cwd"
+
+  dele
+
+    Deletes a file.
+
+    Arguments: the file to delete ( required )
+
+    Example code: 250
+
+    Example reply: Delete operation successful.
+
+  delete
+
+    An alias for "dele"
+
+  mkd
+
+    Creates a directory.
+
+    Arguments: the directory path to create ( required )
+
+    You can supply an absolute path or a relative path. It is up to the
+    server to figure out where to create the directory. It's easier to use
+    absolute paths so you are sure that the server is creating the
+    directory in the right place!
+
+    Remember, the FTP protocol doesn't support recursive directory
+    creation! If /foo exists but /foo/bar doesn't, then you cannot create
+    /foo/bar/baz!
+
+    Example code: 257
+
+    Example reply: "/foo" created
+
+  mkdir
+
+    An alias for "mkd"
+
+  rmd
+
+    Removes a directory.
+
+    Arguments: the directory path to delete ( required )
+
+    You can supply an absolute path or a relative path. It is up to the
+    server to figure out where to delete the directory. It's easier to use
+    absolute paths so you are sure that the server is deleting the right
+    directory!
+
+    Example code: 250
+
+    Example reply: Remove directory operation successful.
+
+  rmdir
+
+    An alias for "rmd"
+
+  cdup
+
+    Changes the working directory to the parent.
+
+    Remember, there might be symlinks or other bizarre stuff going on
+    behind the scenes! It's best to supply full pathnames to "cwd" to be
+    safe.
+
+    Arguments: none
+
+    Example code: 250
+
+    Example reply: Directory successfully changed.
+
+  pwd
+
+    Prints the current working directory.
+
+    Arguments: none
+
+    Example code: 257
+
+    Example reply: "/"
+
+  rename
+
+    Renames a target file to a new name.
+
+    Arguments: the old filename and the new filename
+
+    Remember, the pathnames must exist and is a valid target. Best to send
+    absolute paths!
+
+    Example code: 250
+
+    Example reply: Rename successful.
+
+  mv
+
+    An alias for "rename"
+
+  quit
+
+    Disconnects from the server. Behaves differently depending on the
+    context when this command is received. After this command is sent, this
+    module will destroy itself and not send any more events to your
+    session.
+
+    If this module isn't processing anything it will send the QUIT command
+    and gracefully shutdown when it receives the server reply.
+
+    If this module is processing a command it will disconnect immediately,
+    killing any command processing/data transfers that is happening.
+
+    If you want to force immediate shutdown, use the "shutdown" event.
+
+    Arguments: none
+
+  disconnect
+
+    An alias for "quit"
+
+  shutdown
+
+    Forces a shutdown of the component and kills everything.
+
+    Arguments: none
+
+  noop
+
+    Executes a no-operation command. Useful to keep the connection open or
+    to get the round-trip latency, or whatever :)
+
+    Arguments: none
+
+    Example code: 200
+
+    Example reply: NOOP ok.
+
+  quot
+
+    Sends a quoted command to the server. Useful for sending commands that
+    this module doesn't support.
+
+    Arguments: the actual command + arguments to send.
+
+            $ftp->yield( 'quot', 'CRAZYCMD', @crazy_args );
+
+  quote
+
+    An alias for "quot"
+
+  help
+
+    Gets the server's help output for a command.
+
+    Arguments: optional command to ask for help
+
+    Example code: 214
+
+    Example reply:
+
+            The following commands are recognized.
+            ABOR ACCT ALLO APPE CDUP CWD  DELE EPRT EPSV FEAT HELP LIST MDTM MKD
+            MODE NLST NOOP OPTS PASS PASV PORT PWD  QUIT REIN REST RETR RMD  RNFR
+            RNTO SITE SIZE SMNT STAT STOR STOU STRU SYST TYPE USER XCUP XCWD XMKD
+            XPWD XRMD
+            Help OK.
+
+  site
+
+    Executes a specific command that the server supports. Consult your ftp
+    administrator or the document for the ftpd software for more
+    information.
+
+    Arguments: the command to execute + any optional arguments.
+
+    Example code: 500
+
+    Example reply: Unknown SITE command.
+
+  stat
+
+    Receives some informational text about the current status of the
+    connection.
+
+    BEWARE: While the RFC says this command can be sent while a data
+    transfer is in progress, this is unimplemented!
+
+    Arguments: none
+
+    Example code: 211
+
+    Example reply:
+
+            FTP server status:
+            Connected to 192.168.0.199
+            Logged in as apoc
+            TYPE: ASCII
+            No session bandwidth limit
+            Session timeout in seconds is 300
+            Control connection is plain text
+            Data connections will be plain text
+            At session startup, client count was 1
+            vsFTPd 2.2.0 - secure, fast, stable
+            End of status
+
+  syst
+
+    Gets the system information of the server.
+
+    Arguments: none
+
+    Example code: 215
+
+    Example reply: UNIX Type: L8
+
+  acct
+
+    Send the account information for your login. Generally not used, but if
+    your server requires it you should send this immediately after getting
+    the "authenticated" event.
+
+    Arguments: your account information
+
+    Example code: 502
+
+    Example reply: ACCT not implemented.
+
+  smnt
+
+    Mounts a different filesystem volume on your account. Generally not
+    used.
+
+    Arguments: a pathname to mount or system-specific string
+
+    Example code: 502
+
+    Example reply: SMNT not implemented.
+
+  mdtm
+
+    Gets the modification time of a file. Not supported by all servers! (
+    RFC 3659 )
+
+    Arguments: the file to query
+
+    Example code: 213
+
+    Example reply: 20110502230157
+
+    You can use the "mdtm_parser" in
+    POE::Component::Client::SimpleFTP::Utils function to convert it into a
+    DateTime object.
+
+  size
+
+    Gets the size of a file in bytes. Not supported by all servers! ( RFC
+    3659 )
+
+    Arguments: the file to query
+
+    Example code: 213
+
+    Example reply: 48
+
+  feat
+
+    Queries the FEAT capabilities of the server. Not supported by all
+    servers! ( RFC 2389 )
+
+    Arguments: none
+
+    Example code: 211
+
+    Example reply:
+
+            Features:
+            EPRT
+            EPSV
+            MDTM
+            PASV
+            REST STREAM
+            SIZE
+            TVFS
+            UTF8
+            End
+
+    You can use the "feat_parser" in
+    POE::Component::Client::SimpleFTP::Utils function to convert it into an
+    array of features.
+
+  features
+
+    An alias for "feat"
+
+  opts
+
+    Sets an option for the current session. Not supported by all servers! (
+    RFC 2389 )
+
+    Arguments: the option to set
+
+    Example code: 501
+
+    Example reply: Option not understood.
+
+  options
+
+    An alias for "opts"
+
+ Complex Commands
+
+    This class of commands is called complex because they require opening a
+    new data connection to the server. The requested data is transferred
+    over this connection, and the result is sent back to your session. All
+    of the commands behave the same except for the "upload" types.
+
+    Please look at the examples directory included in this distribution for
+    code samples.
+
+    The typical flow of this command is as follows:
+
+            $ftp->yield( 'get', "/myfile.txt" );
+    
+            # receive a "get_connected" event
+            #       args is: "/myfile.txt"
+    
+            # at this point you prepare to process the incoming data
+    
+            # receive a "get_data" event
+            #       args is: $chunk, "/myfile.txt"
+    
+            # at this point you should write out the data to the terminal, a file, or whatever!
+    
+            # ... keep receiving "get_data" until the server finish sending
+    
+            # receive a "get" event
+            #       args is: $code, $reply, "/myfile.txt"
+    
+            # at this point the transfer is complete
+    
+            # if at any point there is an error, a "get_error" event is sent
+            #       args is: $code, $reply, "/myfile.txt"
+
+    For the "upload" events where you are sending data to the server, the
+    flow is:
+
+            $ftp->yield( 'put', '/myfile.txt' );
+    
+            # receive a "put_connected" event
+            #       args is: "/myfile"
+    
+            # at this point you should get the data to send to the server
+            # from your local filesystem, from a database server, or whatever!
+    
+            # send a chunk of data to the server
+            # the chunk size should depend on your application - a reasonable default is 10240 bytes
+            $ftp->yield( 'put_data', $chunk );
+    
+            # receive a "put_flushed" event
+            #       args is: "/myfile"
+    
+            # at this point, you can either send another chunk or signal EOF
+            $ftp->yield( 'put_close' );
+    
+            # receive a "put" event
+            #       args is: $code, $reply, "/myfile"
+    
+            # at this point the transfer is complete
+    
+            # if at any point there is an error, a "put_error" event is sent
+            #       args is: $code, $reply, "/myfile"
+
+  list
+
+    Receives a directory list. The data is sent in a format similar to the
+    UNIX "ls" command, but can be anything!
+
+    Arguments: the optional path to query ( defaults to current working
+    directory )
+
+    Example data:
+
+            drwxr-xr-x    4 1000     1000         4096 May 02 18:24 a
+            drwxr-xr-x    4 1000     1000         4096 May 02 18:24 b
+            drwxr-xr-x    4 1000     1000         4096 May 02 18:24 c
+            -rw-r--r--    1 1000     1000            0 May 02 20:26 foo.txt
+
+  ls
+
+    An alias for list
+
+  nlst
+
+    Receives a directory list. Differs from list in that only the names are
+    received.
+
+    Arguments: the optional path to query ( defaults to current working
+    directory )
+
+    Example data:
+
+            a
+            b
+            c
+            foo.txt
+
+  dir
+
+    An alias for "nlst"
+
+  retr
+
+    Retrieves a file from the server.
+
+    Arguments: the filename to receive
+
+  get
+
+    An alias for "get"
+
+  stor
+
+    Transmits a file to the server. This uses the "upload" command flow
+    explained in "Complex Commands"!
+
+    Arguments: the filename to put
+
+  stou
+
+    Transmits a file to the server. This differs from "stor" in that the
+    ftp server is required to store the file in a unique way. This uses the
+    "upload" command flow explained in "Complex Commands"!
+
+    Arguments: the filename to put
+
+  put
+
+    An alias for "stor"
+
+ATTRIBUTES
+
+ alias
+
+    The alias this component will use. You can send commands to the ftpd in
+    2 ways:
+
+            my $ftp = POE::Component::Client::SimpleFTP->new( alias => "ftp", ... );
+            $poe_kernel->post( 'ftp', 'cd', 'foobar' );
+    
+            # Or, you can use the yield sub:
+            $ftp->yield( 'cd', 'foobar' );
+
+    The default is: ftp
+
+ username
+
+    The FTP username you will be sending to the server.
+
+    required.
+
+ password
+
+    The FTP password you will be sending to the server.
+
+    required.
+
+ remote_addr
+
+    The IP address of the FTP server to connect to. Can be a DNS hostname
+    or IPv4/6 string.
+
+    required.
+
+ remote_port
+
+    The port of the FTP server to connect to.
+
+    The default is: 21
+
+ local_addr
+
+    The local IP address to bind to for all connections to the server.
+
+    The default is: INADDR_ANY ( let the OS decide )
+
+ local_port
+
+    The local port to bind to for the control connection to the server. If
+    you need to change the data connection's port, please change the
+    "local_data_port" attribute.
+
+    The default is: 0 ( let the OS decide )
+
+ local_data_port
+
+    The local port to bind to for the data connection to the server. Must
+    be a different port than the "local_port" attribute!
+
+    The default is: 0 ( let the OS decide )
+
+ tls_cmd
+
+    A boolean value to enable/disable TLS encryption of the command
+    connection. If you want to use this, you must have
+    POE::Component::SSLify installed!
+
+    The default is: false
+
+ tls_data
+
+    A boolean value to enable/disable TLS encryption of the data
+    connection. If you want to use this, you must have
+    POE::Component::SSLify installed!
+
+    The default is: false
+
+ timeout
+
+    A value specifying the timeout in seconds for the initial connection to
+    the FTP server.
+
+    The default is: 120
+
+ connection_mode
+
+    Determine what connection mode we will be using when opening the data
+    connection to the server. In "active" mode, the server will be
+    connecting to us. In "passive" mode we will be connecting to the
+    server. You usually need "passive" mode if you are behind a firewall.
+
+    The default is: passive
+
+METHODS
+
+ yield
+
+    This method provides an alternative object based means of posting
+    events to the component. First argument is the event to post, following
+    arguments are sent as arguments to the resultant post.
+
+            my $ftp = POE::Component::Client::SimpleFTP->new( alias => "ftp", ... );
+            $ftp->yield( 'cd', 'foobar' );
+    
+            # equivalent to:
+            $poe_kernel->post( $ftp->alias, 'cd', 'foobar' );
+
+FUNCTIONS
+
+ DEBUG
+
+    Enable this if you want to get debugging output. Do it like this:
+
+            sub POE::Component::Client::SimpleFTP::DEBUG () { 1 }
+            use POE::Component::Client::SimpleFTP;
+
+    The default is: false
+
+TLS support
+
+    TLS encryption is available if you want. You would need to enable the
+    "tls_cmd" and "tls_data" attributes and have POE::Component::SSLify
+    installed in order to use it. It should work with a lot of servers and
+    commands. However, not the entire specification is implemented! If you
+    encounter problems when using TLS on a server, please let me know by
+    filing a bug report!
+
+Unimplemented Commands/Actions/Features
+
+    Those are the ideas that probably will be implemented in a future
+    version. Some of them require core changes to this module, while others
+    can be done in user-space but should be implemented here to make it
+    "simpler" :)
+
+            * full TLS support - check the RFCs
+            * FXP ( server<->server ) transfers
+            * intelligent NAT detection
+            * full ipv6 compatibility
+            * restart/abort/append a transfer
+            * bandwidth throttling for data connection
+            * support for "mkdir -p" where this module automatically creates all directories needed
+            * passing a filename/filehandle/whatever to put/get so this module automatically does the reading/writing
+            * directory mirroring ( ala rsync )
+            * use POE::Filter::Ls for parsing ( need to improve it first hah )
+            * encoded pathnames ( translate \012 in filename to \000 as per RFC 959 )
+            * security stuff - http://cr.yp.to/ftp/security.html
+            * event prefix ( so you get ftp_cd events instead of cd ) for easier event management
+            * strict command validation ( we don't check if the command requires 0, 1, or N args )
+
+ RFC 959 "FILE TRANSFER PROTOCOL (FTP)"
+
+            * REIN ( not allowed, as it generally screws up - just reconnect! )
+            * STRU ( default file type is always a good idea )
+            * MODE ( default stream type is always a good idea )
+            * APPE ( should be easy to implement, but im lazy )
+            * ALLO ( it is generally unused and obsolete? )
+            * REST ( a bit tricky to implement, maybe later )
+            * ABOR ( not allowed, as it generally screws up - just disconnect! )
+            * PASV ( this module automatically does it )
+            * PORT ( this module automatically does it )
+            * TYPE ( this module automatically does it )
+            * STAT ( implemented, but not allowed while a transfer is in progress as it generally screws things up )
+
+ RFC 2228 "FTP Security Extensions"
+
+            * AUTH ( only AUTH TLS is supported now )
+            * PROT/PBSZ is supported with the default options if you enable tls_cmd/tls_data
+            * ADAT ( not needed for AUTH TLS? )
+            * CCC ( not needed with TLS? )
+            * MIC ( not needed with TLS? )
+            * CONF ( not needed with TLS? )
+            * ENC ( not needed with TLS? )
+
+ RFC 2389 "Feature negotiation mechanism for the File Transfer Protocol"
+
+            * The entire RFC is implemented
+
+ RFC 2428 "FTP Extensions for IPv6 and NATs"
+
+            * EPRT
+            * EPSV
+
+ RFC 2577 "FTP Security Considerations"
+
+            * unimplemented
+
+ RFC 2640 "Internationalization of the File Transfer Protocol"
+
+            * unimplemented
+
+ RFC 3659 "Extensions to FTP"
+
+            * REST ( same reason as the RFC 959 one )
+            * MLST
+            * MLSD
+
+ RFC 4217 "Securing FTP with TLS"
+
+            * unimplemented except for what is implemented in 2228 :)
+
+ RFC 5796 "FTP Command and Extension Registry"
+
+            * No need to implement this, it is for servers only
+
+SUPPORT
+
+ Perldoc
+
+    You can find documentation for this module with the perldoc command.
+
+      perldoc POE::Component::Client::SimpleFTP
+
+ Websites
+
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+      * MetaCPAN
+
+      A modern, open-source CPAN search engine, useful to view POD in HTML
+      format.
+
+      http://metacpan.org/release/POE-Component-Client-SimpleFTP
+
+      * Search CPAN
+
+      The default CPAN search engine, useful to view POD in HTML format.
+
+      http://search.cpan.org/dist/POE-Component-Client-SimpleFTP
+
+      * RT: CPAN's Bug Tracker
+
+      The RT ( Request Tracker ) website is the default bug/issue tracking
+      system for CPAN.
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-Client-SimpleF
+      TP
+
+      * AnnoCPAN
+
+      The AnnoCPAN is a website that allows community annotations of Perl
+      module documentation.
+
+      http://annocpan.org/dist/POE-Component-Client-SimpleFTP
+
+      * CPAN Ratings
+
+      The CPAN Ratings is a website that allows community ratings and
+      reviews of Perl modules.
+
+      http://cpanratings.perl.org/d/POE-Component-Client-SimpleFTP
+
+      * CPAN Forum
+
+      The CPAN Forum is a web forum for discussing Perl modules.
+
+      http://cpanforum.com/dist/POE-Component-Client-SimpleFTP
+
+      * CPANTS
+
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
+
+      http://cpants.cpanauthors.org/dist/overview/POE-Component-Client-Simp
+      leFTP
+
+      * CPAN Testers
+
+      The CPAN Testers is a network of smokers who run automated tests on
+      uploaded CPAN distributions.
+
+      http://www.cpantesters.org/distro/P/POE-Component-Client-SimpleFTP
+
+      * CPAN Testers Matrix
+
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
+
+      http://matrix.cpantesters.org/?dist=POE-Component-Client-SimpleFTP
+
+      * CPAN Testers Dependencies
+
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
+
+      http://deps.cpantesters.org/?module=POE::Component::Client::SimpleFTP
+
+ Email
+
+    You can email the author of this module at APOCAL at cpan.org asking
+    for help with any problems you have.
+
+ Internet Relay Chat
+
+    You can get live help by using IRC ( Internet Relay Chat ). If you
+    don't know what IRC is, please read this excellent guide:
+    http://en.wikipedia.org/wiki/Internet_Relay_Chat. Please be courteous
+    and patient when talking to us, as we might be busy or sleeping! You
+    can join those networks/channels and get help:
+
+      * irc.perl.org
+
+      You can connect to the server at 'irc.perl.org' and join this
+      channel: #perl-help then talk to this person for help: Apocalypse.
+
+      * irc.freenode.net
+
+      You can connect to the server at 'irc.freenode.net' and join this
+      channel: #perl then talk to this person for help: Apocal.
+
+      * irc.efnet.org
+
+      You can connect to the server at 'irc.efnet.org' and join this
+      channel: #perl then talk to this person for help: Ap0cal.
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests by email to
+    bug-poe-component-client-simpleftp at rt.cpan.org, or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-Client-Sim
+    pleFTP. You will be automatically notified of any progress on the
+    request by the system.
+
+ Source Code
+
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    https://github.com/apocalypse/perl-poe-component-simpleftp
+
+      git clone https://github.com/apocalypse/perl-poe-component-simpleftp.git
+
+AUTHOR
+
+    Apocalypse <APOCAL@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Apocalypse.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this distribution.
+
+DISCLAIMER OF WARRANTY
+
+    THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+    APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
+    HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT
+    WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+    PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE
+    OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU
+    ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR
+    CONVEYS THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
+    INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES
+    ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT
+    NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES
+    SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO
+    OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY
+    HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+

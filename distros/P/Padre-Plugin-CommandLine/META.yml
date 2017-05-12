@@ -1,0 +1,27 @@
+---
+abstract: 'vi and emacs in Padre ?'
+author:
+  - 'Gabor Szabo <szabgab@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+  Padre::PluginBuilder: 0.12
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Padre-Plugin-CommandLine
+provides:
+  Padre::Plugin::CommandLine:
+    file: lib/Padre/Plugin/CommandLine.pm
+    version: 0.03
+requires:
+  File::ShareDir: 1.00
+  Padre: 0.43
+  Wx::Perl::Dialog: 0.03
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-CommandLine
+version: 0.03

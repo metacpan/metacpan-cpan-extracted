@@ -1,0 +1,7 @@
+- Write more tests (Make some real ebooks & disect them using makeztxt -d)
+- Finalize API.
+- Check compression_type & process_method @ set time rather than @ get_ouput()
+  time
+- Check bookmark & annotation offsets in get_output().
+- Set bookmarks &al, to use MAX_(BOOKMARK|whatever)_LENGTH
+

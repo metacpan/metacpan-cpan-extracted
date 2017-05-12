@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+lib/POE/Filter/Transparent/SMTP.pm
+t/00-load.t
+t/010-clone_test.t
+t/020-filter_line_compat.t
+t/030-transparency.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,10 @@
+This file documents the revision history for Perl extension Plack-Middleware-AdaptFilehandleRead.
+
+0.003   24 January 2014
+        - Fixed broken test case by adding required modules
+
+0.002   19 January 2014
+        - Added missing VERSION info.  No functional changes.
+
+0.001   18 January 2014
+        - initial revision on CPAN

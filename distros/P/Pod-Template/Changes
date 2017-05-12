@@ -1,0 +1,10 @@
+Changes for 0.02    Tue Sep  9 20:55:23 2003
+============================================
+
+* Older versions of Params::Check did their allow validation of
+    coderefs differently -- compensate for that.
+
+Changes for 0.01    Sun Sep  7 17:35:18 2003
+============================================
+
+* First release of Pod::Template

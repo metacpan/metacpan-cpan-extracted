@@ -1,0 +1,83 @@
+NAME
+    Phaylon::Class::Cloner - Experimental Customizable Cloning Device
+
+SYNOPSIS
+      use Phaylon::Class::Cloner;
+
+      #  that's what I needed
+      my $cloner = Phaylon::Class::Cloner->new ({
+  
+          CODE => sub { 
+              my ( $self, $coderef ) = @_;
+              return $coderef;
+          },
+      });
+
+      #  cloning something
+      my $cloned = $cloner->clone( $structure );
+
+DESCRIPTION
+    I had problems with cloning of structures that contain coderefs. I
+    didn't need to clone coderefs, just array and hash references. This
+    module enables one to define custom specific and default cloning
+    functionalities.
+
+PUBLIC METHODS
+  new( *options hashref* )
+    Creates a new cloning object. Here's a quick example to show what can be
+    passed:
+
+      my $cloner = Phaylon::Class::Cloner->new ({
+
+          #  if the module finds a coderef
+          CODE => sub { ... },
+
+          #  module ran into an object
+          MyClass => sub {
+              my ( $self, $object ) = @_;
+              return $object->some_cloning_mechanism;
+          },
+
+          #  what to do for non-refs. default is just to 
+          #  return the value
+          '' => sub { ... },
+
+          #  if nothing's found for this type. preset to use
+          #  Storage::dclone()
+          ':default' => sub { ... },
+      });
+
+  clone( *data* )
+    Dispatcher for cloning functionality.
+
+INTERNAL METHODS
+  _clone_default
+    Preset default cloning. Uses Storage's "dclone"
+
+  _clone_plain_scalar
+    Cloning for non-reference scalars. Defaults to return the value.
+
+  _clone_HASH
+    Default for hash references. Clones first level with redispatching
+    values to "clone".
+
+  _clone_ARRAY
+    Same as "_clone_HASH" just for arrays.
+
+REQUIRES
+    Carp, Storable
+
+SEE ALSO
+    Storable
+
+NAMESPACE
+    Due to the specific and experimental nature of this module, it's trying
+    not to waste namespaces and therefore lies under "Phaylon::".
+
+LICENSE
+    This module is free software. It may be used, redistributed and/or
+    modified under the same terms as Perl itself.
+
+AUTHOR AND COPYRIGHT
+    Copyright (c) 2005: Robert Sedlacek "phaylon@dunkelheit.at"
+

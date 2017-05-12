@@ -1,0 +1,6 @@
+docs: |
+    This is even in the FAQ.
+
+    L<http://faq.perl.org/perlfaq4.html#How_can_I_count_the_>
+
+        my $count = () = $string =~ /regex/g;

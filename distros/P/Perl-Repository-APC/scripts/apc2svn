@@ -1,0 +1,620 @@
+#!/usr/bin/perl -w
+
+
+#line 4
+
+my $Id = q$Id: apc2svn 201 2006-02-25 06:29:11Z k $;
+
+warn "WARNING: script is not maintained anymore; please file a feature
+request on rt.cpan.org if you want to continue to use it and indicate
+if you can take it over\n";
+
+sleep 3;
+
+use strict;
+use File::Path qw(rmtree);
+use Getopt::Long;
+use File::Basename;
+use File::Spec ();
+use File::Temp ();
+
+use Perl::Repository::APC2SVN qw(url_latest_change get_dirs_to_add
+get_dirs_to_delete delete_empty_dirs);
+
+our $Signal = 0;
+our $MPV;
+
+$SIG{INT} = $SIG{TERM} = sub {
+  print "Caught SIG$_[0]; please stand by, I'm leaving as soon as possible...\n";
+  $Signal++;
+};
+
+our %Opt;
+
+sub Usage (){
+  qq{Usage: $0 OPTIONS
+
+      --apc         # APC base directory
+      --debug       # be more verbose
+      --h           # this help page
+      --password    # password (not needed for file: URLs)
+      --q           # quiet
+      --singlestep  # feed the patches one at a time to perlpatch2svn
+      --sw_or_co    # set to "co" (default) to prefer checkout over switch
+                    # set to "sw" otherwise
+      --url         # SVN repository (default: http://localhost/svn/perl)
+      --wc          # directory of the working copy
+
+};
+}
+
+GetOptions(\%Opt,
+           "apc=s",
+           "bounds=s",
+           "debug!",
+           "h!",
+           "password=s",
+           "q!",
+           "singlestep!",
+           "sw_or_co=s",
+           "url=s",
+           "wc=s",
+          ) or die Usage;
+
+if ($Opt{h}) {
+  print Usage;
+  exit;
+}
+
+sub mysystem (@);
+sub contains_cr ($);
+sub svn_mkdir_minus_p ($$);
+sub makepatch_version ();
+sub myls ($);
+
+# $Opt{url} ||= "http://localhost/svn/perl";
+$Opt{url} ||= "file:///usr/local/svn/perl";
+$Opt{wc} ||= "perl-wc";
+my @passwordarg;
+$Opt{password} and @passwordarg = "--password=$Opt{password}";
+$Opt{apc} ||= "APC";
+for my $option (qw(apc wc)) {
+  if (File::Spec->file_name_is_absolute($Opt{$option})) {
+    $Opt{$option} = File::Spec->abs2rel($Opt{$option});
+  }
+}
+$Opt{singlestep} = 0 unless defined $Opt{singlestep};
+$Opt{sw_or_co} ||= "co"; # svn 0.17.1 seems to have problems with switch
+unless ($Opt{sw_or_co} =~ /^(co|sw)$/) {
+  die "Illegal value for sw_or_co[$Opt{sw_or_co}]: only 'co' or 'sw' are allowed";
+}
+if ($Opt{debug}) {
+  our $DEBUG = 1;
+}
+
+my $owning_wc = 0;
+my(%latest_change);
+use Perl::Repository::APC;
+my $apc_repo = Perl::Repository::APC->new($Opt{apc});
+APCDIR: for my $apcdir ($apc_repo->apcdirs){
+  my($apc_branch,$pver,@patches) = @$apcdir;
+  exit if $Signal;
+  if (
+      $latest_change{$apc_branch}
+      &&
+      $latest_change{$apc_branch} > $patches[-1] # if ==, we might
+                                                 # still need
+                                                 # branching and
+                                                 # tagging
+     ) {
+    next APCDIR;
+  }
+  my($work_branch, $park_branch_parent);
+  my $tag_branch_parent = "tags/branchpoints";
+  my $rel_branch_parent = "tags/releases";
+  if ($apc_branch eq "perl") {
+    $work_branch = "trunk";
+    $park_branch_parent = "branches/perl";
+  } else {
+    $work_branch = "branches/$apc_branch/mbranch";
+    $park_branch_parent = "branches/$apc_branch/rel";
+    if ($pver eq "5.004_00") {
+      # special case: starts empty
+    } elsif (myls "$Opt{url}/$work_branch") {
+      # if this branch already exists, continue there
+    } else {
+      # else create it with cp from the tagged branch-point
+      svn_mkdir_minus_p $Opt{url}, "branches/$apc_branch";
+      my $from = $pver;
+
+      # before we had maint-5.6/perl-5.6.2, we had only to care for
+      if (index($apc_branch, "/") > 0) {
+        if ($apc_branch eq "maint-5.6/perl-5.6.2") {
+          $from = "5.6.1";
+        } else {
+          die "PANIC ($0): Unknown apc_branch[$apc_branch]";
+        }
+      } else {
+        # 5.6.1 => 5.6.0, 5.004_01 => 5.004_00
+        $from =~ s/1$/0/;
+      }
+
+
+      mysystem svn => "cp", @passwordarg, "-m",
+          "Generating maint branch $apc_branch from $from for $pver",
+              "$Opt{url}/tags/branchpoints/$from",
+                  "$Opt{url}/branches/$apc_branch/mbranch";
+    }
+  }
+  exit if $Signal;
+  $latest_change{$apc_branch} = url_latest_change("$Opt{url}/$work_branch");
+  if ($latest_change{$apc_branch} > $patches[-1]) {
+    next APCDIR;
+  }
+
+  for my $dir ($work_branch, $park_branch_parent,
+                 $tag_branch_parent, $rel_branch_parent) {
+    die "dir empty value" unless $dir;
+    svn_mkdir_minus_p $Opt{url}, $dir;
+  }
+
+  warn sprintf "#### %-15s %10s  %6d %6d ####\n",
+      $apc_branch, $pver, $patches[0], $patches[-1];
+
+  # APPLY PATCHES
+
+  if ($latest_change{$apc_branch} < $patches[-1]) {
+    if ($owning_wc && $Opt{sw_or_co} eq "sw") { # the first time
+                                                # through we don't own
+                                                # it
+      chdir $Opt{wc};
+      mysystem svn => "switch", "-q",
+          "$Opt{url}/$work_branch" or die;
+      chdir "..";
+    } else {
+      rmtree $Opt{wc};
+      mysystem svn => "co", "-q",
+          @passwordarg,  "$Opt{url}/$work_branch", $Opt{wc} or die;
+      $owning_wc=1;
+    }
+    exit if $Signal;
+    {
+      chdir $Opt{wc} or die "Could not chdir to $Opt{wc}: $!";
+
+      my $brancharg;
+      if ($apc_branch eq "perl") {
+        $brancharg = "";
+      } elsif (index($apc_branch, "/") > 0) {
+        # special case for maint-5.6/perl-5.6.2
+        $brancharg = " --branch $apc_branch";
+      } else {
+        $brancharg = " --branch $apc_branch/perl";
+      }
+
+      our $DEBUG;
+      my $debugarg  = $DEBUG ? " --debug" : "";
+      my $want_singlestep;
+      if (
+          $Opt{singlestep}
+          ||
+          # "open" branches that have or may have changed a little since
+          # we were here last time
+          (
+           $latest_change{$apc_branch} >= $patches[0]
+           &&
+           $latest_change{$apc_branch} < $patches[-1]
+          )
+         ) {
+        $want_singlestep = 1;
+      }
+      if ($want_singlestep) {
+      PATCH: for my $patch (0..$#patches){
+          my $nr = $patches[$patch];
+          next PATCH if $latest_change{$apc_branch} >= $nr;
+          my $gz = File::Spec->catfile($Opt{apc}, $pver, "diffs", "$nr.gz");
+          my $upgz = File::Spec->catfile(File::Spec->updir,$gz);
+          if ($Opt{bounds}) {
+            die "Illegal arguments[$Opt{bounds}] to bounds"
+                unless $Opt{bounds} =~ /^(\d+)-(\d+)$/;
+            my($lower,$upper) = ($1,$2);
+            next PATCH if $nr < $lower or $nr > $upper;
+          }
+          printf "Trying %s (%sb)\n", $gz, -s $upgz;
+          my($n) = $nr;
+          $n = sprintf "%05d", $n;
+          # -f is less verbose and faster
+          mysystem("zcat $upgz | perlpatch2svn -f$brancharg$debugarg") or die;
+
+          exit if $Signal;
+        }
+      } else {
+        mysystem("zcat ../$Opt{apc}/$pver/diffs/*.gz | ".
+                 "perlpatch2svn$brancharg$debugarg")
+            or die;
+      }
+      printf "Finished checkin of %s\n", $pver;
+      $latest_change{$apc_branch} = $patches[-1];
+      chdir "..";
+      exit if $Signal;
+    }
+  }
+
+  # DETERMINE TARBALL (we ignore RCs [RELEASE CANDIDATES])
+
+  opendir my $DIR, "$Opt{apc}/$pver" or die;
+  my(@dirent) = grep !/RC|TRIAL/, grep /^perl.*\.tar\.gz$/, readdir $DIR;
+  closedir $DIR;
+  die "\aALERT: (\@dirent > 1: @dirent) in $Opt{apc}/$pver" if @dirent>1;
+  if (@dirent) {
+
+    # SVN TAGGING AND BRANCHING
+
+    unless (myls "$Opt{url}/$park_branch_parent/$pver") {
+      chdir $Opt{wc} or die "Could not chdir to $Opt{wc}: $!";
+      mysystem svn => "cp", @passwordarg, "-m",
+          "Branching $pver", "$Opt{url}/$work_branch",
+              "$Opt{url}/$park_branch_parent/$pver";
+      print "Branched $pver\n";
+      chdir "..";
+    }
+    unless (myls "$Opt{url}/$tag_branch_parent/$pver") {
+      chdir $Opt{wc} or die "Could not chdir to $Opt{wc}: $!";
+      mysystem svn => "cp", @passwordarg, "-m",
+          "Tagging branching point $pver",
+              "$Opt{url}/$work_branch",
+                  "$Opt{url}/$tag_branch_parent/$pver";
+      print "Tagged branching point $pver\n";
+      chdir "..";
+    }
+
+
+    # DETERMINE TARBALL's ROOT DIRECTORY
+
+    my $tarball = $dirent[0];
+    if (myls "$Opt{url}/$rel_branch_parent/$tarball") {
+      next APCDIR;
+    }
+    open my $TAR, "tar tzf $Opt{apc}/$pver/$tarball |" or die;
+    my $tardir = <$TAR>;
+    chomp $tardir;
+    $tardir =~ s|^\./||;
+    $tardir =~ s|/.*$||;
+    close $TAR;
+    print "dirent[@dirent]tardir[$tardir]\n";
+
+    # $tardir/ is the directory that we get if we untar the ball now
+    # and "$Opt{wc}/ is the directory we have to compare against. Note
+    # that we have to eliminate CR in tardir/
+
+    # HANDLE TARBALL COMPARISON AND PATCH SVN's COPY
+
+    # MAKEPATCH
+
+    rmtree $tardir;
+    mysystem tar => "xzf", "$Opt{apc}/$pver/$tarball"
+        or die "Could not run tar";
+    my @ccr = mani_unCR($tardir);
+    # must be nomanifest because either manifest may be wrong
+    unless ($MPV) {
+      $MPV = makepatch_version;
+      die "Your version of makepatch ($MPV) is not recent enough, 2.00 is needed"
+          unless $MPV >= 2.00;
+    }
+    my(undef,$mpfile) = File::Temp::tempfile;
+    $mpfile = File::Spec->rel2abs($mpfile);
+    mysystem("makepatch '-diff=diff -u' -nomanifest ".
+             "-description '$park_branch_parent/$pver vs. $tardir' ".
+             "-exclude .svn ".
+             "$Opt{wc} $tardir > $mpfile")
+        or die "Could not run makepatch";
+    print "Makepatch $pver done\n";
+    rmtree $tardir;
+
+    # APPLYPATCH
+
+    {
+      if ($Opt{sw_or_co} eq "co") {
+        rmtree $Opt{wc};
+        mysystem svn => "co", "-q", "$Opt{url}/$park_branch_parent/$pver", $Opt{wc}
+            or die "Could not co";
+        chdir $Opt{wc};
+      } else {
+        chdir $Opt{wc};
+        mysystem svn => "switch", "-q", "$Opt{url}/$park_branch_parent/$pver"
+            or die "Could not switch";
+      }
+
+      # applypatch is at the mercy of patch and sometimes exits with
+      # error code although we're fine:-( So no check for the return
+      # value here:
+      mysystem "applypatch $mpfile";
+
+      #### svn add/delete:
+      my($adds,$deletes) = parse_applypatch_data($mpfile);
+      unlink $mpfile;
+      if (@$adds){
+        unshift @$adds, get_dirs_to_add(@$adds) ;
+        mysystem svn => "add", @$adds;
+      }
+      mysystem svn => "rm", @$deletes if @$deletes;
+      delete_empty_dirs(@$deletes);
+
+      # so that commit always has something to do:
+      mysystem svn => "propset", "perl:release", $pver, ".";
+
+      # why native? so that Windows people get what they need.
+      # why not CRLF? so that even Unix people can patch the file.
+      mysystem svn => "propset", "svn:eol-style", "native", @ccr if @ccr;
+
+      mysystem svn => "ci", "-m",
+          "Released as $tarball with rootdir $tardir branched at $pver";
+
+      mysystem svn => "cp", @passwordarg, "-m",
+          "Release", "$Opt{url}/$work_branch",
+              "$Opt{url}/$rel_branch_parent/$tarball";
+
+      chdir "..";
+    }
+  } else {
+    print "For $pver there is no tarfile to check in; nothing left to do.\n";
+  }
+  exit if $Signal;
+}
+
+sub svn_mkdir_minus_p ($$) {
+  my($root,$mkdir) = @_;
+  die "mkdir no value" unless $mkdir;
+  my $ipath = "";
+  for my $idir (split m|/|, $mkdir) {
+    $ipath = $ipath ? "$ipath/$idir" : $idir;
+    my $urlipath = "$root/$ipath";
+    unless (myls $urlipath) {
+      mysystem(svn => "mkdir",
+               "-m" => "mkdir $ipath", $urlipath) or die;
+    }
+  }
+}
+
+sub myls ($) {
+  my $ls = shift;
+  die "myls() called with illegal argument [$ls]: must be a URL"
+      unless index($ls,"/") > -1;
+  my($parent,$child) = $ls =~ m|^(.+/)([^/]+)$|;
+  open my $fh, "svn ls $parent|" or return 0;
+  while (<$fh>) {
+    chomp;
+    if (m|^\Q$child\E/?$|){
+      # warn "Info ls: $ls exists\n";
+      return 1;
+    }
+  }
+  close $fh;
+  return 0;
+}
+
+sub contains_cr ($) {
+  my($file) = shift;
+  open my $fh, $file or die "Couldn't open $file: $!";
+  local($/) = "\n";
+  my $firstline = <$fh>;
+  defined $firstline && $firstline =~ /\cM/;
+}
+
+sub mysystem (@) {
+  my @system = @_;
+  warn sprintf("%s: Running (%s)\n",
+               scalar(localtime),
+               join(",",map {"\"$_\""} @system),
+              ) unless $Opt{"q"};
+  system(@system)==0;
+}
+
+sub parse_applypatch_data {
+  my $file = shift;
+  my(@crea, @remo);
+  open my $fh, $file or die "Could not open $file: $!";
+  while (<$fh>) {
+    next unless / ^ \#\#\#\# \s ApplyPatch \s data \s follows /x;
+    last;
+  }
+  while (<$fh>) {
+    last if / ^ \#\#\#\# \s End \s of \s ApplyPatch \s data /x;
+    next unless / ^ \# \s ([cr]) \s (.*) /x;
+    my $spec1 = $1;
+    my $spec2 = $2;
+    require Text::ParseWords;
+    my(@spec2) = Text::ParseWords::shellwords($spec2);
+    if ($spec1 eq "c") {
+      push @crea, $spec2[0];
+    } else {
+      push @remo, $spec2[0];
+    }
+  }
+  (\@crea,\@remo);
+}
+
+sub mani_unCR {
+  my($tardir) = @_;
+  my @ccr;
+  my $mani = "$tardir/MANIFEST";
+  open my $fh, $mani or die "Could not open $mani: $!";
+  while (<$fh>) {
+    my($file) = /(\S+)/ or next;
+    my $intar_file = $file;
+    $intar_file =~ s|^|$tardir/|;
+    next unless contains_cr $intar_file;
+    push @ccr, $file;
+    @ARGV = $intar_file;
+    $^I="";
+    while (<>) {
+      # in 5.7.1 we had files that contained 0x0d0d0a on line endings
+      s/[\r\n]+\z/\n/;
+      print;
+    }
+  }
+  close $fh;
+  @ccr;
+}
+
+sub makepatch_version () {
+  open my $fh, "makepatch --version 2>&1 |" or die "Could not run makepatch";
+  local $/ = "\n";
+  my $v;
+  while (<$fh>) {
+    next unless /^This is makepatch version ([\d\.]+)/;
+    $v = $1;
+  }
+  close $fh; # cannot check return value, --version exits with error
+             # code (at least with makepatch 1.16)
+  $v;
+}
+
+__END__
+
+=head1 NAME
+
+apc2svn - Import APC into subversion with resume-where-it-left-off
+
+=head1 SYNOPSIS
+
+ apc2svn --h # describes all options
+
+=head1 DESCRIPTION
+
+Apply Rafael's perlpatch2svn to all diffs in APC skipping already
+applied patches. An initial run of this script took on my 1 GHz Athlon
+about 12 hours. Update 2003-09: 17 hours with my Athlon 2800. Yes,
+subversion is getting slower.
+
+We assume, our current directory can be used as a working directory
+with only one subdirectory: APC. This is a mirror of
+
+  rsync://ftp.linux.activestate.com/all-of-the-APC-for-mirrors-only/
+
+We further assume that the --url parameter is either an empty
+Subversion repository or one left over from a previous session. It
+should provide space for several GB of data. Note that after
+C<svnadmin create> you need to tweak the db/DB_CONFIG file: increase
+the values of the three lock variables to 8000. Run an C<svnadmin
+recover> afterwards. The latter may be redundant, but better safe than
+sorry.
+
+The partition holding the svn repository should either have about 12
+GB or you must remove BerkeleyDB log files while the script is
+running. See C<db_archive> how to do that. If the log files are
+removed, subversion needs hardly more space than the pure compressed
+patches.
+
+The current directory is assumed to be a working directory for our own
+work. This script will create the subdirectory perl-wc/ (configurable
+via the --wc option), and we'll untar all historic perl distributions
+within the current directory, so we will create temporary directories
+like C<perl5.004_52> etc.
+
+B<Note http URLs:> performance was catastrophic for me via http/DAV.
+B<Note file URLs:> User must be same group as owner, umask should be
+002. File URLs did not work for me for unknown reasons with subversion
+before 0.17.1. They worked fine with 0.17.1 and BerkeleyDB 4.0.14
+
+=head1 REPOSITORY LAYOUT
+
+The following file system layout is realized in the repository:
+
+  trunk/
+  branches/
+           perl/
+                5.004_50/
+                ...
+                5.6.0/
+                ...
+                5.8.0/
+                ...
+                5.9.0/                  not before there is a perl-5.9.0.tar.gz
+           maint-5.004/
+                       mbranch/
+                       rel/
+                           5.004_00/
+                           5.004_01/
+                           5.004_02/
+                           5.004_03/
+                           5.004_04/
+                           5.004_05/
+           maint-5.005/
+                       mbranch/
+                       rel/
+                           5.005_01/
+                           5.005_02/
+                           5.005_03/
+                           5.005_04/    not before there is a perl-5.005_04.tar.gz
+           maint-5.6/
+                     mbranch/
+                     rel/
+                         5.6.1/
+                         5.6.2/         not before there is a perl-5.6.2.tar.gz
+           maint-5.8/
+                     mbranch/
+                     rel/
+                         5.8.1/         not before there is a perl-5.8.1.tar.gz
+  tags/
+       branchpoints/
+                    5.004_00/
+                    5.004_01/
+                    ...
+                    5.004_50/
+                    ...
+       releases/
+                perl5.004.tar.gz/
+                perl5.004_01.tar.gz/
+                perl5.004_02.tar.gz/
+                perl5.004_03.tar.gz/
+                perl5.004_04.tar.gz/
+                perl5.004_05.tar.gz/
+                perl5.004_50.tar.gz/
+                perl5.004_51.tar.gz/
+                perl5.004_52.tar.gz/
+                perl5.004_53.tar.gz/
+                ...
+
+
+The final layout is still subject to change and will be discussed on
+the Perl5-porters mailing list.
+
+The directory branches/perl/ contains perl releases made from the
+trunk. There is already integrated the diff between the branchpoint
+and the final release. One can find the branchpoint in
+tags/branchpoints/, too, and the final release in tags/releases/.
+
+Apc2svn sets a property "perl:release" as soon as a release is
+integrated. From that point in time they should be regarded as
+read-only.
+
+All branches/maint-*/mbranch/ directories contain the respective
+maintainance branches themselves. If new patches for any of them turn
+up, they are integrated there.
+
+branches/maint-*/rel/ contains releases from the corresponding
+maintainance track. As with the trunk we find the branchpoints in
+tags/branchpoints/ too and the final releases are duplicated in
+tags/releases/.
+
+All that implies that only the trunk/ directory and the
+branches/maint-*/mbranch/ directories should be regarded read-write.
+
+
+=head1 BUGS
+
+Error checking of the many calls to external programs need some more
+work. Currently many failures of external programs are tolerated.
+
+=head1 PREREQUISITES
+
+Same prerequisites as mentioned in patchaperlup. Additionally
+makepatch and applypatch by Johan Vromans (CPAN author JV), svn, zcat,
+tar.
+
+=head1 AUTHOR
+
+andreas.koenig@anima.de and Rafael Garcia-Suarez
+
+
+=cut

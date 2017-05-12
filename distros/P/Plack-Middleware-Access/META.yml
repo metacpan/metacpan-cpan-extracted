@@ -1,0 +1,31 @@
+---
+abstract: 'Restrict access depending on remote ip or other parameters'
+author:
+  - 'Yury Zavarin <yury.zavarin@gmail.com>'
+build_requires:
+  Plack::Builder: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Access
+requires:
+  Carp: '0'
+  Net::IP: '0'
+  Plack::Middleware: '0'
+  Plack::Util::Accessor: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/tadam/Plack-Middleware-Access/issues
+  homepage: https://github.com/tadam/Plack-Middleware-Access
+  repository: https://github.com/tadam/Plack-Middleware-Access.git
+version: '0.4'

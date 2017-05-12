@@ -1,0 +1,91 @@
+Revision history for Perl extension POE::Component::Server::SOAP.
+
+* 1.14
+
+	Converted to Build.PL
+	Removed stupid Test::* module requirements, thanks BiNGOs!
+	revamped test suite to modernize it
+
+* 1.13
+
+	removed Test::* modules from dependency list - thanks RT #36725
+
+	dos2unix fixes - thanks RT #36704
+
+	added Build.PL
+
+* 1.12
+
+	Kwalitee-related fixes
+
+* 1.11
+
+	Added ability to override HTTP return code - thanks RT #25514
+	Minor updates to examples for SOAP::Lite update
+
+* 1.10
+
+	Documentation tweaks
+	Finally use a Changes file - thanks RT #18981
+	learned about the difference between ref $self and ref( $self )
+	Kwalitee-related fixes
+
+* 1.09
+
+	Yann Kerherv� spotted a bug where having no Content-Type results in a warning -> which dies...
+	This is long overdue - thanks again!
+
+* 1.08
+
+	vkroll @ #POE @ MAGNet made some excellent suggestions
+		- print the exact SOAP envelope to stderr if DEBUG == 2
+		- the ability to generate the XML yourself, added the RAWDONE/RAWFAULT events
+	Realized that the examples were using ssl, I did not supply directions so the ssl part was removed
+	Hopefully by the next release or two, full SOAP/1.2 support will be included ( also waiting on SOAP::Lite to get out of beta )
+	The next release will have the option to "attach" to an existing SimpleHTTP session ( so there is 1 less webserver running, yay! )
+
+* 1.07
+
+	Made the documentation clearer for ADDRESS, thanks to Kaare Rasmussen!
+
+* 1.06
+
+	Rearranged DEBUG printouts
+	Added ability to pass arguments to SimpleHTTP ( mainly for the SSL stuff )
+
+* 1.05
+
+	Followed SimpleHTTP's STARTLISTEN, STOPLISTEN, SHUTDOWN GRACEFUL changes
+	Some minor internal tweaks
+	POD tweaks
+
+* 1.04
+
+	Big change! The deserializer is now hooked into SOAP::Lite for full SOAP/1.1 interop :)
+	Big change! The output envelope is now hooked into SOAP::Lite instead of SOAP::EnvelopeMaker :)
+	Made debugging more productive by adding service/method/IP to output
+	Got rid of the CHANGES file, it is redundant ;)
+	The headers is now an arrayref of SOAP::Header objects ( if any )
+	Got rid of SOAP::Defs, replaced them with SOAP::Constants ( from SOAP::Lite )
+	Added the MUSTUNDERSTAND parameter to new()
+
+* 1.03
+
+	I realized that I didn't like having the SOAP Fault event called "ERROR" and changed it to "FAULT" :)
+	Fixed the Fault Code in the SYNOPSIS from Add:Error to the more SOAPy one
+	Rocco Caputo helped me with some POD errors/typos/stuff
+	Fixed new() to remove options that exist, but is undef -> results in croaking when DEBUG is on
+
+* 1.02
+
+	POD Formatting ( I'm still not an expert )
+	I forgot to add the test to the MANIFEST, so the distribution had no tests... *gah*
+
+* 1.01
+
+	Took over ownership of this module from Rocco Caputo
+	Broke just about everything :)
+
+* 0.03
+
+	Old version from Rocco Caputo

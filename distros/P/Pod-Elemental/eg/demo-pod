@@ -1,0 +1,142 @@
+#!perl
+use strict;
+use warnings;
+
+use Pod::Eventual::Simple;
+use Pod::Elemental;
+use Pod::Elemental::Selectors -all;
+use Pod::Elemental::Transformer::Pod5;
+use Pod::Elemental::Transformer::Nester;
+use Pod::Elemental::Transformer::Gatherer;
+
+my $str = do { local $/; <DATA> };
+
+my $document = Pod::Elemental->read_string($str);
+
+print "## INPUT DOCUMENT:\n\n";
+print $str, "\n\n";
+
+print "## INITIAL DOCUMENT LOAD:\n\n";
+print $document->as_debug_string, "\n\n";
+
+Pod::Elemental::Transformer::Pod5->transform_node($document);
+
+print "## AFTER TRANSFORM TO POD5:\n\n";
+print $document->as_debug_string, "\n\n";
+
+my $nester = Pod::Elemental::Transformer::Nester->new({
+  top_selector => s_command([ qw(head1 method) ]),
+  content_selectors => [
+    s_flat,
+    s_command( [ qw(head2 head3 head4 over item back) ]),
+  ],
+});
+
+my $gatherer = Pod::Elemental::Transformer::Gatherer->new({
+  gather_selector => s_command([ qw(method) ]),
+  container       => Pod::Elemental::Element::Nested->new({
+    command => 'head1',
+    content => "METHODS\n",
+  }),
+});
+
+$nester->transform_node($document);
+
+print "## AFTER NESTING HEAD1 AND METHOD ELEMENTS:\n\n";
+print $document->as_debug_string, "\n\n";
+
+$gatherer->transform_node($document);
+
+print "## AFTER GATHERING METHOD ELEMENTS UNDER CONTAINER:\n\n";
+print $document->as_debug_string, "\n\n";
+
+$_->command('head2')
+  foreach grep { s_command('method', $_) } @{ $gatherer->container->children };
+
+print "## AFTER TRANSFORMING METHOD ELEMENTS TO HEAD2:\n\n";
+print $document->as_debug_string, "\n\n";
+
+print "## FINAL POD OUTPUT:\n\n";
+print $document->as_pod_string;
+
+__DATA__
+=pod
+
+Ordinary Paragraph 1.1
+
+=begin :dialect Pod7
+
+This is a paragraph.
+
+=image foo
+
+=end :dialect
+
+=head1 Header 1.1
+
+=head2 Header 2.1
+
+=method foo
+
+Ordinary Paragraph 2.1
+
+=over 2
+
+=item * bar
+
+=back
+
+=head2 Header 2.2
+
+Ordinary Paragraph 2.2
+
+=head3 Header 3.1
+
+=over 4
+
+=item * foo
+
+=back
+
+=head1 Header 1.2
+
+Ordinary Paragraph 2.3
+
+Ordinary Paragraph 2.4
+
+=begin comments
+
+This is a big comment I have to write down.
+
+It's not important, but it goes on and on.
+
+=end comments
+
+=method quux
+
+Ordinary Paragraph 2.4
+
+=cut
+
+=method quince
+
+  my $method = $obj->quince(1,2,3);
+
+The above will work.
+
+The following will not:
+
+  my $method = $obj->quince(3,2,1);
+
+=cut
+
+sub quince {
+  my ($self, @args) = @_;
+  die unless increasing(@args);
+  return ordinality(@args);
+}
+
+=pod
+
+Is that clear?
+

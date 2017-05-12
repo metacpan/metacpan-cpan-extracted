@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<foo xmlns:petal="http://purl.org/petal/1.0/">
+  <bar petal:condition="false: always_false">Test A</bar>
+  <bar petal:condition="true: always_false">Test B</bar>
+  <bar petal:condition="not: always_false">Test C</bar>
+  <bar petal:condition="always_false">Test D</bar>
+
+  <bar petal:condition="false: always_true">Test E</bar>
+  <bar petal:condition="true: always_true">Test F</bar>
+  <bar petal:condition="not: always_true">Test G</bar>
+  <bar petal:condition="always_true">Test H</bar>
+</foo>

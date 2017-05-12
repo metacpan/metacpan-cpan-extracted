@@ -1,0 +1,4 @@
+# Mostly empty Pangloss pipeline configuration file for testing
+---
+pipeline:
+  - OpenFrame::WebApp::Segment::Decline::StaticContent

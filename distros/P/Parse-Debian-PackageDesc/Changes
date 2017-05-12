@@ -1,0 +1,15 @@
+0.15  Tue Aug 17 16:55:06 CEST 2010
+        - Add missing test file that made the test suite fail.
+
+0.14  Tue Aug 17 16:55:06 CEST 2010
+        - Correctly parse binNMU source package names (Closes: #60215 on CPAN).
+
+0.13  Fri Jun  4 12:34:21 CEST 2010
+        - Make the upstream version/debian revision parsing compliant with
+          Debian policy (Closes: #58052 in CPAN). Thanks Ansgar Burchardt.
+
+0.12  Wed Jun  2 10:03:42 CEST 2010
+        - Treat files as UTF-8 and return proper strings
+
+0.11  Thu Jun  4 10:03:05 CEST 2009
+        - Initial release

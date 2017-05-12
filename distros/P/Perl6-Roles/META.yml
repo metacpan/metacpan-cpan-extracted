@@ -1,0 +1,17 @@
+---
+name: Perl6-Roles
+version: 0.01
+author: ~
+abstract: Perl6 roles in Perl5
+license: perl
+requires:
+  List::MoreUtils: 0.12
+  Scalar::Util: 1.17
+  perl: 5.6.0
+build_requires:
+  Test::More: 0.47
+provides:
+  Perl6::Roles:
+    file: lib/Perl6/Roles.pm
+    version: 0.01
+generated_by: Module::Build version 0.2701

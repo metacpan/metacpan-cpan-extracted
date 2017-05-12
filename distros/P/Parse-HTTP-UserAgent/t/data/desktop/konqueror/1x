@@ -1,0 +1,9 @@
+[AGENT]
+
+Konqueror/1.1.2
+
+'parser'           => 'generic_name_version',
+'version_raw'      => '1.1.2',
+'version'          => '1.001002',
+'name'             => 'Konqueror',
+'generic'          => 1

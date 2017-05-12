@@ -1,0 +1,27 @@
+Revision history for Perl extension POE::Session::Multiplex.
+
+0.0600 May 18 2011
+    - Fixed for POE 1.311
+
+0.0501 Dec 13 2010
+    - Forgot to update Changes
+
+0.0500 Dec 13 2010
+    - Added _psm_begin, _psm_end
+
+0.0403 Sep 9 2009
+    - Remove use 5.008008.  Thank you Sébastien Aperghis-Tramoni.
+
+0.0402 Apr 15 2009
+    - CPAN testing tweak
+
+0.0401 Apr 14 2009
+    - CPAN testing tweak
+
+0.0400 Apr 11 2009
+    - Frist release to the CPAN
+
+0.01  Apr 6 2009
+	- original version; created by h2xs 1.23 with options
+		-A -n POE::Session::Multiplex --use-new-tests
+

@@ -1,0 +1,9 @@
+DESCRIPTION
+
+    This class adds a hook_after_read_config_file to read CPAN::Uploader's
+    config file in ~/.pause. Encrypted .pause is not supported.
+
+    This module is distributed separately from App::pause because we want
+    pause to be fatpacked and depends only on a few other modules
+    (LWP::UserAgent and LWP::Protocol::https).
+

@@ -1,0 +1,62 @@
+==================================================
+Changes from 2013-10-25 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2014-10-25 20:40:21 +0000
+------------------------------------------
+
+  Change: b90895917197a87a47f77f697cfd25920e83d609
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 00:05:50 +0000
+
+    fix docs 
+
+  Change: bd3f4465c40b80d7686a2cb1e0099a0e96a2a295
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 23:57:52 +0000
+
+    move CONTRIBUTORS into head2 
+
+  Change: 2221e0d91589a6b4c6751f6b9bc2a63df4b2fd6f
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 22:26:20 +0000
+
+    add mailmap so Contributors works 
+
+  Change: 5e3a25f41359448dababf33da790ec76e56476b1
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 22:06:22 +0000
+
+    fix Changes format 
+
+  Change: 52cf2171730b4ed94022f94e90bab2885b15fc13
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 22:04:31 +0000
+
+    use Section::Contributors 
+
+  Change: d7620905b71bbf040ca86880d26603c86f23ae30
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 22:02:30 +0000
+
+    set Pod::Weaver version explicitly so we are sure to pick up
+    SingleEncoding 
+
+  Change: 5c9dd722624fa7b818a9e7ee2eba249cc6ecb815
+  Author: Apocalypse <apocalypse@users.noreply.github.com>
+  Date : 2014-10-23 21:54:49 +0000
+
+    Merge pull request #1 from sergeyromanov/master
+
+    change PWP::Encoding to PWP::SingleEncoding 
+
+  Change: 3e6d8a0af6796db058f4a47581e0c74469678a0b
+  Author: Sergey Romanov <complefor@rambler.ru>
+  Date : 2013-12-02 20:00:21 +0000
+
+    change PWP::Encoding to PWP::SingleEncoding 
+
+================================================
+Plus 3 releases after 2013-10-25 00:00:00 +0000.
+================================================

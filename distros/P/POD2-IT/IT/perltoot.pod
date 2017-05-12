@@ -1,0 +1,1918 @@
+=head1 NOME
+
+perltoot - Guida al Perl orientato agli oggetti, a cura di Tom
+
+=head1 DESCRIZIONE
+
+La programmazione orientata agli oggetti E<egrave> alla moda di questi
+giorni. Alcuni manager preferirebbero gli oggetti all'uovo di Colombo.
+PerchE<eacute>? Che cosa c'E<egrave> di cosE<igrave> speciale in un
+oggetto? Che cosa I<E<egrave>> un oggetto innanzitutto?
+
+Un oggetto non E<egrave> nient'altro che un modo per infilare funzionamenti
+complessi in un grazioso pacchetto semplice da usare. (Questo E<egrave>
+ciE<ograve> che i professori chiamano astrazione). Alcune persone in gamba
+che non hanno di meglio da fare che sedere intorno ad un tavolo per
+settimane al fine di risolvere problemi veramente complicati, creano questi
+splendidi oggetti che possono essere utilizzati anche da persone normali.
+(Questo E<egrave> ciE<ograve> che i professori chiamano riutilizzo del
+software). Gli utenti (cioE<egrave> i programmatori) possono giocare quanto
+vogliono con questo pacchettino, ma non debbono aprirlo e far confusione
+con ciE<ograve> che c'E<egrave> dentro. Esattamente come un costoso
+macchinario, il contratto dice che la garanzia E<egrave> nulla una volta
+aperto il coperchio. Quindi non fatelo.
+
+Il cuore degli oggetti E<egrave> la classe, un piccolo namespace [spazio
+dei nomi, NdT] privato e protetto pieno di dati e funzioni. Una classe
+E<egrave> un insieme di routine correlate che affrontano lo stesso ambito
+di problemi. Potete pensare ad essa come a un tipo definito dall'utente.
+Il meccanismo dei package del Perl, usato anche per moduli piE<ugrave>
+tradizionali, E<egrave> usato pure per moduli di classi. Gli oggetti 
+"vivono" in una classe, ciE<ograve> vuol dire che appartengono a un qualche
+package.
+
+PiE<ugrave> spesso che no, la classe fornisce l'utente di pacchettini.
+Questi pacchettini sono gli oggetti. Sanno a quale classe appartengono e
+come debbono comportarsi. Gli utilizzatori chiedono alla classe di fare
+qualcosa, come "dammi un oggetto". Oppure possono chiedere a uno di questi
+oggetti di fare qualcosa. Chiedere ad una classe di fare qualcosa per
+voi si chiama I<metodo di una classe>. Chiedere ad un oggetto di fare
+qualcosa per voi si chiama I<metodo di un oggetto>. Chiedere ad una
+classe (di solito) o ad un oggetto (talvolta) di restituirvi un
+oggetto si chiama I<costruttore>, che E<egrave> semplicemente un tipo
+particolare di metodo.
+
+Fin qui siamo d'accordo, ma in che cosa differisce un oggetto da qualsiasi
+altro tipo di dato in Perl? Che cos'E<egrave> un oggetto I<veramente>;
+cioE<egrave>, qual'E<egrave> il suo tipo fondamentale? La risposta alla
+prima domanda E<egrave> semplice. Un oggetto E<egrave> differente da
+qualsiasi altro tipo di dato in Perl in una ed una sola maniera: potete
+dereferenziarlo utilizzando non solamente indici numerici o alfanumerici
+come con semplici array e hash, ma con chiamate esplicite di subroutine.
+In una parola, con i I<metodi>.
+
+La risposta alla seconda domanda E<egrave> che un oggetto E<egrave> un
+riferimento, e non un riferimento qualsiasi, badate bene, ma uno sul cui
+referente E<egrave> stato eseguito un I<bless>() [consacrazione, NdT] in
+una particolare classe (leggi: package). Che tipo di riferimento??
+Beh, la risposta a questo E<egrave> un pE<ograve> meno concreta. Questo
+perchE<eacute> in Perl il progettista della classe puE<ograve> impiegare
+qualsiasi tipo di riferimento gli piaccia come tipo di dato intrinseco
+sottostante. Potrebbe essere uno scalare, un array o un riferimento ad un
+hash. Potrebbe anche trattarsi di un riferimento a un codice. Ma data la
+sua innata flessibilitE<agrave>, un oggetto E<egrave> di solito un
+riferimento ad un hash.
+
+=head1 Creare una Classe
+
+Prima di creare una classe, dovete decidere che nome darle. Questo
+perchE<eacute> il nome della classe (package) decide il nome del file
+utilizzato per ospitarla, esattamente come con i normali moduli. Quindi,
+quella classe (package) dovrebbe fornire uno o piE<ugrave> modi per
+generare oggetti. Alla fine, dovrebbe fornire meccanismi per permettere
+agli utilizzatori dei propri oggetti di manipolare indirettamente questi
+oggetti a distanza.
+
+Per esempio, facciamo un semplice modulo classe Persona. Esso viene
+archiviato nel file Persona.pm. Se la classe si fosse chiamata
+Brava::Persona, sarebbe stata archiviata nel file Brava/Persona.pm, e il
+suo package sarebbe diventato Brava::Persona invece della sola Persona.
+(In un personal computer con un sistema operativo diverso da Unix o Plan 9,
+ma con qualcosa come Mac OS o VMS, il separatore di directory puE<ograve>
+essere diverso, ma il principio E<egrave> lo stesso). Non assumete che ci
+sia alcuna relazione formale tra i moduli in base ai nomi delle loro
+directory. E<Egrave> esclusivamente una convenzione per raggruppare, e non
+ha effetto su ereditarietE<agrave>, accessibilitE<agrave> delle variabili o
+qualsiasi altra cosa.
+
+Per questo modulo non abbiamo intenzione di utilizzare Exporter,
+perchE<eacute> siamo una classe di buone maniere che non esporta
+assolutamente niente. Per fabbricare oggetti, una classe deve avere un
+I<metodo costruttore>. Un costruttore restituisce non solo un normale tipo
+di dato, ma un oggetto completamente nuovo di quella classe. Di questa
+stregoneria si occupa la funzione bless(), il cui solo scopo E<egrave> di
+abilitare il suo referente ad essere usato come un oggetto. Ricordatevi: il
+fatto di essere un oggetto significa solamente che i metodi possono essere
+chiamati attraverso di esso.
+
+BenchE<eacute> un costruttore possa essere chiamato in qualsiasi modo
+vogliate, sembra che molti programmatori preferiscano chiamarli new()
+[nuovo, NdT]. Ad ogni modo, new() non E<egrave> una parola riservata, e
+una classe non E<egrave> obbligata a contenerla. Pare che alcuni
+programmatori utilizzino una funzione con lo stesso nome della classe come
+costruttore.
+
+=head2 Rappresentazione di un Oggetto
+
+Il meccanismo di gran lunga piE<ugrave> utilizzato in Perl per
+rappresentare un record Pascal, uno struct C, o una classe C++ E<egrave> un
+hash anonimo. Questo perchE<eacute> un hash ha un numero arbitrario di
+campi dati, ognuno convenientemente acceduto da un nome arbitrario di
+vostra creazione.
+
+Se state solamente emulando qualcosa come uno struct, vi imbatterete in
+qualcosa come:
+
+    $rec = {
+        nome  => "Gianni",
+        eta   => 23,
+        compagni => [ "Norberto", "Raffaele", "Pino"],
+    };
+
+Se ve la sentite, potete aggiungere un po' di distinzione visiva mettendo
+in maiuscolo le chiavi dell'hash:
+
+    $rec = {
+        NOME  => "Gianni",
+        ETA   => 23,
+        COMPAGNI => [ "Norberto", "Raffaele", "Pino"],
+    };
+
+E in questo modo potete chiamare C<< $rec->{NOME} >> per ottenere "Gianni",
+o C<< @{ $rec->{COMPAGNI} } >> per ottenere "Norberto", "Raffaele", e
+"Pino".
+
+Questo stesso modello E<egrave> spesso usato per le classi, sebbene non sia
+considerato l'apice della correttezza della programmazione, da gente nuova
+al concetto di classe, prendere possesso di un oggetto, accedendo in modo
+sfacciato ai suoi dati membri direttamente. Parlando in generale, un
+oggetto dovrebbe essere considerato come una misteriosa struttura dati che
+potete accedere con i I<metodi di oggetto>. Visivamente, le chiamate di
+metodi assomigliano alla dereferenziazione di un riferimento utilizzando un
+nome di una funzione anzichE<eacute> con parentesi graffe o tonde.
+
+=head2 Interfaccia di una Classe
+
+Alcuni linguaggi forniscono un'interfaccia sintattica formale per i metodi
+di una classe, ma non il Perl. Si affida a voi per leggere la
+documentazione di ogni classe. Se provate a chiamare un metodo indefinito
+di un oggetto, il Perl non protesterE<agrave>, ma il programma
+attiverE<agrave> una eccezione a tempo di esecuzione. Allo stesso modo, se
+chiamate un metodo che si aspetta un numero primo come argomento, con un
+numero non primo, non potete aspettarvi che il compilatore individui questa
+discrepanza. (Beh, potete aspettarvi ciE<ograve> che volete, ma non
+accadrE<agrave>).
+
+Supponete di avere un utente ben educato della vostra classe Persona,
+qualcuno che ha letto la documentazione che spiega l'interfaccia
+stabilita. Vediamo come puE<ograve> essere utilizzata la classe Persona:
+
+    use Persona;
+
+    $egli = Persona->new();
+    $egli->nome("Gianni");
+    $egli->eta(23);
+    $egli->compagni( "Norberto", "Raffaele", "Pino" );
+
+    push @Ogni_Record, $egli;  # salva l'oggetto in un array per dopo
+
+    printf "%s ha %d anni.\n", $egli->nome, $egli->eta;
+    print "I suoi compagni sono: ", join(", ", $egli->compagni), "\n";
+
+    printf "Il nome dell'ultimo record e` %s\n", $Ogni_Record[-1]->nome;
+
+Come potete vedere, l'utente della classe non sa (o almeno, non ha alcun
+interesse a sapere) che l'oggetto ha una particolare implementazione
+invece di un'altra. L'interfaccia alla classe ed ai suoi oggetti avviene
+esclusivamente tramite metodi, e questo E<egrave> tutto ciE<ograve> di cui
+l'utilizzatore della classe dovrebbe mai occuparsi.
+
+=head2 Costruttori e Metodi di Istanze
+
+Eppure, I<qualcuno> deve sapere che cosa c'E<egrave> nell'oggetto. E quel
+qualcuno E<egrave> la classe. Essa implementa metodi che il programmatore
+utilizza per accedere all'oggetto. Qui vedrete come implementare la classe
+Persona utilizzando l'idioma standard hash-riferimento-come-un-oggetto.
+Costruiremo un metodo di classe chiamato new() che agisce come costruttore,
+e tre metodi di oggetto chiamati nome(), eta() e compagni() per ottenere
+dati di singoli oggetti nascosti nel nostro hash anonimo.
+
+    package Persona;
+    use strict;
+
+    #########################################################
+    ## il costruttore di oggetto (versione semplicistica)  ##
+    #########################################################
+    sub new {
+        my $self  = {};
+        $self->{NOME}     = undef;
+        $self->{ETA}      = undef;
+        $self->{COMPAGNI} = [];
+        bless($self);           # ma vedi sotto
+        return $self;
+    }
+
+    #################################################
+    ## metodi per accedere dati di singoli oggetti ##
+    ##                                             ##
+    ## Con argomenti, impostano il valore. Senza   ##
+    ## di essi, recuperano il/i valore/i.          ##
+    #################################################
+
+    sub nome {
+        my $self = shift;
+        if (@_) { $self->{NOME} = shift }
+        return $self->{NOME};
+    }
+
+    sub eta {
+        my $self = shift;
+        if (@_) { $self->{ETA} = shift }
+        return $self->{ETA};
+    }
+
+    sub compagni {
+        my $self = shift;
+        if (@_) { @{ $self->{COMPAGNI} } = @_ }
+        return @{ $self->{COMPAGNI} };
+    }
+
+    1;  # cosi` il require o l'use ha successo
+
+Abbiamo creato tre metodi per accedere ai dati di un oggetto, nome(),
+eta() e compagni(). Questi sono tutti sostanzialmente simili. Se
+chiamati con un argomento, impostano il campo appropriato; altrimenti
+restituiscono il valore contenuto in quel campo, ovvero il valore
+corrispondente a quella chiave dell'hash.
+
+=head2 Progetti per il Futuro: Costruttori Migliori
+
+Anche se a questo punto potete anche ignorarne il significato, un giorno
+vi dovrete preoccupare dell'ereditarietE<agrave>. (Potete tranquillamente
+ignorarla per adesso e preoccuparvi dopo, se vi pare). Per assicurarvi
+che tutto funzioni alla perfezione, dovete usare la forma con doppio
+argomento di bless(). Il secondo argomento E<egrave> la classe nella quale
+al referente verrE<agrave> applicata la funzione bless(). Non assumendo la
+nostra classe come secondo argomento di default ed usando invece la classe
+ricevuta come argomento, creiamo in nostro costruttore ereditabile.
+
+    sub new {
+        my $classe = shift;
+        my $self  = {};
+        $self->{NOME}   = undef;
+        $self->{ETA}    = undef;
+        $self->{COMPAGNI}  = [];
+        bless ($self, $classe);
+        return $self;
+    }
+
+Questo E<egrave> tutto ciE<ograve> che concerne i costruttori. Questi
+metodi danno vita agli oggetti, restituendo pacchetti graziosi e misteriosi
+all'utilizzatore, per essere usati in seguito con chiamate ai metodi.
+
+=head2 Distruttori
+
+Ogni storia ha un inizio ed una fine. L'inizio della storia di un
+oggetto E<egrave> il suo costruttore, chiamato esplicitamente quando
+l'oggetto prende vita. Ma la fine della sua storia E<egrave> il
+I<distruttore>, un metodo chiamato implicitamente quando un oggetto perde
+la vita. Qualsiasi codice di clean-up [pulizia, NdT] dedicato ai singoli
+oggetti E<egrave> posto nel distruttore, che deve (in Perl) essere chiamato
+DESTROY [distruggi, NdT].
+
+Se i costruttori possono avere nomi arbitrari, perchE<eacute> i distruttori
+no? PerchE<eacute> mentre i costruttori sono chiamati esplicitamente, i
+distruttori non lo sono. La distruzione avviene automaticamente
+attraverso il sistema di garbage collection (GC) [raccolta di
+immondizia, NdT] del Perl, che E<egrave> un sistema di GC fondato sui
+riferimenti, veloce ma talvolta pigro. Per sapere che cosa chiamare,
+il Perl insiste sul fatto che il distruttore sia chiamato DESTROY.
+La nozione del Perl sul tempo esatto per la chiamata al distruttore
+non E<egrave> al momento ben definita, ecco perchE<eacute> i vostri
+distruttorinon dovrebbero fare affidamento sul quando vengono chiamati.
+
+PerchE<eacute> DESTROY viene scritto completamente maiuscolo? Il Perl
+talvolta utilizza nomi di funzione completamente maiuscoli come
+convenzione per indicare che la funzione viene in qualche modo
+chiamata automaticamente dal Perl. Di questa categoria fanno parte
+BEGIN, END, AUTOLOAD, piE<ugrave> tutti i metodi utilizzati da oggetti
+legati con la funzione tie(), descritti in L<perltie>.
+
+In linguaggi di programmazione orientati agli oggetti veramente buoni,
+l'utente non si cura di quando il distruttore viene chiamato. Accade
+quando ci si aspetta che accada. In linguaggi a basso livello del tutto
+privi di GC, non c'E<egrave> modo di fare affidamento sul fatto che 
+ciE<ograve> avvenga al momento giusto, cosE<igrave> il programmatore deve
+esplicitamente chiamare il distruttore per pulire memoria e stato,
+incrociando le dita che sia il tempo giusto per farlo. A differenza del C++,
+in Perl non E<egrave> quasi mai necessario un distruttore di oggetto, e
+anche quando lo E<egrave>, l'invocazione esplicita non E<egrave> necessaria.
+Nel caso della nostra classe Persona, non abbiamo bisogno del distruttore
+perchE<eacute> il Perl si prende cura di cose di poco conto come la
+deallocazione della memoria.
+
+La sola situazione nella quale il GC basato sui riferimenti del Perl non
+funziona E<egrave> quando si trova di fronte a una struttura dati circolare,
+del tipo:
+
+    $questo->{QUALCOSA} = $questo;
+
+In tal caso, dovete eliminare l'autoriferimento manualmente se volete
+che il vostro programma non sprechi memoria. BenchE<eacute> dichiaratamente
+incline all'errore, questo E<egrave> il meglio che possiamo fare al momento.
+Nondimeno, E<egrave> sicuro che al termine del vostro programma i
+distruttori degli oggetti siano chiamati adeguatamente. Quindi siete
+garantiti dal fatto che un oggetto I<alla fine> viene propriamente
+distrutto, ad eccezione del caso unico in cui un programma non termina mai.
+(Se eseguite codice Perl immerso in un'altra applicazione la fase di GC
+avviene un po' piE<ugrave> frequentemente - ogni qual volta un thread si
+esaurisce).
+
+=head2 Altri Metodi di Oggetto
+
+I metodi di cui abbiamo parlato finora sono stati costruttori o
+semplici "metodi per dati", interfacce a dati archiviati nell'oggetto.
+Questi sono piE<ugrave> o meno come i dati membro di oggetti nell'accezione
+del C++, ad eccezione del fatto che non sono accessibili dall'esterno
+come dati. Al contrario, dovrebbero solamente accedere indirettamente ai
+dati dell'oggetto tramite i suoi metodi. Questa E<egrave> una regola
+importante: in Perl, l'accesso ai dati di un oggetto dovrebbe essere
+I<esclusivamente> effettuato attraverso i metodi.
+
+Il Perl non pone restrizioni su chi puE<ograve> usare quali metodi. La
+distinzione pubblico-contro-privato E<egrave> una convenzione, non sintassi.
+(Beh, a meno che non utilizziate il modulo Alias descritto sotto in
+L<Dati membro come variabili>). Talvolta vedrete nomi di metodo
+iniziare o terminare con uno o due trattini bassi. Questa marcatura
+E<egrave> una convenzione per indicare che i metodi sono privati per quella
+sola classe e talvolta per i suoi stretti conoscenti, le sue immediate
+sottoclassi. Ma questa distinzione non E<egrave> forzata dal Perl in
+sE<eacute>. Sta al programmatore seguire questo comportamento.
+
+Non c'E<egrave> ragione di limitare i metodi al semplice accesso ai dati.
+I metodi possono fare ogni cosa. Il punto chiave E<egrave> che sono
+invocati per mezzo dell'oggetto o della classe. Diciamo che vorremmo metodi
+di oggetto che fanno piE<ugrave> che recuperare o impostare un campo
+particolare.
+
+    sub esclama {
+        my $self = shift;
+        return sprintf "Ciao, sono %s, di %d anni, lavoro con %s",
+            $self->{NOME}, $self->{ETA}, join(", ", @{$self->{COMPAGNI}});
+    }
+
+O forse anche uno come questo:
+
+    sub buon_compleanno {
+        my $self = shift;
+        return ++$self->{ETA};
+    }
+
+Alcuni potrebbero obiettare che si dovrebbe procedere cosE<igrave>:
+
+    sub esclama {
+        my $self = shift;
+        return sprintf "Ciao, sono %s, di %d anni, lavoro con %s",
+            $self->nome, $self->eta, join(", ", $self->compagni);
+    }
+
+    sub buon_compleanno {
+        my $self = shift;
+        return $self->eta( $self->eta() + 1 );
+    }
+
+Ma dato che questi metodi sono tutti eseguiti nella stessa classe,
+ciE<ograve> puE<ograve> non essere critico. Ci sono dei compromessi da fare.
+L'utilizzo diretto dell'hash E<egrave> piE<ugrave> veloce (circa un ordine
+di magnitudo piE<ugrave> veloce, infatti), ed E<egrave> piE<ugrave>
+conveniente quando volete fare degli inserimenti in stringhe. Ma l'utilizzo
+di metodi (l'interfaccia esterna) occulta internamente non solo gli utenti
+della vostra classe ma anche voi stessi da cambiamenti nella
+rappresentazione dei vostri dati.
+
+=head1 Dati della Classe
+
+Che dire a proposito dei "dati della classe", elementi di dati comuni ad
+ogni oggetto di una classe? Per quale scopo li vorreste? Dunque, nella
+vostra classe Persona, potreste voler tener conto del totale della
+popolazione vivente. Come implementereste ciE<ograve>?
+
+I<Potreste> creare una variabile globale chiamata $Persona::Censo. Ma
+forse la sola ragione per cui lo fareste E<egrave> se voi I<voleste>
+che sia possibile accedere ai dati della vostra classe direttamente.
+Qualcuno potrebbe semplicemente prendere $Persona::Censo e farne
+qualsiasi cosa. Forse questo va bene nella vostra progettazione.
+Potreste anche concepibilmente volerla rendere una variabile esportata.
+Per essere esportabile, una variabile deve essere globale a tutto il
+package. Se questo fosse un modulo tradizionale piuttosto che uno
+orientato agli oggetti, potreste farlo.
+
+BenchE<eacute> ci si aspetti questo approccio nella maggior parte dei moduli
+tradizionali, E<egrave> una forma generalmente considerata alquanto mediocre
+nella maggior parte dei moduli a oggetti. In un modulo a oggetti, dovreste
+costruire un velo protettivo per separare l'interfaccia
+dall'implementazione. Fornite cosE<igrave> un metodo di classe per accedere
+ai dati della classe cosE<igrave> come fornite metodi di oggetti per
+accedere ai dati di oggetti.
+
+CosE<igrave>, I<potreste> sempre mantenere $Censo come una variabile
+globale del package e affidarvi ad altro per onorare il contratto con il
+modulo e di conseguenza non mettere le mani nella sua implementazione.
+Potreste anche essere superscaltri e rendere $Censo una variabile legata
+con tie() cosE<igrave> come viene descritto in L<perltie>, in modo da
+intercettare tutti gli accessi.
+
+Ma piE<ugrave> spesso che no, vorrete solamente rendere il dato della
+vostra classe una variabile lessicale con campo di visibilitE<agrave>
+limitato al file. Per far ciE<ograve>, ponete semplicemente questa in cima
+al file:
+
+    my $Censo = 0;
+
+Anche se il campo di visibilitE<agrave> del my() si estingue normalmente
+con il blocco nel quale E<egrave> dichiarato (in questo caso l'intero file
+richiamato con use o require), il deep binding [legame profondo, NdT] del
+Perl per le variabili lessicali garantisce che la variabile non sarE<agrave>
+deallocata, rimanendo accessibile alle funzioni dichiarate all'interno dello
+stesso ambito. PerE<ograve> ciE<ograve> non funziona con variabili globali
+alle quali si diano dati valori temporanei con local().
+
+Indipendentemente dal fatto che vogliate lasciare $Censo come una variabile
+globale al package o ne facciate una lessicale con campo di
+visibilitE<agrave> limitato al file, dovrete implementare questi
+cambiamenti nel vostro costruttore Persona::new() :
+
+    sub new {
+        my $classe = shift;
+        my $self  = {};
+        $Censo++;
+        $self->{NOME}   = undef;
+        $self->{ETA}    = undef;
+        $self->{COMPAGNI}  = [];
+        bless ($self, $classe);
+        return $self;
+    }
+
+    sub popolazione {
+        return $Censo;
+    }
+
+Adesso che abbiamo fatto ciE<ograve>, sicuramente necessitiamo di un
+distruttore per il quale, quando una Persona E<egrave> distrutta, il $Censo
+diminuisce. Possiamo fare in questo modo:
+
+    sub DESTROY { --$Censo }
+
+Notate come non ci sia memoria da deallocare nel distruttore? Il Perl
+si prende cura di questo compito tutto da solo.
+
+In alternativa, potreste utilizzare il modulo Class::Data::Inheritable
+[Inheritable = Ereditabile, NdT] da CPAN.
+
+
+=head2 Accedere ai dati di una classe
+
+In fin dei conti questo non sembra proprio un buon modo per continuare
+a manipolare dati di una classe. Una buona regola scalabile E<egrave> che
+I<non dovete mai riferire direttamente ai dati di una classe da un
+metodo di oggetto>. Altrimenti non state costruendo una classe scalabile
+ed ereditabile. L'oggetto deve rappresentare il punto d'incontro per
+tutte le operazioni, specialmente da un metodo di oggetto. Le variabili
+globali (dati di classi) sarebbero in un certo senso nel "package"
+sbagliato della vostra classe derivata. In Perl, i metodi vengono
+eseguiti nel contesto della classe nella quale sono stati definiti,
+I<non> in quello dell'oggetto che gli ha attivati. Per cui, la
+visibilitE<agrave> in termini di namespace delle variabili globali al
+package nei metodi non ha alcuna relazione con l'ereditarietE<agrave>.
+
+Tutto chiaro? Forse no. Ok, diciamo che qualche altra classe ha "preso
+in prestito" (beh, ereditato) il metodo DESTROY come E<egrave> stato
+definito sopra. Quando questi oggetti sono distrutti, la variabile originale
+$Censo viene alterata, non quella nel namespace del package della nuova
+classe. Forse questo E<egrave> ciE<ograve> che volete, ma probabilmente non
+lo E<egrave>.
+
+Ecco come aggiustare il tutto. Immagazzineremo un riferimento ai dati nel
+valore acceduto dalla chiave hash "_CENSO". PerchE<eacute> il trattino
+basso? Beh, piE<ugrave> che altro perchE<eacute> un trattino basso iniziale
+evoca giE<agrave> una forte sensazione di magico a un programmatore C.
+E<Egrave> solamente una costruzione mnemonica per ricordarci che questo
+campo E<egrave> speciale e non deve essere utilizzato come dato membro
+pubblico come lo sono NOME, ETA, e COMPAGNI. (PoichE<eacute> stiamo
+sviluppando questo codice sotto la direttiva strict, prima della versione 
+5.004 del Perl dobbiamo racchiudere tra doppi apici il nome del campo).
+
+    sub new {
+        my $classe = shift;
+        my $self  = {};
+        $self->{NAME}     = undef;
+        $self->{ETA}      = undef;
+        $self->{COMPAGNI} = [];
+        # dati "privati"
+        $self->{"_CENSO"} = \$Censo;
+        bless ($self, $classe);
+        ++ ${ $self->{"_CENSO"} };
+        return $self;
+    }
+
+    sub popolazione {
+        my $self = shift;
+        if (ref $self) {
+            return ${ $self->{"_CENSO"} };
+        } else {
+            return $Censo;
+        }
+    }
+
+    sub DESTROY {
+        my $self = shift;
+        -- ${ $self->{"_CENSO"} };
+    }
+
+=head2 Metodi di Debug
+
+Per una classe E<egrave> tipico possedere un meccanismo di debug. Per
+esempio, potreste voler vedere quando gli oggetti vengono creati o
+distrutti. Per far ciE<ograve> aggiungiamo una variabile lessicale di debug
+con campo di visibilitE<agrave> limitato al file. Per questo, richiamiamo
+il modulo standard Carp per trasmettere i nostri messaggi warning e fatal.
+In tal modo i messaggi verranno restituiti con il nome del file ed il
+numero di linea del chiamante invece del vostro; se avessimo voluto che
+fossero dalla nostra prospettiva, avremmo semplicemente utilizzato die() e
+warn() direttamente invece di croak() e carp() rispettivamente.
+
+    use Carp;
+    my $Debugging = 0;
+
+Adesso aggiungiamo un nuovo metodo di classe per accedere alla variabile.
+
+    sub debug {
+        my $classe = shift;
+        if (ref $classe) { confess "Metodo di classe chiamato come metodo di oggetto" }
+        unless (@_ == 1) { confess "utilizzo: NOMECLASSE->debug(livello)" }
+        $Debugging = shift;
+    }
+
+Adesso aggiustiamo il DESTROY in modo da farlo lamentare un po' quando
+l'oggetto moribondo si estingue:
+
+    sub DESTROY {
+        my $self = shift;
+        if ($Debugging) { carp "Distruggo $self " . $self->nome }
+        -- ${ $self->{"_CENSO"} };
+    }
+
+Si potrebbe concepibilmente costruire uno stato di debug per ogni oggetto.
+In questo modo potreste chiamare entrambi:
+
+    Persona->debug(1);   # l'intera classe
+    $egli->debug(1);     # solo l'oggetto
+
+Per far ciE<ograve>, il nostro metodo di debug deve comportarsi in maniera
+"bimodale", funzionando per classi I<e> per oggetti. Di conseguenza,
+aggiustiamo i metodi debug() e DESTROY come segue:
+
+    sub debug {
+        my $self = shift;
+        confess "utilizzo: coso->debug(livello)"    unless @_ == 1;
+        my $livello = shift;
+        if (ref($self))  {
+            $self->{"_DEBUG"} = $level;		# solo me stesso
+        } else {
+            $Debugging        = $level;         # l'intera classe
+        }
+    }
+
+    sub DESTROY {
+        my $self = shift;
+        if ($Debugging || $self->{"_DEBUG"}) {
+            carp "Distruggo $self " . $self->nome;
+        }
+        -- ${ $self->{"_CENSO"} };
+    }
+
+Che cosa succede se una classe derivata (che chiameremo Impiegato) eredita
+metodi dalla classe di base Persona? Allora C<< Impiegato->debug() >>,
+quando chiamato come metodo di una classe, manipolerE<agrave>
+$Persona::Debugging invece di $Impiegato::Debugging.
+
+=head2 Distruttori di Classi
+
+Il distruttore di oggetti gestisce la terminazione di ogni oggetto distinto.
+Ma talvolta E<egrave> necessario fare un po' di pulizia quando l'intera
+classe viene messa fuori uso, che al momento succede solo quando il
+programma termina. Per costruire un tale I<distruttore di classe>, create
+una funzione di nome END nel package della sua classe. Funziona esattamente
+come la funzione END nei moduli tradizionali, ovvero viene chiamata
+ogniqualvolta il vostro programma termina a meno che non avvenga una
+eccezione o muoia a causa di un "uncaught signal" [segnale non catturato,
+NdT]. Per esempio,
+
+    sub END {
+        if ($Debugging) {
+            print "Tutte le persone se ne vanno adesso.\n";
+        }
+    }
+
+Quando il programma termina, tutti i distruttori di classi (le funzioni END)
+dovranno essere chiamate nell'ordine opposto di quello con cui sono state
+chiamate (ordinamento LIFO).
+
+=head2 Documentare l'Interfaccia
+
+Ed eccolo qua: vi abbiamo solo mostrato l'I<implementazione> di questa classe
+Persona. La sua I<interfaccia> sarE<agrave> la sua documentazione. Di solito questo
+significa inserirla nel formato pod ("plain old documentation") esattamente
+lE<igrave> nello stesso file. Nel nostro esempio Persona, metteremmo la seguente
+documentazione ovunque nel file Persona.pm. Anche se sembra principalmente
+codice, non lo E<egrave>. E<egrave> documentazione immersa del tipo che verrebbe utilizzato
+dai programmi pod2man, pod2html, o pod2text. Il compilatore del Perl ignora
+totalmente la documentazione pod, cosE<igrave> come i traduttori ignorano il codice.
+Segue un esempio di qualche documentazione pod che descrive l'interfaccia
+formale:
+
+    =head1 NOME
+
+    Persona - classe per implementare gente
+
+    =head1 SINOSSI
+
+     use Persona;
+
+     #######################
+     # metodi della classe #
+     #######################
+     $og    = Persona->new;
+     $conta = Persona->popolazione;
+
+     ##############################
+     # metodi per dati di oggetto #
+     ##############################
+
+     ### ottenere versioni ###
+         $chi   = $og->nome;
+         $anni  = $og->eta;
+         @amici = $og->compagni;
+
+     ### impostare versioni ###
+         $og->name("Gianni");
+         $og->age(23);
+         $og->compagni( "Norberto", "Raffaele", "Pino" );
+
+     ###########################
+     # altri metodi di oggetto #
+     ###########################
+
+     $frase = $og->esclama;
+     $og->buon_compleanno;
+
+    =head1 DESCRIZIONE
+
+    La classe Persona implementa bla bla bla bla....
+
+Questo E<egrave> tutto ciE<ograve> da sapere sulle questioni di interfaccia
+e implementazione. Un programmatore che apre il modulo e si arrischia a
+compiere modifiche ai piccoli ingranaggi che si trovavano chiusi dal
+contratto di interfaccia ha annulla la garanzia, e non dovreste
+preoccuparvi della sua sorte.
+
+=head1 Aggregazione
+
+Supponiamo che piE<ugrave> tardi vogliate cambiare la classe per
+implementare nomi migliori. Forse vorrete supportare sia nomi (o nomi di
+battesimo, senza riguardo per le rispettive religioni) che nomi di famiglia
+(o cognomi), oltre a soprannomi e titoli. Se gli utilizzatori della vostra
+classe Persona accedono correttamente ad essa attraverso la sua interfaccia
+documentata, allora potrete facilmente cambiare l'implementazione
+sottostante. Se non lo fanno, allora perdono ed E<egrave> loro la colpa
+della rottura del contratto e dell'annullamento della garanzia.
+
+Per far ciE<ograve>, creiamo un'altra classe chiamata Nomecompleto. Come
+sarE<agrave> la classe Nomecompleto? Per rispondere a questa domanda,
+dovete prima immaginare come volete usarla. Potreste farlo in questo modo:
+
+    $egli = Persona->new();
+    $egli->nomecompleto->titolo("San");
+    $egli->nomecompleto->battesimo("Tommaso");
+    $egli->nomecompleto->cognome("D'Aquino");
+    $egli->nomecompleto->soprannome("Tommy");
+    printf "Il suo nome normale E<egrave> %s\n", $egli->nome;
+    printf "Ma il suo nome vero E<egrave> %s\n", $egli->nomecompleto->come_stringa;
+
+Ok. Per far ciE<ograve>, cambiamo Persona::new() in modo che supporti un
+campo per il nome completo come segue:
+
+    sub new {
+        my $classe = shift;
+        my $self  = {};
+        $self->{NOMECOMPLETO} = Nomecompleto->new();
+        $self->{ETA}          = undef;
+        $self->{COMPAGNI}     = [];
+        $self->{"_CENSO"}     = \$Censo;
+        bless ($self, $classe);
+        ++ ${ $self->{"_CENSO"} };
+        return $self;
+    }
+
+    sub nomecompleto {
+        my $self = shift;
+        return $self->{NOMECOMPLETO};
+    }
+
+Poi per supportare vecchio codice, definiamo Persona::nome() in questo modo:
+
+    sub nome {
+        my $self = shift;
+        return $self->{NOMECOMPLETO}->soprannome(@_)
+          ||   $self->{NOMECOMPLETO}->battesimo(@_);
+    }
+
+Ecco la classe Nomecompleto. Sceglieremo la stessa tecnica di usare un
+riferimento ad un hash per mantenere i campi dei dati, e metodi con
+il nome appropriato per accederli:
+
+    package Nomecompleto;
+    use strict;
+
+    sub new {
+        my $classe = shift;
+        my $self  = {
+            TITOLO      => undef,
+            BATTESIMO   => undef,
+            COGNOME     => undef,
+            SOPRANNOME  => undef,
+        };
+        bless ($self, $classe);
+        return $self;
+    }
+
+    sub battesimo {
+        my $self = shift;
+        if (@_) { $self->{BATTESIMO} = shift }
+        return $self->{BATTESIMO};
+    }
+
+    sub cognome {
+        my $self = shift;
+        if (@_) { $self->{COGNOME} = shift }
+        return $self->{COGNOME};
+    }
+
+    sub soprannome {
+        my $self = shift;
+        if (@_) { $self->{SOPRANNOME} = shift }
+        return $self->{SOPRANNOME};
+    }
+
+    sub titolo {
+        my $self = shift;
+        if (@_) { $self->{TITOLO} = shift }
+        return $self->{TITOLO};
+    }
+
+    sub come_stringa {
+        my $self = shift;
+        my $nome = join(" ", @$self{'BATTESIME<ograve>, 'COGNOME<egrave>});
+        if ($self->{TITOLO}) {
+            $nome = $self->{TITOLO} . " " . $nome;
+        }
+        return $nome;
+    }
+
+    1;
+
+Infine, ecco il programma di test:
+
+    #!/usr/bin/perl -w
+    use strict;
+    use Persona;
+    sub END { mostra_censo() }
+
+    sub mostra_censo ()  {
+        printf "Popolazione attuale: %d\n", Persona->popolazione;
+    }
+
+    Persona->debug(1);
+
+    mostra_censo();
+
+    my $egli = Persona->new();
+
+    $egli->nomecompleto->battesimo("Thomas");
+    $egli->nomecompleto->cognome("Aquinas");
+    $egli->nomecompleto->soprannome("Tommy");
+    $egli->nomecompleto->titolo("St");
+    $egli->eta(1);
+
+    printf "%s E<egrave> veramente %s.\n", $egli->nome, $egli->nomecompleto->come_stringa;
+    printf "%s ha %d anni.\n", $egli->nome, $egli->eta;
+    $egli->buon_compleanno;
+    printf "%s ha %d anni.\n", $egli->nome, $egli->eta;
+
+    mostra_censo();
+
+=head1 EreditarietE<agrave>
+
+Tutti i sistemi di programmazione orientata agli oggetti supportano una
+qualche nozione di ereditarietE<agrave>. EreditarietE<agrave> significa
+permettere a una classe di addossarsi su di un'altra in modo da non dover
+scrivere lo stesso codice ancora e ancora. Si tratta di riutilizzo di
+software, quindi collegato con la Pigrizia, la principale virtE<ugrave> di
+un programmatore. (I meccanismi di import/export nei moduli tradizionali
+sono anch'essi una forma di riutilizzo del codice, ma piE<ugrave> semplice
+della vera ereditarietE<agrave> che troverete nei moduli oggetto).
+
+A volte la sintassi di ereditarietE<agrave> E<egrave> costruita nel nucleo
+del linguaggio, e a volte no. Il Perl non ha una sintassi speciale per
+specificare la classe (o le classi) dalla quale ereditare. Invece, sta
+tutto rigorosamente nella semantica. Ogni package puE<ograve> avere una
+variabile chiamata @ISA ["IS A" in inglese significa "E<Egrave> UN", NdT],
+che gestisce l'ereditarietE<agrave> (dei metodi). Se provate a invocare un
+metodo di un oggetto o una classe, e quel metodo non si trova nel package
+di quell'oggetto, allora il Perl scandisce gli altri package in @ISA per
+andare in cerca del metodo perduto.
+
+Come le variabili speciali dedicate ai package riconosciute da Exporter
+(tipo @EXPORT, @EXPORT_OK, @EXPORT_FAIL, %EXPORT_TAGS, e $VERSION),
+l'array @ISA I<deve> essere globale con campo di visibilitE<agrave> esteso
+al package e non una variabile lessicale con campo di visibilitE<agrave>
+limitato al file, creata con my(). La maggior parte delle classi hanno solo
+un elemento nel loro array @ISA. In questo caso, abbiamo quel che si chiama
+"ereditarietE<agrave> singola".
+
+Si consideri la seguente classe:
+
+    package Impiegato;
+    use Persona;
+    @ISA = ("Persona");
+    1;
+
+Non un gran che, eh? Tutto ciE<ograve> che fa per ora E<egrave> caricare
+un'altra classe e dichiarare che questa erediterE<agrave> metodi dall'altra
+classe se necessario. Non le abbiamo dato nessuno dei suoi metodi. Contiamo
+sul fatto che un Impiegato si comporti come una Persona.
+
+L'impostazione di una classe vuota, in questa maniera, si chiama "test per
+la sottoclasse vuota"; cioE<egrave>, creare una classe derivata che non fa
+altro che ereditare da una classe di partenza. Se la classe di partenza
+originale E<egrave> stata progettata correttamente, allora la nuova classe
+derivata puE<ograve> essere utilizzata direttamente come un rimpiazzo per
+quella vecchia. CiE<ograve> significa che dovreste essere in grado di
+scrivere un programma come questo:
+
+    use Impiegato;
+    my $impieg = Impiegato->new();
+    $impieg->nome("Gianni");
+    $impieg->eta(23);
+    printf "%s ha %d anni.\n", $impieg->nome, $impieg->eta;
+
+Per correttezza di progettazione, intendiamo sempre utilizzare la forma a
+due argomenti di bless(), evitando l'accesso diretto a dati globali, e non
+esportando alcunchE<eacute>. Se tornate indietro a guardare la funzione
+Persona::new() che abbiamo definito, siamo stati cauti a farlo. Ci sono un
+po' di dati del package utilizzati nel costruttore, ma il riferimento per
+far ciE<ograve> E<egrave> archiviato nell'oggetto stesso e tutti gli altri
+metodi accedono ai dati del package attraverso quel riferimento, per cui
+dovremmo essere a posto.
+
+Che cosa intendiamo per funzione Persona::new() -- non E<egrave> in
+realtE<agrave> un metodo? Beh, in principio sE<igrave>. Un metodo E<egrave>
+solo una funzione che accetta come primo argomento il nome di una classe
+(package) o un oggetto (riferimento al quale E<egrave> stata applicata la
+funzione bless()). Persona::new() E<egrave> la funzione che sia il metodo
+C<< Persona->new() >> che il metodo C<< Impiegato->new() >> finiscono per
+chiamare. Si osservi che benchE<eacute> una chiamata di metodo appaia quasi
+come una chiamata di funzione, esse non sono assolutamente la stessa cosa,
+e se trattate le due alla stessa maniera, rimarrete presto con niente di
+piE<ugrave> che programmi che non funzionano. Anzitutto, le effettive
+convenzioni di chiamata sottostanti sono differenti: chiamate di metodi
+prendono un argomento extra. Secondariamente, le chiamate di funzione non
+effettuano l'ereditarietE<agrave> mentre i metodi sE<igrave>.
+
+        Chaiata di metodo       Chiamata di funzione risultante
+        -----------             ------------------------
+        Persona->new()          Persona::new("Persona")
+        Impiegato->new()        Persona::new("Impiegato")
+
+Quindi non utilizzate chiamate di funzione quando intendete chiamare un
+metodo.
+
+Se un impiegato E<egrave> solo una Persona, questo non E<egrave> molto
+interessante. Quindi aggiungiamo altri metodi. Daremo ai nostri impiegati
+campi di dato per accedere al loro salario, al loro identificatore di
+impiegato, e alla loro data di inizio.
+
+Se siete un po' stanchi di creare tutti questi metodi quasi identici solo
+per accedere ai dati dell'oggetto, non disperate. PiE<ugrave> tardi
+descriveremo molti comodi meccanismi per abbreviare tutto ciE<ograve>. Nel
+frattempo, vediamo il modo diretto:
+
+    sub salario {
+        my $self = shift;
+        if (@_) { $self->{SALARIO} = shift }
+        return $self->{SALARIO};
+    }
+
+    sub id_numero {
+        my $self = shift;
+        if (@_) { $self->{ID} = shift }
+        return $self->{ID};
+    }
+
+    sub data_inizio {
+        my $self = shift;
+        if (@_) { $self->{DATA_INIZIO} = shift }
+        return $self->{DATA_INIZIO};
+    }
+
+=head2 Metodi overridden [scavalcati, NdT]
+
+Che cosa accade quando sia la classe derivata che la classe base definiscono
+lo stesso metodo? Beh, in questo caso ottenete la versione di quel metodo
+della classe derivata. Per esempio, vogliamo che il metodo compagni()
+invocato da un impiegato, agisca un po' diversamente. Invece di restituire
+la lista dei nomi dei compagni, restituiamo una stringa leggermente diversa.
+CosE<igrave> facendo, questo:
+
+    $impieg->compagni("Pietro", "Paolo", "Maria");
+    printf "I suoi compagni sono: %s\n", join(", ", $impieg->compagni);
+
+produrrE<agrave>:
+
+    I suoi compagni sono: COMPAGNO=PIETRO, COMPAGNO=PAOLO, COMPAGNO=MARIA
+
+Per far ciE<ograve>, aggiungete solamente questa definizione nel file
+Impiegato.pm:
+
+    sub compagni {
+        my $self = shift;
+        if (@_) { @{ $self->{COMPAGNI} } = @_ }
+        return map { "COMPAGNO=\U$_" } @{ $self->{COMPAGNI} };
+    }
+
+Con questo, abbiamo appena dimostrato quel concetto altisonante conosciuto
+in alcuni ambienti come I<polimorfismo>. Abbiamo prelevato la forma ed il
+comportamento di un oggetto esistente, e quindi l'abbiamo alterato per
+soddisfare le nostre necessitE<agrave>. Questa E<egrave> una forma di
+Pigrizia. (Venire polimorfizzati E<egrave> anche ciE<ograve> che accade
+quando un mago decide che la forma di una rana sarebbe piE<ugrave> adatta a
+voi).
+
+Di quando in quando vorrete che la chiamata di un metodo attivi sia la
+versione della classe derivata (detta anche "sottoclasse") che la versione
+della classe base (detta anche "superclasse"). In pratica, costruttori e
+distruttori vogliono fare presumibilmente questo, ed ha anche senso,
+probabilmente, nel metodo debug() che abbiamo mostrato in precedenza.
+
+Per far ciE<ograve>, aggiungiamo questo a Impiegato.pm:
+
+    use Carp;
+    my $Debugging = 0;
+
+    sub debug {
+        my $self = shift;
+        confess "utilizzo: thing->debug(level)"    unless @_ == 1;
+        my $livello = shift;
+        if (ref($self))  {
+            $self->{"_DEBUG"} = $livello;
+        } else {
+            $Debugging = $livello;           # l'intera classe
+        }
+        Persona::debug($self, $Debugging);   # non provate a farlo
+    }
+
+Come vedete, continuiamo a chiamare la funzione debug() del package Persona.
+Ma ciE<ograve> E<egrave> troppo debole per una buona progettazione. Che
+accade se Persona non ha una funzione debug(), ma sta ereditando il I<suo>
+metodo debug() da qualche altra parte? Sarebbe leggermente meglio fare
+
+    Persona->debug($Debugging);
+
+Ma anche questo E<egrave> eccessivamente hard-coded [cablato, NdT].
+E<egrave> alquanto meglio fare
+
+    $self->Persona::debug($Debugging);
+
+che E<egrave> uno strano modo per dire di iniziare a cercare il metodo
+debug() in Persona. Questa strategia viene usata piE<ugrave> spesso per
+metodi di oggetto overridden che per metodi di classe overridden.
+
+Qui c'E<egrave> ancora qualcosa che va aggiustata. Abbiamo scritto per
+esteso il nome della superclasse. Questo in particolare non va bene se
+cambiate le classi dalle quali ereditate o ne aggiungete altre. Qui
+fortunatamente la pseudoclasse SUPER ci viene in aiuto.
+
+    $self->SUPER::debug($Debugging);
+
+In questo modo inizia a cercare nella lista @ISA della mia classe. Comunque
+questo ha senso solamente I<all'interno> di una chiamata di metodo. Non
+provate ad accedere a niente in SUPER:: da nessun altra parte,
+perchE<eacute> questo non esiste al di fuori di una chiamata di metodo
+overridden. Osservate che C<SUPER> si riferisce alla superclasse del
+package corrente, I<non> alla superclasse di C<$self>.
+
+Qui lee cose si stanno facendo un po' complicare. Abbiamo fatto qualcosa
+che non andava fatto? Come prima, un modo per verificare se stiamo
+progettando una classe decente E<egrave> per mezzo di una sottoclasse vuota
+di test. Dato che abbiamo giE<agrave> una classe Impiegato che stiamo
+provando a verificare, sarebbe meglio avere una nuova sottoclasse vuota che
+deriva da Impiegato. Eccone una:
+
+    package Capo;
+    use Impiegato;        # :-)
+    @ISA = qw(Impiegato);
+
+E qui vediamo il programma di verifica:
+
+    #!/usr/bin/perl -w
+    use strict;
+    use Capo;
+    Capo->debug(1);
+
+    my $capo = Capo->new();
+
+    $capo->nomecompleto->titolo("Don");
+    $capo->nomecompleto->cognome("Pichon Alvarez");
+    $capo->nomecompleto->battesimo("Federico Jesus");
+    $capo->nomecompleto->soprannome("Fred");
+
+    $capo->eta(47);
+    $capo->compagni("Franco", "Felice", "Fausto");
+
+    printf "%s ha %d anni.\n", $capo->nomecompleto->come_stringa, $capo->age;
+    printf "I suoi compagni sono: %s\n", join(", ", $capo->compagni);
+
+Eseguendolo, vedremo che tutto va ancora bene. Se volete scaricare dalla
+memoria il vostro oggetto in un formato carino, qualcosa come il modo in
+cui il comando 'x' funziona nel debugger, potete usare il modulo
+Data::Dumper da CPAN in questo modo:
+
+    use Data::Dumper;
+    print "Ecco il capo:\n";
+    print Dumper($capo);
+
+Che ci mostra qualcosa del genere:
+
+    Ecco il capo:
+    $VAR1 = bless( {
+	 _CENSO => \1,
+	 NOMECOMPLETO => bless( {
+			      TITOLO => 'Don',
+			      COGNOME => 'Pichon Alvarez',
+			      SOPRANNOME => 'Fred',
+			      BATTESIMO => 'Federico Jesus'
+			    }, 'Nomecompleto' ),
+	 ETA => 47,
+	 COMPAGNI => [
+		    'Franco',
+		    'Felice',
+		    'Fausto'
+		  ]
+       }, 'CapE<ograve> );
+
+Hm.... qui manca qualcosa. Dove sono il salario, la data di inizio, e
+il numero di identificazione? Beh, non abbiamo mai assegnato loro alcun
+valore, nemmeno undef, quindi non saltano fuori nelle chiavi dell'hash. La
+classe Impiegato non ha un metodo new() di per sE<eacute>, ed il metodo
+new() in Persona E<egrave> a conoscenza di Impiegati. (E nemmeno dovrebbe
+saperlo: la corretta progettazione orientata agli oggetti impone che a una
+sottoclasse sia permesso di conoscere la sua immediata superclasse, ma mai
+il contrario). Quindi aggiustiamo Impiegato::new() in questa maniera:
+
+    sub new {
+        my $class = shift;
+        my $self  = $class->SUPER::new();
+        $self->{SALARIO}        = undef;
+        $self->{ID}             = undef;
+        $self->{DATA_INIZIO}    = undef;
+        bless ($self, $class);          # nuova abilitazione, "riconsacrazione"
+        return $self;
+    }
+
+Adesso se scaricate dalla memoria un oggetto Impiegato o Capo, vedrete che
+adesso appariranno nuovi campi.
+
+=head2 EreditarietE<agrave> Multipla
+
+Ok, pur correndo il rischio di confondere i principianti e annoiare i guru
+della programmazione orientata agli oggetti, E<egrave> tempo di confessare
+che il sistema degli oggetti del Perl include quella controversa nozione
+conosciuta come ereditarietE<agrave> multipla, o per brevitE<agrave> EM.
+CiE<ograve> significa che invece di avere una sola classe padre che a sua
+volta puE<ograve> di per sE<eacute> avere una classe padre, ecc., potete
+direttamente ereditare da due o piE<ugrave> genitori. E<Egrave> vero che
+alcuni utilizzi di EM possono mettervi nei guai, sebbene si spera non
+del tutto con il Perl come con linguaggi orientati agli oggetti in modo
+dubbio come il C++.
+
+Il modo in cui funziona in realtE<agrave> E<egrave> molto semplice: basta
+includere piE<ugrave> nomi di package nela lista @ISA. Quando per il Perl
+viene il tempo di andare alla ricerca di metodi per il vostro oggetto, va a
+vedere nell'ordine in ognuno di questi package. Beh, una specie. E<Egrave>
+in realtE<agrave> una prima ricerca in profonditE<agrave> (depth-first)
+totalmente ricorsiva. Considerate un gruppo di liste @ISA come queste:
+
+    @Prima::ISA    = qw( Alfa );
+    @Seconda::ISA  = qw( Beta );
+    @Terza::ISA    = qw( Prima Seconda );
+
+Se avete un oggetto della classe Terza:
+
+    my $ogg = Terza->new();
+    $ogg->gira();
+
+Come troviamo un metodo gira (o un metodo new() per quel caso)? A causa del
+fatto che la ricerca E<egrave> prima in profonditE<agrave>, le classi
+verranno scandite nel seguente ordine: Terza, Prima, Alfa, Seconda, e Beta.
+
+In pratica, si sono visti pochi moduli di classe fare veramente uso della
+EM. Quasi sempre viene scelto un contenimento semplice di una classe
+anzichE<eacute> l'EM. Ecco perchE<eacute> il nostro oggetto Persona
+I<conteneva> un oggetto Nomecompleto. Questo non significa che I<era> un
+Nomecompleto.
+
+Ad ogni modo, c'E<egrave> un caso particolare nel quale l'EM in Perl
+E<egrave> frequentemente utilizzata: quando si prendono in prestito i
+metodi di classe di un'altra classe. Questo E<egrave> abbastanza comune
+specialmente se si ha a che fare con classi per le quali di solito non ci
+interessano gli oggetti di per sE<eacute>, come Exporter, DynaLoader,
+AutoLoader, e SelfLoader. Queste classi non forniscono costruttori;
+esistono solo per il fatto che voi possiate far ereditare i loro metodi di
+classe. (Non E<egrave> esattamente chiaro perchE<eacute> qui E<egrave>
+stata utilizzata l'ereditarietE<agrave> invece dell'inclusione tradizionale
+di moduli).
+
+Per esempio, ecco l'array @ISA del modulo POSIX:
+
+    package POSIX;
+    @ISA = qw(Exporter DynaLoader);
+
+Il modulo POSIX non E<egrave> in realtE<agrave> un modulo orientato agli
+oggetti, ma allora non lo sono neppure Exporter o DynaLoader. Danno solo in
+prestito i comportamenti delle loro classi a POSIX.
+
+PerchE<eacute> l'ereditarietE<agrave> non viene molto utilizzata per i
+metodi di oggetto? Una ragione E<egrave> che puE<ograve> avere effetti
+collaterali complessi. Per prima cosa, il vostro grafo di
+ereditarietE<agrave> (non piE<ugrave> un albero) puE<ograve> confluire
+all'indietro alla stessa classe di base. Sebbene il Perl ci protegga
+dall'ereditarietE<agrave> ricorsiva, avere semplicemente genitori che sono
+imparentati attraverso un avo un comune, sebbene suoni incestuoso, non
+E<egrave> proibito. Cosa accadrebbe se nella nostra classe Terza di cui
+sopra volessimo che il metodo new() chiamasse anche entrambi i costruttori
+overridden nelle sue classi genitrici? La notazione SUPER troverebbe solo
+il primo. In piE<ugrave>, che accadrebbe se entrambe le classi Alfa e Beta
+avessero un avo in comune, chiamato Nullo? Se continuaste a percorrere
+l'albero di ereditarietE<agrave> chiamando metodi overridden, finireste col
+chiamare Nullo::new() due volte, il che potrebbe proprio essere una cattiva
+idea.
+
+=head2 UNIVERSAL: La Radice di Tutti Gli Oggetti
+
+Non sarebbe conveniente se tutti gli oggetti avessero come radice un'unica
+classe base in comune? In questo modo potreste dare ad ogni oggetto dei
+metodi comuni senza dover aggiungerli a tutti quelli inclusi nelle liste
+@ISA. Beh, pare che ciE<ograve> sia possibile. Non lo potete vedere, ma il
+Perl assume tacitamente ed irrevocabilmente che ci sia un elemento extra
+alla fine di @ISA: la classe UNIVERSAL. Nella versione 5.003, non vi si
+trovava alcun metodo predefinito, ma potevate aggiungerne a vostro
+piacimento.
+
+Comunque, dalla versione 5.004 (o qualche release sovversiva, come la
+5.003_08), UNIVERSAL contiene giE<agrave> alcuni metodi. Questi sono
+integrati nel vostro codice oggetto del Perl, quindi non necessitano di
+tempo extra per il caricamento. I metodi predefiniti comprendono isa(),
+can(), e VERSION(). isa() vi dice se un oggetto o una classe "E<egrave>"
+un'altra senza dover voi stessi attraversare la gerarchia:
+
+   $ha_io = $fd->isa("IO::Handle");
+   $discende_da_handle = IO::Socket->isa("IO::Handle");
+
+Il metodo can(), chiamato in quell'oggetto o classe, ci informa se il suo
+argomento stringa E<egrave> un metodo invocabile di quella classe. Infatti,
+restituisce un riferimento della funzione di quel metodo:
+
+   $il_suo_metodo_print = $ogg->can('come_stringE<agrave>);
+
+Infine, il metodo VERSION controlla se la classe (o la classe dell'oggetto)
+ha una variabile globale di package chiamata $VERSION che sia grande
+abbastanza, come in:
+
+    Qualche_Modulo->VERSION(3.0);
+    $la_sua_versione = $ogg->VERSION();
+
+Ad ogni modo, di solito non siamo noi stessi a chiamare VERSION. (Ricordate
+che il nome di una funzione totalmente maiuscolo E<egrave> una convenzione
+del Perl per indicare che la funzione sarE<agrave> automaticamente chiamata
+dal Perl in una qualche maniera). In questo caso, ciE<ograve> accade quando
+scrivete:
+
+    use Qualche_Modulo 3.0;
+
+Se volevate aggiungere il controllo della versione nella vostra classe
+Persona introdotta precedentemente, aggiungete questo a Persona.pm:
+
+    our $VERSION = '1.1';
+
+e quindi in Impiegato.pm potete scrivere
+
+    use Persona 1.1;
+
+E si assicurerE<agrave> che abbiate almeno a disposizione quel numero di
+versione o piE<ugrave> alto. CiE<ograve> non E<egrave> lo stesso che
+caricare il numero di versione corretto. Non esiste al momento nessun
+meccanismo per l'installazione concorrente di versioni multiple di un
+modulo. Deplorevolmente.
+
+=head1 Rappresentazioni Alternative di Oggetti
+
+Non E<egrave> obbligatorio implementare oggetti come riferimenti a hash. Un
+oggetto puE<ograve> essere qualsiasi tipo di riferimento fintantochE<eacute>
+il suo referente sia stato debitamente consacrato con bless(). CiE<ograve>
+significa che uno scalare, una lista, e un riferimento a codice possono
+esserne il bersaglio.
+
+Uno scalare funzionerebbe nel caso in cui l'oggetto abbia solo un semplice
+dato da mantenere. Un array potrebbe funzionare in molti casi, ma
+ciE<ograve> implicherebbe complicazioni per l'ereditarietE<agrave> dato che
+dovreste inventare nuovi indici per la classe derivata.
+
+=head2 Array come oggetti
+
+Se l'utilizzatore della vostra classe onora il contratto e rispetta
+l'interfaccia pubblicata, allora se ve la sentite potete cambiare la sua
+implementazione sottostante. Ecco qui un'altra implementazione che si
+adegua alle stesse specifiche di interfaccia. Questa volta utilizzeremo un
+riferimento ad una lista invece di un riferimento ad un hash per
+rappresentare un oggetto.
+
+    package Persona;
+    use strict;
+
+    my($NOME, $ETA, $COMPAGNI) = ( 0 .. 2 );
+
+    ####################################################
+    ## il costruttore di oggetto (versione con lista) ##
+    ####################################################
+    sub new {
+        my $self = [];
+        $self->[$NOME]   = undef;  # questo non e` necessario
+        $self->[$ETA]    = undef;  # nemmeno questo
+        $self->[$COMPAGNI] = [];   # ma questo non lo e`, veramente
+        bless($self);
+        return $self;
+    }
+
+    sub nome {
+        my $self = shift;
+        if (@_) { $self->[$NOME] = shift }
+        return $self->[$NOME];
+    }
+
+    sub eta {
+        my $self = shift;
+        if (@_) { $self->[$ETA] = shift }
+        return $self->[$ETA];
+    }
+
+    sub compagni {
+        my $self = shift;
+        if (@_) { @{ $self->[$COMPAGNI] } = @_ }
+        return @{ $self->[$COMPAGNI] };
+    }
+
+    1;  # quindi il require o l'use hanno successo
+
+Potete supporre che l'accesso alla lista sia molto piE<ugrave> veloce
+dell'accesso all'hash, ma sono in realtE<agrave> comparabili. L'array
+E<egrave> I<leggermente> piE<ugrave> veloce, ma non piE<ugrave> del dieci o
+quindici per cento, anche quando rimpiazzate le variabili come $ETA con
+numeri letterali, come 1. Una differenza maggiore tra i due approcci
+puE<ograve> trovarsi nell'utilizzo della memoria. La rappresentazione di un
+hash richiede piE<ugrave> memoria della rappresentazione di un array
+perchE<eacute> E<egrave> necessario allocare la memoria sia per le chiavi
+che per i valori. Ad ogni modo, non E<egrave> cosE<igrave> male,
+specialmente dalla versione 5.004, la memoria E<egrave> allocata solo una
+volta per una data chiave di hash, qualunque sia il numero degli hash che
+abbiano quella chiave. Ci si aspetta che in un futuro non ben
+identificabile anche queste differenze si assottiglieranno per via del
+fatto che saranno escogitate rappresentazioni piE<ugrave> efficienti.
+
+Ancora, il piccolo margine in termini di velocitE<agrave> (e un po'
+piE<ugrave> grande in termini di memoria) E<egrave> abbastanza da
+convincere alcuni programmatori a scegliere la rappresentazione con array
+per classi semplici. C'E<egrave> ancora un piccolo problema di
+scalabilitE<agrave>, perE<ograve>, perchE<eacute> piE<ugrave> in
+lE<agrave> nella vita, quando ve la sentirete di creare sottoclassi,
+troverete semplicemente che gli hash funzionano meglio.
+
+=head2 Chiusure come Oggetti
+
+Utilizzare un riferimento a codice per rappresentare un oggetto offre
+delle possibilitE<agrave> affascinanti. Possiamo creare una nuova funzione
+anonima (chiusura) che da sola in tutto il mondo puE<ograve> vedere i dati
+dell'oggetto. Questo perchE<eacute> mettiamo i dati in un hash anonimo che
+E<egrave> visibile lessicalmente solo alla chiusura che creiamo, consacriamo
+con bless(), e restituiamo come oggetto. I metodi di questo oggetto
+effettuano la chiamata della chiusura come una semplice chiamata di
+subroutine, passandole il campo che ci interessa. (SE<igrave>, la doppia
+chiamata di funzione E<egrave> lenta, ma se volevate la velocitE<agrave>,
+non avreste utilizzato per niente gli oggetti, eh? :-)
+
+L'utilizzo sarE<agrave> simile al precedente:
+
+    use Persona;
+    $egli = Persona->new();
+    $egli->nome("Gianni");
+    $egli->eta(23);
+    $egli->compagni( [ "Norberto", "Raffaele", "Pino" ] );
+    printf "%s ha %d anni.\n", $egli->nome, $egli->eta;
+    print "I suoi compagni sono: ", join(", ", @{$egli->compagni}), "\n";
+
+ma l'implementazione sarE<agrave> radicalmente differente, forse anche in
+modo sublime:
+
+    package Persona;
+
+    sub new {
+	 my $classe  = shift;
+	 my $self = {
+	    NOME     => undef,
+	    ETA      => undef,
+	    COMPAGNI => [],
+	 };
+	 my $chiusura = sub {
+	    my $campo = shift;
+	    if (@_) { $self->{$campo} = shift }
+	    return    $self->{$campo};
+	};
+	bless($chiusura, $classe);
+	return $chiusura;
+    }
+
+    sub nome      { &{ $_[0] }("NOME",     @_[ 1 .. $#_ ] ) }
+    sub eta       { &{ $_[0] }("ETA",      @_[ 1 .. $#_ ] ) }
+    sub compagni  { &{ $_[0] }("COMPAGNI", @_[ 1 .. $#_ ] ) }
+
+    1;
+
+Dato che questo oggetto si nasconde dietro a un riferimento a codice,
+risulterE<agrave> probabilmente un po' misterioso per coloro che sono
+abituati ai linguaggi di programmazione procedurali standard o
+orientati agli oggetti piuttosto che ai linguaggi di programmazione
+funzionali dai quali le chiusure provengono. L'oggetto creato e
+restituito dal metodo new() non E<egrave> di per sE<eacute> un riferimento
+a dei dati, come abbiamo visto in precedenza. E<Egrave> un riferimento
+anonimo a codice che ha al suo interno l'accesso a una specifica versione
+(binding lessicale e instanziazione) dei dati dell'oggetto, che sono
+immagazzinati nella variabile privata $self. Sebbene questa sia la stessa
+funzione ogni volta, contiene versioni differenti di $self.
+
+Quando un metodo come C<$egli-E<gt>nome("Gianni")> viene invocato, il
+suo argomento zero-esimo implicito E<egrave> l'oggetto che invoca --
+esattamente come per tutte le chiamate di metodi. Ma in questo caso
+E<egrave> il nostro riferimento a codice (qualcosa come un puntatore a
+funzioni in C++, ma con deep binding di variabili lessicali).
+Non c'E<egrave> molto da fare con un riferimento a codice oltre a invocarlo,
+quindi questo E<egrave> semplicememnte ciE<ograve> che facciamo quando
+diciamo C<&{$_[0]}>. Questa E<egrave> semplicemente una normale chiamata di
+funzione, non una invocazione di metodo. L'argomento iniziale E<egrave> la
+stringa "NOME", ed ogni altro argomento rappresenta tutto ciE<ograve> che
+viene passato al metodo stesso.
+
+Una volta che eseguiamo il codice all'interno della chiusura che E<egrave>
+stata creata con new(), il riferimento all'hash $self diventa visibile. La
+chiusura carpisce il suo primo argomento ("NOME" in questo caso
+perchE<eacute> ciE<ograve> E<egrave> quanto il metodo nome() gli ha
+passato), ed utilizza tale stringa come indice nell'hash privato nascosto
+nella sua unica versione di $self. 
+
+Niente al mondo permetterE<agrave> ad alcuno al di fuori del metodo in
+esecuzione di accedere a questi dati nascosti. Beh, quasi niente.
+I<Potreste> percorrere a singoli passi il programma utilizzando il
+debugger e trovare i pezzi quando siete nel metodo, ma gli altri non hanno
+scampo.
+
+Ecco, se questo non eccita gli appassionati di Scheme [un linguaggio
+multi-paradigma simile al Lisp, NdT], allora non so cosa lo farE<agrave>.
+La traduzione di queste tecniche in C++, Java o in qualsiasi altro
+linguaggio statico-ottuso E<egrave> lasciata come frivolo esercizio per
+gli affezionati di questi campi.
+
+Potreste addirittura aggiungere un po' di stranezze per mezzo della
+funzione caller() e imporre alla chiusura di agire se non chiamata
+attraverso il suo stesso package. Questo indubbiamnte soddisferebbe
+qualche fastidiosa faccenda che riguarda i puristi della programmazione
+e puritani affini.
+
+Se vi stavate chiedendo quando entra in gioco l'Arroganza, la terza
+principale virtE<ugrave> di un programmatore, qui lo vedrete. (PiE<ugrave>
+seriamente, Arroganza E<egrave> solo l'orgoglio della maestria che deriva
+dall'aver scritto un bel po' di codice ben progettato).
+
+=head1 AUTOLOAD: Metodi Proxy
+
+L'utilizzo dell'Autoload [autocaricamento, NdT] E<egrave> un modo per
+intercettare chiamate a metodi non definiti. Una routine di autoload
+puE<ograve> scegliere di creare una nuova funzione sul posto, caricata da
+disco o forse solo valutata con eval() in loco. Questa strategia
+di definizione-sul-posto E<egrave> il perchE<eacute> del nome autoload.
+
+Ma questo E<egrave> solo uno dei possibili approcci. Un altro E<egrave>
+semplicemente di fare in modo che il metodo autocaricato stesso fornisca il
+servizio richiesto. Se utilizzato in questa maniera, potreste pensare ai
+metodi autocaricati come metodi "proxy".
+
+Quando il Perl tenta di chiamare una funzione indefinita in un determinato
+package e non la trova, cerca una funzione di nome AUTOLOAD in quello
+stesso package. Se esiste, viene chiamata dandole gli stessi parametri
+della funzione originale. Il nome della funzione per intero E<egrave>
+salvato nella variabile globale di nome $AUTOLOAD dello stesso package.
+Una volta chiamata, la funzione puE<ograve> fare ciE<ograve> che vuole,
+compreso definire una nuova funzione con il nome giusto, e poi fare una
+cosa elegante tipo un C<goto> ad essa, eliminando se stessa dallo stack di
+chiamata.
+
+Che cosa ha che fare questo con gli oggetti? Dopo tutto, stiamo sempre
+parlando di funzioni, non metodi. Beh, dato che un metodo E<egrave>
+semplicemente una funzione con un argomento extra e un po' di eleganza
+semantica riguardo alla sua localizzazione, possiamo utilizzare la tecnica
+di autoload anche per i metodi. Comunque, il Perl non inizia a cercare il
+metodo AUTOLOAD finchE<eacute> non ha esaurito la ricerca ricorsiva
+attraverso @ISA. Alcuni programmatori hanno anche definito un metodo
+UNIVERSAL::AUTOLOAD per intrappolare chiamate di metodo non risolte per
+ogni tipo di oggetto.
+
+=head2 Autoload per Metodi di Dati
+
+Probabilmente inizierete ad essere un po' sospettosi riguardo al modo in
+cui il codice veniva duplicato quando vi avevamo mostrato la classe Persona,
+ed in seguito la classe Impiegato. I metodi utilizzati per accedere ai
+campi dell'hash apparivano virtualmente identici. Questo avrebbe dovuto
+stuzzicare quella grande virtE<ugrave> del programmatore, l'Impazienza, ma
+al momento la Pigrizia aveva vinto, e cosE<igrave> non ci sono state
+conseguenze. I metodi proxy possono aggiustare la situazione.
+
+Invece di scrivere una nuova funzione ogni volta che vogliamo un nuovo
+campo dati, utilizziamo il meccanismo dell'autoload per generare (in
+realtE<agrave> imitare) metodi sul posto. Per verificare che stiamo
+accedendo ad un membro valido, controlleremo con un campo C<_consentito>,
+che E<egrave> un riferimento a un hash lessicale con campo di
+visibilitE<agrave> limitato al file (come un C file static) di campi
+consentiti in questo record di nome %campi. PerchE<eacute> il trattino
+basso? Per la stesso motivo per il quale lo abbiamo utilizzato per _CENSO:
+come un promemoria che significa "solo per uso interno".
+
+Ecco come appariranno il codice per l'inizializzazione del modulo ed
+il costruttore di classe utilizzando quest'approccio:
+
+    package Persona;
+    use Carp;
+    our $AUTOLOAD;  # e` globale rispetto al package
+
+    my %campi = (
+	nome        => undef,
+	eta         => undef,
+	compagni    => undef,
+    );
+
+    sub new {
+	my $classe = shift;
+	my $self   = {
+	    _consentito => \%campi,
+	    %campi,
+	};
+	bless $self, $classe;
+	return $self;
+    }
+
+Se volessimo valori di default per il nostro record, potremmo inserirli
+dove abbiamo scritto C<undef> nell'hash %campi.
+
+Avete notato come abbiamo salvato un riferimento ai dati della nostra
+classe nell'oggetto stesso? Ricordate che E<egrave> importante accedere ai
+dati della classe attraverso l'oggetto stesso invece di permettere ad ogni
+metodo di accedere direttamente a %campi, altrimenti non potreste avere
+una ereditarietE<agrave> decente.
+
+PerE<ograve>, la vera magia va a risiedere nel nostro metodo proxy, che
+gestirE<agrave> tutte le chiamate a metodi non definiti per gli oggetti
+della classe Persona (o sottoclassi di Persona): E<egrave> chiamato
+AUTOLOAD. Ancora, E<egrave> scritto tutto in maiuscolo perchE<eacute>
+viene invocato implicitamente dal Perl stesso, non direttamente
+dall'utilizzatore.
+
+    sub AUTOLOAD {
+	my $self = shift;
+	my $tipo = ref($self)
+		    or croak "$self non e` un oggetto";
+
+	my $nome = $AUTOLOAD;
+	$nome =~ s/.*://;   # toglie il pezzo relativo ai nomi dei package
+
+	unless (exists $self->{_consentito}->{$nome} ) {
+	    croak "Non posso accedere al campo `$nome' nella classe $tipo";
+	}
+
+	if (@_) {
+	    return $self->{$nome} = shift;
+	} else {
+	    return $self->{$nome};
+	}
+    }
+
+Eccezionale vero? Tutto ciE<ograve> che dobbiamo fare per aggiungere nuovi
+campi dati E<egrave> modificare %campi. Non dobbiamo scrivere nessuna nuova
+funzione.
+
+Avrei potuto evitare totalmente il campo C<_consentito>, ma volevo
+dimostrare come immagazzinare un riferimento ai dati di una classe
+nell'oggetto cosE<igrave> da non dover accedere ai dati della classe
+direttamente da un metodo dell'oggetto.
+
+=head2 Metodi per dati con autoload ereditato
+
+Per quanto riguarda l'ereditarietE<agrave>? Possiamo definire similmente
+la nostra classe Impiegato? SE<igrave>, se continuiamo ad aver cautela.
+
+Ecco come essere cauti:
+
+    package Impiegato;
+    use Persona;
+    use strict;
+    our @ISA = qw(Persona);
+
+    my %campi = (
+	id         => undef,
+	salario    => undef,
+    );
+
+    sub new {
+	my $classe = shift;
+	my $self   = $class->SUPER::new();
+	my($elemento);
+	foreach $elemento (keys %campi) {
+	    $self->{_consentito}->{$elemento} = $campi{$elemento};
+	}
+	@{$self}{keys %campi} = values %campi;
+	return $self;
+    }
+
+Una volta che abbiamo fatto ciE<ograve>, non abbiamo nemmeno piE<ugrave>
+bisogno di una funzione AUTOLOAD nel package Impiegato, perchE<eacute>
+cattureremo la versione di Persona attraverso l'ereditarietE<agrave>, e
+funzionerE<agrave> tutto alla perfezione.
+
+=head1 Strumenti metaclassici
+
+Anche se i metodi proxy possono fornire un approccio piE<ugrave>
+conveniente per rendere le classi piE<ugrave> simili a struct invece che
+scrivere in modo tedioso metodi per dati come funzioni, lascia sempre un
+po' a desiderare. Una cosa E<egrave> che significa dover gestire chiamate
+senza senso che non intendete catturare tramite il vostro proxy. Significa
+anche che dovete essere molto cauti nel gestire l'ereditarietE<agrave>,
+come spiegato sopra.
+
+I programmatori Perl hanno affrontato la questione creando diverse classi
+per costruire classi. Queste metaclassi sono classi che creano altre classi.
+Un paio di queste che meritano attenzione sono Class::Struct e Alias.
+Queste e altre metaclassi collegate si possono trovare nella directory dei
+moduli su CPAN.
+
+=head2 Class::Struct
+
+Una delle piE<ugrave> vecchie E<egrave> Class::Struct. Infatti, la sua
+sintassi e la sua interfaccia vennero abbozzate molto prima che la versione
+numero 5 del Perl si materializzasse. Quel che fa E<egrave> darvi un modo
+per "dichiarare" una classe per avere oggetti i quali campi siano di un
+tipo specifico. La funzione che fa ciE<ograve> si chiama, non abbastanza
+sorprendentemente, struct(). Dato che le strutture o i record non sono tipi
+base in Perl, ogni volta che volete creare una classe per fornire oggetti
+con dati simili a record, voi stessi dovrete definire un metodo new(), e in
+piE<ugrave> dovrete separare i metodi per l'accesso ai dati per ogni campo
+di tale record. Vi annoierete presto di questo precedimento. La funzione
+Class::Struct::struct() allevia questo tedio.
+
+Ecco un semplice esempio del suo utilizzo:
+
+    use Class::Struct qw(struct);
+    use Lavoretto;  # definito dall'utente; vedi sotto
+
+    struct 'FedericE<ograve> => {
+        uno         => '$',
+        molti        => '@',
+        professione => 'LavorettE<ograve>,  # non invoca Lavoretto->new()
+    };
+
+    $ob = Federico->new(professione => Lavoretto->new());
+    $ob->uno("hmmmm");
+
+    $ob->molti(0, "alla");
+    $ob->molti(1, "via");
+    $ob->molti(2, "cosi`");
+    print "Imposta solo: ", $ob->molti(2), "\n";
+
+    $ob->professione->salario(10_000);
+
+Potete dichiarare dei tipi nello struct in modo che siano tipi di base del
+Perl o tipi definiti dall'utente (classi). I tipi dell'utente saranno
+inizializzati chiamando il metodo new() di quella classe.
+
+Osservate che l'oggetto C<Lavoretto> non viene creato automaticamente
+dal metodo new() della classe C<Federico>, quindi dovete specificare
+un oggetto C<Lavoretto> quando create un'istanza di C<Federico>.
+
+Ecco un esempio reale di utilizzo con la generazione di stuct. Mettiamo
+che vogliate sostituire l'idea del Perl di gethostbyname() e gethostbyaddr()
+in modo che restituiscano oggetti che si comportano come le strutture del
+C. Non ci interessano dettagli complessi della programmazione orientata
+agli oggetti. Tutto ciE<ograve> che vogliamo per questi oggetti E<egrave>
+che essi si comportino come struct nell'accezione del C.
+
+    use Socket;
+    use Net::hostent;
+    $h = gethostbyname("perl.com");  # restituisce l'oggetto
+    printf "Il vero nome di perl.com's e` %s, indirizzo %s\n",
+	$h->name, inet_ntoa($h->addr);
+
+Ecco come far ciE<ograve> utilizzando il modulo Class::Struct.
+Il nocciolo della questione sarE<agrave> questa chiamata:
+
+    struct 'Net::hostent' => [   # osservate le parentesi quadre
+	name       => '$',
+	aliases    => '@',
+	addrtype   => '$',
+	'length'   => '$',
+	addr_list  => '@',
+     ];
+
+la quale crea metodi di oggetto con nomi e tipi elencati.
+Crea inoltre per noi un metodo new().
+
+Avremmo potuto anche implementare il nostro oggetto in questa
+maniera:
+
+    struct 'Net::hostent' => {   # osservate le parentesi graffe
+	name       => '$',
+	aliases    => '@',
+	addrtype   => '$',
+	'length'   => '$',
+	addr_list  => '@',
+     };
+
+in modo che Class::Struct utilizzasse un hash anonimo come tipo
+di oggetto, anzichE<eacute> array anonimo. L'array E<egrave> piE<ugrave>
+veloce e piE<ugrave> piccolo ma l'hash funziona meglio se ad un certo punto
+volete implementare l'ereditarietE<agrave>. Dato che per quest'oggetto
+simile a uno struct si prevede l'ereditarietE<agrave>, questa volta
+opteremo per velocitE<agrave> e dimensioni migliori a scapito della
+flessibilitE<agrave>.
+
+Ecco l'intera implementazione:
+
+    package Net::hostent;
+    use strict;
+
+    BEGIN {
+	use Exporter   ();
+	our @EXPORT      = qw(gethostbyname gethostbyaddr gethost);
+	our @EXPORT_OK   = qw(
+			       $h_name         @h_aliases
+			       $h_addrtype     $h_length
+			       @h_addr_list    $h_addr
+			   );
+	our %EXPORT_TAGS = ( FIELDS => [ @EXPORT_OK, @EXPORT ] );
+    }
+    our @EXPORT_OK;
+
+    # Class::Struct vieta l'utilizzo di @ISA
+    sub import { goto &Exporter::import }
+
+    use Class::Struct qw(struct);
+    struct 'Net::hostent' => [
+       name        => '$',
+       aliases     => '@',
+       addrtype    => '$',
+       'length'    => '$',
+       addr_list   => '@',
+    ];
+
+    sub addr { shift->addr_list->[0] }
+
+    sub populate (@) {
+	return unless @_;
+	my $hob = new();  # Questo viene fatto da Class::Struct!
+	$h_name     =    $hob->[0]              = $_[0];
+	@h_aliases  = @{ $hob->[1] } = split ' ', $_[1];
+	$h_addrtype =    $hob->[2]              = $_[2];
+	$h_length   =    $hob->[3]              = $_[3];
+	$h_addr     =                             $_[4];
+	@h_addr_list = @{ $hob->[4] } =         @_[ (4 .. $#_) ];
+	return $hob;
+    }
+
+    sub gethostbyname ($)  { populate(CORE::gethostbyname(shift)) }
+
+    sub gethostbyaddr ($;$) {
+	my ($addr, $addrtype);
+	$addr = shift;
+	require Socket unless @_;
+	$addrtype = @_ ? shift : Socket::AF_INET();
+	populate(CORE::gethostbyaddr($addr, $addrtype))
+    }
+
+    sub gethost($) {
+	if ($_[0] =~ /^\d+(?:\.\d+(?:\.\d+(?:\.\d+)?)?)?$/) {
+	   require Socket;
+	   &gethostbyaddr(Socket::inet_aton(shift));
+	} else {
+	   &gethostbyname;
+	}
+    }
+
+    1;
+
+Abbiamo intrufolato un bel po' di altri concetti accanto alla semplice
+creazione dinamica della classe, del tipo sostituzione di funzioni di base,
+qualche importazione/esportazione, prototipazione di funzioni, scorciatoie
+a chiamate di funzioni con C<&qualcosa>, e rimpiazzo di funzioni con
+C<goto &qualcosa>. Tutto ciE<ograve> ha un senso dalla prospettiva dei
+moduli tradizionali, ma come potete vedere, possiamo anche utilizzarli in
+un modulo a oggetti.
+
+Potete esaminare altre sostituzioni di funzioni di base implementate con
+oggetti e simili a struct nella release 5.004 del Perl in File::stat,
+Net::hostent, Net::netent, Net::protoent, Net::servent, Time::gmtime,
+Time::localtime, User::grent, e User::pwent. Questi moduli hanno un
+componente finale interamente in minuscolo, per convenzione riservato alle
+direttive del compilatore, dato che influiscono sulla compilazione e
+cambiano una funzione integrata. Hanno anche tipi di nomi che un
+programmatore C si aspetterebbe.
+
+=head2 Dati membro come variabili
+
+Se avete familiaritE<agrave> con gli oggetti del C++, allora siete abituati
+ad accedere ai dati membro di un oggetto come semplici variabili da un
+metodo. Il modulo Alias provvede a questo e anche a un bel po' di
+piE<ugrave>, come alla disponibilitE<agrave> di metodi privati che possono
+essere invocati dall'oggetto ma non da chi E<egrave> al di fuori di esso.
+
+Ecco un esempio di creazione di una Persona utilizzando il modulo Alias.
+Quando aggiornate queste magiche variabili di istanza, i valori degli hash
+vengono aggiornati automaticamente. Conveniente, vero?
+
+    package Persona;
+
+    # questo E<egrave> lo stesso di prima...
+    sub new {
+	 my $classe = shift;
+	 my $self = {
+	    NOME  => undef,
+	    ETA   => undef,
+	    COMPAGNI => [],
+	};
+	bless($self, $classe);
+	return $self;
+    }
+
+    use Alias qw(attr);
+    our ($NOME, $ETA, $COMPAGNI);
+
+    sub nome {
+	my $self = attr shift;
+	if (@_) { $NOME = shift; }
+	return    $NOME;
+    }
+
+    sub eta {
+	my $self = attr shift;
+	if (@_) { $ETA = shift; }
+	return    $ETA;
+    }
+
+    sub compagni {
+	my $self = attr shift;
+	if (@_) { @COMPAGNI = @_; }
+	return    @COMPAGNI;
+    }
+
+    sub esclama {
+        my $self = attr shift;
+        return sprintf "Ciao, sono %s, ho %d anni, lavoro con %s",
+            $NOME, $ETA, join(", ", @COMPAGNI);
+    }
+
+    sub buon_compleanno {
+        my $self = attr shift;
+        return ++$ETA;
+    }
+
+L'esigenza della dichiarazione con C<our> deriva dal fatto che Alias
+manipola variabili globali al package con lo stesso nome dei campi.
+Per utilizzare variabili globali mentre C<use strict> E<egrave> effettivo
+dovete dichiararle in precedenza. Queste variabili di package sono
+localizzate nel blocco che racchiude la chiamata ad attr() come se si stia
+utilizzando un local() su di esse. Ad ogni modo, ciE<ograve> significa che
+sono sempre considerate variabili globali con valori temporanei, proprio
+come ogni altra local().
+
+Sarebbe carino combinare Alias con qualcosa del tipo Class::Struct o
+Class::MethodMaker.
+
+=head1 ANNOTAZIONI
+
+=head2 Terminologia degli oggetti
+
+Nella varia letteratura sulla programmazione orientata agli oggetti,
+sembra che siano utilizzate molte parole differenti per descrivere
+solamente pochi concetti distinti. Se non siete giE<agrave> un
+programmatore di oggetti, allora non dovete preoccuparvi di tutte queste
+parole eleganti. Ma se lo siete, allora potreste voler sapere come
+ottenere gli stessi concetti in Perl.
+
+Per esempio, E<egrave> comune chiamare un oggetto una I<istanza> di una
+classe e chiamare i metodi di questi oggetti I<metodi di istanza>.
+I campi dati relativi a ogni oggetto sono spesso chiamati I<dati di istanza>
+o I<attributi di oggetto>, e i campi dati comuni a tutti i membri di
+una classe sono I<dati di classe>, I<attributi di classe>, oppure
+I<membri dati statici>.
+
+Inoltre, I<classe base>, I<classe generica> e I<superclasse> denotano
+tutti la stessa nozione, mentre I<classe derivata>, I<classe specifica>
+e I<subclasse> denotano le altre imparentate.
+
+I programmatori C++ hanno I<metodi statici> e I<metodi virtuali>, ma
+il Perl ha solamente I<metodi di classe> e I<metodi di oggetto>. In
+realtE<agrave> il Perl ha solo i metodi. Se un metodo viene usato per una
+classe o per un oggetto E<egrave> solo a seconda del suo impiego. Potreste
+accidentalmente chiamare un metodo di classe (che si aspetta un argomento
+stringa) su un oggetto (che si aspetta un riferimento) o viceversa.
+
+Da una prospettiva C++, tutti i metodi del Perl sono virtuali. Questo, a
+proposito, E<egrave> il perchE<eacute> non viene mai effettuata la verifica
+con i prototipi delle funzioni nella lista degli argomenti mentre
+ciE<ograve> si puE<ograve> fare con funzioni definite dall'utente.
+
+Dato che una classe E<egrave> di per sE<eacute> qualcosa di un oggetto, le
+classi del Perl possono essere considerate come rappresentazione sia di una
+filosofia "classe come meta-oggetto" (chiamata anche I<fabbrica di oggetti>)
+che di un idea di "classe come definizione di tipo" (comportamento
+I<dichiarante>, non meccanismo I<definente>). Il C++ supporta quest'ultima
+nozione, ma non la precedente.
+
+=head1 SI VEDA ANCHE
+
+I file di documentazione seguenti forniranno indubbiamente una maggiore
+conoscenza di base per questo argomento:
+
+L<perlmod>,
+L<perlref>,
+L<perlobj>,
+L<perlbot>,
+L<perltie>,
+e
+L<overload>.
+
+L<perlboot> E<egrave> un'introduzione piE<ugrave> gradevole e piE<ugrave>
+garbata alla programmazione orientata agli oggetti.
+
+L<perltooc> fornisce piE<ugrave> dettagli sui dati di classi.
+
+Alcuni moduli che potrebbero risultare interessanti sono
+Class::Accessor, Class::Class, Class::Contract,
+Class::Data::Inheritable, Class::MethodMaker e Tie::SecureHash
+
+=head1 AUTORE E COPYRIGHT
+
+Copyright (c) 1997, 1998 Tom Christiansen 
+Tutti i diritti sono riservati.
+
+Questa documentazione E<egrave> gratuita; puE<ograve> essere distribuita
+e/o modificata secondo gli stessi termini del Perl.
+
+Indipendentemente dalla sua distribuzione, tutto il codice di esempio
+in questo documento E<egrave> di pubblico dominio. Avete il permesso e
+siete incoraggiati a usare il codice nei vostri programmi per svago
+o per profitto come ritenete opportuno. Un semplice commento nel
+codice per citare l'autore sarebbe cortese ma non E<egrave> richiesto.
+
+=head2 Ringraziamenti
+
+Grazie a
+Larry Wall,
+Roderick Schertler,
+Gurusamy Sarathy,
+Dean Roehrich,
+Raphael Manfredi,
+Brent Halsey,
+Greg Bacon,
+Brad Appleton,
+e a molti altri per i loro utili commenti.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perltoot
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda http://pod2it.sourceforge.net/ .
+
+=head2 Traduttore
+
+Traduzione a cura di Raffaello Galli <galliraf at googlemail punto com>.
+
+=head2 Revisore
+
+Revisione a cura di dree.

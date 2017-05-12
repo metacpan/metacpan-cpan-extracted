@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: Pod-Wrap
+version: 0.01
+license: perl
+distribution_type: module
+requires:
+  Pod::Parser: 0
+  Text::Wrap: 0
+  perl: '>= 5.6.0'
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Pod::Wrap:
+    file: lib/Pod/Wrap.pm
+    version: 0.01
+generated_by: Module::Build version 0.21

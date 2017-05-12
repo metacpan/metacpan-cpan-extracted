@@ -1,0 +1,50 @@
+= Params-Validate-Checks =
+
+This is the Cpan distribution of the Params::Validate::Checks Perl module.
+
+Params::Validate::Checks provides some named checks for use with
+Params::Validate, and lets you specify your own re-usable named checks.
+
+  use Params::Validate::Checks qw<validate as>;
+
+  sub random_insult
+  {
+    my %arg = validate @_,
+    {
+      name => {as ’string’},
+      words => {as ’pos_int’},
+      paragraphs => {as ’pos_int’, default => 1},
+    };
+
+    # Do something with $arg{name}, $arg{words}, $arg{paragraphs} ...
+  }
+
+== Installation ==
+
+Params::Validate::Checks can be installed using the Cpan client:
+
+  cpan -i Params::Validate::Checks
+
+or by unzipping this distribution and running Build.PL and then Build:
+
+  perl Build.PL
+  ./Build test
+  ./Build install
+
+or, if you have a make program, by running Makefile.PL then make:
+
+  perl Makefile.PL
+  make test
+  make install
+
+== Copyright & Licence ==
+
+© copyright 2006-2008 by Smylers <smylers@cpan.org>
+
+This library is software libre; you may redistribute it and modify it under the
+terms of any of these licences:
+
+* The GNU General Public License, version 2
+* The GNU General Public License, version 3
+* The Artistic License
+* The Artistic License 2.0

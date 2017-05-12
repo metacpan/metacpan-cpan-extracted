@@ -1,0 +1,1087 @@
+# (c) Parse::Eyapp Copyright 2006-2007 Casiano Rodriguez-Leon, all rights reserved.
+%{
+use Carp;
+use Data::Dumper;
+
+our $VERSION = $Parse::Eyapp::Driver::VERSION;
+
+my $debug = 0; # comment
+$Data::Dumper::Indent = 1;
+
+# %times: Hash indexed in the variables: stores the number of 
+# appearances in the treereg formula
+my %times = ();   
+my ($tokenbegin, $tokenend);
+my $filename; # Name of the input file
+
+{ # closure for $numstar: support code for * treeregexes
+
+  my $numstar = -1; # Number of stars in treereg formula
+
+  sub new_star {
+    $numstar++;
+    return "W_$numstar";
+  }
+
+  sub reset_times {
+    %times = ();
+    $numstar = -1; # New formula
+  }
+}
+
+# treereg: IDENT '(' childlist ')' ('and' CODE)? 
+sub new_ident_inner { 
+  my ($id, $line) = @{$_[1]}; 
+  my ($semantic) = $_[5]->children;
+  my $node = $_[3];
+
+  $times{$id}++; 
+
+  $node->{id} = $id;
+  $node->{line} = $line;
+  $node->{semantic} = $semantic? $semantic->{attr} : undef;
+  return (bless $node, 'Parse::Eyapp::Treeregexp::IDENT_INNER');
+}
+
+# treereg: REGEXP (':' IDENT)? '(' childlist ')' ('and' CODE)? 
+sub new_regexp_inner { 
+   my $node = $_[4];
+   my $line = $_[1][1];
+
+   my $id;
+
+   # $W and @W are default variables for REGEXPs
+   if ( $_[2]->children) {
+     $id = $_[2]->child(0)->{attr}[0]; 
+   }
+   else  {
+     $id = 'W';
+   }
+   $times{$id}++;
+
+   $node->{id} = $id;
+   $node->{line} = $line;
+   $node->{regexp} = $_[1][0]; 
+   $node->{options} = $_[1][2];
+
+   my ($semantic) = $_[6]->children;
+   $node->{semantic} = $semantic? $semantic->{attr} : undef;
+   return bless $node, 'Parse::Eyapp::Treeregexp::REGEXP_INNER';
+}
+
+# treereg: SCALAR '(' childlist ')' ('and' CODE)?  
+sub new_scalar_inner { 
+   my $node = $_[3];
+   my ($var, $line) = @{$_[1]};
+   $var =~ s/\$//;
+
+   $times{$var}++; 
+   _SyntaxError('Repeated scalar in treereg', $_[1][1]) if $times{$var} > 1;
+   _SyntaxError(q{Can't use $W to identify an scalar treeregexp}, $_[1][1]) if $var eq 'W'; 
+
+   $node->{id} = $var;
+   $node->{line} = $line;
+   my ($semantic) = $_[5]->children;
+   $node->{semantic} = $semantic? $semantic->{attr} : undef;
+   return (bless $node, 'Parse::Eyapp::Treeregexp::SCALAR_INNER');
+} 
+
+# treereg: : '.' '(' childlist ')' ('and' CODE)? 
+sub new_dot_inner { 
+   my $node = $_[3];
+   my $line = $_[1][1];
+   my $var = 'W';
+
+   $times{$var}++; 
+
+   $node->{id} = $var;
+   $node->{line} = $line;
+   my ($semantic) = $_[5]->children;
+   $node->{semantic} = $semantic? $semantic->{attr} : undef;
+
+   return (bless $node, 'Parse::Eyapp::Treeregexp::SCALAR_INNER');
+} 
+
+# treereg: IDENT ('and' CODE)? 
+sub new_ident_terminal { 
+  my $id = $_[1][0];
+  $times{$id}++; 
+  
+  my ($semantic) = $_[2]->children;
+  $semantic = $semantic? $semantic->{attr} : undef;
+  
+  return (
+    bless { children => [], attr => $id, semantic => $semantic }, 'Parse::Eyapp::Treeregexp::IDENT_TERMINAL'
+         );
+}
+
+# treereg: REGEXP (':' IDENT)? ('and' CODE)? 
+sub new_regexp_terminal { 
+  # $regexp and @regexp are default variables for REGEXPs
+  my $id;
+  if ($_[2]->children) {
+    $id = {$_[2]->child(0)}->{attr}[0];
+  }
+  else  {
+    $id = 'W';
+  }
+  $times{$id}++; 
+
+  my ($semantic) = $_[3]->children;
+  $semantic = $semantic? $semantic->{attr} : undef;
+
+  return bless { 
+    children => [],
+    regexp   => $_[1][0], 
+    options  => $_[1][2],
+    attr     => $id, 
+    semantic => $semantic
+  }, 'Parse::Eyapp::Treeregexp::REGEXP_TERMINAL' 
+}
+
+# treereg: SCALAR ('and' CODE)? 
+sub new_scalar_terminal { 
+  my $var = $_[1][0];
+  $var =~ s/\$//;
+  $times{$var}++; 
+  _SyntaxError('Repeated scalar in treereg', $_[1][1]) if $times{$var} > 1;
+   _SyntaxError(q{Can't use $W to identify an scalar treeregexp}, $_[1][1]) if $var eq 'W'; 
+
+  my ($semantic) = $_[2]->children;
+  $semantic = $semantic? $semantic->{attr} : undef;
+
+  return bless {
+    children => [],
+    attr => $var,
+    semantic => $semantic
+  }, 'Parse::Eyapp::Treeregexp::SCALAR_TERMINAL'; 
+}
+
+# treereg: '.' ('and' CODE)? 
+sub new_dot_terminal { 
+  # $W and @W are implicit variables for dots "."
+  $times{'W'}++; 
+
+  my ($semantic) = $_[2]->children;
+  $semantic = $semantic? $semantic->{attr} : undef;
+
+  return bless { 
+    children => [], 
+    attr => 'W',
+    semantic => $semantic
+  }, 'Parse::Eyapp::Treeregexp::SCALAR_TERMINAL'; 
+}
+
+# treereg: ARRAY 
+sub new_array_terminal { 
+  my $var = $_[1][0];
+  $var =~ s/\@//;
+
+  $times{$var} += 2; # awful trick so that fill_declarations works 
+  _SyntaxError( 'Repeated array in treereg', $_[1][1]) if $times{$var} > 2;
+  _SyntaxError("Can't use $var to identify an array treeregexp", $_[1][1]) if $var =~ /^W(_\d+)?$/; 
+
+  return bless {
+    children => [],
+    attr => $var,
+  }, 'Parse::Eyapp::Treeregexp::ARRAY_TERMINAL'; 
+}
+
+# treereg: '*' 
+sub new_array_star { 
+  # $wathever_#number and @wathever_#number are reserved for "*"
+  my $var = new_star();
+  $times{$var} += 2; 
+
+  return bless {
+    children => [],
+    attr => $var,
+  }, 'Parse::Eyapp::Treeregexp::ARRAY_TERMINAL'; 
+}
+%}
+
+%token CODE IDENT ARRAY REGEXP SCALAR
+
+%%
+treeregexplist:  
+    treeregexp* 
+      { $_[1]->{children} }
+;
+
+treeregexp: 
+    IDENT ':' treereg 
+              ('=>' CODE)? 
+      { 
+        my $name = $_[1][0];
+        my $tree = $_[3];
+        my ($action) = $_[4]->children;
+        my $self = bless { 
+                     name => $name, 
+                     times => [ %times ], 
+                     children => [$tree, $action->{attr} ]
+                   }, 'Parse::Eyapp::Treeregexp::TREEREGEXP'; 
+        reset_times();
+        print Dumper($self) if $debug;
+        $self;
+      }
+  | CODE   # Auxiliary code giving support to transformations
+      { bless $_[1], 'Parse::Eyapp::Treeregexp::GLOBALCODE';  }
+  | IDENT '=' IDENT + ';'  # Transformation family
+      { bless { name => $_[1], members => $_[3] }, 'Parse::Eyapp::Treeregexp::FAMILY'; }
+  | REGEXP  # Error management rule
+      { 
+        _SyntaxError("Expected an Identifier for the treeregexp",  $tokenend); 
+      }
+;
+
+treereg: 
+    IDENT '(' childlist ')' ('and' CODE)? 
+      { 
+        goto &new_ident_inner;
+      }
+  | REGEXP (':' IDENT)? '(' childlist ')' ('and' CODE)? 
+      { 
+         goto &new_regexp_inner;
+      }
+  | SCALAR '(' childlist ')' ('and' CODE)?  
+      { 
+         goto &new_scalar_inner;
+      } 
+  | '.' '(' childlist ')' ('and' CODE)? 
+      { 
+         goto &new_dot_inner;
+      } 
+  | IDENT ('and' CODE)? 
+      { 
+        goto &new_ident_terminal;
+      }
+  | REGEXP (':' IDENT)? ('and' CODE)? 
+      { 
+        goto &new_regexp_terminal;
+      }
+  | SCALAR ('and' CODE)? 
+      { 
+        goto &new_scalar_terminal;
+      }
+  | '.' ('and' CODE)? 
+      { 
+        goto &new_dot_terminal;
+      }
+  | ARRAY 
+      { 
+        goto &new_array_terminal;
+      }
+  | '*' 
+      { 
+        goto &new_array_star;
+      }
+;
+
+childlist: 
+    treereg  <* ','> 
+      { 
+        my @list = $_[1]->children(); 
+        my @New = ();
+        my ($r, $b);
+        my $numarrays = 0;
+
+        # Merge array prefixes with its successors
+        local $_;
+        while (@list) {
+          $_ = shift @list;
+          if ($_->isa('Parse::Eyapp::Treeregexp::ARRAY_TERMINAL')) {
+            $numarrays++;
+            $r = shift @list;
+            if (defined($r)) {
+              croak "Error. Two consecutive lists are not allowed!" if $r->isa('Parse::Eyapp::Treeregexp::ARRAY_TERMINAL');
+              $r->{arrayprefix} = $_->{attr};
+              $_ = $r;
+            }
+          }
+          push @New, $_;
+        }
+        $_[1]->{numarrays} = $numarrays;
+        $_[1]->{children} = \@New;
+        $_[1];
+      } 
+;
+
+%%
+
+my $input;
+
+sub _Lexer {
+
+  return('', undef) unless defined($input);
+
+  #Skip blanks
+  $input=~m{\G((?:
+          \s+       # any white space char
+      |   \#[^\n]*  # Perl like comments
+      |   /\*.*?\*/ # C like comments
+      )+)}xsgc
+    and do {
+        my($blanks)=$1;
+
+        #Maybe At EOF
+            pos($input) >= length($input)
+        and return('', undef);
+        $tokenend += $blanks =~ tr/\n//;
+    };
+    
+    $tokenbegin = $tokenend;
+
+        $input=~/\G(and)/gc
+    and return($1, [$1, $tokenbegin]);
+
+        $input=~/\G([A-Za-z_][A-Za-z0-9_]*)/gc
+    and do {
+      return('IDENT', [$1, $tokenbegin]);
+    };
+
+        $input=~/\G(\$[A-Za-z_][A-Za-z0-9_]*)/gc
+    and do {
+      return('SCALAR', [$1, $tokenbegin]);
+    };
+
+        $input=~/\G(\@[A-Za-z_][A-Za-z0-9_]*)/gc
+    and do {
+      return('ARRAY', [$1, $tokenbegin]);
+    };
+        $input=~m{\G/(
+                      (?:[^/\\]| # no escape or slash
+                           \\\\| # escaped escape
+                            \\/| # escaped slash
+                             \\  # escape
+                      )+?
+                    )
+                   /([Begiomxsc]*)}xgc
+    and do {
+        # $x=~ s/((?:[a-zA_Z_]\w*::)*(?:[a-zA_Z_]\w*))/\\b$1\\b/g
+        my $string = $1;
+        my $options = $2? $2 : '';
+        $tokenend += $string =~ tr/\n//;
+
+        # Default behavior: Each perl identifier is surrounded by \b boundaries
+        # Use "B" option to negate this behavior
+          $string =~ s/((?:[a-zA-Z_][a-zA-Z_0-9]*::)*(?:[a-zA-Z_][a-zA-Z_0-9]*))/\\b$1\\b/g
+        unless $options =~ s{B}{};
+
+        # Default behavior: make "x" default option
+        # Use X option to negate this behavior
+        $options .= "x" unless ($options =~ m{x} or $options =~ s{X}{});
+
+        return('REGEXP', [$string, $tokenbegin, $options]);
+    };
+        $input=~/\G%{/gc
+    and do {
+        my($code);
+
+            $input=~/\G(.*?)%}/sgc
+        or  _SyntaxError( "Unmatched %{", $tokenbegin);
+
+        $code=$1;
+        $tokenend+= $code=~tr/\n//;
+        return('Parse::Eyapp::Treeregexp::GLOBALCODE', [$code, $tokenbegin]);
+    };
+
+        $input=~/\G{/gc
+    and do {
+        my($level,$from,$code);
+
+        $from=pos($input);
+
+        $level=1;
+        while($input=~/([{}])/gc) {
+                substr($input,pos($input)-1,1) eq '\\' #Quoted
+            and next;
+                $level += ($1 eq '{' ? 1 : -1)
+            or last;
+        }
+            $level
+        and  _SyntaxError("Not closed open curly bracket { at $tokenbegin");
+        $code = substr($input,$from,pos($input)-$from-1);
+        $tokenend+= $code=~tr/\n//;
+        return('CODE', [$code, $tokenbegin]);
+    };
+
+        $input=~/\G(=>)/gc
+    and return($1, $1);
+
+    #Always return something
+      $input=~/\G(.)/sg
+    and do {
+      $1 eq "\n" and ++$tokenend;
+      return ($1, [$1, $tokenbegin]);
+    };
+    #At EOF
+    return('', undef);
+}
+
+sub _Error {
+  my($value)=$_[0]->YYCurval;
+
+  die "Syntax Error at end of file\n" unless (defined($value) and ref($value) eq 'ARRAY');
+  my($what)= "input: '$$value[0]'";
+
+  _SyntaxError("Unexpected $what",$$value[1]);
+}
+
+sub _SyntaxError {
+   my($message,$lineno)=@_;
+
+   $message= "Error in file $filename: $message, at ".
+             ($lineno < 0 ? "eof" : "line $lineno").
+             ".\n";
+
+   die $message;
+}
+
+####################################################################
+# Purpose    : Treeregexp compiler bottom end. Code generation.
+
+package Parse::Eyapp::Treeregexp;
+use Carp;
+use List::Util qw(first);
+use Parse::Eyapp::Base qw(compute_lines slurp_file valid_keys invalid_keys write_file);
+
+my %index;    # Index of each ocurrence of a variable
+my $prefix;   # Assume each AST node name /class is prefixed by $prefix
+my $severity = 0; # 0 = Don't  check arity. 1 = Check arity. 2 = Check and give a warning 3 = ... croak
+my $allowlinenumbers = 1; # Enable/Disable line number directives
+#my $warninfo = "Line numbers in error messages are relative to the line where new is called.\n";
+my %methods; # $method{$treeclass} = [ array of YATW objects or transformations ]
+my $ouputlinepattern = '##line NUM FILE # line in code by treeregexp';
+
+sub compute_var_name {
+  my $var = shift;
+
+  my $nodename;
+  if ($times{$var} > 1) { # node is array
+    $nodename = $index{$var}++;
+    $nodename = '$'."$var\[$nodename]";
+  }
+  else {
+    $nodename = '$'.$var;
+  }
+  return $nodename;
+}
+
+####################################################################
+# Usage      :    
+#   my $transform = Parse::Eyapp::Treeregexp->new( STRING => q{
+#      zero_times: TIMES(NUM($x), ., .) and { $x->{attr} == 0 } => { $_[0] = $NUM }
+#      times_zero: TIMES(., ., NUM($x)) and { $x->{attr} == 0 } => { $_[0] = $NUM }
+#    },
+#    PACKAGE => 'Transformations',
+#    OUTPUTFILE => 'main.pm',
+#    SEVERITY => 0,
+#    NUMBERS => 0,
+# ) ;
+# Returns    : A Parse::Eyapp::Treeregexp object
+# Throws     : croak  if STRING and INFILE are defined or if no input is provided
+#              also if the PACKAGE isrg does not contain a valid identifier
+# Parameters : 
+my %_Trnew = (
+  PACKAGE => 'STRING',    # The package where the module will reside
+  PREFIX => 'STRING',     # prefix for all the node classes
+  OUTPUTFILE => 'STRING', # If specified the package will be dumped to such file
+  SYNTAX => 'BOOL',       # Check perl actions syntax after generating the package
+  SEVERITY => 'INT',      # Controls the level of checking matching the number of childrens
+  PERL5LIB => 'ARRAY',    # Search path
+  INFILE => 'STRING',     # Input file containing the grammar
+  STRING => 'STRING',     # Input string containing the grammar. Incompatible with INFILE
+  NUMBERS => 'BOOL',      # Generate (or not) #line directives
+  FIRSTLINE => 'INT',     # Use it only with STRING. The linenumber where the string
+                          # containing the grammar begins
+);
+my $validkeys = valid_keys(%_Trnew);
+
+sub new {
+  my $class = shift;
+  croak "Error in new_package: Use named arguments" if (@_ %2);
+  my %arg = @_;
+
+  if (defined($a = invalid_keys(\%_Trnew, \%arg))) {
+    croak( "Parse::Eyapp::Treeregexp::new Error!: unknown argument $a. "
+          ."Valid arguments are: $validkeys")
+  }
+  my $checksyntax = 1;
+  $checksyntax = $arg{SYNTAX} if exists($arg{SYNTAX});
+
+  my ($packagename, $outputfile) = ($arg{PACKAGE}, $arg{OUTPUTFILE});
+
+  # file scope variables
+  $filename = $arg{INFILE};
+  
+  my $perl5lib = $arg{PERL5LIB} || [];
+
+  #package scope variables
+  $severity = $arg{SEVERITY};
+  $prefix = $arg{PREFIX} || '';
+  $allowlinenumbers = defined($arg{NUMBERS})?$arg{NUMBERS}:1 ;
+
+  my $input_from_file = 0;
+  $tokenbegin = $tokenend = 1;
+
+  $input = $arg{STRING};
+  if (defined($filename)) {
+    $input_from_file = 1;
+    croak "STRING and INFILE parameters are mutually exclusive " if defined($input);
+    $input = slurp_file($filename, 'trg');
+  }
+  elsif (defined($input)) { # input from string
+    my ($callerpackagename);
+    ($callerpackagename, $filename, $tokenend) = caller;
+
+      $packagename = $callerpackagename 
+    unless defined($packagename)  # Perl identifier regexp
+           and $packagename =~ /(?:[A-Za-z_][A-Za-z0-9_]*::)*[A-Za-z_][A-Za-z0-9_]*/;
+
+  }
+  else { 
+    croak "Undefined input.";
+  }
+  ($packagename) = $filename =~ m{(^[a-zA-Z_]\w*)} if !defined($packagename);
+  $tokenend = $arg{FIRSTLINE} if exists($arg{FIRSTLINE}) and $arg{FIRSTLINE} =~ m{^\s*\d+};
+  $tokenbegin = $tokenend;
+    croak "Bad formed package name" 
+  unless $packagename =~ m{^(?:[A-Za-z_][A-Za-z0-9_]*::)* # Perl identifier: prefix
+                            (?:[A-Za-z_][A-Za-z0-9_]*)$}x;
+
+
+  #my ($basename) = $packagename =~ m{([a-zA-Z]\w*$)};
+  #$outputfile = "$basename.pm" unless defined($outputfile);
+
+  my $object = bless {
+           'INPUT_FROM_FILE' => $input_from_file,
+           'PACKAGENAME'     => $packagename, 
+           'OUTPUTFILE'      => $outputfile, 
+           'CHECKSYNTAX'     => $checksyntax, 
+           'PERL5LIB'        => $perl5lib,
+         }, $class;
+  return $object;
+}
+
+sub has_array_prefix {
+  my $self = shift;
+
+  return defined($self->{arrayprefix})
+}
+
+{ # closure with $formula $declarations and $text
+
+  my $formula;
+  my $declarations;
+  my $text = '';
+
+  sub _generate_treereg_code {
+    my $treereg = shift; # the node
+    my $father = shift;  
+    my $source = shift; # Perl code describing how access this node
+    my $order = shift;  # my index in the array of children
+
+    my $name = ref($treereg) || $treereg;
+    my $aux;
+    my $nodename;
+    my $is_array = has_array_prefix($treereg);
+
+    ($nodename, $aux) = $treereg->translate($father, $source, $order);
+    $formula .= $aux;
+    return if (ref($treereg) =~ m{TERMINAL$} or $is_array);
+
+    # $j : index of the child in the treeregexp formula not counting arrays
+    my $j = 0;
+    for (@{$treereg->{children}}) {
+
+      # Saving $is_array has to be done before the call to
+      #_generate_treereg_code, since 
+      # we delete the array_prefix entry after processing node $_
+      # (See sub translate_array_prefix)
+      $is_array = has_array_prefix($_); 
+      _generate_treereg_code($_, $nodename, "$nodename->child($j+\$child_index)", $j);
+      $j++ unless $is_array;
+    }
+    if (my $pat = $treereg->{semantic}) {
+      my $pattern = process_pattern($pat, $filename);
+      $formula .= $pattern;
+    }
+  }
+
+  sub generate_treereg_code {
+    my $treereg = shift;
+
+    $formula = '';
+    _generate_treereg_code($treereg, '', '$_[$child_index]', undef);
+  }
+    
+  # Parameters:
+  # $checksyntax: controls whether or not to check Perl code for syntax errors
+  sub generate {
+    my $self = shift;
+      croak "Error at ".__PACKAGE__."::generate. Expected a ".__PACKAGE__." object." 
+    unless $self->isa(__PACKAGE__);
+    my $checksyntax =  $self->{'CHECKSYNTAX'} || 1;
+    my ($input_from_file, $packagename, $outputfile) 
+      = @$self{'INPUT_FROM_FILE', 'PACKAGENAME', 'OUTPUTFILE',};
+
+    my $parser = Parse::Eyapp::Treeregparser->new();
+    my $t = $parser->YYParse( yylex => \&Parse::Eyapp::Treeregparser::_Lexer, 
+                              yyerror => \&Parse::Eyapp::Treeregparser::_Error,
+                              yybuildingtree => 1);
+
+    # Traverse the tree generating the pattern-action subroutine
+    my ($names, @names, %family); # Names of the generated subroutines
+    my @Transformations = @$t;
+    for my $transform (@Transformations) {
+      $transform->isa('Parse::Eyapp::Treeregexp::GLOBALCODE')
+        and do { 
+          $text .= $transform->translate();
+          next; # iteration done 
+        };
+
+      $transform->isa('Parse::Eyapp::Treeregexp::FAMILY') 
+        and do  {
+          my ($name, @members) = ($transform->{name}[0], @{$transform->{members}{children}});
+          push @{$family{$name}}, @members;
+          next;
+        };
+      my ($treereg, $action)  = @{$transform->{children}}; 
+
+      %times = @{$transform->{times}}; # global scope visible. Weakness
+      %index = ();
+      &fill_declarations(\$declarations);
+
+      my $name = $transform->{name};
+
+      $action ||= ""; # To Do
+      $names .= "$name ";
+      generate_treereg_code($treereg);
+      my @classes = $treereg->classes;
+      push @{$methods{$_}}, $name for @classes;
+
+      $text .= fill_translation_sub($name, \$declarations, \$formula, $action, $filename);
+    } # for my $transform ...
+
+    $text = fill_translation_package($filename, $packagename, \$text, $names, \%family);
+
+    if ($input_from_file or defined($outputfile)) {
+      compute_lines(\$text, $outputfile, $ouputlinepattern) if $self->{NUMBERS};
+      write_file($outputfile, \$text);
+      if ($self->{CHECKSYNTAX}) {
+        push @INC, @{$self->{PERL5LIB}};
+        require $outputfile;
+      }
+    }
+    else {
+      print $text if $debug;
+      if ($self->{CHECKSYNTAX}) {
+        push @INC, @{$self->{PERL5LIB}};
+        croak $@ unless eval $text;
+      }
+    }
+
+    undef %times;
+    undef %index;
+    undef $tokenbegin;
+    undef $tokenend;
+    undef $prefix;
+    undef $input;
+    undef $declarations;
+    undef $text;
+    undef $filename;
+    return 1;
+  }
+
+  sub translate_array_prefix {
+    my ($self, $father, $order) = @_;
+
+    my $localformula = $formula;
+    
+    my $arrname = $self->{arrayprefix};
+    delete($self->{arrayprefix});
+    generate_treereg_code($self);
+    my $aux = fill_translation_array_sub($self, $arrname, $order, \$formula, $father);
+    
+    $formula = $localformula;
+
+    return $aux;
+  }
+
+} # closure with $formula $declarations and $text
+
+sub make_references_to_subs {
+  $_[0] =~ s/\b([a-z_A-Z]\w*)\b/$1 => \\\&$1,/g;
+}
+
+sub unique {
+  my %saw = ();
+  my @out = grep(!$saw{$_}++, @_);
+  return @out;
+}
+
+# Checks that all the transformation rules in the list have been defined
+sub check_existence {
+  my $familyname = shift;
+  my $names = shift;
+  my $line = shift;
+
+  for (@_) {
+    croak "Error! treereg rule '$_' not defined (family '$familyname' at line $line)." 
+      unless $names =~ m/\b$_\b/;
+  }
+}
+
+sub translate {
+  my ($self, $father, $order, $translation) = @_;
+
+  $translation = translate_array_prefix($self, $father, $order) if has_array_prefix($self);
+  return $translation;
+}
+
+######### Fill subroutines ##########
+
+sub linenumber {
+  my ($linenumber, $filename) = @_;
+
+  return "#line $linenumber \"$filename\"" if $allowlinenumbers;
+  return '';
+ }
+
+####################################################################
+# Usage      : fill_translation_array_sub($self, $arrname, $order, \$formula, $father);
+# Purpose    : translation of array atoms in treeregexps like  ABC(@a, B, @c)
+# Returns    : the text containing the sub handler and the loop
+# Parameters : $name:    gives the name to the array and to the sub handler
+#              $order:   index of the array formula as child
+#              $formula: declarations
+#              $father:  the father node of the array tree pattern
+
+sub fill_translation_array_sub {
+   my ($self, $name, $order, $formula, $father, $line) = @_;
+ 
+   chomp($$formula);
+   my $sname = '$'.$name; # var referencing the sub 
+   my $aname = '@'.$name; # the array that will hold the nodes
+   $line = '' unless defined($line);
+
+   return <<"END_TRANSLATION_STAR_SUB";
+      my $sname = sub {
+      my \$child_index = 0;
+  $$formula
+$line
+      return 1;
+      }; # end anonymous sub $sname
+
+      return 0 unless until_first_match(
+                      $father, $order, $sname, \\$aname);
+      \$child_index += 1+$aname;
+END_TRANSLATION_STAR_SUB
+} # sub fill_translation_array_sub
+
+sub process_pattern {
+  my ($pat, $filename) = @_;
+  
+  my $linenodirective = linenumber($pat->[1], $filename);
+  my ($pattern);
+  if (defined($pat)) { 
+    $pattern =<<"ENDOFPATTERN"; 
+    return 0 unless do 
+$linenodirective 
+      {$pat->[0]};
+ENDOFPATTERN
+  }
+  else {
+    $pattern = '';
+    #chomp($formula);
+  }
+  return $pattern;
+}
+
+sub process_action {
+  my ($action, $filename) = @_;
+
+  my ($actiontext);
+
+  if ($action) {
+    my $line_directive = linenumber($action->[1], $filename);
+    $actiontext = "$line_directive\n".
+                  "  { $action->[0]}";
+    }
+  else {
+    $actiontext = "      1;"
+  }
+  return $actiontext;
+}
+
+sub fill_translation_sub {
+  my ($name, $declarations, $formula, $action, $filename, $line) = @_;
+  my ($actiontext);
+
+  $line = '' unless defined($line);
+  $actiontext = process_action($action, $filename);
+
+  return <<"END_TREEREG_TRANSLATIONS";
+
+  sub $name { 
+    my \$$name = \$_[3]; # reference to the YATW pattern object
+$$declarations
+    {
+      my \$child_index = 0;
+
+  $$formula
+    } # end block of child_index
+$actiontext
+
+  } # end of $name 
+$line
+END_TREEREG_TRANSLATIONS
+} # end sub fill_translation_sub
+
+sub fill_declarations {
+  my $declarations = shift;
+
+  $$declarations = '';
+  for (keys(%times)) {
+    $$declarations .= "    my \$$_;\n", next if ($times{$_} == 1);
+    $$declarations .= "    my \@$_;\n"
+  }
+}
+
+sub fill_translation_package {
+  my ($filename, $packagename, $code, $names, $family) = @_;
+  my $familiesdecl = '';
+
+   for (keys %$family) {
+     my $t;
+     my @members = map { $t = $_->{attr}; $t->[0] } @{$family->{$_}};
+     @members = unique(@members);
+     my $line = $family->{$_}[0]{attr}[1];
+     check_existence($_, $names, $line, @members);
+     $t = "@members";
+     &make_references_to_subs($t);
+     my $line_directive = linenumber($line, $filename);
+     $familiesdecl .= "$line_directive\n".
+               "our \@$_ = Parse::Eyapp::YATW->buildpatterns($t);\n"; # TODO lines, etc.
+   }
+
+  my $scalar_names;
+  ($scalar_names = $names) =~ s/\b([a-z_A-Z]\w*)\b/our \$$1,/g;;
+  &make_references_to_subs($names);
+  $familiesdecl .= "our \@all = ( $scalar_names) = Parse::Eyapp::YATW->buildpatterns($names);\n";
+
+  return <<"END_PACKAGE_TRANSLATIONS";
+package $packagename;
+
+# This module has been generated using Parse::Eyapp::Treereg
+# from file $filename. Don't modify it.
+# Change $filename instead.
+# Copyright (c) Casiano Rodriguez-Leon 2006. Universidad de La Laguna.
+# You may use it and distribute it under the terms of either
+# the GNU General Public License or the Artistic License,
+# as specified in the Perl README file.
+
+use strict;
+use warnings;
+use Carp;
+use Parse::Eyapp::_TreeregexpSupport qw(until_first_match checknumchildren);
+
+$familiesdecl
+$$code
+1;
+
+END_PACKAGE_TRANSLATIONS
+} # end of sub fill_translation_package
+
+######## TERMINAL classes #########
+sub code_translation {
+  my $self = shift;
+
+  my $pat = $self->{semantic};
+  return process_pattern($pat, $filename) if $pat;
+  return '';
+}
+
+######## Parse::Eyapp::Treeregexp::REGEXP_TERMINAL  #########
+
+sub Parse::Eyapp::Treeregexp::REGEXP_TERMINAL::translate {
+  my ($self, $father, $source, $order) = @_;
+
+  # nodename is the variable associated with the tree node i.e.
+  # for a node NUM it may be $NUM[0] or similar
+  my ($nodename, $aux);
+  $nodename = '$'.$self->{attr};
+  
+  my ($regexp, $options) = ($self->{regexp}, $self->{options});
+  $aux = translate($self, $father, $order, 
+                   "    return 0 unless ref($nodename = $source) =~ m{$regexp}$options;\n");
+  $aux .= code_translation($self);
+  return ($nodename, $aux);
+}
+
+sub Parse::Eyapp::Treeregexp::REGEXP_TERMINAL::classes {
+  my $treereg = shift;
+
+  my $regexp = $treereg->{regexp};
+
+  # what if option "B" is used?
+  my @classes;
+  @classes = $regexp =~ m/\\b|((?:[a-zA-Z_][a-zA-Z_0-9]*::)*(?:[a-zA-Z_][a-zA-Z_0-9]*))/g;
+  return grep {defined($_) } @classes;
+}
+
+######## Parse::Eyapp::Treeregexp::SCALAR_TERMINAL  #########
+
+sub Parse::Eyapp::Treeregexp::SCALAR_TERMINAL::translate {
+  my ($self, $father, $source, $order) = @_;
+
+  my ($nodename, $aux);
+
+  # Warning! not needed for scalars but for Ws (see alias)
+  $nodename = Parse::Eyapp::Treeregexp::compute_var_name($self->{attr});
+  $aux = translate($self, $father, $order, 
+                   "    return 0 unless defined($nodename = $source);\n");
+
+  $aux .= code_translation($self);
+  return ($nodename, $aux);
+}
+
+sub Parse::Eyapp::Treeregexp::SCALAR_TERMINAL::classes {
+  my $self = shift;
+
+  return ('*');
+}
+
+######## Parse::Eyapp::Treeregexp::IDENT_TERMINAL  #########
+sub Parse::Eyapp::Treeregexp::IDENT_TERMINAL::translate {
+  my ($self, $father, $source, $order) = @_;
+
+  my ($nodename, $aux);
+  my $name = $self->{attr};
+  $nodename = Parse::Eyapp::Treeregexp::compute_var_name($self->{attr});
+  $aux = translate($self, $father, $order, 
+                   "    return 0 unless ref($nodename = $source) eq '$prefix$name';\n");
+  $aux .= code_translation($self);
+  return ($nodename, $aux);
+}
+
+sub Parse::Eyapp::Treeregexp::IDENT_TERMINAL::classes {
+  my $treereg = shift;
+
+  my @classes = ($treereg->{attr});
+  return @classes;
+}
+
+######## Parse::Eyapp::Treeregexp::ARRAY_TERMINAL  #########
+sub Parse::Eyapp::Treeregexp::ARRAY_TERMINAL::translate {
+  my ($self, $father, $source, $order) = @_;
+
+  my ($nodename, $aux);
+  my $id = $self->{attr};
+  $nodename = '@'.$id;
+  $aux = translate($self, $father, $order, 
+                   "    $nodename = ($father->children);\n".
+                   "    $nodename = $nodename\[\$child_index+$order..\$#$id];\n"
+                  ); 
+  return ($nodename, $aux);
+}
+
+sub Parse::Eyapp::Treeregexp::ARRAY_TERMINAL::classes {
+  croak "Fatal error: Parse::Eyapp::Treeregexp::ARRAY_TERMINAL::classes called from the root of a tree";
+}
+
+############### INNER classes ###############
+sub generate_check_numchildren {
+  my ($self, $nodename, $severity) = @_;
+
+  return '' unless $severity;
+
+  my $name = $self->{id};
+  my $numexpected = @{$self->{children}};
+  my $line = $self->{line};
+
+  my $warning = "    return 0 unless checknumchildren($nodename, $numexpected, $line, ".
+                      "'$filename', $self->{numarrays}, $severity);\n";
+  return $warning;
+}
+
+############### Parse::Eyapp::Treeregexp::REGEXP_INNER ###############
+
+sub Parse::Eyapp::Treeregexp::REGEXP_INNER::translate {
+  my ($self, $father, $source, $order) = @_;
+
+  my ($nodename, $aux);
+
+  my $name = $self->{id};
+  $nodename = Parse::Eyapp::Treeregexp::compute_var_name($name);
+
+  my $warning = generate_check_numchildren($self, $nodename, $severity);
+
+  my ($regexp, $options) = ($self->{regexp}, $self->{options});
+
+  # TODO #line goes here
+  my $template = "    return 0 unless ref($nodename = $source) =~ m{$regexp}$options;\n"
+                 .    $warning;
+  $aux = translate($self, $father, $order, $template);
+  return ($nodename, $aux);
+}
+
+*Parse::Eyapp::Treeregexp::REGEXP_INNER::classes = \&Parse::Eyapp::Treeregexp::REGEXP_TERMINAL::classes;
+  
+############### Parse::Eyapp::Treeregexp::IDENT_INNER ###############
+
+sub Parse::Eyapp::Treeregexp::IDENT_INNER::translate {
+   my ($self, $father, $source, $order) = @_;
+
+  my ($nodename, $aux);
+
+  my $name = $self->{id};
+  $nodename = Parse::Eyapp::Treeregexp::compute_var_name($name);
+
+  my $warning = generate_check_numchildren($self, $nodename, $severity);
+
+  my $template = "    return 0 unless (ref($nodename = $source) eq '$prefix$name');\n"
+                       .    $warning;
+  $aux = translate($self, $father, $order, $template);
+  return ($nodename, $aux);
+}
+
+sub Parse::Eyapp::Treeregexp::IDENT_INNER::classes {
+  my $treereg = shift;
+
+  my @classes = ( $treereg->{id} );
+  return @classes;
+}
+
+############### Parse::Eyapp::Treeregexp::SCALAR_INNER ###############
+
+sub Parse::Eyapp::Treeregexp::SCALAR_INNER::translate {
+   my ($self, $father, $source, $order) = @_;
+
+  my ($nodename, $aux);
+
+  my $name = $self->{id};
+
+  # Warning! not needed for scalars but for Ws 
+  $nodename = Parse::Eyapp::Treeregexp::compute_var_name($name);
+
+  my $warning = generate_check_numchildren($self, $nodename, $severity);
+
+  my $template = "    return 0 unless defined($nodename = $source);\n"
+                 .    $warning;
+  $aux = translate($self, $father, $order, $template);
+  return ($nodename, $aux);
+}
+
+*Parse::Eyapp::Treeregexp::SCALAR_INNER::classes = \&Parse::Eyapp::Treeregexp::SCALAR_TERMINAL::classes;
+
+########## Parse::Eyapp::Treeregexp::GLOBALCODE #############
+
+sub Parse::Eyapp::Treeregexp::GLOBALCODE::translate {
+  my $transform = shift;
+
+  my $line_directive = linenumber($transform->[1], $filename);
+  return "$line_directive\n".
+         "$transform->[0]\n";
+};
+

@@ -1,0 +1,160 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.38.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 acf7e99a3161f88adce3845ab09557143af4ac0e AUTHORS
+SHA1 7a95fc8778fbce1f60d222e0d0d1dbb6c649461f Artistic
+SHA1 531e6b5c470d4726483fd68833391653eace0a92 COPYING
+SHA1 01e4731c4e5bbeb8a28ecb061b464ec745235b2e CREDITS
+SHA1 f3e8c9a00b6df8996c9682dd517d7090fcd24cb9 Changes
+SHA1 4969e76ebdb5d8bf5451aa8bbca4bfdc616804ae INSTALL
+SHA1 6bacd60fe4ba24a979a3b73ce4e44094715ae0dd LICENCE
+SHA1 c48ed9f0fe39ac66c9a295699123f134859a69b5 MANIFEST
+SHA1 c48f74e717461f8218c224367f7c57e6dd498b4f MANIFEST.SKIP
+SHA1 c4cd7789108537f853091eb7c9b56bcf02dda9b9 META.yml
+SHA1 c34a81a4dd9426a6e341c5942c36f642a513b3b0 Makefile.PL
+SHA1 8a149cdc8c713a70b102ac8f4642aa34184fae6e README
+SHA1 42ff41abe8e901f8e12118f3fef13c7618251a9c Strings.pm
+SHA1 0ddf3973fa72a8458436726aba5c7553c6cfbbc7 Strings.tt
+SHA1 a112425e8d8435ccc32b2cd3158b93e9c6ec3764 Strings.xs
+SHA1 d7c5caf3b6e2ecd302c5b06adfc57e7bbb22278b const-c.inc
+SHA1 93b19a4cb87140836864f1513459dd7c5fd230ef const-xs.inc
+SHA1 60fc19ade8575fb7cdc134595a7f24e143a90a94 fallback/const-c.inc
+SHA1 93b19a4cb87140836864f1513459dd7c5fd230ef fallback/const-xs.inc
+SHA1 1e0469446a04368c29173715a49c8f4eab26f922 fns/Makefile
+SHA1 6dad0cb5c4af9e094b4572971103e725406978ef fns/addcslashes.fn
+SHA1 49017c4ff887ddaaa483822e32c83ca2dea9f015 fns/addslashes.fn
+SHA1 9aef0fde462fc99d9ed9ac670349884bfeedb118 fns/bin2hex.fn
+SHA1 8088da745757dc7c46a99ba48261990a1bc3b08e fns/chop.fn
+SHA1 a16c51327c9c76f73636661730fa968e3edb1c53 fns/chr.fn
+SHA1 fe3a6b7dbcbf7238729d152aa679bc41a6727037 fns/chunk_split.fn
+SHA1 3501c04f37273bc9e29b040dec39aad02e8d5041 fns/convert_cyr_string.fn
+SHA1 0280c890dbf5de894672624e64f05563d49efd9d fns/count_chars.fn
+SHA1 9da43dbc6951133b00225c5514ec34710328ba91 fns/crc32.fn
+SHA1 7f8d9936de35eb47da036ccd0d9ef38958ed7f80 fns/crypt.fn
+SHA1 090400badcdfff99a212074a1404f1f8a5db331f fns/echo.fn
+SHA1 f48807eaaf3f78f95a2b22fb4b42e468c4ca4635 fns/explode.fn
+SHA1 f188548cbbd79600cabef6d50f94995775d9bc4b fns/fprintf.fn
+SHA1 e8bca4bd44a8fedbb6d7c203560535bef5a0bb7c fns/get_html_translation_table.fn
+SHA1 375cfaaf0d860abec8188a51d9b301ae9070fd67 fns/hebrev.fn
+SHA1 375cfaaf0d860abec8188a51d9b301ae9070fd67 fns/hebrevc.fn
+SHA1 68a118d327b76ebb9a722d4e173a57008ede438a fns/html_entity_decode.fn
+SHA1 ac784cedea0566a9812bb0fc175b6b2b8de9a8ae fns/htmlentities.fn
+SHA1 ac784cedea0566a9812bb0fc175b6b2b8de9a8ae fns/htmlspecialchars.fn
+SHA1 87598886c61fc25a9f5958f25af235f2962d0b1c fns/implode.fn
+SHA1 92ba4c81c2e2da5349dcb7650df4f0ea92c11e48 fns/join.fn
+SHA1 5fb3a3bbbe4bb1288a67ff5c60c6785151a36722 fns/levenshtein.fn
+SHA1 633f0a9740a8d2f5648782f83db6102c6ac573c8 fns/localeconv
+SHA1 2d3ab0c9971f6fa64d0b90c4b0cfddbe9e274586 fns/ltrim.fn
+SHA1 d6ef35d68f03f08bfd8baef3b849e91fd3c45af0 fns/md5.fn
+SHA1 3b55398e8bc3bba87fc3c1259c935c0c9b3b85f2 fns/md5_file.fn
+SHA1 88e96bf7de0f0a947998fbc61aad7bb55c8bbde3 fns/metaphone.fn
+SHA1 c5a4d16def0887dfd1122097fae17d7c58852bfe fns/money_format.fn
+SHA1 ff26d0bc08524a79b2a348430998fd48c59a9d84 fns/nl2br.fn
+SHA1 306498befd97272c7d42e3e3acd2a4b0a2ea19ad fns/nl_langinfo.fn
+SHA1 bf7f6de854d0108c63777050e7a98d90bdad6187 fns/number_format.fn
+SHA1 8743645dab06388e21092eb7d521638ccbbe9d44 fns/ord.fn
+SHA1 dc5f87b5b2a7d770c8857084edced267ae3a7627 fns/parse_str.fn
+SHA1 c3c069252373c118b9466b969f0f0b486d7a5293 fns/print.fn
+SHA1 1e4ebda6f2262005eb29912dbdfffdf82154b924 fns/printf.fn
+SHA1 e876be478b03bd223004e220c337ebaa7486a48c fns/quoted_printable_decode.fn
+SHA1 f6757c283ed3319bf08c9822e899f9905ef47840 fns/quotemeta.fn
+SHA1 c73815c3f14046b02e6bb65f08a8d61a05c8d452 fns/rtrim.fn
+SHA1 3598fc77f5649974c9e00d45c39e47c7c126643b fns/setlocale.fn
+SHA1 21305654e0532029f749eb1693fbaa8651544c16 fns/sha1.fn
+SHA1 503265f696887637921c2fe3fbb7ed6d98802361 fns/sha1_file.fn
+SHA1 ff8d03999a9e96e6cee1c2a1d92a2d17e49776cc fns/similar_text.fn
+SHA1 abcd541d19f23510ad9cdbeb5dabcb77832d73f2 fns/soundex.fn
+SHA1 3ae78ef6819be42b7745d000445aa818494a79fa fns/sprintf.fn
+SHA1 fab4959a891b3fa8d9b3e7f2b02692604ce45ce1 fns/sscanf.fn
+SHA1 7850c95b0581dbf3569319815c47a5de91953eba fns/str_ireplace.fn
+SHA1 1cb72674e0c65fb03532d4df5cae9c6c59b6f2e2 fns/str_pad.fn
+SHA1 ccb5dd3d176aeb7fca2aa6141780b0aa7e6608a6 fns/str_repeat.fn
+SHA1 6605fa0fb47541fdcceddfa686aa75334900acf1 fns/str_replace.fn
+SHA1 b5d81fd432364b0d53006416edf7b73816b4cfd2 fns/str_rot13.fn
+SHA1 4cd9d36d06a5f3cf01a725938a16056539ce52e0 fns/str_shuffle.fn
+SHA1 fe568c53aa51baaccd89b294009541a74823c5a5 fns/str_split.fn
+SHA1 3cd7accced7bfed5ef160f13e6a935e8c0033094 fns/str_word_count.fn
+SHA1 706b40fd01d23fc60a5343bfbec626515a5b1c99 fns/strcasecmp.fn
+SHA1 991f3b10014402ef6ea86702bd2dab34dac4b88d fns/strchr.fn
+SHA1 cfdd94594cc18293f27b4ae1a3972ce7590fc667 fns/strcmp.fn
+SHA1 c19ae574155261c40118a8eb737f4fb51ee27cdf fns/strcoll.fn
+SHA1 cbb794a0a51afb2b1ddd74d4b4b158daf7f18e18 fns/strcspn.fn
+SHA1 92547499607ed6d376a7af062b2e09870df5adf5 fns/strip_tags.fn
+SHA1 f4916b6949c5ad8d72e3277234674801e3c5d4b3 fns/stripcslashes.fn
+SHA1 d0abd1153fee79a5faf13a6385aa30eba5861e55 fns/stripos.fn
+SHA1 a4253cee9aed361a2b824efd4d7c63003601a076 fns/stripslashes.fn
+SHA1 94b34d92855a98d383730fef7f40c473f678ddef fns/stristr.fn
+SHA1 765630f86309f98e473942f3a302860b8c6e1842 fns/strlen.fn
+SHA1 73474f2bebb622a1ac8829b6a5de0ed3bce77dd7 fns/strnatcasecmp.fn
+SHA1 73474f2bebb622a1ac8829b6a5de0ed3bce77dd7 fns/strnatcmp.fn
+SHA1 b690cc4ed6225e556b0bdf144241a828d22be03f fns/strncasecmp.fn
+SHA1 b690cc4ed6225e556b0bdf144241a828d22be03f fns/strncmp.fn
+SHA1 98f4041b4af108aec24c99ff8c57f5f56dd7f023 fns/strpos.fn
+SHA1 80cb59a1a01cb5292e9b87839446333e0becc1d2 fns/strrchr.fn
+SHA1 0a7fd328009d6b75d2ac657a0b0813f51a204a4e fns/strrev.fn
+SHA1 10c04669517f8362281b47af05b704045a61f297 fns/strripos.fn
+SHA1 ab895c36137fcc6bf9d144e6a050ae9368768e3c fns/strrpos.fn
+SHA1 947fc57c3795e5ff3f7c64fea424dfadde7e7621 fns/strstr.fn
+SHA1 b155fbad9d545c2eeee6de0ac71de10f4f1c8f26 fns/strtolower.fn
+SHA1 4b00944680a723d4fe62370ec0154f29e7c9584f fns/strtoupper.fn
+SHA1 27dcd7b9843204a2c3eb10b13a76a4de859c4c3b fns/strtr.fn
+SHA1 131d55e275726d934bf7f2021368e819c21eb855 fns/substr.fn
+SHA1 9835dc6548a5195510fa0be319074ab79dee36c0 fns/substr_compare.fn
+SHA1 03236423ac29a65cf64245a64c38c53371a37fc6 fns/substr_count.fn
+SHA1 131d55e275726d934bf7f2021368e819c21eb855 fns/substr_replace.fn
+SHA1 d5c34041a9f52fa37466b6935dbd1a9fc6f42711 fns/trim.fn
+SHA1 63b2de49dc444b572a0336072bd27f81eb4f3ad0 fns/ucfirst.fn
+SHA1 f8c4295f91f20b3f764eea663e2d0bdd450303cf fns/ucwords.fn
+SHA1 e080d4221fe59dcb632cf15d6047cb8e057a7f63 fns/vprintf.fn
+SHA1 93c7895f1426c5dada42f0980f64eec9db898747 fns/vsprintf.fn
+SHA1 0c7d742dc517f862fbbe3ea386544f5a56bd5a3c fns/wordwrap.fn
+SHA1 a10ad83824ae77996daaa1b5ef614baa5c4981b1 inc/Algorithm/Diff.pm
+SHA1 bc6c439ba84efb76880c45e107cb59a8c5276eab inc/File/Slurp.pm
+SHA1 1297d0289de93954661998b16ccd9a688ae163df inc/Module/Install.pm
+SHA1 e9a711bb1f113bfcb1b452d8fa40fbb1c94a1073 inc/Module/Install/AutoInstall.pm
+SHA1 6cfb0832051abeb2d77a7ad7e8864266854a1cbe inc/Module/Install/Base.pm
+SHA1 14808f1bf5910b6b4366335d3d0530ed66912a40 inc/Module/Install/Include.pm
+SHA1 3f9879b9fac7ee90553635df08ed001ba03b32da inc/Module/Install/Makefile.pm
+SHA1 44bf9f9df31606fe4b0975bbdbf42bc756d1b33d inc/Module/Install/Metadata.pm
+SHA1 c2ac78499487311fb22307fd16f88eef9dbb0493 inc/Test/Builder.pm
+SHA1 2432b8704744fc0b146d6d0e6ce3ec71ebfcd667 inc/Test/Differences.pm
+SHA1 bc962029007d1c6117228a5516dee335cff9a16f inc/Test/More.pm
+SHA1 aa7320f56eab94a18afbec812a36cb33dce2453b inc/Text/Diff.pm
+SHA1 6df370ace72a03525f025f15fc7821908c7a4473 makepm
+SHA1 660a8c4f1cffc2bf1e5096d020700d877310f25f ppport.h
+SHA1 c41574ca2c239b0c8dd9426018ee41eabb06e437 t/99pod.t
+SHA1 5741e1c2ece63b4c36cf6730868c7021c3a39221 t/TestPHP.pm
+SHA1 6cfaed58bb2c192475bfcafb7f5a28d8e7cbf52d t/addcslashes.t
+SHA1 9202204352d79134e5a93ab8d3491b53ed8b786f t/addslashes.t
+SHA1 c300f91272ace895e0153ba08d1b35ee9b483eb0 t/bin2hex.t
+SHA1 9e15430c936df5e587699bfe832dc64bb27ac32a t/chunk_split.t
+SHA1 4f9bc37e3e98089bc8c55fdff81a6d36ce2a24da t/count_chars.t
+SHA1 e74084946ef9a38afd63fa10516b89333edcbfcc t/html/01html.html
+SHA1 746eed7b2aead3c17116863e121f7e62756fd470 t/html/01stripped.html
+SHA1 273962854072aaa7b1bab7de50a4ae7973186812 t/html/02stripped.html
+SHA1 df390ec02742674d046dda2280692a63f2fe7c47 t/money_format.t
+SHA1 e3987603a0d5ac37f62cf28c5ff9701391286c3d t/str_pad.t
+SHA1 dc8b322930604b8583b1c6d6814321e1f19a4a0c t/str_word_count.t
+SHA1 08d81e97aa4c3675c909a9cc1499916b7ca5f537 t/strip_tags.t
+SHA1 dbc4d1197f02389b12e7f5b9d0339c52e87243a0 t/stripcslashes.t
+SHA1 4d5a1880427a8ccfd34aae990e5d03d3316d27b8 t/strtr.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.3 (GNU/Linux)
+
+iD8DBQFAGBmw+6GzsKplXNYRApBxAJ97RH3/yugWvm64pxWxDV1U40V/7wCgrxEP
+zUrkhHxICNvup8r05D3T60E=
+=kIq9
+-----END PGP SIGNATURE-----

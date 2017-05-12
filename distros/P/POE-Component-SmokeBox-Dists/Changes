@@ -1,0 +1,116 @@
+==================================================
+Changes from 2008-08-24 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.08 at 2013-08-23 20:58:56 +0000
+-----------------------------------------
+
+  Change: 4f4b4ec99564301a76e2773fa09d88a539586a53
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-08-23 21:58:56 +0000
+
+    Dzilify the distribution 
+
+-----------------------------------------
+version 1.06 at 2011-09-01 18:34:47 +0000
+-----------------------------------------
+
+  Change: f5d54a76e17550cefb5c3f99c9db226a8c5eb25a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-09-01 19:34:47 +0000
+
+    Strip the trailing whitespace 
+
+  Change: fec2af851c83bbc56838da70323127b985769af6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-09-01 19:30:17 +0000
+
+    Shuffle around the included CPAN mirrors 
+
+-----------------------------------------
+version 1.04 at 2010-12-09 14:42:23 +0000
+-----------------------------------------
+
+  Change: 715d3222a3e48182470878bc8af6bb9a64b66cb4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-12-09 14:42:23 +0000
+
+    Added random selection of 100 CPAN dists 
+
+-----------------------------------------
+version 1.02 at 2010-04-22 08:57:02 +0000
+-----------------------------------------
+
+  Change: 39fbff9223460dd47cc6bf8768539ff691175390
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2010-04-22 09:57:02 +0000
+
+    Reversed most of the Phalanx changes, as they need to match the
+    distribution name.
+
+    Bundle::Phalanx100 lists modules not the distributions. 
+
+  Change: d197e2c2e29f320e9ff1dcea8b005c8d9a077079
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2010-04-22 07:29:33 +0000
+
+    Updated various build configuration. 
+
+  Change: 5871a4faa366074c7a4d4bc5127dac99d9f7f970
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-04-22 14:16:50 +0000
+
+    update the phalanx100 list to 0.07 
+
+  Change: a6e28405eb72185d6c57aebe483c2f3a06de71db
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-04-22 14:16:49 +0000
+
+    change the wording of custom data to one copied from CPANIDX, ha 
+
+  Change: ef8acc58ed7e7ea6eee50c03458e6007e10cdb79
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-04-22 14:16:49 +0000
+
+    document the use of private data parameters 
+
+  Change: 0a7bb61cf60376daa49a3f26b78c7ea106f57e94
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-04-22 14:16:49 +0000
+
+    when you specify the url, have it override the builtin - not append
+    to it 
+
+  Change: bc66c25d980a33f7f943d7e17ba9a864a0c984dc
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-04-22 14:16:48 +0000
+
+    document the url attribute 
+
+  Change: 12076f1dbb06f076a0b8fd281533f689402e78da
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2010-04-22 14:16:48 +0000
+
+    add pkg_time to control age of packages file 
+
+-----------------------------------------
+version 1.00 at 2009-04-22 20:04:39 +0000
+-----------------------------------------
+
+  Change: 047f1f5bf9ee7d59a5cdf10210934215abde89a6
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-04-22 21:04:39 +0000
+
+    Set the repository in META.yml. Tidy up the POD. Update the CPAN
+    mirror list. 
+
+  Change: 31bff509aa04b4b076dbd66d07b9f9b72e379d0a
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-03-12 11:43:01 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

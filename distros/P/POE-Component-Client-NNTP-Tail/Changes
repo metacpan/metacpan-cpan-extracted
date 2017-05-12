@@ -1,0 +1,10 @@
+Revision history for POE-Component-Client-NNTP-Tail
+
+0.03      2011-08-19 09:38:35 America/New_York
+    - Squelch some test warnings
+
+0.02      2011-08-18 23:47:40 America/New_York
+    - Fix issue where polling stops if server disappers (Chris Williams)
+
+0.01 Tue Sep 16 12:25:19 EDT 2008
+    - initial release

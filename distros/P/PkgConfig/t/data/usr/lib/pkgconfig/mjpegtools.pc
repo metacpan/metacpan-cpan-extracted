@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/mjpegtools
+
+Name: MJPEG-tools
+Description: Video-recording, -editing, -filtering and -encoding tools
+Version: 1.9.0
+Libs: -L${libdir} -lmjpegutils 
+Cflags: -I${includedir} -I${includedir}/mpeg2enc -I${includedir}/mplex

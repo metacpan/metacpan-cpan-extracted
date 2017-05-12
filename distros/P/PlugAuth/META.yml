@@ -1,0 +1,46 @@
+---
+abstract: 'Pluggable authentication and authorization server.'
+author:
+  - 'Graham Ollis <gollis@sesda3.com>'
+build_requires:
+  JSON::MaybeXS: '0'
+  Test::Clustericious::Cluster: '0.31'
+  Test::Clustericious::Config: '0'
+  Test::Clustericious::Log: '0'
+  Test::More: '0.94'
+  perl: '5.010001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PlugAuth
+recommends:
+  EV: '0'
+requires:
+  Class::Method::Modifiers: '0'
+  Clone: '0'
+  Clustericious: '1.20'
+  Crypt::PasswdMD5: '0'
+  DateTime: '0'
+  File::HomeDir: '0.91'
+  File::Touch: '0'
+  List::MoreUtils: '0'
+  Log::Log4perl: '0'
+  Path::Class: '0'
+  Role::Tiny: '1.003001'
+  Term::Prompt: '0'
+  Test::Builder: '0'
+  Text::Glob: '0'
+  YAML::XS: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/clustericious/PlugAuth/issues
+  homepage: https://metacpan.org/pod/PlugAuth
+  repository: git://github.com/clustericious/PlugAuth.git
+version: '0.35'
+x_serialization_backend: 'YAML::Tiny version 1.69'

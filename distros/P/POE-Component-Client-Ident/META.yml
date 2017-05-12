@@ -1,0 +1,42 @@
+---
+abstract: 'A component that provides non-blocking ident lookups to your sessions.'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.47
+  Test::POE::Server::TCP: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.88'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-Client-Ident
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  POE::Component::Client::Ident:
+    file: lib/POE/Component/Client/Ident.pm
+    version: 1.16
+  POE::Component::Client::Ident::Agent:
+    file: lib/POE/Component/Client/Ident/Agent.pm
+    version: 1.16
+  POE::Filter::Ident:
+    file: lib/POE/Filter/Ident.pm
+    version: 1.16
+requires:
+  POE: 0.38
+  POE::Filter::Line: 0
+  POE::Wheel::ReadWrite: 0
+  POE::Wheel::SocketFactory: 0
+  perl: 5.6.0
+resources:
+  homepage: http://github.com/bingos/poe-component-client-ident/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bingos/poe-component-client-ident.git
+version: 1.16

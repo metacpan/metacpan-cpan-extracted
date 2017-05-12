@@ -1,0 +1,28 @@
+Prima-Image-Magick version 0.01
+==============================
+
+Prima::Image::Magick - Juggle images between Prima and Image::Magick
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  Prima
+  Image::Magick
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Dmitry Karasik
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

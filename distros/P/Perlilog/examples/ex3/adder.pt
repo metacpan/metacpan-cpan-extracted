@@ -1,0 +1,7 @@
+port theport vars rw0:data1, rw1:data2, r2:sum, r3:diff;
+
+  input  [:]  data1, data2;
+  output [:]  sum, diff;
+
+  assign sum = data1 + data2;
+  assign diff = data1 - data2;

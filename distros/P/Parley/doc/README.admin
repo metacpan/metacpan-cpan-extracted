@@ -1,0 +1,110 @@
+0. INTRODUCTION
+
+  Administering public forums is notoriously nightmarish.
+
+1. BAN TYPES
+
+  The ideas for slowing down Evil People are as follows:
+
+1.1 Account Suspension
+
+    When the account tries to log-in all they see is an "Account Suspended"
+    page.
+
+    The site can be viewed while logged out (i.e. guest user)
+
+1.2 Ban-by-IP
+
+    This can take varying levels of restriction:
+
+1.2.1 Restrict Posting by IP
+
+    Prevent user(s) from matching IPs creating new threads, replying to
+    existing threads or editing existing posts.
+
+1.2.2 Restrict Login by IP
+
+    Prevent user(s) from matching IPs using the login functionality
+
+1.2.3 Restrict Sign-Up by IP
+
+    Prevent new accounts being created from matching IPs
+
+1.2.4 Restrict All Access by IP
+
+    Matching IPs are shown the "Evil People Got You Banned" page.
+    This is pretty harsh, and should be saved as a ast resort .. if
+    implemented/used at all.
+
+2. KNOWN ISSUES
+
+  There are the usual issues of people running through proxies, catching
+  people we didn't intend to, or being used by banned users to circumvent IP
+  based bans.
+
+3. CONCERNS
+
+3.1 Performance
+
+    Will IP checking for every request have a noticable, negative, effect on
+    application performance?
+    We could store information in-session for IPs we discover to be affected,
+    but we then have the following issues:
+        - we're still doing a lookup every hit for the majority of hits (the
+          Good people)
+        - if we escalate or modify a user's IP restriction it won't take
+          effect, since we already have them session-flagged for something
+          lesser.
+
+4. POSSIBLE IMPLEMENTATIONS
+
+4.1 Net::IP::Match::Regexp
+
+    This looks like a useful module for providing (CIDR - a.b.c.d/x) IP ranges
+    and matching IPs that live in those ranges.
+
+4.2 IP matching
+
+    In (3.1) concerns were raised regarding a per hit performance lookup.
+
+    This may be reduced by reducing the number of lookups and queries; instead
+    of a growing set of records in a table - one for each new match - we could
+    make use of the create_iprange_regexp() feature in Net::IP::Match::Regexp
+    and have one row for each ban-type.
+
+    This should reduce database overheads, and hopefully simplify the IP
+    matching.
+
+    The interface may become difficult to use (in the initial) implementation
+    if we offer a textarea to manage the ranges. This could be overcome in the
+    future by having the interface split/format IP blocks on viewing, and
+    compress to one string on saving.
+    A small hit at admin time, instead of a per-hit overhead.
+
+    We'd lose the ability to timestamp individual modifications, or provide a
+    per-block rejection message.
+
+4.3 Admin Action Tracking
+
+    It would be useful for the application to keep a log of changes, with a
+    comment written by the moderator, so that time and reasons for bans could
+    be viewed by other admins.
+
+    e.g.
+
+      2008-02-13 08:25  Added r.s.t.u/x - they just kept on being abusive
+
+    There might be an opportunity to establish the "diff" between the before
+    and after IP list(s) and store those with the message. (list based maths?)
+
+4.4 Admin permissions and roles
+
+    We don't necessarily wish to allow all moderators the ability to perform
+    anoy or all of the restriction actions.
+
+    This will most likely introduce some kind of role based system;
+    Catalyst::Plugin::Authorization::Roles?
+
+    Methods can be added to ::Schema::Person to do various role checks;
+    e.g.  can_suspend_account()
+    [although, how can we use the Catalyst plugin be used from the Schema?]

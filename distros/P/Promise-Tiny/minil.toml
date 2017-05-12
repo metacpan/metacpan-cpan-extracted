@@ -1,0 +1,4 @@
+name = "Promise-Tiny"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

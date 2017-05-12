@@ -1,0 +1,57 @@
+grp:3
+fd:2
+ifd:2
+dp:.
+ts:,
+cs:RM
+ics:MYR
+csa:l
+css:0
+ns:-
+ps:+
+dtf:%A %d %b %Y %I:%M:%S %p %Z
+df:%A %d %b %Y
+tf:%I:%M:%S  %Z
+apf:%I:%M:%S %p %Z
+amu:
+pmu:
+aml:
+pml:
+lm1:Januari
+lm2:Februari
+lm3:Mac
+lm4:April
+lm5:Mei
+lm6:Jun
+lm7:Julai
+lm8:Ogos
+lm9:September
+lm10:Oktober
+lm11:November
+lm12:Disember
+sm1:Jan
+sm2:Feb
+sm3:Mac
+sm4:Apr
+sm5:Mei
+sm6:Jun
+sm7:Jul
+sm8:Ogos
+sm9:Sep
+sm10:Okt
+sm11:Nov
+sm12:Dis
+ld1:Ahad
+ld2:Isnin
+ld3:Selasa
+ld4:Rabu
+ld5:Khamis
+ld6:Jumaat
+ld7:Sabtu
+sd1:Ahd
+sd2:Isn
+sd3:Sel
+sd4:Rab
+sd5:Kha
+sd6:Jum
+sd7:Sab

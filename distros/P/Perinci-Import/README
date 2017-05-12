@@ -1,0 +1,84 @@
+SYNOPSIS
+
+     # import some functions
+     use Perinci::Import 'Some::Module', 'func1', 'func2';
+    
+     # import wrapped function
+     use Perinci::Import 'Some::Function', func1 => {retry => 3};
+    
+     # import all (public) functions
+     use Perinci::Import 'Some::Module', ':all';
+
+DESCRIPTION
+
+    This module is the counterpart of Perinci::Exporter (with slightly
+    incompatible semantic in syntax). It lets you import functions from
+    another modules. Imported modules need not define an exporter; the list
+    of importable functions, their tags, etc are consulted from Rinci
+    metadata (located in %SPEC package variable). Other features include:
+    wrapping functions, importing to another name, etc.
+
+    Perinci::Import is now preferred over Perinci::Exporter as this frees
+    module authors from specifying an exporter explicitly. Personally, I
+    also use the venerable Exporter on some modules.
+
+IMPORTING
+
+    The basic syntax is:
+
+     use Perinci::Import <MODULE::NAME> [FUNC | FUNC => \%OPTS, ...]
+
+    Default exports. If you specify no arguments:
+
+     use Perinci::Import 'Some::Module';
+
+    this will import all functions having the default tag. For example:
+
+     package Some::Module;
+     our %SPEC;
+     $SPEC{func1} = { v=>1.1, tags=>[qw/default a/] };
+     sub   func1    { ... }
+     $SPEC{func2} = { v=>1.1, tags=>[qw/default a b/] };
+     sub   func2    { ... }
+     $SPEC{func3} = { v=>1.1, tags=>[qw/b c/] };
+     sub   func3    { ... }
+     1;
+
+    Some::Module will by default export f1 and f2.
+
+    Importing individual functions. You can import individual functions:
+
+     use Perinci::Import 'Some::Module', qw(f1 f2);
+
+    Each function can have import options, specified in a hashref:
+
+     # this imports f1 and f2 (as bar)
+     use Perinci::Import 'Some::Module', f1 => {args_as=>'array'}, f2=>{-as=>'bar'};
+
+    Each import key, unless those prefixed by dash (-) will be passed to
+    the convert argument of Perinci::Sub::Wrapper's wrap_sub(). Function
+    will be wrapped if one of more such arguments are specified (or -wrap
+    => 1 is given. In the above example, f1 is wrapped because args_as is
+    specified. f2 is not wrapped.
+
+    Importing groups of functions by tags. You can import groups of
+    functions using tags. Tags are collected from function metadata, and
+    written with a : prefix (to differentiate them from function names).
+    Each tag can also have import options:
+
+     use YourModule 'f3', ':a' => {-prefix => 'a_'}; # imports f3, a_f1, a_f2
+
+    Some tags are defined automatically: :default, :all.
+
+    Importing to a different name. As can be seen from previous examples,
+    the -as and -prefix (and also -suffix) import options can be used to
+    import subroutines using into a different name.
+
+FAQ
+
+SEE ALSO
+
+    Perinci, Perinci::Exporter
+
+    Sub::Exporter
+

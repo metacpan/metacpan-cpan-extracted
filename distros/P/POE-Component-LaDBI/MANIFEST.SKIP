@@ -1,0 +1,6 @@
+\bCVS\b
+\.log$
+\.pcf$
+\.tar\.gz$
+\.bak$
+^NO_DB_TESTS$

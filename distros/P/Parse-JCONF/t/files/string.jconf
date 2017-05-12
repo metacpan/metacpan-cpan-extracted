@@ -1,0 +1,17 @@
+simple_string = "This is a test"
+utf_string = "Это тест (αυτή είναι μια δοκιμή)"
+
+multiline_string = 
+"Я узнал, что у меня
+Есть огромная семья
+И тропинка и лесок
+В поле каждый колосок
+Речка, небо голубое
+Это все мое родное
+Это Родина моя,
+Всех люблю на свете я!"
+
+string_with_escapes = "I have no idea\t(is this works somehow)\nSo, try it yourself on disc C:\\
+(Or just \"go away\")"
+
+string_with_utf_escapes = "\u0000Available payment methods are: \u0024, \u00A2, \u20AC"

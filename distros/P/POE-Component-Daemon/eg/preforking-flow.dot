@@ -1,0 +1,78 @@
+digraph Network {
+#    size="20,20";
+    fontname=arial;
+    fontsize=12; 
+    rankdir=TB;
+
+    node [fontname=arial, fontsize=12, style=filled, color=orange ];
+    edge [fontname=arial, weight=10, color=blue, fontsize=12, decorate=0 ];
+
+
+    node [ shape=ellipse ];
+
+    daemon_parent   [ label="signal: daemon_parent" ];
+    daemon_child    [ label="signal: daemon_child" ];
+    daemon_accept   [ label="signal: daemon_accept" ];
+    daemon_shutdown [ label="signal: daemon_shutdown" ];
+    shutdown        [ label="event: shutdown" ];
+
+    node [ shape=polygon, sides=4, skew=.4  ];
+
+    prefork      [ label="Preforking Daemon" ];
+    grand_parent [ label="Grand-parent process" ];
+    parent       [ label="Parent process" ];
+    child        [ label="Child process" ];
+
+
+    node [ shape=circle ];
+    
+    w [ label="w"];
+    f [ label="f"];
+    F [ label="F"];
+    r [ label="r"];
+    e [ label="e"];
+    l [ label="l"];
+
+    node [ shape=box ];
+
+    
+
+    prefork -> startup;
+
+    startup -> grand_parent [ label="detach" ];
+    grand_parent -> parent;
+
+    parent -> F [ label="startup" ];
+
+    startup [ label="Startup\n(->pause_accept)" ];
+
+    parent -> daemon_parent ;
+
+    parent -> check_scoreboard -> parent ;
+    check_scoreboard -> F [ label="Need more children" ];
+
+
+    F -> fork -> f -> child -> daemon_child -> get_ready;
+    get_ready -> w [ label="update_status: wait"];
+
+    w -> daemon_accept -> ready -> request; 
+    ready [ label="ready\n(->resume_accept)" ];
+    request -> r [ label="update_status: req"];
+    r -> do_req;
+    do_req -> done; // [ label="update_status: done"];
+
+    r -> l [ label="update_status: long"];
+
+    request -> l [ label="update_status: long"]; 
+    l -> long_req -> done;
+    done -> w [ label="update_status: done"];
+
+    w -> requests -> shutdown -> e;
+                     shutdown -> daemon_shutdown;
+
+    requests [ label="> N requests" ];
+
+    long_req [ label="Handle long request" ];
+    do_req   [ label="Handle request" ];
+
+}

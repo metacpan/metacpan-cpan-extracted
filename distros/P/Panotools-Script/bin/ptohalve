@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Panotools::Script;
+use Getopt::Long;
+use Pod::Usage;
+
+my $path_output;
+my $help = 0;
+
+GetOptions ('o|output=s' => \$path_output,
+            'h|help' => \$help);
+
+pod2usage (-verbose => 2) if $help;
+
+my $path_pto = shift || pod2usage;
+die "Can't find $path_pto" unless -e $path_pto;
+
+my $p = new Panotools::Script;
+$p->Read ($path_pto);
+
+$p->Panorama->{w} = int ($p->Panorama->{w} / 2);
+$p->Panorama->{h} = int ($p->Panorama->{h} / 2);
+
+for my $i (@{$p->Image})
+{
+    die 'photo '. $i->{n} .' dimensions not multiple of two'
+      unless ($i->{w} %2 == 0 and $i->{h} %2 == 0);
+    $i->{w} /= 2;
+    $i->{h} /= 2;
+    $i->{d} /= 2 if $i->{d} =~ /^[-0-9.]+$/;
+    $i->{e} /= 2 if $i->{e} =~ /^[-0-9.]+$/;
+    $i->{Vx} /= 2 if $i->{Vx} =~ /^[-0-9.]+$/;
+    $i->{Vy} /= 2 if $i->{Vy} =~ /^[-0-9.]+$/;
+
+    if (defined $i->{S})
+    {
+        my @S = split (',', $i->{S});
+        @S = map {int ($_ / 2)} @S;
+        $i->{S} = join ',', @S;
+    }
+}
+
+for my $c (@{$p->Control})
+{
+    $c->{x} /= 2;
+    $c->{y} /= 2;
+    $c->{X} /= 2;
+    $c->{Y} /= 2;
+}
+
+for my $k (@{$p->Mask})
+{
+    my $string = $k->{p};
+    $string =~ s/"//g;
+    my @p = split (' ', $string);
+    @p = map {int ($_ / 2)} @p;
+    $k->{p} = '"'. (join ' ', @p) .'"';
+}
+
+$p->Write ($path_output);
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+ptohalve - rescale a panorama project
+
+=head1 SYNOPSIS
+
+ptohalve [options] --output halved.pto project.pto
+
+ Options:
+  -o | --output     Filename of scaled project (can be the the same as the input)
+  -h | --help       Outputs help documentation
+
+=head1 DESCRIPTION
+
+B<ptohalve> takes a hugin .pto project and halves all pixel dimensions.  It
+will fail if any photos have non-even pixel dimensions. If it succeeds you will
+need to rescale the photos to match:
+
+  mogrify -geometry 50% *.JPG
+
+Note, this tool is useful in conjunction with the L<ptodouble> tool which
+performs the opposite transform.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+L<ptodouble>
+
+=head1 AUTHOR
+
+Bruno Postle - July 2010.
+
+=cut

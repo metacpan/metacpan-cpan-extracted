@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+Device.pm
+Device.xs
+t/00_compile.t

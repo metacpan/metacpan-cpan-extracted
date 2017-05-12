@@ -1,0 +1,27 @@
+short-term TODOs:
+
+   - code cleanup
+   - logging what's worth logging, convert debug output into Log4Perl
+   - generating jop id# automatically
+   - cleanup strategy of memcached data after jobs are done
+   - compute statistics how well slices are balanced out
+
+midterm TODOs:
+
+   - pipelined processor should not retrieve intermediary results
+   - borrow more ideas from existing MR implementations (Perl, Python, ...)
+   - constructor parameters to test liveness of servers
+   - monitoring thread to extract status information as web service
+   - web interface to look at monitoring info
+   - increase of robustness against failures of
+          - workers
+          - memcacheds
+     also during one run (revive SSH'ed workers)
+
+   - support for testing algorithms
+   - fake memcached to allow automatic smoke testing 
+
+long-term TODOs:
+
+   - build an application library under Parallel::MapReduce::Apps::*
+   

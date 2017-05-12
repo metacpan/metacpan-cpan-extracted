@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/bad_ri_emplid.pl
+examples/create_map_group.pl
+examples/get_load_seq.pl
+examples/release_recsuite.pl
+examples/sqr_profiler.exe
+lib/PeopleSoft.pm
+lib/PeopleSoft/EPM.pm
+lib/PeopleSoft/Tools.pm
+t/1.t

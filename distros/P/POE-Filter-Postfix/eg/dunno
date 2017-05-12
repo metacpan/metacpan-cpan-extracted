@@ -1,0 +1,72 @@
+#!perl
+#
+# trivial policy server that logs and returns DUNNO for all requests.
+
+use strict;
+use warnings;
+
+END {
+  Dunno->new;
+  POE::Kernel->run;
+}
+
+package Dunno;
+our $VERSION = '0.003';
+
+
+use MooseX::POE;
+use POE::Filter::Postfix::Plain;
+use POE::Wheel::SocketFactory;
+use POE::Wheel::ReadWrite;
+use Socket;
+
+has path => (is => 'ro', default => '/tmp/dunno.sock');
+has server => (is => 'ro', lazy_build => 1);
+has clients => (is => 'ro', default => sub { {} });
+
+sub _build_server {
+  my ($self) = @_;
+  return POE::Wheel::SocketFactory->new(
+    SocketDomain => AF_UNIX,
+    Reuse => 1,
+    BindAddress => $self->path,
+    SuccessEvent => 'accept',
+    FailureEvent => 'server_error',
+  );
+}
+
+sub START {
+  my ($self) = @_;
+  if (-e $self->path) {
+    unlink $self->path or die $!;
+  }
+  $self->server;
+  warn "listening on " . $self->path . "\n";
+}
+
+event accept => sub {
+  my ($self, $sock) = @_[OBJECT, ARG0];
+  my $wheel = POE::Wheel::ReadWrite->new(
+    Handle => $sock,
+    Filter => POE::Filter::Postfix::Plain->new,
+    InputEvent => 'request',
+    ErrorEvent => 'client_error',
+  );
+  $self->clients->{$wheel->ID} = $wheel;
+};
+
+event server_error => sub {
+  die "server error: @_";
+};
+
+event request => sub {
+  my ($self, $attr, $id) = @_[OBJECT, ARG0..ARG1];
+  use Data::Dumper; warn Dumper($attr);
+  $self->clients->{$id}->put({ action => 'DUNNO' });
+};
+
+event client_error => sub {
+  my ($self, $id) = @_[OBJECT, ARG3];
+  warn "client $id got error\n";
+  delete $self->clients->{$id};
+};

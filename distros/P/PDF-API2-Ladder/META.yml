@@ -1,0 +1,31 @@
+---
+abstract: 'Creates PDFs a line at a time, much like the rungs on a ladder.'
+author:
+  - 'Sean Zellmer <sean@lejeunerenard.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.027
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PDF-API2-Ladder
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  PDF::API2: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/HighgateCross/PDF-API2-Ladder/issues
+  homepage: https://github.com/HighgateCross/PDF-API2-Ladder
+  repository: https://github.com/HighgateCross/PDF-API2-Ladder.git
+version: 0.03

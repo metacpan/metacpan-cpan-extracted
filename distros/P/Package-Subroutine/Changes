@@ -1,0 +1,65 @@
+Changelog of Package-Subroutine
+###############################
+
+0.22 Mi 29. Feb. 2012
+     - increase version number
+
+0.21.1 Di 28. Feb. 2012
+     - add DOES to tested methods only if it exists
+
+0.21 Mi 8. Feb 2012
+     - Add Class::ISA as requirement
+     - new class methods findmethods and remove
+     - BUGFIX: mixin code was plain wrong
+
+0.20 Do 4. Aug 23:16:50 CEST 2011
+     - released with ShipIt
+     - removed xt/critic.t - because this modul is build around bad practice
+ 
+0.19 Do 4. Aug 23:01:00 CEST 2011
+     - delete t/09*-tests in favor of a xt directory
+     - check if it works with aliased
+
+0.18 Thu 23 Jul 2009
+     - export_to method
+
+0.16_3  Wed 27 May 2009
+     - check for spaces
+     - undocumented export_to_caller method
+
+0.16_1  Thu 14 Apr 2009
+     - fixed META.yml requires section
+     - switched to development version schema, let CPANTS do its magic
+     
+0.15  Thu 14 Apr 2009
+     - s/Package-Subroutine/Package::Subroutine/
+
+0.14  Sun 12 Apr 2009
+     - test MANIFEST
+     - first roll out
+
+0.13  Sat 11 Apr 2009
+     - documention fixed
+     - incomplete sub packages moved away
+
+0.12 
+     - let's mixin all methods from a package easily
+
+0.11 
+     - mixin alias
+     - ISA submodule
+     - unimport for Sugar
+
+0.06  Sat 7 Jul 2007
+     - rename to Package-Subroutine
+     - version and install method
+     - respawn from as syntactic sugar
+0.05 
+     - string syntax to import, was removed from the API
+
+0.04 
+     - shortcut _ for current package
+
+0.03
+     - a public release is poorly without tests.
+

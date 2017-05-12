@@ -1,0 +1,896 @@
+msgid "%1 wrote:"
+msgstr "%1 ha scritto:"
+
+msgid "%quant(%1,post)"
+msgstr "%quant(%1,messaggio,messaggi)"
+
+msgid "%quant(%1,Forum)"
+msgstr "%quant(%1,Forum,Forum)"
+
+msgid "%quant(%1,Reply)"
+msgstr "%quant(%1,Risposta,Risposte)"
+
+msgid "%quant(%1,reply)"
+msgstr "%quant(%1,risposta,risposte)"
+
+msgid "%quant(%1,View)"
+msgstr "%quant(%1,Lettura,Letture)"
+
+msgid "%quant(%1,view)"
+msgstr "%quant(%1,lettura,letture)"
+
+msgid "404 Not Found"
+msgstr "Errore 404"
+
+msgid "ACCEPT TERMS"
+msgstr "È necessario accettare i Termini e Condizioni per continuare ad utilizzare questo sito"
+
+msgid "Access Denied"
+msgstr "Accesso Negato"
+
+msgid "Access to this application is not permitted from %1"
+msgstr "Non è permesso accedere all'applicazione da %1"
+
+msgid "Activate Your %s Registration"
+msgstr "Attivare Registrazione %s"
+
+msgid "Active"
+msgstr "Attivo"
+
+msgid "ADD THREAD WATCH"
+msgstr "Aggiungi un Thread Watch"
+
+msgid "Add Reply"
+msgstr "Aggiungi Risposta"
+
+msgid "Add T-and-Cs"
+msgstr "Add T&amp;C"
+
+msgid "Add Watch"
+msgstr "Aggiungi Watch"
+
+msgid "ADMIN LOCK POST"
+msgstr "Chiudi questo messaggio"
+
+msgid "ADMIN SPECIFY LOCK THREAD"
+msgstr "Bisogna specificare il discussione da chiudere"
+
+msgid "ADMIN SPECIFY STICK THREAD"
+msgstr "Bisogna specificare il discussione di rilievo"
+
+msgid "Administration"
+msgstr "Amministrazione"
+
+msgid "ago"
+msgstr "fa"
+
+msgid "All Forums"
+msgstr "Tutti i Forum"
+
+msgid "All Rights Reserved"
+msgstr "Tutti i Diritti Riservati"
+
+msgid "An email has been sent to"
+msgstr "Un'email è stato mandato a"
+
+msgid "An error has occurred"
+msgstr "È stato riscontrato un errore"
+
+msgid "AUTHENTICATION FAILED"
+msgstr "Non è stato possibile effettuare l'autenticazione con le credenziali fornite"
+
+msgid "Avatar"
+msgstr "Avatar"
+
+msgid "Cancel"
+msgstr "Annulla"
+
+msgid "CHANGE AVATAR"
+msgstr "Cambia l'avatar selezionando un file e cliccando il bottone Upload qui sotto"
+
+msgid "Click on the login link to continue"
+msgstr "Cliccare sul link login per continuare"
+
+msgid "Close"
+msgstr "Chiudi"
+
+msgid "Comment"
+msgstr "Commenta"
+
+msgid "Confirm Password"
+msgstr "Conferma Password"
+
+msgid "Contents"
+msgstr "Contenuti"
+
+msgid "Continue"
+msgstr "Continua"
+
+msgid "Continue reading"
+msgstr "Continua lettura"
+
+msgid "Create New Thread"
+msgstr "Crea Nuovo Thread"
+
+msgid "created by"
+msgstr "creato da"
+
+msgid "created by (%1)"
+msgstr "creato da %1"
+
+msgid "Current Avatar"
+msgstr "Avatar Attuale"
+
+msgid "Current Forum"
+msgstr "Forum Attuale"
+
+msgid "Current User"
+msgstr "Utente Attuale"
+
+msgid "DATABASE CRITERIA MISSING"
+msgstr "Mancano criteri per la ricerca del database"
+
+msgid "DATABASE TOO MANY RECORDS"
+msgstr "La ricerca del database ha fornito troppi record"
+
+msgid "Default"
+msgstr "Default"
+
+msgid "DFV FIELDS MISSING"
+msgstr "Manca almeno un campo richiesto."
+
+msgid "DFV FIELDS INVALID"
+msgstr "Almeno un campo ha dati invalidi."
+
+msgid "DFV FILL REQUIRED"
+msgstr "Tutti i campi richiesti devono essere riempiti."
+
+msgid "EDIT LOCKED POST"
+msgstr "Non si può modificare un messaggio chiuso."
+
+msgid "EDIT LOGIN REQUIRED"
+msgstr "È necessario effettuare il login prima di modificare i propri post."
+
+msgid "EDIT OWN POSTS ONLY"
+msgstr "Si possono modificare solo i propri messaggi."
+
+msgid "Edit"
+msgstr "Modifica"
+
+msgid "Edited"
+msgstr "Modificato"
+
+msgid "Email Address"
+msgstr "Indirizzo Email"
+
+msgid "Email Engine"
+msgstr "Motore Email"
+
+msgid "EMAIL FAILED STORE"
+msgstr "Non è stato possibile archiviare l'informazione. Per favore provare più tardi."
+
+msgid "EMAIL IN USE (%1)"
+msgstr "L'indirizzo email fornito è già in uso.<br />Per favore provarne uno diverso o utilizzare la pagina <a href=\"%1\">Password Dimenticata</a>."
+
+msgid "EMAIL SEND PROBLEM"
+msgstr "È stato riscontrato un problema nel mandare un'email dal sistema"
+
+msgid "EMAIL MISSING SUBJECT"
+msgstr "Manca Oggetto"
+
+msgid "ENTER REPLY"
+msgstr "Scrivere la risposta nel modulo sottostante"
+
+msgid "FILE NOT IMAGE"
+msgstr "Il file uploadato sembra non essere un'immagine"
+
+msgid "FILE NEWDIR FAILED"
+msgstr "Non è stato possibile creare la directory. Archiviazione di upload fallita."
+
+msgid "FILE STORE FAILED"
+msgstr "Non è stato possibile archiviare l'upload."
+
+msgid "FILE TOO LARGE"
+msgstr "Le dimensioni del file sono troppo grandi. Il file non può avere dimensioni maggiori di 20K."
+
+msgid "First"
+msgstr "Primo"
+
+msgid "First Name"
+msgstr "Nome"
+
+msgid "Forgotten Password"
+msgstr "Password Dimenticata"
+
+msgid "Forum"
+msgstr "Forum"
+
+msgid "Forums"
+msgstr "Forum"
+
+msgid "Forum List"
+msgstr "Elenco di Forum"
+
+msgid "Forum Moderators"
+msgstr "Moderatori di Forum"
+
+msgid "Forum Name"
+msgstr "Forum Name"
+
+msgid "Forum Summary"
+msgstr "Sommario di Forum"
+
+msgid "FORUMNAME IN USE"
+msgstr "Il nome dato al forum è già in uso. Provare un nome diverso."
+
+msgid "FORUMNAME USED"
+msgstr "è già stato usato da un altro utente."
+
+msgid "General"
+msgstr "Generale"
+
+msgid "Guest User"
+msgstr "Utente Ospite"
+
+msgid "Go"
+msgstr "Vai"
+
+msgid "Help"
+msgstr "Aiuto"
+
+# Search for [....] _in_ [......]
+msgid "in"
+msgstr "in"
+
+msgid "Incomplete authentication URL"
+msgstr "Autenticazione URL Incompleta"
+
+msgid "Incomplete URL"
+msgstr "URL Incompleta"
+
+msgid "IP Bans"
+msgstr "Indirizzi IP banditi"
+
+msgid "IP Information"
+msgstr "IP Information"
+
+msgid "IP Logged"
+msgstr "IP Loggato"
+
+msgid "Invalid %1"
+msgstr "%1 invalido"
+
+msgid "Invalid requested value"
+msgstr "Valore richiesto invalido"
+
+msgid "Last"
+msgstr "Ultimo"
+
+msgid "Last Modified"
+msgstr "Ultima Modifica"
+
+msgid "Last Name"
+msgstr "Cognome"
+
+msgid "Last Post"
+msgstr "Ultimo Messaggio"
+
+msgid "last post by"
+msgstr "ultimo messaggio:"
+
+msgid "last post by (%1)"
+msgstr "ultimo messaggio: %1"
+
+msgid "Last Viewed"
+msgstr "Ultima Lettura"
+
+msgid "LOCK AFTER POSTING"
+msgstr "Chiudi discussione dopo aver inviato il messaggio"
+
+msgid "Lock Thread"
+msgstr "Chiudi Thread"
+
+msgid "Locked"
+msgstr "Chiuso"
+
+msgid "Locked Post"
+msgstr "Messaggio Chiuso"
+
+msgid "Locked Topic"
+msgstr "Discussione Chiusa"
+
+msgid "LOGIN ADD REPLY"
+msgstr "Bisogna aver effettuato il login prima di potere scrivere una risposta."
+
+msgid "LOGIN NEW TOPIC"
+msgstr "Bisogna aver effettuato il login prima di aggiungere una discussione."
+
+msgid "LOGIN REQUIRED"
+msgstr "Bisogna aver effettuato il login prima di poter accedere qui."
+
+msgid "LOGIN THREAD CONTINUE"
+msgstr "Bisogna aver effettuato il login prima di poter usare la funzione continuazione discussione."
+
+msgid "LOGIN USE NEW"
+msgstr "Effettuare login usando nome utente e la <u>nuova</u> password."
+
+msgid "LOGIN VIEW WATCHES"
+msgstr "Bisogna aver effettuato il login prima di potere vedere i discussione seguiti."
+
+msgid "LOGIN WATCH TOPIC"
+msgstr "Bisogna aver effettuato il login prima di poter seguire una discussione."
+
+msgid "Logged in as"
+msgstr "Utente:"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Login Not Allowed"
+msgstr "Login Non Permesso"
+
+msgid "Logins are not permitted from %1"
+msgstr "Login non permessi da %1"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "Manage"
+msgstr "Amministra"
+
+msgid "Manage user roles"
+msgstr "Amministra ruoli utenti"
+
+msgid "Me"
+msgstr "Personale"
+
+msgid "Main Page"
+msgstr "Pagina Principale"
+
+msgid "Message"
+msgstr "Messaggio"
+
+msgid "Moderate"
+msgstr "Moderare"
+
+msgid "My Preferences"
+msgstr "Preferenze"
+
+msgid "My Profile"
+msgstr "Profilo"
+
+msgid "My Watched Threads"
+msgstr "Thread Seguiti"
+
+msgid "Name"
+msgstr "Nome"
+
+msgid "Never Posted"
+msgstr "Mai Scritto Messaggi"
+
+msgid "New Password"
+msgstr "Nuova Password"
+
+msgid "Next"
+msgstr "Prossimo"
+
+msgid "Nickname"
+msgstr "Nick"
+
+msgid "No"
+msgstr "No"
+
+msgid "No Moderators"
+msgstr "Non ci sono moderatori"
+
+msgid "No posts"
+msgstr "Non ci sono messaggi"
+
+msgid "No reason given"
+msgstr "Non è data nessuna ragione"
+
+msgid "NO MATCHING USERS"
+msgstr "Non ci sono utenti che corrispondo alle informazioni fornite"
+
+msgid "NO RECENT THREADS"
+msgstr "Non ci sono discussione recenti da visualizzare"
+
+msgid "NO SEARCH RESULTS"
+msgstr "La ricerca non ha fornito risultati"
+
+msgid "NO SITE TERMS"
+msgstr "Il sito non ha Termini e Condizioni"
+
+msgid "No Such Form"
+msgstr "Il modulo non esiste"
+
+msgid "No User Avatar"
+msgstr "L'utente non ha un Avatar"
+
+msgid "No User Specified"
+msgstr "Nessun utente specificato"
+
+msgid "non-integer forum id passed"
+msgstr "L'id del forum non è un numero intero"
+
+msgid "non-integer post id passed"
+msgstr "L'id del messaggio non è un numero intero"
+
+msgid "non-integer thread id passed"
+msgstr "L'id del discussione non è un numero intero"
+
+msgid "non-integer user id passed"
+msgstr "L'id dell'utente non è un numero intero"
+
+msgid "None"
+msgstr "Nessuno"
+
+msgid "No moderators"
+msgstr "Non ci sono moderatori"
+
+msgid "Notifications"
+msgstr "Avvertimenti"
+
+msgid "Not Authenticated"
+msgstr "Non Autenticato"
+
+msgid "of"
+msgstr "di"
+
+msgid "or"
+msgstr "o"
+
+msgid "Page"
+msgstr "Pagina"
+
+msgid "Page %1 of %2"
+msgstr "Pagina %1 di %2"
+
+msgid "PASSWORD DETAILS SENT"
+msgstr "Nei prossimi minuti dovrebbe essere mandata un'email con ulteriori istruzioni per aggiornare la password."
+
+msgid "PASSWORD EMAIL SEND FAILED"
+msgstr "Il sistema non è riuscito a mandare l'email di aggiornamento password."
+
+msgid "PASSWORD ENTER DETAILS"
+msgstr "Scrivere nome utente e password"
+
+msgid "PASSWORD GAIN"
+msgstr "Per accedere all'account si può mandare un'email per effettuare un reset della password."
+
+msgid "PASSWORD IMPOSSIBLE"
+msgstr "Questo rende impossibile fornire la password, anche se viene dimenticata."
+
+msgid "PASSWORD PROCEED"
+msgstr "Per continuare fornire il nome utente o l'indirizzo email utilizzati per la registrazione."
+
+msgid "PASSWORD RESET"
+msgstr "Per cambiare la password scrivere il nome utente e la nuova password nei campi sottostanti, poi cliccare il bottone <em>cambiare la password</em> per continuare."
+
+msgid "PASSWORD RESET ID BOGUS"
+msgstr "URL Reset Password Invalido"
+
+msgid "PASSWORD RESET SUCCESS"
+msgstr "La password è stata aggiornata."
+
+msgid "PASSWORD RESET URL INCOMPLETE"
+msgstr "URL Reset Password Incompleta."
+
+msgid "PASSWORD STORES"
+msgstr "archivia una copia criptata della password o dell'email usati per la registrazione."
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Password Reminder"
+msgstr "Dimenticato la Password?"
+
+msgid "person"
+msgstr "persona"
+
+msgid "Please choose a language"
+msgstr "Scegli una lingua"
+
+msgid "Please enter your information"
+msgstr "Per favore fornire le proprie informazioni"
+
+msgid "Please enter suspension information"
+msgstr "Immettere informazioni riguardanti la sospensione"
+
+msgid "Please enter your username and password"
+msgstr "Per favore fornire il nome utente e la password"
+
+msgid "people"
+msgstr "persone"
+
+msgid "posted by"
+msgstr "inviato da"
+
+msgid "Post Edited By: %1"
+msgstr "Messaggio Modificato Da: %1"
+
+msgid "Posted from %1"
+msgstr "Inviato da %1"
+
+msgid "Posting Not Allowed"
+msgstr "Non è permesso inviare messaggi"
+
+msgid "Posting is not permitted from %1"
+msgstr "Non è permesso inviare messaggi da %1"
+
+msgid "Posts"
+msgstr "Messaggi"
+
+msgid "posts"
+msgstr "messaggi"
+
+msgid "Posts Made"
+msgstr "Messaggi Scritti"
+
+msgid "PREFS ADD WATCHES"
+msgstr "Aggiorna watch per messaggi nuovi automaticamente"
+
+msgid "PREFS DESIRED LOCATION"
+msgstr "Scegliere il paese di provenienza. Questa informazione sarà usata per visualizzare l'ora di scrittura dei messaggi calcolando i fusi orari."
+
+msgid "PREFS EMAIL NOTIFICATION"
+msgstr "Ricevere email di notifica per discussione sotto osservazione"
+
+msgid "Preview"
+msgstr "Preview"
+
+msgid "Previous"
+msgstr "Precedente"
+
+msgid "PROFILE NOT FOUND"
+msgstr "Non è possibile trovare il profilo dell'utente richiesto."
+
+msgid "Post New Terms"
+msgstr "Aggiornare i Termini"
+
+msgid "Post New Topic"
+msgstr "Crea Nuova Discussione"
+
+msgid "Quote"
+msgstr "Cita"
+
+msgid "Reason for suspension"
+msgstr "Ragione per sospensione"
+
+msgid "Recently Updated Threads"
+msgstr "Thread Aggiornati Recentemente"
+
+msgid "Registration Not Allowed"
+msgstr "Non è permesso effettuare la registrazione"
+
+msgid "Registrations are not permitted from %1"
+msgstr "Non è permesso effettuare la registrazione da %1"
+
+# "Sign Up"
+msgid "Register"
+msgstr "Crea un account"
+
+msgid "Registration Complete"
+msgstr "Registrazione Completata"
+
+msgid "Remove Watch"
+msgstr "Rimuovi Watch"
+
+msgid "REPLY LOCKED THREAD"
+msgstr "Non è possibilie rispondere a discussione chiusi."
+
+msgid "Reply"
+msgstr "Rispondi"
+
+msgid "Replying To"
+msgstr "Rispondendo a"
+
+msgid "Reset My Password"
+msgstr "Cambiare la Password"
+
+msgid "Return to"
+msgstr "Ritornare a"
+
+msgid "Return to the forum"
+msgstr "Ritornare al forum"
+
+msgid "Reset Your %s Password"
+msgstr "Resettare la password di %s"
+
+msgid "said"
+msgstr "ha detto"
+
+msgid "Search"
+msgstr "Cerca"
+
+msgid "Search For"
+msgstr "Trova"
+
+msgid "Search Results"
+msgstr "Risultati Ricerca"
+
+msgid "Searching for"
+msgstr "Cercando per"
+
+msgid "Select Zone"
+msgstr "Seleziona Fuso Orario"
+
+msgid "Service"
+msgstr "Servizio"
+
+msgid "Services"
+msgstr "Servizi"
+
+msgid "Show timezone"
+msgstr "Visualizza Fuso Orario"
+
+msgid "Sign Up"
+msgstr "Crea Account"
+
+msgid "SIGNUP COMPLETE FORM"
+msgstr "Completare il modulo sottostante per creare un nuovo account utente."
+
+msgid "SIGNUP EMAIL"
+msgstr "Indirizzo Email"
+
+msgid "SIGNUP EMAIL CONFIRM"
+msgstr "Conferma Indirizzo Email"
+
+msgid "SIGNUP EMAIL USAGE"
+msgstr "L'indirizzo email non verrà dato terzi. Verrà usato solamente per mandare un link di attivazione per il nuovo account. Se sono stati richiesti avvertimenti di aggiornamenti email a questo indirizzo verranno anche mandati email di notificazione."
+
+msgid "SIGNUP ERRORS"
+msgstr "Sono stati riscontrati i seguenti errori"
+
+msgid "SIGNUP FORUMNAME"
+msgstr "Nome Forum"
+
+msgid "SIGNUP FORUMNAME DESCRIPTION"
+msgstr "Il <em>Nome Forum</em> verrà visualizzato con tutti i messaggi scritti sui forum. I nomi dei forum sono tutti unici, quindi se si registrano due \"John Smith\", solo il primo verrà visualizzato come \"John Smith\" nei messaggi inviati."
+
+msgid "SIGNUP PASSWORD"
+msgstr "Password"
+
+msgid "SIGNUP PASSWORD CONFIRM"
+msgstr "Conferma Password"
+
+msgid "SIGNUP USERNAME"
+msgstr "Nome Utente"
+
+msgid "SITE MODERATOR REQUIRED"
+msgstr "Bisogna essere un moderatore del sito per accedere a questa sezione."
+
+msgid "Site"
+msgstr "Sito"
+
+#msgid "Snippet"
+#msgstr "Frammento"
+
+msgid "Snippet"
+msgstr "Frammento"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "Start A New Topic"
+msgstr "Crea una nuova discussione"
+
+msgid "Stick Thread"
+msgstr "Segnare come discussione di rilievo"
+
+msgid "Sticky"
+msgstr "Rilievo"
+
+msgid "Sticky Topic"
+msgstr "Discussione di Rilievo"
+
+msgid "Stop"
+msgstr "Stop"
+
+msgid "Subject"
+msgstr "Oggetto"
+
+msgid "Summary of Changes"
+msgstr "Sommario di Modifiche"
+
+msgid "Suspend Account"
+msgstr "Sospendi Account"
+
+msgid "Suspended"
+msgstr "Sospeso"
+
+msgid "TERMS ADD NEW"
+msgstr "Aggiungi Nuovi Termini &amp; Condizioni del sito"
+
+msgid "TERMS AGREE"
+msgstr "ACCETTO le condizioni sovrastanti"
+
+msgid "TERMS REJECT"
+msgstr "NON ACCETTO le condizioni sovrastanti"
+
+msgid "Terms and Conditions"
+msgstr "Termini &amp; Condizioni"
+
+msgid "Thanks for signing up"
+msgstr "Grazie per aver effettuato la registrazione"
+
+msgid "The following error message was returned by the application"
+msgstr "L'applicazione ha dato il seguente messaggio di errore"
+
+msgid "There is no current forum to view"
+msgstr "Non è stato selezionato un forum da visualizzare"
+
+msgid "There is no current thread to view"
+msgstr "Non è stato selezionato un discussione da visualizzare"
+
+msgid "THREAD NO INFORMATION"
+msgstr "Non ci sono informazioni per il discussione o il messaggio al quale si è provato a rispondere."
+
+msgid "THREAD NO POSTS"
+msgstr "Non si può rispondere a discussione che non contiene messaggi."
+
+msgid "THREAD WATCH FAILED"
+msgstr "Non è stato possibile aggiungere un watch ai discussione richiesti."
+
+msgid "Thread"
+msgstr "Thread"
+
+msgid "threads"
+msgstr "thread"
+
+msgid "Thread Locked"
+msgstr "Thread Chiuso"
+
+msgid "Time"
+msgstr "Ora"
+
+msgid "Time formatting example"
+msgstr "Esempio formattazione ora"
+
+msgid "Topic"
+msgstr "Discussione"
+
+msgid "Unauthorized!"
+msgstr "Non autorizzato!"
+
+msgid "Unknown field name"
+msgstr "Nome campo sconsociuto"
+
+msgid "Unlock Thread"
+msgstr "Apri Thread"
+
+msgid "Unread posts"
+msgstr "Messagi nuovi"
+
+msgid "Unstick Thread"
+msgstr "Rimuovi \'Rilievo\' da Thread"
+
+msgid "Update"
+msgstr "Aggiorna"
+
+msgid "Update Reply"
+msgstr "Aggiorna Risposta"
+
+msgid "Upload"
+msgstr "Upload"
+
+msgid "Use UTC"
+msgstr "Usare UTC"
+
+msgid "USER ACTIVATE"
+msgstr "Per attivare l'account cliccare sul link nella email"
+
+msgid "USER ALMOST THERE"
+msgstr "Quasi finito..."
+
+msgid "USER AUTHENTICATED"
+msgstr "La registrazione è stat autenticata"
+
+msgid "User Profile"
+msgstr "Profilo Utente"
+
+msgid "User Roles"
+msgstr "Ruoli Utente"
+
+msgid "User has never posted"
+msgstr "L'utente non ha mai inviato messaggi"
+
+msgid "USERNAME IN USE"
+msgstr "Il nome utente fornito è già in uso. Selezionare un altro nome."
+
+msgid "USERNAME INCORRECT"
+msgstr "Nome Utente Fornito Sbagliato."
+
+msgid "Username"
+msgstr "Nome Utente"
+
+msgid "Users"
+msgstr "Utenti"
+
+msgid "View"
+msgstr "Visualizza"
+
+msgid "view"
+msgstr "view"
+
+msgid "View all"
+msgstr "Visualizza tutti"
+
+msgid "views"
+msgstr "views"
+
+msgid "View Threads"
+msgstr "Visualizza Thread"
+
+msgid "Watch this thread"
+msgstr "Segui questo discussione"
+
+msgid "watching this thread"
+msgstr "questo discussione è sotto osservazione"
+
+msgid "We're not in Kansas any more"
+msgstr "Non siamo più in Kansas"
+
+msgid "wrote"
+msgstr "ha scritto"
+
+msgid "Yes"
+msgstr "Sì"
+
+msgid "You are not watching any threads"
+msgstr "Non stai seguendo alcun discussione"
+
+msgid "You are watching this thread"
+msgstr "Stai seguendo questo discussione"
+
+msgid "You don't have the required privileges to do that"
+msgstr "Non hai l'autorizzazione necessaria per farlo"
+
+msgid "Your Details"
+msgstr "Le tue Informazioni"
+
+msgid "Your Preferences"
+msgstr "Le tue Preferenze"
+
+msgid "Your %s Username"
+msgstr "Il tuo Nome Utente %s"
+
+
+# UNITS OF TIME
+
+msgid "second"
+msgstr "secondo"
+
+msgid "seconds"
+msgstr "secondi"
+
+msgid "minute"
+msgstr "minuto"
+
+msgid "minutes"
+msgstr "minuti"
+
+msgid "hour"
+msgstr "ora"
+
+msgid "hours"
+msgstr "ore"
+
+msgid "day"
+msgstr "giorno"
+
+msgid "days"
+msgstr "giorni"
+
+msgid "month"
+msgstr "mese"
+
+msgid "months"
+msgstr "mesi"
+
+msgid "year"
+msgstr "anno"
+
+msgid "years"
+msgstr "anni"
+

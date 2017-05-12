@@ -1,0 +1,222 @@
+Revision history for Panotools::Script.
+
+0.28
+    - new tool: nona-svg - stitch a vector panorama image
+    - new tool: pto2gpano - add GPano XMP metadata
+    - ptovariable: support XYZ translation parameters
+    - match-n-shift: create a project based on a CSV list input file
+    - support new Tpy,Tpp yaw and pitch of remapping plane for translation
+    - match-n-shift try and calculate fov correctly for portrait and fisheye setups
+    - fix bug that failed tests with perl 5.17.*
+
+0.27
+    - remove linux desktop entries for tif2svg-gui enblend-svg process-masks-gui qtvr2erect-gui
+    - apparently there is a bsd called dragonfly
+    - new tool: ptoreset - reset photometric parameters in a .pto file
+    - fix gigatile bug with uncropped output (Emad ud din Bhatt)
+    - remove ptograph as superceded by Hugin layout mode
+    - skip Panotools::Makefile tests if no suitable make executable found
+    - some methods for fast querying of transformation coordinates via pano_trafo
+    - new tool: ptomorph - distort photos before stitching
+    - try and fix division by zero error when EXIF ExposureTime = 0 (Tobias Mueller)
+    - erect2planet and erect2mercator now take multiple input files
+
+0.26
+    - ptoanchor now uses cpfind instead of autopano-sift-c, requires Hugin 2010.4.0
+    - Panotools::Makefile fixes for irix/solaris
+    - tests: workaround math on Darwin
+    - tests: Use 'copy' instead of 'cp' on windows when running tests
+    - new tools: ptohalve and ptodouble - resizes pto project files
+    - fix Transform() and other potential bugs with linked stacks
+
+0.25
+    - Image Radius() method and Panotools::Script OptimalWidth() method
+    - match-n-shift calculate panorama pixel size
+    - match-n-shift populate white balance from EXIF data
+    - gigastart 'images' target
+    - ptofill: --ignoregroups option to force matching between unconnected groups
+    - new tool: entile - splits images to google-maps style tiles
+    - new tool: gmaptemplate - HTML template for viewing tiled images with Google Maps API
+    - new tool: gigatile - crude stitching for very large panoramas
+    - new tool: lens-submit - collect lens and EXIF data
+    - remove GraphViz build dependency as ptograph is superceded by Hugin layout mode
+    - bugfix: pafextract was miscalculating FoV (Pablo d'Angelo)
+    - Support new Mask 'k' line
+
+0.24
+    - new tool: ptoanchor - add control points to a Hugin project
+    - new tool: ptochain - add control points to a Hugin project between consecutive photos
+    - new tool: ptobind - Join the ends of linked photos in a Hugin project
+    - new tool: ptofill - add control points to a Hugin project between likely overlapping photos
+    - new tool: pto2mk2 - Create a Makefile for stitching
+    - new tool: gigastart - assemble multi-row panoramas
+    - rewrite panostart to use ptoanchor
+    - rewrite match-n-shift to use ptoanchor
+    - rewrite ptovariable, CLI not the same
+    - bugfix: crash in Subset() when project has no image metadata
+    - bugfix: tif2svg,enblend-svg fix --jpeg-proxies option (Thomas Modes)
+    - bugfix: match-n-shift fix detection of longest exposure in bracketed sets
+    - bugfix: a full set of defaults are written to new .pto projects
+    - bugfix: support P parameter in p-lines
+    - bugfix: ptomerge fix mixing absolute and relative paths
+    - feature: match-n-shift will get FoV and Eev from EXIF data
+    - feature: panostart and match-n-shift use EXIF ExposureMode for detection of bracketed stacks
+    - feature: erect2cubic --face option to optionally specify cubeface pixel size
+    - feature: ptoinfo reports on stacks and exposure layers
+    - feature: support i-line TiX,TiY,TiZ,TiS 'tilt' and TrX,TrY,TrZ 'XYZ transform' parameters in libpano13-2.9.1
+    - factored Makefile generator to Panotools::Makefile
+    - factored EXIF handling to Panotools::Photos
+    - Panotools::Script new methods: Stacks() ExposureLayers() ConnectedGroups() Connections() UnifyLenses() LinkStacks() AngularDistance()
+    - Panotools::Script::Line::Image new accessor methods: Path(), v() a() b() etc...
+
+0.23
+    - Add new projections to pod documentation and ptoinfo output
+    - Add empty 'v' line to all output as panotools chokes without 'v' lines
+    - New enfuse-mask tool based on enblend-mask
+    - New ptodummy tool for creating missing input photos
+    - panostart: create default Makefile if no output specified
+    - support 'i' line 'j' parameter introduced in gsoc layout project
+
+0.22
+    - Use ImageMagick to workaround matchpoint alpha channel bug
+    - panostart --nostacks option for point-and-shoot sequences with random exposure
+    - match-n-shift workaround EXIF exposure time in both decimal and fractions
+    - unfinished tool ptovariable for setting optimisation parameters
+    - match-n-shift does photometric optimisation unless --stacks specified
+    - erect2qtvr uses sips instead of ImageMagick on OS X
+    - remove pto2fulla as superceded by tca_correct
+    - remove pto2tiff as superceded by pto2mk
+
+0.21
+    - ptoclean, don't give autooptimiser projects with invalid lenses
+    - ptosplit choked on images without associated 'v' lines (Ryan Helinski)
+    - new tool ptsed for editing project files, also useful for converting
+      .pto projects to PToptimizer compatible scripts (Iouri Ivliev)
+    - ptscluster tool for removing bad control points, uses PToptimizer
+      output from libpano13-2.9.14 or later (Iouri Ivliev)
+
+0.20
+    - Centre() method to try and place images in middle of the panorama
+    - new tool ptocentre
+    - panostart rules for building qtvr, mercator, planet views etc...
+    - Write() update 'o' lines when writing if project already contains 'o' lines
+    - Merge() only merge image metadata if already existing
+    - tif2svg only trace outlines if --trace option given
+    - ptoget and ptoset tools to query and set global project parameters
+
+0.19
+    - add pafextract to MANIFEST
+
+0.18
+    - pafextract tool for using panoglview as a pteditor replacement
+    - panostart MAKE_EXTRA_ARGS passed to make
+    - panostart rename -s parameter to -t
+    - panostart AP_EXTRA_ARGS passed to match-n-shift
+    - new Distance() method to report control point errors,
+      doesn't know about equirectangular/cylindrical input yet
+    - new Prune() and Stats() methods for working with control point errors
+    - ptoinfo reports global control point error distance
+    - new tool ptoclean control point reaper
+    - support for extra morph parameters (Iouri Ivliev)
+    - match-n-shift runs ptoclean with --align option
+
+0.17
+    - match-n-shift workaround PTmender failure with separate /tmp/
+    - match-n-shift write output even if no points found
+    - panostart --loquacious verbose output
+    - panostart use file date if no exif date
+    - panostart .PHONY rule
+    - panostart create rules for all output types
+
+0.16
+    - Read() and Write() accept STDIN and STDOUT using '-' placeholder
+    - ptosort now allows sorting many aspects of .pto projects (Felix Hagemann)
+    - Preserve 'disabled' flag for images (Felix Hagemann)
+    - match-n-shift --stacks option to use align_image_stack
+    - panostart does everything
+
+0.15
+    - Fix for ptograph negative coordinates (Felix Hagemann)
+    - ptosort now removes duplicate points too, Duplicates() method
+    - ptopath changes absolute to relative paths in .pto projects
+    - erect2mercator creates a pto project for generating mercator views
+    - ptosplit extracts subsets of .pto projects
+    - ptomerge merges .pto projects
+
+0.14
+    - match-n-shift uses PTmender instead of nona/ImageMagick (now much slower)
+    - new tool ptograph to visualise connections within a project
+    - remove dependency on Math::Matrix
+    - rationalise mixed licenses, now GPLv2+
+    - support optimising photometric parameters for vig_optimize
+    - ptosort for renumbering control points in spatial order
+    - Fix nona-mask to allow -o parameter anywhere, use -i parameter sanely (Felix Hagemann)
+    - enblend-svg, fix mask output (Serge Droz)
+
+0.13
+    - new match-n-shift control point finder tool
+    - fix crash in ptoinfo
+
+0.12
+    - remove Preview(), Optimise() and Stitch() methods
+    - enblend mask, merge mask rather than replace
+    - enblend-svg, render just masks, use enblend-mask to merge
+    - nona-mask, allow full command-line parameters
+    - pto2fulla align_image_stack based tca calculator
+    - ptoinfo hugin project reporting tool and gui wrapper
+    - erect2planet output pto project instead of rendering image
+    - read and write hugin image metadata and options in comment lines
+    - remove pto2tiff-gui due to conflict with hugin_stitch_project
+    - add .desktop files for Linux gui integration
+
+0.11
+    - replace Image::Magick with Image::Size for sizing images
+    - jpeg2qtvr fix CRLF bug on windows
+    - fix cubic2erect (Peter Crowley)
+
+0.09
+    - Stitch() method, fix stupid bug introduced by trying to fix windows bugs
+
+0.08
+    - tif2svg uses autotrace to generate initail vector masks
+    - enblend-svg converts to tiff and runs enblend rather than enblend-mask
+    - tif2svg and enblend-svg support creating jpg proxy images
+    - replaced tempfile with tempdir for windows, still broken on OS X
+
+0.07
+    - new tools: qtvr2erect, tif2svg, enblend-svg
+    - trivial zenity gui wrappers: enblend-svg-gui, erect2qtvr-gui, process-masks-gui, pto2tiff-gui, qtvr2erect-gui, tif2svg-gui
+    - fixes for recent hugin updates
+    - pto2tiff: don't generate cropped tiff images or specify blend levels
+    - portability fixes: process-masks, enblend-mask, pto2tiff, erect2qtvr
+
+0.06
+    - blend any input filetypes with enblend-mask
+    - prefer svg to tiff with enblend-mask
+    - add nona-mask
+    - allow setting STITCHER and OPTIMISER environment
+    - pass options to Stitch()
+    - New Clone() and Preview() methods
+    - New accessor methods: Mode(), Panorama(), Variable(), Image(), Output(), Control(), ControlMorph()
+    - Only pass optimisable variables to PTOptimizer but default to autooptimiser
+    - New exposure, white balance, output mode, bitdepth and camera response parameters supported by hugin/nona
+    - erect2qtvr add --yaw and --outfile options
+
+0.05
+    - change order of nona parameters for BSD (Milan Knizek)
+
+0.04
+    - add erect2qtvr
+
+0.03
+    - add jpeg2qtvr
+
+0.02
+    - Add Transform() method to rotate project files
+    - various bugfixes
+
+0.01
+    - rewritten in less crappy OO style (Bruno Postle)
+
+0.00 Sat May 04 13:01:00 2002
+    - various half working stuff (Bruno Postle)

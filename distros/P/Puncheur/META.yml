@@ -1,0 +1,77 @@
+---
+abstract: 'a web application framework'
+author:
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Puncheur
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Puncheur:
+    file: lib/Puncheur.pm
+    version: v0.3.0
+  Puncheur::Dispatcher::Lite:
+    file: lib/Puncheur/Dispatcher/Lite.pm
+  Puncheur::Dispatcher::PHPish:
+    file: lib/Puncheur/Dispatcher/PHPish.pm
+  Puncheur::Lite:
+    file: lib/Puncheur/Lite.pm
+  Puncheur::Plugin::HandleStatic:
+    file: lib/Puncheur/Plugin/HandleStatic.pm
+  Puncheur::Plugin::JSON:
+    file: lib/Puncheur/Plugin/JSON.pm
+  Puncheur::Plugin::Model:
+    file: lib/Puncheur/Plugin/Model.pm
+  Puncheur::Plugin::ShareDir:
+    file: lib/Puncheur/Plugin/ShareDir.pm
+  Puncheur::Request:
+    file: lib/Puncheur/Request.pm
+  Puncheur::Response:
+    file: lib/Puncheur/Response.pm
+  Puncheur::Runner:
+    file: lib/Puncheur/Runner.pm
+  Puncheur::Trigger:
+    file: lib/Puncheur/Trigger.pm
+recommends:
+  File::ShareDir: '0'
+  MIME::Base64: '0'
+  URL::Encode::XS: '0'
+requires:
+  Clone: '0'
+  Config::PL: '0'
+  Data::Section::Simple: '0'
+  Hash::MultiValue: '0'
+  JSON: '0'
+  Plack: '0'
+  Plack::Middleware::Session: '0'
+  Plack::Request::WithEncoding: '0'
+  Router::Boom: '1.00'
+  Text::Xslate: '0'
+  Tiffany: '0'
+  URI::QueryParam: '0'
+  URL::Encode: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/Songmu/Puncheur/issues
+  homepage: https://github.com/Songmu/Puncheur
+  repository: git://github.com/Songmu/Puncheur.git
+version: v0.3.0

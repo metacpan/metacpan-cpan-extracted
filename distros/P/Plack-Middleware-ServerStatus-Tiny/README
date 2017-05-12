@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Plack-Middleware-ServerStatus-Tiny,
+version 0.002:
+
+  tiny middleware for providing server status information
+
+This software is copyright (c) 2013 by Karen Etheridge.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

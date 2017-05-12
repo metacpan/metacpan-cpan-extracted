@@ -1,0 +1,20 @@
+=head1 Some links to test Pod::XML
+
+L<name>
+L<name/"sec">
+L<name/sec>
+L</"sec">
+L</sec>
+L<"sec">
+L<text|name>
+L<text|name/"sec">
+L<text|name/sec>
+L<text|/"sec">
+L<text|/sec>
+L<text|"sec">
+L<scheme://blah/>
+L<THIS WILL BREAK|scheme://blah/>
+L<File::Cwd>
+L<http://test/>
+L<file://test>
+

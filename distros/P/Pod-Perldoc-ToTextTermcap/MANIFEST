@@ -1,0 +1,7 @@
+lib/Pod/Perldoc/ToTextOverstrike.pm
+lib/Pod/Perldoc/ToTextTermcap.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

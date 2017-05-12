@@ -1,0 +1,133 @@
+NAME
+    Parallel::Workers - run worker tasks in parallel. Worker task is a
+    plugin that you can implement. The availables are Eval for CODE, SSH and
+    XMLRPC.
+
+VERSION
+    This document describes Parallel::Workers version *$VERSION*
+
+SYNOPSIS
+        use Parallel::Workers;
+    
+        #Workers that use Eval action with a trantransaction controller
+        #                 ^^^^
+    
+        my $worker=Parallel::Workers->new(maxworkers=>4,timeout=>10, backend=>"Eval");
+
+        my $id=$worker->create(hosts => \@named, command=>"`date`", 
+                               transaction=>{error=>TRANSACTION_TERM, type=>'SCALAR',regex => qr/.+/m});
+        my $info=$worker->info();
+    
+        #Workers that use SSH action with a trantransaction controller
+        #                 ^^^
+        $worker=Parallel::Workers->new(
+                                        maxworkers=>16,timeout=>10, 
+                                        backend=>"SSH", constructor =>{user=>'demo',pass=>'demo'}
+                                      );
+
+        $id=$worker->create(hosts => \@hosts, command=>"cat /proc/cmdline",
+                                          transaction=>{error=>TRANSACTION_TERM, type=>'SCALAR',regex => qr/.+/m}); 
+
+DESCRIPTION
+    This *Parallel::Workers* allow you to run multiples tasks in parallel
+    with or without error check (see *Parallel::Workers::Transaction*).
+
+    You can specify maxworkers value that limit the max parallel task
+    (threads pool). You can specify the backend that run the task, currently
+    only Eval, SSH and XMLRPC are implemented, but you can make yours for
+    your needs.
+
+    Workers run simples tasks that return value. You can specify different
+    way to check the return value and on error you decide to stop or
+    continue the main workers (see *Parallel::Workers::Transaction*).
+
+            # workers TERM if return value is not in this regex /.+/m
+            $id=$worker->create(...,
+                                transaction=>{error=>TRANSACTION_TERM, type=>'SCALAR',regex => qr/.+/m }; 
+        
+            # workers TERM if return value is not 127
+            $id=$worker->create(...,
+                                transaction=>{error=>TRANSACTION_TERM, type=>'SCALAR',check => 127}; 
+
+            # workers TERM if return value is not an HASH
+            $id=$worker->create(...,
+                                transaction=>{error=>TRANSACTION_TERM, type=>'ARRAY'}; 
+
+            # workers CONTINUE on error
+            $id=$worker->create(...,
+                                transaction=>{error=>TRANSACTION_CONT, ...}; 
+
+METHODS
+  new([%h])
+    Constructor. %h is a hash of attributes :
+
+        maxworkers:16 , the max parallel tasks (threads)
+        timeout:10, the time in second before to kill thread (only when stop workers)
+        backend:undef, the task 
+        constructor:undef, the task constructor
+    
+  info()
+      return all workers results
+  
+  create(hosts => @hosts, spawn=>0, command=>$cmd, params=>%h|@a|$r, transaction=>%h)
+  stop
+  clear
+  join
+DIAGNOSTICS
+    "Error message here, perhaps with %s placeholders"
+        [Description of error here]
+
+    "Another error message here"
+        [Description of error here]
+
+        [Et cetera, et cetera]
+
+CONFIGURATION AND ENVIRONMENT
+    Parallel::Workers requires no configuration files or environment
+    variables.
+
+DEPENDENCIES
+    None.
+
+INCOMPATIBILITIES
+    None reported.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-parallel-jobs@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+AUTHOR
+    Olivier Evalet "<evaleto@gelux.ch>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2006, Olivier Evalet "<evaleto@gelux.ch>". All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

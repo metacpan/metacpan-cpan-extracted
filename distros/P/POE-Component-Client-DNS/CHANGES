@@ -1,0 +1,37 @@
+==================================================
+Changes from 2014-11-12 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.054 at 2015-11-12 15:26:29 +0000
+------------------------------------------
+
+  Change: 3c9796c2513572da0a41e1ef55db9f86c8b41c59
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-11-12 10:24:50 +0000
+
+    Support Net::DNS 1.03. 
+
+  Change: 1cea2d126d1d32dc3ecb01e90a0cdef6541127ce
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2015-11-12 10:24:50 +0000
+
+    Udpate Dist::Zilla configuration for changes to plugins. 
+
+  Change: a6be0cf34adb445e82a166506a42f07e86f3d929
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-09-06 14:02:05 +0000
+
+    Merge pull request #2 from Hugmeir/master
+
+    /etc/hosts in Android is in /system/etc/hosts 
+
+  Change: 8f45959868c5154741c0162178c3a95308ede185
+  Author: Brian Fraser <fraserbn@gmail.com>
+  Date : 2014-07-27 14:42:40 +0000
+
+    /etc/hosts in Android is in /system/etc/hosts 
+
+=================================================
+Plus 19 releases after 2014-11-12 00:00:00 +0000.
+=================================================

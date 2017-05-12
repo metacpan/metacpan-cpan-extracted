@@ -1,0 +1,147 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+
+use Config;
+use Perldoc::Search;
+use Shell::POSIX::Select;
+use File::Basename;
+use Getopt::Std;
+use Pod::Simple::TextContent;
+
+our $LESS = "/usr/bin/less";
+
+getopts("u", \my %opts);
+
+my $searcher = Perldoc::Search->new();
+
+if($opts{u}) {
+    print "This will take a couple of minutes, please stand by.\n";
+    $searcher->update();
+    print "Done\n";
+} elsif(@ARGV) {
+    search();
+}
+
+###########################################
+sub search {
+###########################################
+
+    # Search documents containing both "swish" and "install"
+    my @hits = $searcher->search("@ARGV");
+
+    if ( !@hits ) {
+        print "No Results\n";
+        return;
+    }
+
+    my @select  = ();
+    my %map     = ();
+
+        # Shut up the goofy  Shell::POSIX::Select implementation
+    our($Eof, $Reply);
+
+    for my $hit (@hits) {
+        if(! defined $hit) {
+            die "Before searching, please run the indexer: perldig -u\n";
+        }
+        my $path = my $org_path = $hit->path();
+        $path = $searcher->relative($path);
+        push @select, $path;
+        $map{$path} = $org_path;
+    }
+
+    @select = sort @select;
+
+    select my $file (@select) {
+        system "$LESS $map{$file}";
+        last;
+    }
+}
+
+__END__
+
+=head1 NAME
+
+    perldig - Dig up keywords in the local Perl documentation
+
+=head1 SYNOPSIS
+
+       # Update the index (required before first start)
+    perldig -u
+
+       # Search for a keyword
+    perldig keyword(s)
+
+=head1 DESCRIPTION
+
+When using C<perldig> for the first time, a new index needs to be
+created. Just call
+
+    $ perldig -u
+
+and everything happens automatically: A crawler will detect locally
+installed Perl documentation pages, rummage through the POD and index
+them. When this initial run has been completed, C<perldig> is ready to
+process search requests:
+
+  $ perldig frobnicate
+
+  1) pod/perlguts.pod    2) pod/perlxstut.pod   3) pod/perlnewmod.pod
+
+  Enter number of choice: 
+
+The command above shows a search for the keyword C<frobnicate>. Yes,
+that's a word used in the Perl documentation! It shows three hits and
+asks the user to enter a number between 1 and 3 to open the selected
+documentation page in a pager program (typically C<less>). In there,
+an in-text search for the expression can be started by using the C</>
+(slash) command.
+
+If two or more keywords are given, the search will yield pages that
+contain all of them. When searching for phrases, please include quotes
+(make sure to quote the quotes so the shell doesn't eat them):
+
+   $ perldig '"floating point"'
+
+The underlying I<swish-e> search engine also understands expressions
+connected via AND and OR:
+
+  $ perldig "'floating point' AND approximate AND 'real number'"
+
+To keep the index up to date, it is probably a good idea to run a
+cronjob every morning:
+
+    00 4 * * * /usr/bin/perldig -u >/dev/null 2>&1
+
+If you can read German, please check out this article in the "Linux-
+Magazin", where this script was originally published:
+
+    http://www.linux-magazin.de/Artikel/ausgabe/2003/10/perl/perl.html
+
+=head1 EXAMPLES
+
+    # Update/create the index 
+  $ perldig -u
+  
+  $ perldig frobnicate
+
+  1) pod/perlguts.pod    2) pod/perlxstut.pod   3) pod/perlnewmod.pod  
+
+  Enter number of choice: 1
+  [ ... perlguts man page shows ... ]
+
+=head1 FILES
+
+C<perldig> puts the I<swish-e> index files into the folder C<.perldig>
+in the user's home directory.
+
+=head1 LEGALESE
+
+Copyright 2003-2005 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2003, Mike Schilli <m@perlmeister.com>

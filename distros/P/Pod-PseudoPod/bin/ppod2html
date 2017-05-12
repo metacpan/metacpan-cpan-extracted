@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+######################################################################
+#
+# A sample PseudoPod to HTML converter script that uses
+# Pod::PseudoPod::HTML.
+#
+# usage:
+#
+# $ ppod2html filename1.pod filename2.pod
+#
+# Will produce one html file for each pod file passed in.
+#
+#   filename1.html
+#   filename2.html
+#
+######################################################################
+
+use strict;
+use Pod::PseudoPod::HTML;
+use File::Basename;
+
+foreach my $file (@ARGV) {
+	my $parser = Pod::PseudoPod::HTML->new();
+
+	# HTML output goes to the current working 
+	# directory not the source directory.
+	my $outfile = fileparse( $file, qr{\..*} ) . '.html';
+	
+	open HTMLOUT, ">$outfile" or die "Can't write to $outfile: $!";
+	$parser->output_fh(*HTMLOUT);
+
+	$parser->add_body_tags(1);     # output a complete html document
+	$parser->add_css_tags(1);      # add css tags for cleaner display
+
+	$parser->no_errata_section(1); # don't put errors in doc output
+	$parser->complain_stderr(1);   # output errors on STDERR instead
+
+	if (-e $file) {
+		$parser->parse_file($file);
+	} else {
+		die "Unable to open file\n";
+	}
+	close HTMLOUT;
+}
+
+exit;

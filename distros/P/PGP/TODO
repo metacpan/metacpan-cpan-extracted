@@ -1,0 +1,10 @@
+Things as of 0.3alpha that need to be done:
+
+	+ Correct pod documentation
+	+ Improve PGP::Keyring::Find method
+	+ Create test scripts
+	+ Find and fix possible bugs with Makefile.PL
+	+ Split Pipe.pm into Pipe.pm, Keyring.pm, Key.pm
+	+ Find a way to generate keys from script
+	+ Verbose output for PGP::Keyring::List_Keys
+	+ Fix code for using strict mode	

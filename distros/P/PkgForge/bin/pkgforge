@@ -1,0 +1,119 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# $Id: pkgforge.in 15227 2011-01-07 10:59:03Z squinney@INF.ED.AC.UK $
+# $Source:$
+# $Revision: 15227 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/PkgForge/PkgForge_1_4_8/bin/pkgforge.in $
+# $Date: 2011-01-07 10:59:03 +0000 (Fri, 07 Jan 2011) $
+
+our $VERSION = '1.4.8';
+
+use PkgForge::Tool;
+
+PkgForge::Tool->run;
+
+__END__
+
+=head1 NAME
+
+pkgforge - The Package Forge source code builder tool suite
+
+=head1 VERSION
+
+This documentation refers to pkgforge version 1.4.8
+
+=head1 USAGE
+
+    pkgforge submit --bucket lcfg
+
+=head1 DESCRIPTION
+
+This is a command-line tool which allows you to issue various commands
+to the Package Forge source code build suite.
+
+=head1 COMMANDS
+
+There are two built-in commands:
+
+=over
+
+=item help [command name]
+
+If you call the C<help> command with no arguments it will list all the
+supported commands. If you also specify a particular command name it
+will show all the available command-line options for that specfic
+command.
+
+=item commands
+
+This command gives a list of all available commands.
+
+=back
+
+The following standard commands are each implemented with a separate
+Perl module. For full documentation you need to read the perldoc for
+the specific module. They are all in the C<PkgForge::App>
+namespace. It is possible to extend this list with extra, locally
+supplied, commands with Perl modules in the same namespace.
+
+Note that it is possible to use the shortest unique name for a command
+rather than typing the whole thing.
+
+=over
+
+=item submit - L<PkgForge::App::Submit>
+
+Submits a build job for a set of source packages that you want
+building.
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+Many of these commands can be configured via configuration files as
+well as via their command line options. You should read the
+documentation for the individual Perl modules to see what files are
+examined.
+
+=head1 EXIT STATUS
+
+After successfully running a command it will exit with code zero. An
+error will result in a non-zero error code.
+
+=head1 DEPENDENCIES
+
+This script uses L<PkgForge::Tool> which is L<Moose> powered and the
+L<MooseX::App::Cmd> module is used to handle the command-line
+interface.
+
+=head1 SEE ALSO
+
+L<PkgForge>, pkgforge-submit(1)
+
+=head1 PLATFORMS
+
+This is the list of platforms on which we have tested this
+software. We expect this software to work on any Unix-like platform
+which is supported by Perl.
+
+ScientificLinux5, Fedora13
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or problems (or praise!) to bugs@lcfg.org,
+feedback and patches are also always very welcome.
+
+=head1 AUTHOR
+
+Stephen Quinney <squinney@inf.ed.ac.uk>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 University of Edinburgh. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GPL, version 2 or later.
+
+=cut

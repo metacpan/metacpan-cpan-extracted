@@ -1,0 +1,47 @@
+Plack-Middleware-Options
+
+This module provides a Plack middleware that implements HTTP
+OPTIONS, and also sends a 405 for options that are not allowed.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Plack::Middleware::Options
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Plack-Middleware-Options
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Plack-Middleware-Options
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Plack-Middleware-Options
+
+    Search CPAN
+        http://search.cpan.org/dist/Plack-Middleware-Options/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Rob Hoelz
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,16 @@
+This is PGP::Mail. It is provided under the GPL or Artistic Licence
+at your preference. It was written as a solution to a problem that
+really ought to have a module on the CPAN, however, when I looked,
+I couldn't find one. There are umpteen better ways to write it, but
+most of them seemed to involve sub-classing large parts of
+MIME::Parser which I didn't want to have to do. In essence, the point
+is that for the moment, it is BALGE (By And Large, Good Enough). If
+you want to take it as a base, please feel free, if you want to send
+me patches, ditto.
+
+Consider it Alpha-quality software, however, but Alpha quality that
+works well enough for the simple job it currently does. See the
+perldoc for more information.
+
+Versions before 1.6 may encounter obscure line ending bugs where signatures
+fail to verify properly.

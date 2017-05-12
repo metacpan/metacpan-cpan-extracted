@@ -1,0 +1,18 @@
+Revision history for Parallel-Simple-Dynamic
+
+0.04	Thu Sut 15 12:12:00 2011
+	Corrected POD  
+	Edited Makefile.PL by adding information about depending modules (Class::Std and versions)
+	Removed t/pod* files
+
+0.03	Thu Jan 13 14:10:00 2011
+	Text/POD correction
+	Edited Makefile.PL by adding information about depending modules
+	Edited README file
+
+0.02	Thu Jan 06 18:00:00 2011 
+	Text/POD correction 
+
+0.01    Thu Jan 06 15:00:00 2011 
+        First version, initial release
+

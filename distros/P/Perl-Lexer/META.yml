@@ -1,0 +1,43 @@
+---
+abstract: 'Use Perl5 lexer as a library.'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Lexer
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Perl::Lexer:
+    file: lib/Perl/Lexer.pm
+    version: '0.23'
+  Perl::Lexer::Token:
+    file: lib/Perl/Lexer/Token.pm
+requires:
+  parent: '0'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/tokuhirom/Perl-Lexer/issues
+  homepage: https://github.com/tokuhirom/Perl-Lexer
+  repository: git://github.com/tokuhirom/Perl-Lexer
+version: '0.23'
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Kenichi Ishigaki <charsbar@users.noreply.github.com>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'

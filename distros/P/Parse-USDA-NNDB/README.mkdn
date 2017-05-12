@@ -1,0 +1,67 @@
+# NAME
+
+Parse::USDA::NNDB - download and parse the latest USDA National Nutrient Database
+
+# VERSION
+
+version 0.1
+
+# SYNOPSIS
+
+    use Parse::USDA::NNDB;
+    my $usda = Parse::USDA::NNDB->new($optional_cache_dir);
+    $usda->open_file( 'FD_GROUP' );
+    while (my $fg = $usda->getline) {
+        printf "ID: %s  DESC: %s\n", $fg->{NDB_No}, $fg->{Shrt_Desc};
+    }
+
+# DESCRIPTION
+
+Parse::USDA::NNDB is for parsing the nutrient data files made available by the
+USDA in ASCII format. If the files are not available, they will be automatically 
+retrieved and extracted for you.
+
+# METHODS
+
+- new($basedir)
+
+Creates a new Parse::USDA::NNDB object. Takes one optional argument, a path
+to the dir which contains the datafiles to be parsed.
+
+- __open_file($table)__
+
+Call with the case-insensitive name of the file, without extension, to open.
+You must call this before __get_line__.
+
+Returns true on success.
+
+- __get_line__
+
+After __open_file__, keep calling this to get the next line. Each line is a
+hashref (see USDA docs for their meanings).
+
+Returns undef when the file is finished or if something goes wrong.
+
+- __tables__
+
+Returns a list of all the known tables/filenames.
+
+- __get_columns_for($table)__
+
+Returns a list of the keys used in this file.
+
+# SEE ALSO
+
+[USDA documentation](http://www.ars.usda.gov/Services/docs.htm?docid=8964)
+
+# AUTHOR
+
+Ioan Rogers <ioan.rogers@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Ioan Rogers.
+
+This is free software, licensed under:
+
+    The Artistic License 2.0 (GPL Compatible)

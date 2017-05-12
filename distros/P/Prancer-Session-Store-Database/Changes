@@ -1,0 +1,8 @@
+Revision history for Perl extension Prancer-Session-Store-Database
+
+1.00
+	- Initial release.
+
+1.01 Sun Feb  1 17:21:55 UTC 2015
+	- Adding configuration option for setting additional dsn parameters.
+	- Adding configuration option for running database statements on connection.

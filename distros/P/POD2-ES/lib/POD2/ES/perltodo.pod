@@ -1,0 +1,26 @@
+=encoding utf8
+
+=head1 NAME
+
+perltodo - Vínculo a la lista de tareas pendientes de Perl
+
+=head1 DESCRIPCIÓN
+
+Puede ver la lista de tareas pendientes de Perl 5 en el repositorio git:
+L<http://perl5.git.perl.org/perl.git/blob/HEAD:/Porting/todo.pod>
+
+(La lista de tareas pendientes solía estar aquí, en perltodo. Hemos dejado de
+incluirla, puesto que un listado del estado actual que queda obsoleto en poco
+tiempo no tiene mucha utilidad).
+
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

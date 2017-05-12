@@ -1,0 +1,34 @@
+= Parsing Strings and Trees with `Parse::Eyapp` _(An Introduction to Compiler Construction)_ =
+
+*Casiano Rodriguez-Leon*
+
+_Dpto. Estadistica, I.O. y Computacion. Universidad de La Laguna _
+
+=== Abstract: ===
+
+[http://search.cpan.org/perldoc?Parse::Eyapp Parse::Eyapp] (Extended yapp) is a collection of modules that extends Francois Desarmenien Parse::Yapp 1.05. Eyapp extends yacc/yapp syntax with functionalities like named attributes, EBNF-like expressions, modifiable default action, automatic abstract syntax tree building, dynamic conflict resolution, translation schemes, tree regular expressions, tree transformations, scope analysis support, and directed acyclic graphs among others.
+
+This article teaches you the basics of Compiler Construction using [http://search.cpan.org/perldoc?Parse::Eyapp Parse::Eyapp] to build a translator from infix expressions to Parrot Intermediate Representation.
+
+----
+
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node1.html Introduction]
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node2.html A Fast Introduction to Parrot]
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node3.html The Phases of a Translator]
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node4.html Lexical Analysis]
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node5.html Syntax Analysis]
+    * [http://nereida.deioc.ull.es/~pl/eyapsimple/node6.html Ambiguities and Conflicts]
+    * [http://nereida.deioc.ull.es/~pl/eyapsimple/node7.html Building the AST]
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node8.html Tree Transformations]
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node9.html Resource Allocation]
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node10.html Code Generation]
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node11.html Peephole Transformations]
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node12.html Output Generation]
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node13.html Conclusions and Future Work]
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node14.html About the Author]
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node15.html Acknowledgements]
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node16.html Bibliography]
+  * [http://nereida.deioc.ull.es/~pl/eyapsimple/node17.html About this document ...]
+
+----
+ Procesadores de Lenguajes 2010-01-03

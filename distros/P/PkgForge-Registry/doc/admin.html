@@ -1,0 +1,296 @@
+<html>
+<head>
+<title>PkgForge Registry - Admin Guide</title>
+</head>
+<body>
+<h1>The Package Forge Registry Administrators Guide</h1>
+
+<p>The PkgForge Registry requires a PostgreSQL database. It is not
+currently possible to use any other database as a number of triggers
+and rules rely on the plpgsql language. This document assumes that you
+already have a database running and have administrator rights to
+create new users and databases (normally this is done as
+the <em>postgres</em> user).</p>
+
+<p>If LCFG is being used to manage the system then the best method for
+managing the database is to use the LCFG postgresql component. This
+can be used to configure the ACLs and run backups.</p>
+
+<h2>Installing the Software</h2>
+
+<p>The PkgForge and PkgForge-Registry packages must be
+installed. These are provided as RPMs but it is also possible to build
+and install them from the <code>.tar.gz</code> format in the same way
+as any other Perl module.</p>
+
+<p>Perl version 5.8.8 or newer is required. The PkgForge-Server
+package requires the following modules.</p>
+
+<ul>
+  <li><code>DBD::Pg</code></li>
+  <li><code>DBIx::Class</code></li>
+  <li><code>DateTime</code></li>
+  <li><code>DateTime::Format::Pg</code></li>
+  <li><code>Moose</code></li>
+  <li><code>MooseX::Types</code></li>
+  <li><code>Text::Abbrev</code></li>
+</ul>
+
+<p>If you are using LCFG this can all be installed by including
+the <code>lcfg/options/pkgforge-registry.h</code> header.</p>
+
+<h2>Initialisation</h2>
+
+<p>Note that steps 1 and 2 can be done using
+the <code>registry-init.sh</code> script provided in the
+PkgForge-Registry package. They are detailed here so that a full
+explanation can be provided.</p>
+
+<h3>Step 1: Create the roles</h3>
+
+<p>As the database administrator issue the following commands to create the
+database roles:</p>
+
+<pre>
+createuser --no-createrole --no-createdb --no-superuser pkgforge_admin
+createuser --no-createrole --no-createdb --no-superuser pkgforge_incoming
+createuser --no-createrole --no-createdb --no-superuser pkgforge_builder
+createuser --no-createrole --no-createdb --no-superuser pkgforge_web
+</pre>
+
+<p>Each distinct part of the service runs as a different database user
+to make it possible to restrict write access to only the essential
+tables. This is to prevent deliberate or accidental corruption of the
+data. The admin user owns the database and has complete access. In
+normal operation it is rare that admin access is required for
+modifying the data.</p>
+
+<h3>Step 2: Create the database</h3>
+
+<p>As the database administrator issue the following commands to create the
+database and add the necessary language support:</p>
+
+<pre>
+createdb --owner pkgforge_admin pkgforge
+createlang plpgsql pkgforge
+</pre>
+
+<h3>Step 3: Create the tables and rules</h3>
+
+<p>The final step is to create the tables, functions and rules for the
+database. This is done using the <code>registry-setup.sql</code>
+script which is provided as part of the PkgForge-Registry package. The
+SQL can be run using the <code>psql</code> command-line tool, like
+this:</p>
+
+<pre>
+psql --dbname pkgforge --host pkgforge --username pkgforge_admin --file registry-setup.sql
+</pre>
+
+<p>This assumes that the database server is running on a machine
+named <em>pkgforge</em> and that you have already configured it
+appropriately to allow access as the <em>pkgforge_admin</em> database
+user. If you have not done this then details are provided later in
+this document. The setup script can instead be run as
+the <em>postgres</em> database administrator user.</p>
+
+<h2>Backups</h2>
+
+<p>It is essential to take regular backups of the PkgForge Registry to
+provide security against loss of data because of a crash. The best way
+to do this is with <code>pg_dump</code> as part of a nightly cron
+job.
+
+<p>If the LCFG postgresql component is being used this cron job can be
+added using the LCFG cron component. For example:</p>
+
+<pre>
+!cron.objects                  mADD(pkgforgedb)
+cron.object_pkgforgedb         postgresql
+cron.method_pkgforgedb         run
+cron.args_pkgforgedb           backupdb pkgforge
+cron.run_pkgforgedb            00 22 * * *
+</pre>
+
+<p>That creates a cron job which will run at 22:00 each night and do a
+dump of the pkgforge database using the backupdb method of the LCFG
+postgresql component.</p>
+
+<p>Alternatively this can be done by creating a cron job which calls
+pg_dump directly, for example:</p>
+
+<pre>
+pg_dump --create pkgforge > pkgforge.$(date '+%Y%m%d').dump.sql
+</pre>
+
+<p>This will dump the pkgforge database as plain-text into a file
+which the date as part its name. The command to create the database
+will be prepended to the SQL file.</p>
+
+<p>In the event of a problem occurring, the storing of the data from
+each dump separately is incredibly useful. It makes it possible to
+walk back in time through the dumps to search for where corruption was
+first introduced.</p>
+
+<p>With the dumps done like this it is very easy to restore the
+database. Firstly, do the initialisation step 1, &quot;Create the
+Roles&quot;, which is explained above. After the roles are created the
+following command (as the database administrator) is all that is
+necessary.</p>
+
+<pre>
+psql -f pkgforge.20110501.dump.sql
+</pre>
+
+<p>This is also the best approach for moving the pkgforge database to
+a new host. Just take an additional dump then stop the database on the
+old server. To bring up the database on the new server do the restore
+process described above.</p>
+
+<h2>Access Control</h2>
+
+<p>Access control to PostgreSQL databases is managed through
+the <code>pg_hba.conf</code> and <code>pg_ident.conf</code>
+configuration files. On Redhat/Fedora systems these files are usually
+found in the <code>/var/lib/pgsql/data/</code> directory along with
+all the other configuration files for the server. You can usually
+access this most easily as <code>~postgres/data/</code></p>
+
+<p>PostgreSQL supports numerous different authentication mechanisms,
+for details see
+the <a href="http://www.postgresql.org/docs/">PostgreSQL
+documentation</a>. PkgForge should support any authentication
+mechanism which is supported by
+the <a href="http://search.cpan.org/~timb/DBI/">Perl DBI
+module</a>. Only password and kerberos based authentication has been
+tested though.
+
+<p>The design of the PkgForge system is that each sub-system
+(i.e. incoming queue processor, build daemon and web interface) have
+different database roles. This makes it possible to limit the
+write-access to just the essential set of tables for each role. This
+improves data security and reduces the risk of accidental or
+deliberate corruption. Going beyond that it is sensible to also
+restrict access to the database by IP address and to use SSL for the
+connections.</p>
+
+<h3>SSL Support</h3>
+
+<p>If you want to support SSL connections to the database server you
+need to add an X509 certificate and activate the
+postgresql <code>ssl</code> option in the <code>postgresql.conf</code>
+file. Using the LCFG components it can be done like this:</p>
+
+<pre>
+#include &lt;lcfg/options/postgresql-server.h>
+
+!postgresql.options	mADD(ssl)
+!postgresql.option_ssl	mSET(on)
+
+#include &lt;lcfg/options/x509-client.h>
+
+!x509.keys             mADD(pgssl)
+x509.service_pgssl     &lt;%profile.node%>.&lt;%profile.domain%>
+x509.keyfile_pgssl     &lt;%postgresql.pgauthdir%>/server.key
+x509.certfile_pgssl    &lt;%postgresql.pgauthdir%>/server.crt
+x509.chainfile_pgssl   &lt;%postgresql.pgauthdir%>/root.crt
+x509.uid_pgssl         &lt;%postgresql.pgowner%>
+x509.gid_pgssl         &lt;%postgresql.pggroup%>
+x509.component_pgssl   postgresql
+</pre>
+
+<p>If you are not using the LCFG x509 component you will need to
+create the SSL certificate manually.</p>
+
+<h3>Kerberos Support</h3>
+
+<p>If you want support for kerberos authentication in your database
+you will need a keytab and you will need to set
+the <code>krb_server_keyfile</code> configuration option in
+the <code>postgresql.conf</code> file. With LCFG you can do this using
+the kerberos component:</p>
+
+<pre>
+#include &lt;lcfg/options/kerberos-client.h>
+
+!kerberos.keys                  mADD(postgres)
+kerberos.keytab_postgres	&lt;%postgresql.pgauthdir%>/postgres.keytab
+kerberos.keytabuid_postgres	&lt;%postgresql.pgowner%>
+kerberos.keytabgid_postgres   	&lt;%postgresql.pggroup%>
+
+!postgresql.options                     mADD(krb_server_keyfile)
+postgresql.option_krb_server_keyfile	'&lt;%kerberos.keytab_postgres%>'
+</pre>
+
+<p>If you are not using the LCFG x509 component you will need to
+create the Kerberos keytab file manually. Note also that you would
+need to ensure that the UID and GID for the file are set
+correctly.</p>
+
+<h3>Example</h3>
+
+<p>On an LCFG-managed host the ACLs are handled by the LCFG postgresql
+component. Here is an example which uses kerberos authentication:</p>
+
+<pre>
+#include &lt;lcfg/options/postgresql-server.h>
+
+!postgresql.ident               mADD(pkgf1)
+postgresql.idmap_pkgf1          pkgforge
+postgresql.sysname_pkgf1        example1
+postgresql.pgname_pkgf1         pkgforge_admin
+
+!postgresql.hostssl             mADD(pkgf1)
+postgresql.ssldatabase_pkgf1    pkgforge
+postgresql.ssluser_pkgf1        pkgforge_admin
+!postgresql.ssladdress_pkgf1    mHOSTIP(host1.example.org)
+postgresql.sslnetmask_pkgf1     255.255.255.255
+postgresql.sslauthtype_pkgf1    krb5
+!postgresql.sslauthopt_pkgf1    mSET(map=&lt;%postgresql.idmap_pkgf1%>)
+</pre>
+
+<p>First, this creates a user mapping from the <code>example1</code>
+kerberos principal to the <code>pkgforge_admin</code> database
+role. That mapping appears in the <code>pg_ident.conf</code> file. The
+same mapping can be applied from any username to database role.</p>
+
+<p>
+Secondly, this adds an entry into the <code>pg_hba.conf</code>
+configuration file to allow kerberised aaccess for that database role
+from the <code>host1.example.org</code> host address.
+</p>
+
+<p>With this ACL in place the <code>example1</code> user can access
+the pkgforge database as the <code>pkgforge_admin</code> database role
+from the <code>host1.example.org</code> host using kerberos
+authentication like this:</p>
+
+<pre>
+% psql --dbname pkgforge --host pkgforge --username pkgforge_admin
+</pre>
+
+<p>This example LCFG configuration creates the following entry in
+the <code>pg_ident.conf</code> configuration file:</p>
+
+<pre>
+pkgforge    example1   pkgforge_admin
+</pre>
+
+<p>The first entry is the map name, the second is the system username
+and the third part is the database role.</p>
+
+<p>This example LCFG configuration creates an entry like this in
+the <code>pg_hba.conf</code> configuration file:</p>
+
+<pre>
+hostssl pkgforge pkgforge_admin 192.168.1.175 255.255.255.255 krb5 map=pkgforge
+</pre>
+
+<p>If you are not using the LCFG postgresql component you will need to
+edit these files manually. Once the configuration is done you will
+then also need to reload the database using the init script
+(usually <code>/etc/init.d/postgresql</code>).</p>
+
+</body>
+</html>
+

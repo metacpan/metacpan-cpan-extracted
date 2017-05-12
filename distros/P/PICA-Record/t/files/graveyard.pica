@@ -1,0 +1,62 @@
+001@ $0120,227
+001A $02001:07-01-09
+001B $01999:01-05-09$t12:14:15.000
+001D $00715:15-01-09
+001U $0utf8
+001X $00
+002@ $0Aau
+003@ $0588923168
+004A $A9783401063560$fEUR 16.95
+006G $0991841212
+006L $cDNB$0991841212
+006T $009N032779
+007G $cDNB$0991841212
+008@ $bBISkd
+009Q $S1$ahttp://deposit.d-nb.de/cgi-bin/dokserv?id=3201271&prov=M&dok_var=1&dok_ext=htm$qtext/html$301 Inhaltstext$52$ADNB$B2
+009Q $S0$yRezension$0pdf$ahttp://www.gbv.de/dms/faz-rez/FD1200901172118985.pdf$mDE-601$nFAZ$qpdf/application$v2009-04-30$307$AGBV$B2
+010@ $ager$ceng
+011@ $a2009
+019@ $aXA-DE-BY
+021A $aDas @Graveyard-Buch$hNeil Gaiman. Aus dem Engl.  von Reinhard Tiffert
+022A/01 $aThe @graveyard book <dt.>
+028A $dNeil$aGaiman$9080629490$8Gaiman, Neil *1960-*
+028C $dReinhard$aTiffert$9589449664$8Tiffert, Reinhard
+032@ $a1. Aufl
+033A $pWürzburg$nArena-Verl.
+034D $a310 S
+034I $a195 mm x 121 mm
+037A $aIn Kassette
+045G $aK
+101@ $a120$cPICA$dOldenburg, IBIT Universität Oldenburg <715>
+101B $015-01-09$t15:32:38.000
+101D $015-01-09$b9330$a0715
+101U $0utf8
+145Z/40 $a4/Jungen, Männer/Gespenster-, Grusel- und Vampirgeschichten
+201B/01 $015-01-09$t15:32:38.000
+201D/01 $015-01-09$b9330$a0715
+201U/01 $0utf8
+203@/01 $0917400194
+208@/01 $a15-01-09$bz
+209A/01 $f108$a401-06356/09$dg$x00
+101@ $a227$cPICA$dBraunschweig, Stadtbibliothek Braunschweig <56>
+201B/01 $018-03-09$t10:02:47.000
+201D/01 $018-03-09$b566088$a0056
+201U/01 $0utf8
+203@/01 $0923091475
+208@/01 $a26-02-09$bx
+209A/01 $adb Gai$dc$x00
+209G/01 $a91705971807
+201B/02 $018-03-09$t10:02:47.000
+201D/02 $018-03-09$b566088$a0056
+201U/02 $0utf8
+203@/02 $0923091483
+208@/02 $a26-02-09$bx
+209A/02 $adb Gai$dc$x00
+209G/02 $a9170597183X
+201B/03 $018-03-09$t10:02:47.000
+201D/03 $018-03-09$b566088$a0056
+201U/03 $0utf8
+203@/03 $0923091491
+208@/03 $a26-02-09$bx
+209A/03 $adb Gai$dc$x00
+209G/03 $a91705971862

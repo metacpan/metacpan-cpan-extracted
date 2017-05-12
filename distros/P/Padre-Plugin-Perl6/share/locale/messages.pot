@@ -1,0 +1,328 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-08-18 11:27+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/Perl6.pm:34
+msgid "Perl 6"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:102
+msgid "Create Perl 6..."
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:107
+msgid "Script"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:112
+msgid "Class"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:117
+msgid "Grammar"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:122
+msgid "Package"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:127
+msgid "Module"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:132
+msgid "Role"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:137
+msgid "Inlined in Perl 5"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:145
+msgid "Refactor..."
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:152
+msgid "Find variable declaration"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:155 lib/Padre/Plugin/Perl6.pm:169
+msgid "Perl 6 refactoring support is coming soon..."
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:156 lib/Padre/Plugin/Perl6.pm:170
+#: lib/Padre/Plugin/Perl6.pm:531 lib/Padre/Plugin/Perl6.pm:656
+#: lib/Padre/Plugin/Perl6.pm:831 lib/Padre/Plugin/Perl6/Perl6Document.pm:742
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:785
+msgid "Error"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:166
+msgid "Rename variable"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:181
+msgid "Rakudo"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:189
+msgid "Perl 6 Executable"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:193
+msgid "Perl 6 Executable (No parrot.exe)"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:200
+msgid "Perl 6 PIR"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:208
+msgid "Export..."
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:215
+msgid "Full html"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:220
+msgid "Simple html"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:225
+msgid "Snippet html"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:235
+msgid "More Help?"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:240
+msgid "Perl 6 Introduction"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:241
+msgid "Perl 6 Syntax"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:242
+msgid "Perl 6 Objects Introduction"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:243
+msgid "Perl 6 Regexes Introduction"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:261
+msgid "Visit #padre for Padre Help"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:268
+msgid "Visit #perl6 for Perl 6 Help"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:275
+msgid "Perl 6 Projects"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:285
+msgid "Maintenance"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:292
+msgid "Cleanup STD.pm Lex Cache"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:299
+msgid "Preferences"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:306
+msgid "About"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:349
+#, perl-format
+msgid "Error loading template file '%s'"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:371
+msgid "This plugin enables useful Perl 6 features on Padre IDE."
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:372
+msgid "It integrates coloring and easy access to Perl 6 help documents."
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:373
+msgid "The following modules are used:"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:407
+msgid "Cannot find STD.pm lex cache"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:531 lib/Padre/Plugin/Perl6.pm:656
+#: lib/Padre/Plugin/Perl6.pm:831
+msgid "No document"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:537
+msgid "Not a Perl 6 file"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6.pm:538
+msgid "Operation cancelled"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:154
+#, perl-format
+msgid "Insert declaration for %s"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:185
+#, perl-format
+msgid "Insert a space after %s"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:210
+#, perl-format
+msgid "Insert routine %s"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:235
+msgid "Use ~ instead of . for string concatenation"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:255
+msgid "Use . for method call"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:275
+msgid "Use Perl 6 constructor syntax"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:297
+msgid "Use loop (;;) for looping"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:317
+msgid "Use [*-1] to access final element"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:337
+msgid "Use N.pick for a random number"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:355
+msgid "Use (1..N).pick for a random number"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:375
+msgid "Use [N..*] for indefinite range"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:395
+msgid "Use !! for conditional operator"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:415
+msgid "Use ?? (...) !! to avoid precedence bugs"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:437
+msgid "Use ?? !! for the conditional operator"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:457
+msgid "Use ~= for string concatenation"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:477
+msgid "Use ~~ for pattern matching"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:497
+msgid "Use !~~ for negated pattern matching"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:517
+msgid "Use +> for numeric right shift"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:535
+msgid "Use ~> for string right shift"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:554
+msgid "Use +< for numeric left shift"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:572
+msgid "Use ~< for string left shift"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:592
+msgid "Use $! for eval errors"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:612
+msgid "Use $::PERL_VERSION"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:643
+msgid "Comment error line"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:678
+msgid "Surround with try { ... }"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:705
+msgid "Convert POD6 to XHTML"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:741
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:784
+msgid "Operation failed!"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:753
+msgid "Convert POD6 to Text"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6OutlineTask.pm:210
+msgid "Outline"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6OutlineTask.pm:243
+msgid "Open &Documentation"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Perl6StdColorizerTask.pm:248
+msgid ""
+"'STD Lex Cache' folder is corrupt. Please click on 'Plugins/Perl6/"
+"Maintenance' and then 'Cleanup STD Lex Cache' and then re-open the file."
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Preferences.pm:29
+msgid "Perl 6 preferences"
+msgstr ""
+
+#: lib/Padre/Plugin/Perl6/Preferences.pm:121
+msgid "Enable coloring"
+msgstr ""

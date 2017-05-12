@@ -1,0 +1,117 @@
+# Japanese translations for PACKAGE package.
+# Copyright (C) 2009 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Kenichi Ishigaki <ishigaki@cpan.org>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Mojolicious\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-30 16:50-0300\n"
+"PO-Revision-Date: 2009-07-27 03:59+0900\n"
+"Last-Translator: Kenichi Ishigaki <ishigaki@cpan.org>\n"
+"Language-Team: Japanese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: lib/Padre/Plugin/Mojolicious.pm:44
+#: lib/Padre/Plugin/Mojolicious/NewApp.pm:46
+msgid "New Mojolicious Application"
+msgstr "新しいMojoliciousアプリケーション"
+
+#: lib/Padre/Plugin/Mojolicious.pm:50
+msgid "Start Web Server"
+msgstr "サーバを起動する"
+
+#: lib/Padre/Plugin/Mojolicious.pm:51
+msgid "Stop Web Server"
+msgstr "サーバを停止する"
+
+#: lib/Padre/Plugin/Mojolicious.pm:53
+msgid "Mojolicious Online References"
+msgstr "Mojoliciousオンラインリファレンス"
+
+#: lib/Padre/Plugin/Mojolicious.pm:54
+msgid "Mojolicious Manual"
+msgstr "Mojoliciousマニュアル"
+
+#: lib/Padre/Plugin/Mojolicious.pm:57
+msgid "Mojolicious Website"
+msgstr "Mojoliciousウェブサイト"
+
+#: lib/Padre/Plugin/Mojolicious.pm:60
+msgid "Mojolicious Community Live Support"
+msgstr "Mojoliciousコミュニティライブサポート"
+
+#: lib/Padre/Plugin/Mojolicious.pm:66
+msgid "About"
+msgstr "このプラグインについて"
+
+#: lib/Padre/Plugin/Mojolicious.pm:82
+#, perl-format
+msgid ""
+"Mojolicious application script not found at\n"
+"%s\n"
+"\n"
+"Please make sure the active document is from your Mojolicious project."
+msgstr ""
+"Mojoliciousアプリケーションスクリプトが見つかりません\n"
+"%s\n"
+"\n"
+"現在のドキュメントがMojoliciousプロジェクト内にあるかご確認ください。"
+
+#: lib/Padre/Plugin/Mojolicious.pm:85
+msgid "Server not found"
+msgstr "サーバが見つかりません"
+
+#: lib/Padre/Plugin/Mojolicious.pm:107
+msgid "Web server appears to be running. Launch web browser now?"
+msgstr "サーバは実行中のようです。ブラウザを起動しますか?"
+
+#: lib/Padre/Plugin/Mojolicious.pm:108
+msgid "Start Web Browser?"
+msgstr "ブラウザを起動しますか?"
+
+#: lib/Padre/Plugin/Mojolicious.pm:132
+msgid ""
+"\n"
+"Web server stopped successfully.\n"
+msgstr ""
+"\n"
+"サーバは正常に停止しました。\n"
+
+#: lib/Padre/Plugin/Mojolicious/NewApp.pm:24
+msgid "Application Name:"
+msgstr "アプリケーション名:"
+
+#: lib/Padre/Plugin/Mojolicious/NewApp.pm:28
+msgid "Parent Directory:"
+msgstr "親ディレクトリ:"
+
+#: lib/Padre/Plugin/Mojolicious/NewApp.pm:29
+msgid "Pick parent directory"
+msgstr "親ディレクトリを選択してください"
+
+#: lib/Padre/Plugin/Mojolicious/NewApp.pm:82
+msgid "Invalid Application name"
+msgstr "アプリケーション名が不正です"
+
+#: lib/Padre/Plugin/Mojolicious/NewApp.pm:82
+#: lib/Padre/Plugin/Mojolicious/NewApp.pm:86
+msgid "missing field"
+msgstr "入力されていないフィールドがあります"
+
+#: lib/Padre/Plugin/Mojolicious/NewApp.pm:86
+msgid "You need to select a base directory"
+msgstr "ベースディレクトリを選択してください"
+
+#: lib/Padre/Plugin/Mojolicious/NewApp.pm:120
+#, perl-format
+msgid "%s apparently created. Do you want to open it now?"
+msgstr "%sは作成できたようです。開きますか?"
+
+#: lib/Padre/Plugin/Mojolicious/NewApp.pm:121
+msgid "Done"
+msgstr "完了"

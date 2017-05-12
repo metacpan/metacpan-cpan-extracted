@@ -1,0 +1,200 @@
+Revision history for Perl 5 CPAN module Pod::POM
+
+2.01 2015-11-07 NEILB
+    * Added abstracts to all of the submodules -- a PR from GARU.
+    * Changed README to README.md -- another PR from GARU.
+    * Fixed runtime warning for Pod::POM::ERROR -- another PR from GARU.
+
+2.00 2015-09-05 NEILB
+    * Bumped version to 2.00 because last release failed to index:
+      some of the earlier releases had a dist version of 0.xx, but
+      various of the modules had version numbers 1.0x. PAUSE is now
+      right stricter about monotically increasing version numbers,
+      so easiest to just to jump ahead.
+
+0.30 2015-09-04 NEILB
+    * Dropped File::Slurp in favour of File::Slurper.
+      RT#106853 from Henk van Oers.
+    * Don't try to convert text to UTF-8 if it's already tagged as UTF-8.
+      Thanks to Artem Krivopolenov.
+    * Changed all remaining instances of 'use base' to 'use parent';
+      it was previously using a mixture of parent *and* base.
+    * Added "use warnings" and "require 5.006" to all modules.
+
+0.29_02 2015-08-03 NEILB
+    * Don't try to convert text to UTF-8 if it's already tagged as UTF-8.
+      Thanks to Artem Krivopolenov.
+    * Changed all remaining instances of 'use base' to 'use parent';
+      it was previously using a mixture of parent *and* base.
+
+0.29_01 2015-08-02 NEILB
+    * Switched to Dist::Zilla
+    * Added "use warnings" and "require 5.006" to all modules.
+    * Moved custom-pom2 script from bin/ to examples/
+    * Reformatted this file as per CPAN::Changes::Spec
+
+0.29 2013-12-31 ANDREWF
+    * fixed bug 87124 (upgrade Module::Install)
+    * fixed bug 90010 (typos)
+
+0.28 2013-05-30 ANDREWF
+    * fixed bug 81707 (test failures due to hash randomisation in perl 5.17.6)
+    * change 'use vars' to 'our' declarations
+
+0.27 2010-04-02 ANDREWF
+    * changed 'unless (defined (%{"$class\::ACCEPT"}))' to just
+      'unless (%{"$class\::ACCEPT"})' in Pod::POM::Node to fix defect #56205
+      (use of the now deprecated "defined(%hash)" construct)
+    * updated Makefile.PL to require at least 2001.0929 of Text::Wrap, as 
+      versions prior to this always unexpand tabs.
+    * applied Andreas Koenig's encoding patch
+    * changed 'use base' to 'use parent'
+    * split Pod::POM::Nodes into separate modules, retaining the original file
+      to just use all the individual node modules.
+    * added AF to author and copyright info for modules (in addition to ABW)
+
+0.25 2009-03-27 ANDREWF
+    * updated Makefile.PL to use Module::Include properly - i.e. flag modules
+      as test_requires as appropriate
+    * output test failure reason with diag()
+    * added t/YAML/Tiny.pm (self-contained YAML library) to remove test-only
+      module dependency
+    * test library uses Test::Differences if available but package does not 
+      list it as a dependency
+
+0.24 2009-03-21 ANDREWF
+    * fixed broken YAML files in testcases that were causing tests to fail on
+      some platforms
+    * added text and HTML verbatim paragraph view tests
+    * fixed typo in synopsis in Pod::POM
+
+0.23 2009-03-20 ANDREWF
+    * Applied JJ's patch for coalescing verbatim paragraphs separated
+      by blank lines and refined verbatim paragraph test cases
+      and expected output
+    * Tweaked pom dump format to quote individual text lines
+    * Tweaked PodPOMTestLib to remove dependency on Class::Accessor
+    * Added test cases for =headN hierarchy and =begin blocks
+    * Added format name to =end in Pod::POM::View::Pod
+    * Switch Makefile.PL to Module::Include
+
+0.22 2009-03-19 ANDREWF
+    * Added missing dependencies to Makefile.PL
+    * Added pomdump program to list of executables
+
+0.21 2009-03-18 ANDREWF
+    * Added missing dependencies to Makefile.PL
+
+0.20 2009-03-17 ANDREWF
+    * Added basic pod documentation to the view modules
+    * expanded the test cases (especially expanded sequences and blockquote
+      paragraphs)
+    * add support for blockquote paragraphs to Text and HTML views
+
+0.19 2009-03-17 ANDREWF
+    * Added dump method to Pod::POM::Node
+    * Reorganized tests with new testcases directory
+
+0.18 2009-03-11 ANDREWF
+    * Add patches from RT (next 2 items)
+    * BOOK's ticket #24266: Proposed correction for bugs #1949 and #5759
+      (As described in tickets #1949 and #5759, the content =begin/=end blocks
+      should be treated as data text (no sequence parsing, etc).)
+    * JJ's ticket #16764: Problem handling paragraph separators -
+      incompatibility with perlpodspec
+      (Pod::POM 0.17 does not accept blank lines containing whitespace as
+      paragraph separators, it only accepts blank lines containing no
+      characters at all. According to perlpodspec, blank lines containing
+      whitespace should be taken as paragraph separators.
+    * Modified pom2 to search for viewer modules other than Pod, Text and
+      HTML in @INC, and to pass any options to the constructor method.
+
+0.17 2003-07-24 ABW
+    * Pod::POM::View::Pod::view_item could have $title non reference, so
+      handle that gracefully.
+    * add 'fallback => 1' to use of overload in Pod::POM::Node.
+    * Pod::POM::View::Text and Pod::POM::View::HTML now implement F<>
+      rendering similar to I<>. Tests adjusted. [Stas Bekman]
+    * Added 'bool' overload to Pod::POM::Node to prevent unwanted 
+      stringification of nodes simply to test their truth.  Also removed
+      C<length $text> test from Pod::POM::Nodes::Text::present() which
+      was having the same early stringification side-effect.
+
+0.15 2002-03-10 ABW
+    * Applied a patch from Stas Bekman to re-implement view_seq_link() in 
+      Pod/POM/View/HTML.pm
+      - don't add "the foo manpage" automatically. 
+      - implement a big part of the L<> according to the spec, parts
+        borrowed from Pod::HTML
+      - the implementation includes an optional callback which can be
+        sub-classed to provide transformations of the 'page' part of the L<>
+        tag. For example if the page is located elsewhere.
+    * Applied another patch from Stas to fix view_seq_text()
+      - ! and ; are also punctuation chars
+      - fix comment typos
+      - fix incorrectly parsed url followed by punctuation at the end of string:
+
+0.14 2002-02-25 ABW
+    * Added the visit(), leave() and visiting() methods to Pod::POM::View 
+      to allow visitors to track elements of the path that they've taken.
+      This allows one method to know if it has been called within the context
+      of another.  
+
+0.13 2002-02-06 ABW
+    * Applied a patch from Leon Brocard to change 'length' to 'defined' to
+      make Pod::POM work OK with bleadperl.
+    * Changed Pod::POM::View::HTML view_seq_text() method to automatically
+      escape < > and &.  Thanks to lazy POD author Mark Fowler for raising 
+      the issue. :-)
+
+0.12 2002-01-03 ABW
+    * Applied a patch from Stas Bekman which:
+      - fixes the over/item functionality (quite a few very missing), see 
+        the tests
+      - fixes a bug revealed with "" overload
+      - changes HTML version to be <code>foo</code>, not '<code>foo</code>'
+      - adds the URL hyperlinking code, borrowed from bleadperl's Pod::Html.
+    * Fixed a typo in the SYNOPSIS and removed some dead spaces.  Thanks to 
+      Ron Savage for reporting the problems.  
+    * Added Ron's fancy-pom2.pl script as bin/custom-pom2
+    * Renamed pomcheck to podlint because it is a much catchier name :-)
+    * Added some docs to bin/pom2 and bin/podlint
+    * Several other minor documentation fixes and improvements.
+     
+0.11 2001-12-03 ABW
+    * Fixed HTML view_verbatim() to escape < > and & to HTML entities.
+    * Bumped version number up to 0.11 to ensure it supercedes the ill fated
+      0.1 release which has been confusing CPAN ever since (0.1 < 0.03)
+
+0.03 2001-11-29 ABW
+    * Fixed HTML view_head1() to remove illegal <ul> ... </ul> tags.  Also
+      modified view_over() to detect the type of the first item 
+      (e.g. '=item *', '=item 1.' or '=item foo') and adjust accordingly to
+      create a '<ul>...</ul>' or '<ol>...</ol>' list.  Item titles of the 
+      form '*' or '1.' then get stripped off as appropiate.   Thanks to 
+      Stas Bekman for raising these issues.
+    * Added support for new =head3 and =head4 POD tags, also due to prodding 
+      from Stas.  :-)
+    * Added support for experimental 'meta' tag.  Disabled by default.
+
+0.02 2001-04-09 ABW
+    * Fixed several bugs in Pod/POM/Nodes.pm where I had relied on the 5.6.0
+      "Do The Right Thing" behaviour of C<$EXPECT = qw( ... )> to correctly
+      quote a single string.  Now changed to C<$EXPECT = '...'>.  Thanks
+      to Randal Schwartz for identifying the problem.
+    * Added C<use Pod::POM::View> to Pod::POM::View::* modules because 
+      C<use base qw( Pod::POM::View )> doesn't do it automatically for
+      you in some earlier versions of Perl, even if it says it does.
+    * Updated documentation to refer to released Template Toolkit v2.02
+      and added a little more on using the Pod plugin and VIEW directive
+      to munge Pod.
+    * Changed the Pod::POM::View::Text module to be smarter about indenting,
+      keeping track of a current indent level via an internal INDENT member
+      (when used as an object) or the package variable $INDENT (when used
+      as a class) instead of the previous approach of blindly stuffing 
+      everything through Text::Wrap as an afterthought.  Converting Pod to
+      text is now significantly faster and should generate correctly indented
+      output.
+      
+0.1 2001-01-10 ABW
+    * first public release.

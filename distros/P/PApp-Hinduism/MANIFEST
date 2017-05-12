@@ -1,0 +1,11 @@
+Changes
+Hinduism.pm
+MANIFEST
+SEARCH-TERMS
+hindu_courses.pgsql
+Makefile.PL
+release
+test.pl
+lib/PApp/Hinduism/Default.pm
+scripts/build.pl
+scripts/display.pl

@@ -1,0 +1,13 @@
+use Parse::RecDescent;
+my $teststr="blah1,blah2(blah3,blah4(blah5,blah6(blah7))),blah8";
+my $grammar = q {
+        content:        /[^\)\(\,]+/
+        function:       content '(' list ')'
+        value:          content
+        item:           function | value
+        list:           item ',' list | item
+        startrule:      list
+};
+my $parser = new Parse::RecDescent ($grammar) or die "Bad grammar!\n";
+
+defined $parser->startrule($teststr) or print "Bad text!\n";

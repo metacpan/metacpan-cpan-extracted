@@ -1,0 +1,45 @@
+PerlIO/subfile version 0.08
+===========================
+
+A layer for the PerlIO system to limit you to subsection of a file.
+
+You need perl 5.8.0 or later.
+
+Currently read only.
+
+WHY?
+
+zip files (and other archive files) contain multiple other files within them.
+If the contained file is stored uncompressed then it would be nice to save
+copying it out, and instead give a file handle onto the subfile which behaves
+as if the temporary copy has taken place, but actually reads from the original
+zip.  Basically all you need to do is nobble seek and tell so that file offsets
+are given from the start of the contained file (and you can't seek your way
+outside the bounds), and read so that EOF happens in the right place.
+
+(Reading files from inside uncompressed tar files or any other sort of
+archive format is just the same)
+
+Yes, you can nest them. sub subfiles. :-)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires perl 5.8.0 or later compiler with PerlIO.
+(which is now the default)
+
+COPYRIGHT AND LICENCE
+
+You may distribute this work under the terms of either the GNU General
+Public License or the Artistic License, as specified in perl's README
+file.
+
+Copyright © 2001-2003,2006 Nicholas Clark

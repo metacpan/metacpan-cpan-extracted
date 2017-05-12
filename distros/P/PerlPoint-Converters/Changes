@@ -1,0 +1,501 @@
+
+// vim:filetype=PerlPoint
+// Revision history for PerlPoint-Converters.
+
+// ///////////////////////////
+// See also: ./doc/Changes.htm
+// ///////////////////////////
+
+=Version 1.0.205 07/02/2006
+
+* New option for pp2latex: --section-sequence
+
+* New option for pp2html: --tpl_define
+  This allows to use user defined names in template files. The effect ist that tpl_define names
+  in template files are automatically replaced with the value from the corresponding option:
+
+  Example:
+     --tpl_define "bg_main_wd #FFCCBB"
+
+     This will replace BG_MAIN_WD with #FFCCBB in all template
+     files from a style.
+
+* Now it is possible to specify a class name for tables. This is useful when you want to use a css style sheet:
+
+Style Sheet:
+
+  .mytable {
+     margin-left:1mm;
+     background-color:#e0eeee;
+     padding-left:5px;
+     padding-right:5px;
+     width:15cm;
+  }
+
+Perlpoint:
+
+<<VERBATIM
+  \TABLE{class="mytable" separator="|"}
+  \B<Head1> | \B<Head2>
+   text1    | text 2
+   text1.1  | text 2.1
+  \END_TABLE
+VERBATIM
+    
+
+
+=Version 1.0204  25/02/2005
+
+* better docu (less is more)
+
+=Version 1.0203  20/02/2005
+
+* even more patches from Jochen and Jürgen Christoffel
+
+* Testsuite enhanced (not yet finished)
+
+* new option: --java_script_controls which allows to use keys "n", "p", "s", "i"
+  and left mouse button for navigation.
+
+=Version 1.0202  19/11/2003
+
+* Patches 10 - 20 from Jochen Stenzel (JSTENZEL)
+
+>
+
+* Option \C<includelib>
+
+* Option \C<author>
+
+* Option \C<description>
+
+* Option \C<charset>
+
+* Option \C<norobots>
+
+* Option \C<nosmarttags>
+
+* Option \C<linknavigation>
+
+* Option \C<bootstrapaddress>
+
+* Option \C<validate>
+
+* Option \C<startaddress>
+
+* Option \C<no_html_header>
+
+* Option \C<no_html_bodytags>
+
+
+<
+
+* Option \C<--reverse_order> for reverse order numbering of slides.
+
+* Test-Suite changed. Use .ref files in HTML Format instead of
+  md5 checksums. This needs more space, but it's much easier to maintain.
+  (Escpecially if you are looking for errors, because now you have the
+  reference files available to look into ...)
+
+* \\X tag is now basic tag of PerlPoint (--> require PerlPoint::Parser 0.39)
+
+* New FAQ questions for pp2html
+
+* Enhanced test suite
+
+* Included 9 patches for \C<pp2html> from Jochen Stenzel
+
+* --mv2targetdir Option: Images are moved to target dir
+
+* Documentation in \C<./doc/PPDOC> is now self-contained, i. e. it is
+possible to move this directory somewhere else. There are no longer references
+pointing to ../../.. (in the last version the tree_applet sources were shared
+by all documents but the source base was not a subdirectory of PPDOC ...)
+
+* \\PAGE_COLORS{fg="#xxxxxx" bg="#xxxxxx"} Tag in PerlPoint::Tags::HTML
+
+* Option --contents_indent=m\BR
+  The option --no_contents_indent is now obsolete. You get the same result with
+  --contents_indent=0 (which is the default). You must now use a value > 0 if you
+  want to have the table of contents indented. \BR
+  The new option influences the table of contents also in the case of tree_applet.
+  In previous releases the tree applet TOC was not indented in any case.
+
+* Bugfix in handling of \\LOCALTOC: Had problems with sub chapters of same name
+  in different main chapters (e.g. Chapter1|Overview,  Chapter2|Overview)
+
+* Function \C<relative_path> in Converters.pm, used for finding relative path from
+  slide dir to image dir and applet source dir.
+
+* New style: \C<mixed-mode> as an example for Presentations
+
+* Keyword HEADLINE is expanded to page headline when used in template files. This is
+  useful for top teplates, see \C<mixed-mode> style.
+
+* new option \C<--bullets_align_middle>. Normally bullets will be aligned to top,
+  but this does not look very well when the font size is large. In this case you
+  might use C\<--bullets_align_middle> ...
+
+* pp2latex: patches from Robert Inder included (thanks a lot :-)
+
+>
+
+* use prolog file if necessary
+
+<
+
+* __loaderpath__ removed: check if image has absolute path or is relative to cwd
+
+
+=Version 1.01  12/19/2001
+
+* Many changes ...
+
+* Better documentation: run a "make" in \C<./doc> and look into the \C<./doc/PPDOC>
+  subdirectory.
+
+* Changes now in PerlPoint format; after "make test" see file \C<./doc/Changes.htm>
+
+* \B<PerlPoint::Converters> module (docu and some common functions for converters)
+
+* more keywords which are replaced with option values:
+
+>
+
+* LABEL_NEXT
+
+* LABEL_PREV
+
+* LABEL_INDEX
+
+* LABEL_CONTENTS
+
+* SLIDE_PREFIX
+
+* SLIDE_SUFFIX
+
+* IMAGE_REF
+
+<
+
+* use "\C<IMAGE_REF/LOGO_IMAGE_FILENAME>" in style template files
+
+* Bug fixed: bullet images were not always copied to the
+  image directory
+
+* \C<SLIDE_PREFIX> and \C<SLIDE_SUFFIX> used in frameset templates
+
+* \B<Bundle::PerlPoint> for easy installation via CPAN shell:
+
+ % perl -MCPAN -e shell
+ \U<cpan\>> install Bundle::PerlPoint
+
+* javascript navigation now in a separate file which is included by the
+  navigation templates files
+
+* javascript navigation now uses fixed names for the frames instead of
+  numbers (is now more independant from actual frameset layout)
+
+* \\E< xxx > now be possible in headlines
+
+* test suite uses md5 checksums over generated files
+
+* Tag \\URL{url=target_name} (similar to \\L{url=target_name}<target_name>)
+
+=Version 0.11.01   08/02/2001
+
+*  Cleaning up the test suite (was broken in 0.11, sorry!)
+
+=Version 0.11   07/28/2001
+
+*  Bullet bug fixed: When there was no bullet list in the PerlPoint input file
+   then in the table of contents all bullets were standard HTML <LI> tags even
+   if bullet images had been specified.
+
+*  minor help text bug fixed (==item --> =item)
+
+*  \\BOXCOLORS can now have the option set=default which restores box_bg_color and
+   box_fg_color to their original values (which had been set by options ...)
+
+*  Evaluation of style and main options: Now the main options overwrite options from
+   style directories.
+
+*  edit_cfg.pl script added
+
+*  replace LOGO_IMAG_FILENAME with $OPT{image_ref}/$OPT{logo_image_filename}
+
+*  use reasonalble defaults for  TOP_RIGHT_TXT etc. in styles. They can now be
+   overwritten by main options.
+
+*  --start_page=filename option (default: index.htm)
+
+*  new keywords for Templates to be replaced: TOP_BGCOLOR, BOT_BGCOLOR, ...
+
+*  FAQ, and reference manual started, Getting Started added.
+   Documentation starts to improve :-)
+
+=Version 0.10   06/16/2001
+
+*  Nested tags bug fixed: it was not possible to use \\I, \\C inside 
+   a link \\L tag.
+   NOTE: It is still not possible to have an \\X tag in the body of
+         a \\L tag!
+
+*  Require \C<PerlPoint::Parser 0.3427>
+
+*  Using new tag definition Module: \C<PerlPoint::Tags::HTML, PerlPoint::Tags::LaTeX>
+
+*  Comment with version numbers in each created file
+
+*  Bugfix: \\C, \\I, \\B, ... etc in headers was not correctly handled in former versions
+
+*  --box_border option (for border width of text boxes)
+
+*  --style_sheet option (still as an experiment; the behaviour of pp2html may change
+   when style sheets are used)
+
+*  die when wrong options have been specified
+
+*  workaround for bug in TreeApplet: / was not possible in headers.
+   now slashes are replaced with commas.
+
+*  Empty fields in tables are now filled with "&nbsp;" so that the border will be
+   displayed
+
+*  --style_dir and --style options
+   Support for styles (pre-defined sets of template and configuration files)
+
+*  Bug with list indentation fixed: if the last item in a list is shifted (i.e.
+   shift_level > 1) then the following text or block was indented. Now the
+   shift_level is automatically reduced.
+
+*  Some new Keywords which are replaced when templates are copied to the
+   target directory: TOP_LEFT_TXT, TOP_MIDDLE_TXT, TOP_RIGHT_TXT,
+   same for BASE, and LOGO_IMAGE_FILENAME;
+   corresponding options: --top_left_txt, ...
+
+*  Option --slide_md5: all filenames have the form 
+    <slide_prefix><md5-checksum>.<slide_suffix>
+*  Nested tables are now supported (see \C<PerlPoint::Parser> Docu)
+
+*  Variables can now be used in template Files, see the ex_std_norm-top.tpl for an
+   example: VAR(AUTHOR)
+
+*  support of hierarchical anchor names for slide headers
+
+*  pp2latex: fix for formatting of URLs included (thanks to Alex Sigel)
+
+
+
+
+=Version 0.009   03/04/2001
+
+*  require \C<PerlPoint::Parser 0.32>
+
+*  new parameters --box_width and --filters for pp2html
+
+*  URL_INDEX did point to last page, not to index (bug reported by
+   Jeffrey Haemer)
+
+*  Index entries format changed. Now they look like
+      text ref1 [, ref2, ref3 ...]
+   with "text" beeing the (multiple) index entry and ref1, ref2 ...
+   beeing Hyperlinks as references. The text for the references is
+   either the page number or the chapter number when the --num_headers
+   option has been set.
+
+*  Cleanup with templates. It has not been quite clear, what has to go
+   to the HTML templates and what is generated by pp2html. For example
+   the <BODY> line and the <HTML> tag. There were cases where the
+   <HTML> header and the <BODY> line were duplicated, and a "cleanup"
+   in version 0.008 even introduced a bug :-(
+   So I decided to make it more clear. Please read the docu for
+   pp2html (pp2html --help) and the ppdoc.pp file for more information
+   about that. In short: <HTML>, <TITLE> and <BODY> lines are
+   alway provided by pp2html (with options from outside passed through).
+   HTML Template Files ONLY contain HTML text which is placed inside the
+   <BODY>.
+
+*  templates adapted
+
+*  Continued numbered lists ( the ## paragraphs are now supported)
+
+*  Shiftlevels are handled correctly
+
+*  the \\BOXCOLOR and \\BOXTEXT Tags are obsolete now. Their syntax was
+   not consistent: \\BOXCOLOR<green> has formerly been used to set the
+   box color for code blocks. But normally all text in the tag body
+   (between < and >) is part of the output and NOT a parameter to the
+   tag. Tag parameters are specified in curly brackets. Therefore
+   the new tag is:
+   \\BOXCOLORS{bg=backgroundcolor fg=foregroundcolor}
+   which replaces \\BOXCOLR<backgroundcolor> and \\BOXTEXT<foregroundcolor>
+
+*  bugfix: escapes in code-blocks were inactive after embedded code
+
+*  bugfix: URLs in pp2html were doubled in the output
+
+*  workaround for TreeApplet Bug: Headers which contain a / are not allowed.
+   Therefore all slashes are replaced with commas ...
+
+*  Language parameter in \\EMBED{lang=html ...} is now caseinsensitive
+
+*  Version information clarified: pp2html and pp2latex have individual version
+   numbers (build numbers) and belong to a certain version of the 
+   PerlPoint-Converters package.
+
+*  Individual colors (foreground and background) for table of contents, index
+   and normal slides, top and bottom templates: --bgcolor, --fgcolor, 
+   --toc_bgcolor, --toc_fgcolor, --idx_bgcolor --idx_fgcolor
+   --top_bgcolor, --top_fgcolor, --bot_bgcolor, --bot_fgcolor
+   --top_linkcolor, --bot_linkcolor, --toc_linkcolor, --idx_linkcolor, ...
+
+*  new options: --no_contents_indent, --no_contents_bullets
+   This will prevent the table of contents from beeing indented by <UL> </UL> tags
+   and the second option avoids bullets in front of each entry in the table of contents.
+
+*  optional background images for normal slides, index and table of contents:
+   --back_image, --toc_back_image, --idx_back_image
+   --top_back_image, --bot_back_image
+
+*  use Cwd instead of `pwd`
+
+*  Images can now be part of an \\XREF tag!
+
+*  \\IMAGE tag now supports BORDER=m option
+
+*  XREF, PAGEREF and SECTIONREF now consider javascript navigation
+
+*  --trans_table option re-implemented (had been part of an ancient version of pp2html)
+
+*  different bullet images for different indentation levels
+   --bullet option can be used more than once!
+
+
+=Version 0.008   01/17/2001
+
+*  README updated (Introduction and About PerlPoint-Converters)
+
+*  Requires \C<PerlPoint::Parser 0.29>, and hence perl5.00503
+   (Some earlier versions of the PerlPoint-Package needed perl5.6.0)
+
+*  changes to pp2html:
+
+>
+
+*  Parameters for fgcolor, linkcolor, vlinkcolor, alinkcolor
+
+*  Parameters for cache usage: --cache, --cacheCleanup
+
+*  .cfg files adapted to new options
+
+<
+
+*  changes to pp2latex
+
+>
+
+*  POD Docu updated
+
+*  --slide_dir parameter to be compatible with pp2html
+
+*  --no_index
+
+*  Parameters for cache usage: --cache, --cacheCleanup
+
+*  no formatting in \\verbatim blocks
+
+*  bugfix: version message now goes to STDERR
+
+<
+
+*  ppdoc.pp Dokumentation updated
+
+
+=Version 0.007   12/10/2000
+
+*  First version for CPAN
+
+*  Name of the package changed from `pp2xx' to `PerlPoint-Converters'.
+   The reason was that the Parser package had to change its name from `PP-Package'
+   to `PerlPoint-Package' when being moved to the CPAN. To make it clear that the
+   two packages are closely related, I decided to use the new name.
+
+*  require 5.6.0 (because PerlPoint-Package-0.27 needs it, too)
+
+*  Option "--safe_opcodes"
+
+
+=Version 0.006   10/27/2000
+
+*  \\EMBED  \\END_EMBED supported in pp2html
+
+*  Templates changed (usage of karawane-50.gif)
+
+*  Activated embedded perl code (use Safe)
+
+*  pp2latex: rudimentary support of eps files:
+   when you use \\IMAGE{src="filename.gif"} a file named "filename.eps" will be
+   included in the tex file (if it exists ... :-)
+
+*  ppdoc.pp updated (\\INCLUDE parser-paragraphs, parser-tags and parser-active-contents
+   from Jochen Stenzel)
+
+*  create the slide directory specified by --slide_dir as necessary
+
+*  pp2latex: included first version of TABLE support (from Alexander Sigel)
+
+*  --block_indent option for pp2html
+
+*  --no_index option for pp2html
+
+=Version 0.005   10/19/2000
+
+*  name changed: pp2htm  --> pp2html
+
+*  needs \C<PP::Parser 0.21>
+
+*  handler for DPointItem
+
+*  sorting in index has been corrected
+   multiple index entries are now supported
+
+*  parameter "file" in \\IMAGE tags renamed to "src" (for better consistency with HTML)
+
+*  parameters "height" and "width" supported for \\IMAGE tags
+
+*  parameter "face" supported for \\F tag
+
+*  \\TABLE tags supported
+
+*  handle shift paragraphs > and <
+
+*  Bugfix: if there was no index, the last page was not processed !!
+
+=Version 0.004   10/04/2000
+
+*  \\IMAGE tag implemented
+
+*  \\F tag implemented
+
+*  Option --nav_template for navigation bar inside each page of a frame set
+
+*  automatic insertion of anchor for each page (name of anchor is the page header)
+
+*  Option --java_script_navigation
+
+=Version 0.003   09/10/2000
+
+*  first version with Makfile.PL support
+
+=Version 0.002   08/04/2000
+
+*  make_submission script enhanced
+
+*  ppdoc.pp: first english version, not yet complete
+
+=Version 0.001   08/03/2000
+
+*  Initial version with first versions of make_submission, README
+   and ex_* sample test cases
+

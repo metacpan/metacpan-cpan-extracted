@@ -1,0 +1,47 @@
+Revision history for PICA::Data
+
+0.31  2016-02-19 10:13:44 CET
+    - refactor parser
+    - add PICA::Path::record_field and ::record_subfields
+
+0.30  2016-02-18 20:19:47 CET
+    - add parser for PPXML (PICA+ XML format variant of DNB)
+
+0.29  2016-02-17 09:17:17 CET
+    - skip empty records when parsing
+
+0.28  2016-02-16 14:58:57 CET
+    - add new binary PICA format
+
+0.27  2015-05-07 16:08:19 CEST
+    - bless holdings and items (close #11)
+
+0.26  2015-02-05 12:17:28 CET
+    - fix parsing double-encoded $$ in plain format
+    - support writing to scalar
+    - new methods write and string
+
+0.25  2015-02-05 10:26:29 CET
+    - documentation
+
+0.24  2015-01-16 14:25:24 CET
+    - new function pica_xml_struct
+    - support blessing of records
+
+0.23  2014-09-19 12:12:23 CEST
+    - removed dependency on Moo (close #6)
+    - fixed PICA::Parser::Plus
+
+0.22  2014-09-18 14:42:01 CEST
+    - extend PICA path expressions
+    - fix dependency
+
+0.21  2014-09-18 11:06:29 CEST
+    - added pica_holdings and pica_items (close #1)
+
+0.2001  2014-09-17 15:17:28 CEST
+    - added missing version numbers
+
+0.20  2014-09-17 15:05:55 CEST
+    - split from Catmandu::PICA after heavy refactoring
+

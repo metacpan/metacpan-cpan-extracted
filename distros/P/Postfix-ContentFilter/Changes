@@ -1,0 +1,44 @@
+Revision history for Postfix-ContentFilter
+
+1.12 2014-11-24
+ - added Modern::Perl to prequirements
+ - updated prequirements and bump to version 0.02
+ - add Travis CI configuration
+ - add dependencies for Travis CI
+ - update module dependencies
+ - convert README to Markdown
+ - replace _load_any with Class::Load#load_first_existing_class
+ - code cleanup
+ - ignore .travis.yml and README.md in manifest
+ - enable Module::Signature
+ - use IPC::Run
+ - update prerequirements
+ - fix development options for travis ci
+ - add newline at end of file
+ - prepare for debian packaging
+ - bump to version 1.12 and init debian package
+ - dont make signatures anymore
+ - Merge branch 'master' of
+   github.com:zurborg/libpostfix-contentfilter-perl
+
+1.11 2014-06-10
+ - (no information about this release available)
+
+1.10 2014-06-04
+ - prevent returning an exitcode of -1
+ - added README
+ - Allow Mail::Message objects to be used. Introduces new and parser
+ - flexible loading of parsers
+ - updated package dependencies
+ - updated tests in MANIFEST
+ - no longer support for zero-but-true return value
+
+1.02 2014-05-16
+ - (no information about this release available)
+
+1.01 2014-05-15
+ - fixed build system
+ - removed boilerplate test
+ - remove deleted file from manifest
+ - added minimum module version prequirements
+

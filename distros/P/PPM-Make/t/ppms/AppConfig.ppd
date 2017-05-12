@@ -1,0 +1,17 @@
+<SOFTPKG NAME="AppConfig" VERSION="1,63,0,0">
+	<TITLE>AppConfig</TITLE>
+	<ABSTRACT>AppConfig is a bundle of Perl5 modules for reading configuration files and parsing command line arguments.</ABSTRACT>
+	<AUTHOR>Andy Wardley, (abw@wardley.org)</AUTHOR>
+	<IMPLEMENTATION>
+		<DEPENDENCY NAME="File-HomeDir" VERSION="0,57,0,0" />
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="AppConfig-1.63-PPM56.tar.gz" />
+	</IMPLEMENTATION>
+	<IMPLEMENTATION>
+    <DEPENDENCY NAME="File-HomeDir" VERSION="0,57,0,0" />
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <CODEBASE HREF="AppConfig-1.63-PPM58.tar.gz" />
+  </IMPLEMENTATION>
+</SOFTPKG>

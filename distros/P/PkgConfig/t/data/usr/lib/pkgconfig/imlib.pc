@@ -1,0 +1,13 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+target=@gdktarget@
+
+
+Name: Imlib
+Description: An image loading and rendering library for X11R6
+Version: 1.9.15
+Requires:
+Libs: -L${libdir}  -lImlib  -ljpeg -ltiff -lungif -lpng -lz -lm -lXext  -L/usr/lib  -lSM -lICE -lXext -lX11 
+Cflags: -I${includedir}  -I/usr/include

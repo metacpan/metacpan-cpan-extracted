@@ -1,0 +1,63 @@
+{
+   "abstract" : "include ditaa diagrams in your pod",
+   "author" : [
+      "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Pod-Weaver-Plugin-Ditaa",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "IO::All" : "0",
+            "IPC::System::Simple" : "0",
+            "MIME::Base64" : "0",
+            "Moose" : "0",
+            "Pod::Elemental::Transformer" : "0",
+            "Pod::Weaver::Role::Dialect" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.018"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Elemental" : "0",
+            "Pod::Elemental::Transformer::Pod5" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/frioux/Pod-Weaver-Plugin-Ditaa/issues"
+      },
+      "homepage" : "https://github.com/frioux/Pod-Weaver-Plugin-Ditaa",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frioux/Pod-Weaver-Plugin-Ditaa.git",
+         "web" : "https://github.com/frioux/Pod-Weaver-Plugin-Ditaa"
+      }
+   },
+   "version" : "0.001006"
+}
+

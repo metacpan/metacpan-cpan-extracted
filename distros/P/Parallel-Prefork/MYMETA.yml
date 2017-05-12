@@ -1,0 +1,32 @@
+---
+abstract: 'A simple prefork server framework'
+author:
+  - 'Kazuho Oku'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::Requires: '0'
+  Test::SharedFork: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Module::Install version 1.08, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parallel-Prefork
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Lite: '0.04'
+  List::MoreUtils: '0'
+  Proc::Wait3: '0.03'
+  Scope::Guard: '0'
+  Signal::Mask: '0'
+  perl: '5.008001'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.17'
+x_module_name: Parallel::Prefork

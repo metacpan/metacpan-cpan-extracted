@@ -1,0 +1,57 @@
+---
+abstract: 'Perl::Critic plugin for stricter subroutine checking'
+author:
+  - 'Jeffrey Thalhammer <thaljef@cpan.org>'
+build_requires:
+  Module::Build: '0.4'
+  Perl::Critic::TestUtils: '1.082'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-StricterSubs
+provides:
+  Perl::Critic::Policy::Modules::RequireExplicitInclusion:
+    file: lib/Perl/Critic/Policy/Modules/RequireExplicitInclusion.pm
+    version: '0.05'
+  Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs:
+    file: lib/Perl/Critic/Policy/Subroutines/ProhibitCallsToUndeclaredSubs.pm
+    version: '0.05'
+  Perl::Critic::Policy::Subroutines::ProhibitCallsToUnexportedSubs:
+    file: lib/Perl/Critic/Policy/Subroutines/ProhibitCallsToUnexportedSubs.pm
+    version: '0.05'
+  Perl::Critic::Policy::Subroutines::ProhibitExportingUndeclaredSubs:
+    file: lib/Perl/Critic/Policy/Subroutines/ProhibitExportingUndeclaredSubs.pm
+    version: '0.05'
+  Perl::Critic::Policy::Subroutines::ProhibitQualifiedSubDeclarations:
+    file: lib/Perl/Critic/Policy/Subroutines/ProhibitQualifiedSubDeclarations.pm
+    version: '0.05'
+  Perl::Critic::StricterSubs:
+    file: lib/Perl/Critic/StricterSubs.pm
+    version: '0.05'
+  Perl::Critic::StricterSubs::Utils:
+    file: lib/Perl/Critic/StricterSubs/Utils.pm
+    version: '0.05'
+requires:
+  Carp: '0'
+  English: '0'
+  Exporter: '0'
+  File::PathList: '0'
+  List::MoreUtils: '0'
+  PPI::Document: '0'
+  Perl::Critic::Policy: '1.082'
+  Perl::Critic::Utils: '1.082'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Perl-Critic/Perl-Critic-StricterSubs/issues
+  homepage: http://perlcritic.com
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/Perl-Critic/Perl-Critic-StricterSubs.git
+version: '0.05'

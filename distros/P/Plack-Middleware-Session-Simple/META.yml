@@ -1,0 +1,51 @@
+---
+abstract: 'Make Session Simple'
+author:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+build_requires:
+  Cache::Memory::Simple: '1.02'
+  HTTP::CookieJar: '0.005'
+  HTTP::Message: '5.814'
+  Test::More: '0.98'
+  Test::Requires: '0.07'
+  Test::TCP: '2.01'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Session-Simple
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::Session::Simple:
+    file: lib/Plack/Middleware/Session/Simple.pm
+    version: '0.03'
+  Plack::Middleware::Session::Simple::Session:
+    file: lib/Plack/Middleware/Session/Simple.pm
+requires:
+  Cookie::Baker: '0.02'
+  Digest::SHA1: '2.13'
+  Plack: '1.0029'
+  Scalar::Util: '0'
+  Tie::Hash: '0'
+  parent: '0.223'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/kazeburo/Plack-Middleware-Session-Simple/issues
+  homepage: https://github.com/kazeburo/Plack-Middleware-Session-Simple
+  repository: git://github.com/kazeburo/Plack-Middleware-Session-Simple.git
+version: '0.03'

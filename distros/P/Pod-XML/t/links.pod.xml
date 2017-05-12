@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<pod xmlns="http://axkit.org/ns/2000/pod2xml">
+<head>
+<title></title>
+</head>
+<sect1>
+<title>Some links to test Pod::XML</title>
+<para>
+<link xref='name'>name</link>
+<link xref='name#sec'>name/"sec"</link>
+<link xref='name#sec'>name/sec</link>
+<link xref='#sec'>/"sec"</link>
+<link xref='#sec'>/sec</link>
+<link xref='#sec'>"sec"</link>
+<link xref='name'>text</link>
+<link xref='name#sec'>text</link>
+<link xref='name#sec'>text</link>
+<link xref='#sec'>text</link>
+<link xref='#sec'>text</link>
+<link xref='#sec'>text</link>
+<link xref='scheme://blah/'>scheme://blah/</link>
+<link xref='scheme://blah/'>THIS WILL BREAK</link>
+<link xref='File::Cwd'>File::Cwd</link>
+<link xref='http://test/'>http://test/</link>
+<link xref='file://test'>file://test</link>
+</para>
+</sect1>
+</pod>

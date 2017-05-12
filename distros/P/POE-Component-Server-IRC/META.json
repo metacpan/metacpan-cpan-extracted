@@ -1,0 +1,73 @@
+{
+   "abstract" : "A fully event-driven networkable IRC server daemon module.",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>",
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-Server-IRC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "POE::Component::SSLify" : 0,
+            "POE::Filter::Zlib::Stream" : 0
+         },
+         "requires" : {
+            "Crypt::PasswdMD5" : "1.3",
+            "IRC::Utils" : "0.10",
+            "List::Util" : 0,
+            "Net::Netmask" : "1.9012",
+            "POE" : "0.9999",
+            "POE::Component::Client::DNS" : "1.00",
+            "POE::Component::Client::Ident" : "1.00",
+            "POE::Component::Syndicator" : "0.04",
+            "POE::Filter::IRCD" : "2.2"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "POE::Component::IRC" : "6.68",
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-POE-Component-Server-IRC@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Server-IRC"
+      },
+      "homepage" : "http://search.cpan.org/dist/POE-Component-Server-IRC/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bingos/poe-component-server-irc.git",
+         "web" : "http://github.com/bingos/poe-component-server-irc"
+      }
+   },
+   "version" : "1.54",
+   "x_authority" : "cpan:HINRIK"
+}
+

@@ -1,0 +1,61 @@
+PDL::IO::NDF
+------------
+
+This module allows Starlink NDF files (http://www.starlink.ac.uk)
+to be written and read from the Perl Data Language. All numerical
+array components are read as PDLs.
+
+The PDL home page can be found at http://pdl.perl.org/
+
+  use PDL::IO::NDF;
+  $a = rndf("test.sdf");
+  $a->wndf("output.sdf");
+
+Requirements:
+------------
+
+Requires the following modules from CPAN
+
+   PDL
+   Astro::FITS::Header
+
+PDL 2.4.x or newer is required.
+
+You will also need the NDF module available from
+git://starlink.jach.hawaii.edu/perl-NDF.git and the NDF library
+from a Starlink distribution (http://www.starlink.ac.uk).
+
+Installation
+------------
+
+To install this package independently of the main package type:
+
+ perl Build.PL
+ ./Build
+ ./Build test
+ ./Build install
+
+Authors
+-------
+
+Tim Jenness <tjenness@cpan.org> and Douglas Burke <dburke@cfa.harvard.edu>.
+Currently maintained by Tim Jenness.
+
+Copyright (C) 1998 - 2012 Tim Jenness. All Rights Reserved.  This program is free
+software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+Changes
+-------
+
+  v1.04  - Extracted from PDL distribution and released standalone.
+         - Uses Module::Build
+         - Fixes to bad value support.
+         - FITS header parsing now done by Astro::FITS::Header
+         - Status handling much improved.
+         - Add quickread option to rndf that only reads the primary
+           data array and FITS header.
+
+  v1.03  - Bad value support added by Doug Burke
+
+

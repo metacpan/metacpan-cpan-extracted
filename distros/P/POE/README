@@ -1,0 +1,112 @@
+Version 1.367
+
+--------------------
+Detailed Information
+--------------------
+
+POE is bigger than this README.  Please see http://poe.perl.org/ for
+more information.
+
+---------------------
+Documentation Roadmap
+---------------------
+
+POE includes a lot of documentation.  The main POE man page includes
+references to everything else.
+
+POE has been around for a while.  The CHANGES file has been limited to
+changes in the past year to help keep the distribution size down.
+POE's web site includes a complete change history broken down by
+release.
+
+--------------
+Installing POE
+--------------
+
+POE can be installed through the CPAN or CPANPLUS shell in the usual
+manner.
+
+  % perl -MCPAN -e shell
+  cpan> install POE
+
+Or
+
+  % cpan -i POE
+
+http://poe.perl.org/?Where_to_Get_POE explains other options for
+obtaining POE, including anonymous Subversion access.
+
+------------
+Test Results
+------------
+
+The CPAN Testers are a group of volunteers who test new CPAN
+distributions on a number of platforms.  You can see their test
+results at: http://testers.cpan.org/search?request=dist&dist=POE
+
+POE's ongoing improvement relies on your feedback.  You file bug
+reports, feature requests, and even success stories by e-mailing
+<bug-POE@rt.cpan.org>.
+
+-------------
+Test Coverage
+-------------
+
+POE's tests cover a significant portion of the distribution.  A
+thumbnail sketch of POE's test coverage is available, but do not use
+it as an accurate gauge of quality.
+
+  http://poe.perl.org/?POE's_test_coverage_report
+
+----------------
+Full Change Logs
+----------------
+
+Thanks to the magic of distributed version control, POE is hosted at
+three locations for redundancy.  You can browse the source at any one
+of:
+
+https://github.com/rcaputo/poe
+
+https://gitorious.org/poe
+
+http://poe.git.sourceforge.net/git/gitweb-index.cgi
+
+Complete change logs can also be browsed at those sites.  They all
+provide RSS news feeds for those who want to follow development in
+near-realtime.
+
+-----------
+What POE Is
+-----------
+
+POE is an event-driven networking and multitasking framework for Perl.
+It has been in active development since 1996, with its first open
+release in 1998.  O'Reilly's "The Perl Conference" (now OSCON's Perl
+track) named POE "Best New Module" in 1999.
+
+POE has been used in mission-critical systems such as internetworked
+financial markets, file systems, commerce and application servers.  It
+has been used in projects ranging from a few lines of code to tens of
+thousands.
+
+POE is compatible with perl versions as old as 5.005_03.  This may
+change as it becomes harder to support old versions of Perl over time.
+
+POE includes an evolving component framework.  Components are
+high-level, modular, reusable pieces of programs.  Several components
+have been published on the CPAN, and more are listed on POE's web
+site.  See: http://search.cpan.org/search?query=POE&mode=dist
+
+POE includes components and libraries for making quick work of network
+clients, servers, and peers.  A simple stand-alone web application
+takes about 30 lines of code, most of which is your own custom logic.
+
+----
+Bye!
+----
+
+Thanks for reading!
+
+-- 
+Rocco Caputo / rcaputo@cpan.org / http://poe.perl.org/

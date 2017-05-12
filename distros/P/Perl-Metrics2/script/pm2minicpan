@@ -1,0 +1,96 @@
+#!/usr/bin/perl
+
+# Index and preparse the contents of a minicpan checkout
+
+use 5.008;
+use strict;
+use warnings;
+use File::Find::Rule       ();
+use File::Find::Rule::VCS  ();
+use File::Find::Rule::Perl ();
+use PPI::Cache             ();
+use Perl::Metrics2         ();
+use CPAN::Mini::Visit      ();
+
+our $VERSION = '0.01';
+
+# Check params
+unless ( $ARGV[0] and -d $ARGV[0] ) {
+	die("Missing or invalid minicpan directory");
+}
+unless ( $ARGV[1] and -d $ARGV[1] ) {
+	die("Missing or invalid PPI::Cache directory");
+}
+
+my $flush = !! ( $ARGV[2] and $ARGV[2] eq 'flush' );
+
+# Initialise the metrics instance
+my $metrics = Perl::Metrics2->new(
+	cache => $ARGV[1],
+	study => $flush ? 0 : 1,
+);
+
+if ( 0 ) {
+	# Drop indexes for speed
+	Perl::Metrics2->do('DROP INDEX IF EXISTS cpan_file__release'  );
+	Perl::Metrics2->do('DROP INDEX IF EXISTS cpan_file__file'     );
+	Perl::Metrics2->do('DROP INDEX IF EXISTS cpan_file__md5'      );
+	Perl::Metrics2->do('DROP INDEX IF EXISTS cpan_file__indexable');
+
+	# Flush all entries if we get a flush option
+	if ( $flush ) {
+		print STDERR "# Flushing all cpan_file entries...\n";
+		Perl::Metrics2->do('DELETE FROM cpan_file');
+	}
+
+	my $counter = 0;
+	Perl::Metrics2->begin;
+	CPAN::Mini::Visit->new(
+		minicpan => $ARGV[0],
+		acme     => 0,
+		# author   => $author,
+		ignore   => [ qr/PDF-API/ ],
+		callback => sub { eval {
+			my $the = shift;
+			$counter++;
+			print STDERR "# $counter - $the->{dist}\n";
+			Perl::Metrics2->index_distribution(
+				$the->{dist},
+				$the->{tempdir},
+				'safe',
+			);
+			return 1 if $counter % 100;
+			Perl::Metrics2->commit_begin;
+		} },
+	)->run;
+	Perl::Metrics2->commit;
+
+	# Restore indexes
+	Perl::Metrics2->do('CREATE INDEX IF NOT EXISTS cpan_file__release   on cpan_file ( release   )');
+	Perl::Metrics2->do('CREATE INDEX IF NOT EXISTS cpan_file__file      on cpan_file ( file      )');
+	Perl::Metrics2->do('CREATE INDEX IF NOT EXISTS cpan_file__md5       on cpan_file ( md5       )');
+	Perl::Metrics2->do('CREATE INDEX IF NOT EXISTS cpan_file__indexable on cpan_file ( indexable )');
+
+} else {
+
+	my $counter = 0;
+	CPAN::Mini::Visit->new(
+		minicpan => $ARGV[0],
+		acme     => 0,
+		# author   => $author,
+		ignore   => [ qr/PDF-API/ ],
+		callback => sub {
+			my $the = shift;
+			$counter++;
+			print STDERR "# $counter - $the->{dist}\n";
+			my @files = File::Find::Rule->ignore_svn->perl_file->in($the->{tempdir});
+			foreach my $file ( @files ) {
+				print "# $file\n";
+				eval {
+					PPI::Document->new($file);
+				};
+			};
+		},
+	)->run;
+
+}

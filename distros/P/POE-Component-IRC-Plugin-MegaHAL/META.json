@@ -1,0 +1,66 @@
+{
+   "abstract" : "A PoCo-IRC plugin which provides access to a MegaHAL conversation simulator.",
+   "author" : [
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-IRC-Plugin-MegaHAL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "utils"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Script" : "1.07"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IRC::Utils" : "0.05",
+            "POE::Component::AI::MegaHAL" : "0",
+            "POE::Component::IRC" : "6.22"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-POE-Component-IRC-Plugin-MegaHAL@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-IRC-Plugin-MegaHAL"
+      },
+      "homepage" : "http://metacpan.org/release/POE-Component-IRC-Plugin-MegaHAL",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hinrik/poe-component-irc-plugin-megahal.git",
+         "web" : "http://github.com/hinrik/poe-component-irc-plugin-megahal"
+      }
+   },
+   "version" : "0.46",
+   "x_authority" : "cpan:HINRIK"
+}
+

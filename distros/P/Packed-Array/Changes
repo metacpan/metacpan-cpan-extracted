@@ -1,0 +1,6 @@
+Revision history for Perl extension Packed::Array.
+
+0.01  Thu Feb  6 10:33:23 2003
+	- original version; created by h2xs 1.2 with options
+		-A Packed::Array
+

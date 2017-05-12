@@ -1,0 +1,14 @@
+README for Profile::Log 0.01
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Profile::Log is a module which is designed for collecting timing
+information, and saving it to log files.  See the POD documentation for 
+more.
+
+To install, you can use the following, like most CPAN modules:
+
+ perl Makefile.PL
+ make test
+ sudo make install
+
+Substitute "sudo" in the above to your favourite method of acquiring
+root access.

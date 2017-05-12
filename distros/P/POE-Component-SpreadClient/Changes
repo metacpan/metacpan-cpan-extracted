@@ -1,0 +1,70 @@
+Revision history for POE-Component-SpreadClient
+
+1.003 2014-11-10T20:21:09Z UTC
+ - Updates to the auto-generated files
+ - Tweak POD and some code slightly to pass PerlCritic and other tests
+ - Fix the example client to make it work better
+ - Fix the Spread version specification, RT#66904 ( thanks LordV! )
+
+ [STATISTICS]
+ - code churn: 6 files changed, 113 insertions(+), 87 deletions(-)
+
+1.002 2011-02-17T00:34:38Z UTC
+ - Fix the parsing of REG_MEMB_MESS ( NULLs in WHO ), RT#65795 ( thanks
+   RDB! )
+
+1.001 2011-02-10T03:03:39Z UTC
+ - Removed an erroneous "use warnings FATAL => all;" line that somehow got
+   in the source...
+
+1.000 2011-02-10T02:03:44Z UTC
+ - Converted to Dist::Zilla for the release process!
+ - Fix an issue with FH creation from Spread, RT#65576 ( thanks RDB! )
+
+0.09 0000-00-00T00:00:00Z UTC
+ - Made the constructor return the sessionID, RT#65383 ( thanks RDB! )
+ - Fix a long-standing bug where it dropped multiple messages in a
+   processing run, RT#59423 ( thanks RDB! )
+
+0.08 0000-00-00T00:00:00Z UTC
+ - Fixed mis-rename of AUTHOR section into CREDITS :(
+
+0.07 0000-00-00T00:00:00Z UTC
+ - Converted to Build.PL
+ - Fixed multiple group subscribe bug, thanks RT#38854
+ - Removed stupid Test::* module requirements, thanks BiNGOs!
+ - revamped test suite to modernize it
+ - bumped perl requirement to 5.006 for sanity
+
+0.06 0000-00-00T00:00:00Z UTC
+ - Kwalitee-related fixes
+
+0.05 0000-00-00T00:00:00Z UTC
+ - tweaked the POE::Session::AttributeBased code for compatibility,
+   apologies for the late release! - thanks to XANTUS and FMERGES
+
+0.04 0000-00-00T00:00:00Z UTC
+ - Added the custom_flags arg to publish
+ - Totally revamped the _sp_admin event
+ - Removed the $type variable from _sp_message
+ - Added 1 more error type to _sp_error
+ - POD tweaks as usual
+ - Kwalitee-related fixes
+
+0.03 0000-00-00T00:00:00Z UTC
+ - learned about the difference between ref $self and ref( $self )
+ - Squashed a bug where it would send a sp_error then sp_disconnect, should
+   be sp_error only!
+ - Added new destroy event
+ - POD tweaks
+
+0.02 0000-00-00T00:00:00Z UTC
+ - POD tweaks
+ - Updated the _sp_error routine to include $priv_name ( arguments shifted
+   right by 1 )
+ - Spread.pm does not like 1-member arrayref (
+   publish/subscribe/unsubscribe now does array collapsing )
+
+0.01 0000-00-00T00:00:00Z UTC
+ - first release
+

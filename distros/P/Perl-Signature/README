@@ -1,0 +1,118 @@
+NAME
+    Perl::Signature - Generate functional signatures for Perl source code
+
+  DESCRIPTION
+    In early beta, PPI introduced the concept of "Document Normalization"
+    into the core. It had previously only been implemented "behind the
+    scenes" as part of Perl::Compare.
+
+    Unfortunately, there isn't a whole lot of things you can do with a
+    PPI::Document::Normalized object. It's a giant twisty mass of objects
+    and perl structure, and not very practical for long term storage.
+
+    Perl::Signature implements the idea of a "functional signature" for Perl
+    documents, implemented in a similar way to Object::Signature.
+
+    The normalized document is serialized to a string with Storable, then
+    this string is converted into a MD5 hash, producing a single short
+    string which represents the functionality of the Perl document.
+
+    This signature can then be stored and transfered easily, and at any
+    later point the signature can be regenerated for the file to ensure that
+    it has not changed (functionally).
+
+  Not Stable Across Upgrades
+    Perl::Signature is relatively sensitive to change.
+
+    Primarily, this is because PPI::Normal is biased towards false negative
+    comparison. (Avoiding false "these are the same" by accepting a number
+    of false "these are not the same" results).
+
+    In addition, the serialization of Storable is not assured to use
+    identical file formats across versions.
+
+    In short, you should assume that a signature is valid at best for only
+    as long as the PPI and Storable versions are the same, and at worst only
+    for the current process.
+
+METHODS
+    PPI::Signature provides two sets of methods. A set of
+
+  file_signature $filename
+    The "file_signature" static method takes a filename and produces a
+    signature for the file.
+
+    Returns a 32 character hexidecimal MD5 signature, or "undef" on error.
+
+  source_signature $content | \$content
+    The "source_signature" static method generates a signature for any
+    arbitrary Perl source code, which can be passed as either a raw string,
+    or a reference to a SCALAR containing the code.
+
+    Returns a 32 character hexidecimal MD5 signature, or "undef" on error.
+
+  document_signature $Document
+    The "document_signature" method takes a PPI::Document object and
+    generates a signature for it.
+
+    Returns a 32 character hexidecimal MD5 signature, or "undef" on error.
+
+  new $file
+    As well as static methods for generatic signatures, Perl::Signature also
+    provides a simple way to create signature objects for a particular file.
+
+    This makes it relatively easy to see if a file has changed
+
+    The "new" constructor takes as argument the name of a file, and creates
+    an object that remembers current signature of the file.
+
+  file
+    The "file" accessor returns the name of the file that a Perl::Signature
+    object is set to.
+
+  current
+    The "current" method returns the current signature for the file.
+
+    Returns a 32 character hexidecimal MD5 signature, or "undef" on error.
+
+  original
+    The "original" accessor returns the original signature at the time of
+    the creation of the object.
+
+  changed
+    The "changed" method checks to see if the signature has changed since
+    the object was created.
+
+    Returns true if the file has been (functionally) changed, false if not,
+    or "undef" on error.
+
+  unchanged
+    The "unchanged" method checks to ensure that the signature has not
+    changed since the object was created.
+
+    Returns true if the file is (functionally) unchanged, false if it has
+    changed, or "undef" on error.
+
+SUPPORT
+    All bugs should be filed via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Perl-Signature>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    <http://ali.as/>, PPI
+
+COPYRIGHT
+    Copyright 2004 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

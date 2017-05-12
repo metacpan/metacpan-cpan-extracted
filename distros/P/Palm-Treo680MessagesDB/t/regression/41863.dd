@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1192027727,
+          'number' => '+440200814254',
+          'time' => '15:48',
+          'date' => '2007-10-10',
+          'name' => 'John XXXX (M)',
+          'phone' => '+440200814254',
+          'device' => 'Treo 680',
+          'direction' => 'outbound',
+          'timestamp' => 1192027727,
+          'text' => 'want me to renew rocknessrecords.com? It\'s due later this week',
+          'type' => '0x0000',
+          'category' => 0,
+          'id' => 7107240,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 41863
+        };

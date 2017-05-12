@@ -1,0 +1,26 @@
+Revision history for Proc-Find
+
+0.04    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.03    2014-12-27 (PERLANCAR)
+
+	- Add our extra field: name (created from cmndline: take first word
+	  and strip path).
+
+
+0.02    2014-11-23 (PERLANCAR)
+
+        - Add configuration variable $CACHE.
+
+        - Optimize proc_exists() by only requesting a single result from
+          find_proc().
+
+
+0.01    2014-11-23 (PERLANCAR)
+
+        - First release.

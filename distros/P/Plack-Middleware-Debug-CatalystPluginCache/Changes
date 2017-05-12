@@ -1,0 +1,14 @@
+=head1 NAME
+
+Changes - Significant changes to Plack::Middleware::Debug::CatalystPluginCache
+
+=head2 Changes in 0.101
+
+  Added documentation.
+  Improved dzil configuration.
+
+=head2 Changes in 0.100
+
+  Initial release.
+
+=cut

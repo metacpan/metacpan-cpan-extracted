@@ -1,0 +1,15 @@
+Revision history for Perl extension Plack::Middleware::Debug::Mongo.
+
+0.03    Sat Apr 6 18:03:11 2013 +0000
+    - update tests
+    - added integration with Travis-CI.org
+    - dzillify distribution
+
+0.02  Mon Mar 4 12:01:07 2013
+    - added hashwalk() export and updated *.t
+    - added database statistics module and *.t
+    - updated pods and readme
+
+0.01  Wed Feb 27 15:33:04 2013
+    - original version
+

@@ -1,0 +1,18 @@
+1.71    2017-01-13 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Bump prereq version Config::IOD::Reader to 0.31 (to get
+	  implicit path encoding).
+
+
+1.70    2017-01-12 (PERLANCAR)
+
+	- Remove dependency on Log::Any for easier depak-ing.
+
+
+1.69    2017-01-04 (PERLANCAR)
+
+        - First release, split from Perinci-CmdLine-Lite so it can be depended
+          on by Perinci::CmdLine::Inline-generated scripts without having to
+          depend on Perinci-CmdLine-Lite.

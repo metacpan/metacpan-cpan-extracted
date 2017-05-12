@@ -1,0 +1,17 @@
+Revision history for Perl module POE-Component-IRC-Plugin-Karma
+
+0.003
+	Released: 2011-04-16 01:32:53 UTC
+
+	Fix a regex bug where it wouldn't recognize some karma commands ( thanks GETTY )
+
+0.002
+	Released: 2011-04-02 22:59:11 UTC
+
+	Add 'casesens' option to control case-sensitive searching
+	Tweak some sqlite pragma for performance
+
+0.001
+	Released: 2011-04-02 18:56:02 UTC
+
+	initial release

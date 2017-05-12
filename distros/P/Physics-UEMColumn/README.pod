@@ -1,0 +1,165 @@
+=head1 NAME
+
+Physics::UEMColumn - An Implementation of the Analytic Gaussian (AG) Model for Ultrafast Electron Pulse Propagation
+
+=head1 SYNOPSIS
+
+  use strict;
+  use warnings;
+
+  use Physics::UEMColumn alias => ':standard';
+  use Physics::UEMColumn::Auxiliary ':constants';
+
+  my $pulse = Pulse->new(
+    number   => 1e8,
+    velocity => '1e8 m/s',
+    sigma_t  => 100 ** 2 / 2 . 'um^2',
+    sigma_z  => 50 ** 2 / 2 . 'um^2',
+    eta_t    => me * 5.3 / 3 * 0.5 / 10 . 'kg eV',
+  );
+
+  my $column = Column->new(
+    length => '100 cm',
+  );
+
+  my $sim = Physics::UEMColumn->new(
+    column => $column,
+    pulse  => $pulse,
+  );
+
+  my $result = $sim->propagate;
+
+=head1 DESCRIPTION
+
+L<Physics::UEMColumn> is an implementation of the Analytic Gaussian (AG) electron pulse propagation model, presented by Michalik and Sipe (L<http://dx.doi.org/10.1063/1.2178855>) and extended by Berger and Schroeder (L<http://dx.doi.org/10.1063/1.3512847>). 
+
+=head2 About the Model
+
+This extended model calculates the dynamics of electron pulse propagation for an ultrashort pulse of electrons (that is electron packets of short enough temporal length to be completely contained inside the acceleration region). These electrons are then subject to the internal repulsive Coulomb forces, as well as the external forces of acceleration regions, magnetic lenses and radio-frequency (RF) cavities. 
+
+=head2 Caveats
+
+=over
+
+=item *
+
+The model is a self-similar Gaussian model, and therefore a mean-field model; futher the modeling of external forces is restricted to perfect lensing. 
+
+=item *
+
+The equations governing the generation of pulse (and therefore the initial parameters), are as-yet unpublished, and unexplained. Should this not be preferable, one should manually create a L<Physics::UEMColumn::Pulse> object, rather than allowing the C<Physics::UEMColumn::Photocathode> object to create one automatically.
+
+=item * 
+
+While sensible defaults have been given to the underlying solver's options (see L</solver_opts>, these defaults may not always produce a desired or physically correct output. Care should be taken to be ensure that the solver is setup correctly especially for the scales involved in your particular simulation.
+
+=back
+
+=head2 Examples
+
+Included in the source package is an F<examples> directory. Contained within is a system analogous to an optical Cooke triplet. After a Tantalum photocathode and the acceleration region, is a triplet composed of a magnetic lens, an RF cavity and another magnetic lens. The triplet is tuned to generate a three dimensional focus, presumably at the sample stage location. If available, the script then uses L<PDL> and L<PDL::Graphics::Prima> to plot the transverse (red) and longitudinal (green) HW1/eM beam widths. If those modules are not available the raw data is dumped to STDOUT as comma separated values.
+
+=head2 API Stability
+
+The author hopes that the user-facing API is stable. Unfortunately the internal and subclassing API are still likely to change; use with care.
+
+=head2 Units Handling
+
+L<Physics::UEMColumn> uses C<MooseX::Types::NumUnit> (and thus C<Physics::Unit>) to handle unit coercion. This allows units of different (but compatible) unit to be given to initialization directives. Those units are automatically coerced to the proper internal unit. Please note however that returned values are in the unit system used internally. That is to say, these coercions are an input convenience and not a choice of active unit system.
+
+L<Physics::Unit> is missing a few commonly used abbreviated units, for example C<fs> is unrecognized. It may be prudent to use the L<physics-unit> script to check a new unit for existence. In these cases, the long form of the unit (e.g. C<femtoseconds>) may be used. Such omissions may be filed as bugs on that module and will hopefully be present in subsequent releases.
+
+=head1 THE C<Physics::UEMColumn> CLASS
+
+Instances of the L<Physics::UEMColumn> class may be thought of as the "simulation" objects. The state of a simulation and all its constituent objects are stored in an instance of this class. It does not rely on any internal global state and thus several objects may be used simultaneously.
+
+=head2 Attributes
+
+L<Physics::UEMColumn> objects have certain properties which may be set during instantiation when passed as key value pairs to the C<new> method or may be accessed and possible changed via accessor methods of the same name. These attributes are as follows.
+
+=over 
+
+=item C<debug>
+
+A testing parameter which might give additional output. At this early release stage, no specific output is guaranteed.
+
+=item C<number>
+
+The number of electrons to be generated. If no C<Pulse> object is available, this value is used for pulse generation.
+
+=item C<pulse>
+
+Holder for a L<Physics::UEMColumn::Pulse> object. If one is not given, an attempt will be made to generate one, if enough other information has been given. If generation of such an object is not possible an error message will be shown. Such an object must be present to simulate a column.
+
+=item C<column>
+
+Holder for a L<Physics::UEMColumn::Column> object. This object acts as a holder for other column elements and defines the total column length. This object is required.
+
+=item C<start_time>
+
+Initial time for the simulation, this is C<0> by default. Unit: seconds.
+
+=item C<end_time>
+
+The estimated time at which the simulation will be ended. In actuality the full simulation will end when the pulse has reached the end of the column. For performance reasons it is advantageous for this time to be long enough to reach the end of the simulation. If no value is given for this attribute, one will be estimated from known parameters. Unit: seconds.
+
+=item C<steps>
+
+The requested number of time-step data points returned. This is neither the total number evaluations performed nor guaranteed to be the number of actual data points returned. This is more of a shorthand for specifying a step-width when the total duration is unknown. The default is C<100>. This number must be an integer.
+
+=item C<step_width>
+
+The estimated duration of steps. This number is usually determined from the above parameters. This helps to create a uniform data spacing, even if multiple runs are needed to span the entire column. Unit: seconds.
+
+=item C<time_error>
+
+A multiplicative factor used when estimating the simulation ending time. The default is C<1.1> or 10% additional time. Set to C<1> for no extra time.
+
+=item C<solver_opts>
+
+The options hashref passed directly to the C<ode_solver> from L<PerlGSL::DiffEq>. Unless explicitly changed, the options C<< h_max => 5e-12 >> and C<< h_init => 5e-13 >> are used.
+
+=back
+
+=head2 Methods
+
+=over
+
+=item C<add_element>
+
+A pass-through convenience method which adds a given L<Physics::UEMColumn::Element> instance to the column. Therefore these two calls are exactly equivalent.
+
+ $sim->column->add_element($elem);
+ $sim->add_element($elem);
+
+=item C<propagate>
+
+This method call begins the main simulation. It returns the result of this evaluation. Should a single pulse be propagated more than once the return will not include the results of the previous runs; the full propagation history will be available via the pulse's C<data> attribute.
+
+=back
+
+=head1 IMPORTING
+
+=head1 Class Aliases
+
+Since this is an object oriented simulation, many classes are available to be instantiated, unfortunately many have rather long names. To prevent carpal tunnel syndrome, these classes may be aliased in the current package (via stub functions) to remove the leading namespace C<Physics::UEMColumn::>. To create these aliases, use the import directive C<alias>
+
+ use Physics::UEMColumn alias => ':standard';
+
+The value of the alias directive can be an arrayref of strings of the names of the classes to be aliased, or else the special strings C<:all> (attempts to alias all classes) or C<:standard> (aliases the classes C<Laser Column Photocathode MagneticLens DCAccelerator RFCavity>).
+
+=head1 SOURCE REPOSITORY
+
+L<http://github.com/jberger/Physics-UEMColumn>
+
+=head1 AUTHOR
+
+Joel Berger, E<lt>joel.a.berger@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2013 by Joel Berger
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

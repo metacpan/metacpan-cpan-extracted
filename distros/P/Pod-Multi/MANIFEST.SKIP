@@ -1,0 +1,37 @@
+# Version control files and dirs.
+\bRCS\b
+\bCVS\b
+,v$
+.svn/
+
+# ExtUtils::MakeMaker generated files and dirs.
+^Makefile$
+^blib/
+^blibdirs$
+^pm_to_blib$
+^MakeMaker-\d
+                                                                                                                    
+# Module::Build
+^Build$
+^_build
+
+# Temp, old, vi and emacs files.
+~$
+\.old$
+^#.*#$
+^\.#
+\.swp$
+\.bak$
+\.tmp$
+
+# other
+\.tar\.gz$
+^cover/
+^cover_db/
+^cvg/
+^Todo
+^ToDo
+^TODO
+^superseded/
+^init_update.conf
+

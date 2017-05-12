@@ -1,0 +1,46 @@
+NAME
+    Perlbal::Plugin::ServerStarter - Perlbal plugin for Server::Starter
+    support
+
+SYNOPSIS
+      ## in perlbal.conf
+      LOAD ServerStarter
+      CREATE SERVICE web
+        SET role    = web_server
+        SET docroot = /path/to/htdocs
+        LISTEN = 5000
+      ENABLE web
+
+      ## command line
+      $ start_server --port 5000 -- perlbal -c perlbal.conf
+
+      ## use nifty wrapper script of start_server and perlbal combination
+      $ start_perlbal -c perlbal.conf
+
+DESCRIPTION
+    Perlbal::Plugin::ServerStarter is a plugin to be able to run perlbal via
+    *start_server* command of Server::Starter. Therefor, the hot deployment
+    of upgrading perlbal, plugins and configration changes is available by
+    Perlbal!!
+
+COMMANDS
+    LISTEN = [ip:]port
+        Set port number listened by *start_server*. Under using this plugin,
+        all of 'SET listen = [ip:]port' lines should be replaced in this
+        command, because *start_sever* generate multiple perlbal processes
+        with same configration at restarting processes.
+
+SEE ALSO
+    Server::Starter
+    Perlbal
+
+AUTHOR
+    Hiroshi Sakai <ziguzagu@cpan.org>
+
+    Repository available on github:
+    <https://github.com/ziguzagu/Perlbal-Plugin-ServerStarter/>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,7 @@
+docs: |
+    As per L<perlfaq>:
+
+        $string =~ s/^\s+//;
+
+    A basic glance through L<perlretut> or L<perlreref> should give you an
+    idea on how to change what characters get trimmed.

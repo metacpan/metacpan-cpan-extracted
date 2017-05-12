@@ -1,0 +1,13 @@
+<Octothorpe xmlns:A="uri:type:A" xmlns:C="uri:type:C">
+  <colon/>
+  <A:section_mark>First, some random text<interrobang />
+    <A:section_mark>
+      Hmm actually I want to do this test twice
+      <degree><interpunct>42</interpunct></degree> 
+    </A:section_mark>
+    <period><interpunct>42</interpunct></period> 
+  </A:section_mark>
+  <curly_brackets>
+    <la /><la /><blah /><anything><interpunct>43</interpunct></anything>
+  </curly_brackets>
+</Octothorpe>

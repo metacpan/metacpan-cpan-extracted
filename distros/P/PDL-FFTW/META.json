@@ -1,0 +1,49 @@
+{
+   "abstract" : "Obsolete FFTW version 2 bindings for PDL",
+   "author" : [
+      "Chris Marshall <chm@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Chris Marshall, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDL-FFTW",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::Install" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "PDL::FFTW" : {
+         "file" : "FFTW.pm",
+         "version" : "2.024"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "2.024"
+}

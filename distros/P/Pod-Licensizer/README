@@ -1,0 +1,98 @@
+######################################################################
+    Pod::Licensizer 0.03
+######################################################################
+
+NAME
+    Pod::Licensizer - Keep your project's AUTHOR and LICENSE sections in
+    sync
+
+SYNOPSIS
+        # Command line:
+        $ licensizer
+
+        # API:
+        use Pod::Licensizer;
+
+        my $licensizer = Pod::Licensizer->new();
+        $licensizer->load_file( "MyModule.pm" );
+
+        $licensizer->author_patch( 'Bodo Bravo <bodo@bravo.com>' );
+        $licensizer->license_patch( 'Copyright 2011 blah blah blah' );
+
+        $licensizer->write_file();
+
+DESCRIPTION
+    Pod::Licensizer helps keeping AUTHOR and LICENSE sections in sync across
+    many source files in a project.
+
+  licensizer
+    Pod::Licensizer comes with a command line utility, "licensizer", which
+    traverses a source tree, picks files containing POD documentation, and
+    refreshes their AUTHOR and LICENSE sections.
+
+    You define a ".licensizer.yml" file at the top level of your project
+    containing the desired AUTHOR and LICENSE data like
+
+        # .licensizer.yml
+        author: |
+          Bodo Bravo <bodo@bravo.com>
+          Zach Zulu <zach@zulu.com>
+
+        license: |
+          Copyright 2002-2011 by Bodo Bravo <bodo@bravo.com> and
+          Zach Zulu <zach@zulu.com>. All rights reserved.
+
+    and then simply run the "licensizer" script.
+
+    This is helpful if you want to add an author to your project or change
+    the year in the copyright notice. All you have to do is edit the
+    ".licensizer.yml" file and run "licensizer".
+
+    Advanced format:
+
+        # .licensizer.yml
+    
+        author: 
+          text: |
+            Mike Schilli <cpan@perlmeister.com>
+          mode: verbatim
+    
+        license: 
+          text: |
+            Copyright 2011 by Mike Schilli, all rights reserved.
+            This program is free software, you can redistribute it and/or
+            modify it under the same terms as Perl itself.
+
+    The "verbatim" mode setting makes sure that POD doesn't reformat the
+    text. This is especially useful if you use tabular data (e.g. a vertical
+    column of author names).
+
+  API
+    "new"
+        Constructor.
+
+    "$licensizer->load_file( $file )"
+        Load and parse a file containing POD.
+
+    "$licensizer-">author_patch( "author text", $opts )>
+        Update the POD's AUTHOR section.
+
+    "$licensizer-">license_patch( "license text", $opts )>
+        Update the POD's LICENSE section.
+
+    "$licensizer-">write_file( $filename )>
+        Write back the file. If $filename is omitted, the original file is
+        overwritten.
+
+IS LICENSIZER A WORD?
+    Strictly speaking, no. But what a boring world that would be if you
+    couldn't make up your own words.
+
+LICENSE
+    Copyright 2011 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+        2011, Mike Schilli <cpan@perlmeister.com>
+    

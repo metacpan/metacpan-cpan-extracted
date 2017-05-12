@@ -1,0 +1,33 @@
+#!/bin/sh 
+
+spamwho=`whoami`
+wrapper="`pwd`/qms-wrapper.$$"
+
+sudo ls > /dev/null
+
+echo using wrapper $wrapper
+
+(   echo "#!/bin/sh"
+    echo exec sudo setuidgid qmailq `pwd`/pperl -T -I`pwd`/blib/lib -I`pwd`/blib/arch -- --anyuser --prefork=1 /var/qmail/bin/qmail-scanner-queue.pl
+) > "$wrapper"
+chmod +x $wrapper
+
+export QMAILQUEUE="$wrapper"
+
+echo banging them through
+
+for x in 1 2 3 4 5 6 7 8 9 10 ; do
+    echo -n " $x"
+    (   echo From: nobody
+	echo To: $spamwho
+	echo Subject: test message $x
+	echo 
+	echo "hello $spamwho - test message $x"
+    ) | /var/qmail/bin/qmail-inject
+done
+echo
+
+rm $wrapper
+
+echo "Killing"
+sudo ./pperl -- -k /var/qmail/bin/qmail-scanner-queue.pl

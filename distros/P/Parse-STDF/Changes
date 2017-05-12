@@ -1,0 +1,10 @@
+Revision history for Perl module Parse::STDF
+
+0.2.5 Fri Jul 31 2015
+- Added gdr method
+- Added utility function xVn_array_ref
+- Completed TODO for "GDR" in examples/dump_records_to_ascii.pl
+
+0.2.4 Tue Aug 19 2014
+- Initial Version
+

@@ -1,0 +1,7 @@
+MANIFEST
+bin/ppmprofile.pl
+lib/PPM/Profile.pm
+Makefile.PL
+t/0-signature.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

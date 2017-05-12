@@ -1,0 +1,40 @@
+Revision history for POSIX-RT-Spawn
+
+0.11  Thu Feb 16 22:16:02 UTC 2012
+    - Added missing semicolons to XS statements.
+    - Added ppport request to provide sv_2pv_flags function for Perl 5.6.2.
+
+0.10  Wed Feb  8 07:17:17 UTC 2012
+    - Switched away from undocumented SvPVx_nolen, for compatiblity with
+      Perl < 5.8.9.
+
+0.09  Tue Feb  7 14:51:37 UTC 2012
+    - my_strlcat is also needed for Perl < 5.8.9.
+
+0.08  Wed Feb  1 20:14:03 UTC 2012
+    - Added support for Perls < 5.8.9 by explicitly requesting ppport to
+      provide the my_strlcpy function.
+
+0.07  Tue Jan 24 20:38:39 UTC 2012
+    - Adjusted synopsis and tests to allow for the fact that posix_spawn can
+      return successfully even if the spawned command fails.
+
+0.06  Tue Jan 24 02:29:17 UTC 2012
+    - Fixed inconsistent test results by also checking spawned pid against
+      Perl's ppid, because different command shells have different rules
+      about creating subshells.
+
+0.05  Mon Jan 23 15:58:44 UTC 2012
+    - Added fix for glibc.
+
+0.04  Fri Jan 13 03:37:34 UTC 2012
+    - Fixed for threaded perls.
+
+0.03  Thu Jan 12 23:11:35 UTC 2012
+    - Stopped testing errno, except after expected failure.
+
+0.02  Thu Jan 12 22:23:24 UTC 2012
+    - Fixed tests for Perl 5.8.
+
+0.01  Thu Jan 12 16:51:28 UTC 2012
+    - Initial distribution.

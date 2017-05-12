@@ -1,0 +1,15 @@
+Revision history for Perl extension Prancer::Plugin::Xslate
+
+1.00 Fri Dec 12 19:08:53 UTC 2014
+	- Initial release.
+
+1.04 Sat Dec 13 04:30:09 UTC 2014
+	- Don't remove configuration after loading it once.
+	- Make a singleton so configurations are remembered.
+	- 1.01, 1.02, and 1.03 were screwed up releases
+
+1.05 Wed Dec 24 04:59:04 UTC 2014
+	- Fixing bad code in perl doc and examples
+
+1.06 Sun Feb  8 07:19:59 UTC 2015
+	- Adding option to override configuration at template engine initialization.

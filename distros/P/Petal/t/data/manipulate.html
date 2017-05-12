@@ -1,0 +1,27 @@
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+     
+<html	xml:lang="en"
+	lang="en-"
+	xmlns="http://www.w3.org/1999/xhtml"  
+	xmlns:TAL="http://purl.org/petal/1.0/"
+	TAL:attributes="xmlns:petal string: http://purl.org/petal/1.0/;"
+>
+
+<head>
+	<title petal:content="session/get_form_action_label">Action Label</title>
+</head>
+
+<body bgcolor="white">
+	
+<form petal:attributes="action session/get_form_action">
+<input 	type='hidden' 
+	TAL:attributes="name configuration/get_identity_field_name;" 
+	petal:attributes="value entry/${configuration/get_identity_field_name};"
+/>
+</form>
+
+</body>
+</html>
+

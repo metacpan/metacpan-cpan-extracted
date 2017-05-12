@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/POE/Component/Client/MSN.pm
+lib/POE/Component/Client/MSN/Command.pm
+lib/POE/Filter/MSN.pm
+examples/msn-bot.pl
+examples/msn-bot-noterm.pl
+t/00_compile.t

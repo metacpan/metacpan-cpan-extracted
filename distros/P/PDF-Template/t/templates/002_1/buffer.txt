@@ -1,0 +1,8 @@
+PDF_new('')
+PDF_open_file('')
+PDF_set_parameter('openaction', 'fitpage')
+PDF_set_parameter('openmode', 'none')
+PDF_set_info('Creator', 'PDF::Template')
+PDF_set_info('Author', 'PDF::Template')
+PDF_close('')
+PDF_get_buffer('')

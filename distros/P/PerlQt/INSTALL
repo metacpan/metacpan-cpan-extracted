@@ -1,0 +1,44 @@
+
+Though this package uses GNU's Autoconf framework,
+it is recommended to use the Makefile.PL wrapper
+to drive the ./configure script.
+
+perl Makefile.PL [options]
+make
+make test
+su -c 'make install'
+
+
+=====
+
+Custom important options :
+
+--prefix=<path to KDE3 root directory, or final install prefix>
+
+--with-qt-dir=<path to QT3 root directory>
+
+--without-Mesa : when detecting OpenGL support, check for a proprietary GL
+                 library (e.g NVidia) and not for the MesaGL library.
+
+--disable-GL   : do not compile OpenGL classes into the Smoke interface
+                 library
+
+--enable-smoke : force generation and compilation of the Smoke library,
+                 even if it has been detected on your system
+
+--with-threshold=<0..15> : set the lever of standardness of your Qt
+                 library. Default is 10, which is reasonable.
+                 If your Qt library is very customized, and you
+                 experience missing symbols in libsmokeqt.so, 
+                 set this to zero (paranoid level).
+====
+
+See doc/en/index.html for installation procedure, requirements and
+detailed tutorial.
+
+See also PerlQt/tutorials and PerlQt/examples to get started.
+
+
+
+
+

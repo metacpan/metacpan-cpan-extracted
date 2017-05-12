@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+bindir=${exec_prefix}/bin
+includedir=${prefix}/include
+moduledir=${prefix}/share/gnome-js
+
+Name: GNOME JS Common
+Description: Common modules for GNOME JavaScript bindings.
+Version: 0.1.1

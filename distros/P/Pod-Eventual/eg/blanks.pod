@@ -1,0 +1,27 @@
+
+=head1 ABOUT
+
+This document includes typed regions with data paragraphs with blank lines as
+well as verbatim paragraphs with blank lines.  We want either to have one event
+per block-with-blank or to have sufficient information to reconstruct the
+block.
+
+  For example I have now begin a verbatim paragraph
+
+  and despite the intervening blank I am still in it, and
+
+
+  even several blank lines are included -- without loss -- in the final
+  verbatim paragraph.
+
+=begin data
+
+Similarly, this paragraph
+
+is actually one data para
+
+
+with blank lines within.
+
+=end data
+

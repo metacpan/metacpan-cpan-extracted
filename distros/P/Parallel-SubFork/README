@@ -1,0 +1,30 @@
+Parallel-SubFork
+================
+
+This module provides a simple way to execute arbitrary perl code from different
+processes through the fork system call.
+
+INSTALLATION
+
+To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+This module depends on the following CPAN modules:
+
+	Carp
+	POSIX
+	Class::Accessor::Fast
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2010 by Emmanuel Rodriguez
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

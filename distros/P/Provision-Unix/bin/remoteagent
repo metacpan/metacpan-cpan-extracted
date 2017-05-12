@@ -1,0 +1,245 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+## no critic
+eval 'exec /usr/bin/perl -S $0 ${1+"$@"}' if 0; # not running under some shell
+## use critic
+
+#use Data::Dumper;
+use IO::File;
+use IO::Handle;
+use Getopt::Long;
+
+use lib 'lib';
+use Provision::Unix;
+my $prov = Provision::Unix->new( debug => 0 );
+
+my ( $in_json, $out_json );
+eval { require JSON::XS; };
+if ( $@ ) {
+    require JSON;
+    $in_json  = JSON->new();
+    $out_json = JSON->new();
+    $in_json->allow_nonref(1);
+}
+else {
+    $in_json  = JSON::XS->new();
+    $out_json = JSON::XS->new();
+};
+
+Getopt::Long::GetOptions(
+    'pretty'    => \my $pretty,
+    'timeout=i' => \my $timeout,
+) 
+or die "Didn't understand command line parameters";
+
+my $ins  = IO::Handle->new_from_fd( fileno(STDIN),  'r' );
+my $outs = IO::Handle->new_from_fd( fileno(STDOUT), 'w' );
+$outs->autoflush(1);
+
+$pretty and $out_json->pretty;
+$timeout ||= 0;
+my $buffer = [];
+
+run();
+exit 0;
+
+sub rpc_send {
+    my $obj = shift;
+    my $msg;
+    eval { $msg = $out_json->encode($obj) };
+    local $SIG{PIPE} = sub {
+        die {
+            status  => 'error',
+            type    => 'protocol',
+            message => 'Remote unexpectedly closed pipe',
+        };
+    };
+    $outs->print("$msg\n");
+}
+
+sub rpc_receive {
+
+    return shift @{ $buffer } if scalar @{ $buffer };
+
+    return if ! defined $ins;
+
+    while ( 1 ) {
+        my $i;
+        if ($timeout) {
+            eval {
+                local $SIG{ALRM} = sub { die "alarm\n" };
+                alarm $timeout;
+                $i = $ins->getline;
+                $timeout and alarm 0;
+            };
+        }
+        else {
+            eval { $i = $ins->getline; };
+        }
+        if ($@) {
+            die {
+                status  => 'error',
+                type    => 'timeout',
+                message => 'Timed out',
+            }
+            if $@ eq "alarm\n";
+
+            die {
+                status  => 'error',
+                type    => 'protocol',
+                message => 'Unknown communication error'
+            };
+        }
+        if ( ! defined $i ) {
+            undef $ins;
+            return;
+        }
+        my @reqs;
+        eval { @reqs = $in_json->incr_parse($i); };
+        if ($@) {
+            $in_json->incr_reset;
+            rpc_send( {
+                status  => 'error',
+                type    => 'syntax',
+                message => "Malformed message: parse error: $@",
+            });
+        }
+        elsif ( scalar @reqs ) {
+            push @{ $buffer }, @reqs;
+            $in_json->incr_reset;
+            return shift @{ $buffer };
+        }
+    }
+}
+
+sub run {
+
+    while ( 1 ) {
+        my $o;
+        eval { $o = rpc_receive(); };
+        if ( ! defined $o ) { # Session terminated w/o saying goodbye
+            rpc_send( {
+                status  => 'error',
+                type    => 'system',
+                message => $@,
+            });
+            last;
+        };
+
+        if ( ref $o ne 'HASH' ) {
+            rpc_send( { 
+                status  => 'error',
+                type    => 'syntax',
+                message => 'Malformed message: parse error',
+            });
+            next;
+        };
+
+        my $id = $o->{id};
+        my $action = $o->{action};
+        if ( ! $action || ! length($action) ) {
+            rpc_send( {
+                status  => 'error',
+                type    => 'dispatch',
+                message => 'Malformed message: no action',
+                id      => $id,
+            });
+            next;
+        };
+
+        if ( $action eq 'close' ) {
+            rpc_send( { status => 'ok', message => 'Bye', id => $id } );
+            last;
+        }
+        elsif ( $action eq 'echo' ) {
+            rpc_send( { status  => 'ok', message => 'Echo', id => $id });
+            next;
+        }
+
+        my $result;
+        eval { $result = do_prov_call( $o, $action ); };
+        if ( $@ ) {
+            rpc_send( $@ );
+            last;
+        };
+
+        rpc_send( {
+            status => 'ok',
+            id     => $id,
+            audit  => $prov->audit,
+            result => $result,
+        });
+    }
+}
+
+sub do_prov_call {
+    my ( $req, $action ) = @_;
+    $action = 'get_status' if $action eq 'probe';
+    my $pkg = $req->{provisiontype};
+    my $suffix = '_' . lc($pkg);
+    $pkg = 'Provision::Unix::' . $pkg;
+
+    my %result = ( id => $req->{id} );
+
+    ## no critic
+    eval "require $pkg;";
+    ## use critic
+    die {
+        type    => 'dispatch',
+        message => "Error loading provisioning module $pkg",
+        debug   => $@,
+        status  => 'error',
+        %result,
+    } if $@;
+
+    rpc_send( { message => "Loaded $pkg", status  => 'debug', %result, });
+
+    my $params = $req->{params} || {};
+    my $instance = $pkg->new( prov => $prov );
+
+    rpc_send( { message => "created $pkg object", status  => 'debug', %result, });
+
+    my $method;
+    if ( $pkg->can( $action . $suffix ) ) {
+        $method = $action . $suffix;
+    }
+    elsif ( $pkg->can($action) ) {
+        $method = $action;
+    }
+    else {
+        die {
+            type    => 'dispatch',
+            message => "Unknown action '$action'",
+            status  => 'error',
+            %result,
+        };
+    }
+
+    rpc_send( {
+        message => "Calling '$pkg'::'$method'",
+        data    => $params,
+        status  => 'debug',
+        %result,
+    });
+
+    my $rv;
+    eval { $rv = $instance->$method( defined $params ? %$params : () ); };
+
+    $result{exception} = $@ if $@;
+
+    if ( $@ || ! $rv ) {
+        die {
+            %result,
+            status    => 'error',
+            type      => 'operation',
+            message   => $prov->get_last_error(),
+            audit     => $prov->audit,
+        }; 
+    };
+
+    return $rv;
+}
+

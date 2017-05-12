@@ -1,0 +1,8 @@
+Basic Installation
+==================
+
+tar xvfz pb-1.0.tar.gz
+cd pb-1.0
+perl Makefile.PL
+make 
+make install

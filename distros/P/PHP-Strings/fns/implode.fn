@@ -1,0 +1,4 @@
+docs: |
+    See L<perlfunc/"join">. Note that join cannot accept its arguments in
+    either order because that's just not how Perl arrays and lists work.
+    Note also that the joining sequence is not optional.

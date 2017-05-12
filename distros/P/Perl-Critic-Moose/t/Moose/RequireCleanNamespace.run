@@ -1,0 +1,150 @@
+## name Basic passing - Moose
+## failures 0
+## cut
+
+use Moose;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+no Moose;
+
+
+## name Basic passing - Moose::Role
+## failures 0
+## cut
+
+use Moose::Role;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+no Moose::Role;
+
+
+## name Basic passing - Moose and Moose::Util::TypeConstraints
+## failures 0
+## cut
+
+use Moose;
+use Moose::Util::TypeConstraints;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+no Moose;
+no Moose::Util::TypeConstraints;
+
+
+## name Passing with custom module.
+## failures 0
+## parms { modules => 'MooseX::MySugar' }
+## cut
+
+use MooseX::MySugar;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+no MooseX::MySugar;
+
+
+## name Basic failure - Moose
+## failures 1
+## cut
+
+use Moose;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+
+## name Basic failure - Moose::Role
+## failures 1
+## cut
+
+use Moose::Role;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+
+## name Basic failure - Moose and Moose::Util::TypeConstraints
+## failures 1
+## cut
+
+use Moose;
+use Moose::Util::TypeConstraints;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+
+## name Basic failure - MooseX::Role::Parameterized
+## failures 1
+## cut
+
+use MooseX::Role::Parameterized;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+
+## name Failure with custom module.
+## failures 1
+## parms { modules => 'MooseX::MySugar' }
+## cut
+
+use MooseX::MySugar;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+## name autoclean is a cleaner
+## failures 0
+## cut
+
+use namespace::autoclean;
+use Moose;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+## name custom cleaner
+## failures 0
+## parms { cleaners => 'My::Cleaner' }
+## cut
+
+use My::Cleaner;
+use Moose;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+## name Moose without imports
+## failures 0
+## cut
+
+use Moose ();

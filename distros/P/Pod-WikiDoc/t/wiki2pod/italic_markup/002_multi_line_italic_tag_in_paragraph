@@ -1,0 +1,6 @@
+this text should be ~italic
+and span multiple lines~
+#--------------------------------------------------------------------------#
+this text should be I<italic
+and span multiple lines>
+

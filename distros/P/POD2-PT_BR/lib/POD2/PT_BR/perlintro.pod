@@ -1,0 +1,550 @@
+=encoding utf8
+
+=head1 NOME
+
+perlintro - uma breve introdução ao Perl
+
+=head1 DESCRIÇÃO
+
+Este documento tem por intenção dar a você uma breve introdução à linguagem de programação Perl, com referências para documentações mais aprofundadas. É um guia inicial para aqueles que são novos na linguagem, e provê apenas informações para que você esteja apto a ler códigos escritos em Perl por outras pessoas e entender o que este faz, ou ainda escrever seus próprios programas iniciais. 
+
+Este documento introdutório não tem por objetivo ser completo, e também não deseja ser totalmente correto. Em alguns casos, a perfeição foi sacrificada para que o objetivo de transparecer uma idéia seja alcançado. Sugerimos I<fortemente> que você siga esta introdução com mais informações encontradas no manual completo do Perl, cujo índice pode ser encontrado em L<perltoc>. 
+
+Neste documento, você encontrará referências para outras partes da documentação do Perl. Você pode ler esta documentação usando o comando C<perldoc> ou o mesmo método que você está utilizando para ler este documento.
+
+=head2 O que é o Perl?
+
+O Perl é uma linguagem de programação de uso geral, originalmente desenvolvida para manipulação de textos, utilizada hoje em dia para uma infinidade de tarefas incluindo administração de sistemas, desenvolvimento web, programação de redes, desenvolvimento de interfaces gráficas (GUI), e muitas outras. 
+
+A linguagem foi escrita para ser prática (fácil de utilizar, eficiente, completa) ao invés de bonita (pequena, elegante, mínima). Suas maiores características são sua facilidade de uso, suporte tanto para programação procedural quanto para programação orientada à objetos (OO), poderoso suporte incluso na linguagem para processamento de textos, e uma das maiores coleções de módulos escritos por terceiros. 
+
+Outras definições do Perl são dadas em L<perl>, L<perlfaq1> e sem dúvida em outros lugares. A partir destas informações, podemos determinar que Perl é uma coisa diferente para cada pessoa, mas que muitas pessoas acreditam que é, no mínimo, interessante escrever sobre ela. 
+
+=head2 Executando programas Perl
+
+Para executar um programa Perl, a partir da linha de comando do Unix:
+
+    perl meuprograma.pl
+
+Um método alternativo é colocar isto como a primeira linha do seu script:
+
+    #!/usr/bin/env perl
+
+... e executar seu script como C</caminho/para/script.pl>. Naturalmente, o arquivo deverá ser marcado como executável antes, então execute C<chmod 755 script.pl> (no Unix).
+
+(Essa linha inicial assume que você possui o programa B<env>. Você também pode colocar diretamente o caminho para seu executável perl, como em C<#!/usr/bin/perl>).
+
+Para mais informações, incluindo instruções para outras plataformas como Windows e Mac OS, leia L<perlrun>. 
+
+=head2 Rede de segurança
+
+Perl por padrão muito tolerante. Para torná-lo mais robusto é recomendado iniciar seu programa com as seguintes linhas:
+
+    #!/usr/bin/perl
+    use strict;
+    use warnings;
+
+As duas linhas adicionais solicitam que o perl identifique diversos problemas comuns em seu código. Eles verificam coisas diferentes então você precisa dos dois. Um problema potencial capturado pelo C<use strict;> fará com que seu código seja interrompido imediatamente, enquanto o C<use warnings;> vai simplemente gerar um aviso (como o argumento de linha de comando B<-w>) e deixar seu código executar mesmo assim. Para saber mais sobre eles procure por suas respectivas documentações em L<strict> e L<warnings>.
+
+=head2 Visão Básica da sintaxe
+
+Um programa ou script Perl consiste em um ou mais comandos. Esses comandos são simplesmente escritos no script, um após o outro. Não há necessidade de existir uma função C<main()> ou algo do tipo. 
+
+Comandos Perl são finalizados com um ponto-e-vírgula: 
+
+    print "Alo, mundo";
+
+Comentários começam com um sustenido (#) e vão até o fim da linha:
+
+    # Isso e' um comentario
+
+Espaços em branco são irrelevantes:
+
+    print
+        "Alo, mundo"
+        ;
+
+... exceto dentro de strings com aspas:
+
+    # isto deve imprimir o texto com uma quebra de linha no meio
+    print "Alo
+    mundo";
+
+Aspas duplas ou aspas simples podem ser utilizadas em torno de strings:
+
+    print "Alo, mundo";
+    print 'Alo, mundo';
+
+No entanto, apenas strings com aspas duplas podem "interpolar" variáveis e caracteres especiais como quebra-de-linha (C<\n>):
+
+    print "Alo, $nome\n";     # funciona!
+    print 'Alo, $nome\n';     # exibe $nome\n literalmente
+
+Números não precisam de aspas:
+
+    print 42;
+
+Você pode utilizar parênteses para argumentos de funções ou omití-los de acordo com seu gosto. Elas são necessárias apenas ocasionalmente, para deixar clara questões de precedência.
+
+    print("Alo, mundo\n");
+    print "Alo, mundo\n";
+
+Informações mais detalhadas sobre a sintaxe do Perl pode ser encontrada em L<perlsyn>.
+
+=head2 Tipos de variáveis em Perl
+
+Perl tem três tipos principais de variáveis: scalars, arrays e hashes. 
+
+=over 4
+
+=item Scalars
+
+Uma variável scalar representa um único valor:
+
+    my $animal = "camelo";
+    my $resposta = 42;
+
+Valores de variáveis scalar podem ser strings, inteiros ou números com ponto flutuante, e o Perl irá converter automaticamente entre os tipos conforme a necessidade. Não é necessário pré-declarar os tipos de suas variáveis, mas você deve declará-las usando a palavra-chave C<my> na primeira vez que as usar (Esse é um dos requisitos do C<use strict;>).
+
+Variáveis scalar podem ser utilizados de diversas formas:
+
+    print $animal;
+    print "O animal e' $animal\n";
+    print "O quadrado de $resposta e' ", $resposta * $resposta, "\n";
+    
+Existem algumas variáveis scalar "mágicas" com nomes que se parecem com pontuação ou lixo. Estas variáveis especiais são utilizadas com diversos propósitos, e estão documentadas em L<perlvar>. A única que você precisará conhecer agora é C<$_>, que é a "variável padrão". Ela é utilizada como argumento padrão para um grande número de funções no Perl, e é atribuída implicitamente em algumas construções de iteração.
+
+    print;          # exibe o conteudo de $_ por padrao
+
+=item Arrays
+
+Um array representa uma lista de valores:
+
+    my @animais = ("camelo", "lhama", "coruja");
+    my @numeros = (23, 42, 69);
+    my @misturados   = ("camelo", 42, 1.23);
+
+O índice inicial de uma variável array é zero (0). É assim que você extrai elementos de um array:
+
+    print $animais[0];              # exibe "camelo"
+    print $animais[1];              # exibe "lhama"
+
+A variável especial C<$#array> informa o índice do último elemento de um array:
+
+    print $misturados[$#misturados];       # último elemento, exibe 1.23
+
+Você pode pensar em usar C<$#array + 1> para dizer quantos items existem em um array. Não se incomode com isso. Utilizando @array onde Perl espera encontrar um valor scalar ("em contexto escalar"), ele irá devolver o número de elementos do array:
+
+    if (@animais < 5) { ... }
+
+Os elementos que estamos extraindo do array começam com um C<$> porque você está obtendo um único valor do array -- você pede um valor scalar, você recebe um valor scalar.
+
+Para extrair diversos valores de um array:
+
+    @animais[0,1];                # devolverá ("camel", "llama");
+    @animais[0..2];               # devolverá ("camel", "llama", "owl");
+    @animais[1..$#animais];       # devolverá todos exceto o primeiro elemento
+
+Isto é chamado de "array slice".
+
+Você pode fazer várias coisas úteis com listas:
+
+    my @ordenados  = sort @animais;
+    my @invertidos = reverse @numeros;
+
+Existem alguns arrays especiais também, como C<@ARGV> (os argumentos de linha de comando passados para seu script) e C<@_> (os argumentos passados para uma subrotina). Estas variáveis estão documentadas em L<perlvar>.
+
+=item Hashes
+
+Um hash representa uma coleção de pares de chave/valor:
+
+    my %cores_de_frutas = ("morango", "vermelho", "banana", "amarelo");
+
+Você pode utilizar espaços em branco e o operador C<< => >> para uma leitura mais agradável:
+
+    my %cores_de_frutas = (
+        morango => "vermelho",
+        banana  => "amarelo",
+    );
+
+Para obter elementos de um hash:
+
+    $cores_de_frutas{"morango"};           # retorna "vermelho"
+
+Você pode obter a lista de chaves e valores com as funções C<keys()> e C<values()>.
+
+    my @frutas = keys   %cores_de_frutas;
+    my @cores  = values %cores_de_frutas;
+
+Hashes não possuem uma ordem interna particular, mas você pode ordenar as chaves (utilizando a função C<sort()>) e iterar entre elas.
+
+Assim como variáveis scalar e array especiais, existem também hashes especiais. A mais conhecida delas é a variável %ENV, que contém as variáveis de ambiente. Leia tudo sobre ela (e outras variáveis especiais) em L<perlvar>.
+
+=back
+
+Variáveis scalar, array e hash são documentadas mais detalhadamente em L<perldata>.
+
+Tipos de dados mais complexos podem ser construídos utilizando referências, que permitem a você construir listas e hashes dentro de listas e hashes.
+
+Uma referência é um valor scalar e pode referir-se a qualquer outro tipo de dados do Perl. Portanto ao armazenar uma referência como o valor de um array ou um elemento de um hash, você pode facilmente criar listas e hashes dentro de listas e hashes. O exemplo a seguir mostra uma estrutura de hash de hash de 2 níveis utilizando referências anônimas para hash. 
+
+    my $variaveis = {
+        scalar  =>  {
+                     descricao => "item unico",
+                     simbolo => '$',
+                    },
+        array   =>  {
+                     descricao => "lista ordenada de itens",
+                     simbolo => '@',
+                    },
+        hash    =>  {
+                     descricao => "pares chave/valor",
+                     simbolo => '%',
+                    },
+    };
+
+    print "Scalars comecam com um $variaveis->{'scalar'}->{'simbolo'}\n";
+
+Maiores informações neste tópico de referências podem ser encontradas em L<perlreftut>, L<perllol>, L<perlref> e L<perldsc>.
+
+=head2 Escopo de variáveis
+
+Ao longo da seção anterior todos os exemplos utilizaram a sintaxe:
+
+    my $var = "valor";
+
+O C<my> não é necessário; você pode escrever apenas:
+
+    $var = "valor";
+
+Entretanto, a utilização acima irá criar variáveis globais em todo o seu programa, o que é uma má prática de programação. C<my> cria uma variável em escopo léxico, ao invés do escopo global. Estas variáveis ficam dentro do bloco (isto é, diversos comandos envoltos por chaves { }) em que foram definidas. 
+
+    my $x = "foo";
+    my $alguma_condicao = 1;
+    if ($alguma_condicao) {
+        my $y = "bar";
+        print $x;           # exibe "foo"
+        print $y;           # exibe "bar"
+    }
+    print $x;               # exibe "foo"
+    print $y;               # nao exibe nada; $y saiu de escopo.
+
+Utilizando C<my> em conjunto com C<use strict;> no início de seus scripts Perl significa que o interpretador vai avisar certos erros de programação mais comuns. Por exemplo, no código acima, o último C<print $y> vai causar um erro em tempo de compilação e prevenir você de executar o programa. A utilização de C<strict> é muito recomendada. 
+
+=head2 Construções condicionais e de iteração (laços)
+
+Perl possui a maioria das construções condicionais e de iteração, exceto pela construção case/switch (mas se você realmente a quiser, existe o módulo Switch no Perl 5.8 e mais atuais, e no CPAN. Veja a seção de módulos, abaixo, para mais informações sobre módulos e o CPAN).
+
+As condições podem ser qualquer expressão Perl. Veja a lista de operadores na próxima sessão para informações sobre comparações e operadores lógicos booleanos, que costumam ser utilizados em comandos condicionais. 
+
+=over 4
+
+=item if
+
+    if ( condição ) {
+        ...
+    } elsif ( outra condição ) {
+        ...
+    } else {
+        ...
+    }
+
+Existe também a versão de negação do C<if>:
+
+    unless ( condição ) {
+        ...
+    }
+
+Esta construção é utilizada como uma forma de leitura mais fácil de C<if (!I<condição>)>.
+
+Note que as chaves são necessárias em Perl, mesmo que você tenha apenas uma linha no bloco. Entretanto, existe uma maneira de fazer seus blocos condicionais de uma linha parecerem mais naturais:
+
+
+    # o modo tradicional
+    if ($zippy) {
+        print "Yow!";
+    }
+
+    # o modo Perl, utilizando pós-condição
+    print "Yow!" if $zippy;
+    print "Nao temos bananas" unless $bananas;
+
+=item while
+
+    while ( condição ) {
+        ...
+    }
+
+Há também a versão de negação do C<while>, pela mesma razão que temos o C<unless>:
+
+    until ( condição ) {
+        ...
+    }
+
+Você também pode utilizar o C<while> como uma pós-condição: 
+
+    print "LA LA LA\n" while 1;          # repete eternamente
+
+=item for
+
+Exatamente como em C:
+
+    for ($i = 0; $i <= $max; $i++) {
+        ...
+    }
+
+O estilo de iteração C<for> do C dificilmente é necessário no Perl, já que este oferece um modo mais amigável de iterar listas, com o comando C<foreach>. 
+
+=item foreach
+
+    foreach (@array) {
+        print "Esse elemento e' $_\n";
+    }
+
+    print $list[$_] foreach 0 .. $max;
+    
+    # voce tambem nao precisa usar a variável padrão $_ ...
+    foreach my $chave (keys %hash) {
+        print "O valor de $chave e' $hash{$chave}\n";
+    }
+
+=back
+
+Para mais detalhes sobre construções de iteração (e algumas que não foram mencionadas aqui) veja L<perlsyn>. 
+
+=head2 Operadores e funções embutidas
+
+Perl vem com uma grande seleção de funções embutidas. Algumas das que já vimos incluem C<print>, C<sort> e C<reverse>. Uma lista delas é informada no início do L<perlfunc> e você pode facilmente obter mais informações sobre qualquer função utilizando C<perldoc -f I<função>>.
+
+Operadores do Perl são documentados em detalhes em L<perlop>, mas aqui estão alguns dos mais comuns:
+
+=over 4
+
+=item Aritméticos
+
+    +   adição
+    -   subtração
+    *   multiplicação
+    /   divisão
+
+=item Comparação numérica
+
+    ==  igualdade
+    !=  desigualdade
+    <   menor que
+    >   maior que
+    <=  menor ou igual a
+    >=  maior ou igual a
+
+=item Comparação de strings
+
+    eq  igualdade
+    ne  desigualdade
+    lt  menor que
+    gt  maior que
+    le  menor ou igual a
+    ge  maior ou igual a
+
+(Por que temos comparações numéricas e de string separadas? Porque não temos tipos especiais de variáveis, e o Perl precisa saber quando ordenar numericamente (onde 99 é menor que 100) ou alfabeticamente (onde 100 vêm antes de 99)).
+
+=item Lógica booleana
+
+    &&  and (e)
+    ||  or  (ou)
+    !   not (não)
+
+(C<and>, C<or> e C<not> não estão na tabela acima apenas como descrição dos operadores -- eles também são operadores. São mais fáceis de ler do que operadores do estilo C, mas possuem precedências diferentes de && e amigos. Verifique L<perlop> para mais detalhes.) 
+
+=item Diversos
+
+    =   atribuição
+    .   concatenação de string
+    x   multiplicação de string
+    ..  operador de intervalo (cria uma lista de números) -- N.T.: "range operator"
+
+=back
+
+Diversos operadores podem ser combinados com C<=>, como por exemplo: 
+
+    $a += 1;        # mesmo que $a = $a + 1
+    $a -= 1;        # mesmo que $a = $a - 1
+    $a .= "\n";     # mesmo que $a = $a . "\n";
+
+=head2 Arquivos e I/O
+
+Você pode abrir um arquivo para leitura ou escrita usando a função C<open()>. Ela está documentada com detalhes extravagantes em L<perlfunc> e L<perlopentut>, mas em resumo:
+
+    open(my $entrada, "<",  "entrada.txt") or die "Erro abrindo entrada.txt: $!";
+    open(my $saida,   ">",  "saida.txt")   or die "Erro abrindo saida.txt: $!";
+    open(my $log,     ">>", "meu.log")     or die "Erro abrindo meu.log: $!";
+
+Você pode ler de um filehandle aberto utilizando o operador C<< <> >>. No contexto escalar, ele lê uma única linha do filehandle, e em contexto de lista lê o arquivo inteiro, atribuindo cada linha a um elemento da lista:
+
+    my $linha  = <$entrada>;
+    my @linhas = <$entrada>;
+
+Ler todo o arquivo de uma só vez é chamado I<slurping>. Este procedimento pode ser útil mas pode consumir muita memória. A maioria do processamento em arquivos de texto pode ser feita uma linha por vez com as construções de iteração do Perl.
+
+O operador C<< <> >> é visto com mais frequência em um comando C<while>:
+
+    while (<$entrada>) {     # coloca uma linha de cada vez em $_
+        print "Acabei de ler essa linha: $_";
+    }
+
+Nós já vimos como imprimir para a saída padrão utilizando C<print()>. Entretanto, o C<print()> pode receber um primeiro parâmetro opcional especificando em qual filehandle ele irá escrever:
+
+    print STDERR "Este foi seu ultimo aviso.\n";
+    print $saida $registro;
+    print $log $mensagem;
+
+Quando você não tiver outras operações pra fazer com seus filehandles abertos, você deve fechá-los (embora, sendo bem honesto, o Perl irá fechá-los para você caso você esqueça):
+
+    close $entrada or die "$entrada: $!";
+
+=head2 Expressões Regulares
+
+O suporte à expressões regulares do Perl é intenso e profundo, e é extensamente documentado em L<perlrequick>, L<perretut> e outros lugares. Um resumo:
+
+=over 4
+
+=item Combinação simples
+
+    if (/foo/)       { ... }  # verdadeiro se $_ contem "foo"
+    if ($a =~ /foo/) { ... }  # verdadeiro se $a contem "foo"
+
+O operador de combinações C<//> é documentado em L<perlop>. Ele opera por padrão na variável C<$_>, ou pode ser associado a outra variável utilizando o operador C<=~> (também documentado em L<perlop>). 
+
+=item Substituições simples
+
+    s/foo/bar/;               # substitui foo por bar em $_
+    $a =~ s/foo/bar/;         # substitui foo por bar em $a
+    $a =~ s/foo/bar/g;        # substitui TODAS AS OCORRÊNCIAS de foo por bar em $a
+
+O operador de substituições C<s///> está documentado em L<perlop>.
+
+=item Expressões regulares mais complexas
+
+Você não precisa fazer combinações apenas com strings fixas. Na verdade, você pode combinar qualquer coisa que você quiser utilizando expressões regulares mais complexas. Elas são documentadas mais extensivamente em L<perlre>, mas enquanto isso, aqui está um guia de consulta rápida: 
+
+    .                   um único caractere
+    \s                  um caractere de espaçamento (espaço, tabulação, nova-linha)
+    \S                  um caractere não-espaçamento
+    \d                  um dígito (0-9)
+    \D                  um caractere não-dígito
+    \w                  um caractere de palavra (a-z, A-Z, 0-9, _)
+    \W                  um caractere de não-palavra
+    [aeiou]             combina um único caractere do conjunto dado
+    [^aeiou]            combina com um único caractere de fora do conjunto dado
+    (foo|bar|baz)       combina com qualquer uma das alternativas especificadas
+
+    ^                   início da string
+    $                   final da string
+
+Quantificadores podem ser usados para especificar quantos items da expressão anterior você quer combinar, onde "expressão" pode ser tanto um caractere, um dos meta-caracteres listados acima, ou um grupo de caracteres ou meta-caracteres entre parênteses. 
+
+    *                   zero ou mais da expressão anterior
+    +                   um ou mais da expressão anterior
+    ?                   zero ou um da expressão anterior
+    {3}                 combina exatamente 3 da expressão anterior
+    {3,6}               combina entre 3 e 6 da expressão anterior
+    {3,}                combina 3 ou mais da expressão anterior
+
+Alguns exemplos simples:
+
+    /^\d+/              string que começa com um ou mais dígitos
+    /^$/                string vazia (início e fim adjacentes)
+    /(\d\s){3}/         três dígitos, cada um seguido por um caractere de 
+                        espaçamento (por exemplo "3 4 5 ")
+    /(a.)+/             combina com strings em que cada caractere em posição 
+                        ímpar seja a letra "a" (por exemplo "abacadaf")
+
+    # Esta iteração lê do STDIN, e imprime as linhas que não estão em branco:
+    while (<>) {
+        next if /^$/;
+        print;
+    }
+
+=item Parênteses para captura de dados
+
+Além de agrupamento, parênteses servem para um segundo propósito. Eles podem ser utilizados para capturar os resultados de partes da combinação da expressão regular para posterior utilização. Os resultados são armazenados nas variáveis C<$1>, C<$2> e assim por diante. 
+
+    # uma maneira rápida e suja de separar um endereço eletrônico em partes
+
+    if ($email =~ /([^@]+)@(.+)/) {
+        print "Nome do usuario: $1\n";
+        print "Nome do host: $2\n";
+    }
+
+=item Outras funcionalidades das expressões regulares
+
+Expressões regulares em Perl também suportam backreferences, lookaheads e todos tipo de detalhes complexos. Leia tudo sobre eles em L<perlrequick>, L<perlretut> e L<perlre>.
+
+=back
+
+=head2 Escrevendo subrotinas
+
+Escrever subrotinas é fácil:
+
+    sub logger {
+        my $mensagem = shift;
+        open my $log, ">>", "my.log" or die "Erro abrindo my.log: $!";
+        print $logfile $mensagem;
+    }
+
+Agora podemos usar a subrotina exatamente como qualquer outra função:
+
+    logger("Temos a subrotina logger!");
+
+O que é aquele C<shift>? Bem, os argumentos passados para uma subrotina estão disponíveis através do array especial chamado C<@_> (veja L<perlvar> para mais detalhes). O argumento padrão para a função C<shift> é C<@_>. Então, C<my $mensagem = shift;> extrai o primeiro item da lista de argumentos e o atribui a C<$mensagem>. 
+
+Podemos manipular C<@_> de outras maneiras também:
+
+    my ($mensagem, $prioridade) = @_;     # comum
+    my $mensagem = $_[0];                 # incomum, e feio
+
+Subrotinas também podem retornar valores:
+
+    sub quadrado {
+        my $num = shift;
+        my $resultado = $num * $num;
+        return $resultado;
+    }
+
+E então a use como:
+
+    $sq = quadrado(8);
+
+Para mais informações sobre como escrever subrotinas, veja L<perlsub>.
+
+=head2 Programação orientada a objetos em Perl
+
+A programação orientada à objetos (OO) em Perl é relativamente simples e é implementada utilizando referências que sabem qual tipo de objeto elas são, baseadas no conceito de Perl sobre pacotes. No entanto, Perl OO está muito além do escopo deste documento. Leia L<perlboot>, L<perltoot>, L<perltooc> e L<perlobj>.
+
+Como um programador Perl iniciante, seu uso mais comum de orientação a objetos em Perl será na utilização de módulos escritos por terceiros, que está documentada abaixo. 
+
+=head2 Usando módulos Perl
+
+Módulos Perl oferecem diversas funcionalidades para ajudá-lo a não reinventar a roda, e podem ser obtidos do CPAN ( http://www.cpan.org/ ). Um grande número de módulos populares são incluídos com a distribuição padrão do Perl.
+
+As categorias dos módulos vão da manipulação de textos à protocolos de rede à integração com banco de dados à gráficos. Uma lista categorizada dos módulos também está disponível no CPAN.
+
+Para aprender como instalar módulos obtidos do CPAN, leia L<perlmodinstall>.
+
+Para aprender como utilizar um módulo em particular, utilize C<perldoc I<Nome::Do::Modulo>>. Normalmente você fará algo como C<use I<Nome::Do::Modulo>>, que irá dar acesso às funções exportadas ou à interface orientada à objetos do módulo.
+
+O L<perlfaq> contém perguntas e respostas relacionadas à diversas tarefas comuns, e muitas vezes oferece sugestões de bons módulos do CPAN para usar.
+
+O L<perlmod> descreve os módulos de Perl em geral. L<perlmodlib> lista os módulos vieram com sua instalação Perl.
+
+Se você quiser escrever módulos em Perl, L<perlnewmod> te dará bons conselhos.
+
+=head1 AUTOR
+
+Kirrily "Skud" Robert <skud@cpan.org>
+
+=head1 TRADUÇÃO
+
+Igor Sutton <igor@izut.com>
+
+Breno G. de Oliveira <garu@cpan.org>
+

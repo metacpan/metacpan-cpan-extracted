@@ -1,0 +1,23 @@
+<html>
+  <!--
+  $Id: pp_book-frm.tpl,v 1.2 2001/12/06 21:38:12 lorenz Exp $
+  $Revision: 1.2 $
+  $Date: 2001/12/06 21:38:12 $
+  -->
+<head>
+  <title>Test of pp_book</title>
+</head>
+
+<frameset border=0 frameborder=0 framespacing=0 rows="60, *, 60">
+    <frame src="./pp_book-top.htm" name="Top">
+    <frameset border=0 frameborder=0 framespacing=0 cols="205, *">
+      <frame src="pp_book0000.htm" name="Index">
+      <frame src="pp_book0001.htm" name="Data">
+    </frameset>
+    <frame src="./pp_book-bot.htm" name="Foot">
+</frameset>
+
+<body>
+  Please call the <a href="pp_book0000.htm">titel page</a>
+</body>
+</html> 

@@ -1,0 +1,36 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.001003
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+ [Removed / runtime requires]
+ - utf8
+
+0.001002 2014-08-22T19:55:54Z
+
+0.001001 2014-08-22T08:27:58Z
+ [Added / runtime requires]
+ - Pod::Weaver::Plugin::SingleEncoding
+ - Pod::Weaver::PluginBundle::CorePrep
+ - Pod::Weaver::Section::Authors
+ - Pod::Weaver::Section::Collect
+ - Pod::Weaver::Section::Contributors
+ - Pod::Weaver::Section::Generic
+ - Pod::Weaver::Section::Leftovers
+ - Pod::Weaver::Section::Legal
+ - Pod::Weaver::Section::Name
+ - Pod::Weaver::Section::Region
+ - Pod::Weaver::Section::Version
+
+ [Added / test requires]
+ - Test::Fatal

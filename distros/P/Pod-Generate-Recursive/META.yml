@@ -1,0 +1,27 @@
+---
+abstract: 'Generate POD for directory contents. '
+author:
+  - 'Adam M Dutko <addutko@cpan.org>'
+build_requires:
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Generate-Recursive
+requires:
+  Data::Dumper: '0'
+  Exporter: '0'
+  File::Find: '0'
+  File::Path: '0'
+  Pod::POM: '0'
+  Pod::POM::View::Pod: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+version: '0.5'

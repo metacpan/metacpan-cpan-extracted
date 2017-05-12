@@ -1,0 +1,7 @@
+http://ikiwiki.info
+Pod::ParseUtils
+More documentation|Pod::Parser
+perl
+perlvar/$|
+perldoc/"OPTIONS"
+"DESCRIPTION"

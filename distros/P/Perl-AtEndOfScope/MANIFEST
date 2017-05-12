@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Perl-AtEndOfScope.t
+lib/Perl/AtEndOfScope.pm
+perl-Perl-AtEndOfScope.spec
+mk_README.sh
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,5 @@
+rNN*.t   files relate to reading
+wNN*.t   files relate to writing
+rrNN*.t  files are for 2 stacked filter, both for reading
+wwNN*.t  files are for 2 stacked filter, both for writting
+rwNN*.t  files are for 2 stacked filter, for reading and writting

@@ -1,0 +1,35 @@
+POE-Wheel-Sendfile version 0.02
+===============================
+
+POE::Wheel::Sendfile extends POE::Wheel::ReadWrite and adds the
+possibility of using the sendfile system call to transfer data as
+efficiently.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  POE
+  Sys::Sendfile
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2010, 2011 by Philip Gwyn
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

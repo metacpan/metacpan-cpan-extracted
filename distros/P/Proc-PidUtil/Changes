@@ -1,0 +1,24 @@
+Revision history for Perl extension Proc::PidUtil
+
+0.09  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+0.08  Mon Sep 11 18:54:05 PDT 2006
+	'mkdir' updated from comptability with perl 5.0503
+
+0.07  Tue Jan 11 10:00:37 PST 2005
+	Fix insecure dependency in kill while running with -T switch 
+	at line 111 (#1)
+
+	Thanks to Maxim Nechaev <nechaev@technodesign.ru> for spotting 
+	that bug.
+
+	NOTE: to test taint compliance, after running
+		make install
+	run
+		perl -T t/pu_pid.t
+
+0.06  Tue Mar  12 12:42:10 PST 2004
+	initial release
+
+	converted from Mail::SpamCannibal::PidUtil v0.05

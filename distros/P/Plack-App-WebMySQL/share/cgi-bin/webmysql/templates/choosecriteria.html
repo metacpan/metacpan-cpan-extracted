@@ -1,0 +1,77 @@
+<html>
+	<head>
+		<link rel="stylesheet" type="text/css" href="/webmysql-<!--version-->/main.css" title="Main">
+		<title>WebMySQL: Query</title>
+	</head>
+	<body>
+		<table align="center" bgcolor="#8899DD" width="100%" border="1">
+			<tr>
+				<th><a href="<!--self-->?key=<!--key-->&amp;action=query">Query</a></th>
+				<th><a href="<!--self-->?key=<!--key-->&amp;action=managetables">Manage tables</a></th>
+				<th><a href="<!--self-->?key=<!--key-->&amp;action=managedatabases">Manage databases</a></th>
+				<th><a href="<!--self-->?key=<!--key-->&amp;action=serverinfo">Server information</a></th>
+				<th><a href="<!--self-->?key=<!--key-->&amp;action=logout">Logout</a></th>
+			</tr>
+		</table>
+		<form action="<!--self-->" method="POST" target="_blank">
+			<input type="hidden" name="key" value="<!--key-->">
+			<input type="hidden" name="action" value="runquery">
+			<!--joinlist-->
+			<p>Please choose how you want to filter the results.</p>
+			<table border="1" align="center" bgcolor="#8899DD">
+				<!--criterialist-->
+			</table>
+			<p>Grouping options.</p>
+			<table border="1" align="center" bgcolor="#8899DD">
+	         <tr>
+   				<th>Function</th>
+               <td>
+              		<select name="groupfunc">
+                  	<option value=""></option>
+                     <option value="MIN">Minimum</option>
+                     <option value="MAX">Maximum</option>
+                     <option value="COUNT">Count</option>
+                     <option value="AVG">Average</option>
+                     <option value="SUM">Sum</option>
+                     <option value="STD">Standard deviation</option>
+                     <option value="BIT_OR">Bit Or</option>
+                     <option value="BIT_AND">Bit And</option>
+                 	</select>
+                  <select name="funcfield">
+                  	<option value=""></option>
+							<!--orderbylist-->
+                  </select>
+					</td>
+				</tr>
+            <tr>
+            	<th>Group by</th>
+               <td>
+               	<select name="groupby">
+                  	<option value=""></option>
+                     <!--orderbylist-->
+                  </select>
+               </td>
+				</tr>
+			</table>
+			<p>Extra query options.</p>
+			<table border="1" align="center" bgcolor="#8899DD">
+				<tr><th>Distinct</th><td><input type="checkbox" name="distinct"></td></tr>
+            <tr>
+            	<th>Order</th>
+               <td>
+               	<select name="orderby">
+                  	<option value=""></option>
+                     <!--orderbylist-->
+                  </select>
+                  <input type="checkbox" name="desc">DESC
+               </td>
+				</tr>
+				<tr><th>Limit</th><td><input type="text" name="limit" size="5"></td></tr>
+         </table>
+			<br>
+			<table align="center" bgcolor="#8899DD" border="1">
+				<tr><td><input type="submit" value="Continue"></td></tr>
+			</table>
+		</form>
+	</body>
+</html>

@@ -1,0 +1,32 @@
+NAME
+
+    PMLTQ - Query engine and query language for trees in PML format
+
+VERSION
+
+    version 1.3.1
+
+DESCRIPTION
+
+    This is an implementation of a PML-TQ search engine (CGI module) and a
+    command-line client. A graphical client for PML-TQ is part of the tree
+    editor TrEd (http://ufal.mff.cuni.cz/tred).
+
+AUTHORS
+
+      * Petr Pajas <pajas@ufal.mff.cuni.cz>
+
+      * Jan Štěpánek <stepanek@ufal.mff.cuni.cz>
+
+      * Michal Sedlák <sedlak@ufal.mff.cuni.cz>
+
+      * Matyáš Kopp <matyas.kopp@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Institute of Formal and Applied
+    Linguistics (http://ufal.mff.cuni.cz).
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

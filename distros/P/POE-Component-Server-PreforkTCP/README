@@ -1,0 +1,74 @@
+POE/Component/Server/PreforkTCP version 0.11
+============================================
+
+POE::Compoent::Server::PreforkTCP is a package which help people
+who want to write a TCP server with prefork processes like Apache.
+It is much like Apache 2 , since each process can process many 
+connection in same time.
+
+The package depend on standard POE packages, (Wheel::SocketFactory, 
+Wheel::Run, Component::Server::TCP ... etc). And, it is very simple
+to use, like POE::Compoent::Server::TCP.
+
+	* POE::Component::Server::TCP is the simplest way to write a
+	 TCP server, the ::PreforkTCP package is based ::TCP package,
+	 and, preforkTCP has the same interface as ::TCP, so it is
+	 very easy that move the script of ::TCP to ::PreforkTCP.
+
+when a POE::Component::Server::PreforkTCP object started, it will 
+create many child processes before any request comming, so called 
+preforked prcessess.
+
+The parent process, or called master process , don't accept the client's 
+connection request, it just control its children, born, term, expire ...
+And the child process to do with client request, and each child can
+do with many connection in same time, not by thread, just by POE Session.
+
+The POE::Component::Server::PreforkTCP depend the Wheel::Run to 
+spawn the children, and use pipe to communicate with children, 
+in fact , the pipe is just one-way, The master just recieve the
+children's out, don't sent data to children. The way is simple but
+easy to implement, since the children needn't a special session
+to do with the servers input. 
+
+If the master want to sent some simple instructors to children,
+It can sent signal to children, now, USR1 to pause the server's accept, 
+USR2 to resume the server 's accept, INT to shutdown the children.
+
+The Component::Server::PreforkTCP support many parameters when creating,
+Which can decide how many server born, how many spare server, how long 
+the child server life... These idea  also come form Apache, but more...
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+POE ( Wheel::Run, Component::Server::TCP )...
+
+In the simplest way , you can use Compoent::Server::PreforkTCP as same  
+as Component::Server::TCP.
+
+Next, you can set some parameters for the ::PreforkTCP, such as
+MaxServer, MinServer, MaxSpareServer, MinSpareServer,
+MasterHeartBeatTime, ServerHeatBeatTime, MaxSessionPerServer ... etc.
+
+Please use "perldoc POE::Component::Server::PreforkTCP" to read 
+the detail description of these paramater's meaning after the package
+is installed .
+
+COPYRIGHT AND LICENCE
+
+the package has same lincense as Perl and POE.
+
+Copyright (C) 2002 Wang Bo <wb@95700.net>
+
+

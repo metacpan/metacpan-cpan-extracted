@@ -1,0 +1,28 @@
+---
+abstract: 'Expand postfix mailgroups.'
+author:
+  - 'Petr Kletecka <pek@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300033, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Postfix-Mailgroups-Expand
+requires:
+  AutoLoader: 0
+  Carp: 0
+  Exporter: 0
+  File::Slurp: 0
+  List::MoreUtils: 0
+  perl: 5.006
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/petrkle/postfix-mailgroups-expand/issues
+  repository: git://github.com/petrkle/postfix-mailgroups-expand.git
+version: 1.131020

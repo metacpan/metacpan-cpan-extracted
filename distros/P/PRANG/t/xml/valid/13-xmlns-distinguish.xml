@@ -1,0 +1,11 @@
+<Octothorpe xmlns:A="uri:type:A" xmlns:B="uri:type:B">
+  <colon/>
+  <A:section_mark>
+    <A:section_mark>
+      <interrobang/>
+      <A:broken_bar><interpunct>1753</interpunct></A:broken_bar>
+    </A:section_mark>
+    <interrobang/>
+    <B:broken_bar><parens><colon/></parens></B:broken_bar>
+  </A:section_mark>
+</Octothorpe>

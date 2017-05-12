@@ -1,0 +1,618 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<report xmlns='http://ali.as/xml/schema/pita-xml/0.13'>
+	<install>
+		<platform>
+			<perlpath>/usr/bin/perl</perlpath>
+			<osname>linux</osname>
+			<archname>i386-linux-thread-multi</archname>
+			<perlv>
+Summary of my perl5 (revision 5 version 8 subversion 4) configuration:
+  Platform:
+    osname=linux, osvers=2.4.27-ti1211, archname=i386-linux-thread-multi
+    uname='linux kosh 2.4.27-ti1211 #1 sun sep 19 18:17:45 est 2004 i686 gnulinu
+x '
+    config_args='-Dusethreads -Duselargefiles -Dccflags=-DDEBIAN -Dcccdlflags=-f
+PIC -Darchname=i386-linux -Dprefix=/usr -Dprivlib=/usr/share/perl/5.8 -Darchlib=
+/usr/lib/perl/5.8 -Dvendorprefix=/usr -Dvendorlib=/usr/share/perl5 -Dvendorarch=
+/usr/lib/perl5 -Dsiteprefix=/usr/local -Dsitelib=/usr/local/share/perl/5.8.4 -Ds
+itearch=/usr/local/lib/perl/5.8.4 -Dman1dir=/usr/share/man/man1 -Dman3dir=/usr/s
+hare/man/man3 -Dsiteman1dir=/usr/local/man/man1 -Dsiteman3dir=/usr/local/man/man
+3 -Dman1ext=1 -Dman3ext=3perl -Dpager=/usr/bin/sensible-pager -Uafs -Ud_csh -Uus
+esfio -Uusenm -Duseshrplib -Dlibperl=libperl.so.5.8.4 -Dd_dosuid -des'
+    hint=recommended, useposix=true, d_sigaction=define
+    usethreads=define use5005threads=undef useithreads=define usemultiplicity=de
+fine
+    useperlio=define d_sfio=undef uselargefiles=define usesocks=undef
+    use64bitint=undef use64bitall=undef uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='cc', ccflags ='-D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -DDEBIAN -
+fno-strict-aliasing -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS
+=64',
+    optimize='-O2',
+    cppflags='-D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -DDEBIAN -fno-stric
+t-aliasing -I/usr/local/include'
+    ccversion='', gccversion='3.3.5 (Debian 1:3.3.5-9)', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=1234
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long', ivsize=4, nvtype='double', nvsize=8, Off_t='off_t', lseeksize
+=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='cc', ldflags =' -L/usr/local/lib'
+    libpth=/usr/local/lib /lib /usr/lib
+    libs=-lgdbm -lgdbm_compat -ldb -ldl -lm -lpthread -lc -lcrypt
+    perllibs=-ldl -lm -lpthread -lc -lcrypt
+    libc=/lib/libc-2.3.2.so, so=so, useshrplib=true, libperl=libperl.so.5.8.4
+    gnulibc_version='2.3.2'
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags='-Wl,-E'
+    cccdlflags='-fPIC', lddlflags='-shared -L/usr/local/lib'
+
+
+Characteristics of this binary (from libperl):
+  Compile-time options: MULTIPLICITY USE_ITHREADS USE_LARGE_FILES PERL_IMPLICIT_
+CONTEXT
+  Built under linux
+  Compiled at Mar  8 2005 19:51:48
+  @INC:
+    /etc/perl
+    /usr/local/lib/perl/5.8.4
+    /usr/local/share/perl/5.8.4
+    /usr/lib/perl5
+    /usr/share/perl5
+    /usr/lib/perl/5.8
+    /usr/share/perl/5.8
+    /usr/local/lib/site_perl
+    .
+adam@red:~/GeoSol$ perl -V
+Summary of my perl5 (revision 5 version 8 subversion 4) configuration:
+  Platform:
+    osname=linux, osvers=2.4.27-ti1211, archname=i386-linux-thread-multi
+    uname='linux kosh 2.4.27-ti1211 #1 sun sep 19 18:17:45 est 2004 i686 gnulinux '
+    config_args='-Dusethreads -Duselargefiles -Dccflags=-DDEBIAN -Dcccdlflags=-fPIC -Darchname=i386-linux -Dprefix=/usr -Dprivlib=/usr/share/perl/5.8 -Darchlib=/usr/lib/perl/5.8 -Dvendorprefix=/usr -Dvendorlib=/usr/share/perl5 -Dvendorarch=/usr/lib/perl5 -Dsiteprefix=/usr/local -Dsitelib=/usr/local/share/perl/5.8.4 -Dsitearch=/usr/local/lib/perl/5.8.4 -Dman1dir=/usr/share/man/man1 -Dman3dir=/usr/share/man/man3 -Dsiteman1dir=/usr/local/man/man1 -Dsiteman3dir=/usr/local/man/man3 -Dman1ext=1 -Dman3ext=3perl -Dpager=/usr/bin/sensible-pager -Uafs -Ud_csh -Uusesfio -Uusenm -Duseshrplib -Dlibperl=libperl.so.5.8.4 -Dd_dosuid -des'
+    hint=recommended, useposix=true, d_sigaction=define
+    usethreads=define use5005threads=undef useithreads=define usemultiplicity=define
+    useperlio=define d_sfio=undef uselargefiles=define usesocks=undef
+    use64bitint=undef use64bitall=undef uselongdouble=undef
+    usemymalloc=n, bincompat5005=undef
+  Compiler:
+    cc='cc', ccflags ='-D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -DDEBIAN -fno-strict-aliasing -I/usr/local/include -D_LARGEFILE_SOURCE -D_FILE_OFFSET_BITS=64',
+    optimize='-O2',
+    cppflags='-D_REENTRANT -D_GNU_SOURCE -DTHREADS_HAVE_PIDS -DDEBIAN -fno-strict-aliasing -I/usr/local/include'
+    ccversion='', gccversion='3.3.5 (Debian 1:3.3.5-9)', gccosandvers=''
+    intsize=4, longsize=4, ptrsize=4, doublesize=8, byteorder=1234
+    d_longlong=define, longlongsize=8, d_longdbl=define, longdblsize=12
+    ivtype='long', ivsize=4, nvtype='double', nvsize=8, Off_t='off_t', lseeksize=8
+    alignbytes=4, prototype=define
+  Linker and Libraries:
+    ld='cc', ldflags =' -L/usr/local/lib'
+    libpth=/usr/local/lib /lib /usr/lib
+    libs=-lgdbm -lgdbm_compat -ldb -ldl -lm -lpthread -lc -lcrypt
+    perllibs=-ldl -lm -lpthread -lc -lcrypt
+    libc=/lib/libc-2.3.2.so, so=so, useshrplib=true, libperl=libperl.so.5.8.4
+    gnulibc_version='2.3.2'
+  Dynamic Linking:
+    dlsrc=dl_dlopen.xs, dlext=so, d_dlsymun=undef, ccdlflags='-Wl,-E'
+    cccdlflags='-fPIC', lddlflags='-shared -L/usr/local/lib'
+
+
+Characteristics of this binary (from libperl):
+  Compile-time options: MULTIPLICITY USE_ITHREADS USE_LARGE_FILES PERL_IMPLICIT_CONTEXT
+  Built under linux
+  Compiled at Mar  8 2005 19:51:48
+  @INC:
+    /etc/perl
+    /usr/local/lib/perl/5.8.4
+    /usr/local/share/perl/5.8.4
+    /usr/lib/perl5
+    /usr/share/perl5
+    /usr/lib/perl/5.8
+    /usr/share/perl/5.8
+    /usr/local/lib/site_perl
+    .
+			</perlv>
+		</platform>
+		<distribution>
+			<distname>Params-Util</distname>
+			<filename>Params-Util-0.07.tar.gz</filename>
+			<md5sum>c79bec91e1818b0797935f95f5b2259b</md5sum>
+			<cpanpath>/authors/id/A/AD/ADAMK/Params-Util-0.07.tar.gz</cpanpath>
+		</distribution>
+		<output>
+			<makefilepl>
+*** ExtUtils::AutoInstall version 0.62
+*** Checking for dependencies...
+[Core Features]
+- Test::More   ...loaded. (0.62 >= 0.47)
+- File::Spec   ...loaded. (3.11 >= 0.82)
+- Scalar::Util ...loaded. (1.17 >= 1.11)
+*** ExtUtils::AutoInstall configuration finished.
+Checking if your kit is complete...
+Looks good
+Writing Makefile for Params::Util			
+			</makefilepl>
+			<make>
+cp lib/Params/Util.pm blib/lib/Params/Util.pm
+Manifying blib/man3/Params::Util.3pm
+			</make>
+			<maketest>
+PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'inc', 'blib/lib', 'blib/arch')" t/01_compile.t t/02_util.t t/03_all.t t/99_pod.t
+t/01_compile....ok
+t/02_util.......ok
+t/03_all........ok
+t/99_pod........ok
+All tests successful.
+Files=4, Tests=453,  0 wallclock secs ( 0.40 cusr +  0.05 csys =  0.45 CPU)
+			</maketest>
+			<makeinstall>
+Writing /usr/local/lib/perl/5.8.4/auto/Params/Util/.packlist
+Appending installation info to /usr/local/lib/perl/5.8.4/perllocal.pod			
+			</makeinstall>
+			<test file="t/01_compile.t">
+1..2
+ok 1 - Your perl is new enough
+ok 2 - use Params::Util;
+			</test>
+			<test file="t/02_main.t">
+1..436
+ok 1 - ...::_IDENTIFIER() dies
+ok 2 - ... with expected error message
+ok 3 - ...::_IDENTIFIER(undef) returns undef
+ok 4 - ...::_IDENTIFIER(nullstring) returns undef
+ok 5 - ...::_IDENTIFIER(number) returns undef
+ok 6 - ...::_IDENTIFIER(string) returns undef
+ok 7 - ...::_IDENTIFIER(HASH) returns undef
+ok 8 - ...::_IDENTIFIER(CODE) returns undef
+ok 9 - ...::_IDENTIFIER(ARRAY) returns undef
+ok 10 - ...::_IDENTIFIER(null constant) returns undef
+ok 11 - ...::_IDENTIFIER(SCALAR) returns undef
+ok 12 - ...::_IDENTIFIER(CLASS) returns undef
+ok 13 - ...::_IDENTIFIER('foo') returns ok
+ok 14 - ...::_IDENTIFIER('_foo') returns ok
+ok 15 - ...::_IDENTIFIER('foo1') returns ok
+ok 16 - ...::_IDENTIFIER('__foo_1') returns ok
+ok 17 - use Params::Util;
+ok 18 - _IDENTIFIER imported ok
+ok 19 - ...::_IDENTIFIER() dies
+ok 20 - ... with expected error message
+ok 21 - _IDENTIFIER(undef) returns undef
+ok 22 - _IDENTIFIER(nullstring) returns undef
+ok 23 - _IDENTIFIER(number) returns undef
+ok 24 - _IDENTIFIER(string) returns undef
+ok 25 - _IDENTIFIER(HASH) returns undef
+ok 26 - _IDENTIFIER(CODE) returns undef
+ok 27 - _IDENTIFIER(ARRAY) returns undef
+ok 28 - _IDENTIFIER(null constant) returns undef
+ok 29 - _IDENTIFIER(SCALAR) returns undef
+ok 30 - _IDENTIFIER(CLASS) returns undef
+ok 31 - ...::_IDENTIFIER('foo') returns ok
+ok 32 - ...::_IDENTIFIER('_foo') returns ok
+ok 33 - ...::_IDENTIFIER('foo1') returns ok
+ok 34 - ...::_IDENTIFIER('__foo_1') returns ok
+ok 35 - ...::_CLASS() dies
+ok 36 - ... with expected error message
+ok 37 - ...::_CLASS(undef) returns undef
+ok 38 - ...::_CLASS(nullstring) returns undef
+ok 39 - ...::_CLASS(number) returns undef
+ok 40 - ...::_CLASS(string) returns undef
+ok 41 - ...::_CLASS(HASH) returns undef
+ok 42 - ...::_CLASS(CODE) returns undef
+ok 43 - ...::_CLASS(ARRAY) returns undef
+ok 44 - ...::_CLASS(null constant) returns undef
+ok 45 - ...::_CLASS(SCALAR) returns undef
+ok 46 - ...::_CLASS(bad class) returns undef
+ok 47 - ...::_CLASS(bad class) returns undef
+ok 48 - ...::_CLASS('foo') returns ok
+ok 49 - ...::_CLASS('_foo') returns ok
+ok 50 - ...::_CLASS('foo1') returns ok
+ok 51 - ...::_CLASS('__foo_1') returns ok
+ok 52 - ...::_CLASS('Foo::Bar') returns ok
+ok 53 - ...::_CLASS('_Foo::Baaar::Baz') returns ok
+ok 54 - use Params::Util;
+ok 55 - _CLASS imported ok
+ok 56 - _CLASS() dies
+ok 57 - ... with expected error message
+ok 58 - _CLASS(undef) returns undef
+ok 59 - _CLASS(nullstring) returns undef
+ok 60 - _CLASS(number) returns undef
+ok 61 - _CLASS(string) returns undef
+ok 62 - _CLASS(HASH) returns undef
+ok 63 - _CLASS(CODE) returns undef
+ok 64 - _CLASS(ARRAY) returns undef
+ok 65 - _CLASS(null constant) returns undef
+ok 66 - _CLASS(SCALAR) returns undef
+ok 67 - _CLASS(bad class) returns undef
+ok 68 - _CLASS(bad class) returns undef
+ok 69 - _CLASS('foo') returns ok
+ok 70 - _CLASS('_foo') returns ok
+ok 71 - _CLASS('foo1') returns ok
+ok 72 - _CLASS('__foo_1') returns ok
+ok 73 - _CLASS('Foo::Bar') returns ok
+ok 74 - _CLASS('_Foo::Baaar::Baz') returns ok
+ok 75 - ...::_POSINT() dies
+ok 76 - ... with expected error message
+ok 77 - ...::_POSINT(undef) returns undef
+ok 78 - ...::_POSINT(nullstring) returns undef
+ok 79 - ...::_POSINT(string) returns undef
+ok 80 - ...::_POSINT(HASH) returns undef
+ok 81 - ...::_POSINT(CODE) returns undef
+ok 82 - ...::_POSINT(ARRAY) returns undef
+ok 83 - ...::_POSINT(null constant) returns undef
+ok 84 - ...::_POSINT(SCALAR) returns undef
+ok 85 - ...::_POSINT(bad class) returns undef
+ok 86 - ...::_POSINT(negative) returns undef
+ok 87 - ...::_POSINT(zero) returns undef
+ok 88 - ...::_POSINT(explicit positive) returns undef
+ok 89 - ...::_POSINT(zero lead) returns undef
+ok 90 - ...::_POSINT('1') returns ok
+ok 91 - ...::_POSINT('2') returns ok
+ok 92 - ...::_POSINT('10') returns ok
+ok 93 - ...::_POSINT('123456789') returns ok
+ok 94 - use Params::Util;
+ok 95 - _POSINT imported ok
+ok 96 - _POSINT() dies
+ok 97 - ... with expected error message
+ok 98 - _POSINT(undef) returns undef
+ok 99 - _POSINT(nullstring) returns undef
+ok 100 - _POSINT(string) returns undef
+ok 101 - _POSINT(HASH) returns undef
+ok 102 - _POSINT(CODE) returns undef
+ok 103 - _POSINT(ARRAY) returns undef
+ok 104 - _POSINT(null constant) returns undef
+ok 105 - _POSINT(SCALAR) returns undef
+ok 106 - _POSINT(bad class) returns undef
+ok 107 - _POSINT(negative) returns undef
+ok 108 - _POSINT(zero) returns undef
+ok 109 - _POSINT(explicit positive) returns undef
+ok 110 - _POSINT(zero lead) returns undef
+ok 111 - _POSINT('1') returns ok
+ok 112 - _POSINT('2') returns ok
+ok 113 - _POSINT('10') returns ok
+ok 114 - _POSINT('123456789') returns ok
+ok 115 - ...::_SCALAR() dies
+ok 116 - ... with expected error message
+ok 117 - ...::_SCALAR(undef) returns undef
+ok 118 - ...::_SCALAR(nullstring) returns undef
+ok 119 - ...::_SCALAR(number) returns undef
+ok 120 - ...::_SCALAR(string) returns undef
+ok 121 - ...::_SCALAR(HASH) returns undef
+ok 122 - ...::_SCALAR(CODE) returns undef
+ok 123 - ...::_SCALAR(ARRAY) returns undef
+ok 124 - ...::_SCALAR(null constant) returns undef
+ok 125 - ...::_SCALAR(constant) returns true
+ok 126 - ...::_SCALAR(['foo']) returns true
+ok 127 - ...::_SCALAR returns the same SCALAR reference
+ok 128 - use Params::Util;
+ok 129 - _SCALAR imported ok
+ok 130 - ...::_SCALAR() dies
+ok 131 - ... with expected error message
+ok 132 - ...::_SCALAR(undef) returns undef
+ok 133 - ...::_SCALAR(nullstring) returns undef
+ok 134 - ...::_SCALAR(number) returns undef
+ok 135 - ...::_SCALAR(string) returns undef
+ok 136 - ...::_SCALAR(HASH) returns undef
+ok 137 - ...::_SCALAR(CODE) returns undef
+ok 138 - ...::_SCALAR(ARRAY) returns undef
+ok 139 - ...::_SCALAR(null constant) returns undef
+ok 140 - ...::_SCALAR(constant) returns true
+ok 141 - ...::_SCALAR(SCALAR) returns true
+ok 142 - ...::_SCALAR returns the same SCALAR reference
+ok 143 - ...::_SCALAR0() dies
+ok 144 - ... with expected error message
+ok 145 - ...::_SCALAR0(undef) returns undef
+ok 146 - ...::_SCALAR0(nullstring) returns undef
+ok 147 - ...::_SCALAR0(number) returns undef
+ok 148 - ...::_SCALAR0(string) returns undef
+ok 149 - ...::_SCALAR0(HASH) returns undef
+ok 150 - ...::_SCALAR0(CODE) returns undef
+ok 151 - ...::_SCALAR0(ARRAY) returns undef
+ok 152 - ...::_SCALAR0(constant) returns true
+ok 153 - ...::_SCALAR0(constant) returns true
+ok 154 - ...::_SCALAR0(constant) returns true
+ok 155 - ...::_SCALAR0(constant) returns true
+ok 156 - ...::_SCALAR returns the same SCALAR reference
+ok 157 - ...::_SCALAR returns the same SCALAR reference
+ok 158 - use Params::Util;
+ok 159 - _SCALAR0 imported ok
+ok 160 - ...::_SCALAR0() dies
+ok 161 - ... with expected error message
+ok 162 - ...::_SCALAR0(undef) returns undef
+ok 163 - ...::_SCALAR0(nullstring) returns undef
+ok 164 - ...::_SCALAR0(number) returns undef
+ok 165 - ...::_SCALAR0(string) returns undef
+ok 166 - ...::_SCALAR0(HASH) returns undef
+ok 167 - ...::_SCALAR0(CODE) returns undef
+ok 168 - ...::_SCALAR0(ARRAY) returns undef
+ok 169 - ...::_SCALAR0(constant) returns true
+ok 170 - ...::_SCALAR0(constant) returns true
+ok 171 - ...::_SCALAR0(constant) returns true
+ok 172 - ...::_SCALAR0(constant) returns true
+ok 173 - ...::_SCALAR returns the same SCALAR reference
+ok 174 - ...::_SCALAR returns the same SCALAR reference
+ok 175 - ...::_ARRAY() dies
+ok 176 - ... with expected error message
+ok 177 - ...::_ARRAY(undef) returns undef
+ok 178 - ...::_ARRAY(nullstring) returns undef
+ok 179 - ...::_ARRAY(number) returns undef
+ok 180 - ...::_ARRAY(string) returns undef
+ok 181 - ...::_ARRAY(SCALAR) returns undef
+ok 182 - ...::_ARRAY(HASH) returns undef
+ok 183 - ...::_ARRAY(CODE) returns undef
+ok 184 - ...::_ARRAY(empty ARRAY) returns undef
+ok 185 - ...::_ARRAY([undef]) returns true
+ok 186 - ...::_ARRAY(['foo']) returns true
+ok 187 - ...::_ARRAY returns an ARRAY ok
+ok 188 - ...::_ARRAY($array) returns the same ARRAY reference
+ok 189 - use Params::Util;
+ok 190 - _ARRAY imported ok
+ok 191 - _ARRAY() dies
+ok 192 - ... with expected error message
+ok 193 - _ARRAY(undef) returns undef
+ok 194 - _ARRAY(nullstring) returns undef
+ok 195 - _ARRAY(number) returns undef
+ok 196 - _ARRAY(string) returns undef
+ok 197 - _ARRAY(SCALAR) returns undef
+ok 198 - _ARRAY(HASH) returns undef
+ok 199 - _ARRAY(CODE) returns undef
+ok 200 - _ARRAY(empty ARRAY) returns undef
+ok 201 - _ARRAY([undef]) returns true
+ok 202 - _ARRAY(['foo']) returns true
+ok 203 - _ARRAY returns an ARRAY ok
+ok 204 - _ARRAY($array) returns the same ARRAY reference
+ok 205 - ...::_ARRAY0() dies
+ok 206 - ... with expected error message
+ok 207 - ...::_ARRAY0(undef) returns undef
+ok 208 - ...::_ARRAY0(nullstring) returns undef
+ok 209 - ...::_ARRAY0(number) returns undef
+ok 210 - ...::_ARRAY0(string) returns undef
+ok 211 - ...::_ARRAY0(SCALAR) returns undef
+ok 212 - ...::_ARRAY0(HASH) returns undef
+ok 213 - ...::_ARRAY0(CODE) returns undef
+ok 214 - ...::_ARRAY0(empty ARRAY) returns undef
+ok 215 - ...::_ARRAY0([undef]) returns true
+ok 216 - ...::_ARRAY0(['foo']) returns true
+ok 217 - ...::_ARRAY0 returns an ARRAY ok
+ok 218 - ...::_ARRAY0($array) returns the same ARRAY reference
+ok 219 - use Params::Util;
+ok 220 - _ARRAY0 imported ok
+ok 221 - _ARRAY0() dies
+ok 222 - ... with expected error message
+ok 223 - _ARRAY0(undef) returns undef
+ok 224 - _ARRAY0(nullstring) returns undef
+ok 225 - _ARRAY0(number) returns undef
+ok 226 - _ARRAY0(string) returns undef
+ok 227 - _ARRAY0(SCALAR) returns undef
+ok 228 - _ARRAY0(HASH) returns undef
+ok 229 - _ARRAY0(CODE) returns undef
+ok 230 - _ARRAY0(empty ARRAY) returns undef
+ok 231 - _ARRAY0([undef]) returns true
+ok 232 - _ARRAY0(['foo']) returns true
+ok 233 - _ARRAY0 returns an ARRAY ok
+ok 234 - _ARRAY0($array) returns the same reference
+ok 235 - ...::_HASH() dies
+ok 236 - ... with expected error message
+ok 237 - ...::_HASH(undef) returns undef
+ok 238 - ...::_HASH(nullstring) returns undef
+ok 239 - ...::_HASH(number) returns undef
+ok 240 - ...::_HASH(string) returns undef
+ok 241 - ...::_HASH(SCALAR) returns undef
+ok 242 - ...::_HASH(ARRAY) returns undef
+ok 243 - ...::_HASH(CODE) returns undef
+ok 244 - ...::_HASH(empty HASH) returns undef
+ok 245 - ...::_HASH([undef]) returns ok
+ok 246 - ...::_HASH returns an HASH ok
+ok 247 - ...::_HASH($hash) returns the same reference
+ok 248 - use Params::Util;
+ok 249 - _HASH imported ok
+ok 250 - _HASH() dies
+ok 251 - ... with expected error message
+ok 252 - _HASH(undef) returns undef
+ok 253 - _HASH(nullstring) returns undef
+ok 254 - _HASH(number) returns undef
+ok 255 - _HASH(string) returns undef
+ok 256 - _HASH(SCALAR) returns undef
+ok 257 - _HASH(ARRAY) returns undef
+ok 258 - _HASH(CODE) returns undef
+ok 259 - ...::_HASH(empty HASH) returns undef
+ok 260 - _HASH([undef]) returns true
+ok 261 - _HASH returns an ARRAY ok
+ok 262 - _HASH($hash) returns the same reference
+ok 263 - ...::_HASH0() dies
+ok 264 - ... with expected error message
+ok 265 - ...::_HASH0(undef) returns undef
+ok 266 - ...::_HASH0(nullstring) returns undef
+ok 267 - ...::_HASH0(number) returns undef
+ok 268 - ...::_HASH0(string) returns undef
+ok 269 - ...::_HASH0(SCALAR) returns undef
+ok 270 - ...::_HASH0(ARRAY) returns undef
+ok 271 - ...::_HASH0(CODE) returns undef
+ok 272 - ...::_HASH0(empty ARRAY) returns undef
+ok 273 - ...::_HASH0([undef]) returns true
+ok 274 - ...::_HASH0 returns an ARRAY ok
+ok 275 - ...::_HASH0($hash) returns the same reference
+ok 276 - use Params::Util;
+ok 277 - _HASH0 imported ok
+ok 278 - _HASH0() dies
+ok 279 - ... with expected error message
+ok 280 - _HASH0(undef) returns undef
+ok 281 - _HASH0(nullstring) returns undef
+ok 282 - _HASH0(number) returns undef
+ok 283 - _HASH0(string) returns undef
+ok 284 - _HASH0(SCALAR) returns undef
+ok 285 - _HASH0(ARRAY) returns undef
+ok 286 - _HASH0(CODE) returns undef
+ok 287 - _HASH0(empty ARRAY) returns undef
+ok 288 - _HASH0([undef]) returns true
+ok 289 - _HASH0 returns an ARRAY ok
+ok 290 - _HASH0($hash) returns the same reference
+ok 291 - use Params::Util;
+ok 292 - _CODE imported ok
+ok 293 - ...::_CODE() dies
+ok 294 - ... with expected error message
+ok 295 - ...::_CODE(undef) returns undef
+ok 296 - ...::_CODE(nullstring) returns undef
+ok 297 - ...::_CODE(number) returns undef
+ok 298 - ...::_CODE(string) returns undef
+ok 299 - ...::_CODE(SCALAR) returns undef
+ok 300 - ...::_CODE(ARRAY) returns undef
+ok 301 - ...::_CODE(empty HASH) returns undef
+ok 302 - _CODE() dies
+ok 303 - ... with expected error message
+ok 304 - _CODE(undef) returns undef
+ok 305 - _CODE(nullstring) returns undef
+ok 306 - _CODE(number) returns undef
+ok 307 - _CODE(string) returns undef
+ok 308 - _CODE(SCALAR) returns undef
+ok 309 - _CODE(ARRAY) returns undef
+ok 310 - ...::_CODE(empty HASH) returns undef
+ok 311 - ...::_CODE(anon) returns ok
+ok 312 - ...::_CODE(ref) returns ok
+ok 313 - ...::_CODE(\&amp;func) returns ok
+ok 314 - ...::_CODE(ref) returns the same reference
+ok 315 - ...::_CODE(\&amp;func) returns the same reference
+ok 316 - _CODE(anon) returns ok
+ok 317 - _CODE(ref) returns ok
+ok 318 - _CODE(\&amp;func) returns ok
+ok 319 - _CODE(ref) returns the same reference
+ok 320 - _CODE(\&amp;func) returns the same reference
+ok 321 - ...::_INSTANCE() dies
+ok 322 - ... with expected error message
+ok 323 - ...::_INSTANCE(object) dies
+ok 324 - ... with expected error message
+ok 325 - ...::_INSTANCE(undef) returns undef
+ok 326 - ...::_INSTANCE(nullstring) returns undef
+ok 327 - ...::_INSTANCE(number) returns undef
+ok 328 - ...::_INSTANCE(string) returns undef
+ok 329 - ...::_INSTANCE(HASH) returns undef
+ok 330 - ...::_INSTANCE(CODE) returns undef
+ok 331 - ...::_INSTANCE(ARRAY) returns undef
+ok 332 - ...::_INSTANCE(null constant) returns undef
+ok 333 - ...::_INSTANCE(SCALAR) returns undef
+ok 334 - ...::_INSTANCE(bad object) returns undef
+ok 335 - use Params::Util;
+ok 336 - _INSTANCE imported ok
+ok 337 - _INSTANCE() dies
+ok 338 - ... with expected error message
+ok 339 - _INSTANCE(object) dies
+ok 340 - ... with expected error message
+ok 341 - _INSTANCE(undef) returns undef
+ok 342 - _INSTANCE(nullstring) returns undef
+ok 343 - _INSTANCE(number) returns undef
+ok 344 - _INSTANCE(string) returns undef
+ok 345 - _INSTANCE(HASH) returns undef
+ok 346 - _INSTANCE(CODE) returns undef
+ok 347 - _INSTANCE(ARRAY) returns undef
+ok 348 - _INSTANCE(null constant) returns undef
+ok 349 - _INSTANCE(SCALAR) returns undef
+ok 350 - _INSTANCE(bad object) returns undef
+ok 351 - ...::_INSTANCE(object, class) returns true when expected
+ok 352 - ...::_INSTANCE(object, class) returns the same object
+ok 353 - ...::_INSTANCE(object, class) returns true when expected
+ok 354 - ...::_INSTANCE(object, class) returns the same object
+ok 355 - ...::_INSTANCE(object, class) returns true when expected
+ok 356 - ...::_INSTANCE(object, class) returns the same object
+ok 357 - ...::_INSTANCE(object, class) returns true when expected
+ok 358 - ...::_INSTANCE(object, class) returns the same object
+ok 359 - ...::_INSTANCE(object, class) returns true when expected
+ok 360 - ...::_INSTANCE(object, class) returns the same object
+ok 361 - ...::_INSTANCE(object, class) returns true when expected
+ok 362 - ...::_INSTANCE(object, class) returns the same object
+ok 363 - ...::_INSTANCE(object, class) returns true when expected
+ok 364 - ...::_INSTANCE(object, class) returns the same object
+ok 365 - ...::_INSTANCE(object, class) returns true when expected
+ok 366 - ...::_INSTANCE(object, class) returns the same object
+ok 367 - ...::_INSTANCE(object, class) returns true when expected
+ok 368 - ...::_INSTANCE(object, class) returns the same object
+ok 369 - _INSTANCE(object, class) returns true when expected
+ok 370 - _INSTANCE(object, class) returns the same object
+ok 371 - _INSTANCE(object, class) returns true when expected
+ok 372 - _INSTANCE(object, class) returns the same object
+ok 373 - _INSTANCE(object, class) returns true when expected
+ok 374 - _INSTANCE(object, class) returns the same object
+ok 375 - _INSTANCE(object, class) returns true when expected
+ok 376 - _INSTANCE(object, class) returns the same object
+ok 377 - _INSTANCE(object, class) returns true when expected
+ok 378 - _INSTANCE(object, class) returns the same object
+ok 379 - _INSTANCE(object, class) returns true when expected
+ok 380 - _INSTANCE(object, class) returns the same object
+ok 381 - _INSTANCE(object, class) returns true when expected
+ok 382 - _INSTANCE(object, class) returns the same object
+ok 383 - _INSTANCE(object, class) returns true when expected
+ok 384 - _INSTANCE(object, class) returns the same object
+ok 385 - _INSTANCE(object, class) returns true when expected
+ok 386 - _INSTANCE(object, class) returns the same object
+ok 387 - ...::_SET() dies
+ok 388 - ... with expected error message
+ok 389 - ...::_SET(single) dies
+ok 390 - ... with expected error message
+ok 391 - ...::_SET(undef) returns undef
+ok 392 - ...::_SET(nullstring) returns undef
+ok 393 - ...::_SET(number) returns undef
+ok 394 - ...::_SET(string) returns undef
+ok 395 - ...::_SET(SCALAR) returns undef
+ok 396 - ...::_SET(HASH) returns undef
+ok 397 - ...::_SET(CODE) returns undef
+ok 398 - ...::_SET(empty ARRAY) returns undef
+ok 399 - use Params::Util;
+ok 400 - _SET imported ok
+ok 401 - _SET() dies
+ok 402 - ... with expected error message
+ok 403 - _SET(single) dies
+ok 404 - ... with expected error message
+ok 405 - _SET(undef) returns undef
+ok 406 - _SET(nullstring) returns undef
+ok 407 - _SET(number) returns undef
+ok 408 - _SET(string) returns undef
+ok 409 - _SET(SCALAR) returns undef
+ok 410 - _SET(HASH) returns undef
+ok 411 - _SET(CODE) returns undef
+ok 412 - _SET(empty ARRAY) returns undef
+ok 413 - ...::_SET0() dies
+ok 414 - ... with expected error message
+ok 415 - ...::_SET0(single) dies
+ok 416 - ... with expected error message
+ok 417 - ...::_SET0(undef) returns undef
+ok 418 - ...::_SET0(nullstring) returns undef
+ok 419 - ...::_SET0(number) returns undef
+ok 420 - ...::_SET0(string) returns undef
+ok 421 - ...::_SET0(SCALAR) returns undef
+ok 422 - ...::_SET0(HASH) returns undef
+ok 423 - ...::_SET0(CODE) returns undef
+ok 424 - use Params::Util;
+ok 425 - _SET0 imported ok
+ok 426 - _SET0() dies
+ok 427 - ... with expected error message
+ok 428 - _SET0(single) dies
+ok 429 - ... with expected error message
+ok 430 - _SET0(undef) returns undef
+ok 431 - _SET0(nullstring) returns undef
+ok 432 - _SET0(number) returns undef
+ok 433 - _SET0(string) returns undef
+ok 434 - _SET0(SCALAR) returns undef
+ok 435 - _SET0(HASH) returns undef
+ok 436 - _SET0(CODE) returns undef
+			</test>
+			<test file="t/03_all.t">
+1..14
+ok 1 - use Params::Util;
+ok 2 - _IDENTIFIER imported ok
+ok 3 - _CLASS imported ok
+ok 4 - _POSINT imported ok
+ok 5 - _SCALAR imported ok
+ok 6 - _SCALAR0 imported ok
+ok 7 - _ARRAY imported ok
+ok 8 - _ARRAY0 imported ok
+ok 9 - _HASH imported ok
+ok 10 - _HASH0 imported ok
+ok 11 - _CODE imported ok
+ok 12 - _INSTANCE imported ok
+ok 13 - _SET imported ok
+ok 14 - _SET0 imported ok
+			</test>
+		</output>
+		<analysis>
+			<result>DEPFAIL</result>
+		</analysis>
+	</install>
+</report>

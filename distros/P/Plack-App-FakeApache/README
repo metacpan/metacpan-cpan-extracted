@@ -1,0 +1,62 @@
+NAME
+    Plack::App::FakeApache - Wrapping mod_perl2 applications in Plack
+
+SYNOPSIS
+      use Plack::App::FakeApache;
+
+      my $app = Plack::App::FakeApache->new( 
+        handler    => "My::ResponseHandler"
+        dir_config => { ... }
+      )->to_app;
+
+DESCRIPTION
+    Plack::App::FakeApache transforms a mod_perl2 application into a PSGI
+    application
+
+NOTICE
+    This is Proof of Concept code originating in the mocking code developed
+    to test an internal very non-trivial mod_perl2 application. Features
+    have been added on a need to have basis.
+
+CONFIGURATION
+    handler (required)
+    dir_config
+        Hash used to resolve $req->dir_config() requests
+
+APACHE METHODS
+    The following methods from Apache2::RequestRec and mixins are supported:
+
+    headers_in
+    headers_out
+    subprecess_env
+    dir_config
+    method
+    unparsed_uri
+    uri
+    user
+    hostname
+    content_type
+    content_encoding
+    status
+    log_reason (implemented as a no-op)
+    read
+    print
+    write
+
+PLACK METHODS
+    A few methods have been added to the interface to enable interaction
+    with Plack:
+
+    plack_request
+        Returns the underling Plack::Request object
+
+    plack_response
+        Returns the underlying Plack::Response object. During the request
+        phase this is incomplete.
+
+    finalize
+        Fills information into the response object and finalizes it.
+
+AUTHOR
+    Peter Makholm, peter@makholm.net
+

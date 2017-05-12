@@ -1,0 +1,18 @@
+[% INCLUDE header.tt %]
+[% text = request.parameters.text %]
+<p>This simple application let's you create a SVG button</p>
+<form>
+ Please type in some text!
+ <input type="text" name="text" value="[% text|html %]" />
+ <input type="submit" />
+</form>
+[% IF text %]
+ [% esc = text|uri ; svgurl = request.base _ 'button.svg?text=' _ esc %]
+ <p>
+  Below you find the SVG button with text <em>[% text|html %]</em>.
+ </p><p> 
+  You can download it at <a href="$svgurl">$svgurl</a>.
+ </p>
+ <iframe src="$svgurl" width="300" height="100" ></iframe>
+[% END %]
+[% INCLUDE footer.tt %]

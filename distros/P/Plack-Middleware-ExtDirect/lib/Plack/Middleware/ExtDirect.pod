@@ -1,0 +1,274 @@
+=pod
+
+=begin readme text
+
+Plack::Middleware::ExtDirect
+============================
+
+=end readme
+
+=for readme stop
+
+=head1 NAME
+
+Plack::Middleware::ExtDirect - RPC::ExtDirect gateway for Plack
+
+=head1 SYNOPSIS
+
+In your C<app.psgi>:
+
+    use RPC::ExtDirect::Config;
+    
+    # Ext.Direct Action packages go here
+    use My::Server::Foo;
+    use My::Server::Bar;
+    
+    my $app = sub { ... };
+    
+    builder {
+        my $config = RPC::ExtDirect::Config->new(
+            api_path    => '/api',
+            router_path => '/router',
+            poll_path   => '/events',
+        );
+                            
+        enable 'ExtDirect', config => $config;
+        
+        $app;
+    }
+
+=head1 DESCRIPTION
+
+=for readme continue
+
+This module provides an L<RPC::ExtDirect> gateway implementation for
+L<Plack> environment. It is packaged as a standard Plack middleware
+component suitable for using with L<Plack::Builder>.
+
+Plack::Middleware::ExtDirect is recommended to be used with Perl versions
+5.12 and newer, for reasons explained below. For Perls older than 5.12,
+L<CGI::ExtDirect> gateway may be a better choice - especially if you
+cannot install XS dependent packages.
+
+If you are not familiar with Ext.Direct, more information can be found
+in L<RPC::ExtDirect::Intro>.
+
+=for readme stop
+
+=head1 USAGE
+
+=head2 Configuration
+
+To configure a Plack::Middleware::ExtDirect instance, you will need
+to create an instance of L<RPC::ExtDirect::Config> with all required
+options set, and pass it to Plack::Middleware::ExtDirect constructor
+via L<Plack::Builder>'s C<enable> feature as shown in L</SYNOPSIS>.
+This step is optional; by default the Config instance in the
+L<global API instance|RPC::ExtDirect::API/"GLOBAL API TREE INSTANCE">
+will be used instead.
+
+Refer to L<RPC::ExtDirect::Config/OPTIONS> for the list of
+configuration options and their default values.
+
+=head2 Entry points
+
+Plack::Middleware::ExtDirect has three main entry points: the
+L<API|RPC::ExtDirect::Intro/API> generator, the
+L<Router|RPC::ExtDirect::Intro/Router>, and the
+L<Event Provider|RPC::ExtDirect::Intro/"Event Provider">. Each of
+these has to be assigned a unique server side URI that clients will
+GET/POST requests to. The API generator URI is usually hardcoded in
+the client; the Router and Event Provider URIs are advertised as a
+part of the L<API declaration|RPC::ExtDirect::Intro/"API declaration">
+provided by the API generator.
+
+The entry point URIs are configured with the 
+L<api_path|RPC::ExtDirect::Config/api_path>,
+L<router_path|RPC::ExtDirect::Config/router_path>, and
+L<poll_path|RPC::ExtDirect::Config/poll_path> Config options as shown
+in the L</SYNOPSIS>. These configuration options have default values
+that will work out of box; refer to L<RPC::ExtDirect::Config> for
+details.
+
+=head1 CAVEATS
+
+The considerations below are specific to Plack::Middleware::ExtDirect:
+
+=head2 API definition in Perls < 5.12
+
+L<Plack::Loader> is using C<do> builtin to load the C<app.psgi> that
+returns your PSGI application subroutine. In Perls older than 5.12
+this does not work as expected with C<ExtDirect> attributes if you
+C<use> the Action classes in your C<app.psgi> as shown in L</SYNOPSIS>;
+the appropriate attribute handler never gets called and the Methods
+won't be defined in the global API instance. This problem does not
+exist with Perl 5.12 and newer.
+
+If you absolutely have to use an old Perl version I<and> Plack
+environment, there are two ways of dealing with this problem:
+
+=over 4
+
+=item *
+
+One way is to switch to dynamic API declaration (see
+L<RPC::ExtDirect::API/"DEFINING METHODS DYNAMICALLY">) and pass the
+resulting API object to Plack::Middleware::ExtDirect constructor
+in your C<app.psgi>:
+
+    use RPC::ExtDirect::API;
+    use RPC::ExtDirect::Config;
+    
+    use My::Server::Foo;
+    use My::Server::Bar;
+    
+    my $app = sub { ... };
+    
+    builder {
+        my $config = RPC::ExtDirect::Config->new(
+            api_path    => '/api',
+            router_path => '/router',
+            poll_path   => '/events',
+        );
+        
+        my $api = RPC::ExtDirect::API->new_from_hashref(
+            config   => $config,
+            api_href => {
+                'My::Server::Foo' => {
+                    methods => { ... },
+                },
+                'My::Server::Bar' => {
+                    methods => { ... },
+                },
+            },
+        });
+                            
+        enable 'ExtDirect', api => $api;
+        
+        $app;
+    }
+
+=item *
+
+Another option is to make sure that all packages that provide
+Ext.Direct Methods - including Poll Handler methods - are loaded
+before L<Plack::Runner>'s C<run> method is called. The easiest way
+to do this is to copy C<plackup> script and modify it a little to
+C<use> all relevant modules:
+
+    use strict;
+    use Plack::Runner;
+    
+    # Ext.Direct Action packages go here
+    use My::Server::Foo;
+    use My::Server::Bar;
+    
+    my $runner = Plack::Runner->new;
+    
+    $runner->parse_options(@ARGV);
+    $runner->run;
+
+In fact the code above I<is> practically the whole C<plackup> script.
+
+=back
+
+=head2 Environment objects
+
+For Plack Ext.Direct gateway, the environment object is based on
+L<Plack::Request>. While it does provide the same methods described
+in L<RPC::ExtDirect/"ENVIRONMENT OBJECTS">, behavior of these methods
+can be slightly different from other environments.
+
+For example, C<< $env->http() >> in L<CGI::ExtDirect> will return
+the list of both environment variables and HTTP headers in upper
+case, while the same C<< $env->http() >> in Plack application will
+return only HTTP headers as they were defined in HTTP spec.
+
+To avoid potential problems, always find the actual header name
+first and then use it:
+
+    use List::Util qw/ first /;
+    
+    my ($header) = first { /^Content[-_]Type$/i } $env->http();
+    my $value    = $env->http($header) if $header;
+    
+    ...
+
+=head1 OBJECT INTERFACE
+
+Plack::Middleware::ExtDirect does not provide any publicly accessible
+methods. It is intended to be used with L<Plack::Builder> as shown
+above.
+
+=begin readme
+
+=head1 INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make && make test
+    make install
+
+=end readme
+
+=for readme continue
+
+=head1 EXAMPLES
+
+See included Ext JS examples for ideas on what Ext.Direct is and how
+to use it in Plack applications. The examples are not installed along
+with the Plack::Middleware::ExtDirect module, and are only available
+in the C<examples/> directory of the CPAN distribution.
+
+To run examples type the following in the Plack::Middleware::ExtDirect
+tarball directory (for Perl 5.12 and newer):
+
+    cd examples
+    plackup app.psgi
+
+If you are using Perl 5.8.x or 5.10.x, type the following instead:
+
+    cd examples
+    perl plackup_oldperl app.psgi
+
+Note that the examples do not require Plack::Middleware::ExtDirect to
+be installed so you can try them beforehand. That said, this module
+depends on RPC::ExtDirect being available in C<@INC> so if you don't
+want to install either module, unpack both RPC::ExtDirect and
+Plack::Middleware::ExtDirect tarballs to the same directory and use
+C<$PERL5LIB> to point to RPC::ExtDirect location:
+
+    cd examples
+    PERL5LIB=../../RPC-ExtDirect-3.xx/lib perl plackup_oldperl app.psgi
+
+=for readme stop
+
+=head1 ACKNOWLEDGEMENTS
+
+I would like to thank IntelliSurvey, Inc for sponsoring my work
+on versions 2.x and 3.x of the RPC::ExtDirect suite of modules.
+
+=head1 BUGS AND LIMITATIONS
+
+At this time there are no known bugs in this module. Please report
+problems to the author, patches are always welcome.
+
+Use L<Github tracker|https://github.com/nohuhu/Plack-Middleware-ExtDirect/issues>
+to open bug reports. This is the easiest and quickest way to get your
+issue fixed.
+
+=for readme continue
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2011-2015 Alex Tokarev E<lt>tokarev@cpan.orgE<gt>.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.
+
+Included ExtJS examples are copyright (c) 2011, Sencha Inc. Example code is
+used and distributed under GPL 3.0 license as provided by Sencha Inc. See
+L<http://www.sencha.com/license>
+
+=cut

@@ -1,0 +1,57 @@
+#!/usr/local/bin/perl
+#
+#  Implementation of the Piet programming language, as described at
+#  http://www.physics.usyd.edu.au/~mar/esoteric/piet.html
+#
+#  v 0.1 - 10/19/2001 
+#    Much optimization, reorganization, modularization, documentation, 
+#    testing, and general cleaning up needs done, but it works, sorta.
+#  v 0.2 - 11/11/2001 
+#    Trashing everything, moving to use Piet::Interpreter module.
+
+use strict;
+use Piet::Interpreter;
+use Getopt::Std;
+
+#  Initialize variables and lookup tables
+
+getopts('bdtws:');
+our($opt_b, $opt_d, $opt_s, $opt_t, $opt_w);
+my $csize = $opt_s || 1;
+$^W       = ($opt_d || $opt_w);
+
+my $infile = shift ||  &usage;
+
+my $piet = Piet::Interpreter->new( debug      => $opt_d,
+				   trace      => $opt_t,
+				   codel_size => $opt_s,
+				   );
+$piet->nonstandard('black') if $opt_b;
+
+$piet->image($infile);     
+$piet->run;
+
+
+sub usage {
+    print <<USE;
+
+This script implements the Piet programming language, described in full at:
+  http://www.physics.usyd.edu.au/~mar/esoteric/piet.html
+
+You must supply an image as an argument, like so:
+  piet [-d] [-w] [-s <num>] hello.gif
+
+    Flags:
+      -d : turns on debugging
+      -w : turns on interpreter warnings
+      -t : trace mode - prints operations 
+      -s : sets codel size in pixel width (default 1)
+      -b : sets undefined colors to black (default white) 
+
+Thank you, please come again.
+
+USE
+
+
+    exit;
+}

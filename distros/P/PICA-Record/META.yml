@@ -1,0 +1,55 @@
+---
+abstract: 'Perl module for handling PICA+ records'
+author:
+  - 'Jakob Voß <voss@gbv.de>'
+build_requires:
+  File::Temp: 0
+  SOAP::Transport::HTTP: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PICA-Record
+requires:
+  Carp: 0
+  Config::Simple: 0
+  Cwd: 0
+  DBD::SQLite: 0
+  DBI: 0
+  Data::Dumper: 0
+  Encode: 0
+  Exporter: 0
+  Getopt::Long: 0
+  IO::File: 0
+  IO::Handle: 0
+  IO::Scalar: 0
+  LWP::Simple: 0
+  POSIX: 0
+  PerlIO: 0
+  Pod::Usage: 0
+  SOAP::Lite: 0
+  Scalar::Util: 0
+  String::Escape: 0
+  URI::Escape: 0
+  Unicode::Normalize: 0
+  XML::SAX::Base: 0
+  XML::SAX::ParserFactory: 1.01
+  XML::Writer: 0
+  base: 0
+  constant: 0
+  overload: 0
+  perl: v5.10.0
+  sort: 0
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/gbv/PICA-Record/issues
+  homepage: https://github.com/gbv/PICA-Record
+  repository: https://github.com/gbv/PICA-Record.git
+version: 0.585

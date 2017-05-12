@@ -1,0 +1,66 @@
+# Parse::FSM grammar for a calculator
+
+# prolog
+{
+use Data::Dump 'dump';
+}
+
+# grammar
+prog	: stmt<+;> <eof> 	{ $item[0] } ;	
+
+stmt	: expr				{ $item[0] } ;
+
+expr 	: term addop*		{ my $res = $item[0];
+							  $res += $_ for (@{$item[1]});
+							  $res 
+							} ;
+
+addop	: '+' term			{   $item[1] }
+		| '-' term			{ - $item[1] }
+		;
+		
+term	: factor mulop*		{ my $res = $item[0];
+							  $res *= $_ for (@{$item[1]});
+							  $res 
+							} ;
+							
+mulop	: '*' factor		{     $item[1] }
+	 	| '/' factor		{ 1 / $item[1] }
+		;
+		
+factor	: 'NUM'				{   $item[0][1] }
+		| '-' 'NUM'			{ - $item[0][1] }
+		| '+' 'NUM'			{   $item[0][1] }
+		| '(' expr ')'		{   $item[1]    }
+		;
+
+# epilog
+{
+sub make_lexer {
+	my($line) = @_;
+
+	return sub {
+		for ($line) {
+			/\G[ \t]+/gc;
+			return [NUM  => $1] if /\G(\d+)/gc;
+			return [NAME => $1] if /\G([a-z]\w*)/gci;
+			return [$1   => $1] if /\G(.)/gcs;
+			return;
+		}
+	};
+}
+
+sub run {
+	my($self, $text) = @_;
+	$self->input(make_lexer($text));
+	return $self->parse;
+}
+
+unless (caller) {
+	my $self = __PACKAGE__->new;
+	my $text = "@ARGV";
+	my $ret = $self->run($text);
+	print dump($ret), "\n";
+}
+
+}

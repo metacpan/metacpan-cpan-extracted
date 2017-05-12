@@ -1,0 +1,43 @@
+Persevere-Client version 0.3
+=============================
+
+This is a module for interacting with the Persevere JSON Database, which Supports REST Database interactions, and comet updates.
+
+version 0.2 addes the propSet method, and deleteById method, to allow for updating objects 
+
+version 0.3 provides package naming and version cleanup
+
+version 0.31 fixes perldoc for Persevere::Client::Class
+
+The examples directory has complete functional examples that show full usage of this module
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+JSON
+LWP::UserAgent
+HTTP:Rquest
+HTTP::Status
+HTTP::Headers
+HTTP::Response
+HTTP::Cookies
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2011 by Nathanael Anderson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,48 @@
+NAME
+    Parse::Flexget - Parse the flexget program output
+
+SYNOPSIS
+        use Parse::Flexget qw(flexparse);
+
+        ...
+
+        print "$_\n" for flexparse(@data);
+
+DESCRIPTION
+    Parse::Flexget parses the output from flexget(1) and returns a list of
+    successfully downloaded files. This module was initially written to be
+    used together with File::Media::Sort and File::PatternMatch.
+
+EXPORTS
+    None by default.
+
+FUNCTIONS
+  flexparse()
+    Parameters: @content | \@content
+
+    Returns: @downloads
+
+    In list context, returns an array with all files downloaded by flexget.
+
+    In scalar context, returns the number of files downloaded by flexget.
+
+SEE ALSO
+    File::Media::Sort, File::PatternMatch, flexget(1)
+
+AUTHOR
+      Magnus Woldrich
+      CPAN ID: WOLDRICH
+      magnus@trapd00r.se
+      http://japh.se
+
+CONTRIBUTORS
+    None required yet.
+
+COPYRIGHT
+    Copyright 2010, 2011 the Parse::Flexgets "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+

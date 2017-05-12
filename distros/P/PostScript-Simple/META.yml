@@ -1,0 +1,22 @@
+---
+abstract: 'Produce PostScript files from Perl'
+author:
+  - 'Matthew Newton <mcnewton@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PostScript-Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0.18'
+version: '0.09'

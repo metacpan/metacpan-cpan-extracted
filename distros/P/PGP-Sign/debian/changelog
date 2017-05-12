@@ -1,0 +1,39 @@
+libpgp-sign-perl (0.19-4) unstable; urgency=low
+
+  * Providing binary-arch in debian/rules is required by Policy even if
+    there are no arch-dependent packages.  Whoops.
+
+ -- Russ Allbery <rra@debian.org>  Mon,  5 Dec 2005 15:09:47 -0800
+
+libpgp-sign-perl (0.19-3) unstable; urgency=low
+
+  * Run make test when building the package.
+  * Simplify debian/rules.
+  * Update copyright to my current format and add an explicit packaging
+    copyright and license statement.
+  * Update standards version to 3.6.2 (no changes required).
+  * Update maintainer address.
+
+ -- Russ Allbery <rra@debian.org>  Wed, 16 Nov 2005 21:05:52 -0800
+
+libpgp-sign-perl (0.19-2) unstable; urgency=low
+
+  * Uploaded to Debian.  (Closes: #308429)
+  * Add a watch file.
+  * Use the recommend format for the Homepage link in the description.
+
+ -- Russ Allbery <rra@stanford.edu>  Fri, 10 Jun 2005 15:43:39 -0700
+
+libpgp-sign-perl (0.19-1) unstable; urgency=low
+
+  * New upstream release.
+    - Use --status-fd with GnuPG.  Fixes pgp_verify in non-English locales.
+
+ -- Russ Allbery <rra@stanford.edu>  Sun,  8 Aug 2004 02:57:42 -0700
+
+libpgp-sign-perl (0.18-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Russ Allbery <rra@stanford.edu>  Wed,  4 Aug 2004 22:26:31 -0700
+

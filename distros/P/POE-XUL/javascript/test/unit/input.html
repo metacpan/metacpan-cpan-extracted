@@ -1,0 +1,505 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>script.aculo.us Unit test file</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <script src="../../lib/prototype.js" type="text/javascript"></script>
+  <script src="../../src/util.js" type="text/javascript"></script>
+  <script src="../../src/formated.js" type="text/javascript"></script>
+  <script src="../../src/formatedinput.js" type="text/javascript"></script>
+  <script src="../../lib/unittest.js" type="text/javascript"></script>
+  <link rel="stylesheet" href="../test.css" type="text/css" />
+</head>
+<body>
+
+<h1>FormatedInput input Unit Tests</h1>
+
+<!-- Log output -->
+<div id="testlog"> </div>
+
+<div id="formated">
+<form>
+<input id="hello" value="" />
+<span id="MESSAGE_hello">hello world</span>
+<span id="ERROR_hello">!</span>
+</form>
+
+<!-- Tests follow -->
+<script type="text/javascript" language="javascript" charset="utf-8">
+//<![CDATA[
+
+var cp = { C: [ { leading: "", length: 1, format: "[A:ABCDEFGHJKLMNPQRSTUVYZ]", full_re: "[ABCDEFGHJKLMNPQRSTUVYZ]", re: "[ABCDEFGHJKLMNPQRSTUVYZ]", xform: "uppercase", offset: 0 }, { leading: "", length: 1, format: 9, full_re: "[0-9]", re: "[0-9]", offset: 1 }, { leading: "", length: 1, format: "A", full_re: "[A-Z\\xC0-\\xDF]", re: "[A-Z\\xC0-\\xDF]", xform: "uppercase", offset: 2 }, { leading: "", length: 1, format: " ", full_re: "[\\ ]", re: "[\\ ]", "static": " ", offset: 3 }, { leading: "", length: 1, format: 9, full_re: "[0-9]", re: "[0-9]", offset: 4 }, { leading: "", length: 1, format: "A", full_re: "[A-Z\\xC0-\\xDF]", re: "[A-Z\\xC0-\\xDF]", xform: "uppercase", offset: 5 }, { leading: "", length: 1, format: 9, full_re: "[0-9]", re: "[0-9]", offset: 6 } ], P: [ 0, 1, 2, 3, 4, 5, 6 ] };
+var tel = { C: [ { leading: "", length: 3, format: 999, full_re: "^[0-9]{3}$", re: "[0-9]", offset: 0 }, { leading: "", length: 1, format: "-", full_re: "[\\-]", re: "[\\-]", "static": "-", offset: 3 }, { leading: "", length: 3, format: 999, full_re: "^[0-9]{3}$", re: "[0-9]", offset: 4 }, { leading: "", length: 1, format: "-", full_re: "[\\-]", re: "[\\-]", "static": "-", offset: 7 }, { leading: "", length: 4, format: 9999, full_re: "^[0-9]{4}$", re: "[0-9]", offset: 8 } ], P: [ 0, 0, 0, 1, 2, 2, 2, 3, 4, 4, 4, 4 ] };
+var camp = { C: [ { leading: 0, xform: "leading-space", length: 4, format: 0000, full_re: "^0*[0-9]{0,4}$", re: "[0-9]", offset: 0 }, { leading: "", length: 1, format: "-", full_re: "[\\-]", re: "[\\-]", "static": "-", offset: 4 }, { leading: 0, length: 2, format: 00, full_re: "^0*[0-9]{0,2}$", re: "[0-9]", offset: 5 } ], P: [ 0, 0, 0, 0, 1, 2, 2 ] };
+var money = { C: [ { leading: " ", xform: "leading-space", length: 4, format: "####", full_re: "^ *[0-9]{0,4}$", re: "[0-9]", offset: 0 }, { leading: "", length: 1, format: ".", full_re: "[\\.]", re: "[\\.]", "static": ".", offset: 4 }, { leading: 0, length: 2, format: "##", full_re: "^ *[0-9]{0,2}$", re: "[0-9]", offset: 5 } ], P: [ 0, 0, 0, 0, 1, 2, 2 ] };
+var heure = { C: [ { leading: 0, length: 2, format: "{0-23}", full_re: "[0-9]{2}", min: 0, max: 23, re: "[0-9]", xform: "leading-space", offset: 0 }, { full_re: "[h]", re: "[hH]", xform: "lowercase", "static": "h", length: 1, leading: "", format: "h", offset: 2 }, { leading: 0, length: 2, format: "{0-59}", full_re: "[0-9]{2}", min: 0, max: 59, re: "[0-9]", xform: "leading-space", offset: 3 } ], P: [ 0, 0, 1, 2, 2 ] };
+
+function mk_event ( key ) {
+    return { charCode: key.charCodeAt( 0 ) };
+}
+
+
+new Test.Unit.Runner({
+    // --------------------------------------------------------------
+    testCP: function() { with(this) {
+        var fi = new FormatedInput( 'hello', cp );
+        assert( fi );
+        assertInstanceOf( FormatedInput, fi );
+
+        var E = fi.input();
+        assertNotNull( E, "Got the input" );
+        E.value = '';
+
+        var e = mk_event( 'H' );
+        var def = fi.keypress( e );
+        assert( !def, "FI did it" );
+        assertEqual( 'H', E.value, "One key" );
+
+        e = mk_event( '0' );
+        def = fi.keypress( e );
+        assert( !def, "FI did it" );
+        assertEqual( 'H0', E.value, "Two key" );
+
+        e = mk_event( 'h' );
+        def = fi.keypress( e );
+        assert( !def, "FI did it" );
+        assertEqual( 'H0H ', E.value, "Red key" );
+
+
+        e = mk_event( '0' );
+        fi.keypress( e );
+        assertEqual( 'H0H 0', E.value, "Blue key" );
+
+        e = mk_event( 'h' );
+        fi.keypress( e );
+        assertEqual( 'H0H 0H', E.value, "More key" );
+
+        e = mk_event( '0' );
+        fi.keypress( e );
+        assertEqual( 'H0H 0H0', E.value, "Last key" );
+
+        // To many
+        e = mk_event( '0' );
+        def = fi.keypress( e );
+        assert( !def, "FI did it" );
+        assertEqual( 'H0H 0H0', E.value, "Reject key" );
+
+        // Select everything
+        E.selectionStart = 0;
+
+        // But not a 0
+        def = fi.keypress( e );
+        assert( !def, "FI did it" );
+        assertEqual( 'H0H 0H0', E.value, "Reject key" );
+
+        // Erase and start over
+        e = mk_event( 'H' );
+        fi.keypress( e );
+        assertEqual( 'H', E.value, "Restart" );
+
+        // Dup
+        fi.keypress( e );
+        assertEqual( 'H', E.value, "Reject again" );
+
+        // Fill in everything
+        E.value = 'H0H 0H0';
+        // Select a part
+        E.selectionStart = 0;
+        E.selectionEnd = 4;
+
+        // Only hange the first bit
+        e = mk_event( 'Y' );
+        fi.keypress( e );
+        assertEqual( 'Y0H 0H0', E.value, "Substitute one cell" );
+        
+        e = { charCode: 8 };
+        def = fi.keypress( e );
+        assert( def, "Default action" );
+        assertEqual( 'Y0H 0H0', E.value, "Nothing changed" );
+    }},
+
+    // --------------------------------------------------------------
+    testTel: function() { with(this) {
+        var fi = new FormatedInput( 'hello', tel );
+        assert( fi );
+        assertInstanceOf( FormatedInput, fi );
+
+        var E = fi.input();
+        assertNotNull( E, "Got the input" );
+        E.value = '';
+
+        var e = mk_event( '8' );
+        var def = fi.keypress( e );
+        assert( !def, "FI did it" );
+        assertEqual( '8', E.value, "Telephone" );
+
+        e = mk_event( '1' );
+        def = fi.keypress( e );
+        assert( !def, "FI did it" );
+        assertEqual( '81', E.value, "Telephone" );
+
+        e = mk_event( '9' );
+        fi.keypress( e );
+        assertEqual( '819-', E.value, "Telephone" );
+
+        e = mk_event( '5' );
+        fi.keypress( e );
+        assertEqual( '819-5', E.value, "Telephone" );
+
+        e = mk_event( '6' );
+        fi.keypress( e );
+        assertEqual( '819-56', E.value, "Telephone" );
+
+        e = mk_event( '5' );
+        fi.keypress( e );
+        assertEqual( '819-565-', E.value, "Telephone" );
+
+        e = mk_event( '6' );
+        fi.keypress( e );
+        assertEqual( '819-565-6', E.value, "Telephone" );
+
+        e = mk_event( '5' );
+        fi.keypress( e );
+        assertEqual( '819-565-65', E.value, "Telephone" );
+
+        e = mk_event( '6' );
+        fi.keypress( e );
+        assertEqual( '819-565-656', E.value, "Telephone" );
+
+        e = mk_event( '5' );
+        fi.keypress( e );
+        assertEqual( '819-565-6565', E.value, "Telephone" );
+
+        e = mk_event( '6' );
+        fi.keypress( e );
+        assertEqual( '819-565-6565', E.value, "Telephone" );
+
+        //---------
+        // mutter
+        E.selectionStart = 0;
+        E.selectionEnd   = 0;
+
+        e = mk_event( '6' );
+        fi.keypress( e );
+        assertEqual( '819-565-6565', E.value, "Telephone more" );
+
+        E.value = '819-565-6565';
+        E.selectionStart = 0;
+        E.selectionEnd   = 1;
+
+        e = mk_event( '6' );
+        fi.keypress( e );
+        assertEqual( '619-565-6565', E.value, "Telephone switch" );
+
+        // replace a cell
+        E.value = '819-565-6565';
+        E.selectionStart = 0;
+        E.selectionEnd   = 4;
+
+        e = mk_event( '6' );
+        fi.keypress( e );
+        assertEqual( '6-565-6565', E.value, "Telephone flip" );
+
+        fi.keypress( e );
+        assertEqual( '66-565-6565', E.value, "Telephone the" );
+
+        fi.keypress( e );
+        assertEqual( '666-565-6565', E.value, "Telephone bird" );
+
+        // select too much
+        E.selectionStart = 4;
+        E.selectionEnd   = 9;
+
+        e = mk_event( '0' );
+        fi.keypress( e );
+        assertEqual( '666-0-6565', E.value, "Telephone fencer" );
+
+        // verify some fence posts
+        E.value = "666-999-1111";
+        E.selectionStart = 5;
+        E.selectionEnd   = 9;
+
+        fi.keypress( e );
+        assertEqual( '666-90-1111', E.value, "Telephone moves" );
+
+        E.value = "666-999-1111";
+        E.selectionStart = 7;
+        E.selectionEnd   = 8;
+
+        fi.keypress( e );
+        assertEqual( '666-999-1111', E.value, "Telephone feet" );
+
+        E.selectionStart = 7;
+        E.selectionEnd   = 9;
+
+        fi.keypress( e );
+        assertEqual( '666-999-1111', E.value, "Telephone fast" );
+
+        // highlight the trailing -
+        E.value = "666-999-";
+        E.selectionStart = 7;
+        E.selectionEnd   = 8;
+
+        fi.keypress( e );
+        assertEqual( '666-999-0', E.value, "Telephone trail" );
+
+        E.selectionStart = 7;
+        E.selectionEnd   = 9;
+
+        e = mk_event( '1' );
+        fi.keypress( e );
+        assertEqual( '666-999-10', E.value, "Telephone leads" );
+
+
+    }},
+
+    // --------------------------------------------------------------
+    testCamp: function() { with(this) {
+        var fi = new FormatedInput( 'hello', camp );
+        assert( fi );
+        assertInstanceOf( FormatedInput, fi );
+
+        var E = fi.input();
+        assertNotNull( E, "Got the input" );
+
+        E.value = "66";
+        E.selectionStart = 2;
+        E.selectionEnd   = 2;
+
+        var e = mk_event( '-' );
+        fi.keypress( e );
+        assertEqual( '0066-', E.value, "Camp leading" );
+
+        E.value = "1234-2";
+        E.selectionStart = 4;
+        E.selectionEnd   = 5;
+
+        e = mk_event( '8' );
+        fi.keypress( e );
+        assertEqual( '1234-82', E.value, "Selected static" );
+
+        E.value = "1234-2";
+        E.selectionStart = 4;
+        E.selectionEnd   = 4;
+
+        e = mk_event( '8' );
+        fi.keypress( e );
+        assertEqual( '1234-82', E.value, "Jump static" );
+
+        E.value = "123421";
+        E.selectionStart = 4;
+        E.selectionEnd   = 4;
+
+        e = mk_event( '8' );
+        fi.keypress( e );
+        assertEqual( '1234-21', E.value, "Replace static" );
+
+        E.value = "1234";
+        E.selectionStart = 4;
+        E.selectionEnd   = 4;
+
+        e = mk_event( '8' );
+        fi.keypress( e );
+        assertEqual( '1234-8', E.value, "Append static+key" );
+
+        E.value = "1234";
+        E.selectionStart = 4;
+        E.selectionEnd   = 4;
+
+        e = mk_event( 'h' );
+        fi.keypress( e );
+        assertEqual( '1234', E.value, "Append static, bad key" );
+
+        E.value = "1234-";
+        E.selectionStart = 5;
+        E.selectionEnd   = 5;
+
+        var ok = fi.validate( 0 );
+        assert( ok, "OK, provided its not a submit" );
+
+        ok = fi.validate( 1 );
+        assert( !ok, "Not OK on submit" );
+
+        E.value = "1000";
+        E.selectionStart = 4;
+        E.selectionEnd   = 4;
+
+        fi.on_blur();        
+        assertEqual( '1000-00', E.value, "Trailing 0" );
+
+        E.value = "55";
+        E.selectionStart = 2;
+        E.selectionEnd   = 2;
+
+        fi.on_blur();        
+        assertEqual( '0055-00', E.value, "Trailing 0" );
+
+
+        E.value = "55-55";
+        E.selectionStart = 2;
+        E.selectionEnd   = 2;
+
+        fi.on_blur();        
+        assertEqual( '0055-55', E.value, "Leading 0" );
+
+
+
+    }},
+
+    // --------------------------------------------------------------
+    testMoney: function() { with(this) {
+        var fi = new FormatedInput( 'hello', money );
+        assert( fi );
+        assertInstanceOf( FormatedInput, fi );
+
+        var E = fi.input();
+        assertNotNull( E, "Got the input" );
+
+        E.value = "66";
+        E.selectionStart = 2;
+        E.selectionEnd   = 2;
+
+        var e = mk_event( '.' );
+        fi.keypress( e );
+        assertEqual( '  66.', E.value, "Money leading spaces" );
+
+        var e = mk_event( '6' );
+        fi.keypress( e );
+        assertEqual( '  66.6', E.value, "Money leading spaces" );
+
+        fi.keypress( e );
+        assertEqual( '  66.66', E.value, "Money leading spaces" );
+
+        E.value = "  66";
+        E.selectionStart = 2;
+        E.selectionEnd   = 2;
+
+        fi.on_blur();
+        assertEqual( '  66.00', E.value, "Money trailing 0" );
+
+        E.value = "66";
+        E.selectionStart = 2;
+        E.selectionEnd   = 2;
+
+        // TODO leading space on blur
+        fi.on_blur();
+//        assertEqual( '  66.00', E.value, "Money leading space + trailing 0" );
+        
+    }},
+
+    // --------------------------------------------------------------
+    testHeure: function() { with(this) {
+        var fi = new FormatedInput( 'hello', heure );
+        assert( fi );
+        assertInstanceOf( FormatedInput, fi );
+
+        var E = fi.input();
+        assertNotNull( E, "Got the input" );
+
+        E.value = '';
+        var e = mk_event( '1' );
+        var def = fi.keypress( e );
+        assert( !def, "FI did it" );
+        assertEqual( '1', E.value, "Hour" );
+
+        e = mk_event( '7' );
+        def = fi.keypress( e );
+        assertEqual( '17h', E.value, "Hour" );
+
+        e = mk_event( '2' );
+        def = fi.keypress( e );
+        assertEqual( '17h2', E.value, "Hour + minute" );
+
+        e = mk_event( '7' );
+        def = fi.keypress( e );
+        assertEqual( '17h27', E.value, "Hour + minute" );
+
+        var ok = fi.validate( 0 );
+        assert( ok, "It's OK" );
+
+        E.value = '12';
+        e = mk_event( '1' );
+        def = fi.keypress( e );
+        assertEqual( '12h1', E.value, "Hour + minute" );
+        
+        E.value = '12';
+        e = mk_event( 'h' );
+        def = fi.keypress( e );
+        assertEqual( '12h', E.value, "Hour + letter" );
+
+        E.value = '23h23';
+        ok = fi.validate( 1 );
+        assert( ok, E.value + " OK" );
+
+        E.value = '23h60';
+        ok = fi.validate( 1 );
+        assert( !ok, E.value + " not OK" );
+
+        E.value = '24h59';
+        ok = fi.validate( 1 );
+        assert( !ok, E.value + " not OK" );
+
+        E.value = '00h00';
+        ok = fi.validate( 1 );
+        assert( ok, E.value + " OK" );
+        E.value = '-1h00';
+        ok = fi.validate( 1 );
+        assert( !ok, E.value + " not OK" );
+        assertEqual( 'NaN', fi.problem, "No negative" );
+    }},
+
+    // --------------------------------------------------------------
+    testDate: function() { with(this) {
+        var fi = new FormatedDate( 'hello' );
+        assert( fi );
+        assertInstanceOf( FormatedDate, fi );
+
+        var E = fi.input();
+        assertNotNull( E, "Got the input" );
+
+        E.value = '';
+        var e = mk_event( '1' );
+        var def = fi.keypress( e );
+        assertEqual( false, def, "Not default 1" );
+
+        var now = new Date();
+        var day = (now.getDay());
+        if( day < 10 ) {
+            day = "0" + day;
+        }
+        var month = (1+now.getMonth());
+        if( month < 10 ) {
+            month = "0" + month;
+        }
+        var year = now.getFullYear();
+
+        fi.set_default();
+        assertEqual( '01/' + month + '/' + year, E.value, 
+                                        "Default to this month" );
+
+        E.value = '';
+        fi.set_default();
+        assertEqual( '', E.value, "No default" );
+
+        E.setAttribute( 'auto-default', 1 );
+        E.value = '';
+        fi.set_default();
+
+        assertEqual( now.getDate() + '/' + month + '/' + year, 
+                     E.value, "Default to today" );
+    }},
+
+    // --------------------------------------------------------------
+    test_last: function() {
+        Element.hide( $( "formated" ) );
+        this.assertNotVisible( $( 'formated' ) );
+    }
+
+});
+//]]></script>
+
+
+
+</body>
+</html>

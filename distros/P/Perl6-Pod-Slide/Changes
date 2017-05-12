@@ -1,0 +1,37 @@
+Revision history for Perl module Perl6::Pod::Slide
+
+TODO:
+
+0.10 2013-11-05
+    * Use modern beamer theme names
+      (thanks Ivan Baidakou! )
+
+0.09 2013-11-04
+    * Reformatted as per CPAN::Changes::Spec
+      (thanks Neil! )
+
+0.08 2013-11-03
+    * Make scripts/pod6slide installable
+      (thanks Ivan Baidakou! )
+
+0.07 2012-02-19
+    * use To::Latex
+
+0.06 2012-07-03
+    * fix tests
+
+0.05 2012-06-05
+    * new API in Perl6::Pod
+
+0.04 29.10.2011
+    * add JavaScript support
+
+0.03 24.05.2011
+    * use tmp files for listings
+
+0.02 26.03.2011
+    * fix lists
+
+0.01  11.04.2010
+    * first CPAN release
+

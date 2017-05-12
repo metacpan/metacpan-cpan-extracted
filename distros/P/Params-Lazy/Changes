@@ -1,0 +1,49 @@
+Revision history for Params-Lazy
+
+0.005   2013-09-19T13:20:11:-0300
+        * Top-level caller() now works on <5.18
+        * delay do { eval {die}; sub { $lexical } } no
+          longer crashes.
+        * Delayed code that calls XS-level croak() now functions
+          correctly under PERL_DESTRUCT_LEVEL=2
+        * Threading now works on Perls newer than 5.19.3.
+
+0.004   2013-09-18T03:48:49:-0300
+        * Delaying an expression that doesn't return anything,
+          like a regular expression that didn't match, and then
+          running force() in scalar context will now correctly
+          return undef, instead of picking the topmost value of
+          the stack.
+        * Delayed expressions now have the original @_ in scope;
+          this allows things like 'delay shift;' or
+          'delay function($_[0], $_[3], 10)' to DTRT.
+          The old behavior is still accessible through
+          'no Params::Lazy q(caller_args)', primarily for speed:
+          Some dumbbenching shows the no-caller-args version to be
+          around 20% faster.
+          This fixes #87940.
+        * Initial threading support. Experimental!
+        * delay sub { $lexical } and the like now work, at least in
+          5.18.  In older perls, they work but with some caveats --
+          see the documentation for more information.
+        * force() now inlines itself as a custom op in even
+          more Perls.
+        * delay eval '$foo' will no longer see delayer's lexicals.
+        * __SUB__ should now return the correct value.
+        * Minor test fixups, proper skips for 5.8.
+
+0.003   2013-08-17T08:23:23:-0300
+        * force() may now inline itself as a custom op.
+        * The deferred op is now treated as if run within a
+          pseudoblock, or an eval block in 5.8.
+        * Windows support
+
+0.002   2013-08-16T15:34:47:-0300
+        * Delaying a range should no longer crash
+        * Delayed goto's are now correctly disallowed in 5.18
+        * Lexical $_ tests no longer emmit deprecation warnings
+        * New meta-test should catch stack corruptions
+
+0.001   2013-08-13T14:41:16:-0300
+        First version, released on an unsuspecting world.
+

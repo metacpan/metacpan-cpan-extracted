@@ -1,0 +1,27 @@
+0.004     2014-03-30 21:43:21 America/Los_Angeles
+
+      [ENHANCEMENTS]
+
+      - Added a refresh() method that clears the permission hash
+      if the file on disk is newer.  New permissions will be
+      loaded lazily.
+
+0.003     2013-12-26 23:15:35 America/Los_Angeles
+
+      [BUG FIXES]
+
+      - Fix test failures that resulted from hash randomization
+      which started in perl 5.18.  Thanks to ANDK for bringing
+      this to my attention.
+
+0.002     2013-08-04 19:21:02 America/Los_Angeles
+
+      [ENHANCEMENTS]
+
+      - The constructor now accepts either a filename or a directory
+      as a paramter.  If a directory, it is assumed that the 06perms
+      file will be in the usual place within that directory.
+
+0.001     2013-05-25 14:27:12 America/Los_Angeles
+      
+      Initial release. 

@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               POE-Component-Client-SMTP
+version:            0.22
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    Data::Dumper:         0
+    POE:                  0.26
+    POE::Filter::Line:    0
+    POE::Filter::Stream:  0
+    POE::Filter::Transparent::SMTP:  0.2
+    POE::Wheel::ReadWrite:  0
+    POE::Wheel::SocketFactory:  0
+    Socket:               0
+    Symbol:               0
+    Test::More:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

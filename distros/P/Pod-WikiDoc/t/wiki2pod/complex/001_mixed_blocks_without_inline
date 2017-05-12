@@ -1,0 +1,64 @@
+= NAME
+
+Foo::Bar - The Foo::Bar module
+
+= SYNOPSIS
+
+    use Foo::Bar;
+    Foo::Bar::wibble();
+
+= USAGE
+
+Using Foo::Bar is really simple:
+* wibble it
+* wobble it
+* wubble it
+
+= SEE ALSO
+
+0 Acme::Doh
+0 Acme::Whoops
+#--------------------------------------------------------------------------#
+=head1 NAME
+
+Foo::Bar - The Foo::Bar module
+
+=head1 SYNOPSIS
+
+     use Foo::Bar;
+     Foo::Bar::wibble();
+
+=head1 USAGE
+
+Using Foo::Bar is really simple:
+
+=over
+
+=item *
+
+wibble it
+
+=item *
+
+wobble it
+
+=item *
+
+wubble it
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item 1.
+
+Acme::Doh
+
+=item 2.
+
+Acme::Whoops
+
+=back
+

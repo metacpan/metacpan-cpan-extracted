@@ -1,0 +1,9 @@
+Perl/Exactly.pm
+Perl/Exactly.pm.conf
+Changes
+Makefile.PL
+pMakefile.PL
+MANIFEST
+README
+META.yml
+t/001_test.t

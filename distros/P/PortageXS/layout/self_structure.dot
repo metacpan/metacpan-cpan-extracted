@@ -1,0 +1,24 @@
+strict digraph Perl {
+	graph [compound=1, concentrate=1, overlap=false, rankdir=LR, ranksep=1, smoothing=triangle, splines=spline];
+	node [label="\N", shape=record, style=dotted];
+	edge [minlen=1];
+	"Moo::Object" [label="<port1> Moo::Object"];
+	PortageXS [label="{{<port1> class}|<port2> PortageXS}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"PortageXS::Colors" [label="{{<port1> class}|<port2> PortageXS::Colors}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"PortageXS::Core" [label="{{<port1> role}|<port2> PortageXS::Core}", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+	"PortageXS::MakeConf" [label="{{<port1> class}|<port2> PortageXS::MakeConf}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"PortageXS::System" [label="{{<port1> role}|<port2> PortageXS::System}", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+	"PortageXS::UI::Console" [label="{{<port1> role}|<port2> PortageXS::UI::Console}", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+	"PortageXS::UI::Spinner" [label="{{<port1> class}|<port2> PortageXS::UI::Spinner}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"PortageXS::UI::Spinner::Rainbow" [label="{{<port1> class}|<port2> PortageXS::UI::Spinner::Rainbow}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"PortageXS::Useflags" [label="{{<port1> role}|<port2> PortageXS::Useflags}", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+	"PortageXS::Version" [label="{{<port1> class}|<port2> PortageXS::Version}", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"PortageXS::Core" -> PortageXS [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", samehead=head, tailclip=1, weight=5];
+	"PortageXS::System" -> PortageXS [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", samehead=head, tailclip=1, weight=5];
+	"PortageXS::UI::Console" -> PortageXS [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", samehead=head, tailclip=1, weight=5];
+	"PortageXS::Useflags" -> PortageXS [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", samehead=head, tailclip=1, weight=5];
+	"Moo::Object" -> "PortageXS::Colors" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", samehead=head, tailclip=1, weight=10];
+	"Moo::Object" -> "PortageXS::MakeConf" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", samehead=head, tailclip=1, weight=10];
+	"Moo::Object" -> "PortageXS::UI::Spinner" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", samehead=head, tailclip=1, weight=10];
+	"PortageXS::UI::Spinner" -> "PortageXS::UI::Spinner::Rainbow" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", samehead=head, tailclip=1, weight=10];
+}

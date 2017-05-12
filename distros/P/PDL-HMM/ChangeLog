@@ -1,0 +1,29 @@
+v0.06004 Thu, 17 Dec 2015 13:39:01 +0100 moocow
+	* fixed wrongly succeeding bogus tests with unary ok()
+	  - tests now use Test::More and re-factored common test subroutines
+	* pdlmaker.plm doesn't distribute generated PM files any more (PDL now does this for us)
+
+v0.06003 Fri, 24 Jul 2015 11:00:38 +0200 moocow
+	* accomodate typo-fix "propogate_badflag"->"propagate_badglag" for PDL >= v2.008 API
+	* fixes RT bug #104726
+
+v0.06002 Tue, 24 Sep 2013 13:51:54 +0200 moocow
+	* CONFIGURE_REQUIRES{PDL}=0 in Makefile.PL for cpan-testers friendliness
+
+v0.06001 Mon, 02 Jan 2012 12:46:15 +0100 moocow
+	* added pdlmaker.plm to MANIFEST
+	* moved README to .rpod
+	* updated README
+	* added pdlmaker.plm for cpan-friendly distribution
+
+v0.05 2011-08-26  moocow
+	* fixed some typos
+	* added constrained fw, bw, viterbi, and em methods
+
+v0.04 2005-08-02  moocow
+	* re-import (gaspode)
+	* gamma tests
+	* added omega: final probabilities
+
+v0.01 Wed, 11 May 2005 12:18:26 +0200 (moocow)
+	+ initial version

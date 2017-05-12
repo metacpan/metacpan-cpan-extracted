@@ -1,0 +1,192 @@
+---
+abstract: 'POE Component for reading eris events'
+author:
+  - 'Brad Lhotsky <brad@divisionbyzero.net>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300033, CPAN::Meta::Converter version 2.120630'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-Client-eris
+requires:
+  Carp: 0
+  POE: 0
+  POE::Component::Client::TCP: 0
+  POE::Filter::Stream: 0
+  Parse::Syslog::Line: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+version: 1.4
+x_Dist_Zilla:
+  perl:
+    version: 5.016003
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Basic/GatherDir'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Basic/PruneCruft'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Basic/ManifestSkip'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Basic/MetaYAML'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Basic/License'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Basic/Readme'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Basic/ExtraTests'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Basic/ExecDir'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Basic/ShareDir'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Basic/MakeMaker'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Basic/Manifest'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Basic/TestRelease'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Basic/ConfirmRelease'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Basic/UploadToCPAN'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: CheckChangesHasContent
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: MinimumPerl
+      version: 1.003
+    -
+      class: Dist::Zilla::Plugin::VersionFromModule
+      name: VersionFromModule
+      version: 0.08
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: PodWeaver
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::ReadmeMarkdownFromPod
+      name: ReadmeMarkdownFromPod
+      version: 0.120120
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromBuild
+      name: CopyFilesFromBuild
+      version: 0.103510
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: PodCoverageTests
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: PodSyntaxTests
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: EOLTests
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      name: Test::Compile
+      version: 2.001
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@Git/Check'
+      version: 2.012
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Git/Commit'
+      version: 2.012
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Git/Tag'
+      version: 2.012
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@Git/Push'
+      version: 2.012
+    -
+      class: Dist::Zilla::Plugin::InstallRelease
+      name: InstallRelease
+      version: 0.008
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300033
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300033
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300033

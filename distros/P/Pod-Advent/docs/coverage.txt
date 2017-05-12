@@ -1,0 +1,15 @@
+v0.21
+
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+File                           stmt   bran   cond    sub    pod   time  total
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+bin/pod2advent                100.0  100.0   66.7  100.0    n/a    1.4   98.2   #  54/55
+blib/lib/Pod/Advent.pm        100.0  100.0   92.5  100.0  100.0   98.6   98.7   # 472/478
+Total                         100.0  100.0   91.6  100.0  100.0  100.0   98.7   # 526/533
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+export HARNESS_PERL_SWITCHES=-MDevel::Cover=+ignore,^t/
+cover -delete
+make test
+cover --outputfile=index.html
+chmod go+rx cover_db

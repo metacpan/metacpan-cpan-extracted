@@ -1,0 +1,17 @@
+0.04 2015-09-27T22:58:39+02:00
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+
+0.03 2015-02-02T07:34:43+01:00
+ - Add REPOSITORY section to doc.
+ - Add minimal version of Perl.
+ - Fix SEE ALSO section to reality.
+ - Update LICENSE AND COPYRIGHT section in doc to reality.
+ - Update copyright years.
+
+0.02 2014-11-19T09:35:41+01:00
+ - Fix dependencies.
+
+0.01 2014-11-17T23:00:14+01:00
+ - First version.

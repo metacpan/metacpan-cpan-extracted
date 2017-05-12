@@ -1,0 +1,10 @@
+README
+MANIFEST
+lib/Pod/LaTeX.pm
+ChangeLog
+pod2latex.PL
+Build.PL
+t/require.t
+t/pod2latex.t
+t/user.t
+META.yml

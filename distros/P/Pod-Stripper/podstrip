@@ -1,0 +1,72 @@
+#!/usr/local/bin/perl
+
+use strict;
+use Getopt::Long;
+use Pod::Stripper;
+use Pod::Usage;
+
+
+my $help = '';
+GetOptions('h|help|?' => \$help);
+
+if($help) {
+    pod2usage( { -verbose => 6 } );
+    exit;
+}
+
+umask 0022;
+
+@ARGV < 1 and pod2usage(1);
+
+my $stripper = new Pod::Stripper();
+
+$stripper->parse_from_file(@ARGV);
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+podstrip - strip pod from a file, output what's left
+
+=head1 SYNOPSIS
+
+C<podstrip> F<sourceFile> F<destFile>
+
+[C<-?> | C<-help> | C<-h>]
+
+=head1 DESCRIPTION
+
+C<pod2html> reads the POD in file F<sourceFile>,
+translates it to HTML,
+and writes it to file F<destFile>.
+
+F<destFile> is created world-readable.
+
+=head1 REQUIRES
+
+C<Pod::Stripper>
+C<Pod::Usage>
+C<Getopt::Long>
+
+=head1 SEE ALSO
+
+L<C<Pod::Striper>>
+
+=head1 AUTHOR
+
+D.H. aka crazyinsomniac|at|yahoo.com.
+
+=head1 COPYRIGHT
+
+
+Copyright (c) 2002 by D.H. aka crazyinsomniac|at|yahoo.com.
+All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

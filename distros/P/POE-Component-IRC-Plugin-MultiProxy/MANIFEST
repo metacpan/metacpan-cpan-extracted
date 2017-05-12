@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/POE/Component/IRC/Plugin/MultiProxy.pm
+lib/POE/Component/IRC/Plugin/MultiProxy/Away.pm
+lib/POE/Component/IRC/Plugin/MultiProxy/ClientManager.pm
+lib/POE/Component/IRC/Plugin/MultiProxy/Recall.pm
+lib/POE/Component/IRC/Plugin/MultiProxy/State.pm
+t/01_compile.t

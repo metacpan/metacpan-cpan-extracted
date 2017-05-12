@@ -1,0 +1,185 @@
+#!/usr/bin/env perl
+#
+#   Usage: ./extester --help
+#
+#   Martin Senger <martin.senger@gmail.com>
+#   July 2012
+#
+# ABSTRACT: mock external program
+# PODNAME:  extester
+# -----------------------------------------------------------------
+
+use warnings;
+use strict;
+use File::Basename;
+use File::Path qw(make_path);
+use File::Slurp;
+
+our $VERSION;
+
+# -----------------------------------------------------------------
+# Command-line arguments and script usage
+# -----------------------------------------------------------------
+my ($opt_stdout, $opt_stderr, $opt_exit, $opt_signal, $opt_sleep, $opt_progress);
+my ($opt_create, $opt_pipe);
+BEGIN {
+    use Getopt::Long;
+
+    $VERSION = '1.0.0';
+
+    Getopt::Long::Configure ('no_ignore_case');
+    GetOptions ( 'h|help'     => sub { exec ('perldoc', $0);
+                                       die "Sorry, 'perldoc' not found\n"; },
+                 'v|version'  => sub { print "$VERSION\n";
+                                       exit (0); },
+
+                 #
+                 'stdout=s'        => \$opt_stdout,
+                 'stderr=s'        => \$opt_stderr,
+                 'exit=i'          => \$opt_exit,
+                 'signal=i'        => \$opt_signal,
+                 'sleep=i'         => \$opt_sleep,
+                 'progress=i'      => \$opt_progress,
+                 'create=s%{1,50}' => \$opt_create,
+                 pipe              => \$opt_pipe,
+
+        ) or exit 1;
+}  # end of BEGIN
+
+# -----------------------------------------------------------------
+
+$| = 1;  # flushing STDOUT
+
+# check arguments
+if (defined $opt_sleep) {
+    $opt_sleep = - $opt_sleep if $opt_sleep < 0;   # only non-negative sleep
+    if (defined $opt_progress) {
+        $opt_progress = - $opt_progress if $opt_progress < 0;   # only non-negative progress
+        if ($opt_progress > $opt_sleep) {
+            warn "EXTESTER: -progress $opt_progress > -sleep $opt_sleep. -progress ignored.\n";
+            undef $opt_progress;
+        }
+    }
+} elsif (defined $opt_progress) {
+    warn "EXTESTER: -progress valid only with -sleep. -progress ignored.\n";
+    undef $opt_progress;
+}
+
+# the main
+if ($opt_pipe) {
+    print while (<>);
+}
+
+print STDOUT "$opt_stdout\n" if defined $opt_stdout;
+print STDERR "$opt_stderr\n" if defined $opt_stderr;
+
+if ($opt_progress) {
+    my $slept = $opt_sleep;
+    while ($slept > 0) {
+        sleep ($opt_progress);
+        progress_report();
+        $slept -= $opt_progress;
+    }
+} elsif (defined $opt_sleep) {
+    sleep ($opt_sleep);
+}
+
+if ($opt_create) {
+    # e.g. extester -create a.tmp=1 dir/dor/b.tmp=5 empty.dir/=0
+    foreach my $file (keys %$opt_create) {
+        my ($filename, $dirs, $suffix) = fileparse ($file);
+        if ($dirs and $dirs ne './') {
+            make_path ($dirs);  # like: mkdir -p
+        }
+        if ($filename) {
+            my $count = $opt_create->{$file};
+            unless (is_good_number ($count)) {
+                warn "EXTESTER: '-create $file=$count' does not contain a non-negative integer. Changed to 1.\n";
+                $count = 1;
+            }
+            write_file ($file, map {"$_\n"} (1..$count));
+        }
+    }
+}
+
+kill ($opt_signal => $$) if $opt_signal;
+exit (defined $opt_exit ? $opt_exit : 0);
+
+sub progress_report {
+    print STDERR "Progress reported at ", scalar localtime, "\n";
+}
+
+sub is_good_number {
+    my $str = shift;
+    return unless defined $str;
+    return $str =~ /^[+]?\d+$/ ? 1 : undef;
+}
+
+__END__
+
+=head1 SYNOPSIS
+
+   extester [-stdout <text>]  [-stderr <text>] [-pipe]    \
+            [-exit <integer>] [-signal <integer>]         \
+            [-sleep <seconds> [-progress <seconds>] ]     \
+            [-create <file>=<number> [<file>=<number>...]
+
+   extester -help
+   extester -version
+
+
+=head1 DESCRIPTION
+
+A simple script that does nothing except that:
+
+=over
+
+=item * it may print a given text to its standard output
+
+=item * it may print a given text to its standard error
+
+=item * it may exit with a given exit code
+
+=item * it may send to itself a given signal (which may cause exiting)
+
+=item * it may sleep for a given time period before exiting (or signaling)
+
+=item * it may print a short progress report on its standard error every
+given interval
+
+=item * it may read its standard input and pipes it to its standard output
+
+=item * it may create one or more output files (whose names may iclude
+subdirectorie that will also be created) and fill them with the given
+number of lines
+
+For example:
+
+   extester -create a.tmp=1 dir/dor/b.tmp=5 empty.dir/=0
+
+creates:
+
+   ./a.tmp          size:  2
+   ./dir/dor/b.tmp  size: 15
+   ./empty.dir      an empty directory
+
+
+=back
+
+=head1 OPTIONS
+
+=head2 General options
+
+=over
+
+=item B<-help>
+
+Print documentation and exits.
+
+=item B<-version>
+
+Print the version and exits.
+
+=back
+
+=cut

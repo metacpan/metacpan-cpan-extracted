@@ -1,0 +1,26 @@
+Parse::JCONF
+==============
+
+JSON is good, but not very handy for configuration files. JCONF intended to fix this.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  parent
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Oleg G
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

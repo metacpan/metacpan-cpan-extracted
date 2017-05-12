@@ -1,0 +1,453 @@
+#!perl
+
+# Note: This script is a CLI interface to Riap function /Perinci/Examples/CLI/demo_cli_opts
+# and generated automatically using App::GenPericmdScript version 0.13
+
+our $DATE = '2015-09-03'; # DATE
+our $DIST = 'Perinci-Examples-Bin-Classic'; # DIST
+our $VERSION = '0.07'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Classic;
+
+Perinci::CmdLine::Classic->new(
+    url => "/Perinci/Examples/CLI/demo_cli_opts",
+)->run;
+
+# ABSTRACT: Summary for `demo_cli_opts`
+# PODNAME: peri-eg-demo-cli-opts
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+peri-eg-demo-cli-opts - Summary for `demo_cli_opts`
+
+=head1 VERSION
+
+This document describes version 0.07 of peri-eg-demo-cli-opts (from Perl distribution Perinci-Examples-Bin-Classic), released on 2015-09-03.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % peri-eg-demo-cli-opts [options] <str1> <array1>...
+
+Examples:
+
+Summary for an example:
+
+ % peri-eg-demo-cli-opts --int1 10 'a value' elem1 elem2
+
+A second example:
+
+ % peri-eg-demo-cli-opts --int1 20 --str1 x --array1-json '[1,2]'
+
+=head1 DESCRIPTION
+
+Description for C<demo_cli_opts>.
+
+This is another paragraph from the description. Description by default is
+assumed to be marked up in I<Markdown> (currently referring to CommonMark).
+
+ This paragraph should be set in verbatim.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Cat1 options
+
+=over
+
+=item B<--bool1>
+
+A bool option.
+
+CLI framework should generate `--nobool1` (and `--nobool1`) automatically.
+
+This option has an alias, `-z`. Because the alias has its own
+summary/description, it will be displayed separately.
+
+
+=item B<--flag1>, B<-f>
+
+A flag option.
+
+A flag option is a bool option with the value of 1 (true). It is meant to
+activate something if specified and there is no notion of disabling by
+specifying the opposite. Thus the CLI framework should not generate a
+`--noflag1` option.
+
+This flag has an alias `-f` with no summary/description nor code. So the CLI
+framework should display the alias along with the option. Note that short
+(single-letter) options/aliases do not get `--noX`.
+
+
+=item B<--no-full>
+
+Turn off full processing.
+
+Another bool option with on default.
+
+CLI framework should perhaps show `--nobool2` instead of `--bool2` because
+`--bool2` is active by default. And if it does so, it should also show the
+negative summary in the `summary.alt.bool.not` attribute instead of the normal
+`summary` property.
+
+
+=item B<-z>
+
+This is summary for option `-z`.
+
+See C<--bool1>.
+
+=back
+
+=head2 Cat2 options
+
+=over
+
+=item B<--no-full2>
+
+Another bool option with on default. Because this option does not have
+`summary.alt.bool.not`, CLI framework should not show any summary, despite the
+existence of `summary`.
+
+
+=back
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Negation options
+
+=over
+
+=item B<--are-baz>
+
+This demonstrate negation of --are-foo to --arent-foo.
+
+=item B<--is-bar>
+
+This demonstrate negation of --is-foo to --isnt-foo.
+
+=item B<--with-foo>, B<--wf>
+
+This demonstrate negation of --with-foo to --without-foo.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format-options>=I<s>
+
+Pass options to formatter.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Equivalent to --format=json-pretty.
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--array1-json>=I<s>
+
+Positional, greedy, and plural (JSON-encoded).
+
+See C<--array1>.
+
+=item B<--array1-yaml>=I<s>
+
+Positional, greedy, and plural (YAML-encoded).
+
+See C<--array1>.
+
+=item B<--array1>=I<s@>*
+
+Positional, greedy, and singular.
+
+Argument with non-scalar types (like array or hash) can be specified in the CLI
+using `--ARG-json` or `--ARG-yaml`. Arguments with type of array of string can
+also be specified using multiple `--ARG` options.
+
+This option also links to another option.
+
+
+Can be specified multiple times.
+
+=item B<--female>
+
+Alias for `--gender=F`.
+
+See C<--gender>.
+
+=item B<--gender>=I<s>
+
+A string option.
+
+Valid values:
+
+ ["M","F"]
+
+This option contains flag aliases that have code.
+
+
+=item B<--hash1-json>=I<s>
+
+Demonstrate hash argument with default value from schema (JSON-encoded).
+
+See C<--hash1>.
+
+=item B<--hash1-yaml>=I<s>
+
+Demonstrate hash argument with default value from schema (YAML-encoded).
+
+See C<--hash1>.
+
+=item B<--hash1>=I<s>
+
+Demonstrate hash argument with default value from schema.
+
+Default value:
+
+ {default=>1}
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--input-base64>=I<s>
+
+Specify input (base64-encoded).
+
+See C<--input>.
+
+=item B<--input>=I<s>
+
+Specify input.
+
+This option demonstrates the `cmdline_src` property. Also, since schema type is
+`buf`, we know that the value is binary data. CLI framework will provide
+`--input-base64` to allow specifying binary data encoded in base64.
+
+
+=item B<--int1>=I<i>*, B<-i>
+
+Demonstrate an option with no summary. And a required option.
+
+
+=item B<--int2>=I<i>
+
+Another int option.
+
+Default value:
+
+ 10
+
+Demonstrate a scalar/simple default value.
+
+
+=item B<--male>
+
+Alias for `--gender=M`.
+
+See C<--gender>.
+
+=item B<--output>=I<filename>
+
+Specify output filename.
+
+This option demonstrates how the option would be displayed in the help/usage.
+Due to the `x.schema.entity` attribute giving hint about what the value is, CLI
+framework can show:
+
+    --output=file
+
+instead of the plain and less informative:
+
+    --output=s
+
+
+=item B<--pass>=I<s>, B<-p>
+
+=item B<--str1>=I<s>*
+
+A required option as well as positional argument.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=item B<-F>
+
+Alias for `--female`.
+
+See C<--gender>.
+
+=item B<-M>
+
+Alias for `--male`.
+
+See C<--gender>.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C peri-eg-demo-cli-opts peri-eg-demo-cli-opts
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete peri-eg-demo-cli-opts 'p/*/`peri-eg-demo-cli-opts`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 ENVIRONMENT
+
+=head2 PERI_EG_DEMO_CLI_OPTS => str
+
+Specify additional command-line options
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at C<~/.config/peri-eg-demo-cli-opts.conf>, C<~/peri-eg-demo-cli-opts.conf> or C</etc/peri-eg-demo-cli-opts.conf> (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features. 
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+List of available configuration parameters:
+
+ are_baz (see --are-baz)
+ array1 (see --array1)
+ bool1 (see --bool1)
+ flag1 (see --flag1)
+ format (see --format)
+ format_options (see --format-options)
+ full (see --no-full)
+ full2 (see --no-full2)
+ gender (see --gender)
+ hash1 (see --hash1)
+ input (see --input)
+ int1 (see --int1)
+ int2 (see --int2)
+ is_bar (see --is-bar)
+ output (see --output)
+ pass (see --pass)
+ str1 (see --str1)
+ with_foo (see --with-foo)
+
+=head1 FILES
+
+~/.config/peri-eg-demo-cli-opts.conf
+
+~/peri-eg-demo-cli-opts.conf
+
+/etc/peri-eg-demo-cli-opts.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Examples-Bin-Classic>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Examples-Bin>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Examples-Bin-Classic>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

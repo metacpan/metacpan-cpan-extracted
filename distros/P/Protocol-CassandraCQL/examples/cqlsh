@@ -1,0 +1,135 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use Protocol::CassandraCQL::Client;
+use Protocol::CassandraCQL qw( CONSISTENCY_ONE :types :results );
+
+use Getopt::Long;
+use List::Util qw( max );
+use POSIX qw( strftime );
+use Socket qw( inet_ntoa inet_ntop AF_INET6 );
+use Term::ReadLine;
+
+use Data::Dump 'pp';
+
+GetOptions(
+   'host|h=s' => \(my $HOST = "localhost"),
+   'user|u=s' => \my $USERNAME,
+   'pass|p=s' => \my $PASSWORD,
+   'version|V=i' => \my $CQLVERSION,
+) or exit 1;
+
+my $cassie = Protocol::CassandraCQL::Client->new(
+   PeerHost => $HOST,
+   Username => $USERNAME,
+   Password => $PASSWORD,
+   CQLVersion => $CQLVERSION,
+);
+$cassie or die "Cannot connect to $HOST - $@";
+
+my $term = Term::ReadLine->new( "cqlsh" );
+
+my $keyspace;
+
+if( @ARGV ) {
+   ( undef, $keyspace ) = $cassie->use_keyspace( shift @ARGV );
+}
+
+while( defined( my $query = $term->readline(sprintf "\ncql%s> ", defined $keyspace ? ":$keyspace" : "") ) ) {
+   my ( $type, $result );
+   my $e = eval {
+      ( $type, $result ) = $cassie->query( $query, CONSISTENCY_ONE );
+      1;
+   } ? undef : $@;
+
+   if( $e ) {
+      print "$e\n";
+      next;
+   }
+
+   if( $type == RESULT_SET_KEYSPACE ) {
+      $keyspace = $result;
+   }
+   elsif( $type == RESULT_SCHEMA_CHANGE ) {
+      print join( " ", @$result ) . "\n";
+   }
+   elsif( $type == RESULT_ROWS ) {
+      # TODO: Text::Table?
+
+      my @columns; # formatted, one ARRAY per column, containing row data
+      foreach my $i ( 0 .. $result->rows - 1 ) {
+         my $d = $result->row_array( $i );
+         foreach my $col ( 0 .. $#$d ) {
+            $columns[$col][$i] = "", next if !defined $d->[$col];
+
+            my $str = $result->column_type( $col )->stringify( $d->[$col] );
+
+            $columns[$col][$i] = $str;
+         }
+      }
+      my @colwidths = map {
+         max map { length } $result->column_shortname($_),
+                            $result->column_type($_)->name,
+                            @{ $columns[$_] }
+      } 0 .. $#columns;
+
+      # Column names
+      print join( " | ", map { sprintf "%-*s", $colwidths[$_], $result->column_shortname($_) } 0 .. $#columns ) . "\n";
+
+      # Column types
+      print join( " | ", map { sprintf "%-*s", $colwidths[$_], $result->column_type($_)->name } 0 .. $#columns ) . "\n";
+
+      # Divider
+      print join( "-+-", map { "-" x $colwidths[$_] } 0 .. $#columns ) . "\n";
+
+      # Row data
+      foreach my $i ( 0 .. $result->rows - 1 ) {
+         print join( " | ", map { sprintf "%-*s", $colwidths[$_], $columns[$_][$i] } 0 .. $#columns ) . "\n";
+      }
+   }
+   else {
+      print pp($result) . "\n";
+   }
+}
+
+print "\n"; # clear the last prompt
+
+# Cheating
+
+sub Protocol::CassandraCQL::Type::ASCII::stringify   { qq('$_[1]') }
+sub Protocol::CassandraCQL::Type::BOOLEAN::stringify { $_[1] ? "true" : "false" }
+sub Protocol::CassandraCQL::Type::BLOB::stringify    { unpack "H*", $_[1] }
+sub Protocol::CassandraCQL::Type::DOUBLE::stringify  { sprintf "%.9g", $_[1] }
+sub Protocol::CassandraCQL::Type::FLOAT::stringify   { sprintf "%.5g", $_[1] }
+sub Protocol::CassandraCQL::Type::TIMESTAMP::stringify {
+   my $sec  = int( $_[1] );
+   my $msec = 1000 * ( $_[1] - $sec );
+   strftime( "%Y-%m-%d %H:%M:%S", localtime $sec ) . sprintf ".%03d", $msec }
+sub Protocol::CassandraCQL::Type::VARCHAR::stringify { qq('$_[1]') }
+
+sub Protocol::CassandraCQL::Type::LIST::stringify {
+   my $l = $_[1];
+   "[" . join(", ", map { $_[0]->element_type->stringify($_) } @$l) . "]"
+}
+
+sub Protocol::CassandraCQL::Type::SET::stringify {
+   my $l = $_[1];
+   "{" . join(", ", map { $_[0]->element_type->stringify($_) } @$l) . "}"
+}
+
+sub Protocol::CassandraCQL::Type::MAP::stringify {
+   my $m = $_[1];
+   "{" . join(", ", map { $_[0]->key_type->stringify($_) . "," .
+                          $_[0]->value_type->stringify($m->{$_}) } sort keys %$m ) . "}"
+}
+
+sub Protocol::CassandraCQL::Type::INET::stringify {
+   length($_[1]) ==  4 ? inet_ntoa( $_[1] ) :
+   length($_[1]) == 16 ? inet_ntop( AF_INET6, $_[1] ) :
+                         unpack "H*", $_[1]
+}
+
+sub Protocol::CassandraCQL::Type::stringify { $_[1] }

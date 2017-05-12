@@ -1,0 +1,32 @@
+<?xml version="1.0"?> 
+   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	    xmlns="http://www.cs.rpi.edu/~puninj/XMLJ/course_schema.rdf#">
+     <Course rdf:ID="csci_2962">
+        <name>Programming XML in Java</name>
+        <teacher>
+            <Teacher rdf:ID="jp">
+               <name>John Punin</name>
+	    </Teacher>
+        </teacher>
+        <students>
+            <rdf:Seq>
+	        <rdf:li>
+	           <Student rdf:ID="er">
+		      <name>Elizabeth Roberts</name>
+		   </Student>
+	        </rdf:li>
+	        <rdf:li>
+	           <Student rdf:ID="gl">
+		      <name>George Lucas</name>
+		   </Student>
+	        </rdf:li>
+	        <rdf:li>
+	           <Student rdf:ID="js">
+		      <name>John Smith</name>
+		   </Student>
+	        </rdf:li>
+            </rdf:Seq>
+        </students>
+     </Course>
+   </rdf:RDF>
+   

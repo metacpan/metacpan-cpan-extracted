@@ -1,0 +1,40 @@
+---
+data_dir: "data"
+resources: "resources" # main directory with PML schemas
+
+db:
+  name: pdt_test
+  host: localhost
+  port: 15432
+  user: postgres
+  password:
+
+sys_db: postgres
+
+layers: # description of all data layers
+  - name: adata
+    data: *.a.gz
+    references:
+      a-root/s.rf: '-'
+      m-node/id: '-'
+      m-node/src.rf: '-'
+      w-node/id: '-'
+  - name: tdata
+    data: *.t.gz
+    related-schema:
+      - adata_30_schema.xml
+    references:
+      st-node/tnode.rfs: t-node
+      t-a/aux.rf: 'adata:a-node'  # t-a/aux.rf=adata:a-node
+      t-a/lex.rf: 'adata:a-node'
+      t-bridging-link/target_node.rf: t-node
+      t-coref_text-link/target_node.rf: t-node
+      t-discourse-link/a-connectors.rf: 'adata:a-node'
+      t-discourse-link/all_a-connectors.rf: 'adata:a-node'
+      t-discourse-link/t-connectors.rf: t-node
+      t-discourse-link/target_node.rf: t-node
+      t-node/compl.rf: t-node
+      t-node/coref_gram.rf: t-node  # t-node/coref_gram.rf=t-node
+      t-node/val_frame.rf: '-'
+      t-root/atree.rf: 'adata:a-root'
+

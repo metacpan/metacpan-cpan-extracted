@@ -1,0 +1,668 @@
+Revision history for Package-Builder
+
+------------------------------------------------------------------------
+r150 | jmrenouard | 2007-09-11 18:20:48 +0200 (mar, 11 sep 2007) | 4 lines
+
+* Maintenance release 
+* Packaging and small bug fixes
+
+
+------------------------------------------------------------------------
+r149 | jmrenouard | 2007-09-04 17:39:42 +0200 (mar, 04 sep 2007) | 3 lines
+
+* bug fixes
+
+
+------------------------------------------------------------------------
+r148 | jmrenouard | 2007-08-24 18:06:58 +0200 (ven, 24 aoû 2007) | 4 lines
+
+* A config parser to compare to config dir
+* rid can be substitute by perl -pi.bak -e 's/preprod/production/g' *.properties
+
+
+------------------------------------------------------------------------
+r147 | jmrenouard | 2007-08-23 13:42:28 +0200 (jeu, 23 aoû 2007) | 4 lines
+
+* Cleanup 
+* Add Generic Python Proxy
+* Add Replace in Directory
+
+------------------------------------------------------------------------
+r146 | jmrenouard | 2007-08-21 13:49:12 +0200 (mar, 21 aoû 2007) | 2 lines
+
+* Incomplete port
+
+------------------------------------------------------------------------
+r145 | jmrenouard | 2007-08-20 18:43:31 +0200 (lun, 20 aoû 2007) | 2 lines
+
+* Start of port into Python
+
+------------------------------------------------------------------------
+r144 | jmrenouard | 2007-08-03 10:42:28 +0200 (ven, 03 aoû 2007) | 5 lines
+
+* New Directory
+e-This line, and those below, will be ignored--
+
+A    pas
+
+------------------------------------------------------------------------
+r143 | jmrenouard | 2007-08-03 10:03:12 +0200 (ven, 03 aoû 2007) | 2 lines
+
+* Good naming choice
+
+------------------------------------------------------------------------
+r142 | jmrenouard | 2007-08-03 10:02:09 +0200 (ven, 03 aoû 2007) | 2 lines
+
+* Unstable commit
+
+------------------------------------------------------------------------
+r141 | jmrenouard | 2007-08-03 09:59:02 +0200 (ven, 03 aoû 2007) | 5 lines
+
+* Release 4.40 for myrpm
+* Release 0.1 for puftp
+* Relesase 4.40 for csu
+
+
+------------------------------------------------------------------------
+r140 | jmrenouard | 2007-08-03 09:31:11 +0200 (ven, 03 aoû 2007) | 4 lines
+
+* Release 4.40 for myrpm
+* Release 0.1 for puftp
+* Relesase 4.40 for csu
+
+------------------------------------------------------------------------
+r139 | jmrenouard | 2007-08-02 17:36:02 +0200 (jeu, 02 aoû 2007) | 2 lines
+
+* Reordered directory puftp
+
+------------------------------------------------------------------------
+r138 | jmrenouard | 2007-08-02 09:32:25 +0200 (jeu, 02 aoû 2007) | 3 lines
+
+* Refactoring directories
+
+
+------------------------------------------------------------------------
+r137 | jmrenouard | 2007-08-02 08:42:56 +0200 (jeu, 02 aoû 2007) | 6 lines
+
+* Project directories Review
+* Bug fixes on the 4.36 release
+* Release 4.40 for myrpm
+* Release 0.1 for puftp
+
+
+------------------------------------------------------------------------
+r136 | jmrenouard | 2007-07-31 18:10:26 +0200 (mar, 31 jui 2007) | 5 lines
+
+* First release for udp_client/udp_server file broadcaster.
+It 's very simplistic multis-server file transfer protocol
+But it works !
+
+
+------------------------------------------------------------------------
+r135 | jmrenouard | 2007-07-30 18:19:36 +0200 (lun, 30 jui 2007) | 3 lines
+
+* First release for puftp
+* this is a clone of uftp in python
+
+------------------------------------------------------------------------
+r134 | jmrenouard | 2007-07-30 12:35:20 +0200 (lun, 30 jui 2007) | 3 lines
+
+* Version 4.40
+* Bug fix around check permissions when creating a link without local file reference
+
+------------------------------------------------------------------------
+r133 | jmrenouard | 2007-07-30 10:21:35 +0200 (lun, 30 jui 2007) | 3 lines
+
+* Allow terminal allocation
+* avoid problem with remote exec when doing command like : su -c 'rm -Rf /' :)
+
+------------------------------------------------------------------------
+r132 | jmrenouard | 2007-07-25 10:42:55 +0200 (mer, 25 jui 2007) | 1 line
+
+Version : 4.39 \n* Bubfix for symbolic links
+------------------------------------------------------------------------
+r131 | jmrenouard | 2007-07-23 11:48:53 +0200 (lun, 23 jui 2007) | 3 lines
+
+* File permissions check
+* explicit messages written on stderr
+
+------------------------------------------------------------------------
+r116 | jmrenouard | 2007-07-12 17:10:14 +0200 (jeu, 12 jui 2007) | 2 lines
+
+* Shi bang with a problem !
+
+------------------------------------------------------------------------
+r115 | jmrenouard | 2007-07-12 17:04:09 +0200 (jeu, 12 jui 2007) | 3 lines
+
+* Correction of this release
+* Rpms failed during installation
+
+------------------------------------------------------------------------
+r114 | jmrenouard | 2007-07-12 11:34:36 +0200 (jeu, 12 jui 2007) | 3 lines
+
+* Release 4.36 is out !
+* Happy rpm hacking... 
+
+------------------------------------------------------------------------
+r113 | jmrenouard | 2007-07-12 11:30:21 +0200 (jeu, 12 jui 2007) | 2 lines
+
+* rpm for the 4.36 release of myrpm
+
+------------------------------------------------------------------------
+r112 | jmrenouard | 2007-07-12 11:02:19 +0200 (jeu, 12 jui 2007) | 2 lines
+
+* Review in order to use in from a rpm based installation version
+
+------------------------------------------------------------------------
+r111 | jmrenouard | 2007-07-11 18:08:05 +0200 (mer, 11 jui 2007) | 2 lines
+
+* install script review
+
+------------------------------------------------------------------------
+r110 | jmrenouard | 2007-07-11 17:26:48 +0200 (mer, 11 jui 2007) | 2 lines
+
+* Final renaming tasks
+
+------------------------------------------------------------------------
+r109 | jmrenouard | 2007-07-11 17:23:17 +0200 (mer, 11 jui 2007) | 6 lines
+
+* Packaging perl dependencies
+* Shells script renaming
+* Bug fix with help options in myrpm
+* Bug fix with name in myrpm
+
+
+------------------------------------------------------------------------
+r108 | jmrenouard | 2007-07-11 17:13:42 +0200 (mer, 11 jui 2007) | 2 lines
+
+* Add directive about architecture
+
+------------------------------------------------------------------------
+r107 | jmrenouard | 2007-07-10 18:34:32 +0200 (mar, 10 jui 2007) | 3 lines
+
+* xmyrpm.sh is about to be complete to be used as graphical interface
+* 2 commits before new release
+
+------------------------------------------------------------------------
+r106 | jmrenouard | 2007-07-09 18:57:28 +0200 (lun, 09 jui 2007) | 2 lines
+
+* some fixes around building directory
+
+------------------------------------------------------------------------
+r105 | jmrenouard | 2007-07-09 18:39:55 +0200 (lun, 09 jui 2007) | 2 lines
+
+* New script to make cpan module easily available accross HTTP and fucking proxies
+
+------------------------------------------------------------------------
+r104 | jmrenouard | 2007-07-06 17:57:40 +0200 (ven, 06 jui 2007) | 4 lines
+
+* script Port zfrom enity to dialog
+* xmyrpm.sh is about to be finshed for version 4.
+
+
+------------------------------------------------------------------------
+r103 | jmrenouard | 2007-07-05 19:04:36 +0200 (jeu, 05 jui 2007) | 4 lines
+
+* Version 4.32
+	- full test on the sample test
+	- works fine now !!
+
+------------------------------------------------------------------------
+r102 | jmrenouard | 2007-07-05 18:48:02 +0200 (jeu, 05 jui 2007) | 8 lines
+
+* Version 4.31
+	- Regression fixes with template fails on template code for symbolic links
+        - support special cahracters such as $ ( ) %
+        - clean some blank lines
+	- fix multi call of stat function for nothing
+
+	
+
+------------------------------------------------------------------------
+r101 | jmrenouard | 2007-07-05 12:51:57 +0200 (jeu, 05 jui 2007) | 2 lines
+
+* New remote script for ssh with password as argument
+
+------------------------------------------------------------------------
+r100 | jmrenouard | 2007-07-04 18:29:10 +0200 (mer, 04 jui 2007) | 5 lines
+
+* Bug fixes with dirmane on install.sh
+* Version upgrade
+* cleaning comment about features
+
+
+------------------------------------------------------------------------
+r99 | jmrenouard | 2007-07-03 10:31:02 +0200 (mar, 03 jui 2007) | 2 lines
+
+* Changing symbolic template creation code
+
+------------------------------------------------------------------------
+r98 | jmrenouard | 2007-07-02 18:52:52 +0200 (lun, 02 jui 2007) | 2 lines
+
+* fix on some bugs
+
+------------------------------------------------------------------------
+r97 | jmrenouard | 2007-07-02 14:25:29 +0200 (lun, 02 jui 2007) | 2 lines
+
+* Warning fixes ...
+
+------------------------------------------------------------------------
+r96 | jmrenouard | 2007-07-02 12:37:18 +0200 (lun, 02 jui 2007) | 2 lines
+
+* Remove old versions
+
+------------------------------------------------------------------------
+r95 | jmrenouard | 2007-07-02 10:00:05 +0200 (lun, 02 jui 2007) | 3 lines
+
+* Good initial version
+
+
+------------------------------------------------------------------------
+r94 | jmrenouard | 2007-06-29 23:20:09 +0200 (ven, 29 jun 2007) | 1 line
+
+add xmyrpm in the install file
+------------------------------------------------------------------------
+r93 | jmrenouard | 2007-06-29 23:18:01 +0200 (ven, 29 jun 2007) | 2 lines
+
+* reorder exec.
+
+------------------------------------------------------------------------
+r92 | jmrenouard | 2007-06-29 23:15:48 +0200 (ven, 29 jun 2007) | 3 lines
+
+* First release for xmyrpm
+* install.sh bug fixes
+* same for sample_build.sh
+------------------------------------------------------------------------
+r91 | jmrenouard | 2007-06-29 21:35:56 +0200 (ven, 29 jun 2007) | 1 line
+
+fixes and new zenity installer verion
+------------------------------------------------------------------------
+r90 | jmrenouard | 2007-06-29 21:34:23 +0200 (ven, 29 jun 2007) | 2 lines
+
+new version 
+Zenity installer
+------------------------------------------------------------------------
+r89 | jmrenouard | 2007-06-29 07:42:41 +0200 (ven, 29 jun 2007) | 5 lines
+
+* Reordered main goals for release 4
+* Graphical home installer
+* Specifications reviewed
+* Installer tests
+
+------------------------------------------------------------------------
+r88 | jmrenouard | 2007-06-28 23:58:59 +0200 (jeu, 28 jun 2007) | 3 lines
+
+* UI-Dialog new depandency
+* Graphical Installer 
+
+------------------------------------------------------------------------
+r87 | jmrenouard | 2007-06-28 16:28:22 +0200 (jeu, 28 jun 2007) | 7 lines
+
+* Version : 4.26
+
+- Remove noreplace on config
+- Add new discover special character '(' and ')'
+- fixes for %pre 1 script when no group and no user created
+
+
+------------------------------------------------------------------------
+r86 | jmrenouard | 2007-06-25 23:26:08 +0200 (lun, 25 jun 2007) | 2 lines
+
+* addition
+
+------------------------------------------------------------------------
+r85 | jmrenouard | 2007-06-25 15:55:06 +0200 (lun, 25 jun 2007) | 3 lines
+
+* New install.sh
+
+
+------------------------------------------------------------------------
+r84 | jmrenouard | 2007-06-25 11:01:25 +0200 (lun, 25 jun 2007) | 2 lines
+
+* Add sample .rpmmacros
+
+------------------------------------------------------------------------
+r83 | jmrenouard | 2007-06-25 10:51:26 +0200 (lun, 25 jun 2007) | 5 lines
+
+* Shell script allow admin to handle large number of server.
+* Some script related to Red Hat Satellite
+* Some scripts helps you to handle identities and automatic login via ssh
+
+
+------------------------------------------------------------------------
+r82 | jmrenouard | 2007-06-25 01:06:59 +0200 (lun, 25 jun 2007) | 2 lines
+
+* Add specifications finformation
+
+------------------------------------------------------------------------
+r81 | jmrenouard | 2007-06-25 00:57:52 +0200 (lun, 25 jun 2007) | 2 lines
+
+* nothing else
+
+------------------------------------------------------------------------
+r80 | jmrenouard | 2007-06-20 22:50:25 +0200 (mer, 20 jun 2007) | 4 lines
+
+Version 4.23 :
+ * Fix in pre script for user creation
+
+
+------------------------------------------------------------------------
+r79 | jmrenouard | 2007-06-20 18:45:56 +0200 (mer, 20 jun 2007) | 3 lines
+
+* Template fixes
+
+
+------------------------------------------------------------------------
+r78 | jmrenouard | 2007-06-18 18:35:00 +0200 (lun, 18 jun 2007) | 5 lines
+
+* Version 4.20
+	- Add user bug fixes
+ 	- pre code bug fixes
+
+
+------------------------------------------------------------------------
+r77 | jmrenouard | 2007-06-18 18:12:27 +0200 (lun, 18 jun 2007) | 6 lines
+
+Version 4.18
+	* links problem work around fixes
+	* No create group and user issues, fixes
+	* Some group and user are no detected
+
+
+------------------------------------------------------------------------
+r76 | jmrenouard | 2007-06-18 12:08:38 +0200 (lun, 18 jun 2007) | 2 lines
+
+version 4.15
+
+------------------------------------------------------------------------
+r75 | jmrenouard | 2007-06-18 11:52:02 +0200 (lun, 18 jun 2007) | 5 lines
+
+* Fixes on template
+    - adduser comment is now between " and avoid creation failures.
+    - Config are now set as noreplace for production issues
+	
+
+------------------------------------------------------------------------
+r74 | jmrenouard | 2007-06-14 23:36:46 +0200 (jeu, 14 jun 2007) | 4 lines
+
+* Web Interface is functionnal
+* Need to bind myrpm.pl call and merge result.
+
+
+------------------------------------------------------------------------
+r73 | jmrenouard | 2007-06-13 23:08:43 +0200 (mer, 13 jun 2007) | 6 lines
+
+Version : 4.13
+* Removed building directory at the build stage to avoid compilation problem
+* Complete scripting codes in template
+* Template output review
+
+
+------------------------------------------------------------------------
+r72 | jmrenouard | 2007-06-13 19:07:23 +0200 (mer, 13 jun 2007) | 6 lines
+
+Version : 4.10
+* Bug fixes around symbolic links
+* Fixes around symbolic link creation in the post install
+* Better excluded path list, maybe a bug fixes
+
+
+------------------------------------------------------------------------
+r71 | jmrenouard | 2007-06-13 01:13:09 +0200 (mer, 13 jun 2007) | 2 lines
+
+* small updates on spec
+
+------------------------------------------------------------------------
+r70 | jmrenouard | 2007-06-13 01:12:19 +0200 (mer, 13 jun 2007) | 4 lines
+
+* Packager information are now handled in the web interface.
+* The builder interface is now ready to support builds.
+
+
+------------------------------------------------------------------------
+r69 | jmrenouard | 2007-06-12 18:22:22 +0200 (mar, 12 jun 2007) | 7 lines
+
+Version : 4.04
+* Big work around templating separation
+* The road in order to be able to build a generic and automatic packaging tools is behind us.
+* Deep source cleaning
+* Enforcing template complexity.
+ 
+
+------------------------------------------------------------------------
+r68 | jmrenouard | 2007-06-11 17:24:16 +0200 (lun, 11 jun 2007) | 3 lines
+
+Version:4.02
+* Add a ChangeLog parameter
+
+------------------------------------------------------------------------
+r67 | jmrenouard | 2007-06-11 11:09:03 +0200 (lun, 11 jun 2007) | 9 lines
+
+* Bug fixes about Requires and AutoReqProv
+  In fact if no Requires are set AutoReqProv is set to no
+  Your package is strongly integrated as soon as you will provides requires dependencies.
+
+* First specfications documentation about :
+  The future web interface for myrpm
+  The abstract way we took to be able to build several types of package (deb, rpm, autopackage, tar.gz from slackware) and so one. InstallShield why not !
+
+
+------------------------------------------------------------------------
+r66 | jmrenouard | 2007-06-05 23:08:25 +0200 (mar, 05 jun 2007) | 3 lines
+
+Version : 4.00
+* Upgrade version flag
+
+------------------------------------------------------------------------
+r65 | jmrenouard | 2007-06-05 23:07:10 +0200 (mar, 05 jun 2007) | 5 lines
+
+Version : 4.00
+* Initial import for MyRPM web interface
+* Templates are ready
+
+
+------------------------------------------------------------------------
+r62 | jmrenouard | 2007-06-04 20:58:29 +0200 (lun, 04 jun 2007) | 4 lines
+
+Version : 2.35
+* Cleaning project dependencies
+
+
+------------------------------------------------------------------------
+r57 | jmrenouard | 2007-06-04 18:35:46 +0200 (lun, 04 jun 2007) | 9 lines
+
+Version: 3.25
+* Possibility to create RPM from a archive file in tar or tar.gz format
+* Possibility to change User and group id with numerical value or name value
+* Cleaning is done after package creation to avoid hand based garbading.
+
+-This line, and those below, will be ignored--
+
+M    myrpm.pl
+
+------------------------------------------------------------------------
+r56 | jmrenouard | 2007-06-04 17:35:53 +0200 (lun, 04 jun 2007) | 6 lines
+
+Version : 3.20
+# FEA 17 : from tar list, untar ... and autobuild list for install redefining the -d/-r option
+# FEA 18 : from tar list, untar ... recursively :)
+# FEA 19 : substitute path by rpm var
+
+
+------------------------------------------------------------------------
+r55 | jmrenouard | 2007-05-31 09:04:59 +0200 (jeu, 31 mai 2007) | 2 lines
+
+* Increase version number
+
+------------------------------------------------------------------------
+r54 | jmrenouard | 2007-05-31 09:02:04 +0200 (jeu, 31 mai 2007) | 2 lines
+
+* Fix format documentation 
+
+------------------------------------------------------------------------
+r53 | jmrenouard | 2007-05-07 16:12:13 +0200 (lun, 07 mai 2007) | 2 lines
+
+* New dependencies for graphical interface
+
+------------------------------------------------------------------------
+r50 | jmrenouard | 2007-05-03 18:31:25 +0200 (jeu, 03 mai 2007) | 7 lines
+
+* Multi package handling :)
+* no error
+* Comment directory when they are set as reserved
+* New road map for tar handling
+* custom build script supported.
+ 
+
+------------------------------------------------------------------------
+r49 | jmrenouard | 2007-05-03 12:04:04 +0200 (jeu, 03 mai 2007) | 2 lines
+
+* Remove pwd system call
+
+------------------------------------------------------------------------
+r48 | jmrenouard | 2007-05-02 18:39:46 +0200 (mer, 02 mai 2007) | 2 lines
+
+* small addition in order to be able to split packages
+
+------------------------------------------------------------------------
+r47 | jmrenouard | 2007-05-02 18:32:09 +0200 (mer, 02 mai 2007) | 2 lines
+
+* Feature to do updated.
+
+------------------------------------------------------------------------
+r46 | jmrenouard | 2007-05-02 18:31:02 +0200 (mer, 02 mai 2007) | 5 lines
+
+* Configuration detection (yes)
+* Documentation detection (yes)
+* reserved dir are no more included in directory list
+
+
+------------------------------------------------------------------------
+r45 | jmrenouard | 2007-05-02 17:06:00 +0200 (mer, 02 mai 2007) | 2 lines
+
+* Fix for warning about several files included in package :)
+
+------------------------------------------------------------------------
+r36 | jmrenouard | 2007-04-18 18:16:41 +0200 (mer, 18 avr 2007) | 3 lines
+
+* Blocking bug fixed
+* documentation formating fixes
+
+------------------------------------------------------------------------
+r35 | jmrenouard | 2007-04-18 18:11:31 +0200 (mer, 18 avr 2007) | 2 lines
+
+* French documentation included
+
+------------------------------------------------------------------------
+r34 | jmrenouard | 2007-04-16 19:04:23 +0200 (lun, 16 avr 2007) | 2 lines
+
+* small updates.
+
+------------------------------------------------------------------------
+r33 | jmrenouard | 2007-04-16 14:50:46 +0200 (lun, 16 avr 2007) | 4 lines
+
+* Requires tags added
+* tested feature
+
+
+------------------------------------------------------------------------
+r32 | jmrenouard | 2007-04-11 18:34:40 +0200 (mer, 11 avr 2007) | 4 lines
+
+* Remove here document script style : script failed in fact.
+* Support for sh only, but sh can call other scripts.
+
+
+------------------------------------------------------------------------
+r31 | jmrenouard | 2007-04-10 19:17:46 +0200 (mar, 10 avr 2007) | 2 lines
+
+* old ChangeLog information saved in the new spec version
+
+------------------------------------------------------------------------
+r30 | jmrenouard | 2007-04-10 18:46:11 +0200 (mar, 10 avr 2007) | 5 lines
+
+* Symbolic link now handled properly 
+* Avoid big problem with previous symbolic link on system lib :)
+* In progress to 3.0
+
+
+------------------------------------------------------------------------
+r29 | jmrenouard | 2007-04-06 18:56:28 +0200 (ven, 06 avr 2007) | 2 lines
+
+* Remove feature to realize
+
+------------------------------------------------------------------------
+r28 | jmrenouard | 2007-04-06 18:55:40 +0200 (ven, 06 avr 2007) | 4 lines
+
+* Additionnal script inclusion options
+* Realise it, test it and include it as is, #!/bin/... handle proprely.
+
+
+------------------------------------------------------------------------
+r27 | jmrenouard | 2007-04-05 15:21:43 +0200 (jeu, 05 avr 2007) | 4 lines
+
+* Large improuvment in group and user creation
+* The script handles a default password in creation case
+* The script manages shell, comment gid, uid information in the package  
+
+------------------------------------------------------------------------
+r8 | jmrenouard | 2007-04-02 18:10:32 +0200 (lun, 02 avr 2007) | 5 lines
+
+* Perldoc convertion
+* Architecture handling by using --target option to rpmbuild
+* Doc refactoring and cleaning
+
+
+------------------------------------------------------------------------
+r7 | jmrenouard | 2007-04-02 14:51:58 +0200 (lun, 02 avr 2007) | 3 lines
+
+* Better group and user creation management
+* No more system account created
+
+------------------------------------------------------------------------
+r6 | jmrenouard | 2007-04-02 10:49:06 +0200 (lun, 02 avr 2007) | 3 lines
+
+* Adding group id in the create user and group pre code.
+
+
+------------------------------------------------------------------------
+r5 | jmrenouard | 2007-03-30 15:44:56 +0200 (ven, 30 mar 2007) | 7 lines
+
+* Version.2.9
+* Exclude patterns option added
+* Test successful for exclude pattern
+* Removing sauvage debug display
+* command line documentation updated
+
+
+------------------------------------------------------------------------
+r4 | jmrenouard | 2007-03-30 01:35:34 +0200 (ven, 30 mar 2007) | 3 lines
+
+* Mise à jour
+
+
+------------------------------------------------------------------------
+r3 | jmrenouard | 2007-03-30 01:08:46 +0200 (ven, 30 mar 2007) | 3 lines
+
+* Error fix
+* Validation file list building ( option -d) + chroot fetaure (option -r)
+
+------------------------------------------------------------------------
+r2 | jmrenouard | 2007-03-30 00:45:46 +0200 (ven, 30 mar 2007) | 12 lines
+
+* Version 2.8
+* Initial release
+* Complete chroot handling
+* Full path style handling i.e : relative or absolute
+* Dollar symbol file are removed.
+* Full internal file list builder
+* Option review for consistency
+* Large improvement system 
+
+* Misc fixes and addition on integrated template
+
+
+------------------------------------------------------------------------
+r1 | (no author) | 2007-03-29 22:30:37 +0200 (jeu, 29 mar 2007) | 1 line
+
+Initial directory structure.
+------------------------------------------------------------------------

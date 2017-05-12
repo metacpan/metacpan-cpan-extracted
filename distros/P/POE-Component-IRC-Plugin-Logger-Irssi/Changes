@@ -1,0 +1,16 @@
+Revision history for Perl extension POE::Component::IRC::Plugin::Logger::Irssi.
+
+0.001002 2014-08-17T01:01+03:00
+ - CPAN Day cleanup release
+ - Update Changes to follow CPAN::Changes::Spec
+ - Set POD encoding to utf-8
+ - Reindent code and Makefile.PL
+ - Enable SIGN, add repository
+ - Add shebang line to test
+
+0.001001 2013-08-12T20:01:51+03:00
+ - Fix Makefile.PL
+
+0.001 2013-08-12T15:58:49+03:00
+ - Initial release
+

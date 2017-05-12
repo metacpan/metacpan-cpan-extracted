@@ -1,0 +1,19 @@
+body {
+	padding: 2em;
+}
+
+h1 {
+	font-size: 36px;
+	font-weight: bold;
+}
+
+p {
+	font-family: Arial, Helvetica;
+	font-size: 16px;
+	line-height: 28px;
+}
+
+ul {
+	margin: 0;
+	padding: 0;
+}

@@ -1,0 +1,8 @@
+Revision history for Perl extension Project::Gantt.
+
+0.01  Wed Jun 30 20:36:08 2004
+	- original version; created by h2xs 1.22 with options
+		-AX -n Project::Gantt
+
+1.01  Tue Aug 03 14:09:00 2004
+	- Initial release ready for CPAN

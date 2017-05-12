@@ -1,0 +1,29 @@
+---
+abstract: 'Use Return::MultiLevel as PSGI Middleware'
+author:
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Plack::Builder: '0'
+  Plack::Test: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Return-MultiLevel
+requires:
+  Exporter: '0'
+  Plack: '1.0031'
+  Plack::Util::Accessor: '0'
+  Return::MultiLevel: '0.03'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/jjn1056/Plack-Middleware-Return-MultiLevel/issues
+  homepage: https://github.com/jjn1056/Plack-Middleware-Return-MultiLevel
+  repository: https://github.com/jjn1056/Plack-Middleware-Return-MultiLevel.git
+version: '0.002'

@@ -1,0 +1,70 @@
+#!/bin/sh
+
+# Remove extranaeous libs from the linking command.  Reduces shared-library
+# overhead at exec time.
+
+BIN=perperl
+TMP1=/tmp/remove_libs$$
+TMP2="${TMP1}2"
+
+it_worked() {
+    test $? -eq 0 && ./$BIN -- -v </dev/null 2>&1 | grep version >/dev/null
+}
+
+it_failed() {
+    if it_worked; then
+	return 1
+    else
+	return 0
+    fi
+}
+
+# Try command without alteration.  Exit if it fails.
+"$@" >$TMP1 2>$TMP2
+status=$?
+test $status -eq 0
+if it_failed; then
+    cat $TMP1
+    cat 1>&2 $TMP2
+    rm -f $TMP1 $TMP2
+    exit $status
+fi
+rm -f $TMP1 $TMP2
+mv -f ${BIN} ${BIN}.tmp$$
+
+echo Attempting to remove extraneous libraries from the ${BIN} binary...
+
+while :; do
+    orig_count=$#
+    cmd=$1; shift
+    while test $# -gt 0; do
+	next=$1; shift;
+	case $next in
+	*efence*)
+	    echo keeping $next
+	    ;;
+	-l*|*.a)
+	    # Try to remove it
+	    $cmd "$@" >/dev/null 2>&1
+	    if it_worked; then
+		echo "removed $next"
+		continue;
+	    fi
+	    ;;
+	esac
+	cmd="$cmd $next"
+    done
+    set - $cmd
+    if test $# -eq 0 -o $orig_count -eq $#; then
+	break
+    fi
+done
+
+echo Final command is $cmd
+$cmd
+if it_worked; then
+    rm -f ${BIN}.tmp$$
+else
+    mv -f ${BIN}.tmp$$ ${BIN}
+fi
+exit 0

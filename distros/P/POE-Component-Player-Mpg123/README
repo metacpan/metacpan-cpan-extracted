@@ -1,0 +1,28 @@
+Player-Mpg123 version 0.01
+==========================
+
+This component allows for manipulation of the mpg123 player from
+within the POE environment.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+1. the POE state engine
+2. the "mpg123" player
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Erick Calder <ecalder@cpan.org>
+
+This product is distributed under the MIT License. A copy of this license
+was included in a file called LICENSE. If for some reason, this file was
+not included, please see http://www.opensource.org/licenses/mit-license.html
+to obtain a copy of this license.

@@ -1,0 +1,17 @@
+POE::Filter::Finger
+===================
+
+0.08	Wed Jun  3 09:47:07 BST 2009
+	- username_regex and hostname_regex parameters are actually used,
+	  patch from Dan Moore
+	- Updates to Makefile.PL for additional meta
+
+0.06	Wed Apr  8 12:18:09 BST 2009
+	- Make auto_set_repository() only run at author-time
+
+0.04	Mon Apr  6 09:45:01 BST 2009
+	- Added username_regex and hostname_regex parameters to new().
+	  Requested by Dan Moore.
+
+0.02	Thu Oct 23 12:42:07 BST 2008
+	- Initial CPAN release

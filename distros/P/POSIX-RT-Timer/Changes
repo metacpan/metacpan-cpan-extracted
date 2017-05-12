@@ -1,0 +1,68 @@
+Revision history for POSIX-RT-Timer
+
+0.017     2014-08-21 23:35:23+03:00 Europe/Sofia
+          Fix various compilation issues
+
+0.016     2014-08-16 13:28:48+02:00 Europe/Amsterdam
+          Accept signal names, not just numbers
+          Add coarse and boottime clocks
+          Always deliver signal to current thread if supported
+          Make "realtime" the default clock in Clocks
+          Add handle method to Clock and Timer
+
+0.015     2013-08-18 11:27:34 Europe/Amsterdam
+          Set errno on EINTR too in my_clock_nanosleep
+          Added monotonic_raw timer
+
+0.014     2012-06-25 23:47:05 Europe/Amsterdam
+          Only use POSIX::RT::Signal 0.009+
+          Just TestRecommend POSIX::RT::Signal and Signal::Mask (instead of test-require)
+
+0.013     2012-02-06 23:48:34 Europe/Amsterdam
+          Detect presence or absence of POSIX option groups more correctly
+
+0.012     2012-02-04 16:43:09 Europe/Amsterdam
+          Allow per thread cpu-clocks
+
+0.011     2011-12-06 19:01:36 Europe/Amsterdam
+          Add missing configure dependency
+          Added tests
+
+0.010     2011-12-04 13:49:13 Europe/Amsterdam
+          Removed all remains of callback, added optional identifiers instead.
+
+0.009    2011-01-25
+         Removed callbacks, as they are too unportable and unstable
+
+0.008    2010-09-03
+         Disabled unsafe signals during sleep to satisfy x86
+         Added license file
+
+0.007    2010-08-27
+         Fixed skipcount for sleep
+         Fixed dependency on Test::More 0.82
+         Split out some code into a header for potential split out of POSIX::RT::Clock
+
+0.006    2010-07-01
+         Fixed up portability bug on non-linux
+
+0.005    2010-06-30
+         Sleep is now only defined on systems having this functionality
+         Unit tests no longer use done_testing-style tests.
+         The callback doesn't get lost anymore on perl 5.8
+
+0.004    2010-06-15
+         Fixed a compilation issue on BSD
+         Removed inappropriate pointer usage.
+         Fixed get_resolution
+         Added an example
+
+0.003    2010-06-14
+         Fixed MANIFEST
+
+0.002    2010-06-14
+         Included ppport.h for compatibility with older versions of perl
+
+0.001    2010-06-14
+         First version, released on an unsuspecting world.
+

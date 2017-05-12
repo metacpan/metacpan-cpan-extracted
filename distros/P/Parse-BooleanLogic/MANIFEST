@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Parse/BooleanLogic.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/basics.t
+t/custom_googlish.t
+t/custom_ops.t
+t/custom_parens.t
+t/filter.t
+t/fsolve.t
+t/load.t
+t/partial_solve.t
+t/quotes.t
+t/solve.t
+t/utils.pl

@@ -1,0 +1,46 @@
+Revision history for Pod-Coverage-TrustPod
+
+0.100003  2013-11-05 18:54:26 America/New_York
+          the string *EVERYTHING* is now a pattern meaning "trust everything"
+
+          only anchor the regex from Pod; trustme regex are again non-anchored
+
+0.100002  2012-04-20 22:55:04 America/New_York
+          add docs about using =for instead of =begin/=end
+
+0.100001  2011-07-06 22:08:56 America/New_York
+          anchor the regex at both ends when matching symbols: /\A...\z/
+
+0.100000  2011-04-07 22:53:26 America/New_York
+
+          simplify tests to avoid causing bizarre catastrophic failures on
+          5.13.11
+
+0.092832  2010-10-30 19:44:50 America/New_York
+          remove a bogus prereq
+
+0.092831  2010-10-21 10:44:01 America/New_York
+          repackage with a v1 META.yml file
+
+0.092830  2009-10-10
+          do not fail when a parent class has no POD at all in it
+          (thanks, omega!)
+
+0.092400  2009-08-28
+          trust Pod-trusted content from parent packages Pod, too! big win!
+
+0.091470  2009-05-27
+          work on any paragraph in region, not just indented ones
+
+0.091440  2009-05-24
+          work on =for blocks
+
+0.002     2009-04-18
+          use Pod::Eventual instead of our own parser
+
+0.001     2008-04-07
+          fix packaging issues
+          remove "just a exhibit" warning
+
+0.000     2008-03-26
+          initial release, probably problematic

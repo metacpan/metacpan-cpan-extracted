@@ -1,0 +1,76 @@
+
+POE-Event-Message
+=================
+
+This small set of classes is a starting point for creating a generic 
+application messaging protocol. The intent is for these to be used as 
+a foundation when building networked and/or event-driven applications
+such as Web services.
+
+Features of POE::Event::Message include the following.
+
+. Messages of this class have flexible routing capabilities
+  that work both inside and outside POE-based applications.
+
+. A 'local' message routing mechanism is designed to be
+  plug-compatible with POE's existing 'postback' mechanism.
+  This is referred to as a 'routeback' mechanism in this class.
+
+. A 'remote' message routing mechanism can be used by message-based
+  client scripts, or perhaps as a simple alternative to the 'IKC' 
+  (Inter Kernel Communication) mechanism.
+ 
+. Messages are delivered based on the type of the destination. 
+  A 'local' routing will trigger a POE 'post' or 'call' event,
+  while a 'remote' routing invokes a socket connection to a
+  particular host and port. 
+
+. In addition, this class has the ability to introduce
+  multiple 'forward' and/or 'reverse' routing to multiple
+  event and/or remote host destinations. This allows for 
+  temporary interruption of normal message flow, without
+  any of the original participants (events or whatever)
+  knowing or caring. 
+ 
+. Messages can also be sent through a file handle, such as
+  from a non-POE child to a POE-based parent process.
+
+. Messages can contain almost anything including binary data
+  and complex Perl data structures. 
+
+
+Note that POE and the POE kernel are not requirements for using 
+these classes. Time::Hires is highly recommended (as, without it, 
+there is a small but real possibility of generating duplicate 
+message identifiers).
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires the following modules and libraries.
+The POE kernel is not a requirement for this module.
+
+ POE::Driver::SysRW
+ POE::Filter::Reference
+
+ Time::HiRes  - Optional, but highly recommended
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2007 by Chris Cobb
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,68 @@
+Panotools::Script - Panorama Tools scripting
+============================================
+
+A perl module for reading, writing and manipulating hugin script files
+
+http://hugin.sourceforge.net/
+
+Usage documentation for this perl module and included command-line tools can be
+found on CPAN: http://search.cpan.org/dist/Panotools-Script
+
+Download
+--------
+
+The latest stable version of this library can be downloaded from CPAN:
+http://search.cpan.org/dist/Panotools-Script
+
+Otherwise you can probably upgrade to the latest stable release with the `cpan'
+command-line tool:
+
+  sudo cpan Panotools::Script
+
+The latest development version can be retrieved from the Sourceforge panotools
+project via Mercurial:
+
+  hg clone http://hg.code.sf.net/p/panotools/Panotools-Script
+
+..then follow the installation instructions below:
+
+Installation
+------------
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  sudo make install
+
+
+Dependencies
+------------
+
+Image::Size
+Image::ExifTool
+Test::More
+
+Some of the scripts require 'nona', 'freepv', 'panoglview', 'enblend',
+'enfuse', and ImageMagick command-line tools.
+
+The various *-gui tools require 'zenity' and will only work on
+Linux/unix systems.
+
+TODO
+----
+
+* open/save lens profiles
+
+
+Copyright and licence
+---------------------
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+Copyright (C) 2002 Bruno Postle
+

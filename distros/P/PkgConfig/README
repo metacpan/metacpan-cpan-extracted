@@ -1,0 +1,76 @@
+PkgConfig
+
+This module provides a pure perl version of pkg-config, a program
+that provides compiler and linker flags for installed packages.
+See:
+
+http://www.freedesktop.org/wiki/Software/pkg-config/
+
+for the original.  The POD for the module contains a more detailed
+description of how it works and the differences from the original.
+You can view it before installing using perldoc:
+
+ % perldoc lib/PkgConfig.pm
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You may change the scripts that get installed by using the --script
+option one or more times.  For example, if you prefer not to install
+pkg-config.pl you could do this:
+
+ % perl Makefile.PL --script=ppkg-config
+
+Or if you want to use ppkg-config and pkg-config (say you are on a
+platform that  does not provide it):
+
+ % perl Makefile.PL --script=pkg-config --script=ppkg-config
+
+Or if you don't want any scripts installed at all:
+
+ % perl Makefile.PL --script=none
+
+The default is "--script=ppkg-config --script=pkg-config.pl" except for
+Windows, where the default is just "--script=ppkg-config".
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc PkgConfig
+
+You can also look for information at:
+
+    GitHub, which hosts the projects official repository
+        https://github.com/PerlPkgConfig/perl-PkgConfig
+    
+    Project's issue tracker on GitHub
+        https://github.com/PerlPkgConfig/perl-PkgConfig/issues
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/PkgConfig
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/PkgConfig
+
+    MetaCpan
+        https://metacpan.org/pod/PkgConfig
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 M. Nunberg
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

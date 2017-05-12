@@ -1,0 +1,27 @@
+---
+abstract: 'Easier creation of text blocks when using PDF::API2'
+author:
+  - 'Jay Hannah <jay@jays.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDF-TextBlock
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Accessor::Fast: '0'
+  File::Temp: '0'
+  PDF::API2: '0'
+  Test::More: '0'
+resources:
+  repository: https://github.com/jhannah/pdf-textblock
+version: '0.08'

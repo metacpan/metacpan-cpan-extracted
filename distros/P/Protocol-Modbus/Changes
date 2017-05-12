@@ -1,0 +1,41 @@
+Revision history for Perl extension Protocol::Modbus.
+
+0.10  Sun Jan 26 12:05:01 CET 2014
+
+    - RT#81115: Make sure we have a receive buffer big enough to get
+      the max size of modbus frame via TCP/IP. Thanks to Martin Nørdby Nielsen.
+
+0.09  Sun Jul 15 11:34:42 CEST 2012
+    - Removed loading of Serial driver to avoid forced dependency
+      on Device::SerialPort
+
+0.08  Sat Jul 14 17:29:51 CEST 2012
+    - Properly updated the Changes file for 0.07 too.
+      No other significant change. Perltidied all files.
+    - Fixed a syntax error (!) in the Serial driver.
+      In fact, I had never used it.
+
+0.07  Wed Jul 11 20:15:06 CEST 2012
+    - Fixed RT#78316. Thanks to Chris Orser.
+
+0.06  Mon Mar  5 10:05:56 CET 2012
+    - Fixed error in test code highlighted by CPAN testers report
+      http://www.cpantesters.org/cpan/report/902871d0-6594-11e1-9276-d80e49abe0af
+
+0.05  Fri Dec 12 01:00:00 CET 2008
+    - Bug fix: properly delete socket handle when disconnecting
+
+0.04  Fri Feb 16 16:00:55 CET 2007
+    - Added functions to read/write registers
+    - More tests
+    - More examples
+
+0.02  Mon Feb  5 10:48:25 CET 2007
+    - Added serial transport (untested)
+    - Added write coil request and its example
+    - Added test script for exceptions mechanism
+
+0.01  Tue Jan 30 11:30:23 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X -b 5.6.1 -n Protocol::Modbus
+

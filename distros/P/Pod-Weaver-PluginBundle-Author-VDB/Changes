@@ -1,0 +1,45 @@
+Release history for perl-Pod-Weaver-PluginBundle-Author-VDB
+
+v0.3.4 @ 2016-12-19 22:30 UTC
+
+    -   "OPERATORS" and "VARIABLES" sections added, commands are "operator" and "variable",
+        respectively.
+
+v0.3.3 @ 2016-12-15 23:11 UTC
+
+    -   Special processing for `=for test_synopsis` directive. By default `Pod::Weaver` moves them
+        to the end of the weaved document (to the leftovers). However, `Test::Synopsis` v0.14 wants
+        this directive is located *before* synopsis section. Fixed to insert it before synopsis.
+
+v0.3.2 @ 2015-10-07 13:38 UTC
+
+    -   Some modules are used implicitly and not listed in the module requirements. This may cause
+        error like
+
+            Can't locate Pod/Elemental/Transformer/List.pm
+
+        at run time. Hints for `AutoPrereqs` added to avoid such errors.
+
+v0.3.1 @ 2015-10-02 21:08 UTC
+
+    -   `EXAMPLES` section converted from `Generic` to `Collect` with command `example`.
+
+    -   `KNOWN BUGS` section converted from `Generic` to `Collect` with command `bug`.
+
+v0.3.0 @ 2015-09-24 20:06 UTC
+
+    -   `NOTES` section converted from `Generic` to `Collect` with command `note`.
+
+    -   `use version` added.
+
+    -   Version switched from decimal style to dotted-decimal style.
+
+0.002 @ 2015-08-13 19:22 UTC
+
+    -   `those` region added.
+
+    -   `CAVEATS` section converted from `Generic` to `Collect` with command `=caveat`.
+
+0.001 @ 2015-08-09 21:30 UTC
+
+    -   Initial release.

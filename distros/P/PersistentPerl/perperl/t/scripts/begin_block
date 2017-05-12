@@ -1,0 +1,10 @@
+
+# Bug in 2.02 and earlier - the i_am_perperl method returns false when
+# run from within a BEGIN block
+
+use vars qw($i_am_perperl);
+BEGIN {
+    $i_am_perperl = defined($PersistentPerl::i_am_perperl) &&
+	eval {require PersistentPerl} && PersistentPerl->i_am_perperl;
+}
+print "$i_am_perperl";

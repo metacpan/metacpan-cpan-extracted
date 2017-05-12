@@ -1,0 +1,47 @@
+---
+abstract: 'display information about the current request/response'
+author:
+  - 'Marcel Grunauer, C<< <marcel@cpan.org> >>'
+build_requires:
+  Test::More: 0.70
+configure_requires:
+  Module::Build::Tiny: 0.026
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Debug
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Class::Method::Modifiers: 1.05
+  Data::Dump: 0
+  Encode: 2.23
+  File::ShareDir: 1.00
+  Plack: 0
+  Text::MicroTemplate: 0.15
+  parent: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/miyagawa/Plack-Middleware-Debug/issues
+  homepage: https://github.com/miyagawa/Plack-Middleware-Debug
+  repository: https://github.com/miyagawa/Plack-Middleware-Debug.git
+version: 0.16
+x_contributors:
+  - 'Andreas Marienborg <andreas.marienborg@gmail.com>'
+  - 'Chisel <chisel@chizography.net>'
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'John Napiorkowski <jjn1056@yahoo.com>'
+  - 'Jonathan Swartz <swartz@pobox.com>'
+  - 'Marcel Gruenauer <hanekomu@gmail.com>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'
+  - 'franck cuny <franck@lumberjaph.net>'

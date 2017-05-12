@@ -1,0 +1,1069 @@
+=encoding utf8
+
+=for comment
+Para aplicar un formato uniforme a este archivo, use:
+  perl ./Porting/podtidy pod/perlobj.pod
+
+=head1 NAME
+X<object> X<objeto> X<OOP> X<POO>
+
+perlobj - Referencia de objetos en Perl
+
+=head1 DESCRIPCIÓN
+
+Este documento es una referencia de las características de programación
+orientada a objetos que ofrece Perl. Si busca una introducción a la
+programación orientada a objetos en Perl, consulte L<perlootut>.
+
+Antes de comprender cómo funcionan los objetos en Perl debe conocer el
+concepto de referencia. Encontrará más información en L<perlref>.
+
+Sobre esta base, este documento describe todas las características de la
+orientación a objetos en Perl. Si solo tiene que escribir código orientado a
+objetos, lo más recomendable es usar alguno de los sistemas de programación
+orientada a objetos disponibles en CPAN y descritos en L<perlootut>.
+
+Si desea escribir su propio sistema de orientación a objetos o tiene que
+mantener código que implementa objetos desde cero, este documento le ayudará
+a entender exactamente cómo funciona la orientación a objetos en Perl.
+
+La orientación a objetos en Perl se define mediante unos pocos principios
+básicos:
+
+=over 4
+
+=item 1.
+
+Un objeto es simplemente una estructura de datos que sabe a qué clase
+pertenece.
+
+=item 2.
+
+Una clase no es más que un paquete. Una clase proporciona métodos que deben
+aplicarse a objetos.
+
+=item 3.
+
+Un método es simplemente una subrutina que espera recibir una referencia a un
+objeto (o un nombre de paquete, en el caso de los métodos de la clase) como
+primer argumento.
+
+=back
+
+Veamos cada uno de estos principios en profundidad.
+
+=head2 Un objeto es simplemente una estructura de datos
+X<object> X<bless> X<constructor> X<new> X<objeto> X<bendecir>
+
+A diferencia de otros lenguajes de programación que ofrecen orientación a
+objetos, Perl no dispone de una sintaxis especial para construir objetos. Los
+objetos son simplemente estructuras de datos (hashes, arrays, escalares,
+identificadores de archivos, etc.) que se han asociado explícitamente a una
+clase concreta.
+
+Esta asociación se crea mediante la función predefinida C<bless>, que
+normalmente se usa dentro del I<constructor> de la clase.
+
+Veamos un ejemplo de constructor sencillo:
+
+  package Archivo;
+
+  sub new {
+      my $clase = shift;
+
+      return bless {}, $clase;
+  }
+
+El nombre C<new> no es especial. Podríamos haber llamado al constructor de
+cualquier otra forma:
+
+  package Archivo;
+
+  sub cargar {
+      my $clase = shift;
+
+      return bless {}, $clase;
+  }
+
+El convenio actual en los módulos orientados a objetos es usar siempre C<new>
+como nombre para el constructor, aunque esto no es obligatorio. Cualquier
+subrutina que bendiga una estructura de datos en una clase es un constructor
+válido en Perl.
+
+En los ejemplos anteriores, el código C<{}> crea una referencia a un hash
+anónimo vacío. La función C<bless> recibe esa referencia y asocia el hash a
+la clase indicada por C<$clase>. En el caso más simple la variable C<$clase>
+contendrá la cadena "Archivo".
+
+También podemos usar una variable para almacenar una referencia a la
+estructura de datos que se bendice como objeto:
+
+  sub new {
+      my $clase = shift;
+
+      my $self = {};
+      bless $self, $clase;
+
+      return $self;
+  }
+
+Una vez bendecido el hash al que hace referencia C<$self>, puede empezar a
+utilizarse para hacer llamadas a métodos. Esto es útil si desea inicializar
+el objeto en un método independiente:
+
+  sub new {
+      my $clase = shift;
+
+      my $self = {};
+      bless $self, $clase;
+
+      $self->_inicializar();
+
+      return $self;
+  }
+
+Como el objeto también es un hash, puede tratarlo como tal, usándolo para
+almacenar datos asociados con el objeto. Usualmente, el código de la clase
+puede tratar el hash como una estructura de datos accesible, mientras que el
+código externo a la clase siempre debe tratar al objeto como algo opaco. Esto
+se denomina B<encapsulación>. La encapsulación significa que el usuario de un
+objeto no tiene por qué conocer cómo está implementado. El usuario
+únicamente llama a los métodos documentados del objeto.
+
+Tenga en cuenta, sin embargo, que (al contrario de lo que ocurre en otros
+lenguajes de orientación a objetos) no se asegura ni se fuerza la
+encapsulación en modo alguno. Si desea que los objetos I<sean> realmente
+opacos debe conseguirlo por sí mismo. Esto puede hacerse de diversas formas;
+por ejemplo, mediante el uso de L<"Objetos I<Inside-Out>"> o con algunos
+módulos específicos de CPAN.
+
+=head3 Los objetos están bendecidos; las variables no
+
+La bendición no afecta a la variable que contiene la referencia al objeto
+bendecido, ni a la referencia almacenada por la variable; lo que se bendice es
+aquello a lo que hace referencia la variable (lo que algunas veces se denomina
+I<referente>). Esto se ilustra mejor con el código siguiente:
+
+  use Scalar::Util 'blessed';
+
+  my $foo = {};
+  my $bar = $foo;
+
+  bless $foo, 'Clase';
+  print blessed( $bar ) // 'sin bendecir';   # imprime "Clase"
+
+  $bar = "otro valor";
+  print blessed( $bar ) // 'sin bendecir';   # imprime "sin bendecir"
+
+Cuando se produce la llamada a C<bless> con una variable, se bendice la
+estructura de datos subyacente a la que la variable hace referencia. No se
+bendicen ni la referencia en sí ni tampoco la variable que contiene la
+referencia. Esto es por lo que la segunda llamada a C<blessed( $bar )> devuelve
+falso. En ese momento C<$bar> ya no almacena una referencia a un objeto.
+
+A veces verá en documentación o en libros antiguos que se habla de "bendecir
+una referencia" o se describe un objeto como una "referencia bendecida", pero
+esto no es correcto. No es la referencia la que se bendice como un objeto; se
+bendice aquello a lo que alude la referencia (es decir, el referente).
+
+=head2 Una clase no es más que un paquete
+X<class> X<clase> X<package> X<paquete> X<@ISA> X<inheritance> X<herencia>
+
+Perl no proporciona una sintaxis especial para definir clases. Un paquete es
+simplemente un espacio de nombres que contiene variables y subrutinas. La
+única diferencia es que en una clase la subrutina recibirá como primer
+argumento un objeto o el nombre de una clase. Esto es solo un convenio, por lo
+que una clase puede contener en realidad tanto métodos como subrutinas que
+I<no> operen sobre objetos o clases.
+
+Cada paquete contiene un array especial llamado C<@ISA>. El array C<@ISA>
+contiene la lista de clases primarias (si las hubiera). Perl examina este array
+cuando realiza la resolución de métodos, como se verá a continuación.
+
+Es posible establecer C<@ISA> manualmente; puede ver esto en código Perl
+antiguo. En el código realmente antiguo también se usaba el pragma L<base>.
+Pero en el código nuevo recomendamos usar el pragma L<parent> para declarar
+las clases primarias. Este pragma se ocupará de establecer C<@ISA>. También
+cargará las clases primarias y se asegurará de que el paquete no herede de
+sí mismo.
+
+Independientemente de cómo se establezcan las clases primarias, la variable
+C<@ISA> del paquete contendrá la lista de dichas clases primarias. Se trata de
+una simple lista de escalares, cada uno de los cuales es una cadena que se
+corresponde con un nombre de paquete.
+
+Todas las clases heredan implícitamente de la clase L<UNIVERSAL>. La clase
+L<UNIVERSAL> está implementada en el núcleo de Perl y proporciona varios
+métodos predefinidos, como C<isa()>, C<can()> y C<VERSION()>. La clase
+C<UNIVERSAL> I<nunca> aparecerá en la variable C<@ISA> de ningún paquete.
+
+Perl I<sólo> proporciona herencia de métodos como una característica propia.
+La herencia de atributos debe implementarse en la clase. Encontrará más
+información en la sección L</Implementación de métodos de acceso>.
+
+=head2 Un método no es más que una subrutina
+X<method> X<método>
+
+Perl no proporciona ninguna sintaxis especial para la definición de métodos.
+Un método es simplemente una subrutina normal y se declara con C<sub>. Lo que
+hace que un método sea especial es que espera recibir o un objeto o un nombre
+de clase como primer argumento.
+
+Perl I<ofrece> una sintaxis especial para la llamada a métodos: el operador
+C<< -> >>. Se describirá en detalle más adelante.
+
+La mayoría de los métodos que escriba operarán sobre objetos:
+
+  sub guardar {
+      my $self = shift;
+
+      open my $archivo, '>', $self->ruta() or die $!;
+      print {$archivo} $self->datos()      or die $!;
+      close $archivo                       or die $!;
+  }
+
+=head2 Invocación de métodos
+X<invocation> X<invocación> X<method> X<método> X<arrow> X<flecha> X<< -> >>
+
+La llamada a un método de un objeto se hace de la forma siguiente: C<<
+$objeto->método >>.
+
+La parte situada a la izquierda del operador de invocación de método (flecha)
+es el objeto (o nombre de clase) y la parte situada a la derecha es el nombre
+del método.
+
+  my $pod = Archivo->new( 'perlobj.pod', $datos );
+  $pod->guardar();
+
+La sintaxis C<< -> >> también se usa para desreferenciar una referencia.
+Parece el mismo operador, pero en realidad estas dos operaciones son
+diferentes.
+
+Cuando se llama a un método, lo que hay a la izquierda de la flecha se pasa
+como primer argumento al método. Esto significa que la llamada C<<
+Bicho->new() >>, hace que el método C<new()> reciba la cadena C<"Bicho"> como
+primer argumento. En la llamada C<< $alfredo->decir() >>, la variable
+C<$alfredo> se pasa a C<decir()> como primer argumento.
+
+Al igual que cualquier subrutina en Perl, todos los argumentos pasados en C<@_>
+son alias del argumento original. Esto incluye al propio objeto. Si asigna un
+valor directamente a C<$_[0]>, cambiará el contenido de la variable que
+contiene la referencia al objeto. Recomendamos no hacer esto, a no ser que sepa
+exactamente qué está haciendo.
+
+Perl mira lo que hay a la izquierda del operador flecha para determinar a qué
+paquete pertenece el método. Si hay un nombre de un paquete, busca el método
+en dicho paquete. Si hay un objeto, entonces Perl busca el método en el
+paquete usado para bendecirlo.
+
+Si no hay ni un nombre de paquete ni un objeto, entonces la llamada al método
+producirá un error; consulte la sección L</Variantes en las llamadas a los métodos> 
+para obtener más información.
+
+=head2 Herencia
+X<inheritance> X<herencia>
+
+Ya hemos hablado sobre el array especial C<@ISA> y el pragma L<parent>.
+
+Cuando una clase hereda de otra, cualquier método definido en la clase
+primaria también estará disponible en la clase derivada. Si intenta llamar a
+un método no definido en la clase del objeto que hace la llamada, Perl lo
+buscará también en las clases primarias del objeto.
+
+  package Archivo::MP3;
+  use parent 'Archivo';    # establece @Archivo::MP3::ISA = ('Archivo');
+
+  my $mp3 = Archivo::MP3->new( 'Andvari.mp3', $datos );
+  $mp3->guardar();
+
+Como no se ha definido el método C<guardar()> en la clase C<Archivo::MP3>,
+Perl lo buscará en las clases primarias de la clase C<Archivo::MP3>. Si Perl
+no encuentra un método C<guardar()> en ninguna clase de la jerarquía de
+herencia, el programa finalizará.
+
+En este caso se encuentra un método C<guardar()> en la clase C<Archivo>.
+Observe que el objeto pasado a C<guardar()> en este caso sigue siendo un objeto
+de la clase C<Archivo::MP3>, pese a que el método se encuentra en la clase
+C<Archivo>.
+
+En una clase derivada se puede sobrescribir un método de la clase primaria. En
+ese caso, aún es posible llamar al método de la clase primaria mediante la
+seudoclase C<SUPER>.
+
+  sub guardar {
+      my $self = shift;
+
+      say 'Preparado para el rock';
+      $self->SUPER::guardar();
+  }
+
+El modificador C<SUPER> I<solo> se puede usar para llamar a métodos. No se
+puede usar para llamadas normales a subrutinas ni para métodos de clase:
+
+  SUPER::guardar($algo);   # ERROR: busca la subrutina guardar() en el paquete SUPER
+
+  SUPER->guardar($algo);   # ERROR: busca el método guardar() en la clase
+                           #        SUPER
+
+  $algo->SUPER::guardar(); # CORRECTO: busca el método guardar() en las
+                           #           clases primarias
+
+
+=head3 Forma de resolución de SUPER
+X<SUPER>
+
+La seudoclase C<SUPER> se resuelve a partir del paquete en que se hace la
+llamada. I<NO> se resuelve en base a la clase del objeto. Esto es importante,
+ya que permite que métodos de distintos niveles de una jerarquía de herencia
+de muchos niveles llamen correctamente a sus respectivos métodos en la clase
+primaria correspondiente.
+
+  package A;
+
+  sub new {
+      return bless {}, shift;
+  }
+
+  sub decir {
+      my $self = shift;
+
+      say 'A';
+  }
+
+  package B;
+
+  use parent -norequire, 'A';
+
+  sub decir {
+      my $self = shift;
+
+      $self->SUPER::decir();
+
+      say 'B';
+  }
+
+  package C;
+
+  use parent -norequire, 'B';
+
+  sub decir {
+      my $self = shift;
+
+      $self->SUPER::decir();
+
+      say 'C';
+  }
+
+  my $c = C->new();
+  $c->decir();
+
+En este ejemplo se obtiene el siguiente resultado:
+
+  A
+  B
+  C
+
+Este ejemplo ilustra la forma de resolución de C<SUPER>. Incluso si el objeto
+es bendecido en la clase C<C>, el método C<decir()> de la clase C<B> puede
+llamar a C<SUPER::decir()> y esperar que se busque correctamente en la clase
+primaria de C<B> (es decir, la clase dónde se produce la llamada al método) y
+no en la clase primaria de C<C> (es decir, la clase a la que pertenece el
+objeto).
+
+Hay casos especiales en los que la resolución basada en paquetes puede ser
+problemática. Si se copia una subrutina de un paquete en otro, la resolución
+de C<SUPER> se basará en el paquete original.
+
+=head3 Herencia múltiple
+X<multiple inheritance> X<herencia múltiple>
+
+La herencia múltiple suele indicar un problema de diseño, pero Perl siempre
+le dará cuerda suficiente como para ahorcarse, si es lo que desea.
+
+Para declarar varias clases primarias basta con pasar varios nombres de clase a
+C<use parent>:
+
+  package VariosHijos;
+
+  use parent 'Padre1', 'Padre2';
+
+=head3 Orden de resolución de métodos
+X<method resolution order> X<orden de resolución de métodos> X<mro>
+
+El orden de resolución de métodos solo es interesante en el caso de la
+herencia múltiple. En el caso de la herencia simple, Perl simplemente busca en
+la cadena de herencia para encontrar el método:
+
+  Abuelo
+    |
+  Padre
+    |
+  Hijo
+
+Si se llama a un método en un objeto de la clase C<Hijo> y el método no está
+definido en la clase C<Hijo>, Perl buscará el método en la clase C<Padre> y
+después, si es necesario, en la clase C<Abuelo>.
+
+Si Perl no puede localizar el método en ninguna de estas clases, el programa
+finalizará mostrando un mensaje de error.
+
+Cuando una clase tiene múltiples clases primarias, el orden de búsqueda de
+métodos se complica.
+
+De manera predeterminada, Perl hace una búsqueda en profundidad y con
+recorrido de izquierda a derecha. Esto significa que se comienza buscando en la
+primera clase primaria del array C<@ISA> y después se busca en todas las
+clases primarias de esta, y así sucesivamente. Si no hay éxito en la
+búsqueda del método, se pasará a la siguiente clase primaria del array
+C<@ISA> de la clase original, y la búsqueda continuará desde ahí.
+
+                BisabueloComún
+            /                    \
+  AbueloPaterno             AbueloMaterno
+            \                    /
+             Padre        Madre
+                   \      /
+                    Hijo
+
+Así, dado el diagrama anterior, Perl buscará siguiendo el orden C<Hijo>,
+C<Padre>, C<AbueloPaterno>, C<BisabueloComún>, C<Madre> y, por último,
+C<AbueloMaterno>. Esto puede ser problemático porque ahora se busca en
+C<BisabueloComún> I<antes> de buscar en todas sus clases derivadas (es decir,
+antes de intentar la búsqueda en C<Madre> y C<AbueloMaterno>).
+
+Se puede usar el pragma L<mro> para solicitar un orden de resolución de
+métodos distinto.
+
+  package Hijo;
+
+  use mro 'c3';
+  use parent 'Padre', 'Madre';
+
+Este pragma permite cambiar al orden de resolución "C3". A grandes rasgos, el
+orden "C3" garantiza que no se exploren las clases primarias comunes antes de
+buscar en las clases derivadas, de forma que el orden de búsqueda será ahora:
+C<Hijo>, C<Padre>, C<AbueloPaterno>, C<Madre>, C<AbueloMaterno> y, por último,
+C<BisabueloComún>. Observe que no se trata ya del orden de búsqueda en
+anchura: todos los antecesores de C<Padre> (excepto los antecesores comunes) se
+usan en la búsqueda antes de buscar en cualquiera de los antecesores de
+C<Madre>.
+
+El orden C3 también permite llamar a métodos en clases del mismo nivel
+mediante la seudoclase C<next>. Consulte la documentación de L<mro> para
+conocer más detalles sobre esta característica.
+
+=head3 Resolución de métodos con almacenamiento en caché
+
+Cuando Perl busca un método, almacena en caché la búsqueda, a fin de que
+llamadas posteriores a ese método no tengan que repetir la búsqueda. Cambiar
+la clase primaria de una clase o agregar una subrutina a una clase invalidará
+el contenido de la caché para dicha clase.
+
+El pragma L<mro> proporciona algunas funciones para manipular directamente la
+memoria caché de métodos.
+
+=head2 Implementación de constructores
+X<constructor>
+
+Como se ha mencionado previamente, Perl no incluye una sintaxis especial para
+los constructores. Esto significa que una clase debe implementar su propio
+constructor. Un constructor es sencillamente un método de la clase que
+devuelve una referencia a un objeto nuevo.
+
+El constructor también puede aceptar parámetros adicionales que definen el
+objeto. Vamos a escribir un constructor real para la clase C<Archivo> usada
+previamente:
+
+  package Archivo;
+
+  sub new {
+      my $clase = shift;
+      my ( $ruta, $datos ) = @_;
+
+      my $self = bless {
+          ruta  => $ruta,
+          datos => $datos,
+      }, $clase;
+
+      return $self;
+  }
+
+Como puede verse, hemos almacenado la ruta y los datos del archivo en el mismo
+objeto. Hay que tener presente que el objeto es, en realidad, un hash. Más
+adelante escribiremos métodos de acceso para manipular estos datos.
+
+Para la clase Archivo::MP3 podemos comprobar que la ruta termina en ".mp3":
+
+  package Archivo::MP3;
+
+  sub new {
+      my $clase = shift;
+      my ( $ruta, $datos ) = @_;
+
+      die "No puede crear un objeto Archivo::MP3 sin la extensión mp3\n"
+          unless $ruta =~ /\.mp3\z/;
+
+      return $clase->SUPER::new(@_);
+  }
+
+Este constructor permite que sea la clase primaria la que se encargue de crear
+el objeto.
+
+=head2 Atributos
+X<attribute> X<atributo>
+
+Un atributo es un elemento de información que pertenece a un objeto
+específico. A diferencia de la mayor parte de los lenguajes orientados a
+objetos, en Perl no hay una sintaxis especial ni soporte para declarar y
+manipular atributos.
+
+Los atributos se suelen almacenar en el mismo objeto. Por ejemplo, si el objeto
+es un hash anónimo, podemos almacenar los valores de los atributos en el hash
+usando los nombres de los mismos como claves.
+
+Aunque es posible hacer referencia directamente a estas claves del hash fuera
+de la clase, es recomendable limitar el acceso a los atributos mediante
+métodos de acceso.
+
+Esto ofrece varias ventajas: Los métodos de acceso facilitan el cambio
+posterior de la implementación de un objeto manteniendo intacta la API
+original.
+
+Un método de acceso permite agregar código adicional para controlar el acceso
+a los atributos. Por ejemplo, podemos aplicar un valor predeterminado a un
+atributo al que no se asignó ningún valor en el constructor o podemos validar
+un valor nuevo asignado al atributo.
+
+Además, el uso de los métodos de acceso simplifica la herencia. Las subclases
+pueden usar los métodos de acceso, en lugar de tener que conocer la
+implementación interna de una clase primaria.
+
+=head3 Implementación de métodos de acceso
+X<accessor> X<método de acceso>
+
+Como ocurre con los constructores, en Perl no hay una sintaxis especial para la
+declaración de los métodos de acceso, de forma que las clases deben
+proporcionar métodos de acceso escritos explícitamente para ellas. Hay dos
+tipos comunes de métodos de acceso: de solo lectura y de lectura y escritura.
+
+Un método de acceso de solo lectura simplemente obtiene el valor de un único
+atributo:
+
+  sub ruta {
+      my $self = shift;
+
+      return $self->{ruta};
+  }
+
+Un método de acceso de lectura y escritura permite que el código que lo llama
+establezca y recupere el valor:
+
+  sub ruta {
+      my $self = shift;
+
+      if (@_) {
+          $self->{ruta} = shift;
+      }
+
+      return $self->{ruta};
+  }
+
+=head2 Un inciso sobre cómo crear código más sólido y seguro
+
+Ni el constructor ni los métodos de acceso del ejemplo anterior son muy
+sólidos. No comprueban si la C<$ruta> está definida, ni si se trata de una
+ruta del sistema de archivos válida.
+
+Hacer manualmente estas comprobaciones puede resultar tedioso. También es muy
+aburrido escribir a mano un conjunto de métodos de acceso. Hay muchos módulos
+de CPAN (como los módulos recomendados en el documento L<perlootut>) que
+pueden ayudarle a escribir código más conciso y seguro.
+
+=head2 Variantes en las llamadas a los métodos
+X<method> X<método>
+
+Perl admite varias formas de llamar a los métodos, además de la que ya hemos
+usado, C<< $objeto->metodo() >>.
+
+=head3 Nombres de métodos como cadenas
+
+Perl permite usar como nombre de un método una variable escalar que contiene
+una cadena:
+
+  my $archivo = Archivo->new( $ruta, $datos );
+
+  my $metodo = 'guardar';
+  $archivo->$metodo();
+
+Funciona exactamente igual que la llamada C<< $archivo->guardar() >>. Esto
+puede ser muy útil para escribir código dinámico. Por ejemplo, permite pasar
+el nombre de un método que se va a llamar como parámetro a otro método.
+
+=head3 Nombres de clases como cadenas
+
+Perl también permite usar una variable escalar que contiene el nombre de una
+clase:
+
+  my $clase = 'Archivo';
+
+  my $archivo = $clase->new( $ruta, $datos );
+
+Esto también permite crear código muy dinámico.
+
+=head3 Referencias a subrutinas como métodos
+
+También es posible usar una referencia a una subrutina como un método:
+
+  my $sub = sub {
+      my $self = shift;
+
+      $self->guardar();
+  };
+
+  $archivo->$sub();
+
+Esto equivale exactamente a escribir C<< $sub->($archivo) >>. Puede observar
+este modismo en la siguiente llamada a C<can>:
+
+  if ( my $metodo = $objeto->can('foo') ) {
+      $objeto->$metodo();
+  }
+
+=head3 Desreferencia de llamada a método
+
+Perl también permite usar la desreferencia de una referencia escalar en la
+llamada a un método. Suena complicado, así que veamos algunos ejemplos de
+código:
+
+  $archivo->${ \'guardar' };
+  $archivo->${ devuelve_ref_a_escalar() };
+  $archivo->${ \( devuelve_escalar() ) };
+  $archivo->${ devuelve_ref_a_subrutina() };
+
+Esto funciona si la desreferencia produce una cadena I<o> una referencia a una
+subrutina.
+
+=head3 Llamadas a métodos en identificadores de archivos
+
+Internamente, los identificadores de archivos de Perl son instancias de las
+clases C<IO::Handle> o C<IO::File>. Una vez abierto un identificador de
+archivo, puede usarlo para llamar a métodos. Además, también puede llamar a
+métodos en los identificadores de archivo C<STDIN>, C<STDOUT> y C<STDERR>.
+
+  open my $archivo, '>', 'ruta/de/archivo';
+  $archivo->autoflush();
+  $archivo->print('contenido');
+
+  STDOUT->autoflush();
+
+=head2 Invocación de métodos de clase
+X<invocation> X<invocación>
+
+Puesto que Perl permite usar palabras sueltas como nombres de paquetes y
+subrutinas, a veces se interpreta de forma incorrecta el significado de alguna
+de estas palabras. Por ejemplo, la construcción C<< Clase->new() >> puede
+interpretarse como C<< 'Clase'->new() >> o como C<< Clase()->new() >>. La
+segunda interpretación significa "llamar a una subrutina denominada Clase() y
+después llamar a new() como un método en el valor devuelto por Clase()". Si
+hay una subrutina llamada C<Clase()> en el espacio de nombres actual, Perl
+siempre interpretará C<< Clase->new() >> como la segunda alternativa: una
+llamada a C<new()> sobre el objeto devuelto por la llamada a C<Clase()>.
+
+Puede forzar a Perl a usar la primera interpretación (es decir, como una
+llamada a un método de la clase llamada "Clase") de dos formas. En primer
+lugar, puede agregar C<::> al nombre de la clase:
+
+    Clase::->new()
+
+Perl siempre interpretará esto como una llamada a un método.
+
+De forma alternativa, puede escribir entre comillas el nombre de la clase:
+
+    'Clase'->new()
+
+Por supuesto, si el nombre de la clase está almacenado en una variable
+escalar, Perl también hará lo correcto:
+
+    my $clase = 'Clase';
+    $clase->new();
+
+=head3 Sintaxis indirecta de objeto
+X<indirect object> X<sintaxis indirecta de objeto>
+
+B<Salvo en el caso de los identificadores de archivo, se desaconseja el uso de
+esta sintaxis, ya que puede confundir al intérprete de Perl. Siga leyendo para
+obtener más detalles al respecto.>
+
+Perl admite otra sintaxis para las llamadas a métodos, denominada notación
+"indirecta de objeto". Esta sintaxis se denomina "indirecta" porque el método
+aparece antes que el objeto en el que se hace la llamada.
+
+Se puede usar con cualquier clase o método:
+
+    my $archivo = new Archivo $ruta, $datos;
+    guardar $archivo;
+
+Se recomienda evitar el uso de esta sintaxis por varias razones.
+
+En primer lugar, puede ser confusa al leer el código. En el ejemplo anterior
+no está claro si C<guardar> es un método proporcionado por la clase
+C<Archivo> o simplemente una subrutina que espera un objeto archivo como primer
+argumento.
+
+Cuando se usa con métodos de clase el problema es incluso peor. Puesto que
+Perl permite usar palabras sueltas como nombres de subrutinas, debe adivinar si
+dichas palabras a continuación del método aluden a un nombre de clase o de
+subrutina. Es decir, Perl puede resolver la sintaxis como C<< Archivo->new(
+$ruta, $datos ) >> B<o> como C<< new( Archivo( $ruta, $datos ) ) >>.
+
+Para analizar este código, Perl usa una heurística basada en los nombres de
+paquete vistos, en las subrutinas existentes en el paquete actual, en las
+palabras sueltas usadas y en otros datos. Huelga decir que la heurística puede
+producir resultados sorprendentes.
+
+Versiones anteriores de la documentación (y algunos módulos de CPAN)
+recomendaban el uso de esta sintaxis, especialmente para los constructores, de
+forma que aún pueden encontrarse ejemplos. Sin embargo, recomendamos que no la
+use en el código nuevo.
+
+Puede obligar a Perl a interpretar las palabras sueltas como nombres de clase
+agregándoles "::", como se vio previamente.
+
+  my $archivo = new Archivo::$ruta, $datos;
+
+=head2 C<bless>, C<blessed> y C<ref>
+
+Como ya se vio, un objeto no es más que una estructura de datos bendecida en
+una clase mediante la función C<bless>. La función C<bless> permite usar uno
+o dos argumentos:
+
+  my $objeto = bless {}, $clase;
+  my $objeto = bless {};
+
+En la primera forma, el hash anónimo se bendice en la clase especificada por
+el nombre de clase almacenado en C<$clase>. En la segunda forma, el hash
+anónimo se bendice en el paquete actual.
+
+La segunda forma se desaconseja rotundamente, ya que impide que la subclase
+reutilice el constructor de la clase primaria, pero aún se puede ver en
+código existente.
+
+Si desea averiguar si una variable escalar concreta hace referencia a un
+objeto, puede usar la función C<blessed> exportada por L<Scalar::Util> (que
+forma parte del núcleo de Perl).
+
+  use Scalar::Util 'blessed';
+
+  if ( defined blessed($algo) ) { ... }
+
+Si C<$algo> hace referencia a un objeto, esta función devuelve el nombre del
+paquete en el que se bendijo el objeto. Si C<$algo> no contiene una referencia
+a un objeto bendecido, la función C<blessed> devuelve C<undef>.
+
+Observe que C<blessed($algo)> devolverá falso si se bendijo C<$algo> en una
+clase llamada "0". Esto es posible, pero realmente patológico. No cree una
+clase llamada "0" a menos que sepa exactamente lo que está haciendo.
+
+De forma análoga, la función predefinida C<ref> trata de forma especial las
+referencias a objetos bendecidos. Si llama a C<ref($algo)> y C<$algo> contiene
+una referencia a un objeto, devolverá el nombre de la clase en la que se
+bendijo el objeto.
+
+Si únicamente desea comprobar si una variable contiene una referencia a un
+objeto, se recomienda el uso de C<defined blessed($objeto)>, ya que C<ref>
+devuelve verdadero para todas las referencias, no solo para los objetos.
+
+=head2 La clase UNIVERSAL
+X<UNIVERSAL>
+
+Todas las clases heredan automáticamente de la clase L<UNIVERSAL>, disponible
+en el núcleo de Perl. Esta clase proporciona un conjunto de métodos que se
+pueden llamar desde una clase o un objeto. También puede sobrescribir algunos
+de estos métodos en sus clases. Si lo hace, le recomendamos que siga la
+semántica predefinida que se describe a continuación.
+
+=over 4
+
+=item isa($clase)
+X<isa>
+
+El método C<isa> devuelve I<verdadero> si el objeto es un miembro de la clase
+especificada en C<$clase>, o bien de alguna de las subclases de C<$clase>.
+
+Si sobrescribe este método, no debe generar nunca una excepción.
+
+=item DOES($rol)
+X<DOES>
+
+El método C<DOES> devuelve I<verdadero> si el objeto proclama realizar el rol
+indicado en C<$rol>. De manera predeterminada, equivale a C<isa>. Este método
+se proporciona para su uso con extensiones del sistema de objetos que
+implementan roles, como C<Moose> y C<Role::Tiny>.
+
+También puede sobrescribir C<DOES> directamente en sus clases. Si sobrescribe
+este método, no debe generar nunca una excepción.
+
+=item can($metodo)
+X<can>
+
+El método C<can> comprueba si la clase o el objeto usados disponen de un
+método llamado C<$metodo>. Comprueba la existencia del método en la clase y
+en todas sus clases primarias. Si el método existe, devuelve una referencia a
+la subrutina. Si no existe, devuelve C<undef>.
+
+Si la clase responde a llamadas a métodos a través de C<AUTOLOAD>, puede que
+desee sobrescribir el método C<can> para que devuelva una referencia a
+subrutina para aquellos métodos controlados por su método C<AUTOLOAD>.
+
+Si sobrescribe este método, no debe generar nunca una excepción.
+
+=item VERSION($necesaria)
+X<VERSION>
+
+El método C<VERSION> devuelve el número de versión de la clase (paquete).
+
+Si se incluye el argumento C<$necesaria>, el método comprobará si la versión
+actual (tal y como se define en la variable $VERSION del paquete) es mayor o
+igual que C<$necesaria>; el programa finalizará si no se cumple esta
+condición. La forma C<VERSION> de C<use> llama a este método
+automáticamente.
+
+    use Paquete 1.2 qw(algunas subrutinas importadas);
+    #implicará:
+    Paquete->VERSION(1.2);
+
+Le recomendamos que use este método para acceder a la versión de otro
+paquete, en lugar de mirar directamente en C<$Paquete::VERSION>. El paquete en
+que se comprueba podría haber sobrescrito el método C<VERSION>.
+
+También le recomendamos que use este método para comprobar si un módulo
+tiene la versión necesaria. La implementación interna usa el módulo
+L<version> para comprobar que los diferentes tipos de números de versión se
+comparan de forma correcta.
+
+=back
+
+=head2 AUTOLOAD
+X<AUTOLOAD>
+
+Si llama a un método que no existe en una clase, Perl generará un error. Sin
+embargo, si la clase (o cualquiera de sus clases primarias) define un método
+C<AUTOLOAD>, entonces se llamará a ese método.
+
+Se llama a C<AUTOLOAD> igual que a un método normal, y desde la perspectiva
+del código que llama no hay ninguna diferencia. Sea cual sea el valor devuelto
+por el método C<AUTOLOAD>, se devuelve al código que hace la llamada.
+
+El nombre completo del método llamado está disponible para su clase en la
+variable global de paquete C<AUTOLOAD>. Como se trata de una variable global,
+si desea hacer referencia a la misma sin un prefijo de nombre de paquete
+mediante C<strict 'vars'>, debe declararla.
+
+  # XXX - esta es una forma pésima de implementar métodos de acceso, 
+  # pero se puede usar. Veamos un ejemplo sencillo.
+  our $AUTOLOAD;
+  sub AUTOLOAD {
+      my $self = shift;
+
+      # Eliminar el calificador del nombre original del método...
+      my $llamado =  $AUTOLOAD =~ s/.*:://r;
+
+      # ¿Existe un atributo con este nombre?
+      die "No existe el atributo $llamado"
+          unless exists $self->{$llamado};
+
+      # Si es así, devolverlo...
+      return $self->{$llamado};
+  }
+
+  sub DESTROY { } # ver a continuación
+
+Si se usa el pragma L<strict> sin la declaración C<our $AUTOLOAD>, este
+código no se compilará.
+
+Como se indica en el comentario, esta no es una forma adecuada de implementar
+los métodos de acceso. Es lenta y hace demasiadas suposiciones. Sin embargo,
+puede encontrar esta forma de proporcionar métodos de acceso en código Perl
+antiguo. L<perlootut> incluye recomendaciones para la programación orientada a
+objetos en Perl.
+
+Si su clase dispone de un método C<AUTOLOAD>, le recomendamos que sobrescriba
+el método C<can> en su clase también. Su versión sobrescrita de C<can> debe
+devolver una referencia a la subrutina para cualquier método al que responda
+C<AUTOLOAD>.
+
+=head2 Destructores
+X<destructor> X<DESTROY>
+
+Cuando se descarta la última referencia a un objeto, se destruye el objeto. Si
+sólo dispone de una referencia a un objeto almacenada en una variable escalar
+léxica, se destruirá el objeto cuando se salga del ámbito de la variable
+escalar. Si almacena el objeto en una variable global de paquete, es posible
+que no se salga del ámbito del objeto hasta que finalice el programa.
+
+Si desea realizar alguna tarea específica en el momento de destruir el objeto,
+puede definir un método C<DESTROY> en la clase. Perl siempre llamará a este
+método cuando sea necesario, a menos que esté vacío.
+
+Se llama de la misma manera que cualquier otro método, con el objeto como
+primer argumento. No recibe ningún argumento adicional. Pero la variable
+C<$_[0]> será de solo lectura en el destructor, por lo que no se le puede
+asignar un valor.
+
+Si su método C<DESTROY> genera un error, se omitirá. No se enviará a
+C<STDERR> y no hará que el programa finalice. Sin embargo, si el destructor se
+ejecuta dentro de un bloque C<eval {}>, el error cambiará el valor de C<$@>.
+
+Como los métodos C<DESTROY> pueden llamarse en cualquier momento, debe
+localizar cualquier variable global que pueda actualizarse mediante C<DESTROY>.
+En particular, si usa C<eval {}> debería localizar C<$@>, y si usa C<system> o
+comillas invertidas, debería localizar C<$?>.
+
+Si define C<AUTOLOAD> en la clase, Perl llamará a su método C<AUTOLOAD> para
+controlar el método C<DESTROY>. Puede evitar este comportamiento definiendo un
+método C<DESTROY> vacío, como hicimos en el ejemplo de carga automática.
+También puede comprobar el valor de C<$AUTOLOAD> y volver sin hacer nada
+cuando se realice la llamada para controlar C<DESTROY>.
+
+=head3 Destrucción global
+
+El orden en que se destruyen los objetos durante la destrucción global antes
+de que finalice la ejecución del programa no se puede predecir. Esto significa
+que es posible que se destruyan antes los objetos contenidos en su objeto.
+Antes de llamar a un método en el objeto, debe comprobar si se han definido
+objetos contenidos:
+
+  sub DESTROY {
+      my $self = shift;
+
+      $self->{controlador}->cerrar() if $self->{controlador};
+  }
+
+Puede usar la variable C<${^GLOBAL_PHASE}> para comprobar si está actualmente
+en la fase de destrucción global:
+
+  sub DESTROY {
+      my $self = shift;
+
+      return if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+
+      $self->{controlador}->cerrar();
+  }
+
+Esta variable se incorporó en Perl 5.14.0. Si desea detectar si el programa
+está en la fase de destrucción global en versiones anteriores de Perl, puede
+usar el módulo C<Devel::GlobalDestruction>, disponible en CPAN.
+
+Si el método C<DESTROY> genera una advertencia durante la fase de destrucción
+global, el intérprete de Perl agregará la cadena "I<during global
+destruction>" (durante la destrucción global) a la advertencia.
+
+Durante la fase de destrucción global, Perl siempre reclamará la memoria
+usada por los objetos antes que la de las referencias no bendecidas.
+Encontrará más información sobre la fase de destrucción global en la
+sección "PERL_DESTRUCT_LEVEL" de L<perlhacktips>.
+
+=head2 Objetos no basados en hash
+
+En todos los ejemplos considerados hasta ahora se han usado objetos basados en
+un hash bendecido. Sin embargo, es posible bendecir cualquier tipo de
+estructura de datos o referente, incluidos escalares, globs y subrutinas. Puede
+encontrarse con este tipo de cosas al examinar código Perl ajeno.
+
+Veamos un ejemplo de módulo basado en un escalar bendecido:
+
+  package Hora;
+
+  use strict;
+  use warnings;
+
+  sub new {
+      my $clase = shift;
+
+      my $hora = time;
+      return bless \$hora, $clase;
+  }
+
+  sub tiempo_Unix {
+      my $self = shift;
+      return ${ $self };
+  }
+
+  my $hora = Hora->new();
+  print $hora->tiempo_Unix();
+
+=head2 Objetos I<Inside-Out>
+
+En el pasado, la comunidad Perl experimentó con una técnica llamada "objetos
+I<inside-out>". Un objeto I<inside-out> almacena sus datos fuera de la
+referencia del objeto indexados mediante una propiedad única del objeto (como
+su dirección de memoria), en lugar de almacenarlos en el propio objeto. Esto
+presenta la ventaja de forzar la encapsulación de los atributos del objeto, ya
+que sus datos no se almacenan en el propio objeto.
+
+Esta técnica se popularizó durante un tiempo (y se recomendó en el libro
+I<Perl Best Practices> de Damian Conway), aunque no se llegó a adoptar de
+forma universal. El módulo L<Object::InsideOut> de CPAN proporciona una
+implementación completa de esta técnica y puede que encuentre esta
+implementación u otras en código de otros programadores.
+
+Veamos un ejemplo simple de esta técnica, basado en el módulo
+L<Hash::Util::FieldHash> del núcleo. Este módulo se agregó al núcleo para
+permitir implementaciones de objetos I<inside-out>.
+
+  package Hora;
+
+  use strict;
+  use warnings;
+
+  use Hash::Util::FieldHash 'fieldhash';
+
+  fieldhash my %hora_para;
+
+  sub new {
+      my $clase = shift;
+
+      my $self = bless \( my $objeto ), $clase;
+
+      $hora_para{$self} = time;
+
+      return $self;
+  }
+
+  sub tiempo_Unix {
+      my $self = shift;
+
+      return $hora_para{$self};
+  }
+
+  my $hora = Hora->new();
+  print $hora->tiempo_Unix();
+
+=head2 Seudohashes
+
+Los seudohashes se incluyeron de forma experimental en las primeras versiones
+de Perl y se eliminaron en la versión 5.10.0. Un seudohash es una referencia a
+un array al que se puede acceder mediante claves con nombre, como si fuera un
+hash. Podría ver código de otros programadores con esta característica. Vea
+la documentación del pragma L<fields> para obtener más información.
+
+=head1 VEA TAMBIÉN
+
+Si desea leer una introducción más accesible y sencilla a la programación
+orientada a objetos en Perl, vea el documento L<perlootut>. También debería
+consultar L<perlmodlib>, que le proporcionará unas directrices para la
+construcción de módulos y clases.
+
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Manuel Gómez Olmedo
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

@@ -1,0 +1,483 @@
+=head1 NAME
+
+PDLA::Modules - A guide to PDLA's module reference.
+
+
+=head1 DESCRIPTION
+
+This page serves as a table of contents for PDLA's module documentation.
+This page does not list every single PDLA module. It only shows the ones
+intended for PDLA users, while ommitting those which are deemed "for
+internal use only". If you wish to see a comprehensive list of all
+documentation, please see the L<PDLA::Index|PDLA::Index> page.
+
+=head1 LOOKING FOR A FUNCTION?
+
+If you want to search for a function name, you should use the PDLA
+shell along with the "help" or "apropos" command (to do a fuzzy search).
+For example:
+
+ pdl> apropos xval
+ xlinvals        X axis values between endpoints (see xvals).
+ xlogvals        X axis values logarithmicly spaced...
+ xvals           Fills a piddle with X index values...
+ yvals           Fills a piddle with Y index values. See the CAVEAT for xvals.
+ zvals           Fills a piddle with Z index values. See the CAVEAT for xvals.
+
+To learn more about the PDLA shell, see L<perldl|perldl> or L<pdl2|pdl2>.
+
+=head1 FOUNDATION
+
+=over 5
+
+=item L<perldl|perldl> or L<pdl2|pdl2>
+
+Learn about the PDLA shell.
+
+=back
+
+=head2 Functions
+
+=over 5
+
+=item L<PDLA::Core|PDLA::Core>
+
+Core module (e.g. creating piddles).
+
+=item L<PDLA::Basic|PDLA::Basic>
+
+Simplified interface to the more general PDLA::Primitive.
+
+=item L<PDLA::Ops|PDLA::Ops>
+
+Basic operators (e.g. arithmetic, comparisons, etc.).
+
+=item L<PDLA::Ufunc|PDLA::Ufunc>
+
+Functions that accumulate along a dimension (e.g. sum, max).
+
+=back
+
+=head2 Other Features
+
+=over 5
+
+=item L<PDLA::AutoLoader|PDLA::AutoLoader>
+
+MATLAB-style function autoloader.
+
+=item L<PDLA::Slices|PDLA::Slices>
+
+Indexing and slices. How to access a subset of a piddle.
+
+=item L<PDLA::NiceSlice|PDLA::NiceSlice>
+
+Nicer syntax for slices.
+
+=back
+
+
+
+=head1 MISCELLANEOUS
+
+=over 5
+
+=item L<PDLA::Primitive|PDLA::Primitive>
+
+Fundamental operations on piddles.
+
+=item L<PDLA::Complex|PDLA::Complex>
+
+Complex numbers.
+
+=item L<PDLA::Bad|PDLA::Bad>
+
+Bad value support.
+
+=item L<PDLA::Reduce|PDLA::Reduce>
+
+A 'reduce' function for PDLA.
+
+=item L<PDLA::Lite|PDLA::Lite>
+
+Minimum PDLA module OO loader.
+
+=item L<PDLA::LiteF|PDLA::LiteF>
+
+Minimum PDLA module function loader.
+
+=item L<PDLA::Extended|PDLA::Extended>
+
+Extended Mathematical Operators.
+
+=item L<PDLA::Func|PDLA::Func>
+
+Interpolation-related functions.
+
+=back
+
+
+
+=head1 GRAPHICS
+
+=over 5
+
+=item L<PDLA::Graphics::PGPLOT|PDLA::Graphics::PGPLOT>
+
+PGPLOT library.
+
+=item L<PDLA::Graphics::PLplot|PDLA::Graphics::PLplot>
+
+PLplot library.
+
+=back
+
+
+=head2 3D Graphics
+
+=over 5
+
+=item L<PDLA::Graphics::TriD|PDLA::Graphics::TriD>
+
+3D graphics core module.
+
+=item L<PDLA::Graphics::TriD::Rout|PDLA::Graphics::TriD::Rout>
+
+Helper routines for 3D graphics.
+
+=item L<PDLA::Graphics::TriD::Contours|PDLA::Graphics::TriD::Contours>
+
+3D surface contours.
+
+=back
+
+
+
+=head2 Helper Modules
+
+=over 5
+
+=item L<PDLA::Graphics::LUT|PDLA::Graphics::LUT>
+
+Look-up tables.
+
+=item L<PDLA::Graphics::IIS|PDLA::Graphics::IIS>
+
+Display images on IIS devices.
+
+=item L<PDLA::Graphics::Limits|PDLA::Graphics::Limits>
+
+Derive data limits for display purposes.
+
+=back
+
+
+
+=head1 IMAGE PROCESSING
+
+=over 5
+
+=item L<PDLA::Compression|PDLA::Compression>
+
+Compression utilities.
+
+=item L<PDLA::Image2D|PDLA::Image2D>
+
+2-dimmensional image processing.
+
+=item L<PDLA::ImageND|PDLA::ImageND>
+
+N-dimmensional image processing.
+
+=item L<PDLA::ImageRGB|PDLA::ImageRGB>
+
+RGB image data handling.
+
+=back
+
+
+
+=head1 NUMERICAL METHODS
+
+=over 5
+
+=item L<PDLA::FFT|PDLA::FFT>
+
+Fast Fourier Transform (native implementation).
+
+=item L<PDLA::FFTW|PDLA::FFTW>
+
+PDLA interface to the FFTW library.
+
+=item L<PDLA::Filter::LinPred|PDLA::Filter::LinPred>
+
+Linear predictive filtering.
+
+=item L<PDLA::Filter::Linear|PDLA::Filter::Linear>
+
+Linear filtering.
+
+=item L<PDLA::Opt::Simplex|PDLA::Opt::Simplex>
+
+Simplex optimization routines.
+
+=item L<PDLA::Minuit|PDLA::Minuit>
+
+PDLA interface to the Minuit library.
+
+=item L<PDLA::Slatec|PDLA::Slatec>
+
+PDLA interface to the Slatec library.
+
+=back
+
+
+
+=head1 COORDINATE TRANSFORMATIONS
+
+=over 5
+
+=item L<PDLA::Transform|PDLA::Transform>
+
+Coordinate transforms, image warping, and N-D functions.
+
+=item L<PDLA::Transform::Cartography|PDLA::Transform::Cartography>
+
+Cartographic projections.
+
+=item L<PDLA::Transform::Proj4|PDLA::Transform::Proj4>
+
+PDLA interface to the Proj4 projection library.
+
+=back
+
+
+
+=head1 IO FUNCTIONS
+
+=over 5
+
+=item L<PDLA::IO|PDLA::IO>
+
+Overview of IO functions.
+
+=item L<PDLA::IO::Dumper|PDLA::IO::Dumper>
+
+Data dumper.
+
+=item L<PDLA::IO::FastRaw|PDLA::IO::FastRaw>
+
+Fast storage format (outdated).
+
+=item L<PDLA::IO::FlexRaw|PDLA::IO::FlexRaw>
+
+Flexible storage format.
+
+=item L<PDLA::IO::Rout|PDLA::IO::Rout>
+
+Misc IO routines.
+
+=item L<PDLA::IO::Sortable|PDLA::IO::Sortable>
+
+Support for Perl's 'Storable' module.
+
+=back
+
+
+=head2 Image Formats
+
+=over 5
+
+=item L<PDLA::IO::FITS|PDLA::IO::FITS>
+
+PDLA support for FITS images.
+
+=item L<PDLA::IO::PNM|PDLA::IO::PNM>
+
+PDLA support for PNM images.
+
+=item L<PDLA::IO::GD|PDLA::IO::GD>
+
+PDLA interface to the GD image library.
+
+=item L<PDLA::IO::HDF|PDLA::IO::HDF>
+
+PDLA interface to the HDH4 image library.
+
+=item L<PDLA::IO::NetPBM|PDLA::IO::NetPBM>
+
+PDLA interface to the NetPBM image library.
+
+=item L<PDLA::IO::NDF|PDLA::IO::NDF>
+
+PDLA interface to the Starlink image library. Available
+as a separate CPAN download.
+
+=back
+
+
+
+=head1 2D MATRICES
+
+=over 5
+
+=item L<PDLA::Matrix|PDLA::Matrix>
+
+Convenience class for 2D matrix work.
+
+=item L<PDLA::MatrixOps|PDLA::MatrixOps>
+
+Additional matrix operators.
+
+=back
+
+
+
+=head1 GNU SCIENTIFIC LIBRARY
+
+=over 5
+
+=item L<PDLA::GSL::DIFF|PDLA::GSL::DIFF>
+
+Numerical differentiation.
+
+=item L<PDLA::GSL::INTEG|PDLA::GSL::INTEG>
+
+Numerical integration.
+
+=item L<PDLA::GSL::INTERP|PDLA::GSL::INTERP>
+
+Interpolation.
+
+=item L<PDLA::GSL::MROOT|PDLA::GSL::MROOT>
+
+Multidimensional root-finding.
+
+=item L<PDLA::GSL::RNG|PDLA::GSL::RNG>
+
+RNG and randist.
+
+=back
+
+
+
+=head2 Special Functions
+
+=over 5
+
+=item L<PDLA::GSLSF::AIRY|PDLA::GSLSF::AIRY>
+
+=item L<PDLA::GSLSF::BESSEL|PDLA::GSLSF::BESSEL>
+
+=item L<PDLA::GSLSF::CLAUSEN|PDLA::GSLSF::CLAUSEN>
+
+=item L<PDLA::GSLSF::COULOMB|PDLA::GSLSF::COULOMB>
+
+=item L<PDLA::GSLSF::COUPLING|PDLA::GSLSF::COUPLING>
+
+=item L<PDLA::GSLSF::DAWSON|PDLA::GSLSF::DAWSON>
+
+=item L<PDLA::GSLSF::DEBYE|PDLA::GSLSF::DEBYE>
+
+=item L<PDLA::GSLSF::DILOG|PDLA::GSLSF::DILOG>
+
+=item L<PDLA::GSLSF::ELEMENTARY|PDLA::GSLSF::ELEMENTARY>
+
+=item L<PDLA::GSLSF::ELLINT|PDLA::GSLSF::ELLINT>
+
+=item L<PDLA::GSLSF::ELLJAC|PDLA::GSLSF::ELLJAC>
+
+=item L<PDLA::GSLSF::ERF|PDLA::GSLSF::ERF>
+
+=item L<PDLA::GSLSF::EXP|PDLA::GSLSF::EXP>
+
+=item L<PDLA::GSLSF::EXPINT|PDLA::GSLSF::EXPINT>
+
+=item L<PDLA::GSLSF::FERMI_DIRAC|PDLA::GSLSF::FERMI_DIRAC>
+
+=item L<PDLA::GSLSF::GAMMA|PDLA::GSLSF::GAMMA>
+
+=item L<PDLA::GSLSF::GEGENBAUER|PDLA::GSLSF::GEGENBAUER>
+
+=item L<PDLA::GSLSF::HYPERG|PDLA::GSLSF::HYPERG>
+
+=item L<PDLA::GSLSF::LAGUERRE|PDLA::GSLSF::LAGUERRE>
+
+=item L<PDLA::GSLSF::LEGENDRE|PDLA::GSLSF::LEGENDRE>
+
+=item L<PDLA::GSLSF::LOG|PDLA::GSLSF::LOG>
+
+=item L<PDLA::GSLSF::POLY|PDLA::GSLSF::POLY>
+
+=item L<PDLA::GSLSF::POW_INT|PDLA::GSLSF::POW_INT>
+
+=item L<PDLA::GSLSF::PSI|PDLA::GSLSF::PSI>
+
+=item L<PDLA::GSLSF::SYNCHROTRON|PDLA::GSLSF::SYNCHROTRON>
+
+=item L<PDLA::GSLSF::TRANSPORT|PDLA::GSLSF::TRANSPORT>
+
+=item L<PDLA::GSLSF::TRIG|PDLA::GSLSF::TRIG>
+
+=item L<PDLA::GSLSF::ZETA|PDLA::GSLSF::ZETA>
+
+=back
+
+
+
+=head1 FITTING FUNCTIONS
+
+=over 5
+
+=item L<PDLA::Fit::Gaussian|PDLA::Fit::Gaussian>
+
+Fit gaussian curves.
+
+=item L<PDLA::Fit::Polynomial|PDLA::Fit::Polynomial>
+
+Fit polynomials.
+
+=item L<PDLA::Fit::Linfit|PDLA::Fit::Linfit>
+
+Fit linear combinations of functions.
+
+=item L<PDLA::Fit::LM|PDLA::Fit::LM>
+
+Fit functions using the Levenberg-Marquardt algorithm.
+
+=back
+
+
+
+=head1 ADVANCED
+
+=over 5
+
+=item L<PDLA::Dbg|PDLA::Dbg>
+
+PDLA debugger.
+
+=item L<PDLA::DiskCache|PDLA::DiskCache>
+
+Manage many piddles through a disk cache.
+
+=item L<PDLA::CallExt|PDLA::CallExt>
+
+Call external functions.
+
+=item L<PDLA::Objects|PDLA::Objects>
+
+If you want to sub-class from PDLA (note: incomplete).
+
+=back
+
+
+
+
+=head1 COPYRIGHT
+
+Copyright 2010 Daniel Carrera (dcarrera@gmail.com). You can distribute
+and/or modify this document under the same terms as the current Perl
+license.
+
+See: http://dev.perl.org/licenses/

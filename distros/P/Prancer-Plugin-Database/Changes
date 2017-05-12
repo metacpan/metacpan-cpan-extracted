@@ -1,0 +1,17 @@
+Revision history for Perl extension Prancer::Plugin::Database
+
+1.00 Sat Dec 13 05:45:34 UTC 2014
+	- Initial release.
+
+1.01 Wed Dec 24 04:50:14 UTC 2014
+	- Fixing unit tests, example code, perl docs
+
+1.02 Sun Feb  1 17:21:55 UTC 2015
+	- Adding configuration option for setting additional dsn parameters.
+	- Adding configuration option for running database statements on connection.
+
+1.03 Sun Feb  8 06:45:16 UTC 2015
+	- If no connection name given and only one connection exists then use it.
+
+1.04 Sun Feb  8 06:58:11 UTC 2015
+	- Fixing documentation.

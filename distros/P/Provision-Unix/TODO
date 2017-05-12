@@ -1,0 +1,30 @@
+
+Every module in the Provision::Unix package adheres to the following guidelines: 
+
+ 1. Where possible, specific implementations are generalized into a generic classes. For example, DNS can be provisioned onto a number of different DNS servers. Each server has unique methods to add, modify, or remove DNS objects (zones, zone records, etc). Rather than coding Provision::Unix::DNS to a specific implementation, it is coded as a generic class. DNS operations are requested of the generic class. Based on the chosen DNS server, as configured in provision.conf, the generic class will dispatch the request to the appropriate subclass. If BIND was selected in the config file, the DNS class would dispatch requests to Provision::Unix::DNS::BIND.
+
+2. Applications (including those distributed in this package) should never call the implementation specific modules.  So long as they abide by this rule, they can be assured of a stable interface. 
+
+3. Each generic class should have a command line application in bin/ that provides an interface to the functionality in the modules. In the case of Provision::Unix::DNS, the command line application would be named bin/prov_dns.
+
+4. Every class must have a corresponding suite of tests in t.
+
+
+Provision/Unix/DNS.pm
+  - prov_dns
+    - add delete_zone_record function
+Provision/Unix/DNS/BIND.pm
+  - needs to be authored
+Provision/Unix/User.pm
+  - finish & test quota support
+  - write tests for creategroup and destroygroup
+Provision/Unix/User/Darwin.pm
+  - set passwords for newly created accounts
+Provision/Unix/User/Linux.pm
+  - needs to be authored
+Provision/Unix/Utility.pm
+Provision/Unix/Web.pm
+Provision/Unix/Web/Apache.pm
+  - needs to be extended support more features
+Provision/Unix/Web/Lighttpd.pm
+  - needs to be authored

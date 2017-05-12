@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence name="test"  connection_name="test" >
+    <entities>
+        <entity_file  file="emp.xml"  />
+        <entity_file  file="dept.xml" />
+    </entities>
+    <mapping_rules>
+        <orm_file file="Employee.xml" />
+        <orm_file file="Department.xml" />
+    </mapping_rules>
+</persistence>

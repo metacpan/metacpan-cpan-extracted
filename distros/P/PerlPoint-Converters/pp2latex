@@ -1,0 +1,1308 @@
+#!/usr/bin/perl -w
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+#
+# $Id: pp2latex,v 1.14 2001/12/19 21:04:43 lorenz Exp $
+# $Revision: 1.14 $
+# $Date: 2001/12/19 21:04:43 $
+#
+# $Author: lorenz $
+#
+# Revision History: See end of file
+#===================================================================
+
+# declare script package
+package PerlPoint::Converter::pp2latex;
+
+use Pod::Text;
+use Getopt::ArgvFile qw(argvFile);
+use Getopt::Long;
+#use Data::Dumper;
+                     
+
+# pragmata
+use strict;
+use subs "flush", "push_page", "pp_warn";
+
+# load modules {{{1
+use File::Basename;
+use Carp;
+use Safe;
+
+use PerlPoint::Constants 0.15;
+use PerlPoint::Tags;
+use PerlPoint::Tags::Basic;
+use PerlPoint::Tags::HTML;
+use PerlPoint::Tags::LaTeX;
+use PerlPoint::Backend;
+use PerlPoint::Parser 0.39;
+use PerlPoint::Converters qw(replace_keywords copy_file update_file return_abs_path);
+#}}}1
+
+my $me = basename($0);
+
+my $VERSION = sprintf("%d.%02d", q/$Revision: 1.16 $/ =~ /(\d+)\.(\d+)/);
+my $PACK_VERSION = $PerlPoint::Converters::VERSION;
+$main::VERSION = $VERSION;
+
+my $nix = "";                      # for using RCS keys in Usage, ...
+my $Date = "Date ";
+
+#============================================================= Usage
+
+sub Usage { #{{{1---------------------------------------------------
+  no strict;
+  my $tmpdir = "/tmp";
+  $^W = 0;
+ #my $parser = Pod::Text->new (sentence => 0, loose => 0, width => 78);
+
+  if (defined $ENV{TMP}){
+    $tmpdir = $ENV{TMP};
+  } elsif (defined $ENV{TEMP}) {
+    $tmpdir = $ENV{TEMP};
+  }
+  my $tmpfile = "$tmpdir/$me.$$"."_help";
+  $SIG{INT}  =
+  $SIG{QUIT} =
+  $SIG{HUP}  =
+  $SIG{ABRT} =
+  $SIG{PIPE} = sub { unlink $tmpfile };
+  open(ME, "< $0") or die "Can't open $me: $!\n";
+  open(TMP, "> $tmpfile") or die "Can't open $tmpfile: $!\n";
+  my $skip = 1;
+  while(<ME>){
+    if (/^=cut/){
+      $skip = 1 ;
+      print TMP $_;
+      next;
+    }
+    $skip = 0  if /^=/;
+    next if $skip;
+    s/PROGRAM/$me/g;
+    s/P_VERSION/$VERSION/g;
+    print TMP $_;
+  }
+  close(TMP);
+ #$parser->parse_from_file( $tmpfile );
+  pod2text($tmpfile );
+
+  unlink $tmpfile;
+  exit;
+} # Usage }}}1
+
+#==================================================== Parameter Loop
+
+my %OPT = ( #{{{1
+
+  slide_dir       => ".",
+  no_index        => 0,
+
+); #}}}1
+
+argvFile( home => 1, default => 1);
+
+if (defined $ARGV[0] and $ARGV[0] =~ /-v$/){
+  @ARGV =("-version");  # to avoid ambiguities
+}
+my $verbose = 1;
+
+die unless GetOptions( \%OPT, #{{{1
+
+  "activeContents",
+  "cache",
+  "cacheCleanup",
+  "double_lines",
+  "filter=s",
+  "no_index",
+  "nocopyright",
+  "noinfo",
+  "nowarn",
+  "quiet",
+  "safeOpcode=s@",
+  "set=s@",
+  "section-sequence=s@",
+  "slide_dir=s",
+  "trace:i",
+  "prolog=s",
+  "help",
+  "version",
+
+); #}}}1
+
+# propagate options as necessary
+@OPT{qw(nocopyright noinfo nowarn)}=(1,1,1) if exists $OPT{quiet};
+$OPT{trace}=$ENV{SCRIPTDEBUG} if not exists $OPT{trace} and exists $ENV{SCRIPTDEBUG};
+
+
+#======================================================= Script Body
+Usage(1) if ($OPT{help});
+print STDERR "This is $me, build $VERSION from PerlPoint::Converters $PACK_VERSION\n" unless $OPT{quiet};
+print STDERR "$Date: 2001/12/19 21:04:43 $nix\n" unless $OPT{quiet};
+print STDERR "(c) Lorenz Domke <lorenz.domke\@gmx.de> 2001.\n\n" unless $OPT{nocopyright};
+exit if $OPT{version};
+
+# handle section sequence:
+if (!exists $OPT{"section-sequence"}){
+     ${ $OPT{"section-sequence"}}[0] = "chapter";
+     ${ $OPT{"section-sequence"}}[1] = "section";
+     ${ $OPT{"section-sequence"}}[2] = "subsection";
+     ${ $OPT{"section-sequence"}}[3] = "subsubsection";
+     ${ $OPT{"section-sequence"}}[4] = "paragraph";
+     ${ $OPT{"section-sequence"}}[5] = "subparagraph";
+     ${ $OPT{"section-sequence"}}[6] = "textbf";
+}
+
+$verbose = 0 if ($OPT{quiet} or $OPT{noinfo});
+
+my ($li_start, $li_end);
+$li_start = "\\item ";
+$li_end = "\n";
+
+# declare variables
+# Data Structures
+# 000000000000000
+my $embedded_latex = 0;
+
+my (@streamData, %variables);    # JSTENZEL: added %variables
+my $verbatim_flag = 0;
+
+my $page_ref;  # pointer to current page buffer
+
+my @PAGES;     # Array of pointers to PAGE structures
+#  $PAGES[ $m ] = {
+#                    BODY => [ ... ],
+#                    LEVEL => ...,
+#                    HD => ...,
+#                    PREV => ...,
+#                    NEXT => ...,
+#                    UP => ...,
+#                    DOWN => ...,
+#                 }
+my $page_cnt = -1;
+my %ANCHOR;  # $ANCHOR{a_name} = $page_cnt
+
+my %INDEX;
+my $idx_cnt = 0;
+
+
+
+# declare list of tag openers
+# some are only needed for compatibility with pp2htm
+
+# build parser
+my ($parser)=new PerlPoint::Parser;
+
+
+# build and configure a Safe object
+my $safe = new Safe;
+if (exists $OPT{safeOpcode}){
+  unless (grep($_ eq 'ALL', @{$OPT{safeOpcode}})) {
+     # configure compartment
+     $safe->permit(@{$OPT{safeOpcode}});
+  } else {
+     # simply flag that we want to execute active contents
+     $safe=1;
+  }
+}
+
+# and call it
+$parser->run( #{{{1
+             stream  => \@streamData,
+             files   => \@ARGV,
+             safe    => exists $OPT{activeContents} ? $safe : undef,
+             filter  => exists $OPT{filter} ? $OPT{filter} : "perl|latex",
+             activeBaseData => {
+                                targetLanguage => 'SDF',
+                                userSettings   => {map {$_=>1} exists $OPT{set} ? @{$OPT{set}} : ()},
+                               },
+             vispro  => 1,
+             nestedTables => 1,
+             var2stream   => 1,
+             predeclaredVars => {
+                                 CONVERTER_NAME    => basename($0),
+                                 CONVERTER_VERSION => $main::VERSION,
+                                },
+             headlineLinks => 1,
+             trace   => TRACE_NOTHING
+                      + ((exists $OPT{trace} and $OPT{trace} &  1) ? TRACE_PARAGRAPHS : 0) 
+                      + ((exists $OPT{trace} and $OPT{trace} &  2) ? TRACE_LEXER      : 0)
+                      + ((exists $OPT{trace} and $OPT{trace} &  4) ? TRACE_PARSER     : 0)
+                      + ((exists $OPT{trace} and $OPT{trace} &  8) ? TRACE_SEMANTIC   : 0)
+                      + ((exists $OPT{trace} and $OPT{trace} & 16) ? TRACE_ACTIVE     : 0),
+             display => DISPLAY_ALL
+                      + (exists $OPT{noinfo} ? DISPLAY_NOINFO : 0)                                
+                      + (exists $OPT{nowarn} ? DISPLAY_NOWARN : 0),
+             cache   => (exists $OPT{cache} ? CACHE_ON : CACHE_OFF)
+                      + (exists $OPT{cacheCleanup} ? CACHE_CLEANUP : 0),
+            ) or exit 1; #}}}1
+
+
+# build a backend
+my $backend=new PerlPoint::Backend( #{{{1
+             name    => $me, 
+             trace   => TRACE_NOTHING,
+             display => DISPLAY_ALL
+                      + (exists $OPT{noinfo} ? DISPLAY_NOINFO : 0)
+                      + (exists $OPT{nowarn} ? DISPLAY_NOWARN : 0),
+             vispro  => 1,
+); #}}}1
+#my $backend=new PerlPoint::Backend(name=>$me, trace=>TRACE_BACKEND);
+
+# register backend handlers {{{1
+$backend->register(DIRECTIVE_BLOCK,        \&handleBlock);
+$backend->register(DIRECTIVE_COMMENT,      \&handleComment);
+$backend->register(DIRECTIVE_DOCUMENT,     \&handleDocument);
+$backend->register(DIRECTIVE_HEADLINE,     \&handleHeadline);
+$backend->register(DIRECTIVE_LIST_LSHIFT,  \&handleLShift);
+$backend->register(DIRECTIVE_LIST_RSHIFT,  \&handleRShift);
+$backend->register(DIRECTIVE_ULIST,        \&handleList);
+$backend->register(DIRECTIVE_UPOINT,       \&handlePoint);
+$backend->register(DIRECTIVE_OLIST,        \&handleList);
+$backend->register(DIRECTIVE_OPOINT,       \&handlePoint);
+$backend->register(DIRECTIVE_DLIST,        \&handleList);
+$backend->register(DIRECTIVE_DPOINT,       \&handleDPoint);
+$backend->register(DIRECTIVE_DPOINT_ITEM,  \&handleDPointItem);
+$backend->register(DIRECTIVE_SIMPLE,       \&handleSimple);
+$backend->register(DIRECTIVE_TAG,          \&handleTag);
+$backend->register(DIRECTIVE_TEXT,         \&handleText);
+$backend->register(DIRECTIVE_VARRESET,     \&handleVarReset);    # JSTENZEL
+$backend->register(DIRECTIVE_VARSET,       \&handleVarSet);      # JSTENZEL
+$backend->register(DIRECTIVE_VERBATIM ,    \&handleVerbatim);
+#}}}1
+
+my @BUFFER;
+my @ERRBUFFER;  # buffer for context of error 
+my $box_bg_color= "blue";
+my $box_fg_color= "white";
+
+# and run it
+$backend->run(\@streamData, #{{{1
+); #}}}1
+
+begin_doc();
+
+## Now do your job: output the pages ...
+for (my $i = 0; $i <= $page_cnt; $i++){
+  print STDERR "New Page $i: Level ",
+   $PAGES[$i]->{LEVEL}, " ===> ",
+   $PAGES[$i]->{HD},
+   , " <===\n" if $verbose;
+
+  # print page body
+  foreach my $line ( @{$PAGES[$i]->{BODY}} ){
+    # Replace _INTERNAL_SECTION with correct hyperlink
+    while ($line =~ /_INTERN_SECTION:(.*?):_END/){
+      my $a_name = $1;
+      if (! defined $ANCHOR{$a_name}) {
+        warn "**** SECTIONREF with undefined anchor name '$a_name' detected\n";
+        $line =~ s/_INTERN_SECTION:.*?:_END/_UNDEF_/;  # will flag an error while processing with latex !
+        next;
+      }
+      my $hd = $PAGES[$ANCHOR{$a_name}] -> {HD};
+      my $ref = "PPPage$ANCHOR{$a_name}";    
+      $line =~ s/_INTERN_SECTION:.*?:_END/$hd}{$ref/;  # two arguments, text and ID
+    }
+
+    # Replace _INTERNAL_PAGE with correct hyperlink
+    while ($line =~ /_INTERNAL_PAGE:(.*?):_END/){
+      my $a_name = $1;
+
+      if (! defined $ANCHOR{$a_name}) {
+        warn "**** PAGE with undefined anchor name '$a_name' detected\n";
+        $line =~ s/_INTERNAL_PAGE:.*?:_END/_UNDEF_/;  # will flag an error while processing with latex !
+        next;
+      }
+      my $anch= $ANCHOR{$a_name};
+      my $ref="PPPage$ANCHOR{$a_name}";
+      $line =~ s/_INTERNAL_XREF:.*?:_END/$ref/;
+    }
+
+    # Replace _INTERNAL_XREF with correct hyperlink
+    while ($line =~ /_INTERNAL_XREF:(.*?):_END/){
+      my $a_name = $1;
+
+      if (! defined $ANCHOR{$a_name}) {
+        warn "**** XREF with undefined anchor name '$a_name' detected\n";
+        $line =~ s/_INTERNAL_XREF:.*?:_END/_UNDEF_/;  # will flag an error while processing with latex !
+        next;
+      }
+      my $ref="PPPage$ANCHOR{$a_name}";
+      $line =~ s/_INTERNAL_XREF:.*?:_END/$ref/;
+    }
+
+
+    print $line;
+  } # loop over body lines
+
+}
+
+gen_index() unless $OPT{no_index};
+end_doc();
+
+exit 0;
+
+# SUBROUTINES ##############################################################
+
+# helper function
+sub begin_doc{ #{{{1---------------------------------------------
+  print "% Created by $me, build $VERSION from PerlPoint-Converters $PACK_VERSION\n";
+  if (defined $OPT{prolog}) {
+    # get prolog definitions from file
+    my $prolog_file = $OPT{prolog};
+    if (-e $prolog_file) {
+      open(PR, "< $prolog_file") or die "Cannot open prolog file $prolog_file: $!\n";
+    } else {
+      die "Cannot find prolog file $prolog_file\n";
+    }
+    while(<PR>){
+      print;
+    }
+    close(PR);
+  } else {
+
+  print <<'EOT';
+\documentclass [11pt] {report}   % 
+\usepackage{german}               % ISO-Latin-Zeichensatz (äöüß)
+%\usepackage{isolatin1}            % ISO-Latin-Zeichensatz (äöüß)
+\parindent0pt                     % no indentation of first line
+\parskip1ex                       % white space between chapters
+\pagestyle{headings}     %
+\usepackage{epsf}
+\usepackage{makeidx}
+
+% setup for DIN A4
+\oddsidemargin3cm
+\evensidemargin3cm
+\setlength{\hoffset}{-1in}            % compensation of
+\setlength{\voffset}{-2cm}            % printer offset
+
+\textwidth15cm
+\topmargin1cm
+\headheight3ex
+\headsep12pt
+\textheight23cm
+\setlength{\footskip}{1.5cm}
+
+\makeindex
+
+\begin{document}
+
+\begin{flushleft}
+
+EOT
+  }
+} # begin_doc }}}1
+
+sub end_doc{ #{{{1-----------------------------------------------
+
+# fix alex
+# flushleft ist fix alex
+  print "\n\n\\end{flushleft}\n";
+
+  print "\n\n\\end{document}\n";
+} # end_doc }}}1
+
+sub gen_index { #{{{1--------------------------------------------
+# print "\n\\section{INDEX}\n\n";
+# foreach my $idx (sort keys %INDEX) {
+#   print "$idx \\textbf{ \\pageref{$INDEX{$idx}}}\\\\\n";
+# }
+  print "\n\\printindex\n\n";
+} # gen_index }}}1
+
+sub start_new_page { #{{{1---------------------------------------
+  my ($level, @BF) = @_;
+  $page_cnt ++;
+  $PAGES[$page_cnt] = {
+         BODY => [],
+         LEVEL => $level,
+         HD  => join("", @BF),
+
+       };
+  $page_ref = $PAGES[$page_cnt] -> {BODY};
+  my $hd = $PAGES[$page_cnt] -> {HD};
+  $ANCHOR{$hd} = $page_cnt; # insert anchor for this page
+ #push @{$PAGES[$page_cnt]->{BODY}}, "<a name=\"$hd\">";
+} # start_new_page }}}1
+
+sub handleSimple { #{{{1-----------------------------------------
+# simple directive handler
+  push @BUFFER, escapes($_[2]);
+} # handleSimple }}}1
+
+sub handleHeadline { #{{{1---------------------------------------
+  # $_[2] contains the level number of this header
+  if ($_[1]==DIRECTIVE_START) {
+    flush;
+  } else {
+   #print "==>@BUFFER<==\n";
+    start_new_page($_[2], @BUFFER);
+    my $section;
+    my $max = scalar @{ $OPT{"section-sequence"}};
+    if ($_[2] >= $max) {
+      $section = ${ $OPT{"section-sequence"}}[$max - 1];
+    } else {
+      $section = ${ $OPT{"section-sequence"}}[$_[2]-1];
+    }
+
+    push_page $page_ref, "\n\n\\$section\{";
+    flush;
+    push_page $page_ref, "}\n";
+    push_page $page_ref, "\\label{PPPage$page_cnt}\n";
+  }
+} # handleHeadline }}}1
+
+sub handleList { #{{{1-------------------------------------------
+  flush;
+  my $LIST;
+  if ($_[0]==DIRECTIVE_ULIST){
+     $LIST = "itemize";
+  } elsif ($_[0]==DIRECTIVE_OLIST){
+     $LIST = "enumerate";
+  } elsif ($_[0]==DIRECTIVE_DLIST){
+     $LIST = "itemize";
+  }
+  if ($_[1]==DIRECTIVE_START){
+    push_page $page_ref, "\n\\begin{$LIST}\n";
+  } else {
+    push_page $page_ref, "\\end{$LIST}\n";
+    @BUFFER = ();
+  }
+  
+} # handleList }}}1
+
+sub handlePoint { #{{{1------------------------------------------
+  flush;
+  if ($_[1]==DIRECTIVE_START){
+    push_page $page_ref, $li_start;
+  } else {
+    push_page $page_ref, $li_end;
+    @BUFFER = ();
+  }
+} # handlePoint }}}1
+
+sub handleDPoint { #{{{1-----------------------------------------
+  flush;
+  if ($_[1]==DIRECTIVE_START){
+    push_page $page_ref, "\\item ";
+  } else {
+    push_page $page_ref, "\n\n";
+    @BUFFER = ();
+  }
+} # handleDPoint }}}1
+
+sub handleDPointItem { #{{{1-------------------------------------
+  flush;
+  if ($_[1]==DIRECTIVE_START){
+    # no action
+  } else {
+    push_page $page_ref, "\n\n";
+    @BUFFER = ();
+  }
+} # handleDPointItem }}}1
+
+sub handleText { #{{{1-------------------------------------------
+  flush;
+  if ($_[1]==DIRECTIVE_START){
+    push_page $page_ref, "\n";
+  } else {
+    push_page $page_ref, "\n";
+  }
+} # handleText }}}1
+
+sub handleBlock { # code block with TAG recognition {{{1---------
+#TODO Es muessen alle PerlPoint tags aus dem BUFFER des
+#     Blocks entfernt werden, da Latex in \begin{verbatim} ...
+#     keine Ersetzungen wie \textbf etc. vornehmen kann !!
+  handleVerbatim( $_[0], $_[1], $_[2]);
+} # handleBlock }}}1
+
+sub handleLShift { #{{{1-----------------------------------------
+  if ($_[1]==DIRECTIVE_START){
+    push_page $page_ref, "\n\% Shift <\n";
+  }
+} # handleLShift }}}1
+
+sub handleRShift { #{{{1-----------------------------------------
+  if ($_[1]==DIRECTIVE_START){
+    push_page $page_ref, "\n\% Shift >\n";
+  }
+} # handleRShift }}}1
+
+sub handleVerbatim { # verbatim block without TAG recognition {{{1
+  flush;
+  if ($_[1]==DIRECTIVE_START){
+    $verbatim_flag = 1;
+#   push_page $page_ref, "\n\\rule{\\textwidth}{1pt}\n";
+    push_page $page_ref, "\\begin{verbatim}\n";
+  } else {
+    push_page $page_ref, "\\end{verbatim}";
+#   push_page $page_ref, "\\rule{\\textwidth}{1pt}\n";
+    $verbatim_flag = 0;
+  }
+} # handleVerbatim }}}1
+
+sub handleComment { #{{{1----------------------------------------
+    @BUFFER = (); # skip buffer contents
+} # handleComment }}}1
+
+sub e_escapes{ #{{{1---------------------------------------------
+  my ($flag) = @_;
+  if ($flag eq "micro"){
+    return "\$\\mu\$";
+  } elsif ($flag eq "uuml"){
+    return "ü";
+  } elsif ($flag eq "Uuml"){
+    return "Ü";
+  } elsif ($flag eq "auml"){
+    return "ä";
+  } elsif ($flag eq "Auml"){
+    return "Ä";
+  } elsif ($flag eq "ouml"){
+    return "ö";
+  } elsif ($flag eq "Ouml"){
+    return "Ö";
+  } elsif ($flag eq "szlig"){
+    return "ß";
+  } elsif ($flag eq "nbsp"){
+    return " ";
+  } else {
+    return "__ this was HTML escape: $flag __";  #  --> syntax error in latex
+  }
+} # e_escapes }}}1
+
+sub handleTag { #{{{1--------------------------------------------
+
+  # special tags
+
+  if ($_[2] eq "C") {                                           # special HTML escapes
+    flush;
+    if ($_[1]==DIRECTIVE_COMPLETE) {
+      push_page $page_ref, "}";
+    } else {
+      push_page $page_ref, "\\texttt{";
+    }
+    return;
+  }
+  if ($_[2] eq "E") {                                           # special HTML escapes
+    if ($_[1]==DIRECTIVE_COMPLETE) {
+      push_page $page_ref, e_escapes( "@BUFFER");
+      @BUFFER = ();
+    } else {
+      flush;
+    }
+    return;
+  }
+
+  # character formatting Tags: handle B I U SUP SUB
+  if ($_[2] eq "B"){
+    flush;
+    return if $verbatim_flag;
+    if ($_[1]==DIRECTIVE_START){
+      push_page $page_ref, "\\textbf{";
+    } else {
+      push_page $page_ref, "}";
+    }
+    return;
+  }
+
+  if ($_[2] eq "I"){
+    flush;
+    return if $verbatim_flag;
+    if ($_[1]==DIRECTIVE_START){
+      push_page $page_ref, "\\textit{";
+    } else {
+      push_page $page_ref, "}";
+    }
+    return;
+  }
+
+  if ($_[2] eq "U"){
+    flush;
+    return if $verbatim_flag;
+    if ($_[1]==DIRECTIVE_START){
+      push_page $page_ref, "\\underline{";
+    } else {
+      push_page $page_ref, "}";
+    }
+    return;
+  }
+
+  if ($_[2] eq "SUP"){
+    flush;
+    return if $verbatim_flag;
+    if ($_[1]==DIRECTIVE_START){
+      push_page $page_ref, "\$^{";
+    } else {
+      push_page $page_ref, "}\$";
+    }
+    return;
+  }
+
+  if ($_[2] eq "SUB"){
+    flush;
+    return if $verbatim_flag;
+    if ($_[1]==DIRECTIVE_START){
+      push_page $page_ref, "\$_{";
+    } else {
+      push_page $page_ref, "}\$";
+    }
+    return;
+  }
+
+  if ($_[2] eq "PRINT_TOC"){
+    flush;
+    if ($_[1]==DIRECTIVE_START){
+      push_page $page_ref, "\n\\tableofcontents\n\n\\newpage\n";
+    }
+    return;
+  }
+
+  if ($_[2] eq "MBOX"){
+    flush;
+    if ($_[1]==DIRECTIVE_START){
+      push_page $page_ref, "\\mbox{";
+    } else {
+      push_page $page_ref, "}\$";
+    }
+    return;
+  }
+
+  if ($_[2] eq "LINE_BREAK" or $_[2] eq "BR") {                       # line break
+    if ($_[1]==DIRECTIVE_COMPLETE) {
+      @BUFFER = ();
+      push_page $page_ref, "\\linebreak ";
+    } else {
+      flush;
+    }
+    return;
+  }
+#TODO anpassen; linie malen
+  if ($_[2] eq "HR" ) {                       # horizontal line
+    if ($_[1]==DIRECTIVE_COMPLETE) {
+      @BUFFER = ();
+      push_page $page_ref, "\n\n----------------------------------------------------------\n\n";
+    } else {
+      flush;
+    }
+    return;
+  }
+  if ($_[2] eq "BOXCOLORS") {                                          # box color
+    return
+  }
+
+  if ($_[2] eq "BOXCOLOR") {                                          # box color
+    if ($_[1]==DIRECTIVE_COMPLETE) {
+      $box_bg_color = $BUFFER[0];
+      @BUFFER = ();
+    } else {
+      flush;
+    }
+    return;
+  }
+  if ($_[2] eq "BOXTEXT") {                                          # box text color
+    if ($_[1]==DIRECTIVE_COMPLETE) {
+      $box_fg_color = $BUFFER[0];
+      @BUFFER = ();
+    } else {
+      flush;
+    }
+    return;
+  }
+
+#TODO anpassen
+  if ($_[2] eq "IMAGE") {                                          # image
+    flush;
+    if ($_[1]==DIRECTIVE_COMPLETE) {
+      if ( !defined $_[3]->{'src'}) {
+        die "*** ERROR: Image without 'src' parameter\n";
+      }
+      my $file = $_[3]->{'src'};
+      my $opt = "";
+      push_page $page_ref, "\n\n \% cool image from file $file \n\n";
+      push_page $page_ref, "\n \\begin{center}\n";
+      if ( defined $_[3]->{'epsfysize'}) {
+        my $ysize = $_[3]->{'epsfysize'};
+        push_page $page_ref, "\n\n \\epsfysize=$ysize\n";
+      }
+      if ( defined $_[3]->{'epsfxsize'}) {
+        my $xsize = $_[3]->{'epsfxsize'};
+        push_page $page_ref, "\n\n \\epsfxsize=$xsize\n";
+      }
+      my $ps_file = $file;
+      $ps_file =~ s/\.[^.]*$/.eps/;
+      print STDERR " ... image: $ps_file\n";
+      if (-e $ps_file) {
+        push_page $page_ref, "\n\n\\epsffile{$ps_file}\n\n";
+      } else {
+        push_page $page_ref, "\n\n (image from file $file) \n\n";
+      }
+      push_page $page_ref, "\n \\end{center}\n";
+    }
+    return;
+  }
+
+#TODO anpassen
+  if ($_[2] eq "F" ) {                       # set color and size
+    flush;
+    if ($_[1]==DIRECTIVE_START){
+      my $params = "";
+      if ( defined $_[3]->{'color'}) {
+        $params = "$params color=$_[3]->{'color'}";
+      }
+      if ( defined $_[3]->{'size'}) {
+        $params = "$params size=$_[3]->{'size'}";
+      }
+      push_page $page_ref, "";
+    } else {
+      push_page $page_ref, "";
+    }
+    return;
+  }
+
+  if ($_[2] eq "A") {                                                # Anchor Tag
+    flush;
+  # print STDERR "@_\n" if $verbose;
+  # print STDERR Dumper($_[3]) if $verbose;
+    if ($_[1]==DIRECTIVE_COMPLETE) {
+      if ( !defined $_[3]->{'name'}) {
+        die "*** ERROR: Anchor without 'name' parameter\n";
+      }
+      my $a_name = $_[3]->{'name'};
+      push_page $page_ref, "\\label{$a_name}";
+      # Remember page number for later reference:
+      if (defined $ANCHOR{$a_name}){
+        warn "**** anchor name $a_name used twice !!\n";
+      } else {
+        $ANCHOR{$a_name} = $page_cnt;
+      }
+    }
+    return;
+  }
+# TODO: \URL
+
+  if ($_[2] eq "L") {                                                # general URL
+    if ($_[1]==DIRECTIVE_COMPLETE) {
+      if ( !defined $_[3]->{'url'}) {
+        warn "*** ERROR: Hyperlink \L without 'url' parameter\n";
+      }
+      my $link_text = join("",@BUFFER);
+
+# fix alex!! 2001-04-17
+
+      my $url = $_[3]->{'url'};
+      push_page $page_ref, "\\PPurl{" . $link_text .  "}{" . escapes($url) . "}";
+      @BUFFER=();
+
+    } else {
+      flush;
+    }
+    return;
+  }
+  if ($_[2] eq "PAGEREF") {                                          # page reference
+    if ($_[1]==DIRECTIVE_COMPLETE) {
+      if ( !defined $_[3]->{'name'}) {
+        warn "*** ERROR: PAGEREF without 'name' parameter\n";
+      }
+      my $a_name = $_[3]->{'name'};
+      push_page $page_ref, "\\PPPageref{_INTERNAL_PAGE:$a_name:_END}"; # to be replaced later ...
+    } else {
+      flush;
+    }
+    return;
+  }
+  if ($_[2] eq "SECTIONREF") {                                       # section header reference
+    if ($_[1]==DIRECTIVE_COMPLETE) {
+      if ( !defined $_[3]->{'name'}) {
+        warn "*** ERROR: PAGEREF without 'name' parameter\n";
+      }
+      my $a_name = $_[3]->{'name'};
+      push_page $page_ref, "\\PPSref{_INTERN_SECTION:$a_name:_END}"; # to be replaced later ...
+    } else {
+      flush;
+    }
+    return;
+  }
+  if ($_[2] eq "XREF") {                                       # internal cross reference
+    if ($_[1]==DIRECTIVE_COMPLETE) {
+      if ( !defined $_[3]->{'name'}) {
+        warn "*** ERROR: XREF without 'name' parameter\n";
+      }
+      my $ref_text = join("",@BUFFER);
+      my $a_name = $_[3]->{'name'};
+      push_page $page_ref, "\\PPXref{$ref_text}{_INTERNAL_XREF:$a_name:_END}";
+      @BUFFER = ();
+    } else {
+      flush;
+    }
+    return;
+  }
+
+  if ($_[2] eq "X") {                                          # index entry
+    if ($_[1]==DIRECTIVE_COMPLETE) {
+      my $idx = join("",@BUFFER);
+      $idx_cnt ++;
+      my $index_anchor = "index:$page_cnt" . ":$idx_cnt";
+      $INDEX{$idx} = $index_anchor;
+      push_page $page_ref, "\\label{$index_anchor}";
+
+      push_page $page_ref, "\\index{$idx}";
+
+      if ( defined $_[3]->{'mode'} and $_[3]->{'mode'} eq "index_only"){
+        @BUFFER = ();
+      }
+    } else {
+      flush;
+    }
+    return;
+  }
+
+  if ($_[2] eq "TABLE") {                                       # TABLE
+    flush;
+    if ($_[1]==DIRECTIVE_START) {
+      my $cols = "|c|c|c|c|";
+      if ( defined $_[3]->{'columns'}) {
+         $cols = $_[3]->{'columns'};
+      }
+      push_page $page_ref, "\n\n\\vspace{1ex}\n\\begin{tabular}{$cols}\n";
+      push_page $page_ref, "\\hline\n" unless $OPT{double_lines};
+    } else {
+      push_page $page_ref, "\n\n\\end{tabular}\n\n";
+    }
+    return;
+  }
+
+  if ($_[2] eq "TABLE_HL") {                                       # TABLE
+    flush;
+    if ($_[1]==DIRECTIVE_START) {
+      push_page $page_ref, "\\bf ";
+    } else {
+      push_page $page_ref, " & "; # &
+    }
+    return;
+  }
+
+  if ($_[2] eq "TABLE_ROW") {                                       # TABLE
+    flush;
+    if ($_[1]==DIRECTIVE_START) {
+      push_page $page_ref, "\\hline\n" if $OPT{double_lines};
+    } else {
+      pop (@$page_ref); # to remove extra '&'
+      push_page $page_ref, "\\\\\\hline\n";
+    }
+    return;
+  }
+
+  if ($_[2] eq "TABLE_COL") {                                       # TABLE
+    flush;
+    if ($_[1]==DIRECTIVE_START) {
+      push_page $page_ref, "";
+    } else {
+      push_page $page_ref, " & "; # &
+    }
+    return;
+  }
+
+
+  if ($_[2] eq "EMBED") {                                       # embeded LaTeX
+    flush;
+    if ($_[1]==DIRECTIVE_START) {
+      if ( !defined $_[3]->{'lang'}) {
+        pp_warn "ERROR: EMBED without 'lang' parameter\n";
+      }
+      elsif ($_[3]->{'lang'} =~ /latex/i){
+        $embedded_latex = 1;
+      }
+    } else {
+      $embedded_latex = 0;
+    }
+    @BUFFER=();
+    return;
+  }
+
+  if ($_[2] eq 'LOCALTOC') { # ste, ldo
+     # act mode dependend - we only need to handle this once, there is no tag body
+     if ($_[1]==DIRECTIVE_START)
+       {
+        # get local toc
+        my $toc=$backend->toc(
+                              $backend->currentChapterNr,
+                              exists $_[3]->{depth} ? $_[3]->{depth} : 0,
+                             );
+
+        # anything found?
+        if (@$toc)
+          {
+           # make it into a list
+           push_page $page_ref,  "\n\n\\begin{itemize}\n";
+           push_page $page_ref,  '  \\item ', ' ', $_->[1], "\n" for @$toc;
+           push_page $page_ref,  "\n\\end{itemize}\n\n";
+          }
+       }
+
+     # ok, well done
+     return;
+  }
+
+  warn "**** $me: unkown or not yet implemented tag: $_[2]\n";
+} # handleTag }}}1
+
+sub handleDocument { #{{{1---------------------------------------
+  if ($_[1]==DIRECTIVE_START) {
+    warn "\n[Info] Document start ($_[2]).\n" if $verbose;
+
+  }
+  else {
+
+    warn "\n[Info] Document end ($_[2]).\n" if $verbose;
+  }
+} # handleDocument }}}1
+
+sub flush { #{{{1------------------------------------------------
+  push_page $page_ref, @BUFFER;
+  push @ERRBUFFER, @BUFFER;
+  @BUFFER = ();
+  # trim ERRBUFFER:
+  @ERRBUFFER = grep (!/^\s*$/ ,@ERRBUFFER);
+  for (my $k=1;$k<scalar(@ERRBUFFER)-6;$k++){
+    shift @ERRBUFFER;
+  }
+} # flush }}}1
+
+sub push_page { #{{{1--------------------------------------------
+  # push $text to current page buffer
+  my ($page_ref, @text) = @_;
+  push @$page_ref, @text;
+} # push_page }}}1
+
+sub save { #{{{1-------------------------------------------------
+    my $it = $_[0];
+    $it =~ y/\000-\177/\200-\377/;
+    return $it;
+} # save }}}1
+
+sub escapes { #{{{1----------------------------------------------
+  my $line = shift;
+  return $line if $embedded_latex;
+  return $line if $verbatim_flag;
+  $line =~ s!\334!save('"U')!ge; #"
+  $line =~ s!\374!save('"u')!ge; #"
+  $line =~ s!\326!save('"O')!ge; #"
+  $line =~ s!\366!save('"o')!ge; #"
+  $line =~ s!\304!save('"A')!ge; #"
+  $line =~ s!\344!save('"a')!ge; #"
+  $line =~ s!\337!save('"s')!ge; #"
+    $line =~ s!\$!save("\\\$")!ge;
+    $line =~ s!\\!\$\\backslash\$!g;
+    $line =~ s!&!\\&!g;
+    $line =~ s!#!\\#!g;
+    $line =~ s!%!\\%!g;
+    $line =~ s!~!\\char126!g;
+    $line =~ s!_!\\_!g;
+    $line =~ s!\^!\\char94!g;
+    $line =~ s!{!\\{!g;
+    $line =~ s!}!\\}!g;
+    $line =~ s!>!{\\tt>}!g;
+    $line =~ s!<!{\\tt<}!g;
+    $line =~ s!"!{\\char34}!g; #'
+    $line =~ y/\200-\377/\000-\177/;
+
+    return $line;
+} # escapes }}}1
+
+sub insert_template { #{{{1--------------------------------------
+  my ($f, $page_no, $what) = @_;
+} # insert_template }}}1
+
+sub pp_warn { #{{{1----------------------------------------------
+  my ($message) = @_;
+  print STDERR "*** $me: $message\n";
+  print STDERR "context: ------\n@ERRBUFFER\n---------------\n";
+} # pp_warn }}}1
+
+sub handleVarReset { #{{{1------------------------------------------
+# JSTENZEL
+ # flag that all declared variables were deleted
+ # (flag it by an array reference, which cannot be passed as
+ # a variable value)
+ push(@{$variables{$_}}, [$page_cnt, []]) foreach keys %variables;
+} # handleVarReset }}}1
+
+sub handleVarSet { #{{{1--------------------------------------------
+# JSTENZEL
+ # store new value
+ push(@{$variables{$_[2]{var}}}, [$page_cnt, $_[2]{value}]);
+} # handleVarset }}}1
+
+__END__
+
+
+# POD SECTION {{{1=============================================
+
+=head1 NAME
+
+B<pp2latex> - PerlPoint to LaTeX converter
+
+=head1 VERSION
+
+This man page describes $Revision: 1.14 $
+from PerlPoint::Converters Package 1.0205
+
+
+=head1 SYNOPSIS
+
+  pp2latex --help
+  pp2latex [@options_file] [options] slide_text 
+
+=head1 DESCRIPTION
+
+C<pp2latex> creates a LaTeX file from a PerlPoint input file.
+
+
+=head1 SYNTAX of PerlPoint Files
+
+For a detailed description of the PerlPoint language please refer to the
+excellent POD documentation of the B<PerlPoint::Parser> Module by Jochen Stenzel.
+There you will find everything you ever wanted to know about PerlPoint ;-)
+
+
+=head1 OPTIONS
+
+=over 4
+
+
+=item --section-sequence=chapter
+
+This option may (and should) be specified more than once. For each level of headline a
+corresponding LaTeX section can be specified: The following sequence of options yields
+the assignment shown below:
+
+ --section-sequence=section
+ --section-sequence=subsection
+ --section-sequence=subsubsection
+ --section-sequence=paragraph
+ --section-sequence=bftext
+
+ =Healine Level 0             --->  \section{Headline Level 0}
+ ==Healine Level 1            --->  \subsection{Headline Level 1}
+ ===Healine Level 2           --->  \subsubsection{Headline Level 2}
+ ====Healine Level 3          --->  \paragraph{Headline Level 3}
+ =====Healine Level 4, 5, ... --->  \textbf{Headline Level 4, 5, ...}
+
+B<Note:> --section-sequence=chapter can only be use if the document class is report or book.
+
+=item --filter=regexp
+
+This specifies a regular expression C<regexp> which should match
+all allowed languages for EMBEDed code. The expression is evaluated
+caseinsensitively.
+
+Example: --filter="perl|latex"
+
+=item --prolog=filename
+
+Specifies a file which must contain the LaTeX Declarations for the document.
+C<\documentclass> and C<\begin{document}> must be defined there.
+
+=item --activeContents
+
+PerlPoint sources can embed Perl code which is evaluated while the source is parsed. For
+reasons of security this feature is deactivated by default. Set this option to active
+it. You can use I<--safeOpcode> to fine tune which operations shall be permitted.
+
+=item --double_lines
+
+This option has the effect that all horizontal Lines in Tables are
+doubled.
+
+=item --cache
+
+parsing of one and the same document several times can be accelerated by activating the
+PerlPoint parser cache by this option. The performance boost depends on your document
+structure.
+
+Cache files are written besides the source and named ".<source file>.ppcache".
+
+It can be useful to (temporarily) deactivate the cache to get correct line numbers in
+parser error messages (currently numbers cannot always reported correctly with activated
+cache because of a special perl behaviour).
+
+=item --cacheCleanup
+
+PerlPoint parser cache files grow (with every modified version of a source parsed)
+because they store expressions for every parsed variant of a paragraph. This is usually
+uncritical but you may wish to clean up the cache occasionally. Use this option to
+perform the task (or remove the cache file manually).
+
+
+=item -nocopyright
+
+suppresses the copyright message;
+
+=item -noinfo
+
+supresses runtime informations;
+
+=item --nowarn
+
+supresses warnings;
+
+=item --quiet
+
+a shortcut for "--nocopyright --noinfo --nowarn": all non critical runtime messages are suppressed;
+
+=item --safeOpcode <opcode>
+
+If active contents is enabled (I<--activeContents>), Perl code embedded into the translated PerlPoint sources will be
+evaluated. To keep security this is done via an object of class B<Safe> which restricts code
+to permitted operations. By this option you can declare which opcode (or opcode tag) is
+permitted. Please see the B<Safe> and B<Opcode> manual pages for further details. (These modules
+come with perl.)
+
+This option can be used multiply.
+
+You may want to store these options in default option files, see below for details.
+
+
+For the examples used in I<ppdoc.pp> you should use
+
+ --safeOpcode=:filesys_open --safeOpcode=:still_to_be_decided --safeOpcode=:browse
+
+
+=item --set <flag>
+
+This option allows you to pass certain settings - of your choice - to active contents
+(like conditions) where it can be accessed via the $PerlPoint hash reference. For
+example, your PerlPoint code could contain a condition like
+
+  ? $PerlPoint->{userSettings}{special}
+
+  Special part.
+
+  ? 1
+
+. The special part enclosed by the two conditions would then be processed I<only> if you
+call C<pp2html> with
+
+  --set special
+
+- and if active contents was enabled by I<-active>, of course.
+
+This option can be used multiply.
+
+=item --trace [<level>]
+
+activates traces of the specified level. You may use the environment variable SCRIPTDEBUG
+alternatively (but an option overwrites environment settings). The following levels are
+defined  (use the I<numeric> values) - if a description sounds cryptic to you, just ignore
+the setting:
+
+=item --help
+
+Output of usage.
+
+=item --version
+
+Output of version information.
+
+=back
+
+=head1 FILES
+
+Configuration file $HOME/.pp2latex
+
+=head1 ENVIRONMENT
+
+The following environment variables have influence on the program:
+
+=over 4
+
+=item SCRIPTDEBUG
+
+may be set to a numeric value to activate certain trace levels. You can use option I<-trace>
+alternatively (note that a used option overwrites an environment setting). The several levels
+are described with this option.
+
+=back
+
+
+=head1 SEE ALSO
+
+C<pp2html>
+
+=head1 AUTHOR
+
+Lorenz Domke (lorenz.domke@gmx.de), 2001. All rights reserved.
+
+=cut
+
+#}}}1
+
+# HISTORY SECTION {{{1===========================================
+
+# --------------------------------------------------------------------------
+# version | date   | author | changes
+# --------------------------------------------------------------------------
+# 0.02    |12.10.99| ste    | added a simple backend;
+# 0.01    |09.10.99| ste    | derived from the PP::Parser draft.
+# --------------------------------------------------------------------------
+
+$Log: pp2latex,v $
+Revision 1.14  2001/12/19 21:04:43  lorenz
+Final commit for Version 1.001
+
+Revision 1.13  2001/12/18 22:51:07  lorenz
+Checkin for version 1.01
+
+Revision 1.12  2001/12/06 21:38:06  lorenz
+more tests
+
+Revision 1.11  2001/11/30 00:46:22  lorenz
+new cvs version
+
+Revision 1.10  2001/10/02 08:47:56  lorenz
+LOCALTOC
+
+Revision 1.12  2001/08/16 04:06:46  lorenz
+checkin for/after 0.11.01
+
+Revision 1.11  2001/06/15 15:56:02  lorenz
+ci for Release 0.10 (final)
+
+Revision 1.10  2001/06/14 12:00:56  lorenz
+checkin for version 0.10_05
+
+Revision 1.9  2001/03/11 11:55:11  lorenz
+checkin for version 0.009
+
+Revision 1.8  2001/03/06 21:21:28  lorenz
+checkin for 0.009
+
+Revision 1.7  2001/01/17 22:24:16  lorenz
+checkin for version 0.008
+
+Revision 1.6  2000/12/10 22:48:37  lorenz
+check in for firest CPAN version
+
+Revision 1.5  2000/11/02 19:37:48  lorenz
+checkin for 0.006
+
+Revision 1.4  2000/10/25 20:02:39  lorenz
+support eps
+
+Revision 1.3  2000/08/04 19:56:52  lorenz
+check
+
+Revision 1.2  2000/08/04 17:29:42  lorenz
+sub save
+
+Revision 1.1  2000/07/11 20:02:59  lorenz
+Initial revision
+
+Revision 1.1  2000/04/27 21:28:36  lorenz
+Initial revision
+
+
+#}}}1
+# vim:foldmethod=marker:foldcolumn=4

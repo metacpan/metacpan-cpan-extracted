@@ -1,0 +1,99 @@
+NAME
+    Plone::UserAgent - An LWP agent with "logging into Plone" built-in
+
+SYNOPSIS
+        use Plone::UserAgent;
+
+        my $ua =
+            Plone::UserAgent->new
+                ( username => 'foo',
+                  password => 'bar',
+                  base_uri => 'http://my.plone.site.example.com',
+                );
+
+        $ua->login();
+
+        my $page_uri = $ua->make_uri( '/some/page' );
+
+        my $response = $ua->get($page_uri);
+
+DESCRIPTION
+    This module is a fairly trivial subclass of LWP::UserAgent that knows
+    how to log in to a Plone site. It's been tested with 3.2.2.
+
+    Patches are welcome to add additional Plone-specific features (as long
+    as they're nice patches, not gross, ugly patches).
+
+METHODS
+    This class provides these methods;
+
+Plone::UserAgent->new( ... )
+    This method creates a new user agent object.
+
+    The constructor accepts the following parameters:
+
+    * base_uri
+        The root URI of your Plone site. required.
+
+    * username
+        The username to use when logging in to the site. required, but see
+        below.
+
+    * password
+        The username to use when logging in to the site. required, but see
+        below.
+
+    * config_file
+        An optional config file. This should be an INI config file. All that
+        is expected to be in the file is a username and password, with no
+        section header:
+
+          username = foo
+          password = bar
+
+        This defaults to $HOME/.plone-useragentrc.
+
+    The constructor requires a username and password, but if you don't pass
+    these , it will try to look them up the config file.
+
+  $ua->login()
+    Attempts to log in to the site. Throws an error if it fails.
+
+  $ua->make_uri($path)
+    Given a path, returns a URI based on the `base_uri' passed to the
+    constructor. This is provided for convenience since it's used
+    internally.
+
+AUTHOR
+    Dave Rolsky, >autarch@urth.org<
+
+BUGS
+    Please report any bugs or feature requests to
+    `bug-plone-useragent@rt.cpan.org', or through the web interface at
+    http://rt.cpan.org. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+DONATIONS
+    If you'd like to thank me for the work I've done on this module, please
+    consider making a "donation" to me via PayPal. I spend a lot of free
+    time creating free software, and would appreciate any support you'd care
+    to offer.
+
+    Please note that I am not suggesting that you must do this in order for
+    me to continue working on this particular software. I will continue to
+    do so, inasmuch as I have in the past, for as long as it interests me.
+
+    Similarly, a donation made in this way will probably not make me work on
+    this software much more, unless I get so many donations that I can
+    consider working on free software full time, which seems unlikely at
+    best.
+
+    To donate, log into PayPal and send money to autarch@urth.org or use the
+    button on this page: http://www.urth.org/~autarch/fs-donation.html
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Dave Rolsky, All Rights Reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

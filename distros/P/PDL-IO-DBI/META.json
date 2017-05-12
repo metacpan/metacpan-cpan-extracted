@@ -1,0 +1,59 @@
+{
+   "abstract" : "Create PDL from database (optimized for speed and large data)",
+   "author" : [
+      "KMX <kmx@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDL-IO-DBI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBI" : "0",
+            "Exporter" : "5.57",
+            "PDL" : "2.014",
+            "Test::More" : "0.88",
+            "Test::Number::Delta" : "1.06",
+            "Time::Moment" : "0.12"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "Exporter" : "5.57",
+            "PDL" : "2.014",
+            "Time::Moment" : "0.12",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kmx/pdl-io-dbi/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/kmx/pdl-io-dbi"
+      }
+   },
+   "version" : "0.012",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

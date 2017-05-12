@@ -1,0 +1,23 @@
+Build.PL
+Changes
+examples/autochangelog
+examples/build-all-from-source
+examples/build-pkg
+examples/get-all-source-dependecies
+examples/show-source-dependecies
+lib/Parse/Deb/Control.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+script/deb-control-key-values
+script/deb-control-prefix-perl
+t/01_Parse-Deb-Control.t
+t/control/control-perl
+t/control/control-perl-simple
+t/control/control-perl-simple-add-remove
+t/control/control-perl-simple-comment
+t/control/control-perl-simple-step1
+t/control/control-perl-simple-step2
+t/control/control-perl-simple-step3
+SIGNATURE    Added here by Module::Build

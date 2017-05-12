@@ -1,0 +1,8 @@
+0.2	March 13, 2012
+	- Content-Type might be undef, so we need to check it.
+
+0.1.1	March 5, 2012
+	- Add missing dependency Plack.
+
+0.1	March 4, 2012
+	- Initial release.

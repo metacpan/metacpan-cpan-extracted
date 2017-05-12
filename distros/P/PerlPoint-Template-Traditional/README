@@ -1,0 +1,100 @@
+
+Note: this release is published as a beta, as it contains no tests
+      so far. Nevertheless, it is considered stable as it was used
+      in several larger projects.
+
+
+INTRO
+
+Welcome!
+
+This is the C<PerlPoint::Template::Traditional> package,
+which allows to use an extended version of the traditional
+C<pp2html> template language with PerlPoints C<pp2tdo>
+generators.
+
+Please see the POD documentation of the module for all the
+features provided.
+
+The traditional template allows to write PerlPoint styles
+quickly for people familiar with the traditional syntax.
+People used to run other template engines can use them,
+too, given an engine is available. Please search CPAN
+or the project page for C<PerlPoint::Template::...> modules.
+
+As a user of a style that is based on this engine, all you
+have to do is to install this package.
+
+
+INSTALLATION
+
+As a prerequisite, install C<PerlPoint::Package> with the
+main template layer C<PerlPoint::Template>. Then follow
+the usual steps to install a distribution:
+
+  unpack
+  make test install distclean
+
+or use C<cpanp> or C<cpan> to get all prerequisites automatically.
+
+
+
+DOCUMENTATION
+
+Please refer to the POD documentation of the installed modules,
+and to the tutorial that comes with C<PerlPoint::Package>.
+
+
+SUPPPORT
+
+A PerlPoint mailing list is set up to discuss usage, ideas,
+bugs, suggestions and translator development. To subscribe,
+please send an empty message to perlpoint-subscribe@perl.org.
+
+If you prefer, you can contact me via perl@jochen-stenzel.de
+as well.
+
+
+CREDITS
+
+
+AUTHOR
+
+Copyright (c) Jochen Stenzel (perl@jochen-stenzel.de), 1999-2005.
+All rights reserved.
+
+This module is free software, you can redistribute it and/or modify it
+under the terms of the Artistic License distributed with Perl version
+5.003 or (at your option) any later version. Please refer to the
+Artistic License that came with your Perl distribution for more
+details.
+
+The Artistic License should have been included in your distribution of
+Perl. It resides in the file named "Artistic" at the top-level of the
+Perl source tree (where Perl was downloaded/unpacked - ask your
+system administrator if you dont know where this is).  Alternatively,
+the current version of the Artistic License distributed with Perl can
+be viewed on-line on the World-Wide Web (WWW) from the following URL:
+http://www.perl.com/perl/misc/Artistic.html.
+
+
+DISCLAIMER
+
+This software is distributed in the hope that it will be useful, but
+is provided "AS IS" WITHOUT WARRANTY OF ANY KIND, either expressed or
+implied, INCLUDING, without limitation, the implied warranties of
+MERCHANTABILITY and FITNESS FOR A PARTICULAR PURPOSE.
+
+The ENTIRE RISK as to the quality and performance of the software
+IS WITH YOU (the holder of the software).  Should the software prove
+defective, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR
+CORRECTION.
+
+IN NO EVENT WILL ANY COPYRIGHT HOLDER OR ANY OTHER PARTY WHO MAY CREATE,
+MODIFY, OR DISTRIBUTE THE SOFTWARE BE LIABLE OR RESPONSIBLE TO YOU OR TO
+ANY OTHER ENTITY FOR ANY KIND OF DAMAGES (no matter how awful - not even
+if they arise from known or unknown flaws in the software).
+
+Please refer to the Artistic License that came with your Perl
+distribution for more details.
+

@@ -1,0 +1,7 @@
+=head1 NAME
+
+230-encoding
+
+=encoding iso-8859-2
+
+This is latin-2 for a c with an accent: Slaven Reziæ

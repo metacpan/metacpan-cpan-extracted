@@ -1,0 +1,61 @@
+#
+# Assign names to fields
+#
+# format:
+# name:pds[6]:pds[1]:pds[7]:pds[8]:pds[9]
+#
+# where pds[#] refers to the grib pds table elements (starting from 0)
+# see the WMO document 'A Guide to the Code Form FM 92-IX Ext. GRIB Edition 1'
+# fields 8 and 9 are optional  
+#
+# These names are from the HRM users guide
+#
+PS:1:2:1:0:0                    # surface pressure
+ASOB_S:111:2:1                  # shortwave radiation
+ATHB_S:112:2:1                  # longwave radiation     
+ASOB_T:113:2:8
+ATHB_T:114:2:8
+T:11:2:110
+FIS:6:2:1                       # topo * gravity
+T_G:11:2:1:0:0
+QC:31:201:110
+U:33:2:110
+V:34:2:110
+QV:51:2:110
+W_SNOW:65:2:1
+T_S:85:2:111:0:0
+T_M:85:2:111:0:9
+W_G1:86:2:112:0:10  
+W_G2:86:2:112:10:100  
+W_I:200:201:1:0:0  
+T_SNOW:203:201:1:0:0
+QV_S:51:2:1:0:0                 # specific humidity at the surface
+SOILTYP:57:202:1:0:0  
+ROOT:62:202:1:0:0
+FR_LAND:81:2:1:0:0
+Z0:83:2:1:0:0 
+T_CL:85:2:111:0:36 
+W_CL:86:2:112:100:190  
+PCLOV:87:2:1:0:0
+RAIN_GSP:102:201:1:0:0
+RAIN_CON:113:201:1:0:0
+SNOW_GSP:79:2:1:0:0
+SNOW_CON:78:2:1:0:0
+CLCL:73:2:1:0:0
+CLCH:75:2:1:0:0
+CLCT:71:2:1:0:0
+U_10M:33:2:105:10
+V_10M:34:2:105:10
+TD_2M:17:2:105:2
+T_2M:11:2:105:2
+TMIN_2M:16:2:105:2
+TMAX_2M:15:2:105:2
+
+# on the pressure grid
+GPprs:6:2:100
+PRESmsl:2:2:102
+RHprs:52:2:100
+TMPprs:11:2:100
+UGRDprs:33:2:100
+VGRDprs:34:2:100
+VVELprs:39:2:100

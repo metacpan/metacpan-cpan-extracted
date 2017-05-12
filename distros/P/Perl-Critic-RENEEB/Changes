@@ -1,0 +1,13 @@
+Release history for Perl::Critic::RENEEB
+========================================
+
+0.02  2015-02-23
+
+  [MISC]
+  * Use Git-Bundle
+  * Use Basic-Bundle
+  * Add metadata for resources
+
+0.01  2012-04-11
+
+  + initial release

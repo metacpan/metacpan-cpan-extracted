@@ -1,0 +1,199 @@
+==================================================
+Changes from 2013-11-14 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.012 at 2014-11-14 20:19:55 +0000
+------------------------------------------
+
+  Change: 57b6383e061d573e12fe9cc90950cdbc37dcd25f
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-14 12:18:49 +0000
+
+    remove magic from substr and reduce copying of strings 
+
+------------------------------------------
+version 1.011 at 2014-11-14 03:08:48 +0000
+------------------------------------------
+
+  Change: 65afe245446e0e64a7a7eb87154f9d039fc39272
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-13 19:08:48 +0000
+
+    New CPAN release of POE-Component-SSLify - v1.011
+
+    - Tweak the testsuite thanks to CPANTesters!
+
+    [STATISTICS]
+
+    - code churn: 11 files changed, 37 insertions(+), 35 deletions(-) 
+
+  Change: 6795ac7e0577df360e1cd094113235d12eaae9d9
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-13 19:06:41 +0000
+
+    remove TODO from superbig tests 
+
+  Change: 82379d6f23f8bbb76a03ed26fd4bdbc2af288fd2
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-13 19:01:25 +0000
+
+    dont test blocking mode on MSWin32, thanks CPANTesters and DSOLIMANO 
+
+  Change: 48c4ba77fed8089a608ecaf9ec8b7789a3e73c27
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-13 18:47:32 +0000
+
+    switch to POE::Filter::Block to reduce issues from Filter::Line 
+
+  Change: 9a89ec61f97b246088fb02508d1479295706bd22
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-13 16:30:19 +0000
+
+    add pogomips concept from POE =] 
+
+------------------------------------------
+version 1.010 at 2014-11-12 06:19:01 +0000
+------------------------------------------
+
+  Change: dc234fe2f82b3982d475ee45fdc3534d1bfc178d
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 22:19:01 +0000
+
+    New CPAN release of POE-Component-SSLify - v1.010
+
+    - add informational test that prints out ssleay version
+
+    - clamp the writes to 16K internally to get around write errors
+    reported
+
+    by RT#95071 and RT#58243, thanks!
+
+    [STATISTICS]
+
+    - code churn: 7 files changed, 591 insertions(+), 5 deletions(-) 
+
+  Change: f8043053bd401402979e7161d2fcc31f8184cb3b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 22:13:38 +0000
+
+    satisfy perlcritic... 
+
+  Change: c0ce9919c362c501fbe2487b718e68e5a7e1f038
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 21:50:17 +0000
+
+    add website link about same write issue 
+
+  Change: 3d8fa3c965241a7bc6b9b229d56863823dab02f5
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 21:46:21 +0000
+
+    tweak changes header 
+
+  Change: 26ef9be50cd5069bfe938fc41da7630ef0d5a739
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 21:41:59 +0000
+
+    clamp the writes 
+
+  Change: cae051e4f8c5c6368b9112a4fdc94f75b20ccf0d
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 21:41:07 +0000
+
+    activate superbig tests for automated 
+
+  Change: 68ffe2c85d5f250b02b14e16da8fc973dfb259aa
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 21:30:21 +0000
+
+    add ssleay info test 
+
+  Change: 200d56da2705d8bb5dedc384a8f7694aba331053
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 16:52:04 +0000
+
+    fix damn tabs 
+
+------------------------------------------
+version 1.009 at 2014-11-12 00:45:19 +0000
+------------------------------------------
+
+  Change: 89e7cf553d93fe61a3c2eb9240f027b87d80954d
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 16:45:19 +0000
+
+    New CPAN release of POE-Component-SSLify - v1.009
+
+    - Updates to the auto-generated files
+
+    - Tweaked the testsuite to use done_testing() for sanity, RT#66741
+    (thanks
+
+    RCAPUTO!)
+
+    - Use Test::FailWarnings in the testsuite in place of
+    Test::NoWarnings
+
+    (DAGOLDEN++)
+
+    - Add t/simple_large.t to try and track down RT#58243 (thanks Johan!)
+
+    - Added a boatload of tests to try and track down RT#95071 (thanks
+    Joe!)
+
+    [STATISTICS]
+
+    - code churn: 27 files changed, 2160 insertions(+), 1503 deletions(-) 
+
+  Change: b717e75279e2b28ebd4b0d8ab0ce48cd7540998f
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 16:41:22 +0000
+
+    dont test superbig tests! 
+
+  Change: e1aed14b94e9d1852b08208895262726d629fe3c
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 15:51:56 +0000
+
+    tweak tests and add more large size tests 
+
+  Change: 0d1324143216eb9cd1cf07ba0c2ac814a268cf6f
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 14:29:58 +0000
+
+    fix changes 
+
+  Change: 7621d86c76c95fb7495717a4d4e0b912cfe51b97
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 14:27:39 +0000
+
+    add test to try and track down RT#58243 
+
+  Change: 3db8619e947a14554c1a04ec8a8c5c0cac19acb5
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 14:10:54 +0000
+
+    rename tests for clarity 
+
+  Change: ffbe1df7efa2ab2fd03230a44bdd14f0300bad5e
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 14:08:06 +0000
+
+    use Test::FailWarnings and migrate to done_testing 
+
+  Change: f6a84928364e3a57e71733620bcbe8544a8ee6f2
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-11 14:00:30 +0000
+
+    tweaks to POD and stuff to pass tests 
+
+  Change: cd37d35eacaae2505f7d657b15d6e5820bf4f3fe
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-09 01:19:19 +0000
+
+    mailmap 
+
+================================================
+Plus 9 releases after 2013-11-14 00:00:00 +0000.
+================================================

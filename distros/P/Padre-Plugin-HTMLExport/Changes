@@ -1,0 +1,38 @@
+Revision history for Padre-Plugin-HTMLExport
+
+0.09   2010.12.06
+        Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+        Update German translation (ZENOG)
+        Color settings accessible from the plugin manager (ZENOG)     
+
+0.08   2010.11.02
+        Removed Test::NeedsDisplay dependency (AZAWAWI)
+
+0.07   2010.10.27
+        t/00-load.t is magically injected by [@PadrePlugin] via [LoadTests] (AZAWAWI)
+
+0.06   2010.10.26
+        Added translation files (ZENOG)
+        Added German translation (ZENOG)
+        Added Italian translation (SBLADIN)
+        Added Arabic translation (AZAWAWI)
+        Minor message changes (ZENOG)
+        Compatiblity with latest Padre (ZENOG, AZAWAWI)
+        Switched to Dist::Zilla (AZAWAWI)
+
+0.05    2009.05.31
+        removed taint mode for tests, leading to build errors (jquelin)
+
+0.04    2009.2.1
+        for Padre 0.26
+
+0.03    2009.1.5
+        for Padre 0.23
+
+0.02    2008.12.30
+        Fixed it to work with Padre 0.22
+        Moved to Module::Install
+
+0.01    2008.11.28
+        First version, released on an unsuspecting world.
+

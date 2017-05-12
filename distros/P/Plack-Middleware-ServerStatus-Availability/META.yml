@@ -1,0 +1,46 @@
+---
+abstract: 'manually set server status'
+author:
+  - 'INA Lintaro <tarao.gnn@gmail.com>'
+build_requires:
+  HTTP::Request: '0'
+  Plack: '0'
+  Plack::Builder: '0'
+  Test::Base: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-ServerStatus-Availability
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::ServerStatus::Availability:
+    file: lib/Plack/Middleware/ServerStatus/Availability.pm
+    version: '0.02'
+  Plack::Middleware::ServerStatus::Availability::Status:
+    file: lib/Plack/Middleware/ServerStatus/Availability.pm
+requires:
+  Net::CIDR::Lite: '0'
+  Path::Class: '0'
+  Plack::Middleware: '0'
+  Plack::Request: '0'
+resources:
+  bugtracker: https://github.com/tarao/perl5-Plack-Middleware-ServerStatus-Availability/issues
+  homepage: https://github.com/tarao/perl5-Plack-Middleware-ServerStatus-Availability
+  repository: git://github.com/tarao/perl5-Plack-Middleware-ServerStatus-Availability.git
+version: '0.02'

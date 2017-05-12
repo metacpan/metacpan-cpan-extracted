@@ -1,0 +1,125 @@
+---
+abstract: 'Determine if a given Path resembles a development source tree'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Path-IsDev
+provides:
+  Path::IsDev:
+    file: lib/Path/IsDev.pm
+    version: '1.001003'
+  Path::IsDev::Heuristic::Changelog:
+    file: lib/Path/IsDev/Heuristic/Changelog.pm
+    version: '1.001003'
+  Path::IsDev::Heuristic::DevDirMarker:
+    file: lib/Path/IsDev/Heuristic/DevDirMarker.pm
+    version: '1.001003'
+  Path::IsDev::Heuristic::META:
+    file: lib/Path/IsDev/Heuristic/META.pm
+    version: '1.001003'
+  Path::IsDev::Heuristic::MYMETA:
+    file: lib/Path/IsDev/Heuristic/MYMETA.pm
+    version: '1.001003'
+  Path::IsDev::Heuristic::Makefile:
+    file: lib/Path/IsDev/Heuristic/Makefile.pm
+    version: '1.001003'
+  Path::IsDev::Heuristic::TestDir:
+    file: lib/Path/IsDev/Heuristic/TestDir.pm
+    version: '1.001003'
+  Path::IsDev::Heuristic::Tool::Dzil:
+    file: lib/Path/IsDev/Heuristic/Tool/Dzil.pm
+    version: '1.001003'
+  Path::IsDev::Heuristic::Tool::MakeMaker:
+    file: lib/Path/IsDev/Heuristic/Tool/MakeMaker.pm
+    version: '1.001003'
+  Path::IsDev::Heuristic::Tool::ModuleBuild:
+    file: lib/Path/IsDev/Heuristic/Tool/ModuleBuild.pm
+    version: '1.001003'
+  Path::IsDev::Heuristic::VCS::Git:
+    file: lib/Path/IsDev/Heuristic/VCS/Git.pm
+    version: '1.001003'
+  Path::IsDev::HeuristicSet::Basic:
+    file: lib/Path/IsDev/HeuristicSet/Basic.pm
+    version: '1.001003'
+  Path::IsDev::NegativeHeuristic::HomeDir:
+    file: lib/Path/IsDev/NegativeHeuristic/HomeDir.pm
+    version: '1.001003'
+  Path::IsDev::NegativeHeuristic::IsDev::IgnoreFile:
+    file: lib/Path/IsDev/NegativeHeuristic/IsDev/IgnoreFile.pm
+    version: '1.001003'
+  Path::IsDev::NegativeHeuristic::PerlINC:
+    file: lib/Path/IsDev/NegativeHeuristic/PerlINC.pm
+    version: '1.001003'
+  Path::IsDev::Object:
+    file: lib/Path/IsDev/Object.pm
+    version: '1.001003'
+  Path::IsDev::Result:
+    file: lib/Path/IsDev/Result.pm
+    version: '1.001003'
+  Path::IsDev::Role::Heuristic:
+    file: lib/Path/IsDev/Role/Heuristic.pm
+    version: '1.001003'
+  Path::IsDev::Role::HeuristicSet:
+    file: lib/Path/IsDev/Role/HeuristicSet.pm
+    version: '1.001003'
+  Path::IsDev::Role::HeuristicSet::Simple:
+    file: lib/Path/IsDev/Role/HeuristicSet/Simple.pm
+    version: '1.001003'
+  Path::IsDev::Role::Matcher::Child::BaseName::MatchRegexp:
+    file: lib/Path/IsDev/Role/Matcher/Child/BaseName/MatchRegexp.pm
+    version: '1.001003'
+  Path::IsDev::Role::Matcher::Child::BaseName::MatchRegexp::File:
+    file: lib/Path/IsDev/Role/Matcher/Child/BaseName/MatchRegexp/File.pm
+    version: '1.001003'
+  Path::IsDev::Role::Matcher::Child::Exists::Any:
+    file: lib/Path/IsDev/Role/Matcher/Child/Exists/Any.pm
+    version: '1.001003'
+  Path::IsDev::Role::Matcher::Child::Exists::Any::Dir:
+    file: lib/Path/IsDev/Role/Matcher/Child/Exists/Any/Dir.pm
+    version: '1.001003'
+  Path::IsDev::Role::Matcher::Child::Exists::Any::File:
+    file: lib/Path/IsDev/Role/Matcher/Child/Exists/Any/File.pm
+    version: '1.001003'
+  Path::IsDev::Role::Matcher::FullPath::Is::Any:
+    file: lib/Path/IsDev/Role/Matcher/FullPath/Is/Any.pm
+    version: '1.001003'
+  Path::IsDev::Role::NegativeHeuristic:
+    file: lib/Path/IsDev/Role/NegativeHeuristic.pm
+    version: '1.001003'
+recommends:
+  Path::Tiny: '0.058'
+requires:
+  Carp: '0'
+  Class::Tiny: '0.010'
+  File::HomeDir: '0'
+  Module::Runtime: '0'
+  Path::Tiny: '0.004'
+  Role::Tiny: '0'
+  Role::Tiny::With: '0'
+  Scalar::Util: '0'
+  Sub::Exporter: '0'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Path-IsDev/issues
+  homepage: https://github.com/kentnl/Path-IsDev
+  repository: https://github.com/kentnl/Path-IsDev.git
+version: '1.001003'

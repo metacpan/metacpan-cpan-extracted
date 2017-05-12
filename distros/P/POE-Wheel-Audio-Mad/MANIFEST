@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+Mad.pm
+lib/POE/Component/Audio/Mad/Handle.pm
+lib/POE/Component/Audio/Mad/Dispatch.pm
+lib/POE/Filter/Audio/Mad/Stdio.pm

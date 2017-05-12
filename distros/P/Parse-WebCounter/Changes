@@ -1,0 +1,9 @@
+Revision history for Perl extension Parse::WebCounter.
+
+0.02  Mon Dec 18 22:12:22 2006
+	- Initial CPAN Release
+
+0.01  Mon Oct 11 22:36:20 2004
+	- original version; created by h2xs 1.22 with options
+		-AX Parse::WebCounter
+

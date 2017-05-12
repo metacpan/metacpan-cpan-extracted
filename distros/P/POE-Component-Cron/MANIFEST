@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/POE-Component-Cron.t
+lib/POE/Component/Cron.pm
+META.yml                                 Module meta-data (added by MakeMaker)

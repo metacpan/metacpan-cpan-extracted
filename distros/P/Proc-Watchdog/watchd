@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+#
+# watchd: Simple watchdog for Proc::Watchdog
+#
+# lem@cantv.net 20010524 - Initial release
+#
+#################################
+
+use IO::Dir;
+use IO::File;
+use Getopt::Std;
+
+getopts('hp:vd:');
+
+die qq {
+This is the watch daemon, (c) 2001 Luis E. Munoz, All rights reserved.
+
+Usage: watchd [-h] [-v] [-p <path>] [-d <delay>]
+
+This  must  be  used  in  conjunction  with  the  Proc::Watchdog  perl
+module. The options are described briefly below.
+
+-h		This help screen
+-v		Produce verbose output (useful for debugging)
+-p <path>	The pathname where the watchdog files are created. 
+		This process must have enough permissions so as to
+		erase and read files there. Should only be specified
+		if the ->new() constructor is given a non-standard
+		path.
+-d <delay>	How many seconds between the first signal (TERM) and
+		the second and last (KILL). Defaults to 10 seconds. If
+		set to zero, only a KILL signal will be sent.
+
+} if $opt_h;
+
+$opt_p = '/tmp' 	unless length $opt_p;
+$opt_d = 10 		unless length $opt_d;
+
+if ($opt_p and ! -d $opt_p) {
+   die "Pathname specified with -p $opt_p does not exist\n";
+}
+
+if ($opt_d and $opt_d < 0) {
+   die "The delay specified with -d $opt_d must be possitive\n";
+}
+
+tie my %dir, IO::Dir, $opt_p;
+
+for my $f (keys %dir) {
+
+    warn "Check $f...\n" if $opt_v;
+
+    next unless $f =~ m!^watchdog\.(\d+)$!;
+    my $pid = $1;
+    my $fname = $opt_p . '/' . $f;
+    my $fh = new IO::File $fname;
+
+    unless ($fh) {
+	warn "Failed to open $fname for reading: $!\n";
+	next;
+    }
+
+    my $secs = $fh->getline;
+
+    $fh->close;
+
+    my $last = (stat $fname)[9];
+
+    if (time - $last > $secs) {
+	unlink $fname;
+
+	warn "File $fname is too old\n" if $opt_v;
+
+	if ($opt_d) {
+	    warn "kill -15 $pid\n" if $opt_v;
+	    next unless kill 15, $pid;
+	    sleep $opt_d;
+	}
+
+	warn "kill -9 $pid\n" if $opt_v;
+	kill 9, $pid;
+    }
+    else {
+	warn "File $fname not old enough\n" if $opt_v;
+    }
+}
+
+untie %dir;
+

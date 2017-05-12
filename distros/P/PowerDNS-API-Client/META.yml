@@ -1,0 +1,27 @@
+---
+abstract: 'Client for PowerDNS::API'
+author:
+  - 'Ask Bjørn Hansen <ask@develooper.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PowerDNS-API-Client
+requires:
+  HTTP::Request: 0
+  JSON: 2.0
+  LWP::UserAgent: 0
+  Moose: 1.0
+  URI: 0
+  namespace::clean: 0.20
+resources:
+  bugtracker: http://github.com/abh/PowerDNS-API-Client/issues
+  homepage: http://search.cpan.org/dist/PowerDNS-API-Client/
+  repository: http://github.com/devel/PowerDNS-API-Client
+version: 0.10

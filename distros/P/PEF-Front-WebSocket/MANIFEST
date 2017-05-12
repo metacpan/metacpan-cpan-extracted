@@ -1,0 +1,16 @@
+Changes
+lib/PEF/Front/.directory
+lib/PEF/Front/WebSocket.pm
+lib/PEF/Front/WebSocket/Base.pm
+lib/PEF/Front/WebSocket/Interface.pm
+lib/PEF/Front/WebSocket/QueueClient.pm
+lib/PEF/Front/WebSocket/QueueServer.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/01_ok.t
+t/02_queue.t
+t/03_queue_server.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

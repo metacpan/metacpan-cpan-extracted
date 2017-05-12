@@ -1,0 +1,35 @@
+1.60000 2013-08-21
+
+    - Removed support for smartmatch - as of perl 5.18.0 smartmatch is 
+      marked as experimental, and subject to change or removal.
+
+1.50000 2012-09-11
+
+    - Add support for smartmatch (~~) for perl 5.10.1 and higher.
+      (Ricardo Signes)
+
+1.40000 2008-06-20
+
+    - Added 'values' method to ensure that we can fetch data from junctions
+      and create new junctions based upon old ones.
+
+1.30000 2007-05-11
+
+	- Non-development release.
+	- Moved .pm files into lib directory
+
+1.20_01 2007-01-08
+
+    - Added :ALL export tag (RT #16429).
+    - Added bool and string overloading to stop fatal errors on
+      stringification (RT #24237).
+    - Removed duplicated tests.
+    - Ran files through perltidy.
+
+1.10 2005-05-13
+
+    - Bugfix: error in none() and one() when comparing a Regexp object with !=
+
+1.00 2005-05-13
+
+    - Initial release, includes test suite.

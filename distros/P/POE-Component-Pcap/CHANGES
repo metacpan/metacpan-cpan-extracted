@@ -1,0 +1,65 @@
+$Id: CHANGES,v 1.3 2003/07/08 15:19:53 fletch Exp $
+
+============
+Things to do
+============
+
+Fix / figure out why setting O_NONBLOCK confuzzles pcap on OpenBSD.
+
+================================================
+Revision history for POE::Component::Pcap
+================================================
+
+Changes marked with "(!!!)" may break backward compatibility.  Changes
+marked with "(???)" are just information.
+
+Note to self: Don't forget to tag the version after a new distribution
+is released.  For example: `cvs tag -Rc v1_00 .'
+
+---------------
+0.04 2003.07.08
+---------------
+
+Fixed bugs.cpan.org #1663 (a while back actually, just got around to
+packaging).
+
+Updated things to work with POE 0.26 (removed _signal).
+
+Tested (minimally :) on:
+
+FreeBSD i386 5.0, perl 5.6.1 
+Linux i386 RH9.0, perl 5.8.0 
+
+---------------
+0.03 2001.03.06
+---------------
+
+Michael Stevens noticed that NetPacket::Ethernet wasn't in the list of
+required packages.  D'oh.
+
+---------------
+0.02 2001.02.16
+---------------
+
+First Public Release.  Has an actual working test script.
+
+OpenBSD i386 2.8
+Linux i386 RH6.2
+Solaris Sparc 2.7
+
+---------------
+0.01 2000.11.28
+---------------
+
+Initial version.  Versioned at 0.01 because it's relatively untested.
+Has at least been run on (and seen packets :) the following:
+
+OpenBSD i386 2.7 
+Linux i386 RH6.2
+Solaris Sparc 2.7
+
+Additions to the list are welcome.
+
+===========================
+EOF: Thank you for reading.
+===========================

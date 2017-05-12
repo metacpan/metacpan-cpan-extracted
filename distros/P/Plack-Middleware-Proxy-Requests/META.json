@@ -1,0 +1,52 @@
+{
+   "abstract" : "Forward proxy server",
+   "author" : [
+      "Piotr Roszatycki <dexter@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Proxy-Requests",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Twiggy" : "0"
+         },
+         "requires" : {
+            "Plack" : "0",
+            "Plack::App::Proxy" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::Proxy::Requests" : {
+         "file" : "lib/Plack/Middleware/Proxy/Requests.pm",
+         "version" : "0.0102"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Plack-Middleware-Proxy-Requests"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/dex4er/perl-Plack-Middleware-Proxy-Requests"
+      }
+   },
+   "version" : "0.0102"
+}

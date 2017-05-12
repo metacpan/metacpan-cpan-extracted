@@ -1,0 +1,28 @@
+POE-Component-YubiAuth
+
+Perform verification of Yubikey One Time Passwords using Yubico's public
+verification service.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc POE::Component::YubiAuth
+
+COPYRIGHT AND LICENCE
+
+Copyright 2010 Kirill Miazine.
+
+This software is distributed under an ISC-style license, please see
+<http://km.krot.org/code/license.txt> for details.
+

@@ -1,0 +1,8 @@
+Revision history for Perl extension PDL::Graphics::X::Fits.
+
+0.01  Sun Mar  6 21:41:19 2005
+	- original version; created by h2xs 1.22 with options
+		-XAn PDL::Graphics::X::Fits
+
+      April 2, 2005
+        Finalized for release via CPAN

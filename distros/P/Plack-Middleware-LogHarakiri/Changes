@@ -1,0 +1,28 @@
+Revision history for Plack-Middleware-LogHarakiri
+
+0.0301    2015-06-22 18:42:37+01:00 Europe/London
+  [Docmentation]
+  - Added note about Plack::Middleware::SizeLimit 0.06's
+    log_when_limits_exceeded option.
+
+0.0201    2015-06-17 13:16:34+01:00 Europe/London
+  [Bug Fixes]
+  - Added missing strictures
+
+  [Other]
+  - Tweaked Travis-CI configuration to skip 5.10
+
+0.0200    2015-06-16 08:49:52+01:00 Europe/London
+  [Enhancements]
+  - Include the REQUEST_URI in the log message
+
+  [Documentation]
+  - Generate README from POD using Pod::Readme
+
+  - Documented format of the warning message
+
+  [Other]
+  - Add Travis-CI to repo for smoke testing
+
+0.0100    2015-06-15 11:30:47+01:00 Europe/London
+  - Initial version

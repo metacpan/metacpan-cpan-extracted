@@ -1,0 +1,22 @@
+CHANGES
+LGPL
+MANIFEST			This list of files
+Makefile.PL
+README
+TODO
+lib/Petal/CodePerl.pm
+lib/Petal/CodePerl/CodeGenerator.pm
+lib/Petal/CodePerl/Expr.pm
+lib/Petal/CodePerl/Expr/Alternate.pm
+lib/Petal/CodePerl/Expr/DerefTAL.pm
+lib/Petal/CodePerl/Expr/PathExists.pm
+lib/Petal/CodePerl/Expr/PerlSprintf.pm
+lib/Petal/CodePerl/Parser.pm
+lib/Petal/CodePerl/Compiler.pm
+lib/Petal/CodePerl/GrammarLoader.pm
+lib/Petal/CodePerl/Modifiers.pm
+t/expr.t
+t/petales.t
+grammar
+bin/buildparser
+bin/compile

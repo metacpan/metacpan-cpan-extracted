@@ -1,0 +1,76 @@
+NAME
+    POE::Component::IRC::Plugin::MultiProxy - A multi-server IRC proxy
+
+SYNOPSIS
+     use POE::Component::IRC::Plugin::MultiProxy;
+
+     my $proxy = POE::Component::IRC::Plugin::MultiProxy->new(
+         Listen_port = 12345,
+         Password    = 'foobar',
+     );
+
+     $irc->plugin_add(
+         MultiProxy => $proxy,
+         network    => 'freenode',
+     );
+
+METHODS
+  "new"
+    Creates a new MultiProxy plugin object. Takes the following arguments:
+
+    'Password' (required), the password you will use when connecting to the
+    proxy.
+
+    'Listen_port' (required), the port you want the proxy to listen on.
+
+    'Listen_host' (optional), the host you want the proxy to listen on.
+    Defaults to '0.0.0.0'.
+
+    'Away_msg' (optional), the away message you want to use when no clients
+    are connected.
+
+    'SSL_key', the name of a file containing an SSL key for the listener to
+    use, if you want to enable SSL.
+
+    'SSL_cert', the name of a file containing an SSL certificate for the
+    listener to use, if you want to enable SSL.
+
+    'Recall_mode', how you want messages to be recalled. Available modes
+    are:
+
+    'missed' (the default): MultiProxy will only recall the channel messages
+    you missed since the last time you detached from MultiProxy.
+    'none': MultiProxy will not recall any channel messages.
+    'all': MultiProxy will recall all channel messages.
+
+    Note: MultiProxy will always recall *private messages* that you missed
+    while you were away, regardless of this option.
+
+TODO
+    Look into using POE::Component::Server::IRC as an intermediary for
+    multiple clients.
+
+    Keep recall messages away from prying eyes, instead of in /tmp.
+
+    Add proper tests.
+
+AUTHOR
+    Hinrik Örn Sigurðsson, hinrik.sig@gmail.com
+
+LICENSE AND COPYRIGHT
+    Copyright 2008-2010 Hinrik Örn Sigurðsson
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Other useful IRC bouncers:
+
+    <http://miau.sourceforge.net>
+    <http://znc.sourceforge.net>
+    <http://code.google.com/p/dircproxy/>
+    <http://www.ctrlproxy.org>
+    <http://www.psybnc.at>
+    <http://irssi.org/documentation/proxy>
+    <http://freshmeat.net/projects/bip>
+

@@ -1,0 +1,79 @@
+%{
+=head1 SYNOPSIS
+
+See section 'SOLVING CONFLICTS WITH THE POSTPONED CONFLICT STRATEGY' in
+http://search.cpan.org/perldoc?Parse::Eyapp::debuggingtut
+
+This example contains the same grammar than 
+    
+    DynamicallyChangingTheParser.eyp
+
+but there are no conflicts. The right recursive production
+
+  ds:
+      D ';' ds    
+    | D 
+  ;
+
+has been changed to a leftrecursive production to avoid the conflict:
+
+  ds:
+      ds ';' D    
+    | D 
+  ;
+
+Be sure C<DebugTail.pm> is reachable
+compile it with 
+
+      eyapp -b '' DynamicallyChangingTheParser3.eyp
+
+execute the generated modulino with the option C<-t>:
+
+      ./DynamicallyChangingTheParser3.pm -t
+
+=head1 See also the examples in:
+
+    DynamicallyChangingTheParser.eyp Debug.eyp Debug1.eyp Debug2.eyp and DebugLookForward.eyp
+
+=cut
+
+use base q{DebugTail}; 
+our $VERSION = '0.01'; 
+%}
+
+%token D S
+
+%tree bypass
+
+%%
+p: %name PROG
+    block +
+;
+
+block:
+    %name BLOCK
+    '{' ds ';' ss '}' 
+  | %name SS
+    '{' ss '}'
+;
+
+ds:
+    %name MORE_Ds
+    ds ';' D    
+  | %name LAST_D
+    D 
+;
+
+ss:
+    %name SS
+    S ';' ss      
+  | %name S
+    S       
+;
+
+%%
+
+__PACKAGE__->lexer( \&DebugTail::lex); 
+
+my $prompt = 'Provide a statement like "{D; S} {D; D; S}" and press <CR><CTRL-D>: ';
+__PACKAGE__->main($prompt) unless caller;

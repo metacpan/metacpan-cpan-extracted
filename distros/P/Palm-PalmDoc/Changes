@@ -1,0 +1,46 @@
+Revision history for Perl extension Palm::PalmDoc.
+
+0.0.1 Mon Oct  8 13:59:50 2001
+	- original version; based enormously on Bibelot
+
+0.0.2 Mon Oct  8 16:00:00 2001
+	- added filename filtering
+	- getters and setters
+	
+0.0.3 Tue Oct  9 16:00:00 2001
+	- Added some constructor filtering
+	- Cleaned up some code
+	- Added some POD
+	
+0.0.4 Wed Oct 10 9:00:00 2001
+	- Added compression
+	
+0.0.5 Sun Oct 28 2:00:00 2001
+	- Cleaned up code
+	- Fixed examples
+	
+0.0.6 Mon Oct 29 13:00:00 2001
+	- Fixed bug in Compressed body handling
+
+0.07  Mon Nov 12 23:00:00 2001
+	- Updated README
+	- Improved CPANability
+	- Added parse_from_filehandle and parse_from_file
+
+0.08  Sun Feb 24 23:00:00 2002
+	- Implemented submitted patches by Josef Moellers to fix 2 bugs
+        
+0.09  Sun Sept 8 23:30:00 2002
+	- Implemented new feature by Josef Moellers
+        
+0.10  Thur Nov 21 18:30:00 2002
+	- Warning clean thanks to Scott Wiersdorf
+	
+0.11  Tue Jan 28 02:00:00 2002
+	- Fixed POD and README Typos thanks to Steve Swantz
+
+0.12  Thu Jun 20 00:05:00 2003
+	- Fixed Title legnth thanks to John G. Smith
+
+0.13  Thu Feb 24 20:00:00 2005
+        - Fixed 2 bugs - patch submitted by Helge Oldach

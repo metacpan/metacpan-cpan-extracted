@@ -1,0 +1,12 @@
+0.0.4 Sat Oct 11 18:57:35 CEST 2014
+ - Make another 5% faster.
+
+0.0.3 Fri Oct 10 12:42:53 CEST 2014
+ - Forgot to compile Pegex::CSV::Grammar
+
+0.0.2 Fri Oct 10 12:25:49 CEST 2014
+ - Make a 12.5% speed increase from v0.0.1
+
+0.0.1 Wed Oct  8 17:43:34 CEST 2014
+ - Initial release
+

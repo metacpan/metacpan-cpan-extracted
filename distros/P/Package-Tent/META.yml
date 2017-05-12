@@ -1,0 +1,23 @@
+---
+name: Package-Tent
+version: v0.0.1
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: temporary package infrastructure
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Module::Build: 0.26
+  Test::More: 0
+provides:
+  Package::Tent:
+    file: lib/Package/Tent.pm
+    version: v0.0.1
+no_index:
+  dir:
+    - t/samples
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

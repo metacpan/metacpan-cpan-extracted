@@ -1,0 +1,30 @@
+digraph g {
+node [ fontsize = "10", shape = record ];
+edge [];
+
+"build_log" [shape = record, label = "{<col0> \N| id:  serial\ltask:  integer\lbuilder:  integer\lmodtime:  timestamp with time zone\l}" ];
+
+"builder" [shape = record, label = "{<col0> \N| id:  serial\lname:  character varying(50)\lplatform:  integer\lcurrent:  integer\lmodtime:  timestamp with time zone\l}" ];
+
+"job" [shape = record, label = "{<col0> \N| id:  serial\luuid:  character varying(50)\lsubmitter:  character varying(50)\lstatus:  integer\lsize:  integer\lmodtime:  timestamp with time zone\l}" ];
+
+"job_status" [shape = record, label = "{<col0> \N| id:  serial\lname:  character varying(20)\l}" ];
+
+"platform" [shape = record, label = "{<col0> \N| id:  serial\lname:  character varying(10)\larch:  character varying(10)\lactive:  boolean\l}" ];
+
+"task" [shape = record, label = "{<col0> \N| id:  serial\ljob:  integer\lplatform:  integer\lstatus:  integer\lmodtime:  timestamp with time zone\l}" ];
+
+"task_status" [shape = record, label = "{<col0> \N| id:  serial\lname:  character varying(20)\l}" ];
+
+
+"build_log" -> "task" [label="build_log_task_fkey"];
+"build_log" -> "builder" [label="build_log_builder_fkey"];
+"builder" -> "platform" [label="builder_platform_fkey"];
+"builder" -> "task" [label="builder_current_fkey"];
+"job" -> "job_status" [label="job_status_fkey"];
+"task" -> "job" [label="task_job_fkey"];
+"task" -> "platform" [label="task_platform_fkey"];
+"task" -> "task_status" [label="task_status_fkey"];
+}
+
+

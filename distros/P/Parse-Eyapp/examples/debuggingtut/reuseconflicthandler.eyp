@@ -1,0 +1,63 @@
+%token NUM = /(\d+)/
+%token OP  = /([-+*\/])/
+
+%{
+my $nxr = 0;
+my $nxs = 0;
+%}
+
+%conflict isInTheMiddle {
+
+  $nxs++;
+
+  if ($nxs == $nxr) { 
+    print "Reducing by :MIDx input = '".unexpendedInput()."'\n";
+    $self->YYSetReduce(['NUM', ';' ], ':MIDx' );
+    
+    $nxr = $nxs = 0; 
+  }
+  else { $self->YYSetShift('NUM') } 
+}  
+
+%explorer isInTheMiddle {
+   ($nxr) = $self->YYPreParse('ExpList'); 
+}
+
+%%
+
+T: %isInTheMiddle? S ';' %isInTheMiddle? S ';'
+;
+
+S:
+     x  %PREC isInTheMiddle S x  
+  |  %name :MIDx 
+     x  %PREC isInTheMiddle 
+;
+
+x:
+     NUM
+  |  x OP NUM
+;
+%%
+
+=head1 SYNOPSIS
+
+This grammar is similar to the one in file C<nopackrat.eyp>.
+It can't be parsed by LR(k) nor LL(k) algorithms.
+Backtracking LR and GLR algorithms can but will perform poorly.
+
+Compile it with:
+
+   $ eyapp -P ExpList.eyp 
+   $ eyapp -TC reuseconflicthandler.eyp
+
+Run it with:
+
+   $ ./reuseconflicthandler.pm -t -i -m 1 -c '2; 1 2+2 3-5;'
+
+=head1 SEE ALSO
+
+Files C<nopackrat.eyp>, C<noLRk_exp.eyp>, C<noLRk_expSolved.eyp>
+
+=cut
+

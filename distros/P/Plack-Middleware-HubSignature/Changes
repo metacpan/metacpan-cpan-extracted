@@ -1,0 +1,10 @@
+Revision history for Perl extension Plack-Middleware-HubSignature
+
+0.02 2015-03-23T13:03:37Z
+
+    - use HTTP error code 403 instead of 400 (thanks nichtich)
+
+0.01 2014-12-05T14:45:57Z
+
+    - original version
+

@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1206035309,
+          'number' => '+440200814254',
+          'time' => '17:48',
+          'date' => '2008-03-20',
+          'name' => 'John XXXX (M)',
+          'phone' => '+440200814254',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1206035309,
+          'text' => 'Any idea if u have or could find me a better version of cubase which will work on the imac? So G3 500 running OS 10.3.9',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7107968,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 100949
+        };

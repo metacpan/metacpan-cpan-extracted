@@ -1,0 +1,62 @@
+TODO:
+
+* reject unknown Progect versions
+
+* reject PDB files not made with Progect
+
+* handle missing appdata more gracefully (e.g. fail with error message).
+
+* make code warning-safe
+
+* When import_records produces no records make $self->records an empty list
+  instead of undef
+
+* CSV: if no headings line, report that.
+
+* report number of records read
+
+* text format enhancements:
+  - short-form
+  - underline-headings
+  - split-by-date
+  - undated-heading
+  - auto-link-dated
+  - smart-date-headings
+
+* Fix Categories (2.0.?)
+  - better docs for categories in Record.pm
+
+* Load prefs in DB modules (2.1.?)
+
+* Import/Export prefs in Converter modules (2.?.?)
+
+* VersionDelegator to handle different versions for Prefs and Records
+  (e.g. Given version "30", it would delegate to Prefs v0.30 and
+  Records v0.23).  This will be necessary the next time the prefs
+  format changes but the Record format stays the same.
+
+* require p5-palm 1.2.4
+
+* add 'id' field to the database/converter objects, as per Danny O'Brien's
+  request:
+
+    One minor change I did make to the code (in an awfully hacky way, I'm afraid)
+    was reflect up the 'id' value of the raw record into
+    Palm::Progect::DB_*::Record classes. The id field is useful if you're doing
+    syncing between data sources - you can check to see whether the strange record
+    you're looking at is a completely new file which you should create in the other
+    source, or just a massively edited version of a record you already have.
+
+    I didn't quite look into how you're doing your class accessors, so I just stuck
+    it in the class hash, thusly:
+
+    --- /home/danny/tmp/Palm-Progect-2.0.1/lib/Palm/Progect/DB_18/Record.pm 2002-06-01 00:21:40.000000000 -0700
+    +++ Record.pm   2002-07-21 08:53:26.000000000 -0700
+    @@ -48,6 +48,7 @@
+
+             $self->_parse_raw_record($args{'raw_record'}{'data'});
+             $self->category_id($args{'raw_record'}{'category'});
+    +        $self->{'id'} = ($args{'raw_record'}{'id'});
+         }
+
+     }

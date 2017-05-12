@@ -1,0 +1,52 @@
+=encoding utf8
+
+
+This is Perl module B<Plack::Middleware::RequestId>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Plack-Middleware-RequestId"><img src="https://secure.travis-ci.org/bayashi/Plack-Middleware-RequestId.png?_t=1467254265"/></a> <a href="https://coveralls.io/r/bayashi/Plack-Middleware-RequestId"><img src="https://coveralls.io/repos/bayashi/Plack-Middleware-RequestId/badge.png?_t=1467254265&branch=master"/></a> <a href="http://cpants.cpanauthors.org/dist/Plack-Middleware-RequestId"><img src="http://cpa
+nts.cpanauthors.org/dist/Plack-Middleware-RequestId.png"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Plack::Middleware::RequestId installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Plack::Middleware::RequestId
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Plack::Middleware::RequestId documentation is available as in POD. So you can do:
+
+    % perldoc Plack::Middleware::RequestId
+
+
+=head1 REPOSITORY
+
+Plack::Middleware::RequestId is hosted on github
+L<http://github.com/bayashi/Plack-Middleware-RequestId>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

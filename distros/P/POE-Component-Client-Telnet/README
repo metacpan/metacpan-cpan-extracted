@@ -1,0 +1,19 @@
+POE::Component::Client::Telnet is a non blocking version of Net::Telnet.
+It uses the POE framework. 
+
+POE::Component::Client::Telnet can be installed the usual ways:
+
+Through the CPAN shell:
+
+	perl -MCPAN -e 'install "POE::Component::Client::Telnet"'
+
+Or by downloading it and running the usual commands:
+
+	perl Makefile.PL
+	make test
+	make install
+
+The project needs your help.  If you're interested, please contact
+David Davis, at xantus@cpan.org.
+
+Thank you.

@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Pod-PseudoPod
+version:             0.15
+abstract:            A framework for parsing PseudoPod
+license:             ~
+author:              
+    - Allison Randal (allison@perl.org)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    HTML::Entities:                0
+    Pod::Simple:                   3.02
+    Test::More:                    0
+    Text::Wrap:                    98.112902
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

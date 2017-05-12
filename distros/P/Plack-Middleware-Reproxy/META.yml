@@ -1,0 +1,30 @@
+---
+abstract: 'Handle X-Reproxy-URL From Within Plack'
+author:
+  - 'Daisuke Maki C<< daisuke@endeworks.jp >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  HTTP::Request::Common: 0
+  Test::TCP: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Reproxy
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Furl: 0
+requires:
+  Plack: 0
+  URI: 0
+resources:
+  repository: git://github.com/lestrrat/Plack-Middleware-Reproxy.git
+version: 0.00004

@@ -1,0 +1,257 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 f8c21994eed85861d3f1d8a8bd35e8fa079b57b1 Build.PL
+SHA1 b06abf2457288984d01fe84ab7eb96548c7a0354 CONTRIBUTORS
+SHA1 3f4aaf44f21e66653d6094131db46c95a5def963 Changes
+SHA1 52d6625ce7bbb52961294a8af74fbef585f1ecd0 LICENSE
+SHA1 bd980a75451d4d03b95e58c9317aee33b2d31946 MANIFEST
+SHA1 78d0075165a0b84f4fa4aa592d37d435fe6a9083 META.json
+SHA1 79663c459d146e016667c664bd367311c415fad9 README.mkdn
+SHA1 f2cada29c8d5ab1d024fdf52a0a9fb8082137b3a bin/prophet
+SHA1 11f7a7d2ec2e324d93b3179d460da4b8792a538b dist.ini
+SHA1 735b96cff466878e7aa17784845be243fe9f1b8b doc/foreign-replicas
+SHA1 0a63fd76d2e2155e6fbf78edb70da5f0f7429654 doc/glossary
+SHA1 71790bf530eeafd2fe4b6cde6f717270d706e3d2 doc/jesse_test_env_setup
+SHA1 59bd9a7d29009e9cfd9189c16bf254f4250a2d42 doc/luid
+SHA1 27baa1b5a2d2622d4a72fc6ca93cc3147392ae21 doc/merging-and-conflicts
+SHA1 b8ae52be19cbaabd461d7749d559f70f5e024426 doc/notes-on-merging
+SHA1 041e8e27f1eb09a9f0817247fe42d3fad0a3e35c doc/repository-layout
+SHA1 54fc04082cb835fc4d4da06ab253c801a2d52d94 doc/tab-completion
+SHA1 e94da954f02b0315cfa4c7d3425b227b2580ca8d doc/todo
+SHA1 6e8c6f3c6c79201dc7843f212cb1205e29c20150 doc/web_form_handling
+SHA1 4c828a466956b397e7746f5a7eac838249cc97b6 etc/prophet.bash
+SHA1 10e7cfc89f1ed8f8875956719bbc9ac6c617d817 etc/prophet.zsh
+SHA1 e569ae18b88844caab2be014e5c6e5450feba64e lib/Prophet.pm
+SHA1 4fc193cd1eaf8ee2703966393d5ddacc3f89272b lib/Prophet/App.pm
+SHA1 b5b3491f859368be56e2a2f7a4b03e6fcee9c60d lib/Prophet/CLI.pm
+SHA1 80d4398f6d5e1f9eb047d84b851183db910e9f66 lib/Prophet/CLI/CollectionCommand.pm
+SHA1 e5023b87cb5a204fceca3ad4f400eff67d808d72 lib/Prophet/CLI/Command.pm
+SHA1 3a93ea834b36b3b5e11efab65711810e02a2345d lib/Prophet/CLI/Command/Aliases.pm
+SHA1 3a8f5c54828812a0cac76251d3a11a9f8772de39 lib/Prophet/CLI/Command/Clone.pm
+SHA1 1b9b1762d1afe8b4cfe57b58a87eafa8c0dddf76 lib/Prophet/CLI/Command/Config.pm
+SHA1 d63d63655a6a9a6f93c5a4376ee7b34eb40d22a5 lib/Prophet/CLI/Command/Create.pm
+SHA1 eab1ae872f0a66d1c0178c1bf45bc6552e0bc484 lib/Prophet/CLI/Command/Delete.pm
+SHA1 5628e14cca5a15e59707954c314ed1a7d49e5147 lib/Prophet/CLI/Command/Export.pm
+SHA1 20664fe8d0a17b42bc8fa6ba01c5d5e2c39bde2b lib/Prophet/CLI/Command/History.pm
+SHA1 911b2a16cfb8d86190baaeb497cad9730bbdf37c lib/Prophet/CLI/Command/Info.pm
+SHA1 fc52a1844b74ea4ac8a4f351b606de235d6d949f lib/Prophet/CLI/Command/Init.pm
+SHA1 80df99e2c44c18fa74999cbcb15038c57670057f lib/Prophet/CLI/Command/Log.pm
+SHA1 92444d37d91917045b0eb51d058370dc2a58b0bd lib/Prophet/CLI/Command/Merge.pm
+SHA1 205379dedf92281e7cb532e2132e6fbf842855cf lib/Prophet/CLI/Command/Mirror.pm
+SHA1 c8174ced1bbcfd4299e6fd80f753b745cf2234c9 lib/Prophet/CLI/Command/Publish.pm
+SHA1 ae928800d10937d101fbf966eaa6f8ace94f092a lib/Prophet/CLI/Command/Pull.pm
+SHA1 67bb2695903bcfb07f1b7321eb8b5ac30f2eb235 lib/Prophet/CLI/Command/Push.pm
+SHA1 fd38cc19a704d9fc6baff3313eb822886b5c92bf lib/Prophet/CLI/Command/Search.pm
+SHA1 3be75943977b1ce17aecc310357fee4ea5b67a3e lib/Prophet/CLI/Command/Server.pm
+SHA1 d7e9b2bf56cf9079d46e838716d8c3a982d5f82f lib/Prophet/CLI/Command/Settings.pm
+SHA1 111b0198eb063daaacadf6d78422a560156d0737 lib/Prophet/CLI/Command/Shell.pm
+SHA1 8258466a0769a0b4577e1ab5326981b324bd663c lib/Prophet/CLI/Command/Show.pm
+SHA1 f84581723a2a8cb0945300f5319d9200d01f2dbb lib/Prophet/CLI/Command/Update.pm
+SHA1 d1514e007a90fc0b7bd591ce1aeffbfa5c53ece3 lib/Prophet/CLI/Dispatcher.pm
+SHA1 23e7b707b4e18440c6ff46e6c948182b8c73d256 lib/Prophet/CLI/Dispatcher/Rule.pm
+SHA1 63d0d3200e1bbe340958b249496131537a0e3d31 lib/Prophet/CLI/Dispatcher/Rule/RecordId.pm
+SHA1 2a89d8e885726e718b0072d27a74d507bfee9e48 lib/Prophet/CLI/MirrorCommand.pm
+SHA1 fd951bb0bc69df0c6722b17701ac0440bedbeaca lib/Prophet/CLI/Parameters.pm
+SHA1 bd5bf0c32fae37d06e1023873271b6bc08eb0ae9 lib/Prophet/CLI/ProgressBar.pm
+SHA1 8a8ca07577ded36ec6e1ec2a7f36cc1e0cc600c1 lib/Prophet/CLI/PublishCommand.pm
+SHA1 8afd321ccd4858e4cdaba23451c3fee9de181de6 lib/Prophet/CLI/RecordCommand.pm
+SHA1 42a10b3bef1a215492a5fad25be5fa42c653fc39 lib/Prophet/CLI/TextEditorCommand.pm
+SHA1 18898d3c4fd4abf86dbf391dd87c5c16d970718a lib/Prophet/CLIContext.pm
+SHA1 eb89820580cd2797030df917f5a591cdd4344a85 lib/Prophet/Change.pm
+SHA1 d1ba285c1efa487edda8c23d630d5c4764c23680 lib/Prophet/ChangeSet.pm
+SHA1 a1059254389743ed90dc1d61ff2ff25a1014e7ca lib/Prophet/Collection.pm
+SHA1 96e8814b8be5320261a0d66dbdb98f8afbe58e12 lib/Prophet/Config.pm
+SHA1 60334bd875679c84326799b9ebae452645136d7d lib/Prophet/Conflict.pm
+SHA1 fe2409da7f23588de846ac05c6c4f335d6b27d36 lib/Prophet/ConflictingChange.pm
+SHA1 75634e881dd78d2a7341c90c1948b67baa8138ca lib/Prophet/ConflictingPropChange.pm
+SHA1 898e3e313e01f9ff39b884cd4ad6fec32c116589 lib/Prophet/ContentAddressedStore.pm
+SHA1 74d4dab077e3caf7ff816c4dad444be8f9333b65 lib/Prophet/DatabaseSetting.pm
+SHA1 17177498e833fbbf969091f9ba2b39cb9c489dfb lib/Prophet/FilesystemReplica.pm
+SHA1 9f513b3839336e1299a5a1f406c5e015fac3f477 lib/Prophet/ForeignReplica.pm
+SHA1 94d1437c258a78060389ea41619a7567601acb92 lib/Prophet/Manual.pod
+SHA1 a41130d14e450412cc8b7a4c4bc43c2508d4753c lib/Prophet/Meta/Types.pm
+SHA1 92252bd88e856b1fee41e960b7e2b2fb668ba541 lib/Prophet/PropChange.pm
+SHA1 732f2747c5597c2c6891f953cc4b11b8555e368f lib/Prophet/Record.pm
+SHA1 ac985438ea0949e3f288f0ade07d87226fc61ba0 lib/Prophet/Replica.pm
+SHA1 2e34ca4acd8e88ac5db80b5484657e34bb47b7ad lib/Prophet/Replica/FS/Backend/File.pm
+SHA1 fa52697949929be0ac7f7944d341bbd25b7a241c lib/Prophet/Replica/FS/Backend/LWP.pm
+SHA1 f2ffbdc4c873cd9221d2eaf1430192954e4de73e lib/Prophet/Replica/FS/Backend/SSH.pm
+SHA1 bcdf10b48a6f99e3d047755c6be8ee27af771ed5 lib/Prophet/Replica/file.pm
+SHA1 2c6b22e579f473d29d72d8ef738377cf1f119bba lib/Prophet/Replica/http.pm
+SHA1 4e54d1f1bea17d7615ebc99788289dbe7883b8f2 lib/Prophet/Replica/prophet.pm
+SHA1 3198596badaa0e7810953165ad8b1d44471b5529 lib/Prophet/Replica/prophet_cache.pm
+SHA1 5f2ffb6909506db34f783468e2448b3b4bde2348 lib/Prophet/Replica/sqlite.pm
+SHA1 f6f1ec436251c316c96c761182742eb5fe1c4f60 lib/Prophet/ReplicaExporter.pm
+SHA1 1df92e50940ba2360dcf52e20ba7c9ddd486bf20 lib/Prophet/ReplicaFeedExporter.pm
+SHA1 18f785c09040780d8dc38a9704855f029bc1e7e2 lib/Prophet/Resolver.pm
+SHA1 6618544dfadf39fb05cc7d0dbf019465dc4946ad lib/Prophet/Resolver/AlwaysSource.pm
+SHA1 81ced2d0e3a67f60c961a86c0ee7c0519482f192 lib/Prophet/Resolver/AlwaysTarget.pm
+SHA1 8caf4e4a2fc9ba5b567e8c2075d39ed18f576604 lib/Prophet/Resolver/Failed.pm
+SHA1 7ae3fd4d22e67466df89ce69f7a3732220ec14d5 lib/Prophet/Resolver/Fixup/MissingSourceOldValues.pm
+SHA1 b65b74f810b32a50c7669a19429c1236d101a371 lib/Prophet/Resolver/FromResolutionDB.pm
+SHA1 98fdf18f4a6670c6a1944d887ddf562bd116b482 lib/Prophet/Resolver/IdenticalChanges.pm
+SHA1 06c0c39d23c6797e8375c93a35ce8c76f8e8ad38 lib/Prophet/Resolver/Prompt.pm
+SHA1 9fd69a34173f9d63e4317237ed8a5050e6c0efcc lib/Prophet/Server.pm
+SHA1 27f44f592e4d4acd27c53961f7503414f58c45f7 lib/Prophet/Server/Controller.pm
+SHA1 6e5f9612327d073136322d70e03f45cb0da37660 lib/Prophet/Server/Dispatcher.pm
+SHA1 0a6a446a7b928bcfe13a232b9a7d0bf6b992d72b lib/Prophet/Server/View.pm
+SHA1 9445b9ef8a914456ebcbfe412132bcd8aab02f0a lib/Prophet/Server/ViewHelpers.pm
+SHA1 6f7f2b22bfbe96521b2e5fc8bb1a98fe506552b7 lib/Prophet/Server/ViewHelpers/Function.pm
+SHA1 1ace3e742d1cf4006d915601a6062e1cedd520de lib/Prophet/Server/ViewHelpers/HiddenParam.pm
+SHA1 f695af7e03269aaf71c1611a728b366ca4a7986c lib/Prophet/Server/ViewHelpers/ParamFromFunction.pm
+SHA1 fc626febec9527dcef759223290c8be6a7d40d1d lib/Prophet/Server/ViewHelpers/Widget.pm
+SHA1 e37cf7f29f70fb974bdd28c66ed5ae30ee943244 lib/Prophet/Test.pm
+SHA1 56cfc82eea49d218b1fc9d867c2f56a71dd726ac lib/Prophet/Test/Arena.pm
+SHA1 e2cb4853454115b067b1df266603224afd6cb24b lib/Prophet/Test/Editor.pm
+SHA1 f2d9db6033a46a336cc9e020f779bf131d65d39f lib/Prophet/Test/Participant.pm
+SHA1 dc7584c78a23b8e714ee2ff683c13322b16514eb lib/Prophet/UUIDGenerator.pm
+SHA1 621a8dc804a57bdf88019f202d9a1a3fdc75f1b0 lib/Prophet/Util.pm
+SHA1 63869e93a2da02782c9e7350d6c06e768591e14e lib/Prophet/Web/Field.pm
+SHA1 ffa7bc04924a901b7fc47485b5e35907b6183940 lib/Prophet/Web/FunctionResult.pm
+SHA1 6d2e6c5a52b77ca87948fd9b8922b51878000d0e lib/Prophet/Web/Menu.pm
+SHA1 b6fe21b9ad86f456f2ac1fcfb41a4f33c1bee997 lib/Prophet/Web/Result.pm
+SHA1 7ca6fd77e5fed83f1e9247a70f7cf069369e6b2f perlcriticrc
+SHA1 51f209e96cdbfc26fed7c2b650f64840e34063d5 perltidyrc
+SHA1 1a64485a63f75b46177366635f6cb8e5f9eba851 share/web/static/jquery/css/indicator.gif
+SHA1 e7c01ceb3bbef6af63324dfec20c7bbd730be466 share/web/static/jquery/css/jquery.autocomplete.css
+SHA1 f80d0fda8262e57097e0d1ddaef6b50780a00f94 share/web/static/jquery/css/superfish-navbar.css
+SHA1 cc09787089006732ce3055c36f75cbef19b67299 share/web/static/jquery/css/superfish-vertical.css
+SHA1 ba69b2d3a1af594e9b0cbf82de96128fd46f623f share/web/static/jquery/css/superfish.css
+SHA1 05fa1fbc4b6541c3e8176d235766fa0e411e9931 share/web/static/jquery/css/tablesorter/asc.gif
+SHA1 307311e1752fa2c8dc63c91c684f2f1db3bc0a98 share/web/static/jquery/css/tablesorter/bg.gif
+SHA1 4177aef38e79be4088aca7350ef215cc053c3c9a share/web/static/jquery/css/tablesorter/desc.gif
+SHA1 27b30d87c26efc40539f431151d566d7023ecb60 share/web/static/jquery/css/tablesorter/style.css
+SHA1 e36a899d50b0f5fc9c0dba35b8a6c250950ae761 share/web/static/jquery/images/arrows-cccccc.png
+SHA1 848c456cab294ecd70dba52fed99cc57e0d07bce share/web/static/jquery/images/arrows-ffffff.png
+SHA1 7ea95cf0e24652315eac48a240a22512d775fb5d share/web/static/jquery/images/shadow.png
+SHA1 b8039e617353c17dae0751ea26ee04fa62a7c430 share/web/static/jquery/js/hoverIntent.js
+SHA1 1be9c3684054001f53fa7ff6d85ec3cb573a9cd2 share/web/static/jquery/js/jquery-1.2.6.min.js
+SHA1 07c97a538152bbf8e9c13dabb0c88b36d1b45940 share/web/static/jquery/js/jquery-autocomplete.js
+SHA1 59aa4b78dcec63204000f223d95144478faa4ff8 share/web/static/jquery/js/jquery.bgiframe.min.js
+SHA1 5db3fef1731924e8c20978e19939fdd48aef5963 share/web/static/jquery/js/jquery.tablesorter.min.js
+SHA1 a69a16027f443e635e5fd26648525a974cdeaffe share/web/static/jquery/js/pretty.js
+SHA1 b7b4fdd4a0aa451b888067ef4b69095cfb40dbf2 share/web/static/jquery/js/superfish.js
+SHA1 117e94086595338ea571402803f81d232a688994 share/web/static/jquery/js/supersubs.js
+SHA1 243d8954318e1c949d0654ab2ce1422989aa1c50 share/web/static/yui/css/reset.css
+SHA1 becd1816dfa1e94e6520f88b82b4b4e000c9518d t/00-compile.t
+SHA1 f23d916b89828e312a6bcd4357eeefcc14d906fa t/00-report-prereqs.t
+SHA1 5faf2c33131109949539d7d6af6bf09138262bf6 t/Settings/bin/settings
+SHA1 2302d47241ddf3ea96bd6d3a96214af69bf9f946 t/Settings/lib/App/Settings.pm
+SHA1 77dded30d3b5fb0360ae6a53899fa516191f5221 t/Settings/lib/App/Settings/Bug.pm
+SHA1 dc7b1e06576ce3f94982b900f481375d773ed284 t/Settings/lib/App/Settings/CLI.pm
+SHA1 f4f7b3e0d2e1e7cfe5438fe34b9000b346d6babe t/Settings/lib/App/Settings/Test.pm
+SHA1 e9806074e8135aa0e5d7f5de5c91ec771e2f4e24 t/Settings/t/database-settings-editor.t
+SHA1 db1a248d0c6ea99b7b249c733386932438ebc582 t/Settings/t/sync-database-settings.t
+SHA1 878dd20fa1e88bf103228161ad7cfd3344a0a697 t/WebToy/bin/webtoy
+SHA1 f35de2fee63590bc646443947d7c090350d02be8 t/WebToy/lib/App/WebToy.pm
+SHA1 b0d7142166895c05a6d0603ffa8a077031742651 t/WebToy/lib/App/WebToy/CLI.pm
+SHA1 ab1f8a440561677fb54201de465e38384a9cf22a t/WebToy/lib/App/WebToy/Collection/WikiPage.pm
+SHA1 44708e71572758f2c7cd1a30c9e1c030cbda9fb1 t/WebToy/lib/App/WebToy/Model/WikiPage.pm
+SHA1 109c36f4303a11c84f327c9900211c7a7fd572d8 t/WebToy/lib/App/WebToy/Server/Dispatcher.pm
+SHA1 424c4b09e91eeb3b1181c85fdf4d9678c61d686e t/WebToy/lib/App/WebToy/Server/View.pm
+SHA1 e7ff75054e947cd6ae4d40248fcab1f8d32198b4 t/aliases.t
+SHA1 636f7bac5ffe7a3fdd4ac44c2f506712310c3e95 t/aliases_with_quotes.t
+SHA1 a7d9a17304612e207b2c13f11ab3f32d7c078e2d t/canonicalize.t
+SHA1 868a3fcf9cb0e2780cfc70aaac5b028cc51c3655 t/cli-arg-parsing.t
+SHA1 61de49c8c9cdfaac56d6a94f0bf2b40206f2e6f8 t/cli-arg-translation.t
+SHA1 508e1a0d3ab1798dffe466452bcd0cd54a1c9de3 t/cli.t
+SHA1 8962ce4c21fc0cf0e2db498b0111f85ab6e0fa73 t/config.t
+SHA1 526ea4f56053a9e65bd752e0de473b7e72039a96 t/create-conflict.t
+SHA1 467e196779243a3fe08b92024a6bb3ab81085817 t/create.t
+SHA1 e230aff990891ea34310fe8cdb45370633d0b002 t/data/aliases.tmpl
+SHA1 06c16fc6994c6f663226a70e34a71a7219967eb1 t/data/settings-first.tmpl
+SHA1 f9b5ed6b3f47fcdbd2663373b8e22e6d043f0b8a t/data/settings-second.tmpl
+SHA1 688f57e1edb3436b37349be33586c6c80d912e56 t/data/settings-third.tmpl
+SHA1 fc1547e3e617f8d39c7fec458ea9610d2cf8236e t/database-settings.t
+SHA1 a27f8d8097c6839c225a2f59e9b2260c47437d6f t/default.t
+SHA1 b77dfc5288b9691d9be3fd394370b3966c15eeee t/delete-delete-conflict.t
+SHA1 03c8a045a8d049a62316ba9d64c76adc756aa652 t/edit.t
+SHA1 d5bd2f3e06081fed667da1160cfb8b7979c91c6b t/error.t
+SHA1 78ecd9712fd1ba645cd35e6f0175ee64ee27f7b2 t/export.t
+SHA1 344fd3d88bc5390b9a5102428bd94fba009cd1cb t/generalized_sync_n_merge.t
+SHA1 2170ce751e01cb4d794863ce7e535cd42486c481 t/history.t
+SHA1 954d5afdfffee73d059710bc11a10589f7c905df t/info.t
+SHA1 752d9237bf78c0ca0b9df84169ab157724791af1 t/init.t
+SHA1 217cab9c2379ff2e7d0157d8583b432948694990 t/lib/TestApp/Bug.pm
+SHA1 551e56a13f1ea224f536a3754e3ad6738f2c9c83 t/lib/TestApp/BugCatcher.pm
+SHA1 db67331696b5828e469a596512f93cd0d206679e t/lib/TestApp/Bugs.pm
+SHA1 d014385c560c0018dba31be42ce45330152d049c t/lib/TestApp/ButterflyNet.pm
+SHA1 a88ca00e6a1a3f81b1f99aba1e6747632b682e3e t/local_metadata.t
+SHA1 9430c273d96c80b8c1856afd3dcdea9179600d04 t/log.t
+SHA1 a8a5da8080eab449379875ad34d7cec63fa54c39 t/luid.t
+SHA1 7533de10a9c856512843ebe735f06b26d6f442c7 t/malformed-url.t
+SHA1 f732cd7237c171fbe885a5140d7e879f4766f05a t/non-conflicting-merge.t
+SHA1 884688b0988a7317fef372bbf27fa6886c57c097 t/publish-html.t
+SHA1 f8630fb98e7e70e732d6ec06ec78aa681c64f98e t/publish-pull.t
+SHA1 7ec9db79f2eb973373b2fad37ac6ee7b28dfb138 t/real-conflicting-merge.t
+SHA1 5fb1a1b9f4e9e920abd1a39d516f8e4910a85518 t/record-types.t
+SHA1 e1e042e5c1a1c0879c8f9d6216eb3aaf80b70f9a t/references.t
+SHA1 afba257f63387c80e0b055d0ea8f32bf0aa73d05 t/res-conflict-3.t
+SHA1 bb92d470bddc61bed143d7dc61fa8b93beb9f24c t/resty-server.t
+SHA1 68fdcd53464c8b897dbad6eeb908613985b9245a t/search.t
+SHA1 fdcc66ae9df35687b1429c5dfbce7ba6b415820d t/simple-conflicting-merge.t
+SHA1 7f849da2576b19ad37d8b051e474b8d32704fa7e t/simple-push.t
+SHA1 34c3a1c711811d15c58d76815f5e5dba79c55b36 t/sync-change-to-original-source.t
+SHA1 9c61afcc04218981e8dfbe0fd301c9f6de41800f t/sync-delete-conflict.t
+SHA1 d420c317e7743e03c9064345609e4820e986117f t/sync-ticket.t
+SHA1 126b4aedfed0b44fbc2a29adad9052f40802a0a5 t/sync_3party.t
+SHA1 274715611b2a34ef4b40b3f81295e5c9e383e090 t/test_app.conf
+SHA1 7f7750c82283713ffafaf51c97751b233d6c913f t/usage.t
+SHA1 e342b1563eda9725884dd12b98f2ade60fede4bb t/use.t
+SHA1 dfd34dc60aac94bf5cc5619580e0d9fa12a1a93d t/util.t
+SHA1 8943998a2cf14e49ff2029d425f569ee674ad493 t/validate.t
+SHA1 0871c0885524d49612f1a0bc3332e7d3038d8230 t/validation.t
+SHA1 10c5a3591188c086df31f9ef04f64d894acdd164 tidyall.ini
+SHA1 e7ff12d158e2690257e1d93ff65b84c637efdf78 tools/dump_changesets.idx
+SHA1 031d417b9aea316d78c8e683256acc67e4013ef5 tools/dump_record.idx
+SHA1 12d80978c0e6fe6c9cf71e801b23a145c2a6b238 tools/run_test_yml.pl
+SHA1 fc73e3c66f6fcf5d33abc56b9cece9175a444af5 tools/taste_recipe
+SHA1 e3c633d29005a72652f099d78767eda6fbdbccda weaver.ini
+SHA1 090320cfe20b816e6483a27a975c637c927a36ff xt/01-dependencies.t
+SHA1 6f846f7ede312098a614207bcea6fdb2207b8030 xt/author/test-eol.t
+SHA1 199b3d456352d36185a3f28aaf40efb0475dacab xt/release/cpan-changes.t
+SHA1 cbc5b72710fb645c559b78c8ac8b879f62aff326 xt/release/dist-manifest.t
+SHA1 c6cd63148d20bda841ee21381cd6e9a62b7e6863 xt/release/kwalitee.t
+SHA1 7b52b909acf6cd52733f8f226f92147ed76a2717 xt/release/meta-json.t
+SHA1 bae663945a4380ca95a6ba5d8f5e42d2946e0629 xt/release/minimum-version.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 c769b078112da535475284c9fe0cf6b1c047dbdd xt/release/no-tabs.t
+SHA1 4c599e8a4ebb7a899f90ee3c235a64fdbc7e2c06 xt/release/pod-coverage.t
+SHA1 4146b75714ac972231d12d4fb93e764817a5eb0b xt/release/pod-linkcheck.t
+SHA1 fae7a9531fdd000d4075a378b828a7aa2508491d xt/release/pod-no404s.t
+SHA1 9934d36e45e1143c1a54658bc48872e0591af41b xt/release/pod-syntax.t
+SHA1 29865e58a16b5465bb7efbd399ad16ba72f50695 xt/release/portability.t
+SHA1 7737dadb6441d9eaddc571caf03e6c114cd4a643 xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBCgAGBQJRmZgQAAoJEOpmRc2kYGBPlKkP/1s3YXZet7RZBg9CWQ1hzJx7
+LlvNMdAyawW8/hjciIJL3G+j7OXYwKJUqUJljM89bqCNcYi8lB8AQOEmqoWutxA1
+tf/d7rePG4nshO83UeZmAxcbglrVEoTOpcKes6DLOuYr0iTck3Fj76751oGg6xyg
+wmVmUyuVA+WhrNJ7mEQLV6nIpHm9zF0yGXL3xCDMV01X6W8/FmR6R3nFuCmSZgch
+tiX/fzhxKJKcLkqE5vkaFfDB/w5MkUrF/IXiUvAaDNgQvtTcW1E5gWjWHn5uLG8B
+5wVUDPsMMS/soYFP36gJMszKab34L/omyIEVzRsOt0QIrjyEzgeaDYy/m4xBIy3k
+FusELlkCW5+IlJj//XmKxne8ngi4YSgqHHBTYhAKIaZLS9s/1Vo3ZrjeB8bPwlzw
+nFuHI5pu7uikLh0hNIWQqtL3q4kJQfzBvok7aOwQamkYGJo5cjhb00fzGt40zvMp
+h0wqzUsBB4KPeOl5RJ4OvZcxRwyVgjbfCxsFrT78zzKa9IMR/MjjN3zpsozkgQno
+QR0dz0zqqUIPdx5idqSxOklosvsPOJCz83HpbuUc+Kg3JwQkjdHYOWWREBEclHQZ
+KTT4B7c7TOv8E3k+DQjooFlfiZgQ0RmqtPGkxqTDUv5bgyHN1tdQxFmB3z98gBJ8
+j3Y5/+Ml+1nOzZzxGXgv
+=wM1r
+-----END PGP SIGNATURE-----

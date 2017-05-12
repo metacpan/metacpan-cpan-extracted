@@ -1,0 +1,46 @@
+Revision history for Perl extension Perl-Lint
+
+0.25 2016-09-27T02:08:05Z
+
+    - Fix interaction with B::Keywords properly (Tom Hukins++)
+
+0.24 2016-05-22T16:37:08Z
+
+    - Test fixes for B::Keywords 1.15 (Tom Hukins++)
+
+0.23 2015-05-30T04:03:15Z
+
+    - Fix bug about analysis of dereference (@daleevans++)
+
+0.22 2015-04-04T16:53:59Z
+
+    - Add testing module (Test::Perl::Lint)
+
+0.21 2015-04-03T05:26:40Z
+
+    - Fix line number to point out the violation
+
+0.20 2015-03-28T15:52:01Z
+
+    - Fix some bugs
+    - Implement some policies
+    - Support `## no lint` annotation!
+
+0.11 2015-01-26T16:01:45Z
+
+    - Implement some remained policies
+    - Bug fix
+
+0.10 2014-10-24T07:21:09Z
+
+    - original not development version
+
+0.01_02 2014-08-29T04:48:45Z
+
+    - Implement new policies
+    - Add filter mechanism
+
+0.01_01 2014-08-12T06:53:40Z
+
+    - original version
+

@@ -1,0 +1,11 @@
+Revision history for perl module Path::Map
+
+0.04 2014-02-25
+    - Added support for wildcards
+
+0.03 2013-11-19
+    - Added missing dependency
+
+0.02 2013-11-18
+    - Initial version
+

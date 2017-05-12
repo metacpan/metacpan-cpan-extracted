@@ -1,0 +1,28 @@
+*TODO*
+
+- A tutorial!  POE::Component::Generic is hard!
+- A generalised factory class, in case a constructor requires coderefs
+
+- Better contexts for error messages [caller]
+- ->call, ->yield and ->method should return the request/response ID so
+    that it can be corrolated with the response.
+- User data in the request data hash shouldn't be serialised
+- Test case for Net::DNS
+- Test case for some core blocking module
+- Leak test
+- Error conditions could be reported with ErrorEvent.
+- Document how to overloading POE::Component::Generic::Child, which 
+    could be necessary for more complex modules.
+- Package profiles :
+    POE::Component::Net::SSH2 (wrapper for Net::SSH2) then, when someone
+        wants to write a pure-POE SSH2 module, they already have an
+        interface and test cases to write too.
+    PoCo::Generic's data hash ({event=>''}) becomes de facto 
+        inter-component calling convention.  I WIN.
+- { event=>"__AUTO__" } called from event "foo1" will be converted into
+    { event=>"foo2" }
+- The object returned by ->spawn and used to call methods needs to be
+    different from the object used internaly by PoCo::Generic so we stop
+    polluting its namespace
+- Respawn the child, like EasyDBI does
+- A tutorial about factory methods, etc

@@ -1,0 +1,29 @@
+---
+abstract: 'Simple worker support do jobs in parallel processes.'
+author:
+  - 'Night Sailer(Pan Fan) < nightsailer{at}gmail dot com >'
+build_requires:
+  ExtUtils::MakeMaker: 6.62
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parallel-QueueWorker
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moose: 2.0401
+  Moose::Object: 2.0401
+  Parallel::ForkManager: 0
+  Test::More: 0.98
+  YAML::Any: 0.77
+  feature: 1.16
+  perl: 5.012
+version: 0.001

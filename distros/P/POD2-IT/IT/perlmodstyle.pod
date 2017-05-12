@@ -1,0 +1,860 @@
+=head1 NOME
+
+perlmodstyle - Guida alla scrittura con stile di moduli Perl
+
+=head1 INTRODUZIONE
+
+Questo documento contiene un tentativo di fornire delle linee guida
+della comunitE<agrave> Perl per scrivere moduli. Estende le
+raccomandazioni che si trovano in L<perlstyle>, che E<egrave> da considerarsi
+propedeutico alla lettura di questo documento.
+
+Sebbene questo documento sia destinato ad ogni autore di moduli, esso
+E<egrave> dedicato particolarmente a quegli autori che desiderino pubblicare i
+loro moduli su CPAN.
+
+L'attenzione E<egrave> posta piE<ugrave> su elementi di stile che sono visibili agli
+utenti di un modulo, che su quelle parti che sono visibili esclusivamente
+dagli sviluppatori del modulo. Ad ogni modo, molte delle linee guida
+presentate in questo documento possono essere estrapolate e applicate
+con successo al codice interno di un modulo.
+
+Questo documento differisce da L<perlnewmod> in quanto contiene consigli
+di stile piuttosto che una guida introduttiva alla creazione di
+moduli CPAN. Contiene una lista di requisiti da verificare affinchE<eacute>
+i moduli siano conformi alla miglior pratica, senza necessariamente
+descrivere in dettaglio il metodo per ottenere ciE<ograve>.
+
+Tutti i consigli contenuti in questo documento sono stati racimolati
+da lunghe conversazioni con esperti autori CPAN e utenti. Ogni consiglio
+che troverete E<egrave> il risultato di precedenti errori. Queste informazioni
+sono qui raccolte per aiutarvi ad evitare di ripetere gli stessi errori
+ed il lavoro aggiuntivo che sarebbe inevitabilmente necessario per aggiustarli.
+
+La prima parte di questo documento fornisce una lista di verifica da
+consultare punto per punto; le parti successive forniscono una 
+descrizione piE<ugrave> dettagliata degli oggetti inclusi nella lista.
+La parte finale, "I tranelli piE<ugrave> comuni", descrive alcuni dei piE<ugrave> comuni
+errori commessi dagli autori CPAN.
+
+=head1 RAPIDA LISTA DI VERIFICA
+
+Per i dettagli a proposito delle singole voci in questo elenco, si veda
+sotto.
+
+=head2 Prima di iniziare
+
+=over 4
+
+=item *
+
+Non reinventate la ruota
+
+=item *
+
+Correggete, estendete o fornite una sottoclasse per un modulo esistente
+quando ciE<ograve> E<egrave> possibile
+
+=item *
+
+Fate una cosa e fatela bene
+
+=item *
+
+Scegliete un nome appropriato
+
+=back
+
+=head2 Le API
+
+=over 4
+
+=item *
+
+Le API dovrebbero essere comprensibili da un programmatore di medie capacitE<agrave>
+
+=item *
+
+Metodi semplici per compiti semplici
+
+=item *
+
+Separate le funzionalitE<agrave> dall'output
+
+=item *
+
+Date nomi consistenti a subroutine e metodi
+
+=item *
+
+Date dei nomi ai parametri (in hash o hashref [riferimenti ad hash, NdT])
+quando ci sono piE<ugrave> di due parametri
+
+=back
+
+=head2 StabilitE<agrave>
+
+=over 4
+
+=item *
+
+Assicuratevi che il vostro modulo funzioni con C<use strict> e C<-w>
+
+=item *
+
+Moduli stabili dovrebbero garantire la compatibilitE<agrave> all'indietro
+
+=back
+
+=head2 Documentazione
+
+=over 4
+
+=item *
+
+Scrivete la documentazione in POD
+
+=item *
+
+Documentate lo scopo, l'ambito e le destinazioni d'uso.
+
+=item *
+
+Documentate ogni metodo o subroutine pubblicamente accessibile, compresi parametri e
+valori restituiti
+
+=item *
+
+Fornite degli esempi di utilizzo nella vostra documentazione
+
+=item *
+
+Fornite un file README [LEGGIMI, NdT] e possibilmente anche note di realizzazione, changelog [registro dei cambiamenti, NdT], ecc
+
+=item *
+
+Fornite dei link per ulteriori informazioni (URL, email)
+
+=back
+
+=head2 Considerazioni sulla distribuzione
+
+=over 4
+
+=item *
+
+Specificate i prerequisiti nel Makefile.PL o nel Build.PL
+
+=item *
+
+Specificate i requisiti della versione del Perl con C<use>
+
+=item *
+
+Includete dei test nel vostro modulo
+
+=item *
+
+Utilizzate uno schema di numerazione per le versioni sensato e consistente
+(X.YY E<egrave> l'usuale schema di numerazione dei moduli Perl)
+
+=item *
+
+Incrementate il numero di versione per ogni cambiamento, non importa quanto sia piccolo
+
+=item *
+
+Preparate il modulo per la distribuzione utilizzando "make dist"
+
+=item *
+
+Scegliete una licenza appropriata (GPL/Artistic E<egrave> una buona scelta di default)
+
+=back
+
+=head1 PRIMA DI INIZIARE A SCRIVERE UN MODULO
+
+Provate a non buttarvi a capofitto nello sviluppo del vostro modulo senza
+aver speso un po' di tempo in precedenza a pensarci su. Un minimo di
+precauzione puE<ograve> evitarvi un sacco di lavoro in seguito.
+
+=head2 E<Egrave> giE<agrave> stato fatto in precedenza?
+
+Potreste anche non aver bisogno di scrivere un modulo. Controllate che
+non sia giE<agrave> stato fatto in Perl ed evitate di reinventare la ruota
+a meno che non abbiate una buona ragione per farlo.
+
+Buoni punti di partenza per cercare moduli giE<agrave> esistenti includono 
+http://search.cpan.org/ e la lista modules@perl.org
+
+Se un modulo giE<agrave> esistente fa B<quasi> quello che volete, prendete in
+considerazione la possibilitE<agrave> di scrivere voi stessi una patch, una
+sottoclasse, o una estensione per il modulo esistente anzichE<eacute> riscriverlo.
+
+=head2 Fate una cosa e fatela bene
+
+A rischio di dichiarare ovvietE<agrave>, i moduli sono fatti per essere modulari.
+Uno sviluppatore Perl dovrebbe essere in grado di utilizzare moduli come
+componenti per costruire la propria applicazione. Ad ogni modo, E<egrave>
+importante che i componenti siano della forma giusta, e che lo
+sviluppatore non debba usare un componente grande quando ne basta uno
+piccolo.
+
+Il vostro modulo dovrebbe avere uno scopo chiaramente definito,
+descrivibile da non piE<ugrave> di una semplice frase. E<Egrave> possibile scomporre
+il vostro modulo in un gruppo di moduli correlati?
+
+Cattivo esempio:
+
+"PippoPluto.pm provvede a implementare il protocollo PIPPO e lo standard
+correlato PLUTO."
+
+Buon esempio:
+
+"Pippo.pm provvede a implementare il protocollo PIPPO. Pluto.pm
+implementa lo standard correlato PLUTO."
+
+CiE<ograve> significa che se uno sviluppatore necessita solamente di un modulo
+per lo standard PLUTO, non dovrebbe essere obbligato a installare
+ulteriori librerie per PIPPO.
+
+=head2 Di cosa E<egrave> composto un nome?
+
+Assicuratevi di scegliere in anticipo un nome appropriato per il vostro
+modulo. Questo sarE<agrave> utile per trovare e ricordare il vostro modulo,
+e renderE<agrave> piE<ugrave> intuitivo programmarci.
+
+Quando date un nome al vostro modulo, prendete in considerazione i seguenti
+accorgimenti:
+
+=over 4
+
+=item *
+
+Siate descrittivi (cioE<egrave> descrivete accuratamente le finalitE<agrave> del modulo).
+
+=item * 
+
+Verificate la consistenza con moduli giE<agrave> esistenti.
+
+=item *
+
+Descrivete le funzionalitE<agrave> del modulo, non l'implementazione.
+
+=item *
+
+Evitate di iniziare una nuova gerarchia dal livello piE<ugrave> alto, specialmente
+se E<egrave> giE<agrave> presente una gerarchia apposita sotto la quale potreste inserire
+il vostro modulo.
+
+=back
+
+Dovreste contattare modules@perl.org per chiedere opinioni sul nome del
+vostro modulo prima di renderlo pubblico. Dovreste inoltre provare a
+chiedere consiglio a chi ha giE<agrave> familiaritE<agrave> con il dominio delle
+applicazioni del modulo e con il sistema dei nomi di CPAN. Gli autori di
+moduli simili o moduli con nomi simili potrebbero essere un buon
+punto di partenza.
+
+=head1 PROGETTARE E SCRIVERE IL VOSTRO MODULO
+
+Considerazioni per la progettazione e la stesura di moduli:
+
+=head2 OO o non OO?
+
+Il vostro modulo puE<ograve> essere orientato agli oggetti (OO) oppure no, o
+puE<ograve> disporre di entrambi i tipi di interfacce. Ci sono pro e contro
+per le due tecniche, che devono essere presi in considerazione quando
+progettate le vostre API.
+
+E<Egrave> opinione di Damian Conway [autore di "Object Oriented Perl", NdT] che 
+l'utilizzo di Perl OO debba essere preso in considerazione:
+
+=over 4
+
+=item * 
+
+Quando il sistema E<egrave> di grandi dimensioni o E<egrave> probabile che lo diventi
+
+=item * 
+
+Quando i dati sono aggregati in strutture distinte che diventeranno oggetti
+
+=item * 
+
+Quando i tipi dei dati formano una gererchia naturale che puE<ograve> trarre
+beneficio dal concetto di ereditarietE<agrave>
+
+=item *
+
+Quando le operazioni sui dati variano a seconda del tipo dei dati
+(rendendo praticabile la chiamata polimorfica di metodi)
+
+=item *
+
+Quando E<egrave> plausibile che nuovi tipi di dato siano introdotti in seguito
+nel sistema e dovranno essere manipolati da codice esistente
+
+=item *
+
+Quando interazioni tra dati sono meglio rappresentati da operatori in
+overload
+
+=item *
+
+Quando l'implementazione dei componenti del sistema E<egrave> suscettibile
+di cambiamento nel tempo (e di conseguenza dovrebbe essere incapsulata)
+
+=item *
+
+Quando il progetto del sistema E<egrave> di per sE<eacute> orientato agli oggetti
+
+=item *
+
+Quando il software verrE<agrave> utilizzato da una parte considerevole del
+codice utente. (e l'incapsulazione sarE<agrave> utile per cambiamenti
+nell'implementazione)
+
+=item *
+
+Quando molte operazioni distinte dovranno essere compiute sullo stesso
+insieme di dati.
+
+=back
+
+Valutate con attenzione se lo stile OO E<egrave> appropriato per il vostro
+modulo. Programmazione OO gratuita genera API complesse che sono
+difficili da capire o utilizzare per il programmatore di medie capacitE<agrave>.
+
+=head2 Progettare le vostre API
+
+Le vostre interfacce dovrebbero essere comprensibili per un programmatore
+di medie capacitE<agrave>.
+Le seguenti linee guida possono aiutarvi a giudicare se le vostre API
+sono sufficientemente chiare:
+
+=over 4
+
+=item Scrivete routine semplici che fanno cose semplici.
+
+E<Egrave> meglio scrivere molte routine semplici che poche monolitiche.
+Se la vostra routine si comporta in maniera significativamente
+diversa a seconda dei suoi parametri, E<egrave> un segno che dovreste
+avere due (o piE<ugrave>) routine separate.
+
+=item Separate le funzionalitE<agrave> dall'output.  
+
+Restituite i dati in output nella forma piE<ugrave> generica possibile e
+permettete all'utente di scegliere come utilizzarli.
+La forma piE<ugrave> generica possibile E<egrave> di solito una struttura dati del
+Perl che puE<ograve> essere usata per generare un report testuale, HTML,
+XML, una query per database, o qualsiasi altra cosa di cui i vostri
+utenti abbiano bisogno.
+
+Se la vostra routine esegue una iterazione attraverso un certo tipo di
+lista (tipo una lista di file, o record di un database) potreste
+prendere in considerazione di fornire una "callback" [richiamo, NdT]
+in modo tale che l'utilizzatore possa manipolare a turno ogni
+elemento della lista.
+File::Find ne fornisce un esempio con la sintassi C<find(\&wanted, $dir)>.
+
+=item Fornite scorciatoie e valori di default sensati.
+
+Non costringete ogni utilizzatore del modulo a fare le stesse acrobazie per
+raggiungere risultati semplici. Potete sempre includere dei parametri opzionali
+o routine per i comportamenti piE<ugrave> complessi oppure non standard. Se la maggior
+parte degli utilizzatori devono digitare le stesse poche identiche linee di
+codice quando iniziano ad utilizzare il vostro modulo, E<egrave> segno che avreste
+dovuto considerare quel particolare comportamento come default. Un altro
+buon indicatore del fatto che dobbiate utilizzare comportamenti di default
+E<egrave> quando la maggior parte dei vostri utenti invocano le vostre routine
+con gli stessi parametri.
+
+=item Convenzioni per i nomi
+
+Dovreste dare nomi in maniera consistente. Per esempio, E<egrave> meglio avere:
+
+	mostra_giorno();
+	mostra_settimana();
+	mostra_anno();
+
+che
+
+	mostra_giorno();
+	settimana_mostra();
+	visualizza_anno();
+
+Questo vale parimenti per nomi di metodi, parametri, e qualsiasi altra cosa
+che sia visibile all'utilizzatore (e molte cose che non lo sono!).
+
+=item Passaggio dei parametri
+
+Utilizzate parametri con nome. E<Egrave> piE<ugrave> facile utilizzare un hash come questo:
+
+    $oggetto->fai_qualcosa(
+	    nome => "ciccio",
+	    tipo => "testo",
+	    dimensioni => 1024,
+    );
+
+... che avere una lunga lista di parametri senza nome come questo:
+
+    $oggetto->fai_qualcosa("ciccio", "testo", 1024);
+
+Sebbene la lista di parametri funzioni bene per uno, due o anche tre
+parametri, piE<ugrave> parametri sono difficili da ricordare per
+l'utilizzatore del modulo e ardui per la gestione da parte dell'autore
+dello stesso. Se volete aggiungere un nuovo parametro, dovrete
+aggiungerlo alla fine della lista per retrocompatibilitE<agrave>, e questo
+probabilmente renderE<agrave> non intuitivo l'ordinamento della lista.
+In piE<ugrave>, se diversi elementi possono essere indefiniti potreste
+imbattervi nella seguente poco attraente invocazione di metodo:
+
+    $oggetto->fai_qualcosa(undef, undef, undef, undef, undef, undef, 1024);
+
+Fornite valori di default sensati per quei parametri che possono averne.
+Non forzate l'utente a specificare parametri che avranno quasi sempre
+lo stesso valore.
+
+Il discorso sul passare gli argomenti in un hash o in un riferimento ad un
+hash E<egrave> in definitiva una questione di gusti.
+
+L'utilizzo di chiavi di hash che iniziano con un trattino (C<-name>) o
+completamente maiuscole (C<NAME>) E<egrave> una reliquia di vecchie versioni
+del Perl nelle quali delle normali stringhe di caratteri minuscoli non erano
+gestite correttamente dall'operatore C<=E<gt>>.
+Sebbene alcuni moduli conservino il maiuscolo o il trattino per ragioni
+storiche o per ragioni di gusti personali, la maggior parte dei nuovi
+moduli dovrebbero utilizzare semplici chiavi minuscole. Qualsiasi cosa
+scegliate, siate consistenti!
+
+=back
+
+=head2 Strict e messaggi di warning
+
+Il vostro modulo dovrebbe funzionare con successo con la direttiva strict
+e senza generare alcun messaggio di warning. Il vostro modulo dovrebbe
+inoltre gestire il controllo di dati potenzialmente dannosi
+(taint-checking) quando ciE<ograve> E<egrave> appropriato, sebbene ciE<ograve> possa causare
+difficoltE<agrave> in molti casi.
+
+=head2 RetrocompatibilitE<agrave>
+
+Moduli "stabili" non dovrebbero interrompere la retrocompatibilitE<agrave> senza
+che passi almeno una lunga fase di transizione e un cambiamento di primaria importanza
+nel numero di versione.
+
+=head2 Gestione degli errori e messaggi
+
+Quando il vostro modulo si imbatte in un errore dovrebbe fare una
+o piE<ugrave> cose delle seguenti:
+
+=over 4
+
+=item *
+
+Restituire un valore indefinito.
+
+=item *
+
+Impostare C<$Modulo::errstr> o simili (C<errstr> E<egrave> un nome comune
+utilizzato da DBI e da altri moduli usati di frequente; se scegliete
+qualcos'altro, assicuratevi di documentarlo chiaramente).
+
+=item *
+
+Utilizzate C<warn()> o C<carp()> per inviare messaggi su STDERR.  
+
+=item *
+
+Utilizzate C<croak()> solamente quando il vostro modulo non puE<ograve> in
+alcun modo gestire la situazione. (C<croak()> E<egrave> una versione migliore
+di C<die()> per l'utilizzo all'interno di moduli, che riporta i suoi
+errori dal punto di vista del chiamante. Si veda L<Carp> per dettagli
+su C<croak()>, C<carp()> e altre utili routine).
+
+=item *
+
+In alternativa a quanto detto sopra, potreste preferire di lanciare eccezioni
+utilizzando il modulo Error.
+
+=back
+
+Una gestione dell'errore configuarbile puE<ograve> essere molto utile per gli
+utenti. Si prenda in considerazione di offrire una scelta per i livelli
+di warning e messaggi di debug, un'opzione per spedire messaggi a un file
+esterno, un modo per specificare una routine di gesione di errore, o
+altre caratteristiche simili. Per queste opzioni, siate sicuri di
+garantire comportamenti di default legati agli utilizzi piE<ugrave> frequenti.
+
+=head1 DOCUMENTARE IL VOSTRO MODULO
+
+=head2 POD
+
+Il vostro modulo dovrebbe includere della documentazione destinata agli
+sviluppatori Perl. Dovreste utilizzare la "plain old documentation" (POD)
+[semplice vecchia documentazione, NdT] per la vostra documentazione
+tecnica generale, sebbene potreste voler scrivere documentazione
+aggiuntiva (white papers [libri bianchi, NdT], guide introduttive, ecc)
+in qualche altro formato.
+Dovrete includere i seguenti argomenti:
+
+=over 4
+
+=item *
+
+Una sinossi degli utilizzi comuni del modulo
+
+=item *
+
+Lo scopo, l'ambito e le destinazioni d'uso del vostro modulo.
+
+=item *
+
+L'utilizzo di ogni metodo o subroutine pubblicamente accessibile,
+compresi parametri e valori restituiti
+
+=item *
+
+Esempi di utilizzo
+
+=item *
+
+Fonti per ulteriori informazioni
+
+=item *
+
+Un indirizzo di posta elettronica per l'autore/curatore
+
+=back
+
+Il livello di dettaglio nella documentazione dei moduli Perl va da meno
+dettagliata a piE<ugrave> dettagliata. La vostra sezione SINOSSI dovrebbe
+contenere un esempio di utilizzo minimale (forse cosE<igrave> piccolo da consistere
+di una sola linea di codice; tralasciate i casi di utilizzo non comuni o
+qualsiasi cosa che non sia necessaria per la maggior parte degli utenti); 
+La sezione DESCRIZIONE dovrebbe descrivere il vostro modulo a grandi linee,
+di solito in pochi paragrafi; maggior dettaglio sui metodi e sulle routine del
+modulo, lunghi esempi di codice, o altro materiale approfondito dovrebbero
+essere localizzati in sezioni seguenti.
+Idealmente, coloro che hanno un po' di familiaritE<agrave> con il vostro modulo
+dovrebbero essere in grado di rinfrescarsi la memoria senza muovere la
+pagina in basso. Il vostro lettore, proseguendo con la lettura del documento,
+dovrebbe carpire una progressivamente maggior quantitE<agrave> di informazione.
+
+L'ordinamento consigliato per le sezioni per la documentazione di un modulo Perl
+E<egrave> il seguente:
+
+=over 4
+
+=item * 
+
+NAME
+
+[NOME, NdT]
+
+=item *
+
+SYNOPSIS
+
+[SINOSSI, NdT]
+
+=item *
+
+DESCRIPTION
+
+[DESCRIZIONE, NdT]
+
+=item *
+
+Una o piE<ugrave> sezioni o sottosezioni che forniscano ampi dettagli sui 
+metodi o subroutine pubblicamente accessibili, e su ogni altra
+informazione rilevante.
+
+=item *
+
+BUGS/CAVEATS/etc
+
+[BUG/CAVEAT-AVVERTENZE/ecc, NdT]
+
+=item *
+
+AUTHOR
+
+[AUTORE, NdT]
+
+=item *
+
+SEE ALSO
+
+[SI VEDA ANCHE, NdT]
+
+=item *
+
+COPYRIGHT and LICENSE
+
+[COPYRIGHT e LICENZA, NdT]
+
+=back
+
+Mettete la vostra documentazione vicino al codice che essa va a documentare (documentazione
+"inline"). Includete la documentazione POD per un dato metodo subito sopra alla
+subroutine del metodo. CiE<ograve> rende piE<ugrave> semplice mantenere la documentazione
+aggiornata, e vi evita di dover documentare ogni porzione di codice due volte
+(una volta nel POD e una volta nei commenti).
+
+=head2 README, INSTALL [INSTALLAZIONE, NdT], note di realizzazione, changelog
+
+Il vostro modulo dovrebbe inoltre includere un file README che descriva il
+modulo e contenga riferimenti a ulteriori informazioni (sito web, indirizzo di
+posta elettronica dell'autore). Dovrebbe essere incluso un file INSTALL,
+e dovrebbe contenere semplici istruzioni per l'installazione. Nel caso in
+cui utilizziate ExtUtils::MakeMaker di solito saranno:
+
+=over 4
+
+=item perl Makefile.PL
+
+=item make
+
+=item make test
+
+=item make install
+
+=back
+
+Nel caso in cui utilizziate Module::Build, di solito saranno:
+
+=over 4
+
+=item perl Build.PL
+
+=item perl Build
+
+=item perl Build test
+
+=item perl Build install
+
+=back
+
+Dovreste produrre delle note di rilascio o dei changelog per ogni versione del 
+vostro software, al fine di descrivere cambiamenti visibili all'utilizzatore, in 
+termini rilevanti per l'utente.
+
+=head1 CONSIDERAZIONI SUL RILASCIO
+
+=head2 Numerazione di versioni
+
+La numerazione delle versioni dovrebbe denotare almeno le distribuzioni principale e
+secondaria, e al limite le distribuzioni di ordine gerarchico inferiore.
+Una distribuzione principale E<egrave> tale per cui la maggior parte delle
+funzionalitE<agrave> ha subito un cambiamento, o nella quale sono state aggiunte importanti
+nuove funzionalitE<agrave>. Un rilascio minore si ha quando sono state aggiunte, o modificate, 
+poche funzionalitE<agrave>. Di solito si utilizzano dei numeri di distribuzioni gerarchicamente 
+inferiori per quei cambiamenti che non alterano la funzionalitE<agrave>, come le aggiunte alla 
+documentazione.
+
+Lo schema di numerazione piE<ugrave> comune delle versioni per CPAN E<egrave> del tipo:
+
+    1.00, 1.10, 1.11, 1.20, 1.30, 1.31, 1.32
+
+Una corretta numerazione di una versione per CPAN E<egrave> un numero in virgola mobile
+con almeno due cifre dopo la virgola. Potete verificare la conformitE<agrave> con
+CPAN utilizzando
+
+    perl -MExtUtils::MakeMaker -le 'print MM->parse_version(shift)' 'Pippo.pm'
+
+Se volete distribuire una versione 'beta' o 'alpha' di un modulo, ma non
+desiderate che CPAN.pm la includa nella lista come piE<ugrave> recente, utilizzate
+il trattino basso dopo il normale numero di versione seguito da almeno due
+cifre, per esempio 1.20_01. Se fate ciE<ograve>, E<egrave> consigliato il seguente idioma:
+
+  $VERSION = "1.12_01";
+  $XS_VERSION = $VERSION; # necessario solamente se avete codice XS
+  $VERSION = eval $VERSION;
+
+Con questo trucco MakeMaker leggerE<agrave> solamente la prima linea e poi
+il trattino basso, mentre l'interprete Perl valuterE<agrave> $VERSION
+e convertirE<agrave> la stringa in un numero. Operazioni successive che
+tratteranno $VERSION come un numero, saranno quindi in grado di farlo
+senza generare un messaggio di warning a proposito del fatto che $VERSION
+non sia un numero.
+
+Mai distribuire (anche una singola parola aggiunta alla documentazione)
+senza incrementare il numero. Anche una singola parola di documentazione
+aggiunta dovrebbe risultare in un cambiamento di versione a livello
+gerarchico inferiore.
+
+=head2 Prerequisiti 
+
+Gli autori di moduli dovrebbero valutare attentamente se affidarsi ad
+altri moduli ed a quali.
+
+E<Egrave> fondamentale scegliere moduli che siano il piE<ugrave> possibile stabili.
+In ordine di preferenza:
+
+=over 4
+
+=item *
+
+Moduli base del Perl
+
+=item *
+
+Moduli di CPAN stabili
+
+=item *
+
+Moduli di CPAN instabili
+
+=item *
+
+Moduli non disponibili su CPAN
+
+=back
+
+Specificate i requisiti di versione per i moduli Perl richiesti
+nei prerequisiti nel vostro Makefile.PL o Build.PL.
+
+Assicuratevi di specificare i requisiti della versione de Perl
+in Makefile.PL o in Build.PL e con C<require 5.6.1> o simile.
+Si veda la sezione C<use VERSIONE> di L<perlfunc/require> per i
+dettagli.
+
+=head2 Test
+
+Ogni modulo dovrebbe essere testato prima di essere distribuito (utilizzando 
+"make disttest"), ed i test dovrebbero anche essere disponibili per coloro
+che installano i moduli (utilizzando "make test").
+Per Module::Build dovrete utilizzare l'equivalente di C<make test>: C<perl Build test>.
+
+L'importanza di questi test E<egrave> proporzionale alla presunta stabilitE<agrave> di un
+modulo -- un modulo che pretende di essere stabile o che ambisce ad essere
+largamente utilizzato dovrebbe aderire il piE<ugrave> possibile ad uno stretto regime di
+test.
+
+Moduli che possono risultare utili per i vostri test (con impatto minimo sul
+vostro processo di sviluppo o il vostro tempo) includono Test::Simple,
+Carp::Assert e Test::Inline.
+Per strumenti di test piE<ugrave> sofisticati si vedano Test::More e Test::MockObject.
+
+=head2 Packaging [Pacchettizzazione, NdT]
+
+I moduli dovrebbero essere preparati per la distribuzione [Pacchettizzati, NdT]
+utilizzando uno degli strumenti di pacchettizzazione standard.
+Al momento potete scegliere tra ExtUtils::MakeMaker e Module::Build
+(quest'ultimo piE<ugrave> indipendente dalla piattaforma), per permettere di installare
+i moduli in maniera consistente.
+Se utilizzate ExtUtils::MakeMaker, potete usare "make dist" per creare il
+vostro pacchetto. Esistono strumenti per aiutarvi a fare la build del modulo
+in uno stile compatibile con MakeMaker. Questi includono ExtUtils::ModuleMaker
+e h2xs. Si veda anche L<perlnewmod>.
+
+=head2 Fornire una licenza
+
+Assicuratevi che il vostro modulo abbia una licenza, e che la sua versione integrale
+sia inclusa nella distribuzione (a meno che sia di un tipo comune ed i
+termini di licenza non richiedano di includerla).
+
+Se non sapete che licenza utilizzare, la cosiddetta "dual licensing" [doppia licenza, NdT] 
+sotto GPL e licenza Artistica (la stessa del Perl) E<egrave> una buona idea.
+Si veda L<perlgpl> e L<perlartistic>.
+
+=head1 I TRANELLI PIE<Ugrave> COMUNI
+
+=head2 Reinventare la ruota
+
+Ci sono alcune aree di applicazione che sono giE<agrave> molto, molto ben supportate da
+CPAN. Un esempio sono i sistemi di template, un altro sono i moduli per date
+e ore, e ce ne sono molti altri. BenchE<eacute> sia un rito di passaggio scrivere
+la vostra versione di queste cose, valutate attentamente se il mondo del Perl
+abbia veramente bisogno del vostro contributo.
+
+=head2 Provare a strafare
+
+Il vostro modulo farE<agrave> parte del toolkit di uno sviluppatore. Non sarE<agrave>, di
+per se, l'B<intero> toolkit. Aggiungere nuove funzionalitE<agrave> puE<agrave> essere
+una tentazione fino a quando il vostro codice non diventa un sistema monolitico invece
+che un insieme modulare di blocchi base.
+
+=head2 Documentazione inappropriata
+
+Non cadete nella trappola di scrivere per il lettore sbagliato. Il vostro
+principale destinatario E<egrave> uno sviluppatore con una ragionevole esperienza
+e con almeno una moderata conoscenza a proposito del dominio di applicazione
+del vostro modulo, che ha solo scaricato il modulo e vuole iniziare ad
+usarlo al piE<ugrave> presto possibile.
+
+Guide rapide, documentazione orientata all'utilizzo, pubblicazioni scientifiche,
+FAQ [domante poste di frequente, NdT] non sono appropriate nella documentazione
+principale di un modulo. Se proprio volete includerle, fatelo in un sotto-documento
+del tipo C<Vostro::Modulo::GuidaRapida> o C<Vostro::Modulo::FAQ> e fornite un
+link nella sezione SI VEDA ANCHE della documentazione principale.
+
+=head1 SI VEDA ANCHE
+
+=over 4
+
+=item L<perlstyle>
+
+Guida generale alla programmazione con stile in Perl
+
+=item L<perlnewmod>
+
+Come creare un nuovo modulo
+
+=item L<perlpod>
+
+Documentazione POD
+
+=item L<podchecker>
+
+Verifica la correttezza del vostro POD
+
+=item Programmi di utilitE<agrave> per il packaging [Pacchettizzazione, NdT]
+
+L<ExtUtils::MakeMaker>, L<Module::Build>
+
+=item Strumenti per effettuare test
+
+L<Test::Simple>, L<Test::Inline>, L<Carp::Assert>, L<Test::More>, L<Test::MockObject>
+
+=item http://pause.perl.org/
+
+Perl Authors Upload Server [Server di archiviazione per autori Perl, NdT].
+Contiene riferimenti a informazioni utili per gli autori dei moduli.
+
+=item Qualsiasi buon libro sull'ingegneria del software
+
+=back
+
+=head1 AUTORE
+
+Kirrily "Skud" Robert <skud@cpan.org>
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlmodstyle
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda http://pod2it.sourceforge.net/ .
+
+=head2 Traduttore
+
+Traduzione a cura di Raffaello Galli <galliraf at googlemail punto com>.
+
+=head2 Note del traduttore
+
+Se per caso si verificasse l'evenienza che qualche sviluppatore di lingua italiana
+voglia pubblicare il proprio modulo Perl su CPAN, ma per sua sfortuna non abbia
+sufficiente familiaritE<agrave> con la lingua inglese per scrivere una documentazione
+decente, il team di pod2it si offre per consulenza e revisione.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

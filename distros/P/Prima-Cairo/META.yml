@@ -1,0 +1,30 @@
+---
+abstract: Prima extension for Cairo drawing
+author:
+  - 'Dmitry Karasik <dmitry@karasik.eu.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::Depends: 0.2
+  ExtUtils::PkgConfig: 1
+  Prima: 1.5
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Prima-Cairo
+no_index:
+  directory:
+    - t
+    - inc
+  file:
+    - Makefile.PL
+requires:
+  Cairo: 1.104
+  Prima: 1.42
+  perl: 5.010
+resources:
+  repository: http://github.com/dk/Prima-Cairo
+version: 1.06

@@ -1,0 +1,76 @@
+NAME
+    PITA::Scheme - PITA Testing Schemes
+
+SYNOPSIS
+      # Have the scheme load up from the provided config
+      my $scheme = PITA::Scheme->new(
+          injector => $injector,
+          workarea => $workarea,
+      );
+      
+  # Prepare to run the tests
+      $scheme->prepare_all;
+      
+  # Run the tests
+      $scheme->execute_all;
+
+DESCRIPTION
+    While most of the PITA system exists outside the guest testing images
+    and tries to have as little interaction with them as possible, there is
+    one part that needs to be run from inside it.
+
+    PITA::Scheme objects live inside the image and does three main tasks.
+
+    1. Unpack the package and prepare the testing environment
+
+    2. Run the sequence of commands to execute the tests and capture the
+    results.
+
+    3. Package the results as a PITA::XML::Report and send it to the
+    PITA::Host::ResultServer.
+
+    This functionality is implemented in a module structure that is highly
+    subclassable. In this way, PITA can support multiple different testing
+    schemes for multiple different languages and installer types.
+
+Setting up a Testing Image
+    Each image that will be set up will require a bit of customisation, as
+    the entire point of this type of testing is that every environment is
+    different.
+
+    However, by keeping most of the functionality in the PITA::Scheme
+    objects, all you should need to do is to arrange for a simple Perl
+    script to be launched, that feeds some initial configuration to the
+    PITA::Scheme object.
+
+    And it should do the rest. Or die... but we'll cover that later.
+
+METHODS
+    Please excuse the lack of details for now...
+
+    TO BE COMPLETED
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PITA-Scheme>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>, <http://ali.as/>
+
+SEE ALSO
+    The Perl Image Testing Architecture (<http://ali.as/pita/>)
+
+    PITA, PITA::XML, PITA::Host::ResultServer
+
+COPYRIGHT
+    Copyright 2005 - 2011 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

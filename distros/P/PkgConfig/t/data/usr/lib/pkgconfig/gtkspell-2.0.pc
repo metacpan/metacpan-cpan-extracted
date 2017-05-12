@@ -1,0 +1,13 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: GTKSpell
+Description: GTK spelling library
+Version: 2.0.16
+Requires: gtk+-2.0
+Libs: -L${libdir} -lgtkspell
+Libs.private: -lenchant
+Cflags: -I${includedir}/gtkspell-2.0
+

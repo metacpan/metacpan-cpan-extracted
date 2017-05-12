@@ -1,0 +1,25 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/POE/Component/SNMP/Session.pm
+lib/POE/Component/SNMP/Session/Dispatcher.pm
+t/00-load.t
+t/01_start_stop.t
+t/10_snmp_get.t
+t/11_snmp_nosuch.t
+t/20_snmp_getnext.t
+t/30_snmp_walk.t
+t/40_snmp_set.t
+t/50_snmp_getbulk.t
+t/60_errors.t
+# t/61_retries.t
+t/70_multi.t
+t/71_multi_autherror.t
+t/75_start_stop.t
+t/90_callback_args.t
+# t/pod-coverage.t
+# t/pod.t
+t/TestPCS.pm
+eg/lmss

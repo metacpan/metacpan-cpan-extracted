@@ -1,0 +1,42 @@
+---
+doctype: dist
+
+header:
+  name: Pod-Elemental-Transformer-Stenciller
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.014000
+      - Stenciller: 0.1302
+      - Carp
+      - Module::Load: 0.22
+      - Moose: 2.1400
+      - Pod::Elemental::Transformer
+      - MooseX::AttributeDocumented: 0.1003
+      - Stenciller::Utils
+      - namespace::autoclean: 0.24
+      - Types::Standard: 1.000000
+      - Types::Path::Tiny
+      - Types::Stenciller
+      - Carp
+      - Module::Load
+      - Path::Tiny
+
+  test:
+    requires:
+      - Test::Differences
+      - Pod::Elemental
+      - Pod::Elemental::Transformer::Pod5
+
+
+plugins:
+ - +config: Author::CSSON
+   travis_perl_min: 14
+
+---
+doctype: weaver
+
+plugins:
+ - +config: Author::CSSON
+   splint: 1

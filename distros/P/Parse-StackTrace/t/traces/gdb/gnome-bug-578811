@@ -1,0 +1,15 @@
+#0  0x96709ade in -[NSView setFrameSize:] ()
+#1  0x96709a71 in -[NSView setFrame:] ()
+#2  0x96709677 in -[NSWindow setContentView:] ()
+#3  0x007be20d in -[GstGLNSWindow
+initWithContentRect:styleMask:backing:defer:screen:gstWin:] (self=0x67b990,
+_cmd=0x7c0a34, contentRect={origin = {x = 0, y = 0}, size = {width = 320,
+height = 240}}, styleMask=15, bufferingType=2, flag=0 '\0', aScreen=0x0,
+priv=0x33648) at gstglwindow_cocoa.m:401
+#4  0x007bd834 in gst_gl_window_new (width=320, height=240) at
+gstglwindow_cocoa.m:183
+#5  0x007b5a64 in gst_gl_display_thread_create_context (display=0x7e3088) at
+gstgldisplay.c:529
+#6  0x003e0378 in g_thread_create_proxy (data=0x6689d0) at gthread.c:635
+#7  0x9185e095 in _pthread_start ()
+#8  0x9185df52 in thread_start ()

@@ -1,0 +1,61 @@
+#!/usr/local/bin/perl -w
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
+#
+# This file demonstrates the existing of formatters.
+#
+
+use lib '../..';
+use PPresenter;
+
+my $show = PPresenter->new
+   ( -name       => 'Demonstation of formatters'
+   , -geometry   => '640x480'
+   );
+
+$show->select(template => 'tm');
+$show->select(fontset  => 'scaling');
+
+$show->addSlide
+   ( -title      => 'simple'
+   , -formatter  => 'simple'
+   , -main       => <<MAIN
+No nesting.
+- On level in.  Use more than one line in
+  you input, as long as you indent right.
+- Same level.
+  - Extra indentation.
+    - Third level.
+    - More on the third.
+- At once back to the first.
+Not in the list anymore.
+MAIN
+   );
+
+$show->addSlide
+   ( -title      => 'plain'
+   , -formatter  => 'plain'
+   , -main       => <<MAIN
+The plain type is very raw: just
+    exactly as you typed it in.
+  Although
+ you may use markup-tags, if
+-  needed for instance to put a
+-   word  <LARGE>larger</LARGE>.
+MAIN
+   );
+
+$show->addSlide
+   ( -title      => 'markup'
+   , -formatter  => 'markup'
+   , -main       => <<MAIN
+<TEXT COLOR=green>Some text.</TEXT>
+<P>A paragraph with one <LARGE>large</LARGE>
+  word and three <SMALL>small words.
+  <TEXT COLOR=red TT>blue
+</P>
+Read the demo file and understand containers!
+MAIN
+   );
+
+$show->run;
+

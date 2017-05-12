@@ -1,0 +1,7 @@
+prefix=/usr
+includedir=${prefix}/include
+
+Name: libtut
+Description: TUT unit testing framework for C++
+Version: 2006.03.29
+Cflags: -I${includedir}

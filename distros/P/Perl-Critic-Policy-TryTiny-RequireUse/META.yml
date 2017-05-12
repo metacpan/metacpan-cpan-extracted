@@ -1,0 +1,26 @@
+---
+abstract: 'Requires that code which utilizes Try::Tiny actually use()es it.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  Test::Simple: '0.96'
+  Try::Tiny: '0.19'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-TryTiny-RequireUse
+requires:
+  Perl::Critic: '1.123'
+resources:
+  bugtracker: https://github.com/bluefeet/Perl-Critic-Policy-TryTiny-RequireUse/issues
+  homepage: https://github.com/bluefeet/Perl-Critic-Policy-TryTiny-RequireUse
+  repository: https://github.com/bluefeet/Perl-Critic-Policy-TryTiny-RequireUse.git
+version: '0.02'

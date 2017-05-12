@@ -1,0 +1,47 @@
+---
+abstract: 'SeeAlso Server as PSGI application'
+author:
+  - 'Jakob Voß'
+build_requires:
+  HTTP::Request::Common: '0'
+  Plack::Builder: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-App-SeeAlso
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Encode: '0'
+  Exporter: '0'
+  File::ShareDir: '0'
+  JSON: '0'
+  Plack::App::unAPI: '0.41'
+  Plack::Component: '0'
+  Plack::MIME: '0'
+  Plack::Middleware::JSONP: '0'
+  Plack::Middleware::Static: '0'
+  Plack::Request: '0'
+  Plack::Util: '0'
+  Plack::Util::Accessor: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  base: '0'
+  feature: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/nichtich/Plack-App-SeeAlso/issues
+  homepage: https://github.com/nichtich/Plack-App-SeeAlso
+  repository: https://github.com/nichtich/Plack-App-SeeAlso.git
+version: '0.14'

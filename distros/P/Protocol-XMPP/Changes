@@ -1,0 +1,29 @@
+0.006     2014-08-04 19:25:04+01:00 Europe/London
+	New features:
+	* API updates to support Futures
+
+	Bugs fixed:
+	* Avoid hardcoded debug flag (oops)
+	* Fixed SASL auth handling (was adding then removing a stray '1' from the SASL string)
+
+	Thanks to frew for helping with testing, bug fixing and documentation.
+
+0.005     2011-02-20 01:33:44 Europe/London
+	Add missing Module::Load dependency
+
+0.004     2011-02-16 23:00:03 Europe/London
+	Fix auth against Google caused by missing ->client_start data send (thanks to mst for reporting)
+	Set JID when server notifies us of the current JID value, and don't bother sending JID in presence
+	 or messages since the server knows who we are.
+	Drop lvalue on mechanism type.
+
+0.003     2011-02-06 06:13:24 Europe/London
+	Drop dependency on perl-5.10
+
+0.002     2011-02-06 00:43:09 Europe/London
+	Temporary test fixup release, changes 'use 5.10' to the more accurate 'use 5.010'.
+	Eventually will switch the few 5.10-specific parts of the code over to be 5.8-compatible.
+
+0.001     2011-01-19 22:48:23 Europe/London
+	Initial release to CPAN.
+

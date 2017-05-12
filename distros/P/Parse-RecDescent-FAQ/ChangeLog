@@ -1,0 +1,49 @@
+2010-01-23  Terrence Brannon  <tryon@li2-666.members.linode.com>
+
+	* added a GOTCHAS section and one question
+
+2009-08-13    <tbrannon@devel.cybertechnologyllc.com>
+
+	* added Holger Helmuth's suggestion on how to make line numbers
+	correspond to the grammar
+
+2007-11-08  Terrence Brannon  <W049945@LNOHPOL8170MC1.NAEAST.AD.JPMORGANCHASE.COM>
+
+	* FAQ.tt: added a link to Ted Zlatnov's solution on how to get 
+	"substring" style matches in PRD.
+
+2007-11-07  Terrence Brannon  <W049945@LNOHPOL8170MC1.NAEAST.AD.JPMORGANCHASE.COM>
+
+	* For version 5.08:
+	- Created section on relevant CPAN modules and added:
+	** Data::Match
+	** Parse::RecDescent::Consumer
+	** Regexp::(List|Assemble)
+	** Scalar::Listify
+	- Mentioned the VIM syntax file
+
+2007-09-05  Terrence Brannon  <W049945@LNOHPOL8170MC1.NAEAST.AD.JPMORGANCHASE.COM>
+
+	* added information on parsing large files
+
+2006-01-12  metaperl  <metaperl@gmail.com>
+
+	* Took results from this Perlmonks search:
+	  http://perlmonks.org/?node=Recdescent+dynamic&go_button=Search
+
+	  to add 2 new generative parsing questions
+
+2003-10-16  metaperl  <metaperl@moksha>
+
+	* FAQ.tt (Parse): added Hugh Myer's 17 tips on prd
+
+2003-10-13  metaperl  <metaperl@moksha>
+
+	* FAQ.tt (Parse): added Craig's Parse::RecDescent Area under
+	RESOURCES
+	
+
+	* MANIFEST: removed Changes from MANIFEST. Added ChangeLog (since
+	Emacs seems to have this thing for the file being named
+	ChangeLog). 
+

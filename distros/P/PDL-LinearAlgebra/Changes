@@ -1,0 +1,97 @@
+Revision history for Perl extension PDL::LinearAlgebra
+
+
+0.12  Mon Jun  8 10:42:52 EDT 2015
+
+  * Fix last 'package PDL::Complex'
+  * Add 'clean' option to remove *~ files
+
+0.11
+
+  * Hide PDL and PDL::Complex package declarations from
+    PAUSE/CPAN indexer
+
+0.10
+
+  * Add -lquadmath to compiler flags for gfortran
+
+0.09
+
+  * Use new GENERATE feature to make POD from PP files
+  * Use correct meta-spec for META_MERGE
+  * Require constant 1.03 - older version do not work with hashes.
+
+0.08_03
+
+  * Test of KMX patch to Makefile.PL for better docs on metacpan.org and search.cpan.org
+  * Improved library detection for SPP PDL edition
+
+0.08_02
+
+  * Test of KMX patch to Makefile.PL
+
+0.08_01
+
+  * Add AUTHOR and ABSTRACT info to Makefile.PL
+  * Apply patch from CPAN RT bug #38167
+  * Fix encoding specs for POD
+
+0.08  Tue Dec  3 06:07:55 EST 2013
+
+  * use VERSION_FROM in Makefile.PLs
+  * update license to Artistic 2.0
+  * bump VERSION to 0.08 for official release
+
+0.07_01  Sat Nov 30 18:17:48 EST 2013
+
+  * fixed bug in msyminv()
+  * global conversion from DOS to UNIX line endings
+  * explicitly specifying a Latin-1 encoding in the PODs
+  * removed debianization. This package is already in debian
+  * partial clean up of $VERSION specification
+
+0.07  Wed Nov 27 17:09:40 EST 2013
+
+  * Official release with 1st PDL-2.007 support
+
+0.06_02  Wed Nov 27 14:19:17 EST 2013
+
+  * fix CPAN dependency info so PDL is used for config
+
+0.06_01  Sun Nov 17 11:21:52 2013
+
+  * update build to work with new PDL_Indx data type
+
+0.06  Thu Oct 09 00:00:00 2007
+
+  * remove conflicting cplx routine (thanks to P. Dupre)
+  * remove prototype of sec
+
+0.05  Fri Aug 17 00:00:00 2007
+
+  * version information fixes
+
+0.04  Thu Aug 16 00:00:00 2007
+
+  * mnorm fix (complex)
+  * mfun fix (inplace operations are not supported on upstream PDL::Complex (PDL <= 2.4.3)
+  * remove stringizing routine for PDL::Complex (in upstream now PDL >= 2.4.3)
+    add format variables (forgotten in upstream PDL 2.4.3)
+  * sumover for PDL::Complex fix (dims < 2)
+  * documentation improvements and fixes
+
+0.03  Mon Sep 12 18:05:15 2005
+
+  * documentation corrections
+
+0.02  Wed Aug 24 13:39:15 2005
+
+  * mnorm threading
+  * new routine mrcond
+  * documentation corrections
+  * add PDL.pm in prerequities (Makefile.PL)
+  
+0.01  Mon Aug 15 14:57:24 2005
+
+  * Initial release
+

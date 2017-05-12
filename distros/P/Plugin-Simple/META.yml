@@ -1,0 +1,26 @@
+---
+abstract: 'Load plugins from files or modules.'
+author:
+  - 'Steve Bertrand <steveb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plugin-Simple
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Module::List: '0'
+  Module::Load: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/stevieb9/p5-plugin-simple/issues
+  repository: https://github.com/stevieb9/p5-plugin-simple.git
+version: '0.07'

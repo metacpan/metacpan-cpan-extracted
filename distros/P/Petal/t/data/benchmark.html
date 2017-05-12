@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	<head>
+		<title>Petal Benchmark Page</title>
+	</head>
+	<body>
+
+		<!-- xi:include href="./header.html"/ -->
+
+		<span petal:if="foo/bar">
+ 			Found bar: $foo/bar
+		</span>
+
+		<span petal:if="session/user">
+			<table>
+				<tr><td>User ID:</td><td>$session/user/id</td></tr>
+				<tr><td>User Name:</td><td>$session/user/name</td></tr>
+			</table>
+		</span>
+
+		<span petal:repeat="blah list">
+			<li>list element: $blah</li>
+		</span>
+
+		Session ID: $session/id
+
+  </body>
+</html>

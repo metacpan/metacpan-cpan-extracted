@@ -1,0 +1,25 @@
+#!/usr/local/bin/perl -w
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+use lib '../..';
+use PPresenter;
+use strict;
+
+my $show = new PPresenter
+( -name     => 'Decorations'
+);
+
+$show->select( decoration => 'lines1' )
+     ->change( -pageLogo  => 'ppr_medium.gif'
+             );
+ 
+$show->change( template   => 'ALL'
+             , -showTemplateOutlines => 1
+             );
+
+$show->addSlide
+( -title => 'title'
+, -footer => 'footer'
+);
+
+$show->run;

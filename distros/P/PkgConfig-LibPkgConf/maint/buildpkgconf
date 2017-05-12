@@ -1,0 +1,73 @@
+#!/bin/bash -x
+
+if [ "$1" == "" ] ; then
+  COMMIT=master
+else
+  COMMIT="$1"
+fi
+
+MYTMP=`mktemp -d`/build
+MYPREFIX=$HOME/opt/pkgconf
+EXTRA_CONFIGURE_FLAGS=''
+SYSTEM_LIBDIRS=/usr/lib
+PKG_CONFIG_DIR=/usr/lib/pkgconfig
+
+UNAME=`uname`
+if [ "$UNAME" == "Linux" ] ; then
+  echo "linux"
+  SYSTEM_LIBDIRS=`gcc -print-search-dirs | sed -n -e's/^libraries: =//p' | sed -e 's/:/\n/g' | xargs -n1 readlink -f | grep -v 'gcc\|/[0-9.]\+$$' | sort -u | tr '\n' : | sed 's/:$$//'`
+  if [ -f "/etc/debian_version" ] ; then
+    DEB_HOST_MULTIARCH=`/usr/bin/dpkg-architecture | grep ^DEB_HOST_MULTIARCH | cut -d= -f2`
+    PKG_CONFIG_DIR="/usr/local/lib/$DEB_HOST_MULTIARCH/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/share/pkgconfig:/usr/lib/$DEB_HOST_MULTIARCH/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig"
+  else
+    echo "unknown linux";
+    exit 2;
+  fi
+elif [ "$UNAME" == "Darwin" ]; then
+  echo "mac"
+elif [ "$UNAME" == "FreeBSD" ]; then
+  echo "freebsd"
+  PKG_CONFIG_DIR=/usr/local/libdata/pkgconfig:/usr/local/lib/pkgconfig
+else
+  echo "unknown os";
+  exit 2;
+fi
+
+# this is intended for Debian only.
+# I may update it later as needed
+
+
+git clone https://github.com/pkgconf/pkgconf.git $MYTMP
+
+cd $MYTMP
+
+if [ "$COMMIT" != "master" ] ; then
+  git remote add mine https://github.com/plicease/pkgconf.git
+  git remote update -p
+  git checkout $COMMIT
+fi;
+
+./autogen.sh
+
+./configure \
+  --prefix=$MYPREFIX \
+  --mandir=$MYPREFIX/share/man \
+  --infodir=$MYPREFIX/share/info \
+  --enable-shared \
+  --with-pic \
+  --with-system-libdir=$SYSTEM_LIBDIRS \
+  --with-system-includedir=/usr/include \
+  --with-pkg-config-dir=$MYPREFIX/lib/pkgconfig:$PKG_CONFIG_DIR \
+  $EXTRA_CONFIGURE_FLAGS
+
+make
+
+rm -rf $MYPREFIX
+make install
+
+mkdir $MYPREFIX/dll
+mv $MYPREFIX/lib/*.so* $MYPREFIX/dll
+
+cd $HOME
+
+rm -rf $MYTMP

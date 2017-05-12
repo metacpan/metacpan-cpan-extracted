@@ -1,0 +1,9 @@
+Revision history for Perl extension PostScript::Simple::Table.
+
+1.02  Wed Apr 25 14:59:52 2005
+	- Changed required perl version to a more reasonable number.
+1.01  Wed Dec  7 15:07:45 2005
+	- Fixed test script
+1.00  Wed Dec  7 08:48:13 2005
+	- Initial Release
+

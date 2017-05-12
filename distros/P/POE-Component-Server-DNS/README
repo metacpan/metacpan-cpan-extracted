@@ -1,0 +1,221 @@
+NAME
+
+    POE::Component::Server::DNS - A non-blocking, concurrent DNS server POE
+    component
+
+VERSION
+
+    version 0.32
+
+SYNOPSIS
+
+      use strict;
+      use Net::DNS::RR;
+      use POE qw(Component::Server::DNS);
+    
+      my $dns_server = POE::Component::Server::DNS->spawn( alias => 'dns_server' );
+    
+      POE::Session->create(
+            package_states => [ 'main' => [ qw(_start handler log) ], ],
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+    
+      sub _start {
+        my ($kernel,$heap) = @_[KERNEL,HEAP];
+    
+        # Tell the component that we want log events to go to 'log'
+        $kernel->post( 'dns_server', 'log_event', 'log' );
+    
+        # register a handler for any foobar.com suffixed domains
+        $kernel->post( 'dns_server', 'add_handler',
+            {
+              event => 'handler',
+              label => 'foobar',
+              match => 'foobar\.com$',
+            }
+        );
+        undef;
+      }
+    
+      sub handler {
+        my ($qname,$qclass,$qtype,$callback) = @_[ARG0..ARG3];
+        my ($rcode, @ans, @auth, @add);
+    
+        if ($qtype eq "A") {
+          my ($ttl, $rdata) = (3600, "10.1.2.3");
+          push @ans, Net::DNS::RR->new("$qname $ttl $qclass $qtype $rdata");
+          $rcode = "NOERROR";
+        } else {
+          $rcode = "NXDOMAIN";
+        }
+    
+        $callback->($rcode, \@ans, \@auth, \@add, { aa => 1 });
+        undef;
+      }
+    
+      sub log {
+        my ($ip_port,$net_dns_packet) = @_[ARG0..ARG1];
+        $net_dns_packet->print();
+        undef;
+      }
+
+DESCRIPTION
+
+    POE::Component::Server::DNS is a POE component that implements a DNS
+    server.
+
+    It uses POE::Component::Client::DNS to handle resolving when configured
+    as 'forward_only' and Net::DNS::Resolver::Recurse wrapped by
+    POE::Component::Generic to perform recursion.
+
+    One may add handlers to massage and manipulate responses to particular
+    queries which is vaguely modelled after Net::DNS::Nameserver.
+
+CONSTRUCTOR
+
+    spawn
+
+      Starts a POE::Component::Server::DNS component session and returns an
+      object. Takes a number of optional arguments:
+
+        "alias", an alias to address the component by;
+        "port", which udp port to listen on. Default is 53, which requires 'root' privilege on UN*X type systems;
+        "address", which local IP address to listen on.  Default is INADDR_ANY;
+        "resolver_opts", a set of options to pass to the POE::Component::Client::DNS constructor;
+        "forward_only", be a forwarding only DNS server. Default is 0, be recursive.
+        "no_clients", do not spawn client code (See following notes);
+
+      "no_clients" disables the spawning of client code (PoCo::Client::DNS,
+      Net::DNS::Resolver::Recursive), and doesn't attempt to forward or
+      recurse inbound requests. Any request not handled by one of your
+      handlers will be REFUSED. Saves some resources when you intend your
+      server to be authoritative only (as opposed to a general resolver for
+      DNS client software to point at directly). Additionally, this
+      argument changes the default "Recursion Available" flag in responses
+      to off instead of on.
+
+METHODS
+
+    These are methods that may be used with the object returned by spawn().
+
+    session_id
+
+      Returns the POE::Session ID of the component's session.
+
+    resolver
+
+      Returns a reference to the POE::Component::Client::DNS object.
+
+    shutdown
+
+      Terminates the component and associated resolver.
+
+    sockport
+
+      Returns the port of the socket that the component is listening on.
+
+INPUT EVENTS
+
+    These are states that the component will accept:
+
+    add_handler
+
+      Accepts a hashref as an argument with the following keys:
+
+        "event", the event the component will post to, mandatory;
+        "label", a unique name for this handler, mandatory;
+        "match", a regex expression ( without // ) to match against the host part of queries, mandatory;
+        "session", the session where this handler event should be sent to, defaults to SENDER;
+
+      See OUTPUT EVENTS for details of what happens when a handler is
+      triggered.
+
+    del_handler
+
+      Accepts a handler label to remove.
+
+    log_event
+
+      Tells the component that a session wishes to receive or stop
+      receiving DNS log events. Specify the event you wish to receive log
+      events as the first argument. If no event is specified you stop
+      receiving log events.
+
+    shutdown
+
+      Terminates the component and associated resolver.
+
+HANDLER EVENTS
+
+    These events are triggered by a DNS query matching a handler. The
+    applicable event is fired in the requested session with the following
+    paramters:
+
+      ARG0, query name
+      ARG1, query class
+      ARG2, query type
+      ARG3, a callback coderef
+      ARG4, the IP address and port of the requestor, 'IPaddr:port'
+
+    Do your manipulating then use the callback to fire the response back to
+    the component, returning a response code and references to the answer,
+    authority, and additional sections of the response. For advanced usage
+    there is an optional argument containing an hashref with the settings
+    for the aa, ra, and ad header bits. The argument is of the form { ad =>
+    1, aa => 0, ra => 1 }.
+
+      $callback->( $rcode, \@ans, \@auth, \@add, { aa => 1 } );
+
+LOG EVENTS
+
+    These events are triggered whenever a DNS response is sent to a client.
+
+      ARG0, the IP address and port of the requestor, 'IPaddr:port';
+      ARG1, the Net::DNS::Packet object;
+
+    See Net::DNS::Packet for details.
+
+HISTORY
+
+    The component's genesis was inspired by Jan-Pieter's 'Fun with POE'
+    talk at YAPC::EU 2006, which lay much of the ground-work code such as
+    the POE::Driver and POE::Filter used internally. BinGOs wrapped it all
+    up in a component, added the tests ( borrowed shamelessly from
+    POE::Component::Client::DNS's testsuite ) and documentation.
+
+    Other suggestions as to the API were provided by Ben 'integral' Smith.
+
+    Rocco Caputo brought POE::Component::Client::DNS to the party.
+
+SEE ALSO
+
+    POE::Component::Client::DNS
+
+    POE::Component::Generic
+
+    Net::DNS
+
+    Net::DNS::Packet
+
+AUTHORS
+
+      * Chris Williams <chris@bingosnet.co.uk>
+
+      * Jan-Pieter Cornet <johnpc@xs4all.nl>
+
+      * Brandon Black <blblack@gmail.com>
+
+      * Richard Harman <richard@richardharman.com>
+
+      * Stephan Jauernick <stephan@stejau.de>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Chris Williams, Jan-Pieter
+    Cornet, Brandon Black, Richard Harman and Stephan Jauernick.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

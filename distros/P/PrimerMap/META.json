@@ -1,0 +1,31 @@
+{
+    "name": "PrimerMap",
+    "abstract": "Primer map from sequence and primer positions",
+    "description": "generates a primer sequence graphical map",
+    "version": "1.3",
+    "release_status": "stable",
+    "author": [
+    "Damien OHalloran <damienoh@gwu.edu>"
+  ],
+    "license": ["gpl_2"],
+    "prereqs": {
+        "runtime": {
+            "requires": {
+                "perl": "5.006",
+                "Bio::Graphics": "0",
+                "Bio::SeqFeature::Generic": "0"
+            }
+        },
+        "build": {
+            "requires": {
+                "Test::More": "0"
+            }
+        }
+    },
+    "dynamic_config": 0,
+    "meta-spec": {
+        "version": "2",
+        "url": "https://metacpan.org/pod/CPAN::Meta::Spec"
+    },
+    "generated_by": "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001"
+}

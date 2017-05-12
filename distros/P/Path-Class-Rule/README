@@ -1,0 +1,97 @@
+NAME
+    Path::Class::Rule - Iterative, recursive file finder with Path::Class
+
+VERSION
+    version 0.018
+
+SYNOPSIS
+      use Path::Class::Rule;
+
+      my $rule = Path::Class::Rule->new; # match anything
+      $rule->file->size(">10k");         # add/chain rules
+
+      # iterator interface
+      my $next = $rule->iter( @dirs );
+      while ( my $file = $next->() ) {
+        ...
+      }
+
+      # list interface
+      for my $file ( $rule->all( @dirs ) ) {
+        ...
+      }
+
+DESCRIPTION
+    This module iterates over files and directories to identify ones
+    matching a user-defined set of rules.
+
+    As of version 0.016, this is now a thin subclass of Path::Iterator::Rule
+    that operates on and returns Path::Class objects instead of bare file
+    paths.
+
+    See that module for details on features and usage.
+
+    See "PERFORMANCE" for important caveats. You might want to use
+    "Path::Iterator::Rule" instead.
+
+EXTENDING
+    This module may be extended in the same way as "Path::Iterator::Rule",
+    but test subroutines receive "Path::Class" objects instead of strings.
+
+    Consider whether you should extend "Path::Iterator::Rule" or
+    "Path::Class::Rule". Extending this module specifically is recommended
+    if your tests rely on having a "Path::Class" object.
+
+LEXICAL WARNINGS
+    If you run with lexical warnings enabled, "Path::Iterator::Rule" will
+    issue warnings in certain circumstances (such as a read-only directory
+    that must be skipped). To disable these categories, put the following
+    statement at the correct scope:
+
+      no warnings 'Path::Iterator::Rule';
+
+PERFORMANCE
+    Because all files and directories as processed as "Path::Class" objects,
+    using this module is significantly slower than "Path::Iterator::Rule".
+
+    If you are scanning tens of thousands of files and speed is a concern,
+    you might be better off using that instead and only creating objects
+    from results.
+
+        use Path::Class;
+        use Path::Iterator::Rule;
+
+        my $rule = Path::Iterator::Rule->new->file->size(">10k");
+        my $next = $rule->iter( @dirs );
+
+        while ( my $file = file($next->()) ) {
+            ...
+        }
+
+    Generally, I recommend use this module only if you need to write custom
+    rules that need "Path::Class" features.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/path-class-rule/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/path-class-rule>
+
+      git clone git://github.com/dagolden/path-class-rule.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

@@ -1,0 +1,16 @@
+Revision history for Perl extension Plack::Server::AnyEvent
+
+0.04  Mon May 17 12:28:08 PDT 2010
+        - This software is now deprecated. Use Twiggy
+
+0.03  Wed Nov 11 21:33:16 PST 2009
+        - Merged nothingmuch's fork to make the socket handling much faster (twice as fast!)
+        - Fixed poll_cb and writer shutdown
+        - Implemented graceful exit on SIGQUIT (nothingmuch)
+
+0.02  Thu Oct 29 12:38:15 PDT 2009
+        - Support psgi.streaming and condvar response for delayed response (nothingmuch)
+        - Improved error handling, memory usage and performance by not using AnyEvent::Handle (nothingmuch)
+
+0.01  Mon Oct 12 23:31:52 2009
+        - original version

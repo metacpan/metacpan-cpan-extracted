@@ -1,0 +1,324 @@
+NAME
+    POE::Devel::Benchmarker - Benchmarking POE's performance ( acts more
+    like a smoker )
+
+SYNOPSIS
+            apoc@apoc-x300:~$ cd poe-benchmarker
+            apoc@apoc-x300:~/poe-benchmarker$ perl -MPOE::Devel::Benchmarker -e 'benchmark()'
+
+ABSTRACT
+    This package of tools is designed to benchmark POE's performace across
+    different configurations. The current "tests" are:
+
+    Events
+        posts: This tests how long it takes to post() N times
+
+        dispatches: This tests how long it took to dispatch/deliver all the
+        posts enqueued in the "posts" test
+
+        single_posts: This tests how long it took to yield() between 2
+        states for N times
+
+        calls: This tests how long it took to call() N times
+
+    Alarms
+        alarms: This tests how long it took to add N alarms via alarm(),
+        overwriting each other
+
+        alarm_adds: This tests how long it took to add N alarms via
+        alarm_add()
+
+        alarm_clears: This tests how long it took to clear all alarms set in
+        the "alarm_adds" test
+
+        NOTE: alarm_add is not available on all versions of POE!
+
+    Sessions
+        session_creates: This tests how long it took to create N sessions
+
+        session_destroys: This tests how long it took to destroy all
+        sessions created in the "session_creates" test
+
+    Filehandles
+        select_read_STDIN: This tests how long it took to toggle select_read
+        N times on STDIN
+
+        select_write_STDIN: This tests how long it took to toggle
+        select_write N times on STDIN
+
+        select_read_MYFH: This tests how long it took to toggle select_read
+        N times on a real filehandle
+
+        select_write_MYFH: This tests how long it took to toggle
+        select_write N times on a real filehandle
+
+        NOTE: The MYFH tests don't include the time it took to
+        open()/close() the file :)
+
+    Sockets
+        socket_connects: This tests how long it took to connect+disconnect
+        to a SocketFactory server via localhost
+
+        socket_stream: This tests how long it took to send N chunks of data
+        in a "ping-pong" fashion between the server and client
+
+    POE startup time
+        startups: This tests how long it took to start + close N instances
+        of POE+Loop without any sessions/etc via system()
+
+    POE Loops
+        This is actually a "super" test where all of the specific tests is
+        ran against various POE::Loop::XYZ/FOO for comparison
+
+        NOTE: Not all versions of POE support all Loops!
+
+    POE Assertions
+        This is actually a "super" test where all of the specific tests is
+        ran against POE with/without assertions enabled
+
+        NOTE: Not all versions of POE support assertions!
+
+    POE::XS::Queue::Array
+        This is actually a "super" test where all of the specific tests is
+        ran against POE with XS goodness enabled/disabled
+
+        NOTE: Not all versions of POE support XS::Queue::Array!
+
+DESCRIPTION
+    This module is poorly documented now. Please give me some time to
+    properly document it over time :)
+
+  INSTALLATION
+    Here's a simple outline to get you up to speed quickly. ( and smoking! )
+
+    Install CPAN package + dependencies
+        Download+install the POE::Devel::Benchmarker package from CPAN
+
+                apoc@apoc-x300:~$ cpanp -i POE::Devel::Benchmarker
+
+    Setup initial directories
+        Go anywhere, and create the "parent" directory where you'll be
+        storing test results + stuff. For this example, I have chosen to use
+        ~/poe-benchmarker:
+
+                apoc@apoc-x300:~$ mkdir poe-benchmarker
+                apoc@apoc-x300:~$ cd poe-benchmarker
+                apoc@apoc-x300:~/poe-benchmarker$ mkdir poedists results images
+                apoc@apoc-x300:~/poe-benchmarker$ perl -MPOE::Devel::Benchmarker::GetPOEdists -e 'getPOEdists( 1 )'
+
+                ( go get a coffee while it downloads if you're on a slow link, ha! )
+
+    Let 'er rip!
+        At this point you can start running the benchmark!
+
+        NOTE: the Benchmarker expects everything to be in the "local"
+        directory!
+
+                apoc@apoc-x300:~$ cd poe-benchmarker
+                apoc@apoc-x300:~/poe-benchmarker$ perl -MPOE::Devel::Benchmarker -e 'benchmark()'
+
+                ( go sleep or something, this will take a while! )
+
+  BENCHMARKING
+    On startup the Benchmarker will look in the "poedists" directory and
+    load all the distributions it sees untarred there. Once that is done it
+    will begin autoprobing for available POE::Loop packages. Once it
+    determines what's available, it will begin the benchmarks.
+
+    As the Benchmarker goes through the combinations of POE + Eventloop +
+    Assertions + XS::Queue it will dump data into the results directory. The
+    module also dumps YAML output in the same place, with the suffix of
+    ".yml"
+
+    This module exposes only one subroutine, the benchmark() one. You can
+    pass a hashref to it to set various options. Here is a list of the valid
+    options:
+
+    freshstart => boolean
+        This will tell the Benchmarker to ignore any previous test runs
+        stored in the 'results' directory. This will not delete data from
+        previous runs, only overwrite them. So be careful if you're mixing
+        test runs from different versions!
+
+                benchmark( { freshstart => 1 } );
+
+        default: false
+
+    noxsqueue => boolean
+        This will tell the Benchmarker to force the unavailability of
+        POE::XS::Queue::Array and skip those tests.
+
+        NOTE: The Benchmarker will set this automatically if it cannot load
+        the module!
+
+                benchmark( { noxsqueue => 1 } );
+
+        default: false
+
+    noasserts => boolean
+        This will tell the Benchmarker to not run the ASSERT tests.
+
+                benchmark( { noasserts => 1 } );
+
+        default: false
+
+    litetests => boolean
+        This enables the "lite" tests which will not take up too much time.
+
+                benchmark( { litetests => 0 } );
+
+        default: true
+
+    quiet => boolean
+        This enables quiet mode which will not print anything to the console
+        except for errors.
+
+                benchmark( { 'quiet' => 1 } );
+
+        default: false
+
+    loop => csv list or array
+        This overrides the built-in loop detection algorithm which searches
+        for all known loops.
+
+        There is some "magic" here where you can put a negative sign in
+        front of a loop and we will NOT run that.
+
+        NOTE: Capitalization is important!
+
+                benchmark( { 'loop' => 'IO_Poll,Select' } );    # runs only IO::Poll and Select
+                benchmark( { 'loop' => [ qw( Tk Gtk ) ] } );    # runs only Tk and Gtk
+                benchmark( { 'loop' => '-Tk' } );               # runs all available loops EXCEPT for TK
+
+        Known loops: Event_Lib EV Glib Prima Gtk Kqueue Tk Select IO_Poll
+
+    poe => csv list or array
+        This overrides the built-in POE version detection algorithm which
+        pulls the POE versions from the 'poedists' directory.
+
+        There is some "magic" here where you can put a negative sign in
+        front of a version and we will NOT run that.
+
+        NOTE: The Benchmarker will ignore versions that wasn't found in the
+        directory!
+
+                benchmark( { 'poe' => '0.35,1.003' } );                 # runs on 0.35 and 1.003
+                benchmark( { 'poe' => [ qw( 0.3009 0.12 ) ] } );        # runs on 0.3009 and 0.12
+                benchmark( { 'poe' => '-0.35' } );                      # runs ALL tests except 0.35
+
+  ANALYZING RESULTS
+    Please look at the pretty charts generated by the
+    POE::Devel::Benchmarker::Imager module.
+
+EXPORT
+    Automatically exports the benchmark() subroutine.
+
+TODO
+    Perl version smoking
+        We should be able to run the benchmark over different Perl versions.
+        This would require some fiddling with our layout + logic. It's not
+        that urgent because the workaround is to simply execute the
+        benchmarker under a different perl binary. It's smart enough to use
+        $^X to be consistent across tests/subprocesses :)
+
+    Select the EV backend
+                <Khisanth> and if you are benchmarking, try it with POE using EV with EV using Glib? :P
+                <Apocalypse> I'm not sure how to configure the EV "backend" yet
+                <Apocalypse> too much docs for me to read hah
+                <Khisanth> Apocalypse: use EV::Glib; use Glib; use POE; :)
+
+    Be smarter in smoking timeouts
+        Currently we depend on the litetests option and hardcode some values
+        including the timeout. If your machine is incredibly slow, there's a
+        chance that it could timeout unnecessarily. Please look at the
+        outputs and check to see if there are unusual failures, and inform
+        me.
+
+        Also, some loops perform badly and take almost forever! /me glares
+        at Gtk...
+
+    More benchmarks!
+        As usual, me and the crowd in #poe have plenty of ideas for tests.
+        We'll be adding them over time, but if you have an idea please drop
+        me a line and let me know!
+
+        dngor said there was some benchmarks in the POE svn under
+        trunk/queue...
+
+        Tapout contributed a script that tests HTTP performance, let's see
+        if it deserves to be in the suite :)
+
+        I added the preliminary socket tests, we definitely should expand it
+        seeing how many people use POE for networking...
+
+    Add SQLite/DBI/etc support to the Analyzer
+        It would be nice if we could have a local SQLite db to dump our
+        stats into. This would make arbitrary reports much easier than
+        loading raw YAML files and trying to make sense of them, ha! Also,
+        this means somebody can do the smoking and send the SQLite db to
+        another person to generate the graphs, cool!
+
+    Kqueue loop support
+        As I don't have access to a *BSD box, I cannot really test this.
+        Furthermore, it isn't clear on how I can force/unload this module
+        from POE...
+
+    Wx loop support
+        I have Wx installed, but it doesn't work. Obviously I don't know how
+        to use Wx ;)
+
+        If you have experience, please drop me a line on how to do the
+        "right" thing to get Wx loaded under POE. Here's the error:
+
+                Can't call method "MainLoop" on an undefined value at /usr/local/share/perl/5.8.8/POE/Loop/Wx.pm line 91.
+
+    XS::Loop support
+        The POE::XS::Loop::* modules theoretically could be tested too.
+        However, they will only work in POE >= 1.003! This renders the
+        concept somewhat moot. Maybe, after POE has progressed some versions
+        we can implement this...
+
+SEE ALSO
+    POE
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc POE::Devel::Benchmarker
+
+  Websites
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/POE-Devel-Benchmarker>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/POE-Devel-Benchmarker>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Devel-Benchmarker>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/POE-Devel-Benchmarker>
+
+  Bugs
+    Please report any bugs or feature requests to "bug-poe-devel-benchmarker
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Devel-Benchmarker>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+AUTHOR
+    Apocalypse <apocal@cpan.org>
+
+    BIG THANKS goes to Rocco Caputo <rcaputo@cpan.org> for the first
+    benchmarks!
+
+COPYRIGHT AND LICENSE
+    Copyright 2009 by Apocalypse
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

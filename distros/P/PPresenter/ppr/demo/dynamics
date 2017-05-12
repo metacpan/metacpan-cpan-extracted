@@ -1,0 +1,90 @@
+#!/usr/local/bin/perl -w
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
+#
+# This file demonstrates possibilities of tags and timing.
+# It is especially interesting to see in which way the slide-control
+# window is produced from the data below.
+#
+
+use lib '../..';
+use PPresenter;
+
+my $show = PPresenter->new
+   ( -name       => 'Tags and Timing demo'
+   , -geometry   => '640x480'
+   , -totaltime  => 5*60
+#  , -tags       => [ 'all' ]    # Overrules slide's -active spec.
+   );
+$show->select(template => 'tm'); # I know it is the default.
+$show->select(fontset  => 'scaling');
+
+$show->addSlide
+   ( -title      => 'first slide'
+   , -reqtime    => 75
+   , -main       => <<MAIN
+PPresenter supports slide-timing and dynamics.
+<P>
+You start the show with <TT>g</TT>, and halt it
+with <TT>h</TT>.
+<P>
+Start the timer now, and see the progress bar (bottom)
+moving slowly forwards.
+MAIN
+   );
+
+$show->addSlide
+   ( -title      => 'second slide'
+   , -active     => 0
+   );
+
+$show->addSlide
+   ( -title      => 'third slide: proceeds after 10 secs'
+   , -reqtime    => 10
+   , -proceed    => 'TIME'
+   , -main       => <<MAIN
+The second slide was skipped, because it is not
+selected.
+<P>
+See the popup (press <TT>s</TT>) how this is done.
+MAIN
+   );
+
+$show->addSlide
+   ( -title      => 'fourth slide'
+   , -reqtime    => 30
+   , -main       => <<MAIN
+When you move to the next slide, you see the next
+button on the bottom become green.
+<P>
+You can disable all extra's on the bottom via the
+background menu.
+MAIN
+   );
+
+$show->addSlide
+   ( -title      => 'fifth slide: proceeds immediately'
+   , -tag        => 'shorter'
+   , -proceed    => 'NOW'
+   , -main       => <<MAIN
+Only works if the show is running (you pressed <CODE>g</CODE>)
+MAIN
+   );
+
+$show->addSlide
+   ( -title      => 'sixth slide, tags'
+   , -tags       => [ 'shorter', 'panic' ]
+   , -main       => <<MAIN
+Tags are used to select or disable whole sets of slides.
+Play around with them in the control menu (press <CODE>s</CODE>).
+MAIN
+   );
+
+$show->addSlide
+   ( -title      => 'seventh slide'
+   , -tags       => 'panic'
+   , -main       => <<MAIN
+MAIN
+   );
+
+$show->run
+

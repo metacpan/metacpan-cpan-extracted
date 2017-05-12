@@ -1,0 +1,23 @@
+Revision history for Pod-Weaver-Plugin-Ditaa
+
+0.001006  2015-12-05 15:37:41-08:00 America/Los_Angeles
+  - Rerelease with flags passed in generated POD
+
+0.001005  2015-12-05 09:51:11-08:00 America/Los_Angeles
+  - Allow passing flags to ditaa
+
+0.001004  2015-09-18 20:21:30-07:00 America/Los_Angeles
+  - Add configurable label
+
+0.001003  2015-09-12 09:41:36-07:00 America/Los_Angeles
+  - Added DITAA_TRACE support
+
+0.001002  2015-08-28 21:51:19-07:00 America/Los_Angeles
+  - Remove dep on Moose::Autobox
+  - Remove worthless use of Syntax::Keyword::Junction
+
+0.001001  2015-08-22 11:55:18-07:00 America/Los_Angeles
+  - Add link to ditaa syntax
+
+0.001000  2015-06-13 00:29:59-07:00 America/Los_Angeles
+  - initial release

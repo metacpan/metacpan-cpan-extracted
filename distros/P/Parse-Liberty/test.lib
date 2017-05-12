@@ -1,0 +1,126 @@
+library (test1) {
+
+  technology (cmos);
+  /* 0 */
+  delay_model : table_lookup;
+  time_unit : "1ns";
+  voltage_unit : "1V";
+  current_unit : "1uA";
+  capacitive_load_unit (1, pf);
+  /*0*/ nom_temperature : 25;
+  FANOUT = 5; /* declaration */
+  default_max_transition	: 2.4 ;
+
+  define_group (sec_acore_internal_power, pin);
+  define (sec_acore_rise_power, sec_acore_internal_power, float);
+  define (sec_acore_fall_power, sec_acore_internal_power, float);
+  define (sec_acore_when, sec_acore_internal_power, string);
+
+  lu_table_template (dti_delay_drivex1_5x7) {
+    variable_1 : input_net_transition;
+    variable_2 : total_output_net_capacitance;
+    index_1 ("0.0020, 0.0100, 0.0300, 0.0650, 0.1400");
+    index_2 ("0.0003, 0.0030, 0.0100, 0.0300, 0.0950, 0.1700, 0.3000");
+  }
+
+  cell (cell1) {
+    area : 456;
+
+    ff (NET0108_5, NET078_4) {
+      next_state : "((SE SI) + (!SE D))";
+      clocked_on : "CK";
+      clear : "(!RN)";
+    }
+
+    statetable ("CLK E SE", enl) {
+      table : \
+        "H L L : - : L ,\
+         H L H : - : H ,\
+         H H L : - : H ,\
+         H H H : - : H ,\
+         L - - : - : N ";
+    }
+
+    pin (TST) {
+      direction : input;
+      capacitance : 0.1;
+
+      sec_acore_internal_power (TST) {
+        sec_acore_rise_power : 1000;
+        sec_acore_fall_power : 0;
+        sec_acore_when : "CNT' ";
+      }
+
+      sec_acore_internal_power (TST) {
+        sec_acore_rise_power : 1000;
+        sec_acore_fall_power : 0;
+        sec_acore_when : "CNT  ";
+      }
+    }
+
+    pin (TST2) {
+      direction : inout;
+      capacitance : 0.2;
+
+      sec_acore_internal_power (TST) {
+        sec_acore_rise_power : 1000.00;
+        sec_acore_fall_power : 0.00;
+        sec_acore_when : "CNT' ";
+      }
+
+      sec_acore_internal_power (TST1) {
+        sec_acore_rise_power : 1000;
+        sec_acore_fall_power : 0;
+        sec_acore_when : CNT;
+      }
+    }
+
+    pin (TST3) {
+      direction : output;
+      function : "TST";
+      capacitance : 0.3;
+      max_fanout : FANOUT * 2; /* usage, here max_fanout : 10 */
+
+      sec_acore_internal_power (TST) {
+        sec_acore_rise_power : 1000;
+      }
+
+      timing () {
+        related_pin : TST;
+        timing_sense : positive_unate;
+
+        cell_rise(dti_delay_drivex1_5x7) {
+          values( "0.0111, 0.0164, 0.0277, 0.0587, 0.1607, 0.2785, 0.4858", \
+              "0.0131, 0.0185, 0.0297, 0.0608, 0.1627, 0.2813, 0.4814", \
+              "0.0163, 0.0219, 0.0330, 0.0641, 0.1663, 0.2839, 0.4950", \
+              "0.0196, 0.0255, 0.0371, 0.0683, 0.1701, 0.2885, 0.4904", \
+              "0.0351, 0.0458, 0.0652, 0.1059, 0.2140, 0.3333, 0.5357" );
+        }
+        rise_transition(dti_delay_drivex1_5x7) {
+          values( "1.0111, 1.0164, 1.0277, 1.0587, 1.1607, 1.2785, 1.4858", \
+              "1.0131, 1.0185, 1.0297, 1.0608, 1.1627, 1.2813, 1.4814", \
+              "1.0163, 1.0219, 1.0330, 1.0641, 1.1663, 1.2839, 1.4950", \
+              "1.0196, 1.0255, 1.0371, 1.0683, 1.1701, 1.2885, 1.4904", \
+              "1.0351, 1.0458, 1.0652, 1.1059, 1.2140, 1.3333, 1.5357" );
+        }
+      }
+    }
+  } /* cell */
+
+  cell (cell2) {
+    area : 777.88;
+  }
+
+  cell (cell3) {
+    define (cell3_define, sec_acore_internal_power, string);
+  }
+
+  cell (cell4) {
+
+    pin (A) {
+    }
+  }
+
+  cell (cell5) {
+  }
+}

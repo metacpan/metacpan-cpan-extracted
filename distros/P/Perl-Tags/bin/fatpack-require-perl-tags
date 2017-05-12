@@ -1,0 +1,17 @@
+#!/bin/bash
+
+cd `dirname $0`/..
+
+PERL5LIB=$PERL5LIB:lib/
+
+SCRIPT=bin/require-perl-tags
+FATPACKED=$SCRIPT-packed
+
+fatpack trace $SCRIPT
+fatpack packlists-for `cat fatpacker.trace` > packlists
+fatpack tree `cat packlists`
+fatpack file $SCRIPT > $FATPACKED
+
+chmod +x $FATPACKED
+
+rm -rf fatlib/ fatpacker.trace packlists

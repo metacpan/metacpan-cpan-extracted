@@ -1,0 +1,393 @@
+POE::Stage(3)         User Contributed Perl Documentation        POE::Stage(3)
+
+
+
+NNAAMMEE
+       POE::Stage - a base class for message-driven objects
+
+SSYYNNOOPPSSIISS
+               #!/usr/bin/env perl
+               {
+                       package App;
+                       use POE::Stage::App qw(:base);
+                       sub on_run {
+                               print "hello, ", my $arg_whom, "!\n";
+                       }
+               }
+               App->new()->run( whom => "world" );
+               exit;
+
+DDEESSCCRRIIPPTTIIOONN
+       POE::Stage is a set of base classes for message-driven objects.  It
+       cleanly implements standard patterns that have emerged from years of
+       working with POE and POE::Component modules.
+
+       As I hope the name implies, POE::Stage objects encapsulate discrete
+       steps, or stages, of a larger task.  Eventually they come together to
+       implement programs.
+
+       For example, HTTP requests are performed in four or so distinct stages:
+       1. The server's address is resolved.  2. The client establishes a
+       connection to the server.  3. The client transmits a request.  4. The
+       client receives a response.
+
+       By design, POE::Stage promotes the decomposition of tasks into
+       multiple, smaller stages.  If these stages are generic enough, new
+       tasks may be handled by reusing them in different configurations.
+
+       The hypothetical HTTP client might be a single stage composed of three
+       smaller ones:  A DNS resolver stage, which accepts DNS requests and
+       returns DNS responses.  A TCP client connection factory, which takes
+       socket endpoint descriptions and other parameters, and eventually
+       returns established connections.  Finally, there would be an HTTP
+       protocol stage that uses established connections to send requests and
+       parse responses.
+
+       These stages would be encapsulated by a higher-level HTTP client stage.
+       This would accept HTTP requests and return HTTP responses after
+       performing the necessary steps to gather them.
+
+       This will sound familiar to anyone working with objects.
+
+       These objects are asynchronous and message-driven, however.  The base
+       message class, POE::Request, and its subclasses, implement a standard
+       request/response interface between POE::Stage objects.  Where possible,
+       these messages attempt to mimic simpler, more direct call/return
+       syntax, albeit asynchronously.  POE::Stage also provides a powerful
+       closure-based system for maintaining request and response state, so you
+       don't have to.
+
+RREESSEERRVVEEDD MMEETTHHOODDSS
+       To do its job, POE::Stage requires some methods for its own.  To be
+       extensible, it reserves other methods for standard purposes.  To remain
+       useful, it reserves the least number of methods possible.
+
+       nneeww AARRGGUUMMEENNTT__PPAAIIRRSS
+
+       _n_e_w_(_) creates and returns a new POE::Stage object.  An optional set of
+       named ARGUMENT_PAIRS will be passed to the object's _i_n_i_t_(_) callback
+       before _n_e_w_(_) returns.
+
+       Subclasses should not override _n_e_w_(_) unless they're careful to call the
+       base POE::Stage's constructor.  Object construction is customized
+       through the _i_n_i_t_(_) callback instead.
+
+       iinniitt AARRGGUUMMEENNTT__PPAAIIRRSS
+
+       _i_n_i_t_(_) is a callback used to initialize POE::Stage objects after they
+       are constructed.  POE::Stage's _n_e_w_(_) constructor passes its named
+       ARGUMENT_PAIRS to _i_n_i_t_(_) prior to returning the new object.  The values
+       of these arguments will be available as $arg_name lexicals within the
+       _i_n_i_t_(_) callback:
+
+         my $object = POE::Stage::Something->new( foo => 123 );
+
+               package POE::Stage::Something;
+               sub init {
+                       print my $arg_foo, "\n";  # displays "123\n".
+               }
+
+       The _i_n_i_t_(_) callback is optional.
+
+       HHaannddlleerr
+
+       The Handler method implements an attribute handler that defines which
+       methods handle messages.  Only message handlers have access to the
+       closures that maintain state between messages.
+
+       The Handler method is used as a subroutine attribute:
+
+               sub some_method :Handler {
+                       # Lexical magic occurs here.
+               }
+
+               sub not_a_handler {
+                       # No lexical magic happens in this one.
+               }
+
+       Methods with names beginning with "on_" acquire Handler magic
+       automatically.
+
+               sub on_event {
+                       # Lexical magic occurs here.  No :Handler necessary.
+               }
+
+       eexxppoossee OOBBJJEECCTT,, LLEEXXIICCAALL [[,, LLEEXXIICCAALL[[,, LLEEXXIICCAALL ......]]]]
+
+       _e_x_p_o_s_e_(_) is a function (not a method) that allows handlers to expose
+       members of specific request or response OBJECT.  Each member will be
+       exposed as a particular LEXICAL variable.  OBJECTs must inherit from
+       POE::Request.
+
+       The LEXICAL's name is significant.  The part of the variable name up to
+       the leading underscore is treated as a prefix and ignored.  The
+       remainder of the variable name must match one of the OBJECT's member
+       names.  The sigil is also significant, and it is treated as part of the
+       member name.
+
+       The following example exposes the '$cookie' member of a POE::Request
+       object as the '$sub_cookie' lexical variable.  The exposed variable is
+       then initialized.  In doing so, the value stored into it is saved
+       within the request's closure.  It will be available whenever that
+       request (or a response to it) is visible.
+
+               use POE::Stage qw(expose);
+
+               sub do_request :Handler {
+                       my $req_subrequest = POE::Request->new( ... );
+                       expose $req_subrequest, my $sub_cookie;
+                       $sub_cookie = "stored in the subrequest";
+               }
+
+       LEXICAL prefixes are useful for exposing the same member name from
+       multiple OBJECTs within the same lexical scope.  Otherwise the variable
+       names would clash.
+
+UUSSIINNGG
+       TODO - Describe how POE::Stage is used.  Outline the general pattern
+       for designing and subclassing.
+
+DDEESSIIGGNN GGOOAALLSS
+       POE::Stage implements the most important and common design patterns for
+       POE programs in a consistent and convenient way.
+
+       POE::Stage hides nearly all of POE, including the need to create
+       POE::Session objects and explicitly define event names and their
+       handlers.  The :Handler subroutine attribute defines which methods
+       handle messages.  There's never a need to guess which message types
+       they handle:
+
+               # Handle the "foo" message.
+               sub foo :Handler {
+                       ...
+               }
+
+       POE::Stage simplifies message passing and response handling in at least
+       three ways.  Consider:
+
+               my $request = POE::Request->new(
+                       stage => $target_stage,
+                       method => $target_method,
+                       args => \%arguments,
+                       on_response_x => "handler_x",
+                       on_response_y => "handler_y",
+                       on_response_z => "handler_z",
+               );
+
+       First, it provides standard message clasess.  Developers don't need to
+       roll their own, potentially non-interoperable message-passing schemes.
+       The named \%arguments are supplied and are available to each handler in
+       a standard way, which is described later in the MAGICAL LEXICAL TOUR.
+
+       Second, POE::Stage provides request-scoped closures via $req_foo,
+       $rsp_foo, and _e_x_p_o_s_e_(_).  Stages use these mechanisms to save and access
+       data in specific request and response contexts, eliminating the need to
+       do it explicitly.
+
+       Third, response destinations are tied to the requests themselves.  In
+       the above example, responses of type "response_x" will be handled by
+       "handler_x".  The logic flow of a complex program is more readily
+       apparent.  It gets better, too.  See HANDLER NAMING CONVENTIONS.
+
+       The mechanisms of message passing and context management become
+       implicit, allowing them to be extended transparently.  This will be
+       extended across processes, hopefully with few or no seams.
+
+       POE::Stage includes object-oriented classes for low-level event
+       watchers.  They simplify and standardize POE::Kernel's interface, and
+       they allow watchers to be extended cleanly through normal OO
+       techniques.  The lifespan of each resource is tightly coupled to the
+       lifespan of each object, so ownership and relevance are clearly
+       indicated.
+
+       POE::Stage standardizes shutdown semantics for requests and stages.
+       Requests are canceled by destroying their objects, and stages are shut
+       down the same way.
+
+       POE::Stage simplifies the cleanup of complex, multi-stage activity.
+       Resources for a particular request should be stored within its closure.
+       Canceling the request triggers destruction of that closure and its
+       contents, which in turn triggers the destruction of the resources
+       allocated to that request.  These resources include stages and requests
+       created during the lifetime of the request.  They too are canceled and
+       freedm
+
+MMAAGGIICCAALL LLEEXXIICCAALL TTOOUURR
+       POE::Stage uses lexical aliasing to expose state data to message
+       handlers, which are specified by either the :Handler method attribute
+       or the use of an on_ prefix in the method's name.
+
+       Lexical variable prefixes indicate the data's origin.  For example,
+       $arg_name is the "name" argument included with a message:
+
+               my $request = POE::Request->new(
+                       method => "something",
+                       args => { name => "ralph" },
+                       ...,
+               );
+
+               sub something :Handler {
+                       my $arg_name;  # already contains "ralph"
+               }
+
+       The full list of prefixes and data sources:
+
+       TThhee ""aarrgg__"" lleexxiiccaall pprreeffiixx,, ee..gg..,, $$aarrgg__ffoooo
+
+       Argument (parameter) "xyz".  If an "args" parameter is passed to a
+       POE::Request constructor, its value must be a reference to a hash.
+       Usually it's an anonymous hashref.  Anyway, the hash's members are
+       named arguments to the message handler.  See above for an example.
+
+       TThhee ""rreeqq__"" lleexxiiccaall pprreeffiixx,, ee..gg..,, $$rreeqq__ffoooo
+
+       An incoming request may trigger more than one handler, especially if a
+       POE::Stage object calls itself, or sends sub-requests to a helper
+       stage.  The "req_" lexical prefix refers to data members within the
+       current request's scope.  Their values will magically reflect the
+       proper request scope, regardless what that is.
+
+       TODO - Example.
+
+       TThhee ""sseellff__"" lleexxiiccaall pprreeffiixx,, ee..gg..,, $$sseellff__ffoooo
+
+       The "self" scope refers to the currently active POE::Stage object.
+       Data may be stored there, in which case it's available from any and all
+       requests handled by that object.  This scope is useful for "singleton"
+       or static data that must be shared between or persistent between all
+       requests.
+
+       TODO - Example
+
+       TThhee ""rrsspp__"" lleexxiiccaall pprreeffiixx,, ee..gg..,, $$rrsspp__ffoooo
+
+       The "rsp" scope refers to data stored in a sub-request's scope, but
+       from the response handler's point of view.  That is, when persisting
+       data between a request to a substage and its response, one should store
+       the data in the substage's request, then retrieve it later from the
+       corresponding "rsp" variable.
+
+       TODO - Example.
+
+       TThhee $$sseellff, $req, and $rsp lexicals
+
+       Certain variables are standard:  $self refers to the current object; it
+       need not be initialized from @_.  $req refers to the higher-level
+       request we're currently handling.  When handling responses from
+       substages, $rsp refers to those responses.
+
+       All three variables are intended as invocatnts for method calls.  Other
+       prefixes exist to access data members within each object's scope.
+
+       TODO - Example.
+
+       The techniques used here have been abstracted and released as
+       Lexical::Persistence.
+
+HHAANNDDLLEERR NNAAMMIINNGG CCOONNVVEENNTTIIOONNSS
+       Message handlers are defined in one of two ways.  They may be named
+       anything as long as they have a :Handler attribute, or they may be
+       prefixed with "on_".  In both cases, they gain lexical persistence
+       magic, as discussed previously.
+
+               # Handle the "foo" message.
+               sub foo :Handler { ... }
+
+               # Handle the "on_foo" and "foo" messages.
+               sub on_foo { ... }
+
+       The _o_n___f_o_o_(_) method above handles both "on_foo" and "foo" messages.
+       Given both a _f_o_o_(_) and an _o_n___f_o_o_(_), however, _o_n___f_o_o_(_) will take
+       precedence.
+
+       Requests include on_* parameters that map response types to response
+       handlers.  For example, this request expects two return types,
+       "success" and "failure".  On success, the _h_a_n_d_l_e___s_u_c_c_e_s_s_(_) method is
+       called.  On failure, _h_a_n_d_l_e___f_a_i_l_u_r_e_(_) is called.
+
+               my $req_subrequest = POE::Request->new(
+                       ...,
+                       on_success => "handle_success",
+                       on_failure => "handle_failure",
+               );
+
+       Response types are specified by the "type" parameter to $req->_e_m_i_t_(_)
+       and $req->_r_e_t_u_r_n_(_).  "emit" and "return" are the default types for
+       _e_m_i_t_(_) and _r_e_t_u_r_n_(_), respectively.
+
+       Requests can also have roles, which are usually descriptive of the
+       transaction.  For example, consider a DNS request for a web client
+       component:
+
+               my $req_resolve = POE::Request->new(
+                       ...,
+                       role => "resolver",
+               );
+
+       This is the role of the request, not of the stage that will handle it.
+       In this case, there are no on_* parameters.  Success and failure come
+       back to methods named "on_" . $request_role . "_" . $response_type.  In
+       the previous example, they are:
+
+               sub on_resolver_success { ... }
+               sub on_resolver_failure { ... }
+
+       When subclassing a POE::Stage class, it's sometimes useful to intercept
+       _e_m_i_t_(_) and _r_e_t_u_r_n_(_) messages.  The subclass may implement handlers
+       directly, or it may override or extend the response.  This is done by
+       defining "on_my_" . $response_type methdos in the subclass.  For
+       example, a TCP connection stage might emit an "input" event, like so:
+
+               sub on_socket_readable {
+                       ...;
+                       $req->emit( type => "input", input => $data );
+               }
+
+       A subclass might implement the code to handle the input.  It can do so
+       by defining _o_n___m_y___i_n_p_u_t_(_):
+
+               sub on_my_input {
+                       # send a response here
+               }
+
+       Messages intercepted like this will not be rethrown automatically to
+       the caller.  If that's desired, _o_n___m_y___i_n_p_u_t_(_) will need to _e_m_i_t_(_) or
+
+       TODO - Make a better example.  Something that can tie all these things
+       together conceptually.
+
+BBUUGGSS
+       POE::Stage is not ready for production.  Check back here early and
+       often to find out when it will be.  Please contact the author if you
+       would like to see POE::Stage production-ready sooner.
+
+BBUUGG TTRRAACCKKEERR
+       https://rt.cpan.org/Dist/Display.html?Status=Active&Queue=POE-Stage
+
+RREEPPOOSSIITTOORRYY
+       http://thirdlobe.com/svn/poe-stage/
+
+OOTTHHEERR RREESSOOUURRCCEESS
+       http://search.cpan.org/dist/POE-Stage/
+
+SSEEEE AALLSSOO
+       POE::Stage is the base class for message-driven objects.  POE::Request
+       is the base class for POE::Stage messages.  POE::Watcher is the base
+       class for event watchers.
+
+       <http://thirdlobe.com/projects/poe-stage/> - POE::Stage is hosted here.
+
+       <http://www.eecs.harvard.edu/~mdw/proj/seda/> - SEDA, the Staged Event
+       Driven Architecture.  It's Java, though.
+
+AAUUTTHHOORRSS
+       Rocco Caputo.
+
+LLIICCEENNSSEE
+       POE::Stage is Copyright 2005-2009 by Rocco Caputo.  All rights are
+       reserved.  You may use, modify, and/or distribute this module under the
+       same terms as Perl itself.
+
+
+
+perl v5.10.0                      2009-07-28                     POE::Stage(3)

@@ -1,0 +1,119 @@
+=pod
+
+=head1 NAME
+
+PDF::OCR2::Page
+
+=head1 SYNOPSIS
+   
+   use PDF::OCR2;
+
+   my $path = './file.pdf';
+   my $pdf = PDF::OCR2->new($path);
+
+   my $page    = $pdf->page(1);     
+
+   $page->abs_pdf;
+   
+   $page->abs_images;
+   
+   $page->abs_images_count;
+   
+   $page->text;
+   
+   $page->text_length;   
+            
+
+=head1 DESCRIPTION
+
+Extract a pdf page document's text, from inside the document and if there are images, from the images via
+tesseract ocr.
+
+Mostly meant to be used by PDF::OCR2.
+
+=head1 METHODS
+
+If you pass abs_path argument to constructor, and the file is not on disk, returns undef.
+
+=head2 new()
+
+Arg is hashref. Must have abs_pdf to pdf file.
+Optionally, argument is abs path to file.
+If no abs_pdf is provided or it does not exist on disk, throws exception.
+
+   my $p = PDF::OCR::Page->new('./file.pdf');
+   
+   my $p = PDF::OCR::Page->new({ abs_pdf => './file.pdf' });
+
+=head2 abs_pdf()
+
+Argument is path to pdf representing one (1) page.
+Must be on disk.
+Perl setget method.
+
+=head2 abs_images()
+
+Returns aref of images, returns list in list context, array ref otherwise.
+Uses PDF::GetImages, slow.
+
+   my $imgs = $p->abs_images;
+   my @imgs = $p->abs_images;
+
+=head2 abs_images_count()
+
+Takes no argument. Returns ammount of images found in page.
+
+=head2 text()
+
+Takes no argument.
+Returns all text, images plus text.
+Returns empty string if none.
+
+=head2 text_length()
+
+Takes no argument.
+Returns number, length of the text.
+Returns 0 if none.
+
+=head1 CLASS VARIABLES
+
+Defaults shown.
+
+Eval pdf with PDF::API2 for correctness/etc.
+
+   $PDF::OCR2::CHECK_PDF = 0;
+
+Do not clean up trash when DESTROY
+
+   $PDF::OCR2::Page::NO_TRASH_CLEANUP = 0;
+
+Debug on
+
+   $PDF::OCR2::Page::DEBUG = 0;
+
+=head1 SEE ALSO
+
+L<PDF::OCR2> - parent package.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 COPYRIGHT
+
+Copyright (c) 2008 Leo Charre. All rights reserved.
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+
+
+
+

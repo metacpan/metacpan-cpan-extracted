@@ -1,0 +1,6 @@
+.validated
+Pod-2-DocBook.html
+Pod-2-DocBook.pdf
+book.fo
+chapters/pod/*.xml
+

@@ -1,0 +1,259 @@
+Revision history for Perl extension Parse::Win32Registry.
+
+** 1.0 2012-04-29
+
+Added support for decoding System Mandatory Label ACEs (a feature
+introduced with Windows Vista) and added the command line script
+regml.pl for listing keys with explicit System Mandatory Label ACEs
+set. Improved handling of security descriptors.
+
+Tidied up various aspects of the wxWidgets and GTK applications, and
+harmonised functionality between the various pairs of equivalent
+programs, with a minor difference being the wxWidgets applications
+following Windows keyboard shortcut conventions while the GTK
+applications following Linux keyboard shortcut conventions.
+
+The get_data method of Value objects now returns the unpacked integer
+value for REG_DWORD_BIG_ENDIAN value types instead of the original
+packed binary data.
+
+Added support for values with 'big data'. Thanks to Harlan Carvey for
+all his help with this.
+
+** 0.60 2010-08-15
+
+Parse::Win32Registry now requires Perl 5.8.1.
+
+Implemented new RGKN and RGDB Block objects for Windows 95 registry
+files. Now both Windows 95 and Windows NT registry files have
+a get_block_iterator method, which replaces the get_hbin_iterator
+previously provided for Windows NT registry files. (For backwards
+compatibility, calling the get_hbin_iterator method will call the
+get_block_iterator method.)
+
+Some performance improvements have been made to the processing of
+REG_MULTI_SZ value data (in the get_data method of Value objects), to
+the generation of hexdumps (in the hexdump function and the unparsed
+method of Entry objects), and to the generation of REGEDIT-style octet
+strings (in the as_regedit_export method of Value objects).
+
+Uncompressed (Unicode) key and value names are now correctly read
+from Windows NT registry files.
+
+The following new scripts have been added: wxregcompare.pl,
+wxregscope.pl, and wxregview.pl. The existing regcompare.pl,
+regscope.pl, and regview.pl scripts have been renamed to
+gtkregcompare.pl, gtkregscope.pl, and gtkregview.pl respectively.
+The wx scripts require Mattia Barbon's wxPerl library and the gtk
+scripts require Gtk-Perl. (Binary versions of wxPerl are currently
+available in ActivePerl.)
+
+gtkregscope.pl and wxregscope.pl use the new get_block_iterator
+method, so can read both Windows 95 or Windows NT registry files.
+
+gtkregcompare.pl and wxregcompare.pl allow the Select Files dialog
+to be cancelled to make it possible to review the currently selected files.
+
+regmultidiff.pl now displays changes in a summary mode.
+The previous format is available by specifying the -l or --long option.
+
+** 0.51 2009-10-04
+
+Added new regscope.pl script, a GTK+ registry entry viewer that uses color
+to highlight different types of registry entries.
+
+Documented the get_name method of SID objects and the get_value_data
+method of Key objects. The as_string method of the ACE object and the
+as_stanza method of the SecurityDescriptor object now include the well
+known SID names (as returned by each SID object's get_name method).
+
+Updated the regview.pl and regcompare.pl scripts: regview.pl and
+regcompare.pl can now select keys and/or values when searching,
+regview.pl can now sort columns (e.g. keys can be sorted by timestamp,
+values by type, etc), regcompare.pl can now bookmark keys or values,
+and regview.pl now has a basic report view.
+
+Fixed the get_subtree_iter and make_multiple_subtree_iterator methods
+to return the root key(s) of the subtree(s) as the documentation
+indicates. regview.pl, regmultidiff.pl, and regcompare.pl amended to
+accommodate these changes.
+
+Fixed redisplay problem closing dialogs using Escape in regview.pl and
+regcompare.pl.
+
+Makefile.pl now includes all scripts as exe_files.
+
+** 0.50 2009-07-19
+
+Security information is now extracted from Windows NT registry files.
+Key objects now provide a get_security method which returns a new
+Security object. The various methods of a Security object will return
+Security Descriptor, ACL, ACE, and SID objects.
+
+The support functions unpack_sid, unpack_ace, unpack_acl, and
+unpack_security_descriptor have been added to allow the manual
+extraction of security information from value data.
+
+The support functions compare_multiple_keys and compare_multiple_values
+have been added for comparing keys and values.
+
+Updated scripts: regview.pl now provides searches and displays
+security information for keys. regtree.pl now draws lines connecting
+subkeys to their parent keys. regdump.pl can now display class names
+and security information. regfind.pl and regtimeline.pl can now
+display value data as a hexdump, and regfind.pl now searches raw data
+for unicode matches.
+
+New scripts: regmultidiff.pl is a command line program for comparing
+multiple registry files, and replaces regdiff.pl. regcompare.pl is a
+GTK+ Registry Compare program, and also provides searches.
+regsecurity.pl displays registry security entries. regshell.pl is a
+interactive console program for browsing registry files that offers
+tab completion of key and value names if Term::Readline is available.
+
+Iterators for processing keys and values have now been added,
+mainly to support GUI programs (see regview.pl and regcompare.pl).
+Key objects now offer the get_subkey_iterator, get_value_iterator,
+and get_subtree_iterator methods.
+
+The support functions make_multiple_subkey_iterator,
+make_multiple_value_iterator, and make_multiple_subtree_iterator have
+been added for processing multiple registry files simultaneously.
+
+Similarly, iterators have been added for scanning registry files entry
+by entry. The new Hbin object has been created to represent the
+individual hbins that make up Windows NT registry files. Now you can
+either iterate through all the entries in a registry file, or iterate
+through all the hbins in a registry file and through each entry of
+each hbin.
+
+The as_hexdump method provided by Entry, Key, and Value objects
+has been renamed to unparsed to more accurately reflect what it shows.
+
+The Entry, Key, and Value objects now provide the following methods:
+get_length, get_tag, is_allocated, get_raw_bytes, looks_like_key,
+looks_like_value, and looks_like_security.
+
+Warnings generated by parse errors are now disabled by default.
+
+** 0.41 2008-12-14
+
+Added the new get_class_name function for Windows NT registry keys.
+Added the regclassnames.pl script to demonstrate finding keys that
+have class names, and updated regview.pl to display the timestamp
+and class names of keys in additional columns.
+
+** 0.40 2008-09-28
+
+Added new scripts: regexport.pl for exporting keys and values using
+the Windows Registry Editor Version 5.00 format, regscan.pl for
+dumping all the entries in a registry file, regstats.pl for providing
+basic statistics, regtimeline.pl for listing keys and values in date
+order, regtree.pl for dumping a registry file as an intended tree, and
+regview.pl, a GTK+ Registry Viewer. Updated regdump.pl and regfind.pl
+to provide new options.
+
+Changed parse errors to generate warnings instead of croaking.
+Documented this in the Handling Invalid Data section.
+
+The get_data method of Value objects now handles REG_MULTI_SZ data by
+returning a list of its elements in an array context, and a string in
+a scalar context. The output of get_data_as_string is unaffected.
+
+Added new Registry object methods: get_virtual_root_key,
+get_timestamp, get_timestamp_as_string, and get_embedded_filename.
+
+Added new Key object methods: as_regedit_export, get_parent, and
+is_root.
+
+Added new Value object methods: as_regedit_export, and get_raw_data.
+
+Added the get_next_entry and move_to_first_entry methods to the
+Registry object for iterating through all the entries in a registry
+file. Added the Entry object class as a generic object to represent
+these entries.
+
+Added the methods parse_info and as_hexdump to
+Entry, Key, and Value objects.
+
+Support function convert_filetime_to_epoch_time renamed to
+unpack_windows_time, added the function unpack_unicode_string, and
+documented hexdump.
+
+** 0.30 2007-07-01
+
+Added two new scripts: regfind.pl for searching keys, values, and data
+for a search string, and regdiff.pl for comparing two registry files
+and displaying the differences. dumpreg.pl renamed to regdump.pl and
+command line options simplified.
+
+Introduced the as_string method for Key and Value objects. This is
+intended to be a more usable replacement for the print_summary
+method.
+
+The get_data_as_string method changed to return REG_DWORD values as a
+hexadecimal number followed by its decimal equivalent. Clarified that
+REG_DWORD values are returned as unsigned integers.
+
+Support functions convert_filetime_to_epoch_time and iso8601
+documented.
+
+Fixed bugs handling unusual key names in the get_subkey method.
+
+** 0.25 2006-11-12
+
+Fixed a bug with new WinNT key objects incorrectly setting the offsets
+to subkey lists and value lists when the offset to the parent key had
+a particular value.
+
+** 0.24 2006-10-29
+
+Key objects now have a get_path method, which returns the path
+to that key from the root key of a registry file. Documentation
+updated to describe the new method.
+
+dumpreg.pl updated to use get_path. Dropped the prefix_pattern and
+long_prefix_pattern configuration options from Getopt::Long.
+(which required an unnecessarily recent version of Getopt::Long)
+
+** 0.23 2006-08-13
+
+Key objects now have the get_timestamp and get_timestamp_as_string
+methods, although only Windows NT registry keys will return valid
+values. print_summary nows also displays the timestamp for Windows NT
+registry keys. Documentation updated to reflect this.
+
+Makefile.PL now installs the dumpreg.pl script.
+
+** 0.22 2006-08-06
+
+Included the script dumpreg.pl as both a tool for examining
+registry files, and as an example.
+
+Offsets that require adjustment by fixed amounts (this applies to
+entries in the RGKN block of Windows 95 registry files and to all
+entries in the hbin blocks of Windows NT registry files) are now
+amended before being stored, rather than at seek time.
+
+Troubleshooting section added to the documentation.
+
+** 0.21 2006-07-30
+
+Checks added after every sysread, and improvements attempted for the
+error messages presented. Internal error messages have been made
+distinct from parse errors.
+
+The code that looks up the RGDB entry for Win95 keys has been revised
+to remove some duplicate code. It's still too long.
+
+Reading REG_DWORD values which are not the expected four bytes in
+length no longer results in an exception. get_data now
+returns undef for these values instead of failing.
+
+get_data_as_string updated to return (no data) when get_data returns
+an empty string, and (invalid data) when get_data returns undef (which
+should only occur for invalid REG_DWORD values).
+
+** 0.20 2006-07-23
+
+Released to CPAN.

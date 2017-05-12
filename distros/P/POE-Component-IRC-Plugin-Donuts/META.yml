@@ -1,0 +1,35 @@
+---
+abstract: 'IRC Plugin to announce when there are fresh donuts in the area!'
+author:
+  - 'Curtis Brandt <curtis@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.030
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.4, Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-IRC-Plugin-Donuts
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Carp::POE: 0.10
+  POE::Component::IRC::Plugin: 0
+  WWW::KrispyKreme::HotLight: 0.03
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/aggrolite/POE-Component-IRC-Plugin-Donuts/issues
+  homepage: https://github.com/aggrolite/POE-Component-IRC-Plugin-Donuts
+  repository: https://github.com/aggrolite/POE-Component-IRC-Plugin-Donuts.git
+version: 0.07
+x_contributors:
+  - 'Curtis Brandt <curtisjbrandt@gmail.com>'

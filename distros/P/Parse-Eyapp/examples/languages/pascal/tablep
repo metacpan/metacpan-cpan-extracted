@@ -1,0 +1,1119 @@
+This file comprises the LEX, YACC and Pascal source of the table-driven P
+compiler/interpreter and a makefile separated by asterisks.
+Copyright (c) P.C.Capon & P.J.Jinks 1988
+May be copied for educational purposes only, with the copyright notice
+attached.
+
+Note: The standard version of YACC distributed with UNIX will not generate any
+error recovery code. Instead, the P compiler will generate an error message
+and halt at the first error. If you require proper error recovery, you are
+recommended to use the version of YACC written at Warwick University by Julia
+Dain which supports error recovery (or some similar variant of YACC).
+Try:
+	Julia A. Dain
+	Dept. of Computer Science
+	University of Warwick
+	Coventry CV4 7AL
+	U.K.
+*******************************************************************************
+PFLAGS= -L -C -g
+YFLAGS= -d -v
+CFLAGS = -g
+
+tablel.o: tabley.y tablel.l
+	make y.tab.h
+	lex  tablel.l
+	cc -g -c lex.yy.c
+	rm lex.yy.c
+	mv lex.yy.o tablel.o
+	
+tablep.o: tablep.p
+	pc $(PFLAGS) -c tablep.p
+
+y.tab.h tabley.o: tabley.y
+	yacc -v -d tabley.y
+	cc  -c y.tab.c
+	rm y.tab.c
+	mv y.tab.o tabley.o
+
+tablep: tablep.p tablel.l tabley.y
+	make tablep.o tabley.o tablel.o
+	pc -o tablep tablel.o tabley.o tablep.o
+*******************************************************************************
+%{
+/* Copyright (c) P.C.Capon & P.J.Jinks 1988 */
+/* May be copied for educational purposes only, with the copyright notice */
+/* attached. */
+
+typedef union
+{   int constval;
+    char idval;
+    char addval;
+    char mulval;
+    char relval;
+} lexemevaltype;
+
+#include "y.tab.h"
+
+#define add		0
+#define sub		1
+
+#define mul		0
+#define divd		1
+
+#define eq		0
+#define ne		1
+#define gt		2
+#define lt		3
+#define ge		4
+#define le		5
+%}
+
+alphanumeric	[A-Za-z0-9]
+
+%START		DONE
+
+%%
+
+<DONE>(.|\n)	{ return (0); }
+
+[ \t\n]		{ ; }
+"{"[^}]*"}"	{ ; }
+"VAR"		{ return (varlexeme); }
+"BEGIN"		{ return (beginlexeme); }
+"END"		{ return (endlexeme); }
+"WRITE"		{ return (writelexeme); }
+"IF"		{ return (iflexeme); }
+"WHILE"		{ return (whilelexeme); }
+"THEN"		{ return (thenlexeme); }
+"DO"		{ return (dolexeme); }
+"READ"		{ return (readlexeme); }
+[A-Z]		{ yylval.lexemeval.idval = yytext[0]; return (identifier); }
+[A-Z]{alphanumeric}+|[a-z]{alphanumeric}*	{
+		  ylerror ("illegal identifier");
+		  yylval.lexemeval.idval = ' '; return (identifier); }
+[0-9]		{ yylval.lexemeval.constval = yytext[0]-'0'; return (constant); }
+[0-9][0-9]+	{ ylerror ("illegal constant");
+		  yylval.lexemeval.constval = 0; return (constant); }
+";"		{ return (semicolon); }
+"."		{ BEGIN DONE; return (dot); }
+","		{ return (comma); }
+":="		{ return (assign); }
+"("		{ return (lbracket); }
+")"		{ return (rbracket); }
+"+"		{ yylval.lexemeval.addval = add; return (addop); }
+"-"		{ yylval.lexemeval.addval = sub; return (addop); }
+"*"		{ yylval.lexemeval.mulval = mul; return (mulop); }
+"/"		{ yylval.lexemeval.mulval = divd; return (mulop); }
+"<"		{ yylval.lexemeval.relval = lt; return (relop); }
+"<="		{ yylval.lexemeval.relval = le; return (relop); }
+"<>"		{ yylval.lexemeval.relval = ne; return (relop); }
+">"		{ yylval.lexemeval.relval = gt; return (relop); }
+">="		{ yylval.lexemeval.relval = ge; return (relop); }
+"="		{ yylval.lexemeval.relval = eq; return (relop); }
+.		{ ylerror ("unknown character"); return (unknown); }
+
+%%
+
+/* variables */
+  extern int yyleng, yylineno;
+  extern char yytext[];
+  extern char /* boolean */ errors;
+  extern YYSTYPE yyval;
+
+/* procedure */ yyerror (s)
+  char *s;
+{
+  printf("line %d: %s\n", yylineno, s);
+  /* %d means print the next parameter as an integer,
+  %s means print it as a character string,
+  \n means newline */
+  errors = 1; /* true */
+}
+
+/* procedure */ ylerror (s)
+  char *s;
+{
+  printf("line %d: %s '%s'\n", yylineno, s, yytext);
+  errors = 1; /* true */
+}
+
+/* function */ YYSTYPE* yyerrlval ()
+{
+  static YYSTYPE dummy;
+  dummy.lexemeval.constval= 1;
+  errors = 1; /* true */
+  return &dummy;
+}
+
+/* function */ struct nodetype* callparse (ok)
+  int *ok;
+{
+  *ok = yyparse();
+  return yyval.tree;
+}
+
+/* function */ int makelexeme (lex)
+  int lex;
+{
+  return lex - 257; /* converts yacc type to pascal type */
+}
+******************************************************************************
+%{
+/* Copyright (c) P.C.Capon & P.J.Jinks 1988 */
+/* May be copied for educational purposes only, with the copyright notice */
+/* attached. */
+
+#define NULL 0
+
+#define prognode	0
+#define blocknode	1
+#define assignnode	2
+#define writenode	3
+#define ifnode		4
+#define whilenode	5
+#define expnode		6
+#define lexemenode	7
+
+#define nullexemeval	0
+
+typedef struct nodetype
+{   struct nodetype *next; int serial;
+    char nodecase;
+    union
+    {   struct {struct nodetype *pidlist}		 prognodetype;
+        struct {struct nodetype *contents, *lastb}	 blocknodetype;
+        struct {struct nodetype *pexp, *petc, *lasts}	 statementnodestype;
+        struct {struct nodetype *lexp, *operator, *rexp} expnodetype;
+        struct {char lexeme; int lexemeval}		 lexemenodetype;
+    } nodevariants;
+} nodetype;
+
+typedef union
+{   int constval;
+    char idval;
+    char addval;
+    char mulval;
+    char relval;
+} lexemevaltype;
+
+/* function */ extern nodetype* makelexemenode ();
+/* function */ extern nodetype* makenode ();
+/* function */ extern int makelexeme ();
+/* procedure */ extern dumptree ();
+/* function */ extern nodetype* startlist ();
+/* function */ extern nodetype* makelist ();
+
+%}
+
+%start  program
+
+%union {
+	lexemevaltype lexemeval;
+	struct nodetype *tree;
+	}
+
+%token <lexemeval> dot constant identifier comma assign semicolon
+%token <lexemeval> lbracket rbracket addop mulop relop beginlexeme
+%token <lexemeval> readlexeme writelexeme iflexeme thenlexeme whilelexeme
+%token <lexemeval> dolexeme varlexeme endlexeme unknown
+
+%type <tree> program phead idlist ids block blocks statement comparison
+%type <tree> expression term factor
+
+%%
+
+program : phead block dot
+	{$$ = makenode ($2, prognode, $1, NULL, NULL);}
+        ;
+
+phead   : varlexeme idlist
+	{$$ = $2;}
+        |{$$ = NULL;}
+        ;
+
+idlist  : ids semicolon
+	{$$ = $1;}
+        ;
+
+ids     : identifier
+	{$$ = makelexemenode(NULL, makelexeme(identifier), $1);}
+        | ids comma identifier
+	{$$ = makelexemenode($1, makelexeme(identifier), $3);
+	/* list backward, see blocks */}
+        ;
+
+block   : statement
+        {$$ = $1;}
+        | beginlexeme blocks endlexeme
+        {$$ = makenode (NULL, blocknode, $2, NULL, NULL);}
+        ;
+
+blocks : block
+	{$$ = startlist ($1);}
+	| blocks semicolon block
+	{$$ = makelist ($1, $3);}
+	;
+
+statement : identifier assign expression
+	{$$ = makenode(NULL, assignnode, $3,
+	 makelexemenode(NULL,makelexeme(identifier),$1), NULL);}
+        | writelexeme lbracket expression rbracket
+        {$$ = makenode (NULL, writenode, $3, NULL, NULL);}
+        | iflexeme comparison thenlexeme block
+        {$$ = makenode (NULL, ifnode, $2, $4, NULL);}
+        | whilelexeme comparison dolexeme block
+        {$$ = makenode (NULL, whilenode, $2, $4, NULL);}
+        |{$$ = NULL;}
+        ;
+
+comparison : expression relop expression
+        {$$ = makenode(NULL, expnode, $1,
+        makelexemenode(NULL,makelexeme(relop),$2), $3);}
+        ;
+
+expression : term
+	{$$ = $1;}
+        | expression addop term
+        {$$ = makenode(NULL, expnode, $1,
+        makelexemenode(NULL,makelexeme(addop),$2), $3);}
+        ;
+
+term    : factor
+	{$$ = $1;}
+        | term mulop factor
+	{$$ = makenode(NULL, expnode, $1,
+	makelexemenode(NULL,makelexeme(mulop),$2), $3);}
+        ;
+
+factor  : identifier
+	{$$ = makelexemenode(NULL,makelexeme(identifier),$1);}
+        | constant
+        {$$ = makelexemenode(NULL,makelexeme(constant),$1);}
+        | readlexeme
+        {$$ = makelexemenode(NULL,makelexeme(readlexeme), nullexemeval);}
+        | lbracket expression rbracket
+        {$$ = $2;}
+        ;
+
+%%
+
+extern YYSTYPE *yyerrlval();
+******************************************************************************
+program pcompiler (input, output);
+
+{Copyright (c) P.C.Capon & P.J.Jinks 1988}
+{may be copied for educational purposes only,}
+{with the copyright notice attached.}
+
+label 999;
+
+const
+  trace = false;
+
+{ consts from recursive descent compiler ----------------------------------- }
+
+  namechars = 6;
+  nulop = 0;
+  readproc = 1; writeproc = 2; {call operands}
+  stack = 1; unstack = 2; nooperand = 3; {special operands}
+  maxcode = 500;
+  maxstack = 100;
+  maxvar = 26;
+
+type
+{ types from recursive descent compiler ------------------------------------ }
+
+  lexemetype = (dot, constant, identifier, comma, assign,
+             semicolon, lbracket, rbracket, addop, mulop, relop,
+             beginlexeme, readlexeme, writelexeme, iflexeme,
+             thenlexeme, whilelexeme, dolexeme, varlexeme,
+             endlexeme, unknown);
+  nametype = packed array [1..namechars] of char;
+  addvaltype = (add, sub);
+  mulvaltype = (mul, divd);
+  relvaltype = (eq, ne, gt, lt, ge, le);
+  lexemevaltype = record
+    case lexemetype of
+    constant:   (constval: integer);
+    identifier: (idval: char);
+    addop:      (addval: addvaltype);
+    mulop:      (mulval: mulvaltype);
+    relop:      (relval: relvaltype);
+    end;
+  functiontype = (accload, accstore, stackaccload, accplus,
+               accminus, minusacc, acctimes, accdiv, divacc,
+               stop, call, acccompare, br,
+               breq, brne, brlt, brle, brge, brgt);
+  optypetype = (specialop, constop, varop, labelop);
+  calltype = readproc..writeproc;
+  mode = specialop .. varop;
+  data = integer;
+  address = 0..maxcode;
+  inst = record
+    case funct: functiontype of
+    accload, accstore, stackaccload, accplus, accminus, minusacc,
+    acctimes, accdiv, divacc, acccompare:
+          (accmode: mode; accval: data);
+    br, breq, brne, brlt, brle, brge, brgt:
+          (brval: address);
+    call: (callval: calltype);
+    stop: ();
+    end;
+{ -------------------------------------------------------------------------- }
+
+  nodecasetype = (prognode, blocknode, assignnode, writenode, ifnode,
+                  whilenode, expnode, lexemenode);
+  pnode = ^nodetype;
+  nodetype = record
+    next: pnode;
+    serial: integer;
+    case nodecase: nodecasetype of
+    prognode  : (pidlist: pnode); {block in next}
+    blocknode : (contents, lastb: pnode); {last used only to build tree}
+    assignnode,
+    writenode,
+    ifnode,
+    whilenode : (pexp, petc, lasts: pnode);
+      {assign: etc=var, if/while: etc=block, write: etc=unused}
+    expnode   : (lexp, operator, rexp: pnode);
+      { for expression and comparison - doesn't use next }
+    lexemenode: (lexeme: lexemetype; lexemeval: lexemevaltype);
+      { for operator, constant, identifier, read
+        - doesn't use next except for identifiers in idlist }
+  end;
+
+var
+  nextserial, ok: integer;
+  tree: pnode;
+
+{ vars from recursive descent compiler-------------------------------------- }
+
+  errors: boolean;
+  lexeme: lexemetype;
+  lexemeval: lexemevaltype;
+  lexemes: array [lexemetype] of nametype;
+  variables: array['A'..'Z'] of -1..maxint;
+  {-1=undefined, 0=not used, >0=address}
+  nextvariable: 1..maxint; {address of next variable declared}
+  accinuse: boolean;
+  codepos: 0..maxint; {position to plant next piece of code}
+  forwardadd, reverseadd: array [addvaltype] of functiontype;
+  forwardmul, reversemul: array [mulvaltype] of functiontype;
+  normalskip, reverseskip: array [relvaltype] of functiontype;
+  fnnames: array [functiontype] of nametype;
+  store: array [address] of inst;
+  branchset: set of br..brgt;
+  machinestack: array [0..maxstack] of data;
+  pc: -1..maxcode;
+  acc: data;
+  sf: -1..maxstack;
+  stoprun: boolean;
+  vars: array [1..maxvar] of
+    record
+    defined: boolean;
+    varval: data;
+    end;
+
+{ interface to lex & yacc -------------------------------------------------- }
+
+function yywrap: integer;
+begin
+  yywrap := 1;
+end;
+
+function callparse (var ok: integer): pnode; external c;
+
+function makelexemenode (pnext: pnode; plexeme: lexemetype;
+                        plexemeval: lexemevaltype): pnode;
+var
+  tnode: pnode;
+begin
+  new (tnode);
+  with tnode^ do begin
+    serial := nextserial;
+    nextserial := nextserial + 1;
+    nodecase := lexemenode;
+    lexeme := plexeme;
+    lexemeval := plexemeval;
+    next := pnext;
+  end;
+  makelexemenode := tnode;
+end;
+
+procedure dumptree (tree: pnode; level: integer); forward;
+
+function makenode (pnext: pnode; pnodecase: nodecasetype;
+                   lnode, cnode, rnode: pnode): pnode;
+var
+  tnode: pnode;
+begin
+  new (tnode);
+  with tnode^ do begin
+    serial := nextserial;
+    nextserial := nextserial + 1;
+    nodecase := pnodecase;
+    next := pnext;
+    case pnodecase of
+    prognode  :pidlist := lnode;
+    blocknode :begin contents := lnode; lastb := nil; end;
+    assignnode,
+    writenode,
+    ifnode,
+    whilenode :begin pexp := lnode; petc := cnode; lasts := nil; end;
+    expnode   :begin lexp := lnode; operator := cnode; rexp := rnode; end;
+    end;
+  end;
+  makenode := tnode;
+end;
+
+function startlist (head: pnode): pnode;
+begin
+  if trace then
+    writeln ('startlist');
+  startlist := head;
+  if head <> nil then
+    if head^.nodecase = blocknode then
+      head^.lastb := head
+    else
+      head^.lasts := head;
+  if trace then begin
+    dumptree (head, 1);
+    writeln;
+  end;
+end;
+
+function makelist (head, item: pnode): pnode;
+begin
+  if trace then
+    writeln ('makelist');
+  if head = nil then
+    makelist := startlist (item)
+  else if item = nil then
+    makelist := head
+  else begin
+    makelist := head;
+    if head^.nodecase = blocknode then begin
+      head^.lastb^.next := item;
+      head^.lastb := item;
+    end else begin
+      head^.lasts^.next := item;
+      head^.lasts := item;
+    end;
+  end;
+  if trace then begin
+    dumptree (head, 1);
+    dumptree (item, 1);
+    writeln;
+  end;
+end;
+{ -------------------------------------------------------------------------- }
+
+procedure dumptree {tree: pnode; level: integer};
+const
+  spaces = 4;
+begin
+  {writeln(ord(tree));}
+  while tree <> nil do with tree^ do begin
+    { insert ord in next line for standard pascal }
+    write ('node:', serial:5, {ord (}nodecase{)}:15);
+    case nodecase of
+      prognode  :
+        begin
+          writeln;
+          write (' ':level+spaces, 'pidlist: ');
+          dumptree (pidlist, level+spaces);
+        end;
+      blocknode :
+        begin
+          writeln;
+          write (' ':level+spaces, 'contents:');
+          dumptree (contents, level+spaces);
+          write (' ':level+spaces, 'lastb:');
+          if lastb <> nil then
+            writeln (lastb^.serial:5)
+          else
+            writeln (' nil');
+        end;
+      assignnode,
+      writenode,
+      ifnode,
+      whilenode :
+        begin
+          writeln;
+          write (' ':level+spaces, 'pexp:    ');
+          dumptree (pexp, level+spaces);
+          write (' ':level+spaces, 'petc:    ');
+          dumptree (petc, level+spaces);
+          write (' ':level+spaces, 'lasts:');
+          if lasts <> nil then
+            writeln (lasts^.serial:5)
+          else
+            writeln (' nil');
+        end;
+      expnode   :
+        begin
+          writeln;
+          write (' ':level+spaces, 'lexp:    ');
+          dumptree (lexp, level+spaces);
+          write (' ':level+spaces, 'operator:');
+          dumptree (operator, level+spaces);
+          write (' ':level+spaces, 'rexp:    ');
+          dumptree (rexp, level+spaces);
+        end;
+      lexemenode:
+        begin
+          write(lexemes[lexeme]:namechars+1);
+          if lexeme in [constant, identifier, addop, mulop, relop] then
+            case lexeme of
+            constant:   writeln (lexemeval.constval:5);
+            identifier: writeln (lexemeval.idval:5);
+            { insert ord's in next 3 lines for standard pascal }
+            addop:      writeln ({ord (}lexemeval.addval{)}:5);
+            mulop:      writeln ({ord (}lexemeval.mulval{)}:5);
+            relop:      writeln ({ord (}lexemeval.relval{)}:5);
+            end
+          else
+            writeln;
+          end;
+    end;
+    write (' ':level, 'next:    ');
+    tree := next;
+  end;
+  writeln ('end of list');
+end;
+
+{procedures etc from cmb-----------------------------------------------------}
+ 
+procedure listaline (pos: address);
+begin
+  with store[pos] do begin
+    write (pos:3,' : ',fnnames[funct],' ');
+    case funct of
+    accload,accstore,stackaccload,accplus,accminus,minusacc,acctimes,
+    accdiv,divacc,acccompare:
+      case accmode of
+      varop    :write ('variable ', accval:1);
+      constop  :write ('constant ', accval:1);
+      specialop: 
+        case accval of
+        stack    :write ('stack    ');
+        unstack  :write ('unstack  ');
+        nooperand:;
+        end;
+      end;
+    br, brne, breq, brlt, brle, brge, brgt:
+      write (brval :1);
+    call:
+      if callval = readproc then
+        write ('read')
+      else if callval = writeproc then
+        write ('write')
+      else
+        write (callval :3);
+    stop:;
+    end;
+  end;
+  writeln;
+end;
+ 
+procedure listing;
+  var i: address;
+begin
+  writeln ;
+  writeln ('assembly listing of compiled code');
+  writeln ('=================================');
+  writeln ;
+  for i := 0 to codepos - 1 do
+    listaline (i);
+  writeln;
+end;
+
+procedure error (n :integer);
+begin
+  case n of
+  8  : writeln('variable already declared');
+  9  : writeln('variable not declared');
+  10 : writeln('code overflow');
+  end;
+  errors := true;
+end;
+
+procedure declid (idval: char);
+begin
+  if variables[idval] > 0 then
+    error(8) {variable already declared}
+  else begin
+    variables[idval] := nextvariable;
+    nextvariable := nextvariable + 1;
+  end;
+end;
+ 
+procedure checkid (idval: char);
+begin
+  if variables[idval] = 0 then begin
+    error(9); {variable not declared}
+    variables[idval] := -1;
+    { to stop further error messages }
+  end;
+end;
+
+procedure plant(fn: functiontype; optype: optypetype; opval: integer);
+begin
+  if codepos >= maxcode then begin
+    error (10);
+    codepos := 0; {not very satisfactory, but adequate}
+  end;
+  with store [codepos] do begin
+    funct := fn;
+    case optype of
+      specialop:
+        begin
+          accmode := specialop;
+          accval := opval;
+        end;
+      labelop:
+        if fn = call then
+          callval := opval
+        else
+          brval := opval;
+      constop:
+        begin
+          accval := opval;
+          accmode := constop;
+        end;
+      varop:
+        begin
+          accval := opval;
+          accmode := varop;
+        end;
+      end;
+      write ('plant ');
+      listaline (codepos);
+      codepos := codepos + 1;
+ end;
+end;
+ 
+procedure plantforwardlabel(pos: integer);
+begin
+  writeln('label: used from ', pos);
+  store[pos].brval := codepos;
+end;
+ 
+function saveforwardlabel: integer;
+begin
+  writeln('label used');
+  saveforwardlabel := codepos;
+end;
+ 
+function savelabel: integer;
+begin
+  writeln('label:');
+  savelabel := codepos;
+end;
+ 
+procedure plantaccload (optype: optypetype; opval: integer);
+begin
+  if optype <> specialop then
+    if accinuse then
+      plant (stackaccload, optype, opval)
+    else
+      plant (accload, optype, opval);
+  accinuse := true;
+end;
+
+procedure runerror (message : packed array [lo..hi: integer] of char);
+  var i : integer;
+begin
+  writeln;
+  write ('*** runtime error - ');
+  for i := lo to hi do
+    write (message [i]);
+  writeln (' at address ',pc:1,' ***');
+  writeln;
+  for i := 1 to maxvar do
+    if vars[i].defined then
+      writeln ('variable ',i:2,' = ',vars[i].varval:1);
+  writeln;
+  writeln ('accumulator = ',acc:1);
+  writeln;
+  writeln ('stack front = ', sf);
+  for i := 0 to sf do
+    writeln ('stack item ', i, ' =', machinestack [i]);
+goto 999;
+end;
+ 
+procedure push (d : data);
+begin
+  if sf = maxstack then
+    runerror ('stack overflow');
+  sf := sf + 1;
+  machinestack [sf] := d;
+end;
+ 
+function pop : data;
+begin
+  if sf = -1 then
+    runerror ('stack underflow');
+  pop := machinestack [sf];
+  sf := sf - 1;
+end;
+ 
+function getop : data;
+begin
+  with store [pc] do
+    case accmode of
+    specialop:
+      if accval = unstack then
+        getop := pop
+      else
+        runerror ('illegal operand');
+    constop: getop := accval;
+    varop:
+      if vars[accval].defined then
+        getop := vars[accval].varval
+      else
+        runerror ('undefined variable');
+    end; { case }
+end;
+ 
+procedure interpret; { a single instruction }
+  var operand : data;
+begin
+  pc := pc + 1;
+  with store[pc] do begin
+    case funct of
+    accload: 
+      acc := getop;
+    stackaccload:
+      begin
+        push (acc);
+        acc := getop;
+      end;
+    accplus:
+      acc := acc + getop;
+    accminus:
+      acc := acc - getop;
+    minusacc:
+      acc := getop - acc;
+    acctimes:
+      acc := acc * getop;
+    accdiv:
+      begin
+        operand := getop;
+        if operand = 0 then
+          runerror ('division by zero');
+        acc := acc div operand;
+      end;
+    divacc:
+      begin
+        if acc = 0 then
+          runerror ('division by zero');
+        acc := getop div acc;
+      end;
+    accstore:
+      with store[pc] do
+        case accmode of
+        constop:
+          runerror('illegal operand');
+        varop:
+          with vars [accval] do begin
+            defined := true;
+            varval  := acc;
+          end;
+        specialop:
+          if accval = stack then
+            push (acc)
+          else
+            runerror ('illegal operand');
+        end;
+    acccompare:
+      begin
+        operand := getop;
+        if acc = operand then
+          branchset := [br, breq]
+        else
+          branchset := [br, brne];
+        if acc < operand then
+          branchset := branchset + [brlt]
+        else
+          branchset := branchset + [brge];
+        if acc <= operand then
+          branchset := branchset + [brle]
+        else
+          branchset := branchset + [brgt];
+      end;
+    br, brne, breq, brle, brlt, brgt, brge:
+      if funct in branchset then
+        pc := brval - 1;
+    call:
+      if callval = readproc then
+        read (acc)
+      else if callval = writeproc then
+        writeln (pop:1)
+      else
+        runerror ('illegal call operand');
+    stop:
+      stoprun := true;
+    end; { case }
+  end; { with }
+end; { interpret }
+{ -------------------------------------------------------------------------- }
+
+procedure init;
+var
+  i: 0..maxvar;
+  ch : char;
+begin
+  lexemes[unknown]       := '?     ';
+  lexemes[constant]      := 'digit ';
+  lexemes[identifier]    := 'name  ';
+  lexemes[comma]         := ',     ';
+  lexemes[dot]           := '.     ';
+  lexemes[assign]        := ':=    ';
+  lexemes[semicolon]     := ';     ';
+  lexemes[lbracket]      := '(     ';
+  lexemes[rbracket]      := ')     ';
+  lexemes[addop]         := '+or-  ';
+  lexemes[mulop]         := '*or/  ';
+  lexemes[relop]         := '<=>   ';
+  lexemes[beginlexeme]   := 'BEGIN ';
+  lexemes[readlexeme]    := 'READ  ';
+  lexemes[writelexeme]   := 'WRITE ';
+  lexemes[iflexeme]      := 'IF    ';
+  lexemes[thenlexeme]    := 'THEN  ';
+  lexemes[whilelexeme]   := 'WHILE ';
+  lexemes[dolexeme]      := 'DO    ';
+  lexemes[varlexeme]     := 'VAR   ';
+  lexemes[endlexeme]     := 'END   ';
+  errors := false;
+  nextvariable := 1;
+  for ch := 'A' to 'Z' do
+    variables[ch] := 0;
+  codepos := 0;
+  forwardadd[add]  := accplus;
+  forwardadd[sub]  := accminus;
+  reverseadd[add]  := accplus;
+  reverseadd[sub]  := minusacc;
+  forwardmul[mul]  := acctimes;
+  forwardmul[divd] := accdiv;
+  reversemul[mul]  := acctimes;
+  reversemul[divd] := divacc;
+  normalskip[eq] := brne;
+  normalskip[ne] := breq;
+  normalskip[gt] := brle;
+  normalskip[lt] := brge;
+  normalskip[ge] := brlt;
+  normalskip[le] := brgt;
+  reverseskip[eq] := brne;
+  reverseskip[ne] := breq;
+  reverseskip[gt] := brge;
+  reverseskip[lt] := brle;
+  reverseskip[ge] := brgt;
+  reverseskip[le] := brlt;
+  fnnames[accload]      := 'acc=  ';
+  fnnames[accstore]     := 'acc=> ';
+  fnnames[stackaccload] := '<acc= ';
+  fnnames[accplus]      := 'acc+  ';
+  fnnames[accminus]     := 'acc-  ';
+  fnnames[minusacc]     := '-acc  ';
+  fnnames[acctimes]     := 'acc*  ';
+  fnnames[accdiv]       := 'acc/  ';
+  fnnames[divacc]       := '/acc  ';
+  fnnames[call]         := 'call  ';
+  fnnames[acccompare]   := 'accom ';
+  fnnames[br]           := 'br    ';
+  fnnames[breq]         := 'breq  ';
+  fnnames[brne]         := 'brne  ';
+  fnnames[brlt]         := 'brlt  ';
+  fnnames[brle]         := 'brle  ';
+  fnnames[brge]         := 'brge  ';
+  fnnames[brgt]         := 'brgt  ';
+  fnnames[stop]         := 'stop  ';
+  pc := -1;
+  acc := 0;
+  sf := -1;
+  branchset := [br];
+  for i := 1 to maxvar do
+    vars [i].defined := false;
+  stoprun := false;
+end; 
+
+procedure reverseactionunstack (action: pnode; var iflabel: integer);
+begin
+  with action^ do
+    case lexeme of
+      identifier, constant, readlexeme:
+        writeln ('operator expected in reverseactionunstack');
+      mulop:
+        plant(reversemul[lexemeval.mulval], specialop, unstack);
+      addop:
+        plant(reverseadd[lexemeval.addval], specialop, unstack);
+      relop:
+        begin
+          plant(acccompare, specialop, unstack);
+          iflabel := saveforwardlabel;
+          plant(reverseskip[lexemeval.relval], labelop, nulop);
+        end
+    end;
+end;
+
+procedure forwardaction (action: pnode; optype: optypetype;
+                         opval: integer; var iflabel: integer);
+begin
+  case action^.lexeme of
+    identifier, constant, readlexeme:
+      writeln ('operator expected in forwardaction');
+    mulop:
+      plant(forwardmul[action^.lexemeval.mulval], optype, opval);
+    addop:
+      plant(forwardadd[action^.lexemeval.addval], optype, opval);
+    relop:
+      begin
+        plant(acccompare, optype, opval);
+        iflabel := saveforwardlabel;
+        plant(normalskip[action^.lexemeval.relval], labelop, nulop);
+      end;
+  end;
+end;
+
+procedure plantexpression (tree, action: pnode; var iflabel: integer);
+  { action = nil means acc := tree, <> nil means acc := acc 'action' tree }
+var
+  optype: optypetype;
+  opval: integer;
+begin
+  if tree <> nil then with tree^ do
+    case nodecase of
+    prognode, blocknode, assignnode, writenode, ifnode, whilenode:
+      writeln ('non-expression node in plantexpression');
+    expnode:
+      begin
+        { stack acc if loaded, load acc with tree }
+        plantexpression (lexp, nil, iflabel);
+        plantexpression (rexp, operator, iflabel);
+        if action <> nil then { perform action }
+          reverseactionunstack (action, iflabel);
+      end;
+    lexemenode:
+      begin
+        case lexeme of
+          mulop, addop, relop:
+            writeln ('operand expected in plantexpression');
+          identifier:
+            begin
+              checkid (lexemeval.idval);
+              optype := varop;
+              opval := variables[lexemeval.idval]
+            end;
+          constant:
+            begin
+              optype := constop;
+              opval := lexemeval.constval;
+            end;
+          readlexeme:
+            begin
+              if accinuse then 
+                plant(accstore, specialop, stack);
+              plant(call, labelop, readproc);
+              optype := specialop;
+              opval := unstack;
+            end;
+        end;
+        if action = nil then begin { load acc with operand }
+          if optype <> specialop then { i.e. not already 'read' }
+            plantaccload (optype, opval);
+        end
+        else { perform action }
+          if optype = specialop then { i.e. just stacked & read into acc }
+            reverseactionunstack (action, iflabel)
+          else
+            forwardaction (action, optype, opval, iflabel);
+        accinuse := true;
+      end;
+    end;
+end;
+
+procedure planttree (tree: pnode);
+var
+  dummy, iflabel, whilelabel: integer;
+  idlist: pnode;
+begin
+  while tree <> nil do with tree^ do begin
+    case nodecase of
+      prognode:
+        begin
+          idlist := pidlist;
+          while idlist <> nil do with idlist^ do begin
+            if nodecase <> lexemenode then
+              writeln ('lexeme expected in idlist')
+            else if lexeme <> identifier then
+              writeln ('identifier expected in idlist')
+            else
+              declid (lexemeval.idval);
+            idlist := next;
+          end;
+        end;
+      blocknode:
+        planttree (contents);
+      assignnode:
+        begin
+          accinuse := false;
+          plantexpression (pexp, nil, dummy);
+          checkid (petc^.lexemeval.idval);
+          plant (accstore, varop, variables[petc^.lexemeval.idval]);
+        end;
+      writenode:
+        begin
+          accinuse := false;
+          plantexpression (pexp, nil, dummy);
+          plant (accstore, specialop, stack);
+          plant (call, labelop, writeproc);
+        end;
+      ifnode:
+        begin
+          accinuse := false;
+          plantexpression (pexp, nil, iflabel);
+          planttree (petc);
+          plantforwardlabel (iflabel);
+        end;
+      whilenode:
+        begin
+          whilelabel := savelabel;
+          accinuse := false;
+          plantexpression (pexp, nil, iflabel);
+          planttree (petc);
+          plant (br, labelop, whilelabel);
+          plantforwardlabel (iflabel);
+        end;
+      expnode, lexemenode:
+        writeln ('expressions and lexemes not expected in planttree');
+    end;
+    tree := next;
+  end;
+end;
+
+begin { main body }
+  init;
+  nextserial := 1;
+  tree := callparse (ok);
+  errors := errors or (ok <> 0);
+  if errors then
+    writeln ('errors in syntactic analysis')
+  else begin
+    write (' tree:    ');
+    dumptree (tree, 1);
+    writeln;
+    planttree (tree);
+    plant (stop, specialop, nooperand);
+    writeln;
+    if not errors then begin
+      listing;
+      repeat
+        interpret;
+      until stoprun;
+    end;
+  end;
+999:
+  writeln;
+end.

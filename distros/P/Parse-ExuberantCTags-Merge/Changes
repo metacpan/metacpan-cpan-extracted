@@ -1,0 +1,10 @@
+Revision history for Perl extension Parse::ExuberantCTags::Merge.
+
+1.01  Sun Nov 15 14:08 2009
+  - Add command line interface 'ctags-merger'
+  - Fix thresholding bug.
+  - Fix README.
+
+1.00  Sat Nov 14 16:25 2009
+  - original version
+

@@ -1,0 +1,48 @@
+NAME
+
+    POE::Loop::Mojo_IOLoop - a bridge that allows POE to be driven by
+    Mojo::IOLoop
+
+SYNOPSIS
+
+    See POE::Loop.
+
+     use POE qw(Loop::Mojo_IOLoop);
+     
+     use POE::Kernel { loop => 'Mojo::IOLoop' };
+     
+     BEGIN { $ENV{POE_EVENT_LOOP} = 'POE::Loop::Mojo_IOLoop' }
+     use POE;
+
+DESCRIPTION
+
+    POE::Loop::Mojo_IOLoop implements the interface documented in
+    POE::Loop. Therefore it has no documentation of its own. Please see
+    POE::Loop for more details.
+
+    When using Mojo::IOLoop with POE, the loop must be set explicitly or
+    POE will detect multiple event loops and fail. You can set the event
+    loop by setting the environment variable POE_EVENT_LOOP to
+    POE::Loop::Mojo_IOLoop before POE is loaded, or by including it in the
+    use directive when initially loading POE. See "Using POE with Other
+    Event Loops" in POE::Kernel for more information.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book, dbook@cpan.org
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2015, Dan Book.
+
+    This library is free software; you may redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+SEE ALSO
+
+    POE, POE::Loop, Mojo::IOLoop, POE::Loop::PerlSignals
+

@@ -1,0 +1,14 @@
+Changes to the Perl6::Conf module
+
+v0.04 2009.02.09
+	Require RAKUDO_DIR for the installation.
+	Fix shim.pl so the test script won't need to include the blib/lib directory.
+
+v0.03 2009.02.08
+	Add provides key to Makefile.PL
+
+v0.02 2009.02.08
+	Try to provide more information in META.yml
+
+v0.01 2009.02.08
+	The first version of Perl6::Conf is released to CPAN.

@@ -1,0 +1,21 @@
+SYNOPSIS
+
+    In weaver.ini:
+
+     [@Author::PERLANCAR]
+
+    or in dist.ini:
+
+     [PodWeaver]
+     config_plugin = @Author::PERLANCAR
+
+DESCRIPTION
+
+    Equivalent to (see source code).
+
+SEE ALSO
+
+    Pod::Weaver
+
+    Dist::Zilla::PluginBundle::Author::PERLANCAR
+

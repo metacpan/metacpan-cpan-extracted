@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include/silc
+
+Name: silc-toolkit
+Description: SILC Library
+Version: 1.1.10
+Libs: -L${libdir} -lsilc  -ldl -lpthread
+Cflags: -I${includedir}
+

@@ -1,0 +1,64 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.006'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::More' => '0',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Version' => '1'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Moose' => '0',
+                                      'Pod::Weaver' => '3.101632',
+                                      'Pod::Weaver::Role::Finalizer' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    },
+                      'suggests' => {
+                                      'Text::Wrap' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Exporter' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'PPI' => '0',
+                                   'Pod::Elemental' => '0.102360',
+                                   'Pod::Elemental::Element::Pod5::Command' => '0',
+                                   'Pod::Elemental::Selectors' => '0',
+                                   'Pod::Elemental::Transformer::Nester' => '0',
+                                   'Pod::Elemental::Transformer::Pod5' => '0',
+                                   'Software::License::Perl_5' => '0',
+                                   'Test::Differences' => '0.500',
+                                   'Test::MockObject' => '1.09',
+                                   'Test::More' => '0.96',
+                                   'lib' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,0 +1,10 @@
+{title Treatise on World Peace}
+{subtitle The Solution}
+{author Joe Schmoe joe@schmoe.net}
+{author Bob Marley}
+{docid boa-12345}
+{version 1.0}
+{date February 27, 2002}
+= Introduction =
+
+This is the introduction to our treatise on world peace.

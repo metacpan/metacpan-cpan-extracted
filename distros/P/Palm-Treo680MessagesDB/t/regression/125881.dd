@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1212315312,
+          'number' => '60116',
+          'time' => '11:15',
+          'date' => '2008-06-01',
+          'name' => 'Simon XXXXX (M)',
+          'phone' => '60116',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1212315312,
+          'text' => 'Car Insurance due for renewal? Call Swinton now for a great deal and an instant quote on 31336499782. Calls may be recorded. To stop SMS reply STOP.',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7108249,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 125881
+        };

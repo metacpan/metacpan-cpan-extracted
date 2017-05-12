@@ -1,0 +1,10 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+eg/dunno
+lib/POE/Component/Server/Postfix.pm
+lib/POE/Component/Server/Postfix/TCP.pm
+lib/POE/Component/Server/Postfix/UNIX.pm
+t/basic.t

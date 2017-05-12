@@ -1,0 +1,148 @@
+==================================================
+Changes from 2003-11-12 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2013-11-09 13:59:19 +0000
+------------------------------------------
+
+  Change: 6facf90089b3316600d15960e138242e8a42ac9a
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-09 14:59:00 +0000
+
+    Update POD version 
+
+  Change: 79e5ce540a2de7b47fb9cf6bd40794b8e9a71f21
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-09 14:57:26 +0000
+
+    Enter testing stage (beta) 
+
+  Change: 223d53cf48a3da664ceca546efa2d2e1ff02ffab
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-09 14:56:00 +0000
+
+    Configure version within dist.ini 
+
+  Change: e5d2ef24cafa5d2696df0b510c5f493be434dc72
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-09 13:34:43 +0000
+
+    Change license from Restricted to Artistic 2.0 
+
+  Change: 417d52a867e682f841a5491cf1a69a09a0252e02
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-09 13:07:26 +0000
+
+    Increment version 
+
+  Change: 8447e5fe65dff7a9fa08bc0d20a815a108c3553a
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-09 13:07:14 +0000
+
+    Fix POD version 
+
+  Change: abb0a104a6b623b8452a360af5c3ba0432364167
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-09 13:05:24 +0000
+
+    Increment version 
+
+  Change: cc8c3e39f866c4aba285da4bad38f2544a3eaa5a
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-09 13:00:50 +0000
+
+    Precompose/-compile language tag regex once. 
+
+  Change: a46d349fe7da40c1812312535a07b6f9b954b7c5
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-09 12:49:02 +0000
+
+    Fix ChangelogFromGit version regex 
+
+  Change: 5370f457be419abefb72c9d73a17c0becb9f53f3
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-09 12:42:13 +0000
+
+    Croak when getting an invalid ExtractUriLanguageList list 
+
+  Change: 048be2319f3e9222287c387036221a6d57b83ba0
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-09 12:19:38 +0000
+
+    Increment version 
+
+  Change: ae31aaad4eb4fea10ba2c0626e781287dec449d5
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-09 12:06:28 +0000
+
+    ChangelogFromGit 
+
+  Change: 870614868b0d0672f97b061a5e5867faa7cc2a00
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-09 12:03:36 +0000
+
+    Add ExtractUriLanguageList
+
+    Fixes #3 Only detect and extract the language tags defined with this
+    list. The default is "undef". When "undef" ExtractUriLanguage will try
+    to guess the language tag. 
+
+  Change: 213956ec7372fa31930798f160bdfd4069636023
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-09 11:30:19 +0000
+
+    Rename default environment variables (PATH_INFO_ORIG, LANGUAGE_TAG)
+
+    * Rename default environment variables (PATH_INFO_ORIG, LANGUAGE_TAG)
+    into more safer ones (extracturilanguage.path_info,
+    extracturilanguage.language) * lexical constants for environment
+    variable names (Type.pm) 
+
+  Change: 3c22c2c147f337b60e7b6b1044eae5b8d489b3e7
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-08 16:02:36 +0000
+
+    Increment version 
+
+  Change: 5a5d3597696c0767b1e77020cadf9c9c61ee8ba5
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-08 15:06:02 +0000
+
+    More unit tests 
+
+  Change: dd39af9a4ae0a7ca7fc200d0b10ce5c7064a5d35
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-07 13:10:35 +0000
+
+    Fix loading middleware 
+
+  Change: e9a1391742121f45d38aeab0e1d8478ee9f3dd32
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-06 17:50:21 +0000
+
+    Load Plack::Middleware::ExtractUriLanguage by self
+
+    still not doing anything??? 
+
+  Change: d75039e42ff4a00c2d4d210f54f5b3041fe614e2
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-06 17:37:30 +0000
+
+    Perl::Tidy 
+
+  Change: 128d19c2ae731c770e8df0f33a3e6a47fc9c3016
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-06 17:34:19 +0000
+
+    Add COPYRIGHT 
+
+  Change: 7ad45c1575afb558f16840f427ab725ca6b0f438
+  Author: BURNERSK <burnersk@cpan.org>
+  Date : 2013-11-06 17:33:38 +0000
+
+    Initial import 
+
+================
+End of releases.
+================

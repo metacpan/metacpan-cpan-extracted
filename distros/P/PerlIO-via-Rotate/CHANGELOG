@@ -1,0 +1,47 @@
+0.08	13 April 2012
+	Added VERSION class method to by pass module version check altogether
+	(as suggested by Ribasushi).
+
+0.07    5 April 2012
+        Brought up to date with current code esthetics.  Verified it runs on
+        5.14.2, threaded and unthreaded.  Fixed problem in test-suite that
+	was caused by more recent perl's interpreting numerical values as a
+	version number check.  Documented that required rotations now need to
+	be specified as string values.
+
+	28 January 2004
+	Made sure the test-suite cleans up on multi-versioned systems.
+
+0.06	28 December 2003
+	Added automatic required modules update using Devel::Required.
+
+0.05	13 August 2003
+	Cleaned up Makefile.PL and updated copyright info.  Made sure the
+	test-suite runs with strict and warnings enabled.
+
+	Fixed problem with test for already defined-ness of a sub-module:
+	they really won't be created again if they already exist.
+
+0.04	11 July 2002
+	Upgraded test-suite to make it ready for Perl core inclusion (if that
+	ever happens).  Added check for PerlIO and EBCDIC also, by courtesy of
+	Jarkko Hietaniemi.
+
+	Rearranged top of source to not need fully qualified VERSION anymore.
+
+	Checked for defined() problems: fixed one in "import".
+
+0.03	10 July 2002
+	Migrated to the PerlIO::via:: namespace.
+
+0.02	9 July 2002
+	Fixed some documentation nits reported by Rafael Garcia-Suarez.  Added
+	some more explanation as to why the eval module approach was taken.
+
+	Version number now a '' string (oops).
+
+	Added check so that module is not re-evalled if already available.
+	Adapted t/04basic.t to sort of check this.
+
+0.01    8 July 2002
+	First version.

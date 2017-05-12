@@ -1,0 +1,152 @@
+
+<HTML>
+<HEAD>
+<TITLE>PPresenter; Beginners; Creating the Presentation</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Creating the Presentation</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../../index.html>PPresenter</A><BR>
+<A HREF=../../manual.html>Manual</A><BR>
+<A HREF=../index.html>Tutorials</A><BR>
+<A HREF=index.html>Beginners</A><BR>
+<P>
+<A HREF=define.html>Subject</A><BR>
+<A HREF=design.html>Design</A><BR>
+<B>Creation</B><BR>
+<A HREF=style.html>Styles</A><BR>
+<A HREF=slide.html>Adding Slides</A><BR>
+<A HREF=change.html>Changing&nbsp;defaults</A><BR>
+<A HREF=timing.html>Timing</A><BR>
+<A HREF=tagging.html>Tagging</A><BR>
+<A HREF=dday.html>DDay</A><BR>
+
+    </TD><TD VALIGN=top>
+
+In the previous chapter, we designed our presentation.  We know now with
+some accuracy the general contents of the talk.   We know were we will
+talk about.
+Slides should contain a kind of guideline for your talk.
+
+<H3><A NAME=filling>Filling your Slides</A></H3>
+
+As general rule, each slide should contain:
+<UL>
+<LI>a title, to show what the subject of the slide is;
+<LI>figures, pictures, and code-examples which are used in your talk;
+<LI>very little text.
+</UL>
+Text should be used as sparsely as possible.  If you need to use some
+text, then stick to simple sentences, preferably single words.  The
+sentences (or words) have the importance as section-headers in a written
+paper.  Your talk fills the text in the section shown on the slide.
+<P>
+Although the quality of displaying devices did improve considerably
+over the last years (a good quality beamer with 1024x768 is readily
+available), they cannot compete with plastic foil.  But even with
+the perfect sharpeness of foils, you shall not put much information
+on it.
+<P>
+In general:
+<UL>
+<LI>Do not put more than 7 items on a slide.
+<LI>Use huge letters: everyone, even in the back-seats of the room
+    must be able to read it without problem.
+<LI>Do not use more than 30 words on a slide.
+<LI>Preferrable, do not put any words (except the title) on the slide.
+<LI>Use your slides horizontally.
+</UL>
+<P>
+<EM>Good slides are sparsely filled.</EM>
+
+<H3><A NAME=start>Getting Started with PPresenter</A></H3>
+
+At last: now we can start with composing our slides with PPresenter.  The more
+you know about the programming language Perl, the more use you can profit
+from the features of PPresenter.  If you never used the language, then you
+should start reading on the <A HREF=../notation.html>notation of strings</A>
+in Perl (might also be useful for more experienced Perl programmers).
+<P>
+A presentation in PPresenter is a Perl program.  You write a program using
+objects (Perl can be used as an object oriented language, and PPresenter is
+doing so).  Each slide is an object.  But the main object (the only
+one you create explicitly) is the PPresenter object.
+<P>
+An presentation, without any slides defined, looks as follows:
+<PRE>
+  1:  #!/usr/local/bin/perl -w
+  2:  use strict;
+
+  3:  use PPresenter;
+  4:  my $show = PPresenter-&gt;<A HREF=../../show/new.html>new</A>;
+
+  5:  $show-&gt;run;
+</PRE>
+If you want to copy this example into a file, click this link:
+"<A HREF=show>Template for the Presentation</A>".
+<P>
+<DL>
+<DT>On UNIX systems:
+<DD>The first line is used to start Perl on the moment this script is run.  The
+    Perl interpreter may be in a different directory, so change the path
+    accordingly.  Then, set execute permission on the file
+    (<CODE>chmod +x <I>file</I></CODE>).
+    <P>
+    The <CODE>-w</CODE> option used in the first line is to tell Perl to
+    complain on everything what might be a mistake in your program.  As the
+    perl manual page justifyably remarks as a bug: it is just an option, it
+    should have been made obligatory.
+    <P>
+<DT>On Windows systems:
+<DD>Your script should be named with extention <CODE>.pl</CODE>, and you have
+    to inform Windows to start Perl when the <CODE>.pl</CODE> extention is
+    found.
+    <P>
+    Whether warnings are produced (and they should, to help you) depends on
+    your windows configuration.  If <CODE>-w</CODE> is not the default,
+    then you can add "<CODE>$^W&nbsp;=&nbsp;1;</CODE>" to your program,
+    which has the same effects.
+</DL>
+<P>
+Also the second line is used to improve our code.  By adding
+"<CODE>use&nbsp;strict</CODE>" to our program, Perl will complain about all
+variables used without previous declaration with <CODE>my</CODE>.  This
+will safe you from typing errors in variable names.
+<P>
+The third line orders Perl to compile the software of PPresenter.  On its turn,
+the PPresenter software will enforce compilation of Tk (the graphical system)
+and ImageMagick (for image manipulation, if installed).
+Compilation consumes quite some time (a few seconds) because we are talking
+about many thousands lines of Perl-script.
+<P>
+At line 4, we create the presentation (-object).  In one program, you can
+define more than one presentation, but it is usually easier to make
+one presentation on more than one screen in such case.<BR>
+There are quite a number of
+<A HREF=../../show/new.html>options to <CODE>new</CODE></A>, but you can
+add them later, in the final stages of the presentation-<WBR>development.
+<P>
+The last line (line 5) starts the show.  Between lines 4 and 5, the
+actual work has to be done.  Inbetween those lines, you change the
+defaults, possibly add extra displays, and add the slides to your presentation.
+
+<P>
+Next: <A HREF=style.html>Styles</A>.
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

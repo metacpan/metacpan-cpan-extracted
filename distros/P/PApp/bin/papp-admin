@@ -1,0 +1,504 @@
+#!/opt/bin/perl
+
+use Getopt::Long;
+use PApp::SQL;
+use PApp::Admin;
+use PApp::Config;
+use PApp::DataRef;
+use PApp::Env;
+use PApp::Prefs;
+use PApp::UserObs;
+use PApp::I18n;
+
+use PApp ();
+
+sub usage {
+   my $self = $0;
+   $self =~ s%.*/%%;
+   print <<EOF;
+
+Usage: $self [opts...]
+
+       -h | --help             this list
+       -v | --verbose          be more verbose
+       -q | --quiet            be very quiet
+       -V | --version          show papp version string
+          
+            --initdb           initialize/upgrade database (NYI)
+          | --addset <set>     create appset <set>
+          | --delset <set>     delete appset <set>
+            --list-apps        list applications
+            --list-appsets     list application sets
+            --list-users       list (registered) users
+            --list-groups      list groups / access rights
+
+            --upgrade-apps     upgrade all mounted applications.
+
+       -a | --app <name>       select/create application <name>
+            --appset <name>    set application set <name>
+            --path <path>      set application path
+            --mount <cfg>      set <cfg> as mountconfig (or location)
+            --config <cfg>     set <cfg> as application config
+
+       -g | --group <name>     select/create group <name>
+            --comment <text>   set the group comment string
+
+       -u | --user <name>      select/create user <name>
+            --password <pw>    set new password (dangerous!)
+            --comment <text>   set the user comment string
+	    --grant <group>    add user to <group>
+	    --revoke <group>   remove user from <group>
+
+       -d | --delete           delete selected object
+       -s | --show             show currently selected object
+
+            --expire           expire the state and user db
+                               see the following arguments
+            --keepuser t       keep anon. users this long
+            --keepreguser t    keep registeres users this long
+            --keepstate t      keep state entries this long
+
+            --domain <dom>     select/create translation domain <dom>
+            --import-po <src>  import po-like files from directory <dst>
+            --export-po <dst>  export po-like file(s) into directory <dst>
+            --import <src>     import domain(s) from file <src>
+            --export <dst>     export selected domain to file <dst>
+            --export-dpo       write translation tables and flush tables
+                              
+            --reorganize       reorganize/check various databases, such as the
+                               translation messages.
+
+EOF
+   exit 0;
+}
+
+usage unless @ARGV;
+
+sub call(&@) {
+   my ($sub, @args) = @_;
+   push @calls, sub { $sub->(@args) };
+}
+
+sub clean(&@) {
+   my ($sub, @args) = @_;
+   push @clean, sub { $sub->(@args) };
+}
+
+*verbose = \$PApp::Admin::verbose;
+
+$PApp::SQL::Database = new PApp::SQL::Database "",
+                        $PApp::Config{STATEDB},
+                        $PApp::Config{STATEDB_USER},
+                        $PApp::Config{STATEDB_PASS};
+
+$PApp::SQL::DBH = $PApp::SQL::Database->dbh;
+
+$keepuser    = parsetime($PApp::Config{KEEPUSER}    || getenv "PAPP_KEEPUSER"    || "60d");
+$keepreguser = parsetime($PApp::Config{KEEPREGUSER} || getenv "PAPP_KEEPREGUSER" || "1y");
+$keepstate   = parsetime($PApp::Config{KEEPSTATE}   || getenv "PAPP_KEEPSTATE"   || "14d");
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+{
+   my($obj, $class);
+   GetOptions(
+      "initdb" => sub {
+         call { initdb() };
+      },
+      "help|h" => sub {
+         usage;
+      },
+      "verbose|v" => sub {
+         $verbose++;
+      },
+      "quiet|q" => sub {
+         $verbose = 0;
+      },
+      "version|V" => sub {
+         call { print "$PApp::VERSION\n" };
+      },
+      "list-apps:s" => sub {
+         call { list_apps(shift) } $_[1] ne "" ? $_[1] : "%";
+      },
+      "list-appsets" => sub {
+         call { list_appsets() };
+      },
+      "list-groups:s" => sub {
+         call { list_groups(shift) } $_[1] ne "" ? $_[1] : "_%";
+      },
+      "list-users:s" => sub {
+         call { list_users(shift) } $_[1] ne "" ? $_[1] : "_%";
+      },
+
+      "delset=s" => sub {
+         call { sql_exec "delete from appset where name = ?", shift } $_[1];
+      },
+      "addset=s" => sub {
+         call { sql_exec "insert into appset (name) values (?)", shift } $_[1];
+      },
+
+      "delete|d" => sub {
+         $class and $obj or die "--delete called without a selected object\n";
+         call { $obj->delete } $obj;
+      },
+      "show|s" => sub {
+         $class and $obj or die "--show called without a selected object\n";
+         call { shift->show(shift) } $class, $obj;
+      },
+
+      "group|g=s" => sub {
+         $class = Group;
+         $obj = new PApp::DataRef 'DB_row',
+                    table => "grp",
+                    where => [id => sql_fetch "select id from grp where name = ?", $_[1]],
+                    insertid => 1,
+                    delay => 1;
+         $obj->{name} = $_[1];
+         clean {
+            my $obj = shift;
+            if ($obj->dirty) {
+               $obj->flush;
+            }
+         } $obj;
+      },
+
+      "app|a=s" => sub {
+         $class = App;
+         $obj = new PApp::DataRef 'DB_row',
+                    table => "app",
+                    where => [id => sql_fetch "select id from app where name = ?", $_[1]],
+                    insertid => 1,
+                    delay => 1;
+         $obj->{name} = $_[1];
+         $obj->{appset} ||= 0;
+         clean {
+            my $obj = shift;
+            if ($obj->dirty) {
+               $obj->{mountconfig} ||= "\$Location{'~ ^/$obj->{name}(/|\$)'} = \\%papp_handler";
+               if ($obj->{path} eq "") {
+                  warn "path not set, not creating application\n";
+               } else {
+                  $obj->flush;
+               }
+            }
+         } $obj;
+      },
+      "appset=s" => sub {
+         $class and $obj or die "--appset called without a selected application\n";
+         my $set = sql_fetch "select id from appset where name = ?", $_[1];
+         $set or die "$_[1]: no such appset\n";
+         call { $obj->{appset} = shift } $set;
+      },
+      "path=s" => sub {
+         $class and $obj or die "--path called without a selected application\n";
+         call { $obj->{path} = shift } $_[1];
+      },
+      "config=s" => sub {
+         $class and $obj or die "--config called without a selected application\n";
+         call { $obj->{config} = shift } $_[1];
+      },
+      "mount=s" => sub {
+         $class and $obj or die "--mount called without a selected application\n";
+         call {
+            $obj->{mountconfig} = shift
+         } substr ($_[1], 0, 1) eq "/"
+           ? "\$Location{'~ ^$_[1](/|\$)'} = \\%papp_handler"
+           : $_[1];
+      },
+
+      "user|u=s" => sub {
+         $class = User;
+         $obj = userid $_[1] || user_create;
+      },
+      "password=s" => sub {
+         $class and $obj or die "--password called without a selected user\n";
+         call {
+            local $PApp::userid = $_[0];
+            update_password $_[1];
+         } $obj, $_[1];
+      },
+      "comment=s" => sub {
+         $class and $obj or die "--comment called without a selected user/group\n";
+         if (ref $obj) {
+            call { $obj->{comment} = shift } $_[1];
+         } else {
+            call {
+               local $PApp::userid = $_[0];
+               update_comment $_[1];
+            } $obj, $_[1];
+         }
+      },
+      "grant=s" => sub {
+         $class and $obj or die "--grant called without a selected user\n";
+	 my $grp = sql_fetch "select id from grp where name like ?", $_[1];
+	 $grp or die "--grant called with nonexistant group\n";
+         clean {
+	    sql_exec "insert into usergrp (userid, grpid) values (?, ?)", $_[0], $_[1];
+	 } $obj, $grp;
+      },
+      "revoke=s" => sub {
+         $class and $obj or die "--revoke called without a selected user\n";
+	 my $grp = sql_fetch "select id from grp where name like ?", $_[1];
+	 $grp or die "--revoke called with nonexistant group\n";
+         clean {
+	    sql_exec "delete from usergrp where userid = ? and grpid = ?", $_[0], $_[1];
+	 } $obj, $grp;
+      },
+
+
+      "keepuser=s" => sub {
+         $keepuser = parsetime($_[1]);
+      },
+      "keepreguser=s" => sub {
+         $keepreguser = parsetime($_[1]);
+      },
+      "keepstate=s" => sub {
+         $keepstate = parsetime($_[1]);
+      },
+      "expire" => sub {
+         clean {
+            print "expiring state($keepstate), reguser($keepreguser), user($keepuser)\n" if $verbose > 1;
+            require PApp::Log;
+            PApp::Log::expire_db (
+               keepuser    => $keepuser,
+               keepreguser => $keepreguser,
+               keepstate   => $keepstate,
+            );
+         };
+      },
+
+      "domain=s" => sub {
+         $class = Domain;
+         $obj = $_[1];
+      },
+      "export-po=s" => sub {
+         $class and $obj or die "--export-po called without a selected domain\n";
+         call {
+            &PApp::Admin::export_po;
+         } 1, $obj, $_[1];
+      },
+      "import-po=s" => sub {
+         call {
+            &PApp::Admin::import_po;
+         } 1, $_[1], 1;
+      },
+      "export=s" => sub {
+         $class and $obj or die "--export called without a selected domain\n";
+         call {
+            &PApp::Admin::export_po;
+         } 0, $obj, $_[1];
+      },
+      "import=s" => sub {
+         call {
+            &PApp::Admin::import_po;
+         } 0, $_[1], 1;
+      },
+      "export-dpo" => sub {
+         $class and $obj or die "--export-dpo called without a selected domain\n";
+         call {
+            my ($domain) = @_;
+            print "exporting domain $domain to $PApp::i18ndir/$domain\n";
+            PApp::I18n::export_dpo $domain, "$PApp::i18ndir/$domain";
+            PApp::Event::broadcast papp_i18n_flush => undef;
+         } $obj;
+      },
+
+      "upgrade-apps" => sub {
+         call { &upgrade_apps };
+      },
+
+      "reorganize|reorg" => sub {
+         call { PApp::Admin::reorganize };
+      },
+
+   ) or exit 1;
+}
+
+&{pop @calls} while @calls;
+&{pop @clean} while @clean;
+
+sub upgrade_apps {
+   my $st = sql_exec 
+               \my($name),
+               "select name from app
+                where appset is not null
+                order by name";
+
+   $| = 1;
+   while ($st->fetch) {
+      print "$name...";
+      (load_app PApp $name)->upgrade;
+      print "ok\n";
+   }
+}
+
+sub list_apps {
+   my $st = sql_exec 
+               \my($name, $appset, $path),
+               "select a.name, s.name, a.path from app a left join appset s on (a.appset = s.id)
+                where a.name like ?
+                order by 1",
+               @_ ? shift : "%";
+
+   printf "%-9s %-9s %-15s\n", "NAME", "APPSET", "PATH";
+   while ($st->fetch) {
+      printf "%-9s %-9s %-15s\n",
+         $name,
+         defined $appset ? $appset : "<disabled>",
+         $path;
+   }
+}
+
+sub list_appsets {
+   my $st = sql_exec 
+               \my($id, $name),
+               "select id, name from appset order by name";
+
+   printf "%-5s %s\n", "ID", "NAME";
+   while ($st->fetch) {
+      printf "%-5s %s\n",
+         $id, $name;
+   }
+}
+
+sub list_groups {
+   my $st = sql_exec 
+               \my($id, $name, $desc),
+               "select id, name, comment
+                from grp
+                where id = ? or name like ?
+                order by 2",
+               $_[0], $_[0];
+
+   printf "%4s %-15s %-59.59s\n", "GID", "NAME", "COMMENT";
+   while ($st->fetch) {
+      printf "%4s %-15s %-59.59s\n", $id, $name, $desc;
+   }
+}
+
+sub list_users {
+   my $st = sql_exec 
+               \my($id),
+               "select uid from prefs
+                where path = '' and name = 'papp_username'
+                      and value like ?
+                order by 1",
+               $_[0];
+
+   printf "%4s %-9s %s\n", "UID", "NAME", "COMMENT";
+   while ($st->fetch) {
+      printf "%4s %-9s %s\n",
+         $id,
+         (username $id),
+         $PApp::prefs->user_get($id, "papp_comment");
+   }
+}
+
+sub parsetime {
+   my $time = shift;
+   $time =~ m{^\s*(\d+)([smhdDMyY]?)\s*$}
+      or die "$time: unparseable time value\n";
+
+   return $1 * 60 * 60 * 24 * 365.2425  if $2 eq "y" or $2 eq "Y";
+   return $1 * 60 * 60 * 24 * 30.436875 if              $2 eq "M";
+   return $1 * 60 * 60 * 24             if $2 eq "d" or $2 eq "D";
+   return $1 * 60 * 60                  if $2 eq "h";
+   return $1 * 60                       if $2 eq "m";
+   return $1;
+}
+
+=head1 NAME
+
+papp-admin - administrate papp
+
+=head1 SYNOPSIS
+
+   Usage: papp-admin [opts...]
+
+       -h | --help             this list
+       -v | --verbose          be more verbose
+       -q | --quiet            be very quiet
+       -V | --version          show papp version string
+          
+            --initdb           initialize/upgrade database (NYI)
+          | --addset <set>     create appset <set>
+          | --delset <set>     delete appset <set>
+            --list-apps        list applications
+            --list-appsets     list application sets
+            --list-users       list (registered) users
+            --list-groups      list groups / access rights
+
+            --upgrade-apps     upgrade all mounted applications.
+
+       -a | --app <name>       select/create application <name>
+            --appset <name>    set application set <name>
+            --path <path>      set application path
+            --mount <cfg>      set <cfg> as mountconfig (or location)
+            --config <cfg>     set <cfg> as application config
+
+       -g | --group <name>     select/create group <name>
+            --comment <text>   set the group comment string
+
+       -u | --user <name>      select/create user <name>
+            --password <pw>    set new password (dangerous!)
+            --comment <text>   set the user comment string
+            --grant <group>    add user to <group>
+            --revoke <group>   remove user from <group>
+
+       -d | --delete           delete selected object
+       -s | --show             show currently selected object
+
+            --expire           expire the state and user db
+                               see the following arguments
+            --keepuser t       keep anon. users this long
+            --keepreguser t    keep registeres users this long
+            --keepstate t      keep state entries this long
+
+            --flush-cache      flush package cache (and other things)
+
+            --domain <dom>     select/create translation domain <dom>
+            --import-po <src>  import po-like files from directory <dst>
+            --export-po <dst>  export po-like file(s) into directory <dst>
+            --import <src>     import domain(s) from file <src>
+            --export <dst>     export selected domain to file <dst>
+                              
+            --reorganize       reorganize/check various databases, like the
+                               translation messages.
+
+=head2 Examples
+
+ # list all applications
+ papp-admin --list-apps
+
+ # create a new application-set "port81"
+ papp-admin --addset port81
+
+ # create/change an application and mount it onto /test
+ papp-admin --app test --appset port81 --path apps/test.papp --mount /test
+
+ # delete the test application again
+ papp-admin --app test --delete
+
+ # remount app application to /otheradm, destroying other mount options
+ papp-admin -app admin --mount /otheradm
+
+ # expire state databases, keep anonymous users 60d,
+ # registered users 1 year and state entries for 14 days:
+ papp-admin --keepuser 60d --keepreguser 1y --keepstate 14d --expire
+
+=head1 DESCRIPTION
+
+This utility is used to manage PApp applications, users, groups and their
+associated state/session/preferences data.
+
+=head1 SEE ALSO
+
+L<PApp>.
+
+=head1 AUTHOR
+
+ Marc Lehmann <schmorp@schmorp.de>
+ http://www.goof.com/pcg/marc/
+
+=cut
+
+

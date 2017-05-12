@@ -1,0 +1,29 @@
+=head1 Config::Hierarchical cookbook
+
+=head2 Simple usage
+
+Some text
+
+=begin common
+
+  use Config::Hierarchical ;
+   
+  my $config = new Config::Hierarchical(); 
+  
+  $config->Set(NAME => 'CC', VALUE => 'acc') ;
+  $config->Set(NAME => 'CC', VALUE => 'gcc') ;
+  
+  my $cc_value = $config->Get(NAME => 'CC') ;
+  
+  print "CC = '$cc_value'\n" ;
+
+=end common
+
+=begin test
+
+  my $expected_output = 'gcc' ;
+  is($cc_value, $expected_output, 'expected value') ;
+
+=end test
+
+=cut 

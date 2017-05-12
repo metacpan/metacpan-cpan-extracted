@@ -1,0 +1,68 @@
+Revision history for POE-Component-DirWatch-Object
+
+0.1200  2015-01-28
+  - Changed version numbering scheme to make hotfixes explicit.
+  - All modules have the same version (RT 101514)
+  - Removed trailing whitespace from modules.
+  - Increased delay in tests to fix timing issues.
+  - Added link to the GitHub repo and removed extraneous support
+    links.
+  - Fixed warning about deprecated call to super (RT 191513)
+  - Fixed prereq metadata
+  - Upgraded Module::Install version (RT 101515)
+
+0.10    Apr 30, 2007
+        Do things the right way with predicates and clearers
+0.09    Apr 28, 2007
+        Shutdown convenience method fixed. typo, eeek.
+0.08    Apr 28, 2007
+        Shutdown convenience method
+        use HiRes in tests. i think it caused a failure somewhere
+        tab and space cleanup
+
+0.07    Nov 16, 2006
+	Small changes to POD and _pause() and _resume()
+	Tests for pause and resume functionality!
+	HINT: look out for YummYumm. coming soon to a mirror near you
+
+0.06    Nov 11, 2006
+	*********** INCOMPATIBLE CHANGE ************
+	**  Changed callback behavior to match docs!!!!
+	** Bug as reported by: melo
+	**  http://rt.cpan.org/Public/Bug/Display.html?id=22759
+	**callback no longer gets POE vars!!!!!
+	************************************************************
+
+        Change the way polls are scheduled to minimize unneeded events
+        Added Untouched and Touched
+        Realized that POEing in Moose is really freaking confusing at times
+	Groundwork for async dir polling is done.
+	Add pause and resume support
+	move to Module::Install
+	Goodbye dispatch lists and batch dispatching!!!
+	Goodbye to a few functions. Needed change but may break some of
+	your subclassed modules. Sorry!
+	Started thinking about moving the poll functionality out so I can
+	have support for things like IO::AIO, EventNotify, etc
+	Probably added some bugs
+
+0.05	Aug 16, 2006
+	You store $session and you go to hell. You go to hell and you die.
+	add default=> 's
+
+0.04    Aug 15, 2006
+        I still suck at POD.
+	NewFile can now pick up edited files
+	added new test to new file and fixed MANIFEST
+
+0.03    Aug 11, 2006
+        I suck at POD.
+        Add dispatch event && &_dispatch to improve filtering
+        Add Object::NewFile as an example of how to extend the class
+
+0.02    Aug 10, 2006
+        Signatures Suck
+
+0.01    Aug 08, 2006
+        Initial Release
+

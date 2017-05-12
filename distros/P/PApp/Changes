@@ -1,0 +1,714 @@
+Revision history for Perl extension PApp
+
+TODO: PApp::FormBuffer endless loop in skip_boundary calling _refill
+
+2.1  Thu Feb 11 08:18:30 CET 2016
+	- $PApp::SQL::DBH and ::Database are now set during all of the
+          request execution, not just during run or exceptions.
+	- work around incompatible tiehandle changes in perl 5.16.
+        - work around incompatibilities between mariadb and mysql.
+        - use env variable PAPP_CREATE_TBALE_OPTIONS to specify create table
+          options in make init and make update.
+        - close the data handle in PApp::I18n to conserve file descriptors.
+        - dropped support for switching papp apps (pappid) via state.
+        - require perl 5.010 and enable its features by default in Agni.
+        - use more memory-efficient and faster object lookup in compiled
+          methods.
+
+2.0  Tue Mar 19 13:23:25 CET 2013
+	- escape_html now converts windows-unicode (with windows-1252 garbage)
+          into numeric entitity escapes. escape_html is now ~20% faster as well.
+	- most of the changes below are due to the brutal removal of traditional
+          .papp application support in favour of pure agni.
+        - PApp::EditForm::ef_selectbox didn't interpret arrayrefs as data
+          values as per documentation.
+        - default charset for output is now always utf-8.
+        - work around further api breakage in 5.14.
+	- remove %S, %A, reference_url, current_locals, suburl, sublink,
+          retlink_p, retlink, returl, preferences_url, preferences_link.
+        - replace macro/xpcse.papp by PApp/XPCSE.pm.
+        - replace macro/editform.papp by PApp/EditForm.pm.
+        - remove macro/*.papp, apps/*, widget/*.papp, demo/, simpe-edit/,
+          xmcs/, xpcse/xpcse-demo.papp.
+        - remove PApp/Parser.pm, PApp/Package.pm.
+        - remove support for PApp::Application::PApp.
+        - remove $PApp::module, modules, curprfx, curpath, curmod,
+          ppkg and all references to them, i.e. all PApp "module
+          tree" support.
+        - no longer use or create the pkg table.
+        - new bin/agni option: --import-ignore-type.
+        - fix reference to Storable from PApp::Storable.
+
+last_1x_version Sun May 20 02:08:56 CEST 2012
+	- move config from PApp::Config to /etc/papp/config.
+        - move LIBDIR/config.pl to /etc/papp/secure.
+	- remove most of the DEVELxxxx utf8 workarounds in the i18n scanning
+          code, fixing at least one bug introduced by a fix in perl :)
+	- use optimised bit arithmetic on perls with 64 bit-integers.
+        - work around a performance bnottleneck in expat's character
+          parsing, for a major agni --import speedup with large objects.
+        - implement a horrid workaround for PApp::CGI to support PApp's
+          way to set cookie headers (in itself a horrid workaround
+          for broken set-cookie parsing in most browsers).
+
+1.45 Sun Nov 21 08:20:50 CET 2010
+	- port to perl 5.12.
+	- die if objects belonging to callbacks cannot be loaded.
+        - make sure gid is always quoted when creating callbacks.
+
+1.44 Sat Jan 30 04:06:14 CET 2010
+	- ef_submit and ef_form surlargs are now interpreted before ef_cb_end
+          callbacks.
+	- this release breaks PApp::CGI due to changed cookie handling.
+	- disable autoloading for PApp::Storable.
+        - new functions PApp::add_cookie, PApp::cookie.
+        - new functions PApp::Util::{nonce,asciibits}.
+        - use Guard module to implement guards.
+        - use common::sense, convert PApp to strict mode.
+        - fix a bug in multipart form handling of unknown impact.
+        - fix a bug in PApp/HTML selectbox of unknown impact.
+        - speed up agni store operations by removing dead code
+          fetching _cache.
+        - speed up data::papp_special agni types considerably.
+        - work around corrupted Cookie:-headers sent by firefox.
+        - work around perl 5.10 setting readonly on lots of things.
+
+1.43 Tue Dec  9 18:21:06 CET 2008
+	- implement $PApp::Storable::force_path and make use of it in retrieve.
+
+1.42 Wed Nov 26 08:16:49 CET 2008
+	- PApp sometimes didn't refresh the stack pointer when necessary,
+          leading to crashes and data corruption on stack resizes (most
+          notably when running on secondary perl stacks).
+	- add storable serialisation protection to agni objects.
+        - add PApp::I18n::iso{639,3166} functions.
+        - replace "use strict" in agni by "use strict 'vars'" by default.
+        - speed up by not executing the use strict pragma on every
+          method compile.
+        - lowercase form method names to improve xhtml compatibility
+          (reported by Muttley).
+        - use net_mstore instead of store as default serialiser.
+        - fix a bug where surl would access unallocated memory
+          (which likely was harmless).
+
+1.41 Mon Jan 28 21:06:10 CET 2008
+	- fix long-standing (harmless) bug where agni objects would become
+          blessed twice or more.
+	- really move lzf::set_serializer call into PApp::Config :(.
+
+1.4  Sun Jan 20 13:33:53 CET 2008
+	- move lzf::set_serializer call into PApp::Config.
+        - avoid an sql access in PApp::Event when there are no new events.
+	- update to perl 5.10.
+        - upgrade storable to 5.10 version.
+        - remove some unicode bug workarounds that clash with perl 5.10.
+
+1.3  Tue Oct 23 10:36:53 CEST 2007
+	- allow coderefs in fixup markers.
+        - PApp::HTML::alink now uses tag so supports %attrs prefix hash.
+        - use net_mstore for Compress::LZF, not mstore.
+        - fix papp-admin's --reorganize option.
+        - add --export-dpo option to papp-admin.
+        - PApp::Util now exports dumpval and uniq by default
+          (oesi can orgasm now).
+        - include sysid in commitinfo.
+        - switch from JSON::Syck to JSON::XS.
+        - do not export empty msgids anymore, as this confuses the po
+          file reader into using the wrong target language.
+        - added PApp::guard.
+        - added clear-database option to bin/agni.
+        - fixed ef_form_name to return page-unique values.
+        - fixed ef_custom to simply return a new key.
+        - only install a warn handler during requests.
+
+1.2  Sat Jan  6 20:27:32 CET 2007
+	- editform/checkbox now uses Agni::*64 functions.
+        - textarea now removes the leading newline when the content type
+          is "application/xhtml+xml" (this is a hack, it's impossible to
+          detect how the browser interprets the page, so one cannot work
+          around this incompatibility between html<=4 and xhtml).
+	- other callbacks were errornously executed at the next request
+          when one callback called any abort_ function.
+        - ef_submit surlargs get interpreted after form processing and
+          after ef_cb_end callbacks have been executed.
+        - small memory optimization: _type and _attr get shared between
+          similar agni objects.
+        - abstracted _type and _cache management.
+        - fixed error reporting for non-Agni applications.
+        - on full-image import, bin/agni now resets the mysql insertid
+          to 1.
+        - mass_delete_objects did errornously keep some attributes
+          (still does, much less often, though).
+        - further optimized agni_fetch by avoiding sv_mortalcopy.
+        - implement papp-admin --upgrade-apps.
+        - added SURL_START_SESSION.
+        - add from_json/to_json to PApp::Util.
+
+1.1  Sun Sep  4 16:19:14 CEST 2005
+        - don't update the _cache entry on STORE, this is the job
+          of the store method.
+	- bin/agni: fix --force option.
+        - xpcse now uses the Host: header, if available, to generate
+          its URL.
+	- switched to real I18n instead of stubs in Agni namespaces.
+        - agni statementhandles weren't properly initialized on first
+          database connect.
+        - accept PR-xinclude-20040930 in addition to the 1999 version
+          in PApp::XML::xml_include.
+        - handle #default-namespace used in newer expats in xml_include.
+        - upgraded to Storable-2.15.
+        - new function: PApp::Util::mime_header.
+        - PApp::HTML::mailto_url now uses the above function to encode
+          headers.
+        - blindly accept anything when neither encoding is given, or
+          encoding is ascii|us-ascii|iso-8859-1, when processing
+          form data.
+        - abort_with_file no longer sends the file when $request->header_only
+          is true.
+        - session variables are no longer PApp-path-specific, PApp::Session
+          uses function interface instead of method interface.
+
+1.01 Sun Feb 27 18:43:42 CET 2005
+        - improved speed of Agni fetch and store.
+	- PApp::ECMAScript::escape_string_* now also escape "<"
+          characters, to avoid common de-quoting bugs in browsers.
+        - implement --force option in bin/agni.
+        - PApp::ECMAScript string quoting functions will also quote &.
+
+1.0  Tue Nov 23 18:08:14 CET 2004
+	- check obj_gidseq validity after every import.
+	- various exceptions could cause an agni object to become
+          highly unmagical.
+	- initial speed-up patch for Agni by dynamically patching
+          helem opcodes.
+        - {{..}}-references will do a hash lookup before calling "obj",
+          increasing speed by avoiding a function call.
+        - new function: PApp::insert_fixup.
+
+0.95 Sat Apr 24 09:14:54 CEST 2004
+	- "use strict" by default in Agni methods.
+	- improved ef_password.
+	- new function: set_output.
+	- give priority to "en" when no language is requested.
+        - call PApp::Application->callback_exception when
+          papp execone handlers cause one.
+        - PApp::Application::Agni->callback_exception will call the method
+          of the same name in the mounted application.
+        - Apache-2.0 hack by oesi. Stable.
+        - mark functions in Storable.xs as static, as starting with
+          5.8.1 or 5.8.2 they were colliding with the functions in perls
+          Storable. Probable cause: Storable is built-in in my perl thus
+          it's symbols are found first (damn).
+
+0.22 Sat Nov  1 14:26:10 CET 2003
+	- editform is now transactional, i.e. first phase check,
+          second phase cb_begin/assignments/cb_end.
+        - editform now supplies a guard value, but doesn't check it
+          (yet).
+	- database upgrade (replace obj_attr).
+        - calling PApp::Event::broadcast caused papp to ignore
+          the next two rounds of events.
+        - papp-env supports multiline-assignments.
+        - xpcse now asks for username/password, using a horrible
+          but low-dependency method.
+	- fix endless-loop bug in PApp::FormBuffer.
+
+0.21 Mon Apr 21 17:15:30 CEST 2003
+	- database upgrade (nuke obj_isa), no release.
+	- xpcse now actually exits correctly and doesn't stay in memory.
+        - zaphod inspired some utf8_upgrade on readonly scalars fixes.
+        - ef_password no longer displays the previous contents,
+          and only stores non-empty inputs.
+
+0.2 Fri Nov 15 20:04:32 CET 2002
+	- new function PApp::fixup_marker which lets you embed fixup markers
+          in the output stream and replace them at page output time.
+	- macro/editform's can now be nested. embedding ef_mbegin &c
+          automatically upgrades the form.
+        - fixed a serializing bug in PApp::Storable, reduced size, too.
+        - fixed a DBH race after ChildInit (fetch without execute...).
+        - new %PApp::temporary hash.
+        - Agni applications can be directly mounted now.
+        - $papp_ppkg_table is now a function (i.e. change occurrences to papp_ppkg_table).
+        - PApp::CGI fixed with respect to xpcse.
+        - updated LICENSE, alternative GPL version available on request (only).
+
+0.143  Fri Sep 27 08:04:19 CEST 2002
+	- ef_selectbox now keeps key values on the server: improved security,
+          complex types for key values possible.
+        - $state{papp_lcs} no longer deleted, because parse_multipart_form can
+          be called very late.
+        - new module: PApp::MimeType.
+        - added PApp::Storable, which will, in the future, used to work round
+          limitations in the original Storable module.
+        - XML-ified PApp::Exception. Doh.
+        - new papp runtime events "prefork" and "postfork".
+        - event will now integrity now checked (but not fixed automatically).
+        - new PApp::XML::xml_errorparser.
+        - PApp::DataRef::Scalar now supports specialization.
+        - SURL_EXEC_IMMED.
+        - new function PApp::postpone.
+
+0.142  <elmex-special>
+	- PApp::Event::broadcast accepts multiple scalars now.
+	- callbacks now save and restore the $PApp::SQL::Database at refer.
+	- callbacks can now be defined using {::} syntax, see PApp::PCode.
+          this is an EXPERIMENTAL feature.
+	- SURL_EXEC is now optional and deprecated, do no longer use (just
+          pass the PApp::Callback::Function object directly).
+	- better error messages on missing files when parsing .papp files.
+        - <include> now works relative to the file containing it.
+        - work around scoping probles in PApp/Config.PL, so the old
+          config will be read.
+        - ./papp-install should no longer be called directly.
+        - added PApp::Preprocessor.
+        - make test runs without lots of warnings.
+        - PApp::Util doesn't require PApp.pm anymore.
+        - added PApp::XBox (not working).
+        - added PApp::Session.
+        - PApp::Event now saves/restores the DBH.
+
+0.142 Tue Apr 16 19:17:14 CEST 2002
+        - removed first sublink and suburl argument 
+	- WARNING: You need to either re-run papp-install, or
+          run "alter table papp.grp add unique key (name)" before using this
+          version.
+        - WARNING: DataRef now requires an explicit insertid => 1 when
+          sql_insertid behaviour on zero or undef keys is intended.
+        - WARNING: renamed PApp::User to PApp::UserObs to allow for API
+          needed API changes. Do so in your own programs.
+        - optimized surl to only generate the destination module name
+          when expliticly given and generate alternatives only when necessary.
+          saves time & disk space.
+        - editform now checks wether form data is submitted and dies otherwise.
+        - correctly re-set the cookie when a user logs in.
+        - PApp::User(Obs)? now has immediate grant/revoke_access, i.e. access
+          right changes become effective immediately in all sessions.
+        - simple-edit/x-papp-edit now correctly uses any proxies specified
+          in the environment.
+        - I18n-tables are flushed automatically when poedit writes them,
+          no server-restarts neccessary.
+        - updated (some) iso translations.
+        - <noession> no longer eats package bodies.
+        - HACK: package names containing "::" are unshared and keep their
+          name when compiled to perl.
+        - handle_error now sets the status to 500 (internal server error).
+
+0.141 <no formal release>
+	- bump version for database changes.
+	- state id's are now handled by sequences.
+	- fix userid NULL issues with newer(?) userhandling.
+        - rewrote bin/papp-env using Getopt::Long, now supports --help.
+        - fix PApp::DataRef::delete.
+        - PApp::DataRef didn't support preload => 1 and cache => 0 (cache
+          => 1 is now being forced on preload).
+        - streamlined state-handling a bit.
+        - PApp::DataRef now supports creating rows when caching is off.
+        - PApp::DataRef::Scalar supports generic fetch/store methods.
+        - implemented getpref/setpref function that somehow replace the
+          planned %T functionality. convert user-preferences into the new
+          format.
+
+0.14  <no formal release>
+        - new module PApp::Event.
+        - new function PApp::XML::expand_pi.
+        - editform's ef_checkbox can now modify bitfields.
+        - correct implicit DBH is now set when applications/packages are
+          being compiled.
+        - fixed insert/replace optimization and insertid in DataRef.
+        - surl could coredump when passed funny objects.
+        - $papp_ppkg now package variable in evere <package>.
+        - ef_relation, enum and set now honor html-attributes.
+        - fix the self-ref-circle in PApp::DataRef.
+        - better error messages for config_eval.
+        - updated PApp::DataRef to do REPLACE or INSERT/UPDATE dynamically
+          and documented what is being done;
+        - added a PApp::DataRef::new_locked method.
+        - allow preload => 1 to fail in PApp::DataRef.
+        - fixed the case when utf8 was set to an array.
+	- converted the FAQ to xml and put it online using schmorp's
+          hilarious instant-faq xslt.
+        - implemented app-name-specific access rights in PApp::User.
+        - added eventcount table && checks to enable event processing.
+        - added even more %T hooks (%T was already there and handled,
+          so there is no speed hit yet).
+        - removed %T completely, will be done using a functional interface.
+        - PApp::User::newgrp behaves better when the group already exists now.
+        - bin/papp-admin can now edit users properly.
+        - new, experimental update-policy for PApp::DataRef. mysql users
+          should use mysql_client_found_rows where possible.
+        - ?> now has the same semantics as :> (it was deprecated before)
+        - --"" in :>-sections now doesn't interpolate anymore. might one day
+          be working, but now now.
+        - removed an illegal optimization in PApp::PCode.
+        - utf8-ified PApp::User.
+        - updated PApp::DataRef to support multiple keys. Also warns about
+          lots of deprecated uses that will be removed.
+        - DataRef now supports specialization (template objects).
+        - macro/editform now sets checkboxes to 0 instead of undef (an
+          implementation detail).
+
+0.122 Mon Dec  3 19:32:50 CET 2001
+	- fixed hashing of long strings in PApp::I18n. This invalidates
+          all translation tables.
+        - fixed i18n tables. wrote 4 perlbug reports. flamed with jhi, who
+          is such a nice person...
+        - "fixed" import/export i18n tables with respect to various perl versions.
+        - PApp::Lock always timed out if the lock was down.
+
+0.121 Fri Nov 30 10:53:24 CET 2001
+	- fixed apps/poedit.papp.
+
+0.12  Sat Oct 27 16:55:26 CEST 2001
+	- INCOMPATIBLE CHANGE: $ppkg->insert and embed no longer do the
+          dereferencing for you, i.e. change
+          $ppkg->embed('name') to $ppkg->{pkg}{name}->embed.
+	- INCOMPATIBLE CHANGE: changed the syntax of all SURL_-cookies
+          into functions. This is more natural and gives me more freedom.
+	- added DataRef::invalidate.
+	- changed to using new Compress::LZF::sfreeze functionality.
+	- fixed user/group entry for reconfig AGAIN. how many times did
+          I tell Paul this until I did it myself??
+	- added papp-httpd, a simplistic httpd that mounts an app and
+          starts a webbroser on it.
+	- surl and find_keysv now check wether the ref => xxx assignment
+          really is valid, i.e. ref really is a scalar reference.
+	- PApp::DataRef read in the whole table with mysql + preload=1.
+	- macro/editform: no longer truncate the last two bytes of files.
+	- SIGQUIT can now be used to kill a papp process and get
+          a usable calltrace.
+	- dependencies for stylesheets work again. dumb bug, uh.
+	- ssl.papp now needs "SSLOptions +StdEnvVars +ExportCertData"
+          Table ssluser changed, completely broken.
+	- dbedit now forces utf8 on all fields. have fun.
+        - ef_ functions now return the html instead of outputting it. use
+          something like the following command to convert most uses:
+
+          perl -pi -0777 -e 's%<:(\s*ef_)%<?$1%g' */*.papp
+
+	- fix obscure security glitch with nosession. If your
+          module was secure before it still is ;)
+	- some renames in macro/ssl.papp.
+	- fixed I18n's scan support :( nobody noticed :(:(:(
+	- use Location ~ instead of LocationMatch since mod_perl
+          forgets the "Match" after handling the first entry :(
+	- diehandler no longer tocuhes non-scalar exceptions.
+	- PApp::DataRef now tests autoincrement ids with !! instead of with
+          defined().
+        - apps are now (by default) matched with LocationMatch ^/appname(/|$)
+          which gives them a more directory-like appearance.
+	- exists now works on DataRef::DB_row objects, given they were created
+          using "preload => 1".
+	- translation domain is now inherited by subpackages, fixes the
+          "embedded packages don't get translated"-bug.
+	- PApp::Exception now "optimizes" some exception cases that often lead
+          to perl instability problems.
+	- URI 1.12 is required form now on. 1.09 cost JanMan a day debugging
+          (or fucking, or...).
+	- default module can be set in insert/embed, module might be empty.
+        - implemented http://www.w3.org/TR/xinclude/ in form of
+          PApp::XML::xml_include() that will soon be used throughout papp.
+	- ported PApp/Recode.xs to DEVEL9916, hopefully older versions are
+          still also supported.
+	- PApp.pm: new function setlocale.
+	- SURL_SET_LANG is now SURL_SET_LOCALE.
+	- renamed keys: papp_charset => papp_lcs, papp_lang => papp_locale.
+	- added (parts of) http://iso.plan9.de locale table to I18n/I18n.pm.
+        - removed unnecessary columns from I18n/I18n.pm data section. This
+          saved a lot of space and made it faster.
+	- the module named "*" is called when no other module name matches
+          (wildcard/default module).
+	- allow ".encoding" in language id's.
+	- fix generation bug, some races and unnecessary recompile problem.
+	- PApp::DataRef now dumps destruction errors to stderr (but does not
+          touch $@ in any way).
+	- renamed PApp::DataRef parameter force_utf8 to utf8.
+	- the xs part (surl & friends) did not always honour magic.
+	- ef_submit did not like the value argument.
+	- bugworkaround in escape_uri actually had a neccessary side-effect.
+	- poedit now allows editing of the current display charset.
+	- ef_checkbox now sets the ref correctly to undef or 1.
+	- SURL_POP etc. now work on references again.
+	- implemented ef_radio.
+	- updated PApp::User for the new lazy-uid-allocation scheme.
+	- renamed PApp::userid to getuid, exported PApp::User::userid.
+	- PApp::Application::run did not properly call load_prefs.
+	- properly downgrade to (fake) "iso-8859-1" when sending binary data.
+	- some modifications to allow for lazy allocation of userid
+          and sessionid, as well as hashed stateid allocation.
+	- minor cleanups in PApp/HTML, implemented selectbox, documented tag.
+	- fixed nosession handling (& more), removed some dead cows.
+	- fixing Config.pm.PL for users who use gid 0 with papp.
+	- removing prefix.psql from kis.papp.
+	- <language> now deprecated.
+	- renamed grp.longdesc to grp.comment.
+	- implemented <nosession> element. should be rewritten using namespaces
+	  and xslt ;).
+	- multiline MIME headers in mutlipart/form-data are now supported,
+	  although I've not yet seen a browser use it.
+	- one of the countless bugs in opera actually was useful in finding
+	  a bug in PApp's form-data handling.
+	- marked & moved Pconv && Recode into it's own subdir.
+	- fixed buggy flush logic AGAIN.
+	- enhanced make test a bit. should now do basic sanity checks.
+	- vastly improved PApp::Pconv (therefore renamed from iconv).
+          should be outsourced.
+	- allowed both #elsif and #elif.
+	- documented and maybe fixed sub/ret functionality.
+	- fix escape_uri description and code.
+	- new functions for group management in PApp::User.
+	- mime headers that contain the letter "r" are not longer ignored.
+	- deuglified macro/admin/loginbox.
+	- moved papp statedb management into PApp::Config.
+	- papp-env can now evaluate perl expressions when setting vars.
+	- renamed $sessid to sessionid, sessionid is now part of
+          the surl (which is redundant and could be used for
+          additional sanity-checks).
+	- new module: PApp::User, use it instead of macro/admin.
+	- <import> can now import perl modules (experimental feature).
+	- adedd PApp::abort_with_file (and PApp::CGI::send_fd).
+	- added abort_with, design inspred by oesi, implemented against
+          his wishes ;)
+	- added sessid to state db. The session id will be available in
+          $sessid.
+
+0.11 <no release>
+	- reserved %T for transaction variables.
+	- I18n no longer opens translation tables RDWR or in other
+          invalid modes.
+	- new configure option: errorlog.
+	- totally redid the PApp::CGI interface. See eg/admin.cgi for
+          changes.
+        - did you know that you need to localize $@ at the right place
+          when you overload exceptions? uh-hu.
+	- elmex found & fixed a DoS in macro/tinychat.papp.
+	- fixed papp-admin --user.
+	- more ssl-stuff from oesiman.
+	- added eg/ directory with example stuff.
+	- finalized PApp::CGI. Works surprisingly fast. With SpeedyCGI
+          it rocks.
+	- tweaked error handling. perl is just too unstable.
+	- i18n dpo tables are now written by papp-install.
+        - the uid/gid settings now don't get lost on reconfig.
+        - increased the default size of msgid/msgstr/env AND state. For
+          env/msgstr etc.. it's not speed-relevant in the general case.
+          for state it might be a small problem, but I just hit the page
+          where 64k wasn't enough (sablotron generation time: 2min,
+          netscape rendering time >>30min and then out of memory).
+	- greatly enhanced and fixed macro/admin.papp.
+        - added completely transparent sslauth->user mapping.
+	- implemented and use macro/tinychat ;) If our oesi finds it cool
+          it *must* be cool.
+	- PApp::Env now uses mysql-shared-locks instead of lock tables.
+	- rename SURL_FILENAME to SURL_SUFFIX; SURL_STYLE_EMPTY to
+          SURL_STYLE_STATIC.
+	- changed serialized modpath representation, chop off '-' signs
+          at the end since we can syntehsize them if we know the length.
+	- seperated PApp::SQL from the main sources, renamed ::database to
+          ::Database.
+	- fixed selectbox to be conform with the other functions.
+        - streamlined editform.
+	- fixed important security bug (testing for nonexistant access rights
+          always returned true).
+	- added PApp::Admin.
+	- additional language translation now get auto-detected.
+        - papp-install is now less disturbing.
+        - lots of i18n fixes, language ids get normalized now
+          (you must run i18n-normalize after upgrade!).
+        - first try on an generalized top-level exception mechanism.
+	- implemented surl-styles (see PApp::surlstyle, surl and the
+          new surlstyle attribute for the package element).
+	- --export-po and --import-po for papp-admin.
+	- elaborate microsoft-can't-mime workaround for msie ;(
+	- fixed a bug that kept surl from accepting references
+          as destination "path".
+	- work around bug in mod_perl's $r->args && $r->content. As a side
+          effect, query string with ";" as separator are now supported.
+        - added flush function for outputing partial
+          pages. As a side effect, data is no longer being copied on output
+          (unless a conversion is necssary, of course).
+	- multiple field submits are now supported (see desc. of %P).
+          macro/editform transparently supports this.
+	- ef_button hinzugefügt (== marco is too dumb to write english).
+        - objectbox in selectbox umbenannt.
+	- fixed method discard, new method dirty for PApp::DataRef.
+	- added bin/papp-admin.
+	- apps/admin improved.
+        - app.config is now used directly in the new PApp::Application call,
+          so things like database can be set via the config mechanism.
+	- %state is now no longer destroyed but rather freed, so
+          DESTROY will not be called for objects in %state, if they
+          are saved into the satet database. This is expected, I think.
+	- PApp::XSLT now supports dynamic scheme handlers.
+	- moved from Compress::LZV1 to Compress::LZF, please do:
+          update user set prefs=""; delete from state;
+          or edit PApp.pm and replace LZF by LZV1.
+	- fixed PApp::HTML::radio/checkbox.
+	- fixed ef_relation to support where arguments again.
+	- 5.5-ified SQL/SQL.xs.
+	- argl, form-headers are now treated as bytes.
+	- greatly improved (and fixed) ef_file [untested ;-].
+	- charset conversion done for ef_sbegin/ef_cbegin.
+        - some utf8-support for DataRef::DB_row, for dumb databases.
+	- PApp::HTML::textarea now outputs additional \n before and
+          after the text (for normalization).
+	- macro/editform normalizes text data now (\r\n => \n!)
+	- move from georgian-char-hack to corporate use zone.
+	- documentation enhancements.
+        - new function macro/editform/ef_field.
+        - module name "." == current module in surl.
+	- enhanced macro/editform to parse "normal" GET and POST requests,
+          ef_hidden, better ef_submit.
+        - surl now supports multiple module targets.
+
+0.10 <Unreleased: missing license. Write to marco@toytest.com for complaints>
+	- input/output charset conversion is automatically done for %P and
+          all text/plain fields in macro/editform.
+	- papp now stores the character set the last page was submitted in.
+	- added PApp::Recode, which in turn uses PApp::Iconv (which in turn
+          uses iconv*) to add character-set-conversion.
+	- added macro/ssl.
+        - rewrite of PApp::HTML and extended functionality for
+          macro/editform, for the benefit of ecmascriptloosers.
+	- modulepath from url parsing enabled again.
+	- fixed import state key processing.
+	- fix PApp::Apache to supprot mount_config.
+	- replaced <module src> by <include src>.
+	- <pxml> now supported on a basic level.
+	- String::Similarity 0.02 required (who would have thought...).
+	- added PApp::Lock.
+	- capture {} works again, stderr is no longer redirected
+	- implemeted catch/try (experimental).
+	- reload_p fixed to work correctly.
+	- more robust && correct sql_*-functions.
+	- added PApp::Application, the base class for each
+          application.
+        - removed the concept of nested modules (use nested packages). NYI.
+        - added PApp::Util and PApp::Parser, moving lots of
+          functions from PApp::Parser there.
+        - changed config&mount-mechanism substantially. mounting
+          is now done dynamically.
+	- improved XHTML compliance.
+	- xslt stylesheets can be specified using perl expressions.
+        - more utf8-fixes (translation database + poedit is now in utf8, use
+          i18n-upgradeutf8 to update your translation tables).
+	- mount now properly anchors the url at the serverroot.
+	- reloading works again.
+	- workaround a perl bug with respect to weakrefs in PApp::I18n.
+	- added PApp::XSLT.
+	- Storable-0.7.2 is finally sufficient for PApp without any patches.
+	- first round of stylesheet support inside papp.
+	- renamed pappxml: namespace to simply papp:.
+        - replaced phtml2perl by a more versatile function family (PApp::PCode).
+        - simplified internal rep. of PApp::Callback::Function::'s.
+	- new surl modifiers: SURL_PUSH/UNSHIFT/EXEC/SAVE_PREFS.
+	- PApp::DataRef now fetches and stores the value, not a reference.
+        - new PApp::DataRef::Scalar.
+        - new functions if macro/editform (+ better docs).
+        - MAJOR REWRITE OF THE INNER ENGINE:
+          - nested submodules
+          - embeddable applications
+	- added editable comment and type forms to apps/dbedit.
+        - PApp::Exception->as_string now wraps text better.
+        - %S is now available within newuser and newsession callbacks.
+        - added first try at an PApp::Log module.
+        - papp now caches config information (and the app itself!)
+          in the database (whew, room to improvement).
+        - nfreeze is used everywhere except in the state database.
+        - changed internal %state format, old states are no longer
+          compatible.
+        - nested modules are no longer allowed (to allow for further
+          enhancements!)
+        - fixed PApp::weaken.
+        - backtrace now contains arguments.
+        - wrote, uploaded and required Convert::Scalar module.
+        - improved and fixed a lot of things in PApp::Exception.
+        - PApp::SQL now tries to reconnect two times.
+
+0.08  Sun Jun 18 23:53:50 CEST 2000
+	- PApp now overwrites $SIG{__DIE__}, be careful!
+	- PApp::Exception has a compatibility mode now.
+        - fixed the preferences system to actually make *sense*.
+        - fixed memory corruption bug in SQL.xs that happens
+          because mod_perl BOOT:'s the same object twice :(
+        - fixed documentation of PApp::I18n, PApp::FormBuffer.
+        - PApp::Env and PApp::SQL should be more resistent to restarts.
+        - removed gen-db.sql.
+        - added PApp::DataRef.
+        - added <description> tag to papp, maybe soon followed
+          by <copyright> and <version>.
+        - workaround for mod_perl or perl bug that causes the 'bool'ean
+          value of error messages to be shown instead of their string
+          value. Funny, might be the same bug as with Storable, but
+          for totally different reasons ;)
+        - DataRef'ied macro/editform and the apps that were using it.
+        - PApp::SQL::*fetch methods call finish on the statement handle,
+          as does sql_exec in void context.
+        - load_prefs allows empty prefs settings and doesn't log you
+          out if the preferences field is empty.
+        - fixed PApp::Callback::create_callback.
+        - added experimental preferences field for acedit.
+        - surl now uses "use bytes" because otherwise.. strange things happen.
+        - implemented ref-to-coderef special in PApp::XML.
+        - _really_ commented out #?? in PApp/Parser.
+        - added more compliation facilities to PApp::XML.
+        - implemented "delayed" option which is handy for debugging
+          (improves server restart speed at the expense of more memory).
+        - DataRef/use base: worked around an overload bug in perl.
+        - now flushing translation cache on childinit.
+        - apps/poedit now allows finer-grained access rights "poedit_*" = all
+          apps, "poedit_<app>" = application app etc...
+        - various other small enhancements to apps/poedit, and i18n in general,
+          much more to come!
+        - added life-saving(!!!) index on papp.msgid.id, better execute
+          "alter table papp.msgid add index (id(64))" on your existing
+          installation(s).
+        - fixed apps/dbedit error-reporting (what was it supposed to do?).
+        - improved apps/acedit to also work on groups.
+
+0.07  Fri Jun  9 22:14:36 CEST 2000
+	- fixed dumb typoe in macro/util.papp :(
+        - added PApp::Env module.
+        - dbedit now assumes primary keys are strings that
+          do not need quoting.
+        - added PApp::Callback module.
+
+0.06  Wed Jun  7 21:52:15 CEST 2000
+	- poedit now uses the statedb.
+        - admin now included poedit access right by default.
+        - document PApp::Config rudimentarily.
+        - PApp.pm makes use of PApp::Config now.
+        - PApp::Config now by default uses a 256 bit key.
+        - new env table for future "papp global environment".
+        - added a LONG WIZARD EXAMPLE to PApp::XML's manpage.
+
+0.05  Sat May 27 22:25:51 CEST 2000
+	- added PApp::XML. Boring, but together with XML::XSLT it rocks!
+	- implemented N_($).
+        - addedd attrs to papp's macro element (specify subroutine
+          attributes).
+        - #endif and #else now allow whitespace on the same line
+        - translate styel can be specified "plain" - full text,
+          "code" - scan for __ substrings or "auto" for autodetect.
+
+0.04  Thu May 11 03:24:07 CEST 2000
+	- too many things to remember.
+        - a first try at an installation script and a config mechanism.
+        - PApp::I18n now uses it's own format. With the
+          (not-yet-implemented) pre-sorting it should require less random
+          accesses then gettext. Also supports binary formats (i.e. you
+          could gettextize images) and allows tagging info to be added to
+          the string.
+
+0.03  ???
+
+0.02  ???
+	- added multipart-parsing functions.
+        - added %arg hash, and "one-shot arguments" (see surl).
+        - modularization: many modules were split off into their
+          own packages, this package was divided into many modules.
+          The goal is still far away.
+
+0.01  Thu Jan 13 06:02:04 CET 2000
+	- original version; created by cp -rp
+

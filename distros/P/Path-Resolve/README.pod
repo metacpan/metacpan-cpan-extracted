@@ -1,0 +1,89 @@
+=head1 NAME
+
+Path::Resolve - node.js path module in perl
+
+=for html
+<a href="https://travis-ci.org/mamod/Path-Resolve"><img src="https://travis-ci.org/mamod/Path-Resolve.svg?branch=master"></a>
+
+=head1 SYNOPSIS
+
+    use Path::Resolve;
+    
+    my $path = Path::Resolve->new();
+    
+    my $file = $path->resolve('./r/p/../file.txt');
+    my $ext  = $path->extname($file);
+
+=head1 DESCRIPTION
+
+This module behaves exactly like L<node.js path module|https://nodejs.org/api/path.html>, it doesn't check for path validity, 
+it only works on strings and has utilities to resolve and normalize path strings.
+
+If you're looking for system specific path module that can create, check, chmod, copy ... etc. then
+take a look at L<Path::Tiny>
+
+=head1 METHODS
+
+For a complete documentations about supported methods please check node.js path module
+L<api documentation|https://nodejs.org/api/path.html> all methods are supported
+
+=over 4
+
+=item normalize(p)
+
+Normalize a string path, taking care of '..' and '.' parts.
+
+=item join([path1][, path2][, ...])
+
+Join all arguments together and normalize the resulting path.
+
+=item resolve([from ...], to)
+
+Resolves C<to> to an absolute path.
+
+=item isAbsolute(path)
+
+Determines whether path is an absolute path.
+
+=item relative(from, to)
+
+Solve the relative path C<from> from to C<to>. 
+
+=item dirname(p)
+
+Return the directory name of a path. Similar to the Unix C<dirname> command.
+
+=item basename(p[, ext])
+
+Return the last portion of a path. Similar to the Unix C<basename> command. 
+
+=item extname(p)
+
+Return the extension of the path, from the last '.' to end of string in the last portion of the path.
+
+=item sep
+
+he platform-specific file separator. '\\' or '/'.
+
+=item delimiter
+
+The platform-specific path delimiter, ; or ':'.
+
+=item parse(pathString)
+
+Returns a parsed object from a path string.
+
+=item format(pathObject)
+
+Returns a path string from an object, the opposite of C<parse> method above. 
+
+=back
+
+=head1 AUTHOR
+
+Mamod A. Mehyar, E<lt>mamod.mehyar@gmail.comE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify 
+it under the same terms as Perl itself

@@ -1,0 +1,11 @@
+Revision history for Perl extension Persevere::Client.
+
+0.01  Sun Apr 19 18:25:06 2009
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Persevere::Client
+0.2   Thu Jun 16 11:21:06 2011
+	- added methods: deleteById, propSet
+0.3   Thu Jun 16 14:06:00 2011
+	- Version cleanup
+0.31  Thu Jun 16 23:06:00 2011
+	- Broke perldoc for Persevere::Client::Class in last update, fix for docs

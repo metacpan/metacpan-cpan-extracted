@@ -1,0 +1,253 @@
+Revision history for POE-Component-Server-IRC
+
+1.54  Fri Nov 25 15:36:51 UTC 2011
+    - Resolve problem with remote (versus localhost) clients
+    - Fix shutdown on Win32
+
+1.53  Fri Oct 7 15:35:27 UTC 2011
+    - Fix channel mode handling
+    - Some configuration options were not being accepted case-insensitively
+    - The SQUIT commands was not working
+
+1.52  Thu Oct 6 11:50:38 UTC 2011
+    - Fix public messages for non-spoofed clients (thanks BinGOs!)
+
+1.51  Sat Aug 27 04:32:12 GMT 2011
+    - Fix authentication for clients connecting from localhost
+
+1.50  Thu Jun 2 02:53:21 GMT 2011
+    - Fix invalid method call in Auth plugin when there's no ident response
+
+1.49  Wed May 25 06:23:32 GMT 2011
+    - Fixed a bug were unsuccessful client registration would leave the
+      client's nickname "already in use" when later clients request it.
+    - Backend.pm: Moved client authentication into an Auth plugin.
+    - Backend.pm: Be backwards-compatible by not doing "keys $hashref"
+
+1.48  Sun May 22 17:12:03 GMT 2011
+    - Don't enable debug output if a plugin enables raw events
+    - Backend.pm: Fix issues with listening on the same port on multiple
+      addresses. Also don't emit an ircd_listener_add event when we fail to
+      add a listener.
+    - croak() instead of warn() when add_peer() is called wrong
+    - Document peer name argument to ircd_connected
+    - Depend on IRC::Utils 0.10 for an improved parse_mask()
+    - Add arguments to ircd_socketerr describing the error
+    - Fix broken chomping of output for ircd_raw_output
+    - IRC.pm: Emit ircd_daemon_error on failed peer registration
+    - Depend on PoCo-Client-DNS and PoCo-Client-Ident again, since most
+      people will want them, and authentication is enabled by default.
+
+1.47  Sat May 21 00:14:59 GMT 2011
+    - Only load POE::Filter::Zlib::Stream when using ziplinks
+    - Backend.pm: Document create()'s plugin_debug and options parameters
+    - Add ircd_raw_(input|output) to the backend, and use them to implement
+      a 'debug' option for the frontend.
+    - IRC.pm: Only EAT events from clients, not plugins, for extensibility.
+
+1.46  Fri May 20 12:12:08 GMT 2011
+    - Backend.pm: Document the 'idle', 'antiflood', and 'usessl' parameters
+      to add_listener()
+    - Depend on POE::Component::Syndicator 0.04 so that 'register' with no
+      arguments will work.
+
+1.45  Fri May 20 09:23:17 GMT 2011
+    - Inherit from POE::Component::Syndicator
+    - Make the DNS/Ident dependencies optional, and die if their use is
+      requested when they are unavailable
+    - Turn the OperServ subclass into a plugin instead
+    - Vastly improved the layout of the documentation
+
+1.44  Mon Apr 4 20:44:51 GMT 2011
+    - Fix to work with latest IRC::Utils
+
+1.43  Sun Apr 3 02:57:40 GMT 2011
+    - Removed most of Common.pm in favor of IRC::Utils
+    - Use strftime() instead of Date::Format
+
+1.42  Fri Nov 5 12:30:25 CET 2010
+    - Fix race condition in t/ts_02_multi.t
+
+1.41  Sat Oct 30 22:25:55 GMT 2010
+    - Converted the Changes file to something human-writable (and more
+      human-readable)
+    - Removed the unused Pipeline.pm file
+    - Migrate distribution to Dist::Zilla
+    - Use Object::Pluggable instead of POE::Component::Pluggable
+    - Changed POE::Component::IRC to a test (instead of runtime) dependency
+    - Added some documentation to the distribution about the IRC server
+      protocols we implement
+    - The compress link test was getting skipped unconditionally. Fixed.
+    - The SSL test was not getting run. Enabled it.
+    - Remove POE::Component::Server::IRC::Test::Plugin and the associated
+      4_test_plugin.t test. That sort of testing is covered by
+      Object::Pluggable's test suite.
+
+1.40  Fri Oct 23 16:03:38 CET 2009
+    - Don't send NICK messages more than once when we're in channels
+    - Updated Makefile.PL with newer Module::Install directives
+
+1.38  Tue Jan 27 13:21:14 GMT 2009
+    - We are now using PoCo-Pluggable for plugin stuff
+    - Fixed a race condition where two connecting clients could obtain the
+      same nickname
+
+1.36  Sat Jan 24 22:13:54 GMT 2009
+    - Fixed RT#42760 reported by Hinrik
+    - Added the LICENSE file
+
+1.34  Wed Oct 1 11:46:50 GMT 2008
+    - Moved to full M::I Makefile.PL
+    - Fix and regression test for RT #39701 reported by Hinrik
+
+1.32  FriMay 9 13:47:35 GMT 2008
+    - Moving author tests to xt/, updated prereqs list, indentation tidy to
+      OperServ.pm
+    - Removed MANIFEST.SKIP
+    - Updated and added LICENSE information
+    - Fixed some distribution problems
+
+1.30  Tue Mar 11 12:32:17 GMT 2008
+    - Applied a patch to OperServ from eggzeck for enhancements.
+
+1.28  Wed Feb 20 16:39:30 GMT 2008
+    - Added pmkpasswd utility
+    - Forgot to add prereq for Crypt::PasswdMD5
+
+1.26  Sat Feb 16 13:50:36 GMT 2008
+    - Added crypt/md5 encryption for OPER passwords. New funcs in ::Common,
+      mkpasswd and chkpasswd. Updated common test. Thanks to nanonyme for
+      the suggestion.
+
+1.24  Thu Nov 1 14:00:41 GMT 2007
+    - Update Module::Install to 0.68
+
+1.22  Sun Sep 23 10:13:14 GMT 2007
+    - Added config option to enable oper only RPL_WHOISACTUALLY as
+      suggested by Kaitlyn Parkhurst
+
+1.20  Thu Sep 20 17:56:26 GMT 2007
+    - Removed executable property from Makefile.PL
+    - Updated some of the prereqs in Makefile.PL
+
+1.18  Sat Aug 25 18:01:14 GMT 2007
+    - Applied a patch from lunartear to fix PONG responses
+
+1.16  Thu Aug 23 16:16:45 GMT 2007
+    - add_listener() was using BindAddr instead of BindAddress when calling
+      SocketFactory. Spotted by lunartear
+
+1.14  Thu Aug 23 15:53:52 GMT 2007
+    - Updated the SSL certificate and key
+    - Added 'ircd_listener_failure' output event.
+
+1.12  Fri Jun 29 10:28:37 GMT 2007
+    - Documentation fixes. Added state_(nicks|chans|peers) methods and
+      documented.
+
+0.11  Tue Feb 13 15:57:17 GMT 2007
+    - Refactored the MagNET Oper hacks. Should all work as expected now.
+
+1.10  Tue Feb 13 11:53:44 GMT 2007
+    - Added MagNET Oper hacks.
+    - Added new test, Test::Kwalitee
+
+1.09  Mon Jan 29 14:52:17 GMT 2007
+    - Kwalitee fixes.
+
+1.08  Tue Jan 23 09:58:13 GMT 2007
+    - Fixed a problem with the module on perl-5.6.1
+
+1.07  Fri Dec 29 11:09:49 GMT 2006
+    - PoCo-IRC TOPIC bug caused problems with topic test. Raised poco-irc
+      prereq to 5.18.
+
+1.06  Sat Dec 2 15:46:33 GMT 2006
+    - Automagic registration of parent sessions added, as per buu's
+      suggestion
+
+1.05  Sun Nov 19 14:29:24 GMT 2006
+    - Fixed problem with LIST and topics. Fixed TOPIC command as well.
+      Added a test. Reported by eggzeck"
+
+1.04  Thu Nov 16 09:25:31 GMT 2006
+    - Documentation fix for ::Pipeline, spotted by Martijn van Beers.
+    - Made the compresslink test skip on *bsd systems, which currently have
+      issues that test.
+    - Problem with 472 numeric response fixed. Reported by eggzeck.
+
+1.03  Thu Oct 26 12:14:17 GMT 2006
+    - Ported parse_user() from PoCo-IRC-Common. Ported the new improved
+      shiny parse_mode_line() from the same source.
+
+1.02  Fri Sep 29 08:57:44 GMT 2006
+    - Fixed RT #21769. Sppofed nicks now have a default ircname set.
+      Reported by David Serrano
+
+1.01  Wed Sep 27 10:12:39 GMT 2006
+    - Ensured all modules had 'use strict'
+
+1.00  Tue Sep 26 09:09:22 GMT 2006
+    - Removed Build.PL and bumped versions for release.
+
+0.99_05  Sat Sep 16 15:43:54 GMT 2006
+    - Updated to use Module::Install
+
+0.99_04  Wed Sep 6 17:43:39 GMT 2006
+    - Added OperServ subclass once again. New and improved and shiny. With
+      a test.
+    - Added documentation to OperServ and bumped the version numbers.
+
+0.99_03  Sun Sep 3 17:16:55 GMT 2006
+    - Added pod and pod coverage tests. Fixed documentation accordingly.
+
+0.99_02  Mon Aug 28 18:01:25 GMT 2006
+    - Fucking test was smurfed, still had PoCo-Server-IRC-OperServ in the
+      simple test. Fucktard.
+
+0.99_01  Mon Aug 28 17:30:21 GMT 2006
+    - IRC.pm is now a subclass of Backend.
+    - Updated the documentation in Plugin.pm, removed references to USER
+      events as they aren't applicable.
+    - Added compressed links using POE::Filter::Zlib to ::Backend.
+    - Fixed a bug in the auth system by switching to using Ident::Agent.
+    - Added simpleclient.pl for testing purposes. Backend: now has
+      connection idle tracking. Daemon: implemented nearly all IRC client
+      commands, ( lacking STATS, LINKS, CONNECT, OPER, KILL, etc. ),
+      extended 2_pocosi.t to suit.
+    - Implemented OPER, KILL
+    - Server to server code written and debugged against Hybrid-7.0 \o/
+    - Added REMOVE command a la Freenode hyperion, which is a forced PART.
+    - Added test script for SSLify with associated key/cert combo
+    - We now generate multiple RPL_NAMES if the line length exceeds 510
+      characters.
+    - RPL_WHOISCHANNELS automagically splits on long lines now
+    - More documentation, including SYNOPSIS.
+    - Refactored INVITE code and added handler for peer INVITE messages
+    - Implemented GLINE, KLINE, RKLINE and UNKLINE peer and oper commands.
+    - Implemented spoofed SJOIN command, so spoofed nicks can reset
+      channels. All applicable commands should multiline if output lines >
+      510 chars now. Makefile.PL will detect previous poco-server-irc
+      installs and warn of API changes.
+    - Implemented MODES, the maximum number of non-simple chanmodes that
+      can be applied in one go. Numerous tweaks and fixes. Still haven't
+      got to the bottom of the chan desyncs with half-ops.
+    - Fixed a bug in SJOIN code. Tested using 60 flood bots. Favourable
+      results.
+    - Fixed SQUIT, it was working fine for a leaf-node, but not as a hub.
+    - Reimplemented PRIVMSG/NOTICE handling for both client and peer. Now
+      supports exactly the same syntax as Hybrid.
+    - Changes to UMODE code; Implemented LOCOPS, WALLOPS and OPERWALL
+      commands for client/peer; Added WALLOPS server API command;
+    - Implemented +D umode which is channel deafness, ho-hum.
+    - Added ACCEPT command as related to CALLERID.
+    - Implemented CALLERID (+Gg).
+    - Added a README
+
+0.3  Thu Aug 25 14:06:01 GMT 2005
+    - Amended POD to link the ThreatNet web site.
+    - Added use strict and caught and fixed a lot of typos/scoping
+      problems.
+
+0.02  Mon Jun 20 09:50:14 GMT 2005
+    - First CPAN release

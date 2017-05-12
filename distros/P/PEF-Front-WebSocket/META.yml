@@ -1,0 +1,46 @@
+---
+abstract: unknown
+author:
+  - 'Anton Petrusevich'
+build_requires:
+  Clone: '0'
+  Data::Structure::Util: '0'
+  ExtUtils::MakeMaker: '0'
+  Guard: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PEF-Front-WebSocket
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  AnyEvent: '0'
+  AnyEvent::Fork: '0'
+  AnyEvent::Handle: '0'
+  AnyEvent::Socket: '0'
+  CBOR::XS: '0'
+  Clone: '0'
+  Compress::Raw::Zlib: '0'
+  Coro: '0'
+  Coro::AnyEvent: '0'
+  Data::Dumper: '0'
+  Data::Structure::Util: '0'
+  EV: '0'
+  Errno: '0'
+  PEF::Front: '0.09'
+  Protocol::WebSocket: '0.2'
+  Scalar::Util: '0'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/jef-sure/pef-front-websocket/issues
+  repository: https://github.com/jef-sure/pef-front-websocket.git
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,15 @@
+Revision history for Perl extension Plack-Session-Store-Transparent
+
+0.03 2014-02-05T04:04:11Z
+
+    - fix dependency problems
+
+0.02 2014-01-26T08:54:48Z
+
+    - fix dependency problems
+
+
+0.01 2014-01-14T07:29:29Z
+
+    - first implementation
+

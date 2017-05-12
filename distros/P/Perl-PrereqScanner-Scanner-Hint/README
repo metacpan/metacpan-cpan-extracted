@@ -1,0 +1,332 @@
+WHAT?
+
+Perl::PrereqScanner::Scanner::Hint (or just Scanner::Hint for brevity) is a
+plugin for Perl::PrereqScanner tool. Scanner::Hint looks for # REQUIRE:
+*ModuleName* *VersionRange* comments in the code.
+
+WHY?
+
+I use Dist::Zilla to build my distributions. I also use AutoPrereqs plugin to
+populate distribution's prerequisites. Usually all this stuff works great. But
+sometimes it does not because dependencies are implicit or hidden (see
+"EXAMPLES" in Perl::PrereqScanner::Scanner::Hint::Manual). In such cases I need
+to make implicit dependencies explicit. There are few ways to declare
+prerequisites manually:
+
+Using Prereqs plugin
+    Prerequisites can be listed manually in dist.ini file by using Prereqs
+    plugin, e. g.:
+
+        [Prereqs]
+            IPC::System::Simple
+
+    However, I do not like such approach. If autodie is used in source code and
+    in tests, it complicates Prereqs usage:
+
+        [Prereqs/Runtime]
+            -phase = runtime
+            IPC::System::Simple
+        [Prereqs/Test]
+            -phase = test
+            IPC::System::Simple
+
+    Also, this approach breaks modularity and spreads implementation details. A
+    module is required by a source file, but requirement is specified in
+    different file, dist.ini. It complicates maintenance because I have to keep
+    multiple files in sync: it is so easy to drop using autodie (and so,
+    implicit dependency on IPC::System::Simple) in source code but forget to
+    update dist.ini.
+
+Explicit use as a hint for AutoPrereqs
+    Prerequisites can be listed manually by explicit use statements:
+
+        use autodie ':all';
+        use IPC::System::Simple qw{};   # AutoPrereqs hint: autodie uses it.
+
+    In such a case dependency on IPC::System::Simple is explicit and so detected
+    by AutoPrereqs.
+
+    This approach looks better than using Prereqs plugin:
+
+    However, this is approach is not ideal:
+
+    For example, this layout (see "Pod::Weaver plugin bundle" in
+    Perl::PrereqScanner::Scanner::Hint::Manual) does not work:
+
+        sub mvp_bundle_config {
+            my $me = '@Author::VDB';
+            return (
+                [ "$me/CorePrep",       _p( '@CorePrep'       ), {} ], use Pod::Weaver::PluginBundle::CorePrep qw{},
+                [ "$me/SingleEncoding", _p( '-SingleEncoding' ), {} ], use Pod::Weaver::Plugin::SingleEncoding qw{},
+                ...
+            );
+        };
+
+    …it causes "use" not allowed in expression error, so I have to separate
+    hints and code:
+
+        sub mvp_bundle_config {
+            my $me = '@Author::VDB';
+            use Pod::Weaver::PluginBundle::CorePrep qw{};
+            use Pod::Weaver::Plugin::SingleEncoding qw{};
+            ...
+            return (
+                [ "$me/CorePrep",       _p( '@CorePrep'       ), {} ],
+                [ "$me/SingleEncoding", _p( '-SingleEncoding' ), {} ],
+                ...
+            );
+        };
+
+    which is not desirable in case of long list of plugins/sections: it is easy
+    to add/drop a plugin/section and forget to add/drop corresponding hint for
+    AutoPrereqs.
+
+Thus, I am not satisfied with existing solutions. I want to specify dependencies
+directly in source code, I want to locate it freely, and it should not interfere
+with existing code. To meet these requirements, dependency specification should
+be comment, not code. Like this one:
+
+   use autodie ':all'; ## REQUIRE: IPC::System::Simple
+
+NAMING
+
+perl-Perl-PrereqScanner-Scanner-Hint is official software name.
+
+However, in Perl world prefix "perl-" is redundant and not used. For example, on
+meta::cpan <https://metacpan.org/> this software is named as
+Perl-PrereqScanner-Scanner-Hint. In the rest of the documentation shortened name
+Perl-PrereqScanner-Scanner-Hint is used as synonym for full name
+perl-Perl-PrereqScanner-Scanner-Hint. We are in the Perl world, aren't we?
+
+You may notice that name may be spelled with dashes
+(Perl-PrereqScanner-Scanner-Hint) or with double colons
+(Perl::PrereqScanner::Scanner::Hint). Strictly speaking, there is difference:
+the first one is software name, while the second is name of Perl package, but
+often these names are interchangeable especially if software consists of single
+package.
+
+FORMS
+
+You may face Perl-PrereqScanner-Scanner-Hint in *source* or *distribution*
+forms.
+
+If you are going to specify implicit prerequisites directly in Perl code, you
+will likely be interested in *using* Perl-PrereqScanner-Scanner-Hint
+*distribution*. If you are going to *develop* (or *hack*) the
+Perl-PrereqScanner-Scanner-Hint itself, you will likely need the *source*, not
+distribution.
+
+Since Perl is an interpreting language, modules in the distribution *look* like
+sources. Actually, they are Perl source files. But they are not *actual*
+sources, because they are *built* (preprocessed or generated) by Dist-Zilla.
+
+How to distinguish source and distribution:
+
+*   Source may contain Mercurial files and directories .hgignore, .hgtags, .hg/,
+    while distribution should not.
+
+*   Source should contain dist.ini file, while distribution may not.
+
+*   Source should *not* contain xt/ directory, while distribution should.
+
+*   Name of source directory does *not* include version (e. g.
+    Perl-PrereqScanner-Scanner-Hint), while name of distribution does (e. g.
+    Perl-PrereqScanner-Scanner-Hint-v0.7.1).
+
+SOURCE
+
+Perl-PrereqScanner-Scanner-Hint source is in Mercurial repository hosted on
+fedorapeople.org. To clone the entire repository:
+
+    $ hg clone https://vandebugger.fedorapeople.org/hg/perl-Perl-PrereqScanner-Scanner-Hint
+
+Source Files
+
+Perl-PrereqScanner-Scanner-Hint source files usually include a comment near the
+top of the file:
+
+    This file is part of perl-Perl-PrereqScanner-Scanner-Hint.
+
+Not all source files are included into distribution. Some source files are used
+at distribution build time only, and not required for installation.
+
+DISTRIBUTION
+
+Perl-PrereqScanner-Scanner-Hint distributions are published on CPAN
+<https://metacpan.org/release/Perl-PrereqScanner-Scanner-Hint>.
+
+Generated Files
+
+Distribution may contain files preprocessed or generated by Dist-Zilla and its
+plugins. Some generated files are made from Perl-PrereqScanner-Scanner-Hint
+source, but some are generated from third-party templates. Files generated from
+third-party templates usually include a comment near the top of the file:
+
+    This file was generated with NAME
+
+(where *NAME* is a name of the plugin generated the file). Such files are *not*
+part of Perl-PrereqScanner-Scanner-Hint source, and
+Perl-PrereqScanner-Scanner-Hint copyright and license are not applicable to such
+files.
+
+INSTALLING
+
+With cpanm
+
+cpanm tool is (probably) the easiest way to install distribution. It automates
+downloading, building, testing, installing, and uninstalling.
+
+To install the latest version from CPAN:
+
+    $ cpanm Perl::PrereqScanner::Scanner::Hint
+
+To install a specific version (e. g. *v0.7.1*) from CPAN:
+
+    $ cpanm Perl::PrereqScanner::Scanner::Hint@v0.7.1
+
+To install locally available distribution (e. g. previously downloaded from CPAN
+or built from sources):
+
+    $ cpanm ./Perl-PrereqScanner-Scanner-Hint-v0.7.1.tar.gz
+
+To uninstall the distribution:
+
+    $ cpanm -U Perl::PrereqScanner::Scanner::Hint
+
+Manually
+
+To install distribution tarball manually (let us assume you have version
+*v0.7.1* of the distribution):
+
+    $ tar xaf Perl-PrereqScanner-Scanner-Hint-v0.7.1.tar.gz
+    $ cd Perl-PrereqScanner-Scanner-Hint-v0.7.1
+    $ perl Build.PL
+    $ ./Build build
+    $ ./Build test
+    $ ./Build install
+
+See Also
+
+How to install CPAN modules <http://www.cpan.org/modules/INSTALL.html>
+
+HACKING
+
+For hacking, you will need Mercurial, Perl interpreter and Dist-Zilla (with some
+plugins), and likely cpanm to install missed parts.
+
+Clone the repository first:
+
+    $ hg clone https://vandebugger.fedorapeople.org/hg/perl-Perl-PrereqScanner-Scanner-Hint
+    $ cd perl-Perl-PrereqScanner-Scanner-Hint
+
+To build a distribution from the source, run:
+
+    $ dzil build
+
+If required Dist-Zilla plugins are missed, the dzil tool will warn you and show
+the command to install all the required plugins, e. g.:
+
+    Required plugin Dist::Zilla::Plugin::Test::EOL isn't installed.
+
+    Run 'dzil authordeps' to see a list of all required plugins.
+    You can pipe the list to your CPAN client to install or update them:
+
+        dzil authordeps --missing | cpanm
+
+To run the tests (to check primary software functionality):
+
+    $ dzil test
+
+To run extended tests (to check source code style, documentation and other
+things which are not too important for software end users):
+
+    $ dzil xtest
+
+To install the distribution:
+
+    $ dzil install
+
+or
+
+    $ cpanm ./Perl-PrereqScanner-Scanner-Hint-VERSION.tar.gz
+
+where *VERSION* is a version of built distribution.
+
+To clean the directory:
+
+    $ dzil clean
+
+DOCUMENTATION
+
+Online
+
+The easiest way is browsing the documentation online at meta::cpan
+<https://metacpan.org/release/Perl-PrereqScanner-Scanner-Hint>.
+
+Locally Installed
+
+If you have the distribution installed, use perldoc tool to browse locally
+installed documentation:
+
+    $ perldoc Perl::PrereqScanner::Scanner::Hint::Manual
+    $ perldoc Perl::PrereqScanner::Scanner::Hint
+
+Built from Source
+
+Build Perl-PrereqScanner-Scanner-Hint first (see "HACKING"), then:
+
+    $ cd Perl-PrereqScanner-Scanner-Hint-VERSION
+    $ perldoc Perl::PrereqScanner::Scanner::Hint::Manual
+    $ perldoc Perl::PrereqScanner::Scanner::Hint
+
+where *VERSION* is a version of built distribution.
+
+FEEDBACK
+
+CPAN Request Tracker
+
+The quickest way to report a bug in Perl-PrereqScanner-Scanner-Hint is by
+sending email to bug-Perl-PrereqScanner-Scanner-Hint [at] rt.cpan.org.
+
+CPAN request tracker can be used via web interface also:
+
+Browse bugs
+<https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-PrereqScanner-Scanner-Hi
+nt>
+    Browsing bugs does not require authentication.
+
+Report bugs
+<https://rt.cpan.org/Public/Bug/Report.html?Queue=Perl-PrereqScanner-Scanner-Hin
+t>
+    You need to be a CPAN author, have a BitCard <https://www.bitcard.org/>
+    account, or OpenID in order to report bugs via the web interface.
+
+    (On 2015-04-27 I have logged in successfully with my LiveJournal OpenID, but
+    my Google OpenID did not work for CPAN. I did not check other OpenID
+    providers.)
+
+Send Email to Author
+
+As a last resort, send email to author: Van de Bugger <van.de.bugger@gmail.com>.
+Please start message subject with "perl-Perl-PrereqScanner-Scanner-Hint:".
+
+GLOSSARY
+
+CPAN
+    Comprehensive Perl Archive Network, a large collection of Perl software and
+    documentation. See cpan.org <http://www.cpan.org>, What is CPAN?
+    <http://www.cpan.org/misc/cpan-faq.html#What_is_CPAN>.
+
+Distribution
+    Tarball, containing Perl modules and accompanying files (documentation,
+    metainfo, tests). Usually distributions are uploaded to CPAN, and can be
+    installed with dedicated tools (cpan, cpanm, and others).
+
+Module
+    Perl library file, usually with .pm suffix. Usually contains one package.
+    See perlmod <http://perldoc.perl.org/perlmod.html#Perl-Modules>.
+
+Package
+    Perl language construct. See package
+    <http://perldoc.perl.org/functions/package.html> and perlmod
+    <http://perldoc.perl.org/perlmod.html#Packages>.

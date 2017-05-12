@@ -1,0 +1,22 @@
+Changes in Padre::Plugin::PHP
+
+v0.05   2010.08.08
+        compatibility with new Padre (CHORNY)
+
+v0.04   2010.07.26
+	00-load.t added (CHORNY)
+	keywords added to autocompletition (CHORNY)
+
+v0.03	2009.11.08
+	Fixed a bug in the preferences dialog
+	Added a PHP menu to the menu bar
+
+v0.02	2009.11.01
+	Configurable PHP interpreter and args (SEWI)
+	Run PHP scripts in normal and debug mode (SIRIUS_BLACK)
+	Autcomplete features (SEWI)
+	Auto clean tailing spaces and other things on save (SEWI)
+	Many other things (various authors)
+
+v0.01
+	First version released

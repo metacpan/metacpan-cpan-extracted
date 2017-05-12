@@ -1,0 +1,71 @@
+
+=head1 NAME
+
+testpod - test document for pod formaters.
+
+=head1 SYNOPSIS
+
+  pod2xxx testpod.pod
+
+=head1 DESCRIPTION
+
+This document is supposed to exercise all pod features.
+
+=head2 Bulleted items
+
+=over 4
+
+=item * Bullet
+
+=over 8
+
+=item * Sub-bullet
+
+=back
+
+=back
+
+
+=head2 Numbered items
+
+
+=over 4
+
+=item 1. Level 1
+
+=over 8
+
+=item 2. Level 2
+
+=back
+
+=back
+
+=head2 Text items
+
+
+=over 4
+
+=item An item
+
+=over 8
+
+=item A Sub-item
+
+=back
+
+=back
+
+=head2 Links
+
+See L</"Bulleted items"> or L<F<testpod>/"Bulleted items">
+
+Text with I<italic>, B<bold>, C<code>, F<Filename>, ZeroZ<>width character, 
+E<lt> E<amp> E<gt>, and strange "E<copy>" charactersE<33>
+I<B<Bold in italic.>> B<C<Code in boldE<33>>>
+
+=head3 Third level Heading
+
+=item An item not inside an =over
+
+=head2 That is all for now.

@@ -1,0 +1,7 @@
+Revision history for Perl extension Proc::Spawn.
+
+1.03  Thu May 31 22:29:52 EDT 2001
+        - Corrected flaws in spawn_pty logic
+
+1.02  Tue May 29 09:22:06 EDT 2001
+        - First released version

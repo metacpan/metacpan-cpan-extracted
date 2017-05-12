@@ -1,0 +1,47 @@
+NAME
+    Plack::App::JSP - Javascript PSGI apps via JSP
+
+VERSION
+    version 0.101680
+
+SYNOPSIS
+     # app.psgi - looks pretty normal
+     use Plack::App::JSP;
+     Plack::App::JSP->new( js => q{
+       [ 200, [ 'Content-type', 'text/html' ], [ 'Hello, World!' ] ] 
+     });
+
+     # app.psgi - hello Javascript!
+     Plack::App::JSP->new( js => q{
+        function respond(body) {
+            return [ 200, [ 'Content-type', 'text/html' ], [ body ] ]
+        }
+    
+        respond("Five factorial is " + 
+            (function(x) {
+              if ( x<2 ) return x;
+              return x * arguments.callee(x - 1);
+            })(5)
+        );
+     });
+
+DESCRIPTION
+    Use Javascript to write a PSGI/Plack app
+
+ATTRIBUTES
+  js
+    Your Javascript
+
+SEE ALSO
+    JSP, Plack
+
+AUTHOR
+      Patrick Donelan <pat@patspam.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Patrick Donelan
+    <pat@patspam.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

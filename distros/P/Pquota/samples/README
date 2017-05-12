@@ -1,0 +1,9 @@
+Okay, boris is a slightly cleaned-up copy of the printer interface
+script we use here at BU.  Since we were too lazy to rewrite it in
+perl, we had to write pquota_user_admin.pl to do the dirty work.
+It's actually a much bigger script, but we cut out all but the good
+parts here.  (mostly because it was an ugly hack)        
+
+We're running Solaris 2.6, and we've got an HP Laserjet 5simx. To
+get to the relevant pquota crap here, just search for 'pquota' in
+the file.

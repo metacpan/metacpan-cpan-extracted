@@ -1,0 +1,32 @@
+Revision history for Perl extension PerlGuard::Agent.
+
+0.01  Wed Jul  1 14:59:24 2015
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter PerlGuard::Agent -b 5.10.1
+
+0.02 Mon Aug 17 2015
+  - Add Monitors for DBI and Net::HTTP
+  - Add output methods to communicate with the server using an alpha collector version
+
+0.03 Mon Aug 17 2015
+  - Temporary change to HTTP::Async to make sure we process all outbound messages
+
+0.04 Wed 19 Aug 2015
+  - Had a missing file from Manifest
+
+0.05 Mon 12 Oct 2015
+  - Mojo apps can now submit profiles on the next tick and free up the client
+
+0.08 Mon 2 Nov 2015
+  - Add some safety checks so the agent is less likely to break production
+
+0.12 Tue 19 Jan 2016
+  - CGI::Application apps tend to have a single controller action that accepts get AND post and then 
+    does different things depending on which it is, to help split these up lets append this to the controller action
+
+0.13 Wed 20 Jan 2016
+  - Drop Moo requirement down to version 1
+
+0.14 Mon 25 Jan 2016
+  - Silence some warnings
+  - Attempt to show some useful information for requests that fail routing (404s etc)

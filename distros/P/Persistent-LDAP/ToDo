@@ -1,0 +1,6 @@
+o add method: update
+    Currently, an update does a delete and insert, which was simple
+    to implement, but not the fastest for performance.
+
+Please see the ToDo file for the Persistent DBI module for other
+possible changes to this module.

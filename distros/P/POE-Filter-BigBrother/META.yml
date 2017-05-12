@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               POE-Filter-BigBrother
+version:            0.13
+abstract:           protocol abstractions for BigBrother streams
+author:
+    - Yves Blusseau
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    POE::Filter:  0.38
+    Test::More:   0.60
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

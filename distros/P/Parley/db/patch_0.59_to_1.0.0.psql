@@ -1,0 +1,27 @@
+-- Patch:
+--   From: 0.59
+--   To:   1.0.0
+--
+-- Description:
+
+BEGIN;
+
+-- patch starts here --
+
+ALTER TABLE user_roles
+    ADD COLUMN authentication_id integer
+        references authentication(id);
+
+UPDATE user_roles
+    SET authentication_id = person_id;
+
+ALTER TABLE user_roles
+    ALTER COLUMN person_id
+        SET NOT NULL;
+
+ALTER TABLE user_roles
+    DROP COLUMN person_id;
+
+-- patch ends here --
+
+COMMIT;

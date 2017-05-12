@@ -1,0 +1,84 @@
+{
+   "abstract" : "Plack application to display the sessions of OpenVPN server",
+   "author" : [
+      "Anton Gerasimov <chim@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-App-OpenVPN-Status",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "examples",
+         "corpus"
+      ],
+      "namespace" : [
+         "t::lib"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack" : "0.9979",
+            "Text::MicroTemplate" : "0.15",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::App::OpenVPN::Status" : {
+         "file" : "lib/Plack/App/OpenVPN/Status.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Wu-Wu/Plack-App-OpenVPN-Status/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Plack-App-OpenVPN-Status",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Wu-Wu/Plack-App-OpenVPN-Status.git",
+         "web" : "https://github.com/Wu-Wu/Plack-App-OpenVPN-Status"
+      }
+   },
+   "version" : "0.16",
+   "x_authority" : "cpan:CHIM"
+}
+

@@ -1,0 +1,32 @@
+Revision history for Perl extension Perl::Signature
+
+1.09 Sat Aug 16 2008
+	- No functional changes
+	- Upgraded to Module::Install 0.77
+
+0.08 Sat Apr 22 2006
+	- No functional changes
+	- Moved from SourceForge CVS to new collaborative SVN
+	- Upgraded to Module::Install 0.62
+
+0.07 Fri Dec 30 2005
+	- ::Set->new($layer) only accepted 1. Now accepts 2 as well. :/
+	- Updated PPI dep to 1.109 to fix $_ being clobbered.
+	- Upgraded Module::Install
+
+0.05 Wed May 25 2005
+	- Updated to handle API change at PPI 0.990
+
+0.04  Wed Feb  9 2005
+	- Added the ->files and ->file methods
+
+0.03  Tue Feb  8 2005
+	- Added Perl::Signature::Set
+
+0.02  Mon Feb  7 2005
+	- Upgraded to the beta PPI code
+	- API changed quite a bit
+	- Added instantiable usage
+
+0.01  Mon Sep 22 2004
+	- Created the initial implementation

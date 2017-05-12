@@ -1,0 +1,28 @@
+########################################################################
+#
+# This file contains the connection information needed to connect
+# to the LDAP directory for the test programs.
+# You will probably want to remove this file after everything is working.
+#
+########################################################################
+
+### Bind DN to login to LDAP directory as ###
+### leave blank if there isn't one   ###
+BindDN:		cn=Directory Manager
+
+### password for Bind DN ###
+### leave blank if there isn't one   ###
+Passwd:		test1234
+
+### Hostname or IP address of LDAP directory server ###
+Host:		localhost
+
+### Port of the LDAP directory ###
+Port:		389
+
+### Base DN to start all searches/updates ###
+BaseDN:		ou=Snow Movers Dept,ou=Engineering,o=Big Snow Organization,c=US
+
+### Skip the Netscape Directory Server tests? ###
+### Y = Yes, I have a NS-SLAPD running and have write access to it. ###
+SkipTests:	Y

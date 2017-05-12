@@ -1,0 +1,38 @@
++{
+    head1  => 'cyan',
+    head2  => 'reset bold',
+    bold   => 'reset bold',
+    file   => 'green',
+    italic => 'reset italic',
+    link   => 'blue',
+    code => {
+        Character         => 'red',
+        String            => 'cyan',
+        Number            => 'cyan',
+        Quote             => 'cyan',
+
+        Label             => 'green',
+
+        Builtin_Function  => 'green',
+        Builtin_Operator  => 'green',
+        Keyword           => 'green',
+
+        Package           => 'yellow',
+        Variable_Hash     => 'yellow',
+        Variable_Array    => 'yellow',
+        Variable_Scalar   => 'yellow',
+        Variable_Typeglob => 'yellow',
+
+        Subroutine        => 'blue',
+
+        Bareword          => 'reset',
+        Symbol            => 'reset',
+        Operator          => 'reset',
+
+        Comment_Normal    => 'bright_green',
+        Comment_POD       => 'bright_green',
+        DATA              => 'bright_green',
+
+        Directive         => 'bright_red',
+    },
+};

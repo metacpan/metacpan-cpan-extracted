@@ -1,0 +1,8 @@
+Revision history for Perl extension Project::Libs.
+
+0.02  Mon Aug 5 2013
+      - Added a support for glob path in `lib_dirs`
+      (Thanks to shibayu36)
+
+0.01  Wed Nov 24 2010
+      - initial release

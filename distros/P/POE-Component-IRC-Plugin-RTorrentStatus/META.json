@@ -1,0 +1,66 @@
+{
+   "abstract" : "A PoCo-IRC plugin which prints RTorrent status messages to IRC",
+   "author" : [
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-IRC-Plugin-RTorrentStatus",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "utils"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "1.07"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : 0,
+            "DateTime" : 0,
+            "DateTime::Format::Human::Duration" : 0,
+            "Format::Human::Bytes" : 0,
+            "List::Util" : 0,
+            "POE" : 0,
+            "POE::Component::IRC" : 0,
+            "POE::Component::IRC::Plugin::FollowTail" : "6.22"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-POE-Component-IRC-Plugin-RTorrentStatus@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-IRC-Plugin-RTorrentStatus"
+      },
+      "homepage" : "http://metacpan.org/release/POE-Component-IRC-Plugin-RTorrentStatus",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hinrik/poe-component-irc-plugin-rtorrentstatus.git",
+         "web" : "http://github.com/hinrik/poe-component-irc-plugin-rtorrentstatus"
+      }
+   },
+   "version" : "0.17",
+   "x_authority" : "cpan:HINRIK"
+}
+

@@ -1,0 +1,127 @@
+---
+- !perl/Profile::Log
+  0:
+    - 86571502
+    - 544547
+  Z:
+    - 86571504
+    - 509547
+  mc: 0
+  t:
+    - read
+    - 0.001
+    - parseXML
+    - 0.006
+    - send
+    - 0.003
+    - recv
+    - 1.954
+    - respond
+    - '0.000 '
+  tag:
+    ID: '4,463623'
+    comment: 'FE Times:'
+    hostname: srssweb2
+    process: SrsFrontEnd-srsdev
+    type: DomainDetailsQry
+- !perl/Profile::Log
+  0:
+    - 86571502
+    - 553088
+  Z:
+    - 86571504
+    - 505088
+  m:
+    spread:
+      - 86571502
+      - 593088
+  mc: 1
+  t:
+    - read_config
+    - 0.002
+    - valid_config
+    - 0.000
+    - fork
+    - 0.001
+    - read
+    - 0.002
+    - init
+    - 0.000
+    - m0:spread
+    - 0.035
+    - m0:send
+    - 0.004
+    - m0:srspapp3
+    - 1.910
+    - respond
+    - '0.001 '
+  tag:
+    ID: '4,463623'
+    comment: 'Times:'
+    hostname: srssweb2
+    process: FeRep-srsdev
+- !perl/Profile::Log
+  0:
+    - 86571502
+    - 606203
+  Z:
+    - 86571504
+    - 463203
+  mc: 0
+  t:
+    - childspread
+    - 0.207
+    - init
+    - 0.199
+    - process
+    - 1.443
+    - respond
+    - 0.001
+    - request
+    - '0.000 '
+  tag:
+    ID: '4,463623'
+    comment: 'Times:'
+    hostname: srspapp3
+    process: Listener-srsdev
+- !perl/Profile::Log
+  0:
+    - 86571503
+    - 97447
+  Z:
+    - 86571504
+    - 451447
+  m:
+    process:
+      - 86571503
+      - 493447
+  mc: 1
+  t:
+    - hout
+    - 0.000
+    - new
+    - 0.003
+    - init
+    - 0.000
+    - keytext
+    - 0.300
+    - pgpv1
+    - 0.043
+    - pgpv
+    - 0.021
+    - parse
+    - 0.029
+    - m0:process
+    - 0.000
+    - m0:process
+    - 0.952
+    - sign
+    - 0.004
+    - send
+    - '0.001 '
+  tag:
+    ID: '4,463623'
+    comment: 'BE Times:'
+    hostname: srspapp3
+    process: SrsBackend-srsdev
+    type: DomainDetailsQry

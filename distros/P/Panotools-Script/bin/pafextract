@@ -1,0 +1,123 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Panotools::Script;
+use Math::Trig;
+use Image::Size;
+use File::Spec;
+
+die "Usage: $0 project.paf" unless (defined $ARGV[0] and -e $ARGV[0]);
+
+my $path_paf = File::Spec->rel2abs ($ARGV[0]);
+open (PAF, '<'. $path_paf);
+my $paf = {};
+for my $line (<PAF>)
+{
+    if ($line =~ /^(.+)=(.+)$/)
+    {
+        my ($key, $value) = ($1, $2);
+        $key =~ s/\\ / /g;
+        $paf->{$key} = $value;
+    }
+}
+
+my ($v, $d, $f) = File::Spec->splitpath ($path_paf);
+my $path_equirect = File::Spec->catpath ($v, $d, $paf->{'Panorama Image'});
+
+my ($px_width_equirect, $px_height_equirect) = imgsize ($path_equirect);
+die unless ($px_width_equirect * $px_height_equirect > 0);
+
+my $deg_hfov_equirect = $paf->{'Image Maximum Pan'} - $paf->{'Image Minimum Pan'};
+$deg_hfov_equirect = 360 if $deg_hfov_equirect < 1;
+
+my $px_radius_equirect = ($deg_hfov_equirect / 360) * $px_width_equirect / (2 * atan2(0,-1));
+
+my $rad_vfov = $paf->{'Initial FOV'} * atan2(0,-1) / 180;
+
+my $px_height = int (tan ($rad_vfov/2) * $px_radius_equirect * 2);
+my $px_width = int ($px_height * 4/3);
+
+my $focal_length = $px_height / (2*tan($rad_vfov/2));
+my $rad_hfov = 2 * atan( $px_width / (2.0 * $focal_length));
+
+# create a .pto project to extract the rectilinear view stored in the .paf file
+my $pto_extract = new Panotools::Script;
+$pto_extract->Panorama->Set (w => $px_width, h => $px_height,
+                             n => 'TIFF',
+                             v => ($rad_hfov * 180 / atan2(0,-1)),
+                             f => 0);
+
+my $equirect = new Panotools::Script::Line::Image;
+$equirect->Set (w => $px_width_equirect, h => $px_height_equirect, f => 4,
+                v => $deg_hfov_equirect, r => 0, p => 0, y => 0,
+                n => '"'. $path_equirect .'"');
+push @{$pto_extract->Image}, $equirect;
+
+$pto_extract->Transform (0, 0, 0 - $paf->{'Initial Pan'});
+$pto_extract->Transform (0, $paf->{'Initial Tilt'}, 0);
+
+my $path_temp_pto = $path_paf .'.'. $$ .'.temp.pto';
+
+$pto_extract->Write ($path_temp_pto);
+
+# render the rectilinear view, delete the .pto project
+system ('nona', '-o', $path_paf .'.extract', $path_temp_pto);
+unlink $path_temp_pto;
+
+# create a .pto that reprojects the extracted rectilinear back into the original image
+my $pto_insert = new Panotools::Script;
+$pto_insert->Panorama->Set (w => $px_width_equirect, h => $px_height_equirect,
+                            v => $deg_hfov_equirect, n => 'TIFF');
+
+my $rectilinear = new Panotools::Script::Line::Image;
+$rectilinear->Set (w => $px_width, h => $px_height,
+                   f => 0, v => ($rad_hfov * 180 / atan2(0,-1)),
+                   n => '"'. $path_paf .'.extract.tif"');
+push @{$pto_insert->Image}, $rectilinear;
+
+$pto_insert->Transform (0, 0 - $paf->{'Initial Tilt'}, 0);
+$pto_insert->Transform (0, 0, $paf->{'Initial Pan'});
+
+$pto_insert->Write ($path_paf .'.extract.pto');
+
+__END__
+
+=head1 NAME
+
+pafextract - render panoglview .paf projects
+
+=head1 SYNOPSIS
+
+  panoglview equirectangular.tif
+  pafextract project.paf
+  gimp project.paf.extract.tif
+  nona -o overlay project.paf.extract.pto
+  composite overlay.tif equirectangular.tif merged.tif
+
+=head1 DESCRIPTION
+
+B<pafextract> takes a panoglview .paf file and renders the saved view as a
+suitably sized .tif file.  This is useful for simply extracting a 'normal' view
+from an equirectangular panorama.
+
+A hugin .pto project is also created, containing all the information necessary
+to reproject the extracted .tif image back into the same equirectangular space
+as the original.  This is useful for merging edits back into the original with
+a tool such as ImageMagick or the Gimp.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+=head1 AUTHOR
+
+Bruno Postle - September 2008.
+
+=cut

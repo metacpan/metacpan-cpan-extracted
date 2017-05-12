@@ -1,0 +1,311 @@
+# ABSTRACT: Guide for authenticating and authorizing against a PlugAuth server
+# VERSION
+# PODNAME: PlugAuth::Guide::Client
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+PlugAuth::Guide::Client - Guide for authenticating and authorizing against a PlugAuth server
+
+=head1 VERSION
+
+version 0.35
+
+=head1 DESCRIPTION
+
+This document contains some common recipes for using interacting as a client
+in various environments with a L<PlugAuth> server.
+
+This document assumes a PlugAuth server listening on http://localhost:3000 with
+users C<primus> (an administrator) with password "spark" and C<optimus> (a user) with
+password "matrix".  The resource.txt file for the server looks like this:
+
+ / (accounts): primus
+ /user (change_password): primus
+ /user/#u (change_password): #u
+ /some/user/resource (GET): optimus
+
+For details on setting up a PlugAuth server using the default plugins, see
+L<PlugAuth::Guide::Server>.  All of these examples are included with the 
+L<PlugAuth> distribution in example directory.
+
+=head2 From a L<Clustericious> service using L<Clustericious::Plugin::PlugAuth>.
+
+Any Clustericious service can be integrated with PlugAuth using the Clustericious
+L<PlugAuth|Clustericious::Plugin::PlugAuth> plugin.  Here is an example Routes
+module
+
+ package ExampleAppExample::Routes;
+ 
+ use Clustericious::RouteBuilder;
+ 
+ get '/' => sub { shift->render(text => 'hello') };
+ 
+ authenticate;
+ authorize;
+ 
+ get '/some/user/resource' => sub { shift->render(text => 'hello') };
+
+And example configuration to go along with it.
+
+ ---
+ url: http://localhost:3001
+ plug_auth:
+   url: http://localhost:3000
+
+This will configure the example application to listen on localhost port 3001 and
+to use the PlugAuth server listening on localhost port 3000.  You can start this
+service by using the daemon command
+
+ % perl ExampleAppExample.pl daemon -l http://localhost:3001
+
+And test it by navigating your browser to http://localhost:3001/some/user/resource .
+The web browser should prompt you for a username and password, and accept the 
+credentials for C<optimus>.
+
+For more details see L<Clustericious::Plugin::PlugAuth>.
+
+=head2 From Perl using L<PlugAuth::Client>
+
+L<PlugAuth::Client> can be used to authenticate against a L<PlugAuth> server from
+a Perl script or module.  L<PlugAuth::Client> needs a configuration file, just like
+PlugAuth.  You can use the same configuration file as you use for the server,
+although the only configuration item you need is C<url>:
+
+ ---
+ url: http://localhost:3000
+
+First you will need t ocreate an instance of PlugAuth::Client:
+
+ use strict;
+ use warnings;
+ use 5.010001;
+ use PlugAuth::Client;
+ 
+ my $client = PlugAuth::Client->new;
+
+Then you should specify your credentials using the C<login> method.  C<login> doesn't
+connect to the L<PlugAuth> server itself, but it does remember the credentials and use
+it on the next call that you make to the L<PlugAuth> server.
+
+ print "user: ";
+ my $username = <STDIN>;
+ print "pass: ";
+ my $password = <STDIN>;
+ 
+ chomp $username;
+ chomp $password;
+ 
+ $client->login($username, $password);
+
+Obviously in a production environment you should hide the password when prompting for
+a password, but for this example, it will be helpful to see the credentials at the shell.
+
+To check that the credentials are correct, you can use the auth method:
+
+ if($client->auth)
+ {
+   say "$username is authenticated";
+ }
+ else
+ {
+   say "AUTH FAILED";
+ }
+
+And to check that you are authorized for a particular resource, use the authz method:
+
+ if($client->authz($username, 'GET', '/some/user/resource'))
+ {
+   say "$username is authorized to GET /some/user/resource";
+ }
+ else
+ {
+   say "AUTHZ FAILED";
+ }
+
+Here we run this example script using bogus credentials:
+
+ % perl client.pl
+ user: bogus
+ pass: bogus
+ AUTH FAILED
+ AUTHZ FAILED
+
+Next, try the user administrator credentials.  Note that although primus is an 
+administrator for users we did not give him permission to get the resource
+/some/user/resource, so the authorization fails.
+
+ % perl client.pl
+ user: primus
+ pass: spark
+ primus is authenticated
+ AUTHZ FAILED
+
+Finally, providing the credentials for optimus should pass both authentication
+and authorization.
+
+ % perl client.pl
+ user: optimus
+ pass: matrix
+ optimus is authenticated
+ optimus is authorized to GET /some/user/resource
+
+There are a number of other features that can be accessed using this interface.
+Please see L<PlugAuth::Client> for details.
+
+=head2 From the command line using L<plugauthclient> and L<plugauthpasswd>.
+
+The L<PlugAuth::Client> distribution installs two programs for interacting with a
+PlugAuth server from the command line.  L<plugauthclient> is a thin wrapper around
+the Perl and RESTful APIs provided by L<PlugAuth>.  As in the previous example, we
+need a configuration file in ~/etc/PlugAuth.conf, but only the url needs to be 
+specified for the client.  Once that is setup we can check authentication and
+authorization, just like we could via the Perl API.
+
+ % plugauthclient auth
+ Username for  at localhost :  [default joe] bogus
+ Password: 
+ [ERROR] 2012/11/30 12:17:16 Client.pm (733) Error trying to GET http://user:*****@localhost:3000/auth : 403 Forbidden
+ [ERROR] 2012/11/30 12:17:16 Client.pm (737) not ok
+ [ERROR] 2012/11/30 12:17:16 Command.pm (253) Forbidden
+ % plugauthclient auth
+ Username for  at localhost :  [default joe] optimus
+ Password: 
+ --- ok
+ % plugauthclient authz primus GET /some/user/resource
+ [ERROR] 2012/11/30 12:19:11 Client.pm (733) Error trying to GET http://localhost:3000/authz/user/primus/GET/some/user/resource : 403 Forbidden
+ [ERROR] 2012/11/30 12:19:11 Client.pm (737) unauthorized : primus cannot GET /some/user/resource
+ [ERROR] 2012/11/30 12:19:11 Command.pm (253) Forbidden
+ % plugauthclient authz optimus GET /some/user/resource
+ --- ok
+
+L<plugauthpasswd> provides a mechanism for changing your password:
+
+ % plugauthpasswd
+ Username:  [default joe] optimus
+ Old Password:
+ New Password:
+ Verify New Password:
+ --- ok
+
+=head2 From another language using a WWW library
+
+The RESTful API for L<PlugAuth> is documented in L<PlugAuth::Routes>.  For authentication
+simply make a HTTP GET request to http://localhost:3000/auth using HTTP BASIC authentication.
+To check authorization make a HTTP GET request to
+http://localhost:3000/authz/user/I<username>/I<action>/I<resource> .  For example to check
+that C<optimus> can GET on the resource /some/user/resource, the constructed resource would
+be http://localhost:3000/authz/user/primus/GET/some/user/resource .  All routes in the RESTful
+API return standard HTTP status codes.
+
+=head2 From a sh script using wget
+
+If you do not have L<PlugAuth::Client> installed and cannot install it, you can use C<wget>
+or C<curl>.  Because L<PlugAuth> uses standard HTTP status codes, C<wget> will return non
+zero on failure and you can construct an if around it.
+
+ #!/bin/sh
+ 
+ USER=$1
+ PASS=$2
+ WGET="wget -q -O /dev/null"
+ 
+ if $WGET http://${USER}:${PASS}@localhost:3000/auth ; then
+   echo "$USER is authenticate"
+ else
+   echo "AUTH FAILED"
+ fi
+ 
+ if $WGET http://localhost:3000/authz/user/${USER}/GET/some/user/resource ; then
+   echo "$USER is authorized to GET /some/user/resource"
+ else
+   echo "AUTHZ FAILED"
+ fi
+
+Here we pass it bogus credentials
+
+ % sh client.sh bogus bogus
+ AUTH FAILED
+ AUTHZ FAILED
+
+And here we pass it good credentials
+
+ % sh client.sh optimus matrix
+ optimus is authenticate
+ optimus is authorized to GET /some/user/resource
+
+=head2 From PAM (Pluggable Authentication Module)
+
+There is a L<PAM module that will authenticate against a HTTP server 
+using HTTP Basic authentication on 
+git|https://github.com/beatgammit/pam-http>. It is licensed under the 
+MIT License and is based on work by Kragen Sitaker.  I had to install 
+C<libpam0g-dev> and C<libcurl4-openssl-dev> on my Debian system in order 
+for it to build for me.
+
+ % git clone git://github.com/beatgammit/pam-http.git
+ % cd pam-http
+ % make
+ % sudo cp mypam.so /lib/security
+
+Add these two lines to the top of your /etc/pam.d/common-auth (or other) config:
+
+ auth sufficient mypam.so url=http://localhost:3000/auth
+ account sufficient mypam.so
+
+C<sufficient> means that it will fallback on your existing passwd file or whatever
+authentication mechanism is configured already.  Change the C<url> argument
+to the URL for your L<PlugAuth> server.
+
+There are numerous caveats here.  PlugAuth usually runs as an unprivileged 
+user which means it binds to an unprivileged port, and if an unauthorized 
+user sets up their own PlugAuth service before the "correct" PlugAuth server 
+starts, authentication could be subverted.  Encryption, such as SSL should 
+be used if you are authenticating against a L<PlugAuth> server over the 
+network, but pam-http as written does not check the authenticity of the 
+PlugAuth server's SSL certificate.  Unix accounts require more information 
+than just authentication, which is not provided by L<PlugAuth>, so something 
+like LDAP may be more appropriate.  None of these things are insurmountable 
+if you take the time to fix them, but care needs to be taken.
+
+=head2 From Apache 2.x
+
+The authentication and authorization handlers
+L<PlugAuth::Client::Tiny::Apache2AuthenHandler>, and
+L<PlugAuth::Client::Tiny::Apache2AuthzHandler>
+can be used to authenticate and authorize (respectively)
+against a PlugAuth server from an Apache 2.x configuration file.
+These modules require mod_perl.
+
+ <Location /protected>
+   PerlAuthenHandler PlugAuth::Client::Tiny::Apache2AuthenHandler
+   PerlAuthzHandler  PlugAuth::Client::Tiny::Apache2AuthzHandler
+   AuthType Basic
+   AuthName "My Protected Documents"
+   Require valid-user
+   PerlSetEnv PLUGAUTH_URL http://localhost:3001
+ </Location>
+
+=head1 SEE ALSO
+
+L<PlugAuth>, 
+L<PlugAuth::Client>, 
+L<Authen::Simple::PlugAuth>
+
+=head1 AUTHOR
+
+Graham Ollis <gollis@sesda3.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by NASA GSFC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

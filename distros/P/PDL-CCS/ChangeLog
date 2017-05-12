@@ -1,0 +1,187 @@
+v1.23.3 Mon, 06 Jun 2016 14:45:29 +0200 moocow
+	+ fixed ccs_wfits() typecast-to-long hack for indx types
+	  - feature request including patch posted to https://sourceforge.net/p/pdl/bugs/421/
+
+v1.23.2 Mon, 06 Jun 2016 11:20:12 +0200 moocow
+	+ win32/NaN fixes for tests (RT bug #115078)
+
+v1.23.1 Tue, 12 Jan 2016 13:24:00 +0100 moocow
+	+ fixed index overflow bug picking maximum output dimension in perl-side ccs_xindex2d()
+	+ added optional pass-in $anorm() for ccs_vcos_zdd()
+	+ added pointer-optimized sparse-crs matrix vs. sparse-coo vector cosine method ccs_vcos_pzd()
+
+v1.23.0 Tue, 15 Dec 2015 13:25:35 +0100 moocow
+	+ fixed "uninitialized value" warnings for PDL->can($type) in PDL::CCS::IO::*
+	+ added support for ndims>2 to PDL::CCS::IO::MatrixMarket
+	+ added sparse/dense vector-cosine ccs_vcos_zdd() in PDL::CCS::MatrixOps, with wrapper PDL::CCS::Nd::vcos_zdd()
+	  - dense/dense variant in PDL::VectorValued::Utils::vv_vcos() for PDL::VectorValued v1.0.5
+	+ fixed BAD handling in CCS::Compat::ccsget(), CCS::Compat::ccsget2d()
+	+ fixed I/O type handling in integer ufuncs (borover)
+	+ fixed wrongly succeeding bogus tests with unary ok()
+	  - tests now use Test::More and re-factored common test subroutines
+	+ fixed C-level abs() function in CCS::Utils::nnza(); now dispatches to one of {abs,labs,llabs,fabsf,fabs} using PDL::PP types(...) macro
+	+ fixed CCS ufunc type-promotion logic to be compatible with PDL v2.015
+	+ pared down CCS/t/06_matops.t to test only missing==0 : matrix ops don't work correctly with missing!=0
+	+ pdlmaker.plm doesn't distribute generated PM files any more (PDL now does this for us)
+
+v1.22.6 Wed, 25 Nov 2015 16:27:24 +0100 moocow
+	+ added CCS::IO::FITS, CCS::IO::MatrixMarket, CCS::IO::LDAC, CCS::IO::PETSc
+	+ moved common I/O utilities to CCS::IO::Common
+	+ added CCS::IO tests
+
+v1.22.5 Mon, 23 Nov 2015 12:34:25 +0100 moocow
+	+ no real joy with Makefile.PL workaround (UNKNOWN results are still pretty wonky)
+	+ updating PDL::VectorValued to use shared $VERSION via perl-reversion script from module Perl::Version
+	+ PDL::CCS can now depend directly on PDL::VectorValued
+
+v1.22.4 Tue, 17 Nov 2015 09:54:23 +0100 mocoow
+	+ Makefile.PL workaround for PDL::VectorValued(::Version) strangeness on cpantesters
+	  - see http://sourceforge.net/p/pdl/mailman/message/34623263/ ("headaches with indirect PDL-related dependencies on cpantesters", 2015-11-16 13:16:44)
+
+v1.22.3 Thu, 05 Nov 2015 10:43:54 +0100 moocow
+	+ workaround for PDL::clump(-N) bug in PDL-v2.014: compute non-negative clump() arguments in CCS/Compat.pm
+	  - see RT bug #108472; PDL bug https://sourceforge.net/p/pdl/bugs/406/
+	+ workaround for changed PDL::reshape() behavior in CCS/t/05_binops.t, CCS/t/06_matops.t : getting ugly realloc errors without it
+	  - see RT bug #107829
+
+v1.22.2 Tue, 18 Aug 2015 13:04:09 +0200 moocow
+	+ added clearptr($pdimi) method
+
+v1.22.1 Wed, 08 Apr 2015 16:09:43 +0200 moocow
+	+ fixed ccs_xindex2d() utility and added CCS::Nd::xsubset2d() wrapper
+
+v1.22.0 Wed, 08 Apr 2015 13:49:14 +0200
+	+ added ccs_xindex2d() utility function: fast Cartesian product indexing of sparse 2d matrices
+
+v1.21.0 Mon, 16 Mar 2015 13:22:34 +0100 moocow
+	+ added PDL::IO::FastRaw wrappers (incl mapfraw) for PDL::CCS::Nd objects
+	+ PDL::CCS::Nd->fromWhich() now accepts ARRAY-refs for 'pdims' and 'vdims' options
+
+v1.20.2 Wed, 05 Nov 2014 13:24:55 +0100 moocow
+	+ more empty-piddle fixes for PDL-v2.4.11 (kaskade / debian wheezy)
+
+v1.20.1 Wed, 05 Nov 2014 10:41:19 +0100 moocow
+	+ improved handling of empty pdls in PDL::CCS::Nd
+
+v1.19.1 Thu, 26 Sep 2013 08:57:11 +0200 moocow
+	+ use ExtUtils::MakeMaker::prompt() for configuration questions; fixes RT #88972
+
+v1.19.0 Wed, 25 Sep 2013 12:13:27 +0200 moocow
+	+ added (optional) support for 64-bit indices via PDL_Indx (requires PDL >= v2.007)
+
+v1.18.0 Wed, 07 Nov 2012 13:57:26 +0100
+	+ added CCS::Functions::ccs_qsort(), CCS::Nd::qsort(), CCS::Nd::qsorti()
+	+ new qsort code requires PDL::VectorValued >= v0.06 (for enumvec())
+	+ added :lvalue attribute to selected CCS::Nd and CCS::Functions subs
+
+v1.16 Mon, 02 Jan 2012 13:38:48 +0100 moocow
+	+ cpan-friendly distribution with pdlmaker.plm
+
+v1.15 2011-12-20 moocow
+	* [r5936] band-aided barf()ing PDL::CCS::Functions::ccs_decode()
+	  due to mismatched dimensions in empty index and value piddles
+
+v1.14 2011-03-31  moocow
+	* [r5596] CCS/Makefile.PL, CCS/Nd.pm, CCS/Version.pm,
+	  CCS/testme.perl, ChangeLog, Makefile.PL, testme.perl: + v1.14:
+	  updated for PDL::VectorValued 0.04 (qsortveci -> vv_qsortveci)
+
+v1.13 2010-02-26  moocow
+	* [r4085] CCS/MatrixOps/ccsmatops.pd, CCS/Nd.pm, CCS/Version.pm,
+	  testme.perl: + updated MatrixOps::ccs_matmult2d_sdd : 2d matrix
+	  mult with arbitrary finite missing values
+	* [r4084] MANIFEST: + updated MANIFEST (added CCS/MatrixOps/
+	  subdir)
+
+v1.12 2009-11-04  moocow
+	* [r3653] CCS/Nd.pm: + v1.12: fixed empty-dimension bug in
+	  CCS::Nd::dice_axis() [not indexND as in last log message]
+	* [r3652] CCS/Nd.pm, CCS/Utils/ccsutils.pd, CCS/Version.pm: +
+	  v1.12: fixed empty-dimension bug in CCS::Nd::indexND()
+
+v1.11 2009-10-31  moocow
+	* [r3621] CCS/MatrixOps/ccsmatops.pd, CCS/Nd.pm, CCS/t/06_matops.t,
+	  testme.perl: + added matmult2d_zdd() variant: should really work
+	* [r3618] CCS.pm, CCS/Attic, CCS/Makefile.PL, CCS/MatrixOps,
+	  CCS/MatrixOps/Makefile.PL, CCS/MatrixOps/ccsmatops.pd,
+	  CCS/MatrixOps/t, CCS/MatrixOps/t/00_basic.t,
+	  CCS/MatrixOps/t/common.plt, CCS/Nd.pm, CCS/Version.pm,
+	  CCS/t/06_matops.t, testme.perl: + v1.11: added
+	  CCS::Nd::matmult2d_sdd for correct matrix multiplication with
+	  dense 2nd operand and output
+
+v1.10 2009-10-22  moocow
+	* [r3567] CCS/Nd.pm, CCS/Version.pm: + v1.10: added isbad(),
+	  isgood()
+
+v1.09 2009-10-19  moocow
+	* [r3540] CCS/Ufunc/ccsufunc.pd:
+	* [r3539] CCS/Ufunc/ccsufunc.pd, CCS/Version.pm:
+	* [r3538] CCS/Ufunc/ccsufunc.pd:
+
+v1.08 2009-07-16  moocow
+	* [r3395] CCS/Nd.pm, CCS/Version.pm, ChangeLog, testme.perl: +
+	  added CCS::Nd methods interpolate(), interpol()
+
+v1.07 2008-07-26  moocow
+	* [r2534] CCS/Nd.pm: + improved BAD handling in
+	  _ccsnd_binary_op_mia()
+	* [r2533] CCS/Nd.pm, CCS/Version.pm: + improved BAD handling in
+	  _ccsnd_binary_op_mia()
+
+v1.06 2008-06-26  moocow
+	* [r2490] CCS/Version.pm: + v1.06: added CCS::Nd::_missing()
+	* [r2489] CCS/Nd.pm: + added '_missing()' method
+
+v1.05 Fri, 02 May 2008 13:00:22 +0200
+	+ added CCS::Nd::ismissing(), CCS::Nd::ispresent() mask methods
+	+ added CCS::Nd::maximum_ind(), CCS::Nd::minimum_ind()
+
+v1.04 Mon, 28 Apr 2008 23:48:57 +0200
+	+ added PDL::CCS::Ufunc::ccs_accum_average()
+	+ added PDL::CCS::Nd wrappers: average_nz, avg_nz, average, avg
+	+ documented PDL::CCS::Nd method _nzvals(), added alias _whichVals()
+	+ added CCS::Nd::badflag()
+
+v1.03 Wed, 20 Feb 2008 10:30:39 +0100
+	+ fixed some bugs in PDL::CCS::Nd::to_physically_indexed()
+	  - bad use of vdims for pdims (output pdl should be physically ordered)
+	  - missing value wasn't getting appended to output pdl
+
+v1.02 Thu, 14 Feb 2008 12:50:11 +0100
+	+ fixed some bugs in PDL::CCS::Nd::string(), ::appendWhich() for objects with empty index pdls
+	+ fixed virtual-dimension indexing bug in PDL::CCS::Nd::indexNDi
+	  causing indexing to fail for e.g. transposed sparse matrices
+
+v1.01 Tue, 24 Apr 2007 01:24:05 +0200 (moocow)
+	+ added PDL::CCS::Nd perl class for sparse Nd piddle-like structures
+	+ separated out submodules Utils, Ufunc, Ops
+	+ added PDL::CCS::Compat for backwards-compatibility
+
+2007-03-27  moocow
+	* [r1933] Attic/CCS.pd, CCS.pd: + minor documentation fixes
+
+2007-02-27  moocow
+	* [r1847] Attic/CCS.pd, CCS.pd, t/02_encode.t, t/03_ops.t,
+	  t/Attic/02_encode.t, t/Attic/03_ops.t, t/common.plt, testme.perl:
+	  + added partial decoding, encoding from indices, ufuncs
+
+2007-02-26  moocow
+	* [r1845] Attic/CCS.pd, CCS.pd, t/03_ops.t, t/Attic/03_ops.t,
+	  testme.perl: + added whichND, which, transpose, and basic vector
+	  ops
+	* [r1842] Attic/CCS.pd, CCS.pd: + added bad-processing stuff to
+	  PDL::CCS
+
+2007-02-26  moocow
+	* [r1845] Attic/CCS.pd, CCS.pd, t/03_ops.t, t/Attic/03_ops.t,
+	  testme.perl: + added whichND, which, transpose, and basic vector
+	  ops
+	* [r1842] Attic/CCS.pd, CCS.pd: + added bad-processing stuff to
+	  PDL::CCS
+
+2005-08-02  moocow
+	* [r1215] Attic/CCS.pd, CCS.pd, ChangeLog: re-import (gaspode)
+
+v0.01 Sat, 11 Jun 2005 10:32:05 +0200 (moocow)
+	+ initial version, 2d pdls only

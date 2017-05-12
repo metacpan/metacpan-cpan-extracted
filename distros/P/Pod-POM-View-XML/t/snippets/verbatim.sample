@@ -1,0 +1,16 @@
+=pod 
+
+this is  normal text
+
+    and this  is   verbatim
+      text
+
+---
+<pod_pod
+><pod_para
+>this is  normal text</pod_para
+><pod_preformated
+>    and this  is   verbatim
+      text</pod_preformated
+></pod_pod
+>

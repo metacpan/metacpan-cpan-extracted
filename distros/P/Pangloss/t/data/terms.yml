@@ -1,0 +1,373 @@
+# Terms in YAML
+---
+  Arrears:
+    ar: 'متأخرات'
+    es: 'Atrasos'
+    fr: 'Arriérés'
+    zh: '欠租'
+
+  Assets:
+    ar: 'الممتلكات'
+    es: 'Valores o propiedades'
+    zh: '資產'
+
+  Asylum seeker:
+    es: 'Solicitante de asilo político'
+    zh: '尋求政治庇護人士'
+
+  Attendance Allowance:
+    fr: 'Allocation aux personnes handicapées'
+    zh: '護理津貼'
+
+  Auction:
+    ar: 'مزاد'
+    fr: 'Enchères'
+    zh: '拍賣'
+
+  Bailiffs:
+    ar: 'محصلو ديون'
+    es: 'Algüaciles'
+    fr: 'Huissiers'
+    zh: '執行官'
+
+  Bankruptcy Orders:
+    ar: 'إعلان الإفلاس'
+    es: 'Órdenes de bancarrota o quiebra'
+    fr: 'Ordres de faillite'
+    zh: '破產法令'
+
+  Bed and breakfast:
+    fr: 'Bed and Breakfast'
+    zh: '供應早餐的旅店'
+
+  Blacklist:
+    ar: 'القائمة السوداء'
+    es: 'Lista negra'
+    fr: 'Liste noire'
+    zh: '黑名單'
+
+  Cash Less Voucher System:
+    ar: 'نظام استمارة الشراء غير القابلة للاستبدال بالنقد'
+    es: 'Sistema de pago mediante vales o comprobantes'
+    fr: 'Système de coupons sans argent'
+    zh: '非現金發票方式'
+
+  Child Benefit:
+    es: 'Ayuda para los hijos'
+    fr: 'Allocations familiales'
+    zh: '小孩津貼'
+
+  Conditional Sale Agreement:
+    ar: 'اتفاقايت البيع المشروط'
+    fr: 'Contrat  de vente sous conditions'
+    zh: '附帶條件買賣合約'
+
+  Consumer Credit Act 1974:
+    fr: 'Loi de 1974 sur le crédit et les consommateurs'
+    zh: '消費者貸款條例1974'
+
+  Conveyancing solicitor:
+    ar: 'محامي المبايعة'
+    fr: 'Notaire rédacteur des actes de cessions'
+    zh: '辦理買賣的律師'
+
+  Cosumer Credit Act 1974:
+    es: 'Ley de crédito al consumidor de 1974'
+
+  Council:
+    ar: 'مجلس محلي'
+    es: 'Ayuntamiento'
+    fr: 'Conseil'
+    zh: '地區政府'
+
+  Council Tax Benefit:
+    es: 'Ayuda para pagar el impuesto del Ayuntamiento'
+    zh: '地區稅津貼Social Fund Payments'
+
+  Council tax:
+    es: 'Impuesto del Ayuntamietno'
+    zh: '地區稅'
+
+  County Court:
+    ar: 'محكمة المنطقة'
+    es: 'Juzgado municipal'
+    fr: 'Cour de justice régionale'
+    zh: '地方法院'
+
+  Credit Scoring:
+    ar: 'أهلية الاستقراض'
+    es: 'Puntuación para el crédito'
+    fr: 'Système à points établissant le droit au crédit'
+    zh: '信用累積分'
+
+  Creditor:
+    ar: 'المقرض'
+    es: 'Acreedor'
+    fr: 'Créancier'
+    zh: '債主'
+
+  Data Protection:
+    ar: 'Act تشريع حماية البيانات'
+
+  Data Protection Act:
+    es: 'Ley de protección de datos personales'
+    fr: 'Loi pour la protection des renseignements sur les individus'
+    zh: '資料保障條例'
+
+  Debt:
+    es: 'Deuda'
+    fr: 'Endettement Department for Work and Pensions'
+    zh: '欠債'
+
+  Default Notice:
+    ar: 'مذكرة عجز عن التسديد'
+    fr: 'Avis de défaut de paiement'
+    zh: '拖欠通知'
+
+  Department for Work and Pensions:
+    es: 'Ministerio de Trabajo y Asuntos Sociales'
+    zh: '福利署'
+
+  Direct debits:
+    ar: 'الديون التي تسدد مباشرة من الرصيد'
+    fr: 'Virements automatiques'
+    zh: '直接轉賬'
+
+  Disability Benefits:
+    es: 'Ayudas para personas discapacitadas'
+    fr: 'Allocations aux personnes handicapées'
+    zh: '傷殘福利'
+
+  Disability Living Allowance:
+    fr: 'Allocation aux personnes handicapées'
+    zh: '傷殘生活津貼'
+
+  District Judge:
+    ar: 'قاضي مقاطعة'
+    es: 'Juez del tribunal del distrito'
+    fr: 'Juge  de région'
+    zh: '地方法官'
+
+  Electoral Register:
+    ar: 'سجل الناخبين'
+    es: 'Registro Electoral'
+    fr: 'Registre électoral'
+    zh: '選民登記'
+
+  Employment:
+    es: 'Trabajo'
+    fr: 'Emploi'
+    zh: '工作'
+
+  Employment Services:
+    ar: 'خدمات التوظيف'
+    es: 'Servicios de empleo'
+    zh: '就業部門'
+
+  Endowment Policy:
+    ar: 'بوليصة وقف'
+    es: 'Plan de pensiones con seguro de vida'
+    fr: 'Assurance à capital différé'
+    zh: '人壽保險'
+
+  Enforccement Regulations:
+    zh: '執行法例規條'
+
+  Enforcement Regulations:
+    ar: 'تنظيمات التنفيذ'
+    es: 'Ejecución o aplicación del reglamento'
+
+  Exceptional Leave to remain:
+    es: 'Permiso de residencia excepcional limitado a 4 años'
+    fr: 'Droit de séjour exceptionnel'
+    zh: '特准居留'
+
+  Health:
+    es: 'Salud'
+    fr: 'Santé'
+    zh: '保健'
+
+  Hire Purchase Agreements:
+    ar: 'اتفاقيات قروض الاستملاك'
+    fr: 'Contrats de location achat'
+    zh: '分期付款合約'
+
+  Home Office:
+    ar: 'مكتب الشئون الداخلية'
+    es: 'Ministerio del Interior'
+    zh: '內政署'
+
+  Homeless:
+    zh: '無家可歸'
+
+  Hostel:
+    fr: 'Hostel'
+    zh: '青年宿舍'
+
+  Housing:
+    es: 'Vivienda'
+    fr: 'Logement'
+    zh: '居屋'
+
+  Housing Association:
+    es: 'Fundación que provee vivienda social'
+    fr: 'Association logement'
+    zh: '房屋協會'
+
+  Housing Benefit:
+    es: 'Ayuda para la vivienda'
+    fr: 'Allocations logement'
+    zh: '房屋津貼'
+
+  Housing Under Homeless Legislation:
+    es: 'Vivienda a través de las leyes de ayuda a las personas sin hogar'
+    zh: '無家可歸條例分配的房屋'
+
+  Immigration:
+    es: 'Inmigración'
+    fr: 'Immigration'
+    zh: '移民'
+
+  Income Based Job Seekers Allowance:
+    es: 'Subsidio de desempleo para personas que no han cotizado'
+    zh: '低收入尋職人士津貼'
+
+  Income Support:
+    ar: 'دعم الدخل'
+    es: 'Ayuda para personas sin ingresos'
+    fr: 'Aide au revenu'
+    zh: '入息補助'
+
+  Indefinite Leave to remain:
+    es: 'Permiso de residencia permanente o indefinido'
+    fr: 'Droit de séjour permanent'
+    zh: '無限期居留'
+
+  Intestacy Rules:
+    ar: 'قواعد عدم وجود وصية'
+    es: 'Normas en caso de falta de testamento'
+    zh: '毋遺囑規條'
+
+  Invalid Care Allowance:
+    es: 'Ayuda para gente discapacitada que necesita ser atendida'
+    fr: 'Allocation aux invalides'
+    zh: '看護病人津貼'
+
+  Job Seekers Allowance:
+    ar: 'مخصصات الباحثين عن عمل'
+
+  Joint Tenants:
+    ar: 'شركاء متحدون'
+    zh: '聯名房客'
+
+  Land Registry:
+    ar: 'سجل الأرضية'
+    es: 'Registro de la propiedad o de la tierra'
+    zh: '土地登記署'
+
+  Magistrates Court:
+    ar: 'المحكمة الابتدائية'
+
+  Mortgage:
+    es: 'Hipoteca'
+    fr: 'Emprunt hypothécaire'
+    zh: '房屋按揭'
+
+  Naturalisation:
+    es: 'Proceso por el que se consigue la nacionalidad'
+    fr: 'Naturalisation'
+    zh: '入藉'
+
+  Next of kin:
+    ar: 'الأقارب من الدرجة الأولى'
+    es: 'Pariente más cercano'
+    fr: 'Parent le plus proche'
+    zh: '近親'
+
+  Notice of Disassociation:
+    ar: 'تنبيه على فك الارتباط'
+    fr: 'Avis de non association'
+    zh: '脫離關係告示'
+
+  Ownership in Common:
+    fr: 'Propriété en commun'
+
+  Personal Representative:
+    ar: 'ممثلا شخصيا'
+    es: 'Albacea o representante testamentario'
+    fr: 'Représentant financier'
+    zh: '私人代表'
+
+  Probate:
+    ar: 'إثبات صحة الوصاية'
+    es: 'Verificación oficial de un testamento'
+    fr: 'Validation'
+    zh: '遺囑驗證'
+
+  Refuge:
+    fr: 'Refuge'
+    zh: '庇護所'
+
+  Refugee:
+    fr: 'Réfugié'
+    zh: '難民'
+
+  Return of Goods Order:
+    ar: 'أمر إرجاع سلع'
+    es: 'Orden de devolución de bienes'
+    fr: 'Ordre de retour de marchandise'
+    zh: '退回商品法令'
+
+  Severe Disablement Allowance:
+    es: 'Ayuda para personas con minusvalías graves'
+    fr: 'Allocation aux personnes sévèrement handicapées'
+    zh: '嚴重傷殘津貼'
+
+  Social Fund Payments:
+    es: 'Pagos del Fondo Social'
+    fr: 'Payements des fonds sociaux'
+
+  Squatting:
+    es: 'Ocupa'
+    fr: 'Squatter'
+    zh: '非法居住'
+
+  Standard Acknowledgement Letter:
+    ar: 'رسالة التعريف الرسمية'
+
+  Subject to Immigration Control:
+    es: 'Sujeto al control de Inmigración'
+    zh: '受移民管制'
+
+  Tenancy agreement:
+    es: 'Contrato de alquiler'
+    fr: 'Contrat de location'
+    zh: '租約'
+
+  Tenancy in Common:
+    ar: 'العين المستأجرة المشتركة'
+    zh: '共同房客'
+
+  The Inland Revenue:
+    ar: 'بهيئة تقدير وتجميع الضرائب'
+    fr: 'Le Trésor Public'
+    zh: '稅務局'
+
+  Time Order:
+    ar: 'أمر إمهال'
+    zh: '時間法令'
+
+  Waiting list:
+    es: 'Lista de espera'
+    zh: '等待列'
+
+  Walking Possession:
+    ar: 'وضع يد وانصراف'
+    fr: 'Avis de repossession'
+
+  Welfare benefits:
+    es: 'Ayudas económicas del Estado'
+    fr: 'Indemnités sociales'
+    zh: '國家福利'
+
+

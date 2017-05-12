@@ -1,0 +1,204 @@
+# PODNAME:  Plack::App::Hostname
+# ABSTRACT: Run multiple apps dispatched by the request Host header
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Plack::App::Hostname - Run multiple apps dispatched by the request Host header
+
+=head1 VERSION
+
+version 1.001
+
+=head1 SYNOPSIS
+
+ Plack::App::Hostname->new
+     ->map_hosts_to( $redirector_app => glob '{www.,}example.{com,net,org}' )
+     ->map_hosts_to( $content_app    => 'example.org' )
+     ->map_hosts_to( $admin_app      => 'edit.example.org' )
+     ->map_hosts_to( $tenant_app     => '**.example.org' )
+     ->to_app;
+
+=head1 DESCRIPTION
+
+This PSGI application dispatches requests to any number of other applications
+based on the C<Host> request header. This is sometimes referred to as virtual
+hosting. The mapping as well as the configuration is reconfigurable at runtime
+with immediate effect. It is fast in the simple case but will accept a custom
+match callback to support complex scenarios.
+
+One likely "complex" scenario is deployment on a multiprocess forking server,
+where updates to the mapping only take effect per worker process. Arranging for
+all workers to update their mappings in lockstep is fiddly but a custom matcher
+doing lookups against some type of IPC-able table is not.
+
+Instances of this application can be introspected to ask whether a particular
+hostname can be dispatched. This makes it easy to make other parts of compound
+PSGI applications adapt to changes in the dynamic mapping.
+
+=head1 CONFIGURATION
+
+These are the named arguments you can pass to C<new>. All of these are also
+accessors if you prefer to write them that way.
+
+=head2 default_app
+
+An app that will be called if nothing else matched. You might want to use this
+for some kind of default page.
+
+If you do not provide this, a 400 error page will be returned for such
+requests.
+
+=head2 missing_header_app
+
+An app that will be called in case the client did not provide a C<Host> header
+at all. This should only occur with legacy clients that do not speak HTTP/1.1.
+
+If you do not provide this, a 400 error page will be returned for such
+requests.
+
+=head2 custom_matcher
+
+A code ref that will be invoked if the hostname was not found in the internal
+mapping. You can use this to implement your own dynamic mapping.
+
+The hostname will be passed in C<$_> and will already be lowercased. The return
+value should be either a PSGI application code reference or C<undef>.
+
+E.g.
+
+ Plack::App:Hostname->new( custom_matcher => sub {
+     $dbix_simple
+        ->query( 'SELECT COUNT(*) FROM site WHERE hostname = ?', $_ )
+        ->into( my $is_known );
+     return $is_known ? $customer_site_app : undef;
+ } );
+
+Or even:
+
+ Plack::App:Hostname->new( custom_matcher => sub {
+     return unless /^(\d+)\.wat\.info$/;
+     my $n = $1;
+     sub { [ 200, ['Content-Type','text/html'], ['w'.('a' x $n).'t'] ] }
+ } );
+
+You can go hog wild here.
+
+=head1 METHODS
+
+=head2 map_hosts_to
+
+ $hostmap->map_hosts_to( $app => 'example.com', 'www.example.com' );
+
+Maps any number of hostnames to an application. Remaps any existing mapping for
+these hostnames.
+
+You can include a C<**> wildcard prefix to dispatch that entire (sub)domain to
+an app, e.g. C<**.example.org> will match C<foo.example.org> C<bar.example.org>
+C<foo.bar.example.org> C<foo.bar.baz.example.org> etc. Note that this wildcard
+will not match C<example.org> itself.
+
+The order in which hostnames are added is irrelevant: matches are always tried
+in order of decreasing specificity. So a matching non-wildcard hostname always
+takes precedence, and otherwise the longest matching pattern wins.
+
+=head2 unmap_app
+
+ $hostmap->unmap_app( $admin_app );
+
+Unmaps the given application from all hostnames it is mapped to.
+
+You can pass several applications to unmap at once.
+
+=head2 unmap_host
+
+ $hostmap->unmap_host( 'www.example.net' );
+
+Unmaps the given hostname.
+
+Wildcards have no special meaning. If you request unmapping C<**.example.org>,
+only the single entry for C<**.example.org> will be unmapped (if any).
+
+You can pass several hostnames to unmap at once.
+
+=head2 to_app
+
+ my $app = $hostmap->to_app;
+
+Returns the application code reference for the Plack::App::Hostname instance.
+
+=head2 matching
+
+ $hostmap->matching( 'www.example.com' );
+
+Returns the application mapped to a known hostname.
+
+It first tries to find an application in its internal mapping, then calls
+your L<C<custom_matcher>|/custom_matcher> if one is configured. If both
+attempts fail, it returns C<undef>.
+
+Note that this will I<not> fall back to your L<C<default_app>|/default_app>.
+This makes it usable as a predicate to test whether the Plack::App::Hostname
+instance in question will serve a given hostname. (It's easy enough to do the
+fallback explicitly if needed.)
+
+=head1 TODO
+
+=over 4
+
+=item *
+
+Wildcard matching for a specific number of levels, i.e. C<*.*.example.com>
+would match C<foo.bar.example.com> but neither C<www.example.com> nor
+C<foo.bar.baz.example.com>. But an implementation of this must not have undue
+runtime cost.
+
+=back
+
+Patches welcome.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Plack::App::URLMap>
+
+Performs a much more complex job: it dispatches not only based on hostname, but
+also based on the path, modifying the C<PATH_INFO> accordingly. It is much more
+convenient if you need that, but also much slower to dispatch, and only provides
+a static mapping that cannot be modified after initialisation.
+
+=item L<Plack::App::HostMap>
+
+This supports a C<*.> prefix to match all subdomains of a domain, but requires
+L<Domain::PublicSuffix> for this feature, and includes caching to reduce the
+overhead incurred by that. The mapping is theoretically modifiable at runtime,
+but the caching complicates matters: there is no interface to clear it, so you
+either have to turn it off or monkey with internals.
+
+=item L<Plack::App::Vhost>
+
+Mappings are specified as a series of patterns to try in order. This is slower
+than a hash lookup in the simple case, but due to lack of dynamic matching, not
+flexible enough for complex cases either. I consider this a bad trade-off: you
+pay extra and gain little; mostly, you just pay extra.
+
+=back
+
+=head1 AUTHOR
+
+Aristotle Pagaltzis <pagaltzis@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

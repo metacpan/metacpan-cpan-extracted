@@ -1,0 +1,19 @@
+#!/usr/local/bin/perl
+
+use 5.008;
+use strict;
+use PPI::App::ppi_version::BDFOY;
+
+
+use vars qw{$VERSION};
+BEGIN {
+	$|       = 1;
+	$^W      = 1;
+	$VERSION = '0.13';
+}
+
+print "brian d foy's ppi_version $VERSION\n";
+
+exit(
+        PPI::App::ppi_version::BDFOY->main(@ARGV)
+);

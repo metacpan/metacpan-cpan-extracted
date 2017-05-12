@@ -1,0 +1,8 @@
+Revision history for Package-Butcher
+
+0.02    Feb 16, 2011
+        No functional changes. Just moved some author tests to xt/
+
+0.01    Feb 12, 2011
+        Slice and dice classes to force them to load.
+

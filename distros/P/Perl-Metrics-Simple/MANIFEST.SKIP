@@ -1,0 +1,16 @@
+blib
+.git
+.cvsignore
+.project
+.settings
+.includepath
+.bak
+.svn
+_build
+^Build$
+CVS
+\.tar\.gz$
+^Perl-Metrics-Simple
+.DS_Store
+^MYMETA.yml$
+^MYMETA\.json$

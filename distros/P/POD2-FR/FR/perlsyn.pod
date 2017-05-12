@@ -1,0 +1,813 @@
+=encoding iso-8859-1
+
+=head1 NAME/NOM X<syntaxe>
+
+perlsyn - Syntaxe de Perl
+
+=head1 DESCRIPTION
+
+Un script Perl est constitué d'une suite de déclarations et
+d'instructions qui sont exécutées de haut en bas. Les boucles, les
+sous-programmes et d'autres structures de contrôles vous permettent de
+vous déplacer dans le code.
+
+Perl est un langage à syntaxe libre. Vous pouvez donc le présenter et
+l'indenter comme bon vous semble. Les espaces ne servent qu'à séparer
+les éléments syntaxiques contrairement à des langages comme Python où
+ils font partie intégrante de la syntaxe.
+
+La plupart des éléments syntaxiques de Perl sont B<optionnels>. Au
+lieu de vous obliger à mettre des parenthèses pour chaque appel de
+fonction ou à déclarer toutes les variables, Perl vous laisse libre de
+le faire ou non et se débrouille pour comprendre ce que vous
+voulez. Ceci s'appelle B<Fait Ce Que Je Pense> ou B<FCQJP> (NdT: en
+anglais B<Do What I Mean> ou B<DWIM>). Le programmeur peut donc être
+B<paresseux> et peut coder dans le style qui lui plait.
+
+Perl B<emprunte sa syntaxe> et ses concepts à de nombreux
+langagesE<nbsp>: awk, sed, C, Bourne Shell, Smalltalk, Lisp et même
+l'Anglais. D'autres langages ont emprunté à la syntaxe de Perl, en
+particulier ses extensions aux expressions rationnelles. Donc, si vous
+avez programmé avec d'autres langages, vous rencontrerez des
+constructions familières en Perl. Souvent elles fonctionnent de la
+même manière mais lisez tout de même L<perltrap> pour savoir quand
+elles diffèrent.
+
+=head2 Declarations X<déclarations> X<undef> X<indéfinie> X<non initialisé>
+
+Les seules choses que vous devez absolument déclarer en Perl sont les
+formats de rapport et les sous-programmes (parfois ce n'est même pas
+nécessaire pour les sous-programmes). Une variable contient la valeur
+indéfinie (C<undef>) jusqu'à ce qu'on lui affecte une valeur, qui est
+n'importe quoi autre que C<undef>. Lorsqu'il est utilisé comme un
+nombre, C<undef> est traité comme C<0> ; lorsqu'il est utilisé comme
+une chaîne, il est traité comme la chaîne vide, C<""> ; et lorsqu'il
+est utilisé comme une référence qui n'a pas été affectée, il est
+traité comme une erreur. Si vous activez les avertissements, vous
+serez notifié de l'utilisation d'une valeur non initialisée chaque
+fois que vous traiterez C<undef> comme une chaîne ou un nombre. En
+tout cas, habituellement. Son utilisation dans un contexte booléen,
+tel queE<nbsp>:
+
+  my $a;
+  if ($a) {}
+
+ne déclenche pas d'avertissement (parce qu'on teste la véracité et non
+la présence d'une valeur définie).  Les opérateurs tels que C<++>,
+C<-->, C<+=>, C<-=> et C<.=> lorsqu'ils agissent sur une valeur
+indéfinies comme dansE<nbsp>:
+
+  my $a;
+  $a++;
+
+ne déclenchent pas non plus de tels avertissements.
+
+Une déclaration peut être mise partout où une instruction peut trouver
+place, mais n'a pas d'effet sur l'exécution de la séquence
+d'instructions principale - les déclarations prennent toutes effet au
+moment de la compilation. Typiquement, toutes les déclarations sont
+placées au début ou à la fin du script. Toutefois, si vous utilisez
+des variables privées de portée lexicales créées avec C<my()>, vous
+devrez vous assurez que la définition de votre format ou de votre
+sous-programme est à l'intérieur du même bloc que le my si vous voulez
+pouvoir accéder à ces variables privées.
+
+La déclaration d'un sous-programme permet à un nom de sous-programme
+d'être utilisé comme s'il était un opérateur de liste à partir de ce
+point dans le programme.  Vous pouvez déclarer un sous-programme sans
+le définir en disant C<sub name>, ainsiE<nbsp>:
+X<sous-programme, déclaration>
+
+    sub myname;
+    $me = myname $0             or die "can't get myname";
+
+Notez que myname() fonctionne comme un opérateur de liste, et non
+comme un opérateur unaire ; faites donc attention à utiliser C<or> au
+lieu de C<||> dans ce cas. Toutefois, si vous déclariez le
+sous-programme avec C<sub myname ($)>, alors C<myname> fonctionnerait
+comme un opérateur unaire, donc C<or> aussi bien que C<||> feraient
+l'affaire.
+
+Les déclarations de sous-programmes peuvent aussi être chargées à
+l'aide de l'instruction C<require> ou bien à la fois chargées et
+importées dans votre espace de noms via l'instruction C<use>. Voir
+L<perlmod> pour plus de détails.
+
+Une séquence d'instructions peut contenir des déclarations de
+variables de portée lexicale, mais à part pour déclarer un nom de
+variable, la déclaration fonctionne comme une instruction ordinaire,
+et est élaborée à l'intérieur de la séquence d'instructions en tant
+que telle. Cela signifie qu'elle a à la fois un effet à la compilation
+et lors de l'exécution.
+
+=head2 Commentaires X<commentaire> X<#>
+
+Dans une ligne, tout texte commençant par le caractère C<"#"> et
+jusqu'à la fin de la ligne est considéré commme un commentaire et est
+donc ignoré. L'exception à cette règle concerne les C<"#"> présents
+dans les chaînes de caractères ou dans les expressions rationnelles.
+
+=head2 Instructions simples X<instructions> X<point-virgule> X<expression> X<;>
+
+Le seul type d'instruction simple est une expression évaluée pour ses
+effets de bord. Chaque instruction simple doit être terminée par un
+point-virgule, sauf si c'est la dernière instruction d'un bloc, auquel
+cas le point-virgule est optionnel. (Nous vous encourageons tout de
+même à placer ce point-virgule si le bloc prend plus d'une ligne, car
+vous pourriez éventuellement ajouter une autre ligne).  Notez qu'il
+existe des opérateurs comme C<eval {}> et C<do {}> qui ont l'air
+d'instructions composées, mais qui ne le sont pas (ce sont juste des
+TERMES dans une expression), et qui ont donc besoin d'une terminaison
+explicite s'ils sont utilisés comme dernier élément d'une instruction.
+
+=head2 Le vrai et le faux X<vrai> X<faux> X<!> X<not> X<négation> X<0>
+
+Le nombre 0, les chaînes C<'0'> et C<''>, la liste vide C<()> et
+C<undef> sont considérés comme faux dans un contexte booléen. Tout
+autre valeur est considérée comme vraie. La négation d'une valeur
+vraie par les opérateurs C<!> ou C<not> retourne une valeur fausse
+spéciale. Lorsqu'elle est évaluée en tant que chaîne, elle vaut C<''>
+mais évaluée en tant que nombre, elle vaut 0.
+
+=head2 Modificateurs d'instruction X<modificateur d'instruction> X<modificateur> X<if> X<unless> X<while> X<until> X<foreach> X<for>
+
+Toute instruction simple peut être suivie de façon optionelle par un
+I<UNIQUE> modificateur, juste avant le point-virgule de terminaison
+(ou la fin du bloc).  Les modificateurs possibles sontE<nbsp>:
+
+    if EXPR
+    unless EXPR
+    while EXPR
+    until EXPR
+    foreach LISTE
+
+L'expression C<EXPR> qui suit le modificateur s'appelle la
+"condition". Sa véracité ou sa fausseté détermine le comportement du
+modificateur.
+
+C<if> exécute l'instruction une fois I<si et seulement si> la
+condition est vraie. C<unless> fait le contraireE<nbsp>: il exécute
+l'instruction I<sauf> si la condition est vraie (autrement dit, si la
+condition est fausse).
+
+  print "Les bassets ont de longues oreilles" if length $oreilles >= 10;
+  aller_dehors() and jouer() unless $il_pleut;
+
+Le modificateur C<foreach> est un itérateurE<nbsp>: il exécute
+l'instruction une fois pour chacun des items de LISTE (avec C<$_> qui
+est un alias de l'item courant).
+
+  print "Bonjour $_ !\n" foreach ("tout le monde", "Anne", "Maitresse");
+
+C<while> répète l'instruction I<tant que> la condition est
+vraie. C<until> fait le contraireE<nbsp>: il répète l'instruction I<jusqu'à>
+ce que la condition soit vraie (ou, autrement dit, tant que la
+condition est fausse).
+
+  # Dans les deux cas on compte de 0 à 10
+  print $i++ while $i <= 10;
+  print $j++ until $j >  10;
+
+Les modificateurs C<while> et C<until> ont la sémantique habituelle
+des "boucles C<while>" (la condition est évaluée en premier), sauf
+lorsqu'ils sont appliqués à un C<do>-BLOC (ou à la construction
+désapprouvée C<do>-SOUS_PROGRAMME), auquel cas le bloc s'exécute une
+fois avant que la condition ne soit évaluée.  Ceci afin que vous
+puissiez écrire des boucles telles queE<nbsp>:
+
+    do {
+        $line = <STDIN>;
+        ...
+    } until $line  eq ".\n";
+
+Voir L<perlfunc/do>. Notez aussi que l'instruction de contrôle de
+boucle décrite plus tard I<ne> fonctionnera I<pas> dans cette
+construction, car les modificateurs n'utilisent pas de labels de
+boucle. Désolé. Vous pouvez toujours mettre un autre bloc à
+l'intérieur (for C<next>) ou autour (for C<last>) pour réaliser ce
+genre de choses. Pour C<next>, il suffit de doubler les accoladesE<nbsp>:
+X<next> X<last> X<redo>
+
+    do {{
+        next if $x == $y;
+        # faire quelque chose ici
+    }} until $x++ > $z;
+
+Pour C<last>, vous devez faire quelque chose de plus élaboréE<nbsp>:
+X<last>
+
+    LOOP: { 
+            do {
+                last if $x = $y**2;
+                # faire quelque chose ici
+            } while $x++ <= $z;
+    }
+
+B<NOTEE<nbsp>:> le comportement d'une instruction C<my> modifié par un
+modificateur conditionnel ou une construction de boucle (par exemple
+C<my $x if ...>) est B<indéfini>. La valeur de la variable peut être
+C<undef>, la valeur précédement affectée ou n'importe quoi d'autre. Ne
+dépendez pas d'un comportement particulier. Les prochaines versions de
+perl feront peut-être quelque chose de différents que celle que vous
+utilisez actuellement.
+X<my>
+
+=head2 Instructions composées X<composée, instruction> X<bloc> X<accolade> X<{> X<}> X<if> X<unless> X<while> X<until> X<foreach> X<for> X<continue>
+
+En Perl, une séquence d'instructions qui définit une portée est
+appelée un bloc.  Un bloc est parfois délimité par le fichier qui le
+contient (dans le cas d'un fichier requis, ou dans celui du programme
+en entier), et parfois un bloc est délimité par la longueur d'une
+chaîne (dans le cas d'un eval).
+
+Mais généralement, un bloc est délimité par des accolades. Nous
+appellerons cette construction syntaxique un BLOC.
+
+Les instructions composées suivantes peuvent être utilisées pour
+contrôler un fluxE<nbsp>:
+
+    if (EXPR) BLOC
+    if (EXPR) BLOC else BLOC
+    if (EXPR) BLOC elsif (EXPR) BLOC ... else BLOC
+    LABEL while (EXPR) BLOC
+    LABEL while (EXPR) BLOC continue BLOC
+    LABEL until (EXPR) BLOC
+    LABEL until (EXPR) BLOC continue BLOC
+    LABEL for (EXPR; EXPR; EXPR) BLOC
+    LABEL foreach VAR (LIST) BLOC
+    LABEL foreach VAR (LIST) BLOCK continue BLOCK
+    LABEL BLOC continue BLOC
+
+Notez que, contrairement au C et au Pascal, tout ceci est défini en
+termes de BLOCs, et non d'instructions. Ceci veut dire que les
+accolades sont I<requises> - aucune instruction ne doit traîner. Si
+vous désirez écrire des conditionnelles sans accolades, il existe
+plusieurs autres façons de le faire. Les exemples suivants font tous
+la même choseE<nbsp>:
+
+    if (!open(FOO)) { die "Can't open $FOO: $!"; }
+    die "Can't open $FOO: $!" unless open(FOO);
+    open(FOO) or die "Can't open $FOO: $!";     # FOO or bust!
+    open(FOO) ? 'hi mom' : die "Can't open $FOO: $!";
+                        # ce dernier est un peu exotique
+
+L'instruction C<if> est directe. Puisque les BLOCs sont toujours
+entourés d'accolades, il n'y a jamais d'ambiguïté pour savoir à quel
+C<if> correspond un C<else>. Si vous utilisez C<unless> à la place de
+C<if>, le sens du test est inversé.
+
+L'instruction C<while> exécute le bloc tant que l'expression est vraie
+(son évaluation ne renvoie pas une chaîne nulle (C<"">) ou C<0> ou
+C<"0")>. L'instruction C<until> exécute le bloc tant que l'expression
+est fausse.  Le LABEL est optionnel, et s'il est présent, il est
+constitué d'un identifiant suivi de deux points.  Le LABEL identifie
+la boucle pour les instructions de contrôle de boucle C<next>,
+C<last>, et C<redo>. Si le LABEL est omis, l'instruction de contrôle
+de boucle se réfère à la boucle incluse dans toutes les autres. Ceci
+peut amener une recherche dynamique dans votre pile au moment de
+l'exécution pour trouver le LABEL. Un comportement aussi désespérant
+provoquera un avertissement si vous utilisez le pragma C<use warnings>
+ou l'option B<-w>.
+
+S'il existe un BLOC C<continue>, il est toujours exécuté juste avant
+que la condition ne soit à nouveau évaluée. Ce bloc peut donc être
+utilisé pour incrémenter une variable de boucle, même lorsque la
+boucle a été continuée via l'instruction C<next>.
+
+=head2 Contrôle de boucle X<contrôle de boucle> X<boucle, contrôle> X<next> X<last> X<redo> X<continue>
+
+La commande C<next> démarre la prochaine itération de la boucleE<nbsp>:
+
+    LINE: while (<STDIN>) {
+        next LINE if /^#/;      # elimine les commentaires
+        ...
+    }
+
+La commande C<last> sort immédiatement de la boucle en question. Le
+bloc C<continue>, s'il existe, n'est pas exécutéE<nbsp>:
+
+    LINE: while (<STDIN>) {
+        last LINE if /^$/;      # sort quand on en a fini avec l'en-tete
+        ...
+    }
+
+La commande C<redo> redémarre le bloc de la boucle sans réévaluer la
+condition.  Le bloc C<continue>, s'il existe, n'est I<pas>
+exécuté. Cette commande est normalement utilisée par les programmes
+qui veulent se mentir à eux-mêmes au sujet de ce qui vient de leur
+être fourni en entrée.
+
+Par exemple, lors du traitement d'un fichier comme F</etc/termcap>. Si
+vos lignes en entrée sont susceptibles de se terminer par un antislash
+pour indiquer leur continuation, vous pouvez vouloir poursuivre et
+récupérer l'enregistrement suivant.
+
+  while (<>) {
+    chomp;
+    if (s/\\$//) {
+      $_ .= <>;
+      redo unless eof();
+    }
+    # on traite $_
+  }
+
+qui est le raccourci Perl pour la version plus expliciteE<nbsp>:
+
+  LINE: while (defined($line = <ARGV>)) {
+    chomp($line);
+    if ($line =~ s/\\$//) {
+      $line .= <ARGV>;
+      redo LINE unless eof(); # pas eof(ARGV)!
+    }
+    # on traite $line
+  }
+
+Notez que s'il y avait un bloc C<continue> dans le code ci-dessus, il
+ne serait exécuté que pour les lignes rejetées par l'expression
+rationnelle (puisque redo saut le bloc continue). Un bloc C<continue>
+est souvent utilisé pour réinitialiser les compteurs de lignes ou les
+recherches de motifs C<?pat?> qui ne correspondent qu'une foisE<nbsp>:
+
+  # inspire par :1,$g/fred/s//WILMA/
+  while (<>) {
+    ?(fred)?    && s//WILMA $1 WILMA/;
+    ?(barney)?  && s//BETTY $1 BETTY/;
+    ?(homer)?   && s//MARGE $1 MARGE/;
+  } continue {
+    print "$ARGV $.: $_";
+    close ARGV  if eof();           # reinitialise $.
+    reset       if eof();           # reinitialise ?pat?
+  }
+
+Si le mot C<while> est remplacé par le mot C<until>, le sens du test
+est inversé, mais la condition est toujours testée avant la première
+itération.
+
+Les instructions de contrôle de boucle ne fonctionnent pas dans un
+C<if> ou dans un C<unless>, puisque ce ne sont pas des boucles. Vous
+pouvez toutefois doubler les accolades pour qu'elles le deviennent.
+
+  if (/pattern/) {{
+    last if /fred/;
+    next if /barney/; # même effet que "last", mais en moins compréhensible
+    # mettre quelque chose ici
+  }}
+
+Ceci est du au fait qu'un bloc est considéré comme une boucle qui ne
+s'exécute qu'une fois. Voir L<"BLOCs de base et instruction switch">.
+
+La forme C<while/if BLOC BLOC>, disponible en Perl 4, ne l'est
+plus. Remplacez toutes les occurrences de C<if BLOC> par C<if (do
+BLOC)>.
+
+=head2 Boucles for X<for> X<foreach>
+
+Les boucles C<for> de Perl dans le style de C fonctionnent de la même
+façon que les boucles C<while> correspondantes ; cela signifie que
+ceciE<nbsp>:
+
+  for ($i = 1; $i < 10; $i++) {
+    ...
+  }
+
+est la même chose que çaE<nbsp>:
+
+  $i = 1;
+  while ($i < 10) {
+    ...
+  } continue {
+    $i++;
+  }
+
+Il existe une différence mineureE<nbsp>: si des variables sont déclarées par
+C<my> dans la section d'initialisation d'un C<for>, la portée lexicale
+de ces variables est limitée à la boucle C<for> (le corps de la boucle
+et sa section de contrôle).
+X<my>
+
+En plus du bouclage classique dans les indices d'un tableau, C<for>
+peut se prêter à de nombreuses autres applications intéressantes. En
+voici une qui évite le problème que vous rencontrez si vous testez
+explicitement la fin d'un fichier sur un descripteur de fichier
+interactif, ce qui donne l'impression que votre programme se gèle.
+X<eof> X<end-of-file> X<fin de fichier>
+
+    $on_a_tty = -t STDIN && -t STDOUT;
+    sub prompt { print "yes? " if $on_a_tty }
+    for ( prompt(); <STDIN>; prompt() ) {
+        # faire quelque chose ici
+    }
+
+Utiliser C<readline> (ou sous sa forme d'opérateur, C<< <EXPR> >>)
+comme condition d'un C<for> est un raccourci d'écriture pour ce qui
+suit. Ce comportement est le même pour la condition d'une boucle
+C<while>.
+X<readline> X<< <> >>
+
+  for ( prompt(); defined( $_ = <STDIN> ); prompt() ) {
+    # faire quelque chose
+  }
+
+=head2 Boucles foreach X<for> X<foreach>
+
+La boucle C<foreach> itère sur une liste de valeurs normale et fixe la
+variable VAR à chacune de ces valeurs successivement. Si la variable
+est précédée du mot-clé C<my>, alors elle a une portée limitée du
+point de vue lexical, et n'est par conséquent visible qu'à l'intérieur
+de la boucle. Autrement, la variable est implicitement locale à la
+boucle et reprend sa valeur précédente à la sortie de la boucle. Si la
+variable était précédemment déclaré par C<my>, elle utilise cette
+variable au lieu de celle qui est globale, mais elle est toujours
+locale à la boucle.
+X<my> X<local>
+
+Le mot-clé C<foreach> est en fait un synonyme du mot-clé C<for>, vous
+pouvez donc utiliser C<foreach> pour sa lisibilité ou C<for> pour sa
+concision (Ou parce que le Bourne shell vous est plus familier que
+I<csh>, vous rendant l'utilisation de C<for> plus naturelle). Si VAR
+est omis, C<$_> est fixée à chaque valeur.
+X<$_>
+
+Si un élément de LIST est une lvalue (une valeur modifiable), vous
+pouvez la modifier en modifiant VAR à l'intérieur de la boucle. À
+l'inverse, si un élément de LIST n'est pas une lvalue (c'est une
+constante), toute tentative de modification de cet élément
+échouera. En d'autres termes, la variable d'index de la boucle
+C<foreach> est un alias implicite de chaque élément de la liste sur
+laquelle vous bouclez.
+X<alias>
+
+Si une partie de LIST est un tableau, C<foreach> sera très troublé
+dans le cas où vous lui ajouteriez ou retireriez des éléments à
+l'intérieur de la boucle, par exemple à l'aide de C<splice>. Ne faites
+donc pas cela.
+X<splice>
+
+C<foreach> ne fera probablement pas ce que vous désirez si VAR est une
+variable liée ou une autre variable spéciale. Ne faites pas cela non
+plus.
+
+ExemplesE<nbsp>:
+
+    for (@ary) { s/foo/bar/ }
+
+    for my $elem (@elements) {
+        $elem *= 2;
+    }
+
+    for $count (10,9,8,7,6,5,4,3,2,1,'BOOM') {
+        print $count, "\n"; sleep(1);
+    }
+
+    for (1..15) { print "Merry Christmas\n"; }
+
+    foreach $item (split(/:[\\\n:]*/, $ENV{TERMCAP})) {
+        print "Item: $item\n";
+    }
+
+Voici comment un programmeur C pourrait coder un algorithme en PerlE<nbsp>:
+
+    for (my $i = 0; $i < @ary1; $i++) {
+        for (my $j = 0; $j < @ary2; $j++) {
+            if ($ary1[$i] > $ary2[$j]) {
+                last; # ne peut pas sortir totalement :-(
+            }
+            $ary1[$i] += $ary2[$j];
+        }
+        # voici l'endroit ou ce last m'emmene
+    }
+
+Tandis que voici comment un programmeur Perl plus à l'aise avec
+l'idiome pourrait le faireE<nbsp>:
+
+    OUTER: for my $wid (@ary1) {
+    INNER:   for my $jet (@ary2) {
+                next OUTER if $wid > $jet;
+                $wid += $jet;
+             }
+          }
+
+Vous voyez à quel point c'est plus facile ? C'est plus propre, plus
+sûr, et plus rapide. C'est plus propre parce qu'il y a moins de
+bruit. C'est plus sûr car si du code est ajouté entre les deux boucles
+par la suite, le nouveau code ne sera pas exécuté accidentellement. Le
+C<next> itère de façon explicite sur l'autre boucle plutôt que de
+simplement terminer celle qui est à l'intérieur. Et c'est plus rapide
+parce que Perl exécute une instruction C<foreach> plus rapidement
+qu'une boucle C<for> équivalente.
+
+=head2 BLOCs de base et instruction switch
+
+X<switch> X<bloc> X<choix>
+
+Un BLOC en lui-même (avec ou sans label) est d'un point de vue
+sémantique, équivalent à une boucle qui s'exécute une fois. Vous
+pouvez donc y utilisez n'importe quelle instruction de contrôle de
+boucle pour en sortir ou le recommencer (Notez que ce n'est I<PAS>
+vrai pour les blocs C<eval{}>, C<sub{}>, ou C<do{}> contrairement à la
+croyance populaire, qui I<NE> comptent I<PAS> pour des boucles). Le
+bloc C<continue> est optionnel.
+
+La construction de BLOC est particulièrement élégante pour créer des
+structures de choix.
+
+    SWITCH: {
+        if (/^abc/) { $abc = 1; last SWITCH; }
+        if (/^def/) { $def = 1; last SWITCH; }
+        if (/^xyz/) { $xyz = 1; last SWITCH; }
+        $nothing = 1;
+    }
+
+Il n'y a pas d'instruction C<switch> officielle en Perl, car il existe
+déjà plusieurs façons d'écrire quelque chose d'équivalent.
+
+En revanche, depuis Perl 5.8 pour obtenir les instructions switch et
+case, ceux qui le souhaitent peuvent faire appel à l'extension Switch
+en écrivantE<nbsp>:
+
+  use Switch;
+
+À partir de là, les nouvelles instructions seront disponibles. Ce
+n'est pas aussi rapide que cela pourrait l'être puisque elles ne font
+pas réellement partie du langage (elles sont réalisées via un filtrage
+des sources) mais elles sont disponibles et utilisables.
+
+Vous pourriez écrire à la place du bloc précédentE<nbsp>:
+
+    SWITCH: {
+        $abc = 1, last SWITCH  if /^abc/;
+        $def = 1, last SWITCH  if /^def/;
+        $xyz = 1, last SWITCH  if /^xyz/;
+        $nothing = 1;
+    }
+
+(Ce n'est pas aussi étrange que cela en a l'air une fois que vous avez
+réalisé que vous pouvez utiliser des "opérateurs" de contrôle de
+boucle à l'intérieur d'une expression, c'est juste l'opérateur binaire
+virgule normal utilisé dans un contexte scalaire. Voir
+L<perlop/"Opérateur virgule">.)
+
+ou
+
+    SWITCH: {
+        /^abc/ && do { $abc = 1; last SWITCH; };
+        /^def/ && do { $def = 1; last SWITCH; };
+        /^xyz/ && do { $xyz = 1; last SWITCH; };
+        $nothing = 1;
+    }
+
+ou formaté de façon à avoir un peu plus l'air d'une instruction
+C<switch> "convenable"E<nbsp>:
+
+    SWITCH: {
+        /^abc/      && do {
+                            $abc = 1;
+                            last SWITCH;
+                       };
+
+        /^def/      && do {
+                            $def = 1;
+                            last SWITCH;
+                       };
+
+        /^xyz/      && do {
+                            $xyz = 1;
+                            last SWITCH;
+                        };
+        $nothing = 1;
+    }
+
+ou
+
+    SWITCH: {
+        /^abc/ and $abc = 1, last SWITCH;
+        /^def/ and $def = 1, last SWITCH;
+        /^xyz/ and $xyz = 1, last SWITCH;
+        $nothing = 1;
+    }
+
+or même, horreur,
+
+    if (/^abc/)
+        { $abc = 1 }
+    elsif (/^def/)
+        { $def = 1 }
+    elsif (/^xyz/)
+        { $xyz = 1 }
+    else
+        { $nothing = 1 }
+
+Un idiome courant pour une instruction C<switch> est d'utiliser
+l'aliasing de C<foreach> pour effectuer une affectation temporaire de
+C<$_> pour une reconnaissance pratique des casE<nbsp>:
+
+    SWITCH: for ($where) {
+                /In Card Names/     && do { push @flags, '-e'; last; };
+                /Anywhere/          && do { push @flags, '-h'; last; };
+                /In Rulings/        && do {                    last; };
+                die "unknown value for form variable where: `$where'";
+            }
+
+Une autre approche intéressante de l'instruction switch est de
+s'arranger pour qu'un bloc C<do> renvoie la valeur correcteE<nbsp>:
+
+    $amode = do {
+        if     ($flag & O_RDONLY) { "r" }       # XXX : n'est-ce pas 0?
+        elsif  ($flag & O_WRONLY) { ($flag & O_APPEND) ? "a" : "w" }
+        elsif  ($flag & O_RDWR)   {
+            if ($flag & O_CREAT)  { "w+" }
+            else                  { ($flag & O_APPEND) ? "a+" : "r+" }
+        }
+    };
+
+ou 
+
+        print do {
+            ($flags & O_WRONLY) ? "write-only"          :
+            ($flags & O_RDWR)   ? "read-write"          :
+                                  "read-only";
+        };
+
+Ou si vous êtes certain que toutes les clauses C<&&> sont vraies, vous
+pouvez utiliser quelque chose comme ceci, qui "switche" sur la valeur
+de la variable d'environnement C<HTTP_USER_AGENT>.
+
+    #!/usr/bin/perl 
+    # choisir une page du jargon file selon le browser
+    $dir = 'http://www.wins.uva.nl/~mes/jargon';
+    for ($ENV{HTTP_USER_AGENT}) { 
+        $page  =    /Mac/            && 'm/Macintrash.html'
+                 || /Win(dows )?NT/  && 'e/evilandrude.html'
+                 || /Win|MSIE|WebTV/ && 'm/MicroslothWindows.html'
+                 || /Linux/          && 'l/Linux.html'
+                 || /HP-UX/          && 'h/HP-SUX.html'
+                 || /SunOS/          && 's/ScumOS.html'
+                 ||                     'a/AppendixB.html';
+    }
+    print "Location: $dir/$page\015\012\015\012";
+
+Ce type d'instruction switch ne fonctionne que lorsque vous savez que
+les clauses C<&&> seront vraies. Si vous ne le savez pas, l'exemple
+précédent utilisant C<?:> devrait être utilisé.
+
+Vous pourriez aussi envisager d'écrire un hachage de références de
+sous-programmes au lieu de synthétiser une instruction C<switch>.
+
+=head2 Goto X<goto>
+
+Bien que cela ne soit pas destiné aux âmes sensibles, Perl supporte
+une instruction C<goto>. Il en existe trois formesE<nbsp>: C<goto>-LABEL,
+C<goto>-EXPR, et C<goto>-&NAME. Un LABEL de boucle n'est pas en vérité
+une cible valide pour un C<goto> ; c'est juste le nom de la boucle.
+
+La forme C<goto>-LABEL trouve l'instruction marquée par LABEL et
+reprend l'exécution à cet endroit. Elle ne peut pas être utilisée pour
+aller dans une structure qui nécessite une initialisation, comme un
+sous-programme ou une boucle C<foreach>. Elle ne peut pas non plus
+être utilisée pour aller dans une structure très optimisée. Elle peut
+être employée pour aller presque n'importe où ailleurs à l'intérieur
+de la portée dynamique, y compris hors des sous-programmes, mais il
+est habituellement préférable d'utiliser une autre construction comme
+C<last> ou C<die>. L'auteur de Perl n'a jamais ressenti le besoin
+d'utiliser cette forme de C<goto> (en Perl, à vrai dire - C est une
+toute autre question).
+
+La forme C<goto>-EXPR attend un nom de label, dont la portée sera
+résolue dynamiquement. Ceci permet des C<goto>s calculés à la mode de
+FORTRAN, mais ce n'est pas nécessairement recommandé si vous optimisez
+la maintenance du codeE<nbsp>:
+
+    goto(("FOO", "BAR", "GLARCH")[$i]);
+
+La forme C<goto>-&NAME est hautement magique, et substitue au
+sous-programme en cours d'exécution un appel au sous-programme
+nommé. C'est utilisé par les sous-programmes C<AUTOLOAD()> qui veulent
+charger une autre routine et prétendre que cette autre routine a été
+appelée à leur place (sauf que toute modification de C<@_> dans le
+sous-programme en cours est propagée à l'autre routine). Après le
+C<goto>, même C<caller()> ne pourra pas dire que cette routine n'a pas
+été appelée en premier.
+
+Dans presque tous les cas similaires, une bien, bien meilleure idée est
+d'utiliser les mécanismes de contrôle de flux structurés comme
+C<next>, C<last>, ou C<redo> au lieu de s'en remettre à un
+C<goto>. Pour certaines applications, la paire C<eval{}> - die() pour
+le traitement des exceptions peut aussi être une approche prudente.
+
+=head2 PODE<nbsp>: documentation intégrée X<POD> X<documentation>
+
+Perl dispose d'un mécanisme pour mélanger de la documentation avec le
+code source. Lorsqu'il attend le début d'une nouvelle instruction, si
+le compilateur rencontre une ligne commençant par un signe égal et un
+mot, comme ceci
+
+    =head1 Here There Be Pods!
+
+Alors ce texte et tout ce qui suit jusqu'à et y compris une ligne
+commençant par C<=cut> sera ignoré. Le format du texte en faisant
+partie est décrit dans L<perlpod>.
+
+Ceci vous permet de mélanger librement votre code source et votre
+documentation, comme dans
+
+    =item snazzle($)
+
+    La fonction snazzle() se comportera de la facon la plus
+    spectaculaire que vous pouvez imaginer, y compris la pyrotechnie
+    cybernetique.
+
+    =cut retour au compilateur, nuff of this pod stuff!
+
+    sub snazzle($) {
+        my $thingie = shift;
+        .........
+    }
+
+Notez que les traducteurs pod ne devraient traiter que les paragraphes
+débutant par une directive pod (cela rend leur analyse plus simple),
+tandis que le compilateur sait en réalité chercher des séquences pod
+même au milieu d'un paragraphe. Cela signifie que le bout de code
+secret qui suit sera ignoré à la fois par le compilateur et les
+traducteurs.
+
+    $a=3;
+    =truc secret
+     warn "Neither POD nor CODE!?"
+    =cut back
+    print "got $a\n";
+
+Vous ne devriez probablement pas vous reposer sur le fait que le
+C<warn()> sera ignoré pour toujours. Les traducteurs pod ne sont pas
+tous bien élevés de ce point de vue, et le compilateur deviendra
+peut-être plus regardant.
+
+On peut aussi utiliser des directives pod pour mettre rapidement une
+partie de code en commentaire.
+
+=head2 Bons Vieux Commentaires (Non !) X<commentaire> X<ligne> X<#> X<préprocesseur> X<eval>
+
+Perl peut traiter des directives de ligne, à la manière du
+préprocesseur C. Avec cela, on peut contrôler l'idée que Perl se fait
+des noms de fichiers et des numéros de ligne dans les messages
+d'erreur ou dans les avertissements (en particulier pour les chaînes
+traitées par C<eval()>). La syntaxe de ce mécanisme est la même que
+pour pour la plupart des préprocesseurs CE<nbsp>: elle reconnaît
+l'expression régulièreE<nbsp>:
+
+  # example: '# line 42 "new_filename.plx"'
+  /^\#   \s*
+    line \s+ (\d+)   \s*
+    (?:\s("?)([^"]+)\2)? \s*
+  $/x
+
+avec C<$1> uqi est le numéro de ligne pour la ligne suivante et C<$3>
+qui est le nom optionnel du fichier (avec ou sans guillemets).
+
+Voici quelques exemples que vous devriez pouvoir taper dans votre
+interpréteur de commandesE<nbsp>:
+
+    % perl
+    # line 200 "bzzzt"
+    # the `#' on the previous line must be the first char on line
+    die 'foo';
+    __END__
+    foo at bzzzt line 201.
+
+    % perl
+    # line 200 "bzzzt"
+    eval qq[\n#line 2001 ""\ndie 'foo']; print $@;
+    __END__
+    foo at - line 2001.
+
+    % perl
+    eval qq[\n#line 200 "foo bar"\ndie 'foo']; print $@;
+    __END__
+    foo at foo bar line 200.
+
+    % perl
+    # line 345 "goop"
+    eval "\n#line " . __LINE__ . ' "' . __FILE__ ."\"\ndie 'foo'";
+    print $@;
+    __END__
+    foo at goop line 345.
+
+=cut
+
+=head1 TRADUCTION
+
+=head2 Version
+
+Cette traduction française correspond à la version anglaise distribuée avec
+perl 5.8.8.  Pour en savoir plus concernant ces traductions, consultez
+L<http://perl.enstimac.fr/>.
+
+=head2 Traducteur
+
+Traduction initialeE<nbsp>: Roland Trique
+<F<roland.trique@free.fr>>. Mise à jourE<nbsp>: Paul Gaborit
+<paul.gaborit at enstimac.fr>.
+
+=head2 RELECTURE
+
+Régis Julié <F<Regis.Julie@cetelem.fr>>,
+Etienne Gauthier <F<egauthie@capgemini.fr>>

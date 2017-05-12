@@ -1,0 +1,82 @@
+NAME
+    Perlbal::Plugin::ForwardedFor - Rename the X-Forwarded-For header in
+    Perlbal
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+    This plugin changes the header Perlbal will use to delcare itself as a
+    proxy.
+
+    Usually Perlbal will - perl RFC - add itself to X-Forwarded-For, but
+    this plugins allows you to change that to any header you want, so you
+    could differ Perlbal from other possible proxies the user might have.
+
+    In your Perlbal configuration:
+
+        LOAD ForwardedFor
+
+        CREATE SERVICE http_balancer
+          SET role      = reverse_proxy
+          SET pool      = machines
+          SET plugins   = ForwardedFor
+          FORWARDED_FOR = X-Perlbal-Forwarded-For
+
+SUBROUTINES/METHODS
+  load
+    Register a global hook and check for configuration problems.
+
+  register
+    Register a service hook to run a callback to rewrite the header.
+
+  rewrite_header
+    The function that is called as the callback.
+
+    Rewrites the *X-Forwarded-For* to whatever header name you specified in
+    the configuration file.
+
+AUTHOR
+    Sawyer X, "<xsawyerx at cpan.org>"
+
+BUGS
+    This plugin is on Github and you can file issues on:
+
+    <http://github.com/xsawyerx/perlbal-plugin-forwardedfor/issues>
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Perlbal::Plugin::ForwardedFor
+
+    You can also look for information at:
+
+    *   Github issue tracker:
+
+        <http://github.com/xsawyerx/perlbal-plugin-forwardedfor/issues>
+
+    *   Github page:
+
+        <http://github.com/xsawyerx/perlbal-plugin-forwardedfor>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Perlbal-Plugin-ForwardedFor>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Perlbal-Plugin-ForwardedFor>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Perlbal-Plugin-ForwardedFor/>
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Sawyer X.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

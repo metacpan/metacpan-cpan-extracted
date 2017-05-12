@@ -1,0 +1,30 @@
+NAME
+    Plack-Middleware-CrossOrigin - Adds headers to allow Cross-Origin Resource Sharing
+
+INSTALLATION
+    To install this distribution, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Alternatively, have the CPAN client install it:
+
+        cpan .
+
+BUILDING FROM SOURCE
+    Dist::Zilla and several plugins are needed to build this
+    distribution.  After installing Dist::Zilla, you can see a list
+    of additional modules needed with the command:
+
+        dzil authordeps --missing
+
+    The module can be built with the command
+
+        dzil build
+
+    or installed with the command
+
+        dzil install
+

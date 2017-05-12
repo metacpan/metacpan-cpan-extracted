@@ -1,0 +1,131 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::SPDY::Frame::Control
+at lib/Protocol/SPDY/Frame/Control.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Protocol::SPDY::Frame::Control - control frame subclass for the SPDY protocol
+
+=head1 VERSION
+
+version 1.001
+
+=head1 DESCRIPTION
+
+Support for control frames. Typically you'd interact with these through the top-level
+L<Protocol::SPDY> object.
+
+Subclass of L<Protocol::SPDY::Frame>. See also L<Protocol::SPDY::Frame::Data>.
+
+=head2 TYPES
+
+The following control frame types are known:
+
+=over 4
+
+=item * L<SYN_STREAM|Protocol::SPDY::Frame::Control::SYN_STREAM>
+
+=item * L<RST_STREAM|Protocol::SPDY::Frame::Control::RST_STREAM>
+
+=item * L<SYN_REPLY|Protocol::SPDY::Frame::Control::SYN_REPLY>
+
+=item * L<HEADERS|Protocol::SPDY::Frame::Control::HEADERS>
+
+=item * L<CREDENTIAL|Protocol::SPDY::Frame::Control::CREDENTIAL>
+
+=item * L<GOAWAY|Protocol::SPDY::Frame::Control::GOAWAY>
+
+=item * L<PING|Protocol::SPDY::Frame::Control::PING>
+
+=item * L<SETTINGS|Protocol::SPDY::Frame::Control::SETTINGS>
+
+=back
+
+=head1 METHODS
+
+=head2 is_control
+
+This is a control frame, so it will return true.
+
+=head2 is_data
+
+This is not a data frame, so it returns false.
+
+=head2 version
+
+The version for this frame - probably 3.
+
+=head2 type
+
+The numerical type for this frame.
+
+=head2 uni
+
+Unidirectional flag (if set, we expect no response from the other side).
+
+=head2 compress
+
+The compression flag. Used on some frames.
+
+=head2 as_packet
+
+Returns the byte representation for this frame.
+
+=head2 pairs_to_nv_header
+
+Returns a name-value pair header block.
+
+=head2 find_class_for_type
+
+Returns the class appropriate for the given type (can be numerical
+or string representation).
+
+=head2 from_data
+
+Instantiates a frame from the given bytes.
+
+=head2 to_string
+
+String representation for debugging.
+
+=head1 COMPONENTS
+
+Further documentation can be found in the following modules:
+
+=over 4
+
+=item * L<Protocol::SPDY> - top-level protocol object
+
+=item * L<Protocol::SPDY::Frame> - generic frame class
+
+=item * L<Protocol::SPDY::Frame::Control> - specific subclass for control frames
+
+=item * L<Protocol::SPDY::Frame::Data> - specific subclass for data frames
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Protocol::SPDY::Frame>
+
+L<< I<< E<98>E<111>E<111>E<108> overloading >>|Protocol::SPDY::Frame/I<< E<98>E<111>E<111>E<108> overloading >> >>, L<extract_frame|Protocol::SPDY::Frame/extract_frame>, L<extract_headers|Protocol::SPDY::Frame/extract_headers>, L<fin|Protocol::SPDY::Frame/fin>, L<length|Protocol::SPDY::Frame/length>, L<new|Protocol::SPDY::Frame/new>, L<parse|Protocol::SPDY::Frame/parse>, L<type_string|Protocol::SPDY::Frame/type_string>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2015. Licensed under the same terms as Perl itself.

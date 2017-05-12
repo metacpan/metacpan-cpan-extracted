@@ -1,0 +1,45 @@
+README for Perl extension Parse-Taxonomy
+
+    use Parse::Taxonomy::MaterializedPath;
+
+    $source = "./t/data/alpha.csv";
+    $obj = Parse::Taxonomy::MaterializedPath->new( {
+        file    => $source,
+    } );
+
+    $hashified_taxonomy = $obj->hashify_taxonomy();
+
+and:
+
+    use Parse::Taxonomy::AdjacentList;
+
+    $source = "./t/data/alpha.csv";
+    $obj = Parse::Taxonomy::AdjacentList->new( {
+        file    => $source,
+    } );
+
+    $pathified_taxonomy = $obj->pathify_taxonomy();
+
+More documentation in lib/Parse/Taxonomy.pm,
+lib/Parse/Taxonomy/MaterializedPath.pm and lib/Parse/Taxonomy/AdjacentList.pm.
+Once installed, say:
+
+    perldoc Parse::Taxonomy
+
+You should be able to use this set of instructions to install the module...
+
+This document refers to version 0.24 of Parse-Taxonomy.  This version was
+released April 09 2016.
+
+To install this module on your system, place the tarball archive file in a
+temporary directory and call the following:
+
+    gunzip Parse-Taxonomy-0.24.tar.gz
+    tar xf Parse-Taxonomy-0.24.tar
+    cd Parse-Taxonomy-0.24
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

@@ -1,0 +1,85 @@
+{
+   "abstract" : "Git Smart HTTP Server PSGI(Plack) Implementation",
+   "author" : [
+      "Ryuzo Yamamoto <ryuzo.yamamoto@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-App-GitSmartHttp",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Spec" : "0",
+            "File::Which" : "0",
+            "File::chdir" : "0",
+            "HTTP::Date" : "0",
+            "IO::Uncompress::Gunzip" : "2.055",
+            "IPC::Open3" : "0",
+            "Plack" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Copy::Recursive" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::App::GitSmartHttp" : {
+         "file" : "lib/Plack/App/GitSmartHttp.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dragon3/Plack-App-GitSmartHttp/issues"
+      },
+      "homepage" : "https://github.com/dragon3/Plack-App-GitSmartHttp",
+      "repository" : {
+         "url" : "git://github.com/dragon3/Plack-App-GitSmartHttp.git",
+         "web" : "https://github.com/dragon3/Plack-App-GitSmartHttp"
+      }
+   },
+   "version" : "0.07"
+}

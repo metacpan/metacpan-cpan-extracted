@@ -1,0 +1,27 @@
+---
+abstract: 'Include constants from POD'
+author:
+  - 'Sam Vilain <sam@vilain.net>'
+  - 'Marius Gavrilescu <marius@ieval.ro>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Constants
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Pod::Parser: '1.13'
+  perl: '5.006002'
+resources:
+  repository: https://git.ieval.ro/?p=pod-constants.git
+version: 0.19
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

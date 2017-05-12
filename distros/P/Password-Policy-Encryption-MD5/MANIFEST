@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+lib/Password/Policy/Encryption/MD5.pm
+t/000-load.t
+t/md5.t
+t/release-pod-syntax.t
+t/release-synopsis.t

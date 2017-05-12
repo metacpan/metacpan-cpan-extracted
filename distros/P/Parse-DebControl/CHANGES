@@ -1,0 +1,108 @@
+CHANGES
+     Version 2.005 - January 13th, 2004
+
+     * More generic test suite fix for earlier versions of Test::More
+     * Updated copyright statement
+
+     Version 2.004 - January 12th, 2004
+
+     * More documentation formatting and typo fixes
+     * CHANGES file now generated automatically
+     * Fixes for potential test suite failure in Pod::Coverage run
+     * Adds the "addNewline" option to write_file to solve the streaming stanza problem.
+     * Adds tests for the addNewline option
+
+     Version 2.003 - January 6th, 2004
+
+     * Added optional Test::Pod test
+     * Skips potential Win32 test failure in the module where it wants to write to /tmp.
+     * Added optional Pod::Coverage test
+
+     Version 2.002 - October 7th, 2003
+
+     * No code changes. Fixes to test suite
+
+     Version 2.001 - September 11th, 2003
+
+     * Cleaned up more POD errors
+     * Added tests for file writing
+     * Fixed bug where write_file ignored the gzip parameter
+
+     Version 2.0 - September 5th, 2003
+
+     * Version increase.
+     * Added gzip support (with the tryGzip option), so that compresses control files can be parsed on the fly
+     * Added gzip support for writing of control files
+     * Added parse_web to snag files right off the web. Useful for things such as apt's Sources.gz and Packages.gz
+
+     Version 1.10b - September 2nd, 2003
+
+     * Documentation fix for ## vs # in stripComments
+
+     Version 1.10 - September 2nd, 2003
+
+     * Documentation fixes, as pointed out by pudge
+     * Adds a feature to stripComments where ## will get interpolated as a literal pound sign, as suggested by pudge.
+
+     Version 1.9 - July 24th, 2003
+
+     * Fix for warning for edge case (uninitialized value in chomp)
+     * Tests for CRLF
+
+     Version 1.8 - July 11th, 2003
+
+     * By default, we now strip off whitespace unless verbMultiLine is in place. This makes sense for things like conf files where trailing whitespace has no meaning. Thanks to pudge for reporting this.
+
+     Version 1.7 - June 25th, 2003
+
+     * POD documentation error noticed again by Frank Lichtenheld
+     * Also by Frank, applied a patch to add a "verbMultiLine" option so that we can hand multiline fields back unparsed.
+     * Slightly expanded test suite to cover new features
+
+     Version 1.6.1 - June 9th, 2003
+
+     * POD cleanups noticed by Frank Lichtenheld. Thank you, Frank.
+
+     Version 1.6 - June 2nd, 2003
+
+     * Cleaned up some warnings when you pass in empty hashrefs or arrayrefs
+     * Added stripComments setting
+     * Cleaned up POD errors
+
+     Version 1.5 - May 8th, 2003
+
+     * Added a line to quash errors with undef hashkeys and writing
+     * Fixed the Makefile.PL to straighten up DebControl.pm being in the wrong dir
+
+     Version 1.4 - April 30th, 2003
+
+     * Removed exports as they were unnecessary. Many thanks to pudge, who pointed this out.
+
+     Version 1.3 - April 28th, 2003
+
+     * Fixed a bug where writing blank stanzas would throw a warning. Fix found and supplied by Nate Oostendorp.
+
+     Version 1.2b - April 25th, 2003
+
+     Fixed:
+
+     * A bug in the test suite where IxHash was not disabled in 40write.t. Thanks to Jeroen Latour from cpan-testers for the report.
+
+     Version 1.2 - April 24th, 2003
+
+     Fixed:
+
+     * A bug in IxHash support where multiple stanzas might be out of order
+
+     Version 1.1 - April 23rd, 2003
+
+     Added:
+
+     * Writing support
+     * Tie::IxHash support
+     * Case insensitive reading support
+
+     Version 1.0 - April 23rd, 2003
+
+     * This is the initial public release for CPAN, so everything is new.
+

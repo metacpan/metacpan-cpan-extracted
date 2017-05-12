@@ -1,0 +1,52 @@
+PApp database requirenments
+
+    PApp itself is, in general, database-independent. This means that
+    applications in general are free to use any database they want, as
+    long as there exists a DBI driver for them.
+
+    PApp itself also needs a database for administration purposes. Since
+    ANSI-SQL is not complete with regards to many operations (like unique
+    column ids) and most databases do not really implement SQL fully, PApp
+    uses some extensions to SQL:
+
+    PApp core:
+
+        PApp itself does not create databases or tables, you must do this
+        yourself. The papp-install script tries to create the necessary
+        database and tables, but this extension to DBI is currently only
+        supported by very few databases (e.g. MySQL), so you have to
+        either use mysql for papp itself or read the table definitions and
+        create corersponding tables yourself. Pre-made configs for various
+        databases are on their way.
+
+        A special note is required for the state, user and pkg tables:
+        These tables store raw binary data in the state/prefs field
+        respectively. Both of these are usually smaller than 4k (this
+        depends mainly on the size of the state and user preferences you
+        need), so most databases can use TEXT/BLOB/IMAGE fields for them.
+        PApp will not try to "update" the state field, but it will try to
+        update the "prefs" field which is a problem for some databases.
+
+        PApp requires the sql_insertid function, so have a look at the
+        additional requirements of PApp::SQL below.
+
+    PApp::DataRef:
+       
+        PApp::DataRef uses "harmless" select and update statements to
+        read/write existing table rows. When creating new rows and
+        insertid is "1", it will insert the row with the primary key set
+        to NULL and expect it to create a new row and therefore requires
+        PApp::SQL::sql_insertid. This is fortunately a common exension.
+
+    PApp::SQL:
+
+        PApp::SQL offers a function named sql_insertid that should
+        return the id of the primary key that was created for the last
+        select that had a NULL value for the key. Implementations for
+        MySQL, Postgres, Sybase, Informix and SQLite already exist,
+        you might want to add your own implementation to make
+        PApp::DataRef and the core work.
+
+If you need an adaption for your database please contact
+papp-porting@nethype.de for availability.
+

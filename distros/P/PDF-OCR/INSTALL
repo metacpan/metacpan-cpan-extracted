@@ -1,0 +1,104 @@
+INSTALL
+=======
+$Revision: 1.6 $
+
+Leo Charre leocharre at cpan dot org
+
+Chances are this package is NOT going to install properly through CPAN.
+There are some dependencies that are not perl things.
+
+
+Change into the directory holding this file.
+
+	perl Makefile.PL
+
+If you see any missing modules like File::Which
+
+	cpan File::Which
+
+After that 
+
+	make test
+
+This should take a minute or more.
+
+If it fails, you may be missing non perl prerequisites...
+
+1) INSTALLING PREREQUISITES
+===========================
+
+DEPENDENCIES
+
+ImageMagick convert
+xpdf pdfimages
+PDF::GetImages
+PDF::Burst
+CAM::PDF
+PDF::API2
+
+
+There are a few dependencies you will need to meet. Things that are not necessarily perl.
+You must install tesseract, and.. 
+Here's what you should have:
+
+t1lib 
+freetype 
+freetype-devel 
+libpaper 
+libpaper-devel 
+libpng 
+xpdf 
+ghostscript 
+openmotif 
+openmotif-devel 
+freetype2
+
+Changes are you have most of these.
+
+Misc Notes:
+
+You should also test out pdfimages (from xpdf)
+This utility extracts images from a pdf
+
+have to make sure if you build xpdf, that you use 
+./configure --with-freetype2-includes=/path/to/freetyp2 dir
+
+
+INSTALLING TESSERACT
+
+You may be able to simply install the SVN version of Tesseract by using:
+
+ svn checkout http://tesseract-ocr.googlecode.com/svn/trunk/ tesseract-ocr
+ ./runautoconf
+ mkdir build-directory
+ cd build-directory
+ ../configure
+ make
+ make install
+
+
+for more see google project on ocr, they use tesseract
+
+
+
+2) INSTALLING
+=============
+
+Back in the directory holding the package (and this file).
+
+	perl Makefile.PL
+	make test
+
+It should work. Now you install.
+
+	make install
+
+There.
+
+Enjoy!
+
+Leo Charre leocharre at cpan dot org
+
+
+
+

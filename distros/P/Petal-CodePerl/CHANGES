@@ -1,0 +1,41 @@
+0.06
+
+added need_new_hash()
+
+fixed spelling in POD
+
+0.05
+
+Forgot to recompile the grammar in the last version, so inline modifiers
+only worked when CODEPERL_DEV was set. Added a rule to Makefile.PL to
+recomile the grammar when the grammar file changes.
+
+0.04
+
+added support for compiled modifiers
+
+fixed a problem that occurred in taint mode if you didn't load Code::Perl
+
+Added GrammarLoader, now if the CODEPERL_DEV env variable is true, the
+grammar will be recompiled every time, useful if you're changing the grammar
+
+added use warnings and Test::NoWarnings everywhere
+
+added bin/ with compile and buildparser
+
+0.03
+
+Moved the CPT modifications into Petal::CodePerl otherwise they're not done
+for cached scripts with Petal >= 0.95
+
+0.02
+
+using a precompiled Parse::RecDescent parser
+
+got rid of some unqualified fn calls in the grammar
+
+Parser is not loaded by default
+
+0.01
+
+first release

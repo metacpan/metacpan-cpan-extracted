@@ -1,0 +1,135 @@
+NAME
+    Params::Profile - module for registering Parameter profiles
+
+SYNOPSIS
+        package Foo::Bar;
+
+        use Params::Profile;
+
+        ### Single profile
+        Params::Profile->register_profile(
+                        'method'    => 'subroto',
+                        'profile'   => {
+                                    testkey1 => { required => 1 },
+                                    testkey2 => {
+                                            required => 1,
+                                            allow => qr/^\d+$/,
+                                        },
+                                    testkey3 => {
+                                            allow => qr/^\w+$/,
+                                        },
+                                    },
+                    );
+
+        sub subroto {
+            my (%params) = @_;
+
+            return unlesss Params::Profile->validate('params' => \%params);
+            ### DO SOME STUFF HERE ...
+        }
+
+        my $profile = Params::Profile->get_profile('method' => 'subroto');
+
+        ### Multiple Profile
+        Params::Profile->register_profile(
+                        'method'    => 'subalso',
+                        'profile'   => [
+                                        'subroto',
+                                        {
+                                        testkey4 => { required => 1 },
+                                        testkey5 => {
+                                                required => 1,
+                                                allow => qr/^\d+$/,
+                                            },
+                                        testkey6 => {
+                                                allow => qr/^\w+$/,
+                                            },
+                                        },
+                                    ],
+                    );
+
+        sub subalso {
+            my (%params) = @_;
+
+            ### Checks parameters agains profile of subroto and above registered
+            ### profile
+            return unlesss Params::Profile->validate('params' => \%params);
+
+            ### DO SOME STUFF HERE ...
+        }
+
+DESCRIPTION
+    Params::Profile provides a mechanism for a centralised Params::Check or
+    a Data::FormValidater profile. You can bind a profile to a
+    class::subroutine, then, when you are in a subroutine you can simply
+    call Params::Profile->check($params) of
+    Params::Profile->validate($params) to validate against this profile.
+    Validate will return true or false on successfull or failed validation.
+    Check will return what "Data::FormValidator" or "Params::Check" would
+    return. (For "Params::Check" this is simply a hash with the validated
+    parameters , for "Data::FormValidator", this is a
+    "Data::FormValidator::Results" object)
+
+Object Methods
+  Params::Profile->register_profile('method' => $method, 'profile' =>
+$profile [, caller => $callerclass )
+    Register a new profile for method for the called-from caller class.
+    Instead of a profile, you could give a STRING containing the method from
+    which you want to use the profile...or simpler saying: make an alias to
+    a profile. You can also give an ARRAYREF containing both strings
+    (defining the aliases) and HASHREFS, defining profiles which then will
+    be combined (See second example in SYNOPSYS). When you provide the
+    optional caller option, you define the class where the given method is
+    defined.
+
+  Params::Profile->get_profile( method => $method [, caller => $caller ]);
+    Returns the profile registered for $method, or when no $method is given,
+    returns the profile for caller.
+
+  Params::Profile->verify_profiles( \@methods );
+    Verifies for each method in list, if the profile exists. Returns undef
+    when it doesn't. Also checks for aliases which point to no existing
+    profiles.
+
+  Params::Profile->clear_profiles();
+    Clear the loaded profiles.
+
+  Params::Profile->get_profiles()
+    Just return a hash containing all the registered profiles, it is in the
+    form: method => [ \%profile ]
+
+  Params::Profile->validate( params => %params [, method => $method ] )
+    When given an hash of key->value pairs, this sub will check the values
+    against the loaded profile. Returns true when it validates, otherwise
+    returns false. It will check against the loaded profile for the given
+    method, or when method doesn't exist, against the caller
+
+  Params::Profile->check( params => %params [, method => $method ] )
+    When given an hash of key->value pairs, this sub will check the values
+    against the loaded profile. It will check against the loaded profile for
+    the given method, or when method doesn't exist, against the caller.
+
+    Depending on the used profile, it will return %hash with values for a
+    Params::Check profile. Or an object Data::FormValidator::Results when
+    the laoded profile is a Data::FormValidator profile.
+
+AUTHOR
+    This module by
+
+    Michiel Ootjers <michiel@cpan.org>.
+
+    and
+
+    Jos Boumans <kane@cpan.org>.
+
+ACKNOWLEDGEMENTS
+    Thanks to Jos Boumans for "Params::Check", and the authors of
+    "Data::FormValidator"
+
+COPYRIGHT
+    This module is copyright (c) 2002 Michiel Ootjers <michiel@cpan.org>.
+    All rights reserved.
+
+    This library is free software; you may redistribute and/or modify it
+    under the same terms as Perl itself.
+

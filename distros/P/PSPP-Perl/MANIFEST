@@ -1,0 +1,14 @@
+Changes
+const-c.inc
+const-xs.inc
+COPYING
+Examples.pod
+lib/PSPP.pm
+Makefile.PL
+MANIFEST
+ppport.h
+PSPP.xs
+README
+t/Pspp.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

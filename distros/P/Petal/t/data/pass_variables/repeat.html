@@ -1,0 +1,11 @@
+<html>
+<body>
+	<!-- pass vars back to the templating engine in petal:repeat statements: -->
+	<span petal:repeat="type test/sub_test/list foo">
+		Object 1: $type
+	</span>
+	<?repeat name="type test/sub_test/list foo"?>
+		Object 2: $type
+	<?end?>
+</body>
+</html>

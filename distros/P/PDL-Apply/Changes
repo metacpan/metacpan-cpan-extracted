@@ -1,0 +1,7 @@
+Changes for PDL-Apply distribution
+
+0.002   2015/10/16
+        - fixed [rt.cpan.org #107827] Test suite fails with uselongdouble
+
+0.001   2015/10/16
+        - initial version

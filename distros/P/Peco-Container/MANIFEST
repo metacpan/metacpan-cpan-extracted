@@ -1,0 +1,26 @@
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Peco/Container.pm
+lib/Peco/Container/Abstract.pm
+lib/Peco/Container/Autoload.pm
+lib/Peco/Container/Chained.pm
+lib/Peco/Container/Clonable.pm
+lib/Peco/Spec.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/00-basic.t
+t/01-service.t
+t/02-setter.t
+t/03-create.t
+t/04-factory.t
+t/05-subclass.t
+t/06-cycle.t
+t/lib/Test/Class.pm
+t/lib/Test/MySpec.pm

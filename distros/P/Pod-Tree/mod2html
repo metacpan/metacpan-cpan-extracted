@@ -1,0 +1,220 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+use File::Find;
+use File::Path;
+use Getopt::Long;
+use HTML::Stream;
+use IO::File;
+use Pod::Tree::HTML;
+
+my %Options = ( bgcolor => '#ffffff' );
+my %Index;
+
+my $ok = GetOptions( \%Options, "base:s", "css:s", "index:s", "toc!", "hr:i", "bgcolor:s", "text:s" );
+$ok or die "Bad command line options\n";
+
+my ( $ModDir, $HTMLDir ) = @ARGV;
+$HTMLDir or die "mod2html modDir HTMLDir\n";
+
+$ModDir =~ s( /$ )()x;
+$HTMLDir =~ s( /$ )()x;
+
+mkpath($HTMLDir);
+
+my $HTML_inode = ( stat $HTMLDir )[1];
+
+umask 0022;
+
+find(
+	{
+		wanted   => \&Translate,
+		no_chdir => 1
+	},
+	$ModDir
+);
+
+Index() if $Options{index};
+
+sub Translate {
+	-d and &Translate_Dir;
+	-f and &Translate_POD;
+}
+
+sub Translate_Dir {
+	my $dir   = $File::Find::name;
+	my $inode = ( stat $dir )[1];    # always 0 on Win32
+
+	if ( $inode and $inode == $HTML_inode ) {
+		$File::Find::prune = 1;
+		return;
+	}
+
+	$dir =~ s/^$ModDir/$HTMLDir/o;
+	-d $dir or mkdir $dir, 0755 or die "Can't mkdir $dir: $!\n";
+	print "$File::Find::name\n";
+}
+
+sub Translate_POD {
+	m( \.(pm|pod)$ )x or return;
+	my $source = $File::Find::name;
+
+	Hidden($source) and return;
+	print "$source\n";
+
+	my $dest = $source;
+	$dest =~ s/^$ModDir/$HTMLDir/;
+	$dest =~ s( \.\w+$ )(.html)x;
+
+	my $depth = Depth($source);
+
+	my $pod = $source;
+	$pod =~ s(^$ModDir/)();
+	$pod =~ s( \.\w+$ )()x;
+	$Index{$pod} = 1;
+
+	my $html = Pod::Tree::HTML->new( $source, $dest );
+	$html->set_options( %Options, depth => $depth );
+	$html->translate;
+}
+
+sub Hidden {
+	my $source = shift;
+	$source =~ m(\.pm$) or return 0;
+	$source =~ s(\.pm$)(.pod);
+	-e $source;
+}
+
+sub Depth {
+	my $path = shift;
+	$path =~ s(^$ModDir/)();
+	my @path = split m(/), $path;
+	@path - 1;
+}
+
+sub Index {
+	my $index = "$HTMLDir/index.html";
+	my $fh    = IO::File->new(">$index");
+	defined $fh or die "Can't open $index: $!\n";
+
+	my $stream = HTML::Stream->new($fh);
+
+	my $title   = $Options{index};
+	my $bgcolor = $Options{bgcolor};
+	my $text    = $Options{text};
+
+	$stream->HTML->HEAD;
+	$stream->TITLE->text($title)->_TITLE;
+	$stream->_HEAD->BODY( BGCOLOR => $bgcolor, TEXT => $text );
+	$stream->H1->t($title)->_H1;
+
+	Emit_Entries($stream);
+
+	$stream->_BODY->_HTML;
+}
+
+sub Emit_Entries {
+	my $stream = shift;
+
+	$stream->UL;
+
+	for my $entry ( sort keys %Index ) {
+		$stream->LI->A( HREF => "$entry.html" )->t($entry)->_A->_LI;
+	}
+
+	$stream->_UL;
+}
+
+__END__
+
+=head1 NAME
+
+mod2html - translate module PODs to HTML
+
+=head1 SYNOPSIS
+
+C<mod2html> 
+[C<--base> I<url>]
+[C<--css> I<url>]
+[C<--index> I<title>]
+[C<-->[C<no>]C<toc>] [C<--hr> I<level>] 
+[C<--bgcolor> I<#rrggbb>] [C<--text> I<#rrggbb>]
+I<modDir> I<HTMLdir>
+
+=head1 DESCRIPTION
+
+C<mod2html> locates all the PODs under I<modDir>
+translates them to HTML,
+and writes them to a directory tree under F<HTMLdir>.
+
+The directory tree maps the module namespaces.
+
+It makes the HTML files world-readable.
+
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--base> I<url>
+
+Translate C<LE<lt>E<gt>> sequences into HTML
+links relative to I<url>.
+
+=item C<--css> I<url>
+
+Specifies a Cascanding Style Sheet for the generated HTML page.
+
+
+=item C<--index> I<title>
+
+Writes an index of all the HTML files to I<HTMLDir>F</index.html>.
+I<title> is used as the title of the index page.
+
+
+=item C<-->[C<no>]C<toc>
+
+Includes or omits the table of contents.
+Default is to include the TOC.
+
+=item C<--hr> I<level>
+
+Controls the profusion of horizontal lines in the output, as follows:
+
+    level   horizontal lines
+    0 	    none
+    1 	    between TOC and body
+    2 	    after each =head1
+    3 	    after each =head1 and =head2
+
+Default is level 1.
+
+=item C<--bgcolor> I<#rrggbb>
+
+Set the background color to I<#rrggbb>.
+Default is white.
+
+=item C<--text> I<#rrggbb>
+
+Set the text color to I<#rrggbb>.
+Default is black.
+
+=back
+
+=head1 REQUIRES
+
+L<C<Pod::Tree::HTML>>
+
+=head1 SEE ALSO
+
+L<C<pod2html>>, L<C<pods2html>>, L<C<Pod::Tree::HTML>>
+
+=head1 AUTHOR
+
+Steven McDougall, <swmcd@world.std.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2003 by Steven McDougall.  This program is free software;
+you can redistribute it and/or modify it under the same terms as Perl.

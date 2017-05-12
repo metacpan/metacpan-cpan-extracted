@@ -1,0 +1,9 @@
+	LD A,1
+#include 't/Data/include.z80' ignored
+	LD A,3
+#include "t/Data/include.z80" ignored
+	LD A,5
+#include <t/Data/include.z80> ignored
+	LD A,7
+#include t/Data/include.z80 ignored
+	LD A,9

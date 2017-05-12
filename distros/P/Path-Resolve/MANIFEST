@@ -1,0 +1,11 @@
+Changes
+lib/Path/Resolve.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/both.t
+t/Parse.t
+t/POSIX.t
+t/windows.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

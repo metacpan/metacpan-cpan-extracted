@@ -1,0 +1,124 @@
+NAME
+    Parse::Deb::Control - parse and manipulate debian/control in a
+    controlable way
+
+SYNOPSIS
+    Print out all "Package:" values lines
+
+        use Parse::Deb::Control;
+
+        my $parser = Parse::Deb::Control->new($control_txt);
+        my $parser = Parse::Deb::Control->new(['path', 'to', 'debian', 'control']);
+        my $parser = Parse::Deb::Control->new($fh);
+    
+        foreach my $para ($parser->get_paras('Package')) {
+            print $para->{'Package'}, "\n";
+        }
+
+    or
+
+        foreach my $entry ($parser->get_keys('Package')) {
+            print ${$entry->{'value'}}, "\n";
+        }
+
+    Modify "Maintainer:"
+
+        my $mantainer = 'someone@new';
+
+        my $parser = Parse::Deb::Control->new($control_txt);
+        foreach my $para ($parser->get_paras(qw{ Maintainer })) {
+            $para->{'Maintainer'} =~ s/^ (\s*) (\S.*) $/ $maintainer\n/xms;
+        }
+
+    or
+
+        my $parser = Parse::Deb::Control->new($control_txt);
+        foreach my $src_pkg ($parser->get_keys(qw{ Maintainer })) {
+            ${$src_pkg->{'value'}} =~ s/^ (\s*) (\S.*) $/ $maintainer\n/xms;
+        }
+
+    and
+
+        print $parser->control;
+
+DESCRIPTION
+    This modules helps to automate changes in debian/control file. It tries
+    hard to preserve the original structure so that diff on input and output
+    can be made and it will be clear what was changed. There are 2 checks.
+    First when original debian/control file processed it is generated back
+    and compared to the original. The program dies if those two doesn't
+    match. After making changes and creating new file. The result is parsed
+    again and the same check is applied to make sure the file will be still
+    parseable.
+
+    See also Parse::DebControl for alternative.
+
+PROPERTIES
+        _control_src
+        structure
+
+METHODS
+  new()
+    Object constructor. Accepts anythign IO::Any->read() does to get
+    debian/control from.
+
+  content()
+    Returns content of the debian/control. The return value is an array ref
+    holding hashes representing control file paragraphs.
+
+  control
+    Returns text representation of a debian/control constructed from
+    `<$self-'content>> and `<$self-'structure>>.
+
+  get_keys
+    Parameters are the requested keys from debian/control. Returns array of
+    key/values of matching keys. Ex.
+
+        {
+            'key'   => 'Package',
+            'value' => \"perl",
+            'para'  => { ... one item from $self->content array ... },
+        }
+
+    Note that value is a pointer to scalar value so that it can be easyly
+    modified if needed.
+
+  get_paras
+    Returns a paragraphs that has key(s) passed as argument.
+
+AUTHOR
+    Jozef Kutej, `<jkutej at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-parse-deb-control at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Parse-Deb-Control. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Parse::Deb::Control
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parse-Deb-Control
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Parse-Deb-Control
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Parse-Deb-Control
+
+    * Search CPAN
+        http://search.cpan.org/dist/Parse-Deb-Control
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Jozef Kutej, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

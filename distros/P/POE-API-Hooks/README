@@ -1,0 +1,98 @@
+NAME
+    POE::API::Hooks - Implement lightweight hooks into POE
+
+SYNOPSIS
+      use POE;
+      use POE::API::Hooks;
+
+      POE::API::Hooks->add(
+          before_event_dispatch  => \&do_something,
+          after_event_dispatch   => \&do_something,
+          before_session_create  => \&do_something,
+          after_session_create   => \&do_something,
+          before_event_enqueue   => \&do_something,
+          after_event_enqueue    => \&do_something,
+      );
+
+      # ... carry on with life as normal ...
+
+DISCUSSION
+    This module adds lightweight hooks into the inner workings of POE.
+    Currently, one can add hooks into POE that get called before/after an
+    event is dispatched, before/after a Session is created, and/or
+    before/after an event is enqueued. These callbacks receive the exact
+    same argument list as their Kernel/Session counterpart. For event
+    dispatch related callbacks, see "_dispatch_event" and "_data_ev_enqueue"
+    in POE::Kernel. For session related callbacks, see "create" in
+    POE::Session.
+
+WARNING
+    This interface is designed for advanced users. Wrapping any of the
+    available POE internals is a potentially dangerous operation. Please
+    read the POE documentation and source code carefully before attempting
+    an override of this nature.
+
+METHODS
+  add
+      POE::API::Hooks->add(
+          before_event_dispatch  => \&do_something,
+          after_event_dispatch   => \&do_something,
+
+          before_session_create  => \&do_something,
+          after_session_create   => \&do_something,
+
+          before_event_enqueue   => \&do_something,
+          after_event_enqueue    => \&do_something,
+      );
+
+    "add" is the only public method of this class. The method installs the
+    requested hooks. The list of options above contains all possible hooks.
+    No hook is required so the user may set only one hook if they desire.
+
+    The callback provided for each hook will be called, obviously, when that
+    state occurs. "before_event_dispatch" will be called just before event
+    dispatch, for instance. These callbacks are passed whatever arguments
+    are provided to the wrapped subroutine. For instance, if a
+    "before_session_create" callback is registered and a user calls
+    "POE::Session->create('POE')", the registered callback will receive
+    "('POE::Session', 'POE')" in @_.
+
+BUGS
+    When "$_[KERNEL]->call($_[SESSION], "event")" is used, _event_dispatch
+    is bypassed. This is an optimization, not a bug, but it will cause the
+    event_dispatch hook to be bypassed under this condition. Someone relying
+    on the event_dispatch hook may call this a bug.
+
+AUTHOR
+    Matt Cashner (sungo@pobox.com)
+
+LICENSE
+    Copyright (c) 2004, 2008 Matt Cashner. All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+    *   Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+
+    *   Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    *   Neither the name of Matt Cashner nor the names of its contributors
+        may be used to endorse or promote products derived from this
+        software without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+    IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+    TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+    PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+    OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+    EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+    PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

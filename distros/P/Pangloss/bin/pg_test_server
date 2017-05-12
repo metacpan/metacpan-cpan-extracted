@@ -1,0 +1,114 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Pod::Usage qw( pod2usage );
+use Getopt::Long qw( GetOptions );
+use File::Spec::Functions qw( catfile catdir rel2abs );
+
+my $debug = 0;
+my $help  = 0;
+my $port  = 8080;
+my $home  = get_pangloss_home();
+my $lib   = catdir($home, 'lib');
+my ($config, $dsn);
+
+GetOptions( 'd|debug+'   => \$debug,
+	    'h|help'     => \$help,
+	    'p|port=n'   => \$port,
+	    'c|config=s' => \$config,
+	    'dsn=s'      => \$dsn, );
+
+pod2usage if ($help);
+
+warn "using home directory: $home\n" if $debug;
+
+eval "use lib '$lib'";
+die  "Error loading Pangloss libraries from '$lib' - $@!" if ($@);
+
+warn "using Pangloss libraries from $lib\n" if $debug;
+require Pangloss::WebApp::Standalone;
+
+# this will have to do until we hit PG::WebApp->init_debug:
+{ no warnings; $Pangloss::DEBUG{ALL} = 1 if $debug; }
+
+Pangloss::Config->set_default_for
+  ( 'PG_CONFIG_FILE',
+    sub { catfile( shift->{PG_HOME}, 'conf', 'config.yaml' ); } );
+
+local %ENV = ( %ENV, PG_HOME => $home, PG_DEBUG => $debug );
+$ENV{PG_CONFIG_FILE} = $config if $config;
+$ENV{PG_PIXIE_DSN}   = $dsn    if $dsn;
+
+exit Pangloss::WebApp::Standalone
+      ->new
+      ->port( $port )
+      ->event_loop;
+
+sub get_pangloss_home {
+    return $ENV{PANGLOSS_HOME} if ($ENV{PANGLOSS_HOME});
+    return $ENV{PG_HOME} if ($ENV{PG_HOME});
+    require File::Basename;
+    my $dir = File::Basename::dirname( File::Spec->rel2abs( $0 ) );
+    $dir    =~ s/\W?bin\W?\z//i;
+    return $dir;
+}
+
+__END__
+
+=head1 NAME
+
+pg_test_server - stand-alone webserver for Pangloss
+
+=head1 SYNOPSIS
+
+  pg_test_server [-h] [-d [-d]] [--port=...] [--config=...] [--dsn=...]
+
+=head2 options:
+
+=over 4
+
+=item -h, --help
+
+print usage and exit.
+
+=item -p, --port=n
+
+listen on the specified port, defaults to C<8080>.
+
+=item -c, --config=<path>
+
+use the specified controller config file, defaults to C<conf/config.yaml>.
+
+=item --dsn=<pixie_store_spec>
+
+use the specified Pixie DSN, default set in L<Pangloss::Config>
+
+=item -d, --debug
+
+increase debugging level, defaults to C<0>.
+
+=back
+
+=head1 DESCRIPTION
+
+This is a single-threaded stand-alone test server for Pangloss that relies on
+L<HTTP::Daemon>.
+
+=head1 AUTHOR
+
+Steve Purkis <spurkis@quiup.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2003, Quiup Ltd.
+
+This module is free software; you can redistribute it or modify it under
+the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Pangloss>, L<Pangloss::Config>
+
+=cut

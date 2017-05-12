@@ -1,0 +1,59 @@
+{
+   "abstract" : "Bringing the power of POE to CPAN smoke testing.",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "POE-Component-CPAN-Reporter",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "POE" : "1.367",
+            "POE::Component::SmokeBox::Recent" : "1",
+            "POE::Wheel::Run" : "0",
+            "Storable" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/poe-component-cpan-reporter",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/poe-component-cpan-reporter.git",
+         "web" : "https://github.com/bingos/poe-component-cpan-reporter"
+      }
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

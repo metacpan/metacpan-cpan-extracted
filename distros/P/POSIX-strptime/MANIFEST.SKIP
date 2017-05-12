@@ -1,0 +1,12 @@
+#defaults
+^Makefile$
+^blib/
+^pm_to_blib
+^blibdirs
+\.svn
+\.tar.gz$
+\.c$
+\.bs$
+\.o$
+MYMETA.yml
+MYMETA.json

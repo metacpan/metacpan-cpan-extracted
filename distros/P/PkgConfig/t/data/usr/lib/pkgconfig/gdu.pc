@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: gdu
+Description: GObject based Disk Utility Library
+Version: 2.30.1
+Requires: gobject-2.0 gio-2.0
+Libs: -L${libdir} -lgdu
+Cflags: -I${includedir}/gnome-disk-utility

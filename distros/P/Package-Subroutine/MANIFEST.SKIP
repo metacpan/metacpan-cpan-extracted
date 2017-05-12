@@ -1,0 +1,24 @@
+# Version Control
+\B\.svn\b
+^.git/
+
+# Build process
+\bblib/
+\bMakefile$
+^Build$
+^_build/
+^pm_to_blib
+
+# temporary or backup Files
+~$
+\.bak$
+
+# Devel::Cover
+\bcover_db\b
+
+# release
+^Package-Subroutine-v?\d+\.\d*\.tar\.gz$
+^Package-Subroutine-v?\d+\.?\d*_\d+\.tar\.gz$
+^MYMETA.yml$
+^.shipit$
+^MYMETA\.json$

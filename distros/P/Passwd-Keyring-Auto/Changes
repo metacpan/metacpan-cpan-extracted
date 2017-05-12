@@ -1,0 +1,144 @@
+Revision history for Keyring::Auto
+
+0.7201	2015-12-10
+    	#1 Added README.md for good BitBucket presentation
+
+	    #3 Disabled most tests if run under root, as running them in such context
+	    just caused various failures.
+
+        (maintainer-related) Disabled python version hook, UpdateVersion Extension
+        is to be used instead.
+
+0.72	2015-02-25
+   	    Fixed error (wrong skip) in one of the tests.
+
+0.71	2015-01-30
+        Adding dependency on Moo version which handles
+        string defaults (to resolve issues reported on Moo
+        1.000008)
+
+0.70    2015-01-24
+
+        Environment variables shortened to PASSWD_KEYRING_CONFIG,
+        PASSWD_KEYRING_DEBUG, PASSWD_KEYRING_FORCE, etc.
+
+        Initial release of passwd_keyring helper script. Current
+        version supports config-file related activities (create,
+        spawn editor on, show settings summary).
+
+        Fixed problems with cpan install due to wrong test.
+
+0.3003  2015-01-15
+
+        Fixed bug introduced in 0.30: password group and app name were
+        not passed to backends, therefore all passwords were saved
+        in default group.
+
+0.3001  2015-01-12
+
+        Updated missing dependencies.
+
+0.30    2015-01-12
+
+        Introduced configuration file support (and documented how it
+        is related to other config methods).
+
+        Tuned and documented priority of various ways of configuring 
+        preferred backends.
+
+        Noticeable internal changes (which should not, except 
+        better logging, have impact on external behaviour).
+
+0.2801  2015-01-08
+
+        Support for new environment variable. 
+        PASSWD_KEYRING_AUTO_FORCE can be set to short name of keyring
+        which must be used no matter what. If it is present, only this
+        backend is considered.
+
+        Passwd::Keyring::Auto->new handles named parameters force,
+        prefer and forbid - appropriately enforced backend, list of
+        preferred backends, list of forbidden backends. This way 
+        module behaviour can also be impacted from the code.
+
+        Documentation improvements.
+
+0.2704  2015-01-06
+
+        Added kwalitee testing and making some tests happier. No
+        functionality changes.  
+
+        Fixed recommended modules on OSX (no more KDE and Gnome
+        recommendation there).
+
+0.2703  2012-11-27
+
+        Better name for example, installing it in share dir for easier
+        access.
+
+        Dropping problematic tests. No way to guess whether KDEWallet
+        is indeed available.
+
+0.2702  2012-11-22
+
+        Added empty package to make linking documentation on CPAN
+        easier, as suggested in first comment to
+        http://prepan.org/module/429En4oFfM
+
+0.2701  2012-11-20
+
+        Fixed some test failures reported by cpantesters (removed
+        unneeded import of Test::Exception, added conditionals
+        checking whether loaded keyring is persistent and can be
+        tested for data recovery by separate object).
+
+0.27    2012-11-11
+
+        Support for loading OSXKeychain backend on Mac OS/X (darwin) platform.
+
+        Added standalone non-trivial example.
+
+        get_keyring is exported by default.
+
+        Improved keyring selection code structure (introducing concept
+        of scoring etc)..
+
+        Handling PASSWD_KEYRING_AUTO_FORBID and PASSWD_KEYRING_AUTO_PREFER
+        environment variables.
+
+        Handling PASSWD_KEYRING_AUTO_DEBUG variable, if it is set, we
+        emit some diagnostics of what we pick.
+
+        Terminology fixes in docs and param names (realm instead of service/domain)
+
+        Recommended modules are picked according to the current platform.
+
+0.2602  2012-11-09
+
+        Documentation updates
+
+0.2601  2012-11-08
+
+        Small documentation fixes, more info in CPAN metadata
+
+0.26    2012-11-08
+
+        Updated location of KeyringAPI document.
+
+0.25    2012-11-08
+
+        Added support for KDEWallet as alternative for Linux desktops.
+
+0.24    2012-11-08
+
+        Clarifying meaning of app and group parameters.
+
+0.23    2012-11-08
+
+        Documented keyring backends API (L<Passwd::Keyring::KeyringAPI>).
+        Tests properly clean created passwords.
+
+0.21    2012-11-04
+
+        First version.
+

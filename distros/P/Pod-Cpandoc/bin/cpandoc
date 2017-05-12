@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+use Pod::Cpandoc;
+exit( Pod::Cpandoc->run() );
+
+__END__
+
+=head1 NAME
+
+cpandoc
+
+=head1 DESCRIPTION
+
+See L<Pod::Cpandoc> and L<Pod::Perldoc>.
+
+=cut
+

@@ -1,0 +1,242 @@
+NAME
+    Params::Coerce - Allows your classes to do coercion of parameters
+
+SYNOPSIS
+      # Coerce a object of class Foo to a Bar
+      my $bar = Params::Coerce::coerce('Bar', $Foo)
+  
+      # Create a coercion param function
+      use Params::Coerce '_Bar' => 'Bar';
+      my $bar = _Bar($Foo);
+  
+      # Usage when Bar has a 'from' method
+      my $bar = Bar->from($Foo);
+
+    Real world example using HTML::Location.
+
+      # My class needs a URI
+      package Web::Spider;
+  
+      use URI;
+      use Params::Coerce 'coerce';
+  
+      sub new {
+          my $class = shift;
+      
+          # Where do we start spidering
+          my $start = coerce('URI', shift) or die "Wasn't passed a URI";
+      
+          bless { root => $start }, $class;
+      }
+  
+      #############################################
+      # Now we can do the following
+  
+      # Pass a URI as normal
+      my $URI     = URI->new('http://ali.as/');
+      my $Spider1 = Web::Spider->new( $URI );
+  
+      # We can also pass anything that can be coerced into being a URI
+      my $Website = HTML::Location->new( '/home/adam/public_html', 'http://ali.as' );
+      my $Spider2 = Web::Spider->new( $Website );
+
+DESCRIPTION
+    A big part of good API design is that we should be able to be flexible
+    in the ways that we take parameters.
+
+    Params::Coerce attempts to encourage this, by making it easier to take a
+    variety of different arguments, while adding negligable additional
+    complexity to your code.
+
+  What is Coercion
+    "Coercion" in computing terms generally referse to "implicit type
+    conversion". This is where data and object are converted from one type
+    to another behind the scenes, and you just just magically get what you
+    need.
+
+    The overload pragma, and its string overloading is the form of coercion
+    you are most likely to have encountered in Perl programming. In this
+    case, your object is automatically (within perl itself) coerced into a
+    string.
+
+    "Params::Coerce" is intended for higher-order coercion between various
+    types of different objects, for use mainly in subroutine and (mostly)
+    method parameters, particularly on external APIs.
+
+  __as_Another_Class Methods
+    At the heart of "Params::Coerce" is the ability to transform objects
+    from one thing to another. This can be done by a variety of different
+    mechanisms.
+
+    The prefered mechanism for this is by creating a specially named method
+    in a class that indicates it can be coerced into another type of object.
+
+    As an example, HTML::Location provides an object method that returns an
+    equivalent URI object.
+
+      # In the package HTML::Location
+  
+      # Coerce to a URI
+      sub __as_URI {
+            my $self = shift;
+            return URI->new( $self->uri );
+      }
+
+  __from_Another_Class Methods
+    From version 0.04 of "Params::Coerce", you may now also provide
+    __from_Another_Class methods as well. In the above example, rather then
+    having to define a method in HTML::Location, you may instead define one
+    in URI. The following code has an identical effect.
+
+      # In the package URI
+  
+      # Coerce from a HTML::Location
+      sub __from_HTML_Location {
+            my $Location = shift;
+            return URI->new( $Location->uri );
+      }
+
+    "Params::Coerce" will only look for the __from method, if it does not
+    find a __as method.
+
+  Loading Classes
+    One thing to note with the "__as_Another_Class" methods is that you are
+    not required to load the class you are converting to in the class you
+    are converting from.
+
+    In the above example, HTML::Location does not have to load the URI
+    class. The need to load the classes for every object we might some day
+    need to be coerced to would result in highly excessive resource usage.
+
+    Instead, "Params::Coerce" guarentees that the class you are converting
+    to "will" be loaded before it calls the __as_Another_Class method. Of
+    course, in most situations you will have already loaded it for another
+    purpose in either the From or To classes and this won't be an issue.
+
+    If you make use of some class other than the class you are being coerced
+    to in the __as_Another_Class method, you will need to make sure that is
+    loaded in your code, but it is suggested that you do it at run-time with
+    a "require" if you are not using it already elsewhere.
+
+  Coercing a Parameter
+    The most explicit way of accessing the coercion functionality is with
+    the Params::Coerce::coerce function. It takes as its first argument the
+    name of the class you wish to coerce to, followed by the parameter to
+    which you wish to apply the coercion.
+
+      package My::Class;
+  
+      use URI ();
+      use Params::Coerce '_URI' => 'URI';
+  
+      sub new {
+            my $class = shift;
+        
+            # Take a URI argument
+            my $URI = Params::Coerce::coerce('URI', shift) or return;
+        
+            ...
+      }
+
+    For people doing procedural programming, you may also import this
+    function.
+
+      # Import the coerce function
+      use Params::Coerce 'coerce';
+
+    Please note thatThe "coerce|Params::Coerce" function is the only
+    function that can be imported, and that the two argument pragma (or the
+    passing of two or more arguments to ->import) means something different
+    entirely.
+
+  Importing Parameter Coercion Methods
+    The second way of using Params::Coerce, and the more common one for
+    Object-Oriented programming, is to create method specifically for taking
+    parameters in a coercing manner.
+
+      package My::Class;
+  
+      use URI ();
+      use Params::Coerce '_URI' => 'URI';
+  
+      sub new {
+            my $class = shift;
+
+            # Take a URI as parameter
+            my $URI1 = $class->_URI(shift) or return;
+            my $URI2 = _URI(shift) or return;
+            ...
+      }
+
+  The "from" Constructor
+    From version 0.11 of "Params::Coerce", an additional mechanism is
+    available with the importable "from" constructor.
+
+      package My::Class;
+  
+      use Params::Coerce 'from';
+  
+      package Other::Class;
+  
+      sub method {
+            my $self = shift;
+            my $My   = My::Class->from(shift) or die "Bad param";
+            ...
+      }
+
+    This is mainly a convenience. The above is equivalent to
+
+      package My::Class;
+  
+      use Params::Coerce 'from' => 'Params::Coerce';
+
+    In future versions, this "->from" syntax may also tweak the resolution
+    order of the coercion.
+
+  Chained Coercion
+    While it is intended that Params::Coerce will eventually support
+    coercion using multiple steps, like
+    "<Foo::Bar-"__as_HTML_Location->__as_URI>>, it is not currently capable
+    of this. At this time only a single coercion step is supported.
+
+FUNCTIONS
+  coerce $class, $param
+    The "coerce" function takes a class name and a single parameter and
+    attempts to coerce the parameter into the intended class, or one of its
+    subclasses.
+
+    Please note that it is the responsibility of the consuming class to
+    ensure that the class you wish to coerce to is loaded. "coerce" will
+    check this and die is it is not loaded.
+
+    Returns an instance of the class you specify, or one of its subclasses.
+    Returns "undef" if the parameter cannot be coerced into the class you
+    wish.
+
+TO DO
+    - Write more unit tests
+
+    - Implement chained coercion
+
+    - Provide a way to coerce to string, int, etc that is compatible with
+    overload and other types of things.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Param-Coerce>
+
+    For other issues, contact the maintainer
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2004 - 2006 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,102 @@
+# NAME
+
+POE::Component::Client::eris - POE Component for reading eris events
+
+# VERSION
+
+version 1.4
+
+# SYNOPSIS
+
+POE session for integration with the eris event correlation engine.
+
+    use POE::Component::Client::eris;
+
+    my $eris_sess_id = POE::Component::Client::eris->spawn(
+            RemoteAddress       => 'localhost',     #default
+            RemotePort          => '9514',          #default
+            Alias               => 'eris_client',   #default
+            Subscribe           => [qw(snort dhcpd)],               # REQUIRED (and/or Match)
+            Match               => [qw(devbox1 myusername error)],  # REQUIRED (and/or Subscribe)
+            MessageHandler      => sub { ... },      # REQUIRED
+    );
+    ...
+    POE::Kernel->run();
+
+For use with a server running the POE::Component::Server::eris output.
+
+# EXPORT
+
+POE::Component::Client::eris does not export any symbols.
+
+# FUNCTIONS
+
+## spawn
+
+Creates the POE::Session for the eris correlator.
+
+Parameters:
+    RemoteAddress       => 'localhost',     \#default
+    RemotePort          => '9514',          \#default
+    Alias               => 'eris\_client',   \#default
+    Subscribe           => \[qw(snort dhcpd)\],               \# REQUIRED (and/or Match)
+    Match               => \[qw(devbox1 myusername error)\],  \# REQUIRED (and/or Subscribe)
+    MessageHandler      => sub { ... },      \# REQUIRED
+    ReturnType          => 'hash',           \# default, or 'string'
+
+# BUGS
+
+Please report any bugs or feature requests to
+`bug-poe-component-client-eris at rt.cpan.org`, or through the web interface at
+[http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-Client-eris](http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-Client-eris).
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+# SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc POE::Component::Client::eris
+
+You can also look for information at:
+
+- AnnoCPAN: Annotated CPAN documentation
+
+    [http://annocpan.org/dist/POE-Component-Client-eris](http://annocpan.org/dist/POE-Component-Client-eris)
+
+- CPAN Ratings
+
+    [http://cpanratings.perl.org/d/POE-Component-Client-eris](http://cpanratings.perl.org/d/POE-Component-Client-eris)
+
+- RT: CPAN's request tracker
+
+    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-Client-eris](http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-Client-eris)
+
+- Search CPAN
+
+    [http://search.cpan.org/dist/POE-Component-Client-eris](http://search.cpan.org/dist/POE-Component-Client-eris)
+
+- See also
+
+    [http://search.cpan.org/dist/POE-Component-Server-eris](http://search.cpan.org/dist/POE-Component-Server-eris)
+
+# ACKNOWLEDGEMENTS
+
+# COPYRIGHT & LICENSE
+
+Copyright 2007 Brad Lhotsky, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+# AUTHOR
+
+Brad Lhotsky <brad@divisionbyzero.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Brad Lhotsky.
+
+This is free software, licensed under:
+
+    The (three-clause) BSD License

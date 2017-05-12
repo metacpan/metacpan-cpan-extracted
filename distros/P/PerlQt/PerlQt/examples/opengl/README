@@ -1,0 +1,12 @@
+Before you can run the OpenGL examples, you need to install
+the OpenGL module available on CPAN (http://www.cpan.org)
+
+Latest version is 0.54, as of 09/11/02
+
+Both Smoke and Qt must also have been compiled with OpenGL support.
+
+If your Qt library has OpenGL support but PerlQt complains about lacking
+ methods or classes, check ./configure's config.log file for any
+error that might have occured while detecting your OpenGL settings.
+
+You might also want to check if OpenGL is properly installed on your system.

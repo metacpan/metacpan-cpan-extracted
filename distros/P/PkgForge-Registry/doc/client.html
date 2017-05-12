@@ -1,0 +1,199 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <title>PkgForge Registry - Client Configuration</title>
+  <meta name="author" content="Stephen Quinney">
+</head>
+
+<body>
+
+<h1>Package Forge - Registry Client Configuration</h1>
+
+<p>All access to the Package Forge database is done using
+the <a href="http://search.cpan.org/~timb/DBI/">Perl DBI
+module</a>. Although it is possible to do all queries and updates with
+raw SQL via that module it is not recommended. The PkgForge-Registry
+package comes with a complete set of Perl modules which provide an
+Object-Oriented interface to the registry database using the
+Perl <a href="http://search.cpan.org/~abraxxa/DBIx-Class/">DBIx::Class</a>
+framework. Further to that layer of abstraction PkgForge provides a
+single <code>PkgForge::Registry</code> module which simplifies the
+configuration and loading of the DBIx::Class schema object.</p>
+
+<p>Access to the PkgForge Registry database for each PkgForge handler
+(e.g. the incoming queue processor and the build daemons) can be
+configured in a number of ways. This configuration is done using
+the YAML files stored in the <code>/etc/pkgforge/</code> directory.</p>
+
+<h2>Parameters</h2>
+
+<p>This is the complete list of parameters which can be configured for
+access to the registry database. You only need to specify the database
+name and any others which are appropriate.</p>
+
+<dl>
+  <dt>name</dt>
+  <dd>This is the name of the database. This must be specified.</dd>
+  <dt>host</dt>
+  <dd>This is the host name of the database server. This is optional.</dd>
+  <dt>port</dt>
+  <dd>This is the port number on which the database server is listening. This is optional.</dd>
+  <dt>user</dt>
+  <dd>This is the user name with which to connect to the database. This is optional.</dd>
+  <dt>pass</dt>
+  <dd>This is the password with which to connect to the database. This is optional.</dd>
+</dl>
+
+<h2>Manual Approach</h2>
+
+<p>The simplest approach is where all the necessary configuration for
+registry access is stored in <code>/etc/pkgforge/registry.yml</code>
+which is the default file. In this case the required attributes and
+values are just listed as a simple hash. Here is an example:</p>
+
+<pre>
+--- 
+"host": 'pkgforge'
+"name": 'pkgforge'
+"user": 'pkgforge_admin'
+</pre>
+
+<p>Beyond that, the registry access can be configured via the
+appropriate handler-specific configuration files
+(e.g. <code>/etc/pkgforge/buildd.yml</code>
+or <code>/etc/pkgforge/incoming.yml</code>). Also, in the case of the
+build daemons there is a platform-specific configuration file
+(e.g. <code>/etc/pkgforge/buildd-bressler_sl664.yml</code>), any
+registry information in the platform-specific file will override that
+in the general build configuration file. In this case the
+configuration can be either a string or a reference to a hash. The
+simple string is considered to be the name of an alternative YAML file
+which contains the required access parameters. In the case of the
+reference to a hash, that is used as the set of attributes and values.</p>
+
+<p>Here is an example for the incoming queue processor
+(<code>/etc/pkgforge/incoming.yml</code>). Only the registry section
+is important for this example:</p>
+
+<pre>
+--- 
+"debug": 1
+"init": '/etc/init.d/pkgforge-incoming'
+"keytab": '/etc/pkgforge/pkgforge_incoming.keytab'
+"registry": 
+  "host": 'pkgforge'
+  "name": 'pkgforge'
+  "user": 'pkgforge_incoming'
+"start": 'yes'
+</pre>
+
+<p>Here is an example for a build daemon
+(<code>/etc/pkgforge/buildd.yml</code>). Only the registry section is
+important for this example:</p>
+
+<pre>
+--- 
+"debug": 1
+"init": '/etc/init.d/pkgforge-buildd'
+"keytab": '/etc/pkgforge/pkgforge_builder.keytab'
+"registry": 
+  "host": 'pkgforge'
+  "name": 'pkgforge'
+  "user": 'pkgforge_builder'
+"start": 'yes'
+</pre>
+
+<h2>Configuration using LCFG</h2>
+
+<p>If the LCFG pkgforge component is being used to configure the
+Package Forge handlers then the setup of the registry access is very
+simple. The following LCFG resources allow parameters to be set
+globally:</p>
+
+<ul>
+  <li><code>db_name</code></li>
+  <li><code>db_host</code></li>
+  <li><code>db_port</code></li>
+  <li><code>db_user</code></li>
+  <li><code>db_pass</code></li>
+</ul>
+
+<p>These map directly onto the attributes listed previously. In
+addition to this the <code>db_user</code> and <code>db_pass</code>
+resources can be overridden on a per-handler basis. It is not expected
+that the database name, host or port will need to be altered on a
+per-handler basis.</p>
+
+<p>The <code>lcfg/options/pkgforge-registry.h</code> header contains
+the following default settings for the DB access parameters. The
+following examples show how these can be overridden on a per-handler
+basis. It is expected that normally you would just include the
+appropriate header and no extra configuration would be required for
+the handlers to access the registry.</p>
+
+<pre>
+#include &lt;lcfg/options/pkgforge.h>
+
+!pkgforge.db_name           mSET(pkgforge)
+!pkgforge.db_host           mSET(pkgforge)
+!pkgforge.db_user           mSET(pkgforge_admin)
+</pre>
+
+<p>The <code>lcfg/options/pkgforge-master.h</code> header then
+overrides the user name for the incoming queue processor like
+this:</p>
+
+<pre>
+!pkgforge.db_user_incoming  mSET(pkgforge_incoming)
+</pre>
+
+<p>Similarly the <code>lcfg/options/pkgforge-builder.h</code>
+overrides the user name for the build daemon to be:
+
+<pre>
+!pkgforge.db_user_buildd    mSET(pkgforge_builder)
+</pre>
+
+<h2>Kerberos Access Configuration</h2>
+
+<p>The init-scripts for the PkgForge handlers have support for running
+the k5start daemon to manage a Kerberos credentials cache for each
+handler. This allows the daemons to have Kerberos-authenticated access
+to the registry database. You will need to create a keytab for each
+daemon. The LCFG kerberos component makes this very easy.</p>
+
+<p>Here is an example, using the LCFG kerberos component.</p>
+
+<pre>
+#include &lt;lcfg/options/pkgforge-builder.h>
+
+pkgforge.keytab_buildd      <%pkgforge.configdir%>/pkgforge_builder.keytab
+
+#include &lt;lcfg/options/kerberos-client.h>
+
+!kerberos.keys                       mADD(pkgforge_builder)
+kerberos.keytab_pkgforge_builder     <%pkgforge.keytab_buildd%>
+kerberos.keytabuid_pkgforge_builder  <%pkgforge.user%>
+kerberos.keytabgid_pkgforge_builder  <%pkgforge.group%>
+</pre>
+
+<p>The <code>pkgforge.keytab_buildd</code> resource tells the build
+daemon init-script which keytab should be used when running k5start.</p>
+
+<p>The principal will be named
+like <code>pkgforge_builder/host1.example.org</code>. The principal
+could be manually created and stored into a keytab using
+the <code>kadmin</code> command if you do not wish to use the LCFG
+kerberos component. Note that the UID and GID for the keytab MUST be
+correct or nothing will work.</p>
+
+<p>The keytab file name is passed to the init-script via a sysconfig
+file. For build daemons this
+is <code>/etc/sysconfig/pkgforge-buildd</code> and for the incoming
+queue processor this
+is <code>/etc/sysconfig/pkgforge-incoming</code>. If configuring the
+system manually then the <code>KRB5_KEYTAB</code> shell variable must
+be set in the appropriate sysconfig file.</p>
+
+</body>
+</html>

@@ -1,0 +1,27 @@
+Revision history for Perl extension Plack-Middleware-Bootstrap
+
+0.08 2016-06-09T08:32:35Z
+  - Stringify the response body
+
+0.07 2015-10-06T07:10:36Z
+  - Skip Bootstrapping if content seems compressed (astj++)
+
+0.06 2015-01-13T01:19:06Z
+    - remove content-length header (thanks songmu)
+
+0.05 2014-12-17T00:19:09Z
+    - Update pod
+
+0.04 2014-12-16T01:56:21Z
+    - Fix pod
+
+0.03 2014-12-15T08:57:56Z
+    - Fix markup
+
+0.02 2014-12-15T08:48:59Z
+    - Fix error
+
+0.01 2014-12-15T08:24:56Z
+
+    - original version
+

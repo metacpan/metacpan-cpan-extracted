@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+POP3.pm
+README
+samples/test.perl
+samples/term.perl
+t/01_require.t

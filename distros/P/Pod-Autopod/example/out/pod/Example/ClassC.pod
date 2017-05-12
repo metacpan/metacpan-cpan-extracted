@@ -1,0 +1,41 @@
+=head1 NAME
+
+Example::ClassC - Example Class C
+
+
+=head1 DESCRIPTION
+
+This is class B
+
+
+=head1 METHODS
+
+=head2 foo
+
+ foo($text);
+
+This method is doing foo.
+
+
+ print $this->foo();
+
+
+It is not doing bar, only foo.
+
+
+=over
+
+=item *
+list item a
+
+=item *
+list item b
+
+=back
+
+
+
+
+
+=cut
+

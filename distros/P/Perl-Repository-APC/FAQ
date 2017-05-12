@@ -1,0 +1,55 @@
+=head1 FAQ
+
+=over
+
+=item What is this FAQ about?
+
+This FAQ is about the scripts that come with the Perl::Repository::APC
+module. The README gives an overview, each script has a manpage, and
+this FAQ is about practical usage questions.
+
+=item How portable are these scripts?
+
+File system must be case sensitive because we are patching things as
+they actually happened on the perforce repo. And from tim to time we
+had filenames that conflict with a case tolerant filesystem. Other
+than that everything should be pretty portable.
+
+=item How much disk space do I need to run buildaperl or binsearchaperl?
+
+At the time of this writing (2003-03), the APC contains 18850 patches
+and all directories together occupy on my disk 630 MB. If you want to
+operate on a full APC, you do not need all of this. You only need the
+directories APC/5* and APC/perl-current-diffs. These currently add up
+to 500 MB.
+
+If you only want to examine a subset, you can reduce the disk space
+needed significantly.
+
+The most space on my installation though is not taken by the
+repository mirror but by the cache of installed perls I accumulate
+when I run binsearchaperl regularly. These need unlimited diskspace
+in theory. But the binary search algorithm finds its target with only
+at most 15 compilations if you have no cache, so you can delete the
+cache when you're done and one Gigabyte will suffice to successfully
+run binsearchaperl.
+
+=item How can I run binary searches that need modules from CPAN?
+
+Use the --prep=somescript switch to binsearchaperl. C<somescript> must
+be a script that installs the needed module from CPAN. The output of
+that script is ignored by binsearchaperl.
+
+=item Can I use binsearchaperl with a partial mirror of the APC?
+
+If you want to only track, say, bleadperl, you need to mirror the
+directory associated with bleadperl (at the time of this writing
+5.9.0) and the directory that contains the basis for bleadperl (at the
+time of this writing 5.8.0). See the sample Makefile in the eg
+directory how to create and maintain a custom subset of APC.
+
+=item How can I find out the patch ID of, say perl 5.8.7?
+
+Module::CoreList::patchlevel (given $Module::CoreList::VERSION >= 2.01)
+
+=back

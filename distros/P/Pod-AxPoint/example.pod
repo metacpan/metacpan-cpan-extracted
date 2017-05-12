@@ -1,0 +1,77 @@
+=begin xml
+
+<title>Aus Perl POD HTML Slideshows erzeugen</title>
+<metadata>
+ <speaker>Thomas Linden</speaker>
+ <email>tlinden@cpan.org</email>
+ <organisation>DAEMON.DE</organisation>
+ <link>http://www.daemon.de</link>
+ <bullet level="1">n</bullet>
+ <bullet level="2">l</bullet>
+ <bullet level="3">u</bullet>
+ <bullet level="4">F</bullet>
+ <numbers level="3">item</numbers>
+ <numbers level="4">($a)</numbers>
+</metadata>
+
+=end xml
+
+=head1 POD als Slideshow verwenden
+
+POD ist eine tolle Sprache.
+
+Mit B<pod2axpoint> kann man I<POD> Dateien zu B<XML> convertieren.
+Die Syntax wurde hierbei erweitert, so dass man alle AxPoint
+Features nutzen kann.
+
+Es folgen einige Beispiele:
+
+=head2 Source Code
+
+=begin text
+
+sub formatter_meta {
+  my ($text) = @_;
+  foreach (split /\n\n*/, $text) {
+    next if(/^\s*$/ or /^\s*#/);
+    s/\s*#.*$//; # we support comments
+    my ($tag, $param, $option) = split /\s\s*/;
+    if (! $option) {
+      $option = $param;
+      $param  = "";
+    }
+    print qq(<$tag $param>$option</$tag>\n);
+  }
+}
+
+=end text
+
+=head2 Text Formatierung
+
+B<Fetter Text>
+
+I<Kursiver Text>
+
+ Ein Code Einzeiler.
+
+=head2 Auch Listen gehen
+
+=over
+
+=item Eintrag 1
+
+=item Eintrag 2
+
+=item Eintrag 3
+
+=back
+
+=head2 Oder auch Links
+
+Einfacher Link: L<http://www.daemon.de>.
+
+=head1 Haben Wollen
+
+B<pod2axpoint> ist auf dem CPAN verfuegbar.
+
+=cut

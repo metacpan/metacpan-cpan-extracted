@@ -1,0 +1,33 @@
+PHP-Functions-File version 0.04
+===============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Compress::Zlib
+  LWP::UserAgent
+  File::Spec
+  HTTP::Request
+  HTTP::Response
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by Tomohide Nagashima <tnaga@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either at your option,
+any later version of Perl 5 you may have available.
+
+

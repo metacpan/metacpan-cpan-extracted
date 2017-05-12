@@ -1,0 +1,90 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Formatters</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Formatters</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<B>Formatters:</B>
+<UL>
+<LI><A HREF=plain.html>Plain</A><BR>
+<LI><A HREF=simple.html>Simple</A><BR>
+<LI><A HREF=markup.html>Markup</A><BR>
+</UL>
+<P>
+<A HREF=#options>Options</A>
+
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> has a few formatters,
+which each enable someone to specify what text should appear on a slide.
+<DL>
+<DT>The <B><A HREF=markup.html>markup</A></B> formatter
+<DD>is very close to HTML, but there are a few important differences.
+<DT>The <B><A HREF=simple.html>simple</A></B> formatter
+<DD>is a simplification on the markup-formatter: it is less work
+    to specify lists.
+<DT>The <B><A HREF=plain.html>plain</A></B> formatter
+<DD>is presenting data as typed in.  This does not give nice visual
+    results.
+</DL>
+
+<H2><A NAME=options>General Formatter Options</A></H2>
+
+All formatters share these options:
+<DL>
+<DT><B>-nestIndents =&gt; [ </B> <EM>indent-spec, ...</EM> <B> ] </B>,
+    where indent-spec is <B>[</B> <EM>fontsize, indent-percent</EM> <B>]</B>
+<DD>A list of indentation specifications.  This specifies the size of the
+    font to be used on each level, relative to the level of the enclosing
+    level, and the amount of indentation it has to get.
+    <P>
+    The dots, which are put in front of the list-items are
+    decoration-dependent, so defined in the
+    <A HREF=../decoration/index.html>decoration style-element</A>.
+    <P>
+    If you change this nest description list, you have to specify the whole
+    list again: adding of changing single elements will have effect on
+    slides earlier in the presentation.
+    <P>
+<DT><B>-lineSkip =&gt;</B> <EM>percentage</EM>
+<DD>When a line is left empty (usually at start of a paragraph), that
+    does not mean that it should have to be the font-height: usually less is
+    nicer.  Relative to the height of the running font.
+    <P>
+<DT><B>-listSkip =&gt;</B> <EM>percentage</EM>
+<DD>Extra line-height (relative to the running font) to be made above each
+    list-item.
+    <P>
+<DT><B>-imageHSpace =&gt;</B> <EM>percentage</EM>
+<DD>The amount of space to be left free on the left or right (which is
+    applicable) between the image and text when the image is aligned
+    left or right.  Relative to the screen-width.
+    <P>
+    The bahaviour is different from HTML, where the space is always both
+    left and right of the image.
+    <P>
+<DT><B>-imageVSpace =&gt;</B> <EM>percentage</EM>
+<DD>The amount of space to be left free on the top or bottom (which is
+    applicable).  Only if there is text above or below the image.
+    Relative to the screen-height.
+    <P>
+</DL>
+<P>
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

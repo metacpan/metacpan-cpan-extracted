@@ -1,0 +1,27 @@
+Pod-Simple-Vim
+
+This module converts POD documentation to a format that can be viewed with syntax colouring in the Vim text editor. You need to have the Vim Perldoc plugin installed in order to take advantage of this module.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Pod::Simple::Vim
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Petar Shangov
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

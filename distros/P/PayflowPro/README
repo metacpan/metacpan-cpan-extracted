@@ -1,0 +1,120 @@
+NAME
+    PayflowPro - Library for accessing PayPal's Payflow Pro HTTP interface
+
+SYNOPSIS
+      use PayflowPro qw(pfpro);
+      my $data = {
+        USER=>'MyUserId',
+        VENDOR=>'MyVendorId',
+        PARTNER=>'MyPartnerId',
+        PWD=>'MyPassword',
+
+        AMT=> '42.24',
+        TAXAMT=>'0.00',      # no tax charged, but specifying it lowers cost
+        INVNUM=>$$,
+        DESC=>"Test invoice $$",
+        COMMENT1=>"Comment 1 $$",
+        COMMENT2=>"Comment 2 $$",
+        CUSTCODE=>$$ . 'a' . $$,
+
+        TRXTYPE=>'S',                       # sale
+        TENDER=>'C',                        # credit card
+
+        # Commercial Card additional info
+        PONUM=>$$.'-'.$$,
+        SHIPTOZIP=>'20850', # for AmEx Level 2
+        DESC4=>'FRT0.00',   # for AmEx Level 2
+
+        # verisign tracking info
+        STREET => '123 AnyStreet',
+        CITY => 'Anytown',
+        COUNTRY => 'us',
+        FIRSTNAME => 'Firsty',
+        LASTNAME => 'Lasty',
+        STATE => 'md',
+        ZIP => '20850',
+
+        ACCT => '5555555555554444',
+        EXPDATE => '1009',
+        CVV2 => '123',
+      };
+
+      my $res = pfpro($data);
+
+      if ($res->{RESULT} == 0) {
+        print "Woohooo!  We charged the card!\n";
+      }
+
+DESCRIPTION
+    Interface to HTTP gateway for PayPal's Payflow Pro service. Implements
+    the pfpro() function to simplify replacing the old PFProAPI perl module.
+
+    Methods implemented are:
+
+  pftestmode($testmode)
+    Set test mode on or off. Test mode means it uses the testing server
+    rather than the live one. Default mode is live ($testmode == 0).
+
+    Returns true.
+
+  pfdebug($mode)
+    Set debug mode on or off. Turns on some warn statements to track
+    progress of the request. Default mode is off ($mode == 0).
+
+    Returns current setting.
+
+  pfpro($data)
+    Process request as per hash ref $data. See PFPro API docs on name/value
+    pairs to pass in. All we do here is convert them into an HTTP request,
+    then convert the response back into a hash and return the reference to
+    it. This emulates the pfpro() function in the original API.
+
+    Additionally, we honor a "TIMEOUT" value which specifies the number of
+    seconds to wait for a response from the server. The default is 30
+    seconds. Normally for production you should not need to alter this
+    value. The test servers are slower so may need larger timeout. The
+    minimum value that PayPal will accept is 5 seconds.
+
+    It uses the time and the "INVNUM" (Invoice Number) field of input to
+    generate the unique request ID, so don't try to process the same INVNUM
+    more than once per second. "INVNUM" is a required datum to be passed
+    into this function. Bad things happen if you don't.
+
+    Upon communications failure, it fakes up a response message with
+    "RESULT" = -1. Internally, the library tries several times to process
+    the transaction if there are network problems before returning this
+    failure mode.
+
+    To validate the SSL certificate, you need a ca-bundle file with a list
+    of valid certificate signers. Then set the environment variable
+    HTTPS_CA_FILE to point to that file. This assumes you are using the
+    "Crypt::SSLeay" SSL driver for LWP (should be the default). In your
+    code, add some lines like this:
+
+     # CA cert peer verification
+     $ENV{HTTPS_CA_FILE} = '/path/to/ca-bundle.crt';
+
+    It is likely to be in /etc/ssl or /usr/local/etc/ssl or /usr/local/certs
+    depending on your OS version. The script mk-ca-bundle.pl included with
+    this module can be used to create the bundle file based on the current
+    Mozilla certificate data if you don't already have such a file. One is
+    also included in the source for this module, but it may be out of date
+    so it is recommended that you run the mk-ca-bundle.pl script to ensure
+    you have the latest information. This program is copied from the CURL
+    project "https://github.com/bagder/curl/blob/master/lib/mk-ca-bundle.pl"
+
+    If you do not set HTTPS_CA_FILE it will still work, but you don't get
+    the certificate validation to ensure you're speaking to the authentic
+    site. You will also get in the HTTPS response headers
+
+     Client-SSL-Warning: Peer certificate not verified
+
+    but you'll only see that if you turn on debugging.
+
+AUTHOR
+    Vivek Khera <vivek@khera.org>
+
+LICENSE
+    This module is Copyright 2007-2016 Khera Communications, Inc. It is
+    licensed under the same terms as Perl itself.
+

@@ -1,0 +1,17 @@
+=head1 NAME
+
+Changes - List of significant changes to PostgreSQL::PLPerl::Call
+
+=head2 Changes in 1.006
+
+  Changed SP->foo to PG->foo.
+  Fixed tests.
+  Added documentation on how to enable use in PostgreSQL.
+
+=head2 Changes in 1.005
+
+  Added DBI as prerequisite.
+  Skipped tests if createdb fails (e.g. PostgreSQL not installed)
+	or DBD::Pg isn't available or can't connect.
+
+=cut

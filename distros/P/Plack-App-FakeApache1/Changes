@@ -1,0 +1,74 @@
+Revision history for Plack-App-FakeApache1
+
+0.0.5     2015-11-15 22:41:32+00:00 UTC
+
+ - Merged pull-requests from Paul Cochrane:
+   - #6 replace NoTabsTests
+   - #7 add missing abstracts (for dzil)
+   - #8 add Travis config
+   - #9 purge trailing whitespace
+   - #10 fix POD errors
+   - #11 update dist.ini
+   - #12 add missing strictures
+   - #13 remove shebang in tests
+   - #14 fix typos in POD
+   - #15 fix tests on non-English locales
+   - #16 increase error severity in call handler
+ - Resolve "[PkgVersion] no blank line for $VERSION after package" with dzil prep
+ - add skeleton POD for methods
+   unhelpfully empty but keeps pod-coverage tests happy
+
+0.0.4     2014-01-22 11:35:18 Europe/London
+ - Fall back to SERVER_NAME if HTTP_HOST is not set (ilmari)
+ - Add 'strict' to FakeModPerl1::Server
+
+0.0.3     2013-06-20 12:02:04 Europe/London
+ - add missing 'use Plack::Util' (issue #2)
+ - Update bugtracker to point to github
+
+0.0.2     2013-04-30 17:52:14 Europe/London
+
+ This is a clean-up-and-improve release. A number of issues arose in final
+ stages of a conversion from AP1 - dispatcher logic, strange things, lack of
+ tests. Some of these issues have started to be addressed here.
+
+ - Replace 'use feature :5.10' with 'use 5.10.1'
+ - Fix up dispatch behaviour
+ - Disable half-finished tests
+ - Start writing dispatcher-location test
+ - Add t/50-app test and data
+ - Add tests for ::FakeModPerl1::Dispatcher
+ - Make AP1 Handler croak if we don't have a $app
+ - Add simple Plack::App::FakeApache1 test
+ - Switch to the FakeModPerl1 dispatcher
+ - Remove 'mostly duped and dead' module
+
+0.0.1  2013-04-23 11:09:14 Europe/London
+ - No functional changes; releasing as v0.0.1
+
+0.0.1_05 2012-06-26 10:51:14 Europe/London
+ - add remaining 4xx status codes
+ - add HTTP_OK (200) status code
+
+0.0.1_04  2012-06-20 10:16:03 Europe/London
+ - add [AutoPrereqs] plugin
+
+0.0.1_03  2012-06-19 16:01:37 Europe/London
+ - add missing constants to export list (doh!)
+
+v0.0.1_02 2012-06-19 15:46:57 Europe/London
+ - Add constant: HTTP_METHOD_NOT_ALLOWED (405)
+ - Fix response status with internal server error
+ - Better treatment of $plack->{response}{status}
+ - More sentible behaviour on server/code error
+ - Add support for send_http_header()
+ - Remove pointless 'NO BODY' output
+ - Remove debugger breakpoint
+ - handle_psgi() takes apache config file argument
+ - Remove company-specific modules, env-vars
+
+v0.0.1_01   Wed Apr 18 10:10:26 2012 +0100
+ - Add factored out modules from $myapp
+ - Switch Kwalitee test pluding used with dzil
+ - Continue ripping off Plack::App::FakeApache
+ - Post-minting Initial Commit

@@ -1,0 +1,32 @@
+---
+abstract: "Support module for the 'pegex' CLI command"
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pegex-Cmd
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - example
+requires:
+  App::Cmd: '0'
+  Module::Pluggable: '0'
+  Mouse: '0'
+  MouseX::App::Cmd: '0'
+  Pegex: '0.30'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/pegex-cmd-pm/issues
+  homepage: https://github.com/ingydotnet/pegex-cmd-pm
+  repository: https://github.com/ingydotnet/pegex-cmd-pm.git
+version: '0.26'

@@ -1,0 +1,15 @@
+---
+name: Package-Relative
+version: 0.01
+author: ~
+abstract: Support for '..' style relative paths in perl namespaces.
+license: perl
+requires:
+  perl: >= 5.006
+build_requires:
+  Test::More: 0
+provides:
+  Package::Relative:
+    file: lib/Package/Relative.pm
+    version: 0.01
+generated_by: Module::Build version 0.261

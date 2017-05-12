@@ -1,0 +1,15 @@
+Revision history for Petal::Mail.
+
+0.31 Wed Mar 16 2005
+    - added binmode (SENDMAIL, ":utf8"); to force utf-8 output
+    - removed defunct email address
+
+0.3 Fri Jan 16 2004
+    - repeated tests with input and output set to 'HTML'
+ 
+0.2 Tue Jan  6 2004
+    - Applied William's patch
+    - Added William's tests 
+
+0.1 Fri Oct 31 2003
+    - Initial release

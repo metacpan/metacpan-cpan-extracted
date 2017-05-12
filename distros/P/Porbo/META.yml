@@ -1,0 +1,47 @@
+---
+abstract: 'Porbo HTTP development psgi server'
+author:
+  - 'Uchiko <memememomo@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Requires: '0'
+  Test::TCP: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Porbo
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Handler::Porbo:
+    file: lib/Plack/Handler/Porbo.pm
+  Porbo:
+    file: lib/Porbo.pm
+    version: '0.01'
+  Porbo::Server:
+    file: lib/Porbo/Server.pm
+requires:
+  AnyEvent: '0'
+  HTTP::Status: '0'
+  Plack: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/memememomo/Porbo/issues
+  homepage: https://github.com/memememomo/Porbo
+  repository: git://github.com/memememomo/Porbo.git
+version: '0.01'

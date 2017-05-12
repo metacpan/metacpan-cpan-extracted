@@ -1,0 +1,6 @@
+# Sample config file for "run" program
+queue = gamma
+nodes = [gamma01.clc.cuhk.edu.hk, gamma03.clc.cuhk.edu.hk]
+ppn   = 1
+cput  = 01:00:00
+mem   = 600mb

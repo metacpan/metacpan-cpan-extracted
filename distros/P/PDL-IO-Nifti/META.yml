@@ -1,0 +1,24 @@
+---
+abstract: 'Module to access imaging data using Nifti-1 standard'
+author:
+  - 'Ingo Schmid <ingosch@gmx.at>'
+build_requires:
+  Test::Simple: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.132510'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PDL-IO-Nifti
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  ExtUtils::F77: 0
+  PDL: 0
+  perl: 0
+version: 0.73

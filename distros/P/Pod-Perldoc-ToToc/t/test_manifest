@@ -1,0 +1,5 @@
+load.t
+pod.t
+pod_coverage.t
+example.t
+t/rt/37979.t

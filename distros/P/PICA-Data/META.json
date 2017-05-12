@@ -1,0 +1,66 @@
+{
+   "abstract" : "PICA record processing",
+   "author" : [
+      "Jakob Voß"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.035, Dist::Milla version v1.0.8, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PICA-Data",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.8",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XML::LibXML" : "1.78",
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gbv/PICA-Data/issues"
+      },
+      "homepage" : "https://github.com/gbv/PICA-Data",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gbv/PICA-Data.git",
+         "web" : "https://github.com/gbv/PICA-Data"
+      }
+   },
+   "version" : "0.31",
+   "x_contributors" : [
+      "Jakob Voss <jakob@nichtich.de>",
+      "Jakob Voss <voss@gbv.de>",
+      "Jakob Voß <jakob@nichtich.de>",
+      "Johann Rolschewski <jorol@cpan.org>",
+      "Johann Rolschewski <rolschewski@gmail.com>"
+   ]
+}
+

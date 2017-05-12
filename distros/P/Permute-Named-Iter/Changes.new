@@ -1,0 +1,25 @@
+Revision history for Permute-Named-Iter
+
+0.04    2016-09-26 (PERLANCAR)
+
+	- No functional changes.
+
+        - Fix minor POD formatting.
+
+
+0.03    2016-09-25 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention some other modules & CLI: Set::Product,
+	  Set::CrossProduct, PERLANCAR::Permute::Named, cross, permute-named.
+
+
+0.02    2015-10-01 (PERLANCAR)
+
+	- [Bugfix] Fix endless loop problem when there is only one key.
+
+
+0.01    2015-10-01 (PERLANCAR)
+
+        - First release.

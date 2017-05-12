@@ -1,0 +1,12 @@
+.cvsignore
+Changes
+fake_sendmail.pl
+lib/Petal/Mail.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/001_Formatter_XML.t
+t/002_Sendmail.t
+t/003_unicode.t
+t/data/en.xml
+t/data/news.xml

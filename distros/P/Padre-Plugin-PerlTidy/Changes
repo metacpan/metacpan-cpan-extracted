@@ -1,0 +1,114 @@
+Revision history for Perl extension Padre::Plugin::PerlTidy.
+
+0.22 2012.2.28
+    - Fix missing META.yml RT #75368 (Reported by KENTNL)  (AZAWAWI)
+
+0.21 2012.01.11
+    - Fix packaging issue with 0.20 (AZAWAWI)
+
+0.20 2012.01.11
+    - Tweak to enable selected text to work (BOWTIE, DODATHOME)
+
+0.19 2011.11.24
+    - Restored missing Params::Util dependency (AZAWAWI)
+    - Removed is_padre_plugin dependency (AZAWAWI)
+
+0.18 2011.11.15
+    - Switch to Module::Install (BOWTIE)
+    - Use PerlTidy from trunk/tools #1239 (BOWTIE)
+
+0.17  2011.02.14 
+    - Bumped the version number to reflect the adaptation to the Plugin API so the Plugin Manager shows the version of the plugin (CLAUDIO)
+    - Removed bug broke the plugin (related to perltidyc). 	
+
+0.16   2010.12.06
+    - Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+
+0.15   2010.10.29
+    - Removed Test::NeedsDisplay dependency (AZAWAWI)
+
+0.14   2010.10.27
+    - Fixed t/01-menu.t to work under no DISPLAY (AZAWAWI)
+    - t/00-load.t is magically injected by [@PadrePlugin] via [LoadTests] (AZAWAWI)
+
+0.13   2010.10.25
+    - Switched to Dist::Zilla (AZAWAWI)
+    - Fixed t/00-load.t to work under no DISPLAY (AZAWAWI)
+    - Fix the uninitialized variable warning when tidying an unsaved tab (AZAWAWI)
+    - Updated Arabic translation (AZAWAWI)
+
+0.12  Tue Oct 12 2010
+    - Fix duplicate "my $output" call
+
+0.11  Mon Oct 11 2010
+    - Added translations:
+      - Turkish (BURAK)
+    - When tidying and exporting an unsaved document or text, the tab title is
+      now used instead of the undefined document filename (AZAWAWI)
+    - Prevent the current destructive nature when tidying a non-Perl document
+      or text (AZAWAWI)
+    - Re-used standard Padre's message and error method calls instead of
+      Wx::MessageBox (AZAWAWI, idea from SZABGAB++)
+    - Fixed RT #61993 "Can't tidy code when the bottom pane is off on Padre startup"
+      (AZAWAWI, Reported by RENEEB++)
+
+0.10  Thu Jan 21 2010
+    - A variety of cleanups to use Padre::Current more efficiently (ADAMK)
+    - Added menu separator (ADAMK)
+    - A somewhat cleaner code style that is closer to general conventions (ADAMK)
+    - Added project config file that matches that of Padre itself (ADAMK)
+    - Applied the Perl::Tidy plugin to itself, using the project config (ADAMK, BRICAS)
+    - Added a few more menu tests (BRICAS)
+
+0.09  Thu Jan 14 2010
+    - Fixed #776: PerlTidy needs -nse and -nst options (MRWHIPPLE)
+    - _T() replaced with Wx::gettext() (BRICAS)
+    - Use new project config setting (config_perltidy) if available (BRICAS)
+
+0.08  Mon Aug 17 2009
+    - Center editor on active line after format (claudio)
+    - Make cursor location storage less resource hungry (claudio)
+    - Actually install the translations (RSN)
+    - Added translations:
+      - Japanese (ishigaki)
+    - Updates for latest (0.43) API (BRICAS)
+    - Add pod stubs so pod coverage will pass (BRICAS)
+    - Renamed to the new Padre 0.43 PO naming scheme (azawawi)
+
+0.07  Fri Jun 12 2009
+    - Added translations:
+      - German (hjansen)
+      - Arabic (azawawi)
+      - Spanish (brunov)
+      - Brazilian Portuguese (garu)
+    - Cursor location is kept after cleaning (instead of beginning document).
+      (claudio)
+    - Menu tests are now locale agnostic (BRICAS)
+
+0.06  Wed May 20 2009
+    - Keyboard shortcuts added (claudio)
+    - Added translations:
+      - French (jquelin)
+      - Polish (therek)
+      - Chinese (Traditional) translation (BLUET)
+
+0.05  Mon Feb 09 2009
+    - Use Padre 0.26 API for output window (KAARE)
+    - Move author tests to release time checking (ADAMK + BRICAS)
+
+0.04  Tue Jan 06 2009
+    - Add HTML export feature (HJANSEN)
+    - Capture errors from PerlTidy (HJANSEN)
+    - Update for latest (0.23) API
+
+0.03  Mon Dec 15 2008
+    - Update for latest API
+
+0.02  Thu Nov 27 2008
+    - Use Module::Install::PadrePlugin to allow the user to install the plugin
+      to their local dir
+    - instead of use() Perl::Tidy, require() when needed
+    - Update for the latest plugin system
+
+0.01  Thu Oct 23 2008
+    - original version

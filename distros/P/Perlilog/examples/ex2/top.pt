@@ -1,0 +1,21 @@
+module top;
+
+   reg    clk;
+   reg 	  rst;
+   port   clkrst vars clk:clk, rst:rst;
+         
+   always #5 clk = ~clk;
+    
+   initial
+      begin
+	 // initial values
+	 clk = 0;
+	 
+	 // reset system
+	 rst = 1'b0; // negate reset
+	 #2;
+	 rst = 1'b1; // assert reset
+	 repeat(4) @(posedge clk);
+	 rst = 1'b0; // negate reset
+      end
+endmodule

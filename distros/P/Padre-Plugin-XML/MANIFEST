@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Padre/Plugin/XML/Document.pm
+lib/Padre/Plugin/XML.pm
+lib/Padre/Task/SyntaxChecker/XML.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/pod.t

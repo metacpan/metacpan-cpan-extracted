@@ -1,0 +1,45 @@
+#!/usr/bin/perl -w
+use strict;
+
+use lib qw(blib/lib blib/arch);
+# BEGIN { sub POE::Kernel::TRACE_EVENTS () { 1 };}
+# BEGIN { sub POE::Kernel::TRACE_GARBAGE () { 1 };}
+use POE qw(Session);
+use POE::Component::IKC::Client;
+use POE::Component::IKC::Responder;
+
+my $NAME="Client$$";
+
+my $first=1;
+
+### Send a request to the time-server
+sub server_io
+{
+    my($kernel, $msg)=@_;
+}
+
+$|++;
+print "Creating sessions...\n";
+
+POE::Component::IKC::Client->spawn(
+        unix=>($ENV{TMPDIR}||$ENV{TEMP}||'/tmp').'/userver',    
+        name=>$NAME,
+        subscribe=>[qw(poe://shut-server/Goaway)],
+);
+
+POE::Session->new(
+        _start=>sub 
+        {
+            my($kernel)=$_[KERNEL];
+            $kernel->delay(short_wait=>5);
+        },
+        short_wait=>sub{
+            my($kernel)=$_[KERNEL];
+            warn "telling the foo' to go away\n";
+            $kernel->post(Goaway=>'goaway');
+        }
+    );
+
+print "Running client...\n";
+$poe_kernel->run();
+print "Client stopped\n";

@@ -1,0 +1,191 @@
+Revision history for PortageXS
+
+0.3.1 2013-07-27T08:58:15Z
+ [00 MAJOR Changes]
+ - Guts overhaulled so everywhere file IO was done directly, or via
+   PortageXS::Core::getFileContents, it is instead now done by Path::Tiny.
+ - DirHandle based traversal replaced by Path::Tiny iterate()
+ - Many linewise readers replaced with shorter Path::Tiny->lines
+ - BREAKAGES EXPECED
+ - Primary configuaration code now modularised to MakeConf, and everywhere
+   that used that 'getParamFromFile' previously is now proxied there via
+   pxs->config-getParam()
+ - getPortdir() is now deprecated in favour of the lowercase portdir, which
+   is an inroad to eventually one day using moo lazy accessors.
+ - more dependence on shared configuration for paths, but still warty
+
+ [Dependencies::Added / develop requires]
+ - Test::CPAN::Changes 0.19
+
+ [Dependencies::Added / runtime requires]
+ - IO::Handle
+ - Path::Tiny
+
+ [Dependencies::Removed / runtime requires]
+ - DirHandle
+ - Exporter
+
+ [Documentation]
+ - Code now annotated with MetaPOD
+
+ [Misc]
+ - Examples moved to top level
+
+0.3.0 2013-07-27T06:13:05Z
+ [00 Major Changes]
+ - Color logic factored out into its own module
+ - examples moved top level
+ - Exporter stuff replaced with Roles
+ - Hash is tied to warn about legacy code.
+ - ::UI::Console has most its methods deprecated now
+
+ [Bugfix]
+ - another residual path to make.conf ... better solution still in the
+   works.
+
+ [Dependencies::Added / runtime requires]
+ - Moo 1.000008
+ - Role::Tiny
+ - Role::Tiny::With
+ - Tie::Hash::Method
+
+0.2.12 2013-07-24T06:23:39Z
+ [Bugfix]
+ - Partial solution to b.g.o #264680, bailing on unreadable categories,
+   including non-categories that are also unreadable such as 'package'. Its
+   not ideal, but its better than bailing for a predominant chunk of users.
+
+ [Dependencies::Added / develop requires]
+ - Test::CPAN::Changes 0.19
+
+ [Documentation]
+ - Changelog retroactively touched up to work better with CPAN::Changes
+
+ [Internals]
+ - Refactored body of searchPackages into 2 smaller and more reusable
+   parts.
+
+0.2.11 2013-07-22T15:23:47Z
+ - Package toolkit migrated to Dist::Zilla
+ - b.g.o #437414 Now fixed in the code.
+ - Maintainer/Release of codebase taken up by KENTNL (kentnl@cpan.org)
+ - Codebase published via CPAN
+ - Add PortageXS::Version (taken from CPANPLUS::Dist::Gentoo)
+
+0.2.10 2009-04-15T00:00:00Z
+ - Gentoo v0.02.10
+ - Fixed bug b.g.o #265102
+
+0.2.9 2008-12-01T00:00:00Z
+ - Gentoo v0.02.09
+ - Fixed bugs that occured when using new profiles (2008.0+)
+ - Implemented getPortageMakeParam()
+ - getArch() is now a wrapper for getPortageMakeParam() only
+
+0.2.8 2008-05-12T00:00:00Z
+ - Gentoo v0.02.08
+ - Fixed bug b.g.o #216484 - Affected function: getArch()
+
+0.2.7 2007-05-20T00:00:00Z
+ - Gentoo v0.02.07
+ - Optional parameter repo: getAvailableEbuilds()
+ - New functions: searchPackageByHerd(), searchPackageByMaintainer()
+ - Fixed bug b.g.o #178745 - Affected function: getParamFromFile()
+
+0.2.6 2007-04-19T00:00:00Z
+ - Gentoo v0.02.06
+ - fileBelongsToPackage(): Do not die if CONTENTS file is missing.
+   (Reported by Michael Cummings <mcummings@gentoo.org>)
+ - Speedup functions getFilesOfInstalledPackage(), fileBelongsToPackage()
+ - Source cleanups
+ - New functions: disableColors(), getPackagesFromWorld(),
+   recordPackageInWorld(), removePackageFromWorld()
+ - formatUseflags(): Also handle suffixes (% and *)
+ - added .cache dir to EXCLUDE_DIRS for use with paludis
+ - removed virtual dir from EXCLUDE_DIRS - we actually want virtuals in
+ - getPackagesFromCategory(): - Use PORTDIR by default - New optional
+   parameter to set the repository to use - Check for dirs before trying to
+   access them
+ - searchPackage(): Works - Feel free to use it now.
+ - Fixed bug #175175 - getArch() was not able to resolve the profile path
+   if make.profile was an absolute path
+ - Apply fixes from bug #175175 to getProfilePath(); refactored getArch()
+   and getUsemasksFromProfile()
+ - Make test getPortageXScategorylist() more robust
+
+0.2.5 2007-04-09T00:00:00Z
+ - Gentoo v0.02.05
+ - New functions: getEbuildName(), getUsedescs(), getCategories(),
+   formatUseflags() (from demerge 0.032), sortUseflags(),
+   getUsemasksFromProfile(), getProfilePath(), resetCaches()
+ - Fixed some function descriptions
+ - Moved /etc/portagexs to /etc/pxs for convenience
+ - When initializing also initialise colors and apply NOCOLOR variable
+   setting from make.conf to comply with portage (See `man make.conf` for
+   further information); changes in UI::Console
+ - Implemented caching for getUsedescs(), getHomedir(),
+   getUsemasksFromProfile()
+ - getUsedesc() is only a wrapper for getUsedescs() now
+ - getUsedescs() now accepts an optional parameter that stores
+   'category/package' when looking up local usedescs
+ - searchPackage() is silent now (no more direct output) and supports two
+   search modes
+ - Make formatUseflags() correctly format masked useflags
+ - More / better examples
+ - More tests
+
+0.2.4 2007-03-09T00:00:00Z
+ - Gentoo v0.02.04
+ - Made full category/package-version string mandatory for function
+   getUseSettingsOfInstalledPackage() which otherwise causes odd behaviour
+   in apps such as demerge
+
+0.2.3 2007-02-18T00:00:00Z
+ - Gentoo v0.02.03
+ - New deps: IO::Socket::SSL, Sys::Syslog
+ - New configuration file for the server: /etc/portagexs/portagexsd.conf
+ - Initscript for the server
+ - Runtime optimizations
+ - Basic server and client implemented
+
+0.2.2 2006-11-17T00:00:00Z
+ - Gentoo v0.02.02
+ - New functions: searchPackage(), getReponame(), resolveMirror(),
+   getUsedesc()
+ - New example: searchPackage.pl, resolveMirror.pl, getUsedesc.pl
+ - New module: Useflags.pm
+ - Syntax stuff
+ - Added tests for new functions (left out: searchPackage because it will
+   change in the future; do not use it!)
+
+0.2.1 2006-11-12T00:00:02Z
+ - Gentoo v0.02.01
+ - fix Console.pm functions: printColored, print_ok, print_err, print_info
+ - Do not fail if IUSE/USE-files are missing in
+   getUseSettingsOfInstalledPackage()
+
+0.2.0 2006-11-12T00:00:01Z
+ - Gentoo v0.02
+ - getPackagesFromCategory() was returning a list of categories when given
+   category was empty
+ - handle multiple overlays
+ - getArch() returns ARCH set in system-profile
+
+0.1.0 2006-01-01T00:00:03Z
+ - ( actual timestamp unknown )
+ - Gentoo v0.01
+ - Clean up getEbuildVersion regexp
+ - added tests for getEbuildVersion
+ - fixed test for getPortageXScategorylist
+
+0.0.2 2006-01-01T00:00:02Z
+ - ( actual timestamp unknown )
+ - Gentoo v0.01_p2
+ - New functions: getPortdirOverlay, getHomedir
+
+0.0.1 2006-01-01T00:00:01Z
+ - ( actual timestamp unknown )
+ - Gentoo v0.01_p1
+ - Initial unofficial release (hey.. i could have just touched the
+   'Changes' file ;))
+

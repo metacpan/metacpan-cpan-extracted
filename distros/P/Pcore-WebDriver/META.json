@@ -1,0 +1,54 @@
+{
+   "abstract" : "non-blocking WebDriver protocol implementation",
+   "author" : [
+      "zdm <zdm@softvisio.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "CPAN::Meta version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "version" : 2
+   },
+   "name" : "Pcore-WebDriver",
+   "no_index" : {
+      "directory" : [
+         "share",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "v0.39.0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "v1.51.0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Imager" : "0",
+            "Imager::File::PNG" : "0",
+            "Pcore" : "v0.24.5"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/softvisio/pcore-webdriver/issues?status=new&status=open"
+      },
+      "homepage" : "https://bitbucket.org/softvisio/pcore-webdriver/overview",
+      "repository" : {
+         "type" : "hg",
+         "url" : "https://bitbucket.org/softvisio/pcore-webdriver",
+         "web" : "https://bitbucket.org/softvisio/pcore-webdriver/overview"
+      }
+   },
+   "version" : "v0.7.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

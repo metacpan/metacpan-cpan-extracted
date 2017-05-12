@@ -1,0 +1,12 @@
+Revision History for Perl module Perl6::GatherTake
+
+0.0.3 Thu Jul 17 10:12:32 CEST 2008
+  - Changed homepage in the docs
+  - release without skewed clock (avoid "timestamp in future" errors from
+    make)
+
+0.0.2 Sun Jun  8 14:14:52 CEST 2008
+ - added missing documents to distribution (README, Changes)
+
+0.0.1 Fri Apr  4 12:42:57 CEST 2008
+ - Initial release

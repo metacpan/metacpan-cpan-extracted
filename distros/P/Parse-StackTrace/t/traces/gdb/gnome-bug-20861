@@ -1,0 +1,61 @@
+0x405ebd09 in wait4 ()
+#0  0x405ebd09 in wait4 ()
+#1  0x40646cb8 in   ()
+#2  0x401463d8 in gnome_init ()
+#3  <signal handler called>
+#4  0x8482 in ?? ()
+#5  0x405be9ed in   ()
+#6  0x40563796 in gdk_pixbuf_finalize ()
+#7  0x40563762 in gdk_pixbuf_finalize ()
+#8  0x4056368b in gdk_pixbuf_unref ()
+#9  0x804d090 in   ()
+#10 0x804d24f in   ()
+#11 0x40293e51 in   ()
+#12 0x402c27fc in gtk_signal_remove_emission_hook ()
+#13 0x402c1c65 in gtk_signal_set_funcs ()
+#14 0x402bfd43 in gtk_signal_emit ()
+#15 0x402de98c in gtk_toggle_button_toggled ()
+#16 0x402b2141 in gtk_radio_button_group ()
+#17 0x40293e51 in   ()
+#18 0x402c1aff in gtk_signal_set_funcs ()
+#19 0x402bfd43 in gtk_signal_emit ()
+#20 0x40230b08 in gtk_button_clicked ()
+#21 0x402defcd in gtk_toggle_button_toggled ()
+#22 0x40293e51 in   ()
+#23 0x402c1aff in gtk_signal_set_funcs ()
+#24 0x402bfd43 in gtk_signal_emit ()
+#25 0x40230a48 in gtk_button_released ()
+#26 0x40231a98 in gtk_button_get_relief ()
+#27 0x40293adb in   ()
+#28 0x402c1ca3 in gtk_signal_set_funcs ()
+#29 0x402bfd43 in gtk_signal_emit ()
+#30 0x402f61fb in gtk_widget_event ()
+#31 0x40293a45 in gtk_propagate_event ()
+#32 0x40292c6e in gtk_main_do_event ()
+#33 0x40341097 in gdk_wm_protocols_filter ()
+#34 0x400992b9 in g_get_current_time ()
+#35 0x400998c3 in g_get_current_time ()
+#36 0x40099a5c in g_main_run ()
+#37 0x40292567 in gtk_main ()
+#38 0x4002a555 in capplet_corba_gtk_main ()
+#39 0x40029edc in capplet_gtk_main ()
+#40 0x804fded in main ()
+#41 0x40587a42 in   ()
+#0  0x405ebd09 in wait4 ()
+No symbol table info available.
+#1  0x40646cb8 in   ()
+No symbol table info available.
+#2  0x401463d8 in gnome_init ()
+No symbol table info available.
+#3  <signal handler called>
+No symbol table info available.
+#4  0x8482 in ?? ()
+No symbol table info available.
+#5  0x405be9ed in   ()
+No symbol table info available.
+#6  0x40563796 in gdk_pixbuf_finalize ()
+No symbol table info available.
+#7  0x40563762 in gdk_pixbuf_finalize ()
+No symbol table info available.
+
+

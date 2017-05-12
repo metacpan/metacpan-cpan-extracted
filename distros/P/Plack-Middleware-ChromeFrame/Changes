@@ -1,0 +1,8 @@
+Revision history for Plack-Middleware-ChromeFrame
+
+0.02  Thu Jan 27 01:51:32 UTC 2011
+    - Avoided running app if redirection is performed.
+    - Added check for Opera- older versions masqueraded as IE.
+
+0.01  Sat Jan 22 06:22:21 UTC 2011
+    - Initial distribution.

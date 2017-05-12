@@ -1,0 +1,35 @@
+#-----------------------------------------------------------------
+# Changes for Pod::Strip
+# $Rev: 17 $
+# $Date: 2006-03-20 21:18:35 +0100 (Mon, 20 Mar 2006) $ 
+#-----------------------------------------------------------------
+
+
+1.02    2006-03-20
+  - changed to 'traditional' Makefile.PL creation (easier install)
+    (suggested by Alexandre Masselot <olav@genebio.com>)
+  - clarified and updated some docs
+
+
+1.01    2005-11-07
+  - removed typo in docs (RT #15392 reported by schubiger@cpan.org)
+
+
+1.00    2004-10-05
+  - first release to CPAN
+  - added license to Build.PL
+  - some more changes in Build.PL
+
+
+0.02    2004-09-30
+  - added replace_with_comments, based on patches submitted by
+    John McNamara <jmcnamara@cpan.org>
+  
+
+0.01    2004-04-29
+  - updated docs, tests, MANIFEST, etc
+
+  
+0.00    2004-09-28
+- initial version, done with Module::Starter and some manual tweaking
+

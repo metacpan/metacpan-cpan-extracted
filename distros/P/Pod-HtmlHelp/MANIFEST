@@ -1,0 +1,9 @@
+Changes
+HtmlHelp.pm
+MANIFEST
+Makefile.PL
+README
+SIGNATURE
+WinHtml.pm
+bin/pod2chm
+t/1-basic.t

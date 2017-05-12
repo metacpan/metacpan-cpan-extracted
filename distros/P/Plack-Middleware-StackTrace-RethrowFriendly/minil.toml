@@ -1,0 +1,6 @@
+name = "Plack-Middleware-StackTrace-RethrowFriendly"
+badges = ["travis"]
+authority="cpan:TARAO"
+
+module_maker="ModuleBuildTiny"
+

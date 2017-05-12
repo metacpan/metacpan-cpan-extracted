@@ -1,0 +1,34 @@
+NAME
+    POE::Filter::Slim::CLI - A POE filter for talking with SlimServer over
+    CLI
+
+SYNOPSIS
+        use POE::Filter::Slim::CLI;
+    
+        my $filter    = POE::Filter::Slim::CLI->new();
+        my $arrayref  = $filter->get( [ $line ] );
+        my $arrayref2 = $filter->put( $arrayref );
+
+DESCRIPTION
+    POE::Filter::Slim::CLI handles all the details of SlimServer's CLI
+    protocol. It unescapes and returns results as an arrayref. Requests sent
+    as arrayrefs are translated into the correct escaped format.
+
+    It is a subclass of POE::Filter::Line.
+
+METHODS
+    new Creates a new POE::Filter::Slim::CLI object. There are no arguments.
+
+    get_one
+        Parses CLI lines into arrays.
+
+    put Writes array(s) of CLI requests into escaped strings.
+
+AUTHOR
+    Andy Grundman <andy@slimdevices.com>
+
+SEE ALSO
+    POE
+
+    POE::Filter::Line
+

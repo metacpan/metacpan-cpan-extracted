@@ -1,0 +1,9 @@
+* Better documentation.
+
+* Make CommandFactory command class loading more robust - can
+  sometimes mask real reason why loading failed.
+
+* Add more powerful assertion methods to Command.pm
+  
+* Add web testing support and example.
+

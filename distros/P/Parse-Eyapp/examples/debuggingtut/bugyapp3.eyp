@@ -1,0 +1,8 @@
+# This grammar illustrate the use of 'strict'
+# see http://search.cpan.org/perldoc?Parse::Eyapp::debuggingtut
+# see also file 'bugyapp2.eyp'
+%strict
+%token NUM
+%%
+expr: NUM;
+%%

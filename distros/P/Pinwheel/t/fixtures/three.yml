@@ -1,0 +1,19 @@
+one:
+    anchor: 1
+    non_numeric_id: 'abcdefgh'
+    parent_id: ~
+
+two:
+    anchor: 2
+    parent_id: 'one'
+
+three_with_a_very_long_name:
+    anchor: 3
+    created_on: '2007-01-01 10:20:30'
+    updated_at: '2007-01-01 11:22:33'
+
+four:
+    id: 4
+    parent_id: 'one'
+    anchor: 0
+

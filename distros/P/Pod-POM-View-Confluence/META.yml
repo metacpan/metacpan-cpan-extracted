@@ -1,0 +1,21 @@
+---
+name: Pod-POM-View-Confluence
+version: 0.01
+author:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+abstract: Confluence view of a Pod Object Model
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Pod::POM: 0.17
+build_requires:
+  Test::More: 0
+provides:
+  Pod::POM::View::Confluence:
+    file: lib/Pod/POM/View/Confluence.pm
+    version: 0.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

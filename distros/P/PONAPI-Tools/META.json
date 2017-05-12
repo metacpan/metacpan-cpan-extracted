@@ -1,0 +1,120 @@
+{
+   "abstract" : "PONAPI-Tools - {json:api} document building tools",
+   "author" : [
+      "Mickey Nasriachi <mickey@cpan.org>",
+      "Stevan Little <stevan@cpan.org>",
+      "Brian Fraser <hugmeir@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PONAPI-Tools",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "URI" : "0",
+            "URI::QueryParam" : "0",
+            "parent" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "JSON::MaybeXS" : "0",
+            "Plack::Request" : "0",
+            "Test::Fatal" : "0",
+            "Test::Moose" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PONAPI::Document" : {
+         "file" : "lib/PONAPI/Document.pm",
+         "version" : "0.001002"
+      },
+      "PONAPI::Document::Builder" : {
+         "file" : "lib/PONAPI/Document/Builder.pm",
+         "version" : "0.001002"
+      },
+      "PONAPI::Document::Builder::Document" : {
+         "file" : "lib/PONAPI/Document/Builder/Document.pm",
+         "version" : "0.001002"
+      },
+      "PONAPI::Document::Builder::Errors" : {
+         "file" : "lib/PONAPI/Document/Builder/Errors.pm",
+         "version" : "0.001002"
+      },
+      "PONAPI::Document::Builder::Links" : {
+         "file" : "lib/PONAPI/Document/Builder/Links.pm",
+         "version" : "0.001002"
+      },
+      "PONAPI::Document::Builder::Relationship" : {
+         "file" : "lib/PONAPI/Document/Builder/Relationship.pm",
+         "version" : "0.001002"
+      },
+      "PONAPI::Document::Builder::Resource" : {
+         "file" : "lib/PONAPI/Document/Builder/Resource.pm",
+         "version" : "0.001002"
+      },
+      "PONAPI::Document::Builder::Resource::Identifier" : {
+         "file" : "lib/PONAPI/Document/Builder/Resource/Identifier.pm",
+         "version" : "0.001002"
+      },
+      "PONAPI::Document::Builder::Resource::Null" : {
+         "file" : "lib/PONAPI/Document/Builder/Resource/Null.pm",
+         "version" : "0.001002"
+      },
+      "PONAPI::Document::Builder::Role::HasLinksBuilder" : {
+         "file" : "lib/PONAPI/Document/Builder/Role/HasLinksBuilder.pm",
+         "version" : "0.001002"
+      },
+      "PONAPI::Document::Builder::Role::HasMeta" : {
+         "file" : "lib/PONAPI/Document/Builder/Role/HasMeta.pm",
+         "version" : "0.001002"
+      },
+      "PONAPI::Document::Builder::Role::HasPagination" : {
+         "file" : "lib/PONAPI/Document/Builder/Role/HasPagination.pm",
+         "version" : "0.001002"
+      },
+      "PONAPI::Names" : {
+         "file" : "lib/PONAPI/Names.pm",
+         "version" : "0.001002"
+      },
+      "PONAPI::Tools" : {
+         "file" : "lib/PONAPI/Tools.pm",
+         "version" : "0.001002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/mickeyn/PONAPI/tree/master/Tools"
+      }
+   },
+   "version" : "0.001002",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

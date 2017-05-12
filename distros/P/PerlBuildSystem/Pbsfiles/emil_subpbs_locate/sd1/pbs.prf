@@ -1,0 +1,6 @@
+AddCommandLineSwitches(
+    '-sd /devel/subpbs_locate/sd2',
+    '-sd /devel/subpbs_locate/sd1'
+);
+
+1;

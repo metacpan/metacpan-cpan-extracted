@@ -1,0 +1,28 @@
+Revision history for Perl extension Package::Alias
+
+0.13 Wed Jun 19 10:03:09 PDT 2013
+    - [DEFECT] Restore Changes file - https://rt.cpan.org/Public/Bug/Display.html?id=86261
+    - Added SEE ALSO section to docs.
+
+0.12 Wed Mar 09 00:00:00 PDT 2011
+    - Loads modules automatically - idea from OVID.
+    - [FEATURE] Handle Mouse - JPIERCE - https://rt.cpan.org/Public/Bug/Display.html?id=52314
+    - Use Dist::Zilla. Restructured and simplified distribution.
+    - Tests improved. Coverage 100%.
+
+0.04 Sun Jul 20 21:59:31 PDT 2003
+	- Removed eval
+
+0.03 Thu Jul 17 10:30:54 2003
+	- API change: argument order is reversed to behave like
+	  use constant, and ln(1) syntax.
+	- Added $BRAVE. P::A won't blow away an existing namespace
+	  unless you explicitly tell it to.
+
+0.02 Mon Jan  7 12:49:13 2003
+	- No code changes
+	- Changed documentation per Chip's request.
+	- README not a stub file anymore
+
+0.01 Mon Jan  6 15:10:31 2003
+	- Original version; created by ExtUtils::ModuleMaker 0.204_01

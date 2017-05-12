@@ -1,0 +1,706 @@
+=head1 NOME
+
+perlintro -- una breve introduzione e panoramica del linguaggio Perl
+
+=head2 DESCRIZIONE
+
+Questo documento E<egrave> stato pensato per dare una veloce panoramica
+del linguaggio di programmazione Perl e per fornire riferimenti ad
+ulteriore documentazione. E<Egrave> pensato come una guida di autoapprendimento
+per i neofiti del linguaggio, e fornisce abbastanza informazioni
+per mettervi in grado di leggere codice Perl di altre persone e
+di capire a grandi linee quello che sta facendo, o di scrivere
+semplici script.
+
+Questo documento E<egrave> introduttivo e non mira ad essere completo.
+Nemmeno ad essere del tutto accurato. In alcuni casi la perfezione
+E<egrave> stata sacrificata per riuscire a rendere l'idea. E<Egrave> 
+I<caldamente> consigliato far seguire a questa introduzione 
+la lettura di altre informazioni dal manuale Perl completo, 
+il cui indice puE<ograve> essere trovato in L<perltoc>.
+
+All'interno di questo documento troverete riferimenti ad altre
+parti della documentazione del Perl. Potete leggere tale documentazione
+usando il comando C<perldoc> o qualunque altra cosa stiate utilizzando
+per leggere questo documento.
+
+=head2 Cosa E<egrave> il Perl?
+
+Perl E<egrave> un linguaggio di programmazione general-purpose originariamente
+sviluppato per la manipolazione di testo e usato attualmente per
+un'ampia gamma di compiti quali l'amministrazione di sistema, lo
+sviluppo web, la programmazione di rete, lo sviluppo di GUI e
+altro ancora.
+
+Il linguaggio E<egrave> fatto per essere pratico (facile da usare, efficiente,
+completo) piuttosto che bello (piccolo, elegante, minimale). Le sue
+principali caratteristiche sono la facilitE<agrave> d'uso, il supporto
+per la programmazione procedurale o orientata agli oggetti, la presenza
+di potenti primitive per la manipolazione del testo e il fatto di avere
+una delle piE<ugrave> impressionanti raccolte di moduli prodotti da terze
+parti.
+
+Ulteriori definizioni di Perl vengono date in L<perl>, L<perlfaq1> e senza
+dubbio anche in altri posti. Se ne puE<ograve> dedurre che il Perl E<egrave> 
+percepito in maniera differente da persone differenti, ma che un sacco 
+di persone pensa che valga almeno la pena di occuparsene.
+
+=head2 Lanciare programmi Perl
+
+Per lanciare un programma Perl dalla linea di comando Unix:
+
+	perl nomeprogramma.pl
+
+
+Alternativamente, usate questa come prima linea del vostro
+script:
+
+	#!/usr/bin/env perl
+
+... e lanciate lo script come C</path/dello/script.pl>. Naturalmente,
+prima lo dovrete rendere eseguibile, con C<chmod 755 script.pl>
+(in ambiente Unix).
+
+Per ulteriori informazioni, incluse le istruzioni per altre
+piattaforme quali Windows e Mac OS, leggete L<perlrun>.
+
+=head2 Panoramica della sintassi di base
+
+Uno script o un programma Perl consiste di una o piE<ugrave> istruzioni.
+Queste istruzioni vengono scritte semplicemente nello script una 
+dietro l'altra. Non c'E<egrave> bisogno di avere una funzione C<main()> 
+o cose di questo genere.
+
+Le istruzioni Perl finiscono con un punto e virgola:
+
+	print "Ciao, mondo!";
+
+
+I commenti cominciano con un cancelletto e continuano fino alla fine della
+stringa.
+
+	# Questo e` un commento
+	
+
+Gli spazi sono irrilevanti
+
+	print
+		"Ciao, mondo"
+		;
+		
+...fatta eccezione per quando compaiono all'interno di stringhe.
+
+	# Questo stamperebbe un'interruzione di linea a meta'
+	print "Ciao
+	mondo";
+
+Gli apici doppi o singoli possono essere usati attorno a stringhe di caratteri:
+
+	print "Ciao, mondo";
+	print 'Ciao, mondo';
+	
+PerE<ograve> solo i doppi apici interpretano le variabili e i caratteri come
+i new-line (C<\n>) presenti nella stringa:
+
+	print "Ciao, $nome\n"; 	# Funziona correttamente
+	print 'Ciao, $nome\n'; 	# Stampa $nome\n, cosi' come e` scritto
+
+I numeri non hanno bisogno di essere racchiusi tra virgolette singole o doppie:
+
+	print 42;
+
+Per gli argomenti delle funzioni, potete usare le parentesi
+oppure ometterle, a seconda del vostro gusto personale.
+Sono richieste soltanto a volte, per chiarire questioni di precedenza.
+
+	print("Ciao, mondo");
+	print "Ciao, mondo";
+
+Informazioni piE<ugrave> dettagliate a proposito della sintassi del 
+Perl possono essere trovate in L<perlsyn>.
+
+=head2 Tipi di variabile in Perl
+
+Il Perl ha tre tipi di variabile principali: scalari, array e hash.
+
+=over 4
+
+=item Scalari
+
+Uno scalare rappresenta un singolo valore:
+
+	my $animale = "cammello";
+	my $risposta = 42;
+
+I valori scalari possono essere stringhe, interi o numeri in 
+virgola mobile: Perl convertirE<agrave> automaticamente dall'uno all'altro
+secondo quanto richiesto. Non c'E<egrave> bisogno di predichiarare il
+tipo delle vostre variabili.
+
+I valori scalari possono essere usati in vari modi:
+
+	print $animale;
+	print "L'animale e` un $animale\n";
+	print "Il quadrato di $risposta e` ", $risposta * $risposta, "\n";
+
+C'E<egrave> un certo numero di scalari "magici" con nomi che assomigliano
+a segni di punteggiatura o a rumore su una linea telefonica. Queste
+variabili speciali sono usate per ogni genere di scopi, e sono
+documentate in L<perlvar>. L'unica che serve conoscere, per adesso, E<egrave>
+C<$_>, la "variabile di default". Viene usata come argomento
+di default per molte funzioni, e viene assegnata implicitamente da
+un certo numero di costrutti di iterazione.
+
+	print;		# Stampa il contenuto di $_ per default
+
+=item Array
+
+Un array rappresenta una lista di valori:
+
+    my @animali = ("cammello", "lama", "gufo");
+    my @numeri = (23, 42, 69);
+    my @misto   = ("cammello", 42, 1.23);
+
+Gli array sono indiciati a partire da zero. Ecco come accedere
+agli elementi di un array:
+
+    print $animali[0];              # stampa "cammello"
+    print $animali[1];              # stampa "lama"
+
+La variabile speciale C<$#array> contiene l'indice dell'ultimo
+elemento di un array:
+
+    print $misto[$#misto];       # l'ultimo elemento, stampa 1.23
+
+Potreste essere tentati di usare C<$#array + 1> per sapere quanti
+elementi ci sono in un array. Non ce n'E<egrave> bisogno. Accade infatti che
+usando C<@array> dove il Perl si aspetta di trovare un valore 
+scalare (in altre parole "in un contesto scalare") otterrete il numero
+di elementi nell'array:
+	
+	if ( @animali < 5 ) { ... }
+
+Gli elementi che otteniamo dall'array cominciano con C<$>
+poichE<eacute> stiamo prendendo un singolo valore dall'array -- chiedete
+uno scalare, ottenete uno scalare.
+
+Per ottenere valori multipli da un array:
+
+    @animali[0,1];              # restituisce ("cammello", "lama");
+    @animali[0..2];             # restituisce ("cammello", "lama", "gufo");
+    @animali[1..$#animali];     # restituisce tutto eccetto il primo elemento
+
+Questa si chiama "fetta di array".
+
+Con le liste potete fare diverse cose utili:
+
+    my @ordinati      = sort @animali;
+    my @alla_rovescia = reverse @numeri;
+
+Ci sono inoltre una coppia di array speciali, come C<@ARGV>
+(gli argomenti passati al vostro script tramite la linea di comando)
+e C<@_> (gli argomenti passati ad una subroutine). Sono 
+documentati in L<perlvar>.
+
+=item Hash
+
+Una hash rappresenta un insieme di coppie chiave/valore:
+
+    my %colore_del_frutto = ("mela", "rosso", "banana", "giallo");
+
+Potete usare lo spazio e l'operatore C<< => >> per sistemarli in 
+maniera migliore:
+
+    my %colore_del_frutto = (
+        mela   => "rosso",
+        banana => "giallo",
+    );
+
+Per accedere agli elementi della hash:
+
+    $colore_del_frutto{"mela"};           # restituisce "rosso"
+
+Potete ottenere una lista di chiavi e di valori usando 
+C<keys()> e C<values>.
+
+    my @frutti = keys %colore_del_frutto;
+    my @colori = values %colore_del_frutto;
+
+Le hash non hanno un ordine interno particolare, perE<ograve> 
+potete ordinare le chiavi e iterare tra di esse.
+
+CosE<igrave> come per gli scalari e gli array speciali, ci sono
+anche le hash speciali. La piE<ugrave> conosciuta E<egrave> C<%ENV> che
+contiene le variabili d'ambiente. A questo proposito,
+potete leggere tutto in L<perlvar> (anche per quel che
+riguarda le altre variabili speciali).
+
+=back
+
+Scalari, array e hash sono documentati in maniera piE<ugrave> 
+completa in L<perldata>.
+
+Si possono costruire tipi di dato piE<ugrave> complessi usando 
+le reference, che permettono di costruire liste e hash
+all'interno di liste e hash.
+
+Una reference E<egrave> un valore scalare e puE<ograve> riferirsi a
+qualunque altro tipo di dato. CosE<igrave>, memorizzando una 
+reference come valore di un array o come elemento di una 
+hash, potete facilmente creare liste e hash all'interno
+di altre liste ed hash. Il seguente esempio mostra una
+hash di hash, ottenuta mediante reference anonime ad
+hash.
+
+    my $variabili = {
+        scalare  =>  { 
+                     descrizione => "singolo elemento",
+                     sigil => '$',
+                    },
+        array   =>  {
+                     descrizione => "lista ordinata di elementi",
+                     sigil => '@',
+                    },
+        hash    =>  {
+                     descrizione => "coppie chiave/valore",
+                     sigil => '%',
+                    },
+    };
+
+    print "Gli scalari cominciano con un $variabili->{'scalare'}->{'sigil'}\n";
+
+Informazioni esaustive sulle reference possono essere trovate
+in L<perlreftut>, L<perllol>, L<perlref> e L<perldsc>.
+
+=head2 Scope delle variabili
+
+Nella sezione precedente tutti gli esempi usavano la sintassi:
+
+    my $variabile = "valore";
+
+In effetti, C<my> non E<egrave> richiesto; potreste usare soltanto:
+
+    $var = "value";
+
+Tuttavia, quest'ultima istruzione creerebbe variabili globali:
+E<egrave> una cattiva pratica di programmazione. C<my> invece crea
+variabili con scope lessicale. Lo scope delle variabili si estende
+al blocco (vale a dire un gruppo di istruzioni delimitate da
+parentesi graffe) in cui esse sono definite.
+
+    my $a = "pippo";
+    if ($una_certa_condizione) {
+        my $b = "pluto";
+        print $a;           # stampa "pippo"
+        print $b;           # stampa "pluto"
+    }
+    print $a;               # stampa "pippo"
+    print $b;               # non stampa nulla; $b e` finito fuori dallo scope
+
+Usare C<my> in combinazione con C<use strict;> in cima al proprio
+script Perl significa che l'interprete si accorgerE<agrave> di alcuni
+tipici errori di programmazione. Nell'esempio precedente, il
+C<print $b> finale avrebbe causato un errore nella fase di compilazione
+e avrebbe impedito di lanciare il programma. Usare C<strict> E<egrave> 
+caldamente consigliato.
+
+=head2 Costrutti condizionali e di loop
+
+Il Perl ha molti degli usuali costrutti condizionali e di loop, fatta eccezione
+per il costrutto case/switch (ma se davvero lo volete, c'E<egrave> il modulo
+Switch all'interno di Perl 5.8 e successivi, e su CPAN. Consultate la sezione 
+sui moduli, sotto, per ulteriori informazioni a proposito dei moduli e di CPAN).
+
+Le condizioni possono essere rappresentate da qualunque espressione
+Perl. Confrontate la lista di operatori nella prossima sezione per
+informazioni sugli operatori logici e di confronto, che sono
+comunemente usati nelle istruzioni condizionali.
+
+=over 4
+
+=item if
+
+    if ( condizione ) {
+        ...
+    } elsif ( altra condizione ) {
+        ...
+    } else {
+        ...
+    }
+
+Ce n'E<egrave> anche una versione negata:
+
+	unless ( condizione ) {
+		...
+	}
+	
+E<Egrave> fornita come una versione piE<ugrave> leggibile di C<if (!I<condizione>)>.
+
+Va notato che in Perl le parentesi sono richieste, anche se nel blocco avete 
+una sola linea. Tuttavia, c'E<egrave> un metodo piE<ugrave> furbo per rendere
+piE<ugrave> simili all'inglese i vostri blocchi condizionali costituiti da una 
+sola linea:
+
+    # il modo tradizionale
+    if ($frizzante) {
+        print "Si`!";
+    }
+
+    # la versione "a la Perl", con una post-condizione
+    print "Si`!" if $frizzante;
+    print "Non abbiamo banane" unless $banane;
+
+=item while
+
+    while ( condizione ) {
+        ...
+    }
+
+Ce n'E<egrave> anche una versione negata, per la stessa ragione per cui
+esiste C<unless>:
+
+    until ( condizione ) {
+        ...
+    }
+
+Potete anche usare C<while> in una post-condizione:
+
+    print "LA LA LA\n" while 1;          # ciclo infinito
+
+=item for
+
+Esattamente come in C:
+
+    for ($i=0; $i <= $max; $i++) {
+        ...
+    }
+
+In Perl si ha raramente bisogno del ciclo for in stile C, poichE<eacute>
+il Perl fornisce un metodo piE<ugrave> veloce per iterare su una lista:
+C<foreach>.
+
+=item foreach
+
+    foreach (@array) {
+        print "Questo elemento vale $_\n";
+    }
+
+    # Non siete nemmeno obbligati ad usare il default $_ ...
+    foreach my $chiave (keys %hash) {
+        print "Il valore di $chiave e` $hash{$chiave}\n";
+    }
+
+=back
+
+Per ulteriori dettagli sui costrutti di loop (anche su alcuni che
+non sono stati nominati in questa panoramica), consultate L<perlsyn>.
+
+=head2 Operatori e funzioni
+
+Perl fornisce un'ampia selezione di funzioni builtin. Alcune di
+quelle che abbiamo giE<agrave> visto sono C<print>, C<sort> and C<reverse>.
+All'inizio di L<perlfunc> ce n'E<egrave> una lista e potete facilmente ottenere
+informazioni su ciascuna di esse usando C<perldoc -f I<functionname>>.
+
+Gli operatori sono documentati nei particolari in L<perlop>, ma ecco
+alcuni dei piE<ugrave> comuni:
+
+=over 4
+
+=item Aritmetici
+
+    +   addizione
+    -   sottrazione
+    *   multiplicazione
+    /   divisione
+
+=item Confronto Numerico
+
+    ==  uguaglianza
+    !=  disuaguaglianza
+    <   minore 
+    >   maggiore 
+    <=  minore o uguale 
+    >=  maggiore o uguale 
+
+=item Confronto tra stringhe
+
+    eq  uguaglianza
+    ne  disuguaglianza
+    lt  minore
+    gt  maggiore
+    le  minore o uguale  
+    ge  maggiore o uguale
+
+(PerchE<eacute> esistono confronti numerici e lessicografici separati?
+PerchE<eacute> non abbiamo tipi di variabile speciali, e Perl ha bisogno 
+di sapere se deve ordinare numericamente (il 99 viene prima del
+100) o in maniera lessicografica (e il 100 viene prima del 99).
+
+=item Logica booleana
+
+    &&  and
+    ||  or
+    !   not
+
+(C<and>, C<or> e C<not> non sono soltanto nella tabella come
+descrizione degli operatori -- sono anche supportati come 
+operatori veri e propri. Sono piE<ugrave> leggibili dei corrispondenti
+operatori C-style, ma hanno una precedenza differente rispetto
+a C<&&> e company. Consultate L<perlop> per ulteriori dettagli).
+
+=item Miscellanea
+
+    =   assegnmento
+    .   concatenazione di stringhe
+    x   moltiplicazione di stringhe
+    ..  range operator (crea una lista di numeri)
+
+Molti operatori possono essere messi assieme con un C<=>, come segue:
+
+    $a += 1;        # lo stesso che $a = $a + 1
+    $a -= 1;        # lo stesso che $a = $a - 1
+    $a .= "\n";     # lo stesso che $a = $a . "\n";
+
+=head2 File e I/O
+
+Potete aprire un file per l'input e l'output usando
+la funzione C<open()>. E<Egrave> documentata in maniera tremendamente
+dettagliata in L<perlfunc> e L<perlopentut> ma, in sintesi:
+
+    open(INFILE,  "input.txt")   or die "Non posso aprire input.txt: $!";
+    open(OUTFILE, ">output.txt") or die "Non posso aprire output.txt: $!";
+    open(LOGFILE, ">>my.log")    or die "Non posso aprire logfile: $!";
+
+Potete leggere da un filehandle aperto usando l'operatore C<< <> >>.
+In un contesto scalare legge una singola linea dal filehandle,
+e in un contesto di lista legge l'intero file, assegnando ogni
+linea ad un elemento della lista:
+
+    my $linea = <INFILE>;
+    my @linee = <INFILE>;
+
+La lettura dell'intero file in un colpo solo E<egrave> chiamata 
+I<slurping>. PuE<ograve> essere utile, ma puE<ograve> anche essere 
+uno spreco di memoria. La maggior parte delle elaborazioni
+su file di testo puE<ograve> essere fatta una linea alla volta, 
+usando i costrutti di loop del Perl.
+
+L'operatore C<< <> >> E<egrave> molto spesso usato in un ciclo
+C<while>:
+
+    while (<INFILE>) {     # Ad ogni iterazione assegna una linea del file a $_ 
+        print "Ho appena letto questa linea: $_";
+    }
+
+Abbiamo giE<agrave> visto come stampare sullo standard output
+usando C<print()>. C<print()> puE<ograve> anche accettare, perE<ograve>,
+un parametro opzionale che specifica su quale
+filehandle si deve stampare:
+
+    print STDERR "Questo e` il tuo ultimo avvertimento.\n";
+    print OUTFILE $record;
+    print LOGFILE $messaggio;
+
+Quando avete finito con i vostri filehandle, dovreste
+chiuderli con C<close> (anche se, per la veritE<agrave>, Perl
+metterE<agrave> in ordine le cose al posto vostro se ve lo dimenticate):
+
+    close INFILE;
+
+=head2 Espressioni regolari
+
+Il supporto di Perl per le espressioni regolari E<egrave> allo stesso tempo
+ampio e profondo, ed E<egrave> il soggetto della documentazione che si
+puE<ograve> trovare in L<perlrequick>, L<perlretut> e altrove. Ad ogni modo,
+brevemente:
+
+=over 4
+
+=item Matching semplice
+
+    if (/foo/)       { ... }  # vero se $_ contiene "foo"
+    if ($a =~ /foo/) { ... }  # vero se $a contiene "foo"
+
+L'operatore di sostituzione C<//> E<egrave> documentato in L<perlop>.
+Per default opera su C<$_>, ma puE<ograve> essere "legato" ad un altra
+variabile usando l'operatore di binding, C<=~> (a sua volta
+documentato in L<perlop>).
+
+=item Sostituzioni semplici
+
+     s/pippo/pluto/;               # sostituisce pippo con pluto in $_
+     $a =~ s/pippo/pluto/;         # sostituisce pippo con pluto in $a
+     $a =~ s/pippo/pluto/g;        # sostituisce TUTTE LE OCCORRENZE di pippo con pluto in $a
+
+L'operatore di sostituzione C<s///> E<egrave> documentato in L<perlop>.
+
+=item Espressioni regolari piE<ugrave> complesse
+
+Non E<egrave> necessario che facciate matching con stringhe fisse.
+In effetti, potete fare matching con tutto quello che vi passa
+per la testa, usando espressioni regolari piE<ugrave> complesse.
+Sono documentate in dettaglio in L<perlre>, ma nel frattempo ecco
+un piccolo schema riassuntivo:
+
+    .                   un singolo carattere
+    \s                  un carattare 'blank' (spazio, tab, newline)
+    \S                  un carattere non-'blank'
+    \d                  una cifra (0-9)
+    \D                  un carattare che non sia una cifra
+    \w                  un carattere alfanumerico (a-z, A-Z, 0-9, _)
+    \W                  un carattere non alfanumerico
+    [aeiou]             corrisponde ad un singolo carattere nell'insieme dato
+    [^aeiou]            corrisponde ad un singolo carattere nel complemento dell'insieme dato
+    (foo|bar|baz)       corrisponde ad una qualunque delle alternative specificate
+
+    ^                   inizio della stringa
+    $                   fine della stringa
+
+I quantificatori possono essere utilizzati per specificare quante
+volte volete che l'ultima "cosa" menzionata venga matchata, dove
+"cosa" sta a significare un singolo carattere, uno dei metacaratteri
+appena elencati, oppure un gruppo di caratteri o metacaratteri fra
+parentesi.
+
+    *                   zero o piu` occorrenze dell'ultimo elemento
+    +                   una o piu` occorrenze dell'ultimo elemento
+    ?                   zero o una occorrenza dell'ultimo elemento
+    {3}                 esattamente 3 occorrenze dell'ultimo elemento
+    {3,6}               tra le 3 e le 6 occorrenze dell'ultimo elemento
+    {3,}                3 o piu` occorrenze dell'ultimo elemento
+
+Alcuni brevi esempi:
+
+    /^\d+/              la stringa comincia con uno o piu` caratteri
+    /^$/                non c'e` nulla nella stringa (inizio e fine sono adiacenti)
+    /(\d\s){3}/         tre cifre, ognuna seguita da uno spazio (ad es. "3 4 5 ")
+    /(a.)+/             una stringa nella quale ogni carattere in posizione dispari 
+                        e` una 'a' (ad es. "abacadaf")
+
+    # Questo ciclo legge da STDIN, e stampa tutte le righe non-vuote:
+    while (<>) {
+        next if /^$/;
+        print;
+    }
+
+=item Parentesi per "catturare"
+
+Oltre che per raggruppare, le parentesi servono ad un altro scopo.
+Possono essere utilizzate per catturare i risultati del matching 
+dell'espressione regolare, per uso futuro.
+I risultati finiscono in C<$1>, C<$2> e cosE<igrave> via.
+
+    # una maniera semplice e sporca per spezzare un indirizzo email in due parti
+
+    if ($email =~ /([^@])+@(.+)/) {
+        print "Il nome utente e` $1\n";
+        print "Il nome dell'host e` $2\n";
+    }
+
+=item Altre caratteristiche delle espressioni regolari
+
+Le espressioni regolari supportano i riferimenti all'indietro
+(backreference), quelli in avanti (lookahead) e qualunque tipo piE<ugrave>
+complesso di dettagli. Leggete L<perlrequick>, L<perlretut>, L<perlre>.
+
+=back
+
+=head2 Scrivere subroutine
+
+Scrivere subroutine E<egrave> facile:
+
+    sub log {
+        my $messaggiodilog = shift;
+        print LOGFILE $messaggiodilog;
+    }
+
+Cos'E<egrave> quello C<shift>? Gli argomenti per una subroutine sono
+disponibili in uno speciale array chiamato C<@_> (consultate 
+L<perlvar> per altre informazioni in proposito). L'argomento di
+default della funzione C<shift> E<egrave> C<@_>.
+Quindi C<my $messaggiodilog = shift;> toglie il primo elemento fuori 
+dalla lista e lo assegna a C<$messaggiodilog>.
+
+Si puE<ograve> manipolare C<@_> anche in altri modi:
+
+    my ($messaggiodilog, $priorita) = @_;       # comune
+    my $messaggiodilog = $_[0];                 # poco comune, e orribile
+
+Le subroutine possono anche restituire valori:
+
+    sub square {
+        my $num = shift;
+        my $result = $num * $num;
+        return $result;
+    }
+
+Per ulteriori informazioni sulla scrittura di subroutine,
+si veda L<perlsub>.
+
+=head2 Perl OO
+
+La programmazione orientata agli oggetti in Perl E<egrave> relativamente 
+semplice ed E<egrave> implementata usando delle reference che sono a 
+conoscenza di che tipo di oggetto sono, basata sul concetto dei package 
+del Perl. Ad ogni modo, la programmazione orientata agli oggetti in Perl 
+va ampiamente al di lE<egrave> dello scopo di questo documento.
+Leggete L<perlboot>, L<perltoot>, L<perltooc> e L<perlobj>.
+
+Come programmatori Perl alle prime armi, l'uso piE<ugrave> comune della 
+programmazione orientata agli oggetti in Perl che potete fare sarE<agrave> 
+nell'utilizzo di moduli di terze parti, che E<egrave> documentato di seguito.
+
+=head2 Usare i moduli Perl
+
+I moduli Perl forniscono una serie di caratteristiche per aiutarvi a non
+reinventare la ruota, e possono essere scaricati da CPAN
+( http://www.cpan.org ). Un certo numero di moduli di uso comune E<egrave> 
+incluso nella stessa distribuzione di Perl.
+
+Le categorie spaziano dalla manipolazione del testo ai protocolli
+di rete, dall'integrazione con database alla grafica. Anche una lista di
+moduli per categoria E<egrave> disponibile tramite CPAN.
+
+Per imparare ad installare i moduli scaricati da CPAN, leggete
+L<perlmodinstall>.
+
+Per imparare ad utilizzare un dato modulo, usate 
+C<perldoc I<Nome::Modulo>>. Tipicamente si tratterE<agrave> di 
+C<use Nome::Modulo>, che vi darE<agrave> accesso alle funzioni esportate o ad
+un'interfaccia ad oggetti al modulo.
+
+L<perlfaq> contiene domande e risposte relative a molti compiti
+comuni, e spesso fornisce suggerimenti sui moduli CPAN validi da usare.
+
+L<perlmod> descrive i moduli Perl in generale. L<perlmodlib>
+elenca i moduli che vengono forniti con la distribuzione Perl
+standard.
+
+Se sentite il bisogno di scrivere moduli Perl, L<perlnewmod>
+vi darE<agrave> buoni consigli.
+
+=head1 AUTORE
+
+Kirrily "Skud" Robert <skud@cpan.org>
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlintro
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Stefano Rodighiero E<lt>larsen at perl.itE<gt>.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

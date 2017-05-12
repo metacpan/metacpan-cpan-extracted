@@ -1,0 +1,45 @@
+---
+abstract: 'Git Smart HTTP Server PSGI(Plack) Implementation'
+author:
+  - 'Ryuzo Yamamoto <ryuzo.yamamoto@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  File::Copy::Recursive: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.1, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-App-GitSmartHttp
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::App::GitSmartHttp:
+    file: lib/Plack/App/GitSmartHttp.pm
+    version: '0.07'
+requires:
+  Cwd: '0'
+  File::Spec: '0'
+  File::Which: '0'
+  File::chdir: '0'
+  HTTP::Date: '0'
+  IO::Uncompress::Gunzip: '2.055'
+  IPC::Open3: '0'
+  Plack: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/dragon3/Plack-App-GitSmartHttp/issues
+  homepage: https://github.com/dragon3/Plack-App-GitSmartHttp
+  repository: git://github.com/dragon3/Plack-App-GitSmartHttp.git
+version: '0.07'

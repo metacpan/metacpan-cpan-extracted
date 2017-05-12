@@ -1,0 +1,156 @@
+#!/usr/bin/perl
+my $RCS_Id = '$Id: font2pfa.pl,v 1.7 2000-02-04 10:32:30+01 jv Exp $ ';
+
+# Author          : Johan Vromans
+# Created On      : Fri Dec 20 16:21:21 2002
+# Last Modified By: Johan Vromans
+# Last Modified On: Fri Dec 20 17:04:07 2002
+# Update Count    : 17
+# Status          : Released
+
+################ Common stuff ################
+
+use strict;
+my $my_package = 'Sciurix';
+my ($my_name, $my_version) = $RCS_Id =~ /: (.+).pl,v ([\d.]+)/;
+$my_version .= '*' if length('$Locker:  $ ') > 12;
+
+################ Program parameters ################
+
+use Getopt::Long 2.00;
+my $output;
+my $verbose = 0;
+my $afm = 0;
+my ($debug, $trace) = (0, 0);
+options ();
+
+################ Presets ################
+
+use PostScript::Font::TTtoType42;
+
+################ The Process ################
+
+my $font = new PostScript::Font::TTtoType42::
+  ($ARGV[0],
+   debug => $debug,
+   trace => $trace,
+   verbose => $verbose);
+
+die("$font: Error opening\n") unless $font;
+
+if ( defined $output ) {
+    open (STDOUT, ">$output") || die ("$output: $!\n");
+}
+print STDOUT ($afm ? ${$font->afm_as_string} : ${$font->as_string});
+
+################ Subroutines ################
+
+sub options {
+    my $help = 0;		# handled locally
+    my $ident = 0;		# handled locally
+
+    # Process options.
+    if ( @ARGV > 0 && $ARGV[0] =~ /^[-+]/ ) {
+	usage ()
+	    unless GetOptions ("ident"		=> \$ident,
+			       "verbose"	=> \$verbose,
+			       "output=s"	=> \$output,
+			       "afm"		=> \$afm,
+			       "trace"		=> \$trace,
+			       "help"		=> \$help,
+			       "debug"		=> \$debug)
+		&& !$help;
+    }
+    print STDERR ("This is $my_package [$my_name $my_version]\n")
+	if $ident;
+    usage () unless @ARGV <= 1;
+    @ARGV = ("-") unless @ARGV;
+}
+
+sub usage {
+    print STDERR <<EndOfUsage;
+This is $my_package [$my_name $my_version]
+Usage: $0 [options] [input-file]
+    -output XXX		sends output to file XXX instead of standard output
+    -help		this message
+    -ident		show identification
+    -verbose		verbose information
+EndOfUsage
+    exit 1;
+}
+
+=pod
+
+=head1 NAME
+
+ttfwrapper - wraps a True Type font into PostScript Type42 format
+
+=head1 SYNOPSIS
+
+  ttfwrapper [options] [input]
+
+    -output XXX		writes output to file XXX instead of standard output
+    -afm		writes metrics (AFM) instead of the Type42 data
+    -help		this message
+    -ident		show identification
+    -verbose		verbose information
+
+=head1 DESCRIPTION
+
+B<ttfwrapper> converts a True Type font to PostScript font.
+
+The program takes, as command line argument, the name of a True Type
+font file. The font data will be wrapped in Type42 format and written
+to the output.
+
+B<ttfwrapper> depends on the capabilities of the modules 
+C<PostScript::Font> and C<Font::TTF>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-output> filename
+
+Writes the output to the named file. If this option is omitted, output
+is sent to standard output.
+
+=item B<-afm>
+
+Output the font metrics in AFM format.
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-ident>
+
+Prints program identification.
+
+=item B<-verbose>
+
+More verbose information.
+
+=back
+
+=head1 AUTHOR
+
+Johan Vromans, Squirrel Consultancy <jvromans@squirrel.nl>
+
+=head1 COPYRIGHT and DISCLAIMER
+
+This program is Copyright 2002,1999 by Squirrel Consultancy. All
+rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of either: a) the GNU General Public License as
+published by the Free Software Foundation; either version 1, or (at
+your option) any later version, or b) the "Artistic License" which
+comes with Perl.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See either the
+GNU General Public License or the Artistic License for more details.
+
+=cut

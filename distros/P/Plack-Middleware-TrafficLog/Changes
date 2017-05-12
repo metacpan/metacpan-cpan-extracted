@@ -1,0 +1,33 @@
+0.0401  2015-10-14      Piotr Roszatycki <dexter@cpan.org>
+
+* Bugfix for typo that shows some warnings on Perl 5.22.
+
+0.0400  2014-06-28      Piotr Roszatycki <dexter@cpan.org>
+
+* POSIX::strftime::Compiler replaces POSIX::strftime::GNU
+
+0.0300  2014-06-28      Piotr Roszatycki <dexter@cpan.org>
+
+* The body of request and response is not logged by default.
+* New option: with_all_chunks. For streaming reponses only first chunk is
+  logged by default.
+* Requires POSIX::strftime::GNU
+
+0.0202  2012-08-17      Piotr Roszatycki <dexter@cpan.org>
+
+* Correct timezone on systems where strftime doesn't support %z.
+* Log also REMOTE_PORT if is defined.
+
+0.0201  2012-08-08      Piotr Roszatycki <dexter@cpan.org>
+
+* Log responses without body.
+* Log correctly responses with unknown status.
+
+0.02    2012-08-07      Piotr Roszatycki <dexter@cpan.org>
+
+* Delayed and streamed reponses are now supported.
+* Build does not require Test::Exception.
+
+0.01    2012-08-07      Piotr Roszatycki <dexter@cpan.org>
+
+* First CPAN release.

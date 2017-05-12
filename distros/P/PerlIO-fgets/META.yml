@@ -1,0 +1,28 @@
+---
+abstract: 'Provides a C<fgets()> like function for PerlIO file handles'
+author:
+  - 'Christian Hansen C<chansen@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  IO::File: 0
+  Test::HexString: 0
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PerlIO-fgets
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/chansen/p5-perlio-fgets
+version: 0.02

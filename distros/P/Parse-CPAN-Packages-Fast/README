@@ -1,0 +1,22 @@
+Parse::CPAN::Packages::Fast
+---------------------------
+
+Interface to CPAN's package index file.
+
+This is a reimplementation of the existing Parse::CPAN::Packages
+module. It tries to be largely API compatible while being notably
+faster.
+
+To install, do
+
+    cpan .
+
+or if CPAN.pm is too old or not configured correctly, do alternatively
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Send suggestions, bug reports etc. to Slaven Rezic (srezic at cpan dot
+org).

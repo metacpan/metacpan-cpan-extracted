@@ -1,0 +1,13 @@
+=pod
+
+http://www.example.com/
+https://www.foobar.com/
+http://www.google.com/
+ftp://www.example.com/
+http://www.google.com/search?q=example.com
+
+=for stop_uris google.com
+
+http://www.google.com/images
+
+=cut

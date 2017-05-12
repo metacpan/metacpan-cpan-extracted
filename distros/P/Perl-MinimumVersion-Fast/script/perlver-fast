@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Perl::MinimumVersion::Fast;
+
+if (@ARGV) {
+    for (@ARGV) {
+        my $v = Perl::MinimumVersion::Fast->new($_);
+        printf "%s: %s\n", $_, $v->minimum_version;
+    }
+} else {
+    my $src = join("", <>);
+    my $v = Perl::MinimumVersion::Fast->new($src);
+    printf "%s: %s\n", $_, $v->minimum_version;
+}

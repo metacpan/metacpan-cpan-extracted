@@ -1,0 +1,111 @@
+=for advent_year 2008
+
+=for advent_day 32
+
+=for advent_title This is a sample
+
+=for advent_author David Westbrook
+
+=for a_non_existent_target some value
+
+=begin quote
+
+First a quote section.
+
+Second verse.
+
+=end quote
+
+B<See the L<sample.pod> file that this HTML was generated from.>
+
+Then an A<http://www.example.com/foo/bar.txt|Example Link>
+for a M<Pod::Simple> module.  See also M<Pod::Simple::Subclassing>.
+Now we mention M<Pod::Simple> again.
+Now we talk about a F<data.txt> file.
+And our copy of L<data.txt>.
+And a plain A<http://www.example.com> a/href.
+
+And some foot-noted text.N<f1>
+
+=head1 BIG Header (1)
+
+=head2 normal header (2)
+
+=head3 little header (3)
+
+=head4 littlest header (4)
+
+=head2 Other tags
+
+Regular B<bold> and I<italics> work too.
+
+And in-line code such as this C<my $foo=Bar-E<gt>new()> snippet.
+
+And regular pod Verbatim is treated as code:
+
+  my $x = $y;
+  $x += 3;
+
+=head2 More code examples
+
+Just a code snippet:
+
+=begin code
+
+foreach my $foo ( @bar ){
+  print $foo;
+}
+
+my $x;
+
+=end code
+
+A code snippet w/line numbers:
+
+=begin codeNNN
+
+foreach my $foo ( @bar ){
+  print $foo;
+}
+
+my $bar;
+
+=end codeNNN
+
+And code sourced from the L<sample.pl> file:
+
+=sourcedcode sample.pl
+
+And a specific link to A<#sample.pl.3|the third line>.
+
+And just &lt;pre&gt; tag stuff, e.g. for output or data.
+
+mispelling example. repeating mispelling.
+
+=begin pre
+
+This is just preformatted
+       t
+         e
+           x
+             t.
+Which is good for output examples.
+
+and more output
+
+=end pre
+
+=begin eds
+
+Editorial section
+
+Testing B<bold> and I<italics> and M<Foo::Bar> module link
+
+=end eds
+
+=begin footnote f1
+
+This is the first footnote.
+
+=end footnote
+

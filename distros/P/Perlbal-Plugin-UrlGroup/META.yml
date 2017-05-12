@@ -1,0 +1,30 @@
+---
+abstract: 'let URL match it in regular expression'
+author:
+  - 'Atsushi Kobayashi  C<< <nekokak __at__ gmail dot com> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.94
+  Test::TCP: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.95'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perlbal-Plugin-UrlGroup
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Filter::Util::Call: 0
+  Perlbal: 0
+  URI::Escape: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/nekokak/Perlbal-Plugin-UrlGroup.git
+version: 0.03

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?> 
+
+<!--
+###############################################################################
+#
+# @(#)hello.pnlp	1.7 02/09/11
+#
+# PNLP File for Hello Demo Application
+#
+###############################################################################
+ -->
+
+
+<pnlp spec="0.1"
+      codebase="http://localhost/perlwebstart/apps"
+      href="hello.pnlp">
+   <information> 
+      <title>Hello App</title> 
+      <vendor>Some Vendor</vendor>
+      <homepage href="http://localhost/perlwebstart/demos.html"/>
+      <description>Hello Demo Description</description>
+   </information> 
+   <resources>
+      <perlws version="0.1"/>
+      <par href="C.par" />
+      <par href="A.par" />
+   </resources>
+   <application-desc main-par="A">
+   <argument>one</argument>
+   <argument>-two three</argument>
+   </application-desc>
+</pnlp> 

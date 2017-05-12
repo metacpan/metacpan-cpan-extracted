@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+SIGNATURE
+lib/Pod/XPath.pm
+t/00load.t
+t/01pod.t
+t/03xpaths.t
+t/04module.t
+t/data/xml.pod
+t/data/xml.xml
+t/data/urifind.pod
+META.yml                                Module meta-data (added by MakeMaker)

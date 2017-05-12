@@ -1,0 +1,49 @@
+Things I can't/don't want to do
+
+1. Make pods2html emit a frameset with the index in one frame and
+the POD in the other.
+
+This is an easy hack on pods2html for anyone who wants it.
+If people want lots of hacks like this, it might be worth adding
+hooks to pods2html to support them.
+
+
+2. Remove the ($] >= 5.005 ? key from Makefile.PL
+I had a complaint that this syntax breaks on Cygwin, but I can no
+longer contact the person who reported it to confirm the problem.
+
+
+3. Generate an index and TOC in the sytle of Marek::Pod::Html
+This is
+- beyond the scope of POD
+- beyond the scope of Pod::Tree
+
+
+4. XHTML support
+I've had a request for XHTML compliance.
+I thought this would be easy
+- downcase all the tags
+- maybe a few other tweaks
+
+However, Pod::Tree::HTML uses HTML::Stream to emit the HTML, so doing
+this means either hacking or replacing that module. I don't want to do
+the first, and the second is a big job.
+
+
+5. Solaris problem
+A test failure on Solaris that I don't understand and probably can't
+reproduce. This may be another example of the $Config{perlpath} vs.
+perl problem.
+  
+
+6. Complaint of -w warnings on empty paragraphs
+I can't reproduce this, and I haven't been able to contact the
+reporter. 
+
+
+7. HTML classes for CSS
+I have a request to specify HTML classes to support CSS. It's not hard
+to do, but it bulks up both the code and the generated HTML, and it
+isn't clear that it gains anything. Style sheets can use HTML element
+names as selectors. POD is so simple that I don't think there are any
+HTML elements that are used in more than one context.

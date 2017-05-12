@@ -1,0 +1,36 @@
+There are Proc::Application::* files. 
+
+example of Proc::Application usage:
+
+package Program;
+use Proc::Application;
+@Program::ISA = qw(Proc::Application);
+sub main { print "Done\n"; sleep ( 1000 ); }
+sub options
+{
+    my $this = shift;
+    $options = $this->SUPER::options();
+    $options->{test} = { template => 'test=s',
+                         description => 'tralivali' };
+    $options;
+}
+
+package main;
+Program->new->run();
+
+example of Proc::Application::Daemon usage:
+
+package Program;
+use Proc::Application::Daemon;
+use base qw(Proc::Application::Daemon);
+sub handler 
+{ 
+    my ( $this, $socket ) = @_;
+    $socket->print ( "done\n" );
+    $this->log->warning ( "warning" );
+    $this->log->notice  ( "notice"  );
+    $this->log->error   ( "error"   );
+    die "fatal";
+}
+package main;
+Program->new->run();

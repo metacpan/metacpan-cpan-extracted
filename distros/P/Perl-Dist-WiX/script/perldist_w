@@ -1,0 +1,187 @@
+#!/usr/bin/perl
+
+use 5.008001;
+use strict;
+use warnings;
+use Params::Util qw{ _IDENTIFIER };
+use Pod::Usage;
+use Getopt::Long qw();
+use URI;
+
+our $VERSION = '1.100';
+our $VERSION_STRING = $VERSION;
+$VERSION = eval $VERSION_STRING;
+
+# Show usage
+unless ( @ARGV ) {
+	pod2usage( {
+		-exitstatus => 1,
+		-verbose    => 0,
+	} );
+	exit(1);
+}
+
+#####################################################################
+# Handle Options
+
+
+my $BINARY_ROOT  = undef;
+my $PORTABLE     = undef;
+my $PERL_VERSION = undef;
+my $CPAN         = undef;
+my $OUTPUT       = undef;
+my $FORCE        = undef;
+my $TRACE        = undef;
+my $OFFLINE      = undef;
+my %OPTIONS_IN;
+my $result       = Getopt::Long::GetOptions(
+	"binary_root=s"  => \$BINARY_ROOT,
+	"portable"       => \$PORTABLE,
+	"perl_version=s" => \$PERL_VERSION,
+	"cpan=s"         => \$CPAN,
+	"output=s"       => \$OUTPUT,
+	"force!"         => \$FORCE,
+	"trace=i"        => \$TRACE,
+	"offline!"       => \$OFFLINE,
+	"option=s"       => \%OPTIONS_IN,
+	"help|?"         => sub { pod2usage(-exitstatus => 1, -verbose => 0); },
+	"man"            => sub { pod2usage(-exitstatus => 1, -verbose => 2); },
+	"usage"          => sub { usage(); },
+	"version"        => sub { version(); }
+);
+
+# Did we get a valid file as the first param?
+unless ( $ARGV[0] ) {
+	print "Did not get a distribution name\n";
+	exit(0);
+}
+
+# Get the distribution class name
+my $class = $ARGV[0];
+if ( _IDENTIFIER($class) ) {
+	# Simple name like "Vanilla"
+	$class = "Perl::Dist::$class";
+}
+eval "require $class;";
+if ( $@ ) {
+	die "Failed to load $class: $@";
+}
+unless ( $class->isa('Perl::Dist::WiX') ) {
+	die "$class is not a Perl::Dist::WiX subclass";
+}
+
+# Generate options and hand off to the class
+my %options = (
+	# Perl may not build properly under
+	# a directory with spaces in it.
+	temp_dir => 'C:\\tmp',
+	# Force perl only by default.
+	forceperl => 1,
+);
+if ( defined $PERL_VERSION ) {
+	$options{perl_version} = $PERL_VERSION;
+}
+if ( defined $CPAN ) {
+	$options{cpan} = URI->new( $CPAN );
+}
+if ( defined $BINARY_ROOT ) {
+	$options{binary_root} = $BINARY_ROOT;
+}
+if ( defined $FORCE ) {
+	$options{force} = 1;
+}
+if ( defined $PORTABLE ) {
+	$options{portable} = 1;
+}
+if ( defined $TRACE ) {
+	$options{trace} = $TRACE;
+}
+if ( defined $OFFLINE ) {
+	$options{offline} = 1;
+}
+if ( %OPTIONS_IN ) {
+	print "Additional options added.\n";
+	%options = ( %options, %OPTIONS_IN );
+}
+
+# Run the build
+my $dist = $class->new( %options );
+unless ( $dist ) {
+	die "Failed to create $class";
+}
+unless ( $dist->run() ) {
+	die "Failed to run";
+}
+
+exit(0);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+perldist_w - Windows Perl distribution builder
+
+=head1 SYNOPSIS
+
+Simplfied usage...
+
+  perldist_w Vanilla
+  ...
+  (various output for 1-2 hours)
+  ...
+  Created as C:\tmp\vp\output\vanilla-perl-5.10.0-build-9.exe
+
+Full usage equivalent...
+
+  perldist_w --perl_version=588 --cpan="file://c:/minicpan/" Perl::Dist::Vanilla
+
+=head1 DESCRIPTION
+
+B<perldist_w> is the command line front-end to the L<Perl::Dist::WiX> 
+Win32 Perl distribution builder.
+
+It takes arguments, burns CPU for an hour or more, and then
+spits out a distribution package.
+
+The argument is the class name for the distribution. This will be
+a subclass of L<Perl::Dist::WiX> that provides configuration information and
+scripts the installation sequence.
+
+If you are building a "Perl::Dist::Distribution" class, you can drop
+the "Perl::Dist::" as a convenience.
+
+And that's about all there is to it.
+
+For more information, see L<Perl::Dist::WiX>.
+
+=head1 SUPPORT
+
+Bugs should be reported via the CPAN bug tracker at
+
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Perl-Dist>
+
+For other issues, contact the author.
+
+=head1 AUTHOR
+
+Curtis Jewell E<lt>csjewell@cpan.orgE<gt>
+
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<Perl::Dist::WiX>, L<http://ali.as/>
+
+=head1 COPYRIGHT
+
+Copyright 2007 - 2009 Adam Kennedy. Copyright 2009 Curtis Jewell.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=cut

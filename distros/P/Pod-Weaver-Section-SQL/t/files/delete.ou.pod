@@ -1,0 +1,29 @@
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Module::Name - abstract text
+
+=head1 VERSION
+
+version 0.01
+
+=head1 AUTHOR
+
+Armand Leclercq <armand.leclercq@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2014 by Armand Leclercq.
+
+This is free software, licensed under:
+
+  The Artistic License 1.0
+
+=head1 SQL
+
+B<DELETE> * B<FROM> toto_table B<WHERE> column B<E<gt>=> 'limit' B<AND> column B<E<lt>> 'other'
+
+=cut

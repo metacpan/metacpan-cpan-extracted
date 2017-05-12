@@ -1,0 +1,51 @@
+NAME
+    Pod::Weaver::Section::BugsAndLimitations - Add a BUGS AND LIMITATIONS
+    pod section
+
+VERSION
+    version 1.20
+
+SYNOPSIS
+    In "weaver.ini":
+
+        [BugsAndLimitations]
+
+OVERVIEW
+    This section plugin will produce a hunk of Pod that refers to the
+    bugtracker URL.
+
+    You need to use Dist::Zilla::Plugin::Bugtracker in your "dist.ini" file,
+    because this plugin relies on information that other plugin generates.
+
+  weave_section
+    adds the "BUGS AND LIMITATIONS" section.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <https://metacpan.org/module/Pod::Weaver::Section::BugsAndLimitations/>.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/doherty/Pod-Weaver-Section-BugsAndLimitations> and
+    may be cloned from
+    <git://github.com/doherty/Pod-Weaver-Section-BugsAndLimitations.git>
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at
+    <https://github.com/doherty/Pod-Weaver-Section-BugsAndLimitations/issues
+    >.
+
+AUTHORS
+    *   Marcel Gruenauer <marcel@cpan.org>
+
+    *   Mike Doherty <doherty@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Mike Doherty.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

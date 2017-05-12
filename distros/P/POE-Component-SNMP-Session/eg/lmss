@@ -1,0 +1,487 @@
+#!/usr/bin/perl
+
+
+use Time::HiRes qw/time/;
+
+use YAML;
+use Data::Dumper;
+
+
+use warnings;
+use strict;
+
+use constant SNMP_HOSTS => 1;
+use constant SHOW_ALL_LOADS => 0;
+
+use constant SHOW_LOADS => 1;
+use constant SHOW_TEMPS => 0;
+
+
+BEGIN {
+    use constant DO_GRAPH => 1;
+    use constant STATUS_LINE => 1;
+
+    if (DO_GRAPH or STATUS_LINE) {
+        eval "use Tk; use Tk::Graph";
+
+
+        # eval {
+        # require Tk; import Tk;
+        # require Tk::Graph; import Tk::Graph;
+
+        # use POE qw/Component::SNMP::Session Component::Client::TCP/;
+        # };
+
+
+        die $@ if $@;
+    }
+
+    eval "use POE qw/Component::SNMP::Session Component::Client::TCP/";
+
+}
+
+# do 'trace_calls.pl';
+
+my $VERBOSE      = 0;
+my $POLL_DELAY   = 5;
+my $REDRAW_DELAY = 2;
+my $RETRIES      = 3;
+
+# even if i'm working on the component, if it *functions* I don't want
+# its debug output for this program
+$POE::Component::SNMP::Session::Dispatcher::DEBUG = 0;
+# $SNMP::debugging = 2;
+# $VERBOSE = 1;
+
+$|++;
+
+$POLL_DELAY = $ENV{DELAY} if $ENV{DELAY};
+
+# {{{ SNMP variables
+
+# snmpget -v1 -c public localhost 1.3.6.1.4.1.2021.10.1.3.1
+# snmpget -v1 -c public localhost enterprises.ucdavis.laTable.laEntry.laLoad.1
+
+#my $load1_oid = 'enterprises.ucdavis.laTable.laEntry.laLoad.1';
+my $load1_oid  = '.1.3.6.1.4.1.2021.10.1.3.1';
+$load1_oid = 'laLoad.1';
+
+my $load5_oid  = '.1.3.6.1.4.1.2021.10.1.3.2';
+my $load15_oid = '.1.3.6.1.4.1.2021.10.1.3.3';
+# hostname oid: system.sysName => 1.3.6.1.2.1.1.5.0
+my $host_oid = '.1.3.6.1.2.1.1.5.0';
+$host_oid = 'sysName.0';
+
+my $oid_ssCpuRawUser    = ".1.3.6.1.4.1.2021.11.50";
+my $oid_ssCpuRawSystem  = ".1.3.6.1.4.1.2021.11.51";
+my $oid_ssCpuRawNice    = ".1.3.6.1.4.1.2021.11.52";
+my $oid_ssCpuRawIdle    = ".1.3.6.1.4.1.2021.11.53";
+
+my $vblist = SNMP::VarList->new([laLoad => 1],
+#                                 [sysName => 0],
+#                                 [lmTempSensorsValue => 1],
+#                                 [lmTempSensorsValue => 2],
+#                                 [lmTempSensorsValue => 3],
+                               );
+
+$load1_oid = 'lmTempSensorsValue.2';
+
+=pod
+
+UCD MIB Variables related to CPU
+
+UCD-SNMP-MIB::ssCpuUser.0 = INTEGER: 20
+UCD-SNMP-MIB::ssCpuSystem.0 = INTEGER: 3
+UCD-SNMP-MIB::ssCpuIdle.0 = INTEGER: 76
+UCD-SNMP-MIB::ssCpuRawUser.0 = Counter32: 43354787
+UCD-SNMP-MIB::ssCpuRawNice.0 = Counter32: 8497
+UCD-SNMP-MIB::ssCpuRawSystem.0 = Counter32: 4490664
+UCD-SNMP-MIB::ssCpuRawIdle.0 = Counter32: 228477228
+UCD-SNMP-MIB::ssCpuRawWait.0 = Counter32: 0
+UCD-SNMP-MIB::ssCpuRawKernel.0 = Counter32: 0
+UCD-SNMP-MIB::ssCpuRawInterrupt.0 = Counter32: 0
+UCD-SNMP-MIB::ssCpuRawSoftIRQ.0 = Counter32: 0
+
+
+=cut
+
+# }}} SNMP variables
+
+# {{{ HOSTS
+
+my %snmp_host;
+my %snmp_community;
+
+0 and %snmp_host = (localhost => ['localhost', 'blue' ],
+                    devel => [ 'devel', 'red' ]
+                   );
+
+{
+    no warnings; # it wants to complain about the # chars in the qw// for
+    # the color values.
+
+
+    my $hostcount = 0;
+
+    # file syntax is: label hostname color community
+    # "community" is optional and defaults to 'public'
+    my ($snmp_hosts_file) = glob "~/.snmp_hosts";
+    if (1 and
+        -e $snmp_hosts_file
+        # or not keys %snmp_host
+       ) {
+        open HOSTS, $snmp_hosts_file or die "can't read $snmp_hosts_file: $!\n";
+
+        while (<HOSTS>) {
+            chomp;
+            next if /^\s*#/;
+            my ($name, $host, $color, $community) = split;
+            next unless $name;
+
+            $snmp_host{$name} = [$host, $color];
+            if (defined $community) {
+                # print "using community $community for $name ($host)\n";
+                $snmp_community{$name} = $community;
+            }
+
+            # last if ++$hostcount == 2;
+        }
+        close HOSTS;
+        # print Dump(\%snmp_host); exit;
+    } else {
+        %snmp_host = (localhost => ['localhost', 'blue' ],
+                      # devel => [ 'devel', 'red' ]
+                     );
+    }
+}
+
+# use warnings;
+
+# }}} HOSTS
+
+## STATES ##
+# {{{ _start
+
+sub _start {
+    my($kernel, $heap, $session) = @_[KERNEL, HEAP, SESSION];
+    my %config;
+
+    $kernel->alias_set('graph_window');
+
+    # {{{ snmp hosts
+
+    if (SNMP_HOSTS) {
+        my %t;
+	while (my ($name, $etc) = each %snmp_host) {
+	    my ($host, $one, $five, $fifteen) = @$etc;
+	    my $name_01 = "${name}_01";
+	    my $name_t1 = "${name}_t1";
+	    my $name_t2 = "${name}_t2";
+	    my $name_t3 = "${name}_t3";
+
+            $t{$name} = "$name";
+
+            if (SHOW_LOADS) {
+                $config{$name_01} = {
+                                     -title => $t{$name},
+                                     -color => $one,
+                                    };
+            }
+
+            if (SHOW_TEMPS) {
+                # block here, go get the labels via SNMP::Session directly!
+
+
+                $config{$name_t1} = {
+                                     -title => $t{"$name T1"},
+                                     -color => $one #  & 0xAAAAAA,
+                                    };
+
+                $config{$name_t2} = {
+                                     -title => $t{"$name T2"},
+                                     -color => $one # & 0x555555,
+                                    };
+                $config{$name_t3} = {
+                                     -title => $t{"$name T3"},
+                                     -color => $one
+                                    };
+            }
+	    $heap->{fields}->{$name} = [ $name_01, $name_t1, $name_t2, $name_t3 ];
+
+	    $heap->{snmp_hostnames}->{$host} = $name;
+
+	    ## setup the snmp processes
+	    my $session = POE::Component::SNMP::Session->create(
+                                                                DestHost  => $host,
+                                                                # DestHost  => $host,
+                                                                Community => $snmp_community{$name} || 'public',
+                                                                Alias => "snmp_$name",
+                                                                # Timeout => 4.8,
+                                                                # Timeout => $POLL_DELAY/2 - 0.5, # a little clearance
+                                                                Retries => $RETRIES,
+                                                                localaddr => '64.146.132.121',
+                                                                Version => 2,
+                                                                # debug => 0x3E,
+                                                                # debug => 0x04, # transport
+                                                                # debug => 0x08, # dispatcher
+                                                                # debug => 0x0B, # dispatcher + transport
+                                                               );
+
+
+            # $kernel->yield(snmp_poll => $name);
+            $kernel->call($_[SESSION] => snmp_poll => $name);
+
+            # mark poll time
+	    $heap->{next}{$name} = $heap->{time}{$name} = time;
+
+	}
+
+    }
+
+    # $SNMP::debugging = 3;
+
+    # }}} snmp hosts
+    # {{{ set up the graph widget
+
+    if (DO_GRAPH) {
+        $heap->{ca} = $poe_main_window->Graph(
+                                              -type => 'LINE',
+                                              -linewidth => 2,
+                                              -look => 100,
+                                              -sortnames => 'alpha',
+                                              -legend => 1,
+                                              # -lineheight => 30,
+                                              # -threed => 5,
+                                              -headroom => 10,
+
+                                              # -dots => 2,
+
+                                              # how is this supposed to work?
+                                              -balloon => 1,
+                                              -printvalue => '%s %s',
+
+                                              # our data
+                                              -config => \%config,
+                                             );
+
+        $poe_main_window->configure(-title => "load averages");
+        $poe_main_window->iconbitmap('@/usr/share/xemacs/xemacs-packages/etc/frame-icon/radioactive.xbm');
+
+        $heap->{ca}->pack(
+                          -expand => 1,
+                          -fill => 'both',
+                         );
+
+        $kernel->delay_add( redraw_graph => $REDRAW_DELAY );
+
+    }
+
+    $heap->{values} = []; # empty update list;
+    # $kernel->call( $session => 'redraw_graph' );
+
+    # }}} set up the graph widget
+    # {{{ and the status line
+
+    if (STATUS_LINE) {
+        # Create a Status Line widget, and pass it to Client::TCP
+        my $st = $poe_main_window->Label(-text => "- reading stats -");
+        $heap->{status_widget} = $st;
+        $st->pack(-side => 'top', -anchor => 'n', -fill => 'x');
+
+        $heap->{stat_watcher} =
+          POE::Component::Client::TCP->new( RemoteAddress => 'log1', # 'count1',
+                                            RemotePort    => 10002,
+                                            Args          => [ $st ],
+                                            Started       => sub { $_[HEAP]{st} = $_[ARG0] },
+                                            ServerInput   => \&got_status_line,
+                                            ConnectError  => \&reconnect_statusd,
+                                            Disconnected  => \&reconnect_statusd,
+                                          );
+    }
+
+    # }}} and the status line
+
+    setpriority 0,0,10; # go to low priority
+
+}
+
+# }}} _start
+# {{{ snmp_poll
+
+sub snmp_poll {
+    my($kernel, $heap, $name) = @_[KERNEL, HEAP, ARG0, ARG1, ARG2];
+
+    # poll an SNMP host
+    $kernel->post( "snmp_$name", get => snmp_response =>
+                    # -varbindlist => [ $load1_oid ],
+                   # $load1_oid,
+                   # $host_oid,
+                   $vblist,
+                   # SNMP::VarList->new([ $load1_oid ], [ $host_oid, ])
+                  );
+}
+
+# }}} snmp_poll
+# {{{ snmp_response
+
+sub snmp_response {
+    my($kernel, $heap, $request, $response) = @_[KERNEL, HEAP, ARG0, ARG1];
+
+    my ($alias,   $host, $session, $cmd, @args)  = @$request;
+    my ($results) = @$response;
+
+    # use YAML; print Dump($request); die;
+
+    my $loadavg = 0;
+
+    my ($name) = $alias =~ /snmp_(.*)/;
+
+    if (ref $results) {
+	# GOOD ANSWER!
+	unless ($name) {
+            $VERBOSE and warn "no name defined, grabbing from results";
+	    $host = $results->{$host_oid};
+	    $name = $heap->{snmp_hostnames}{$host};
+            $VERBOSE and warn "name defined as $name";
+	}
+        # use YAML; print Dump($results);
+
+        # loadaverage
+	$loadavg = $results->[0][2];
+
+        $loadavg /= 100 / 2 # scale 1-100 = loadavg of 0-2.  This is experimental on my part.
+          if @{$snmp_host{$name}} == 3 and $snmp_host{$name}[2] eq 'scale';
+
+        # $loadavg += 1 if $name eq 'devel';
+        $VERBOSE and print "$name: $loadavg\n";
+    } else {
+
+	$VERBOSE and warn "SNMP timeout $name\n";
+
+          # use YAML; warn Dump($response);
+    }
+
+    my $delay;
+
+    # We want the reads to happen every n seconds or so.  sometimes,
+    # there's a delay, or a retry, and it takes 2 seconds to get an
+    # answer.  Sometime, most of the time, it's nearly instantaneous.
+    # So ... we stashed the "next should run at" time with the
+    # request, and see if we have passed that time yet.  If not, delay
+    # until the next regular interval.
+    #
+    # This way, everybody keeps making their requests at approximately
+    # the same time, instead of staggered... gives a visible "tick" to
+    # the data. :)
+    my $time = time;
+    my $next = $heap->{next}{$name};
+
+    if ($time < $next) {
+        $delay = $next - $time;
+    } else {
+        $delay = $POLL_DELAY - ($time - $next);
+    }
+
+    if ($delay < 0) {
+        $delay = 0;
+    }
+
+    $heap->{time}{$name} = $next;
+    $heap->{next}{$name} = $next + $POLL_DELAY;
+
+    # print "Re-polling $name in $delay seconds: ", $delay+ $time, "\n";
+
+    $kernel->delay_add( snmp_poll => $delay, $name);
+
+
+    my $fields = $heap->{fields}->{$name};
+    unless (defined $fields) {
+        warn "No such name $name";
+    }
+
+    if (SHOW_LOADS) {
+        push @{$heap->{values}}, ($fields->[0] => $loadavg);
+    }
+
+    # use Spiffy qw/:XXX/;
+    # WWW $fields;
+
+    if (SHOW_TEMPS) {
+        use List::Util qw/max/;
+        no warnings;
+        my $value = max ( map { $results->[$_ + 2][2] } 1..3 );
+        # my $value = $results->[$_ + 2][2];
+        my $cooked =
+              (! defined $value or $value eq 'NOSUCHOBJECT' or $value > 100_000)
+                ? 0
+                  : int ($value / 1000) ;
+
+#             unless ($cooked > 1) {
+#                 # local $^W = 0;
+#                 no warnings;
+#                 print "$name $_: skipping $cooked ($value)\n";
+#             }
+
+        # $cooked > 1 and
+
+            push @{$heap->{values}},
+              ( $fields->[1]  => $cooked );
+    }
+}
+
+# }}} snmp_response
+# {{{ got_status_line
+
+# Input from my custom stat reporting service
+sub got_status_line {
+    my($heap, $input) = @_[HEAP, ARG0];
+
+    my ($status) = $input =~ m/Load \S+ \| (.+?Day)/;
+    $heap->{st}->configure(-text => $status);
+}
+
+# }}} got_status_line
+
+sub reconnect_statusd {
+    my $kernel = $_[KERNEL];
+    $kernel->yield('reconnect');
+    $_[HEAP]->{st}->configure(-text => '- disconnected -');
+}
+
+# {{{ redraw_graph
+
+sub redraw_graph {
+    my ($kernel, $heap) = @_[KERNEL, HEAP];
+
+    # defer the call to $heap->{ca}->set() to be the *LAST* call in
+    # this function.
+
+    $kernel->delay_add( redraw_graph => $REDRAW_DELAY );
+
+    return unless @{$heap->{values}}; # don't redraw unless we have changed data
+
+    my $v = $heap->{values};
+    $heap->{values} = []; # empty update list
+
+    # return unless keys %v;    
+        if (DO_GRAPH) {
+        if ($VERBOSE) {
+            print "REDRAW\n";
+        }
+        $heap->{ca}->set({@$v});
+    }
+
+}
+
+# }}} redraw_graph
+
+POE::Session->create
+  ( inline_states => {
+                      _start        => \&_start,
+                      snmp_poll     => \&snmp_poll,
+                      snmp_response => \&snmp_response,
+                      redraw_graph  => \&redraw_graph,
+                     }
+  );
+
+POE::Kernel->run;

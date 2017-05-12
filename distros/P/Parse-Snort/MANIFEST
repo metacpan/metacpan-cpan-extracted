@@ -1,0 +1,14 @@
+Changes
+lib/Parse/Snort.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/10_parse_text_rule.t
+t/20_parse_hash_rule.t
+t/30_parse_hash_rule.t
+t/90_parse_text_rule_abuse.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

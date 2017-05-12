@@ -1,0 +1,127 @@
+NAME
+    Params::Smart - use both positional and named arguments in a subroutine
+
+REQUIREMENTS
+    The following non-core modules are required:
+
+      Regexp::Common
+
+INSTALLATION
+    Installation can be done using the traditional Makefile.PL or the newer
+    Build.PL methods.
+
+    Using Makefile.PL:
+
+      perl Makefile.PL
+      make test
+      make install
+
+    (On Windows platforms you should use `nmake' instead.)
+
+    Using Build.PL (if you have Module::Build installed):
+
+      perl Build.PL
+      perl Build test
+      perl Build install
+
+SYNOPSIS
+      use Params::Smart 0.04;
+
+      sub my_sub {
+        %args = Params(qw( foo bar ?bo ?baz ))->args(@_);
+        ...
+      }
+
+      my_sub( foo=> 1, bar=>2, bo=>3 );  # call with named arguments
+
+      my_sub(1, 2, 3);                   # same, with positional args
+
+DESCRIPTION
+    This module provides "smart" parameter handling for subroutines without
+    having to use a changed syntax or source filters. Features include:
+
+    *   Mixed use of named and positional parameters.
+
+    *   Type checking and coercion through callbacks.
+
+    *   Dyanmic parameters configured from callbacks.
+
+    *   Memoization of parameter templates.
+
+  Compatability with Previous Versions
+
+    Note that the formatting for simple parameter templates has changed
+    since version 0.03, and the complex parameter templates were not
+    implemented until version 0.04, so it is best to specify a minimum
+    version in use statements
+
+      use Params::Smart 0.04;
+
+REVISION HISTORY
+    A brief list of changes since the previous release:
+
+    0.08  Wed Mar 21 2007
+            - added case where undef value used in positional parameter
+                  (thanks to Rick Westerman)
+            - minor reorganization of POD
+
+    For a detailed history see the Changes file included in this
+    distribution.
+
+CAVEATS
+    Because Perl5 treats hashes as lists, this module attempts to interpret
+    the arguments as a hash of named parameters first. If some hash keys
+    match, and some do not, then it assumes there has been an error. If no
+    keys match, then it assumes that it the arguments are positional.
+
+    In theory one can pass positional arguments where every other argument
+    matches a hash key, or one can pass a hash with the wrong keys (possible
+    if one copies/pastes code from the wrong call) and so it is treated as a
+    positional argument.
+
+    This is probably uncommon for most data, but subroutines should take
+    extra care to check if values are within allowed ranges. There may even
+    be security issues if users can blindly specify data that they know can
+    cause this confusion. If the application is critical enough, then this
+    may not be an appropriate module to use (at least not until the ability
+    to distinguish between lists and hashes is improved).
+
+    To diagnose potential bugs, or to enforce named or positional calling
+    one can check the _named parameter.
+
+    A future version might make use of Perl internals to get around this
+    problem.
+
+SEE ALSO
+    This module is superficially similar in function to Getargs::Mixed but
+    does not require named parameters to have an initial dash ('-').
+
+    Class::NamedParams provides a framework for implementing named
+    parameters in classes.
+
+    Sub::NamedParams will create a named-parameter wrapper around
+    subroutines which use positional parameters.
+
+    The syntax of the parameter templates is inspired by Perl6::Subs, though
+    not necessarily compatible. (See also *Apocalypse 6* in Perl6::Bible).
+
+    Sub::Usage inspired the error-messages returned by calls to arg().
+
+    Params::Validate is useful for (additional) parameter validation beyond
+    what this module is capable of.
+
+    Class::ParmList provides a framework for parameter validation as well.
+
+AUTHOR
+    Robert Rothenberg <rrwo at cpan.org>
+
+  Suggestions and Bug Reporting
+
+    Feedback is always welcome. Please use the CPAN Request Tracker at
+    http://rt.cpan.org to submit bug reports.
+
+LICENSE
+    Copyright (c) 2005-2007 Robert Rothenberg. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself.
+

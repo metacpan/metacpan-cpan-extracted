@@ -1,0 +1,23 @@
+Revision history for Postfix-Parse-Mailq
+
+1.005     2015-07-17 18:55:54-04:00 America/New_York
+        - report "(error: things on fire)" as error_string when it precedes the
+          recipient list
+
+1.004     2014-01-25 11:41:43-05:00 America/New_York
+        - add support for long queue ids (thanks,Johan Carlquist!)
+
+1.003     2013-10-15 21:52:03 America/New_York
+          update bugtracker and repo
+
+1.002     2013-05-29 09:33:28 America/New_York
+          avoid warnings, do not warn on the elusive "zero recipient message"
+
+1.001     2008-10-24
+          avoid warnings, do not choke on the last line of mailq output
+
+1.000     2008-10-17
+          tests, spool location
+
+0.001     2008-10-02
+          initial release

@@ -1,0 +1,88 @@
+Revision history for Perl extension Pg::Loader.
+
+0.21  Fri Oct 18 23:33:33 2013
+	- Fixed test regarding DROM INDEX
+
+0.19  Sun Oct 16 20:34:11 2011
+
+0.18  Sun Aug 29 01:05:01 2011
+       - Regular upkeep: changed installer, changed and added tests
+
+0.17  Mon May 10 06:16:13 2010
+	- using inc::Module::Install installer
+	- silenced 'deprecated' warning in Pg::Loader::Columns
+
+0.16  Sun Nov  2 10:14:44 2008
+	- Fixed a critical a bug in update mode
+
+0.15  Sun Nov  2 05:10:09 2008
+	- More regression test
+
+0.14  Sat Nov 1 07:43:24 2008
+	- Fixed irritagin undef
+
+0.13  Fri Oct 31 23:33:44 2008
+	- This a bug-fix release
+	- Saner behavior for "reject_log" and "reject_data": files are
+          created only when needed; loaders with small "copy_every" append
+          to same section data; different sections can record to different
+          files, and no need to adjust to correct loggin level.
+	- Other bug fixes
+ 
+0.12  Wed Oct 29 03:43:27 2008
+	- minor bugfixes
+
+0.11  Sun Oct 26 21:54:30 2008
+	- Added UPDATE capabilities, but only when table has primary keys
+	- Added lc_monetary and lc_time support
+	- Added command option -e  that sets copy_every=1
+	- Added command option -t  that sets schema.table
+        - Added "update" , "update_copy", "reject_data", and "reject_log"
+	- Added --Logfile command-line option
+        - Some ok_dies regression tests are disabled due to LOGEXIT, overide
+          them.
+
+0.10  Mon Oct 20 01:09:58 2008
+        - Added lc_messages, datestyle, and client_encoding 
+	- Fixed 'copy" and "copy_only" to work with variable
+          number or input columns.
+        - Added preliminary work for buldk updates. 
+          Not finished, not documentated
+        - Minor documentation enhancements
+        - Minor error checking enhancements
+        - Minor presentation enhancements
+	- Added a TODO file
+
+0.09  Sun Oct 12 16:52:42 2008
+	- data can now arrive from stdin
+
+0.08  Wed Jul 23 21:48:23 2008
+	- fixed an undefined usage() error
+
+0.07  Wed Jul 23 21:48:23 2008
+	- Fixed license entry (to perl)
+
+0.06  Wed Jul  9 04:23:11 2008
+	- More regression tests using DBD::Mock
+	- Minor refactoring
+	- fix udc substitutions
+
+0.05  Tue Jul  8 06:32:16 2008
+	- fixed vacuum analyze
+	- enabled index drop and recreation at the right place
+	- added forgotten regression tests
+
+0.04  Tue Jul 8 04:43:28 2008
+	- added the -g option which generates a sample configuration file
+	- added support for the "copy" parameter
+	- More error checks.
+
+0.03  Mon Jul 7 16:10:12 2008
+	- Fixed a warning when no pluggins are loaded
+
+0.02  Mon Jul 7 06:50:21 2008
+	- Added user value-transformation modules
+
+0.01  Sat Jun 28 16:50:21 2008
+	- original version; created by h2xs 1.23 with options
+		-AXn Pg::Loader

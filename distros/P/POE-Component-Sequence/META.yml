@@ -1,0 +1,30 @@
+---
+abstract: 'Asynchronous sequences with multiple callbacks'
+author:
+  - 'Eric Waters <ewaters@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-Sequence
+provides:
+  POE::Component::Sequence:
+    file: lib/POE/Component/Sequence.pm
+    version: 0.02
+  POE::Component::Sequence::Nested:
+    file: lib/POE/Component/Sequence/Nested.pm
+    version: 0
+requires:
+  Class::MethodMaker: 1
+  POE: 0
+resources:
+  bugtracker: http://github.com/ewaters/poe-component-sequence/issues?labels=bug
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/ewaters/poe-component-sequence
+version: 0.02

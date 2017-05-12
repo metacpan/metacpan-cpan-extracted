@@ -1,0 +1,85 @@
+{
+   "abstract" : "yet another assertion keyword",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PerlX-Assert",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::StrictMode" : "0",
+            "Exporter::Tiny" : "0",
+            "perl" : "5.008001"
+         },
+         "suggests" : {
+            "Devel::Declare" : "0",
+            "Keyword::Simple" : "0.02"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Modern" : "0.007"
+         },
+         "suggests" : {
+            "Moops" : "0.033"
+         }
+      }
+   },
+   "provides" : {
+      "PerlX::Assert" : {
+         "file" : "lib/PerlX/Assert.pm",
+         "version" : "0.905"
+      },
+      "PerlX::Assert::DD" : {
+         "file" : "lib/PerlX/Assert/DD.pm",
+         "version" : "0.905"
+      },
+      "PerlX::Assert::Keyword" : {
+         "file" : "lib/PerlX/Assert/Keyword.pm",
+         "version" : "0.905"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Assert"
+      },
+      "homepage" : "https://metacpan.org/release/PerlX-Assert",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-perlx-assert.git",
+         "web" : "https://github.com/tobyink/p5-perlx-assert"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/PerlX-Assert/project"
+   },
+   "version" : "0.905",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

@@ -1,0 +1,33 @@
+Changes for POE-Component-Logger.
+
+1.10    2010-10-30  Olivier Mengué (DOLMEN)
+	Public release.
+	Major refactoring: code is smaller and cleaner.
+	Fix for RT#62397: $DefaultLevel is now retrieved immediately (when
+	  using the Logger->log or P:C:L->log) instead of at event
+	  processing time. This allows the use of a temporary definition
+	  of $DefaultLevel (with 'local'). This should make the API more
+	  consistent with the usual usage of global variables.
+
+1.01    2010-10-28  Olivier Mengué (DOLMEN)
+	Public release, same as 1.00_02.
+	Add ROADMAP file for future releases 1.10 and 1.50.
+
+1.00_02 2010-10-27  Olivier Mengué (DOLMEN)
+	Developer release.
+	Major internal improvement: remove the creation of a temporary
+	  POE::Session for each Logger->log() call.
+	Back to minimum Perl version 5.6.0 (checked with Perl::MinimumVersion).
+	More tests. Code coverage is now 100% (if that means anything).
+	POD fixes. Updated copyright.
+
+1.00_01 2010-10-24  Olivier Mengué (DOLMEN)
+	Developer release.
+	Repository is now hosted on GitHub:
+          http://github.com/dolmen/POE-Component-Logger
+	Added test suite (with some TODO items).
+	Renammed private subs with '_' prefix.
+	More meta in Makefile.PL.
+
+1.00    2002-01-10  Matt Sergeant (MSERGEANT)
+	Intitial revision.

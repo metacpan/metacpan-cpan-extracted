@@ -1,0 +1,62 @@
+02/01/2005 10:23:18;Q;19.davinci;queue=workq
+02/01/2005 10:23:18;S;19.davinci;user=gonwat group=mpccc jobname=n queue=workq
+ctime=1107282198 qtime=1107282198 etime=1107282198 start=1107282198
+exec_host=davinci/0*4 Resource_List.mem=500mb Resource_List.ncpus=4
+Resource_List.walltime=00:25:00 
+02/01/2005 10:23:19;E;19.davinci;user=gonwat group=mpccc jobname=n queue=workq
+ctime=1107282198 qtime=1107282198 etime=1107282198 start=1107282198
+exec_host=davinci/0*4 Resource_List.mem=500mb Resource_List.ncpus=4
+Resource_List.walltime=00:25:00 session=8569 end=1107282199 Exit_status=255
+resources_used.cpupercent=0 resources_used.cput=00:00:00
+resources_used.mem=3584kb resources_used.ncpus=4 resources_used.vmem=10096kb
+resources_used.walltime=00:00:00
+02/01/2005 11:06:18;Q;20.davinci;queue=workq
+02/01/2005 11:06:18;S;20.davinci;user=gonwat group=mpccc jobname=n queue=workq
+ctime=1107284778 qtime=1107284778 etime=1107284778 start=1107284778
+exec_host=davinci/0*4 Resource_List.mem=500mb Resource_List.ncpus=4
+Resource_List.walltime=00:25:00 
+02/01/2005 11:06:18;E;20.davinci;user=gonwat group=mpccc jobname=n queue=workq
+ctime=1107284778 qtime=1107284778 etime=1107284778 start=1107284778
+exec_host=davinci/0*4 Resource_List.mem=500mb Resource_List.ncpus=4
+Resource_List.walltime=00:25:00 session=15040 end=1107284778 Exit_status=255
+resources_used.cpupercent=0 resources_used.cput=00:00:00
+resources_used.mem=2880kb resources_used.ncpus=4 resources_used.vmem=6848kb
+resources_used.walltime=00:00:00
+02/01/2005 11:56:09;Q;26.davinci;queue=workq
+02/01/2005 11:56:10;S;26.davinci;user=carjert group=ccc jobname=junk.pbs
+queue=workq ctime=1107287769 qtime=1107287769 etime=1107287769 start=1107287770
+exec_host=davinci/0*4 Resource_List.mem=500mb Resource_List.ncpus=4
+Resource_List.walltime=00:25:00 
+02/01/2005 11:56:10;E;26.davinci;user=carjert group=ccc jobname=junk.pbs
+queue=workq ctime=1107287769 qtime=1107287769 etime=1107287769 start=1107287770
+exec_host=davinci/0*4 Resource_List.mem=500mb Resource_List.ncpus=4
+Resource_List.walltime=00:25:00 session=16607 end=1107287770 Exit_status=0
+resources_used.cpupercent=0 resources_used.cput=00:00:00
+resources_used.mem=4864kb resources_used.ncpus=4 resources_used.vmem=17600kb
+resources_used.walltime=00:00:00
+02/01/2005 18:48:10;Q;41.davinci;queue=workq
+02/01/2005 18:48:10;S;41.davinci;user=carjert group=ccc jobname=madbench.pbs
+queue=workq ctime=1107312490 qtime=1107312490 etime=1107312490 start=1107312490
+exec_host=davinci/0*4 Resource_List.mem=500mb Resource_List.ncpus=4
+Resource_List.walltime=00:10:00 
+02/01/2005 18:48:11;E;41.davinci;user=carjert group=ccc jobname=madbench.pbs
+queue=workq ctime=1107312490 qtime=1107312490 etime=1107312490 start=1107312490
+exec_host=davinci/0*4 Resource_List.mem=500mb Resource_List.ncpus=4
+Resource_List.walltime=00:10:00 session=19337 end=1107312491 Exit_status=255
+resources_used.cpupercent=0 resources_used.cput=00:00:00
+resources_used.mem=2352kb resources_used.ncpus=4 resources_used.vmem=8272kb
+resources_used.walltime=00:00:01
+10/04/2010 17:20:46;E;209367.cvrsvc09-ib;user=nonac group=nonac account=cstaff
+jobname=IOR queue=mag_serial ctime=1286238023 qtime=1286238023 etime=1286238023
+start=1286238045 owner=nonac@cvrsvc02-ib exec_host=c0935-ib/0
+Resource_List.neednodes=1:ppn=2 Resource_List.nodect=1
+Resource_List.nodes=1:ppn=2 Resource_List.walltime=00:10:00 session=13052
+end=1286238046 Exit_status=1 resources_used.cput=00:00:00
+resources_used.mem=0kb resources_used.vmem=0kb resources_used.walltime=00:00:02
+10/04/2010 17:23:24;E;209385.cvrsvc09-ib;user=nonac group=nonac account=cstaff
+jobname=IOR queue=mag_serial ctime=1286238184 qtime=1286238184 etime=1286238184
+start=1286238203 owner=nonac@cvrsvc02-ib exec_host=c0933-ib/0
+Resource_List.neednodes=1:ppn=1 Resource_List.nodect=1
+Resource_List.nodes=1:ppn=1 Resource_List.walltime=00:10:00 session=27544
+end=1286238204 Exit_status=0 resources_used.cput=00:00:00
+resources_used.mem=0kb resources_used.vmem=0kb resources_used.walltime=00:00:01

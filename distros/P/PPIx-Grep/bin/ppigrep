@@ -1,0 +1,283 @@
+#!/usr/bin/env perl
+
+use utf8;
+use 5.008001;
+
+use strict;
+use warnings;
+
+use version; our $VERSION = qv('v0.0.6');
+
+use PPIx::Grep qw< run >;
+
+exit run(@ARGV);
+
+__END__
+
+=encoding utf8
+
+=for stopwords ppigrep whitespace
+
+=head1 NAME
+
+ppigrep - Search L<PPI> documents (not Perl code).
+
+
+=head1 VERSION
+
+This document describes ppigrep version 0.0.6.
+
+
+=head1 USAGE
+
+    ppigrep [--format format] PPI-class file [...]
+
+    ppigrep { -h | --help | -V | --version }
+
+
+=head1 DESCRIPTION
+
+C<ppigrep> is meant as a means of more intelligently searching L<PPI>
+documents than via L<ack> or C<grep>.  You might know PPI documents
+better as Perl code, but there are valid PPI documents that are not
+valid Perl.  See the PPI documentation for the details on the
+differences.
+
+C<ppigrep> does not search or emit lines from your files.  It searches
+and emits the contents of L<PPI::Element>s, which may consist of
+partial or multiple lines.  Thus, given a file F<foo.pl> which
+contains
+
+    $x = 'a' . 'b';
+
+C<ppigrep quote foo.pl> will emit
+
+    foo.pl:1:6:'a'
+    foo.pl:1:12:'b'
+
+by default, even though both expressions were found on the same line.
+
+
+=head1 REQUIRED ARGUMENTS
+
+=over
+
+=item · PPI-class
+
+A comma-delimited list of names of L<PPI::Element> subclasses to
+search for, as recognizable by L<PPIx::Shorthand>.
+
+For example, you could specify "package,include" to get all instances
+of L<PPI::Statement::Package> and L<PPI::Statement::Include>.
+
+
+=item · file [...]
+
+A list of files to search.
+
+
+=back
+
+
+=head1 OPTIONS
+
+=over
+
+=item · C<--match>
+
+A Perl regular expression that each L<PPI::Element>'s contents must
+match.
+
+
+=item · C<--format format>
+
+A C<printf>-like format for the output for each found L<PPI::Element>.
+The default value is C<%f:%l:%c:%s>.
+
+Specifiable fields are:
+
+=over
+
+=item C<%f> – The name of the file.
+
+=item C<%l> – The starting line number of the element.
+
+=item C<%c> – The starting character within the first line of the
+element.
+
+=item C<%C> – The starting column within the first line of the
+element.  This will differ from C<%c> when there are tab characters.
+
+=item C<%L> – The class of the element, with the 'PPI::' prefix
+removed (you can always get that back by prefixing this field with the
+5 characters).
+
+=item C<%s> – The source-code/content for the element.
+
+=item C<%S> – The source-code/content for the element, C<chomp>ed.
+
+=item C<%W> – The source-code/content for the element, leading and trailing
+whitespace removed and all other whitespace converted to a single space
+character.
+
+=back
+
+Z<>
+
+=item · C<--help> or C<-h>
+
+Emit a short description of this command and its options and quit.
+
+
+=item · C<--version> or C<-V>
+
+Emit the version of this command and quit.
+
+
+=back
+
+
+=head1 EXAMPLES
+
+=over
+
+=item Show all C<eval> statements.
+
+    ppigrep --format '%s' --match '^\s*eval' statement Some/Module.pm
+
+
+=item Find all calls to the date program via back-ticks, e.g. C<`date`>.
+
+    ppigrep --match '\bdate\b' backtick Some/Module.pm
+
+
+=back
+
+
+=head1 DIAGNOSTICS
+
+Exits with a value that is equivalent to the one for C<grep>.  If a
+match was found, this is 0.  If no match was found, this is 1.  And if
+any problems occurred, this is 2.
+
+
+=over
+
+=item Could not figure out what PPI class to use for "%s".
+
+The PPI-class argument could not be resolved to a subclass of
+C<PPI::Element> via L<PPIx::Shorthand>.
+
+
+=item Could not find any PPI::Element subclasses to use for "%s".
+
+The pattern argument didn't resolve to any L<PPI::Element> subclasses.
+Did you specify the empty string?
+
+
+=item Invalid regex "%s": %s.
+
+The regex specified via C<--match> could not be compiled.
+
+
+=item "%s" does not exist.
+
+Cannot find the file.
+
+
+=item "%s" is not readable.
+
+Cannot read the file.
+
+
+=item "%s" is a directory.
+
+The "file" was actually a directory.
+
+
+=item Could not parse "%s".
+
+L<PPI> could not interpret the file as a Perl document.
+
+
+=back
+
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+None, yet.
+
+
+=head1 DEPENDENCIES
+
+L<PPIx::Grep>
+
+
+=head1 INCOMPATIBILITIES
+
+None known.
+
+
+=head1 BUGS AND LIMITATIONS
+
+=over
+
+=item · This thing is way too limited in functionality.
+
+
+=back
+
+
+Please report any bugs or feature requests to
+C<bug-ppix-grep@rt.cpan.org>, or through the web
+interface at L<http://rt.cpan.org>.
+
+
+=head1 SEE ALSO
+
+L<App::Ack>
+L<App::Grepl>
+
+
+=head1 AUTHOR
+
+Elliot Shank C<< <perl@galumph.com> >>
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright ©2007-2008, Elliot Shank C<< <perl@galumph.com> >>. All
+rights reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME
+THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE LIABLE
+TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES.
+
+=cut
+
+# setup vim: set filetype=perl tabstop=4 softtabstop=4 expandtab :
+# setup vim: set shiftwidth=4 shiftround textwidth=78 nowrap autoindent :
+# setup vim: set foldmethod=indent foldlevel=0 :

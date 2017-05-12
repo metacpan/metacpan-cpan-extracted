@@ -1,0 +1,25 @@
+---
+abstract: 'Generate SAX events for perl source code (incomplete)'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  Class::Autouse: 1.26
+  File::Spec: 0.80
+  Test::More: 0.47
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Perl-SAX
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  PPI: 1.002
+  XML::SAX::Base: 1.04
+  XML::SAX::Writer: 0.44
+  perl: 5.005
+version: 0.08

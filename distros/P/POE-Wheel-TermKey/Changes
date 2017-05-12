@@ -1,0 +1,7 @@
+Revision history for POE-Wheel-TermKey
+
+0.02    CHANGES:
+         * Updated for Term::TermKey 0.10 / libtermkey 0.10
+
+0.01    First version, released on an unsuspecting world.
+

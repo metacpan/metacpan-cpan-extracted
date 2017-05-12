@@ -1,0 +1,44 @@
+=encoding iso-8859-1
+
+=head1 NAME/NOM
+
+perlintern - Documentation autogénérée de fonctions Perl purement internes
+
+=head1 DESCRIPTION
+
+Ce fichier est la documentation autogénérée de fonctions de
+l'interpréteur Perl qui sont documentées à l'aide du format interne de
+documentation de Perl mais qui ne sont pas marquées comme faisant
+partie de l'API de Perl. En d'autres termes, B<elles ne doivent pas
+être utilisées dans des extensions>E<nbsp>!
+
+=over 8
+
+=back
+
+=head1 AUTEURS
+
+Le système d'autodocumentation a été originellement ajouté au noyau
+Perl par Benjamin Stuhl. La documentation est de tous ceux qui ont été
+suffisamment bons pour documenter leurs fonctions.
+
+=head1 VOIR AUSSI
+
+L<perlguts>, L<perlapi>
+
+=head1 TRADUCTION
+
+=head2 Version
+
+Cette traduction française correspond à la version anglaise distribuée avec
+perl 5.6.0.  Pour en savoir plus concernant ces traductions, consultez
+L<http://perl.enstimac.fr/>.
+
+=head2 Traducteur
+
+Roland Trique <F<roland.trique@uhb.fr>>
+
+=head2 Relecture
+
+Gérard Delafond
+

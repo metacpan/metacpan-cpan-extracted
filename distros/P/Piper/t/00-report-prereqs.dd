@@ -1,0 +1,106 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '6.17',
+                                        'perl' => 'v5.10.0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Dist::Zilla' => '5',
+                                      'Dist::Zilla::Plugin::Authority' => '0',
+                                      'Dist::Zilla::Plugin::AutoPrereqs' => '0',
+                                      'Dist::Zilla::Plugin::BumpVersionAfterRelease' => '0',
+                                      'Dist::Zilla::Plugin::CPANFile' => '0',
+                                      'Dist::Zilla::Plugin::CheckChangesHasContent' => '0',
+                                      'Dist::Zilla::Plugin::CheckMetaResources' => '0',
+                                      'Dist::Zilla::Plugin::CheckPrereqsIndexed' => '0',
+                                      'Dist::Zilla::Plugin::ConfirmRelease' => '0',
+                                      'Dist::Zilla::Plugin::ContributorsFromGit' => '0',
+                                      'Dist::Zilla::Plugin::CopyFilesFromBuild::Filtered' => '0',
+                                      'Dist::Zilla::Plugin::ExecDir' => '0',
+                                      'Dist::Zilla::Plugin::Git::Check' => '0',
+                                      'Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch' => '0',
+                                      'Dist::Zilla::Plugin::Git::Commit' => '0',
+                                      'Dist::Zilla::Plugin::Git::GatherDir' => '0',
+                                      'Dist::Zilla::Plugin::Git::Push' => '0',
+                                      'Dist::Zilla::Plugin::Git::Tag' => '0',
+                                      'Dist::Zilla::Plugin::GitHub::Meta' => '0',
+                                      'Dist::Zilla::Plugin::GitHub::Update' => '0',
+                                      'Dist::Zilla::Plugin::License' => '0',
+                                      'Dist::Zilla::Plugin::MakeMaker' => '0',
+                                      'Dist::Zilla::Plugin::Manifest' => '0',
+                                      'Dist::Zilla::Plugin::ManifestSkip' => '0',
+                                      'Dist::Zilla::Plugin::MetaJSON' => '0',
+                                      'Dist::Zilla::Plugin::MetaNoIndex' => '0',
+                                      'Dist::Zilla::Plugin::MetaProvides::Package' => '0',
+                                      'Dist::Zilla::Plugin::MetaTests' => '0',
+                                      'Dist::Zilla::Plugin::MetaYAML' => '0',
+                                      'Dist::Zilla::Plugin::MinimumPerl' => '0',
+                                      'Dist::Zilla::Plugin::NextRelease' => '0',
+                                      'Dist::Zilla::Plugin::PodSyntaxTests' => '0',
+                                      'Dist::Zilla::Plugin::Prereqs::AuthorDeps' => '0',
+                                      'Dist::Zilla::Plugin::PromptIfStale' => '0',
+                                      'Dist::Zilla::Plugin::PruneCruft' => '0',
+                                      'Dist::Zilla::Plugin::ReadmeMarkdownFromPod' => '0',
+                                      'Dist::Zilla::Plugin::RewriteVersion' => '0',
+                                      'Dist::Zilla::Plugin::RunExtraTests' => '0',
+                                      'Dist::Zilla::Plugin::SurgicalPodWeaver' => '0',
+                                      'Dist::Zilla::Plugin::Test::Compile' => '0',
+                                      'Dist::Zilla::Plugin::Test::MinimumVersion' => '0',
+                                      'Dist::Zilla::Plugin::Test::PodSpelling' => '0',
+                                      'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0',
+                                      'Dist::Zilla::Plugin::Test::Version' => '0',
+                                      'Dist::Zilla::Plugin::TestRelease' => '0',
+                                      'Dist::Zilla::Plugin::UploadToCPAN' => '0',
+                                      'Pod::Wordlist' => '0',
+                                      'Software::License::Apache_2_0' => '0',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::Memory::Cycle' => '0',
+                                      'Test::MinimumVersion' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Most' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Version' => '1'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Data::Dump' => '0',
+                                      'List::AllUtils' => '0',
+                                      'List::UtilsBy' => '0',
+                                      'Moo' => '0',
+                                      'Moo::Role' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Types::Common::Numeric' => '0',
+                                      'Types::Common::String' => '0',
+                                      'Types::LoadableClass' => '0',
+                                      'Types::Standard' => '0',
+                                      'namespace::clean' => '0',
+                                      'overload' => '0',
+                                      'perl' => 'v5.10.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Capture::Tiny' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Most' => '0',
+                                   'blib' => '1.01',
+                                   'perl' => 'v5.10.0'
+                                 }
+                 }
+     };
+  $x;
+ }

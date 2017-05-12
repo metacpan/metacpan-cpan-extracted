@@ -1,0 +1,24 @@
+POE::Filter::RecDescent
+---------------------------------------------------
+Jeff Goff <jgoff@cpan.org>
+February 29, 2004
+
+About
+-----
+
+See POE::Component::Client::RecDescent
+
+Installation
+------------
+
+This package requires the following extra modules from CPAN:
+
+You will need a recent version of POE (0.28 is the most recent, it may work with earlier versions)
+
+The installation process is straightforward:
+
+  perl Makefile.PL
+  make test
+  make install
+
+The Makefile.PL does not take any extra arguments.

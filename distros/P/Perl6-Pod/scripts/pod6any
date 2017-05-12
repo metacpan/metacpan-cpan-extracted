@@ -1,0 +1,98 @@
+#!/usr/bin/perl
+#===============================================================================
+#
+#         FILE: pod6any
+#
+#  DESCRIPTION:  export pod6 via custom output filter
+#       AUTHOR:  Aliaksandr P. Zahatski ,  <zag@cpan.org>
+#===============================================================================
+#$Id$
+use strict;
+use warnings;
+use Data::Dumper;
+use Test::More;
+use Getopt::Long;
+use Pod::Usage;
+use Encode qw(encode decode is_utf8);
+use Perl6::Pod::To;
+use IO::File;
+my ( $help, $man );
+my %opt =
+  ( help => \$help, man => \$man );
+GetOptions( \%opt, 'help|?', 'man')
+  or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+my $infile = shift;
+my $in_fd;
+if ($infile) {
+    $in_fd = new IO::File:: "< $infile" or die "$infile: $!";
+}
+else {
+    $in_fd = \*STDIN;
+}
+
+#first parse
+use Perl6::Pod::Utl;
+my $str;
+{local $/;
+$str = <$in_fd>};
+my $tree  = Perl6::Pod::Utl::parse_pod($str);
+#die Dumper ($tree);
+die $tree ? 'OK' : "BAD";
+
+exit;
+
+=head1 NAME
+
+  pod6any  - convert pod6 to ANY
+
+=head1 SYNOPSIS
+
+  pod6any < somefile.pod6 > somefile.any
+  pod6any somefile.pod6  > somefile.any
+
+
+   options:
+
+    -help  - print help message
+    -man   - print man page
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits
+
+=item B<-man>
+
+Prints manual page and exits
+
+=back
+
+=head1 DESCRIPTION
+
+  B<pod6xml>  - convert Perl pod to XML
+
+=head1 EXAMPLE
+
+  pod6any -M Perl6::Pod::To::XHML -opt Tert=1 -opt header=chapter < somefile.pod6 > somefile.xml
+
+
+=head1 AUTHOR
+
+Zahatski Aliaksandr, E<lt>zag@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009-2015 by Zahatski Aliaksandr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut
+
+

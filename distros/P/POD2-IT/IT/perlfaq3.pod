@@ -1,0 +1,1078 @@
+=head1 NOME
+
+perlfaq3 - Strumenti di Programmazione ($Revision: 1.21 $, $Date: 2009/01/26 17:06:25 $)
+
+=head1 DESCRIZIONE
+
+Questa sezione della FAQ risponde a domande relative agli strumenti di
+programmazione ed al supporto.
+
+=head2 Come posso fare (qualsiasi cosa)?
+
+Avete guardato in CPAN (vedete L<perlfaq2>)? E<egrave> probabile che qualcuno
+abbia giE<agrave> scritto un modulo in grado di risolvere il vostro problema.
+Avete letto le man page appropriate? Qui di seguito E<egrave> riportato un
+breve indice di esse:
+
+       Argomenti base  perldata, perlvar, perlsyn, perlop, perlsub
+       Esecuzione      perlrun, perldebug
+       Funzioni        perlfunc
+       Oggetti         perlref, perlmod, perlobj, perltie
+       Strutture Dati  perlref, perllol, perldsc
+       Moduli          perlmod, perlmodlib, perlsub
+       Regex           perlre, perlfunc, perlop, perllocale
+       Passare a perl5 perltrap, perl
+       Linking col C   perlxstut, perlxs, perlcall, perlguts, perlembed
+       Vare            http://www.cpan.org/misc/olddoc/FMTEYEWTK.tgz
+                       (non E<egrave> una man page ma E<egrave> ugualmente
+                       utile, una collezione di vari saggi su tecniche di
+                       programmazione in Perl)
+
+Un sommario essenziale dei contenuti delle man page sul Perl si trova in
+L<perltoc>.
+
+=head2 Come posso usare Perl interattivamente?
+
+L'approccio tipico consiste nel servirsi del Perl debugger, descritto nella
+man page perldebug(1), su un programma "vuoto", ad esempio:
+
+   perl -de 42
+
+A questo punto potete scrivere del codice Perl, e verrE<agrave> subito
+eseguito. Potete anche esaminare la tabella dei simboli, ottenere backtrace
+dello stack, controllare i valori delle variabili, impostare breakpoint, ed
+effettuare altre operazioni tipiche dei debugger simbolici.
+
+=head2 C'E<egrave> una shell Perl?
+
+E<Egrave> attualmente disponibile la versione 1.8 di psh (Perl sh).
+La Perl Shell E<egrave> una shell che combina la natura interattiva di
+una shell Unix con la potenza del Perl. L'obiettivo E<egrave> di avere
+finalmente una shell completa di tutte le caretteristiche, che si comporti
+come ci si aspetta da una normale  attivitE<agrave> di shell. PerE<ograve>,
+la Shell Perl userE<agrave> la sintassi 
+e la funzionalitE<agrave> del Perl per le istruzioni di controllo del
+flusso ed altre cose. Potete ottenere psh da http://sourceforge.net/projects/psh/ .
+
+Zoidberg E<egrave> un progetto simile, e fornisce una shell scritta in
+perl, configurata in perl e gestita in perl. E<Egrave> intesa come una
+shell di login ed un ambiente di sviluppo. PuE<ograve> essere trovata
+presso http://zoidberg.sf.net/ o presso il mirror CPAN piE<ugrave>
+vicino a voi.
+
+Il modulo Shell.pm (distribuito con il Perl) permette al Perl di usare comandi
+che non fanno parte del linguaggio Perl come comandi della shell. perlsh,
+dalla distribuzione sorgente, E<egrave> semplicistico e non interessante,
+ma potrebbe essere ugalmente ciE<ograve> di cui si ha bisogno. 
+
+=head2 Come faccio a sapere quali moduli sono installati sul mio sistema?
+
+Si puE<ograve> utilizzare il modulo ExtUtils::Installed per vedere tutti i 
+moduli installati, anche se esso puE<ograve> impiegare un po' di tempo per
+compiere la sua magia. La libreria standard inclusa nel Perl E<egrave>
+indicata solo con "Perl" (sebbene si possa ottenere questa lista con
+ Mod::CoreList) 
+
+    use ExtUtils::Installed;
+    
+    my $inst   = ExtUtils::Installed->new();
+    my @moduli = $inst->modules();
+
+Se volete una lista di tutti i nomi dei file dei moduli Perl, potete
+usare File::Find::Rule. 
+
+    use File::Find::Rule;
+    
+    my @file = File::Find::Rule->file()->name( '*.pm' )->in( @INC );
+
+Se non avete questo modulo, potete ottenere lo stesso risultato
+con File::Find che fa parte della libreria standard. 
+
+    use File::Find;
+    my @file;    
+
+    find(
+      sub {
+      	push @files, $File::Find::name
+      		if -f $File::Find::name && /\.pm$/
+      	},
+
+      @INC
+      );   
+
+        print join "\n", @file;
+
+Se avete semplicemente bisogno di un veloce controllo 
+per vedere se un modulo E<egrave> disponibile, potete verificarne la
+documentazione. Se risuscite a leggerne la documentazione, il modulo potrebbe
+essere installato. Se non riuscite a leggere la documentazione, il modulo
+potrebbe non averne (in rari casi). 
+
+    prompt% perldoc Modulo::Nome
+
+Potete anche provare a includere il modulo in uno one-liner per vedere 
+se il perl lo trova. 
+
+    perl -MModulo::Nome -e1 
+
+=head2 Come effettuo il debug dei miei programmi Perl?
+
+Avete provato C<use warnings> o usato C<-w>? Abilitano i warning, utili per
+individuare le pratiche dubbie.
+
+Avete provato C<use strict>? Vi impedisce di usare riferimenti simbolici, vi
+costringe a predichiarare ogni subroutine che chiamate con una bareword (*)
+e, cosa probabilmente piE<ugrave> importante, vi costringe a predichiarare
+le vostre variabili con C<my>, C<our> o C<use vars>.
+
+Avete controllato i valori di ritorno di tutte le chiamate di sistema? Il
+sistema operativo (e di conseguenza il Perl) vi informa se hanno funzionato
+o meno, e se non hanno funzionato vi dice perchE<eacute>.
+
+   open(FH, "> /etc/nonpossoscrivere")
+     or die "Non posso scrivere su /etc/nonpossoscrivere: $!\n";
+
+Avete letto L<perltrap>? E<egrave> pieno di suggerimenti per programmatori
+Perl vecchi e nuovi ed ha anche una sezione per coloro che giungono da
+linguaggi come I<awk> e I<C>.
+
+Avete provato il debugger Perl, descritto in L<perldebug>? Potete eseguire
+il vostro programma linea per linea, vedere cosa sta facendo e capire per
+quale ragione non sta facendo ciE<ograve> che dovrebbe.
+
+(*) Letteralmente parola nuda, indica una parola che potrebbe essere la
+chiamata di una funzione (ma non ha nE<eacute> & all'inizio nE<eacute> ()
+alla fine) ed E<egrave> per questo ambigua per perl a tempo di compilazione.
+In assenza di use strict 'subs' (che genera errore) viene trattata come se
+fosse inclusa tra virgolette. [NdT]
+
+=head2 Come effettuo il profiling dei miei programmi Perl?
+
+Dovreste procurarvi il modulo Devel::DProf (disponibile nella distribuzione
+standard, o separatamente su CPAN) e usare Benchmark.pm della distribuzione
+standard. Il modulo Benchmark consente di misurare la velocitE<agrave> di
+porzioni specifiche del vostro codice, mentre Devel::DProf fornisce una
+classifica dettagliata dei punti in cui il codice spende il suo tempo.
+
+Ecco un esempio d'uso di Benchmark:
+
+  use Benchmark;
+
+  @robaccia   = `cat /etc/motd`;
+  $iterazioni = 10_000;
+
+  timethese($iterazioni, {
+            'map' => sub { my @a = @robaccia;
+               map { s/a/b/ } @a;
+               return @a
+             },
+            'for' => sub { my @a = @robaccia;
+               local $_;
+               for (@a) { s/a/b/ };
+               return @a },
+           });
+
+Ed ecco quello che stampa (su un certo calcolatore -- i risultati dipenderanno
+dal vostro hardware, dal sistema operativo, e dal carico di lavoro del vostro
+computer):
+
+  Benchmark: timing 10000 iterations of for, map...
+         for:  4 secs ( 3.97 usr  0.01 sys =  3.98 cpu)
+         map:  6 secs ( 4.97 usr  0.00 sys =  4.97 cpu)
+
+Siate consapevoli del fatto che un buon benchmark E<egrave> molto difficile
+da scrivere. Esso si limita a controllare i dati che gli passate e dimostra
+poco della differente complessitE<agrave> degli algoritmi a confronto.
+
+=head2 Come posso fornire i miei programmi Perl di rimandi (cross-reference)?
+
+Il modulo B::Xref puE<ograve> essere usato per generare rapporti dei rimandi
+per programmi Perl.
+
+    perl -MO=Xref[,OPZIONI] nomescript.plx
+
+=head2 Esiste un pretty-printer (formattatore) per il Perl?
+
+Perltidy E<egrave> uno script Perl che indenta e riformatta script Perl per
+renderli piE<ugrave> facili da leggere, cercando di applicare le regole
+contenute in L<perlstyle>. Se scrivete script Perl, o spendete molto tempo
+leggendoli, probabilmente lo troverete utile. E<Egrave> disponibile
+alla URL http://perltidy.sourceforge.net
+
+Naturalmente, seguendo semplicemente le linee-guida di perlstyle, non
+dovrebbe esserci bisogno di riformattare. L'abitudine di formattare il codice
+mentre lo si scrive aiuterE<agrave> a prevenire i bug. Il vostro editor
+puE<ograve> e dovrebbe aiutarvi in questo compito. perl-mode o il piE<ugrave>
+recente cperl-mode di Emacs possono fornire una considerevole quantitE<agrave>
+di aiuto con la maggior parte del codice (ma non tutto), e gli editor meno
+programmabili possono fornire un ausilio significativo. Tom Christiansen e
+molti altri utenti VI sono fedeli seguaci delle seguenti impostazioni di vi
+e dei suoi cloni:
+
+    set ai sw=4
+    map! ^O {^M}^[O^T
+
+Inseriteli nel vostro file F<.exrc> (sostituendo gli accenti circonflessi
+con caratteri di controllo) e via. Nella modalitE<agrave> di inserimento
+^T serve per aumentare l'indentazione, ^D per diminuirla e ^O per diminuire
+l'indentazione di un blocco. Si puE<ograve> trovare un esempio piE<ugrave>
+complesso, e commentato, su
+http://www.cpan.org/authors/id/TOMC/scripts/toms.exrc.gz
+
+a2ps http://www-inf.enst.fr/%7Edemaille/a2ps/black+white.ps.gz svolge un sacco
+di compiti relativi alla generazione di output stampati in maniera
+accattivante a partire da documenti, cosE<igrave> come enscript su 
+http://people.ssh.fi/mtr/genscript/ .
+
+=head2 Esite una versione di ctags per Perl?
+
+(contributo di brian d foy)
+
+Gli exuberant ctags supportano Perl: http://ctags.sourceforge.net/
+
+Potete provare anche pltags: http://www.mscha.com/pltags.zip
+
+=head2 Esiste un IDE o un editor Perl per Windows? 
+
+I programmi in Perl sono in testo semplice, quindi qualsiasi editor li 
+puE<ograve> creare.
+
+Se utilizzate Unix, avete giE<agrave> un IDE--Unix. La filosofia UNIX E<egrave>
+la filosofia di diversi piccoli strumenti che singolarmente fanno una cosa e la
+fanno bene. E<Egrave> una sorta di cassetta degli attrezzi di un falegname.
+
+Se volete un IDE, date un'occhiata a quelli che seguono (in ordine alfabetico, 
+non in ordine di preferenza):
+
+=over 4
+
+=item Eclipse
+
+http://e-p-i-c.sf.net/
+
+L'Eclipse Perl Integration Project [Progetto per l'Integrazione di Perl ed Eclipse, NdT] 
+integra funzioni di editing/debugging con Eclipse.
+
+=item Enginsite
+
+http://www.enginsite.com/
+
+Perl Editor da EngInSite E<egrave> un completo ambiente integrato di sviluppo (IDE)
+per creare, testare ed effettuare il debug di script Perl; for creating, testing, and  debugging  Perl scripts;
+il programma funziona su Windows 9x/NT/2000/XP o successivi.
+
+=item Komodo
+
+http://www.ActiveState.com/Products/Komodo/
+
+L'IDE multi piattaforma e multi linguaggio di Activestate (dall'ottobre 2004 per Windows, 
+Linux e Solaris), ha il supporto Perl, include un debugger di espressioni regolari e un
+debugging remoto.
+
+=item Open Perl IDE
+
+http://open-perl-ide.sourceforge.net/
+
+Open Perl IDE E<egrave> un ambiente integrato di sviluppo per scrivere e fare il debugging
+di script in Perl mediante l'ActivePerl di ActiveState su Windows 95/98/NT/2000.
+
+=item OptiPerl
+
+http://www.optiperl.com/
+
+OptiPerl E<egrave> un IDE Windows con un ambiente CGI simulato, include un debugger e un
+editor syntax highlighting [evidenziatore di sintassi, NdT].
+
+=item PerlBuilder
+
+http://www.solutionsoft.com/perl.htm
+
+PerlBuilder E<egrave> un ambiente integrato di
+sviluppo per Windows che supporta lo sviluppo Perl.
+
+=item visiPerl+
+
+http://helpconsulting.net/visiperl/
+
+Da Help Consulting, per Windows.
+
+=item Visual Perl
+
+http://www.activestate.com/Products/Visual_Perl/
+
+Visual Perl E<egrave> un plugin per Visual Studio.NET da ActiveState.
+
+=item Zeus
+
+http://www.zeusedit.com/lookmain.html
+
+Zeus per Windows E<egrave> un altro editor/IDE multi linguaggio per Win32
+che ha un supporto per il Perl:
+
+=back
+
+Per gli editor: se utilizzate Unix probabilmente avete giE<agrave> vi o un
+clone di vi, e probabilmente anche emacs, dunque non dovreste aver
+bisogno di fare il download di nulla. In qualunque emacs, la modalitE<agrave>
+c-mode (M-x cperl-mode) fornisce forse il miglior metodo di editing in
+Perl disponibile.
+
+Se state usando Windows, potete servirvi di qualsiasi editor che vi permetta di
+lavorare con il plain text [testo semplice con file ad estensione txt, NdT],
+come NotePad o WordPad. I Word processor come Microsoft Word o WordPerfect
+tipicamente non sono indicati, dal momento che inseriscono qualsiasi sorta
+di informazione dietro le quinte, anche se molti permettono di salvare
+file come "Solo Testo". Potete anche scaricare editor di testo
+progettati specificatamente per la programmazione, come Textpad
+( http://www.textpad.com/ ) e UltraEdit ( http://www.ultraedit.com/ ),
+fra gli altri.
+
+Se state usando MacOS, valgono le stesse considerazioni. Con MacPerl
+(per un ambiente Classic) c'E<eacute> un semplice editor. Editor esterni
+popolari sono BBEdit ( http://www.bbedit.com/ ) o Alpha
+( http://www.his.com/~jguyer/Alpha/Alpha8.html ). Anche gli utenti di MacOS X possono
+usare gli editor Unix. Neil Bowers (la persona che sta dietro a Geekcruises)
+ha un elenco di editor per Mac che sono in grado di gestire Perl
+( http://www.neilbowers.org/macperleditors.html ).
+
+=over 4
+
+=item GNU Emacs
+
+http://www.gnu.org/software/emacs/windows/ntemacs.html
+
+=item MicroEMACS
+
+http://www.microemacs.de/
+
+=item XEmacs
+
+http://www.xemacs.org/Download/index.html
+
+=item Jed
+
+http://space.mit.edu/~davis/jed/
+
+=back
+
+o cloni di vi come
+
+=over 4
+
+=item Elvis
+
+ftp://ftp.cs.pdx.edu/pub/elvis/ http://www.fh-wedel.de/elvis/
+
+=item Vile
+
+http://dickey.his.com/vile/vile.html
+
+=item Vim
+
+http://www.vim.org/
+
+=back
+
+Per gli amanti di vi in generale, Windows o altro:
+
+        http://www.thomer.com/thomer/vi/vi.html
+
+nvi ( http://www.bostic.com/vi/, disponibile su CPAN in src/misc/) E<egrave>
+ancora un clone vi, sfortunatamente non disponibile per Windows, ma su
+piattaforme UNIX potresti essere interessato a provarlo, anzitutto
+perchE<eacute> non E<egrave> un clone vi in senso stretto, + il vero vi,
+o la sua nuova incarnazione, ed in secondo luogo perchE<eacute> potete
+utilizzare Perl al suo interno come linguaggio di scripting. nvi non
+E<egrave> tuttavia l'unico a poter fare ciE<ograve>: almeno vim e vile
+offrono un Perl embedded.
+
+I seguenti link sono editor/IDE multilinguaggio per Win32 che supportano
+Perl:
+
+=over 4
+
+=item Codewright
+
+http://www.borland.com/codewright/
+
+=item MultiEdit
+
+http://www.MultiEdit.com/
+
+=item SlickEdit
+
+http://www.slickedit.com/
+
+=back
+
+C'E<egrave> anche un editor, basato su una text widget di testo semplice
+scritto in Perl che E<egrave> distribuito con il modulo Tk su CPAN. Il
+ptkdb ( http://world.std.com/~aep/ptkdb/ ) E<egrave> un debugger basato su
+Perl/tk che si comporta come una sorta ambiente di sviluppo. Perl Composer
+( http://perlcomposer.sourceforge.net/ ) E<egrave> un IDE per la creazione
+di una GUI Perl/Tk.
+
+Oltre ad un editor/IDE, potreste essere interessato in un ambiente shell per
+Win32 piE<ugrave> potente. Le tue scelte comprendono 
+
+=over 4
+
+=item Bash
+
+dal pacchetto Cygwin  ( http://sources.redhat.com/cygwin/ )
+
+=item Ksh
+
+dal Toolkit MKS ( http://www.mks.com/ ) oppure la shell Bourne shell 
+dall'ambiente U/WIN ( http://www.research.att.com/sw/tools/uwin/ )
+
+=item Tcsh
+
+ftp://ftp.astron.com/pub/tcsh/ , si veda anche 
+http://www.primate.wisc.edu/software/csh-tcsh-book/
+
+=item Zsh
+
+ftp://ftp.blarg.net/users/amol/zsh/ , si veda anche http://www.zsh.org/
+
+=back
+
+MKS e U/WIN sono commerciali (U/WIN E<egrave> libero per scopi educativi e
+di ricerca), Cygwin E<egrave> sotto la GNU Public License (ma ciE<ograve>
+E<egrave> irrilevante se si utilizza Perl). Cygwin, MKs, e U/WIN contengono
+tutti (oltre alle shell) un insieme molto vasto di utility standard UNIX .
+
+Se state trasferendo file di testo da Unix a Windows usando FTP, accertatevi
+di trasferirli in modalitE<agrave> ASCII, cosE<igrave> i terminatori di riga
+saranno convertiti in modo appropiato.
+
+Su Mac OS, con il MacPerl Application viene incluso un semplice text editor
+di 32k che si comporta come un rudimentale IDE. In contrasto con il MacPerl
+Application, il MPW Perl tool puE<ograve> fare uso della stessa shell MPW
+come fosse un editor (senza il limite di 32k). 
+
+=over 4
+
+=item Affrus
+
+E<egrave> un completo ambiente di sviluppo Perl con un pieno supporto al debug
+( http://www.latenightsw.com ).
+
+=item Alpha
+
+E<egrave> un editor, scritto estendibile in Tcl, che non di meno ha un
+supporto incorporato per diversi popolari linguaggi di markup e
+programmazione inclusi il Perl e l'HTML ( http://www.his.com/~jguyer/Alpha/Alpha8.html ).
+
+=item BBEdit and BBEdit Lite
+
+sono text editors per Mac OS che hanno un Perl sensitivity mode 
+( http://web.barebones.com/ ).
+
+=back
+
+Pepper e Pe sono text editor sensibili al linguaggio di programmazione
+rispettivamente per Mac OS X e BeOS ( http://www.hekkelman.com/ ).
+
+=head2 Dove posso trovare delle macro per vi?
+
+Per una versione completa del file di configurazione per vi di Tom
+Christiansen, consultate
+http://www.cpan.org/authors/Tom_Christiansen/scripts/toms.exrc.gz ,
+il file standard di benchmark per gli emulatori di vi. Il file viene
+eseguito al meglio con nvi, la versione corrente di vi di Berkeley, che,
+guarda caso, puE<ograve> essere compilato con un interprete Perl
+integrato--si veda http://www.cpan.org/src/misc/ .
+
+=head2 Dove posso trovare perl-mode per emacs?
+
+PiE<ugrave> o meno a partire dalla versione 19 patchlevel 22 di Emacs,
+sono stati presenti sia perl-mode.el sia il supporto per il debugger
+Perl interno. Tutto ciE<ograve> dovrebbe essere incluso nella distribuzione
+standard di Emacs 19.
+
+Nella directory del sorgente Perl potete trovare una directory denominata
+"emacs", che contiene un cperl-mode il quale fornisce la colorazione delle
+parole chiave, un help sensibile al contesto ed altre cose eccezionali.
+
+Notate che il perl-mode di emacs potrebbe avere problemi con C<"main'pippo">
+(singolo apice), e far confusione con l'indentatura e l'evidenziamento
+della sintassi. Probabilmente starete usando C<"main::pippo"> nel codice
+Perl recente, quindi questo non dovrebbe essere un problema.
+
+=head2 Come si possono usare le curses con il Perl? 
+
+Il modulo Curses, su CPAN, fornisce una interfaccia alla libreria curses
+con un modulo ad oggetti caricabile dinamicamente. Una piccola demo
+puE<ograve> essere trovata all'indirizzo
+http://www.cpan.org/authors/Tom_Christiansen/scripts/rep.gz ; questo
+programma ripete un comando ed aggiorna lo schermo come richiesto,
+rappresentando B<rep ps axu> in maniera simile a B<top>.
+
+=head2 Come posso usare X oppure Tk con il Perl?
+
+Tk E<egrave> un'interfaccia completa, orientata agli oggetti e basata su
+Perl, al toolkit Tk, che non costringe all'utilizzo del Tcl solamente per
+avere il Tk. Sx E<egrave> un'interfaccia all'insieme di Widget Athena.
+Entrambe sono disponibili su CPAN. Si veda la web directory:
+http://www.cpan.org/modules/by-category/08_User_Interfaces/
+
+Inestimabili per i programmatori Perl/Tk sono le FAQ del Perl/Tk su
+http://phaseit.net/claird/comp.lang.perl.tk/ptkFAQ.html , la Guida di riferimento
+del Perl/Tk disponibile su http://www.cpan.org/authors/Stephen_O_Lidie/
+e le pagine del manuale che si trovano online su
+http://www-users.cs.umn.edu/%7Eamundson/perl/perltk/toc.html .
+
+=head2 Come posso rendere piE<ugrave> veloce il mio programma scritto in Perl?
+
+Il massimo E<egrave> trovare un algoritmo migliore. Spesso la differenza
+E<egrave> notevole. Potreste controllare il capitolo 8 del Camel Book, che
+contiene alcuni trucchi per migliorare l'efficienza. Anche il libro di Jon
+Bentley, "Programming Pearls" (non E<egrave> un errore di battitura!),
+contiene buoni suggerimenti sull'ottimizzazione. Per quanto riguarda i
+benchmark, il consiglio si riassume in: realizzate dei benchmark e fate
+profiling per essere sicuri di ottimizzare nel punto giusto, cercate degli
+algoritmi migliori anzichE<eacute> mettere a punto i dettagli, e quando
+tutti i tentativi falliscono, considerate la possibilitE<agrave> di comprare
+hardware piE<ugrave> veloce. Potreste voler leggere la risposta alla
+precedente domanda "Come effettuo il profiling dei miei programmi Perl?"
+se non l'avete giE<agrave> fatto.
+
+Un approccio diverso consiste nell'applicare le tecniche di Autoloading
+al codice utilizzato di rado. Guardate i moduli AutoSplit e AutoLoad
+nella distribuzione standard. Oppure potete capire qual E<egrave> il collo
+di bottiglia e scrivere solo quella parte in C, cosE<igrave>, come si
+usava individuare i colli di bottiglia nel codice C per poi riscriverli
+in assembler. Analogo alla riscrittura del codice in C E<egrave> l'uso
+di moduli nei quali le sezioni critiche sono scritte in C (ad esempio,
+il modulo PDL di CPAN).
+
+Se al momento il vostro eseguibile perl E<egrave> linkato ad una I<libc.so>
+condivisa, allora in molti casi potete ottenere un miglioramento della
+performance del 10-25% ricompilandolo e linkandolo ad una libc.a statica.
+Questo produrrE<agrave> un eseguibile perl piE<ugrave> grande, ma i vostri
+programmi (e i programmatori) vi ringrazieranno. Guardate il file F<INSTALL>
+nella distribuzione del codice per ulteriori informazioni.
+
+Il programma undump era un vecchio tentativo di velocizzare i programmi
+Perl memorizzandoli su disco in forma giE<agrave> compilata. Non E<egrave>
+piE<ugrave> un'opzione praticabile, dato che funziona solo su alcune
+architetture, e comunque non era una buona soluzione.
+
+=head2 Come posso fare affinchE<eacute> i miei programmi in Perl occupino meno memoria?
+
+Quando si tratta di trovare un compromesso tra tempo e risorse, Perl sceglie
+quasi sempre di utilizzare piE<ugrave> memoria. Gli scalari, in Perl,
+utilizzano piE<ugrave> memoria delle stringhe in C, gli array occupano
+piE<ugrave> memoria di questi e gli hash ne usano ancora di piE<ugrave>.
+Nonostante ci sia ancora molto da fare, le recenti release si sono occupate
+di questi problemi. Per esempio, a partire dala 5,004, le chiavi duplicate
+degli hash sono ripartite fra tutti gli hash che le stanno usando, in modo
+che non sia necessaria una nuova riallocazione.
+
+In certi casi, usare substr() o vec() per simulare array puE<ograve> essere
+altamente favorevole. Per esempio, un array di mille booleani
+occuperE<agrave> almeno 20.000 byte di spazio, ma puE<ograve> essere
+trasformato in un vettore di 125-byte--un considerevole risparmio di memoria.
+Il modulo standard Tie::SubstrHash puE<ograve> anche aiutare per certi tipi
+di strutture dati. Se state lavorando con strutture dati particolari (matrici,
+ad esempio) i moduli che le implementano in C potrebbero usare meno memoria
+degli equivalenti moduli Perl.
+
+Un'altra cosa da provare E<egrave> capire se il vostro Perl sia stato
+compilato con la funziona malloc di sistema o con quella propria di Perl.
+Qualunque sia la veritE<agrave>, provate ad usare l'altra ed osservate
+se questo fa la differenza. Informazioni su malloc sono reperibili nel
+file F<INSTALL> nei sorgenti della distribuzione. Potete capire se state
+usando malloc del perl digitando C<perl -V:usemymalloc>.
+
+Naturalmente il metodo migliore per risparmiare memoria E<egrave>, in primo
+luogo, non fare nulla per sprecarla. Le buone pratiche di programmazione
+possono orientarsi in questa direzione:
+
+=over 4
+
+=item * Non siate ingordi!
+
+Non leggete un intero file in memoria se puoi esaminarlo linea per linea. O,
+piE<ugrave> concretamente, usate un ciclo come questo:
+
+    #
+    # Buona Idea
+    # while ()
+    {
+         # ...
+    }
+
+al posto di questo:
+
+    #
+    # Cattiva Idea
+    #
+    @dati = ;
+    foreach (@dati) {
+       # ...
+    }
+
+Quando i file che state analizzando sono piccoli, non importa molto quale
+metodo usate, ma fa una enorme differenza quando essi iniziano a diventare
+piE<ugrave> grandi.
+
+=item * Usate map e grep solo quando E<egrave> il caso
+
+Ricordate che sia map sia grep si aspettano una LISTA di argomenti,
+quindi questo codice:
+
+    @ricercato = grep {/pattern/} ;
+
+causerE<agrave> il risucchio dell'intero file. Per file grandi, E<egrave>
+meglio creare un ciclo:
+
+    while () { push(@ricercato, $_) if /pattern/; }
+
+=item * Evitate apici non necessari e conversioni in stringa
+
+Non inserite tra apici stringhe di grandi dimensioni, a meno che non
+sia assolutamente necessario:
+
+    my $copia = "$grande_stringa";
+
+crea due copie di $grande_stringa (una per $copia e un'altra per la stringa
+fra doppi apici), considerando che
+
+    my $copia = $grande_copia;
+
+crea una sola copia.
+
+Lo stesso vale per fare di un grande array una stringa:
+
+    {
+       local $, = "\n";
+       print @grande_array;
+    }
+
+E<egrave> molto piE<ugrave> efficiente di un
+
+    print join "\n", @grande_array;
+
+o
+
+    {
+       local $" = "\n";
+       print "@grande_array";
+    }
+
+=item * Passate per reference
+
+Passate gli array e gli hash tramite reference, non tramite valori. Per dirne
+una, E<egrave> il solo metodo per passare liste multiple o hash (o entrambi)
+in una singola chiamata/ritorno. Inoltre, questo procedimento evita di
+generare una copia di tutti i contenuti. Questo richiede un certo giudizio,
+comunque, perchE<eacute> qualsiasi cambiamento sarE<egrave> propagato di
+nuovo ai dati originali. Se volete veramente mutilare (o modificare) una
+copia, dovrete sacrificare la memoria necessaria per crearne una.
+
+=item * Legate al disco le variabili grandi.
+
+Per "grandi" depositi di dati (per esempio quelli che eccedono la memoria
+disponibile), considerate la possibilitE<agrave> di utilizzare uno dei moduli
+DB per immagazzinarli sul disco anzichE<eacute> in RAM. CiE<ograve>
+penalizzerE<agrave> il tempo di accesso ma E<egrave> probabilmente meglio
+che provacare un massiccio swapping del vostro disco rigido.
+
+=back
+
+=head2 E<Egrave> sicuro restituire un riferimento a dati locali o a dati lessicali?
+
+SE<igrave>. Di questo si occupa il sistema di garbage collector del Perl,
+dunque tutto si risolverE<agrave> in maniera appropriata.
+
+    sub creaneuno {
+
+        my @a = ( 1 .. 10 );
+        return \@a;
+    }
+
+    for $i ( 1 .. 10 ) {
+        push @molti, creaneuno();
+    }
+
+    print $molti[4][5], "\n";
+
+    print "@molti\n";
+
+=head2 Come posso liberare un array o un hash in modo che il mio programma si riduca (in memoria)?
+
+(contributo di Michael Carman)
+
+Di solito non si puE<ograve>. La memoria allocata ai lessicali (cioE<egrave> le variabili my()) 
+non poE<ograve> essere recuperata o riutilizzata anche se le variabili vanno al di fuori dello scope. 
+La memoria E<egrave> riservata nel caso che le variabili ritornito nello scope. La memoria allocata 
+alle variabili globali puE<ograve> essere riutilizzata (all'interno del vostro programma) utilizzando 
+undef() e/o delete().
+
+Sulla maggior parte dei sistemi operativi, la
+memoria allocata ad un programma non puE<ograve> essere restituita al sistema.
+Questo E<egrave> il motivo per cui i programmi di lunga esecuzione talvolta
+si ri-eseguono. Alcuni sistemi operativi (da rimarcare, i sistemi che usano
+mmap(2) per allocare grosse porzioni di memoria) possono chiedere la
+restituzione della memoria che non viene piE<igrave> usata, ma, su tali
+sistemi, perl deve essre configurato e compilato affinchE<eacute> usi il
+malloc del sistema operativo e non quello del perl.
+
+In generale, l'allocazione di memoria e la deallocazione, in Perl non sono qualcosa 
+di cui possiate o che dobbiate preoccuparvi molto.
+
+Consultate anche "Come posso fare affinchE<eacute> i miei programmi in Perl occupino meno memoria?"
+
+Ad ogni modo, un uso giudizioso di my() sulle vostre variabili vi
+aiuterE<agrave> ad assicurarvi la loro uscita dallo scope in maniera che
+Perl possa liberare quello spazio per usarlo in altre parti del vostro
+programma. Una variabile globale, naturalmente, non uscirE<agrave> mai dallo
+scope, per cui non si puE<ograve> avere automaticamente la restituzione del
+suo spazio, benchE<eacute> eseguire su di essa un undef() e/o un delete()
+otterrE<agrave> lo stesso effetto. In generale, l'allocazione di memoria e
+la deallocazione, in Perl non sono qualcosa di cui possiate o che dobbiate
+preoccuparvi molto, ma anche questa proprietE<agrave> (la preallocazione
+di tipi di dato) E<egrave> in cantiere.
+
+=head2 Come posso rendere piE<ugrave> efficienti i miei script CGI?
+
+Al di lE<agrave> dei normali provvedimenti descritti al fine di rendere
+piE<ugrave> veloci o piE<ugrave> piccoli i normali programmi Perl, un
+programma CGI ha delle ulteriori questioni. Esso viene eseguito diverse
+volte al secondo. Dato che, ogni qualvolta viene eseguito, esso
+necessita di essere ricompilato e spesso alloca un megabyte, o
+piE<ugrave>, di memoria di sistema, questo potrebbe rivelarsi mortale.
+Compilare in C non vi sarE<agrave> di aiuto perchE<eacute> il collo di
+bottiglia si trova nello spreco di risorse che si ha a causa dal processo
+di avvio.
+
+Ci sono due modi gettonati per evitare questo spreco di risorse. Una soluzione
+coinvolge l'esecuzione del server HTTP Apache (disponibile su
+http://www.apache.org/ ) con uno o l'altro dei moduli plugin mod_perl e
+mod_fastcgi.
+
+Con mod_perl ed il modulo Apache::Registry (distribuito con mod_perl), httpd
+funzionerE<agrave> con un interprete Perl integrato che precompilerE<agrave>
+i vostri script e li eseguirE<agrave> all'interno dello stesso spazio di
+indirizzamento, senza effettuare dei fork. L'estensione di Apache darE<agrave>
+a Perl l'accesso alle API interne del server, facendo sE<igrave> che i
+moduli scritti in Perl possano fare proprio tutto quello che puE<ograve>
+fare un modulo scritto in C. Per maggiori informazioni su mod_perl, si veda
+http://perl.apache.org/
+
+Con il modulo FCGI (da CPAN) e il modulo mod_fastcgi (disponibile su
+http://www.fastcgi.com/ ) ogni vostro programma Perl diverrE<agrave> un
+processo demone permanente.
+
+Entrambe queste soluzioni possono avere effetti di vasta portata sul vostro
+sistema e sul modo in cui scrivete i vostri programmi CGI, dunque indagate
+su di essi con cautela.
+
+Consultate
+http://www.cpan.org/modules/by-category/15_World_Wide_Web_HTML_HTTP_CGI/ .
+
+=head2 Come posso nascondere il codice sorgente del mio programma Perl?
+
+Cancellatelo. :-) Seriamente, ci sono un certo numero di (per lo piE<ugrave>
+insoddisfacenti) soluzioni, con diversi livelli di "sicurezza".
+
+Prima di tutto, ad ogni modo, non non si puE<ograve> rimuovere il permesso di
+lettura, perchE<eacute> il codice sorgente deve essere leggibile
+affinchE<eacute> sia compilato ed interpretato. (Tuttavia questo non significa
+che il sorgente di uno script CGI sia leggibile sul web dalle persone,
+ma solo dalle persone che hanno accesso al filesystem.) Dunque, dovete
+lasciare i permessi al livello socialmente amichevole di 0755.
+
+Alcune persone considerano questo un problema di sicurezza. Se i vostri
+programmi compiono azioni insicure e si affidano a persone che non conoscono
+il modo di sfruttare queste insicurezze, ciE<ograve> non E<egrave> sicuro.
+Spesso per qualcuno E<egrave> possibile determinare le insicurezze e
+sfruttarle senza vedere il sorgente. La sicurezza attraverso l'oscuratezza,
+il modo per chiamare il fatto di nascondere i vostri bug invece di
+correggerli, E<egrave> davvero qualcosa di poco sicuro.
+
+Potete provare ad usare la cifratura attraverso filtri per il
+sorgente (a partire dal Perl 5.8, i moduli Filter::Simple e
+Filter::Util::Call sono inclusi nella distribuzione standard), ma ogni
+discreto programmatore sarE<agrave> in grado di decifrarlo. Potete
+provare usando il compilatore e interprete di byte code descritto
+piE<ugrave> in basso, ma i curiosi potrebbero ancora decompilarlo.
+Potete tentare di utilizzare il compilatore di codice nativo descritto
+piE<ugrave> sotto, ma i cracker potrebbero disassemblarlo. Queste cose
+mettono in difficoltE<agrave>, in varia misura, coloro i quali vogliono
+impossessarsi del vostro codice, ma nessuno puE<ograve> nasconderlo
+definitivamente (ciE<ograve> E<egrave> vero per qualsiasi linguaggio,
+non solo Perl).
+
+E<eacute> molto facile recuperare il sorgente dei programmi Perl. Date
+semplicemente in pasto il programma all'interprete perl ed utilizzate i moduli
+nella gerarchia B:: . Il modulo B::Deparse dovrebbe essere in grado di
+superare il maggior numero di tentativi di nascondere il sorgente. Di
+nuovo, questo non riguarda solo Perl.
+
+Se siete preoccupati che le persone traggano profitto dal vostro
+codice, allora la conclusione E<egrave> che niente darE<agrave> piE<ugrave>
+sicurezza legale di una licenza restrittiva. Fornite una licenza al vostro
+software e tempestatelo di frasi minacciose del tipo "Questo E<egrave>
+software inedito di proprietE<agrave> della ditta XYZ. L'accesso ad esso
+non vi dE<agrave> il permesso di usarlo bla bla bla." Non siamo avvocati
+naturalmente, dunque dovreste consultare un legale per essere sicuri
+che la stesura della vostra licenza reggerE<agrave> in tribunale.
+
+=head2 Come posso compilare programmi Perl in C o in bytecode?
+
+(contributo di brian d foy)
+
+In generale, non potete farlo. Ci sono comunque alcune cose che possono 
+funzionare per il vostro caso. Le persone di solito pongono questa domanda 
+perchE<eacute> vogliono distribuire i propri lavori senza regalare il codice 
+sorgente e la maggior parte delle soluzioni sacrifica l'occupazione su disco 
+per la convenienza. Probabilmente non vedrete nemmeno questo gran incremento di 
+velocitE<agrave> visto che la maggior parte delle soluzioni semplicemente 
+ingloba un interprete Perl nel prodotto finale (ma consultate
+L<Come posso rendere piE<ugrave> veloce il mio programma scritto in Perl?>).
+
+Il Perl Archive Toolkit ( http://par.perl.org/index.cgi ) E<egrave> l'analogo Perl 
+del JAR di Java. E<Egrave> disponibile gratuitamente su CPAN ( http://search.cpan.org/dist/PAR/ ).
+
+Lo spazio dei nomi B::*, spesso chiamato "il compilatore Perl", in realtE<agrave> E<egrave> un 
+modo per i programmatori Perl di sbirciare nelle proprie interiora piuttosto che creare versioni 
+precompilate dei vostri programmi. Ad ogni modo, il modulo B::Bytecode puE<ograve> convertire i vostri 
+script in un formato bytecode che potrebbe essere caricato successivamente dal modulo ByteLoader ed 
+eseguito come un usuale script Perl.
+
+Ci sono anche alcuni prodotti commerciali che vi potrebbero andar bene, 
+sebbene ne dobbiate acquistare una licenza.
+
+Il Perl Dev Kit ( http://www.activestate.com/Products/Perl_Dev_Kit/ ) da 
+ActiveState puE<ograve> "Turn your Perl programs into ready-to-run
+executables for HP-UX, Linux, Solaris and Windows." [Convertire i vostri programmi 
+Perl in eseguibili pronti da usare per HP-UX, Linux, Solaris e Windows,", NdT]
+
+Perl2Exe ( http://www.indigostar.com/perl2exe.htm ) E<egrave> un programma a linea di 
+comando per convertire degli script perl in file eseguibili. Produce eseguibili per le 
+piattaforme Windows e unix.
+
+=head2 Come si puE<ograve> compilare il Perl dentro Java?
+
+Con il Perl Resource Kit della O'Reilly Media sarete in
+grado di integrare Java e Perl. Consultate
+http://www.oreilly.com/catalog/prkunix/ .
+
+Perl 5.6 comprende il Java Perl Lingo, o JPL. JPL, che E<egrave> ancora
+in fase di sviluppo, permette di chiamare codice Perl da Java.
+Consultate jpl/README nell'albero delle directory della distribuzione sorgente
+Perl.
+
+=head2 Come posso far funzionare "#!perl" su [MS-DOS,NT,...]?
+
+Per OS/2 usate semplicemente
+
+    extproc perl -S -vostri_switch
+
+come prima linea nel file C<*.cmd> (C<-S> E<egrave> necessario a causa di un
+bug nella gestione di "extproc" in cmd.exe). Per il DOS dovrete anzitutto
+creare un batch file corrisposndente e codificare tutto in
+C<ALTERNATIVE_SHEBANG> (consultate il file F<INSTALL> nella distribuzione
+sorgente per maggiori informazioni).
+
+L'installazione Win95/NT, quando usate il Perl di ActiveState, modifica il
+Registry per associare l'estensione C<.pl> all'interprete perl. Se intallate
+un'altra distribuzione, o magari compilate il vostro Perl Win95/NT personale
+dai sorgenti standard utilizzando una versione Windows di gcc (ad esempio
+con cygwin o mingw32), allora dovrete modificare voi stessi il registry.
+Oltre ad associare C<.pl> all'interprete, gli utilizzatori di NT possono
+usare C<SET PATHEXT=%PATHEXT%.PL> per essere in grado di lanciare programmi
+come C<install-linux.pl> semplicemente digitando C<install-linux>.
+
+I programmi Perl sotto MacOS "Classico" hanno gli appropriati Creator e Type, quindi
+un doppio click su di essi causa l'invocazione dell'applicazione Perl.
+Sotto Mac OS X, le applicazioni cliccabili possono essere fatte a partire da 
+qualsiasi script di tipo C<#!> utilizzando l'utility DropScript di Wil
+Sanchez: http://www.wsanchez.net/software/ .
+
+I<IMPORTANTE!>: Qualunque cosa facciate, PER FAVORE, non fate la pazzia di
+copiare l'interprete perl nella vostra directory cgi-bin, al fine di far
+sE<igrave> che i vostri programmi funzionino bene sotto un web server. Questo
+E<egrave> un rischio di sicurezza ESTRAMAMENTE grande. Prendetevi il tempo
+necessario per capire come fare le cose in maniera corretta.
+
+=head2 Posso scrivere, dalla linea di comando, programmi Perl utili?
+
+SE<igrave>. Leggete L<perlrun> per maggiori informazioni. Di seguito sono
+riportati alcuni esempi. (Questi assumono che vengano applicate le regole di
+quoting della shell Unix standard.)
+
+    # somma primo ed ultimo campo
+    perl -lane 'print $F[0] + $F[-1]' *
+
+    # identifica i file di testo
+    perl -le 'for(@ARGV) {print if -f && -T _}' *
+
+    # rimuove (la maggior parte de) i commenti dal programma C
+    perl -0777 -pe 's{/\*.*?\*/}{}gs' pippo.c
+
+    # cambia la data di un file ad un mese prima, sconfiggendo i reaper deamon
+    perl -e '$X=24*60*60; utime(time(),time() + 30 * $X,@ARGV)' *
+
+    # trova il primo uid inutilizzato
+    perl -le '$i++ while getpwuid($i); print $i'
+
+    # visualizza il path delle pagine man
+    echo $PATH | perl -nl -072 -e '
+        s![^/+]*$!man!&&-d&&!$s{$_}++&&push@m,$_;END{print"@m"}'
+
+OK, l'ultimo in realtE<agrave> partecipava all'Obfuscated Perl Contest. :-)
+
+=head2 PerchE<eacute> gli one-liner Perl non funzionano sul mio sistema DOS/Mac/VMS?
+
+Di solito il problema E<egrave> che l'interprete dei comandi di questi
+sistemi ha idee sul quoting piuttosto differenti rispetto a quelle delle
+shell Unix nelle quali gli one-liner sono stati creati. Su alcuni sistemi,
+potreste dover cambiare gli apici singoli in doppi apici, cosa che I<NON>
+dovete fare in Unix o nei sistemi Plan9. Potreste inoltre dover cambiare
+un singolo % in un %%.
+
+Ad esempio:
+
+    # Unix
+    perl -e 'print "Ciao Mondo\n"'
+
+    # DOS, etc.
+    perl -e "print \"Ciao Mondo\n\""
+
+    # Mac
+    print "Ciao Mondo\n"
+    (e poi Run "Myscript" oppure Shift-Mela-R)
+
+    # VMS
+    perl -e "print ""Ciao Mondo\n"""
+
+Il problema E<egrave> che nessuno di questi esempi E<egrave> affidabile:
+dipende dall'interprete dei comandi. In ambiente Unix, i primi due esempi
+spesso funzionano. In ambiente DOS E<egrave> del tutto possibile che nessuno 
+dei due funzioni. Se la shell fosse 4DOS, probabilmente avreste miglior
+fortuna con qualcosa del genere:
+
+    perl -e "print <Ctrl-x>"Ciao Mondo\n<Ctrl-x>""
+
+Su Mac, dipende dall'ambiente che state usando. La shell MacPerl, oppure
+MPW, E<egrave> in larga misura analoga ad una shell Unix per quanto riguarda
+il supporto di diverse varianti del quoting, eccettuato il fatto che adopera
+liberamente i caratteri non-ASCII come caratteri di controllo.
+
+L'uso di qq(), q() e qx() anzichE<eacute> dei "doppi apici", 'singoli apici' e
+`apici inversi' potrebbe rendere gli one-liner piE<ugrave> semplici da 
+scrivere.
+
+Non c'E<egrave> una soluzione generale. E<Egrave> una situazione confusa.
+
+[Parte di questa risposta E<egrave> un contributo di Kenneth Albanowski.]
+
+=head2 Dove posso imparare qualcosa sulla programmazione CGI o Web in Perl?
+
+Per quanto riguarda i moduli, procuratevi CGI o LWP da CPAN. Per i libri di
+testo, consultate i due specifici indicati nella domanda riguardante i libri.
+Per problemi e domande relative al web, come "PerchE<eacute> mi capitano
+errori 500" oppure "PerchE<eacute> non funziona dal browser quando funziona
+benissimo dalla linea di comando", consultate le guide alla risoluzione dei
+problemi ed i riferimenti in L<perlfaq9> o nella CGI MetaFAQ (NdT: in lingua
+inglese):
+
+        http://www.perl.org/CGI_MetaFAQ.html
+
+=head2 Dove posso imparare qualcosa sulla programmazione orientata agli oggetti in Perl?
+
+Un buon punto di partenza E<egrave> L<perltoot>, mentre L<perlobj>,
+L<perlboot>, L<perltoot>, L<perltooc> e L<perlbot> potete usare come
+riferimenti.
+
+Un buon libro sulla OO in Perl E<egrave> "Object-Oriented Perl" di Damian
+Conway della Manning Publications oppure "Learning Perl
+References, Objects, & Modules" di Randal Schwartz e Tom
+Phoenix da O'Reilly Media.
+
+=head2 Dove posso imparare qualcosa sul linking del C con il Perl?
+
+Se volete chiamare codice C da Perl, partite con L<perlxstut>, andando avanti
+con L<perlxs>, L<xsubpp> e L<perlguts>. Se desiderate chiamare Perl da C,
+allora leggete L<perlembed>, L<perlcall> e L<perlguts>. Non dimenticate che
+si puE<ograve> imparare molto dando un'occhiata a come gli autori dei moduli
+di estesione esistenti hanno scritto il loro codice ed hanno risolto i loro
+problemi.
+
+Potreste non aver bisogno di tutta la potenza di XS. Il modulo Inline::C vi
+permette di mettere codice C direttamente nei vostri sorgenti Perl. Il modulo
+si occupa di tutta la magia per fare funzionare le cose. Dovete ancora imparare
+almeno un po' delle API del perl ma non avrete a che fare con la complessitE<agrave>
+dei file di supporto XS.
+
+=head2 Ho letto le pagine di manuale perlembed, perlguts, ecc., ma non riesco ad incapsulare l'interprete perl nel mio programma C, dove sbaglio?
+
+Scaricate il pacchetto ExtUtils::Embed da CPAN e lanciate 'make test'. Se
+i test hanno successo, leggete e rileggete la documentazione. Se falliscono,
+guardate la pagina perlbug e inviate una segnalazione di errore con l'output di
+C<make test TEST_VERBOSE=1> e C<perl -V>.
+
+=head2 Quando ho provato a lanciare il mio script, ho ricevuto questo messaggio. Cosa vuol dire?
+
+Una lista completa dei messaggi d'errore e dei warning di Perl, corredata
+da spiegazioni, puE<ograve> essere trovata in perldiag. Potete inoltre usare
+il programma splain (distribuito insieme a Perl) per spiegare il messaggio
+d'errore:
+
+    perl programma 2>messaggi_diagnostici.out
+    splain [-v] [-p] messaggi_diagnostici.out
+
+oppure modificare il vostro programma affinchE<eacute> spieghi i messaggi
+per voi:
+
+    use diagnostics;
+
+oppure
+
+    use diagnostics -verbose;
+
+=head2 Cos'E<egrave> MakeMaker? 
+
+Questo modulo (che fa parte della distribuzione Perl standard) E<egrave>
+progettato per scrivere, a partire da un Makefile.PL, un Makefile per un
+modulo di estensione. Per maggiori informazioni vedete ExtUtils::MakeMaker.
+
+=head1 AUTORE E COPYRIGHT
+
+Copyright (c) 1997-2006 Tom Christiansen, Nathan Torkington e altri autori menzionati.
+Tutti i diritti riservati.
+
+Questa documentazione E<egrave> libera; potete ridistribuirla e/o modificarla
+secondo gli stessi termini applicati al Perl.
+
+Indipendentemente dalle modalitE<agrave> di distribuzione, tutti gli esempi di
+codice in questo file sono rilasciati al pubblico dominio. Potete, e siete
+incoraggiati a farlo, utilizzare il presente codice o qualunque forma
+derivata da esso nei vostri programmi per divertimento o per profitto.
+Un semplice commento nel codice che dia riconoscimento alle FAQ sarebbe
+cortese ma non E<egrave> obbligatorio.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlfaq3
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Michele Beltrame.
+
+=head2 Revisore
+
+Revisione a cura di Michele Beltrame e dree.
+
+=cut

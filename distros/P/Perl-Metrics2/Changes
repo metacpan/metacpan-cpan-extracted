@@ -1,0 +1,41 @@
+Changes for Perl extension Perl-Metrics2
+
+0.06 Fri  7 Aug 2009
+	- Added missing File::Find::Rule::Perl dependency
+
+0.05 Tue  4 Aug 2009
+	- A variety of more efficient indexes and index generators.
+	- Make the main document loop find documents in real-time rather
+	  than pre-build a list of them. Saves even more memory.
+	- Strip most of the speed monitoring code, it needed the pre-baked
+	  file list to work.
+	- Move the study index from the plugins to the core
+	- Pass-through md5 through several methods to prevent one instance
+	  of it having to be regenerated.
+
+0.04 Mon  3 Aug 2009
+	- Implenting indexable tracking
+	- Prevent duplicate work in core plugin
+	- Plugins not advertise destruction
+	- Allow the last destructive plugin to destroy the original
+	  document, to prevent excessive cloning.
+	- Improved runtime estimation based on file-size throughput of
+	  the cache .ppi storables. Per-file estimation was pointless
+	  when running files smallest to largest.
+
+0.03 Sun 10 May 2009
+	- Adding source lines of code metric to the core
+	- Adding integration with PPI::Cache
+	- Added process_cache to do metric rescanning directly from the cache
+	- Added manual index drop and restore
+	- Streamlined metric insert statements within a single prepare
+	- Added pm2minicpan to index and cache a local minicpan
+	- Added pm2db for access to minor database cleaning operations
+	- Added pm2precache and pm2preparse
+	- Added Perl::Metrics2::Parse to move the PPI parsing into a subprocess
+
+0.02 Sun 10 May 2009
+	- Adding the CpanFile table
+
+0.01 Mon 16 Feb 2009
+	- Creating initial revision

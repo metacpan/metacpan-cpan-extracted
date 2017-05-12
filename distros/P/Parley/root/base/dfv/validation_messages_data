@@ -1,0 +1,36 @@
+[%
+    SET error_message = {
+        # messages for missing fields
+        missing => {
+            match_type                  => 'MISSING_SEARCH_MATCH_TYPE',
+            search_terms                => 'MISSING_SEARCH_TERMS',
+
+            first_name                  => 'MISSING_FIRST_NAME',
+            last_name                   => 'MISSING_LAST_NAME',
+            forum_name                  => 'MISSING_FORUM_NAME',
+            email                       => 'MISSING_EMAIL',
+            confirm_email               => 'MISSING_CONFIRM_EMAIL',
+            new_username                => 'MISSING_NEW_USERNAME',
+            new_password                => 'MISSING_NEW_PASSWORD',
+            confirm_password            => 'MISSING_CONFIRM_PASSWORD',
+
+            moon_stick                  => 'I demand the MOON! On a STICK!',
+        },
+
+        # messages for invalid fields (failed constraints)
+        invalid => {
+            'username-not-unique'       => 'USERNAME_NOT_UNIQUE',
+            'forumname-not-unique'      => 'FORUMNAME_NOT_UNIQUE',
+            # reCAPTCHA messages (from: http://recaptcha.net/apidocs/captcha/)
+            'incorrect-captcha-sol'     => 'the CAPTCHA solution was incorrect',
+            'recaptcha-not-reachable'   => 'unable to contact the reCAPTCHA verify server',
+        },
+
+        # mappings from field names to something we'd like to show the user
+        name => {
+            email_address               => 'Email Address',
+            new_username                => 'Username',
+            forum_name                  => 'Forum Name',
+        },
+    }
+%]

@@ -1,0 +1,90 @@
+0.91
+ - Change Path::Class dep to 0.31 (fixes RT#83707)
+ - Move author tests to xt/ (fixes RT#83708)
+ - Remove final bit of Pod::Tree requirements (re-fixes RT#81896)
+
+0.90
+ - Upgrade of version to 0.90 since we are basically production in DBIC
+ - Bring code back to 5.8 capatibility (fixes RT#81903)
+ - Fix _check_pod_sections to work without Pod::Tree requirement (fixes RT#81896)
+ - Add return value for write_pod (fixes RT#81905)
+
+0.16
+ - Move "golden" test files to baseline/
+ - Add new dead_links test
+ - Fix 5.12-- hashref issue
+ - Fix MANIFEST
+ - Correct Pod::Tree requirement with dead_links test
+
+0.15
+ - Add new dead_links option
+ - Fix overzealous mkpath
+
+0.14
+ - Remove "probable unexpected import" warning, per RT #73992
+
+0.13
+ - Fix EOL problems that are failing on CPAN
+
+0.12
+ - Add new options test platform
+ - Fix certain options to sanitize much better
+ - Clean up docs for clearer list of inputs/defaults, etc.
+ - Fix require by replacing it with Class::Load
+ - Switch to Module::Install for easier maint
+ - Remove Schema.pm from testing (too many dependencies)
+ - _Privatize private subs
+
+0.11
+ - Add the following config options:
+   - skip_classes
+   - skip_inherits
+   - force_inherits
+   - method_format
+   - debug
+ - Some refactoring
+
+0.09
+ - Stop outputting the inherited methods section multiple times.
+
+0.08
+ - Work around arguable perl bug with failed entries in %INC
+   - Upshot: If you distribution has modules that fail to load,
+     and then we try to create documentation for them after that,
+     we won't die horribly.
+ - Add a LICENSE section to the POD.
+
+0.07
+ - Create, and document a $DEBUG var, to put debug printing in
+   - Get rid of silent dependency on Data::Dump::Streamer
+   - Recriminate self over it.
+ - Make it possible to manually behave as if Moose or C3 weren't
+   present, to make sure the test suite still PASSes.
+ - Make it possible to see what gets loaded during the test suite,
+   to see if extra dependencies have snuck in.
+ - Help genericizing and releasing either of those welcome, BTW.
+
+0.06
+ - Yet another go at not reloading files.
+ - Make error messages on unloadable files somewhat less verbose.
+
+0.05
+ - Try harder to avoid reloading the code being documented.
+ - Make doc maps actually work.
+
+0.04
+ - Add force_permissions option (with documentation but not test, yet, fixme).
+
+0.03
+ - Make Moose test much less specific.  (Should fix FAILs from test
+   reporters.)
+ - Add use warnings/strict to the pm files under t/, to quiet
+   Test::Kwalitee.
+
+0.02
+ - Version bump because of a stupid error uploading to PAUSE... the kind of
+   stupid error that you can't just fix and reupload, because PAUSE doesn't
+   let you overwrite files.
+
+0.01
+ - First version

@@ -1,0 +1,618 @@
+
+=head1 NAME
+
+Perl::Critic::PolicySummary - Descriptions of the Policy modules included with L<Perl::Critic|Perl::Critic> itself.
+
+
+=head1 DESCRIPTION
+
+The following Policy modules are distributed with Perl::Critic. (There are
+additional Policies that can be found in add-on distributions.)  The Policy
+modules have been categorized according to the table of contents in Damian
+Conway's book B<Perl Best Practices>. Since most coding standards take the
+form "do this..." or "don't do that...", I have adopted the convention of
+naming each module C<RequireSomething> or C<ProhibitSomething>.  Each Policy
+is listed here with its default severity.  If you don't agree with the default
+severity, you can change it in your F<.perlcriticrc> file (try C<perlcritic
+--profile-proto> for a starting version).  See the documentation of each
+module for its specific details.
+
+
+=head1 POLICIES
+
+=head2 L<BuiltinFunctions::ProhibitBooleanGrep|Perl::Critic::Policy::BuiltinFunctions::ProhibitBooleanGrep>
+
+Use C<List::MoreUtils::any> instead of C<grep> in boolean context. [Default severity 2]
+
+=head2 L<BuiltinFunctions::ProhibitComplexMappings|Perl::Critic::Policy::BuiltinFunctions::ProhibitComplexMappings>
+
+Map blocks should have a single statement. [Default severity 3]
+
+=head2 L<BuiltinFunctions::ProhibitLvalueSubstr|Perl::Critic::Policy::BuiltinFunctions::ProhibitLvalueSubstr>
+
+Use 4-argument C<substr> instead of writing C<substr($foo, 2, 6) = $bar>. [Default severity 3]
+
+=head2 L<BuiltinFunctions::ProhibitReverseSortBlock|Perl::Critic::Policy::BuiltinFunctions::ProhibitReverseSortBlock>
+
+Forbid $b before $a in sort blocks. [Default severity 1]
+
+=head2 L<BuiltinFunctions::ProhibitSleepViaSelect|Perl::Critic::Policy::BuiltinFunctions::ProhibitSleepViaSelect>
+
+Use L<Time::HiRes|Time::HiRes> instead of something like C<select(undef, undef, undef, .05)>. [Default severity 5]
+
+=head2 L<BuiltinFunctions::ProhibitStringyEval|Perl::Critic::Policy::BuiltinFunctions::ProhibitStringyEval>
+
+Write C<eval { my $foo; bar($foo) }> instead of C<eval "my $foo; bar($foo);">. [Default severity 5]
+
+=head2 L<BuiltinFunctions::ProhibitStringySplit|Perl::Critic::Policy::BuiltinFunctions::ProhibitStringySplit>
+
+Write C<split /-/, $string> instead of C<split '-', $string>. [Default severity 2]
+
+=head2 L<BuiltinFunctions::ProhibitUniversalCan|Perl::Critic::Policy::BuiltinFunctions::ProhibitUniversalCan>
+
+Write C<< eval { $foo->can($name) } >> instead of C<UNIVERSAL::can($foo, $name)>. [Default severity 3]
+
+=head2 L<BuiltinFunctions::ProhibitUniversalIsa|Perl::Critic::Policy::BuiltinFunctions::ProhibitUniversalIsa>
+
+Write C<< eval { $foo->isa($pkg) } >> instead of C<UNIVERSAL::isa($foo, $pkg)>. [Default severity 3]
+
+=head2 L<BuiltinFunctions::ProhibitUselessTopic|Perl::Critic::Policy::BuiltinFunctions::ProhibitUselessTopic>
+
+Don't pass $_ to built-in functions that assume it, or to most filetest operators. [Default severity 2]
+
+=head2 L<BuiltinFunctions::ProhibitVoidGrep|Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidGrep>
+
+Don't use C<grep> in void contexts. [Default severity 3]
+
+=head2 L<BuiltinFunctions::ProhibitVoidMap|Perl::Critic::Policy::BuiltinFunctions::ProhibitVoidMap>
+
+Don't use C<map> in void contexts. [Default severity 3]
+
+=head2 L<BuiltinFunctions::RequireBlockGrep|Perl::Critic::Policy::BuiltinFunctions::RequireBlockGrep>
+
+Write C<grep { /$pattern/ } @list> instead of C<grep /$pattern/, @list>. [Default severity 4]
+
+=head2 L<BuiltinFunctions::RequireBlockMap|Perl::Critic::Policy::BuiltinFunctions::RequireBlockMap>
+
+Write C<map { /$pattern/ } @list> instead of C<map /$pattern/, @list>. [Default severity 4]
+
+=head2 L<BuiltinFunctions::RequireGlobFunction|Perl::Critic::Policy::BuiltinFunctions::RequireGlobFunction>
+
+Use C<glob q{*}> instead of <*>. [Default severity 5]
+
+=head2 L<BuiltinFunctions::RequireSimpleSortBlock|Perl::Critic::Policy::BuiltinFunctions::RequireSimpleSortBlock>
+
+Sort blocks should have a single statement. [Default severity 3]
+
+=head2 L<ClassHierarchies::ProhibitAutoloading|Perl::Critic::Policy::ClassHierarchies::ProhibitAutoloading>
+
+AUTOLOAD methods should be avoided. [Default severity 3]
+
+=head2 L<ClassHierarchies::ProhibitExplicitISA|Perl::Critic::Policy::ClassHierarchies::ProhibitExplicitISA>
+
+Employ C<use base> instead of C<@ISA>. [Default severity 3]
+
+=head2 L<ClassHierarchies::ProhibitOneArgBless|Perl::Critic::Policy::ClassHierarchies::ProhibitOneArgBless>
+
+Write C<bless {}, $class;> instead of just C<bless {};>. [Default severity 5]
+
+=head2 L<CodeLayout::ProhibitHardTabs|Perl::Critic::Policy::CodeLayout::ProhibitHardTabs>
+
+Use spaces instead of tabs. [Default severity 3]
+
+=head2 L<CodeLayout::ProhibitParensWithBuiltins|Perl::Critic::Policy::CodeLayout::ProhibitParensWithBuiltins>
+
+Write C<open $handle, $path> instead of C<open($handle, $path)>. [Default severity 1]
+
+=head2 L<CodeLayout::ProhibitQuotedWordLists|Perl::Critic::Policy::CodeLayout::ProhibitQuotedWordLists>
+
+Write C<qw(foo bar baz)> instead of C<('foo', 'bar', 'baz')>. [Default severity 2]
+
+=head2 L<CodeLayout::ProhibitTrailingWhitespace|Perl::Critic::Policy::CodeLayout::ProhibitTrailingWhitespace>
+
+Don't use whitespace at the end of lines. [Default severity 1]
+
+=head2 L<CodeLayout::RequireConsistentNewlines|Perl::Critic::Policy::CodeLayout::RequireConsistentNewlines>
+
+Use the same newline through the source. [Default severity 4]
+
+=head2 L<CodeLayout::RequireTidyCode|Perl::Critic::Policy::CodeLayout::RequireTidyCode>
+
+Must run code through L<perltidy|perltidy>. [Default severity 1]
+
+=head2 L<CodeLayout::RequireTrailingCommas|Perl::Critic::Policy::CodeLayout::RequireTrailingCommas>
+
+Put a comma at the end of every multi-line list declaration, including the last one. [Default severity 1]
+
+=head2 L<ControlStructures::ProhibitCStyleForLoops|Perl::Critic::Policy::ControlStructures::ProhibitCStyleForLoops>
+
+Write C<for(0..20)> instead of C<for($i=0; $i<=20; $i++)>. [Default severity 2]
+
+=head2 L<ControlStructures::ProhibitCascadingIfElse|Perl::Critic::Policy::ControlStructures::ProhibitCascadingIfElse>
+
+Don't write long "if-elsif-elsif-elsif-elsif...else" chains. [Default severity 3]
+
+=head2 L<ControlStructures::ProhibitDeepNests|Perl::Critic::Policy::ControlStructures::ProhibitDeepNests>
+
+Don't write deeply nested loops and conditionals. [Default severity 3]
+
+=head2 L<ControlStructures::ProhibitLabelsWithSpecialBlockNames|Perl::Critic::Policy::ControlStructures::ProhibitLabelsWithSpecialBlockNames>
+
+Don't use labels that are the same as the special block names. [Default severity 4]
+
+=head2 L<ControlStructures::ProhibitMutatingListFunctions|Perl::Critic::Policy::ControlStructures::ProhibitMutatingListFunctions>
+
+Don't modify C<$_> in list functions. [Default severity 5]
+
+=head2 L<ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions|Perl::Critic::Policy::ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions>
+
+Don't use operators like C<not>, C<!~>, and C<le> within C<until> and C<unless>. [Default severity 3]
+
+=head2 L<ControlStructures::ProhibitPostfixControls|Perl::Critic::Policy::ControlStructures::ProhibitPostfixControls>
+
+Write C<if($condition){ do_something() }> instead of C<do_something() if $condition>. [Default severity 2]
+
+=head2 L<ControlStructures::ProhibitUnlessBlocks|Perl::Critic::Policy::ControlStructures::ProhibitUnlessBlocks>
+
+Write C<if(! $condition)> instead of C<unless($condition)>. [Default severity 2]
+
+=head2 L<ControlStructures::ProhibitUnreachableCode|Perl::Critic::Policy::ControlStructures::ProhibitUnreachableCode>
+
+Don't write code after an unconditional C<die, exit, or next>. [Default severity 4]
+
+=head2 L<ControlStructures::ProhibitUntilBlocks|Perl::Critic::Policy::ControlStructures::ProhibitUntilBlocks>
+
+Write C<while(! $condition)> instead of C<until($condition)>. [Default severity 2]
+
+=head2 L<ControlStructures::ProhibitYadaOperator|Perl::Critic::Policy::ControlStructures::ProhibitYadaOperator>
+
+Never use C<...> in production code. [Default severity 4]
+
+=head2 L<Documentation::PodSpelling|Perl::Critic::Policy::Documentation::PodSpelling>
+
+Check your spelling. [Default severity 1]
+
+=head2 L<Documentation::RequirePackageMatchesPodName|Perl::Critic::Policy::Documentation::RequirePackageMatchesPodName>
+
+The C<=head1 NAME> section should match the package. [Default severity 1]
+
+=head2 L<Documentation::RequirePodAtEnd|Perl::Critic::Policy::Documentation::RequirePodAtEnd>
+
+All POD should be after C<__END__>. [Default severity 1]
+
+=head2 L<Documentation::RequirePodLinksIncludeText|Perl::Critic::Policy::Documentation::RequirePodLinksIncludeText>
+
+Provide text to display with your pod links. [Default severity 2]
+
+=head2 L<Documentation::RequirePodSections|Perl::Critic::Policy::Documentation::RequirePodSections>
+
+Organize your POD into the customary sections. [Default severity 2]
+
+=head2 L<ErrorHandling::RequireCarping|Perl::Critic::Policy::ErrorHandling::RequireCarping>
+
+Use functions from L<Carp|Carp> instead of C<warn> or C<die>. [Default severity 3]
+
+=head2 L<ErrorHandling::RequireCheckingReturnValueOfEval|Perl::Critic::Policy::ErrorHandling::RequireCheckingReturnValueOfEval>
+
+You can't depend upon the value of C<$@>/C<$EVAL_ERROR> to tell whether an C<eval> failed. [Default severity 3]
+
+=head2 L<InputOutput::ProhibitBacktickOperators|Perl::Critic::Policy::InputOutput::ProhibitBacktickOperators>
+
+Discourage stuff like C<@files = `ls $directory`>. [Default severity 3]
+
+=head2 L<InputOutput::ProhibitBarewordFileHandles|Perl::Critic::Policy::InputOutput::ProhibitBarewordFileHandles>
+
+Write C<open my $fh, q{<}, $filename;> instead of C<open FH, q{<}, $filename;>. [Default severity 5]
+
+=head2 L<InputOutput::ProhibitExplicitStdin|Perl::Critic::Policy::InputOutput::ProhibitExplicitStdin>
+
+Use "<>" or "<ARGV>" or a prompting module instead of "<STDIN>". [Default severity 4]
+
+=head2 L<InputOutput::ProhibitInteractiveTest|Perl::Critic::Policy::InputOutput::ProhibitInteractiveTest>
+
+Use prompt() instead of -t. [Default severity 5]
+
+=head2 L<InputOutput::ProhibitJoinedReadline|Perl::Critic::Policy::InputOutput::ProhibitJoinedReadline>
+
+Use C<local $/ = undef> or L<Path::Tiny|Path::Tiny> instead of joined readline. [Default severity 3]
+
+=head2 L<InputOutput::ProhibitOneArgSelect|Perl::Critic::Policy::InputOutput::ProhibitOneArgSelect>
+
+Never write C<select($fh)>. [Default severity 4]
+
+=head2 L<InputOutput::ProhibitReadlineInForLoop|Perl::Critic::Policy::InputOutput::ProhibitReadlineInForLoop>
+
+Write C<< while( $line = <> ){...} >> instead of C<< for(<>){...} >>. [Default severity 4]
+
+=head2 L<InputOutput::ProhibitTwoArgOpen|Perl::Critic::Policy::InputOutput::ProhibitTwoArgOpen>
+
+Write C<< open $fh, q{<}, $filename; >> instead of C<< open $fh, "<$filename"; >>. [Default severity 5]
+
+=head2 L<InputOutput::RequireBracedFileHandleWithPrint|Perl::Critic::Policy::InputOutput::RequireBracedFileHandleWithPrint>
+
+Write C<print {$FH} $foo, $bar;> instead of C<print $FH $foo, $bar;>. [Default severity 1]
+
+=head2 L<InputOutput::RequireBriefOpen|Perl::Critic::Policy::InputOutput::RequireBriefOpen>
+
+Close filehandles as soon as possible after opening them. [Default severity 4]
+
+=head2 L<InputOutput::RequireCheckedClose|Perl::Critic::Policy::InputOutput::RequireCheckedClose>
+
+Write C<< my $error = close $fh; >> instead of C<< close $fh; >>. [Default severity 2]
+
+=head2 L<InputOutput::RequireCheckedOpen|Perl::Critic::Policy::InputOutput::RequireCheckedOpen>
+
+Write C<< my $error = open $fh, $mode, $filename; >> instead of C<< open $fh, $mode, $filename; >>. [Default severity 3]
+
+=head2 L<InputOutput::RequireCheckedSyscalls|Perl::Critic::Policy::InputOutput::RequireCheckedSyscalls>
+
+Return value of flagged function ignored. [Default severity 1]
+
+=head2 L<InputOutput::RequireEncodingWithUTF8Layer|Perl::Critic::Policy::InputOutput::RequireEncodingWithUTF8Layer>
+
+Write C<< open $fh, q{<:encoding(UTF-8)}, $filename; >> instead of C<< open $fh, q{<:utf8}, $filename; >>. [Default severity 5]
+
+=head2 L<Miscellanea::ProhibitFormats|Perl::Critic::Policy::Miscellanea::ProhibitFormats>
+
+Do not use C<format>. [Default severity 3]
+
+=head2 L<Miscellanea::ProhibitTies|Perl::Critic::Policy::Miscellanea::ProhibitTies>
+
+Do not use C<tie>. [Default severity 2]
+
+=head2 L<Miscellanea::ProhibitUnrestrictedNoCritic|Perl::Critic::Policy::Miscellanea::ProhibitUnrestrictedNoCritic>
+
+Forbid a bare C<## no critic> [Default severity 3]
+
+=head2 L<Miscellanea::ProhibitUselessNoCritic|Perl::Critic::Policy::Miscellanea::ProhibitUselessNoCritic>
+
+Remove ineffective "## no critic" annotations. [Default severity 2]
+
+=head2 L<Modules::ProhibitAutomaticExportation|Perl::Critic::Policy::Modules::ProhibitAutomaticExportation>
+
+Export symbols via C<@EXPORT_OK> or C<%EXPORT_TAGS> instead of C<@EXPORT>. [Default severity 4]
+
+=head2 L<Modules::ProhibitConditionalUseStatements|Perl::Critic::Policy::Modules::ProhibitConditionalUseStatements>
+
+Avoid putting conditional logic around compile-time includes. [Default severity 3]
+
+=head2 L<Modules::ProhibitEvilModules|Perl::Critic::Policy::Modules::ProhibitEvilModules>
+
+Ban modules that aren't blessed by your shop. [Default severity 5]
+
+=head2 L<Modules::ProhibitExcessMainComplexity|Perl::Critic::Policy::Modules::ProhibitExcessMainComplexity>
+
+Minimize complexity in code that is B<outside> of subroutines. [Default severity 3]
+
+=head2 L<Modules::ProhibitMultiplePackages|Perl::Critic::Policy::Modules::ProhibitMultiplePackages>
+
+Put packages (especially subclasses) in separate files. [Default severity 4]
+
+=head2 L<Modules::RequireBarewordIncludes|Perl::Critic::Policy::Modules::RequireBarewordIncludes>
+
+Write C<require Module> instead of C<require 'Module.pm'>. [Default severity 5]
+
+=head2 L<Modules::RequireEndWithOne|Perl::Critic::Policy::Modules::RequireEndWithOne>
+
+End each module with an explicitly C<1;> instead of some funky expression. [Default severity 4]
+
+=head2 L<Modules::RequireExplicitPackage|Perl::Critic::Policy::Modules::RequireExplicitPackage>
+
+Always make the C<package> explicit. [Default severity 4]
+
+=head2 L<Modules::RequireFilenameMatchesPackage|Perl::Critic::Policy::Modules::RequireFilenameMatchesPackage>
+
+Package declaration must match filename. [Default severity 5]
+
+=head2 L<Modules::RequireNoMatchVarsWithUseEnglish|Perl::Critic::Policy::Modules::RequireNoMatchVarsWithUseEnglish>
+
+C<use English> must be passed a C<-no_match_vars> argument. [Default severity 2]
+
+=head2 L<Modules::RequireVersionVar|Perl::Critic::Policy::Modules::RequireVersionVar>
+
+Give every module a C<$VERSION> number. [Default severity 2]
+
+=head2 L<NamingConventions::Capitalization|Perl::Critic::Policy::NamingConventions::Capitalization>
+
+Distinguish different program components by case. [Default severity 1]
+
+=head2 L<NamingConventions::ProhibitAmbiguousNames|Perl::Critic::Policy::NamingConventions::ProhibitAmbiguousNames>
+
+Don't use vague variable or subroutine names like 'last' or 'record'. [Default severity 3]
+
+=head2 L<Objects::ProhibitIndirectSyntax|Perl::Critic::Policy::Objects::ProhibitIndirectSyntax>
+
+Prohibit indirect object call syntax. [Default severity 4]
+
+=head2 L<References::ProhibitDoubleSigils|Perl::Critic::Policy::References::ProhibitDoubleSigils>
+
+Write C<@{ $array_ref }> instead of C<@$array_ref>. [Default severity 2]
+
+=head2 L<RegularExpressions::ProhibitCaptureWithoutTest|Perl::Critic::Policy::RegularExpressions::ProhibitCaptureWithoutTest>
+
+Capture variable used outside conditional. [Default severity 3]
+
+=head2 L<RegularExpressions::ProhibitComplexRegexes|Perl::Critic::Policy::RegularExpressions::ProhibitComplexRegexes>
+
+Split long regexps into smaller C<qr//> chunks. [Default severity 3]
+
+=head2 L<RegularExpressions::ProhibitEnumeratedClasses|Perl::Critic::Policy::RegularExpressions::ProhibitEnumeratedClasses>
+
+Use named character classes instead of explicit character lists. [Default severity 1]
+
+=head2 L<RegularExpressions::ProhibitEscapedMetacharacters|Perl::Critic::Policy::RegularExpressions::ProhibitEscapedMetacharacters>
+
+Use character classes for literal meta-characters instead of escapes. [Default severity 1]
+
+=head2 L<RegularExpressions::ProhibitFixedStringMatches|Perl::Critic::Policy::RegularExpressions::ProhibitFixedStringMatches>
+
+Use C<eq> or hash instead of fixed-pattern regexps. [Default severity 2]
+
+=head2 L<RegularExpressions::ProhibitSingleCharAlternation|Perl::Critic::Policy::RegularExpressions::ProhibitSingleCharAlternation>
+
+Use C<[abc]> instead of C<a|b|c>. [Default severity 1]
+
+=head2 L<RegularExpressions::ProhibitUnusedCapture|Perl::Critic::Policy::RegularExpressions::ProhibitUnusedCapture>
+
+Only use a capturing group if you plan to use the captured value. [Default severity 3]
+
+=head2 L<RegularExpressions::ProhibitUnusualDelimiters|Perl::Critic::Policy::RegularExpressions::ProhibitUnusualDelimiters>
+
+Use only C<//> or C<{}> to delimit regexps. [Default severity 1]
+
+=head2 L<RegularExpressions::ProhibitUselessTopic|Perl::Critic::Policy::RegularExpressions::ProhibitUselessTopic>
+
+Don't use $_ to match against regexes. [Default severity 2]
+
+=head2 L<RegularExpressions::RequireBracesForMultiline|Perl::Critic::Policy::RegularExpressions::RequireBracesForMultiline>
+
+Use C<{> and C<}> to delimit multi-line regexps. [Default severity 1]
+
+=head2 L<RegularExpressions::RequireDotMatchAnything|Perl::Critic::Policy::RegularExpressions::RequireDotMatchAnything>
+
+Always use the C</s> modifier with regular expressions. [Default severity 2]
+
+=head2 L<RegularExpressions::RequireExtendedFormatting|Perl::Critic::Policy::RegularExpressions::RequireExtendedFormatting>
+
+Always use the C</x> modifier with regular expressions. [Default severity 3]
+
+=head2 L<RegularExpressions::RequireLineBoundaryMatching|Perl::Critic::Policy::RegularExpressions::RequireLineBoundaryMatching>
+
+Always use the C</m> modifier with regular expressions. [Default severity 2]
+
+=head2 L<Subroutines::ProhibitAmpersandSigils|Perl::Critic::Policy::Subroutines::ProhibitAmpersandSigils>
+
+Don't call functions with a leading ampersand sigil. [Default severity 2]
+
+=head2 L<Subroutines::ProhibitBuiltinHomonyms|Perl::Critic::Policy::Subroutines::ProhibitBuiltinHomonyms>
+
+Don't declare your own C<open> function. [Default severity 4]
+
+=head2 L<Subroutines::ProhibitExcessComplexity|Perl::Critic::Policy::Subroutines::ProhibitExcessComplexity>
+
+Minimize complexity by factoring code into smaller subroutines. [Default severity 3]
+
+=head2 L<Subroutines::ProhibitExplicitReturnUndef|Perl::Critic::Policy::Subroutines::ProhibitExplicitReturnUndef>
+
+Return failure with bare C<return> instead of C<return undef>. [Default severity 5]
+
+=head2 L<Subroutines::ProhibitManyArgs|Perl::Critic::Policy::Subroutines::ProhibitManyArgs>
+
+Too many arguments. [Default severity 3]
+
+=head2 L<Subroutines::ProhibitNestedSubs|Perl::Critic::Policy::Subroutines::ProhibitNestedSubs>
+
+C<sub never { sub correct {} }>. [Default severity 5]
+
+=head2 L<Subroutines::ProhibitReturnSort|Perl::Critic::Policy::Subroutines::ProhibitReturnSort>
+
+Behavior of C<sort> is not defined if called in scalar context. [Default severity 5]
+
+=head2 L<Subroutines::ProhibitSubroutinePrototypes|Perl::Critic::Policy::Subroutines::ProhibitSubroutinePrototypes>
+
+Don't write C<sub my_function (@@) {}>. [Default severity 5]
+
+=head2 L<Subroutines::ProhibitUnusedPrivateSubroutines|Perl::Critic::Policy::Subroutines::ProhibitUnusedPrivateSubroutines>
+
+Prevent unused private subroutines. [Default severity 3]
+
+=head2 L<Subroutines::ProtectPrivateSubs|Perl::Critic::Policy::Subroutines::ProtectPrivateSubs>
+
+Prevent access to private subs in other packages. [Default severity 3]
+
+=head2 L<Subroutines::RequireArgUnpacking|Perl::Critic::Policy::Subroutines::RequireArgUnpacking>
+
+Always unpack C<@_> first. [Default severity 4]
+
+=head2 L<Subroutines::RequireFinalReturn|Perl::Critic::Policy::Subroutines::RequireFinalReturn>
+
+End every path through a subroutine with an explicit C<return> statement. [Default severity 4]
+
+=head2 L<TestingAndDebugging::ProhibitNoStrict|Perl::Critic::Policy::TestingAndDebugging::ProhibitNoStrict>
+
+Prohibit various flavors of C<no strict>. [Default severity 5]
+
+=head2 L<TestingAndDebugging::ProhibitNoWarnings|Perl::Critic::Policy::TestingAndDebugging::ProhibitNoWarnings>
+
+Prohibit various flavors of C<no warnings>. [Default severity 4]
+
+=head2 L<TestingAndDebugging::ProhibitProlongedStrictureOverride|Perl::Critic::Policy::TestingAndDebugging::ProhibitProlongedStrictureOverride>
+
+Don't turn off strict for large blocks of code. [Default severity 4]
+
+=head2 L<TestingAndDebugging::RequireTestLabels|Perl::Critic::Policy::TestingAndDebugging::RequireTestLabels>
+
+Tests should all have labels. [Default severity 3]
+
+=head2 L<TestingAndDebugging::RequireUseStrict|Perl::Critic::Policy::TestingAndDebugging::RequireUseStrict>
+
+Always C<use strict>. [Default severity 5]
+
+=head2 L<TestingAndDebugging::RequireUseWarnings|Perl::Critic::Policy::TestingAndDebugging::RequireUseWarnings>
+
+Always C<use warnings>. [Default severity 4]
+
+=head2 L<ValuesAndExpressions::ProhibitCommaSeparatedStatements|Perl::Critic::Policy::ValuesAndExpressions::ProhibitCommaSeparatedStatements>
+
+Don't use the comma operator as a statement separator. [Default severity 4]
+
+=head2 L<ValuesAndExpressions::ProhibitComplexVersion|Perl::Critic::Policy::ValuesAndExpressions::ProhibitComplexVersion>
+
+Prohibit version values from outside the module. [Default severity 3]
+
+=head2 L<ValuesAndExpressions::ProhibitConstantPragma|Perl::Critic::Policy::ValuesAndExpressions::ProhibitConstantPragma>
+
+Don't C<< use constant FOO => 15 >>. [Default severity 4]
+
+=head2 L<ValuesAndExpressions::ProhibitEmptyQuotes|Perl::Critic::Policy::ValuesAndExpressions::ProhibitEmptyQuotes>
+
+Write C<q{}> instead of C<''>. [Default severity 2]
+
+=head2 L<ValuesAndExpressions::ProhibitEscapedCharacters|Perl::Critic::Policy::ValuesAndExpressions::ProhibitEscapedCharacters>
+
+Write C<"\N{DELETE}"> instead of C<"\x7F">, etc. [Default severity 2]
+
+=head2 L<ValuesAndExpressions::ProhibitImplicitNewlines|Perl::Critic::Policy::ValuesAndExpressions::ProhibitImplicitNewlines>
+
+Use concatenation or HEREDOCs instead of literal line breaks in strings. [Default severity 3]
+
+=head2 L<ValuesAndExpressions::ProhibitInterpolationOfLiterals|Perl::Critic::Policy::ValuesAndExpressions::ProhibitInterpolationOfLiterals>
+
+Always use single quotes for literal strings. [Default severity 1]
+
+=head2 L<ValuesAndExpressions::ProhibitLeadingZeros|Perl::Critic::Policy::ValuesAndExpressions::ProhibitLeadingZeros>
+
+Write C<oct(755)> instead of C<0755>. [Default severity 5]
+
+=head2 L<ValuesAndExpressions::ProhibitLongChainsOfMethodCalls|Perl::Critic::Policy::ValuesAndExpressions::ProhibitLongChainsOfMethodCalls>
+
+Long chains of method calls indicate tightly coupled code. [Default severity 2]
+
+=head2 L<ValuesAndExpressions::ProhibitMagicNumbers|Perl::Critic::Policy::ValuesAndExpressions::ProhibitMagicNumbers>
+
+Don't use values that don't explain themselves. [Default severity 2]
+
+=head2 L<ValuesAndExpressions::ProhibitMismatchedOperators|Perl::Critic::Policy::ValuesAndExpressions::ProhibitMismatchedOperators>
+
+Don't mix numeric operators with string operands, or vice-versa. [Default severity 3]
+
+=head2 L<ValuesAndExpressions::ProhibitMixedBooleanOperators|Perl::Critic::Policy::ValuesAndExpressions::ProhibitMixedBooleanOperators>
+
+Write C< !$foo && $bar || $baz > instead of C< not $foo && $bar or $baz>. [Default severity 4]
+
+=head2 L<ValuesAndExpressions::ProhibitNoisyQuotes|Perl::Critic::Policy::ValuesAndExpressions::ProhibitNoisyQuotes>
+
+Use C<q{}> or C<qq{}> instead of quotes for awkward-looking strings. [Default severity 2]
+
+=head2 L<ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters|Perl::Critic::Policy::ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters>
+
+Don't use quotes (C<'>, C<">, C<`>) as delimiters for the quote-like operators. [Default severity 3]
+
+=head2 L<ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator|Perl::Critic::Policy::ValuesAndExpressions::ProhibitSpecialLiteralHeredocTerminator>
+
+Don't write C< print <<'__END__' >. [Default severity 3]
+
+=head2 L<ValuesAndExpressions::ProhibitVersionStrings|Perl::Critic::Policy::ValuesAndExpressions::ProhibitVersionStrings>
+
+Don't use strings like C<v1.4> or C<1.4.5> when including other modules. [Default severity 3]
+
+=head2 L<ValuesAndExpressions::RequireConstantVersion|Perl::Critic::Policy::ValuesAndExpressions::RequireConstantVersion>
+
+Require $VERSION to be a constant rather than a computed value. [Default severity 2]
+
+=head2 L<ValuesAndExpressions::RequireInterpolationOfMetachars|Perl::Critic::Policy::ValuesAndExpressions::RequireInterpolationOfMetachars>
+
+Warns that you might have used single quotes when you really wanted double-quotes. [Default severity 1]
+
+=head2 L<ValuesAndExpressions::RequireNumberSeparators|Perl::Critic::Policy::ValuesAndExpressions::RequireNumberSeparators>
+
+Write C< 141_234_397.0145 > instead of C< 141234397.0145 >. [Default severity 2]
+
+=head2 L<ValuesAndExpressions::RequireQuotedHeredocTerminator|Perl::Critic::Policy::ValuesAndExpressions::RequireQuotedHeredocTerminator>
+
+Write C< print <<'THE_END' > or C< print <<"THE_END" >. [Default severity 3]
+
+=head2 L<ValuesAndExpressions::RequireUpperCaseHeredocTerminator|Perl::Critic::Policy::ValuesAndExpressions::RequireUpperCaseHeredocTerminator>
+
+Write C< <<'THE_END'; > instead of C< <<'theEnd'; >. [Default severity 2]
+
+=head2 L<Variables::ProhibitAugmentedAssignmentInDeclaration|Perl::Critic::Policy::Variables::ProhibitAugmentedAssignmentInDeclaration>
+
+Do not write C< my $foo .= 'bar'; >. [Default severity 4]
+
+=head2 L<Variables::ProhibitConditionalDeclarations|Perl::Critic::Policy::Variables::ProhibitConditionalDeclarations>
+
+Do not write C< my $foo = $bar if $baz; >. [Default severity 5]
+
+=head2 L<Variables::ProhibitEvilVariables|Perl::Critic::Policy::Variables::ProhibitEvilVariables>
+
+Ban variables that aren't blessed by your shop. [Default severity 5]
+
+=head2 L<Variables::ProhibitLocalVars|Perl::Critic::Policy::Variables::ProhibitLocalVars>
+
+Use C<my> instead of C<local>, except when you have to. [Default severity 2]
+
+=head2 L<Variables::ProhibitMatchVars|Perl::Critic::Policy::Variables::ProhibitMatchVars>
+
+Avoid C<$`>, C<$&>, C<$'> and their English equivalents. [Default severity 4]
+
+=head2 L<Variables::ProhibitPackageVars|Perl::Critic::Policy::Variables::ProhibitPackageVars>
+
+Eliminate globals declared with C<our> or C<use vars>. [Default severity 3]
+
+=head2 L<Variables::ProhibitPerl4PackageNames|Perl::Critic::Policy::Variables::ProhibitPerl4PackageNames>
+
+Use double colon (::) to separate package name components instead of single quotes ('). [Default severity 2]
+
+=head2 L<Variables::ProhibitPunctuationVars|Perl::Critic::Policy::Variables::ProhibitPunctuationVars>
+
+Write C<$EVAL_ERROR> instead of C<$@>. [Default severity 2]
+
+=head2 L<Variables::ProhibitReusedNames|Perl::Critic::Policy::Variables::ProhibitReusedNames>
+
+Do not reuse a variable name in a lexical scope [Default severity 3]
+
+=head2 L<Variables::ProhibitUnusedVariables|Perl::Critic::Policy::Variables::ProhibitUnusedVariables>
+
+Don't ask for storage you don't need. [Default severity 3]
+
+=head2 L<Variables::ProtectPrivateVars|Perl::Critic::Policy::Variables::ProtectPrivateVars>
+
+Prevent access to private vars in other packages. [Default severity 3]
+
+=head2 L<Variables::RequireInitializationForLocalVars|Perl::Critic::Policy::Variables::RequireInitializationForLocalVars>
+
+Write C<local $foo = $bar;> instead of just C<local $foo;>. [Default severity 3]
+
+=head2 L<Variables::RequireLexicalLoopIterators|Perl::Critic::Policy::Variables::RequireLexicalLoopIterators>
+
+Write C<for my $element (@list) {...}> instead of C<for $element (@list) {...}>. [Default severity 5]
+
+=head2 L<Variables::RequireLocalizedPunctuationVars|Perl::Critic::Policy::Variables::RequireLocalizedPunctuationVars>
+
+Magic variables should be assigned as "local". [Default severity 4]
+
+=head2 L<Variables::RequireNegativeIndices|Perl::Critic::Policy::Variables::RequireNegativeIndices>
+
+Negative array index should be used. [Default severity 4]
+
+
+=head1 VERSION
+
+This is part of L<Perl::Critic|Perl::Critic> version 1.126.
+
+
+=head1 AUTHOR
+
+Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005-2011 Imaginative Software Systems.  All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.  The full text of this license
+can be found in the LICENSE file included with this module.
+
+=cut

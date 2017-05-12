@@ -1,0 +1,55 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::SPDY::Server
+at lib/Protocol/SPDY/Server.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Protocol::SPDY::Server - server-side handling for SPDY sessions
+
+=head1 VERSION
+
+version 1.001
+
+=head1 SYNOPSIS
+
+ use Protocol::SPDY;
+
+=head1 DESCRIPTION
+
+See L<Protocol::SPDY> and L<Protocol::SPDY::Base>.
+
+=head1 METHODS
+
+=head2 initial_stream_id
+
+Server streams always start at 2.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Protocol::SPDY::Base>
+
+L<apply_settings|Protocol::SPDY::Base/apply_settings>, L<batch|Protocol::SPDY::Base/batch>, L<check_version|Protocol::SPDY::Base/check_version>, L<client_certificate_vector_size|Protocol::SPDY::Base/client_certificate_vector_size>, L<create_stream|Protocol::SPDY::Base/create_stream>, L<credential|Protocol::SPDY::Base/credential>, L<current_cwnd|Protocol::SPDY::Base/current_cwnd>, L<dispatch_frame|Protocol::SPDY::Base/dispatch_frame>, L<dispatch_unhandled_frame|Protocol::SPDY::Base/dispatch_unhandled_frame>, L<download_retrans_rate|Protocol::SPDY::Base/download_retrans_rate>, L<expected_download_bandwidth|Protocol::SPDY::Base/expected_download_bandwidth>, L<expected_round_trip_time|Protocol::SPDY::Base/expected_round_trip_time>, L<expected_upload_bandwidth|Protocol::SPDY::Base/expected_upload_bandwidth>, L<extract_frame|Protocol::SPDY::Base/extract_frame>, L<goaway|Protocol::SPDY::Base/goaway>, L<has_stream|Protocol::SPDY::Base/has_stream>, L<incoming_stream|Protocol::SPDY::Base/incoming_stream>, L<initial_window_size|Protocol::SPDY::Base/initial_window_size>, L<last_stream_id|Protocol::SPDY::Base/last_stream_id>, L<max_concurrent_streams|Protocol::SPDY::Base/max_concurrent_streams>, L<new|Protocol::SPDY::Base/new>, L<next_stream_id|Protocol::SPDY::Base/next_stream_id>, L<on_read|Protocol::SPDY::Base/on_read>, L<parse_frame|Protocol::SPDY::Base/parse_frame>, L<pending_send|Protocol::SPDY::Base/pending_send>, L<ping|Protocol::SPDY::Base/ping>, L<prioritise_incoming_frames|Protocol::SPDY::Base/prioritise_incoming_frames>, L<queue_frame|Protocol::SPDY::Base/queue_frame>, L<receiver_zlib|Protocol::SPDY::Base/receiver_zlib>, L<related_stream|Protocol::SPDY::Base/related_stream>, L<request_close|Protocol::SPDY::Base/request_close>, L<restore_initial_settings|Protocol::SPDY::Base/restore_initial_settings>, L<send_settings|Protocol::SPDY::Base/send_settings>, L<sender_zlib|Protocol::SPDY::Base/sender_zlib>, L<settings|Protocol::SPDY::Base/settings>, L<stream_by_id|Protocol::SPDY::Base/stream_by_id>, L<version|Protocol::SPDY::Base/version>, L<write|Protocol::SPDY::Base/write>
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2015. Licensed under the same terms as Perl itself.

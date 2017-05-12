@@ -1,0 +1,44 @@
+---
+abstract: 'Session::Simple with JWS(JSON Web Sigmature) Cookie'
+author:
+  - 'ritou <ritou.06@gmail.com>'
+build_requires:
+  Cache::Memory::Simple: '1.02'
+  HTTP::CookieJar: '0.005'
+  HTTP::Message: '5.814'
+  Test::More: '0.98'
+  Test::Requires: '0.07'
+  Test::TCP: '2.01'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Session-Simple-JWSCookie
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::Session::Simple::JWSCookie:
+    file: lib/Plack/Middleware/Session/Simple/JWSCookie.pm
+    version: '0.01'
+requires:
+  JSON::WebToken: '0.08'
+  Plack::Middleware::Session::Simple: '0.03'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ritou/p5-plack-middleware-session-simple-jwscookie/issues
+  homepage: https://github.com/ritou/p5-plack-middleware-session-simple-jwscookie
+  repository: git://github.com/ritou/p5-plack-middleware-session-simple-jwscookie.git
+version: '0.01'
+x_authority: cpan:RITOU

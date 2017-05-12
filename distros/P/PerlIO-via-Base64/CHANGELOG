@@ -1,0 +1,42 @@
+0.08	5 April 2012
+	Made sure it runs with 5.14.2, threaded and unthreaded.  Some minor
+	pod tweaks.
+
+	7 August 2009
+	Brought up to date to 5.10.1 and to latest coding esthetics insights.
+
+	28 January 2004
+	Made sure the test-suite cleans up on multi-versioned systems.
+
+0.07    28 December 2003
+        Added automatic required modules update using Devel::Required.
+
+0.06	13 August 2003
+	Cleaned up Makefile.PL and updated copyright message.  Made sure the
+	test-suite runs under strict and warnings.
+
+0.05	21 July 2002
+	Added import() method so that you can now specify the line ending mode
+	in the -use- statement.  Adapted test-suite accordingly.
+
+	Added "can_ok" check to test-suite.
+
+0.04	11 July 2002
+	Upgraded test-suite to make it ready for Perl core inclusion (if that
+	ever happens).  Added check for PerlIO and EBCDIC also, by courtesy of
+	Jarkko Hietaniemi.
+
+	Rearranged top of source to not need fully qualified VERSION anymore.
+
+	Checked for defined() problems: none found.
+
+0.03	10 July 2002
+	Moved to the PerlIO::via namespace.
+
+0.02	9 July 2002
+	Fixed some documentation nits reported by Rafael Garcia-Suarez.
+
+	Version number now a '' string (oops).
+
+0.01    1 July 2002
+	Migrated from the now obsoleted IOLayer:: namespace.

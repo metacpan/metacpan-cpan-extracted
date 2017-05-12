@@ -1,0 +1,8 @@
+<html>
+<body bgcolor="#ffffff">
+<h1>NAME</h1>
+
+<p>230-encoding</p>
+<p>This is latin-2 for a c with an accent: Slaven Rezi&#x107;</p>
+</body>
+</html>

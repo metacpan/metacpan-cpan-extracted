@@ -1,0 +1,71 @@
+{
+   "abstract" : "Provides an easy to use API for the creation and management of passwords in a secure manner",
+   "author" : [
+      "Günter Grodotzki <guenter@perlhipster.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Passwords",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "autodie" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "autodie" : "0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Crypt::Eksblowfish::Bcrypt" : "0.009",
+            "Data::Entropy::Algorithms" : "0.007",
+            "autodie" : "0",
+            "perl" : "5.01",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bugs@perlhipster.com",
+         "web" : "https://github.com/lifeofguenter/p5-passwords/issues"
+      },
+      "homepage" : "http://www.perlhipster.com/p5-passwords",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/lifeofguenter/p5-passwords.git",
+         "web" : "https://github.com/lifeofguenter/p5-passwords"
+      }
+   },
+   "version" : "0.01"
+}

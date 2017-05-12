@@ -1,0 +1,297 @@
+NAME
+    POE::Component::Server::Bayeux - Bayeux/cometd server implementation in
+    POE
+
+SYNOPSIS
+      use POE qw(Component::Server::Bayeux);
+
+      # Create the server, listening on port 8080
+      my $server = POE::Component::Server::Bayeux->spawn(
+          Port  => 8080,
+          Alias => 'bayeux_server',
+      );
+
+      # Create a local client, a reply-bot
+      POE::Session->create(
+          inline_states => {
+              _start => sub {
+                  my ($kernel, $heap) = @_[KERNEL, HEAP];
+                  $kernel->alias_set('test_local_client');
+
+                  # Subscribe to /chat/demo, assigning a state for events
+                  $kernel->post('bayeux_server', 'subscribe', {
+                      channel => '/chat/demo',
+                      client_id => $heap->{client_id},
+                      args => {
+                          state => 'subscribe_response',
+                      },
+                  });
+              },
+              subscribe_response => sub {
+                  my ($kernel, $heap, $message) = @_[KERNEL, HEAP, ARG0];
+
+                  # Don't auto-reply to my own messages
+                  return if $message->{clientId} eq $heap->{client_id};
+
+                  # Auto-reply to every message posted
+                  $kernel->post('bayeux_server', 'publish', {
+                      channel => $message->{channel},
+                      client_id => $heap->{client_id},
+                      data => {
+                          user => 'Autobot',
+                          chat => "I got your message, ".($message->{data}{user} || 'anon'),
+                      },
+                  });
+              },
+          },
+          heap => {
+              client_id => 'test_local_client',
+          },
+      );
+
+      $poe_kernel->run();
+
+DESCRIPTION
+    This module implements the Bayeux Protocol (1.0draft1) from the Dojo
+    Foundation. Also called cometd, Bayeux is a low-latency routing protocol
+    for JSON encoded events between clients and servers in a
+    publish-subscribe model.
+
+    This is the server implementation. There is also a client found at
+    POE::Component::Client::Bayeux. With this server, you can roll out a
+    cometd server and basic HTTP server with POE communication capabilities.
+    It comes bundled with test code that you can run in your browser to test
+    the functionality for a basic chat program.
+
+    Please note: This is the first release of this code. Not much testing
+    has been done, so please keep that in mind if you plan on using this for
+    production. It was developed for a production environment that is still
+    being built, so future versions of this code will be released over the
+    next month that will be more feature complete and less prone to errors.
+
+USAGE
+  spawn (...)
+        Create a new Bayeux server. Arguments to this method:
+
+        *Port* (default: 80)
+            Bind an HTTP server to this port.
+
+        *Alias* (default: 'bayeux')
+            The POE session alias for local clients to post to.
+
+        *AnonPublish* (default: 0)
+            Allow HTTP-connected clients to publish without handshake.
+
+        *ConnectTimeout* (default: 120)
+            Seconds before an HTTP-connected client is timed out and forced
+            to rehandshake. Clients must not go this long between having a
+            connect open.
+
+        *ClientMaxConnections* (default: 10)
+            Maximum number of concurrent connections allowed from a single
+            IP address. Not effective for anything but the bayeux/cometd
+            connections, as the simple HTTP server doesn't support counting
+            concurrent connections.
+
+        *Debug* (default: 0)
+            Either 0 or 1, indicates level of logging.
+
+        *LogFile* (default: undef)
+            If present, opens the file path indicated for logging output.
+
+        *DocumentRoot* (default: '/var/www')
+            Document root of generic HTTP server for file serving.
+
+        *DirectoryIndex* (default: [ 'index.html' ])
+            Index file (think Apache config).
+
+        *TypeExpires* (default: {})
+            Provide a hashref of MIME types and their associated expiry
+            time. Similar to mod_expires 'ExpiresByType $key "access plus
+            $value seconds"'.
+
+        *PostHandle* (default: undef)
+            Provide a subref which will be called with the HTTP::Request and
+            HTTP::Response of any simple HTTP requests before the request is
+            completed. This could allow the code to modify the headers of
+            the response as needed (i.e., path-based expiry time).
+
+        *Services* (default: {})
+            Each key of this hash represents a service channel that will be
+            available. The name of the channel will be '/service/$key', and
+            the handling is dependent on the $value. Provide '_handler' as a
+            fallback handler.
+
+            If $value is a coderef, the code will be called with a single
+            arg of the message being acted upon. The return value(s) of the
+            coderef will be considered response(s) to be sent back to the
+            client, so return an empty array if you don't want this to
+            happen (if you've added responses by
+            $message->request->add_response()).
+
+        *MessageACL* (defaults: sub {})
+            Coderef to perform authorization checks on messages. Code block
+            is passed two args, the Client, and the Message. If the message
+            should be rejected, the code should set is_error() on the
+            message.
+
+            One could use this to perform authentication on the 'handshake'
+            message:
+
+              sub {
+                  my ($client, $message) = @_;
+
+                  return unless $message->isa('POE::Component::Server::Bayeux::Message::Meta');
+                  return unless $message->type eq 'handshake';
+
+                  my $error;
+
+                  while (1) {
+                      if (! $message->ext ||
+                          ! (defined $message->ext->{username} && defined $message->ext->{password})) {
+                          $error = "Must pass username and password in ext to handshake";
+                          last;
+                      }
+
+                      my $authenticated = $message->ext->{username} eq 'admin'
+                          && $message->ext->{password} eq 'password' ? 1 : 0;
+
+                      if (! $authenticated) {
+                          $error = "Invalid username or password";
+                          last;
+                      }
+
+                      $client->flags->{is_authenticated} = 1;
+                      last;
+                  }
+
+                  if ($error) {
+                      $message->is_error($error);
+                  }
+              }
+
+        *Callback* (defaults: sub {})
+            Coderef to receive general event notifications from the server.
+            Sends a hashref like so:
+
+              {
+                  event => 'new_connection',
+                  client_id => ...,
+                  client => ...,
+                  message => ...,
+              }
+
+            See "Server Callbacks" for more details about every type of
+            event that this will receive.
+
+        *ContentHandler* (defaults: {})
+            Additional ContentHandler for POE::Component::Server::HTTP
+            creation. Use this to extend the HTTP server content handling.
+
+        Returns a class object with methods of interest:
+
+        *logger*
+            Returns the Log::Log4perl object used by the server. Use this
+            for unified logging output.
+
+        *session*
+            The POE::Session object returned from an internal create() call.
+
+POE STATES
+    Most of the server code is regarding interaction with HTTP-connected
+    clients. For this, see POE::Component::Server::Bayeux::Client. It
+    supports locally connected POE sessions, and for this, makes the
+    following states available.
+
+    These same states are called internally to handle the basic PubSub
+    behavior of the server for all clients, local and HTTP.
+
+  subscribe ({...})
+        Required keys 'channel', 'client_id'. Optional key 'args' (hashref).
+
+        Subscribes client_id to the channel indicated. If subscribe() is
+        called by another session, it's treated as a non-HTTP request and
+        will not perform authentication on the subscription. Local clients
+        need not handshake or connect.
+
+        Events published to the subscribed channel are sent to the calling
+        session's method named 'deliver', which can be overrided by the args
+        hashref key 'state'. For example:
+
+          $kernel->post('bayeux_server', 'subscribe', {
+              channel => '/chat/demo',
+              client_id => 'local_client',
+              args => {
+                  state => 'subscribe_events',
+              },
+          });
+
+  unsubscribe ({...})
+        Required keys 'channel', 'client_id'.
+
+        Unsubscribes client_id from the channel indicated.
+
+  publish ({...})
+        Required keys 'channel' and 'data'. Optional keys 'client_id', 'id',
+        and 'ext'.
+
+        Publishes a message to the channel specified. The keys 'client_id',
+        'id' and 'ext' are passed thru, appended to the message sent. For
+        local clients who subscribed from another session, the message is
+        immediately posted to their callback state. For HTTP clients,
+        messages are put into queue and flushed if they have an open
+        /meta/connect.
+
+  client_push ({...})
+  Server Callbacks
+    Using the Callback feature of the server spawning, you can be notified
+    about every significant event on the server. Below describes all the
+    current callback events:
+
+    *subscribe*
+        Keys 'client_id' and 'channel'
+
+    *unsubscribe*
+        Keys 'client_id' and 'channel'
+
+    *publish*
+        Keys 'channel' and 'data', optional: 'client_id', 'id', 'ext'
+
+    *client_push*
+        Keys 'channel' and 'client_id', optional: (any extra). Indicates
+        data was pushed to the client not as a normal request/response or a
+        publish/subscribe (out-of-sequence reply to a /service, for
+        example). Likely only triggered by local sessions.
+
+    *client_connect*
+        Keys 'client_id' and either 'ip' or 'session' depending on the type
+        of client.
+
+    *client_disconnect*
+        Key 'client_id'.
+
+TODO
+    Lots of stuff.
+
+    The code currently implements only the long-polling transport and
+    doesn't yet strictly follow all the directives in the protocol document
+    http://svn.xantus.org/shortbus/trunk/bayeux/bayeux.html
+
+KNOWN BUGS
+    No known bugs, but I'm sure you can find some.
+
+SEE ALSO
+    POE, POE::Component::Server::HTTP
+
+COPYRIGHT
+    Copyright (c) 2008 Eric Waters and XMission LLC
+    (http://www.xmission.com/). All rights reserved. This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+AUTHOR
+    Eric Waters <ewaters@uarc.com>
+

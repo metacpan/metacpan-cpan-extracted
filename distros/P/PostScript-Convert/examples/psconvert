@@ -1,0 +1,13 @@
+#! /usr/bin/env perl
+#---------------------------------------------------------------------
+# Copyright 2009 Christopher J. Madsen
+#
+# Convert PostScript using PostScript::Convert
+#---------------------------------------------------------------------
+
+use strict;
+use warnings;
+
+use PostScript::Convert;
+
+psconvert(@ARGV);

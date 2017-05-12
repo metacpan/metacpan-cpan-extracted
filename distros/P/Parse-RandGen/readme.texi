@@ -1,0 +1,193 @@
+\input texinfo @c -*-texinfo-*-
+@c $Revision: #3 $$Date: 2005/07/18 $$Author: jd150722 $
+@c %**start of header
+@setfilename readme.info
+@settitle Parse::RandGen Installation
+@c %**end of header
+
+@c DESCRIPTION: TexInfo: DOCUMENT source run through texinfo to produce README file
+@c Use 'make README' to produce the output file
+
+@node Top, Copyright, (dir), (dir)
+
+This is the Parse::RandGen Package.
+
+@menu
+* Copyright::                   
+* Introduction::                
+* Description::                 
+* Limitations::                 
+* Obtaining Distribution::      
+* Supported Systems::           
+* Installation::                
+@end menu
+
+@node Copyright, Introduction, Top, Top
+@section Copyright
+
+This package is Copyright 2003-2005 by Jeff Dutton @email{jdutton@@cpan.org}.
+
+You may distribute under the terms of either the GNU General Public License
+or the Artistic License, as specified in the Perl README file.
+
+This code is provided with no warranty of any kind, and is used entirely at
+your own risk.
+
+@node Introduction, Description, Copyright, Top
+@section Introduction
+
+This package contains modules that can be used to randomly generate parse data
+that matches (or doesn't match) a grammatical specification.  The primary
+use for this data is to test parsers.
+
+A more limited (but potentially helpful) use of the package is to generate
+random data that satisfies a regular expression (see B<Parse::RandGen::Regexp>).
+
+For example:
+
+@example
+      use Parse::RandGen;
+      my $reObj = Parse::RandGen::Regexp->new( qr/foo(bar|baz)*/ );
+      print "Here is some random data that satisfies the RE: <" . $reObj->pick() . ">\n";
+      print "Here is some that (hopefully) doesn't match the RE: <" . $reObj->pick(match=>0) . ">\n";
+@end example
+
+The call to Parse::RandGen::Regexp::pick() above will return strings such as 'foo', 'foobaz',
+'foobazbarbarbaz', etc....
+
+The package may be also used to build a BNF style Grammar object, composed of Rules,
+Productions, and various types of Conditions (Literals, Regexps, Subrules) and randomly generate
+data based on the grammatical specification.
+
+The following is an example of using Parse::RandGen to generate random data according to a BNF
+grammar:
+
+@example
+    my $grammar = Parse::RandGen::Grammar->new("Filename");
+    $grammar->defineRule("token")->set( prod=>[ cond=>qr/[a-zA-Z0-9_.]+/, ], );
+    $grammar->defineRule("pathUnit")->set( prod=>[ cond=>"token", cond=>"'/'", ], );
+    $grammar->defineRule("relativePath")->set( prod=>[ cond=>"pathUnit(*)", cond=>"token", ], );
+    $grammar->defineRule("absolutePath")->set( prod=>[ cond=>"'/'", cond=>"pathUnit(*)", cond=>"token(?)", ], );
+    $grammar->defineRule("path")->set( prod=>[ cond=>"absolutePath", ],
+				       prod=>[ cond=>"relativePath", ],  );
+    print "Here is a random path: <" . $grammar->rule("path")->pick() . ">\n";
+@end example
+
+The call to Parse::RandGen::Rule::pick() above will return strings such as
+'LF/3yIZPi0h/u', '/','/v3/Dd5ha', '4', etc....
+
+@node Description, Obtaining Distribution, Introduction, Top
+@section Description
+
+A BNF-type grammar is the fundamental abstraction of Parse::RandGen.
+
+A Grammar is a set of Rules.  Each Rule consists of an alternation of Productions (logically ORs).
+A Production consists of a sequence of Conditions (logical ANDs).
+
+In BNF notation, the relationship of Rules and Productions is:
+
+@example
+  rule1:         production1
+               | production2
+               | production3
+@end example
+
+This means that 'rule1' is satisfied by either 'production1', 'production2', or 'production3' (alternation).
+
+A Production consists of one or more Conditions that must be satisfied one after the other.  The notation
+for a production varies, but the following is an example in a Parse::RecDescent style grammar:
+
+@example
+  perlFuncCall:  m/&?/ identifier '(' argument(s?) ')'
+               | scalar '->' identifier '(' argument(s?) ')'
+@end example
+
+In this example, 'perlFuncCall' is the Rule.  The first line contains the first Production, which consists
+of the following Conditions:  (1) match an optional ampersand '&' followed by (2) a single 'identifier'
+followed by (3) an open parenthesis followed by (4) 0 or more 'argument' subrules followed by (5) a close
+parenthesis.  The second line contains another possible form for a Perl function call
+(disclaimer:  this is just a partial example of function call forms).
+
+Conditions that are regular expressions (@samp{man Parse::RandGen::Regexp}) also follow this model.
+Parse::RandGen::Regexp takes a regular expression and breaks it apart into a grammatical rule of ORs and ANDs.
+As a result, picking random data for regular expressions (Regexps) behaves the same as picking random data
+for grammatical rules (Rules).
+
+This is the fundamental way Parse::RandGen works, which will hopefully make its behavior (both features and limitations)
+more obvious:
+
+The pick() method picks random parse data for a Rule by choosing a path through the Rules requirements of Production
+and Condition objects.  First it randomly picks one of the Rule's Productions to satisfy (OR), then it goes about
+satisfying all of the Conditions in that Production (AND).  Often, a Condition will reference another Rule that must
+be satisfied N to M times.  So a number X will be chosen between N and M, and data will be successively chosen to
+satisy that sub-Rule X times.
+
+As a result, pick() should always pick random data that will actually satisfy the Rule or Regexp (because any path
+through the tree of requirements should yield a match).
+
+The user can also call 'pick(match=>0)' which will attempt to NOT MATCH a Rule or Regexp.  However,
+this will not always be successful in picking bad parse data, depending on how exclusive the various Productions
+and Conditions are.  For example, the regular expression m/foo(bar|baz)/ could accidentally produce a good match
+when it did not intend to if it decided to pick corrupt 'bar' in order to force a mismatch and turned it into
+'baz'.  This would then cause the data to match a different Production than the one it was trying to corrupt.
+
+Also, certain Rules and Regexps will match ANYTHING.  In this case, there is no way for Parse::RandGen to produce
+random data that will not match (though it will think it can and will try).
+
+@node Limitations, Obtaining Distribution, Description, Top
+@section Limitations
+
+Regular Expression Limitations:
+
+@itemize @bullet
+Start of input (^) and end of input ($) are ignored (shouldn't have an adverse effect).
+
+Case and quoting metacharacters \l, \u, \L, \U, \E, and \Q are not supported.
+
+Zero-width assertions (\b, \B, \A, \Z, \z, \G) are ignored, which may have adverse effects.
+@end itemize
+
+
+@node Obtaining Distribution, Supported Systems, Description, Top
+@section Obtaining Distribution
+
+The latest version is available at 
+@uref{http://www.perl.org/CPAN/}
+
+Download the latest package from that site, and decompress.
+@samp{gunzip Parse-RandGen_version.tar.gz ; tar xvf Parse-RandGen_version.tar}
+
+@node Supported Systems, Installation, Obtaining Distribution, Top
+@section Supported Systems
+
+This version of Parse::RandGen has been built and tested on:
+
+@itemize @bullet
+@item i386-linux
+@end itemize
+
+It should run on any system with Perl, though it requires the following
+modules:  Carp, Data::Dumper, and YAPE::Regex (version 3.02 or later).
+
+@node Installation,  , Supported Systems, Top
+@section Installation
+
+@enumerate
+@item
+@code{cd} to the directory containing this README notice.
+
+@item
+Type @samp{perl Makefile.PL} to configure Parse::RandGen for your system.
+
+@item
+Type @samp{make} to build the package.
+
+@item
+Type @samp{make test} to check the package.
+
+@item
+Type @samp{make install} to install the programs and any documentation.
+
+@end enumerate
+
+

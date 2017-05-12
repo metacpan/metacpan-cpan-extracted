@@ -1,0 +1,36 @@
+POEx-HTTP-Server version 0.01
+=============================
+
+POEx::HTTP::Server is a clean POE implementation of an HTTP server.  It uses
+POEx::URI to simplify event specification.  It allows limiting connection
+concurrency and implements HTTP 1.1 keep-alive.  It has built in
+compatibility with POE::Component::Daemon's prefork server support.
+
+POEx::HTTP::Server also includes a method for easily sending a static file
+to the browser, with HEAD and If-Modified-Since support.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    POE
+    LWP
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010, 2011 by Philip Gwyn.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

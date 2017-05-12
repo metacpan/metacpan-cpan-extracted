@@ -1,0 +1,36 @@
+Revision history for Perl extension PDF::Reuse::Tutorial.
+
+0.11  Thu Jul 28 2005
+      Removed much of the examples with JavaScript, as they don't work under Acrobat 7.0
+
+0.10  Mon May 10 2004
+      Changed a few examples to show right adjustment and hyperlinks.
+
+0.09  Tue Feb 3 2004
+      Restructured the contents a little. Added a snippet of code to extract the
+      programs etc. from the POD. Added a warning about JavaScript and webpdf.api
+      Moved examples from PDF::Reuse here.
+
+0.08  Tue Nov 11 2003
+      Updated with the new parameters for forms and images from 
+      PDF::Reuse version 0.18
+0.07  Thu Oct 23 2003
+      Added an example about "Filling in a form without 
+      spending a fortune"
+0.06  Wed Sep 3 2003
+      A new example about how to produce bookmarks. Also
+      an example how to make "individual" popup menus.
+0.05  Sun Aug 17
+     Added 3 examples with links
+0.04  Thu June 5
+   - Changed last example to use PDF::Reuse::Barcode and
+     let it show 3 different barcode images
+0.03  Mon May 12 18:33:00 2003
+   - Added a little section about how to run PDF::Reuse
+     from Progress
+0.02  Wed Apr 30 14:52:00 2003
+   - Added a little section about how to make a simple 
+     COM/ActiveX wrapper around PDF::Reuse
+0.01  Tue Apr  8 15:20:31 2003
+	- original version; created by h2xs 1.22 with options
+		-AX PDF::Reuse::Tutorial

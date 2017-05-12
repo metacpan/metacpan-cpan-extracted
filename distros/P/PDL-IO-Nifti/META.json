@@ -1,0 +1,43 @@
+{
+   "abstract" : "Module to access imaging data using Nifti-1 standard",
+   "author" : [
+      "Ingo Schmid <ingosch@gmx.at>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.132510",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDL-IO-Nifti",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Simple" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::F77" : "0",
+            "PDL" : "0",
+            "perl" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.73"
+}

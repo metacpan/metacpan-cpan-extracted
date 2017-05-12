@@ -1,0 +1,93 @@
+COPYRIGHT
+
+(c) 1998-2001 Francois Desarmenien owns the copyright for Parse::Yapp
+(c) 2006-2008 Parse::Eyapp by Casiano Rodriguez-Leon
+Parse::Eyapp uses and modifies all the files in the Parse::Yapp 1.05
+distribution.
+
+IMPORTANT NOTES
+
+The main source of documentation is  Parse::Eyapp (Reference guide).
+Have a look at the tests, they can help you. 
+Not all the examples in the examples/ directory work.
+
+The eyapp frontend has its own documentation using either 'perldoc eyapp'
+or (on systems with man pages) 'man eyapp'.
+
+The trereg frontend to Parse::Eyapp::Treeregexp has its own documentation 
+using either 'perldoc treereg' or (on systems with man pages) 'man treereg'.
+
+Any help on improving those documentations is very welcome.
+
+DESCRIPTION
+
+Parse::Eyapp (Extended yapp) is a collection of modules
+that extends Francois Desarmenien Parse::Yapp 1.05.
+Eyapp extends yacc/yapp syntax with
+functionalities like named attributes,
+EBNF-like expressions, modifiable default action,
+automatic syntax tree building,
+semi-automatic abstract syntax tree building,
+translation schemes, tree regular expressions,
+tree transformations, scope analysis, support,
+directed acyclic graphs and a few more.
+
+REQUIREMENTS
+
+Requires perl5.6 or higher
+
+You need the following modules:
+
+                     List::Util  
+                     Data::Dumper
+                     Pod::Usage 
+
+The last three belong to the core of recent Perl distributions.
+Some of the tests make use of:
+
+Test::Exception
+Test::Warning
+Test::Pod
+
+The tests related with those modules are skipped if you haven't installed
+those modules. 
+
+If you decided to install Test::Warn be aware that
+Test::Warn depends on  Array::Compare. My experience is that you must 
+install Array::Compare by hand first (i.e. perl Makefile.PL; make; make test; make install)
+and then go to install Test::Warn.
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+LEARNING TO USE IT
+
+- Make a local copy of the examples/ directory in this distribution
+- Probably it will be also a good idea to make a copy of the tests in the t/ directory.
+  They also illustrate the use of Eyapp
+- Get the pdf files in 
+     http://nereida.deioc.ull.es/~pl/perlexamples/Eyapp.pdf
+
+- Print Eyapp.pdf.
+
+WARRANTY
+
+This software comes with absolutely NO WARRANTY of any kind. 
+I just hope it can be useful.
+
+FEEDBACK
+
+Send feedback, comments and bugs to:
+
+Casiano Rodriguez-Leon <casiano@ull.es>
+
+COPYRIGHT 
+(C) 2006-2008 by Casiano Rodriguez-Leon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6 or,
+at your option, any later version of Perl 5 you may have available.

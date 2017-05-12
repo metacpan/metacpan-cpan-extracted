@@ -1,0 +1,139 @@
+
+== 0.3003 -- 06/12/2016 ==
+
+ * POSIX::tmpnam is deprecated
+
+== 0.3002 -- 06/07/2015 ==
+
+ * Don't start server if we can't connect to db, when using Storage::DBI
+
+== 0.3001 -- 08/08/2013 ==
+
+ * Migrated from MooseX::AttributeHelpers to native Moose traits
+ * Skip tests that hang on Windows machines
+
+== 0.3000 -- 07/01/2013 ==
+
+ * The 'persistent' header now accepts '1' in addition to 'true'.
+ * Fixed the 'Use of uninitialized value in string eq' warnings that got
+   printed for each message that had no 'persistent' header.
+ * Migrated to Dist::Zilla.
+ * Updated to a more Perl toolchain friendly versioning scheme.
+
+== 0.2.13 -- 06/03/2012 ==
+
+ * Retry only max_retry times when a db operation fails.
+ * Fixed deprecated usage of qw() as parentheses.
+
+== 0.2.12 -- 07/28/2011 ==
+
+ * Added missing test which caused last release to fail to install (Thanks to Naveed
+   Massjouni!)
+
+== 0.2.11 -- 07/26/2011 ==
+
+ * Unit tests and documentation for the clustering support added in the last release.
+ * Updated to work with the latest Moose (2.0201)
+
+== 0.2.10 -- 07/20/2010 ==
+
+ * Added Paul Driver's Storage::Remote (a remote front-store for a clustered MQ)
+ * Multiple Storage::DBI engines in seperate MQ's can now share the same DB if they are
+   given unique mq_id's.
+ * Storage::DBI can now take a list of DB servers and will attempt to failover to another
+   one when the current one goes down.
+ * mq.pl can now be used to run an MQ based on Storage::DBI.
+ * DB schemas changed.
+
+== 0.2.9 -- 06/05/2010 ==
+
+ * A fix to bug #49666 which affected the order of messages (Thanks Naveed Massjouni!)
+ * Depends on POE::Filter::Stomp 0.04 or later (fixes issues with Windows-style newlines)
+ * Fixed a regression in Storage::DBI->new( ... ) - Can now pass a HASH ref
+ * Fixed schemas for MySQL
+
+== 0.2.8 -- 01/26/2010 ==
+
+ * A better fix for new POE which doesn't crash the tests on some users systems.
+
+== 0.2.7 -- 01/23/2010 ==
+
+ * Fixes to get PoCo::MQ working with latest Moose and POE (Thanks to SQUEEK!)
+
+== 0.2.6 -- 02/04/2009 ==
+
+ * Possible fix for a bug where PoCo::MQ crashes because a message is being ACK'd by a client
+   that isn't the one the message was originally sent to and the original client is now
+   disconnected.
+ * Fixed a bug (since 0.2.0) where unsubscribing from a queue wouldn't correctly disown a
+   subscribers owned messages (Thanks Jason McManus!)
+ * Small fixes and additions to documentation and unit tests.
+
+== 0.2.5 -- 12/18/2008 ==
+
+ * Fixed dependancies in Makefile.PL per rt# 41786 (Thanks Sebastien Aperghis-Tramoni!)
+
+== 0.2.4 -- 10/27/2008 ==
+
+ * Fix for bug where delayed messages could be delivered more than once to different subscribers.
+ * Changed 'receipt' header on RECEIPT frames to 'receipt-id' to match the STOMP spec.
+
+== 0.2.3 -- 10/9/2008 ==
+
+ * Added the 'message_class' argument to allow extending the message object.
+ * Added the 'pump_frequency' argument to enable an automatic pump timer (also --pump-freq to mq.pl).
+ * Added support for the 'deliver-after' header to delay message delivery (db schema changes!).
+
+== 0.2.2 -- 6/6/2008 ==
+
+ * Fix for a regression in 0.2.x with regard to ack => 'auto'.
+
+== 0.2.1 -- 4/28/2008 ==
+
+ * Unbroke the interface to Storage::Generic.
+ * Added missing dependancy to Data::UUID.
+
+== 0.2.0 -- 4/24/2008 ==
+
+ * Massive refactor:
+   - Built on Moose.
+   - Any storage engine can be a front-store.
+   - Callback passing (versus old static method).
+ * Storage::Complex:
+   - Treat the front store like a cache.
+   - Separate 'granularity' parameter.
+ * Storage::Throttled:
+   - Can claim and retrieve messages for improved performance.
+ * Comprehensive unit-test suite.
+
+== 0.1.8 -- 2/5/2008 ==
+
+ * Configurable message ID generators (UUIDs are now the default).
+ * Abstracted Storage::Complex to take a configurable front-store and expire function.
+ * An alterative memory-based storage engine (Storage::BigMemory) which operates in
+   O(1) time with any number of messages.
+ * Support for non-persistent topics (via topic://).
+ * Use POE::Filter::Stomp for handling STOMP frame parsing.
+
+== 0.1.7 -- 12/19/2007 ==
+
+ * Added support for statistics gathering.
+ * Attempt to shutdown gracefully after receiving the TERM, INT or HUP signals.
+ * Fixed a bug where messages could get owned by a subscriber forever.
+
+== 0.1.6 -- 9/5/2007 ==
+
+ * Added a pump_deferred() function to send a message to pump a queue
+ * Fixed a bug with ack_type => 'auto'
+ * mq.pl: Output a sane error message when unable to write the crashed.log
+
+== 0.1.5 -- 8/27/2007 ==
+
+ * Added missing dependancies to Makefile.PL
+
+== 0.1.4 -- 6/25/2007 ==
+
+ * Added crash.log and daemonizing support to mq.pl script.
+ * Added documentation for mq.pl script.
+ * Various little documentation fixes.
+

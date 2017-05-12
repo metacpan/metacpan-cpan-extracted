@@ -1,0 +1,349 @@
+NAME
+    PApp - creating applications for the WorldWideWeb [Vortrag]
+
+PApp - what is it?
+    PApp (which is simply short for "Perl APPlication") is a basically a
+    collection of perl modules directed at seasoned perl programmers that
+    allows one to create *large* applications for stateful protocols (like
+    http or wap). It is possible to implement a simple-but-complete content
+    management system in a few hundred lines of papp-code.
+
+About this document/presentation
+    The presentation I will hold at the linuxworldexpo will explain a lot of
+    technical details not included in this document. The slides for the
+    linuxworldexpo presentation will be available at
+    <http://www.goof.com/pcg/marc/docs.html>, shortly after the
+    linuxworldexpo.
+
+What was the motivation for creating PApp?
+    The original motivation for writing PApp came when our company (nethype
+    GmbH) started to implement a highly interactive website that required at
+    least limited forms of content management.
+
+    Creating large or even medium-sized applications for the Web using CGI
+    is a tedious task. Things like preserving state (a.k.a. session-tracking
+    and/or user-tracking) is a major headache, both for the programmer and
+    the security advisor.
+
+    PApp solves these and a lot of other problems we didn't originally
+    envision by providing a generic and easy API.
+
+Features of PApp / Advantages over other solutions
+    While PApp could be mistaken to be yet another CGI-wrapper, this is not
+    the case. PApp concentrates on providing an application-centric view,
+    rather than a web-page-centric one. This means that there can be one web
+    page per file (as with CGI), but it is also possible to put multiple
+    pages into a single file (papp pages, called *modules*, are often so
+    short that it makes a lot of sense to group related pages together), or
+    to distribute them between many files. Of course, the good-old include
+    mechanism is still there (although not named "include").
+
+  State management / Persistance
+    At your option (you want this!), PApp can manage persistent variables
+    for a single session or user. This means that variables almost
+    automatically stay persistent for the whole session. This marking
+    mechanism is very generic: State variables (called *state keys* in PApp
+    parlance) can be marked as session-dependent (the default),
+    user-dependent (persistent over session borders, also called *preference
+    items*), local to a page or a group of pages or any mixture thereof.
+    Interesting planned extensions include things like transactions and
+    transaction-dependent state keys.
+
+    An example for a user-dependent state key is the language the user
+    selected last. A typical session-dependent variable is the flag wether
+    the user has authorized herself. A local variable could be data from a
+    multi-page transaction.
+
+  Security
+    A common bug in cgi scripts is passing of sensitive data in so-called
+    *hidden fields* of web forms, hidden from the casual user but of course
+    open to attacks. With PApp this is very unnatural: The state data never
+    leaves the server, but instead an encrypted (128 bit twofish code)
+    *cookie* is used (usually encoded in the URL, not to be mistaken with
+    the cookies netscape implements). Compromising the server key gives
+    access to other sessions (similar to a broken caching proxy), but still
+    makes it impossible to change the data.
+
+    In general, the design of PApp makes security the first priority, not
+    only by careful design of the network/server protocol but also by
+    providing easy and standardized methods for common tasks.
+
+  Session/User-tracking
+    Session and user-tracking are done automatically by PApp. The
+    application can react to session starts if necesary (e.g. by redirecting
+    the user to a start page when the data on the accessed page is no longer
+    available or initializing state keys on session start). This is also
+    possible when new users start a new session, of course. A session is
+    defined by PApp as a tree with the page that started a session (i.e. one
+    without or with an invalid session cookie)
+
+    User tracking beyond sessions is currently done using the http-cookie
+    mechanism. Care has been taken to do this sensibly, however: The session
+    data from cookies is ignored and a user without (or with disabled)
+    cookies will not be flooded with cookie request more than once or twice
+    a day. This is another example of how PApp can easily adapt to users.
+
+  User administration
+    PApp manages users per-server, not per-application. Applications can use
+    an access right system similar to the unix user/group mechanism to
+    aministrate its users, but can also implement their own system. PApp
+    identifies every user using a unique user id with optional attributes
+    like name/password/group and preferences.
+
+  I18n
+    I18n is short for *Internationalization*, which, in the context of PApp
+    means multiple language support. PApp does this using *language
+    tagging*, string scanning and a generic translation editor. The I18n
+    model of PApp is more general than the widely-known gettext model
+    implimented by GNU and sun, among others. The target language is chosen
+    using the users preferred language and protocol-specific data (e.g. the
+    "Accept-Language"-http-header).
+
+    Every source file can use a different language (if necessary; the
+    language format allows finer-grained distribution of languages but this
+    is not yet implemented). PApp can scan for strings in papp-sources,
+    text/html/xml files and even database fields (e.g. you can declare a
+    single database table row as english, to be translated, or as mixed
+    language, to be scanned for language tags). Every application specifies
+    the destination languages it wants to support. A translation editor (an
+    example application "delivered" with PApp) can be used by translators to
+    translate as-of-yet-untranslated messages, updates can be done on the
+    fly.
+
+    I18n is as easy as writing "__"Translate this"" (the tagging syntax is a
+    reminiscent of the widely used "_("message")"-syntax of C) in your
+    documents or program.
+
+  Unicode / Multi-charset ability
+    Internally, PApp supports only two datatypes: *binary* and *text*.
+    Binary is usually used for images or similar data, while text should be
+    used for html (or xml or wml...) pages. Relatively recent fixes to the
+    unicode standard mostly pacified the objections raised by a lot of
+    cultural groups against this standard, so PApp encodes everything using
+    unicode.
+
+    The internal representation is independent of the output encoding or
+    even the output character set. You can opt to output "iso-8859-1" text
+    or, if the user wants something else, another charset + encoding like
+    "iso-2022-jp". This selection can be based on program choice (i.e.
+    hardwired) or can be based on the users preferences or protocol data
+    (e.g. the "Accept-Charset"-http-header), similar to the selection of the
+    target language.
+
+  Speed
+    Speed was a major concern when designing the API. Although implemented
+    to a large part in perl, PApp aims at providing a similar speed than
+    bare in-server scripts (like "Apache::Registry"-based scripts). At least
+    for non-trivial ("real-world") pages, PApp pages should be very similar
+    in performance, but of course cannot beat "Apache::Registry". However,
+    features like I18n come basically at no cost, both with respect to
+    programming time and to the runtime, often leading to correctly tagged
+    applications even when multi-language was not originally a target of an
+    application ("because it's so easy to do").
+
+  Scalability
+    PApp applications easily scale to many servers if a single server cannot
+    sustain the load. The only limitation is that there must be a single
+    database-server managing the state keys, which is usually a very small
+    amount of processing power a PApp application consumes.
+
+  XML
+    PApp support for XML is two-fold: First, PApp uses XML for its own
+    papp-source-format specifying basic layout of an application. The
+    decision for using XML was not easy, as XML can be regarded as a format
+    designed for machines (but still decipherable and writable by humans, if
+    necessary), while humans are generally better suited with SGML.
+
+    However, XML is used not only for internal source files, but is fully
+    supported as a text format. together with its evil brother *PXML*, which
+    is basically xml (text) with embedded perl code (or vice versa), it
+    allows PApp to apply stylesheets (XSLT) to webpages either at
+    compliation time or at runtime. PApp applications can be written fully
+    in XML, and only the output stylesheets decides wether to actually
+    output HTML, WML (for mobile phones) or XML (for XML-capable-browsers,
+    if sensible).
+
+    As an added gimmick, PApp can dynamically fetch XML or PXML data (or
+    code!) from other sources at runtime. Content management systems usually
+    want to store pages (and/or layout) inside a database. An example on how
+    to implement this even fits as an example into the manpage for the
+    "PApp::XML"-module.
+
+  Protocol- & Layout-independence
+    Together with stylesheets, PApp applications can be written with only
+    minimal dependencies on layout or target protocol. It is possible to
+    write applications that only provide "modules", and only the final
+    stylesheet decides how it is rendered. Since PApp supports this
+    implicitly this enables layout- and protocol-independent applications.
+
+    Together with the I18n model, this enables the almost complete
+    seperation of translation/programming/design and environment. I18n comes
+    at almost no cost, while layout seperation of course requires though on
+    the programmer's side, while protocol independence requires translation
+    stylesheets to translate internal xml representations into the target
+    "language".
+
+  Platform-independence
+    Although the main target of PApp is Apache/mod_perl, an interface based
+    on CGI (or similar mechanisms) is possible (yet slower). PApp
+    applications are indifferent to the environment (i.e. it is easy to
+    write an application that runs both under CGI and inside apache).
+
+  Database support
+    Serious web applications without database support are, of course,
+    impossible. Therefore PApp provides a lot of conviniences for
+    applications: Each application (and sub-application) can define a
+    default database connection which is persistent, cached, and checked
+    (like all database connections in PApp). SQL support is compatible to
+    the underlying DBI interface, but PApp programmers rarely have to resort
+    to that API. PApp automatically caches prepared SQL statements (allowing
+    the query optimiser to work once). Since a code-excerpt is better than a
+    thousand marketing words, here is an actual example:
+
+     <:
+       my $st = sql_exec \my($id, name),
+                         "select id, name from user where name like ?",
+                         $S{name};
+    :>
+    <table><tr><th>ID</th><th>Name</th></tr>
+    <:
+       while ($st->fetch) {
+          ?><tr><td>$id</td><td>$name</td></tr><:
+       }
+    :>
+    </table>
+
+    This displays all id/name-pairs in a given table using a
+    nicely-formatted html-table.
+
+    PApp currently uses MySQL for internal state management (MySQL is very
+    fast for the task at hand). Applications are free to use any database
+    they want, of course.
+
+  Persistent helper objects
+    As mentioned earlier, database connections are persistent. PApp provides
+    a number of "unusual" persistent objects, for example, it is possible to
+    tell PApp that a given callback needs to be called after a specific URL
+    has been clicked, independent of the target page (i.e. the target page
+    has to know nothing about who called it). Another helper object is the
+    persistent SQL row object, which maps SQL rows into perl hashes. The
+    following code excerpt (using the *editform* library which is part of
+    PApp, and fully language-tagged) displays the id and name fields of a
+    table in a freely-editable (HTML-) form. Updates to the database are
+    done automatically, thus, the example is complete:
+
+     <:
+       my $row = new PApp::DataRef 'DB_row',
+                                   table => "user",
+                                   where => [id => $userid];
+
+       # pre-set name
+       $row->{name} ||= "<username>";
+
+       ef_begin;
+       :><br>__"ID:"   <?ef_string \$row->{id}  ,  5:><:
+       :><br>__"Name:" <?ef_string \$row->{name}, 20:><:
+       ef_submit __"Update";
+       ef_end;
+    :>
+
+  Debugability
+    Since PApp is written by its main users (or, conversely, the main users
+    of PApp also develop it), debugging support is relatively strong. PApp
+    usually is able to deliver a complete backtrace of the program,
+    including "interesting objects", when a fatal error occurs and features
+    a powerful exception mechanism to gather information from all stages
+    (low- to high-level) of a request. It is possible to store the backtrace
+    and error information into a database, providing the user with a nice
+    error message while mailing the administrator about the incident. The
+    information saved by PApp allows the programmer to precisely reproduce
+    the error situation (as far as possible), but usually the URL suffices
+    the uniquely identify the precise state of the session.
+
+    Schemes where the user could add comments to such a "coredump" or even
+    browse the data structures interactively (given correct access rights)
+    should be possible, but not implemented so far (this would be
+    implemented using a specialized PApp application supposedly called the
+    "error browser").
+
+  "Web-Widgets"
+    The newest addition to PApp (and therefore not final in its
+    implementation) are reusable components also dubbed *Web-Widgets*,
+    similar to reusable GUI-objects named "widgets". An example for such a
+    component would be a standard "forum" widget. In one of our projects we
+    use the same forum widget to provide "web chat", "small ads" and the
+    "news!" page, all with the same code but using different stylesheets to
+    customize the layout.
+
+    A PApp-application is, in some sense, a large state-machine. this is a
+    limitation of stateless protocols which is hard, but not impossible, to
+    circumvent (if perl only had efficient continuations). Any application
+    can be embedded into other applications, while retaining their own state
+    and their own state machine and of course their own set of variables /
+    state keys. Standard PApp applications are not much more than a single
+    page with html header/footer, authenticitation check and an embedded
+    "Web-widget".
+
+  Logging
+    Logging is a required part of any serious business. Gathering
+    statistical data is a basic requirenment today. PApp saves every state
+    key to a database for each page impression/request (usually between 300
+    and 900 bytes). This saved information contains everything nedeed to
+    recreate a given page except the actual program code. When session/state
+    data is being expired (necessary to put a sensible bound on the size of
+    the state database), PApp conviniently allows applications to gather
+    statistical data from individual "hits", using almost the same
+    environment as at runtime. Expiring and data gathering can, of course,
+    be done seperately if necessary.
+
+Disadvantages
+    PApp is not actually a revolution, judged by its components. It does,
+    however draw a lot of functionality and ideas into a single,
+    well-contained package. Nevertheless, there are quite a few reasons on
+    why *NOT* to use PApp, or at least not to use PApp *YET*.
+
+    *   PApp is not yet a released module, its API is in flux (with respect
+        to recent features), and not everything is working as it should yet.
+        This is fortunately only a question of time.
+
+    *   Only a single person is currently developing and designing PApp for
+        free. This means that advances might sometimes not lead into the
+        direction you want, and maybe not in the schedule you want.
+
+    *   PApp requires the very latest perl - at the moment, this is perl 5.7
+        + custom patches, due to the buggy unicode support in earlier
+        versions. The latest released PApp module (on CPAN) does not rely on
+        unicode, but is already quite outdated with respect to current
+        features.
+
+    *   There is a total lack of tutorials or introductory courses. While
+        all PApp modules are documented, it is very much impossible to learn
+        it using the reference documentation alone. Basically a one-day
+        course under four eyes is necessary to get you up and running - PApp
+        is not trivial. The lost time is generally made up with the increase
+        in productivity experienced with PApp, though, similar to learning
+        Perl ;)
+
+    References
+
+    *   PApp is available as a standard module from CPAN, although the
+        current version uploaded is very old.
+
+    *   The PApp homepage is available at the author's homepage, under
+        <http://www.goof.com/pcg/marc/papp.html>. This page includes links
+        to the current manpages. Online demos are, unfortunately, not yet
+        available.
+
+    *   The newest versions of PApp can be accessed using CVS as a
+        sourceforge project, at <http://www.sourceforge.net>.
+
+    *   The slides for this presentation will be available at the author's
+        homepage, at <http://www.goof.com/pcg/marc/docs.html>, shortly after
+        the linuxworldexpo.
+
+    Apology
+
+    I'd like to apologize for any typoes or other mistakes in this document.
+    It was written in a single session without access to a spellchecker and
+    so has not been debugged it yet ;)
+

@@ -1,0 +1,27 @@
+---
+abstract: 'Javascript PSGI apps via JSP'
+author:
+  - 'Patrick Donelan <pat@patspam.com>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+generated_by: 'Dist::Zilla version 2.101241'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-App-JSP
+recommends: {}
+requires:
+  JSP: 0
+  Plack::Component: 0
+  Plack::Util::Accessor: 0
+  parent: 0
+resources:
+  repository: http://github.com/pdonelan/Plack-App-JSP
+version: 0.101680

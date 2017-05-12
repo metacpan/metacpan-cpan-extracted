@@ -1,0 +1,13 @@
+<div class="title_container">
+  <h1>
+    [% title %]
+  </h1>
+</div>
+<ul>
+  [% FOREACH page IN pages %]
+    <li><a href="[% page.link %]">[% page.name %]</a>
+    [% IF page.title %]
+      - [% page.title %]
+    [% END %]
+  [% END %]
+</ul>

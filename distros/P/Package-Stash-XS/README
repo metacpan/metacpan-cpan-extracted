@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Package-Stash-XS,
+version 0.28:
+
+  faster and more correct implementation of the Package::Stash API
+
+This software is copyright (c) 2013 by Jesse Luehrs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,80 @@
+Revision history for perl module PDF-Imposition
+
+0.24 2017-03-12
+
+ - Add supported options (in module and script) for PDF::Cropmarks
+   (font_size, cropmark_length, cropmark_offset) and set explicitely
+   the values, to avoid relying on the PDF::Cropmarks default values.
+
+0.23 2016-11-11
+
+ - Carry on the PDF metadata when processing the PDF
+
+0.22 2016-03-12
+
+ - Removed dependency on CAM::PDF
+ - Bumped dependency to PDF::API2 with xref support (RT#112461)
+
+0.21 2016-01-13
+
+ - Optimization: avoid the creation of a pdf just to get the cover
+   right. This change should speed up things about 33%.
+
+0.20 2016-01-08
+
+ - New dependencies: Moo and Type::Tiny for better code layout
+ - New options: paper and paper_thickness for crop marks
+ - New option: title (to set the PDF's Title metainfo)
+
+0.16 2016-01-02
+
+ - New schema: 1x1
+ - Improved tests and some minor internal refactoring
+
+0.15 2015-10-30
+
+ - Fixed bug on fileparse usage which could lead to unexpected results
+
+0.14 2015-03-28
+ - New schema: 1x8x2
+
+0.12 2015-02-01
+ - New schema: ea4x4 (this is a weird one)
+
+0.11 2015-01-12
+ - New schemas: 1repeat2top, 1repeat2side, 1repeat4
+
+0.10 2014-12-05
+ - New schema: 4up
+ - Add some basic info the the output PDF
+
+0.09 2014-10-06
+ - 1x4x2cutfoldbind now obeys the cover setting
+
+0.08 2014-10-06
+ - New schema: 1x4x2cutfoldbind
+
+0.07 2014-05-17
+ - Fixed test plans for memory leaks
+
+0.06 2014-05-17
+ - Fixed bad memory leak due to missing ->release on the PDF::API2 objects
+
+0.05 2014-02-18
+ - Fixed useless warning (debug leftover)
+ - Fixed this Changes files
+
+0.04 2013-06-07
+ - Fixed the changelog, which was missing the previous entry.
+ - Added the new schema 2side (like "psnup -2").
+
+0.03 2013-06-07
+ - Fixed missing prerequisite (Try::Tiny) in the Makefile
+
+0.02 2013-06-07
+ - Minor bugfixes to documentation and adjusted the Makefile to
+   install the script.
+
+0.01 2013-06-06
+ - Initial release on CPAN. It ships schemas 2up, 2down, 2x4x2
+

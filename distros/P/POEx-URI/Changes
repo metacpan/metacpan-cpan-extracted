@@ -1,0 +1,13 @@
+Revision history for Perl extension POEx::URI.
+
+0.0300 May 7 2009
+    - Added support for [8100::1] form of IPv6 addresse (RFC3986)
+    - ->canonical enforces 2 segments (/session/event)
+    - Added and documented ->argument
+
+0.0200 May 7 2009
+    - First release to the CPAN
+
+0.0100 May 6 2009
+    - First draft
+

@@ -1,0 +1,11 @@
+Revision history for Perl extension Parallel::MPI::Simple.
+
+0.01  Thu Nov  1 22:46:27 2001
+	- original version, played with by self, not for release.
+0.04  2011-06-06
+        - Fixes to find things when mpicc available, might quieten bugs
+0.05  2011-06-06
+        - Heroic efforts get this working on windows.  Because you can.
+
+0.10  2011-08-19
+        - Added MPI_ANY_SOURCE

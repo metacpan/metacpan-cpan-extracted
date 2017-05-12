@@ -1,0 +1,52 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+my %FILES = (
+    'NS6lib.js' => [ qw( Application.js Conduit.js Runner.js Status.js Blocker.js ) ],
+    'prototype.js' => [ qw( prototype.js ) ],
+    'POE-XUL.js' => [ qw( css_browser_selector.js util.js formated.js 
+                            formatedinput.js formatedarea.js
+                            select_widget.js multikeypress.js ) ]
+);
+
+
+my $DEST = shift;
+my @SRC = @ARGV;
+
+die "Usage $0 DEST SRC1 SRC2...." unless @SRC and $DEST;
+
+while( my( $out, $files ) = each %FILES ) {
+
+    my $outfile = "$DEST/$out";
+    open JS, ">$outfile" or die "Unable to create $outfile: $!";
+    foreach my $in ( @$files ) {
+        my $once = 0;
+        foreach my $dir ( @SRC ) {
+            my $infile = "$dir/$in";
+            next unless -r $infile;
+            open SRC, $infile or die "Unable to create $infile: $!";
+            print "$infile -> $outfile\n";
+            print JS <<JS;
+// ---------------------------------------------------------------------------
+// FILE: $infile
+// ---------------------------------------------------------------------------
+
+JS
+            print JS <SRC>;
+            print JS <<JS;
+
+// ---------------------------------------------------------------------------
+// EOF: $infile
+// ---------------------------------------------------------------------------
+JS
+            $once++;
+            close SRC;
+            last;
+        }
+        next if $once;
+        die "Unable to find $in in @SRC";
+    }
+    close JS;
+}

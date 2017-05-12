@@ -1,0 +1,21 @@
+# When you compiled GOODS using makefile.linux-pthreads, use this
+use ExtUtils::MakeMaker;
+
+my $argdef = '';
+for my $arg(@ARGV) {
+	$argdef .= "$arg " if $arg =~ /^-D/;
+}
+
+WriteMakefile(
+    'NAME'      => 'Pogo',
+    'VERSION_FROM' => 'Pogo.pm', # finds $VERSION
+    'CC'        => 'g++',
+    'LD'        => '$(CC)',
+    'CCFLAGS'   => '--no-rtti',
+    'LDDLFLAGS' => '-shared -lpthread -L/usr/local/lib',
+    'LIBS'      => '-lstdc++ -L/usr/local/goods/lib -lclient',
+    'DEFINE'    => "$argdef -DPTHREADS -D_REENTRANT",
+    'INC'       => '-I/usr/local/goods/inc',
+    'XSPROTOARG' => '-noprototypes',
+    'OBJECT'    => 'Pogo.o pogomain.o pogogcls.o pogocall.o nstring.o',
+);

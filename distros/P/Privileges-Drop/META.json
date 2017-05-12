@@ -1,0 +1,47 @@
+{
+   "abstract" : "A module to make it simple to drop all privileges, even \nPOSIX groups.",
+   "author" : [
+      "Troels Liebe Bentsen <troels@infopro.dk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Privileges-Drop",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Privileges::Drop" : {
+         "file" : "lib/Privileges/Drop.pm",
+         "version" : "1.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.03"
+}

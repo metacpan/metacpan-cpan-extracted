@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/libjingle-0.3
+
+Name: JingleBase
+Description: Jingle Base Library
+Version: 0.3.11
+Libs: -L${libdir} -ljinglebase-0.3
+Cflags: -I${includedir} -DPOSIX -DFEATURE_ENABLE_SSL=1

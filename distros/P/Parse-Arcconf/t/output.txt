@@ -1,0 +1,313 @@
+Controllers found: 1
+----------------------------------------------------------------------
+Controller information
+----------------------------------------------------------------------
+   Controller Status                        : Okay
+   Channel description                      : SAS/SATA
+   Controller Model                         : IBM ServeRAID 8i
+   Controller Serial Number                 : 143FCA
+   Physical Slot                            : 0
+   Installed memory                         : 256 MB
+   Copyback                                 : Disabled
+   Data scrubbing                           : Enabled
+   Automatic Failover                       : Enabled
+   Defunct disk drive count                 : 0
+   Logical drives/Offline/Critical          : 1/0/0
+   --------------------------------------------------------
+   Controller Version Information
+   --------------------------------------------------------
+   BIOS                                     : 5.2-0 (17002)
+   Firmware                                 : 5.2-0 (17002)
+   Driver                                   : 1.1-5 (2461)
+   Boot Flash                               : 5.2-0 (17002)
+   --------------------------------------------------------
+   Controller Battery Information
+   --------------------------------------------------------
+   Status                                   : Okay
+   Over temperature                         : No
+   Capacity remaining                       : 100 percent
+   Time remaining (at current draw)         : 3 days, 5 hours, 20 minutes
+   --------------------------------------------------------
+   Controller Vital Product Data
+   --------------------------------------------------------
+   VPD Assigned#                            : 13N2230
+   EC Version#                              : H19036
+   Controller FRU#                          : 13N2233
+   Battery FRU#                             : 13N2256
+
+----------------------------------------------------------------------
+Logical drive information
+----------------------------------------------------------------------
+Logical drive number 0
+   Logical drive name                       : A
+   RAID level                               : 5
+   Status of logical drive                  : Okay
+   Size                                     : 349500 MB
+   Stripe-unit size                         : 256 KB
+   Read-cache mode                          : Enabled
+   Write-cache mode                         : Enabled (write-back)
+   Write-cache setting                      : Enabled (write-back) when protected by battery
+   Partitioned                              : Yes
+   Protected by Hot-Spare                   : No
+   Bootable                                 : Yes
+   Defunct stripes                          : No
+   --------------------------------------------------------
+   Logical drive segment information
+   --------------------------------------------------------
+   Segment 0                                : Present (0,0) 3NP264SH
+   Segment 1                                : Present (0,1) BSF000ME
+   Segment 2                                : Present (0,2) 3NP27QHY
+   Segment 3                                : Present (0,4) 3NP264L8
+   Segment 4                                : Present (0,5) 3NP27R6E
+   Segment 5                                : Present (0,6) P2X7BP5A
+Logical drive number 1
+   Logical drive name                       : B
+   RAID level                               : 5
+   Status of logical drive                  : Okay
+   Size                                     : 349500 MB
+   Stripe-unit size                         : 256 KB
+   Read-cache mode                          : Enabled
+   Write-cache mode                         : Enabled (write-back)
+   Write-cache setting                      : Enabled (write-back) when protected by battery
+   Partitioned                              : Yes
+   Protected by Hot-Spare                   : No
+   Bootable                                 : Yes
+   Defunct stripes                          : No
+   --------------------------------------------------------
+   Logical drive segment information
+   --------------------------------------------------------
+   Segment 0                                : Present (1,0) 3NP264SH
+   Segment 1                                : Present (1,1) BSF000ME
+   Segment 2                                : Present (1,2) 3NP27QHY
+   Segment 3                                : Present (1,4) 3NP264L8
+   Segment 4                                : Present (1,5) 3NP27R6E
+   Segment 5                                : Present (1,6) P2X7BP5A
+
+
+----------------------------------------------------------------------
+Physical Device information
+----------------------------------------------------------------------
+      Device #0
+         Device is a Hard drive
+         State                              : Online
+         Supported                          : Yes
+         Transfer Speed                     : SAS 3.0 Gb/s
+         Reported Channel,Device            : 0,0
+         Reported Location                  : Enclosure 0, Slot 0
+         Reported ESD                       : 2,0
+         Vendor                             : IBM-ESXS
+         Model                              : ST973402SS
+         Firmware                           : B522
+         Serial number                      : 3NP264SH
+         World-wide name                    : 5000C5000776E700
+         Size                               : 70006 MB
+         Write Cache                        : Disabled (write-through)
+         FRU                                : 26K5779
+         PFA                                : No
+      Device #1
+         Device is a Hard drive
+         State                              : Online
+         Supported                          : Yes
+         Transfer Speed                     : SAS 3.0 Gb/s
+         Reported Channel,Device            : 0,1
+         Reported Location                  : Enclosure 0, Slot 1
+         Reported ESD                       : 2,0
+         Vendor                             : IBM-ESXS
+         Model                              : MBB2073RC
+         Firmware                           : SB01
+         Serial number                      : BSF000ME
+         World-wide name                    : 500000E018743C11
+         Size                               : 70006 MB
+         Write Cache                        : Disabled (write-through)
+         FRU                                : 26K5779
+         PFA                                : No
+      Device #2
+         Device is a Hard drive
+         State                              : Online
+         Supported                          : Yes
+         Transfer Speed                     : SAS 3.0 Gb/s
+         Reported Channel,Device            : 0,2
+         Reported Location                  : Enclosure 0, Slot 2
+         Reported ESD                       : 2,0
+         Vendor                             : IBM-ESXS
+         Model                              : ST973402SS
+         Firmware                           : B522
+         Serial number                      : 3NP27QHY
+         World-wide name                    : 5000C500077A2EB8
+         Size                               : 70006 MB
+         Write Cache                        : Disabled (write-through)
+         FRU                                : 26K5779
+         PFA                                : No
+      Device #3
+         Device is a Hard drive
+         State                              : Online
+         Supported                          : Yes
+         Transfer Speed                     : SAS 3.0 Gb/s
+         Reported Channel,Device            : 0,4
+         Reported Location                  : Enclosure 0, Slot 3
+         Reported ESD                       : 2,0
+         Vendor                             : IBM-ESXS
+         Model                              : ST973402SS
+         Firmware                           : B522
+         Serial number                      : 3NP264L8
+         World-wide name                    : 5000C5000776E418
+         Size                               : 70006 MB
+         Write Cache                        : Disabled (write-through)
+         FRU                                : 26K5779
+         PFA                                : No
+      Device #4
+         Device is a Hard drive
+         State                              : Online
+         Supported                          : Yes
+         Transfer Speed                     : SAS 3.0 Gb/s
+         Reported Channel,Device            : 0,5
+         Reported Location                  : Enclosure 0, Slot 4
+         Reported ESD                       : 2,0
+         Vendor                             : IBM-ESXS
+         Model                              : ST973402SS
+         Firmware                           : B522
+         Serial number                      : 3NP27R6E
+         World-wide name                    : 5000C500077A2F08
+         Size                               : 70006 MB
+         Write Cache                        : Disabled (write-through)
+         FRU                                : 26K5779
+         PFA                                : No
+      Device #5
+         Device is a Hard drive
+         State                              : Online
+         Supported                          : Yes
+         Transfer Speed                     : SAS 3.0 Gb/s
+         Reported Channel,Device            : 0,6
+         Reported Location                  : Enclosure 0, Slot 5
+         Reported ESD                       : 2,0
+         Vendor                             : IBM-ESXS
+         Model                              : CBRBA073C3ETS0 N
+         Firmware                           : C49B
+         Serial number                      : P2X7BP5A
+         World-wide name                    : 5000CCA0007E25DB
+         Size                               : 70006 MB
+         Write Cache                        : Disabled (write-through)
+         FRU                                : 39R7366
+         PFA                                : No
+      Device #6
+         Device is an Enclosure services device
+         Reported Channel,Device            : 2,0
+         Enclosure ID                       : 0
+         Type                               : SES2
+         Vendor                             : IBM
+         Model                              : SAS SES-2 DEVICE
+         Firmware                           : 0.09
+         Status of Enclosure services device
+            Temperature                     : Normal
+      Device #7
+         Device is a Hard drive
+         State                              : Online
+         Supported                          : Yes
+         Transfer Speed                     : SAS 3.0 Gb/s
+         Reported Channel,Device            : 0,0
+         Reported Location                  : Enclosure 0, Slot 0
+         Reported ESD                       : 2,0
+         Vendor                             : IBM-ESXS
+         Model                              : ST973402SS
+         Firmware                           : B522
+         Serial number                      : 3NP264SH
+         World-wide name                    : 5000C5000776E700
+         Size                               : 70006 MB
+         Write Cache                        : Disabled (write-through)
+         FRU                                : 26K5779
+         PFA                                : No
+      Device #8
+         Device is a Hard drive
+         State                              : Online
+         Supported                          : Yes
+         Transfer Speed                     : SAS 3.0 Gb/s
+         Reported Channel,Device            : 0,1
+         Reported Location                  : Enclosure 0, Slot 1
+         Reported ESD                       : 2,0
+         Vendor                             : IBM-ESXS
+         Model                              : MBB2073RC
+         Firmware                           : SB01
+         Serial number                      : BSF000ME
+         World-wide name                    : 500000E018743C11
+         Size                               : 70006 MB
+         Write Cache                        : Disabled (write-through)
+         FRU                                : 26K5779
+         PFA                                : No
+      Device #9
+         Device is a Hard drive
+         State                              : Online
+         Supported                          : Yes
+         Transfer Speed                     : SAS 3.0 Gb/s
+         Reported Channel,Device            : 0,2
+         Reported Location                  : Enclosure 0, Slot 2
+         Reported ESD                       : 2,0
+         Vendor                             : IBM-ESXS
+         Model                              : ST973402SS
+         Firmware                           : B522
+         Serial number                      : 3NP27QHY
+         World-wide name                    : 5000C500077A2EB8
+         Size                               : 70006 MB
+         Write Cache                        : Disabled (write-through)
+         FRU                                : 26K5779
+         PFA                                : No
+      Device #10
+         Device is a Hard drive
+         State                              : Online
+         Supported                          : Yes
+         Transfer Speed                     : SAS 3.0 Gb/s
+         Reported Channel,Device            : 0,4
+         Reported Location                  : Enclosure 0, Slot 3
+         Reported ESD                       : 2,0
+         Vendor                             : IBM-ESXS
+         Model                              : ST973402SS
+         Firmware                           : B522
+         Serial number                      : 3NP264L8
+         World-wide name                    : 5000C5000776E418
+         Size                               : 70006 MB
+         Write Cache                        : Disabled (write-through)
+         FRU                                : 26K5779
+         PFA                                : No
+      Device #11
+         Device is a Hard drive
+         State                              : Online
+         Supported                          : Yes
+         Transfer Speed                     : SAS 3.0 Gb/s
+         Reported Channel,Device            : 0,5
+         Reported Location                  : Enclosure 0, Slot 4
+         Reported ESD                       : 2,0
+         Vendor                             : IBM-ESXS
+         Model                              : ST973402SS
+         Firmware                           : B522
+         Serial number                      : 3NP27R6E
+         World-wide name                    : 5000C500077A2F08
+         Size                               : 70006 MB
+         Write Cache                        : Disabled (write-through)
+         FRU                                : 26K5779
+         PFA                                : No
+      Device #12
+         Device is a Hard drive
+         State                              : Online
+         Supported                          : Yes
+         Transfer Speed                     : SAS 3.0 Gb/s
+         Reported Channel,Device            : 0,6
+         Reported Location                  : Enclosure 0, Slot 5
+         Reported ESD                       : 2,0
+         Vendor                             : IBM-ESXS
+         Model                              : CBRBA073C3ETS0 N
+         Firmware                           : C49B
+         Serial number                      : P2X7BP5A
+         World-wide name                    : 5000CCA0007E25DB
+         Size                               : 70006 MB
+         Write Cache                        : Disabled (write-through)
+         FRU                                : 39R7366
+         PFA                                : No
+      Device #13
+         Device is an Enclosure services device
+         Reported Channel,Device            : 2,0
+         Enclosure ID                       : 0
+         Type                               : SES2
+         Vendor                             : IBM
+         Model                              : SAS SES-2 DEVICE
+         Firmware                           : 0.09
+         Status of Enclosure services device
+            Temperature                     : Normal

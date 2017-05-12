@@ -1,0 +1,67 @@
+0.17  Wed Apr 4 01:19:47 GMT 2012
+    - Fix regex for magnet torrents
+
+0.16  Fri Mar 23 20:30:35 GMT 2012
+    - Don't fail on RAR files with C<'> in their name
+    - Ignore temporary magnet torrents
+
+0.15  Mon Apr 4 20:18:49 GMT 2011
+    - Preserve symlinks in the torrent log path
+
+0.14  Sat Apr 2 00:57:44 GMT 2011
+    - Expand '~' in torrent log filename, and convert it to an absolute
+      path in case the process will chdir().
+
+0.13  Fri Apr 1 23:02:19 GMT 2011
+    - Add more troubleshooting info for the RTorrent configuration
+    - Avoid an undefined warning when the unrar fails with no error message
+
+0.12  Thu Dec 2 20:06:58 GMT 2010
+    - Describe caveats related to catching error messages for failed unrars
+    - Add missing argument to pocoirc example in SYNOPSIS
+    - Add missing RTorrent hook for erased torrents
+
+0.11  Tue Sep 28 08:54:33 GMT 2010
+    - Update SYNOPSIS to reflect App-Pocoirc changes
+
+0.10  Tue Sep 14 01:53:29 GMT 2010
+    - Eliminate warning due to dubious sprintf usage
+
+0.09  Sat Sep 11 22:01:33 GMT 2010
+    - Change the IRC colors for "finished" and "unrared" to make them unique
+
+0.08  Thu Sep 9 06:35:57 GMT 2010
+    - Mention App::Pocoirc in the SYNOPSIS
+
+0.07  Mon Sep 6 04:39:40 GMT 2010
+    - Fix erroneous dependency on the FollowTail plugin
+
+0.06  Tue Aug 17 22:55:10 GMT 2010
+    - Use Dist::Zilla
+    - Make all warnings fatal
+
+0.05 Mon Aug  2 08:39:02 GMT 2010
+    - Added timestamps to the log file.
+    - Report the start of the hash check as well as the end of it. This way,
+      time needed for the hash check will not affect the average bandwidth
+      report. The irctor-queue event handlers for rtorrent need to be
+      modified for this release. See the docs.
+    - Report if (and why) an unrar operation fails.
+
+0.04 Fri Apr  9 19:38:12 GMT 2010
+    - Create the torrent log file if it doesn't exist
+
+0.03 Wed Mar  3 22:39:17 GMT 2010
+    - Divide RTorrent's ratio number by 1000 so it will actually be a ratio
+    - Adjust RTorrent configuration docs to use $d.get_tied_to_file instead
+      of $d.get_loaded_file. This should fix incorrectly reported download
+      times after restarts.
+
+0.02 Tue Mar  2 22:14:15 GMT 2010
+    - Support RTorrent's 'download.event.erased'
+    - Fix the bug with the name of torrents getting replaced with the info
+      has after RTorrent restarts
+    - Expanded the documentation for irctor-queue
+
+0.01 Sat Feb 27 05:11:35 GMT 2010
+    - First CPAN release

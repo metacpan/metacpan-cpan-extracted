@@ -1,0 +1,9 @@
+SYNOPSIS
+
+     use Parse::Hosts qw(parse_hosts);
+     my $res = parse_hosts();
+
+SEE ALSO
+
+    parse-hosts from App::ParseHosts, CLI script.
+

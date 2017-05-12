@@ -1,0 +1,8 @@
+Revision history for POE-Component-Server-MySQL
+
+0.02    20/10/2010
+        BlockSize was cutting sql request in pieces.
+
+0.01    20/10/2010
+        First version, released on an unsuspecting world.
+

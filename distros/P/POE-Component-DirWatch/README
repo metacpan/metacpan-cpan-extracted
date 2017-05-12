@@ -1,0 +1,191 @@
+NAME
+    POE::Component::DirWatch - POE directory watcher
+
+SYNOPSIS
+      use POE::Component::DirWatch;
+
+      my $watcher = POE::Component::DirWatch->new
+        (
+         alias      => 'dirwatch',
+         directory  => '/some_dir',
+         filter     => sub { $_[0]->is_file ? $_[0] =~ /\.gz$/ : 1 },
+         dir_callback  => sub{ ... },
+         file_callback => sub{ ... },
+         interval   => 1,
+        );
+
+      $poe_kernel->run;
+
+DESCRIPTION
+    POE::Component::DirWatch watches a directory for files or directories.
+    Upon finding either it will invoke a user-supplied callback function
+    depending on whether the item is a file or directory.
+
+ASYNCHRONOUS IO SUPPORT
+    This object supports asynchronous IO access using IO::AIO. At load time,
+    the class will detect whether IO::AIO is present in the host system and,
+    if it is present, apply the POE::Component::DirWatch::Role::AIO role to
+    the current class, adding the "aio" attribute, the <aio_callback> event,
+    and replacing "_poll" with an asynchronous version. If you do not wish
+    to use AIO you can specify so with he "no_aio" flag like this:
+
+        use POE::Component::DirWatch (no_aio => 1);
+
+ATTRIBUTES
+  alias
+    Read only alias for the DirWatch session. Defaults to "dirwatch" if not
+    specified. You can NOT rename a session at runtime.
+
+  directory
+    Read-write, required. A Path::Class::Dir object for the directory
+    watched. Automatically coerces strings into Path::Class::Dir objects.
+
+  interval
+    Required read-write integer representing interval between the end of a
+    poll event and the scheduled start of the next. Defaults to 1.
+
+  file_callback
+    has_file_callback - predicate
+    clear_file_callback - clearer
+
+    Optional read-write code reference to call when a file is found. The
+    code reference will passed a single argument, a Path::Class::File object
+    representing the file found. It usually makes most sense to process the
+    file and remove it from the directory to avoid duplicate processing
+
+  dir_callback
+    has_dir_callback - predicate
+    clear_dir_callback - clearer
+
+    Optional read-write code reference to call when a directory is found.
+    The code reference will passed a single argument, a Path::Class::Dir
+    object representing the directory found.
+
+  filter
+    has_filter - predicate
+    clear_filter - clearer
+
+    An optional read-write code reference that, if present, will be called
+    for each item in the watched directory. The code reference will passed a
+    single argument, a Path::Class::File or Path::Class::Dir object
+    representing the file/dir found. The code should return true if the
+    callback should be called and false if the file should be ignored.
+
+  next_poll
+    has_next_poll - predicate
+    clear_next_poll - clearer
+
+    The ID of the alarm for the next scheduled poll, if any. Has clearer and
+    predicate methods named "clear_next_poll" and "has_next_poll". Please
+    note that clearing the "next_poll" just clears the next poll id, it does
+    not remove the alarm, please use "pause" for that.
+
+OBJECT METHODS
+  new( \%attrs)
+      See SYNOPSIS and ATTRIBUTES.
+
+  session
+    Returns a reference to the actual POE session. Please avoid this unless
+    you are subclassing. Even then it is recommended that it is always used
+    as "$watcher->session->method" because copying the object reference
+    around could create a problem with lingering references.
+
+  pause [$until]
+    Synchronous call to _pause. This just posts an immediate _pause event to
+    the kernel.
+
+  resume [$when]
+    Synchronous call to _resume. This just posts an immediate _resume event
+    to the kernel.
+
+  shutdown
+    Convenience method that posts a FIFO shutdown event.
+
+  meta
+    See Moose;
+
+EVENT HANDLING METHODS
+    These methods are not part of the public interface of this class, and
+    expect to be called from whithin POE with the standard positional
+    arguments. Use them at your own risk.
+
+  _start
+    Runs when "$poe_kernel->run" is called to set the session's alias and
+    schedule the first "poll" event.
+
+  _poll
+    Triggered by the "poll" event this is the re-occurring action. _poll
+    will use get a list of all items in the directory and call the
+    appropriate callback.
+
+  _file_callback
+    Will execute the "file_callback" code reference, if any.
+
+  _pause [$until]
+    Triggered by the "_pause" event this method will remove the alarm
+    scheduling the next directory poll. It takes an optional argument of
+    $until, which dictates when the polling should begin again. If $until is
+    an integer smaller than the result of time() it will treat $until as the
+    number of seconds to wait before polling. If $until is an integer larger
+    than the result of time() it will treat $until as an epoch timestamp.
+
+         #these two are the same thing
+         $watcher->pause( time() + 60);
+         $watcher->pause( 60 );
+
+         #this is one also the same
+         $watcher->pause;
+         $watcher->resume( 60 );
+
+  _resume [$when]
+    Triggered by the "_resume" event this method will remove the alarm
+    scheduling the next directory poll (if any) and schedule a new poll
+    alarm. It takes an optional argument of $when, which dictates when the
+    polling should begin again. If $when is an integer smaller than the
+    result of time() it will treat $until as the number of seconds to wait
+    before polling. If $until is an integer larger than the result of time()
+    it will treat $when as an epoch timestamp and schedule the poll alarm
+    accordingly. If not specified, the alarm will be scheduled with a delay
+    of zero.
+
+  _shutdown
+    Delete the "heap", remove the alias we are using and remove all set
+    alarms.
+
+  BUILD
+    Constructor. "create()"s a POE::Session.
+
+TODO
+    More examples
+    More tests
+    ChangeNotify support (patches welcome!)
+
+SEE ALSO
+    POE::Session, POE::Component, Moose, POE,
+
+    The git repository for this project can be found in on github,
+    <http://github.com/arcanez/poe-component-dirwatch/>
+
+AUTHOR
+    Guillermo Roditi, <groditi@cpan.org>
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-poe-component-dirwatch at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-DirWatch>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+ACKNOWLEDGEMENTS
+    #poe & #moose on irc.perl.org
+    Matt S Trout
+    Rocco Caputo
+    Charles Reiss
+    Stevan Little
+    Eric Cholet
+
+COPYRIGHT
+    Copyright 2006-2008 Guillermo Roditi. This is free software; you may
+    redistribute it and/or modify it under the same terms as Perl itself.
+

@@ -1,0 +1,91 @@
+Changes made to PPM in order to support XML::Parser
+===================================================
+
+===============================================================================
+PPD file format
+===============================================================================
+
+- Created an XML DTD, based on my original notes, as well as information
+  gleaned from the documentation Murray provided and the internals of PPM.
+  Built in a similar fashion to the OSD DTD; _extremely_ flexible, to the point
+  of not allowing for much data validation to take place.  Should be considered
+  usable, by not necessarily complete or strict.
+
+===============================================================================
+PPM_DAT file format
+===============================================================================
+
+- Created an XML DTD, baed on information gleaned from the documentation Murray
+  provided and the internals of PPM.  Built similarly to the DTD for PPD;
+  flexible and not very strict.  At this point, the DTD is to be considered
+  incomplete as it doesn't currently specify how PPD documents are to be kept
+  internally.
+
+- A number of elements were renamed due to their not being valid XML element
+  names (cannot have an underscore in an element or attribute name):
+    Old name                    New name
+    -----------------------     -------------------------
+    PPM_VER                     PPMVER
+    PLATFORM::OS_VALUE          PLATFORM::OSVALUE
+    PLATFORM::OS_VERSION        PLATFORM::OSVERSION
+    OPTIONS::FORCE_INSTALL      OPTIONS::FORCEINSTALL
+    OPTIONS::BUILD_DIR          OPTIONS::BUILDDIR
+    PPM_PRECIOUS                PPMPRECIOUS
+    INST_DATE                   INSTDATE
+    INST_ROOT                   INSTROOT
+    INST_PACKLIST               INSTPACKLIST
+    INST_PPD                    INSTPPD
+
+===============================================================================
+New modules/scripts
+===============================================================================
+
+- With the release of XML::Parser-2.09, they have reintroduced 'Styles' back
+  into the parser.  A style refers to the style of parser that is requested,
+  allowing for parsing via either subroutines, data structures, or an object
+  hierarchy.  For PPM, I've gone the route of using objects to refer to each of
+  the elements within the documents.  This allows for a fairly robust way to
+  deal with the document once you've read it into memory by giving us the
+  ability to do validation against some of the DTD requirements (e.g. required
+  attributes/child elements).
+  - Creating a new XML document by object can be a bit lengthy as we need to
+    allocate each element individually, but this also allows us to validate our
+    own XML documents before outputting them anywhere.
+
+- Created an XML::Element module.
+  - Allows for outputting of XML elements as well as creation via 'new'.
+
+- Created an XML::ValidatingElement module.
+  - Allows for elements to have some basic validation done on them by providing
+    lists of optional/required attributes/child elements.
+
+- Created an XML::PPD module.
+  - Defines all of the elements valid in a PPD file, as well as providing
+    validation rules for each of the elements.  Full documentation on the file
+    format is included in the POD, as well as a copy of the DTD that it
+    validates against and a sample PPD file.
+
+- Created an XML::PPMConfig module.
+  - Defines all of the elements valid in the PPM configuration file, as well as
+    providing validation rules for each of the elements.  Full documentation on
+    the file format is included in the POD, as well as a copy of the DTD that
+    it validates against and a sample PPMConfig file.
+
+- Created a 'updateppmconf' script.
+  - Converts a PPM configuration file from the old format (with underscores) to
+    the new format which is suitable for reading with XML::Parser.
+
+===============================================================================
+Changes to PPM.pm
+===============================================================================
+
+- Updated to use the XML::PPMConfig, XML::PPD, and XML::Parser modules.
+  - Went through the entire module and replaced all references to using the
+    original data structure provided by Osd.pm to use the object model provided
+    by these modules.  Made the code for parsing a heck of a lot easier to
+    write, it's just a bit trickier to build an XML document than before (can't
+    just use 'print...').
+
+- Removed the POD documentation outlining the structure/format of the PPM
+  configuration file, and refer people to XML::PPMConfig instead.
+

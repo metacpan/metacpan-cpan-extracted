@@ -1,0 +1,57 @@
+## name Suspicious but OK
+## failures 0
+## cut
+
+my $data = 'foo';
+print $1;
+sub utf8 { return; }
+
+#-----------------------------------------------------------------------------
+
+## name No Plan
+## failures 3
+## cut
+
+my $data3 = 'bar';
+my @obj4 = qw( Moe Larry Curly );
+my %user5 = ();
+
+#-----------------------------------------------------------------------------
+
+## name Default Exceptions
+## failures 0
+## cut
+
+my $md5;
+my $x11;
+my $UTF8;
+
+#-----------------------------------------------------------------------------
+
+## name Overriding Exceptions
+## failures 0
+## parms { exceptions => 'logan7' }
+## cut
+
+my $logan7;
+
+#-----------------------------------------------------------------------------
+
+## name Overriding Exceptions Removes Defaults
+## failures 3
+## parms { exceptions => 'logan7' }
+## cut
+
+my $md5;
+my $x11;
+my $UTF8;
+
+#-----------------------------------------------------------------------------
+
+## name partial exception
+## failures 0
+## cut
+
+  my $generated_md5;
+
+#-----------------------------------------------------------------------------

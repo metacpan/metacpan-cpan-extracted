@@ -1,0 +1,108 @@
+==================================================
+Changes from 2013-07-08 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.272 at 2014-07-08 17:54:44 +0000
+------------------------------------------
+
+  Change: 96d92a6c75eefdc3fd701c7af9a3255e1f446de5
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-08 13:45:54 +0000
+
+    rt.cpan.org 92985. Ideally resolve "Not an ARRAY reference" at
+    shutdown.
+
+    I haven't encountered the problem myself, but I see where it could
+    happen, thanks to the bug report. This change should fix it, but I
+    haven't got a test case, so no absolute guarantees are made. 
+
+  Change: 3e489b54e73a1ba6e7949f4c96b24bb23bda901f
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-08 13:42:24 +0000
+
+    Speed up the test by shutting down the component when done. 
+
+  Change: a18da3eebd52c4341cca6baa8121607526b02ca1
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-09-28 09:56:09 +0000
+
+    Merge pull request #3 from dsteinbrunner/patch-1
+
+    Bugtracker metadata fix. 
+
+  Change: d5c4b1e9d2f16a2f06e11b674e6d5273f5d9c964
+  Author: David Steinbrunner <dsteinbrunner@pobox.com>
+  Date : 2013-09-25 05:24:04 +0000
+
+    bugtracker metadata fix 
+
+  Change: 4f3529282049828691feed6fa726d90ba1e78176
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-09-07 18:06:06 +0000
+
+    Minor syntax cleanups. Nothing functionally significant. 
+
+  Change: c3e8492b933336765287302fb5a7fc54ddce0347
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-09-07 17:49:05 +0000
+
+    Improve thread safety.
+
+    Move away from using stringified references. The references can
+    change when threads come into play, but the saved string versions
+    won't. This includes using fork() on Windows. 
+
+  Change: c8e993b3b8345644bfa49e8fac114760d0224303
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-09-07 17:44:49 +0000
+
+    Consolidate C<use constant> statements. 
+
+  Change: 838ec7f439841a60ccd744b2c60e7df94089ec96
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-07-15 22:20:47 +0000
+
+    Log why connection tests fail.
+
+    Most cpantesters.org failure reports are of the form "connection
+    failed" without explaining why. Explain why. 
+
+  Change: e3bb8e929fed59ef7dd166a9a92c47c047f07205
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-07-15 03:10:15 +0000
+
+    Resolve most bind() conflicts by using port 0.
+
+    I was using random ports, which are mostly okay, but over the course
+    of hundreds of cpantesters.org reports, enough showed up to make it a
+    concern 
+
+  Change: 20d1dce836f7ecba7ae4cbb0449fa4540e1c6e92
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-07-15 02:37:31 +0000
+
+    Remove a TestServer shutdown race condition.
+
+    Counted after 14 cpantesters.org failures of the form "Failed test
+    'first request honored asynchronously'". Added detailed error
+    information to the failure. If it happens again, I'll be better
+    prepared to fix it.
+
+    Stopped relying on the order of first/second connection callbacks.
+    Previously, if the second fired first, we'd shut down the TestServer
+    too early. The first connection would then fail because.
+
+    Meanwhile, always shutdown the connection manager (not just after the
+    second response). Each session has its own, and they both need to go.
+    Otherwise the program waits the obligatory connection pool timeout. 
+
+  Change: 776e56c9af244b0ea35f12f9e4298654548d32cf
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-06-03 03:08:19 +0000
+
+    Add more values to some debugging statements. 
+
+=================================================
+Plus 33 releases after 2013-07-08 00:00:00 +0000.
+=================================================

@@ -1,0 +1,43 @@
+Release history for Pod-Weaver-Section-Contributors
+
+0.009   2014-12-22 11:51:10 Asia/Seoul
+    - remove the use of autobox (ETHER)
+
+0.008   2014-08-08 11:47:58 Asia/Seoul
+    - fix exception that occurs when not run via Dist::Zilla (ETHER)
+    - now also fetching contributors directly from Dist::Zilla
+      'x_contributors' metadata (ETHER)
+    - stopwords now passed to the [StopWords] plugin directly via =for
+      directives, which also lets Pod::Spell see them (without requiring the
+      plugin) (ETHER)
+    - no longer sorting the list of contributor names; the original ordering
+      from the various sources is respected (ETHER)
+
+0.007   2013-12-12 16:58:15 Asia/Seoul
+    - avoid warning message when manipulating stopwords
+
+0.006   2013-06-13 14:21:39 Asia/Seoul
+    - New option to determine publish the CONTRIBUTOR/CONTRIBUTORS
+      section to all the modules or only the main module.
+      Suggested by THALJEF.
+
+0.005   2013-05-12 01:03:34 Asia/Seoul
+    - fix errors when trying to access a non-existent stash (v0.004, ETHER)
+
+0.004   2013-05-10 16:39:14 Asia/Seoul
+    - contributor names are added back into [%PodWeaver] for
+      Pod::Weaver::Plugin::StopWords (ETHER)
+
+0.003   2013-03-27 11:35:00 Asia/Seoul
+    - New option to specify the heading level (if any) of the inserted text.
+      Suggested by ETHER. (CDRAUG)
+
+0.002   2013-03-25 15:07:22 Asia/Seoul
+    - Merge contributors names on weaver.ini and dist.ini rather than
+      overriding weaver.ini. (CDRAUG)
+    - Implemented catching of contributors names from comments in the
+      source. (CDRAUG)
+    - It now removes repeated names of contributors. (CDRAUG)
+
+0.001   2012-06-19 04:22:31 Asia/Seoul
+    First version, released on unsuspecting world.

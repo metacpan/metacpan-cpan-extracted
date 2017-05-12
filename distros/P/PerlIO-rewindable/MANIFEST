@@ -1,0 +1,15 @@
+.cvsignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/PerlIO/.cvsignore
+lib/PerlIO/rewindable.pm
+lib/PerlIO/rewindable.xs
+t/pod_cvg.t
+t/pod_syn.t
+t/rewind.t
+SIGNATURE    Added here by Module::Build

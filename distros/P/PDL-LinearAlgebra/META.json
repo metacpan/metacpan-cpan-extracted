@@ -1,0 +1,50 @@
+{
+   "abstract" : "PDL bindings to some BLAS and LAPACK library routines",
+   "author" : [
+      "Chris Marshall <chm@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDL-LinearAlgebra",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "PDL" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "PDL" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "0",
+            "constant" : "1.03"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://pdl.perl.org/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.code.sf.net/p/pdl/pdl-linearalgebra",
+         "web" : "http://sourceforge.net/p/pdl/pdl-linearalgebra/ci/master/tree/"
+      }
+   },
+   "version" : "0.12"
+}

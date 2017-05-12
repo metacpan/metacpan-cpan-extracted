@@ -1,0 +1,13 @@
+Build.PL
+INSTALL
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/cpan_mangler.psgi
+lib/Plack/Middleware/HTMLify.pm
+t/00_compile.t
+t/author-critic.t
+t/htmlify.t

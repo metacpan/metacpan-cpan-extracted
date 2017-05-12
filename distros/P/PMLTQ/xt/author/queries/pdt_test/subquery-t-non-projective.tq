@@ -1,0 +1,6 @@
+# Neprojektivní hrana
+t-node $ref1 := 
+[ parent t-node $ref0 := 
+     [ 1+x same-tree-as t-node $ref2 := 
+          [ !ancestor $ref0, ((order-follows $ref0 and order-precedes $ref1) or (order-follows $ref1 and order-precedes $ref0)) ] ] ];
+  >> give $ref1.id,$ref0.id sort by $1,$2

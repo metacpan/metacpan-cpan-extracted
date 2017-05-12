@@ -1,0 +1,8 @@
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-Miscellanea::RequireRcsKeywords]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+[-Tics::ProhibitUseBase]
+[Documentation::RequirePodSections]
+lib_sections = NAME | AFFILIATION | VERSION | SYNOPSIS | DESCRIPTION | INTERFACE | AUTHOR | LICENSE AND COPYRIGHT | CONFIGURATION AND ENVIRONMENT | DIAGNOSTICS | DEPENDENCIES | INCOMPATIBILITIES | BUGS AND LIMITATIONS
+[-ControlStructures::ProhibitPostfixControls]

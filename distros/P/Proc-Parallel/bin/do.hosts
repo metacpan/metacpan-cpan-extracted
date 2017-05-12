@@ -1,0 +1,234 @@
+#!/usr/bin/perl
+
+package main::dohosts;
+
+use strict;
+use warnings;
+use Proc::Parallel;
+use Tie::Function::Examples qw(%q_shell);
+
+our @more_places_to_look = ();
+
+run(@ARGV) unless caller();
+
+sub usage
+{
+	my ($msg) = @_;
+	require Pod::Usage;
+	if ($msg =~ /^\d+/) {
+		Pod::Usage::pod2usage('-verbose' => $msg);
+	} else {
+		Pod::Usage::pod2usage('-verbose' => 99, '-msg' => "\nError: $msg\n", 
+			'-sections' => "USAGE|OPTIONS");
+	}
+}
+
+sub run
+{
+	my (@argv) = @_;
+
+
+	my $series;
+	my $NNN = 0;
+	my $zero;
+	my $host_list;
+	my $local;
+	my $name;
+	my $counter;
+	my $raw;
+	my $simultaneous = 0;
+
+	while (@argv && (($argv[0] =~ /^-/) || ! $host_list)) {
+		my $a = shift @argv;
+		if ($a =~ /^(?:-s|--series|--single)$/) {
+			$series = 1;
+		} elsif ($a =~ /^(?:-N|--NNN)$/) {
+			$NNN = shift @argv;
+			usage("NNN requires an integer")
+				unless $NNN =~ /^\d+$/;
+		} elsif ($a =~ /^--?l(?:ocal)?$/) {
+			$local = 1;
+			$name = 1;
+		} elsif ($a =~ /^--?r(?:aw)?$/) {
+			$raw = 1;
+		} elsif ($a =~ /^--?n(?:ame)?$/) {
+			$name = 1;
+		} elsif ($a =~ /^--?h(?:elp)?$/) {
+			usage(2);
+		} elsif ($a =~ /^--?c(?:ounter)?$/) {
+			$counter = 1;
+		} elsif ($a =~ /^-?-0$/) {
+			$zero = 1;
+		} elsif ($a =~ /^-?-(\d+)$/) {
+			$simultaneous = $1;
+		} elsif ($a =~ /^-/) {
+			usage("Unknown flag: $a");
+		} elsif (! $host_list) {
+			$host_list = $a;
+		} else {
+			usage("unexpected argument : $a");
+		}
+	}
+	usage("need to specify a host list and a command") unless $host_list;
+	usage("need to specify a command") unless @argv;
+
+	PLACE:
+	for(;;) {
+		last if $host_list =~ m{/} && -f $host_list;
+
+		my @hlp = ("$ENV{HOME}/.hosts.", @more_places_to_look);
+		unshift(@hlp, "$ENV{DO_DOT_HOSTS_LISTS}")
+			if $ENV{DO_DOT_HOSTS_LISTS};
+
+		for my $p (@hlp) {
+			next unless -f "$p$host_list";
+			$host_list = "$p$host_list";
+			last PLACE;
+		}
+
+		usage("need a hosts lists file");
+	}
+
+	open my $hl, "<", $host_list
+		or die "open $host_list: $!";
+
+	my @hosts;
+
+	while (<$hl>) {
+		chomp;
+		s/#.*//;
+		next if /^\s*$/;
+		push(@hosts, grep { /\S/ } split(/\s+/, $_));
+	}
+
+	close($hl);
+
+	my $n = $NNN || 1;
+
+	my @todo_list;
+	my $running = 0;
+
+	my $total = $n * @hosts;
+	my $count = $zero ? 0 : 1;
+	for my $nnn (1..$n) {
+		for my $host (@hosts) {
+			my $command = join(' ', map { $q_shell{$_} } @argv);
+			$command = $argv[0] if @argv == 1;
+			my $sub = '';
+			if ($NNN) {
+				$sub = $nnn;
+				$sub -= 1 if $zero;
+				$command =~ s/NNN/$sub/g;
+				$sub = "-$sub";
+			} 
+			if ($name) {
+				$command =~ s/=HOSTNAME=/$host/g;
+			}
+			if ($counter) {
+				$command =~ s/=COUNTER=/$count/g;
+				$command =~ s/=TOTAL=/$total/g;
+				$count++;
+			}
+			$command = "ssh -o StrictHostKeyChecking=no $host -n $q_shell{$command}"
+				unless $local;
+
+			my $header = "$host$sub:\t";
+			$header = '' if $raw;
+
+			my $per_line = sub {
+				my ($handler, $ioe, $input_buffer_reference) = @_;
+				while (<$ioe>) {
+					print "$header$_";
+				}
+			};
+			my $finished = sub {
+				my ($handler, $ioe, $input_buffer_reference) = @_;
+				print "$header$$input_buffer_reference\n"
+				if length($$input_buffer_reference);
+				$running--;
+				if (@todo_list) {
+					start_command( @{shift @todo_list} );
+					$running++;
+				}
+			};
+
+			if ($series) {
+				print "+ $command\n";
+				system($command);
+			} elsif ($simultaneous && $running >= $simultaneous) {
+				push(@todo_list, [ "$command 2>&1", $per_line, $finished ]);
+			} else {
+				start_command("$command 2>&1", $per_line, $finished );
+				$running++;
+			}
+		}
+	}
+
+	finish_commands() unless $series;
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+ do.hosts - run commands across a cluster of systems at once
+
+=head1 USAGE
+
+ do.hosts host-list-file [OPTIONS] command-to-run
+
+=head1 OPTIONS
+
+	--series 	Run commands in series rather than in parallel
+	-N --NNN n	Run n commands per system, replace "NNN" in command with command number
+	--counter	Replace =COUNTER= and =TOTAL= with a count and total command number
+	-0 		For -NNN and --counter count from zero instead of one
+	--local		Do not ssh to remote systems (implies --name)
+	--name		In command, replace =HOSTNAME= with the remote system name 
+	--raw		Do not tag command output with hostnames
+	--help		Display this message
+	--NUM		Run at most NUM simultaneous commands (start more as others finish)
+
+=head1 DESCRIPTION
+
+do.hosts is a command to run a commmand on a bunch of systems at once.
+It requires a file that lists the remote systems.  In that file,
+multiple hosts can be put on the same line.
+
+If the host-list-file isn't a valid filename, $0 will try
+to find the host-list-file by looking in:
+
+ $ENV{DO_DOT_HOSTS_LISTS}
+ $ENV{HOME}/.hosts.
+
+It will append host-list-file to those locations.  If host-list-file
+is "cluster1", it will look for:
+
+ $ENV{DO_DOT_HOSTS_LISTS}cluster1
+ $ENV{HOME}/.hosts.cluster1
+
+The options can come before or after the host-list-file. 
+
+If the host-list-file does not contain any slashes (/) then it will not
+look in the current directory for it.
+
+=head1 EXAMPLES
+
+ do.hosts cluster1 uptime
+ do.hosts cluster1 -N 2 echo NNN
+ do.hosts cluster1 --counter echo =COUNTER=
+ do.hosts cluster1 --local scp access_log =HOSTNAME=:/data/david/dsl
+ do.hosts cluster1 --raw cat /data/david/dsl | wc
+ do.hosts cluster1 --local scp =HOSTNAME=:/data/david/dsl foo.=HOSTNAME=
+ do.hosts cluster1 --local --counter scp =HOSTNAME=:/data/david/dsl foo.=COUNTER=
+
+=head1 LICENSE
+
+Copyright (C) 2007-2008 SearchMe, Inc.
+Copyright (C) 2008-2010 David Sharnoff
+Copyright (C) 2011 Google, Inc.
+This package may be used and redistributed under the terms of either
+the Artistic 2.0 or LGPL 2.1 license.
+

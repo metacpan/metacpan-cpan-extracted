@@ -1,0 +1,38 @@
+v0.09 Thu, 17 Dec 2015 11:15:55 +0100 moocow
+	+ fixed wrongly succeeding bogus tests with unary ok()
+	  - tests now use Test::More and re-factored common test subroutines
+	+ pdlmaker.plm doesn't distribute generated PM files any more (PDL now does this for us)
+
+v0.08 Mon, 23 Nov 2015 12:19:25 +0100 moocow
+	+ no real joy with Makefile.PL workaround (UNKNOWN results are still pretty wonky)
+	+ updating PDL::VectorValued to use shared $VERSION via perl-reversion script from module Perl::Version
+	+ PDL::Ngrams can now depend directly on PDL::VectorValued
+
+v0.07 Tue, 17 Nov 2015 09:41:47 +0100 moocow
+	+ Makefile.PL workaround for PDL::VectorValued(::Version) strangeness on cpantesters
+	+ see http://sourceforge.net/p/pdl/mailman/message/34623263/ ("headaches with indirect PDL-related dependencies on cpantesters", 2015-11-16 13:16:44)
+	+ cleaned up MANIFEST
+	+ cleaned up test directory
+	  - removed bogus t/01_rlevec.t (really just a stale dup of PDL::VectorValued test-file of same name)
+	  - renamed other test files for gapless enumeration
+
+v0.06 Thu, 05 Nov 2015 10:27:18 +0100 moocow
+	+ workaround for clump(-N) bug in PDL-v2.014: compute non-negative clump() argument in PDL::Ngrams::ng_cofreq()
+	+ should resolve RT bug #108472; reported upstream PDL bug as https://sourceforge.net/p/pdl/bugs/406/
+
+v0.05003 Tue, 24 Sep 2013 13:44:43 +0200 moocow
+	+ added support for PDL_Index type (PDL >= v2.007)
+	+ changed version convention to jive more or less with both pp_setversion() and version->parse()
+
+v0.04 Mon, 02 Jan 2012 12:36:00 +0100 moocow
+	+ added pdlmaker.plm for CPAN-friendly distribution
+
+v0.03 Fri, 06 Apr 2007 18:15:49 +0200 moocow
+	+ compiled PDL::PP code now in module Ngrams::Utils
+	+ moved general vector utilities to new module PDL::VectorValued, added dependency
+
+v0.02 2007-03-22 00:01:04 +0100 moocow
+	+ moved PDL::PP code to Ngrams/ngutils.pd
+
+v0.01 Mon, 19 Mar 2007 23:21:21 +0100 (moocow)
+	+ initial version

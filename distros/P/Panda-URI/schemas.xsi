@@ -1,0 +1,44 @@
+MODULE = Panda::URI                PACKAGE = Panda::URI::_userpass
+PROTOTYPES: DISABLE
+
+string URI::UserPass::user (SV* newval = NULL) {
+    if (newval) {
+        THIS->user(sv2string(aTHX_ newval));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->user();
+}
+
+string URI::UserPass::password (SV* newval = NULL) {
+    if (newval) {
+        THIS->password(sv2string(aTHX_ newval));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->password();
+}
+
+MODULE = Panda::URI                PACKAGE = Panda::URI::http
+PROTOTYPES: DISABLE
+
+URI* URI::new (string url = string(), ...) {
+    try { RETVAL = new XSURI::http(url); }
+    catch (URIError exc) { croak(exc.what()); }
+    XSURIWrapper::add_query_args(aTHX_ RETVAL, MARK+3, items-2);
+}    
+
+MODULE = Panda::URI                PACKAGE = Panda::URI::https
+PROTOTYPES: DISABLE
+
+URI* URI::new (string url = string(), ...) {
+    try { RETVAL = new XSURI::https(url); }
+    catch (URIError exc) { croak(exc.what()); }
+    XSURIWrapper::add_query_args(aTHX_ RETVAL, MARK+3, items-2);
+}    
+
+MODULE = Panda::URI                PACKAGE = Panda::URI::ftp
+PROTOTYPES: DISABLE
+
+URI* URI::new (string url = string(), int flags = 0) {
+    try { RETVAL = new XSURI::ftp(url, flags); }
+    catch (URIError exc) { croak(exc.what()); }
+}

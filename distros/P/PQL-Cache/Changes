@@ -1,0 +1,7 @@
+Revision history for Perl extension PQL::Cache;
+
+0.800  Sun Dec 21 13:52:32 2014
+    - original version;
+        -AX PQL::Cache;
+    - incomplete: using of object get-subs for column values
+

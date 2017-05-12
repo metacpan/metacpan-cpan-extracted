@@ -1,0 +1,1405 @@
+!init OPT_STYLE="paper"
+
+!define DOC_NAME	"PApp - Perl-Anwendungen für die Zukunft des WWW"
+!define DOC_AUTHOR	"Marc Lehmann <schmorp@schmorp.de>"
+!build_title
+
+H1: PApp - Wie beschreibt man ein Chamäleon?
+
+PApp ist schwer zu beschreiben, da es sich nicht auf ein spezielles
+Problem spezialisiert, sondern möglichst eine offene Universallösung sein
+will. Unter anderem ist PApp:
+
+- ein Embedded-Perl-Dialekt. Es gibt verschiedene Formen: Zum einen den
+"literal programming style", der nicht XML-konform ist, sondern beliebige
+Daten ausgeben kann und viele Möglichkeiten des Einbettens von Perl in
+XML. Zum anderen einen Standard-XML-Dialekt, der eine Mischung aus beidem
+darstellt.
+
+- eine Bibliothek (aus vielen Perl-Modulen), die das Arbeiten in einer
+CGI-artigen Umgebung erlauben. Die Umgebung hält sich mehr an Apache, ist
+jedoch unabhängig davon, ob die PApp-Anwendung in einer CGI-Umgebung,
+unter mod_perl oder (z.B.) unter CGI::SpeedyCGI ausgeführt wird.
+
+- eine Bibliothek, die das Arbeiten mit HTML, XML, SQL und anderen,
+häufig benutzten Umständlichkeiten vereinfacht.
+
+- eine grosse "State-Maschine", die technisch getrennte Programmteile
+(z.B. CGI) logisch zu {{einer}} Applikation zusammenfasst.
+
+- ein XSLT-Stylesheet-Prozessor. Damit kann man Layout und Inhalt
+voneinander trennen. Oder auch Ausgabeformat (PDF/HTML/XML etc.) vom
+Layout. Oder vom Inhalt... Oder der Benutzersprache...
+
+H2: Warum PApp geschrieben wurde
+
+Grosse und kleine Applikationen für das WWW zu erstellen ist sehr
+arbeitsaufwendig. Session-Variablen kennt Perl (zum Glück ;) nicht,
+Session- und Usertracking natürlich auch nicht. Es gibt sehr gute
+Module, die einem einen Teil der Arbeit abnehmen, aber es ist immer sehr
+aufwendig und umständlich. Dies führt zu unübersichtlichen Programmen,
+die noch dazu auf viele Dateien aufgeteilt sind, die nicht unbedingt der
+inneren Logik des Programmes entsprechen. Auch Sicherheitsfehler (wie das
+Übergeben von sicherheitsrelevanten Daten über {{hidden-fields}} oder
+ähnliches) passieren schnell, schliesslich muss man sich bei jeder Seite
+überlegen, wie man seine Daten weiterreicht.
+
+Datenbankabfragen, das Einbauen des Layouts usw. sind sehr
+umständlich. Internationalisierung existiert praktisch nicht.
+
+PApp vereinfacht alle diese Probleme, indem es sie weitestgehend
+automatisiert.
+
+H1: Grundlegende PApp-Features oder "Nie wieder CGI"
+
+Zunächst möchte ich einige der vielen Features von PApp vorstellen
+(natürlich die wichtigsten ;). Wem das zu langweilig ist und erstmal
+eine richtige PApp-Applikation sehen will, sollte zum nächsten Abschnitt
+gehen, "Eine einfache Anwendung mit PApp".
+
+H2: Applikationen statt Einzelseitenverwaltungsmonstren
+
+Bei CGI oder anderen Schnittstellen ist die Sicht auf die Anwendung
+protokollbedingt seitenbasiert - jede "logische" Seite ist eine Datei
+oder eine Fallunterscheidung innerhalb der Datei - gemeinsame Komponenten
+müssen in Bibliotheken (oder auch einfachen "Include"-Dateien; das ist im
+Prinzip das gleiche) abgelegt werden, die auf jeder Seite erneut geladen,
+konfiguriert und eingebaut werden müssen. Perl-Programme funktionieren
+jedoch anders, da gibt es keine Zustände, die beim Anklicken wechseln,
+sondern ein lineares Programm. Dies läßt sich zwar auch mit PApp nicht
+verwirklichen, aber es tut sein Bestes, diese Einschränkungen aufzuheben,
+indem es ganze Anwendungen bearbeitet: Ob mehrere Seiten in einer Datei
+oder eine Seite auf mehrere Dateien verteilt wird ist in PApp egal.
+
+H2: Development/Maintainance: Aktivposten statt Bremsklötzen
+
+H3: Entwicklungshilfe
+
+Programme müssen erst entwickelt werden. Dabei werden Fehler
+gemacht. Daran ändert PApp nichts. Da bei PApp sehr viele Komponenten
+zusammenwirken, können die Fehler entsprechend komplex sein. Eine gute
+Unterstützung bei der Fehlersuche ist also wichtig.
+
+Dies fängt damit an, dass die Zeilennummern des Quelltextes auch
+nach Kompilieren von Perl/XML zu reinem Perl oder z.B. in ein XSLT
+erhalten bleiben. Sollte ein Fehler auftreten, so hat man sofort Zugriff
+auf die Quelldateien, einen kompletten Backtrace und natürlich die
+State-Daten. Das Exception-System von PApp ist einfach zu benutzen (C<die>
+genügt, will man es schöner haben benutzt man C<fancydie> ;) und
+beliebig erweiterbar.
+
+Im Betrieb will man natürlich keine ausführlichen Fehlermeldungen,
+womöglich komplett mit Passwort der Datenbank usf... Deshalb
+protokolliert PApp alle Fehler in eine SQL-Datenbank zusammen mit der
+State-ID, so dass nur die Fehlerkategorie erscheint (plus ein nettes
+Textfeld, in dem der Benutzer zusätzliche Informationen eingeben
+kann). Solange die Seite nur wiederholbare Aktionen enthält, kann der
+Entwickler den Fehler jederzeit reproduzieren.
+
+H3: Datenbanken
+
+Wie soll man ohne auskommen? Natürlich garnicht. In Perl gibt es ein ganz
+wunderbares System (DBI!), um mehr oder weniger genormt auf SQL-Datenbanken
+zugreifen zu können. Jetzt ist "nacktes" DBI recht umständlich,
+zumindest für mich, für den vier Aufrufe pro SQL-Befehl entschieden
+zu viel sind. Vor allem, wenn man diese aus effizienzgründen über das
+Programm verstreuen muss (C<prepare> und C<execute>).
+
+In PApp erledigt man die meisten Aufgaben mit der C<sql_exec>-Funktion
+(den Rest erledigt man mit C<sql_fetch/fetchall/exists/insertid>). Der
+folgende Aufruf beispielsweise ersetzt C<prepare>, C<bind_params>,
+C<execute> und C<bind_columns>:
+
+!block perl
+ my $st = sql_exec \my($p, $w),
+                   "select purzel, wurzel from table
+                    where name like ?",
+                   $S{search};
+ 
+ while ($st->fetch) {
+    echo "$p, $w\n";
+ }
+!endblock
+
+Der besondere Clou: Die SQL-Statements werden gecached, d.h. im
+Allgemeinen nur ein einziges mal C<prepare>d. Bei Datenbanken, die einiges
+an Aufwand in diesem Schritt investieren (Stichwort Query-Optimizer)
+ist das ein grosses Plus. Sogar bei Datenbanken, die dies nicht tun
+(z.B. MySQL) steigt die Geschwindigkeit merklich. Zudem stehen C<prepare>
+und das C<execute> nicht mehr weit auseinander (Initialisierung
+vs. Benutzung!).
+
+Bei Datenbanken, die eine Art "insertid" unterstützen (zum Glück fast
+alle), kann man diese nach einem C<INSERT> gleich mit abfragen:
+
+!block perl
+ my $id = sql_insertid
+             sql_exec "insert into tiere (name) values (?)",
+                      "hase";
+!endblock
+
+Den Database-Handle habe ich übrigens nicht vergessen: Wenn man
+keinen angibt, wird ein Default-Handle benutzt. Geschickterweise wird
+dieser von PApp selbst gesetzt, so dass man sich im Normalfall noch
+nicht einmal um die Datenbankverbindung kümmern muss (weil diese auf
+dem Produktionssystem meistens andere Passwörter benötigt als auf
+dem Entwicklungssystem, stellt man diese geschickterweise bei der
+Konfiguration der Applikation ein).
+
+<<<admin.png>>>
+
+H2: Trennung von Quelltext und Sprache
+
+H3: XML
+
+XML wird in mehreren Teilen von PApp unterstützt bzw. gefordert: Der
+Standard-Dialekt von PApp ist in XML geschrieben, d.h. um "normale"
+PApp-Applikationen zu schreiben muss man sich XML bedienen. Die Ausgabe
+von PApp (meistens Text) ist beliebig, sofern man keine Stylesheets
+benutzt. Tut man das, muss die Ausgabe natürlich in XML-Syntax sein. Und
+last-not-least gibt es ein PApp-Modul, mit dem man beliebige XML-Fragmente
+mit eingebettetem Perl-Quelltext bearbeiten/ausführen/anzeigen kann.
+
+Die Entscheidung, XML so zentral einzusetzen, fiel mir nicht
+leicht: Meiner Meinung nach ist XML wunderbar dafür geeignet,
+Daten innerhalb von Programmen zu verarbeiten und vor allem
+auszutauschen. Toll ist, dass Menschen XML notfalls lesen und auch
+schreiben können. Ansonsten ist doch die Mächtigkeit von SGML (oder
+etwas anderem) vorzuziehen.
+
+XML jedoch hat bestechende Vorteile: HTML ist eine XML-Applikation (und
+HTML ist wichtig ;); es existiert eine breite Unterstützung für XML;
+es gibt bestehende Standards für Stylesheets, Layout, Metadaten und
+mehr. Schliesslich ist XML auch noch sehr schnell. Nun ja.
+
+Das hat mich trotzdem nicht davon abgehalten, noch etwas
+draufzusetzen: Fast alle Dokumente können in einem "Meta-Format" mit
+eingebettetem Perl-Quelltext geschrieben werden. Die Standard-Syntax
+dafür bedient sich vier sog. "Modus-Umschalter", die jeweils vom
+"Verbatim" in den "Perl"-Modus bzw. zurück schalten:
+
+!block verbatim
+ <:          schalte von HTML in Perl um
+ <?          wie <:, füge jedoch das Ergebnis in die Ausgabe ein
+
+ :>          schalte in den HTML-Modus
+ ?>          schalte in den interpolierten HMTL-Modus
+!endblock
+
+Eine HTML-Seite kann man z.B. so schreiben:
+
+!block perl
+ <h1>Ein bisschen HTML</h1>
+ <: echo "mit eingebautem perl" :>
+ <: print "so gehts auch, ist aber unendlich wenig langsamer ;)" :>
+ <?"So gehts am schnellsten":>
+ <:for my $text (qw(Noch eine komische Methode)) {
+    ?>$text&#160;<:
+ }:>
+!endblock
+
+Die Modus-Umschalter verhalten sich dabei wie eine Statement-Grenze in Perl (also C<;>).
+
+H3: I18n
+
+I18n steht kurz für Internationalisierung: Das englische Wort
+{{Internationalization}} hat 18 Buchstaben zwischen dem 'I' und dem
+'n', und da das Wort für den Durchschnittsamerikaner viel zu lang und
+kompliziert ist, hat man diese 18 Buchstaben einfach durch "18" ersetzt.
+
+In Kontext von PApp bedeutet dies, dass beinahe überall Textmeldungen
+übersetzt werden können (wer das C<gettext>-Paket kennt, mit dem
+üblicherweise C-Programme internationalisiert werden, wird sich fast
+sofort Zuhause fühlen). Hier ist ein Beispiel:
+
+!block verbatim
+ <h1>__"Contents"</h1>
+ <:for (1..10) {:>
+    <?slink sprintf(__"Chapter %d", $i++),
+            "view_chapter", chapterid => $i:>
+ <:}:>
+!endblock
+
+Wie man sieht, kann man C<__"text"> sowohl im
+HTML/XML/wasauchimmer-Quelltext benutzen, als auch auf Perl-Ebene
+aufrufen. Die C<__>-Funktion erledigt dabei zwei Aufgaben: Zunächst
+werden damit Textkonstanten zum übersetzen {{markiert}}. Zur Laufzeit
+wird dann in der Übersetzungstabelle nachgesehen und der (evt.)
+übersetzte String zurückgeliefert.
+
+Wenn man Daten z.B. aus einer Datenbank in eine Variable holt, darf man
+diese natürlich {{nicht}} markieren, da sie ja nur zur Laufzeit einen
+String {{enthält}}, selbst aber keine Textkonstante ist. In solchen
+Fällen verwendet man C<gettext>:
+
+!block perl
+ my $st = sql_exec \my($id, $name), "select id, name from table";
+
+ while ($st->fetch) {
+    echo "<li>", gettext$name, "</li><br/>";
+ }
+!endblock
+
+In welche Sprache jeweils übersetzt wird, entscheidet bei HTTP die
+Einstellung des Browsers, wobei man zweckmässigerweise ein Menü
+anbietet, in dem der Benutzer dies überschreiben kann:
+
+!block perl
+ <?slink "I want English", SURL_SET_LOCALE("en"):>
+ <?slink "Deutsch willich!", SURL_SET_LOCALE("de"):>
+!endblock
+
+Auch die Spracheinstellung ist eine Preferences-Variable. Im Gegensatz
+zum C<gettext>-Paket müssen die Quelltexte nicht alle in einer Sprache
+sein. Bei C<gettext> ist das auch weniger ein Problem, da der Quellcode
+eines Programms meistens in einer (natürlichen) Sprache geschrieben
+wurde, in PApp kann man aber Seiten dynamisch einfügen oder Datenbanken
+übersetzen. Da diese meist nicht vom selben Team geschrieben werden, ist
+es nützlich, dort unterschiedliche Sprachen verwenden zu können.
+
+<<<poedit1.png>>>
+<<<poedit2.png>>>
+
+H3: Unicode / Zeichensatzunabhängigkeit
+
+Intern unterstützt PApp genau zwei Datentypen (genau wie Perl
+selbst): {{Binärdaten}} und {{Text}}. Binärdaten verwendet man
+üblicherweise für Bilder, Datei-Downloads und ähnliches. Diese Daten
+werden von PApp nicht angerührt.
+
+Ganz anders Text: Perl arbeitet intern mit Unicode, das z.Zt. entweder in
+ISO-8859-1 oder UTF-8 gespeichert wird. Dieser interne Zeichensatz ist
+völlig unabhängig von der Ausgabe, d.h. der Text wird bei der Ausgabe
+automatisch in den gewünschten Zeichensatz kodiert (das geschieht wieder
+Browser/Benutzer/Programmabhängig wobei von den gebräuchlichen Browsern
+nur Netscape und Lynx die entsprechenden Header liefern). Umgekehrt werden
+Formulardaten u.ä. automatisch in Unicode gewandelt, d.h. in C<%P> steht
+Unicode auch wenn der Browser ein Formular in ISO-2022-JP zurückgeschickt
+hat.
+
+Ein JPEG-Bild kann man z.B. so ausgeben:
+
+!block perl
+ content_type "image/jpeg", undef;
+ $gd->jpeg(80);
+!endblock
+
+Während man eine japanische Benutzerin vielleicht mit ISO-2022-JP
+zufriedenstellen kann:
+
+!block perl
+ content_type "text/html", "iso-2022-jp";
+ echo __"Hoffentlich war der Übersetzer fleissig";
+!endblock
+
+H2: Trennung von Daten und Layout/Protokoll
+
+Sprache und Quelltext trennt PApp ja schon. Jetzt muss man noch das Layout
+vom eigentliche Programm bzw. das Protokoll von den eigentlichen Daten
+trennen.
+
+Mit XSLT-Stylesheets geht das. Und mehr: "Browser XYZ hat ein Problem? Ich
+fix' es im Stylesheet und vergesse es dann einfach." (z.B. sollte man
+leere HTML-Tabellenzellen für Netscape lieber mit einem C<&nbsp;>
+füllen).  "Es soll WML (oder CHTML) sein? Ich weiss zwar nicht, wozu
+das ganze WML-Zeugs sinnvoll sein soll, aber dann mache ich halt' ein
+Stylesheet dafür." Und eine der wichtigsten Anwendungen:  "Wir brauchen
+eine Version zum drucken. Dafür wandeln wir unser XML-Dokument in XSL" (und dann
+nach Latex, PDF...).
+
+Das bedeutet, dass man - Planung natürlich vorausgesetzt - einen hohen
+Grad an Protokollunabhängigkeit erreichen kann, ohne den Quelltext zu
+sehr mit Layout-Entscheidungen o.ä. belasten zu müssen.
+
+Leider gibt es noch keine Web-Designer, die XSLT statt HTML/CSS liefern,
+aber (meine) Vision des Webs der Zukunft sieht so aus: Der Server liefert
+XML zusammen mit einem XSLT (vom Designer), welches XSL erzeugt. Dieses
+wird dann angezeigt/gedruckt etc.a.. Metadaten (mit dem etwas besseren
+Nachfolger von RDF) gestatten dann Fragen wie: "Wer hat dieses Dokument
+geschrieben?", "Wozu dient es?" aber auch: "Wieso ist das Ding so bunt?".
+
+H2: Trennung von Funktionalität und Ausführungsumgebung
+
+Plattform-Unabhängigkeit: ein toller Begriff. Was bedeutet er? Nicht
+viel. Bei PApp bedeutet es, dass auf Unix-Abhängigkeiten möglichst
+verzichtet wurde und sich PApp nicht an einen bestimmten Server
+(z.B. Apache) bindet. In der Praxis kann man als Platform mod_perl oder
+CGI verwenden und für Unfälle wie Windoze schere ich mich einen Dreck
+(d.h. ich habe momentan nicht vor, für proprietäre Schnittstellen
+Module zu schreiben bzw. habe PApp nur mit den beschriebenen Plattformen
+getetst). Aber auch andere Umgebungen wie Text-Interfaces sind denkbar: Da
+PApp der Applikation immer eine gleichbleibende Umgebung anbietet, muss
+man lediglich ein Schnittstellenmodul schreiben.
+
+H2: Persistente Variablen für Sessions und User
+
+PApp kümmert sich automatisch um persistente Variablen. So kann man
+automatisch Variablen erzeugen, die über eine gesamte Sitzung (die mit
+dem Aufruf der ersten URL beginnt und dann einen Baum bildet) persistent
+sind. Das geht so einfach, dass man spezielle Hilfsmittel braucht, um
+nicht an jeder Stelle der Sitzung Zugriff auf beinahe alles zu besitzen.
+
+Persistente Variablen gibt es in verschiedenen Geschmäckern. Es gibt:
+
+- Session-Variablen (sogenannte {{state keys}}), die über eine gesamte
+Sitzung erhalten bleiben. Diese werden im Hash C<%S> gespeichert. Man kann
+beliebige Werte darin ablegen (solange C<Storable> diese serialisieren
+kann). Meistens geschieht dies durch Anklicken eines Links, weniger
+häufig direkt.
+
+- Benutzerabhängige Variablen (die auch über Sitzungsgrenzen hinaus
+erhalten bleiben und deshalb {{preferences items}}, Voreinstellungen,
+heissen). Auch diese befinden sich in C<%S>, von wo sie automatisch in die
+Benutzerdatenbank wandern bzw, von dort gelesen werden.
+
+- Lokale Variablen ({{local keys}}) zu nur innerhalb einer Seite oder
+einer Gruppe von Seiten Bedeutung haben. Diese befinden sich ebenfalls in
+C<%S> und werden automatisch daraus entfernt.
+
+- oder beliebige Kombinationen davon.
+
+Ein Beispiel für eine Sitzungsvariable ist die Information, ob der
+Benutzer sich schon angemeldet/eingeloggt hat oder ob er bestimmte
+Zugriffsrechte besitzt.  Eine benutzerabhängige Variable ist z.B. die
+Sprache, die der Benutzer zuletzt ausgewählt hat (global) oder die
+Anzahl der Tabellenzeilen, die der Benutzer gerne auf einer bestimmten
+Seite angezeigt haben möchte. Eine lokale Variable ist z.B. ein
+Datenbank-Objekt, das über mehrere Seiten (z.B. einer Transaktion)
+gebraucht wird und danach seine Gültigkeit verliert.
+
+Dadurch ergeben sich mehr Möglichkeiten, als man erwarten
+würde: Unabhängige Komponenten (z.B. Werbebanner oder Foren) sind auf
+normale Weise nur sehr schwer zu programmieren, da sie immer Hilfe vom
+"Hauptprogramm" erfordern, wenn es um die Parameterübergabe geht. In PApp
+benutzt man einfach persistente Variablen.
+
+Ein Beispiel für eine etwas ungewöhnlichere Komponente ist die
+{{editform}}-Bibliothek. Mit ihr kann man HTML-Formulare erstellen, die
+sich direkt an eine bestimmte Variable binden:
+
+!block perl
+ ef_begin;
+ ef_string \$S{search};
+ ef_end;
+!endblock
+
+Dieses Beispiel stammt von einer Seite, die Objekte aus einer Datenbank
+anzeigt und sich dabei auf solche beschränkt, die ein Suchwort
+enthalten. Das Formular bindet die State-Variable C<search> an ein
+HTML-Textfeld. Bei der Ausgabe wird der aktuelle Wert von C<$S{search}>
+benutzt. Ändert der Benutzer den Text und schickt das Formular ab wird
+die Seite neu aufgebaut - mit einem anderen Wert in C<$S{search}>. Da
+C<editform> beliebige Perl-Referenzen akzeptiert und man in PApp auch
+Referenzen auf Dateien, SQL-Spalten etc... erzeugen kann, werden viele
+Formulare zum Kinderspiel.
+
+Zusätzlich zu den Sitzungsvariablen gibt es noch sogenannte
+{{Argumente}}, die nur eine Seite lang "persistent" sind, d.h. bei einem
+Link auf eine andere Seite übergeben werden:
+
+!block perl
+ echo slink "Klicken Sie hier", -argument1 => "wert1", var2 => "wert2";
+!endblock
+
+Wenn man diesem Link folgt, steht der "wert1" im Hash C<%A> bzw. "wert2"
+im Hash C<%S>:
+
+!block perl
+ printf "Das Argument argument1 ist %s, die State-Variable var2 ist %s",
+        $A{argument1}, $S{var2};
+!endblock
+
+Werte, die von "Aussen" (z.B. GET-Request in CGI) kommen, stehen, um die
+Verwirrung komplett zu machen, in C<%P>. Als Faustregel gilt: was in C<%S>
+und C<%A> steht ist sicher (bzw. man hat es selbst dorthin gepackt), was
+in C<%P> steht ist unsicher und muss erst gefiltert/geprüft werden.
+
+H2: Sicherheit
+
+In vielen CGI-Programmen (aber nicht nur dort) wird der Fehler
+begangen, sensitive Daten in {{hidden}}-Feldern in einem Formular zu
+"verstecken" oder sie in die URL zu kodieren um die Parameterübergabe zu
+realisieren. Dies ist in PApp nicht nötig, da der persistente 'State' in
+einer Datenbank gespeichert wird und nur der (mit 256 Bit verschlüsselte)
+Zeiger darauf zum Client übertragen wird. Dadurch werden sensitive Daten
+gar nicht erst zum Client übertragen, was natürlich auch Bandbreite
+spart. Sollte der Schlüssel einmal bekannt werden kann man zwar auf
+andere Sessions zugreifen, die Daten jedoch immer noch nicht verändern
+(dieser Fall tritt beispielsweise auch auf, wenn ein kaputtes Proxy
+zwischen Server und Client sitzt).
+
+Eine typische PApp-URL sieht übrigens so aus (Applikation "kis", Modul
+"abteilungswahl"):
+
+!block verbatim
+ /kis/abteilungswahl/NIlRSJNDIfP3AHfVjxLF5F
+!endblock
+
+Da eine "Seite" in PApp aus einem Modulbaum besteht, geht es auch
+komplizierter:
+
+!block verbatim
+ /exec/admin/+admin=poedit+poedit=view--?papp=eTDgL.I-lj9O9lTO3wznTk
+!endblock
+
+Zusammen mit einem sicheren Transportprotokoll (z.B. SSL, wobei die
+meisten Browser nur ungenügend oder garnicht gegenüber Attacken
+schützen, nur so am Rande ;) schützt man sich damit gegen alle Seiten.
+
+Benutzerauthentifizierung über Zertifikate ist auch im Einsatz: Mit
+dem C<ssl>-Modul von Stefan Traby gibt es seit neuestem eine komplette,
+transparente SSL-Integration in das PApp User-Management: Nach
+einem "<:ssl_user_needed:>" hat man beispielsweise eine garantierte
+SSL-Session mit User-Zertifikat und einem eindeutigen PApp-user. Das
+CA-Management-Tool ist in Vorbereitung.
+
+<<<janman.png>>>
+
+H2: Session/User-tracking
+
+Persistente Variablen erfordern Session-Tracking. Benutzerabhängige
+Einstellungen (Preferences) darüber hinaus auch User-Tracking. Ersteres
+geschieht mit einer Session-ID, die (auf verschiedene Arten) in die
+URL-kodiert wird und die alle notwendigen Daten enthält, um die
+gewünschte Seite komplett zu erzeugen. Darüber hinaus wird (optional)
+ein Cookie benutzt, das aber z.Zt. nur zum identifizieren des Benutzers
+dient, da ich Session-Definitionen über Cookie als Unsinn erachte. Das
+Cookie wird auch nur einmal am Tag gesetzt, so dass man auch mit der
+Browser-Einstellung "vor Cookies warnen" arbeiten kann.
+
+Eine Anwendung wird darüber informiert, ob eine neue Session begonnen
+wurde oder ob sich ein bisher unbekannter Benutzer angemeldet hat, so dass
+man Benutzereinstellungen o.ä. initialisieren kann. Dies nützt PApp
+selbst, um sich z.B. die gewünschte Sprache des Benutzers zu merken oder
+um das User-Cookie nur einmal täglich zu setzen.
+
+Eine "Sitzung" ist übrigens ein Baum (nicht nur in PApp), der mit dem
+ersten "Hit" als Wurzel beginnt. Dadurch ist es unter anderem möglich,
+die Anzahl der "Reloads" einer Seite zu bestimmen. Dies ist nützlich,
+um potentiell gefährliche Aktionen (z.B. Löschen von Datenbanken,
+abschicken von E-mails) nur einmal auszuführen.
+
+H2: Benutzerverwaltung
+
+Da PApp Benutzer (mehr oder weniger) eindeutig identifizieren muss,
+implementiert es intern eine eigene Benutzerverwaltung inklusive einer
+Unix-artigen Rechtevergabe (es gibt allerdings keinen Super-User im
+Unix-Sinne). In vielen Anwendungen kann man diese gleich mitbenutzen, da
+eine eindeutige Benutzer-ID automatisch vergeben wird.
+
+!block verbatim
+  Sie sind wahrscheinlich Benutzer Nummer <?$userid:><br/>
+ #if auth_p
+  Und ausserdem haben sie sich authentifiziert.<br/>
+ # if access_p "admin"
+  Oh, und "admin"-Rechte besitzen Sie auch noch! Meine Güte!!<br/>
+ # endif
+ #endif
+!endblock
+
+H2: Geschwindigkeit und Skalierbarkeit
+
+Geschwindigkeit war bei der Implementierung von PApp das zweitwichtigste
+Ziel (Korrektheit ist das wichtigste ;). Als Marke dient mir ein
+Pentium-II 266Mhz-Rechner, auf dem auch komplexe Seiten mit mindestens 15
+Hits/Sekunde dargestellt werden, bzw. der Vergleich mit einem ähnlichen
+C<Apache::Registry>-Skript.
+
+Das State-Management von PApp verschlingt pro Seite 1-3 Datenbankzugriffe,
+die die Zeit bei weitem dominieren (andere Features wie I18n sind im
+Prinzip kostenlos).  Da komplexe Seiten im Allgemeinen wesentlich mehr und
+kompliziertere Zugriffe enthalten bzw. man ja irgendwie seine Daten
+speichern muss, ist dies in der Praxis selten eine Einschränkung
+(Ausnahmen gab und gibt es immer). Andere PApp-Features (z.B. im
+SQL-Bereich) bringen häufig sogar eine Steigerung der Geschwindigkeit.
+
+Da ich bisher keine Seite fabrizieren konnte, die die 15 Zugriffe/s-Marke
+unterschritten hätte, glaube ich noch etwas Spielraum für noch mehr
+Features zu haben. Wer sich übrigens fragt, woher diese magische Grenze
+von 15 Hits/s kommen: 15 Hits ist die Marke, die einen wirklich grossen
+Server von den 99.99% der restlichen Welt unterscheidet. Hat man auf
+seinem Server 15 oder mehr Zugriffe pro Sekunde kann man sich meistens
+auch eine schnellere Datenbank oder mehrere Rechner leisten: PApp skaliert
+problemlos auf mehrere Maschinen oder SMP-Rechner.
+
+H2: Ideen, Ideen: z.B. "tied forms"
+
+Ich habe es schon angesprochen: Persistenz von fast allem, zusammen mit
+den Möglichkeiten von Perl können einen schon auf Ideen bringen, z.B.
+auf eine Bibliothek (editform), die HTML-Formularfelder an Perl-Refrenzen
+bindet.
+
+Nun ist es an der Zeit, einmal eine Referenz auf eine SQL-Tabelle zu
+erzeugen:
+
+!block perl
+ <:
+    my $row = new PApp::DataRef 'DB_row',
+                                table => "user",
+                                where => [id => $userid],
+                                delay => 1,
+                                autocommit => 1;
+ 
+    # pre-set name
+    $row->{name} ||= "<username>";
+                                
+    ef_begin;
+    :><br>__"ID:"   <?ef_string \$row->{id}  ,  5:><:
+    :><br>__"Name:" <?ef_string \$row->{name}, 20:><:
+    ef_submit __"Update";
+    ef_end;
+ :>
+!endblock
+
+Die Referenz auf die Zeile steht in C<$row> und verhält sich wie eine
+Referenz auf einen herkömmlichen Perl-Hash. Das C<autocommit> sorgt
+dafür, dass die geänderten Daten automatisch zurückgeschrieben werden
+sobald das C<$row>-Objekt gelöscht wird (ausser Scope geht, C<DESTROY>ed
+wird). Sie ist lokal (C<my>!) gespeichert, da aber die C<ef_>-Funktionen
+die Referenz persistent speichern, wird das Objekt erst auf der nächsten
+Seite (also nachdem die Ergebnisse hineingeschrieben wurden!) zerstört,
+bzw. die Daten geschrieben. Etwas kompliziert, aber zum benutzen muss man
+die Details ja auch nicht kennen.
+
+Nun macht das Beispiel keine Fehlerüberprüfung, meistens das
+schwierigste. Mit PApp kein Problem. Zuerst schalten wir das C<autocommit>
+ab, damit die Daten nicht "aus Versehen" geschrieben werden. Ausserdem
+übergeben wir die Referenz als Argument an die "nächste" Seite.
+
+!block perl
+ <:
+    my $row = $A{row}
+           || new PApp::DataRef 'DB_row',
+                                table => "user",
+                                where => [id => $userid],
+                                delay => 1,
+                                autocommit => 0;
+ 
+    ef_begin -row => $row; # Daten als Argument übergeben
+!endblock
+
+Nun brauchen wir ein Flag, das uns sagt, ob der Datensatz fehlerhaft ist
+und schon können wir loslegen:
+
+!block perl
+   my $err = 0; # Daten fehlerhaft?
+
+   :><br/>__"ID:"   <?ef_string \$row->{id}  ,  5:><:
+ #if $row->{id} !~ /^(\d+)$/
+      <error>__"The ID must be an integer!"</error>
+      <:$err++:>
+ #endif
+   :><br/>__"Name:" <?ef_string \$row->{name}, 20:><:
+ #if 2 > length $row->{name}
+      <error>__"The Name must contain at least two characters!"</error>
+      <:$err++:>
+ #endif
+   ef_submit __"Update";
+   ef_end;
+!endblock
+
+Die Daten schreibt man dann bei Bedarf in die Datenbank:
+
+!block perl
+ #if $row->dirty
+ # if $err
+    <error>__"The entered Data is invalid, please
+              surrender or die (or correct it ;)</error>
+ # else
+    <:$row->flush:>
+    __"The record has been updated."
+ # endif
+ #endif
+ :>
+!endblock
+
+H2: "Web-Widgets"
+
+Eine relativ neue "Neuerung" in PApp ist die Einführung von
+Web-Widgets. Wie so vieles sind das keine speziellen Objekte, sondern eine
+Art der Programmierung, die zwar schon immer möglich war, aber an die man
+nicht sofort denkt.
+
+Statt einer ganzen Applikation, die "ganze Seiten" (z.B. ganze
+HTML-Seiten) ausgibt, schreibt man eine Applikation, die nur noch
+Teilseiten ausgibt, die man in größere Applikationenn einbaut. Dies ist
+nicht das gleiche wie ein "include": Der Namensraum (globale Variablen,
+state-keys, also Session-Variablen und Preferences) einer solchen
+eingebetteten Applikation ist getrennt von der einbettenden Anwendung und
+bildet eine Art "Unternamensraum".
+
+Derlei eingebettete Anwendungen sind vollkommen autark, haben ihren
+eigenen Zustand ("aktuelle Seite") und können ihre eigenen Formulare,
+Links etc. erzeugen die mit anderen Applikationen nicht kollidieren. In
+einer Anwendung verwende ich dasselbe Forum-Element, um "Web Chat",
+"Kleinanzeigen" und eine "News!"-Seite zu implementieren - jedesmal eine
+leicht andere Konfiguration aber derselbe Code.
+
+Da PApp-Applikationen im Prinzip nur grosse Statemaschinen sind (das ist
+eine Einschränkung der verwendeten Protokolle, d.h. bis Perl effektive
+und schnelle continuations bekommt ;), kann man sie auch einfach in andere
+einbauen. Sie können sich gegenseitig beeinflussen, treten sich aber
+nicht auf die Füsse.
+
+Also im Prinzip genauso wie ein "Widget" in X11 oder gtk+.
+
+H2: Logging/Protokollierung
+
+PApp protokolliert wesentlich mehr, als man benötigt, legal wäre, und
+speicherbar wäre. Da PApp jederzeit in der Lage sein muss, eine ältere
+Seite zu regenerieren ("Back & Reload"), speichert es pro Seite die
+persistenten Variablen (ca. 300-900 Byte, je nach Applikation, das ist,
+wie gesagt, auch eine tolle Sache zum debuggen).
+
+Aber irgendwann müssen diese Daten wieder weg bzw. statistische Daten
+her - nichts ist interessanter, als Zugriffsmuster, Voreinstellungen oder
+ähnliches, an dem man ablesen kann, welche Dinge beliebt sind und welche
+nicht (klar, man kann auch ganz andere Sachen auswerten, aber das ist
+nicht mein Problem).
+
+Beim Aufräumen spielt PApp die einzelnen Zugriffe noch einmal
+durch. Statt jedoch Seiten zu erzeugen gibt PApp den einzelnen
+Applikationen die Möglichkeit, statistische Daten zu sammeln. Etwas
+undokumentierter (wenn es da Abstufungen gibt) ist die Möglichkeit,
+globale Daten zu sammeln, aber es geht...
+
+H1: Eine einfache Anwendung mit PApp
+
+Jetzt kommen wir zur eigentlichen Frage: Wie sieht so ein PApp-Programm
+aus? Nun, meistens so:
+
+H2: Das Hauptprogramm
+
+!block verbatim
+ <package name="demo"> <domain lang="en">
+
+ <database dsn="DBI:mysql:demodb"/>
+
+ <translate fields="project.name place.name" lang="de"/>
+ <translate fields="project.description" lang="*" style="auto"/>
+
+ <import src="macro/util"/>
+
+ <include src="demo/somepages"/>
+
+ </domain> </package>
+!endblock
+
+Hmm... das ist also erstmal XML mit furchtbar vielen neuen
+Elementen. Normalerweise kopiert man sich einfach ein anderes Programm
+und schreibt nicht alles neu. Gut: zuersteinmal das C<package>-Element:
+damit wird - genau wie in Perl - ein neuer Namensraum erzeugt, der sowohl
+normale Package-Variablen als auch State-Variablen enthält. Nicht jedes
+Programm muss einen eigenen Namensraum öffnen.
+
+Das nächste Element, C<domain>, aktiviert die Übersetzungen: Alle
+markierten Texte werden unter einem Namen, der C<domain>
+gebündelt. Beispielsweise befinden sich alle Texte des PApp-Systems
+selbst in der "papp"-Domain. Da im Beispiel kein Domainname angegeben
+wird, nimmt PApp den Namen des umschliessenden C<package>-Elements, d.h.
+wir definieren hier eine Übersetzungsdomain "demo".
+
+Das nächste Element deklariert die Standarddatenbank: Wird die
+Datenbankhandle bei SQL-Abfragen weggelassen, wird diese Datenbank
+benutzt. Normalerweise deklariert man Datenbanken aber nicht im Quellcode,
+sondern beim Einrichten der Anwendung im Konfigurationsmenü.
+
+Zu den nächsten beiden Elementen muss ich etwas über das Programm
+erklären, das ich hier entwickeln möchte: Das Demo-Programm sollte
+kurz sein und die wichtigsten Features von PApp zeigen. Es wird aus drei
+(Web-) Seiten bestehen, eine Art Hauptseite mit einem Menü und zwei
+Unterseiten, auf denen man ein Projekt auswählen kann (ein Projekt ist
+ein einfacher Datensatz in der Datenbank, der den Projektnamen, den
+Ort und die Beschreibung enthält). Auf der dritten Seite kann man die
+einzelnen Felder eines Projektes ansehen und ändern.
+
+Als besonders überflüssiger Schnickschnack sollen die Projektdaten
+übersetzbar sein, d.h. in der Sprache des Benutzers angezeigt werden. Das
+ist nicht sehr wirklichkeitsnah, gibt dafür aber ein sehr simples
+Beispiel ab.
+
+Da die Projektdaten in der Datenbank gespeichert sind, kann man
+sie nicht einfach mit C<__"xxx"> markieren, sondern braucht ein
+C<translate>-Element. Wo PApp die Übersetzungen herbekommt, ist relativ
+egal, man muss PApp nur sagen, wie es an die Texte herankommt und in
+welcher Sprache sie sind.
+
+Das erste C<translate>-Element sagt, dass die Spalten C<name> in der
+Tabelle <project> und die Spalte C<name> in der Tabelle C<place> in
+Deutsch sind und dementsprechend in andere Sprachen zu übersetzen sind.
+
+Das zweite C<translate>-Element ist schon komplizierter: Nicht alle
+Projektbeschreibungen sind in derselben Sprache (behaupte ich einfach
+mal), weshalb als Sprache C<*> angegeben wird. Das bedeutet lediglich,
+dass {{alle}} Übersetzer diese Texte übersetzen müssen. Wenn der
+Englisch-Deutsch-Übersetzer also auf einen Deutschen Text stößt, muss
+er ihn einfach überspringen. Wäre die Spalte als "de" (oder "deu")
+markiert, würde er sie garnicht erst zu Gesicht bekommen.
+
+Da Beschreibungen ausserdem sehr lang sein können, erhält man mit
+C<style="auto"> die Möglichkeit, die C<__"xxx">-Syntax auch in
+den Beschreibungen zu verwenden. Dies kann man auch für einfache
+Textbausteine mißbrauchen...
+
+Das darauffolgende C<import>-Element ist wieder etwas einfacher: es
+entspricht mehr oder weniger der C<use>-Anweisung in Perl (in genau die
+wird es auch übersetzt), bezieht sich aber auf PApp-Dateien. Damit
+kann man Funktionen aus anderen (PApp-) Namensräumen importieren. Im
+vorliegenden Fall importiere ich einfach mal das C<macro/util>-Paket, das
+sich immer wieder grosser Beliebtheit erfreut.
+
+Das letzte Element tut zur Abwechslung genau das, was es sagt: es
+fügt (logisch gesehen) eine andere Datei an dieser Stelle ein. Die
+Entscheidung, die folgenden Seiten in eine andere Datei auszulagern, lohnt
+sich normalerweise nur für grössere Programme, aber so bleibt das
+Beispiel klein.
+
+Bis jetzt tut sich noch nichts. Ändern wir das:
+
+H2: Das erste PApp-Modul
+
+Einzelne Zustände (z.B. Webseiten) werden bei PApp "Module" genannt, wohl
+einzig um die Anwender zu verwirren. Diese Module werden meist in andere
+Elemente (C<domain>, C<package>, C<style> etc..) verpackt, die auf die
+Sete auf verschiedenste Weise einwirken.
+
+Ausführbaren Code kann man grundsätzlich in zwei Formen
+angeben: Normaler Perl-Code und Perl-Code gemischt mit Text (also wie bei
+anderen embedded-Dialekten):
+
+!block verbatim
+ <module name=""><phtml><![CDATA[
+    <html> <title>
+       __"PApp - demo", <?localtime:>
+    </title>
+
+    <?slink "Deutsch", "/papp_locale" => "de":>
+    <?slink "English", SURL_SET_LOCALE('en'):>
+
+    <p><?slink __"To the editor",  "editor":>
+    <p><?slink __"Edit project 1", "editor", projectid => 1:>
+      
+    </html>
+ ]]></phtml></module>
+!endblock
+
+Zuerst zum C<module>-Element: Jedes Modul besitzt einen eindeutigen
+Namen. Das Standardmodul (das angezeigt wird, wenn nichts spezielles
+ausgewählt ist, also sozusagen die Startseite) ist das Modul mit dem
+leeren Namen: C<"">.
+
+Das Ergebnis eines Moduls sind die Ausgaben, die darin gemacht werden
+(z.B. mit C<printf> oder dem PApp-C<echo>). Die Ausgabe des obersten
+Moduls (im Baum) wird an den Browser geschickt. Für Ausgabe braucht man
+Perl und das habe ich in ein C<phtml>-Element gepackt (für verbatimen
+Perl-code würde man ein C<perl>- oder C<xperl>-Element verwenden, für
+Perl gemischt mit XML gibt es noch C<pxml>).
+
+Innerhalb des C<phtml>-Elementes darf nur eine Zeichenkette stehen, die
+ausgegeben wird. Da wir innerhalb der Zeichenkette Perl einbetten wollen
+und die Modus-Umschalter {{kein}} gültiges XML sind, muss der Inhalt
+geschützt werden, in diesem Fall mit einem C<CDATA> (die Verwendung von
+Abkürzungen in VI o.ä. empfiehlt sich ;).
+
+Da dies das oberste Modul ist und wir (noch) kein Stylesheet verwenden,
+müssen wir eine ganz HTML-Seite ausgeben. Als Titel nehmen wir den Text
+C<PApp-demo>, der übersetzt werden muss sowie, weil es so schön ist, die
+aktuelle Uhrzeit. Dies geschieht mit einem {{C:<?}}: Der Ausdruck (hier
+C<localtime>) wird in einem skalaren Kontext ausgewertet und das Ergebnis
+ausgegeben.
+
+Die nächste Code-Zeile ist interessanter:
+
+!block verbatim
+    <?slink "Deutsch", "/papp_locale" => "de":>
+!endblock
+
+C<slink> ist PApps Art, eine Hypertext-Referenz (C<A>-Element) zu
+erzeugen. C<slink> erwartet als erstes Argument den Inhalt des Verweises
+(der Text, den der Benutzer "anklicken" muss) und daraufhin die
+sogenannten C<surl>-Argumente, die bei vielen PApp-Funktionen angegeben
+werden können. C<surl>-Argumente sind im wesentlich "Name => Wert"-Paare,
+die dem Zielmodul als Argumente übergeben werden können. Im Beispiel
+ist das die Variable C</papp_locale> (der Slash am Anfang markiert eine
+globale Variable), die auf den Wert "de" gesetzt wird. Das Ergebnis ist,
+dass Textmeldungen nun auf Deutsch übersetzt werden.
+
+!block verbatim
+    <?slink "English", SURL_SET_LOCALE('en'):>
+!endblock
+
+Neben Argumenten kann man auch bestimmte "Cookies" in die
+C<surl>-Argumente einbauen. C<SURL_SET_LOCALE> z.B. setzt die Sprache auf
+den folgenden Wert und speichert ausserdem die Voreinstellungen ab,
+d.h. die Sprachwahl ist nun permanent. Neben C<SURL_SET_LOCALE> gibt es
+noch eine ganze Reihe weitere "Cookies" wie z.B.  C<SURL_EXEC>, mit dem
+man bei Auswahl des Links eine Unterroutine aufrufen lassen kann oder
+C<SURL_STYLE_GET>, mit dem man den Stil der URL einmalig überschreiben
+kann. Die nächste Zeile bringt eine weitere Erweiterung:
+
+!block verbatim
+    <p><?slink __"To the editor",  "editor":>
+!endblock
+
+Bisher wurde kein {{Ziel}} für den Link angegeben. In solchen Fällen
+nimmt PApp die aktuelle Seite (das aktuelle Modul) als Ziel, d.h. sie wird
+einfach neu geladen (bei Sprachänderungen etc. ja gewünscht). Möchte
+man ein anderes Modul ansteuern, gibt man einfach den Namen des Moduls an,
+z.B. C<"editor">. Ein "Klick" auf den Link (oder das Laden der URL, wie
+auch immer das geschieht) ruft dann das C<editor>-Modul auf.
+
+Das "Ziel" muss auch nicht immer ein Modulname sein, es geht auch
+komplizierter: C<"admin,user/edit,group/"> z.B. verzweigt auf das
+C<admin>-Modul und gleichzeitig in einem eingebetteten Widget C<user> auf
+das Modul C<edit>, während es im Widget C<group> auf das Hauptmodul (das
+mit dem leeren String als Namen) schaltet. Aber das braucht man wirklich
+nur in grossen Projekten ;).
+
+Ziel und Argumente kann man natürlich kombinieren:
+
+!block verbatim
+    <p><?slink __"Edit project 1", "editor", projectid => 1:>
+!endblock
+
+Hier wird dieselbe Seite (C<editor>) angesteuert, dieses mal wird jedoch
+ein Argument übergeben. Beim Aufruf wird dieses Argument in den State
+geschrieben, steht dem C<editor>-Modul also als C<$S{projectid}> zur
+Verfügung. Manchmal möchte man einfach nur ein Argument übergeben,
+dass nicht im State endet, d.h. nicht persistent ist. In diesem Fall
+kann man vor den Namen ein '-' stellen, der Wert landet dann nicht in
+C<%S> sondern in C<%A> und wird nach dem Aufruf weggeworfen. Eine dritte
+Möglichkeit ist es, eine Referenz auf einen Skalar anzugeben (der
+natürlich persistent sein muss, sonst existiert er beim Aufruf nicht
+mehr).
+
+Die Werte dürfen beliebige Perl-Referenzen sein, solange sie
+serialisierbar sind. In PApp gehören Code-Referenzen und (PApp-)
+Datenbankhandles übrigens zu den serialisierbaren Datentypen, wenn man
+etwas Vorsicht walten lässt.
+
+Der erste Link auf C<editor> soll, da er kein Projekt auswählt, eine
+Liste aller Projekte zeigen während der zweite ein spezielles Projekt
+(das hoffentlich existiert) anzeigen soll.  Damit wäre die erste Seite
+erklärt, schreiten wir zum C<editor>-Modul:
+
+H2: Das C<editor>-Modul
+
+Ich gebe zu, ich habe etwas gemogelt. Natürlich macht es normalerweise
+mehr Sinn, zwei getrennte Seiten (z.B. C<project_list> und
+C<project_edit>) für das Listen und Edieren zu benutzen. Aber dann hätte
+ich keinen Grund, ein weiteres Stückchen "syntactic sugar" zu zeigen,
+Präprozessorkommandos:
+
+!block perl
+ <module name="editor">
+ <state keys="projectid" local="yes"/>
+ <phtml><![CDATA[
+    <:header:>
+
+ #if defined $S{projectid}
+    ... edit the specific project
+ #else
+    ... show a list of projects
+ #endif
+
+    <:footer:>
+ ]]></phtml></module>
+!endblock
+
+Das C<module>-Element kennen wir ja schon. Diesmal deklariert es das
+C<editor>-Modul. Das nächste Element C<state> ist schon interessanter:
+hier markiert es bestimmte State-Keys (hier: C<projectid>) als C<local>,
+d.h. lokal zu allen Seiten, die diese Variable so markieren. Da das
+Hauptmodul die C<projectid> {{nicht}} als lokal markiert, wird sie beim
+"Klick" auf das Hauptmodul automatisch gelöscht. Hätte man stattdessen
+geschrieben
+
+!block perl
+ <state keys="projectid bgcolour" preferences="yes"/>
+!endblock
+
+hätte man die beiden State-Keys als Voreinstellungswerte markiert, d.h.
+beim nächsten Aufruf würde der Benutzer das gleiche Projekt sehen (und
+eventuell die gleiche Hintergrundfarbe, je nachdem, was C<bgcolour>
+bedeutet).
+
+Die beiden "Tags", {{C:<:header:>}} und {{C:<:footer:>}}, sind eigentlich
+nur getarnte Funktionsaufrufe: In den Tagen vor XSLT habe ich meistens auf
+diese Weise ein Standard-Layout erstellt. C<header> könnte man z.B. so definieren:
+
+!block perl
+ <macro name="header"><phtml><![CDATA[
+    <html>
+    <head><title>__"Hallole"</title></head>
+    <body>
+ ]]></phtml></macro>
+!endblock
+
+C<macro> definiert eine ganz normale Perl-Funktion, sie kann Argumente
+annehmen und Werte zurückliefern. Der einzige Unterschied ist, dass man
+Perl-Funktionen auf diese Weise in "phtml"-Syntax schreiben kann. Um
+einzelne Seiten gegen unberechtigen Zugriff zu schützen (und um noch mehr
+abzuschweifen) habe ich früher folgendes gemacht:
+
+!block perl
+ <macro name="page(&amp;)" args="$body"><phtml><![CDATA[
+ <html> <body>
+ #if access_p "project_editor"
+    <:&$body:> <!-- eigentliche seite anzeigen -->
+ #else
+    __"You need to login yourself first"<p>
+    <:loginbox:> <!-- loginbox anzeigen -->
+ #endif
+ </body> </html>
+ ]]></phtml></macro>
+
+ <module name="secure_page"><phtml><![CDATA[
+ <:page {:>
+    <h1>__"Hallo"</h1>
+ <:}:>
+ ]]></phtml></module>
+!endblock
+
+Gut, zurück zum Thema: Die Aufgabe ist klar: ist eine C<projectid>
+gegeben, soll das entsprechende Projekt ediert werden, sonst soll eine
+Liste von Projekten zur Auswahl angeboten werden.
+
+Das könnte man zwar mit einem C<if> lösen, es geht aber auch anders:
+
+!block perl
+ #if <perl-ausdruck>
+   ...
+ #elif <perl-ausdruck>
+   ...
+ #else
+   ...
+ #endif
+!endblock
+
+Das ist fast so schön wie C... *hüstel*. Jedenfalls wird es in ein
+hundsnormales Perl-if/elsif/else/endif umgesetzt. Die beiden Teile "edit
+the specific project" und "show a list of projects" werden sofort gefüllt:
+
+H3: "show a list of projects"
+
+Zuerst die Liste der Projekte. Ah, wir benötigen SQL. Nun, das ist
+einfach, wir brauchen nur "jede Menge" HTML auf das Problem zu werfen:
+
+!block perl
+ <table><tr><th>__"Project"<th>__"Budget"
+ <:
+    my $st =
+       sql_exec \my($id, $name, $budget),
+           "select id, name, budget
+            from project";
+
+    while ($st->fetch) {
+       :><tr><td>
+          <?slink gettext$name,
+                  projectid => $id?>
+         <td>$budget
+       <:
+    }
+ :>
+ </table>
+!endblock
+
+Dies erzeugt eine einfache HTML-Tabelle mit den beiden
+Spaltenüberschriften "Project" und "Budget", natürlich übersetzbar. Der
+Aufruf von C<sql_exec> tut drei Dinge:
+
+^ C<prepare>, falls notwendig (C<prepare>te Statements werden gecached).
+& C<bind_columns>, auf die drei Referenzen C<\$id>, C<\$name> und C<\$budget>.
+& C<execute>, um die Abfrage zu starten.
+
+Nun müssen wir nur noch in einer Schleife über die Zeilen iterieren
+(mit dem alten DBI-Bekannten C<fetch>) und TR/TD-Zeilen ausgeben. In
+der Schleife kann man sehr schön sehen, wie man zwischen Perl und HTML
+umschalten kann. Keine Angst, daran gewöhnt man sich sehr schnell, vor
+allem mit Syntax-Hilighting (ein weiterer Grund, auf vim umzusteigen).
+
+Das einzig Komplizierte ist der Aufruf von C<slink>, der einen C<A
+HREF>-Link auf das C<editor>-Modul (also auf die aktuelle Seite) erzeugt
+und diesem gleich noch die aktuelle Projekt-ID mitgibt.  C<gettext> ist
+der Runtime-Teil der C<__>-Funktion, d.h. die Funktion, die von C<__> zur
+Laufzeit aufgerufen wird. Sie {{übersetzt}} das Argument, {{markiert}} es
+aber nicht.
+
+Das Ergebnis ist ein Link, der beim Aufruf die Seite neu lädt, nur mit
+dem Unterschied, dass diesmal eine Projekt-ID verfügbar ist also nicht
+mehr die Liste angezeigt wird.
+
+H3: "edit the specific project"
+
+Der Rest ist nun relativ einfach: Mit C<DataRef> eine Referenz erzeugen,
+mit C<editform> ein Formular, der Rest geht von alleine:
+
+!block perl
+ <:ef_begin:>
+
+ <:my $row = new PApp::DataRef 'DB_row',
+        table => "project",
+        where => [id => $S{projectid}]:>
+
+ <p>__"Name":        <:ef_string \$row->{name}, 40:>
+ <p>__"Place:"       <:ef_relation \$row->{place},
+                                   "id, name from place order by 2",
+                                   0 => __"unknown":>
+ <p>__"Budget":      <:ef_string \$row->{budget}, 8:>
+ <p>__"Description": <:ef_text \$row->{description}, 60, 10:>
+
+ <:ef_constant \$row->{user}, $userid:>
+
+ <:ef_submit __"Update":>
+ <:ef_end:>
+!endblock
+
+C<new PApp::DataRef> erzeugt eine Zeilenreferenz auf die Zeile mit
+dem gewünschten Projekt, C<ef_begin> und C<ef_end> umschliessen ein
+Formular, C<ef_string> erzeugt ein Textfeld in der gewünschten Breite
+während C<ef_text> ein C<textarea>-Element erzeugt. C<ef_submit> sollte
+selbsterklärend sein.
+
+Habe ich was vergessen? Oh ja, der Ort ist ja in einer separaten Tabelle,
+in C<project> wird ja nur die ID des Ortes gespeichert.  Für solche
+Relationen gibt es bei C<editform> das C<ef_relation>-"Element". Man
+übergibt einen SQL-Ausdruck, der zwei Spalten (ID und Name) liefert
+und optional ein paar weitere Paare (z.B. kann man auch "unbekannt"
+angeben). Als Ergebnis erhält man ein C<select>-Element in HTML.
+
+Als letztes wird ein Formularfeld noch mit einer Konstanten (die der
+Benutzer nicht ändern kann) gefüllt, in diesem Fall wird das Feld
+C<user> auf die aktuelle C<userid> gesetzt, so weiss man immer, wer den
+Datensatz zuletzt verändert hat.
+
+Wer Formulare in anderen Sprachen (WML...) benötigt, kann sich seien
+eigenen Elemente basteln: C<editform> ist es grundsätzlich egal, wie die
+Syntax ist, solange das Schnittstellenmodul von PApp die Daten dekodieren
+kann.
+
+H2: Aufgemotzt hält besser
+
+Bis jetzt war alles noch langweilige Grundlagen. Vor allem ist
+Standard-HTML doch soo langweilig: die Tabellen sind nicht farbig
+hinterlegt, um das Lesen zu erleichtern. Und die C<header>- und
+C<footer>-Methode ist auch nicht gerade ein flexibles Layout-Werkzeug.
+
+Deshalb{{}}: XSLT muss her ("eXtensible StyLesheet Transformations"). Und weil
+ich so anspruchsvoll bin, gleich zwei Stylesheets: eins ohne aufwendige
+Grafik zum benutzen und eins mit vielen farbigen Elementen zum verkaufen
+("bunt haben wollen").
+
+Zuerst müssen wir das Stylesheet laden:
+
+!block perl
+ <perl><![CDATA[
+    $stylesheet[0] = $papp->load_stylesheet("demo/demo1");
+    $stylesheet[1] = $papp->load_stylesheet("demo/demo2");
+ ]]></perl>
+!endblock perl
+
+Naja, zuerst müsste man es schreiben oder besser klauen. Ausserdem muss
+man es nicht zuerst laden, aber darüber gehe ich einfach mal hinweg...
+
+Das C<perl>-Element ist übrigens {{nicht}} in einem Modul: Perl-Code,
+der nicht in ein Modul gesteckt wird, wird beim Laden der Applikation
+ausgeführt, d.h. ganz ähnlich wie ein Perl-Modul. Zu diesem Zeitpunkt
+kann man aufwendige Initialisierungen machen bzw. Dateien nachladen, die
+man später braucht.
+
+Wie wendet man diese "Stylesheets" nun an? Ganz einfach, man packt alle
+Module, die "gestyled" werden sollen, in ein C<style>-Element:
+
+!block perl
+ <style apply="output" expr="$stylesheet[ $S{style} ]">
+
+ <module name=""><phtml><![CDATA[
+    <p/><?slink __"To the edito...
+    <p/><?slink __"Edit projec...
+ ]]></phtml></module>
+
+ ...
+ </style>
+!endblock perl
+
+Das C<apply> bezieht sich auf den Zeitpunkt, zu dem das Stylesheet
+angewendet werden soll. C<apply="output"> bestimmt, dass das Stylesheet
+kurz vor der Ausgabe angewendet werden soll. Normalerweise würde man nun
+den Dateinamen des Stylesheets mit C<src="pfad"> angeben, da wir aber
+zwischen zwei Stylesheets hin- und herschalten wollen, geben wir mit
+C<expr> einen Perl-Ausdruck an, der ein Stylesheet-Objekt als Ergebnis
+haben (sollte).  Das muss {{natürlich}} auch kein XSLT-Stylesheet sein,
+aber wem sage ich das...
+
+Das Modul ist übrigens (bis auf die durch "..." angedeuteten Lücken)
+vollständig, d.h. der Kopf mit Titel und Sprachumschalter (sowie
+Stylesheet-Umschalter) wird durch das Stylesheet hinzugefügt.
+
+H1: Tinychat - ein kleiner Chat in 20 Zeilen
+
+Zum Schluss noch ein sehr einfaches Beispiel: C<macro/tinychat.papp> ist
+ein sehr einfaches Chat-Fenster: Es zeigt die letzten fünf Eingabezeilen
+an, gefolgt von einer Eingabebox. Der Chat-Inhalt ist systemweit, d.h. auf
+allen Servern in einem PApp-System ist immer derselbe Text, man kann diese
+"Chatbox" also in beliebige Programme einbauen.
+
+!block perl
+ <macro name="tinychat*()"><pxml><![CDATA[
+ #if $A{tinychat_submit} && $P{input} && !reload_p
+ <:
+    lockenv {
+       my $r = getenv "TINYCHAT";
+       shift @$r while @$r > 5;
+       push @$r, escape_html sprintf "%s: %s",
+                    username || "<ANON$userid>", $P{input};
+       setenv "TINYCHAT", $r;
+    }; 
+ :> 
+ #endif
+ <: 
+    my $r = getenv "TINYCHAT";
+    echo map "<tt>$_</tt><br />", @$r;
+ :>
+ <br />
+ <?sform -tinychat_submit => 1:>__"Chat: "<?textfield "input":><?endform:>
+ ]]></pxml></macro>
+!endblock
+
+Zuallererst ist C<tinychat> nur eine Funktion, teilt sich also den
+Namensraum mit dem Aufrufer. Tinychat ist so winzig und so schlecht
+konfigurierbar, dass das Sinn macht... Sehen wir uns mal den Teil an, der
+die Ausgabe erledigt:
+
+!block perl
+ <: 
+    my $r = getenv "TINYCHAT";
+    echo map "<tt>$_</tt><br />", @$r;
+ :>
+!endblock
+
+Die Texte sind in einer "Environment"-Variable gespeichert. Diese
+Variablen sind global für das gesamte PApp-System und könenn auch
+ausserhalb von PApp abgefragt bzw. verändert werden. Das ganze ist also
+eher ein System zur asynchronen Kommunikation. Neben normalen Strings kann
+man alles darin ablegen, was irgendwie serialisierbar ist, insbesondere
+eine Array-Referenz, in der die einzelnen Zeilen sind.
+
+Zur Ausgabe wird also lediglich die Variable C<PAPP_TINYCHAT> ausgelesen
+und die einzelnen Zeilen in ein "<tt>zeile</tt><br />" gepackt.
+
+Fehlt noch das Eingabefeld:
+
+!block perl
+ <?sform -tinychat_submit => 1:>
+ __"Chat: "
+ <?textfield "input":>
+ <?endform:>
+!endblock
+
+Hier wird kein C<editform> benutzt: Der Overhead ist im Vergleich
+zum Gewinn (es gibt keinen) zu gross.  Die Funktion C<sform>
+(die auch von C<ef_begin> benutzt wird) gibt das einleitende
+C<FORM>-Tag aus.  Dann folgt der Text C<Chat:> und ein ganz normales
+HTML-C<INPUT>-Element. C<endform> schleisslich gibt ein "</FORM>" aus und
+existiert eigentlich nur aus Symmetrie.
+
+Das Eingabefeld heisst C<input>. Was passiert, wenn wir sonst noch
+ein C<input>-Feld haben und dieses andere Feld submittet wird?  Kein
+Problem{{}}: Wir übergeben C<sform> einfach ein Argument, das nur dazu
+dient, die Information "Tinychat-Formular ist gemeint" zu übertragen.
+
+Ganz nebenbei: C<sform> ist - wie sehr viele PApp-Funktionen - sehr
+einfach definiert:
+
+!block perl
+   PApp::HTML::_tag "form", { method => 'GET', action => &surl };
+!endblock
+
+Nun zum Teil, der die Eingabezeile nach dem Abschicken hinzufügt:
+
+!block perl
+ #if $A{tinychat_submit} && $P{input} && !reload_p
+ <:
+    lockenv {
+       my $r = getenv "TINYCHAT";
+       shift @$r while @$r > 5;
+       push @$r, escape_html sprintf "%s (%s): %s",
+                    username || "<ANON$userid>", $P{input};
+       setenv "TINYCHAT", $r;
+    }; 
+ :> 
+ #endif
+!endblock
+
+Die erste Zeile testet drei Dinge:
+
+^ Es muss "unser" Formular sein; das erkennt man daran, dass der Parameter
+  C<tinychat_submit> logisch wahr ist.
+& Die Eingabe sollte nicht leer sein (o.k. "0" ist auch nicht erlaubt).
+& Die Seite sollte nicht das Ergebnis eines "Reloads" sein.
+
+Der letzte Punkt bedarf einer Erklärung: PApp weiss, wie oft eine
+Seite angefordert wurde und teilt dies über die Funktion C<reload_p>
+mit, die die Anzahl der Seitenaufrufe für {{dieselbe}} Seite minus
+eins zurückliefert. Ist diese Zahl ungleich null, wurde der Code schon
+ausgeführt.
+
+Das eigentliche hinzufügen ist Standard: Variable holen, alte Zeilen
+rauslöschen, neue Zeile hinzufügen, Variable auf neuen Wert setzen.
+
+Die Funktion C<lockenv>, in die die Manipulation eingeschlossen ist,
+schützt das Programm gegen gleichzeitige Modifikationen anderer
+Webserver, d.h. die Operation wird atomar.  C<escape_html> quoted das
+Argument. Die Funktion C<username> (aus dem C<macro/admin>-Paket) liefert
+den Namen des Benutzers, falls dieser einen besitzt. Ansonsten nimmt
+Tinychat C<ANON> + die numerische User-ID, die jedem Benutzer zugeteilt
+wird.
+
+H1: Die Nachteile
+
+Bei allen Vorteilen, es gibt auch Nachteile... die packe ich ans Ende und
+fasse mich auch gerne sehr kurz:
+
+H2: Die Lizenz (Oder doch ein Vorteil?)
+
+Tja, PApp war doch tatsächlich mal GPL, und zwar zu einer Zeit, zu der
+wir es praktisch nur als CGI-Krücke verwendet haben. Inzwischen hat
+sich PApp gemausert und wurde zu einem unserer Standbeine. Als eine
+andere Firma versuchte, uns mit unserem Produkt Konkurrenz bei unseren
+Kunden zu machen ("wir können da einfach ein paar Dutzend Programmierer
+dransetzen"), mussten wir leider handeln.
+
+Die "PApp Public License" ist so ähnlich wie die MySQL Public License,
+d.h. wer sie privat einsetzt (bzw. für die Forschung und Lehre oder
+für eine not-for-profit-Organisation), darf PApp weiterhin kostenlos
+nutzen. Wer kräftig Kohle damit macht, muss uns einen Teil davon abgeben
+(die eigentliche Lizenz ist etwas länger ;).
+
+Langfristig ist geplant, PApp wieder in GPL oder besser zu
+überführen. Mittelfristig muss man damit Leben ;)
+
+H2: Die Abhängigkeiten
+
+Zur Zeit gibt es keine Perl-Release, die annähernd mit UTF8
+zurechtkommt. Z.Zt. (d.h. buchstäblich in dieser Minute) benötigt
+PApp perl-5.7.0-DEVEL7952 oder ein paar hundert Patches davor oder
+danach. Demnächst wird auf DEVEL8xxx umgestellt (z.Zt. gibt es einige
+Bugs, die dies verhindern). PApp funktioniert zwar wunderbar, aber eben
+nur, wenn die restlichen Komponenten aufeinander abgestimmt sind.
+
+H2: MySQL
+
+Das Grundsystem von PApp benötigt zwar kein MySQL, einige Module
+(z.B. C<PApp::Env>) dagegen (aus Geschwindigkeitsgründen) schon.
+Möchte man also eine einfache Installation und alle Features empfiehlt
+sich MySQL, zumindest für die PApp-interne Datenbank selbst. Ansonsten
+arbeitet PApp mit allen Datenbanken, die ein DBI-Interface aufweisen, ohne
+Probleme.
+
+H2: Geschmackssache
+
+PApp ist etwas sehr persönliches - ich habe meine eigenen Vorstellungen
+davon, wie Web/CGI etc. funktionieren sollte, darin verwirklicht. Es
+hat meine Motivation (die sich mit "nie wieder CGI" zusammenfassen
+liess) gewaltig gesteigert - Ein einfaches aber dennoch komplettes
+Content-Management-System kann man in weniger als 500 Zeilen hinlegen -
+für mich ein wichtiger Faktor, denn ich hasse nichts mehr, als das Rad
+jedesmal neu erfinden zu müssen.
+
+Da ich bekannt bin für meinen etwas merkwürdigen Geschmack (sagt man
+mir) muss das {{wie}} nicht unbedingt jedem gefallen.
+
+A1: Referenzen
+
+* {{http://papp.plan9.de/}}. Die PApp-Homepage.
+
+A1: XSLT-Quelltext "Text-Only-Layout"
+
+Dies und das folgende XSLT-Stylesheet kratzen nur an der Oberfläche
+dessen, was mit XSLT möglich ist.
+
+!block verbatim
+ <xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:papp="http://www.plan9.de/xmlns/papp"
+ >
+
+ <xsl:output method="html" omit-xml-declaration='yes' media-type="text/html" encoding="utf-8"/>
+
+ <xsl:template match="papp:module">
+    <html>
+    <title><xsl:value-of select="@module"/></title>
+    <body>
+    <?slink "English", SURL_SET_LOCALE('en'):>
+    <xsl:text> </xsl:text>
+    <?slink "Deutsch", SURL_SET_LOCALE("de"):>
+    <br/>
+    <?slink __"Fancy", style => 1:>
+
+    <hr/>
+    <xsl:apply-templates/>
+    <hr/>
+    <:debugbox:>
+    </body>
+    </html>
+ </xsl:template>
+
+ <xsl:template match="node()|@*">
+    <xsl:copy>
+       <xsl:apply-templates/>
+    </xsl:copy>
+ </xsl:template>
+
+ </xsl:stylesheet>
+!endblock
+
+A1: XSLT-Quelltext "Superbunt und Superhässlich-Layout"
+
+!block verbatim
+ <xsl:stylesheet version="1.0"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:papp="http://www.plan9.de/xmlns/papp"
+ >
+
+ <xsl:output method="xhtml" omit-xml-declaration='yes' media-type="text/html" encoding="utf-8"/>
+
+ <xsl:template match="papp:module">
+    <html>
+    <title><xsl:value-of select="@module"/></title>
+    <body link="#a000000" alink="#a00000" vlink="#a00000" text="#000000" bgcolor="#ffffb4">
+    <?slink "English", SURL_SET_LOCALE('en'):>
+    <xsl:text> </xsl:text>
+    <?slink "Deutsch", SURL_SET_LOCALE("de"):>
+    <br/>
+    <?slink __"Plain", style => 0:>
+    <table bgcolor='#ffff00' border="1"><tr>
+ #if $PApp::module ne ""
+    <td><?slink __"[MAIN PAGE]", "":></td>
+ #endif
+ #if $PApp::module ne "editor" or $S{projectid}
+    <td><?slink __"[PROJECTS]", "editor", projectid => undef:></td>
+ #endif
+    </tr></table>
+    <xsl:if test="@module=''">
+       <h1>__"Demo"</h1>
+       __"Welcome to our pages..."
+    </xsl:if>
+    <table bgcolor="#ffffff" border="5" cellpadding="20"><tr><td>
+    <xsl:apply-templates/>
+    </td></tr></table>
+    <hr/>
+    <font size="1">Copyright whatever, whenever etc...</font>
+    </body>
+    </html>
+ </xsl:template>
+
+ <xsl:template match="node()|@*">
+    <xsl:copy>
+       <xsl:apply-templates/>
+    </xsl:copy>
+ </xsl:template>
+
+ </xsl:stylesheet>
+!endblock
+
+

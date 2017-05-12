@@ -1,0 +1,36 @@
+Copyright 2010, 2011 Kevin Ryde
+
+This file is part of Pod-MinimumVersion.
+
+Pod-MinimumVersion is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3, or (at your option)
+any later version.
+
+Pod-MinimumVersion is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You can get a copy of the GNU General Public License online at
+<http://www.gnu.org/licenses/>.
+
+
+Version 50, April 2011
+    - fix detection of C<< in =item etc text parts
+
+Version 49, March 2011
+    - separate dist from Perl-Critic-Pulp
+    - document 5.12 L<text|URL>
+
+Version 48, March 2011
+    - new 5.12 L<text|URL>
+
+Version 33, April 2010
+    - quietly ignore POD parse errors
+
+Version 23, November 2009
+    - PodMinimumVersion 5.004 for =for, =begin, =end
+
+Version 19, June 2009
+    - the first version

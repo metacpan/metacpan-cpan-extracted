@@ -1,0 +1,32 @@
+Pod::Constants version 0.19
+===========================
+
+Pod::Constants allows you to extract data from your POD at run-time,
+meaning you can do things like declare constants in POD and not have
+to update two places at once every time you make a change.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Pod::Parser, 1.13 or better.  That is to say, I haven't tested it on
+any earlier version.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001, 2002, 2007 Sam Vilain.  All Rights Reserved.
+
+Copyright (C) 2015-2016 by Marius Gavrilescu <marius@ieval.ro>.
+
+This module is free software. It may be used, redistributed and/or
+modified under the terms of the Perl Artistic License, version 2.
+
+See the LICENSE file in the root of this distribution for a copy of
+the Perl Artistic License, version 2.

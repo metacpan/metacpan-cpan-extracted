@@ -1,0 +1,18 @@
+mkwindows.pl --
+
+  * export tags
+
+  * Several other windows could be added.
+     barcilon-tems
+     ultra spherical windows
+
+  * scalloping loss function is not working properly.
+
+  * Other analysis functions could be added. There are, for
+  instance, matlab scripts with these things implemented.
+
+  * filter design tools. Most of these would belong in another
+    module. But the tools to determine values of parameters
+    for window functions probably belong here.
+
+  * plot more than one window function simultaneously.

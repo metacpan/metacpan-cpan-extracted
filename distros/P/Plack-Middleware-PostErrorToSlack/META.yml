@@ -1,0 +1,44 @@
+---
+abstract: 'Post error message to Slack when you app dies'
+author:
+  - 'This library is free software; you can redistribute it and/or modify'
+build_requires:
+  Test::Mock::Guard: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-PostErrorToSlack
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::PostErrorToSlack:
+    file: lib/Plack/Middleware/PostErrorToSlack.pm
+    version: '0.01'
+requires:
+  HTTP::Request::Common: '0'
+  JSON::XS: '0'
+  Plack: '0'
+  Try::Tiny: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/hitode909/Plack-Middleware-PostErrorToSlack/issues
+  homepage: https://github.com/hitode909/Plack-Middleware-PostErrorToSlack
+  repository: git://github.com/hitode909/Plack-Middleware-PostErrorToSlack.git
+version: '0.01'
+x_authority: cpan:HITODE
+x_contributors:
+  - 'hitode909 <hitode909@gmail.com>'

@@ -1,0 +1,236 @@
+Revision history for Proc-Launcher
+
+For complete revision history, see: http://github.com/wu/Proc-Launcher
+
+0.0.37 Sat Feb 14, 2015 12:56 pm
+
+  - fix changelog
+    - go back to maintaining this manually rather than trying to autogenerate
+
+0.0.36 Sat Feb 14, 2015 1:00 am
+
+  - add stop_signal, this allows sending other signals than just HUP
+  - ported from Mouse to Moo
+    - Thanks to Michael Langner (cpan-mila) for these improvements!
+
+  - Added the option to run the launched process as a different user with Privileges::Drop
+    - Thanks to Sam Crawley (Mutant) for implementing this feature!
+
+  - update dist.ini and add cpanfile
+
+0.0.35 Wed Apr 20, 2011 10:18 pm
+
+  - enable debugging in test case 90_launcher_named_pipe.t
+    - continuing to get CPAN test case failures on OpenBSD
+    - can't reproduce errors in my VirtualBox OpenBSD virtual machine
+
+0.0.34 Mon Apr 18, 2011  6:00pm
+
+  - adding some additional debugging for test case failures in launcher tail()
+
+0.0.33 Mon Apr 18, 2011  5:45pm
+
+  - Adding Dist::Zilla::Plugin::ReportVersions::Tiny for test case failure debugging
+
+0.0.32 Mon Apr 18, 2011  5:23pm
+
+  - Adding some debugging to Launcher write_pipe() method
+
+0.0.31 Fri Apr 15, 2011  9:09pm
+
+  - adding some additional debugging for failures on MirBSD and OpenBSD
+
+  - updating dzil.ini, no longer works with current version of Dist-Zilla
+
+  - resolve locking bug that can result in multiple instances of a daemon being started
+    - launcher's start() method may now return undef if child exits immediately or takes a long time to fork()
+
+0.0.30 Thu Jun 24, 2010  7:46 pm
+
+    - fixing one more broken test missed in previous release
+      - use a temporary directory for pid/log files
+
+0.0.29 Wed Jun 23, 2010  2:50 pm
+
+    - fix some broken test cases
+      - always use a temporary directory for test case pid/log files
+
+0.0.28 Tue Jun 22, 2010 11:10 pm
+
+    - fix for bug where is_running() called immediately after start() returned false
+      - write child pidfile in parent process on fork()
+        - child process might not be forked instantly if system is busy
+      - prevents needing to cache the pid
+        - gets ugly since multiple processes might be attempting to control the same daemon
+      - warning: two processes calling start() at exactly the same time could still start two daemons
+        - still working on a fix
+
+
+0.0.27 Tue Jun 22, 2010 10:45 pm
+
+    - remove required class 'Proc::Launcher::Supervisor' on Proc::Launcher::Manager's supervisor object
+
+    - tweak sleep times on a few test cases
+      - warning: child process may return false if is_running() called immediately following start()
+        - child process may not have written pid file yet
+        - considering another fix for this involving caching the pid from fork()
+
+0.0.26 Sat Dec  5, 2009  5:02 am
+
+    - adjusting sleep times in test cases
+      - consistently sleep a few seconds after start() and stop() before is_running()
+      - pid is no longer being cached, need to wait for child process has forked and written pidfile
+      - generally happens very quickly but might take a few seconds on slower machines
+
+0.0.25 Sat Dec  5, 2009  3:59 am
+
+    - API CHANGES:
+      - read_pid() is now pid()
+      - pid attribute removed, now call $obj->pid() instead of $obj->pid
+      - no longer caches pid in Proc::Launcher
+      - resolves a bug where supervisor thinks a process was shut down and starts a second one
+
+    - adjust some sleep times in the test cases to pass more reliably in my vm
+
+0.0.24 Sun Nov 22, 2009 12:07 am
+
+    - create optional named pipe attached to STDIN of forked process
+      - must be enabled, default is to not create the named pipe
+
+    - forked process calls stopped() on exit to remove pidfile/named pipe
+      - cleaned up some of the leaky abstraction issues with is_running()
+
+    - check if pid owned by another user
+      - catches some cases where a pid that has been recycled
+
+    - update $0 in forked processes to include 'perl - Proc::Launcher'
+      - makes forked processes easy to identify
+      
+0.0.23 Wed Nov 11, 2009  1:54 am
+
+    - resolve a bug where multiple Launchers try to start the same daemon at the same time
+      - added simple rename-based lock to write_pid() method
+
+0.0.20 Sun Nov  8, 2009  6:37 pm
+
+    - adding reports for Devel::Cover and Perl::Metrics::Simple
+      - increased test coverage to 92%
+
+    - improvements for launching processes with a named class, method, and context
+      - more test cases
+      - more debugging output
+
+    - several improvements to tail() in panctl, manager, and launcher
+
+    - launched processes now call setsid
+
+    - improvements to manager
+      - start() method returns number of daemons started
+      - testing enable() and disable()
+
+    - launcher restart() method now accepts number of seconds to sleep
+      - updated docs with the details
+
+
+0.0.19 Tue Nov  3, 2009 11:27 pm
+
+  - manager's spawn() method renamed register()
+    - spawn() was misleading since it doesn't actually start a process
+
+  - minor doc tweaks
+
+0.0.18 Fri Oct 30, 2009 11:42 pm
+
+  - added methods to enable/disable daemons
+
+    - daemon won't perform start() if disabled
+
+    - supervisor doesn't start() a daemon that is disabled
+      - no longer have to restart the supervisor to change the active daemon list
+
+    - disable() touches a file, enable() removes it
+      - daemon_name.disabled, next to daemon_name.{pid,log}
+  
+
+0.0.17 Tue Oct 27, 2009  2:30 am
+
+  - added docs for panctl
+
+0.0.16 Mon Oct 26, 2009 10:09 pm
+
+  - fix a bug involving error 'Filehandle STDIN reopened as $fh only for output'
+    - reopen STDIN to /dev/null rather than closing it in forked process
+
+  - allow start/stop/force_stop methods to be called on supervisor
+    - manager API change for the supervisor, see POD docs
+  
+
+0.0.15 Sun Oct 25, 2009  6:14 pm
+
+  - added a new 'tail' method to Proc::Launcher::Manager
+    - uses File::Tail::select
+    - remove tail logic from panctl
+
+0.0.14 Sun Oct 25, 2009  4:59 pm
+
+  - bug fix in Proc::Launcher::Supervisor - update for API change in manager
+
+0.0.13 Sat Oct 24, 2009  7:35 pm
+
+  - settin $VERSION in all modules
+
+0.0.12 Sat Oct 24, 2009  5:09 pm
+
+  - File::Tail is now a prereq
+  - added kwalitee release test
+
+0.0.11 Fri Oct 23, 2009  5:57 pm
+
+  - add some missing bits to new role including POD
+  - resolve perl critic error with module loaded at runtime
+
+0.0.10 Fri Oct 23, 2009  3:31 am
+
+  - Launcher tweaks
+    - if given class name + method name, load the class
+    - is_running returns name of running daemon, more consist with manager
+
+0.0.9 Thu Oct 22, 2009  9:12 pm
+
+  - rework of the manager start/stop/restart API
+    - manager uses the same API as the launcher
+      - remove the "_all" from the names
+      - greatly simplifies GRID::Launcher design
+    - created 'Launchable' role to enforce standard interface
+
+  - Launcher now allows either class name + method name or sub ref
+    - more compatible with GRID::Launcher
+
+  - replaced POE tail with a much simpler File::Tail implementation
+    - manager now gets log file end position as soon as daemons are registered
+
+0.0.8 Mon Oct 19, 2009  5:41 pm
+
+  - better verification of PID, remove Scalar::Util dependency
+
+  - defining 'recommends' section in meta yaml for POE
+    - POE is only necessary for the 'tail' plugin
+    - uses Dist::Zilla::Plugin::MetaRecommends - just uploaded minutes ago
+
+0.0.7 Sat Oct 17, 2009 11:10 pm
+
+  - just bumping version number after resetting version for a few classes
+
+0.0.6 Sat Oct 17, 2009  6:22 pm
+
+  - create pid_dir if it does not already exist
+
+0.0.2 Sat Oct 17, 2009  2:53 pm
+
+  - add 'use strict' and 'use warnings'
+    - redundant with Mouse, but needed by cpants for kwalitee score :P
+
+0.0.1  Fri Oct 16 22:05:11 2009
+
+  - Initial release.
+

@@ -1,0 +1,78 @@
+{
+   "abstract" : "A promise implementation written in Perl",
+   "author" : [
+      "hatz48 <hatz48@hatena.ne.jp>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Promise-Tiny",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Class" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Promise::Tiny" : {
+         "file" : "lib/Promise/Tiny.pm",
+         "version" : "0.02"
+      },
+      "Promise::Tiny::AnyEvent" : {
+         "file" : "lib/Promise/Tiny/AnyEvent.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hatz48/perl-promise-tiny/issues"
+      },
+      "homepage" : "https://github.com/hatz48/perl-promise-tiny",
+      "repository" : {
+         "url" : "git://github.com/hatz48/perl-promise-tiny.git",
+         "web" : "https://github.com/hatz48/perl-promise-tiny"
+      }
+   },
+   "version" : "0.02"
+}

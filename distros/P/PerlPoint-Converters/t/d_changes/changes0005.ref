@@ -1,0 +1,42 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!-- ZOOMSTOP -->
+
+<HTML>
+
+<!-- *** Created by pp2html, build 1.21 from PerlPoint-Converters 1.0202  -->
+
+<HEAD>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+
+<!-- ZOOMRESTART -->
+
+
+
+<TITLE>Version 0.005   10/19/2000</TITLE>
+</HEAD>
+
+<!-- ************************************************************** -->
+<BODY bgcolor="#FFFFFF" text="#000000" link="#0000CC" vlink="#AAAAAA" alink="#FF0000">
+<a name="Version 0.005   10/19/2000"></a>
+
+<H1>Version 0.005   10/19/2000
+</H1>
+
+<UL>
+<LI>name changed: pp2htm  --&gt; pp2html</LI>
+<LI>needs <CODE>PP::Parser 0.21</CODE></LI>
+<LI>handler for DPointItem</LI>
+<LI>sorting in index has been corrected multiple index entries are now supported</LI>
+<LI>parameter &quot;file&quot; in \IMAGE tags renamed to &quot;src&quot; (for better consistency with HTML)</LI>
+<LI>parameters &quot;height&quot; and &quot;width&quot; supported for \IMAGE tags</LI>
+<LI>parameter &quot;face&quot; supported for \F tag</LI>
+<LI>\TABLE tags supported</LI>
+<LI>handle shift paragraphs &gt; and &lt;</LI>
+<LI>Bugfix: if there was no index, the last page was not processed !!</LI>
+</UL>
+</BODY>
+</HTML>

@@ -1,0 +1,72 @@
+Revision history for PDF::Tiny
+
+0.08    7 April, 2017
+      • Uncompressed streams can now  be  read  [rt.cpan.org #120836].
+        Thanks to Pali for the patch.
+
+0.07    6 March, 2017
+      • import_page  has been fixed not to give pages the wrong  size
+        if the source PDF happens to have the size  (MediaBox)  speci-
+        fied both in the page tree and on the page itself.
+
+0.06    5 March, 2017
+      • The print method no longer uses tell, which means that it now
+        produces a correct cross-reference table when printing  to  a
+        file handle for which tell returns no useful value.
+      • It is much faster now when handling files  with  hundreds  of
+        pages (thanks to Devel::NYTProf).
+
+0.05    4 March, 2017
+      • New features:
+        • PDF 1.5 (Acrobat 6)  cross-reference and object streams can
+          now be read.  (Hybrid-reference files  are  not  fully  sup-
+          ported.  The streams will be ignored.)
+        • New decode_stream method.
+      • API changes (all low-level):
+        • get_obj now returns nothing for the null object (since null
+          is supposed to be equivalent to a nonexistent  entry;  this
+          should make code that calls it simpler).
+        • Similarly, dictionary elements containing null are stripped
+          at parse time.
+        • The format of the xref hash has changed. It can now contain
+          array refs (for objects in object streams).
+      • Bug fixes:
+        • parse_string with one argument no longer hangs if it encoun-
+          ters an incomplete string token (e.g., ‘(foo’).
+        • get_obj will now fetch the  keys  of  a  stream  dictionary
+          (e.g.,  $pdf->get_obj(qw< /Root  /Pages  /Kids 0  /Contents
+                                    /Filter >)).
+        • vivify_obj  now correctly uses an empty  parsed  dictionary
+          object for a stream’s second element, instead of a hash ref.
+        • Conversion of  flat objects  into first-class  objects  (as
+          advertised in the docs) actually works now.
+        • Page-handling functions now work with PDFs that have nested
+          page arrays.
+
+0.04    2 March, 2017
+      • Files smaller than 1K can now be opened.
+
+0.03    2 March, 2017
+      • Editing an existing PDF without an ID (very rare)  was result-
+        ing  in  existing  object  numbers  being  reused.  This  has
+        been fixed.
+      • Numerous bugs have been fixed relating to parsing and  serial-
+        ization of PDF strings:
+        • Parsing of very long strings used to get stuck in a loop.
+        • Output of such strings contained overlong lines.
+        • Escaped line breaks are now correctly ignored.
+        • Carriage returns are now emitted as \r (as-is they would be
+          interpreted as line feeds).
+        • Hex strings are no longer split with \<nl>  on output,  but
+          simply with new lines.
+        •‘Flat’  objects are now emitted as they are,  and not  split
+          with \<nl>.
+
+0.02    26 February, 2017
+      • insert_page  and  get_page  (and,  under  some  circumstances,
+        delete_page), are now significantly faster.  The speed differ-
+        ence will only be noticed if the PDF has hundreds of pages.
+      • Added benchmarks.
+
+0.01    25 February, 2017
+        First release

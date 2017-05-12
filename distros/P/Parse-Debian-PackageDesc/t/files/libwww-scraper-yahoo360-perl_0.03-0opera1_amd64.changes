@@ -1,0 +1,30 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Format: 1.7
+Date: Mon, 11 May 2009 10:06:59 +0200
+Source: libwww-scraper-yahoo360-perl
+Binary: libwww-scraper-yahoo360-perl
+Architecture: source all
+Version: 0.03-0opera1
+Distribution: unstable
+Urgency: low
+Maintainer: Esteban Manchado Velázquez (Debian packaging) <estebanm@opera.com>
+Changed-By: Esteban Manchado Velázquez (Debian packaging) <estebanm@opera.com>
+Description:
+ libwww-scraper-yahoo360-perl - Yahoo 360 blogs old-fashioned crappy scraper
+Changes:
+ libwww-scraper-yahoo360-perl (0.03-0opera1) unstable; urgency=low
+ .
+   * New upstream release
+Files:
+ c16faef926c798ca8a67bfaf1080dca8 731 perl optional libwww-scraper-yahoo360-perl_0.03-0opera1.dsc
+ 3d32b2fedaa08a94435379af30175875 1987 perl optional libwww-scraper-yahoo360-perl_0.03-0opera1.diff.gz
+ d4c03275ae1fb2aa377a08612bdd3de9 11450 perl optional libwww-scraper-yahoo360-perl_0.03-0opera1_all.deb
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFKB9zLjiY6Pgy8KYcRAoKlAJ0f6NwMHMQpbGXlVTdOCUrYA7XlhwCeIVrs
+IMAsD5AElhdees0HhGDmNOA=
+=0RFM
+-----END PGP SIGNATURE-----

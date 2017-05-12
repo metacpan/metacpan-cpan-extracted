@@ -1,0 +1,230 @@
+
+=pod
+
+=head1 PBS, a short introduction
+
+This document is a gentle introduction to I<PBS> . It gives you some insight in why we designed it the way we did.
+
+I<PBS> is a build utility in the same spirit as  I<make>. It is B<not> compatible with I<make> and B<works completely differently>!
+
+=head2 History
+
+I<PBS> history starts with the complete frustration state we got in when trying to have I<gmake> do anything complicated. 
+To fix that problem, we introduced I<cons> at our job and it worked fine but I was not completely happy with cons as were other people on the cons mailing list.
+
+During Chrismas break, I  always try to start a new project. The month was december, my frustration with I<make> was at its top, Chrismas was one week away,
+I<PBS> was born! After a week work I had a small working build system. At that time I had contact with Michel Pfeiffer who was working on,
+the now defunct, I<make.pl>. Our goals where to write an advanced build system under 10 KB code (I can only smile when I see I<PBS>
+is closer to 400 than 10 KB).
+
+=head2 Why a new build system
+
+From I<make.pl> home page:
+
+Arcane make and its various derivatives (cook, GNU make, jam, makepp, ...) use a weird language mix of a variable and
+rule syntax plus, for actually doing something, embedded shell (along with sed, awk ...)  The derivatives improve this language,
+but the improvements are not accessible with automake, and still don't make a really useable language.
+
+Having a powerfull scripting language instead for a crippled one makes a huge difference for
+a build system maintainer.  To the arcane I<make>, I would add the ugly, unreadable XML based build systems.
+
+I also wanted to try new ideas that haven't been used in other build systems.
+
+=head2 What's a meta build system?
+
+I<META> is a very overloaded word that computer engineers use when they want to make something sound more intelligent than 
+it really is. B<PBS> is not a build system, it's a library that makes it possible to write a build tool and eventually an instanciation of it,
+ie a build system. 
+
+Work must be invested in a build system, or more rightly in "the" build system you are using. This is true whatever
+tool you are using. We have such a tool, I<pbs>. Note the lower case name.
+
+I<PBS> give you the possibility to do things, it's up to you to do them. If you are looking for some magical build system, there are a few
+out there that might do that for you. If you write build systems when you have free time or really, really when you need to do it, then
+I<PBS> is not for you.
+
+=head2 Goals
+
+=over 2
+
+=item * a powerfull, expandable system
+
+=item * a very controllable system (through override)
+
+=item * something fun to work with
+
+=item * not re-invent too much of the wheel
+
+=item * a scripting laguage worth the name
+
+=back
+
+=head2 General design
+
+I<PBS> is a three pass system, it build a dependency graph, checks the dependency graph to find out what is to be build, builds whatever
+node that needs it. This is very different from I<make> which builds on the run. Both systems have advantages and disadvantages.
+
+I<PBS> lets you define rule in scripts written in perl. Using I<filters> you could write them in whatever language you want. Once the rules
+are defined, I<PBS> generates the dependency graph by applying the rules recursively on the top tager and it's dependencies. Having the whole 
+dependency graph has these advantages:
+
+=over 2
+
+=item * it's informative as you can visualize or check everything in your build
+
+=item * it allows for optimization of the build
+
+=item * it allows for dynamic build (like looking where in the graph nodes are)
+
+=back
+
+It also has the following disadvantages:
+
+=over 2
+
+=item * it takes time
+
+=item * it takes loads of memory
+
+=back
+
+To overcome the first disadvantage, I<PBS> uses caching scheme we call B<warp>.
+
+=head2 PBS is Perl
+
+I<PBS> is a superset of Perl or an add-in to Perl (choose whichever you prefer).  It introduces only a very few extra functions.
+Those functions are nothing more than plain Perl subs. The build scripts being perl, they are interpreted by perl within the frame
+of I<PBS>. 
+
+=head2 Syntax
+
+I, Nadim Khemir,  wrote B<PBS> but the credit is not only mine. Anders Lindgren has been involved from the very begining with the
+architecture and he is also the one that can use I<PBS> best. Ola Maartensson also deserves large credit for forcing us not to fix something
+for our needs but think about other users (mainly him :-). He set his mark in how things should look like and how verbose a build system should be.
+Ola and I maintained the build system at our work. It was based on I<make> and that's why we tried to have it look a bit the same.
+
+Here is a simple rule:
+
+  AddRule 's_objects'  #name
+	=> [ '*/*.o' => '*.s' ]  #depender
+	=> "%AS %ASFLAGS ... -o %FILE_TO_BUILD %DEPENDENCY_LIST" ; # builder
+
+The rule could be defined in a rule library and that library could be included instead for definig the rule inline. This is exactely what we do
+in a file we call (wrongly as the rule above is for assembler files) B<C.pm>. I<PBS> has support for finding libraries and locally overidding libraries.
+The above (and much more)  is replaced in our B<Pbsfiles> by this single line:
+
+  PbsUse('Rules/C') ;
+
+We try to mimic Perl's I<use> and we give our libraries the extension I<.pm>. B<Pbsfiles> should have extention I<.pl>.
+
+I<PBS> will automatically push your script in a package. This is done to separate rules and configurations 
+when doing a hierarchical build. all B<Pbsfiles> run in I<strict> mode. 
+
+=head2 Pbsfiles are dynamic!
+
+B<Pbsfiles> are perl scripts so all you can do in a perl scrip you can do in a B<Pbsfile>, including using modules from B<CPAN>.
+
+You can add rules but you can also remove rules from the rules defined in the libraries you include.
+
+=head2 Power to the People
+
+I<PBS> doesn't do much and does nothing by default. I don't like to guess what is going on so I find  it empowering to have
+to tell the system what to do. Since I<PBS> is a meta build system, you can write your own interface that makes it look easy or or 
+use the less easy but straight forward native interface.
+
+I<PBS> has no built-in rules, period.
+
+=head2 Rules
+
+Rules have 6 components, 2 are mandatory. 
+
+A rule always has a name (mandatory). This is to simplify debugging (of _your_ build system).
+
+A rule also bellongs to a rule namespace. More often than not, I<PBS> handles  this transparently and you don't even know it is there. 
+
+A rule can carry a node type, ie when a node matches a rule, the rule type are passed to the node. 
+
+To know if a rule matches a node, a (mandatory) depender is declared. Most often the depender is a list containing a regex and a dependency definition.
+A depender can also be a perl sub so it can get very powerfull and complicated, one such depender is the example C depender that comes with I<pbs>.
+
+I<PBS> also needs to know how to build nodes. This is either done with a list of shell commands or, again, by using perl subs. 
+
+Finally (since version 0.28_3) I<PBS> accepts what we call "node subs". Node subs are run when a node is added to the graph. These subs can do a wide range of operations
+that are described in the reference manual. you can also define you own "node subs".
+
+All these elements are described in detail in the reference manual.
+
+=head3 Meta rule
+
+A meta rule is a rule made of multiple rules with some glue to say which of the base rules does match. An example is:
+
+From which source code you build an object file when you hace a C file and and assembler file ?
+
+You have three rules, one to build from a C file, one to build from an assembler file and one to arbitrate between the rules.
+
+=head3 Dependers
+
+Dependers are perl subs, you can also define a sub that return a depender sub. These subs are run in order and the B<sum> of the dependencies
+becomes the node under work dependencies. Note that this is different from I<make>. 
+
+=head3 Builder
+
+A builder is also a perl sub. To simplify things, for the user anyhow, B<AddRule> also accepts a list of shell commands. I<PBS> uses the builder from 
+the last matching rule. It will also tell you (if you ask) if nodes had other builders.
+
+=head2 Configuration
+
+I<PBS> lets you define and query configuration variables. These are perl variables so they can contain live objects like mailer or anything you fancy.
+I<PBS> will check if you try to override a configuration variable and show you what your variables contain if you ask.
+
+=head2 Directories
+
+=head3 PBS directory and '.'
+
+PBS never changes directory and you should never change directory in a depender or a builder. Everything is based in '.', the current directory. The check
+step locates the files based in '.' and set their full path build names.
+
+=head3 Build directory
+
+if you don't give a specific build directory to I<PBS>, it will build int "out_" + your user name. So you never clutter your source directory unless  you really want to.
+
+=head3 Source directory
+
+I<PBS> can locate your source files from multiple directories, these are also sometime named "repositories" in other build systems. Your repositories
+can also contain binary files.
+
+=head2 Hierarchical builds
+
+B<PBS> supports hirarchical builds, No extra process is started for a sub build (called sub pbs). This is a necessity as we must have the full
+dependency graph. Unlike I<cons>, top build files and lower level build files are equivalent. This lets you use I<PBS> for building projects or
+their sub components without the same set of B<Pbsfiles>
+
+=head2 Node Triggers
+
+There are two ways to start a sub pbs, by directly matching a rule that starts a subpbs or by defining a trigger. A trigger will start a sub pbs
+when a node "triggers" a rule (this is much easier to comprehend with an example).  The nice thing is that triggers can be defined in the sub Pbsfile
+and imported  from there. This allows for a better separation of the rules making up your build system. The user's manual has such an example.
+
+=head2 Documenting your Pbsfiles
+
+B<Pbsfiles> can be commented with B<POD> and I<PBS> can extract the documentation and even search it for you.
+
+=head2 Debugging
+
+I<PBS> has debugging hooks that let you run speciific perl code on certain events. The support works in the perl debugger too. (hmm what about latest perl version?)
+
+=head1 AUTHORS
+
+Khemir Nadim ibn Hamouda. <nadim@khemir.net>and Ander Lindgren (ALI).
+
+Thanks to  Ola Maartensson for his input.
+
+Parts of the development was funded by B<C-Technologies AB, Ideon Research Center, Lund, Sweden>.
+
+=head1 LICENSE 
+
+Artistic License 2.0
+
+=cut
+
+

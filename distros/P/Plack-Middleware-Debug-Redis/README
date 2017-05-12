@@ -1,0 +1,124 @@
+NAME
+    Plack::Middleware::Debug::Redis - Extend Plack::Middleware::Debug with
+    Redis panels
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+        # inside your psgi app
+        use Plack::Builder;
+
+        my $app = sub {[
+            200,
+            [ 'Content-Type' => 'text/html' ],
+            [ '<html><body>OK</body></html>' ]
+        ]};
+        my $redis_host = 'redi.example.com:6379';
+
+        builder {
+            mount '/' => builder {
+                enable 'Debug',
+                    panels => [
+                        [ 'Redis::Info', instance => $redis_host ],
+                        [ 'Redis::Keys', instance => $redis_host, db => 3 ],
+                    ];
+                $app;
+            };
+        };
+
+DESCRIPTION
+    This distribution extends Plack::Middleware::Debug with some Redis
+    panels. At the moment, the following panels available:
+
+PANELS
+  Redis::Info
+    Diplay panel with generic Redis server information which is available by
+    the command INFO. See Plack::Middleware::Debug::Redis::Info for
+    additional information.
+
+  Redis::Keys
+    Diplay panel with keys Redis server information. See
+    Plack::Middleware::Debug::Redis::Keys for additional information.
+
+METHODS
+  redis_connect
+    Checks passed parameters and connects to redis server instance. Returns
+    redis handle or croaks.
+
+  redis
+    Redis handle to operate with.
+
+OPTIONS
+    All options should be passed as a hash reference. The following options
+    are available to tune it for your needs.
+
+  instance
+    A string consist of a hostname (or an IP address) and port number
+    (delimited with a colon) or unix socket path of the redis-server
+    instance to connect to. Not required. Default value is 127.0.0.1:6379.
+    Some usage examples
+
+        # tcp/ip redis-servers
+        instance => '';                          # treats as '127.0.0.1:6379'
+        instance => 'TCP:example.com:11230';     # ..as 'example.com:11230'
+        instance => 'tcp:redis.example.org';     # ..as 'redis.example.org:6379'
+        instance => 'redis-db.example.com';      # ..as 'redis-db.example.com:6379'
+        instance => 'tcp:127.0.0.1';             # ..as '127.0.0.1:6379'
+        instance => 'tcp:10.90.90.90:5000';      # ..as '10.90.90.90:5000'
+        instance => '192.168.100.230';           # ..as '192.168.100.230:6379'
+        instance => 'bogus:0'                    # ..as 'bogus:6379' (allowed > 0 and < 65536)
+        instance => 'Inet:172.16.5.4:65000';     # ..as '172.16.5.4:65000'
+        instance => 'bar:-100';                  # ..as 'bar:6379' (allowed > 0 and < 65536)
+        instance => 'baz:70000';                 # ..as 'baz:6379' (allowed > 0 and < 65536) and so on..
+
+        # unix sockets might be passed like this
+        instance => 'Unix:/var/foo/Redis.sock';  # this socket path '/var/foo/Redis.sock'
+        instance => '/bar/tmp/redis/sock';       # ..as '/bar/tmp/redis/sock',
+        instance => 'unix:/var/foo/redis.sock';  # ..as '/var/foo/redis.sock',
+
+  password
+    Password string for redis-server's AUTH command to processing any other
+    commands. Optional. Check the redis-server manual for directive
+    *requirepass* if you would to use redis internal authentication.
+
+  db
+    A redis-server database number to use. Not obligatory option. If this
+    one omitted then value 0 will be assigned.
+
+  reconnect
+    A time (in seconds) to re-establish connection to the redis-server
+    before an exception will be raised. Not required. Default value is 10
+    sec.
+
+  every
+    Interval (in milliseconds) after which will be an attempt to
+    re-establish lost connection to the redis-server. Not required. Default
+    value is 100 ms.
+
+  debug
+    Enables debug information to STDERR, including all interactions with the
+    redis-server. Not required. Default value is 0 (disabled).
+
+BUGS
+    Please report any bugs or feature requests through the web interface at
+    <https://github.com/Wu-Wu/Plack-Middleware-Debug-Redis/issues>
+
+SEE ALSO
+    Plack::Middleware::Debug::Redis::Info
+
+    Plack::Middleware::Debug::Redis::Keys
+
+    Plack::Middleware::Debug
+
+    Redis
+
+AUTHOR
+    Anton Gerasimov <chim@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Anton Gerasimov.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

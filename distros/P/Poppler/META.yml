@@ -1,0 +1,33 @@
+---
+abstract: 'Bindings to the poppler PDF rendering library'
+author:
+  - 'Jeremy Volkening <jdv@base2bio.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::PkgConfig: '0'
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Poppler
+provides:
+  Poppler:
+    file: lib/Poppler.pm
+    version: '1.0101'
+  Poppler::Page::Dimension:
+    file: lib/Poppler/Page/Dimension.pm
+requires:
+  Cairo: '0'
+  Carp: '0'
+  Exporter: '0'
+  File::ShareDir: '1.00'
+  Glib::Object::Introspection: '0.016'
+  URI: '1.64'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/c9s/perl-poppler
+version: '1.0101'

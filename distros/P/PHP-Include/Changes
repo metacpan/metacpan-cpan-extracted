@@ -1,0 +1,59 @@
+Revision history for Perl extension PHP::Include.
+
+0.37  Mon Oct 12 17:48:44 WEST 2015
+        - fixed POD errors.
+
+0.36  Mon Dec 10 14:06:04 WET 2012
+        - supports variables defined as my or our.
+
+0.35  Tue May 15 20:50:24 WEST 2012
+        - support backslashed quotes inside strings.
+
+0.34  Sat Oct  1 15:25:21 WEST 2011
+        - parse comments correctly (or mostly).
+
+0.33  Sat Feb  5 21:56:01 WET 2011
+        - added support to lists of hashes.
+        - added support to hases of hashes.
+
+0.32  Fri Feb  4 20:45:12 WET 2011
+        - added support to nested arrays on arrays.
+
+0.31  Fri Feb  4 19:53:24 WET 2011
+        - support // style comments within Array() definitions.
+
+0.30  Fri Jan 28 14:16:06 WET 2011
+        - added support to nested arrays on hashes.
+
+0.20  Mon Jun  6 09:37:53 CDT 2005
+        - added // style comments (thanks Rudiger Grefe)
+
+0.10  Sun Mar 14 09:08:34 2004
+        - fixed documentation error (thanks Aran Deltac)
+        - constants can now be integers
+        - no longer require 5.8.0
+
+0.08  Tue Mar 02 09:19:12 2004
+        - added shell style comment handling (thanks Aaron Sherman)
+        - allow trailing comma (thanks Aaron)
+
+0.07  Fri Nov 14 04:45:33 2003
+	- revamped grammar in PHP::Include::Vars so that double quotes
+	  actually work, and productions return properly instead of 
+	  cheating by stashing things in package variables. This was
+	  all inspired by RT #4397. 
+
+0.06  Mon Oct 13 09:06:00 2003
+	- include_php_vars() now can have a single quoted string
+
+0.05  Tue Dec 31 09:17:00 2002
+	- understands constants 
+	- ability to get diagnostics
+
+0.02  Mon Dec 30 09:02:00 2002
+	- docs update (thanks Andy)
+
+0.01  Tue Dec 17 14:10:36 2002
+	- original version; created by h2xs 1.22 with options
+		-X PHP/Include
+

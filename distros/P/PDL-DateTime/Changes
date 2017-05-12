@@ -1,0 +1,10 @@
+Changes for PDL-DateTime distribution
+
+0.003   2017/01/01
+        - fix: dt_periodicity
+
+0.002   2015/10/17
+        - new methods: dt_year, dt_quarter, dt_month, dt_day
+
+0.001   2015/10/16
+        - initial version

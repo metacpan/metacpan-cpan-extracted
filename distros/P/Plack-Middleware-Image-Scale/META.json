@@ -1,0 +1,83 @@
+{
+   "abstract" : "Resize jpeg and png images on the fly",
+   "author" : [
+      "Panu Ervamaa <pnu@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Image-Scale",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "Image::Scale" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "Plack::MIME" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Util" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.006",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Class::MOP" : "0",
+            "Data::Dumper" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "HTTP::Request::Common" : "0",
+            "HTTP::Response" : "0",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Imager" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Middleware::Static" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "lib" : "0",
+            "perl" : "5.006",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pnu/Plack-Middleware-Image-Scale.git",
+         "web" : "http://github.com/pnu/Plack-Middleware-Image-Scale"
+      }
+   },
+   "version" : "0.011",
+   "x_authority" : "cpan:PNU"
+}
+

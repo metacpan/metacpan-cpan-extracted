@@ -1,0 +1,56 @@
+Revision history for Padre-Plugin-Catalyst
+
+0.09
+    compatibility with newer Padre versions (ZENOG)
+
+0.08
+    disabling plugin's own panel until it's properly fixed
+    fixed Build.PL requirements (ticket 53616 - thanks Jens Rehsack for reporting!)
+    fixed bug where the plugin dies when trying to call helper methods while not in
+    a catalyst project. What we do now is disable the whole menu (ticket 53603 - 
+    thanks Alexander Hartmaier for reporting!)
+
+0.07
+    now plugin uses its very own panel (zamolxes' wishlist) 
+    updated documentation for better clarification (Philip Potter)
+    menu redone with menu_plugins(), allowing us to gray-out menu options
+    now "start server" and "stop server" enable/disable each other
+    crediting previously unsung translators (Ishigaki Kenichi (ishigaki) 
+    for japanese and Sebastian Willing (SeWi) for german)
+
+0.06
+    There was no version 0.06. Mythical? No one shall ever know ;)
+
+0.05
+	Added option to update application scripts (upgrade your app to a new version of Catalyst) (garu)
+    Renamed to the new Padre 0.43 PO naming scheme (azawawi)
+    Fixed "start server" helper (jason best)
+
+0.04
+	Added Spanish translation (BRUNOV)
+    removed taint mode for test, leading to build failures (jquelin)
+	Added Catalyst Community Live Support (garu)
+	Expanded Catalyst Tutorial to a submenu, updated to newest version (garu)
+
+0.03	
+	Default model name set to 'DB', type set to DBIC::Schema (if available) (GARU)
+	Added translation support (SZABGAB)
+	Added translations:
+	- Arabic                (AZAWAWI)
+	- Brazilian Portuguese  (GARU)
+	- Chinese (Traditional) (BLUET)
+	- Dutch                 (DDN)
+	- French                (jquelin)
+	- Polish                (THEREK)
+	- Russian               (SHARIFULN)
+
+0.02    2009-04-08
+        Now working on MS-Windows too  (FAYLAND)
+        Added "create new model" window (GARU)
+        Added "create new controller" window (GARU)
+        Added checkbox to shorten MVC names while creating a new app (GARU)
+        Added plugin icon (tiny Catalyst logo) (GARU)
+
+0.01    2009-03-31
+        First version, released on an unsuspecting world.
+

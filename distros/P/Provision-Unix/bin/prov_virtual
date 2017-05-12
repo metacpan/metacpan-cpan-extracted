@@ -1,0 +1,215 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Dumper qw( Dumper );
+use English qw( -no_match_vars );
+use Getopt::Long;
+use Pod::Usage;
+
+use lib 'lib';
+use Provision::Unix;
+use Provision::Unix::VirtualOS;
+
+my $prov = Provision::Unix->new( debug => 0 );
+my $util = $prov->get_util;
+
+Getopt::Long::GetOptions(
+    'action=s'        => \my $action,
+    'name=s'          => \my $name,
+    'ip=s'            => \my $ip,
+
+    'template=s'      => \my $template,
+    'config=s'        => \my $config,
+    'cpu=s'           => \my $cpu,
+    'disk_root=s'     => \my $disk_root,
+    'disk_size=s'     => \my $disk_size,
+    'ram=s'           => \my $ram,
+    'hostname=s'      => \my $hostname,
+    'password=s'      => \my $password,
+    'nameservers=s'   => \my $nameservers,
+    'searchdomain=s'  => \my $searchdomain,
+
+    'new_node=s'      => \my $new_node,
+    'connection_test' => \my $connection_test,
+    'verbose'         => \my $debug,
+    'version'         => \my $version,
+    'help'            => \my $help,
+) or die 'error parsing command line options';
+
+pod2usage( { -verbose => 3 } ) if $help;
+$prov->get_version() and exit if $version;
+$EUID == 0 or die 'Virtual OS functions require root privileges.';
+my $vos  = Provision::Unix::VirtualOS->new( prov => $prov );
+
+my %actions = map { $_ => 1 } qw/ create destroy start stop restart reinstall
+     disable enable modify probe mount unmount console set_password migrate 
+     create_snapshot destroy_snapshot mount_snapshot unmount_snapshot 
+     unmount_inactive_snapshots
+     transition untransition
+     get_config publish_arp /;
+
+my $questions = {
+    action    => "the action to perform: \n\tcreate, destroy\n\tstart, stop, restart\n\tdisable, enable, mount, unmount, modify, console, probe",
+    name      => "the virtual environment name/ID",
+    ip        => "the IP address[es] (space delimited)",
+    ram       => 'RAM (in MB)',
+    cpu       => '# of CPU cores available to this VE',
+    template  => "the OS template/tarball to use",
+    config    => "the configuration file",
+    disk_root => "the path to the virtual OS root",
+    disk_size => "the disk size (limit) ",
+    hostname  => "the virtual hostname",
+    password  => "the root password",
+    nameservers  => "the nameservers (for /etc/resolv.conf)",
+    searchdomain  => "the search domain (for /etc/resolv.conf)",
+};
+
+$action ||= $util->ask( $questions->{action}, default=>'create' );
+$action = lc($action);
+$action =~ s/\s//g;  # strip off spaces
+
+pod2usage( { -verbose => 1 } ) if !$actions{$action};
+
+$name ||= $util->ask( $questions->{name} );
+$debug = defined $debug ? $debug : 0;
+
+my %request = ( debug => $debug, fatal => 0, name => lc($name) );
+
+create()       if $action eq 'create' || $action eq 'reinstall';
+modify()       if $action eq 'modify';
+set_password() if $action eq 'set_password';
+migrate()      if $action eq 'migrate';
+publish_arp()  if $action eq 'publish_arp';
+
+foreach ( keys %request ) { delete $request{$_} if ! defined $request{$_}; };
+print Dumper( $vos->$action( %request ) );
+
+$prov->error( "dump error log", fatal => 0 ) if $debug;
+print "done.\n";
+exit;
+
+sub create {
+    $request{ip}       = $ip       || $util->ask( $questions->{ip} );
+    $request{hostname} = $hostname || $util->ask( $questions->{hostname} );
+    $request{template} = $template || $util->ask( $questions->{template}, 
+        default => 'centos-5-i386-default' );
+    $request{config}   = $config   || $util->ask( $questions->{config} );
+    $request{cpu}      = $cpu      || $util->ask( $questions->{cpu} );
+    $request{ram}       = $ram;       
+    $request{disk_size} = $disk_size;
+    if ( ! $request{config} ) {
+        $request{ram}       ||= $util->ask( $questions->{ram}       );
+        $request{disk_size} ||= $util->ask( $questions->{disk_size} );
+    };
+    $request{nameservers}  = $nameservers  || $util->ask( $questions->{nameservers} );
+    $request{searchdomain} = $searchdomain || $util->ask( $questions->{searchdomain} );
+    $request{password}     = $password     || $util->ask( $questions->{password} );
+
+    warn "creating!\n";
+    $prov->audit("dispatching creation request");
+}
+
+sub migrate {
+    $request{new_node} = $new_node || $util->ask( "the destination HW node hostname or IP" );
+    $request{connection_test} = $connection_test || $util->ask( "only test the connection", default => 0 );
+}
+sub modify {
+    $request{ip}           = $ip          || $util->ask( $questions->{ip}        );
+    $request{ram}          = $ram         || $util->ask( $questions->{ram}       );
+    $request{disk_size}    = $disk_size   || $util->ask( $questions->{disk_size} );
+    $request{nameservers}  = $nameservers || $util->ask( $questions->{nameservers} );
+    $request{searchdomain} = $searchdomain || $util->ask( $questions->{searchdomain} );
+    $request{hostname}     = $hostname    || $util->ask( $questions->{hostname}  );
+    $request{cpu}          = $cpu      || $util->ask( $questions->{cpu} );
+    $request{password}     = $password    || $util->ask( $questions->{password}  );
+}
+sub publish_arp {
+    delete $request{name};
+    $request{ip} = $ip || $util->ask( $questions->{ip} );
+};
+sub set_password {
+    $request{password} = $password || $util->ask( $questions->{password} );
+}
+
+__END__
+
+=head1 NAME 
+
+prov_virtual - a command line interface for provisioning virtual machines
+
+=head1 SYNOPSIS
+
+    prov_virtual --action=  [--name example.com]
+
+Action is one of the following:
+
+  create   - creates a new virtual environment/machine/server
+  destroy  - remove a VE from the system
+
+  start    - start up a VE
+  stop     - shut down a VE
+  restart  - restart a VE
+
+  enable   - enable/restore a VE
+  disable  - disable/suspend a VE
+
+  modify   - make changes to an existing VE
+  set_password - update root password in VE
+  migrate  - move VE to new hardware node
+
+  probe    - get status of a VE (returns a hash)
+  mount    - mount the VE disk image
+  unmount  - unmount VE disk image
+  console  - start a console session
+
+  help     - display this help document
+
+required arguments: action, name
+
+optional arguments: ip, hostname, template, config, password, nameservers, searchdomain
+
+=head1 USAGE
+ 
+ prov_virtual --name=555 --action=create
+ prov_virtual --name=555 --action=mount
+ prov_virtual --name=555 --action=unmount
+ prov_virtual --name=555 --action=start
+ prov_virtual --name=555 --action=console
+ prov_virtual --name=555 --action=stop
+ prov_virtual --name=555 --action=destroy
+
+
+=head1 DESCRIPTION
+ 
+prov_virtual is a command line interface for provisioning virtual environments on various virtualization platforms. Support is included for OpenVZ, Xen, and FreeBSD jails. The syntax for provisioning a VPS on all supported platforms is identical.
+
+See also Provision::Unix::VirtualOS and its subclasses.
+ 
+=head1 CONFIGURATION AND ENVIRONMENT
+
+See the [VirtualOS] section in provision.conf
+
+=head1 DEPENDENCIES
+ 
+  Config::Tiny
+  Getopt::Long
+  Params::Validate
+  Digest::MD5 
+  LWP::UserAgent
+
+=head1 AUTHOR
+ 
+Matt Simerson, C<< <matt at tnpi.net> >>
+ 
+ 
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2009 The Network People, Inc. (info@tnpi.net)
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

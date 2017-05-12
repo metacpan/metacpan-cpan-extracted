@@ -1,0 +1,20 @@
+Revision history for Perl extension Path-Canonical
+
+0.05 2014-04-09T05:32:18Z
+
+    - Check the path is leading as drive letter or UNC leading paths.
+
+0.04 2014-04-09T05:27:12Z
+
+    - Add canon_filepath that works fine on windows.
+    - Changed sub-routine name s/canonpath/canon_path/g.
+
+0.03 2014-04-09T04:50:59Z
+
+    - Check the path is a file or directory
+
+
+0.01 2014-04-09T02:30:48Z
+
+    - original version
+

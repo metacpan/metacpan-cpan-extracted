@@ -1,0 +1,169 @@
+
+
+INTRO
+
+Welcome!
+
+This package provides modules to write PerlPoint
+translator software. The PerlPoint format, initially
+designed by *Tom Christiansen*, is intended to provide
+a simple and portable way to generate slides without
+the need of a proprietary product. Slides can be prepared
+in a text editor of your choice, generated on any platform
+where you find perl, and presented by any browser which can
+render the chosen output format.
+
+To sum it up, Perl Point Software takes a text
+and transforms it into slides written in a certain
+document description language. This is, by tradition,
+usually HTML, but you may decide to use another
+target format like XML, SGML, TeX or whatever you want.
+
+Well, this sounds fine, but how to write a translator
+which transforms ASCII into the output format of your
+choice? Thats what this package is for. It provides a
+general converter (perlpoint) which can be easily extended
+by own formatter modules to produce what you want.
+
+Additionally, the included base framework allows to write
+complete converters like perlpoint itself, or like the already
+existing pp2sdf, pp2html, pp2latex etc.
+
+
+
+INSTALLATION
+
+As usual: unpack and run "make test" and
+"make install distclean". This will install
+both the module set (various PerlPoint::...
+modules) and the translator pp2sdf.
+
+If you are using CPAN.pm or CPANPLUS, try to
+install Bundle::PerlPoint to get all PerlPoint
+related packages at once.
+
+
+DOCUMENTATION
+
+Documentation for translator *authors* is provided
+in the modules in POD format (see PerlPoint::Parser,
+PerlPoint::Backend and PerlPoint::Constants).
+Additionally, there is a PerlPoint document
+"writing-converters.pp" in the doc subdirectory
+which may be converted by your preferred converter.
+
+Base documentation for translator *users* is provided
+in PerlPoint (see the doc subdirectory). This basic
+documentation is intended as a startup help to translator
+authors to write specific documentation. It describes
+general aspects and can be directly included into
+translator specific PerlPoint documents by \INCLUDE.
+
+
+KNOWN TRANSLATOR SOFTWARE
+
+Translators using this package are *pp2html* and
+*pp2latex* by Lorenz Domke. A *pp2sdf* software comes
+with this package itself, see the demo directory.
+
+As mentioned above, all PerlPoint related packages
+including Lorenz' converters can be installed via
+CPAN.pm as Bundle::PerlPoint.
+
+
+DEMO TRANSLATORS
+
+The demo directory contains several converters on base
+of this package. Except for pp2sdf which serves as a
+reference implementation, these are just illustrations
+intended to show how the package can be used. So they
+are not fully functional but really worth a look.
+
+To run pp2ppresenter, XML::Generator needs to be installed.
+
+If someone wants to take over the demos to make them
+full featured converters provided in an own CPAN package,
+feel free to do so. Just let me know.
+
+
+SUPPPORT
+
+A PerlPoint mailing list is set up to discuss usage, ideas,
+bugs, suggestions and translator development. To subscribe,
+please send an empty message to perlpoint-subscribe@perl.org.
+
+If you prefer, you can contact me via perl@jochen-stenzel.de
+as well.
+
+
+CREDITS
+
+Thanks to Tom Christiansen for the idea and first implementation
+of PerlPoint! And special thanks for his permission to use this
+name for our new implementation.
+
+Thanks to Lorenz Domke who begun to extend the initial software.
+I think I was the "main tester and user" besides himself. Finally
+I started to think about various output formats and a parser and
+he agreed to transform pp2html to the new model. I appreciate
+his cowork in language design and testing. In fact, this project
+grew up in two parts: the module package and first translators
+Lorenz wrote on its base (pp2html, pp2latex). Great teamwork!
+
+Thanks to Stephen Riehm who shared his ideas of extensions for
+the original software with us. The final language was basically
+designed by a team of Lorenz, him and me.
+
+Thanks to Alex Sigel, Norbert Gruener and Jeffrey S. Haemer who
+became our first users outside the team and helped us by their
+usage reports and suggestions. Special thanks to Alex for
+propagating the toolkit and his help to publish the software!
+
+Thanks to Johan Vromans and Mark Overmeer for the PerlPoint
+brainstorming meeting at the 3rd German Workshop. Various ideas
+came up there and are still making their way into the software.
+
+Thanks to Benjamin Holzmann for XML::Generator and his very fast
+help and patches.
+
+
+AUTHOR
+
+Copyright (c) Jochen Stenzel (perl@jochen-stenzel.de), 1999-2003.
+All rights reserved.
+
+This module is free software, you can redistribute it and/or modify it
+under the terms of the Artistic License distributed with Perl version
+5.003 or (at your option) any later version. Please refer to the
+Artistic License that came with your Perl distribution for more
+details.
+
+The Artistic License should have been included in your distribution of
+Perl. It resides in the file named "Artistic" at the top-level of the
+Perl source tree (where Perl was downloaded/unpacked - ask your
+system administrator if you dont know where this is).  Alternatively,
+the current version of the Artistic License distributed with Perl can
+be viewed on-line on the World-Wide Web (WWW) from the following URL:
+http://www.perl.com/perl/misc/Artistic.html.
+
+
+DISCLAIMER
+
+This software is distributed in the hope that it will be useful, but
+is provided "AS IS" WITHOUT WARRANTY OF ANY KIND, either expressed or
+implied, INCLUDING, without limitation, the implied warranties of
+MERCHANTABILITY and FITNESS FOR A PARTICULAR PURPOSE.
+
+The ENTIRE RISK as to the quality and performance of the software
+IS WITH YOU (the holder of the software).  Should the software prove
+defective, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR
+CORRECTION.
+
+IN NO EVENT WILL ANY COPYRIGHT HOLDER OR ANY OTHER PARTY WHO MAY CREATE,
+MODIFY, OR DISTRIBUTE THE SOFTWARE BE LIABLE OR RESPONSIBLE TO YOU OR TO
+ANY OTHER ENTITY FOR ANY KIND OF DAMAGES (no matter how awful - not even
+if they arise from known or unknown flaws in the software).
+
+Please refer to the Artistic License that came with your Perl
+distribution for more details.
+

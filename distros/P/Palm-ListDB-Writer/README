@@ -1,0 +1,49 @@
+Palm::ListDB::Writer
+====================
+
+Palm::ListDB::Writer is a module that easily constructs databases for
+the Palm utility List. List is written by Andrew Low (roo@magma.ca,
+http://www.magma.ca/~roo).
+
+An utility program csv2lsdb is included that can generate List DBs
+from comma-separated value files (CSVs).
+
+See http://www.magma.ca/~roo for more information on the List utility.
+
+This module is not based on L<Palm::PDB> or L<Palm::ListDB>.
+
+Advantages of Palm::ListDB::Writer over Palm::ListDB:
+
+ * Easy to use
+ * Automatic maintenance of categories, adding them on the fly if you want
+ * Controlled flexibility in truncating data that is too long
+ * Presorts the database records
+
+Advantages of Palm::ListDB over Palm::ListDB::Writer:
+
+ * Based on Palm::PDB, hence gives more detailed control over the database
+ * Can import databases as well
+
+INSTALLATION
+
+To install type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Getopt::Long 2.33
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright 2003,2017 Squirrel Consultancy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

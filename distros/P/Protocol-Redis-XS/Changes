@@ -1,0 +1,16 @@
+0.05
+- Encode using XS implementation (und3f)
+- Update hiredis version
+
+0.04
+- Up to API version 1
+
+0.03
+- Add tests for XS specific issues
+- Code cleanups
+
+0.02 25 March 2011
+- Fix error handling multiple messages in a single response
+
+0.01 25 March 2011
+- Initial version

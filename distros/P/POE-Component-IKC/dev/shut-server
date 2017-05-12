@@ -1,0 +1,55 @@
+#!/usr/bin/perl -w
+use strict;
+
+use lib qw(blib/lib blib/arch);
+
+# BEGIN {sub POE::Kernel::TRACE_GARBAGE () { 1 }}
+
+use POE;
+use POE::Session;
+use POE::Component::IKC::Server;
+use POE::Component::IKC::Specifier;
+
+# Very simple server.  all it does is shutdown when 'goaway' is posted
+
+
+POE::Component::IKC::Server->spawn(
+    unix=>($ENV{TMPDIR}||$ENV{TEMP}||'/tmp').'/userver',    
+    name=>'shut-server');       
+
+POE::Session->create(
+    inline_states => {
+            _start=>\&time_start,
+            goaway=>\&goaway,
+            _stop=>\&time_stop,
+        }
+);
+
+print "Running server for 60 seconds at most...\n";
+$poe_kernel->run();
+print "Server exited...\n";
+
+#############################################
+sub time_start
+{
+    my($kernel, $heap, $session)=@_[KERNEL, HEAP, SESSION];
+    $kernel->delay('goaway', 60);
+    $kernel->alias_set('Goaway');
+    $kernel->call(IKC=>'publish',  
+                  Goaway=>[qw(goaway)]);
+    
+}
+
+#############################################
+sub goaway
+{
+    my($kernel, $heap)=@_[KERNEL, HEAP];
+    warn "Now it's time to say good night, sleep tight\n";
+    $kernel->post('IKC', 'shutdown');
+    $kernel->delay('goaway');
+}
+
+sub time_stop
+{
+    warn "Time to _stop\n";
+}

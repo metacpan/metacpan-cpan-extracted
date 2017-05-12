@@ -1,0 +1,11 @@
+Revision history for Perl extension POE::Component::Server::JSONRPC
+
+0.05 2012-06-20
+     - Added support for SSL certificates and HTTP auth
+
+0.02 2007-10-19T16:37:54+09:00
+     - added missing prereqs
+
+0.01 2007-10-19T15:52:00+09:00
+     - original version
+

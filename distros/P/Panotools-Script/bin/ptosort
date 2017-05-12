@@ -1,0 +1,298 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Panotools::Script;
+use Getopt::Long;
+use Pod::Usage;
+
+my $pto_in;
+my $pto_out;
+my $image_sort = "n,";
+my $point_sort = "n,N,y";
+my $clean = "yes";
+my $help;
+
+my $image_sort_fuzzy;
+$image_sort_fuzzy = {
+		     y => 10.0,
+		     p => 5.0,
+		     r => 5.0,
+		     Eev => 0.3
+		    };
+
+sub point_compare ( $$ )
+{
+    foreach (split /,/,$point_sort)
+    {
+	return $_[0]->{$_} <=> $_[1]->{$_}
+	    if ($_[0]->{$_} != $_[1]->{$_});
+    }
+    return 0;
+}
+sub image_compare ( $$ )
+{
+    for my $skey (split /,/,$image_sort )
+    {
+	if ( $skey =~ /n/ )
+	{
+	    return $_[0]->{$skey} cmp $_[1]->{$skey}
+		if ($_[0]->{$skey} ne $_[1]->{$skey});
+	    next;
+	}
+	elsif ( $skey =~ /^(.*):$/ )
+	{
+	    return $_[0]->{$1} <=> $_[1]->{$1}
+		if ($_[0]->{$1} != $_[1]->{$1});
+	    next;
+	}
+	elsif ( $skey =~ /^(.*)~([0-9.]+)$/ )
+	{
+	    $image_sort_fuzzy->{$1} = $2;
+	    $skey = $1;
+	}
+	
+	if (exists $image_sort_fuzzy->{$skey})
+	{
+	    return -1 if $_[0]->{$skey} < $_[1]->{$skey} - $image_sort_fuzzy->{$skey} / 2.0;
+	    return 1 if $_[0]->{$skey} > $_[1]->{$skey} + $image_sort_fuzzy->{$skey} / 2.0;
+	    next;
+	}
+	else
+	{
+	    return $_[0]->{$skey} <=> $_[1]->{$skey}
+		if ($_[0]->{$skey} != $_[1]->{$skey});
+	    next;
+	}
+    }
+    return 0;
+}
+
+GetOptions ('i|image=s' => \$image_sort,
+	    'p|point=s' => \$point_sort,
+	    'c|clean=s' => \$clean,
+	    'h|help'    => \$help );
+
+pod2usage (-verbose => 2) if $help;
+pod2usage (2) unless scalar @ARGV == 2;
+
+$pto_in  = shift @ARGV;
+$pto_out = shift @ARGV;
+
+my $pto = new Panotools::Script;
+$pto->Read ($pto_in);
+
+# treat image sorting first
+my $image_list = $pto->Image;
+
+my $sorted_image_list;
+@{$sorted_image_list} = sort image_compare @$image_list;
+
+# create a mapping of what the sort did
+my $mapping;
+for my $i ( 0 .. scalar @$image_list - 1 )
+{
+    for my $j ( 0 .. scalar @$sorted_image_list - 1)
+    {
+	if ( @{$image_list}[$i] eq @{$sorted_image_list}[$j] )
+	{
+	    $mapping->{$i} = $j;
+	    last;
+	}
+    }
+}
+
+my $sorted_pto = $pto->Clone;
+
+# take care of the implicit assumption k0 if no k is present
+if ( ! exists $pto->Panorama->{"k"} && $mapping->{0} != 0 )
+{
+    $pto->Panorama->{k} = 0;
+}
+# fix the anchor reference in the "panorama" line
+for my $key ("k","b","d")
+{
+    if (exists $pto->Panorama->{$key})
+    {
+	$sorted_pto->Panorama->{$key} = $mapping->{$pto->Panorama->{$key}}
+    }
+}
+
+# clear variable and imagemetadata in the new $sorted_pto
+$sorted_pto->{imagemetadata} = [];
+$sorted_pto->{variable} = new Panotools::Script::Line::Variable;
+
+# reorder "image", "imagemetadata" and "variable" lines
+for my $index (0 .. scalar @{$pto->Image} - 1)
+{
+    $sorted_pto->Image->[$mapping->{$index}]
+	= $pto->Image->[$index];
+    if (defined $pto->ImageMetadata->[$index] )
+    {
+	$sorted_pto->ImageMetadata->[$mapping->{$index}]
+	    = $pto->ImageMetadata->[$index];
+    }
+    if (exists $pto->Variable->{$index})
+    {
+	$sorted_pto->Variable->{$mapping->{$index}} = $pto->Variable->{$index};
+    }
+}
+
+# take care of hugins "anchor for position" image
+if ( exists $pto->Option->{optimizeReferenceImage} )
+{
+    $sorted_pto->Option->{optimizeReferenceImage} = $mapping->{$pto->Option->{optimizeReferenceImage}};
+}
+
+# change references in "image" lines
+for my $index (0 .. scalar @{$sorted_pto->Image} - 1)
+{
+    my $image = $sorted_pto->{image}->[$index];
+    for my $key (keys %{$image})
+    {
+	if ( $image->{$key} =~ /^=([0-9]+)$/ )
+	{
+	    my $no = $1;
+	    $image->{$key} =~ s/^=$no$/=$mapping->{$no}/;
+	}
+    }
+}
+# clean references up, so that they always reference to a lower image number
+for my $index (0 .. scalar @{$sorted_pto->Image} - 1)
+{
+    my $image = $sorted_pto->{image}->[$index];
+    for my $key (keys %{$image})
+    {
+	if ( $image->{$key} =~ /^=([0-9]+)$/ )
+	{
+	    my $no = $1;
+	    if ( $no > $index)
+	    {
+		$image->{$key} = $sorted_pto->Image->[$no]->{$key};
+		$sorted_pto->Image->[$no]->{$key} = "=".$index;
+
+		# all later references to $no need to point to $index as well:
+		for my $k ($index + 1 .. scalar @{$sorted_pto->Image} - 1)
+		{
+		    my $later_img = $sorted_pto->{image}->[$k];
+		    foreach (keys %{$later_img})
+		    {
+			$later_img->{$_} =~ s/^=$no$/=$index/;
+		    }
+		}
+	    }
+	}
+    }
+}
+
+# change control points
+for my $index ( 0 .. scalar @{$sorted_pto->Control} - 1 )
+{
+    my $cp =  $sorted_pto->{control}->[$index];
+    $cp->{n} = $mapping->{$cp->{n}};
+    $cp->{N} = $mapping->{$cp->{N}};
+}
+
+for my $index ( 0 .. scalar @{$sorted_pto->Mask} - 1 )
+{
+    my $mask = $sorted_pto->Mask->[$index];
+    $mask->{i} = $mapping->{$mask->{i}};
+}
+
+# change controlmorph points
+for my $index ( 0 .. scalar @{$sorted_pto->ControlMorph} - 1 )
+{
+    my $cp =  $sorted_pto->{control}->[$index];
+    $cp->{i} = $mapping->{$cp->{i}};
+}
+
+# sort the control points
+my $points = $sorted_pto->Control;
+@{$points} = sort point_compare @{$points};
+
+# remove duplicate control points
+if ( $clean eq "yes" )
+{
+    my $i = scalar (@{$sorted_pto->Duplicates});
+    print STDERR "Duplicate control points removed: $i\n" if $i;
+}
+
+$sorted_pto->Write($pto_out);
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+B<ptosort> - sort pto files with variable criteria
+
+=head1 SYNOPSIS
+
+ptosort [options] infile.pto outfile.pto
+
+ Options:
+  -p | --point order	Provide a sorting order for control points
+  -i | --image order	Provide a sorting order for images
+  -c | --clean yes/no   Switch removal of duplicate control points
+			on/off, default is on
+  -h | --help		Show the full manpage
+
+=cut
+
+=head1 DESCRIPTION
+
+B<ptosort> takes a pto file as input, sorts it and writes a sorted
+pto file as output. By default images are sorted according to their
+filename and control points are sorted by left image number, right
+image number and y pixel coordinate.
+
+The --point and --image command line options can be used to modify the
+sorting order. The order string should consist of a list letters
+separated by commas identifying the values to be taken for the
+comparison, e.g. for images y means yaw or r means roll. By default
+sorting for yaw (y), pitch (p), roll (r) and exposure (Eev) is fuzzy,
+i.e. values within an interval of 10 degress for yaw are considered to
+be the same. This is especially useful when sorting multirow
+panoramas. Appending a colon to the sort parameter forces strict
+sorting without fuzziness, while appending a tilde and a numerical
+value can be used to specify the fuzziness in terms of intervall
+width.
+
+=head1 EXAMPLES
+
+=over 5
+
+=item ptosort --image n --point n,N,y in.pto out.pto
+
+Sort the images by filename and the control points by left image
+number, right image number and y pixel coordinate. This is identical
+to the default behaviour without options.
+
+=item ptosort --image y in.pto out.pto
+
+Sort images by yaw and control points using the default.
+
+=item ptosort --image y,p,Eev in.pto out.pto
+
+Sort images in a multiraw panorama by position and exposure value.
+
+=item ptosort --image Eev:,y~5.5,p in.pto out.pto
+
+Sort strict without fuzziness by exposure value, with a fuzziness
+interval of 5.5 degree by yaw and by pitch.
+
+=back
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 AUTHOR
+
+Felix Hagemann, July 2008
+
+=cut

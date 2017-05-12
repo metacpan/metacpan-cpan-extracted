@@ -1,0 +1,798 @@
+# Compile it with:
+#          $ eyapp -sb '' ansic.eyp
+# That will produce a stand-alone modulino.
+# Run it with:
+#          $ ./ansic.pm -file prueba.c         
+#         
+%strict
+
+%token IDENTIFIER CONSTANT STRING_LITERAL SIZEOF
+%token PTR_OP INC_OP DEC_OP LEFT_OP RIGHT_OP LE_OP GE_OP EQ_OP NE_OP
+%token AND_OP OR_OP MUL_ASSIGN DIV_ASSIGN MOD_ASSIGN ADD_ASSIGN
+%token SUB_ASSIGN LEFT_ASSIGN RIGHT_ASSIGN AND_ASSIGN
+%token XOR_ASSIGN OR_ASSIGN TYPE_NAME
+
+%token TYPEDEF EXTERN STATIC AUTO REGISTER
+%token CHAR SHORT INT LONG SIGNED UNSIGNED FLOAT DOUBLE CONST VOLATILE VOID
+%token STRUCT UNION ENUM ELLIPSIS
+
+%token CASE DEFAULT IF ELSE SWITCH WHILE DO FOR GOTO CONTINUE BREAK RETURN
+
+%start translation_unit
+
+%left WEAK
+%right ELSE
+
+%tree 
+
+%namingscheme {
+  #Receives a Parse::Eyapp object describing the grammar
+  my $self = shift;
+
+  $self->tokennames(
+    ';' => 'SC',
+    "{" => 'OC',
+    "<%" => 'OC',,
+    "}" => 'CC',
+    "%>" => 'CC',
+    ',' => 'COMMA',
+    ':' => 'COLON',
+    '=' => 'ASSIGN',
+    '(' => 'LP',
+    ')' => 'RP',
+    "[" => 'LB',
+    "<:" => 'LB',
+    "]" => 'RB',
+    ":>" => 'RB',
+    '.' => 'DOT',
+    '&' => 'AMP',
+    '!' => 'NOT',
+    '~' => 'BNOT',
+    '-' => 'MINUS',
+    '+' => 'PLUS',
+    '*' => 'STAR',
+    '/' => 'DIV',
+    '%' => 'PERCENT',
+    '<' => 'LT',
+    '>' => 'GT',
+    '^' => 'XOR',
+    '|' => 'OR',
+    '?' => 'QUESTION',
+  );
+
+  # returns the handler that will give names
+  # to the right hand sides
+  \&give_rhs_name;
+}
+
+%%
+
+primary_expression
+        : IDENTIFIER
+        | CONSTANT
+        | STRING_LITERAL
+        | '(' expression ')'
+        ;
+
+postfix_expression
+        : primary_expression
+        | postfix_expression '[' expression ']'
+        | postfix_expression '(' ')'
+        | postfix_expression '(' argument_expression_list ')'
+        | postfix_expression '.' IDENTIFIER
+        | postfix_expression PTR_OP IDENTIFIER
+        | postfix_expression INC_OP
+        | postfix_expression DEC_OP
+        ;
+
+argument_expression_list
+        : assignment_expression
+        | argument_expression_list ',' assignment_expression
+        ;
+
+unary_expression
+        : postfix_expression
+        | INC_OP unary_expression
+        | DEC_OP unary_expression
+        | unary_operator cast_expression
+        | SIZEOF unary_expression
+        | SIZEOF '(' type_name ')'
+        ;
+
+unary_operator
+        : '&'
+        | '*'
+        | '+'
+        | '-'
+        | '~'
+        | '!'
+        ;
+
+cast_expression
+        : unary_expression
+        | '(' type_name ')' cast_expression
+        ;
+
+multiplicative_expression
+        : cast_expression
+        | multiplicative_expression '*' cast_expression
+        | multiplicative_expression '/' cast_expression
+        | multiplicative_expression '%' cast_expression
+        ;
+
+additive_expression
+        : multiplicative_expression
+        | additive_expression '+' multiplicative_expression
+        | additive_expression '-' multiplicative_expression
+        ;
+
+shift_expression
+        : additive_expression
+        | shift_expression LEFT_OP additive_expression
+        | shift_expression RIGHT_OP additive_expression
+        ;
+
+relational_expression
+        : shift_expression
+        | relational_expression '<' shift_expression
+        | relational_expression '>' shift_expression
+        | relational_expression LE_OP shift_expression
+        | relational_expression GE_OP shift_expression
+        ;
+
+equality_expression
+        : relational_expression
+        | equality_expression EQ_OP relational_expression
+        | equality_expression NE_OP relational_expression
+        ;
+
+and_expression
+        : equality_expression
+        | and_expression '&' equality_expression
+        ;
+
+exclusive_or_expression
+        : and_expression
+        | exclusive_or_expression '^' and_expression
+        ;
+
+inclusive_or_expression
+        : exclusive_or_expression
+        | inclusive_or_expression '|' exclusive_or_expression
+        ;
+
+logical_and_expression
+        : inclusive_or_expression
+        | logical_and_expression AND_OP inclusive_or_expression
+        ;
+
+logical_or_expression
+        : logical_and_expression
+        | logical_or_expression OR_OP logical_and_expression
+        ;
+
+conditional_expression
+        : logical_or_expression
+        | logical_or_expression '?' expression ':' conditional_expression
+        ;
+
+assignment_expression
+        : conditional_expression
+        | unary_expression assignment_operator assignment_expression
+        ;
+
+assignment_operator
+        : '='
+        | MUL_ASSIGN
+        | DIV_ASSIGN
+        | MOD_ASSIGN
+        | ADD_ASSIGN
+        | SUB_ASSIGN
+        | LEFT_ASSIGN
+        | RIGHT_ASSIGN
+        | AND_ASSIGN
+        | XOR_ASSIGN
+        | OR_ASSIGN
+        ;
+
+expression
+        : assignment_expression
+        | expression ',' assignment_expression
+        ;
+
+constant_expression
+        : conditional_expression
+        ;
+
+declaration
+        : declaration_specifiers ';'
+        | $declaration_specifiers $init_declarator_list ';'
+            {
+              my $storage_class_specifier =  $declaration_specifiers->child(0);
+              if ($storage_class_specifier->child(0)->{token} eq 'TYPEDEF') {
+
+                for my $init_declarator ( $init_declarator_list->Children) {
+                  # Get the identifier
+                  my $c;
+                  for($c = $init_declarator; 
+                      $c && !($c->isa('TERMINAL')); 
+
+                      # pointers are prefixes others (arrays, functions) are suffixes
+                      $c = ($c->type eq 'declarator_is_pointer_direct_declarator')? $c->child(1) : $c->child(0))
+                    {}
+                  my $typeid = $c->{attr}[0];
+                  $_[0]->{symboltable}{$typeid} = 1;
+                  print "\ntypedef definition of $typeid\n";
+                }
+              }
+
+              goto &Parse::Eyapp::Driver::YYBuildAST;
+            }
+        ;
+
+declaration_specifiers
+        : storage_class_specifier
+        | storage_class_specifier declaration_specifiers
+        | type_specifier
+        | type_specifier declaration_specifiers
+        | type_qualifier
+        | type_qualifier declaration_specifiers
+        ;
+
+init_declarator_list
+        : init_declarator
+        | init_declarator_list ',' init_declarator
+        ;
+
+init_declarator
+        : declarator
+        | declarator '=' initializer
+        ;
+
+storage_class_specifier
+        : TYPEDEF
+        | EXTERN
+        | STATIC
+        | AUTO
+        | REGISTER
+        ;
+
+type_specifier
+        : VOID
+        | CHAR
+        | SHORT
+        | INT
+        | LONG
+        | FLOAT
+        | DOUBLE
+        | SIGNED
+        | UNSIGNED
+        | struct_or_union_specifier
+        | enum_specifier
+        | TYPE_NAME
+        ;
+
+struct_or_union_specifier
+        : struct_or_union IDENTIFIER '{' struct_declaration_list '}'
+        | struct_or_union '{' struct_declaration_list '}'
+        | struct_or_union IDENTIFIER
+        ;
+
+struct_or_union
+        : STRUCT
+        | UNION
+        ;
+
+struct_declaration_list
+        : struct_declaration
+        | struct_declaration_list struct_declaration
+        ;
+
+struct_declaration
+        : specifier_qualifier_list struct_declarator_list ';'
+        ;
+
+specifier_qualifier_list
+        : type_specifier specifier_qualifier_list
+        | type_specifier
+        | type_qualifier specifier_qualifier_list
+        | type_qualifier
+        ;
+
+struct_declarator_list
+        : struct_declarator
+        | struct_declarator_list ',' struct_declarator
+        ;
+
+struct_declarator
+        : declarator
+        | ':' constant_expression
+        | declarator ':' constant_expression
+        ;
+
+enum_specifier
+        : ENUM '{' enumerator_list '}'
+        | ENUM IDENTIFIER '{' enumerator_list '}'
+        | ENUM IDENTIFIER
+        ;
+
+enumerator_list
+        : enumerator
+        | enumerator_list ',' enumerator
+        ;
+
+enumerator
+        : IDENTIFIER
+        | IDENTIFIER '=' constant_expression
+        ;
+
+type_qualifier
+        : CONST
+        | VOLATILE
+        ;
+
+declarator
+        : pointer direct_declarator
+        | direct_declarator
+        ;
+
+direct_declarator
+        : IDENTIFIER
+        | '(' declarator ')'
+        | direct_declarator '[' constant_expression ']'
+        | direct_declarator '[' ']'
+        | direct_declarator '(' parameter_type_list ')'
+        | direct_declarator '(' identifier_list ')'
+        | direct_declarator '(' ')'
+        ;
+
+pointer
+        : '*'
+        | '*' type_qualifier_list
+        | '*' pointer
+        | '*' type_qualifier_list pointer
+        ;
+
+type_qualifier_list
+        : type_qualifier
+        | type_qualifier_list type_qualifier
+        ;
+
+
+parameter_type_list
+        : parameter_list
+        | parameter_list ',' ELLIPSIS
+        ;
+
+parameter_list
+        : parameter_declaration
+        | parameter_list ',' parameter_declaration
+        ;
+
+parameter_declaration
+        : declaration_specifiers declarator
+        | declaration_specifiers abstract_declarator
+        | declaration_specifiers
+        ;
+
+identifier_list
+        : IDENTIFIER
+        | identifier_list ',' IDENTIFIER
+        ;
+
+type_name
+        : specifier_qualifier_list
+        | specifier_qualifier_list abstract_declarator
+        ;
+
+abstract_declarator
+        : pointer
+        | direct_abstract_declarator
+        | pointer direct_abstract_declarator
+        ;
+
+direct_abstract_declarator
+        : '(' abstract_declarator ')'
+        | '[' ']'
+        | '[' constant_expression ']'
+        | direct_abstract_declarator '[' ']'
+        | direct_abstract_declarator '[' constant_expression ']'
+        | '(' ')'
+        | '(' parameter_type_list ')'
+        | direct_abstract_declarator '(' ')'
+        | direct_abstract_declarator '(' parameter_type_list ')'
+        ;
+
+initializer
+        : assignment_expression
+        | '{' initializer_list '}'
+        | '{' initializer_list ',' '}'
+        ;
+
+initializer_list
+        : initializer
+        | initializer_list ',' initializer
+        ;
+
+statement
+        : labeled_statement
+        | compound_statement
+        | expression_statement
+        | selection_statement
+        | iteration_statement
+        | jump_statement
+        ;
+
+labeled_statement
+        : IDENTIFIER ':' statement
+        | CASE constant_expression ':' statement
+        | DEFAULT ':' statement
+        ;
+
+compound_statement
+        : '{' '}'
+        | '{' statement_list '}'
+        | '{' declaration_list '}'
+        | '{' declaration_list statement_list '}'
+        ;
+
+declaration_list
+        : declaration
+        | declaration_list declaration
+        ;
+
+statement_list
+        : statement
+        | statement_list statement
+        ;
+
+expression_statement
+        : ';'
+        | expression ';'
+        ;
+
+selection_statement
+        : IF '(' expression ')' statement                   %prec WEAK
+        | IF '(' expression ')' statement ELSE statement
+        | SWITCH '(' expression ')' statement
+        ;
+
+iteration_statement
+        : WHILE '(' expression ')' statement
+        | DO statement WHILE '(' expression ')' ';'
+        | FOR '(' expression_statement expression_statement ')' statement
+        | FOR '(' expression_statement expression_statement expression ')' statement
+        ;
+
+jump_statement
+        : GOTO IDENTIFIER ';'
+        | CONTINUE ';'
+        | BREAK ';'
+        | RETURN ';'
+        | RETURN expression ';'
+        ;
+
+translation_unit
+        : external_declaration
+        | translation_unit external_declaration
+        ;
+
+external_declaration
+        : function_definition
+        | declaration
+        ;
+
+function_definition
+        : declaration_specifiers declarator declaration_list compound_statement
+        | declaration_specifiers declarator compound_statement
+        | declarator declaration_list compound_statement
+        | declarator compound_statement
+        ;
+
+%%
+
+use Carp;
+use Getopt::Long;
+
+my %keywords = (
+  auto => 'AUTO',
+  break => 'BREAK',
+  case => 'CASE',
+  char => 'CHAR',
+  const => 'CONST',
+  continue => 'CONTINUE',
+  default => 'DEFAULT',
+  do => 'DO',
+  double => 'DOUBLE',
+  else => 'ELSE',
+  enum => 'ENUM',
+  extern => 'EXTERN',
+  float => 'FLOAT',
+  for => 'FOR',
+  goto => 'GOTO',
+  if => 'IF',
+  int => 'INT',
+  long => 'LONG',
+  register => 'REGISTER',
+  return => 'RETURN',
+  short => 'SHORT',
+  signed => 'SIGNED',
+  sizeof => 'SIZEOF',
+  static => 'STATIC',
+  struct => 'STRUCT',
+  switch => 'SWITCH',
+  typedef => 'TYPEDEF',
+  union => 'UNION',
+  unsigned => 'UNSIGNED',
+  void => 'VOID',
+  volatile => 'VOLATILE',
+  while => 'WHILE',
+);
+
+my %lexeme = (
+  '...' => 'ELLIPSIS',
+  '>>=' => 'RIGHT_ASSIGN',
+  '<<=' => 'LEFT_ASSIGN',
+  '+=' => 'ADD_ASSIGN',
+  '-=' => 'SUB_ASSIGN',
+  '*=' => 'MUL_ASSIGN',
+  '/=' => 'DIV_ASSIGN',
+  '%=' => 'MOD_ASSIGN',
+  '&=' => 'AND_ASSIGN',
+  '^=' => 'XOR_ASSIGN',
+  '|=' => 'OR_ASSIGN',
+  '>>' => 'RIGHT_OP',
+  '<<' => 'LEFT_OP',
+  '++' => 'INC_OP',
+  '--' => 'DEC_OP',
+  '->' => 'PTR_OP',
+  '&&' => 'AND_OP',
+  '||' => 'OR_OP',
+  '<=' => 'LE_OP',
+  '>=' => 'GE_OP',
+  '==' => 'EQ_OP',
+  '!=' => 'NE_OP',
+  ';' => ';',
+  "{" => '{',
+  "<%" => '{',
+  "}" => '}',
+  "%>" => '}',
+  ',' => ',',
+  ':' => ':',
+  '=' => '=',
+  '(' => '(',
+  ')' => ')',
+  "[" => '[',
+  "<:" => '[',
+  "]" => ']',
+  ":>" => ']',
+  '.' => '.',
+  '&' => '&',
+  '!' => '!',
+  '~' => '~',
+  '-' => '-',
+  '+' => '+',
+  '*' => '*',
+  '/' => '/',
+  '%' => '%',
+  '<' => '<',
+  '>' => '>',
+  '^' => '^',
+  '|' => '|',
+  '?' => '?',
+);
+
+my ($tokenbegin, $tokenend) = (1, 1);
+
+sub _Lexer {
+  my($parser)=shift;
+
+  my $token;
+  for ($parser->{INPUT}) {
+      return('',undef) if !defined($_) or $_ eq '';
+
+      #Skip blanks
+      s{\A
+         ((?:
+              \s+       # any white space char
+          |   /\*.*?\*/ # C like comments
+          |   //[^\n]*  # C++ like comments
+          )+
+         )
+       }
+       {}xs
+      and do {
+            my($blanks)=$1;
+
+            #Maybe At EOF
+            return('', undef) if $_ eq '';
+            $tokenend += $blanks =~ tr/\n//;
+        };
+
+     $tokenbegin = $tokenend;
+
+      s{^(L?\"(\\.|[^\\"])*\")}{}    
+              and return('STRING_LITERAL', [$1, $tokenbegin]);
+
+      s{^(
+            0[xX][0-9a-fA-F]+[uUlL]? # hexadecimal
+          | 0\d+[uUlL]?              # octal
+          | \d*\.\d+([Ee][+-]?\d+)?[fFlL]? # float
+          | \d+\.\d*([Ee][+-]?\d+)?[fFlL]? # float
+          | \d+[Ee][+-]?\d+[fFlL]?   # decimal/float with exp
+          | \d+[uUlL]?               # decimal
+          | L?'(\\.|[^\\'])+'        # string
+         )
+       }
+       {}x
+              and return('CONSTANT',[$1, $tokenbegin]);
+
+      #s/^([A-Z][A-Za-z0-9_]*)//
+      #  and do {
+      #    my $word = $1;
+      #    return('TYPE_NAME',[$word, $tokenbegin]);
+      #};
+
+      s/^([a-zA-Z_][A-Za-z0-9_]*)//
+        and do {
+          my $word = $1;
+          my $r;
+          return ($r, [$r, $tokenbegin]) if defined($r = $keywords{$word});
+          return('TYPE_NAME',[$word, $tokenbegin]) if $parser->{symboltable}{$word};
+          return('IDENTIFIER',[$word, $tokenbegin]);
+      };
+
+      m/^(\S\S\S)/ and  defined($token = $1) and exists($lexeme{$token})
+        and do {
+          s/...//;
+          return ($lexeme{$token}, [$token, $tokenbegin]);
+        }; # do
+
+      m/^(\S\S)/ and  defined($token = $1) and exists($lexeme{$token})
+        and do {
+          s/..//;
+          return ($lexeme{$token}, [$token, $tokenbegin]);
+        }; # do
+
+      m/^(\S)/ and defined($token = $1) and  exists($lexeme{$token})
+        and do {
+          s/.//;
+          return ($lexeme{$token}, [$token, $tokenbegin]);
+        }; # do
+      
+
+      die "Unexpected character at $tokenbegin\n";
+  } # for
+}
+
+sub _Error {
+  my($token)=$_[0]->YYCurval;
+  my($what)= $token ? "input: '$token->[0]' in line $token->[1]" : "end of input";
+  my @expected = $_[0]->YYExpect();
+  my $expected = @expected? "Expected one of these tokens: '@expected'":"";
+
+  croak "Syntax error near $what. $expected\n";
+}
+
+sub Run {
+    my($self)=shift;
+    my $yydebug = shift || 0;
+
+    return $self->YYParse( 
+      yylex => \&_Lexer, 
+      yyerror => \&_Error,
+      yydebug => $yydebug, # 0x1F
+    );
+}
+
+sub uploadfile {
+  my $file = shift;
+  my $msg = shift;
+
+  my $input = '';
+  eval {
+    $input = Parse::Eyapp::Base::slurp_file($file) 
+  };
+  if ($@) {
+    print $msg;
+    local $/ = undef;
+    $input = <STDIN>;
+  }
+  return $input;
+}
+
+sub main {
+  my $package = shift;
+
+  my $debug = 0;
+  my $file = '';
+  my $result = GetOptions (
+    "debug!" => \$debug,  
+    "file=s" => \$file,
+  );
+
+  $debug = 0x1F if $debug;
+  $file = shift if !$file && @ARGV; 
+
+  my $parser = $package->new();
+  my $prompt = "Expressions. Press CTRL-D (Unix) or CTRL-Z (Windows) to finish:\n";
+  $parser->{INPUT} = uploadfile($file, $prompt);
+  $Parse::Eyapp::Node::INDENT = 2;
+
+  print "\n******************************************************************\n";
+  print $parser->Run( $debug )->str,"\n";
+}
+
+sub TERMINAL::info {
+  $_[0]->{attr}[0]
+};
+
+__PACKAGE__->main unless caller();
+
+
+=head1 NAME ANSIC eyapp grammar and parser
+
+=head1 SYNOPSIS
+
+Compile it with:
+
+  $ eyapp -b '' ansic.eyp
+
+Run it with:
+
+  $ ansic.pm -file program.c -debug
+
+or, if you don't want debug info:
+
+  $ ansic.pm -file typedefstruct.c
+
+=head1 DESCRIPTION
+
+Scope and type analysis is not implemented (yet). Typedefs have global scope
+and can not be hidden by later declarations.
+I.e. the parser produces an error message for the following program:
+
+  typedef int A;
+  A A;
+
+since it interprets the Third C<A> as a type name.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item * L<http://www.lysator.liu.se/c/ANSI-C-grammar-y.html>
+
+=item * L<http://cs.tu-berlin.de/~jutta/c/ANSI-C-grammar-l.html>
+
+=item * L<http://frama-c.cea.fr/download/acsl_1.2.pdf>
+
+=item * L<http://www.open-std.org/JTC1/SC22/WG14/www/standards>
+
+=item * L<http://www.open-std.org/JTC1/SC22/WG14/www/docs/n1256.pdf>
+
+
+=back
+
+=head1 AUTHOR 
+ 
+Casiano Rodriguez-Leon (casiano@ull.es)
+
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2006-2008 Casiano Rodriguez-Leon (casiano@ull.es). All rights reserved.
+
+These modules are free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+
+
+=cut
+
+
+

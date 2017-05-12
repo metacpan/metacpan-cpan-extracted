@@ -1,0 +1,259 @@
+=head1 NAME
+
+Persistent::Hash - API Reference (0.1)
+
+=head1 DESCRIPTION
+
+This file contains the complete API Reference to Persistent::Hash. It explains
+the configuration options and their meaning. 
+
+Other Persistent::Hash manuals:
+
+L<Persistent::Hash> - Persistent::Hash module overview and description
+
+L<Persistent::Hash::Manual> - Programmer manual, examples and explanations
+
+L<Persistent::Hash::Storage> - Guide to Persistent::Hash Storage module programmers
+
+=head1 IMPLEMENTATION
+
+The basic implementation of Persistent::Hash uses the perltie mechanism to hook into the standard
+hash structure and provide additionnal functionnality. When creating a subclass (data type), you basically
+create a class that inherits from Persistent::Hash. You control the options of your data type by overloading
+constants/subroutines to the desired behaviour. 
+
+=head1 DATA TYPES CONFIGURATION OPTIONS (Constants)
+
+This is an exaustive list of configuration options (constants) that can be overriden in a Persistent::Hash
+data type.
+
+=head2 PROJECT
+
+The project constant defines the first part of the automatically generated hash type (object type) of a specific
+data type. When defining a data type, this value should be set to the project's name. (default: phash)
+
+	i.e. use constant PROJECT => 'MyProject';
+	i.e. MyProject/Data_Type_Package
+
+=head2 DEBUG_LEVEL
+
+This constant when set to a true value will activate debugging output to STDERR of Persistent::Hash.
+This allows a programmer to troubleshoot problem in a data type. (default: off)
+
+	i.e. use constant DEBUG_LEVEL => 1;
+
+=head2 STORAGE_MODULE
+
+Defines the storage module to be used when saving a hash. (default: Persistent::Hash::MySQL)
+
+	i.e. use constant STORAGE_MODULE => 'Persistent::Hash::MySQL';
+
+=head2 INFO_TABLE
+
+This constant defines the table used to save the basic information for a Persistent::Hash object. This 
+table should follow the standard table definition defined in docs/tables.pod.
+
+	i.e. use constant INFO_TABLE => 'phash_info';
+
+=head2 DATA_TABLE
+
+This option defines the table used to save the serialized keys specified in DATA_FIELDS. This table should
+follow the standard table definition for 'phash_data' defined in docs/tables.pod.
+
+	i.e. use constant DATA_TABLE => 'phash_data';
+
+=head2 INDEX_TABLE
+
+This option defines the table used to save the keys specified in INDEX_FIELDS. This table needs a mandatory
+'id' field and a column for each of the INDEX_FIELDS.
+
+	i.e. use constant INDEX_TABLE => 'phash_index';
+
+=head2 DATA_FIELDS
+
+This option needs to be set to an anonymous list of keys/fields that will be serialized in the DATA_TABLE. 
+
+	i.e. use constant DATA_FIELDS => ['field','field2','field3'];
+
+=head2 INDEX_FIELDS
+
+This option needs to be set to an anonymous list of keys/fields that will be saved in the INDEX_TABLE. 
+
+	i.e. use constant INDEX_FIELDS => ['field','field2','field3'];
+
+=head2 STRICT_FIELDS
+
+When set to a true value, only the keys/fields listed in INDEX_FIELDS and DATA_FIELDS will be allowed to be 
+set in the hash.  (default: off)
+
+	i.e. use constant STRICT_FIELDS => 1;
+
+=head2 STORABLE
+
+When set to a true value, will allow the hash to be saved to storage. When set to false, Save() will return undef
+and do NOOP. (default: off)
+
+	i.e. use constant STORABLE => 1;
+
+=head2 LOAD_ON_DEMAND
+
+When set to a true value, the actual data and index fields/keys will only be loaded when a key is requested.
+This means that you can Load() alot of object without hitting your storage too much, and then spread the 
+retrieval load by accessing keys in your hashes. (default: on)
+
+	i.e. use constant LOAD_ON_DEMAND => 1;
+
+=head2 SAVE_ONLY_IF_DIRTY
+
+When set to a true value, Save() will return undef and do NOOP if the object is not dirty when Save() was called.
+(default: off)
+
+	i.e use constant SAVE_ONLY_IF_DIRTY => 1;
+
+=head1 STANDARD API
+
+=head2 Type()
+	
+Returns the hash type of a Persistent::Hash. Constructed from the PROJECT config constant
+and the hash's package name.
+
+	i.e. MyProject/MyProject_Customer
+
+=head2 Id()
+
+Returns the current hash id. Returns undef if object has not been saved.
+
+	i.e. my $hash_id = $hash->Id();
+
+=head2 TimeCreated()
+
+Returns the epoch time at wich this hash has been saved for the first time.
+Returns undef when object has not been saved.
+
+	i.e. print localtime($hash->TimeCreated());
+
+=head2 TimeModified()
+
+Returns the epoch time of the last time this hash was saved to Storage.
+Returns undef when object has not been saved.
+
+	i.e. print localtime($hash->TimeModified());
+
+=head2 new()
+
+Constructor to create a new hash. No save operation is performed without explicit Save()
+
+	i.e. my $hash = MyProject::MyHash->new();
+
+=head2 Load() / load()
+
+Constructor to retrieve a has from storage with it's unique id.
+Returns undef when object is unloadable.
+
+	i.e. my $hash = MyProject::MyHash->Load($id);
+
+=head2 Save()
+
+Perform save to Storage using the currently defined STORAGE_MODULE.
+Returns the hash id (or new id if new hash) on success. Undef on error.
+
+	i.e. my $hash_id = $hash->Save();
+
+=head2 Delete()
+
+Delete a hash from storage and untie the reference. Returns true on success.
+
+	i.e. $hash->Delete();
+
+=head1 DATA TYPE METHODS HOOKS 
+
+This is an exaustive list of the method can can or should be overloaded by a programmer to create a useful
+base class or data type.
+
+=head2 DatabaseHandle()
+
+This method receives the hash as a reference and should return a database handle. We strongly recommend
+implementing some kind of database caching at this level for optimal performance. This method will be called
+by the storage module to connect to the database.
+
+	i.e.
+	
+	sub DatabaseHandle
+	{
+		my $self = shift;
+
+		if(not defined $DBH_CACHE)
+		{
+			$DBH_CACHE = DBI->connect('dbi:db:db','dbuser','dbpw') || die $DBI::errstr;
+		}
+
+		return $DBH_CACHE; 
+	}
+
+=head2 SaveHook()
+
+This method will be automatically called after a call to Save() has been done and can be used to perform tasks 
+after a save. For example, if you want an object to be unusable after a save:
+
+	i.e. (Unusable object after save)
+
+	sub SaveHook
+	{	
+		my $self = shift;
+		$self->Untie();	
+	}
+	
+
+=head2 DeleteHook()
+
+This method will be automatically called after a call to Delete() has been done, just before the object is untied.
+Use this hook to provide after deletion processing to the object.
+
+	i.e. (Cascading delete)	
+	sub DeleteHook
+	{
+		my $self = shift;
+
+		foreach my $child ($self->{childs)
+		{
+			$child->Delete();	
+		}
+	}
+
+=head2 LoadHook()
+
+This method will be automatically called after a call to Load() has been done, just before the object is returned.
+Use this hook to implement some processing after a load has been done. 
+
+	i.e. (Remove index keys after load)
+
+	sub LoadHook
+	{
+		my $self = shift;
+
+		foreach my $key (@{ $self->INDEX_FIELDS() })
+		{
+			delete $self->{$key};
+		}
+	}
+
+
+=head1 COPYRIGHT
+
+Copyright(c) 2001 Benoit Beausejour <bbeausej@pobox.com>
+
+All rights reserved. This program is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself. 
+
+=head1 AUTHOR
+
+Benoit Beausejour <bbeausej@pobox.com>
+
+=head1 SEE ALSO
+
+Persistent::Hash(1).
+perltie(1).
+perl(1).
+
+=cut
+

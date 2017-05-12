@@ -1,0 +1,63 @@
+PDF/Reuse/Barcode version 0.07
+==============================
+
+This is a sub-module to PDF::Reuse. It creates barcode "images" to be used in
+PDF documents. It uses GD::Barcode and its sub-modules: GD::Barcode::Code39,
+COOP2of5, EAN13 and so on to calculate the barcode pattern.
+If you want Code128-barcodes you need Barcode::Code128.
+Normally the barcodes are displayed on a white background and with the characters
+under the bars. You can rotate the "image", make it smaller or bigger, prolong the
+bars and change the background.
+(But then, don't forget to test that your scanner still understands it.)
+
+
+INSTALLATION
+
+To install this module in a Windows environment:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+(If you haven't got nmake, try to download it via
+http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15.exe)
+
+
+Under other operating systems try the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules:
+
+   PDF::Reuse
+   GD::Barcode
+   GD::Barcode::Code39
+   GD::Barcode::COOP2of5
+   GD::Barcode::EAN13
+   GD::Barcode::EAN8
+   GD::Barcode::IATA2of5
+   GD::Barcode::Industrial2of5
+   GD::Barcode::ITF
+   GD::Barcode::Matrix2of5
+   GD::Barcode::NW7
+   GD::Barcode::QRcode
+   GD::Barcode::UPCA
+   GD::Barcode::UPCE
+   Barcode::Code128
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 - 2009 Lars Lundberg, Solidez HB
+Copyright (C) 2010 - 2014 Chris Nighswonger
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

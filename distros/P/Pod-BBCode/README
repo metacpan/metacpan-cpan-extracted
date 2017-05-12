@@ -1,0 +1,25 @@
+Pod-BBCode 1.5
+
+Simple module converts .pod files into BBCode syntax, for the ease of
+posting POD documents to vBulletin (or other system which use BBCode)
+forums.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+see LICENSE for details
+
+Copyright (C) 2005 chaoslawful
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

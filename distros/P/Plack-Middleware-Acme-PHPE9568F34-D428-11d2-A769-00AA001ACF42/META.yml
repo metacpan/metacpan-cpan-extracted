@@ -1,0 +1,22 @@
+---
+abstract: "Implement PHP's best features with PSGI!"
+author:
+  - "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Acme-PHPE9568F34-D428-11d2-A769-00AA001ACF42
+requires:
+  Data::Section: 0
+  MIME::Base64: 0
+  Plack: 0.9979
+  Test::More: 0.88
+resources:
+  repository: git://github.com/frioux/Plack-Middleware-Acme-PHPE9568F34-D428-11d2-A769-00AA001ACF42
+version: 3.141000

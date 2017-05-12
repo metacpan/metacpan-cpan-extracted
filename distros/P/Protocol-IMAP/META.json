@@ -1,0 +1,57 @@
+{
+   "abstract" : "Support for RFC3501 Internet Message Access Protocol (IMAP4)",
+   "author" : [
+      "Tom Molesworth <protocol-imap@entitymodel.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Protocol-IMAP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::SASL" : "0",
+            "Encode::IMAPUTF7" : "0",
+            "POSIX" : "0",
+            "Socket" : "0",
+            "Time::HiRes" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-protocol-imap at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Protocol-IMAP"
+      },
+      "homepage" : "http://search.cpan.org/dist/Protocol-IMAP/"
+   },
+   "version" : "0.004"
+}
+

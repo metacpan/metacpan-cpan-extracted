@@ -1,0 +1,44 @@
+PAB3 - Perl Application Builder / Version 3
+===========================================
+
+PAB3 contains a framework for building rapid applications with Perl.
+It includes a template handler for producing output. The templates
+are translated into perl scripts before running them. This should
+perform the maximum of speed. PAB3 can handle database connections
+and provides an easy to use interface to it. It can log all of the
+key actions, including the elapsed time in a file. Several formating
+functions may help generating nice output.
+It supports the CGI interface and has been optimized for running under
+ModPerl or PerlEx environments.
+
+It has been tested on unix, darwin and win(32,x64) platforms.
+
+INSTALLATION
+
+To install this library type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Use "perl Makefile.PL --help" to get a list of avaiable options.
+
+DEPENDENCIES
+
+This library may require these other modules and libraries:
+
+Storable
+Time::HiRes
+Digest::MD5
+
+mod_perl 2.x
+mod_perl 1.x
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Christian Mueller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

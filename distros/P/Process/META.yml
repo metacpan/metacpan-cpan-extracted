@@ -1,0 +1,43 @@
+---
+abstract: 'Objects that represent generic computational processes'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  File::Remove: 1.51
+  File::Spec: 0.80
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Process
+name: Process
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  File::Temp: 0
+  IO::File: 0
+  IO::Handle: 0
+  IO::String: 0
+  IPC::Run3: 0.034
+  List::Util: 1.17
+  Params::Util: 0.10
+  Probe::Perl: 0.01
+  Scalar::Util: 1.17
+  Storable: 2.14
+  YAML::Tiny: 1.36
+  perl: 5.00503
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Process
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Process
+version: 0.30

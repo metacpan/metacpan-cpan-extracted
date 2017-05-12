@@ -1,0 +1,11 @@
+DESCRIPTION
+
+    This module contains the routine editdist copied from App::perlbrew,
+    which is copied from Wikipedia article "Levenshtein Distance".
+
+FUNCTIONS
+
+ editdist($str1, $str2) => int
+
+    Not exported.
+

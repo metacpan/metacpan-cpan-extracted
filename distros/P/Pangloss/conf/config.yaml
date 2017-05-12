@@ -1,0 +1,160 @@
+# Standalone Server
+# -----------------
+# Pangloss pipeline configuration file
+#
+# User login is done by bunging the user into the session.
+#
+# NOTE: watch your tabs - the YAML parser gets confused and dies if you
+# switch between tabs and spaces.
+#
+---
+search-packages:
+  - Pangloss::Segment
+  - OpenFrame::WebApp::Segment
+  - OpenFrame::Segment
+pipeline:
+  - OpenFrame::Segment::HTTP::Request
+  - StoreRequest
+  - Session::CookieLoader
+  - pangloss pipe:
+      - Decline::StaticContent
+      - loaders pipe:
+          - load current user pipe:
+              - Decline::UserInSession
+              - UserLoader
+              - User::SaveInSession
+              # should we remove the user from the store here??
+          - LoadConcept
+          - LoadCategory
+          - LoadLanguage
+          - LoadTerm
+          - LoadTermStatus
+          - LoadUser
+          - load current search request pipe:
+              - Decline::NoSelectedSearch
+              - SearchRequest::GetFromSession
+              - SearchRequest::Update
+              - SearchRequest::SaveInSession
+              - Request::ListConcepts
+              - Request::ListLanguages
+              - Request::ListCategories
+              - Request::ListStatusCodes
+              - Request::ListTranslators
+              - Request::ListProofreaders
+#     - Decline::NoPanglossRequest
+      - editor pipe:
+#          - Decline::NoEditorRequest
+          - user editor pipe:
+              - Decline::NoUser
+              - Request::ListLanguages
+              - user admin pipe:
+                  - Decline::NotAdmin
+                  - Decline::NoSelectedUser
+                  - ModifyUser
+                  - RemoveUser
+              - add user pipe:
+                  - Decline::NotAdmin
+                  - Decline::NoUser
+                  - AddUser
+          - language editor pipe:
+              - Decline::NoLanguage
+              - language admin pipe:
+                  - Decline::NotAdmin
+                  - Decline::NoSelectedLanguage
+                  - ModifyLanguage
+                  - RemoveLanguage
+              - add language pipe:
+                  - Decline::NotAdmin
+                  - Decline::NoLanguage
+                  - AddLanguage
+          - category editor pipe:
+              - Decline::NoCategory
+              - category admin pipe:
+                  - Decline::NotAdmin
+                  - Decline::NoSelectedCategory
+                  - ModifyCategory
+                  - RemoveCategory
+              - add category pipe:
+                  - Decline::CantAddCategories
+                  - AddCategory
+          - concept editor pipe:
+              - Decline::NoConcept
+              - Request::ListCategories
+              - concept admin pipe:
+                  - Decline::NotAdmin
+                  - Decline::NoSelectedConcept
+                  - ModifyConcept
+                  - RemoveConcept
+              - add concept pipe:
+                  - Decline::CantAddConcepts
+                  - AddConcept
+          - term editor pipe:
+              - Decline::NoTerm
+              - Request::ListLanguages
+              - term admin pipe:
+                  - Decline::NotAdmin
+                  - Decline::NoSelectedTerm
+                  - ModifyTerm
+                  - RemoveTerm
+              - term translator pipe:
+                  - Decline::CantTranslateTerm
+                  - AddTerm
+          - term proofreader pipe:
+              - Decline::NoSelectedTerm
+              - Decline::CantProofreadSelectedTerm
+              - Decline::NoTermStatus
+              - ModifyTermStatus
+      - load business objects pipe:
+          - get user pipe:
+              - Decline::NoSelectedUser
+              - GetUser
+              - Request::ListLanguages
+          - get language pipe:
+              - Decline::NoSelectedLanguage
+              - GetLanguage
+          - get category pipe:
+              - Decline::NoSelectedCategory
+              - GetCategory
+          - get concept pipe:
+              - Decline::NoSelectedConcept
+              - GetConcept
+              - Request::ListCategories
+          - get term pipe:
+              - Decline::NoSelectedTerm
+              - GetTerm
+              - Request::ListLanguages
+          - list users pipe:
+              - Decline::NoListUsers
+              - ListUsers
+          - list translators pipe:
+              - Decline::NoListTranslators
+              - ListTranslators
+          - list proofreaders pipe:
+              - Decline::NoListProofreaders
+              - ListProofreaders
+          - list languages pipe:
+              - Decline::NoListLanguages
+              - ListLanguages
+          - list categories pipe:
+              - Decline::NoListCategories
+              - ListCategories
+          - list concepts pipe:
+              - Decline::NoListConcepts
+              - ListConcepts
+          - list terms pipe:
+              - Decline::NoListTerms
+              - ListTerms
+          - list status codes pipe:
+              - Decline::NoListStatusCodes
+              - ListStatusCodes
+      - search pipe:
+          - Pager::GetFromSession
+          - do the search pipe:
+              - Decline::NoSearchRequest
+              - Search
+              - Pager::SaveInSession
+          - Pager::SetCurrentPage
+      - TemplateMapper
+      - TemplateVars
+      - TemplateLoader
+  - ContentLoader: { directory: "./web" }

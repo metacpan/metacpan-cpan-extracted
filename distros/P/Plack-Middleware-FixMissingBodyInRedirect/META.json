@@ -1,0 +1,63 @@
+{
+   "abstract" : "Plack::Middleware which sets body for redirect response, if it's not already set",
+   "author" : [
+      "Upasana <me@upasana.me>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-FixMissingBodyInRedirect",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::Entities" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Util" : "0",
+            "Scalar::Util" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Sweet-kid/Plack-Middleware-FixMissingBodyInRedirect/issues"
+      },
+      "homepage" : "https://github.com/Sweet-kid/Plack-Middleware-FixMissingBodyInRedirect",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Sweet-kid/Plack-Middleware-FixMissingBodyInRedirect.git",
+         "web" : "https://github.com/Sweet-kid/Plack-Middleware-FixMissingBodyInRedirect"
+      }
+   },
+   "version" : "0.12"
+}
+

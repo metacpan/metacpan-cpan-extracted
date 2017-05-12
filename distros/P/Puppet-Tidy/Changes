@@ -1,0 +1,14 @@
+0.3 2013-02-09
+  - Fix incompatability with Perl < 5.10.0 due lack of \R
+  - Add a Changes file.
+
+0.2  2013-02-06
+  - Added -c option to the standalone version to check the resulting
+    Puppet file with "puppet parser validate"
+  - Handle quoted booleans.
+  - Fix an issue where qualified variables would be mangled.
+  - Fixed too greedy comment changing (#83072).
+  - Improved test cases.
+
+0.1  2012-12-10
+  - Initial release of Puppet::Tidy.

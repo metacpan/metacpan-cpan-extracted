@@ -1,0 +1,12 @@
+name: chr
+docs: |
+    PHP's and Perl's L<chr|perlfunc/"chr"> functions operate sufficiently
+    identically.
+
+    Note that PHP's claims an ASCII value as input. Perl assumes Unicode.
+    But ensure you see L<the documentation|perlfunc/"chr"> for a precise
+    definition.
+
+    Note that it returns B<one character>, which in some string
+    encodings may not necessarily be B<one byte>.
+

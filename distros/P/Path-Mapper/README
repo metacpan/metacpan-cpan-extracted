@@ -1,0 +1,57 @@
+NAME
+    Path::Mapper - Map a virtual path to an actual one
+
+VERSION
+    version 0.012
+
+SYNOPSIS
+        my $mapper = Path::Mapper->new( base => '../' )
+        $mapper->map( a/b => /apple )
+
+        $mapper->dir( /a/b/xyzzy/ ) # /apple/xyzzy
+        $mapper->dir( /a/bxyzzy/ ) # ../a/bxyzzy
+
+DESCRIPTION
+    Path::Mapper will map a virtual path to an actual one, doing a
+    substitution based on the deepest common directory
+
+    Think of it as doing something like symbolic link resolution (though not
+    exactly)
+
+USAGE
+  Path::Mapper->new( [ base => <base> ] )
+    Create a new "Path::Mapper" object using <base> as the 'root' directory
+    (by default, everything is mapped to be under that directory)
+
+  $mapper->base( <base> )
+    Change the base directory for $mapper to <base>
+
+  $mapper->map( <virtual> => <actual> )
+    Set up a map from <virtual> and anything under (e.g. <virtual>/*) to map
+    to the <actual> prefix instead of the usual base
+
+  $mapper->map( <path> )
+    Return a 2-element list containing the actual base for this path and the
+    path remainder. You probably don't want/need to use this method
+
+  $mapper->dir( <path> )
+    Map the virtual <path> to an actual one and return the result as a
+    Path::Class::Dir object
+
+  $mapper->file( <path> )
+    Map the virtual <path> to an actual one and return the result as a
+    Path::Class::File object
+
+  $mapper->path( <path> )
+    Map the virtual <path> to an actual one and return the result as a
+    Path::Abstract object
+
+AUTHOR
+      Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+dist.ini
+lib/PerlIO/buffersize.pm
+lib/PerlIO/buffersize.xs
+t/00-compile.t
+t/10-basics.t
+t/release-kwalitee.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

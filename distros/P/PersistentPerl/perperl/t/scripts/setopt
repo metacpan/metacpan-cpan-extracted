@@ -1,0 +1,3 @@
+use PersistentPerl;
+PersistentPerl->setopt('timeout', 1);
+print $$;

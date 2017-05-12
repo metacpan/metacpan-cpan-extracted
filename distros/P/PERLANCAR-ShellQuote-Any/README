@@ -1,0 +1,35 @@
+SYNOPSIS
+
+     use ShellQuote::Any; # exports shell_quote()
+    
+     shell_quote('curl', 'http://example.com/?foo=123&bar=baz');
+     # curl 'http://example.com/?foo=123&bar=baz'
+
+DESCRIPTION
+
+    This distribution is currently For testing only.
+
+FUNCTIONS
+
+ shell_quote(@cmd) => str
+
+    Quote command @cmd according to OS. On Windows, will use
+    Win32::ShellQuote's quote_system_string(). Otherwise, will use
+    String::ShellQuote's shell_quote(). Exported by default.
+
+    If you want to simulate how quoting is done under another OS, you could
+    do something like:
+
+     {
+         local $^O = "Win32"; # simulate Windows
+         say shell_quote("foo bar");
+     }
+
+SEE ALSO
+
+    Win32::ShellQuote
+
+    String::ShellQuote
+
+    ShellQuote::Any
+

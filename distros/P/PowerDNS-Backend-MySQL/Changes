@@ -1,0 +1,47 @@
+Revision history for PowerDNS-Backend-MySQL
+
+0.12	Fri Sep 21 11:24:20 PDT 2012
+	Added the Github URL to the POD.
+	Adding space between new methods and POD to satisfy Test::Pod::Coverage in t/pod-coverage.t
+
+0.11	Fri Aug  3 16:15:23 PDT 2012
+	Adding two new methods: make_domain_master and add_master to address bug #76908 - patch submitted by Rich Vincelette <rvincelette@athenahealth.com> .
+
+0.10	Fri Jan 13 16:44:34 PST 2012
+	Adding the 'list_all_records' method.
+
+0.09	Fri Nov 21 11:42:28 PST 2008
+	Adding the 'list_domain_names_by_type' method.
+
+0.08	Fri Aug  1 09:37:48 PDT 2008
+	Adding the 'find_record_by_name' method.
+	Better return value checking on all methods; in some cases 'true' could have been returned when in-fact the action was not performed.
+
+0.07	Tue Jul 29 11:39:39 PDT 2008
+	Added an example code for the update_records method.
+	Added the update_or_add_records method.
+	Add locks around critical sections.
+	Implement and document the increment_serial method.
+
+0.06	Wed May  7 15:24:50 PDT 2008
+	Added the 'update_records' method.
+
+0.05	Fri Mar 21 10:27:27 PDT 2008
+	list_records() now returns the full records attribute list (name,content,ttl,prio) instead of just name and content. #33569: FrancescoLovergine <frankie [...] debian.org> .
+	Created a note about $DBI::errstr .
+
+0.04	Tue Mar 18 13:39:27 PDT 2008
+	Calling disconnect on the DBI handler would cause spurious warnings in some cases; calling
+	delete on the DBI object instead which should automatically disconnect in the DBI DESTROY method.
+
+0.03	Fri Feb 15 15:16:38 PST 2008
+	Removed spurious errors from destructor; thanks Jan-Piet Mens <jp@mens.de> who spotted this.
+	Removed pointless finish statement in the add_domain method.
+
+0.02	Fri Jan 18 11:12:55 PST 2008
+	Fixed small syntax bug in author POD area.
+	Set the proper PREREQ_PM.
+
+0.01    Tue Dec  4 11:46:42 PST 2007
+        Initial release.
+

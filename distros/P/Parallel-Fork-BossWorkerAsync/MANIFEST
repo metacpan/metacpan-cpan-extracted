@@ -1,0 +1,14 @@
+Changes
+lib/Parallel/Fork/BossWorkerAsync.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/alarm.t
+t/delim.t
+t/end-to-end.t
+t/init_exit.t
+t/large_data.t
+t/large_return.t.hold
+t/nonblocking.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

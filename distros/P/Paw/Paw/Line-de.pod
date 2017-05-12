@@ -1,0 +1,56 @@
+=head1 Line Widget
+
+B<$line=Paw::Line::new($length, [$name], [$char], [$direction])>;
+
+B<Parameter>
+
+     $name      => Name des Widgets [optional]
+
+     $char      => Zeichen aus dem die Linie aufgebaut wird (ACS_HLINE)
+                   [optional]
+
+     $direction => Richtung in der die Linie liegen soll "v" bzw. "h"
+                   (h = default) [optional]
+
+     $length    => Laenge der Linie
+
+B<Example>
+
+     $l=Paw::Line::new(length=>$columns, char=>"#");
+
+=head2 abs_move_widget($new_x, $new_y)
+
+Das Widget verschiebt sich auf die neue absolute Schirm Position.
+Wird nur einer der Parameter angegeben, so behaelt der andere seinen Wert bei.
+
+B<Beispiel>
+
+     $l->abs_move_widget( new_x=>5 );      #y-pos bleibt wie sie ist
+
+=head2 get_widget_pos()
+
+Gibt ein Array mit den beiden Wertde (x-Position, y-Position) zurueck. 
+
+B<Beispiel>
+
+     ($xpos,$ypos)=$l->get_widget_pos(); 
+
+=head2 set_color($color_pair)
+
+Setzt ein neues color_pair.
+
+B<Beispiel>
+
+     $l->set_color(3);
+
+=head2 set_border([``shade''])
+
+aktiviert den Rahmen der Box. Optional auch mit Schatten. 
+
+B<Beispiel>
+
+     $box->set_border("shade"); or $win->set_border();
+
+
+=cut
+

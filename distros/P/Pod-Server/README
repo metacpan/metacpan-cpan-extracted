@@ -1,0 +1,26 @@
+
+  The Ruby people have this nice utility called 
+  
+    gem_server 
+
+  which is a little web server
+  that serves up the documentation
+  for all the locally installed rubygems.
+
+  It's really handy.
+
+  And then I was left wondering,
+
+    "Why doesn't Perl have something like this???"
+
+      (Apparently, it did...  There's something called Pod::WebServer
+       which is a lot like Pod::Server, but I didn't know of its
+       existence until after I wrote Pod::Server.)
+
+  Pod::Server is better looking, though.  ;-)
+  So try it out.
+
+    pod_server --help
+
+    pod_server -bg '#100' -pbg '#211' -afg '#f44' -ahfg '#fcc'
+

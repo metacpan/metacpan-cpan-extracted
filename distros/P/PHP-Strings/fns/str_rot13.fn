@@ -1,0 +1,6 @@
+docs: |
+    This is rather trivially implemented as:
+
+        $message =~ tr/A-Za-z/N-ZA-Mn-za-m/
+
+    (As per "Programming Perl", 3rd edition, section 5.2.4.)

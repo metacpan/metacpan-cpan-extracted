@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+README.md
+cpanfile
+examples/test.pl
+lib/POE/Component/EasyDBI.pm
+lib/POE/Component/EasyDBI/SubProcess.pm
+minil.toml
+t/1.t
+t/2.t
+t/3.t
+META.yml

@@ -1,0 +1,105 @@
+{
+   "abstract" : "perl builder",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Build",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Perl::Releases" : "0",
+            "Devel::PatchPerl" : "0.88",
+            "File::Temp" : "0",
+            "File::pushd" : "0",
+            "Getopt::Long" : "0",
+            "HTTP::Tiny" : "0",
+            "Pod::Usage" : "1.63",
+            "perl" : "5.008002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Build" : {
+         "file" : "lib/Perl/Build.pm",
+         "version" : "1.13"
+      },
+      "Perl::Build::Built" : {
+         "file" : "lib/Perl/Build/Built.pm",
+         "version" : "1.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Perl-Build/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Perl-Build",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Perl-Build.git",
+         "web" : "https://github.com/tokuhirom/Perl-Build"
+      }
+   },
+   "version" : "1.13",
+   "x_contributors" : [
+      "Daisuke Murase <typester@cpan.org>",
+      "Kent Fredric <kentfredric@gmail.com>",
+      "Mark Stosberg <mark@stosberg.com>",
+      "Kang-min Liu <gugod@gugod.org>",
+      "Akihiro Uchida <uchida@ike-dyn.ritsumei.ac.jp>",
+      "Neil Bowers <neil@bowers.com>",
+      "Katsuhiro KONISHI <konishi@hauN.org>",
+      "Masahiro Chiba <nihen@megabbs.com>",
+      "hagihala <hagihala@hatena.ne.jp>",
+      "Tony <zearin@gonk.net>",
+      "Przemysław Wesołek <jest@go.art.pl>",
+      "Kenichi Ishigaki <ishigaki@cpan.org>",
+      "Masahiro Nagano <kazeburo@gmail.com>",
+      "Shoichi Kaji <skaji@cpan.org>",
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
+      "moznion <moznion@gmail.com>",
+      "Ashley Hindmarsh <ash+github@best-scarper.co.uk>",
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Tatsuhiko Miyagawa <miyagawa@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

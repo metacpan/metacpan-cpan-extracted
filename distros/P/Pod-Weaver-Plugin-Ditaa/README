@@ -1,0 +1,85 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [@Default]
+     [-Ditaa]
+
+    In the pod of one of your modules:
+
+     =head1 HOW IT WORKS
+    
+     =begin ditaa
+    
+     label: How it works
+    
+        +--------+   +-------+    +-------+
+        |        | --+ ditaa +--> |       |
+        |  Text  |   +-------+    |diagram|
+        |Document|   |!magic!|    |       |
+        |     {d}|   |       |    |       |
+        +---+----+   +-------+    +-------+
+            :                         ^
+            |       Lots of work      |
+            +-------------------------+
+    
+     =end ditaa
+
+IN ACTION
+
+DESCRIPTION
+
+    It has often been said that a picture is worth a thousand words. I find
+    that sometimes a diagram truly can illuminate your design. This
+    Pod::Weaver plugin allows you to put ditaa
+    <http://ditaa.sourceforge.net/> diagrams in your pod and render the
+    image for an html view. In text mode it merely uses the text diagram
+    directly.
+
+    Note that you may put a label: Foo at the top of your diagram, but if
+    you do not you will get a numbered label in the format Figure $i.
+
+SYNTAX
+
+    The ditaa syntax is documented here
+    <http://ditaa.sourceforge.net/#usage>.
+
+PASSING FLAGS TO DITAA
+
+     =begin ditaa -r -S
+    
+     label: Passing Flags
+    
+        +--------+
+        |        |
+        |  Test  |
+        |        |
+        +---+----+
+    
+     =end ditaa
+
+    To pass flags to ditaa simply append the flags to the =begin ditaa
+    directive.
+
+DEBUGGING
+
+    Set the DITAA_TRACE env var and you'll see all of the commands that
+    this plugin runs printed to STDERR. If you set the env var to keep the
+    temporary files referenced in the command will not automatically be
+    deleted, so you can ensure that the text and image diagrams were
+    created correctly.
+
+PERL SUPPORT POLICY
+
+    Because this module is geared towards helping release code, as opposed
+    to helping run code, I only aim at supporting the last 3 releases of
+    Perl. So for example, at the time of writing that would be 5.22, 5.20,
+    and 5.18. As an author who is developing against Perl and using this to
+    release modules, you can use either perlbrew <http://perlbrew.pl/> or
+    plenv <https://github.com/tokuhirom/plenv> to get a more recent perl
+    for building releases.
+
+    Don't bother sending patches to support older versions; I could
+    probably support 5.8 if I wanted, but this is more so that I can
+    continue to use new perl features.
+

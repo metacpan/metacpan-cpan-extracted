@@ -1,0 +1,6 @@
+# Pipeline configuration file with bad (ie: non-existent) class name
+---
+search-packages:
+  - not yet functional...
+pipeline:
+  - This::Class::Does::Not::Exist

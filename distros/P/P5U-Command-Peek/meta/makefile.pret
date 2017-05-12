@@ -1,0 +1,10 @@
+# This file provides instructions for packaging.
+
+`P5U-Command-Peek`
+	perl_version_from m`P5U::Command::Peek`;
+	version_from      m`P5U::Command::Peek`;
+	readme_from       m`P5U::Command::Peek`;
+	requires          p`P5U`;
+	test_requires     p`Test::More 0.61` ;
+	.
+

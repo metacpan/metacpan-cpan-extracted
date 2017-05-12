@@ -1,0 +1,4 @@
+name = "Plagger-Plugin-CustomFeed-GitHub"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

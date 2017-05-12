@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+my %host;
+
+while (<>) {
+	next unless /^(\S+):\t\s*(\d+)\s/;
+	push(@{$host{$1}}, $2);
+}
+
+for my $h (keys %host) {
+	my $cmd = "ssh $h kill @{$host{$h}} &";
+	print "+ $cmd\n";
+	system $cmd;
+}
+
+__END__
+
+=head1 LICENSE
+
+This package may be used and redistributed under the terms of either
+the Artistic 2.0 or LGPL 2.1 license.
+

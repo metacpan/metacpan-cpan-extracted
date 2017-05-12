@@ -1,0 +1,24 @@
+---
+abstract: 'Map multiple apps in different paths'
+author:
+  - 'James Raspass <j.raspass@cv-library.co.uk>'
+build_requires: {}
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-App-URLHashMap
+provides:
+  Plack::App::URLHashMap:
+    file: lib/Plack/App/URLHashMap.pm
+    version: 0.1
+requires:
+  Plack::Component: 0
+  parent: 0
+  perl: v5.8.8
+resources:
+  bugtracker: https://github.com/cv-library/Plack-App-URLHashMap/issues
+  repository: git://github.com/cv-library/Plack-App-URLHashMap.git
+version: 0.1

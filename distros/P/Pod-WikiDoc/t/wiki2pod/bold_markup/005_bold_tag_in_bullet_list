@@ -1,0 +1,17 @@
+* this text should be *bold* here
+* this text should be *bold and 
+span multiple lines*
+#--------------------------------------------------------------------------#
+=over
+
+=item *
+
+this text should be B<bold> here
+
+=item *
+
+this text should be B<bold and 
+span multiple lines>
+
+=back
+

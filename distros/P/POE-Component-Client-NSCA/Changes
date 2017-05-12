@@ -1,0 +1,23 @@
+==================================================
+Changes from 2012-05-05 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.18 at 2017-05-04 15:35:43 +0000
+-----------------------------------------
+
+  Change: 655401208657862c1e0a7d5e513e05caec449754
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-05-04 16:35:43 +0000
+
+    Switch dist to Dist::Zilla 
+
+  Change: c9652bb195e683ee2ee5c45c8aa423b13c1222fd
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-06-19 10:29:21 +0000
+
+    Squashed warnings in testsuite 
+
+===============================================
+Plus 1 release after 2012-05-05 00:00:00 +0000.
+===============================================

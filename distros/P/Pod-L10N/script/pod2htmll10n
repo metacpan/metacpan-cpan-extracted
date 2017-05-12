@@ -1,0 +1,4 @@
+#! /usr/bin/perl
+use Pod::L10N::Html;
+
+pod2htmll10n @ARGV;

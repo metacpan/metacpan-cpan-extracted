@@ -1,0 +1,90 @@
+POD2-ES
+=======
+
+POD2::ES - Documentación de Perl en español
+
+INSTALACIÓN
+
+Para instalar este módulo, ejecute los siguientes comandos:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+Vea http://github.com/zipf/perldoc-es para obtener más información sobre
+el proyecto.
+
+
+NOTAS SOBRE LA TRADUCCIÓN
+
+Para este proyecto hemos tomado las siguientes decisiones:
+
+* No utilizar caracteres acentuados en los nombres de variables y
+funciones de los ejemplos de código
+
+Es perfectamente posible utilizarlos (solo hay que codificar el programa
+como UTF-8 y agregar "use utf8;" al principio), pero teniendo en mente a
+ese programador más impulsivo, que valora su tiempo y no quiere perderse en
+reflexiones ni verse encorsetado por las normas de la lengua, creemos que
+así resultará más fácil probar el código de los ejemplos.
+
+Por otra parte, en aquellos sistemas que cuenten con un sistema antiguo de
+visualización de texto, como los terminales de línea de comandos, es posible
+que se pierdan los acentos. En la mayor parte de los casos será debido
+a la presencia de una versión de groff (programa utilizado por los comandos
+man y perldoc) que no admite dichos caracteres. En la documentación
+HTML no debería haber problemas.
+
+* No traducir los términos "array" y "hash"
+
+Si tenemos en cuenta que Perl tiene más de 20 años y que la inmensa mayoría
+de los libros disponibles sobre este lenguaje están en inglés, a nadie
+extrañará que la comunidad de habla hispana se refiera a estos tipos de
+datos por su nombre en inglés. Existen posibles traducciones, como "matriz",
+"lista" o "arreglo" para "array", o "diccionario" para "hash", pero su uso
+no se ha extendido, por lo que hemos preferido utilizar su nombre original.
+Creemos que esto facilitará la lectura de la documentación.
+
+* Utilizar "español neutro"
+
+El "español neutro" es un español controlado que pretende evitar el uso de
+términos ofensivos o de construcciones poco frecuentes en determinados países
+de habla hispana, con el objetivo de lograr traducciones válidas para 
+España y Latinoamérica.
+
+
+SOPORTE Y DOCUMENTACIÓN
+
+Tras instalar el módulo, puede consultar la documentación con el comando 
+perldoc.
+
+    perldoc POD2::ES
+
+También puede buscar información en:
+
+    RT, el sistema de seguimiento de solicitudes de CPAN
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=POD2-ES
+
+    AnnoCPAN, la documentación de CPAN anotada
+    http://annocpan.org/dist/POD2-ES
+
+    Valoraciones de CPAN
+    http://cpanratings.perl.org/d/POD2-ES
+
+    Búsqueda de módulos de CPAN
+    http://search.cpan.org/dist/POD2/
+
+
+LICENCIA Y COPYRIGHT
+
+Copyright (C) 2011-2012 Equipo de Perl en Español
+
+Este programa es software libre; puede redistribuirlo o modificarlo bajo
+los términos de la licencia GNU General Public License publicada por la
+Free Software Foundation, o los de la licencia Artistic.
+
+Consulte http://dev.perl.org/licenses/ para obtener más información.
+
+

@@ -1,0 +1,23 @@
+---
+abstract: 'Extracts embedded tests and code examples from POD'
+author:
+  - 'Michael G Schwern <schwern@pobox.com>'
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Pod::Tests
+name: Pod-Tests
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Test::Harness: 1.22
+  Test::More: 0.33
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.19

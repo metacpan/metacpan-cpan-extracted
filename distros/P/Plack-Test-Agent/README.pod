@@ -1,0 +1,9 @@
+=head1 Plack::Test::Agent
+
+This experimental distribution is an object oriented version of Plack::Test.
+Its name may change. It may prove to have been a silly idea. Use it if you
+like, and please give feedback if you want to continue to use it.
+
+See
+L<http://www.modernperlbooks.com/mt/2011/09/placktest-and-great-test-interfaces.html>
+and L<https://github.com/miyagawa/Plack/issues/180> for discussion.

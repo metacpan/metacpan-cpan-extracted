@@ -1,0 +1,58 @@
+{
+   "abstract" : "a POE based RADIUS server component",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-Server-RADIUS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Math::Random" : "0.69",
+            "Net::IP::Minimal" : "0.02",
+            "Net::Radius::Dictionary" : "1.55",
+            "Net::Radius::Packet" : "1.55",
+            "POE" : "0.9999",
+            "POE::Component::Client::RADIUS" : "1",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/poe-component-server-radius",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/poe-component-server-radius.git",
+         "web" : "https://github.com/bingos/poe-component-server-radius"
+      }
+   },
+   "version" : "1.08"
+}
+

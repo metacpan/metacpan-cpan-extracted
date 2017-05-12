@@ -1,0 +1,11 @@
+Changes.pod
+Makefile.PL
+MANIFEST
+META.yml
+Outline.pm
+pod-outline
+README
+t/00load.t
+t/indent.pod
+t/indent.t
+t/pod.t

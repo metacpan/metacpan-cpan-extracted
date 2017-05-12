@@ -1,0 +1,6 @@
+docs: |
+    Equivalent to:
+
+        use locale;
+
+        $a cmp $b

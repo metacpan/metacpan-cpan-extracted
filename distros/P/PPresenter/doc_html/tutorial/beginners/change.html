@@ -1,0 +1,145 @@
+
+<HTML>
+<HEAD>
+<TITLE>PPresenter; Beginners; Change Defaults</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Change Defaults</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../../index.html>PPresenter</A><BR>
+<A HREF=../../manual.html>Manual</A><BR>
+<A HREF=../index.html>Tutorials</A><BR>
+<A HREF=index.html>Beginners</A><BR>
+<P>
+<A HREF=define.html>Subject</A><BR>
+<A HREF=design.html>Design</A><BR>
+<A HREF=create.html>Creation</A><BR>
+<A HREF=style.html>Styles</A><BR>
+<A HREF=slide.html>Adding Slides</A><BR>
+<B>Changing&nbsp;defaults</B><BR>
+<A HREF=timing.html>Timing</A><BR>
+<A HREF=tagging.html>Tagging</A><BR>
+<A HREF=dday.html>DDay</A><BR>
+
+    </TD><TD VALIGN=top>
+
+In the previous example, I used all the default style-elements.  However,
+in practical situations, you sometimes need to be able to change or
+overrule the default style elements.
+<P>
+There are three ways to overrule defaults:
+<UL>
+<LI>Overrule the default style-element for one slide,
+<LI>Switch to a new default style-element, and
+<LI>Change the default for an option.
+</UL>
+
+<H3><A NAME=overrule_style>Overrule the style-element for one slide</A></H3>
+
+You can specify the name of style-elements when adding a slide.  This is
+most commonly used for the template element, because every slide requires
+a screen template but not always the '<CODE>title main</CODE>' version.
+The example should explain the most of it:
+<PRE>
+   $show-&gt;addSlide
+      ( -title     =&gt; 'other template'
+      , -template  =&gt; 'tblr'
+      , -left      =&gt; 'text on the left'
+      , -right     =&gt; 'text on the right'
+      );
+</PRE>
+<IMG SRC=../../template/tblr.gif WIDHT=160 HEIGHT=120 HSPACE=10 ALIGN=right>
+The default template '<CODE>tm</CODE>' is overruled by the
+<CODE>-template</CODE> option.  The selected template for this slide (only this
+slide) is '<CODE>tblr</CODE>' (abbreviation of "title big-left right", see
+image).<BR>
+The selected template has options <CODE>-title</CODE>, <CODE>-left</CODE>,
+and <CODE>-right</CODE> to be overruled with something useful.
+<BR CLEAR=right>
+
+<H3><A NAME=change_style>Set a new Default for a Style-Element</A></H3>
+
+If you like a different style-element to be used in all slides, it is
+not pleasant to have that repeated for each slide again.  To change the
+selected default do:
+<PRE>
+    my $show = PPresenter-&gt;new;
+    $show-&gt;select(fontset =&gt; 'scaling');
+    $show-&gt;addSlide(...);
+</PRE>
+which will set the fontset to scaling X11-fonts (on UNIX).  You can change
+the selection whenever you like and as often as you like: PPresenter keeps track
+of it.
+<P>
+In the above case, we select the right fontset for the selected style.  This
+is equivalent to:
+<PRE>
+   $show-&gt;find(style =&gt; 'SELECTED')
+        -&gt;select(fontset =&gt; 'scaling');
+</PRE>
+and
+<PRE>
+   $show-&gt;find('style')
+        -&gt;select(fontset =&gt; 'scaling');
+</PRE>
+
+<H3><A NAME=change_option>Change the Default for an Option</A></H3>
+
+There are a few ways to change the default value for one of the options
+of a style-element.  Of course, you can be specific and repeat yourself
+at each slide to overrule the default:
+<PRE>
+   $show-&gt;addSlide(-fgcolor =&gt; 'red', ...);
+   $show-&gt;addSlide(-fgcolor =&gt; 'red', ...);
+</PRE>
+But I can also say:
+<PRE>
+   $show-&gt;find('decoration')
+        -&gt;change(-fgcolor =&gt; 'red');
+
+   $show-&gt;addSlide(...);
+   $show-&gt;addSlide(...);
+</PRE>
+Changes do not influence slides defined before the change is made.<BR>
+<CODE>$show-&gt;find('decoration')</CODE> is equivalent to<BR>
+<CODE>$show-&gt;find(decoration =&gt; 'SELECTED')</CODE>.
+<P>
+An other alternative is:
+<PRE>
+   $show-&gt;change
+       ( decoration =&gt; 'SELECTED'
+       , -fgcolor   =&gt; 'red'
+       );
+</PRE>
+<P>
+If you want to change all style-elements of kind:
+<PRE>
+   $show-&gt;change
+       ( template        =&gt; 'ALL'
+       , -areaSeparation =&gt; '2%'
+       );
+</PRE>
+The area's in all templates will now be a bit larger, because the
+space inbetween those areas is reduced from the default <CODE>3%</CODE>
+(of the window's width or height) to only <CODE>2%</CODE>.
+
+<P>
+Next: <A HREF=timing.html>Timing</A>.
+
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

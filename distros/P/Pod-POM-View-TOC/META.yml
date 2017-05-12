@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Pod-POM-View-TOC
+version:             0.02
+abstract:            Generate the TOC of a POD with Pod::POM
+license:             ~
+author:              
+    - Moritz Onken <onken@houseofdesign.de>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Pod::POM:                      0.17
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

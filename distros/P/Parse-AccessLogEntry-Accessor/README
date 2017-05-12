@@ -1,0 +1,29 @@
+Parse-AccessLogEntry-Accessor version 0.01
+
+adds accessors to Parse::AccessLogEntry module.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Parse::AccessLogEntry
+    Class::Accessor::Fast
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Ryoji Tanida
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

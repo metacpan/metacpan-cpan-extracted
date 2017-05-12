@@ -1,0 +1,99 @@
+=== ChangeLog discontinued ===
+
+	With the move to git, we stop maintaining a separate ChangeLog and
+	rely on proper commit messages instead.  Web view of changes:
+	<http://git.gnome.org/browse/perl-Pango/>.
+
+2009-03-25  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* MANIFEST: Remove pango-perl-private.h.
+
+2009-03-24  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* pango.exports: Fix the list of exported functions so that
+	linking against us works on MSWin32.  Patch by Martin
+	Schlemmer.  (GNOME #576373)
+
+2009-03-24  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* pango-perl.h
+	* pango-perl-private.h (removed)
+	* xs/PangoAttributes.xs: Clean up a holdover from the split-off:
+	properly declare gtk2perl_pango_attribute_register_custom_type in
+	pango-perl.h so that Gtk2 can use it without having to jump
+	through hoops, and move the one macro that is in use out of
+	pango-perl-private.h which thus becomes empty.
+
+2009-03-17  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL
+	* NEWS
+	* README
+	* lib/Pango.pm: Stable release 1.220.
+
+2009-03-17  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* t/inc/PangoTestHelper.pm
+	* t/PangoLayout.t: Change version checks to refer to stable
+	versions only.
+
+2009-03-08  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* NEWS
+	* lib/Pango.pm: Release 1.211.
+
+2009-03-08  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* Makefile.PL: Use Glib::MakeMaker to add a precompiled-headers
+	Makefile target that precompiles pango-perl.h.
+
+2009-01-01  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* t/PangoLayout.t
+	* xs/PangoLayout.xs: Allow passing undef to
+	Gtk2::Pango::Layout::set_attributes().  Patch by Emmanuel
+	Rodriguez.  (RT #42079)
+
+2008-12-16  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* t/PangoLayout.t: Fix a skip count.  Patch by Kevin Ryde.
+
+2008-11-24  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* t/PangoLayout.t
+	* xs/PangoLayout.xs: Wrap pango_layout_get_baseline.  Patch by
+	Thierry Vignaud.
+
+2008-11-16  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* NEWS
+	* lib/Pango.pm: Release 1.210.
+
+2008-11-16  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* README: Add small introductory paragraph.
+
+2008-11-16  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* MANIFEST
+	* examples/cairo-simple.pl (added): Add an example demonstrating
+	how to use Pango in conjunction with Cairo and Gtk2.
+
+2008-11-16  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	* AUTHORS
+	* lib/Pango.pm: Update list of authors.
+
+	* lib/Pango.pm: Add some documentation.
+
+	* Makefile.PL: Use META_MERGE instead of EXTRA_META.
+
+	* lib/Pango.pm
+	* Makefile.PL: Remove unused code for handling constants.
+
+	* Makefile.PL
+	* README: Update dependencies.
+
+2008-11-02  Torsten Schoenfeld  <kaffeetisch@gmx.de>
+
+	Initial import into GNOME SVN.

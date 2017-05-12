@@ -1,0 +1,138 @@
+
+<html>
+<head>
+<title>Pod::Classdoc::ForProjectTOC</title>
+</head>
+<body>
+<table width='100%' border=0 CELLPADDING='0' CELLSPACING='3'>
+<TR>
+<TD VALIGN='top' align=left><FONT SIZE='-2'>
+ SUMMARY:&nbsp;CONSTR&nbsp;|&nbsp;<a href='#method_summary'>METHOD</a>
+ </FONT></TD>
+<TD VALIGN='top' align=right><FONT SIZE='-2'>
+DETAIL:&nbsp;CONSTR&nbsp;|&nbsp;<a href='#method_detail'>METHOD</a>
+</FONT></TD>
+</TR>
+</table><hr>
+<h2>Class Pod::Classdoc::ForProjectTOC</h2>
+
+<p>
+<dl>
+<dt><b>Inherits from:</b>
+<dd><a href='../../Pod/Classdoc.html'>Pod::Classdoc</a></dd>
+</dt>
+</dl>
+
+<hr>
+
+
+Subclass of <a href='http://search.cpan.org/perldoc?Pod::Classdoc'>Pod::Classdoc</a> providing methods to
+write a project TOC.
+
+<p>
+
+<dl>
+
+<a name='summary'></a>
+
+<a name='method_summary'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#98B5EB'><th align=left><font size='+2'>Method Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_getProjectTOC'>getProjectTOC</a>(Additions =&gt; <i>value</i>, Manuals =&gt; <i>value</i>, SourceMap =&gt; <i>value</i>, Order =&gt; <i>value</i>, GroupExternals =&gt; <i>value</i>)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Generate a project table of contents document for the current collection of
+classdocs as a nested HTML list.
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_writeProjectTOC'>writeProjectTOC</a>(Additions =&gt; <i>value</i>, Manuals =&gt; <i>value</i>, SourceMap =&gt; <i>value</i>, Order =&gt; <i>value</i>, GroupExternals =&gt; <i>value</i>)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Write out a project table of contents document for the current collection of
+classdocs as a nested HTML list.
+</td></tr>
+</table>
+<p>
+
+<a name='method_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#98B5EB'>
+	<th align=left><font size='+2'>Method Details</font></th>
+</tr></table>
+
+<a name='_f_getProjectTOC'></a>
+<h3>getProjectTOC</h3>
+<pre>
+getProjectTOC(Additions =&gt; <i>value</i>, Manuals =&gt; <i>value</i>, SourceMap =&gt; <i>value</i>, Order =&gt; <i>value</i>, GroupExternals =&gt; <i>value</i>)
+</pre><p>
+<dl>
+<dd>
+Generate a project table of contents document for the current collection of
+classdocs as a nested HTML list. Caller may optionally specify
+the order of classes in the menu.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>Additions</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>string of additional HTML list elements to append to TOC
+</td></tr>
+<tr><td align=left valign=top><code>Manuals</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>hashref mapping package names to manual files
+</td></tr>
+<tr><td align=left valign=top><code>SourceMap</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>hashref mapping packages and methods to their source filename
+</td></tr>
+<tr><td align=left valign=top><code>Order</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>arrayref of package names in the order in which they should appear in TOC; if a partial list,
+					any remaining packages will be appended to the TOC in alphabetical order
+</td></tr>
+<tr><td align=left valign=top><code>GroupExternals</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>if true, group external methods separately
+
+</td></tr>
+</table></dd>
+<dt><b>Returns:</b><dd>the TOC document
+</dd>
+</dl></dd></dl><hr>
+
+<a name='_f_writeProjectTOC'></a>
+<h3>writeProjectTOC</h3>
+<pre>
+writeProjectTOC(Additions =&gt; <i>value</i>, Manuals =&gt; <i>value</i>, SourceMap =&gt; <i>value</i>, Order =&gt; <i>value</i>, GroupExternals =&gt; <i>value</i>)
+</pre><p>
+<dl>
+<dd>
+Write out a project table of contents document for the current collection of
+classdocs as a nested HTML list. The output filename is 'toc.html'.
+The caller may optionally specify the order of classes in the menu.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>Additions</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>string of additional HTML list elements to append to TOC
+</td></tr>
+<tr><td align=left valign=top><code>Manuals</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>hashref mapping package names to manual files
+</td></tr>
+<tr><td align=left valign=top><code>SourceMap</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>hashref mapping packages and methods to their source filename
+</td></tr>
+<tr><td align=left valign=top><code>Order</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>arrayref of packages in the order in which they should appear in TOC; if a partial list,
+					any remaining packages will be appended to the TOC in alphabetical order
+</td></tr>
+<tr><td align=left valign=top><code>GroupExternals</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>if true, group external methods separately
+
+</td></tr>
+</table></dd>
+<dt><b>Returns:</b><dd>this object on success, undef on failure, with error message in $@
+</dd>
+</dl></dd></dl><hr>
+
+<small>
+<center>
+<i>Generated by POD::ClassDoc 1.01 on Sat Aug 18 11:02:01 2007</i>
+</center>
+</small>
+</body>
+</html>

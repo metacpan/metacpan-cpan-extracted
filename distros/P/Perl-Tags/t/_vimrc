@@ -1,0 +1,37 @@
+if has('perl')
+function s:init_tags()
+perl <<EOF
+    use lib "$ENV{HOME}/.vim/perllib/", "$ENV{HOME}/cpan";
+    use Perl::Tags::Naive;
+    $naive_tagger = Perl::Tags::Naive->new( max_level=>3, exts =>1 );
+        # only go one level down by default, NOPE, 3 is better
+        # cuz then can look at SN_Application methods
+EOF
+endfunction
+
+function s:do_tags(filename)
+" let l:tagname=s:get_tagname(a:filename)
+perl <<EOF
+    my $filename = VIM::Eval('a:filename');
+
+    $naive_tagger->process(files => $filename, refresh=>1 );
+
+    # we'll now do a global (for this PID), which will get updated as you source dive.
+    # If a new instance gets an old name, that tags file will get overwritten
+    # diddums, but of course this does mean there'll be lots of annoying little
+    # tags files knocking around
+
+    my $tagsfile="$ENV{test_tempdir}/tags_$$";
+    VIM::SetOption("tags+=$tagsfile");
+    VIM::DoCommand("let g:perl_tags_filename='$tagsfile'");
+
+    # of course, it may not even output, for example, if there's nothing new to process
+    $naive_tagger->output( outfile => $tagsfile );
+
+EOF
+endfunction
+
+call s:init_tags()
+call s:do_tags(expand('%'))
+endif
+

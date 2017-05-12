@@ -1,0 +1,157 @@
+  do so by shoving the keys into memcache, and a few implementations might 
+    work: 
+       1. One memcache key, all mappers do a get-update-put on the value, 
+       which is a list of keys 
+       2. One memcache key per mapper output key, an incrementing integer. 
+       Next integer to use is maintained in a special memcache key, and mappers 
+       request that next key every time they want to output a value. 
+ Doesn't solve 
+       duplicate keys, and sharding the reducers has to get into 
+ modulo-arithmetic 
+       (reducer 5 of 20 takes every (20x + 5)th key), and that kinda 
+ makes my head 
+       hurt. 
+       3. Variant of (1), but with each mapper getting its own key to which 
+       to write.  Better concurrency, but doesn't handle uniquness and 
+ would thus 
+       require a second pass. 
+
+
+
+
+t) const {
+    return NULL;
+  }
+
+  /**
+   * Create an application record reader.
+
+ * @return the new RecordReader or NULL, if the Java RecordReader should be
+   *    used.
+   */
+  virtual RecordReader* createRecordReader(MapContext& context) const {
+    return NULL;
+  }
+
+  /**
+   * Create an application record writer.
+
+ * @return the new RecordWriter or NULL, if the Java RecordWriter should be
+   *    used.
+   */
+
+ virtual RecordWriter* createRecordWriter(ReduceContext& context) const {
+    return NULL;
+  }
+
+  virtual ~Factory() {}
+};
+
+/**
+
+* Start the event handling loop that runs the task. This will use the given
+* factory to create Mappers and Reducers and so on.
+* @return true, if the task succeeded.
+*/
+bool runTask(const Factory& factory);
+
+}
+
+#endif
+
+
+
+
+
+
+http://groups.google.com/group/httpmr-discuss/files
+
+
+----- Forwarded message from Robert Barta <rho@devc.at> -----
+
+Date: Sun, 6 Jul 2008 12:46:44 +0200
+From: Robert Barta <rho@devc.at>
+To: rho@devc.at
+Reply-To: rho@devc.at
+Subject: [rho@devc.at: mapreduce]
+
+----- Forwarded message from Robert Barta <rho@devc.at> -----
+
+Date: Fri, 4 Jul 2008 15:26:12 +0200
+From: Robert Barta <rho@devc.at>
+To: rho@devc.at
+Reply-To: rho@devc.at
+Subject: mapreduce
+
+mapreduce
+slide: http://labs.google.com/papers/mapreduce-osdi04-slides/index.html
+paper: http://labs.google.com/papers/mapreduce.html
+
+http://code.google.com/edu/parallel/mapreduce-tutorial.html
+paper: http://www.cs.vu.nl/~ralf/MapReduce/paper.pdf
+criticism: http://www.databasecolumn.com/2008/01/mapreduce-a-major-step-back.html
+
+
+[1] "MapReduce:  Simplified Data Processing on Large Clusters," Jeff Dean and Sanjay Ghemawat, Proceedings of the 2004 OSDI Conference, 2004.
+
+----- End forwarded message -----
+
+http://swik.net/hadoop/Google+Blog+Search:+hadoop/MapReduce+with+multi-languages/b9msa
+
+http://cs.baylor.edu/~speegle/5335/2007slides/MapReduceMerge.pdf
+
+http://wiki.apache.org/pig/PigTutorial#Pig_Script_1
+
+http://elichen.blogspot.com/2008_07_01_archive.html
+
+http://startupmeme.com/google-google-you-slow-acquired-companies-down/
+
+http://www.tropo.com/dave/blog/2008/07/13/infinitesortedobjectsequence-for-large-data-sets-in-python/
+
+http://genericlanguage.blogspot.com/2008/07/mapreduce-part-2-pagerank.html
+
+http://www.databasecolumn.com/2008/01/mapreduce-continued.html
+
+
+http://tech.rufy.com/2006/08/mapreduce-for-ruby-ridiculously-easy.html
+
+http://www.raja-gopal.com/?p=42
+
+
+----- Forwarded message from Robert Barta <rho@devc.at> -----
+
+Date: Sat, 12 Jul 2008 09:54:06 +0200
+From: Robert Barta <rho@devc.at>
+To: rho@devc.at
+Reply-To: rho@devc.at
+Subject: [rho@devc.at: RDF hadoop] mapreduce
+
+http://www.uwtv.org/programs/displayevent.aspx?rID=3898
+
+----- Forwarded message from Robert Barta <rho@devc.at> -----
+
+Date: Wed, 9 Jul 2008 15:32:31 +0200
+From: Robert Barta <rho@devc.at>
+To: rho@devc.at
+Reply-To: rho@devc.at
+Subject: RDF hadoop
+
+rd> hmm someone emptied two pages about hbase and rdf:
+          http://wiki.apache.org/hadoop/HRDF?action=info
+          http://wiki.apache.org/hadoop/Hbase/RDF?action=info           [14:57]
+<Shepard> at least http://wiki.apache.org/incubator/HRdfStoreProposal is still
+          there
+
+
+
+%cancel
+
+http://mark.aufflick.com/blog/2006/11/18/mapreduce-in-perl
+
+http://www.lexemetech.com/search/label/MapReduce
+
+http://backpan.perl.org/authors/id/I/IW/IWOODHEAD/MapReduce-0.03.readme
+
+http://github.com/naoya/mapreduce-lite/tree/master
+
+http://www.grotto-group.com/~gulfie/projects/cluster/pdmr.subpage.html

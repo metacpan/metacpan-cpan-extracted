@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Perl6-Binding
+version:      0.601
+version_from: lib/Perl6/Binding.pm
+installdirs:  site
+requires:
+    Filter::Util::Call:            1.0601
+    PadWalker:                     0.10
+    Text::Balanced:                1.95
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

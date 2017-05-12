@@ -1,0 +1,67 @@
+# Change file for Plack::Middleware::TemplateToolkit
+
+0.28 Mon 16 Feb 2015 19:00:52
+    Add missing TT config options ENCODING and OUTLINE_TAG
+
+0.27 Sat  8 Mar 2014 19:59:47
+    Add missing NAME pod (thanks to neilb for pointing out)
+
+0.26 Sat 29 Sep 2012 10:37:11 BST
+    Add request object as variable in error template
+
+0.25
+    Error templates now get request path as variable
+    Catch if vars method is broken
+    Added timer
+
+0.21
+    Extend semantic of tt.path and tt.template
+
+0.2
+    Fixed bug with vars as singletons
+    Modified and documented tt.path, tt.template, tt.vars
+    Added Plack::Middleware::Debug::TemplateToolkit
+    New parameter request_vars to inject request variables
+    Modified utf8 parameter
+
+0.15
+    Warn on deprecated accessors
+    Introduced $env->{'tt.template'}
+
+0.12
+    Use same configuration options as Template Toolkit
+    Introduced $env->{'tt.vars'}
+    More error handling
+    Fixed some UTF8 handling
+
+0.1
+    Renamed to Plack::Middleware::TemplateToolkit
+    Add variable injection
+    More test coverage
+
+# Previous life as Plack::App::TemplateToolkit...
+
+0.07
+    Support templates for error documents
+    Log processing errors as warnings
+
+0.06
+    Migrated to Plack::App::TemplateToolkit
+    Add support of multiple MIME types
+
+0.05
+    Add POD for process option
+    Add interpolate and post_chomp options
+    interpolate now defaults to 0
+
+0.04 Tue 3 May 2011
+    Add process option
+
+0.03 Mon 2 May 2011
+    Accidental release - should have been version 0.02
+
+0.02 Sun 1 May 2011
+    Add pre_process option
+
+0.01 Sat 29 Jan 2011
+    Inital release

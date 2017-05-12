@@ -1,0 +1,14 @@
+0.04 2015-10-18T11:30:19Z
+    - Fix: utf8-encode our output
+
+0.03 2014-08-17T07:45:44Z
+    - Add some tests
+
+0.02 2014-08-17T07:06:24Z
+    - Added a missing dependency to cpanfile
+
+0.01 2014-08-16T13:49:16Z
+    - Initial release
+
+0.01 Sat Mar 08 22:00:00 GMT 2014
+    - The start of it

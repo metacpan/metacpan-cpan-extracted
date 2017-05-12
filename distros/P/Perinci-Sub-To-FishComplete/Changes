@@ -1,0 +1,21 @@
+Revision history for Perinci-Sub-To-FishComplete
+
+0.03    2015-09-04 (PERLANCAR)
+
+        - [dist] Move spec prereqs from RuntimeRequires to DevelopRecommends to
+          reduce deps but still allow indicating spec requirement.
+
+        - Check whether an option has static completion, if yes then include
+          directly in completion script instead of delegating to program.
+
+
+0.02    2014-12-02 (PERLANCAR)
+
+	- Switch Perinci::Sub::To::{CLIOptSpec,CLIDocData}.
+
+	- Correct See Also.
+
+
+0.01     2014-11-29 (PERLANCAR)
+
+         - First release.

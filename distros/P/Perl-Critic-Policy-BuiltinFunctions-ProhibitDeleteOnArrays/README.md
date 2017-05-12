@@ -1,0 +1,1 @@
+# perlcritic-prohibit-array-delete

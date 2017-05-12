@@ -1,0 +1,47 @@
+Pod-Elemental-MakeSelector version 0.12, released October 17, 2015
+
+
+This module provides an alternative to Pod::Elemental::Selectors.  It
+allows more complex criteria to be expressed by a single selector,
+including criteria that Pod::Elemental::Selectors doesn't currently
+handle.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+
+DEPENDENCIES
+
+  Package         Minimum Version
+  --------------- ---------------
+  perl             5.8.0
+  Carp             
+  Pod::Elemental   0.102360
+  Sub::Exporter
+
+
+
+CHANGES
+    Here's what's new in version 0.12 of Pod-Elemental-MakeSelector:
+    (See the file "Changes" for the full revision history.)
+
+	- No functional changes
+	- Fix typo in documentation
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

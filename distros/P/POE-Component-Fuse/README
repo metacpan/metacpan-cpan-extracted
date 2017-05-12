@@ -1,0 +1,391 @@
+NAME
+    POE::Component::Fuse - Using FUSE in POE asynchronously
+
+SYNOPSIS
+            #!/usr/bin/perl
+            # a simple example to illustrate directory listings
+            use strict; use warnings;
+
+            use POE qw( Component::Fuse );
+            use base 'POE::Session::AttributeBased';
+
+            # constants we need to interact with FUSE
+            use Errno qw( :POSIX );         # ENOENT EISDIR etc
+
+            my %files = (
+                    '/' => {        # a directory
+                            type => 0040,
+                            mode => 0755,
+                            ctime => time()-1000,
+                    },
+                    '/a' => {       # a file
+                            type => 0100,
+                            mode => 0644,
+                            ctime => time()-2000,
+                    },
+                    '/foo' => {     # a directory
+                            type => 0040,
+                            mode => 0755,
+                            ctime => time()-3000,
+                    },
+                    '/foo/bar' => { # a file
+                            type => 0100,
+                            mode => 0755,
+                            ctime => time()-4000,
+                    },
+            );
+
+            POE::Session->create(
+                    __PACKAGE__->inline_states(),
+            );
+
+            POE::Kernel->run();
+            exit;
+
+            sub _start : State {
+                    # create the fuse session
+                    POE::Component::Fuse->spawn;
+                    print "Check us out at the default place: /tmp/poefuse\n";
+                    print "You can navigate the directory, but no I/O operations are supported!\n";
+            }
+            sub _child : State {
+                    return;
+            }
+            sub _stop : State {
+                    return;
+            }
+
+            # return unimplemented for the rest of the FUSE api
+            sub _default : State {
+                    if ( $_[ARG0] =~ /^fuse/ ) {
+                            $_[ARG1]->[0]->( -ENOSYS() );
+                    }
+                    return;
+            }
+
+            sub fuse_CLOSED : State {
+                    print "shutdown: $_[ARG0]\n";
+                    return;
+            }
+
+            sub fuse_getattr : State {
+                    my( $postback, $context, $path ) = @_[ ARG0 .. ARG2 ];
+
+                    if ( exists $files{ $path } ) {
+                            my $size = exists( $files{ $path }{'cont'} ) ? length( $files{ $path }{'cont'} ) : 0;
+                            $size = $files{ $path }{'size'} if exists $files{ $path }{'size'};
+                            my $modes = ( $files{ $path }{'type'} << 9 ) + $files{ $path }{'mode'};
+                            my ($dev, $ino, $rdev, $blocks, $gid, $uid, $nlink, $blksize) = ( 0, 0, 0, 1, (split( /\s+/, $) ))[0], $>, 1, 1024 );
+                            my ($atime, $ctime, $mtime);
+                            $atime = $ctime = $mtime = $files{ $path }{'ctime'};
+
+                            # finally, return the darn data!
+                            $postback->( $dev, $ino, $modes, $nlink, $uid, $gid, $rdev, $size, $atime, $mtime, $ctime, $blksize, $blocks );
+                    } else {
+                            # path does not exist
+                            $postback->( -ENOENT() );
+                    }
+
+                    return;
+            }
+
+            sub fuse_getdir : State {
+                    my( $postback, $context, $path ) = @_[ ARG0 .. ARG2 ];
+
+                    if ( exists $files{ $path } ) {
+                            if ( $files{ $path }{'type'} & 0040 ) {
+                                    # construct all the data in this directory
+                                    my @list = map { $_ =~ s/^$path\/?//; $_ }
+                                            grep { $_ =~ /^$path\/?[^\/]+$/ } ( keys %files );
+
+                                    # no need to add "." and ".." - FUSE handles it automatically!
+
+                                    # return the list with a success code on the end
+                                    $postback->( @list, 0 );
+                            } else {
+                                    # path is not a directory!
+                                    $postback->( -ENOTDIR() );
+                            }
+                    } else {
+                            # path does not exist!
+                            $postback->( -ENOENT() );
+                    }
+
+                    return;
+            }
+
+            sub fuse_getxattr : State {
+                    my( $postback, $context, $path, $attr ) = @_[ ARG0 .. ARG3 ];
+
+                    # we don't have any extended attribute support
+                    $postback->( 0 );
+
+                    return;
+            }
+
+ABSTRACT
+    Using this module will enable you to asynchronously process FUSE
+    requests from the kernel in POE. Think of this module as a simple
+    wrapper around Fuse to POEify it.
+
+DESCRIPTION
+    This module allows you to use FUSE filesystems in POE. Basically, it is
+    a wrapper around Fuse and exposes it's API via events. Furthermore, you
+    can use Filesys::Virtual to handle the filesystem.
+
+    The standard way to use this module is to do this:
+
+            use POE;
+            use POE::Component::Fuse;
+
+            POE::Component::Fuse->spawn( ... );
+
+            POE::Session->create( ... );
+
+            POE::Kernel->run();
+
+    Naturally, the best way to quickly get up to speed is to study other
+    implementations of FUSE to see what they have done. Furthermore, please
+    look at the scripts in the examples/ directory in the tarball!
+
+  Starting Fuse
+    To start Fuse, just call it's spawn method:
+
+            POE::Component::Fuse->spawn( ... );
+
+    This method will return failure on errors or return success.
+
+    NOTE: The act of starting/stopping PoCo-Fuse fires off _child events,
+    read the POE documentation on what to do with them :)
+
+    This constructor accepts either a hashref or a hash, valid options are:
+
+   alias
+    This sets the session alias in POE.
+
+    The default is: "fuse"
+
+   mount
+    This sets the mountpoint for FUSE.
+
+    If this mountpoint doesn't exist ( and the "mkdir" option isn't set )
+    spawn() will return failure.
+
+    The default is: "/tmp/poefuse"
+
+   mountoptions
+    This passes the options to FUSE for mounting.
+
+    NOTE: this is a comma-separated string!
+
+    The default is: undef
+
+   mkdir
+    If true, PoCo-Fuse will attempt to mkdir the mountpoint if it doesn't
+    exist.
+
+    If the mkdir attempt fails, spawn() will return failure.
+
+    The default is: false
+
+   umount
+    If true, PoCo-Fuse will attempt to umount the filesystem on
+    exit/shutdown.
+
+    This basically calls "fusermount -u -z $mountpoint"
+
+    WARNING: This is not exactly portable and is in the testing stage.
+    Feedback would be much appreciated!
+
+    The default is: false
+
+   rmdir
+    If true, PoCo-Fuse will attempt to rmdir the mountpoint on
+    exit/shutdown. Extremely useful when you specify a mountpoint that was
+    randomly-generated ( e.x. "/tmp/poe$$" ) so we don't "leave behind" lots
+    of empty directories.
+
+    WARNING: Be careful when using this or your directory could vanish!
+
+   prefix
+    The prefix for all events generated by this module when using the
+    "session" method.
+
+    The default is: "fuse_"
+
+   session
+    The session to send all FUSE events to. Used in conjunction with the
+    "prefix" option, you can control where the events arrive.
+
+    If this option is missing ( or POE is not running ) and "vfilesys" isn't
+    enabled spawn() will return failure.
+
+    NOTE: You cannot use this and "vfilesys" at the same time! PoCo-Fuse
+    will pick vfilesys over this! If this is the case, then the session will
+    only get the CLOSE event, not API requests.
+
+    The default is: calling session ( if POE is running ) when "vfilesys"
+    isn't specified or error
+
+   vfilesys
+    The Filesys::Virtual object to use as our filesystem. PoCo-Fuse will
+    proceed to use Fuse::Filesys::Virtual to wrap around it and process the
+    events internally.
+
+    Furthermore, you can also use Filesys::Virtual::Async subclasses, this
+    module understands their callback API and will process it properly!
+
+    If this option is missing and "session" isn't enabled spawn() will
+    return failure.
+
+    NOTE: You cannot use this and "session" at the same time! PoCo-Fuse will
+    pick this over session!
+
+    Compatibility has not been tested with all Filesys::Virtual::XYZ
+    subclasses, so please let me know if some isn't working properly!
+
+    The default is: not used
+
+  Commands
+    There is only one command you can use, because this module does nothing
+    except process FUSE events.
+
+   shutdown
+    Tells this module to kill the FUSE mount and terminates the session. Due
+    to the semantics of FUSE, this will often result in a wedged filesystem.
+    You would need to either umount it manually ( via "fusermount -u $mount"
+    ) or by enabling the "umount" option.
+
+  Events
+    If you aren't using the Filesys::Virtual interface, the FUSE api will be
+    exposed to you in it's glory via events to your session. You can process
+    them, and send the data back via the supplied postback. All the
+    arguments are identical to the one in Fuse so please take a good look at
+    that module for more information!
+
+    The only place where this differs is the additional arguments. All
+    events will receive 2 extra arguments in front of the standard FUSE
+    args. They are the postback and context info. The postback is
+    self-explanatory, you supply the return data to it and it'll fire an
+    event back to PoCo-Fuse for processing. The context is the calling
+    context received from FUSE. It is a hashref with the 3 keys in it: uid,
+    gid, pid. It is received via the fuse_get_context() sub from Fuse.
+
+    Remember that the events are the fuse methods with the prefix tacked on
+    to them. A typical FUSE handler would look something like the example
+    below. ( it is sugared via POE::Session::AttributeBased hah )
+
+            sub fuse_getdir : State {
+                    my( $postback, $context, $path ) = @_[ ARG0 .. ARG2 ];
+
+                    # somehow get our data, we fake it here for instructional reasons
+                    $postback->( 'foo', 'bar', 0 );
+                    return;
+            }
+
+    Again, pretty please read the Fuse documentation for all the events you
+    can receive. Here's the list as of Fuse v0.09: getattr readlink getdir
+    mknod mkdir unlink rmdir symlink rename link chmod chown truncate utime
+    open read write statfs flush release fsync setxattr getxattr listxattr
+    removexattr.
+
+   CLOSED
+    This is a special event sent to the session notifying it of component
+    shutdown. As usual, it will be prefixed by the prefix set in the
+    options.
+
+    The event handler will get one argument, the error string. If you shut
+    down the component, it will be "shutdown", otherwise it will contain
+    some error string. A sample handler is below.
+
+            sub fuse_CLOSED : State {
+                    my $error = $_[ARG0];
+                    if ( $error ne 'shutdown' ) {
+                            print "AIEE: $error\n";
+
+                            # do some actions like emailing the sysadmin, restarting the component, etc...
+                    } else {
+                            # we told it to shutdown, so what do we want to do next?
+                    }
+
+                    return;
+            }
+
+  Internals
+   XSification
+    This module does it's magic by spawning a subprocess via Wheel::Run and
+    passing events back and forth to the Fuse module loaded in it. This
+    isn't exactly optimal which is obvious, but it works perfectly!
+
+    I'm working on improving this by using XS but it will take me some time
+    seeing how I'm a n00b :( Furthermore, FUSE doesn't really help because I
+    have to figure out how to get at the filehandle buried deep in it and
+    expose it to POE...
+
+    If anybody have the time and knowledge, please help me out and we can
+    have fun converting this to a pure XS module!
+
+   Debugging
+    You can enable debug mode which prints out some information ( and
+    especially error messages ) by doing this:
+
+            sub POE::Component::Fuse::DEBUG () { 1 }
+            use POE::Component::Fuse;
+
+EXPORT
+    None.
+
+SEE ALSO
+    POE
+
+    Fuse
+
+    Filesys::Virtual
+
+    Fuse::Filesys::Virtual
+
+    Filesys::Virtual::Async
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc POE::Component::Fuse
+
+  Websites
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/POE-Component-Fuse>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/POE-Component-Fuse>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-Fuse>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/POE-Component-Fuse>
+
+  Bugs
+    Please report any bugs or feature requests to "bug-poe-component-fuse at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-Fuse>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+AUTHOR
+    Apocalypse <apocal@cpan.org>
+
+    Props goes to xantus who got me motivated to write this :)
+
+    Also, this module couldn't have gotten off the ground if not for Fuse
+    which did the heavy XS lifting!
+
+COPYRIGHT AND LICENSE
+    Copyright 2009 by Apocalypse
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,136 @@
+# If you're wondering why there's a gazillion exclusions in here...
+# It's because I installed every Perl::Critic policy there is ;)
+
+# ---------------------------------------------
+# Policies that is already covered by other tests in Test::Apocalypse
+# ---------------------------------------------
+
+[-Compatibility::PerlMinimumVersionAndWhy]
+[-Modules::RequirePerlVersion]
+# covered by MinimumVersion
+
+[-Documentation::PodSpelling]
+# covered by Pod_Spelling
+
+# ---------------------------------------------
+# editor/style stuff that is too strict
+# ---------------------------------------------
+
+[-Bangs::ProhibitCommentedOutCode]
+[-Bangs::ProhibitFlagComments]
+[-Bangs::ProhibitVagueNames]
+[-CodeLayout::ProhibitHardTabs]
+[-CodeLayout::ProhibitParensWithBuiltins]
+[-CodeLayout::RequireTidyCode]
+[-CodeLayout::RequireTrailingCommaAtNewline]
+[-CodeLayout::RequireUseUTF8]
+[-Documentation::RequirePodLinksIncludeText]
+[-Documentation::RequirePODUseEncodingUTF8]
+[-Documentation::ProhibitUnbalancedParens]
+[-Editor::RequireEmacsFileVariables]
+[-Miscellanea::RequireRcsKeywords]
+[-Modules::ProhibitExcessMainComplexity]
+[-NamingConventions::Capitalization]
+[-NamingConventions::ProhibitMixedCaseVars]
+[-Subroutines::ProhibitExcessComplexity]
+[-Subroutines::ProhibitSubroutinePrototypes]
+[-Tics::ProhibitLongLines]
+[-ValuesAndExpressions::ProhibitEscapedCharacters]
+[-ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+[-ValuesAndExpressions::ProhibitMagicNumbers]
+[-ValuesAndExpressions::ProhibitNoisyQuotes]
+[-ValuesAndExpressions::RestrictLongStrings]
+
+# ---------------------------------------------
+# miscellaneous policies that is just plain annoying
+# ---------------------------------------------
+
+[-BuiltinFunctions::ProhibitStringyEval]
+[-BuiltinFunctions::ProhibitStringySplit]
+[-BuiltinFunctions::ProhibitUselessTopic]
+[-Compatibility::ProhibitThreeArgumentOpen]
+[-ControlStructures::ProhibitCascadingIfElse]
+[-ControlStructures::ProhibitDeepNests]
+[-ControlStructures::ProhibitPostfixControls]
+[-ErrorHandling::RequireCarping]
+[-ErrorHandling::RequireCheckingReturnValueOfEval]
+[-ErrorHandling::RequireUseOfExceptions]
+[-InputOutput::RequireBracedFileHandleWithPrint]
+[-InputOutput::RequireBriefOpen]
+[-InputOutput::RequireCheckedSyscalls]
+[-Lax::ProhibitEmptyQuotes::ExceptAsFallback]
+[-Lax::ProhibitStringyEval::ExceptForRequire]
+[-Miscellanea::ProhibitTies]
+[-Modules::ProhibitAutomaticExportation]
+[-Modules::RequireBarewordIncludes]
+[-Modules::RequireExplicitPackage]
+[-NamingConventions::ProhibitMixedCaseSubs]
+[-References::ProhibitDoubleSigils]
+[-RegularExpressions::ProhibitEscapedMetacharacters]
+[-RegularExpressions::ProhibitFixedStringMatches]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-RegularExpressions::ProhibitUselessTopic]
+[-Subroutines::ProhibitCallsToUndeclaredSubs]
+[-Subroutines::ProhibitCallsToUnexportedSubs]
+[-Subroutines::ProhibitManyArgs]
+[-Subroutines::ProhibitUnusedPrivateSubroutines]
+[-Subroutines::ProtectPrivateSubs]
+[-Subroutines::RequireArgUnpacking]
+[-Subroutines::RequireFinalReturn]
+[-TestingAndDebugging::ProhibitNoStrict]
+[-TestingAndDebugging::ProhibitNoWarnings]
+[-ValuesAndExpressions::ProhibitAccessOfPrivateData]
+[-ValuesAndExpressions::ProhibitCommaSeparatedStatements]
+[-ValuesAndExpressions::ProhibitEmptyQuotes]
+[-ValuesAndExpressions::ProhibitFiletest_f]
+[-ValuesAndExpressions::ProhibitInterpolationOfLiterals]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+[-Variables::ProhibitLocalVars]
+[-Variables::ProhibitPunctuationVars]
+[-Variables::ProhibitPackageVars]
+[-Variables::RequireInitializationForLocalVars]
+
+# ---------------------------------------------
+# TODO probably sane policies but need to do a lot of work to fix them...
+# ---------------------------------------------
+
+[-CodeLayout::ProhibitHashBarewords]
+# sometimes we're lazy!
+
+[-Compatibility::PodMinimumVersion]
+# there should be a Test::Apocalypse check for that!
+
+[-ControlStructures::ProhibitUnlessBlocks]
+# it's so easy to be lazy!
+
+[-Documentation::RequirePodSections]
+# what is the "default" list? Obviously not PBP because it requires way too much sections!
+
+[-Miscellanea::ProhibitUselessNoCritic]
+# I don't want to go through my old code and clean them up... laziness again!
+
+[-Modules::RequireExplicitInclusion]
+# while this makes sense sometimes it's a drag to list the modules that you *know* a prereq will pull in...
+
+[-RegularExpressions::ProhibitComplexRegexes]
+# while this is true it's unavoidable in some cases...
+
+[-RegularExpressions::ProhibitUnusualDelimiters]
+# sometimes we like other delims...
+
+[-Subroutines::ProhibitBuiltinHomonyms]
+# in POE "shutdown" is commonly used, also in some classes we define convenience methods like "print" and etc...
+
+[-ValuesAndExpressions::ProhibitMixedBooleanOperators]
+# sometimes it feels "natural" to code in that style...
+
+[-ValuesAndExpressions::ProhibitVersionStrings]
+# is this really a problem? If so, it's still a lot of work to go through code and figure out the proper string...
+
+[-ValuesAndExpressions::RequireConstantOnLeftSideOfEquality]
+# I think "$^O eq 'MSWin32'" is valid... I don't want to rewrite tons of code just to satisfy this...
+
+[-Documentation::ProhibitVerbatimMarkup]
+# TODO why can't I put this in the code as ## no critic ??

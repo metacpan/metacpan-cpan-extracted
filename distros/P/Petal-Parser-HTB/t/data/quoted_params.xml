@@ -1,0 +1,1 @@
+<input type="hidden" name="mbox" petal:attributes="value cgi/param 'mbox'" />

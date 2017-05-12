@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Pod/Simple/Wiki/Googlecode.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01_googlecode_format.t
+t/02_googlecode_head.t
+t/03_googlecode_lists.t
+t/pod.t

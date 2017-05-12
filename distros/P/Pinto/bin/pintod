@@ -1,0 +1,230 @@
+#!perl
+
+# ABSTRACT: Web interface to a Pinto repository
+# PODNAME: pintod
+
+#-----------------------------------------------------------------------------
+
+use strict;
+use warnings;
+
+#-----------------------------------------------------------------------------
+
+BEGIN {
+  my $home_var = 'PINTO_HOME';
+  my $home_dir = $ENV{$home_var};
+
+  if ($home_dir) {
+    require File::Spec;
+    my $lib_dir = File::Spec->catfile($home_dir, qw(lib perl5));
+    die "$home_var ($home_dir) does not exist!\n" unless -e $home_dir;
+    eval qq{use lib '$lib_dir'; 1} or die $@; ## no critic (Eval)
+  }
+
+  unless ( eval {require Pinto::Server; 1} ) {
+    die $home_dir ? $@ : $@ . "Do you need to set $home_var?\n";
+  }
+}
+
+#-----------------------------------------------------------------------------
+
+use Pod::Usage;
+use Plack::Runner;
+use List::MoreUtils qw(none);
+use Getopt::Long qw(:config pass_through);  # to retain unrecognized options
+
+#-----------------------------------------------------------------------------
+
+our $VERSION = '0.12'; # VERSION
+
+#-----------------------------------------------------------------------------
+
+my @opt_spec = qw(root|r=s auth=s%);
+GetOptions(\my %opts, @opt_spec) or pod2usage;
+
+$opts{root} ||= $ENV{PINTO_REPOSITORY_ROOT};
+pod2usage(-message => 'Must specify a repository root') if not $opts{root};
+
+# HACK: To avoid defaulting to the Plack default port, we must wedge
+# in our own --port argument, unless the user has specified their own.
+push @ARGV, ('--port' => Pinto::Server->default_port)
+  if none { /^ --? p(?: ort)?/x } @ARGV;
+
+# HACK: Wedge in our own --server argument, unless the user has
+# specified one or has set the PLACK_SERVER environment variable
+push @ARGV, ('--server' => 'Starman')
+  if !$ENV{PLACK_SERVER} and none { /^ --? s(?: erver)?/x } @ARGV;
+
+# TODO: Consider sending the server access log into the log directory
+# for the repository by default, so everything is in one place.
+
+my $runner = Plack::Runner->new;
+$runner->parse_options(@ARGV);
+
+my $server = Pinto::Server->new(%opts);
+my $app    = $server->to_app;
+
+$runner->run($app);
+
+
+#----------------------------------------------------------------------------
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=for :stopwords Jeffrey Ryan Thalhammer pintod
+
+=head1 NAME
+
+pintod - Web interface to a Pinto repository
+
+=head1 VERSION
+
+version 0.12
+
+=head1 SYNOPSIS
+
+  pintod --root=/path/to/repository [--auth key=value] [--port=N]
+
+=head1 DESCRIPTION
+
+C<pintod> provides a web API to a L<Pinto> repository.  Clients (like
+L<pinto>) can use this API to manage and inspect the repository.  In
+addition, C<pintod> serves up the distributions within the repository,
+so you can use it as the backend for L<cpan> or L<cpanm>.
+
+Before running C<pintod> you must first create a Pinto repository.  For
+example:
+
+  pinto --root=/path/to/repository init
+
+See L<pinto> for more information about creating a reposiotry.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --root PATH
+
+=item -r PATH
+
+The path to the root directory of the Pinto repository you wish to
+serve.  Alternatively, you may set the C<PINTO_REPOSITORY_ROOT>
+environment variable.
+
+=back
+
+=head1 OPTIONS
+
+=over 4
+
+=item --auth KEY=VALUE
+
+Sets an option for the authentication scheme (default is no authentication).
+Each time this is used, a key=value pair must follow; one of them must be
+'backend', which should correspond to a class in the L<Authen::Simple>
+namespace. The remaining options will be passed as-is to the authentication
+backend.
+
+See L<"USING BASIC HTTP AUTHENTICATION"> for more guidance on enabling
+authenticaion with minimal fuss, or see L<"USING OTHER AUTHENTICATION SCHEMES">
+for more complex options.
+
+=item --port INTEGER
+
+=item -p INTEGER
+
+Specifies the port number that the server will listen on.  The default is
+B<3111>.  If you specify a different port, all clients will also have to specify
+that port.  So you probably don't want to change the port unless you have
+a very good reason.
+
+=item other options
+
+All other options supported by L<plackup> are supported too, such as
+C<--server>, C<--daemonize>, C<--access-log>, C<--error-log> etc.  These will
+be passed to L<Plack::Runner>.  By default, C<pintod> uses on the L<Starman>
+for the server backend.  Be aware that not all servers support the same options.
+
+=back
+
+=head1 USING BASIC HTTP AUTHENTICATION
+
+C<pintod> ships with L<Authen::Simple::Passwd>, so the easiest way to run
+the server with basic HTTP authentication is to create a password file using
+the C<htpasswd> utility:
+
+  htpasswd -c /path/to/htpasswd USER
+
+You will be prompted to enter the password for C<USER> twice.  Then repeat
+that command B<without the -c option> for each additional user.   You may
+want to put the F<htpasswd> file inside the top of your repository.
+
+Then launch pintod like this:
+
+  pintod --root path/to/repository --auth backend=Passwd --auth path=path/to/htpasswd
+
+If you already have an F<htpasswd> file somewhere, you may just point to it
+directly, or create a symlink.  In any case, the F<htpasswd> file needs to
+be readable by the user that will be running C<pintod>.
+
+=head1 USING OTHER AUTHENTICATION SCHEMES
+
+If you wish to use a different authenticaion scheme, then you'll first need
+to install the appropriate L<Authen::Simple> backend module.  Then configure
+L<pintod> accordingly.  For example, this would be a valid configuration
+for Kerberos:
+
+  --auth backend=Kerberos --auth realm=REALM.YOUR_COMPANY.COM
+
+and this is how the authentication backend will be constructed:
+
+  my $auth = Authen::Simple::Kerberos->new(
+    realm => 'REALM.YOUR_COMPANY.COM'
+  );
+
+=head1 DEPLOYMENT
+
+C<pintod> is PSGI compatible, running under L<Plack::Runner> by
+default.  It will use whatever backend you specify on the command line
+or have configured in your environment (defaults to L<Starman>).
+
+If you wish to add your own middleware and/or customize the backend in
+other ways, you can use L<Pinto::Server> in a custom F<.psgi> script like
+this:
+
+    # my-pintod.psgi
+
+    my %opts   = (...);
+    my $server = Pinto::Server->new(%opts);
+    my $app    = $server->to_app;
+
+    # wrap $app with middlewares here and/or
+    # insert code customized for your backend
+    # which operates on the $app
+
+Then you may directly launch F<my-pintod.psgi> using L<plackup>.
+
+=head1 SEE ALSO
+
+L<pinto> to create and manage a Pinto repository.
+
+L<Pinto::Manual> for general information on using Pinto.
+
+L<Stratopan|http://stratopan.com> for hosting your Pinto repository in the cloud.
+
+=head1 AUTHOR
+
+Jeffrey Ryan Thalhammer <jeff@stratopan.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,27 @@
+---
+abstract: 'Encode/decode DX film codes'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+  perl: '5.022'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.022'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Photography-DX
+requires:
+  Moo: '2.0'
+  namespace::clean: '0'
+  perl: '5.022'
+resources:
+  bugtracker: https://github.com/plicease/Photography-DX/issues
+  homepage: https://metacpan.org/pod/Photography::DX
+  repository: git://github.com/plicease/Photography-DX.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

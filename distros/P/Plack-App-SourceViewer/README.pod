@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Plack::App::SourceViewer>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Plack-App-SourceViewer"><img src="https://secure.travis-ci.org/bayashi/Plack-App-SourceViewer.png?_t=1457227925"/></a> <a href="https://coveralls.io/r/bayashi/Plack-App-SourceViewer"><img src="https://coveralls.io/repos/bayashi/Plack-App-SourceViewer/badge.png?_t=1457227925&branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Plack::App::SourceViewer installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Plack::App::SourceViewer
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Plack::App::SourceViewer documentation is available as in POD. So you can do:
+
+    % perldoc Plack::App::SourceViewer
+
+
+=head1 REPOSITORY
+
+Plack::App::SourceViewer is hosted on github
+L<http://github.com/bayashi/Plack-App-SourceViewer>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

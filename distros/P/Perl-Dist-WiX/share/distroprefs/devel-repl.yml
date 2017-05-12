@@ -1,0 +1,13 @@
+---
+comment: |
+
+  Devel::REPL needs an optional, but requested feature deactivated.
+
+match:
+  distribution: |
+    ^(?x:
+    .^   # never matches, only purpose is to let things align nicely
+    |FREW/Devel-REPL-1.003011.tar.gz          # Needs a patch to install.
+    )|
+patches:
+    - "Devel-REPL-1.003011.patch"

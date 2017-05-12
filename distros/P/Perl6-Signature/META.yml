@@ -1,0 +1,29 @@
+---
+abstract: 'Parse, query, and pretty-print Perl 6 signatures'
+author:
+  - 'Gaal Yahas, C<< <gaal at forum2.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perl6-Signature
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0.33
+  Parse::RecDescent: 0
+  Text::Balanced: 0
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+version: 0.04

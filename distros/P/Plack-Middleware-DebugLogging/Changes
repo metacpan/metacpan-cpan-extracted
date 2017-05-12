@@ -1,0 +1,20 @@
+Revision history for Perl extension Plack-Middleware-DebugLogging
+
+0.001005  2015-04-28 19:55:58-04:00 America/New_York
+    - fix a test and missing prereq (thanks @Brianwisti)
+
+0.001004  2014-06-24 17:50:58EDT-0400 America/Toronto
+    - now debuglogging will attempt to deserialize bodyparams if it can map
+      content-type to a deserializer we have installed
+
+0.001003  2014-04-07 09:05:15-04:00 EST5EDT
+    - improve documentation to show off more features of DebugLogging.
+
+0.001002  2014-03-24 10:37:27-04:00 EST5EDT
+    - bugfix to request param logging. now allows for more fine tuned control.
+
+0.001001  2014-03-21 19:37:54-04:00 EST5EDT
+    - was using msg instead of message in psgix.logger input erroneously.
+
+0.001000  2014-03-21 18:54:49-04:00 EST5EDT
+    - initial release.

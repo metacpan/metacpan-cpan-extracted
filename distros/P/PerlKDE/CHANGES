@@ -1,0 +1,25 @@
+Changes from 0.003 to 0.004  (2000-Feb-5)
+---------------------------
+
+- Requires PerlQt-2.104 compiled with Qt-1.4
+- Made Makefile.PL a little smarter
+- Stacked the typemaps from Qt-1.4 with the KDE typemap
+- Included the upgraded Pig.pm
+
+
+Changes from 0.002 to 0.003  (2000-Jan-26)
+---------------------------
+
+- Requires PerlQt-2.103 compiled with Qt-1.4
+- Finished adding all classes from -lkdeui
+- Moved headers into include/
+- Changed Makefile.PL LIBS from $(KDEDIR) to $ENV{KDEDIR}
+- Can now create any Application, not just KDE::Application
+
+
+Changes from 0.001 to 0.002  (2000-Jan-21)
+---------------------------
+
+- Requires PerlQt-2.102 compiled with Qt-1.4
+- Added several classes
+- Added several test applications, look in the t/ directory

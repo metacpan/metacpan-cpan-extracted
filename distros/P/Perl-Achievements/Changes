@@ -1,0 +1,38 @@
+Revision history for Perl::Achievements
+
+0.4.0 2012-06-05
+ [ENHANCEMENTS]
+ - add 'dry_run' option (useful for testing)
+
+ [STATISTICS]
+ - code churn: 9 files changed, 27 insertions(+), 8 deletions(-)
+
+0.3.0 2012-06-02
+ [ENHANCEMENTS]
+ - New Schwartzian Transform achievement (contributed by Daniel Bruder)
+
+0.2.2 2012-02-08
+ [BUG FIXES]
+ - Create and populate the config file.
+
+0.2.1 2012-02-06
+ [BUG FIXES]
+ - Newer Moose wasn't agreeing with 'Num|Undef' and Number trait
+
+0.2.0 2012-02-04
+ [ENHANCEMENTS]
+ - new 'report' command
+
+0.1.0 2012-02-02
+ [ENHANCEMENTS]
+ - add WeekendWarrior achievement
+
+0.0.2 2012-01-30
+ [GENERAL]
+ - unleashed to CPAN, due to severe peer pressure.  (aka brian d foy made
+   me do it)
+
+0.0.1 2010-08-20T09:45:12Z
+ [GENERAL]
+ - Birth of a strange new baby.
+

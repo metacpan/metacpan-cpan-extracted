@@ -1,0 +1,226 @@
+#!/usr/bin/perl -w
+
+# Iouri Ivliev 2008
+
+use strict;
+use Getopt::Std;
+use Panotools::Script;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+our $VERSION = "0.0.2 (using Panotools::Script $Panotools::Script::VERSION)";
+our ($opt_C,$opt_I,$opt_M,$opt_P,$opt_V) = 
+    (undef, undef, undef, undef, undef);
+our ($opt_O,$opt_i,$opt_o,$opt_r,$opt_s) = 
+    (0,     undef, undef, undef, undef);
+getopts 'C:I:M:P:V:O:io:rs';
+(HELP_MESSAGE(\*STDERR),die "No input script\n") if $#ARGV<0;
+(HELP_MESSAGE(\*STDERR),die "Only one input script allowed\n") if $#ARGV>0;
+
+sub HELP_MESSAGE {
+    my $h = shift;
+    my ($cmd) = ($0 =~ m,([^/\\]+)$,);
+    print $h <<EOM
+Usage: $cmd [options] <script>
+Options are:
+    -C  - set control point line(s) variables
+    -I  - set input image line(s) variables
+    -M  - set mode line variables
+    -O  - verbosity flags
+            0x01 - script info
+            0x02 - panorama and mode info
+            0x04 - images info
+            0x08 - control points info
+    -P  - set panorama line variables
+    -V  - set optimisation line(s) variables
+    -i  - update input image line(s) based on PToptimiser output line(s)
+          implies -r
+    -o  - output script file
+    -r  - remove output line(s) and morph control point(s)
+    -s  - remove variables unrecognized by PToptimiser
+EOM
+}
+
+sub VERSION_MESSAGE {
+    my $h = shift;
+    my ($cmd) = ($0 =~ m,([^/\\]+)$,);
+    print $h <<EOM
+$cmd $VERSION
+Panorama Tools Script command line editor
+EOM
+}
+
+
+$opt_O = 0xff unless $opt_O or $opt_o;
+$opt_O = eval $opt_O;
+sub verbose {
+    my $vf = shift;
+    printf STDOUT @_ if $vf & $opt_O;
+}
+
+sub getvars {
+    split /,/,shift;
+}
+
+sub getnums {
+    my $n = shift;
+    --$n;
+    my @i;
+    foreach (@_) {
+        foreach (split /,/,$_) {
+            (push(@i,$_),next) unless /^(\d+)-(\d+)?/;
+            push @i,($1..($2?$2:$n));
+        }
+    }
+    @i;
+}
+
+
+my $P = new Panotools::Script;
+verbose 0x01,"Loading $ARGV[0]\n";
+$P->Read($ARGV[0]);
+my ($p,$m) = ($P->Panorama,$P->Mode);
+my ($i,$c,$o) = ($P->Image,$P->Control,$P->Output);
+my ($in,$cn,$on) = (1+$#{$i},1+$#{$c},1+$#{$o});
+my $v = $P->Variable;
+verbose 0x02,"Output panorama: %dx%d (HFOV: %d)\n",$p->{w},$p->{h},$p->{v};
+verbose 0x02,"Input images ('i'): $in; Output images ('o'): $on\n";
+verbose 0x02,"Control points ('c'): $cn\n";
+
+$P->Output2Image if (!$in or $opt_i) and $on;
+
+if (defined $opt_P) {
+    verbose 0x8000,"DEBUG: panorama line variables '%s'\n",$opt_P;
+    my %p = split /:/,$opt_P;
+    foreach (keys %p) {
+        my $val = $p{$_};
+        verbose 0x8000,"DEBUG: vars = '%s'; val = '%s'\n",$_,$val;
+        my @v = getvars $_;
+        verbose 0x8000,"DEBUG: vars = %s\n",join ',',@v;
+        my $valid = Panotools::Script::Line::Panorama::_valid;
+        foreach my $vn (@v) {
+            $vn =~ /$valid/ 
+                or die "Incorrect panorama line variables syntax: expecting <vars>:<val>[:<vars>:<val>]\n\tvars are $valid\n";
+            verbose 0x02, 
+                "Panorama variable %s: %s => %s\n", 
+                $vn,defined($p->{$vn})?$p->{$vn}:'<undef>',$val;
+            $p->{$vn} = $val;
+        }
+    }
+}
+
+if (defined $opt_M) {
+    verbose 0x8000,"DEBUG: mode line variables '%s'\n",$opt_M;
+    my %m = split /:/,$opt_M;
+    foreach (keys %m) {
+        my $val = $m{$_};
+        verbose 0x8000,"DEBUG: vars = '%s'; val = '%s'\n",$_,$val;
+        my @v = getvars $_;
+        verbose 0x8000,"DEBUG: vars = %s\n",join ',',@v;
+        my $valid = Panotools::Script::Line::Mode::_valid;
+        foreach my $vn (@v) {
+            $vn =~ /$valid/ 
+                or die "Incorrect mode line variables syntax: expecting <vars>:<val>[:<vars>:<val>]\n\tvars are $valid\n";
+            verbose 0x02, 
+                "Mode variable %s: %s => %s\n", 
+                $vn,defined($m->{$vn})?$m->{$vn}:'<undef>',$val;
+            $m->{$vn} = $val;
+        }
+    }
+}
+
+if (defined $opt_I) {
+    verbose 0x8000,"DEBUG: input image line(s) variables '%s'\n",$opt_I;
+    my %i = split /:/,$opt_I;
+    foreach (keys %i) {
+        my ($vars,$imgs) = split /\//,$_;
+        my $val = $i{$_};
+        verbose 0x8000,"DEBUG: vars = '%s'; imgs = '%s'\n",$vars,$imgs;
+        my @v = getvars $vars;
+        verbose 0x8000,"DEBUG: vars = %s\n",join ',',@v;
+        my @i = getnums $in,$imgs;
+        verbose 0x8000,"DEBUG: imgs = %s\n",join ',',@i;
+        my $valid = Panotools::Script::Line::Image::_valid;
+        foreach my $vn (@v) {
+            $vn =~ /$valid/ 
+                or die "Incorrect input image line(s) variables syntax: expecting <vars>/<imgs>:<val>[:<vars>/<imgs>:<val>]\n\tvars are $valid\n";
+            foreach my $ii (@i) {
+                my $nv = $val;
+                $nv = sprintf $val,$ii if $vn eq 'n';
+                verbose 0x04, 
+                    "Input image %d variable %s: %s => %s\n", 
+                    $ii,$vn, 
+                    defined($i->[$ii]->{$vn})?$i->[$ii]->{$vn}:'<undef>', 
+                    $nv;
+                $i->[$ii]->{$vn} = $nv;
+            }
+        }
+    }
+}
+
+if (defined $opt_V) {
+    delete @$v{keys %$v};
+    verbose 0x8000,"DEBUG: optimisation line(s) variables '%s'\n",$opt_V;
+    foreach (split /:/,$opt_V) {
+        my ($vars,$imgs) = split /\//,$_;
+        verbose 0x8000,"DEBUG: vars = '%s'; imgs = '%s'\n",$vars,$imgs;
+        my @v = getvars $vars;
+        verbose 0x8000,"DEBUG: vars = %s\n",join ',',@v;
+        my @i = getnums $in,$imgs;
+        verbose 0x8000,"DEBUG: imgs = %s\n",join ',',@i;
+        my $valid = Panotools::Script::Line::Variable::_valid;
+        foreach my $vn (@v) {
+            $vn =~ /$valid/ 
+                or die "Incorrect optimisation line(s) variables syntax: expecting <vars>/<imgs>[:<vars>/<imgs>]\n\tvars are $valid\n";
+            foreach my $ii (@i) {
+                $v->{$ii}->{$vn} = 1;
+                if (defined($i->[$ii]->{$vn}) and $i->[$ii]->{$vn} eq '=0') {
+                    $i->[$ii]->{$vn} = 0;
+                    verbose 0x04, 
+                        "Input image %d variable %s: =0 => 0\n",$ii,$vn; 
+                }
+            }
+        }
+    }
+}
+
+if (defined $opt_C) {
+    verbose 0x8000,"DEBUG: control point line(s) variables '%s'\n",$opt_C;
+    my %c = split /:/,$opt_C;
+    foreach (keys %c) {
+        my ($vars,$cps) = split /\//,$_;
+        my $val = $c{$_};
+        verbose 0x8000,"DEBUG: vars = '%s'; imgs = '%s'\n",$vars,$cps;
+        my @v = getvars $vars;
+        verbose 0x8000,"DEBUG: vars = %s\n",join ',',@v;
+        my @c = getnums $cn,$cps;
+        verbose 0x8000,"DEBUG: imgs = %s\n",join ',',@c;
+        my $valid = Panotools::Script::Line::Control::_valid;
+        foreach my $vn (@v) {
+            $vn =~ /$valid/ 
+                or die "Incorrect control point line(s) variables syntax: expecting <vars>/<cps>:<val>[:<vars>/<cps>:<val>]\n\tvars are $valid\n";
+            foreach my $ci (@c) {
+                verbose 0x04, 
+                    "Control point %d variable %s: %s => %s\n", 
+                    $ci,$vn, 
+                    defined($c->[$ci]->{$vn})?$c->[$ci]->{$vn}:'<undef>', 
+                    $val;
+                $c->[$ci]->{$vn} = $val;
+            }
+        }
+    }
+}
+
+exit 0 unless defined $opt_o; 
+
+verbose 0x10,"Saving $opt_o\n";
+if ($opt_s) {
+    delete $p->{E};
+    delete $p->{R};
+    delete $p->{S};
+    delete @$_{qw(Eb Eev Er Ra Rb Rc Rd Re Va Vb Vc Vd Vx Vy)} for @$i;
+}
+if ($opt_r or $opt_i) {
+    splice @$o,0;
+    splice @{$P->ControlMorph},0;
+}
+$P->Write($opt_o);

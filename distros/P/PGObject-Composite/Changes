@@ -1,0 +1,8 @@
+Revision history for PGObject-Composite
+
+0.02	2014-09-08
+        Minor fixes to test cases and routines, following fixes in PGObject.pm
+
+0.01    2014-09-07
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,13 @@
+2015-06-07:
+
+* Remove dependency on utf8::all
+
+
+2015-06-07:
+
+* Migrate to Dist::Zilla
+
+
+2014-10-16:
+
+* Removed perl5i as dependency

@@ -1,0 +1,6 @@
+###gff-version 3
+
+Scaffold3	trf	VNTR	697	764	91	+	0	ID=VNTR:3.1;organism_name=repeats;Note=Period%3D7,Exponent%3D9.7,Score%3D91,Error%3D5;Name=VNTR%20repeat
+Scaffold3	trf	VNTR	667	765	87	+	0	ID=VNTR:3.2;organism_name=repeats;Note=Period%3D7,Exponent%3D13.7,Score%3D87,Error%3D18;Name=VNTR%20repeat
+SEQ1	polloc	VNTR	525	526	761	+	0	ID=VNTR-ext:1.1.1;organism_name=multi;Note=Based%20on%20group%201:%20VNTR:3.1%2C%20VNTR:3.2,Extended%20feature
+Scaffold3_woRep	polloc	VNTR	525	662	688	+	0	ID=VNTR-ext:2.1.2;organism_name=repeats;Note=Based%20on%20group%201:%20VNTR:3.1%2C%20VNTR:3.2,Extended%20feature

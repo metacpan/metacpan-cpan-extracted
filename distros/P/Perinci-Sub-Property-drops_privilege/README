@@ -1,0 +1,23 @@
+SYNOPSIS
+
+     # in your function metadata
+     drops_privilege => 'temp'
+
+DESCRIPTION
+
+    Valid values: '', 'temporary' (or 'temp'), or 'permanent' (or 'perm').
+
+    This property declares that function drops privilege (either
+    temporarily by setting EUID ($>), or permanently by setting UID ($<))
+    during execution. Usually the function is run by superuser and needs to
+    perform things on behalf of normal users.
+
+    This property's wrapper implementation currently does this: If
+    privilege is dropped temporarily, make sure that we switch back to
+    superuser. Sometimes when the function dies, privileges are not
+    restored, causing failure to subsequent operation.
+
+SEE ALSO
+
+    Perinci
+

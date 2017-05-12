@@ -1,0 +1,117 @@
+NAME
+    PYX::XMLNorm - Processing PYX data or file and do XML normalization.
+
+SYNOPSIS
+     use PYX::XMLNorm;
+     my $obj = PYX::XMLNorm->new(%parameters);
+     $obj->parse($pyx, $out);
+     $obj->parse_file($input_file, $out);
+     $obj->parse_handle($input_file_handler, $out);
+
+METHODS
+    "new(%parameters)"
+             Constructor.
+
+            *       "flush_stack"
+
+                     Flush stack on finalization.
+                     Default value is 0.
+
+            *       "output_handler"
+
+                     Output handler.
+                     Default value is \*STDOUT.
+
+            *       "rules"
+
+                     XML normalization rules.
+                     Parameter is required.
+                     Format of rules is:
+                     Outer element => list of inner elements.
+                     e.g.
+                     {
+                             'middle' => ['end'],
+                     },
+                     Outer element can be '*'.
+                     Default value is {}.
+
+    "parse($pyx[, $out])"
+             Parse PYX text or array of PYX text.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+    "parse_file($input_file[, $out])"
+             Parse file with PYX data.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+    "parse_handler($input_file_handler[, $out])"
+             Parse PYX handler.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+ERRORS
+     new():
+             Cannot exist XML normalization rules.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use PYX::XMLNorm;
+
+     # Example data.
+     my $pyx = <<'END';
+     (begin
+     (middle
+     (end
+     -data
+     )middle
+     )begin
+     END
+
+     # Object.
+     my $obj = PYX::XMLNorm->new(
+             'rules' => {
+                     'middle' => ['end'],
+             },
+     );
+
+     # Nomrmalize..
+     $obj->parse($pyx);
+
+     # Output:
+     # (begin
+     # (middle
+     # (end
+     # -data
+     # )end
+     # )middle
+     # )begin
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, PYX, PYX::Parser.
+
+SEE ALSO
+    PYX A perl module for PYX handling.
+
+    Task::PYX
+        Install the PYX modules.
+
+REPOSITORY
+    <https://github.com/tupinek/PYX-XMLNorm>
+
+AUTHOR
+    Michal Špaček skim@cpan.org.
+
+LICENSE AND COPYRIGHT
+     © 2011-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.04
+

@@ -1,0 +1,45 @@
+Revision history for Pod-Eventual
+
+0.094001  2013-11-05 22:09:53 America/New_York
+          require Mixin-Linewise 0.102 to avoid busted 0.101
+
+0.094000  2013-10-19 17:14:10 America/New_York
+          tiny documentation tweak
+
+0.093331  2013-10-12 22:28:59 America/New_York
+          update repo and bugtracker
+
+0.093330  2009-11-29 17:42:51 America/New_York
+          re-release to include a META.yml for cpandeps
+
+0.093170  2009-11-13
+          document *all four* event types
+
+0.091480  2009-05-28 13:50:52 UTC
+          nonpod events are now monolithic for each nonpod segment
+          we call the correct method for the last event in input
+
+0.091470  2009-05-27
+          eliminate verbatim events; verbatim detection is left to a higher
+          level library
+
+0.091440  2009-05-23
+          add "blank" events to capture blank lines
+
+0.006     2008-10-25
+          tweak command paragraph detection to match perlpodspec
+
+0.005     2008-10-25
+          lines of only whitespace are now considered blank (see perlpodspec)
+
+0.004     2008-10-21
+          NOT BACK COMPAT: Pod::Eventual::Simple provides hashrefs for non-pod
+
+0.003     2008-10-12
+          add Pod::Eventual::Simple to just get an arrayref of events
+
+0.002     2008-06-08
+          some new features (line number, nonpod) from HDP
+
+0.001     2008-06-05
+          first release!

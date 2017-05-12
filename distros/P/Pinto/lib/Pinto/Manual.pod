@@ -1,0 +1,76 @@
+# ABSTRACT: Entry point for Pinto documentation
+
+package Pinto::Manual;
+
+#------------------------------------------------------------------------------
+
+# VERSION
+
+#------------------------------------------------------------------------------
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=for :stopwords Jeffrey Ryan Thalhammer Stratopan
+
+=head1 NAME
+
+Pinto::Manual - Entry point for Pinto documentation
+
+=head1 VERSION
+
+version 0.12
+
+=head1 TABLE OF CONTENTS
+
+The manual consists of the following documents:
+
+=head2 L<Pinto::Manual::Introduction>
+
+Explains the goals, terminology, and concepts in L<Pinto>.
+
+=head2 L<Pinto::Manual::Installing>
+
+Some suggestions for installing L<Pinto>.
+
+=head2 L<Pinto::Manual::Tutorial>
+
+Presents a narrative explanation of how to use L<Pinto>.
+
+=head2 L<Pinto::Manual::QuickStart>
+
+Presents a condensed summary of L<pinto> commands.
+
+=head2 L<Pinto::Manual::Thanks>
+
+Names of those who helped to finance L<Pinto>.
+
+=head1 SEE ALSO
+
+L<Stratopan|http://stratopan.com> is a web service built on Pinto.
+Using Stratopan, you can store all your public and private Perl
+modules in the cloud without having to create and manage your own
+Pinto repository.  Stratopan also has facilities for creating teams of
+collaborators, controlling access to your repositories, browsing your
+repository contents or revision history, and visualizing your
+dependency tree.
+
+At the time of this writing, L<Stratopan|http://stratopan.com> is
+still in the alpha stage.  But it is definitely worth investigation.
+
+=head1 AUTHOR
+
+Jeffrey Ryan Thalhammer <jeff@stratopan.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Jeffrey Ryan Thalhammer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

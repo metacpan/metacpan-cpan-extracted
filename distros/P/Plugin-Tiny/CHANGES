@@ -1,0 +1,38 @@
+{{$NEXT}}
+0.012
+- require at least Moo 1.002000; rt #85734. Thanks RIZEN!
+- changed dist.ini again; should just effect Plugin::Tiny's release cycle; not 
+  the module's code.
+0.011     2012-12-25 13:34:03 America/New_York
+- pod: add SEE ALSO section; n
+0.010     2012-12-20 18:25:53 America/New_York
+- make Plugin::Tiny tinier by using modules with smaller footprint; good-bye
+  Moose, hello Moo; thanks to Toby Inkster!
+0.009     2012-12-19 23:32:14 America/New_York
+- fix type incompatibility for single role as Str in new, introduced in 0.007
+- add corresponding tests
+0.008     2012-12-19 12:52:24 America/New_York
+- re-release just to test new dzil config
+0.007     2012-12-19 12:39:02 America/New_York
+- pod rewrites
+- allow one or multiple roles both for constructor and during register
+v0.006
+- slightly better tests
+- confess if phase already registered; overwrite with force
+- even more pod cleanup
+v0.005
+- more pod and pod cleanup 
+v0.004
+- more pod cleanup: clean method names for TOC
+- add method register_bundle
+
+v.003
+- add two methods get_phase and get_class to get info on plugin
+- add debug init arg
+- method default_phase is now public and works a little differently
+- allow role=>undef in register to unset a global role temporarily
+- better error messages
+- get_plugin returns undef if phase or plugin not found
+- various pod updates
+
+v0.002 released to CPAN

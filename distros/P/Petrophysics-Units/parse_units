@@ -1,0 +1,198 @@
+#! /usr/bin/perl -w
+
+# The following POSC (c) products were used in the creation of this work:
+#    - epsgUnits.xml
+#    - poscUnits.xml
+# These files can be downloaded from http://www.posc.org.  Please see
+# http://www.posc.org/ebiz/pefxml/patternsobjects.html#units
+#
+# Due to the POSC Product License Agreement, these files are not
+# distributed in their original form.  This derivative work converted
+# those files to perl objects, and added unit conversion functionality
+# to the objects.
+
+#    This file is part of the "OSPetro" project.  Please see
+#    http://OSPetro.sourceforge.net for further details.
+#
+#    Copyright (C) 2003  Bjarne Steinsbo
+#
+#    This library is free software; you can redistribute it and/or
+#    modify it under the terms of version 2 of the GNU Lesser General
+#    Public License as published by the Free Software Foundation.
+#
+#    This library is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+#    Lesser General Public License for more details.
+#
+#    You should have received a copy of the GNU Lesser General Public
+#    License along with this library; if not, write to the Free Software
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+#    The author can be contacted at "steinsbo@users.sourceforge.net"
+
+use strict;
+use XML::LibXML;
+use Data::Dumper;
+
+# Quick-and-very-dirty parsing of xml file to produce internal perl data
+# structure.  The POSC xml files are parsed, and the internal data
+# structure is then dumped out to a file.  This utility is provided as
+# a means for the user to get updated unit dictionaries from POSC or
+# other places, and integrate those with this software.
+
+# Usage:
+#  parse_units class-prefix file1.xml poscUnits.xml epsgUnits.xml > units.data
+
+my ($class_name, @files) = @ARGV;
+
+my @all_objects;
+my %seen_already;
+my %uom_field = map { $_ => 1 } qw(
+    name quantity_type catalog_name catalog_symbol display
+);
+
+for my $xml_file (@files) {
+    my $parser = XML::LibXML->new ();
+    my $doc = $parser->parse_file ($xml_file);
+    # Read the uoms
+    my @nodes = $doc->getElementsByLocalName("UnitOfMeasure");
+
+    for my $n (@nodes) {
+	# Make object with attributes
+	my $object = bless {
+	    id => $n->getAttribute ('id'),
+	    annotation => $n->getAttribute ('annotation'),
+	}, $class_name;
+	if ($seen_already{$object->{id}}) {
+	    printf STDERR "Warning: Unit %s (%s) already seen\n",
+		$object->{id}, $object->{annotation};
+	    next;
+	}
+	# Add more attributes
+	for (
+	    my $child = $n->firstChild;
+	    defined $child;
+	    $child = $child->nextSibling
+	) {
+	    my $nn = $child->nodeName;
+	    $nn =~ s/^([A-Z])/lc($1)/e;
+	    $nn =~ s/([A-Z])/'_' . lc($1)/ge;
+	    if (defined $uom_field{$nn}) {
+		$object->{$nn} = ($child->textContent)[0];
+	    } elsif ($child->nodeName eq 'text') {
+		# Silently ignore
+	    } elsif ($child->nodeName eq 'BaseUnit') {
+		$object->{is_base} = 1;
+		# Further processing of base units
+		for (
+		    my $gchild = $child->firstChild;
+		    defined $gchild;
+		    $gchild = $gchild->nextSibling
+		) {
+		    if ($gchild->nodeName eq 'Description') {
+			$object->{description} = ($gchild->textContent)[0];
+		    } elsif ($gchild->nodeName eq 'text') {
+			# Silently ignore
+		    } elsif ($gchild->nodeName eq 'BasicAuthority') {
+			$object->{basic_authority} = ($gchild->textContent)[0];
+		    }
+		}
+	    } elsif ($child->nodeName eq 'ConversionToBaseUnit') {
+		$object->{base_unit} = $child->getAttribute ('baseUnit');
+		$object->{base_unit} =~ s/^#//;
+		$object->{base_unit} = $seen_already{$object->{base_unit}}
+		    if exists $seen_already{$object->{base_unit}};
+		# Further processing of conversion
+		for (
+		    my $gchild = $child->firstChild;
+		    defined $gchild;
+		    $gchild = $gchild->nextSibling
+		) {
+		    if ($gchild->nodeName eq 'Factor') {
+			$object->{B} = ($gchild->textContent)[0];
+			$object->{A} = 0; $object->{C} = 1; $object->{D} = 0;
+		    } elsif ($gchild->nodeName eq 'text') {
+			# Silently ignore
+		    } elsif ($gchild->nodeName eq 'Fraction') {
+			# Oh God, yet another level...
+			for (
+			    my $ggchild = $gchild->firstChild;
+			    defined $ggchild;
+			    $ggchild = $ggchild->nextSibling
+			) {
+			    if ($ggchild->nodeName eq 'Numerator') {
+				$object->{B} = ($ggchild->textContent)[0];
+			    } elsif ($ggchild->nodeName eq 'text') {
+				# Silently ignore
+			    } elsif ($ggchild->nodeName eq 'Denominator') {
+				$object->{D} = ($ggchild->textContent)[0];
+			    } else {
+				printf STDERR "Unexpected %s\n",
+				    $ggchild->nodeName;
+			    }
+			    $object->{A} = $object->{C} = 0;
+			}
+		    } elsif ($gchild->nodeName eq 'Formula') {
+			# Oh God, yet another level...
+			for (
+			    my $ggchild = $gchild->firstChild;
+			    defined $ggchild;
+			    $ggchild = $ggchild->nextSibling
+			) {
+			    if ($ggchild->nodeName eq 'A') {
+				$object->{A} = ($ggchild->textContent)[0];
+			    } elsif ($ggchild->nodeName eq 'text') {
+				# Silently ignore
+			    } elsif ($ggchild->nodeName eq 'B') {
+				$object->{B} = ($ggchild->textContent)[0];
+			    } elsif ($ggchild->nodeName eq 'C') {
+				$object->{C} = ($ggchild->textContent)[0];
+			    } elsif ($ggchild->nodeName eq 'D') {
+				$object->{D} = ($ggchild->textContent)[0];
+			    } else {
+				printf STDERR "Unexpected %s\n",
+				    $ggchild->nodeName;
+			    }
+			    $object->{D} = 0 unless defined $object->{D};
+			}
+		    } else {
+			printf STDERR "Unexpected %s\n", $gchild->nodeName;
+		    }
+		}
+	    } else {
+		printf STDERR "Unexpected %s\n", $child->nodeName;
+	    }
+	}
+	push @all_objects, $object;
+	$seen_already{$object->{id}} = $object;
+    }
+    my $dumper = Data::Dumper->new ([\@all_objects], ['*objects']);
+    print $dumper->Purity (1)->Indent (1)->Quotekeys (0)->Sortkeys (1)->Dump;
+}
+
+exit 0;
+
+__END__
+  <pr:UnitsDefinition>
+    <pr:UnitOfMeasure id="m" annotation="m">
+      <Name>metre</Name>
+      <QuantityType>length</QuantityType>
+      <CatalogName>EPSG abbreviation</CatalogName>
+      <CatalogSymbol isExplicit="True">m</CatalogSymbol>
+      <BaseUnit>
+        <Description>The metre is the length equal to 1 650 763.73 wavelengths in vacuum of the radiation corresponding to the transition between the levels 2p10 and 5d5 of the krypton-86 atom.</Description>
+        <BasicAuthority>ISO 1000</BasicAuthority>
+      </BaseUnit>
+    </pr:UnitOfMeasure>
+ 
+    <pr:UnitOfMeasure id="chCla" annotation="ch(Cla)">
+      <Name>Clarke's chain</Name>
+      <QuantityType>length</QuantityType>
+      <CatalogName>EPSG abbreviation</CatalogName>
+      <CatalogSymbol isExplicit="True">chCla</CatalogSymbol>
+      <Display>ch<sub>Cla</sub></Display>
+      <ConversionToBaseUnit baseUnit="#m">
+        <Factor>20.11661949</Factor>
+      </ConversionToBaseUnit>
+    </pr:UnitOfMeasure>

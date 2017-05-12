@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/POE-Filter-Regexp.t
+lib/POE/Filter/Regexp.pm

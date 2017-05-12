@@ -1,0 +1,112 @@
+This package contains a couple of modules to get information for and
+from PostScript fonts and associated metrics files. Also included is a
+module to facilitate basic typesetting, a program to make font
+samples, and programs to handle the conversion of font data to
+PostScript binary (.pfb) and ASCII (.pfa) formats. Example program
+shows how basic typesetting can be obtained.
+
+Modules:
+
+   PostScript::Resources - fetch info from Unix PostScript Resource files
+
+			Unix PostScript Resource (.upr) files are the
+			Adobe specified way of defining PostScript
+			resources on Unix systems. Using .upr files,
+			font names and families are associated with
+			their metrics and outline data.
+
+   PostScript::Font   - get information from a PostScript font file
+
+			Information includes the font name, font
+			family name, but also encoding vector and list
+			of glyphs.
+			Font types 1 and 42 are supported; types 2, 3
+			and 5 are usually handled as well.
+			TrueType fonts are internally converted to
+			Type42 fonts, using an external conversion
+			tool (not included).
+
+   PostScript::FontMetrics - get information from Adobe Font Metrics file
+
+			Information includes the font name, font
+			family name, encoding vector, width and
+			kerning tables.
+
+			A example program is provided that shows how
+			to use the metrics for basic typesetting of
+			PostScript texts.
+
+   PostScript::PrinterFontMetrics - get information from Printer Font Metrics file
+
+			Like PostScript::FontMetrics, but gets the
+			information from a .PFM file instead.
+
+   PostScript::FontInfo - get information from Windows .INF files
+
+			Information includes the font name, font
+			family name and PC filename prefix.
+
+   PostScript::BasicTypesetter
+   PostScript::PseudoISO - tools for basic typesetting
+
+			These modules contains functions to do basic
+			typesetting, like setting paragraphs of text
+			using different fonts, colors, styles, and
+			alignments (left, right, center and
+			justified). All with kerning applied.
+			Note that these modules are currently
+			experimental.
+
+Programs:
+
+   fontsampler        - makes detailed or concise sample pages of fonts
+
+			In detailed mode, one or more pages are
+			produced to show all the glyphs of the font.
+			Otherwise, just a sample of the font is
+			printed, allowing for 40 or more font samples
+			per page.
+			The output is compliant with Adobe's Document
+			Structuring Conventions version 3.0.
+
+   font2pfa	      - decodes a font file to ASCII (.pfa) format
+
+			The input format may be any type that
+			PostScript::Font can deal with.
+
+   font2pfb	      - encodes a font file to binary (.pfb) format
+
+			The input format may be any type that
+			PostScript::Font can deal with.
+
+   ttfwrapper	      - wraps a True Type font in PostScript Type42 format.
+
+		        This functionality is also provided by
+		        font2pfa, but ttfwrapper can also write the
+		        corresponding metrics (AFM) files.
+			
+To install, unpack the archive, change to the unpacked directory, and
+type:
+
+    perl Makefile.PL
+    make all test
+    make install
+
+REQUIREMENTS
+
+For TrueType font handling, the CPAN package Font::TTF must be
+installed. 
+
+AVAILABILITY
+
+(web-page) http://www.squirrel.nl/people/jvromans/software.html
+(search)   http://search.cpan.org/search?module=PostScript%3A%3AFont
+(download) http://www.perl.com/CPAN/authors/id/JV/
+           Archive name: PostScript-Font-x.xx.tar.gz
+
+----------------------------------------------------------------------------
+Johan Vromans                                           jvromans@squirrel.nl
+Squirrel Consultancy                                  Exloo, the Netherlands
+http://www.squirrel.nl                http://www.squirrel.nl/people/jvromans
+PGP Key 2048/4783B14D     http://www.squirrel.nl/people/jvromans/pgpkey.html
+----------------------- "Arms are made for hugging" ------------------------

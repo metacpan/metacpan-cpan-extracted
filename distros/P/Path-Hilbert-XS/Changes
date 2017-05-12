@@ -1,0 +1,11 @@
+0.003	2015-08-17
+	* Replace powers of 2 table with bit fiddling.
+	(cleaner, a bit faster, and more obscure at the same time!!!!)
+
+0.002   2015-08-12
+        * Improve portability. (Rafael Garcia Suarez)
+        * Added this Changelog.
+        * Some statistics in POD.
+
+0.001   2015-08-10
+        * First version.

@@ -1,0 +1,29 @@
+POE::Component::Server::HTTPServer version 0.9.2
+================================================
+
+POE::Component::Server::HTTPServer is a POE-based HTTP server component.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+ - POE
+ - MIME::Types
+ - libwww-perl
+ - (optional) The TemplateHandler request handler requires HTML::Template
+   and HTML::Template::HashWrapper.
+
+COPYRIGHT AND LICENCE
+
+Copyright 2003 Greg Fast (gdf@speakeasy.net)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,16 @@
+===============
+ Pangloss Bugs
+===============
+
+x. UserLoader segments don't use a try block!
+
+x. Errors do not appear in /edit/add_language.html.
+
+x. Remove-on-enter bug in editor pages.
+
+   Pressing <enter> on editor pages removes the item!  Could use image
+   submits, or just move the button so it's not first on the page.
+
+
+__
+EOF

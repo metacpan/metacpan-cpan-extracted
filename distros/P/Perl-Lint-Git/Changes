@@ -1,0 +1,15 @@
+Revision history for Perl-Lint-Git
+
+v1.1.0  2017-03-22
+        - Relicensed under Perl 5 terms.
+        - Switched to Test::Requires::Git instead of the now obsolete
+          Test::Git::has_git(). Thank you, Philippe Bruhat!
+
+v1.0.2  2015-05-19
+        - Fix git version test.
+
+v1.0.1  2015-05-19
+        - Fix prereq version for Perl::Lint.
+
+v1.0.0  2015-05-15
+        - First public version.

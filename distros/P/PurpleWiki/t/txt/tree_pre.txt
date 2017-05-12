@@ -1,0 +1,15 @@
+{{{
+void helloWorld() {
+    printf("Hello, world!\n");
+
+}
+}}}
+  more preformatted content.
+ pretty cool, eh?
+{{{
+Yeah, pretty cool.
+}}}
+The function, {{{helloWorld()}}}, tells the story.
+{{{
+Okay, now for some real {{{funkiness}}}!
+}}}

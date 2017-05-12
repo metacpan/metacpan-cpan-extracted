@@ -1,0 +1,66 @@
+__END__
+
+=head1 INSPIRATION
+
+Plift was inspired by the template system provided by L<Lift|http://liftweb.net/>
+(hence the name), a web framework for the Scala programming language.
+They apply a concept called "View-First", which differs from the traditional
+"Controller-First" concept popularized by the MVC frameworks.
+
+On the "Controller-First" approach, the Controller is executed first, and is
+responsible for pulling data from the "Model", then making this data available
+to the "View". This creates a tight coupling between the controller and the
+final rendered webpage, since it needs to know and gather all data possibly
+need by the webpage templates. Thats perfect for well defined webapp actions,
+but not so perfect for creating reusable website components.
+
+On the other hand, a "View-First" framework starts by parsing the view, then
+executing small, well-defined pieces of code triggered by special html attributes
+found in the template itself. These code snippets are responsible for rendering
+dynamic data using the html element (that triggered it) as the data template.
+That reflects the reality that a webpage is composed by independent,
+well-defined blocks of dynamic html (surrounded by static html, of course), like
+a menu, gallery, a list of blog posts or any other content.
+
+Using that approach, a CMS application can provide all sorts of special html
+elements for template designers to use, like:
+
+    <google-map address="..." />
+
+    <youtube-video id="..." />
+
+    <!-- a form that renders itself -->
+    <x-form name="contact" />
+
+    <blog-list limit="3">
+        <!-- html template for blog post here -->
+    </blog-list>
+
+    <gallery limit="3">
+        <!-- html template for gallery item here -->
+    </gallery>
+
+    <youtube-playlist id="...">
+         <!-- html template for video item here -->
+    </youtube-playlist>
+
+A kind of server-side L<"Custom Elements"|https://developer.mozilla.org/en-US/docs/Web/Web_Components/Custom_Elements>).
+
+My frist version of Plift (back in 2013, DarkPAN) implemented only the
+minimum to execute the "View-First" approach: it could 'include', 'wrap' and
+call code snippets triggered from html elements. It couldn't even interpolate
+data by itself. And that proved to be enough to create dozens of corporate
+websites and (albeit simple) webapps (including our own website
+http://kreato.com.br, of course). With small annoyances here and there, but
+haven't been using L<Template>::Toolkit type of engine (for website templating)
+since then.
+
+This version has a more generic handler dispatcher, and also has the data rendering
+feature, so we can call it a templating engine. :)
+
+
+=head1 AUTHOR
+
+Carlos Fernando Avila Gratz E<lt>cafe@kreato.com.brE<gt>
+
+=cut

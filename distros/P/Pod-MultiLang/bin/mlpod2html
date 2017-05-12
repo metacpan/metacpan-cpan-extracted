@@ -1,0 +1,138 @@
+#!/usr/local/ymir/perl/bin/perl -w
+## ----------------------------------------------------------------------------
+#  mlpod2html
+#    多言語Pod
+# -----------------------------------------------------------------------------
+# Mastering programed by YAMASHINA Hio
+#
+# Copyright 2003 YMIRLINK,Inc.
+# -----------------------------------------------------------------------------
+# $Id: mlpod2html,v 1.7 2003/09/13 05:52:43 hio Exp $
+# -----------------------------------------------------------------------------
+package Mlpod2html;
+use strict;
+
+BEGIN
+{
+  if( 0 )
+  {
+    # for debug
+    eval
+    {
+      ($SIG{__DIE__})='DEFAULT';
+      require Diehook;
+    };
+    if( !$@ )
+    {
+      Diehook->addhook();
+      #Diehook->addwarnhook();
+    }
+  }
+}
+
+use Pod::MultiLang::Html;
+
+my @arraykeys = qw( poddir langs );
+my @paramkeys = qw( css made missing-poddir missing-pragmadir missing-dir 
+                    in-charset out-charset default-lang auto-out auto-html
+                    );
+
+# -----------------------------------------------------------------------------
+# mlpod2html 起動.
+#
+&do_work(@ARGV);
+sub do_work
+{
+  my %opt;
+  my @files;
+  while(@_)
+  {
+    $_ = shift;
+    if( $_ eq '--' )
+    {
+      push(@files,@_);
+      last;
+    }
+    if( $_ eq '-o' )
+    {
+      my $v = shift;
+      $opt{outfile} = ($v=~/(.*)/)[0];
+    }elsif( $_ eq '-h' || $_ eq '--help' )
+    {
+      print "usage: mlpod2html [options] file\n";
+			print "options:\n";
+			my $opts = { (map{$_=>'list'}@arraykeys), (map{$_=>'scalar'}@paramkeys)};
+			foreach my $key (sort keys %$opts)
+			{
+				my $pad = ' 'x(17-length($key));
+				print "  --$key$pad [$opts->{$key}]\n";
+			}
+      exit;
+    }elsif( $_ eq '-V' || $_ eq '--version' )
+    {
+      print "mlpod2html version $Pod::MultiLang::Html::VERSION\n";
+      exit;
+    }elsif( /^--([\w-]+)(=?)(.*)$/ )
+    {
+      my ($k,$set,$v) = ($1,$2,$3);
+      if( !$set )
+      {
+	$v = 1;
+      }
+      if( grep{$_ eq $k}@arraykeys )
+      {
+	$v = [split(/[:,]/,$v)];
+      }elsif( grep{$_ eq $k}@paramkeys )
+      {
+      }else
+      {
+	warn "unknown key [$k]\n";
+      }
+      $k =~ tr/-/_/;
+      $opt{$k} = $v;
+    }elsif( /^-/ )
+    {
+      warn "ignore option [$_[0]]\n";
+    }else
+    {
+      push(@files,$_);
+    }
+  }
+  if( !$opt{langs} && $ENV{MLPOD_LANGS} )
+  {
+    $opt{langs} = [split(/[:,]/,$ENV{MLPOD_LANGS})];
+  }
+  
+  ## Create a parser object and have it parse file whose name was
+  ## given on the command-line (use STDIN if no files were given).
+  my $parser = new Pod::MultiLang::Html(%opt);
+  
+  if( @files==0 )
+  {
+    $parser->parse_from_file('-',$opt{outfile}||'-');
+  }else
+  {
+    foreach (@files)
+    {
+      -d $_ and die "[$_] is directory.";
+      my $outfile = $opt{outfile};
+      if( $outfile )
+      {
+        $parser->parse_from_file($_,$outfile);
+      }elsif( $opt{auto_out} || $opt{auto_html} )
+      {
+	($outfile = $_)=~s/\.(pod|pl|pm|mlpod)$/.html/ or $outfile = $_.'.html';
+        $parser->parse_from_file($_,$outfile);
+      }else
+      {
+	$parser->parse_from_file($_);
+      }
+    } # foreach
+  }
+}
+
+1;
+__END__
+# -----------------------------------------------------------------------------
+# End of File.
+# -----------------------------------------------------------------------------

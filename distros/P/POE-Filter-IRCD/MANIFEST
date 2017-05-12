@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/irc.pl
+lib/POE/Filter/IRCD.pm
+t/00-compile.t
+t/01_ircd.t
+t/02_dancer.t
+t/03_withtags.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

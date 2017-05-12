@@ -1,0 +1,44 @@
+0.23 Sat Aug 16 16:30:51 PDT 2014
+ - Change 'See' to 'See Also' in doc
+
+0.22 Sat Aug 16 11:51:40 PDT 2014
+ - Meta 0.0.2
+
+0.21 Sat Aug 16 03:56:03 PDT 2014
+ - Eliminate spurious trailing whitespace
+
+0.20 Fri Aug 15 21:24:30 PDT 2014
+ - Remove t/use_ok.t
+
+0.19 Fri Aug 15 20:21:20 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.18 Thu Aug  7 16:29:05 PDT 2014
+ - Fix the test/devel / xt tests
+
+0.17 Mon Aug  4 01:20:39 PDT 2014
+ - Fix Meta and add Contributing
+
+0.16 Thu Jul  3 02:03:31 PDT 2014
+ - Support complex lists. @ggl++
+
+0.15 Sat Jun 28 10:53:29 PDT 2014
+ - Apply 2 year old doc PR for @TommyStanton++
+
+0.14 Sat Jun 28 09:47:35 PDT 2014
+ - Added a proper parsing test and got things working again.
+ - Grammar is now up to date.
+
+0.13 Fri Jun 27 20:46:40 PDT 2014
+ - Switch to Zilla-Dist
+ - Upgrade grammar to new pegex
+
+0.12 Thu Nov  8 11:07:04 PST 2012
+ - Use new Pegex
+
+0.11 Sat Nov  5 01:12:57 PDT 2011
+ - Get prereqs right.
+
+0.10 Sun Oct  9 10:16:47 EDT 2011
+ - First Release
+

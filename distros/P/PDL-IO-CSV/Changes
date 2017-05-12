@@ -1,0 +1,33 @@
+Changes for PDL::IO::CSV
+
+0.010   2016/12/23
+        - fix: tests fail without PDL::DateTime #1
+
+0.009   2016/12/16
+        - Makefile.PL tuning
+
+0.008   2016/12/16
+        - rcsv1D: datetime_detect - improved & default switched to 1
+        - rcsv1D: header - default switched to 'auto'
+        - rcsv1D: type - datetime time can be specified as strptime format string
+
+0.007   2015/10/16
+        - rcsv1D: PDL::DateTime support - see type=>'datetime' + detect_datetime=>1
+        - wcsv1D: PDL::DateTime support
+        - rcsv1D + wcsv1D: special option - header=>'auto' (for both loading/saving)
+
+0.006   2014/12/15
+        - require PDL 2.006 as we need unpdl()
+        - doc update: reading/writing from/to scalar variables
+        - enhanced header param by rcsv* functions
+
+0.005   2014/11/26
+        - perl 5.8.9 compatibility
+
+0.004   2014/11/26
+        - doc improvements
+        - replace die() with croak()
+        - better warnings for perls without 64bitint
+
+0.003   2014/11/25
+        - first public release

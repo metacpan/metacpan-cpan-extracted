@@ -1,0 +1,14 @@
+abstract: gather/take in Perl 5
+author: Gaal Yahas, C<< <gaal at forum2.org> >>
+build_requires: 
+  Test::Exception: 0
+  Test::More: 0.31
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: MIT
+name: Perl6-Take
+no_index: 
+  directory: 
+    - inc
+    - t
+version: 0.04

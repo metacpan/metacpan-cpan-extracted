@@ -1,0 +1,11 @@
+use inc::Module::Install;
+name 'POE-Component-IRC-Plugin-Blowfish';
+author 'Johannes Plunien';
+version_from 'lib/POE/Component/IRC/Plugin/Blowfish.pm';
+abstract_from 'lib/POE/Component/IRC/Plugin/Blowfish.pm';
+license 'perl';
+build_requires 'Test::More' => 0.47;
+requires 'POE' => 0.37;
+requires 'POE::Component::IRC' => 5.07;
+requires 'Crypt::Blowfish_PP' => 1.12;
+WriteAll;

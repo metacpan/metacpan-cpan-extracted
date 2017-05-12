@@ -1,0 +1,28 @@
+---
+abstract: 'Pattern match-based argument binding for Perl.'
+author:
+  - 'Koichi SATOH <sato@seesaa.co.jp>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.120921'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Params-PatternMatch
+requires:
+  B: 0
+  Carp: 0
+  Data::Compare: 0
+  Exporter::Lite: 0
+  Scalar::Util: 0
+  TryCatch: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/sekia/Params-PatternMatch/issues
+  repository: git://github.com/sekia/Params-PatternMatch.git
+version: 0.01

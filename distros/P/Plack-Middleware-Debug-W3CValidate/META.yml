@@ -1,0 +1,33 @@
+---
+abstract: 'Validate your Response Content'
+author:
+  - 'John Napiorkowski, C<< <jjnapiork@cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Plack::Middleware::Debug::W3CValidate
+name: Plack-Middleware-Debug-W3CValidate
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+requires:
+  Plack: 0
+  Plack::Middleware::Debug: 0
+  WebService::Validator::HTML::W3C: 0
+  XML::XPath: 0
+  parent: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jjn1056/Plack-Middleware-Debug-W3CValidate.git
+version: 0.04

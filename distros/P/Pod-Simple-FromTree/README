@@ -1,0 +1,50 @@
+NAME
+
+Pod::Simple::FromTree - parse POD from tree form
+
+DESCRIPTION
+
+This is a subclass of Pod::Simple, intended to be further subclassed.
+Objects of this class, as with Pod::Simple, can parse a POD document,
+internally using an event-based protocol, and subclasses are expected
+to add specific behaviour to do something with the events.  This class
+provides a method to parse from an existing parse tree, of the type
+that Pod::Simple::SimpleTree generates.  (The basic Pod::Simple can only
+parse from POD source, either in a file or in a Perl string.)
+
+Not only can this class be directly subclassed, but it can also be mixed
+into an existing subclass of Pod::Simple.  For example, a class that
+inherits from this class and Pod::Man (which is a subclass of Pod::Simple)
+can accept a POD parse tree and render it as man page nroff source.
+Class::Mix provides a mechanism to generate such mixed classes on demand.
+
+Processing POD from the parse tree form is useful in almost any
+non-trivial workflow.  Most obviously, it is useful if automatic or
+structured editing of the POD is desired, which is most easily performed
+on the parse tree form of the document.  It is also an efficiency
+improvement if the same document is to be rendered in more than one
+form: the POD source can be parsed once to generate a parse tree (using
+Pod::Simple::SimpleTree), and then the parse tree rendered multiple times
+(using subclasses of this class).
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2010 PhotoBox Ltd
+
+Copyright (C) 2011, 2012 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

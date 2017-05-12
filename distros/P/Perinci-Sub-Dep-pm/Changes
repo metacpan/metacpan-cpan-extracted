@@ -1,0 +1,20 @@
+Revision history for Perinci-Sub-Dep-pm
+
+0.30    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.29     2012-12-21 (SHARYANTO)
+
+         - No functional changes. Use Perinci::Sub::DepUtil.
+
+
+0.28     2012-08-10 (SHARYANTO)
+
+         - First release, split to make Perinci dist empty (that dist was a
+           growing mixed bag and caused headache in dependencies).

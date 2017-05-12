@@ -1,0 +1,17 @@
+=pod
+
+=over 4
+
+=item * The C<FB_DEFAULT> replaces invalid sequences with a substitution string
+
+This is some extra text
+
+=item * C<FB_CROAK> dies immediately on error...
+
+=item * C<FB_QUIET> stops immediately--leaving the string partially decoded
+
+=item * C<FB_WARN> like C<FB_QUIET>, but with warning's
+
+=back
+
+=cut

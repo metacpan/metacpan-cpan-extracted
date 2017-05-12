@@ -1,0 +1,55 @@
+# Data from Table 3.2, Page 49 in
+#   John Fox, Applied Regression Analysis, Linear Models, and Related Methods
+#   1997, SAGE Publications, Inc.
+#
+# Legend:
+# Prestige Income Education Occupation
+#
+# Professional and Managerial
+ 97  76  97 Physician
+ 93  64  93 Professor
+ 92  78  82 Banker
+ 90  75  92 Architect
+ 90  64  86 Chemist
+ 90  80 100 Dentist
+ 89  76  98 Lawyer
+ 88  72  86 Civil engineer
+ 87  21  84 Minister
+ 83  72  76 Pilot
+ 82  62  86 Accountant
+ 81  60  56 Factory owner
+ 76  55  90 Author
+ 76  53  45 Contractor
+ 73  48  91 Teacher
+ 59  41  84 Welfare worker
+ 57  42  74 Undertaker
+ 45  42  44 Store manager
+# White Collar
+ 52  67  87 Reporter
+ 41  55  71 Insurance agent
+ 39  29  72 Bookkeeper
+ 38  76  34 Conductor
+ 34  48  55 Mail carrier
+ 16  29  50 Store clerk
+# Blue Collar
+ 67  81  28 Railroad engineer
+ 57  36  32 Machinist
+ 53  47  39 Electrician
+ 41  34  47 Policeman
+ 33  21  23 Carpenter
+ 29  44  25 Plumber
+ 26  22  22 Auto repairman
+ 24  21  20 Machine operator
+ 20  16  26 Barber
+ 19  42  26 Streetcar motorman
+ 16  14  22 Cook
+ 15   7   7 Coal miner
+ 13  21  15 Truck driver
+ 11  17  25 Night watchman
+ 10  15  29 Gas station attendant
+ 10   9  19 Taxi driver
+ 10   8  32 Waiter
+  8   7  20 Janitor
+  7  16  28 Bartender
+  6  12  30 Soda fountain clerk
+  3   9  17 Shoe shiner

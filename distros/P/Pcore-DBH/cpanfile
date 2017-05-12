@@ -1,0 +1,2 @@
+requires 'Pcore', v0.23.20;
+requires 'DBI';

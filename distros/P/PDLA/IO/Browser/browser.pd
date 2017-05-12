@@ -1,0 +1,67 @@
+pp_addpm({At=>Top},<<'EOD');
+
+=head1 NAME
+
+PDLA::IO::Browser -- 2D data browser for PDLA
+
+=head1 DESCRIPTION
+
+cursor terminal browser for piddles.
+
+=head1 SYNOPSIS
+
+ use PDLA::IO::Browser;
+
+=cut
+
+
+EOD
+
+use PDLA::Types;
+
+pp_def(
+	'browse',
+	Pars => 'a(n,m);',
+	Code => "
+	browse(\$TBSULQFD($PDLA_B,$PDLA_S,$PDLA_US,$PDLA_L,$PDLA_LL,$PDLA_F,$PDLA_D),
+	       \$SIZE(n),\$SIZE(m),\$P(a));
+	",
+	GenericTypes => [qw(B S U L Q F D)],
+Doc=><<'EOD');
+=head2 browse
+
+=for ref
+
+browse a 2D array using terminal cursor keys
+
+=for usage
+
+ browse $data
+
+This uses the CURSES library to allow one to scroll
+around a PDLA array using the cursor keys.
+
+
+
+=cut
+
+
+EOD
+pp_addpm({At=>Bot},<<'EOD');
+
+=head1 AUTHOR
+
+Copyright (C) Robin Williams 1997 (rjrw@ast.leeds.ac.uk).
+All rights reserved. There is no warranty. You are allowed
+to redistribute this software / documentation under certain
+conditions. For details, see the file COPYING in the PDLA
+distribution. If this file is separated from the PDLA distribution,
+the copyright notice should be included in the file.
+
+
+=cut
+
+
+EOD
+
+pp_done();

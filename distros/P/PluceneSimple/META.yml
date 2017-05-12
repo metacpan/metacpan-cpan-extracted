@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name: PluceneSimple
+version: 1.04
+license: unknown
+distribution_type: module
+requires:
+  File::Spec::Functions: 1.2
+  Plucene: 1.09
+  Time::Piece: 1.08
+  Time::Piece::Range: 1.0
+recommends: {}
+build_requires:
+  File::Find::Rule: 0.10
+  File::Path: 1.05
+  File::Slurp: 2002.1031
+  Test::Class: 0.03
+  Test::Harness: 2.30
+conflicts: {}
+provides:
+  Plucene::Simple:
+    file: lib/Plucene/Simple.pm
+    version: 1.04
+generated_by: Module::Build version 0.21

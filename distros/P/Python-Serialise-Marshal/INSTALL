@@ -1,0 +1,12 @@
+The usual ...
+
+- With Module::Build
+% perl Build.PL
+% perl Build test
+% sudo perl Build install
+
+
+- Without Module::Build
+% perl Makefile.PL
+% make test
+% make install

@@ -1,0 +1,139 @@
+[% DEFAULT
+   title = "Bootchart This!"
+   header = [ "This is the header.", "La La La" ]
+   width = "800"
+   #height = "600"
+   style_sheet = "/* SVG style sheets are not very widely supported */"
+   class = {}
+   class.Back = "fill: white"
+   class.Title = "font-family: sans-serif; font-size: 14pt; font-weight: bold"
+   class.Header = "font-family: sans-serif; font-size: 9pt; fill: #000000"
+   class.CPU = "fill-opacity: 0.75; fill: #668cb2; stroke: #668cb2"
+   class.LegendBack = "stroke: #e0e0e0; fill: #f5f5f5"
+   class.LegendText = "font-family: sans-serif; font-size: 9pt; fill: #000000"
+   class.OverTop = "font-family: sans-serif; font-size: 8pt; fill: #000000"
+%][%
+   DEFAULT
+   class.Data = []
+   class.Data.0 = "fill: #f0f0f0"   # default
+   class.Data.1 = "fill: #ff8c00"
+   class.Data.2 = "fill: #b22222"
+   class.Data.3 = "fill: #458b00"
+   class.Data.4 = "fill: #b8860b"
+   class.Data.5 = "fill: #36648b"
+   class.Data.6 = "fill: #00c5cd"
+   class.Data.7 = "fill: #458b74"
+   class.Data.8 = "fill: #7f7f7f"
+   class.Data.9 = "fill: #ee4040"
+   class.Data.10 = "fill: #32cd32"
+   class.Data.11 = "fill: #ffd700"
+   class.Data.12 = "fill: #6495ed"
+   class.Data.13 = "fill: #ff69b4"
+%][%
+   DEFAULT
+   class.Signature = "font-family: sans-serif; font-size: 11pt; fill: #000000; opacity: 0.4"
+   class.TimeLabels = "font-family: sans-serif; font-size: 9pt; fill: #000000; opacity: 0.7"
+
+   class.LogLabel = "font-family: sans-serif; font-size: 7pt; fill: #7f7f7f"
+   class.MarkLabel = "font-family: sans-serif; font-size: 7pt; fill: #7f7f7f"
+   class.ProcessTree = "fill: #ffffff; stroke: #e0e0e0; padding: 10px"
+   class.Tick = "stroke: #e6e6e6; stroke-width: 1px"
+   class.Stroke = "stroke: #d0d0d0"
+   class.LogBorder = "stroke: #d0d0d0; stroke-dasharray: 5,3"
+   class.MarkBorder = "stroke: #d0d0d0; stroke-dasharray: 2,1,1,1,2,5"
+   signature = "SVG based on bootchart.org"
+   show_signature = 0
+   styles = {
+      Title = { assumed_line_pixel_height = 24
+		leading = 22
+	      }
+      Header = { line_spacing = 1.2
+		 line_pixel_height = 14
+	       }
+      Legend = { width = "480px"
+		 column_width = 120
+		 box_size = 10
+		 box_padding = 5
+		 show_back = 1
+		 leading = 2.5
+	       }
+      Axis = { height = "15" }
+      Chart = { item_height = 18
+		padding = 2
+		box_padding = 10
+	      }
+      OverTop = { avg_char_width = 6  # pixels
+		   }
+      MarkLabels = { avg_char_width = 8  # pixels
+		   }
+   }
+   data = {
+       timescale = {
+	   min = 0
+	   max = 2
+	   tick = 0.1
+	   strokes = 0.5
+       }
+   }
+   # FIXME - these need to be qualified for which part they apply to;
+   # convention needed for tag names for "component name"
+   classifications = [
+	{ name = "Unclassified" },
+   ]
+   ;
+   IF !legend_index;
+      legend_index = {};
+      legend = [];
+      lastidx = classifications.size - 1;
+      FOR i = [ 0 .. lastidx ];
+	x = classifications.$i;
+	legend.$i = x.name;
+	FOR y = x.actions;
+	  legend_index.$y = i;
+	END;
+      END;
+   END;
+   USE html;
+   y_pos = 0;
+-%]
+<?xml version="1.0" standalone="no"?>
+[% UNLESS suppress_doctype %]<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+[% END %]
+
+[% content = BLOCK %]
+	<rect x="0" y="0" width="100%" height="100%" [% 'style="' _ class.Back _ '"'%]/>
+	
+[%# <!-- Title text --> #]
+[%# <!-- y_pos is [% y_pos % ] before Title --> %]
+[%- y_pos = y_pos + styles.Title.leading %]
+	<text [% 'style="' _ class.Title _ '"' %] x="10" y="[% y_pos %]">[% title | html %]</text>
+[%- y_pos = y_pos + styles.Title.assumed_line_pixel_height %]
+
+<!-- y_pos is [% y_pos %] before header -->
+<g style="[% class.Header %]" transform="translate(10, [% y_pos %])">
+[%- i = 0;
+   FOR line = header %]
+		<text dy="[% styles.Header.line_pixel_height * i %]px">[% line | html %]</text>
+[%-    y_pos = y_pos + styles.Header.line_pixel_height;
+       i = i + 1;
+   END %]
+	</g>
+<!-- y_pos is [% y_pos %] after header -->
+
+<!-- y_pos is [% y_pos %] before timeline.svg.tt -->
+[% PROCESS timeline.svg.tt %]
+<!-- y_pos is [% y_pos %] after timeline.svg.tt -->
+
+	[% IF show_signature %]<text x="0" y="100%" dx="5" dy="-5" [% 'style="' _ class.Signature _ '"' %]>[% signature | html  %]</text>[% END %]
+[% END %]
+
+<svg width="[% width %]px" height="[% y_pos %]px" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" zoomAndPan="magnify" version="1.0" contentScriptType="text/ecmascript" contentStyleType="text/css">
+	<defs>
+		<style type="text/css"><![CDATA[
+			/* Style sheet */
+			[% style_sheet %]
+		]]></style>
+	</defs>
+	[% content %]
+</svg>
+	

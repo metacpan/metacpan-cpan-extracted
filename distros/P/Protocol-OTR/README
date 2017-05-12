@@ -1,0 +1,242 @@
+NAME
+    Protocol::OTR - Off-the-Record secure messaging protocol
+
+VERSION
+    version 0.05
+
+SYNOPSIS
+        use Protocol::OTR qw( :constants );
+
+        my $otr = Protocol::OTR->new(
+            {
+                privkeys_file => "otr.private_key",
+                contacts_file => "otr.fingerprints",
+                instance_tags_file => "otr.instance_tags",
+            }
+        );
+
+        # find or create account
+        my $alice = $otr->account('alice@domain', 'prpl-jabber');
+
+        # find or create contact known by $alice
+        my $bob = $alice->contact('bob@domain');
+
+        # create secure channel to Bob
+        my $channel = $bob->channel(
+            {
+                policy => ...,
+                max_message_size => ...,
+                on_write => sub { ... },
+                on_read => sub { ... },
+                on_gone_secure => sub { ... },
+                on_gone_insecure => sub { ... },
+                on_still_secure => sub { ... },
+                on_unverified_fingerprint => sub { ... },
+                on_symkey => sub { ... },
+                on_timer => sub { ... },
+                on_smp => sub { ... },
+                on_error => sub { ... },
+                on_event => sub { ... },
+                on_smp_event => sub { ... },
+                on_before_encrypt => sub { ... },
+                on_after_decrypt => sub { ... },
+                on_is_contact_logged_in => sub { ... },
+            }
+        );
+
+        # establish private chat
+        $channel->init();
+
+        # encrypt message
+        $channel->write("Hi Bob!");
+
+        # finish all sessions
+        $channel->finish();
+
+DESCRIPTION
+    Protocol::OTR provides bindings to Off-the-Record C library
+    <https://otr.cypherpunks.ca/> allowing to manage OTR setup and to
+    communicate in secure way.
+
+METHODS
+  new
+        my $otr = Protocol::OTR->new(
+            {
+                privkeys_file => "otr.private_key",
+                contacts_file => "otr.fingerprints",
+                instance_tags_file => "otr.instance_tags",
+            }
+        );
+
+    Returns an context object using optionally specified files. If files do
+    not exist, they will be created when needed.
+
+    The example above shows the default filenames used.
+
+  find_account
+        my $account = $otr->find_account( $name, $protocol );
+
+    Returns an account object Protocol::OTR::Account if exists, otherwise
+    "undef".
+
+  account
+        my $account = $otr->account( $name, $protocol );
+
+    Returns an existing matching account object Protocol::OTR::Account or
+    creates new one.
+
+    Note: Generating new private key may take some time.
+
+  accounts
+        my @accounts = $otr->accounts();
+
+    Returns a list of known account objects Protocol::OTR::Account.
+
+ENVIRONMENT VARIABLES
+  PROTOCOL_OTR_ENABLE_QUICK_RANDOM
+        BEGIN { $ENV{PROTOCOL_OTR_ENABLE_QUICK_RANDOM} = 1; }
+        use Protocol::OTR;
+
+    If exists in environment it will use much faster "/dev/urandom", rather
+    then more secure, but slow "/dev/random".
+
+EXPORTED CONSTANTS
+    Constants are grouped in four groups, to import them all use
+    ":constants".
+
+  :policies
+    See "policy" in Protocol::OTR::Channel for usage details.
+
+   POLICY_OPPORTUNISTIC
+    Start OTR conversation whenever it detects that the correspondent
+    supports it. Default.
+
+   POLICY_ALWAYS
+    Requires encrypted conversation.
+
+  :error_codes
+    See "on_error" in Protocol::OTR::Channel for usage details.
+
+   ERRCODE_NONE
+   ERRCODE_ENCRYPTION_ERROR
+    Error occured while encrypting a message.
+
+   ERRCODE_MSG_NOT_IN_PRIVATE
+    Sent encrypted message to somebody who is not in a mutual OTR session.
+
+   ERRCODE_MSG_UNREADABLE
+    Sent an unreadable encrypted message
+
+   ERRCODE_MSG_MALFORMED
+    Message sent is malformed.
+
+  :event_codes
+    See "on_event" in Protocol::OTR::Channel for usage details.
+
+   MSGEVENT_NONE
+   MSGEVENT_ENCRYPTION_REQUIRED
+    Our policy requires encryption but we are trying to send an unencrypted
+    message out.
+
+   MSGEVENT_ENCRYPTION_ERROR
+    An error occured while encrypting a message and the message was not
+    sent.
+
+   MSGEVENT_CONNECTION_ENDED
+    Message has not been sent because our buddy has ended the private
+    conversation. We should either close the connection, or refresh it.
+
+   MSGEVENT_SETUP_ERROR
+    A private conversation could not be set up. Error message will be
+    passed.
+
+   MSGEVENT_MSG_REFLECTED
+    Received our own OTR messages.
+
+   MSGEVENT_MSG_RESENT
+    The previous message was resent.
+
+   MSGEVENT_RCVDMSG_NOT_IN_PRIVATE
+    Received an encrypted message but cannot read it because no private
+    connection is established yet.
+
+   MSGEVENT_RCVDMSG_UNREADABLE
+    Cannot read the received message.
+
+   MSGEVENT_RCVDMSG_MALFORMED
+    The message received contains malformed data.
+
+   MSGEVENT_LOG_HEARTBEAT_RCVD
+    Received a heartbeat.
+
+   MSGEVENT_LOG_HEARTBEAT_SENT
+    Sent a heartbeat.
+
+   MSGEVENT_RCVDMSG_GENERAL_ERR
+    Received a general OTR error. Error message will be passed.
+
+   MSGEVENT_RCVDMSG_UNENCRYPTED
+    Received an unencrypted message. The unencrypted message will be passed.
+
+   MSGEVENT_RCVDMSG_UNRECOGNIZED
+    Cannot recognize the type of OTR message received.
+
+   MSGEVENT_RCVDMSG_FOR_OTHER_INSTANCE
+    Received and discarded a message intended for another instance.
+
+  :smp_event_codes
+    See "on_smp_event" in Protocol::OTR::Channel for usage details.
+
+   SMPEVENT_NONE
+   SMPEVENT_CHEATED
+    The current verification has been aborted, use progress percent to
+    update auth progress dialog.
+
+   SMPEVENT_IN_PROGRESS
+   SMPEVENT_SUCCESS
+   SMPEVENT_FAILURE
+   SMPEVENT_ABORT
+    Update the auth progress dialog with progress percent
+
+   SMPEVENT_ERROR
+    Same as "SMPEVENT_CHEATED".
+
+  :instags
+    See "select_session" in Protocol::OTR::Channel for usage details.
+
+   INSTAG_BEST
+    Session that has the best conversation status, then fingerprint status
+    (in the event of a tie), then most recent (similarly in the event of a
+    tie). When calculating how recent an instance has been active,
+    "INSTAG_BEST" is limited by a one second resolution.
+
+   INSTAG_RECENT
+    The most recent session (either by message sent or received).
+
+   INSTAG_RECENT_RECEIVED
+    The session with the most recent message received.
+
+   INSTAG_RECENT_SENT
+    The session with the most recent message sent.
+
+SEE ALSO
+    *   <https://otr.cypherpunks.ca/>
+
+    *   Protocol::OTR::Account
+
+    *   Protocol::OTR::Contact
+
+    *   Protocol::OTR::Fingerprint
+
+    *   Protocol::OTR::Channel
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

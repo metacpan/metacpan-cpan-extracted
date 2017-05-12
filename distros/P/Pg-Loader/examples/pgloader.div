@@ -1,0 +1,37 @@
+[pgsql]
+base  = stock2
+pass  = silver
+host = localhost
+port = 5432
+user = ioannis
+password= silver
+#pgsysconfdir=.
+#service=
+
+[divi]
+filename   = dividend.dat
+filename   = d
+
+table       = public.overview2
+#field_sep = 
+format=csv
+copy= stock, yield, xdate, div
+copy_columns = yield,  div, xdate
+#copy
+#only_cols    = 1-6
+#only_cols    = 1-2,4,5
+#use_template = cvs1
+copy_every=1
+reformat= xdate:John::Util::addyear
+
+[cvs1]
+#template=true
+#format=cvs
+#doublequote=false
+#escapechar=|
+#quotechar="
+#reject_log=rej_log
+#reject_data=rej_data
+#reformat= fn:John::Util::jupper, score:John::Util::changed
+#null=\NA
+#trailing_sep=true

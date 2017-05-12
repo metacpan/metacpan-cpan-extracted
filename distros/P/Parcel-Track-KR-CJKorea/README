@@ -1,0 +1,69 @@
+NAME
+    Parcel::Track::KR::CJKorea - Parcel::Track driver for the CJ Korea
+    Express (CJ ëííµì´)
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+        use Parcel::Track;
+
+        # Create a tracker
+        my $tracker = Parcel::Track->new( 'KR::CJKorea', '808-123-4567' );
+
+        # ID & URI
+        print $tracker->id . "\n";
+        print $tracker->uri . "\n";
+
+        # Track the information
+        my $result = $tracker->track;
+
+        # Get the information what you want.
+        if ( $result ) {
+            print "Message sent ok\n";
+            print "$result->{from}\n";
+            print "$result->{to}\n";
+            print "$result->{result}\n";
+            print "$_\n" for @{ $result->{descs} };
+            print "$_\n" for @{ $result->{htmls} };
+        }
+        else {
+            print "Failed to track information\n";
+        }
+
+ATTRIBUTES
+  id
+METHODS
+  track
+  uri
+SEE ALSO
+    *   Parcel::Track
+
+    *   CJ Korea Express (CJ 대한통운) <https://www.doortodoor.co.kr>
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/keedi/Parcel-Track-KR-CJKorea/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/keedi/Parcel-Track-KR-CJKorea>
+
+      git clone https://github.com/keedi/Parcel-Track-KR-CJKorea.git
+
+AUTHOR
+    김도형 - Keedi Kim <keedi@cpan.org>
+
+CONTRIBUTOR
+    홍형석 - Hyungsuk Hong <aanoaa@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2016 by Keedi Kim.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

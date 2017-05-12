@@ -1,0 +1,12 @@
+Revision history for Perl6-Take
+
+0.03    2007-01-30
+        Rename to Perl6::Take to avoid clashes with existing module.
+        Cleanups and CPAN upload suggested by nothingmuch++.
+
+0.02    2007-01-30
+        En passant take, as newly specced for Perl 6.
+
+0.01    2006-12-21
+        First version, not released on an unsuspecting world.
+

@@ -1,0 +1,72 @@
+{
+   "abstract" : "allow old style CGI applications to use the plack streaming protocol",
+   "author" : [
+      "Torsten Förtsch <torsten.foertsch@gmx.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-App-CGIBin-Streaming",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.037"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Compile" : "0.17",
+            "PerlIO::via" : "0.11",
+            "Plack" : "0.9989",
+            "perl" : "5.014"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Starman" : "0.3001",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/binary-com/perl-Plack-App-CGIBin-Streaming/issues"
+      },
+      "homepage" : "https://github.com/binary-com/perl-Plack-App-CGIBin-Streaming",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/binary-com/perl-Plack-App-CGIBin-Streaming.git",
+         "web" : "https://github.com/binary-com/perl-Plack-App-CGIBin-Streaming"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "Jean-Yves Sireau <jy@binary.com>",
+      "Kaveh Mousavi Zamani <kaveh@binary.com>",
+      "Rakesh Kumar Shardiwal <rakesh.shardiwal@gmail.com>",
+      "Torsten Förtsch <torsten@binary.com>"
+   ]
+}
+

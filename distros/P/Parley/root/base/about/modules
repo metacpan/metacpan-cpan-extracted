@@ -1,0 +1,39 @@
+
+<h1>Loaded modules with a version number</h1>
+<table>
+[% FOREACH module = loaded_module_data.sort('name') %]
+[% IF module.version && ! (module.version == '-1, set by base.pm') %]
+<tr>
+<td>[% module.name %]</td>
+<td>[% module.version || '<i>undefined</i>' %]</td>
+</tr>
+[% END %]
+[% END %]
+</table>
+
+
+
+<h1>Loaded modules with no version number</h1>
+<table>
+[% FOREACH module = loaded_module_data.sort('name') %]
+[% IF ! module.version %]
+<tr>
+<td>[% module.name %]</td>
+<td>[% module.version || '<i>undefined</i>' %]</td>
+</tr>
+[% END %]
+[% END %]
+</table>
+
+
+<h1>Loaded modules with version set by base.pm</h1>
+<table>
+[% FOREACH module = loaded_module_data.sort('name') %]
+[% IF module.version == '-1, set by base.pm' %]
+<tr>
+<td>[% module.name %]</td>
+<td>[% module.version || '<i>undefined</i>' %]</td>
+</tr>
+[% END %]
+[% END %]
+</table>

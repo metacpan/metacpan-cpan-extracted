@@ -1,0 +1,42 @@
+PerlQt is Copyright (C) 1997-2000, Ashley Winters <jql@accessone.com>
+
+PerlQt is mostly distributed under the LGPL, and is not distributed under
+the QPL license. Since this is a Qt-1.x application as defined by the Qt
+Free Software License, the obligitory notification:
+
+PerlQt requires the Qt library, which is copyright
+Troll Tech AS.  Freely distributable programs may generally
+use Qt for free, see README.QT for details
+
+The notable exceptions to the LGPL licensing include the two Perl modules,
+Pig.pm and SigSlot.pm. Those are distributed under the Artistic/GPL
+licensing scheme as layed out by Perl. Everything in the Qt*/ directories 
+is probably public domain, since I don't make any claims to it. Everything
+in tutorials/ and examples/ is copyright Troll Tech AS.
+
+
+The C/C++ source license, LGPL:
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Library General Public
+License as published by the Free Software Foundation; either
+version 2 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Library General Public License for more details.
+
+You should have received a copy of the GNU Library General Public
+License along with this library; if not, write to the Free
+Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+The Perl source license:
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of either:
+
+        a) the GNU General Public License as published by the Free
+        Software Foundation; either version 1, or (at your option) any
+        later version, or
+
+        b) the "Artistic License" which comes with this Kit.

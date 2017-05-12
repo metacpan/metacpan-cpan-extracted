@@ -1,0 +1,162 @@
+SYNOPSIS
+
+        use Pollux;
+        use Pollux::Action;
+    
+        my $store = Pollux->new(
+            reducer => {
+                visibility_filter => \&visibility_filter,
+                todos             => \&todos
+            },
+        );
+    
+        my $AddTodo             = Pollux::Action->new( 'ADD_TODO', 'text' );
+        my $CompleteTodo        = Pollux::Action->new( 'COMPLETE_TODO', 'index' );
+        my $SetVisibilityFilter = Pollux::Action->new( 'SET_VISIBILITY_FILTER', 'filter' );
+    
+        sub visibility_filter($action, $state = 'SHOW_ALL' ) {
+            given ( $action ) {
+                return $action->{filter} when $SetVisibilityFilter;
+    
+                default { return $state }
+            }
+        }
+    
+        sub todos($action=undef,$state=[]) {
+            given( $action ) {
+                when( $AddTodo ) {
+                    return [ @$state, { text => $action->{text}, completed => 0 } ];
+                }
+                when ( $CompleteTodo ) {
+                    my $i = 0;
+                    [ map { ( $i++ != $action->{index} ) ? $_ : merge( $_, { completed => 1 } ) } @$state ];
+                }
+                default { return $state }
+            }
+        }
+    
+        $store->dispatch($AddTodo->('Learn about actions'));
+        $store->dispatch($AddTodo->('Learn about reducers'));
+        $store->dispatch($AddTodo->('Learn about store'));
+        $store->dispatch($CompleteTodo->(0));
+        $store->dispatch($CompleteTodo->(1));
+        $store->dispatch($SetVisibilityFilter->('SHOW_COMPLETED'));
+
+DESCRIPTION
+
+    WARNING: This is is still thought-experiment alpha-quality software,
+    and is likely to change a lot in its next iterations. Use with the
+    maximal caveat you can emptor.
+
+    This is a Perl port of Redux <http://redux.js.org>, done mostly to see
+    how easy/hard it'd be. For a longer explanation and some implementation
+    details, see the blog entry
+    <https://www.iinteractive.com/notebook/2016/09/09/pollux.html>.
+
+EXPORTED FUNCTIONS
+
+    Pollux exports three helper functions, code, which is taken directly
+    from Clone, merge, which is taken from Hash::Merge with the with the
+    merging logic tweaked ever so slightly to better behave with Pollux,
+    and combine_reducers, which takes a hashref of sub-states and their
+    reducers and mash them into a single reducer.
+
+        sub visibility_filter($action, $state = 'SHOW_ALL' ) {
+            given ( $action ) {
+                return $action->{filter} when $SetVisibilityFilter;
+    
+                default { return $state }
+            }
+        }
+    
+        sub todos($action=undef,$state=[]) {
+            given( $action ) {
+                when( $AddTodo ) {
+                    return [ @$state, { text => $action->{text}, completed => 0 } ];
+                }
+                when ( $CompleteTodo ) {
+                    my $i = 0;
+                    [ map { ( $i++ != $action->{index} ) ? $_ : merge( $_, { completed => 1 } ) } @$state ];
+                }
+                default { return $state }
+            }
+        }
+    
+        my $main_reducer = combine_reducers({
+            todos             => \&todos,
+            visibility_filter => \&visibility_filter,
+        });
+
+CONSTRUCTOR
+
+        my $store = Pollux->new(
+            state       => \%original_state,
+            reducer     => \&my_reducer,
+            middlewares => \@middlewares
+        );
+
+    Creates a new Pollux store. The constructor's arguments are:
+
+ state
+
+    Original state of the store. Can be any type of variable reference.
+    Note that the state will be internally turned into an immutable
+    structure via Const::Fast.
+
+ reducer
+
+    Reducing function to be used to turn dispatches into state changes.
+
+ middlewares
+
+    Array ref of middleware functions that are applied to the incoming
+    dispatches. Each function has the signature:
+
+        sub my_middling_ware( $store, $next, $action ) {
+            ...;
+        }
+
+    $store and $action are self-evident. $next is a code ref to the next
+    step in the dispatch processing.
+
+    Middlewares are executed in the order in which they are declared. For
+    example:
+
+        sub one   ($store,$next,$action) { $next->( $action->{msg} .= 'a' ) }
+        sub two   ($store,$next,$action) { $next->( $action->{msg} .= 'b' ) }
+        sub three ($store,$next,$action) { $next->( $action->{msg} .= 'c' ) }
+    
+        my $store = Pollux->new(
+            middlewares => [ \&one, \&two, \&three ],
+            reducer => sub($action,$state) {
+                return { msg => $action->{msg };        
+            }
+        );
+    
+        $store->dispatch({ msg => '' });
+    
+        say $store->state->{msg}; # prints 'abc'
+
+METHODS
+
+ dispatch
+
+        $store->dispatch( $action );
+
+    Dispatches an action to the store. The action can be anything your
+    reducers are ready to receive, but you might want to use Pollux::Action
+    objects.
+
+ subscribe
+
+        my $unsub = $store->subscribe(sub{
+            my $store = shift;
+            ...
+        });
+    
+        # when no longer interested
+        $unsub->();
+
+    Function that will be called each time a change in the store has been
+    detected. To unsubscribe, call the returned code ref.
+

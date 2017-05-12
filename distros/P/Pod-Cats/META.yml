@@ -1,0 +1,46 @@
+---
+abstract: 'The POD-like markup language written for podcats.in'
+author:
+  - 'Alastair McGowan-Douglas <altreus@perl.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Cats
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Pod::Cats:
+    file: lib/Pod/Cats.pm
+    version: '0.08'
+  Pod::Cats::Parser::MGC:
+    file: lib/Pod/Cats/Parser/MGC.pm
+    version: '0.08'
+requires:
+  Carp: '1.11'
+  Data::Dumper: '0'
+  List::Util: '1.21'
+  Parser::MGC: '0.06'
+  String::Util: '0'
+  Test::More: '0'
+resources:
+  bugtracker: https://github.com/Altreus/Pod-Cats/issues
+  homepage: https://github.com/Altreus/Pod-Cats
+  repository: https://github.com/Altreus/Pod-Cats.git
+version: '0.08'
+x_contributors:
+  - 'Alastair McGowan-Douglas <alastair.douglas+github@gmail.com>'
+  - 'Alastair McGowan-Douglas <alastair.douglas@gmail.com>'
+  - 'Alastair McGowan-Douglas <alastair.mcgowan@opusvl.com>'
+  - 'Alastair McGowan-Douglas <altreus@altre.us>'

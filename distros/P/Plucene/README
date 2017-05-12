@@ -1,0 +1,33 @@
+Plucene
+=======
+
+Plucene is a Perl port of the Java Lucene search engine.
+(http://jakarta.apache.org/lucene/) In the same way as Lucene, it is not
+a standalone application, but a library you can use to index documents
+and search for things in them later.
+
+Using Plucene
+=============
+
+Plucene, like Lucene, is designed to be extended, and allows you to
+construct your own query types, analyzers, and so on. Future versions of
+Lucene will contain more of these, as well as instructions for how to
+subclass the base modules to create your own.
+
+More information
+================
+
+Bug reports, patches, queries, discussion etc should be addressed to
+the mailing list. More information on the list can be found at:
+
+http://www.kasei.com/mailman/listinfo/plucene
+
+Of course, since Plucene is almost a straight port of Java Lucene,
+everything said about Lucene at http://jakarta.apache.org/lucene/ should
+be true about Plucene. Apart from the bits about it being in Java.
+
+License
+=======
+
+See the documentation for Plucene.pm for license, authorship and other
+details.

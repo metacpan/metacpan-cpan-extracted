@@ -1,0 +1,22 @@
+---
+name: POE-Component-Basement
+version: 0.01
+author:
+  - Robert Sedlacek <phaylon@dunkelheit.at>
+abstract: Basic Class::Std and POE component functionality
+license: perl
+requires:
+  Class::Data::Inheritable: 0
+  Class::Std: 0.0.4
+  NEXT: 0.60
+  POE: 0.3
+  Scalar::Util: 0
+  Sub::Installer: 0.0.2
+  UNIVERSAL::require: 0
+provides:
+  POE::Component::Basement:
+    file: lib/POE/Component/Basement.pm
+    version: 0.01
+  POE::Component::Basement::Std:
+    file: lib/POE/Component/Basement/Std.pm
+generated_by: Module::Build version 0.2611

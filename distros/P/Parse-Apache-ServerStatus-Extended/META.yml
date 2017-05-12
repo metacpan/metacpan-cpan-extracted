@@ -1,0 +1,15 @@
+abstract: Simple module to parse apache's extended server-status.
+author: Gosuke Miyashita  C<< <gosukenator at gmail.com> >>
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: Parse-Apache-ServerStatus-Extended
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Parse::Apache::ServerStatus: 0
+  Web::Scraper: 0
+  perl: 5.8.1
+version: 0.02

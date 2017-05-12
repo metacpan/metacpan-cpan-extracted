@@ -1,0 +1,639 @@
+=head1 NAME
+
+PSGI::FAQ - Frequently Asked Questions and answers
+
+=head1 QUESTIONS
+
+=head2 General
+
+=head3 How do you pronounce PSGI?
+
+We read it simply P-S-G-I.
+
+=head3 So what is this?
+
+PSGI is an interface between web servers and perl-based web
+applications akin to what CGI does for web servers and CGI scripts.
+
+=head3 Why do we need this?
+
+Perl has L<CGI> as a core module that somewhat abstracts the
+difference between CGI, mod_perl and FastCGI. However, most web
+application framework developers (e.g. Catalyst and Jifty) usually
+avoid using it to maximize the performance and to access low-level
+APIs. So they end up writing adapters for all of those different
+environments, some of which may be well tested while others are not.
+
+PSGI allows web application framework developers to only write an
+adapter for PSGI.  End users can choose from among all the backends that
+support the PSGI interface.
+
+=head3 You said PSGI is similar to CGI. How is the PSGI interface different from CGI?
+
+The PSGI interface is intentionally designed to be very similar to CGI so
+that supporting PSGI in addition to CGI would be extremely easy. Here's
+a highlight of the key differences between CGI and PSGI:
+
+=over 4
+
+=item *
+
+In CGI, servers are the actual web servers written in any languages
+but mostly in C, and script is a script that can be written in any
+language such as C, Perl, Shell scripts, Ruby or Python.
+
+In PSGI, servers are still web servers, but they're perl processes that
+are usually embedded in the web server (like mod_perl) or a perl daemon
+process called by a web server (like FastCGI), or an entirely perl based
+web server. And PSGI application is a perl code reference.
+
+=item *
+
+In CGI, we use STDIN, STDERR, and environment variables to read
+parameters and the HTTP request body and to send errors from the
+application.
+
+In PSGI, we use the C<$env> hash references and the I<psgi.input> and
+I<psgi.errors> streams to pass that data between servers and applications.
+
+=item *
+
+In CGI, applications are supposed to print HTTP headers and body to
+STDOUT to pass it back to the web server.
+
+In PSGI, applications are supposed to return a HTTP status code,
+headers, and body (as an array ref or a filehandle-like object) to the
+application as an array reference.
+
+=back
+
+=head3 My framework already does CGI, FCGI and mod_perl. Why do I want to support PSGI?
+
+There are many benefits for the web application framework to support PSGI.
+
+=over 4
+
+=item *
+
+You can stop writing code to support many web server
+environments.
+
+Plack has a lot of well-tested server adapters to environments such as
+CGI, FastCGI and mod_perl. There are also many new web servers built
+to support the PSGI standard interface, such as L<Starman>, L<Starlet>
+and L<Twiggy>. Once your framework supports PSGI, there's nothing you
+need to do to run your application on these new web servers. You can
+get that I<for free>.
+
+Also, even if your framework already supports most server environments
+like discussed above, you can now drop these code in favor of only
+supporting PSGI. This is what L<Jifty> and L<Catalyst> have done, when
+they implemented the PSGI support. Less code means less bugs :)
+
+=item *
+
+Your framework can now use all of Plack middleware components.
+
+Just search for C<Plack::Middleware> on CPAN and you'll see hundreds
+of PSGI compatible middleware components. They're often newly created,
+but also extracted from plugins for certain web frameworks such as
+L<Catalyst>. By supporting PSGI interface, your framework can make use
+of all of these useful middleware, such as session management, content
+caching, URL rewriting and debug panel to name just a few.
+
+=item *
+
+You can test the application using the consistent L<Plack::Test> interface.
+
+Any PSGI application can be tested using L<Plack::Test>, either
+through a mock request or a live server implementation. There's also
+L<Test::WWW::Mechanize::PSGI> to allow Mechanize-style testing.
+
+=back
+
+=head3 I'm writing a web application. What's the benefit of PSGI for me?
+
+If the framework you're using supports PSGI, that means your
+application can run on any of existing and future PSGI
+implementations. You can provide a C<.psgi> file that returns PSGI
+application, the end users of your application should be able to
+configure and run your application in a bunch of different ways.
+
+=head3 But I'm writing a web application in CGI and it works well. Should I switch to PSGI?
+
+If you're writing a web application with a plain CGI.pm and without
+using any web frameworks, you're limiting your application in the
+plain CGI environments, along with mod_perl and FastCGI with some
+tweaks. If you're the only one developer and user of your application
+then that's probably fine.
+
+One day you want to deploy your application in a shared hosting
+environment for your clients, or run your server in the standalone
+mode rather than as a CGI script, or distribute your application as
+open source software. Limiting your application in the CGI environment
+by using CGI.pm will bite you then.
+
+You can start using one of PSGI compatible frameworks (either
+full-stack ones or micro ones), or use L<Plack::Request> if you are
+anti frameworks, to make your application PSGI aware, to be more
+future proof.
+
+Even if you ignore PSGI today and write applications in plain CGI, you
+can always later switch to PSGI with the L<CGI::PSGI> wrapper.
+
+=head3 What should I do to support PSGI?
+
+If you're a web server developer, write a PSGI implementation that
+calls a PSGI application. Also join the development on Plack, the PSGI
+toolkit and utilities, to add a server adapter for your web server.
+
+If you're a web application framework developer, write an adapter for
+PSGI. Now you're freed from supporting all different server
+environments.
+
+If you're a web application developer (or a web application framework
+user), choose the framework that supports PSGI, or ask the author to
+support it. :) If your application is a large scale installable
+application that doesn't use any existing frameworks (e.g. WebGUI or
+Movable Type) you're considered as a framework developer instead from
+the PSGI point of view. So, writing an adapter for PSGI on your
+application would make more sense.
+
+=head3 Is PSGI faster than (my framework)?
+
+Again, PSGI is not an implementation, but there's a potential for a
+very fast PSGI implementation that preloads everything and runs fully
+optimized code as a preforked standalone with XS parsers, an
+event-based tiny web server written in C and embedded perl that
+supports PSGI, or a plain-old CGI.pm based backend that doesn't load
+any modules at all and runs pretty quickly without eating so much
+memory under the CGI environment.
+
+There are prefork web server implementations such as L<Starman> and
+L<Starlet>, as well as fully asynchronous event based implementations
+such as L<Twiggy>, L<Corona> or L<Feersum>. They're pretty fast and
+they include adapters for Plack so you can run with the L<plackup>
+utility.
+
+Users of your framework can choose which backend is the best for their
+needs.  You, as a web application framework developer, don't need to
+think about lots of different users with different needs.
+
+=head2 Plack
+
+=head3 What is Plack? What is the difference between PSGI and Plack?
+
+PSGI is a specification, so there's no software or module called PSGI.
+End users will need to choose one of the PSGI server implementations
+to run PSGI applications on. Plack is a set of PSGI utilities and
+contains the reference PSGI server L<HTTP::Server::PSGI>, as well as
+Web server adapters for CGI, FastCGI and mod_perl.
+
+Plack also has useful APIs and helpers on top of PSGI, such as
+L<Plack::Request> to provide a nice object-oriented API on request
+objects, L<plackup> that allows you to run an PSGI application from
+the command line and configure it using C<app.psgi> (a la Rack's
+Rackup), and L<Plack::Test> that allows you to test your application
+using standard L<HTTP::Request> and L<HTTP::Response> pair through
+mocked HTTP or live HTTP servers. See L<Plack> for details.
+
+=head3 What kind of server backends would be available?
+
+In Plack, we already support most web servers like Apache2, and also
+the ones that supports standard CGI or FastCGI, but also try to
+support special web servers that can embed perl, like Perlbal or
+nginx. We think it would be really nice if Apache module mod_perlite
+and Google AppEngine supported PSGI too, so that you could run your
+PSGI/Plack based perl app in the cloud.
+
+=head3 Ruby is Rack and JavaScript is Jack. Why is it not called Pack?
+
+Well Pack indeed is a cute name, but Perl has a built-in function pack
+so it's a little confusing, especially when speaking instead of writing.
+
+=head3 What namespaces should I use to implement PSGI support?
+
+B<Do not use the PSGI:: namespace to implement PSGI backends
+or adapters>.
+
+The PSGI namespace is reserved for PSGI specifications and reference
+unit tests that implementors have to pass. It should not be used by
+particular implementations.
+
+If you write a plugin or an extension to support PSGI for an
+(imaginary) web application framework called C<Camper>, name the code
+such as C<Camper::Engine::PSGI>.
+
+If you write a web server that supports PSGI interface, then name it
+however you want. You can optionally support L<Plack::Handler>'s
+abstract interface or write an adapter for it, which is:
+
+  my $server = Plack::Handler::FooBar->new(%opt);
+  $server->run($app);
+
+By supporting this C<new> and C<run> in your server, it becomes
+plackup compatible, so users can run your app via C<plackup>. You're
+recommended to, but not required to follow this API, in which case you
+have to provide your own PSGI app launcher.
+
+=head3 I have a CGI or mod_perl application that I want to run on PSGI/Plack. What should I do?
+
+You have several choices:
+
+=over 4
+
+=item CGI::PSGI
+
+If you have a web application (or framework) that uses CGI.pm to handle
+query parameters, L<CGI::PSGI> can help you migrate to PSGI.  You'll
+need to change how you create CGI objects and how to return the response
+headers and body, but the rest of your code will work unchanged.
+
+=item CGI::Emulate::PSGI and CGI::Compile
+
+If you have a dead old CGI script that you want to change as little as
+possible (or even no change at all), then L<CGI::Emulate::PSGI> and
+L<CGI::Compile> can compile and wrap them up as a PSGI application.
+
+Compared to L<CGI::PSGI>, this might be less efficient because of
+STDIN/STDOUT capturing and environment variable mangling, but should
+work with any CGI implementation, not just CGI.pm, and L<CGI::Compile>
+does the job of compiling a CGI script into a code reference just like
+mod_perl's Registry does.
+
+=item Plack::Request and Plack::Response
+
+If you have an L<HTTP::Engine> based application (framework), or want to
+write an app from scratch and need a better interface than L<CGI>, or
+you're used to L<Apache::Request>, then L<Plack::Request> and
+L<Plack::Response> might be what you want. It gives you a nice
+Request/Response object API on top of the PSGI env hash and response
+array.
+
+=back
+
+NOTE: Don't forget that whenever you have a CGI script that runs once
+and exits, and you turn it into a persistent process, it may have
+cleanup that needs to happen after every request -- variables that need
+to be reset, files that need to be closed or deleted, etc.  PSGI can do
+nothing about that (you have to fix it) except give you this friendly
+reminder.
+
+=head2 HTTP::Engine
+
+=head3 Why PSGI/Plack instead of HTTP::Engine?
+
+HTTP::Engine was a great experiment, but it mixed the application
+interface (the C<request_handler> interface) with implementations, and
+the monolithic class hierarchy and role based interfaces make it really
+hard to write a new backend. We kept the existing HTTP::Engine and broke
+it into three parts: The interface specification (PSGI), Reference
+server implementations (Plack::Handler) and Standard APIs and Tools
+(Plack).
+
+=head3 Will HTTP::Engine be dead?
+
+It won't be dead. HTTP::Engine will stay as it is and still be useful
+if you want to write a micro webserver application rather than a
+framework.
+
+=head3 Do I have to rewrite my HTTP::Engine application to follow PSGI interface?
+
+No, you don't need to rewrite your existing HTTP::Engine application.
+It can be easily turned into a PSGI application using
+L<HTTP::Engine::Interface::PSGI>.
+
+Alternatively, you can use L<Plack::Request> and L<Plack::Response>
+which gives compatible APIs to L<HTTP::Engine::Request> and
+L<HTTP::Engine::Response>:
+
+  use Plack::Request;
+  use Plack::Response;
+
+  sub request_handler {
+      my $req = Plack::Request->new(shift);
+      my $res = Plack::Response->new;
+      # ...
+      return $res->finalize;
+  }
+
+And this C<request_handler> is a PSGI application now.
+
+=head2 API Design
+
+Keep in mind that most design choices made in the PSGI spec are to
+minimize the requirements on backends so they can optimize things.
+Adding a fancy interface or allowing flexibility in the PSGI layers
+might sound catchy to end users, but it would just add things that
+backends have to support, which would end up getting in the way of
+optimizations, or introducing more bugs. What makes a fancy API to
+attract web application developers is your framework, not PSGI.
+
+=head3 Why a big env hash instead of objects with APIs?
+
+The simplicity of the interface is the key that made WSGI and Rack
+successful. PSGI is a low-level interface between backends and web
+application framework developers. If we define an API on what type of
+objects should be passed and which method they need to implement,
+there will be so much duplicated code in the backends, some of
+which may be buggy.
+
+For instance, PSGI defines C<< $env->{SERVER_NAME} >> as a
+string. What if the PSGI spec required it to be an instance of Net::IP?
+Backend code would have to depend on the Net::IP module, or have to
+write a mock object that implements ALL of Net::IP's methods.
+Backends depending on specific modules or having to reinvent lots
+of stuff is considered harmful and that's why the interface is as minimal
+as possible.
+
+Making a nice API for the end users is a job that web application
+frameworks (adapter developers) should do, not something PSGI needs to
+define.
+
+=head3 Why is the application a code ref rather than an object with a ->call method?
+
+Requiring an object I<in addition to> a code ref would make EVERY
+backend's code a few lines more tedious, while requiring an object
+I<instead of> a code ref would make application developers write
+another class and instanciate an object.
+
+In other words, yes an object with a C<call> method could work, but
+again PSGI was designed to be as simple as possible, and making a code
+reference out of class/object is no brainer but the other way round
+always requires a few lines of code and possibly a new file.
+
+=head3 Why are the headers returned as an array ref and not a hash ref?
+
+Short: In order to support multiple headers (e.g. C<Set-Cookie>).
+
+Long: In Python WSGI, the response header is a list of (C<header_name>,
+C<header_value>) I<tuples> i.e. C<type(response_headers) is ListType>
+so there can be multiple entries for the same header key. In Rack and
+JSGI, a header value is a String consisting of lines separated by
+"C<\n>".
+
+We liked Python's specification here, and since Perl hashes don't
+allow multiple entries with the same key (unless it's C<tie>d), using
+an array reference to store C<< [ key => value, key => value ] >> is
+the simplest solution to keep both framework adapters and
+backends simple. Other options, like allowing an array ref
+in addition to a plain scalar, make either side of the code
+unnecessarily tedious.
+
+=head3 I want to send Unicode content in the HTTP response. How can I do so?
+
+PSGI mocks wire protocols like CGI, and the interface doesn't care too
+much about the character encodings and string semantics. That means,
+all the data on PSGI environment values, content body etc. are sent as
+byte strings, and it is an application's responsibility to properly
+decode or encode characters such that it's being sent over HTTP.
+
+If you have a decoded string in your application and want to send them
+in C<UTF-8> as an HTTP body, you should use L<Encode> module to encode
+it to utf-8. Note that if you use one of PSGI-supporting frameworks,
+chances are that they allow you to set Unicode text in the response
+body and they do the encoding for you. Check the documentation of your
+framework to see if that's the case.
+
+This design decision was made so it gives more flexibility to PSGI
+applications and frameworks, without putting complicated work into
+PSGI web servers and interface specification itself.
+
+=head3 No iterators support in $body?
+
+We learned that WSGI and Rack really enjoy the benefit of Python and
+Ruby's language beauty, which are iterable objects in Python or
+iterators in Ruby.
+
+Rack, for instance, expects the body as an object that responds to
+the C<each> method and then yields the buffer, so
+
+  body.each { |buf| request.write(buf) }
+
+would just magically work whether body is an Array, FileIO object or an
+object that implements iterators. Perl doesn't have such a beautiful
+thing in the language unless L<autobox> is loaded.  PSGI should not make
+autobox as a requirement, so we only support a simple array ref or file
+handle.
+
+Writing an IO::Handle-like object is pretty easy since it's only
+C<getline> and C<close>. You can also use PerlIO to write an object that
+behaves like a filehandle, though it might be considered a little
+unstable.
+
+See also L<IO::Handle::Util> to turn anything iterators-like into
+IO::Handle-like.
+
+=head3 How should server determine to switch to sendfile(2) based serving?
+
+First of all, an application SHOULD always set a IO::Handle-like
+object (or an array of chunks) that responds to C<getline> and
+C<close> as a body. That is guaranteed to work with any servers.
+
+Optionally, if the server is written in perl or can tell a file
+descriptor number to the C-land to serve the file, then the server MAY
+check if the body is a real filehandle (possibly using
+L<Plack::Util>'s C<is_real_fh> function), then get a file descriptor
+with C<fileno> and call sendfile(2) or equivalent zero-copy data
+transfer using that.
+
+Otherwise, if the server can't send a file using the file descriptor
+but needs a local file path (like mod_perl or nginx), the application
+can return an IO::Handle-like object that also responds to C<path>
+method. This type of IO-like object can easily be created using
+L<IO::File::WithPath>, L<IO::Handle::Util> or L<Plack::Util>'s
+C<set_io_path> function.
+
+Middlewares can also look to see if the body has C<path> method and
+does something interesting with it, like setting C<X-Sendfile>
+headers.
+
+To summarize:
+
+=over 4
+
+=item *
+
+When to serve static files, applications should always return a real
+filehandle or IO::Handle object. That should work everywhere, and can
+be optimized in some environments.
+
+=item *
+
+Applications can also set IO::Handle like object with an additional
+C<path> method, then it should work everywhere again, and can be
+optimized in even more environments.
+
+=back
+
+=head3 What if I want to stream content or do a long-poll Comet?
+
+The most straightforward way to implement server push is for your
+application to return a IO::Handle-like object as a content body that
+implements C<getline> to return pushed content. This is guaranteed to
+work everywhere, but it's more like I<pull> than I<push>, and it's
+hard to do non-blocking I/O unless you use Coro.
+
+If you want to do server push, where your application runs in an event
+loop and push content body to the client as it's ready, you should
+return a callback to delay the response.
+
+  # long-poll comet like a chat application
+  my $app = sub {
+      my $env = shift;
+      unless ($env->{'psgi.streaming'}) {
+          die "This application needs psgi.streaming support";
+      }
+      return sub {
+          my $respond = shift;
+          wait_for_new_message(sub {
+              my $message = shift;
+              my $body = [ $message->to_json ];
+              $respond->([200, ['Content-Type', 'application/json'], $body]);
+          });
+      };
+  };
+
+C<wait_for_new_message> can be blocking or non-blocking: it's up to
+you. Most of the case you want to run it non-blockingly and should use
+event loops like L<AnyEvent>. You may also check C<psgi.nonblocking>
+value to see that it's possible and fallback to a blocking call
+otherwise.
+
+Also, to stream the content body (like streaming messages over the
+Flash socket or multipart XMLHTTPRequest):
+
+  my $app = sub {
+      my $env = shift;
+      unless ($env->{'psgi.streaming'}) {
+          die "This application needs psgi.streaming support";
+      }
+      return sub {
+          my $respond = shift;
+          my $writer = $respond->([200, ['Content-Type', 'text/plain']]);
+          wait_for_new_message(sub {
+              my $message = shift;
+              if ($message) {
+                  $writer->write($message->to_json);
+              } else {
+                  $writer->close;
+              }
+          });
+      };
+  };
+
+=head3 Which framework should I use to do streaming though?
+
+We have servers that support non-blocking (where C<psgi.nonblocking>
+is set to true), but the problem is that framework side doesn't
+necessarily support asynchronous event loop. For instance Catalyst has
+C<write> method on the response object:
+
+  while ($cond) {
+      $c->res->write($some_stuff);
+  }
+
+This should work with all servers with C<psgi.streaming> support even
+if they are blocking, and it should be fine if they're running in
+multiple processes (C<psgi.multiprocess> is true).
+
+L<Catalyst::Engine::PSGI> also supports setting an IO::Handle-like
+object that supports C<getline>, so using L<IO::Handle::Util>
+
+  my $io = io_from_getline sub {
+       return $data; # or undef when done()
+  };
+  $c->res->body($io);
+
+And that works fine to do streaming, but it's blocking (I<pull>)
+rather than asynchronous server push, so again you should be careful
+not to run this application on non-blocking (and non-multiprocess)
+server environments.
+
+We expect that more web frameworks will appear that is focused on, or
+existent frameworks will add support for, asynchronous and
+non-blocking streaming interface.
+
+=head3 Is psgi.streaming interface a requirement for the servers?
+
+It is specified as B<SHOULD>, so unless there is a strong reason not
+to implement the interface, all servers are encouraged to implement
+this interface.
+
+However, if you implement a PSGI server using an Perl XS interface for
+the ultimate performance or integration with web servers like Apache
+or nginx, or implement a sandbox like environment (like Google
+AppEngine or Heroku) or distributed platform using tools like Gearman,
+you might not want to implement this interface.
+
+That's fine, and in that case applications relying on the streaming
+interface can still use L<Plack::Middleware::BufferedStreaming> to
+fallback to the buffered write on unsupported servers.
+
+=head3 Why CGI-style environment variables instead of HTTP headers as a hash?
+
+Most existing web application frameworks already have code or a handler
+to run under the CGI environment. Using CGI-style hash keys instead of
+HTTP headers makes it trivial for the framework developers to implement
+an adapter to support PSGI. For instance, L<Catalyst::Engine::PSGI> is
+only a few dozens lines different from L<Catalyst::Engine::CGI> and was
+written in less than an hour.
+
+=head3 Why is PATH_INFO URI decoded?
+
+To be compatible with CGI spec (RFC 3875) and most web servers'
+implementations (like Apache and lighttpd).
+
+I understand it could be inconvenient that you can't distinguish
+C<foo%2fbar> from C<foo/bar> in the trailing path, but the CGI spec
+clearly says C<PATH_INFO> should be decoded by servers, and that web
+servers can deny such requests containing C<%2f> (since such requests
+would lose information in PATH_INFO). Leaving those reserved characters
+undecoded (partial decoding) would make things worse, since then you
+can't tell C<foo%2fbar> from C<foo%252fbar> and could be a security hole
+with double encoding or decoding.
+
+For web application frameworks that need more control over the actual
+raw URI (such as L<Catalyst>), we made the C<REQUEST_URI> environment
+hash key REQUIRED. The servers should set the undecoded (unparsed)
+original URI (containing the query string) to this key. Note that
+C<REQUEST_URI> is completely raw even if the encoded entities are
+URI-safe.
+
+For comparison, WSGI (PEP-333) defines both C<SCRIPT_NAME> and
+C<PATH_INFO> be decoded and Rack leaves it implementation dependent,
+while I<fixing> most of PATH_INFO left encoded in Ruby web server
+implementations.
+
+L<http://www.python.org/dev/peps/pep-0333/#url-reconstruction>
+L<http://groups.google.com/group/rack-devel/browse_thread/thread/ddf4622e69bea53f>
+
+=head1 SEE ALSO
+
+WSGI's FAQ clearly answers lots of questions about how some API design
+decisions were made, some of which can directly apply to PSGI.
+
+L<http://www.python.org/dev/peps/pep-0333/#questions-and-answers>
+
+=head1 MORE QUESTIONS?
+
+If you have a question that is not answered here, or things you totally
+disagree with, come join the IRC channel #plack on irc.perl.org or
+mailing list L<http://groups.google.com/group/psgi-plack>. Be sure you
+clarify which hat you're wearing: application developers, server
+implementors or middleware developers. And don't criticize the spec just
+to criticize it: show your exact code that doesn't work or get too messy
+because of spec restrictions etc. We'll ignore all nitpicks and bikeshed
+discussion.
+
+=head1 AUTHOR
+
+Tatsuhiko Miyagawa E<lt>miyagawa@bulknews.netE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright Tatsuhiko Miyagawa, 2009-2010.
+
+This document is licensed under the Creative Commons license by-sa.
+
+=cut

@@ -1,0 +1,25 @@
+<h1>[%l('IP Information')%]</h1>
+
+<h2>[% ip_address %]</h2>
+
+[% dummy_value = people_posting.reset %]
+<table class="forum_list">
+    <thead>
+        <th>[%l('Name')%]</td>
+        <th>[%l('Posts Made')%]</td>
+    </thead>
+    <tbody>
+        [% WHILE (post = people_posting.next) %]
+        [% toggler = (1 - (toggler||0)) %]
+
+        <tr class="row [% row_styles.$toggler %]">
+            <td width="50%">
+                <a href="[%c.uri_for('/user/profile',{'user'=>post.creator.id})%]">[% post.creator.forum_name %]</a>
+            </td>
+            <td width="40%">
+                [% post.creator.posts_from_ip(ip_address).count %]
+            </td>
+        </tr>
+        [% END %]
+    </tbody>
+</table>

@@ -1,0 +1,11 @@
+=head1 headline
+
+    # Do nothing
+    sub func {
+        my ($self, $args) = @_;
+        return;
+    }
+
+    MyApp->func();
+
+    __END__

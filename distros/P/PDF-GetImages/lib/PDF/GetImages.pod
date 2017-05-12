@@ -1,0 +1,113 @@
+=pod
+
+=head1 NAME
+
+PDF::GetImages - get images from pdf document
+
+=head1 SYNOPSIS
+
+	use PDF::GetImages 'pdfimages';
+   
+   my $images = pdfimages('/abs/path/tofile.pdf');
+
+=head1 DESCRIPTION
+
+Get images out of a pdf document. 
+This code makes use of pdfimages which is part of xpdf. 
+In case CAM::PDF scripts don't work for you, you may want to try using
+this to extract images from PDF documents.
+See L<DEPENDENCIES AND REQUIREMENTS>
+
+=head1 pdfimages()
+
+Argument is abs path to pdf file on disk.
+Optional argument, is path to a dir to which to send images extracted.
+Returns array ref with abs paths to images extracted.
+
+By default, images are extracted to same dir pdf file is in.
+
+If this is not a file on disk, or is not a pdf, warns and returns undef.
+
+If no images are extracted, returns empty array ref.
+
+   my $path = '/home/myself/file.pdf';
+
+   my $abs_images = pdfimages($path) 
+      or die($PDF::GetImages::errstr);
+   
+   scalar @$abs_images 
+      or die("no images in $path");
+   
+   for (@$abs_images){
+      print "$_\n";
+   }
+
+=head1 DEBUG
+
+To turn on debug messages:
+
+   $PDF::GetImages::DEBUG = 1;
+
+=head1 FORCE_JPG
+
+By default pdfimages will spit out pbm or ppm image format files which are huge and unruly.
+If you want to make sure the images output are jpg..
+
+   $PDF::GetImages::FORCE_JPG= 1 ;
+
+You must have imagemagick convert installed for this to work.
+
+=head1 DEPENDENCIES AND REQUIREMENTS
+
+This module requires Unix family operating system to be installed. 
+You must have 'xpdf' package and 'ImageMagick' convert installed.
+The package checks for paths to these binaries at compile time, not execution time.
+
+Presently we are using cli 'pdfgetimages'.
+You must have xpdf installed on your system.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 COPYRIGHT
+
+Copyright (c) 2011 Leo Charre. All rights reserved.
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=head1 SEE ALSO
+
+http://www.imagemagick.org/, 
+xpdf, 
+L<CAM::PDF>
+
+=cut
+
+
+
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension Pod::Simple::LaTeX.
+
+0.01  Thu Oct  2 20:29:34 2003
+	- original version; created by h2xs 1.23 with options
+		-AXn Pod::Simple::LaTeX
+

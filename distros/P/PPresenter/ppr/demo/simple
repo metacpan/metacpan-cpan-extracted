@@ -1,0 +1,26 @@
+#!/usr/local/bin/perl -w
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+use lib '../..';
+use PPresenter;
+use strict;
+
+my $show = new PPresenter
+( -name     => 'A very simple show'
+);
+
+$show->addSlide
+( -name     => 'first slide'
+, -template => 'main'
+, -main     => <<MAIN
+<CENTER>
+<BIG COLOR=red>My Show</BIG>
+</CENTER>
+
+Hi, welcome to PPresenter.  This package
+helps you creating presentations using
+Perl and Tk.
+MAIN
+);
+
+$show->run;

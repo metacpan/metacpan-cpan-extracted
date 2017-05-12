@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               Project-Easy
+version:            0.30
+abstract:           ~
+author:
+    - Ivan Baktsheev <dot.and.thing@gmail.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Easy:     0.16
+    DBI::Easy:       0.22
+    IO::Easy:        0.16
+    JSON:            2.51
+    Sys::SigAction:  0.11
+resources:
+    bugtracker:  http://rt.cpan.org/NoAuth/Bugs.html?Dist=Project-Easy
+    homepage:    http://perlhug.com
+    license:     http://dev.perl.org/licenses/
+    repository:  git://web-app.git.sourceforge.net/gitroot/perl-easy/perl-easy
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

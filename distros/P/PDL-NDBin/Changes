@@ -1,0 +1,181 @@
+Revision history for PDL::NDBin
+
+0.018     2015-09-15 15:50:41+02:00 Europe/Brussels
+
+ - the PDL function propogate_badflag() has been renamed to propagate_badflag()
+   somewhere between 2.007 and 2.008, and PDL::NDBin has been adapted to work
+   with both pre-2.008 and post-2.008 PDLs. Reported by Slaven Rezić, practical
+   fix by Bryan Jurish (thank you!)
+
+0.017     2015-04-01 13:43:19CEST+0200 Europe/Brussels
+
+ - add support for variable-width bins (Diab Jerius)
+
+0.016     2014-11-17 11:13:39CET+0100 Europe/Brussels
+
+ - worked around a warning message emitted by the latest Perl development
+   releases (RT #100228). Reported by Slaven Rezić (thank you!). (Edward
+   Baudrez)
+
+0.015     2013-12-11 11:56:13 Europe/Brussels
+
+ - added PDL::Core::Dev to configure_requires (RT #91304) (Edward Baudrez)
+
+0.014     2013-12-10 14:24:54 Europe/Brussels
+
+ - tests started failing with recent development versions of PDL (2.007_01 or
+   2.007_02, not sure). Fixed now. (Edward Baudrez)
+
+0.013     2013-12-06 09:01:39 Europe/Brussels
+
+ - added 64-bit support. PDL::NDBin will take advantage of 64-bit support with
+   recent versions of PDL (2.007 or later), but should work with earlier
+   versions, as well. Note that 64-bit support has not been tested very well
+   yet, so it qualifies as 64-bit "safe" until I find time for more testing.
+   But PDL::NDBin should now at least install on PDL 2.007 or later. (Edward
+   Baudrez)
+
+0.012     2013-07-02 11:13:46 Europe/Brussels
+
+ - fixed the tests to work with the latest development release of PDL
+   (2.006_03) (Edward Baudrez)
+
+0.011     2013-03-15 09:55:16 Europe/Brussels
+
+ - try to avoid test failures with old versions of Module::Pluggable (Edward
+   Baudrez)
+ - changed the syntax to specify the type of the output piddle in the action
+   class constructors. Previously, this was achieved by passing a coderef:
+      PDL::NDBin::Action::Avg->new( ..., type => \&PDL::double );
+   This has now changed to
+      type => double         # or 'type => PDL::double'
+   The new syntax is simpler and arguably clearer. (Edward Baudrez)
+ - implemented the action classes PDL::NDBin::Action::Min and
+   PDL::NDBin::Action::Max (Edward Baudrez)
+ - various minor fixes (Edward Baudrez)
+
+0.010     2013-03-07 11:09:22 Europe/Brussels
+
+ - release on master branch instead of development branch; no changes
+
+0.009     2013-03-07 11:01:19 Europe/Brussels
+
+ - it is now possible to pass additional arguments to action class constructors
+   when specifying actions; the only additional argument so far is the type of
+   the output piddle, allowing you to write, e.g.,
+      my $binner = PDL::NDBin->new(
+         axes => ...,
+         vars => [ [ var => { class => 'StdDev', type => \&PDL::float } ] ],
+      );
+   to get the standard deviation in type 'float' instead of the default type
+   'double' (Edward Baudrez)
+ - try to make the tests run under Perl 5.8 (Edward Baudrez)
+ - other minor fixes (Edward Baudrez)
+
+0.008     2013-02-12 17:29:45 Europe/Brussels
+
+ - implemented the advance() method of PDL::NDBin::Iterator in XS. This
+   improves the performance of PDL::NDBin for very large bin numbers greatly,
+   and also reduces the overhead (for very small datafiles) somewhat. The user
+   manual has been updated with the latest results. (Edward Baudrez)
+ - fixed a test that started failing with the latest PDL development releases
+   (Edward Baudrez)
+
+0.007     2013-02-05 23:42:23 Europe/Brussels
+
+ - simplified and optimized PDL::NDBin::Iterator somewhat, in an attempt to
+   address the poor performance with large numbers of bins (Edward Baudrez)
+ - added more tests in an attempt to catch a strange test failure that I cannot
+   reproduce (Edward Baudrez)
+
+0.006     2013-02-03 22:06:31 Europe/Brussels
+
+ - first public release
+
+0.005     2013-02-03 21:12:45 Europe/Brussels
+
+ - never released on CPAN
+ - started using Dist::Zilla for distribution management (Edward Baudrez)
+ - added documentation for PDL::NDBin::Iterator and other classes (Edward
+   Baudrez)
+
+0.004 2013-02-02
+
+ - never released on CPAN
+
+ [API change: preferred interface]
+ - the object-oriented interface is now the preferred interface (Edward Baudrez)
+ - require the axis specifications in new() to be given as key => value pairs
+   (Edward Baudrez)
+ - make_labels() has been removed; you should use the method labels() now; call
+   as follows:
+      my $binner = PDL::NDBin->new( axes => [ [ 'x', ... ] ] );
+      $binner->feed( x => $x );
+      my @labels = $binner->labels;
+   The required data can also be fed directly to labels() if desired:
+      my @labels = $binner->labels( x => $x );
+   (Edward Baudrez)
+ - process_axes() has been removed; you should use autoscale() now (see below)
+   (Edward Baudrez)
+ - support for DEFAULT_ACTION has been dropped; it is now required to specify
+   an action for every variable (Edward Baudrez)
+ - variables no longer assume a default action when none is supplied; it is now
+   required to state the action explicitly for every variable. To continue to
+   use the default action of producing a histogram, use the following:
+      ndbin( ..., vars => [ $x, 'Count' ] );
+   (Edward Baudrez)
+
+ [New features]
+ - in addition to 'step', 'min', and 'n', new() now also accepts 'max' and
+   'round' in axis specifications (Edward Baudrez)
+ - added a method feed() to feed data piecewise (or all at once) before calling
+   process(); this can be very useful when data is being read from a file. It
+   essentially separates the data feeding from the processing step (both were
+   done at the same time before, in the call to process()). This also means you
+   can now call process() without arguments, provided that you have already fed
+   all required data before. (Edward Baudrez)
+ - added a method autoscale() to have missing axis specifications derived
+   automatically from the data. As a side effect, it is now allowed to call the
+   constructor with too few or even without any axis specifications:
+      my $binner = PDL::NDBin->new( axes => [ [ x => ( n => 10 ) ],
+                                              [ 'y' ] ] );
+      $binner->process( x => $x, y => $y );
+   This used to raise an error in previous versions. (Edward Baudrez)
+
+ [Other improvements]
+ - also greatly expanded the manual, test suite, and benchmark (Edward Baudrez)
+ - fixed a few bugs (Edward Baudrez)
+
+0.003 2012-08-10
+
+ - never released on CPAN
+ - PDL::NDBin now supports concatenation of calls: very useful to process
+   multiple input files. You need use the object-oriented interface to do this.
+   (Edward Baudrez)
+ - API change for action coderefs: the first (and only) argument is now an
+   iterator instead of a piddle containing the selected data. This means that
+   where coderefs looked like this in the previous version:
+      sub { my $pdl = shift; return $pdl->avg }
+   you now have to write:
+      sub { my $iter = shift; return $iter->selection->avg }
+   (Edward Baudrez)
+ - exceptions in actions are no longer caught. This change requires the user to
+   protect from potentially dangerous code with an 'eval' block. (Edward
+   Baudrez)
+ - in addition to coderefs, now also accepts action class names (Edward
+   Baudrez)
+ - continued the object-oriented refactoring (Edward Baudrez)
+ - greatly expanded the test suite (Edward Baudrez)
+
+0.002 2012-07-11
+
+ - never released on CPAN
+ - now using Log::Any for logging (Edward Baudrez)
+ - started refactoring by moving to object-oriented core implementation, with
+   wrapper functions. This change is not yet visible at the user level, but
+   will become so in the next version. (Edward Baudrez)
+
+0.001 2012-06-28
+
+ - never released on CPAN
+ - imported the code in a Git repository (Edward Baudrez)

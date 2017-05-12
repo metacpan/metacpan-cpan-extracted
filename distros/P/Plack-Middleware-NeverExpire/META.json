@@ -1,0 +1,59 @@
+{
+   "abstract" : "set expiration headers far in the future",
+   "author" : [
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-NeverExpire",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack" : "0.9942",
+            "Plack::Middleware" : "0",
+            "Plack::Util" : "0",
+            "Time::Piece" : "0",
+            "Time::Seconds" : "0",
+            "parent" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/ap/Plack-Middleware-NeverExpire/issues"
+      },
+      "homepage" : "http://github.com/ap/Plack-Middleware-NeverExpire",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ap/Plack-Middleware-NeverExpire"
+      }
+   },
+   "version" : "1.006"
+}
+

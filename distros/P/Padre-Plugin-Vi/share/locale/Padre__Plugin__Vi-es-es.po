@@ -1,0 +1,19 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: padre-plugin-vi\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-04-30 07:18+0200\n"
+"PO-Revision-Date: 2009-04-30 02:21-0300\n"
+"Last-Translator: Bruno Vecchi <vecchi.b@gmail.com>\n"
+"Language-Team: Bruno Vecchi <vecchi.b@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/Vi.pm:297
+msgid "About"
+msgstr "Acerca de"
+
+#: lib/Padre/Plugin/Vi.pm:307
+msgid "Copyright 2008 Gabor Szabo"
+msgstr "Copyright 2008 Gabor Szabo"

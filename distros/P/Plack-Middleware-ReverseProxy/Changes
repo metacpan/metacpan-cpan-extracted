@@ -1,0 +1,50 @@
+Revision history for Perl extension Plack::Middleware::ReverseProxy
+
+0.15    Mon Jan  7 15:59:54 PST 2013
+        - Cut down dependencies for tests (kazeburo)
+
+0.14    Sat May 26 20:19:23 PDT 2012
+        - Fixed Plack dependency
+
+0.13    Mon May 14 02:30:13 EEST 2012
+        - Reverted the fix in 0.12, instead fixing the test to not check port number
+
+0.12    Sun May 13 09:30:58 EEST 2012
+        - Fixed the default HTTP port detection in case if it was https and use :80 (doy)
+
+0.11    Thu Oct 13 11:30:00 2011
+        - test_requires 'Test::Base' instead of use_test_base (by tokuhirom)
+
+0.10    Fri Aug 26 00:30:00 2011
+        - fix dependency error (RT:70437 by bobtfish)
+
+0.09    Tue May 03 20:02:00 2011
+        - fix for x-forwarded-proto: http (by fujiwara)
+
+0.08    Tue Nov 23 18:20:00 2010
+        - Compatibility with Apache 1.x frontend
+
+0.07    Sat Aug 28 09:40:00 2010
+        - Fix dependencies
+
+0.06    Wed Feb 17 12:52:30 2010
+        - Fix pod (yusukebe)
+
+0.05    Fri Jan 29 17:35:00 2010
+        - use psgi.url_scheme, to be forward compatible with Plack 1.0 change,
+        and be explicit about the env key anyway.
+        (t/reverseproxy.t by miyagawa)
+
+0.04    Wed Jan 13 16:53:20 2010
+
+        - Tell the environment the request is secure if it was forwarded for a 
+        secure port.(rafl)
+
+0.03    Tue Dec 22 17:05:00 2009
+        - fix build_requires
+
+0.02    Tue Dec 22 15:30:00 2009
+        - use the last item of x-forwarded-host as host
+
+0.01    Tue Dec 22 14:40:00 2009
+        - original version

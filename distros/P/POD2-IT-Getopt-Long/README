@@ -1,0 +1,36 @@
+POD2-IT-Getopt-Long version 1.02
+================================
+
+POD2::IT::Getopt::Long - Italian translation of Getopt::Long
+Perl module.
+
+See http://pod2it.sourceforge.net for more details about the 
+Italian Perldoc Translation Project.
+
+CHANGES FROM PREVIOUS VERSION
+
+	+ Fixed typos
+	
+See 'Changes' file in this distribution for complete history revision.
+
+INSTALLATION
+
+To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+This module doesn't require other modules and libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Enrico Sorcinelli. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+

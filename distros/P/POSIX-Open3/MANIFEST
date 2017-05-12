@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/POSIX/Open3.pm
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/POSIX-Open3.t
+META.yml                                 Module meta-data (added by MakeMaker)

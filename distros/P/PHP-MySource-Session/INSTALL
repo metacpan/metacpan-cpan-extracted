@@ -1,0 +1,9 @@
+Pretty simple install ...
+
+	tar -xzvf PHP-MySource-Session-0.0.1.tar-gz
+	cd PHP-MySource-Session-0.0.1
+
+	perl Makefile.PL
+	make
+	make test
+	make install

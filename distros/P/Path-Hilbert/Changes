@@ -1,0 +1,4 @@
+2014-04-25 v1.0 initial version
+2014-05-03 v1.1 now with a BigInt variant for the clinically insane
+2014-05-18 v1.2 now without the "must be a power of 2" side limit, if you don't mind noninteger return values
+2016-01-02 v1.205 now links to Path::Hilbert::XS

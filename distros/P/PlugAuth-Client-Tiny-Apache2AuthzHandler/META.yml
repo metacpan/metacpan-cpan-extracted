@@ -1,0 +1,29 @@
+---
+abstract: 'Apache authorization handler for PlugAuth'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+  perl: '5.012'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.012'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PlugAuth-Client-Tiny-Apache2AuthzHandler
+requires:
+  Apache2::Access: '0'
+  Apache2::Const: '0'
+  Apache2::RequestRec: '0'
+  Apache2::RequestUtil: '0'
+  PlugAuth::Client::Tiny: '0'
+  perl: '5.012'
+resources:
+  bugtracker: https://github.com/plicease/PlugAuth-Client-Tiny-Apache2AuthzHandler/issues
+  homepage: http://perl.wdlabs.com/PlugAuth-Client-Tiny-Apache2AuthzHandler
+  repository: git://github.com/plicease/PlugAuth-Client-Tiny-Apache2AuthzHandler.git
+version: '0.02'

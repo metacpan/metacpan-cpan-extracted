@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use FindBin '$Bin';
+
+use Benchmark::Command;
+use File::Temp qw(tempfile);
+use Perinci::CmdLine::Inline qw(gen_inline_pericmd_script); # just to fail the script if the module is not available
+use Perinci::Examples::Tiny; # just to fail the script if the module is not available
+
+my (undef, $inline_script_path) = tempfile();
+my $res = gen_inline_pericmd_script(output_file => $inline_script_path, url=>"/Perinci/Examples/Tiny/odd_even", overwrite=>1);
+die "Can't generate Perinci::CmdLine::Inline CLI script: $res->[0] - $res->[1]" unless $res->[0] == 200;
+say "DEBUG: Inline script is at $inline_script_path" if $ENV{DEBUG};
+
+my ($fh, $lite_script_path) = tempfile();
+my $lite_code = 'use Perinci::CmdLine::Lite; Perinci::CmdLine::Lite->new(url=>"/Perinci/Examples/Tiny/odd_even")->run;';
+print $fh $lite_code;
+close $fh or die "Can't write Perinci::CmdLine::Lite script: $!";
+say "DEBUG: Lite script is at $lite_script_path" if $ENV{DEBUG};
+
+Benchmark::Command::run(
+    undef,
+    {
+        'perl'                   => [$^X, "-I$Bin/../lib", "-e1"],
+
+        '-c (inline)'            => [$^X, "-I$Bin/../lib", "-c", $inline_script_path],
+        'run --version (inline)' => [$^X, "-I$Bin/../lib", $inline_script_path, "--version"],
+        'run 1 (inline)'         => [$^X, "-I$Bin/../lib", $inline_script_path, 1],
+
+        '-c (lite)'              => [$^X, "-I$Bin/../lib", "-c", $lite_script_path],
+        'run --version (lite)'   => [$^X, "-I$Bin/../lib", $lite_script_path, '--version'],
+        'run 1 (lite)'           => [$^X, "-I$Bin/../lib", $lite_script_path, '--', '1'],
+    },
+    {
+        quiet => 1,
+    },
+);

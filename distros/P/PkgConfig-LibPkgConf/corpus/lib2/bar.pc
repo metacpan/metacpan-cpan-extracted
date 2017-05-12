@@ -1,0 +1,11 @@
+prefix=/test2
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: bar
+Description: A testing pkg-config file
+Version: 1.2.3
+Libs: -L${libdir} -lbar
+Cflags: -I${includedir}/bar
+Cflags.private: -DBAR_STATIC

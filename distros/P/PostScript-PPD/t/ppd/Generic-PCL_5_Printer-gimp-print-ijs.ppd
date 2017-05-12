@@ -1,0 +1,1078 @@
+*PPD-Adobe: "4.3"
+*%
+*% For information on using this, and to obtain the required backend
+*% script, consult http://www.linuxprinting.org/
+*%
+*% This file is published under the GNU General Public License
+*%
+*% PPD-O-MATIC (3.0.0 or newer) generated this PPD file. It is for use with 
+*% all programs and environments which use PPD files for dealing with
+*% printer capability information. The printer must be configured with the
+*% "foomatic-rip" backend filter script of Foomatic 3.0.0 or newer. This 
+*% file and "foomatic-rip" work together to support PPD-controlled printer
+*% driver option access with arbitrary free software printer drivers and
+*% printing spoolers.
+*%
+*% To save this file on your disk, wait until the download has completed
+*% (the animation of the browser logo must stop) and then use the
+*% "Save as..." command in the "File" menu of your browser or in the 
+*% pop-up manu when you click on this document with the right mouse button.
+*% DO NOT cut and paste this file into an editor with your mouse. This can
+*% introduce additional line breaks which lead to unexpected results.
+*%
+*% You may save this file as 'Generic-PCL_5_Printer-gimp-print-ijs.ppd'
+*%
+*%
+*FormatVersion:	"4.3"
+*FileVersion:	"1.1"
+*LanguageVersion: English 
+*LanguageEncoding: ISOLatin1
+*PCFileName:	"GIMP-PRI.PPD"
+*Manufacturer:	"Generic"
+*Product:	"(PCL 5 Printer)"
+*cupsVersion:	1.0
+*cupsManualCopies: True
+*cupsModelNumber:  2
+*cupsFilter:	"application/vnd.cups-postscript 0 foomatic-rip"
+*%pprRIP:        foomatic-rip other
+*ModelName:     "Generic PCL 5 Printer"
+*ShortNickName: "Generic PCL 5 P. gimp-print-ijs"
+*NickName:      "Generic PCL 5 Printer Foomatic/gimp-print-ijs (recommended)"
+*PSVersion:	"(3010.000) 550"
+*PSVersion:	"(3010.000) 651"
+*PSVersion:	"(3010.000) 652"
+*PSVersion:	"(3010.000) 653"
+*PSVersion:	"(3010.000) 704"
+*PSVersion:	"(3010.000) 705"
+*PSVersion:	"(3010.000) 800"
+*LanguageLevel:	"3"
+*ColorDevice:	False
+*DefaultColorSpace: Gray
+*FileSystem:	False
+*Throughput:	"1"
+*LandscapeOrientation: Plus90
+*TTRasterizer:	Type42
+
+
+
+
+*VariablePaperSize: False
+
+*FoomaticIDs: Generic-PCL_5_Printer gimp-print-ijs
+*FoomaticRIPCommandLine: "gs -q -dPARANOIDSAFER -dNOPAUSE -dBATCH -sDE&&
+VICE=ijs -sIjsServer=ijsgimpprint -dIjsUseOutputFD%A -sIjsParams=&quot&&
+;%B&quot;%Z -sOutputFile=- -"
+*End
+
+*FoomaticRIPOption Model: enum CmdLine A 100
+*FoomaticRIPOptionSetting Model=pcl-3: " -sDeviceManufacturer=HEWLETT-&&
+PACKARD -sDeviceModel=pcl-3"
+*End
+
+*OpenGroup: General/General
+
+*OpenUI *PrintoutMode/Printout Mode: PickOne
+*FoomaticRIPOption PrintoutMode: enum Composite A
+*OrderDependency: 10 AnySetup *PrintoutMode
+*DefaultPrintoutMode: Normal
+*PrintoutMode Draft/Draft (Economy): "%% FoomaticRIPOptionSetting: PrintoutMode=Draft"
+*FoomaticRIPOptionSetting PrintoutMode=Draft: "GSResolution=150x150DPI&&
+ Quality=150dpi Dither=VeryFast ImageType=LineArt OutputType=Grayscale&&
+"
+*End
+*PrintoutMode Normal/Normal: "%% FoomaticRIPOptionSetting: PrintoutMode=Normal"
+*FoomaticRIPOptionSetting PrintoutMode=Normal: "GSResolution=300x300DP&&
+I Quality=300dpi Dither=VeryFast ImageType=Photographs OutputType=Gray&&
+scale"
+*End
+*CloseUI: *PrintoutMode
+
+*OpenUI *PageSize/Page Size: PickOne
+*FoomaticRIPOption PageSize: enum CmdLine A
+*OrderDependency: 110 AnySetup *PageSize
+*DefaultPageSize: Letter
+*PageSize Letter/Letter: "%% FoomaticRIPOptionSetting: PageSize=Letter"
+*FoomaticRIPOptionSetting PageSize=Letter: " -dDEVICEWIDTHPOINTS=612 -&&
+dDEVICEHEIGHTPOINTS=792"
+*End
+*PageSize A4/A4: "%% FoomaticRIPOptionSetting: PageSize=A4"
+*FoomaticRIPOptionSetting PageSize=A4: " -dDEVICEWIDTHPOINTS=595 -dDEV&&
+ICEHEIGHTPOINTS=842"
+*End
+*PageSize C5/C5: "%% FoomaticRIPOptionSetting: PageSize=C5"
+*FoomaticRIPOptionSetting PageSize=C5: " -dDEVICEWIDTHPOINTS=459 -dDEV&&
+ICEHEIGHTPOINTS=649"
+*End
+*PageSize C6/C6: "%% FoomaticRIPOptionSetting: PageSize=C6"
+*FoomaticRIPOptionSetting PageSize=C6: " -dDEVICEWIDTHPOINTS=323 -dDEV&&
+ICEHEIGHTPOINTS=459"
+*End
+*PageSize COM10/Commercial 10: "%% FoomaticRIPOptionSetting: PageSize=COM10"
+*FoomaticRIPOptionSetting PageSize=COM10: " -dDEVICEWIDTHPOINTS=297 -d&&
+DEVICEHEIGHTPOINTS=684"
+*End
+*PageSize DL/DL: "%% FoomaticRIPOptionSetting: PageSize=DL"
+*FoomaticRIPOptionSetting PageSize=DL: " -dDEVICEWIDTHPOINTS=311 -dDEV&&
+ICEHEIGHTPOINTS=623"
+*End
+*PageSize Executive/Executive: "%% FoomaticRIPOptionSetting: PageSize=Executive"
+*FoomaticRIPOptionSetting PageSize=Executive: " -dDEVICEWIDTHPOINTS=52&&
+2 -dDEVICEHEIGHTPOINTS=756"
+*End
+*PageSize Legal/Legal: "%% FoomaticRIPOptionSetting: PageSize=Legal"
+*FoomaticRIPOptionSetting PageSize=Legal: " -dDEVICEWIDTHPOINTS=612 -d&&
+DEVICEHEIGHTPOINTS=1008"
+*End
+*PageSize Monarch/Monarch Envelope: "%% FoomaticRIPOptionSetting: PageSize=Monarch"
+*FoomaticRIPOptionSetting PageSize=Monarch: " -dDEVICEWIDTHPOINTS=279 &&
+-dDEVICEHEIGHTPOINTS=540"
+*End
+*PageSize Statement/Manual: "%% FoomaticRIPOptionSetting: PageSize=Statement"
+*FoomaticRIPOptionSetting PageSize=Statement: " -dDEVICEWIDTHPOINTS=39&&
+6 -dDEVICEHEIGHTPOINTS=612"
+*End
+*CloseUI: *PageSize
+
+*OpenUI *PageRegion: PickOne
+*OrderDependency: 110 AnySetup *PageRegion
+*DefaultPageRegion: Letter
+*PageRegion Letter/Letter: "%% FoomaticRIPOptionSetting: PageSize=Letter"
+*PageRegion A4/A4: "%% FoomaticRIPOptionSetting: PageSize=A4"
+*PageRegion C5/C5: "%% FoomaticRIPOptionSetting: PageSize=C5"
+*PageRegion C6/C6: "%% FoomaticRIPOptionSetting: PageSize=C6"
+*PageRegion COM10/Commercial 10: "%% FoomaticRIPOptionSetting: PageSize=COM10"
+*PageRegion DL/DL: "%% FoomaticRIPOptionSetting: PageSize=DL"
+*PageRegion Executive/Executive: "%% FoomaticRIPOptionSetting: PageSize=Executive"
+*PageRegion Legal/Legal: "%% FoomaticRIPOptionSetting: PageSize=Legal"
+*PageRegion Monarch/Monarch Envelope: "%% FoomaticRIPOptionSetting: PageSize=Monarch"
+*PageRegion Statement/Manual: "%% FoomaticRIPOptionSetting: PageSize=Statement"
+*CloseUI: *PageRegion
+
+*DefaultImageableArea: Letter
+*ImageableArea Letter/Letter: "18 12 594 780"
+*ImageableArea A4/A4: "10 12 585 830"
+*ImageableArea C5/C5: "18 12 441 637"
+*ImageableArea C6/C6: "18 12 305 447"
+*ImageableArea COM10/Commercial 10: "18 12 279 672"
+*ImageableArea DL/DL: "18 12 293 611"
+*ImageableArea Executive/Executive: "18 12 504 744"
+*ImageableArea Legal/Legal: "18 12 594 996"
+*ImageableArea Monarch/Monarch Envelope: "18 12 261 528"
+*ImageableArea Statement/Manual: "18 12 378 600"
+
+*DefaultPaperDimension: Letter
+*PaperDimension Letter/Letter: "612 792"
+*PaperDimension A4/A4: "595 842"
+*PaperDimension C5/C5: "459 649"
+*PaperDimension C6/C6: "323 459"
+*PaperDimension COM10/Commercial 10: "297 684"
+*PaperDimension DL/DL: "311 623"
+*PaperDimension Executive/Executive: "522 756"
+*PaperDimension Legal/Legal: "612 1008"
+*PaperDimension Monarch/Monarch Envelope: "279 540"
+*PaperDimension Statement/Manual: "396 612"
+
+*OpenUI *InputSlot/Input Slot: PickOne
+*FoomaticRIPOption InputSlot: enum CmdLine B
+*OrderDependency: 130 AnySetup *InputSlot
+*DefaultInputSlot: Standard
+*InputSlot Upper/Tray 2: "%% FoomaticRIPOptionSetting: InputSlot=Upper"
+*FoomaticRIPOptionSetting InputSlot=Upper: "MediaSource=Upper,"
+*InputSlot Lower/Tray 3: "%% FoomaticRIPOptionSetting: InputSlot=Lower"
+*FoomaticRIPOptionSetting InputSlot=Lower: "MediaSource=Lower,"
+*InputSlot MultiPurpose/Tray 1: "%% FoomaticRIPOptionSetting: InputSlot=MultiPurpose"
+*FoomaticRIPOptionSetting InputSlot=MultiPurpose: "MediaSource=MultiPu&&
+rpose,"
+*End
+*InputSlot LargeCapacity/Tray 4: "%% FoomaticRIPOptionSetting: InputSlot=LargeCapacity"
+*FoomaticRIPOptionSetting InputSlot=LargeCapacity: "MediaSource=LargeC&&
+apacity,"
+*End
+*InputSlot Manual/Manual: "%% FoomaticRIPOptionSetting: InputSlot=Manual"
+*FoomaticRIPOptionSetting InputSlot=Manual: "MediaSource=Manual,"
+*InputSlot Standard/Standard: "%% FoomaticRIPOptionSetting: InputSlot=Standard"
+*FoomaticRIPOptionSetting InputSlot=Standard: "MediaSource=Standard,"
+*CloseUI: *InputSlot
+
+*CloseGroup: General
+
+*OpenGroup: Adjustment/Adjustment
+
+*OpenUI *stpGamma/stpGamma: PickOne
+*FoomaticRIPOption stpGamma: float CmdLine B
+*FoomaticRIPOptionPrototype stpGamma: "Gamma=%s,"
+*FoomaticRIPOptionRange stpGamma: 0.1 4
+*OrderDependency: 180 AnySetup *stpGamma
+*DefaultstpGamma: 1.00
+*FoomaticRIPDefaultstpGamma: 1.00
+*stpGamma 0.10/0.10: "%% FoomaticRIPOptionSetting: stpGamma=0.10"
+*stpGamma 0.15/0.15: "%% FoomaticRIPOptionSetting: stpGamma=0.15"
+*stpGamma 0.20/0.20: "%% FoomaticRIPOptionSetting: stpGamma=0.20"
+*stpGamma 0.25/0.25: "%% FoomaticRIPOptionSetting: stpGamma=0.25"
+*stpGamma 0.30/0.30: "%% FoomaticRIPOptionSetting: stpGamma=0.30"
+*stpGamma 0.35/0.35: "%% FoomaticRIPOptionSetting: stpGamma=0.35"
+*stpGamma 0.40/0.40: "%% FoomaticRIPOptionSetting: stpGamma=0.40"
+*stpGamma 0.45/0.45: "%% FoomaticRIPOptionSetting: stpGamma=0.45"
+*stpGamma 0.50/0.50: "%% FoomaticRIPOptionSetting: stpGamma=0.50"
+*stpGamma 0.55/0.55: "%% FoomaticRIPOptionSetting: stpGamma=0.55"
+*stpGamma 0.60/0.60: "%% FoomaticRIPOptionSetting: stpGamma=0.60"
+*stpGamma 0.65/0.65: "%% FoomaticRIPOptionSetting: stpGamma=0.65"
+*stpGamma 0.70/0.70: "%% FoomaticRIPOptionSetting: stpGamma=0.70"
+*stpGamma 0.75/0.75: "%% FoomaticRIPOptionSetting: stpGamma=0.75"
+*stpGamma 0.80/0.80: "%% FoomaticRIPOptionSetting: stpGamma=0.80"
+*stpGamma 0.85/0.85: "%% FoomaticRIPOptionSetting: stpGamma=0.85"
+*stpGamma 0.90/0.90: "%% FoomaticRIPOptionSetting: stpGamma=0.90"
+*stpGamma 0.95/0.95: "%% FoomaticRIPOptionSetting: stpGamma=0.95"
+*stpGamma 1.00/1.00: "%% FoomaticRIPOptionSetting: stpGamma=1.00"
+*stpGamma 1.05/1.05: "%% FoomaticRIPOptionSetting: stpGamma=1.05"
+*stpGamma 1.10/1.10: "%% FoomaticRIPOptionSetting: stpGamma=1.10"
+*stpGamma 1.15/1.15: "%% FoomaticRIPOptionSetting: stpGamma=1.15"
+*stpGamma 1.20/1.20: "%% FoomaticRIPOptionSetting: stpGamma=1.20"
+*stpGamma 1.25/1.25: "%% FoomaticRIPOptionSetting: stpGamma=1.25"
+*stpGamma 1.30/1.30: "%% FoomaticRIPOptionSetting: stpGamma=1.30"
+*stpGamma 1.35/1.35: "%% FoomaticRIPOptionSetting: stpGamma=1.35"
+*stpGamma 1.40/1.40: "%% FoomaticRIPOptionSetting: stpGamma=1.40"
+*stpGamma 1.45/1.45: "%% FoomaticRIPOptionSetting: stpGamma=1.45"
+*stpGamma 1.50/1.50: "%% FoomaticRIPOptionSetting: stpGamma=1.50"
+*stpGamma 1.55/1.55: "%% FoomaticRIPOptionSetting: stpGamma=1.55"
+*stpGamma 1.60/1.60: "%% FoomaticRIPOptionSetting: stpGamma=1.60"
+*stpGamma 1.65/1.65: "%% FoomaticRIPOptionSetting: stpGamma=1.65"
+*stpGamma 1.70/1.70: "%% FoomaticRIPOptionSetting: stpGamma=1.70"
+*stpGamma 1.75/1.75: "%% FoomaticRIPOptionSetting: stpGamma=1.75"
+*stpGamma 1.80/1.80: "%% FoomaticRIPOptionSetting: stpGamma=1.80"
+*stpGamma 1.85/1.85: "%% FoomaticRIPOptionSetting: stpGamma=1.85"
+*stpGamma 1.90/1.90: "%% FoomaticRIPOptionSetting: stpGamma=1.90"
+*stpGamma 1.95/1.95: "%% FoomaticRIPOptionSetting: stpGamma=1.95"
+*stpGamma 2.00/2.00: "%% FoomaticRIPOptionSetting: stpGamma=2.00"
+*stpGamma 2.05/2.05: "%% FoomaticRIPOptionSetting: stpGamma=2.05"
+*stpGamma 2.10/2.10: "%% FoomaticRIPOptionSetting: stpGamma=2.10"
+*stpGamma 2.15/2.15: "%% FoomaticRIPOptionSetting: stpGamma=2.15"
+*stpGamma 2.20/2.20: "%% FoomaticRIPOptionSetting: stpGamma=2.20"
+*stpGamma 2.25/2.25: "%% FoomaticRIPOptionSetting: stpGamma=2.25"
+*stpGamma 2.30/2.30: "%% FoomaticRIPOptionSetting: stpGamma=2.30"
+*stpGamma 2.35/2.35: "%% FoomaticRIPOptionSetting: stpGamma=2.35"
+*stpGamma 2.40/2.40: "%% FoomaticRIPOptionSetting: stpGamma=2.40"
+*stpGamma 2.45/2.45: "%% FoomaticRIPOptionSetting: stpGamma=2.45"
+*stpGamma 2.50/2.50: "%% FoomaticRIPOptionSetting: stpGamma=2.50"
+*stpGamma 2.55/2.55: "%% FoomaticRIPOptionSetting: stpGamma=2.55"
+*stpGamma 2.60/2.60: "%% FoomaticRIPOptionSetting: stpGamma=2.60"
+*stpGamma 2.65/2.65: "%% FoomaticRIPOptionSetting: stpGamma=2.65"
+*stpGamma 2.70/2.70: "%% FoomaticRIPOptionSetting: stpGamma=2.70"
+*stpGamma 2.75/2.75: "%% FoomaticRIPOptionSetting: stpGamma=2.75"
+*stpGamma 2.80/2.80: "%% FoomaticRIPOptionSetting: stpGamma=2.80"
+*stpGamma 2.85/2.85: "%% FoomaticRIPOptionSetting: stpGamma=2.85"
+*stpGamma 2.90/2.90: "%% FoomaticRIPOptionSetting: stpGamma=2.90"
+*stpGamma 2.95/2.95: "%% FoomaticRIPOptionSetting: stpGamma=2.95"
+*stpGamma 3.00/3.00: "%% FoomaticRIPOptionSetting: stpGamma=3.00"
+*stpGamma 3.05/3.05: "%% FoomaticRIPOptionSetting: stpGamma=3.05"
+*stpGamma 3.10/3.10: "%% FoomaticRIPOptionSetting: stpGamma=3.10"
+*stpGamma 3.15/3.15: "%% FoomaticRIPOptionSetting: stpGamma=3.15"
+*stpGamma 3.20/3.20: "%% FoomaticRIPOptionSetting: stpGamma=3.20"
+*stpGamma 3.25/3.25: "%% FoomaticRIPOptionSetting: stpGamma=3.25"
+*stpGamma 3.30/3.30: "%% FoomaticRIPOptionSetting: stpGamma=3.30"
+*stpGamma 3.35/3.35: "%% FoomaticRIPOptionSetting: stpGamma=3.35"
+*stpGamma 3.40/3.40: "%% FoomaticRIPOptionSetting: stpGamma=3.40"
+*stpGamma 3.45/3.45: "%% FoomaticRIPOptionSetting: stpGamma=3.45"
+*stpGamma 3.50/3.50: "%% FoomaticRIPOptionSetting: stpGamma=3.50"
+*stpGamma 3.55/3.55: "%% FoomaticRIPOptionSetting: stpGamma=3.55"
+*stpGamma 3.60/3.60: "%% FoomaticRIPOptionSetting: stpGamma=3.60"
+*stpGamma 3.65/3.65: "%% FoomaticRIPOptionSetting: stpGamma=3.65"
+*stpGamma 3.70/3.70: "%% FoomaticRIPOptionSetting: stpGamma=3.70"
+*stpGamma 3.75/3.75: "%% FoomaticRIPOptionSetting: stpGamma=3.75"
+*stpGamma 3.80/3.80: "%% FoomaticRIPOptionSetting: stpGamma=3.80"
+*stpGamma 3.85/3.85: "%% FoomaticRIPOptionSetting: stpGamma=3.85"
+*stpGamma 3.90/3.90: "%% FoomaticRIPOptionSetting: stpGamma=3.90"
+*stpGamma 3.95/3.95: "%% FoomaticRIPOptionSetting: stpGamma=3.95"
+*stpGamma 4.00/4.00: "%% FoomaticRIPOptionSetting: stpGamma=4.00"
+*CloseUI: *stpGamma
+
+*OpenUI *Density/Density: PickOne
+*FoomaticRIPOption Density: float CmdLine B
+*FoomaticRIPOptionPrototype Density: "Density=%s,"
+*FoomaticRIPOptionRange Density: 0.1 2
+*OrderDependency: 160 AnySetup *Density
+*DefaultDensity: 1.00
+*FoomaticRIPDefaultDensity: 1.00
+*Density 0.10/0.10: "%% FoomaticRIPOptionSetting: Density=0.10"
+*Density 0.12/0.12: "%% FoomaticRIPOptionSetting: Density=0.12"
+*Density 0.14/0.14: "%% FoomaticRIPOptionSetting: Density=0.14"
+*Density 0.16/0.16: "%% FoomaticRIPOptionSetting: Density=0.16"
+*Density 0.18/0.18: "%% FoomaticRIPOptionSetting: Density=0.18"
+*Density 0.20/0.20: "%% FoomaticRIPOptionSetting: Density=0.20"
+*Density 0.22/0.22: "%% FoomaticRIPOptionSetting: Density=0.22"
+*Density 0.24/0.24: "%% FoomaticRIPOptionSetting: Density=0.24"
+*Density 0.26/0.26: "%% FoomaticRIPOptionSetting: Density=0.26"
+*Density 0.28/0.28: "%% FoomaticRIPOptionSetting: Density=0.28"
+*Density 0.30/0.30: "%% FoomaticRIPOptionSetting: Density=0.30"
+*Density 0.32/0.32: "%% FoomaticRIPOptionSetting: Density=0.32"
+*Density 0.34/0.34: "%% FoomaticRIPOptionSetting: Density=0.34"
+*Density 0.36/0.36: "%% FoomaticRIPOptionSetting: Density=0.36"
+*Density 0.38/0.38: "%% FoomaticRIPOptionSetting: Density=0.38"
+*Density 0.40/0.40: "%% FoomaticRIPOptionSetting: Density=0.40"
+*Density 0.42/0.42: "%% FoomaticRIPOptionSetting: Density=0.42"
+*Density 0.44/0.44: "%% FoomaticRIPOptionSetting: Density=0.44"
+*Density 0.46/0.46: "%% FoomaticRIPOptionSetting: Density=0.46"
+*Density 0.48/0.48: "%% FoomaticRIPOptionSetting: Density=0.48"
+*Density 0.50/0.50: "%% FoomaticRIPOptionSetting: Density=0.50"
+*Density 0.52/0.52: "%% FoomaticRIPOptionSetting: Density=0.52"
+*Density 0.54/0.54: "%% FoomaticRIPOptionSetting: Density=0.54"
+*Density 0.56/0.56: "%% FoomaticRIPOptionSetting: Density=0.56"
+*Density 0.58/0.58: "%% FoomaticRIPOptionSetting: Density=0.58"
+*Density 0.60/0.60: "%% FoomaticRIPOptionSetting: Density=0.60"
+*Density 0.62/0.62: "%% FoomaticRIPOptionSetting: Density=0.62"
+*Density 0.64/0.64: "%% FoomaticRIPOptionSetting: Density=0.64"
+*Density 0.66/0.66: "%% FoomaticRIPOptionSetting: Density=0.66"
+*Density 0.68/0.68: "%% FoomaticRIPOptionSetting: Density=0.68"
+*Density 0.70/0.70: "%% FoomaticRIPOptionSetting: Density=0.70"
+*Density 0.72/0.72: "%% FoomaticRIPOptionSetting: Density=0.72"
+*Density 0.74/0.74: "%% FoomaticRIPOptionSetting: Density=0.74"
+*Density 0.76/0.76: "%% FoomaticRIPOptionSetting: Density=0.76"
+*Density 0.78/0.78: "%% FoomaticRIPOptionSetting: Density=0.78"
+*Density 0.80/0.80: "%% FoomaticRIPOptionSetting: Density=0.80"
+*Density 0.82/0.82: "%% FoomaticRIPOptionSetting: Density=0.82"
+*Density 0.84/0.84: "%% FoomaticRIPOptionSetting: Density=0.84"
+*Density 0.86/0.86: "%% FoomaticRIPOptionSetting: Density=0.86"
+*Density 0.88/0.88: "%% FoomaticRIPOptionSetting: Density=0.88"
+*Density 0.90/0.90: "%% FoomaticRIPOptionSetting: Density=0.90"
+*Density 0.92/0.92: "%% FoomaticRIPOptionSetting: Density=0.92"
+*Density 0.94/0.94: "%% FoomaticRIPOptionSetting: Density=0.94"
+*Density 0.96/0.96: "%% FoomaticRIPOptionSetting: Density=0.96"
+*Density 0.98/0.98: "%% FoomaticRIPOptionSetting: Density=0.98"
+*Density 1.00/1.00: "%% FoomaticRIPOptionSetting: Density=1.00"
+*Density 1.02/1.02: "%% FoomaticRIPOptionSetting: Density=1.02"
+*Density 1.04/1.04: "%% FoomaticRIPOptionSetting: Density=1.04"
+*Density 1.06/1.06: "%% FoomaticRIPOptionSetting: Density=1.06"
+*Density 1.08/1.08: "%% FoomaticRIPOptionSetting: Density=1.08"
+*Density 1.10/1.10: "%% FoomaticRIPOptionSetting: Density=1.10"
+*Density 1.12/1.12: "%% FoomaticRIPOptionSetting: Density=1.12"
+*Density 1.14/1.14: "%% FoomaticRIPOptionSetting: Density=1.14"
+*Density 1.16/1.16: "%% FoomaticRIPOptionSetting: Density=1.16"
+*Density 1.18/1.18: "%% FoomaticRIPOptionSetting: Density=1.18"
+*Density 1.20/1.20: "%% FoomaticRIPOptionSetting: Density=1.20"
+*Density 1.22/1.22: "%% FoomaticRIPOptionSetting: Density=1.22"
+*Density 1.24/1.24: "%% FoomaticRIPOptionSetting: Density=1.24"
+*Density 1.26/1.26: "%% FoomaticRIPOptionSetting: Density=1.26"
+*Density 1.28/1.28: "%% FoomaticRIPOptionSetting: Density=1.28"
+*Density 1.30/1.30: "%% FoomaticRIPOptionSetting: Density=1.30"
+*Density 1.32/1.32: "%% FoomaticRIPOptionSetting: Density=1.32"
+*Density 1.34/1.34: "%% FoomaticRIPOptionSetting: Density=1.34"
+*Density 1.36/1.36: "%% FoomaticRIPOptionSetting: Density=1.36"
+*Density 1.38/1.38: "%% FoomaticRIPOptionSetting: Density=1.38"
+*Density 1.40/1.40: "%% FoomaticRIPOptionSetting: Density=1.40"
+*Density 1.42/1.42: "%% FoomaticRIPOptionSetting: Density=1.42"
+*Density 1.44/1.44: "%% FoomaticRIPOptionSetting: Density=1.44"
+*Density 1.46/1.46: "%% FoomaticRIPOptionSetting: Density=1.46"
+*Density 1.48/1.48: "%% FoomaticRIPOptionSetting: Density=1.48"
+*Density 1.50/1.50: "%% FoomaticRIPOptionSetting: Density=1.50"
+*Density 1.52/1.52: "%% FoomaticRIPOptionSetting: Density=1.52"
+*Density 1.54/1.54: "%% FoomaticRIPOptionSetting: Density=1.54"
+*Density 1.56/1.56: "%% FoomaticRIPOptionSetting: Density=1.56"
+*Density 1.58/1.58: "%% FoomaticRIPOptionSetting: Density=1.58"
+*Density 1.60/1.60: "%% FoomaticRIPOptionSetting: Density=1.60"
+*Density 1.62/1.62: "%% FoomaticRIPOptionSetting: Density=1.62"
+*Density 1.64/1.64: "%% FoomaticRIPOptionSetting: Density=1.64"
+*Density 1.66/1.66: "%% FoomaticRIPOptionSetting: Density=1.66"
+*Density 1.68/1.68: "%% FoomaticRIPOptionSetting: Density=1.68"
+*Density 1.70/1.70: "%% FoomaticRIPOptionSetting: Density=1.70"
+*Density 1.72/1.72: "%% FoomaticRIPOptionSetting: Density=1.72"
+*Density 1.74/1.74: "%% FoomaticRIPOptionSetting: Density=1.74"
+*Density 1.76/1.76: "%% FoomaticRIPOptionSetting: Density=1.76"
+*Density 1.78/1.78: "%% FoomaticRIPOptionSetting: Density=1.78"
+*Density 1.80/1.80: "%% FoomaticRIPOptionSetting: Density=1.80"
+*Density 1.82/1.82: "%% FoomaticRIPOptionSetting: Density=1.82"
+*Density 1.84/1.84: "%% FoomaticRIPOptionSetting: Density=1.84"
+*Density 1.86/1.86: "%% FoomaticRIPOptionSetting: Density=1.86"
+*Density 1.88/1.88: "%% FoomaticRIPOptionSetting: Density=1.88"
+*Density 1.90/1.90: "%% FoomaticRIPOptionSetting: Density=1.90"
+*Density 1.92/1.92: "%% FoomaticRIPOptionSetting: Density=1.92"
+*Density 1.94/1.94: "%% FoomaticRIPOptionSetting: Density=1.94"
+*Density 1.96/1.96: "%% FoomaticRIPOptionSetting: Density=1.96"
+*Density 1.98/1.98: "%% FoomaticRIPOptionSetting: Density=1.98"
+*Density 2.00/2.00: "%% FoomaticRIPOptionSetting: Density=2.00"
+*CloseUI: *Density
+
+*OpenUI *stpBrightness/stpBrightness: PickOne
+*FoomaticRIPOption stpBrightness: float CmdLine B
+*FoomaticRIPOptionPrototype stpBrightness: "Brightness=%s,"
+*FoomaticRIPOptionRange stpBrightness: 0 2
+*OrderDependency: 170 AnySetup *stpBrightness
+*DefaultstpBrightness: 1.00
+*FoomaticRIPDefaultstpBrightness: 1.00
+*stpBrightness 0.00/0.00: "%% FoomaticRIPOptionSetting: stpBrightness=0.00"
+*stpBrightness 0.02/0.02: "%% FoomaticRIPOptionSetting: stpBrightness=0.02"
+*stpBrightness 0.04/0.04: "%% FoomaticRIPOptionSetting: stpBrightness=0.04"
+*stpBrightness 0.06/0.06: "%% FoomaticRIPOptionSetting: stpBrightness=0.06"
+*stpBrightness 0.08/0.08: "%% FoomaticRIPOptionSetting: stpBrightness=0.08"
+*stpBrightness 0.10/0.10: "%% FoomaticRIPOptionSetting: stpBrightness=0.10"
+*stpBrightness 0.12/0.12: "%% FoomaticRIPOptionSetting: stpBrightness=0.12"
+*stpBrightness 0.14/0.14: "%% FoomaticRIPOptionSetting: stpBrightness=0.14"
+*stpBrightness 0.16/0.16: "%% FoomaticRIPOptionSetting: stpBrightness=0.16"
+*stpBrightness 0.18/0.18: "%% FoomaticRIPOptionSetting: stpBrightness=0.18"
+*stpBrightness 0.20/0.20: "%% FoomaticRIPOptionSetting: stpBrightness=0.20"
+*stpBrightness 0.22/0.22: "%% FoomaticRIPOptionSetting: stpBrightness=0.22"
+*stpBrightness 0.24/0.24: "%% FoomaticRIPOptionSetting: stpBrightness=0.24"
+*stpBrightness 0.26/0.26: "%% FoomaticRIPOptionSetting: stpBrightness=0.26"
+*stpBrightness 0.28/0.28: "%% FoomaticRIPOptionSetting: stpBrightness=0.28"
+*stpBrightness 0.30/0.30: "%% FoomaticRIPOptionSetting: stpBrightness=0.30"
+*stpBrightness 0.32/0.32: "%% FoomaticRIPOptionSetting: stpBrightness=0.32"
+*stpBrightness 0.34/0.34: "%% FoomaticRIPOptionSetting: stpBrightness=0.34"
+*stpBrightness 0.36/0.36: "%% FoomaticRIPOptionSetting: stpBrightness=0.36"
+*stpBrightness 0.38/0.38: "%% FoomaticRIPOptionSetting: stpBrightness=0.38"
+*stpBrightness 0.40/0.40: "%% FoomaticRIPOptionSetting: stpBrightness=0.40"
+*stpBrightness 0.42/0.42: "%% FoomaticRIPOptionSetting: stpBrightness=0.42"
+*stpBrightness 0.44/0.44: "%% FoomaticRIPOptionSetting: stpBrightness=0.44"
+*stpBrightness 0.46/0.46: "%% FoomaticRIPOptionSetting: stpBrightness=0.46"
+*stpBrightness 0.48/0.48: "%% FoomaticRIPOptionSetting: stpBrightness=0.48"
+*stpBrightness 0.50/0.50: "%% FoomaticRIPOptionSetting: stpBrightness=0.50"
+*stpBrightness 0.52/0.52: "%% FoomaticRIPOptionSetting: stpBrightness=0.52"
+*stpBrightness 0.54/0.54: "%% FoomaticRIPOptionSetting: stpBrightness=0.54"
+*stpBrightness 0.56/0.56: "%% FoomaticRIPOptionSetting: stpBrightness=0.56"
+*stpBrightness 0.58/0.58: "%% FoomaticRIPOptionSetting: stpBrightness=0.58"
+*stpBrightness 0.60/0.60: "%% FoomaticRIPOptionSetting: stpBrightness=0.60"
+*stpBrightness 0.62/0.62: "%% FoomaticRIPOptionSetting: stpBrightness=0.62"
+*stpBrightness 0.64/0.64: "%% FoomaticRIPOptionSetting: stpBrightness=0.64"
+*stpBrightness 0.66/0.66: "%% FoomaticRIPOptionSetting: stpBrightness=0.66"
+*stpBrightness 0.68/0.68: "%% FoomaticRIPOptionSetting: stpBrightness=0.68"
+*stpBrightness 0.70/0.70: "%% FoomaticRIPOptionSetting: stpBrightness=0.70"
+*stpBrightness 0.72/0.72: "%% FoomaticRIPOptionSetting: stpBrightness=0.72"
+*stpBrightness 0.74/0.74: "%% FoomaticRIPOptionSetting: stpBrightness=0.74"
+*stpBrightness 0.76/0.76: "%% FoomaticRIPOptionSetting: stpBrightness=0.76"
+*stpBrightness 0.78/0.78: "%% FoomaticRIPOptionSetting: stpBrightness=0.78"
+*stpBrightness 0.80/0.80: "%% FoomaticRIPOptionSetting: stpBrightness=0.80"
+*stpBrightness 0.82/0.82: "%% FoomaticRIPOptionSetting: stpBrightness=0.82"
+*stpBrightness 0.84/0.84: "%% FoomaticRIPOptionSetting: stpBrightness=0.84"
+*stpBrightness 0.86/0.86: "%% FoomaticRIPOptionSetting: stpBrightness=0.86"
+*stpBrightness 0.88/0.88: "%% FoomaticRIPOptionSetting: stpBrightness=0.88"
+*stpBrightness 0.90/0.90: "%% FoomaticRIPOptionSetting: stpBrightness=0.90"
+*stpBrightness 0.92/0.92: "%% FoomaticRIPOptionSetting: stpBrightness=0.92"
+*stpBrightness 0.94/0.94: "%% FoomaticRIPOptionSetting: stpBrightness=0.94"
+*stpBrightness 0.96/0.96: "%% FoomaticRIPOptionSetting: stpBrightness=0.96"
+*stpBrightness 0.98/0.98: "%% FoomaticRIPOptionSetting: stpBrightness=0.98"
+*stpBrightness 1.00/1.00: "%% FoomaticRIPOptionSetting: stpBrightness=1.00"
+*stpBrightness 1.02/1.02: "%% FoomaticRIPOptionSetting: stpBrightness=1.02"
+*stpBrightness 1.04/1.04: "%% FoomaticRIPOptionSetting: stpBrightness=1.04"
+*stpBrightness 1.06/1.06: "%% FoomaticRIPOptionSetting: stpBrightness=1.06"
+*stpBrightness 1.08/1.08: "%% FoomaticRIPOptionSetting: stpBrightness=1.08"
+*stpBrightness 1.10/1.10: "%% FoomaticRIPOptionSetting: stpBrightness=1.10"
+*stpBrightness 1.12/1.12: "%% FoomaticRIPOptionSetting: stpBrightness=1.12"
+*stpBrightness 1.14/1.14: "%% FoomaticRIPOptionSetting: stpBrightness=1.14"
+*stpBrightness 1.16/1.16: "%% FoomaticRIPOptionSetting: stpBrightness=1.16"
+*stpBrightness 1.18/1.18: "%% FoomaticRIPOptionSetting: stpBrightness=1.18"
+*stpBrightness 1.20/1.20: "%% FoomaticRIPOptionSetting: stpBrightness=1.20"
+*stpBrightness 1.22/1.22: "%% FoomaticRIPOptionSetting: stpBrightness=1.22"
+*stpBrightness 1.24/1.24: "%% FoomaticRIPOptionSetting: stpBrightness=1.24"
+*stpBrightness 1.26/1.26: "%% FoomaticRIPOptionSetting: stpBrightness=1.26"
+*stpBrightness 1.28/1.28: "%% FoomaticRIPOptionSetting: stpBrightness=1.28"
+*stpBrightness 1.30/1.30: "%% FoomaticRIPOptionSetting: stpBrightness=1.30"
+*stpBrightness 1.32/1.32: "%% FoomaticRIPOptionSetting: stpBrightness=1.32"
+*stpBrightness 1.34/1.34: "%% FoomaticRIPOptionSetting: stpBrightness=1.34"
+*stpBrightness 1.36/1.36: "%% FoomaticRIPOptionSetting: stpBrightness=1.36"
+*stpBrightness 1.38/1.38: "%% FoomaticRIPOptionSetting: stpBrightness=1.38"
+*stpBrightness 1.40/1.40: "%% FoomaticRIPOptionSetting: stpBrightness=1.40"
+*stpBrightness 1.42/1.42: "%% FoomaticRIPOptionSetting: stpBrightness=1.42"
+*stpBrightness 1.44/1.44: "%% FoomaticRIPOptionSetting: stpBrightness=1.44"
+*stpBrightness 1.46/1.46: "%% FoomaticRIPOptionSetting: stpBrightness=1.46"
+*stpBrightness 1.48/1.48: "%% FoomaticRIPOptionSetting: stpBrightness=1.48"
+*stpBrightness 1.50/1.50: "%% FoomaticRIPOptionSetting: stpBrightness=1.50"
+*stpBrightness 1.52/1.52: "%% FoomaticRIPOptionSetting: stpBrightness=1.52"
+*stpBrightness 1.54/1.54: "%% FoomaticRIPOptionSetting: stpBrightness=1.54"
+*stpBrightness 1.56/1.56: "%% FoomaticRIPOptionSetting: stpBrightness=1.56"
+*stpBrightness 1.58/1.58: "%% FoomaticRIPOptionSetting: stpBrightness=1.58"
+*stpBrightness 1.60/1.60: "%% FoomaticRIPOptionSetting: stpBrightness=1.60"
+*stpBrightness 1.62/1.62: "%% FoomaticRIPOptionSetting: stpBrightness=1.62"
+*stpBrightness 1.64/1.64: "%% FoomaticRIPOptionSetting: stpBrightness=1.64"
+*stpBrightness 1.66/1.66: "%% FoomaticRIPOptionSetting: stpBrightness=1.66"
+*stpBrightness 1.68/1.68: "%% FoomaticRIPOptionSetting: stpBrightness=1.68"
+*stpBrightness 1.70/1.70: "%% FoomaticRIPOptionSetting: stpBrightness=1.70"
+*stpBrightness 1.72/1.72: "%% FoomaticRIPOptionSetting: stpBrightness=1.72"
+*stpBrightness 1.74/1.74: "%% FoomaticRIPOptionSetting: stpBrightness=1.74"
+*stpBrightness 1.76/1.76: "%% FoomaticRIPOptionSetting: stpBrightness=1.76"
+*stpBrightness 1.78/1.78: "%% FoomaticRIPOptionSetting: stpBrightness=1.78"
+*stpBrightness 1.80/1.80: "%% FoomaticRIPOptionSetting: stpBrightness=1.80"
+*stpBrightness 1.82/1.82: "%% FoomaticRIPOptionSetting: stpBrightness=1.82"
+*stpBrightness 1.84/1.84: "%% FoomaticRIPOptionSetting: stpBrightness=1.84"
+*stpBrightness 1.86/1.86: "%% FoomaticRIPOptionSetting: stpBrightness=1.86"
+*stpBrightness 1.88/1.88: "%% FoomaticRIPOptionSetting: stpBrightness=1.88"
+*stpBrightness 1.90/1.90: "%% FoomaticRIPOptionSetting: stpBrightness=1.90"
+*stpBrightness 1.92/1.92: "%% FoomaticRIPOptionSetting: stpBrightness=1.92"
+*stpBrightness 1.94/1.94: "%% FoomaticRIPOptionSetting: stpBrightness=1.94"
+*stpBrightness 1.96/1.96: "%% FoomaticRIPOptionSetting: stpBrightness=1.96"
+*stpBrightness 1.98/1.98: "%% FoomaticRIPOptionSetting: stpBrightness=1.98"
+*stpBrightness 2.00/2.00: "%% FoomaticRIPOptionSetting: stpBrightness=2.00"
+*CloseUI: *stpBrightness
+
+*OpenUI *stpSaturation/stpSaturation: PickOne
+*FoomaticRIPOption stpSaturation: float CmdLine B
+*FoomaticRIPOptionPrototype stpSaturation: "Saturation=%s,"
+*FoomaticRIPOptionRange stpSaturation: 0 9
+*OrderDependency: 200 AnySetup *stpSaturation
+*DefaultstpSaturation: 1.0
+*FoomaticRIPDefaultstpSaturation: 1.0
+*stpSaturation 0.0/0.0: "%% FoomaticRIPOptionSetting: stpSaturation=0.0"
+*stpSaturation 0.1/0.1: "%% FoomaticRIPOptionSetting: stpSaturation=0.1"
+*stpSaturation 0.2/0.2: "%% FoomaticRIPOptionSetting: stpSaturation=0.2"
+*stpSaturation 0.3/0.3: "%% FoomaticRIPOptionSetting: stpSaturation=0.3"
+*stpSaturation 0.4/0.4: "%% FoomaticRIPOptionSetting: stpSaturation=0.4"
+*stpSaturation 0.5/0.5: "%% FoomaticRIPOptionSetting: stpSaturation=0.5"
+*stpSaturation 0.6/0.6: "%% FoomaticRIPOptionSetting: stpSaturation=0.6"
+*stpSaturation 0.7/0.7: "%% FoomaticRIPOptionSetting: stpSaturation=0.7"
+*stpSaturation 0.8/0.8: "%% FoomaticRIPOptionSetting: stpSaturation=0.8"
+*stpSaturation 0.9/0.9: "%% FoomaticRIPOptionSetting: stpSaturation=0.9"
+*stpSaturation 1.0/1.0: "%% FoomaticRIPOptionSetting: stpSaturation=1.0"
+*stpSaturation 1.1/1.1: "%% FoomaticRIPOptionSetting: stpSaturation=1.1"
+*stpSaturation 1.2/1.2: "%% FoomaticRIPOptionSetting: stpSaturation=1.2"
+*stpSaturation 1.3/1.3: "%% FoomaticRIPOptionSetting: stpSaturation=1.3"
+*stpSaturation 1.4/1.4: "%% FoomaticRIPOptionSetting: stpSaturation=1.4"
+*stpSaturation 1.5/1.5: "%% FoomaticRIPOptionSetting: stpSaturation=1.5"
+*stpSaturation 1.6/1.6: "%% FoomaticRIPOptionSetting: stpSaturation=1.6"
+*stpSaturation 1.7/1.7: "%% FoomaticRIPOptionSetting: stpSaturation=1.7"
+*stpSaturation 1.8/1.8: "%% FoomaticRIPOptionSetting: stpSaturation=1.8"
+*stpSaturation 1.9/1.9: "%% FoomaticRIPOptionSetting: stpSaturation=1.9"
+*stpSaturation 2.0/2.0: "%% FoomaticRIPOptionSetting: stpSaturation=2.0"
+*stpSaturation 2.1/2.1: "%% FoomaticRIPOptionSetting: stpSaturation=2.1"
+*stpSaturation 2.2/2.2: "%% FoomaticRIPOptionSetting: stpSaturation=2.2"
+*stpSaturation 2.3/2.3: "%% FoomaticRIPOptionSetting: stpSaturation=2.3"
+*stpSaturation 2.4/2.4: "%% FoomaticRIPOptionSetting: stpSaturation=2.4"
+*stpSaturation 2.5/2.5: "%% FoomaticRIPOptionSetting: stpSaturation=2.5"
+*stpSaturation 2.6/2.6: "%% FoomaticRIPOptionSetting: stpSaturation=2.6"
+*stpSaturation 2.7/2.7: "%% FoomaticRIPOptionSetting: stpSaturation=2.7"
+*stpSaturation 2.8/2.8: "%% FoomaticRIPOptionSetting: stpSaturation=2.8"
+*stpSaturation 2.9/2.9: "%% FoomaticRIPOptionSetting: stpSaturation=2.9"
+*stpSaturation 3.0/3.0: "%% FoomaticRIPOptionSetting: stpSaturation=3.0"
+*stpSaturation 3.1/3.1: "%% FoomaticRIPOptionSetting: stpSaturation=3.1"
+*stpSaturation 3.2/3.2: "%% FoomaticRIPOptionSetting: stpSaturation=3.2"
+*stpSaturation 3.3/3.3: "%% FoomaticRIPOptionSetting: stpSaturation=3.3"
+*stpSaturation 3.4/3.4: "%% FoomaticRIPOptionSetting: stpSaturation=3.4"
+*stpSaturation 3.5/3.5: "%% FoomaticRIPOptionSetting: stpSaturation=3.5"
+*stpSaturation 3.6/3.6: "%% FoomaticRIPOptionSetting: stpSaturation=3.6"
+*stpSaturation 3.7/3.7: "%% FoomaticRIPOptionSetting: stpSaturation=3.7"
+*stpSaturation 3.8/3.8: "%% FoomaticRIPOptionSetting: stpSaturation=3.8"
+*stpSaturation 3.9/3.9: "%% FoomaticRIPOptionSetting: stpSaturation=3.9"
+*stpSaturation 4.0/4.0: "%% FoomaticRIPOptionSetting: stpSaturation=4.0"
+*stpSaturation 4.1/4.1: "%% FoomaticRIPOptionSetting: stpSaturation=4.1"
+*stpSaturation 4.2/4.2: "%% FoomaticRIPOptionSetting: stpSaturation=4.2"
+*stpSaturation 4.3/4.3: "%% FoomaticRIPOptionSetting: stpSaturation=4.3"
+*stpSaturation 4.4/4.4: "%% FoomaticRIPOptionSetting: stpSaturation=4.4"
+*stpSaturation 4.5/4.5: "%% FoomaticRIPOptionSetting: stpSaturation=4.5"
+*stpSaturation 4.6/4.6: "%% FoomaticRIPOptionSetting: stpSaturation=4.6"
+*stpSaturation 4.7/4.7: "%% FoomaticRIPOptionSetting: stpSaturation=4.7"
+*stpSaturation 4.8/4.8: "%% FoomaticRIPOptionSetting: stpSaturation=4.8"
+*stpSaturation 4.9/4.9: "%% FoomaticRIPOptionSetting: stpSaturation=4.9"
+*stpSaturation 5.0/5.0: "%% FoomaticRIPOptionSetting: stpSaturation=5.0"
+*stpSaturation 5.1/5.1: "%% FoomaticRIPOptionSetting: stpSaturation=5.1"
+*stpSaturation 5.2/5.2: "%% FoomaticRIPOptionSetting: stpSaturation=5.2"
+*stpSaturation 5.3/5.3: "%% FoomaticRIPOptionSetting: stpSaturation=5.3"
+*stpSaturation 5.4/5.4: "%% FoomaticRIPOptionSetting: stpSaturation=5.4"
+*stpSaturation 5.5/5.5: "%% FoomaticRIPOptionSetting: stpSaturation=5.5"
+*stpSaturation 5.6/5.6: "%% FoomaticRIPOptionSetting: stpSaturation=5.6"
+*stpSaturation 5.7/5.7: "%% FoomaticRIPOptionSetting: stpSaturation=5.7"
+*stpSaturation 5.8/5.8: "%% FoomaticRIPOptionSetting: stpSaturation=5.8"
+*stpSaturation 5.9/5.9: "%% FoomaticRIPOptionSetting: stpSaturation=5.9"
+*stpSaturation 6.0/6.0: "%% FoomaticRIPOptionSetting: stpSaturation=6.0"
+*stpSaturation 6.1/6.1: "%% FoomaticRIPOptionSetting: stpSaturation=6.1"
+*stpSaturation 6.2/6.2: "%% FoomaticRIPOptionSetting: stpSaturation=6.2"
+*stpSaturation 6.3/6.3: "%% FoomaticRIPOptionSetting: stpSaturation=6.3"
+*stpSaturation 6.4/6.4: "%% FoomaticRIPOptionSetting: stpSaturation=6.4"
+*stpSaturation 6.5/6.5: "%% FoomaticRIPOptionSetting: stpSaturation=6.5"
+*stpSaturation 6.6/6.6: "%% FoomaticRIPOptionSetting: stpSaturation=6.6"
+*stpSaturation 6.7/6.7: "%% FoomaticRIPOptionSetting: stpSaturation=6.7"
+*stpSaturation 6.8/6.8: "%% FoomaticRIPOptionSetting: stpSaturation=6.8"
+*stpSaturation 6.9/6.9: "%% FoomaticRIPOptionSetting: stpSaturation=6.9"
+*stpSaturation 7.0/7.0: "%% FoomaticRIPOptionSetting: stpSaturation=7.0"
+*stpSaturation 7.1/7.1: "%% FoomaticRIPOptionSetting: stpSaturation=7.1"
+*stpSaturation 7.2/7.2: "%% FoomaticRIPOptionSetting: stpSaturation=7.2"
+*stpSaturation 7.3/7.3: "%% FoomaticRIPOptionSetting: stpSaturation=7.3"
+*stpSaturation 7.4/7.4: "%% FoomaticRIPOptionSetting: stpSaturation=7.4"
+*stpSaturation 7.5/7.5: "%% FoomaticRIPOptionSetting: stpSaturation=7.5"
+*stpSaturation 7.6/7.6: "%% FoomaticRIPOptionSetting: stpSaturation=7.6"
+*stpSaturation 7.7/7.7: "%% FoomaticRIPOptionSetting: stpSaturation=7.7"
+*stpSaturation 7.8/7.8: "%% FoomaticRIPOptionSetting: stpSaturation=7.8"
+*stpSaturation 7.9/7.9: "%% FoomaticRIPOptionSetting: stpSaturation=7.9"
+*stpSaturation 8.0/8.0: "%% FoomaticRIPOptionSetting: stpSaturation=8.0"
+*stpSaturation 8.1/8.1: "%% FoomaticRIPOptionSetting: stpSaturation=8.1"
+*stpSaturation 8.2/8.2: "%% FoomaticRIPOptionSetting: stpSaturation=8.2"
+*stpSaturation 8.3/8.3: "%% FoomaticRIPOptionSetting: stpSaturation=8.3"
+*stpSaturation 8.4/8.4: "%% FoomaticRIPOptionSetting: stpSaturation=8.4"
+*stpSaturation 8.5/8.5: "%% FoomaticRIPOptionSetting: stpSaturation=8.5"
+*stpSaturation 8.6/8.6: "%% FoomaticRIPOptionSetting: stpSaturation=8.6"
+*stpSaturation 8.7/8.7: "%% FoomaticRIPOptionSetting: stpSaturation=8.7"
+*stpSaturation 8.8/8.8: "%% FoomaticRIPOptionSetting: stpSaturation=8.8"
+*stpSaturation 8.9/8.9: "%% FoomaticRIPOptionSetting: stpSaturation=8.9"
+*stpSaturation 9.0/9.0: "%% FoomaticRIPOptionSetting: stpSaturation=9.0"
+*CloseUI: *stpSaturation
+
+*OpenUI *Contrast/Contrast Level: PickOne
+*FoomaticRIPOption Contrast: float CmdLine B
+*FoomaticRIPOptionPrototype Contrast: "Contrast=%s,"
+*FoomaticRIPOptionRange Contrast: 0 4
+*OrderDependency: 190 AnySetup *Contrast
+*DefaultContrast: 1.00
+*FoomaticRIPDefaultContrast: 1.00
+*Contrast 0.00/0.00: "%% FoomaticRIPOptionSetting: Contrast=0.00"
+*Contrast 0.05/0.05: "%% FoomaticRIPOptionSetting: Contrast=0.05"
+*Contrast 0.10/0.10: "%% FoomaticRIPOptionSetting: Contrast=0.10"
+*Contrast 0.15/0.15: "%% FoomaticRIPOptionSetting: Contrast=0.15"
+*Contrast 0.20/0.20: "%% FoomaticRIPOptionSetting: Contrast=0.20"
+*Contrast 0.25/0.25: "%% FoomaticRIPOptionSetting: Contrast=0.25"
+*Contrast 0.30/0.30: "%% FoomaticRIPOptionSetting: Contrast=0.30"
+*Contrast 0.35/0.35: "%% FoomaticRIPOptionSetting: Contrast=0.35"
+*Contrast 0.40/0.40: "%% FoomaticRIPOptionSetting: Contrast=0.40"
+*Contrast 0.45/0.45: "%% FoomaticRIPOptionSetting: Contrast=0.45"
+*Contrast 0.50/0.50: "%% FoomaticRIPOptionSetting: Contrast=0.50"
+*Contrast 0.55/0.55: "%% FoomaticRIPOptionSetting: Contrast=0.55"
+*Contrast 0.60/0.60: "%% FoomaticRIPOptionSetting: Contrast=0.60"
+*Contrast 0.65/0.65: "%% FoomaticRIPOptionSetting: Contrast=0.65"
+*Contrast 0.70/0.70: "%% FoomaticRIPOptionSetting: Contrast=0.70"
+*Contrast 0.75/0.75: "%% FoomaticRIPOptionSetting: Contrast=0.75"
+*Contrast 0.80/0.80: "%% FoomaticRIPOptionSetting: Contrast=0.80"
+*Contrast 0.85/0.85: "%% FoomaticRIPOptionSetting: Contrast=0.85"
+*Contrast 0.90/0.90: "%% FoomaticRIPOptionSetting: Contrast=0.90"
+*Contrast 0.95/0.95: "%% FoomaticRIPOptionSetting: Contrast=0.95"
+*Contrast 1.00/1.00: "%% FoomaticRIPOptionSetting: Contrast=1.00"
+*Contrast 1.05/1.05: "%% FoomaticRIPOptionSetting: Contrast=1.05"
+*Contrast 1.10/1.10: "%% FoomaticRIPOptionSetting: Contrast=1.10"
+*Contrast 1.15/1.15: "%% FoomaticRIPOptionSetting: Contrast=1.15"
+*Contrast 1.20/1.20: "%% FoomaticRIPOptionSetting: Contrast=1.20"
+*Contrast 1.25/1.25: "%% FoomaticRIPOptionSetting: Contrast=1.25"
+*Contrast 1.30/1.30: "%% FoomaticRIPOptionSetting: Contrast=1.30"
+*Contrast 1.35/1.35: "%% FoomaticRIPOptionSetting: Contrast=1.35"
+*Contrast 1.40/1.40: "%% FoomaticRIPOptionSetting: Contrast=1.40"
+*Contrast 1.45/1.45: "%% FoomaticRIPOptionSetting: Contrast=1.45"
+*Contrast 1.50/1.50: "%% FoomaticRIPOptionSetting: Contrast=1.50"
+*Contrast 1.55/1.55: "%% FoomaticRIPOptionSetting: Contrast=1.55"
+*Contrast 1.60/1.60: "%% FoomaticRIPOptionSetting: Contrast=1.60"
+*Contrast 1.65/1.65: "%% FoomaticRIPOptionSetting: Contrast=1.65"
+*Contrast 1.70/1.70: "%% FoomaticRIPOptionSetting: Contrast=1.70"
+*Contrast 1.75/1.75: "%% FoomaticRIPOptionSetting: Contrast=1.75"
+*Contrast 1.80/1.80: "%% FoomaticRIPOptionSetting: Contrast=1.80"
+*Contrast 1.85/1.85: "%% FoomaticRIPOptionSetting: Contrast=1.85"
+*Contrast 1.90/1.90: "%% FoomaticRIPOptionSetting: Contrast=1.90"
+*Contrast 1.95/1.95: "%% FoomaticRIPOptionSetting: Contrast=1.95"
+*Contrast 2.00/2.00: "%% FoomaticRIPOptionSetting: Contrast=2.00"
+*Contrast 2.05/2.05: "%% FoomaticRIPOptionSetting: Contrast=2.05"
+*Contrast 2.10/2.10: "%% FoomaticRIPOptionSetting: Contrast=2.10"
+*Contrast 2.15/2.15: "%% FoomaticRIPOptionSetting: Contrast=2.15"
+*Contrast 2.20/2.20: "%% FoomaticRIPOptionSetting: Contrast=2.20"
+*Contrast 2.25/2.25: "%% FoomaticRIPOptionSetting: Contrast=2.25"
+*Contrast 2.30/2.30: "%% FoomaticRIPOptionSetting: Contrast=2.30"
+*Contrast 2.35/2.35: "%% FoomaticRIPOptionSetting: Contrast=2.35"
+*Contrast 2.40/2.40: "%% FoomaticRIPOptionSetting: Contrast=2.40"
+*Contrast 2.45/2.45: "%% FoomaticRIPOptionSetting: Contrast=2.45"
+*Contrast 2.50/2.50: "%% FoomaticRIPOptionSetting: Contrast=2.50"
+*Contrast 2.55/2.55: "%% FoomaticRIPOptionSetting: Contrast=2.55"
+*Contrast 2.60/2.60: "%% FoomaticRIPOptionSetting: Contrast=2.60"
+*Contrast 2.65/2.65: "%% FoomaticRIPOptionSetting: Contrast=2.65"
+*Contrast 2.70/2.70: "%% FoomaticRIPOptionSetting: Contrast=2.70"
+*Contrast 2.75/2.75: "%% FoomaticRIPOptionSetting: Contrast=2.75"
+*Contrast 2.80/2.80: "%% FoomaticRIPOptionSetting: Contrast=2.80"
+*Contrast 2.85/2.85: "%% FoomaticRIPOptionSetting: Contrast=2.85"
+*Contrast 2.90/2.90: "%% FoomaticRIPOptionSetting: Contrast=2.90"
+*Contrast 2.95/2.95: "%% FoomaticRIPOptionSetting: Contrast=2.95"
+*Contrast 3.00/3.00: "%% FoomaticRIPOptionSetting: Contrast=3.00"
+*Contrast 3.05/3.05: "%% FoomaticRIPOptionSetting: Contrast=3.05"
+*Contrast 3.10/3.10: "%% FoomaticRIPOptionSetting: Contrast=3.10"
+*Contrast 3.15/3.15: "%% FoomaticRIPOptionSetting: Contrast=3.15"
+*Contrast 3.20/3.20: "%% FoomaticRIPOptionSetting: Contrast=3.20"
+*Contrast 3.25/3.25: "%% FoomaticRIPOptionSetting: Contrast=3.25"
+*Contrast 3.30/3.30: "%% FoomaticRIPOptionSetting: Contrast=3.30"
+*Contrast 3.35/3.35: "%% FoomaticRIPOptionSetting: Contrast=3.35"
+*Contrast 3.40/3.40: "%% FoomaticRIPOptionSetting: Contrast=3.40"
+*Contrast 3.45/3.45: "%% FoomaticRIPOptionSetting: Contrast=3.45"
+*Contrast 3.50/3.50: "%% FoomaticRIPOptionSetting: Contrast=3.50"
+*Contrast 3.55/3.55: "%% FoomaticRIPOptionSetting: Contrast=3.55"
+*Contrast 3.60/3.60: "%% FoomaticRIPOptionSetting: Contrast=3.60"
+*Contrast 3.65/3.65: "%% FoomaticRIPOptionSetting: Contrast=3.65"
+*Contrast 3.70/3.70: "%% FoomaticRIPOptionSetting: Contrast=3.70"
+*Contrast 3.75/3.75: "%% FoomaticRIPOptionSetting: Contrast=3.75"
+*Contrast 3.80/3.80: "%% FoomaticRIPOptionSetting: Contrast=3.80"
+*Contrast 3.85/3.85: "%% FoomaticRIPOptionSetting: Contrast=3.85"
+*Contrast 3.90/3.90: "%% FoomaticRIPOptionSetting: Contrast=3.90"
+*Contrast 3.95/3.95: "%% FoomaticRIPOptionSetting: Contrast=3.95"
+*Contrast 4.00/4.00: "%% FoomaticRIPOptionSetting: Contrast=4.00"
+*CloseUI: *Contrast
+
+*OpenUI *Cyan/Cyan Level: PickOne
+*FoomaticRIPOption Cyan: float CmdLine B
+*FoomaticRIPOptionPrototype Cyan: "Cyan=%s,"
+*FoomaticRIPOptionRange Cyan: 0 4
+*OrderDependency: 210 AnySetup *Cyan
+*DefaultCyan: 1.00
+*FoomaticRIPDefaultCyan: 1.00
+*Cyan 0.00/0.00: "%% FoomaticRIPOptionSetting: Cyan=0.00"
+*Cyan 0.05/0.05: "%% FoomaticRIPOptionSetting: Cyan=0.05"
+*Cyan 0.10/0.10: "%% FoomaticRIPOptionSetting: Cyan=0.10"
+*Cyan 0.15/0.15: "%% FoomaticRIPOptionSetting: Cyan=0.15"
+*Cyan 0.20/0.20: "%% FoomaticRIPOptionSetting: Cyan=0.20"
+*Cyan 0.25/0.25: "%% FoomaticRIPOptionSetting: Cyan=0.25"
+*Cyan 0.30/0.30: "%% FoomaticRIPOptionSetting: Cyan=0.30"
+*Cyan 0.35/0.35: "%% FoomaticRIPOptionSetting: Cyan=0.35"
+*Cyan 0.40/0.40: "%% FoomaticRIPOptionSetting: Cyan=0.40"
+*Cyan 0.45/0.45: "%% FoomaticRIPOptionSetting: Cyan=0.45"
+*Cyan 0.50/0.50: "%% FoomaticRIPOptionSetting: Cyan=0.50"
+*Cyan 0.55/0.55: "%% FoomaticRIPOptionSetting: Cyan=0.55"
+*Cyan 0.60/0.60: "%% FoomaticRIPOptionSetting: Cyan=0.60"
+*Cyan 0.65/0.65: "%% FoomaticRIPOptionSetting: Cyan=0.65"
+*Cyan 0.70/0.70: "%% FoomaticRIPOptionSetting: Cyan=0.70"
+*Cyan 0.75/0.75: "%% FoomaticRIPOptionSetting: Cyan=0.75"
+*Cyan 0.80/0.80: "%% FoomaticRIPOptionSetting: Cyan=0.80"
+*Cyan 0.85/0.85: "%% FoomaticRIPOptionSetting: Cyan=0.85"
+*Cyan 0.90/0.90: "%% FoomaticRIPOptionSetting: Cyan=0.90"
+*Cyan 0.95/0.95: "%% FoomaticRIPOptionSetting: Cyan=0.95"
+*Cyan 1.00/1.00: "%% FoomaticRIPOptionSetting: Cyan=1.00"
+*Cyan 1.05/1.05: "%% FoomaticRIPOptionSetting: Cyan=1.05"
+*Cyan 1.10/1.10: "%% FoomaticRIPOptionSetting: Cyan=1.10"
+*Cyan 1.15/1.15: "%% FoomaticRIPOptionSetting: Cyan=1.15"
+*Cyan 1.20/1.20: "%% FoomaticRIPOptionSetting: Cyan=1.20"
+*Cyan 1.25/1.25: "%% FoomaticRIPOptionSetting: Cyan=1.25"
+*Cyan 1.30/1.30: "%% FoomaticRIPOptionSetting: Cyan=1.30"
+*Cyan 1.35/1.35: "%% FoomaticRIPOptionSetting: Cyan=1.35"
+*Cyan 1.40/1.40: "%% FoomaticRIPOptionSetting: Cyan=1.40"
+*Cyan 1.45/1.45: "%% FoomaticRIPOptionSetting: Cyan=1.45"
+*Cyan 1.50/1.50: "%% FoomaticRIPOptionSetting: Cyan=1.50"
+*Cyan 1.55/1.55: "%% FoomaticRIPOptionSetting: Cyan=1.55"
+*Cyan 1.60/1.60: "%% FoomaticRIPOptionSetting: Cyan=1.60"
+*Cyan 1.65/1.65: "%% FoomaticRIPOptionSetting: Cyan=1.65"
+*Cyan 1.70/1.70: "%% FoomaticRIPOptionSetting: Cyan=1.70"
+*Cyan 1.75/1.75: "%% FoomaticRIPOptionSetting: Cyan=1.75"
+*Cyan 1.80/1.80: "%% FoomaticRIPOptionSetting: Cyan=1.80"
+*Cyan 1.85/1.85: "%% FoomaticRIPOptionSetting: Cyan=1.85"
+*Cyan 1.90/1.90: "%% FoomaticRIPOptionSetting: Cyan=1.90"
+*Cyan 1.95/1.95: "%% FoomaticRIPOptionSetting: Cyan=1.95"
+*Cyan 2.00/2.00: "%% FoomaticRIPOptionSetting: Cyan=2.00"
+*Cyan 2.05/2.05: "%% FoomaticRIPOptionSetting: Cyan=2.05"
+*Cyan 2.10/2.10: "%% FoomaticRIPOptionSetting: Cyan=2.10"
+*Cyan 2.15/2.15: "%% FoomaticRIPOptionSetting: Cyan=2.15"
+*Cyan 2.20/2.20: "%% FoomaticRIPOptionSetting: Cyan=2.20"
+*Cyan 2.25/2.25: "%% FoomaticRIPOptionSetting: Cyan=2.25"
+*Cyan 2.30/2.30: "%% FoomaticRIPOptionSetting: Cyan=2.30"
+*Cyan 2.35/2.35: "%% FoomaticRIPOptionSetting: Cyan=2.35"
+*Cyan 2.40/2.40: "%% FoomaticRIPOptionSetting: Cyan=2.40"
+*Cyan 2.45/2.45: "%% FoomaticRIPOptionSetting: Cyan=2.45"
+*Cyan 2.50/2.50: "%% FoomaticRIPOptionSetting: Cyan=2.50"
+*Cyan 2.55/2.55: "%% FoomaticRIPOptionSetting: Cyan=2.55"
+*Cyan 2.60/2.60: "%% FoomaticRIPOptionSetting: Cyan=2.60"
+*Cyan 2.65/2.65: "%% FoomaticRIPOptionSetting: Cyan=2.65"
+*Cyan 2.70/2.70: "%% FoomaticRIPOptionSetting: Cyan=2.70"
+*Cyan 2.75/2.75: "%% FoomaticRIPOptionSetting: Cyan=2.75"
+*Cyan 2.80/2.80: "%% FoomaticRIPOptionSetting: Cyan=2.80"
+*Cyan 2.85/2.85: "%% FoomaticRIPOptionSetting: Cyan=2.85"
+*Cyan 2.90/2.90: "%% FoomaticRIPOptionSetting: Cyan=2.90"
+*Cyan 2.95/2.95: "%% FoomaticRIPOptionSetting: Cyan=2.95"
+*Cyan 3.00/3.00: "%% FoomaticRIPOptionSetting: Cyan=3.00"
+*Cyan 3.05/3.05: "%% FoomaticRIPOptionSetting: Cyan=3.05"
+*Cyan 3.10/3.10: "%% FoomaticRIPOptionSetting: Cyan=3.10"
+*Cyan 3.15/3.15: "%% FoomaticRIPOptionSetting: Cyan=3.15"
+*Cyan 3.20/3.20: "%% FoomaticRIPOptionSetting: Cyan=3.20"
+*Cyan 3.25/3.25: "%% FoomaticRIPOptionSetting: Cyan=3.25"
+*Cyan 3.30/3.30: "%% FoomaticRIPOptionSetting: Cyan=3.30"
+*Cyan 3.35/3.35: "%% FoomaticRIPOptionSetting: Cyan=3.35"
+*Cyan 3.40/3.40: "%% FoomaticRIPOptionSetting: Cyan=3.40"
+*Cyan 3.45/3.45: "%% FoomaticRIPOptionSetting: Cyan=3.45"
+*Cyan 3.50/3.50: "%% FoomaticRIPOptionSetting: Cyan=3.50"
+*Cyan 3.55/3.55: "%% FoomaticRIPOptionSetting: Cyan=3.55"
+*Cyan 3.60/3.60: "%% FoomaticRIPOptionSetting: Cyan=3.60"
+*Cyan 3.65/3.65: "%% FoomaticRIPOptionSetting: Cyan=3.65"
+*Cyan 3.70/3.70: "%% FoomaticRIPOptionSetting: Cyan=3.70"
+*Cyan 3.75/3.75: "%% FoomaticRIPOptionSetting: Cyan=3.75"
+*Cyan 3.80/3.80: "%% FoomaticRIPOptionSetting: Cyan=3.80"
+*Cyan 3.85/3.85: "%% FoomaticRIPOptionSetting: Cyan=3.85"
+*Cyan 3.90/3.90: "%% FoomaticRIPOptionSetting: Cyan=3.90"
+*Cyan 3.95/3.95: "%% FoomaticRIPOptionSetting: Cyan=3.95"
+*Cyan 4.00/4.00: "%% FoomaticRIPOptionSetting: Cyan=4.00"
+*CloseUI: *Cyan
+
+*OpenUI *Magenta/Magenta Level: PickOne
+*FoomaticRIPOption Magenta: float CmdLine B
+*FoomaticRIPOptionPrototype Magenta: "Magenta=%s,"
+*FoomaticRIPOptionRange Magenta: 0 4
+*OrderDependency: 220 AnySetup *Magenta
+*DefaultMagenta: 1.00
+*FoomaticRIPDefaultMagenta: 1.00
+*Magenta 0.00/0.00: "%% FoomaticRIPOptionSetting: Magenta=0.00"
+*Magenta 0.05/0.05: "%% FoomaticRIPOptionSetting: Magenta=0.05"
+*Magenta 0.10/0.10: "%% FoomaticRIPOptionSetting: Magenta=0.10"
+*Magenta 0.15/0.15: "%% FoomaticRIPOptionSetting: Magenta=0.15"
+*Magenta 0.20/0.20: "%% FoomaticRIPOptionSetting: Magenta=0.20"
+*Magenta 0.25/0.25: "%% FoomaticRIPOptionSetting: Magenta=0.25"
+*Magenta 0.30/0.30: "%% FoomaticRIPOptionSetting: Magenta=0.30"
+*Magenta 0.35/0.35: "%% FoomaticRIPOptionSetting: Magenta=0.35"
+*Magenta 0.40/0.40: "%% FoomaticRIPOptionSetting: Magenta=0.40"
+*Magenta 0.45/0.45: "%% FoomaticRIPOptionSetting: Magenta=0.45"
+*Magenta 0.50/0.50: "%% FoomaticRIPOptionSetting: Magenta=0.50"
+*Magenta 0.55/0.55: "%% FoomaticRIPOptionSetting: Magenta=0.55"
+*Magenta 0.60/0.60: "%% FoomaticRIPOptionSetting: Magenta=0.60"
+*Magenta 0.65/0.65: "%% FoomaticRIPOptionSetting: Magenta=0.65"
+*Magenta 0.70/0.70: "%% FoomaticRIPOptionSetting: Magenta=0.70"
+*Magenta 0.75/0.75: "%% FoomaticRIPOptionSetting: Magenta=0.75"
+*Magenta 0.80/0.80: "%% FoomaticRIPOptionSetting: Magenta=0.80"
+*Magenta 0.85/0.85: "%% FoomaticRIPOptionSetting: Magenta=0.85"
+*Magenta 0.90/0.90: "%% FoomaticRIPOptionSetting: Magenta=0.90"
+*Magenta 0.95/0.95: "%% FoomaticRIPOptionSetting: Magenta=0.95"
+*Magenta 1.00/1.00: "%% FoomaticRIPOptionSetting: Magenta=1.00"
+*Magenta 1.05/1.05: "%% FoomaticRIPOptionSetting: Magenta=1.05"
+*Magenta 1.10/1.10: "%% FoomaticRIPOptionSetting: Magenta=1.10"
+*Magenta 1.15/1.15: "%% FoomaticRIPOptionSetting: Magenta=1.15"
+*Magenta 1.20/1.20: "%% FoomaticRIPOptionSetting: Magenta=1.20"
+*Magenta 1.25/1.25: "%% FoomaticRIPOptionSetting: Magenta=1.25"
+*Magenta 1.30/1.30: "%% FoomaticRIPOptionSetting: Magenta=1.30"
+*Magenta 1.35/1.35: "%% FoomaticRIPOptionSetting: Magenta=1.35"
+*Magenta 1.40/1.40: "%% FoomaticRIPOptionSetting: Magenta=1.40"
+*Magenta 1.45/1.45: "%% FoomaticRIPOptionSetting: Magenta=1.45"
+*Magenta 1.50/1.50: "%% FoomaticRIPOptionSetting: Magenta=1.50"
+*Magenta 1.55/1.55: "%% FoomaticRIPOptionSetting: Magenta=1.55"
+*Magenta 1.60/1.60: "%% FoomaticRIPOptionSetting: Magenta=1.60"
+*Magenta 1.65/1.65: "%% FoomaticRIPOptionSetting: Magenta=1.65"
+*Magenta 1.70/1.70: "%% FoomaticRIPOptionSetting: Magenta=1.70"
+*Magenta 1.75/1.75: "%% FoomaticRIPOptionSetting: Magenta=1.75"
+*Magenta 1.80/1.80: "%% FoomaticRIPOptionSetting: Magenta=1.80"
+*Magenta 1.85/1.85: "%% FoomaticRIPOptionSetting: Magenta=1.85"
+*Magenta 1.90/1.90: "%% FoomaticRIPOptionSetting: Magenta=1.90"
+*Magenta 1.95/1.95: "%% FoomaticRIPOptionSetting: Magenta=1.95"
+*Magenta 2.00/2.00: "%% FoomaticRIPOptionSetting: Magenta=2.00"
+*Magenta 2.05/2.05: "%% FoomaticRIPOptionSetting: Magenta=2.05"
+*Magenta 2.10/2.10: "%% FoomaticRIPOptionSetting: Magenta=2.10"
+*Magenta 2.15/2.15: "%% FoomaticRIPOptionSetting: Magenta=2.15"
+*Magenta 2.20/2.20: "%% FoomaticRIPOptionSetting: Magenta=2.20"
+*Magenta 2.25/2.25: "%% FoomaticRIPOptionSetting: Magenta=2.25"
+*Magenta 2.30/2.30: "%% FoomaticRIPOptionSetting: Magenta=2.30"
+*Magenta 2.35/2.35: "%% FoomaticRIPOptionSetting: Magenta=2.35"
+*Magenta 2.40/2.40: "%% FoomaticRIPOptionSetting: Magenta=2.40"
+*Magenta 2.45/2.45: "%% FoomaticRIPOptionSetting: Magenta=2.45"
+*Magenta 2.50/2.50: "%% FoomaticRIPOptionSetting: Magenta=2.50"
+*Magenta 2.55/2.55: "%% FoomaticRIPOptionSetting: Magenta=2.55"
+*Magenta 2.60/2.60: "%% FoomaticRIPOptionSetting: Magenta=2.60"
+*Magenta 2.65/2.65: "%% FoomaticRIPOptionSetting: Magenta=2.65"
+*Magenta 2.70/2.70: "%% FoomaticRIPOptionSetting: Magenta=2.70"
+*Magenta 2.75/2.75: "%% FoomaticRIPOptionSetting: Magenta=2.75"
+*Magenta 2.80/2.80: "%% FoomaticRIPOptionSetting: Magenta=2.80"
+*Magenta 2.85/2.85: "%% FoomaticRIPOptionSetting: Magenta=2.85"
+*Magenta 2.90/2.90: "%% FoomaticRIPOptionSetting: Magenta=2.90"
+*Magenta 2.95/2.95: "%% FoomaticRIPOptionSetting: Magenta=2.95"
+*Magenta 3.00/3.00: "%% FoomaticRIPOptionSetting: Magenta=3.00"
+*Magenta 3.05/3.05: "%% FoomaticRIPOptionSetting: Magenta=3.05"
+*Magenta 3.10/3.10: "%% FoomaticRIPOptionSetting: Magenta=3.10"
+*Magenta 3.15/3.15: "%% FoomaticRIPOptionSetting: Magenta=3.15"
+*Magenta 3.20/3.20: "%% FoomaticRIPOptionSetting: Magenta=3.20"
+*Magenta 3.25/3.25: "%% FoomaticRIPOptionSetting: Magenta=3.25"
+*Magenta 3.30/3.30: "%% FoomaticRIPOptionSetting: Magenta=3.30"
+*Magenta 3.35/3.35: "%% FoomaticRIPOptionSetting: Magenta=3.35"
+*Magenta 3.40/3.40: "%% FoomaticRIPOptionSetting: Magenta=3.40"
+*Magenta 3.45/3.45: "%% FoomaticRIPOptionSetting: Magenta=3.45"
+*Magenta 3.50/3.50: "%% FoomaticRIPOptionSetting: Magenta=3.50"
+*Magenta 3.55/3.55: "%% FoomaticRIPOptionSetting: Magenta=3.55"
+*Magenta 3.60/3.60: "%% FoomaticRIPOptionSetting: Magenta=3.60"
+*Magenta 3.65/3.65: "%% FoomaticRIPOptionSetting: Magenta=3.65"
+*Magenta 3.70/3.70: "%% FoomaticRIPOptionSetting: Magenta=3.70"
+*Magenta 3.75/3.75: "%% FoomaticRIPOptionSetting: Magenta=3.75"
+*Magenta 3.80/3.80: "%% FoomaticRIPOptionSetting: Magenta=3.80"
+*Magenta 3.85/3.85: "%% FoomaticRIPOptionSetting: Magenta=3.85"
+*Magenta 3.90/3.90: "%% FoomaticRIPOptionSetting: Magenta=3.90"
+*Magenta 3.95/3.95: "%% FoomaticRIPOptionSetting: Magenta=3.95"
+*Magenta 4.00/4.00: "%% FoomaticRIPOptionSetting: Magenta=4.00"
+*CloseUI: *Magenta
+
+*OpenUI *Yellow/Yellow Level: PickOne
+*FoomaticRIPOption Yellow: float CmdLine B
+*FoomaticRIPOptionPrototype Yellow: "Yellow=%s"
+*FoomaticRIPOptionRange Yellow: 0 4
+*OrderDependency: 230 AnySetup *Yellow
+*DefaultYellow: 1.00
+*FoomaticRIPDefaultYellow: 1.00
+*Yellow 0.00/0.00: "%% FoomaticRIPOptionSetting: Yellow=0.00"
+*Yellow 0.05/0.05: "%% FoomaticRIPOptionSetting: Yellow=0.05"
+*Yellow 0.10/0.10: "%% FoomaticRIPOptionSetting: Yellow=0.10"
+*Yellow 0.15/0.15: "%% FoomaticRIPOptionSetting: Yellow=0.15"
+*Yellow 0.20/0.20: "%% FoomaticRIPOptionSetting: Yellow=0.20"
+*Yellow 0.25/0.25: "%% FoomaticRIPOptionSetting: Yellow=0.25"
+*Yellow 0.30/0.30: "%% FoomaticRIPOptionSetting: Yellow=0.30"
+*Yellow 0.35/0.35: "%% FoomaticRIPOptionSetting: Yellow=0.35"
+*Yellow 0.40/0.40: "%% FoomaticRIPOptionSetting: Yellow=0.40"
+*Yellow 0.45/0.45: "%% FoomaticRIPOptionSetting: Yellow=0.45"
+*Yellow 0.50/0.50: "%% FoomaticRIPOptionSetting: Yellow=0.50"
+*Yellow 0.55/0.55: "%% FoomaticRIPOptionSetting: Yellow=0.55"
+*Yellow 0.60/0.60: "%% FoomaticRIPOptionSetting: Yellow=0.60"
+*Yellow 0.65/0.65: "%% FoomaticRIPOptionSetting: Yellow=0.65"
+*Yellow 0.70/0.70: "%% FoomaticRIPOptionSetting: Yellow=0.70"
+*Yellow 0.75/0.75: "%% FoomaticRIPOptionSetting: Yellow=0.75"
+*Yellow 0.80/0.80: "%% FoomaticRIPOptionSetting: Yellow=0.80"
+*Yellow 0.85/0.85: "%% FoomaticRIPOptionSetting: Yellow=0.85"
+*Yellow 0.90/0.90: "%% FoomaticRIPOptionSetting: Yellow=0.90"
+*Yellow 0.95/0.95: "%% FoomaticRIPOptionSetting: Yellow=0.95"
+*Yellow 1.00/1.00: "%% FoomaticRIPOptionSetting: Yellow=1.00"
+*Yellow 1.05/1.05: "%% FoomaticRIPOptionSetting: Yellow=1.05"
+*Yellow 1.10/1.10: "%% FoomaticRIPOptionSetting: Yellow=1.10"
+*Yellow 1.15/1.15: "%% FoomaticRIPOptionSetting: Yellow=1.15"
+*Yellow 1.20/1.20: "%% FoomaticRIPOptionSetting: Yellow=1.20"
+*Yellow 1.25/1.25: "%% FoomaticRIPOptionSetting: Yellow=1.25"
+*Yellow 1.30/1.30: "%% FoomaticRIPOptionSetting: Yellow=1.30"
+*Yellow 1.35/1.35: "%% FoomaticRIPOptionSetting: Yellow=1.35"
+*Yellow 1.40/1.40: "%% FoomaticRIPOptionSetting: Yellow=1.40"
+*Yellow 1.45/1.45: "%% FoomaticRIPOptionSetting: Yellow=1.45"
+*Yellow 1.50/1.50: "%% FoomaticRIPOptionSetting: Yellow=1.50"
+*Yellow 1.55/1.55: "%% FoomaticRIPOptionSetting: Yellow=1.55"
+*Yellow 1.60/1.60: "%% FoomaticRIPOptionSetting: Yellow=1.60"
+*Yellow 1.65/1.65: "%% FoomaticRIPOptionSetting: Yellow=1.65"
+*Yellow 1.70/1.70: "%% FoomaticRIPOptionSetting: Yellow=1.70"
+*Yellow 1.75/1.75: "%% FoomaticRIPOptionSetting: Yellow=1.75"
+*Yellow 1.80/1.80: "%% FoomaticRIPOptionSetting: Yellow=1.80"
+*Yellow 1.85/1.85: "%% FoomaticRIPOptionSetting: Yellow=1.85"
+*Yellow 1.90/1.90: "%% FoomaticRIPOptionSetting: Yellow=1.90"
+*Yellow 1.95/1.95: "%% FoomaticRIPOptionSetting: Yellow=1.95"
+*Yellow 2.00/2.00: "%% FoomaticRIPOptionSetting: Yellow=2.00"
+*Yellow 2.05/2.05: "%% FoomaticRIPOptionSetting: Yellow=2.05"
+*Yellow 2.10/2.10: "%% FoomaticRIPOptionSetting: Yellow=2.10"
+*Yellow 2.15/2.15: "%% FoomaticRIPOptionSetting: Yellow=2.15"
+*Yellow 2.20/2.20: "%% FoomaticRIPOptionSetting: Yellow=2.20"
+*Yellow 2.25/2.25: "%% FoomaticRIPOptionSetting: Yellow=2.25"
+*Yellow 2.30/2.30: "%% FoomaticRIPOptionSetting: Yellow=2.30"
+*Yellow 2.35/2.35: "%% FoomaticRIPOptionSetting: Yellow=2.35"
+*Yellow 2.40/2.40: "%% FoomaticRIPOptionSetting: Yellow=2.40"
+*Yellow 2.45/2.45: "%% FoomaticRIPOptionSetting: Yellow=2.45"
+*Yellow 2.50/2.50: "%% FoomaticRIPOptionSetting: Yellow=2.50"
+*Yellow 2.55/2.55: "%% FoomaticRIPOptionSetting: Yellow=2.55"
+*Yellow 2.60/2.60: "%% FoomaticRIPOptionSetting: Yellow=2.60"
+*Yellow 2.65/2.65: "%% FoomaticRIPOptionSetting: Yellow=2.65"
+*Yellow 2.70/2.70: "%% FoomaticRIPOptionSetting: Yellow=2.70"
+*Yellow 2.75/2.75: "%% FoomaticRIPOptionSetting: Yellow=2.75"
+*Yellow 2.80/2.80: "%% FoomaticRIPOptionSetting: Yellow=2.80"
+*Yellow 2.85/2.85: "%% FoomaticRIPOptionSetting: Yellow=2.85"
+*Yellow 2.90/2.90: "%% FoomaticRIPOptionSetting: Yellow=2.90"
+*Yellow 2.95/2.95: "%% FoomaticRIPOptionSetting: Yellow=2.95"
+*Yellow 3.00/3.00: "%% FoomaticRIPOptionSetting: Yellow=3.00"
+*Yellow 3.05/3.05: "%% FoomaticRIPOptionSetting: Yellow=3.05"
+*Yellow 3.10/3.10: "%% FoomaticRIPOptionSetting: Yellow=3.10"
+*Yellow 3.15/3.15: "%% FoomaticRIPOptionSetting: Yellow=3.15"
+*Yellow 3.20/3.20: "%% FoomaticRIPOptionSetting: Yellow=3.20"
+*Yellow 3.25/3.25: "%% FoomaticRIPOptionSetting: Yellow=3.25"
+*Yellow 3.30/3.30: "%% FoomaticRIPOptionSetting: Yellow=3.30"
+*Yellow 3.35/3.35: "%% FoomaticRIPOptionSetting: Yellow=3.35"
+*Yellow 3.40/3.40: "%% FoomaticRIPOptionSetting: Yellow=3.40"
+*Yellow 3.45/3.45: "%% FoomaticRIPOptionSetting: Yellow=3.45"
+*Yellow 3.50/3.50: "%% FoomaticRIPOptionSetting: Yellow=3.50"
+*Yellow 3.55/3.55: "%% FoomaticRIPOptionSetting: Yellow=3.55"
+*Yellow 3.60/3.60: "%% FoomaticRIPOptionSetting: Yellow=3.60"
+*Yellow 3.65/3.65: "%% FoomaticRIPOptionSetting: Yellow=3.65"
+*Yellow 3.70/3.70: "%% FoomaticRIPOptionSetting: Yellow=3.70"
+*Yellow 3.75/3.75: "%% FoomaticRIPOptionSetting: Yellow=3.75"
+*Yellow 3.80/3.80: "%% FoomaticRIPOptionSetting: Yellow=3.80"
+*Yellow 3.85/3.85: "%% FoomaticRIPOptionSetting: Yellow=3.85"
+*Yellow 3.90/3.90: "%% FoomaticRIPOptionSetting: Yellow=3.90"
+*Yellow 3.95/3.95: "%% FoomaticRIPOptionSetting: Yellow=3.95"
+*Yellow 4.00/4.00: "%% FoomaticRIPOptionSetting: Yellow=4.00"
+*CloseUI: *Yellow
+
+*CloseGroup: Adjustment
+
+*OpenGroup: PrintoutMode/Printout Mode
+
+*OpenUI *GSResolution/Ghostscript Resolution: PickOne
+*FoomaticRIPOption GSResolution: enum CmdLine A
+*OrderDependency: 120 AnySetup *GSResolution
+*DefaultGSResolution: FromPrintoutMode
+*GSResolution FromPrintoutMode/Controlled by 'Printout Mode': "%% FoomaticRIPOptionSetting: GSResolution=@PrintoutMode"
+*GSResolution 150x150DPI/150 x 150 DPI: "%% FoomaticRIPOptionSetting: GSResolution=150x150DPI"
+*FoomaticRIPOptionSetting GSResolution=150x150DPI: " -r150x150"
+*GSResolution 300x300DPI/300 x 300 DPI: "%% FoomaticRIPOptionSetting: GSResolution=300x300DPI"
+*FoomaticRIPOptionSetting GSResolution=300x300DPI: " -r300x300"
+*CloseUI: *GSResolution
+
+*OpenUI *Quality/Quality: PickOne
+*FoomaticRIPOption Quality: enum CmdLine B
+*OrderDependency: 100 AnySetup *Quality
+*DefaultQuality: FromPrintoutMode
+*Quality FromPrintoutMode/Controlled by 'Printout Mode': "%% FoomaticRIPOptionSetting: Quality=@PrintoutMode"
+*Quality 150dpi/150x150 DPI: "%% FoomaticRIPOptionSetting: Quality=150dpi"
+*FoomaticRIPOptionSetting Quality=150dpi: "Quality=150dpi,"
+*Quality 300dpi/300x300 DPI: "%% FoomaticRIPOptionSetting: Quality=300dpi"
+*FoomaticRIPOptionSetting Quality=300dpi: "Quality=300dpi,"
+*CloseUI: *Quality
+
+*OpenUI *OutputType/Output Type: PickOne
+*FoomaticRIPOption OutputType: enum CmdLine A
+*OrderDependency: 130 AnySetup *OutputType
+*DefaultOutputType: FromPrintoutMode
+*OutputType FromPrintoutMode/Controlled by 'Printout Mode': "%% FoomaticRIPOptionSetting: OutputType=@PrintoutMode"
+*OutputType BlackAndWhite/Black and White: "%% FoomaticRIPOptionSetting: OutputType=BlackAndWhite"
+*FoomaticRIPOptionSetting OutputType=BlackAndWhite: " -sProcessColorMo&&
+del=DeviceGray -dBitsPerSample=1"
+*End
+*OutputType Grayscale/Gray Scale: "%% FoomaticRIPOptionSetting: OutputType=Grayscale"
+*FoomaticRIPOptionSetting OutputType=Grayscale: " -sProcessColorModel=&&
+DeviceGray"
+*End
+*CloseUI: *OutputType
+
+*OpenUI *ImageType/Image Type: PickOne
+*FoomaticRIPOption ImageType: enum CmdLine B
+*OrderDependency: 150 AnySetup *ImageType
+*DefaultImageType: FromPrintoutMode
+*ImageType FromPrintoutMode/Controlled by 'Printout Mode': "%% FoomaticRIPOptionSetting: ImageType=@PrintoutMode"
+*ImageType Photographs/Continuous-tone photographs: "%% FoomaticRIPOptionSetting: ImageType=Photographs"
+*FoomaticRIPOptionSetting ImageType=Photographs: "ImageType=2,"
+*ImageType LineArt/Line art: "%% FoomaticRIPOptionSetting: ImageType=LineArt"
+*FoomaticRIPOptionSetting ImageType=LineArt: "ImageType=0,"
+*ImageType Solids/Primarily solid colors or smooth gradients: "%% FoomaticRIPOptionSetting: ImageType=Solids"
+*FoomaticRIPOptionSetting ImageType=Solids: "ImageType=1,"
+*CloseUI: *ImageType
+
+*OpenUI *Dither/Dither Algorithm: PickOne
+*FoomaticRIPOption Dither: enum CmdLine B
+*OrderDependency: 140 AnySetup *Dither
+*DefaultDither: FromPrintoutMode
+*Dither FromPrintoutMode/Controlled by 'Printout Mode': "%% FoomaticRIPOptionSetting: Dither=@PrintoutMode"
+*Dither Adaptive/Adaptive Hybrid: "%% FoomaticRIPOptionSetting: Dither=Adaptive"
+*FoomaticRIPOptionSetting Dither=Adaptive: "Dither=Adaptive,"
+*Dither EvenTone/EvenTone: "%% FoomaticRIPOptionSetting: Dither=EvenTone"
+*FoomaticRIPOptionSetting Dither=EvenTone: "Dither=EvenTone,"
+*Dither Fast/Fast: "%% FoomaticRIPOptionSetting: Dither=Fast"
+*FoomaticRIPOptionSetting Dither=Fast: "Dither=Fast,"
+*Dither Floyd/Hybrid Floyd-Steinberg: "%% FoomaticRIPOptionSetting: Dither=Floyd"
+*FoomaticRIPOptionSetting Dither=Floyd: "Dither=Floyd,"
+*Dither Ordered/Ordered: "%% FoomaticRIPOptionSetting: Dither=Ordered"
+*FoomaticRIPOptionSetting Dither=Ordered: "Dither=Ordered,"
+*Dither VeryFast/Very Fast: "%% FoomaticRIPOptionSetting: Dither=VeryFast"
+*FoomaticRIPOptionSetting Dither=VeryFast: "Dither=VeryFast,"
+*CloseUI: *Dither
+
+*CloseGroup: PrintoutMode
+
+
+*% Generic boilerplate PPD stuff as standard PostScript fonts and so on
+
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(001.006S)" Standard ROM
+*Font AvantGarde-Demi: Standard "(001.007S)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(001.007S)" Standard ROM
+*Font Bookman-Demi: Standard "(001.004S)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(001.004S)" Standard ROM
+*Font Bookman-Light: Standard "(001.004S)" Standard ROM
+*Font Bookman-LightItalic: Standard "(001.004S)" Standard ROM
+*Font Courier: Standard "(002.004S)" Standard ROM
+*Font Courier-Bold: Standard "(002.004S)" Standard ROM
+*Font Courier-BoldOblique: Standard "(002.004S)" Standard ROM
+*Font Courier-Oblique: Standard "(002.004S)" Standard ROM
+*Font Helvetica: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(001.007S)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(001.006S)" Standard ROM
+*Font Helvetica-Oblique: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(001.009S)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(001.007S)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(001.006S)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(001.007S)" Standard ROM
+*Font Palatino-Bold: Standard "(001.005S)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Italic: Standard "(001.005S)" Standard ROM
+*Font Palatino-Roman: Standard "(001.005S)" Standard ROM
+*Font Symbol: Special "(001.007S)" Special ROM
+*Font Times-Bold: Standard "(001.007S)" Standard ROM
+*Font Times-BoldItalic: Standard "(001.009S)" Standard ROM
+*Font Times-Italic: Standard "(001.007S)" Standard ROM
+*Font Times-Roman: Standard "(001.007S)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(001.007S)" Standard ROM
+*Font ZapfDingbats: Special "(001.004S)" Standard ROM
+

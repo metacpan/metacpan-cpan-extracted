@@ -1,0 +1,27 @@
+This is the Perl module Pod::Generated.
+
+## Installation
+
+Pod::Generated installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Pod::Generated
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+## Documentation
+
+Pod::Generated documentation is available as in POD. So you can do:
+
+    % perldoc Pod::Generated
+
+to read the documentation online with your favorite pager.
+
+Marcel Gruenauer

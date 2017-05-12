@@ -1,0 +1,25 @@
+- staticMethodA
+- staticMethodA
+- Base staticMethodB  1
+- Derived staticMethodB  111
+Base.staticDump()
+	staticData1: 1
+	staticData2: 2
+	staticData3: 333
+Base.instanceDump() Base
+	staticData1: 1
+	instanceData1: 1
+Base.staticDump()
+	staticData1: 1
+	staticData2: 2
+	staticData3: 333
+
+Base.instanceDump() Derived
+	staticData1: 1
+	instanceData1: 1
+Derived.staticDumpB()
+	staticData1: 111
+	staticData2: 2
+	staticData3: 333
+Derived.instanceDumpB() Derived
+	staticData1: 111

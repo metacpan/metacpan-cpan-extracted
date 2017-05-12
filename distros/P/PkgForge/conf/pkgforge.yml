@@ -1,0 +1,4 @@
+incoming: /var/lib/pkgforge/incoming
+accepted: /var/lib/pkgforge/accepted
+results:  /var/lib/pkgforge/results
+website:  http://pkgforge.example.org/

@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+subfile.pm
+subfile.xs
+t/test.t
+META.yml                                Module meta-data in YAML

@@ -1,0 +1,14 @@
+---
+comment: |
+
+  Crypt::SSLeay needs a patch and to install in Strawberry Perl 64-bit (RT# 52408)
+  It also needs a hint in order to install without command line options.
+
+match:
+  distribution: |
+    ^(?x:
+    .^   # never matches, only purpose is to let things align nicely
+    |DLAND/Crypt-SSLeay-0.57.tar.gz          # Needs a patch to install.
+    )|
+patches:
+    - "Crypt-SSLeay-0.57.patch"

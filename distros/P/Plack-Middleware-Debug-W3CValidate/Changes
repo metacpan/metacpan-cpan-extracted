@@ -1,0 +1,12 @@
+Revision history for Perl extension Plack-Middleware-Debug-W3CValidate
+
+0.03	22 August 2010
+	- You'd think I'd know how to prep a dist by now, right?
+
+0.02    20 August 2010
+        - messed up previous release somehow :(
+        - Added repository info
+        - minor code reformatting
+
+0.01    20 August 2010
+        - First release, buyer beware.

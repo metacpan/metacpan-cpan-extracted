@@ -1,0 +1,15 @@
+Revision history for Perl extension Parse::Nessus::NBE
+
+1.1  Tue Apr 27 16:06:21 2004
+	- added one function (nstatvulns)
+	- added %EXPORT_TAG support, thanks Gwen <gwen@reptiles.org> 
+	- updated POD
+
+1.0  Thu Jan 22 23:13:31 2004
+	- added two functions (nstatos, nstatservices)
+	- updated POD
+
+0.01  Mon May 12 22:18:39 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n Parse::Nessus::NBE
+

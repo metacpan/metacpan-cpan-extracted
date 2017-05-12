@@ -1,0 +1,25 @@
+---
+abstract: 'A wrapper written for PDF::API2'
+author:
+  - 'Andy Orr <aorr_at_cpan_dot_org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PDF-Report
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  PDF::API2: 0
+  Test::More: 0
+resources:
+  repository: https://github.com/hashbangperl/perl-pdf-report
+version: 1.36

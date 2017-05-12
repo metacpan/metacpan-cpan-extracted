@@ -1,0 +1,14 @@
+Sep 29 11:38:24 srssweb2 SrsFrontEnd-srsdev[5461]: FE Times: ID=4,463623; type=DomainDetailsQry; 0=11:38:22.544547; tot=1.965; read=0.001; parseXML=0.006; send=0.003; recv=1.954; respond=0.000 
+Sep 29 11:38:24 srssweb2 FeRep-srsdev[3969]: Times: ID=4,463623; 0=11:38:22.553088; tot=1.952; read_config=0.002; valid_config=0.000; fork=0.001; read=0.002; init=0.000; m0:spread=0.035; m0:send=0.004; m0:srspapp3=1.910; respond=0.001 
+Sep 29 11:38:24 srspapp3 Listener-srsdev[30744]: Times: ID=4,463623; 0=11:38:22.606203; tot=1.857; childspread=0.207; init=0.199; process=1.443; respond=0.001; request=0.000 
+Sep 29 11:38:24 srspapp3 SrsBackend-srsdev[14961]: BE Times: ID=4,463623; type=DomainDetailsQry; 0=11:38:23.097447; tot=1.354; hout=0.000; new=0.003; init=0.000; keytext=0.300; pgpv1=0.043; pgpv=0.021; parse=0.029; m0:process=0.000; m0:process=0.952; sign=0.004; send=0.001 
+
+Sep 29 11:38:32 srssweb2 SrsFrontEnd-srsdev[5462]: FE Times: ID=4,463624; type=DomainDetailsQry; 0=11:38:30.824156; tot=1.784; read=0.001; parseXML=0.007; send=0.003; recv=1.773; respond=0.000 
+Sep 29 11:38:32 srssweb2 FeRep-srsdev[4026]: Times: ID=4,463624; 0=11:38:30.833040; tot=1.770; read_config=0.002; valid_config=0.000; fork=0.001; read=0.002; init=0.000; m0:spread=0.035; m0:send=0.004; m0:srspapp3=1.728; respond=0.001 
+Sep 29 11:38:32 srspapp3 Listener-srsdev[30777]: Times: ID=4,463624; 0=11:38:30.887228; tot=1.682; childspread=0.112; init=0.012; process=1.558; respond=0.001; request=0.000 
+Sep 29 11:38:32 srspapp3 SrsBackend-srsdev[30747]: BE Times: ID=4,463624; type=DomainDetailsQry; 0=11:38:32.249128; tot=0.316; hout=0.000; new=0.076; init=0.000; keytext=0.009; pgpv1=0.055; pgpv=0.017; parse=0.009; m0:process=0.000; m0:process=0.120; sign=0.025; send=0.003 
+
+Sep 29 11:39:26 srssweb2 SrsFrontEnd-srsdev[5463]: FE Times: ID=4,463625; type=DomainUpdate; 0=11:39:20.622068; tot=5.958; read=0.001; parseXML=0.006; send=0.004; recv=5.946; respond=0.000 
+Sep 29 11:39:26 srssweb2 FeRep-srsdev[4308]: Times: ID=4,463625; 0=11:39:20.631361; tot=5.947; read_config=0.002; valid_config=0.000; fork=0.001; read=0.002; init=0.000; lock=0.005; m0:spread=0.034; m0:send=0.004; m0:srspapp3=5.901; check=0.001; respond=0.000; check2=0.000 
+Sep 29 11:39:26 srspapp3 Listener-srsdev[31008]: Times: ID=4,463625; 0=11:39:20.701952; tot=5.806; childspread=0.108; init=0.011; process=5.686; respond=0.001; request=0.000 
+Sep 29 11:39:26 srspapp3 SrsBackend-srsdev[30780]: BE Times: ID=4,463625; type=DomainUpdate; 0=11:39:21.601850; tot=4.902; hout=0.000; new=0.028; init=0.001; keytext=0.003; pgpv1=0.045; pgpv=0.017; parse=0.009; recordrq=0.242; m0:process=0.000; m0:process=4.430; sign=0.018; logrs=0.107; send=0.002 

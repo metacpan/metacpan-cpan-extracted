@@ -1,0 +1,60 @@
+{
+   "abstract" : "Use tabs for indenting, spaces for aligning.",
+   "author" : [
+      "Guillaume Aubert <aubertg@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Critic-Policy-CodeLayout-TabIndentSpaceAlign",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic::Policy" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Perl::Critic::Policy" : "0",
+            "Perl::Critic::Utils" : "0",
+            "Readonly" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::Policy::CodeLayout::TabIndentSpaceAlign" : {
+         "file" : "lib/Perl/Critic/Policy/CodeLayout/TabIndentSpaceAlign.pm",
+         "version" : "v1.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/guillaumeaubert/Perl-Critic-Policy-CodeLayout-TabIndentSpaceAlign/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Perl-Critic-Policy-CodeLayout-TabIndentSpaceAlign",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/guillaumeaubert/Perl-Critic-Policy-CodeLayout-TabIndentSpaceAlign"
+      }
+   },
+   "version" : "v1.1.0"
+}

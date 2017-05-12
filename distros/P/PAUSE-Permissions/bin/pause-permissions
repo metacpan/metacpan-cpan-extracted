@@ -1,0 +1,110 @@
+#!/usr/bin/env perl 
+
+package PAUSE::Permissions::pause_permissions;
+$PAUSE::Permissions::pause_permissions::VERSION = '0.16';
+use strict;
+use warnings;
+
+use 5.10.0;
+
+use PAUSE::Permissions;
+
+use List::Util 1.33 qw/ any /;
+
+use Moo;
+use MooX::Options
+    protect_argv => 0,
+    usage_string => 'USAGE: %c %o <First::Module> <Second::Module> ...';
+
+option max_age => (
+    is => 'ro',
+    format => 's',
+    doc => 'max age of the cache. default: 1 day',
+    default => sub { '1 day' },
+);
+
+option silent => (
+    is => 'ro',
+    doc => "don't issue warnings if modules are not found",
+);
+
+option nocomaints => (
+    is => 'ro',
+    doc => "only print out the owner of the module",
+);
+
+option author => (
+    is     => 'ro',
+    format => 's',
+    doc    => "print all modules owned or maintained by this author",
+);
+
+has pp => (
+    is => 'ro',
+    lazy => 1,
+    default => sub { PAUSE::Permissions->new( max_age => $_[0]->max_age ) },
+);
+
+has modules => (
+    is => 'ro',
+    lazy => 1,
+    default => sub { [
+        @ARGV ? @ARGV : split /\s+/, <STDIN>
+    ] },
+);
+
+sub run {
+    my $self = shift;
+
+    return $self->print_author if $self->author;
+    
+    $self->print_ownership($_) for @{ $self->modules };
+}
+
+sub print_author {
+    my $self = shift;
+
+    my $author = $self->author;
+    my $comaints = ! $self->nocomaints;
+
+    my $it = $self->pp->module_iterator;
+
+    while( my $mod = $it->next_module ) {
+        no warnings 'uninitialized';
+        $self->print_ownership($mod) if
+            any { $_ eq $author } $mod->owner, ( $mod->co_maintainers ) x $comaints;
+    }
+    
+    
+}
+
+
+sub print_ownership {
+    my( $self, $m ) = @_;
+
+    my $module = ref $m ? $m : ( 
+        $self->pp->module_permissions($m)
+            or return $self->silent || warn "Module '$m' not found\n" 
+    );
+
+    say join "\t", $module->name, $module->owner || 'none', ( $module->co_maintainers ) x !$self->nocomaints;
+}
+
+PAUSE::Permissions::pause_permissions->new_with_options->run;
+
+__END__
+
+=head1 NAME
+
+pause-permissions - list the maintainers of CPAN modules
+
+=head1 SYNOPSIS
+
+    pause-permissions Moose Moo PAUSE::Permissions
+
+=head1 DESCRIPTION
+
+Prints out the maintainers of the modules given either as arguments, or via 
+STDIN. The owner of the module is always printed first.
+
+If a module doesn't exist, a warning is issued.

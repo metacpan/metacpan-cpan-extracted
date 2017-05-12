@@ -1,0 +1,23 @@
+---
+abstract: 'Parse OpenGL Shader Language files into an abstract syntax tree'
+author:
+  - 'Tom Molesworth <tom@entitymodel.com>'
+build_requires:
+  Module::Build: 0.3601
+  Test::Deep: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120530'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-GLSL
+requires:
+  Parser::MGC: 0.09
+  parent: 0
+  perl: 5.008
+version: 0.002

@@ -1,0 +1,43 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre2It\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-23 11:08+0300\n"
+"PO-Revision-Date: 2010-11-03 14:57+0100\n"
+"Last-Translator: Simone Blandino <simone.blandino@gmail.com>\n"
+"Language-Team: Padre2It <simone.blandino@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Italian\n"
+"X-Poedit-Country: ITALY\n"
+
+#: lib/Padre/Plugin/NYTProf.pm:16
+msgid "NYTProf - Perl Profiler"
+msgstr "NYTProf - profilatore Perl"
+
+#: lib/Padre/Plugin/NYTProf.pm:28
+msgid "Run Profiling"
+msgstr "Esegui profilazione"
+
+#: lib/Padre/Plugin/NYTProf.pm:29
+msgid "Generate Profiling Report"
+msgstr "Genera report profilazione"
+
+#: lib/Padre/Plugin/NYTProf.pm:30
+msgid "Show Generated Profiling Report"
+msgstr "Mostra il report della profilazione generato"
+
+#: lib/Padre/Plugin/NYTProf.pm:34
+msgid "About"
+msgstr "Informazioni su"
+
+#: lib/Padre/Plugin/NYTProf.pm:116
+msgid "This system is running NYTProf version "
+msgstr "Questo sistema sta eseguendo NYTProf, versione"
+

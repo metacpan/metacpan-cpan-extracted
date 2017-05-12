@@ -1,0 +1,26 @@
+Revision history for Perinci-Sub-Property-memoize
+
+0.04    2016-05-11 (PERLANCAR)
+
+	- [dist] Bump prereq version Perinci::Sub::PropertyUtil to 0.11
+	  (incompatible change due to schema for Rinci function now in
+	  Sah::Schema::rinci::function_meta instead of Sah::Schema::Rinci).
+
+
+0.03    2016-03-10 (PERLANCAR)
+
+        - Update code (__squote has been removed, we now use Data::Dmp)
+          [RT#112890].
+
+
+0.02    2015-02-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix tests and update to latest Test::Perinci::Sub::Wrapper
+	  [RT#101901].
+
+
+0.01     2014-03-13 (SHARYANTO)
+
+         - First release.

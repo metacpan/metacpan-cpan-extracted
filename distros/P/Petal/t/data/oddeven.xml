@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<foo xmlns:petal="http://purl.org/petal/1.0/">
+  <loop petal:repeat="item items" petal:omit-tag="">
+  <odd petal:content="item" petal:condition="repeat/odd">Odd item</odd>
+  <even petal:content="item" petal:condition="repeat/even">Even item</even>
+  </loop>
+</foo>

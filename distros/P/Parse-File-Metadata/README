@@ -1,0 +1,38 @@
+README for Parse-File-Metadata
+
+NAME
+    Parse::File::Metadata - For plain-text files that contain both metadata
+    and data records, parse metadata first
+
+DESCRIPTION
+    This module is useful when you have to parse a plain-text file that
+    meets the following conditions:
+
+    *   The file consists of two types of records:
+
+        *   A header section consisting of key-value pairs which
+            constitute, in some sense, metadata.
+
+        *   A body section consisting mainly or entirely of data
+            records, which may be either delimited or fixed-width.
+
+        *   The header and the body are separated by one or more empty
+            records.
+
+    *   Your program must parse the metadata first, then make a decision on
+        the basis of the metadata whether to proceed with parsing of the
+        data. The metadata may or may not be used in the parsing of the
+        data.
+
+    *   Call 'perldoc lib/Parse/File/Metadata.pm' for further documentation.
+
+INSTALLATION
+    You should be able to use this set of instructions
+    to install the module:
+    
+    perl Makefile.PL
+    make
+    make test
+    make install
+    
+    If you are on a windows box you should use 'nmake' rather than 'make'.

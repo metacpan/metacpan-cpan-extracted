@@ -1,0 +1,233 @@
+
+
+# = HISTORY SECTION =====================================================================
+
+# ---------------------------------------------------------------------------------------
+# version | date   | author   | changes
+# ---------------------------------------------------------------------------------------
+# 0.07    |02.01.03| JSTENZEL | modern run() call;
+# 0.06    |27.02.02| JSTENZEL | auto-anchors headlines (for \REF);
+# 0.05    |10.06.01| JSTENZEL | new script namespace "PerlPoint::Converter::pp2tree";
+#         |        | JSTENZEL | adapted to new tag declarations;
+# 0.04    |07.12.00| JSTENZEL | new module namespace "PerlPoint";
+# 0.03    |07.10.00| JSTENZEL | renamed to pp2tree;
+# 0.02    |12.10.99| JSTENZEL | added a simple backend;
+# 0.01    |09.10.99| JSTENZEL | derived from the PerlPoint::Parser draft.
+# ---------------------------------------------------------------------------------------
+
+# = POD SECTION =========================================================================
+
+=head1 NAME
+
+B<pp2tree> - a Perl Point demo application visualizing a documents structure
+
+=head1 VERSION
+
+This manual describes version B<0.07>.
+
+This is a demonstration application of the PP package. It
+visualizes a Perl Point document as a tree.
+
+=head1 SYNOPSIS
+
+=head1 FILES
+
+=head1 ENVIRONMENT
+
+=head1 NOTES
+
+This is a demonstration only. A real life pp2tree visualizer surely
+should be more robust etc., the intention of this code is simply
+to I<show the usage of PerlPoint::Package>, not a perfect translator.
+
+=head1 SEE ALSO
+
+PerlPoint::Parser
+
+PerlPoint::Backend
+
+=head1 AUTHOR
+
+Copyright (c) Jochen Stenzel (perl@jochen-stenzel.de), 1999-2001. All rights reserved.
+
+=cut
+
+
+# declare script package
+package PerlPoint::Converter::pp2tree;
+
+# declare version
+$VERSION=$VERSION=0.07;
+
+# pragmata
+use strict;
+
+# load modules
+use Carp;
+use Getopt::Long;
+use PerlPoint::Tags;
+use PerlPoint::Backend;
+use PerlPoint::Constants;
+use PerlPoint::Parser 0.34;
+use PerlPoint::Tags::Basic;
+use Getopt::ArgvFile qw(argvFile);
+
+
+# declare variables
+my ($depth, $patt, @streamData, %options)=(0, "   |");
+
+# get options
+argvFile(home=>1, default=>1);
+GetOptions(\%options,
+           "tagset=s@",         # add a tag set to the scripts own tag declarations;
+          );
+
+# import tags
+PerlPoint::Tags::addTagSets(@{$options{tagset}}) if exists $options{tagset};
+
+# build parser
+my ($parser)=new PerlPoint::Parser;
+
+# and call it
+$parser->run(
+             stream          => \@streamData,
+             files           => \@ARGV,
+
+             headlineLinks   => 1,
+
+             filter          => 'perl|pod',
+
+             safe            => exists $options{activeContents} ? $safe : undef,
+             activeBaseData  => {
+                                 targetLanguage => 'POD',
+                                 userSettings   => {map {$_=>1} exists $options{set} ? @{$options{set}} : ()},
+                                },
+
+             predeclaredVars => {
+                                 CONVERTER_NAME    => basename($0),
+                                 CONVERTER_VERSION => do {no strict 'refs'; ${join('::', __PACKAGE__, 'VERSION')}},
+                                },
+
+             vispro          => 1,
+             cache           =>   (exists $options{cache} ? CACHE_ON : CACHE_OFF)
+                                + (exists $options{cacheCleanup} ? CACHE_CLEANUP : 0),
+             display         =>   DISPLAY_ALL
+                                + (exists $options{noinfo} ? DISPLAY_NOINFO : 0)
+                                + (exists $options{nowarn} ? DISPLAY_NOWARN : 0),
+             trace           =>   TRACE_NOTHING
+                                + ((exists $options{trace} and $options{trace} & TRACE_PARAGRAPHS) ? TRACE_PARAGRAPHS : 0)
+                                + ((exists $options{trace} and $options{trace} & TRACE_LEXER)      ? TRACE_LEXER      : 0)
+                                + ((exists $options{trace} and $options{trace} & TRACE_PARSER)     ? TRACE_PARSER     : 0)
+                                + ((exists $options{trace} and $options{trace} & TRACE_SEMANTIC)   ? TRACE_SEMANTIC   : 0)
+                                + ((exists $options{trace} and $options{trace} & TRACE_ACTIVE)     ? TRACE_ACTIVE     : 0)
+                                + ((exists $options{trace} and $options{trace} & TRACE_TMPFILES)   ? TRACE_TMPFILES   : 0),
+            ) or exit(1);
+
+
+# build a backend
+my $backend=new PerlPoint::Backend(name=>'pp2tree', trace=>TRACE_NOTHING);
+
+# register backend handlers
+$backend->register(DIRECTIVE_BLOCK, \&handleBlock);
+$backend->register(DIRECTIVE_COMMENT, \&handleComment);
+$backend->register(DIRECTIVE_DOCUMENT, \&handleDocument);
+$backend->register(DIRECTIVE_HEADLINE, \&handleHeadline);
+$backend->register($_, \&handleList) foreach (DIRECTIVE_ULIST, DIRECTIVE_OLIST, DIRECTIVE_DLIST);
+$backend->register($_, \&handleListPoint) foreach (DIRECTIVE_UPOINT, DIRECTIVE_OPOINT, DIRECTIVE_DPOINT);
+$backend->register(DIRECTIVE_LIST_LSHIFT, \&handleListShift);
+$backend->register(DIRECTIVE_LIST_RSHIFT, \&handleListShift);
+$backend->register(DIRECTIVE_SIMPLE, \&handleSimple);
+$backend->register(DIRECTIVE_TAG, \&handleTag);
+$backend->register(DIRECTIVE_TEXT, \&handleText);
+$backend->register(DIRECTIVE_VERBATIM, \&handleVerbatim);
+
+# and run it
+$backend->run(\@streamData);
+
+
+# SUBROUTINES ###############################################################################
+
+# helper function
+sub visualize
+ {
+  # get and check parameters
+  my ($state, $msg)=@_;
+  confess "[BUG] Missing state parameter.\n" unless defined $state;
+  confess "[BUG] Missing message parameter.\n" unless defined $msg;
+
+  if ($state==DIRECTIVE_START)
+    {
+     # update graphics
+     warn(($patt x $depth), "\n");
+     warn(($patt x $depth), "- $msg.\n");
+     warn(($patt x ($depth+1)), "\n");
+
+     # update data
+     $depth++;
+    }
+  else
+    {
+     # update data
+     $depth-- if $depth>0;
+
+     # update graphics
+     warn(($patt x ($depth+1)), "\n");
+     warn(($patt x $depth), "- $msg.\n");
+     warn(($patt x $depth), "\n");
+    }
+ }
+
+# simple directive handlers
+sub handleSimple
+ {
+  # update the token counter
+  ;
+ }
+sub handleHeadline
+ {visualize($_[1], "Headline $_[2]");}
+
+sub handleList
+ {visualize($_[1], join(' ', $_[0]==DIRECTIVE_OLIST ? 'Ordered' : $_[0]==DIRECTIVE_ULIST ? 'Unordered' : 'Definition', 'list'));}
+
+sub handleListPoint
+ {visualize($_[1], $_[0]==DIRECTIVE_DPOINT ? 'Definition' : 'Item');}
+
+sub handleListShift
+ {visualize($_[1], "List Shift");}
+
+sub handleBlock
+ {visualize($_[1], "Block");}
+
+sub handleText
+ {visualize($_[1], "Text");}
+
+sub handleVerbatim
+ {visualize($_[1], "Verbatim block");}
+
+sub handleComment
+ {visualize($_[1], "Comment");}
+
+sub handleTag
+ {visualize($_[1], "Tag $_[2]");}
+
+sub handleDocument
+ {
+  if ($_[1]==DIRECTIVE_START)
+    {
+     # update graphics
+     warn "Document (base $_[2]).\n";
+     warn "$patt\n";
+
+     # update data
+     $depth++;
+    }
+  else
+    {
+     # update data
+     $depth-- if $depth>0;
+
+     # update graphics
+     warn "$patt\n";
+     warn "Document (base $_[2]).\n";
+    }
+ }

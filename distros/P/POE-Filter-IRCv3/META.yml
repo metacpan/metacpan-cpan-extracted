@@ -1,0 +1,26 @@
+---
+abstract: 'Fast IRCv3.2 parser for POE or stand-alone use'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  Scalar::Util: 0
+  Test::Deep: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Filter-IRCv3
+recommends:
+  POE::Filter: 1
+requires:
+  perl: 5.008
+resources:
+  repository: git://github.com/avenj/poe-filter-ircv3.git
+version: 1.002002

@@ -1,0 +1,25 @@
+
+=head1 NAME
+
+test POD
+
+=begin xhtml
+
+<p>This is some text/html</p>
+
+=end xhtml
+
+=head1 DESCRIPTION
+
+=for pod2xhtml <b>Woo!</b>
+
+=begin html
+
+This should be omitted from the output.<br>
+It may be possible in future to run HTML blocks through tidy, to convert to
+xhtml, but this is not yet implemented.
+
+=end html
+
+=cut
+

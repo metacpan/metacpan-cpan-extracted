@@ -1,0 +1,19 @@
+# ListAndAction.eyp
+%{
+my $num = 0;
+%}
+
+%%
+S:      'c'                      
+            { 
+              print "S -> c\n" 
+            }
+    |    ('a' {$num++; print "Seen <$num> 'a's\n"; $_[1] }) S 'b'   
+            { 
+              print "S -> (a ) S b\n" 
+            }
+;
+%%
+
+# eyapp -C ListAndAction.eyp
+#./ListAndAction.pm -c 'a a c b b'

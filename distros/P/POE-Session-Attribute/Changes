@@ -1,0 +1,17 @@
+Revision history for Perl extension POE::Session::Attribute.
+
+0.01  Thu Feb 16 01:42:26 2006
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n POE::Session::Attribute
+
+0.02  Sat Apr 30 17:10:00 2006
+	+ explicit state names as attribute arguments
+
+0.03  Mon May  1 17:10:00 2006
+	* dependencies cleaup
+	+ POE::Session::AttributeBased [v0.03] compatibility
+	    [all material tests passed]
+
+0.80  Thu May  4 11:18:05 MSD 2006
+	+ POD coverage for POE::Session::AttributeBased compats
+        * version bumped, i don't think we're gonna have big API changes soon.

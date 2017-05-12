@@ -1,0 +1,264 @@
+name en-gb Padre
+
+
+
+# Padre GUI Colours
+style Padre::Wx::Directory::TreeCtrl
+SetForegroundColour                               990000
+SetBackgroundColour                               ffffee
+
+
+
+# Padre Internal Editor Colours
+style padre
+StyleSetForeground PADRE_BLACK                    000000
+StyleSetForeground PADRE_BLUE                     000099
+StyleSetForeground PADRE_RED                      990000
+StyleSetForeground PADRE_GREEN                    00aa00
+StyleSetForeground PADRE_MAGENTA                  8b008b
+StyleSetForeground PADRE_ORANGE                   ff8228
+StyleSetForeground PADRE_CRIMSON                  dc143c
+StyleSetForeground PADRE_BROWN                    a52a2a
+StyleSetForeground PADRE_DIFF_HEADER              000000
+StyleSetBackground PADRE_DIFF_HEADER              eeee22
+StyleSetForeground PADRE_DIFF_DELETED             000000
+StyleSetBackground PADRE_DIFF_DELETED             ff8080
+StyleSetForeground PADRE_DIFF_ADDED               000000
+StyleSetBackground PADRE_DIFF_ADDED               80ff80
+StyleSetForeground PADRE_WARNING                  af8000
+StyleSetBackground PADRE_WARNING                  fffff0
+StyleSetForeground PADRE_ERROR                    af0000
+StyleSetBackground PADRE_ERROR                    fff0f0
+# Code folding margin
+SetFoldMarginColour     1 eeeeee
+SetFoldMarginHiColour   1 eeeeee
+MarkerSetForeground     SC_MARKNUM_FOLDEREND      eeeeee
+MarkerSetBackground     SC_MARKNUM_FOLDEREND      586e75
+MarkerSetForeground     SC_MARKNUM_FOLDEROPENMID  eeeeee
+MarkerSetBackground     SC_MARKNUM_FOLDEROPENMID  586e75
+MarkerSetForeground     SC_MARKNUM_FOLDERMIDTAIL  586e75
+MarkerSetBackground     SC_MARKNUM_FOLDERMIDTAIL  586e75
+MarkerSetForeground     SC_MARKNUM_FOLDERTAIL     586e75
+MarkerSetBackground     SC_MARKNUM_FOLDERTAIL     586e75
+MarkerSetForeground     SC_MARKNUM_FOLDERSUB      586e75
+MarkerSetBackground     SC_MARKNUM_FOLDERSUB      586e75
+MarkerSetForeground     SC_MARKNUM_FOLDER         586e75
+MarkerSetBackground     SC_MARKNUM_FOLDER         eeeeee
+MarkerSetForeground     SC_MARKNUM_FOLDEROPEN     eeeeee
+MarkerSetBackground     SC_MARKNUM_FOLDEROPEN     586e75
+
+
+
+style text/plain
+include padre
+SetCaretForeground                                000000
+SetCaretLineBackground                            ffff04
+StyleSetBackground STYLE_DEFAULT            ffffff
+StyleSetForeground STYLE_DEFAULT            000000
+StyleSetBackground STYLE_LINENUMBER         eeeeee
+StyleSetForeground STYLE_INDENTGUIDE        0000ff
+StyleSetForeground STYLE_BRACELIGHT         00ff00
+StyleSetForeground STYLE_BRACEBAD           ff0000
+
+
+
+style text/x-config
+include text/plain
+StyleSetForeground SCE_CONF_DEFAULT             000000
+StyleSetForeground SCE_CONF_COMMENT             007f00
+StyleSetForeground SCE_CONF_NUMBER              007f7f
+StyleSetForeground SCE_CONF_IDENTIFIER          0000ff
+StyleSetForeground SCE_CONF_EXTENSION           202020
+StyleSetForeground SCE_CONF_PARAMETER           208820
+StyleSetForeground SCE_CONF_STRING              ff7f00
+StyleSetForeground SCE_CONF_OPERATOR            00007f
+StyleSetForeground SCE_CONF_IP                  209999
+StyleSetForeground SCE_CONF_DIRECTIVE           202020
+
+
+
+style application/x-perl
+include text/plain
+StyleSetForeground SCE_PL_DEFAULT               999999
+StyleSetForeground SCE_PL_ERROR                 ff0000
+StyleSetForeground SCE_PL_COMMENTLINE           007f00
+StyleSetForeground SCE_PL_POD                   7f7f7f
+StyleSetForeground SCE_PL_POD_VERB              7f7f7f
+StyleSetForeground SCE_PL_NUMBER                007f7f
+StyleSetForeground SCE_PL_WORD                  00007f
+StyleSetBold       SCE_PL_WORD                  1
+StyleSetForeground SCE_PL_STRING                ff7f00
+StyleSetForeground SCE_PL_CHARACTER             7f007f
+StyleSetForeground SCE_PL_PUNCTUATION           00ff00
+StyleSetForeground SCE_PL_PREPROCESSOR          7f7f7f
+StyleSetForeground SCE_PL_OPERATOR              00007f
+StyleSetForeground SCE_PL_IDENTIFIER            0000ff
+StyleSetForeground SCE_PL_SCALAR                7f007f
+StyleSetForeground SCE_PL_ARRAY                 4080ff
+StyleSetForeground SCE_PL_HASH                  0080ff
+StyleSetForeground SCE_PL_SYMBOLTABLE           00ff00
+StyleSetForeground SCE_PL_REGEX                 ff007f
+StyleSetForeground SCE_PL_REGSUBST              7f7f00
+StyleSetForeground SCE_PL_LONGQUOTE             ff7f00
+StyleSetForeground SCE_PL_BACKTICKS             ffaa00
+StyleSetForeground SCE_PL_DATASECTION           ff7f00
+StyleSetForeground SCE_PL_HERE_DELIM            ff7f00
+StyleSetForeground SCE_PL_HERE_Q                7f007f
+StyleSetForeground SCE_PL_HERE_QQ               ff7f00
+StyleSetForeground SCE_PL_HERE_QX               ffaa00
+StyleSetForeground SCE_PL_STRING_Q              7f007f
+StyleSetForeground SCE_PL_STRING_QQ             ff7f00
+StyleSetForeground SCE_PL_STRING_QX             ffaa00
+StyleSetForeground SCE_PL_STRING_QR             ff007f
+StyleSetForeground SCE_PL_STRING_QW             7f007f
+# Missing SCE_PL_VARIABLE_INDEXER (16)
+# Missing SCE_PL_SUB_PROTOTYPE    (40)
+# Missing SCE_PL_FORMAT_IDENT     (41)
+# Missing SCE_PL_FORMAT           (42)
+
+
+
+style text/x-csrc
+include text/plain
+StyleSetForeground SCE_C_DEFAULT                000000
+StyleSetForeground SCE_C_COMMENT                007f00
+StyleSetForeground SCE_C_COMMENTLINE            007f00
+StyleSetForeground SCE_C_COMMENTDOC             7f7f7f
+StyleSetForeground SCE_C_NUMBER                 007f7f
+StyleSetForeground SCE_C_WORD                   00007f
+StyleSetBold       SCE_C_WORD                   1
+StyleSetForeground SCE_C_WORD2                  00007f
+StyleSetBold       SCE_C_WORD2                  1
+StyleSetForeground SCE_C_STRING                 ff7f00
+StyleSetForeground SCE_C_CHARACTER              7f007f
+StyleSetForeground SCE_C_PREPROCESSOR           7f7f7f
+StyleSetBold       SCE_C_PREPROCESSOR           1
+StyleSetForeground SCE_C_OPERATOR               00007f
+StyleSetForeground SCE_C_IDENTIFIER             0000ff
+StyleSetForeground SCE_C_STRINGEOL              ff0000
+StyleSetForeground SCE_C_VERBATIM               7f007f
+StyleSetForeground SCE_C_REGEX                  ff007f
+StyleSetForeground SCE_C_COMMENTLINEDOC         7f7f7f
+
+
+
+style text/x-perlxs
+include text/x-csrc
+StyleSetForeground SCE_C_COMMENTDOC             007f00
+StyleSetForeground SCE_C_WORD                   7f007f
+StyleSetForeground SCE_C_UUID                   7f007f
+StyleSetForeground SCE_C_PREPROCESSOR           777777
+StyleSetBold       SCE_C_PREPROCESSOR           1
+StyleSetForeground SCE_C_COMMENTLINEDOC         007f00
+StyleSetForeground SCE_C_WORD2                  7f007f
+StyleSetBold       SCE_C_WORD2                  1
+StyleSetForeground SCE_C_COMMENTDOCKEYWORD      000000
+StyleSetBackground SCE_C_COMMENTDOCKEYWORD      ff0000
+StyleSetForeground SCE_C_COMMENTDOCKEYWORDERROR 000000
+StyleSetBackground SCE_C_COMMENTDOCKEYWORDERROR ff0000
+StyleSetForeground SCE_C_GLOBALCLASS            7f007f
+
+
+
+style text/x-patch
+include text/plain
+StyleSetForeground SCE_DIFF_DEFAULT             000000
+StyleSetForeground SCE_DIFF_COMMENT             007f00
+StyleSetBackground SCE_DIFF_COMMENT             eeeeee
+StyleSetBold       SCE_DIFF_COMMENT             1
+StyleSetEOLFilled  SCE_DIFF_COMMENT             1
+StyleSetForeground SCE_DIFF_COMMAND             808080
+StyleSetBold       SCE_DIFF_COMMAND             1
+StyleSetBackground SCE_DIFF_HEADER              ffff80
+StyleSetForeground SCE_DIFF_POSITION            7f007f
+StyleSetBold       SCE_DIFF_POSITION            1
+StyleSetBackground SCE_DIFF_DELETED             ff8080
+StyleSetBold       SCE_DIFF_DELETED             1
+StyleSetBackground SCE_DIFF_ADDED               80ff80
+StyleSetBold       SCE_DIFF_ADDED               1
+
+
+
+style text/x-makefile
+include text/plain
+StyleSetForeground SCE_MAKE_DEFAULT             000000
+StyleSetForeground SCE_MAKE_COMMENT             007f00
+StyleSetForeground SCE_MAKE_PREPROCESSOR        aa0000
+StyleSetForeground SCE_MAKE_IDENTIFIER          000080
+StyleSetForeground SCE_MAKE_OPERATOR            7f007f
+StyleSetForeground SCE_MAKE_TARGET              a00000
+StyleSetForeground SCE_MAKE_IDEOL               7f0000
+
+
+
+style text/x-yaml
+include text/plain
+StyleSetForeground SCE_YAML_DEFAULT             000000
+StyleSetForeground SCE_YAML_COMMENT             008800
+StyleSetForeground SCE_YAML_IDENTIFIER          000088
+StyleSetBold       SCE_YAML_IDENTIFIER          1
+StyleSetForeground SCE_YAML_KEYWORD             880088
+StyleSetForeground SCE_YAML_NUMBER              880000
+StyleSetForeground SCE_YAML_REFERENCE           008888
+StyleSetForeground SCE_YAML_DOCUMENT            ffffff
+StyleSetBackground SCE_YAML_DOCUMENT            000088
+StyleSetBold       SCE_YAML_DOCUMENT            1
+StyleSetEOLFilled  SCE_YAML_DOCUMENT            1
+StyleSetForeground SCE_YAML_TEXT                333366
+StyleSetForeground SCE_YAML_ERROR               ffffff
+StyleSetBackground SCE_YAML_ERROR               000088
+StyleSetBold       SCE_YAML_ERROR               1
+StyleSetEOLFilled  SCE_YAML_ERROR               1
+
+
+
+style text/css
+include text/plain
+StyleSetForeground SCE_CSS_DEFAULT              000000
+StyleSetForeground SCE_CSS_TAG                  2020ff
+StyleSetBold       SCE_CSS_TAG                  1
+StyleSetForeground SCE_CSS_CLASS                3350ff
+StyleSetBold       SCE_CSS_CLASS                1
+StyleSetForeground SCE_CSS_PSEUDOCLASS          202020
+StyleSetForeground SCE_CSS_UNKNOWN_PSEUDOCLASS  202020
+StyleSetBold       SCE_CSS_UNKNOWN_PSEUDOCLASS  1
+StyleSetForeground SCE_CSS_OPERATOR             3350ff
+StyleSetBold       SCE_CSS_OPERATOR             1
+StyleSetForeground SCE_CSS_IDENTIFIER           882020
+StyleSetForeground SCE_CSS_UNKNOWN_IDENTIFIER   202020
+StyleSetBold       SCE_CSS_UNKNOWN_IDENTIFIER   1
+StyleSetForeground SCE_CSS_VALUE                209999
+StyleSetForeground SCE_CSS_COMMENT              888820
+StyleSetForeground SCE_CSS_ID                   3030aa
+StyleSetBold       SCE_CSS_ID                   1
+StyleSetForeground SCE_CSS_IMPORTANT            202020
+StyleSetForeground SCE_CSS_DIRECTIVE            202020
+StyleSetForeground SCE_CSS_DOUBLESTRING         202020
+StyleSetForeground SCE_CSS_SINGLESTRING         202020
+StyleSetForeground SCE_CSS_IDENTIFIER2          202020
+StyleSetForeground SCE_CSS_ATTRIBUTE            202020
+
+#inspired by gvim with bash/pluigin
+style application/x-shellscript
+include text/plain
+StyleSetForeground SCE_SH_DEFAULT				000000
+StyleSetForeground SCE_SH_ERROR					ff0000 # red
+StyleSetForeground SCE_SH_COMMENTLINE			0000ff # blue
+StyleSetForeground SCE_SH_NUMBER				B452CD #
+StyleSetForeground SCE_SH_WORD					A52A2A #red/brown
+StyleSetBold SCE_SH_WORD						1
+StyleSetForeground SCE_SH_STRING				ff17ff #"pink-ish"
+#StyleSetBold SCE_SH_STRING						1
+StyleSetForeground SCE_SH_CHARACTER				ff17ff #'pink-ish'
+StyleSetForeground SCE_SH_OPERATOR				000000 # black
+StyleSetForeground SCE_SH_IDENTIFIER			008B8B # cyan-ish
+StyleSetForeground SCE_SH_SCALAR				A233F6 # magentish ##ff17ff # pink-ish
+StyleSetForeground SCE_SH_PARAM					A233F6 # magentish
+StyleSetForeground SCE_SH_BACKTICKS				ff0000 # red
+StyleSetForeground SCE_SH_HERE_DELIM			00ff00
+StyleSetForeground SCE_SH_HERE_Q				000000
+
+# Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+# LICENSE
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl 5 itself.

@@ -1,0 +1,16 @@
+MANIFEST
+META.yml
+Build.PL
+Makefile.PL
+README
+Changes
+eg/bb-client-send-event
+eg/bb-client-send-status
+eg/bb-mock-server
+eg/bb-true-server
+lib/POE/Component/Client/BigBrother.pm
+t/00-load.t
+t/01-api.t
+t/10-check-by-pocotcp.t
+t/pod-coverage.t
+t/pod.t

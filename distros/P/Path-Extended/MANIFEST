@@ -1,0 +1,47 @@
+Changes
+cpanfile
+lib/Path/Extended.pm
+lib/Path/Extended/Class.pm
+lib/Path/Extended/Class/Dir.pm
+lib/Path/Extended/Class/File.pm
+lib/Path/Extended/Dir.pm
+lib/Path/Extended/Entity.pm
+lib/Path/Extended/File.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/10_entity/basic.t
+t/15_file_or_dir/basic.t
+t/15_file_or_dir/for_dir.t
+t/20_file/copy.t
+t/20_file/grep.t
+t/20_file/overload.t
+t/20_file/path.t
+t/20_file/read.t
+t/20_file/slurp.t
+t/20_file/stat.t
+t/30_directory/copy.t
+t/30_directory/exists.t
+t/30_directory/find.t
+t/30_directory/mkdir.t
+t/30_directory/next.t
+t/30_directory/path.t
+t/30_directory/prune.t
+t/30_directory/recurse.t
+t/30_directory/rmdir.t
+t/30_directory/seek.t
+t/30_directory/subsumes.t
+t/40_compatibility/basic.t
+t/40_compatibility/filesystem.t
+t/50_subclass/dir.t
+t/50_subclass/file.t
+t/50_subclass/file_or_dir.t
+t/50_subclass/import.t
+t/99_pod.t
+t/99_podcoverage.t
+t/lib/Path/Extended/Test.pm
+t/lib/Path/Extended/Test/Dir.pm
+t/lib/Path/Extended/Test/File.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

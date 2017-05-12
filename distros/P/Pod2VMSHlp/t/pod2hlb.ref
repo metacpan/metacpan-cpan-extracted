@@ -1,0 +1,25 @@
+1 pod2hlb
+pod2hlb
+NAME
+    pod2hlb - pod library to VMS help library converter.
+
+SYNOPSIS
+    edit pod2hlb. perl pod2hlb
+
+DESCRIPTION
+    This is an extremely simple program that merely converts the
+    PERL_ROOT:[lib.pod]*.pod files into *.hlp files using the
+    Pod::Hlp module. It then adds all the resultant .hlp files to a
+    PERL.HLB library in the DEFAULT directory. You are strongly
+    encouraged to modify the code to suit your personal preferences
+    and/or local pod locations.
+
+    Since this program invokes the LIBRARIAN it is unlikely to work
+    on non-VMS systems. For that reason is uses RMS style file
+    specifications internally.
+
+AUTHOR
+    Copyright (c) 1999 Peter Prymmer. This program may be used under
+    the same terms as Perl. Peter Prymmer pvhp@best.com 1-MAY-1999.
+    First released with Pod2Hlp1.00 Aug 19 1996.
+

@@ -1,0 +1,50 @@
+=head1 NAME
+
+B - Some demo POD
+
+=head1 SYNOPSIS
+
+	use Pod::Xhtml;
+	my $px = new Pod::Xhtml;
+
+=head2 SUB-SYNOPSIS
+
+To test returning back to head1.
+
+=head1 DESCRIPTION
+
+This is a module to translate POD to Xhtml. Lorem ipsum L<Dolor/Dolor> sit amet consectueur adipscing elit. Sed diam nomumny.
+
+=head1 LINKS
+
+L<@ARGV> should link to the as-yet undefined E<quot>I<@ARGV>E<quot> section
+
+Whereas L<$ARGV> shouldn't. It should link to the undefined
+E<quot>I<$ARGV>E<quot> section
+
+=head1 ISSUES
+
+=head2 KNOWN ISSUES
+
+=head3 $ARGV
+
+Is sometimes undefined
+
+=head3 @ARGV
+
+Is occasionally populated with the numbers 1, 2, 3, 4, 5, 6, 7, 8, 9 and 10
+
+=head3 %ARGV
+
+Does not exist
+
+=head3 Test for Escaped HTML in Marked text
+
+C<< <meta /> >>
+
+B<R&R>
+
+I<"hello">
+
+=cut
+

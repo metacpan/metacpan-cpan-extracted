@@ -1,0 +1,67 @@
+ 30-May-2016           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.73
+ + CPAN#114623: Changes file gives wrong date for 1.72
+   fix for typo in this file, do it right this time for 1.73
+ + CPAN#113846: 1.71 broke core t/porting/podcheck.t
+   removed spurious "use Data::Dumper"
+
+
+ 23-May-2016           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.72
+ + applied numerous patches by Karl Williamson - many thanks, now this
+   distro is in sync with core Perl again
+ + CPAN#102526: License declaration mismatch
+   made this distro licensed like Perl itself
+ + CPAN#104857: META.json version ne dist version
+   attempt to clean up META.yml and META.json
+ + CPAN#108492: Line number is wrong
+   tested this ticket, and it seems to be correct now
+ + thanks to H M Brand for pointing out a way to produce more compatible
+   tar.gz distribution files
+
+
+ 22-Sep-2013           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.71
+ + rephrased the NAME section as suggested by Neil in CPAN#93145
+ + applied patches from TONYC (CPAN#96199)
+ + one minor change to make this work again with 5.8; may as well work
+   with prior Perl versions, but not tested; added a "use 5.008" to
+   Makefile.PL and removed the use 5.14 from Checker.pm
+
+ Version 1.70
+ + applied all 19 patches from CPAN#85442: PATCH: ditch Pod::Parser for 
+   Pod::Simple - many thanks to all contributers!
+    0001-import-Marc-Green-s-port-to-Pod-Simple.patch
+    0002-replace-illegal-empty-L-with-C-LE-lt-E-gt.patch
+    0003-start-expecting-the-new-item-changed-type-warning.patch
+    0004-we-get-back-warning-if-we-turn-them-on.patch
+    0005-avoid-hash-ordering-bug-in-tests.patch
+    0006-eliminate-the-utterly-broken-unescaped-warning.patch
+    0007-remove-weird-added-later-remark-about-unescaped.patch
+    0008-remove-mention-of-unescaped.patch
+    0009-item-type-mismatch-was-moved-to-Pod-Simple.patch
+    0010-use-the-same-warning-error-level-as-in-Pod-Simple.patch
+    0011-rely-on-over-w-o-closing-back-being-in-Pod-Simple.patch
+    0012-eliminate-the-list-stack-thus-eliminating-use-of-Pod.patch
+    0013-expect-new-L-warnings-from-Pod-Simple.patch
+    0014-stop-passing-on-Pod-Hyperlink-warnings-as-warnings.patch
+    0015-reimplement-unresolved-internal-hyperlink-check.patch
+    0016-make-it-easy-to-get-diffs-on-what-broke-expectations.patch
+    0017-avoid-using-experimental-feature.patch
+    0018-tweak-docs-a-bit.patch
+    0019-update-prereq-for-Pod-Simple.patch
+ + created new release with updated $VERSIONs
+
+ 27-Jan-2013           Marek Rouchal                        <marekr@cpan.org>
+ -----------------------------------------------------------------------------
+ Version 1.60
+ + preparation of changing this module to use Pod::Simple
+   refactored the Pod-Parser distribution and moved all things Pod::Checker
+   to this new distribution package
+ + CPAN RT#79535: Pod::Checker synopsis for podchecker is opposite
+   corrected the POD synopsis
+ + factored this distribution out of Pod-Parser-1.51
+

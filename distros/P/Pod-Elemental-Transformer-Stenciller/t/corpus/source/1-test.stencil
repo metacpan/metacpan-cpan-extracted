@@ -1,0 +1,119 @@
+
+Intro text
+goes  here
+
+== stencil { name => 'thing' }  ==
+
+thing
+
+here
+
+--input--
+
+    other thing
+
+--end input---------------------------------
+
+in between
+is three lines
+in a row
+
+------output--
+
+    expecting this
+
+--end output--
+
+A text after output
+
+
+== stencil { example => 0 } ==
+
+Header stencil 2
+
+--input--
+
+    Input stencil 2
+
+--end input--
+
+Between stencil 2
+
+--output--
+
+    Output stencil 2
+
+--end output--
+
+== stencil ==
+
+Header stencil 3
+
+--input--
+
+    Input stencil 3
+
+--end input--
+
+Between stencil 3
+
+--output--
+
+    Output stencil 3
+
+--end output--
+
+After stencil 3
+
+
+== stencil { to_pod => 0 } ==
+
+Header stencil 4
+
+--input--
+
+    Input stencil 4
+
+--end input--
+
+Between stencil 4
+
+--output--
+
+    Output stencil 4
+
+--end output--
+
+After stencil 4
+
+== stencil { to_pod => 1 } ==
+
+Header stencil 5
+
+--input--
+
+    Input stencil 5
+
+--end input--
+
+Between stencil 5
+
+--output--
+
+    Output stencil 5
+
+--end output--
+
+After stencil 5
+
+
+== stencil ==
+
+html stencil
+
+--input--
+    <%= badge '3' %>
+--end input--
+--output--
+    <span class="badge">3</span></a>
+--end output--

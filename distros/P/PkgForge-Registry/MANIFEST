@@ -1,0 +1,27 @@
+Build.PL
+ChangeLog
+conf/registry-builder.yml
+conf/registry-incoming.yml
+conf/registry-web.yml
+conf/registry.yml
+lcfg.yml
+lib/PkgForge/Registry.pm
+lib/PkgForge/Registry/App.pm
+lib/PkgForge/Registry/Role.pm
+lib/PkgForge/Registry/Schema.pm
+lib/PkgForge/Registry/Schema/Result/Builder.pm
+lib/PkgForge/Registry/Schema/Result/Job.pm
+lib/PkgForge/Registry/Schema/Result/JobStatus.pm
+lib/PkgForge/Registry/Schema/Result/Platform.pm
+lib/PkgForge/Registry/Schema/Result/TaskStatus.pm
+lib/PkgForge/Registry/Schema/Result/Task.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+PkgForge-Registry.spec
+README
+scripts/registry-init.sh
+scripts/registry-setup.sql
+scripts/registry-wipe.sql
+t/00_load.t

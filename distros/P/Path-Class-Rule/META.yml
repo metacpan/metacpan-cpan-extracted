@@ -1,0 +1,47 @@
+---
+abstract: 'Iterative, recursive file finder with Path::Class'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Config: 0
+  Exporter: 0
+  File::Find: 0
+  File::Temp: 0
+  File::pushd: 0
+  Test::Deep: 0
+  Test::More: 0.92
+  autodie: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Path-Class-Rule
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Path::Class::Rule:
+    file: lib/Path/Class/Rule.pm
+    version: 0.018
+requires:
+  Path::Class: 0
+  Path::Iterator::Rule: 0.002
+  namespace::clean: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dagolden/path-class-rule/issues
+  homepage: https://metacpan.org/release/Path-Class-Rule
+  repository: git://github.com/dagolden/path-class-rule.git
+version: 0.018

@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+deb-control-key-values - print out all values for given key
+
+=head1 SYNOPSIS
+
+	deb-control-key-values "--key=Package" debian/control
+
+=head1 DESCRIPTION
+
+
+=cut
+
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Parse::Deb::Control;
+
+exit main();
+
+sub main {
+    my $help;
+    my $key;
+    my $no_trim = 0;
+    GetOptions(
+        'help|h'  => \$help,
+        'key|k=s' => \$key,
+        'no-trim' => \$no_trim,
+    ) or pod2usage;
+    pod2usage if $help;
+    pod2usage if not $key;
+    
+    my $control_txt = ''; while (my $line = <>) { $control_txt .= $line; };
+    my $parser = Parse::Deb::Control->new($control_txt);
+
+	# output values of give key
+	foreach my $entry ($parser->get_keys($key)) {
+		my $value = ${$entry->{'value'}};
+		if (not $no_trim) {
+			$value =~ s/^\s+//;
+			$value =~ s/\s+$//;
+		}
+		print $value, "\n";
+	}
+	
+    return 0;
+}

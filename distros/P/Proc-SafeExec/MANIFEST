@@ -1,0 +1,5 @@
+Makefile.PL
+MANIFEST
+t/Proc-SafeExec.t
+lib/Proc/SafeExec.pm
+lib/Proc/SafeExec/Queue.pm

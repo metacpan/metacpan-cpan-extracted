@@ -1,0 +1,39 @@
+%left   '+'
+%left   '*'
+
+%defaultaction { 
+  my $self = shift;
+
+  my $class = $self->YYPrefix;
+  $class .=  $self->YYName; 
+
+  $class->action(@_);
+}
+
+%%
+exp:        %name NUM
+              NUM 
+        |   %name PLUS
+              exp '+' exp         
+        |   %name TIMES
+              exp '*' exp         
+        |   '(' exp ')'
+              { $_[2] }
+;
+
+%%
+
+use base qw{CommonTail};
+
+=head1 SYNOPSIS
+
+The default semantic action in this translation scheme
+is to delegate the execution in methods 
+with names C<Prefix::TIMES::action>,
+C<Prefix::PLUS::action>, etc. where
+C<Prefix> is set via the C<yyprefix> parameter
+and C<PLUS>, C<TIMES> stands for the name of the rhs.
+
+See files C<calcu.pl>, C<postf.pl>
+
+=cut

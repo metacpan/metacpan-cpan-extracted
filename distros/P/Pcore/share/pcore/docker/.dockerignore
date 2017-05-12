@@ -1,0 +1,7 @@
+# SCM
+.hg*
+.git*
+
+# pcore
+data/
+wiki/

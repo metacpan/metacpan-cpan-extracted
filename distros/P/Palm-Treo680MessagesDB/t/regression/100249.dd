@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1205937479,
+          'number' => '+440200814254',
+          'time' => '14:37',
+          'date' => '2008-03-19',
+          'name' => 'John XXXX (M)',
+          'phone' => '+440200814254',
+          'device' => 'Treo 680',
+          'direction' => 'outbound',
+          'timestamp' => 1205937479,
+          'text' => 'twas delivered to your tesco.net address at 1848 :-) but in brief - trinity arms, trinity gardens, brixton. here\'s a map: http://tinyurl.com/2jtefx',
+          'type' => '0x0002',
+          'category' => 0,
+          'id' => 7107962,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 100249
+        };

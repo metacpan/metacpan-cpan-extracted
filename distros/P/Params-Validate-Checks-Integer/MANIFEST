@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Params/Validate/Checks/Integer.pm
+t/author-perlcritic.t
+t/lib/params/validate/checks/integer.t
+t/lib/params/validate/checks/non-neg-int.t
+xt/author/perlcriticrc

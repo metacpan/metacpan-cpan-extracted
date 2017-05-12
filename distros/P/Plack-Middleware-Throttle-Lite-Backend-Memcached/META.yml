@@ -1,0 +1,49 @@
+---
+abstract: 'Memcache-driven storage backend for Throttle-Lite'
+author:
+  - 'Anton Gerasimov <chim@cpan.org>'
+build_requires:
+  Cache::Memcached::Fast: 0
+  HTTP::Message: 6.01
+  Plack: 1.0001
+  Test::Exception: 0
+  Test::More: 0.98
+  Test::Pod: 1.22
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Throttle-Lite-Backend-Memcached
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - examples
+    - corpus
+  namespace:
+    - t::lib
+  package:
+    - DB
+provides:
+  Plack::Middleware::Throttle::Lite::Backend::Memcached:
+    file: lib/Plack/Middleware/Throttle/Lite/Backend/Memcached.pm
+    version: 0.03
+requires:
+  Cache::Memcached::Fast: 0
+  Carp: 0
+  Plack::Middleware::Throttle::Lite: 0.02
+  parent: 0
+  perl: 5.008009
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/Wu-Wu/Plack-Middleware-Throttle-Lite-Backend-Memcached/issues
+  homepage: https://metacpan.org/release/Plack-Middleware-Throttle-Lite-Backend-Memcached
+  repository: git://github.com/Wu-Wu/Plack-Middleware-Throttle-Lite-Backend-Memcached.git
+version: 0.03
+x_authority: cpan:CHIM

@@ -1,0 +1,114 @@
+
+---
+#
+# MooseX::Declare snippets bundle for Padre::Plugin::Moose
+# By Ahmad M. Zawawi (azawawi)
+#
+
+# after method modifier
+after: |
+  after ${1:method_name} {
+      ${2: # body...}
+  }; 
+
+# before method modifier
+before: |
+  before ${1:method_name} {
+      ${2: # body...}
+  }; 
+
+# around method modifier
+around: |
+  around ${1:method_name} {
+      ${2: # body...}
+  }; 
+
+# Augment method modifier
+augment: |
+  augment ${1:method_name} {
+      ${2: # body...}
+  }; 
+
+# Override method modifier
+override: |
+  override ${1:method_name} {
+      ${2: # body...}
+  }; 
+
+# Define class type
+classtype: class_type '${1:ClassName}';
+
+# Type coercion
+coerce: |
+  coerce '${1:type}' 
+      => from '${2:parent_type}' 
+         via { ${3} };
+
+# Desctrutor
+DEMOLISH: |
+  method DEMOLISH {
+      ${1:# body...}
+  }
+
+# Constructor
+BUILD: |
+  method BUILD {
+      ${1:# body...}
+  }
+
+# Property
+has: has '${1:property}' => ( is => '${2:rw}', isa  => '${3:Str}', );
+
+# Type
+type: |
+  type '${1:type}' 
+      => where { ${2} };
+
+# Subtype
+subtype: subtype '${1:type}' => as '${2:parent_type}' => ${3:where \{ \}};
+
+# Exclude
+excludes: excludes '${1:OtherRole}';
+
+# has lazy property builder
+hasl: |
+  has ${1:property} => (
+      is  => '${2:rw}',
+      isa => '${3:Str}',
+      lazy_build => 1,
+  );
+  
+  method _build_$1 {
+      my $self = shift;
+  
+      ${4:# TODO implement _build_$1}
+  }
+
+# Role definition
+role: |
+  use MooseX::Declare;
+  
+  role ${1:RoleName} with (${2:MyRole}) {
+      ${3: # body...}
+  };
+
+  1;
+
+# Require a method definition
+requires: requires '${1:my_method}';
+
+# Class declaration
+class: |
+  use MooseX::Declare;
+  
+  class ${1:ClassName} extends (${2:MyParent}) with (${3:MyRole}) {
+      ${4: # body...}
+  }
+
+  1;
+
+# Method declaration
+meth: |
+  method ${1:method_name}(${2}) {
+      ${3: # body...}
+  }

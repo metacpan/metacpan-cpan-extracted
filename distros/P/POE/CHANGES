@@ -1,0 +1,634 @@
+================================
+2015-06-03 10:10:18 -0400 v1_367
+================================
+
+  commit 4f2ef10e7039f96659757f9e5097c45fc57cace1
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Wed Jun 3 10:10:18 2015 -0400
+  
+    Version bump for release.
+
+  commit 208a5bf377f6b8c2064e927efd4bd331ab2016c2
+  Merge: e9377b1 6e0f41e
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Jun 2 15:17:24 2015 -0400
+  
+    Merge pull request #22 from zhouzhen1/prchallenge
+
+    Some trivial changes for the CPAN PR challenge.
+
+  commit e9377b10c19c11ed1d3e5d34040b2dcf90227a51
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Jun 2 14:37:40 2015 -0400
+  
+    rt.cpan.org 96039. Avoid close() on a FIFO until the reader is done.
+
+    Cygwin seems to block on close() if a FIFO contains data. This test
+    deadlocks because it expects the ability to read from the FIFO
+    asynchronously later.
+
+  commit 882a097209c2b6e02ccd31f3fb32c24bed73cdb6
+  Author: Sulev-Madis Silber (ketas) <madis555@hot.ee>
+  Date:   Tue Jun 2 13:58:57 2015 -0400
+  
+    rt.cpan.org 100499. Fix SuccessEvent values for AF_INET6.
+
+    Applied ketas' micro patches, and updated an example in the docs.
+
+  commit e60ea6c5b7c8ae1b50fefeed336393e18df9a474
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Jun 2 09:08:59 2015 -0400
+  
+    rt.cpan.org 101227. Comment on an unused assertion.
+
+  commit 3df9e01dbc658c46b254df59968eda2413f9c21b
+  Author: Slaven Rezić <srezic@cpan.org>
+  Date:   Tue Jun 2 08:18:28 2015 -0400
+  
+    rt.cpan.org 103842. Skip YAML line ending test on contemporary YAML.
+
+  commit 6e0f41e8e671915de594d1c841b52e4042a5f04d
+  Author: zhouzhen1 <zhouzhen1@gmail.com>
+  Date:   Sun May 17 10:52:18 2015 +0800
+  
+    a couple of pod typo fix
+
+  commit 13ad85f20a46adb5afd354c68f650878eee32a8b
+  Author: zhouzhen1 <zhouzhen1@gmail.com>
+  Date:   Sun May 17 10:51:09 2015 +0800
+  
+    add 'use strict' to POE/Queue.pm and POE/Resource.pm
+
+  commit a888ad45a0eef04fa2aa476e60c54a13a54fd668
+  Merge: 4feeb50 d6ac082
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Mon Feb 23 15:09:52 2015 -0500
+  
+    Merge pull request #20 from nanis/nanis-fix-for-nmake
+
+    Hard coded Unix-style directory separator causes problems on Windows
+    with nmake
+
+  commit 2e4f77ac8a675453270bc7529ce9c8a4eb498a24
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sat Feb 21 15:45:21 2015 +0000
+  
+    Enable bind for IN6ADDR_ANY
+
+  commit d6ac082351191b359d33b92e731748d56b8014dc
+  Author: A. Sinan Unur <nanis@cpan.org>
+  Date:   Fri Dec 19 13:57:00 2014 -0500
+  
+    Use File::Spec->catfile to compose certain paths
+
+    Surrounding them with double quotes worked on Windows, but created
+    problems on other systems.
+
+  commit 36a15cfb9bd929c60f86089bbdab8a883a835cc5
+  Author: A. Sinan Unur <nanis@cpan.org>
+  Date:   Fri Dec 19 13:41:38 2014 -0500
+  
+    Quote paths to fix errors with nmake on Windows
+
+    C:\...\POE-1.366> nmake test
+
+    "C:\opt\perl-5.20.1\bin\perl.exe" mylib/gen-tests.perl lib/POE.pm
+    Can't open perl script "mylib": Permission denied NMAKE : fatal error
+    U1077: 'C:\opt\perl-5.20.1\bin\perl.exe' : return code '0xd' Stop.
+
+    This happens because perl ends up seeing mylib and /gen-tests.perl as
+    two separate thingies. It seemed to me that the most straightforward
+    solution which I do not think should effect any other platforms is to
+    quote the filename arguments. Hope this makes sense.
+
+  commit ee3a45043e210fcbf51b6ba4c44b8cd618ca1a37
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Mon Dec 15 19:38:14 2014 -0500
+  
+    Make loop discovery O(M+N) instead of O(M*N) stat() operations.
+
+  commit 61353ea4b552b4f4448daf60b06f0cb5f8fbc602
+  Author: Tobias Leich <email@froggs.de>
+  Date:   Wed Nov 5 10:54:21 2014 +0100
+  
+    fix typo ("Consier" => "Consider") 
+
+================================
+2014-11-03 13:39:18 -0500 v1_366
+================================
+
+  commit 63e55125e55b4220984cc51dc3eb68ae1eb9cb21
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Mon Nov 3 13:39:18 2014 -0500
+  
+    Bump versions and dependencies for release.
+
+  commit b800fb63188ac415b9f706428289d89b9d90e32f
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Oct 31 12:23:41 2014 -0400
+  
+    Fall back to getprotobyname() if Socket doesn't export IPPROTO_TCP or
+    IPPROTO_UDP.
+
+    CPAN testers were failing POE because Socket didn't provide these on
+    the full range of test machines. The common thread seems to be Perl
+    prior to 5.9. While quite old, there's no compelling reason not to
+    support it.
+
+    This change also caches the protocol numbers at startup, rather than
+    looking them up every time. It should be slightly faster as a result.
+
+  commit 90d04a311e463749dfeb10f3032866a723e7ca82
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Fri Oct 31 11:12:11 2014 -0400
+  
+    [rt.cpan.org 91406] Use empty string instead of undef for __DIE__
+    handler.
+
+    The rt.cpan.org bug alleges that the empty string is more compatible.
+    It doesn't seem to make a difference for contemporary versions of
+    Perl, so why not?
+
+  commit c6f8e4f9dabbef51a75dbb043c01c92807fc604c
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Thu Oct 30 12:26:25 2014 -0400
+  
+    Trigger POE::Session _stop handlers when POE::Kernel->stop() is
+    called.
+
+  commit ad6056b4bf5f928f87694fb274b7f30ae1534eb7
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Thu Oct 30 12:18:00 2014 -0400
+  
+    Remove Data::Dump. It's not used, but use() is FAILing tests.
+
+  commit 4d3cc9fb8310050b4854a5f17ebb3821a870edae
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Thu Oct 2 16:12:42 2014 -0400
+  
+    Clarify the "now running in a different process" warning. 
+
+================================
+2014-10-01 19:38:47 -0400 v1_365
+================================
+
+  commit ac32695a49330c0543eb985c7e7024f29b14ea28
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Wed Oct 1 19:38:47 2014 -0400
+  
+    Bump the version for release.
+
+  commit 0ffe08ceb164a53003a28364b9a9e3012961ecbb
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Wed Oct 1 19:28:11 2014 -0400
+  
+    Expose exceptions thrown from SIGDIE handlers.
+
+    This change causes both the error that triggered a SIGDIE and the
+    error within the SIGDIE handler to be rethrown together.
+
+  commit 786a6080bf3df744ad91d0b108ea2e4143a59e07
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Wed Oct 1 19:22:25 2014 -0400
+  
+    Add a failing test case for reporting die() from within SIGDIE.
+
+    Grinnz provided this test case on Freenode #perl. It shows that die()
+    within a SIGDIE handler is not reported. Instead, the original error
+    is thrown without any indication why it wasn't handled as intended.
+
+  commit 2eacf6bb69ab0843ed02a842a58de676c1cde06e
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Mon Sep 29 08:58:50 2014 -0400
+  
+    SeekBack of 0 is fine on special files.
+
+    Problem found by coworkers at Plixer International.
+
+  commit 1092eff5dfde3ebc9db1f7e0948e332d794b38a7
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Sep 12 13:57:31 2014 -0400
+  
+    Import carp() into POE::Filter::HTTPD.
+
+    Passing a bogus parameter to POE::Filter::HTTPD->new() caused a
+    complaint that carp() wasn't defined, rather than the proper
+    complaint the carp() call was making.
+
+    Thanks go to gbjk for passing on an anonymous report in IRC.
+
+  commit 3155fff17f189be2674fb7870c8fc9d289392c37
+  Author: Brian Fraser <fraserbn@gmail.com>
+  Date:   Sun Jul 27 03:25:47 2014 +0200
+  
+    Workaround for systems without getprotobyn* (e.g. android) 
+
+================================
+2014-07-12 18:24:36 -0400 v1_364
+================================
+
+  commit 7d8713c1fad195f6ad0bf9dc55855e3162cc4838
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sat Jul 12 18:24:36 2014 -0400
+  
+    Version bump for release.
+
+  commit e55f062ea7019c907f6503c55f3be39caf05d74a
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sat Jul 12 14:35:28 2014 -0400
+  
+    Stop loading Data::Dump. It wasn't even being used.
+
+    Address
+    http://www.cpantesters.org/cpan/report/15547962-09ee-11e4-941a-988245
+    14c1bc
+
+  commit 95dfad133b07402744a0e9f77987b9c90d3e2177
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sat Jul 12 14:33:04 2014 -0400
+  
+    Replace // with || for that CPAN smoke box running Perl 5.8.9. 
+
+================================
+2014-07-12 02:41:55 -0400 v1_363
+================================
+
+  commit a4fb23c2afebe1aba411dba2d3623ea25bf64d95
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sat Jul 12 02:41:55 2014 -0400
+  
+    Bump version for release.
+
+  commit d68983dbb5ef4ed6de27c7433ee31d09e4f2474c
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sat Jul 12 02:02:30 2014 -0400
+  
+    Take about 1sec off a regression test.
+
+  commit d00cd369b9f12df5f2b59bf91807243a72fe189a
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sat Jul 12 01:54:27 2014 -0400
+  
+    Add POE::Test::Sequence::create_generic_session().
+
+    A generic session runs all the events it receives through the test
+    sequence. It seems like something that might be common for simple
+    tests.
+
+    t/90_regression/leolo-alarm-adjust.t uses it as a proof of concept, a
+    future documentation example, and to shave about 2sec off the test.
+
+  commit 903492af7d00400a86dab68a574cc0510ec73cea
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sat Jul 12 01:30:49 2014 -0400
+  
+    Shave about 3sec off a regression test.
+
+  commit ba28c4e87622035e0a80325d3a9f5026ed3cd333
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sat Jul 12 01:26:27 2014 -0400
+  
+    Shave 2.5 seconds off a regression test. 
+
+================================
+2014-07-11 23:16:32 -0400 v1_362
+================================
+
+  commit 66e54c7933be4b571d20eb638aaafd4502a06c43
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Jul 11 23:16:32 2014 -0400
+  
+    Bump version for release.
+
+  commit ec6842f343367e2b49c5d21ae93df4fab99dd91e
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Jul 11 22:56:04 2014 -0400
+  
+    Reduce the time for another FollowTail test from ~5sec to ~0.2sec.
+
+  commit 9e042d00f54896e735f425b90195ec00243d5552
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Jul 11 22:42:28 2014 -0400
+  
+    Don't fire undefined FollowTail idle events.
+
+  commit 31396d74dad0c1b552b8f468968f1a9fa976b169
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Jul 11 21:12:00 2014 -0400
+  
+    Abstract the regression test sequence helper into
+    POE::Test::Sequence.
+
+  commit 65cf8fc77ce18a7d803a70f6fc9dd7a91f687aec
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Jul 11 19:26:35 2014 -0400
+  
+    Speed up a test by adding an idle event to POE::Wheel::FollowTail.
+
+    Rather than wait for several seconds to elapse, tests can set a low
+    PollInterval and use IdleEvent handlers to tell when it's ready to
+    move on.
+
+    As a proof of concept, this commit also removes about 8 seconds from
+    a regression test using the new IdleEvent.
+
+  commit d30f5b361699c00ef539499bac35c3f5cbd5ef66
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Jul 11 13:13:02 2014 -0400
+  
+    Avoid uninitialized value warnings when testing in development.
+
+  commit caaa3ad01136522e3f6a470d9e05d6c373fa1a81
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Jul 11 09:41:20 2014 -0400
+  
+    Remove a harmless(?) debugging print() from a test. 
+
+================================
+2014-07-11 09:31:29 -0400 v1_361
+================================
+
+  commit 4d439d921fd0d8b0b7d40cf423c45e3a78e23fa6
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Jul 11 09:31:29 2014 -0400
+  
+    Version bump for release.
+
+  commit 3ab670538cb23ef4a4f6f003a63aae9ac708fd0e
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Jul 11 09:25:45 2014 -0400
+  
+    Fix a test hang on Windows. 
+
+================================
+2014-07-08 08:20:30 -0400 v1_360
+================================
+
+  commit b14098d84f61e3cfd24acaf77d3ed805eff20992
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Jul 8 08:20:30 2014 -0400
+  
+    Version bump to trigger a new release with Chris' regression fix.
+
+  commit 3f672f6fde0a70a560888c4691bb83f03ae38e6e
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Jul 8 00:47:19 2014 -0400
+  
+    Update POE::Test::Loops dependency. 
+
+================================
+2014-07-08 08:16:28 -0400 v1_359
+================================
+
+  commit 712e3905fbfe1b55ade59366d1c798964f38e6bd
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Mon Jul 7 23:07:28 2014 -0400
+  
+    Version bump.
+
+  commit 20b920f6fa6bb225cc91da0ec2c368bdca7aabd7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue Jul 8 12:44:48 2014 +0100
+  
+    Fix regression in SocketFactory with getnameinfo()
+
+  commit adaa221878dfa42c854adc498e3734021ab88b92
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Mon Jul 7 22:47:36 2014 -0400
+  
+    rt.cpan.org 91374. Clarify a warning when an optional dependency is
+    needed but absent.
+
+  commit 5e21f99ecabaab4b1dfe8ecf53488c30b2655999
+  Merge: 8c98157 f3e987d
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Mon Jul 7 20:38:14 2014 -0400
+  
+    Merge remote-tracking branch 'remotes/gh/master'
+
+  commit f3e987d634d98d28f73b38d72b2f1d0dfe268cf6
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Mon Jul 7 16:25:22 2014 -0400
+  
+    Windows reports local address 0 as 0.0.0.0, and then the test canot
+    connect to itself.
+
+  commit 8c98157d46d7839181456de2c283604bd20f57e5
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Thu May 22 12:39:25 2014 -0400
+  
+    Fixed the doco
+
+  commit 8de5712496e49d07904ca61a16d369b25fd4cc7f
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sun May 4 16:37:24 2014 -0400
+  
+    Revert "Convert POE::Resource::SIDs into a proper class."
+
+    This reverts commit 68089ffe81a2dd1e39c07288ba1723d74165523f.
+
+  commit b8bc1e1fe916e31ac663e29af614553eb0aa5956
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sun May 4 16:37:15 2014 -0400
+  
+    Revert "Convert POE::Resource::Extrefs into a proper class."
+
+    This reverts commit 3ae646376bd89572e9a61ae1d10d0609d0cdc025.
+
+  commit b1e052e77580d51e9f9879044d15c4c6bc682507
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sun May 4 16:37:04 2014 -0400
+  
+    Revert "Convert POE::Resource::Aliases into a proper class."
+
+    This reverts commit f8e8c694d00c3cecf50c2a4d120ee67d7024c42d.
+
+  commit 9bb7c26ad0e11d182e51bc28ed5625c620c16c08
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Thu Apr 10 13:56:32 2014 -0400
+  
+    POE::Filter::HTTPD will use Email::MIME::RFC2047::Encoder to convert
+
+    UTF-8 headers into MIME entities Documentation for above Tests for
+    above Added exceptions to 02_pod_coverage.t for POE::Filter::HTTPD
+
+  commit dc5cbb25c5ed91a1f1165062664ac9e3bebbea84
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Wed Apr 9 15:21:22 2014 -0400
+  
+    POE::Filter::Block->new complains about unknown params
+    POE::Filter::Grep->new complains about unknown params
+    POE::Filter::Map->new complains about unknown params Added
+    POE::Filter::Map::FIRST_UNUSED Added
+    POE::Filter::Stackable::FIRST_UNUSED
+
+  commit c149a72e0f9c3cd3fa70760056d45209d197b7ba
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Wed Apr 9 15:08:30 2014 -0400
+  
+    Added POE::Filter::BlockRecord::FIRST_UNUSED
+    POE::Filter::BlockRecord->new now checks for unknown params
+
+  commit b49ccba376012704149991a7bbad17ee6f2a9567
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Wed Apr 9 14:07:04 2014 -0400
+  
+    Added MaxBuffer support Created a constructor that takes named
+    parameters. Above constructor will also accept the old syntax
+    Documentation for above Test cases for above Added
+    POE::Fitler::Reference::FIRST_UNUSED
+
+  commit a9742150086d7a9bba7a0e7f9e96cb7b5588ad99
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Wed Apr 9 14:01:33 2014 -0400
+  
+    Added FIRST_UNUSED
+
+  commit 489d8be032999de120dbcbb8379dabc59d90e539
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Wed Apr 9 12:52:45 2014 -0400
+  
+    Added MaxBuffer to POE::Filter::HTTPD Document above Tests for above
+    POE::Filter::HTTPD->new now complain about unknown parameters Get
+    MaxContent via POE::Filter->__param_max() Added
+    POE::Filter::HTTPD::FIRST_UNUSED
+
+  commit 3110b479e14d2a5a553a298454cffaee844ae389
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Wed Apr 9 12:20:43 2014 -0400
+  
+    Added DEBUG constant Used above to help me figure some crap for
+    POEx::HTTP::Server
+
+  commit 1472d98b7355f0356e293dac4282faec603b75d4
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Wed Apr 9 12:19:50 2014 -0400
+  
+    Added MaxLength and MaxBuffer to POE::Filter::Line Tests for above
+    Documented above
+
+  commit 036525b5c8906193d1596d6723ffa07af252301d
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Wed Apr 9 12:11:09 2014 -0400
+  
+    Added MaxBuffer and MaxLength parameters to POE::Filter::Block Added
+    POE::Filter->__param_max for above Added unit tests for MaxBuffer and
+    MaxLength Document the above Added POE::Filter::Block::FIRST_UNUSED
+    because there wasn't one
+
+  commit 0fae143ab3d3c76a54ad9dd25eef27c2eccdb950
+  Merge: ff6d5f8 f8e8c69
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Tue Apr 8 17:01:59 2014 -0400
+  
+    Merge branch 'master' of ssh://git.code.sf.net/p/poe/poe
+
+  commit ff6d5f8d48860b68647224a9005438a9afd9431e
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Tue Apr 8 16:59:40 2014 -0400
+  
+    POE::Filter::HTTPD Streaming mode no longer requires switching
+    filters t/90_regression/leolo-filter-httpd.t tests the above
+
+  commit f8e8c694d00c3cecf50c2a4d120ee67d7024c42d
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Apr 8 12:16:30 2014 -0400
+  
+    Convert POE::Resource::Aliases into a proper class.
+
+  commit 6434f8a8a97668d303e834038d0f23f801b90dd1
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Mon Apr 7 16:11:20 2014 -0400
+  
+    Added POE::Filter::HTTPD->get_pending Added tests for Streaming
+    requests This time remember to commit the unit test
+
+  commit b1e6ab1ae698acd21573adf81363731c40305df5
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Mon Apr 7 16:03:19 2014 -0400
+  
+    Make sure Content-Length is a number Added tests for Content-Length
+    changes
+
+  commit 2f9cb24ab7482b7357afb027f133aaa9bc36c901
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Mon Apr 7 15:37:30 2014 -0400
+  
+    Added Streaming and MaxContent to POE::Filter::HTTPD
+
+  commit 3ae646376bd89572e9a61ae1d10d0609d0cdc025
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Mon Apr 7 02:12:51 2014 -0400
+  
+    Convert POE::Resource::Extrefs into a proper class.
+
+  commit 68089ffe81a2dd1e39c07288ba1723d74165523f
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sun Apr 6 21:21:52 2014 -0400
+  
+    Convert POE::Resource::SIDs into a proper class.
+
+  commit 32ff484caef4bbdea1b36b42b3cf59f9e86d0793
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sun Apr 6 17:32:25 2014 -0400
+  
+    Add parens to method invocations. Comment some internal methods.
+
+  commit a71ac22e55e0f4577bb90f3a18cb1e7500e56cc1
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Sun Apr 6 15:47:48 2014 -0400
+  
+    Crudely benchmark the machine under test.
+
+    A lot of POE's tests work around slow machines by unconditionally
+    delaying a lot. This makes the tests feel ponderous on fast systems,
+    and it thwarts Continuous Integration.
+
+    Benchmarking machines under test will help me tell how much the
+    work-around is needed. It may eventually hint to other tests how long
+    they need to wait.
+
+  commit 4a97b6befde298936bfa6bedfb5e3f0a1afae0ad
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Fri Apr 4 14:34:03 2014 -0400
+  
+    Fixed previous patch for delay_adjust( $id, 0 ), which means the
+    delay happens now.
+
+  commit 5d656bae46101c2fa74775960bbe084b9a597379
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Fri Apr 4 14:13:11 2014 -0400
+  
+    Fixed POE::Kernel->delay_adjust() Added
+    POE::Resource::Events->_data_ev_set() for above Tweaked
+    POE::Resource::Events->_data_ev_adjust() in case it is called with
+    $time
+
+  commit b3f89d3386fc685440a4193c46713cb5cbf7aeae
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Fri Apr 4 13:53:53 2014 -0400
+  
+    Fixed my regression test
+
+  commit 9c6a69289fea5f4a93f9464a4efea0011fd08804
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Fri Apr 4 13:51:01 2014 -0400
+  
+    Added leolo-alarm-adjust.t to test alarm_adjust() and delay_adjust()
+
+  commit e3db9b7c0dff9e46811f200507f5307aee6b1b80
+  Author: Philip Gwyn <gwyn@cpan.org>
+  Date:   Thu Mar 27 12:09:54 2014 -0400
+  
+    Calculate window pixel size from columns, lines. Doco changes for
+    above. Don't complain about Winsize for pty-pipe conduit.
+
+  commit 1f63f16144151c334b6ade0a12a02d58fa80387a
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Feb 28 11:33:02 2014 -0500
+  
+    Socket.pm supports unpack_sockaddr_in6() now. 
+
+==============
+End of Excerpt
+==============

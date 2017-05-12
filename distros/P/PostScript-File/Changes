@@ -1,0 +1,226 @@
+Revision history for Perl extension PostScript::File.
+
+2.23   2015-10-10
+	- No functional changes
+	- Fix typos in documentation (RT#107673)
+	  (patch from Jonathan Yu via Florian Schlichting of Debian)
+
+2.22   2015-05-09
+	- No functional changes
+	- Release tests moved to xt/
+
+2.21   2015-05-02 (Trial Release)
+	- Release tests moved to xt/
+
+2.20   2012-02-11
+	[API Improvements]
+
+	- Added use_functions method, which selects functions from a
+	  library provided by new module PostScript::File::Functions.
+	- Added set_min_langlevel method
+	- Added all_comments strip type
+	- Renamed methods add_function, get_functions, & has_function
+	  to add_procset, get_procsets, & has_procset.	The old names
+	  are still available for backwards compatibility, but their
+	  use is deprecated.
+	- Private methods bbox_comment, pre_pages, post_pages, &
+	  print_file were renamed.  You shouldn't have been using them
+	  anyway.
+	- The get_ordinal method is now private.  While it was
+	  formerly documented, it unnecessarily exposed the internals
+	  and had no real use.
+
+	[Other Changes]
+
+	- Multi-line string literals are now protected from
+	  comment/whitespace stripping.
+	- Fixed bug: add_preview might strip the preview
+	- Fixed bug: check_tilde treated "0" like the empty string
+	- The documentation has been cleaned up.
+
+2.11   2011-10-11
+	[Improvements to word wrapping provided by Metrics objects]
+
+	- Added optional \%param to wrap method
+	- Added set_wrap_chars method
+	- You can now use ZERO WIDTH SPACE (U+200B) to allow breaking
+	  a line at any point.
+	- Fixed bug: wrap method didn't wrap after hyphens.
+	  By default, it now wraps after hyphens, dashes, and forward
+	  slashes.
+	- Word wrapping now has tests
+
+2.10   2011-05-05
+	[API Improvements]
+
+	- You can pass "newpage => 0" to the constructor to prevent it
+	  from creating the first page.  This leads to more natural
+	  loops, because you call newpage before each page (instead of
+	  "before each page except the first").
+	- Added get_printable_width, get_printable_height,
+	  get_page_printable_width, & get_page_printable_height methods
+
+	[Other Changes]
+
+	- Fixed bug: clipping never actually worked
+	- Fixed bug: errx parameter was not handled correctly in new
+	- Documentation fixes
+
+2.02   2010-12-24
+	- Revised the rules for hyphen-minus processing:
+	  If it's preceded by punctuation and followed by a digit, or
+	  it's followed by a currency symbol, it's a minus sign (U+2212).
+	- Clean up use of eval and properly localize $@
+
+2.01   2010-03-03
+	- The metrics for the cp1252 encoding did not reflect the
+	  accents mapped to control characters (but those characters
+	  are not normally used, anyway).
+	- Fixed some warnings in the test suite
+	- Version 2.00 actually needs Encode 2.21, but only specified 2.12
+
+2.00   2010-02-26
+	- Numerous API changes, mostly minor, but there could be
+	  problems with backwards compatibility.
+
+	- Changed ISOLatin1Encoding to match PostScript's.
+	  The HYPHEN-MINUS (\x2D) is now /minus instead of /hyphen.
+	  Use SOFT-HYPHEN (\xAD) to get a proper hyphen.
+	  Made the same change to Win1252Encoding (cp1252).
+
+	  Please read Hyphens and Minus Signs in PostScript::File for details.
+
+	- Added auto_hyphen attribute with get/set methods
+	- Added need_fonts attribute
+	- Added as_string, embed_font, need_resource, & testable_output methods
+	- add_resource accepts all DSC 3.0 resource types,
+	  but no longer accepts generic 'Resource' type
+	- Reencode fonts added using embed_font or add_resource
+	- Added PostScript::File::Metrics, which includes the metrics
+	  for the standard PostScript fonts.  No more trying to
+	  configure Font::AFM!!!
+	- PNG output has been removed.  Use PostScript::Convert instead.
+	- embed_document now handles & removes TIFF, WMF, or EPSI preview
+	- output accepts an open filehandle as a filename alternative
+	- Passing undef to output always returns the PostScript as a string
+
+	[Minor changes in 2.00]
+
+	- Don't reencode Symbol; it doesn't use the StandardEncoding.
+	  This is not backwards compatible, but I doubt anyone was
+	  using Symbol-iso, as it's not very useful.
+	- Mapped some control characters as accents in Win1252Encoding,
+	  since the Red Book suggests they are required in langlevel 1
+	- add_default, add_resource, add_setup, add_page_setup,
+	  add_page_trailer, & add_trailer now append instead of
+	  overwriting previous value
+	- add_function is now a no-op if has_function returns true
+	- add_resource uses BeginResource instead of deprecated comments
+	- get_strip now returns 'none', 'space', or 'comments'
+	  instead of the regular expression being used
+	- In eps mode, output now returns a list of pages
+	- Multiple calls to output no longer cause duplicate resources
+	- Passing a filename to output does not permanently set the filename
+	- Fonts & resources appear in the document Setup section
+	  instead of the Prolog
+	- Include a Local Variables section for Emacs in the %%Trailer
+	  describing the file's encoding
+
+1.05   2009-10-29
+	- Major change in the way reencode works.
+	  Setting it to 'cp1252' or 'iso-8859-1' causes automatic
+	  character set translation from Unicode strings.
+	- Added cp1252 (Win1252Encoding) support.
+	  Most people should now use reencode => 'cp1252',
+	  even if they are not on Windows, to get the best
+	  Unicode support (which is still quite limited).
+	- When writing to a file, the output method now returns the pathname
+	- The %%BoundingBox must be integers.  If it's not, round up and
+	  also add a %%HiResBoundingBox comment.
+	- Fixed bug in pstr (wasn't quoting backslashes)
+	- It's %%PageOrder, not %%Order (and the order should be capitalized)
+	- Added an examples directory
+
+1.04   2009-10-22
+	- add_comment now appends to comments (as originally documented)
+	  (fixes RT#25786)
+	- Allow WIDTHxHEIGHT as a paper size
+	- Remove spaces before DSC comments even when strip none
+	- pstr now wraps strings longer than 240 characters
+	- strip comments is more aggressive (but won't remove DSC comments)
+
+1.03   2009-10-20
+	- Added pstr function/method
+	- Added embed_document method
+	- The dir & file parameters to new now actually work
+	- The file_ext parameter and {get,set}_file_ext methods allow
+	  you to change the way PostScript::File appends an extension
+	  to the output filename
+	- The PNG output added in 1.01 is now documented
+	- Using Ghostscript to generate PNG should work on Windows now
+	- Include resource types in %%DocumentSuppliedResources comment
+	- Fixed has_function to avoid false positives
+	- Include procset PostScript_File in %%DocumentSuppliedResources
+	- PostScript::File now requires Perl 5.8.0 or later
+
+1.02   2009-09-21
+	- Now maintained by Christopher J. Madsen
+	- Stripping leading whitespace now works with Perl 5.10 (RT#49838)
+
+1.01   2003-08-27
+	- support for PNG format from Ghostscript
+
+1.00   2003-05-14
+	- minor alterations
+	- promoted to beta
+	- licensing changed from Artistic to 'as Perl'
+
+0.13   2003-04-28
+	- fix paper size bug
+
+0.10   2002-11-20
+	- 1cm borders by default
+	- support for user variables
+	- support for by-page user variables
+	- errors now on by default
+	- db_where, db_on and db_off added to postscript code
+	- corrected usage of db_active
+
+0.09   2002-11-11
+	- corrected version number in test
+
+0.08   2002-11-10
+	- minor changes
+	- Correct attribution to Latin1Encoding
+
+0.07    2002-10-20
+	- Namespace changed from PostScript::Graph::File
+
+0.06    2002-10-11
+	- Namespace changed from PostScript::File
+
+0.05    2002-10-06
+	- bugfix: page orientation with gv
+
+0.04   2002-09-27
+	- tidied up v0.03 pod changes
+	- added 'has_function()'
+
+0.03   2002-09-24
+	- bugfix: interaction between debug 2 and custom dicts
+	- added tests
+	- 'new' now accepts hash ref as well as hash keys/values
+	- bugfix: only add 1 function set
+	- bugfix: %%Orientation now always shown
+	- pod now makes use of html indexing
+
+0.02   2002-09-22
+	- debug => (not 2) wasn't working. fixed.
+	- restored many functions to new-option only
+	- page_number renamed to page_label
+	- added comment stripping
+	- streamlined packaging
+
+0.01   2002-09-21
+	- original version; created by h2xs 1.21 with options
+	  -X -n PostScript::File

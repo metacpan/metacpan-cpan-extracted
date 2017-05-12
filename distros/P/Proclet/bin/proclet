@@ -1,0 +1,243 @@
+#!/usr/bin/perl 
+
+use strict;
+use warnings;
+use Getopt::Compact::WithCmd;
+use Proclet;
+use YAML::XS;
+use utf8;
+
+our $VERSION = $Proclet::VERSION;
+
+my %opt;
+$opt{concurrency} = '';
+$opt{procfile} = 'Procfile';
+$opt{envfile} = '';
+$opt{color} = 0;
+$opt{port} = 5000;
+
+my $go = Getopt::Compact::WithCmd->new(
+    name => 'proclet',
+    version => $Proclet::VERSION,
+    args => '[service]',
+    command_struct => {
+        'start' => {
+            options => [
+                [
+                    [qw/c concurrency/],
+                    'the number of each process type to run. The value passed in should be in the format process=num,process=num',
+                    '=s',
+                    \$opt{concurrency},
+                    { required => 0 },
+                ],
+                [
+                    [qw/e env/],
+                    'an alternate environment file. You can specify more than one file by using: --env file1,file2.',
+                    '=s',
+                    \$opt{envfile},
+                    { required => 0 }
+                ],
+                [
+                    [qw/f procfile/],
+                    'an alternate Procfile to load, implies -d at the Procfile root',
+                    '=s',
+                    \$opt{procfile},
+                    { required => 0 }
+                ], 
+                [
+                    [qw/color/],
+                    'colored log',
+                    '!',
+                    \$opt{color},
+                    { required => 0 }
+                ], 
+                [
+                    [qw/p port/],
+                    'Port number which used as the base for this application. Should be a multiple of 1000',
+                    '=i',
+                    \$opt{port},
+                    { required => 0 }
+                ], 
+            ],
+        }
+   },
+);
+
+my $cmd  = $go->command || $go->show_usage;
+$go->show_usage if $go->opts->{help};
+my ($args) = @{$go->args};
+
+if ( -f '.foreman' ) {
+    my $yaml_opt;
+    eval { 
+        $yaml_opt = YAML::XS::LoadFile('.foreman');
+    };
+    die 'cannot load .foreman as yaml: '. $@ if $@;
+    %opt = (
+        %opt,
+        %$yaml_opt
+    );
+}
+
+if ( $cmd eq 'start' ) {
+
+    if ( ! length($opt{envfile}) && -f '.env') {
+        load_envfile('.env');
+    }
+    else {
+        my @envfile = split /,/, $opt{envfile};
+        load_envfile($_) for @envfile;
+    }
+
+    my $services = load_procfile($opt{procfile});
+    my $concurrency = parse_concurrency($opt{concurrency});
+
+    die 'no services defined' unless @$services;
+
+    my $proclet = Proclet->new( color => $opt{color}, _base_port => $opt{port} );
+    for my $service ( @$services ) {
+        my ($process, $command) = @$service;
+        my $worker = exists $concurrency->{$process} ? $concurrency->{$process} : 1;
+        $worker = 0 if defined $args && $process ne $args;
+        $proclet->service(
+            tag => $process,
+            code => $command,
+            worker => $worker, 
+        );
+    }
+    $proclet->run();
+}
+else {
+    $go->show_usage()
+}
+
+
+sub load_procfile {
+    my $file = shift;
+    my @services;
+    open(my $fh, '<:utf8', $file) or die "cannot load procfile $file: $!";
+    while (my $line = <$fh>) {
+        next if $line =~ /^\s*#/;
+        if (my ($name, $command) = ($line =~ /^([^:]+)\s*:\s*(.+)$/)) {
+            push @services, [$name, $command];
+        }
+    }
+    return \@services;
+}
+
+sub load_envfile {
+    my $file = shift;    
+    open(my $fh, '<:utf8', $file) or die "cannot load envfile $file: $!";
+    while (my $line = <$fh>) {
+        if (my ($name, $val) = ($line =~ /^([^=]+)\s*=\s*(.+)/)) {
+            $ENV{$name} = $val;
+        }
+    }
+}
+
+sub parse_concurrency {
+    my $opt = shift;
+    my %concurrency;
+    for my $process ( split /,/, $opt ) {
+        if ( $process =~ /^\s*([^=]+)\s*=\s*(\d+)\s*$/ ) {
+            $concurrency{$1} = $2;
+        }
+        else {
+            die "incorrect concurrency option, near '$process'";
+        }
+    }
+    return \%concurrency;
+}
+
+__END__
+
+=head1 NAME
+
+proclet - foreman for perl
+
+=head1 SYNOPSIS
+
+  $ cat Procfile
+  memd: memcached -v -p 11211
+  plack: plackup -p 9022 -e 'sub { [200, [], ["OK"]] }'
+  $ proclet start
+
+=head1 DESCRIPTION
+
+proclet is foreman for perl, manages Procfile-based applications.
+
+proclet does not support B<EXPORT> yet.
+
+=head1 RUNNING
+
+B<proclet start> is used to run your application directly from the command line.
+
+The following options control how the application is run:
+
+=over 4
+
+=item -h, --help
+
+Display help message
+
+=item -c, --concurrency: Str
+
+The number of each process type to run. The value passed in should be in the format process=num,process=num
+
+=item -e, --env: Str
+
+An alternate environment file. You can specify more than one file by using: --env file1,file2.
+
+=item -f, --procfile: Str
+
+An alternate Procfile to load, implies -d at the Procfile root
+
+=item --color
+
+Colored log
+
+=item -p, --port: Num
+
+Port number which used as the base for this application. Should be a multiple of 1000
+
+=back
+
+=head1 PROCFILE
+
+A Procfile should contain both a name for the process and the command used to run it.
+
+  web: bundle exec thin start
+  job: bundle exec rake jobs:work
+
+=head1 ENVIRONMENT
+
+If a B<.env> file exists in the current directory, the default environment will be read from it. This file should contain key/value pairs, separated by =, with one key/value pair per line.
+
+  FOO=bar
+  BAZ=qux
+
+=head1 DEFAULT OPTIONS
+
+If a B<.foreman> file exists in the current directory, default options will be read from it. This file should be in YAML format with the long option name as keys. Example:
+
+  concurrency: alpha=0,bravo=1
+  color: 1
+
+=head1 PORT ASSIGNMENT
+
+As same as foreman, proclet starts to assign from port 5000 by default. and assigns them in blocks of 100 per service in the order used in your Procfile. You can specify an alternate starting port number with the -p option.
+
+=head1 AUTHOR
+
+Masahiro Nagano E<lt>kazeburo {at} gmail.comE<gt>
+
+=head1 SEE ALSO
+
+L<Proclet>, L<https://github.com/ddollar/foreman>, L<http://blog.daviddollar.org/2011/05/06/introducing-foreman.html>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

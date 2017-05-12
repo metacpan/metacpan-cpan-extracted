@@ -1,0 +1,35 @@
+-- Patch:
+--   From: 1.0.0
+--   To:   1.0.3
+--
+-- Description:
+--
+--      add table for database based sessions
+--      add skin column in preferences
+
+BEGIN;
+
+-- patch starts here --
+
+    -- Create a table in your database for sessions
+    -- [from Catalyst::Plugin::Session::Store::DBIC docs]
+    CREATE TABLE sessions (
+        id              CHAR(72) PRIMARY KEY,
+        session_data    TEXT,
+        expires         INTEGER,
+
+        -- we like to know when a session was created
+        created         timestamp with time zone
+                        default CURRENT_TIMESTAMP
+                        not null
+    );
+    ALTER TABLE sessions OWNER TO parley;
+
+    ALTER TABLE public.preference
+        ADD COLUMN
+            skin        varchar(100) NULL
+    ;
+
+-- patch ends here --
+
+COMMIT;

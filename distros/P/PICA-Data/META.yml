@@ -1,0 +1,36 @@
+---
+abstract: 'PICA record processing'
+author:
+  - 'Jakob Voß'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, Dist::Milla version v1.0.8, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PICA-Data
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  XML::LibXML: '1.78'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/gbv/PICA-Data/issues
+  homepage: https://github.com/gbv/PICA-Data
+  repository: https://github.com/gbv/PICA-Data.git
+version: '0.31'
+x_contributors:
+  - 'Jakob Voss <jakob@nichtich.de>'
+  - 'Jakob Voss <voss@gbv.de>'
+  - 'Jakob Voß <jakob@nichtich.de>'
+  - 'Johann Rolschewski <jorol@cpan.org>'
+  - 'Johann Rolschewski <rolschewski@gmail.com>'

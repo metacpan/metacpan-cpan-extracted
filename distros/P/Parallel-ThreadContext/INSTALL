@@ -1,0 +1,4 @@
+perl MAKEFILE.pl
+make
+make test
+make install

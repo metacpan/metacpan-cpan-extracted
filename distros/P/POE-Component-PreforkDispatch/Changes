@@ -1,0 +1,7 @@
+0.101  2007-10-29
+
+- Removed POE::Wheel::ReadLine which isn't used
+
+0.1  2007-10-25
+
+- Initial release

@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/POE/Component/Client/Whois/Smart.pm
+lib/POE/Component/Client/Whois/Smart/Cache.pm
+lib/POE/Component/Client/Whois/Smart/DirectI.pm
+lib/POE/Component/Client/Whois/Smart/NetWhoisRaw.pm
+lib/POE/Component/Client/Whois/Smart/NetWhoisRawHTTP.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01-test.t
+t/02-cache.t
+t/03-directi.t
+t/04-netwhoisraw.t

@@ -1,0 +1,40 @@
+# List3_tree_d_sem.yp
+%semantic token 'c' 'd' 
+%tree
+%{
+use Data::Dumper;
+%}
+%%
+S:      'c'+  'd'+ 
+           { 
+              print Dumper($_[1]);
+              print Dumper($_[2]);
+           } 
+;
+
+%%
+
+sub _Error {
+  print "Syntax error.\n";
+}
+
+sub _Lexer {
+    my($parser)=shift;
+
+        ${$parser->input()}
+    or  $parser->input(scalar(<STDIN>));
+
+    for (${$parser->input}) {
+        s/^[ \t\n]+//;
+        s/^(.)//s and return($1,$1);
+        return('',undef);
+    }
+}
+
+sub Run {
+    my($self)=shift;
+    $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error, 
+      # yybuildingtree => 1,
+      #, yydebug => 0x1F 
+    );
+}

@@ -1,0 +1,133 @@
+Revision history for Perl module Plack::Middleware::ServerStatus::Lite
+
+0.36 2016-09-20T00:26:04Z
+
+  - Fix JSON types unexpectedly changed at 0.35 
+    Thank you astj
+
+0.35 2016-06-06T15:30:48Z
+
+  - Improve apache's mod_status compatibility
+    Thank you tokuhirom
+
+0.34 2014-09-30T02:39:47Z
+
+  - fix test in parallel mode #14
+
+0.33 2013-09-19T02:49:19Z
+
+   - use open for open counter_file. 
+     Is there bugs around perlio and sysopen in perl-5.8?
+
+0.32 2013-09-13T01:29:58Z
+
+   - fix requires. add Getopt::Long and Pod::Usage
+
+0.31 2013-09-09T03:41:43Z
+
+   - fixing test. check stderr
+
+0.30 2013-09-05T05:33:14Z
+
+   - non-trial release
+
+0.21 2013-09-04T06:51:09Z
+
+   - add server-status. check local server-status without HTTP reqs
+     Original code by karenetheridge. Thanks
+   - store status as JSON
+
+0.20 2013-08-27T00:17:34Z
+
+   - Reformatted Changes file as per CPAN::Changes::Spec (Thank you neilbowers)
+
+0.19 2013-08-26T05:03:32Z
+
+   - add warnings when 'allow' is missing.
+     https://github.com/kazeburo/Plack-Middleware-ServerStatus-Lite/issues/12
+
+0.18 2013-07-22T06:39:12Z
+
+   - add more tests. check response body
+
+0.17 2013-07-22T06:25:23Z
+
+   - requires Parallel::Scoreboard >= 0.03
+   - check body in response_cb for delayed and normal response
+
+0.16 2013-06-18T15:57:56Z
+
+   - non-trial release
+
+0.15 2013-06-17T02:40:30Z
+
+   - re-add skip_ps_command see
+     https://github.com/kazeburo/Plack-Middleware-ServerStatus-Lite/issues/10
+
+0.14 2013-06-14T07:46:44Z
+
+   - (experimental) drop skip_ps_command opt. Maybe it's not used
+   - support cygwin
+
+0.13 2013-04-19T01:26:53Z
+
+   - re-package with Minilla
+   - refactor around IPv6 cidr check
+   - (status page) remove a blank line at the bottom
+
+0.12 2013-03-07 09:24:24
+
+   - requires JSON 2.xx 
+
+0.11 2013-02-05 11:46:55
+
+   - uses 'ps -ax' instead of "-e" in *BSD os
+   - supports IPv6 
+     (Thanks kuriyama-san) 
+
+0.10 2013-01-28 14:04:48
+
+   - don't use response_cb if response is ArrayRef.
+     response_cb removes Content-Length header.
+
+0.09 2012-09-03 16:21:44
+
+    - added skip_ps_command option for systems does not have /proc
+
+0.08 2012-08-24 17:35:24
+
+    - allow counting of bytes sent (Thanks kgoess)
+    - changed to use Plack::Util::response_cb
+
+0.07 2012-06-01 13:20:17
+
+    - display "Total Accesses" and "Seconds since beginning
+      of most recent request" original idea by smly
+
+0.06 2012-03-23 13:46:27
+
+    - Support JSON format status
+
+0.05 2012-02-09 00:54:11
+
+    - Some OS does not support ps "x" opt. uses "-e" instead of "x" 
+
+0.04 2012-02-08 10:04:32
+
+    - added "x" opt for ps command. thanks wolfgang.
+      Without -x, the Server-Status will not work if the Server is started 
+      with eg. Server::Starter which detaches the processes 
+      from a controlling terminal.
+
+0.03 2012-01-16 10:09:50
+
+    - Support delayed response. thanks nihen.
+
+0.02 2012-01-05 10:03:51
+
+    - Show uptime also in human-readble form. thanks nichtich.
+
+0.01 2010-07-01 11:00:13
+
+    - original version
+

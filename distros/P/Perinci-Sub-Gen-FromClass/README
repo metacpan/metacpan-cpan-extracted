@@ -1,0 +1,49 @@
+SYNOPSIS
+
+    Given a Mo/Moo/Mouse/Moose class:
+
+        # MyClass
+        use Moo;
+        has attr1 => (is => 'ro', required=>1);
+        has attr2 => (is => 'rw');
+        sub do_this { ... }
+        sub do_that { ... }
+        1;
+
+    you can generate a function for it:
+
+        use Perinci::Sub::Gen::FromClass qw(gen_func_from_class);
+        gen_func_from_class(
+            name   => 'do_this',
+    
+            class  => 'MyClass',
+            type   => 'Moo',
+            method => 'do_this',
+            method_args => [3, 4, 5], # optional
+        );
+
+    then if you call this function:
+
+        do_this(attr1=>1, attr2=>2);
+
+    it will do something like (instantiate class and call a method):
+
+        MyClass->new(attr1=>1, attr2=>2)->do_this(3, 4, 5);
+
+DESCRIPTION
+
+    Sometimes some module annoyingly only provides OO interface like:
+
+     my $obj = Foo->new(arg1=>1, arg2=>2);
+     $obj->some_action;
+
+    when it could very well just be:
+
+     some_action(arg1=>1, arg2=>2);
+
+    This module helps you create that function from a class.
+
+SEE ALSO
+
+    Rinci
+

@@ -1,0 +1,5 @@
+<xml>
+  <attribute petal:attributes="attr string:0" />
+  <content petal:content="string:0">yo</content>
+  replace: <replace petal:replace="string:0">yoyo</replace>
+</xml>

@@ -1,0 +1,44 @@
+---
+name: POE-Component-Fuse
+version: 0.05
+author:
+  - 'Apocalypse <APOCAL@cpan.org>'
+abstract: Using FUSE in POE
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Config: 0
+  DynaLoader: 0
+  Errno: 0
+  Fcntl: 0
+  Filesys::Virtual::Async: 0
+  Fuse::Filesys::Virtual: 0
+  POE: 0
+  POE::Component::AIO: 0
+  POE::Filter::Line: 0
+  POE::Filter::Reference: 0
+  POE::Session: 0
+  POE::Session::AttributeBased: 0
+  POE::Wheel::Run: 0
+  Scalar::Util: 0
+  perl: 5.006
+dynamic_config: 0
+provides:
+  POE::Component::Fuse:
+    file: lib/POE/Component/Fuse.pm
+    version: 0.05
+  POE::Component::Fuse::AsyncFsV:
+    file: lib/POE/Component/Fuse/AsyncFsV.pm
+    version: 0.05
+  POE::Component::Fuse::SubProcess:
+    file: lib/POE/Component/Fuse/SubProcess.pm
+    version: 0.05
+  POE::Component::Fuse::myFuse:
+    file: lib/POE/Component/Fuse/myFuse.pm
+    version: 0.05
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,7 @@
+<div class="title_container">
+  <h1>Source code of [% title %]</h1>
+</div>
+
+<h3>[% filename %]</h3>
+
+<pre class="verbatim_highlighted">[% pod %]</pre>

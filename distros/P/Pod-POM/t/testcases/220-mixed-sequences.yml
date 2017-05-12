@@ -1,0 +1,6 @@
+---
+notes: >
+  Sequences can be expressed as N<text> or N<< text >>.  This test mixes those
+  formats.
+view-pod:
+  todo: pod view output not as expected

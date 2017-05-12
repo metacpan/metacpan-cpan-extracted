@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/Perlbal/Control.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/001_basic.t
+t/pod.t
+Makefile.PL
+META.yml

@@ -1,0 +1,112 @@
+Revision history for Perl module Parse::BBCode
+
+0.15 2014-07-15 16:16:00 CEST
+- POD, minimum perl, consistent version numbers
+
+0.14_001 2014-07-12 23:00:00 CEST
+- Bugfix: multiple quoted attributes were not parsed correctly (TLoD-Snake, github #3)
+
+0.14 Sun May 13 16:56:03 CEST 2012
+- See changes from the develop versions
+- Make single quoting of attributes optional (see option attribute_quote)
+
+0.13_004 Sat May 12 01:21:52 CEST 2012
+- Bugfix/Change: Allow whitespaces after attributes
+- Change: Allow underscores in attribute names
+- Change: Allow single quotes in attributes
+  (all RT#76137)
+
+0.13_003 Mon Oct  3 13:50:16 CEST 2011
+- Bugfix: closing noparse tags
+- new option: strip linebreaks before/after block tags is now configurable
+
+0.13_002 Wed Sep 28 18:08:21 CEST 2011
+- make attribute parsing inheritable
+
+0.13_001 Sun Sep 25 17:03:51 CEST 2011
+- Bugfix: another bugfix with short tags
+- Bugfix: closing tags did not happen always (RT 71018)
+- Bugfix: closing unclosed noparse tag (RT 71018)
+- Bugfix: case insensitive search for closing noparse tags (RT 70964)
+- Documentation Fix: default values (RT 70929)
+
+0.13 Fri Aug 19 14:04:10 CEST 2011
+- Bugfix: short tags broke tag before
+
+0.12_005 Fri May 20 14:05:38 CEST 2011
+New Feature: short tags like [cpan://Module|link title] (experimental)
+
+0.12_004 Mon May 16 18:02:34 CEST 2011
+New Feature: smiley processor
+
+0.12_003 Mon May 16 13:16:46 CEST 2011
+- New Feature: numbered lists [list=1][*]... [list=a]...
+- New Features: url_finder, text_processor, linebreaks
+
+0.12_002 Tue May 10 18:17:23 CEST 2011
+- New Feature: pass your own information to the rendering subroutines. See
+  render()
+
+0.12_001 Mon May  9 20:08:05 CEST 2011
+- New Feature: Parse::BBCode::Tag: new accessors 'num' and 'level',
+  new method 'walk'
+
+0.12 Sat May  7 22:50:28 CEST 2011
+- Security: allow only http://... and /... links (some old and some
+  strange (MSIE) browsers interpret javascr<tab>ipt:)
+- Change: [color]: allow uppercase hex colors, and allow only the 17
+  standard html colors
+- New feature: supply info hash with information on tags outside the
+  currently processed
+- Change: In block tags the first and last linebreak is removed
+
+0.11 Sun Sep 19 13:36:47 CEST 2010
+- Security: change img tag to use "link" escape (filtering javascript:)
+- Added Parse::BBCode::Text
+- Added AUBBC to compare.html and bench.pl
+
+0.10 Mon Jun 14 19:34:12 CEST 2010
+- Bugfix: memleak
+  https://rt.cpan.org/Ticket/Display.html?id=54815
+- Feature: new option direct_attribute
+  https://rt.cpan.org/Ticket/Display.html?id=53353
+- Partly Bugfix: ignoring line breaks at list start/end
+  https://rt.cpan.org/Ticket/Display.html?id=55732
+
+0.09 Thu May 21 13:41:03 CEST 2009
+- Change: Leave tags unparsed where the escape function returns undef
+  http://rt.cpan.org/Public/Bug/Display.html?id=43845
+- Don't change parameter hash
+  http://rt.cpan.org/Public/Bug/Display.html?id=45718
+- remove warning for []
+- Bugfix: nested lists
+
+0.08 Sun Mar  8 23:05:45 CET 2009
+- Bugfix: two url tags following each other remained the
+  second one unparsed
+- New feature: Access to attributes like [img=url align=left]
+  through %{align}attr
+
+0.07 Thu Feb 19 12:03:23 CET 2009
+- Bugfix: Missing dependency declaration
+  http://rt.cpan.org/Public/Bug/Display.html?id=43365
+- Bugfix: Case insensitive for closing tags
+  http://rt.cpan.org/Public/Bug/Display.html?id=42781
+- Bugfix: Syntax error in output-HTML
+  http://rt.cpan.org/Public/Bug/Display.html?id=42780
+- Bugfix: Test::NoWarnings removed in test
+
+0.06 Sun Jun 29 21:49:13 CEST 2008
+- New Feature: Added single-tags like [hr], like Viacheslav Tikhanovskii suggested
+- New Feature: Added url-class for tags
+
+0.05 Mon Jun  2 19:58:26 CEST 2008
+- Fixed test
+- Changed plaintext subroutine calling arguments
+
+0.04 Sun May 18 19:32:11 CEST 2008
+- Several bugfixes, some syntax changes, added escapes
+
+0.03 Mon May  5 21:50:39 CEST 2008
+- Initial Version
+

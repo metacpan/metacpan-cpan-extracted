@@ -1,0 +1,1375 @@
+# ABSTRACT: An introduction to using PONAPI::Server
+# PODNAME: PONAPI::Manual
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+PONAPI::Manual - An introduction to using PONAPI::Server
+
+=head1 VERSION
+
+version 0.003001
+
+=head1 DESCRIPTION
+
+The origin of the name PONAPI (pronounced: Po-Na-Pi) is JSONAPI.
+We jokingly decided to replace the JavaScript reference (JS) with a Perl one (P).
+
+This document describes how to use and set up C<PONAPI::Server>.
+The latter parts describe how to set up a repository from scratch,
+including a set-by-step of the implementation.
+
+The recommended usage is to use L<PONAPI::Server> directly as a PSGI
+application:
+
+    # myapp.psgi
+    use PONAPI::Server;
+    PONAPI::Server->new(
+        'repository.class' => 'Test::PONAPI::Repository::MockDB',
+    )->to_app;
+
+And later, on the command line, you can use any PSGI-compatible utility
+to run the application:
+
+    plackup -p 5000 myapp.psgi
+
+Any L<{json:api}|http://jsonapi.org/> compliant client can then access your application:
+
+    $ perl -MPONAPI::Client -MData::Dumper -E 'say Dumper(PONAPI::Client->new->retrieve(type => "people", id => 88))'
+
+    $ curl -X GET -H "Accept: application/vnd.api+json" 'http://0:5000/people/88
+
+That'll give you the default options, with the default repository; for a real
+world scenario, you'll have to get your hands dirty.
+
+Because {json:api} extensively uses the C<PATCH> method, we recommend using
+L<Plack::Middleware::MethodOverride> or another similar middleware to enable
+HTTP method overriding; this is to allow clients without PATCH to still use
+the API:
+
+    # myapp.psgi
+    use PONAPI::Server;
+    use Plack::Middleware::MethodOverride;
+
+    my $app = PONAPI::Server->to_app(
+        'repository.class' => 'Test::PONAPI::Repository::MockDB',
+    )
+    Plack::Middleware::MethodOverride->wrap($app);
+
+=head1 A QUICK DEMO
+
+The L<ponapi> utility comes with C<PONAPI::Server>; it can be be used
+to set up a basic PONAPI server environment:
+
+    $ ponapi gen --dir my_ponapi --new_repo My::PONAPI::Repo
+
+The environment will include a server configuration file, and the minimum
+boilerplate for a repository, and a .psgi script to start the server.
+
+L<ponapi> can also be used to start a test instance to toy around without
+having to write a repo of your own:
+
+    $ ponapi demo --server --port 5000
+
+    # We can then query that server with the ponapi util...
+    # Do a random query
+    $ ponapi demo --query
+    # output JSON data only
+    $ ponapi demo --query --json
+    # Or specify what you want
+    $ ponapi demo --query /articles/2
+    $ ponapi demo --query /articles/2/comments
+    $ ponapi demo --query /articles/2/relationships/comments
+    $ ponapi demo --query /people/88?include=articles
+
+    # ... or with PONAPI::Client
+    $ perl -MPONAPI::Client -E 'PONAPI::Client->new->retrieve_all(type => q<articles>)'
+
+The rest of this document will expand on the server configuration file
+(C<server.yaml>) and on how to create your own repository.
+
+=head1 SERVER CONFIGURATION
+
+The server looks for a YAML configuration file in C<conf/server.yml>, under
+the current working directory.
+
+    # PONAPI server & repository configuration file
+
+    # switch options take the positive values: "yes", 1 & "true"
+    #                     and negative values: "no", 0 & "false"
+
+    server:
+      spec_version:            "1.0"        # {json:api} version
+      sort_allowed:            "false"      # server-side sorting support
+      send_version_header:     "true"       # server will send 'X-PONAPI-Server-Version' header responses
+      send_document_self_link: "true"       # server will add a 'self' link to documents without errors
+      links_type:              "relative"   # all links are either "relative" or "full" (inc. request base)
+      respond_to_updates_with_200: "false"  # successful updates will return 200's instead of 202's when true
+
+    repository:
+      class:  "Test::PONAPI::Repository::MockDB"
+      args:   []
+
+Currently, only two sections of C<server.yml> are relevant to
+L<PONAPI::Server>: C<server>, which influences how the server behaves, and
+C<repository>, which is the class that controls how the data is acquired.
+See L<CREATING A REPOSITORY> for more on the latter.
+
+=over
+
+=item spec_version
+
+The L<{json:api}|http://jsonapi.org/> version that the server is serving.
+B<Must> be present.
+
+=item sort_allowed
+
+true/false. If true, server-side sorting is supported.  If false, requests
+including the C<sort> parameter will immediately return an error, without
+ever reaching the repository.
+
+=item send_version_header
+
+true/false.  If true, all responses will include the {json:api} spec version
+set in C<spec_version>, through a custom C<X-PONAPI-Server-Version> header.
+
+=item send_document_self_link
+
+true/false.  On successful operations, the document will be forced
+to include a C<links> section with a C<self> key, which will usually
+point to the request path (but not always -- consider pagination).
+
+=item links_type
+
+Either C<"relative"> or C<"full"> -- full links will include the request base
+(hostname), while relative requests will not:
+
+    /articles/1                      # Relative link
+    http://localhost:5000/articles/1 # Full link
+
+=item respond_to_updates_with_200
+
+true/false.
+
+This is false by default, which will cause successful update-like operations
+(C<update>, C<update_relationships>, C<create_relationships>, and
+C<delete_relationships>) to immediately return with a 202, instead of
+a 200.
+
+This is often desirable, because the specification mandates that certain
+update operations returning a 200 do an extra retrieve and pass over
+that information to the client.  Due to several factors (e.g. replication
+delay) that retrieve might either need to be run on the master, or return
+unreliable information, and may slow down requests due to the extra fetch.
+
+=back
+
+=head1 CREATING A REPOSITORY
+
+The other relevant section of C<server.yml> is C<repository>, which may
+look something like this:
+
+    repository:
+      class:  "My::Repository::Yadda"
+      args:   []
+
+Where C<My::Repository::Yadda> is a class that consumes the
+C<PONAPI::Repository> role; args will be passed to the
+repo when it is instantiated.
+
+To use PONAPI, we'll need a repo to communicate between the server and
+the data we want to serve, so let's create a minimal repo from
+scratch.  A repository in PONAPI is an abstracted set of collections of
+resources, in the "Uniform Resource Locator" sense, which may or may
+not directly reflect your data source model. Your repository class
+merely needs to define sensible behaviours for the required methods
+defined in C<PONAPI::Repository> and that may be as simple as a
+direct reflection of your data source model or it may allow for more
+useful abtractions.
+
+Our aim here is to have a repo that will handle something like a minimalistic blog,
+so we need to figure out what data types we'll handle, and what their
+relationships are.
+
+For this example, we'll have three types -- articles, comments, and people --
+and two relationships: articles have one or more comments, and articles
+have one author.
+
+It may help to think of relationships as something like foreign keys in SQL.
+
+In any case, the structure we want to have is this:
+    articles
+        -> has comments
+        -> has an author (type people)
+
+And in SQL, the tables might look something like this:
+
+    CREATE TABLE articles (
+        id            INTEGER     PRIMARY KEY AUTOINCREMENT,
+        title         CHAR(64)    NOT NULL,
+        body          TEXT        NOT NULL,
+        created       DATETIME    NOT NULL   DEFAULT CURRENT_TIMESTAMP,
+        updated       DATETIME    NOT NULL   DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE people (
+        id            INTEGER     PRIMARY KEY,
+        name          CHAR(64)    NOT NULL   DEFAULT "anonymous",
+        age           INTEGER     NOT NULL   DEFAULT "100",
+        gender        CHAR(10)    NOT NULL   DEFAULT "unknown"
+    );
+
+    CREATE TABLE comments (
+        id            INTEGER     PRIMARY KEY,
+        body          TEXT        NOT NULL DEFAULT ""
+    );
+
+And finally, on perl:
+
+    # First, some boilerplate...
+    package My::Repository::Hooray;
+    use Moose;
+    with 'PONAPI::Repository';
+    use PONAPI::Constants;
+    use PONAPI::Exception;
+
+That is the initial boilerplate for any repo.  The L<PONAPI::Repository>
+role requires us to define several methods, which also require us to have
+some information regarding the data we are serving:
+
+    my %types = (
+        articles => 1,
+        comments => 1,
+        people   => 1,
+    );
+    # Returns true if the repo handles $type
+    sub has_type {
+        my ($self, $type) = @_;
+        return 1 if $types{$type};
+    }
+
+    my %relationships => (
+        # Articles has two relationships, one to comments, and
+        # one to authors -- but authors actually has type 'people'
+        articles => {
+            comments => { type => 'comments', one_to_many => 1 },
+            authors  => { type => 'people',   one_to_many => 0 },
+        },
+    );
+    # Returns true if $type has a $rel_type relationships
+    sub has_relationship {
+        my ( $self, $type, $rel_name ) = @_;
+        return 1 if exists $relationships{$type}
+                 && exists $relationships{$type}{$rel_type};
+    }
+
+    # Returns true if $rel has a on
+    sub has_one_to_many_relationship {
+        my ( $self, $type, $rel_name ) = @_;
+        return unless $self->has_relationship($type, $rel_type);
+        return 1 if $relationships{$type}{$rel_type}{one_to_many};
+    }
+
+The next method we have to define is C<type_has_fields>.  We'll get a type and
+an arrayref of fields, and we'll return true if B<all> all elements in the
+arrayref are attributes of type.
+
+    my %columns = (
+        articles => [qw/ id title body created updated /],
+        people   => [qw/ id name age gender /],
+        comments => [qw/ id body /],
+    );
+    sub type_has_fields {
+        my ($self, $type, $has_fields) = @_;
+        return unless $self->has_type($type);
+
+        my %type_columns = map +($_=>1), @{ $columns{$type} };
+        return if grep !exists $type_columns{$_}, @$has_fields;
+        return 1;
+    }
+
+With those out of the way, we can get to the meat of the repository:
+
+=head2 API method
+
+All of these will receive B<at least> these two arguments:
+C<type>, the type of the request, and C<document>, an instance
+of L<PONAPI::Document>.
+
+Note that by the time the arguments reach the API methods,
+some amount of validation will have already happened, like
+if the requested relationships exists.
+
+=head3 retrieve_all
+
+    retrieve_all( type => $type, %optional_arguments )
+
+Our starting point:
+
+    sub retrieve_all {
+        my ($self, %args) = @_;
+        my $type     = $args{type};
+        my $document = $args{document};
+
+        my $dbh   = $self->dbh;
+        my $table = $dbh->quote($type);
+        my $sth   = $dbh->prepare(qq{ SELECT * FROM $table });
+
+        return unless $sth->execute;
+
+        while ( my $row = $sth->fetchrow_hashref ) {
+            my $id = delete $row->{id};
+
+            # Add a new resource, identified by $type and $id
+            my $resource = $doc->add_resource( type => $type, id => $id );
+            # These will show up under the attributes key
+            $resource->add_attribute( $_ => $row->{$_} ) for keys %{$row};
+            # Add a links key, with pointer to ourselves
+            $resource->add_self_link();
+        }
+
+        return;
+    }
+
+A call to C< $dao-E<gt>retrieve_all(type =E<gt> 'articles', ...) > will then return
+something like this:
+
+    {
+        data => [
+            {
+                type => 'articles',
+                id   => 123456,
+                attributes => {
+                    title   => 'This Or That',
+                    body    => '...',
+                    updated => '...',
+                    created => '...',
+                },
+                links => {
+                    self => '/articles/123456',
+                },
+            },
+            ...
+        ],
+    }
+
+To be fully API compliant, we should also return the relationships
+that a given resource has.  To do this, we'll need a way of finding
+what our related resources are.
+For simplicity, let's assume that our data in SQL is in some junction
+tables:
+
+    -- articles-to-authors, one to one
+    CREATE TABLE rel_articles_people (
+        id_articles   INTEGER     NOT NULL PRIMARY KEY,
+        id_people     INTEGER     NOT NULL
+    )
+
+    -- articles-to-comments, one to many
+    CREATE TABLE IF NOT EXISTS rel_articles_comments (
+        id_articles   INTEGER     NOT NULL,
+        id_comments   INTEGER     UNIQUE     NOT NULL
+    )
+
+Then, we can change C<%relationships> to have that same information:
+
+    my %relationships => (
+        articles => {
+            comments => {
+                type          => 'comments',
+                one_to_many   => 1,
+                rel_table     => 'rel_articles_comments',
+                id_column     => 'id_articles',
+                rel_id_column => 'id_comments',
+            },
+            authors  => ...,
+        },
+        ...
+    );
+
+    sub _fetch_relationships {
+        my ($self, %args) = @_;
+        my ($type, $id)   = @args{qw/ type id /};
+
+        my $type_relationships = $relationships{$type} || {};
+        return unless %$type_relationships;
+
+        my $dbh = $self->dbh;
+        my %rels;
+        foreach my $rel_type ( keys %$type_relationships ) {
+            my $relationship_info = $type_relationships->{$rel_type};
+            my $table             = $relationship_info->{rel_table};
+            my $id_col            = $relationship_info->{id_column};
+            my $rel_id_col        = $relationship_info->{rel_id_column};
+
+            my $sth = $dbh->prepare(
+                "SELECT $rel_id_col FROM $table WHERE $id_col = ?"
+            );
+            return unless $sth->execute($id);
+
+            while ( my $row = $sth->fetchrow_hashref ) {
+                push @{ $rels{$rel_type} ||= []}, $row->{$rel_id_col};
+            }
+        }
+
+        return \%rels;
+    }
+
+    sub _add_relationships {
+        my ($self, %args) = @_;
+        my $resource = $args{resource};
+
+        my $all_relationships = $self->_fetch_relationships(%args);
+        foreach my $rel_type ( keys %$all_relationships )	 {
+            my $relationships = $all_relationships->{$rel_type} || [];
+            next unless @$relationships;
+
+            my $one_to_many = $self->has_one_to_many_relationship($type, $rel_type);
+            foreach my $rel_id ( @$relationships ) {
+                $resource->add_relationship( $rel_type, $rel_id, $one_to_many )
+                    ->add_self_link
+                    ->add_related_link;
+            }
+        }
+    }
+
+    sub retrieve_all {
+        ...
+        # Inside the while loop:
+        $self->_add_relationships(
+            %args,
+            resource => $resource,
+        );
+        ...
+    }
+
+With this as our starting base, let's go over all the potential arguments we
+can receive, and see how we can implement them.
+
+=over
+
+=item include
+
+L<Spec|http://jsonapi.org/format/#fetching-includes>.
+
+This will contain an arrayref of relationship names, like one of these:
+
+    [qw/ authors /]
+    [qw/ authors comments /]
+
+If present, our response needs to include a top-level C<included> key
+with has full resources for every relationship of the types in the arrayref.
+For instance, if we get C<include =E<gt> [qw/ comments /]>, and the requested
+resources have two comments, then our C<include> will have those two, with
+the same information as if the user had manually called C<retrieve> on
+each of them.
+
+The responses should look something like this:
+
+    {
+        data     => [... same as before ...],
+        included => [
+            {
+                type => 'comments'
+                id   => 44,
+                attributes => {
+                    body  => 'I make terrible comments',
+                },
+                links => { self => '/comments/44' },
+            }
+            {
+                type => 'comments'
+                id   => 45,
+                attributes => {
+                    body  => 'I make even worse comments!',
+                },
+                links => { self => '/comments/45' },
+            }
+        ],
+    }
+
+In our repo:
+
+    sub _add_included {
+        my ( $self, $type, $ids, %args ) = @_;
+        my ( $doc ) = @args{qw< document >};
+
+        my $placeholders = join ", ", ('?') x @$ids;
+        my $sql = "SELECT * FROM $type WHERE id IN ( $placeholders )";
+
+        my $sth = $self->dbh->prepare($sql);
+        $sql->execute(@$ids);
+
+        while ( my $inc = $sth->fetchrow_hashref() ) {
+            my $id = delete $inc->{id};
+            $doc->add_included( type => $type, id => $id )
+                ->add_attributes( %{$inc} )
+                ->add_self_link;
+        }
+    }
+
+    sub _add_relationships {
+        ... # same as before
+        # Inside the main for loop
+        $self->_add_include(
+            $rel_type, $relationships,
+            %args,
+        );
+        ...
+    }
+
+=item fields
+
+L<Spec|http://jsonapi.org/format/#fetching-sparse-fieldsets>.
+
+This will arrive as a hashref looking something like this:
+
+    type   => 'articles',
+    fields => {
+        articles => [qw/ title /],
+    }
+
+Here, the meaning is quite simple: only return the 'title'
+attribute of the resource:
+
+    {
+        type => 'articles',
+        id   => 2,
+        attributes => {
+            title => "The great title!",
+        },
+        # No relationships requested!
+        relationships => {},
+    }
+
+However, not only can we get attributes in C<fields>, but also relationships.
+Consider a request with this:
+
+    type   => 'articles',
+    fields => {
+        articles   => [qw/ title authors /],
+    }
+
+In this case, we'll want to return this:
+
+    {
+        type => 'articles',
+        id   => 2,
+        attributes => {
+            title => "The great title!",
+        },
+        # No relationships requested!
+        relationships => {
+            authors => { type => 'people', id => 44 },
+        },
+    }
+
+Moreso, C<fields> can be combined with C<include>:
+
+    type    => 'articles',
+    include => [qw/ authors /],
+    fields  => {
+        articles => [], # no attributes or relationships
+        people   => [qw/ name /],
+    },
+
+And the response:
+
+    data => [
+        { type => "articles", id => 2, },
+        { type => "articles", id => 3, },
+    ],
+    include => [
+        {
+            type => 'people', id => 44,
+            attributes => { name => "Foo" },
+        },
+        {
+            type => 'people', id => 46,
+            attributes => { name => "Bar" },
+        }
+    ]
+
+Sadly for the SQL example, this means we'll have to filter our relationships
+out of C<fields> manually.  On the bright side, L<PONAPI::DAO> will have already
+validated that all of the requested fields are valid for the given type, so we
+can avoid those steps.
+
+Let's tackle fetching only soem attributes first.  So far, we have two
+SELECT statements, one in retrieve_all, and one in _add_included; since both
+will need to handle C<fields>, let's add a function to abstract that complexity away:
+
+    sub _columns_for_select {
+        my ($self, %args) = @_;
+        my $type    = $args{type};
+        my $columns = $columns{$type};
+
+        if ( my $fields = $args{fields}{$type} ) {
+            my $type_relationships = $relationships{$type} || {};
+            $columns = [
+                'id',
+                grep !exists $type_relationships->{$_}, @$fields
+            ];
+        }
+
+        return $columns;
+    }
+
+Now, we could do something like this in retrieve_all and _add_included:
+
+    ...
+    my $dbh     = $self->dbh;
+    my $table   = $dbh->quote($type);
+    my $columns = $self->_columns_for_select(%args);
+
+    $columns    = join ', ', map $dbh->quote($_), @$columns;
+    my $sth     = $dbh->prepare(qq{ SELECT $columns FROM $table });
+    ...
+
+(At this point, you should be seriously looking into alternatives to
+composing your own SQL.  The manual will continue rolling it's own SQL, but
+please don't do that.  For your sanity.)
+
+We'll also want to modify our _fetch_relationships to handle C<fields>
+requesting only certain relationships:
+
+    ...
+    foreach my $rel_type ( keys %$type_relationships ) {
+        if ( $args{fields} && $args{fields}{$type} ) {
+            next unless exists $args{fields}{$type}{$rel_type};
+        }
+    ...
+
+=item page
+
+L<Spec|http://jsonapi.org/format/#fetching-pagination>.
+
+{json:api} doesn't specify much for C<page>.  The repository
+will get a hash, but the contents and format are entirely implementation
+dependent.
+For simplicity, let's take an offset-based approach, where page should look
+like this:
+
+    page => {
+        offset => 15000,
+        limit  => 5000,
+    }
+
+One options is to implement this in terms of a LIMIT:
+
+    ... # in retrieve_all
+    # Make sure to validate $args{page} first! The DAO won't do it
+    # for you!
+    my %page        = %{ $args{page} || {} };
+    $page{offset} //= 0;
+
+    my ($limit, $offset) = @page{qw/limit offset/};
+
+    $sql .= "\nLIMIT $offset, $limit" if $limit;
+    ...
+
+So far so good, but we may want to provide pagination links for the
+user to fetch the next batch of data.
+
+    my ($self, %args) = @_;
+    my ($page, $rows_fetched, $document) = @args{qw/page rows document/};
+
+    my ($offset, $limit) = @{$page}{qw/offset limit/};
+
+    my %current = %$page;
+    my %first = ( %current, offset => 0, );
+    my (%previous, %next);
+
+    if ( ($offset - $limit) >= 0 ) {
+        %previous = %current;
+        $previous{offset} -= $current{limit};
+    }
+
+    if ( $rows_fetched >= $limit ) {
+        %next = %current;
+        $next{offset} += $limit;
+    }
+
+    $document->add_pagination_links(
+        first => \%first,
+        self  => \%current,
+        prev  => \%previous,
+        next  => \%next,
+    );
+
+=item sort
+
+L<Spec|http://jsonapi.org/format/#fetching-sorting>.
+
+Will arrive as an arrayref of attributes, relationship names, and
+B<relationship attributes>:
+
+    type => 'articles',
+    # Just attributes
+    sort => [qw/ created title /],
+
+    type => 'articles',
+    # attributes + relationship names
+    sort => [qw/ created comments /],
+
+    type => 'articles',
+    # relationship attributes
+    sort => [qw/ authors.name /],
+
+Fields may start with a minus (C<->), which means they must be sorted
+in descending order:
+
+    type => 'articles',
+    # created DESC, title ASC
+    sort => [qw/ -created title /],
+
+For our SQL example, we'll only support sorting by first-level
+attributes, to keep the code simple:
+
+    ...
+    my $sort     = $args{sort} || [];
+    my $sort_sql = join ", ", map {
+        my ($desc, $col) = /\A(-?)(.+)\z/;
+        $col = exists $columns{$type}{$col} ? $dbh->quote($col) : undef;
+        $col
+            ? ( $desc ? "$col DESC" : "$col ASC" )
+            : ();
+    } @$sort;
+
+    $sql .= "\n ORDER BY $sort_sql" if $sort_sql;
+    ...
+
+Implementation note for SQL repositories:  While not required, we recommend
+implementing sort so that sorting by C<id> automagically uses whatever
+the underlaying column name is.  This is to avoid clients needing to know
+specifics of the repo implementation to sort by the primary key:
+
+    # Bad, client needs to know that id => id_articles
+    $client->retrieve_all(
+        type => 'articles',
+        sort => [qw/article_id/],
+    );
+
+    # Good, client just sorts by id, repo handles changing that to id_articles
+    $client->retrieve_all(
+        type => 'articles',
+        sort => [qw/id/],
+    );
+
+=item filter
+
+L<Spec|http://jsonapi.org/format/#fetching-filtering>.
+
+This is almost entirely up to the repo. You will receive a hashref, but
+the contents and how to handle them are entirely up to you.
+
+To make implementing C<retrieve> simpler, the example will implement a
+filter that allows for this:
+
+    filter => {
+        id  => [ 1, 2, 55 ], # id IN (1, 2, 55)
+        age => 44,           # age = 44
+    },
+
+And in the code:
+
+    ...
+    my $filter = $args{filter} || {};
+    my (@bind, @where);
+    foreach my $col ( grep { exists $columns{$type}{$_} } keys %$filer ) {
+        my $filter_values = $filter{$col};
+
+        my $quoted = $dbh->quote($col);
+        my $where;
+        if ( ref $filter_values ) {
+            my $placeholder_csv = join ', ', ('?') x @$filter_values;
+            $where = "$quoted IN ( $placeholder_csv )";
+        }
+        else {
+            $filter_values = [ $filter_values ];
+            $where = "$quoted = ?";
+        }
+
+        push @where, "($where)";
+        push @bind, @$filter_values;
+    }
+    my $where = join " AND ", @where;
+    ...
+    $sql .= "\n$where" if $where;
+    ...
+    $sth->execute(@bind);
+    ...
+
+Note that the spec does not define any way to express complex filters,
+like C<E<lt>=> or even a simple C<OR>; this may change in future versions
+of the spec, or extended in future versions of C<PONAPI>.
+
+=back
+
+=head3 retrieve
+
+    retrieve( type => $type, id => $id, %optional_arguments )
+
+L<Spec|http://jsonapi.org/format/#fetching-resources>.
+
+Similar to C<retrieve_all>, but instead of returning multiple resources,
+it returns just one.  Takes all the same arguments as C<retrieve_all>,
+but C<page> and C<sort> are only relevant for C<include>d resources.
+
+Since our <retrieve_all> example has a working C<filter>, we can implement
+C<retrieve> based on top of that:
+
+    sub retrieve {
+        my ($self, %args) = @_;
+        my $type = $args{type};
+        my $id   = delete $args{id};
+        $args{filter}{$type} = $id;
+
+        # This is missing page+sort of the included arguments
+        return $self->retrieve_all(%args);
+    }
+
+=head3 retrieve_relationships
+
+    retrieve_relationships( type => $type, id => $id, rel_type => $rel_type, %optional_arguments )
+
+L<Spec|http://jsonapi.org/format/#fetching-relationships>.
+
+For one-to-one relationships, this returns a L<single resource identifier|http://jsonapi.org/format/#document-resource-identifier-objects>:
+
+    $dao->retrieve_relationships( type => 'articles, id => 1, rel_type => 'authors' );
+    # returns
+    data => { type => 'people', id => 6 }
+
+For one-to-many, it returns a collection of resource identifiers:
+
+    $dao->retrieve_relationships( type => 'articles, id => 1, rel_type => 'comments' );
+    # returns
+    data => [
+        { type => 'comments', id => 45 },
+        { type => 'comments', id => 46 },
+    ]
+
+C<retrieve_relationships> may get a subset of the optional arguments for
+C<retrieve_all>: C<filter>, C<page>, and C<sort>.
+
+For the client, C<retrieve_relationships> serves primarily a shortcut to
+this:
+
+    my $response = $client->retrieve(
+        type     => 'articles',
+        id       => 2,
+        rel_type => 'comments',
+        fields   => {
+            articles => [qw/comments/],
+            comments => [qw/id/],
+        },
+    )->{data}{relationships}{comments};
+
+With the added functionality that they may C<page> the results.
+
+=head3 retrieve_by_relationship
+
+    retrieve_by_relationship( type => $type, id => $id, rel_type => $rel_type, %optional_arguments )
+
+Similar to C<retrieve_relationships>, but returns full resources,
+rather than just resource identifiers.
+
+=head3 delete
+
+    delete(type => $type, id => $id)
+
+L<Spec|http://jsonapi.org/format/#crud-deleting>.
+
+Removes a single resource.
+
+    sub delete {
+        my ($self, %args) = @_;
+
+        my $dbh   = $self->dbh;
+        my $table = $dbh->quote($type);
+        my $sth   = $dbh->prepare(qq{ DELETE FROM $table WHERE id = ? });
+
+        $sth->execute($args{id});
+    }
+
+It's up to the repo if it also wants to remove any relationships what
+the resource may have.
+
+=head3 create
+
+    create(type => $type, data => $data, %optinal_arguments)
+
+L<Spec|http://jsonapi.org/format/#crud-creating>.
+
+Create a new resource of type C<$type>, using the data provided.
+The only optional argument is C<id> -- repos can choose to
+use client-provided IDs, if desired.
+
+C<$data> will be in this format:
+
+    $data => {
+        type          => $type,
+        attributes    => { ... },
+        relationships => {
+            foo => { ... },          # one-to-one
+            bar => [ { ... }, ... ], # one-to-many
+        },
+    }
+
+Note that repos B<must> add a resource to the document passed in,
+where the C<id> is the id of the created resource.
+
+Implementation example -- we won't handle a user-provided C<id>.
+
+    sub create {
+        my ($self, %args) = @_;
+        my ($doc, $type, $data, $id) = @args{qw/document type data id/};
+
+        if ( $id ) {
+            PONAPI::Exception->throw(
+                message          => "User-provided ids are not supported",
+                bad_request_data => 1,
+           );
+        }
+
+        my $attributes    = $data->{attributes}    || {};
+        my $relationships = $data->{relationships} || {};
+
+        my $dbh   = $self->dbh;
+        my $table = $dbh->quote($type);
+        my $sql   = "INSERT INTO $table ";
+        my @values;
+        if ( %$attributes ) {
+            my @quoted_columns = map $dbh->quote($_), keys %$attributes;
+            @values            = values %$attributes;
+
+            $sql .= '('        . join(',', @quoted_columns)       . ')'
+                  . 'VALUES (' . join(',', '?' x @quoted_columns) . ')';
+        }
+        else {
+            $sql .= 'DEFAULT VALUES'; # assuming sqlite, will not work elsewhere
+        }
+
+        my $sth = $dbh->prepare($sql);
+        $sth->execute(@values);
+
+        # This is critical! We need to let the user know the inserted
+        # id
+        my $new_id = $self->dbh->last_insert_id("","","","");
+        $doc->add_resource( type => $type, id => $new_id );
+
+        # Finally, we defer creating relationships to another method
+        foreach my $rel_type ( keys %$relationships ) {
+            my $rel_data = $relationships->{$rel_type};
+            $self->update_relationships(
+                %args,
+                id       => $new_id,
+                rel_type => $rel_type,
+                data     => $rel_data,
+            );
+        }
+
+    }
+
+=head3 update
+
+    update( type => $type, id => $id, data => { ... } )
+
+L<Spec|http://jsonapi.org/format/#crud-updating>.
+
+Updates the resource. C<data> may have one or both of C<attributes>
+and C<relationships>:
+
+Change the title, leave everything else alone:
+    data => {
+        type => 'articles',
+        id   => 2,
+        attributes => { title => 'New title!', },
+    }
+
+Update the one-to-one author relationship, leave everything else alone:
+    data => {
+        type => 'articles',
+        id   => 2,
+        relationships => {
+            authors => { type => 'people', id => 3 },
+        }
+    }
+
+Update the one-to-many comments relationship, clear the one-to-one
+author relationship, change the body of the article:
+
+    data => {
+        type => 'articles',
+        id   => 2,
+        attributes    => { body => "New and improved", },
+        relationships => {
+            authors  => undef,
+            comments => [
+                { type => 'comments', id => 99  },
+                { type => 'comments', id => 100 },
+            ],
+        }
+    }
+
+Clear the one-to-many comments relationship:
+
+    data => {
+        type => 'articles',
+        id   => 2,
+        relationships => { comments => [] }
+    }
+
+B<C<update> has a strict return value!> It MUST return one
+of three constants imported by L<PONAPI::Constants>:
+
+=over 3
+
+=item PONAPI_UPDATED_NOTHING
+
+The requested update did nothing.  Amongst other reasons, this may be
+because the resource doesn't exist, or the changes were no-ops.
+
+Spec-wise, this is used to distinguish between returning a 200/202
+and returning a 204 or 404; see http://jsonapi.org/format/#crud-updating-relationship-responses-204
+and http://jsonapi.org/format/#crud-updating-responses-404
+
+Depending on the underlaying implementation, this may be hard to figure
+out, so implementations may chose to just return C<PONAPI_UPDATED_NORMAL>
+instead.
+
+(in C<DBD::mysql>, you'll need to either connect to the database with
+C<mysql_client_found_rows>, or parse C< $dbh-E<gt>{mysql_info} > for C<Changed>
+immediately after the UPDATE)
+
+=item PONAPI_UPDATED_EXTENDED
+
+The request asked us to update 2 rows, but for whatever reason, we updated
+more.  As an example, this may be due to automatically adding the C<updated_at>
+column on every update.
+
+Depending on the server configuration, returning C<PONAPI_UPDATED_EXTENDED>
+may trigger an extra C<retrieve> on the updated resource, to ensure that
+the client has the most up to date data.
+
+=item PONAPI_UPDATED_NORMAL
+
+Everything went fine and we updated normally.
+
+=back
+
+Code example:
+
+    sub update {
+        my ($self, %args) = @_;
+        my ($type, $id, $data) = @args{qw/type id data/};
+
+        my ($attributes, $relationships) = map $_||{}, @{$data}{qw/attributes relationships/};
+
+        my $return_value = PONAPI_UPDATED_NORMAL;
+        if ( %$attributes ) {
+            my $dbh = $self->dbh;
+
+            my ( @update, @values_for_update);
+            while ( my ($column, $new_value) = each %$attributes ) {
+               push @update, $dbh->quote($_) . " = ?";
+               push @values_for_update, $new_value;
+            }
+
+            my $sql = "UPDATE $table SET "
+                    . join( ', ', @update )
+                    . 'VALUES ('
+                    . join( ',', ('?') x @values_for_update )
+                    . ')';
+
+            my $sth = $dbh->prepare($sql);
+            $sth->execute(@values_for_update);
+
+            if ( !$sth->rows ) {
+                # Woah there. Either the resource doesn't exist, or
+                # the update did nothing
+                return PONAPI_UPDATED_NOTHING;
+            }
+        }
+
+        foreach my $rel_type ( keys %$relationships ) {
+            # We'll get to this later
+            $self->update_relationships(
+                %args,
+                rel_type => $rel_type,
+                data     => $relationships->{$rel_type},
+            );
+        }
+    }
+
+Since we're not adding any extra columns, we can ignore
+C<PONAPI_UPDATED_EXTENDED>.
+
+=head3 delete_relationships
+
+    delete_relationships( type => $type, id => $id, rel_type => $rel_type, data => [ { ... }, ... ] )
+
+L<Spec|http://jsonapi.org/format/#crud-updating-to-many-relationships>.
+
+Removes the resource(s) in C<data> as from the one-to-many relationship
+pointed by $type and $rel_type.
+
+Like C<update>, C<delete_relationships> has a strict return value.
+
+    sub delete_relationships {
+        my ( $self, %args ) = @_;
+        my ( $type, $id, $rel_type, $data ) = @args{qw< type id rel_type data >};
+
+        my $relationship_info = $type_relationships->{$rel_type};
+        my $table             = $relationship_info->{rel_table};
+        my $id_column         = $relationship_info->{id_column};
+        my $rel_id_column     = $relationship_info->{rel_id_column};
+        my $key_type          = $relationship_info->{type};
+
+        my @all_values;
+        foreach my $resource ( @$data ) {
+            my $data_type = $resource->{type};
+
+            # This is one of the few cases when we need to manually validate
+            # that the data is correct -- this catches cases like this:
+            # {
+            #   rel_type => 'comments',
+            #   data => [
+            #       { type => comments => id => 5  }, # Good
+            #       { type => people   => id => 19 }, # Bad, why people?
+            #   ],
+            # }
+            if ( $data_type ne $key_type ) {
+                PONAPI::Exception->throw(
+                    message          => "Data has type `$data_type`, but we were expecting `$key_type`",
+                    bad_request_data => 1,
+                );
+            }
+
+            push @all_values, $resource->{id};
+        }
+
+        my $rows_modified = 0;
+        my $sql = "DELETE FROM $table WHERE $id_column = ? AND $rel_id_column = ?";
+        my $sth = $self->dbh->prepare($sql);
+        foreach my $rel_id ( @all_values ) {
+            $sth->execute($id, $rel_id);
+            $rows_modified += $sth->rows;
+        }
+
+        return !$rows_modified
+            ? PONAPI_UPDATED_NOTHING
+            : PONAPI_UPDATED_NORMAL;
+    }
+
+=head3 create_relationships
+
+    create_relationships( type => $type, id => $id, rel_type => $rel_type, data => [ { ... }, ... ] )
+
+L<Spec|http://jsonapi.org/format/#crud-updating-to-many-relationships>.
+
+Adds the resource(s) in C<data> as new members to the one-to-many relationship
+pointed by $type and $rel_type.
+
+Like C<update>, C<create_relationships> has a strict return value.
+
+Sample implementation:
+
+    sub create_relationships {
+        my ( $self, %args ) = @_;
+        my ( $type, $id, $rel_type, $data ) = @args{qw<type id rel_type data>};
+
+        my $dbh               = $self->dbh;
+        my $table             = $dbh->quote($type);
+        my $relationship_info = $type_relationships->{$rel_type};
+        my $rel_table         = $relationship_info->{rel_table};
+        my $key_type          = $relationship_info->{type};
+        my $id_column         = $relationship_info->{id_column};
+        my $rel_id_column     = $relationship_info->{rel_id_column};
+
+        my $sql = 'INSERT INTO ' . $dbh->quote($rel_table) . ' '
+                . '('
+                    . join(',', map $dbh->quote($_), $id_column, $rel_id_column)
+                . ') VALUES (?, ?)';
+
+        my @all_values;
+        foreach my $relationship ( @$data ) {
+            my $data_type = $relationship->{type};
+
+            if ( $data_type ne $key_type ) {
+                PONAPI::Exception->throw(
+                    message          => "Data has type `$data_type`, but we were expecting `$key_type`",
+                    bad_request_data => 1,
+                );
+            }
+
+            my $insert = [ $id, $relationship->{id} ];
+
+            push @all_values, $insert;
+        }
+
+        my $sth = $dbh->prepare($sql);
+        foreach my $values ( @all_values ) {
+            $sth->execute(@$values);
+        }
+
+        return PONAPI_UPDATED_NORMAL;
+    }
+=head3 update_relationships
+
+    update_relationships( type => $type, id => $id, rel_type => $rel_type, data => ... )
+
+L<Spec|http://jsonapi.org/format/#crud-updating-relationships>.
+
+Unlike the previous two methods, C<update_relationships> handles both
+one-to-many and one-to-one relationships.  For one-to-one, C<data> will
+be either a hashref, or C<undef>; for a one-to-many, it'll be an arrayref.
+
+    data => undef,                           # clear the one-to-one
+    data => { type => 'people', id => 781 }, # update the one-to-one
+    data => [],                              # clear the one-to-many,
+    data => [                                # update the one-to-many
+        { type => 'comments', id => 415 },
+        { type => 'comments', id => 416 },
+    ]
+
+Like C<update>, C<update_relationships> has a strict return value.
+
+    sub update_relationships {
+        my ($self, %args) = @_;
+        my ( $type, $id, $rel_type, $data ) = @args{qw< type id rel_type data >};
+
+        my $relationship_info = $type_relationships->{$rel_type};
+        my $rel_table         = $relationship_info->{rel_table};
+        my $id_column         = $relationship_info->{id_column};
+        my $rel_id_column     = $relationship_info->{rel_id_column};
+
+        # Let's have an arrayref
+        $data = $data
+                ? ref($data) eq 'HASH' ? [ keys(%$data) ? $data : () ] : $data
+                : [];
+
+        # Let's start by clearing all relationships; this way
+        # we can implement the SQL below without adding special cases
+        # for ON DUPLICATE KEY UPDATE and sosuch.
+        my $sql = "DELETE FROM $rel_table WHERE $id_column = ?";
+        my $delete_sth = $self->dbh->prepare($sql);
+        $delete_sth->execute($id);
+
+        # And now, update the relationship by inserting into it
+        my $sql = "INSERT INTO $rel_table ($id_column, $id_rel_column) VALUES (?, ?)";
+        my $sth->prepare($sql);
+        foreach my $insert ( @$data ) {
+            $sth->execute( $id, $insert{id} );
+        }
+
+        return PONAPI_UPDATED_NORMAL;
+    }
+
+=head2 What should the repository validate?
+
+While the DAO takes care of most validations, some things fall squarely on
+repositories:
+
+=over 4
+
+=item Valid member names
+
+L<The spec specifies certain restriction to member names|http://jsonapi.org/format/#document-member-names>.
+
+C<PONAPI::Server> only implements these for the data coming from
+the clients; for full spec compliance, repositories should
+also validate that whatever they add to the document passes
+those constraints.  The module L<PONAPI::Names> provides
+a function to validate if a given string is a valid member name.
+
+=item Type validation in (create|update|delete)_relationships
+
+This is one of the few cases when we need to manually validate
+that the data is correct, in order to catch cases like this:
+
+    {
+        rel_type => 'comments',
+        data => [
+            { type => comments => id => 5  }, # Good
+            { type => people   => id => 19 }, # Bad, why people?
+        ],
+    }
+
+The implementation examples above include these checks, and
+how to throw exceptions for them.
+
+=back
+
+=head2 Throwing exceptions
+
+It is recommended that you throw exceptions in the repo by using
+L<PONAPI::Exception>:
+
+    PONAPI::Exception->throw(
+        message => "Something has gone horribly wrong"
+    );
+
+See the documentation of L<PONAPI::Exception> for more examples, including
+the different of more specific exceptions you can throw.
+
+=head2 Responding with a particular status
+
+Usually this is not needed, but it's possible to manually set
+the status of most responses by using C< $document-E<gt>set_status($n) >
+in any API method.
+
+=head2 Repos without relationships
+
+This boils down to:
+
+    sub has_relationship {}
+    sub has_one_to_many_relationship {}
+
+    # These should never be reached if the two has_* methods
+    # above return false
+    sub retrieve_relationships {}
+    sub retrieve_by_relationship {}
+    sub create_relationships {}
+    sub delete_relationships {}
+    sub update_relationships {}
+
+=head2 What about bulk inserts?
+
+C<{json:api}> itself has no way to do bulk inserts or updates,
+but opens the possibility of these being implemented through extensions.
+
+However, C<PONAPI::Server> doesn't support extensions yet.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Mickey Nasriachi <mickey@cpan.org>
+
+=item *
+
+Stevan Little <stevan@cpan.org>
+
+=item *
+
+Brian Fraser <hugmeir@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Mickey Nasriachi, Stevan Little, Brian Fraser.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,92 @@
+Revision history for Project-Euler
+
+
+0.20        08/26/2010 12:32:23 AM (CDT)
+    *   Move to Dist::Zilla
+    *   Massive cleanup of documentation
+    *   Removed Lib/MultipleCheck
+    *   Added Lib/Utils to hold common utility functions
+    *   Added / fixed many of the tests
+    *   Removed tests duplicated by Dist::Zilla
+
+
+0.1.6
+    *   Don't index the scripts directory
+    *   Have name_test also validate perldoc statement is correct
+
+  # Lib::Types (0.1.2)
+    *   Cleaned up POD
+
+  # Problem::Base (0.2.3)
+    *   Added 'more_info' attribute
+            Used if a problem wants to give some additional information
+            about a solved problem
+    *   Cleaned up POD
+
+  # Problem::P002 (0.1.3)
+    *   Set more_info to the list of fib numbers used in the sum
+
+  # Problem::P003 (0.1.1)
+    *   Set more_info to the list of prime factors for the number
+
+  # Problem::P004 (0.1.0)
+    *   Created problem 4 which finds the highest palindrome created by the
+            product of 2 x-digit numbers
+
+
+0.1.5  12/12/2009 06:49:29 PM (CST)
+    *   Completely re-ordered tests using sub-directories for logical seperation
+    *   Moved maintainer tests to xt/release
+    *   Added tests for Lib::MultipleCheck
+    *   Added test to ensure consistent naming schemes
+    *   Added test to make sure no required module was left out
+    *   Created template script to auto-generate a problem
+
+  # Problem::P001 (0.2.2)
+    *   Cleaned up version info
+
+  # Problem::P002 (0.2.2)
+    *   Fix the name to accurately reflect the project number
+
+  # Problem::Base (0.2.2)
+    *   Removed unused modules
+
+
+0.1.4   12/08/2009 01:36:22 AM (CST)
+    *   Updated POD documentation of the main class
+    *   Removed template file from P:E:P
+    *   Replaced template file with base file in load_test
+    *   Removed many of the duplicate problem tests which were covered in the
+            base_test
+
+  # Problem::P001 (0.1.1)
+  # Problem::P002 (0.1.1)
+  # Lib::MultipleCheck (0.1.1)
+    *   Updated POD documentation to better reflect module implementation
+
+  # Problem::Base (0.2.1)
+    *   Moved type definitions to P:E:L:Types
+
+  # Lib::Types (0.1.1)
+    *   Defined types required in P:E:Base
+    *   Updated POD documentation to better reflect module implementation
+
+
+0.1.3   2009-12-07
+        Second problem is complete
+
+
+0.1.2   2009-12-06
+        Use custom types definitions now
+
+
+0.1.1   2009-12-06
+        First problem is complete (with all the tests done as well)
+
+
+0.1.0   2009-11-23
+        Got the base class functionality down
+
+
+0.0.1   2009-11-22
+        First version, released on an unsuspecting world.

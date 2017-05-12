@@ -1,0 +1,162 @@
+package Panda::Config::Perl;
+use 5.012;
+use Panda::Lib(); # XS code needs xs::lib::merge
+
+our $VERSION = '1.1.7';
+
+require Panda::XSLoader;
+Panda::XSLoader::load();
+
+sub process {
+    my ($class, $file, $initial_cfg) = @_;
+
+    my ($mstash, $nsstash);
+    {
+        no strict 'refs';
+        $mstash = \%{"::"};
+        delete $mstash->{'NS::'};
+        $nsstash = \%{"NS::"};
+    }
+
+    _apply_initial_cfg('', Panda::Lib::fclone($initial_cfg)) if $initial_cfg;
+    _process_file($file);
+
+    my $ret = {};
+
+    my $cfg = {};
+    if(defined $nsstash->{'__CONFIG__'}){
+        $cfg = ${$nsstash->{'__CONFIG__'}};
+        delete $nsstash->{'__CONFIG__'};
+    }
+    _get_config($ret, $nsstash, $cfg, '');
+
+    # remove garbage we've created
+    delete $mstash->{'NS::'};
+
+    return $ret;
+}
+
+sub _apply_initial_cfg {
+    my ($ns, $cfg) = @_;
+    foreach my $key (keys %$cfg) {
+        if (substr($key, -2, 2) eq '::') {
+            _apply_initial_cfg($ns.$key, $cfg->{$key});
+        } else {
+            no strict 'refs';
+            *{"NS::$ns$key"} = \$cfg->{$key};
+        }
+    }
+}
+
+sub _process_file {
+    my ($file, $ns) = @_;
+    open my $fh, '<', $file or die "Panda::Config::Perl: cannot open $file: $!";
+    my $content;
+    {
+        local $/ = undef;
+        $content = <$fh>;
+    }
+    close $fh;
+
+    my $curdir = '';
+    if ((my $pos = rindex($file, '/')) >= 0) {
+        $curdir = substr($file, 0, $pos);
+    }
+
+    $content =~ s/^[^\S\r\n]*#(namespace|namespace-abs|include)(?:[^\S\r\n]+(.+))?$/_process_directive($curdir, $ns, $1, $2)/gme;
+
+    my $pkg = $ns ? "NS::$ns" : "NS";
+    $content = "package $pkg; sub { $content;\n }";
+    my $ok;
+    {
+        no strict;
+        enable_op_tracking();
+        my $sub = eval $content;
+        disable_op_tracking();
+        $ok = eval { $sub->(); 1 } if $sub;
+    }
+    unless ($ok) {
+        my $err = $@;
+        die $err if $err =~ /Error-prone code/;
+        $err =~ s/Panda::Config::Perl: //g unless ref $err;
+        die "Panda::Config::Perl: error while processing config $file: $err\n".
+            "================ Error-prone code ================\n".
+            _content_linno($content).
+            "==================================================";
+    }
+
+    return;
+}
+
+sub _process_directive {
+    my ($curdir, $ns, $directive, $rest) = @_;
+    $rest =~ s/\s+$//;
+    $rest //= '';
+    if (index($directive, 'namespace') == 0) {
+        $ns = '' if $directive eq 'namespace-abs';
+        my $pkg = $ns ? "NS::$ns" : 'NS';
+        $pkg .= "::$1" if $rest =~ /\s*(\S+)/;
+        return "package $pkg;";
+    }
+    elsif ($directive eq 'include') {
+        return "Panda::Config::Perl::_INCLUDE('$curdir', __PACKAGE__, $rest);";
+    }
+}
+
+sub _INCLUDE {
+    my ($dir, $curpkg, $file) = @_;
+    my $ns = '';
+    if ($curpkg ne 'NS') {
+        $ns = $curpkg;
+        substr($ns, 0, 4, ''); # remove /^NS::/
+    }
+    unless (substr($file, 0, 1) eq '/') { $file = $dir ? "$dir/$file" : $file }
+    if (index($file, '*') >= 0) {
+        _process_file($_, $ns) for glob($file);
+    } else {
+        _process_file($file, $ns);
+    }
+}
+
+sub _get_config {
+    my ($dest, $stash, $config, $ns) = @_;
+    my @ns_list;
+
+    my $assign_proc;
+    $assign_proc = $config->{assign_proc} if defined $config->{assign_proc};
+    foreach my $key (keys %$stash) {
+        next if $key eq 'BEGIN' or $key eq 'DESTROY' or $key eq 'AUTOLOAD' or index($key, '__ANON__') == 0;
+        if (substr($key, -2, 2) eq '::') {
+            push @ns_list, $key;
+            next;
+        }
+        my $glob = $stash->{$key} or next;
+        next if !defined $$glob and defined *$glob{CODE};
+        if(defined $assign_proc){
+            $dest->{$key} = undef;
+            $assign_proc->($dest->{$key}, $$glob);
+        } else {
+            $dest->{$key} = $$glob;
+        }
+    }
+
+    foreach my $subns (@ns_list) {
+        my $substash = \%{$stash->{$subns}};
+        substr($subns, -2, 2, '');
+        my $subns_full = $ns ? "${ns}::$subns" : $subns;
+        if (exists $dest->{$subns}) {
+            die "Panda::Config::Perl: conflict between variable '$subns' in namespace '$ns' and a namespace '$subns_full'. ".
+                "You shouldn't have variables that overlap with namespaces as they would merge into the same hash.\n";
+        }
+        _get_config($dest->{$subns} = {}, $substash, $config, $subns_full);
+    }
+}
+
+sub _content_linno {
+    my $content = shift;
+    my $i = 0;
+    $content =~ s/^(.*)$/$i++; "$i: $1"/mge;
+    return $content;
+}
+
+1;

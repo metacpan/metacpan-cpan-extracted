@@ -1,0 +1,167 @@
+0.72 Mon Aug 31 18:54:08 BST 2015
+  - changelog test in CI
+  - remove erroneous dep on PDL::GSL::CDF
+
+0.71 Sat Aug 29 18:54:08 BST 2015
+  - Beef up CI with optional requirements spelled out and apt installed
+  - kmeans and kmeans_bad tests retry, marked TODO as fails on clang
+  - add badges to README and rename to Markdown file
+  - Print out kmeans_bad test for debugging.
+  - Metadata fix
+  - Add manifest test, remove META.yml from main MANIFEST
+
+0.70    18/08/2015
+  - Updated to work with PDL-2.008. More tests for anova.
+
+0.6.5   11/03/2013
+  - Updated to work with PDL-2.007. Real 64bit support yet to come.
+
+0.6.4   09/05/2013
+  - Make 'cpan PDL::Stats' work.
+
+0.6.3   05/05/2013
+  - binomial_test() bug fix -- [rt.cpan.org #82725]
+  - pmf_poisson() updated to handle large input values thanks to David Mertens.
+  - ols() bad value support update thanks to Ingo Schmid.
+  - anova(), anova_rptd() bad value support update.
+
+0.6.2   04/29/2012
+  - Windows pdldoc database install fix.
+
+0.6.1   04/24/2012
+  - Bails out of installation if running under perl 5.15.0 to 5.15.8 but allows --force to attempt a build regardless.
+
+0.6.0   04/08/2012
+  - Added group_by() method in Basic.pm.
+  - Updates pdl doc database.
+  - Bails out of installation if running under perl 5.14.0 to 5.15.8.
+  - Removed old deprecated method get_data() from Basic.pm
+  - Moved no slatec warning from module to test. Removed lvalue assignments from tests.
+
+0.5.5   04/22/2011
+  - GLM Windows 32-bit test bug fix; GLM quits installation with PDL-2.4.7 warning. Documentation update.
+
+0.5.4   04/19/2011
+  - GLM pca() and plot_scores() can do cov version.
+  - [rt.cpan.org #67557] Undo PREREQ_FATAL => 1 in Makefile.PL.
+
+0.5.3   04/18/2011
+  - stats_glm.t pca() test SLATEC vs. MatrixOps precision fix.
+
+0.5.2   04/17/2011
+  - stats_glm.t pca() test precision fix.
+
+0.5.1   04/16/2011
+  - ***GLM pca() return value names updated*** to be more compatible with the literature.
+  - GLM added plot_scores(); plot_scree() name changed to plot_screes() for consistency across plotting functions.
+  - Updated plotting functions to default to png in Windows because GW doesn't reopen after close.
+
+0.5.0	04/02/2011
+  - Updated tests to use __DATA__ instead of separate test data files.
+  - GLM added interaction_code(); bug fix for dummy_code().
+  - GLM added ols_rptd()!
+  - GLM added plot_residual().
+  - GLM eval wrapped optional modules; replaced perl reverse sort with slice (-1:0).
+  - Basic added binomial_test().
+  - TS updated plot_season() to season_m(); deprecated a few old function names, filt_exp(), filt_ma(), and dsea().
+
+0.4.3	04/08/2010
+  - Distr::plot_distr() bug fix.
+  - Kmeans::kmeans() pod update.
+
+0.4.2	03/27/2010
+  - rtable() added to PDL::Basic. get_data() deprecated. Preparing for transitioning to using rcols() for IO.
+  - perldl online help support! (ie "? stdv" in perldl works)
+
+0.4.1	02/02/2010
+  - GLM anova anova_rptd IVNM default val matched to [].
+  - Makefile.PL exit 0 without PDL::Lite.
+  - TS added wmape
+  - pod fix for CPAN
+
+0.4.0	01/24/2010
+  - GLM anova_rptd supports between subject factors! We are now beta!
+
+0.3.2	01/08/2010
+  - Kmeans kmeans CNTRD checks undef besides PDL->null. opt{V} printout update
+  - Kmeans added which_cluster
+  - Kmeans pca_cluster does scree plot with cutoff line
+  - GLM logistic pod update
+  - GLM anova anova_rptd pca plot_scree plotting options update
+
+0.3.1	12/16/2009
+  - Removed pms--relying on pdl-stats.sourceforge.net for web documentation instead of CPAN. Minor pod update.
+  - GLM::ols_t removed $y->squeeze, so that edge case like ols_t on 1 obs threads properly (y[1,10]->ols_t(x[1,10]->dummy(1), {const=>0}) gives b[1,10]).
+  - GLM::anova_rptd se fix.
+  - GLM::anova and anova_rptd plot se fix.
+  - PDL::Stats::TS included. ***alpha alpha*** code! Included because I'm tired of maintaining it separately from PDL::Stats.
+
+0.3.0	12/03/2009
+  - GLM::anova_rptd! works for purely within designs
+  - GLM::anova bug fix--not messing up caller @ if passed @ ref in IV instead of pdl
+  - Change prereq from PDL to PDL::Lite
+  - Stats.pm quick-start guide update
+  - t/stats_glm logistic test modified to use more proper numbers in x
+
+0.2.8	11/04/2009
+  - Fixed minor bug (mismatched nseed and self cluster pdls. oops) in switching to use cluster assignment as stop criteria. btw initial R2 now based on self instead of seeds.
+
+0.2.7	11/04/2009
+  - GLM::plot_scree allows directly passing NCOMP. plots cutoff line for screes if requested
+  - kmeans stops when cluster assignment no longer changes instead of using R2CRT.
+  - If not specified, Kmeans::pca_cluster studies scree plot to determine NCOMP
+      Basic::get_data STDERR message fix: data pdl o x v, NOT v x o
+
+0.2.6	10/12/2009
+  - anova bad value se bug fix
+  - centroid bad value empty cluser bug fix
+  - basic, glm, distr rid of nan and use bad value instead
+
+0.2.5   09/17/2009
+  - PREREQ_FATAL => 1 in Makefile.PL
+  - added pca_cluster in Kmeans.
+  - anova one-way bug fix.
+  - plot_means one-way bug fix.
+
+0.2.4   09/02/2009
+  - added corr_table in PDL::Stats::Basic.
+  - PDL::Stats::GLM::pca uses corr_table.
+  - kmeans no longer quits with empty cluster. kmeans 3d threading bug fix.
+  - use short-circuit ISBAD(a) || ISBAD(b) instead of ISGOOD(a) && ISGOOD(b) in bad value processing.
+
+0.2.3   08/24/2009
+  - ***anova interface change*** IV names now passed in \%opt instead of @ ref. I appologize for the interface change, but it matches the new method plot_means, and makes it easier to pass IVs themselves. I promise that such interface changes will be extremely rare, if at all.
+  - anova now supports bad value in DV.
+  - Added plot_means in PDL::Stats::GLM. anova plots highest order interaction by default.
+  - Added plot_scree in PDL::Stats::GLM. pca does scree plot by default.
+  - Added pca_sorti in PDL::Stats::GLM.
+  - plot_distr in PDL::Stats::Distr accepts WIN option
+  - Set prerequisite PDL => 2.4.4, which has bad value support by default
+
+0.2.2   07/23/2009
+  - stats_distr.t moved form t/ to Distr/t, ie skip the test if no GSL.
+  - more kmeans fix (4d, seeding). added seeded kmeans tests.
+
+0.2.1   07/22/2009
+  - kmeans 4d fix. added pms dir for cpan pod parse
+
+0.2.0   07/21/2009
+  - kmeans threads! ss/ms bug fix. more tests on kmeans added.
+
+0.1.3   07/17/2009
+  - quick-start for non-PDL people in Stats.pm pod
+  - ols_t uses double internally. GLM pod update
+  - r2_change threads (switched to use ols_t instead of ols)
+  - get_data which_id moved to Basic from GLM
+  - tests grouped in PDL-Stats/t except for PDL::GSL::CDF
+
+0.1.2   07/15/2009
+  - Cleaned up some versioning stuff in Stats.pm
+  - GLM::get_data TYPE default to double. MISSN handling update; set to BAD by default.
+  - Case insensitive option passing.
+
+0.1.1   07/14/2009
+  - Fixed PDL::Stats::GLM::ols b_p value for b_t < 0.
+
+0.1.0   07/13/2009
+  - First version, released on an unsuspecting world.

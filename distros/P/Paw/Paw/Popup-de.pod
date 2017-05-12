@@ -1,0 +1,44 @@
+=head1 Popup Window
+
+B<$popup=Paw::Popup::new($height, $width, \@buttons, \$text, [$name]);>
+
+B<Parameter>
+
+     $height   => Anzahl der Reihen
+
+     $width    => Anzahl der Spalten
+
+     $name     => Name des Widgets [optional]
+
+     \@buttons => Ein Array von Strings fuer die Label der Buttons in der Box.
+
+     \$text    => Eine Refernez auf ein Scalar mit dem Text
+
+B<Beispiel>
+
+     @butt=("Okay", "Cancel");
+     $text=("Do you really not want to continue ?");
+     $pu=Paw::Popup::new(height=>20, width=>20,
+                         buttons=>\@butt, text=>\$text);
+
+Wenn ein Button gedrueckt wird, schliesst sich die Box und es wird die Nummer des
+Buttons zurueck gegeben (beginnend bei 0).
+
+=head2 draw();
+
+Stellt das Popup Fenster am Schirm da, gibt den gedrueckten Button zurueck.
+
+B<Beispiel>
+
+     $button=$pu->draw();
+
+=head2 set_border([``shade''])
+
+aktiviert den Rahmen der Box. Optional auch mit Schatten. 
+
+B<Beispiel>
+
+     $box->set_border("shade"); or $win->set_border();
+
+=cut
+

@@ -1,0 +1,95 @@
+Persistent::DBI - An Abstract Persistent Class implemented using a DBI
+                  Data Source
+    by David Winters
+
+WHAT IS THIS?
+
+Persistent is a framework of classes that makes it easier to store and
+retrieve Perl objects from various types of data stores.  Using the
+common interface that all of these classes inherit, you can
+store/retrieve objects to/from various types of data stores such as
+text and DBM files, relational databases, LDAP directories and so on,
+all with the same programming interface.
+
+This package contains an abstract class that is implemented using a
+DBI database as the data store.  Since this class is abstract, it is
+not instantiated directly, but is inherited by quite a few other
+Persistent subclasses that use a DBI database as their data store such
+as the following classes:
+
+  Persistent::MySQL
+  Persistent::Oracle
+  Persistent::Sybase
+  Persistent::mSQL
+
+HOW DO I INSTALL IT?
+
+Since this class inherits from the Persistent::Base class and the DBI
+package is required, the order of installation should be something
+like this:
+
+  1. Install DBI
+  2. Install DBD::MySQL or Oracle or Sybase or ...
+  3. Install Persistent::Base
+  4. Install Persistent::DBI
+  5. Install Persistent::MySQL or Oracle or Sybase or ...
+
+You can download these classes and all other Persistent
+classes/packages from CPAN.  You can also download the Persistent
+classes from the following web site:
+
+http://www.bigsnow.org/persistent/
+
+Install this package by doing the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you want to install a private copy in your home directory, then use
+the PREFIX option when you generate the Makefile like this:
+
+    perl Makefile.PL PREFIX=~/perl_lib
+
+This package does require Perl 5.004 or later.
+
+WHERE IS THE DOCUMENTATION?
+
+You can find the documentation by typing "man Persistent::DBI" or
+"perldoc Persistent::DBI" after you have installed this software.  If
+you're looking for online documentation, check out:
+
+http://www.bigsnow.org/persistent/
+
+You will probably also be interested in the general Persistent
+documentation that comes in the Persistent Base package.  This can be
+found by typing "man Persistent" or "perldoc Persistent" and is also
+available online at the above URL.  The Persistent documentation for a
+particular DBI database (MySQL, Oracle, Sybase, etc.) is also
+available after you install that subclass under the name
+Persistent::{RDBMS} where {RDBMS} is the name of the DBI database
+(MySQL, Oracle, Sybase, etc.).
+
+WHERE ARE THE EXAMPLES?
+
+There are no examples for this package since it only contains an
+abstract class.  You'll most likely be interested in the examples for
+the Persistent database subclass that you install and those will be
+included in their respective packages in the "examples" directory.
+Examples can also be found on the web site mentioned above.
+
+WARNING!
+
+This software is definitely a work in progress.  (Though, it has been
+used in more than 10 real world applications.)  Because of this, the
+interface is definitely subject to change and bugs may be found.  We
+would definitely love to hear from you regarding bugs or general
+comments.  So please feel free to send mail to:
+
+winters@bigsnow.org
+
+Thanks, have fun, and let me know what you think!
+
+David Winters
+winters@bigsnow.org

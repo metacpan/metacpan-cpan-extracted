@@ -1,0 +1,3 @@
+<a attr="href string:test.cgi?rm=edit_coach&amp;fn=$first_name">
+  <?var name="first_name"?> <?var name="last_name"?>
+</a>

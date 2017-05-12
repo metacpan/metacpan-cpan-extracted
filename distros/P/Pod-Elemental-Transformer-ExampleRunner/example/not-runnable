@@ -1,0 +1,4 @@
+:
+#FOR: demonstrate what happens when a script can't be run
+chmod -x $0
+echo "lol, shell script!"

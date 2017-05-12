@@ -1,0 +1,10 @@
+README
+MANIFEST
+Mail.pm
+Makefile.PL
+t/pgp-mail.t
+t/pgp-mime.t
+t/plaintext.t
+t/mbm-pgp.pub
+t/mbm-pgp.sec
+META.yml                                 Module meta-data (added by MakeMaker)

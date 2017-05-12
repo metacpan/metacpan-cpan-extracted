@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 00e0c08589d33c8ca7c26f32dfbeb648f079e68d Changes
+SHA1 9f246bf9ae63fb1f54bbf4bd98c891780cae1870 MANIFEST
+SHA1 939ec377eed4acef14ffd444d3306ef5530a5b3a META.json
+SHA1 e34a5607f5a987bf763506b411aa4be4cd26afd4 META.yml
+SHA1 35c7dfa23b68a72732433296ddadb04da3c50990 Makefile.PL
+SHA1 fe9f9e572beff80c46298c7fbf330c8f6189cd34 README
+SHA1 9cb91e22db30427384f4ba6cb06b0e85bde3bfbb lib/Plack/Middleware/BasicStyle.pm
+SHA1 a88c70a59b7a994612b2be53c582f3c03e606c4b t/Plack-Middleware-BasicStyle.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCgAGBQJX7sSJAAoJEMoENb5ewbNiUo4QAJfyF52wFFS+miwErnfLIJJB
+muiMh4mtBzXkBrM4H9X/mqR0gGuenSXAaLxk2U6NtucgtZhZtvrJvCi7NpQV5lEf
+CvHADYPwLlsYUiXRsW7LOkMIj1f/yXQ3JfcuDzE7so5uSxth4BtluNkJh3TI6Xiq
+2QS3IimppsH4N1M8aHcBskiR+EywOg7OXhqwFMp54npOeUWHbxJ2QcHxr6Hu9wDD
+C/RkSltPkFqAt/wcuyUYzgcagKEEk5Bqo6iu9Y6O24Rd9jetDfp651MSnTcTopj7
+P/aAbyxA/9eR81rtXb2RGQsaGfxmPljfhEU5fxPUCnZXINCnP9Xi7BmlOumv4ilD
+skWFqC3di+83qDDZm1sOJj1+tXjgVwBWbwji0311oHE5CdgUyE7Hfcb3z6yPDJay
+IcAv5TgtXL012L7T43HAGZKYeARi+HU1EZrsUisHIwNJw+Je/m+fZG3yQ+faEZzK
+wtrjbkXjjyeJJEIjCP0Yua7a2RjSr/NsYeXRtHTBmkbDVnrGxJpEwtZE0whnpREE
+kuVlQ34K/Hq45AOI9w0t98efN4GehhnsHQfEBH91g45LIl3iJ1G1z8zkrTOR9dwx
+VCGjgWAHYu6ZEADpexONIMcjkifE+WjExv6iBcwevhpg5+VOZsPEjjxvbhrTdSSr
+/iq2IJiqTK3iVB6nfBKj
+=46mt
+-----END PGP SIGNATURE-----

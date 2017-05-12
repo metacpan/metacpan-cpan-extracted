@@ -1,0 +1,266 @@
+---
+abstract: 'Query engine and query language for trees in PML format'
+author:
+  - 'Petr Pajas <pajas@ufal.mff.cuni.cz>'
+  - 'Jan Štěpánek <stepanek@ufal.mff.cuni.cz>'
+  - 'Michal Sedlák <sedlak@ufal.mff.cuni.cz>'
+  - 'Matyáš Kopp <matyas.kopp@gmail.com>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.3601
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PMLTQ
+no_index:
+  file:
+    - lib/PMLTQ/_Parser.pm
+provides:
+  PMLTQ:
+    file: lib/PMLTQ.pm
+    version: v1.3.1
+  PMLTQ::Base:
+    file: lib/PMLTQ/Base.pm
+    version: v1.3.1
+  PMLTQ::BtredEvaluator:
+    file: lib/PMLTQ/BtredEvaluator.pm
+    version: v1.3.1
+  PMLTQ::CGI:
+    file: lib/PMLTQ/CGI.pm
+    version: v1.3.1
+  PMLTQ::Command:
+    file: lib/PMLTQ/Command.pm
+    version: v1.3.1
+  PMLTQ::Command::convert:
+    file: lib/PMLTQ/Command/convert.pm
+    version: v1.3.1
+  PMLTQ::Command::delete:
+    file: lib/PMLTQ/Command/delete.pm
+    version: v1.3.1
+  PMLTQ::Command::init:
+    file: lib/PMLTQ/Command/init.pm
+    version: v1.3.1
+  PMLTQ::Command::initdb:
+    file: lib/PMLTQ/Command/initdb.pm
+    version: v1.3.1
+  PMLTQ::Command::load:
+    file: lib/PMLTQ/Command/load.pm
+    version: v1.3.1
+  PMLTQ::Command::query:
+    file: lib/PMLTQ/Command/query.pm
+    version: v1.3.1
+  PMLTQ::Command::verify:
+    file: lib/PMLTQ/Command/verify.pm
+    version: v1.3.1
+  PMLTQ::Command::version:
+    file: lib/PMLTQ/Command/version.pm
+    version: v1.3.1
+  PMLTQ::Command::webdelete:
+    file: lib/PMLTQ/Command/webdelete.pm
+    version: v1.3.1
+  PMLTQ::Command::webload:
+    file: lib/PMLTQ/Command/webload.pm
+    version: v1.3.1
+  PMLTQ::Command::webverify:
+    file: lib/PMLTQ/Command/webverify.pm
+    version: v1.3.1
+  PMLTQ::Commands:
+    file: lib/PMLTQ/Commands.pm
+    version: v1.3.1
+  PMLTQ::Common:
+    file: lib/PMLTQ/Common.pm
+    version: v1.3.1
+  PMLTQ::Grammar:
+    file: lib/PMLTQ/Grammar.pm
+    version: v1.3.1
+  PMLTQ::Loader:
+    file: lib/PMLTQ/Loader.pm
+    version: v1.3.1
+  PMLTQ::NG2PMLTQ:
+    file: lib/PMLTQ/NG2PMLTQ.pm
+    version: v1.3.1
+  PMLTQ::PML2BASE:
+    file: lib/PMLTQ/PML2BASE.pm
+    version: v1.3.1
+  PMLTQ::ParserError:
+    file: lib/PMLTQ/ParserError.pm
+    version: v1.3.1
+  PMLTQ::Planner:
+    file: lib/PMLTQ/Planner.pm
+    version: v1.3.1
+  PMLTQ::Relation:
+    file: lib/PMLTQ/Relation.pm
+    version: v1.3.1
+  PMLTQ::Relation::AncestorIterator:
+    file: lib/PMLTQ/Relation/AncestorIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::AncestorIteratorWithBoundedDepth:
+    file: lib/PMLTQ/Relation/AncestorIteratorWithBoundedDepth.pm
+    version: v1.3.1
+  PMLTQ::Relation::ChildnodeIterator:
+    file: lib/PMLTQ/Relation/ChildnodeIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::CurrentFileIterator:
+    file: lib/PMLTQ/Relation/CurrentFileIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::CurrentFilelistIterator:
+    file: lib/PMLTQ/Relation/CurrentFilelistIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::CurrentFilelistTreesIterator:
+    file: lib/PMLTQ/Relation/CurrentFilelistTreesIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::CurrentTreeIterator:
+    file: lib/PMLTQ/Relation/CurrentTreeIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::DepthFirstFollowsIterator:
+    file: lib/PMLTQ/Relation/DepthFirstFollowsIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::DepthFirstPrecedesIterator:
+    file: lib/PMLTQ/Relation/DepthFirstPrecedesIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::DepthFirstRangeIterator:
+    file: lib/PMLTQ/Relation/DepthFirstRangeIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::DescendantIterator:
+    file: lib/PMLTQ/Relation/DescendantIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::DescendantIteratorWithBoundedDepth:
+    file: lib/PMLTQ/Relation/DescendantIteratorWithBoundedDepth.pm
+    version: v1.3.1
+  PMLTQ::Relation::FSFileIterator:
+    file: lib/PMLTQ/Relation/FSFileIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::Iterator:
+    file: lib/PMLTQ/Relation/Iterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::MemberIterator:
+    file: lib/PMLTQ/Relation/MemberIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::OptionalIterator:
+    file: lib/PMLTQ/Relation/OptionalIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::OrderIterator:
+    file: lib/PMLTQ/Relation/OrderIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::PDT:
+    file: lib/PMLTQ/Relation/PDT.pm
+    version: v1.3.1
+  PMLTQ::Relation::PDT::AEChildIterator:
+    file: lib/PMLTQ/Relation/PDT/AEChildIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::PDT::AEParentIterator:
+    file: lib/PMLTQ/Relation/PDT/AEParentIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::PDT::ALexOrAuxRFIterator:
+    file: lib/PMLTQ/Relation/PDT/ALexOrAuxRFIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::PDT::TEChildIterator:
+    file: lib/PMLTQ/Relation/PDT/TEChildIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::PDT::TEParentIterator:
+    file: lib/PMLTQ/Relation/PDT/TEParentIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::PMLREFIterator:
+    file: lib/PMLTQ/Relation/PMLREFIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::ParentIterator:
+    file: lib/PMLTQ/Relation/ParentIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::SameTreeIterator:
+    file: lib/PMLTQ/Relation/SameTreeIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::SiblingIterator:
+    file: lib/PMLTQ/Relation/SiblingIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::SiblingIteratorWithDistance:
+    file: lib/PMLTQ/Relation/SiblingIteratorWithDistance.pm
+    version: v1.3.1
+  PMLTQ::Relation::SimpleListIterator:
+    file: lib/PMLTQ/Relation/SimpleListIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::TransitiveIterator:
+    file: lib/PMLTQ/Relation/TransitiveIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::TreeIterator:
+    file: lib/PMLTQ/Relation/TreeIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::Treex:
+    file: lib/PMLTQ/Relation/Treex.pm
+    version: v1.3.1
+  PMLTQ::Relation::Treex::AEChildCIterator:
+    file: lib/PMLTQ/Relation/Treex/AEChildCIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::Treex::AEChildIterator:
+    file: lib/PMLTQ/Relation/Treex/AEChildIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::Treex::AEParentCIterator:
+    file: lib/PMLTQ/Relation/Treex/AEParentCIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::Treex::AEParentIterator:
+    file: lib/PMLTQ/Relation/Treex/AEParentIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::Treex::TEChildIterator:
+    file: lib/PMLTQ/Relation/Treex/TEChildIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::Treex::TEParentIterator:
+    file: lib/PMLTQ/Relation/Treex/TEParentIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::TreexFileIterator:
+    file: lib/PMLTQ/Relation/TreexFileIterator.pm
+    version: v1.3.1
+  PMLTQ::Relation::TreexFilelistIterator:
+    file: lib/PMLTQ/Relation/TreexFilelistIterator.pm
+    version: v1.3.1
+  PMLTQ::SQLEvaluator:
+    file: lib/PMLTQ/SQLEvaluator.pm
+    version: v1.3.1
+  PMLTQ::TypeMapper:
+    file: lib/PMLTQ/TypeMapper.pm
+    version: v1.3.1
+recommends:
+  DBD::Pg: v2.19.3
+  HTTP::Request::AsCGI: 1.2
+  HTTP::Server::Simple::CGI: 0.44
+  Net::HTTPServer: v1.1.1
+requires:
+  Benchmark: 1.12
+  DBI: 0
+  Digest::MD5: 2.51
+  File::ShareDir: 1.102
+  File::Slurp: 0
+  Getopt::Long: 2.48
+  Graph: 0.96
+  Graph::ChuLiuEdmonds: 0.06
+  HTTP::Cookies: 0
+  Hash::Merge: 0
+  IO::Scalar: 2.110
+  JSON: 2.90
+  LWP::UserAgent: 0
+  List::MoreUtils: 0
+  List::Util: 1.45
+  MIME::Types: 2.04
+  Mojo::Base::XS: 0
+  Pod::Usage: 1.67
+  Text::Balanced: 0
+  Time::HiRes: 1.97
+  Treex::PML: 2.18
+  URI::Encode: 0
+  URI::WithBase: 0
+  YAML: 0.88
+  YAML::Tiny: 0
+resources:
+  homepage: http://ufal.mff.cuni.cz/pmltq/
+  repository: https://github.com/ufal/perl-pmltq.git
+version: 1.3.1
+x_authority: cpan:MATY
+x_authority_from_module: PMLTQ
+x_permissions_from_module: PMLTQ

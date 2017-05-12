@@ -1,0 +1,11 @@
+prefix=/foo
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: doublequote
+Description: this is a description
+Version: 1.00
+Cflags: -I${includedir} -DFOO="bar baz"
+Libs: -lfoo
+Libs.private: -lbar -lbaz

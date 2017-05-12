@@ -1,0 +1,32 @@
+---
+abstract: "added HTTP Header 'X-Content-Type-Options: nosniff'"
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  HTTP::Request::Common: 0
+  LWP::UserAgent: 0
+  Plack::Builder: 0
+  Plack::Test: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-IEnosniff
+provides:
+  Plack::Middleware::IEnosniff:
+    file: lib/Plack/Middleware/IEnosniff.pm
+    version: 0.02
+requires:
+  Carp: 0
+  Plack::Middleware: 0
+  Plack::Util: 0
+  Plack::Util::Accessor: 0
+  perl: v5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Plack-Middleware-IEnosniff
+version: 0.02

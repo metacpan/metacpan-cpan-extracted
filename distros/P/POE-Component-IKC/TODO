@@ -1,0 +1,63 @@
+- extend the monitor stuff
+    - socket errors
+    - remote_subscribe/remote_unsubscribe
+
+- Other IPC then just INET and UNIX domain sockets (IPC, Pipes, FIFOs)
+
+- Global event naming scheme
+    This will also make documentation and discussions easier.
+
+- Access restrictions
+    Currently all a foreign kernel can post events to any session w/in
+    a local kernel.
+
+    A much better idea would be to have sessions register the events
+    they want foreign kernels to get access.  
+
+- Proxy sessions
+    During negociation phase, a kernel will tell the foreign kernel about
+    all the sessions that have "exposed" events.  The local kernel will
+    create proxy sessions locally of thses sessions.  These sessions will
+    "die" when the kernel disconnects.  (Hey, why not have these proxy
+    sessions attempt to reconnect also?) This will mean $_[SENDER] will
+    always make sense.
+
+    However, the negociation phase could rapidly become overly tedious if a
+    foreign kernel knows about 100 Sessions, but the local kernel is only 
+    going to use one of them.
+
+- Lazy Proxy creation
+    When someone does a $kernel->alias_resolve(), the kernel could query
+    foreign kernels if they have the given session alias.
+
+
+
+Looking wider :
+
+- POE::Carp  AKA MONITORING
+    POE needs a general exception handling mechanism.  This will allow us
+    to send better diagnostic messages back to foreign kernels.  Maybe
+    something along the lines of the monitor stuff.
+
+- IKC clouds
+    I envision a multiply connected network of IKC servers, one per host.  A
+    IKC server would need to be able to find at least one other IKC server. 
+    After connecting, they would send each other all the kernels they know
+    about, and how to connect to each of them.
+
+    A kernel that wants to expose sessions and events to foreign kernels
+    (let's call it a IKC module) would only connect to the nearest IKC
+    server, which would take care of propogating the information to the
+    other servers in the cluster).
+
+    This will allow us to implement load balancing, rollover,
+    high-availablility and other buzz-words.  And remote CONFIGS!  See next
+    item
+
+- Automagical IKC
+    /etc/poe.conf or ~/.poe.conf could have all the params needed for
+    connecting to the IKC cluster.
+
+    Cf Stem: it has a nice config-driven way of doing things (local config,
+    ARGS config and even remote config).  This is similar, but better, then
+    the POE::Interface (a la IDL) idea I had at the begining.

@@ -1,0 +1,14 @@
+---
+comment: |
+
+  Task::Catalyst has a requirement in its Makefile.PL that is not
+  Win32 compatible.
+
+match:
+  distribution: |
+    ^(?x:
+    .^   # never matches, only purpose is to let things align nicely
+    |FLORA/Task-Catalyst-4.00.tar.gz          # Needs a patch to install.
+    )|
+patches:
+    - "Task-Catalyst-4.00.patch"

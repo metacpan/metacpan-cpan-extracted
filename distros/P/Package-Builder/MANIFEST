@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+#META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Package/Builder.pm
+lib/Package/Utils.pm
+t/00-load.t
+t/01-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+myrpm
+META.yml                                 Module meta-data (added by MakeMaker)

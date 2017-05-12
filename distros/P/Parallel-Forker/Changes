@@ -1,0 +1,123 @@
+Revision history for Perl extension Parallel::Forker
+
+The contributors that suggested a given feature are shown in [].
+
+* Parallel::Forker 1.234 2017-04-26
+
+****	Fix tests '.' for Perl 5.26.0, rt121025.  [Dan Collins]
+
+* Parallel::Forker 1.232 2010-11-02
+
+***	Add ::Forker process method. [by Niels van Dijke]
+
+***	Add ::Process state and state_stats methods. [by Niels van Dijke]
+
+* Parallel::Forker 1.231 2010-07-01
+
+****	Fix rsh test failure.
+
+****	Use Test::More to simplify test failure debugging.
+
+* Parallel::Forker 1.230 2010-06-16
+
+**	Add reap_processes and reap to reclaim memory. [by Muir Manders]
+
+***	Fix memory leak. [by Muir Manders]
+
+****	Fix Pod::Usage dependency, rt51024. [Andreas Koenig]
+
+* Parallel::Forker 1.225 2010-01-12
+
+****	Documentation updates.
+
+* Parallel::Forker 1.224 2009-05-19
+
+**	This package is now licensed under LGPL v3 and/or Artistic v2.0.
+
+****	Fix ignore files to support GIT.
+
+* Parallel::Forker 1.223 2008-11-14
+
+***	Add in_parent method and recommend usage, rt40886. [Ton Voon]
+
+* Parallel::Forker 1.222 2008/1/29
+
+***	Run processes in sorted rather than hash order. [Bryce Denney]
+
+****	Reorganize kit to use lib directory, for easier standalone use.
+
+* Parallel::Forker 1.221 2007/6/12
+
+***	Warn, but allow users to set SIG{CHLD}='IGNORE'. [Kevin Montuori]
+
+****    Warn if use_sig_child is undefined, as need to know if on or off.
+
+****	Report error if create or schedule a task, and the same name exists.
+
+****	Documentation cleanups. [Bryce Denney]
+
+* Parallel::Forker 1.220 2007/2/2
+
+****	Add use_sig_child method, and accelerate poll.  [Darrell Bishop]
+
+* Parallel::Forker 1.214 2007/2/1
+
+****    Fix hang in applications that call poll without sig_child.
+	This broke in 1.212 and 1.213. [Venkataramana Mokkapati]
+
+* Parallel::Forker 1.213 2007/1/28
+
+****    Internal refactoring of poll and wait_all routines.
+
+****    Documentation cleanups. [Darrell Bishop]
+
+* Parallel::Forker 1.212 2007/1/23
+
+****    Extend poll() to allow multiple processes to complete. [Darrell Bishop]
+	This means poll() has no return value; the old return was undocumented.
+
+* Parallel::Forker 1.211 2006-10-03
+
+****    Fix kill_tree causing _subprocesses error message
+
+* Parallel::Forker 1.210 2006-05-19
+
+***     Internal reorganization of modules and comments.
+
+* Parallel::Forker 1.202 2006-04-05
+
+****	Remove Schedule::Load dependency.  [Alan Burlison]
+
+* Parallel::Forker 1.201 2006-03-30
+
+***	Add last-run PID number to write_tree output file.  [Jeff Dutton]
+
+***	Fix poll() setting activity with no runnable processes. [Jeff Dutton]
+
+* Parallel::Forker 1.200 2005-10-19
+
+**	First public release.
+
+* Parallel::Forker 1.100 2002-10-27
+
+**	Support running processes when other processes fail.
+
+* Parallel::Forker 1.000 2002-07-26
+
+**	First created
+
+----------------------------------------------------------------------
+DESCRIPTION: Documentation on change history for this package
+----------------------------------------------------------------------
+
+This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
+
+Copyright 2003-2017 by Wilson Snyder.  This program is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License
+Version 2.0.
+
+Local variables:
+mode: outline
+paragraph-separate: "[ 	\f\n]*$"
+end:

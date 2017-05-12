@@ -1,0 +1,29 @@
+#===============================================================================
+# gentle  5 (least severe)
+# stern   4
+# harsh   3
+# cruel   2
+# brutal  1 (most severe)
+#===============================================================================
+severity = 1
+verbose = 8
+
+## Don't force checking of 'print' calls
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+ 
+## Don't check common punct vars
+[Variables::ProhibitPunctuationVars]
+allow = $@ $!
+ 
+## Turn these off
+[-ControlStructures::ProhibitPostfixControls]
+[-ControlStructures::ProhibitUnlessBlocks]
+[-Documentation::RequirePodSections]
+[-InputOutput::RequireBracedFileHandleWithPrint]
+[-Miscellanea::RequireRcsKeywords]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-Subroutines::RequireArgUnpacking]

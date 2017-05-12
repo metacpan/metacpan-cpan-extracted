@@ -1,0 +1,34 @@
+---
+abstract: 'Support server for PITA virtual machines'
+author:
+  - 'David Davis <xantus@cpan.org>'
+build_requires:
+  HTTP::Request: 0
+  IO::Socket::INET: 0
+  LWP::UserAgent: 2.033
+  Test::More: 0.47
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: PITA::POE::SupportServer
+name: PITA-POE-SupportServer
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  MIME::Types: 0
+  POE: 1.000
+  POE::Component::Server::SimpleContent: 1.05
+  POE::Component::Server::SimpleHTTP: 1.19
+  Params::Util: 0.22
+  Process: 0.18
+  URI: 1.35
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.41

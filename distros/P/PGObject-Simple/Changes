@@ -1,0 +1,55 @@
+Revision history for PGObject-Simple
+
+
+2.0.0   2016-11-21
+        Release version 2.0.0 in order to get out of the 1.9 vs 1.10 mess
+
+1.91    2016-11-21
+        CPAN won't accept 1.10.1 as it's lower than 1.9... Renumbering
+
+1.10.1  2016-11-21
+        Fix minimum dependency on PGObject
+
+1.9     2016-11-20
+        Fix issue #5: Don't call $value->to_db() [PGObject already does]
+        Fix issue #6: Don't special-case BYTEA arguments
+        Fix author tests
+
+1.8     2014-08-21
+        1. Made use of catalog-lookups memoization-safe.
+
+1.7     2014-08-19
+        1. Solved a number of issues regarding overriding defaults for 
+        application frameworks
+
+1.6     2014-02-24
+        1. Added per class schema handling (overridden by per call handling).
+        2. Re-arranged requirements in Makefile.PL
+        3. DB tests now use DB_TESTING=1 to set on, consistent with other
+        PGObject modules
+
+1.5     2014-02-16
+        1. Added contextual return handling so that db procedure calls can 
+        return either the first row of the set (usually useful where that is
+        the only row) or the full set.
+
+1.4     2013-11-12
+        1.  Fixed __PACKAGE__->call_dbmethod interface so it works.
+
+1.3     2013-06-07
+        1. Fixed test case that caused thins to bomb
+
+1.2     2013-06-05
+        1. Added registry support
+        2. Additional safety checks for database tests
+
+1.1     2013-05-30
+        1. Added function prefix support.
+        2. More documentation
+
+1.00    2013-05-26
+        First version, released on an unsuspecting world.
+        Changes from LedgerSMB's API include:
+          1.  call_procedure uses funcname instead of procname argument
+          2.  main mapper is called call_dbmethod instead of exec_method
+          3.  Fewer assumptions regarding database connection handling

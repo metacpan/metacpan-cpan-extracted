@@ -1,0 +1,22 @@
+Revision history for Pod-Weaver-Section-Completion-GetoptLongSubcommand
+
+0.04    2016-04-30 (PERLANCAR)
+
+	- Skip completer script (_foo).
+
+
+0.03    2015-08-26 (PERLANCAR)
+
+	- Adjust to PWR:SectionText::SelfCompletion 0.04.
+
+
+0.02    2015-04-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- Remove Moose::Autobox.
+
+
+0.01    2015-02-11 (PERLANCAR)
+
+        - First release.

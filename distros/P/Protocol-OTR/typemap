@@ -1,0 +1,3 @@
+TYPEMAP
+Protocol::OTR          T_PTROBJ
+

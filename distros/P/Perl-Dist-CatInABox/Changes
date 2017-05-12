@@ -1,0 +1,7 @@
+Revision history for Perl-Dist-CatInABox
+
+0.02 Fri 24 Oct 2008
+	- Offload the curation of the additional modules to Task::CatInABox
+
+0.01 Thu 23 Oct 2008
+	- First version, released on an unsuspecting world.

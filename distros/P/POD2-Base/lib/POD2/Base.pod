@@ -1,0 +1,284 @@
+
+=head1 NAME
+
+POD2::Base - Base module for translations of Perl documentation
+
+=head1 SYNOPSIS
+
+    use POD2::Base;
+    $pod2 = POD2::Base->new({ lang => 'EO' });
+
+    @dirs = $pod2->pod_dirs;
+    $re = $pod2->search_perlfunc_re;
+
+=head1 DESCRIPTION
+
+This module is an abstraction of the code in POD2::IT 
+and POD2::FR. These modules belong to the Italian and 
+the French translation projects of core Perl pods.
+
+Once a translation package had been installed, the translated 
+documentation can be accessed with: 
+
+    $ perldoc POD2::<lang>::<podname>
+
+(where <lang> is a language abbreviation like IT, FR,
+TLH, etc.)
+
+This is guaranteed to work even for older versions of
+L<perldoc|perldoc>. It is not very convenient but always works.
+
+To improve the support to read translated docs, the
+L<perldoc|perldoc> utility (since version 3.14_01) was updated 
+to find translated PODs via:
+
+    $ perldoc -L IT <podpage>
+    $ perldoc -L FR -f <function>
+    $ perldoc -L TH -q <FAQregex>
+
+(I<Note>: this support was shipped together with the
+recently released 5.10.0 version the Perl interpreter.)
+
+The objective of this class is to provide a minimum
+base to help C<perldoc> and authors of translation
+packages to do their job.
+
+=head1 SUBCLASSING
+
+If you want to write a translation package (and have
+some customization needs), your
+work may be diminished if you subclass C<Pod::Base>.
+
+For example, a minimum example is provided below:
+
+    package POD2::TLH; # Klingon
+
+    use POD2::Base;
+    our @ISA = qw( POD2::Base );
+
+    sub search_perlfunc_re { # makes 'perldoc -f' work
+        return 'Klingon Listing of Perl Functions';
+    }
+
+    1;
+
+And then
+
+    $ perldoc -L tlh perlintro
+
+will present you the introduction of Perl in Klingon language 
+(provided a F<POD2/TLH/perlintro.pod> file was shipped together
+with F<POD2/TLH.pm>) and
+
+    $ perldoc -L tlh -f pack
+
+will find you the Klingon documentation of C<pack> (if
+F<POD2/TLH/perlfunc.pod> was made available as well).
+
+=head1 METHODS
+
+This module has been made into a proper class
+with a very small API.
+
+=over 4
+
+=item B<new>
+
+    $pod2 = POD2::Base->new(\%args);
+    $pod2 = POD2::ANY->new();
+
+The constructor. An actual call might look like this:
+
+    $pod2 = POD2::Base->new({ lang => 'tlh' });
+
+where the supported options are:
+
+=over 4 
+
+=item * "lang"
+
+Specifies the language code we're interested in.
+This is required, but can be extracted from
+the name of a subclass. Read below.
+
+=item * "inc"
+
+This is used to override the list of Perl
+library directories where POD documents 
+are searched (namely, C<@INC>). Most of the
+time, you don't want to mess with that.
+It's handy for debugging and testing.
+
+It must be an array ref.
+
+=back
+
+If C<POD2::ANY> is a subclass of C<POD2::Base>, the
+inherited constructor will work without arguments
+pulling 'ANY' from the package name and using it
+as the intented language code.
+
+Note that use of "inc" in the constructor
+freezes the list of library dirs searched by the
+C<POD2::Base> instance. If this is not used,
+the up-to-date C<@INC> is used at each call
+of C<pod_dirs> (so that dynamic changes in
+the Perl library path are taken into account).
+That's what we meant with the
+"Most of the time, you don't want to mess with that" 
+mentioned above.
+
+=item B<pod_dirs>
+
+    @dirs = $pod2->pod_dirs;
+    @dirs = $pod2->pod_dirs(\%options);
+
+Used by C<Pod::Perldoc> to find out where to
+look for translated pods. 
+
+The C<POD2::Base> default behavior is to find
+F<< POD2/<lang>/ >> directories under the
+current Perl library directories (C<@INC>) or
+the list given as argument "inc" in the constructor.
+
+The supported options are:
+
+=over 4
+
+=item * "test"
+
+By default, the return of C<pod_dirs> do not
+include POD directories which do not exist (tested
+with C<-d>). If an explicit false value for this option (like
+C<< test => 0 >>) is given, such test is not done
+and C<pod_dirs> includes all possible candidates
+F<< POD2/<lang>/ >> under the library directories.
+(Handy for debugging this module. Not much practical
+use for anything else.)
+
+=back
+
+=item B<search_perlfunc_re>
+
+    $re = $pod2->search_perlfunc_re; 
+
+To implement C<< perldoc -f <function> >>
+the current code of C<Pod::Perldoc> uses a hard coded string
+"Alphabetical Listing of Perl Functions" or the return
+of this method (in a regexp) to skip the introduction
+and reach the listing of core functions.
+Thus a translation package with a corresponding translated
+F<perlfunc.pod> should define this method to 
+make C<< perldoc -L <lang> -f <function> >>
+work properly.
+
+=back
+
+There are other methods documented below. However,
+they will probably be superseded in future versions
+when more general methods to find and display metadata
+on translated PODs are designed and implemented.
+
+=over 4
+
+=item B<pod_info>
+
+    $hashref = $pod2->pod_info;
+
+Used by C<POD2::Base> itself. The return contains
+some metadata on the translated PODs which is used
+by the methods C<print_pod> and C<print_pods>.
+
+When subclassing, you B<should> override this
+with the current information on what POD
+translations the current package is providing.
+
+=item B<print_pods>
+
+    $pod2->print_pods;
+
+Prints all translated pods and the corresponding Perl version
+of the original files.
+
+=item B<print_pod>
+
+    $pod2->print_pod(@pages);
+    $pod2->print_pod(); # uses @ARGV
+
+Prints the corresponding Perl version of the original files
+corresponding to the pods passed as arguments.
+
+=back
+
+=head1 EXAMPLES
+
+=head2 POD2::TLH
+
+A slightly extended version of C<POD2::TLH> 
+goes like this:
+
+    package POD2::TLH; # Klingon
+
+    use POD2::Base;
+    our @ISA = qw( POD2::Base );
+
+    sub search_perlfunc_re {
+        return 'Klingon Listing of Perl Functions';
+    }
+
+    sub pod_info {
+        return { perlintro => '5.8.8' };
+    }
+
+    1;
+
+And you may try:
+
+    use POD2::TLH;
+    my $pod2 = 'POD2::TLH';
+    $pod2->print_pods();
+    $pod2->print_pod('pod_foo', 'pod_baz', ...); 
+
+=head2 THE INSTALLED FILES
+
+If you want to find out which language-specific
+POD files are installed at your Perl,
+you could use a code similar to this.
+
+    use File::Find;
+    use POD2::Base;
+
+    my $pod2 = POD2::Base->new({ lang => $lang });
+
+    my @files;
+    find sub { push @files, $File::Find::name } if -f },
+         $pod2->pod_dirs;
+    print "$_\n" for @files;
+
+In the C<POD2-Base> distribution tarball, a script
+F<eg/list.pl> is included with an improved
+version of this code.
+
+The rules of finding POD in F<.pod>, F<.pm> files and others
+belong to L<Pod::Perldoc>. So C<POD2::Base> do not try
+to repeat them here.
+
+
+=head1 AUTHORS
+
+Enrico Sorcinelli E<lt>bepi at perl.itE<gt> (the original POD2::IT code)
+
+Adriano Ferreira E<lt>ferreira at cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<POD2::IT>, L<POD2::FR>, L<POD2::LT>, L<POD2::CN>, L<perldoc>, L<perl>.
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2006 Perl.it / Perl Mongers Italia
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

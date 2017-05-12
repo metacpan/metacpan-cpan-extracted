@@ -1,0 +1,97 @@
+PCL/Simple version 1.01
+=======================
+
+NAME
+
+    PCL::Simple - Create PCL for printing plain text files
+
+SYNOPSIS
+
+      use PCL::Simple qw( PCL_pre PCL_post );
+
+      open PLAIN,  '<plain_file.txt'         or die;
+      open SNAZZY, '>ready_for_printing.txt' or die;
+
+      print SNAZZY PCL_pre( -w => 132, -lpp => 66 );
+      print SNAZZY while (<PLAIN>);
+      print SNAZZY PCL_post;
+
+      close PLAIN;
+      close SNAZZY;
+
+DESCRIPTION
+
+    PCL::Simple will provide PCL strings that cause your printer to print
+    a plain text file with *exactly* the right font -- i.e. the exact font
+    needed to fill the page with as many fixed width characters across
+    and down as you specify.
+
+    In addition to providing for your desired width and height layout, the
+    provided PCL strings will also cause the printer to honor your other
+    desires regarding paper size, paper orientation, sides printed, and
+    number of copies.
+
+USAGE
+
+    Two functions are exportable: PCL_pre and PCL_post.
+
+    PCL_post takes no parameters, it simply returns a string containing the
+    "Printer Reset Command" and "Universal Exit Language Command" as
+    specified by PCL documentation. This string is meant for appending to
+    the end of your plain text document.
+
+    PCL_pre takes a list or an href of key value pairs and returns a PCL
+    string for insertion at the beginning of your plain text document.
+    PCL_pre Paramaters are:
+
+    "-w"
+      Width (Required)
+
+    "-lpp"
+      Lines Per Page (Required)
+
+    "-ms"
+      Media Size defaults to letter. Valid values are: executive, letter,
+      legal, ledger, a4, a3, monarch, com-10, d1, c5, b5
+
+    "-msrc"
+      Media Source is not set by default.  Valid values are:
+      numbers from 0 to 69.  Generally refers to paper trays or
+      feeders.  See your printer documentation for details.
+
+    "-o"
+      Orientation defaults to portrait. Valid values are: landscape,
+      portrait.
+
+    "-s"
+      Sides defaults to 0. Valid values are: 0 (Single), 1 (Double Long), 2
+      (Double Short)
+
+    "-c"
+      Copies defaults to 1.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+  None
+
+BUGS
+
+  PCL_pre will often slightly undersize the font for landscape orientations,
+  such that one extra character might fit the page.  This means the printed
+  page will have a *slightly* larger right margin than left.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Phil R Lawrence.  All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+

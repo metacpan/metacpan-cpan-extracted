@@ -1,0 +1,52 @@
+pod
+  head1
+    @title
+      "NAME"
+    text
+      @text
+        "140-lists"
+  head1
+    @title
+      "EXAMPLES"
+    text
+      @text
+        "An itemized list:"
+    over
+      @indent
+        "4"
+      item
+        @title
+          "*"
+        text
+          @text
+            "item 1"
+      item
+        @title
+          "*"
+        text
+          @text
+            "item 2"
+      item
+        @title
+          "*"
+        text
+          @text
+            "item 3"
+    text
+      @text
+        "A definition list:"
+    over
+      @indent
+        "4"
+      item
+        @title
+          "Term 1"
+        text
+          @text
+            "description 1"
+      item
+        @title
+          "Term 2"
+        text
+          @text
+            "description 2"

@@ -1,0 +1,72 @@
+Release history for Pod-Eventual-Reconstruct
+
+1.000002 2017-03-07T11:43:33Z 97647a8
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+ - Tests more compatible with older Test::More
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - develop: +4 ↑2 (suggests: ↑2)
+ - test: ↓1
+
+1.000001 2015-06-23T02:43:46Z e238a3a
+ [BugFix]
+ - Newer Moo is mandatory
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - runtime: ↑1 (recommends: -1)
+
+1.000000 2015-06-22T02:03:58Z 47e3e0a
+ [00 Major]
+ - Packaging changes here that may break hand-operated downstream vendors.
+
+ [01 Version Scheme]
+ - X.yyyzzz is now in use instead of x.y.z
+ - This is the primary reason for the 1.0 release.
+ - https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129
+
+ [02 Tooling overhaul]
+ - Module::Build as installer is getting replaced with ExtUtils::MakeMaker
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+ - Dependencies are also softened in regards to latest things.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.2, see misc/*.deps* for details
+ - build: -1
+ - configure: +2 -1 (recommends: +1)
+ - develop: +51 -2 (recommends: +1 -1, suggests: +1 ↑1)
+ - runtime: ↓1 (recommends: +2)
+ - test: +4 ↓1 -2 (recommends: +3)
+
+ [Meta]
+ - repository moved to kentnl org.
+ - YAML tidyer
+ - author = kentnl
+
+ [Misc]
+ - Whitespace realignment
+
+0.1.2 2013-06-05T19:09:26Z
+ - Tests refactored to use Test::Differences
+
+ [Dependencies::Added / test requires]
+ - Test::Differences
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.1, see misc/*.deps* for details
+ - test: +1
+
+0.1.1 2013-06-05T16:55:26Z
+ [!Noteworthy Changes]
+ - Added LazyCut subclass for easier POD Filtering
+
+ [Dependencies::Added / runtime requires]
+ - Data::Dump
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.0, see misc/*.deps* for details
+ - runtime: +1
+
+0.1.0 2013-06-02T09:56:48Z
+ - First version.

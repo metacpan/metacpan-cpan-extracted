@@ -1,0 +1,47 @@
+{
+   "abstract" : "Safely and easily kill runaway processes",
+   "author" : [
+      "M. Nunberg <mnunberg@haskalah.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-ProcTerminator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Struct" : "0",
+            "Constant::Generate" : "0.16",
+            "Moo" : "0.009014",
+            "POE" : "0",
+            "POE::Sugar::Attributes" : "0.02",
+            "Proc::Terminator" : "0.03",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}

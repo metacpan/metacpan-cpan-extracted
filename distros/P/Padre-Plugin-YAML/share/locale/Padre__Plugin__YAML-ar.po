@@ -1,0 +1,42 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-YAML\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-03-21 16:25+0200\n"
+"PO-Revision-Date: 2012-03-21 16:33+0200\n"
+"Last-Translator: \n"
+"Language-Team: Arabic\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/YAML.pm:56
+msgid "About"
+msgstr "عن البرنامج"
+
+#: lib/Padre/Plugin/YAML/Syntax.pm:65
+msgid "Unknown YAML error"
+msgstr "خطأ YAML مجهول"
+
+#: lib/Padre/Plugin/YAML.pm:25
+msgid "YAML"
+msgstr "YAML"
+
+#: lib/Padre/Plugin/YAML.pm:68
+msgid "YAML Plug-in"
+msgstr "برنامج YAML المساعد"
+
+#: lib/Padre/Plugin/YAML.pm:71
+#, perl-format
+msgid ""
+"YAML support for Padre\n"
+"\n"
+"Copyright 2011-2012 %s\n"
+"This plug-in is free software; you can redistribute it and/or modify it under the same terms as Padre.\n"
+msgstr ""
+"دعم YAML ل Padre\n"
+"\n"
+" حقوق الطبع محفوظة2011-2012 %s\n"
+"هذا البرنامج المساعد هو برنامج مجاني، يمكنك توزيعه و/أو تعديله تحت نفس بنود اتفاقية Padre\n"
+

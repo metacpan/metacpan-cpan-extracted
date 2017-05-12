@@ -1,0 +1,11 @@
+﻿<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+  <link rel="stylesheet" href="[% request.base %]sample.css" type="text/css" />
+  <title>$title</title>
+ </head>
+ <body>
+  <div id="header">
+   <span class="title"><a href="$request.base">[% title|html %] </a></span>
+  </div>
+  <div id="main">

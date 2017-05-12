@@ -1,0 +1,54 @@
+SYNOPSIS
+
+     use Perinci::Sub::ValidateArgs qw(gen_args_validator);
+    
+     our %SPEC;
+     $SPEC{foo} = {
+         v => 1.1,
+         args => {
+             a1 => {
+                schema => 'int*',
+                req => 1,
+             },
+             a2 => {
+                 schema => [array => of=>'int*'],
+                 default => 'peach',
+             },
+         },
+         'x.func.validate_args' => 1,
+     };
+     sub foo {
+         state $validator = gen_args_validator();
+         my %args = @_;
+         if (my $err = $validator->(\%args)) { return $err }
+    
+         ...
+     }
+
+    or, if you want the validator to die on failure:
+
+     ...
+     sub foo {
+         state $validator = gen_args_validator(die => 1);
+         my %args = @_;
+         $validator->(\%args);
+    
+         ...
+     }
+
+DESCRIPTION
+
+    This module (PSV for short) can be used to validate function arguments
+    using schema information in Rinci function metadata.
+
+    There are other ways if you want to validate function arguments using
+    Sah schemas. See Data::Sah::Manual::ParamsValidating.
+
+SEE ALSO
+
+    Rinci, Data::Sah
+
+    Dist::Zilla::Plugin::IfBuilt
+
+    Dist::Zilla::Plugin::Rinci::Validate
+

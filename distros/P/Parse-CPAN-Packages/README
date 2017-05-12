@@ -1,0 +1,176 @@
+NAME
+    Parse::CPAN::Packages - Parse 02packages.details.txt.gz
+
+SYNOPSIS
+      use Parse::CPAN::Packages;
+
+      # must have downloaded
+      my $p = Parse::CPAN::Packages->new("02packages.details.txt.gz");
+      # either a filename as above or pass in the contents of the file
+      # (uncompressed)
+      my $p = Parse::CPAN::Packages->new($packages_details_contents);
+
+      my $m = $p->package("Acme::Colour");
+      # $m is a Parse::CPAN::Packages::Package object
+      print $m->package, "\n";   # Acme::Colour
+      print $m->version, "\n";   # 1.00
+
+      my $d = $m->distribution();
+      # $d is a Parse::CPAN::Packages::Distribution object
+      print $d->prefix, "\n";    # L/LB/LBROCARD/Acme-Colour-1.00.tar.gz
+      print $d->dist, "\n";      # Acme-Colour
+      print $d->version, "\n";   # 1.00
+      print $d->maturity, "\n";  # released
+      print $d->filename, "\n";  # Acme-Colour-1.00.tar.gz
+      print $d->cpanid, "\n";    # LBROCARD
+      print $d->distvname, "\n"; # Acme-Colour-1.00
+
+      # all the package objects
+      my @packages = $p->packages;
+
+      # all the distribution objects
+      my @distributions = $p->distributions;
+
+      # the latest distribution
+      $d = $p->latest_distribution("Acme-Colour");
+      is($d->prefix, "L/LB/LBROCARD/Acme-Colour-1.00.tar.gz");
+      is($d->version, "1.00");
+
+      # all the latest distributions
+      my @distributions = $p->latest_distributions;
+
+DESCRIPTION
+    The Comprehensive Perl Archive Network (CPAN) is a very useful
+    collection of Perl code. It has several indices of the files that it
+    hosts, including a file named "02packages.details.txt.gz" in the
+    "modules" directory. This file contains lots of useful information and
+    this module provides a simple interface to the data contained within.
+
+    In a future release Parse::CPAN::Packages::Package and
+    Parse::CPAN::Packages::Distribution might have more information.
+
+  Methods
+    new Creates a new instance from a details file.
+
+        The constructor can be passed either the path to the
+        "02packages.details.txt.gz" file, a path to an ungzipped version of
+        this file, or a scalar containing the entire uncompressed contents
+        of the file.
+
+        Note that this module does not concern itself with downloading this
+        file. You should do this yourself. For example:
+
+           use LWP::Simple qw(get);
+           my $data = get("http://www.cpan.org/modules/02packages.details.txt.gz");
+           my $p = Parse::CPAN::Packages->new($data);
+
+    package($packagename)
+        Returns a "Parse::CPAN::Packages::Package" that represents the named
+        package.
+
+          my $p = Parse::CPAN::Distribution->new($gzfilename);
+          my $package = $p->package("Acme::Colour");
+
+    packages()
+        Returns a list of Parse::CPAN::Packages::Package objects
+        representing all the packages that were extracted from the file.
+
+    package_count()
+        Returns the numebr of packages stored.
+
+    distribution($filename)
+        Returns a Parse::CPAN::Distribution that represents the filename
+        passed:
+
+          my $p = Parse::CPAN::Distribution->new($gzfilename);
+          my $dist = $p->distribution('L/LB/LBROCARD/Acme-Colour-1.00.tar.gz');
+
+    distributions()
+        Returns a list of Parse::CPAN::Distribution objects representing all
+        the known distributions.
+
+    distribution_count()
+        Returns the number of distributions stored.
+
+    latest_distribution($distname)
+        Returns the "Parse::CPAN::Distribution" that represents the latest
+        distribution for the named disribution passed, that is to say it
+        returns the distribution that has the highest version number (as
+        determined by version.pm or number comparison if that fails):
+
+          my $p = Parse::CPAN::Distribution->new($gzfilename);
+          my $dist = $p->distribution('Acme-Color');
+
+    latest_distrbutions()
+        Returns a list of Parse::CPAN::Distribution objects representing all
+        the latest distributions.
+
+    latest_distribution_count()
+        Returns the number of distributions stored.
+
+  Preamble Methods
+    These methods return the information from the preamble at the start of
+    the file. They return undef if for any reason no matching preamble line
+    was found.
+
+    file()
+    url()
+    description()
+    columns()
+    intended_for()
+    written_by()
+    line_count()
+    last_updated()
+
+  Addtional Methods
+    These are additional methods that you may find useful.
+
+    parse($filename)
+        Parses the filename. Works in a similar fashion to the the
+        constructor (i.e. you can pass it a filename for a
+        compressed/1uncompressed file, a uncompressed scalar containing the
+        file. You can also pass nothing to indicate to load the compressed
+        file from the current working directory.)
+
+        Note that each time this function is run the packages and
+        distribtions found will be "added" to the current list of packages.
+
+    add_quick($package_name, $package_version, $prefix)
+        Quick way of adding a new package and distribution.
+
+    add_package($package_obj)
+        Adds a package. Note that you'll probably want to add the
+        corrisponding distribution for that package too (it's not done
+        automatically.)
+
+    add_distribution($distribution_obj)
+        Adds a distribution. Note that you'll probably want to add the
+        corrisponding packages for that distribution too (it's not done
+        automatically.)
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2004-9, Leon Brocard
+
+LICENSE
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+
+BUGS
+    This module leaks memory as packages hold distributions and
+    distributions hold packages. No attempt has been made to fix this as
+    it's not anticpated that this will be used in long running programs that
+    will dispose of the objects once created.
+
+    The old interface for "new" where if you passed no arguments it would
+    look for a "02packages.details.txt.gz" in your current directory is no
+    longer supported.
+
+TODO
+    delete_* methods. merge_into method. Documentation for other modules.
+
+SEE ALSO
+    CPAN::DistInfoname, Parse::CPAN::Packages::Writer.
+

@@ -1,0 +1,14 @@
+TYPEMAP
+struct attrl *        	      T_PTROBJ
+
+OUTPUT
+T_PTROBJ
+        sv_setref_pv( $arg, CLASS, (void*)$var );
+
+INPUT
+T_PTROBJ
+        if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) ){
+                $var = ($type)SvIV((SV*)SvRV( $arg ));
+        }else{
+                XSRETURN_UNDEF;
+        }

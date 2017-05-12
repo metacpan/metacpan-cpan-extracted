@@ -1,0 +1,47 @@
+=pod
+
+This is the bulleted paragraph.
+
+=over
+
+=item * Item A
+
+=item * Item B
+
+=item * Item C
+
+=back
+
+This is the numbered paragraph.
+
+=over
+
+=item 1. One
+
+=item 2. Two
+
+=item 3. Three
+
+=back
+
+This is the text paragraph.
+
+=over
+
+=item Heading A
+
+This is a line under Heading A.
+
+=item Heading B
+
+This is a line under Heading B.
+
+=item Heading C
+
+This is a line under Heading C.
+
+=back
+
+This is the final paragraph.
+
+=cut

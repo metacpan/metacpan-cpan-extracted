@@ -1,0 +1,132 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; change()</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>change()</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+function<BR>
+<UL>
+<LI><B>change</B>
+<LI><A HREF=find.html>find</A>
+<LI><A HREF=select.html>select</A>
+</UL>
+<P>
+change via:
+<UL>
+<LI><A HREF=#show>show</A><BR>
+<LI><A HREF=#style>style</A><BR>
+<LI><A HREF=#elem>style-elem</A><BR>
+</UL>
+<P>
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.
+Presentations are written in options to style-elements grouped into
+<A HREF=../style/index.html>styles</A>.  Well, sometimes you like to
+change the style-elements.
+<P>
+The following changes are possible:
+<UL>
+<LI>changes on styles and style-elements <A HREF=#show>via the show</A>.
+<LI>changes of style-elements <A HREF=#style>within a style</A>.
+<LI>changes on <A HREF=#elem>a style-element</A>.
+</UL>
+
+The general syntax is:
+<PRE>
+  <I>$o</I> = <I>$object</I>->change(<I>$objtype, name, options</I>);
+  <I>$o</I> = <I>$object</I>->change(<I>$objtype, </I>'ALL'<I>, options</I>);
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<H2>Changes via <A NAME=show>Show</A></H2>
+
+Via the show, you can change a style and change the style-elements of
+the selected style.  The following two are equivalent:
+<PRE>
+   use PPresenter;
+   my $show = PPresenter->new;
+   $show->change(style => 'slidenotes'
+                , -name => 'notes');
+   $show->find(style => 'slidenotes')
+        ->change(-name  => 'notes');
+</PRE>
+Also the next three are equivalent:
+<PRE>
+   $show->change(template => 'tm'
+          , -showTemplateOutlines => 1);
+   $show->find(style)
+        ->change(template => 'tm'
+          , -showTemplateOutlines => 1);
+   $show->find(style)->find(template => 'tm')
+        ->change(-showTemplateOutlines => 1);
+</PRE>
+If you want to use <CODE>template => 'ALL'</CODE>, then the last
+syntax cannot be used.
+<P>
+A change on a show returns the style, so you can write:
+<PRE>
+   $show->change(template => 'ALL'
+          , -areaSeparation => '8%')
+        ->change(decoration => 'SELECTED'
+          , -fgcolor => 'red', -backdrop => 1);
+</PRE>
+
+<H2>Changes via <A NAME=style>Style</A></H2>
+
+Changes via the style are exactly equivalent to
+<A HREF=#show>changes to the show</A>, only not called via the
+show-object, by a style object. For instance:
+<PRE>
+   my $style = $show->find(style => 'slidenotes')
+   $style->change(decoration => 'ALL'
+      , -bgcolor => 'green');
+</PRE>
+
+<H2>Changes via <A NAME=elem>Style-element</A></H2>
+
+Each style-element belongs to a list of style-elements for
+exactly one style.  If you change a the style-element, it will
+do as if it was <A HREF=#style>changed via the style</A>, except
+that it will return the changed object.
+<P>
+The following is equivalent:
+<PRE>
+   my $d = $show->find('decoration');
+   $d->change(-fgcolor => 'blue');
+</PRE>
+and
+<PRE>
+   $show->find(style => 'SELECTED')
+        ->change(decoration => 'SELECTED'
+          , -fgcolor => 'blue');
+</PRE>
+And there are more ways to write the same:
+<PRE>
+   $show->change(decoration => 'SELECTED'
+          , -fgcolor => 'blue');
+
+   $show->find('decoration')
+        ->change(-fgcolor => 'blue');
+</PRE>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

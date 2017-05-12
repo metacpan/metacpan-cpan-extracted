@@ -1,0 +1,14 @@
+Revision history for Perl module Parse::Diagnostics
+
+0.03 2016-12-09
+
+- Make line numbers work correctly
+
+0.02 2016-02-18
+
+- Fix errors in "parse-diagnostics" script
+
+0.01 2016-02-05
+
+- Initial version
+

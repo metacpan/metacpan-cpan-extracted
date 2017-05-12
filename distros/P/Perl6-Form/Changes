@@ -1,0 +1,57 @@
+Revision history for Perl extension Perl6::Form.
+
+0.01  Sat Oct 11 22:14:00 2003
+	- original version; created by h2xs 1.22 with options
+		-A -P -X -f -n Perl6::Form
+
+
+
+0.02	Tue Dec 16 11:37:43 2003
+
+	Private release to beta testers
+
+
+0.03	Fri Feb 27 03:42:07 2004
+
+	First public release
+
+
+0.04	Tue Mar  9 02:59:48 2004
+
+    - Updated internals to mirror interface changes in Perl6::Export
+
+
+
+
+0.005  Tue Apr 29 19:48:41 2014
+
+    - Updated Makefile.PL to note Perl6::Export 0.07 dependency
+
+    - Added support for separated integers: {>>,>>>,>>}
+
+    - Misc. doc patches (thanks Jerrad)
+
+    - Fixed handling of declarative two-column fields (thanks David)
+
+    - Fixed infinite loop when page length too short for headers and 
+      at least one line of content
+
+    - Fixed doc examples so arrays are always obviously passed
+      by reference
+
+
+
+0.05  Sun Sep 11 21:20:41 2016
+
+    - Added metadata to distribution (thanks Karen)
+
+    - Fixed version number (thanks Stefan!)
+
+    - Fixed integers with grouping
+
+
+
+0.06  Sun Sep 11 22:40:06 2016
+
+    - Made compatible with Perl 5.25+ (Thanks Slaven)
+

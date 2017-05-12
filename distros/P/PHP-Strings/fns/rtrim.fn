@@ -1,0 +1,6 @@
+docs: |
+    Another trivial regular expression:
+
+        $string =~ s/\s+$//;
+
+    See the notes on L<"ltrim">.

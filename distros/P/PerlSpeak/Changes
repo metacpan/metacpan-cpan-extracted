@@ -1,0 +1,95 @@
+
+Revision history for Perl extension PerlSpeak.
+
+0.01  Sat Jan  6 21:58:49 2007
+	- original version; created by h2xs 1.23 with options
+		-AX PerlSpeak
+
+ 1/9/2007 ver 0.03
+
+ * Fixed error handling for opendir and readdir.
+
+ * Added property tts_command => $string 
+    (insert "text_arg" where the text to speak should be.)
+
+ * Added property no_dot_files => $boolean default is 1
+    (Set to 0 to show hidden files)
+
+ * Fixed bug in tts_engine => "cepstral" (previously misspelled as cepstrel)
+
+ * Added funtionality to traverse directory tree up as well as down.
+    (user can now use the arrow keys for browsing and selecting
+    up and down browses files in current directory. Right selects the 
+    file or directory. Left moves up one directory like "cd ..")
+
+ * Added property hide_extentions => $boolean to turn off speaking of file
+    extensions with the filepicker method. Default is 0.
+    (NOTE: If hiding extensions the no_dot_files property must be set to 1)
+    
+ * Added property "make_readable" which takes a regular expression as an argument.
+    PerlSpeak.pm substitues a space for characters that match expression.  The
+    default is "[_\\]" which substitutes a space for "\" and "_".
+
+
+
+ 1/20/2007 ver 0.50
+ 
+ * Added funtionality for reading a text file. Method "say" will now take
+    text or a file name as an argument. Also added method "readfile" which
+    takes a file name as an argument. The property tts_file_command was also
+    added to accomodate tts systems other than festival or cepstral.
+
+ * Added funtionality for converting a text file to a wave file via the
+    "file2wave" method and optionally the "file2wave_command" property.
+ 
+ * Added properties "file_prefix" and "dir_prefix" to enable changing
+    text to speak prior to file and directory names in the "filepicker"
+    and "dirpicker" methods.
+    
+ * Added "browsable", a boolean property which will togle the browsable feature
+    of the "filepicker" method. 
+    
+ * Added "dir_return", a boolean property which will allows the "filepicker" 
+    method to return the path to a directory as well as the path to a file.
+    
+ * Changed required version of perl to 5.6. I see no reason why PerlSpeak.pm
+    should not work under perl 5.6, however, this has not yet been tested. If
+    you have problems with PerlSpeak on your version of perl let me know.
+
+
+1/24/2007 ver 0.51
+
+ * Fixed errors in documentation
+
+
+ 6/17/2007 ver 1.0
+
+ * Fixed error message 'cannot stat filename' when making a cal to say()
+
+
+ 10/10/2007 ver 1.5
+ 
+  * Added boolean property echo_off to turn off printing of text said to screen.
+
+  * Added method menu_list(@list) Returns element of @list selected by user.
+
+  * Added method getString() Returns a string speaking each character as you
+    type. Also handles backspaces.
+
+  * Added method conirm(). Returns boolean. Prompts user to enter Y for yes
+    or N for no.  Enter also returns true.
+
+  * Added shortcuts to the menu() method. You can press the number of menu
+    index or the letter of the first word in menu item to jump to that item.
+    
+    
+ 01/02/2008 ver 2.01
+ 
+  * Added suport for festival_server, festival_pipe, and espeak text to speech
+    engines. This includes several methods and properties such as voice, pitch
+    volume, and rate.
+    
+  * Added method getType(filename) Returns mime type for filename.
+
+
+

@@ -1,0 +1,17 @@
+<html>
+<body bgcolor="#ffffff">
+<h1>NAME</h1>
+
+<p>200-simple-sequences</p>
+<h1>TESTCASES</h1>
+
+<p>This is <b>bold</b>.</p>
+<p>This is <i>italic</i>.</p>
+<p>This is <code>code</code>.</p>
+<p>This is a <i>filename</i>.</p>
+<p>This is an ampersand escape: &amp;.</p>
+<p>This is a non-breaking&nbsp;space&nbsp;sequence.</p>
+<p>This is an index entry. (Nothing to see)</p>
+<p>This line contains a Z sequence.</p>
+</body>
+</html>

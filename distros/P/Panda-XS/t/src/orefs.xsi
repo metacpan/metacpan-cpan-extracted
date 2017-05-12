@@ -1,0 +1,91 @@
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::OSV
+PROTOTYPES: DISABLE
+
+OSV* OSV::new (SV* strsv) {
+    if (SvOK(strsv)) RETVAL = newSVpv(SvPV_nolen(strsv), 0);
+    else RETVAL = NULL;
+}
+
+const char* OSV::get_val () {
+    if (SvOK(THIS)) RETVAL = SvPV_nolen(THIS);
+    else RETVAL = NULL;
+}
+
+void OSV::set_val (OSV* other) {
+    if (other) {
+        STRLEN len;
+        const char* str = SvPV(other, len);
+        sv_setpvn(THIS, str, len);
+    }
+    else SvOK_off(THIS);
+}
+
+OSV* OSV::clone () {
+    const char* CLASS = HvNAME(SvSTASH(THIS));
+    RETVAL = SvOK(THIS) ? newSVpvn(SvPVX(THIS), SvCUR(THIS)) : newSV(0);
+}
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::OAV
+PROTOTYPES: DISABLE
+
+OAV* OAV::new (AV* av) {
+    if (av) RETVAL = clone_array(aTHX_ av);
+    else RETVAL = NULL;
+}
+
+AV* OAV::get_val () {
+    RETVAL = clone_array(aTHX_ THIS);
+}
+
+void OAV::set_val (OAV* other) {
+    av_clear(THIS);
+    clone_array(aTHX_ other, THIS);
+}
+
+OAV* OAV::clone () {
+    const char* CLASS = HvNAME(SvSTASH(THIS));
+    RETVAL = clone_array(aTHX_ THIS);
+}
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::OHV
+PROTOTYPES: DISABLE
+
+OHV* OHV::new (HV* hv) {
+    if (hv) RETVAL = clone_hash(aTHX_ hv);
+    else RETVAL = NULL;
+}
+
+HV* OHV::get_val () {
+    RETVAL = clone_hash(aTHX_ THIS);
+}
+
+void OHV::set_val (OHV* other) {
+    hv_clear(THIS);
+    clone_hash(aTHX_ other, THIS);
+}
+
+OHV* OHV::clone () {
+    const char* CLASS = HvNAME(SvSTASH(THIS));
+    RETVAL = clone_hash(aTHX_ THIS);
+}
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::OIO
+PROTOTYPES: DISABLE
+
+OIO* OIO::new (IO* io) {
+    RETVAL = io;
+}
+
+int OIO::get_val () {
+    RETVAL = PerlIO_fileno(IoIFP(THIS));
+}
+
+void OIO::set_val (OIO* other) {
+    if (!other) other = GvIO(gv_fetchpv("STDERR", 0, SVt_PVIO));
+    IoIFP(THIS) = IoIFP(other);
+}
+
+OIO* OIO::clone () {
+    HV* CLASS = SvSTASH(THIS);
+    RETVAL = THIS;
+}

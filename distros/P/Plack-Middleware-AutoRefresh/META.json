@@ -1,0 +1,68 @@
+{
+   "abstract" : "Reload pages in browsers when files are modified",
+   "author" : [
+      "Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.011",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-AutoRefresh",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034",
+            "perl" : "5.008"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.011",
+            "Test::Kwalitee" : "0",
+            "Test::Perl::Critic" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::Filesys::Notify" : "0",
+            "File::ShareDir" : "0",
+            "File::Slurp" : "0",
+            "JSON::Any" : "0",
+            "Plack" : "0",
+            "Readonly" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::AutoRefresh" : {
+         "file" : "lib/Plack/Middleware/AutoRefresh.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/mvgrimes/Plack-Middleware-AutoRefresh/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/mvgrimes/Plack-Middleware-AutoRefresh.git",
+         "web" : "http://github.com/mvgrimes/Plack-Middleware-AutoRefresh"
+      }
+   },
+   "version" : "0.09",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

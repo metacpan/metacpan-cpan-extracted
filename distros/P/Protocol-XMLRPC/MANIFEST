@@ -1,0 +1,39 @@
+Changes
+lib/Protocol/XMLRPC.pm
+lib/Protocol/XMLRPC/Client.pm
+lib/Protocol/XMLRPC/Dispatcher.pm
+lib/Protocol/XMLRPC/Method.pm
+lib/Protocol/XMLRPC/MethodCall.pm
+lib/Protocol/XMLRPC/MethodResponse.pm
+lib/Protocol/XMLRPC/Value.pm
+lib/Protocol/XMLRPC/Value/Array.pm
+lib/Protocol/XMLRPC/Value/Base64.pm
+lib/Protocol/XMLRPC/Value/Boolean.pm
+lib/Protocol/XMLRPC/Value/DateTime.pm
+lib/Protocol/XMLRPC/Value/Double.pm
+lib/Protocol/XMLRPC/Value/Integer.pm
+lib/Protocol/XMLRPC/Value/String.pm
+lib/Protocol/XMLRPC/Value/Struct.pm
+lib/Protocol/XMLRPC/ValueFactory.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/client.t
+t/dispatcher.t
+t/method-call.t
+t/method-response-fault.t
+t/method-response.t
+t/value-factory.t
+t/value/array.t
+t/value/base64.t
+t/value/boolean.t
+t/value/datetime.t
+t/value/double.t
+t/value/integer.t
+t/value/string.t
+t/value/struct.t
+xt/changes.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

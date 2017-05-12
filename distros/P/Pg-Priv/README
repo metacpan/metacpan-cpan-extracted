@@ -1,0 +1,66 @@
+Pg/Priv version 0.12
+====================
+
+This module parses PostgreSQL ACL arrays and represents the underlying
+privileges as objects. Use accessors on the objects to see what privileges are
+granted by whom and to whom.
+
+PostgreSQL ACLs are arrays of strings. Each string represents a single set of
+privileges granted by one role to another role. ACLs look something like this:
+
+    my $acl = [
+       'miriam=arwdDxt/miriam',
+       '=r/miriam',
+       'admin=arw/miriam',
+    ];
+
+The format of the privileges are interpreted thus (borrowed from the
+[PostgreSQL
+Documentation](http://www.postgresql.org/docs/current/static/sql-grant.html#SQL-GRANT-NOTES)):
+
+       rolename=xxxx -- privileges granted to a role
+               =xxxx -- privileges granted to PUBLIC
+
+                   r -- SELECT ("read")
+                   w -- UPDATE ("write")
+                   a -- INSERT ("append")
+                   d -- DELETE
+                   D -- TRUNCATE
+                   x -- REFERENCES
+                   t -- TRIGGER
+                   X -- EXECUTE
+                   U -- USAGE
+                   C -- CREATE
+                   c -- CONNECT
+                   T -- TEMPORARY
+             arwdDxt -- ALL PRIVILEGES (for tables, varies for other objects)
+                   * -- grant option for preceding privilege
+
+               /yyyy -- role that granted this privilege
+
+Pg::Priv uses these rules (plus a few other gotchas here and there) to parse
+these privileges into objects. The above three privileges in the ACL array
+would thus be returned by `parse_acl()` as three Pg::Priv objects that you
+could then interrogate.
+
+INSTALLATION
+
+To install this module, type the following:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Dependencies
+------------
+
+Pg::Prive requires no non-core Perl modules.
+
+Copyright and Licence
+---------------------
+
+Copyright (c) 2009 Etsy, Inc. and David. E. Wheeler. Some Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

@@ -1,0 +1,31 @@
+Revision history for App-PFT
+
+0.0.1   2016-02-25
+        First version, library extxracted from App::PFT
+
+0.5.1   2016-04-11
+        Quite stable, used for App::PFT successfully
+
+0.5.3   2016-05-21
+        Changes needed to reflect App::PFT version 1.0.x, which is ready.
+
+1.0.0   2016-06-08
+        Improved structure
+        Improved unit tests
+        Improved link ref features
+
+1.1.0   2016-12-27
+        Fixes in site mapping
+        Additional configuration keys: site.theme
+        Miscellaneous fixes/improvements
+
+1.1.1   2017-01-13
+        Some bugfixes
+        Improved docs
+
+1.1.2   2017-01-20
+        More bugfixes
+
+1.2.0   2017-05-06
+        Improved/fixed direct content query
+        Fixed installation under Debian Jessie

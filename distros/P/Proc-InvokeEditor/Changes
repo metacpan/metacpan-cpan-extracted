@@ -1,0 +1,29 @@
+Revision history for Perl extension Proc::InvokeEditor.
+
+0.01_01  Mon Aug 27 14:08:09 2001
+	- original version; created by h2xs 1.21 with options
+		-X -A -m Proc::InvokeEditor -v 0.01_01 -b 5.005_03
+
+0.01_02  Mon Aug 27 16:50 2001
+  - new version, incorporate feedback so $EDITOR = 'xemacs -nw'
+    works, added more error checking when looping through editors
+    , added editors_env and editors_prepend.
+
+1.01 13 Mar 2007
+  - Increase CPANTS score.
+
+1.02 16 Dec 2007
+  - Patches from Tim Booth tbooth@ceh.ac.uk to provide optional filename
+	suffix option.
+
+1.04 30 Jul 2010
+  - Add a "use warnings" to keep CPANTS happy.
+
+1.05 19 Feb 2011
+  - Fix README
+
+1.06 25 Apr 2011
+  - Apply patch from Jesse Luehrs to optionally reuse temp file names.
+
+1.07 04 Aug 2014
+  - Apply patch from Brian Fraser to work on android.

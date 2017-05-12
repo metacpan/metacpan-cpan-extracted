@@ -1,0 +1,4 @@
+Revision history for Perl extension Plack::Middleware::Throttle
+
+0.01    Wed Mar 31 12:30:35 2010
+        - original version

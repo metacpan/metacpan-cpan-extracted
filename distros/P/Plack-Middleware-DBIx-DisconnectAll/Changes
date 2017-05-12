@@ -1,0 +1,10 @@
+Revision history for Perl extension Plack::Middleware::DBIx::DisconnectAll
+
+0.02 2013-07-19T06:10:05Z
+
+    - repackaging with Minilla
+    - check $res->[2] for do not return cb in response_cb 
+    - add test
+
+0.01    Wed Dec 12 13:01:34 2012
+    - original version

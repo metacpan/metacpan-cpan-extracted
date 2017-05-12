@@ -1,0 +1,72 @@
+NAME
+    Pod::Elemental::Transformer::List::Converter - Convert a list to...
+    something else
+
+VERSION
+    This document describes 0.001 of
+    Pod::Elemental::Transformer::List::Converter - released February 27,
+    2012 as part of Pod-Elemental-Transformer-List-Converter.
+
+SYNOPSIS
+        # somewhere inside your code...
+        my $transformer = Pod::Elemental::Transformer::List::Converter->new;
+        $transformer->transform_node($node);
+
+DESCRIPTION
+    This Pod::Elemental::Transformer takes a given node's children, and
+    converts any list commands to another command, "head2" by default.
+
+    That is:
+
+    "=item" becomes "=head2", and
+    "=over" and <=back> commands are dropped entirely.
+
+    As you can imagine, it's important to be selective with the nodes you
+    run through this transformer -- if you pass the entire document to it,
+    it will obliterate any lists found.
+
+ATTRIBUTES
+  command
+    The command we change "=item" elements to; defaults to "head2".
+
+METHODS
+  command
+    Accessor to the command attribute.
+
+  transform_node($node)
+    Takes a node, and replaces any "=item"'s with our target command (by
+    default, "=head2"). We also drop any command elements found for "=over"
+    and "=back".
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   Pod::Elemental::Transformer
+
+    *   Pod::Weaver::Section::Collect::FromOther
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/pod-elemental-transformer-list-converter>
+    and may be cloned from
+    <git://github.com/RsrchBoy/pod-elemental-transformer-list-converter.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/pod-elemental-transformer-list-converter/iss
+    ues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

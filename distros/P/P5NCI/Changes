@@ -1,0 +1,29 @@
+Revision history for Perl extension P5NCI.
+
+0.31 Wed Dec 12 01:49:05 UTC 2007
+    - backed down from four arguments to three, to save compilation time
+    - improved packaging and distribution (RT #27963, Andreas Koenig)
+    - changed float tests to check against deltas, not absolute floats
+
+0.30 Fri Jun 30 21:37:32 UTC 2006
+    - rewrote thunk parameter generator with Norman Nunley (now more complete)
+    - added P5NCI::Declare
+
+0.20  Tue May 9 2006
+    - added pointer support
+
+0.10  Sat May  6 22:54:15 UTC 2006
+    - fixed float argument mangling bug on x86 (should fix other platforms)
+    - attempted to reduce memory use with DynaLoader tricks
+    - first version released to the CPAN
+
+0.03  Fri Aug 27 18:05:16 UTC 2004  (chromatic)
+    - improve function reference handling in XS
+
+0.02  Fri Aug 27 00:08:59 UTC 2004  (chromatic)
+    - allow simple string types
+    - avoid unnecessary recompiling
+    - improve generated XS (hopefully better compiler compatibility)
+
+0.01  Fri Aug 20 03:19:37 UTC 2004  (chromatic)
+    - original version released

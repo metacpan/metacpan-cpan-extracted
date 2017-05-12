@@ -1,0 +1,2 @@
+docs: |
+   Unlike PHP, Perl isn't stupid. See L<sprintf|perlfunc/"sprintf">.

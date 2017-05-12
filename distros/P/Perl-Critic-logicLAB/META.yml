@@ -1,0 +1,36 @@
+---
+abstract: 'Perl::Critic policies implemented and used by logicLAB'
+author:
+  - 'Jonas B. Nielsen (jonasbn), <jonasbn@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.142060'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-logicLAB
+provides:
+  Perl::Critic::logicLAB:
+    file: lib/Perl/Critic/logicLAB.pm
+    version: '0.09'
+requires:
+  Perl::Critic::Policy::logicLAB::ModuleBlacklist: '0'
+  Perl::Critic::Policy::logicLAB::ProhibitShellDispatch: '0'
+  Perl::Critic::Policy::logicLAB::ProhibitUseLib: '0'
+  Perl::Critic::Policy::logicLAB::RequirePackageNamePattern: '0'
+  Perl::Critic::Policy::logicLAB::RequireParamsValidate: '0'
+  Perl::Critic::Policy::logicLAB::RequireSheBang: '0'
+  Perl::Critic::Policy::logicLAB::RequireVersionFormat: '0'
+  perl: v5.6.0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Critic-logicLAB
+  homepage: http://logiclab.jira.com/wiki/display/PCLL/Home
+  license: http://opensource.org/licenses/artistic-license.php
+  projectChangelog: http://logiclab.jira.com/browse/PCLL#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel
+  projectSite: http://logicLAB.jira.com/browse/PCLL
+  projectWiki: http://logiclab.jira.com/wiki/display/PCLL/Home
+  repository: https://github.com/jonasbn/pcll
+version: '0.09'

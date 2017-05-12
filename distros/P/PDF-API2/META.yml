@@ -1,0 +1,22 @@
+---
+abstract: 'Facilitates the creation and modification of PDF files'
+author:
+  - 'Steve Simms <steve@deefs.net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDF-API2
+requires:
+  Compress::Zlib: '1.0'
+  Font::TTF: '0'
+  perl: v5.8.5
+resources:
+  repository: git://github.com/ssimms/pdfapi2.git
+version: '2.031'
+x_serialization_backend: 'YAML::Tiny version 1.69'

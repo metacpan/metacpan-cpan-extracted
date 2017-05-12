@@ -1,0 +1,21 @@
+## name ProhibitSingleArgArraySlice
+## failures 3
+## cut
+
+@arr[3];
+$thing = @arr[3];
+@things = @arr[3];
+
+## name ProhibitSingleArgArraySlice
+## failures 0
+## cut
+
+my @values = @stuff[@more_stuff]
+my @values = @stuff[keys %hash]
+if (@Things) {...}
+@arr[ 3, 2 ];
+@arr[ some_func() ];
+$arr[3]
+@{ $arr[3] }
+my ($rd, $action, $tmpl) = @opts{qw(rd action tmpl)};
+

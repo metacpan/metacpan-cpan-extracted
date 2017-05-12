@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+libgnome_serverdir=$(prefix)/lib/NetworkManager
+
+Name: NetworkManager
+Description: System for maintaining active network connection
+Requires:
+Version: 0.8.1
+Cflags: -I${includedir}/NetworkManager

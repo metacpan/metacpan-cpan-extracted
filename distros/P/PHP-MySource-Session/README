@@ -1,0 +1,75 @@
+NAME
+    PHP::MySource::Session - read / write MySource PHP session files
+
+SYNOPSIS
+    use PHP::MySource::Session;
+
+    my $session = PHP::MySource::Session->new
+                (      mysource_root=>"/mysource/root",
+                       session_id=>"01234567890abcdef01234567890abcd"
+                );
+
+    # see if this user is logged in
+    my $foo = $session->is_logged_in();
+
+    my $foo = $session->get_registered_name();
+
+    my $foo = $session->get_editor_pages();
+
+    my $foo = $session->get_print_errors();
+
+    my $foo = $session->get_result_message();
+
+    my $foo = $session->get_user();
+
+    my $foo = $session->get_external_vars();
+
+    my $foo = $session->get_error_call();
+
+    my $foo = $session->get_login_attempts();
+
+    my $foo = $session->get_access_groups();
+
+    my $foo = $session->get_error_msg();
+
+    my $foo = $session->get_login_key();
+
+    my $foo = $session->get_last_access();
+
+    # Just dump out all of the Session variables
+    print $session->dump();
+
+DESCRIPTION
+    PHP::MySource::Session provides a way to read variables from PHP4
+    session files created by version 2.8.2 of the MySource content
+    management system.
+
+    MySource is available at http://mysource.squiz.net. The author
+    of this module has no affiliation with MySource other than being
+    a happy customer.
+
+OPTIONS
+    MySource saves PHP4 session files to the "cache" directory under
+    the MySource root directory by default. If the cache directory
+    is located somewhere else or named differently, you can pass 
+    mysource_cache to the constructor method.
+
+NOTES
+    *   This is very basic and is based on gross assumptions of how
+        MySource works. As I have time, I will hopefully be able to
+        refine these assumptions.
+
+TODO
+    *   Allow "set" methods
+    *   Create methods that do more than just retrieve and save
+        variables (i.e. is_logged_in, get_acess_groups)
+
+AUTHOR
+    Dave Homsher, II <dave@homsher.com>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the PHP::Session manpage
+

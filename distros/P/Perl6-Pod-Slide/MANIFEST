@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Perl6/Pod/Slide.pm
+Makefile.PL
+MANIFEST
+README
+scripts/pod6slide
+t/01_Blocks.t
+t/lib/T/Slide.pm
+t/lib/TBase.pm
+META.yml
+META.json

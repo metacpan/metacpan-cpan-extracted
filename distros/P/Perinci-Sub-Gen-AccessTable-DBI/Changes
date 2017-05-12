@@ -1,0 +1,121 @@
+Revision history for Perinci-Sub-Gen-AccessTable-DBI
+
+0.17    2016-02-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update prereq minimum version Perinci::Sub::Gen::AccessTable to
+	  0.55 (incompatible with previous version).
+
+
+0.16    2016-02-23 (PERLANCAR)
+
+	- Adjust to Perinci::Sub::Gen::AccessTable 0.55 [RT#112293].
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.15    2015-09-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.14    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.13    2015-07-15 (PERLANCAR)
+
+	- Adjust to Perinci::Sub::Gen::AccessTable 0.46+ (q renamed to
+	  query).
+
+	- Add x.dynamic_generator_modules attribute to function metadata.
+
+
+0.12    2015-02-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use Data::Sah::Normalize instead of Data::Sah when just for
+	  normalizing schemas.
+
+
+0.11     2014-05-27 (SHARYANTO)
+
+         - No functional changes.
+
+         - Update prereq version to avoid CT failure reports.
+
+
+0.10     2014-05-26 (SHARYANTO)
+
+         - No functional changes.
+
+         - App 'use experimental smartmatch' for perl 5.18+.
+
+
+0.09     2013-12-13 (SHARYANTO)
+
+         - No functional changes. Use Locale::TextDomain::UTF8.
+
+
+0.08     2013-12-12 (SHARYANTO)
+
+         - No functional changes. Switch from Locale::Maketext to
+           Locale::TextDomain.
+
+
+0.07     2013-07-19 (SHARYANTO)
+
+         - No functional changes. Fix test result [CT].
+
+
+0.06     2012-11-02 (SHARYANTO)
+
+         - No functional changes.
+
+         [INCOMPATIBLE CHANGES]
+
+         - Adjust to Perinci-Sub-Gen-AccessTable 0.17.
+
+         - No longer use Perinci::Exporter.
+
+
+0.05     2012-08-07 (SHARYANTO)
+
+         - No functional changes. Use Perinci::Exporter.
+
+
+0.04     2012-08-07 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Use 'goto &sub' to avoid adding to call stack (breaks detecting
+           caller package).
+
+         - Fix creating temp files in tests.
+
+
+0.03     2012-08-07 (SHARYANTO)
+
+         - No functional changes. Adjust test to not open tempfile to see if
+           this will alleviate 'db is locked' SQLite error CT reports (mostly on
+           OpenBSD/FreeBSD).
+
+
+0.02     2012-07-11 (SHARYANTO)
+
+         - No functional changes. Rebuild to update POD to
+           Perinci::Sub::Gen::AccessTable 0.14.
+
+
+0.01     2012-07-05 (SHARYANTO)
+
+         - First release.

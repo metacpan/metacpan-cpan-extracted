@@ -1,0 +1,8 @@
+0.02 2015-10-21T17:00:08+02:00
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Rename test files to my standard.
+ - Update Module::Install to 1.16 version.
+
+0.01 2015-04-05T00:25:48+02:00
+ - First version.

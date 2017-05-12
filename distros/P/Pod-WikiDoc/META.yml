@@ -1,0 +1,67 @@
+---
+abstract: 'Generate Pod from inline wiki style text'
+author:
+  - 'David A Golden <dagolden@cpan.org>'
+build_requires:
+  Carp: '0'
+  Cwd: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Find: '1'
+  File::Spec: '3'
+  File::Temp: '0'
+  IO::String: '1.06'
+  IPC::Run3: '0.033'
+  Probe::Perl: '0.01'
+  Test::Builder: '0'
+  Test::More: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-WikiDoc
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Pod::WikiDoc:
+    file: lib/Pod/WikiDoc.pm
+    version: '0.21'
+requires:
+  Carp: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Path: '0'
+  File::pushd: '0'
+  Getopt::Lucid: '0.14'
+  IO::File: '0'
+  IO::String: '1.06'
+  Parse::RecDescent: '1.967006'
+  Pod::Usage: '1'
+  Scalar::Util: '1.02'
+  Text::Balanced: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/pod-wikidoc/issues
+  homepage: https://github.com/dagolden/pod-wikidoc
+  repository: https://github.com/dagolden/pod-wikidoc.git
+version: '0.21'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'James E Keenan <jkeenan@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

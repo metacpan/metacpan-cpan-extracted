@@ -1,0 +1,7 @@
+Revision history for Proc-PidChange
+ 
+0.002     2012-08-20T13:57:12Z
+        * Mention that POSIX::AtFork should be added to your prerequisites
+
+0.001     2012-08-20T12:06:17Z
+        * Initial release

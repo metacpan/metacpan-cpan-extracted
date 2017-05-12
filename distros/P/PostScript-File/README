@@ -1,0 +1,64 @@
+PostScript::File version 2.23, released October 10, 2015
+
+This module produces the outline for an Adobe PostScript file. It provides
+convenient routines for writing PostScript directly, including reporting
+PostScript errors and debugging support.  Although it may be used independently,
+the functions provided are also suitable for use in other modules.  See one of
+these modules for a top-level object.
+
+    PostScript::Calendar
+    PostScript::Report
+    PostScript::Graph::XY
+    PostScript::Graph::Bar
+    Finance::Shares::Chart
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries, although they are all
+part of the standard Perl distribution:
+
+  Package        Minimum Version
+  -------------- ---------------
+  perl            5.8.0
+  Carp            
+  Encode          2.21
+  Exporter        5.57
+  File::Spec      
+  Scalar::Util    
+  Sys::Hostname
+
+
+
+CHANGES
+    Here's what's new in version 2.23 of PostScript::File:
+    (See the file "Changes" for the full revision history.)
+
+	- No functional changes
+	- Fix typos in documentation (RT#107673)
+	  (patch from Jonathan Yu via Florian Schlichting of Debian)
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2002, 2003 Christopher P Willmot.  All rights reserved.
+
+Copyright 2009 Christopher J. Madsen. All rights reserved.
+
+This work is published under the same licensing terms as Perl itself, which may
+be found at http://www.perl.org.  The existance of this work does not imply that
+it is fit for any purpose implied by the code or accompanying documentation.
+There is no warranty whatsoever.  Use at your own risk.

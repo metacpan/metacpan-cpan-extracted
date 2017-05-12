@@ -1,0 +1,13 @@
+=for filter=kate:Fortran 10 PRINT *, 'Hello, world!'
+__RESULT__
++kate
+<html><body bgcolor="#ffffff">
+<pre><span class="k-decval">10</span> <span class="k-function">PRINT</span> <span class="k-keyword">*</span>, <span class="k-string">'Hello, world!'</span>
+</pre>
+</body></html>
+__RESULT__
+-kate
+<html><body bgcolor="#ffffff">
+<pre>10 PRINT *, 'Hello, world!'
+</pre>
+</body></html>

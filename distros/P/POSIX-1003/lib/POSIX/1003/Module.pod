@@ -1,0 +1,84 @@
+=encoding utf8
+
+=head1 NAME
+
+POSIX::1003::Module - Base of POSIX::1003 components
+
+=head1 INHERITANCE
+
+ POSIX::1003::Module is extended by
+   POSIX::1003::Confstr
+   POSIX::1003::Errno
+   POSIX::1003::Events
+   POSIX::1003::FS
+   POSIX::1003::Fcntl
+   POSIX::1003::FdIO
+   POSIX::1003::Limit
+   POSIX::1003::Locale
+   POSIX::1003::Math
+   POSIX::1003::OS
+   POSIX::1003::Pathconf
+   POSIX::1003::Proc
+   POSIX::1003::Properties
+   POSIX::1003::Signals
+   POSIX::1003::Sysconf
+   POSIX::1003::Termios
+   POSIX::1003::Time
+   POSIX::1003::User
+
+=head1 SYNOPSIS
+
+   # use the specific extensions
+   # and see POSIX::Overview and POSIX::1003
+
+=head1 DESCRIPTION
+
+The POSIX functions and constants are provided via extensions of this
+module.  This module itself only facilitates those implementations.
+
+=head1 METHODS
+
+=over 4
+
+=item POSIX::1003::Module-E<gt>B<exampleValue>(NAME)
+
+Returns an example value for the NAMEd variable. Often, this is a
+compile-time or runtime constant. For some extensions, like C<::Pathconf>,
+that may not be the case.
+
+=item $obj-E<gt>B<import>()
+
+All modules provide a C<:constants> and a C<:functions> tag, sometimes
+more.  The default is C<:all>, which means: everthing. You may also
+specify C<:none> (of course: nothing).
+
+When the import list is preceeded by C<+1>, the symbols will get published
+into the namespace of your caller namespace, not your own namespace.
+
+  use POSIX::1003::Pathconf;
+  use POSIX::1003::Pathconf ':all';  # same
+  use POSIX::1003 ':pc';             # same, for the lazy
+  use POSIX::1003 ':pathconf';       # same, less lazy
+
+  sub MyModule::import(@)   # your own tricky exporter
+  {   POSIX::1003::Pathconf->import('+1', @_);
+  }
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of POSIX-1003 distribution version 0.98,
+built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights 2011-2013 on the perl code and the related documentation
+ by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

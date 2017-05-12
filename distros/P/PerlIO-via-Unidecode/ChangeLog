@@ -1,0 +1,19 @@
+        (Last-Modified Time-stamp: "2014-07-27 02:40:31 MDT sburke@cpan.org")
+
+REVISION HISTORY FOR PERL MODULE PerlIO::via::Unidecode --
+
+
+2014-07-26  Sean M. Burke  sburke@cpan.org
+	* Release 1.02 -- NO CHANGE TO THE CODE.
+	Just updating the documentation and dist
+	 stuff (Makefile,PL, README, MANIFEST.SKIP, etc.)
+	Updated t/*.t to be more liberal in accepting whatever
+	 Cyrillic-to-ASCII transliteration that Unidecode is
+	 using these days.
+	
+	
+2003-08-26  Sean M. Burke  sburke@cpan.org
+	
+	* Release 1.01 -- First public release.
+
+[END OF CHANGELOG]

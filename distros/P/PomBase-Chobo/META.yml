@@ -1,0 +1,41 @@
+---
+abstract: 'Fast OBO to Chado loading using PostgreSQL COPY'
+author:
+  - 'Kim Rutherford <kim@pombase.org>'
+build_requires:
+  Capture::Tiny: '0'
+  List::Util: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  strict: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PomBase-Chobo
+requires:
+  Carp: '0'
+  Clone: '0'
+  DBI: '0'
+  Data::Compare: '0'
+  FileHandle: '0'
+  Getopt::Long: '0'
+  List::Compare: '0'
+  Mouse: '0'
+  Mouse::Role: '0'
+  Text::CSV: '0'
+  Text::CSV::Encoded: '0'
+  Try::Tiny: '0'
+  lib: '0'
+  perl: '5.020'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pombase/chobo/issues
+  homepage: https://github.com/pombase/chobo
+  repository: https://github.com/pombase/chobo.git
+version: '0.012'
+x_serialization_backend: 'YAML::Tiny version 1.70'

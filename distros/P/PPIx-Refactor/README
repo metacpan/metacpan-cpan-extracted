@@ -1,0 +1,107 @@
+NAME
+
+    PPIx::Refactor - Hooks for refactoring perl via PPI
+
+SYNOPSIS
+
+        use PPIx::Refactor;
+        my $p = PPIx::Refactor->new(file => '/path/to/perl/code/file.pl',
+                                    ppi_find => sub {
+                                        my ($elem, $doc) = @_;
+                                        return 1 if $elem->class eq 'PPI::Statement::Sub',
+                                        return 0;
+                                    }
+                                    [ writer => \&found ]);
+        my $finds = $p->finds; # for examining them interactively
+        $p->rewrite; # rewrites the file in place.  You are using version control yes?
+
+SUMMARY
+
+    This is a really simple module to make rewriting perl code via PPI
+    debugger friendly and easy. See the test in t/refactor.t
+    <https://github.com/singingfish/PPIx-Refactor/blob/master/t/refactor.t>
+    of this distribution for a working example. Pretty much all the real
+    work happens in the coderef you set up in $p->ppi_find and $p->writer.
+
+    For an example of a simple script for checking statements in code for
+    being syntactically identical (i.e. a crude copypasta detector) see 
+    similar_statements.pl  in the examples directory of the distribution.
+
+    NOTE PPI::Cache is used to store a cached representation of the source
+    parse in /tmp/pppix-refactor_cache
+
+ RATIONALE
+
+    Rewriting code via ppi is a fiddly pain. PPIx::Refactor provides a
+    minimal interface so you can concentrate on the fiddlyness and minimise
+    the pain.
+
+ TODO
+
+    Would be nice to specify a rewriter via roles, and it would be nice to
+    have $self in $p->ppi_find. On the other hand rewrite/refactoring code
+    like this can either be simple throwaways, or really really
+    complicated. This code is so far optimised for the throwaway case.
+
+ ATTRIBUTES
+
+  file
+
+    required string that coerces into a Path::Tiny
+
+  doc
+
+    lazily built PPI::Document
+
+  element
+
+    If you're using prior finds (e.g. subroutines you're trying to analyse)
+    you'll want to pass an element into new rather than a doc. Element
+    defaults to the document you passed in.
+
+  ppi_find
+
+    required coderef with which to find the elements of interest
+
+  writer
+
+    optional coderef with which to rewrite the code.
+
+  finds
+
+    lazy built arrayref of all the elements of interest found
+
+METHODS
+
+ $self->rewrite
+
+    Worker sub that rewrites the code. Operates on what it finds in
+    <$self-finds>>
+
+ $self->dump($elem, $whitespace);
+
+    For debugging. Prints a dump of the passed in element. If $whitespace
+    is true it will include whitespace in the dump. Defaults to false.
+
+AUTHOR
+
+    Kieren Diment, <zarquon at cpan.org>
+
+BUGS
+
+    Please report any bugs or feature requests via github:
+    https://github.com/singingfish/PPIx-Refactor/issues.
+
+SUPPORT
+
+    Jump on to #web-simple on irc.perl.org
+
+ACKNOWLEDGEMENTS
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2015 Kieren Diment.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as perl itself.
+

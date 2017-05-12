@@ -1,0 +1,24 @@
+---
+abstract: 'Restart processes when they exceed a size limit'
+author:
+  - 'Mike Schilli <m@perlmeister.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.131560'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Process-MaxSize
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Log::Log4perl: 1
+resources:
+  repository: http://github.com/mschilli/process-maxsize-perl
+version: 0.04

@@ -1,0 +1,24 @@
+[% INCLUDE common/header.tt
+           title = "Saving Preferences"
+%]
+
+[% IF errorUserName %]
+<p>Invalid UserName [% username %]: not saved.</p>
+[% ELSIF NOT userName %]
+<p>UserName removed.</p>
+[% ELSE %]
+<p>UserName [% userName %] saved.</p>
+[% END %]
+
+[% IF passwordRemoved %]
+<p>Password removed.</p>
+[% ELSIF passwordChanged %]
+<p>Password changed.</p>
+[% END %]
+
+<p>Server time: [% serverTime %]<br />
+Local time: [% localTime %]</p>
+
+<p><b>Preferences saved.</b></p>
+
+[% INCLUDE common/footer.tt %]

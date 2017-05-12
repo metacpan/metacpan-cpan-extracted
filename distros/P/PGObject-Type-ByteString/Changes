@@ -1,0 +1,13 @@
+Revision history for PGObject-Type-ByteString
+
+1.1.2   2016-12-04
+        Fix copyright attribution in LICENSE (consistency)
+
+1.1.1   2016-11-21
+        Fix NAME section in the PGObject::Type::ByteString module
+
+1.1.0   2016-11-20
+        Switch from hashref to scalarref, while we can
+
+1.0.0   2016-11-19
+        First version.

@@ -1,0 +1,51 @@
+Pod-PluginCatalog version 0.02, released January 3, 2015
+
+
+This module aids in formatting a tag-based catalog of plugins.  It
+was written to create the catalog at http://dzil.org/plugins/ but
+should also be useful for similar catalogs.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+
+DEPENDENCIES
+
+  Package                              Minimum Version
+  ------------------------------------ ---------------
+  perl                                  5.10.0
+  Encode                                
+  Moose                                 
+  Pod::Elemental                        
+  Pod::Elemental::Selectors             
+  Pod::Elemental::Transformer::Nester   
+  Text::Template                        
+  autodie                               
+  namespace::autoclean
+
+
+
+CHANGES
+    Here's what's new in version 0.02 of Pod-PluginCatalog:
+    (See the file "Changes" for the full revision history.)
+
+	- no functional changes
+	- release tests moved to xt/
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

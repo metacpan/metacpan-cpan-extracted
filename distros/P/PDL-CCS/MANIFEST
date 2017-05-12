@@ -1,0 +1,61 @@
+ChangeLog
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+Config.PL
+pdlmaker.plm
+README.txt
+README.rpod
+CCS.pm
+CCS/Makefile.PL
+CCS/Functions.pm
+CCS/Compat.pm
+CCS/Config.pm
+CCS/IO/Makefile.PL
+CCS/IO/Common.pm
+CCS/IO/FastRaw.pm
+CCS/IO/FITS.pm
+CCS/IO/LDAC.pm
+CCS/IO/MatrixMarket.pm
+CCS/IO/PETSc.pm
+CCS/Nd.pm
+CCS/Version.pm
+CCS/Ops/Makefile.PL
+CCS/Ops/ccsops.pd		# CCS/Ops/Ops.pm
+CCS/Ops/Ops.pm
+CCS/Ufunc/Makefile.PL
+CCS/Ufunc/ccsufunc.pd		# CCS/Ufunc/Ufunc.pm
+CCS/Ufunc/Ufunc.pm
+CCS/Utils/Makefile.PL
+CCS/Utils/ccsutils.pd		# CCS/Utils/Utils.pm
+CCS/Utils/Utils.pm
+CCS/MatrixOps/Makefile.PL
+CCS/MatrixOps/ccsmatops.pd	# CCS/MatrixOps/MatrixOps.pm
+CCS/MatrixOps/MatrixOps.pm
+t/common.plt
+t/00_basic.t
+t/01_nnz.t
+t/02_encode.t
+t/03_ops.t
+CCS/t/00_basic.t
+CCS/t/01_encode.t
+CCS/t/02_indexing.t
+CCS/t/03_ufuncs.t
+CCS/t/04_unops.t
+CCS/t/05_binops.t
+CCS/t/06_matops.t
+CCS/t/common.plt
+CCS/IO/t/00_basic.t
+CCS/IO/t/01_io.t
+CCS/Utils/t/00_basic.t
+CCS/Utils/t/01_nnz.t
+CCS/Utils/t/02_encode.t
+CCS/Utils/t/03_decode.t
+CCS/Utils/t/common.plt
+CCS/Ufunc/t/00_basic.t
+CCS/Ufunc/t/01_ufunc.t
+CCS/Ufunc/t/common.plt
+CCS/Ops/t/00_basic.t
+CCS/MatrixOps/t/00_basic.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

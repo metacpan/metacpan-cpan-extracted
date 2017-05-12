@@ -1,0 +1,17 @@
+=for filter=wikimedia:extended=1:implicit_links=1
+A NormalLink
+[[let the Sun shine|AnExtendedLink]]
+
+__RESULT__
++wikimedia
+<html><body bgcolor="#ffffff">
+<p>A <a href='NormalLink'>NormalLink</a>
+<a href='let%20the%20Sun%20shine'>AnExtendedLink</a></p>
+
+</body></html>
+__RESULT__
+-wikimedia
+<html><body bgcolor="#ffffff">
+<pre>A NormalLink
+[[let the Sun shine|AnExtendedLink]]</pre>
+</body></html>

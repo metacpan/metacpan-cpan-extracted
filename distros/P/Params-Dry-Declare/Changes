@@ -1,0 +1,18 @@
+Revision history for Params-Dry-Declare
+
+0.9907 2014-03-18
+ - multi types tests are skipped if Params::Dry < 1.20
+0.9906 2014-03-18
+ - adding support for multi types provided in Params::Dry
+0.9905 2014-03-07
+ - kwalitee: fix version number in pod
+0.9904 2014-03-07
+ - kwalitee: LICENSE file META.yml
+0.9903 2013-07-30
+ - RT#87453 fix Changes format
+0.9902 2013-07-30 
+ - Adding Params::Dry use in module,
+0.9901 2013-07-26 
+ - Fix example (Param -> Param::Dry)
+0.99 2013-07-25
+ - First version, released on an unsuspecting world.

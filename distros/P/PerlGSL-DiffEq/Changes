@@ -1,0 +1,40 @@
+Revision history for Perl extension Math::GSLx::ODEIV2.
+
+0.08 
+	- Rename to PerlGSL::DiffEq (part of PerlGSL "standard" library)
+	- Move to Module::Build
+
+---- FORK FROM MATH::GSLx::ODEIV2 ----
+
+0.07 Mon Oct 10
+	- Added additional tests (leto++)
+		- still need Jacobian tests
+	- Fixed critical bug when t0 != 0
+
+0.06  Wed Oct 5
+	- Added h_max parameter and renamed h_step to h_init
+	- Added Jacobian handling and with it the remaining step types
+	- Added error handling to ode_solver when equation returns a non-number
+
+0.05  Wed Aug 3
+	- C level memory allocation now emits error if not properly allocated
+	- Bugfix related to user configuration of epsabs and epsrel
+
+0.04  Sun Jul 17
+	- fixed problematic memory management (Sisyphus++)
+	- fixed (hopefully) reference count problem
+	- separated some xs functionality (data storage) into distinct functions
+		- allows modular replacement of data storage types
+		- this is first step towards pdl backend
+
+0.03  Sat Jul 16
+	- fixed some compile errors (Sisyphus++)
+	- added the initial conditions to the return from ode_solver
+
+0.02  Fri Jul 15 
+	- added error, h_step and step type options to ode_solver
+
+0.01  Sun Jul 10 11:39:12 2011
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.0 -APn Math::GSLx::ODEIV2
+

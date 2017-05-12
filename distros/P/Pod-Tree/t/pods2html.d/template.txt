@@ -1,0 +1,13 @@
+<html>
+ <head>
+  <base href="{$base}">
+  <link href="{$css}" rel="stylesheet" type="text/css">
+  <title>{$title}</title>
+ </head>
+ <body bgcolor="{$bgcolor}" text="{$text}">
+<h1>TEMPLATE</h1>
+{$color} is the color of my true love's {$part}
+  {$toc}
+  {$body}
+ </body>
+</html>

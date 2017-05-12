@@ -1,0 +1,29 @@
+## name ImplicitConditional
+## failures 1
+## cut
+
+sub foo { if ($foo) { return 1 } }
+
+## name ImplicitConditionalNoReturn
+## failures 0
+## cut
+
+sub foo { return if bar(); if ($foo) { bar() } }
+
+## name NotLastStatement
+## failures 0
+## cut
+
+sub foo { if ($foo) { return 1 } return 0 }
+
+## name ConditionalWithElsif
+## failures 1
+## cut
+
+sub foo { if ($foo) { return 1 } elsif ($bar) { return 0 } }
+
+## name ConditionalWithElse
+## failures 0
+## cut
+
+sub foo { if ($foo) { return 1 } else { return 0 } }

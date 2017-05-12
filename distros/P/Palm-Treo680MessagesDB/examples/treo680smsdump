@@ -1,0 +1,172 @@
+#!perl
+# $Id: treo680smsdump,v 1.10 2008/07/18 13:37:16 drhyde Exp $
+
+use strict;
+use warnings;
+
+use vars qw($VERSION);
+
+use Palm::PDB;
+
+$VERSION = '1.0';
+my $file = pop();
+my $filtersub = sub { 1 };
+my $debug = 0;
+my $blob  = 0;
+my @blobs = ();
+
+$/ = undef;
+
+while(@ARGV) {
+    my $switch = shift;
+    my $newfiltersub = sub { 1 };
+    if($switch eq '--blob') {
+        push @ARGV, $file;
+        $blob = 1;
+	while(@ARGV && -f $ARGV[0]) {
+	    push @blobs, shift();
+	}
+    } elsif($switch eq '--offset') {
+	my %offsetlist = ();
+	my $thisarg;
+	while(@ARGV && $ARGV[0] =~ /^\d+$/) {
+	    $offsetlist{shift()} = 1;
+	}
+	$newfiltersub = sub { exists($offsetlist{$_->{offset}}) };
+    } elsif($switch eq '--inbound') {
+	$newfiltersub = sub { $_->{direction} eq 'inbound' };
+    } elsif($switch eq '--outbound') {
+	$newfiltersub = sub { $_->{direction} eq 'outbound' };
+    } elsif($switch eq '--date') {
+        my $date = shift;
+	$newfiltersub = sub { $_->{date} =~ /^$date/ };
+    } elsif($switch eq '--binary') {
+        $debug = 1;
+    } elsif($switch eq '--type') {
+	my %typelist = ();
+	my $thisarg;
+	while(@ARGV && $ARGV[0] =~ /^0x[0-9a-f]{4}$/i) {
+	    $typelist{uc(shift())} = 1;
+	}
+	$newfiltersub = sub { exists($typelist{uc($_->{type})}) };
+    } else {
+        die("Bad switch $switch\n");
+    }
+    my $oldfiltersub = $filtersub;
+    $filtersub = sub { $newfiltersub->($_) && $oldfiltersub->($_) };
+}
+
+eval "use Palm::Treo680MessagesDB debug => $debug";
+my $pdb;
+if($blob) {
+    @blobs = map {
+        Palm::Treo680MessagesDB::_parseblob(do {
+    	open(my $fh, $_) || die("Can't open $_\n");
+    	<$fh>;
+        })
+    } @blobs;
+} else {
+    $pdb = Palm::PDB->new();
+    $pdb->Load($file);
+}
+
+foreach my $record (
+    grep { $filtersub->($_) }
+    ($blob ? @blobs : @{$pdb->{records}})
+) {
+    printf(
+        ($record->{direction} eq 'inbound' ? 'From:' : 'To:')."\t%s (%s)\n".
+	"Offset:\t%s\tType:\t%s\n".
+        "When:\t%s %s\t (epoch: %s)\n".
+        "Text:\t%s\n\n",
+        map { defined($record->{$_}) ? $record->{$_} : '[no data]' } qw(name number offset type date time epoch text)
+    );
+    if(exists($record->{debug})) { print $record->{debug}."\n\n"; }
+}
+
+=head1 NAME
+
+treo680smsdump - a script to dump a Treo 680 SMS messages database
+in a human-readable form
+
+=head1 SYNOPSIS
+
+    treo680smsdump [options] path/to/messages-database.pdb
+
+    treo680smsdump --blob list_of_files [other options]
+
+=head1 FILTERS
+
+You can filter results with the following options.
+
+=head2 --inbound
+
+Only return inbound SMSes
+
+=head2 --outbound
+
+Only return outbound SMSes
+
+=head2 --date
+
+    --date 2008-03-21
+    --date 2008-03
+    --date 2008
+
+Only return SMSes from the specified date (or month, or year)
+
+=head1 OTHER OPTIONS
+
+The following options may be useful for debugging and for investigating
+unknown record types:
+
+=head2 --blob file1 [file2 ...]
+
+Read individual records from the named file(s) instead of reading a database.
+'Unknown' records are not filtered out.  Some fields, such as offset,
+that can only be divined from a proper database are left blank.
+
+=head2 --binary
+
+Include a hexadecimal dump of each record.  'Unknown' records are not filtered
+out.
+
+=head2 --offset
+
+    --offset 123 [456 789 ...]
+
+Only return the record(s) at the specified offset(s).
+
+=head2 --type
+
+    --type 0x0002 [0x400C ...]
+
+Only return the record(s) with the specified type(s).  These must be given
+in hexadecimal with four digits.
+
+=head1 LIMITATIONS, BUGS and FEEDBACK
+
+This is a thin wrapper around Palm::Treo680MessagesDB and so suffers
+from all its limitations and perhaps some exciting ones of its own.
+Please see L<Palm::Treo680MessagesDB> for known issues and how to
+report bugs.
+
+=head1 SEE ALSO
+
+The 'smsdump' script distributed with Palm::SMS.
+
+=head1 AUTHOR, COPYRIGHT and LICENCE
+
+Copyright 2008 David Cantrell E<lt>david@cantrell.org.ukE<gt>
+
+This software is free-as-in-speech software, and may be used,
+distributed, and modified under the terms of either the GNU
+General Public Licence version 2 or the Artistic Licence. It's
+up to you which one you use. The full text of the licences can
+be found in the files GPL2.txt and ARTISTIC.txt, respectively.
+
+=head1 CONSPIRACY
+
+This is also free-as-in-mason software.
+
+=cut

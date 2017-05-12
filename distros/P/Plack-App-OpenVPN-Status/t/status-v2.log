@@ -1,0 +1,8 @@
+TITLE,OpenVPN 2.2.2 i386-portbld-freebsd8.2 [SSL] [LZO2] [eurephia] built on Jun 26 2012
+TIME,Wed Dec  5 21:15:35 2012,1354727735
+HEADER,CLIENT_LIST,Common Name,Real Address,Virtual Address,Bytes Received,Bytes Sent,Connected Since,Connected Since (time_t)
+CLIENT_LIST,cadvecisvo,1.2.3.4:4449,10.6.6.10,758510,7322678,Wed Dec  5 21:09:57 2012,1354727397
+HEADER,ROUTING_TABLE,Virtual Address,Common Name,Real Address,Last Ref,Last Ref (time_t)
+ROUTING_TABLE,00:ff:de:ad:be:ef,cadvecisvo,1.2.3.4:4449,Wed Dec  5 21:15:31 2012,1354727731
+GLOBAL_STATS,Max bcast/mcast queue length,0
+END

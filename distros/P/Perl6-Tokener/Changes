@@ -1,0 +1,6 @@
+Revision history for Perl extension Perl6::Tokener.
+
+0.01  Sun Jan 27 19:18:26 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Perl6::Tokener
+

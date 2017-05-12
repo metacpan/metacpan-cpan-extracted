@@ -1,0 +1,2631 @@
+2003-09-13 00:39  germaingarand
+
+	* PerlQt/handlers.cpp:
+
+	- cache copy constructor && destructor lookups
+	- avoid looking twice in type hash for most common types
+	
+2003-09-13 00:37  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	- fix line numbers && current file on error (no method to call...)
+	
+2003-09-12 15:43  germaingarand
+
+	* PerlQt/handlers.cpp:
+
+	- reworking the tied marshallers: let's allow readonly variables.
+	
+2003-09-12 15:24  germaingarand
+
+	* PerlQt/t/b_nogui.t:
+
+	- adding test for tied marshaller/TextStream
+	
+2003-09-12 13:13  germaingarand
+
+	* PerlQt/Qt.xs:
+
+	(see previous commit on handlers.cpp)
+	
+2003-09-12 13:12  germaingarand
+
+	* PerlQt/handlers.cpp:
+
+	- fix garbage collection: we need to register external objects as well, so that
+	  widgets using e.g: the $mainWindow->menuBar() pointer as parent don't get GCed.
+	- do not look in real stash if call is for a Qt::enum
+	  (emulation of the previous Legacy autoload behaviour)
+	
+2003-09-12 13:02  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	- strict matching is too strict. We'll do that only for operators
+	
+2003-09-10 18:16  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	- We don't want to check the type of every argument, but let's check at least Qt Objects.
+	  Wrong casts are deadly and hard to debug.
+	- got rid of the legacy autoload. Fully qualified calls are much faster now.
+	
+2003-09-10 13:17  germaingarand
+
+	* puic/uic.cpp:
+
+	- 3.1 Actions were housed
+	
+2003-09-09 10:45  germaingarand
+
+	* ChangeLog.CVS, ChangeLog.CVS.delta, Makefile.am, cvs2cl.pl:
+
+	- updated ChangeLogs
+	
+2003-09-09 09:21  germaingarand
+
+	* PerlQt/: Qt.xs, handlers.cpp:
+
+	fix compile for 5.6.1
+	
+2003-09-09 07:32  germaingarand
+
+	* perleditor/: perlcompletion.cpp, perlcompletion.h:
+
+	- perlcompletion isn't at top speed until a first call has been made.
+	  Put a singleShot timer to warm it up before the user come
+	
+2003-09-09 06:25  germaingarand
+
+	* PerlQt/Makefile.PL.in:
+
+	- add qt_libraries to RPATH too, otherwise Qt.so can pull a qt-mt library different from the one Smoke
+	  would have picked up.
+	
+2003-09-08 18:13  germaingarand
+
+	* PerlQt/t/ca_i18n.t:
+
+	- one more test, monitoring "use bytes" pragma
+	
+2003-09-08 16:24  germaingarand
+
+	* PerlQt/: MANIFEST, Makefile.PL.in, Qt.pod:
+
+	- cleaning Makefile.PL.in
+	- install documentation in {datadir}/PerlQt-3
+	- install a short Qt.pod notice pointing to the real doc, for those
+	  who are going to try "perldoc Qt" :-}
+	
+2003-09-08 15:38  germaingarand
+
+	* doc/: en/PerlQt.pod, en/index.html, fr/PerlQt.pod, fr/index.html:
+
+	- updated documentation (/en and /fr) to reflect 3.008 changes
+	
+2003-09-08 02:23  germaingarand
+
+	* perleditor/README.perleditor.quickstart:
+
+	- a bit of documentation never hurts...
+	
+2003-09-08 01:47  germaingarand
+
+	* perleditor/: objectbrowser.cpp, perlaction.cpp:
+
+	- fixing proper detection of PerlEditor modified state when Running Project
+	
+2003-09-07 15:32  germaingarand
+
+	* perleditor/: listeditor.h, mainfilesettings.h, preferences.h,
+	projectsettings.h, slotfuncdia.h:
+
+	removing auto-generated headers
+	
+2003-09-07 15:26  germaingarand
+
+	* PerlQt/lib/Qt/debug.pm:
+
+	- warn and display list of available debugging channels when asked for an unknown one
+	
+2003-09-07 15:18  germaingarand
+
+	* configure.in, PerlQt/Qt.pm:
+
+	- bumping version to 3.008
+	
+2003-09-07 14:35  germaingarand
+
+	* PerlQt/: Qt.xs, handlers.cpp:
+
+	- major bug fix: "use bytes" and "use locale" pragmata didn't apply to current scope.
+	  They are held in the op_private of the context stack after compiling, no more in PL_hints.
+	  Thanks to Ashley for pointing where to find them :)
+	  Additionaly, there was a loss of context in AUTOLOAD due to the many hops.
+	  So we need to fetch the old context in there.
+	
+2003-09-06 21:05  germaingarand
+
+	* puic/: Makefile.am, puic.1:
+
+	adding Lutz Badenheuer <Lutz.Badenheuer@t-online.de>'s man page
+	
+2003-09-06 19:03  germaingarand
+
+	* perleditor/yyindent.cpp:
+
+	- fix comment detection.
+	
+2003-09-06 16:51  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	- be more strict when matching ambiguous methods
+	- fixed a bug regarding the priority of some types
+	
+2003-09-05 03:30  germaingarand
+
+	* PerlQt/: Qt.pm, Qt.xs, handlers.cpp:
+
+	- implemented QByteArray Marshaller (from/to Perl string, tied if needed)
+	  Still needs some thought /wrt to Utf8 handling (think qCompress/qUncompress)
+	
+	  With QDataStream static operators and this, we get a nice object serializer :)
+	
+	  use Qt::constants;
+	  $bytearray = "";
+	  $a = Qt::DataStream( $bytearray, IO_WriteOnly );
+	  # now magically serialize some objects in $bytearray
+	  $a << $qdatetime << $qfont << $qpixmap;
+	
+2003-09-01 21:09  germaingarand
+
+	* PerlQt/: Qt.xs, handlers.cpp:
+
+	- real non-const QString&/* marshaller implemented via tied scalars
+	  e.g:
+	  use Qt;
+	  use Qt::constants;
+	
+	  $str = "Foooooooooooooooo";
+	
+	  $ts = Qt::TextStream( $str, IO_WriteOnly );
+	  $ts << "pi = " << 3.14;
+	
+	  # $str is now "pi = 3.14oooooooo"
+	
+	  The link is maintained until the scalar is destroyed, or until it is untied.
+	
+2003-08-31 16:35  germaingarand
+
+	* PerlQt/lib/Qt/GlobalSpace.pm, PerlQt/Qt.pm, PerlQt/t/b_nogui.t,
+	kalyptus/ChangeLog, kalyptus/Iter.pm, kalyptus/README,
+	kalyptus/kalyptus, kalyptus/kalyptusCxxToSmoke.pm,
+	kalyptus/kdocAstUtil.pm:
+
+	updating kalyptus/smoke  (GlobSpace operator names no longer munged)
+	
+2003-08-31 14:38  germaingarand
+
+	* PerlQt/: Qt.pm, lib/Qt/slots.pm:
+
+	- more permissive syntax for new sig/slot declarations (white spaces, quotes)
+	- implement consistency check of old vs. new style slot declarations
+	  allows one to say
+	     use Qt::slots "foo" => ["int"];
+	  then
+	     sub foo : SLOT( int ) {} # OK. Same decl. Noop.
+	     sub foo : SLOT( QString ) {} # triggers a warning:
+	                                  # Slot declaration:
+					  # 	foo(QString)
+					  # will override previous declaration:
+					  #	foo(int)
+	
+2003-08-30 23:01  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	Doing it the Right Way.
+	- make $SIG{__DIE__} local inside eval'ed ops
+	- added missing operators (unary minus, binary mul)
+	- GlobalSpace operators with assignment were returning wrong values
+	
+2003-08-28 02:10  germaingarand
+
+	* smoke/qt/generate.pl.in, smoke/qt/qt_smoke.h, kalyptus/kalyptus,
+	kalyptus/kalyptusCxxToSmoke.pm, kalyptus/kalyptusDataDict.pm,
+	kalyptus/kdocAstUtil.pm:
+
+	- GlobalSpace support + updates
+	
+2003-08-28 02:02  germaingarand
+
+	* smoke/qt/header_list:
+
+	-removing conflicting/useless headers
+	
+2003-08-28 01:28  germaingarand
+
+	* PerlQt/: Qt.pm, lib/Qt/GlobalSpace.pm, lib/Qt/constants.pm:
+
+	- adding support for the new Qt::GlobalSpace pseudo-class holding all global Qt functions.
+	  Requires a recompilation of Smoke.
+	    use Qt::GlobalSpace; # exports all symbols to the caller's namespace (not recommended)
+	    use Qt::GlobalSpace qw( bitBlt qCompress qSysInfo ); # export listed symbols only
+	- when an operator call fails, forward the call to Qt::GlobalSpace which has a lot of static operators:
+	      $aPoint = Qt::Point( 20, 20 );
+	      $aPoint += Qt::Point( 10, 10); # this one calls Qt::Point->operator+()
+	      $o = Qt::Point(10,10) + Qt::Point(30,30); # this is forwarded to Qt::GlobalSpace::+( QPoint, QPoint )
+	- made "use Qt::constant" export all symbols by default (IO_ReadOnly, ...).
+	
+2003-08-20 10:12  germaingarand
+
+	* PerlQt/handlers.cpp:
+
+	- construct_copy for const ref: update the macros, and oh, don't forget to
+	  mark the resulting object as allocated. Caveat leakem.
+	
+2003-08-20 09:25  germaingarand
+
+	* PerlQt/handlers.cpp:
+
+	- fixed a severe bug in construct_copy
+	- when marshalling const QFoo&, construct a copy...
+	  this ought to fix a lot of subtle bugs (mostly QShared related).
+	
+2003-08-14 20:52  germaingarand
+
+	* puic/: form.cpp, uic.cpp, uic.h:
+
+	- various fixes for when compiling with Qt < 3.1
+	
+2003-08-14 18:44  germaingarand
+
+	* PerlQt/Makefile.PL.in, admin/acinclude.m4.in,
+	smoke/qt/qtguess.pl.in:
+
+	- nice patch by Marek Rouchal<marek.rouchal@infineon.com>. Improves Solaris
+	  compatibility and static builds. Many thanks to him!
+	- fix the sometimes incorrect rpath for Smoke (kde_libraries=>libdir)
+	
+2003-08-14 18:35  germaingarand
+
+	* puic/: form.cpp, main.cpp, object.cpp, uic.cpp, uic.h,
+	widgetdatabase.cpp:
+
+	- end of uic 3.2 merging at last. Pheeeew.
+	
+2003-08-14 18:22  germaingarand
+
+	* perleditor/perlaction.cpp:
+
+	- prevent random crash when destroying qprocesses too early
+	
+2003-07-18 03:14  germaingarand
+
+	* puic/object.cpp:
+
+	- compile fix by David Hugh-Jones <hughjonesd@yahoo.co.uk>
+	
+2003-06-14 04:52  germaingarand
+
+	* smoke/qt/Makefile.am, smoke/qt/header_list,
+	kalyptus/kalyptusCxxToSmoke.pm:
+
+	- fix Smoke generation for Qt-3.2b1
+	
+2003-06-14 04:47  germaingarand
+
+	* PerlQt/: Qt.pm, Qt.xs, handlers.cpp, perlqt.h:
+
+	- speed optimizations again. cachegrind rocks
+	
+2003-06-09 17:17  germaingarand
+
+	* PerlQt/lib/Qt/attributes.pm:
+
+	- do not redefine attributes if they have already been defined in base class.
+	
+2003-06-09 17:15  germaingarand
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	- Some polishing on Q*Items garbage collection. setAllocated() is now correct.
+	- Speed, speed, speed. Moved object destruction routine to XS. Object creation/deletion
+	  is now 50% faster than in 5.006
+	
+2003-06-08 02:01  germaingarand
+
+	* puic/: domtool.cpp, domtool.h, form.cpp, main.cpp, object.cpp,
+	subclassing.cpp, uic.cpp, uic.h, widgetdatabase.cpp:
+
+	- big merges from uic. Regressions expected. Needs testing
+	
+2003-06-06 21:30  germaingarand
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	- sig/slot defined via sub attributes are now created upon metaObject() request if needed.
+	  Much better this way, since it allows runtime evaluation:
+	      eval "sub foo : SLOT() {}"
+	
+2003-06-06 02:51  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	for now: slot/signal/dcop => SLOT/SIGNAL/DCOP
+	
+2003-06-06 01:53  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	- moved the sig/slot attributes handling from Qt::base to the Qt::Object package,
+	  where it obviously belongs
+	- silenced a 5.6.0 warning /wrt Qt::debug
+	
+2003-06-05 22:07  germaingarand
+
+	* PerlQt/: Qt.pm, lib/Qt/signals.pm, lib/Qt/slots.pm:
+
+	- implemented Ashley's great syntax proposal for sig/slots definition via sub attributes
+		sub mySlot : slot( int, const QString& ) { ... }
+		sub mySig : signal( bool );
+	  Of course, the old/alternative syntax is still valid.
+	
+2003-06-05 15:22  germaingarand
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	- fixed the garbage collection for Q*Items.
+	  Use list->takeItem( foo ) when available to safely remove an Item from a list (then undef it to delete).
+	- as a consequence, could remove the dreadful obj->isa("Q*Item") test. Gives a nice 30% speed up in
+	  Object creation.
+	
+2003-05-30 03:22  germaingarand
+
+	* puic/puic.pro:
+
+	- added a qmake project file, for easy building of puic when checked out separately
+	  ( export QTDIR, then:
+	    $QTDIR/bin/qmake -makefile puic.pro && make && make install )
+	
+2003-05-30 01:36  germaingarand
+
+	* perleditor/: listeditor.ui.h, objectbrowser.cpp, objectbrowser.h,
+	perlaction.cpp, perlaction.h, perlcompletion.cpp, perleditor.cpp:
+
+	- fixed a bug in function arguments completion
+	- turnaround for a Designer bug (it wouldn't mark current form as modified in some circumstances)
+	- small bugfixes and code cleanup
+	
+2003-05-28 22:17  germaingarand
+
+	* perleditor/: preferenceinterfaceimpl.cpp, syntaxhighliter_perl.h:
+
+	- gcc-2.9x fixes
+	
+2003-05-28 18:30  germaingarand
+
+	* perleditor/: mainfilesettings.ui.h, perlaction.cpp,
+	projectsettings.ui.h, projectsettingsinterfaceimpl.cpp,
+	yyindent.cpp:
+
+	- rewrote the project settings saving code (had overlooked the nice customSetting interface)
+	
+2003-05-28 04:58  germaingarand
+
+	* perleditor/: README, actioninterfaceimpl.cpp,
+	actioninterfaceimpl.h, common.cpp, common.h,
+	editorinterfaceimpl.cpp, editorinterfaceimpl.h,
+	languageinterfaceimpl.cpp, listeditor.h, mainfilesettings.h,
+	mainfilesettings.ui, mainfilesettings.ui.h, objectbrowser.cpp,
+	objectbrowser.h, perlaction.cpp, perlaction.h, perlcompletion.cpp,
+	perlcompletion.h, perleditor.cpp, perleditor.h, perleditor.pro,
+	perlmainprojectfile.cpp, perlmainprojectfile.h, pqtapiprocess.cpp,
+	pqtapiprocess.h, preferences.h, projectsettings.h,
+	projectsettings.ui, projectsettings.ui.h,
+	projectsettingsinterfaceimpl.cpp, slotfuncdia.h,
+	sourcetemplateinterfaceimpl.cpp:
+
+	- implemented "Build and run project". One can now fully develop/test/run a PerlQt program without ever using
+	  a console. This is VB on steroids :)
+	- added an application template
+	- project settings looks OK. Would need some testing usability wise though
+	- lot of bugfixes
+	
+2003-05-26 21:28  germaingarand
+
+	* puic/main.cpp:
+
+	- bumping version to 0.6main.cpp
+	
+2003-05-26 21:25  germaingarand
+
+	* puic/form.cpp:
+
+	- adding "# line" directive to ui.pm
+	
+2003-05-26 19:41  germaingarand
+
+	* perleditor/: actioninterfaceimpl.cpp, actioninterfaceimpl.h,
+	common.cpp, common.h, imagefactory.h, languageinterfaceimpl.cpp,
+	listeditor.h, mainfilesettings.h, perlaction.cpp, perlaction.h,
+	perleditor.cpp, perleditor.h, perleditor.pro, preferences.h,
+	projectsettings.h, slotfuncdia.h, images/perlqt.png,
+	images/perlqtblue.png, images/perlqtblue2.png:
+
+	- added PerlQt Menu/toolbar ("Run form/run project" triggers puic->perl)
+	- "run project" not yet implemented
+	- "Run Form" can be accessed also with RMB on source code
+	- When Form is run through Perl, STDOUT/STDERR are captured and redirected to the Designer's
+	  Output Window
+	- Perl syntax errors and warnings show up with correct line number/ FormFile name, thanks to
+	  '# line \d+ "foo"' magic :-)
+	- some icons
+	
+2003-05-26 00:57  germaingarand
+
+	* perleditor/: languageinterfaceimpl.cpp, objectbrowser.cpp,
+	perlcompletion.cpp, perleditor.cpp, perleditor.h,
+	pqtapiprocess.cpp, designer_3.1_patches/resource.cpp.diff:
+
+	- added "Build and Run this form with perl" RMB option
+	- code cleanup
+	
+2003-05-25 15:31  germaingarand
+
+	* perleditor/: README, imagefactory.h, languageinterfaceimpl.cpp,
+	objectbrowser.cpp, perlcompletion.cpp, images/editcut.png:
+
+	README
+	
+2003-05-25 15:30  germaingarand
+
+	* perleditor/designer_3.1_patches/: designerappiface.cpp.diff,
+	mainwindowactions.cpp.diff, resource.cpp.diff:
+
+	- needed Designer 3.1 patches
+	(hopefully not for long, as discussion with Marius B. Monsen from Trolltech could lead to having
+	those issues fixed in 3.2)
+	
+2003-05-25 15:27  germaingarand
+
+	* perleditor/images/filenew.png:
+
+	images/editcut.png
+	
+2003-05-23 23:35  germaingarand
+
+	* perleditor/: completion.cpp, listeditor.h, perlcompletion.cpp,
+	perlcompletion.h, pqtapiprocess.cpp, projectsettings.h,
+	slotfuncdia.h, slotfuncdia.ui, slotfuncdia.ui.h:
+
+	- invalidate "function" radio if user input obviously describes a slot.
+	- better auto-completion: methods, statics and enums are all in. Yay!
+	  (might need some optims, I'm on a 2400+ box now ;-P)
+	
+2003-05-23 16:23  germaingarand
+
+	* PerlQt/bin/pqtapi:
+
+	- added option 'p' for including inherited methods of 'class' in results
+	- option 'm' is for communication with the Designer Plugin (for code completion)
+	
+2003-05-23 09:39  germaingarand
+
+	* perleditor/: listeditor.cpp, mainfilesettings.cpp,
+	preferences.cpp, projectsettings.cpp, slotfuncdia.cpp:
+
+	those are auto-generated
+	
+2003-05-22 21:34  germaingarand
+
+	* perleditor/: completion.cpp, editor.h, parenmatcher.cpp,
+	parenmatcher.h, perlindent.h, preferences.ui.h, arghintwidget.h,
+	globaldefs.h, markerwidget.cpp, objectbrowser.h, projectsettings.h,
+	projectsettings.ui.h, slotfuncdia.ui, viewmanager.cpp,
+	completion.h, languageinterfaceimpl.h, listeditor.h,
+	mainfilesettings.cpp, pqtapiprocess.h, preferences.ui,
+	syntaxhighliter_perl.h, classbrowserinterfaceimpl.cpp, common.h,
+	conf.cpp, conf.h, editorinterfaceimpl.cpp, listeditor.ui,
+	listeditor.ui.h, mainfilesettings.ui, mainfilesettings.ui.h,
+	paragdata.h, perlbrowser.cpp, perlbrowser.h, perlcompletion.h,
+	perleditor.h, perlindent.cpp, perlqt.cpp,
+	preferenceinterfaceimpl.cpp, projectsettings.ui, slotfuncdia.ui.h,
+	syntaxhighliter_perl.cpp, viewmanager.h, yyindent.cpp, yyreg.cpp,
+	yyreg.h, arghintwidget.cpp, classbrowserinterfaceimpl.h,
+	editor.cpp, editorinterfaceimpl.h, hierarchyview.cpp,
+	imagefactory.h, languageinterfaceimpl.cpp, objectbrowser.cpp,
+	perlcompletion.cpp, preferenceinterfaceimpl.h, preferences.cpp,
+	preferences.h, projectsettings.cpp, slotfuncdia.cpp, slotfuncdia.h,
+	sourcetemplateinterfaceimpl.cpp, sourcetemplateinterfaceimpl.h,
+	browser.cpp, browser.h, common.cpp, defdialog.ui, hierarchyview.h,
+	listeditor.cpp, mainfilesettings.h, markerwidget.h, perleditor.cpp,
+	perleditor.pro, pqtapiprocess.cpp,
+	projectsettingsinterfaceimpl.cpp, projectsettingsinterfaceimpl.h,
+	variabledialog.ui, images/editslots.png, images/folder.png,
+	interfaces/actioninterface.h, interfaces/classbrowserinterface.h,
+	interfaces/designerinterface.h, interfaces/editorinterface.h,
+	interfaces/filterinterface.h, interfaces/interpreterinterface.h,
+	interfaces/languageinterface.h, interfaces/preferenceinterface.h,
+	interfaces/programinterface.h, interfaces/projectsettingsiface.h,
+	interfaces/sourcetemplateiface.h, interfaces/templatewizardiface.h,
+	interfaces/widgetinterface.h:
+
+	Initial import of the PerlQt plugin for Qt Designer
+	
+2003-05-22 21:34  germaingarand
+
+	* perleditor/: completion.cpp, editor.h, parenmatcher.cpp,
+	parenmatcher.h, perlindent.h, preferences.ui.h, arghintwidget.h,
+	globaldefs.h, markerwidget.cpp, objectbrowser.h, projectsettings.h,
+	projectsettings.ui.h, slotfuncdia.ui, viewmanager.cpp,
+	completion.h, languageinterfaceimpl.h, listeditor.h,
+	mainfilesettings.cpp, pqtapiprocess.h, preferences.ui,
+	syntaxhighliter_perl.h, classbrowserinterfaceimpl.cpp, common.h,
+	conf.cpp, conf.h, editorinterfaceimpl.cpp, listeditor.ui,
+	listeditor.ui.h, mainfilesettings.ui, mainfilesettings.ui.h,
+	paragdata.h, perlbrowser.cpp, perlbrowser.h, perlcompletion.h,
+	perleditor.h, perlindent.cpp, perlqt.cpp,
+	preferenceinterfaceimpl.cpp, projectsettings.ui, slotfuncdia.ui.h,
+	syntaxhighliter_perl.cpp, viewmanager.h, yyindent.cpp, yyreg.cpp,
+	yyreg.h, arghintwidget.cpp, classbrowserinterfaceimpl.h,
+	editor.cpp, editorinterfaceimpl.h, hierarchyview.cpp,
+	imagefactory.h, languageinterfaceimpl.cpp, objectbrowser.cpp,
+	perlcompletion.cpp, preferenceinterfaceimpl.h, preferences.cpp,
+	preferences.h, projectsettings.cpp, slotfuncdia.cpp, slotfuncdia.h,
+	sourcetemplateinterfaceimpl.cpp, sourcetemplateinterfaceimpl.h,
+	browser.cpp, browser.h, common.cpp, defdialog.ui, hierarchyview.h,
+	listeditor.cpp, mainfilesettings.h, markerwidget.h, perleditor.cpp,
+	perleditor.pro, pqtapiprocess.cpp,
+	projectsettingsinterfaceimpl.cpp, projectsettingsinterfaceimpl.h,
+	variabledialog.ui, images/editslots.png, images/folder.png,
+	interfaces/actioninterface.h, interfaces/classbrowserinterface.h,
+	interfaces/designerinterface.h, interfaces/editorinterface.h,
+	interfaces/filterinterface.h, interfaces/interpreterinterface.h,
+	interfaces/languageinterface.h, interfaces/preferenceinterface.h,
+	interfaces/programinterface.h, interfaces/projectsettingsiface.h,
+	interfaces/sourcetemplateiface.h, interfaces/templatewizardiface.h,
+	interfaces/widgetinterface.h:
+
+	Initial revision
+	
+2003-05-22 04:58  germaingarand
+
+	* puic/: form.cpp, subclassing.cpp:
+
+	- support for the Designer's PerlQt plugin
+	- patch by Terrence (Terry) Fleury <tfleury@ncsa.uiuc.edu>
+	  for incluson of "Use" directives (also supported by the plugin, and stored
+	  in the same structure)
+	- DESTROY really ought to call SUPER->DESTROY
+	
+2003-05-11 01:41  germaingarand
+
+	* puic/: widgetdatabase.cpp, widgetdatabase.h:
+
+	-updated the widget database (fix for #731881)
+	
+2003-04-15 23:03  germaingarand
+
+	* doc/: en/PerlQt.pod, en/index.html, fr/PerlQt.pod, fr/index.html:
+
+	-documenting new marshallers
+	
+2003-04-15 22:43  germaingarand
+
+	* configure.in, PerlQt/Qt.pm:
+
+	bumping version number to 3.007
+	
+2003-04-15 16:07  germaingarand
+
+	* PerlQt/: handlers.cpp, Qt.pm, smokeperl.h:
+
+	- added 8 marshallers for Q*List classes:
+	  QWidgetList, QCanvasItemList, QObjectList, QPtrList<QTab>, QPtrList<QToolBar>,
+	  QPtrList<QDockWindow>, QPtrList<QNetworkOperation>,  QFileInfoList
+	
+2003-04-15 16:04  germaingarand
+
+	* smoke/qt/Makefile.am:
+
+	bumping revision number
+	
+2003-04-15 16:02  germaingarand
+
+	* kalyptus/kalyptusCxxToSmoke.pm:
+
+	disabling 3 template derived classes, now handled by marshallers
+	
+2003-04-06 16:40  germaingarand
+
+	* admin/: Doxyfile.am, Doxyfile.global, acinclude.m4.in, am_edit,
+	cvs.sh, debianrules, detect-autoconf.sh, Makefile.common,
+	libtool.m4.in, nmcheck:
+
+	updating admin dir
+	
+2003-03-08 19:03  germaingarand
+
+	* PerlQt/bin/pqtsh:
+
+	disable strict in eval
+	
+2003-03-03 14:37  germaingarand
+
+	* puic/: main.cpp, object.cpp:
+
+	skip 'database' property (doesn't exist anymore), thanks to Michael Traxler for pointing that one
+	
+2003-02-22 13:43  germaingarand
+
+	* puic/object.cpp:
+
+	 temporary font objects where incorrect
+	
+2003-02-22 13:05  germaingarand
+
+	* puic/uic.cpp:
+
+	+ else if ( attrib == "resizeable" || attrib == "resizable" )
+	
+2003-02-19 17:14  germaingarand
+
+	* Makefile.PL:
+
+	getting rid of Automake dependancy
+	
+2003-02-19 17:01  germaingarand
+
+	* PerlQt/bin/pqtsh:
+
+	- redirect STDOUT/STDERR to shell window (patch by Stéphane Payrard<stef@payrard.net>)
+	- fixed troubles with line breaks and Qt-3.1
+	- discard empty lines on save
+	
+2003-02-19 13:44  germaingarand
+
+	* smoke/qt/Makefile.am, smoke/qt/generate.pl.in,
+	smoke/qt/qtguess.pl.in, kalyptus/kalyptus,
+	kalyptus/kalyptusCxxToSmoke.pm:
+
+	getting rid of GNU toolchain dependancy at last :)
+	
+2003-02-13 15:30  germaingarand
+
+	* doc/: en/PerlQt.pod, en/index.html, fr/PerlQt.pod, fr/index.html:
+
+	How to perform an installation with user rights + various details
+	
+2003-02-13 12:23  germaingarand
+
+	* configure.in, PerlQt/Qt.pm:
+
+	finally, lets bump the version number to 3.006
+	
+2003-02-13 12:21  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	operators modifying their operand (++, +=, ...)  need to return the modified object itself, not the Qt ref to the modified object
+	
+2003-02-12 23:47  germaingarand
+
+	* TODO:
+
+	update
+	
+2003-02-12 23:34  germaingarand
+
+	* PerlQt/t/h_allstyles.t:
+
+	too many errors on this one
+	
+2003-02-12 22:11  germaingarand
+
+	* PerlQt/examples/: progress/progress.pl, richedit/richedit.pl:
+
+	no blib
+	
+2003-02-12 22:04  germaingarand
+
+	* PerlQt/examples/forever/forever.pl:
+
+	no blib
+	
+2003-02-12 21:21  germaingarand
+
+	* PerlQt/examples/drawlines/drawlines.pl:
+
+	no blib
+	
+2003-02-12 21:17  germaingarand
+
+	* PerlQt/examples/: aclock/aclock.pl, dclock/dclock.pl,
+	buttongroups/buttongroups.pl, drawdemo/drawdemo.pl:
+
+	no blib
+	
+2003-02-12 21:16  germaingarand
+
+	* PerlQt/Makefile.PL.in:
+
+	better chmod +x the scripts before install
+	
+2003-02-12 17:07  germaingarand
+
+	* doc/: fr/PerlQt.pod, fr/index.html, en/PerlQt.pod, en/index.html:
+
+	updated documentation
+	
+2003-02-12 16:44  germaingarand
+
+	* ChangeLog:
+
+	update
+	
+2003-02-12 15:25  germaingarand
+
+	* doc/: en/PerlQt.pod, en/index.html, images/pqtsh.png:
+
+	updated english documentation
+	
+2003-02-12 13:18  germaingarand
+
+	* PerlQt/bin/pqtsh:
+
+	adding an interactive example (within help menu)
+	
+2003-02-12 10:54  germaingarand
+
+	* PerlQt/lib/Qt/isa.pm:
+
+	cope with 5.8.0's buggy if.pm - patch by S.Payrard<stef@payrard.net>
+	
+2003-02-12 10:44  germaingarand
+
+	* PerlQt/: Qt.pm, lib/Qt/signals.pm, lib/Qt/slots.pm:
+
+	-Allow runtime definition of Signals/Slots (via eval)
+	
+2003-02-11 23:18  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	-when dumping possible method matches, look also in super classes
+	
+2003-02-11 23:15  germaingarand
+
+	* PerlQt/: MANIFEST, Makefile.PL.in, bin/pqtsh, bin/pqtapi:
+
+	- adding pqtsh and pqtapi utilities
+	
+2003-02-09 15:15  germaingarand
+
+	* PerlQt/lib/Qt/constants.pm:
+
+	export sub names, not globs
+	
+2003-02-07 22:25  germaingarand
+
+	* PerlQt/Qt.xs:
+
+	oops
+	
+2003-02-07 22:24  germaingarand
+
+	* PerlQt/Qt.xs:
+
+	- IRIX compiler fix (don't 'return' in a void method)
+	
+2003-02-06 23:07  germaingarand
+
+	* PerlQt/: lib/Qt/constants.pm, MANIFEST:
+
+	- adding a Qt::constants module for import of Qt constants
+	(mainly intended for qiodevice.h's IO_* hardcoded values, but who knows...)
+	
+2003-02-06 18:36  germaingarand
+
+	* admin/acinclude.m4.in:
+
+	propagate $LIBXINERAMA
+	
+2003-02-05 11:19  germaingarand
+
+	* configure.in:
+
+	too many QT_NO_* tests - totally overkill
+	
+2003-02-05 11:14  germaingarand
+
+	* ChangeLog:
+
+	...
+	
+2003-02-05 10:03  germaingarand
+
+	* PerlQt/t/g_gui.t:
+
+	avoid loading syle plugins for first GUI test
+	
+2003-02-05 00:19  germaingarand
+
+	* smoke/qt/generate.pl.in, kalyptus/kalyptus:
+
+	do not write kalyptus cache in $HOME... it breaks chrooted builds
+	
+2003-02-04 16:52  germaingarand
+
+	* configure.in, PerlQt/Qt.pm:
+
+	bump version
+	
+2003-01-30 10:41  germaingarand
+
+	* Makefile.am, PerlQt/t/h_allstyles.t:
+
+	set correct LD_LIBRARY_PATH before running tests
+	
+2003-01-27 11:11  germaingarand
+
+	* PerlQt/Makefile.PL.in:
+
+	add CXXFLAGS to compilation parameters
+	
+2003-01-27 11:09  germaingarand
+
+	* PerlQt/Makefile.PL.in:
+
+	use RPATH in a more crossplatform way (through libtool)
+	
+2003-01-27 09:33  germaingarand
+
+	* admin/conf.change.pl:
+
+	support post-processing commands in AC_CONFIG* macros
+	
+2003-01-14 16:00  germaingarand
+
+	* smoke/qt/Makefile.am:
+
+	added  KDE_RPATH to libsmokeqt (about time)
+	
+2003-01-05 04:00  germaingarand
+
+	* PerlQt/: lib/Qt/isa.pm, Qt.pm:
+
+	- implementation of operator overloading (21 supported operators). Copy constructors *aren't*
+	  available : they clash with Perl semantics.
+	- raised priority of QString in ambiguous methods resolution
+	
+2003-01-04 06:22  germaingarand
+
+	* PerlQt/handlers.cpp:
+
+	- fixed QCString marshaller : don't tag pure ASCII strings as UTF-8
+	- QString marshalling toSV is now driven by HINT_BYTES (a.k.a "use bytes" pragma)
+	  This is intended as a compatiblity device for legacy code that can't handle UTF-8
+	
+2002-12-22 02:52  germaingarand
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	- fixing Perl debugger at last
+	
+2002-12-17 10:45  germaingarand
+
+	* puic/: main.cpp, uic.cpp:
+
+	- fixed a bug with embedded pixmaps
+	
+2002-12-16 20:45  germaingarand
+
+	* PerlQt/: t/f_import.t, t/h_allstyles.t, MANIFEST:
+
+	- fixing invocation of make test from within Perlqt/
+	
+2002-12-16 18:13  germaingarand
+
+	* configure.in, PerlQt/Qt.pm:
+
+	version = 'PerlQt-3.004' (final)
+	
+2002-12-16 17:43  germaingarand
+
+	* kalyptus/kalyptusCxxToSmoke.pm:
+
+	- fixed a problem with multiple inheritance when looking for cf_virtual
+	
+2002-12-16 17:38  germaingarand
+
+	* PerlQt/: Qt.pm, Qt.xs, handlers.cpp, perlqt.h, smokeperl.h:
+
+	- code cleanup and optimization
+	- fixed a bug with hasVirtual()
+	
+2002-12-16 17:32  germaingarand
+
+	* PerlQt/examples/forever/forever.pl:
+
+	avoid QPoint
+	
+2002-12-16 17:26  germaingarand
+
+	* PerlQt/examples/progress/progress.pl:
+
+	initial checkin
+	
+2002-12-16 17:24  germaingarand
+
+	* PerlQt/lib/Qt/: isa.pm, debug.pm:
+
+	- fixed redefinition of a sub in isa.pm
+	- added "use Qt;" in debug.pm
+	
+2002-12-16 17:04  germaingarand
+
+	* PerlQt/t/Foo/SubCodec.pm:
+
+	- adding the test suite (make test)
+	
+2002-12-16 17:01  germaingarand
+
+	* test.pl, Makefile.am, PerlQt/test.pl, PerlQt/t/a_loading.t,
+	PerlQt/t/b_nogui.t, PerlQt/t/c_qapp.t, PerlQt/t/d_sigslot.t,
+	PerlQt/t/e_sigslot_inherit.t, PerlQt/t/f_import.t,
+	PerlQt/t/g_gui.t, PerlQt/t/h_allstyles.t, PerlQt/t/My/Codec.pm,
+	PerlQt/t/My/SubCodec.pm:
+
+	- adding the test suite (make test)
+	
+2002-12-16 16:57  germaingarand
+
+	* configure.in, doc/en/PerlQt.pod, doc/en/index.html,
+	smoke/qt/qtguess.pl.in:
+
+	typo: treshold <-> threshold (configure option)
+	
+2002-12-16 16:45  germaingarand
+
+	* configure.in:
+
+	changed default test threshold to be 5
+	
+2002-12-13 20:53  germaingarand
+
+	* PerlQt/: handlers.cpp, Qt.xs:
+
+	-fixed compilation with 5.6.0
+	-fix HAS_BOOL for SUN's Forte
+	
+2002-12-13 11:42  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	added a CAST function
+	
+2002-12-13 11:41  germaingarand
+
+	* PerlQt/handlers.cpp:
+
+	- made the marshaller croak instead of marshalling null as a reference to a Qt object
+	- 5.6.0 doesn't have is_utf8_string, made it use QTextCodec::heuristicContentMatch() instead
+	
+2002-12-12 01:50  germaingarand
+
+	* puic/: form.cpp, main.cpp:
+
+	- added parsing of custom member variables
+	- fixed issue with init()/destroy()
+	
+2002-12-11 15:53  germaingarand
+
+	* configure.in, PerlQt/Qt.pm:
+
+	updating $VERSION (3.004-RC2)
+	
+2002-12-11 15:43  germaingarand
+
+	* ChangeLog:
+
+	updated for 3.004-RC2
+	
+2002-12-11 15:31  germaingarand
+
+	* doc/en/: PerlQt.pod, index.html:
+
+	added several appendices to documentation (debugging, marshallers and i18n)
+	
+2002-12-11 09:54  germaingarand
+
+	* INSTALL, README, PerlQt/MANIFEST, PerlQt/Qt.pm:
+
+	- updated README/INSTALL
+	- turnaround for KDE's malloc in Qt.pm
+	- added Qt/debug.pm in MANIFEST
+	
+2002-12-09 18:09  germaingarand
+
+	* Makefile.am, smoke/qt/qtguess.pl.in:
+
+	- add Makefile.cvs to make dist
+	- correct qtguess.pl : retry grabbing symbols without __cplusplus if it fails (e.g. for Sun Forte)
+	
+2002-12-09 17:32  germaingarand
+
+	* Makefile.PL:
+
+	Makefile.PL is likely to become the default building command, since conflicts of automake versions
+	are impossible to sort out within the framework.
+	
+2002-12-09 05:37  germaingarand
+
+	* PerlQt/Qt.xs:
+
+	added Qt::version()
+	
+2002-12-09 05:06  germaingarand
+
+	* Makefile.PL:
+
+	wrapper for ./configure intended to be used by CPAN
+	
+2002-12-07 15:55  germaingarand
+
+	* configure.in, PerlQt/Qt.pm:
+
+	- Adjust version no. for RC1
+	- correct USE_QT_KDE so that configure doesn't reject Qt-3.0
+	
+2002-12-07 13:17  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	- allow subclassing of Qt::Application
+	
+2002-12-06 23:36  germaingarand
+
+	* puic/: embed.cpp, main.cpp:
+
+	- Issue the "use utf8" pragma. That's all we need to fully support i18n in puic :)
+	
+2002-12-06 21:37  germaingarand
+
+	* PerlQt/: Qt.pm, Qt.xs, handlers.cpp:
+
+	- code cleanup && added some comments in Qt.xs
+	- fixed segfault when marshalling "undef" as QString& (handlers.cpp)
+	- added bool*/bool& marshallers
+	- more consistent debugging statements wrt the considered channel
+	- more profiling/optimization of caching
+	
+2002-12-05 14:20  germaingarand
+
+	* admin/: Doxyfile.am, Doxyfile.global, compile,
+	configure.in.bot.end, cvs-clean.pl, cvs.sh, detect-autoconf.sh:
+
+	damn, I forgot to cvs add a lot of file in the new admin dir ;(
+	
+2002-12-05 14:10  germaingarand
+
+	* PerlQt/: Qt.xs, Qt.pm:
+
+	- switched all method calls to G_EVAL : needed for having a correct 'this' pointer if an error occur inside an eval{}
+	- implemented the memoize-like cache in C++ with a QAsciiDict (gain 50% in speed)
+	
+2002-12-03 21:45  germaingarand
+
+	* configure.in:
+
+	minor error
+	
+2002-12-03 21:36  germaingarand
+
+	* configure.in:
+
+	updating reimplementation of an AC macro
+	
+2002-12-03 17:16  germaingarand
+
+	* admin/: ChangeLog, Makefile.common, acinclude.m4.in, am_edit,
+	config.guess, config.pl, config.sub, debianrules, depcomp,
+	install-sh, libtool.m4.in, ltconfig, ltmain.sh, missing,
+	mkinstalldirs, old-libtool.m4.in, old-ltcf-c.sh, old-ltcf-cxx.sh,
+	old-ltcf-gcj.sh, old-ltconfig, old-ltmain.sh:
+
+	updating /admin directory to KDE 3.1's
+	
+2002-12-03 16:53  germaingarand
+
+	* PerlQt/Qt.xs:
+
+	removing a stupid debug line that went in
+	
+2002-12-03 15:20  germaingarand
+
+	* smoke/qt/qtguess.pl.in:
+
+	fixed a quotation error
+	  -$qtflags =~ s/\$\((.*?)\)/$x{'$1'}/g;
+	  +$qtflags =~ s/\$\((.*?)\)/$x{$1}/g;
+	
+2002-12-02 21:28  germaingarand
+
+	* PerlQt/: Qt.pm, Qt.xs, handlers.cpp, perlqt.h, lib/Qt/debug.pm:
+
+	- added pragma for enabling multiple debugging channels. See lib/Qt/debug.pm
+	- findAllMethods(classId [, startingWith]) for a more useful debug output and easy impl. of code completion.
+	  eg. to pretty print the whole Qt API:
+	
+	  for (1..400)
+	  {
+	     $a=Qt::_internal::findAllMethods($_);
+	     @x=map {@{ $$a{$_} }} sort keys %$a;
+	     print Qt::_internal::dumpCandidates(\@x);
+	  }
+	- various optimizations and cleanups for an overall gain in speed of 15% approx.
+	
+2002-11-28 14:26  germaingarand
+
+	* Makefile.am:
+
+	adjusting EXTRA_DIST for /doc
+	
+2002-11-28 13:08  germaingarand
+
+	* PerlQt/smokeperl.h:
+
+	operator= should return *this
+	
+2002-11-28 12:33  germaingarand
+
+	* doc/: Makefile, PerlQt.pod, index.html, pod.css:
+
+	removing doc/* (moved to /doc/en)
+	
+2002-11-28 12:31  germaingarand
+
+	* doc/: css/pod.css, en/Makefile, en/PerlQt.pod, en/index.html,
+	fr/Makefile, fr/PerlQt.pod, fr/index.html:
+
+	adding french documentation, thanks to Stéphane Payard
+	
+2002-11-27 19:53  germaingarand
+
+	* PerlQt/handlers.cpp:
+
+	- Internationalization support (QString now marshalls toSV as UTF8)
+	- ISO C++ fixes (replaced variable-size arrays by new[])
+	
+2002-11-27 19:51  germaingarand
+
+	* PerlQt/Qt.xs:
+
+	Changed variable-size arrays to use "new" (ISO C++ conformance... should fix the build on Compaq's CC)
+	
+2002-11-18 02:20  germaingarand
+
+	* smoke/qt/generate.pl.in:
+
+	Exclude some more Qt headers (3.1)
+	
+2002-11-18 02:17  germaingarand
+
+	* kalyptus/: kalyptus, kalyptusCxxToSmoke.pm, kalyptusDataDict.pm:
+
+	Syncing Qt-3.1 fixes from KDE's CVS
+	
+2002-10-14 10:15  germaingarand
+
+	* PerlQt/: handlers.cpp, Qt.pm:
+
+	added a marshaller for QValueList<int>
+	
+2002-10-12 17:42  germaingarand
+
+	* kalyptus/kalyptusCxxToSmoke.pm:
+
+	Skip QTSManip class: resulting file cause internal compiler errors on many platforms
+	
+2002-10-09 18:20  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	updating $VERSION
+	
+2002-10-08 01:40  germaingarand
+
+	* puic/: main.cpp, form.cpp, object.cpp:
+
+	- s/this->SUPER::polish/SUPER->polish/ in database code
+	- fixed setAccel to use an intermediate Qt::KeySequence
+	
+2002-10-08 00:27  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	Added a turnaround for a Qt bug.
+	QGridLayout::addMultiCellLayout does not reparent its QLayout argument, leading to parentless Layouts.
+	
+2002-09-27 20:04  germaingarand
+
+	* puic/: uic.cpp, main.cpp:
+
+	Fixing multiple lines concatenation within tr calls.
+	
+2002-09-27 11:40  germaingarand
+
+	* PerlQt/MANIFEST:
+
+	added network example
+	
+2002-09-27 11:35  germaingarand
+
+	* PerlQt/examples/network/httpd/httpd.pl:
+
+	initial import of the httpd example
+	
+2002-09-27 00:41  germaingarand
+
+	* doc/: PerlQt.pod, index.html:
+
+	typo
+	
+2002-09-26 21:08  germaingarand
+
+	* PerlQt/: Qt.xs, lib/Qt/isa.pm:
+
+	SUPER was only forwarding to base Perl classes, not base Qt classes
+	Fixed
+	
+2002-09-25 11:04  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	Fixing signals inheritance
+	
+2002-09-22 16:30  germaingarand
+
+	* PerlQt/Qt.xs, doc/PerlQt.pod, doc/index.html:
+
+	SUPER->foo() was not passing the 'this' object.
+	Removed the this->SUPER->foo construct which was buggy, and useless since SUPER is "protected" right now.
+	Might implement "public" SUPER later (e.g $myContainedObj->SUPER->foo() )... no emergency though.
+	
+2002-09-22 16:16  germaingarand
+
+	* smoke/qt/generate.pl.in, kalyptus/kalyptus,
+	kalyptus/kalyptusCxxToSmoke.pm:
+
+	Fixing SMOKE to build with Qt-3.1b1
+	
+2002-09-20 16:01  germaingarand
+
+	* configure.in:
+
+	Fixed wong test for GL/gl.h
+	(was causing Smoke's build to fail when OpenGL headers aren't installed)
+	
+2002-09-19 01:53  germaingarand
+
+	* smoke/qt/generate.pl.in:
+
+	removed debug
+	
+2002-09-19 01:47  germaingarand
+
+	* Makefile.am, smoke/qt/generate.pl.in, smoke/qt/header_list:
+
+	Changed generate.pl to use a closed list of headers... some system don't store Qt headers in a distinct directory.
+	
+2002-09-18 18:56  germaingarand
+
+	* doc/: PerlQt.pod, index.html:
+
+	fixed an error in one of the tutorials
+	
+2002-09-18 10:06  germaingarand
+
+	* doc/: PerlQt.pod, index.html:
+
+	Updating install instructions
+	
+2002-09-16 16:24  germaingarand
+
+	* PerlQt/: lib/Qt/attributes.pm, lib/Qt/isa.pm, Qt.pm, Qt.xs:
+
+	Inheritance of slots/attributes/SUPER was still half wrong. Fixed.
+	
+2002-09-14 20:54  germaingarand
+
+	* Makefile.am:
+
+	Adding doc dir to the dist target
+	
+2002-09-14 20:32  germaingarand
+
+	* smoke/qt/Makefile.am:
+
+	simplifying default Makefile.am to minimum
+	
+2002-09-14 18:45  germaingarand
+
+	* configure.in:
+
+	increasing version number to 3.002
+	
+2002-09-14 17:58  germaingarand
+
+	* PerlQt/Qt.xs:
+
+	cleaning a debug line
+	
+2002-09-14 17:52  germaingarand
+
+	* doc/: PerlQt.pod, index.html:
+
+	Update for the "SUPER" construct
+	
+2002-09-14 17:50  germaingarand
+
+	* PerlQt/: lib/Qt/isa.pm, Qt.pm, Qt.xs:
+
+	Implemented a special attribute "SUPER" for calling methods on the superclass
+	
+2002-09-14 05:37  germaingarand
+
+	* PerlQt/: Qt.pm, Qt.xs, lib/Qt/isa.pm:
+
+	- Fixed inheritance of attributes
+	- added a "no warnings" block around "this" assignation statement
+	(Michael Traxler reported "use of uninitialised value" warning on SuSE's Perl 5.6.1)
+	
+2002-09-14 04:51  germaingarand
+
+	* puic/form.cpp:
+
+	- Fixed grabbing of slots from ui.h file
+	  Now handles also additional functions.
+	- If(0)'ed the Font Handler
+	
+2002-09-13 12:29  germaingarand
+
+	* kalyptus/kalyptus, kalyptus/kalyptusCxxToSmoke.pm,
+	smoke/qt/qtguess.pl.in:
+
+	Qt 3.1 fixes
+	
+2002-09-12 12:32  germaingarand
+
+	* smoke/qt/generate.pl.in:
+
+	should learn how to revert one day :-/
+	
+2002-09-12 03:19  germaingarand
+
+	* PerlQt/MANIFEST:
+
+	Update
+	
+2002-09-12 03:11  germaingarand
+
+	* doc/index.html:
+
+	updated from latest PerlQt.pod
+	
+2002-09-12 03:10  germaingarand
+
+	* doc/PerlQt.pod:
+
+	Added a note about correct syntax for calling a base class method
+	
+2002-09-12 02:43  germaingarand
+
+	* PerlQt/lib/Qt/isa.pm:
+
+	cleaning pollution of $_
+	
+2002-09-11 19:38  germaingarand
+
+	* smoke/qt/generate.pl.in:
+
+	added a bogus header in the skiplist
+	
+2002-09-11 19:26  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	fixing broken regex in argmatch (my fault)
+	
+2002-09-11 05:18  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	fixing polling of uninitialised {slots} array
+	Still not totally right... creating extra/unneeded qt_invoke
+	
+2002-09-11 04:21  germaingarand
+
+	* doc/PerlQt.pod:
+
+	Added a chapter about puic usage
+	
+2002-09-11 02:59  germaingarand
+
+	* PerlQt/Makefile.PL.in:
+
+	Fixing some env vars value and a broken regex
+	
+2002-09-11 02:57  germaingarand
+
+	* INSTALL, README, configure.in, smoke/qt/Makefile.am,
+	smoke/qt/generate.pl.in:
+
+	Adding OpenGL detection && compilation to the autoconf framework
+	--without-Mesa : if you use a vendor specific GL lib, specify this (default is to look for Mesa)
+	--disable-GL : skip GL stuff... not really needed since it is skipped anyway if Qt doesn't have it
+	
+2002-09-11 02:51  germaingarand
+
+	* PerlQt/examples/opengl/: README, gear/gear, box/GLBox.pm,
+	box/glbox:
+
+	Initial import of OpenGL examples
+	
+2002-09-10 12:40  germaingarand
+
+	* puic/: main.cpp, subclassing.cpp, uic.cpp:
+
+	Polishing -subimpl option
+	- only generate derived slot stub for those that aren't implemented in the ui file
+	- -x now generates appropriate code with -subimpl
+	
+2002-09-10 11:24  germaingarand
+
+	* puic/: form.cpp, main.cpp:
+
+	- option subimpl now working
+	- code to parse ui.h files... you can write Perl code for slots directly in the designer.
+	
+2002-09-10 00:33  germaingarand
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	Implementing slot inheritance
+	
+2002-09-09 13:55  germaingarand
+
+	* PerlQt/lib/Qt/: signals.pm, slots.pm:
+
+	Allow a space between typename and ref/star sign for sig/slot args (i.e 'FooType &' is now OK)
+	
+2002-09-09 12:13  germaingarand
+
+	* PerlQt/Qt.xs:
+
+	oops. removed unwanted debug output
+	
+2002-09-09 10:47  germaingarand
+
+	* kalyptus/: kalyptus, kdocUtil.pm:
+
+	Fixing incorrect parsing of enums with left/right bitshifts
+	
+2002-09-09 10:41  germaingarand
+
+	* puic/uic.cpp:
+
+	Fixing bad names for extern pixmaps
+	
+2002-09-09 10:41  germaingarand
+
+	* puic/: form.cpp, main.cpp, uic.h:
+
+	Database code now fully working
+	- handles multiple connections
+	- option -x generates template code to configure the connections
+	
+2002-09-09 10:38  germaingarand
+
+	* PerlQt/lib/Qt/isa.pm:
+
+	Fixing import rules for deeper-than-CWD located modules
+	New rule is : always import fully qualified &X::Y::classname, but only
+	import &classname in the caller namespace if they share the same namespace
+	prefix.
+	
+2002-09-09 10:30  germaingarand
+
+	* PerlQt/Qt.xs:
+
+	- test for virtual destructor replaces endless isDerivedFrom() tests
+	- added a function to lookup for an allocated object corresponding to a given anonymous pointer
+	
+2002-09-09 10:25  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	-better discrimination of method arguments (check for array reference)
+	-added Qt::SqlCursor to PersistentObjects (this is getting ugly :-/)
+	
+2002-09-09 10:23  germaingarand
+
+	* COPYING, ChangeLog, INSTALL, Makefile.am, configure.in,
+	inst-apps, subdirs, PerlQt/Makefile.PL.in, smoke/qt/Makefile.am,
+	smoke/qt/generate.pl.in:
+
+	improved build system
+	- Smoke is now linked correctly wether it's installed on the system or built in the source tree
+	- some extra configure options to control the behaviour (--with-treshold=X for qtguess tests,
+	                                                         --enable-smoke to force smoke builds)
+	
+2002-08-22 05:46  germaingarand
+
+	* README, TODO, configure.in, subdirs, AUTHORS, COPYING, ChangeLog,
+	Makefile.am, Makefile.cvs, config.h.in, stamp-h.in, doc/Makefile,
+	doc/PerlQt.pod, doc/index.html, doc/pod.css, doc/images/ex1.png,
+	doc/images/ex2.png, puic/TODO, puic/Makefile.am, puic/domtool.cpp,
+	puic/embed.cpp, puic/form.cpp, puic/globaldefs.h, puic/main.cpp,
+	puic/object.cpp, puic/parser.cpp, puic/parser.h,
+	puic/subclassing.cpp, puic/uic.cpp, puic/uic.h,
+	puic/widgetdatabase.cpp, puic/widgetinterface.h, admin/depcomp,
+	admin/old-libtool.m4.in, admin/old-ltcf-cxx.sh,
+	admin/old-ltcf-gcj.sh, puic/LICENSE.GPL, puic/domtool.h,
+	puic/stamp-h.in, puic/widgetdatabase.h, admin/Makefile.common,
+	admin/config.guess, admin/config.pl, admin/configure.in.min,
+	admin/ltmain.sh, admin/acinclude.m4.in, admin/config.sub,
+	admin/install-sh, admin/conf.change.pl, admin/ltconfig,
+	admin/missing, admin/mkinstalldirs, admin/old-ltmain.sh,
+	admin/am_edit, admin/old-ltconfig, admin/debianrules,
+	admin/libtool.m4.in, admin/ylwrap, admin/ChangeLog,
+	admin/old-ltcf-c.sh, smoke/Makefile.am, smoke/README,
+	smoke/smoke.h, smoke/qt/Makefile.am, smoke/qt/generate.pl.in,
+	smoke/qt/generate_makefile_am.pl, smoke/qt/qt_smoke.h,
+	smoke/qt/qtguess.pl.in, PerlQt/MANIFEST, PerlQt/Makefile.PL.in,
+	PerlQt/examples/richedit/imageCollection.pm,
+	PerlQt/examples/richedit/richedit.pl, kalyptus/Ast.pm,
+	kalyptus/README, kalyptus/TODO, kalyptus/Version, kalyptus/Iter.pm,
+	kalyptus/kalyptus, kalyptus/kalyptusDataDict.pm,
+	kalyptus/kdocAstUtil.pm, kalyptus/ChangeLog,
+	kalyptus/kalyptusCxxToSmoke.pm, kalyptus/kdocLib.pm,
+	kalyptus/kdocParseDoc.pm, kalyptus/kdocUtil.pm:
+
+	Initial import of new PerlQt-3 tree with Autoconf framework
+	
+2002-08-22 05:46  germaingarand
+
+	* README, TODO, configure.in, subdirs, AUTHORS, COPYING, ChangeLog,
+	Makefile.am, Makefile.cvs, config.h.in, stamp-h.in, doc/Makefile,
+	doc/PerlQt.pod, doc/index.html, doc/pod.css, doc/images/ex1.png,
+	doc/images/ex2.png, puic/TODO, puic/Makefile.am, puic/domtool.cpp,
+	puic/embed.cpp, puic/form.cpp, puic/globaldefs.h, puic/main.cpp,
+	puic/object.cpp, puic/parser.cpp, puic/parser.h,
+	puic/subclassing.cpp, puic/uic.cpp, puic/uic.h,
+	puic/widgetdatabase.cpp, puic/widgetinterface.h, admin/depcomp,
+	admin/old-libtool.m4.in, admin/old-ltcf-cxx.sh,
+	admin/old-ltcf-gcj.sh, puic/LICENSE.GPL, puic/domtool.h,
+	puic/stamp-h.in, puic/widgetdatabase.h, admin/Makefile.common,
+	admin/config.guess, admin/config.pl, admin/configure.in.min,
+	admin/ltmain.sh, admin/acinclude.m4.in, admin/config.sub,
+	admin/install-sh, admin/conf.change.pl, admin/ltconfig,
+	admin/missing, admin/mkinstalldirs, admin/old-ltmain.sh,
+	admin/am_edit, admin/old-ltconfig, admin/debianrules,
+	admin/libtool.m4.in, admin/ylwrap, admin/ChangeLog,
+	admin/old-ltcf-c.sh, smoke/Makefile.am, smoke/README,
+	smoke/smoke.h, smoke/qt/Makefile.am, smoke/qt/generate.pl.in,
+	smoke/qt/generate_makefile_am.pl, smoke/qt/qt_smoke.h,
+	smoke/qt/qtguess.pl.in, PerlQt/MANIFEST, PerlQt/Makefile.PL.in,
+	PerlQt/examples/richedit/imageCollection.pm,
+	PerlQt/examples/richedit/richedit.pl, kalyptus/Ast.pm,
+	kalyptus/README, kalyptus/TODO, kalyptus/Version, kalyptus/Iter.pm,
+	kalyptus/kalyptus, kalyptus/kalyptusDataDict.pm,
+	kalyptus/kdocAstUtil.pm, kalyptus/ChangeLog,
+	kalyptus/kalyptusCxxToSmoke.pm, kalyptus/kdocLib.pm,
+	kalyptus/kdocParseDoc.pm, kalyptus/kdocUtil.pm:
+
+	Initial revision
+	
+2002-08-22 04:38  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	Added line number & file to the 'Lookup for...' warning in do_autoload/autoloaded.
+	It also filters out calls to enums now.
+	
+2002-08-20 18:15  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	do_autoload/autoloaded: Choose a different caller(n) if needed
+	
+2002-08-20 17:59  germaingarand
+
+	* PerlQt/Qt.xs:
+
+	burn-proofing catArguments
+	
+2002-08-20 15:33  germaingarand
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	- Added detailed error reporting (Ambiguity candidates, warning when discarding args, correct file and line spotting when dying, etc.). Partly backported from dev branch.
+	- Added caching for method calls (makes PerlQt 300% faster :-)
+	
+2002-08-14 17:02  germaingarand
+
+	* PerlQt/Qt.pm:
+
+	Don't hide object into parent if parent shall die !
+	Fixes case where parent is a pointer to a QObject that wasn't allocated from Perl.
+	
+2002-08-13 18:11  germaingarand
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	Added some PersistentObjects cases as well as some isDerivedFrom tests.
+	
+2002-07-19 18:40  awinters
+
+	* PerlQt/: Makefile.PL, smokeperl.cpp, lib/Qt/isa.pm:
+
+	Fix to virtual functions in Perl subclasses - register the classname with Smoke from Qt::isa
+	
+2002-07-17 03:35  awinters
+
+	* PerlQt/Qt.pm:
+
+	Fixing perl-5.8 compatibility problem. This generates a warning with -w,
+	but since this code branch is obsolete I don't care that much. :(
+	
+2002-06-30 01:51  awinters
+
+	* PerlQt/: handlers.cpp, smokeperl.cpp:
+
+	memory leak fixes
+	
+2002-06-29 21:55  awinters
+
+	* PerlQt/smokeperl.cpp:
+
+	broken leaky virtual method support - rejoice
+	
+2002-06-28 08:52  awinters
+
+	* PerlQt/: Qt.pm, smokeperl.cpp:
+
+	More destructor voodoo. Why is QApplication getting addRefed?
+	
+2002-06-27 04:59  awinters
+
+	* PerlQt/: Qt.pm, smokeperl.cpp, smokeperl.h:
+
+	global destruction working nicely
+	
+2002-06-27 02:22  awinters
+
+	* PerlQt/smokeperl.cpp:
+
+	enabled method calling - t1 through t6 work again
+	
+2002-06-27 01:46  awinters
+
+	* PerlQt/smokeperl.cpp:
+
+	code movement
+	
+2002-06-27 01:44  awinters
+
+	* PerlQt/smokeperl.cpp:
+
+	Start of multimethod dispatching
+	
+2002-06-26 04:56  awinters
+
+	* PerlQt/: Qt.xs, smokeperl.cpp, lib/Qt/attributes.pm,
+	lib/Qt/isa.pm, lib/Qt/signals.pm, lib/Qt/slots.pm,
+	tutorials/t7/LCDRange.pm:
+
+	Getting the skeleton working for the tutorials
+	
+2002-06-26 03:36  awinters
+
+	* PerlQt/smokeperl.cpp:
+
+	Added Smoke::this(), and a possibly useful closure() function
+	
+2002-06-26 02:45  awinters
+
+	* PerlQt/: Qt.pm, smokeperl.cpp, smokeperl.h:
+
+	This debugging stuff is great
+	
+2002-06-25 21:08  awinters
+
+	* PerlQt/smokeperl.cpp:
+
+	use SmokeClass::parents()
+	
+2002-06-25 20:54  awinters
+
+	* PerlQt/smokeperl.cpp:
+
+	reference counting...
+	
+2002-06-25 16:52  awinters
+
+	* PerlQt/smokeperl.cpp:
+
+	file/line-number needed to be taken from caller
+	
+2002-06-25 07:09  awinters
+
+	* PerlQt/smokeperl.cpp:
+
+	Kickass error messages!
+	
+2002-06-25 06:18  awinters
+
+	* PerlQt/Qt.pm:
+
+	Changed the versioning, cooler this way.
+	
+2002-06-25 05:47  awinters
+
+	* PerlQt/: Makefile.PL, Qt.pm, Qt.xs, handlers.cpp, marshall.h,
+	perlqt.h, smokeperl.cpp, smokeperl.h:
+
+	Initial version of code rewrite
+	
+2002-06-15 01:19  awinters
+
+	* PerlQt/: smokeperl.cpp, smokeperl.h:
+
+	Added smokeperl.cpp... doesn't do anything, and it's not linked in yet.
+	
+2002-06-14 21:02  awinters
+
+	* PerlQt/smokeperl.h:
+
+	Perhaps I have it right this time
+	
+2002-06-14 20:57  awinters
+
+	* PerlQt/smokeperl.h:
+
+	SmokeMethod::call()
+	
+2002-06-14 20:51  awinters
+
+	* PerlQt/smokeperl.h:
+
+	Added SmokeMethod
+	
+2002-06-14 20:27  awinters
+
+	* PerlQt/: Qt.xs, handlers.cpp, marshall.h, perlqt.h, smokeperl.h:
+
+	Adding smokeperl.h. Changed all uses of Smoke::Type to SmokeType.
+	
+2002-06-14 03:11  awinters
+
+	* PerlQt/handlers.cpp:
+
+	
+	I unchanged my mind. Is that a crime?
+	
+2002-06-14 03:06  awinters
+
+	* PerlQt/handlers.cpp:
+
+	I changed my mind, you can't pass NULL to a function expecting int*. Sorry.
+	
+2002-06-14 02:52  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	Added a global object persistance thing
+	
+2002-06-14 02:28  awinters
+
+	* PerlQt/handlers.cpp:
+
+	int* handler
+	
+2002-06-13 22:58  awinters
+
+	* PerlQt/handlers.cpp:
+
+	Untested QStringList marshaller. Try it.
+	
+2002-06-13 09:09  awinters
+
+	* PerlQt/: Qt.pm, lib/Qt/isa.pm:
+
+	Created a global baseclass - something I've been meaning to do for a while. Made constructors automatically inherit, you don't need to have empty constructors anymore.
+	
+2002-06-13 08:47  awinters
+
+	* PerlQt/: Qt.pm, examples/aclock/AnalogClock.pm,
+	examples/buttongroups/ButtonsGroups.pm,
+	examples/dclock/DigitalClock.pm, examples/drawdemo/drawdemo.pl,
+	examples/drawlines/drawlines.pl, examples/forever/forever.pl,
+	lib/Qt/isa.pm, tutorials/t10/CannonField.pm,
+	tutorials/t10/LCDRange.pm, tutorials/t10/t10.pl,
+	tutorials/t11/CannonField.pm, tutorials/t11/LCDRange.pm,
+	tutorials/t11/t11.pl, tutorials/t12/CannonField.pm,
+	tutorials/t12/LCDRange.pm, tutorials/t12/t12.pl,
+	tutorials/t13/CannonField.pm, tutorials/t13/GameBoard.pm,
+	tutorials/t13/LCDRange.pm, tutorials/t14/CannonField.pm,
+	tutorials/t14/GameBoard.pm, tutorials/t14/LCDRange.pm,
+	tutorials/t4/t4.pl, tutorials/t5/t5.pl, tutorials/t6/t6.pl,
+	tutorials/t7/LCDRange.pm, tutorials/t7/t7.pl,
+	tutorials/t8/CannonField.pm, tutorials/t8/LCDRange.pm,
+	tutorials/t8/t8.pl, tutorials/t9/CannonField.pm,
+	tutorials/t9/LCDRange.pm, tutorials/t9/t9.pl:
+
+	new => NEW. NEW() acts like the C++ constructor function, new() acts like a nice object instantiator.
+	
+2002-06-13 03:10  awinters
+
+	* PerlQt/Qt.pm:
+
+	Evil debug statement
+	
+2002-06-13 03:05  awinters
+
+	* PerlQt/: Qt.xs, examples/drawdemo/drawdemo.pl,
+	examples/drawlines/drawlines.pl, examples/forever/forever.pl,
+	lib/Qt/isa.pm, tutorials/t10/t10.pl, tutorials/t11/t11.pl,
+	tutorials/t12/t12.pl, tutorials/t4/t4.pl, tutorials/t5/t5.pl,
+	tutorials/t6/t6.pl, tutorials/t7/t7.pl, tutorials/t8/t8.pl,
+	tutorials/t9/t9.pl:
+
+	Hack 'use'
+	
+2002-06-10 06:04  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	@ISA is now honored - had to fudge to make Exporter work
+	
+2002-06-10 04:29  awinters
+
+	* PerlQt/: Qt.pm, handlers.cpp:
+
+	New type handlers for uchar* and QRgb*, as well as a QImage constructor
+	
+2002-06-10 02:04  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	Evil hacks for puic
+	
+2002-06-05 18:35  awinters
+
+	* PerlQt/examples/buttongroups/: buttongroups.pl, buttonsgroups.pl:
+
+	Original was misnamed buttonsgroups.pl - now buttongroups.pl
+	
+2002-06-04 20:58  awinters
+
+	* PerlQt/: examples/dclock/DigitalClock.pm,
+	tutorials/t14/GameBoard.pm, tutorials/t5/t5.pl, tutorials/t6/t6.pl,
+	tutorials/t7/LCDRange.pm:
+
+	Make constant usage as pleasing as possible
+	
+2002-06-04 20:20  awinters
+
+	* PerlQt/Qt.pm:
+
+	$AUTOLOAD is always $Qt::AutoLoad::AUTOLOAD, now
+	
+2002-06-04 18:57  awinters
+
+	* PerlQt/handlers.cpp:
+
+	No smoke_types.h
+	
+2002-06-04 16:58  awinters
+
+	* PerlQt/: INSTALL, Qt.xs:
+
+	Fixing build procedure - smoke_types.h is long dead
+	
+2002-06-04 08:36  awinters
+
+	* PerlQt/INSTALL:
+
+	KDE SDK hopefully isn't required
+	
+2002-06-04 07:55  awinters
+
+	* PerlQt/: INSTALL, README:
+
+	Build instructions
+	
+2002-06-04 01:50  awinters
+
+	* PerlQt/examples/: aclock/aclock.pl,
+	buttongroups/buttonsgroups.pl, dclock/dclock.pl,
+	drawdemo/drawdemo.pl, drawlines/drawlines.pl, forever/forever.pl:
+
+	add 'use blib' and 'use constant'
+	
+2002-06-04 00:51  awinters
+
+	* PerlQt/examples/dclock/DigitalClock.pm:
+
+	LeftButton is global
+	
+2002-06-03 07:29  awinters
+
+	* PerlQt/tutorials/runall.pl:
+
+	$^X is handy
+	
+2002-06-03 06:25  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, lib/Qt/isa.pm:
+
+	XS autoload was disabled in Perl-5.6.1, so I made a perl sub redirect autoloads
+	
+2002-06-02 10:53  awinters
+
+	* PerlQt/Qt.pm:
+
+	List ops are fun
+	
+2002-06-02 10:49  awinters
+
+	* PerlQt/Qt.pm:
+
+	Don't ask me why, but signals can have return-values. I don't even want to imagine it.
+	
+2002-06-02 10:46  awinters
+
+	* PerlQt/Qt.pm:
+
+	Switched from DynaLoader to XSLoader. Gave exported functions prototypes, for better or worse.
+	
+2002-06-02 10:29  awinters
+
+	* PerlQt/tutorials/runall.pl:
+
+	I'm not usually paranoid about security, but this was too easy not to fix.
+	
+2002-06-02 10:25  awinters
+
+	* PerlQt/tutorials/runall.pl:
+
+	Script to run all the tutorials in order
+	
+2002-06-02 07:24  awinters
+
+	* PerlQt/perlqt.h:
+
+	ifdef
+	
+2002-06-02 07:22  awinters
+
+	* PerlQt/: Makefile.PL, Qt.xs, handlers.cpp, perlqt.h:
+
+	Created perlqt.h, moved code from Qt.xs to new handlers.cpp. Starting code reorganization.
+	
+2002-06-02 03:28  awinters
+
+	* PerlQt/examples/forever/forever.pl:
+
+	Added forever - this will be my benchmark. Current results: SLOW
+	
+2002-06-02 03:09  awinters
+
+	* PerlQt/examples/drawlines/drawlines.pl:
+
+	Adding drawlines demo
+	
+2002-06-02 02:35  awinters
+
+	* PerlQt/examples/drawdemo/drawdemo.pl:
+
+	Added drawdemo
+	
+2002-06-01 23:37  awinters
+
+	* PerlQt/examples/dclock/: dclock, dclock.pl:
+
+	Renamed dclock to dclock.pl
+	
+2002-06-01 23:36  awinters
+
+	* PerlQt/examples/buttongroups/: ButtonsGroups.pm,
+	buttonsgroups.pl:
+
+	Added buttongroups example
+	
+2002-06-01 23:36  awinters
+
+	* PerlQt/examples/aclock/: aclock, aclock.pl:
+
+	Renamed aclock to aclock.pl
+	
+2002-06-01 23:05  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, examples/aclock/AnalogClock.pm,
+	examples/aclock/aclock, examples/dclock/DigitalClock.pm,
+	examples/dclock/dclock, lib/Qt/attributes.pm, lib/Qt/isa.pm,
+	lib/Qt/signals.pm, lib/Qt/slots.pm, tutorials/t1/t1.pl,
+	tutorials/t10/CannonField.pm, tutorials/t10/LCDRange.pm,
+	tutorials/t10/t10.pl, tutorials/t11/CannonField.pm,
+	tutorials/t11/LCDRange.pm, tutorials/t11/t11.pl,
+	tutorials/t12/CannonField.pm, tutorials/t12/LCDRange.pm,
+	tutorials/t12/t12.pl, tutorials/t13/CannonField.pm,
+	tutorials/t13/GameBoard.pm, tutorials/t13/LCDRange.pm,
+	tutorials/t13/t13.pl, tutorials/t14/CannonField.pm,
+	tutorials/t14/GameBoard.pm, tutorials/t14/LCDRange.pm,
+	tutorials/t14/t14.pl, tutorials/t2/t2.pl, tutorials/t3/t3.pl,
+	tutorials/t4/t4.pl, tutorials/t5/t5.pl, tutorials/t6/t6.pl,
+	tutorials/t7/LCDRange.pm, tutorials/t7/t7.pl,
+	tutorials/t8/CannonField.pm, tutorials/t8/LCDRange.pm,
+	tutorials/t8/t8.pl, tutorials/t9/CannonField.pm,
+	tutorials/t9/LCDRange.pm, tutorials/t9/t9.pl:
+
+	Merged 'this' change, tutorials changed accordingly
+	
+2002-06-01 23:00  awinters
+
+	* PerlQt/examples/dclock/: DigitalClock.pm, dclock:
+
+	Adding dclock
+	
+2002-06-01 23:00  awinters
+
+	* PerlQt/examples/dclock/DigitalClock.pm:
+
+	file DigitalClock.pm was initially added on branch this.
+	
+2002-06-01 23:00  awinters
+
+	* PerlQt/examples/dclock/dclock:
+
+	file dclock was initially added on branch this.
+	
+2002-06-01 21:17  awinters
+
+	* PerlQt/examples/aclock/AnalogClock.pm:
+
+	file AnalogClock.pm was initially added on branch this.
+	
+2002-06-01 21:17  awinters
+
+	* PerlQt/examples/aclock/aclock:
+
+	file aclock was initially added on branch this.
+	
+2002-06-01 21:17  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, examples/aclock/AnalogClock.pm,
+	examples/aclock/aclock:
+
+	Added support for QCOORD* and Qt::PointArray::setPoints. Added global min() and max() functions.
+	
+2002-06-01 11:15  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, lib/Qt/signals.pm:
+
+	Made qt_emit also use XS code - noticable speedup in t7. Qt::_internal::invoke is obsolete
+	
+2002-06-01 10:13  awinters
+
+	* PerlQt/: lib/Qt/slots.pm, tutorials/t1/t1.pl,
+	tutorials/t10/t10.pl, tutorials/t11/t11.pl, tutorials/t12/t12.pl,
+	tutorials/t13/CannonField.pm, tutorials/t13/GameBoard.pm,
+	tutorials/t13/t13.pl, tutorials/t14/CannonField.pm,
+	tutorials/t14/GameBoard.pm, tutorials/t14/t14.pl,
+	tutorials/t2/t2.pl, tutorials/t3/t3.pl, tutorials/t4/t4.pl,
+	tutorials/t5/t5.pl, tutorials/t6/t6.pl, tutorials/t7/t7.pl,
+	tutorials/t8/t8.pl, tutorials/t9/t9.pl:
+
+	tutorial mods - use blib and enable canShoot(bool) signal in t13/t14.
+	
+2002-06-01 09:59  awinters
+
+	* PerlQt/: Qt.xs, lib/Qt/slots.pm:
+
+	qt_invoke implemented in XS
+	
+2002-06-01 06:37  awinters
+
+	* PerlQt/: Qt.xs, lib/Qt/signals.pm:
+
+	Code reorganization, start of XS slot work
+	
+2002-06-01 00:19  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, lib/Qt/signals.pm, lib/Qt/slots.pm:
+
+	emit signal() now uses type marshalling -- the way has been shown
+	
+2002-05-31 06:42  awinters
+
+	* PerlQt/: Qt.pm, tutorials/t10/CannonField.pm,
+	tutorials/t10/LCDRange.pm, tutorials/t10/t10.pl,
+	tutorials/t11/CannonField.pm, tutorials/t11/t11.pl,
+	tutorials/t12/CannonField.pm, tutorials/t12/t12.pl,
+	tutorials/t13/CannonField.pm, tutorials/t8/CannonField.pm,
+	tutorials/t8/LCDRange.pm, tutorials/t8/t8.pl,
+	tutorials/t9/CannonField.pm, tutorials/t9/LCDRange.pm,
+	tutorials/t9/t9.pl:
+
+	Mostly done with code style revision
+	
+2002-05-31 06:18  awinters
+
+	* PerlQt/: Qt.xs, tutorials/t11/CannonField.pm,
+	tutorials/t11/LCDRange.pm, tutorials/t11/t11.pl:
+
+	It seems I still haven't knocked down the &Constant quirks. It's zero arguments! Sheesh.
+	
+2002-05-31 06:07  awinters
+
+	* PerlQt/tutorials/t12/: CannonField.pm, LCDRange.pm, t12.pl:
+
+	My revisionist ways continue
+	
+2002-05-31 05:51  awinters
+
+	* PerlQt/tutorials/t13/: CannonField.pm, GameBoard.pm, LCDRange.pm,
+	t13.pl:
+
+	t13 revisions
+	
+2002-05-31 05:37  awinters
+
+	* PerlQt/tutorials/t14/: CannonField.pm, GameBoard.pm, LCDRange.pm,
+	t14.pl:
+
+	I'm trying to define a coding style using t14 as the baseline. This works with the latest kalyptus.
+	
+2002-05-31 04:48  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, tutorials/t10/CannonField.pm,
+	tutorials/t10/LCDRange.pm, tutorials/t10/t10.pl,
+	tutorials/t11/CannonField.pm, tutorials/t11/LCDRange.pm,
+	tutorials/t11/t11.pl, tutorials/t14/CannonField.pm,
+	tutorials/t14/GameBoard.pm, tutorials/t14/LCDRange.pm,
+	tutorials/t14/t14.pl, tutorials/t2/t2.pl, tutorials/t3/t3.pl,
+	tutorials/t4/t4.pl, tutorials/t5/t5.pl, tutorials/t6/t6.pl,
+	tutorials/t7/LCDRange.pm, tutorials/t7/t7.pl,
+	tutorials/t8/LCDRange.pm, tutorials/t8/t8.pl,
+	tutorials/t9/CannonField.pm, tutorials/t9/LCDRange.pm,
+	tutorials/t9/t9.pl:
+
+	AUTOLOAD return values on user-defined functions work, &Constant works thanks to ignoring any arguments passed, t14 ported to new
+	code format.
+	
+2002-05-31 03:37  awinters
+
+	* PerlQt/: Qt.pm, lib/Qt/attributes.pm, tutorials/t9/LCDRange.pm,
+	tutorials/t9/t9.pl:
+
+	Changed static method calls from Class->method to Class::method
+	
+2002-05-30 22:48  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, lib/Qt/signals.pm,
+	tutorials/t10/CannonField.pm, tutorials/t10/LCDRange.pm,
+	tutorials/t10/t10.pl, tutorials/t9/CannonField.pm,
+	tutorials/t9/LCDRange.pm, tutorials/t9/t9.pl:
+
+	Changed how sv_this was being saved. That fixed the passing-lvalue-this-around problem
+	
+2002-05-30 13:30  awinters
+
+	* PerlQt/: lib/Qt/isa.pm, tutorials/t8/CannonField.pm,
+	tutorials/t8/LCDRange.pm, tutorials/t8/t8.pl:
+
+	passing 'this' as an lvalue to constructors which MODIFY 'this' could be unpleasant. Perhaps using sv_setsv was a bad idea.
+	
+2002-05-30 13:16  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, lib/Qt/signals.pm, lib/Qt/slots.pm,
+	tutorials/t5/t5.pl, tutorials/t6/t6.pl, tutorials/t7/LCDRange.pm,
+	tutorials/t7/t7.pl:
+
+	Made signals/slots use 'this'
+	
+2002-05-30 12:51  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, tutorials/t4/t4.pl:
+
+	set 'this' for do_autoload, so QObject-mirroring refcounting works
+	
+2002-05-30 12:29  awinters
+
+	* PerlQt/: Qt.xs, lib/Qt/isa.pm:
+
+	AUTOLOAD now works on non-method-calls in classes, by defaulting unknown functions to this->method
+	
+2002-05-30 11:05  awinters
+
+	* PerlQt/: Qt.pm, lib/Qt/isa.pm:
+
+	enable MyClass->AUTOLOAD and @ISA searching from autoloader
+	
+2002-05-30 10:53  awinters
+
+	* PerlQt/lib/Qt/isa.pm:
+
+	Add import() function for use classes, so MyClass() constructors work
+	
+2002-05-30 10:07  awinters
+
+	* PerlQt/Qt.xs:
+
+	Object destruction seems to work again
+	
+2002-05-30 07:40  awinters
+
+	* PerlQt/Qt.xs:
+
+	Stop pushing 'this' on the stack for virtual methods
+	
+2002-05-30 07:28  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	Calling convention works. $x->foo works for AUTOLOAD case, haven't tested the non-AUTOLOAD case even though it should work too.
+	
+2002-05-30 05:01  awinters
+
+	* PerlQt/Qt.xs:
+
+	AUTOLOAD now works for calling Perl-defined methods
+	
+2002-05-30 04:12  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, lib/Qt/isa.pm:
+
+	Added an XS autoload
+	
+2002-05-30 02:08  awinters
+
+	* PerlQt/: Qt.xs, lib/Qt/attributes.pm, lib/Qt/isa.pm:
+
+	Implementation of 'this' and attributes
+	
+2002-05-30 02:08  awinters
+
+	* PerlQt/lib/Qt/attributes.pm:
+
+	file attributes.pm was initially added on branch this.
+	
+2002-05-29 11:09  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, tutorials/t1/t1.pl,
+	tutorials/t14/CannonField.pm, tutorials/t14/GameBoard.pm,
+	tutorials/t14/LCDRange.pm, tutorials/t14/t14.pl,
+	tutorials/t2/t2.pl, tutorials/t3/t3.pl, tutorials/t4/t4.pl,
+	tutorials/t5/t5.pl, tutorials/t6/t6.pl, tutorials/t7/LCDRange.pm,
+	tutorials/t7/t7.pl, tutorials/t8/CannonField.pm,
+	tutorials/t8/LCDRange.pm, tutorials/t8/t8.pl,
+	tutorials/t9/CannonField.pm, tutorials/t9/LCDRange.pm,
+	tutorials/t9/t9.pl:
+
+	Outline for goal of this branch - pretty programs
+	
+2002-05-29 09:18  awinters
+
+	* PerlQt/Qt.xs:
+
+	Forgot to remove debugging arguments to warn() before committing
+	
+2002-05-29 04:49  awinters
+
+	* PerlQt/tutorials/t9/: CannonField.pm, LCDRange.pm, t9.pl:
+
+	Initial commit
+	
+2002-05-29 04:47  awinters
+
+	* PerlQt/tutorials/t10/CannonField.pm:
+
+	Color constants work now
+	
+2002-05-29 04:40  awinters
+
+	* PerlQt/tutorials/: t11/CannonField.pm, t11/LCDRange.pm,
+	t11/t11.pl, t12/CannonField.pm, t12/LCDRange.pm, t12/t12.pl,
+	t13/CannonField.pm, t13/GameBoard.pm, t13/LCDRange.pm, t13/t13.pl,
+	t14/CannonField.pm, t14/GameBoard.pm, t14/LCDRange.pm, t14/t14.pl:
+
+	Adding tutorials
+	
+2002-05-28 23:33  awinters
+
+	* PerlQt/: Qt.xs, tutorials/t10/CannonField.pm,
+	tutorials/t10/LCDRange.pm, tutorials/t10/t10.pl:
+
+	Plugged a memory-leak involving tf_stack return-values, and added isa(QPaintDevice) to the list of classes added to the
+	virtual function object-map. Tutorial 10 added.
+	
+2002-05-28 22:13  awinters
+
+	* PerlQt/tutorials/t8/CannonField.pm:
+
+	When I said ambiguous method resolution was improved, I wasn't kidding.
+	
+2002-05-28 22:12  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, tutorials/t8/CannonField.pm,
+	tutorials/t8/LCDRange.pm, tutorials/t8/t8.pl:
+
+	Copy constructor implemented for virtual method return-values, ambiguous method resolution improved, t8 working.
+	
+2002-05-28 20:27  awinters
+
+	* PerlQt/Qt.pm:
+
+	Added emit keyword
+	
+2002-05-28 20:13  awinters
+
+	* PerlQt/tutorials/: t6/t6.pl, t7/LCDRange.pm, t7/t7.pl:
+
+	Last commit failed, new object destruction
+	
+2002-05-28 20:13  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, tutorials/t4/t4.pl, tutorials/t5/t5.pl:
+
+	New object destruction - Perl now mirrors QObject reference counts
+	
+2002-05-28 07:49  awinters
+
+	* PerlQt/tutorials/t7/: LCDRange.pm, t7.pl:
+
+	Tutorial 7, in all its glory
+	
+2002-05-28 07:48  awinters
+
+	* PerlQt/: Qt.xs, lib/Qt/signals.pm:
+
+	Workings of tutorial 7
+	
+2002-05-28 06:53  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, lib/Qt/signals.pm, lib/Qt/slots.pm:
+
+	signal and slot implementation merged a bit, first stab at ambiguous method resolution added.
+	
+2002-05-28 04:08  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, lib/Qt/slots.pm:
+
+	Slots are now declared through the Qt::slots pragma. Only int arguments are supported, so far.
+	
+2002-05-28 00:19  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, lib/Qt/slots.pm:
+
+	Got slot arguments working
+	
+2002-05-27 19:52  awinters
+
+	* PerlQt/lib/Qt/slots.pm:
+
+	More slot goodness
+	
+2002-05-27 19:37  awinters
+
+	* PerlQt/lib/Qt/slots.pm:
+
+	Recognize when Perl slot is invoked
+	
+2002-05-27 19:27  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, lib/Qt/slots.pm:
+
+	Paranoid backup. I got a slot to work, and I want it to stay that way. :)
+	
+2002-05-27 18:47  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs, lib/Qt/isa.pm, lib/Qt/signals.pm,
+	lib/Qt/slots.pm:
+
+	Start overriding signal/slot methods. Qt is now 'aware' of PerlQt classes, thanks to overrides of className() and
+	metaObject().
+	
+2002-05-27 09:09  awinters
+
+	* PerlQt/Qt.xs:
+
+	Bye bye, comments
+	
+2002-05-27 08:53  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	Dirty first draft of 'proper' reference counting
+	
+2002-05-27 08:52  awinters
+
+	* PerlQt/tutorials/: t1/t1.pl, t2/t2.pl, t3/t3.pl, t4/t4.pl,
+	t5/t5.pl, t6/t6.pl:
+
+	use strict is mandatory, now. Reference counts matter.
+	
+2002-05-27 02:51  awinters
+
+	* PerlQt/Qt.xs:
+
+	I never manage to get all the debug statements first time around...
+	
+2002-05-27 02:49  awinters
+
+	* PerlQt/Qt.xs:
+
+	Fully working marshalling class. Toss MyStack for good; Long live Marshall!
+	
+2002-05-27 01:35  awinters
+
+	* PerlQt/Qt.xs:
+
+	I don't need these debugging statements anymore
+	
+2002-05-27 01:28  awinters
+
+	* PerlQt/: Qt.xs, marshall.h:
+
+	Marshalling works for method calls
+	
+2002-05-26 23:41  awinters
+
+	* PerlQt/: Qt.xs, marshall.h:
+
+	Defined some of the type mapping
+	
+2002-05-26 23:23  awinters
+
+	* PerlQt/marshall.h:
+
+	#ifndef MARSHALL_H
+	
+2002-05-26 23:19  awinters
+
+	* PerlQt/: Qt.xs, marshall.h:
+
+	Defining general type-marshalling interface
+	
+2002-05-24 20:14  awinters
+
+	* PerlQt/Makefile.PL:
+
+	Forgot to update this...
+	
+2002-05-24 17:25  awinters
+
+	* PerlQt/Qt.xs:
+
+	Eliminate warning during global destruction
+	
+2002-05-24 17:19  awinters
+
+	* PerlQt/tutorials/: t2/t2.pl, t3/t3.pl, t4/t4.pl, t5/t5.pl,
+	t6/t6.pl:
+
+	Enums work, now
+	
+2002-05-24 08:19  awinters
+
+	* PerlQt/lib/Qt/: enumerations.pm, properties.pm, signals.pm,
+	slots.pm:
+
+	Documented some proposed usage. Perhaps good, perhaps not.
+	
+2002-05-24 07:45  awinters
+
+	* PerlQt/lib/Qt/isa.pm:
+
+	Initial implementation - no QMetaObject stuff yet
+	
+2002-05-24 07:43  awinters
+
+	* PerlQt/tutorials/: t4/t4.pl, t5/t5.pl, t6/t6.pl:
+
+	Use Qt::isa pragma
+	
+2002-05-24 07:36  awinters
+
+	* PerlQt/lib/Qt/: enumerations.pm, isa.pm, properties.pm,
+	signals.pm, slots.pm:
+
+	Adding some QMetaObject-generating pragmas
+	
+2002-05-24 04:46  awinters
+
+	* PerlQt/Qt.xs:
+
+	That qobject boolean was a bad idea...
+	
+2002-05-24 04:13  awinters
+
+	* PerlQt/Qt.xs:
+
+	Fixed memory leak, isQObject() forgot to return false
+	
+2002-05-24 03:41  awinters
+
+	* PerlQt/Qt.xs:
+
+	Call delete through smoked library
+	
+2002-05-24 03:24  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	Added a flag indicating whether an object can be deleted -- object deletion enabled.
+	
+2002-05-24 02:59  awinters
+
+	* PerlQt/Qt.xs:
+
+	First version with virtual functions
+	
+2002-05-24 02:36  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	Beginning of virtual method support
+	
+2002-05-24 02:07  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	Default to silent output, and remove old commented functions.
+	
+2002-05-24 01:56  awinters
+
+	* PerlQt/: Qt.xs, Qt.pm:
+
+	Implemented rudimentary object tracking and destruction.
+	
+2002-05-23 22:57  awinters
+
+	* PerlQt/: Qt.pm, Qt.xs:
+
+	Implement new smokelib => perl interface SmokeBinding class, and add destructor callback. Start of work to
+	get working object destruction.
+	
+2002-05-23 20:53  awinters
+
+	* PerlQt/Qt.xs:
+
+	Changed return-value handling to be generic so it can handle virtual-function arguments as well.
+	
+2002-05-23 06:16  awinters
+
+	* PerlQt/Qt.xs:
+
+	This one works. First working version in SF CVS
+	
+2002-05-23 06:02  awinters
+
+	* PerlQt/: Makefile.PL, Qt.pm, Qt.xs, tutorials/t1/t1.pl,
+	tutorials/t2/t2.pl, tutorials/t3/t3.pl, tutorials/t4/t4.pl,
+	tutorials/t5/t5.pl, tutorials/t6/t6.pl:
+
+	Imported sourcecode
+	
+2002-05-23 06:02  awinters
+
+	* PerlQt/: Makefile.PL, Qt.pm, Qt.xs, tutorials/t1/t1.pl,
+	tutorials/t2/t2.pl, tutorials/t3/t3.pl, tutorials/t4/t4.pl,
+	tutorials/t5/t5.pl, tutorials/t6/t6.pl:
+
+	Initial revision
+	

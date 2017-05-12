@@ -1,0 +1,13 @@
+Revision history for Perl extension PAD
+
+0.04    Mon Aug 11 03:10:01 2014
+        - suppress warning on bootstrap without arguments
+
+0.03    Thu Jul 10 00:30:06 2014
+        - Add simple command line option parser (OGATA Tetsuji)
+
+0.02    Sun Sep 30 18:27:39 2012
+        - initial release
+
+0.01    Sat Sep 29 12:12:30 2012
+        - original version

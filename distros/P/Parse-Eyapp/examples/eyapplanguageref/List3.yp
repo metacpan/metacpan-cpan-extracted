@@ -1,0 +1,13 @@
+%semantic token 'c' 
+%{
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+%}
+%%
+S:      'c'+  'd'+ 
+           { 
+              print Dumper($_[1]);
+              print Dumper($_[2]);
+           } 
+;
+%%

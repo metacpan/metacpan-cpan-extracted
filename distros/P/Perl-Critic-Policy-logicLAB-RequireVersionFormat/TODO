@@ -1,0 +1,9 @@
+TODO file for Perl::Critic::Policy::logicLAB::RequireVersionFormat
+
+$Id$
+
+Project road map:
+http://logiclab.jira.com/browse/PCPMRVF#selectedTab=com.atlassian.jira.plugin.system.project%3Aroadmap-panel
+
+- Integrate with Perl::Critic::Policy::Modules::RequireVersionVar [PCPMRVF-6]
+  http://logiclab.jira.com/browse/PCPMRVF-6

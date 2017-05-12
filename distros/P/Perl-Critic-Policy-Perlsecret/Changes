@@ -1,0 +1,26 @@
+Revision history for Perl-Critic-Policy-Perlsecret
+v0.0.11 2017-01-05
+        Fix for false positives in Venus detection identified by otrosien
+        Issue #16
+v0.0.10 2016-10-19
+        Fix for false positive Abbott and Costello bug identified by Sawyer
+        Issue #14 from Github
+v0.0.9  2016-10-04
+        Updated the TravisCI and Dzil code.
+v0.0.8  2016-10-15
+        - Added Pod.
+        - Bug fix with new disallow code.
+        - Typo in description removed.
+v0.0.7  2016-10-04
+        - Config allows overriding so specific secrets can be allowed.
+v0.0.6  2016-07-29
+        - Rewrite using PPI properly
+v0.0.5  2016-07-29
+        - Released in error as 0.0.6
+v0.0.4  2014-09-14
+v0.0.3  2014-09-11
+        - Migrating to Dist::Zilla
+v0.0.2  2014-09-09
+        - Fixing some Kwalitee issues
+v0.0.1  2014-08-16
+        - Initial Release

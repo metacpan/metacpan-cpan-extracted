@@ -1,0 +1,133 @@
+=head1 NAME
+
+Persistent::Hash - Storage module Programmer Manual (0.1)
+
+=head1 DESCRIPTION
+
+
+Other Persistent::Hash manuals:
+
+L<Persistent::Hash> - Persistent::Hash module overview and description
+
+L<Persistent::Hash::API> - API Reference
+
+L<Persistent::Hash::Manual> - Programmer Manual
+
+=head1 OVERVIEW
+
+This manual briefly explains the main API for a Persistent::Hash storage module in the hopes
+more storage module come to life.
+
+=head1 MANUAL CONVENTIONS
+
+Glossary:
+
+=over 3
+
+=item * Source: The Persistent::Hash source code
+
+=item * Data Type: A subclass of Persistent::Hash
+
+=item * Storage: The database, flatfile or other medium where the data is stored
+
+=item * Storage module: The storage module that knows how to store to Storage
+
+=item * Configuration options: The subclass overloaded constants (API)
+
+=item * Hash type: The hash MIME type constructed with the project and package name
+
+=back
+
+=head1 STANDARD STORAGE API
+
+=head2 LoadHashInfo()
+
+This method will be called on the storage module when Persistent::Hash needs to load a 
+certain hash info (id,time_accessed,time_modified). The file docs/tables.pod describes
+the info table in detail.
+
+This method receives a classname (itself),an object package and an 'id'. Those three
+parameters need to be defined or else something is going wrong.
+
+A database handle can be obtained by called DatabaseHandle() on the object package, as
+a method call. This method should load the information from the media concerning the
+'id' and return a hash ref of the following type of format:
+
+	{
+		type => $type,
+		time_accessed => $time_accessed,
+		time_modified => $time_modified,
+	}
+
+=head2 LoadHashData()
+
+This method will be called on the storage module when Persistent::Hash needs to load
+the 'data' chunk of a hash. (DATA_FIELDS). This method should receive the untied version
+of the hash from wich it can obtain the 'id'.
+
+You can get a database handle by calling DatabaseHandle() on the untied hash.
+
+This method should return a hash ref of the DATA_FIELDS with their according media values.
+
+=head2 LoadHashIndex()
+
+This method will be called on the storage module when Persistent::Hash needs to load
+the 'index' chunk of a hash. (INDEX_FIELDS). This method should receive the untied version
+of the hash from wich it can obtain the 'id'.
+
+You can get a database handle by calling DatabaseHandle() on the untied hash.
+
+This method should return a hash ref of the INDEX_FIELDS with their according media values.
+
+=head2 DeleteHash()
+
+This method will be called on the storage module when Persistent::Hash needs to delete a 
+hash from Storage. It should delete all known records of a hash in the media.
+This method should receive the tied hash as a parameter from wich it can extract the 'id'.
+
+You can get a database handle by calling DatabaseHandle() on the tied hash.
+
+This method should return true on success, undef on error.
+
+=head2 InsertHash()
+
+This method will be called on the storage module when Persistent::Hash needs to insert a new
+hash in Storage. It should insert info,data and index records into the media.
+
+You should receive the tied version of the hash. More importantly, this method should generate
+the unique identifier for this object. The id HAS to be numeric. 
+
+You can get a database handle by calling DatabaseHandle() on the tied hash.
+
+This method sould return the newly generated 'id' on success, undef on failure.
+
+=head2 UpdateHash()
+
+This method will be called on the storage module when Persistent::Hash needs to insert a new
+hash in Storage. It should insert info,data and index records into the media.
+
+You should receive the tied version of the hash from wich it can extract the 'id'.
+
+You can get a database handle by calling DatabaseHandle() on the tied hash.
+
+This method sould return the id' on success, undef on failure.
+
+=head1 COPYRIGHT
+
+Copyright(c) 2002 Benoit Beausejour <bbeausej@pobox.com>
+
+All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself. 
+
+
+=head1 AUTHOR
+
+Benoit Beausejour <bbeausej@pobox.com>
+
+=head1 SEE ALSO
+
+Persistent::Hash(1).
+perltie(1).
+perl(1).
+
+=cut
+

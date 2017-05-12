@@ -1,0 +1,23 @@
+It is too simple:
+
+1. Select a 'MODE' from the menu. 
+   To navigate, use arrow keys, the vi keys (j ,k , m ), or ENTER .
+   The letter 'h' un-pops the menu display.
+   TAB (or 'l') moves you to the next window.
+
+2. Most modes requires to select a namespace from the the 'Schemas' listbox. 
+   Use arrows, vi keys, ENTER (or SPACE, ' ', or 'h' ) seals the selection. 
+   Press 'd' to view more acl permissions on schema
+   TAB (or 'l') moves you to the button window.
+
+3. The results are displayed in the bottom window.
+   Use arrows, vi keys, ENTER (or SPACE, or ' ' ) seals the selection.
+   Keep pressing 'd' if you want more results.
+   Ctrl-H displays Help screen
+   Ctrl-F appends the contents of the bottom display to /tmp/pcurse.out
+   In tables mode Ctrl-L displays the last 20 updates in table
+   In tables and database mode Ctrl-A analyses at table or database
+   In tables and database mode Ctrl-V analyses at table or database
+   TBB (or 'l') takes you back to the starting menu.
+
+4. Press 'q' to quit the program. Thank you for flying Pcurse!  

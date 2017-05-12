@@ -1,0 +1,496 @@
+=encoding iso-8859-13
+
+=head1 NAME
+
+perlintro - Trumpas ávadas á Perlà
+
+=head1 DESCRIPTION
+
+=head2 Kas yra Perl?
+
+Perl yra bendros paskirties programavimo kalba, kuri pradþioje buvo skirta manipuliavimui tekstu, o dabar yra naudojama daugeliui uþduoèiø: sistemø administravimui, interneto svetainiø, tinklo, grafiniø sàsajø programavimui ir kitoms uþduotims. 
+
+Ði kalba yra labiau praktiðka (lengva naudoti, efektyvi, pilna) negu graþi (maþa, elegantiðka, minimalistinë). Pagrindinës Perlo ypatybës yra naudojimo paprastumas, tiek procedûrinio, tiek objektinio programavimo palaikymas, patogus teksto apdorojimas ir vienas didþiausiø nemokamø moduliø pasirinkimas.
+
+=head2 Perlo programø vykdymas
+
+Norint vykdyti Perlo programà Unix komandinëje eilutëje tereikia paraðyti:
+
+    perl programosvardas.pl
+
+Arba galima paraðyti tokià pirmàjà programos eilutæ:
+
+    #!/usr/bin/env perl
+
+... ir tada paleisti programà ðitaip:
+
+    /kelias/iki/perl/programos.pl
+
+Tiesa, ði programa turi turëti "vykdymo" nuostatà, tad reikia Unix paraðyti
+
+    chmod 755 programa.pl
+
+prieð jà paleidþiant.
+
+Daugiau informacijos apie Perl interpretatoriø galima rasti L<perlrun> dokumentacijoje.
+
+=head2 Paprasèiausios sintaksës apþvalga
+
+Perlo programa susideda ið vieno ar keliø sakiniø. Ðie sakiniai paprastai bûna suraðyti byloje. Prieðingai nei kai kuriose kitose kalbose, nereikia apraðyti C<main()> funkcijos ar panaðiø dalykø.
+
+Perlo sakiniai baigiasi kabliataðkiu:
+
+    print "Sveikas, pasauli";
+
+Komentarai prasideda grotelëmis ir tæsiasi iki eilutës pabaigos:
+
+    # Èia yra komentaras
+
+Tarpai, naujos eilutës (I<whitespace>) nieko nereiðkia:
+
+    print
+        "Sveikas, pasauli"
+        ;
+
+...nebent jie yra simboliø eilutëse:
+
+    # atspausdins "sveikas pasauli" dviejose eilutëse
+    print "Sveikas
+    pasauli";
+
+Simboliø eilutes galima apraðyti tiek viengubomis, tiek dvigubomis kabutëmis:
+
+    print 'Sveikas, pasauli';
+    print "Sveikas, pasauli";
+
+Taèiau tik dvigubose kabutëse esanèios simboliø eilutës "interpoliuoja" kintamuosius ir specialiuosius simbolius, tokius kaip naujos eilutës simbolis (C<\n>):
+
+    print "Sveikas, $vardas\n"; # veikia kaip derëtø
+    print 'Sveikas, $vardas\n'; # spausdins $vardas\n taip kaip paraðyta
+
+Skaièiø nereikia imti á kabutes:
+
+    print 42;
+
+Priklausomai nuo jûsø skonio, funkcijø argumentus galima raðyti skliausteliuose, o galima juos ir praleisti. Skliausteliai reikalingi tik retkarèiais norint paaiðkinti operacijø eiliðkumà.
+
+    print("Sveikas, pasauli\n");
+    print "Sveikas, pasauli\n";
+
+Daugiau informacijos apie Perl sintaksæ galima rasti L<perlsyn> dokumentacijoje.
+
+=head2 Perlo kintamøjø tipai
+
+Perlas turi tris pagrindinius kintamøjø tipus: skaliarus, paprastuosius masyvus bei asociatyviuosius masyvus.
+
+=head3 Skaliarai
+
+Skaliarai saugo vienà reikðmæ:
+
+    my $gyvunas = "kupranugaris";
+    my $atsakymas = 42;
+
+Skaliarinës reikðmës gali bûti simboliø eilutës, sveiki skaièiai arba skaièiai su kableliu. Perlas automatiðkai pagal poreiká pavers vienà tipà á kità. Nebûtina prieð vartojant kintamuosius juos deklaruoti.
+
+Skaliarus galima naudoti ávairiai:
+
+    print $gyvunas;
+    print "Gyvûnas yra $gyvunas\n";
+    print "$atsakymas pakëlus kvadratu gausime ", $atsakymas * $atsakymas, "\n";
+
+Perle yra keletas labai neáskaitomai atrodanèiø "magiðkø" skaliariniø kintamøjø. Ðie specialûs kintamieji naudojami ávairiausiais tikslais ir visi yra apraðyti L<perlvar> dokumentacijoje. Kol kas vienintelis toks specialus kintamasis, apie kurá vertëtø þinoti yra C<$_>, kuris reiðkia "kintamàjá pagal nutylëjimà". Jis naudojamas daugelyje Perlo funkcijø, jei joms neperduodami kiti kintamieji, bei automatiðkai nustatomas kai kuriuose cikluose.
+
+    print; # pagal nutylëjimà atspausdina tai kas saugoma $_
+
+=head3 Paprastieji masyvai
+
+Paprastuose masyvuose saugomas reikðmiø sàraðas:
+
+    my @gyvunai = ("kupranugaris", "lama", "pelëda");
+    my @skaiciai = (23, 42, 69);
+    my @maisyta = ("kupranugaris", 42, 1.23);
+
+Masyvø indeksai prasideda nuo nulio. Ðtai kaip prieinama prie masyvo elemento:
+
+    print $gyvunai[0]; # spausdina "kupranugaris"
+    print $gyvunai[1]; # spausdina "lama"
+
+Specialusis kintamasis C<$#masyvas> paskutinio masyvo elemento indekso numerá:
+
+    print $maisyta[$#maisyta]; # spausdina paskutiná elementà -- 1.23
+
+Galbût jums norint suþinoti kiek yra masyve elementø norisi naudoti C<$#masyvas + 1>, bet tai nëra bûtina, nes naudojant C<@masyvas> ten kur Perlas tikisi skaliaro ("skaliariniame kontekste") bus gràþinamas masyvo elementø skaièius:
+
+    if (@gyvunai < 5) { ... } # jei masyve @gyvunai maþiau nei 5 elementai...
+
+Norint gauti keletà reikðmiø ið masyvo:
+
+    @gyvunai[0,1];          # gràþina ("kupranugaris", "lama");
+    @gyvunai[0..2];         # gràþina ("kupranugaris", "lama", "pelëda");
+    @gyvunai[1..$#gyvunai]; # gràþina visus elementus, iðskyrus pirmà
+
+Tai vadinama "masyvo dalimi" (I<array slice>)
+
+Su masyvais galima atlikti ávairius naudingus veiksmus:
+
+    my @surikiuoti = sort @gyvunai;
+    my @atgaline_tvarka = reverse @skaiciai;
+
+Perle yra ir keletas specialiøjø masyvø: C<@ARGV> (programai perduoti komandinës eilutës argumentai), C<@_> (argumentai perduoti subrutinai). Visi jie apraðyti L<perlvar> dokumentacijoje.
+
+=head3 Asociatyvieji masyvai
+
+Asociatyvus masyvas apraðo vardo-reikðmës porø aibæ:
+
+    my %vaisiu_spalvos = ("obuolys", "raudonas", "bananas", "geltonas");
+
+Naudojant tarpus ir C<=E<gt>> operatoriø galima perraðyti áskaitomiau:
+
+    my %vaisiu_spalvos = (
+        obuolys => "raudonas",
+        bananas => "geltonas",
+    );
+
+Pasiekti elementus galima taip:
+
+    $vaisiu_spalvos{"obuolys"}; # gràþina "raudonas"
+
+Raktø bei reikðmiø sàraðus galima gauti per funkcijas C<keys()> ir C<values()>
+
+    my @vaisiai = keys %vaisiu_spalvos;
+    my @spalvos = values %vaisiu_spalvos;
+
+Asociatyvûs masyvai neturi kokios nors rikiavimo tvarkos, nors visada galima surikiuoti masyvà, kuris gaunamas su funkcija C<keys()>.
+
+Lygiai kaip yra specialiøjø skaliarø ar paprastø masyvø, taip yra ir specialiø asociatyviø masyvø. Labiausiai naudojamas yra C<%ENV> specialusis asociatyvusis masyvas, kuriame saugomi aplinkos kintamieji. Apie tai plaèiau L<perlvar> dokumentacijoje.
+
+Plaèiau apie skaliarus, paprastus ir asociatyviuosius masyvus galima pasiskaityti L<perldata> dokumentacijoje.
+
+Sudëtingesnës duomenø struktûros gali bûti sudaromos naudojantis nuorodomis (I<references>). Jø dëka galima sukurti sàraðus ir masyvus kituose sàraðuose bei masyvuose.
+
+Nuoroda yra skaliarinë reikðmë, galinti rodyti á bet kurio tipo Perlo duomenis. Taigi, iðsaugant nuorodà á masyvà kaip kito masyvo elementà, galima sudaryti masyvø masyvus (daugiamaèius masyvus). Ðtai pavyzdys, kuriame saugoma dviejø lygiø asociatyvaus masyvo asociatyviame masyve struktûra pasinaudojus anoniminëmis nuorodomis:
+
+    my $kintamieji = {
+        skaliarai    => {
+            apibudinimas => "viena reikðmë",
+            simbolis     => '$',
+            },
+        masyvai      => {
+            apibudinimas => "reikðmiø sàraðas",
+            simbolis     => '@',
+            },
+        asociatyvus  => {
+            apibudinimas => "rakto/reikðmës poros",
+            simbolis     => '%',
+            },
+    };
+
+    print "Skaliarai prasideda simboliu ".
+        "$kintamieji->{'skaliarai'}->{'simbolis'}\n";
+
+Pilna dokumentacija apie nuorodas yra L<perlreftut>, L<perllol>, L<perlref> ir L<perldsc> dokumentacijose.
+
+=head2 Kintamøjø sritys
+
+Kol kas visada kintamuosius apraðëme naudodami ðià sintaksæ:
+
+    my $kintamasis = "reikðmë";
+
+Tiesà sakant, C<my> nëra bûtinas, galima tiesiog raðyti:
+
+    $kintamasis = "reikðmë";
+
+Taèiau jei praleidþiate C<my>, sukuriamas globalusis kintamasis visoje jûsø programoje, o tai nëra pats geriausias programavimo bûdas. C<my> sukuria I<leksinës srities> (I<lexically scoped>) kintamàjá, kuris galioja tik tame bloke, kuriame jis yra apraðytas (blokas yra keletas sakiniø, apskliaustø figûriniais skliaustais).
+
+    my $a = "foo";
+    if ($kazkas) {
+        my $b = "bar";
+        print $a; # spausdina "foo"
+        print $b; # spausdina "bar"
+    }
+    print $a; # spausdina "foo"
+    print $b; # nieko nespausdina, nes $b galiojimo blokas jau baigësi
+
+Jeigu naudosite C<my> kartu su C<use strict;> jûsø programos pradþioje, Perlo interpretatorius galës pastebëti daþnas programuotojø klaidas ir apie tai jus áspëti. Tarkim aukðèiau duotame pavyzdyje paskutinis C<print $b;> iðmestø klaidà ir programa neveiktø. Rekomenduojama visada naudoti C<strict> sintaksæ.
+
+=head2 Sàlygos ir ciklø sakiniai
+
+Perlas turi visus standartinius ciklos ir sàlygos sakinius iðskyrus C<case/switch> (bet jei jums tikrai jø reikia, galite pasinaudoti moduliu C<Switch>, kuris netgi gali daugiau nei áprasti C<switch/case> sakiniai kitose kalbose).
+
+Sàlyga gali bûti bet kuris Perlo sakinys. Kitame skyriuje bus apraðomi operatoriai, tad þiûrëkite ten, kokie sàlygos, Bûlio logikos operatoriai daþnai naudojami sàlygos sakiniuose.
+
+=head3 if
+
+    if ( sàlyga ) {
+        ...
+    } elsif ( kita sàlyga ) {
+        ...
+    } else {
+       ...
+    }
+
+Yra ir atvirkðtinë versija:
+
+    unless ( sàlyga ) {
+       ...
+    }
+
+... kuri reiðkia tà patá kaip ir C<if (!sàlyga) { ... }>, tik C<unless> lengviau perskaityti.
+
+Perlo sàlygos sakiniuose figûriniai skliaustai yra bûtini, net jei yra tik vienas sakinys sàlygos bloke. Taèiau galima be to apsieiti ir iðkelti sàlygà á sakinio galà:
+
+    # tradicinis bûdas
+    if ( $kazkas ) {
+        print "aha!";
+    }
+    # labiau perliðkas bûdas:
+    print "aha!" if $kazkas;
+    print "nebëra bananø" unless $bananai;
+
+=head3 while
+
+    while ( sàlyga ) {
+        ...
+    }
+
+Kaip ir su C<unless>, yra ir atvirkðtinë versija:
+
+    until ( sàlyga ) { # tas pats kaip while (!sàlyga)
+        ...
+    }
+
+C<while> galima permesti ir á galà:
+
+    print "la la la\n" while 1; # amþinas ciklas
+
+=head3 for
+
+Lygiai taip kaip ir C:
+
+    for ($i = 0; $i <= $max; $i++) {
+        ...
+    }
+
+C stiliaus C<for> ciklas retai naudojamas Perle, nes Perl turi draugiðkesná ir lengviau panaudojamà C<foreach> ciklà.
+
+=head3 foreach
+
+    foreach (@masyvas) {
+        print "Masyvo elementas $_\n";
+    }
+    # nebûtina naudot $_...
+    foreach my $raktas (keys %hash) {
+        print "Rakto $raktas reikðmë yra $hash{$raktas}\n";
+    }
+
+Daugiau apie ciklo sakinius (ir dar apie tuos kurie èia nepaminëti) galima rasti L<perlsyn> dokumentacijoje.
+
+=head2 Operatoriai ir funkcijos
+
+Perlas turi daug standartiniø funkcijø. kai kurias jau matëme ðiame ávade (tokias kaip C<print>, C<sort> arba C<reverse>). Pilnas funkcijø sàraðas yra L<perlfunc> dokumentacijoje ir apie kurià nors funkcijà lengva pasiskaityti konsolëje ávedus C<perldoc -f I<funkcijospavadinimas>>.
+
+Perlo operatoriai pilnai apraðyti L<perlop> dokumentacijoje. Ðtai keletas daþniau sutinkamø:
+
+Aritmetiniai:
+
+    +   sudëtis
+    -   atimtis
+    *   daugyba
+    /   dalyba
+
+Matematinio palyginimo:
+
+    ==   lygybës
+    !=   nelygybës
+    <    maþiau negu
+    >    daugiau negu
+    <=   maþiau arba lygu
+    >=   daugiau arba lygu
+
+Simboliø eiluèiø palyginimo:
+
+    eq   lygybës
+    ne   nelygybës
+    lt   maþiau nei
+    gt   daugiau nei
+    le   maþiau arba lygu
+    ge   daugiau arba lygu
+
+Kodël reikia skirtingø palyginimo operatoriø simboliø eilutëms ir matematinëms iðraiðkoms? Kadangi Perlas netipizuoja kintamøjø pagal tai ar tai skaièius, ar simboliø eilutë, jam reikia nurodyti ar rikiuoti matematiðkai (kur 99 yra maþiau nei 100) ar alfabetiðkai (kur 100 eina prieð 99)
+
+Loginiai operatoriai:
+
+    &&   ir
+    ||   ar
+    !    ne</pre>
+
+C<&&>, C<||> bei C<!> galima uþraðyti ir C<and>, C<or>, C<not>. Taip jie labiau áskaitomi, taèiau keièiasi pirmumo eilë. Plaèiau apie skirtumus tarp C<and> ir C<&&> galima rasti L<perlop> dokumentacijoje.
+
+Kiti operatoriai:
+
+    =     priskyrimas
+    .     simboliø eiluèiø sujungimas
+    x     simboliø eiluèiø daugyba
+    ..    intervalo operatorius (sukuria skaièiø sàraðà)
+
+Dauguma operatoriø gali bûti derinami su C<=> ðitokiu bûdu:
+
+    $a += 1;    # tas pats kaip $a = $a + 1;
+    $a -= 1;    # tas pats kaip $a = $a - 1;
+    $a .= "\n"; # tas pats kaip $a = $a . "\n";
+
+=head2 Bylos ir ávestis/iðvestis
+
+Ávesèiai ar iðvesèiai bylà galima atidaryti su funkcija C<open()>. Pilnai su visomis detalëmis ji apraðyta L<perlfunc> bei L<perlopentut> dokumentacijoje, taèiau trumpai:
+
+    open(INFILE,  "infile.txt")    or die "Negaliu atidaryt input.txt: $!";
+    open(OUTFILE, ">outfile.txt")  or die "Negaliu atidaryt outfile.txt: $!";
+    open(LOGFILE, ">>logfile.txt") or die "Negaliu atidaryt logfile.txt: $!";
+
+Skaityti ið bylos galima naudojantis C<E<lt>E<gt>> operatoriø. Skaliariniame kontekste jis nuskaito vienà eilutæ ið bylos, o sàraðo kontekste gràþina ið bylos eiluèiø sudarytà masyvà:
+
+    my $eilute = <INFILE>;
+    my @eilutes = <INFILE>;
+
+Visos bylos nuskaitymas ið karto vadinamas "ðliurpimu" (I<slurping>). Tai gali bûti naudinga, bet kartu gali ir pareikalauti daug atminties resursø. Daugumà dalykø galima padaryti tekstà apdorojant po eilutæ ir naudojantis Perlo ciklais.
+
+Operatorius C<E<lt>E<gt>> daþniausiai naudojamas tokiame C<while> cikle:
+
+    while (<INFILE>) { # priskiria kiekvienà bylos eilutæ $_
+        print "Kà tik perskaièiau eilutæ: $_";
+    }
+
+Mes jau matëme kaip spausdinti tekstà naudojantis C<print()>. Taèiau C<print()> galima nurodyti pirmu argumentu á kurià bylà spausdinti:
+
+    print STDERR "Paskutinis perspëjimas\n";
+    print OUTFILE $irasas;
+    print LOGFILE $ivykis;
+
+Kai baigiate dirbti su bylomis, jas reiktø uþdaryti su funkcija C<close()> (nors tiesà sakant, Perlas sutvarkys viskà kà pridarëte, net jei ir pamirðote uþdaryti bylà)
+
+    close INFILE;
+
+=head2 Ápraiðkos
+
+Perlas palaiko sudëtingà ir plaèià ápraiðkø sintaksæ. Pilnà jos apraðymà galima rasti L<perlrequick>, L<perlretut> ir kituose dokumentacijos skyriuose. Taèiau trumpai:
+
+=head3 Paprastas tikrinimas
+
+    if (/foo/)       { ... } # 'true' jei $_ yra simboliø seka 'foo'
+    if ($a =~ /foo/) { ... } # 'true' jei $a yra simboliø seka 'foo'
+
+Ápraiðkø operatorius C<//> apraðytas L<perlop> dokumentacijoje. Jis pagal nutylëjimà ápraðkà taiko kintamajam C<$_>, taèiau tai galima pakeisti, pasinaudojus operatoriumi C<=~> (kurio apraðymà irgi galima rasti L<perlop> dokumentacijoje).
+
+=head3 Paprastas pakeitimas
+
+    s/foo/bar/;           # pakeièia 'foo' á 'bar' kintamajame $_
+    $a =~ s/foo/bar/;     # pakeièia 'foo' á 'bar' kintamajame $a
+    $a =~ s/foo/bar/g;    # pakeièia VISUS 'foo' á 'bar' kintamajame $a
+
+Pakeitimo operatorius C<s///> apraðytas L<perlop> dokumentacijoje.
+
+=head3 Sudëtingesnës ápraiðkos
+
+Ápraiðkos nebûtinai sudaromos ið pastoviø simboliø eiluèiø. Tiesà sakant, naudojantis sudëtingesnëmis ápraiðkomis galite apraðyti tokius ðablonus, kokius tik sugalvosite. Pilnai tai apraðyta L<perlre> dokumentacijoje, o èia pateikiama tik trumpa lentelë:
+
+    .               vienas bet koks simbolis
+    \s              tarpai, naujos eilutës ir tabuliacijos simboliai (I<whitespace>)
+    \S              ne tarpai, ne naujos eilutës ir ne tabuliacija (I<non-whitespace>)
+    \d              skaitmuo (0-9)
+    \D              ne skaitmuo
+    \w              þodþiø simbolis (a-z, A-Z, 0-9 ir _)
+    \W              ne þodþiø simbolis
+    [aeiou]         atitinka vienà simbolá ið duotos aibës
+    [^aeiou]        atitinka vienà simbolá ne ið duotosios aibës
+    (foo|bar|baz)   atitinka vienà ið alternatyvø
+    ^               eilutës pradþia
+    $               eilutës pabaiga
+
+Taip pat galima nurodyti kiek kartø ápraiðka turi atitikti prieð tai nurodytà iðraiðkà, kur "iðraiðka" yra paprastas simbolis arba vienas ið metasimboliø nurodytø prieð ðià pastraipà esanèioje lentelëje.
+
+    *       nulá ar daugiau kartø
+    +       vienà ar daugiau kartø
+    ?       nulá arba vienà kartà
+    {3}     lygiai tris kartus
+    {3,6}   nuo trijø iki ðeðiø kartø
+    {3,}    tris ar daugiau kartø
+
+Keletas trumpø pavyzdþiø:
+
+    /^\d+/          eilutë prasidedanti vienu ar daugiau skaitmenø
+    /^$/            tuðèia eilutë (po eilutës pradþios ið karto eina eilutës pabaiga)
+    /(\d\s){3}/     trys skaitmenys atskirti tarpais ar tabuliacija (tarkim "3 4 5 ")
+    /(a.)+/         eilutë, kurioje kiekviena neporinë raidë yra 'a' (pvz 'abacadaf')
+
+    # Ðis ciklas skaito ið STDIN ir spausdina netuðèias eilutes:
+    while (<>) {
+        next if /^$/;
+        print;
+    }
+
+=head3 Skliausteliai
+
+Skliausteliai naudojami ne vien tik grupavimui -- jie turi ir kità paskirtá. Jie gali bûti naudojami ápraiðkos rezultatø iðsaugojimui. Rezultatai atsiduria kintamuosiuose C<$1>, C<$2> ir taip toliau.
+
+    # pigus ir ne visai tikslus bûdas iðskaidyti el.paðto adresà á dalis:
+    if ($email =~ /([^@])+@(.+)/) {
+        print "Vartotojo vardas: $1\n";
+        print "Domenas: $2\n";
+    }
+
+=head3 Kitos ápraiðkø galimybës
+
+Perlo ápraiðkos dar palaiko daugybæ dalykø (I<backreferences, lookaheads> ir t.t.) Apie visà tai galima pasiskaityti L<perlrequick>, L<perlretut> ir L<perlre> dokumentacijose.
+
+=head2 Funkcijø raðymas
+
+Labai lengva raðytis savo funkcijas:
+
+    sub log {
+        my $pranesimas = shift;
+        print LOGBYLA $pranesimas;
+    }
+
+Kà veikia tas C<shift>? Na, funkcijai perduodami argumentai atsiranda masyve C<@_> (apie tai daugiau L<perlvar> dokumentacijoje). Jeigu C<shift> neperduodami jokie argumentai, ði funkcija naudoja masyvà C<@_>. Tad C<my $pranesimas = shift;> paima pirmà argumentø masyvo nará ir priskiria já kintamajam C<$pranesimas>.
+
+Su C<@_> galima elgtis ir kitaip:
+
+    my ($pranesimas, $svarbumas) = @_; # daþnas bûdas
+    my $pranesimas = $_[0];            # retas ir bjaurus bûdas
+
+Funkcijos gali gràþinti reikðmes:
+
+    sub kvadratas {
+        my $skaicius = shift;
+        my $rezultatas = $skaicius * $skaicius;
+        return $rezultatas;
+    }
+
+Daugiau apie funkcijas L<perlsub> dokumentacijoje
+
+=head2 Objektinis Perlas
+
+Objektinis Perlas yra ganëtinai paprastas. Objektai Perle yra nuorodos, kurios magiðkai þino I<koká> objektà jos vaizduoja. Taèiau objektinis Perlas neáeina á ðá trumpà ávadà. Skaitykite L<perlboot>, L<perltoot>, L<perltooc> ir L<perlobj> dokumentacijà.
+
+Pradedantieji Perlo programuotojai daþniausiai su objektiniu programavimu susiduria tik naudodamiesi Perlo moduliais.
+
+=head2 Naudojimasis Perlo moduliais
+
+Perlo moduliai leidþia jums neiðradinëti dviraèio, nes galima naudotis jau kaþkieno paraðytu kodu. Modulius galima parsisiøsti ið http://www.cpan.org . Nemaþai moduliø yra ádiegiami kartu su paèiu Perlu.
+
+Moduliai CPAN svetainëje yra kategorizuoti. Yra daug ávairiausiø kategorijø: nuo teksto apdorojimo iki tinklo protokolø, nuo duomenø baziø iki grafikos.
+
+Norint suþinoti kaip naudotis kuriuo nors moduliu, komandinëje eilutëje paraðykite C<perldoc Modulio::Pavadinimas>. Kode daþniausiai jums reikës raðyti C<use Modulio::Pavadinimas> -- tai ákraus moulá ir leis naudotis jo funkcijomis.
+
+L<perlfaq> dokumentacijoje yra daþnai uþduodami klausimai ir atsakymai apie daþnai pasitaikanèias uþduotis. Daþnai atsakymai siûlo naudotis vienu ar kitu moduliu.
+
+L<perlmod> dokumentacija bendrai apraðo Perlo modulius, L<perlmodlib> dokumentacijoje yra sàraðas moduliø, kurie ádiegti kartu su Perlu.
+
+Jeigu patys norite raðytis Perlo modulius, skaitykite L<perlnewmod> dokumentacijà.
+
+=head1 AUTHOR
+
+Vertë Petras Kudaras <moxliukas@delfi.lt> 2003-2004.
+Pastabos, pataisymai ir pasiûlymai labai laukiami.
+
+=cut

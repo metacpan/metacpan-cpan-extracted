@@ -1,0 +1,25 @@
+.travis.yml
+bin/check_perldiag
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Scripts.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Parse/ErrorString/Perl.pm
+lib/Parse/ErrorString/Perl/ErrorItem.pm
+lib/Parse/ErrorString/Perl/StackItem.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01-errors.t
+t/02-diagnostics.t
+t/03-split_diagnostics.t
+t/04-perldiag.t
+t/05-stacktrace.t
+t/06-short_filename.t
+t/10-check_perldiag.t

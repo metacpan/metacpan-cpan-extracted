@@ -1,0 +1,113 @@
+{
+   "abstract" : "It's a yet another command-line tool for PostgreSQL operation. ",
+   "author" : [
+      "@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pgtools",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "DBD::Pg" : "v3.5.3",
+            "DBI" : "1.6",
+            "DateTime" : "1.2",
+            "DateTime::Format::Strptime" : "1.6",
+            "File::Spec" : "0",
+            "JSON::XS" : "3.0",
+            "Perl6::Slurp" : "0",
+            "perl" : "5.021001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Class::Accessor" : "0",
+            "DBD::Mock" : "0",
+            "DBD::Pg" : "v3.5.3",
+            "DBI" : "1.6",
+            "DateTime" : "1.2",
+            "DateTime::Format::Strptime" : "1.6",
+            "File::Spec" : "0",
+            "JSON::XS" : "3.0",
+            "Perl6::Slurp" : "0",
+            "Test::Exception" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0.98",
+            "Test::Perl::Critic" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Pgtools" : {
+         "file" : "lib/Pgtools.pm",
+         "version" : "0.009"
+      },
+      "Pgtools::Conf" : {
+         "file" : "lib/Pgtools/Conf.pm"
+      },
+      "Pgtools::Config_diff" : {
+         "file" : "lib/Pgtools/Config_diff.pm"
+      },
+      "Pgtools::Connection" : {
+         "file" : "lib/Pgtools/Connection.pm"
+      },
+      "Pgtools::Fingerprint" : {
+         "file" : "lib/Pgtools/Fingerprint.pm"
+      },
+      "Pgtools::Kill" : {
+         "file" : "lib/Pgtools/Kill.pm"
+      },
+      "Pgtools::Query" : {
+         "file" : "lib/Pgtools/Query.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tom--bo/Pgtools/issues"
+      },
+      "homepage" : "https://github.com/tom--bo/Pgtools",
+      "repository" : {
+         "url" : "git://github.com/tom--bo/Pgtools.git",
+         "web" : "https://github.com/tom--bo/Pgtools"
+      }
+   },
+   "version" : "0.009",
+   "x_contributors" : [
+      "tom--bo <otsuka.t.2013@gmail.com>"
+   ]
+}

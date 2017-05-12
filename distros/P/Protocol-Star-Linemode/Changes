@@ -1,0 +1,10 @@
+Changes for Protocol-Star-Linemode
+
+1.0.0  2014-01-27 11:05:05 CET
+		- Use role instead of sub class for generated code.
+
+0.1.2  2013-08-08 11:12:54 CEST
+		- Fixes to docs
+
+0.1.1  2013-08-08 10:25:01 CEST
+		- Converted to Milla

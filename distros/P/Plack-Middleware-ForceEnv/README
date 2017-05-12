@@ -1,0 +1,32 @@
+NAME
+    Plack::Middleware::ForceEnv - Force set environment variables for
+    testing
+
+SYNOPSIS
+        # in app.psgi
+        use Plack::Builder;
+
+        builder {
+            enable 'ForceEnv' =>
+                REMOTE_ADDR => "127.0.0.1",
+                REMOTE_USER => "trs";
+            $app;
+        };
+
+        # with plackup
+        plackup -e 'enable ForceEnv => REMOTE_USER => "trs"' app.psgi
+
+DESCRIPTION
+    ForceEnv modifies the environment passed to the application by adding
+    your specified key value pairs.
+
+    This is primarily useful when testing apps under plackup (or similar) in
+    a development environment.
+
+AUTHOR
+    Thomas Sibley <tsibley@cpan.org>
+
+LICENSE
+    This library is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+

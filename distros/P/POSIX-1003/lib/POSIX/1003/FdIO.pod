@@ -1,0 +1,299 @@
+=encoding utf8
+
+=head1 NAME
+
+POSIX::1003::FdIO - POSIX handling file descriptors
+
+=head1 INHERITANCE
+
+ POSIX::1003::FdIO
+   is a POSIX::1003::Module
+
+=head1 SYNOPSIS
+
+  use POSIX::1003::FdIO;
+
+  $fd = openfd($fn, O_RDWR);
+  defined $fd or die $!;   # $fd==0 is valid value! (STDIN)
+
+  $fd = openfd($fn, O_WRONLY|O_TRUNC);
+  $fd = openfd($fn, O_CREAT|O_WRONLY, 0640);
+
+  my $buf;
+  $bytes_read    = readfd($fd, $buf, BUFSIZ);
+  $bytes_written = writefd($fd, $buf, 5);
+
+  $off_t = seekfd($fd, 0, SEEK_SET);  # rewind!
+  $fd2   = dupfd($fd);
+
+  closefd($fd) or die $!;
+
+  my ($r, $w) = pipefd();
+  writefd($w, "hello", 5);
+  readfd($r, $buf, 5);
+  closefd($r) && closefd($w) or die $!;
+
+  my $fh = fdopen($fd, 'w') or die $!;
+
+=head1 DESCRIPTION
+
+Most people believe that the C<sys*> commands in Perl Core are not
+capable of doing unbuffered IO. For those people, we have this module.
+But there is more in file-descriptor space, missing from Core.
+
+The question whether C<sysread()> or L<readfd()|POSIX::1003::FdIO/"Standard POSIX"> is meassurable faster
+cannot be answered.
+
+The C<fcntl()> command has its separate module L<POSIX::1003::Fcntl|POSIX::1003::Fcntl>.
+Locking functions are locate there as well, because they are often
+implemented via C<fcntl>.
+
+See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
+ 
+=over 4
+
+=item POSIX::1003::FdIO-E<gt>B<exampleValue>(NAME)
+
+See L<POSIX::1003::Module/"METHODS">
+
+=item $obj-E<gt>B<import>()
+
+See L<POSIX::1003::Module/"METHODS">
+
+=back
+
+=head1 FUNCTIONS
+
+=head2 Overview
+
+Perl defaults to use file-handles, avoiding file descriptors. For
+that reason, the C<fread> of POSIX is the C<read> of Perl; that's
+confusing.  But the POSIX standard is confused as well: some function
+names which start with an C<f> are actually for file-descriptors, other
+for file-handles!
+
+The POSIX module, distributed with Perl, makes you write C<CORE::read()>
+and C<POSIX::read()> explicitly. However, C<POSIX::read()> is the same
+as C<CORE::sysread()>!
+
+To avoid conflicts with function names in Perl core, and the confusion
+that the POSIX created, all exported function names provided by this
+module contain 'fd' in their name.
+
+    POSIX    Perl-Core POSIX.pm  POSIX::1003::FdIO
+ FH fseek     seek
+ FD lseek     sysseek   lseek    seekfd
+ FH fopen     open
+ FD open      sysopen            openfd   # sysopen is clumpsy
+ FD fdopen    open               fdopen   # IO::Handle->new_from_fd
+ FH fclose    close
+ FD close     close     close    closefd
+ FH fread     read
+ FD read      sysread   read     readfd
+ FH fwrite    print
+ FD write     syswrite  write    writefd
+ FH           pipe,open                   # buffered unless $|=0
+ FD pipe                pipe     pipefd
+ FH stat      stat
+ FD fstat               fstat    statfd
+ FN lstat     lstat
+ FH ftell     tell
+ FD                              tellfd   # tell on fd not in POSIX
+ FH rewind              rewind
+ FD                              rewindfd # rewind on fd not in POSIX
+ FD creat               creat    creatfd
+ FD dup                          dupfd
+ FD fcntl     fcntl              (many)   # see ::Fcntl
+ FD flock     flock              flockfd  # see ::Fcntl
+ FD lockf                        lockf    # see ::Fcntl
+ FN truncate  truncate
+ FD ftruncate                    truncfd
+
+Works on: FH=file handle, FD=file descriptor, FN=file name
+
+=head2 Standard POSIX
+
+=over 4
+
+=item B<closefd>(FD)
+
+Always check the return code: C<undef> on error, cause in C<$!>.
+  closefd $fd or die $!;
+
+There is no C<sysclose()> in core, because C<sysopen()> does unbuffered
+IO via its perl-style file-handle: when you open with C<CORE::sysopen()>,
+you must close with C<CORE::close()>.
+
+=item B<creatfd>(FILENAME, MODE)
+
+Implemented via L<openfd()|POSIX::1003::FdIO/"Standard POSIX">, which is true by definition of POSIX.
+
+=item B<dup2fd>(FD, NEWFD)
+
+Copy file-descriptor FD to an explicit NEWFD number. When already
+in use, the file at NEWFD will be closed first.  Returns undef on
+failure.
+
+=item B<dupfd>(FD)
+
+Copy the file-descriptor FD into the lowest-numbered unused descriptor.
+The new fd is returned, undef on failure.
+
+=item B<fdopen>(FD, MODE)
+
+Converts a FD into an (buffered) FH.  You probably want to set binmode
+after this.  MODE can be Perl-like '<', '>', '>>', or POSIX standard
+'r', 'w', 'a'.  POSIX modes 'r+', 'w+', and 'a+' can probably not be
+supported.
+
+=item B<openfd>(FILENAME, FLAGS, MODE)
+
+Returned is an integer file descriptor (FD).  Returns C<undef> on
+failure (and '0' is a valid FD!)
+
+FLAGS are composed from the C<O_*> constants defined by this module (import
+tag C<:mode>) The MODE field combines C<S_I*> constants defined by
+L<POSIX::1003::FS|POSIX::1003::FS> (import tag C<:stat>).
+
+=item B<pipefd>()
+
+Returns the reader and writer file descriptors.
+See also L<POSIX::1003::Fcntl::setfd_pipe_size()|POSIX::1003::Fcntl/"Additional">
+
+example: 
+
+  my ($r, $w) = pipefd;
+  writefd($w, "hello", 5 );
+  readfd($r, $buf, 5 );
+
+=item B<readfd>(FD, SCALAR, [LENGTH])
+
+Read the maximum of LENGTH bytes from FD into the SCALAR. Returned is
+the actual number of bytes read.  The value C<-1> tells you there is
+an error, reported in C<$!>
+
+B<Be warned> that a returned value smaller than LENGTH does not mean
+that the FD has nothing more to offer: the end is reached only when 0
+(zero) is returned.  Therefore, this reading is quite inconvenient.
+You may want to use POSIX::Util subroutine readfd_all
+
+=item B<seekfd>(FD, OFFSET, WHENCE)
+
+The WHENCE is a C<SEEK_*> constant.
+
+=item B<statfd>(FD)
+
+Request file administration information about an open file. It returns
+the same list of values as C<stat> on filenames.
+
+=item B<truncfd>(FD, [LENGTH])
+
+[0.96] Shorten the file to the LENGTH (defaults to 0).  The file offset
+(your pointer in the file) is not changed, so you may need to L<seekfd()|POSIX::1003::FdIO/"Standard POSIX">
+as well.  Behavior is undefined when LENGTH is larger than the file size.
+
+The POSIX name for this function is C<ftruncate>.
+
+=item B<writefd>(FD, BYTES, [LENGTH])
+
+Attempt to write the first LENGTH bytes of STRING to FD. Returned is
+the number of bytes actually written.  You have an error only when C<-1>
+is returned.
+
+=back
+
+=head2 Additional
+
+Zillions of Perl programs reimplement these functions. Let's simplify
+code.
+
+=over 4
+
+=item B<rewindfd>(FD)
+
+Seek to the beginning of the file.
+
+=item B<tellfd>(FD)
+
+Reports the location in the file. This call does not exist (not in POSIX,
+nor on other UNIXes), however is a logical counterpart of the C<tell()> on
+filenames.
+
+=back
+
+=head1 CONSTANTS
+
+The following constants are exported, shown here with the values
+discovered during installation of this module.
+
+=for comment
+#TABLE_FDIO_START
+
+  BUFSIZ         8192
+  EOF            -1
+  MAX_INPUT      255
+  O_ACCMODE      3
+  O_APPEND       1024
+  O_ASYNC        8192
+  O_CLOEXEC      524288
+  O_CREAT        64
+  O_DIRECT       16384
+  O_DIRECTORY    65536
+  O_DSYNC        4096
+  O_EXCL         128
+  O_FSYNC        1052672
+  O_LARGEFILE    0
+  O_NDELAY       2048
+  O_NOATIME      262144
+  O_NOCTTY       256
+  O_NOFOLLOW     131072
+  O_NONBLOCK     2048
+  O_RDONLY       0
+  O_RDWR         2
+  O_RSYNC        1052672
+  O_SYNC         1052672
+  O_TRUNC        512
+  O_WRONLY       1
+  PIPE_BUF       4096
+  SEEK_CUR       1
+  SEEK_DATA      3
+  SEEK_END       2
+  SEEK_HOLE      4
+  SEEK_SET       0
+  SSIZE_MAX      9223372036854775807
+  STDERR_FILENO  2
+  STDIN_FILENO   0
+  STDOUT_FILENO  1
+
+
+=for comment
+#TABLE_FDIO_END
+
+
+
+
+
+You can limit the import to the C<SEEK_*> constants by explicitly
+using the C<:seek> import tag.  Use the C<:mode> for all C<O_*>
+constants, to be used with L<openfd()|POSIX::1003::FdIO/"Standard POSIX">.
+
+=head1 SEE ALSO
+
+This module is part of POSIX-1003 distribution version 0.98,
+built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights 2011-2013 on the perl code and the related documentation
+ by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

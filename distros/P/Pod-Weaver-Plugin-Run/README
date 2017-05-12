@@ -1,0 +1,51 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [-Run]
+     ;;; each of these options can be specified multiple times
+     ;include_module = Foo
+     ;include_module_pattern = ^Bar.+$
+     ;exclude_module = Baz
+     ;exclude_module_pattern = ^Qux
+     ;include_file = lib/Quux.pm
+     ;include_file_pattern = Corge\d+
+     ;exclude_file = lib/Grault.pm
+     ;exclude_file_pattern = Garply\d+
+    
+     code = sub { my ($self, $document, $input) = @_; ... }
+     ;code = ...
+
+DESCRIPTION
+
+    This plugin will compile the code specified in weaver.ini and execute
+    it. It effectively lets you write weave_section() directly in
+    weaver.ini.
+
+CONFIGURATION
+
+ include_module => str+
+
+ include_module_pattern => str+
+
+ exclude_module => str+
+
+ exclude_module_pattern => str+
+
+ include_file => str+
+
+ include_file_pattern => str+
+
+ exclude_file => str+
+
+ exclude_file_pattern => str+
+
+ code => str+
+
+SEE ALSO
+
+    Pod::Weaver::Plugin::Eval, an older incarnation of this module.
+
+    Dist::Zilla::Plugin::Hook lets you do something similar for
+    Dist::Zilla: it lets you write dzil plugins directly in dist.ini.
+

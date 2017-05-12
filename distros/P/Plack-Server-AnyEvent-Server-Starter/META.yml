@@ -1,0 +1,33 @@
+---
+abstract: 'Use AnyEvent-Based Plack Apps From Server::Starter'
+author:
+  - 'Daisuke Maki'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  LWP: 0
+  Test::More: 0
+  Test::TCP: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Server-AnyEvent-Server-Starter
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent: 0
+  AnyEvent::Socket: 0
+  AnyEvent::Util: 0
+  IO::Socket::INET: 0
+  Plack: 0
+  Plack::Server::AnyEvent: 0
+  Server::Starter: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.00001

@@ -1,0 +1,29 @@
+---
+name: Physics-Particles
+version: 1.02
+author:
+  - 'Steffen Mueller <physpart-module at steffen-mueller dot net>'
+abstract: Simulate particle dynamics
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Data::Dumper: 0
+build_requires:
+  Test::More: 0
+conflicts:
+  Physics::Springs: <1.0
+  Physics::Springs::Friction: <1.0
+recommends:
+  Math::Project3D: 0
+  Math::Project3D::Plot: 0
+  Test::Pod: 1.0
+  Test::Pod::Coverage: 1.0
+provides:
+  Physics::Particles:
+    file: lib/Physics/Particles.pm
+    version: 1.02
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

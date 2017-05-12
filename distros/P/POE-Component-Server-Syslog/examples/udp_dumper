@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use POE;
+use POE::Component::Server::Syslog;
+use Data::Dumper;
+
+POE::Session->create(
+	inline_states => {
+		_start => sub {
+			$_[KERNEL]->sig($_, 'sig') for qw(INT HUP TERM);
+
+			$_[HEAP]->{syslog} = POE::Component::Server::Syslog->spawn(
+				Type     => 'udp',
+				BindPort => 4095,
+				InputState => \&client_input,
+				ErrorState => \&client_error,
+			);
+		},
+		
+		_stop => sub {},
+
+		sig => sub {
+			$_[KERNEL]->call($_[HEAP]->{syslog}, 'shutdown');
+			return;
+		},
+	},
+);
+
+POE::Kernel->run();
+
+######################################
+
+sub client_input {
+    my $msg = $_[ARG0];
+    print Dumper $msg;
+}
+
+sub client_error {
+    warn "BAD MESSAGE: $_[ARG0]";
+}

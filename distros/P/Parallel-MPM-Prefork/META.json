@@ -1,0 +1,46 @@
+{
+   "abstract" : "A simple non-threaded, non-OO, pre-forking, self-regulating, multi-purpose multi-processing module. Period.",
+   "author" : [
+      "Carsten Gaebler"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parallel-MPM-Prefork",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Parallel::MPM::Prefork" : {
+         "file" : "lib/Parallel/MPM/Prefork.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.14"
+}

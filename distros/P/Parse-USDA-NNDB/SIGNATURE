@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 7d2c80d6c365f0b0c24cba147e0b8b65cb8ef0d1 Build.PL
+SHA1 d32536dd08419db3490f7a34a6c6e04b4dd036ad Changes
+SHA1 a1ab3620bf8ebcb1c939621980cbdc79d3d943eb LICENSE
+SHA1 c7f551b2d6166275a6b48e05bacb9daeb6527a7b MANIFEST
+SHA1 b0c7f067c9cd7c7ab629a87673bdd549e906b4ce META.json
+SHA1 677223911ae53f6a68e1ef58e6dba37b98bf34a9 README.mkdn
+SHA1 780582f007afb46c4073f3005ffbd5db67fad381 dist.ini
+SHA1 e1bd7baf3b4f16726a7dc28712bf2a04270512a6 examples/usda2sqlite.pl
+SHA1 2e31e9c19c72710ab2ec49c8bb0e871780fc95f0 examples/usda_sqlite.sql
+SHA1 d9eebf59a5185e610fa2e6fc5ca890eee07b05a0 lib/Parse/USDA/NNDB.pm
+SHA1 9bd468e8c87b34681593290db6f72f049aeacb59 t/00-compile.t
+SHA1 b0f2ac0b28f663d98de8369e26c2dc3fd3d4e52d xt/author/critic.t
+SHA1 1a99d0fdc3cb21777b606e50b4c1de78906fbdd9 xt/author/pod-spell.t
+SHA1 e3094e32340a9a0dcb90d91b77d66e61cbf7fa14 xt/perlcriticrc
+SHA1 dbf9e6df169fbb02633a2261e1ba2922f0a6a90f xt/perltidyrc
+SHA1 28ef20a73b7cf9b85585e2b7db6fc80424289134 xt/release/cpan-changes.t
+SHA1 f1df216d28e5f464bc6b68faf0b85cc0e38c7246 xt/release/kwalitee.t
+SHA1 7b52b909acf6cd52733f8f226f92147ed76a2717 xt/release/meta-json.t
+SHA1 e9a889d6b725ee070e06aae1a8ad544495322cb2 xt/release/pod-coverage.t
+SHA1 953dabed9f33b54280f9e5a41b790d94fb8c83a4 xt/release/pod-linkcheck.t
+SHA1 2b19eca129231f1a72b70d35b6d0054bfe0e1853 xt/release/pod-no404s.t
+SHA1 9934d36e45e1143c1a54658bc48872e0591af41b xt/release/pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iQIcBAEBCgAGBQJPLnyYAAoJEOpmRc2kYGBPgckQAKzQa760XhGVI5MIHUH4nBHM
+BwTZ3Mb9BxN12/Hz5g6gR3Y2IqL8Dnyko6TJ+W/BP7XidVIY5FB/QlTCTetuJRIH
+Td9HDiZTN9wMru1lPiKFCni/lGJnN/vDbfUF59vvXbx3RIDugkF9pi8GVbc0Ny9M
+7NSLr6G09BcfL/Ns2uOdvjZzcjJdsrt7emCB8rDmbwmNCpbUmJET2OQA1DlQFJVd
+bW90xCatbPFMEAul1gT+qHbCIpE3ad37QAO+ERzBGNZV6Op06tAiSf+VmfVA5Njg
+JJ1KljsCeRB6R2J5VHGMIYwCj21ejV331YrwSynMYn0KmzFm66vWGbHY2kAN1WBo
+T6ZINd7xDf5kGZJb9D/3W9zKt39Gh02i8fKwky/Km+V6BgDgO1NVzEJVZM4S762o
+QHl4rvJgSEEd6omYaMqbTn7nmTsvjZRp4fim2kQqn5nY0FY7Oqu/0NHkYJwVsRa5
+I5M9HrherrBFpi3v33lgi0SQQpMRdpTixoYbSZhJvB0zVEPSeHiHOjkOcMz7zigk
+B7Qf7dNoWbvUpPuMn4qdkNjcM223BFsfvk3YJZ9W6wdo7onw+2rVxpHgRDUt/4fO
++rG8MEcKQX6L1+gOhb1Kl5k3kSj7I2Rzy9sIdnki26lEBFRuoKNIUYG82/ZXvFK6
+7VJN6pH+fTgaFWkw/Dqi
+=iEyy
+-----END PGP SIGNATURE-----

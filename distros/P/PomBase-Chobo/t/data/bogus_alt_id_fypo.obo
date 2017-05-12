@@ -1,0 +1,12 @@
+format-version: 1.2
+date: 12:04:2011 18:01
+remark: an test ontology that has a term with an alt_id that clashes with fypo
+ontology: fypo_bogus
+
+[Term]
+id: FYPO:99999
+name: bogus
+namespace: fission_yeast_phenotype
+def: "Any of the set of observable characteristics of an organism resulting from the interaction of its genotype with the environment." [PomBase:mah]
+creation_date: 2011-03-16T03:59:25Z
+alt_id: FYPO:0000001

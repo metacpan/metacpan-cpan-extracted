@@ -1,0 +1,41 @@
+PerlX-Assert
+============
+
+Created:      2014-04-20
+Home page:    <https://metacpan.org/release/PerlX-Assert>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Assert>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.905	2014-05-07
+
+ - Updated: Perl 5.26 compatibility.
+
+0.904	2014-10-05
+
+ [ Packaging ]
+ - Add 'test suggests' dep on Moops.
+ - Fix META.json problems by building with newer Dist::Inkt.
+
+0.903	2014-08-13
+
+ [ Documentation ]
+ - Better document Devel::StrictMode usage.
+
+0.902	2014-08-13	First stable release
+
+ [ BACK COMPAT ]
+ - Refer to Devel::StrictMode for a decision on whether to arm ourself.
+
+0.900_02	2014-04-22
+
+ - Use Exporter::Tiny, which will provide a decent framework for adding
+   more features in the future.
+
+0.900_01	2014-04-22
+
+ - Extend PerlX::Assert::Keyword support to Perl 5.12.x.
+
+0.900_00	2014-04-21	Experimental split from Moops
+
+ - Includes PerlX::Assert::DD which extends support to older versions of
+   Perl, albeit with slightly dodgy parsing.

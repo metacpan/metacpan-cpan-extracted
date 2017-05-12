@@ -1,0 +1,154 @@
+%{
+=head1 SYNOPSIS
+
+See 
+
+=over 2
+
+=item * File pascalenumeratedvsrange.eyp in examples/debuggintut/
+
+=item * The Bison manual L<http://www.gnu.org/software/bison/manual/html_mono/bison.html>
+
+=back
+
+Compile it with:
+
+            eyapp -b '' pascalenumeratedvsrangesolvedviadyn.eyp
+
+run it with this options:
+
+            ./pascalenumeratedvsrangesolvedviadyn.pm -t
+
+Try these inputs:
+
+                type r = (x) ..  y ;
+                type r = (x+2)*3 ..  y/2 ;
+                type e = (x, y, z);
+                type e = (x);
+
+=cut
+
+use base q{DebugTail}; 
+
+my $ID = qr{[A-Za-z][A-Za-z0-9_]*};
+             # Identifiers separated by commas
+my $IDLIST = qr{ \s*(?:\s*,\s* $ID)* \s* }x;
+             # list followed by a closing par and a semicolon 
+my $RESTOFLIST = qr{$IDLIST \) \s* ; }x;
+%}
+
+%namingscheme {
+  #Receives a Parse::Eyapp object describing the grammar
+  my $self = shift;
+
+  $self->tokennames(
+    '(' => 'LP',
+    '..' => 'DOTDOT',
+    ',' => 'COMMA',
+    ')' => 'RP',
+    '+' => 'PLUS',
+    '-' => 'MINUS',
+    '*' => 'TIMES',
+    '/' => 'DIV',
+  );
+
+  # returns the handler that will give names
+  # to the right hand sides
+  \&give_rhs_name;
+}
+
+%strict
+
+%token ID NUM DOTDOT TYPE
+%left   '-' '+'
+%left   '*' '/'
+
+%tree
+
+%%
+
+type_decl : TYPE ID '=' type ';'
+;
+
+type : 
+      %name ENUM
+      '(' id_list ')'
+    | %name RANGE
+      expr DOTDOT expr
+;
+
+id_list : 
+      %name EnumID
+      ID rangeORenum
+    | id_list ',' ID
+;
+
+expr : '(' expr ')'
+    | expr '+' expr
+    | expr '-' expr
+    | expr '*' expr
+    | expr '/' expr
+    | %name RangeID
+      ID rangeORenum
+    | NUM
+;
+
+rangeORenum: /* empty: postponed conflict resolution */
+      {
+          my $parser = shift;
+          if (${$parser->input()} =~ m{\G(?= $RESTOFLIST)}gcx) {
+              $parser->YYSetReduce(')', 'EnumID' );
+            }
+            else {
+              $parser->YYSetReduce(')', 'RangeID' );
+            }
+      }
+;
+
+%%
+
+__PACKAGE__->lexer(
+  sub {
+    my $parser = shift;
+
+    for (${$parser->input()}) {    # contextualize
+      m{\G(\s*)}gc;
+      $parser->tokenline($1 =~ tr{\n}{});
+
+      m{\Gtype\b}gic                 and return ('TYPE', 'TYPE');
+
+      m{\G($ID)}gc                   and return ('ID',  $1);
+
+      m{\G([0-9]+)}gc                and return ('NUM', $1);
+
+      m{\G\.\.}gc                    and return ('DOTDOT',  '..');
+
+      m{\G(.)}gc                     and return ($1,    $1);
+
+      return('',undef);
+    }
+  }
+);
+
+unless (caller()) {
+  $Parse::Eyapp::Node::INDENT = 1;
+  my $prompt = << 'EOP';
+Try this input:
+    type 
+    r
+    =
+    (x)
+    ..
+    y
+    ;
+
+Here other inputs you can try:
+
+    type r = (x+2)*3 ..  y/2 ;
+    type e = (x, y, z);
+    type e = (x);
+
+Press CTRL-D (CTRL-W in windows) to produce the end-of-file
+EOP
+  __PACKAGE__->main($prompt); 
+}

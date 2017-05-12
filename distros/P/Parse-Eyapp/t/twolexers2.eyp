@@ -1,0 +1,34 @@
+# Compile it with:
+# $ eyapp -TC twolexers2.eyp 
+# Run it with:
+# $ ./twolexers2.pm -t -i -c 'A A %% d3 c2'
+
+%%
+s:  first '%%' { $_[0]->YYLexer(\&Lexer2) } second
+;
+
+first:
+    A first
+  | A
+;
+
+second:
+    A second
+  | A
+;
+
+%%
+
+sub Lexer2 {
+    my($parser)=shift;
+
+    print "In Lexer 2 \n";
+    for (${$parser->YYInput}) {
+        m/\G\s*/gc;
+        m/\G(\w+)/gc    and return('A',$1);
+        m/\G(.)/gcs and die "Error. Expected a word,Found $1\n";
+    }
+    return('', undef);
+}
+
+

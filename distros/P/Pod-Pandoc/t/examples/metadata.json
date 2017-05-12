@@ -1,0 +1,7 @@
+{
+  "title": "title from json",
+  "bool": false,
+  "map": {
+      "list": [1,2]
+  }
+}

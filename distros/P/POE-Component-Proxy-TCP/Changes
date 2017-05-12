@@ -1,0 +1,6 @@
+Revision history for Perl extension POE::Component::Proxy::TCP.
+
+0.01  Thu Jun 24 01:20:41 2004
+	- original version; created by h2xs 1.23 with options
+		-XAn POE::Component::Proxy::TCP
+

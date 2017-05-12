@@ -1,0 +1,37 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Power/Outlet.pm
+lib/Power/Outlet/Common.pm
+lib/Power/Outlet/Common/IP.pm
+lib/Power/Outlet/Common/IP/SNMP.pm
+lib/Power/Outlet/Common/IP/HTTP.pm
+lib/Power/Outlet/Common/IP/HTTP/JSON.pm
+lib/Power/Outlet/Common/IP/HTTP/UPnP.pm
+lib/Power/Outlet/Hue.pm
+lib/Power/Outlet/iBoot.pm
+lib/Power/Outlet/iBootBar.pm
+lib/Power/Outlet/WeMo.pm
+t/001_load.t
+t/002_http.t
+t/002_ip.t
+t/002_iBoot_live.t
+t/003_iBootBar_live.t
+t/003_Hue_live.t
+t/003_WeMo_live.t
+t/004_iBoot_defaults.t
+t/005_iBootBar_defaults.t
+perl-Power-Outlet.spec
+scripts/power-outlet
+scripts/power-outlet.cgi
+scripts/power-outlet-json.cgi
+scripts/conf/power-outlet.ini
+scripts/images/btn-on.png
+scripts/images/btn-off.png
+scripts/images/btn-license.txt
+scripts/httpd/power-outlet.conf
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

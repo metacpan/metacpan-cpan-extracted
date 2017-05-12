@@ -1,0 +1,7 @@
+---
+title: a *title*
+map:
+    list:
+        - 'a *string*' 
+bool: true
+...

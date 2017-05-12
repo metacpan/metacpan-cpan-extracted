@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+package MyWidget;
+use KDE;
+
+@ISA = qw(Qt::Widget);
+
+sub new {
+    my $self = shift->SUPER::new(@_);
+    $self->setFixedSize(440, 80);
+    my $Progress = $self->{'Progress'} = new KDE::Progress($self);
+    $Progress->resize(400, 40);
+    $Progress->move(20, 20);
+    $self->startTimer(50);
+
+    return $self;
+}
+
+$direction = 'fwd';
+$style = KDE::Progress::Solid;
+
+sub timerEvent {
+    my $self = shift;
+    my $Progress = $self->{'Progress'};
+    if($direction eq 'fwd') {
+	if($Progress->value == $Progress->maxValue) {
+	    $direction = 'back';
+	} else {
+	    $Progress->advance(1);
+	}
+    } else {
+	if($Progress->value == $Progress->minValue) {
+	    $direction = 'fwd';
+	    $style = ($style == KDE::Progress::Solid) ?
+		KDE::Progress::Blocked : KDE::Progress::Solid;
+	    $Progress->setBarStyle($style);
+	} else {
+	    $Progress->advance(-1);
+	}
+    }
+}
+
+package main;
+
+use KDE;
+import KDE::app;
+
+$w = new MyWidget;
+$app->setMainWidget($w);
+$w->show;
+exit $app->exec;

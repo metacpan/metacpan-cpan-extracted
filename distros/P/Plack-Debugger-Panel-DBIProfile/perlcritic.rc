@@ -1,0 +1,12 @@
+# perlcritic.rc
+
+# report everything
+#severity  = 1
+
+# only report the worst
+severity  = 5
+
+color = 1
+
+#[-TestingAndDebugging::RequireUseStrict]
+

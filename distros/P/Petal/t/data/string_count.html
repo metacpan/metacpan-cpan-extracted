@@ -1,0 +1,8 @@
+<ul petal:repeat="student students">
+  <li>
+    <?var name="string:${__count__} - $student.first_name"?>
+    <?var name="student.last_name"?>
+  - <?var name="student.email"?> -
+    <input attr="name string:first_name${__count__}" type="string" />
+  </li>
+</ul>

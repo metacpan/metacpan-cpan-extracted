@@ -1,0 +1,15 @@
+Normal Perl Module Install ...
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you want to build the mod_pml Apache module also
+you can either build it in the Apache subdirectory
+or...
+
+	perl Makefile.PL DO_APACHE=1
+	make
+	make test
+	make install

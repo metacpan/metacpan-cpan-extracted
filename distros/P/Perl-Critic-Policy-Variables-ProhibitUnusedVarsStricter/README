@@ -1,0 +1,53 @@
+Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter is
+Copyright (C) 2012-2016 by Thomas R. Wyant, III
+
+DESCRIPTION
+
+This package contains a more comprehensive version of the core
+Perl::Critic policy Variables::ProhibitUnusedVariables. It is not
+intended as a replacement for the core policy, but as an alternative for
+people who want a more thorough check at the (possible) risk of
+(hopefully only) a few false positives.
+
+Perl::Critic is a prerequisite for this package. It is the intent that
+the prerequisites of this package be those of Perl::Critic, so no extra
+stuff should be needed.
+
+INSTALLATION
+
+This package is installable by either of the two usual incantations:
+
+    tar -xzf \
+	Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter-9.999.tar
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+or
+
+    tar -xzf \
+	Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter-9.999.tar
+    perl Build.PL
+    ./Build
+    ./Build test
+    sudo ./Build install
+
+You should substitute the appropriate program name for 'make', eg nmake
+(typically) under MSWin32, or mms or mmk under VMS. See
+ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe for a copy of
+nmake for MSWin32 if you need it.
+
+Of course, since it's pure Perl, you can just expand the kit and drop
+the .pm file into the Perl/Critic/Policy/Variables/ directory (creating
+it if necessary) in the appropriate place in your @INC directories.
+
+LICENSING INFORMATION
+
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

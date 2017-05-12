@@ -1,0 +1,25 @@
+Revision history for Perl extension Pod::Stripper.
+0.22  Tue Feb 26 08:58:43 2002 GMT
+    - added 'EXE_FILES' => ['podstrip'] ;)
+    - foiled by permissions and cpan testers, I improved test.pl
+      (chmod 0660, 'test.stripped' or die "can't chmod test.stripped? $!";)
+
+0.21  Sun Feb 24 16:25:40 2002 GMT
+    - finally sobered up, got a little time, wrote a requested feature
+      (doesn't strip out hidden code anymore)
+    - moved the pod around some
+    - finally uploaded to CPAN
+
+0.2 - Sun Jan 18 03:25:40 2002 GMT
+    - reformatted some code, cleaned up the dist, make dist
+
+0.02  Thu Jan 10 04:37:00 2002 GMT
+    - added unless(caller()) to package main
+
+0.01  Tue Jan  8 19:21:00 2002 GMT
+    - updated pretty much everything, wrote module ;)
+
+0.01  Tue Jan  8 19:12:46 2002 GMT
+	- original version; created by h2xs 1.21 with options
+		-AX -n Pod::Stripper
+

@@ -1,0 +1,43 @@
+# obsolete
+
+%conflict isInTheMiddle {
+  my $nxs = $self->YYSymbolStack(0, -1, 'x');
+  my $nxr = (unexpendedInput() =~ tr/x//); 
+  print "nxs = $nxs nrx = $nxr\n";
+
+  if ($nxs == $nxr+1) { 
+    print "Reducing by :MIDx\n";
+    $self->YYSetReduce('x', ':MIDx' ) 
+  }
+  else { $self->YYSetShift('x') } 
+}
+
+%expect 1
+
+%%
+S:
+     x  %PREC isInTheMiddle S x  
+  |  %name :MIDx 
+     x  %PREC isInTheMiddle ;
+%%
+
+=head1 SYNOPSIS
+
+This grammar is similar to the one in file C<nopackrat.eyp>.
+It can't be parsed by LR(k) nor LL(k) algorithms.
+Backtracking LR and GLR algorithms can but will perform poorly.
+
+Compile it with:
+
+   $ eyapp -TC nopackratPPCR.eyp
+
+Run it with:
+
+   $ ./nopackratPPCR.pm -t -i -c 'xxx'
+
+=head1 SEE ALSO
+
+Files C<nopackrat.eyp>, C<noLRk_exp.eyp>, C<noLRk_expSolved.eyp>
+
+=cut
+

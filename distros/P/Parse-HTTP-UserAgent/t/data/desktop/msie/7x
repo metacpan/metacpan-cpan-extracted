@@ -1,0 +1,120 @@
+[AGENT]
+
+# Weirdo
+
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; .NET CLR 1.0.3705; InfoPath.1; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 1.1.4322; .NET CLR 3.0.04506.590; .NET CLR 3.5.20706; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; Zune 2.5; WWTClient2; MS-RTC LM 8; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)
+
+'parser'           => 'msie',
+'os'               => 'Windows XP',
+'extras'           => ['MSIE 6.0','SV1','InfoPath.1','Zune 2.5','WWTClient2','MS-RTC LM 8'],
+'version_raw'      => '7.0',
+'version'          => '7.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.0.3705','2.0.50727','3.0.04506.30','1.1.4322','3.0.04506.590','3.5.20706','3.0.04506.648','3.5.21022','3.0.4506.2152','3.5.30729'],
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.04506.648; .NET CLR 3.5.21022; InfoPath.2)
+
+'parser'           => 'msie',
+'os'               => 'Windows XP',
+'extras'           => [ 'InfoPath.2' ],
+'version_raw'      => '7.0',
+'version'          => '7.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.1.4322','2.0.50727','3.0.04506.30','3.0.04506.648','3.5.21022'],
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Supplied by Tesco.net; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
+
+'parser'           => 'msie',
+'os'               => 'Windows XP',
+'extras'           => [ 'Supplied by Tesco.net' ],
+'version_raw'      => '7.0',
+'version'          => '7.000',
+'name'             => 'MSIE',
+'dotnet'           => [ '1.1.4322', '2.0.50727' ],
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Tesco; .NET CLR 1.1.4322)
+
+'parser'           => 'msie',
+'os'               => 'Windows XP',
+'extras'           => ['Tesco'],
+'version_raw'      => '7.0',
+'version'          => '7.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.1.4322'],
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Sky Broadband; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506; Tesco)
+
+'parser'           => 'msie',
+'os'               => 'Windows Vista / Server 2008',
+'extras'           => ['Sky Broadband','SLCC1','Media Center PC 5.0','Tesco'],
+'version_raw'      => '7.0',
+'version'          => '7.000',
+'name'             => 'MSIE',
+'dotnet'           => ['2.0.50727','3.0.04506'],
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Tesco; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
+
+'parser'           => 'msie',
+'os'               => 'Windows XP',
+'extras'           => ['Tesco'],
+'version_raw'      => '7.0',
+'version'          => '7.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.1.4322','2.0.50727'],
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Tesco; YPC 3.2.0; .NET CLR 1.1.4322; yplus 5.3.04b)
+
+'parser'           => 'msie',
+'os'               => 'Windows XP',
+'extras'           => ['Tesco','YPC 3.2.0','yplus 5.3.04b'],
+'version_raw'      => '7.0',
+'version'          => '7.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.1.4322'],
+
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1)
+
+name        => 'MSIE',
+os          => 'Windows XP',
+parser      => 'msie',
+version     => '7.000',
+version_raw => '7.0',
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; BT Openworld Broadband; .NET CLR 1.1.4322)
+
+dotnet      => [ '1.1.4322' ],
+extras      => [ 'BT Openworld Broadband' ],
+name        => 'MSIE',
+os          => 'Windows XP',
+parser      => 'msie',
+version     => '7.000',
+version_raw => '7.0',
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; yie5.5_SBCDSL; SU 3.005; .NET CLR 1.0.3705)
+
+dotnet      => [ '1.0.3705' ],
+extras      => [ 'yie5.5_SBCDSL', 'SU 3.005' ],
+name        => 'MSIE',
+os          => 'Windows XP',
+parser      => 'msie',
+version     => '7.000',
+version_raw => '7.0',

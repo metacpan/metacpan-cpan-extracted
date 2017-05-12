@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use File::Spec;
+use Panotools::Script;
+use Image::Size;
+
+die "usage\n  $0 equirectangular.tif [...]" unless scalar @ARGV;
+
+for my $img_erect (@ARGV)
+{
+
+my $pto_sgraphic = $img_erect;
+$pto_sgraphic =~ s/\.([[:alnum:]]+)$/-sgraphic.pto/;
+
+my ($width, $height) = imgsize ($img_erect);
+my $face = int (0.6 * $width);
+my ($volume, $directories, $file) = File::Spec->splitpath ($img_erect);
+
+my $stereographic = new Panotools::Script;
+if (-e $pto_sgraphic)
+{
+    $stereographic->Read ($pto_sgraphic);
+    $stereographic->Panorama->Set (w => $face, h => $face);
+    $stereographic->Image->[0]->Set (w => $width, h => $height);
+}
+else
+{
+    # set v => 253.7398 to get the horizon halfway between centre and edge
+    $stereographic->Panorama->Set (v => 253.7398, f => 4, u => 0, w => $face, h => $face, n => '"TIFF"');
+    $stereographic->Image->[0] = new Panotools::Script::Line::Image;
+    $stereographic->Image->[0]->Set (w => $width, h => $height, v => 360, f => 4, r => 0, p => 0, y => 0, n => "\"$file\"");
+}
+$stereographic->Write ($pto_sgraphic);
+
+}
+
+__END__
+
+=head1 NAME
+
+erect2planet - Extract a stereographic 'little planet' from an equirectangular image
+
+=head1 Synopsis
+
+  erect2planet equirectangular.tif
+
+=head1 DESCRIPTION
+
+Generates a suitably sized stereographic .pto project from a 360 degree
+equirectangular image.  Input is in any image format understood by hugin,
+output is in square TIFF format with a field of view of 253.7398 degrees (this
+places the horizon halfway between the centre and the edge).
+
+The output filename is derived automatically from the input filename with
+'-sgraphic.pto' appended.  Existing .pto files will not be clobbered but
+will be updated when input images change size.
+
+L<http://hugin.sourceforge.net/>
+
+=head1 License
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 See Also
+
+L<perl>, L<Panotools::Script>
+
+=head1 Author
+
+Bruno Postle <bruno AT postle.net>
+

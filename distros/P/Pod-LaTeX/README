@@ -1,0 +1,112 @@
+Pod::LaTeX - convert Pod to latex using Pod::Parser
+
+This is version 0.60 of Pod::LaTeX. This module can be used to
+convert pod data to latex. It uses the standard Pod::Parser module.
+A pod2latex replacement command is provided. This can be installed over
+the pod2latex command distributed with perl.
+
+Please let me know of any problems.
+
+INSTALLATION
+
+ % perl Build.PL
+ % ./Build
+ % ./Build test
+ % ./Build install
+
+Currently the tests are not very good (only a simple test is provided).
+
+REQUIREMENTS
+
+Requires perl 5.005 or newer.
+
+Written completely in Perl. XS is not required.
+
+Requires the PodParser package from CPAN. This is standard with
+perl 5.6.0. This module is part of the standard perl distribution
+and has been since perl 5.6.1.
+
+AUTHOR
+
+Tim Jenness <tjenness@cpan.org>
+
+Copyright (C) 2011-2012 Tim Jenness.
+Copyright (C) 1999-2004 Tim Jenness and the UK Particle Physics and
+Astronomy Research Council. All Rights Reserved.  This program is free
+software; you can redistribute it and/or modify it under the same
+terms as Perl itself.
+
+CHANGES
+
+V0.61
+    - Update site vs perl install for perl v5.12 and above
+    - Issue a deprecation warning if the module is being used in perl 5.17.0 and above.
+      This module will be removed from perl Core for perl 5.20. (Ricardo Signes)
+      It will still be available on CPAN.
+
+V0.60
+    - Patch for "--" from Dima Kogan (RT #72518)
+
+V0.59
+    - Use Module::Build
+    - Fix trivial pod typo (RT #46887)
+
+V0.58
+    - Fix problem with [] in items (R. de Vries)
+
+V0.57
+    - Missing README file for V0.56 now added. No changes to code.
+
+V0.56
+    - Add -prefile/-postfile and -preamble/-postamble options to pod2latex
+      and fix double printing of user postamble.
+      (thanks to Adriano Rodrigues Ferreira)
+    - UserPostamble and UserPreamble were erroneously being written
+      even when AddPostamble and AddPreamble were false.
+
+V0.55
+    - Fix enumerated lists so that they do not double up the number
+      (Aerial Scolnicov and Sudhi Herle)
+    - Strip "." and ")" from numbers when looking for enumerated lists
+      (Sudhi Herle)
+    - Module now returns a true value (add 1; at end) (Dan Kogai)
+    - Many new Pod escapes supported (Peter J Acklam)
+    - The module now installs into the PERL dirs and not the site
+      install if the perl version is greater than 5.6.0 (since this
+      module is part of core perl as of v5.6.1).
+    - The pod2latex script is now configured as a true pod2latex.PL
+      application (imported changes from bleadperl)
+    - Should now pass tests with Pod::ParseUtils v0.30 installed
+      (thanks to Mark Veltzer for pointing out the problem)
+
+V0.54
+    - Fix misunderstanding with =for
+    - Add fixes for <  and > (and also |)
+    - Fix tabbing (thanks to Hugh S Myers)
+    - Fix strange indenting with long items (Hugh S Myers)
+    - add a real test
+    - Fix L<> since the fix to escape | had broken it
+    - add -h1level to pod2latex
+
+V0.53
+    - Handle long items (Mark A Hershberge)
+    - Escape ~ (Simon Cozens)
+    - Add verbar and sol support as well as | escape (Marcel Grunauer)
+
+V0.52
+    - minor fix to pod2latex to preserve order of supplied arguments
+
+V0.51
+    - Fix some of the warning messages so that they report the
+      line number in the pod file correctly for errors.
+
+    - Fix escaping of ^, { and }
+
+V0.50 
+    - First public release
+
+KNOWN BUGS
+
+  - Does not automatically convert func() to B<func()> and $a to C<$a>
+
+  - Probably does not match the new perlpodspec

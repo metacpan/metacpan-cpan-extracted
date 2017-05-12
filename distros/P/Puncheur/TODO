@@ -1,0 +1,14 @@
+- documentation
+- test
+- problem that `$app->config` is global (static method).
+ - object method and clone? (how is cost?)
+ - use Data::Lock ? (restrict hash is too strict!!!)
+ - インスタンスメソッドにすると、Plugin::Model で上手くアサインできない問題
+- 同じアプリをちがう設定で複数newすると問題が起きる
+ - app_name指定してくださいって話
+ - new した時にすでにnewされたものがあった場合に、なんらかのケアが必要かも
+ - newをオーバーライドされたら割とおしまい (-> new再定義するなポリシー?)
+  - newしたあとのフックポイントが必要かなー (BUILD的な)
+  - newをオーバーライドした場合はエラー出すとか？
+- parse_options for Puncheur::Runner
+- filter in Dispatcher::Lite inspired from Kossy

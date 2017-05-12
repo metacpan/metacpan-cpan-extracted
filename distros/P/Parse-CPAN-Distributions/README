@@ -1,0 +1,77 @@
+Parse-CPAN-Distributions
+========================
+
+DESCRIPTION
+
+This distribution provides the ability to index the distributions that are 
+currently listed on CPAN. This is done using the mirror index file find-ls.
+
+DEPENDENCIES
+
+The distribution requires the following modules:
+
+  CPAN::DistnameInfo
+  File::Basename
+  File::Path
+  File::Slurp
+  File::Temp
+  IO::File
+  IO::Zlib
+  LWP::UserAgent
+  version
+
+For testing purposes, the following modules are required:
+
+  IO::File
+  Test::More
+
+For testing purposes, the following modules are desireable, but not essential:
+
+  Test::CPAN::Meta
+  Test::CPAN::Meta::JSON
+  Test::Pod
+  Test::Pod::Coverage
+
+INSTALLATION
+
+To install this module type the following:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+For more detailed installation instructions, see INSTALL.
+
+USAGE
+
+Read the pod documentation in the distribution files.
+
+CHANGES
+
+For a complete list of changes, see the Changes file.
+
+SUPPORT
+
+There are no known bugs at the time of this release. However, if you spot a
+bug or are experiencing difficulties that are not explained within the POD
+documentation, please send an email to barbie@cpan.org or submit a bug to the
+RT system. However, it would help greatly if you are able to pinpoint problems 
+or even supply a patch. 
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me.
+
+RT: http://rt.cpan.org/Public/Dist/Display.html?Name=Parse-CPAN-Distributions
+
+AUTHOR
+
+Barbie <barbie@cpan.org>
+for Miss Barbell Productions http://www.missbarbell.co.uk.
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2008-2014 Barbie for Miss Barbell Productions.
+
+This distribution is free software; you can redistribute it and/or
+modify it under the Artistic License v2.

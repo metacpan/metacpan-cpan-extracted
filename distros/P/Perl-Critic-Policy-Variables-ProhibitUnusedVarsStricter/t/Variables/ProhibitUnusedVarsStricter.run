@@ -1,0 +1,559 @@
+## name Simple unused, single, unassigned lexical.
+## failures 1
+## cut
+
+my $x;
+
+#-----------------------------------------------------------------------------
+
+## name Simple unused, multiple, unassigned lexicals.
+## failures 3
+## cut
+
+my ($x, @z, %y);
+
+#-----------------------------------------------------------------------------
+
+## name Same-named 'my' nested inside 'foreach' handled properly.
+## failures 0
+## cut
+
+# This is really about declarations in 'for' and 'foreach' wrongly taking
+# precedence over declarations inside them. The problem was that the list of
+# declarations was supposed to be in reverse order by position, but the 'for'
+# and 'foreach' declarations were shoved onto the front of the list.
+
+foreach my $foo ( @bar ) {
+    my $foo = "${foo}bar";
+    say $foo;
+}
+
+#-----------------------------------------------------------------------------
+
+## name Simple unused assigned lexicals.
+## failures 1
+## cut
+
+# Need to look out for RAII.
+my $y = foo();
+
+#-----------------------------------------------------------------------------
+
+## name List assignment.
+## failures 2
+## cut
+
+my ($b, $y) = qw{ foo bar };
+
+#-----------------------------------------------------------------------------
+
+## name Simple unused explicit global.
+## failures 0
+## cut
+
+our $x;
+
+#-----------------------------------------------------------------------------
+
+## name Simple unused implicit global.
+## failures 0
+## cut
+
+$x;
+
+#-----------------------------------------------------------------------------
+
+## name Simple unused localized.
+## failures 0
+## cut
+
+local $x;
+
+#-----------------------------------------------------------------------------
+
+## name Simple used lexical scalar.
+## failures 0
+## cut
+
+my $x = 1;
+
+print $x;
+
+#-----------------------------------------------------------------------------
+
+## name Simple used lexical array.
+## failures 0
+## cut
+
+my @x;
+
+$x[0] = 5;
+
+#-----------------------------------------------------------------------------
+
+## name Simple used lexical hash.
+## failures 0
+## cut
+
+my %foo;
+
+$foo{bar} = -24;
+
+#-----------------------------------------------------------------------------
+
+## name Shadowed variable.
+## failures 2
+## cut
+
+my $x = 2;
+
+{
+    my $x = 1;
+    blah();
+}
+
+#-----------------------------------------------------------------------------
+
+## name Shadowed variable, one of which is used
+## failures 1
+## cut
+
+my $x = 2;
+
+{
+    my $x = 1;
+    blah();
+}
+
+blah( $x );
+
+#-----------------------------------------------------------------------------
+
+## name Separate lexicals.
+## failures 2
+## cut
+
+{
+    my $x = 2;
+}
+
+{
+    my $x = 1;
+    blah();
+}
+
+#-----------------------------------------------------------------------------
+
+## name Separate lexicals, one of which is used.
+## failures 1
+## cut
+
+{
+    my $x = 2;
+}
+
+{
+    my $x = 1;
+    blah( $x );
+}
+
+#-----------------------------------------------------------------------------
+
+## name Closures
+## failures 0
+## cut
+
+{
+   my $has_graphviz = undef;
+
+   sub has_graphviz {
+      if (!defined $has_graphviz) {
+         $has_graphviz = eval { require GraphViz; 1; } ? 1 : 0;
+      }
+      return $has_graphviz;
+   }
+}
+
+#-----------------------------------------------------------------------------
+
+## name Interpolation in replacement portion of s/.../.../smx
+## failures 0
+## cut
+
+my %foo;
+s/ ( \w+ ) /$foo{$1}/smx;
+
+my @bar = ( qw{ 0 I II III IV V } );
+s/ ( \d+ ) / "$bar[$1]" /smxge;
+
+my $baz = 'Bat';
+s/ \w+ /${baz}man/smx;
+
+#-----------------------------------------------------------------------------
+
+## name Interpolation in replacement portion of s/.../.../smxe
+## failures 0
+## cut
+
+my %foo;
+
+s/ ( \w+ ) / $foo{$1} /smxe;
+
+#-----------------------------------------------------------------------------
+
+## name Variable used in regexp embedded code
+## failures 0
+## cut
+
+my %foo;
+
+m/ (?{ $foo{bar} }) /smx;
+
+#-----------------------------------------------------------------------------
+
+## name Variables interpolated into string
+## failures 0
+## cut
+
+my $foo = 'Foozie';
+my $bar = 'Alley Oop';
+my @baz = qw{ Moe Larry Curley };
+my %fruit = (
+    apple   => 'manzana',
+    banana  => 'platino',
+);
+my $teddy = 'Theodore';
+my $one = 'I'
+my $five = 'V';
+
+"$foo";
+qq{$bar};
+"$baz[1]";
+qq{$fruit{apple}};
+"\\${teddy}bear";
+"$one$five";
+
+#-----------------------------------------------------------------------------
+
+## name Variables not interpolated into string
+## failures 4
+## cut
+
+my $foo = 'Foozie';
+my $bar = 'Alley Oop';
+my @baz = qw{ Moe Larry Curley };
+my %fruit = (
+    apple   => 'manzana',
+    banana  => 'platino',
+);
+
+"\$foo";
+qq{\\\$bar};
+" \$baz[1]";
+qq{\\\\\$fruit{apple}};
+"\${foo}bear";
+
+#-----------------------------------------------------------------------------
+
+## name Variable interpolated into here document
+## failures 0
+## cut
+
+my $foo = 'Foozie';
+my @baz = qw{ Moe Larry Curley };
+my %fruit = (
+    apple   => 'manzana',
+    banana  => 'platino',
+);
+
+foo( <<EOD );
+$foo $baz[0] $fruit{apple} ${foo}bar
+EOD
+
+#-----------------------------------------------------------------------------
+
+## name Unused unpacking variables are prohibited
+## failures 4
+## cut
+
+sub foo {
+    my ( $self ) = @_;
+}
+
+sub bar {
+    my $self = shift;
+}
+
+sub baz {
+    my $self = shift @_;
+}
+
+sub burfle {
+    my $self = $_[0];
+}
+
+#-----------------------------------------------------------------------------
+
+## name Unused unpacking variables can be allowed.
+## parms { allow_unused_subroutine_arguments => '1' }
+## failures 0
+## cut
+
+sub foo {
+    my ( $self ) = @_;
+}
+
+sub bar {
+    my $self = shift;
+}
+
+sub baz {
+    my $self = shift @_;
+}
+
+sub burfle {
+    my $self = $_[0];
+}
+
+sub bork {
+    my ( $self, @args ) = @_;
+}
+
+#-----------------------------------------------------------------------------
+
+## name Variable does not exist until next statement after 'my'
+## failures 1
+## cut
+
+my $x;
+
+do {
+    my $x = $x;
+};
+
+$x = 42;
+
+#-----------------------------------------------------------------------------
+
+## name Variable does not exist until next statement after 'my' (list assign)
+## failures 2
+## cut
+
+my ( $x, $y );
+
+do {
+    my ( $x, $y ) = ( $x, $y );
+};
+
+( $x, $y ) = ( 17, 42 );
+
+#-----------------------------------------------------------------------------
+
+## name PPI::Token::QuoteLike::ReadLine
+## failures 0
+## cut
+
+my $fh = IO::File->new( 'foo.txt', '<' );
+
+while ( <$fh> ) {
+    print;
+}
+
+#-----------------------------------------------------------------------------
+
+## name Interpolating back-tick-ish constructions
+## failures 0
+## cut
+
+my ( $foo, $bar ) = qw{ baz burfle };
+
+`$foo`;
+qx{$bar};
+
+#-----------------------------------------------------------------------------
+
+## name Non-interpolating back-tick-ish constructions
+## failures 1
+## cut
+
+my $foo = 'bar';
+
+qx'$foo';
+
+#-----------------------------------------------------------------------------
+
+## name PPI edge case open( my $fh, $mode, $name )
+## failures 0
+## cut
+
+open( my $fh, $mode, $name );   # Should not trigger on $mode, $name
+print { $fh } "Hello, sailor!\n";
+
+#-----------------------------------------------------------------------------
+
+## name Taking a reference is OK
+## failures 0
+## cut
+
+\( my $foo = 'bar' );
+\do { my $bar = 'baz' };
+
+#-----------------------------------------------------------------------------
+
+## name Taking a reference is not OK if the user says not
+## parms { prohibit_reference_only_variables => '1' }
+## failures 2
+## cut
+
+\( my $foo = 'bar' );
+\do { my $bar = 'baz' };
+
+#-----------------------------------------------------------------------------
+
+## name Unknown computations are not allowed
+## failures 1
+## cut
+
+{
+    my $foo = scope_watch();
+}
+
+#-----------------------------------------------------------------------------
+
+## name Can add to allowed computation list
+## parms { allow_if_computed_by => 'scope_watch' }
+## failures 0
+## cut
+
+{
+    my $foo = scope_watch();
+}
+
+#-----------------------------------------------------------------------------
+
+## name Double dollar form of dereference
+## failures 0
+## cut
+
+my $foo = { bar => 42 };
+print $$foo{bar};
+my $bar = [ 42 ];
+print $$bar[0];
+my $baz = { bar => 42 };
+print "$$baz{bar}\n";
+my $burfle = [ 42 ];
+print "$$burfle[0]\n";
+
+#-----------------------------------------------------------------------------
+
+## name $#foo and friends
+## failures 0
+## cut
+
+my @foo;
+print $#foo;
+
+my $bar = [ qw{ one two three } ];
+print $#$bar;
+
+#-----------------------------------------------------------------------------
+
+## name curly-bracketed variable names
+## failures 0
+## cut
+
+my $foo = 'bar';
+print ${foo}
+
+#-----------------------------------------------------------------------------
+
+## name proper scope for loop variables
+## failures 1
+## cut
+
+my $foo;
+foreach my $foo ( qw{ bar baz } ) {
+    say $foo;
+}
+
+#-----------------------------------------------------------------------------
+
+## name unused state variables
+## failures 1
+## cut
+
+state $foo = 'bar';
+
+#-----------------------------------------------------------------------------
+
+## name used state variables
+## failures 0
+## cut
+
+state $bar = 'baz';
+say $bar;
+
+#-----------------------------------------------------------------------------
+
+## name temporary lvalue
+## failures 0
+## cut
+
+return my $x = 'foo';
+
+return ( my $y = 42 );
+
+#-----------------------------------------------------------------------------
+
+## name prohibit temporary lvalue
+## parms { prohibit_returned_lexicals => '1' }
+## failures 2
+## cut
+
+return my $x = 'foo';
+
+return ( my $y = 42 );
+
+#-----------------------------------------------------------------------------
+
+## name survive use of Object::InsideOut and odd PPI behavior
+## failures 1
+## cut
+
+# Code is from JABRA/MetasploitExpress-Parser-0.02.tar.gz
+# file lib/MetasploitExpress/Parser/Host.pm
+
+use Object::InsideOut;
+
+my @state : Field : Arg(state) : Get(state);
+
+#-----------------------------------------------------------------------------
+
+## name recursive
+## failures 0
+## cut
+
+my $x = 'foo';
+
+say "@{[ qx<ls $x> ]}";
+
+#-----------------------------------------------------------------------------
+
+## name escaped sigil
+## failures 0
+## cut
+
+my $x = 'foo';
+
+say "\@$x";
+
+#-----------------------------------------------------------------------------
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab shiftround :

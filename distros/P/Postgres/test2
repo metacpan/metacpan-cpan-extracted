@@ -1,0 +1,91 @@
+#!/usr/local/bin/perl
+
+# test code is from Owen Taylor <owt1@cornell.edu> who wrote
+# the putline/getline interface code, too.
+
+# the tests assume you have Postgres 1.09 else change the '\.' "end of
+# input" marker to just '.' below.
+
+use Postgres;
+
+# this will connect to your default database, or whatever your
+# PGDATABASE environment variable says.
+
+$dbh = db_connect(undef) or die "Error: $Postgres::error";
+print "ok 0\n";
+
+$result = $dbh->execute("create table ages (name varchar(20), age int4)");
+if ($result) {
+  print "ok 1\n";
+} else {
+  print "no ok 1 Error: $Postgres::error\n";
+}
+
+$result = $dbh->execute("copy ages from stdin");
+if ($result) {
+  print "ok 2\n";
+} else {
+  print "no ok 2 Error: $Postgres::error\n";
+}
+
+# There's no real way of getting meaningful error's for putline...
+# which tends to make it useless.  (Better to copy from a file
+# instead).
+$dbh->putline("fred\\\njones\t10\n");
+$dbh->putline("\\.\n");
+print "ok 3\n";
+
+# returns 0 on success
+if (!$dbh->endcopy()) {
+  print "ok 4\n";
+} else {
+  print "no ok 4\n";
+}
+
+$result = $dbh->execute("copy ages to stdout");
+if ($result) {
+  print "ok 5\n";
+} else {
+  print "no ok 5 Error: $Postgres::error\n";
+}
+
+# the following gets an entire record, handling internal newlines.
+# (as well as one can -- postgres95's handling is somewhat broken
+#  it seems).
+my $str = "";
+my $retstr;
+my $error = 0;
+while (1) {
+    $str .= ($retstr = $dbh->getline);
+    last unless defined $retstr;
+    last unless $str =~ /(^|[^\\])(\\\\)*\\$/;
+    $str .= "\n";
+}
+
+# do we get our record?
+if (defined $retstr && $str eq "fred\\\njones\t10") {
+    print "ok 6\n";
+} else {
+    print "not ok 6\n";
+}
+
+$str = $dbh->getline;
+if (defined $str && $str eq '\.') {
+  print "ok 7\n";
+} else {
+  print "not ok 7\n";
+}
+
+# returns 0 on success
+if (!$dbh->endcopy()) {
+  print "ok 8\n";
+} else {
+  print "not ok 8\n";
+}
+
+$result = $dbh->execute("drop table ages");
+if ($result) {
+  print "ok 9\n";
+} else {
+  print "not ok 9 Error: $Postgres::error\n";
+}

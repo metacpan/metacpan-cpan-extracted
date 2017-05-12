@@ -1,0 +1,62 @@
+==================================================
+Changes from 2009-05-13 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.06 at 2014-05-12 10:15:34 +0000
+-----------------------------------------
+
+  Change: fbb3f40e61985d599b2cea5f20f1890b1be6e0a5
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-05-12 11:15:34 +0000
+
+    Net::DNS removed a constant, implement it ourselves *sigh* 
+
+-----------------------------------------
+version 0.04 at 2013-01-31 15:55:04 +0000
+-----------------------------------------
+
+  Change: ec427510240affd740e71fabef200081c0aebe7e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-01-31 15:55:04 +0000
+
+    Bump to version 0.04 
+
+  Change: fdc2d0a3d5d8cf21aa6767d369215bc5529b60f8
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2013-01-31 07:23:39 +0000
+
+    Merge pull request #1 from stephan48/master
+
+    Added the fix/hack needed for the UDP DNS Filter also to the TCP DNS
+    Filter Module 
+
+  Change: 094cb09cb0609d5b9c0bd205fd4df97ea7c29f20
+  Author: Stephan Jauernick <stephan@stejau.de>
+  Date : 2013-01-31 15:26:40 +0000
+
+    Update lib/POE/Filter/DNS/TCP.pm
+
+    The same fix as for
+    https://github.com/bingos/poe-component-server-dns/commit/9d5facc88a8
+    abaa052af9a23938bbf05776c1ff3 was needed here. 
+
+-----------------------------------------
+version 0.02 at 2011-06-16 20:46:30 +0000
+-----------------------------------------
+
+  Change: ddfbde450e782933c11362d090a00a4cea0e0f90
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-06-16 21:46:30 +0000
+
+    Fixed issues with parsing, added documentation and tests. 
+
+  Change: d8d14ec726746d1f26920936c7545303130d0b2a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-06-16 19:57:34 +0000
+
+    Nobody here but us checkins 
+
+================
+End of releases.
+================

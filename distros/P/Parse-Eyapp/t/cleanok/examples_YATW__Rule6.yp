@@ -1,0 +1,33 @@
+%right '=' 
+%left '-' '+' 
+%left '*' '/' 
+%left NEG 
+%tree
+%lexer 
+
+%%
+
+line:
+      exp  
+;
+exp:
+      %name NUM
+      NUM
+    | %name VAR
+      VAR
+    | %name ASSIGN
+      VAR '=' exp
+    | %name PLUS
+      exp '+' exp
+    | %name MINUS
+      exp '-' exp
+    | %name TIMES
+      exp '*' exp
+    | %name DIV
+      exp '/' exp
+    | %name UMINUS
+      '-' exp %prec NEG
+    | '(' exp ')'  /* Let us simplify a bit the tree */
+;
+
+%%

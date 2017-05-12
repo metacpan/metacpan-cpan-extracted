@@ -1,0 +1,207 @@
+#!/usr/bin/perl -w
+# $Id: forking 688 2010-12-15 14:05:10Z fil $
+
+use strict;
+
+# use Religion::Package qw(1 1);
+use POE;
+use POE::Component::Daemon;
+use POE::Wheel::SocketFactory;
+use POE::Driver::SysRW;
+use POE::Filter::Line;
+use POE::Wheel::ReadWrite;
+use POSIX qw(EADDRINUSE);
+use Socket qw(inet_ntoa sockaddr_in);
+use FindBin;
+
+sub DEBUG () { 0 }
+
+my $port=shift;
+die "Usage: $0 port" unless defined $port;
+
+my $logfile = "$FindBin::Dir/log_forking";
+
+
+
+#########################
+POE::Session->create(
+inline_states=>{
+
+    _start=>sub {
+            my($kernel, $heap)=@_[KERNEL, HEAP];
+            $heap->{wheel}=POE::Wheel::SocketFactory->new(
+                BindPort     => $port,
+                Reuse        => 'on',                # Lets the port be reused
+                BindAddress  => '127.0.0.1',
+                SuccessEvent => 'accept',  
+                FailureEvent => 'error'
+            );
+            if( $port == 0 ) {
+                $port = ( sockaddr_in($heap->{wheel}->getsockname()) )[0];
+                print "PORT=$port\n";
+            }
+            else {
+                warn "$$: Listening on port $port";
+            }
+            $heap->{rid}=0;
+
+            $kernel->sig('daemon_child' => 'daemon_child' );
+            $kernel->sig('daemon_shutdown' => 'daemon_shutdown' );
+            $kernel->sig('daemon_pause' => 'daemon_pause' );
+            $kernel->sig('daemon_resume' => 'daemon_resume' );
+
+            $kernel->sig( USR1 => 'USR1' );
+    },
+
+    error=>sub {
+        my ($heap, $operation, $errnum, $errstr) = @_[HEAP, ARG0, ARG1, ARG2];
+
+        if(0==$errnum and $operation eq 'read') { # EOF
+            if($heap->{pending}) {
+                $heap->{done}=1;
+                return;
+            } else {
+                Daemon->shutdown();
+            }
+        }
+        else {
+            warn "$$: $operation:$errnum: $errstr";
+        }
+        if($errnum==EADDRINUSE) {       # EADDRINUSE
+            Daemon->shutdown();     # THIS IS IMPORTANT
+        }
+        delete $heap->{wheel};
+        delete $heap->{wheel_client};
+        # Daemon->shutdown;  
+    },   
+
+    ###############
+    # daemon_shutdown signal, caused by going from req -> done
+    daemon_shutdown => sub {
+        my ($heap, $kernel) = @_[HEAP, KERNEL];
+        delete $heap->{wheel};
+        delete $heap->{wheel_client};
+    },
+
+    ###############
+    # socketfactory got a connection handle it here
+    accept=>sub {       
+        my ($heap, $handle, $peer, $port, $id)=@_[HEAP, ARG0..ARG3];
+
+        $peer=inet_ntoa($peer);
+        DEBUG and warn "Connection id=$id from $peer:$port";
+
+        my $info={handle=>$handle, peer=>$peer, port=>$port, id=>$id};
+        $heap->{parent} = $$;
+
+        Daemon->update_status('req', $info);
+    },
+
+    ###############
+    # PoCo::Daemon thinks there are too many proceses, and that we should
+    # prevent more from happening
+    daemon_pause => sub {
+        my( $heap, $kernel ) = @_[ HEAP, KERNEL ];
+        DEBUG and warn "PAUSE";
+        if( $heap->{wheel} ) {
+            $heap->{wheel}->pause_accept;
+        }
+    },    
+    # PoCo::Daemon no longer thinks there are too many proceses.
+    daemon_resume => sub {
+        my( $heap, $kernel ) = @_[ HEAP, KERNEL ];
+        DEBUG and warn "RESUME";
+        if( $heap->{wheel} ) {
+            $heap->{wheel}->resume_accept;
+        }
+    },    
+
+    ###############
+    # We are now the child process.  That is, we went from wait -> req
+    # and so PoCo::Daemon forked a process to handle the req
+    daemon_child=>sub {
+        my($heap, $info)=@_[HEAP, ARG1]; 
+
+        # $info is the hash we built in 'accept'
+
+        delete $heap->{wheel};
+
+        $heap->{wheel_client} = POE::Wheel::ReadWrite->new(
+                Handle=>$info->{handle},
+                Driver=> new POE::Driver::SysRW, # using sysread and syswrite
+                Filter=> POE::Filter::Line->new(), # use a line filter for negociati
+                InputEvent => 'input',
+                FlushedEvent => 'flushed',
+                ErrorEvent => 'error'
+            );
+        Daemon->update_status('long');
+    },
+
+    ###############
+    # ReadWrite's InputEvent.
+    input => sub {
+        my($heap, $line)=@_[HEAP, ARG0];
+        DEBUG and warn "Received $line";
+
+        $line = uc $line;
+
+        if($line eq 'PID') {
+            $heap->{wheel_client}->put($$);
+        }
+        elsif($line eq 'PARENT') {
+            $heap->{wheel_client}->put( $heap->{parent} );
+        }
+        elsif($line eq 'PING') {
+            $heap->{wheel_client}->put('PONG');
+        }
+        elsif($line eq 'LOGFILE') {
+            $heap->{wheel_client}->put( $logfile );
+        }
+        elsif($line eq 'KERNEL') {
+            $heap->{wheel_client}->put( $poe_kernel->ID );
+        }
+        elsif($line eq 'DONE') {
+            $heap->{wheel_client}->put('OK');
+            $heap->{done}=1;
+        }
+        elsif($line eq 'STATUS') {
+            $heap->{wheel_client}->put(Daemon->status);
+        }
+        else {
+            $heap->{wheel_client}->put('???');
+        }
+        $heap->{pending}=1;
+    },
+
+    ###############
+    # ReadWrite's FlushedEvent.
+    flushed=>sub {
+        my($heap)=$_[HEAP];
+        # DEBUG and warn "Flushed";
+        $heap->{pending}=0;
+        return unless $heap->{done};
+
+        delete $heap->{wheel_client};
+        $poe_kernel->post(Daemon=>'update_status', 'done');
+    },
+
+    ###############
+    USR1=>sub { Daemon->peek( 1 ) },
+
+});      
+
+#########################
+POE::Component::Daemon->spawn(
+            verbose=>1,
+            alias=>'Daemon',
+            logfile=>$logfile,
+            detach=>1,
+            max_children=>3,
+        );
+
+#########################
+$poe_kernel->run();
+
+DEBUG and warn "$$: Exiting";
+1;
+

@@ -1,0 +1,29 @@
+Revision history for Padre-Plugin-HTML
+
+0.09    2009.05.31
+        removed taint mode for test, leading to build failure (jquelin)
+
+0.08    2009.1.23
+        for Padre 0.26
+
+0.07    2009.1.5
+        for Padre 0.23
+
+0.06    2008.12.24
+        comment_lines_str
+
+0.05    2008.12.19
+        add Padre::Document::HTML with get_command
+
+0.04    2008.12.19
+        fix htmltidy
+
+0.03    2008.12.18
+        small bug fix
+
+0.02    2008.12.18
+        add HTML::Lint
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

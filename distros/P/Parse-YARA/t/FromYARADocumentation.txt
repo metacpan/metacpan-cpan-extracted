@@ -1,0 +1,343 @@
+// Rules from Yara Documentation for testing purposes
+// See: http://code.google.com/p/yara-project/
+rule BadBoy
+{
+	strings:
+		$a = "win.exe"
+		$b = "http://foo.com/badfile1.exe"
+		$c = "http://bar.com/badfile2.exe"
+
+	condition:
+		$a and ($b or $c)
+}
+
+rule Dummy
+{
+	condition:
+		false
+}
+
+rule ExampleRule
+{
+	strings:
+		$my_text_string = "text here"
+		$my_hex_string = { E2 34 A1 C8 23 FB }
+
+	condition:
+		$my_text_string or $my_hex_string
+}
+
+/*
+	This is a multi-line comment ...
+*/
+rule CommentExample // ... and this is single-line comment
+{
+	condition:
+		false // just an dummy rule, don't do this
+}
+
+rule WildcardExample
+{
+	strings:
+		$hex_string = { E2 34 ?? C8 A? FB }
+
+	condition:
+		$hex_string
+}
+
+rule JumpExample
+{
+	strings:
+		$hex_string = { F4 23 [4-6] 62 B4 }
+
+	condition:
+		$hex_string
+}
+
+rule AlternativesExample1
+{
+	strings:
+		$hex_string = { F4 23 ( 62 B4 | 56 ) 45 }
+
+	condition:
+		$hex_string
+}
+
+rule AlternativesExample2
+{
+	strings:
+		$hex_string = { F4 23 ( 62 B4 | 56 | 45 ?? 67 ) 45 }
+
+	condition:
+		$hex_string
+}
+
+rule TextExample
+{
+	strings:
+		$text_string = "foobar"
+
+	condition:
+		$text_string
+}
+
+rule CaseInsensitiveExample
+{
+	strings:
+		$text_string = "foobar" nocase
+
+	condition:
+		$text_string
+}
+
+rule WideCharTextExample1
+{
+	strings:
+		$wide_string = "Borland" wide
+
+	condition:
+		$wide_string
+}
+
+rule WideCharTextExample2
+{
+	strings:
+		$wide_and_ascii_string = "Borland" wide ascii
+
+	condition:
+		$wide_and_ascii_string
+}
+
+rule RegExpExample1
+{
+	strings:
+		$re1 = /md5: [0-9a-zA-Z]{32}/
+		$re2 = /state: (on|off)/
+
+	condition:
+		$re1 and $re2
+}
+
+rule ConditionExample
+{
+	strings:
+		$a = "text1"
+		$b = "text2"
+		$c = "text3"
+		$d = "text4"
+
+	condition:
+		($a or $b) and ($c or $d)
+} 
+
+rule CountExample
+{
+	strings:
+		$a = "dummy1"
+		$b = "dummy2"
+
+	condition:
+		#a == 6 and #b > 10
+}
+
+rule AtExample
+{
+	strings:
+		$a = "dummy1"
+		$b = "dummy2"
+
+	condition:
+		$a at 100 and $b at 200
+}
+
+rule InExample
+{
+	strings:
+		$a = "dummy1"
+		$b = "dummy2"
+
+	condition:
+		$a in (0..100) and $b in (100..filesize)
+}
+
+rule FileSizeExample
+{
+	condition:
+		filesize > 200KB
+}
+
+rule EntryPointExample1
+{
+	strings:
+		$a = { E8 00 00 00 00 }
+
+	condition:
+		$a at entrypoint
+}
+
+rule EntryPointExample2
+{
+	strings:
+		$a = { 9C 50 66 A1 ?? ?? ?? 00 66 A9 ?? ?? 58 0F 85 }
+
+	condition:
+		$a in (entrypoint..entrypoint + 10)
+}
+
+rule IsPE
+{
+	condition:
+		// MZ signature at offset 0 and ...
+		uint16(0) == 0x5A4D and
+		// ... PE signature at offset stored in MZ header at 0x3C
+		uint32(uint32(0x3C)) == 0x00004550
+}
+
+rule OfExample1
+{
+	strings:
+		$a = "dummy1"
+		$b = "dummy2"
+		$c = "dummy3"
+
+	condition:
+		2 of ($a,$b,$c)
+}
+
+rule OfExample2
+{
+	strings:
+		$foo1 = "foo1"
+		$foo2 = "foo2"
+		$foo3 = "foo3"
+
+	condition:
+		/* ($foo*) is equivalent to ($foo1,$foo2,$foo3) */
+		2 of ($foo*)
+}
+
+rule OfExample3
+{
+	strings:
+		$foo1 = "foo1"
+		$foo2 = "foo2"
+		$bar1 = "bar1"
+		$bar2 = "bar2"
+
+	condition:
+		3 of ($foo*,$bar1,$bar2)
+}
+
+rule OfExample4
+{
+	strings:
+		$a = "dummy1"
+		$b = "dummy2"
+		$c = "dummy3"
+
+	condition:
+		1 of them /* equivalent to 1 of ($*) */
+}
+
+rule AnonymousStrings
+{
+	strings:
+		$ = "dummy1"
+		$ = "dummy2"
+
+	condition:
+		1 of them
+}
+
+rule Occurences
+{
+	strings:
+		$a = "dummy1"
+		$b = "dummy2"
+
+	condition:
+		for all i in (1,2,3) : (@a[i] + 10 == @b[i])
+}
+
+rule Rule1
+{
+	strings:
+		$a = "dummy1"
+
+	condition:
+		$a
+}
+
+rule Rule2
+{
+	strings:
+		$a = "dummy2"
+
+	condition:
+		$a and Rule1
+}
+
+global rule SizeLimit
+{
+	condition:
+		filesize < 2MB
+}
+
+private rule PrivateRuleExample
+{
+	condition:
+		false
+}
+
+rule TagsExample1 : Foo Bar Baz
+{
+	condition:
+		false
+}
+
+rule TagsExample2 : Bar
+{
+	condition:
+		false
+}
+
+rule MetadataExample
+{
+	meta:
+		my_identifier_1 = "Some string data"
+		my_identifier_2 = 24
+		my_identifier_3 = true
+
+	strings:
+		$my_text_string = "text here"
+		$my_hex_string = { E2 34 A1 C8 23 FB }
+
+	condition:
+		$my_text_string or $my_hex_string
+}
+
+rule ExternalVariableExample1
+{
+	condition:
+		ext_var == 10
+}
+
+rule ExternalVariableExample2
+{
+	condition:
+		bool_ext_var or filesize < int_ext_var
+}
+
+rule ExternalVariableExample3
+{
+	condition:
+		string_ext_var contains "text"
+}
+
+rule ExternalVariableExample4
+{
+	condition:
+		string_ext_var matches /[a-z]+/
+}
+include "MalwareRules.txt"
+include "PackerRules.txt"

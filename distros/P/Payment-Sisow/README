@@ -1,0 +1,25 @@
+=== README for Payment-Sisow version 0.12
+=   Generated on Mon Jan  6 09:41:13 2014 by OODoc 2.01
+
+There are various ways to install this module:
+
+ (1) if you have a command-line, you can do:
+       perl -MCPAN -e 'install <any package from this distribution>'
+
+ (2) if you use Windows, have a look at http://ppm.activestate.com/
+
+ (3) if you have downloaded this module manually (as root/administrator)
+       gzip -d Payment-Sisow-0.12.tar.gz
+       tar -xf Payment-Sisow-0.12.tar
+       cd Payment-Sisow-0.12
+       perl Makefile.PL
+       make          # optional
+       make test     # optional
+       make install
+
+For usage, see the included manual-pages or
+    http://search.cpan.org/dist/Payment-Sisow-0.12/
+
+Please report problems to
+    http://rt.cpan.org/Dist/Display.html?Queue=Payment-Sisow
+

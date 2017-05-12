@@ -1,0 +1,84 @@
+{
+   "abstract" : "Serve static files and Text::Xslate template files from document root with directory index",
+   "author" : [
+      "Kenta Sato <karupa@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-App-Directory-Xslate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38",
+            "perl" : "5.008_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "Plack" : "0",
+            "Plack::App::Directory" : "0",
+            "Plack::App::File" : "0",
+            "Plack::Util" : "0",
+            "Plack::Util::Accessor" : "0",
+            "Text::Xslate" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::App::Directory::Xslate" : {
+         "file" : "lib/Plack/App/Directory/Xslate.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/karupanerura/p5-Plack-App-Directory-Xslate/issues"
+      },
+      "homepage" : "https://github.com/karupanerura/p5-Plack-App-Directory-Xslate",
+      "repository" : {
+         "url" : "git://github.com/karupanerura/p5-Plack-App-Directory-Xslate.git",
+         "web" : "https://github.com/karupanerura/p5-Plack-App-Directory-Xslate"
+      }
+   },
+   "version" : "0.07"
+}

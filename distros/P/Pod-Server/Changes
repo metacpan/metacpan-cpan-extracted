@@ -1,0 +1,59 @@
+1.14 Wed Feb 19 19:12:47 PST 2014
+  - gave --tree option a default value of [] so Squatting::On::PSGI doesn't crash
+
+1.13 Sat Feb 15 11:49:24 PST 2014
+  - added --tree <DIR> option which lets you
+    specify more directories to search for perl modules.
+    Thanks to @duncanmg for adding this..
+
+1.12 Fri Apr 29 21:11:05 PDT 2011
+  - require latest Squatting
+
+1.11 Wed Apr 27 04:39:32 PDT 2011
+  - updated to work w/ Squatting 0.80
+  - use Pod::Simple::Search to find modules
+
+1.10 Tue Apr 27 14:17:24 PDT 2010
+  - Make sure File::Which is used safely and correctly (thanks to Terrence Brannon)
+
+1.09
+  - changed default font for verbatim (code block) sections
+
+1.08
+  - just playing around w/ ShipIt
+  - functionally equivalent to 1.07
+
+1.07
+  - mentioned other expressions of the pod web server idea
+    that I've become aware of.
+  - enabled strict and warnings
+  - pass follow_symlinks => 2 to File::Find.
+    Doing so makes ubuntu's mod_perl 2 complain less.
+  - Made Text::VimColor optional
+
+1.06
+  - Fixed the index -> body %3A%3A linking error
+  - updated the README a tiny bit
+  - made compatible with Squatting 0.50
+
+1.05
+  - Defer scanning for POD until init is called.
+  - Scan for binaries installed by module distributions, as well.
+
+1.04
+  - Made vim syntax highlighting colors configurable
+  - Made sure page title was set in source view
+
+1.03
+  - Mentioned git repository at github.com in POD
+  - Added vim syntax highlighting for source code view
+
+1.02 (accidentally skipped release)
+  - Added a Changes file
+
+1.01
+  - Made title configurable
+
+1.00
+  - Initial release
+

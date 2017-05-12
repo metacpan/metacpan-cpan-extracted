@@ -1,0 +1,66 @@
+{
+   "abstract" : "A library of building blocks for parsing text",
+   "author" : [
+      "Wim Vanderbauwhede <Wim.Vanderbauwhede@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Parser-Combinators",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wimvanderbauwhede/Perl-Parser-Combinators/issues"
+      },
+      "homepage" : "https://github.com/wimvanderbauwhede/Perl-Parser-Combinators",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wimvanderbauwhede/Perl-Parser-Combinators.git",
+         "web" : "https://github.com/wimvanderbauwhede/Perl-Parser-Combinators"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Wim Vanderbauwhede <Wim.Vanderbauwhede@mail.be>"
+   ]
+}
+

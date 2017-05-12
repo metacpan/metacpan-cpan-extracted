@@ -1,0 +1,56 @@
+{
+   "abstract" : "abstract implementation of the bittorrent p2p protocol",
+   "author" : [
+      "Tom Molesworth <cpan@entitymodel.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Protocol-BitTorrent",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Convert::Bencode_XS" : "0.06",
+            "Digest::SHA" : "5.63",
+            "HTTP::Message" : "0",
+            "Try::Tiny" : "0.11",
+            "URI" : "0",
+            "URI::QueryParam" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-protocol-bittorrent at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Protocol-BitTorrent"
+      },
+      "homepage" : "http://search.cpan.org/dist/Protocol-BitTorrent/"
+   },
+   "version" : "0.004"
+}
+

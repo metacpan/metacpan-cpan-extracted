@@ -1,0 +1,17 @@
+LogServ-P10.pl - a P10 compatible simple log service
+==============
+
+Quick and dirty service bot that simply logs all events to LogServ-P10.log 
+
+For usage ./LogServ-P10.pl --help
+
+- Use /invite <nickname> and the service bot will join that channel and automatically opmode +o itself
+
+LogServ-Hyb.pl - a Hybrid/TSora compatible simple log service
+==============
+
+Quick and dirty service bot that simply logs all events to LogServ-Hyb.log
+
+For usage ./LogServ-Hyb.pl --help
+
+- Use /invite <nickname> and the service bot will join that channel and automatically get +o 

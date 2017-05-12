@@ -1,0 +1,3 @@
+TYPEMAP
+
+PDL::IO::Image      T_PTROBJ

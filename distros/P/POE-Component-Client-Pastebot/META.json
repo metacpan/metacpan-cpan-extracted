@@ -1,0 +1,65 @@
+{
+   "abstract" : "Interact with Bot::Pastebot web services from POE.",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "POE-Component-Client-Pastebot",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::TokeParser" : "0",
+            "HTTP::Request::Common" : "0",
+            "POE" : "1.294",
+            "POE::Component::Client::HTTP" : "0.88",
+            "URI" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "File::Spec" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Response" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "POE::Filter::HTTP::Parser" : "1.06",
+            "Test::More" : "0.47",
+            "Test::POE::Server::TCP" : "1.06"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/poe-component-client-pastebot",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/poe-component-client-pastebot.git",
+         "web" : "https://github.com/bingos/poe-component-client-pastebot"
+      }
+   },
+   "version" : "1.18",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+}
+

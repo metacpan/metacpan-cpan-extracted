@@ -1,0 +1,67 @@
+{
+   "abstract" : "A non-blocking wrapper around AI::MegaHAL.",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>",
+      "David Davis <xantus@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "POE-Component-AI-MegaHAL",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AI::MegaHAL" : "0.07",
+            "POE" : "0.9999",
+            "POE::Filter::Line" : "0",
+            "POE::Filter::Reference" : "0",
+            "POE::Wheel::Run" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/poe-component-ai-megahal",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/poe-component-ai-megahal.git",
+         "web" : "https://github.com/bingos/poe-component-ai-megahal"
+      }
+   },
+   "version" : "1.20",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0227"
+}
+

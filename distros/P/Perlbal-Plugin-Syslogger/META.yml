@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Perlbal-Plugin-Syslogger
+version:            1.00
+abstract:           Perlbal plugin that adds low-impact syslog
+author:
+    - Adam Thomason <athomason@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Danga::Socket:        1.59
+    Log::Syslog::Constants:  1.01
+    Log::Syslog::DangaSocket:  1.05
+    Log::Syslog::Fast:    0.48
+    Perlbal:              1.76
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

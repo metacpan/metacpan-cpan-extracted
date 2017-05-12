@@ -1,0 +1,695 @@
+=head1 NOME
+
+perlfaq9 - Programmazione di rete ($Revision: 1.19 $, $Date: 2009/01/26 17:06:25 $)
+
+=head1 DESCRIZIONE
+
+Questa sezione tratta le domande relative alla programmazione di
+rete, in internet, e qualche domanda sul web.
+
+=head2 Qual E<egrave> la forma corretta di risposta da uno script CGI
+
+(Risponde Alan Flavell <flavell+www@a5.ph.gla.ac.uk> ...)
+
+La Common Gateway Interface (CGI) specifica un'interfaccia software tra un
+programma ("script CGI") e un server web (HTTPD). Essa non E<egrave> specifica
+del Perl ed ha le proprie FAQ, tutorial e un gruppo usenet,
+comp.infosystems.www.authoring.cgi
+
+La specifica CGI originale E<egrave> descritta su un RFC informativo:
+http://www.ietf.org/rfc/rfc3875
+
+Altri documenti rilevanti sono elencati su:
+http://www.perl.org/CGI_MetaFAQ.html
+
+Queste FAQ Perl toccano alcune problematiche CGI in maniera molto selettiva.
+Ad ogni modo, si suggerisce caldamente ai programmatori Perl l'uso del modulo
+CGI.pm che si prenda cura dei particolari al loro posto.
+
+La similitudine tra gli header di risposta CGI (definiti nella specifica CGI)
+e gli header di risposta HTTP (definiti nella specifica HTTP, RFC2616)
+E<egrave> intenzionale ma puE<ograve> talvolta confondere.
+
+La specifica CGI definisce due tipi di script: il "Parsed Header" script, e
+il "Non Parsed Header" (NPH) script. Controlla la documentazione del
+vostro server per vedere quale di esse viene supportata. Gli script "Parsed
+Header" sono piE<ugrave> semplici sotto vari aspetti. La specifica CGI permette una
+qualsiasi delle usuali rappresentazioni del newline nella risposta CGI
+(E<egrave> compito del server creare un'accurata risposta HTTP basata su di
+essa). CosE<igrave> "\n" scritto in modalitE<agrave> testuale E<egrave>
+tecnicamente corretto e raccomandato. Gli script NPH sono piE<ugrave>
+complessi: essi devono emettere un completo ed accurato insieme di
+intestazioni HTTP di risposta di transazione; la specifica HTTP richiede
+che i record siano terminati con un carriage-return e un line-feed,
+cioE<egrave> ASCII \015\012 scritto in binario.
+
+L'uso di CGI.pm fornisce una piattaforma indipendente eccellente, includendo
+i sistemi EBCDIC. CGI.pm seleziona una rappresentazione appropriata di
+newline ($CGI::CRLF) e imposta binmode in maniera appropriata.
+
+=head2 I miei script funzionano dalla linea di comando ma non dal browser. (500 Errore del server)
+
+Molte cose potrebbero essere sbagliate. Potete consultare la guida
+"Troubleshooting Perl CGI" [in inglese, NdT] su:
+
+    http://www.perl.org/troubleshooting_CGI.html
+
+Se, dopo ciE<ograve>, potete dimostrare di aver letto le FAQ e che il vostro
+problema non E<egrave> qualcosa di cosE<igrave> semplice per cui si
+puE<ograve> trovare facilmente una risposta, probabilmente riceverete una
+risposta cortese ed utile se inviate un messaggio su
+comp.infosystems.www.authoring.cgi (se ha qualcosa a che fare con i
+protocolli HTTP o CGI). Le domande che sembrano riguardare il Perl ma che
+in realtE<agrave> riguardano i CGI non sono invece accolte tanto bene su
+comp.lang.perl.misc.
+
+Le utili FAQ, i documenti collegati, e le guide alla risoluzione dei problemi
+sono elencate nella CGI Meta FAQ [in inglese, NdT]:
+
+	http://www.perl.org/CGI_MetaFAQ.html
+
+=head2 Come posso ottenere migliori messaggi di errore da un programma CGI?
+
+Usate il modulo CGI::Carp. Esso sostituisce "warn" e "die", oltre alle
+funzioni "carp", "croak" e "confess" del normale modulo Carp, con delle
+versioni piE<ugrave> esplicative e piE<ugrave> sicure. I messaggi saranno
+comunque inviati al normale error log del server.
+
+    use CGI::Carp;
+    warn "Questa e` solo una lamentela";
+    die "Ma questa e` una cosa piu` seria";
+
+Il seguente utilizzo di CGI::Carp redireziona inoltre gli errori ad un file
+di vostra scelta, collocato in un blocco BEGIN, in modo che vengano anche
+catturati i warning generati al momento della compilazione:
+
+    BEGIN {
+        use CGI::Carp qw(carpout);
+        open(LOG, ">>/var/local/cgi-logs/miolog-cgi")
+            or die "Non riesco ad aggiunger righe a miolog-cgi: $!\n";
+        carpout(*LOG);
+    }
+
+Potete anche far sE<igrave> che gli errori fatali ritornino al browser del client,
+il che va bene per il debugging ma potrebbe confondere l'utente.
+
+    use CGI::Carp qw(fatalsToBrowser);
+    die "Brutto errore qui";
+
+Anche se l'errore accade prima che abbiate inviato gli header HTTP, il
+modulo cercherE<agrave> di occuparsi di ciE<ograve>, cosE<igrave> da evitare
+i temuti errori 500 del server. I normali warning continueranno ad essere
+inviati all'error log del server (o in qualunque posto li abbiate
+redirezionati con "carpout"), preceduti dal nome dell'applicazione e
+dalla data.
+
+=head2 Come rimuovo i tag HTML presenti in una stringa?
+
+La via piE<ugrave> corretta (benchE<eacute> non la piE<ugrave> veloce)
+consiste nell'usare HTML::Parser da CPAN. Un'altra via abbastanza corretta
+consiste nell'usare HTML::FormatText, che non solo rimuove i tag HTML ma
+tenta anche di applicare un minimo di semplice formattazione al normale testo
+che ne risulta.
+
+Molti tentano un approccio sciocco tramite le espressioni regolari, come
+C<< s/<.*?>//g >>, ma questo fallisce in molti casi poichE<eacute> i tag
+possono continuare sulla riga successiva, possono contenere parentesi
+angolari tra apici, oppure potrebbe essere presente un commento HTML.
+Inoltre, spesso queste persone si dimenticano di convertire le
+entitE<agrave>, come ad esempio C<&lt;>.
+
+Ecco un approccio "sciocco", che funziona con la maggior parte dei file:
+
+    #!/usr/bin/perl -p0777
+    s/<(?:[^>'"]*|(['"]).*?\1)*>//gs
+
+Se ciE<ograve> che volete E<egrave> una soluzione piE<ugrave> completa,
+date un'occhiata al programma striphtml all'indirizzo
+http://www.cpan.org/authors/Tom_Christiansen/scripts/striphtml.gz .
+
+Ecco alcuni casi ingannevoli, ai quali dovete prestare attenzione al
+momento di scegliere una soluzione:
+
+    <IMG SRC = "pippo.gif" ALT = "A > B">
+
+    <IMG SRC = "pippo.gif"
+         ALT = "A > B">
+
+    <!-- <Un commento> -->
+
+    <script>if (a<b && a>c)</script>
+
+    <# Solo dati #>
+
+    <![INCLUDE CDATA [ >>>>>>>>>>>> ]]>
+
+Se i commenti HTML includono altri tag, queste soluzioni non funzioneranno
+nemmeno con testi come questo:
+
+    <!-- Questa sezione e` commentata.
+        <B>Non puoi vedermi!</B>
+    -->
+
+=head2 Come estraggo le URL?
+
+Potete facilmente estrarre tutti i tipi di URL dal codice HTML con
+C<HTML::SimpleLinkExtor>, il quale gestisce anchor, immagini, oggetti,
+frame, e molti altri tag che possono contenere una URL. Se avete bisogno
+di qualcosa di piE<ugrave> complesso, potete creare la vostra sottoclasse
+di C<HTML::LinkExtor> o C<HTML::Parser>. Potete persino usare
+C<HTML::SimpleLinkExtor> come esempio per qualcosa di tagliato per le
+vostre esigenze specifiche.
+
+Potete usare URI::Find per estrarre le URL da un documento di testo arbitrario.
+
+Soluzioni meno complete che coinvolgono le espressioni regolari, possono
+risparmiarvi parecchio tempo di esecuzione se siete a conoscenza che l'input
+E<egrave> semplice. Una soluzione di Tom Christiansen E<egrave> 100 volte
+piE<ugrave> veloce della maggior parte dei moduli, ma estrae solamente le
+URL dagli anchor nei quali il primo attributo E<egrave> HREF e non sono
+presenti altri attributi.
+
+	#!/usr/bin/perl -n00
+	# qxurl - tchrist@perl.com
+	print "$2\n" while m{
+            < \s*
+            A \s+ HREF \s* = \s* (["']) (.*?) \1
+            \s* >
+	}gsix;
+
+=head2 Come scarico un file dalla macchina dell'utente? Come apro un file situato su un'altra macchina?
+
+In questo caso, scaricare dignifica usare la caratteristica di caricamento file delle
+form HTML. Permettete al navigatore del web di specificare un file da inviare al
+vostro web server. Per voi sembrerE<agrave> uno scaricamento, per l'utente sembrerE<agrave> un
+caricamento. Non ha importanza come lo chiamate, lo fate con ciE<ograve> che E<egrave>
+conosciuto come codifica B<multipart/form-data>. Il modulo CGI.pm (che viene fornito 
+con il Perl quale parte della Libreria Standard) supporta questo con 
+il metodo start_multipart_form(), che E<egrave> diverso dal metodo startform().
+
+Consultate la sezione nella documentazione di CGI.pm sul caricamento dei file per
+esempi di codice e dettagli.
+
+=head2 Come posso fare un menE<ugrave> pop-up in HTML?
+
+Usate i tag B<< SELECT >> e B<< OPTION >>. Il modulo CGI.pm (disponibile su
+CPAN) supporta questo widget, come molti altri, inclusi alcuni che
+sintetizza intelligentemente da sE<eacute>.
+
+=head2 Come prelevo un file HTML?
+
+Un metodo, se avete il browser HTML testuale lynx installato sul vostro
+sistema, E<egrave> questo:
+
+    $codice_html  = `lynx -source $url`;
+    $testo_pagina = `lynx -dump $url`;
+
+I moduli di libwww-perl (LWP), disponibili su CPAN, forniscono una via
+piE<ugrave> potente per fare la stessa cosa. Non hanno bisogno di lynx
+ma, come lynx, possono sfruttare i proxy:
+
+    # versione piu` semplice
+    use LWP::Simple;
+    $contenuto = get($URL);
+
+    # o stampa HTML da una URL
+    use LWP::Simple;
+    getprint "http://www.linpro.no/lwp/";
+
+    # oppure stampa ASCI dall'HTML da una URL
+    # necessita anche di HTML-Tree da CPAN
+    use LWP::Simple;
+    use HTML::Parser;
+    use HTML::FormatText;
+    my ($html, $ascii);
+    $html = get("http://www.perl.com/");
+    defined $html
+         or die "Non riesco a prelevare l'HTML da http://www.perl.com/";
+    $ascii = HTML::FormatText->new->format(parse_html($html));
+    print $ascii;
+
+=head2 Come automatizzo l'invio di una form HTML?
+
+Se state facendo qualcosa di complesso come muoversi attraverso molte pagine e 
+form o in un sito web, potete usare C<WWW::Mechanize>. Consultate la sua documentazione 
+per tutti i dettagli.
+
+Se state inviando i valori della form usando il metodo GET, create una URL
+e codificate la form utilizzando il metodo "query_form":
+
+    use LWP::Simple;
+    use URI::URL;
+
+    my $url = url('http://www.perl.com/cgi-bin/cpan_mod');
+    $url->query_form(module => 'DB_File', readme => 1);
+    $contenuto = get($url);
+
+Se state invece usando il metodo POST, create il vostro user agent (*)
+e codificate i contenuti in maniera appropriata.
+
+    use HTTP::Request::Common qw(POST);
+    use LWP::UserAgent;
+
+    $ua = LWP::UserAgent->new();
+    my $rich = POST 'http://www.perl.com/cgi-bin/cpan_mod',
+                   [ module => 'DB_File', readme => 1 ];
+    $contenuto = $ua->request($rich)->as_string;
+
+(*) [in senso generale, componente software che effettua la navigazione, NdT]
+
+=head2 Come decodifico o creo quei %-codici sul web? 
+
+Se state scrivendo uno script CGI, dovreste usare il modulo CGI.pm che
+viene distribuito con il perl, oppure qualche modulo equivalente. Il modulo
+CGI decodifica automaticamente le interrogazioni per voi e fornisce una
+funzione escape() che si occupa delle codifiche.
+
+La migliore fonte di informazioni dettagliate sulla codifica delle URI
+E<egrave> l'RFC 2396. Fondamentalmente, questa viene svolta dalla seguente
+sostituzione:
+
+    s/([^\w()'*~!.-])/sprintf '%%%02x', ord $1/eg;   # codifica
+
+    s/%([A-Fa-f\d]{2})/chr hex $1/eg;                # decodifica
+	s/%([[:xdigit:]]{2})/chr hex $1/eg;          # stessa cosa
+
+Comunque sia, la dovreste applicare solo su singoli componenti di URI,
+altrimenti perderete informazione e in generale si ingarbuglieranno
+le cose. Se questo non ha chiarito i fatti, non preoccupatevi. Semplicemente, 
+andate a leggere la sezione 2 dell'RFC, E<egrave> probabilmente la
+migliore spiegazione che ci sia.
+
+L'RFC 2396 contiene anche molte altre utili informazioni, inclusa una
+espressione regolare per suddividere una URI arbitraria in componenti
+(Appendice B).
+
+=head2 Come effettuo la redirezione ad un'altra pagina?
+
+Specificate la URL completa della destinazione (anche se si trova sullo
+stesso server). Questo E<egrave> uno dei due diversi tipi di risposta CGI   
+"Location:", che sono definiti delle specifiche CGI per quanto
+riguardo gli script Parsed Headers [in cui gli header vengono
+analizzati dal server, NdT]. L'altro tipo (un path assoluto) viene
+risolto internamente al server senza alcuna redirezione HTTP. Le
+specifiche CGI non permettono di usare URL relative in nessuno dei
+due casi.
+
+L'utilizzo di CGI.pm E<egrave> caldamente raccomandato. Questo esempio mostra
+la redirezione con una URL completa. Questa redirezione E<egrave> gestita
+dal browser web.
+
+    use CGI qw/:standard/;
+
+    my $url = 'http://www.cpan.org/';
+    print redirect($url);
+
+Il seguente esempio mostra invece una redirezione con un path assoluto.
+Questa redirezione E<egrave> gestita dal server web locale.
+
+    my $url = '/CPAN/index.html';
+    print redirect($url);
+
+Se scritta direttamente, una redirezione potrebbe essere come segue
+(il "\n" finale E<egrave> mostrato separatamente, per chiarezza), usando
+una URL completa o un path assoluto.
+
+    print "Location: $url\n";   # header di risposta CGI
+    print "\n";                 # fine degli header
+
+=head2 Come faccio ad inserire una password nelle mie pagine web?
+
+Per abilitare l'autenticazione per il vostro server web, E<egrave> necessario
+configurarlo. La configurazione E<egrave> differente per i diversi tipi di
+server web---apache la effettua in maniera differente da iPlanet che
+differisce da IIS. Controllate la documentazione del vostro server web per i
+dettagli del vostro particolare server.
+
+=head2 Come si fanno a modificare i file .htpasswd e .htgroup in Perl?
+
+I moduli HTTPD::UserAdmin e HTTPD::GroupAdmin forniscono un'inferfaccia
+OO consistente a questi file, senza badare al loro formato. I database
+possono essere di testo, dbm, Berkeley DB o un qualsiasi database che abbia
+un driver DBI compatibile. HTTPD::UserAdmin supporta file usati nelle
+autenticazioni "Basic" e "Digest". Di seguito un esempio:
+
+     use HTTPD::UserAdmin ();
+     HTTPD::UserAdmin
+          ->new(DB => "/pippo/.htpasswd")
+          ->add($nomeutente => $password);
+
+=head2 Come faccio ad assicurarmi che gli utenti non immettano in una form dei valori che possono far fare brutte cose al mio script CGI?
+
+Consultate i riferimenti elencati nella nella sezione Security della CGI
+Meta FAQ [in inglese, NdT]:
+
+    http://www.perl.org/CGI_MetaFAQ.html
+
+=head2 Come effettuo il parsing dell'header di una mail?
+
+Per una soluzione veloce-e-sporca, provate questa soluzione derivata da
+L<perlfunc/split>:
+
+    $/ = '';
+    $header = <MSG>;
+    $header =~ s/\n\s+/ /g;      # unisce le linee successive
+    %head = ( UNIX_FROM_LINE, split /^([-\w]+):\s*/m, $header );
+
+Questa soluzione non funziona bene se, ad esempio, state cercando di
+gestire tutte le linee Received. Un approccio piE<ugrave> completo
+consiste nell'usare il modulo Mail::Header da CPAN (parte del pacchetto
+MailTools).
+
+=head2 Come faccio a decodificare una form CGI?
+
+(contributo di brian d foy)
+
+Usate il modulo CGI.pm che trovate nel Perl. E<Egrave> veloce e facile ed 
+effettivamente svolge un bel po' di lavoro er garantire che le cose avvengano in 
+maniera corretta. Si occupano delle richieste GET, POST ed HEAD, form multipart, campi 
+multivalore, stringhe di interrogazione, combinazioni di messaggi del body e molte altre 
+cose di cui probabilmente non vorreste starci a pensare.
+
+Niente di piE<ugrave> semplice: il modulo CGI effettua il parsing [analisi sintattica, NdT] 
+dell'input e rende disponibile ogni valore attraverso la funzione C<param()>.
+
+	use CGI qw(:standard);
+	
+	my $totale = param( 'prezzo' ) + param( 'spedizione' );
+	
+	my @items = param( 'oggetto' ); # valori multipli, stesso nome del campo
+
+Se volete un approccio orientato agli oggetti, CGI.pm puE<ograve> fare pure questo.
+
+	use CGI;
+	
+	my $cgi = CGI->new();
+	
+	my $total = $cgi->param( 'prezzo' ) + $cgi->param( 'spedizione' );
+	
+	my @items = $cgi->param( 'oggetto' );
+
+Potreste anche provare CGI::Minimal che E<egrave> una versione leggera della stessa cosa.
+Anche altri moduli del tipo CGI::*, disponibili su CPAN, potrebbero fare un lavoro migliore per voi.
+
+Molte persone tentano di scrivere il proprio decodificatore (o copiare quello di un altro programma) 
+e poi incappare in una o molte problematiche di questo tipo di compito. E<Egrave> molto piE<ugrave> 
+semplice e meno seccante usare CGI.pm.
+
+=head2 Come si fa a verificare la validitE<agrave> di un indirizzo di posta elettronica?
+
+Non si puE<ograve>. Almeno, non in tempo reale. E<Egrave> un peccato, eh?
+
+Senza inviare una mail all'indirizzo e senza controllare che ci sia un essere
+umano a rispondere dall'altra parte, non si puE<ograve> stabilire se un
+indirizzo email E<egrave> valido. Anche se applicate lo standard per gli
+header delle mail, potete avere problemi, poichE<eacute> esistono indirizzi
+cui si puE<ograve> mandar posta che non seguono le regole dell'RFC-822
+(lo standard per gli header delle mail), e indirizzi che le seguono cui
+invece non si puE<ograve> mandare posta.
+
+In molti sono tentati di provare ad eliminare certi indirizzi non validi
+che appaiono frequentemente con una semplice espressione regolare, come
+C</^[w.-]+@(?:[w-]+.)+w+$/>. E<egrave> una pessima idea. Comunque, questo
+modo di procedere scarta molti indirizzi validi, e non dice nulla sulla
+possibilitE<agrave> di inviare posta ad essi, quindi non E<egrave>
+consigliata. Piuttosto, guardate
+http://www.cpan.org/authors/Tom_Christiansen/scripts/ckaddr.gz ,
+che di fatto esegue un controllo seguendo tutte le specifiche dell'RFC
+(a parte i commenti innestati), cerca gli indirizzi dai quali potreste
+non voler accettare mail (Bill Clinton o il vostro postmaster, diciamo),
+e poi si assicura che l'hostname dato sia rintracciabile nei descrittori
+di tipo MX del DNS. Non E<egrave> veloce, ma svolge i compiti che si prefigge.
+
+Il nostro consiglio per verificare l'indirizzo di posta elettronica di
+una persona E<egrave> far sE<igrave> che scriva il proprio indirizzo due
+volte, come si fa normalmente per cambiare una password. Questo di solito
+elimina gli errori di battitura. Se le due versioni coincidono, mandate
+una mail all'indirizzo, con un messaggio personale che assomigli al seguente:
+
+    Caro utente@host.com,
+
+    Per favore, conferma, rispondendo a questo messaggio,  l'indirizzo
+    email che ci hai dato Mercoledi` 6 Maggio 2003 alle ore 9:35.
+    Includi nella risposta la stringa "Supercalifragilistichespiralidoso",
+    ma scritta al contrario; in altre parole, comincia con "Osod...".
+    Una volta fatto, il tuo indirizzo confermato verra` incluso nei
+    nostri archivi.
+
+Se vi arriva la risposta e l'utente ha seguito le vostre istruzioni, potete
+essere ragionevolmente certi che l'indirizzo E<egrave> reale.
+
+Una strategia correlata, meno vulnerabile alla contraffazione, E<egrave>
+dare all'utente un PIN (personal ID number: numero di identificazione
+personale). Registrate l'indirizzo e il PIN (meglio se casuale) per l'uso
+futuro. Nella mail che inviate, chiedete all'utente di includere il PIN
+nella sua risposta. Se perE<ograve> la mail torna indietro, o il messaggio
+viene incluso in una mail di risposta automatica tipo "Sono in vacanza",
+il PIN ci sarE<agrave> comunque. Quindi il meglio E<egrave> chiedere di
+rispondere con una versione decisamente modificata del PIN, ad esempio
+con i caratteri invertiti, oppure con un'unitE<agrave> aggiunta o
+sottratta ad ogni cifra, eccetera.
+
+=head2 Come si decodifica una stringa MIME/BASE64?
+
+Il pacchetto MIME-Base64 (disponibile su CPAN) tratta sia questa sia la
+codifica MIME/QP. Decodificare da BASE64 diventa semplice: 
+
+    use MIME::Base64;
+    $decodificato = decode_base64($codificato);
+
+Il pacchetto MIME-Tools (disponibile su CPAN) supporta l'estrazione con
+decodifica degli allegati codificati in BASE64, direttamente dai messaggi
+email.
+
+Se la stringa da decodificare E<egrave> breve (lunga meno di 84 byte) un
+approccio piE<ugrave> diretto E<egrave> quello di usare il formato "u"
+della funzione unpack() dopo una semplice translitterazione:
+
+    tr#A-Za-z0-9+/##cd;          	  # rimuove i caratteri non base64
+    tr#A-Za-z0-9+/# -_#;                  # converte nel formato uuencode
+    $lungh = pack("c", 32 + 0.75*length); # calcola la lunghezza in byte
+    print unpack("u", $len . $_);         # effettua l'uudecode e stampa
+
+=head2 Come ottengo l'indirizzo e-mail dell'utente?
+
+Sui sistemi che supportano getpwuid, la variabile $<, ed il modulo 
+Sys::Hostname (che E<egrave> incluso nella distribuzione standard del perl),
+potete probabilmente provare ad utilizzare qualcosa come:
+
+    use Sys::Hostname;
+    $address = sprintf('%s@%s', scalar getpwuid($<), hostname);
+
+Le politiche aziendali sugli indirizzi e-mail possono far sE<igrave> che questo
+codice generi indirizzi che il sistema di posta aziendale non accetta,
+dunque dovrete chiedere gli indirizzi direttamente agli utenti, quando vi servono. 
+Inoltre, non tutti i sistemi su cui gira Perl rendono disponibili
+queste informazioni come fa Unix.
+
+Il modulo Mail::Util da CPAN (parte del pacchetto MailTools) fornisce una
+funzione mailaddress() che cerca di supporre l'indirizzo e-mail dell'utente.
+La supposizione E<egrave> piE<ugrave> intelligente rispetto al codice sopra
+riportato, poichE<eacute> fa uso di informazioni fornite al modulo al
+momento dell'installazione, ma potrebbe essere anch'essa errata. Ancora,
+il modo migliore E<egrave> spesso quello di chiedere all'utente.
+
+=head2 Come spedisco la posta?
+
+Usate direttamente il programma C<sendmail>:
+
+    open(SENDMAIL, "|/usr/lib/sendmail -oi -t -odq")
+                        or die "Impossibile aprire sendmail: $!\n";
+    print SENDMAIL <<"EOF";
+    From: Mittente <io\@host>
+    To: Destinatario <tu\@altrohost>
+    Subject: Un oggetto significativo
+
+    Il corpo del messaggio va qui dopo una linea vuota.
+    Puo` essere lungo quante linee desiderate.
+    EOF
+    close(SENDMAIL)     or warn "sendmail non si e` chiuso correttamente";
+
+L'opzione B<-oi> impedisce a sendmail di intepretare come "fine del
+messaggio" una linea contenente un singolo punto. L'opzione B<-t> indica
+di usare l'header per decidere a chi va spedito il messaggio, e B<-odq>
+indica di mettere il messaggio nella coda. Quest'ultima opzione significa
+che il vostro messaggio non sarE<agrave> spedito subito, dunque omettetela
+se desiderate una spedizione immediata.
+
+In alternativa, alcune vie meno convenienti includono la chiamata a mail
+(a volte denominato mailx) direttamente, o semplicemente l'apertura della
+porta 25 al fine di intrattenere una intima conversazione con il server SMTP
+remoto, probabilmente sendmail.
+
+Oppure potreste usare il modulo CPAN Mail::Mailer:
+
+    use Mail::Mailer;
+
+    $mailer = Mail::Mailer->new();
+    $mailer->open({ From    => $indirizzo_mittente,
+                    To      => $indirizzo_destinatario,
+                    Subject => $oggetto,
+                  })
+        or die "Non posso aprire: $!\n";
+    print $mailer $body;
+    $mailer->close();
+
+Il modulo Mail::Internet usa Net::SMTP, che E<egrave> meno Unix-centrico di
+Mail::Mailer, ma anche meno affidabile. Evitate i comandi SMTP puri. Ci
+sono molte ragioni per servirsi di un agente di trasporto della posta
+come sendmail. Queste includono le code, i record MX, e la sicurezza.
+
+=head2 Come si usa MIME per creare un allegato ad un messaggio?
+
+Questa risposta proviene direttamente dalla documentazione di MIME::Lite.
+Create un messaggio multipart (vale a dire, un messaggio con degli allegati).
+
+    use MIME::Lite;
+
+    ### Crea un nuovo messaggio multipart:
+    $msg = MIME::Lite->new(
+              From    =>'me@ilmiohost.com',
+              To      =>'te@iltuohost.com',
+              Cc      =>'qualche@altrohost.com, ancora@uno.com',
+              Subject =>'Un messaggio in due parti...',
+              Type    =>'multipart/mixed'
+    );
+
+    ### Aggiunge una parte (ogni "attach" ha gli stessi argomenti di "new"):
+    $msg->attach(Type     =>'TEXT',
+                Data     =>"Ecco la GIF che volevi"
+    );
+    $msg->attach(Type     =>'image/gif',
+                Path     =>'aaa000123.gif',
+                Filename =>'logo.gif'
+    );
+
+    $text = $msg->as_string;
+
+MIME::Lite include anche un metodo per inviare queste cose.
+
+   $msg->send;
+
+Con le impostazioni di default usa L<sendmail>, ma puE<ograve> essere
+adattato per usare SMTP attraverso L<Net::SMTP>.
+
+=head2 Come faccio a leggere la posta elettronica?
+
+BenchE<eacute> sia possibile usare il modulo Mail::Folder (che E<egrave>
+disponibile su CPAN come parte del pacchetto MailFolder) oppure il modulo
+Mail::Internet (contenuto nel pacchetto MailTools), spesso un modulo
+E<egrave> eccessivo. Ecco un programma che ordina i messaggi.
+
+    #!/usr/bin/perl
+
+    my(@msgs, @sub);
+    my $msgno = -1;
+    $/ = '';                    # legge paragrafo per paragrafo
+    while (<>) {
+        if (/^From/m) {
+            /^Subject:\s*(?:Re:\s*)*(.*)/mi;
+            $sub[++$msgno] = lc($1) || '';
+        }
+        $msgs[$msgno] .= $_;
+    }
+    for my $i (sort { $sub[$a] cmp $sub[$b] || $a <=> $b } (0 .. $#msgs)) {
+        print $msgs[$i];
+    }
+
+O, piE<ugrave> brevemente:
+
+    #!/usr/bin/perl -n00
+    # bysub2 - ordinamento per soggetto alla awk
+    BEGIN { $msgno = -1 }
+    $sub[++$msgno] = (/^Subject:\s*(?:Re:\s*)*(.*)/mi)[0] if /^From/m;
+    $msg[$msgno] .= $_;
+    END { print @msg[ sort { $sub[$a] cmp $sub[$b] || $a <=> $b } (0 .. $#msg) ] }
+
+=head2 Come faccio a sapere il mio hostname, il nome del mio dominio e il mio indirizzo IP?
+X<hostname, domainname, IP address, host, domain, hostfqdn, inet_ntoa,
+gethostbyname, Socket, Net::Domain, Sys::Hostname>
+
+(contributo di brian d foy)
+
+Il modulo Net::Domain, che fa parte della distribuzione standard a partire dal
+perl5.7.3, puE<ograve> farvi ottenere il fully qualified domain name (FQDN)
+[nome di dominio completo, NdT], il nome dell'host oppure il nome del dominio.
+
+	use Net::Domain qw(hostname hostfqdn hostdomain);
+
+	my $host = hostfqdn();
+
+Anche il modulo C<Sys::Hostname>, incluso nella della distribuzione standard a partire dal
+perl5.6, puE<ograve> ottenere il nome dell'host.
+
+	use Sys::Hostname;
+
+	$host = hostname();
+
+Per ottenere l'indirizzo IP, potete usare la funzione interna C<gethostbyname> per
+cambiare il nome in un numero. Per cambiare quel numero nella forma ad ottetto puntata
+(a.b.c.d) che la maggior parte delle persone si aspetta, usate la funzione C<inet_ntoa>
+dal modulo C<Socket>, anch'esso distribuito con il perl.
+
+    use Socket;
+
+    my $indirizzo = inet_ntoa(
+    	scalar gethostbyname( $host || 'localhost' )
+    	);
+
+=head2 Come prelevo una news o la lista dei newsgroup attivi?
+
+Usate i moduli Net::NNTP oppure News::NNTPClient, entrambi disponibili
+su CPAN. Essi possono rendere facili compiti quali prelevare la lista dei
+neswgroup, ad esempio:
+
+  perl -MNews::NNTPClient
+    -e 'print News::NNTPClient->new->list("newsgroups")'
+
+=head2 Come prelevo/invio un file via FTP?
+
+LWP::Simple (disponibile su CPAN) puE<ograve> prelevare ma non puE<ograve>
+inviare. Net::FTP (anch'essa disponibile su CPAN) E<egrave> piE<ugrave>
+complessa ma puE<ograve> inviare oltre che prelevare.
+
+=head2 Come faccio a chiamare procedure remote in Perl? ["Remote Procedure Call", abbreviato in RPC, NdT]
+
+(Contributo di brian d foy)
+
+Utilizzate uno dei moduli su RPC che potete trovare su CPAN (
+http://search.cpan.org/search?query=RPC&mode=all ).
+
+=head1 AUTORE E COPYRIGHT
+
+Copyright (c) 1997-2006 Tom Christiansen, Nathan Torkington e altri autori menzionati.
+Tutti i diritti riservati.
+
+Questa documentazione E<egrave> libera; potete ridistribuirla e/o modificarla
+secondo gli stessi termini applicati al Perl.
+
+Indipendentemente dalle modalitE<agrave> di distribuzione, tutti gli esempi di
+codice in questo file sono rilasciati al pubblico dominio. Potete, e siete
+incoraggiati a farlo, utilizzare il presente codice o qualunque forma
+derivata da esso nei vostri programmi per divertimento o per profitto.
+Un semplice commento nel codice che dia riconoscimento alle FAQ sarebbe
+cortese ma non E<egrave> obbligatorio.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlfaq9
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Michele Beltrame.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

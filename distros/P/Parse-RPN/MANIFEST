@@ -1,0 +1,24 @@
+MANIFEST                   This shipping list
+Makefile.PL                Generic Makefile template
+lib/Parse/RPN.pm           Is a minimalist RPN parser/processor (a little like FORTH)
+README             	   Read this first
+RPN.pl                     A little sample script which allow to play with the module from the command line
+META.yml                   Module meta-data (added by MakeMaker)
+Changes
+META.json                  Module JSON meta-data (added by MakeMaker)
+t/sample
+t/00Syntax.t               Load module
+t/01Aritmetic.t
+t/02Math.t
+t/03Relational.t
+t/04Logical.t
+t/05String.t
+t/06REGEX.t
+t/07MISC1.t
+t/08STACK.t
+t/09DICT.t
+t/10Control.t
+t/11Perl.t
+t/12IO.t
+t/13Misc2.t
+t/14SLxxx.t

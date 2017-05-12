@@ -1,0 +1,16 @@
+					<div petal:if="view/concept/error" class="error">
+						<?if name="view/concept/error/isInvalid"?>
+							Validation Error:
+							<ul>
+								<li petal:if="view/concept/error/isNameRequired">Concept name required!</li>
+								<li petal:if="view/concept/error/isCreatorRequired">Concept creator required!</li>
+								<li petal:if="view/concept/error/isDateRequired">Concept date required!</li>
+							</ul>
+						<?else?>
+						  Error:
+							<ul>
+								<li petal:if="view/concept/error/isExists">A concept named &quot;$view/concept/error/concept/name&quot; already exists!</li>
+								<li petal:if="view/concept/error/isNonExistent">No concept named &quot;$view/concept/error/concept/name&quot; exists!</li>
+							</ul>
+						<?end?>
+					</div>

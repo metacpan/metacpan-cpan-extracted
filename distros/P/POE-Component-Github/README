@@ -1,0 +1,15 @@
+    POE::Component::Github is a POE component that provides asynchronous
+    access to the Github API <http://develop.github.com/> to other POE
+    sessions or components. It was inspired by Net::Github.
+
+    The component handles communicating with the Github API and will parse
+    the JSON data returned into perl data structures for you.
+
+    The component also implements flood control to ensure that no more than
+    60 requests are made per minute ( which is the current limit ).
+
+    Copyright © Chris Williams
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.

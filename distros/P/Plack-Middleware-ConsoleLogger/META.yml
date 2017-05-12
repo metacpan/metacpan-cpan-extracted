@@ -1,0 +1,40 @@
+---
+abstract: 'Write logs to Firebug or Webkit Inspector'
+author:
+  - 'Tatsuhiko Miyagawa'
+build_requires:
+  ExtUtils::MakeMaker: '6.42'
+  Test::More: '0'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-ConsoleLogger
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  JavaScript::Value::Escape: '0.07'
+  Plack: '0.99'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/miyagawa/Plack-Middleware-ConsoleLogger/issues
+  homepage: https://github.com/miyagawa/Plack-Middleware-ConsoleLogger
+  repository: https://github.com/miyagawa/Plack-Middleware-ConsoleLogger.git
+version: '0.05'
+x_contributors:
+  - 'franck cuny <franck@lumberjaph.net>'
+  - 'Jay Lenti <jlenti@riccagroup.com>'
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Tatsuhiko Miyagawa <miyagawa@gmail.com>'

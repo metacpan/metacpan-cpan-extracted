@@ -1,0 +1,47 @@
+Pg-Corruption version 0.01
+==========================
+
+ Checks if primary keys and foreign keys on a table are free of corruption, that
+is it verifies that they enforce their constraint roles. Indexes are not used
+to fetch heap values since, of course, we can't assume they function properly 
+when it is this functionality that we want to verify. Tables with compound fk 
+are not currently supported, but tables with multiple but non-compound fk
+to other tables are supported.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+DBD::Pg
+Getopt::Compact
+
+And requires the modules bellow only for testing:
+Test::Pod::Coverage
+Test::Pod
+Test::HasVersion
+Test::Dependencies
+Test::CPAN::Meta
+Test::MinimumVersion
+Test::Spelling
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2013 by ioannis Tambouras
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,32 @@
+Pod/Stripper version 0.21
+=============================
+
+Welcome to the Pod::Stripper README file
+
+Pod::Stripper is a subclass of Pod::Parser
+Pod::Stripper strips all pod from it's input,
+and outputs what's left, which is presumably code
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Pod::Parser, and all it's dependencies
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002 by D.H. aka crazyinsomniac|at|yahoo.com.
+All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it under
+the same terms as Perl itself.

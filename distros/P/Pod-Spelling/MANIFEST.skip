@@ -1,0 +1,12 @@
+DS_Store$
+.*\.yml
+.*\.old$
+.*\.bak$
+Makefile
+~$
+blib.*?$
+.*#$
+.*temp.*
+.*Untitled.*
+.*tar\.gz$
+MYMETA.json

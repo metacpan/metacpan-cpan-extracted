@@ -1,0 +1,123 @@
+#!/usr/bin/perl
+#ABSTRACT: run DAIA test suites
+#PODNAME: provedaia
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Plack::App::DAIA::Test::Suite;
+use Test::More;
+
+my ($help,$version,$server,$end,$combined,$verbose);
+
+GetOptions(
+    'help|?'   => \$help,
+    'server:s' => \$server,
+    'version'  => \$version,
+    'end'      => \$end,
+    'combined' => \$combined,
+    'verbose'  => \$verbose,
+);
+pod2usage(-verbose => 1) if defined $help;
+
+if ($version) {
+    printf "This is provedaia with Plack::App::DAIA %s and DAIA %s\n",
+           $PLack::App::DAIA::VERSION, $DAIA::VERSION;
+    exit;
+}
+
+$end = 1 if $combined;
+@ARGV = \*STDIN unless @ARGV;
+
+foreach (@ARGV) {
+    diag( $_ ) unless ref $_;
+    $server = $_ if $combined;
+    eval { 
+        provedaia( $_, server => $server, end => $end, verbose => $verbose );
+    };
+    fail( $@ ) if $@;
+}
+
+done_testing;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+provedaia - run DAIA test suites
+
+=head1 VERSION
+
+version 0.55
+
+=head1 SYNOPSIS
+
+provedaia [<OPTIONS>] [<FILES>]
+
+ Options:
+   -?|-h|--help          show this help
+   --version             show version
+   --server URL-or-file  set base URL of DAIA server or load PSGI script
+   --end                 skip everything until __END__ in input
+   --combined            use files as both, server and test suite
+   --verbose             more diagnostic messages
+
+=head1 DESCRIPTION
+
+This script can be used to test DAIA servers. The output conforms to Test
+Anything Protocol (TAP). Tests can be provided to this script from files or
+from standard input. If option C<--end> or option C<--combined> is set, tests
+start after the C<__END__> marker, so both implementation and tests can be in
+one file. See the bottom of C<examples/daia-ubbielefeld.pl> for an example.
+
+Test syntax is described in module L<Plack::App::DAIA::Test::Suite>, which this
+script is based on. Basically, a test is a set of document identifiers to be
+queried to a DAIA server, and a set of (partial) DAIA responses that the server
+is expected to return. A typical usage scenario for this script is:
+
+=over 4
+
+=item
+
+Implement a DAIA server, for instance in C<myapp.psgi> and run it, for
+instance at C<http://localhost:5000/>.
+
+=item
+
+Write some test suites for the DAIA server, for instance in C<test1.txt>
+and C<test2.txt>. 
+
+=item
+
+Run C<provedaia> as
+
+  provedaia --server myapp.psgi test1.txt test2.txt
+
+or as
+
+  provedaia --server http://localhost:5000/ test1.txt test2.txt
+
+If implementation contains its own test suite, one can also call
+
+  provedaia --combined myapp.psgi
+
+=back
+
+=head1 AUTHOR
+
+Jakob Voß
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Jakob Voß.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

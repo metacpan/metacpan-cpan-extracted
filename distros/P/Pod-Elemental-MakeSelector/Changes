@@ -1,0 +1,42 @@
+Revision history for Pod-Elemental-MakeSelector
+
+0.12   2015-10-17
+	- No functional changes
+	- Fix typo in documentation
+
+0.11   2015-06-20
+	- No functional changes
+	- Add 20-parsing.t
+
+0.10   2015-05-30
+	- No longer uses the experimental smartmatch operator.
+	  Instead, the code generator implements limited smartmatching.
+	  This could potentially break your code if you were doing something
+	  the new matcher doesn't support.
+	- Now compatible with Perl 5.8
+	- No functional changes since 0.06 trial release
+
+0.06   2015-05-16 (Trial Release)
+	- Don't use the // (defined-or) operator for Perl 5.8 compatibility
+
+0.05   2015-04-25 (Trial Release)
+	- Don't use the experimental smartmatch operator.
+	  Instead, the code generator implements limited smartmatching.
+	  This could potentially break your code if you were doing something
+	  the new matcher doesn't support.
+
+0.04   2015-04-18
+	- Refine how optional parameters are detected
+	- Add tests with arrayrefs containing both strings & regexps
+
+0.03   2014-03-01
+	- Suppress "Smartmatch is experimental" warning on Perl 5.18 and up
+
+0.02   2012-07-20
+	- Require Perl 5.10.1, as 5.10.0 doesn't support matching
+	  against an arrayref of regexes
+	- List Pod::Elemental as a dependency, even though we don't
+	  use it directly
+
+0.01   2012-07-14
+	- Initial release

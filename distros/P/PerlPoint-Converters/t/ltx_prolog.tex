@@ -1,0 +1,46 @@
+
+\documentclass [11pt] {report}   % 
+\usepackage{german}               % ISO-Latin-Zeichensatz (äöüß)
+\usepackage{isolatin1}
+\parindent0pt                     % no indentation of first line
+\parskip1ex                       % white space between chapters
+\pagestyle{headings}     %
+\usepackage{epsf}
+\usepackage{makeidx}
+
+% setup for DIN A4
+\oddsidemargin3cm
+\evensidemargin3cm
+\setlength{\hoffset}{-1in}            % compensation of
+\setlength{\voffset}{-2cm}            % printer offset
+\title{Interactive Information Limited: Test Document}
+\author{Prolog Template by Robert Inder}
+\def\chaptername{Section}
+
+\textwidth15cm
+\topmargin1cm
+\headheight3ex
+\headsep12pt
+\textheight23cm
+\setlength{\footskip}{1.5cm}
+
+\makeindex
+
+\newcommand{\PPurl}[2]{\ifx#1#2{\tt #1}\else{#1\protect\footnote{url: {\tt #2}}}\fi}
+
+\newcommand{\PPSref}[2]{#1 (Section \ref{#2}, Page \pageref{#2})}
+
+\newcommand{\PPXref}[2]{#1 (Section \ref{#2}, Page \pageref{#2})}
+
+\newcommand{\PPPageref}[1]{Page \pageref{#1}}
+
+
+
+\begin{document}
+\maketitle
+
+\tableofcontents
+
+\begin{flushleft}
+
+

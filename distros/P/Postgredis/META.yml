@@ -1,0 +1,25 @@
+---
+abstract: 'PostgreSQL and Redis mashup'
+author:
+  - 'Brian Duggan <bduggan@matatu.org>'
+build_requires:
+  Mojo::Pg: '0'
+  Test::More: '0'
+  Test::PostgreSQL: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Postgredis
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: '5.002'
+version: 0.03
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,247 @@
+Thread 21 (Thread 0x7f4b35eb2910 (LWP 5937)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+#1  0x0000003ad5414150 in g_async_queue_pop_intern_unlocked (queue=0x241be40, try=0, end_time=0x0) at gasyncqueue.c:358
+#2  0x0000003ad5414514 in IA__g_async_queue_pop (queue=0x241be40) at gasyncqueue.c:398
+#3  0x00007f4b42b19231 in sync_request_thread_cb (cFile=0x2394e38) at camel-db.c:78
+#4  0x0000003ad54616e4 in g_thread_create_proxy (data=0x243bb30) at gthread.c:635
+#5  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#6  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#7  0x0000000000000000 in ?? ()
+Current language:  auto; currently asm
+
+Thread 20 (Thread 0x7f4b354b1910 (LWP 5938)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+#1  0x0000003ad5414150 in g_async_queue_pop_intern_unlocked (queue=0x23aafe0, try=0, end_time=0x0) at gasyncqueue.c:358
+#2  0x0000003ad5414514 in IA__g_async_queue_pop (queue=0x23aafe0) at gasyncqueue.c:398
+#3  0x00007f4b42b19231 in sync_request_thread_cb (cFile=0x242e558) at camel-db.c:78
+#4  0x0000003ad54616e4 in g_thread_create_proxy (data=0x2446df0) at gthread.c:635
+#5  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#6  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#7  0x0000000000000000 in ?? ()
+
+Thread 19 (Thread 0x7f4b2d7fb910 (LWP 5943)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+#1  0x0000003ad5414150 in g_async_queue_pop_intern_unlocked (queue=0x7f4b24003760, try=0, end_time=0x0) at gasyncqueue.c:358
+#2  0x0000003ad5414514 in IA__g_async_queue_pop (queue=0x7f4b24003760) at gasyncqueue.c:398
+#3  0x00007f4b42b19231 in sync_request_thread_cb (cFile=0x7f4b24004508) at camel-db.c:78
+#4  0x0000003ad54616e4 in g_thread_create_proxy (data=0x7f4b24003fe0) at gthread.c:635
+#5  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#6  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#7  0x0000000000000000 in ?? ()
+
+Thread 18 (Thread 0x7f4b2cdfa910 (LWP 5945)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+#1  0x0000003ad5414150 in g_async_queue_pop_intern_unlocked (queue=0x7f4b240151f0, try=0, end_time=0x0) at gasyncqueue.c:358
+#2  0x0000003ad5414514 in IA__g_async_queue_pop (queue=0x7f4b240151f0) at gasyncqueue.c:398
+#3  0x00007f4b42b19231 in sync_request_thread_cb (cFile=0x7f4b24024f28) at camel-db.c:78
+#4  0x0000003ad54616e4 in g_thread_create_proxy (data=0x7f4b24015250) at gthread.c:635
+#5  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#6  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#7  0x0000000000000000 in ?? ()
+
+Thread 17 (Thread 0x7f4b11d06910 (LWP 5946)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+#1  0x0000003ad5414150 in g_async_queue_pop_intern_unlocked (queue=0x7f4b1c002a60, try=0, end_time=0x0) at gasyncqueue.c:358
+#2  0x0000003ad5414514 in IA__g_async_queue_pop (queue=0x7f4b1c002a60) at gasyncqueue.c:398
+#3  0x00007f4b42b19231 in sync_request_thread_cb (cFile=0x7f4b1c003848) at camel-db.c:78
+#4  0x0000003ad54616e4 in g_thread_create_proxy (data=0x7f4b1c0032f0) at gthread.c:635
+#5  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#6  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#7  0x0000000000000000 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+
+Thread 16 (Thread 0x7f4b10c81910 (LWP 5947)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+#1  0x0000003ad5414150 in g_async_queue_pop_intern_unlocked (queue=0x7f4b1c011d30, try=0, end_time=0x0) at gasyncqueue.c:358
+#2  0x0000003ad5414514 in IA__g_async_queue_pop (queue=0x7f4b1c011d30) at gasyncqueue.c:398
+#3  0x00007f4b42b19231 in sync_request_thread_cb (cFile=0x7f4b1c011bc8) at camel-db.c:78
+#4  0x0000003ad54616e4 in g_thread_create_proxy (data=0x7f4b1c011d90) at gthread.c:635
+#5  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#6  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#7  0x0000000000000000 in ?? ()
+
+Thread 15 (Thread 0x7f4b0af1c910 (LWP 5948)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+#1  0x0000003ad5414150 in g_async_queue_pop_intern_unlocked (queue=0x7f4b20002800, try=0, end_time=0x0) at gasyncqueue.c:358
+#2  0x0000003ad5414514 in IA__g_async_queue_pop (queue=0x7f4b20002800) at gasyncqueue.c:398
+#3  0x00007f4b42b19231 in sync_request_thread_cb (cFile=0x7f4b20003618) at camel-db.c:78
+#4  0x0000003ad54616e4 in g_thread_create_proxy (data=0x7f4b200030c0) at gthread.c:635
+#5  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#6  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#7  0x0000000000000000 in ?? ()
+
+Thread 14 (Thread 0x7f4b0a51b910 (LWP 5949)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+#1  0x0000003ad5414150 in g_async_queue_pop_intern_unlocked (queue=0x7f4b20011cb0, try=0, end_time=0x0) at gasyncqueue.c:358
+#2  0x0000003ad5414514 in IA__g_async_queue_pop (queue=0x7f4b20011cb0) at gasyncqueue.c:398
+#3  0x00007f4b42b19231 in sync_request_thread_cb (cFile=0x7f4b2001cbc8) at camel-db.c:78
+#4  0x0000003ad54616e4 in g_thread_create_proxy (data=0x7f4b2001d870) at gthread.c:635
+#5  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#6  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#7  0x0000000000000000 in ?? ()
+
+Thread 13 (Thread 0x7f4b09b1a910 (LWP 5950)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+#1  0x0000003ad5414150 in g_async_queue_pop_intern_unlocked (queue=0x7f4b18002fd0, try=0, end_time=0x0) at gasyncqueue.c:358
+#2  0x0000003ad5414514 in IA__g_async_queue_pop (queue=0x7f4b18002fd0) at gasyncqueue.c:398
+#3  0x00007f4b42b19231 in sync_request_thread_cb (cFile=0x7f4b18004cf8) at camel-db.c:78
+#4  0x0000003ad54616e4 in g_thread_create_proxy (data=0x7f4b18002b20) at gthread.c:635
+#5  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#6  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#7  0x0000000000000000 in ?? ()
+
+Thread 12 (Thread 0x7f4b09119910 (LWP 5951)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+#1  0x0000003ad5414150 in g_async_queue_pop_intern_unlocked (queue=0x7f4b18015ac0, try=0, end_time=0x0) at gasyncqueue.c:358
+#2  0x0000003ad5414514 in IA__g_async_queue_pop (queue=0x7f4b18015ac0) at gasyncqueue.c:398
+#3  0x00007f4b42b19231 in sync_request_thread_cb (cFile=0x7f4b18028c08) at camel-db.c:78
+#4  0x0000003ad54616e4 in g_thread_create_proxy (data=0x7f4b18012980) at gthread.c:635
+#5  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#6  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#7  0x0000000000000000 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+
+Thread 11 (Thread 0x7f4b2ffff910 (LWP 5954)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+#1  0x0000003ad5414150 in g_async_queue_pop_intern_unlocked (queue=0x2503ea0, try=0, end_time=0x0) at gasyncqueue.c:358
+#2  0x0000003ad5414514 in IA__g_async_queue_pop (queue=0x2503ea0) at gasyncqueue.c:398
+#3  0x00007f4b42b19231 in sync_request_thread_cb (cFile=0x2540558) at camel-db.c:78
+#4  0x0000003ad54616e4 in g_thread_create_proxy (data=0x255f360) at gthread.c:635
+#5  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#6  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#7  0x0000000000000000 in ?? ()
+
+Thread 10 (Thread 0x7f4af3fff910 (LWP 5955)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+#1  0x0000003ad5414150 in g_async_queue_pop_intern_unlocked (queue=0x2546680, try=0, end_time=0x0) at gasyncqueue.c:358
+#2  0x0000003ad5414514 in IA__g_async_queue_pop (queue=0x2546680) at gasyncqueue.c:398
+#3  0x00007f4b42b19231 in sync_request_thread_cb (cFile=0x255ea68) at camel-db.c:78
+#4  0x0000003ad54616e4 in g_thread_create_proxy (data=0x25d3880) at gthread.c:635
+#5  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#6  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#7  0x0000000000000000 in ?? ()
+
+Thread 9 (Thread 0x7f4af35fe910 (LWP 5956)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+#1  0x0000003ad5414150 in g_async_queue_pop_intern_unlocked (queue=0x2510d90, try=0, end_time=0x0) at gasyncqueue.c:358
+#2  0x0000003ad5414514 in IA__g_async_queue_pop (queue=0x2510d90) at gasyncqueue.c:398
+#3  0x00007f4b42b19231 in sync_request_thread_cb (cFile=0x2607ad8) at camel-db.c:78
+#4  0x0000003ad54616e4 in g_thread_create_proxy (data=0x26063e0) at gthread.c:635
+#5  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#6  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#7  0x0000000000000000 in ?? ()
+
+Thread 8 (Thread 0x7f4b2e1fc910 (LWP 5957)):
+#0  pthread_cond_wait@@GLIBC_2.3.2 () at ../nptl/sysdeps/unix/sysv/linux/x86_64/pthread_cond_wait.S:261
+#1  0x0000003ad5414150 in g_async_queue_pop_intern_unlocked (queue=0x26258e0, try=0, end_time=0x0) at gasyncqueue.c:358
+#2  0x0000003ad5414514 in IA__g_async_queue_pop (queue=0x26258e0) at gasyncqueue.c:398
+#3  0x00007f4b42b19231 in sync_request_thread_cb (cFile=0x2626f38) at camel-db.c:78
+#4  0x0000003ad54616e4 in g_thread_create_proxy (data=0x26254e0) at gthread.c:635
+#5  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#6  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#7  0x0000000000000000 in ?? ()
+
+Thread 7 (Thread 0x7f4af21fc910 (LWP 5967)):
+#0  0x0000003ad38d4f73 in *__GI___poll (fds=<value optimized out>, nfds=<value optimized out>, timeout=-1) at ../sysdeps/unix/sysv/linux/poll.c:87
+#1  0x00007f4b080cf7f3 in poll_func (ufds=0x7f4aec001160, nfds=2, timeout=-1, userdata=0x294e3d0) at pulse/thread-mainloop.c:71
+#2  0x00007f4b080bd2c4 in pa_mainloop_poll (m=0x2950330) at pulse/mainloop.c:857
+#3  0x00007f4b080bd673 in pa_mainloop_iterate (m=0x2950330, block=1, retval=0x0) at pulse/mainloop.c:923
+#4  0x00007f4b080bd6e6 in pa_mainloop_run (m=0x2950330, retval=0x0) at pulse/mainloop.c:941
+#5  0x00007f4b080cf870 in thread (userdata=0x294e130) at pulse/thread-mainloop.c:90
+#6  0x00007f4af11ccc2b in internal_thread_func (userdata=0x295f080) at pulsecore/thread-posix.c:72
+#7  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+---Type <return> to continue, or q <return> to quit---
+#8  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#9  0x0000000000000000 in ?? ()
+
+Thread 6 (Thread 0x7f4ae3ffe910 (LWP 6025)):
+#0  0x0000003ad38d4f73 in *__GI___poll (fds=<value optimized out>, nfds=<value optimized out>, timeout=-1) at ../sysdeps/unix/sysv/linux/poll.c:87
+#1  0x0000003ad543b6e2 in g_main_context_poll (n_fds=<value optimized out>, fds=<value optimized out>, priority=<value optimized out>, 
+    timeout=<value optimized out>, context=<value optimized out>) at gmain.c:2761
+#2  g_main_context_iterate (n_fds=<value optimized out>, fds=<value optimized out>, priority=<value optimized out>, timeout=<value optimized out>, 
+    context=<value optimized out>) at gmain.c:2443
+#3  0x0000003ad543bd85 in IA__g_main_loop_run (loop=0x7f4af4001200) at gmain.c:2656
+#4  0x00007f4b42d8c0ad in startup_mainloop (arg=<value optimized out>) at e-book.c:3794
+#5  0x0000003ad54616e4 in g_thread_create_proxy (data=0x7f4ae81b55c0) at gthread.c:635
+#6  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#7  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#8  0x0000000000000000 in ?? ()
+Current language:  auto; currently minimal
+
+Thread 5 (Thread 0x7f4b2e77d910 (LWP 6026)):
+#0  0x0000003ad38d4f73 in *__GI___poll (fds=<value optimized out>, nfds=<value optimized out>, timeout=-1) at ../sysdeps/unix/sysv/linux/poll.c:87
+#1  0x0000003ad543b6e2 in g_main_context_poll (n_fds=<value optimized out>, fds=<value optimized out>, priority=<value optimized out>, 
+    timeout=<value optimized out>, context=<value optimized out>) at gmain.c:2761
+#2  g_main_context_iterate (n_fds=<value optimized out>, fds=<value optimized out>, priority=<value optimized out>, timeout=<value optimized out>, 
+    context=<value optimized out>) at gmain.c:2443
+#3  0x0000003ad543bd85 in IA__g_main_loop_run (loop=0x7f4ae81b5430) at gmain.c:2656
+#4  0x00000038be047d20 in link_io_thread_fn (data=<value optimized out>) at linc.c:396
+#5  0x0000003ad54616e4 in g_thread_create_proxy (data=0x7f4ae80e6fa0) at gthread.c:635
+#6  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#7  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#8  0x0000000000000000 in ?? ()
+
+Thread 4 (Thread 0x7f4adbfff910 (LWP 8978)):
+#0  __lll_lock_wait () at ../nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:136
+#1  0x0000003ad4408fe5 in _L_lock_949 () from /lib64/libpthread.so.0
+#2  0x0000003ad4408e08 in __pthread_mutex_lock (mutex=0x2653af0) at pthread_mutex_lock.c:61
+#3  0x00007f4b4320e482 in camel_folder_summary_array (s=0x2679eb0) at camel-folder-summary.c:486
+#4  0x00007f4b4321451b in camel_folder_thread_messages_new (folder=0x266f040, uids=0x2c461b0, thread_subject=<value optimized out>)
+    at camel-folder-thread.c:621
+#5  0x00007f4b39f3fbc8 in regen_list_exec (m=0x2f0ab20) at message-list.c:4178
+#6  0x00007f4b39f320ef in mail_msg_proxy (msg=0x2f0ab20) at mail-mt.c:520
+#7  0x0000003ad5462d22 in g_thread_pool_thread_proxy (data=<value optimized out>) at gthreadpool.c:265
+#8  0x0000003ad54616e4 in g_thread_create_proxy (data=0x2d23020) at gthread.c:635
+#9  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#10 0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#11 0x0000000000000000 in ?? ()
+
+Thread 3 (Thread 0x7f4ae0c76910 (LWP 8979)):
+#0  __lll_lock_wait () at ../nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:136
+#1  0x0000003ad4408fe5 in _L_lock_949 () from /lib64/libpthread.so.0
+#2  0x0000003ad4408e08 in __pthread_mutex_lock (mutex=0x26341d0) at pthread_mutex_lock.c:61
+#3  0x00007f4b42b17a5e in camel_db_begin_transaction (cdb=0x26341b0, ex=0x7f4ae0c75d70) at camel-db.c:514
+#4  0x00007f4b42b1801c in cdb_delete_ids (cdb=<value optimized out>, folder_name=0x26539f0 "New Mail/New Mail Simple", uids=<value optimized out>, 
+---Type <return> to continue, or q <return> to quit---
+    uid_prefix=0x7f4b42b4b087 "", field=<value optimized out>, ex=0x7f4ae0c75d70) at camel-db.c:1515
+#5  0x00007f4b4320dab7 in camel_folder_summary_remove_range (s=0x2679eb0, start=<value optimized out>, end=<value optimized out>)
+    at camel-folder-summary.c:2395
+#6  0x00007f4b43238262 in vee_rebuild_folder (vf=0x266f040, source=<value optimized out>, ex=<value optimized out>) at camel-vee-folder.c:1224
+#7  0x00007f4b43235027 in vee_refresh_info (folder=0x266f040, ex=0x357f910) at camel-vee-folder.c:465
+#8  0x00007f4b39f320ef in mail_msg_proxy (msg=0x357f8f0) at mail-mt.c:520
+#9  0x0000003ad5462d22 in g_thread_pool_thread_proxy (data=<value optimized out>) at gthreadpool.c:265
+#10 0x0000003ad54616e4 in g_thread_create_proxy (data=0x249d1c0) at gthread.c:635
+#11 0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#12 0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#13 0x0000000000000000 in ?? ()
+Current language:  auto; currently asm
+
+Thread 2 (Thread 0x7f4ae2657910 (LWP 8980)):
+#0  __lll_lock_wait () at ../nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:136
+#1  0x0000003ad4408fe5 in _L_lock_949 () from /lib64/libpthread.so.0
+#2  0x0000003ad4408e08 in __pthread_mutex_lock (mutex=0x2637550) at pthread_mutex_lock.c:61
+#3  0x00007f4b43237332 in folder_changed_change (session=<value optimized out>, msg=<value optimized out>) at camel-vee-folder.c:1540
+#4  0x00007f4b43229d6b in session_thread_proxy (msg=0x7f4b2049af00, session=0x242f490) at camel-session.c:597
+#5  0x0000003ad5462d22 in g_thread_pool_thread_proxy (data=<value optimized out>) at gthreadpool.c:265
+#6  0x0000003ad54616e4 in g_thread_create_proxy (data=0x7f4b20049b10) at gthread.c:635
+#7  0x0000003ad440686a in start_thread (arg=<value optimized out>) at pthread_create.c:297
+#8  0x0000003ad38de25d in clone () at ../sysdeps/unix/sysv/linux/x86_64/clone.S:112
+#9  0x0000000000000000 in ?? ()
+
+Thread 1 (Thread 0x7f4b4196b7f0 (LWP 5932)):
+#0  __lll_lock_wait () at ../nptl/sysdeps/unix/sysv/linux/x86_64/lowlevellock.S:136
+#1  0x0000003ad4408fe5 in _L_lock_949 () from /lib64/libpthread.so.0
+#2  0x0000003ad4408e08 in __pthread_mutex_lock (mutex=0x2653af0) at pthread_mutex_lock.c:61
+#3  0x00007f4b4320c2b3 in camel_folder_summary_index (s=0x2679eb0, i=0) at camel-folder-summary.c:387
+#4  0x00007f4b43239793 in vf_getv (object=0x266f040, ex=<value optimized out>, args=<value optimized out>) at camel-vee-folder.c:2018
+#5  0x00007f4b42b37645 in camel_object_get (vo=0x266f040, ex=0x0) at camel-object.c:1588
+#6  0x00007f4b39f2b717 in view_changed (component_view=<value optimized out>, emfv=<value optimized out>) at mail-component.c:536
+#7  view_changed_timeout (component_view=<value optimized out>, emfv=<value optimized out>) at mail-component.c:628
+#8  0x0000003ad54388db in g_timeout_dispatch (source=0x3574730, callback=0x80, user_data=0x2) at gmain.c:3253
+#9  0x0000003ad543818e in g_main_dispatch (context=<value optimized out>) at gmain.c:1814
+#10 IA__g_main_context_dispatch (context=<value optimized out>) at gmain.c:2367
+#11 0x0000003ad543b8e8 in g_main_context_iterate (context=0x2317850, block=<value optimized out>, dispatch=<value optimized out>, 
+    self=<value optimized out>) at gmain.c:2448
+#12 0x0000003ad543bd85 in IA__g_main_loop_run (loop=0x238f130) at gmain.c:2656
+#13 0x00000038be82d026 in bonobo_main () at bonobo-main.c:311
+#14 0x00000000004162ba in main (argc=<value optimized out>, argv=<value optimized out>) at main.c:704

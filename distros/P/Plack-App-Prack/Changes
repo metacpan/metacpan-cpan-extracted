@@ -1,0 +1,5 @@
+0.02 (12/27/2012)
+  - catch rack startup errors (e.g. missing gems)
+
+0.01 (04/01/2011)
+  - initial release

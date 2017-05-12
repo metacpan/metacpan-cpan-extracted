@@ -1,0 +1,23 @@
+POSIX-2008 version 0.04
+=======================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This library probably requires someone to make it portable even though it's
+called POSIX.
+
+LICENCE
+
+This library is free software. You can redistribute and/or modify it under the
+terms of the Do What The Fuck You Want To Public License, Version 2, as
+published by Sam Hocevar. See the COPYING file or http://www.wtfpl.net/ for
+more details.

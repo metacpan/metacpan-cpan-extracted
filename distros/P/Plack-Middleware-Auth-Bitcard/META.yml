@@ -1,0 +1,41 @@
+---
+abstract: 'Bitcard authentication for Plack, which I suppose is what you might have guessed from the name'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  HTTP::Request::Common: '0'
+  URI: '0'
+  URI::QueryParam: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Moose::Meta::Class::__ANON__::SERIAL::6 version , CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Auth-Bitcard
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Plack::Middleware::Auth::Bitcard:
+    file: lib/Plack/Middleware/Auth/Bitcard.pm
+    version: '0.002'
+requires:
+  Authen::Bitcard: '0'
+  JSON: '2.00'
+  Plack: '1.0000'
+resources:
+  X_identifier: http://purl.org/NET/cpan-uri/dist/Plack-Middleware-Auth-Bitcard/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Plack-Middleware-Auth-Bitcard
+  homepage: https://metacpan.org/release/Plack-Middleware-Auth-Bitcard
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-plack-middleware-auth-bitcard.git
+version: '0.002'

@@ -1,0 +1,10 @@
+Revision history for Perl extension PAR::Dist::FromPPD.
+
+0.03  Thu Dec 21 17:48 2006
+    - get_ppd_content is now public and exportable.
+
+0.02 was a broken release. Do not use it.
+
+0.01  Thu Oct 27 10:45 2006
+    - original version as uploaded to CPAN
+

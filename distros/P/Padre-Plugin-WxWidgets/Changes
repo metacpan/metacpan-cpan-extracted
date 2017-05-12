@@ -1,0 +1,24 @@
+Revision history for Padre-Plugin-wxWidgets
+
+0.05  2012.2.28
+	- Fixed missing abstract in POD (AZAWAWI)
+
+0.04  2012.2.28
+	- Moved bin/parse_wxwidgets_docs to private/bin/parse_wxwidgets_docs
+	  to fix RT #66122 "Do not install parse_wxwidgets_docs" (AZAWAWI)
+	- Added Brazilian Portuguese translation (GARU)
+	- Updated to latest Padre::Plugin requirements (BOWTIE)
+	- Updated documentation bundle to 2.8.12 (AZAWAWI)
+
+0.03   2010.12.08
+	- Added better documentation to parse_wxwidgets_docs (AZAWAWI)
+	- Switched back to re-use [@PadrePlugin] (AZAWAWI)
+	- Added Dutch translation (ddn123456 - Dirk De Nijs)
+
+0.02   2010.12.06
+	- Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+	- Added bin/parse_wxwidgets_docs script (Damyan Ivanov, ZENOG, AZAWAWI)
+
+0.01   2010.11.07
+	- First version, released on an unsuspecting world.
+

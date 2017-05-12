@@ -1,0 +1,70 @@
+=head1 NAME
+
+Moo - Minimalist Object Orientation (with Moose compatibility)
+
+=head1 SYNOPSIS
+
+  package Cat::Food;
+
+  use Moo;
+  use strictures 2;
+  use namespace::clean;
+
+  sub feed_lion {
+    my $self = shift;
+    my $amount = shift || 1;
+
+    $self->pounds( $self->pounds - $amount );
+  }
+
+  has taste => (
+    is => \'ro\',
+  );
+
+  has brand => (
+    is  => \'ro\',
+    isa => sub {
+      die "Only SWEET-TREATZ supported!" unless $_[0] eq \'SWEET-TREATZ\'
+    },
+  );
+
+  has pounds => (
+    is  => \'rw\',
+    isa => sub { die "$_[0] is too much cat food!" unless $_[0] < 15 },
+  );
+
+  1;
+
+And elsewhere:
+
+  my $full = Cat::Food->new(
+      taste  => \'DELICIOUS.\',
+      brand  => \'SWEET-TREATZ\',
+      pounds => 10,
+  );
+
+  $full->feed_lion;
+
+  say $full->pounds;
+
+=head1 DESCRIPTION
+
+C<Moo> is an extremely light-weight Object Orientation system. It allows one to
+concisely define objects and roles with a convenient syntax that avoids the
+details of Perl\'s object system.  C<Moo> contains a subset of L<Moose> and is
+optimised for rapid startup.
+
+C<Moo> avoids depending on any XS modules to allow for simple deployments.  The
+name C<Moo> is based on the idea that it provides almost -- but not quite --
+two thirds of L<Moose>.
+
+Unlike L<Mouse> this module does not aim at full compatibility with
+L<Moose>\'s surface syntax, preferring instead to provide full interoperability
+via the metaclass inflation capabilities described in L</MOO AND MOOSE>.
+
+For a full list of the minor differences between L<Moose> and L<Moo>\'s surface
+syntax, see L</INCOMPATIBILITIES WITH MOOSE>.
+
+=head1 something
+
+sess

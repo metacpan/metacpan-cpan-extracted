@@ -1,0 +1,9 @@
+Revision history for PowerDNS-API-Client
+ 
+0.10  February 17, 2011
+      - Require namespace::clean 0.20
+      - Include JSON and HTTP::Request prereqs
+      - Remove debug
+
+0.01  February 14, 2011
+      - First release

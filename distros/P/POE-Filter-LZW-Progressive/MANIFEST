@@ -1,0 +1,11 @@
+Build.PL
+Makefile.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+README
+lib/POE/Filter/LZW/Progressive.pm
+t/1-test.t
+
+SIGNATURE    Added here by Module::Build

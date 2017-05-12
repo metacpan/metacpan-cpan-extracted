@@ -1,0 +1,326 @@
+NAME
+
+    POE::Component::Client::SOCKS - SOCKS enable any POE Component
+
+VERSION
+
+    version 1.02
+
+SYNOPSIS
+
+    Spawning a SOCKS broker:
+
+       use strict;
+       use POE qw(Component::Client::SOCKS Wheel::ReadWrite Filter::Line);
+       use Data::Dumper;
+    
+       my $poco = POE::Component::Client::SOCKS->spawn( options => { trace => 0 } );
+    
+       POE::Session->create(
+              package_states => [
+          'main' => [ qw(_start _success _failed _conn_input _conn_error) ],
+        ],
+        heap => { sockify => $poco },
+        options => { trace => 0 },
+       );
+    
+       $poe_kernel->run();
+       exit 0;
+    
+       sub _start {
+         my ($kernel,$heap) = @_[KERNEL,HEAP];
+         $heap->{sockify}->connect( 
+          SocksProxy => '127.0.0.1',
+          RemoteAddress => 'cou.ch',
+          RemotePort => 6667,
+          SuccessEvent => '_success',
+          FailureEvent => '_failed',
+         );
+         return;
+       }
+    
+       sub _success {
+         my ($heap,$args) = @_[HEAP,ARG0];
+         warn Dumper( $args );
+         $heap->{wheel} = POE::Wheel::ReadWrite->new(
+          Handle => $args->{socket},
+          Filter => POE::Filter::Line->new(),
+          InputEvent => '_conn_input',
+          ErrorEvent => '_conn_error',
+         );
+         return;
+       }
+    
+       sub _failed {
+         warn Dumper( $_[ARG0] );
+         return;
+       }
+    
+       sub _conn_input {
+         warn $_[ARG0], "\n";
+         return;
+       }
+    
+       sub _conn_error {
+         delete $_[HEAP]->{wheel};
+         return;
+       }
+
+    A one shot CONNECT request:
+
+       use strict;
+       use POE qw(Component::Client::SOCKS Wheel::ReadWrite Filter::Line);
+       use Data::Dumper;
+    
+       POE::Session->create(
+        package_states => [
+          'main' => [ qw(_start _success _failed _conn_input _conn_error) ],
+        ],
+       );
+    
+       $poe_kernel->run();
+       exit 0;
+    
+       sub _start {
+         my ($kernel,$heap) = @_[KERNEL,HEAP];
+         POE::Component::Client::SOCKS->connect( 
+          SocksProxy => '127.0.0.1',
+          RemoteAddress => 'cou.ch',
+          RemotePort => 6667,
+          SuccessEvent => '_success',
+          FailureEvent => '_failed',
+         );
+         return;
+       }
+    
+       sub _success {
+         my ($heap,$args) = @_[HEAP,ARG0];
+         warn Dumper( $args );
+         $heap->{wheel} = POE::Wheel::ReadWrite->new(
+          Handle => $args->{socket},
+          Filter => POE::Filter::Line->new(),
+          InputEvent => '_conn_input',
+          ErrorEvent => '_conn_error',
+         );
+         return;
+       }
+    
+       sub _failed {
+         warn Dumper( $_[ARG0] );
+         return;
+       }
+    
+       sub _conn_input {
+         warn $_[ARG0], "\n";
+         return;
+       }
+    
+       sub _conn_error {
+         delete $_[HEAP]->{wheel};
+         return;
+       }
+
+DESCRIPTION
+
+    POE::Component::Client::SOCKS provides SOCKSification services to other
+    POE sessions and components. It accepts connection requests and deals
+    with all the SOCKS negotiation on your behalf. It returns either a
+    SuccessEvent which will have a shiny socket handle for you to use or an
+    FailureEvent which should say what went wrong.
+
+    SOCKS 4 and 4a based servers are supported.
+
+CONSTRUCTORS
+
+    One may start POE::Component::Client::SOCKS in two ways. If you spawn
+    it creates a session that can then broker lots of SOCKS connections on
+    your behalf. Or you may use 'connect' and 'bind' to broker one
+    connection instance.
+
+      POE::Component::Client::SOCKS->spawn( ... );
+    
+      POE::Component::Client::SOCKS->connect( ... );
+    
+      POE::Component::Client::SOCKS->bind( ... );
+
+    spawn
+
+      Creates a new POE::Component::Client::SOCKS session that may be used
+      lots of times. Takes the following optional parameters:
+
+        'alias', set an alias that you can use to address the component later;
+        'options', a hashref of POE session options;
+
+      Returns an object.
+
+    connect
+
+      Creates a one-shot POE::Component::Client::SOCKS session that will
+      connect to a SOCKS server and negotiate a CONNECT. Takes the
+      following parameters ( mandatory ones are indicated ):
+
+        'SocksProxy', the SOCKS server that you want to connect to (Mandatory);
+        'RemoteAddress', the address that you want the SOCKS proxy to connect to (Mandatory);
+        'RemotePort', the port that you want the SOCKS proxy to connect to (Mandatory);
+        'SuccessEvent', the event that will be sent when a CONNECT is successful (Mandatory);
+        'FailureEvent', the event to send when a CONNECT is not successful or errored (Mandatory);
+        'SocksPort', the SOCKS server port to connect to (default is 1080);
+
+      Takes any number of arbitary parameters that will passed through to
+      the SuccessEvent/FailureEvent. Please use underscore prefixes to
+      avoid future API changes.
+
+    bind
+
+      Creates a one-shot POE::Component::Client::SOCKS session that will
+      connect to a SOCKS server and negotiate a BIND. Takes the following
+      parameters ( mandatory ones are indicated ):
+
+        'SocksProxy', the SOCKS server that you want to connect to (Mandatory);
+        'RemoteAddress', the address that you want the SOCKS proxy to connect to (Mandatory);
+        'RemotePort', the port that you want the SOCKS proxy to connect to (Mandatory);
+        'SuccessEvent', the event that will be sent when a BIND is successful (Mandatory);
+        'FailureEvent', the event to send when a BIND is not successful or errored (Mandatory);
+        'SocksPort', the SOCKS server port to connect to (default is 1080);
+
+      Takes any number of arbitary parameters that will passed through to
+      the SuccessEvent/FailureEvent. Please use underscore prefixes to
+      avoid future API changes.
+
+METHODS
+
+    connect
+
+      Connect to a SOCKS server and negotiate a CONNECT. Takes the
+      following parameters ( mandatory ones are indicated ):
+
+        'SocksProxy', the SOCKS server that you want to connect to (Mandatory);
+        'RemoteAddress', the address that you want the SOCKS proxy to connect to (Mandatory);
+        'RemotePort', the port that you want the SOCKS proxy to connect to (Mandatory);
+        'SuccessEvent', the event that will be sent when a CONNECT is successful (Mandatory);
+        'FailureEvent', the event to send when a CONNECT is not successful or errored (Mandatory);
+        'SocksPort', the SOCKS server port to connect to (default is 1080);
+
+      Takes any number of arbitary parameters that will passed through to
+      the SuccessEvent/FailureEvent. Please use underscore prefixes to
+      avoid future API changes.
+
+    bind
+
+      Connect to a SOCKS server and negotiate a BIND. Takes the following
+      parameters ( mandatory ones are indicated ):
+
+        'SocksProxy', the SOCKS server that you want to connect to (Mandatory);
+        'RemoteAddress', the address that you want the SOCKS proxy to connect to (Mandatory);
+        'RemotePort', the port that you want the SOCKS proxy to connect to (Mandatory);
+        'SuccessEvent', the event that will be sent when a BIND is successful (Mandatory);
+        'FailureEvent', the event to send when a BIND is not successful or errored (Mandatory);
+        'SocksPort', the SOCKS server port to connect to (default is 1080);
+
+      Takes any number of arbitary parameters that will passed through to
+      the SuccessEvent/FailureEvent. Please use underscore prefixes to
+      avoid future API changes.
+
+    shutdown
+
+      Terminates the component. Disconnects any pending SOCKS requests.
+
+    session_id
+
+INPUT EVENTS
+
+    connect
+
+      Connect to a SOCKS server and negotiate a CONNECT. Takes the
+      following parameters ( mandatory ones are indicated ):
+
+        'SocksProxy', the SOCKS server that you want to connect to (Mandatory);
+        'RemoteAddress', the address that you want the SOCKS proxy to connect to (Mandatory);
+        'RemotePort', the port that you want the SOCKS proxy to connect to (Mandatory);
+        'SuccessEvent', the event that will be sent when a CONNECT is successful (Mandatory);
+        'FailureEvent', the event to send when a CONNECT is not successful or errored (Mandatory);
+        'SocksPort', the SOCKS server port to connect to (default is 1080);
+
+      Takes any number of arbitary parameters that will passed through to
+      the SuccessEvent/FailureEvent. Please use underscore prefixes to
+      avoid future API changes.
+
+    bind
+
+      Connect to a SOCKS server and negotiate a BIND. Takes the following
+      parameters ( mandatory ones are indicated ):
+
+        'SocksProxy', the SOCKS server that you want to connect to (Mandatory);
+        'RemoteAddress', the address that you want the SOCKS proxy to connect to (Mandatory);
+        'RemotePort', the port that you want the SOCKS proxy to connect to (Mandatory);
+        'SuccessEvent', the event that will be sent when a BIND is successful (Mandatory);
+        'FailureEvent', the event to send when a BIND is not successful or errored (Mandatory);
+        'SocksPort', the SOCKS server port to connect to (default is 1080);
+
+      Takes any number of arbitary parameters that will passed through to
+      the SuccessEvent/FailureEvent. Please use underscore prefixes to
+      avoid future API changes.
+
+    shutdown
+
+      Terminates the component. Disconnects any pending SOCKS requests.
+
+OUTPUT EVENTS
+
+    The component returns either a SuccessEvent or an FailureEvent, you
+    specify the events in your session that you wish to be triggered for
+    each type. ARG0 will be a hashref. See details following.
+
+    Any arbitary parameters passed though will be in the returned hashref.
+
+    SuccessEvent
+
+      All the parameters passed to 'connect' or 'bind' will be present,
+      plus:
+
+        'socket', the socket handle of the connection to the SOCKS server;
+        'socks_response', an arrayref consisting of the reply from the SOCKS server:
+                          the result code, the dest IP and the dest port.
+
+      For a BIND, the dest IP and the dest port are the address and port
+      that the SOCKS server has opened for listening.
+
+    FailureEvent
+
+      Generated if something went wrong, either a connection could not be
+      established with the SOCKS server or the SOCKS server rejected our
+      request.
+
+      If a connection to the SOCKS server could not be established then the
+      following will exist:
+
+        'sockerr', an arrayref containing the operation, errnum and errstr as returned by 
+                   POE::Wheel::SocketFactory;
+
+      If the SOCKS server rejected our request for some reason the
+      following will exist:
+
+        'socks_unknown', a string error message. This is generated if we get a garbled response
+                         from the SOCKS server;
+        'socks_error', an integer response from the SOCKS server, indicating that it has rejected the
+                       request.
+
+SEE ALSO
+
+    http://socks.permeo.com/protocol/socks4.protocol
+
+    http://socks.permeo.com/protocol/socks4a.protocol
+
+    POE::Wheel::SocketFactory
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

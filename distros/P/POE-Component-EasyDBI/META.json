@@ -1,0 +1,94 @@
+{
+   "abstract" : "Perl extension for asynchronous non-blocking DBI calls in POE",
+   "author" : [
+      "David Davis <xantus@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-EasyDBI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Meta" : "2.143240",
+            "DBD::SQLite" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "Time::Stopwatch" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBI" : "1.38",
+            "POE" : "0.3101",
+            "Params::Util" : "0",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.00600",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "DBD::SQLite" : "0",
+            "Time::Stopwatch" : "0"
+         },
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Requires" : "0.08"
+         }
+      }
+   },
+   "provides" : {
+      "POE::Component::EasyDBI" : {
+         "file" : "lib/POE/Component/EasyDBI.pm",
+         "version" : "1.28"
+      },
+      "POE::Component::EasyDBI::SubProcess" : {
+         "file" : "lib/POE/Component/EasyDBI/SubProcess.pm",
+         "version" : "1.28"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/gps4net/POE-Component-EasyDBI",
+      "repository" : {
+         "url" : "git://github.com/gps4net/POE-Component-EasyDBI.git",
+         "web" : "https://github.com/gps4net/POE-Component-EasyDBI"
+      }
+   },
+   "version" : "1.28",
+   "x_authority" : "cpan:XANTUS",
+   "x_contributors" : [
+      "Olivier Mengué <dolmen@cpan.org>",
+      "Gelu Lupaș <gvl@cpan.org>"
+   ]
+}

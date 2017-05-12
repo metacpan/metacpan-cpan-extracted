@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 3adb28552cd4b623aa3be4bbf7c393adf3e6ab06 Changes
+SHA1 9675393432635c70c590192309916d2e2f4de20c INSTALL
+SHA1 43b9ff0e21a8504c73194bee2acdd52769627608 LICENSE
+SHA1 5ced6e11f830eb1634e4a90e5b416c1614ce7979 MANIFEST
+SHA1 d27e74e15a08c28c65cd1e54139ae93d0dc69595 MANIFEST.SKIP
+SHA1 7c84ef8c9a625be546f63c9bdc0bb16b57b285bd META.json
+SHA1 e7627e8c31db4f566626cd42df70b3a42a68ec03 Makefile.PL
+SHA1 51a084c3aa80fcd228497b6cea44c54286c75418 README
+SHA1 8825e0546a39b4adcd9067da29dfe25e91966e03 dist.ini
+SHA1 e4166b7f2a7aedfa88e7cdef1eff3a3eba2445b1 lib/Pye/MongoDB.pm
+SHA1 ce3e4b7585da66f1e27c9f4c71640e9b2819162e t/00-load.t
+SHA1 73e6e1e4ec46d2194e0efafd8c1e968b3cad4bb0 t/01-simple.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iF4EAREIAAYFAlS/4rkACgkQa4OHQAFM10fFWAD/aro5Dm7B5ciLplULDQMUJPrq
+IKTuPiOVAjreplMY6JoA/2T3Pg2N+TDP6YoFi5GBnI0IsGrrbIo8QvOza0EzuJyn
+=/W8E
+-----END PGP SIGNATURE-----

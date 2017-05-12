@@ -1,0 +1,56 @@
+---
+abstract: 'a transformer to replace "wikidoc" data regions with Pod5 elements'
+author:
+  - 'Ricardo SIGNES <rjbs@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Pod::Elemental: '0.092941'
+  Pod::Elemental::Transformer::Pod5: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Elemental-Transformer-WikiDoc
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Pod::Elemental::Transformer::WikiDoc:
+    file: lib/Pod/Elemental/Transformer/WikiDoc.pm
+    version: '0.093004'
+  Pod::Weaver::Plugin::WikiDoc:
+    file: lib/Pod/Weaver/Plugin/WikiDoc.pm
+    version: '0.093004'
+requires:
+  Moose: '0'
+  Pod::Elemental: '0.092941'
+  Pod::Elemental::Transformer: '0'
+  Pod::Elemental::Types: '0'
+  Pod::Weaver::Role::Dialect: '0'
+  Pod::WikiDoc: '0.18'
+  namespace::autoclean: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/dagolden/Pod-Elemental-Transformer-WikiDoc/issues
+  homepage: https://github.com/dagolden/Pod-Elemental-Transformer-WikiDoc
+  repository: https://github.com/dagolden/Pod-Elemental-Transformer-WikiDoc.git
+version: '0.093004'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Kent Fredric <kentfredric@gmail.com>'

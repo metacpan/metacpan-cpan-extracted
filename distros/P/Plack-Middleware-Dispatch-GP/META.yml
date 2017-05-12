@@ -1,0 +1,29 @@
+---
+abstract: 'dispatcher middleware for general purposes handling'
+author:
+  - 'Alexei Pastuchov <palik@cpan.org>'
+build_requires:
+  Plack::Builder: 0
+  Plack::Test: 0
+  Test::Exception: 0.32
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.120351'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Dispatch-GP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Plack::Middleware: 0
+  Plack::Request: 1.0032
+  Plack::Util::Accessor: 0
+  Scalar::Util: 1.27
+  perl: 5.006
+version: 0.01

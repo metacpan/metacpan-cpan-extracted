@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+examples/test.pl
+examples/cisco.pl
+lib/POE/Component/Client/Telnet.pm
+t/00_compile.t
+run-test
+run-cisco-test
+META.yml                                 Module meta-data (added by MakeMaker)

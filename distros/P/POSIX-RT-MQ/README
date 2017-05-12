@@ -1,0 +1,63 @@
+POSIX/RT/MQ version 0.03
+========================
+
+DESCRIPTION
+
+POSIX::RT::MQ module provides perl interface for POSIX message queues API,
+part of POSIX RealTime Extension, namely:
+
+  mq_open()
+  mq_close()
+  mq_send()
+  mq_receive()
+  mq_getattr()
+  mq_setattr()
+  mq_unlink()
+  mq_notify()  -- limited support only
+  MQ_OPEN_MAX and MQ_PRIO_MAX constants.
+
+
+PORTABILITY
+
+Many operating systems still lack POSIX message queues support,
+so regret there are chances you'll be not able to use this module
+(and POSIX message queues at all) with your favorite OS :-(
+
+Solaris: Has POSIX message queues support since 2.6 or even earlier,
+         This module should work.
+         
+Digital UNIX (or whatever it is called today):
+         Is known to support POSIX message queues.
+         I don't have any such box handy - if somebody does please
+         help with module's porting !      
+
+AIX:     POSIX mq not supported (at least in 4.3.3 and AFAIK in 5 also).
+         You are likely to be able to compile this module
+         but any calls will fail with "Function not implemented"
+         error.
+
+Other systems I have access to (Linux, SCO OpenServer, SCO UnixWare)
+don't support POSIX Message Queues.
+
+   
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Ilja Tabachnik <billy@arnis-bsl.com>
+
+This library is free software; you can redistribute it and/or                   
+modify it under the same terms as Perl itself. 
+
+# $Id: README,v 1.8 2003/01/28 07:05:35 ilja Exp $
+

@@ -1,0 +1,33 @@
+---
+abstract: 'PAR generation from Padre'
+author:
+  - 'Gabor Szabo'
+  - 'Steffen Mueller'
+build_requires:
+  Test::More: 0.47
+configure_requires:
+  Module::Build: 0.36
+  Padre::PluginBuilder: 0.12
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Padre-Plugin-PAR
+provides:
+  Padre::Plugin::PAR:
+    file: lib/Padre/Plugin/PAR.pm
+    version: 0.06
+requires:
+  Carp: 0
+  Cwd: 0
+  Data::Dumper: 0
+  File::ShareDir: 1.00
+  PAR::Packer: 1.005
+  Padre: 0.43
+  perl: 5.008
+resources:
+  homepage: http://padre.perlide.org/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-PAR/
+version: 0.06

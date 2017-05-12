@@ -1,0 +1,27 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/PITA/POE/SupportServer.pm
+lib/PITA/POE/SupportServer/Specification.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_compile.t
+t/01_startup.t
+t/02_startup2.t
+t/03_activity.t
+t/04_activity.t
+t/05_shutdown.t
+t/06_content.t
+t/07_nocpan.t
+t/97_meta.t
+t/98_pod.t
+t/99_pmv.t

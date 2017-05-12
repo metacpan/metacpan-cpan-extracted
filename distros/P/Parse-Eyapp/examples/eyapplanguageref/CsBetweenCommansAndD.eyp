@@ -1,0 +1,26 @@
+%semantic token 'c' 'd' 
+
+%{
+sub TERMINAL::info {
+  $_[0]->attr;
+}
+%}
+%tree
+%%
+S: 
+    ('c' <* ','> 'd')*   
+      { 
+         print "\nNode\n";
+         print $_[1]->str."\n"; 
+         print "\nChild 0\n";
+         print $_[1]->child(0)->str."\n"; 
+         print "\nChild 1\n";
+         print $_[1]->child(1)->str."\n"; 
+         $_[1] 
+      }
+;
+
+%%
+
+# eyapp -C CsBetweenCommansAndD.eyp
+# ./CsBetweenCommansAndD.pm -c 'c , c, c d'

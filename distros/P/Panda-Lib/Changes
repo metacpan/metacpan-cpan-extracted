@@ -1,0 +1,52 @@
+1.3.1    13.03.2017
+           - compile with all warnings enabled, fix warnings
+1.3.0    11.02.2017
+           - prevent MSWin "clone" hangs: prevent installation on Windows with SJLJ compiler
+             (because perl breaks C++ exceptions in this case - perl just hangs on next "croak" after C++ exception)
+           - refactor memory pools' thread_local implementation (use C++11 features)
+           - full refactor of panda::string:
+             panda::basic_string<...>, panda::string, panda::wstring, panda::u16_string, panda::u32_string
+           - added std::string_view if c++ < 17
+           - added std::from_chars, std::to_chars if c++ < 17
+           - added panda::[unordered_]string_[multi](map|set) to support passing string_view to some methods for string keys
+1.2.3    06.02.2017
+           - bugfix in panda::string with external pointer assign
+1.2.2    31.01.2017
+           - added panda::lib::h2be16, h2le16, be2h16, le2h16, h2be32, h2le32, be2h32, le2h32, h2be64, h2le64, be2h64, le2h64
+1.2.1    25.01.2017
+           - make PXS_TRY a single block
+           - added IteratorPair
+           - removed MACRO 'INLINE' and 'THREAD_LOCAL'
+           - removed macros likely/unlikely -> moved to panda::likely(), panda::unlikely()
+1.2.0    17.01.2017
+           - require c++11
+           - add move constructors to panda::string, add std::hash for panda::string
+1.1.6    13.01.2017
+           - no visible changes
+1.1.5    11.01.2017
+           - added PXS_TRY macro helper for dealing with C++ exceptions (auto-rethrow perl exception)
+1.1.4    03.03.2016
+           - fix latest c++ warnings
+1.1.3    15.07.2015
+           - operator bool for panda::string
+1.1.2    16.04.2015
+           - make last param optional for merge and clone function (C++)
+1.1.1    10.02.2015
+           - docs improve, no code changes
+1.1.0    05.02.2015
+           - Change clone hook from CLONE to HOOK_CLONE, because CLONE is used on threaded perls at thread creation.
+           - add second param $with_cross_check to 'clone' function. Add lclone method with behaves like clone($arg, 0)
+           - docs/test changes
+1.0.1    03.02.2015
+           - bump version to require win32-friendly Panda::XS/Panda::Install
+1.0.0    31.01.2015
+           - fix threaded builds for NO_GET_CONTEXT
+           - remove <algorithm> usage from panda::string, as it conflicts with perl headers under c++11
+           - cosmetic
+           - bump version to release
+0.1.1    30.01.2015
+           - Added public API MACRO-attributes 'INLINE' and 'THREAD_LOCAL' if not yet defined
+           - Added MemoryPool, ObjectAllocator, AllocatedObject - fast memory allocators (thread-safe)
+           - Fixed Win32 compilation & tests
+0.1.0    31.10.2014
+           - first release

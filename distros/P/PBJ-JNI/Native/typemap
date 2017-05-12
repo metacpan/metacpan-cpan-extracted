@@ -1,0 +1,50 @@
+TYPEMAP
+JavaVM *	T_PTROBJ
+JNIEnv *	T_PTROBJ
+
+const JNINativeMethod * T_PTROBJ
+
+const char *    T_PV
+const jchar *   T_PTROBJ
+const jbyte *   T_PTROBJ
+
+jboolean *	T_PTROBJ
+jvalue *	T_PTROBJ
+jbyte *		T_PTROBJ
+jchar *		T_PTROBJ
+jshort *	T_PTROBJ
+jint *		T_PTROBJ
+jlong *		T_PTROBJ
+jfloat *	T_PTROBJ
+jdouble *	T_PTROBJ
+
+jthrowable	T_PTROBJ
+jarray		T_PTROBJ
+jbooleanArray	T_PTROBJ
+jbyteArray	T_PTROBJ
+jcharArray	T_PTROBJ
+jshortArray	T_PTROBJ
+jintArray	T_PTROBJ
+jlongArray	T_PTROBJ
+jfloatArray	T_PTROBJ
+jdoubleArray	T_PTROBJ
+jobjectArray	T_PTROBJ
+
+jweak		T_PTROBJ
+jclass		T_PTROBJ
+jmethodID	T_PTROBJ
+jfieldID	T_PTROBJ
+jstring 	T_PTROBJ
+
+jsize		T_IV
+jboolean	T_CHAR
+jint		T_IV
+jbyte		T_CHAR
+jchar		T_CHAR
+jshort		T_SHORT
+jlong		T_LONG
+jfloat		T_FLOAT
+jdouble		T_DOUBLE
+jobject		T_PTROBJ
+
+cstring		T_PTROBJ

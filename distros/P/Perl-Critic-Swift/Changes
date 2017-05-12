@@ -1,0 +1,13 @@
+Revision history for Perl-Critic-Swift
+
+1.0.3  2008-05-03
+       Fix dependencies.
+
+1.0.2  2008-04-19
+       Playing the kwalitee game.
+
+1.0.1  2007-05-07
+       Fix false negative in CodeLayout::RequireUseUTF8.
+
+1.0.0  2007-05-07
+       Initial release.

@@ -1,0 +1,33 @@
+---
+abstract: 'Generates a formatted byte string for Star POS printers'
+author:
+  - 'Peter Stuifzand <peter@stuifzand.eu>'
+build_requires:
+  File::Slurp: 0
+  Marpa::R2: 0
+configure_requires:
+  Module::Build::Tiny: 0.030
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Protocol-Star-Linemode
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Moo: 1.004002
+resources:
+  bugtracker: https://github.com/stuifzand-software/star-linemode/issues
+  homepage: https://github.com/stuifzand-software/star-linemode
+  repository: https://github.com/stuifzand-software/star-linemode.git
+version: 1.0.0
+x_contributors:
+  - 'Peter Stuifzand <peter.stuifzand@gmail.com>'

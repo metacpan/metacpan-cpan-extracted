@@ -1,0 +1,14 @@
+Build.PL
+lib/Proc/BackOff.pm
+lib/Proc/BackOff/Exponential.pm
+lib/Proc/BackOff/Linear.pm
+lib/Proc/BackOff/Random.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01_require.t
+t/02_basic.t
+t/03_timing_exponential.t
+t/03_timing_linear.t
+t/03_timing_random.t

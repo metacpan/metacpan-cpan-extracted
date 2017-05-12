@@ -1,0 +1,707 @@
+#!/usr/bin/perl -w
+
+use strict;
+use 5.004;
+use Getopt::Long;
+use vars qw( $VERSION %PDBHandlers %PRCHandlers $hexdump );
+
+use strict;
+use Palm::Progect;
+use Palm::Progect::Constants;
+use Getopt::Long;
+use File::Spec;
+
+# print "called: $0 @ARGV\n";
+
+################################################################################
+# Find available converters, and Progect DB converters
+# and from these modules, build a list of options for GetOpt::Long,
+# and also build the usage text
+
+my %Options = (
+    'General' => {
+        'quiet'         => '',
+        'show_help'     => '',
+        'source_format' => 'auto',
+        'target_format' => 'auto',
+    },
+);
+
+my %Get_Options = (
+    'quiet'            => \$Options{'general'}{'quiet'},
+    'help'             => \$Options{'general'}{'show_help'},
+    'input-format:s'   => \$Options{'general'}{'source_format'},
+    'output-format:s'  => \$Options{'general'}{'target_format'},
+    'input-version:i'  => \$Options{'general'}{'input_version'},
+    'output-version:i' => \$Options{'general'}{'output_version'},
+);
+
+my %converters          = find_converters();
+my @handled_db_versions = find_handled_db_versions();
+
+my $handled_db_versions = join ', ', @handled_db_versions;
+my %handled_db_versions = map { $_ => 1 } @handled_db_versions;
+
+my @import_converter_list;
+my @export_converter_list;
+my @specific_converter_options;
+my @unavailable_converters;
+my %extension_converters;
+foreach my $converter (keys %converters) {
+
+    # There might be an error loading the module,
+    # for instance, because its dependencies are not
+    # satisfied (e.g. Text::CSV_XS)
+    eval {
+        require $converters{$converter}{'File'};
+    };
+
+    if ($@) {
+        push @unavailable_converters, $converter;
+        next;
+    }
+
+    my $converter_class = $converters{$converter}{'Class'};
+
+    my $options = {};
+
+    # We don't care if these methods don't exist.
+    # (Just silently skip this converter in that case)
+    eval {
+        push @import_converter_list, $converter if $converter_class->provides_import();
+        push @export_converter_list, $converter if $converter_class->provides_export();
+
+        $options = $converter_class->options_spec();
+
+        my @extensions = $converter_class->accepted_extensions();
+
+        foreach my $extension (@extensions) {
+            # remove non-word characters
+            $extension =~ s/\W//g;
+
+            $extension_converters{$extension} = $converter;
+        }
+    };
+
+    my @description_lines;
+    my $converter_usage = '';
+    foreach my $name (keys %$options) {
+        my ($spec, $default, $description) = @{ $options->{$name} };
+
+        $Options{'converters'}{$converter}{$name} = $default;
+        push @description_lines, $description;
+        $Get_Options{$spec} = \$Options{'converters'}{$converter}{$name};
+    }
+
+    if (@description_lines) {
+        $converter_usage .= (join "\n", "$converters{$converter}{'Name'} Converter Options", @description_lines)
+                         . "\n\n";
+    }
+
+    push @specific_converter_options, $converter_usage;
+}
+
+foreach my $converter (@unavailable_converters) {
+    delete $converters{$converter};
+}
+
+my $import_converter_list      = lc join '|','auto', 'pdb', @import_converter_list;
+my $export_converter_list      = lc join '|','auto', 'pdb', @export_converter_list;
+my $specific_converter_options = join '',    @specific_converter_options;
+
+my $usage = <<EOF;
+progconv - converts between .txt, .csv and Progect's PDB format.
+Usage: perl progconv [options] sourcefile targetfile
+
+Options:
+  --quiet            Suppress informational messages
+
+Conversion Options:
+  --input-format=$import_converter_list
+  --output-format=$export_converter_list
+
+    When 'auto' is selected, then progconv will guess the file's type
+    based on its extension.
+
+  --input-version=n  Try to read Progect PDB databases as version n
+  --output-version=n Write Progect PDB databases as version n
+                     Supported Versions: $handled_db_versions
+
+$specific_converter_options
+EOF
+
+GetOptions(
+    %Get_Options
+);
+
+die $usage if $Options{'general'}{'show_help'};
+
+################################################################################
+# Look at the source and target file and try to figure out
+# what type they are.
+#
+# The user may have specified an explicit type via --input-type and/or --output-type
+# or they may have selected 'auto'.
+#
+# Or they may have chosen something unrecognized.
+
+my ($source, $target) = @ARGV;
+$source ||= '';
+$target ||= '';
+
+$source or die "Can't find source file $source\n", $usage;
+-f $source or die "Source file $source does not exist \n", $usage;
+
+my $pdb = new Palm::PDB;
+
+my $source_format = lc $Options{'general'}{'source_format'} || 'auto';
+my $source_extension = '';
+$source_extension = lc $1 if $source =~ /\.([^.]*?)$/;
+
+$source_format = 'pdb' if $source_extension eq 'pdb';
+
+if ($source_format ne 'pdb') {
+    if ($source_format ne 'auto' and !exists $converters{$source_format}) {
+        die "Unrecognized input type: $source_format\n";
+    }
+
+    if (!exists $converters{$source_format}) {
+        # 'Auto'
+        $source_format = $extension_converters{$source_extension};
+
+        # Error if we can't determine the type
+        if (!exists $converters{$source_format}) {
+            die "Can't determine type from extension: $source_extension\n";
+        }
+    }
+}
+
+my $target_format = lc $Options{'general'}{'target_format'} || 'auto';
+
+my $target_extension = '';
+$target_extension = lc $1 if $target =~ /\.([^.]*?)$/;
+
+$target_format = 'pdb' if $target_extension eq 'pdb';
+
+if ($target_format ne 'pdb') {
+
+    if ($target_format ne 'auto' and !exists $converters{$target_format}) {
+        die "Unrecognized output type: $target_format\n";
+    }
+    if ($target) {
+        if ($target_format ne 'pdb' and !exists $converters{$target_format}) {
+            # 'Auto'
+            $target_format = $extension_converters{$target_extension};
+
+            # Error if we can't determine the type
+            if (!exists $converters{$target_format}) {
+                die "Can't determine type from extension: $target_extension\n";
+            }
+
+        }
+    }
+    else { # Dump text to STDOUT if Target filename not specified
+        $target_format = 'text' if $target_format eq 'auto';
+    }
+}
+
+
+################################################################################
+# Dispatch to the proper class to do the actual translations
+#
+# At this point, $source_converter and target converter will both
+# be set to 'pdb' or to a Converter name
+#
+
+# Options passed to all modules start with the 'general' options
+# (i.e. quiet, show-help, etc.)
+my %General_Options = (
+    quiet => $Options{'general'}{'quiet'},
+);
+
+my $progect_db = Palm::Progect->new(options => \%General_Options);
+
+for my $version ($Options{'general'}{'input_version'}, $Options{'general'}{'input_version'}) {
+    if ($version && !$handled_db_versions{$version}) {
+        die "Can't handle Progect db version: $version\n";
+    }
+}
+
+if ($source_format eq 'pdb') {
+    $progect_db->load_db(
+        file    => $source,
+        version => $Options{'general'}{'input_version'},
+    );
+}
+else {
+    # Use proper, capitalized names for converters
+    my $source_format_name = $converters{$source_format}{'Name'};
+
+    # merge the options for this format into the options
+    # we pass to the converter module
+
+    my %Passed_Options = %General_Options;
+    for (keys %{$Options{'converters'}{$source_format}}) {
+        $Passed_Options{$_} = $Options{'converters'}{$source_format}{$_};
+    }
+
+    $progect_db->import_prefs(
+        file    => $source,
+        format  => $source_format_name,
+        %Passed_Options,
+    );
+    $progect_db->import_records(
+        file    => $source,
+        format  => $source_format_name,
+        %Passed_Options,
+    );
+}
+
+if ($target_format eq 'pdb') {
+    $progect_db->save_db(
+        file    => $target,
+        version => $Options{'general'}{'output_version'},
+        %Options,
+    );
+}
+else {
+    # Use proper, capitalized names for converters
+    my $target_format_name = $converters{$target_format}{'Name'};
+
+    # # merge the options for this format into the options
+    # we pass to the converter module
+
+    my %Passed_Options = %General_Options;
+    for (keys %{$Options{'converters'}{$target_format}}) {
+        $Passed_Options{$_} = $Options{'converters'}{$target_format}{$_};
+    }
+
+    $progect_db->export_prefs(
+        file    => $target,
+        format  => $target_format_name,
+        %Passed_Options,
+    );
+    $progect_db->export_records(
+        file    => $target,
+        format  => $target_format_name,
+        %Passed_Options,
+    );
+}
+
+# return info on each converter module that can be found
+
+sub find_converters {
+    local *DIR;
+
+    my %converter;
+    foreach my $inc (@INC) {
+        my $path = File::Spec->join($inc, 'Palm', 'Progect', 'Converter');
+
+        next unless -d $path;
+
+        if (opendir DIR, $path) {
+            my @modules = readdir(DIR);
+            close DIR;
+
+            foreach my $module (@modules) {
+                next unless -f File::Spec->join($path, $module);
+                next unless $module =~ /^(.*)\.pm$/;
+
+                $converters{lc $1} = { Name => $1 };
+            }
+        }
+    }
+
+    foreach my $converter (keys %converters) {
+        my $name = $converters{$converter}{Name};
+        $converters{$converter}{Class} = 'Palm::Progect::Converter::' . $name;
+        $converters{$converter}{File}  = File::Spec->join('Palm', 'Progect', 'Converter', $name . '.pm' );
+    }
+
+    return %converters if wantarray;
+    return \%converters;
+}
+
+sub find_handled_db_versions {
+    my @handled_versions;
+    foreach my $inc (@INC) {
+        my $path = File::Spec->join($inc, 'Palm', 'Progect');
+
+        next unless -d $path;
+
+        if (opendir DIR, $path) {
+            my @subdirs = readdir(DIR);
+            close DIR;
+
+            foreach my $subdir (@subdirs) {
+                next unless -d File::Spec->join($path, $subdir);
+
+                next unless $subdir =~ /^DB_(\d*)$/;
+
+                push @handled_versions, $1;
+            }
+        }
+    }
+    return @handled_versions if wantarray;
+    return \@handled_versions;
+}
+
+__END__
+
+=head1 NAME
+
+progconv - convert between .txt, .csv and Palm Progect's PDB format.
+
+=head1 SYNOPSIS
+
+Export from a .pdb database to a text representation:
+
+    perl progconv lbPG-MyProgect.pdb MyProgect.txt
+
+Convert a text tree back into a database:
+
+    perl progconv MyProgect.txt lbPG-MyProgect.pdb
+
+You can convert to/from CSV files:
+
+    perl progconv lbPG-MyProgect.pdb MyProgect.csv
+    perl progconv MyProgect.csv MyProgect.txt
+    perl progconv MyProgect.csv lbPG-MyProgect.pdb
+
+You can convert between various Progect database
+versions:
+
+    perl progconv --output-format=23 MyOldProgect.pdb MyNewProgect.pdb
+
+=head1 DESCRIPTION
+
+C<progconv> is a program you run on your desktop computer
+to allow you to import to and export from Palm Progect
+database files.
+
+For its text format, it uses a layout very similar to
+the one used by Progect's own built-in converter:
+
+    [x] Level 1 Todo item
+        [10%] Child (progress)
+            . Child of Child (informational)
+
+    [80%] (31/12/2001) Progress item
+        [ ] Unticked action item
+
+Almost all of Progect's fields are supported using this
+format, including categories, ToDo links and notes.
+
+See below under L<PROGCONV TEXT FORMAT>
+
+For its CSV format it uses a simple table of records, with
+indent level being one of the fields.  See below under
+L<PROGCONV CSV FORMAT>.
+
+This program was written on Linux (Redhat 7.1).
+It was tested on Windows 98 with perl 5.005 and perl 5.6.1,
+and on Linux (Redhat 7.1) with perl 5.6.0 and perl 5.6.1.
+
+=head1 OPTIONS
+
+=head2 General Options
+
+=over 4
+
+=item --quiet
+
+Suppress informational messages
+
+=back
+
+=head2 Conversion Options
+
+=over 4
+
+=item --input-format=auto|pdb|text|csv
+
+The format C<progconv> should import from.  Either C<auto>, C<pdb>, C<text>, or
+C<csv>.
+
+When C<auto> is selected, then C<progconv> will guess the file's type based
+on its extension.
+
+The default is C<auto>.
+
+=item --output-format=auto|pdb|text|csv
+
+The format C<progconv> should export to.  Either C<auto>, C<pdb>, C<text>, or
+C<csv>.
+
+When C<auto> is selected, then C<progconv> will guess the file's type based
+on its extension.
+
+The default is C<auto>.
+
+=item --input-version=n
+
+Ignore the version number stored in the source database, and import it
+as version C<n>.
+
+Currently supported versions are C<18> (for Progect database version 0.18) and
+C<23> (for Progect database version 0.23).
+
+Progect database version 0.18 was used all the way up until Progect version
+0.22, so if you saved a database with Progect 0.22, the database will be
+a version 0.18 database.
+
+=item --output-version=n
+
+Write the output database in version C<n>.
+
+Currently supported versions are C<18> (for Progect database version 0.18) and
+C<23> (for Progect database version 0.23).
+
+Progect database version 0.18 was used all the way up until Progect version
+0.22, so if you saved a database with Progect 0.22, the database will be
+a version 0.18 database.
+
+=back
+
+=head2 Text Conversion Options
+
+=over 4
+
+=item --tabstop=n
+
+Treat tabs as n columns wide (default is 8)
+
+=item --use-spaces
+
+By default, C<progconv> uses tabs to indent records.
+With this C<--use-spaces> option, it will use spaces
+instead, using C<--tabstop> spaces per indent level.
+
+=item --date-format
+
+The input and output format for dates.  You can have any text
+here so long as it includes some combination of dd, mm, yy, yyyy.
+Using words for months at this point is NOT supported.
+
+The default is yyyy/mm/dd, so nobody can accuse me of being Y2K
+non-complient.  If you want to use dd/mm/yy (which is how the
+Progect program itself seems to currently export things on my Palm),
+then you can use:
+
+    --date-format=dd/mm/yy
+
+=item --columns=n
+
+For multiline descriptions and notes, progect will wrap text to
+fit the screen.  Use this option to tell how wide the screen is.
+The default is 80.  To disable wrapping, use C<--columns=0>
+
+=back
+
+=head2 CSV Conversion Options
+
+=over 4
+
+=item --csv-sep=c
+
+Use character C<c> as the csv separator (defaults to C<;>)
+
+=item --csv-eol-pc
+
+Use C<\r\n> as the csv line terminator (the default)
+
+=item --csv-eol-unix
+
+Use C<\n> as the csv line terminator
+
+=item --csv-eol-mac
+
+Use C<\r> the csv line terminator
+
+=item --csv-quote-char=c
+
+Use character C<c> as the csv quote char (defaults to C<">)
+
+=item --csv-date-format
+
+The input and output format for dates in csv files.  See
+L<--date-format>
+
+=back
+
+=head1 PROGCONV TEXT FORMAT
+
+Here is a summary of the various types of records:
+
+    [ ] action type
+    [x] completed action type
+    < > action type with todo link
+    <x> completed action type with todo link
+
+    [80%] progress type
+    [4/5] numeric type
+
+    . info type
+
+    [ ] [5] action type with priority
+    [ ] (15/7/2001) action type with date
+
+    [80%] [5] (15/7/2001) {category} progress type with priority and date and category
+
+    [80%] [5] (15/7/2001) {category} progress type with priority and date and category <<
+        Multi-Line note
+        for this item
+        >>
+
+
+=head1 PROGCONV CSV FORMAT
+
+The CSV format allows for basic import/export with spreadsheet programs.
+The CSV file does not look like a tree structure; instead, there is a C<level>
+column, which indicates the indent level for the current row.
+
+The columns in the format are:
+
+=over 4
+
+=item level
+
+The indent level of the record.
+
+=item description
+
+=item priority
+
+The priority of the record from 1 to 5, or 0 for no priority.
+
+=item isAction
+
+=item isProgress
+
+=item isNumeric
+
+=item isInfo
+
+Any record can have one (and only one) of the above types.
+
+If you are going to change the type of a record, remember
+to set all the other types to false:
+
+    isAction isProgress isNumeric isInfo
+    0        0          0         1
+
+=item completed
+
+Completed has different values depending upon the type of record.
+For action items, it is either 1 or 0, for complete or not complete.
+
+For Progress items, it is a number between 1 and 100, indicating a
+percentage.
+
+For Numeric items it is a number between 1 and 100 indicating the
+the integer percentage of the C<numericActual> value divided by
+the C<numericLimit> value.
+
+=item numericActual
+
+The numerator of a numeric record.  If the numeric value of
+a record is C<4/5>, then the C<numericActual> value is C<4>.
+
+=item numericLimit
+
+The denominator of a numeric record.  If the numeric value of
+a record is C<4/5>, then the C<numericLimit> value is C<5>.
+
+=item DateDue
+
+This is a date in the format specified on the command line with the
+C<--csv-date-format> option
+
+=item category
+
+=item opened
+
+=item description
+
+=item note
+
+=back
+
+Additionally, see the L<--csv-sep >, L<--csv-eol-pc >, L<--csv-eol-unix >,
+L<--csv-eol-mac > and L<--csv-quote-char > options.
+
+=head1 BUGS and CAVEATS
+
+=head2 Categories
+
+C<progconv> reads and writes categories properly from and to Progect C<PDB>
+files.  As of version 0.25, Progect itself can read these categories properly.
+(However version 0.25 has problems with preferences - see below)
+
+Versions of Progect earlier than 0.25 may have problems reading
+the categories as saved by C<progconv>.
+
+This is due to the fact that C<progconv> does not write the preferences
+block correctly.
+
+As a result, when you load into an older version of Progect a database
+that you created with C<progconv>, You will get a warning that "Your
+preferences have been deleted".
+
+Progect will then reset the category list.
+
+However, all of the records will still keep their references to the deleted
+categories.
+
+So, if you select "Edit Categories..." and recreate the categories
+B<in the exact same order> as they were before, the records will
+magically return to their proper categories.
+
+Again, these steps are only required when you are using a version of
+Progect that is older than version 0.25.
+
+=head2 Preferences
+
+Preferences are not handled properly yet.  They cannot be imported or
+exported, and they are not read from the Progect database file.
+
+Additionally, in Progect version 0.23 and earlier, when you load a
+database created by C<progconv> into Progect, you will get a warning
+that "Your preferences have been deleted".  The preferences for the
+database will be reset to sensible defaults.
+
+In Progect version 0.25, you will not get this warning.
+
+=head2 Two-digit Dates
+
+Using a two digit date format will fail for dates before 1950
+or after 2049 :).
+
+=head1 AUTHOR
+
+Michael Graham E<lt>mag-perl@occamstoothbrush.comE<gt>
+
+Copyright (C) 2001 Michael Graham.  All rights reserved.
+This program is free software.  You can use, modify, and
+distribute it under the same terms as Perl itself.
+
+The latest version of this program can be found on http://www.occamstoothbrush.com/perl/
+
+=head1 SEE ALSO
+
+http://progect.sourceforge.net/
+
+L<Palm::Progect>
+
+L<Palm::Progect::Converter::Text>
+
+L<Palm::Progect::Converter::CSV>
+
+L<Palm::PDB>
+
+L<Text::CSV_XS>
+
+=cut
+
+
+

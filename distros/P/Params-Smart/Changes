@@ -1,0 +1,64 @@
+Revision history for Perl extension Params::Smart.
+
+0.08  Wed Mar 21 2007
+	- added case where undef value used in positional parameter
+          (thanks to Rick Westerman)
+	- minor reorganization of POD
+
+0.07  Thu Feb  9 2006
+	- added "needs" option for complex paramater templates
+	- added ':all' export tag
+	- added ParamsNC function, and updated tests to check
+	- calls to Param are memoized by caller information rather
+	  than parameter
+	- added note about method parameters in the documentation
+	- SEE ALSO section included in POD, not just the README
+	- corrected typos in documentation and examples
+	- corrected typos in error messages
+
+0.06  Fri May  6 2005
+	- corrected stupid glitch from Pod::Readme
+
+0.05  Fri May  6 2005
+	- removed links to module manpages because the pod2text function
+	  stupidly changes L<Module> to "the Module manpage"
+	- fixed bug that caused warnings in Regexp::Common
+	- redid POD to use Pod::Readme
+	- updated SEE ALSO section
+
+0.04  Thu Apr 28 2005
+	- rewrote documentation
+	- uses Regexp::Common
+	- defaults can have double-quote-delimited strings
+	- changed format of error messages
+	- added friendlier usage message on error
+	- parameter name aliases allowed
+	- callbacks can modify parameters
+	- use custom memoization due to issues with callbacks
+	- implemented callbacks
+	- misc optimizations/tweaks
+        - added hashref params as alternative to strings
+	- added parse_param and set_param methods
+	- additional information documented
+	- fixed formatting mistake in POD
+
+0.03  Sun Apr 17 2005
+	- updated documentation
+	- added hooks for type support
+	- named parameter calls may have an initial '-'
+	* parameters are now required by default
+	* '+' now requires that a parameter be named
+	- fixed bug with assigning default values
+	- fixed bug with using 2 positional parameters
+	- added more tests
+	- Params is memoized
+	- noted Getargs::Mixed in SEE ALSO of POD
+
+0.02  Fri Apr 15 2005
+	- corrected minor typos in POD
+	- removed reference to (wrong) SourceForge project
+
+0.01  Fri Apr 15 23:24:25 2005
+	- original version; created by h2xs 1.23 with options
+		-X -b 5.6.0 -n Params::Smart -v 0.01
+

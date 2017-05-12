@@ -1,0 +1,4 @@
+#!/usr/bin/perperl -- -M1
+$| = 1;
+print "Content-type: text/html\n\n$$\n";
+kill(9, $$);

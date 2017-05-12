@@ -1,0 +1,11 @@
+blib
+Makefile
+pm_to_blib
+test_dir
+README
+*.bs
+*.old
+*.bak
+.svn
+.git
+MYMETA.*

@@ -1,0 +1,19 @@
+format-version: 1.2
+date: 14:10:2015 16:48
+saved-by: midori
+auto-generated-by: OBO-Edit 2.3.1
+subsetdef: qc_do_not_annotate "Term not to be used for direct annotation"
+subsetdef: qc_do_not_manually_annotate "Term not to be used for direct manual annotation"
+default-namespace: fission_yeast_phenotype
+remark: svn version: $Revision: 303 $
+ontology: fypo
+
+[Term]
+id: FYPO:0000001
+name: phenotype
+def: "Any of the set of observable characteristics of an organism resulting from the interaction of its genotype with the environment." [PomBase:mah]
+comment: This is a high-level term whose primary purpose is to organize terms beneath it in the ontology, and we expect that it will not be used for direct annotations. Please consider using a more specific term to annotate each phenotype.
+subset: qc_do_not_annotate
+subset: qc_do_not_manually_annotate
+synonym: "fission yeast phenotype" EXACT [PomBase:mah]
+creation_date: 2011-03-16T03:59:25Z

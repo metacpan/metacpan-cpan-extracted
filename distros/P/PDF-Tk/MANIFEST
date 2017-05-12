@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/PDF/Tk.pm
+MANIFEST			This list of files
+META.yml
+README
+t/01use.t
+t/02pod.t
+t/03podcoverage.t

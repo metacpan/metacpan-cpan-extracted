@@ -1,0 +1,18 @@
+
+2015-07-05 v0.04
++ updated deps
+
+2015-02-22 v0.03
++ updated Catalyst::Runtime
++ added List::MoreUtils
++ updated List::Util
++ updated LWP
++ updated Mojolicious
++ added App::cloc
++ added Algorithm::Diff
++ added Regexp::Common
++ added Digest::MD5
+
+2015-02-07 v0.02
++ first release
+

@@ -1,0 +1,1 @@
+docs: C<setlocale> is provided by the L<POSIX> module.

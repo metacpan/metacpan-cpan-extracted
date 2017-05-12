@@ -1,0 +1,158 @@
+=head1 NAME
+
+urifind - find URIs in a document and dump them to STDOUT.
+
+=head1 SYNOPSIS
+
+    $ urifind file
+
+=head1 DESCRIPTION
+
+F<urifind> is a simple script that finds URIs in one or more files
+(using C<URI::Find>), and outputs them to to STDOUT.  That's it.
+
+To find all the URIs in F<file1>, use:
+
+    $ urifind file1
+
+To find the URIs in multiple files, simply list them as arguments:
+
+    $ urifind file1 file2 file3
+
+F<urifind> will read from C<STDIN> if no files are given or if a
+filename of C<-> is specified:
+
+    $ wget http://www.boston.com/ -O - | urifind
+
+When multiple files are listed, F<urifind> prefixes each found URI
+with the file from which it came:
+
+    $ urifind file1 file2
+    file1: http://www.boston.com/index.html
+    file2: http://use.perl.org/
+
+This can be turned on for single files with the C<-p> ("prefix") switch:
+
+    $urifind -p file3
+    file1: http://fsck.com/rt/
+
+It can also be turned off for multiple files with the C<-n> ("no
+prefix") switch:
+
+    $ urifind file1 file2
+    http://www.boston.com/index.html
+    http://use.perl.org/
+
+By default, URIs will be displayed in the order found; to sort them
+ascii-betically, use the C<-s> ("sort") option.  To reverse sort them,
+use the C<-r> ("reverse") flag (C<-r> implies C<-s>).
+
+    $ urifind -s file1 file2
+    http://use.perl.org/
+    http://www.boston.com/index.html
+    mailto:webmaster@boston.com
+
+    $ urifind -r file1 file2
+    mailto:webmaster@boston.com
+    http://www.boston.com/index.html
+    http://use.perl.org/
+
+Finally, F<urifind> supports limiting the returned URIs by scheme or
+by arbitrary pattern, using the C<-S> option (for schemes) and the
+C<-P> option.  Both C<-S> and C<-P> can be specified multiple times:
+
+    $ urifind -S mailto file1
+    mailto:webmaster@boston.com
+
+    $ urifind -S mailto -S http
+    mailto:webmaster@boston.com
+    http://www.boston.com/index.html
+
+C<-P> takes an arbitrary Perl regex.  It might need to be protected
+from the shell:
+
+    $ urifind -P 's?html?' file1
+    http://www.boston.com/index.html
+
+    $ urifind -P '\.org\b' -S http file4
+    http://www.gnu.org/software/wget/wget.html
+
+Add a C<-d> to have F<urifind> dump the refexen generated from C<-S>
+and C<-P> to C<STDERR>.  C<-D> does the same but exits immediately:
+
+    $ urifind -P '\.org\b' -S http -D 
+    $scheme = '^(\bhttp\b):'
+    @pats = ('^(\bhttp\b):', '\.org\b')
+
+To remove duplicates from the results, use the C<-u> ("unique")
+switch.
+
+=head1 OPTION SUMMARY
+
+=over 4
+
+=item -s
+
+Sort results.
+
+=item -r
+
+Reverse sort results (implies -s).
+
+=item -u
+
+Return unique results only.
+
+=item -n
+
+Don't include filename in output.
+
+=item -p
+
+Include filename in output (0 by default, but 1 if multiple files are
+included on the command line).
+
+=item -P $re
+
+Print only lines matching regex '$re' (may be specified multiple times).
+
+=item -S $scheme
+
+Only this scheme (may be specified multiple times).
+
+=item -h
+
+Help summary.
+
+=item -v
+
+Display version and exit.
+
+=item -d
+
+Dump compiled regexes for C<-S> and C<-P> to C<STDERR>.
+
+=item -D
+
+Same as C<-d>, but exit after dumping.
+
+=back
+
+=head1 VERSION
+
+This is F<urifind>, revision $Revision: 1.1.1.1 $.
+
+=head1 AUTHOR
+
+darren chamberlain E<lt>darren@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+(C) 2003 darren chamberlain
+
+This library is free software; you may distribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<Perl>

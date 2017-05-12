@@ -1,0 +1,174 @@
+Revision history for POE::Component::Generic.
+
+0.1403 Nov 30 2012
+    - on_exit() has been broken for ... 1.5 years
+
+0.1402 Nov 28 2011
+    - Use FindBin to get t:: into @INC
+    - Allow test delay to be long to deal with slow smokers
+
+0.1401 Aug 26 2011
+    - Added t/00_info.t
+
+0.1400 Wed May 18 2011
+    - Added ->kill()
+    - Added on_exit
+
+0.1300 Wed May 18 2011
+    - Bump copyright date
+    - Don't blindly call $obj->DESTROY, as per rt68062
+    - Confirmed to work with POE 1.311
+    - Tentatively removed the limit of alt_fork on Win32, as per rt67072
+
+0.1205 Wed Sep 16 2009
+    - Tweak 02_pod_coverage.t
+    - Require 5.6
+    - no strict 'subs'; in Net::SSH2 code
+
+0.1204 Tue Sep 15 2009
+    - 21_alt_fork-x.t blindly chmod, then check for +x
+
+0.1203 Tue Sep 15 2009
+
+    - 21_alt_fork-x.t checks to make sure t/alt-fork is +x.  If not, skip
+      tests.  5.10.0 on Ubuntu wasn't setting +x on anything in t/
+        Thank you Naveed Massjouni.
+
+0.1202 Fri Sep 11 2009
+    - Use POE::Wheel::Run->PID instead of $$ from the child
+
+0.1201 Wed May 06 2009
+    - Fix a bunch of warnings that were previously hidden by POE turning off
+        warnings.
+        - Thank you Hinrik
+    - Added 01_pod and 02_pod_coverage
+
+0.1200 Wed Mar 11 2009
+    - Better handling of shutdown, delete wheel on CHLD.  Now the session
+      may _stop, even if the kernel keeps on.
+        Thank you Paul Williams.  Closes RT 44039
+    - Unit tests for above
+    - Create a smaller closure to run the child process
+    - Tweak debug messages
+    - Tweak doco intro
+
+0.1101 Thu Sep 04 2008 
+    - Internal release
+
+0.1100 Wed Jan 23 2008
+    - Did away with mapping PBids to session/event tupples.  This allows
+        us to completely ignore postback GC issues, at the cost of slightly
+        modifying postback semantics.  Win!
+        Closes RT 32067, thank you Paul Driver.
+
+0.1008 Thu Nov 29 2007
+    - t/91_ssh.t wasn't skipping out early if Net::SSH2 wasn't installed
+
+0.1007 Thu Nov 29 2007
+    - Fixed POD synopsis of PoCo::Generic::Net::SSH2
+    - Fixed PoCo::Generic::Net::SSH2 to work with Net::SSH2 0.18
+    - Fixed error about package methods
+    - Improved explanations in the POD.
+    - Added examples.
+    - Don't allow 0-9 in object ID
+
+0.1006 Fri Aug 17 2007
+    - Fixed t/21-alt_fork for NetBSD.  
+        Thank you BinGOs
+
+0.1005 Wed Aug 15 2007
+    - t/alt-fork uses /bin/sh
+
+0.1004 Wed Aug 15 2007
+    - Make sure we have /usr/bin/perl
+
+0.1003 Tue Aug 14 2007
+    - Don't use Data::Denter !
+    - Don't expect @INC to be a given length !
+
+0.1002 Tue Aug 14 2007
+    - alt_fork can be a path to the perl executable
+        Thank you Matt Sickler for the idea
+
+0.1001 Thu Jun 7 2007
+    - refcount_increment on the dest session, not $sender
+        Thank you David Snopek
+
+0.1000
+    - Added {error}
+
+0.0911 Mon Dec 4 2006
+    - Moved to subversion.  Removed Log tags.
+    - Versions in PM_PREREQ now numbers
+
+0.0910 Wed Nov 15 2006
+    - Warnings about alt_fork on MSWin32.
+    - Skip 20_alt_fork.t.
+    - Don't use alt_fork in the other test cases.
+
+0.0905 Tue Aug 29 2006
+    - Better example in PoCo::Generic::Object about factories.
+
+0.0904 Wed May 3 2006
+    - Forgot to add t/P15.pm to manifest
+
+0.0903 Tue May 2 2006
+    - In child, dup STDOUT to talk to parent and dup STDERR to STDOUT so
+      that user code can't mess up the output.
+            Thanks to Jeremy Palmer for pushing me into this idea.
+
+0.0901 Tue Apr 18 2006
+    - Fix alt_fork for MSWin32.  Reported working by BinGOs, thank you.
+
+0.09 Tue Apr 18 2006
+    - Fix Ext::MM::Coverage->ignore in Makefile.PL
+    - Use Win32::LoginName on MSWin32 in Makefile.PL
+    - Tests now check delay within one second
+
+0.08 Thu Apr 13 2006
+    - New vs spawn in the examples
+    - Work around in PoCo::Generic::Net::SSH2 so that the PAUSE indexer 
+        doesn't complain
+    - PoCo::Generic::Net::SSH2 now works with alt_fork=>1
+
+0.07 Wed Apr 12 2006
+    - Added documentation
+    - Added __callback_argument and __postback_arguement
+    - Use Scalar::Util::reftype instead of ref()
+    - Added __package_register
+    - Added PoCo::Generic::Net::SSH2->exec and ->cmd
+    - Fixed PoCo::Generic::Object->DESTROY
+    - Added test cases to improve test coverage
+
+0.06 Tue Apr 11 2006
+    - Added PoCo::Generic::Net::SSH2
+    - Added t/91_ssh2.t which tests the above
+    - Added t/90_ssh.t which tests Net::SSH::Perl
+    - Added options to Makefile.PL to config the above 2 tests
+    - Added Generic->package_register
+    - Added Generic->new options :
+            - packages to configure factory generated packages
+            - child_package so we can overload the Child process behaviour
+    - Object IDs now get incremented properly
+    - Child now uses get_requests to fetch the next requests
+
+0.05 Mon Apr 10 2006
+    - Major refactoring
+    - Added factory methods
+    - Split spawn() and new() apart
+
+0.04 Thu Apr 6 2006
+    - Added callbacks
+    - Renamed all the wheel_* events to __wheel_* so that the only
+      method name that can't be called on an object is 'shutdown'.
+
+0.03 Thu Apr 6 2006
+    - Added callbacks -- still need postbacks
+
+0.02 Thu Apr 6 2006
+    - Brown paper bag edition
+    - Removed Data::Denter usage from test cases
+    - Updated README
+
+0.01 Wed Apr 5 2006
+    - first version based on my module poco client daap

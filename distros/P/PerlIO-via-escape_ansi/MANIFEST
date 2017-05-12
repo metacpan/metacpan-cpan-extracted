@@ -1,0 +1,15 @@
+MANIFEST
+META.yml
+Makefile.PL
+README
+Changes
+lib/PerlIO/via/escape_ansi.pm
+escape_ansi.xs
+escape_chars.c
+escape_chars.h
+t/00-load.t
+t/11-as-filter.t
+t/12-as-function.t
+t/TestData.pm
+t/pod-coverage.t
+t/pod.t

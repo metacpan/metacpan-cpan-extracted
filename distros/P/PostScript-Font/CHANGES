@@ -1,0 +1,124 @@
+Version 1.10.02
+---------------
+
+  * Fixed test basic so it succeeds again on 5.6.
+
+Version 1.10.01
+---------------
+
+  * Fixed test basic so it succeeds on Windows.
+
+Version 1.10
+------------
+
+  * Fixed priority of entries in PS_RESOURCESPATH. Thanks to Michael
+    Piotrowski for finding this.
+
+Version 1.09
+------------
+
+  * Fixed a leak in resources (open file handles) when using True Type
+    fonts.
+
+  * Add WinANSIEncoding.
+
+Version 1.08
+------------
+
+  * Add ISOLatin9Encoding (ISO-8859-15).
+
+Version 1.07
+------------
+
+  * Remove the need for an external program to convert True Type fonts
+    to Type42. With a little help of Font::TTF we can do the
+    conversion ourselves.
+
+  * Fix to PostScript generation with less-than 3 digit octal numbers.
+
+Version 1.06
+------------
+
+  * Small fixes to parsing of AFM files.
+
+Version 1.05
+------------
+
+  * Fix PostScript::PseudoISO::prepstr to handle \240 to retain
+    spaces.
+
+  * Fix PostScript::FontMetrics to allow a dash in glyph names.
+
+Version 1.04
+------------
+
+  * Minor bugfixes.
+
+Version 1.03
+------------
+
+  * New modules: PostScript::BasicTypesetter and PostScript::PseudoISO.
+    These module provides the necessary tools to do basic typesetting.
+    NOTE: THESE MODULES ARE EXPERIMENTAL. THE APIs MAY CHANGE IN THE FUTURE.
+
+  * New module: PostScript::PrinterFontMetrics.
+    This module is like PostScript::FontMetrics, but gets the
+    information from a .PFM file instead.
+    This module was developed and contributed by Andrew Ford.
+
+  * New example/btexample.pl; Shows how to use BasicTypesetter.
+    (Additional: times.upr, time0000.afm and time0003.afm.)
+
+  * fontsampler: Skip fonts that appear to have only .notdef glyphs.
+
+  * Split off the encodings in two separate modules:
+    PostScript::ISOLatin1Encoding and PostScript::StandardEncoding.
+    This eliminates the need for FontMetrics related programs to
+    require Font.pm, just for the encodings.
+
+  * Makefile.PL: Remind the user how to change the directory where the
+    binaries get installed.
+
+  * Bugfix: Use binary read when reading a font (Windows only).
+
+Version 1.02
+------------
+
+  * PostScript::Font: Add FontBBox method.
+
+Version 1.01
+------------
+
+  * PostScript::Font: TrueType fonts are handled by means of
+    converting to Type42 using the 'ttftot42' tool.
+    
+    This program will be used automatically if it can be located on
+    the PATH. Alternatively, you can set the variable
+    $PostScript::Font::ttftot42 to the name of the ttftot42 command on
+    your system. 
+
+    See: http://ftp.giga.or.at/pub/nih/ttftot42 for details.
+
+  * fontsampler: Correct clipping for page 2 and higher.
+
+  * All modules: add value 'ignore' for error option.
+
+  * PostScript::FontMetrics: Handle True Type fonts by extracting the
+    metrics using the 'ttftot42' tool. See above.
+
+  * PostScript::FontMetrics: Use encoding info.
+    New 'kstring' method returns a vector of strings and
+    displacements, suitable for typesetting a text with kerning and a
+    given additional stretch.
+
+  * PostScript::Resources: New module, parses a Unix PostScript
+    Resource (UPR) file. 
+
+    See the specification of the Adobe Display PostScript Toolkit for
+    X, URL: http://www.adobe.com/supportservice/devrelations/PDFS/TN/DPS.refmanuals.TK.pdf
+
+    The format of the font resources file is described in appendix A
+    of this document.
+
+  * example: Added an example program to illustrate how these modules
+    can be used for basis PostScript typesetting.

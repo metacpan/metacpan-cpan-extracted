@@ -1,0 +1,6 @@
+<Octothorpe xmlns:A="uri:type:A" xmlns:C="uri:type:C">
+  <colon/>
+  <pipe>
+    <fishhooks foo="bar" baz="frop" schmoo="fratatatah!" period="one" A:period="two" C:period="three" />
+  </pipe>
+</Octothorpe>

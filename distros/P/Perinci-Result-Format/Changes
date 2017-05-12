@@ -1,0 +1,120 @@
+Revision history for Perinci-Result-Format
+
+0.45    2015-11-29 (PERLANCAR)
+
+	- Observe table.fields result metadata.
+
+
+0.44    2015-11-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- Remove phpserialization test because the dep is now optional
+	  [RT#108424].
+
+
+0.43    2015-10-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- Downgrade prereqs
+	  Data::Format::Pretty::{Perl,PHP,PHPSerialization,Ruby,YAML} from
+	  requires to recommends, to reduce deps.
+
+
+0.42    2015-09-29 (PERLANCAR)
+
+	- Add option is_naked.
+
+
+0.41    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.40    2015-03-10 (PERLANCAR)
+
+	- Change result metadata 'result_format_options' ->
+	  'format_options'.
+
+
+0.39     2015-02-24 (PERLANCAR)
+
+         - 'result_format_options' result metadata: read 'any' format as
+           fallback, remove support for old format.
+
+         - [Bugfix] See only content when status is 2xx, not just 200.
+
+
+0.38     2014-06-18 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Second attempt, coding mistake.
+
+
+0.37     2014-06-18 (SHARYANTO)
+
+         - If $Enable_Cleansing is true, do clone-and-clean instead of
+           clean-in-place, to avoid modifying e.g. Rinci metadata cache in a
+           long-running server.
+
+
+0.36     2014-02-14 (SHARYANTO)
+
+         - Update for the perl formatter (it adds color by default now, so we
+           need to be able to handle/disable it).
+
+
+0.35     2013-10-24 (SHARYANTO)
+
+         - Add format: phpserialization.
+
+
+0.34     2013-10-05 (SHARYANTO)
+
+         - Add formats: perl & ruby.
+
+
+0.33     2013-10-03 (SHARYANTO)
+
+         - text: Colorize error response.
+
+
+0.32     2013-09-16 (SHARYANTO)
+
+         - text: Show previous errors and stack trace.
+
+
+0.31     2013-07-05 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add package variable flag $Enable_Cleansing to allow in-place
+           cleansing of data that contain items that cannot be handled by
+           formatter. For example, JSON cannot handle circular data or complex
+           types other than array/hash.
+
+
+0.30     2013-03-01 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add package variable flag $Enable_Decoration to allow disabling
+           colored YAML/JSON output (used by Perinci-Access-HTTP-Server, for
+           example).
+
+
+0.29     2012-12-25 (SHARYANTO) - Merry Christmas!
+
+         - Observe result metadata: result_format_options.
+
+
+0.28     2012-08-10 (SHARYANTO)
+
+         - First release, split to make Perinci dist empty (that dist was a
+           growing mixed bag and caused headache in dependencies).

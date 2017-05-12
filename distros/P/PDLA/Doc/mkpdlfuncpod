@@ -1,0 +1,93 @@
+use PDLA::Doc;
+use PDLA::Doc::Perldl;
+
+# @dontmod = qw/ PDLA::Graphics::TriD::Tk /;
+%Category = (
+	     IO => '^PDLA::IO',
+	     Graphics => '^PDLA::Graphics',
+	     Core => '^PDLA::Core|
+                      ^PDLA::Primitive|
+                      ^PDLA::Slices|
+                      ^PDLA::Math|
+                      ^PDLA::Basic',
+	     Lib => '^PDLA::Image
+                     |^PDLA::Slatec
+		     |^PDLA::FFT
+                     |^PDLA::Filter
+                     |^PDLA::Fit
+                     |^PDLA::Gaussian
+                     |^PDLA::GSL',
+	     Dev => '^PDLA::Types
+                    |^PDLA::Dbg
+                    |^PDLA::Options
+                    |^PDLA::Autoloader
+                    |^PDLA::Callext
+                    |^PDLA::Doc::Perldl',
+	     Derived => '^PDLA::Complex
+                        |^PDLA::Char
+                        |^PDLA::Func',
+	     );
+
+sub nofunc {
+  my ($func,$hash) = @_;
+  if ($func =~ /AUTOLOAD
+	       |MainLoop
+	       /xs ||
+      $hash->{Ref} =~ /^internal$/) 
+	{ print STDERR "skipping $func\n"; return 1 } else { return 0 }
+}
+
+
+# a very simple script to generate a huge manpage of all documented
+# PDLA functions
+# mainly to demonstrate what we can do with the new doc format
+
+print << 'EOD';
+
+=head1 NAME
+
+pdlfunc - Functions in the PDLA distribution
+
+=head1 DESCRIPTION
+
+This is a listing of all documented functions in the PDLA distribution.
+
+=head2 Alphabetical Listing of PDLA Functions
+
+=over 8
+
+EOD
+
+$onldc = $PDLA::onlinedoc; # new PDLA::Doc ('/tmp/pdlhash.dbtxt');
+$db = $onldc->ensuredb;
+while (my ($key,$val) = each %$db) {
+  my $strip = $key;
+  $strip =~ s/PDLA.*::(.*)$/$1/;
+  $val->{Stripped} = $strip;
+}
+
+@match = $onldc->search('.*',['Name'],1);
+@match = sort {lc $a->[1]->{Stripped} cmp lc $b->[1]->{Stripped}} @match;
+
+for (@match) {
+	next if $_->[1]->{Ref} =~ /(Module|Manual):/ ||
+	nofunc $_->[1]->{Stripped}, $_->[1];
+	$sh = new StrHandle;
+	print STDERR "function $_->[0] ($_->[1]->{Stripped})\n";
+	$onldc->funcdocs($_->[0],$sh);
+	$mod = "\n\nModule: $_->[1]->{Module}\n\n";
+	$stripped = $_->[1]->{Stripped};
+	$txt = $sh->text;
+	$txt =~ s/=head2 (.*)$/=item $stripped$mod/mg;
+	$txt =~ s/^=cut\s*$//mg;
+	$txt =~ s/^=for.*$//mg;
+	$txt =~ s/Docs from .*$//mg;
+	print $txt;
+}
+
+print <<'EOD';
+
+=back
+
+EOD
+

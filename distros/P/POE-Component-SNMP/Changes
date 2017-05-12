@@ -1,0 +1,490 @@
+Revision history for Perl extension POE::Component::SNMP. -*-text-*-
+
+0.01  Mon Apr 21 13:28:31 2003
+        - original version; created by h2xs 1.22 with options
+                -AX -n POE::Component::SNMP
+
+0.90  Mon Jun  7 18:44:00 2004
+        - Module inherited by Rob Bloodgood, from the previous
+          maintainer, Todd Caine.
+
+        - added POE::Component::SNMP::Dispatcher module, to subclass
+          Net::SNMP::Dispatcher such that all socket and scheduling
+          operations were processed by POE's event loop.
+
+        - updated the callback variables so that the hostname and
+          session alias of the SNMP object queried are returned to the
+          callback event.
+
+        - made write tests optional during install, so that the module
+          would install correctly even where a writeable host was
+          unavailable.
+        
+0.92  Mon Sep  6 13:19:53 2004
+        - Updated to be compatible with new Net::SNMP release 5.0.0
+
+0.93  Thu Aug 11 11:57:29 2005
+        - Updated POE session constructor from the deprecated new() to
+          the new create() method.
+
+        - Removed a bunch of commented, deprecated code that was still
+          a holdover from the 0.01
+
+0.94  Thu Mar 30 14:43:19 2006
+        - Reorganized the module distribution to use a lib/ dir, cuz
+          MakeMaker was being dumb.
+
+        - Updated Makefile.PL to remove the config file on 'make
+          realclean'
+
+        - Tweaked the docs.
+
+        - Altered the sample script in the SYNOPSIS to actually work.
+
+        - Removed remaining commented references to deprecated code.
+
+        - Followed a suggestion from Curtis J. Coleman to re-order
+          component shutdown so that finish() worked correctly.
+
+        - Lots of minor cleanups in the text
+
+        - At LAST: removed the duplicate methods to account for the
+          difference between Net::SNMP 4.x and 5.x.  Now this is
+          achieved by aliasing the functions that need to be
+          duplicated in the symbol table.
+
+0.95  Sat Apr  8 14:46:54 PDT 2006
+        - Collapsed all the identical method calls into a dispatch
+          mechanism around a single method call template.
+
+        - VASTLY improved error handling.
+
+        - Added the snmp method (eg get, set, walk) and request args
+          to the request packet returned to callbacks.
+
+        - Reorganized Dispatcher.pm, trimmed old commented
+          code. Removed unneeded debugging statements.
+
+	- trimmed unnecessary parameters from calls to
+          __invoke_callback().
+
+        - added new tests for various aspects of error handling.
+
+0.96  Mon Apr 10 01:29:40 PDT 2006
+	- re-ordered the hostname and community checks so that the
+	  fatal "hostname is required" is thrown BEFORE the warning
+	  "using default community".
+
+	- added new tests for error conditions and parameter errors
+
+	- changed the return values to always return something sane,
+          e.g. a string or a ref, not a string or a ref or maybe an
+          undef, THEN a string!  The only reason I didn't change this
+          before is that I mistakenly thought this weird error
+          structure came directly from Net::SNMP, but it turns out I
+          just inherited it. <sigh>
+
+	- for compatibility, continue to return the $snmp_object->error
+	  value in the second slot, since the last change alters the API.
+
+	- Also, changed the original args returned to callbacks from
+          being a listref to a simple list, in the same way they
+          came in.
+
+	- Unified style in docs.  Cleaned up internal and external POD
+          links.
+
+0.97  Mon Apr 10 13:14:01 PDT 2006
+        - Fixed some formatting tweaks in the docs.
+
+        - Renamed the function snmp_last_error_message to snmp_errmsg,
+          to correspond the the component request 'errmsg', like the
+          other method names.
+
+        - DANG!  Left in some debugging references to YAML and Spiffy
+          that I meant to comment out. Which breaks systems that don't
+          have those modules installed.  Grr.  Fixed.
+
+        - Also pulled references to YAML from the sample script... not
+          everybody has YAML.
+
+0.98  Wed Apr 12 20:02:12 PDT 2006
+        - Improved dispatcher tracing by making all calls consistently
+          trace their execution.  Use Net::SNMP debug functions to
+          report our activities when the debug flag to trace the
+          Dispatcher is set in the constructor.  Gives nice,
+          consistent trace output.
+
+        - Started work to remove the requirement that each host have a
+          different -localport parameter.  I chased it down.  The
+          fundemental question is, how is it possible for Net::SNMP to
+          reuse the same socket for every remote host, without parsing
+          the internals of the packet and matching them to a "replies
+          expected" table?  The answer is, it is not.  Net::SNMP
+          dispatches all queries in the order received, serially.  The
+          workaround we used is correct.  Note to self: NOW STOP
+          WONDERING IF THIS IS POSSIBLE!
+
+        - Accidentally optimized the whole module by a factor of at
+          least 3x by copying Net::SNMP::Dispatcher's send_pdu() into
+          PoCo::SNMP::Dispatcher.  See notes on send_pdu().
+
+        - Changed __schedule_event so that events with no delay simply
+          invoke their callback args instead of post()ing to
+          __invoke_callback.  This saves me a POE state call.
+
+        - Updated _send_pdu to return TRUE, just like the Net::SNMP
+          version does.
+
+0.99
+	- Changed send_pdu() optimization. Instead of being a copy of
+          the N:S:D's, we simply change the function reference
+          involved, with local(), before invoking SUPER::send_pdu().
+
+        - Changed __send_next_pdu and __pdu_sent around... the 2nd
+          half of __send_next_pdu belonged logically in __pdu_sent.
+          This saves me a POE state call and is cleaner.
+
+        - Renamed __send_next_pdu to __dispatch_pdu.
+
+        - Discovered that select_read() can take additional args to
+          pass back to the event triggered when a handle goes live.
+          Duuhh.  What this means is, I no longer have to dig into
+          Net::SNMP to find out where they stashed the callback,
+          indexed by the fileno of the socket.  Instead I can simply
+          pass and invoke the supplied callback.  This changed
+          register(), __listen, and __socket_callback.
+
+	- Discovered that extra args support for select_read() wasn't
+          added until 0.32. <sigh> Coded it back, only this time
+          without mucking around with private attributes of my parent
+          class.
+
+	- Tweaked whitespace so stuff looks consistent.
+
+	- Copied the sanity check from Net::SNMP that loads and
+          verifies the dispatcher instance.  Now P:C:S:Dispatcher
+          doesn't muck around with Net::SNMP's package space, just
+          subclasses it.  Instead, P:C:S loads the Dispatcher in a
+          BEGIN block, just like Net::SNMP.  THEN it mucks with
+          Net::SNMP's namespace. <evil grin>
+
+	- Replaced references to $self in the constructor with $this,
+          following Net::SNMP's convention and the rest of the module.
+
+	- Removed alot of folds.  I had folds around every function,
+          now I just have them around major sections.
+
+	- Started working on the edge case where somebody is dumb
+          enough to call finish() while data is still pending.	
+
+	- Updated constructor to accept all forms of -alias, alias,
+          Alias, and the same for -hostname.
+
+	- Removed the check for a valid varbindlist in the error
+          handler of the snmp_request().  Just return the error.
+
+	- Changed tracking of _current_pdu from a reference to the
+          callback args to a simple flag.  All it needs to do is
+          *exist*.
+
+        - Triple-checked that the reference changing done in
+          send_pdu() was indeed persisting for subsequent
+          invocations of _send_pdu().
+
+        - Adusted the debug output to have a more verbose mode
+          available.
+
+        - More work on the finish() cleanup... now we delete pending
+          requests but allow the current request to complete.
+
+	- Altered socket listen/unlisten operations to use
+          select_pause_read() and select_resume_read(), because docs
+          say they are more lightweight.  Initial tests show reduction
+          of approx. 20% in system loadavg with loadavg_multi_snmp.
+
+	- moved the socket ops to two new private methods,
+          _watch_handle() and _unwatch_handle().  These functions
+          maintain the reference counting of who has what handle,
+          without any of the rest of the module having to count any
+          part of it.  that's good. :)
+
+	- had to adjust _unwatch_handle() to NOT stop listening when
+          there are replies due, in __clean_pending
+
+	- put the folds back in, not quite as many before tho.  it's
+          easier to go from block to block that way, and only have the
+          functions unfolded that I'm working on.
+
+	- moved tracking of current and pending requests from the
+          session heap to the dispatcher object, so that the info can
+          be retrieved in POE or non-POE space.
+
+	- added the private method _pending_pdu_count(), based on
+          the last change.
+
+        - renamed __pdu_sent to __dispatch_pending_pdu
+
+	- use _pending_pdu_count() check to skip invoking
+          __dispatch_pending_pdu unless there is actually anything
+          pending.  this saves me a POE state call for most situations.
+	
+	- added accessors for current and pending pdus, instead of
+          getting directly into the heap hash or object.
+
+	- tried to change __clear_pending from an event to an object
+          method, but it hangs when I do that.
+
+	- way, way more tests.  almost rewrote 40_set from
+          scratch... now instead of just blindly setting something, it
+          reads it, sets something else, verifies, then puts it back
+          and verifies.  Much more robust.
+
+        - turns out that a better hook for subclassing than schedule()
+          is _event_insert().  By using it instead, we get A) the same
+          $event reference that cancel() receives, and B) a method
+          name that does *not* change between 4.x and 5.x.  The logic
+          for cancel() stays the same.
+
+	- commented references to schedule/_schedule in the
+          compatibility section.
+
+        - changed _event_insert() so that if the time to invoke the
+          callback is immediate, it is invoked right then, *instead*
+          of calling __schedule.  This saves me another POE state
+          call, woo-hoo!
+
+        - created a global debug flag in the config file so that I can
+          turn on and off debug output in *all* tests with one change.
+
+        - followed to the suggestion of Curtis J. Coleman to add the
+          ability to set arbitrary callback arguments to be returned
+          to callback events along with ordinary response data.
+          created tests for it. actually, I put in a couple of lines
+          of code and then wrote the tests... and then actually put in
+          the feature. :) tests are cool.
+
+        - changed a coupla stray call()'s in the tests to posts().
+
+        - added tests and logic for localport conflicts... my previous
+          code didn't work, and I ran into this error: "Failed to bind
+          UDP/IPv4 socket: Address already in use at ~/bin/wackastat
+          line 38", followed by "POE::Kernel's run() method was never
+          called."
+
+        - added an _arg_scan() to flexibly fetch values from a *list*
+          of key/value pairs.
+
+        - finally tracked down and eliminated the last stray reference
+          that was holding our sessions open when we called 'finish'
+          with requests still in the pipe!!!!  It turns out the
+          $MESSAGE_PROCESSING subsystem was holding a cached copy of
+          our request, including its callback.
+
+        - put an error check in __dispatch_pending_pdu based on an
+          error report from Curtis Coleman
+
+1.00 Mon Apr 24 15:55:23 PDT 2006
+        - release
+
+1.01 Mon Apr 24 17:41:08 PDT 2006
+        - already got an error report from Curtis
+          Coleman.. __socket_callback ended up seeing an empty
+          callback.  Fix by deferring unless there is a current callback.
+
+1.02 Tue Apr 25 11:38:00 PDT 2006
+        - CPAN automated testing indicates not being able to correctly
+          locate TestPCS.pm.  Turns out I forgot to put it into the
+          MANIFEST, so it wasn't bundled in the distribution!
+
+        - Turns out my tests were anticipating the wealth of results
+          available from the Net-SNMP daemon, which is not delivered
+          from, for example, an Alcatel DSLAM.  With the invaluable
+          assistance of Curtis Coleman again, as well as a few others
+          in #PoE, got the tests straightened out.  Thanks guys!
+
+1.03 Fri Jun  2 18:51:19 PDT 2006
+        - small doc tweaks
+
+        - micro-optimized _pending_pdu_count by skipping exists() and
+          just using ref().
+
+        - added a check to __schedule_event to execute immediately if
+          for some strange reason the time of execution has already
+          arrived and yet we're still invoking __schedule.
+
+        - fixed a logic error in the -localport initializer that was
+          preventing retries if the random port chosen was already in
+          use.  Thanks to Curtis Coleman for the spot.
+
+1.04 Tue Jun  6 14:35:30 PDT 2006
+        - my fix was broken.  fixed for real this time.  thanks to
+          Curtis AGAIN!
+
+1.05 Fri Jun 16 13:00:40 PDT 2006
+        - turned off $VERBOSE in Dispatcher.pm... even when debug
+          messages weren't being shown, VERBOSE adds some extra
+          processing that is unnecessary (unless, of course, you're
+          developing PoCo::SNMP :).
+
+        - my assumptions about having a singleton dispatcher session
+          fell apart when a user tried to run the POE kernel more than
+          once... after the first run, the session is destroyed,
+          causing subsequent runs to fail.  added destructor logic to
+          the dispatcher's _stop event, and constructor logic to the
+          main component's create() method.  Now it functions properly
+          if run more than once.  Thanks to Nigel Bowden for the spot.
+
+1.06 Tue Sep 12 00:43:42 PDT 2006
+        - finish() behavior was broken... calling finish() for one
+          session finished (well, broke) the entire component,
+          PERMANENTLY.  oops.  removed all references to the internal
+          "_abort" flag.  now the caveat is, if you finish() using
+          POE::Kernel->call() in the same event that you've made
+          requests, the program will hang because there will be stray
+          events.  use post(), or yield() instead.  Thanks to Kenny
+          Flegal for the spot *and* the test case.
+
+	- cleaned up the -localport logic a little bit... added a
+          do..while() where I had a while() plus the same line of code
+          twice.
+
+        - added a 'trap2c' method a version or two ago... but forgot
+          to add it to the states list in the constructor for the
+          PoCo::SNMP session.  This meant that anybody trying to use
+          it would silently fail.  oops.  same for 'callback_args'.
+          oops twice.
+
+        - did a little bit of refactoring in Dispatcher.pm to make
+          identifiers "tell the story" a little better, cuz on a
+          re-read of the logic it wasn't "instantly clear" what I'd
+          been trying to do. __dispatch_pdu and __dispatch_pending_pdu
+          read more clearly now.
+
+        - made my debugging functions a little better at no-op'ing
+          when not debugging, resulting in a small improvement in
+          "make test" times.
+
+1.07 Wed Sep 27 16:30:17 PDT 2006
+        - added 71_multi_autherror.t to test SNMP v2c authentication
+          errors.  Net::SNMP returns 'no response'.
+
+        - changed the call to POE::Kernel->post() to yield() in
+          deregister(), saving the overhead of resolving the session
+          since it is always called within the Dispatcher session.
+
+        - also changed register() and schedule() in the Dispatcher to
+          use POE::Kernel->call() instead of post(), because they
+          doesn't hurt concurrency there, all they do is select_read()
+          or alarm_set() then return.
+
+        - removed an extraneous localport() accessor from SNMP.pm.
+
+        - re-enabled the "duplicate session" check in the constructor
+          because POE now correctly allows the check under
+          ASSERT_DEFAULT.
+
+        - Finally added folds to SNMP.pm.
+
+        - Minor changes to the documentation.
+
+        - Removed an unused variable from __clear_pending().
+
+1.10 Fri Jul 25 01:39:08 PDT 2008
+        - Added a Test::Pod pod.t to increase module Kwalitee.  *NOT*
+          adding Test::Pod::Coverage stuff because my "coverage" isn't
+          in functions, but in states.  Plus, Dispatcher doesn't have
+          or need docs.  So there.
+
+        - altered/renamed _get_next_pending_pdu(), returning a scalar
+          to _get_next_pending_pdu_args, returning an array, to unify
+          __dispatch_pdu and __dispatch_pending_pdu
+
+        - merged the __dispatch_pending_pdu event completely into
+          __dispatch_pdu, by making deregister fetch the pending args,
+          since the only difference between them was where they got
+          the args for the SUPER::_send_pdu() call.
+
+        - added clarification to the docs WRT concurrency.
+
+        - fixed a small bug in the error handling for callback_args.
+
+        - POE_ASSERT_DATA still throws a fatal error when
+          alias_resolve() fails (up until 0.95), so updated the check
+          to match this "minimum" condition.
+
+        - updated the docs to have sample usages of each of the
+          request types.
+
+        - tweaked the localport conflict detection slightly.  Added a
+          test for it.
+
+        - Andrew Hoying sent in a patch adding the getentries method,
+          along with POD *and* a test case... woo-hoo!  He reports
+          that switching some of his code from walk to getentries
+          significantly cut down on the amount of packets sent over
+          the network.
+
+        - renamed (un)?watch_transport to (un)?watch_socket.  It's
+          closer to what I really mean, and I've started work on
+          PoCo::SNMP::Session, which will have such a similar
+          structure to this module that I want to unify the
+          differences as far as possible.
+
+        - attempted to alter socket watch/unwatch behavior to leave
+          the socket "hot" in between requests.  This saves 2 method
+          calls and 2 kernel calls per request.  However, it's not
+          quite right, so it's currently disabled
+
+        - fixed a bug where SNMPv3 requests that fail could let me wind
+          up in __clear_pending without a valid socket to unwatch/clear.
+
+        - fixed a bug where I checked _pending_pdu without passing a
+          (mandatory) fileno parameter.  Oops.
+
+        - got the "hot" socket logic right.  I kinda cheated... I just
+          skipped right past pausing/resuming select_read on the sockets.
+
+
+
+        - finally got the tests right.  I hope.
+
+
+1.1001 Fri Aug  1 01:58:09 PDT 2008
+        - nope, still didn't get it right. left a stray dependency.  
+          changed my version system because I seem to do this alot.  now 
+          releasing version 1.1001.  I'm hoping I don't have to release
+          version 1.1002 tomorrow. :)
+
+1.1002 Fri Dec  4 18:33:23 PST 2009
+        - Updated for Net::SNMP v6.0.0
+
+        - looking more closely at my fail reports, they have another
+          problem: Net::SNMP uses a v-string, and it doesn't compare
+          properly in the test suite.  Tweaked Makefile.PL.
+
+        - Applied cleanup patches from gcola aka acferen__yahoo.com to
+          eliminate some harmless but annoying warnings.
+
+        - Turns out that using POE::Kernel->method as a global access
+          to the kernel is unsupported.  Since I'm already importing
+          POE::Kernel, I have $poe_kernel in my namespace already, so
+          use that instead.
+
+1.1003
+        - Cleanups
+
+1.1004 Mon Dec  7 13:17:15 PST 2009
+        - more cleanups
+
+1.1005 Mon Dec  7 13:30:08 PST 2009
+        - Apparently my 'eval { use Sub::Identify }' is causing
+          hiccups with smoke testing.  Rewritten to 'eval { require
+          Sub::Identify }'
+
+1.1006 Sun Jan 10 20:17:10 PST 2010
+        - well I'm now blushing because I finally found a bug that was
+          reported to me but I was previously unable to reproduce.
+          The author of Net::SNMP has released v6.0.0, which doesn't
+          compare very well to a "regular" number like 5.0.  This
+          broke my 4.x support.  So I have removed it.

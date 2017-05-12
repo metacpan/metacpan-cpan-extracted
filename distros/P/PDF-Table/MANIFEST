@@ -1,0 +1,22 @@
+Changes
+examples/header.pl
+examples/header_repeat_with_cell_props.pl
+examples/row_height.pl
+examples/sample1.pl
+examples/table_of_lorem.pdf
+lib/PDF/Table.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+README.md
+t/Basics.t
+t/lib/PDFAPI2Mock.pm
+t/lib/TestData.pm
+t/PDF-Table.t
+t/pod.t
+t/manifest.t
+t/table.t
+util/pod2cpanhtml.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

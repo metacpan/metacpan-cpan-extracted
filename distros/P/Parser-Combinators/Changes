@@ -1,0 +1,13 @@
+Revision history for Parser-Combinators
+
+0.05  2015-09-18 13:22:46 BST
+        - Factored out Data::Dumper into show()
+0.04  2015-09-17 14:44:34 BST
+        - Fixed hash comparison using is_deeply() rather than Dumper()
+
+0.03  2013-08-29 10:30:13 BST
+        - getParseTree now returns a hash of hashes, for easy access to the parsed data.
+        - Fixed README.md minor typographical issues
+
+0.02  2013-08-26 15:35:07 BST
+        - Better documentation, renamed some combinators to be the same as in Parsec, fixed bindP/returnP, added more tests

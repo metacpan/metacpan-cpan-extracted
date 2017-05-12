@@ -1,0 +1,51 @@
+PostScript-ScheduleGrid-XMLTV version 0.04, released August 15, 2015
+
+
+This module uses PostScript::ScheduleGrid to create printable TV
+listings from data provided by XMLTV.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+
+DEPENDENCIES
+
+  Package                       Minimum Version
+  ----------------------------- ---------------
+  perl                           5.10.0
+  DateTime::Format::XMLTV        
+  Encode                         
+  List::Util                     
+  Moose                          
+  Moose::Util::TypeConstraints   
+  MooseX::Types::DateTime        
+  MooseX::Types::Moose           
+  PostScript::ScheduleGrid       
+  XMLTV                          0.005
+  namespace::autoclean
+
+
+
+CHANGES
+    Here's what's new in version 0.04 of PostScript-ScheduleGrid-XMLTV:
+    (See the file "Changes" for the full revision history.)
+
+	- Add 10-sample.t
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

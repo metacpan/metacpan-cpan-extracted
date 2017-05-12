@@ -1,0 +1,250 @@
+NAME
+
+    Pod::Cats - The POD-like markup language written for podcats.in
+
+VERSION
+
+    Version 0.05
+
+DESCRIPTION
+
+    POD is an expressive markup language - like Perl is an expressive
+    programming language - and for a plain text file format there is little
+    finer. Pod::Cats is an extension of the POD semantics that adds more
+    syntax and more flexibility to the language.
+
+    Pod::Cats is designed to be extended and doesn't implement any default
+    commands or entities.
+
+SYNTAX
+
+    Pod::Cats syntax borrows ideas from POD and adds its own.
+
+    A paragraph is any block of text delimited by blank lines (whitespace
+    ignored). This is the same as POD, and basically allows you to use hard
+    word wrapping in your markup without having to join them all together
+    for output later.
+
+    There are three command paragraphs, which are defined by their first
+    character. This character must be in the first column; whitespace at
+    the start of a paragraph is syntactically relevant.
+
+    =COMMAND CONTENT 
+
+      A line beginning with the = symbol denotes a single command. Usually
+      this will be some sort of header, perhaps the equivalent of a <hr>,
+      something like that. It is roughly equivalent to the self-closing tag
+      in XML. CONTENT is just text that may or may not be present. The
+      relationship of CONTENT to the COMMAND is for you to define, as is
+      the meaning of COMMAND.
+
+      When a =COMMAND block is completed, it is passed to "handle_command".
+
+    +NAME CONTENT 
+
+      A line beginning with + opens a named block; its name is NAME.
+      Similar to =COMMAND, the CONTENT is arbitrary, and its relationship
+      to the NAME of the block is up to you.
+
+      When this is encountered you are invited to "handle_begin".
+
+    -NAME 
+
+      A line beginning with - is the end of the named block previously
+      started. These must match in reverse order to the + block with the
+      matching NAME - basically the same as XML's <NAME></NAME> pairs. It
+      is passed to "handle_end", and unlike the other two command
+      paragraphs it accepts no content.
+
+    Then there are two types of text paragraph, for which the text is not
+    syntactically relevant but whitespace still is:
+
+    Verbatim paragraphs
+
+      A line whose first character is whitespace is considered verbatim. No
+      removal of whitespace is done to the rest of the paragraph if the
+      first character is whitespace; all your text is repeated verbatim,
+      hence the name
+
+      The verbatim paragraph continues until the first non-verbatim
+      paragraph is encountered. A blank line is no longer considered to end
+      the paragraph. Therefore, two verbatim paragraphs can only be
+      separated by a non-verbatim paragraph with non-whitespace content.
+      The special formatting code Z<> can be used on its own to separate
+      them with zero-width content.
+
+      All lines in the verbatim paragraph will have their leading
+      whitespace removed. This is done intelligently: the minimum amount of
+      leading whitespace found on any line is removed from all lines. This
+      allows you to indent other lines (even the first one) relative to the
+      syntactic whitespace that defines the verbatim paragraph without your
+      indentation being parsed out.
+
+      "Entities" are not parsed in verbatim paragraphs, as expected.
+
+      When a verbatim paragraph has been collated, it is passed to
+      "handle_verbatim".
+
+    Paragraphs
+
+      Everything that doesn't get caught by one of the above rules is
+      deemed to be a plain text paragraph. As with all paragraphs, a single
+      line break is removed by the parser and a blank line causes the
+      paragraph to be processed. It is passed to "handle_paragraph".
+
+    And finally the inline formatting markup, entities.
+
+    X<>  
+
+      An entity is defined as a capital letter followed by a delimiter that
+      is repeated n times, then any amount of text up to a matching
+      quantity of a balanced delimiter.
+
+      In normal POD the only delimiter is <, so entities have the format
+      X<>; except that the opening delimiter may be duplicated as long as
+      the closing delimiter matches, allowing you to put the delimiter
+      itself inside the entity: X<<>>; in Pod::Cats you can use any
+      delimiter, removing the requirement to duplicate it at all: C[ X<> ].
+
+      Once an entity has begun, nested entities are only considered if the
+      delimiters are the same as those used for the outer entity: B[
+      I[bold-italic] ]; B[I<bold>].
+
+      Apart from the special entity Z<>, the letter used for the entity has
+      no inherent meaning to Pod::Cats. The parsed entity is provided to
+      "handle_entity". Z<> retains its meaning from POD, which is to be a
+      zero-width 'divider' to break up things that would otherwise be
+      considered syntax. You are not given Z<> to handle, and Z<> itself
+      will produce undef if it is the only content to an element. A
+      paragraph comprising solely Z<> will never generate a parsed
+      paragraph; it will be skipped.
+
+METHODS
+
+ new
+
+    Create a new parser. Options are provided as a hashref, but there is
+    currently only one:
+
+    delimiters
+
+      A string containing delimiters to use. Bracketed delimiters will be
+      balanced; other delimiters will simply be used as-is. This echoes the
+      delimiter philosophy of Perl syntax such as regexes and q{}. The
+      string should be all the possible delimiters, listed once each, and
+      only the opening brackets of balanced pairs.
+
+      The default is '<', same as POD.
+
+ parse
+
+    Parses a string containing whatever Pod::Cats code you have.
+
+ parse_file
+
+    Opens the file given by filename and reads it all in and then parses
+    that.
+
+ parse_lines
+
+    "parse" and "parse_file" both come here, which just takes the markup
+    text as an array of lines and parses them. This is where the logic
+    happens. It is exposed publicly so you can parse an array of your own
+    if you want.
+
+ handle_verbatim
+
+    The verbatim paragraph as it was in the code, except with the minimum
+    amount of whitespace stripped from each line as described in Verbatim
+    paragraphs. Passed in as a single string with line breaks preserved.
+
+    Do whatever you want. Default is to return the string straight back
+    atcha.
+
+ handle_entity
+
+    Passed the letter of the entity as the first argument and its content
+    as the rest of @_. The content will alternate between plain text and
+    the return value of this function for any nested entities inside this
+    one.
+
+    For this reason you should return a scalar from this method, be it text
+    or a ref. The default is to concatenate @_, thus replacing entities
+    with their contents.
+
+    Note that this method is the only one whose return value is of
+    relevance to the parser, since what you return from this will appear in
+    another handler, depending on what type of paragraph the entity is in.
+
+    You will never get the Z<> entity.
+
+ handle_paragraph
+
+    The paragraph is split into sections that alternate between plain text
+    and the return values of handle_entity as described above. These
+    sections are arrayed in @_. Note that the paragraph could start with an
+    entity.
+
+    By default it returns @_ concatenated, since the default behaviour of
+    handle_entity is to remove the formatting but keep the contents.
+
+ handle_command
+
+    When a command is encountered it comes here. The first argument is the
+    COMMAND (from =COMMAND); the rest of the arguments follow the rules of
+    paragraphs and alternate between plain text and parsed entities.
+
+    By default it returns @_ concatenated, same as paragraphs.
+
+ handle_begin
+
+    This is handled the same as handle_command, except it is called when a
+    begin command is encountered. The same rules apply.
+
+ handle_end
+
+    The counterpart to the begin handler. This is called when the "end"
+    paragraph is encountered. The parser will already have discovered
+    whether your begins and ends are not balanced so you don't need to
+    worry about that.
+
+    Note that there is no content for an end paragraph so the only argument
+    this gets is the command name.
+
+TODO
+
+    The document is parsed into DOM, then events are fired SAX-like.
+    Preferable to fire the events and build the DOM from that.
+
+    Currently the matching of begin/end commands is a bit naive.
+
+    Line numbers of errors are not yet reported.
+
+AUTHOR
+
+    Altreus, <altreus at perl.org>
+
+BUGS
+
+    Bug reports to github please: http://github.com/Altreus/Pod-Cats/issues
+
+SUPPORT
+
+    You are reading the only documentation for this module.
+
+    For more help, give me a holler on irc.freenode.com #perl
+
+ACKNOWLEDGEMENTS
+
+    Paul Evans (LeoNerd) basically wrote Parser::MGC because I was whining
+    about not being able to parse these entity delimiters with any of the
+    token parsers I could find; and then he wrote a POD example that I only
+    had to tweak in order to do so. So a lot of the credit should go to
+    him!
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2013 Altreus.
+
+    This module is released under the MIT licence.
+

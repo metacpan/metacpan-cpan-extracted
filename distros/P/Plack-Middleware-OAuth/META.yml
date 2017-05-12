@@ -1,0 +1,33 @@
+---
+abstract: 'Plack middleware for OAuth1, OAuth2 and builtin provider configs. '
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.03'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Plack::Middleware::OAuth
+name: Plack-Middleware-OAuth
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DateTime: 0
+  Digest::MD5: 0
+  File::Spec: 0
+  HTTP::Request::Common: 0
+  JSON::Any: 0
+  LWP::Protocol::https: 0
+  LWP::UserAgent: 0
+  Net::OAuth: 0
+  Plack::Middleware::Session: 0
+  URI: 0
+  URI::Query: 0
+  YAML::Any: 0
+version: 0.10

@@ -1,0 +1,5 @@
+TYPEMAP
+PApp::Recode::Pconv		T_PTROBJ
+
+
+

@@ -1,0 +1,37 @@
+---
+abstract: 'Dynamic policies for Perl::Critic.'
+author:
+  - 'Jeffrey Thalhammer <thaljef@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perl-Critic-Dynamic
+provides:
+  Perl::Critic::Dynamic:
+    file: lib/Perl/Critic/Dynamic.pm
+    version: 0.05
+  Perl::Critic::DynamicPolicy:
+    file: lib/Perl/Critic/DynamicPolicy.pm
+    version: 0.05
+  Perl::Critic::Policy::Dynamic::ValidateAgainstSymbolTable:
+    file: lib/Perl/Critic/Policy/Dynamic/ValidateAgainstSymbolTable.pm
+    version: 0.05
+requires:
+  Devel::Symdump: 2.07
+  Perl::Critic::Policy: 1.108
+  Perl::Critic::Utils: 1.108
+  Readonly: 0
+  Storable: 2.16
+resources:
+  MailingList: http://perlcritic.tigris.org/servlets/SummarizeList?listName=users
+  homepage: http://perlcritic.com
+  license: http://dev.perl.org/licenses/
+  repository: http://guest@perlcritic.tigris.org/svn/perlcritic/trunk/distributions/Perl-Critic-Dynamic/
+version: 0.05

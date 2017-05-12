@@ -1,0 +1,123 @@
+%strict
+
+%token ID INT INTEGER 
+%syntactic token HEX
+
+%right '='
+%left '+'
+
+%{
+use base 'DebugTail';
+my %st;
+%}
+
+%tree bypass alias
+
+%%
+stmt:
+    decl <* ';'> expr <%name EXPS + ';'>
+      {
+        $_[2]->{st} = { %st };
+        $_[2];
+      }
+;
+
+decl:
+    INT ID <+ ','>
+      {
+        $st{$_->{attr}} = 1 for $_[2]->children();
+      }
+;
+
+expr:
+    %name ID
+    $ID
+      {
+        my $parser = shift;
+
+        my $hexflag = $parser->{HEXFLAG};
+        if ($hexflag and !exists($st{$ID}) and $ID =~ m{^([A-F0-9]+$)}) {
+          Parse::Eyapp::Node->new('NUM', sub { $_[0]->{attr} = hex($ID) }); 
+        }
+        else {
+          Parse::Eyapp::Node->new('ID', sub { $_[0]->{attr} = $ID });
+        }
+      }
+  | %name NUM
+    INTEGER
+  | %name HEX
+    HEX '(' { $_[0]->{HEXFLAG} = 1; } $expr { $_[0]->{HEXFLAG} = 0 } ')'
+      { $expr }
+  | %name ASSIGN
+    id '=' expr 
+  | %name PLUS
+    expr '+' expr
+;
+
+id : ID
+;
+
+%%
+
+# Context-dependant lexer
+__PACKAGE__->lexer( sub {
+    my $parser = shift;
+
+    for (${$parser->input}) {    # contextualize
+      m{\G\s*(\#.*)?}gc;
+
+      m{\G(HEX\b|INT\b)}igc and return (uc($1), $1);
+
+      m{(\G\d+)}gc and return ('INTEGER', $parser->{HEXFLAG}? hex($1) : $1);
+
+
+      return ('ID', $1) if m{\G([a-zA-Z_]\w*)}gc;
+
+      m{\G(.)}gc         and return ($1, $1);
+
+      return('',undef);
+    }
+  }
+);
+
+*TERMINAL::info = *NUM::info = *ID::info = sub {
+  $_[0]->{attr}
+};
+
+__PACKAGE__->main unless caller();
+
+=head1 SYNOPSIS
+
+Compile it with:
+
+            eyapp -b '' Tieins.eyp
+
+Run it with:
+
+            ./Tieins.pm -t -f inputforsemanticinfo.txt
+
+try also:
+
+            ./Tieins.pm -t -f inputforsemanticinfo2.txt
+
+=head1 THIS EXAMPLE
+
+In this "Calc"-like example we have a language with a special construct C<hex
+(hex-expr)>. After the keyword C<hex> comes an C<expression> in parentheses in
+which all integers are hexadecimal. In particular, strings in C</[A-F0-9]+/>
+like C<A1B> must be treated as an hex integer unless they were previously
+declared.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item * File C<SemanticInfoInTokens.eyp>
+
+=item * L<http://www.gnu.org/software/bison/manual/html_mono/bison.html#Lexical-Tie_002dins>
+
+=item * L<http://en.wikipedia.org/wiki/The_lexer_hack>
+
+=item * L<http://eli.thegreenplace.net/2007/11/24/the-context-sensitivity-of-cs-grammar/>
+
+=back

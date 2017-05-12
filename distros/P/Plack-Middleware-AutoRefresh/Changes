@@ -1,0 +1,21 @@
+Changes for Plack::Middleware::AutoRefresh
+
+0.09 - Wed Sep 14 16:34:12 EDT 2016
+    Properly escapes curly brackets in regex (RT#117496)
+    Thanks to srezic for the bug report.
+    [Removes warnings on perl 5.22. Upgrade recommended if using 5.22 or later.]
+
+
+0.08 - Tue Mar 30 18:46:50 2010
+    Bug fix release: close tcp sessions upon subsequent requests (RT#56119)
+
+    Fixed a bug in which tcp sessions were remaining open. The js
+    client would reload every 1.5s and eventually we would use up
+    all the tcp ports.
+
+    Made the js a bit more robust. Should deal with terminated
+    plack servers much more reliably--ie, continue to try to reload.
+
+0.05 - Thu Feb 11 08:40:08 2010
+    Initial release to cpan
+

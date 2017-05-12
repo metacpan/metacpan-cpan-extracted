@@ -1,0 +1,148 @@
+## name GoodFeatures
+## failures 0
+## cut
+
+my $x : Foo = 1;
+use UNIVERSAL ();
+UNIVERSAL->can('foo');
+use POSIX ();
+for my $foo (qw(foo bar)) { ... }
+1 for qw(foo bar);
+do { ... };
+do '...';
+do $foo;
+isalnum $foo;
+isalpha $foo;
+iscntrl $foo;
+isdigit $foo;
+isgraph $foo;
+islower $foo;
+isprint $foo;
+ispunct $foo;
+isspace $foo;
+isupper $foo;
+isxdigit $foo;
+tmpnam $foo;
+defined $foo;
+defined $foo[0];
+defined $foo{bar};
+defined &foo;
+foo ? bar ? 'foo' : 'bar' : 'baz';
+foo ? bar ? foo : bar : baz;
+$foo =~ m?foo?;
+$foo =~ s?foo?bar?;
+$foo =~ m/foo/x;
+$foo =~ s/foo/bar/x;
+qr/foo/x;
+"\N{FOO BAR}";
+`\N{FOO BAR}`;
+qx(\N{FOO BAR});
+qq{\N{FOO BAR}};
+qr/\N{FOO BAR}/;
+m'\N{FOO BAR}';
+s{\N{FOO BAR}}{};
+keys %hash;
+keys %$href;
+keys(%{$href});
+keys %{$foo{bar}[5]};
+keys $foo->{bar}[5]->%*;
+shift(@array);
+shift @$aref;
+shift @{$aref};
+shift(@{$foo->{bar}[5]});
+shift $foo->{bar}[5]->@*;
+shift;
+shift();
+
+## name BadFeatures
+## failures 42
+## cut
+
+$[ = 1;
+my $x := 1;
+UNIVERSAL->import;
+use UNIVERSAL;
+use UNIVERSAL 'foo';
+for my $foo qw(foo bar) { ... }
+do foo(...);
+do &foo(...);
+do $foo(...);
+POSIX::isalnum($foo);
+POSIX::isalpha($foo);
+POSIX::iscntrl($foo);
+POSIX::isdigit($foo);
+POSIX::isgraph($foo);
+POSIX::islower($foo);
+POSIX::isprint($foo);
+POSIX::ispunct($foo);
+POSIX::isspace($foo);
+POSIX::isupper($foo);
+POSIX::isxdigit($foo);
+POSIX::tmpnam($foo);
+defined @foo;
+defined %foo;
+defined(@foo);
+defined(%foo);
+$foo =~ ?foo?;
+$foo =~ m/foo/xx;
+$foo =~ s/foo/bar/xx;
+qr/foo/xx;
+"\N{FOO BAR}";
+`\N{FOO BAR}`;
+qq{\N{FOO BAR}};
+qx(\N{FOO BAR});
+qr^\N{FOO BAR}^;
+m<\N{FOO BAR}>;
+s/\N{FOO BAR}//;
+each $ref;
+keys($ref);
+pop $foo->{bar};
+push $foo{bar}[0];
+shift($foo->[5]);
+splice $foo, $bar, $baz;
+unshift $ref, @bar;
+values $ref;
+
+## name MultipleBadFeatures
+## failures 6
+## cut
+
+qr!\N{FOO BAR}!xx;
+m,\N{FOO BAR},axbxc;
+s[\N{FOO BAR}][]xxx;
+
+## name POSIXDeprecations
+## failures 12
+## cut
+
+use POSIX;
+isalnum $foo;
+isalpha $foo;
+iscntrl $foo;
+isdigit $foo;
+isgraph $foo;
+islower $foo;
+isprint $foo;
+ispunct $foo;
+isspace $foo;
+isupper $foo;
+isxdigit $foo;
+tmpnam $foo;
+
+## name POSIXDeprecationsImported
+## failures 12
+## cut
+
+use POSIX qw(isalnum isalpha iscntrl isdigit isgraph islower isprint ispunct isspace isupper isxdigit tmpnam);
+isalnum $foo;
+isalpha $foo;
+iscntrl $foo;
+isdigit $foo;
+isgraph $foo;
+islower $foo;
+isprint $foo;
+ispunct $foo;
+isspace $foo;
+isupper $foo;
+isxdigit $foo;
+tmpnam $foo;

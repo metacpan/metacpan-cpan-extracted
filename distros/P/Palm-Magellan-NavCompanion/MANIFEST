@@ -1,0 +1,18 @@
+Changes
+examples/README
+files/waypoints.pdb
+files/waypoints1.pdb
+lib/Palm/NavCompanion.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/compile.t
+t/fields.t
+t/Load.t
+t/pod.t
+t/pod_coverage.t
+t/prereq.t
+t/raw_records.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

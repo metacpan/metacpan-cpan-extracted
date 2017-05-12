@@ -1,0 +1,27 @@
+NAME
+    Plack::Middleware::DiePretty - Show a 500 error page if you die
+
+SYNOPSIS
+      enable 'DiePretty';
+      enable 'DiePretty', template => 'my/500.html';
+
+OPTIONS
+    The following are options that can be passed to this module.
+
+    *template*
+        The location of your template (currently, Template::Toolkit parsed)
+
+BUGS
+    All complex software has bugs lurking in it, and this module is no
+    exception. If you find a bug please either email me, or add the bug to
+    cpan-RT.
+
+AUTHOR
+    Justin Hunter <justin.d.hunter@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Justin Hunter
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

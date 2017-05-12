@@ -1,0 +1,736 @@
+=pod
+
+=head1 PseudoPod
+
+A Pod Extension for Authoring Large Documents
+
+=head2 Introduction
+
+Perl's "Plain Old Documentation" format (Pod) is not, by any means, a
+perfect markup language. It lacks XML's robust features of
+well-formedness and unambiguous syntax. In fact, it was never intended
+to be anything more than a simple format for embedding documentation
+inside programs, as Larry Wall's comment in the perlpod man page
+alludes:
+
+  "...I'm not at all claiming this to be sufficient for producing a
+  book."
+
+Yet many Pod People -- er, I mean, authors -- want to do just that.
+Pod is, after all, the darling of Perl hackers everywhere. O'Reilly
+decided to extend it into the realm of large, complex documents, such
+as the typical book. This extension, called PseudoPod (thanks to
+Jason McIntosh for the excellent name), adds some inline tags,
+block structures, and rules to make processing work smoothly.
+
+Before you go any further, you should go and read the perlpod man
+page, if you haven't already. It lays the foundation for PseudoPod,
+establishing some important rules for syntax and semantics that we
+rely on.
+
+=head2 Terminology
+
+Before we dive into the nitty-gritty details of PseudoPod, we should
+recap the basic concepts of Pod. The following table covers just about
+everything:
+
+=over
+
+=item Block
+
+A region of text that contains one or more lines, such as a
+paragraph, head, code listing, or figure.
+
+  =begin foo
+
+  Fa la la la la.
+
+  =end foo
+
+=item Inline Segment
+
+A region of text that contained inside a block, usually
+within one line, with localized style properties or semantics.
+
+  I I<loved>
+  Proust's T<Remembance of Things Past>.
+
+=item Simple Paragraph
+
+Just a plain, ordinary block of text. Always unindented.
+
+  Hello there.
+
+=item Verbatim Paragraph
+
+A section of code, screen output, or an equation whose space and
+characters need to be preserved, verbatim. Always indented.
+
+      x + y = z
+
+=item Command Paragraph
+
+Start a new block style of one or more lines. Multi-line commands may
+require another command to end the block.
+
+  =head1 What I Did On My Summer Vacation
+
+=item Begin Block
+
+A block that contains other blocks, usually to create a
+special structure, such as a figure or sidebar.
+
+  =begin note
+
+  It's not a good idea to stick metal objects
+  into a wall socket.
+
+  =end note
+
+=item For Block
+
+A block that denotes a special style or semantic, for
+example to generate a visible comment in text.
+
+  =for production
+
+  In the following paragraph, please use the
+  Mayan petroglyph for corn in place of [corn].
+
+  =end for
+
+
+=back
+
+=head2 Simple Paragraphs
+
+Simple paragraphs are well-named, for they have no special formatting
+requirements other than to separate them with a blank line. Here are
+two simple paras living together in a file:
+
+  A bland, uninteresting, boring,
+  garden-variety, nondescript, rudimentary,
+  common, run-of-the-mill, low-key,
+  unassuming, plain old paragraph.
+
+  Another bland, uninteresting, boring,
+  garden-variety, nondescript, rudimentary,
+  common, run-of-the-mill, low-key,
+  unassuming, plain old paragraph.
+
+Simple paragraphs will not preserve special spacing. Pod formatters
+are allowed to throw away line breaks, adjust line width, and make any
+other changes to beautify the paragraphs. If you need to preserve
+spacing for any reason, you should use a verbatim paragraph.
+
+Note that simple paragraphs may not be indented. Any indented line
+will be treated as a line of code in a separate block.
+
+=head2 Verbatim Paragraphs
+
+A verbatim paragraph will, unlike the simple paragraph type, preserve
+all spaces and linebreaks. It's distinguished by indenting every line
+at least one space. The amount doesn't matter, as long as subsequent
+lines are indented as least as much as the first line. The Pod parser
+will measure the first line's indentation and subtract it from
+following lines.
+
+Here's an example:
+
+  # generate a magic number
+  sub floopy {
+    my $x = shift;
+
+    if( $x >= 9 ) {
+      return ($x << 3) * 7;
+    } else {
+      return 0;
+    }
+  }
+
+Blank lines in code are okay. The verbatim block will continue until a
+simple paragraph or command paragraph interrupt it.
+
+Please do not use tabs! Tab characters are unpredictible. We will try
+to convert them into strings of 8 spaces, but that might not be what
+you want. So, to be unambiguous about it, please only use spaces.
+
+=head2 Command Paragraphs
+
+Command paragraphs are used for all other structures in Pod. The
+command takes the form of an equals sign (=) followed by some string
+of alphabetic characters and either a newline or a space and an
+optional string of data. It looks like this:
+
+  =COMMAND DATA
+
+The equals sign must be the first character on the line or it will be
+interpreted as something else. If you need to place an equals sign at
+the beginning of a line, you should use an inline tag like C<=> to
+encapsulate it. It's good style, but not required, to precede and
+follow a command paragraph with blank lines.
+
+The data can be anything, and it depends on the context what will be
+done with it. A =head1 command would use data as a section title. This
+line would begin a table and use everything after the word "graphic"
+as the title of the table:
+
+  =begin table graphic Using array references.
+
+So the data may contain other commands with data, several levels deep.
+In general, we try to keep it pretty simple, however.
+
+=head2 Heads and Document Structure
+
+The most common command paragraph type is the head. A head takes the
+form of =headN TITLE where N is a single digit from 0 to 4, inversely
+proportional to its level of significance and TITLE is the text to be
+used in the head. Level 0 is for the title of a chapter, while level 4
+is a sub-sub-sub-section (also called a D-head). An A-head, or level 1
+section, would look like this:
+
+  =head1 Lizard Feeding Tips
+
+Pod books typically are split up into multiple files, each
+containing a single chapter, appendix, or part page (intro to a part
+of the book). Every PseudoPod file should follow this pattern:
+
+  =head0 CHAPTER TITLE
+
+  INTRO PARAGRAPH.
+
+  =head1 SECTION TITLE
+
+  INTRO PARAGRAPH.
+
+  =head2 SUBSECTION TITLE
+
+  INTRO PARAGRAPH.
+
+  PARAGRAPH.
+
+    line of code
+      line of code
+        line of code
+      line of code
+    line of code
+
+  ...
+
+The file should always start with a =head0 which corresponds to a
+chapter or appendix title. There should be only one per file.
+Following that is a =head1 which starts a new section. This may be
+followed by a =head2 and so on down to =head4, but no further than
+that. Please be careful to nest section levels properly. It's an error
+to have something line this:
+
+  =head1 A Happy Section
+
+  Blah blah blah blah.
+
+  =head3 A Misplaced Section!
+
+  This section doesn't belong here.
+
+So never let a =head3 follow a =head1 without an intervening =head2 or
+the parser will likely burst into flames. And it's bad style too.
+
+=head2 Inline Character Tagging
+
+Inline character tags, also known as interior sequences in Pod
+parlance, are a special syntactic form that delineates special
+treatment for character sequences inside a block. For example, to mark
+a word so that it has italic font style, you would do this:
+
+  This I<word> should be italicized.
+
+In this example, the word "word" will be rendered in italics, while
+all the other words will be treated normally.
+
+The general form of an inline tag is a single character (A-Z are
+currently supported), followed by a start delimiter and end delimiter.
+The simplest delimiters are angle brackets (< and >). But sometimes
+these aren't enough. If you need to enclose the character >, for
+example, then you have to use an alternate delimiter set so the parser
+won't be confused. In that case, you can use multiples of < and
+>, as long as the number of braces on the left match the number on the
+right. You can also add space between brackets and data, which will be
+stripped. These all do the same thing:
+
+  C<foo>
+  C<<foo>>
+  C<< foo >>
+  C<<<<< foo >>>>>
+
+We have tried to preserve all the inline tags defined in the original
+Pod spec. The set used by PseudoPod adds a bunch more. The following
+table lays out the tags and their meanings:
+
+   Tag  Meaning                        Example
+   A, L Cross reference to an end      See A<sect-fooby>. 
+        point declared with Z<>
+
+   B    Bold                           You make me B<very>
+                                       angry.
+
+   C    Constant Width                 Set the data using the
+                                       method C<setData()>.
+
+   E    Entity reference               The product is x
+                                       E<times> y.
+
+   F    Filename                       Edit the file F<.cshrc>.
+
+   G    Superscript                    E = MCG<2>
+
+   H    Subscript                      HH<2>O
+
+   I    Italic                         Do I<not> eat that.
+
+   M    First occuring term            This phenomenon is
+                                       called M<granulation>.
+
+   N    Footnote                       TheoreticallyN<Meaning,
+                                       "not really>, it's possible.
+
+   R    Replaceable thing              C< R<n> + 2 >, where
+                                       R<n> is the number of pages
+
+   S    Text with non-breaking spaces
+
+   T    Citation                       Read my book, T<Eating Meat
+                                       and Loving It>.
+
+   U    URL                            Download the module from
+                                       U<http://www.cpan.org/>.
+
+   X    Index term                     X<chicken, recipes for>
+
+   Z    A cross reference endpoint     =begin figure My Bedroom
+                                       Z<fig-br>
+
+
+Some notes about the above table:
+
+=over
+
+=item 1
+
+The C<A> tag will be replaced with some generated text that
+references another object. Its data is a unique indentifier string
+that matches a C<Z> tag elsewhere in the document. So, if there is
+an A head followed by a C<ZE<lt>floofE<gt>>, then you can insert
+C<AE<lt>floofE<gt>> anywhere in the document. It will be replaced with
+something like "Section 3.4, 'Gloppy Drainpipes'" or whatever makes
+sense in that context. This will work with sections, chapters, tables,
+examples, or figures.
+
+=item 2
+
+In standard Pod, C<E> means any escaped character, but we have
+taken this further. In PseudoPod, the data in C<E> is the name of
+an XML entity, as defined in ISO-8879. So, translated into XML it
+would wind up as &times; and when translated into Unicode, it
+would become the multiplication symbol ×. For a complete list of
+these entities, consult DocBook, The Definitive Guide by Walsh and
+Muellner, which contains a handy table in an appendix.
+
+=item 3
+
+As is also true for all other inlines, the C<N> tag, for footnotes,
+cannot contain multiple paragraphs.
+
+=item 4
+
+The C<X> tag will not be displayed where it's invoked. Instead, the
+parser will stash it away to use in building the index later.
+(Technically, it will still be located there after conversion, but
+in another form that is also invisible.) Separate primary,
+secondary, and tertiary terms with a comma. Start the data with
+the words "See" or "See also" to create an index entry that
+redirects to another term. Only one C<X> tag per entry is allowed.
+
+=item 5
+
+The C<Z> tag always follows a command paragraph to which it lends
+its data as an identifier. Elsewhere in the file, an C<A> tag will
+contain the same data, setting up a cross reference to that
+structure.
+
+=back
+
+The most common type of error we see in Pod files is imbalanced
+delimiters in inline tags. Be wary of this! These are all errors:
+
+  C<>>
+  C<< x - y > z >
+  T<The Marsupial Handbook, by Joeseph Skrim, is a great...
+
+=head2 Cross References
+
+Cross references are easy, if you remember where to put the link
+endpoints. We've named the two inline tag types for internal cross
+references to be easy to remember. Just think, "from A to Z".
+C<AE<lt>DATAE<gt>> starts a cross reference to an object with an
+identifer "DATA". It can appear inside any simple paragraph or list.
+C<ZE<lt>DATAE<gt>> completes a cross reference by labelling the object
+that contains it "DATA". It always appears inside a structure, right
+after the command paragraph that starts it, like a figure or section.
+
+The following is an example, with a paragraph containing a cross
+reference that points to a figure:
+
+  Our escape route takes us underneath the prison wall, out into an
+  old apple orchard. The map is detailed in A<escape-route>.
+
+  =begin figure picture Tunnel Trajectory
+
+  Z<escape-route>
+    ... picture here ...
+
+  =end figure
+
+It doesn't matter if the C<A> tag comes before or after the C<Z> tag,
+nor how many times the C<Z> is referenced. However, every C<A> must
+reference an existing C<Z>, and no two C<Z> tags can contain the same
+identifier.  It's not a fatal error, but will cause the parser to
+complain and be unable to complete the link.
+
+If you want to reference something in another file, it works the same
+way. However, all the files share the same namespace for identifiers.
+Make sure that you don't use the same identifier twice in different
+files or cross references will behave unpredictibly.
+
+=head2 Lists
+
+A list always begins with a =over command and ends with a =back
+command. List items start with =item and can take several forms,
+depending on the kind of list:
+
+=over
+
+=item bulleted list
+
+Place a star after the =item like this:
+
+  =over
+
+  =item * popsicle
+
+  =item *
+  ice cream
+
+  =back
+
+Note that it doesn't matter if the item text continues on the
+same line as the star or begins on a new line.
+
+=item numbered list
+
+Place a number after the =item. The actual value doesn't
+matter, as the formatter will number items automatically, so
+typically people just use the number "1":
+
+  =over
+
+  =item 1 mount bicycle
+
+  =item 1
+  balance on seat
+
+  =item 1 put feet on pedals
+
+  =item 1 pedal quickly so you don't fall over
+
+  =back
+
+Again, it doesn't matter if you continue on the same line with
+item text. Longer paras will probably be more readable if you
+use a new line.
+
+=item term-definition list
+
+The term immediately follows the =item command, with definition
+on a new line:
+
+  =over
+
+  =item food
+
+  A thing to ingest that gives you energy and tastes yummy.
+
+  =item mud
+
+  A thing you play with and makes your clothes all dirty.
+
+  =back
+
+=back
+
+Lists can be nested, and each list item can hold multiple paragraphs.
+But please, no tables or figures inside lists. They're icky and make
+the parser sad. Here's a complex example:
+
+  If you need sugar in a hurry, this list will provide some
+  suggestions:
+
+  =over
+
+  =item 1 Donuts
+
+  There are three principle varieties of this confection:
+
+  =over
+
+  =item 1 Crullers
+
+  =item 1 Roundies
+
+  =item 1 Jellies
+
+  =back
+
+  =item 1 Candy bars
+
+  Even more carbohydrates packed into a convenient, tiny package. Some
+  of my favorites are:
+
+  =over
+
+  =item 1 Payday (nutty)
+
+  =item 1 Snickers (nougaty)
+
+  =item 1 Zagnut (coconutty)
+
+  =back
+
+  =back
+
+=head2 Examples
+
+An example is simply a wrapper for something to give it a title and
+hook for cross references. The usual candidate for inclusion is a code
+listing. Here's an example:
+
+  =begin listing A Frightening Subroutine
+
+  Z<ex-scary>
+
+    for( my $i=0; $i<10; $i++ ) {
+      print "BOO!\n";
+    }
+
+  =end listing
+
+=head2 Tables
+
+A table is a great way to convey complex information in a compact way.
+Unfortunately, tables are themselves complex when it comes to markup.
+We realize that authors don't like to be constrained in complex markup
+scenarios, so we offer three ways to markup tables:
+
+=over
+
+=item *
+
+As a Pod formatted table
+
+=item *
+
+As verbatim text
+
+=item *
+
+As an HTML-tagged table
+
+=back
+
+Here's the basic form of a table:
+
+  =begin table TYPE TITLE
+
+  Z<IDENTIFIER>
+
+  CONTENT
+
+  =end table
+
+The preferred method is the PseudoPod table format which has =row 
+and =cell tags, as well as =headrow to mark the heading row 
+and =bodyrows to mark the start of the main body of the table:
+
+  =begin table An Example Table
+
+  =headrow
+
+  =row
+
+  =cell Header for first column (row 1, col 1)
+
+  =cell Header for 2nd column (row 1, col 2)
+
+  =bodyrows
+
+  =row
+
+  =cell Cell for row 2, col 1
+
+  =cell Cell for row 2, col 2
+
+  =row
+
+  =cell Cell for row 3, col 1
+
+  =cell Cell for row 3, col 2
+
+  =end table
+
+The second method is a freestyle, anything-goes format. Make your own
+columns and headers any way you want. The plus side is: infinite
+creativity! The downside is: we will end up recoding the whole table
+ourselves in production which slows us down a bit. Just try to make it
+clear what is in which column and on what row, and it will be okay
+with us.
+
+The table markup is a wrapper, similar to examples, but with an extra
+keyword, TYPE, to denote the kind of table. If the keyword is "html",
+our parser will read it like an HTML table. If it's anything else,
+like "graphic" or "picture", it will be treated as an ASCII rendering.
+For example:
+
+  =begin table picture Comparing Camels to Horses.
+
+  Z<camel-horse-chart>
+
+    CAMEL                HORSE
+    Lives in desert      Lives in grassland
+    Bumpy                Smooth
+    Spits                Kicks
+
+  =end table
+
+=head2 Figures
+
+A figure holds some kind of picture, whether an imported graphic or an
+ASCII masterpiece you paint yourself. The general form is similar to a
+table's:
+
+  =begin figure TYPE TITLE
+
+  Z<IDENTIFIER>
+
+  CONTENT
+
+  =end figure
+
+If the TYPE is "graphic", then the parser will expect to see a
+reference to an external file, the name of a graphic to import. For
+example:
+
+  =begin figure graphic My Hairstyle
+
+  Z<fig-hair>
+
+  F<figs/myhair.gif>
+
+  =end figure
+
+For any other value of TYPE, the parser assumes you drew your own
+lovely diagram in text:
+
+  =begin figure pikchur My Hairstyle
+
+  Z<fig-hair>
+
+      \  | / //
+      \ \ - / \
+       \ | /
+       (o o)      I look like a pineapple!
+       ( < )
+       (===)
+
+  =end figure
+
+=head2 Other Structures
+
+The rest of this tutorial is a mixed bag of oddball stuff you can drop
+in your book.
+
+=head3 Comments
+
+If you want to leave a comment in the manuscript for somebody to see,
+you can use the =for command. The data in the command specifies who
+the comment is for. Typical designations include "production",
+"author", and "editor". For instance:
+
+  =for editors
+
+  My misspelling of 'antidisestablishmentarianism' in the following
+  paragraph is intentional.
+
+  =end for
+
+=head3 Literal Layouts
+
+If you want something to be treated like a verbatim paragraph, but not
+rendered in constant width font, then use =begin literal. Here's a bit
+of poetry done up like that:
+
+  =begin literal
+
+  As I was going up the stair,
+  I met a man who was not there.
+  He wasn't there again today;
+  I wish that man would go away.
+
+  =end literal
+
+=head3 Footnotes
+
+Footnotes use the C<N> inline tag to locate them inside blocks.
+Strangely, they also function like blocks in that they can be many
+lines long. The following example shows how you might use them:
+
+  O'Reilly books often contain footnotes,N<Perl books especially, it
+  would seemN<Though I wouldn't go so far as to say they I<overdo>
+  it.>.> though I believe that house style limits them to three per
+  page.N<Uh oh.>
+
+=head3 Epigraphs
+
+For an epigraph, just wrap it up in a =begin epigraph command like
+this:
+
+  =begin epigraph
+
+  Great art must be licked.
+  --Jas W Felter, Mail Artist
+
+  =end epigraph
+
+=head3 Author Information
+
+If you need to specify the author's name for a particular chapter or
+article, use the =author command:
+
+  =author Ferdinand Buscaglia
+
+=head2 History
+
+PseudoPod was originally the brainchild of Jason "J-mac" McIntosh who
+worked for O'Reilly's Publishing Tools Group. It was used for many
+venerable Perl books, including several revisions of the Camel and
+Llama. The Pod::PseudoPod modules were developed by Allison Randal while
+writing a book for O'Reilly as an easy-to-use and easy-to-install
+alternative to O'Reilly's internal PseudoPod parsing and formatting
+tools, to allow authors to check their formatting before submitting
+files.
+
+As of 2007, PsuedoPod is no longer used or maintained by O'Reilly, after
+they switched all their manuscripts to DocBook. L<Pod::PseudoPod> is now
+the primary parser for PseudoPod, and includes
+L<Pod::PseudoPod::DocBook> to generate DocBook output suitable for
+submission to O'Reilly.
+
+=end

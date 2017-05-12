@@ -1,0 +1,11 @@
+# $Id: MANIFEST,v 1.3 2005/11/29 12:09:10 mrodrigu Exp $
+Changes
+lib/Params/Style.pm
+Build.PL
+README
+t/1.t
+t/autotie.t
+t/pod.t
+t/pod_coverage.t
+MANIFEST
+META.yml

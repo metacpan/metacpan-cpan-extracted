@@ -1,0 +1,51 @@
+NAME
+
+    POE::Loop::EV - a bridge that supports EV from POE
+
+SYNOPSIS
+
+        use POE 'Loop::EV';
+        
+        ...
+        
+        POE::Kernel->run();
+
+DESCRIPTION
+
+    This class is an implementation of the abstract POE::Loop interface. It
+    follows POE::Loop's public interface exactly. Therefore, please see
+    POE::Loop for its documentation.
+
+CAVEATS
+
+    Certain EV backends do not support polling on normal filehandles,
+    namely epoll and kqueue. You should avoid using regular filehandles
+    with select_read, select_write, ReadWrite, etc.
+
+    See the libev documentation
+    <http://pod.tst.eu/http://cvs.schmorp.de/libev/ev.pod#PORTABILITY_NOTES>
+    for more information on portability issues with different EV backends.
+
+SEE ALSO
+
+    POE, POE::Loop, EV
+
+AUTHOR
+
+    Andy Grundman <andy@hybridized.org>
+
+CONTRIBUTORS
+
+      * Dan Book <dbook@cpan.org>
+
+THANKS
+
+    Brandon Black, for his POE::Loop::Event_Lib module.
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2007 by Andy Grundman.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

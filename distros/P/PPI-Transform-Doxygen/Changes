@@ -1,0 +1,6 @@
+0.1 2017-01-11
+  - first public release
+
+0.2 2017-01-12
+  - fixed script installation
+  - fixed missing pod errors

@@ -1,0 +1,196 @@
+MODULE = Panda::URI                PACKAGE = Panda::URI
+PROTOTYPES: DISABLE
+
+URI* URI::new (string url = string(), int flags = 0) {
+    RETVAL = new XSURI(url, flags);
+}
+
+string URI::url (SV* newval = NULL, int flags = 0) {
+    if (newval) {
+        try { THIS->assign(SvOK(newval) ? sv2string(aTHX_ newval) : "", flags); }
+        catch (URIError exc) { croak(exc.what()); }
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->to_string();
+}
+            
+string URI::scheme (SV* newval = NULL) : ALIAS(proto=1, protocol=2) {
+    if (newval) {
+        try { THIS->scheme(SvOK(newval) ? sv2string(aTHX_ newval) : ""); }
+        catch (URIError exc) { croak(exc.what()); }
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->scheme();
+    PERL_UNUSED_VAR(ix);
+}
+
+string URI::user_info (SV* newval = NULL) {
+    if (newval) {
+        THIS->user_info(SvOK(newval) ? sv2string(aTHX_ newval) : "");
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->user_info();
+}    
+    
+string URI::host (SV* newval = NULL) {
+    if (newval) {
+        THIS->host(SvOK(newval) ? sv2string(aTHX_ newval) : "");
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->host();
+}
+ 
+int URI::port (SV* newval = NULL) {
+    if (newval) {
+        THIS->port(SvIV(newval));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->port();
+}
+    
+string URI::path (SV* newval = NULL) {
+    if (newval) {
+        THIS->path(SvOK(newval) ? sv2string(aTHX_ newval) : "");
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->path();
+}    
+    
+string URI::query_string (SV* newval = NULL) {
+    if (newval) {
+        THIS->query_string(SvOK(newval) ? sv2string(aTHX_ newval) : "");
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->query_string();
+} 
+    
+string URI::raw_query (SV* newval = NULL) {
+    if (newval) {
+        THIS->raw_query(SvOK(newval) ? sv2string(aTHX_ newval) : "");
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->raw_query();
+}
+        
+SV* URI::query (...) {
+    if (items > 1) {
+        XSURIWrapper::add_query_args(aTHX_ THIS, MARK+2, items-1, true);
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS_wrapper->query_hv(aTHX);
+    SvREFCNT_inc(RETVAL);
+}
+    
+void URI::add_query (...) {
+    XSURIWrapper::add_query_args(aTHX_ THIS, MARK+2, items-1);
+}
+
+string URI::param (string_view name, SV* val = NULL) : ALIAS(multiparam = 1) {
+    if (val) {
+        XSURIWrapper::add_param(aTHX_ THIS, string(name), val, true);
+        XSRETURN_UNDEF;
+    }
+    if (ix == 0) { // param method
+        Query::const_iterator it = THIS->query().find(name);
+        if (it == THIS->query().cend()) XSRETURN_UNDEF;
+        RETVAL = it->second;
+    } else { // multiparam method
+        size_t nvals = THIS->query().count(name);
+        switch (nvals) {
+            case 0:
+                XSRETURN_EMPTY; break;
+            case 1:
+                RETVAL = THIS->query().find(name)->second; break;
+            default:    
+                SP -= items;
+                EXTEND(SP, nvals);
+                const auto& query = THIS->query();
+                auto pair = query.equal_range(name);
+                for (auto it = pair.first; it != pair.second; ++it) mPUSHp(it->second.data(), it->second.length());
+                XSRETURN(nvals);
+        }
+    }
+}
+
+int URI::nparam () {
+    RETVAL = THIS->query().size();
+}    
+    
+size_t URI::remove_param (string name) {
+    RETVAL = THIS->query().erase(name);
+}
+    
+string URI::fragment (SV* newval = NULL) : ALIAS(hash=1) {
+    if (newval) {
+        THIS->fragment(SvOK(newval) ? sv2string(aTHX_ newval) : "");
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->fragment();
+    PERL_UNUSED_VAR(ix);
+}    
+    
+string URI::location (SV* newval = NULL) {
+    if (newval) {
+        THIS->location(SvOK(newval) ? sv2string(aTHX_ newval) : "");
+        XSRETURN_UNDEF;
+    }
+    RETVAL = THIS->location();
+}    
+
+uint16_t URI::explicit_port ()
+
+uint16_t URI::default_port ()
+
+string URI::explicit_location ()
+    
+string URI::relative () : ALIAS(rel=1) {
+    RETVAL = THIS->relative();
+    PERL_UNUSED_VAR(ix);
+}
+    
+string URI::to_string (...) : ALIAS(as_string=1) {
+    RETVAL = THIS->to_string();
+    PERL_UNUSED_VAR(ix);
+}
+
+bool URI::secure ()
+
+void URI::set (URI* source) {
+    try { THIS->assign(*source); }
+    catch (URIError exc) { croak(exc.what()); }
+}    
+    
+void URI::assign (string url, int flags = 0) {
+    try { THIS->assign(url, flags); }
+    catch (URIError exc) { croak(exc.what()); }
+}
+    
+bool URI::equals (URI* other) {
+    RETVAL = THIS->equals(*other);
+}    
+    
+URI* URI::clone () {
+    HV* CLASS = SvSTASH(SvRV(ST(0)));
+    if (dynamic_cast<URI::Strict*>(THIS)) RETVAL = URI::create(*THIS);
+    else                                  RETVAL = new URI(*THIS);
+}
+    
+void URI::path_segments (...) {
+    if (items > 1) {
+        std::vector<string_view> list;
+        list.reserve(items-1);
+        for (I32 i = 1; i < items; ++i) list.push_back(sv2string_view(aTHX_ ST(i)));
+        THIS->path_segments(list.cbegin(), list.cend());
+        XSRETURN_EMPTY;
+    }
+    const std::vector<string> list = THIS->path_segments();
+    EXTEND(SP, list.size());
+    for (std::vector<string>::const_iterator it = list.begin(); it != list.end(); ++it) mPUSHp(it->data(), it->length());
+}
+
+bool URI::to_bool (...) {
+    RETVAL = THIS->scheme().length() || THIS->host().length() || THIS->path().length() || THIS->query_string().length() ||
+             THIS->fragment().length();
+}
+    
+void URI::DESTROY () {}

@@ -1,0 +1,48 @@
+{
+   "abstract" : "A simple POE Component for monitoring DHCP traffic.",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-DHCP-Monitor",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::DHCP::Packet" : "0.66",
+            "POE" : "1.004",
+            "POE::Wheel::SocketFactory" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/poe-component-dhcp-monitor",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/poe-component-dhcp-monitor.git",
+         "web" : "https://github.com/bingos/poe-component-dhcp-monitor"
+      }
+   },
+   "version" : "1.04"
+}
+

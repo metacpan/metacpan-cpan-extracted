@@ -1,0 +1,15 @@
+NAME
+
+    Protocol::MTProto - Helper functions for MTProto
+
+DESCRIPTION
+
+    This distribution is very-much a work-in-progress. Right now it simply
+    contains a TL schema parser, but the hope is that it will eventually
+    contain a full implementation of TL and MTProto, sufficient to create a
+    Perl Telegram client.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

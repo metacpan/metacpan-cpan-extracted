@@ -1,0 +1,2 @@
+requires 'Pcore', v0.22.2;
+requires 'Imager';

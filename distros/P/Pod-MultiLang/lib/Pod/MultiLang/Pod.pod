@@ -1,0 +1,119 @@
+=encoding utf-8
+
+=for stopwords
+	MultiLang
+	MultiLang-pod
+	buildtext
+	langs
+	mlpod
+	utf-8
+	verbmsg
+
+=head1 NAME
+
+Pod::MultiLang::Pod - turn MultiLang-pod into just pod
+
+
+=head1 SYNOPSIS
+
+ $parser = Pod::MultiLang::Pod->new(%opts);
+ $parser->parse_from_file($infile,$outfile);
+
+=head1 DESCRIPTION
+
+Pod::MultiLang::Pod translates pod into normal pod.
+This inherits L<Pod::MultiLang> and it inherits L<Pod::Parser>, 
+usage is same as Pod::Parser.
+
+
+=head1 OPTIONS
+
+method new takes follow arguments:
+
+
+=over
+
+=item langs
+
+ langs => [qw(ja en)]
+
+inherited from Pod::MultiLang.
+pass to Pod::MultiLang->new(). 
+see L<Pod::MultiLang/new>.
+
+
+specify languages. 
+paragraphs which exist in mlpod document but not selected with
+C<langs> are ignored in result.
+
+
+=item in_charset
+
+encoding for input document.
+default is utf-8. 
+
+
+=item out_charset
+
+encoding for output document.
+default is utf-8.
+
+
+and embed as 
+Z<><meta content="Content-Type" value="text/html; charset=" /> .
+
+
+=item default_lang
+
+language for outsize of JZ<><> interior sequence.
+
+
+=back
+
+=head1 METHODS
+
+=head2 new
+
+create new instance.
+
+
+=head1 OVERRIDES
+
+This module implements L<Pod::Parser>.
+
+
+=over 4
+
+=item begin_pod
+
+=item end_pod
+
+=item interior_sequence
+
+=back
+
+=head1 PRIVATE FUNCTIONS
+
+=over 4
+
+=item rebuild
+
+=item buildtext
+
+=item output_pod
+
+=item on_mlpod_link
+
+=item on_mlpod_plain
+
+=item verbmsg
+
+=item parse_mlpod
+
+=back
+
+=head1 SEE ALSO
+
+L<Pod::MultiLang>
+
+

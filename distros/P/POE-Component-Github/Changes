@@ -1,0 +1,12 @@
+Changelog for POE-Component-Github
+==================================
+
+0.08  Tue Mar  8 01:14:25 GMT 2011
+  - Update required version of POE::Filter::HTTP::Parser
+    and fix tests
+
+0.06	Tue May 19 10:20:35 BST 2009
+	- Added URI::Escape to the prereqs.
+
+0.02	Sun May 17 23:11:52 BST 2009
+	- Initial CPAN release

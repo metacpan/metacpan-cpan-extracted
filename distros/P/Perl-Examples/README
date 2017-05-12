@@ -1,0 +1,20 @@
+DESCRIPTION
+
+    EARLY RELEASE, MORE EXAMPLES TO COME, CONTRIBUTIONS WELCOME.
+
+    This distribution, as the name suggests, contains a random collection
+    of various Perl modules/scripts, mostly for testing. Some examples are:
+
+      * script that generates warning
+
+      * script that dies
+
+      * script that contains an endless loop
+
+      * script that grows indefinitely
+
+      * module that contains POD examples
+
+    As more examples are added they might get reorganized (renamed, spun
+    off to another dist, etc).
+

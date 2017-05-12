@@ -1,0 +1,25 @@
+---
+abstract: 'node.js path module in perl'
+author:
+  - 'Mamod Mehyar <mamod.mehyar@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Path-Resolve
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+resources:
+  bugtracker: https://github.com/mamod/Path-Resolve/issues
+  repository: git://github.com/mamod/Path-Resolve.git
+version: v0.0.2

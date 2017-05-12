@@ -1,0 +1,64 @@
+{
+   "abstract" : "Create a static syntax tree for a POD",
+   "author" : [
+      "Steven McDougall (swmcd@world.std.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Tree",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find" : "1",
+            "HTML::Stream" : "1.49",
+            "IO::File" : "1",
+            "IO::String" : "1",
+            "Pod::Escapes" : "1.02",
+            "Text::Template" : "1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Tiny" : "0.068",
+            "Test::Compile" : "v1.2.1",
+            "Test::More" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/szabgab/Pod-Tree/issues"
+      },
+      "homepage" : "http://metacpan.org/pod/Pod::Tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/szabgab/Pod-Tree.git",
+         "web" : "http://github.com/szabgab/Pod-Tree"
+      }
+   },
+   "version" : "1.25"
+}

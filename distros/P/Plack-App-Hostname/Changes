@@ -1,0 +1,8 @@
+Release history for Plack-App-Hostname
+
+1.001 Tue 20 Sep 2016
+	- Packaging changes
+	- Small optimisation in hottest code path
+
+1.000 Fri 09 Jan 2015
+	- Initial release

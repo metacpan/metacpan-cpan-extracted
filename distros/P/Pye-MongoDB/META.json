@@ -1,0 +1,55 @@
+{
+   "abstract" : "Log with Pye on top of MongoDB",
+   "author" : [
+      "Ido Perlmuter <ido@ido50.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pye-MongoDB",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "MongoDB" : "0",
+            "MongoDB::Code" : "0",
+            "Pye" : "2.001000",
+            "Role::Tiny::With" : "0",
+            "Tie::IxHash" : "0",
+            "perl" : "5.006",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ido50/Pye-MongoDB/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ido50/Pye-MongoDB.git",
+         "web" : "https://github.com/ido50/Pye-MongoDB"
+      }
+   },
+   "version" : "1.000001"
+}
+

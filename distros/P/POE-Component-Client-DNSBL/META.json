@@ -1,0 +1,48 @@
+{
+   "abstract" : "A component that provides non-blocking DNSBL lookups",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-Client-DNSBL",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::Dumper" : "0.47",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::IP::Minimal" : 0,
+            "POE" : "1.004",
+            "POE::Component::Client::DNS" : "1",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/poe-component-client-dnsbl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/poe-component-client-dnsbl.git",
+         "web" : "https://github.com/bingos/poe-component-client-dnsbl"
+      }
+   },
+   "version" : "1.08"
+}
+

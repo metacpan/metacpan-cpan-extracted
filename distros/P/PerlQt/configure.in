@@ -1,0 +1,525 @@
+dnl    This file is part of the KDE libraries/packages
+dnl    Copyright (C) 2001 Stephan Kulow (coolo@kde.org)
+ 
+dnl    This file is free software; you can redistribute it and/or
+dnl    modify it under the terms of the GNU Library General Public
+dnl    License as published by the Free Software Foundation; either
+dnl    version 2 of the License, or (at your option) any later version.
+ 
+dnl    This library is distributed in the hope that it will be useful,
+dnl    but WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+dnl    Library General Public License for more details.
+ 
+dnl    You should have received a copy of the GNU Library General Public License
+dnl    along with this library; see the file COPYING.LIB.  If not, write to
+dnl    the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+dnl    Boston, MA 02111-1307, USA.
+
+# Original Author was Kalle@kde.org
+# I lifted it in some mater. (Stephan Kulow)
+# I used much code from Janos Farkas
+
+dnl Process this file with autoconf to produce a configure script.
+
+AC_INIT(acinclude.m4) dnl a source file from your sub dir
+
+AC_PREREQ(2.50)
+
+dnl This is so we can use kde-common
+AC_CONFIG_AUX_DIR(admin)
+
+dnl This ksh/zsh feature conflicts with `cd blah ; pwd`
+unset CDPATH
+
+dnl Checking host/target/build systems, for make, install etc.
+AC_CANONICAL_BUILD
+dnl Perform program name transformation
+AC_ARG_PROGRAM
+
+dnl Automake doc recommends to do this only here. (Janos)
+AM_INIT_AUTOMAKE(PerlQt, 3.008) dnl searches for some needed programs
+
+KDE_SET_PREFIX
+
+dnl generate the config header
+AM_CONFIG_HEADER(config.h) dnl at the distribution this done
+
+dnl Checks for programs.
+AC_CHECK_COMPILERS
+AC_ENABLE_SHARED(yes)
+AC_ENABLE_STATIC(no)
+KDE_PROG_LIBTOOL
+
+dnl for NLS support. Call them in this order!
+dnl WITH_NLS is for the po files
+dnl AM_KDE_WITH_NLS
+
+KDE_USE_QT(3.0)
+
+
+dnl ------------------------------------------------------------------------
+dnl Reimplementation of AC_BASE_PATH_KDE avoiding the need for
+dnl a prefix pointing to KDEDIR.
+dnl $(KDE_LDFLAGS) will be the kdeliblocation (if any)
+dnl and $(kde_includes) will be the kdehdrlocation (if any)
+dnl ------------------------------------------------------------------------
+dnl
+
+AC_DEFUN(AC_BASE_PATH_INSTALL,
+[
+AC_PREREQ([2.13])
+AC_REQUIRE([AC_PATH_QT])dnl
+AC_REQUIRE([KDE_CHECK_LIB64])
+
+AC_CHECK_RPATH
+dnl PQT
+AC_MSG_CHECKING([for KDE or an Install directory])
+dnl /PQT
+if test "${prefix}" != NONE; then
+  kde_includes=${prefix}/include
+  ac_kde_includes=$prefix/include
+
+  if test "${exec_prefix}" != NONE; then
+     kde_libraries=${libdir}
+     ac_kde_libraries=$libdir
+     if test "$ac_kde_libraries" = '${exec_prefix}/lib'${kdelibsuff}; then
+	ac_kde_libraries=$exec_prefix/lib${kdelibsuff}
+     fi
+  else
+     kde_libraries=${prefix}/lib${kdelibsuff}
+     ac_kde_libraries=$prefix/lib${kdelibsuff}
+  fi
+else
+  ac_kde_includes=
+  ac_kde_libraries=
+  kde_libraries=""
+  kde_includes=""
+fi
+
+AC_CACHE_VAL(ac_cv_have_kde,
+[#try to guess kde locations
+
+dnl PQT
+kde_check_header="kdeversion.h"
+kde_check_lib="libkdefx.la"
+dnl /PQT
+
+if test -z "$1"; then
+
+kde_incdirs="/usr/lib/kde/include /usr/local/kde/include /usr/local/include /usr/kde/include /usr/include/kde /usr/include /opt/kde3/include /opt/kde/include $x_includes $qt_includes"
+test -n "$KDEDIR" && kde_incdirs="$KDEDIR/include $KDEDIR/include/kde $KDEDIR $kde_incdirs"
+kde_incdirs="$ac_kde_includes $kde_incdirs"
+AC_FIND_FILE($kde_check_header, $kde_incdirs, kde_incdir)
+ac_kde_includes="$kde_incdir"
+
+if test -n "$ac_kde_includes" && test ! -r "$ac_kde_includes/$kde_check_header"; then
+dnl PQT
+  AC_MSG_WARN([
+in the prefix, you've chosen, are no KDE headers installed.])
+dnl /PQT
+fi
+
+kde_libdirs="/usr/lib/kde/lib${kdelibsuff} /usr/local/kde/lib${kdelibsuff} /usr/kde/lib${kdelibsuff} /usr/lib${kdelibsuff}/kde /usr/lib${kdelibsuff}/kde3 /usr/lib${kdelibsuff} /usr/X11R6/lib${kdelibsuff} /usr/local/lib${kdelibsuff} /opt/kde3/lib${kdelibsuff} /opt/kde/lib${kdelibsuff} /usr/X11R6/kde/lib${kdelibsuff}"
+test -n "$KDEDIR" && kde_libdirs="$KDEDIR/lib${kdelibsuff} $KDEDIR $kde_libdirs"
+kde_libdirs="$ac_kde_libraries $libdir $kde_libdirs"
+AC_FIND_FILE($kde_check_lib, $kde_libdirs, kde_libdir)
+ac_kde_libraries="$kde_libdir"
+
+kde_widgetdir=NO
+dnl this might be somewhere else
+AC_FIND_FILE("kde3/plugins/designer/kdewidgets.la", $kde_libdirs, kde_widgetdir)
+
+if test -n "$ac_kde_libraries" && test ! -r "$ac_kde_libraries/$kde_check_lib"; then
+dnl PQT
+AC_MSG_WARN([
+in the prefix, you've chosen, are no KDE libraries installed.])
+dnl /PQT
+fi
+dnl PQT
+dnl if test -n "$kde_widgetdir" && test ! -r "$kde_widgetdir/kde3/plugins/designer/kdewidgets.la"; then
+dnl AC_MSG_ERROR([
+dnl I can't find the designer plugins. These are required and should have been installed
+dnl by kdelibs])
+dnl fi
+dnl /PQT
+
+if test -n "$kde_widgetdir"; then
+    kde_widgetdir="$kde_widgetdir/kde3/plugins/designer"
+fi
+
+if test "$ac_kde_includes" = NO || test "$ac_kde_libraries" = NO || test "$kde_widgetdir" = NO; then
+  ac_cv_have_kde="have_kde=no"
+else
+  ac_cv_have_kde="have_kde=yes \
+    ac_kde_includes=$ac_kde_includes ac_kde_libraries=$ac_kde_libraries"
+fi
+
+
+
+
+else dnl test -z $1
+
+  ac_cv_have_kde="have_kde=no"
+
+fi
+])dnl
+
+eval "$ac_cv_have_kde"
+
+if test "$have_kde" != "yes"; then
+ if test "${prefix}" = NONE; then
+  ac_kde_prefix="$ac_default_prefix"
+ else
+  ac_kde_prefix="$prefix"
+ fi
+ if test "$exec_prefix" = NONE; then
+  ac_kde_exec_prefix="$ac_kde_prefix"
+dnl PQT
+  AC_MSG_RESULT([will use $ac_kde_prefix])
+ else
+  ac_kde_exec_prefix="$exec_prefix"
+  AC_MSG_RESULT([will use $ac_kde_prefix and $ac_kde_exec_prefix])
+dnl /PQT
+ fi
+
+ kde_libraries="${libdir}"
+ kde_includes=${ac_kde_prefix}/include
+
+else
+  ac_cv_have_kde="have_kde=yes \
+    ac_kde_includes=$ac_kde_includes ac_kde_libraries=$ac_kde_libraries"
+  AC_MSG_RESULT([libraries $ac_kde_libraries, headers $ac_kde_includes])
+
+  kde_libraries="$ac_kde_libraries"
+  kde_includes="$ac_kde_includes"
+fi
+AC_SUBST(kde_libraries)
+AC_SUBST(kde_includes)
+
+if test "$kde_includes" = "$x_includes" || test "$kde_includes" = "$qt_includes"  || test "$kde_includes" = "/usr/include"; then
+ KDE_INCLUDES=""
+else
+ KDE_INCLUDES="-I$kde_includes"
+ all_includes="$KDE_INCLUDES $all_includes"
+fi
+
+KDE_LDFLAGS="-L$kde_libraries"
+dnl PQT
+if test "$kde_libraries" != "$x_libraries" && test "$kde_libraries" != "$qt_libraries" ; then
+ all_libraries="$all_libraries $KDE_LDFLAGS"
+fi
+dnl /PQT
+
+AC_SUBST(KDE_LDFLAGS)
+AC_SUBST(KDE_INCLUDES)
+
+AC_REQUIRE([KDE_CHECK_EXTRA_LIBS])
+
+all_libraries="$all_libraries $USER_LDFLAGS"
+all_includes="$all_includes $USER_INCLUDES"
+AC_SUBST(all_includes)
+AC_SUBST(all_libraries)
+
+AC_SUBST(AUTODIRS)
+
+])
+
+dnl-------------------------------
+dnl
+dnl Check for the SMOKE Library
+dnl
+dnl-------------------------------
+
+AC_DEFUN(KDE_CHECK_SMOKE,
+[
+AC_MSG_CHECKING(for SmokeQt)
+AC_CACHE_VAL(kde_have_smokeqt,
+[
+
+ kde_ldflags_safe="$LDFLAGS"
+ kde_libs_safe="$LIBS"
+ kde_cxxflags_safe="$CXXFLAGS"
+ kde_ldpath_save="$LD_LIBRARY_PATH"
+
+ AC_LANG_SAVE
+ AC_LANG_CPLUSPLUS
+ LIBS="-lsmokeqt"
+ CXXFLAGS="$CXXFLAGS -I$prefix/include -I$prefix/include/kde $all_includes"
+ LDFLAGS="$LDFLAGS $all_libraries $USER_LDFLAGS"
+ LD_LIBRARY_PATH="$qt_libraries"
+
+ AC_TRY_LINK([
+#include <smoke.h>
+
+ ],
+ [
+   Smoke::Index i;
+ ],
+  kde_have_smokeqt=yes,
+  kde_have_smokeqt=no
+ )
+
+ LDFLAGS=$kde_ldflags_safe
+ LIBS=$kde_libs_safe
+ CXXFLAGS=$kde_cxxflags_safe
+ LD_LIBRARY_PATH=$kde_ldpath_save
+])
+
+AC_LANG_RESTORE
+
+AC_MSG_RESULT($kde_have_smokeqt)
+
+$1=$kde_have_smokeqt
+])
+
+
+dnl @synopsis MDL_HAVE_OPENGL
+dnl 
+dnl Search for OpenGL.  We search first for Mesa (a GPL'ed version of
+dnl OpenGL) before a vendor's version of OpenGL, unless we were
+dnl specifically asked not to with `--with-Mesa=no' or `--without-Mesa'.
+dnl
+dnl The four "standard" OpenGL libraries are searched for: "-lGL",
+dnl "-lGLU", "-lGLX" (or "-lMesaGL", "-lMesaGLU" as the case may be) and
+dnl "-lglut".
+dnl
+dnl All of the libraries that are found (since "-lglut" or "-lGLX" might
+dnl be missing) are added to the shell output variable "GL_LIBS", along
+dnl with any other libraries that are necessary to successfully link an
+dnl OpenGL application (e.g. the X11 libraries).  Care has been taken to
+dnl make sure that all of the libraries in "GL_LIBS" are listed in the
+dnl proper order.
+dnl
+dnl Additionally, the shell output variable "GL_CFLAGS" is set to any
+dnl flags (e.g. "-I" flags) that are necessary to successfully compile
+dnl an OpenGL application.
+dnl
+dnl The following shell variable (which are not output variables) are
+dnl also set to either "yes" or "no" (depending on which libraries were
+dnl found) to help you determine exactly what was found.
+dnl
+dnl   have_GL
+dnl   have_GLU
+dnl   have_GLX
+dnl   have_glut
+dnl
+dnl A complete little toy "Automake `make distcheck'" package of how to
+dnl use this macro is available at:
+dnl
+dnl   ftp://ftp.slac.stanford.edu/users/langston/autoconf/ac_opengl-0.01.tar.gz
+dnl
+dnl Please note that as the ac_opengl macro and the toy example evolves,
+dnl the version number increases, so you may have to adjust the above
+dnl URL accordingly.
+dnl
+dnl @version 0.01 $Id: configure.in,v 1.18 2003/09/07 14:18:50 germaingarand Exp $
+dnl @author Matthew D. Langston <langston@SLAC.Stanford.EDU>
+
+AC_DEFUN(MDL_HAVE_OPENGL,
+[
+  AC_REQUIRE([AC_PROG_CC])
+  AC_REQUIRE([AC_PATH_X])
+  AC_REQUIRE([AC_PATH_XTRA])
+  AC_REQUIRE([MDL_CHECK_LIBM])
+
+  AC_CACHE_CHECK([for OpenGL], mdl_cv_have_OpenGL,
+  [
+dnl Check for Mesa first, unless we were asked not to.
+    AC_HELP_STRING()
+    AC_ARG_ENABLE(Mesa, [  --with-Mesa          Prefer the Mesa library over a vendors native OpenGL library (default=yes)],
+                 , use_Mesa=$enableval
+                 , use_Mesa=yes)
+
+    if test x"$use_Mesa" = xyes; then
+       GL_search_list="MesaGL   GL"
+      GLU_search_list="MesaGLU GLU"
+      GLX_search_list="MesaGLX GLX"
+    else
+       GL_search_list="GL  MesaGL"
+      GLU_search_list="GLU MesaGLU"
+      GLX_search_list="GLX MesaGLX"
+    fi      
+
+    AC_LANG_SAVE
+    AC_LANG_C
+
+dnl If we are running under X11 then add in the appropriate libraries.
+    if test x"$no_x" != xyes; then
+dnl Add everything we need to compile and link X programs to GL_CFLAGS
+dnl and GL_X_LIBS.
+      GL_CFLAGS="$X_CFLAGS"
+      GL_X_LIBS="$X_PRE_LIBS $X_LIBS -lX11 -lXext -lXmu -lXt -lXi $X_EXTRA_LIBS $LIBM"
+    fi
+    GL_save_CPPFLAGS="$CPPFLAGS"
+    CPPFLAGS="$GL_CFLAGS"
+
+    GL_save_LIBS="$LIBS"
+    LIBS="$GL_X_LIBS"
+
+    # Save the "AC_MSG_RESULT file descriptor" to FD 8.
+    exec 8>&AC_FD_MSG
+
+    # Temporarily turn off AC_MSG_RESULT so that the user gets pretty
+    # messages.
+    exec AC_FD_MSG>/dev/null
+
+    AC_SEARCH_LIBS(glAccum,          $GL_search_list, have_GL=yes,   have_GL=no)
+    AC_SEARCH_LIBS(gluBeginCurve,   $GLU_search_list, have_GLU=yes,  have_GLU=no)
+    AC_SEARCH_LIBS(glXChooseVisual, $GLX_search_list, have_GLX=yes,  have_GLX=no)
+    AC_SEARCH_LIBS(glutInit,        glut,             have_glut=yes, have_glut=no)
+
+    # Restore pretty messages.
+    exec AC_FD_MSG>&8
+
+    if test -n "$LIBS"; then
+      mdl_cv_have_OpenGL=yes
+      GL_LIBS="$LIBS"
+      AC_SUBST(GL_CFLAGS)
+      AC_SUBST(GL_LIBS)
+    else
+      mdl_cv_have_OpenGL=no
+      GL_CFLAGS=
+    fi
+
+dnl Reset GL_X_LIBS regardless, since it was just a temporary variable
+dnl and we don't want to be global namespace polluters.
+    GL_X_LIBS=
+
+    LIBS="$GL_save_LIBS"
+    CPPFLAGS="$GL_save_CPPFLAGS"
+
+    AC_LANG_RESTORE
+  ])
+])
+
+dnl ####################### -*- Mode: M4 -*- ###########################
+dnl Copyright (C) 98, 1999 Matthew D. Langston <langston@SLAC.Stanford.EDU>
+dnl
+dnl This file is free software; you can redistribute it and/or modify it
+dnl under the terms of the GNU General Public License as published by
+dnl the Free Software Foundation; either version 2 of the License, or
+dnl (at your option) any later version.
+dnl
+dnl This file is distributed in the hope that it will be useful, but
+dnl WITHOUT ANY WARRANTY; without even the implied warranty of
+dnl MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+dnl General Public License for more details.
+dnl
+dnl You should have received a copy of the GNU General Public License
+dnl along with this file; if not, write to:
+dnl
+dnl   Free Software Foundation, Inc.
+dnl   Suite 330
+dnl   59 Temple Place
+dnl   Boston, MA 02111-1307, USA.
+dnl ####################################################################
+
+
+dnl @synopsis MDL_CHECK_LIBM
+dnl 
+dnl Search for math library (typically -lm).
+dnl
+dnl The variable LIBM (which is not an output variable by default) is
+dnl set to a value which is suitable for use in a Makefile (for example,
+dnl in make's LOADLIBES macro) provided you AC_SUBST it first.
+dnl
+dnl @version 0.01 $Id: configure.in,v 1.18 2003/09/07 14:18:50 germaingarand Exp $
+dnl @author Matthew D. Langston <langston@SLAC.Stanford.EDU>
+
+# AC_CHECK_LIBM - check for math library
+AC_DEFUN(MDL_CHECK_LIBM,
+[AC_REQUIRE([AC_CANONICAL_HOST])dnl
+LIBM=
+case "$host" in
+*-*-beos* | *-*-cygwin*)
+  # These system don't have libm
+  ;;
+*-ncr-sysv4.3*)
+  AC_CHECK_LIB(mw, _mwvalidcheckl, LIBM="-lmw")
+  AC_CHECK_LIB(m, main, LIBM="$LIBM -lm")
+  ;;
+*)
+  AC_CHECK_LIB(m, main, LIBM="-lm")
+  ;;
+esac
+])
+
+dnl PACKAGE set before
+
+AC_BASE_PATH_INSTALL
+#MIN_CONFIG(3)
+
+HAVE_SMOKE="no"
+KDE_CHECK_SMOKE(HAVE_SMOKE)
+
+AC_ARG_ENABLE(
+   smoke,
+   [  --enable-smoke		generate libsmoke, even if it has been found on your system],
+   kde_force_smoke=$enableval,
+   kde_force_smoke=no
+)
+
+AC_ARG_ENABLE(
+   GL,
+   [  --disable-GL		do not try to compile Qt's OpenGL module in smoke],
+   kde_enable_GL=$enableval,
+   kde_enable_GL=yes
+)
+
+KDE_HAVE_GL="no"
+
+if test "$HAVE_SMOKE" = "yes" && test "$kde_force_smoke" = "no"; then
+    DO_NOT_COMPILE="$DO_NOT_COMPILE smoke"
+else
+    if test "X$kde_enable_GL" = "Xyes"; then
+        dnl check for OpenGL
+        MDL_HAVE_OPENGL
+        have_gl_headers="no"
+        AC_CHECK_HEADER([GL/gl.h], 
+            [ AC_CHECK_HEADER([GL/glu.h], [have_gl_headers="yes"])]) 
+        if test "X$have_GL" = "Xyes" && test "X$have_GLU" = "Xyes" && test "X$have_gl_headers" = "Xyes"; then
+            KDE_HAVE_GL="yes"
+        fi
+    fi
+fi
+
+AC_SUBST(KDE_HAVE_GL)   
+
+KDE_CREATE_SUBDIRSLIST
+AC_SUBST(USE_RPATH)
+
+AC_CONFIG_FILES(PerlQt/Makefile.PL, [cd PerlQt && perl Makefile.PL && cd ..])
+AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([puic/Makefile])
+
+AC_ARG_WITH(
+   threshold,
+   [ --with-threshold[=ARG]        Qt tests threshold ARG=[0..15] Default:14 Lower=more tests],
+   [ qt_test_threshold="$withval" ],
+   [ qt_test_threshold=14 ]
+)
+AC_SUBST(qt_test_threshold)
+
+
+if test "$HAVE_SMOKE" = "no" || test "$kde_force_smoke" != "no"; then
+   AC_CONFIG_FILES(smoke/qt/qtguess.pl, [cd smoke/qt && perl qtguess.pl && cd ../..] )
+   AC_CONFIG_FILES(smoke/qt/generate.pl, [cd smoke/qt && perl generate.pl && cd ../..])
+   AC_CONFIG_FILES([smoke/Makefile])
+   AC_CONFIG_FILES([smoke/qt/Makefile])
+fi
+
+AC_OUTPUT
+
+all_tests=fine
+
+dnl
+dnl latest tests goes here
+dnl
+
+
+if test "$all_tests" = "fine"; then
+   echo ""
+   echo "Good - your configure finished. Start make now"
+   echo ""
+fi

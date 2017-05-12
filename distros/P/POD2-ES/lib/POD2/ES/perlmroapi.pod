@@ -1,0 +1,122 @@
+=encoding utf8
+
+=head1 NAME
+
+perlmroapi - Interfaz del complemento de resolución de métodos de Perl
+
+=head1 DESCRIPCIÓN
+
+En Perl 5.10.1 se incluyó una nueva interfaz para conectar y usar órdenes de
+resolución de métodos distintos del predeterminado (búsqueda lineal en
+profundidad). El orden de resolución de métodos C3 agregado en 5.10.0 se ha
+reimplementado como un complemento sin cambiar su interfaz del espacio Perl.
+
+Cada complemento debe registrarse a sí mismo proporcionando la siguiente
+estructura
+
+    struct mro_alg {
+        AV *(*resolve)(pTHX_ HV *stash, U32 level);
+        const char *name;
+        U16 length;
+        U16 kflags;
+        U32 hash;
+    };
+
+y llamar a C<Perl_mro_register>:
+
+    Perl_mro_register(aTHX_ &mi_alg_mro);
+
+=over 4
+
+=item resolve
+
+Puntero a la función de linealización, que se describe a continuación.
+
+=item name
+
+Nombre del orden de resolución de métodos, codificado en ISO-8859-1 o UTF-8.
+
+=item length
+
+Longitud del nombre.
+
+=item kflags
+
+Si se proporciona el nombre codificado en UTF-8, debe establecer C<HVhek_UTF8>
+como valor de kflags. El valor se pasa directamente como el parámetro
+I<kflags> a C<hv_common()>.
+
+=item hash
+
+Un valor de hash calculado previamente para el nombre del orden de resolución
+de métodos, o bien 0.
+
+=back
+
+=head1 Retrollamadas
+
+La función C<resolve> se llama para generar una relación ISA lineal para el
+hash de tabla de símbolos (o "stash", contracción de I<symbol table hash>)
+indicado, con este orden de resolución de métodos. Se llama con un puntero al
+hash de tabla de símbolos, y un valor de I<level> igual a 0. El núcleo
+siempre establece I<level> en 0 cuando se llama a la función; el parámetro se
+proporciona para permitir que su implementación pueda realizar un seguimiento
+de la profundidad en caso de que tenga que funcionar de manera recursiva.
+
+La función debe devolver una referencia a un array con las clases primarias
+ordenadas. Los nombres de las clases deben ser el resultado de llamar a
+C<HvENAME()> en el hash de tabla de símbolos. En aquellos casos en los que
+C<HvENAME()> devuelva un valor nulo, se debe usar C<HvNAME()> en su lugar.
+
+El código que llama debe encargarse de incrementar el contador de referencias
+del array devuelto si se quiere mantener la estructura. Por lo tanto, si ha
+creado un valor temporal al que no apunta ningún puntero, use C<sv_2mortal()>
+para asegurarse de que se elimina de la manera correcta. Si almacenó en caché
+el valor devuelto, debe devolver un puntero a dicho valor sin cambiar el
+contador de referencias.
+
+=head1 Almacenamiento en caché
+
+El cálculo de órdenes de resolución de métodos puede ser costoso. La
+implementación proporciona una caché en la que puede almacenar un único C<SV
+*>, o cualquier cosa que se pueda convertir en C<SV *>, como un C<AV *>. Para
+leer el valor privado, use la macro C<MRO_GET_PRIVATE_DATA()>, pasándole la
+estructura C<mro_meta> del hash de tabla de símbolos, y un puntero a la
+estructura C<mro_alg>:
+
+    meta = HvMROMETA(stash);
+    private_sv = MRO_GET_PRIVATE_DATA(meta, &mi_alg_mro);
+
+Para establecer el valor privado, llame a C<Perl_mro_set_private_data()>:
+
+    Perl_mro_set_private_data(aTHX_ meta, &alg_c3, private_sv);
+
+La caché de datos privada se apropiará de una referencia a private_sv, de la
+misma manera que C<hv_store()> asumirá la propiedad de una referencia al valor
+que le pase.
+
+=head1 Ejemplos
+
+Si desea ver ejemplos de implementaciones de orden de resolución de métodos,
+consulte C<S_mro_get_linear_isa_c3()> y la sección C<BOOT:> de
+F<ext/mro/mro.xs>; vea también C<S_mro_get_linear_isa_dfs()> en F<mro_core.c>
+
+=head1 AUTORES
+
+La aplicación del orden de resolución de métodos C3 y los órdenes de
+resolución de métodos intercambiables del núcleo de Perl son obra de Brandon
+L. Black. Nicholas Clark creó la interfaz conectable, refactorizó la
+implementación de Brandon para trabajar con ella y redactó este documento.
+
+=cut
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

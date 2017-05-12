@@ -1,0 +1,176 @@
+Revision history for PerlIO-Util
+
+TODO:
+* improve documents
+* PerlIO::cat - Concatenates a number of files
+
+0.72 2011-05-25 23:13:37
+    - Fix tests for 5.14.0
+
+0.71 Thu Jan 28 14:01:08 2010
+    - Fix a buffer overflow issue of 64bit arch (tokuhirom)
+    - Fix typos in the pods
+
+0.70 Sat Jun  6 08:50:01 2009
+	- remove PerlIO::fse from t/00_load.t
+	- fix pods
+
+0.69_01 Wed May 27 10:22:18 2009
+	- split PerlIO::fse into an independent distribution
+	- add $io->inspect() method
+	- improve PerlIO->open() with a smart gensym routine
+
+0.60 Tue Sep 16 09:03:31 2008
+	- use Module::Install
+	- use PERL_NO_GET_CONTEXT for effciency
+	- add t/98_portfs for testing filenames portability
+	- fix t/05_extra.t on some utf8 environments
+	- fix pod documents
+	- internal cleanup
+	* PerlIO::tee
+		- add PerlIOTee_dup()
+		- add t/062_tee_threads.t
+
+0.56 Mon Jul 28 10:47:42 2008
+	- remove errno tests which depends on platforms
+
+0.55 Sun Jul 27 21:10:22 2008
+	- fix some bugs about possibe SEGV
+	- fix some minor bugs
+	- add t/09_invalid.t
+	- add more tests
+
+0.54 Tue Jul 15 17:39:03 2008
+	- fix a bug from serucity check code in :tee
+
+0.53 Mon Jul 14 08:46:42 2008
+	- fix t/08_taint.t
+
+0.52 Sun Jul 13 13:25:59 2008
+	- add security check to :tee and add t/08_taint.t
+	- remove unportable code from t/20_reverse.t
+	- update ppport.h to 3.14_01
+
+0.51 Thu Jul 10 15:48:19 2008
+	- add t/99_pod-coverage.t
+	- add some tests
+	- skip fse test when non-cp932 environment
+
+0.50 Mon Jun 23 18:17:36 2008
+	- add PerlIO::fse for filesystem encodings
+	- add PerlIO::Util::JA (Japanese document)
+	- change :reverse to be seekable
+	- change :reverse to be more robust
+	- update ppport.h
+	- fix some bugs
+
+0.42 Sun Jun  8 23:37:12 2008
+	- fix examples of PerlIO::excl
+	- accept dummy layers regardless of the order
+		(e.g. ":utf8 :creat :flock" and ":flock :utf8 :creat" are okey)
+	- fix to work on Win32 system
+	- accept perl < 5.8.6, but not recommended
+
+0.41 Sat Jun  7 14:44:10 2008
+	- no code change
+	- require perl 5.8.6 because of possible null pointer accesses
+		(PerlIO_binmode() in perlio.c before perl < 5.8.6)
+
+0.40 Sat Jun  7 12:33:07 2008
+	- change to follow tac(1) in GNU coreutils when files don't end newline
+	- :reverse refuses non-raw layers (namely, :crlf, :encoding, etc.)
+	- add PerlIOReverse_open()
+	- fix some bugs
+
+0.32 Tue Jun  3 22:41:55 2008
+	- change some tests for CRLF platforms (temporarily)
+
+0.31 Mon Jun  2 22:37:04 2008
+	- :reverse calls binmode() internally when pushed (for CRLF convertion)
+	- remove errno tests in t/10_dir.t
+	- remove ungetc() tests (because it might not tested well)
+	- now pop_layer() doesn't die when invaid filehandles is supplied
+	- fix possible segv on applying :flock to invalid filehandles
+
+0.30 Sun Jun  1 09:38:53 2008
+	- add PerlIO::reverse to read lines backward
+	- remove PerlIODir_seek() except for seek(f, 0, 0) (temporarily)
+	- remove PerlIODir_tell() (temporarily)
+
+0.21 Fri May 30 09:31:30 2008
+	- fix PerlIODir_seek() to typecast the pos argument
+	- rewrite PerlIODir_seek() and PerlIODir_open() to be simple
+
+0.20 Wed May 28 14:00:39 2008
+	- add PerlIO::dir to read directories
+
+0.16 Sun May 25 15:44:42 2008
+	- internal cleanup
+	- fix some issues
+	- skip some test in 08_tee_binmode.t when :crlf layer is default
+
+0.15 Fri May 23 00:10:31 2008
+	- fix the problem of PerlIOTee_binmode() finally!
+		(but there are some limits on Win32 because of the perlio structure)
+
+0.14 Wed May 21 23:18:59 2008
+	- fix an issue of opening 3 or more files on :tee (from 0.13)
+	- change PerlIOTee_binmode() again
+		(now works correctly on PERLIO=:crlf environment)
+
+0.13 Tue May 20 09:12:46 2008
+	- fix PerlIOTee_binmode() to return the correct value
+		(and add t/07_tee_binmode.t)
+
+0.12 Fri May 16 00:00:01 2008
+	- change for the pseudo layers to (correctly) refuse other pseudo layers
+		 before them (e.g. ":utf8 :flock" or ":raw :creat" is NG)
+	- try fixing PerlIOTee_binmode() again
+
+0.11 Tue May 13 09:20:25 2008
+	- fix an issue of binmode() on Win32 (thanks to Taro Nishino)
+	- fix some  problems
+
+0.10 Sun May 11 12:11:06 2008
+	- add binmode() routine for :tee (thanks to Taro Nishino)
+	- add PerlIO::Util->open() method
+	- add misc/piotee.pl for example
+	- internal cleanup
+
+0.09 Sat May 10 11:02:52 2008
+	- fixed an uninitialized pointer exception in :tee
+	- fixed some issues in :tee
+	- add seek() to :tee
+
+0.08 Fri May  9 09:34:33 2008
+	- add :tee layer
+	- add PerlIO/(flock.pm|creat.pm|excl.pm|tee.pm) for autoloading
+
+0.07 Tue Apr 29 10:53:52 2008
+	- use get_cv() instead of get_cvn_flags() for Win32 (thanks to Taro Nishino)
+
+0.06 Sat Apr 26 21:17:57 2008
+	- change pop_layer() to return the name of the poped layer
+	- change push_layer() to allow a semicolon as a prefix (like ':utf8')
+	- use ppport.h for compatibility
+
+0.05 Thu Apr 24 00:26:47 2008
+	- improve portability on Win32 (about dVAR macro)
+
+0.04 Fri Apr 18 20:07:55 2008
+	- add t/05_extra.t
+	- check compilation on Win32 (there are some functions missing)
+
+0.03 Thu Apr 17 16:02:31 2008
+	- add push_layer()/pop_layer() methods to IO::Handle package
+	- export PerlIO::get_layers() function to IO::Handle package
+
+0.02 Sun Apr 13 10:23:59 2008
+	- warn on binmode($fh, ':creat') instead of die
+	- remove PerlIO::Layer::name() method
+	- some minor changes
+	- improve portability
+
+0.01 Fri Apr 11 09:32:36 2008
+	- Initial release.
+

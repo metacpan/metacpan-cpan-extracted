@@ -1,0 +1,93 @@
+# -*-perl-*-
+
+=head1 POD als Slideshow verwenden
+
+POD ist eine tolle Sprache.
+
+Mit B<pod2s5> kann man aus I<POD> Dateien HTML Slideshows mittels
+S5 erstellen.
+
+Es folgen einige Beispiele:
+
+=begin note
+
+Ich spreche kein Deutsch.
+
+=end note
+
+=head1 Source Code
+
+=begin perl
+
+sub formatter_meta {
+  my ($text) = @_;
+  foreach (split /\n\n*/, $text) {
+    next if(/^\s*$/ or /^\s*#/);
+    s/\s*#.*$//; # we support comments
+    my ($tag, $param, $option) = split /\s\s*/;
+    if (! $option) {
+      $option = $param;
+      $param  = "";
+    }
+    print qq(<$tag $param>$option</$tag>\n);
+  }
+}
+
+=end perl
+
+=head1 Text Formatierung
+
+B<Fetter Text>
+
+I<Kursiver Text>
+
+U<Underline Text>
+
+ Ein Code Einzeiler.
+
+=head2 Auch Listen gehen
+
+=over
+
+=item Eintrag 1
+
+=item Eintrag 2
+
+=item Eintrag 3
+
+=back
+
+=head1 Oder auch Links
+
+Einfacher Link: L<http://www.daemon.de>.
+
+Benannter Link: L<Daemon|http://www.daemon.de>.
+
+=head1 Ein Bild
+
+G<http://meyerweb.com/eric/tools/s5/pix/s5filemap.png>
+
+=head1 Incremental Liste
+
+=over
+
+=item *
+
+Zeile 1
+
+=item *
+
+Zeile 2
+
+=item *
+
+Zeile 3
+
+=back
+
+
+=head1 Haben Wollen ?
+
+B<pod2s5> ist auf dem CPAN verfuegbar.
+
+=cut

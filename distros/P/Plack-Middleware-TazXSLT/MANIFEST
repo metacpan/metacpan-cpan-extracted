@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Plack/Middleware/TazXSLT.pm
+MANIFEST			This list of files
+t/documents/01.xml
+t/documents/01.xsl
+t/documents/01_no_pi.xml
+t/documents/change_http_status.xsl
+t/documents/change_http_status.xml
+t/errors.t
+t/replace_headers.t
+t/transform.t
+t/lib/MockUserAgent.pm
+README
+META.yml
+META.json

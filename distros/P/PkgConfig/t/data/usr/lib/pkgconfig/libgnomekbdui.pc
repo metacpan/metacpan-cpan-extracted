@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libgnomekbd
+Description: GNOME keyboard shared library
+Version: 2.30.2
+Requires: libgnomekbd = 2.30.2
+Libs: -L${libdir} -lgnomekbdui
+Cflags: -I${includedir}

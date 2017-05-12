@@ -1,0 +1,74 @@
+Parse-Liberty version 0.13
+==========================
+
+Parse::Liberty may be used to extract and modify information from Synopsys Liberty files.
+Liberty format is widely used standard for keeping various information for EDA applications.
+Parse::Liberty build on top Perl-C SWIG interface to Open Source Liberty liberty_parse functions.
+
+INSTALLATION
+
+To install this module do the following:
+
+    1. Download liberty_parse from Open Source Liberty:
+        http://www.opensourceliberty.org Resources (Registration Required)
+        Recommended version is 2.5 (may be found in Archived Liberty Versions)
+    
+    2. untar
+    
+    3. ./configure
+    
+    4. make
+    
+    5. make test
+    
+    6. make perl/liberty.so
+    
+    6.1. if previous fails, change 'P2 = ' in Makefile to
+
+        P2 = `perl -MExtUtils::Embed -e ccopts`
+
+        and rerun
+    
+    7. copy perl/liberty.so to one of the $LD_LIBRARY_PATH or $PERL5LIB locations
+    
+    8. SWIG-generated perl/liberty.pm missed some essential wrappers, so we need to add them:
+        
+        after line
+            *si2drDefineGetInfo = *libertyc::si2drDefineGetInfo;
+        
+        add these
+            *si2drDefineGetName = *libertyc::si2drDefineGetName;
+            *si2drDefineGetAllowedGroupName = *libertyc::si2drDefineGetAllowedGroupName;
+            *si2drDefineGetValueType = *libertyc::si2drDefineGetValueType;
+    
+    9. copy perl/liberty.pm to one of the $PERL5LIB locations
+    
+    10. install this module:
+
+        perl Makefile.PL
+            or
+                perl Makefile.PL PREFIX=path/to/location
+            to install module to non-default location. For user home use PREFIX=$HOME
+        make
+        make test
+        make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Parse::Liberty
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  liberty_parse from Open Source Liberty. Recommended version is 2.5
+  (http://www.opensourceliberty.org)
+
+COPYRIGHT AND LICENCE
+
+Copyright 2015 Eugene Gagarin
+
+This library is free software; you may redistribute it and/or modify
+it under the same terms as Perl itself.

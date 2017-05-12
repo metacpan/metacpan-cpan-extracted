@@ -1,0 +1,458 @@
+package Perinci::CmdLine::Manual; # just to make podweaver happy
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: Perinci::CmdLine manual
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perinci::CmdLine::Manual - Perinci::CmdLine manual
+
+=head1 VERSION
+
+This document describes version 1.50 of Perinci::CmdLine::Manual (from Perl distribution Perinci-CmdLine), released on 2016-12-10.
+
+=head1 DESCRIPTION
+
+Perinci::CmdLine is a command-line application framework. It parses command-line
+options and dispatches to one of your specified Perl functions, passing the
+command-line options and arguments to the function. It accesses functions via
+L<Riap> protocol (using the L<Perinci::Access> Riap client library) so you can
+use remote functions transparently. Features:
+
+=over 4
+
+=item * Command-line options parsing
+
+Non-scalar arguments (array, hash, other nested) can also be passed as JSON or
+YAML. For example, if the C<tags> argument is defined as 'array', then all of
+below are equivalent:
+
+ % mycmd --tags-yaml '[foo, bar, baz]'
+ % mycmd --tags-json '["foo","bar","baz"]'
+ % mycmd --tags foo --tags bar --tags baz
+
+=item * Help message (utilizing information from metadata, supports translation)
+
+ % mycmd --help
+ % mycmd -h
+ % mycmd -?
+
+=item * Tab completion for various shells (including completion from remote code)
+
+Example for bash:
+
+ % complete -C mycmd mycmd
+ % mycmd --he<tab> ; # --help
+ % mycmd s<tab>    ; # sub1, sub2, sub3 (if those are the specified subcommands)
+ % mycmd sub1 -<tab> ; # list the options available for sub1 subcommand
+
+=item * Undo/redo/history
+
+If the function supports transaction (see L<Rinci::Transaction>,
+L<Riap::Transaction>) the framework will setup transaction and provide command
+to do undo (--undo) and redo (--redo) as well as seeing the undo/transaction
+list (--history) and clearing the list (--clear-history).
+
+=item * Version (--version, -v)
+
+=item * List available subcommands (--subcommands)
+
+=item * Configurable output format (--format, --format-options)
+
+By default C<yaml>, C<json>, C<text>, C<text-simple>, C<text-pretty> are
+recognized.
+
+=back
+
+=head1 CONCEPTS
+
+Perinci::CmdLine is very function-oriented (and very not object-oriented, on
+purpose). You write your "business logic" in a function (of course, you are free
+to subdivide or delegate to other functions, but there must be one main function
+for a single-subcommand CLI application, or one function for each subcommand in
+a multiple-subcommand CLI application.
+
+ sub cliapp {
+     ...
+ }
+
+You annotate the function with L<Rinci> metadata, where you describe what
+arguments (and command-line aliases, if any) the function (program) accepts, the
+summary and description of those arguments, and several other aspects as
+necessary.
+
+ $SPEC{cliapp} = {
+     v => 1.1,
+     summary => 'A program to do blah blah',
+     args => {
+         foo => {
+             summary => 'foo argument',
+             req => 1,
+             pos => 0,
+             cmdline_aliases => {f=>{}},
+         },
+         bar => { ... },
+     },
+ };
+ sub cliapp {
+     ...
+ }
+
+Finally, you "run" your function:
+
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url => '/main/cliapp')->run;
+
+For a multi-subcommand application:
+
+ Perinci::CmdLine::Any->new(
+     url => '/main/cliapp',
+     subcommands => {
+         sc1 => { url => '/main/do_sc1' },
+         sc2 => { url => '/main/do_sc2' },
+         ...
+     },
+ )->run;
+
+That's it. Command-line option parsing, help message, as well as tab completion
+will work without extra effort.
+
+To run a remote function, you can simply specify a remote URL, e.g.
+C<http://example.com/api/somefunc>. All the features like options parsing,
+help/usage, as well as tab completion will work with remote functions as well.
+
+=head1 DISPATCHING
+
+Below is the description of how the framework determines what action and which
+function to call.
+
+TODO
+
+=head1 LOGGING
+
+Logging is done with L<Log::Any::IfLOG> (for producing). For displaying logs,
+PC::Classic uses L<Log::Any::App> currently which supports multiple outputs
+(screen, file, etc) while PC::Lite currently uses L<Log::Any::Adapter::Screen>
+which only supports displaying to screen.
+
+Loading Log::Any adapters adds to startup overhead time, so the framework tries
+to be smart when determining whether or not to do logging output. Here are the
+order of rules being used:
+
+=over
+
+=item * If LOG environment is undefined or false, turn off logging
+
+So you need to use LOG=1 to turn on logging.
+
+=item * If running shell completion (C<COMP_LINE> is defined), output is off
+
+Normally, shell completion does not need to show log output.
+
+=item * If subcommand's C<log> setting is defined, use that
+
+This allows you, e.g. to turn off logging by default for subcommands that need
+faster startup time.
+
+=item * [Classic] If action metadata's default_log setting is defined, use that
+
+For example, actions like C<help>, C<list>, and C<version> has C<default_log>
+set to 0, for faster startup time.
+
+=item * Use log attribute setting
+
+=back
+
+=head1 [Classic] UTF8 OUTPUT
+
+By default, C<< binmode(STDOUT, ":utf8") >> is issued if utf8 output is desired.
+This is determined by, in order:
+
+=over
+
+=item * Use setting from environment UTF8, if defined.
+
+This allows you to force-disable or force-enable utf8 output.
+
+=item * Use setting from action metadata, if defined.
+
+Some actions like L<help>, L<list>, and L<version> output translated text, so
+they have their C<use_utf8> metadata set to 1.
+
+=item * Use setting from subcommand, if defined.
+
+=item * Use setting from C<use_utf8> attribute.
+
+This attribute comes from L<SHARYANTO::Role::TermAttrs>, its default is
+determined from L<UTF8> environment as well as terminal's capabilities.
+
+=back
+
+=head1 [Classic] COLOR THEMES
+
+By default colors are used, but if terminal is detected as not having color
+support, they are turned off. You can also turn off colors by setting COLOR=0 or
+using PERINCI_CMDLINE_COLOR_THEME=Default::no_color.
+
+=head1 COMMAND-LINE OPTION/ARGUMENT PARSING
+
+This section describes how Perinci::CmdLine parses command-line
+options/arguments into function arguments. Command-line option parsing is
+implemented by L<Perinci::Sub::GetArgs::Argv>.
+
+For boolean function arguments, use C<--arg> to set C<arg> to true (1), and
+C<--noarg> to set C<arg> to false (0). A flag argument (C<< [bool => {is=>1}]
+>>) only recognizes C<--arg> and not C<--noarg>. For single letter arguments,
+only C<-X> is recognized, not C<--X> nor C<--noX>.
+
+For string and number function arguments, use C<--arg VALUE> or C<--arg=VALUE>
+(or C<-X VALUE> for single letter arguments) to set argument value. Other scalar
+arguments use the same way, except that some parsing will be done (e.g. for date
+type, --arg 1343920342 or --arg '2012-07-31' can be used to set a date value,
+which will be a DateTime object.) (Note that date parsing will be done by
+L<Data::Sah> and currently not implemented yet.)
+
+For arguments with type array of scalar, a series of C<--arg VALUE> is accepted,
+a la L<Getopt::Long>:
+
+ --tags tag1 --tags tag2 ; # will result in tags => ['tag1', 'tag2']
+
+For other non-scalar arguments, also use C<--arg VALUE> or C<--arg=VALUE>, but
+VALUE will be attempted to be parsed using JSON, and then YAML. This is
+convenient for common cases:
+
+ --aoa  '[[1],[2],[3]]'  # parsed as JSON
+ --hash '{a: 1, b: 2}'   # parsed as YAML
+
+For explicit JSON parsing, all arguments can also be set via --ARG-json. This
+can be used to input undefined value in scalars, or setting array value without
+using repetitive C<--arg VALUE>:
+
+ --str-json 'null'    # set undef value
+ --ary-json '[1,2,3]' # set array value without doing --ary 1 --ary 2 --ary 3
+ --ary-json '[]'      # set empty array value
+
+Likewise for explicit YAML parsing:
+
+ --str-yaml '~'       # set undef value
+ --ary-yaml '[a, b]'  # set array value without doing --ary a --ary b
+ --ary-yaml '[]'      # set empty array value
+
+B<Submetadata>. Arguments from submetadata will also be given respective
+command-line options (and aliases) with prefixed names. For example this
+function metadata:
+
+ {
+     v => 1.1,
+     args => {
+         foo => {schema=>'str*'},
+         bar => {
+             schema => 'hash*',
+             meta => {
+                 v => 1.1,
+                 args => {
+                     baz => {schema=>'str*'},
+                     qux => {
+                         schema=>'str*,
+                     },
+                 },
+             },
+         },
+         quux => {
+             schema => 'array*',
+             element_meta => {
+                 v => 1.1,
+                 args => {
+                     corge => {schema=>'str*', cmdline_aliases=>{C=>{}},
+                     grault => {schema=>'str*'},
+                 },
+             },
+         },
+     },
+ }
+
+You can specify on the command-line:
+
+ % prog --foo val \
+     --bar-baz val --bar-qux val \
+     --quux-corge 11 \
+     --quux-corge 21 --quux-grault 22 \
+     --quux-C 31
+
+The resulting argument will be:
+
+ {
+     foo => 'val',
+     bar => {
+         baz => 'val',
+         qux => 'val',
+     },
+     quux => [
+         {corge=>11},
+         {corge=>21, grault=>22},
+         {corge=>31},
+     ],
+ }
+
+For more examples on argument submetadata, see L<Perinci::Examples::SubMeta>.
+
+=head1 SHELL COMPLETION
+
+The framework can detect when C<COMP_LINE> and C<COMP_POINT> environment
+variables (set by bash when completing using external command) are set and then
+answer the completion. In bash, activating tab completion for your script is as
+easy as (assuming your script is already in PATH):
+
+ % complete -C yourscript yourscript
+
+That is, your script can complete itself. The above command can be put in
+C<~/.bashrc>. But it is recommended that you use L<shcompgen> instead (see
+below).
+
+Tcsh uses C<COMMAND_LINE> instead. The framework can also detect that.
+
+For other shells: some shells can emulate bash (like zsh) and for some other
+(like fish) you need to generate a set of C<complete> commands for each
+command-line option.
+
+C<shcompgen> is a CLI tool that can detect all scripts in PATH if they are using
+Perinci::CmdLine (as well as a few other frameworks) and generate shell
+completion scripts for them. It supports several shells. Combined with
+L<Dist::Zilla::Plugin::GenShellCompletion>, you can make it so that users
+installing your distribution can immediately/automatically activate tab
+completion for your scripts.
+
+=head1 PROGRESS INDICATOR
+
+For functions that express that they do progress updating (by setting their
+C<progress> feature to true), Perinci::CmdLine will setup an output, currently
+either L<Progress::Any::Output::TermProgressBar> if program runs interactively,
+or L<Progress::Any::Output::LogAny> if program doesn't run interactively.
+
+=head1 CONFIGURATION FILE
+
+Configuration files are read to preset the value of arguments, before
+potentially overridden/merged with command-line options. Configuration files are
+in L<IOD> format, which is basically C<INI> with some extra features.
+
+By default, configuration files are searched in C</etc> and home directory, with
+the name of I<program_name> + C<.conf>. If multiple files are found, the
+contents are merged together.
+
+If user wants to use a custom configuration file, she can issue C<--config-path>
+command-line option.
+
+If user does not want to read configuration file, she can issue C<--no-config>
+command-line option.
+
+INI files have the concept of "sections". In Perinci::CmdLine, you can use
+sections to put settings that will only be applied to a certain subcommand, or a
+certain "profile". "Config profiles" is a way to specify multiple
+sets/cases/scenarios in a single configuration file.
+
+Example 1 (without any profile or subcommand):
+
+ ; prog.conf
+
+ foo=1
+ bar=2
+
+When executing program (the comments will show what arguments are set):
+
+ % prog; # {foo=>1, bar=>2}
+ % prog --foo 10; # {foo=>10, bar=>2}
+
+Example 2 (with profiles):
+
+ ; prog.conf
+
+ [profile=profile1]
+ foo=1
+ bar=2
+
+ [profile=profile2]
+ foo=10
+ bar=20
+
+When executing program:
+
+ % prog; # {}
+ % prog --config-profile profile1; # {foo=>1, bar=>2}
+ % prog --config-profile profile2; # {foo=>10, bar=>20}
+
+Example 3 (with subcommands):
+
+ ; prog.conf
+
+ [subcommand=sc1]
+ foo=1
+ bar=2
+
+ [subcommand=sc2]
+ baz=3
+ qux=4
+
+When executing program:
+
+ % prog sc1; # {foo=>1, bar=>2}
+ % prog sc2; # {baz=>3, qux=>4}
+
+Example 4 (with subcommands and profiles):
+
+ ; prog.conf
+ [subcommand=sc1 profile=profile1]
+ foo=1
+ bar=2
+
+ [profile=profile2 subcommand=sc1]
+ foo=10
+ bar=20
+
+When executing program:
+
+ % prog sc1 --config-profile profile1; # {foo=>1, bar=>2}
+ % prog sc1 --config-profile profile2; # {foo=>10, bar=>20}
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-CmdLine>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Perinci::CmdLine::Manual::Examples>
+
+L<Perinci::CmdLine::Manual::FAQ>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,90 @@
+NAME
+    POE::Component::OSCAR - A POE Component for the Net::OSCAR module
+
+SYNOPSIS
+    use POE qw(Component::OSCAR);
+
+    [ ... POE set up ... ]
+
+    sub _start {
+			# start an OSCAR session $oscar =
+			POE::Component::OSCAR->new();
+
+			# start an OSCAR session with automatic throttling of new connections
+			# to prevent being banned by the server
+			$oscar = POE::Component::OSCAR->new( throttle => 4 );
+
+			# set up the "im_in" callback to call your state, "im_in_state"
+			$oscar->set_callback( im_in => 'im_in_state');
+
+			# it's good to detect errors if you don't want to get banned
+			$oscar->set_callback( error => 'error_state' );
+			$oscar->set_callback( admin_error => 'admin_erro_stater' );
+			$oscar->set_callback( rate_alert => 'rate_alert_state' );
+
+			# sign on
+			$oscar->signon( screenname => $MY_SCREENNAME, password => $MY_PASSWORD );
+    }
+
+    sub im_in_state { 
+			my ($nothing, $args) = @_[ARG0..$#_]; my ($object,
+				$who, $what, $away) = @$args;
+
+      print "Got '$what' from $who\n";
+    }
+
+DEPENDENCIES
+    This modules requires "Net::OSCAR", "POE", and "Time::HiRes".
+
+ABSTRACT
+    This module is a wrapper around the Net::OSCAR module that allows it to
+    be used from POE applications.
+
+DESCRIPTION
+    The wrapper is very thin, so most of the useful documentation can be
+    found in the Net::OSCAR module.
+
+    Create a new connection with
+
+        $oscar = POE::Component::OSCAR->new();
+
+    Though it has an object interface to make coding simpler, this actually
+    spawns a POE session. The arguments to the object are passed directly to
+    the Net::OSCAR module, with the exception of 'throttle'. If passed in,
+    the 'throttle' argument will indicate the minimum amount of time the
+    module will wait between sending messages. This is useful, since bots
+    that send lots of messages quickly will get banned.
+
+    All other method calls on the object are passed directly to the
+    Net::OSCAR module. For instance, to set the debug logging level, use
+
+          $oscar->loglevel( 5 );
+
+    The only relevant POE::Component::OSCAR method is 'set_callback' which
+    can be used to post events to your own session via Net::OSCAR's
+    callbacks.
+
+    For instance, to be notified of an incoming message, use
+
+          $oscar->set_callback( im_in => 'im_in_state' );
+
+    where 'im_in' is a Net::OSCAR callback (see the Net::OSCAR documentation
+    and the oscartest script for all the callbacks) and 'im_in_state' is a
+    state in your POE session.
+
+SEE ALSO
+    The examples directory included with this package.
+
+    The "Net::OSCAR" documentation.
+
+    The "oscartest" script, which comes with "Net::OSCAR"
+
+AUTHOR
+    Dan McCormick, <dan@codeop.com>
+
+COPYRIGHT AND LICENSE
+    Copyright 2006 by Dan McCormick
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Plucene-Analysis-UTF8Analyzer.t
+lib/Plucene/Analysis/UTF8.pod
+lib/Plucene/Analysis/UTF8Analyzer.pm
+lib/Plucene/Analysis/UTF8Tokenizer.pm

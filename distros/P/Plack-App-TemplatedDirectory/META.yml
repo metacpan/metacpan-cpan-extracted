@@ -1,0 +1,49 @@
+---
+abstract: 'Serve static files from document root with directory index'
+author:
+  - 'Kaare Rasmussen <kaare@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.3601'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-App-TemplatedDirectory
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+provides:
+  Plack::App::TemplatedDirectory:
+    file: lib/Plack/App/TemplatedDirectory.pm
+    version: '0.001'
+requires:
+  DirHandle: '0'
+  HTTP::Date: '0'
+  Plack::App::File: '0'
+  Plack::MIME: '0'
+  Plack::Request: '0'
+  Plack::Util: '0'
+  Plack::Util::Accessor: '0'
+  Text::Xslate: '0'
+  URI::Escape: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/kaare/Plack-App-TemplatedDirectory
+  repository: https://github.com/kaare/Plack-App-TemplatedDirectory.git
+version: '0.001'

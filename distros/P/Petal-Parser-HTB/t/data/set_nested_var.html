@@ -1,0 +1,23 @@
+<html>
+<body>
+  <!-- This should auto-vivify a hash: -->
+	<?var name="set: my/test/fu string:1"?>
+	<?if  name="true: my"?>
+		ok: my defined
+		<?if  name="true: my/test"?>
+			ok: my-test defined
+			<?if name="true: my/test/fu"?>
+				ok: my-test-fu defined
+			<?end?>
+		<?end?>
+	<?end?>
+  <!-- This should auto-vivify an array: -->
+	<?var name="set: foo/1 string:1"?>
+	<?if  name="true: foo"?>
+		ok: foo defined
+		<?if  name="true: foo/1"?>
+			ok: foo-1 defined
+		<?end?>
+	<?end?>
+</body>
+</html>

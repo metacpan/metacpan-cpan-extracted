@@ -1,0 +1,45 @@
+Revision history for Perinci-Sub-Property-dies_on_error
+
+0.07    2016-05-11 (PERLANCAR)
+
+	- [dist] Bump prereq version Perinci::Sub::PropertyUtil to 0.11
+	  (incompatible change due to schema for Rinci function now in
+	  Sah::Schema::rinci::function_meta instead of Sah::Schema::Rinci).
+
+
+0.06     2016-03-09 (PERLANCAR)
+
+         - No functional changes.
+
+         - Re-release/re-upload (accidentally deleted from CPAN).
+
+
+0.05     2014-03-07 (SHARYANTO)
+
+         - Adjust to Perinci::Sub::Wrapper 0.51.
+
+         - Now cannot be used when result_naked=>1.
+
+         - Propagate error from eval block in generated wrapper code
+           ($_w_eval_err).
+
+
+0.04     2012-12-21 (SHARYANTO)
+
+         - No functional changes. Use Perinci::Sub::PropertyUtil.
+
+
+0.03     2012-08-09 (SHARYANTO)
+
+         - No functional changes. Correct casing in name:
+           Perinci::Sub::{p,P}roperty::
+
+
+0.02     2012-07-31 (SHARYANTO)
+
+         - No functional changes. Show function name in die message.
+
+
+0.01     2012-07-31 (SHARYANTO)
+
+         - First release.

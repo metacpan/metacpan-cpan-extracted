@@ -1,0 +1,39 @@
+Changes
+COPYING
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+debian/source/format
+debian/watch
+devel/dualvar.pl
+devel/errno-anystring.pl
+devel/exe-localeconv.c
+devel/filename.pl
+devel/funcs.pl
+devel/Makefile
+devel/posix-wide.pl
+devel/run.pl
+lib/POSIX/Wide.pm
+lib/POSIX/Wide/ERRNO.pm
+lib/POSIX/Wide/EXTENDED_OS_ERROR.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+SIGNATURE
+t/MyTestHelpers.pm
+t/POSIX-Wide.t
+xt/0-file-is-part-of.t
+xt/0-META-read.t
+xt/0-no-debug-left-on.t
+xt/0-Test-ConsistentVersion.t
+xt/0-Test-DistManifest.t
+xt/0-Test-Pod.t
+xt/0-Test-Synopsis.t
+xt/0-Test-YAML-Meta.t
+xtools/my-check-copyright-years.sh
+xtools/my-check-spelling.sh
+xtools/my-deb.sh
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

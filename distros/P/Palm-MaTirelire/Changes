@@ -1,0 +1,22 @@
+Revision history for Perl extension Palm::MaTirelire.
+
+1.14  Mon Sep 15 21:22:33 UTC 2014
+        - set the version correctly...
+
+1.13  Mon Sep 15 21:19:45 UTC 2014
+        - add Palm::StdAppInfo to prereqs
+
+1.12  Sun Feb 12 08:51:00 UTC 2012
+        - exportM2.pl without perl-5.14 goto warnings.
+
+1.11  Sat Feb 11 23:20:00 UTC 2012
+      	- Types.pm without perl-5.14 goto warnings.
+
+1.10  Mon May  3 13:14:20 UTC 2010
+        - no longer use CVS
+	- use base / our
+	- no longer use vars
+
+0.01  Sun Jan 30 13:43:41 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -n Palm::MaTirelire

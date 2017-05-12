@@ -1,0 +1,56 @@
+Revision history for Perl extension PDL::Audio
+
+TODO: read_sound returns undef? how to return ints from pp_def subs?
+
+1.2   Wed Apr 18 10:24:11 CEST 2012
+	- update sndlib/config.guess and config.sub, recreated configure.
+        - birds now uses PGPLOT only when USE_PGPLOT=1 is set in the
+          environment.
+        - created and installed bin/pdlaudio-demo and pdlaudio-birds.
+        - make clean makes clean in sndlib as well.
+        - embellished the intiial gen_oscill example a bit.
+
+1.1   Tue Nov  8 19:48:00 CET 2005
+	- fix raudio/waudio/describe_audio to use the same logical
+          layout for samples and to work correctly for stereo audio
+          (reported by Bob MacCallum).
+
+1.011 Thu Mar  3 18:00:52 CET 2005
+	- change of contact address.
+        - improved README.
+
+1.01  Tue Dec 28 21:50:20 CET 2004
+	- compile sndlib with -fPIC or equivalent.
+        - fixed some typoes, and many minor bugs
+          (thx to oesi).
+        - open soundcards in nonblocking mode when initializing,
+          avoiding blocks on lesser hardware.
+        - avoid in-place fftw as they are documented gto work but simply
+          barf.
+
+1.0   Mon Jul 12 15:28:17 CEST 2004
+	- fixed _writesound (I never needed that).
+        - slightly improved filter_center.
+
+0.05  Mon May 15 05:56:54 CEST 2000
+	- removed PDL::Complex (it's now part of PDL)
+        - updated to use the new PDL::PP.
+
+0.04  Tue Dec 28 16:29:47 CET 1999
+        - many more filters (fft, src, granulate, convolve), many more
+          bugfixes, working accessors...
+        - remez fir filter design
+        - cut down on object size using GenericTypes. Hooo is it large!
+
+0.03  (private release)
+        - implemented many generators and filters, inspired by common lisp
+          music.
+
+0.02  Tue Dec 21 15:07:56 CET 1999
+	- added irix audio support and some more by Christian Soeller.
+        - removed that irix support again, in favour of sndlib ;)
+        - clm.c[ch] is distributed but not yet used (it is _large_!).
+
+0.01  Mon Dec 13 06:02:42 CET 1999
+	- original version; created by cp -rp
+

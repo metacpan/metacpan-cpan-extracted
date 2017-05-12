@@ -1,0 +1,23 @@
+lib/Proc/JobQueue.pm
+lib/Proc/JobQueue/BackgroundQueue.pm
+lib/Proc/JobQueue/Command.pm
+lib/Proc/JobQueue/DependencyJob.pm
+lib/Proc/JobQueue/DependencyQueue.pm
+lib/Proc/JobQueue/EventQueue.pm
+lib/Proc/JobQueue/DependencyTask.pm
+lib/Proc/JobQueue/Job.pm
+lib/Proc/JobQueue/Move.pm
+lib/Proc/JobQueue/RemoteDependencyJob.pm
+lib/Proc/JobQueue/Sequence.pm
+lib/Proc/JobQueue/Sort.pm
+Makefile.PL
+MANIFEST			This list of files
+t/event.t
+t/jobqueue.t
+t/olddependency.t
+t/oldsequence.t
+t/lib/Proc/JobQueue/Testing.pm
+t/lib/Proc/JobQueue/FakeCanonical.pm
+t/lib/Proc/JobQueue/OldSequence.pm
+CHANGELOG
+META.yml                                 Module meta-data (added by MakeMaker)

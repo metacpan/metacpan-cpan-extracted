@@ -1,0 +1,8 @@
+Release history for Plack-Middleware-MockProxyFrontend
+
+0.002 Tue 04 Aug 2015
+	- Documentation improvements
+	- More specific error messages
+
+0.001 Fri 15 May 2015
+	- Initial release

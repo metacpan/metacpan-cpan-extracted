@@ -1,0 +1,18 @@
+=begin filter ppi
+
+    # now in verbatim
+    $A++;
+
+=end filter
+__RESULT__
++ppi
+<html><body bgcolor="#ffffff">
+<pre>    <span class="comment"># now in verbatim
+    </span><span class="symbol">$A</span><span class="operator">++</span><span class="structure">;</span></pre>
+</body></html>
+__RESULT__
+-ppi
+<html><body bgcolor="#ffffff">
+<pre>    # now in verbatim
+    $A++;</pre>
+</body></html>

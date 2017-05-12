@@ -1,0 +1,30 @@
+diff -rup Parley-0.57_02_orig/lib/Parley/Controller/Post.pm Parley-0.57_02/lib/Parley/Controller/Post.pm
+--- Parley-0.57_02_orig/lib/Parley/Controller/Post.pm	2007-10-03 12:52:39.000000000 +0200
++++ Parley-0.57_02/lib/Parley/Controller/Post.pm	2007-10-22 15:30:02.000000000 +0200
+@@ -55,7 +55,8 @@ sub edit : Local {
+     }
+ 
+     # process the form submission
+-    else {
++    elsif (defined $c->request->method() and $c->request->method() eq 'POST') {
+         # validate the form data
+         $c->form(
+             $dfv_profile_for{edit_post}
+diff -rup Parley-0.57_02_orig/lib/Parley/Controller/Thread.pm Parley-0.57_02/lib/Parley/Controller/Thread.pm
+--- Parley-0.57_02_orig/lib/Parley/Controller/Thread.pm	2007-10-03 12:51:31.000000000 +0200
++++ Parley-0.57_02/lib/Parley/Controller/Thread.pm	2007-10-22 15:30:59.000000000 +0200
+@@ -388,12 +388,14 @@ sub _add_new_reply {
+         foreach my $f ( $c->form->missing ) {
+             push @{ $c->stash->{view}{error}{messages} }, $f;
+         }
++        return;
+     }
+     elsif ($c->form->has_invalid()) {
+         $c->stash->{view}{error}{message} = q{One or more fields are invalid};
+         foreach my $f ( $c->form->invalid ) {
+             push @{ $c->stash->{view}{error}{messages} }, $f;
+         }
++        return;
+     }
+ 
+     # otherwise, the form data is ok ...

@@ -1,0 +1,78 @@
+NAME
+
+    POE::Filter::LZW - A POE filter wrapped around Compress::LZW
+
+VERSION
+
+    version 1.74
+
+SYNOPSIS
+
+        use POE::Filter::LZW;
+    
+        my $filter = POE::Filter::LZW->new();
+        my $scalar = 'Blah Blah Blah';
+        my $compressed_array   = $filter->put( [ $scalar ] );
+        my $uncompressed_array = $filter->get( $compressed_array );
+    
+        use POE qw(Filter::Stackable Filter::Line Filter::LZW);
+    
+        my ($filter) = POE::Filter::Stackable->new();
+        $filter->push( POE::Filter::LZW->new(),
+                       POE::Filter::Line->new( InputRegexp => '\015?\012', OutputLiteral => "\015\012" ),
+
+DESCRIPTION
+
+    POE::Filter::LZW provides a POE filter for performing
+    compression/decompression using Compress::LZW. It is suitable for use
+    with POE::Filter::Stackable.
+
+CONSTRUCTOR
+
+    new
+
+      Creates a new POE::Filter::LZW object.
+
+METHODS
+
+    get_one_start
+
+    get_one
+
+    get
+
+      Takes an arrayref which is contains lines of compressed input.
+      Returns an arrayref of decompressed lines.
+
+    put
+
+      Takes an arrayref containing lines of uncompressed output, returns an
+      arrayref of compressed lines.
+
+    clone
+
+      Makes a copy of the filter, and clears the copy's buffer.
+
+    level
+
+      Sets the compression level. Consult Compress::LZW for details.
+
+SEE ALSO
+
+    POE
+
+    Compress::LZW
+
+    POE::Filter::Stackable
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,46 @@
+---
+abstract: 'A fully event-driven IRC client module'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+  - 'Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>'
+build_requires:
+  Test::Differences: '0.61'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-IRC
+no_index:
+  directory:
+    - t
+    - xt
+    - utils
+    - examples
+recommends:
+  POE::Component::Client::DNS: '0.99'
+requires:
+  IRC::Utils: '0.12'
+  List::MoreUtils: '0'
+  POE: '1.311'
+  POE::Component::Syndicator: '0'
+  POE::Driver::SysRW: '0'
+  POE::Filter::IRCD: '2.42'
+  POE::Filter::Line: '0'
+  POE::Filter::Stackable: '0'
+  POE::Filter::Stream: '0'
+  POE::Session: '0'
+  POE::Wheel::ReadWrite: '0'
+  POE::Wheel::SocketFactory: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-IRC
+  homepage: http://metacpan.org/release/POE-Component-IRC
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bingos/poe-component-irc.git
+version: '6.88'
+x_authority: cpan:HINRIK

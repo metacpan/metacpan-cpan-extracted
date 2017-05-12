@@ -1,0 +1,56 @@
+PerlIO-via-Skip version 0.01
+============================
+
+This module implements a PerlIO layer that discards lines from IO
+streams. By default, all lines are accepted and passed-through as if no
+filters are present.  Input filters discard input lines, and output
+filters discard output lines; therefore, input lines (that meet user's
+criteria) are excluded from input, and in a similar manner 
+when specified, output lines are omitted from output.
+
+The code is re-entrant. Multiple filters can be
+stacked together without interfering with one another.
+These filters were designed for read, write, and append handles
+( 'r', 'w', 'a'), but will refuse installation
+for read-write mode.
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+There are no required dependencies. These Test modules, however,
+are recomended during testing:
+
+Test::Pod::Coverage
+Test::Pod
+Test::Pod::Coverage
+Test::HasVersion
+Test::CPAN::Meta
+Test::Exception
+Test::Distribution
+Test::Dependencies
+Test::MinimumVersion
+Test::Strict
+Test::Spelling
+Test::Exception
+                    
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 by Ioannis Tambouras
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+

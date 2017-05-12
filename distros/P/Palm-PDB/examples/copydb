@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+# Utility to copy the contents of a PDB.
+# $Id: copydb,v 1.2 1999/11/18 05:21:01 arensb Exp $
+use strict;
+
+use Palm::PDB;
+use Palm::Raw;
+
+my $pdb = new Palm::PDB;
+
+$pdb->Load($ARGV[0]);
+
+$pdb->Write("foo.pdb");

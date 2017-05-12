@@ -1,0 +1,9 @@
+#defaults
+^unicodeeol\.(?!pm|xs|h).+$
+^.*\.pdb$
+^MANIFEST.bak$
+^Makefile$
+^Makefile.old$
+^blib/
+^pm_to_blib$
+^blibdirs$

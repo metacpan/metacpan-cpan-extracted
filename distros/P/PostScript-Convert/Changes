@@ -1,0 +1,15 @@
+Revision history for PostScript::Convert
+
+0.03   2014-03-15
+	- Add JPEG output formats (not recommended for most files)
+	- Document that PDF files are also acceptable input
+	  (This always worked; it just wasn't documented.)
+
+0.02   2012-04-12
+	- Add paper_size & resolution options
+	- Put gs_param before "-c .setpdfwrite" so it works with PDF output
+	- Make dependency on Exporter 5.57 explicit
+	- Add hello_world example
+
+0.01   2010-02-26
+	- Initial release

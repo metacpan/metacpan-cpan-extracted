@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+libgnome_serverdir=${prefix}/lib/metacity
+
+Name: libmetacity-private
+Description: Metacity internals shared 
+Requires: gtk+-2.0
+Version: 2.30.1
+Libs: -L${libdir} -lmetacity-private
+Cflags: -I${includedir}/metacity-1

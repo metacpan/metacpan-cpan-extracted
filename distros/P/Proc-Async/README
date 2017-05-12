@@ -1,0 +1,417 @@
+NAME
+    Proc::Async - Running and monitoring processes asynchronously
+
+VERSION
+    version 0.2.0
+
+SYNOPSIS
+       use Proc::Async;
+
+       # start an external program
+       $jobid = Proc::Async->start ('blastx', '-query', '/data/my.seq', '-out', 'blastout');
+
+       # later, usually from another program (or in another time),
+       # investigate what is the external program doing
+       if (Proc::Async->is_finished ($jobid)) {
+          @files = Proc::Async->result_list ($jobid);
+          foreach my $file (@files) {
+             print Proc::Async->result ($file);
+          }
+          print Proc::Async->stdout();
+          print Proc::Async->stderr();
+       }
+
+       $status = Proc::Async->status ($jobid);
+
+DESCRIPTION
+    This module can execute an external process, monitor its state, get its
+    results and, if needed, kill it prematurely and remove its results.
+    There are, of course, many modules that cover similar functionality,
+    including functions directly built-in in Perl. So why to have this
+    module, at all? The main feature is hidden in the second part of the
+    module name, the word Async. The individual methods (to execute, to
+    monitor, to get results, etc.) can be called (almost) independently from
+    each other, from separate Perl programs, and there may be any delay
+    between them.
+
+    It focuses mainly on invoking external programs from the CGI scripts in
+    the web applications. Here is a typical scenario: Your CGI script starts
+    an external program which may take some time before it finishes. The CGI
+    scripts does not wait for it and returns back, remembering (e.g. in a
+    form of a hidden variable in the returned HTML page) the only thing, the
+    ID of the just started job (a "jobID"). Meanwhile, the invoked external
+    program has been *demonized* (it became a daemon process, a process
+    nobody waits for). Now you have another CGI script that can use the
+    remembered "jobID" to monitor status and get results of the previously
+    started process.
+
+    The core functionality, the demonization, is done by the module
+    "Proc::Daemon". If you plan to write a single program that starts a
+    daemon process and waits for it, then you may need just the
+    "Proc::Daemon" module. But if you wish to split individual calls into
+    two or more programs then the "Proc::Async" may be your choice.
+
+METHODS
+    All methods of this module are *class* methods, there is no "new"
+    instance constructor. It does not make much sense to have an instance if
+    you wish to use it from a separate program, does it? The communication
+    between individual calls is done in a temporary directory (as it is
+    explained later in this documentation but it is not important for the
+    module usage).
+
+  start($args [,$options]) *or* start(@args, [$options])
+    This method starts an external program, makes a daemon process from it,
+    does not wait for its completion and returns a token, a job ID. This
+    token will be used as an argument in all other methods. Therefore, there
+    is no sense to call any of the other methods without calling the
+    "start()" first.
+
+    $args is an arrayref with the full command-line (including the external
+    program name). Or, it can be given as a normal list @args.
+
+    For example:
+
+       my $jobid = Proc::Async->start (qw{ wget -O cpan.index.html http://search.cpan.org/index.html });
+
+    or
+
+       my $jobid = Proc::Async->start ( [qw{ wget -O cpan.index.html http://search.cpan.org/index.html }] );
+
+    If the given array of arguments has only one element, it is still
+    considered as an array. Therefore, you cannot use a single string
+    representing the full command-line:
+
+       # this will not work
+       $jobid = start ("date -u");
+
+    This is a feature not a bug. It prevents to let the shell interprets the
+    meta-characters inside the arguments. More about it in the Perl's
+    documentation (try: "perldoc -f exec"). But sometimes you are willing to
+    sacrifice safety and to let a shell to act for your benefit. An example
+    is the usage of a pipe character in the command line. In order to allow
+    it, you need to specify an option "Proc::Async::ALLOW_SHELL" in the
+    start() method:
+
+       # this works
+       $jobid = start ("date -u", { Proc::Async::ALLOW_SHELL() => 1 });
+
+       # ...and this works, as well
+       # (it prints number 3 to the standard output)
+       $jobid = start ("echo one two three | wc -w", { Proc::Async::ALLOW_SHELL() => 1 });
+
+    The options (so far only one is recognized) are given as a hashref that
+    is the last argument of the "start()" method. The keys of this hash are
+    defined as constants in this module:
+
+       use constant {
+          ALLOW_SHELL => 'ALLOW_SHELL',
+
+       };
+
+    For each job, this method creates a temporary directory (within your
+    system temporary directory, which is, on Unix system, usually "/tmp")
+    and change there ("chdir") before executing the wanted external program.
+    Keep this directory change in mind if your external programs are in the
+    same directory as your Perl program that invokes them. You can use, for
+    example, the "FindBin" module to locate them correctly:
+
+       use FindBin qw($Bin);
+       ...
+       my @args = ("$Bin/my-external-program", ....);
+       $jobid = Proc::Async->start (\@args);
+
+    If you need to access this job directory (in case that you need more
+    than provided by the methods of this module), use the method
+    "working_dir()" to get its path and name.
+
+  status($jobid)
+    In scalar context, it returns status of the given process (given by its
+    $jobid). The status is expressed by a plain text using the following
+    constants:
+
+       use constant {
+           STATUS_UNKNOWN     => 'unknown',
+           STATUS_CREATED     => 'created',
+           STATUS_RUNNING     => 'running',
+           STATUS_COMPLETED   => 'completed',
+           STATUS_TERM_BY_REQ => 'terminated by request',
+           STATUS_TERM_BY_ERR => 'terminated by error',
+       };
+
+    In array context, it additionally returns (optional) details of the
+    status. There can be zero to more details accompanying the status, e.g.
+    the exit code, or the signal number that caused the process to die. The
+    details are in plain text, no constants used. For example:
+
+       $jobid = Proc::Async->start ('date');
+       @status = Proc::Async->status ($jobid);
+       print join ("\n", @status);
+
+    will print:
+
+       running
+       started at Sat May 18 09:35:27 2013
+
+    or
+
+       $jobid = Proc::Async->start ('sleep', 5);
+       ...
+       @status = Proc::Async->status ($jobid);
+       print join ("\n", @status);
+
+    will print:
+
+       completed
+       exit code 0
+       completed at Sat May 18 09:45:12 2013
+       elapsed time 5 seconds
+
+    or, a case when the started job was killed:
+
+       $jobid = Proc::Async->start ('sleep', 60);
+       Proc::Async->signal ($jobid, 9);
+       @status = Proc::Async->status ($jobid);
+       print join ("\n", @status);
+
+    will print:
+
+       terminated by request
+       terminated by signal 9
+       without coredump
+       terminated at Sat May 18 09:41:56 2013
+       elapsed time 0 seconds
+
+  is_finished($jobid)
+    A convenient method that returns true if the status of the job indicates
+    that the external program had finished (well or badly). Or false if not.
+    Which includes the case when the state is unknown.
+
+  signal($jobid [,$signal])
+    It sends a signal to the given job (given by the $jobid). $signal is a
+    positive integer between 1 and 64. Default is 9 which means the KILL
+    signal. The available signals are the ones listed out by "kill -l" on
+    your system.
+
+    It returns true on success, zero on failure (no such job, no such
+    process). It can also croak if the $signal is invalid.
+
+  result_list($jobid)
+    It returns a list of (some) filenames that exist in the job directory
+    that is specified by the given $jobid. The filenames are relative to
+    this job directory, and they may include subdirectories if there are
+    subdirectories within this job directory (it all depends what your
+    external program created there). For example:
+
+       $jobid = Proc::Async->start (qw{ wget -o log.file -O output.file http://www.perl.org/index.html });
+       ...
+       @files = Proc::Async->result_list ($jobid);
+       print join ("\n", @files);
+
+    prints:
+
+       output.file
+       log.file
+
+    The names of the files returned by the "result_list()" can be used in
+    the method "result()" in order to get the file content.
+
+    If the given $jobid does not represent an existing (and readable)
+    directory, it returns an empty list (without croaking).
+
+    If the external program created new files inside new directories, the
+    "result_list()" returns names of these files, too. In other words, it
+    returns names of all files found within the job directory (however deep
+    in sub-directories), except special files (see the next paragraph) and
+    empty sub-directories.
+
+    There are also files with the special names, as defined by the following
+    constants:
+
+       use constant STDOUT_FILE => '___proc_async_stdout___';
+       use constant STDERR_FILE => '___proc_async_stderr___';
+       use constant CONFIG_FILE => '___proc_async_status.cfg';
+
+    These files contain standard streams of the external programs (their
+    content can be fetched by the methods "stdout()" and "stderr()") and
+    internal information about the status of the executed program.
+
+    Another example: If the contents of a job directory is the following:
+
+       ___proc_async_stdout___
+       ___proc_async_stderr___
+       ___proc_async_status.cfg
+       a.file
+       a.dir/
+          file1
+          file2
+          b.dir/
+             file3
+       empty.dir/
+
+    then the returned list will look like this:
+
+       ('a.file',
+        'a.dir/file1',
+        'a.dir/file2',
+        'b.dir/file3')
+
+  result($jobid, $file)
+    It returns the content of the given $file from the job given by $jobid.
+    The $file is a relative filename; must be one of those returned by
+    method "result_list()". It returns undef if the $file does not exist (or
+    if it does not exist in the list returned by "result_list()").
+
+    For getting content of the standard stream, use the following methods:
+
+  stdout($jobid)
+    It returns the content of the STDOUT from the job given by $jobid. It
+    may be an empty string if the job did not produce any STDOUT, or if the
+    job does not exist anymore.
+
+  stderr($jobid)
+    It returns the content of the STDERR from the job given by $jobid. It
+    may be an empty string if the job did not produce any STDERR, or if the
+    job does not exist anymore.
+
+    If you execute an external program that cannot be found you will find an
+    error message about it here, as well:
+
+       my $jobid = Proc::Async->start ('a-bad-program');
+       ...
+       print join ("\n", Proc::Async->status ($jobid);
+
+          terminated by error
+          exit code 2
+          completed at Sat May 18 11:02:04 2013
+          elapsed time 0 seconds
+
+       print Proc::Async->stderr();
+
+          Can't exec "a-bad-program": No such file or directory at lib/Proc/Async.pm line 148.
+
+  working_dir($jobid)
+    It returns the name of the working directory for the given $jobid. Or
+    undef if such working directory does not exist.
+
+    You may notice that the $jobid looks like a name of a working directory.
+    Actually, in the current implementation, it is, indeed, the same. But it
+    may change in the future. Therefore, better use this method and do not
+    rely on such sameness.
+
+  clean($jobid)
+    It deletes all files belonging to the given job, including its job
+    directory. It returns the number of file successfully deleted. If you
+    ask for a status of the job after being cleaned up, you get
+    "STATUS_UNKNOWN".
+
+  get_configuration($jobid)
+    Use this method only if you wish to look at the internals (for example
+    to get exact starting and ending time of a job). It creates a
+    configuration (an instance of "Proc::Async::Config") and fills it from
+    the configuration file (if such file exists) for the given job. It
+    returns a two-element array, the first element being a configuration
+    instance, the second element the file name where the configuration was
+    filled from:
+
+       my $jobid = Proc::Async->start ('date', '-u');
+       ...
+       my ($cfg, $cfgfile) = Proc::Async->get_configuration ($jobid);
+       foreach my $name ($cfg->param) {
+          foreach my $value ($cfg->param ($name)) {
+              print STDOUT "$name=$value\n";
+          }
+       }
+
+    will print:
+
+       job.arg=date
+       job.arg=-u
+       job.ended=1368865570
+       job.id=/tmp/q74Bgd8mXX
+       job.pid=22273
+       job.started=1368865570
+       job.status=completed
+       job.status.detail=exit code 0
+       job.status.detail=completed at Sat May 18 11:26:10 2013
+       job.status.detail=elapsed time 0 seconds
+
+ADDITIONAL FILES
+    The module distribution has several example and helping files (which are
+    not installed when the module is fetched by the "cpan" or "cpanm").
+
+   scripts/procasync
+    It is a command-line oriented script that can invoke any of the
+    functionality of this module. Its purpose is to test the module and,
+    perhaps more importantly, to show how to use the module's methods.
+    Otherwise, it does not make much sense (that is why it is not normally
+    installed).
+
+    It has its own (but only short) documentation:
+
+       scripts/procasync -help
+
+    or
+
+       perldoc scripts/procasync
+
+    Some examples are:
+
+       scripts/procasync -start date
+       scripts/procasync -start 'date -u'
+       scripts/procasync -start 'sleep 100'
+
+    The "-start" arguments can be repeated if its arguments have spaces:
+
+       scripts/procasync -start cat -start '/data/filename with spaces'
+
+    All lines above print a job ID that must be used in a consequent usage:
+
+       scripts/procasync -jobid /tmp/hBsXcrafhn -status
+       scripts/procasync -jobid /tmp/hBsXcrafhn -stdout -stderr -rlist
+       scripts/procasync -jobid /tmp/hBsXcrafhn -wdir
+       ...etc...
+
+   examples/README
+    Because this module is focused mainly on its usage within CGI scripts,
+    there is an example of a simple web application. The "README" file
+    explains how to install it and run it from your web server. Here
+    <http://sites.google.com/site/martinsenger/extester-screenshot.png> is
+    its screenshot.
+
+   t/data/extester
+    This script can be used for testing this module (as it is used in the
+    regular Perl tests and in the web application mentioned above). It can
+    be invoked as an external program and, depending on its command line
+    arguments, it creates some standard and/or standard error streams, exits
+    with the specified exit code, etc. It has its own documentation:
+
+       perldoc t/data/extester
+
+    An example of its command-line:
+
+       extester -stdout an-out -stderr an-err -exit 5 -create a.tmp=5 few/new/dirs/b.tmp=3 an/empty/dir/=0
+
+    which writes given short texts into stdout and stderr, creates two files
+    ("a.tmp" and "b.tmp", the latter one together with the given
+    sub-directories hierarchy) and it exits with exit code 5.
+
+BUGS
+    Please report any bugs or feature requests to
+    <http://github.com/msenger/Proc-Async/issues>.
+
+  Missing features
+    Standard input
+        Currently, there is no support for providing standard input for the
+        started external process.
+
+AUTHOR
+    Martin Senger <martin.senger@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Martin Senger, CBRC-KAUST
+    (Computational Biology Research Center - King Abdullah University of
+    Science and Technology) All Rights Reserved.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,16 @@
+Changes
+lib/Package/Base.pm
+lib/Package/Base/Devel.pm
+lib/Package/Install.pm
+lib/Package/Configure.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+pkg_config.in
+README.Package-Base
+README.Package-Install
+bin/pstub.PL
+t/01.contructor_pb.t
+t/02.constructor_pbd.t
+t/03.override.t
+t/04.pkg_config.t

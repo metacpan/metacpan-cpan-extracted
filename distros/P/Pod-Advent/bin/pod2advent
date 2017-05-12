@@ -1,0 +1,72 @@
+#!perl
+
+use strict;
+use warnings;
+use Pod::Advent;
+use Getopt::Long;
+
+my $pod = shift @ARGV or die "need pod filename, or - for file on stdin, or + for snippet on stdin";
+
+
+my $css;
+my $isadvent = 1;
+my $spellcheck = 1;
+GetOptions(
+	'css=s' => \$css,
+	'advent!' => \$isadvent,
+	'spellcheck!' => \$spellcheck,
+);
+
+my $advent = Pod::Advent->new;
+
+if( !$spellcheck && $advent->spellcheck_enabled ){
+  # user wants the (available) spellcheck turned off
+
+  # HACK. This should be an accessor to an attribute.
+  $Pod::Advent::speller = undef;
+}
+
+$advent->css_url($css) if $css;
+
+$Pod::Advent::data{isAdvent} = $isadvent;  # HACK. This should be an accessor to an attribute.
+
+if( $pod eq '-' ){
+  $advent->parse_file( \*STDIN );
+}elsif( $pod eq '+' ){
+  local $/ = undef;
+  my $s = "=pod\n\n" . <STDIN> . "\n\n=cut";
+  $Pod::Advent::BODY_ONLY = 1;
+  $advent->parse_string_document( $s );
+}else{
+  $advent->parse_file( $pod );
+}
+
+if( $advent->num_spelling_errors ){
+  print STDERR "Possible SPELLING ERRORS:\n";
+  my %seen;
+  foreach my $word ( $advent->spelling_errors ){
+    print STDERR "\t$word\n" unless $seen{$word}++;
+  }
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+pod2advent - create Perl Advent Calendar html from POD file
+
+=head1 SYNOPSIS
+
+  pod2advent entry.pod > entry.html
+
+  cat entry.pod | pod2advent - > entry.html
+
+  echo 'A<http://example.com|Test>' | pod2advent +
+
+=head1 DESCRIPTION
+
+Simple command-line wrapper for L<Pod::Advent>.
+
+=cut

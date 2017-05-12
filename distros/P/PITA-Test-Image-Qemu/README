@@ -1,0 +1,43 @@
+NAME
+    PITA::Test::Image::Qemu - A tiny Qemu test image that only boots and
+    pings
+
+DESCRIPTION
+    This distribution contains a small Qemu image intended for snapshot-mode
+    testing of the PITA::Guest::Driver::Qemu module.
+
+    Primarily, it is intended for testing the launch-shutdown cycle, and not
+    for testing discovery or package testing.
+
+    It verifies that the driver is using the qemu binary properly.
+
+METHODS
+  filename
+    The static "filename" method returns the location of the expanded
+    testing image, verified to exist. The file will be available only with
+    read permissions, and without the ability to write.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PITA-Test-Image-Qemu>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    The Practical Image Testing Architecture (<http://ali.as/pita/>)
+
+    PITA, PITA::Guest::Driver::Qemu
+
+COPYRIGHT
+    Copyright 2006 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

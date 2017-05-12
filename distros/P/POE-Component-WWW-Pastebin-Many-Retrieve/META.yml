@@ -1,0 +1,24 @@
+---
+name: POE-Component-WWW-Pastebin-Many-Retrieve
+version: 0.001
+author:
+  - 'Zoffix Znet <zoffix@cpan.org>'
+abstract: non-blocking wrapper around WWW::Pastebin::Many::Retrieve
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 1.04
+  POE: 0.9999
+  POE::Component::NonBlockingWrapper::Base: 0.002
+  WWW::Pastebin::Many::Retrieve: 0.001
+build_requires:
+  Test::More: 0
+provides:
+  POE::Component::WWW::Pastebin::Many::Retrieve:
+    file: lib/POE/Component/WWW/Pastebin/Many/Retrieve.pm
+    version: 0.001
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,13 @@
+=head1 NAME
+
+=head1 DESCRIPTION
+
+=begin docbook
+
+<para id="42">
+This is an XML section passed straight through to the output.
+</para>
+
+=end
+
+=cut

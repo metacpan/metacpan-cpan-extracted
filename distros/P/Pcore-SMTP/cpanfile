@@ -1,0 +1,2 @@
+requires 'Pcore',        v0.25.0;
+requires 'Authen::SASL', v2.16.0;

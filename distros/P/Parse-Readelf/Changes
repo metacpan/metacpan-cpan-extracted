@@ -1,0 +1,67 @@
+Revision history for Perl extension Parse::Readelf.
+
+0.18	(12.05.2015)
+	fixed regexp in test for Perl 5.22
+
+0.17	(12.07.2013)
+	fix for bad sort order when using display_nested_items
+
+0.16	(06.04.2013-09.04.2013)
+	Fix for multidimensional arrays
+
+0.15	(26.12.2012-05.04.2013)
+	added support for some more TAGs and attributes
+	fixed missing include directive and added test in example source
+	added first (experimental) support for Dwarf-4
+
+0.14	(12.03.2012-03.10.2012)
+	introduced constants for result tupel and fixed documentation (63778)
+
+0.13	(12.03.2012)
+	fixed bug with C typedefs (66776)
+
+0.12	(09.03.2012)
+	fixed tests for Carp >= 1.25
+
+0.11	(26.11.2011)
+	removed some intermediate paranoia checks
+
+0.10	(15.03.2010-10.08.2011)
+	fixed tests for MSWin without "cat"
+	improved robustness of tail of expected error messages
+	added possible wildcards and strings to recognition of const values
+
+0.09	(21.01.2010)
+	fixed bad results for empty regular expression in item_ids_matching
+
+0.08	(21.12.2009)
+	yet another missing "attribute to be ignored" found
+
+0.07	(21.12.2009)
+	fixed regexp for 1 byte locations
+	added missing ignored attribute
+
+0.06	(11.11.2009-20.12.2009)
+	avoid SIGPIPE on close in tests 63++ of Parse-Readelf-Debug-Info.t
+	fixed installation INC path in example structure_layout.pl
+	fixed regexps to recognise changed output of newer readelf
+	fixed sort order for structure layout
+	added special handling of items with info for other items
+
+0.05	(19.05.2009-30.05.2009)
+	support of newer readelf/objdump versions
+	example script now supports STDIN
+	added support of volatile TAG, bugfix of postfixes
+
+0.04	(05.04.2008-30.04.2009)
+	hopefully fixed tests for Windows
+	added Build.PL
+
+0.03	(03.11.2007-10.12.2007)
+	rebuild with newer MakeMaker, added missing ignored TAG
+
+0.02	(27.09.2007-31.09.2007)
+	fixed test to work with Perl version 5.6, added POD tests
+
+0.01	(21.01.2007-10.09.2007)
+	first version supporting printing of structure layout

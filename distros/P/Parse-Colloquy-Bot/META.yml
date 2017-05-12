@@ -1,0 +1,20 @@
+---
+name: Parse-Colloquy-Bot
+version: 0.02
+author:
+  - Nicola Worthington <nicolaw@cpan.org>
+abstract: Parse Colloquy bot/client terminal output
+license: open_source
+requires:
+  Carp: 0
+recommends:
+  Test: 0
+  Test::Deep: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Parse::Colloquy::Bot:
+    file: lib/Parse/Colloquy/Bot.pm
+    version: 0.02
+generated_by: Module::Build version 0.2611

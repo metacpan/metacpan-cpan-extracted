@@ -1,0 +1,6 @@
+Revision history for Perl extension Petrophysics::Units.
+
+0.01  Mon Oct 20 13:05:09 2003
+	- original version; created by h2xs 1.22 with options
+		--compat-version=5.6.0 -X -n Petrophysics::Units
+

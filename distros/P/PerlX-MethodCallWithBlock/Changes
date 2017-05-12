@@ -1,0 +1,20 @@
+Revision history for Perl extension PerlX::MethodCallWithBlock
+
+0.05
+- Fix dependencies
+
+0.04
+- make sure it work with autobox, autobox::Core
+- slightly reduce the chance to see the message "PL_linestr is not long enough"
+- supporting more indentations of schwartzian transform statements.
+
+0.03
+- cool reading example code!
+- reimplement with the $doc->find method from PPI for easier logic
+
+0.02
+- make it works when no arg list is given
+- reimplement the parsing part with PPI
+
+0.01    Mon Aug 31 20:41:26 2009
+        - original version

@@ -1,0 +1,10 @@
+.travis.yml
+Changes
+lib/Preproc/Tiny.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README.md
+t/Preproc-Tiny.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

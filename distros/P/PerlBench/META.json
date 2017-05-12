@@ -1,0 +1,67 @@
+{
+   "abstract" : "compare several perls's performance",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PerlBench",
+   "no_index" : {
+      "directory" : [
+         "benchmarks",
+         "perlbench-results",
+         "t"
+      ],
+      "package" : [
+         "Pod::HTML"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "Getopt::Std" : "0",
+            "Sys::Hostname" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/perlbench/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/perlbench",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/perlbench.git",
+         "web" : "https://github.com/briandfoy/perlbench"
+      }
+   },
+   "version" : "1.001",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

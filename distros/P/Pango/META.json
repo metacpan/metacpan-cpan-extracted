@@ -1,0 +1,81 @@
+{
+   "abstract" : "Layout and render international text",
+   "author" : [
+      "gtk2-perl Team <gtk-perl-list at gnome dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "lgpl_2_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pango",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "file" : [
+         "xs/Pango.xs",
+         "xs/PangoAttributes.xs",
+         "xs/PangoContext.xs",
+         "xs/PangoFont.xs",
+         "xs/PangoFontset.xs",
+         "xs/PangoFontMap.xs",
+         "xs/PangoLayout.xs",
+         "xs/PangoRenderer.xs",
+         "xs/PangoScript.xs",
+         "xs/PangoTabs.xs",
+         "xs/PangoTypes.xs",
+         "xs/PangoCairo.xs",
+         "xs/PangoGravity.xs",
+         "xs/PangoMatrix.xs"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Cairo" : "1.000",
+            "ExtUtils::Depends" : "0.300",
+            "ExtUtils::MakeMaker" : "0",
+            "ExtUtils::PkgConfig" : "1.030",
+            "Glib" : "1.220"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cairo" : "1.000",
+            "ExtUtils::Depends" : "0.300",
+            "ExtUtils::PkgConfig" : "1.030",
+            "Glib" : "1.220"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Pango [at] rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Pango"
+      },
+      "homepage" : "http://gtk2-perl.sourceforge.net",
+      "license" : [
+         "http://www.gnu.org/licenses/lgpl-2.1.html"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.gnome.org/perl-Pango",
+         "web" : "http://git.gnome.org/browse/perl-Pango"
+      },
+      "x_MailingList" : "https://mail.gnome.org/mailman/listinfo/gtk-perl-list",
+      "x_twitter" : "https://twitter.com/GTKPerl"
+   },
+   "version" : "1.227"
+}

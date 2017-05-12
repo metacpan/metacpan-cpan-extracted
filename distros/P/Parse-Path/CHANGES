@@ -1,0 +1,31 @@
+Revision History for Parse-Path
+===============================
+
+v0.92 2013-09-11
+----------------
+
+commit 85e27274747852e28e8adf4df7b66b7d623e2208
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Wed Sep 11 21:17:02 2013 -0400
+
+    Remove ClassAttribute in favor of one-time isa validation (#1)
+
+v0.91 2013-08-09
+----------------
+
+commit ae62b0ac68e6cefadcdec679300c20df7c18f869
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Fri Aug 9 22:18:02 2013 -0400
+
+    Release v0.91
+
+commit c789276058d7e458ab16dbd150df41bf7ad38731
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Fri Aug 9 22:15:10 2013 -0400
+
+    Fix 00-compile.t to skip PerlClassUTF8
+    Add small note in Role docs about pos_translation and missing delimiters
+
+===================================
+End of changes in the last 365 days
+===================================

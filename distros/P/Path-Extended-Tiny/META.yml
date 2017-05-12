@@ -1,0 +1,33 @@
+---
+abstract: 'a Path::Tiny wrapper for Path::Extended compatibility'
+author:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+  Test::UseAllModules: '0.10'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.06'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Path-Extended-Tiny
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Encode: '0'
+  Exporter: '5.57'
+  File::Copy::Recursive: '0'
+  File::Find: '0'
+  File::Path: '0'
+  IO::Handle: '1.25'
+  Path::Tiny: '0.048'
+  Text::Glob: '0'
+resources:
+  repository: https://github.com/charsbar/Path-Extended-Tiny
+version: '0.08'

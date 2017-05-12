@@ -1,0 +1,47 @@
+2011-09-16
+
+   * removed test document
+
+2009-01-13 09:49  cvs
+
+	* MANIFEST, Makefile.PL: made sure to check os and xpdf and convert
+	  deps before rest of Makefile.PL runs
+
+2009-01-13 09:43  cvs
+
+	* Changes, t/04_knowntofail.t, t/noimages.pdf: Added tests for
+	  bogus file not on disk, and added a test for a file that does not
+	  have any images. to make sure it works properly.
+
+2009-01-13 09:24  cvs
+
+	* lib/PDF/GetImages.pm: Moved documentation separate pod file.
+	  Cleaned up documentation, added some explanations.
+
+	  Made sure pdfimages() does not die if the argument is not a file
+	  on disk or not a pdf, but instead will return undef and save
+	  error in $PDF::GetImages::errstr properly.
+
+	  Cleaned up code.
+
+2008-09-25 15:45  cvs
+
+	* lib/PDF/GetImages.pm: added some test docs
+
+2008-05-12 16:06  cvs
+
+	* lib/PDF/GetImages.pm: made sure to check that we have the binary
+	  execs that we want
+
+2007-12-31 16:59  cvs
+
+	* MANIFEST, Makefile.PL, t/00_Dependencies_Check.t,
+	  t/01_PDF_GetImages.t, t/09_cleanup.t, lib/PDF/GetImages.pm,
+	  t/scan1.pdf: Initial revision
+
+2007-12-31 16:59  cvs
+
+	* MANIFEST, Makefile.PL, t/00_Dependencies_Check.t,
+	  t/01_PDF_GetImages.t, t/09_cleanup.t, lib/PDF/GetImages.pm,
+	  t/scan1.pdf: init
+

@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+META.json
+Makefile
+README.md
+cpanfile
+inc/Module/AutoInstall.pm
+lib/Plack/Middleware/Debug/GitStatus.pm
+t/Plack/Middleware/Debug/GitStatus.t
+test-app.psgi
+META.yml
+MANIFEST

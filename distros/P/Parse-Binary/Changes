@@ -1,0 +1,63 @@
+[Changes for 0.11 - 2009-01-25]
+
+* When formatting a structure, repeating a variable-counted field 0 times
+  should result in no output, instead of a literal ARRAY(...) string.
+  Contributed by: Werner Höhrer
+
+[Changes for 0.10 - 2006-07-07]
+
+* Updated Module::Install to 0.63.
+* Updated Audrey's contact information.
+
+[Changes for 0.09 - 2004-12-24]
+
+* In Parse::Binary::FixedFormat's lazy_unformat, remove
+  dangling cyclic references to reduce memory leakage.
+
+[Changes for 0.08 - 2004-09-08]
+
+* In Parse::Binary::FixedFormat, pass data around by
+  reference instead of by value to reduce memory usage.
+
+[Changes for 0.07 - 2004-03-16]
+
+* Fix incompatibility with 5.6.x due to mixing "use integer" and "$] < 5.008".
+* Bump version for FixedFormat too.
+* Even more optimisations.
+* Cache sibling_index for more speed gain
+* Cache is_type.
+* Properly implement nested lazy loading.
+
+[Changes for 0.06 - 2004-02-17]
+
+* Allow "__" to be used as "::" in is_type().
+* True lazy iterating of trailing members.
+* Deprecate flyweight cache in favor of generators.
+* Lazy loading of members via next_member implemented.
+* Recommend Scalar::Util now.
+* New function set_output_file(), next_member(), callback() and callback_members()
+
+[Changes for 0.05 - 2004-02-15]
+
+* Fields with name as '_' now means "choose an unique name for me".
+  there can be multiple such fields, and they won't overlap.
+* New control constant ENCODED_FIELDS (default to 'Data'), that controls 
+  which fields get affected by ENCODING.
+
+[Changes for 0.04 - 2004-02-15]
+
+* Remove an unneccessary ->refresh after set_members.
+
+[Changes for 0.03 - 2004-02-14]
+
+* Properly handles "(format)*" style formats in 5.6.x.
+
+[Changes for 0.02 - 2004-02-13]
+
+* More fixes for Perl 5.6.
+* Make $count safe to use for Perl 5.6.
+* Fix small POD typos.
+
+[Changes for 0.01 - 2004-02-13]
+
+* Initial CPAN release.

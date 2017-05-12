@@ -1,0 +1,55 @@
+README for Pod::PXML
+                                        Time-stamp: "2001-05-25 22:00:17 MDT"
+
+			    Pod::PXML
+
+This is an experimental module for converting between POD and an XML
+instance that I've designed to be a notational variant of POD.
+
+See the makefile for the list of dependencies.
+
+
+
+INSTALLATION
+
+You install this module-suite, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of this module-suite in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL PREFIX=~/perl
+
+See perldoc perlmodinstall for more information on installing modules.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for this
+module should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of this module is available from the Comprehensive
+Perl Archive Network (CPAN).  Visit <http://www.perl.com/CPAN/> to
+find a CPAN site near you.
+
+
+COPYRIGHT
+
+Copyright 2001, Sean M. Burke <sburke@cpan.org>, all rights reserved.
+
+The programs and documentation in this dist are distributed in the
+hope that they will be useful, but without any warranty; without even
+the implied warranty of merchantability or fitness for a particular
+purpose.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,23 @@
+0.  Have perl5 installed.  The later the version, the better.
+    In fact, perl5.004 may be mandatory.
+
+1.  Read FAQ, SECURITY, README and MODULE_NOTES.
+
+2.  Install all of the modules listed in MODULE_NOTES, making sure
+    to understand the notes in MODULE_NOTES and act on them if
+    necessary.
+
+3.  Type 'perl Makefile.PL'.
+
+4.  Type 'make'.
+
+5.  Type 'make install'.
+
+6.  Go read misc/HOW_TO_PLAY.
+
+7.  Go read the source code.
+
+8.  Have fun!
+
+9.  When your fun is negatively impacted by errorful features,
+    send me a bug report at fsg@ultranet.com.

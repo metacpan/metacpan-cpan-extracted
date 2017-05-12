@@ -1,0 +1,66 @@
+@prefix cpan: <http://purl.org/NET/cpan-uri/person/> .
+@prefix cpant: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dbug: <http://ontologi.es/doap-bugs#> .
+@prefix dcs: <http://ontologi.es/doap-changeset#> .
+@prefix dist: <http://purl.org/NET/cpan-uri/dist/P5U-Command-Changes/> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+_:r1369770599r0 a dcs:Update ;
+	rdfs:label "Use match::simple instead of smartmatch." .
+_:r1369770599r1 <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/P5U/Command/Changes.pm" ;
+	<http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#programmingLanguage> "Perl" ;
+	a <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#FileDataObject>, <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#SourceCode> ;
+	rdfs:label "P5U::Command::Changes" .
+_:r1369770599r2 <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/P5U/Command/Changes.pm" ;
+	<http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#programmingLanguage> "Perl" ;
+	a <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#FileDataObject>, <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#SourceCode> ;
+	rdfs:label "P5U::Command::Changes" .
+_:r1369770599r3 <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/P5U/Command/Changes.pm" ;
+	<http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#programmingLanguage> "Perl" ;
+	a <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#FileDataObject>, <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#SourceCode> ;
+	rdfs:label "P5U::Command::Changes" .
+_:rbC75159A8C7CF11E2A9D4F10D5BF283EDr0 dcs:item _:r1369770599r0 .
+_:rbC75159A8C7CF11E2A9D4F10D5BF283EDr1 doap:browse <https://github.com/tobyink/p5-p5u-command-changes> ;
+	a doap:GitRepository .
+<http://dev.perl.org/licenses/> <http://purl.org/dc/terms/title> "the same terms as the perl 5 programming language system itself" .
+dist:project cpant:perl_version_from _:r1369770599r1 ;
+	cpant:readme_from _:r1369770599r3 ;
+	cpant:requires "CPAN::Changes"^^cpant:dsWithoutVersion, "JSON"^^cpant:dsWithoutVersion, "LWP::UserAgent"^^cpant:dsWithoutVersion, "Module::Info"^^cpant:dsWithoutVersion, "P5U"^^cpant:dsWithoutVersion ;
+	cpant:test_requires "Test::More 0.61"^^cpant:dsWithVersion ;
+	cpant:version_from _:r1369770599r2 ;
+	<http://purl.org/dc/terms/contributor> cpan:tobyink ;
+	doap:bug-database <http://rt.cpan.org/Dist/Display.html?Queue=P5U-Command-Changes> ;
+	doap:created "2012-09-12"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:developer cpan:tobyink ;
+	doap:download-page <https://metacpan.org/release/P5U-Command-Changes> ;
+	doap:homepage <https://metacpan.org/release/P5U-Command-Changes> ;
+	doap:license <http://dev.perl.org/licenses/> ;
+	doap:maintainer cpan:tobyink ;
+	doap:name "P5U-Command-Changes" ;
+	doap:programming-language "Perl" ;
+	doap:release dist:v_0-001, dist:v_0-002 ;
+	doap:repository _:rbC75159A8C7CF11E2A9D4F10D5BF283EDr1 ;
+	doap:shortdesc "p5u extension to view change logs" ;
+	a doap:Project .
+dist:v_0-001 dcs:released-by cpan:tobyink ;
+	<http://purl.org/dc/terms/identifier> "P5U-Command-Changes-0.001"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2012-09-12"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-Command-Changes-0.001.tar.gz> ;
+	doap:revision "0.001"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a doap:Version ;
+	rdfs:label "Initial release" .
+dist:v_0-002 dcs:changeset _:rbC75159A8C7CF11E2A9D4F10D5BF283EDr0 ;
+	dcs:released-by cpan:tobyink ;
+	<http://purl.org/dc/terms/identifier> "P5U-Command-Changes-0.002"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	<http://purl.org/dc/terms/issued> "2013-05-28"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-Command-Changes-0.002.tar.gz> ;
+	doap:revision "0.002"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a doap:Version .
+cpan:tobyink a foaf:Person ;
+	foaf:mbox <mailto:tobyink@cpan.org> ;
+	foaf:name "Toby Inkster" ;
+	foaf:nick "TOBYINK" ;
+	foaf:page <https://metacpan.org/author/TOBYINK> .

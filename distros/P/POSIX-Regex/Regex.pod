@@ -1,0 +1,80 @@
+=head1 NAME
+
+POSIX::Regex - OO interface for the gnu regex engine
+
+=head1 SYNOPSIS
+
+    use POSIX::Regex qw(:all);
+
+    my $reg = new POSIX::Regex('a\(a\|b\)\(c\)');
+
+    print "You win a toy!\n" if $reg->match("aac");
+
+    if( my @m = $reg->match("abc") ) { # returns the matches
+        print "entire match: ", shift @m, "\n";
+        print "\tgroup match: $_\n" for @m;
+
+    } else {
+        print "No toy for you!\n";
+    }
+
+=head1 REGULAR OPTIONS
+
+(All of the following text was plagarized without edit from 'man 3 regex'.)
+
+If you choose to import :all then you will have the following regular options
+that you may optionally pass to new() (aka regcomp).
+
+=head2 REG_ICASE
+
+Do  not differentiate case.  Subsequent regexec() searches using this pattern
+buffer will be case insen- sitive.
+
+=head2 REG_EXTENDED
+
+Use POSIX Extended Regular Expression syntax when interpreting regex.  If not
+set, POSIX  Basic  Regular Expression syntax is used.
+
+=head2 REG_NEWLINE
+
+Match-any-character operators don't match a newline.
+
+A non-matching list ([^...])  not containing a newline does not match a newline.
+
+Match-beginning-of-line operator (^) matches the empty string immediately after
+a newline, regardless of whether eflags, the execution flags of regexec(),
+contains REG_NOTBOL.
+
+Match-end-of-line operator ($) matches the empty string immediately  before  a
+newline,  regardless  of whether eflags contains REG_NOTEOL.
+
+=head2 REG_NOTBOL
+
+The match-beginning-of-line operator always fails to match  (but see  the
+compilation  flag  REG_NEWLINE above) This flag may be used when different
+portions of a string are passed to regexec() and the beginning of the string
+should not be interpreted as the beginning of the line.
+
+=head2 REG_NOTEOL
+
+=head1 AUTHOR
+
+Paul Miller <jettero@cpan.org>
+
+I am using this software in my own projects...  If you find bugs, please
+please please let me know. :) Actually, let me know if you find it handy at
+all.  Half the fun of releasing this stuff is knowing that people use it.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2007 Paul Miller -- LGPL2
+
+=head1 FAQ
+
+Yes, I'm aware there's special support for alternate regular expression systems
+in perl 5.10.x ... let me know when people are done with perl 5.6 and 5.8 and
+I'll delete this from CPAN.  Thanks.
+
+=head1 SEE ALSO
+
+perl(1), regex(3)

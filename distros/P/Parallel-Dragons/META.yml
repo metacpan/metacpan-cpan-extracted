@@ -1,0 +1,21 @@
+---
+abstract: 'Daemon are forever... Dragons lay eggs, grow fast and die in flames!'
+author:
+  - 'theMage <themage@magick-source.net>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parallel-Dragons
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: v0.9.4

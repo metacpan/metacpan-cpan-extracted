@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                PDF-Reuse
+version:             0.39
+abstract:            Reuse and mass produce PDF documents
+license:             perl
+author:
+    - Lars Lundberg LARSLUND@CPAN.ORG
+    - Chris Nighswonger CNIGHS@CPAN.ORG
+generated_by:        ExtUtils::MakeMaker version 6.42_02
+distribution_type:   module
+requires:
+    AutoLoader:                    0
+    Carp:                          0
+    Compress::Zlib:                0
+    Data::Dumper:                  0
+    Digest::MD5:                   0
+    Exporter:                      0
+    Font::TTF:                     0
+    Text::PDF::TTFont0:            0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

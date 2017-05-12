@@ -1,0 +1,14 @@
+Revision history for Perl extension PCL::Simple.
+
+1.00  Tue Apr 16 11:13:12 2002
+        - original version; created by h2xs 1.21 with options
+            -AX -n PCL::Simple
+
+1.01  Tue Aug 20 09:36:21 2002
+        - added -msrc flag for controlling media source (paper
+          tray) via PCL 
+
+1.02  Thu May 25 16:53:47 2006
+        - changed UEL Command string from "\e%-123245X" to "\e%-12345X"
+          (Thanks, Eric!)
+

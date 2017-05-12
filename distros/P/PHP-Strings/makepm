@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+use strict;
+use warnings FATAL => 'all';
+use YAML qw( LoadFile Dump );
+use Template;
+use B::Keywords;
+use Getopt::Long;
+
+GetOptions(
+    'debug' => \my $debug,
+    'nomake' => \my $do_makefile,
+);
+
+$_ = $_ ? 1 : 0 for $debug;
+$_ = $_ ? 0 : 1 for $do_makefile;
+
+sub load_fns
+{
+    my @fns = <fns/*.fn>;
+    my %fns;
+    for my $file (@fns) {
+        warn "$file...\n" if $debug;
+        my $data = LoadFile( $file );
+        $data->{name} ||= do {
+            $file =~ m[/([^.]+)] and $1;
+        };
+        die "$data->{name} has no docs!" unless length $data->{docs};
+        $fns{$data->{name}} = $data;
+    }
+
+    return \%fns;
+}
+
+sub inject
+{
+    my ( $data) = @_;
+    my %perl = map { ($_,1) } @B::Keywords::Functions;
+    my @values = @{$data}{sort keys %$data};
+
+    chomp( my @synopses = grep defined, map { $_->{synopsis} } @values );
+    s/^/    /mg for @synopses;
+    defined $_->{synopsis} and $_->{synopsis} =~ s/^/    /mg for @values;
+    my %requirements = map { %$_ } grep defined, map { $_->{requirements} } @values;
+
+    my @autoinstall;
+    for ( @values )
+    {
+        next unless $_->{requirements};
+        push @autoinstall, {
+            name => $_->{name},
+            requirements => $_->{requirements},
+        };
+    }
+
+    for ( values %$data ) {
+        $_->{exports} ||= [ $_->{name} ];
+        delete $_->{exports} if exists $perl{$_->{name}};
+        $_->{badegg} = !$_->{code} && $_->{exports};
+    }
+    my $injection = {
+        autoinstall => \@autoinstall,
+        synopses => \@synopses,
+        requirements => \%requirements,
+        fns => $data,
+    };
+
+    my $tt = Template->new() or die $Template::ERROR;
+    return sub {
+        my ($in, $out) = @_;
+        warn "Formatting $in...\n";
+        $tt->process( $in, $injection, $out ) or die $tt->error();
+    };
+}
+
+{
+    my $fns = load_fns();
+    my $formatter = inject( $fns );
+    $formatter->( 'Strings.tt', 'Strings.pm' );
+    $formatter->( 'Makefile.tt', 'Makefile.PL' ) if $do_makefile;
+}

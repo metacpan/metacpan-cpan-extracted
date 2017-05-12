@@ -1,0 +1,21 @@
+<SOFTPKG NAME="Archive-Tar" VERSION="1,30,0,0">
+	<TITLE>Archive-Tar</TITLE>
+	<ABSTRACT>Manipulates TAR archives</ABSTRACT>
+	<AUTHOR>Jos Boumans (kane@cpan.org)</AUTHOR>
+	<IMPLEMENTATION>
+		<DEPENDENCY NAME="File-Spec" VERSION="0,82,0,0" />
+		<DEPENDENCY NAME="IO-String" VERSION="0,0,0,0" />
+		<DEPENDENCY NAME="IO-Zlib" VERSION="1,01,0,0" />
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+		<CODEBASE HREF="Archive-Tar-1.30-PPM56.tar.gz" />
+	</IMPLEMENTATION>
+	<IMPLEMENTATION>
+    <DEPENDENCY NAME="File-Spec" VERSION="0,82,0,0" />
+    <DEPENDENCY NAME="IO-String" VERSION="0,0,0,0" />
+    <DEPENDENCY NAME="IO-Zlib" VERSION="1,01,0,0" />
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <CODEBASE HREF="Archive-Tar-1.30-PPM58.tar.gz" />
+  </IMPLEMENTATION>
+</SOFTPKG>

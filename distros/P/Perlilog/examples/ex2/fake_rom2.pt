@@ -1,0 +1,21 @@
+port fakeport vars r0:zero, r1:one, r2:two, r3:three;
+
+module fake_rom(zero, one, two, three);
+
+   output [:] zero, one, two, three;
+
+   assign zero  = 8'd65;
+   assign one   = 8'd66;
+   assign two   = 8'd67;
+   assign three = 8'd10;
+endmodule
+
+
+
+
+
+
+
+
+
+

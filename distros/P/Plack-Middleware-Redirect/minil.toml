@@ -1,0 +1,4 @@
+name = "Plack-Middleware-Redirect"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

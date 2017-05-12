@@ -1,0 +1,48 @@
+Revision history for Perl extension Prancer
+
+0.01 Mon Mar 31 04:27:36 UTC 2014
+	- Initial release.
+
+0.03 Wed Apr  2 03:02:51 UTC 2014
+	- Screwed up 0.02, releasing again compatible with CPAN
+
+0.04 Sun Apr  6 05:52:15 UTC 2014
+	- Fixing warnings when paths do not exist
+	- Allow default values on session/config gets
+	- Fixing bug in getting all parameters
+
+0.05 Mon Apr 21 06:12:13 UTC 2014
+	- make Plack::Middleware::Session a required module to make tests work, among other things
+	- fix bug that would prevent cookies from being sent with responses
+	- adding headers and cookies to the template
+	- allow setting PLUGIN_BASE on TT plugin
+	- fix TT plugin extension
+	- doc updates
+
+0.06 Sun Apr 27 07:30:27 UTC 2014
+	- removing template code
+	- adding sqlite/mysql connectors
+
+0.07 Thu May  1 21:15:25 UTC 2014
+	- Documentation updates
+	- Moving this out of "test" to make it fully available on CPAN
+
+0.08 Wed May 14 06:18:03 UTC 2014
+	- Fixing bug that would load too many uploads
+
+0.09 Tue May 20 05:23:53 UTC 2014
+	- Removing dumb tests
+
+1.00 Fri Dec 12 06:56:57 UTC 2014
+	- Completely rewriting to use Web::Simple for routing.
+	- Removing a lot of extra components and stripping down to just config management, routing, and session management.
+
+1.01 Fri Dec 12 15:11:36 UTC 2014
+	- Changing status so that this actually gets indexed by CPAN
+
+1.04 Sat Dec 13 04:35:58 UTC 2014
+	- Don't remove configuration options on loading things.
+	- 1.02 and 1.03 were screwed up releases
+
+1.05 Wed Dec  9 05:12:15 UTC 2015
+	- Changing HTTP::Headers uage to HTTP::Headers::Fast to fix compatibility with Plack 1.0038.

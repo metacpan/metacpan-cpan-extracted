@@ -1,0 +1,10 @@
+Build.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+lib/Parse/CPAN/Modlist.pm
+lib/Parse/CPAN/Modlist/Module.pm
+t/01use.t
+t/02simple.t
+t/03withdata.t
+t/data/03modlist.data

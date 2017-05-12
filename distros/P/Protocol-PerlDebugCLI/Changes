@@ -1,0 +1,8 @@
+Revision history for Protocol-PerlDebugCLI
+
+0.002     2012-01-28 16:44:59 Europe/London
+	Fix pod formatting, seems that the PkgVersion dzil plugin
+	expects the NAME section to be a single line only?
+
+0.001     2012-01-28 16:25:03 Europe/London
+	Initial CPAN release

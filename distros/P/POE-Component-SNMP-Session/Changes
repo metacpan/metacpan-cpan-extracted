@@ -1,0 +1,46 @@
+Revision history for POE-Component-SNMP-Session
+
+0.1202  Fri Dec 11 17:38:15 PST 2009
+        Documentation cleanups.
+
+        Altered 00-load.t to return at least ONE "ok", so smoke tests
+        can have something positive to report, eg "all tests pass."
+
+0.1201  Thu Apr 30 12:43:49 PDT 2009
+        So it seems I left reference to 'YAML' in 2 of the tests, and
+        while it's installed automatically these days by CPAN,
+        apparently some smoke testers don't include it in their
+        sandbox. <sigh>
+
+0.1200  Tue Apr 28 16:40:00 PDT 2008
+        Updated the tests AGAIN, bumping the version number to have
+        more digits for small subreleases.  Now, SNMP.pm is *not* a
+        listed requirement, as it can *not* be auto-installed from
+        CPAN.  So the tests "pass" by not running anything at all in
+        an automated setting.  It's cheesy but it works.
+
+0.11    Fri Jun 27 17:41:05 PDT 2008
+        Fixed the tests... they were broken if there wasn't a proper
+        config, which is unreasonable... it should quietly do nothing.
+        It does that now.  Also updated the docs with a few extra
+        examples.
+
+0.10    Fri Oct 19 12:55:56 PDT 2007
+        Updated docs.  Added a couple of examples, and corrected the
+        type names returned to query callbacks.  Also updated the
+        LICENSE in Makefile.PL... love those Kwalitee points!
+
+0.09    Thu Oct 18 18:19:45 PDT 2007
+        Had left behind references to Spiffy.pm for debugging
+        purposes.  Oops.
+
+0.08    Wed Oct 10 10:30:25 PDT 2007
+        Finished docs.
+        
+        Stripped unnecessary dispatcher code.
+        
+        Fixed a testing bug.
+
+0.01    Wed Jul 11 23:57:02 PDT 2007
+        First version, hoping we caught everything!
+

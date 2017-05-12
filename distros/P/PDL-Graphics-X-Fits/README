@@ -1,0 +1,24 @@
+PDL/Graphics/X/Fits version 0.01
+===================
+
+This module enables one to display fits images in an OO fashion.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+A working version of X11 and PDL::Graphics::X version 0.04 or greater
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Hazen Babcock
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

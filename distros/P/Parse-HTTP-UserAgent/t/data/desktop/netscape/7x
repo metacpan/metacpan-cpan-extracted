@@ -1,0 +1,44 @@
+[AGENT]
+
+Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.0.1) Gecko/20020823 Netscape/7.0
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Linux i686',
+'extras'           => ['X11'],
+'version_raw'      => '7.0',
+'lang'             => 'en-US',
+'mozilla'          => [ '1.0.1','1.000001'],
+'version'          => '7.000',
+'name'             => 'Netscape',
+'toolkit'          => ['Gecko','20020823','20020823.000']
+
+[AGENT]
+
+Mozilla/5.0 (Macintosh; U; PPC; en-US; rv:1.0.1) Gecko/20020823 Netscape/7.0
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'PPC',
+'extras'           => ['Macintosh'],
+'version_raw'      => '7.0',
+'lang'             => 'en-US',
+'mozilla'          => [ '1.0.1','1.000001'],
+'version'          => '7.000',
+'name'             => 'Netscape',
+'toolkit'          => ['Gecko','20020823','20020823.000']
+
+[AGENT]
+
+Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.0.1) Gecko/20020823 Netscape/7.0 (CK-SillyDog)
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Windows XP',
+'extras'           => ['Windows','CK-SillyDog'],
+'version_raw'      => '7.0',
+'lang'             => 'en-US',
+'mozilla'          => [ '1.0.1','1.000001'],
+'version'          => '7.000',
+'name'             => 'Netscape',
+'toolkit'          => ['Gecko','20020823','20020823.000']

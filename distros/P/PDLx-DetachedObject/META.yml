@@ -1,0 +1,35 @@
+---
+abstract: 'parent class for subclassing PDL from class frameworks'
+author:
+  - 'The Smithsonian Astrophysical Observatory'
+build_requires:
+  Class::Accessor: '0'
+  Class::Tiny: '0'
+  ExtUtils::MakeMaker: '6.36'
+  Moo: '0'
+  Object::Tiny: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  ExtUtils::MakeMaker: '6.36'
+dynamic_config: '0'
+generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDLx-DetachedObject
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  PDL: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PDLx-DetachedObject
+  license: http://www.gnu.org/licenses/gpl-3.0.html
+  repository: https://github.com/djerius/PDLx-DetachedObject
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

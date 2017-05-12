@@ -1,0 +1,196 @@
+---
+abstract: 'Concatenate and minify JavaScript and CSS files'
+author:
+  - 'Moritz Onken'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Assets
+provides:
+  Plack::Middleware::Assets:
+    file: lib/Plack/Middleware/Assets.pm
+    version: v1.0.0
+  Plack::Middleware::Assets::Type::css:
+    file: lib/Plack/Middleware/Assets.pm
+    version: v1.0.0
+  Plack::Middleware::Assets::Type::js:
+    file: lib/Plack/Middleware/Assets.pm
+    version: v1.0.0
+  Plack::Middleware::Assets::Type::plain:
+    file: lib/Plack/Middleware/Assets.pm
+    version: v1.0.0
+requires:
+  CSS::Minifier::XS: 0
+  Digest::MD5: 0
+  HTTP::Date: 0
+  JavaScript::Minifier::XS: 0
+  Plack::Middleware: 0
+resources:
+  bugtracker: https://github.com/monken/p5-moosex-attribute-deflator/issues
+  repository: git://github.com/monken/p5-plack-middleware-assets.git
+version: 1.0.0
+x_Dist_Zilla:
+  perl:
+    version: 5.016002
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: GatherDir
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      name: Test::Compile
+      version: 2.002
+    -
+      class: Dist::Zilla::Plugin::HasVersionTests
+      name: HasVersionTests
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::KwaliteeTests
+      name: KwaliteeTests
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: Test::MinimumVersion
+      version: 2.000005
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: PodCoverageTests
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: PodSyntaxTests
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::ReportVersions::Tiny
+      name: ReportVersions::Tiny
+      version: 1.08
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: PruneCruft
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: PruneFiles
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: ManifestSkip
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: ExtraTests
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: NextRelease
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: PodWeaver
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::Prepender
+      name: Prepender
+      version: 1.112280
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: ExecDir
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: ShareDir
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::Bugtracker
+      name: Bugtracker
+      version: 1.111080
+    -
+      class: Dist::Zilla::Plugin::Repository
+      name: Repository
+      version: 0.19
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      name: MetaProvides::Package
+      version: 1.14000002
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::License
+      name: License
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      name: ModuleBuild
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: MetaYAML
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: Readme
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: Manifest
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::CheckChangeLog
+      name: CheckChangeLog
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300035
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300035
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300035

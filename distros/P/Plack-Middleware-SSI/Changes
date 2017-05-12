@@ -1,0 +1,21 @@
+Revision history for Plack::Middleware::SSI
+
+0.14     Tue Mar 15 09:05:15 2016
+       - fix content type matching bug (thanks bireon)
+
+0.13     Tue Mar 15 09:05:00 2016
+       - fix RT # 110455 experimental keys on references bug (thanks SREZIC)
+
+0.12     Tue Jul 16 17:28:41 2013
+       - fix, simplify and optimize _parse_ssi_chunk
+         Merge pull request #1 from ap/fix-parser by Aristotle Pagaltzis
+
+0.11     Fri Jun 10 16:28:59 CEST 2011
+       - Add support for <!--#config ... -->
+
+0.10     Wed Jun  8 02:28:23 CEST 2011
+       - First release of Plack::Middleware::SSI
+       - Support set, echo, exec, flastmod, fsize and include SSI directives
+       - Support DATE_GMT, DATE_LOCAL, DOCUMENT_NAME, DOCUMENT_URI,
+         LAST_MODIFIED and QUERY_STRING_UNESCAPED SSI variables
+

@@ -1,0 +1,11 @@
+Revision history for Perl module Parse::Gitignore
+
+0.02 2016-02-04
+
+- Testing problem resolved
+- Add "excludesfile" method
+
+0.01 2016-02-03
+
+- Initial version
+

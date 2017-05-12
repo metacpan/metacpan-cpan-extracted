@@ -1,0 +1,20 @@
+DBI
+---
+o add method: create_table, gen_ddl
+
+o add method: load_data_dictionary
+    - gets attribute definition from data dictionary
+
+o add method: DBI::table
+
+o investigate comparisons in where clauses
+    - DateTime, Number
+
+o modify method: DBI::delete should return false when object does not
+                 exist -- 0 rows deleted
+
+o fix bug: NULL fields (shmu case) - IS NULL
+
+o add method: update
+    Currently, an update does a delete and insert, which was simple
+    to implement, but not the fastest for performance.

@@ -1,0 +1,107 @@
+#!/usr/bin/perl
+# $Id: pod2bbcode,v 1.2 2005/05/15 13:40:27 chaos Exp $
+# $Log: pod2bbcode,v $
+# Revision 1.2  2005/05/15 13:40:27  chaos
+# added new switches --headcolor, --itemcolor and --textcolor
+#
+# Revision 1.1  2005/05/15 12:48:43  chaos
+# added pod2bbcode
+#
+# vim:ts=4 sw=4
+use Pod::BBCode;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my %opt;
+GetOptions(\%opt,'infile|i=s','help|h','version|v','headcolor|hc=s',
+'itemcolor|ic=s','textcolor|tc=s')
+    or pod2usage(-message=>"Try $0 --help",-verbose=>0);
+
+pod2usage(-verbose=>1) if $opt{help};
+
+if($opt{version}) {
+    print "pod2bbcode version $Pod::BBCode::VERSION\n";
+    exit(0);
+}
+
+$opt{infile}||=shift;
+
+my $p=new Pod::BBCode(
+    -headcolor=>$opt{headcolor},
+    -itemcolor=>$opt{itemcolor},
+    -textcolor=>$opt{textcolor},
+);
+if($opt{infile}) {
+    $p->parse_from_file($opt{infile});
+} else {
+    $p->parse_from_filehandle(\*STDIN);
+}
+
+=head1 NAME
+
+pod2bbcode - converts a .pod file to BBCode syntax.
+
+=head1 SYNOPSIS
+
+    pod2bbcode -i in.pod > out.txt
+    pod2bbcode in.pod > out.txt
+    pod2bbcode -hc red -ic blue -tc green > out.txt
+
+=head1 DESCRIPTION
+
+This program converts the POD syntax to BBCode syntax and print the result
+to the standard output.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-i> I<FILE>, B<--infile>=I<FILE>
+
+Specify the POD file to convert. When missing, the first argument is taken,
+i.e., these two lines are equivalent:
+
+    pod2bbcode -i in.pod
+    pod2bbcode in.pod
+
+When both the C<--infile> option and the first argument are missing, the POD is
+read from the standard input.
+
+=item B<-hc> I<COLOR>, B<--headcolor>=I<COLOR>
+
+Specify the color of heads. When missing, there won't be color specifications
+in generated BBCodes. I<COLOR> is the valid color codes in BBCode syntax.
+
+=item B<-ic> I<COLOR>, B<--itemcolor>=I<COLOR>
+
+Specify the color of item names. I<COLOR> is the valid color codes in BBCode
+syntax.
+
+=item B<-tc> I<COLOR>, B<--textcolor>=I<COLOR>
+
+Specify the color of texts. I<COLOR> is the valid color codes in BBCode syntax.
+
+=item B<-v>, B<--version>
+
+Prints the program's version and exits.
+
+=item B<-h>, B<--help>
+
+Prints a help message and exits.
+
+=back
+
+=head1 SEE ALSO
+
+L<perlpod>, L<Pod::BBCode>, L<Pod::TikiWiki>
+
+=head1 AUTHOR
+
+chaoslawful <chaoslaw@cpan.org>
+
+This program is modified based on pod2tikiwiki program, thanks to the original
+author!
+
+=cut
+

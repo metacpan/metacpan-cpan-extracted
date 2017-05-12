@@ -1,0 +1,19 @@
+Revision history for Perl extension POE::Component::Client::Lingr
+
+  0.04  Mon Jan 29 22:05:23 PST 2007
+        - Refactored internal code to use object_states
+        - spawn() method now returns an object and you can say $obj->yield() without aliasing mess
+        - Added lingr-ircd.pl example code
+
+  0.03  Mon Jan 29 04:37:55 PST 2007
+        - Fixed a bug notifying events of GET methods
+
+  0.02  Mon Jan 29 01:33:58 PST 2007
+        - Fixed ticket handling in room.* methods
+        - Fixed camelCase method to URI mapping
+        - Renamed sample script to bot.pl
+        - Added Google Calculator bot example code
+        - Set Debug to 0
+
+  0.01  Sun Jan 28 20:07:34 2007
+        - original version

@@ -1,0 +1,558 @@
+
+body {
+    text-align: left;
+}
+
+div#userinfo_box {
+    position:       absolute;
+    top:            0;
+    right:          0;
+    height:         70px;
+    width:          200px;
+    border:         none;
+    background:     #eee;
+    padding-top:    3px;
+    padding-right:  10px;
+    text-align:     right;
+    font-size:      85%;
+}
+
+/* link styling */
+a.nav, a.nav:visited, a.nav:link, a.nav:active {
+    background:         #ccc;
+    border:             solid black 1px;
+    border-style:       outset;
+    display:            block;
+    font-size:          85%;
+    font-weight:        bold;
+    list-style-image:   none;
+    list-style-type:    none;
+    margin-left:        20px;
+    margin-top:         0px;
+    padding-bottom:     0.2em;
+    padding-left:       0.5em;
+    padding-top:        0.2em;
+    text-decoration:    none;
+    width:              120px;
+}
+
+h1 {
+    font-size: 100%;
+    font-weight: bold;
+    text-align: left;
+}
+h2 {
+    font-size: 93%;
+    font-weight: bold;
+    text-align: left;
+}
+h3 {
+    font-size: 85%;
+    font-weight: bold;
+    font-style:     italic;
+    text-align: left;
+}
+
+
+a.nav:hover {
+    background:         #000;
+    color:              #fff;
+}
+
+a, a:link, a:visited, a:active {
+    background:         transparent;
+    color:              blue;
+    text-decoration:    none;
+}
+
+th {
+    text-align:         left;
+    font-weight:        bold;
+    font-size:          85%;
+}
+
+td {
+    border:             1px solid #888;
+    padding:            3px;
+}
+
+/* login dialog styling */
+#login_dialog form {  /* set width in form, not fieldset (still takes up more room w/ fieldset width */
+    margin: 0;
+    padding: 0;
+    min-width: 400px;
+    max-width: 600px;
+}
+#login_dialog form fieldset {
+    / * clear: both; note that this clear causes inputs to break to left in ie5.x mac, commented out */
+    /*
+    border-color: #000;
+    border-width: 1px;
+    border-style: solid;
+    */
+    padding: 10px;        /* padding in fieldset support spotty in IE */
+    margin: 0;
+    border: none;
+}
+#login_dialog form label { 
+    display: block;  /* block float the labels to left column, set a width */
+    float: left; 
+    width: 150px; 
+    padding: 0; 
+    margin: 5px 0 0; /* set top margin same as form input - textarea etc. elements */
+    text-align: right; 
+    font-weight: bold;
+    margin-bottom : 0;
+}
+#login_dialog form input, form textarea {
+    /* display: inline; inline display must not be set or will hide submit buttons in IE 5x mac */
+    width:auto;      /* set width of form elements to auto-size, otherwise watch for wrap on resize */
+    margin:5px 0 0 10px; /* set margin on left of form elements rather than right of
+                              label aligns textarea better in IE */
+}
+#login_dialog form p {
+    font-size: 85%;
+}
+
+/* style classes */
+
+.right_align {
+    text-align: right;
+}
+
+.center_align {
+    text-align: center;
+}
+
+
+.forum_link {
+    font-size:      93%;
+    font-weight:    bold;
+}
+.forum_description {
+    font-size:      85%;
+}
+
+.topic_link {
+    font-weight:    bold;
+}
+.topic_creator {
+    display:        block;
+    font-size:      85%;
+    /*text-align:     right;*/
+    float: right;
+}
+.forum_mini_pager {
+    display:        block;
+    font-size:      85%;
+    /*text-align:     right;*/
+    float: left;
+}
+.topic_last_post {
+    font-size:      85%;
+}
+
+.post_subject {
+    font-weight:    bold;
+}
+
+.post_creator {
+    font-weight:    bold;
+    font-style:     italic;
+    font-size:      85%;
+}
+
+.post_created {
+    text-align:     right;
+    font-size:      85%;
+}
+
+.reply_post_message {
+    width: 100%;
+    //background-color: rgb(251,215,194);
+    background-color: #ddd;
+    border: 2px inset #fff;
+}
+
+.post_message {
+    width: 100%;
+    background-color: rgb(251,215,194);
+    border: 2px inset #fff;
+    display: block;
+}
+
+.innerpost {
+    padding: 5px;
+    overflow: auto;
+    font-size:      85%;
+}
+
+.in_response_to {
+    margin-left:    20px;
+    font-weight:    bold;
+    font-style:     italic;
+    font-size:      85%;
+}
+
+.quoted_message {
+        border:         solid black 1pt;
+        background:     #ccc;
+        color:          #000;
+        margin-left:    20px;
+        margin-right:   0px;
+        margin-top:     0px;
+        margin-bottom:  0px;
+        padding:        2px;
+        font-size:      93%;
+
+        display: block;
+        overflow: auto;
+}
+
+
+.no_table_border table {
+    border: none;
+}
+.no_table_border td {
+    border: none;
+}
+
+.thread_watch {
+    font-size:          77%;
+}
+.pager_advanced {
+    font-size:          77%;
+}
+.moderator_list {
+    font-size:          77%;
+    text-align:         left;
+}
+
+.interval_ago {
+    display:            block;
+    text-align:         right;
+    font-size:          77%;
+}
+
+.thread_header {
+    font-weight:        bold;
+    background:         #666;
+    padding:            4px;
+    text-align:         left;
+}
+
+.thread_header a {
+    color:              #ccc;
+}
+
+.forum_list {
+    margin-left:        auto;
+    margin-right:       auto;
+    width:              80%;
+    font-size:          93%;
+}
+.forum_list td {
+    vertical-align:     top;
+    border:             none;
+    border:             1px dashed #ddd;
+}
+
+.forum_view {
+    margin-left:        auto;
+    margin-right:       auto;
+    width:              80%;
+}
+.forum_view td {
+    vertical-align:     top;
+    border:             none;
+    border:             1px dashed #ddd;
+    font-size:          85%;
+}
+.forum_view th {
+}
+
+.recently_updated {
+    margin-left:        auto;
+    margin-right:       auto;
+    width:              80%;
+}
+.recently_updated td {
+    vertical-align:     top;
+    border:             1px dashed #ddd;
+}
+
+.thread_watches {
+    margin-left:        auto;
+    margin-right:       auto;
+    width:              80%;
+}
+.thread_watches td {
+    vertical-align:     top;
+    border:             1px dashed #ddd;
+}
+
+.search_results {
+    margin-left:        auto;
+    margin-right:       auto;
+    width:              80%;
+}
+
+.signup {
+    margin-left:        auto;
+    margin-right:       auto;
+    width:              80%;
+}
+
+.site_services {
+    margin-left:        auto;
+    margin-right:       auto;
+    width:              80%;
+}
+
+
+.user_profile {
+    margin-left:        auto;
+    margin-right:       auto;
+    width:              80%;
+}
+.user_profile td {
+    vertical-align:     top;
+}
+
+.prefs_notification {
+    margin-left:        auto;
+    margin-right:       auto;
+    width:              80%;
+}
+
+.user_profile_key {
+    font-weight:        bold;
+    text-align:         right;
+    vertical-align:     top;
+}
+
+td.user_profile_key {
+    width:              120px;
+}
+
+.user_profile_value {
+    font-weight:        none;
+    text-align:         left;
+    vertical-align:     top;
+}
+
+.thread_posts {
+    margin-left:        auto;
+    margin-right:       auto;
+    width:              80%;
+}
+
+.thread_info {
+    margin:             0px;
+    width:              100%;
+    border:             none;
+    padding:            0px;
+}
+
+.thread_info td {
+    border:             none;
+    padding:            0px;
+}
+
+.post {
+    padding-top:        5px;
+    vertical-align:     top;
+}
+
+.post_edited_alert {
+    font-weight:    bold;
+    font-style:     italic;
+    font-size:      85%;
+}
+
+.user_post_info {
+    background:         #ccc;
+    font-size:          77%;
+    margin-left:        auto;
+    margin-right:       auto;
+    text-align:         center;
+    vertical-align:     top;
+    width:              100px;
+}
+
+.quote {
+    background-color:   #F9FBFF;
+    border:             1px solid #333;
+    font-size:          85%;
+    margin:             0 0 2px 4px;
+    padding:            6px;
+    width:              85%;
+    overflow:           hidden;
+}
+
+.post_info {
+    font-size:          77%;
+    line-height:        1.1em;
+    margin-top:         10px;
+    margin-bottom:      2px;
+    text-align:         right;
+}
+
+a.button:visited, a.button:link, a.button:active, .button, a.button {
+    border:             2px solid;
+    border-color:       #FC9 #630 #330 #F96;
+    padding:            2px 7px 2px 7px;
+    font:               bold 0.9em verdana,sans-serif;
+    color:              #000;
+    background:         #ccc;
+    text-decoration:    none;
+    margin:             2px;
+}
+
+
+
+form {  /* set width in form, not fieldset (still takes up more room w/ fieldset width */
+  margin: 0;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0;
+  /*min-width: 500px;*/
+  max-width: 600px;
+  width: 560px;
+  /*background: red;*/
+}
+
+form input, form textarea {
+    /* display: inline; inline display must not be set or will hide submit buttons in IE 5x mac */
+    width:auto;      /* set width of form elements to auto-size, otherwise watch for wrap on resize */
+    margin:5px 0 0 10px; /* set margin on left of form elements rather than right of
+                              label aligns textarea better in IE */
+}
+
+form input#reset {
+    margin-left:0px; /* set margin-left back to zero on reset button (set above) */
+}
+
+form label { 
+    display: block;  /* block float the labels to left column, set a width */
+    float: left;
+    width: 150px;
+    padding: 0;
+    margin: 5px 0 0; /* set top margin same as form input - textarea etc. elements */
+    text-align: right;
+    font-weight: bold;
+}
+
+
+
+a[href $='.jpg']{
+    padding-left: 20px;
+    background:   transparent url(/static/images/filetypes/image.png) no-repeat center left;
+}
+
+a[href $='.pdf']{
+    padding-left: 20px;
+    background:   transparent url(/static/images/filetypes/pdf.png) no-repeat center left;
+}
+
+
+.help li {
+    margin-top:         25px;
+    margin-right:       25px;
+    list-style-type:    none;
+    border-left:        2px solid #666;
+    padding-top:        5px;
+    padding-bottom:     5px;
+    padding-left:       10px;
+    background-color:   #ddd;
+}
+.help li ul li, .help li ol li{
+    margin-top:         5px;
+    list-style-type:    disc;
+    border-left:        none;
+    padding-left:       none;
+    padding-top:        none;
+    padding-bottom:     none;
+    background-color:   transparent;
+}
+
+.error_messages {
+    width:              80%;
+    margin-top:         10px;
+    margin-bottom:      10px;
+    margin-left:        auto;
+    margin-right:       auto;
+    border:             2px solid black;
+    color:              white;
+    background-color:   red;
+    font-weight:        bold;
+    padding:            5px;
+}
+
+.site_terms {
+    width:              80%;
+    margin-left:        auto;
+    margin-right:       auto;
+    margin-bottom:      10px;
+    padding:            5px;
+    border:             1px solid #666;
+}
+
+#loader_wait.yui-overlay {
+    position:       fixed;
+    float: right;
+    top:            10px;
+    right:          10px;
+    border:         none;
+    text-align: right;
+    }
+
+
+/* ForumCode styles */
+.forumcode_code {
+    font-family:        monospace;
+    border:             1px solid #333;
+    font-size:          85%;
+    margin:             15px 20px 15px 20px;
+    padding:            6px;
+    width:              85%;
+    overflow:           auto;
+
+    color:              #ff0;
+    background-color:   #333;
+    border:             1px solid #666;
+
+    white-space:        pre;
+}
+
+.forumcode_pre {
+    background-color:   transparent;
+    font-family:        monospace;
+    border:             1px dashed #333;
+    font-size:          85%;
+    margin:             15px 20px 15px 20px;
+    padding:            6px;
+    width:              85%;
+    overflow:           auto;
+
+    white-space:        pre;
+}
+
+.forumcode_quote {
+    background-color:   #eee;
+    font-family:        monospace;
+    font-style:         italic;
+    border:             1px dotted #333;
+    font-size:          85%;
+    margin:             15px 20px 15px 20px;
+    padding:            6px;
+    width:              85%;
+    overflow:           auto;
+}
+
+.forumcode_quoting {
+    font-weight:        bold;
+    margin-bottom:      3px;
+}
+
+

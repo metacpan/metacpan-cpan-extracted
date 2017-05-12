@@ -1,0 +1,53 @@
+3.03	2004.04.19	Andrew A. Novikov
+	- documentation revised;
+	- minor bugs in POD documentation fixed.
+
+
+3.02	2004.04.19	Andrew A. Novikov
+	- minor bugs in POD documentation fixed.
+
+
+3.01	2004.04.19	Andrew A. Novikov
+	- minor bugs in POD documentation fixed.
+
+
+3.00	2004.04.19	Andrew A. Novikov
+	- global tags introduced;
+	- callbacks introduced;
+	- added functionality to include templates via predefined callback;
+	- added methods: block_src(), block_res(), push_block_src(),
+	  push_block_res(), unshift_block_src(), unshift_block_res(),
+	  reset_block_src(), reset_block_src_all(), get_oblock(),
+	  enum_blocks(), set_parsed(), gtag(), callback(), unparse(),
+	  unparse_all();
+	- changed prototype for constuctor (you may customize number of
+	  attempts to open template and sleep time between attempts;
+	- set_tag(), get_tag(), push_tag(), unshift_tag() methods now accept
+	  references;
+	- block(), push_block(), unshift_block() are deprecated in favour of
+	  block_src(), block_res(), push_block_src(), push_block_res(),
+	  unshift_block_src(), unshift_block_res();
+	- behavior of block(), push_block(), unshift_block() is changed
+	  slightly;
+	- both block sources and results both are accessible now;
+	- minor bugs fixed;
+	- some bugs in POD documentation fixed;
+	- text after block close tag is allowed now;
+	- documentation revised;
+	- test cases revised.
+
+
+2.03	2003.09.10	Andrew A. Novikov
+	- bug fix: it's possible now to use Parse::Plain object as
+	  a value in a hash passed to parse().
+
+
+2.02	2003.09.26	Andrew A. Novikov
+	- some additional symbols (underscores, dashes, dots, semicolons,
+	  colons, commas, parentheses, asterisks, ampersands and caret
+	  symbols) now allowed in tag / block names;
+	- test was created.
+
+
+2.01	2003.09.23	Andrew A. Novikov
+	- nested blocks allowed. POD documentation written.

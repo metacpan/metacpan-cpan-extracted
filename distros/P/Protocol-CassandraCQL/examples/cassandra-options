@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use Protocol::CassandraCQL::Client;
+use Protocol::CassandraCQL::Frame;
+use Protocol::CassandraCQL qw( OPCODE_OPTIONS OPCODE_SUPPORTED );
+use Protocol::CassandraCQL::Frames qw( parse_supported_frame );
+
+use Getopt::Long;
+
+GetOptions(
+   'host|h=s' => \(my $HOST = "localhost"),
+   'user|u=s' => \my $USERNAME,
+   'pass|p=s' => \my $PASSWORD,
+   'version|V=i' => \my $CQLVERSION,
+) or exit 1;
+
+my $cassie = Protocol::CassandraCQL::Client->new(
+   PeerHost => $HOST,
+   Username => $USERNAME,
+   Password => $PASSWORD,
+   CQLVersion => $CQLVERSION,
+);
+$cassie or die "Cannot connect to $HOST - $@";
+
+my ( $op, $response ) = $cassie->send_message( OPCODE_OPTIONS, Protocol::CassandraCQL::Frame->new );
+$op == OPCODE_SUPPORTED or die "Expected OPCODE_SUPPORTED";
+
+my $opts = parse_supported_frame( 1, $response );
+
+foreach my $option ( sort keys %$opts ) {
+   print "$option: " . join( ", ", @{ $opts->{$option} } ) . "\n";
+}

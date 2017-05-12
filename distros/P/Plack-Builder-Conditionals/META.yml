@@ -1,0 +1,44 @@
+---
+abstract: 'Plack::Builder extension'
+author:
+  - 'Masahiro Nagano <kazeburo {at} gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.4.2, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Builder-Conditionals
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Plack::Builder::Conditionals:
+    file: lib/Plack/Builder/Conditionals.pm
+    version: 0.05
+requires:
+  List::MoreUtils: 0
+  Net::CIDR::Lite: 0
+  Plack: 0.9941
+resources:
+  bugtracker: https://github.com/kazeburo/Plack-Builder-Conditionals/issues
+  homepage: https://github.com/kazeburo/Plack-Builder-Conditionals
+  repository: git://github.com/kazeburo/Plack-Builder-Conditionals.git
+version: 0.05
+x_contributors:
+  - 'Masahiro Nagano <m-nagano@livedoor.jp>'
+  - 'Hans Dieter Pearcey <hdp@weftsoar.net>'
+  - 'Shoichi Kaji <skaji@outlook.com>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'

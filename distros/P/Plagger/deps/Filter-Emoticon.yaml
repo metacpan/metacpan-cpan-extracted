@@ -1,0 +1,4 @@
+name: Filter::Emoticon
+author: Naoya Ito
+depends: 
+  Text::Emoticon: 0

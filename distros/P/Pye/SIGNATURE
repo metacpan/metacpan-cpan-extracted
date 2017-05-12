@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 a834ac2669a3e2c72b9491efb78787d6ea3c01f9 Changes
+SHA1 36a5a185d1eeff0d831dc6a5380d7b2611188f2a INSTALL
+SHA1 18b23aca8e4a23265eea414516fa260230dbf4f5 LICENSE
+SHA1 4f03a5c857459d8594eeab4afe32371293ba9726 MANIFEST
+SHA1 d27e74e15a08c28c65cd1e54139ae93d0dc69595 MANIFEST.SKIP
+SHA1 aae77e8889a7fd64f932b6733b28b0d6d48edf05 META.json
+SHA1 0d20f58c6fa60634f970d5c9baf6e6df34b7b7be Makefile.PL
+SHA1 4e651c08c24818630802c9bd5e635c947c58971a README
+SHA1 345d7dce83a9ead803051edf60fa88105d177652 bin/pye
+SHA1 f02947f7c8641fb630a273f03f6cf1fdac04ea9d dist.ini
+SHA1 4abcb0a4745295b962aba1f7c6dd2f182c3d81f2 lib/Pye.pm
+SHA1 e421d5a98e5efc4d7e32f063d5d1e6ca5dd10bb9 t/00-load.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iF4EAREIAAYFAlTALwMACgkQa4OHQAFM10cebAD/e0WX1wqt1DnQWD+8xYmxwng2
+YOsJuqod7qFGs9aYRJQA/1K0AUnvN4NIG5EhXFcJ4Z4OZR5VQr/+3GszdeCIx/El
+=bYsK
+-----END PGP SIGNATURE-----

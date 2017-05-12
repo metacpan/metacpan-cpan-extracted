@@ -1,0 +1,84 @@
+(ja.utf-8)
+
+ v0.14 (2008/02/08)
+       [ja] L<>で余計な空白テキストができることがあるバグの修正.
+       [en] fix, L<> sometimes has empty text.
+ 
+ v0.13 (2007/12/14)
+       [ja] L</>での判断ができないため名前付きリストのリンクIDから'item_'を除去.
+       [en] fix, remove 'item_' prefix from link id.
+ 
+ v0.12 (2007/12/14)
+       [ja] missing_dirでhttp://を使えないバグの修正
+            (副作用としてベースディレクトリはエスケープされなくなりました)
+       [en] fix, could not use http:// on missing_dir parameter.
+ 
+ v0.11 (2006/11/17)
+       [ja] freebsd で make に失敗する不具合の修正.
+       [en] fix, make failure on freebsd.
+ 
+ v0.10 (2006/11/15)
+       [ja] HTML化時にE<>を復元しないように.
+       [en] fix, keep E<> as &#xxx without unescape
+ 
+ v0.09 (2006/07/09)
+       [ja] 和訳ドキュメント同梱
+       [en] add japanese documents
+       [ja] =encoding プラグマ対応
+       [en] no warn on  =encoding pragma
+
+ v0.08 (2004/08/14)
+       [ja] mlpod2pod の書き直し
+       [en] rewrite mlpod2pod
+
+ v0.07 (2004/08/01)
+       [ja] バグ修正
+       [en] fix some bugs
+
+ v0.06 (2003/09/14)
+       mlpod2pod
+         o [ja] verbatim 内も J<> を消しちゃってたのを修正
+           [en] fix removing J<> inside verbatim paragraph
+ 
+ v0.05 (2003/09/14)
+       [ja] .pod ファイルもパッケージに追加
+       [en] add .pod files into package
+
+ v0.04 (2003/09/14)
+       [ja] t/00-use.t 追加
+       [en] t/00-use.t added
+
+ v0.03 (2003/09/13)
+       [ja]ドキュメント加筆
+       [en] write much of documents
+       [ja] ドキュメントを mlpod に分離
+       [en] split mlpod documents into .mlpod files from .pm and .pod files
+       MultiLang::Html
+         o [ja] css,madeの指定がないときにはタグの生成も抑制するように
+           [en] when css,made omitted, correspond html-tag not generate too
+         o [ja] 非 ASCII 文字をアンカーにできるように実装
+           [en] non-ascii chars can be used as anchor id
+       [ja] 見出し語句の辞書を独立
+       [en] independent heading word dictionary from Pod::MultiLang package
+       mlpod2html
+         o [ja] MLPOD_LANGS 環境変数に --langs 指定の効果を持たせる
+           [en] MLPOD_LANGS environment variable has --langs effect
+       [ja] mlpod2pod 作成
+       [en] create mlpod2pod script
+
+ v0.02 (2003/09/06)
+       mlpod2html
+         o [ja] 出力ファイルの指定がないとき, デフォルトでは標準出力に
+                送るように
+           [en] using stdout when output file omitted
+         o [ja] --auto-html 追加
+           [en] --auto-html options added
+       MultiLang::Html
+         o [ja] =begin の無視状態がちゃんと処理されていなかったのを修正
+           [en] fix ignoring unknown =begin block is not worded
+
+ v0.01 (2003/09/06)
+       [ja] 初版
+       [en] initial version
+
+$Id: Changes,v 1.13 2004/08/14 09:00:30 hio Exp $

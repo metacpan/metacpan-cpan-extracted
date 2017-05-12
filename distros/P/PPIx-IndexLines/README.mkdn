@@ -1,0 +1,71 @@
+# NAME
+
+PPIx::IndexLines - Given a line number, returns some basic information about where in the perl document you are
+
+# VERSION
+
+version 0.05
+
+# SYNOPSIS
+
+  #!/usr/bin/perl
+  use strict;
+  use warnings;
+  use PPIx::IndexLines;
+  my $document = PPIx::IndexLines->new( +shift );
+  $document->index_lines;
+  print $document->line_type( +shift );
+
+# METHODS
+
+## new
+
+Accepts either a scalar or a scalar reference.  This is passed directly to
+PPI::Document::new, so the same rules as in that method apply.
+
+Basically, if you pass in a scalar, it will be assumed to be a filename and
+said file will be loaded and parsed.
+
+Otherwise, a scalar reference is assumed to be a PPI document and will be
+parsed directly.
+
+## index_lines
+
+Call this method to index the lines for the new PPI::Document.
+
+## line_type
+
+Call this method with a line number, it will return one of
+
+  BEGIN CHECK UNITCHECK INIT END POD __DATA__ __END__
+
+or
+
+  <PackageName>::<SubName>
+
+# INSTALLATION
+
+See perlmodinstall for information and options on installing Perl modules.
+
+# SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+- *
+
+[PPIx::IndexOffsets](http://search.cpan.org/perldoc?PPIx::IndexOffsets)
+
+- *
+
+[PPIx::LineToSub](http://search.cpan.org/perldoc?PPIx::LineToSub)
+
+# AUTHOR
+
+Alan Young <harleypig@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Alan Young.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

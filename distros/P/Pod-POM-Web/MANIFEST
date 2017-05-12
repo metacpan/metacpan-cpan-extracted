@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Pod/POM/Web.pm
+lib/Pod/POM/Web/Help.pod
+lib/Pod/POM/Web/Indexer.pm
+lib/Pod/POM/Web/lib/PodPomWeb.css
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/indexer.t
+t/pod.t
+t/requests.t
+t/TODO.txt
+META.json

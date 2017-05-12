@@ -1,0 +1,280 @@
+<html>
+<head>
+<title>PkgForge - Build Jobs</title>
+</head>
+<body>
+
+<h1>Package Forge - Build Jobs</h1>
+
+<p>Central to the design of the Package Forge system is the concept of
+a <em>build job</em> which is what the user submits. In essence a
+build job has a unique identifier and consists of a set of, one or
+more, source packages along with some instructions which tell the
+target build systems how and where the packages should be built and
+submitted.</p>
+
+<h2>The Job Class</h2>
+
+<p>A build job is represented by the <code>PkgForge::Job</code>
+class. This has the following important attributes:</p>
+
+<h3>The Identifier</h3>
+
+<p>
+This can be any string the user chooses which has not been previously
+seen by the system. The only limitation on the contents is that placed
+by the column definition in the job table of the registry database,
+this requires it to be a maximum of 50 characters long. If the user
+does not select their own tracking identifier then a Universally
+Unique Identifiers (UUID) is generated using
+the <code>Data::UUID</code> module.
+</p>
+
+<h3>Platforms</h3>
+
+<p>
+This controls the set of platforms for which the build job should be
+submitted. By default, if the user does not express an opinion, all
+supported, active platforms will be selected. As well as the
+straightforward, positive inclusive approach of just listing the
+suitable target platforms (e.g. &quot;sl5, f13&quot) it is possible to
+exclude particular unsuitable platforms from the whole set
+(e.g. &quot;!f13&quot;).
+</p>
+
+<p>
+In PkgForge terminology a platform name is based only on the
+distribution name and version (e.g. &quot;f13&quot; or
+&quot;sl5&quot;). The platform name does <strong>not</strong> contain
+any reference to the architecture. Note that this is different from
+LCFG which appends an &quot;_64&quot; for the x86_64 architecture. The
+target architectures are handled separately, see below for details.
+</p>
+
+<p>
+It should be noted that there are no limits on the strings which can
+be placed in the list of platforms. Anything which refers to a
+platform which does not exist will be ignored, no errors are
+reported. However, a helpful warning is given on the web interface
+when it spots that a submitted job refers to unsupported or inactive
+platforms.
+</p>
+
+<h3>Architectures</h3>
+
+<p>
+The architecture list is used in a very similar way to the platform
+list. This controls the set of architectures for which the build job
+should be submitted. By default, if the user does not express an
+opinion, all architectures for the selected platforms will be
+selected. Again, as well as the straightforward, positive inclusive
+approach of just listing the suitable target architectures
+(e.g. &quot;i386, x86_64&quot) it is possible to exclude particular
+unsuitable architectures from the whole set
+(e.g. &quot;!x86_64&quot;).
+</p>
+
+<p>
+It should be noted that there are no limits on the strings which can
+be placed in the list of architectures. Anything which refers to a
+platform which does not exist will be ignored, no errors are
+reported. However, a helpful warning is given on the web interface
+when it spots that a submitted job refers to unsupported or inactive
+architectures.
+</p>
+
+<p>
+Further to this, it is worth noting that there are some limits on what
+can be achieved with this method of specifying the platform and
+architecture lists. If a job should be built for different
+architectures on different platforms (e.g. i386-only on sl5 but all on
+f13) then it will need to be submitted as multiple separate jobs. It
+is not expected that this will cause much difficulty.
+</p>
+
+<h3>The Source Packages</h3>
+
+<p>
+Clearly the most important part of a build job is the set of source
+packages which should be built. A job may contain one or more source
+packages of multiple file types. Any file type which has an associated
+Perl class which implements the <code>PkgForge::Source</code> Moose
+role can be added to a job. Individual build daemons will filter the
+set of source packages and only attempt to build from those which are
+appropriate (e.g. an RPM builder might only choose SRPMs). This
+feature makes it very easy for a user to submit a job for all
+platforms without needing prior knowledge as to which will support a
+particular file type.
+</p>
+
+<p>
+When a job is submitted the source packages are validated and the SHA1
+sums are calculated. These are then used throughout the system to
+ensure that the source package files remain consistent. The validation
+varies from type to type but includes basics such as checks that the
+file exists and is of a non-zero size. For example, the SRPM source
+package type also checks that the package is a valid source RPM.
+</p>
+
+<p>
+The builds of the source packages will be attempted in the order that
+they are specified by the user.  When building a set of packages some
+platforms will stop immediately when an error is encountered, on
+others the build will move onto the next package and the failed
+package will be retried later. See the documentation for the relevant
+build daemon for full details.
+</p>
+
+<h3>The Package Bucket</h3>
+
+<p>
+The package bucket is LCFG/DICE terminology for a directory in which
+built packages are stored. In the Package Forge build system the
+bucket is typically used for two related issues. The first is the
+selection of the build system configuration to be used and the second
+is the selection of the location into which built packages will be
+stored.
+</p>
+
+<p>
+There are no restrictions on what the user can set as the bucket for a
+submitted job. The knowledge of which buckets are supported is only
+available to the build daemons (and varies on each platform) so the
+incoming queue processor cannot check for validity. Depending on the
+build system being used an incorrect bucket name could trigger an
+error and cause a complete failure to build the job. 
+<p>
+
+<p>
+The bucket name <strong>must</strong> be specified by the user. Where
+it is not applicable a build daemon may choose to completely ignore
+the bucket though, in which case it can be set to anything the user
+chooses. For example, an external site using their own pkgforge system
+may choose to put all packages into a single location or may not use
+the pkgsubmit tool.
+</p>
+
+<p>
+The RPM builder uses mock to make packages. On these platforms the
+mock configuration is closely related to the directory to be used for
+storing built packages. Packages in certain directories should only
+have build-dependencies on packages in other particular
+directories. For example, on F13 the LCFG packages in
+the <code>lcfg</code> bucket should only depend on software which is
+in F13 or already in the bucket. There should not be any dependencies
+on packages in buckets with license restrictions
+(e.g. <code>inf</code> or <code>uoe</code>). The list of buckets is
+site-dependent, see local documentation for details.
+</p>
+
+<h3>Reports</h3>
+
+<p>
+Currently Package Forge only supports sending reports via email. The
+report attribute is used to specify the (comma-separated) list of
+email addresses to which a report should be sent after each build job
+is completed. If nothing is specified then no reports will be sent.
+</p>
+
+<p>
+Due to the way in which a job is split into multiple tasks, one for
+each target platform, a separate report is sent for each task. So, for
+example, one submitted job may generate four reports
+(<code>sl5/i386</code>,
+<code>sl5/x86_64</code>, <code>f13/i386</code>, <code>f13/x86_64</code>). There
+is no way to easily aggregate the messages as the data is stored
+separately for each task.
+</p>
+
+
+<h2>Submitting a new job</h2>
+
+<p>A build job is submitted as a directory which contains all the
+source packages and a meta-data manifest file. This directory is
+placed into a standard location in the file-system where the user has
+write access. In the School of Informatics the file-system used is AFS
+so that a build job may be submitted from anywhere.</p>
+
+<p>
+Build jobs are submitted using the <code>submit</code> command of
+the <code>pkgforge</code> command-line tool. Here is the current short
+help-text for the command:
+</p>
+
+<pre>
+pkgforge submit [-aBcpr] [long options...]
+	--verbose           Verbose output
+	-c --configfile     The configuration file for this application
+	-a --archs          The architectures for which packages should be built
+	--target            Location into which jobs should be submitted
+	--id                The unique identifier for this job
+	-p --platforms      The platforms on which packages should be built
+	-B --bucket         The bucket to which the packages will be submitted.
+	-r --report         Email addresses to which build reports will be sent
+</pre>
+
+<p>
+Most of these options (<code>--archs</code>, <code>--platforms</code>,
+<code>--id</code>, <code>--bucket</code> and <code>--report</code>)
+have already been discussed above. It is unlikely that it will ever be
+necessary to set the target option, this controls where the new build
+job should be stored and the default should be correct. It is entirely
+possible to use the submission tool with multiple separate pkgforge
+systems though in which the target option is essential. The only other
+option which might come in handy is that for changing the
+configfile. Again, if multiple pkgforge systems are being used it
+might be necessary to have different configurations for each. The
+standard configuration file handling is discussed below.
+</p>
+
+<h3>Job Submission Examples</h3>
+
+<p>Submitting a job for only F13 (both i386 and x86_64
+architectures):</p>
+
+<pre>
+$ pkgforge submit --bucket lcfg --platform f13 foobar-1-2.src.rpm
+</pre>
+
+<p>Submitting a job for all platforms except SL5 (again, for all
+  architectures):</p>
+
+<pre>
+$ pkgforge submit --bucket world --platform '!sl5' foobar-1-2.src.rpm
+</pre>
+
+<p>Email reports are needed:</p>
+
+<pre>
+$ pkgforge submit --bucket devel --report somebody@example.org foobar-1-2.src.rpm
+</pre>
+
+<h3>Job Submission Configuration</h3>
+
+<p>
+For the job submission tool the following configuration files are
+examined and, if they exist, the contents are used to set the default
+values for the submission client options. Values for options set in
+files which are later in the list override any values from files which
+are earlier in the list.
+</p>
+
+<ol>
+  <li><code>/etc/pkgforge/pkgforge.yml</code></li>
+  <li><code>/etc/pkgforge/submit.yml</code></li>
+  <li><code>~/.pkgforge/pkgforge.yml</code></li>
+  <li><code>~/.pkgforge/submit.yml</code></li>
+</ol>
+
+<p>
+Default values for any submit option can be set, the configuration
+file format is YAML. The easiest approach is to look at the
+system-wide configuration files and copy the applicable settings into
+the local directory. For example, this makes it possible to avoid
+having to specify the email addresses for reports every time a job is
+submitted.
+</p>
+
+
+</body>
+</html>

@@ -1,0 +1,199 @@
+=encoding iso-8859-13
+
+=head1 PAVADINIMAS (NAME)
+
+perldelta - kas naujo perl v5.8.3 versijoje
+
+=head1 APRAÐYMAS (DESCRIPTION)
+
+Ðiame dokumente yra apraðomi perlo 5.8.2 ir 5.8.3 versijø skirtumai
+
+Jeigu jûs atnaujinate perlo versijà ið ankstesnës (tarkim 5.6.1) versijos,
+pirma perskaitykite L<perl58delta>, kur yra apraðyti pokyèiai tarp 5.6.0 ir
+5.8.0, L<perl581delta> bei L<perl582delta>, kuriose apraðyti skirtumai
+tarp 5.8.0, 5.8.1 ir 5.8.2 versijø.
+
+=over 4
+
+=item Nesuderinami pokyèiai
+
+Nëra nesuderinamø su 5.8.2 versija pokyèiø.
+
+=item Patobulinimai branduolyje
+
+Pririðtiems per C<tie> mechanizmà asociatyviesiems masyvams (heðams) dabar
+galima apraðyti metodà C<SCALAR>. Jis yra iðkvieèiamas tada kai 
+pririðtas heðas yra naudojamas skaliariniame kontekste, kaip kad
+
+    if (%tied_hash) {
+	...
+    }
+
+
+Iki ðiol tokiu atveju C<%tied_hash> gràþindavo tai kas bûtø buvæ gràþinama 
+prieð pririðant heðà (taigi daþniausiai 0). Ðiuo metu nesant apraðyto C<SCALAR> 
+metodo gràþinama TRUE, jei veiksmas vyksta C<each> iteracijoje arba 
+iðkvieèiamas C<FIRSTKEY> metodas, patikrinantis ar heðas nëra tuðèias (perlas 
+uþtikrina kad kitas C<each> taipogi prasidës C<FIRSTKEY> iðkvietimu). Plaèiau 
+apie tai skaitykite L<perltie/SCALAR> dokumentacijà.
+
+=item Moduliai ir pragmos
+
+=over 4
+
+=item CGI
+
+=item Cwd
+
+=item Digest
+
+=item Digest::MD5
+
+=item Encode
+
+=item ExtUtils::MakeMaker
+
+Dabar gali sugeneruoti SIGNATURE bylà jei yra ádiegtas Module::Signature 
+modulis. Tereikia metodui C<WriteMakefile()> perduoti (SIGN => 1).
+(Modulá patobulino Autrijus Tang gavæs The Perl Foundation stipendijà)
+
+=item File::Spec
+
+=item FindBin
+
+Dabar yra funkcija C<again> kuri iðsprendþia problemas, kurios iðkyla kai 
+moduliai, esantys skirtingose direktorijose nori pasinaudoti FindBin.
+
+=item List::Util
+
+Dabar nuorodas (references) galima paversti á skirtàsias tik skaitymui 
+(read-only).
+
+=item Math::BigInt
+
+=item PodParser
+
+=item Pod::Perldoc
+
+=item POSIX
+
+=item Unicode::Collate
+
+=item Unicode::Normalize
+
+=item Test::Harness
+
+=item threads::shared
+
+C<cond_wait> turi naujà dviejø argumentø formà. Pridëta C<cond_timedwait>.
+
+=back
+
+=item Pagalbiniø programø patobulinimai
+
+C<find2perl> dabar pagal nutylëjimà ájungia C<-print> raktà. Iki ðiol já 
+reikëdavo nurodyti komandinëje eilutëje.
+
+Atsirado nauja pagalbinë programa C<prove>, kuria galima nesunkiai paleisti
+atskirus regresijos testus per komandinæ eilutæ. C<prove> yra Test::Harness
+modulio dalis, tad senesniø perlo versijø vartotojai jà gali gauti per CPAN.
+
+=item Nauja dokumentacija
+
+Kai kuriose vietose dokumentacija buvo ðiek tiek patobulinta ir 
+standartizuota.
+
+Patobulinta specialius kodo blokus (BEGIN, CHECK, INIT, END) apraðanti
+dokumentacija.
+
+=item Kodo greièio patobulinimai
+
+=item Ádiegimo ir tinkinimo (konfigûravimo) patobulinimai
+
+Perlas dabar veikia OpenVMS I64 platformoje
+
+=item Rinktiniai riktø pataisymai
+
+Panaudojus C<substr()> UTF8 simboliø eilutei ir paskui bandant jà pasiekti 
+kartais bûdavo gràþinamos ðiûkðlës. Tai buvo todël, kad á laikinàjà atmintinæ 
+bûdavo áraðomi neteisingi simboliø nuotoliai nuo eilutës pradþios. Ðis 
+riktas pataisytas.
+
+C<$a .. $b> dabar turëtø veikti kaip ir tikëtasi jei $a ar $b reikðmës yra 
+C<undef>.
+
+Dabar be problemø galima naudoti unikodinius asociatyviøjø masyvø (heðø) 
+raktus.
+
+C<$^E> nuskaitymas dabar iðsaugo C<$!>. Anksèiau C kodas, kuris slepiasi 
+po C<$^E> neiðsaugodavo C<errno>, taigi bandant nuskaityti C<$^E> galëjo 
+netikëtai pasikeisti C<errno> ir tuo paèiu C<$!>.
+
+Gráþtamosios funkcijos (vël) veikia su C++. 5.8.2 versijoje vienas klaidos 
+pataisymas netyèia sugadino kai kuriø C++ raðytø Perlo moduliø kompiliavimà.
+
+=item Nauji arba pakeisti diagnostinai praneðimai
+
+=item Pakitæs C kodas
+
+Asociatyviøjø masyvø (heðø) kodas buvo sumaþintas iðimant kai kuriuos 
+pasikartojanèius kodo fragmentus. Iðorinë kodo sàsaja nepasikeitë, tad be 
+aukðèiau iðvardintø riktø pataisymø niekas neturëjo pasikeisti.
+
+C<hv_clear_placeholders> dabar yra perlo API dalis.
+
+Aptvarkytos kai kurios C makro funkcijos. Ypaè tos, kurios sukuria laikinus 
+vietinius kintamuosius - dabar jos turëtø atsargiau parinkti ðiems 
+kintamiesiems vardà taip iðvengiant riktø susijusiø su skirtingais 
+kintamaisiais turinèiais tuos paèius vardus.
+
+C<signal.h> dabar visada átraukiamas.
+
+=item Tinkinimas ir kompiliavimas
+
+C<Configure> dabar iðkvieèia gráþtamàsias funkcijas (callbacks) 
+nepaisydamas kintamojo kuriam jis yra kvieèiamas reikðmës. Anksèiau ðios 
+funkcijos buvo iðkvieèiamos tik C<case $variable $define)> ðakai. 
+Ðis pokytis turëtø liesti tik platformø programuotojus, kurie raðo 
+konfigûracines hints bylas.
+
+=item Nauji testai
+
+=item Þinomos problemos
+
+Turime krûvà nepataisytø riktø. Riktø taisymas ir tvarkymas nëra pats 
+ádomiausias darbas, ypaè bendruomenei kuri viskà daro be atlygio.
+
+Perl5 programuotojø komanda ðiuo metu daro kai kuriuos patobulinimus, 
+kurie turëtø padëti iðspræsti ðias problemas 2004-øjø metø pradþioje.
+
+=item Problemos specifinës kuriai nors platformai
+
+=item Praneðimai apie riktus
+
+Jeigu manote jog radote riktà, perþvelkite paskutines temas 
+comp.lang.perl.misc naujienø grupëje jei perlo riktø duomenø bazæ 
+adresu http://bugs.perl.org.  Papildomos informacijos taip pat gali 
+bûti ir pagrindinëje perlo svetainëje http://www.perl.org.
+
+Jeigu manote kad radote rktà, kurio dar niekas neaptiko, pasinaudokite
+B<perlbug> programa, kuri yra perlo dalis. Pasistenkite kuo labiau 
+sumaþinti kodo iðtraukà, kuria parodomas riktas. Jûsø rikto apraðymas,
+kartu su C<perl -V> rezultatu, bus iðsiøstas adresu perlbug@perl.org
+ir iðanalizuotas perlo programuotojø komandos. Visus perlo riktus 
+galite matyti adresu at http://bugs.perl.org/
+
+=back
+
+=head1 TAIP PAT ÞIÛRËKITE (SEE ALSO)
+
+F<Changes> byla labai detaliai apraðo visus pokyèius.
+
+F<INSTALL> byla apraðo kaip ádiegti perlà.
+
+F<README> byloje yra apraðyti bendri dalykai.
+
+F<Artistic> ir F<Copying> bylose yra informacija apie perlo autorines 
+teises.
+
+=cut

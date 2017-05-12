@@ -1,0 +1,7 @@
+
+[% feed.title %]
+[% entry.title %]
+[%- IF entry.author %]
+by [% entry.author %]
+[%- END %]
+[% entry.link -%]

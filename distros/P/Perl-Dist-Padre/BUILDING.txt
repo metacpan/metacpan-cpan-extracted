@@ -1,0 +1,100 @@
+It is assumed that unzip and svn are available.
+
+You can download unzip from 
+http://gnuwin32.sourceforge.net/packages.html
+and svn from http://subversion.tigris.org/getting.html#windows
+
+It is also assumed that LWP, Archive::Tar and IO::Compress::Gzip are installed.
+(this is the case for any Strawberry Perl distribution.)
+
+rem Setup CPAN environment variable to point to you choice of CPAN mirror
+set CPAN=http://theoryx5.uwinnipeg.ca/pub/CPAN
+rem or the 5-min CPAN mirror
+set CPAN=http://cpan.hexten.net
+
+You really need to use a Bootstrap installation for these steps, 
+because at the end of this, this will install into c:\strawberry, and you can't 
+overwrite the host perl.
+
+A usable Bootstrap build is at 
+http://strawberryperl.com/download/bootstrap/bootstrap-perl-5.10.1.1.msi, or you 
+can build one yourself by going "perldist Bootstrap" once steps 2 and 3 are done.
+
+1) To speed up the build, we either need to get (1a) or build (1b) a .par file for
+Alien::wxWidgets.
+
+NOTE: There used to be a requirement that the steps in 1b were performed in a 
+Strawberry build, because Alien::wxWidgets hard-coded the library locations.
+Version 0.46 removed this problem (it adjusts the location on the fly.)
+
+1a) Getting the Alien::wxWidgets .par file.
+
+cd C:\
+lwp-download http://www.commandline.co.uk/mtee/mtee.zip
+unzip mtee.zip
+lwp-download http://www.strawberryperl.com/download/padre/Alien-wxWidgets-0.50-MSWin32-x86-multi-thread-5.10.1.par
+
+1b) [Only needed if an updated version of Alien::wxWidgets is wanted from the one
+above] Create a par file for Alien::wxWidgets.
+
+rem Setup which version of Alien wxWidgets to use
+set ALIEN_WIDGETS=Alien-wxWidgets-0.50
+
+cd C:\
+lwp-download http://www.commandline.co.uk/mtee/mtee.zip
+unzip mtee.zip
+lwp-download %CPAN%/authors/id/M/MB/MBARBON/%ALIEN_WIDGETS%.tar.gz
+ptar -x -z -f %ALIEN_WIDGETS%.tar.gz
+cd %ALIEN_WIDGETS%
+perl Makefile.PL
+perl -MPAR::Dist -eblib_to_par
+rem wait 40 minutes
+copy Alien-*.par ..
+cd ..
+
+(NOTE: 0.46 and below used to require a patch in order to avoid warnings when linking the MSI.
+This patch was incorporated into 0.46_01 and later versions of Alien::wxWidgets.)
+
+2) Install Alien::WiX and Perl::Dist::WiX from CPAN.
+3) Install Perl::Dist::Strawberry from CPAN.
+
+rem say [y] install minicpan script ... This is important for optional step 5a
+cpan Alien::WiX Perl::Dist::WiX Perl::Dist::Strawberry
+
+4) Install Perl::Dist::Padre from svn or from CPAN. SVN directions are below.
+
+rem --- install via CPAN
+cpan Perl::Dist::Padre
+
+rem ---- or install from SVN
+cpan parent
+svn co https://svn.perlide.org/padre/trunk/Perl-Dist-Padre
+cd Perl-Dist-Padre
+perl Makefile.PL && dmake && dmake test
+dmake install
+cd ..
+
+4a) (Optional) If you want to build off a minicpan, do this:
+
+minicpan_pdwix --dist Perl-Dist-Padre --minicpan C:\Padre-minicpan\ --cpan %CPAN%
+
+5) Actually build the dist...
+
+set PERL_DIST_PADRE_ALIENWXWIDGETS_PAR_LOCATION=C:\Alien-wxWidgets-0.50-MSWin32-x86-multi-thread-5.10.1.par
+rem to make sure the path is correct
+dir %PERL_DIST_PADRE_ALIENWXWIDGETS_PAR_LOCATION%
+
+rem --- without minicpan (4a)
+perldist_w Padre --cpan %CPAN% 2>&1 | mtee padre-install.txt
+(wait for 1-3 hours)
+
+rem --- with minicpan (4a)
+perldist_w Padre --cpan file://C:/Padre-minicpan/ 2>&1 | mtee padre-install.txt
+
+[If you want more information during the build, put "--trace 2" between "perldist_w" and "Padre" 
+
+Build Troubleshooting
+---------------------
+%TEMP%/perldist/output contains the output of the last command that has been run. 
+(whenever a perl, dmake, or Build.bat command is run, the output is in 
+debug.out and debug.err files in that directory.)

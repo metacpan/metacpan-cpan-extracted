@@ -1,0 +1,12 @@
+=head1 HEAD1
+
+Head 1 text
+
+=head2 HEADI<2>
+
+Head2 B<text>
+
+    +------------------------------+
+    | This is a verbatim paragraph |
+    +------------------------------+
+

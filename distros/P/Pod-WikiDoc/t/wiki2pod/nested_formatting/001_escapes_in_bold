@@ -1,0 +1,6 @@
+Nesting *bold/escapes*
+and *<other-nested>* formats
+#--------------------------------------------------------------------------#
+Nesting B<boldE<sol>escapes>
+and B<E<lt>other-nestedE<gt>> formats
+

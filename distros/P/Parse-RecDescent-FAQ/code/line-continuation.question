@@ -1,0 +1,16 @@
+I need to parse a grammar that includes line continuation
+characters.  For example:
+
+ // COMMAND ARG1-VALUE,ARG2-VALUE, +
+    ARG3-VALUE,ARG4-VALUE, +
+    EVEN-MORE-ARGS
+ // ANOTHERCOMMAND
+ * and a comment
+ * or two
+
+How do I formulate a rule (or rules) to treat the first command
+as if all 5 arguments were specified on a single line?  I need to
+skip over the /\s*+\n\s*/ sequence.  It seems like skip or resync
+should do this for me, but if so, I haven't discovered the
+correct technique, yet.
+

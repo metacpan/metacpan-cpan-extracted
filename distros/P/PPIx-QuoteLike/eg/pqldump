@@ -1,0 +1,163 @@
+#!/usr/bin/env perl
+
+use 5.006;
+
+use strict;
+use warnings;
+
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+use PPIx::QuoteLike::Dumper;
+
+our $VERSION = '0.005';
+
+my %opt;
+
+GetOptions( \%opt,
+    qw{
+	encoding=s indent=i margin=i
+	perl_version|perl-version! ppi! significant!
+	tokens! variables!
+    },
+    'whitespace!'	=> sub {
+	$opt{significant} = !$_[1];
+	return;
+    },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+defined $opt{encoding}
+    and binmode STDOUT, ":encoding($opt{encoding})";
+
+my @dumper_arg = map { $_ => $opt{$_} } qw{
+    encoding indent margin perl_version ppi
+    significant tokens variables
+};
+
+foreach my $arg ( @ARGV ) {
+    print PPIx::QuoteLike::Dumper->dump( $arg, @dumper_arg,
+	none => "$arg not recognized by PPIx::Regexp" );
+}
+
+__END__
+
+=head1 TITLE
+
+pqldump - Dump a quotelike thing
+
+=head1 SYNOPSIS
+
+ pqldump '"foo$bar"'
+ pqldump fubar.pl
+ pqldump -help
+ pqldump -version
+
+=head1 OPTIONS
+
+
+=head2 -encoding
+
+ -encoding utf-8
+
+This option specifies the encoding of the entities to be parsed, and of
+the output. If unspecified, no encoding is assumed unless the input is a
+file, in which case the file's encoding is derived from its PPI parse.
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -indent
+
+ -indent 4
+
+This option controls the number of spaces each level of structure is
+indented.
+
+The default is C<-indent 2>.
+
+=head2 -margin
+
+ -margin 2
+
+This option controls the number of spaces of left margin.
+
+The default is C<-margin 0>.
+
+=head2 -perl-version
+
+If asserted, this option causes the minimum Perl version (and the
+maximum if applicable) to be dumped.
+
+The defualt is C<-noperl-version>.
+
+=head2 -ppi
+
+If asserted, this option causes a PPI dump on any interpolations found.
+L<PPI|PPI> must be installed for this to work.
+
+The default is C<-noppi>.
+
+
+=head2 -significant
+
+If this option is asserted, only significant tokens are dumped. As of
+version 0.004, this only has effect in combination with C<-tokens>,
+since all tokens interior to the string are significant.
+
+The default is C<-nosignificant>.
+
+=head2 -tokens
+
+If asserted, an unstructured dump of the tokens found is done.
+
+The default is C<-notokens>.
+
+=head2 -variables
+
+If asserted, this option causes the names of variables interpolated by
+any interpolations found to be dumped. L<PPI|PPI> must be installed for
+this to work.
+
+The default is C<-novariables>.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head2 -whitespace
+
+This option is the inverse of L<-significant|/-significant>, and is
+added for quasi-compatibility with the L<Perl::Critic|Perl::Critic>
+C<ppidump> tool.
+
+The default is (and must be) C<-whitespace>.
+
+=head1 DETAILS
+
+This Perl script is a command-line interface to
+L<PPIx::QuoteLike::Dumper|PPIx::QuoteLike::Dumper>'s
+L<dump()|PPIx::QuoteLike::Dumper/dump> method. The arguments can be
+either literals or files. For files, all literals in the file are
+dumped.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

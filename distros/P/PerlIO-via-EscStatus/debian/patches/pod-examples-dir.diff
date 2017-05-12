@@ -1,0 +1,14 @@
+diff -Nur -x '*.orig' -x '*~' escstatus/lib/ProgressMonitor/Stringify/ToEscStatus.pm escstatus.new/lib/ProgressMonitor/Stringify/ToEscStatus.pm
+--- escstatus/lib/ProgressMonitor/Stringify/ToEscStatus.pm	2010-01-23 16:35:02.000000000 +1100
++++ escstatus.new/lib/ProgressMonitor/Stringify/ToEscStatus.pm	2010-01-23 16:39:04.000000000 +1100
+@@ -140,8 +140,8 @@
+ 
+ giving the output form EscStatus uses.  The contents of the status line are
+ built by the configured C<ProgressMonitor> field objects in the usual way.
+-See F<examples/progressmonitor.pl> in the EscStatus sources for a complete
+-program.
++See F</usr/share/doc/libperlio-via-escstatus-perl/examples/progressmonitor.pl>
++for a complete program.
+ 
+ =head1 FUNCTIONS
+ 

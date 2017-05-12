@@ -1,0 +1,139 @@
+NAME
+    POE::Component::AIO - Asynchronous Input/Output for POE
+
+SYNOPSIS
+     use POE qw( Component::AIO );
+
+     ...
+
+     aio_read( $fh, 0, 1024, $buffer, 0, $poco_aio->callback( 'open_done' ) );
+ 
+     aio_read( $fh, 0, 1024, $buffer, 0, sub {
+       ...
+     } );
+
+DESCRIPTION
+     This component adds support for L<IO::AIO> use in POE
+
+  EXAMPLE
+      use POE;
+
+      Foo->new();
+
+      $poe_kernel->run();
+
+      package Foo;
+
+      use POE qw( Component::AIO );
+      use Fcntl;
+
+      use strict;
+      use warnings;
+
+      sub new {
+          my $class = shift;
+
+          my $self = bless( {}, $class );
+
+          POE::Session->create(
+              object_states => [
+                  $self => [qw(
+                      _start
+                      _stop
+
+                      open_done
+                      read_done
+                  )]
+              ]
+          );
+    
+          return $self;
+      }
+
+      sub _start {
+          my $file = '/etc/passwd';
+      
+          aio_open( $file, O_RDONLY, 0, $poco_aio->callback( 'open_done', $file ) );
+      }
+  
+      sub open_done {
+          my ( $self, $session, $file, $fh ) = @_[ OBJECT, SESSION, ARG0, ARG1 ];
+      
+          unless ( defined $fh ) {
+              die "aio open failed on $file: $!";
+          }
+      
+          my $buffer = '';
+          # read 1024 bytes from $fh
+          aio_read( $fh, 0, 1024, $buffer, 0, $poco_aio->postback( 'read_done', \$buffer ) );
+      }
+  
+      sub read_done {
+          my ( $self, $buffer, $bytes ) = @_[ OBJECT, ARG0, ARG1 ];
+  
+          unless( $bytes > 0 ) {
+              die "aio read failed: $!";
+          }
+      
+          print $$buffer;
+      }
+  
+      sub _stop {
+          $poco_aio->shutdown();
+      }
+
+NOTES
+    This module automaticly bootstraps itself on use(). $poco_aio is
+    imported into your namespace for easy use. Just like $poe_kernel when
+    using POE. There are two import options available: no_auto_bootstrap and
+    no_auto_export.
+
+    Example:
+
+      use POE::Component::AIO { no_auto_bootstrap => 1, no_auto_export => 1 };
+
+    Also, use of this modules' callback and postback methods are completely
+    optional. They are included for convenience, but note that they don't
+    work the same as the postback and callback methods from POE::Session.
+
+METHODS
+    new()
+        Call this to get the singleton object, which is the same as
+        $poco_aio. See the notes above. You do not need to call this unless
+        you have disabled auto bootstrapping.
+
+    shutdown()
+        Stop the session used by this module.
+
+    callback( $event [, $params ] )
+        Returns a callback. Params are optional and are stacked before
+        params passed to the callback at call time. This differs from
+        POE::Session's callback because the params are not wrapped in array
+        references. It uses the current session to latch the callback to. If
+        you want to use another session, you can pass an array ref of the
+        session id and event name as the event param.
+
+        Examples:
+
+          $cb = $poco_aio->callback( 'foo' );
+          $cb = $poco_aio->callback( 'foo', $bar );
+          $cb = $poco_aio->callback( [ $session->ID(), 'foo' ] );
+          $cb = $poco_aio->callback( [ $session->ID(), 'foo' ], $bar );
+
+    postback( $event [, $params ] );
+        See the callback method. The only difference is that it uses a post
+        instead of call
+
+SEE ALSO
+        IO::AIO, POE
+
+AUTHOR
+        David Davis <xantus@cpan.org> <http://xantus.org/>
+
+LICENSE
+        Artistic License
+
+COPYRIGHT AND LICENSE
+        Copyright 2007 David Davis, and The Dojo Foundation. Code was shared
+        from the Cometd project <http://cometd.com/>
+

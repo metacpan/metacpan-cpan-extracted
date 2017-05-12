@@ -1,0 +1,173 @@
+
+Palm::Progect 2.0 is a nearly complete rewrite of version 1.0,
+And as a result there has been one small change to the command-line
+interface, and a complete rewrite of the internals and the API.
+
+But there are also some new features to make up for this.  I'll list
+those first.
+
+New Features
+============
+
+* Palm::Progect will automatically load the proper database driver
+  based on version.  This makes it possible to import from one version
+  and export to another.
+
+* The Import/Export converters are now separate modules, under
+  Palm::Progect::Converter::*. Users can write their own converters for
+  new formats, and place them in a local module tree. New converters can
+  be import-only, export-only or import/export. New converters will
+  appear automatically to the progconv program.  Converters can specify
+  their command-line options (which will appear when the user types
+  'progconv --help'), and will receive these arguments from progconv.
+
+* Priorities are now imported/exported correctly by the Text
+  format converter.  Before, they were ignored, even though
+  the documentation suggested that they were imported and exported.
+
+* Categories are now imported/exported correctly, and you no longer
+  get the "Your Preferences have been deleted" message.  Full
+  Preferences support is not quite there, however.
+
+Command-Line change
+===================
+If you have only been using the progconv command-line program, then
+there is only one change you need to know about:
+
+    --date-format
+        has become
+    --date-format and --csv-date-format
+
+In the past, there was one command-line option for specifying the
+format to use with dates: --date-format.  This set the date format
+for the Text converter and the CSV converter.
+
+Now there are two parameters:
+
+    --date-format        # For the Text converter
+    --csv-date-format    # For the CSV converter
+
+The default value for each of these is 'yyyy/mm/dd', which
+is the same as the default for the old --date-format parameter.
+
+Palm::Progect Internal and API changes
+======================================
+The Palm::Progect interface has been completely changed,
+and any client programs that used Palm::Progect directly will
+have to be changed to use the new API.
+
+Here is a summary of the changed functions:
+
+ Palm::Progect v1.x       Palm::Progect v2.x           Notes
+ ------------------       ------------------           ------------------
+ new()                    new(options => \%options)    can pass user options to
+                                                       constructor. Currently
+                                                       only the value 'quiet'
+                                                       is supported.
+
+ Load($file)              load_db(file => $file ... )  Changed to support other
+                                                       options, such as
+                                                       'version'
+
+ Write($file)             save_db(file => $file ... )  Changed to support other
+                                                       options, such as
+                                                       'version'
+
+
+ Repair_Tree(\@records)   repair_tree()                Also, this is now
+                                                       handled automatically on
+                                                       save
+
+ $pdb->{'records'}        $progect->records            See below for the
+                                                       changes in the
+                                                       record format
+
+
+Additionally, the way Palm::Progect handles records has now been
+changed.  In version 1.x, Palm::Progect maintained records
+as an arrayref in $pdb->{'records'}.  Each item in this list
+was a hashref, containing mixed-case keys like 'dateDue'
+and isProgress.
+
+In version 2.x, the record list is found in $progect->records:
+
+   my @records = @{ $progect->records };
+
+Each record in the list is now an object of type Palm::Progect::Record.
+
+You access the properties of the record via methods.  And instead of the
+mixed-case keys of v1.x, they are in the more Perl-ish style of all
+lowercase with underscores as necessary:
+
+
+ Record v1.x         Record v2.x          Notes
+ -----------         --------------       ------------------
+ description         description
+
+ note                note
+
+ priority            priority
+ completed           completed
+ numericActual       completed_actual
+ numericLimit        completed_limit
+ category            category_name        See below under "Category Handling"
+
+ level               level
+ opened              is_opened
+ hasNext             has_next
+ hasChild            has_child
+ hasPrev             has_prev
+
+ dateDue             date_due
+ hasToDo             has_todo
+
+ isAction            type
+ isProgress          type
+ isNumeric           type
+ isInfo              type
+
+ hasNote             # removed            instead, check if Note is blank
+ hasDueDate          # removed            instead, check if date_due is 0
+
+Preferences and Categories
+==========================
+Finally, in version 1.x you had to deal manually with the
+following aspects of the Progect PDB file:
+
+  * categories
+    - convert between name and number
+    - maintain list of valid names
+    - pack and unpack these in the appinfo block
+
+  * set the database name
+  * handle database preferences
+  * repair record tree
+  * maintain the root record of the record tree
+
+
+Category Handling
+=================
+In Palm::Progect v1.x there was a global category list (which you you
+had to maintain), and each record had an id which was an index into this
+list.
+
+Palm::Progect v2.x handles the categories for you.  For most purposes,
+you can get and set a record's category by name instead of by id.
+
+For instance, you can now do the following:
+
+    my $progect = Palm::Progect->new();
+    my $progect->load_db('some_file');
+
+    foreach my $record (@{ $progect->records }) {
+        my $category    = $record->category_name;
+        my $description = $record->description;
+
+        unless ($category) {
+            $category_name = 'My New Category';
+            $category      = $record->category_name($category);
+        }
+
+        print "$category : $description\n";
+    }
+

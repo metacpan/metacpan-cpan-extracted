@@ -1,0 +1,9 @@
+=sql SELECT * FROM table1
+
+  $table1 = some_function
+
+=sql SELECT * FROM table2
+
+table2 is a copy of table and we want to have the difference.
+
+=cut

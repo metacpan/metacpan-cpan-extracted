@@ -1,0 +1,68 @@
+{
+   "abstract" : "syntactic sugar for if (defined ...) { ... }",
+   "author" : [
+      "Toby Inkster <tobyink@cpan.org>",
+      "TOBYINK <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::8 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PerlX-Perform",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      }
+   },
+   "provides" : {
+      "PerlX::Perform" : {
+         "file" : "lib/PerlX/Perform.pm",
+         "version" : "0.006"
+      },
+      "PerlX::Perform::Manifesto" : {
+         "file" : "lib/PerlX/Perform.pm"
+      },
+      "Syntax::Feature::Perform" : {
+         "file" : "lib/Syntax/Feature/Perform.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/PerlX-Perform/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Perform"
+      },
+      "homepage" : "https://metacpan.org/release/PerlX-Perform",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-perlx-perform.git",
+         "web" : "https://github.com/tobyink/p5-perlx-perform"
+      }
+   },
+   "version" : "0.006",
+   "x_contributors" : [
+      "TOBYINK"
+   ]
+}

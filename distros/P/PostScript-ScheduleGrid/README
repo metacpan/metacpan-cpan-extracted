@@ -1,0 +1,58 @@
+PostScript::ScheduleGrid version 0.05, released August 22, 2015
+
+
+This module creates a printable schedule of events (using PostScript)
+in a grid format often used for TV listings.  You supply the schedule
+data.  If you're producing actual TV listings, the
+PostScript::ScheduleGrid::XMLTV module (distributed separately) can be
+used to get the schedule data from XMLTV.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+
+DEPENDENCIES
+
+  Package                       Minimum Version
+  ----------------------------- ---------------
+  perl                           5.10.0
+  DateTime                       
+  DateTime::TimeZone             
+  List::Util                     1.20
+  Module::Runtime                
+  Moose                          
+  Moose::Role                    
+  Moose::Util::TypeConstraints   
+  MooseX::Types                  
+  MooseX::Types::DateTime        
+  MooseX::Types::Moose           
+  POSIX                          
+  PostScript::File               2.20
+  namespace::autoclean
+
+
+
+CHANGES
+    Here's what's new in version 0.05 of PostScript::ScheduleGrid:
+    (See the file "Changes" for the full revision history.)
+
+	- Document that the output method also accepts an open filehandle.
+	  (This has been true since 0.01; it just wasn't documented here.)
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

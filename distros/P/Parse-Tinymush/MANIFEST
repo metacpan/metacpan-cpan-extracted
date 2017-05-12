@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Parse-Tinymush.t
+lib/Parse/Tinymush.pm
+META.yml                                 Module meta-data (added by MakeMaker)

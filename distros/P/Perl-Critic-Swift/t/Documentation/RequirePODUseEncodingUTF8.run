@@ -1,0 +1,61 @@
+## name No POD
+## failures 0
+## cut
+
+# Blah
+$x = 1;
+
+## name Some POD without encoding
+## failures 1
+## cut
+
+# Blah
+$x = 1;
+
+=pod
+
+Blah
+
+=cut
+
+## name Some POD without any code without encoding
+## failures 1
+## cut
+
+=pod
+
+Blah
+
+=cut
+
+## name Some POD with encoding
+## failures 0
+## cut
+
+# Blah
+$x = 1;
+
+=pod
+
+=encoding utf8
+
+Blah
+
+=cut
+
+## name Some POD without any code with encoding
+## failures 0
+## cut
+
+=pod
+
+=encoding utf8
+
+Blah
+
+=cut
+
+
+# setup vim: set filetype=perl tabstop=4 softtabstop=4 expandtab :
+# setup vim: set shiftwidth=4 shiftround textwidth=78 nowrap autoindent :
+# setup vim: set foldmethod=indent foldlevel=0 :

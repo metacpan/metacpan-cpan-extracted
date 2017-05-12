@@ -1,0 +1,23 @@
+Revision history for PITA-Test-Dummy-Perl5-MI
+
+0.77   Thu 28 Aug 2008
+	- Moving to Module::Install 0.77
+
+0.65   Sun  1 Jul 2007
+	- Upgrading to the final version of 0.65
+
+0.65   Tue  6 Mar 2007
+	- Upgrading for use with early experimental Module::Install 0.65
+
+0.64   Tue  1 Jan 2007
+	- Removed an automated 99_author.t QA test that needed Test::More
+
+0.6301 Sat 17 Jun 2006
+	- Corrected a bug in the module
+
+0.63 Sat 17 Jun 2006
+	- Upgraded to Module::Install 0.63
+	- Removed the use of auto_install();
+
+0.61 Sat 18 Mar 2006
+	- First version

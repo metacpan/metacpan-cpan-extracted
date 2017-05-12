@@ -1,0 +1,26 @@
+Revision history for Perl extension Plack-Middleware-DebugRequestParams
+
+0.06 2013-06-20T13:34:03Z
+
+    - fix for two-bytes characters
+
+0.05 2013-06-10T03:38:47Z
+
+    - remove unused dependency (syohex++)
+
+0.04 2013-06-09T12:42:27Z
+
+    - add ignore_path option
+
+0.03 2013-06-07T00:03:34Z
+
+    - fix
+
+0.02 2013-06-06T23:57:10Z
+
+    - fix cpanfile
+
+0.01 2013-06-06T19:25:39Z
+
+    - original version
+

@@ -1,0 +1,18 @@
+-*- org -*-
+
+* 0.005
+  1. [2016-06-12 Sun] Added INSTALL
+
+* 0.006
+  1. [2016-06-12 Sun] Add mode line to Changes to use org-mode when
+     editing.
+  2. Add to INSTALL
+  3. Correct error in README
+  4. [2016-06-16 Thu] Correct error in SYNOPSIS of Photonic.pm
+  5. [2016-07-07 Thu] Add authors.
+  6. Correct mistake in Types and in FieldH.
+* 0.007
+  1. Put authors in Build.PL
+  2. Update references in README
+  3. Add modules for retarded calculations.
+

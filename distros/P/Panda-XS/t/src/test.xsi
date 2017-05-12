@@ -1,0 +1,37 @@
+INCLUDE: t/src/primitives.xsi
+INCLUDE: t/src/refs.xsi
+INCLUDE: t/src/orefs.xsi
+
+INCLUDE: t/src/obj-single.xsi
+INCLUDE: t/src/obj-child.xsi
+INCLUDE: t/src/obj-refcnt-shared.xsi
+INCLUDE: t/src/obj-static_cast.xsi
+INCLUDE: t/src/obj-wrap.xsi
+INCLUDE: t/src/obj-xsbackref.xsi
+INCLUDE: t/src/obj-wrap-shared-xsbackref.xsi
+
+INCLUDE: t/src/oext-join.xsi
+INCLUDE: t/src/oext-mixin.xsi
+INCLUDE: t/src/oext-avhv.xsi
+INCLUDE: t/src/oext-threads.xsi
+
+INCLUDE: t/src/typemap-cast.xsi
+
+INCLUDE: t/src/callsub.xsi
+
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test
+PROTOTYPES: DISABLE
+
+int dcnt (SV* newval = NULL) {
+    if (newval) dcnt = SvIV(newval);
+    RETVAL = dcnt;
+}
+
+bool register_package (const char* module, const char* source_module) {
+    RETVAL = xs::register_package(aTHX_ module, source_module);
+}
+
+void inherit_package (const char* module, const char* parent) {
+    xs::inherit_package(aTHX_ module, parent);
+}

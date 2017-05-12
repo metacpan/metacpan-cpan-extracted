@@ -1,0 +1,34 @@
+---
+name: Polycom-Config-File
+version: 0.04
+author: ["Zachary Blair <zblair@cpan.org>"]
+abstract: 'Parse config files for Polycom VoIP phones'
+license: perl
+distribution_type: module
+generated_by: 'Zachary Blair'
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Encode: 0
+  File::Spec: 0
+  IO::File: 0
+  Test::More: 0
+  XML::Twig: 0
+  perl: 5.8
+no_index:
+  directory:
+    - t
+provides:
+  Polycom::Config::File:
+    file: lib/Polycom/Config/File.pm
+    version: 0.04
+keywords:
+  - Polycom
+  - VoIP
+  - Config
+  - SoundPoint
+  - SoundStation
+  - VVX
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

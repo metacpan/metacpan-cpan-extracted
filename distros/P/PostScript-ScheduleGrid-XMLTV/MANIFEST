@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+examples/example.pl
+examples/synopsis.pl
+lib/PostScript/ScheduleGrid/XMLTV.pm
+t/00-all_prereqs.t
+t/00-load.t
+t/10-sample.t
+t/sample.xml
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

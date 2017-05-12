@@ -1,0 +1,17 @@
+Revision history for Perl extension Plack::Middleware::ConsoleLogger
+
+0.05  2015-01-20 12:21:56 PST
+        - Fix test failure with new JavaScript::Value::Escape (jlenti)
+        - Migrate to Milla
+
+0.04  Thu Jul  7 12:53:41 PDT 2011
+      - Encode high bit characters with \uXXXX (#1)
+
+0.03  Wed May 18 14:54:07 PDT 2011
+      - Escape more literals inside JavaScript
+
+0.02  Wed May  5 17:51:19 PDT 2010
+      - Fixed deps
+
+0.01  Wed Jan 20 15:15:30 2010
+      - original version

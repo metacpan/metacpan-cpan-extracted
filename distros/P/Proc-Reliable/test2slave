@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+use FileHandle;
+\*STDOUT->autoflush();
+print("ready:\n");
+$i = 0;
+while($line = <STDIN>) {
+    print("got $i: '$line'\n");
+    $i++;
+    #if($i > 3) {  # intentionally cause sigpipe
+	#last;
+    #}
+}
+

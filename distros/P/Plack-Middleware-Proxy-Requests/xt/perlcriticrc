@@ -1,0 +1,35 @@
+# local defaults for perlcritic
+severity = 3
+verbose = 4
+
+[ControlStructures::ProhibitCascadingIfElse]
+max_elsif = 5
+
+[Modules::ProhibitExcessMainComplexity]
+max_mccabe = 30
+
+[NamingConventions::ProhibitAmbiguousNames]
+forbid = last set left right no abstract contract record second
+
+[RegularExpressions::ProhibitComplexRegexes]
+max_characters = 70
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 75
+
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 40
+
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+[Subroutines::RequireArgUnpacking]
+short_subroutine_statements = 2
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = vars subs refs
+
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = all
+
+[TestingAndDebugging::ProhibitProlongedStrictureOverride]
+statements = 12

@@ -1,0 +1,117 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Panotools::Script;
+use Panotools::Photos;
+
+my $help = 0;
+
+my $path_pto;
+my $eev;
+my $balance;
+my $response;
+my $vignetting;
+
+GetOptions ('o|output=s' => \$path_pto,
+            'e|eev' => \$eev,
+            'b|balance' => \$balance,
+            'r|response' => \$response,
+            'v|vignetting' => \$vignetting,
+            'h|help' => \$help);
+
+pod2usage (-verbose => 2) if $help;
+pod2usage (2) unless (scalar @ARGV);
+
+$path_pto = $ARGV[0] unless defined $path_pto;
+
+my $pto = new Panotools::Script;
+$pto->Read ($ARGV[0]);
+
+my $photos_all = new Panotools::Photos (map {$_->Path ($ARGV[0])} @{$pto->Image});
+
+my @AverageRGB = $photos_all->AverageRGB;
+my $sum_Eev;
+
+for my $id (0 .. scalar @{$photos_all} -1)
+{
+    my $image = $pto->Image->[$id];
+    my $photo = $photos_all->[$id];
+    $sum_Eev += $photos_all->Eev ($id);
+
+    if ($eev)
+    {
+        $image->{Eev} = $photos_all->Eev ($id);
+    }
+    if ($balance)
+    {
+        $image->{Er} = 1.0; $image->{Eb} = 1.0;
+        $image->{Er} = $photo->{exif}->{RedBalance} / $AverageRGB[0] if $photo->{exif}->{RedBalance};
+        $image->{Eb} = $photo->{exif}->{BlueBalance} / $AverageRGB[2] if $photo->{exif}->{BlueBalance};
+    }
+    if ($response)
+    {
+        $image->{Ra} = 0; $image->{Rb} = 0; $image->{Rc} = 0; $image->{Rd} = 0; $image->{Re} = 0;
+    }
+    if ($vignetting)
+    {
+        $image->{Va} = 1; $image->{Vb} = 0; $image->{Vc} = 0; $image->{Vd} = 0; $image->{Vx} = 0; $image->{Vy} = 0;
+    }
+}
+
+$pto->Panorama->{E} = sprintf ('%.3f', $sum_Eev / scalar @{$photos_all}) if ($eev);
+
+$pto->Write ($path_pto);
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+ptoreset - reset photometric parameters in a .pto file
+
+=head1 SYNOPSIS
+
+ptoreset [options] --output output.pto project.pto
+
+ Options:
+  -o | --output name    Filename of output panorama project.
+                          Input file is overwritten if not specified.
+  -e | --eev            Reset Eev exposure value of photos to EXIF values
+                          global project Eev is set to average of all photos
+  -b | --balance        Reset white balance of photos to EXIF values
+  -r | --response       Reset camera response of photos to EMoR default
+  -v | --vignetting     Reset vignetting of photos to none
+  -h | --help           Outputs help documentation.
+
+=head1 DESCRIPTION
+
+B<ptoreset> takes a Hugin .pto project file and writes it to a new file.
+Optionally various photometric parameters are reset, either to EXIF values or
+to sensible defaults.
+
+e.g. to reset all photometric parameters in a Hugin project:
+
+  ptoreset -b -r -e -v project.pto
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+=head1 AUTHOR
+
+Bruno Postle - June 2011.
+
+=cut
+
+=begin perl

@@ -1,0 +1,688 @@
+=head1 NAME
+
+Pogo - Perl GOODS interface
+
+=head1 SYNOPSIS
+
+  use Pogo;
+
+  $pogo = new Pogo 'sample.cfg';  # データベースに接続
+  $root = $pogo->root_tie;        # データベースのrootハッシュへの参照を得る
+  
+  $root->{key1} = "string";       # 文字列をデータベースに格納
+  $value = $root->{key1};         # $value は "string"
+  
+  $root->{key2} = [1,2,3];        # 配列をデータベースに格納
+  $arrayref = $root->{key1};      # データベース中の配列への参照を得る
+  $value = $root->{key2}->[0];    # $value は 1
+  
+  $root->{key3} = {a=>1,b=>2};    # ハッシュをデータベースに格納
+  $hashref = $root->{key3};       # データベース中のハッシュへの参照を得る
+  $value = $root->{key3}->{b};    # $value は 2
+  
+  $root->{key4} = new Pogo::Btree;# Bツリーハッシュを作る
+  $hashref = $root->{key5};       # Bツリーはハッシュとしてアクセスできる
+  
+  $root->{key5} = new Pogo::Htree;# Hツリーハッシュを作る
+  $hashref = $root->{key6};       # Hツリーはハッシュとしてアクセスできる
+  
+  $root->{key6} = new Aclass;     # オブジェクトをデータベースに格納
+  $obj = $root->{key4};           # $obj はデータベース中の Aclass オブジェクト
+
+
+=head1 DESCRIPTION
+
+=head2 概要
+
+Pogo は GOODS (Generic Object Oriented Database System)の Perl インタ 
+ーフェースです。Pogo は Perl のスカラや配列やハッシュやオブジェクトを 
+ダイレクトにデータベースオブジェクトに対応づけます。Pogo には次のデー 
+タタイプがあります。
+
+  - スカラー
+  - 配列
+  - ハッシュ
+  - Hツリー (ハッシュエントリ表がBツリーとなっているハッシュ)
+  - Bツリー
+  - Nツリー（キーが整数値のBツリー）
+
+スカラーデータや集合タイプデータの要素の値は、文字列か、他のデータへの
+参照です。Pogo は Perl の tie の仕組みを利用してデータベース中の永続デ
+ータへの透過的なアクセス方法を提供します。データベース中の各データは内
+部的にクラス名を持てるので、Perl のオブジェクト（つまりクラス名で     
+bless された参照）をデータベース中に格納できます。
+
+=head2 GOODS サーバー
+
+Pogo のベースとなっている GOODS は、クライアントサーバー型のデータベー
+スです。Pogo のアプリケーションは、同じマシン上か TCP/IP でつながった 
+他のマシン上で動作中の、GOODS サーバープロセスを必要とします。GOODS サ
+ーバーのプログラムは「goodsrv」という名前で、/usr/local/goods/bin/ に 
+インストールされます。Pogo のアプリケーションとそれに対応する goodsrv 
+はお互いに通信するために同じ TCP ポートを使う必要があります。そのため 
+に両者は、goodsrv のホスト名と TCP ポート番号を記載した同じ設定ファイ 
+ルを参照します。設定ファイルは「.cfg」の拡張子でなければなりません。ロ
+ーカルマシン上の goodsrv に対する典型的な設定ファイルは次のような内容 
+になります。
+
+  1
+  0: localhost:6100
+
+１行目の「1」はこのデータベースが一つの goodsrv を使うことを意味します
+（二つ以上使うことも可能ですが Pogo では一つしか使いません）。二行目の
+「0: localhost:6100」は、一つ目の goodsrv が、localhost にあって、ポー
+ト番号6100を使うことを意味しています。
+
+この設定ファイルが、「test.cfg」として作られているならば、goodsrvは次のように起動できます。
+
+  goodsrv test
+
+すると、goodsrv は次に示す一組のデータベースファイルを作成します。これ
+らのファイルを削除したり直接編集したりは絶対にしないでください。
+
+  test.his
+  test.idx
+  test.log
+  test.map
+  test.odb
+
+起動した goodsrv はコンソールからのコマンド入力を待ちつつ、指定された 
+TCP ポートを通じてデータベースサービスを提供します。コマンドによって、
+データベースの統計情報を見たり、バックアップを取ったりできます。GOODS 
+の readme.htm を参照してください。
+
+実用上は、goodsrv はバックグラウンドプロセスとして起動されることになる
+でしょう。Pogo は、goodsrv をバックグラウンドで起動するためと、その   
+goodsrv にコマンドを送るための、二つのユーティリティースクリプトを用意
+しています。goodsrv を、test.cfg に従って起動するには次のようにします。
+
+  startgoodsrv test &
+
+この場合、goodsrvの画面出力はtest.goodsrv.logに保存されます。
+goodsrvを終了するには、次のようにします。
+
+  cmdgoodsrv test exit
+
+=head2 tieインターフェース
+
+=over 4
+
+=item B<接続>
+
+まず最初に、実行中のGOODSサーバーに接続します。
+
+  $pogo = new Pogo $cfgfilename;
+
+$cfgfilename は GOODS サーバーを指定する設定ファイル名です。これで得ら
+れた Pogo オブジェクトは以下で使用します。
+
+=item B<ルートを得る>
+
+次に、データベース中のルートBツリーへの参照を得ます。
+
+  $root = $pogo->root_tie;
+
+ノート：GOODS データベース中の永続データは、必ず他の永続データから参照
+されていなくてはなりません。もしあるデータがどの永続データからも参照さ
+れなくなると、そのデータは GOODS のガベージコレクションシステムによっ 
+て回収されます。このことから、データベースには少なくとも一つは、絶対的
+な永続データがなければならないということになります。それがルートと呼ば
+れるデータです。Pogo データベースのルートは B ツリーデータです。      
+root_tie メソッドは、このルート B ツリーデータへの参照を返します。
+
+=item B<文字列と数値>
+
+データベースにデータを格納するには、単に Perl のデータを $root を通じ 
+て代入するだけです。$root はハッシュ参照であることに注意してください。
+
+  $root->{key} = "value";
+  $root->{pi} = 3.14;
+
+ノート：Pogo データベースでは、データ値文字列にはヌル文字（"\x00"）を 
+含むことができますが、ハッシュキー文字列には含むことができません。
+
+ノート：数値3.14は文字列"3.14"として格納されます。このデータ変換はオー
+バーヘッドですので、将来の Pogo では直接数値として格納するようになるで
+しょう。
+
+データベースにデータを格納したら、それを取り出すことができます。
+
+  $value = $root->{key};  # $value は "value"
+  $pi = $root->{pi};      # $pi は "3.14"
+
+=item B<配列とハッシュ>
+
+配列やハッシュを格納するには、参照を代入します。
+
+  $root->{key1} = \@array;
+  $root->{key2} = [1,2,3];
+  $root->{key3} = \%hash;
+  $root->{key4} = {a=>1,b=>2,c=>3};
+  $root->{key5} = {a=>[1,2],b=>{c=>3,d=>4}};
+
+この代入は、参照だけを格納するのではなく、その配列やハッシュの中味もデ
+ータベースに格納されるということに注意してください。データベース中の永
+続データは、非永続（つまりメモリ上の）データを参照することはできません
+ので。つまり、配列やハッシュのコピーがデータベース中に作られてその参照
+が代入されることになるわけです。上の例で言えば、代入後に@array や %   
+hash を変更しても、$root->{key1}の配列や $root->{key3}のハッシュが変更
+されるわけではありません。
+
+格納した値を得るには、普通に ->[] や ->{} の記法を使うことができます。
+
+  $value = $root->{key5}->{a}->[1];  # $value は 2
+  $value = $root->{key5}{a}[1];      # {} や [] の間の -> は省略可能
+
+もし指定した値がデータベース中の別のデータへの参照であった場合は、然る
+べき型の参照が得られます。その参照は、データベースにデータを格納したり
+得たりするのに使えます。
+
+  $hashref = $root->{key4};     # ハッシュ参照を得る
+  $hashref->{d} = 4;            # データを格納する
+  $value = $hashref->{c};       # $value は 3
+
+ノート：CODEとIOの参照はデータベースに格納することはできません。
+
+=item B<配列のサイズ>
+
+Pogo の配列は必要なときに自動的に大きくなります。しかし、これはデータ 
+ベース内のデータの再配置をともないます。配列参照が代入されたときには、
+その配列のサイズに設定されますが、もし最大サイズが見積もれるなら、あら
+かじめサイズを設定しておくことをお勧めします。サイズを指定して配列を作
+るには、Pogo::Array::new メソッドを使います。
+
+  $root->{sqrt} = new Pogo::Array 1000;
+  for(0..999) { $root->{sqrt}->[$_] = sqrt $_; }
+
+=item B<ハッシュのサイズ>
+
+Pogo のハッシュは、固定サイズのハッシュエントリ表を持ち、そのサイズを 
+変更することはできません。ハッシュエントリ表のサイズは、格納できるキー
+の数を制限するわけではありませんが、ハッシュエントリ表のサイズに対して
+多すぎるキーを格納すると遅くなります。ですから、ハッシュの用途に応じて
+適切なハッシュエントリ表のサイズを選ぶことが必要です。（将来の Pogo で
+は自動的なハッシュエントリ表のサイズ拡張がサポートされるようになるでし
+ょう。）ハッシュ参照が代入されるときには、そのハッシュと同じハッシュエ
+ントリ表のサイズが設定されます。ハッシュエントリ表のサイズを指定してハ
+ッシュを作るには、Pogo::Hash::new メソッドを使います。
+
+  $root->{smallhash} = new Pogo::Hash 8;
+  $root->{largehash} = new Pogo::Hash 1024;
+
+サイズを省略すると、256になります。
+
+=item B<Hツリー>
+
+Pogo のハッシュのハッシュエントリ表は固定サイズの配列なので、あまり大 
+きなサイズのハッシュは実用的ではありません。もし非常に大きなハッシュが
+必要なら、H ツリーを使ってください。H ツリーのハッシュエントリ表は B  
+ツリーになっているので、巨大なサイズが可能です。ハッシュエントリ表のサ
+イズを指定して H ツリーを作るには、Pogo::Htree::new メソッドを使います。
+
+  $root->{hugehash} = new Pogo::Htree 131072;
+
+サイズを省略すると、65536になります。
+
+=item B<Bツリー>
+
+もうひとつの巨大ハッシュを作る方法は、B ツリーです。B ツリーでは、ハッ
+シュのキー自体が B ツリーのキーとなります。そのためにキーは自動的に整 
+列されることになります。また、ハッシュエントリ表のサイズのサイズの問題
+はありません。その一方で、Pogo の B ツリーのキー索引はキー文字列の先頭
+8バイトから作られるため、もし多くのキーが先頭8バイトが同じであると、そ
+のキーの検索は遅くなります。B ツリーを作るには、Pogo::Btree::new メソ 
+ッドを使います。
+
+  $root->{btree} = new Pogo::Btree;
+
+サイズの指定は必要ありません。
+
+tie インターフェースでは、ある文字列に部分一致するハッシュキーを探すと
+いうことはできません。それには、Pogo::tied_object と Pogo::Btree::find
+_key を使います。
+
+  $foundkey = Pogo::tied_object($root->{btree})->find_key($string);
+
+Pogo::tied_object は、データの参照先に tie された隠れたオブジェクトを 
+返します。$root->{btree}が B ツリーであれば、Pogo::tied_object($root->
+{btree}) は Pogo::Btree オブジェクトになります。そして、Pogo::Btree:: 
+find_key メソッドは、指定された文字列に前方部分一致するキーを返します。
+
+=item B<Nツリー>
+
+B ツリーでキーを整数値として扱いたい場合があります。つまり、「10」が  
+「2」より後になるようにしたい（B ツリーでは文字列として扱うので逆にな 
+る）。そういう場合には N ツリーを使えば、キーは long 整数値として扱わ 
+れます。その点を除けば B ツリーと同じです。
+
+  $root->{ntree} = new Pogo::Ntree;
+
+=item B<オブジェクト>
+
+SCALAR/ARRAY/HASH 参照だけを使っている Perl オブジェクトであれば、Pogo
+データベースに格納できます。
+
+  sub Foo::new { bless {name => $_[1]}, $_[0]; }
+  sub Foo::name { $_[0]->{name}; }
+  $root->{obj} = new Foo "bar";
+  $obj = $root->{obj};            # $obj は Foo オブジェクト
+  $name = $obj->name;             # $name は "bar"
+
+もし、オブジェクトで使うハッシュエントリ表のサイズを指定したかったり、
+H ツリーや B ツリーを使いたいという場合は、Pogo::Hash::new_tie、Pogo::
+Htree::new_tie、Pogo::Btree::new_tie のメソッドを使ってください。
+
+  sub Bar::new {
+      my($class, $name) = @_;
+      my $self = new_tie Pogo::Htree 10000;
+      $self->{name} = $name;
+      bless $self, $class;
+  }
+
+Pogo::*::new_tie を使ったクラスは Pogo データベース用になることに注意 
+してください。
+
+=item B<トランザクション>
+
+Pogo にはトランザクション機構があります。もしデータベースについての一 
+連の操作を「不可分」としたい場合、トランザクションを使います。「不可  
+分」とは、一連の操作がすべて成功裏に実行されるか、あるいは何も行われな
+いか、のどちらかであることを意味します。また、他のデータベースクライア
+ントが、その一連の操作に割り込んで来ないことも意味しています。
+
+データベース全体についてのトランザクションを操作するには、Pogo::      
+begin_transaction、Pogo::abort_transaction、Pogo::end_transaction のメ
+ソッドを使います。
+
+  $root->{key} = 1;
+  
+  $pogo->begin_transaction;
+  $root->{key} = 2;
+  $pogo->abort_transaction;    # 中止: 上の代入はキャンセルされる
+  $value = $root->{key};       # $value は 1 のまま
+  
+  $pogo->begin_transaction;
+  $root->{key} = 3;
+  $pogo->end_transaction;      # 終了: 上の代入は有効
+  $value = $root->{key};       # $value は 3
+
+これらのメソッドは、クラスメソッドとしてではなく、オブジェクトメソッド
+として呼ばなければなりません。
+
+このトランザクションはデータベース全体をロックするので、長時間のトラン
+ザクションは並行処理の効率を低下させます。
+
+データ毎のトランザクションが必要な場合は、Pogo::atomic_call メソッドを
+使います。
+
+  $root->{key} = \@array;
+  Pogo::atomic_call(\&sortarray, $root->{key});
+  sub sortarray { my $aref = shift; @$aref = sort @$aref; }
+
+sortarray が呼ばれている間、$root->{key}はロックされます。従って他のデ
+ータベースクライアントがソートを邪魔することがありませんし、ソートが中
+途半端に終わるということもありません。
+
+データ毎のトランザクションには、ユーザーによる中止の機能はありません。
+
+=item B<受動的動作>
+
+データベース中のデータを監視し、他のデータベースクライアントによってそ
+のデータが変更されたら何かの処理をする、というスクリプトが必要な場合は、
+Pogo::wait_modification 関数を使います。
+
+  $result = Pogo::wait_modification($root->{key}, 5);
+
+この文が実行されると、$root->{key}が他のデータベースクライアントによっ
+て変更されるか、5秒経つまで、実行は止まります。$result は、データが変 
+更された場合は1、時間切れの場合は0になります。
+
+時間切れまでの秒数を省略すると、永遠に待ち続けます。
+
+=back
+
+=head2 データベースブラウザ
+
+Pogo には Pogo データベースの内容を覗くスクリプト browse が付属してい 
+ます。test.cfg のデータベースを覗くには、次のように実行します。
+
+  browse test
+
+すると、browseは次のように表示して、コマンド入力を待ちます。
+
+  test.cfg opened
+  root=(HASH(Btree)(10000))>
+
+「ls」と入力するとルート B ツリーハッシュの内容が例えば次のように見ら 
+れます。他のデータへの参照についてはクラス名、データ種別、オブジェクト
+ID が表示されます。
+
+  {aobj} = Aclass(HASH(Hash)(1012d))
+  {index} = (HASH(Btree)(10282))
+  {list} = (ARRAY(10036))
+  {name} = "test"
+
+ここで「cd index」と入力すると、現在位置が $root->{index}になり、プロ 
+ンプトは次のように変わります。
+
+  root{index}=(HASH(Btree))>
+
+「cd」と入力するとルートに戻ります。「cd ..」と入力すると親に戻ります。
+「exit」で終了です。
+
+=head2 メソッド
+
+「クラスメソッド」と記されたもの以外は、オブジェクトメソッドです。[]記
+号は省略可能な引数を意味します。
+
+=over 4
+
+=item $pogo = Pogo->new [config_filename]
+
+クラスメソッド。Pogo オブジェクトを作って返します。config_filename が 
+指定されていると、その設定ファイルに従って動作している GOODS サーバー 
+に接続します。対応する GOODS サーバーは動作中でなければなりません。
+
+=item $pogo->open config_filename
+
+もし Pogo オブジェクトがまだ GOODS サーバーに接続していなければ、この 
+メソッドで接続します。
+
+=item $pogo->close
+
+GOODS サーバーとの接続を切ります。通常はこのメソッドを使う必要はありません。
+Pogo オブジェクトが破棄されるときに自動的に実行されます。
+
+=item $pogo->opened
+
+Pogo オブジェクトが GOODS サーバーに接続していれば 1、接続していなけれ
+ば 0 を返します。
+
+=item $pogo->root
+
+ルートBツリーに対応したPogo::Btreeオブジェクトを作って返します。
+
+=item $pogo->root_tie
+
+ルート B ツリーに対応した Pogo::Btree オブジェクトを作り、それに tie  
+されたハッシュへの参照を返します。
+
+=item $pogo->begin_transaction
+
+トランザクションを開始します。
+
+=item $pogo->abort_transaction
+
+トランザクションを中止します。
+
+=item $pogo->end_transaction
+
+トランザクションを終了します。
+
+=item $obj = Pogo::Scalar->new [pogoobj]
+
+クラスメソッド。Pogo::Scalar オブジェクトを作って返します。Pogo オブジ
+ェクト pogoobj を指定した場合は、そのデータベースに格納されます。
+
+=item $scalarref = Pogo::Scalar->new_tie [pogovar ,class]
+
+クラスメソッド。Pogo::Scalar オブジェクトを作り、スカラをそれに tie し、
+そのスカラの参照を返します。Pogo の変数 pogovar が指定され、それがすで
+にデータベースにアタッチされている場合は、同じデータベースにアタッチさ
+れます。クラス名 class を指定した場合は、その 
+クラス名で bless されます。
+
+=item $obj = Pogo::Array->new [size ,pogoobj]
+
+クラスメソッド。size で指定されたサイズの Pogo::Array オブジェクトを作
+って返します。size が省略されると、1になります。Pogo オブジェクト     
+pogoobj を指定した場合は、そのデータベースに格納されます。
+
+=item $arrayref = Pogo::Array->new_tie [size ,pogovar ,class]
+
+クラスメソッド。size で指定されたサイズの Pogo::Array オブジェクトを作
+り、配列をそれに tie し、その配列の参照を返します。 size が省略される 
+と、1になります。Pogo の変数 pogovar が指定され、それがすでにデータベ 
+ースにアタッチされている場合は、同じデータベースにアタッチされます。ク
+ラス名 class を指定した場合は、そのクラス名 
+で bless されます。
+
+=item $obj = Pogo::Hash->new [size ,pogoobj]
+
+クラスメソッド。size で指定されたサイズのハッシュエントリ表の Pogo::  
+Hash オブジェクトを作って返します。size が省略されると、256 になります。
+Pogo オブジェクト pogoobj を指定した場合は、そのデータベースに格納され
+ます。
+
+=item $hashref = Pogo::Hash->new_tie [size ,pogovar ,class]
+
+クラスメソッド。size で指定されたサイズのハッシュエントリ表の Pogo::  
+Hash オブジェクトを作り、ハッシュをそれに tie し、そのハッシュの参照を
+返します。size が省略されると、256 になります。Pogo の変数 pogovar が 
+指定され、それがすでにデータベースにアタッチされている場合は、同じデー
+タベースにアタッチされます。クラス名 class を指定した場合は、そのクラ 
+ス名で bless されます。
+
+=item $obj = Pogo::Htree->new [size ,pogoobj]
+
+クラスメソッド。size で指定されたサイズのハッシュエントリ表の Pogo::  
+Htree オブジェクトを作って返します。size が省略されると、 65536 になり
+ます。Pogo オブジェクト pogoobj を指定した場合は、そのデータベースに格
+納されます。
+
+=item $hashref = Pogo::Htree->new_tie [size ,pogovar ,class]
+
+クラスメソッド。size で指定されたサイズのハッシュエントリ表の Pogo::  
+Htree オブジェクトを作り、ハッシュをそれに tie し、そのハッシュの参照 
+を返します。size が省略されると、 65536 になります。Pogo の変数       
+pogovar が指定され、それがすでにデータベースにアタッチされている場合は、
+同じデータベースにアタッチされます。クラス名 class を指定した場合は、 
+そのクラス名で bless されます。
+
+=item $obj = Pogo::Btree->new [pogoobj]
+
+クラスメソッド。Pogo::Btree オブジェクトを作って返します。Pogo オブジ 
+ェクト pogoobj を指定した場合は、そのデータベースに格納されます。
+
+=item $hashref = Pogo::Btree->new_tie [pogovar ,class]
+
+クラスメソッド。Pogo::Btree オブジェクトを作り、ハッシュをそれに tie  
+し、そのハッシュの参照を返します。Pogo の変数 pogovar が指定され、それ
+がすでにデータベースにアタッチされている場合は、同じデータベースにアタ
+ッチされます。クラス名 class を指定した場合は、そのクラス名で bless さ
+れます。
+
+=item $obj = Pogo::Ntree->new [pogoobj]
+
+クラスメソッド。Pogo::Ntree オブジェクトを作って返します。Pogo オブジ 
+ェクト pogoobj を指定した場合は、そのデータベースに格納されます。
+
+=item $hashref = Pogo::Ntree->new_tie [pogovar ,class]
+
+クラスメソッド。Pogo::Ntree オブジェクトを作り、ハッシュをそれに tie  
+し、そのハッシュの参照を返します。Pogo の変数 pogovar が指定され、それ
+がすでにデータベースにアタッチされている場合は、同じデータベースにアタ
+ッチされます。クラス名 class を指定した場合は、そのクラス名で bless さ
+れます。
+
+ノート：これらの Pogo::*::new や Pogo::*::new_tie メソッドで作られたオ
+ブジェクトは、メモリ上にあり、まだ永続的ではありません。既存の永続デー
+タに参照された時に始めて、永続データになります。また、引数に Pogo オブ
+ジェクトを指定すると、そのデータベースに格納されますが、やはり既存の永
+続データに参照されて始めて真に永続データになります。
+
+=back
+
+=head2 ユーティリティー関数
+
+=over 4
+
+=item Pogo::type_of
+
+指定されたPogoデータの参照タイプ、クラス名、tieクラス名を返します。
+
+  ($reftype, $class, $tiedclass) = Pogo::type_of($root->{key});
+
+例えば次のような値が得られます。
+
+  () : 参照でない
+  ('ARRAY', '', 'Pogo::Array') : 配列
+  ('HASH', '', 'Pogo::Btree') : Bツリーハッシュ
+  ('HASH', 'Aclass', 'Pogo::Hash') : Aclassオブジェクト
+
+=item Pogo::tied_object
+
+指定されたPogoデータの参照先がtieされたPogo::*オブジェクトを返します。
+
+=item Pogo::equal
+
+二つの Pogo データを引数にとって、それが同じデータベースオブジェクトを
+指すなら1、違うなら0を返します。
+
+=item Pogo::object_id
+
+指定されたPogoデータのデータベースオブジェクトIDを返します。
+
+=item Pogo::atomic_call
+
+指定された関数を「不可分」に実行し、その結果を返します。
+
+  $result = Pogo::atomic_call(\&func, $data, @args);
+
+\&func はサブルーチン参照、$data は Pogo データです。$data は実行中ロ 
+ックされます。ロックがおこなわれる点を除けば、次と同じです。
+
+  $result = func($data, @args);
+
+funcはスカラコンテキストで呼ばれ、返り値は整数に変換されます。
+
+=item Pogo::wait_modification
+
+指定されたデータが他のデータベースクライアントによって変更されるか、あ
+るいは指定された秒数経つまで待ちます。データが変更された場合は1、時間 
+切れの場合は0を返します。
+
+  $result = Pogo::wait_modification($data, $sec);
+
+時間切れまでの秒数が省略されると、永遠に待ちます。
+
+=item Pogo::get_root_tie
+
+引数に指定された Pogo データから、データベースのルート B ツリーに対応 
+した Pogo::Btree オブジェクトを得て、それに tie されたハッシュへの参照
+を返します。 
+
+  $root = Pogo::get_root_tie($pogovar);
+
+=back
+
+=head2 低レベルメソッド
+
+以下のメソッドはtieインターフェース内部で使われているものです。
+
+=over 4
+
+=item Pogo::Var
+
+Pogo::Var は、以下の Pogo::*クラス群すべての抽象基本クラスです。Pogo::
+Var オブジェクトは使えません。
+
+  Pogo::Var::get_class
+  Pogo::Var::set_class
+  Pogo::Var::begin_transaction
+  Pogo::Var::abort_transaction
+  Pogo::Var::end_transaction
+  Pogo::Var::root
+  Pogo::Var::root_tie
+  Pogo::Var::call
+  Pogo::Var::equal
+  Pogo::Var::wait_modification
+  Pogo::Var::object_id
+
+=item Pogo::Scalar
+
+  Pogo::Scalar::get
+  Pogo::Scalar::set
+
+=item Pogo::Array
+
+  Pogo::Array::get
+  Pogo::Array::set
+  Pogo::Array::get_size
+  Pogo::Array::set_size
+  Pogo::Array::clear
+  Pogo::Array::push
+  Pogo::Array::pop
+  Pogo::Array::insert
+  Pogo::Array::remove
+
+=item Pogo::Hash
+
+  Pogo::Hash::get
+  Pogo::Hash::set
+  Pogo::Hash::exists
+  Pogo::Hash::remove
+  Pogo::Hash::clear
+  Pogo::Hash::first_key
+  Pogo::Hash::next_key
+
+=item Pogo::Htree
+
+  Pogo::Htree::get
+  Pogo::Htree::set
+  Pogo::Htree::exists
+  Pogo::Htree::remove
+  Pogo::Htree::clear
+  Pogo::Htree::first_key
+  Pogo::Htree::next_key
+
+=item Pogo::Btree, Pogo::Ntree
+
+以下のメソッドはPogo::Ntreeでも同じ
+
+  Pogo::Btree::get
+  Pogo::Btree::set
+  Pogo::Btree::exists
+  Pogo::Btree::remove
+  Pogo::Btree::clear
+  Pogo::Btree::first_key
+  Pogo::Btree::last_key
+  Pogo::Btree::next_key
+  Pogo::Btree::prev_key
+  Pogo::Btree::find_key
+
+=back
+
+=head2 低レベルクラスの派生とメソッドのフック
+
+低レベルクラスからの派生クラスを作ってメソッドをオーバーライドすることができます。また、メソッドをオーバーライドする代わりに、メソッドをフックする仕組みも用意されています。
+
+例えばPogo::Array::setメソッドをフックしたい場合は次のようにします。
+
+  # MyArray.pm
+  package MyArray;
+  @ISA = qw(Pogo::Array);
+  %HOOK = (set => \&set_hook);  # set() メソッドを set_hook() でフック
+  sub set_hook {
+    my($self, $idx, $value) = @_;
+    do_something($self, $idx, $value);
+    1;     # 偽を返すと元のメソッドは呼ばれない
+  }
+  ...
+  1;
+
+そして次のようにします。
+
+  use MyArray;
+  $obj = new MyArray;
+  $obj->set(0, "value"); # set_hook($obj, 0, "value") と Pogo::Array::set($obj, 0, "value") が呼ばれる
+
+
+=head1 AUTHOR
+
+中島 靖 <nakajima@netstock.co.jp>
+
+=head1 SEE ALSO
+
+GOODSのreadme.htm
+

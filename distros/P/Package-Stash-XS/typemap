@@ -1,0 +1,18 @@
+TYPEMAP
+varspec_t	T_VARSPEC
+vartype_t	T_VARTYPE
+
+INPUT
+T_VARSPEC
+    if (SvPOK($arg))
+        _deconstruct_variable_name($arg, &$var);
+    else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVHV)
+        _deconstruct_variable_hash((HV*)SvRV($arg), &$var);
+    else
+        croak(\"varspec must be a string or a hashref\");
+    _check_varspec_is_valid(&$var);
+
+T_VARTYPE
+    if (!SvPOK($arg))
+        croak(\"vartype must be a string\");
+    $var = string_to_vartype(SvPV_nolen($arg));

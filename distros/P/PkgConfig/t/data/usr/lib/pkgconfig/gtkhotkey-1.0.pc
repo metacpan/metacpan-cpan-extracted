@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: gtkhotkey
+Description: Helper library for Gtk+ applications to register and bind hotkeys in a consistent way
+Version: 0.2.1
+Requires: glib-2.0 gobject-2.0 gtk+-2.0
+Libs: -L${libdir} -lgtkhotkey
+Cflags: -I${includedir}/gtkhotkey-1.0

@@ -1,0 +1,12 @@
+<h1>[%l('Recently Updated Threads')%]</h1>
+
+[%- IF thread_list.count > 0 %]
+[% PROCESS shared/pager_advanced %]
+<table class="recently_updated">
+    [% WHILE (thread = thread_list.next) %]
+    [% PROCESS shared/postinfo_table_row show_forum_name=1 %]
+    [% END %]
+</table>
+[% ELSE %]
+[%l('NO RECENT THREADS')%]
+[% END %]

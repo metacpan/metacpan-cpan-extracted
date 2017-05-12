@@ -1,0 +1,46 @@
+Pinwheel News
+-------------
+
+Version 0.2.6
+
+* Fixed database reconnection bug
+
+Version 0.2.5
+
+* Added documentation for the Pinwheel::Cache module
+* The caching backend is now an object and should implement the Cache::Cache API
+* Wrote three built-in caching backend modules: Null, Cache, Memcached
+* Added new 'test' and 'setup_test_db' actions to Pinweel application build scripts.
+
+Version 0.2.4
+
+* Added JSON with HTML syntax highlighting to data view.
+
+Version 0.2.3
+
+* Fixed eager loading of models that use single table inheritance.
+* Die when unable to find an appropriate class for single table inheritance.
+
+Version 0.2.2
+
+* Fixed bug where redirects wouldn't work under mod_perl if non-port 80 was used.
+
+Version 0.2.1
+
+* Separate perl-Pinwheel and perl-Pinwheel-devel packages.
+* Added Module::Build::PinwheelApp module to help build pinwheel applications.
+
+Version 0.2.0
+
+* Added Pinwheel:: namespace to modules.
+* Renamed Helpers::Common to Pinwheel::Helpers.
+* Bug fixes for tests when warnings are turned on.
+* Added Module::Build based build system.
+
+
+Version 0.1.0
+
+* First version extrated from the APS project.
+
+
+

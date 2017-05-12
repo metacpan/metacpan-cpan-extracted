@@ -1,0 +1,10 @@
+Revision history for Perl extension PDFREP.
+
+1.00  Wed Jun 27 15:17:45 2001
+        - original version; created by h2xs 1.18
+
+1.01  Tue Jul 10 08:00:00 2001
+        - New release; incorporating column settings.
+
+2.20  Mon Jul 23 11:18:00 2007
+        - Update to version 2 fixing bracket display error

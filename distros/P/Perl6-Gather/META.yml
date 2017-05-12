@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Perl6-Gather
+version:             0.42
+abstract:            Implements the Perl 6 'gather/take' control structure in Perl 5
+license:             ~
+author:              
+    - Damian Conway <DCONWAY@CPAN.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Perl6::Export:                 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

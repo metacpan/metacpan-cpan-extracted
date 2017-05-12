@@ -1,0 +1,59 @@
+SYNOPSIS
+
+     # in function metadata
+     result_postfilter => {
+         re   => 'str',    # convert regex object to string
+         date => 'epoch',  # convert date object to an integer Unix time
+         code => 'str',    # convert subroutine to string literal 'CODE'
+     }
+
+DESCRIPTION
+
+    NOTE: The use of this property is now deprecated. Generating filtering
+    code for each function is quite wasteful when there are hundreds or
+    more functions that are wrapped. Instead, see Data::Clean::JSON.
+
+    This property specifies postfilters for function result. Currently the
+    focus of this property is converting values that are unsafe when
+    exporting to JSON/YAML.
+
+    Value: a hash containing instruction of how to filter. Known keys:
+
+      * re (filter regex object)
+
+      With filter values: str (stringify it).
+
+      * date (date object, such as DateTime in Perl)
+
+      With filter values: epoch (convert to Unix epoch time).
+
+      * code (subroutine)
+
+      With filter values: str (convert to string literal CODE).
+
+    More sophisticated filtering rules might be specified in the future.
+
+    Filtering using generated code can be faster since the code will use
+    for() loop and inline conversion instead of callback for each data item
+    (higher subroutine call overhead).
+
+NOTES
+
+    Another alternative is using the encoder's facility, for example the
+    JSON module can convert blessed object:
+
+     use JSON 2;
+     my $encoder = JSON->new->convert_blessed;
+     {
+         local *DateTime::TO_JSON = sub { $_[0]->ymd };
+         print $encoder->encode($doc);
+     }
+
+    But this currently can't convert coderefs. JSON also can't handle
+    circular references, which neither this wrapper property nor the above
+    way can work around.
+
+SEE ALSO
+
+    Perinci
+

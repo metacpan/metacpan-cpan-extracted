@@ -1,0 +1,2 @@
+# 5.6.2 didn't have this
+PerlIO *	T_INOUT

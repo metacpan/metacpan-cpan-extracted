@@ -1,0 +1,7 @@
+o Add a Time datatype to the Persistent Base package so that times
+  can be stored using this subclass.  Currently due to the limitations
+  of the mSQL database, which does not provide a combined DateTime datatype,
+  only the date is stored when using a Persistent DateTime datatype.
+
+Please see the ToDo file for the Persistent DBI module for other
+possible changes to this module.

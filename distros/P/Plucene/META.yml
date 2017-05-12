@@ -1,0 +1,186 @@
+---
+name: Plucene
+version: 1.25
+author: ~
+abstract: A Perl port of the Lucene search engine
+license: unknown
+requires:
+  Bit::Vector::Minimal: 1.0
+  Carp: 0
+  Class::Accessor: 0.18
+  Class::Accessor::Fast: 0.02
+  Class::Virtual: 0.03
+  Encode: ''
+  File::Spec::Functions: 1.1
+  IO::File: 1.08
+  IO::Handle: 1.21_00
+  IO::Scalar: 2.104
+  Lingua::Stem::En: 2.12
+  List::Util: 1.13
+  Memoize: 1.01
+  Tie::Array::Sorted: 1.1
+  Time::Piece: 1.08
+build_requires:
+  File::Slurp: 2002.1031
+  Test::Harness: 2.30
+provides:
+  Plucene:
+    file: lib/Plucene.pm
+    version: 1.25
+  Plucene::Analysis::Analyzer:
+    file: lib/Plucene/Analysis/Analyzer.pm
+  Plucene::Analysis::CharTokenizer:
+    file: lib/Plucene/Analysis/CharTokenizer.pm
+  Plucene::Analysis::LetterTokenizer:
+    file: lib/Plucene/Analysis/LetterTokenizer.pm
+  Plucene::Analysis::LowerCaseFilter:
+    file: lib/Plucene/Analysis/LowerCaseFilter.pm
+  Plucene::Analysis::LowerCaseTokenizer:
+    file: lib/Plucene/Analysis/LowerCaseTokenizer.pm
+  Plucene::Analysis::PorterStemFilter:
+    file: lib/Plucene/Analysis/PorterStemFilter.pm
+  Plucene::Analysis::SimpleAnalyzer:
+    file: lib/Plucene/Analysis/SimpleAnalyzer.pm
+  Plucene::Analysis::Standard::StandardAnalyzer:
+    file: lib/Plucene/Analysis/Standard/StandardAnalyzer.pm
+  Plucene::Analysis::Standard::StandardTokenizer:
+    file: lib/Plucene/Analysis/Standard/StandardTokenizer.pm
+  Plucene::Analysis::StopAnalyzer:
+    file: lib/Plucene/Analysis/StopAnalyzer.pm
+  Plucene::Analysis::StopFilter:
+    file: lib/Plucene/Analysis/StopFilter.pm
+  Plucene::Analysis::Token:
+    file: lib/Plucene/Analysis/Token.pm
+  Plucene::Analysis::TokenFilter:
+    file: lib/Plucene/Analysis/TokenFilter.pm
+  Plucene::Analysis::Tokenizer:
+    file: lib/Plucene/Analysis/Tokenizer.pm
+  Plucene::Analysis::WhitespaceAnalyzer:
+    file: lib/Plucene/Analysis/WhitespaceAnalyzer.pm
+  Plucene::Analysis::WhitespaceTokenizer:
+    file: lib/Plucene/Analysis/WhitespaceTokenizer.pm
+  Plucene::Bitvector:
+    file: lib/Plucene/Bitvector.pm
+  Plucene::Document:
+    file: lib/Plucene/Document.pm
+  Plucene::Document::DateSerializer:
+    file: lib/Plucene/Document/DateSerializer.pm
+  Plucene::Document::Field:
+    file: lib/Plucene/Document/Field.pm
+  Plucene::Index::DocumentWriter:
+    file: lib/Plucene/Index/DocumentWriter.pm
+  Plucene::Index::FieldInfos:
+    file: lib/Plucene/Index/FieldInfos.pm
+  Plucene::Index::FieldsReader:
+    file: lib/Plucene/Index/FieldsReader.pm
+  Plucene::Index::FieldsWriter:
+    file: lib/Plucene/Index/FieldsWriter.pm
+  Plucene::Index::Norm:
+    file: lib/Plucene/Index/SegmentReader.pm
+  Plucene::Index::Posting:
+    file: lib/Plucene/Index/DocumentWriter.pm
+  Plucene::Index::Reader:
+    file: lib/Plucene/Index/Reader.pm
+  Plucene::Index::SegmentInfo:
+    file: lib/Plucene/Index/SegmentInfo.pm
+  Plucene::Index::SegmentInfos:
+    file: lib/Plucene/Index/SegmentInfos.pm
+  Plucene::Index::SegmentMergeInfo:
+    file: lib/Plucene/Index/SegmentMergeInfo.pm
+  Plucene::Index::SegmentMerger:
+    file: lib/Plucene/Index/SegmentMerger.pm
+  Plucene::Index::SegmentReader:
+    file: lib/Plucene/Index/SegmentReader.pm
+  Plucene::Index::SegmentTermDocs:
+    file: lib/Plucene/Index/SegmentTermDocs.pm
+  Plucene::Index::SegmentTermEnum:
+    file: lib/Plucene/Index/SegmentTermEnum.pm
+  Plucene::Index::SegmentTermPositions:
+    file: lib/Plucene/Index/SegmentTermPositions.pm
+  Plucene::Index::SegmentsReader:
+    file: lib/Plucene/Index/SegmentsReader.pm
+  Plucene::Index::SegmentsTermDocs:
+    file: lib/Plucene/Index/SegmentsReader.pm
+  Plucene::Index::SegmentsTermEnum:
+    file: lib/Plucene/Index/SegmentsTermEnum.pm
+  Plucene::Index::SegmentsTermPositions:
+    file: lib/Plucene/Index/SegmentsReader.pm
+  Plucene::Index::Term:
+    file: lib/Plucene/Index/Term.pm
+  Plucene::Index::TermInfo:
+    file: lib/Plucene/Index/TermInfo.pm
+  Plucene::Index::TermInfosReader:
+    file: lib/Plucene/Index/TermInfosReader.pm
+  Plucene::Index::TermInfosWriter:
+    file: lib/Plucene/Index/TermInfosWriter.pm
+  Plucene::Index::Writer:
+    file: lib/Plucene/Index/Writer.pm
+  Plucene::QueryParser:
+    file: lib/Plucene/QueryParser.pm
+  Plucene::QueryParser::Phrase:
+    file: lib/Plucene/QueryParser.pm
+  Plucene::QueryParser::Prefix:
+    file: lib/Plucene/QueryParser.pm
+  Plucene::QueryParser::Subquery:
+    file: lib/Plucene/QueryParser.pm
+  Plucene::QueryParser::Term:
+    file: lib/Plucene/QueryParser.pm
+  Plucene::QueryParser::TopLevel:
+    file: lib/Plucene/QueryParser.pm
+  Plucene::Search::BooleanClause:
+    file: lib/Plucene/Search/BooleanClause.pm
+  Plucene::Search::BooleanQuery:
+    file: lib/Plucene/Search/BooleanQuery.pm
+  Plucene::Search::BooleanScorer:
+    file: lib/Plucene/Search/BooleanScorer.pm
+  Plucene::Search::BucketCollector:
+    file: lib/Plucene/Search/BooleanScorer.pm
+  Plucene::Search::BucketTable:
+    file: lib/Plucene/Search/BooleanScorer.pm
+  Plucene::Search::DateFilter:
+    file: lib/Plucene/Search/DateFilter.pm
+  Plucene::Search::Filter:
+    file: lib/Plucene/Search/Filter.pm
+  Plucene::Search::HitCollector:
+    file: lib/Plucene/Search/HitCollector.pm
+  Plucene::Search::HitDoc:
+    file: lib/Plucene/Search/Hits.pm
+  Plucene::Search::Hits:
+    file: lib/Plucene/Search/Hits.pm
+  Plucene::Search::IndexSearcher:
+    file: lib/Plucene/Search/IndexSearcher.pm
+  Plucene::Search::PhrasePositions:
+    file: lib/Plucene/Search/PhrasePositions.pm
+  Plucene::Search::PhraseQuery:
+    file: lib/Plucene/Search/PhraseQuery.pm
+  Plucene::Search::PhraseScorer:
+    file: lib/Plucene/Search/PhraseScorer.pm
+  Plucene::Search::PhraseScorer::Exact:
+    file: lib/Plucene/Search/PhraseScorer/Exact.pm
+  Plucene::Search::PhraseScorer::Sloppy:
+    file: lib/Plucene/Search/PhraseScorer/Sloppy.pm
+  Plucene::Search::PrefixQuery:
+    file: lib/Plucene/Search/PrefixQuery.pm
+  Plucene::Search::Query:
+    file: lib/Plucene/Search/Query.pm
+  Plucene::Search::Scorer:
+    file: lib/Plucene/Search/Scorer.pm
+  Plucene::Search::Searcher:
+    file: lib/Plucene/Search/Searcher.pm
+  Plucene::Search::Similarity:
+    file: lib/Plucene/Search/Similarity.pm
+  Plucene::Search::TermQuery:
+    file: lib/Plucene/Search/TermQuery.pm
+  Plucene::Search::TermScorer:
+    file: lib/Plucene/Search/TermScorer.pm
+  Plucene::Search::TopDocs:
+    file: lib/Plucene/Search/TopDocs.pm
+  Plucene::Store::InputStream:
+    file: lib/Plucene/Store/InputStream.pm
+  Plucene::Store::OutputStream:
+    file: lib/Plucene/Store/OutputStream.pm
+  Plucene::TestCase:
+    file: lib/Plucene/TestCase.pm
+  Plucene::Utils:
+    file: lib/Plucene/Utils.pm
+generated_by: Module::Build version 0.26

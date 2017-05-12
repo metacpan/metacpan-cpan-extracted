@@ -1,0 +1,53 @@
+NAME
+    Plack::Middleware::CSS::Compressor - Plack middleware to compress
+    stylesheets
+
+SYNOPSIS
+      use Plack::App::File;
+      use Plack::Builder;
+
+      builder {
+          mount '/public' => builder {
+              enable 'CSS::Compressor';
+              Plack::App::File( root => './public' );
+          };
+          mount '/' => $app;
+      };
+
+      # or in a middleware setup
+
+      builder {
+          enable 'CSS::Compressor',
+              suffix => '.min'
+          ;
+          enable 'Static',
+              path => sub { s!\A /public/ !!x },
+              root => './public/'
+          ;
+
+          $app;
+      };
+
+DESCRIPTION
+    This middleware provides the possibility to compress stylesheets on the
+    fly.
+
+OPTIONS
+    suffix  String or regular expression object that matches a suffix at the
+            end of the file. This allows to control compression through the
+            file name. To unconditionally enable compression set the suffix
+            to an empty string.
+
+SEE ALSO
+    CSS::Compressor, Plack
+
+AUTHOR
+    Simon Bertrang <janus@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2013 by Simon Bertrang
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.12.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

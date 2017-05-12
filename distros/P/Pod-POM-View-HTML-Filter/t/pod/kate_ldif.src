@@ -1,0 +1,45 @@
+=begin filter kate LDIF
+
+  # debut
+  dn: dc=example,dc=com
+  dc: example
+  objectClass: top
+  objectClass: domain
+  
+  dn: cn=Manager, dc=example,dc=com
+  objectClass: organizationalRole
+  cn: Manager
+  
+  # fin
+
+=end filter
+__RESULT__
++kate
+<html><body bgcolor="#ffffff">
+<pre>  <span class="k-string"># debut</span><span class="k-string">
+  </span><span class="k-keyword">dn:</span><span class="k-string"> </span><span class="k-float">dc=</span><span class="k-string">example,</span><span class="k-float">dc=</span><span class="k-string">com</span><span class="k-string">
+  </span><span class="k-keyword">dc:</span><span class="k-string"> example</span><span class="k-string">
+  </span><span class="k-keyword">objectClass:</span><span class="k-string"> top</span><span class="k-string">
+  </span><span class="k-keyword">objectClass:</span><span class="k-string"> domain</span><span class="k-string">
+  </span><span class="k-string">
+  </span><span class="k-keyword">dn:</span><span class="k-string"> </span><span class="k-float">cn=</span><span class="k-string">Manager, </span><span class="k-float">dc=</span><span class="k-string">example,</span><span class="k-float">dc=</span><span class="k-string">com</span><span class="k-string">
+  </span><span class="k-keyword">objectClass:</span><span class="k-string"> organizationalRole</span><span class="k-string">
+  </span><span class="k-keyword">cn:</span><span class="k-string"> Manager</span><span class="k-string">
+  </span><span class="k-string">
+  </span><span class="k-comment"># fin</span></pre>
+</body></html>
+__RESULT__
+-kate
+<html><body bgcolor="#ffffff">
+<pre>  # debut
+  dn: dc=example,dc=com
+  dc: example
+  objectClass: top
+  objectClass: domain
+
+  dn: cn=Manager, dc=example,dc=com
+  objectClass: organizationalRole
+  cn: Manager
+
+  # fin</pre>
+</body></html>

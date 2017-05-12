@@ -1,0 +1,38 @@
+<div class="title_container">
+  <h1>
+    [% pagename %]
+  </h1>
+</div>
+<div class="mod_az_list">
+  <a href="[% c.uri_for('/index/functions') %]">Perl functions A-Z</a> |
+  <a href="[% c.uri_for('/index/functions_by_category') %]">Perl functions by category</a> |
+  <a href="[% c.uri_for('/view','perlfunc') %]">The 'perlfunc' manpage</a>
+</div>
+
+<div class="mod_az_list">
+  [% FOREACH az IN function_az %]
+    [% IF az.link %]
+      <a href="[% az.link %]">[% az.letter %]</a>
+    [% ELSE %]
+      [% az.letter %]
+    [% END %]
+    [% UNLESS loop.last %]
+      |
+    [% END %]
+  [% END %]
+</div>
+
+[% FOREACH az IN function_az %]
+  [% IF az.link %]
+    <a name="[% az.letter %]"></a>
+    <h2>[% az.letter %]</h2>
+    <ul>
+      [% FOREACH function IN az.functions %]
+        <li><a href="[% c.uri_for('/functions',function.url) %]">[% function.name %]</a>
+        [% IF function.description %]
+          - [% function.description %]
+        [% END %]
+      [% END %]
+    </ul>
+  [% END %]
+[% END %]

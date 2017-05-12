@@ -1,0 +1,21 @@
+---
+name: Parse-Range
+version: 0.96
+author: []
+abstract: Parse text range definitions
+license: bsd
+resources:
+  license: http://www.opensource.org/licenses/bsd-license.php
+requires:
+  List::MoreUtils: 0.22
+  Test::More: 0.92
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Parse::Range:
+    file: lib/Parse/Range.pm
+    version: 0.96
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

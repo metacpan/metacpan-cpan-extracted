@@ -1,0 +1,13 @@
+Build.PL
+ChangeLog
+lib/POE/Filter/XML/RPC.pm
+lib/POE/Filter/XML/RPC/Fault.pm
+lib/POE/Filter/XML/RPC/Request.pm
+lib/POE/Filter/XML/RPC/Response.pm
+lib/POE/Filter/XML/RPC/Value.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/01-basic.t

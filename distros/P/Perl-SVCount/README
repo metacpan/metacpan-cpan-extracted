@@ -1,0 +1,4 @@
+Perl::SVCount
+-------------
+A perl module to retrieve the global count of allocated SVs.
+See SVCount.pm for docs.

@@ -1,0 +1,392 @@
+#!/usr/bin/perl
+
+use strict;
+# use warnings;
+use Getopt::Long qw(:config no_ignore_case auto_version auto_help);
+use PPM::Make;
+use Pod::Usage;
+$main::VERSION = $PPM::Make::VERSION;
+my %opts = ();
+my @files = ();
+my %progs = ();
+GetOptions(\%opts,
+           'zip_archive|z',
+           'force|f',
+           'ignore|i',
+           'cpan',
+           'no_cfg',
+           'no-cfg',
+           'no_case',
+           'binary|b:s',
+           'arch_sub|n',
+           'script|s:s',
+           'exec|e:s',
+           'os|o:s',
+           'arch|a:s',
+           'remove|r',
+           'as|A!',
+           'vs|V',
+           'vsr',
+           'vsp',
+           'zipdist',
+           'add|x:s' => \@files,
+           'program|p:s' => \%progs,
+           'ppd:s',
+           'ar:s',
+           'zip:s',
+           'host:s',
+           'user:s',
+           'passwd:s',
+	   'no-ppm4',
+	   'no-html',
+	   'no-remote-lookup',
+	   'skip',
+          ) or pod2usage(2);
+
+my $dist = shift;
+my %upload = ();
+
+for (qw(binary script exec add program ppd ar host user passwd)) {
+  die "Please supply an argument to '$_'"
+     if ( defined $opts{$_} and $opts{$_} eq "");
+}
+
+for (qw(ppd ar host user passwd zip)) {
+  $upload{$_} = delete $opts{$_};
+}
+$opts{upload} = \%upload if defined $upload{ppd};
+$opts{dist} = $dist if $dist;
+
+for (qw(cfg ppm4 html remote-lookup)) {
+  my $given = 'no-' . $_;
+  next unless $opts{$given};
+  my $passed = 'no_' . $_;
+  $passed =~ s/-/_/g;
+  $opts{$passed} = delete $opts{$given};
+}
+
+my $ppm = PPM::Make->new(%opts);
+$ppm->make_ppm();
+
+__END__
+
+=head1 NAME
+
+make_ppm - make a PPM distribution
+
+=head1 SYNOPSIS
+
+   make_ppm [options] [Module | Distribution]
+
+Options:
+
+ [-z | --zip_archive]      : make a zip distribution
+ [-f | --force]            : force remaking a distribution
+ [-i | --ignore]           : ignore any failing test results
+ [ --skip]                 : skip running the tests
+ [-b | --binary] location  : specify the binary location
+ [-n | --arch_sub]         : use \$Config{archname} as a subdirectory
+ [-s | --script] script    : specify a script in the <INSTALL> field
+ [-e | --exec] exec        : specify the executable to run the <INSTALL> script
+ [-x | --add] file         : add file to the archive
+ [-o | --os] os            : use os for the <OS> field
+ [-a | --arch] arch        : use arch for the <ARCHITECTURE> field
+ [-v | --version]          : print version information and exit
+ [-h | --help]             : print this help screen
+ [-r | --remove]           : remove the build directory after installation
+ [-p | --program]  b=a     : specify "a" to be used for the "b" program
+ [-A | --as]               : add Perl version number to ARCHITECTURE (>= 5.8)
+ [-V | --ppmv]             : add version string to ppd and archive filenames
+ [ --ppd ]  location       : copy the ppd to the specified location
+ [ --ar ]   location       : copy the archive file to the specified location
+ [ --zip ]   location      : copy the zipped file to the specified location
+ [ --host]  host           : use the specified host for copying the ppm files
+ [ --user]  user           : username to use when transferring ppm files
+ [ --passwd] password      : password associated with user
+ [ --cpan ]                : make a CPAN distribution
+ [ --no_case ]             : for module searches, ignore case
+ [ --no-case ]             : for module searches, ignore case
+ [ --no_cfg ]              : do not read a .ppmcfg configuration file
+ [ --no-remote-lookup]     : don't use external data sources for meta information
+ [ --vsr]                  : add version string to the archive filename
+ [ --vsp]                  : add version string to the ppd filename
+ [ --zipdist]              : create a zip file of the .ppd and .tar.gz files
+ [ --no-ppm4]              : don't add ppm4 extensions to the ppd file
+ [ --no-html]              : don't generate html documentation
+
+Additional Arguments:
+
+   Module       : specify a module to fetch (requires CPAN.pm)
+   Distribution : specify a distribution to fetch
+
+With no arguments, make_ppm will build a distribution
+inside the current directory. 
+
+=head1 DESCRIPTION
+
+C<make_ppm> is an interface to the C<PPM::Make> module,
+and is used to build a PPM (Perl Package Manager) distribution
+from a CPAN source distribution. See L<PPM::Make> for a
+discussion.
+
+Apart from the options described below, without any arguments 
+C<make_ppm> will assume it is inside an unpacked source
+distribution and make the corresponding PPM distribution.
+If it is given an argument of what looks like a module
+name (eg, I<Net::FTP>), it will use C<CPAN.pm> to look up the 
+corresponding distribution and fetch and build it. Otherwise, 
+additional arguments (eg, F<package.tar.gz>, or
+I<http://someplace.org/package.tar.gz>) will be interpreted
+as distributions to fetch and build.
+
+Options can be read from a configuration file
+(see L<PPM::Make>) and/or given as options to I<make_ppm>,
+unless the I<no_cfg> option is given. An example
+C<.ppmcfg> file is
+
+ [default]
+ 
+ host = me.wherever.ca
+ user = me
+ passwd = whatever
+ 
+ [ MSWin32-x86-multi-thread-5.8 ]
+ 
+ binary = http://me.wherever.ca/ppms/x86/
+ ppd = /usr/local/httpd/htdocs/ppms/
+ ar = /usr/local/httpd/htdocs/ppms/x86/
+ zip = /usr/local/httpd/htdocs/ppms/zips
+ zipdist = 1
+ reps = <<END
+ http://theoryx5.uwinnipeg.ca/ppms/
+ http://www.bribes.org/perl/ppm/
+ http://ppm.activestate.com/PPMPackages/5.8-windows/
+ END
+ bundle = /usr/local/httpd/htdocs/ppms/bundles
+ 
+ [ MSWin32-x86-multi-thread ]
+ 
+ binary = http://me.wherever.ca/ppmpackages/x86/
+ ppd = /usr/local/httpd/htdocs/ppmpackages/
+ ar = /usr/local/httpd/htdocs/ppmpackages/x86/
+ zip = /usr/local/httpd/htdocs/ppmpackages/zips
+ zipdist = 1
+ no_ppm4 = 1
+ reps = <<END
+ http://ppm.activestate.com/PPMPackages/5.6/
+ http://theoryx5.uwinnipeg.ca/ppmpackages/
+ http://www.bribes.org/perl/ppm/
+ END
+ bundle = /usr/local/httpd/htdocs/ppmpackages/bundles
+
+In case of duplicates, the options to I<make_ppm> take
+precedence. Available options include:
+
+=over
+
+=item [-z | --zip]
+
+By default, C<make_ppm> will build a C<.tar.gz> distribution
+if possible. This option forces a C<.zip> distribution to be made.
+
+=item [-f | --force]
+
+By default, if C<make_ppm> detects a F<blib/> directory,
+it will assume the distribution has already been made, and
+will not remake it. This option forces remaking the distribution.
+
+=item [-i | --ignore]
+
+By default, C<make_ppm>, if it is building the distribution,
+will die if all tests do not pass. Turning on this option
+instructs C<make_ppm> to ignore any test failures.
+
+=item [ --skip ]
+
+Setting this option will skip running any tests supplied
+with the package.
+
+=item [-b | --binary] location
+
+I<location> is used as the value for the C<BINARY_LOCATION>
+attribute passed to C<perl Makefile.PL>, and is used in
+setting the I<HREF> attribute of the I<CODEBASE> field
+in the ppd file.
+
+=item [-n | --arch_sub]
+
+This option will insert the value of C<$Config{archname}>
+(or the value of the I<-a> option, if given)
+as a relative subdirectory in the I<HREF> attribute of the 
+I<CODEBASE> field in the ppd file.
+
+=item  [-o | --os] os
+
+If this option is specified, the value, if present, will be used 
+instead of the default for the I<NAME> attribute of the I<OS> field 
+of the ppd file. If no value is supplied, the I<OS> field will not 
+be included in the ppd file.
+
+=item [-a | --arch] arch
+
+If this option is specified, the value, if present, will be used instead 
+of the default for the I<NAME> attribute of the I<ARCHITECTURE> field of 
+the ppd file. If no value is specified, the  I<ARCHITECTURE> field 
+will not be included in the ppd file.
+
+=item  [-s | --script] script
+
+This will be used in the I<PPM_INSTALL_SCRIPT>
+attribute passed to C<perl Makefile.PL>, and arises in
+setting the value of the I<INSTALL> field in the ppd file.
+If this begins with I<http://> or I<ftp://>, so that the
+script is assumed external, this will be
+used as the I<HREF> attribute for I<INSTALL>.
+
+=item [-e | --exec] exec
+
+This will be used in the I<PPM_INSTALL_EXEC>
+attribute passed to C<perl Makefile.PL>, and arises in
+setting the I<EXEC> attribute of the I<INSTALL> field
+in the ppd file.
+
+=item  [-x | --add] file
+
+This option, which can be specified multiple times, can
+be used to add additional files outside of the the F<blib>
+directory to the archive.
+
+=item [-r | --remove]
+
+If specified, the directory used to build the ppm distribution
+given on the command line will be removed after a successful install.
+
+=item [-p | --prog] program=/path/to/program
+
+This option specifies that C</path/to/program> should be used
+for C<program>, rather than the one PPM::Make finds. This option
+can be specified multiple times, with
+C<program> being one of C<tar>, C<gzip>, C<zip>, C<unzip>, or C<make>.
+
+=item [--ppd] $path_to_ppd_files
+
+If given, this will copy the ppd file to the location specified,
+and must be given as an absolute pathname. If I<host> is specified,
+this copy will be done via ftp, otherwise a local copy is made.
+
+=item [--ar] $path_to_archive_file
+
+This is the location where the archive file should be placed.
+This may either be an absolute pathname or a relative one,
+in which case it is interpreted to be relative to that
+specified by I<ppd>. If this is not given, but I<ppd>
+is specified, this will default to the value of I<ppd>.
+
+=item [--zip] $path_to_zip_file
+
+This is the location where the zipped file created with the
+I<--zipdist> options should be placed.
+This may either be an absolute pathname or a relative one,
+in which case it is interpreted to be relative to that
+specified by I<ppd>. If this is not given, but I<ppd>
+is specified, this will default to the value of I<ppd>.
+
+=item [--host] $hostname
+
+If specified, an ftp transfer to the specified host is
+done, with I<ppd> and I<ar> as described above.
+
+=item [--user] $username
+
+This specifies the user name to login as when transferring
+via ftp.
+
+=item [--passwd] $passwd
+
+This is the associated password to use for I<user>
+
+=item [-A | --as]
+
+Beginning with Perl-5.8, Activestate adds the Perl version number to
+the NAME of the ARCHITECTURE tag in the ppd file. This option,
+which is enabled by default, will make a ppd file compatible with this
+practice. Specify C<--noas> to disable this option.
+
+=item [-V | --vs]
+
+This option will add a version string (based on the VERSION reported
+in the ppd file) to the ppd and archive filenames.
+
+=item [--vsr]
+
+This option, if enabled, will add a version string 
+(based on the VERSION reported in the ppd file) to the 
+archive filename.
+
+=item [--vsp]
+
+This option, if enabled, will add a version string 
+(based on the VERSION reported in the ppd file) to the 
+ppd filename.
+
+=item [--zipdist]
+
+If enabled, this option will create a zip file C<archive.zip>
+consisting of the C<archive.ppd> ppd file and the C<archive.tar.gz>
+archive file, suitable for local installations. A short README
+file giving the command for installation is also included.
+
+=item [--cpan]
+
+If specified, a distribution will be made using C<make dist>
+which will include the I<ppd> and I<archive> file.
+
+=item [--no_case]
+
+If specified, module searches will be performed in a case-insensitive
+manner.
+
+=item [--no_cfg]
+
+If specified, do not attempt to read a F<.ppmcfg> configuration
+file.
+
+=item [--no-cfg]
+
+If specified, do not attempt to read a F<.ppmcfg> configuration
+file.
+
+=item [--no-ppm4]
+
+If specified, do not add ppm4 extensions (such as the
+I<PROVIDE> element) to the ppd file.
+
+=item [--no-html]
+
+If specified, do not build html documentation.
+
+=item [--no-remote-lookup]
+
+If specified, do not query remote data sources for meta information.
+
+=item [--help]
+
+This prints out a short help screen and exits.
+
+=item [--version]
+
+This prints out some version information and exits.
+
+=back
+
+=head1 COPYRIGHT
+
+This program is copyright, 2002, by Randy Kobes 
+E<lt>r.kobes@uwinnipeg.caE<gt>.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<PPM::Make>, and L<PPM>.
+
+=cut

@@ -1,0 +1,78 @@
+{
+   "abstract" : "Plack::Builder extension",
+   "author" : [
+      "Masahiro Nagano <kazeburo {at} gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.4.2",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Builder-Conditionals",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.2"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "Net::CIDR::Lite" : "0",
+            "Plack" : "0.9941"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Builder::Conditionals" : {
+         "file" : "lib/Plack/Builder/Conditionals.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazeburo/Plack-Builder-Conditionals/issues"
+      },
+      "homepage" : "https://github.com/kazeburo/Plack-Builder-Conditionals",
+      "repository" : {
+         "url" : "git://github.com/kazeburo/Plack-Builder-Conditionals.git",
+         "web" : "https://github.com/kazeburo/Plack-Builder-Conditionals"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Masahiro Nagano <m-nagano@livedoor.jp>",
+      "Hans Dieter Pearcey <hdp@weftsoar.net>",
+      "Shoichi Kaji <skaji@outlook.com>",
+      "Masahiro Nagano <kazeburo@gmail.com>"
+   ]
+}

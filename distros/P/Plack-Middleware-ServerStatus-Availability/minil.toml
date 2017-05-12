@@ -1,0 +1,4 @@
+name = "Plack-Middleware-ServerStatus-Availability"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

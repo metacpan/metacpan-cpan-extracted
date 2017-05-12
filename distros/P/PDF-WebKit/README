@@ -1,0 +1,41 @@
+PDF-WebKit version 0.91
+=======================
+
+Use WebKit to Generate PDFs from HTML (via wkhtmltopdf)
+
+  my $pdf = PDF::WebKit->new('http://www.google.com/')->to_pdf;
+
+HOMEPAGE
+
+http://github.com/kingpong/perl-PDF-WebKit
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  * IPC::Run
+  * Moo
+  * XML::LibXML 1.62 (recommended)
+
+To run the tests, you'll need:
+
+  * Test::Spec
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Informatics Corporation of America.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.9 or,
+at your option, any later version of Perl 5 you may have available.
+
+

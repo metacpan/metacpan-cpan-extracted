@@ -1,0 +1,12 @@
+=for filter=shell echo "foo"
+__RESULT__
++shell
+<html><body bgcolor="#ffffff">
+<pre>echo <span class="s-quo">"</span><span class="s-val">foo</span><span class="s-quo">"</span></pre>
+</body></html>
+__RESULT__
+-shell
+<html><body bgcolor="#ffffff">
+<pre>echo "foo"
+</pre>
+</body></html>

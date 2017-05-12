@@ -1,0 +1,56 @@
+Parse::RandGen NEWS --  history of user-visible changes.
+See the end for copying conditions.
+
+The contributors that suggested a given feature is shown in [].
+
+* Changes in Parse::RandGen 0.202 8/31/2005
+**	Fix bug in Literal::pick(match=>0) that resulted in the
+	literal not being corrupted, as it should.
+
+***	Refactored common code from pick() into pickRepetitions()
+	[James Gregory]
+
+***	$Parse::RandGen::Debug can be set to enable debug messages.
+
+***	In the pick() functions, when a capture is specified and match=>1,
+	only the last repetition of a Subrule gets the value of the capture
+	(the others can be anything).
+
+
+* Changes in Parse::RandGen 0.201 7/14/2005
+**	Added "t/15_regex_pick.t" test to the MANIFEST
+	(forgot it in 0.200)
+
+
+
+* Changes in Parse::RandGen 0.200 7/13/2005
+
+**	Fix bug in CharClass when min is specified but not max
+	(e.g. /a{50,}/).  [James Gregory]
+
+***	Added support for captures in Regexp (named or numbered).
+
+***	Added ability for pick() to take user-specified values for
+	subrules or regexp captures to constrain the generation of
+	random data.
+
+
+* Initial release of Parse::RandGen 0.100 8/19/2003
+
+****	Initial release
+
+----------------------------------------------------------------------
+$Revision: #4 $$Date: 2005/08/31 $$Author: jd150722 $
+----------------------------------------------------------------------
+Copyright information:
+
+   Copyright 2003-2005 by Jeff Dutton.  This program is free software;
+   you can redistribute it and/or modify it under the terms of either the GNU
+   General Public License or the Perl Artistic License.
+
+   See the README file included with this file for licencing information.
+
+Local variables:
+mode: outline
+paragraph-separate: "[ 	]*$"
+end:

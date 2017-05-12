@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-basic.t
+t/01-utf8.t
+t/02-entities.t
+t/pod.t
+t/pod-coverage.t
+lib/Polycom/Config/File.pm
+examples/test.pl
+examples/0004f21ac123-regLine.cfg

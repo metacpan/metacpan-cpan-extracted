@@ -1,0 +1,122 @@
+=encoding utf8
+
+=head1 NAME
+
+perlcheat - Hoja resumen de Perl 5
+
+=head1 DESCRIPCIÓN
+
+Esta 'hoja resumen' es una referencia útil para programadores principiantes.
+No abarca todo, pero incluye 195 características del lenguaje; no es mal
+comienzo.
+
+=head2 La hoja
+
+  CONTEXTOS  SIGILOS  ref        ARRAYS        HASHES
+  nulo       $escalar SCALAR     @array        %hash
+  escalar    @array   ARRAY      @array[0, 2]  @hash{'a', 'b'}
+  lista      %hash    HASH       $array[0]     $hash{'a'}
+             &sub     CODE
+             *glob    GLOB       VALORES ESCALARES
+                      FORMAT     número, cadena, ref, glob, undef
+  REFERENCIAS
+  \      referencia       $$foo[1]       equivale a $foo->[1]
+  $@%&*  desreferenciar   $$foo{bar}     equivale a $foo->{bar}
+  []     ref. array anón. ${$$foo[1]}[2] equivale a $foo->[1]->[2]
+  {}     ref. hash anón.  ${$$foo[1]}[2] equivale a $foo->[1][2]
+  \()    lista de ref.
+                         SINTAXIS
+  PRECEDENCIA OPERADORES foreach (LIST) { }     for (a;b;c) { }
+  ->                     while   (e) { }        until (e)   { }
+  ++ --                  if      (e) { } elsif (e) { } else { }
+  **                     unless  (e) { } elsif (e) { } else { }
+  ! ~ \ u+ u-            given   (e) { when (e) {} default {} }
+  =~ !~
+  * / % x                NÚMEROS vs CADENAS  FALSO vs VERDADERO
+  + - .                   =          =       undef, "", 0, "0"
+  << >>                   +          .       otra cosa
+  ops unarios con nombre  == !=      eq ne
+  < > <= >= lt gt le ge   < > <= >=  lt gt le ge
+  == != <=> eq ne cmp ~~  <=>        cmp
+  &
+  | ^             MODIFICADORES REGEX          METACARACTERES REGEX
+  &&              /i no distinguir may/min     ^       principio cadena
+  || //           /m basado en líneas ^$       $       fin cadena (antes \n)
+  .. ...          /s . incluir \n              +       uno o más
+  ?:              /x ignorar espacios          *       cero o más
+  = += last goto  /p preservar                 ?      cero o uno
+  , =>            /a ASCII   /aa seguro        {3,7}   repeticiones en rango
+  ops lista       /l config. reg. /d  dual     |       alternancia
+  not             /u Unicode                   []      clase caracteres
+  and             /e evaluar /ee reevaluar     \b      límite
+  or xor          /g global                    \z      fin de cadena
+                  /o compilar patrón una vez   ()      capturar
+  DEPURACIÓN                                   (?:p)   sin captura
+  -MO=Deparse     CLASES CARACTERES EXP. REG.  (?#t)   comentario
+  -MO=Terse       .   [^\n]                    (?=p)   inspec. pos. delante
+  -D##            \s  espacio en blanco        (?!p)   inspec. neg delante
+  -d:Trace        \w  caracteres palabra       (?<=p)  inspec. pos. atrás \K
+                  \d  dígitos                  (?<!p)  inspec. neg. atrás
+  CONFIGURACIÓN   \pP propiedad con nombre     (?>p)   sin vuelta atrás
+  perl -V:ivsize  \h  espacio en blanco horiz. (?|p|p) reinicio bifurcación
+                  \R  salto de línea           (?<n>p) captura con nombre
+                  \S \W \D \H negar            \g{n}   ref a captura con nombre
+                                               \K      mantener parte izquierda
+  LISTAS RETORNO FUNCIONES
+  stat      localtime    caller            VARIABLES ESPECIALES
+   0 dev    0 segundo    0 paquete         $_    variable predeterminada
+   1 ino    1 minuto     1 nombre archivo  $0    nombre programa
+   2 mode   2 hora       2 línea           $/    separador entrada
+   3 nlink  3 día        3 subrutina       $\    separador salida
+   4 uid    4 mes-1      4 hasargs         $|    volcado automático
+   5 gid    5 año-1900   5 wantarray       $!    error de sys/libcall
+   6 rdev   6 día semana 6 evaltext        $@    error eval
+   7 size   7 día año    7 is_require      $$    Id. proceso
+   8 atime  8 is_dst     8 hints           $.    número de línea
+   9 mtime               9 máscara bits    @ARGV args línea comandos
+  10 ctime              10 hash de pistas  @INC  rutas de inclusión
+  11 blksz               3..10 solo        @_    args subroutina
+  12 blcks               con EXPR          %ENV  entorno
+
+=head1 AGRADECIMIENTOS
+
+La primera versión de este documento se publicó en Perl Monks, donde muchas
+personas realizaron útiles sugerencias. Gracias, Perl Monks.
+
+Debemos un agradecimiento especial a Damian Conway, quien no sólo sugirió
+importantes cambios, sino que también se entretuvo en contar el número de
+características incluidas y creó una versión para Perl 6 con el fin de
+demostrar que Perl seguirá siendo Perl.
+
+=head1 AUTOR
+
+Juerd Waalboer <#####@juerd.nl>, con la ayuda de muchos Perl Monks.
+
+=head1 VEA TAMBIÉN
+
+=over 4
+
+=item *
+
+L<http://perlmonks.org/?node_id=216602> - Artículo original de PM
+
+=item *
+
+L<http://perlmonks.org/?node_id=238031> - Versión para Perl 6 de Damian Conway
+
+=item *
+
+L<http://juerd.nl/site.plp/perlcheat> - Página de la hoja resumen de Perl
+
+=back
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

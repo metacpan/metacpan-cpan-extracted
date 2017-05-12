@@ -1,0 +1,27 @@
+
+severity = 3
+verbose  = 8
+
+#------------------------------------------------------------------------------
+
+[CodeLayout::RequireTidyCode]
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|AFFILIATION|VERSION|DESCRIPTION|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES AND REQUIREMENTS|INCOMPATIBILITIES|BUGS AND LIMITATIONS|BUG REPORTING|TEST AND QUALITY|SEE ALSO|AUTHOR|LICENSE AND COPYRIGHT
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+[-NamingConventions::Capitalization]
+
+
+[logicLAB::RequireSheBang]
+formats = #!/usr/bin/env perl
+
+#TODO
+
+[-Documentation::RequirePodSections]
+
+[-Documentation::RequirePodLinksIncludeText]

@@ -1,0 +1,38 @@
+---
+abstract: 'Housekeeping for sets of named parameters'
+author:
+  - 'Dorian Taylor, C<< <dorian at cpan.org> >>'
+  - 'Dorian Taylor <dorian@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Params-Registry
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DateTime: '0.70'
+  DateTime::Set: '0.31'
+  Moose: '2.0604'
+  MooseX::Params::Validate: '0.18'
+  MooseX::Types: '0.35'
+  Set::Infinite: '0.63'
+  Set::Scalar: '1.25'
+  Throwable: '0.200008'
+  Tie::IxHash: '1.23'
+  URI: '1.60'
+  namespace::autoclean: '0.20'
+  perl: 5.10.0
+resources:
+  license: http://apache.org/licenses/LICENSE-2.0
+version: '0.03'

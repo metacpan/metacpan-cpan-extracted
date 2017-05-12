@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Name: barcode2.xml
+    Author: Cosimo Streppone <cosimo@cpan.org>
+    Description:
+    Example of a PDF where we define a simple barcode label of 150 x 100 mm.
+    This is useful because with PDF::API2::importPageIntoForm() method we can
+    apply and duplicate this tiny label onto an A4 page (cool!).
+-->
+<report version="1.0">
+
+    <definition>
+        <name>Moveunit label 100x50</name>
+        <url>pdf-100x50-pltcode.xml</url>
+        <info>
+            <Author>Cosimo Streppone</Author>
+            <ModDate>2006-03-23</ModDate>
+            <CreationDate>2006-03-23</CreationDate>
+            <Keywords>Item Label Barcode</Keywords>
+        </info>
+        <destination>barcode2.pdf</destination>
+        <paper>100 x 50 mm</paper>
+        <orientation>portrait</orientation>
+        <font>Helvetica</font>
+        <default_font>Helvetica</default_font>
+        <default_font_size>24</default_font_size>
+        <x_margin>5</x_margin>
+        <y_margin>5</y_margin>
+    </definition>
+
+    <data>
+
+        <page>
+        
+            <!-- Don't include a footer in this report -->
+            <footerless>1</footerless>
+
+            <!-- Header has all our content -->
+            <header>
+
+                <!-- Upper barcode clear text -->
+                <cell x="142" y="110">
+                    <font_size>26</font_size>
+                    <align>center</align>
+                    <text>SKUyynnnnnnn</text>
+                    <percent>80</percent>
+                </cell>
+
+                <!-- Barcode cell with lower clear text -->
+                <cell x="142" y="20">
+                    <font_size>13</font_size>
+                    <type>code128</type>
+                    <barcode>SKUyynnnnnnn</barcode>
+                    <percent>90</percent>
+                    <align>center</align>
+                    <zone>35</zone>                       <!-- bars height is 35 postscript points -->
+                    <scale>1.4</scale>                    <!-- 140% the original dimension -->
+                </cell>
+
+            </header>
+        </page>
+
+        <datasource>
+        </datasource>
+    </data>
+
+</report>

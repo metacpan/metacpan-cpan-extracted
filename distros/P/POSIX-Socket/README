@@ -1,0 +1,25 @@
+POSIX/Socket version 0.09
+==========================
+
+Low-level socket operations: _socket _close _connect _fcntl _bind 
+_recv _send _sendto _getsockname _send_n _recv_n _accept _listen.
+Available as plain functions. Uses file descriptors instead of file 
+handles. File descriptors can be shared between threads.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012-13, Yury Kotlyarov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+

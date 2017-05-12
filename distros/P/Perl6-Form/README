@@ -1,0 +1,27 @@
+Perl6::Form version 0.06
+=======================
+
+Implements the Perl 6 'form' formatting function
+
+=head1 WARNING
+
+The syntax and semantics of Perl 6 is still being finalized
+and consequently is at any time subject to change. That means the
+same caveat applies to this module.
+
+
+=head1 DEPENDENCIES
+
+Requires: Perl 5.8.0, Perl6::Export, Scalar::Util, List::Util.
+
+
+=head1 AUTHOR
+
+Damian Conway (damian@conway.org)
+
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2003, Damian Conway. All Rights Reserved.
+ This module is free software. It may be used, redistributed
+    and/or modified under the same terms as Perl itself.

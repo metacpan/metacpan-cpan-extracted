@@ -1,0 +1,132 @@
+/* standard elements */
+body
+    {
+    background: #FFFFFF;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    }	
+p
+    {
+    color: #000000;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    }
+blockquote
+    {
+    color: #000000;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    }
+ul
+    {
+    color: #000000;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    list-style-type: disc;
+    }
+ol
+    {
+    color: #000000;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-weight: normal;
+    }
+h1
+    { 
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 18px;
+    font-weight: bold;
+    color: #2660C9;
+    }
+h2 
+    {
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    font-weight: bold;
+    color: #2660C9;
+    background-color: #EAE2BB;
+    }
+h3
+    { 
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    font-weight: bold;
+    color: #000000;
+    }        
+h4
+    { 
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: 11px;
+    font-weight: bold;
+    color: #2660C9;
+    } 	
+
+pre
+    {
+    font-size: 120%;
+    padding-bottom: 5px;
+    }
+tt
+    {
+    font-size: 120%;
+    }
+code
+    {
+    font-size: 120%;
+    }
+kbd
+    {
+    font-size: 120%;
+    }
+   
+/* documentation link formatting */
+a:link 
+	{ 
+	color: #2660C9;
+        text-decoration: underline;
+	}
+a:visited 
+	{
+        color: #2660C9; 
+        text-decoration: underline;
+	}
+a:hover
+	{
+	color: #000000;
+    text-decoration: underline;
+	}
+a:active 
+	{ 
+        color: #2660C9;
+        text-decoration: underline;
+	}
+.docsubheading
+	{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-weight: bold;
+	color: #B82619;
+	background-color: #EAE2BB;
+	}
+.docsubheadinggrey
+	{
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 13px;
+	font-weight: bold;
+	color: #B82619;
+	background-color: #cccccc;
+    }
+.error
+    {
+    color: #B82619;
+    }    
+.err
+    {
+    color: #B82619;
+    }    
+    
+/* unordered list without bullets */
+ul.sans 
+	{ 
+	list-style-type: none;
+	}
+        

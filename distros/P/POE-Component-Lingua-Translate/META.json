@@ -1,0 +1,55 @@
+{
+   "abstract" : "A non-blocking wrapper around L<Lingua::Translate|Lingua::Translate>",
+   "author" : [
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-Lingua-Translate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "utils"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::Translate" : "0.08",
+            "POE" : 0,
+            "POE::Component::Generic" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-POE-Component-Lingua-Translate@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Lingua-Translate"
+      },
+      "homepage" : "http://search.cpan.org/dist/POE-Component-Lingua-Translate/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hinrik/poe-component-lingua-translate.git",
+         "web" : "http://github.com/hinrik/poe-component-lingua-translate"
+      }
+   },
+   "version" : "0.06",
+   "x_authority" : "cpan:HINRIK"
+}
+

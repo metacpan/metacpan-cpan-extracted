@@ -1,0 +1,9 @@
+Revision history for Perl module Pod::Confluence
+
+1.01 2017-01-05
+
+    - resolve: Links with no name part are incorrectly processed #1
+
+1.00 2016-12-21
+
+    - Initial release.

@@ -1,0 +1,95 @@
+Revision history for Perl extension POEIKC
+
+0.04      Sat Oct 11 2008
+        - revised a test script.
+
+0.03_01   Thu Oct  9 2008
+        - added an option of startup. default is "spawn". 
+          eg) poeikcd -M MyModule --startup start
+                 `MyModule->spawn'
+              poeikcd -M MyModule --startup=new start
+                 `MyModule->new'
+
+0.03      Tue Sep  2 2008
+          The change from 0.02
+        - added "POEIKC::Daemon::P2P".  Peer-to-Peer is made in this.
+        - revised a logic of shutdown.
+        - added the option which changed $0($PROGRAM_NAME).
+        - able to do it in "delay" in "loop".
+
+0.02_07   Thu Aug 29 2008
+        - added the option which changed $0($PROGRAM_NAME)
+        - able to do it in "delay" in "loop".
+          eg)
+             "poikc -U loop  MyModule::my_method args .."
+                package MyModule;
+                our $delay = 3;
+
+0.02_06   Thu Aug 28 2008
+        - revised a test script.
+        - revised a logic of shutdown.
+          did shutdown before returning a response to a client, but was able 
+          to give a client the time to spare that gave back a response.
+
+0.02_05   Thu Aug 27 2008
+        - revised a test script.
+        - corrected a document.
+
+0.02_04   Thu Aug 25 2008
+        - revised a test script.
+
+0.02_03   Thu Aug 21 2008
+        - added a test of "POEIKC::Daemon::P2P"
+
+0.02_02   Mon Aug 18 2008
+        - "POEIKC::Daemon::AndClient" changed a name in "POEIKC::Daemon::P2P".
+           As for poeikcd, the network constitution of the Peer-to-Peer model 
+           was enabled.
+
+0.02_01   Sun Aug 17 2008
+        - Added "POEIKC::Daemon::AndClient"(fictitious name) to be able to 
+          easily communicate between poeikcd.
+
+0.02     Wed Aug 13 2008
+        - added the option which could change a server name. 
+          By this, I can communicate between two server & clients!
+
+0.01     Thu Feb 27 2008
+        - The official version
+
+0.00_07  Thu Feb 22 2008
+        - poikc : -T option. history resize.
+        - The revision of the 'Makefile.PL'. recommends 'Term::ReadLine::Gnu';
+
+0.00_06  Thu Feb 21 2008
+        - poikc : -T option. decided to use 'Term::ReadLine::Gnu'.
+
+0.00_05  Thu Feb 21 2008
+        - poeikcd : -I option. can put PATH at the time of the start in @INC.
+            eg) -I ./lib 
+        - poikc : -T option. Added a history command.
+                  history file path : $ENV{HOME}.'/.poikc_history'
+
+0.00_04  Thu Feb 20 2008
+        - poikc : -T option. got possible to almost use the terminal. 
+                             supported an argument including the blank.
+        - poikc : -T option. Added a use command.
+            eg) 
+            $ poikc -T
+            localhost:47225 POEIKCd> use LWP::Simple
+            localhost:47225 POEIKCd> ::get http://search.cpan.org/~suzuki/
+
+0.00_03  Thu Feb 19 2008
+        - The revision of the 'Makefile.PL'.
+        - Directory rearranging in the inc directory.
+
+0.00_02  Thu Feb 16 2008
+        - The revision of the test cord.
+
+0.00_01  Thu Feb 15 2008
+        - poeikcd : supported a parameter of IKC server.
+        - poikc : Added -T option. took in a terminal experimentally. 
+          There is malfunction.
+
+0.00_00  Thu Feb 14 00:57:56 2008
+        - replaced from POEIKCdaemon to POEIKC.

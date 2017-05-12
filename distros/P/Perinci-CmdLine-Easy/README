@@ -1,0 +1,66 @@
+SYNOPSIS
+
+    In your command-line script (e.g. named list-cpan-dists):
+
+     use JSON qw(decode_json);
+     use LWP::Simple;
+     use Perinci::CmdLine::Easy qw(run_cmdline_app);
+     run_cmdline_app(
+         summary => "List CPAN distributions that belong to an author",
+         sub     => sub {
+             my $cpanid = shift or die "Please supply CPAN ID\n";
+             my $res = get "http://api.metacpan.org/v0/release/_search?q=author:".
+                 uc($cpanid)."%20AND%20status:latest&fields=name&size=5000"
+                 or die "Can't query MetaCPAN";
+             $res = $json->decode($res);
+             die "MetaCPAN timed out\n" if $res->{timed_out};
+             my @dists;
+             for my $hit (@{ $res->{hits}{hits} }) {
+                 my $dist = $hit->{fields}{name};
+                 $dist =~ s/-\d.+//;
+                 push @dists, $dist;
+             }
+             \@dists;
+         },
+         argv    => [qw/cpanid*/],
+     );
+
+    To run this program:
+
+     % list-cpan-dists --help ;# display help message
+     % LANG=id_ID list-cpan-dists --help ;# display help message in Indonesian
+     % list-cpan-dists SHARYANTO
+
+    To do bash tab completion:
+
+     % complete -C list-cpan-dists list-cpan-dists
+     % list-cpan-dists <tab> ;# completes to --help, --version, --cpanid, etc
+     % list-cpan-dists --c<tab> ;# completes to --cpanid
+
+DESCRIPTION
+
+    NOTE: This is an experimental module.
+
+    Perinci::CmdLine::Easy is a thin wrapper for Perinci::CmdLine and is
+    meant to be a gentler or easier alternative to Perinci::CmdLine. You do
+    not need to know any Rinci or Riap concepts, or provide your own
+    metadata. Just supply the subroutine, summary, list of arguments, and
+    you're good to go. Of course, if you need more customization, there's
+    Perinci::CmdLine.
+
+    What you'll get:
+
+      * Command-line options parsing
+
+      * Help message (supports translation)
+
+      * Tab completion for bash
+
+      * Formatting of output (supports complex data structure)
+
+      * Logging
+
+SEE ALSO
+
+    Perinci::CmdLine
+

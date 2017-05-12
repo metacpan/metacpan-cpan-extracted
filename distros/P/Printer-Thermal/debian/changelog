@@ -1,0 +1,12 @@
+printer-thermal (0.29) stable; urgency=low
+  * Link to the successor module in description 
+
+ -- Shantanu Bhadoria <shantanu@cpan.org>  Fri, 27 Mar 2015 12:57:24 +0000
+
+printer-thermal (0.28) stable; urgency=low
+  * v0.28
+  - Deprecating in favour of Printer::ESCPOS (Shantanu Bhadoria) 
+  * Deprecating in favour of Printer::ESCPOS 
+
+ -- Shantanu Bhadoria <shantanu@cpan.org>  Mon, 16 Mar 2015 12:11:30 +0000
+

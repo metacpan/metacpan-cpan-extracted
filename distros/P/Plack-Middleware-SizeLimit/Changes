@@ -1,0 +1,23 @@
+[Changes for 0.09 - Wed Jan  6 21:22:42 CST 2016]
+
+* Fix build error; no funtional changes. (fgabolde)
+
+[Changes for 0.08 - Wed Nov 25 20:24:34 CST 2015]
+
+* Add META.yml, update documentation, add a couple of tests (bk)
+
+[Changes for 0.06 - Mon Jun 22 18:04:00 BST 2015]
+
+* Added log_when_limits_exceeded option (rrwo)
+
+[Changes for 0.05 - Sun Oct 21 21:44:48 CST 2012]
+
+* Rebuild with up-to-date Module::Install 1.06; no functional changes.
+
+[Changes for 0.04 - Tue Mar 27 17:11:15 CST 2012]
+
+* Restore (no-op) compatibility with non-harakiri-supporting servers.
+
+[Changes for 0.03 - 2011年 6月23日 周四 15時59分11秒 CST]
+
+* Initial release to CPAN.

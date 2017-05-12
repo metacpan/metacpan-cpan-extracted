@@ -1,0 +1,59 @@
+
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Export as Images</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Export</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../../index.html>PPresenter</A><BR>
+<A HREF=../../manual.html>Manual</A><BR>
+<A HREF=../index.html>Export</A><BR>
+<A HREF=index.html>Images</A><BR>
+<B>ImageMagick</B><BR>
+<P>
+<A HREF=#use>Use</A><BR>
+<A HREF=#options>Options</A><BR>
+
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.  With this module, you can export your slide into a directory
+full of images.
+
+<H2><A NAME=use>Using this Module</A></H2>
+To be able to use this exporter module, you have to add it explicitly
+to your show:
+<PRE>
+   $show->addExporter('PPresenter::Export::Images::ImageMagick');
+</PRE>
+
+<H2><A NAME=options>Options</A></H2>
+
+The Images::ImageMagick objects have all general
+<A HREF=../index.html#options>options from Export</A>.
+Next to these you can specify:
+<DL>
+<DT><B>-outputDir =&gt;</B> <I>directory</I>
+<DD>The directory where the images are written to.  This directory is
+    created when required.  The directory is not clean-up when it already
+    exists.
+</DL>
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

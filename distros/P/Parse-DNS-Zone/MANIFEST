@@ -1,0 +1,20 @@
+Changes
+doc/Contributors
+doc/example.pl
+lib/Parse/DNS/Zone.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/01-dist.t
+t/03-filehandling.t
+t/03-fqdnize.t
+t/03-parser.t
+t/03-strip_quotes.t
+t/data/db.include
+t/data/db.nottl
+t/data/db.simple
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

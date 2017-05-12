@@ -1,0 +1,29 @@
+---
+abstract: 'A Perlish Interface to the GSL 1D Integration Library'
+author:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+build_requires:
+  ExtUtils::CBuilder: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PerlGSL-Integration-SingleDim
+no_index:
+  file:
+    - README.pod
+provides:
+  PerlGSL::Integration::SingleDim:
+    file: lib/PerlGSL/Integration/SingleDim.pm
+    version: 0.002
+requires:
+  perl: 5.008
+resources:
+  bugtracker: http://github.com/jberger/PerlGSL-Integration-SingleDim/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/PerlGSL-Integration-SingleDim
+version: 0.002

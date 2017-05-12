@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+README
+LICENSE
+lib/POE/Component/IRC/Plugin/WWW/CPANRatings/RSS.pm
+examples/ratings_bot.pl
+t/00-load.t
+xt/kwalitee.t
+xt/pod-coverage.t
+xt/pod.t
+Makefile.PL
+META.yml
+META.json

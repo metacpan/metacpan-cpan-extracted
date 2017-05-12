@@ -1,0 +1,43 @@
+Proc::Safetynet version 0.01
+============================
+
+Proc::Safetynet is a utility framework for building programs that
+supervises or "babysits" other processes. Supervision tasks can include
+process management (start / stop) and program provisioning (add / remove
+applications).
+
+Proc::Safetynet is especially useful for monitoring and auto-restarting 
+long-running server programs (e.g. FastCGI scripts).
+
+Proc::Safetynet heavily borrows concepts and implementation details
+from the Supervisord project - http://supervisord.org
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Test::Exception
+    JSON::XS
+    Moose
+    POE
+    POE::Filter::JSON::Incr
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Dexter Tad-y <dexterbt1@yahoo.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

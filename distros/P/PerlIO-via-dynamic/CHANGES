@@ -1,0 +1,30 @@
+[Changes for 0.14 - 3 Nov, 2012]
+
+* Update to not warn on perl 5.16 and above
+
+[Changes for 0.13 - 31 May, 2008]
+
+* Workaround a refcnt bug in Perl 5.10.0
+
+[Changes for 0.12 - 6 Mar, 2006]
+
+* Dummy release, as I accidentally delete the previous
+  one from pause.
+
+[Changes for 0.11 - 16 Sep, 2004]
+
+* Try harder to find space to hold reference.
+* Cleanup constructor.
+
+[Changes for 0.10 - 6 Sep, 2004]
+
+* Add use_read option to use READ instead of FILL.
+* Make next layer autoflush on write.
+
+[Changes for 0.02 - 17 Feb, 2004]
+
+Support cleanup for dynamic namespaces..
+
+[Changes for 0.01 - 5 Feb, 2004]
+
+Initial release.

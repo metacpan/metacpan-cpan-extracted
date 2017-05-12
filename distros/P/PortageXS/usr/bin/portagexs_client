@@ -1,0 +1,100 @@
+#!/usr/bin/perl
+
+# -----------------------------------------------------------------------------
+#
+# portagexs_client
+#
+# author      : Christian Hartmann <ian@gentoo.org>
+# license     : GPL-2
+# header      : $Header: /srv/cvsroot/portagexs/trunk/usr/bin/portagexs_client,v 1.3 2007/04/09 18:32:13 ian Exp $
+#
+# -----------------------------------------------------------------------------
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation; either version 2 of the License, or (at your option) any later
+# version.
+#
+# -----------------------------------------------------------------------------
+
+use strict;
+use warnings;
+use lib '../../lib';
+use PortageXS;
+use Term::ANSIColor;
+use IO::Socket::SSL;
+
+my $pxs=PortageXS->new();
+
+# - Print header >
+print "\n".color('green bold')." portagexs_client".color('reset')." version ".$pxs->{'VERSION'}."\n";
+print "                  Distributed under the terms of the GPL-2\n\n";
+
+my ($v_mode, $sock, $buf);
+my $remote_addr=$ARGV[0];
+
+sub INT_handler {
+	print "bye\n\n";
+	$sock->close();
+	exit(0);
+}
+
+$SIG{'INT'} = 'INT_handler';
+$SIG{'HUP'} = 'INT_handler';
+$SIG{'TERM'} = 'INT_handler';
+
+if (!$remote_addr) {
+	print " Usage: portagexs_client <ip>\n\n";
+	exit(0);
+}
+
+if(!($sock = IO::Socket::SSL->new( PeerAddr => $remote_addr,
+				PeerPort => '9200',
+				Proto    => 'tcp',
+				SSL_use_cert => 1,
+				SSL_verify_mode => 0x01,
+				SSL_passwd_cb => sub { return "" },
+				SSL_key_file => $pxs->{PREFIX}->child('etc/pxs/certs/client-key.pem')->stringify,
+				SSL_cert_file => $pxs->{PREFIX}->child('etc/pxs/certs/client-cert.pem')->stringify,
+				SSL_ca_file => $pxs->{PREFIX}->child('etc/pxs/certs/my-ca.pem')->stringify,
+				 ))) {
+	$pxs->print_err("unable to create socket: ".&IO::Socket::SSL::errstr."\n");
+	$pxs->print_err("Server down?\n");
+	exit(0);
+} else {
+	$pxs->print_ok("connect ($sock)\n");
+}
+
+# - Check server cert first >
+my ($subject_name, $issuer_name, $cipher);
+if( ref($sock) eq "IO::Socket::SSL") {
+	$subject_name = $sock->peer_certificate("subject");
+	$issuer_name = $sock->peer_certificate("issuer");
+	$cipher = $sock->get_cipher();
+}
+$pxs->print_ok("cipher: $cipher.\n");
+$pxs->print_ok("server cert - subject name: ".$subject_name."\n");
+$pxs->print_ok("server cert - issuer name: ".$issuer_name."\n");
+print "\n";
+
+print $remote_addr."> ";
+while (<STDIN>) {
+	my $command=$_;
+	chomp($command);
+	print $sock $command."\n";
+	last if $command eq "bye";
+	last if $command eq "quit";
+	last if $command eq "exit";
+	my $lines=<$sock>;
+	for(my $i=1;$i<=$lines;$i++) {
+		my $answer=<$sock>;
+		chomp($answer);
+		print ": ".$answer."\n";
+
+	}
+	print $remote_addr."> ";
+}
+
+$sock->close();
+
+exit(0);

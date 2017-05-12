@@ -1,0 +1,22 @@
+Revision history for Perl extension Parse::Crontab
+
+0.05 2015-07-07T12:48:27Z
+    - fix sample code (masartz++)
+
+0.04 2013-06-11T12:56:31Z
+    - add match method to Parse::Crontab::Scheduel object
+    - add Parse::Crontab::Scheduel->parse method for standalone usage
+    - switch to Minilla
+
+0.03    Wed Feb 20 06:00:00 2013
+    - fix bug Parse::Crontab::Entity's stringify overload
+    - `has_user_field` option for system crontab
+    - output some warnings if crontab contains some risky description.
+    - `verbose` option for errors/warnings output immediately
+
+0.02    Sun Jan 6 15:00:00 2013
+    - fix dist abstract
+    - fix bug under perl 5.12 lower
+
+0.01    Fri Jan 4 17:04:00 2013
+    - original version

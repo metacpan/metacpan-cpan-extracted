@@ -1,0 +1,60 @@
+{
+   "abstract" : "Catalyst style console debugging for plack apps",
+   "author" : [
+      "Matthew Phillips <mattp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-DebugLogging",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper::Concise" : "0",
+            "Data::Serializer::Raw" : "0",
+            "HTTP::Message" : "0",
+            "Module::Runtime" : "0",
+            "Plack" : "0",
+            "Term::Size::Any" : "0",
+            "Test::LongString" : "0",
+            "Text::SimpleTable" : "0",
+            "Try::Tiny" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mattp-/Plack-Middleware-DebugLogging/issues"
+      },
+      "homepage" : "https://github.com/mattp-/Plack-Middleware-DebugLogging",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mattp-/Plack-Middleware-DebugLogging.git",
+         "web" : "https://github.com/mattp-/Plack-Middleware-DebugLogging"
+      }
+   },
+   "version" : "0.001005"
+}
+

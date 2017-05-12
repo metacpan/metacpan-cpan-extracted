@@ -1,0 +1,93 @@
+SYNOPSIS
+
+     use Pod::Elide qw(elide);
+     print elide(<<EOP, 20);
+     =head1 NAME
+    
+     Foo - Do something fooish
+    
+     =head1 VERSION
+    
+     1.23
+    
+     =head1 SYNOPSIS
+    
+      blah blah
+      blah blah
+      blah blah
+    
+     =head1 DESCRIPTION
+    
+     Some description some description some description. Some description some
+     description some description some description. Some description some
+     description some description. Some description some description some
+     description some description. Some description some description some
+     description. Some description some description some description some
+     description.
+    
+     =head1 FUNCTIONS
+    
+     =head2 func1
+    
+     Blah blah blah
+     Blah blah blah
+    
+     =head2 func2
+    
+     Blah blah blah
+     Blah blah blah
+    
+     =head1 SEE ALSO
+    
+     L<Bar>
+    
+     =cut
+     EOP
+
+    The output is something like:
+
+     =head1 NAME
+    
+     =head1 VERSION
+    
+     =head1 SYNOPSIS
+    
+     =head1 DESCRIPTION
+    
+     Some description some description some description. Some description some
+     description some description some description. Some description some
+     ..
+     =head1 FUNCTIONS
+    
+     =head2 func1
+    
+     =head2 func2
+    
+     =head1 SEE ALSO
+    
+     =cut
+
+DESCRIPTION
+
+    This module can be used to elide lines from a POD string to reduce its
+    number of lines (e.g. for summarizing a POD). It will try to elide text
+    lines first before POD command lines. head3 will be elided before
+    head2, head2 before head1, and so on.
+
+FUNCTIONS
+
+ elide($pod, $len[, \%opts]) => str
+
+    Elide lines from POD string $pod if the string contains more than $len
+    lines.
+
+    Known options:
+
+      * marker => str (default: '..')
+
+      * truncate => 'top'|'middle'|'bottom'|'ends' (default: 'bottom')
+
+      * retain_level => int (1|2|3|9, default: 9)
+
+SEE ALSO
+

@@ -1,0 +1,34 @@
+Path::Class::Versioned version 0.04
+===========================
+
+See the individual module documentation for more information
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Path::Class
+    List::Util
+    overload
+    Moose
+    MooseX::Types::Path::Class
+    MooseX::Params::Validate
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2010 Infinity Interactive, Inc.
+
+http://www.iinteractive.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

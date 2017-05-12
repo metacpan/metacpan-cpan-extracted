@@ -1,0 +1,120 @@
+0.05    Tue Oct 17 18:25:05 AKDT 2000
+
+    PerlConfig.pm
+        - fixed a bug where if there was no thing order for a given symbol
+          (Thing_Order is empty, or the Symbol key is empty) undef was set
+          for the symbol, rather than omitting the symbol entirely
+        - replaced the paragraph in the BUGS section with a description of
+          what could be viewed as a bug regarding the above change
+
+    t/parse/things.t
+        - renamed verify_symbols_are_undefined() to
+          verify_symbols_are_nonexistent(), and altered it to use exists
+          rather than defined
+        - added Symbols argument to all verify_parsed() calls
+        - fixed the tests call to account for the recent changes in
+          verify_parsed() and its Symbols argument
+
+    t/parse/testconfig.pm
+        - added hash argument handling to verify_parsed()
+
+
+
+0.04    Sat Sep 16 02:07:53 AKDT 2000
+
+    PerlConfig.pm
+        - removed the undef of the entire namespace, which was causing
+          some serious problems with caller() and closures (see
+          http://shoebox.net/bugs/perl/delete-package.pl for an example
+          script)
+
+
+0.03    Fri Jul 21 15:42:57 AKDT 2000
+
+    README
+        - added a note regarding the < 1.0 version number
+
+    test suite
+        - removed t/_*.t tests due to their internal nature; internals have
+          changed a bit (especially _do_file()), and it's difficult to keep
+          the test suite up to date; it's also not entirely correct to be
+          testing internal features, it's much better to test the external,
+          user-visible interface as much as possible
+
+    t/parse/lex-test.conf
+        - added for use by t/parse/taint.t
+
+    t/parse/*.t
+        - replaced Files and Handlers usage with File and Handler, where
+          appropriate
+
+    t/parse/lexicals.t
+        - replaced usage of test.conf with lex-test.conf            
+        - added verification of lexicals inserted and parsed out of
+          lex-test.conf
+
+    t/parse/taint.t
+        - removed cleanup of configuration filename; it's unnecessary, due
+          to the list argument call to system()
+
+    t/parse/test.conf
+        - removed $lexical_filename and $lexical_namespace
+        - moved $success to the top
+
+    t/parse/testconfig.pm
+        - added lex-test.conf to %test_conf                  
+        - removed Filename and Namespace keys from
+          $test_conf{'test.conf'}{Lexicals}
+        - removed lexical_filename and lexical_namespace keys from
+          $test_conf{'test.conf'}{Symbols}
+        - removed the tests for $namespace and $filename lexicals in
+          verify_parsed_default_lexicals()
+        - modified ok() to allow for the specification of a comment when not
+          called as a method
+
+    PerlConfig.pm
+        - renamed Error_preparse argument to Warn_preparse
+        - added Error_invalid_namespace, Warn_default, and Warn_eval
+          arguments
+        - reworked Error_ and Warn_ argument handling to store values in
+          hashes
+        - added handling for File and Handler arguments (they get merged
+          into Files and Handlers, respectively)
+        - reworked all $*_errsub variable usage to use the new %errsub hash
+        - moved lexicals string construction into
+          _construct_lexicals_string()
+        - moved namespace construction into _construct_namespace()
+        - added _valid_namespace(), and usage of it before the namespace is
+          used
+        - wrapped the call to _do_file() in a block so $SIG{__WARN__}
+          catching can be localized
+        - moved symbol parsing into _parse_symbols()
+        - moved the undef of the entire namespace into a block so no strict
+          'refs' can be localized
+        - moved handler dispatching to _dispatch_handlers()
+        - reworked _do_file() to take less of a role in handling errors and
+          warnings; it simply takes an already opened filehandle, a
+          namespace, a hash reference, and a lexicals string, and does an
+          eval; untainting, error handling, and lexicals string construction
+          are now handling in parse()
+        - removed the $namespace and $filename lexicals from _do_file(), and thus
+          from being used in the configuration file
+        - added _encode_namespace() for use in _construct_namespace()
+        - updated the documentation to reflect user-visible changes
+        - intentionally made documentation regarding namespace construction
+          vague to allow for future changes in how it's done
+
+
+0.02    Mon Mar 20 22:57:26 AKST 2000
+
+    - added Taint_Clean option, with documentation, and untainting of the
+      filehandle used in _do_file()
+    - added an Export section to the documentation
+    - removed @EXPORT
+
+    - updated README (the DESCRIPTION was out of sync)
+
+
+0.01    Wed Feb 16 04:19:33 AKST 2000
+
+    - initial revision, added everything

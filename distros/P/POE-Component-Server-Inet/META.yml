@@ -1,0 +1,31 @@
+---
+abstract: 'a super-server daemon implementation in POE'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-Server-Inet
+requires:
+  Net::Netmask: '1.9015'
+  POE: '1'
+  POE::Filter::Stream: '0'
+  POE::Wheel::ReadWrite: '0'
+  POE::Wheel::Run: '0'
+  POE::Wheel::SocketFactory: '0'
+  Socket: '0'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/bingos/poe-component-server-inet
+  repository: https://github.com/bingos/poe-component-server-inet.git
+version: '0.06'

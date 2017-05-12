@@ -1,0 +1,10 @@
+<SOFTPKG NAME="Apache-Session" VERSION="1,80,0,0">
+	<TITLE>Apache-Session</TITLE>
+	<ABSTRACT>A persistence framework for session data</ABSTRACT>
+	<AUTHOR>Casey West &lt;casey@geeknest.com&gt;</AUTHOR>
+	<IMPLEMENTATION>
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+		<CODEBASE HREF="http://theoryx5.uwinnipeg.ca/ppms/x86/Apache-Session.tar.gz" />
+	</IMPLEMENTATION>
+</SOFTPKG>

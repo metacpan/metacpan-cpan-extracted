@@ -1,0 +1,269 @@
+=head1 NAME
+
+PITA::Guest::Server::Specification - Spec for the POE Support Server
+
+=head1 DESCRIPTION
+
+L<PITA>'s driver design for image-based guest drivers is based on the
+following rules about how the image will be launched and run.
+
+The Support Server implements these rules.
+
+=head2 Surrounding Environment
+
+The Support Server's role is to launch and provide supporting services to
+guests.
+
+Each guest will be executed from the command line, with the actual
+command line to run determined in the main class of each driver and
+provided to the support server as a pre-built command ready to execute.
+
+Any testing data, files, and commands will be provided inside an ISO
+image that the guest will load as a CD or second hard drive, known as an
+"injector". Any command line options for loading this image will already
+have been set as part of the command to be run.
+
+Once the command has been run, an program termed the Image Manager
+pre-installed into each image will take control of the image immediately
+at startup time.
+
+As soon as the Image Manager has been started, it will contact the
+support server to signal a successful startup. This contact will be in
+the form of a HTTP C<GET /> request to a HTTP server that is integrated
+into the support server.
+
+After loading the test data from the injector inside the image, one of
+three named tasks will be done by the image manager.
+
+=head3 ping
+
+The "ping" task will cause the image manager to load, contact the
+support server, and then immediately shut down.
+
+The purpose of the ping command is to validate and verify that the image
+is a valid PITA test image.
+
+=head3 discover
+
+In PITA, a testing context is identified by a testing "scheme" name,
+and a file-system path that defines the root of the testing context.
+
+However, the definition for the "platform description" element of the
+testing context is far more complex.
+
+Rather than a simple naming scheme, it is described by a large C<HASH>
+containing up to 200 key/value pairs, which includes normal items such as
+architecture but may extend to additional values such as support for
+threads, or even to a level of detail which includes the details of
+the individual compiler optimisations Perl was built with.
+
+As such, it is not realistic or practical to expect the user to provide any
+information about the testing contexts. Instead PITA supports auto-discovery
+of testing contexts within an image, on the assuption that the image itself
+valid (which will have been previously determined using the "ping"
+instruction).
+
+Each test image will contain a simple configuration file that lists only the
+scheme and root path each of the testing contexts contained on the image.
+
+The "discover" instruction will cause the image manager to check each of the
+testing contexts contained in the config file and do some processing to
+extract the platform definition for each one, returning it to the support
+server via a PUT command.
+
+=head3 test
+
+The "test" instruction is performed on a discovered guest, and
+processed on a software package included inside the injector.
+
+The guest will launch, test the package (which may or may not result in
+additional requests being sent to the support server such as CPAN requests)
+and then on completion of the test run the image will PUT the result of the
+testing to the support server at a known path.
+
+=head2 Functional Requirements
+
+The primary responsibility of the Support Server is to execute a command
+which starts the guest, to monitor the guest, to accept and record HTTP
+requests from the guest image, and to track various timeout and error
+conditions for the image, and finally on shutdown of the guest to return
+the information gathered during the run to the caller.
+
+=head3 Launch and monitoring of the guest
+
+The Support Server will be provided with a pre-compiled command to be run
+on the command line, appropriate for the host operating system, which
+will launch the guest instance.
+
+The Support Server should execute the command, and observe that the process
+starts and continues to run, noting any unexpected crash of the guest. For
+cases when the guest does not shut down correctly, the Support
+Server should have the capability to reliably shut down the guest,
+preferable elegantly, but if needed forcefully.
+
+=head3 Detection of the Startup Ping
+
+When the guest image starts, it should issue a HTTP "GET /" request to
+the internal IP address of the host. The Support Server should operate
+a HTTP server which will accept the "GET /" request and understand it to
+meana a successful startup of the guest and the Image Manager process.
+
+The Support Server should understand that, after a configurable
+period of time, that the startup has failed, and should shut down the
+process accordingly.
+
+=head3 Capture of Testing Results
+
+All discovery testing generates results, and since the injector may
+well be read-only, it is not a reliably mechanism for extracting the
+results.
+
+However, since a requirement of a successful start as that the
+guest image issues a simple HTTP GET request, we can also use the same
+HTTP mechanism for extracting the results.
+
+The Support Server will be provided at constructor-time with a
+configurable set of file/path names, for example "/results.xml".
+
+While initially this will most likely be a single file, in the
+future a more complex specification for the files (multiple,
+order, compulsory/optional, etc) may be necesary.
+
+At the least, initially the support server should support multiple
+files.
+
+The Support Server should accept HTTP PUT messages for these
+paths, accepting and storing the files (most likely in memory
+initially but that is an implementation detail).
+
+On completion of it's execution run, the files and their contents should
+be returned to the caller.
+
+Note that the size of the result files may be quite large, and in
+the future some amount of protection may be required (in the form of
+an upper limits) for protection of the host from runaway or malicious
+processes on the guests.
+
+=head3 Provision of Supporting Resources
+
+From time to time, the guest image may require additional resources
+that they were not provided with originally. Again, they will need to
+request these resources from outside the guest image.
+
+For security reasons, access from the guest to the Internet may not
+be guarenteed. Access to the Support Server will however be available.
+
+In the Perl case, the Support Server will need to provide the guest
+image with access to a CPAN mirror or proxy.
+
+The Support Server should be able to provide, configurably, access
+to files within a directory on the host server, via a HTTP subpath.
+
+For example, a L<minicpan> checkout may exist on the host server
+at F</var/cache/minicpan/>. This might be accessed via the HTTP
+request "GET /cpan/".
+
+All requests to the mirror should be recorded. Ideally this should be
+done as a list of paths relative to the CPAN mount point, but an
+absolute path is acceptable as well.
+
+It may be necesary at a later date to also allow the Support Server
+to act as a full web proxy, but won't be required initially.
+
+=head3 Shutdown and Detection of Failure
+
+The Support Server should have the ability to reliably shut down the
+server.
+
+The conditions for shutdown are.
+
+1. Receiving the result file, or all required result files, from
+the guest image, plus an optional and configurable timeout period
+to give an opportunity for the guest to shut itself down.
+
+2. The compulsory, configurable timeout from the initial execution
+of the guest to the reception of the startup GET / request, indicating
+a startup failure or that the guest is not a PITA image.
+
+3. A compulsory, configurable timeout from the last time any HTTP
+request was recieved from the guest image, indicating a hard-loop or
+some other crash on the guest.
+
+4. A compulsory, configurable timeout for the entire testing run,
+catching any actively-looping failed installation process.
+
+=head2 General Implementation
+
+The Support Server should be implemented as a L<Process> subclass,
+most likely as a L<Process::Storable> subclass (which also
+implements the L<Process::Serializable> role.
+
+That is, it should be constructed with C<new>, which should be
+storable with L<Storable>, it should use a C<prepare> method to
+set up for execution, initialize POE Sessions, validate the
+execution environment, and so on. And then it on a C<run> method
+it should start the POE kernel, run until completion, and then
+following the shutdown of the POE kernel, tidy up the object to
+put it into a state that is capable of being put back through
+L<Storable> again, with all data inside the one storabled object.
+
+See the documentation for the L<Process> family of modules for
+more information.
+
+=head2 Constructor API
+
+As a tentative sample, a notional creation and use of a
+PITA::Guest::Server object might look as follows.
+
+  my $server = PITA::Guest::Server->new(
+          execute => [
+                  '/usr/bin/qemu',
+                  '-snapshot',
+                  '-hda',
+                  '/var/pita/image/ba312bb13f.img',
+                  ],
+          http_local_addr => '127.0.0.1',
+          http_local_port => 80,
+          http_mirrors => {
+                  '/cpan' => '/var/cache/minicpan',
+                  },
+          http_result => '/result.xml',
+          http_startup_timeout => 30,
+          http_activity_timeout => 3600,
+          http_shutdown_timeout => 10,
+  ) or die "Failed to create support server";
+  
+  $server->prepare
+          or die "Failed to prepare support server";
+  
+  $server->run
+          or die "Failed to run support server";
+  
+  my $result_file = $server->http_result('/result.xml')
+          or die "Guest Image execution failed";
+
+Although the use of the L<Process> API may look pointless
+in this example its use will let us contain the POE process
+more strictly, and it will allow the actual execution to be
+done in a seperate Perl instance, on a different CPU, or
+even on a different host to the main PITA host process.
+
+=head1 AUTHOR
+
+Adam Kennedy E<lt>adamk@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<PITA>, L<POE>, L<Process>, L<http://ali.as/>
+
+=head1 COPYRIGHT
+
+Copyright 2006 - 2007 Adam Kennedy.
+
+This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+
+=cut

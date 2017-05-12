@@ -1,0 +1,48 @@
+Pod-IkiWiki
+
+This package contains a Perl library and a Perl script. 
+
+The library provides code for convert POD text to IkiWiki text, and the Perl
+script, pod2ikiwiki, is a mini tool that can be used as a command line filter. 
+
+PREREQUISITES 
+
+The package needs the Pod::Parser library.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Pod::IkiWiki
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pod-IkiWiki
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Pod-IkiWiki
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Pod-IkiWiki
+
+    Search CPAN
+        http://search.cpan.org/dist/Pod-IkiWiki
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 "Víctor Moral"
+
+This program is released under the following license: gpl
+

@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Pad-Tie
+version:      0.006
+version_from: lib/Pad/Tie.pm
+installdirs:  site
+requires:
+    Data::OptList:                 0.101
+    Devel::LexAlias:               0.04
+    Lexical::Persistence:          0.97
+    Module::Pluggable:             3.1
+    Test::More:                    0
+    Test::use::ok:                 0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

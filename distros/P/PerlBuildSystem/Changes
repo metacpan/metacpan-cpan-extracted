@@ -1,0 +1,2617 @@
+----------------------------------------------------------------------
+r290:  nadim | 2007-01-28 22:08:53 +0100
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/INSTALL
+  M  /local/PBS/trunk/MANIFEST
+  M  /local/PBS/trunk/PBS/Config.pm
+  M  /local/PBS/trunk/PBS/PBS.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/PBSLib/Configs/Compilers/gcc.pm
+  D  /local/PBS/trunk/PBSLib/Rules/Obigo.pm
+  M  /local/PBS/trunk/PBSLib/Rules/VisualStudioDSP.pm
+  M  /local/PBS/trunk/PBSLib/Rules/VisualStudioProject.pm
+  D  /local/PBS/trunk/PBSLib/Wizards/ObigoPbsfile.pl
+  M  /local/PBS/trunk/Pbsfiles/prf_as_pbs_module/nadim.prf
+  M  /local/PBS/trunk/Pbsfiles/prf_as_pbs_module/pbs.prf
+  M  /local/PBS/trunk/Todo.txt
+  M  /local/PBS/trunk/doc/how_fast_is_it
+  M  /local/PBS/trunk/script/pbs.pl
+
+FIXED: TheBigO
+----------------------------------------------------------------------
+r289:  nadim | 2006-11-11 14:36:46 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Check.pm
+  M  /local/PBS/trunk/PBS/Depend.pm
+  M  /local/PBS/trunk/PBS/Digest.pm
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/PBS.pm
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+  M  /local/PBS/trunk/PBS/PostBuild.pm
+  M  /local/PBS/trunk/PBS/Rules/Dependers/Subpbs.pm
+  M  /local/PBS/trunk/PBS/Triggers.pm
+
+CHANGED: call to File::Spec done without class specifier
+----------------------------------------------------------------------
+r288:  nadim | 2006-10-26 10:40:12 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/Warp/Warp1_7.pm
+  M  /local/PBS/trunk/PBS/Warp/Warp1_8.pm
+
+ADDED: handle passed parent config (see --load_config)
+----------------------------------------------------------------------
+r287:  nadim | 2006-10-26 10:38:10 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+
+ADDED: --load_config switch handling
+----------------------------------------------------------------------
+r286:  nadim | 2006-10-26 10:35:34 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBS.pm
+
+ADDED: information header to the saved config format
+----------------------------------------------------------------------
+r285:  nadim | 2006-10-26 10:33:34 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+
+CHANGED: --no_warp to use Warp0
+----------------------------------------------------------------------
+r284:  nadim | 2006-10-26 10:32:23 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Log.pm
+
+FIXED: LIB_PATH was displayed as ARRAY0x...
+----------------------------------------------------------------------
+r283:  nadim | 2006-10-26 10:31:05 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+
+ADDED: warp0 and --load_config
+----------------------------------------------------------------------
+r282:  nadim | 2006-10-26 10:29:10 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/MANIFEST
+  A  /local/PBS/trunk/PBS/Warp/Warp0.pm
+
+ADDED: Warp0 module
+----------------------------------------------------------------------
+r281:  nadim | 2006-10-25 00:19:32 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/PBS.pm
+  M  /local/PBS/trunk/PBS/Warp.pm
+  M  /local/PBS/trunk/PBS/Warp/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/Warp/Warp1_7.pm
+  M  /local/PBS/trunk/PBS/Warp/Warp1_8.pm
+  M  /local/PBS/trunk/Todo.txt
+
+ADDED: support for save/load config
+----------------------------------------------------------------------
+r280:  nadim | 2006-10-25 00:18:48 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Check.pm
+
+FIXED: typo
+----------------------------------------------------------------------
+r279:  nadim | 2006-10-25 00:13:55 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+
+ADDED: --save_config and --load_config
+CHANGED: --display_package_loading to --display_pbsfile_loading
+FIXED: restored --config_namespace, deleted by mistake
+----------------------------------------------------------------------
+r278:  nadim | 2006-10-25 00:08:22 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+
+CHANGED: default color for warning2
+----------------------------------------------------------------------
+r277:  nadim | 2006-10-25 00:07:58 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+
+FIXED: typo
+----------------------------------------------------------------------
+r276:  nadim | 2006-10-24 16:31:52 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Depend.pm
+
+REMOVED: last remains of micro warp for warp 1.6 version
+----------------------------------------------------------------------
+r275:  nadim | 2006-10-24 16:15:42 +0200
+Changed paths:
+  A  /local/PBS/trunk/doc/sscm_2006
+  A  /local/PBS/trunk/doc/sscm_2006/a_pbs_slide.pod
+  A  /local/PBS/trunk/doc/sscm_2006/legend.png
+  A  /local/PBS/trunk/doc/sscm_2006/perl_style.css
+  A  /local/PBS/trunk/doc/sscm_2006/pod2slide.pl
+  A  /local/PBS/trunk/doc/sscm_2006/tree.png
+
+ADDED: SSCM presentation
+----------------------------------------------------------------------
+r274:  nadim | 2006-10-24 16:09:00 +0200
+Changed paths:
+  A  /local/PBS/trunk/Pbsfiles/C_include_C
+  A  /local/PBS/trunk/Pbsfiles/C_include_C/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/C_include_C/common.c
+  A  /local/PBS/trunk/Pbsfiles/C_include_C/common.h
+  A  /local/PBS/trunk/Pbsfiles/C_include_C/common2.c
+  A  /local/PBS/trunk/Pbsfiles/C_include_C/main.c
+  A  /local/PBS/trunk/Pbsfiles/C_include_C/pbs.prf
+  A  /local/PBS/trunk/Pbsfiles/C_include_C/world.c
+  A  /local/PBS/trunk/t/with_warp_1_8.t
+
+ADDED: Example of C files including C files
+----------------------------------------------------------------------
+r273:  nadim | 2006-10-24 16:06:14 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/INSTALL
+  M  /local/PBS/trunk/MANIFEST
+  M  /local/PBS/trunk/PBS/Warp.pm
+  M  /local/PBS/trunk/PBS/Warp/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/Warp/Warp1_7.pm
+  A  /local/PBS/trunk/PBS/Warp/Warp1_8.pm
+  M  /local/PBS/trunk/PBSLib/UserBuild/BuildSequenceMiner.pm
+  M  /local/PBS/trunk/Pbsfiles/hello/main.c
+  M  /local/PBS/trunk/Todo.txt
+  M  /local/PBS/trunk/t/Misc/CDependencyGraph.pm
+  M  /local/PBS/trunk/t/Rules/Dependencies.pm
+  D  /local/PBS/trunk/t/with_warp.t
+  A  /local/PBS/trunk/t/with_warp_1_5.t
+  A  /local/PBS/trunk/t/with_warp_1_7.t
+
+ADDED: Warp 1.8
+----------------------------------------------------------------------
+r272:  nadim | 2006-10-13 19:51:29 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBS.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+
+ADDED: -dpuv
+----------------------------------------------------------------------
+r271:  nadim | 2006-10-13 19:49:20 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp.pm
+
+CHANGED: accept any warp name
+----------------------------------------------------------------------
+r270:  nadim | 2006-10-10 21:41:39 +0200
+Changed paths:
+  M  /local/PBS/trunk/doc/how_fast_is_it
+
+FIXED: typo
+----------------------------------------------------------------------
+r269:  nadim | 2006-10-10 21:40:59 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBS.pm
+
+ADDED: number of nodes inserted so far in the the subpbs compact information display
+----------------------------------------------------------------------
+r268:  nadim | 2006-08-30 01:25:25 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Rules/C_depender.pm
+
+FIXED: rules can be called multiple times, made rule compliant and added warning when including C files from C files
+----------------------------------------------------------------------
+r267:  nadim | 2006-08-22 00:24:58 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/PBS/Warp.pm
+  M  /local/PBS/trunk/PBS/Warp/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/Warp/Warp1_7.pm
+  M  /local/PBS/trunk/Todo.txt
+  M  /local/PBS/trunk/t/Correctness/OneCFile.pm
+  M  /local/PBS/trunk/t/Misc/ExtraDependencies.pm
+  M  /local/PBS/trunk/t/Misc/Nodetypes.pm
+  M  /local/PBS/trunk/t/PBS.pm
+
+CHANGED: warp switches
+CHANGED: warp modules do not output their version anymore allowing the same test suite all warp modules
+ADDED: Warp 1.7 test
+----------------------------------------------------------------------
+r266:  nadim | 2006-08-20 22:13:49 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/Warp/Warp1_7.pm
+
+CHANGED: use functionality from main warp module
+----------------------------------------------------------------------
+r265:  nadim | 2006-08-20 22:08:36 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/MANIFEST
+  M  /local/PBS/trunk/PBS/Check.pm
+  M  /local/PBS/trunk/PBS/Depend.pm
+  M  /local/PBS/trunk/PBS/Digest.pm
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/PBS/Plugin.pm
+  A  /local/PBS/trunk/PBS/Warp
+  A  /local/PBS/trunk/PBS/Warp.pm
+  A  /local/PBS/trunk/PBS/Warp/Warp1_5.pm (from /local/PBS/trunk/PBS/Warp1_5.pm:264)
+  A  /local/PBS/trunk/PBS/Warp/Warp1_7.pm (from /local/PBS/trunk/PBS/Warp1_7.pm:264)
+  D  /local/PBS/trunk/PBS/Warp1_5.pm
+  D  /local/PBS/trunk/PBS/Warp1_7.pm
+  M  /local/PBS/trunk/PBSLib/Rules/C_depender.pm
+  A  /local/PBS/trunk/Pbsfiles/C_depender_full_path
+  A  /local/PBS/trunk/Pbsfiles/C_depender_full_path/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/C_depender_full_path/common.h
+  A  /local/PBS/trunk/Pbsfiles/C_depender_full_path/main.c
+  A  /local/PBS/trunk/Pbsfiles/C_depender_full_path/pbs.prf
+  A  /local/PBS/trunk/Pbsfiles/C_depender_full_path/world.c
+  A  /local/PBS/trunk/Pbsfiles/hello2/postpbs.pl
+  A  /local/PBS/trunk/Pbsfiles/late_depend
+  A  /local/PBS/trunk/Pbsfiles/late_depend/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/late_depend/subpbs.pl
+  M  /local/PBS/trunk/Todo.txt
+  M  /local/PBS/trunk/script/project_generator.pl
+  M  /local/PBS/trunk/t/Misc/CommandLineFlags.pm
+  M  /local/PBS/trunk/t/Rules/Dependencies.pm
+  A  /local/PBS/trunk/t/Rules/LateDependencies.pm
+
+FIXED: svk/install problem
+CHANGED: nodes are not depended anymore when no rule matches them undepended nodes can be linked to and depended anywhere a warning for undependd nodes is given at check time added tests for late depend 
+ADDED: write digest and C dependency file in output directory even when node is full path
+CHANGED: Warp restructuration started
+----------------------------------------------------------------------
+r264:  nadim | 2006-08-20 19:25:23 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/Warp1_7.pm
+
+FIXED: removed unecessary duplicated code
+----------------------------------------------------------------------
+r263:  nadim | 2006-08-20 19:03:04 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/Warp1_7.pm
+
+CHANGED: compute md5 only once when creating the warp file
+----------------------------------------------------------------------
+r262:  nadim | 2006-08-17 13:47:08 +0200
+Changed paths:
+  M  /local/PBS/trunk/Todo.txt
+
+ADDED: comment about pbs output when run remotely
+----------------------------------------------------------------------
+r261:  nadim | 2006-07-12 22:14:11 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/PBSLib/Configs/Compilers/gcc.pm
+  M  /local/PBS/trunk/PBSLib/Rules/VisualStudioProject.pm
+  M  /local/PBS/trunk/PBSLib/Utils/VisualStudioProjectFile.pm
+  M  /local/PBS/trunk/Todo.txt
+
+CHANGED: Visual studio modules by haakan
+CHANGED: made gcc the default compiler
+CHANGED: build system
+----------------------------------------------------------------------
+r260:  nadim | 2006-06-15 09:42:16 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+
+FIXED: problem with svk and version module generation when not on Nadims box
+----------------------------------------------------------------------
+r259:  nadim | 2006-06-14 19:49:47 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Depend.pm
+  M  /local/PBS/trunk/Todo.txt
+
+ADDED: handle --tt ... switches in IMMEDIATE_BUILD
+----------------------------------------------------------------------
+r258:  nadim | 2006-06-11 22:28:31 +0200
+Changed paths:
+  M  /local/PBS/trunk/MANIFEST
+  A  /local/PBS/trunk/Pbsfiles/debug/stop_on_node_insertion.pl
+
+ADDED: example showing how to stop and get user input after each node insertion
+----------------------------------------------------------------------
+r257:  nadim | 2006-06-11 22:13:39 +0200
+Changed paths:
+  M  /local/PBS/trunk/t/Correctness/CDepender.pm
+
+FIXED: test after making colorization default
+----------------------------------------------------------------------
+r256:  nadim | 2006-06-11 22:12:58 +0200
+Changed paths:
+  M  /local/PBS/trunk/Pbsfiles/hello2/Pbsfile.pl
+  M  /local/PBS/trunk/Plugins/SimplifyRule.pm
+
+ADDED: better error message for simplified 2 args AddSubpbsRule
+----------------------------------------------------------------------
+r255:  nadim | 2006-06-11 14:51:39 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Depend.pm
+
+CHANGED: linked node information format
+----------------------------------------------------------------------
+r254:  nadim | 2006-06-11 14:50:18 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/Plugins/TreeVisualisation.pm
+
+CHANGED: --tree_matching_rules to -tree_inserted_at
+----------------------------------------------------------------------
+r253:  nadim | 2006-06-11 14:16:57 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/Plugins/TreeVisualisation.pm
+
+ADDED: --tree_matching_rules
+----------------------------------------------------------------------
+r252:  nadim | 2006-06-11 12:01:45 +0200
+Changed paths:
+  M  /local/PBS/trunk/Plugins/TreeVisualisation.pm
+
+ADDED: --tnd functionality
+----------------------------------------------------------------------
+r251:  nadim | 2006-06-10 11:02:23 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Digest.pm
+
+FIXED: 2 years old warning about reopening STDERR as input only
+----------------------------------------------------------------------
+r250:  nadim | 2006-06-09 00:43:17 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+
+FIXED: get the version from within the build command
+----------------------------------------------------------------------
+r249:  nadim | 2006-06-09 00:35:49 +0200
+Changed paths:
+  M  /local/PBS/trunk/Plugins/SimplifyRule.pm
+
+ADDED: comments on invalid number of arguments
+----------------------------------------------------------------------
+r248:  nadim | 2006-06-09 00:31:44 +0200
+Changed paths:
+  M  /local/PBS/trunk/Plugins/SimplifyRule.pm
+
+CHANGED: AddSubpbsRule take 2 or 4+ arguments
+----------------------------------------------------------------------
+r247:  nadim | 2006-06-09 00:08:28 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/MANIFEST
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/Todo.txt
+
+ADDED: extract version from svk 
+----------------------------------------------------------------------
+r246:  nadim | 2006-06-09 00:07:40 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+
+FIXED: --display_search_info documentation
+----------------------------------------------------------------------
+r245:  nadim | 2006-06-08 22:47:18 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Depend.pm
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/Todo.txt
+
+CHANGED: made -colorize default
+ADDED: --ddl to display dependencies in a less compact format
+----------------------------------------------------------------------
+r244:  nadim | 2006-06-08 21:11:18 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Wizards/BuilderSub.pl
+
+ADDED: EvaluateCommandForNode example in the builder wizard
+----------------------------------------------------------------------
+r243:  nadim | 2006-06-08 20:47:00 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/MANIFEST
+  A  /local/PBS/trunk/Plugins/ExpandObjects.pm
+  M  /local/PBS/trunk/Todo.txt
+
+ADDED: %DEPENDENCY_LIST_EXPANDED plugin
+----------------------------------------------------------------------
+r242:  nadim | 2006-06-07 08:08:05 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/Todo.txt
+
+FIXED: missing pbsfile handled properly
+----------------------------------------------------------------------
+r241:  nadim | 2006-06-06 22:23:54 +0200
+Changed paths:
+  M  /local/PBS/trunk/t/Rules/Dependencies.pm
+
+CHANGED: quoted output
+----------------------------------------------------------------------
+r240:  nadim | 2006-06-06 22:22:20 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Check.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/Pbsfiles/cyclic/Pbsfile.pl
+  M  /local/PBS/trunk/t/ErrorHandling/CyclicDependencies.pm
+
+CHANGED: accept source cyclic dependency
+CHANGED: cycle detection code
+ADDED: warning suppresion switch for source dependencies and pedantic switch for source cyclic dependencies
+FIXED: tests for cyclic dependencies
+----------------------------------------------------------------------
+r239:  nadim | 2006-06-06 22:18:45 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+
+CHANGED: quoted name
+----------------------------------------------------------------------
+r238:  nadim | 2006-06-06 22:18:12 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Rules/C.pm
+
+Removed: use of depend and build as default
+----------------------------------------------------------------------
+r237:  nadim | 2006-06-01 23:32:43 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/Warp1_7.pm
+
+FIXED: Run without warp if there are no nodes in the warp graph (ie Immediate build failed)
+----------------------------------------------------------------------
+r236:  nadim | 2006-05-31 23:29:21 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/MANIFEST
+  M  /local/PBS/trunk/PBSLib/Builders/SingleRunBuilder.pm
+  M  /local/PBS/trunk/Pbsfiles/single_run_builder/Pbsfile.pl
+  M  /local/PBS/trunk/Todo.txt
+
+ADDED: possibility to give a shell command to singleRunBuilder
+----------------------------------------------------------------------
+r235:  nadim | 2006-05-31 22:25:04 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Rules/Builders.pm
+
+FIXED: typo due to an extra $
+----------------------------------------------------------------------
+r234:  nadim | 2006-05-31 22:00:49 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Watch/InotifyWatcher.pm
+  M  /local/PBS/trunk/PBS/Watch/Win32Watcher.pm
+  D  /local/PBS/trunk/PBSLib/Builders/MultiNodeBuilder.pm
+  A  /local/PBS/trunk/PBSLib/Builders/SingleRunBuilder.pm (from /local/PBS/trunk/PBSLib/Builders/MultiNodeBuilder.pm:232)
+  M  /local/PBS/trunk/PBSLib/Wizards/PostPbs.pl
+  M  /local/PBS/trunk/PBSLib/Wizards/Prf.pl
+  M  /local/PBS/trunk/Pbsfiles/cyclic/Pbsfile.pl
+  D  /local/PBS/trunk/Pbsfiles/multi_node_builder
+  A  /local/PBS/trunk/Pbsfiles/single_run_builder (from /local/PBS/trunk/Pbsfiles/multi_node_builder:233)
+  M  /local/PBS/trunk/Todo.txt
+  M  /local/PBS/trunk/script/create_pbs_binary.pl
+  M  /local/PBS/trunk/script/create_pbs_documentation.pl
+
+CHANGED: MultipleNodeBuilder to SingleRunBuilder
+ADDED: some documentation
+FIXED: wizard postpbs which wasn't a wizard
+----------------------------------------------------------------------
+r233:  nadim | 2006-05-31 21:57:57 +0200
+Changed paths:
+  M  /local/PBS/trunk/Pbsfiles/multi_node_builder/Pbsfile.pl
+
+CHANGED: use SingleRunBuilder and added some ideas for the future
+----------------------------------------------------------------------
+r232:  nadim | 2006-05-31 21:54:13 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Builders/MultiNodeBuilder.pm
+
+CHANGED: renamed to SingleRunBuilder
+----------------------------------------------------------------------
+r231:  nadim | 2006-05-31 21:41:55 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Depend.pm
+
+FIXED: IMMEDIATE_BUILD build twice when the target was in a subpbs. once in the subpbs and once when mergin the subpbs tree
+----------------------------------------------------------------------
+r230:  nadim | 2006-05-31 21:39:43 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Rules/Builders.pm
+
+ADDED: %FILE_TO_BUILD_NO_EXT %FILE_TO_BUILD_BASENAME
+----------------------------------------------------------------------
+r229:  nadim | 2006-05-31 21:31:25 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/Warp1_7.pm
+
+FIXED: division by zero when there was no node in a warp file
+----------------------------------------------------------------------
+r228:  nadim | 2006-05-31 21:27:36 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+
+ADDED: utility functions GetBuildDirectory and GetSourceDirectory (note those are packeg not node variables)
+----------------------------------------------------------------------
+r227:  nadim | 2006-05-31 12:49:54 +0200
+Changed paths:
+  A  /local/PBS/trunk/script/create_pbs_documentation.pl
+
+ADDED: pod2projdoc documentation generation scrip
+----------------------------------------------------------------------
+r226:  nadim | 2006-05-30 11:07:11 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/MANIFEST
+  M  /local/PBS/trunk/PBS/Watch/InotifyWatcher.pm
+  M  /local/PBS/trunk/PBS/Watch/Win32Watcher.pm
+  M  /local/PBS/trunk/Todo.txt
+  D  /local/PBS/trunk/emil_pbs_todo.txt
+  D  /local/PBS/trunk/emil_pbs_win32_issues.txt
+  M  /local/PBS/trunk/script/watch_server.pl
+  D  /local/PBS/trunk/test
+
+FIXED: pathes after moving Watch* modules
+----------------------------------------------------------------------
+r225:  nadim | 2006-05-30 10:42:58 +0200
+Changed paths:
+  A  /local/PBS/trunk/Pbsfiles/hello (from /local/PBS/trunk/test/hello:220)
+  A  /local/PBS/trunk/Pbsfiles/hello2 (from /local/PBS/trunk/test/hello2:214)
+  D  /local/PBS/trunk/test/hello
+  D  /local/PBS/trunk/test/hello2
+
+MOVED: hello world examples
+----------------------------------------------------------------------
+r224:  nadim | 2006-05-30 10:40:34 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  D  /local/PBS/trunk/InotifyWatcher.pm
+  M  /local/PBS/trunk/MANIFEST
+  A  /local/PBS/trunk/PBS/Watch
+  M  /local/PBS/trunk/PBS/Watch/Client.pm (from /local/PBS/trunk/PBS/WatchClient.pm:84)
+  A  /local/PBS/trunk/PBS/Watch/InotifyWatcher.pm (from /local/PBS/trunk/InotifyWatcher.pm:180)
+  A  /local/PBS/trunk/PBS/Watch/Win32Watcher.pm (from /local/PBS/trunk/Win32Watcher.pm:156)
+  D  /local/PBS/trunk/PBS/WatchClient.pm
+  M  /local/PBS/trunk/Plugins/FileWatchClient.pm
+  D  /local/PBS/trunk/Win32Watcher.pm
+
+CHANGED: structure of the "watch" script and modules
+----------------------------------------------------------------------
+r223:  nadim | 2006-05-30 10:24:05 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  D  /local/PBS/trunk/Crazy_pbs
+  M  /local/PBS/trunk/MANIFEST
+  M  /local/PBS/trunk/Todo.txt
+  D  /local/PBS/trunk/build_server.pl
+  A  /local/PBS/trunk/doc/crazy_pbs (from /local/PBS/trunk/Crazy_pbs:197)
+  D  /local/PBS/trunk/make_pbs_exe.pl
+  D  /local/PBS/trunk/pbs.pl
+  D  /local/PBS/trunk/pbs_test.pl
+  D  /local/PBS/trunk/pbsrun.txt
+  D  /local/PBS/trunk/project_generator.pl
+  D  /local/PBS/trunk/run_pbs_win32.pl
+  A  /local/PBS/trunk/script
+  A  /local/PBS/trunk/script/build_server.pl (from /local/PBS/trunk/build_server.pl:204)
+  A  /local/PBS/trunk/script/create_pbs_binary.pl
+  A  /local/PBS/trunk/script/make_pbs_exe.pl (from /local/PBS/trunk/make_pbs_exe.pl:156)
+  A  /local/PBS/trunk/script/pbs.pl (from /local/PBS/trunk/pbs.pl:207)
+  A  /local/PBS/trunk/script/project_generator.pl (from /local/PBS/trunk/project_generator.pl:177)
+  A  /local/PBS/trunk/script/run_pbs_win32.pl (from /local/PBS/trunk/run_pbs_win32.pl:156)
+  A  /local/PBS/trunk/script/watch_client.pl (from /local/PBS/trunk/watch_client.pl:50)
+  A  /local/PBS/trunk/script/watch_server.pl (from /local/PBS/trunk/watch_server.pl:207)
+  A  /local/PBS/trunk/t/pbs_test.pl (from /local/PBS/trunk/pbs_test.pl:39)
+  D  /local/PBS/trunk/watch_client.pl
+  D  /local/PBS/trunk/watch_server.pl
+
+FIXED: moved some files around to better the structure
+----------------------------------------------------------------------
+r222:  nadim | 2006-05-26 12:37:47 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  D  /local/PBS/trunk/generate_bash_completion.pl
+
+ADDED: integrate bash completion script generation in pbs
+----------------------------------------------------------------------
+r221:  nadim | 2006-05-26 12:02:28 +0200
+Changed paths:
+  M  /local/PBS/trunk/Todo.txt
+  M  /local/PBS/trunk/doc/pnw2004/a_pbs_slide.pod
+  M  /local/PBS/trunk/doc/pnw2004/cyclic.png
+  M  /local/PBS/trunk/doc/pnw2004/cyclic2.png
+  M  /local/PBS/trunk/doc/pnw2004/legend.png
+  M  /local/PBS/trunk/doc/pnw2004/mono1.jpg
+  M  /local/PBS/trunk/doc/pnw2004/pmiller.jpg
+  M  /local/PBS/trunk/doc/pnw2004/trigger.png
+
+FIXED: images where 0 bytes in size
+----------------------------------------------------------------------
+r220:  nadim | 2006-05-21 23:02:36 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/test/hello/pbs.prf
+
+ADDED: --display_pbs_lib_path and --display_pbs_plugin_path
+FIXED: handling of lib path in double prf run
+----------------------------------------------------------------------
+r219:  nadim | 2006-05-21 21:07:33 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/MANIFEST
+  M  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+  M  /local/PBS/trunk/PBS/Digest.pm
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/Log.pm
+  M  /local/PBS/trunk/PBS/Shell.pm
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  D  /local/PBS/trunk/PBS/Warp1_6.pm
+  M  /local/PBS/trunk/PBS/Warp1_7.pm
+  M  /local/PBS/trunk/Todo.txt
+  M  /local/PBS/trunk/doc/reference_manual.pod
+  M  /local/PBS/trunk/doc/user_manual.pod
+  M  /local/PBS/trunk/t/PBS.pm
+
+CHANGED: Finishig the environment variable removal
+REMOVED: Warp 1.6
+----------------------------------------------------------------------
+r218:  nadim | 2006-05-19 21:17:56 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Digest.pm
+  M  /local/PBS/trunk/PBS/Log.pm
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+
+ADDED: use $USERNAME (default on win32) if $USER is not set
+----------------------------------------------------------------------
+r217:  nadim | 2006-05-19 21:04:47 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Digest.pm
+  M  /local/PBS/trunk/PBS/Log.pm
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+
+FIXED: handling of $USER variable
+----------------------------------------------------------------------
+r216:  nadim | 2006-05-19 21:04:16 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Prf.pm
+
+REMOVED: AddCommandLineDefinitions
+----------------------------------------------------------------------
+r215:  nadim | 2006-05-18 23:50:33 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/PBS/DefaultBuild.pm
+  M  /local/PBS/trunk/PBS/Depend.pm
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/PBS/Plugin.pm
+  M  /local/PBS/trunk/PBS/Prf.pm
+  M  /local/PBS/trunk/PBS/Rules.pm
+  M  /local/PBS/trunk/PBS/Rules/Builders.pm
+  M  /local/PBS/trunk/PBS/Triggers.pm
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/Warp1_7.pm
+  M  /local/PBS/trunk/PBSLib/Rules/C.pm
+  M  /local/PBS/trunk/Pbsfiles/plugin_shell_filter/Pbsfile.pl
+  M  /local/PBS/trunk/Todo.txt
+  M  /local/PBS/trunk/doc/user_manual.pod
+  M  /local/PBS/trunk/generate_bash_completion.pl
+  M  /local/PBS/trunk/t/Misc/CommandLineFlags.pm
+  M  /local/PBS/trunk/t/Misc/PbsUse.pm
+  M  /local/PBS/trunk/t/Misc/Triggers.pm
+  M  /local/PBS/trunk/test/hello/pbs.prf
+
+REMOVED: -nge
+FIXED: AddConfigSwitches wouldn't accept --switch (two minuses)
+ADDED: --no_default_path_warning
+CHANGED: Removed $PBS_XXX flags
+FIXED: Command line override of prf
+CHANGED: tests and some documentation
+FIXED: bad message when no Pbsfile existed
+----------------------------------------------------------------------
+r214:  nadim | 2006-05-14 11:17:51 +0200
+Changed paths:
+  M  /local/PBS/trunk/MANIFEST
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+  M  /local/PBS/trunk/PBS/Prf.pm
+  D  /local/PBS/trunk/Pbsfiles/cyclic/default_pbs.prf
+  A  /local/PBS/trunk/Pbsfiles/cyclic/pbs.prf (from /local/PBS/trunk/Pbsfiles/cyclic/default_pbs.prf:49)
+  D  /local/PBS/trunk/Pbsfiles/emil_subpbs_locate/sd1/default_pbs.prf
+  A  /local/PBS/trunk/Pbsfiles/emil_subpbs_locate/sd1/pbs.prf (from /local/PBS/trunk/Pbsfiles/emil_subpbs_locate/sd1/default_pbs.prf:154)
+  D  /local/PBS/trunk/Pbsfiles/legend/default_pbs.prf
+  A  /local/PBS/trunk/Pbsfiles/legend/pbs.prf (from /local/PBS/trunk/Pbsfiles/legend/default_pbs.prf:49)
+  D  /local/PBS/trunk/Pbsfiles/node_subs/default_pbs.prf
+  A  /local/PBS/trunk/Pbsfiles/node_subs/pbs.prf (from /local/PBS/trunk/Pbsfiles/node_subs/default_pbs.prf:49)
+  D  /local/PBS/trunk/Pbsfiles/prf_as_pbs_module/default_pbs.prf
+  A  /local/PBS/trunk/Pbsfiles/prf_as_pbs_module/pbs.prf (from /local/PBS/trunk/Pbsfiles/prf_as_pbs_module/default_pbs.prf:8)
+  M  /local/PBS/trunk/Todo.txt
+  M  /local/PBS/trunk/t/Misc/Targets.pm
+  D  /local/PBS/trunk/test/hello/default_pbs.prf
+  A  /local/PBS/trunk/test/hello/pbs.prf (from /local/PBS/trunk/test/hello/default_pbs.prf:213)
+  D  /local/PBS/trunk/test/hello2/default_pbs.prf
+  A  /local/PBS/trunk/test/hello2/pbs.prf (from /local/PBS/trunk/test/hello2/default_pbs.prf:49)
+
+CHANGED: default prf is name "pbs.prf"
+----------------------------------------------------------------------
+r213:  nadim | 2006-05-14 11:15:12 +0200
+Changed paths:
+  M  /local/PBS/trunk/test/hello/default_pbs.prf
+
+
+----------------------------------------------------------------------
+r212:  nadim | 2006-05-14 10:35:27 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp1_7.pm
+
+ADDED: warp file name to statistics
+----------------------------------------------------------------------
+r211:  nadim | 2006-05-14 10:35:12 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+
+ADDED: warp file name to statistics
+----------------------------------------------------------------------
+r210:  nadim | 2006-05-14 10:34:12 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+
+FIXED: pbsfile is extracted from a prf if any
+----------------------------------------------------------------------
+r209:  nadim | 2006-05-14 10:32:28 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Digest.pm
+
+ADDED: timing statistics
+----------------------------------------------------------------------
+r208:  nadim | 2006-05-14 10:30:38 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Rules/VisualStudioProject.pm
+
+CHANGED: refactored and documented
+----------------------------------------------------------------------
+r207:  nadim | 2006-04-16 15:22:47 +0200
+Changed paths:
+  D  /local/PBS/trunk/Changes
+  D  /local/PBS/trunk/pbs
+  A  /local/PBS/trunk/pbs.pl (from /local/PBS/trunk/pbs:199)
+  M  /local/PBS/trunk/watch_server.pl
+
+ADDED: documentation to watch_server.pl
+----------------------------------------------------------------------
+r206:  nadim | 2006-04-16 15:21:23 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+
+FIXED: reverted to pbs.pl for windows compatibility
+----------------------------------------------------------------------
+r205:  nadim | 2006-04-16 14:50:44 +0200
+Changed paths:
+  M  /local/PBS/trunk/generate_bash_completion.pl
+
+ADDED: documentation
+----------------------------------------------------------------------
+r204:  nadim | 2006-04-16 14:50:31 +0200
+Changed paths:
+  M  /local/PBS/trunk/build_server.pl
+
+ADDED: documentation
+----------------------------------------------------------------------
+r203:  nadim | 2006-04-16 14:49:57 +0200
+Changed paths:
+  M  /local/PBS/trunk/Todo.txt
+
+ADDED: new ideas
+----------------------------------------------------------------------
+r202:  nadim | 2006-04-16 14:47:58 +0200
+Changed paths:
+  M  /local/PBS/trunk/README
+
+CHANGED: updated to new figures from test project
+----------------------------------------------------------------------
+r201:  nadim | 2006-04-16 14:45:48 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+
+ADDED: comments about using a signature for every build
+----------------------------------------------------------------------
+r200:  nadim | 2006-04-16 14:44:42 +0200
+Changed paths:
+  M  /local/PBS/trunk/MANIFEST
+
+FIXED: reverted to pbs.pl for windows compatibility
+----------------------------------------------------------------------
+r199:  nadim | 2006-04-16 14:42:04 +0200
+Changed paths:
+  M  /local/PBS/trunk/pbs
+
+ADDED: new documentation footer
+----------------------------------------------------------------------
+r198:  nadim | 2006-04-16 14:38:35 +0200
+Changed paths:
+  M  /local/PBS/trunk/INSTALL
+
+ADDED: lib location information matching the latest build set
+----------------------------------------------------------------------
+r197:  nadim | 2006-04-16 14:33:44 +0200
+Changed paths:
+  M  /local/PBS/trunk/Crazy_pbs
+
+FIXED: typo
+----------------------------------------------------------------------
+r196:  nadim | 2006-04-16 14:32:57 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+
+ADDED: Getversion drom svk on development box
+----------------------------------------------------------------------
+r195:  nadim | 2006-04-16 14:30:28 +0200
+Changed paths:
+  A  /local/PBS/trunk/Makefile.PL
+
+ADDED: cpan/make compatibility install
+----------------------------------------------------------------------
+r183:  nadim | 2006-03-27 21:48:18 +0200
+Changed paths:
+  M  /local/PBS/trunk/test/hello2/Pbsfile.pl
+
+CHANGED: little nice rules
+----------------------------------------------------------------------
+r182:  nadim | 2006-03-26 21:16:39 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+
+ADDED: automatic revision appending to version
+----------------------------------------------------------------------
+r181:  nadim | 2006-03-26 14:07:02 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/DefaultBuild.pm
+
+FIXED: number of checked nodes was not erased after "check"
+----------------------------------------------------------------------
+r180:  nadim | 2006-03-24 20:26:27 +0100
+Changed paths:
+  M  /local/PBS/trunk/InotifyWatcher.pm
+  M  /local/PBS/trunk/PBS/Build/ForkedNodeBuilder.pm
+  M  /local/PBS/trunk/PBS/Constants.pm
+  M  /local/PBS/trunk/PBS/Shell.pm
+  M  /local/PBS/trunk/Todo.txt
+
+CAHNGED: minor changes, typos and updated
+----------------------------------------------------------------------
+r179:  nadim | 2006-03-24 20:25:32 +0100
+Changed paths:
+  M  /local/PBS/trunk/watch_server.pl
+
+FIXED: deleted files are properly tagged
+----------------------------------------------------------------------
+r178:  nadim | 2006-03-24 20:24:27 +0100
+Changed paths:
+  M  /local/PBS/trunk/t/Misc/CommandLineFlags.pm
+
+FIXED: handle new build buffer naming scheme
+----------------------------------------------------------------------
+r177:  nadim | 2006-03-24 20:22:18 +0100
+Changed paths:
+  M  /local/PBS/trunk/project_generator.pl
+
+CHANGED: refactored and added command line option handling
+----------------------------------------------------------------------
+r176:  nadim | 2006-03-24 20:21:07 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Digest.pm
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/PBS.pm
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/Warp1_7.pm
+  M  /local/PBS/trunk/PBSLib/Wizards/PostPbs.pl
+  M  /local/PBS/trunk/Plugins/FileWatchClient.pm
+
+ADDED: statistic information
+----------------------------------------------------------------------
+r175:  nadim | 2006-03-24 19:16:41 +0100
+Changed paths:
+  A  /local/PBS/trunk/doc/links.txt
+
+ADDED: WWW links
+----------------------------------------------------------------------
+r174:  nadim | 2006-03-24 19:12:50 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+
+FIXED: __SELF got into triggerring_dependencies list as if it was a real node
+----------------------------------------------------------------------
+r173:  nadim | 2006-03-23 01:53:47 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Configs/Compilers/gcc.pm
+  M  /local/PBS/trunk/PBSLib/Rules/C.pm
+
+FIXED: diabled config.pm warning about undefined variables
+----------------------------------------------------------------------
+r172:  nadim | 2006-03-23 01:04:46 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build/ForkedNodeBuilder.pm
+
+FIXED: buffer naming gave "file name too long" error
+----------------------------------------------------------------------
+r171:  nadim | 2006-03-23 01:03:39 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build/Forked.pm
+
+ADDED: comment on parallel build optimisation
+----------------------------------------------------------------------
+r170:  nadim | 2006-03-22 20:35:12 +0100
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/MANIFEST
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/PBS/SubpbsResult.pm
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  D  /local/PBS/trunk/PBSLib/Builders/Obigo.pm
+  A  /local/PBS/trunk/PBSLib/Builders/Objects.pm (from /local/PBS/trunk/PBSLib/Builders/Obigo.pm:169)
+  M  /local/PBS/trunk/PBSLib/Rules/Compilers/gcc.pm
+  M  /local/PBS/trunk/README
+  M  /local/PBS/trunk/Todo.txt
+  D  /local/PBS/trunk/pbs.pl
+
+CHANGED: more merge from jobs pbs and integration of warp 1.7
+----------------------------------------------------------------------
+r169:  nadim | 2006-03-22 20:33:12 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Builders/Obigo.pm
+
+CHANGED: made project independant
+----------------------------------------------------------------------
+r168:  nadim | 2006-03-22 20:20:30 +0100
+Changed paths:
+  A  /local/PBS/trunk/PBS/Warp1_7.pm
+
+ADDED: new module to save warp data as a blob in a db
+----------------------------------------------------------------------
+r167:  nadim | 2006-03-22 20:19:21 +0100
+Changed paths:
+  A  /local/PBS/trunk/project_generator.pl
+
+ADDED: script to generate small or very big projects to help testing pbs scalability
+----------------------------------------------------------------------
+r166:  nadim | 2006-03-21 22:24:49 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Rules/C_DependAndBuild.pm
+
+FIXED: made my test reflex better than my ci reflex
+----------------------------------------------------------------------
+r165:  nadim | 2006-03-21 22:15:15 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+  M  /local/PBS/trunk/PBSLib/Rules/C_DependAndBuild.pm
+
+CHANGED: display better message when build is done before builder
+----------------------------------------------------------------------
+r164:  nadim | 2006-03-21 22:07:51 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Check.pm
+
+CHANGED: leave BUILD_DONE unchanged
+----------------------------------------------------------------------
+r163:  nadim | 2006-03-21 21:54:23 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Rules/C_DependAndBuild.pm
+
+CHANGED: revert to normal depend if no object file depends on the C file
+----------------------------------------------------------------------
+r162:  nadim | 2006-03-21 21:53:15 +0100
+Changed paths:
+  M  /local/PBS/trunk/MANIFEST
+
+CHANGED: updated build script to latest changes
+----------------------------------------------------------------------
+r161:  nadim | 2006-03-21 21:52:42 +0100
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+
+CHANGED: updated build script to latest changes
+----------------------------------------------------------------------
+r160:  nadim | 2006-03-21 21:51:41 +0100
+Changed paths:
+  A  /local/PBS/trunk/Crazy_pbs
+
+ADDED: cray discussion about fuzzy pbs I had with anders a late evening
+----------------------------------------------------------------------
+r159:  nadim | 2006-03-21 21:50:39 +0100
+Changed paths:
+  A  /local/PBS/trunk/pbs
+
+CHANGED: named pbs.pl to pbs so we can use it in a more natural way
+----------------------------------------------------------------------
+r158:  nadim | 2006-03-20 01:20:50 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Configs/Compilers/cl.pm
+  M  /local/PBS/trunk/PBSLib/Configs/Compilers/gcc.pm
+
+ADDED: depend on the right version  of the Devel::Depend modules
+----------------------------------------------------------------------
+r157:  nadim | 2006-03-20 01:15:51 +0100
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  D  /local/PBS/trunk/META.yml
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  D  /local/PBS/trunk/pbs_bash_completion
+  D  /local/PBS/trunk/podhpp_config
+  M  /local/PBS/trunk/t/Correctness/DependencyGraphIsNotATree.pm
+  D  /local/PBS/trunk/test_watch_server.pl
+
+CHANGED: version and installation procedure
+----------------------------------------------------------------------
+r156:  nadim | 2006-03-20 00:18:30 +0100
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  A  /local/PBS/trunk/InotifyWatcher.pm
+  M  /local/PBS/trunk/MANIFEST
+  D  /local/PBS/trunk/PBS/.links
+  M  /local/PBS/trunk/PBS/Build.pm
+  M  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+  M  /local/PBS/trunk/PBS/Check.pm
+  M  /local/PBS/trunk/PBS/Constants.pm
+  M  /local/PBS/trunk/PBS/Depend.pm
+  M  /local/PBS/trunk/PBS/Digest.pm
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/Graph/Html.pm
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/PBS/Plugin.pm
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  D  /local/PBS/trunk/Pbsfiles/c_depender
+  M  /local/PBS/trunk/Pbsfiles/cyclic/b.c
+  D  /local/PBS/trunk/Pbsfiles/legend/graphs
+  M  /local/PBS/trunk/Pbsfiles/subpbs_locate/Pbsfile.pl
+  D  /local/PBS/trunk/Pbsfiles/subpbs_search
+  D  /local/PBS/trunk/Pbsfiles/user_help
+  D  /local/PBS/trunk/Plugins/InotifyClient.pm
+  M  /local/PBS/trunk/Todo.txt
+  A  /local/PBS/trunk/Win32Watcher.pm
+  M  /local/PBS/trunk/doc/Cookbook/Java/simple_java/Pbsfile.pl
+  D  /local/PBS/trunk/doc/Cookbook/Java/simple_java/documenting_pbsfile.html
+  D  /local/PBS/trunk/doc/Cookbook/Java/simple_java/documenting_pbsfile.pl
+  D  /local/PBS/trunk/doc/Cookbook/Java/simple_java/pod2htmd.tmp
+  D  /local/PBS/trunk/doc/Cookbook/Java/simple_java/pod2htmi.tmp
+  D  /local/PBS/trunk/doc/Cookbook/Java/simple_java/xxx
+  M  /local/PBS/trunk/doc/Cookbook/Java/simple_java_2/Pbsfile.pl
+  M  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jar/Manifest.txt
+  M  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jar/Pbsfile.pl
+  M  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jni/HelloWorldNative.c
+  M  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jni/HelloWorldNative.java
+  M  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jni/Pbsfile.pl
+  D  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jni/Pbsfile.pl.old
+  D  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jni/Pbsfile.ulf
+  D  /local/PBS/trunk/doc/Cookbook/cookbook.html
+  M  /local/PBS/trunk/doc/Cookbook/cookbook.pod
+  D  /local/PBS/trunk/doc/Cookbook/pod2htmd.tmp
+  D  /local/PBS/trunk/doc/Cookbook/pod2htmi.tmp
+  D  /local/PBS/trunk/doc/pbsum.tex
+  M  /local/PBS/trunk/doc/pnw2004/cyclic.png
+  M  /local/PBS/trunk/doc/pnw2004/cyclic2.png
+  M  /local/PBS/trunk/doc/pnw2004/legend.png
+  M  /local/PBS/trunk/doc/pnw2004/mono1.jpg
+  M  /local/PBS/trunk/doc/pnw2004/pmiller.jpg
+  D  /local/PBS/trunk/doc/pnw2004/pod2htmd.tmp
+  D  /local/PBS/trunk/doc/pnw2004/pod2htmi.tmp
+  M  /local/PBS/trunk/doc/pnw2004/trigger.png
+  A  /local/PBS/trunk/emil_pbs_todo.txt
+  A  /local/PBS/trunk/emil_pbs_win32_issues.txt
+  A  /local/PBS/trunk/make_pbs_exe.pl
+  M  /local/PBS/trunk/pbs.pl
+  A  /local/PBS/trunk/pbsrun.txt
+  A  /local/PBS/trunk/run_pbs_win32.pl
+  M  /local/PBS/trunk/t/AllTests.pm
+  M  /local/PBS/trunk/t/Correctness/CDepender.pm
+  M  /local/PBS/trunk/t/Correctness/DependencyGraphIsNotATree.pm
+  M  /local/PBS/trunk/t/Correctness/IncludeFiles.pm
+  M  /local/PBS/trunk/t/Correctness/OneCFile.pm
+  M  /local/PBS/trunk/t/Correctness/TwoCFiles.pm
+  M  /local/PBS/trunk/t/ErrorHandling/BuildError.pm
+  M  /local/PBS/trunk/t/ErrorHandling/CyclicDependencies.pm
+  M  /local/PBS/trunk/t/ErrorHandling/NonExisting.pm
+  M  /local/PBS/trunk/t/Misc/AddConfig.pm
+  M  /local/PBS/trunk/t/Misc/CDependencyGraph.pm
+  M  /local/PBS/trunk/t/Misc/CommandLineFlags.pm
+  M  /local/PBS/trunk/t/Misc/ExtraDependencies.pm
+  M  /local/PBS/trunk/t/Misc/Nodetypes.pm
+  M  /local/PBS/trunk/t/Misc/PbsUse.pm
+  M  /local/PBS/trunk/t/Misc/SourceDirectory.pm
+  M  /local/PBS/trunk/t/Misc/Subpbs.pm
+  M  /local/PBS/trunk/t/Misc/Targets.pm
+  M  /local/PBS/trunk/t/Misc/Triggers.pm
+  M  /local/PBS/trunk/t/PBS.pm
+  M  /local/PBS/trunk/t/Rules/Builder.pm
+  M  /local/PBS/trunk/t/Rules/NodeAttributes.pm
+  M  /local/PBS/trunk/t/Rules/NodeSubs.pm
+  M  /local/PBS/trunk/t/Rules/ReplaceRule.pm
+  M  /local/PBS/trunk/t/TestClassTemplate.pm
+  M  /local/PBS/trunk/t/run_many_times.t
+  M  /local/PBS/trunk/t/with_warp.t
+  M  /local/PBS/trunk/t/without_warp.t
+  M  /local/PBS/trunk/test/hello/Pbsfile.pl
+  M  /local/PBS/trunk/test/hello2/Pbsfile.pl
+  M  /local/PBS/trunk/test/hello2/main/main.pl
+  M  /local/PBS/trunk/test/hello2/world/world.pl
+  M  /local/PBS/trunk/watch_server.pl
+
+CHANGED: Merge after windows speedup and SVK problems
+----------------------------------------------------------------------
+r155:  nadim | 2006-03-20 00:13:24 +0100
+Changed paths:
+  A  /local/PBS/trunk/Plugins/FileWatchClient.pm
+
+ADDED: generic watch client
+----------------------------------------------------------------------
+r154:  nadim | 2006-03-20 00:12:06 +0100
+Changed paths:
+  A  /local/PBS/trunk/Pbsfiles/emil_subpbs_locate
+  A  /local/PBS/trunk/Pbsfiles/emil_subpbs_locate/sd1
+  A  /local/PBS/trunk/Pbsfiles/emil_subpbs_locate/sd1/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/emil_subpbs_locate/sd1/a.c
+  A  /local/PBS/trunk/Pbsfiles/emil_subpbs_locate/sd1/b
+  A  /local/PBS/trunk/Pbsfiles/emil_subpbs_locate/sd1/b/a.h
+  A  /local/PBS/trunk/Pbsfiles/emil_subpbs_locate/sd1/default_pbs.prf
+  A  /local/PBS/trunk/Pbsfiles/emil_subpbs_locate/sd2
+  A  /local/PBS/trunk/Pbsfiles/emil_subpbs_locate/sd2/b
+  A  /local/PBS/trunk/Pbsfiles/emil_subpbs_locate/sd2/b/a.h
+
+ADDED: another test for pbsfile locating
+----------------------------------------------------------------------
+r153:  nadim | 2006-03-20 00:07:22 +0100
+Changed paths:
+  A  /local/PBS/trunk/t/setup_data
+  A  /local/PBS/trunk/t/setup_data/c_depender
+  A  /local/PBS/trunk/t/setup_data/c_depender/1.c
+  A  /local/PBS/trunk/t/setup_data/c_depender/1_2.c
+  A  /local/PBS/trunk/t/setup_data/c_depender/1_error.c
+  A  /local/PBS/trunk/t/setup_data/c_depender/2.c
+  A  /local/PBS/trunk/t/setup_data/c_depender/2_2.c
+  A  /local/PBS/trunk/t/setup_data/c_depender/2_3.c
+  A  /local/PBS/trunk/t/setup_data/c_depender/2_error.c
+  A  /local/PBS/trunk/t/setup_data/c_depender/3.c
+  A  /local/PBS/trunk/t/setup_data/c_depender/Pbsfile.pl
+  A  /local/PBS/trunk/t/setup_data/c_depender/Pbsfile2.pl
+  A  /local/PBS/trunk/t/setup_data/c_depender/Pbsfile_abort.pl
+  A  /local/PBS/trunk/t/setup_data/c_depender/a.h
+  A  /local/PBS/trunk/t/setup_data/c_depender/a2.h
+  A  /local/PBS/trunk/t/setup_data/c_depender/b.h
+  A  /local/PBS/trunk/t/setup_data/c_depender/b2.h
+  A  /local/PBS/trunk/t/setup_data/c_depender/b3.h
+  A  /local/PBS/trunk/t/setup_data/depending_pbsfile
+  A  /local/PBS/trunk/t/setup_data/depending_pbsfile/Pbsfile.pl
+  A  /local/PBS/trunk/t/setup_data/depending_pbsfile/Subpbs.pl
+
+ADDED: new way to setup test data
+----------------------------------------------------------------------
+r152:  nadim | 2006-03-20 00:06:35 +0100
+Changed paths:
+  A  /local/PBS/trunk/t/Correctness/DependingPbsfile.pm
+
+ADDED: Test for a C depender that also builds the object files
+----------------------------------------------------------------------
+r151:  nadim | 2006-03-19 23:59:33 +0100
+Changed paths:
+  A  /local/PBS/trunk/PBSLib/Builders/Obigo.pm
+  M  /local/PBS/trunk/PBSLib/Configs/ConfigureProject.pm
+  M  /local/PBS/trunk/PBSLib/Configs/ConfigureProjectVariablesAndRules.pm
+  D  /local/PBS/trunk/PBSLib/Configs/gcc.pm
+  M  /local/PBS/trunk/PBSLib/Language/Simplified.pm
+  M  /local/PBS/trunk/PBSLib/Rules/C.pm
+  A  /local/PBS/trunk/PBSLib/Rules/C_DependAndBuild.pm
+  M  /local/PBS/trunk/PBSLib/Rules/C_depender.pm
+  A  /local/PBS/trunk/PBSLib/Rules/Compilers
+  A  /local/PBS/trunk/PBSLib/Rules/Compilers/cl.pm
+  A  /local/PBS/trunk/PBSLib/Rules/Compilers/compiler.pm
+  A  /local/PBS/trunk/PBSLib/Rules/Compilers/gcc.pm
+  A  /local/PBS/trunk/PBSLib/Rules/NodeSubs
+  A  /local/PBS/trunk/PBSLib/Rules/NodeSubs/Config.pm
+  A  /local/PBS/trunk/PBSLib/Rules/Obigo.pm
+  A  /local/PBS/trunk/PBSLib/Rules/VisualStudioDSP.pm
+  A  /local/PBS/trunk/PBSLib/Rules/VisualStudioProject.pm
+  A  /local/PBS/trunk/PBSLib/Rules/cl_pch.pm
+  A  /local/PBS/trunk/PBSLib/Utils
+  A  /local/PBS/trunk/PBSLib/Utils/VisualStudioProjectFile.pm
+  A  /local/PBS/trunk/PBSLib/Wizards/ObigoPbsfile.pl
+
+CHANGED: new modules and structure after windows speedup merge
+----------------------------------------------------------------------
+r150:  nadim | 2006-03-19 23:56:22 +0100
+Changed paths:
+  A  /local/PBS/trunk/PBSLib/Configs/Compilers
+  A  /local/PBS/trunk/PBSLib/Configs/Compilers/cl.pm
+  A  /local/PBS/trunk/PBSLib/Configs/Compilers/compiler.pm
+  A  /local/PBS/trunk/PBSLib/Configs/Compilers/gcc.pm
+  A  /local/PBS/trunk/PBSLib/Configs/Compilers/old_gcc.pm
+
+CHANGED: new location for compiler configurations
+----------------------------------------------------------------------
+r149:  nadim | 2006-03-19 23:54:03 +0100
+Changed paths:
+  A  /local/PBS/trunk/PBS/SubpbsResult.pm
+
+ADDED: module to support for hierarchical projects
+----------------------------------------------------------------------
+r147:  nadim | 2006-01-12 12:33:10 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Rules/C_depender.pm
+
+CHANGED: way to generate repository include pathes
+----------------------------------------------------------------------
+r146:  nadim | 2006-01-12 12:15:14 +0100
+Changed paths:
+  M  /local/PBS/trunk/Changes
+  M  /local/PBS/trunk/MANIFEST
+  M  /local/PBS/trunk/Todo.txt
+
+ADDED: test files, wizard, ..
+----------------------------------------------------------------------
+r145:  nadim | 2006-01-12 12:12:15 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+
+FIXED: typo
+----------------------------------------------------------------------
+r144:  nadim | 2006-01-12 12:11:43 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+
+CHANGED: removed useless checking of trigger
+----------------------------------------------------------------------
+r139:  nadim | 2005-12-06 21:27:55 +0100
+Changed paths:
+  A  /local/PBS/trunk/pbs_bash_completion
+
+ADDED: bash completion
+----------------------------------------------------------------------
+r138:  nadim | 2005-12-06 21:26:07 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Rules/C_depender.pm
+
+FIXED: rt.cpan.org: Ticket #16291 synchronized and unsynchronized dependency caches 
+----------------------------------------------------------------------
+r137:  nadim | 2005-12-06 21:24:06 +0100
+Changed paths:
+  M  /local/PBS/trunk/t/Misc/CommandLineFlags.pm
+
+FIXED: regex to check correct match
+----------------------------------------------------------------------
+r136:  nadim | 2005-12-06 21:08:30 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Depend.pm
+
+FIXED: rt.cpan.org: Ticket #15372 Subpbs and rules without dependencies can coexist 
+----------------------------------------------------------------------
+r135:  nadim | 2005-12-03 00:37:18 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Config.pm
+
+FIXED: variable name
+ADDED: handle --no_silent_override in GetConfig:SILENT_NOT_EXITS
+----------------------------------------------------------------------
+r134:  nadim | 2005-12-03 00:11:46 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Config.pm
+
+ADDED: SILENT_NOT_EXISTS to GetConfig
+----------------------------------------------------------------------
+r133:  nadim | 2005-11-30 00:50:14 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/DefaultBuild.pm
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+
+REMOVED: MD5 cache flushing
+----------------------------------------------------------------------
+r132:  nadim | 2005-11-30 00:48:25 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Digest.pm
+
+ADDED: debugging info used while minimizing MD5 cache flushing
+----------------------------------------------------------------------
+r131:  nadim | 2005-11-30 00:46:14 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+
+FIXED: __nodes wheren't eliminated from dependencies due to code handling force_trigger
+----------------------------------------------------------------------
+r130:  nadim | 2005-11-28 23:35:36 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+  M  /local/PBS/trunk/PBS/Check.pm
+  M  /local/PBS/trunk/PBS/Depend.pm
+  M  /local/PBS/trunk/PBS/Digest.pm
+  M  /local/PBS/trunk/PBS/Information.pm
+
+FIXED: error in handling of the new FORCE_TRIGGER 
+CHANGED: rt.cpan.org: Ticket #16093 Reduce node building overhead (Information.pm)
+----------------------------------------------------------------------
+r129:  nadim | 2005-11-25 10:26:19 +0100
+Changed paths:
+  M  /local/PBS/trunk/META.yml
+  M  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+  M  /local/PBS/trunk/PBS/Digest.pm
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/Information.pm
+  M  /local/PBS/trunk/Todo.txt
+
+FIXED: handling the new __FORCE_TRIGGER format
+ADDED: display time spend in diplaying the node header
+CHANGED: new version
+----------------------------------------------------------------------
+r128:  nadim | 2005-11-24 02:41:35 +0100
+Changed paths:
+  M  /local/PBS/trunk/MANIFEST
+
+ADDED: C dependencies (and synch cache) test files
+----------------------------------------------------------------------
+r127:  nadim | 2005-11-24 02:40:24 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Check.pm
+  M  /local/PBS/trunk/PBS/Depend.pm
+  M  /local/PBS/trunk/PBS/Rules/Creator.pm
+
+CHANGED: FORCE_TRIGGER and SYNCHRONIZE are now objects instead for strings
+----------------------------------------------------------------------
+r126:  nadim | 2005-11-24 02:39:23 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Rules/C_depender.pm
+
+CHANGED: cleaned up an uneeded, commented code
+----------------------------------------------------------------------
+r125:  nadim | 2005-11-24 02:35:40 +0100
+Changed paths:
+  M  /local/PBS/trunk/t/Misc/CommandLineFlags.pm
+
+CHANGED: test to new output format
+----------------------------------------------------------------------
+r124:  nadim | 2005-11-24 00:23:29 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Depend.pm
+  M  /local/PBS/trunk/PBSLib/Rules/C_depender.pm
+
+FIXED: separator to work on windows
+----------------------------------------------------------------------
+r123:  nadim | 2005-11-24 00:10:47 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Wizards/Creator.pl
+
+CHANGED: new force trigger format
+----------------------------------------------------------------------
+r122:  nadim | 2005-11-24 00:09:50 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Rules/Creator.pm
+
+FIXED: separator to differentiate from windows drive separator
+----------------------------------------------------------------------
+r121:  nadim | 2005-11-23 21:51:00 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Rules/Builders.pm
+
+FIXED: handle windows path format
+----------------------------------------------------------------------
+r120:  nadim | 2005-11-23 21:45:15 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build.pm
+
+FIXED: cache was synchronized even if build failed!
+----------------------------------------------------------------------
+r119:  nadim | 2005-11-23 21:44:08 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+
+CHANGED: set plugin pathes to nothing
+----------------------------------------------------------------------
+r118:  nadim | 2005-11-23 21:43:13 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Information.pm
+
+CHANGED: node information is output to STDOUT
+----------------------------------------------------------------------
+r117:  nadim | 2005-11-23 21:42:16 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Plugin.pm
+
+FIXED: normal "glob" handles ~ strangely
+----------------------------------------------------------------------
+r116:  nadim | 2005-11-23 21:35:55 +0100
+Changed paths:
+  A  /local/PBS/trunk/Pbsfiles/plugin_shell_filter
+  A  /local/PBS/trunk/Pbsfiles/plugin_shell_filter/Pbsfile.pl
+
+ADDED: example for shell command filtering via plugin
+----------------------------------------------------------------------
+r115:  nadim | 2005-11-23 21:34:58 +0100
+Changed paths:
+  A  /local/PBS/trunk/Pbsfiles/c_depender
+  A  /local/PBS/trunk/Pbsfiles/c_depender/1.c
+  A  /local/PBS/trunk/Pbsfiles/c_depender/1_2.c
+  A  /local/PBS/trunk/Pbsfiles/c_depender/1_error.c
+  A  /local/PBS/trunk/Pbsfiles/c_depender/2.c
+  A  /local/PBS/trunk/Pbsfiles/c_depender/2_2.c
+  A  /local/PBS/trunk/Pbsfiles/c_depender/2_3.c
+  A  /local/PBS/trunk/Pbsfiles/c_depender/2_error.c
+  A  /local/PBS/trunk/Pbsfiles/c_depender/3.c
+  A  /local/PBS/trunk/Pbsfiles/c_depender/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/c_depender/Pbsfile2.pl
+  A  /local/PBS/trunk/Pbsfiles/c_depender/Pbsfile_abort.pl
+  A  /local/PBS/trunk/Pbsfiles/c_depender/a.h
+  A  /local/PBS/trunk/Pbsfiles/c_depender/a2.h
+  A  /local/PBS/trunk/Pbsfiles/c_depender/b.h
+  A  /local/PBS/trunk/Pbsfiles/c_depender/b2.h
+  A  /local/PBS/trunk/Pbsfiles/c_depender/b3.h
+
+ADDED: verify new unsynchronized cache handling
+----------------------------------------------------------------------
+r114:  nadim | 2005-11-23 21:33:31 +0100
+Changed paths:
+  A  /local/PBS/trunk/t/Correctness/CDepender.pm
+
+ADDED: verify new unsynchronized cache handling
+----------------------------------------------------------------------
+r113:  nadim | 2005-11-23 21:32:33 +0100
+Changed paths:
+  M  /local/PBS/trunk/t/AllTests.pm
+  M  /local/PBS/trunk/t/Correctness/DependencyGraphIsNotATree.pm
+  M  /local/PBS/trunk/t/ErrorHandling/CyclicDependencies.pm
+  M  /local/PBS/trunk/t/Misc/AddConfig.pm
+  M  /local/PBS/trunk/t/Misc/CDependencyGraph.pm
+  M  /local/PBS/trunk/t/Misc/CommandLineFlags.pm
+  M  /local/PBS/trunk/t/PBS.pm
+  M  /local/PBS/trunk/t/Rules/Builder.pm
+  M  /local/PBS/trunk/t/Rules/Dependencies.pm
+
+CHANGED: adapt to newest version of PBS
+----------------------------------------------------------------------
+r112:  nadim | 2005-11-19 21:20:49 +0100
+Changed paths:
+  M  /local/PBS/trunk/Changes
+  M  /local/PBS/trunk/MANIFEST
+  M  /local/PBS/trunk/README
+  M  /local/PBS/trunk/Todo.txt
+
+CHANGED: minor changes in administrative files
+----------------------------------------------------------------------
+r111:  nadim | 2005-11-19 21:18:20 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build.pm
+  M  /local/PBS/trunk/PBS/Build/Forked.pm
+  M  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+  M  /local/PBS/trunk/PBS/Depend.pm
+  M  /local/PBS/trunk/PBSLib/Rules/C_depender.pm
+
+FIXED: rt.cpan.org: Ticket #15853 Dependency cache is updated too early 
+	when a dependers caches information, that information is not valid
+	untill all the nodes depending on it are build. PBS synchronizes
+	the caches when necessary
+
+	The C depender also uses unsynchronized caches if they are valid.
+----------------------------------------------------------------------
+r110:  nadim | 2005-11-19 21:09:54 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Rules/Builders.pm
+  M  /local/PBS/trunk/Plugins/EvaluateShellCommand.pm
+
+CHANGED: EvaluateShellCommand plugin get more information about the node to build
+----------------------------------------------------------------------
+r109:  nadim | 2005-11-13 15:06:24 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Output.pm
+
+FIXED: --no_color did not remove the the ansi reset code
+----------------------------------------------------------------------
+r108:  nadim | 2005-11-13 15:04:26 +0100
+Changed paths:
+  A  /local/PBS/trunk/generate_bash_completion.pl
+
+ADDED: generator for bash completion
+----------------------------------------------------------------------
+r107:  nadim | 2005-11-13 12:11:17 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+  M  /local/PBS/trunk/PBS/Digest.pm
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+
+ADDED: statistic display
+----------------------------------------------------------------------
+r106:  nadim | 2005-11-12 23:26:02 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+  M  /local/PBS/trunk/PBS/DefaultBuild.pm
+  M  /local/PBS/trunk/PBS/Digest.pm
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+
+CHANGED: use cache for MD5
+----------------------------------------------------------------------
+r105:  nadim | 2005-11-12 19:27:05 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Config.pm
+
+FIXED: removed superfluous single quotes returned by caller
+----------------------------------------------------------------------
+r104:  nadim | 2005-11-12 01:06:27 +0100
+Changed paths:
+  M  /local/PBS/trunk/MANIFEST
+
+ADDED: tests for GetConfigAsList
+----------------------------------------------------------------------
+r103:  nadim | 2005-11-12 01:05:45 +0100
+Changed paths:
+  A  /local/PBS/trunk/Pbsfiles/config/as_list.pl
+
+ADDED: tests for GetConfigAsList
+----------------------------------------------------------------------
+r102:  nadim | 2005-11-12 01:04:57 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+
+REMOVED: display_non_existing_config_variable
+----------------------------------------------------------------------
+r101:  nadim | 2005-11-12 01:04:16 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Rules/C.pm
+
+ADDED: message when automatically adding CDEFINES
+----------------------------------------------------------------------
+r100:  nadim | 2005-11-12 01:02:52 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Config.pm
+
+CHANGED: Refactored GetConfi and GetConfigFrom
+ADDED: GetConfigAsList GetConfigFromAsList
+----------------------------------------------------------------------
+r99:  nadim | 2005-11-11 23:03:40 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Rules/C_depender.pm
+
+FIXED: error was displayed with PrintWarning.
+----------------------------------------------------------------------
+r98:  nadim | 2005-11-11 00:45:29 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+
+ADDED: --check_dependencies_at_build_time
+----------------------------------------------------------------------
+r97:  nadim | 2005-11-11 00:42:42 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Rules/C_depender.pm
+
+DDED: version bump and a comment
+----------------------------------------------------------------------
+r96:  nadim | 2005-11-10 23:23:03 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+
+FIXED: ignored warp rebuild if using watch server
+----------------------------------------------------------------------
+r95:  nadim | 2005-11-10 20:16:59 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Digest.pm
+
+FIXED: typo
+----------------------------------------------------------------------
+r94:  nadim | 2005-11-10 13:48:53 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBSLib/Rules/C_depender.pm
+
+FIXED: return match value even if there are no dependencies
+----------------------------------------------------------------------
+r93:  nadim | 2005-11-09 23:16:09 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Digest.pm
+
+CHANGED: alignment
+----------------------------------------------------------------------
+r92:  nadim | 2005-11-09 01:17:16 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/PBS/Plugin.pm
+  M  /local/PBS/trunk/PBSLib/Rules/C.pm
+
+ADDED: API to load plugins at run time
+----------------------------------------------------------------------
+r91:  nadim | 2005-11-08 11:15:17 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+  M  /local/PBS/trunk/PBS/Rules/Builders.pm
+  M  /local/PBS/trunk/Plugins/EvaluateShellCommand.pm
+
+FIXED: %PBS_REPOSITORIES handling polluted all configs
+CHANGED: moved %PBS_REPOSITORY handling to plugin and refactored PBS code
+----------------------------------------------------------------------
+r90:  nadim | 2005-11-08 11:13:34 +0100
+Changed paths:
+  M  /local/PBS/trunk/MANIFEST
+
+ADDED: inotify watch server
+----------------------------------------------------------------------
+r89:  nadim | 2005-11-08 11:12:22 +0100
+Changed paths:
+  M  /local/PBS/trunk/Plugins/InotifyClient.pm
+
+ADDED: document verbosity switch
+----------------------------------------------------------------------
+r88:  nadim | 2005-11-08 09:33:34 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Config.pm
+  M  /local/PBS/trunk/Plugins/EvaluateShellCommand.pm
+
+CHANGED: moved PBS_REPOSITORY handling to plugin
+----------------------------------------------------------------------
+r87:  nadim | 2005-11-08 09:04:06 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+
+CHANGED: Use standard output even when watches are used and none triggered
+----------------------------------------------------------------------
+r86:  nadim | 2005-11-06 13:03:30 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  M  /local/PBS/trunk/Plugins/InotifyClient.pm
+
+ADDED: -inotify_verbose. When set the triggering files are dumped on the display
+MODIFIED: speedup warp when no files are modified.
+----------------------------------------------------------------------
+r85:  nadim | 2005-11-05 23:00:58 +0100
+Changed paths:
+  M  /local/PBS/trunk/test_watch_server.pl
+
+ADDED: verbosity control from the command line
+----------------------------------------------------------------------
+r84:  nadim | 2005-11-05 23:00:08 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/WatchClient.pm
+  A  /local/PBS/trunk/Plugins/InotifyClient.pm
+
+CHANGED: Moved inotify watch client to a plugin
+----------------------------------------------------------------------
+r83:  nadim | 2005-11-05 22:57:48 +0100
+Changed paths:
+  M  /local/PBS/trunk/t/Misc/AddConfig.pm
+  M  /local/PBS/trunk/t/Misc/CommandLineFlags.pm
+
+REMOVED: Obsolete comment
+CHANGED: Test output from stdout instead for stderr after PrintWarning change
+----------------------------------------------------------------------
+r82:  nadim | 2005-11-05 13:29:09 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Output.pm
+
+CHANGED: Warnings go to stdout
+----------------------------------------------------------------------
+r81:  nadim | 2005-11-05 11:30:19 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/WatchClient.pm
+  M  /local/PBS/trunk/test_watch_server.pl
+
+ADDED: all watched nodes have their nemes collpased. This eliminate a bunch of false positives
+----------------------------------------------------------------------
+r80:  nadim | 2005-11-05 11:29:09 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Digest.pm
+
+FIXED: Allow configuration to contain perl data structures
+----------------------------------------------------------------------
+r79:  nadim | 2005-11-04 01:37:45 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+
+FIXED: removed double separators
+----------------------------------------------------------------------
+r78:  nadim | 2005-11-03 09:26:10 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+
+FIXED: rt.cpan.org: Ticket #15474 CollapsePath doesn't work
+----------------------------------------------------------------------
+r77:  nadim | 2005-11-03 09:23:15 +0100
+Changed paths:
+  M  /local/PBS/trunk/t/ErrorHandling/CyclicDependencies.pm
+
+CHANGED: test to match new error message
+----------------------------------------------------------------------
+r76:  nadim | 2005-11-02 21:51:23 +0100
+Changed paths:
+  M  /local/PBS/trunk/Pbsfiles/cyclic/Pbsfile.pl
+
+ADDED: pbsfile documentation
+ADDED: example with multiple cycles
+----------------------------------------------------------------------
+r75:  nadim | 2005-11-02 21:22:14 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Output.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+
+ADDED: rt.cpan.org: Ticket #15469 Add --no_colors switch
+----------------------------------------------------------------------
+r74:  nadim | 2005-11-02 21:20:17 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Check.pm
+
+ADDED: rt.cpan.org: Ticket #15467 No message while detecting cycles 
+----------------------------------------------------------------------
+r73:  nadim | 2005-11-02 20:57:52 +0100
+Changed paths:
+  A  /local/PBS/trunk/Pbsfiles/subpbs_search
+  A  /local/PBS/trunk/Pbsfiles/subpbs_search/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_search/d1
+  A  /local/PBS/trunk/Pbsfiles/subpbs_search/d1/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_search/d1/d11
+  A  /local/PBS/trunk/Pbsfiles/subpbs_search/d1/d11/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_search/d11
+  A  /local/PBS/trunk/Pbsfiles/subpbs_search/d11/Pbsfile.pl
+
+Test for pbs module include order
+----------------------------------------------------------------------
+r72:  nadim | 2005-11-02 20:57:29 +0100
+Changed paths:
+  M  /local/PBS/trunk/Pbsfiles/subpbs_locate/Pbsfile.pl
+
+CHANGED: documentation
+----------------------------------------------------------------------
+r71:  nadim | 2005-11-02 20:51:53 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Build/ForkedNodeBuilder.pm
+
+FIXED: typo
+----------------------------------------------------------------------
+r70:  nadim | 2005-11-02 20:50:23 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/WatchClient.pm
+  M  /local/PBS/trunk/test_watch_server.pl
+  M  /local/PBS/trunk/watch_server.pl
+
+FIXED: new way to synchronize with server. Fixes lots of false negatives'
+
+----------------------------------------------------------------------
+r69:  nadim | 2005-10-31 21:12:29 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+
+FIXED: no pbsfil defined when running --pp Ticket #15432
+----------------------------------------------------------------------
+r68:  nadim | 2005-10-31 20:14:14 +0100
+Changed paths:
+  M  /local/PBS/trunk/test_watch_server.pl
+
+ADDED: gurantee we test after a fresh build
+----------------------------------------------------------------------
+r67:  nadim | 2005-10-31 20:13:37 +0100
+Changed paths:
+  M  /local/PBS/trunk/watch_server.pl
+
+ADDED: verify if we should poll Inotification more than one
+----------------------------------------------------------------------
+r66:  nadim | 2005-10-31 20:12:51 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+
+ADDED: synchronize with the watch server only if we build successfully
+----------------------------------------------------------------------
+r65:  nadim | 2005-10-31 20:03:28 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/Config.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+
+ADDED: --no_silent_override
+----------------------------------------------------------------------
+r64:  nadim | 2005-10-30 19:57:50 +0100
+Changed paths:
+  A  /local/PBS/trunk/test_watch_server.pl
+  M  /local/PBS/trunk/watch_server.pl
+
+automatic test for watch server. Amso usefull for finding dependency errors in a build system
+----------------------------------------------------------------------
+r63:  nadim | 2005-10-30 19:56:49 +0100
+Changed paths:
+  M  /local/PBS/trunk/PBS/WatchClient.pm
+
+modified the protocol a bit to get the number of watches when gettin the trigged files
+----------------------------------------------------------------------
+r62:  nadim | 2005-10-30 14:55:14 +0100
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/MANIFEST
+  D  /local/PBS/trunk/PBS/Inotify.pm
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/WatchClient.pm (from /local/PBS/trunk/PBS/Inotify.pm:51)
+  M  /local/PBS/trunk/Todo.txt
+  M  /local/PBS/trunk/watch_server.pl
+
+CHANGED: Made specific Inotify.pm unspecific. Only the protocol remains
+CHANGED: Moved all watch code to WatchClient.pm
+CHANGED: watch server handles deleted nodes
+----------------------------------------------------------------------
+r61:  nadim | 2005-10-29 18:23:21 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  M  /local/PBS/trunk/watch_server.pl
+
+ADDED: checks for false positives and negatives
+CHANGED: interface and Inotify code
+----------------------------------------------------------------------
+r60:  nadim | 2005-10-29 18:20:38 +0200
+Changed paths:
+  M  /local/PBS/trunk/Changes
+
+
+----------------------------------------------------------------------
+r59:  nadim | 2005-10-29 00:58:10 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+
+FIXED: rt.cpan.org: Ticket #15357 Bug when omitting target in new prf file format in PBS 0.36
+----------------------------------------------------------------------
+r58:  nadim | 2005-10-29 00:31:50 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/PBSLib/Rules/C_depender.pm
+
+ADDED: rt.cpan.org: Ticket #15365 Add option to easily display Depender command and output 
+----------------------------------------------------------------------
+r57:  nadim | 2005-10-28 23:22:16 +0200
+Changed paths:
+  M  /local/PBS/trunk/Changes
+  M  /local/PBS/trunk/PBS/Check.pm
+  M  /local/PBS/trunk/PBS/Digest.pm
+  M  /local/PBS/trunk/PBS/Graph.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/Todo.txt
+  M  /local/PBS/trunk/doc/pnw2004/a_pbs_slide.pod
+
+REMOVED: remains of NO_DIGEST
+----------------------------------------------------------------------
+r56:  nadim | 2005-10-28 23:21:47 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  M  /local/PBS/trunk/watch_server.pl
+
+
+----------------------------------------------------------------------
+r55:  nadim | 2005-10-28 23:19:13 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+
+FIXED: error when the switches could not be parsed
+----------------------------------------------------------------------
+r54:  nadim | 2005-10-28 23:08:05 +0200
+Changed paths:
+  M  /local/PBS/trunk/MANIFEST
+
+ADDED: linked node warning test files and watch_client script
+----------------------------------------------------------------------
+r53:  nadim | 2005-10-28 23:05:45 +0200
+Changed paths:
+  A  /local/PBS/trunk/Pbsfiles/link
+  A  /local/PBS/trunk/Pbsfiles/link/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/link/subpbs.pl
+  A  /local/PBS/trunk/Pbsfiles/link/subpbs2.pl
+
+test for linked node warning messages
+----------------------------------------------------------------------
+r52:  nadim | 2005-10-28 23:03:32 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Depend.pm
+
+CHANGED: linked node warning messages
+----------------------------------------------------------------------
+r51:  nadim | 2005-10-27 03:07:28 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Inotify.pm
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  M  /local/PBS/trunk/watch_server.pl
+
+ADDED: Inotify usage in Warp1_5. tests are failing only when server is up
+----------------------------------------------------------------------
+r50:  nadim | 2005-10-26 23:41:22 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/Changes
+  M  /local/PBS/trunk/MANIFEST
+  A  /local/PBS/trunk/PBS/Inotify.pm
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  D  /local/PBS/trunk/PBS/old_GraphViz.pm
+  M  /local/PBS/trunk/watch_client.pl
+  M  /local/PBS/trunk/watch_server.pl
+
+ started integrating Inotify capability
+----------------------------------------------------------------------
+r49:  nadim | 2005-10-26 21:05:00 +0200
+Changed paths:
+  M  /local/PBS/trunk/MANIFEST
+  D  /local/PBS/trunk/Pbsfiles/cyclic/Pbs.prf
+  A  /local/PBS/trunk/Pbsfiles/cyclic/default_pbs.prf
+  D  /local/PBS/trunk/Pbsfiles/legend/Pbs.prf
+  A  /local/PBS/trunk/Pbsfiles/legend/default_pbs.prf
+  M  /local/PBS/trunk/Pbsfiles/miner/miner.prf
+  D  /local/PBS/trunk/Pbsfiles/node_subs/Pbs.prf
+  A  /local/PBS/trunk/Pbsfiles/node_subs/default_pbs.prf
+  M  /local/PBS/trunk/Pbsfiles/pure_perl_rule/nadim.prf
+  M  /local/PBS/trunk/doc/pnw2004/a_pbs_slide.pod
+  D  /local/PBS/trunk/test/hello/Pbs.prf
+  A  /local/PBS/trunk/test/hello/default_pbs.prf
+  D  /local/PBS/trunk/test/hello2/Pbs.prf
+  A  /local/PBS/trunk/test/hello2/default_pbs.prf
+
+CHANGED: use new perl base prf format in all examples
+----------------------------------------------------------------------
+r48:  nadim | 2005-10-26 20:53:02 +0200
+Changed paths:
+  M  /local/PBS/trunk/Changes
+
+
+----------------------------------------------------------------------
+r47:  nadim | 2005-10-26 20:51:31 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Digest.pm
+
+FIXED: AddNodeConfigVariableDependencies depends on the node config
+CHANGED: use Data::Compare to verify digest entries, this allows for serialization of perl data as entry values
+FIXED: typos
+ADDED: AddNodeConfigVariableDependencies documentation in POD
+----------------------------------------------------------------------
+r46:  nadim | 2005-10-26 20:47:43 +0200
+Changed paths:
+  M  /local/PBS/trunk/Pbsfiles/node_subs/Pbsfile.pl
+
+ADDED: AddNodeConfigVariableDependencies test when using node subs
+----------------------------------------------------------------------
+r45:  nadim | 2005-10-26 04:23:58 +0200
+Changed paths:
+  A  /local/PBS/trunk/watch_client.pl
+
+example client for watch_server.pl
+----------------------------------------------------------------------
+r44:  nadim | 2005-10-26 04:23:07 +0200
+Changed paths:
+  M  /local/PBS/trunk/watch_server.pl
+
+ADDED: handles multiple clients watches
+----------------------------------------------------------------------
+r43:  nadim | 2005-10-26 03:04:49 +0200
+Changed paths:
+  M  /local/PBS/trunk/watch_server.pl
+
+Made server single process and allow watches to be shared among projects
+----------------------------------------------------------------------
+r42:  nadim | 2005-10-25 04:11:52 +0200
+Changed paths:
+  D  /local/PBS/trunk/Pbsfiles/pbs_root
+
+REMOVED: pbs_root example was too trivial to keep
+----------------------------------------------------------------------
+r41:  nadim | 2005-10-25 04:10:09 +0200
+Changed paths:
+  A  /local/PBS/trunk/Pbsfiles/pbs_root
+  A  /local/PBS/trunk/Pbsfiles/pbs_root/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/pbs_root/d1
+  A  /local/PBS/trunk/Pbsfiles/pbs_root/d1/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/pbs_root/out_nadim
+  A  /local/PBS/trunk/Pbsfiles/pbs_root/out_nadim/Pbsfile_618def89b112398549e6ed0aedc7918b.warp1_5.pl
+  A  /local/PBS/trunk/Pbsfiles/pbs_root/repository
+  A  /local/PBS/trunk/Pbsfiles/pbs_root/repository/in_root
+
+ADDED: pbs root example
+----------------------------------------------------------------------
+r40:  nadim | 2005-10-25 04:09:35 +0200
+Changed paths:
+  M  /local/PBS/trunk/MANIFEST
+
+added watch server to distribution
+----------------------------------------------------------------------
+r39:  nadim | 2005-10-25 04:07:15 +0200
+Changed paths:
+  M  /local/PBS/trunk/pbs_test.pl
+
+dos2unix conversion
+----------------------------------------------------------------------
+r38:  nadim | 2005-10-25 03:12:06 +0200
+Changed paths:
+  M  /local/PBS/trunk/META.yml
+
+patched Module::Build
+----------------------------------------------------------------------
+r37:  nadim | 2005-10-25 03:09:59 +0200
+Changed paths:
+  M  /local/PBS/trunk/Changes
+
+latest additions
+----------------------------------------------------------------------
+r36:  nadim | 2005-10-25 03:09:13 +0200
+Changed paths:
+  A  /local/PBS/trunk/watch_server.pl
+
+prototype to use a inotify server with PBS
+----------------------------------------------------------------------
+r35:  nadim | 2005-10-25 02:18:51 +0200
+Changed paths:
+  M  /local/PBS/trunk/Plugins/SimplifyRule.pm
+
+wrote introduction documentation
+----------------------------------------------------------------------
+r34:  nadim | 2005-10-25 02:15:05 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Constants.pm
+
+allow lowercase rule attributes
+----------------------------------------------------------------------
+r33:  nadim | 2005-10-20 03:09:55 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Digest.pm
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+  M  /local/PBS/trunk/PBS/Warp1_6.pm
+
+MODIFIED: centralized warp md5 verification
+----------------------------------------------------------------------
+r32:  nadim | 2005-10-19 22:04:37 +0200
+Changed paths:
+  D  /local/PBS/trunk/Plugins/NodeChecker.pm
+
+REMOVED: This was not the right place to implement checking speedup
+----------------------------------------------------------------------
+r31:  nadim | 2005-10-19 04:32:35 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Check.pm
+  M  /local/PBS/trunk/PBS/DefaultBuild.pm
+  M  /local/PBS/trunk/Plugins/NodeChecker.pm
+
+ADDED: support for plugin to speedup checking (inotify and archive bit)
+----------------------------------------------------------------------
+r30:  nadim | 2005-10-19 04:31:40 +0200
+Changed paths:
+  M  /local/PBS/trunk/Todo.txt
+
+ADDED: new activities
+----------------------------------------------------------------------
+r29:  nadim | 2005-10-19 04:30:35 +0200
+Changed paths:
+  M  /local/PBS/trunk/Pbsfiles/prf_as_pbs_module/nadim.prf
+
+FIXED: neede to check this file again, problem with SVK?
+----------------------------------------------------------------------
+r28:  nadim | 2005-10-19 04:14:48 +0200
+Changed paths:
+  A  /local/PBS/trunk/Plugins/NodeChecker.pm
+
+ADDED: file
+----------------------------------------------------------------------
+r27:  nadim | 2005-10-19 04:13:26 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+
+CHANGED: register plugin switches as a whole not switch components
+----------------------------------------------------------------------
+r26:  nadim | 2005-10-19 04:11:58 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+
+FIXED: plugins must be scanned very early as they add switches
+----------------------------------------------------------------------
+r25:  nadim | 2005-10-19 04:10:26 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Check.pm
+
+REMOVED: comment that is not true anymore
+----------------------------------------------------------------------
+r24:  nadim | 2005-10-19 04:09:23 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Plugin.pm
+
+FIXED: plugin name display and RunSub stopped after first plugin
+----------------------------------------------------------------------
+r23:  nadim | 2005-10-19 02:53:35 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Plugin.pm
+
+revert to plugins that return nothing
+----------------------------------------------------------------------
+r22:  nadim | 2005-10-19 01:35:41 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Plugin.pm
+
+FIXED: missing return made RunPluginSub return something other than undef 
+----------------------------------------------------------------------
+r21:  nadim | 2005-10-19 01:08:26 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Warp1_5.pm
+
+REMOVED: useless dependency
+----------------------------------------------------------------------
+r20:  nadim | 2005-10-19 01:00:36 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/Plugin.pm
+
+ADDED: RunPluginSub can now return data
+----------------------------------------------------------------------
+r19:  nadim | 2005-10-18 21:27:40 +0200
+Changed paths:
+  M  /local/PBS/trunk/Todo.txt
+
+CHANGED: updated Todo list
+----------------------------------------------------------------------
+r18:  nadim | 2005-10-18 19:51:31 +0200
+Changed paths:
+  A  /local/PBS/trunk/PBSLib/Wizards/Prf.pl
+
+ADDED: perl prf example as a wizard
+----------------------------------------------------------------------
+r17:  nadim | 2005-10-18 19:23:24 +0200
+Changed paths:
+  M  /local/PBS/trunk/t/Misc/Targets.pm
+
+FIXED: more automatic tests
+----------------------------------------------------------------------
+r16:  nadim | 2005-10-18 17:41:17 +0200
+Changed paths:
+  M  /local/PBS/trunk/t/Misc/CommandLineFlags.pm
+
+CHANGED: merged test for new prf format
+----------------------------------------------------------------------
+r15:  nadim | 2005-10-18 17:38:54 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+
+CHANGED: give the user the possibility to run a wizard even if there are config errors
+----------------------------------------------------------------------
+r14:  nadim | 2005-10-18 17:20:41 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+  M  /local/PBS/trunk/doc/pnw2004/a_pbs_slide.pod
+
+ADDED: documentation for new format prf
+----------------------------------------------------------------------
+r13:  nadim | 2005-10-18 17:06:23 +0200
+Changed paths:
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+  M  /local/PBS/trunk/Todo.txt
+
+FIXED: proper checking of PBS configuration after Perl prf changes
+----------------------------------------------------------------------
+r10:  nadim | 2005-10-18 16:19:01 +0200
+Changed paths:
+  M  /local/PBS/trunk/MANIFEST
+
+ADDED: example prf to distribution
+----------------------------------------------------------------------
+r9:  nadim | 2005-10-18 16:06:54 +0200
+Changed paths:
+  A  /local/PBS/trunk/PBS/Prf.pm
+
+ADDED: PBS functions available in prf
+----------------------------------------------------------------------
+r8:  nadim | 2005-10-18 14:43:52 +0200
+Changed paths:
+  M  /local/PBS/trunk/MANIFEST
+  A  /local/PBS/trunk/Pbsfiles/prf_as_pbs_module/default_pbs.prf
+
+ADDED: default_pbs.prf example
+----------------------------------------------------------------------
+r7:  nadim | 2005-10-18 14:38:12 +0200
+Changed paths:
+  M  /local/PBS/trunk/Changes
+  M  /local/PBS/trunk/MANIFEST
+
+CHANGED: prf files are now perl
+----------------------------------------------------------------------
+r6:  nadim | 2005-10-18 14:33:50 +0200
+Changed paths:
+  M  /local/PBS/trunk/Build.PL
+  M  /local/PBS/trunk/Changes
+  M  /local/PBS/trunk/MANIFEST
+  M  /local/PBS/trunk/PBS/FrontEnd.pm
+  M  /local/PBS/trunk/PBS/PBSConfig.pm
+  M  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  M  /local/PBS/trunk/PBS/Plugin.pm
+  M  /local/PBS/trunk/Pbsfiles/prf_as_pbs_module/Pbsfile.pl
+
+CHANGED: prf files are now perl
+----------------------------------------------------------------------
+r5:  nadim | 2005-10-18 00:15:18 +0200
+Changed paths:
+  D  /local/PBS/trunk/Pbsfiles/prf_as_pbs_module/nadim.newprf
+  A  /local/PBS/trunk/Pbsfiles/prf_as_pbs_module/nadim.prf (from /local/PBS/trunk/Pbsfiles/prf_as_pbs_module/nadim.newprf:3)
+
+CHANGED: renamed to standard prf extension
+----------------------------------------------------------------------
+r4:  nadim | 2005-10-17 23:56:43 +0200
+Changed paths:
+  M  /local/PBS/trunk/Pbsfiles/prf_as_pbs_module/Pbsfile.pl
+
+verify switch parsing is OK
+----------------------------------------------------------------------
+r3:  nadim | 2005-10-17 23:43:14 +0200
+Changed paths:
+  A  /local/PBS/trunk/Build.PL
+  A  /local/PBS/trunk/Changes
+  A  /local/PBS/trunk/INSTALL
+  A  /local/PBS/trunk/MANIFEST
+  A  /local/PBS/trunk/META.yml
+  A  /local/PBS/trunk/PBS
+  A  /local/PBS/trunk/PBS/.links
+  A  /local/PBS/trunk/PBS/.links/Build
+  A  /local/PBS/trunk/PBS/.links/Graph
+  A  /local/PBS/trunk/PBS/.links/Rules
+  A  /local/PBS/trunk/PBS/.links/Shell
+  A  /local/PBS/trunk/PBS/Attributes.pm
+  A  /local/PBS/trunk/PBS/Build
+  A  /local/PBS/trunk/PBS/Build.pm
+  A  /local/PBS/trunk/PBS/Build/Forked.pm
+  A  /local/PBS/trunk/PBS/Build/ForkedNodeBuilder.pm
+  A  /local/PBS/trunk/PBS/Build/LightWeightServer.pm
+  A  /local/PBS/trunk/PBS/Build/NodeBuilder.pm
+  A  /local/PBS/trunk/PBS/Build/Threaded.pm
+  A  /local/PBS/trunk/PBS/Check.pm
+  A  /local/PBS/trunk/PBS/Config.pm
+  A  /local/PBS/trunk/PBS/Constants.pm
+  A  /local/PBS/trunk/PBS/Cyclic.pm
+  A  /local/PBS/trunk/PBS/Debug.pm
+  A  /local/PBS/trunk/PBS/DefaultBuild.pm
+  A  /local/PBS/trunk/PBS/Depend.pm
+  A  /local/PBS/trunk/PBS/Digest.pm
+  A  /local/PBS/trunk/PBS/Distributor.pm
+  A  /local/PBS/trunk/PBS/Documentation.pm
+  A  /local/PBS/trunk/PBS/FrontEnd.pm
+  A  /local/PBS/trunk/PBS/Graph
+  A  /local/PBS/trunk/PBS/Graph.pm
+  A  /local/PBS/trunk/PBS/Graph/Html.pm
+  A  /local/PBS/trunk/PBS/Graph/Snapshots.pm
+  A  /local/PBS/trunk/PBS/GraphViz.pm
+  A  /local/PBS/trunk/PBS/Information.pm
+  A  /local/PBS/trunk/PBS/Log.pm
+  A  /local/PBS/trunk/PBS/Output.pm
+  A  /local/PBS/trunk/PBS/PBS.pm
+  A  /local/PBS/trunk/PBS/PBSConfig.pm
+  A  /local/PBS/trunk/PBS/PBSConfigSwitches.pm
+  A  /local/PBS/trunk/PBS/Plugin.pm
+  A  /local/PBS/trunk/PBS/PostBuild.pm
+  A  /local/PBS/trunk/PBS/ProgressBar.pm
+  A  /local/PBS/trunk/PBS/Rules
+  A  /local/PBS/trunk/PBS/Rules.pm
+  A  /local/PBS/trunk/PBS/Rules/Builders.pm
+  A  /local/PBS/trunk/PBS/Rules/Creator.pm
+  A  /local/PBS/trunk/PBS/Rules/Dependers
+  A  /local/PBS/trunk/PBS/Rules/Dependers.pm
+  A  /local/PBS/trunk/PBS/Rules/Dependers/Subpbs.pm
+  A  /local/PBS/trunk/PBS/Rules/Metarules.pm
+  A  /local/PBS/trunk/PBS/Shell
+  A  /local/PBS/trunk/PBS/Shell.pm
+  A  /local/PBS/trunk/PBS/Shell/SSH.pm
+  A  /local/PBS/trunk/PBS/Shell/Telnet.pm
+  A  /local/PBS/trunk/PBS/Triggers.pm
+  A  /local/PBS/trunk/PBS/Warp1_5.pm
+  A  /local/PBS/trunk/PBS/Warp1_6.pm
+  A  /local/PBS/trunk/PBS/Wizard.pm
+  A  /local/PBS/trunk/PBS/old_GraphViz.pm
+  A  /local/PBS/trunk/PBSLib
+  A  /local/PBS/trunk/PBSLib/Builders
+  A  /local/PBS/trunk/PBSLib/Builders/MultiNodeBuilder.pm
+  A  /local/PBS/trunk/PBSLib/Configs
+  A  /local/PBS/trunk/PBSLib/Configs/ConfigureProject.pm
+  A  /local/PBS/trunk/PBSLib/Configs/ConfigureProjectVariablesAndRules.pm
+  A  /local/PBS/trunk/PBSLib/Configs/ShellCommands.pm
+  A  /local/PBS/trunk/PBSLib/Configs/gcc.pm
+  A  /local/PBS/trunk/PBSLib/Dependers
+  A  /local/PBS/trunk/PBSLib/Dependers/Locator.pm
+  A  /local/PBS/trunk/PBSLib/Dependers/Matchers.pm
+  A  /local/PBS/trunk/PBSLib/Language
+  A  /local/PBS/trunk/PBSLib/Language/Simplified.pm
+  A  /local/PBS/trunk/PBSLib/MetaRules
+  A  /local/PBS/trunk/PBSLib/MetaRules/FirstAndOnlyOneOnDisk.pm
+  A  /local/PBS/trunk/PBSLib/Rules
+  A  /local/PBS/trunk/PBSLib/Rules/C.pm
+  A  /local/PBS/trunk/PBSLib/Rules/C_depender.pm
+  A  /local/PBS/trunk/PBSLib/UserBuild
+  A  /local/PBS/trunk/PBSLib/UserBuild/BuildSequenceMiner.pm
+  A  /local/PBS/trunk/PBSLib/UserBuild/Multiple_O_Compile.pm
+  A  /local/PBS/trunk/PBSLib/Wizards
+  A  /local/PBS/trunk/PBSLib/Wizards/Breakpoint.pl
+  A  /local/PBS/trunk/PBSLib/Wizards/BuilderSub.pl
+  A  /local/PBS/trunk/PBSLib/Wizards/Creator.pl
+  A  /local/PBS/trunk/PBSLib/Wizards/Distributor.pl
+  A  /local/PBS/trunk/PBSLib/Wizards/NodeSub.pl
+  A  /local/PBS/trunk/PBSLib/Wizards/Plugin.pl
+  A  /local/PBS/trunk/PBSLib/Wizards/PostPbs.pl
+  A  /local/PBS/trunk/PBSLib/Wizards/SimpleDependerSub.pl
+  A  /local/PBS/trunk/PBSLib/Wizards/StandardPbsfile.pl
+  A  /local/PBS/trunk/PBSLib/Wizards/Subpbs.pl
+  A  /local/PBS/trunk/PBSLib/Wizards/menu.pl
+  A  /local/PBS/trunk/PBSLib/Wizards/template.pl
+  A  /local/PBS/trunk/Pbsfiles
+  A  /local/PBS/trunk/Pbsfiles/color
+  A  /local/PBS/trunk/Pbsfiles/color/pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/config
+  A  /local/PBS/trunk/Pbsfiles/config/bp.pl
+  A  /local/PBS/trunk/Pbsfiles/config/child.pl
+  A  /local/PBS/trunk/Pbsfiles/config/force.pl
+  A  /local/PBS/trunk/Pbsfiles/config/grand_daughter.pl
+  A  /local/PBS/trunk/Pbsfiles/config/grand_son.pl
+  A  /local/PBS/trunk/Pbsfiles/config/lock.pl
+  A  /local/PBS/trunk/Pbsfiles/config/parent.pl
+  A  /local/PBS/trunk/Pbsfiles/creator
+  A  /local/PBS/trunk/Pbsfiles/creator/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/creator/dependency_2_to_A
+  A  /local/PBS/trunk/Pbsfiles/creator/dependency_to_A
+  A  /local/PBS/trunk/Pbsfiles/cyclic
+  A  /local/PBS/trunk/Pbsfiles/cyclic/Pbs.prf
+  A  /local/PBS/trunk/Pbsfiles/cyclic/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/cyclic/a.c
+  A  /local/PBS/trunk/Pbsfiles/cyclic/a.h
+  A  /local/PBS/trunk/Pbsfiles/cyclic/b.c
+  A  /local/PBS/trunk/Pbsfiles/cyclic/b.h
+  A  /local/PBS/trunk/Pbsfiles/debug
+  A  /local/PBS/trunk/Pbsfiles/debug/1.pl
+  A  /local/PBS/trunk/Pbsfiles/debug/2.pl
+  A  /local/PBS/trunk/Pbsfiles/debug/3.pl
+  A  /local/PBS/trunk/Pbsfiles/debug/bp.pl
+  A  /local/PBS/trunk/Pbsfiles/digest
+  A  /local/PBS/trunk/Pbsfiles/digest/digest.pl
+  A  /local/PBS/trunk/Pbsfiles/error_messages
+  A  /local/PBS/trunk/Pbsfiles/error_messages/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/forced
+  A  /local/PBS/trunk/Pbsfiles/forced/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/frontend
+  A  /local/PBS/trunk/Pbsfiles/frontend/frontend.pl
+  A  /local/PBS/trunk/Pbsfiles/hosted
+  A  /local/PBS/trunk/Pbsfiles/hosted/host_ssh.pl
+  A  /local/PBS/trunk/Pbsfiles/hosted/world.c
+  A  /local/PBS/trunk/Pbsfiles/java
+  A  /local/PBS/trunk/Pbsfiles/java/HelloWorld.java
+  A  /local/PBS/trunk/Pbsfiles/java/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/language
+  A  /local/PBS/trunk/Pbsfiles/language/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/language_java
+  A  /local/PBS/trunk/Pbsfiles/language_java/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/legend
+  A  /local/PBS/trunk/Pbsfiles/legend/Pbs.prf
+  A  /local/PBS/trunk/Pbsfiles/legend/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/legend/config_legend.pl
+  A  /local/PBS/trunk/Pbsfiles/legend/cyclic_legend.pl
+  A  /local/PBS/trunk/Pbsfiles/legend/digest
+  A  /local/PBS/trunk/Pbsfiles/legend/existing_dependency
+  A  /local/PBS/trunk/Pbsfiles/legend/graphs
+  A  /local/PBS/trunk/Pbsfiles/legend/legend.pl
+  A  /local/PBS/trunk/Pbsfiles/legend/not_to_rebuild
+  A  /local/PBS/trunk/Pbsfiles/legend/subpbs.pl
+  A  /local/PBS/trunk/Pbsfiles/legend/subpbs2.pl
+  A  /local/PBS/trunk/Pbsfiles/legend/subpbs3.pl
+  A  /local/PBS/trunk/Pbsfiles/legend/trigger.pl
+  A  /local/PBS/trunk/Pbsfiles/locate_or_local
+  A  /local/PBS/trunk/Pbsfiles/locate_or_local/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/locate_or_local/trigger.pl
+  A  /local/PBS/trunk/Pbsfiles/micro_warp
+  A  /local/PBS/trunk/Pbsfiles/micro_warp/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/miner
+  A  /local/PBS/trunk/Pbsfiles/miner/miner.pl
+  A  /local/PBS/trunk/Pbsfiles/miner/miner.prf
+  A  /local/PBS/trunk/Pbsfiles/miner/miner_2.pl
+  A  /local/PBS/trunk/Pbsfiles/miner/miner_3.pl
+  A  /local/PBS/trunk/Pbsfiles/miner/miner_usb.pl
+  A  /local/PBS/trunk/Pbsfiles/multi
+  A  /local/PBS/trunk/Pbsfiles/multi/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/multi/sub.pl
+  A  /local/PBS/trunk/Pbsfiles/multi_node_builder
+  A  /local/PBS/trunk/Pbsfiles/multi_node_builder/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/node_subs
+  A  /local/PBS/trunk/Pbsfiles/node_subs/Pbs.prf
+  A  /local/PBS/trunk/Pbsfiles/node_subs/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/node_subs/common.h
+  A  /local/PBS/trunk/Pbsfiles/node_subs/main.c
+  A  /local/PBS/trunk/Pbsfiles/node_subs/world.c
+  A  /local/PBS/trunk/Pbsfiles/post_build
+  A  /local/PBS/trunk/Pbsfiles/post_build/post_build.pl
+  A  /local/PBS/trunk/Pbsfiles/prf_as_pbs_module
+  A  /local/PBS/trunk/Pbsfiles/prf_as_pbs_module/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/prf_as_pbs_module/nadim.newprf
+  A  /local/PBS/trunk/Pbsfiles/project_config
+  A  /local/PBS/trunk/Pbsfiles/project_config/1.pl
+  A  /local/PBS/trunk/Pbsfiles/project_config/2.pl
+  A  /local/PBS/trunk/Pbsfiles/project_config/3.pl
+  A  /local/PBS/trunk/Pbsfiles/pure_perl_rule
+  A  /local/PBS/trunk/Pbsfiles/pure_perl_rule/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/pure_perl_rule/nadim.prf
+  A  /local/PBS/trunk/Pbsfiles/remote_fork
+  A  /local/PBS/trunk/Pbsfiles/remote_fork/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/s
+  A  /local/PBS/trunk/Pbsfiles/s/s_a1.pl
+  A  /local/PBS/trunk/Pbsfiles/s/s_b1.pl
+  A  /local/PBS/trunk/Pbsfiles/s/s_b2.pl
+  A  /local/PBS/trunk/Pbsfiles/s/s_b3.pl
+  A  /local/PBS/trunk/Pbsfiles/s/s_c1.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/d1
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/d1/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/d1/d11
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/d1/d11/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd1
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd1/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd1/d1
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd1/d1/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd1/d1/d11
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd1/d1/d11/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd1/d1/d12
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd1/d1/d12/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd1/d2
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd1/d2/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd1/d2/d21
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd1/d2/d21/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd2
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd2/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd2/d2
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd2/d2/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd2/d2/d21
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd2/d2/d21/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd2/d3
+  A  /local/PBS/trunk/Pbsfiles/subpbs_locate/sd2/d3/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_space
+  A  /local/PBS/trunk/Pbsfiles/subpbs_space/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/subpbs_space/subpbs.pl
+  A  /local/PBS/trunk/Pbsfiles/test1
+  A  /local/PBS/trunk/Pbsfiles/test1/P2.pl
+  A  /local/PBS/trunk/Pbsfiles/test1/P3.pl
+  A  /local/PBS/trunk/Pbsfiles/test1/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/test1/cyclic.pl
+  A  /local/PBS/trunk/Pbsfiles/trigger
+  A  /local/PBS/trunk/Pbsfiles/trigger/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/trigger/trigger.pl
+  A  /local/PBS/trunk/Pbsfiles/user_build
+  A  /local/PBS/trunk/Pbsfiles/user_build/user_build.pl
+  A  /local/PBS/trunk/Pbsfiles/user_help
+  A  /local/PBS/trunk/Pbsfiles/user_help/Pbsfile.pl
+  A  /local/PBS/trunk/Pbsfiles/user_help/pod2htmd.tmp
+  A  /local/PBS/trunk/Pbsfiles/user_help/pod2htmi.tmp
+  A  /local/PBS/trunk/Pbsfiles/user_help/run.pl
+  A  /local/PBS/trunk/Plugins
+  A  /local/PBS/trunk/Plugins/CheckNodeName.pm
+  A  /local/PBS/trunk/Plugins/CreateDump.pm
+  A  /local/PBS/trunk/Plugins/CreateLog.pm
+  A  /local/PBS/trunk/Plugins/EvaluateShellCommand.pm
+  A  /local/PBS/trunk/Plugins/GraphGeneration.pm
+  A  /local/PBS/trunk/Plugins/PackageVisualisation.pm
+  A  /local/PBS/trunk/Plugins/PostPbs.pm
+  A  /local/PBS/trunk/Plugins/SimplifyRule.pm
+  A  /local/PBS/trunk/Plugins/TreeVisualisation.pm
+  A  /local/PBS/trunk/Plugins/Visualisation.pm
+  A  /local/PBS/trunk/README
+  A  /local/PBS/trunk/Todo.txt
+  A  /local/PBS/trunk/build_server.pl
+  A  /local/PBS/trunk/doc
+  A  /local/PBS/trunk/doc/Cookbook
+  A  /local/PBS/trunk/doc/Cookbook/C
+  A  /local/PBS/trunk/doc/Cookbook/C/Pbsfile.pl
+  A  /local/PBS/trunk/doc/Cookbook/C/hello_world.c
+  A  /local/PBS/trunk/doc/Cookbook/Java
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java/HelloWorld.java
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java/Pbsfile.pl
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java/documenting_pbsfile.html
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java/documenting_pbsfile.pl
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java/pod2htmd.tmp
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java/pod2htmi.tmp
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java/xxx
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_2
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_2/Main.java
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_2/Pbsfile.pl
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_2/Print.java
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jar
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jar/Main.java
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jar/Manifest.txt
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jar/Pbsfile.pl
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jar/Print.java
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jni
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jni/HelloWorldNative.c
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jni/HelloWorldNative.java
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jni/Pbsfile.pl
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jni/Pbsfile.pl.old
+  A  /local/PBS/trunk/doc/Cookbook/Java/simple_java_jni/Pbsfile.ulf
+  A  /local/PBS/trunk/doc/Cookbook/cookbook.html
+  A  /local/PBS/trunk/doc/Cookbook/cookbook.pod
+  A  /local/PBS/trunk/doc/Cookbook/pod2htmd.tmp
+  A  /local/PBS/trunk/doc/Cookbook/pod2htmi.tmp
+  A  /local/PBS/trunk/doc/PBS_short_introduction.pod
+  A  /local/PBS/trunk/doc/documenting_pbsfile.pod
+  A  /local/PBS/trunk/doc/how_fast_is_it
+  A  /local/PBS/trunk/doc/pbs_users_guide.pod
+  A  /local/PBS/trunk/doc/pbsum.tex
+  A  /local/PBS/trunk/doc/pnw2004
+  A  /local/PBS/trunk/doc/pnw2004/README
+  A  /local/PBS/trunk/doc/pnw2004/TODO
+  A  /local/PBS/trunk/doc/pnw2004/a_pbs_slide.pod
+  A  /local/PBS/trunk/doc/pnw2004/cyclic.png
+  A  /local/PBS/trunk/doc/pnw2004/cyclic2.png
+  A  /local/PBS/trunk/doc/pnw2004/examples
+  A  /local/PBS/trunk/doc/pnw2004/examples/package_fiddle.pl
+  A  /local/PBS/trunk/doc/pnw2004/legend.png
+  A  /local/PBS/trunk/doc/pnw2004/mono1.jpg
+  A  /local/PBS/trunk/doc/pnw2004/perl_style.css
+  A  /local/PBS/trunk/doc/pnw2004/pmiller.jpg
+  A  /local/PBS/trunk/doc/pnw2004/pod2htmd.tmp
+  A  /local/PBS/trunk/doc/pnw2004/pod2htmi.tmp
+  A  /local/PBS/trunk/doc/pnw2004/pod2slide.pl
+  A  /local/PBS/trunk/doc/pnw2004/trigger.png
+  A  /local/PBS/trunk/doc/reference_manual.pod
+  A  /local/PBS/trunk/doc/user_manual.pod
+  A  /local/PBS/trunk/licence.txt
+  A  /local/PBS/trunk/pbs.pl
+  A  /local/PBS/trunk/pbs_test.pl
+  A  /local/PBS/trunk/podhpp_config
+  A  /local/PBS/trunk/t
+  A  /local/PBS/trunk/t/AllTests.pm
+  A  /local/PBS/trunk/t/Correctness
+  A  /local/PBS/trunk/t/Correctness/DependencyGraphIsNotATree.pm
+  A  /local/PBS/trunk/t/Correctness/IncludeFiles.pm
+  A  /local/PBS/trunk/t/Correctness/OneCFile.pm
+  A  /local/PBS/trunk/t/Correctness/TwoCFiles.pm
+  A  /local/PBS/trunk/t/ErrorHandling
+  A  /local/PBS/trunk/t/ErrorHandling/BuildError.pm
+  A  /local/PBS/trunk/t/ErrorHandling/CyclicDependencies.pm
+  A  /local/PBS/trunk/t/ErrorHandling/NonExisting.pm
+  A  /local/PBS/trunk/t/Misc
+  A  /local/PBS/trunk/t/Misc/AddConfig.pm
+  A  /local/PBS/trunk/t/Misc/CDependencyGraph.pm
+  A  /local/PBS/trunk/t/Misc/CommandLineFlags.pm
+  A  /local/PBS/trunk/t/Misc/ExtraDependencies.pm
+  A  /local/PBS/trunk/t/Misc/Nodetypes.pm
+  A  /local/PBS/trunk/t/Misc/PbsUse.pm
+  A  /local/PBS/trunk/t/Misc/SourceDirectory.pm
+  A  /local/PBS/trunk/t/Misc/Subpbs.pm
+  A  /local/PBS/trunk/t/Misc/Targets.pm
+  A  /local/PBS/trunk/t/Misc/Triggers.pm
+  A  /local/PBS/trunk/t/PBS.pm
+  A  /local/PBS/trunk/t/Rules
+  A  /local/PBS/trunk/t/Rules/Builder.pm
+  A  /local/PBS/trunk/t/Rules/Dependencies.pm
+  A  /local/PBS/trunk/t/Rules/NodeAttributes.pm
+  A  /local/PBS/trunk/t/Rules/NodeSubs.pm
+  A  /local/PBS/trunk/t/Rules/ReplaceRule.pm
+  A  /local/PBS/trunk/t/TODO
+  A  /local/PBS/trunk/t/TestClassTemplate.pm
+  A  /local/PBS/trunk/t/documentation.pod
+  A  /local/PBS/trunk/t/run_many_times.t
+  A  /local/PBS/trunk/t/with_warp.t
+  A  /local/PBS/trunk/t/without_warp.t
+  A  /local/PBS/trunk/test
+  A  /local/PBS/trunk/test/hello
+  A  /local/PBS/trunk/test/hello/Pbs.prf
+  A  /local/PBS/trunk/test/hello/Pbsfile.pl
+  A  /local/PBS/trunk/test/hello/common.h
+  A  /local/PBS/trunk/test/hello/main.c
+  A  /local/PBS/trunk/test/hello/world.c
+  A  /local/PBS/trunk/test/hello2
+  A  /local/PBS/trunk/test/hello2/Pbs.prf
+  A  /local/PBS/trunk/test/hello2/Pbsfile.pl
+  A  /local/PBS/trunk/test/hello2/common.h
+  A  /local/PBS/trunk/test/hello2/main
+  A  /local/PBS/trunk/test/hello2/main/main.c
+  A  /local/PBS/trunk/test/hello2/main/main.pl
+  A  /local/PBS/trunk/test/hello2/world
+  A  /local/PBS/trunk/test/hello2/world/header
+  A  /local/PBS/trunk/test/hello2/world/header/reverse.h
+  A  /local/PBS/trunk/test/hello2/world/world.c
+  A  /local/PBS/trunk/test/hello2/world/world.h
+  A  /local/PBS/trunk/test/hello2/world/world.pl
+  A  /local/PBS/trunk/test/hello2/world/world2.h
+
+import PBS
+----------------------------------------------------------------------
+r2:  nadim | 2005-10-17 23:43:14 +0200
+Changed paths:
+  A  /local/PBS
+  A  /local/PBS/trunk
+
+Directory for svk import.
+----------------------------------------------------------------------

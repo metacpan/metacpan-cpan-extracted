@@ -1,0 +1,29 @@
+# This example illustrates one way to isolate the lexer and error subs
+# The lexer and subs are in module "TailModule.pm"
+%{
+use base 'TailModule';
+%}
+
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+
+%defaultaction { return  "$left $right $op"; }
+
+%%
+line: $exp  { print "$exp\n" }
+;
+
+exp:        $NUM  { $NUM }            
+        |   $VAR  { $VAR }            
+        |   VAR.left '='.op exp.right         
+        |   exp.left '+'.op exp.right         
+        |   exp.left '-'.op exp.right        
+        |   exp.left '*'.op exp.right       
+        |   exp.left '/'.op exp.right      
+        |   '-' $exp %prec NEG { "$exp NEG" }
+        |   '(' $exp ')' { $exp }      
+;
+
+%%

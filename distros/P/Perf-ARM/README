@@ -1,0 +1,91 @@
+Perf::ARM is a very simple XS wrapper around the Application
+Response Measurement interface. To quote the ARM FAQ:
+(http://www.cmg.org/regions/cmgarmw/armfaq.html)
+
+"What is ARM?
+  ARM stands for Application Response Measurement. It is an API
+  jointly developed by an industry partnership that is used to
+  monitor the availability and performance of applications. This
+  monitoring is done from the perspective of the application itself,
+  so it reflects those units of work that are important from the
+  perspective of the business."
+
+Basically, putting the arm_start and arm_stop calls in your C
+(and now perl) code will allow you to gather and view performance data
+with HP Openview tools, including Glance, and other consumers
+of ARM data, like Tivoli's tools.
+
+Documentation and links:
+    - as usual, try 'perldoc ARM.pm' or after install, 'perdoc Perf::ARM'
+      for usage info
+    - the test scripts in the t/ directory may serve as interesting
+      examples to get you started
+    - check out
+	+ ARM FAQ at http://www.cmg.org/regions/cmgarmw/armfaq.html
+	+ CMG ARM Working Group info page at
+	  http://www.cmg.org/regions/cmgarmw/
+	+ HP-UX: /opt/perf/include/arm.h or /usr/include/arm.h
+	+ Glance docs at http://www.openview.hp.com/products/
+
+Prerequisites:
+    - perl 5.005 or later
+      The module has only been heavily used with 5.6 -- older versions
+      may or may not work. Please report problems to me. In
+      particular, some implementations of libarm use threads, which
+      has not worked well for me with perl 5.004_04.
+
+    - A functioning cc, gcc, or ANSI compliant C compiler
+
+    - the ARM include file - generally /usr/include/arm.h
+
+    - a functioning ARM library (check for /usr/lib/libarm.* or build
+      and use the libarm from the CMG ARM SDK)
+      for HP-UX, this means the Measureware Glance Pak's libarm.sl
+      The default HP-UX installation includes a NOP library that
+      will allow an application that links with ARM to run, but
+      no ARM instrumentation will really be collected. The
+      same is true for this perl module -- it is possible to
+      use the perl ARM calls without checking error codes, and
+      a NOP libarm will be silently ignored. However, the
+      'make test' step of the Perf::ARM module installation *does*
+      check error codes, so it will fail if the any arm_* related
+      calls fail. Calls to the NOP library will fail, so the
+      'make test' will fail as well.
+
+HP-UX Installation notes:
+    - see /usr/include/arm.h for a list of the errors that
+      can be returned from the calls. Hint: search for ARM_INVID to jump
+      to the error code listing.
+    - You may need to make adjustments to your /var/opt/perf/ttd.conf
+      file to allow arm_init() and arm_getid() to succeed. See the
+      ttd.conf(4) man page for more information.
+
+Current limitations:
+    - 'make test' does not pass for the ARM SDK no-operation
+      (NULL) shared libraries, as the module expects real return
+      codes. The libagent library from the SDK works fine.
+    - the arm_update() routine is not supported yet
+    - user metrics and correlators have not been tested
+    - the module has only been tested on an HP-UX 11.00 system
+      using the Measureware/Glance libarm.sl
+    - this is my first submission to CPAN and my first XS module --
+      doubtless it shows. :) Feedback, suggestions,
+      constructive criticism, and random assistance are very welcome
+    - the tests included in t/ are very rudimentary
+    - some versions of perl built with usemymalloc='y' fail. Workaround:
+      rebuild with usemymalloc='n'.
+
+Glance note:
+    - on HP-UX systems with the Glance/Measureware tools, you may also
+      find a line like this useful for seeing the ARM traffic:
+	glance -adviser_only -j 5 -syntax /opt/perf/examples/adviser/arm
+
+Acknowledgements:
+    - Many thanks to Doug Grumann for the ARM examples and insights
+    - David Carter has sent several improvements to the tests and
+      demonstrated how to use Inline. Look for these in an upcoming
+      version of Perf::ARM.
+
+Copyright (c) 2001 Hewlett-Packard Company. All rights reserved.
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.

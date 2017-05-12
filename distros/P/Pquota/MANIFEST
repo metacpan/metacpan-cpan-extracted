@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+Pquota.pm
+README
+samples/README
+samples/boris
+samples/pquota_user_admin.pl
+t/test.t

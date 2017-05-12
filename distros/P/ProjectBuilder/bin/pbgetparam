@@ -1,0 +1,133 @@
+#!/usr/bin/perl -w
+#
+# Project Builder Distribution Parameter extractor
+#
+# $Id$
+#
+# Copyright B. Cornec 2007-2016
+# Provided under the GPL v2
+
+use strict 'vars';
+use Getopt::Long qw(:config auto_abbrev no_ignore_case);
+use Data::Dumper;
+use lib qw (lib);
+#use lib '/usr/share/perl5'; # mandatory for opensuse
+use ProjectBuilder::Base;
+use ProjectBuilder::Env;
+use ProjectBuilder::Distribution;
+use ProjectBuilder::Conf;
+
+=pod
+
+=head1 NAME
+
+pb, aka project-builder.org - builds packages for your projects
+
+=head1 DESCRIPTION
+
+pb helps you build various packages directly from your project sources.
+pbdistrogetparam is a command from the pb project providing the value of the parameter for the running distribution based on the most precise tuple
+It is a CLI version of the pb_distro_get_param function
+
+=head1 SYNOPSIS
+
+pbdistrogetparam [-h][-v][-p project][-d distro-ver-arch] [param|-a]
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h|--help>
+
+Prints this help
+
+=item B<-v|--verbose>
+
+Print a brief help message and exits.
+
+=item B<-d|--distribution>
+
+The tuple for which to print the parameter value considered (by default current distribution)
+
+=item B<-p|--project project_name>
+
+Name of the project you're working on (or use the env variable PBPROJ)
+
+=item B<-a|--all>
+
+Process all configuration parameters
+
+=back 
+
+=head1 ARGUMENTS
+
+Arguments is mandatory and corresponds to the parameter whose value is requested for the related distribution tuple.
+
+=head1 WEB SITES
+
+The main Web site of the project is available at L<http://www.project-builder.org/>. Bug reports should be filled using the trac instance of the project at L<http://trac.project-builder.org/>.
+
+=head1 USER MAILING LIST
+
+Cf: L<http://www.mondorescue.org/sympa/info/pb-announce> for announces and L<http://www.mondorescue.org/sympa/info/pb-devel> for the development of the pb project.
+
+=head1 CONFIGURATION FILES
+
+Uses the main /etc/pb/pb.conf (or /usr/local/etc/pb/pb.conf if installed from files) configuration file to give its answers.
+
+=head1 AUTHORS
+
+The Project-Builder.org team L<http://trac.project-builder.org/> lead by Bruno Cornec L<mailto:bruno@project-builder.org>.
+
+=head1 COPYRIGHT
+
+Project-Builder.org is distributed under the GPL v2.0 license
+described in the file C<COPYING> included with the distribution.
+
+=cut
+
+my %opts;					# CLI Options
+
+GetOptions(
+		"verbose|v+" => \$opts{'v'},
+		"help|h" => \$opts{'h'},
+		"all|a" => \$opts{'a'},
+		"project|p=s" => \$opts{'p'},
+		"distribution|d=s" => \$opts{'d'},
+);
+if (defined $opts{'h'}) {
+	pb_syntax(0,$opts{'h'}-1);
+}
+if (defined $opts{'man'}) {
+	pb_syntax(0,2);
+}
+if (defined $opts{'v'}) {
+	$pbdebug = $opts{'v'};
+}
+pb_log_init($pbdebug, \*STDOUT);
+
+my $dist = $opts{'d'};
+pb_env_init($opts{'p'},0,"none",0);
+my $pbos = pb_distro_get_context($dist);
+
+my @tab = @ARGV;
+@tab = pb_conf_get_all() if (defined $opts{'a'});
+
+my %rep;
+my $i = 0;
+# Index on prj
+foreach my $r (pb_conf_get(@tab)) {
+	$rep{$tab[$i]} = $r->{'default'} if (defined  $r->{'default'});
+	$rep{$tab[$i]} = $r->{$ENV{'PBPROJ'}} if (defined  $r->{$ENV{'PBPROJ'}});
+	$i++;
+}
+# Index on distro
+$i = 0;
+foreach my $r (pb_distro_get_param($pbos,pb_conf_get(@tab))) {
+	$rep{$tab[$i]} = $r if (defined $tab[$i]);
+	$i++;
+}
+foreach my $r (keys %rep) {
+	print "$r => " if ((defined $opts{'v'}) || (defined $opts{'a'}));
+	print "$rep{$r}\n";
+}

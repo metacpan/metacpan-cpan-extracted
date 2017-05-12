@@ -1,0 +1,43 @@
+Parallel::Fork::BossWorker
+==========================
+
+Parallel::Fork::BossWorker makes creating multiprocess applications easy.
+
+The module is designed to work in a queue style of setup; with the worker
+processes requesting 'work' from the boss process. The boss process
+transparently serializes and sends the work data to your work handler, to be
+consumed and worked. The worker process then transparently serializes and
+sends optional data back to the boss process to be handled in your result
+handler.
+
+This process repeats until the work queue is empty.
+
+See the POD documentation in BossWorker.pm for details on how to use
+P:F:BW.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Data::CGIForm
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2007 by Jeff Rodriguez
+
+Portions Copyright (c) 2011 Tim Wilde
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+$Id: README 7 2011-02-15 13:20:54Z twilde $

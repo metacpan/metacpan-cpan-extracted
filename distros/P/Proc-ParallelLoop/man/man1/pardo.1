@@ -1,0 +1,74 @@
+.TH PARDO "1" "November 2000" "Environment Utils" Byro
+.nh
+.SH NAME
+pardo \- run sh(1) commands in parallel
+.SH SYNOPSIS
+.B pardo
+[-v variable_name] [-c command_string] [-m max_processes] arg ...
+.br
+.SH DESCRIPTION
+.PP
+Reads sh commands (from standard input if no -c option given)
+and executes them once for each arg, setting an environment
+variable to the current arg for each run.  If -v is not given
+then "parvar" is used.  Execution of commands for each arg
+occurs in parallel processes.  Standard output and standard error
+output from parallel runs are serialized, so it looks the same as
+it would if the runs for each arg were executed sequentially in
+the order given.
+.br
+.SH RETURNS
+.PP
+Returns 0 status if all instances of the command string return 0.
+Otherwise, returns the nonzero status of the first command string instance
+to do likewise.  ("first" being relative to the order of the arguments
+given to pardo.)
+.br
+.TP
+\fB\-h, \-\-help\fR
+Display some help and exit
+.TP
+\fB\-v s, \-\-var=s\fR
+The name of an environment variable which will be set to one of the
+args when the sh(1) commands are executed.
+.TP
+\fB\-c s, \-\-commands=s\fR
+A string to be executed by sh(1) once for each arg.  If not given, pardo
+reads from standard input.
+.TP
+\fB\-m i, \-\-maxprocs=i\fR
+The maximum number of worker processes to allow to exist at a time.
+The default is 5.  When the maximum number of processes are spawned,
+pardo waits until one completes before starting a new instance of the
+command string.
+.SH ENVIRONMENT
+.TP
+\fBparvar\fR
+This is the name of the environment variable that parvar uses by default to
+pass arguments to your command string.  You can use the -v option to specify
+a different name.
+.SH EXAMPLES
+.PP
+   pardo -c 'makewhatis $parvar' /usr/man /usr/local/man
+.PP
+Builds indexes for each man directory in parallel.
+(You wouldn't want to do this if your man directories are all on the same
+partition.)
+.PP
+   pardo /usr/man /usr/local/man <<odrap
+.br
+      makewhatis \\$parvar
+.br
+   odrap
+.PP
+Same as above, but uses standard input to simulate the appearance of a
+for loop.  Potentially reasonable for using pardo in scripts.
+.SH "REPORTING BUGS"
+.PP
+Report bugs to <bdarrah@pacbell.net>.
+.SH "SEE ALSO"
+.PP
+sh(1)
+.SH AUTHOR
+.PP
+Byron Darrah <bdarrah@pacbell.net>

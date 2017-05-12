@@ -1,0 +1,41 @@
+</div>
+
+<div id="sidebar">
+[% IF visitedPages.size > 0 %]
+<div class='box'>
+<h3>Your Visited Pages</h3>
+
+<p>
+  [% FOREACH page = visitedPages %]
+  <a href="[% baseUrl %]?[% page.id %]">[% page.pageName %]</a><br />
+  [% END %]
+</p>
+</div>
+[% END %]
+
+[% IF backlinksUrl %]
+<div class='box'>
+<h3><a href="[% backlinksUrl %]">View Backlinks</a></h3>
+</div>
+[% END %]
+
+<div class='box'>
+[% INCLUDE common/searchbar.tt %]
+</div>
+</div>
+</div>
+
+<div id="footer">
+<div class='left'>
+[% INCLUDE common/pagebar.tt %]
+</div>
+<div class='right'>
+<a href="http://www.blueoxen.org/tools/purplewiki/">
+<span class="poweredby">PurpleWiki</span></a><br />
+<a href="[% baseUrl %]?action=rss">
+<span class="syndicate">RSS</span></a>
+</div>
+</div>
+
+</body>
+</html>

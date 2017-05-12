@@ -1,0 +1,253 @@
+NAME
+    POE::Component::Server::RADIUS - a POE based RADIUS server component
+
+VERSION
+    version 1.08
+
+SYNOPSIS
+       use strict;
+       use Net::Radius::Dictionary;
+       use POE qw(Component::Server::RADIUS);
+
+       # Lets define some users who we'll allow access if they can provide the password
+       my %users = (
+               aj => '0fGbqzu0cfA',
+               clippy => 'D)z5gcjex1fB',
+               cobb => '3ctPbe,cyl8K',
+               crudpuppy => '0"bchMltV7dz',
+               cthulhu => 'pn}Vbe0Dwr5z',
+               matt => 'dyQ4sZ^x0eta',
+               mike => 'iRr3auKbv8l>',
+               mrcola => 'ynj4H?jec1Ol',
+               tanya => 'korvS2~Rip4f',
+               tux => 'Io2obo2kT%xq',
+       );
+
+       # We need a Net::Radius::Dictionary object to pass to the poco
+       my $dict = Net::Radius::Dictionary->new( 'dictionary' );
+
+       my $radiusd = POE::Component::Server::RADIUS->spawn( dict => $dict );
+
+       # Add some NAS devices to the poco
+       $radiusd->add_client( name => 'creosote', address => '192.168.1.73', secret => 'Po9hpbN^nz6n' );
+       $radiusd->add_client( name => 'dunmanifestin', address => '192.168.1.17', secret => '9g~dorQuos5E' );
+       $radiusd->add_client( name => 'genua', address => '192.168.1.71', secret => 'Qj8zmmr3hZb,' );
+       $radiusd->add_client( name => 'ladysybilramkin', address => '192.168.1.217', secret => 'j8yTuBfl)t2s' );
+       $radiusd->add_client( name => 'mort', address => '192.168.1.229', secret => '8oEhfKm(krr0' );
+       $radiusd->add_client( name => 'ysabell', address => '192.168.1.84', secret => 'i8quDld_2suH' );
+
+       POE::Session->create(
+          package_states => [
+                    'main' => [qw(_start _authenticate _accounting)],
+          ],
+          heap => { users => \%users, },
+       );
+
+       $poe_kernel->run();
+       exit 0;
+
+       sub _start {
+         # We need to register with the poco to receive events
+         $poe_kernel->post(
+                $radiusd->session_id(),
+                'register',
+                authevent => '_authenticate',
+                acctevent => '_accounting'
+         );
+         return;
+       }
+
+       sub _authenticate {
+         my ($kernel,$sender,$heap,$client,$data,$req_id) = @_[KERNEL,SENDER,HEAP,ARG0,ARG1,ARG2];
+         # Lets ignore dodgy requests
+         return unless $data->{'User-Name'} and $data->{'User-Password'};
+         # Send a reject if the username doesn't exist
+         unless ( $heap->{users}->{ $data->{'User-Name'} } ) {
+            $kernel->call( $sender, 'reject', $req_id );
+            return;
+         }
+         # Does the password match? If not send a reject
+         unless ( $heap->{users}->{ $data->{'User-Name'} } eq $data->{'User-Password'} ) {
+            $kernel->call( $sender, 'reject', $req_id );
+            return;
+         }
+         # Okay everything is cool.
+         $kernel->call( $sender, 'accept', $req_id );
+         return;
+       }
+
+       sub _accounting {
+         my ($kernel,$sender,$heap,$client,$data) = @_[KERNEL,SENDER,HEAP,ARG0,ARG1];
+         # Do something with the data provided, like log to a database or a file
+         return;
+       }
+
+DESCRIPTION
+    POE::Component::Server::RADIUS is a POE component that provides Remote
+    Authentication Dial In User Service (RADIUS) server services to other
+    POE sessions and components.
+
+    RADIUS is commonly used by ISPs and corporations managing access to
+    Internet or internal networks and is an AAA (authentication,
+    authorisation, and accounting) protocol.
+
+    The component deals with the receiving and transmission of RADIUS
+    packets and uses the excellent Net::Radius::Packet and
+    Net::Radius::Dictionary modules to construct the RADIUS packets.
+
+    Currently only PAP authentication is supported. Help and advice would be
+    appreciated on implementing others. See contact details below.
+
+    The component does not deal with the actual authentication of users nor
+    with the logging of accounting data. That is the job of other sessions
+    which register with the component to receive events.
+
+CONSTRUCTOR
+    "spawn"
+        Creates a new POE::Component::Server::RADIUS session that starts
+        various UDP sockets. Takes one mandatory and a number of optional
+        parameters:
+
+          'dict', a Net::Radius::Dictionary object reference, mandatory;
+          'alias', set an alias that you can use to address the component later;
+          'options', a hashref of POE session options;
+          'authport', specify a port to listen on for authentication requests;
+          'acctport', specify a port to listen on for accounting requests;
+          'legacy', set to a true value to make the component honour legacy listener ports;
+          'timeout', set a time out in seconds that the poco waits for sessions to respond to auth requests,
+                     default 10;
+
+        By default the component listens on ports 1812 and 1813 for
+        authentication and accounting requests, respectively. These are the
+        "official" ports from the applicable RFCs. Setting "legacy" option
+        makes the component also listen on ports 1645 and 1646.
+
+        Returns a POE::Component::Server::RADIUS object, which provides the
+        following methods:
+
+METHODS
+    "add_client"
+        Adds a RADIUS client to the server configuration. RADIUS clients
+        need to be registered with their IP address and a shared secret.
+        Takes a number of required parameters:
+
+          'name', a unique reference name;
+          'address', an IPv4 address;
+          'secret', a shared secret pass-phrase;
+
+    "del_client"
+        Removes a previously registered RADIUS client. Takes one argument,
+        either a "name" or an IPv4 address.
+
+    "session_id"
+        Takes no arguments. Returns the POE Session ID of the component.
+
+    "shutdown"
+        Terminates the component.
+
+    "authports"
+        Returns a list of all the UDP ports configured for authentication
+        requests.
+
+    "acctports"
+        Returns a list of all the UDP ports configured for accounting
+        requests.
+
+    "dictionary"
+        Returns a reference to the Net::Radius::Dictionary object that was
+        supplied to "spawn".
+
+INPUT EVENTS
+    These are events that the component will accept:
+
+    "register"
+        This will register the sending session to receive events from the
+        component. It requires either one of the following parameters. You
+        may specify both if you require:
+
+          'authevent', event in your session that will be triggered for authentication requests;
+          'acctevent', event in your session that will be triggered for accounting requests;
+
+        The component automatically responds to accounting requests.
+
+        Authentication requests require your session to send either an
+        "accept" or "reject" response back to the component.
+
+    "accept"
+        Tells the component to send an "Access-Accept" response back to the
+        requesting client. Requires one mandatory argument which is a
+        request_id previously given you by the component (See OUTPUT EVENTS
+        for details). The remaining parameters are assumed to be RADIUS
+        attributes that you want adding to the "Access-Accept" response.
+        Check with the RFC for what attributes are valid.
+
+    "reject"
+        Tells the component to send an "Access-Reject" response back to the
+        requesting client. Requires one mandatory argument which is a
+        request_id previously given you by the component (See OUTPUT EVENTS
+        for details). The remaining parameters are assumed to be RADIUS
+        attributes that you want adding to the "Access-Reject" response.
+        Check with the RFC for what attributes are valid.
+
+    "unregister"
+        This will unregister the sending session from receiving events.
+
+    "shutdown"
+        Terminates the component.
+
+OUTPUT EVENTS
+    Dependent on which event types your session registered with the
+    component to receive, you will get either one or the other of these or
+    both.
+
+    "acctevent" type events
+        ARG0 will be the IP address of the RADIUS client. The component will
+        have already discarded accounting requests from clients which don't
+        have a matching IP address and shared-secret. ARG1 will be hashref
+        containing RADIUS attributes and value pairs. ARG2 will be a
+        Net::Radius::Packet object representing the request.
+
+        As the component automatically responds to valid clients with an
+        "Accounting-Response" packet, your session need not take any further
+        action in response to these events.
+
+    "authevent" type events
+        ARG0 will be the IP address of the RADIUS client. The component will
+        have already 'decrypted' the "User-Password" provided using the
+        configured shared-secret for the RADIUS client. ARG1 will be a
+        hashref containing RADIUS attributes and value pairs. ARG3 will be a
+        unique request_id required when sending "accept" or "reject" events
+        back to the component. ARG4 will be a Net::Radius::Packet object
+        representing the request.
+
+        You must check the validity of the request and then issue either an
+        "accept" or "reject" event back to the component using the
+        request_id and specifying any RADIUS attributes that you wish
+        conveyed to the client.
+
+        The component times out authentication requests to prevent stale
+        requests. This timeout is configurable through the "spawn"
+        constructor.
+
+        To get timely responses back to RADIUS clients it is suggested that
+        you use "call" instead of "post" to send "accept" or "reject" events
+        back to the component.
+
+SEE ALSO
+    POE
+
+    <http://en.wikipedia.org/wiki/RADIUS>
+
+    <http://www.faqs.org/rfcs/rfc2138.html>
+
+    <http://www.faqs.org/rfcs/rfc2866.html>
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

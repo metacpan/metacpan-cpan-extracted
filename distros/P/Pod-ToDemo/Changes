@@ -1,0 +1,43 @@
+Changes for Pod::ToDemo
+
+1.20110709 2011-07-08 17:35:47 America/Los_Angeles
+
+1.20110614 2011-06-14 15:34:28 America/Los_Angeles
+    - fixed Git links in metadata
+
+1.20110613 2011-06-12 20:22:51 America/Los_Angeles
+    - ported to Dist::Zilla
+    - removed troublesome signature tests
+
+Sat Nov 19 06:13:35 UTC 2005  chromatic
+	- version 1.01
+	- fixed simple use not to behave badly when using a demo as a module
+	- improved documentation to show the two use cases
+	- removed useless code
+
+Sat Jul  9 00:22:17 UTC 2005  chromatic
+	- bumped up version number to 1.00
+	- added POD and POD coverage tests
+	- create traditional Makefile.PL from Build.PL
+	- improved POD
+	- removed generated files from source control
+
+Fri Dec 24 20:24:07 UTC 2004  chromatic
+	- actually release 0.22
+	- sign the distribution
+	- clean up Build.PL slightly
+
+Thu Nov 18 06:28:39 UTC 2004  chromatic
+	- one more test tweak for Windows users (thanks to Robert Rothenberg
+
+Wed Aug 18 17:25:01 UTC 2004  chromatic
+	- fix a test bug for Windows users
+	- add back in test plan in t/base.t
+
+Wed Aug 18 05:13:33 UTC 2004  chromatic
+	- bugfix release 0.20
+	- improved tests
+	- revised method of calling so it actually works (thanks to Greg Lepore)
+
+Fri Dec 26 20:30:31 UTC 2003  chromatic
+	- initial release 0.10

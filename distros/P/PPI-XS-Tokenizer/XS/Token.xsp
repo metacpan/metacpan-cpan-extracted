@@ -1,0 +1,10 @@
+
+%module{PPI::XS::Tokenizer};
+
+%name{PPI::XS::Tokenizer::Token} class Token
+{
+  %name{new} Token();
+  ~Token();
+};
+
+

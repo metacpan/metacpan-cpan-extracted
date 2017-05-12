@@ -1,0 +1,25 @@
+Revision history for Perl extension Parse::CSV
+0.07 Sat 05 Mar 2016
+    - META.yml was missing
+0.06 Fri 04 Mar 2016
+	- Methods string and fields are deprecated in Text::CSV_XS
+	  now they are in Parse::CSV
+0.05 Fri 13 Jan 2012
+	- bugfix: now it also works with version 1.99 of parent module
+0.04 Wed 11 May 2011
+	- adding new method
+		- "pushcombine" adds fields at the end of the actual row
+0.03 Wed 23 Mar 2011
+	First working version
+	- adding new methods:
+		- "colnames" gets or sets colnames of hashes.
+		- "pushcolnames" adds colnames at the end of your fields-array. 
+		- "fields" 
+
+0.02 Fri 11 Mar 2011
+	- Deleting all working methods
+	- Correcting all not working methods
+		- combine, string and print
+
+0.01 Thu 10 Mar 2011
+	- Copying of Parse::CSV

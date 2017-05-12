@@ -1,0 +1,18 @@
+Revision history for Pod-Weaver-Section-AllowOverride
+
+0.05   2014-05-05
+	- Don't use given/when, as Perl 5.18 marked it experimental
+
+0.04   2013-01-05
+	- Add the match_anywhere attribute
+	- Add tests
+
+0.03   2012-08-11
+	- Use Pod::Elemental::MakeSelector instead of building a
+	  selector by hand
+
+0.02   2012-06-06
+	- Add the action attribute
+
+0.01   2012-06-01
+	- Initial release

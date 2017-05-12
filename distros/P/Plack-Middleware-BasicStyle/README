@@ -1,0 +1,49 @@
+Plack-Middleware-BasicStyle version 0.001
+=========================================
+
+Plack::Middleware::BasicStyle is a Plack middleware that adds a basic
+<style> element to HTML pages that do not have a stylesheet.
+
+The default style, taken from
+L<http://bettermotherfuckingwebsite.com>, is (before minification):
+
+  <style>
+    body {
+      margin:40px auto;
+      max-width: 650px;
+      line-height: 1.6;
+      font-size:18px;
+      color:#444;
+      padding:0 10px
+    }
+
+    h1,h2,h3 {
+      line-height:1.2
+    }
+  </style>
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* HTML::Parser
+* Plack
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.24.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

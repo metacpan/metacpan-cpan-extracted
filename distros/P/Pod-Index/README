@@ -1,0 +1,28 @@
+Pod::Index version 0.14
+=======================
+
+The Pod-Index distributions includes various modules for indexing and
+searching POD that is marked appropriately with X<> POD codes.
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+        perl-5.8.0+
+
+        Search::Dict => 0,
+        Pod::Parser  => 1,
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 Ivan Tubert-Brohman <itub@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,98 @@
+Plugins-Factory version 0.01
+============================
+NAME
+    Plugins::Factory - simple plugins factory.
+
+SYNOPSIS
+    - - - - - - - - - - - - - - - - - - - -
+
+        package MyProject::MyModel::News;
+        # some model
+
+    sub new { bless( ref $_[1] eq 'HASH' ? $_[1] : {}, $[0] ) }
+        sub get_news {print $_[0]->{'news'}}
+
+    1;
+
+    - - - - - - - - - - - - - - - - - - - -
+
+    package MyProject::MyModel::Rss;
+        # some model
+        use LWP;
+
+    my $singletone;
+
+    sub new {
+            unless ($singletone) {
+                    $singletone = LWP::UserAgent->new();
+            }
+            return $singletone;
+        }
+        sub get_rss {...}
+
+    1;
+
+    - - - - - - - - - - - - - - - - - - - -
+
+        package MyProject::MyController::Newspaper;
+        # some controller
+
+    sub init {__PACKAGE__}
+        sub process {
+            my ($class,@param) = @_;
+            ...
+        }
+
+    1;
+
+    - - - - - - - - - - - - - - - - - - - -
+
+    package MyApplication;
+        # you app
+        use Plugins::Factory
+                        model => {
+                            plugin_namespace => 'MyProject::MyModel',
+                            init_method => 'new'
+                        },
+                        controller => {
+                            plugin_namespace => 'MyProject::MyController',
+                            init_method => 'init'
+                        };
+
+    MyApplication->model('News',{news=>'some news'})->get_news();
+        # equvalent MyProject::MyModel::News->new({news=>'some news'})->get_news()
+
+    MyApplication->model('MyProject::MyModel::News',{news=>'some news'})->get_news();
+        # alternative call
+
+    MyApplication->model('Rss')->get_rss(@param);
+        # equvalent MyProject::MyModel::Rss->new()->get_rss(@param)
+
+    MyApplication->controller('Newspaper')->process(@param);
+        # equvalent MyProject::MyController::Newspaper->init()->process(@param)
+
+DESCRIPTION
+    Plugins::Factory find and load your plugin and save link to initial
+    method. Every time, when you call plugins group alias with short (or full)
+    plugin name, Plugins::Factory execute link to initial method. This is good
+    for custom application with MVC, when you need in intuitive interface.
+
+  CALL SYNOPSIS
+        use Plugins::Factory
+                        name_group => {
+                            plugin_namespace => 'namespace::to::group::plugin',
+                            init_method => 'name_method_to_call_when_you_call_name_group'
+                        },...;
+
+    alternative
+
+        require Plugins::Factory;
+        Plugins::Factory->import(
+                        name_group => {
+                            plugin_namespace => 'namespace::to::group::plugin',
+                            init_method => 'name_method_to_call_when_you_call_name_group'
+                        },...
+        );
+
+AUTHOR
+    Ivan Sivirinov

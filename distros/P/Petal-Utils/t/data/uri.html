@@ -1,0 +1,15 @@
+<html xmlns:tal="http://purl.org/petal/1.0/">
+	<body>
+		<p>
+			<!--? Uri Escape -->
+			&   ${uri_escape: $and}
+			' ' ${uri_escape: 	space}
+			,   ${uri_escape: 	comma}
+			;   ${uri_escape: 	scolon}
+			/   ${uri_escape: 	slash}
+			?   ${uri_escape: 	qmark}
+			.   ${uri_escape: 	dot}
+		</p>
+	</body>
+</html>
+

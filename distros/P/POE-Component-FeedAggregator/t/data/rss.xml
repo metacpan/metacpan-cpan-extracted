@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rss version="2.0"
+ xmlns:blogChannel="http://backend.userland.com/blogChannelModule"
+ xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+ xmlns:content="http://purl.org/rss/1.0/modules/content/"
+ xmlns:atom="http://www.w3.org/2005/Atom"
+ xmlns:dcterms="http://purl.org/dc/terms/"
+>
+
+<channel>
+<title></title>
+<link></link>
+<description></description>
+
+<item>
+<title>vti: Technical details on implementing a WebSocket VNC client</title>
+<link>http://showmetheco.de/articles/2010/11/technical-details-on-implementing-a-websocket-vnc-client.html</link>
+<author>vti</author>
+<guid isPermaLink="true">http://showmetheco.de/articles/2010/11/technical-details-on-implementing-a-websocket-vnc-client.html</guid>
+<content:encoded>&#x3C;p&#x3E;Now I am going to explain more details about the previous &#x3C;a href=&#x22;http://showmetheco.de/articles/2010/11/perl-websockets-and-vnc-in-your-browser.html&#x22; class=&#x22;podlinkurl&#x22;&#x3E;http://showmetheco.de/articles/2010/11/perl-websockets-and-vnc-in-your-browser.html&#x3C;/a&#x3E; post.&#x3C;/p&#x3E;
+&#x3C;div class=&#x22;more&#x22;&#x3E;&#x26;rarr; &#x3C;a href=&#x22;/articles/2010/11/technical-details-on-implementing-a-websocket-vnc-client.html#cut&#x22;&#x3E;Keep reading&#x3C;/a&#x3E;&#x3C;/div&#x3E;
+
+</content:encoded>
+<dcterms:modified>2010-11-05T15:54:00Z</dcterms:modified>
+</item>
+<item>
+<title>Tokuhiro Matsuno: [perl]DBIx::Skinny&#xE2;&#x80;&#x99;s trigger strategy</title>
+<link>http://d.hatena.ne.jp/tokuhirom/20101105/1288951436</link>
+<author>Tokuhiro Matsuno</author>
+<guid isPermaLink="true">http://d.hatena.ne.jp/tokuhirom/20101105/1288951436</guid>
+<content:encoded>my $row = $db-&#x26;gt;insert($args); pre_insert: ($db, $args, $table_name) post_insert: ($db, $row, $table_name) my $updated_rows_count = $db-&#x26;gt;update($args); my $updated_rows_count = $row-&#x26;gt;update(); # example $args: +{ id =&#x26;gt; $row-&#x26;gt;id } pre_update: ($db, $ar [...]
+</content:encoded>
+<dcterms:modified>2010-11-05T10:03:56Z</dcterms:modified>
+</item>
+<item>
+<title>Renee Baecker: Perl Ecosystem Group</title>
+<link>http://reneeb-perlblog.blogspot.com/2010/11/perl-ecosystem-group.html</link>
+<author>Renee Baecker</author>
+<guid isPermaLink="true">http://reneeb-perlblog.blogspot.com/2010/11/perl-ecosystem-group.html</guid>
+<content:encoded>Zusammen mit &#x3C;a href=&#x22;http://szabgab.com/&#x22;&#x3E;Gabor Szabo&#x3C;/a&#x3E; habe ich die &#x3C;a href=&#x22;http://perl-ecosystem.com/&#x22;&#x3E;Perl Ecosystem Group&#x3C;/a&#x3E; gestartet. Diese Organisation soll die Verbindung zwischen Unternehmen, die &#x3C;a href=&#x22;http://www.perl.org/&#x22;&#x3E;Perl&#x3C;/a&#x3E; einsetzen, und der Perl Community verbessern.&#x3C;br/&#x3E;
+&#x3C;br/&#x3E;
+Unsere Ziele sind:&#x3C;br/&#x3E;
+&#x3C;ul&#x3E;
+&#x3C;li&#x3E;Unternehmen helfen mehr gute Perl-Programmierer [...]&#x3C;/li&#x3E;
+&#x3C;/ul&#x3E;
+
+</content:encoded>
+<dcterms:modified>2010-11-05T10:02:00Z</dcterms:modified>
+</item>
+<item>
+<title>Toru Yamaguchi: [Perl][MySQL] Time::Piece::MySQL &#xE3;&#x81;&#xA8;&#xE3;&#x82;&#xBF;&#xE3;&#x82;&#xA4;&#xE3;&#x83;&#xA0;&#xE3;&#x82;&#xBE;&#xE3;&#x83;&#xBC;&#xE3;&#x83;&#xB3;</title>
+<link>http://d.hatena.ne.jp/ZIGOROu/20101105/1288927369</link>
+<author>Toru Yamaguchi</author>
+<guid isPermaLink="true">http://d.hatena.ne.jp/ZIGOROu/20101105/1288927369</guid>
+<content:encoded>MySQL &#xE3;&#x81;&#x8B;&#xE3;&#x82;&#x89; UNIX_TIMESTAMP() &#xE3;&#x81;&#xA8; NOW() &#xE3;&#x81;&#xAE;&#xE5;&#x80;&#xA4;&#xE3;&#x82;&#x92;&#xE3;&#x81;&#x93;&#xE3;&#x82;&#x93;&#xE3;&#x81;&#xAA;&#xE6;&#x84;&#x9F;&#xE3;&#x81;&#x98;&#xE3;&#x81;&#xA7;&#xE5;&#x87;&#xBA;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x99;&#xE3;&#x80;&#x82; [12:13:13 root@bopobo/test :4] SELECT UNIX_TIMESTAMP(), NOW(); +------------------+---------------------+ | UNIX_TIMESTAMP() | NOW() | +------------------+---------------------+ | 1288926767 | 2010-11 [...]
+</content:encoded>
+<dcterms:modified>2010-11-05T03:22:49Z</dcterms:modified>
+</item>
+<item>
+<title>Gabor Szabo (szabgab): Perl Ecosystem Group</title>
+<link>http://szabgab.com/blog/2010/11/perl-ecosystem-group.html</link>
+<author>Gabor Szabo (szabgab)</author>
+<guid isPermaLink="true">http://szabgab.com/blog/2010/11/perl-ecosystem-group.html</guid>
+<content:encoded>Finally it is happening. Renee Baecker and myself have established the Perl Ecosystem Group. We have several items on our agenda such as Helping companies to be better connected to the Perl community. Helping companies to find more good Perl develope [...]
+</content:encoded>
+<dcterms:modified>2010-11-05T02:44:00Z</dcterms:modified>
+</item>
+<item>
+<title>chromatic: Composability, Scoping, and Non-Interference</title>
+<link>http://www.modernperlbooks.com/mt/2010/11/composability-scoping-and-non-interference.html</link>
+<author>chromatic</author>
+<guid isPermaLink="true">http://www.modernperlbooks.com/mt/2010/11/composability-scoping-and-non-interference.html</guid>
+<content:encoded>Perl 5&#x27;s flexibility allows the CPAN to exist and CPAN&#x27;s flexibility allows Perl 5 to evolve. Where would Perl be without the DBI or TAP? Imagine using Perl 5 without LWP or Moose or Perl::Critic. Even so, the difference between...
+</content:encoded>
+<dcterms:modified>2010-11-04T19:32:11Z</dcterms:modified>
+</item>
+<item>
+<title>Craftworks: [perl][cpan] WWW::Curl &#xE3;&#x81;&#xA7;&#xE4;&#xBD;&#xBF;&#xE3;&#x81;&#x88;&#xE3;&#x82;&#x8B;&#xE3;&#x82;&#xAA;&#xE3;&#x83;&#x97;&#xE3;&#x82;&#xB7;&#xE3;&#x83;&#xA7;&#xE3;&#x83;&#xB3;&#xE4;&#xB8;&#x80;&#xE8;&#xA6;&#xA7;</title>
+<link>http://d.hatena.ne.jp/Craftworks/20101104/1288889018</link>
+<author>Craftworks</author>
+<guid isPermaLink="true">http://d.hatena.ne.jp/Craftworks/20101104/1288889018</guid>
+<content:encoded>WWW::Curl &#xE3;&#x81;&#xAF;&#xE9;&#x80;&#x9F;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x99;&#xE3;&#x81;&#x8C;&#xE3;&#x83;&#x89;&#xE3;&#x82;&#xAD;&#xE3;&#x83;&#xA5;&#xE3;&#x83;&#xA1;&#xE3;&#x83;&#xB3;&#xE3;&#x83;&#x88;&#xE3;&#x81;&#x8C;&#xE5;&#xB0;&#x91;&#xE3;&#x81;&#xAA;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#xAE;&#xE3;&#x81;&#x8C;&#xE7;&#x8E;&#x89;&#xE3;&#x81;&#xAB;&#xE7;&#x91;&#x95;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x99;&#xE3;&#x80;&#x82;perldoc &#xE3;&#x81;&#xAB; setopt() &#xE3;&#x82;&#x84; getinfo() &#xE3;&#x81;&#xA7;&#xE6;&#x8C;&#x87;&#xE5;&#xAE;&#x9A;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x8D;&#xE3;&#x82;&#x8B;&#xE3;&#x82;&#xAA;&#xE3;&#x83;&#x97;&#xE3;&#x82;&#xB7;&#xE3;&#x83;&#xA7;&#xE3;&#x83;&#xB3;&#xE4;&#xB8;&#x80;&#xE8;&#xA6;&#xA7;&#xE3;&#x81;&#x8C;&#xE8;&#xBC;&#x89;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#xA6;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#xAA;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x99;&#xE3;&#x80;&#x82; &#xE5;&#xAE;&#x9F;&#xE3;&#x81;&#xAF; PHP &#xE3;&#x81;&#xAE;&#xE3;&#x83;&#x9E;&#xE3;&#x83;&#x8B;&#xE3;&#x83;&#xA5;&#xE3;&#x82;&#xA2;&#xE3;&#x83;&#xAB;&#xE3;&#x81;&#xAB;&#xE8;&#x89;&#xAF;&#xE3;&#x81;&#x84;&#xE6;&#x84;&#x9F;&#xE3;&#x81;&#x98;&#xE3;&#x81;&#xA7;&#xE8;&#xBC;&#x89;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#xA6;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x99;&#xE3;&#x80;&#x82; setopt() &#xE3;&#x81;&#xAB;&#xE6;&#x8C;&#x87;&#xE5;&#xAE;&#x9A;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x8D;&#xE3;&#x82;&#x8B;&#xE3;&#x82;&#xAA;&#xE3;&#x83;&#x97;&#xE3;&#x82;&#xB7;&#xE3;&#x83;&#xA7;&#xE3;&#x83;&#xB3;&#xE4;&#xB8;&#x80;&#xE8;&#xA6;&#xA7; getinfo() &#xE3;&#x81;&#xAB;&#xE6;&#x8C;&#x87;&#xE5;&#xAE;&#x9A;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x8D;&#xE3;&#x82;&#x8B;&#xE3;&#x82;&#xAA;&#xE3;&#x83;&#x97;&#xE3;&#x82;&#xB7;&#xE3;&#x83;&#xA7;&#xE3;&#x83;&#xB3;
+</content:encoded>
+<dcterms:modified>2010-11-04T16:43:38Z</dcterms:modified>
+</item>
+<item>
+<title>Hironori Yoshida: [Perl]colordiff&#xE3;&#x81;&#xAE;&#xE6;&#x96;&#x87;&#xE5;&#xAD;&#x97;&#xE5;&#x8D;&#x98;&#xE4;&#xBD;&#x8D;&#xE7;&#x89;&#x88;ccdiff&#xE3;&#x82;&#x92;&#xE4;&#xBD;&#x9C;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#x9F;id:yappo++</title>
+<link>http://d.hatena.ne.jp/holidays-l/20101105/p1</link>
+<author>Hironori Yoshida</author>
+<guid isPermaLink="true">http://d.hatena.ne.jp/holidays-l/20101105/p1</guid>
+<content:encoded>&#x3C;div class=&#x22;section&#x22;&#x3E;
+&#x3C;p&#x3E;diff&#xE3;&#x81;&#xAB;&#xE8;&#x89;&#xB2;&#xE4;&#xBB;&#x98;&#xE3;&#x81;&#x91;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#x9F;&#xE3;&#x81;&#x8B;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#x9F;&#xE3;&#x81;&#x91;&#xE3;&#x81;&#xA9;&#xE3;&#x80;&#x81;colordiff&#xE3;&#x81;&#xBF;&#xE3;&#x81;&#x9F;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#xAA;&#xE8;&#xA1;&#x8C;&#xE5;&#x8D;&#x98;&#xE4;&#xBD;&#x8D;&#xE3;&#x81;&#x98;&#xE3;&#x82;&#x83;&#xE3;&#x81;&#xAA;&#xE3;&#x81;&#x8F;&#xE3;&#x81;&#xA6;&#xE3;&#x80;&#x81;&#xE6;&#x96;&#x87;&#xE5;&#xAD;&#x97;&#xE5;&#x8D;&#x98;&#xE4;&#xBD;&#x8D;&#xE3;&#x81;&#xA7;&#xE8;&#x89;&#xB2;&#xE4;&#xBB;&#x98;&#xE3;&#x81;&#x91;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#x9F;&#xE3;&#x81;&#x84;&#xE3;&#x80;&#x82;&#x3C;/p&#x3E;
+&#x3C;p&#x3E;&#x3C;a href=&#x22;http://d.hatena.ne.jp/yappo/&#x22;&#x3E;id:yappo&#x3C;/a&#x3E;&#xE3;&#x81;&#xAE;&#x3C;a href=&#x22;http://cpansearch.perl.org/perldoc?String::Diff&#x22;&#x3E;String::Diff - search.cpan.org&#x3C;/a&#x3E;&#xE4;&#xBD;&#xBF;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#xA6;ccdiff(charactor color diff)&#xE3;&#x81;&#xA8;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#x86;&#xE3;&#x81;&#xAE;&#xE3;&#x82;&#x92;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#xA1;&#xE3;&#x81;&#x82;&#xE3;&#x81;&#x92;&#xE3;&#x81;&#x9F;&#xE3;&#x80;&#x82;&#x3C;/p&#x3E;
+&#x3C;br/&#x3E;
+&#x3C;p&#x3E;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#xA6;&#xE3;&#x81;&#x8B;&#xE5;&#xBE;&#x8C;&#xE3;&#x81;&#x8B;&#xE3;&#x82;&#x89;&#xE5;&#x8D;&#x98;&#xE8;&#xAA;&#x9E;&#xE5;&#x8D;&#x98;&#xE4;&#xBD;&#x8D;&#xE3;&#x81;&#xAE;&#xE6;&#x96;&#xB9;&#xE3;&#x81;&#x8C;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#x8B;&#xE3;&#x81;&#xAA;&#xE3;&#x81;&#xA8;&#xE6;&#x80;&#x9D;&#xE3;&#x81;&#xA3;&#xE3;&#x81;&#x9F;&#xE3;&#x80;&#x82;&#x3C;/p&#x3E;
+&#x3C;p&#x3E;&#xE3;&#x81;&#xA7;wdiff&#xE3;&#x81;&#xA8;colordiff&#xE3;&#x81;&#xAE;&#xE7;&#xB5;&#x84;&#xE3;&#x81;&#xBF;&#xE5;&#x90;&#x88;&#xE3;&#x82;&#x8F;&#xE3;&#x81;&#x9B;&#xE3;&#x81;&#xA8;&#xE3;&#x81;&#x8B;&#xE8;&#xA9;&#xA6;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#xA6;&#xE3;&#x81;&#xBF;&#xE3;&#x81;&#x9F;&#xE3;&#x81;&#x91;&#xE3;&#x81;&#xA9;&#xE3;&#x80;&#x81;&#x3C;/p&#x3E;
+&#x3C;pre class=&#x22;syntax-highlight&#x22;&#x3E;
+% cat foo.patch &#x3C;span class=&#x22;synStatement&#x22;&#x3E;|&#x3C;/span&#x3E; wdiff &#x3C;span class=&#x22;synSpecial&#x22;&#x3E;-d&#x3C;/span&#x3E; &#x3C;span class=&#x22;synStatement&#x22;&#x3E;|&#x3C;/span&#x3E; colordiff
+&#x3C;/pre&#x3E;
+&#x3C;p&#x3E;&#xE3;&#x81;&#xA0;&#xE3;&#x81;&#xA8;&#xE3;&#x80;&#x81;&#xE6;&#x97;&#xA5;&#xE6;&#x9C;&#xAC;&#xE8;&#xAA;&#x9E;&#xE3;&#x81;&#xAE;&#xE6;&#x89;&#xB1;&#xE3;&#x81;&#x84;&#xE3;&#x82;&#x82;&#xE3;&#x81;&#x8A;&#xE3;&#x81;&#x8B;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#x8F;&#xE3;&#x81;&#xA6;&#xE4;&#xBD;&#x95;&#xE3;&#x81;&#x8B;&#xE5;&#x87;&#xBA;&#xE5;&#x8A;&#x9B;&#xE3;&#x81;&#x8C;&#xE5;&#xBE;&#xAE;&#xE5;&#xA6;&#x99;&#xE3;&#x81;&#xA7; [...]&#x3C;/p&#x3E;
+&#x3C;/div&#x3E;
+
+</content:encoded>
+<dcterms:modified>2010-11-04T15:00:00Z</dcterms:modified>
+</item>
+<item>
+<title>Martin Evans (MJEVANS): Development release of DBD::ODBC 1.26_1 - please test</title>
+<link>http://www.martin-evans.me.uk/node/82</link>
+<author>Martin Evans (MJEVANS)</author>
+<guid isPermaLink="true">http://www.martin-evans.me.uk/node/82</guid>
+<content:encoded>I&#x27;ve recently uploaded a new experimental (and development) release of DBD::ODBC 1.26_1 to CPAN. This contains over 200 block code changes so it is a VERY significant change and should not be used on production servers until you have tested it. This [...]
+</content:encoded>
+<dcterms:modified>2010-11-03T19:07:21Z</dcterms:modified>
+</item>
+<item>
+<title>Bryce Verdier: Project Euler: Problem 8</title>
+<link>http://feedproxy.google.com/~r/Scrollingtext/~3/-NuB0MiuaTI/project-euler-problem-8</link>
+<author>Bryce Verdier</author>
+<guid isPermaLink="true">http://feedproxy.google.com/~r/Scrollingtext/~3/-NuB0MiuaTI/project-euler-problem-8</guid>
+<content:encoded>&#x3C;p&#x3E;The website has problem eight stated as such,&#xE2;&#x80;&#x9C;Find the greatest product of five consecutive digits in the 1000-digit number.&#x3C;br/&#x3E;
+73167176531330624919225119674426574742355349194934&#x3C;br/&#x3E;
+96983520312774506326239578318016984801869478851843&#x3C;br/&#x3E;
+85861560789112949495459501 [...]&#x3C;/p&#x3E;
+
+</content:encoded>
+<dcterms:modified>2010-11-03T17:43:45Z</dcterms:modified>
+</item>
+<item>
+<title>Goro Fuji (GFUJI):  Mojolicious meets Xslate</title>
+<link>http://d.hatena.ne.jp/gfx/20101103/1288801272</link>
+<author>Goro Fuji (GFUJI)</author>
+<guid isPermaLink="true">http://d.hatena.ne.jp/gfx/20101103/1288801272</guid>
+<content:encoded>Re: Mojolicious::Lite&#xE3;&#x81;&#xA7;&#xE3;&#x80;&#x81;Text::XSlate&#xE3;&#x82;&#x92;&#xE4;&#xBD;&#xBF;&#xE3;&#x81;&#x88;&#xE3;&#x82;&#x8B;&#xE3;&#x82;&#x88;&#xE3;&#x81;&#x86;&#xE3;&#x81;&#xAB;&#xE3;&#x81;&#x99;&#xE3;&#x82;&#x8B; &#xE9;&#x81;&#x85;&#xE3;&#x83;&#xAC;&#xE3;&#x82;&#xB9;&#xE3;&#x81;&#xA7;&#xE3;&#x81;&#x99;&#xE3;&#x81;&#x8C;&#xE3;&#x80;&#x81;MojoX::Renderer::Xslate&#xE3;&#x82;&#x92;&#xE3;&#x83;&#x87;&#xE3;&#x83;&#x95;&#xE3;&#x82;&#xA9;&#xE3;&#x83;&#xAB;&#xE3;&#x83;&#x88;&#xE3;&#x81;&#xA7;__DATA__&#xE4;&#xBB;&#xA5;&#xE4;&#xB8;&#x8B;&#xE3;&#x82;&#x92;&#xE8;&#xA6;&#x8B;&#xE3;&#x82;&#x8B;&#xE3;&#x82;&#x88;&#xE3;&#x81;&#x86;&#xE3;&#x81;&#xAB;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#xA6;&#xE3;&#x82;&#x82;&#xE3;&#x82;&#x89;&#xE3;&#x81;&#x84;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x97;&#xE3;&#x81;&#x9F;&#xE3;&#x80;&#x82; &#xE3;&#x81;&#x93;&#xE3;&#x82;&#x8C;&#xE3;&#x81;&#xA7;Mojo&#xE3;&#x81;&#xA7;&#xE3;&#x82;&#x82;&#xE7;&#x89;&#xB9;&#xE5;&#x88;&#xA5;&#xE3;&#x81;&#xAA;&#xE5;&#xB7;&#xA5;&#xE5;&#xA4;&#xAB;&#xE3;&#x81;&#xAA;&#xE3;&#x81;&#x8F;Xslate&#xE3;&#x81;&#x8C;&#xE4;&#xBD;&#xBF;&#xE3;&#x81;&#x88;&#xE3;&#x81;&#xBE;&#xE3;&#x81;&#x99;&#xE3;&#x80;&#x82;&#xE3;&#x80;&#x82; #!perl package HelloMojo; use strict; use warnings; use Mojolicious::Lite; # &#xE3;&#x83;&#x90;&#xE3;&#x83;&#xBC;&#xE3;&#x82;&#xB8;&#xE3;&#x83;&#xA7;&#xE3;&#x83;&#xB3;&#xE7;&#xA2;&#xBA;&#xE8;&#xAA;&#x8D;&#xE3;&#x81;&#xAE;&#xE3;&#x81;&#x9F;&#xE3;&#x82;&#x81;use&#xE3;&#x81;&#x97;&#xE3;&#x81;&#xA6;&#xE3;&#x81;&#x84;&#xE3;&#x82;&#x8B;&#xE3;&#x81;&#x8C;&#xE3;&#x80;&#x81; # &#xE9;&#x80;&#x9A;&#xE5;&#xB8;&#xB8;&#xE3;&#x81;&#xAF;plubin()&#xE3;&#x81;&#xA7;&#xE8;&#x87;&#xAA; [...]
+</content:encoded>
+<dcterms:modified>2010-11-03T16:21:12Z</dcterms:modified>
+</item>
+<item>
+<title>f00li5h: Wrapping An OO module in a procedural API using Exporter::Simple</title>
+<link>http://feedproxy.google.com/~r/PatchPublishOrPaw/~3/5QveLmedtJ0/Wrapping-An-OO-module-in-a-procedural-API-using-Exporter::Simple.html</link>
+<author>f00li5h</author>
+<guid isPermaLink="true">http://feedproxy.google.com/~r/PatchPublishOrPaw/~3/5QveLmedtJ0/Wrapping-An-OO-module-in-a-procedural-API-using-Exporter::Simple.html</guid>
+<content:encoded>&#x3C;p&#x3E;&#x3C;strong&#x3E;Object Oriented Programming:&#x3C;/strong&#x3E; An idiom in which you capture behaviour along with state with interlated types.&#x3C;/p&#x3E;
+&#x3C;p&#x3E;I like procedural APIs. I&#x27;m not sorry about that. OO is a hammer, and sometimes I want to put in a screw, simple.&#x3C;/p&#x3E;
+&#x3C;h2&#x3E;
+  &#x3C;a name=&#x22;an_example___&#x22; id=&#x22;an_example___&#x22;&#x3E;An example...&#x3C;/a&#x3E;
+&#x3C;/h2&#x3E;
+&#x3C;p&#x3E;&#x3C;code&#x3E;CPAN.pm&#x3C;/code&#x3E; is a goo [...]&#x3C;/p&#x3E;
+
+</content:encoded>
+<dcterms:modified>2010-11-03T10:22:00Z</dcterms:modified>
+</item>
+<item>
+<title>vti: Perl, WebSockets and VNC in your browser</title>
+<link>http://showmetheco.de/articles/2010/11/20101003T7:57:00-perl-websockets-and-vnc-in-your-browser.html</link>
+<author>vti</author>
+<guid isPermaLink="true">http://showmetheco.de/articles/2010/11/20101003T7:57:00-perl-websockets-and-vnc-in-your-browser.html</guid>
+<content:encoded>Here is a video a made up to show that it is possible to run a VNC client in your browser! Perl + WebSockets + VNC Source code is available on GitHub http://github.com/vti/showmethedesktop.
+</content:encoded>
+<dcterms:modified>2010-11-03T09:56:42Z</dcterms:modified>
+</item>
+<item>
+<title>vti: Perl, WebSockets and VNC in your browser</title>
+<link>http://showmetheco.de/articles/2010/11/perl-websockets-and-vnc-in-your-browser.html</link>
+<author>vti</author>
+<guid isPermaLink="true">http://showmetheco.de/articles/2010/11/perl-websockets-and-vnc-in-your-browser.html</guid>
+<content:encoded>Here is a video a made up to show that it is possible to run a VNC client in your browser! Perl + WebSockets + VNC Source code is available on GitHub http://github.com/vti/showmethedesktop.
+</content:encoded>
+<dcterms:modified>2010-11-03T07:57:00Z</dcterms:modified>
+</item>
+<item>
+<title>Leonard: The lone programmer</title>
+<link>http://blog.lib.umn.edu/leonard/perl/2010/11/the-lone-programmer.html</link>
+<author>Leonard</author>
+<guid isPermaLink="true">http://blog.lib.umn.edu/leonard/perl/2010/11/the-lone-programmer.html</guid>
+<content:encoded>Beware the lone programmer.I say this for many reasons, but they all can be summed up by answering either: 1. Why isn&#x27;t anyone else working with him/her? Or: 2. What are we missing with a programmer working alone?I will start...
+</content:encoded>
+<dcterms:modified>2010-11-02T19:50:35Z</dcterms:modified>
+</item>
+<item>
+<title>Andy Brown (setitesuk): Web design Survey</title>
+<link>http://vampiresoftware.blogspot.com/2010/11/web-design-survey.html</link>
+<author>Andy Brown (setitesuk)</author>
+<guid isPermaLink="true">http://vampiresoftware.blogspot.com/2010/11/web-design-survey.html</guid>
+<content:encoded>&#x3C;a href=&#x22;http://alistapart.com/articles/survey2010&#x22;&#x3E;
+  &#x3C;img src=&#x22;http://aneventapart.com/webdesignsurvey/templates/ala/images/i-took-the-2010-survey.gif&#x22; alt=&#x22;&#x22;/&#x3E;
+&#x3C;/a&#x3E;
+&#x3C;div class=&#x22;blogger-post-footer&#x22;&#x3E;
+  &#x3C;img alt=&#x22;&#x22;/&#x3E;
+&#x3C;/div&#x3E;
+
+</content:encoded>
+<dcterms:modified>2010-11-02T08:54:00Z</dcterms:modified>
+</item>
+<item>
+<title>Olaf Alders: Using Plack to &#x22;Like&#x22; a Module on Facebook</title>
+<link>http://blogs.perl.org/users/olaf_alders/2010/11/using-plack-to-like-a-module-on-facebook.html</link>
+<author>Olaf Alders</author>
+<guid isPermaLink="true">http://blogs.perl.org/users/olaf_alders/2010/11/using-plack-to-like-a-module-on-facebook.html</guid>
+<content:encoded>We&#x27;ve made a couple of fun changes to cpan-mangler. First off, you can now &#x22;like&#x22; modules on Facebook: Now, up and downvoting of modules would be a lot more useful, but this can be fun (and confusing for your friends):...
+</content:encoded>
+<dcterms:modified>2010-11-02T03:36:02Z</dcterms:modified>
+</item>
+<item>
+<title>Gabor Szabo (szabgab): Perl Devroom at FOSDEM 2011 - call for talk proposals</title>
+<link>http://szabgab.com/blog/2010/11/perl-devroom-at-fosdem-2011.html</link>
+<author>Gabor Szabo (szabgab)</author>
+<guid isPermaLink="true">http://szabgab.com/blog/2010/11/perl-devroom-at-fosdem-2011.html</guid>
+<content:encoded>A couple of days ago our request for a Perl devroom was accepted by the FOSDEM organizers. This means we are going to have a room on Sunday, 6th February from 9:00-17:00 where we can organize Perl related talks. The room has 72 seats and the expected [...]
+</content:encoded>
+<dcterms:modified>2010-11-02T01:47:36Z</dcterms:modified>
+</item>
+<item>
+<title>chromatic: Extensibility and Composability</title>
+<link>http://www.modernperlbooks.com/mt/2010/11/extensibility-and-composability.html</link>
+<author>chromatic</author>
+<guid isPermaLink="true">http://www.modernperlbooks.com/mt/2010/11/extensibility-and-composability.html</guid>
+<content:encoded>Everyone always says that CPAN is Perl 5&#x27;s killer feature, and that&#x27;s true to an extent. Certainly the ability for me, an experienced Perl 5 programmer and CPAN contributor, to discover a need in my code, search CPAN for it,...
+</content:encoded>
+<dcterms:modified>2010-11-01T18:50:11Z</dcterms:modified>
+</item>
+<item>
+<title>Thomas Fahle: Lesetipp: 16. Ausgabe des Perl-Magazins $foo erschienen</title>
+<link>http://perl-howto.de/2010/11/lesetipp-16-ausgabe-des-perlmagazins-foo-erschienen.html</link>
+<author>Thomas Fahle</author>
+<guid isPermaLink="true">http://perl-howto.de/2010/11/lesetipp-16-ausgabe-des-perlmagazins-foo-erschienen.html</guid>
+<content:encoded>Heute ist die neue, 16. Ausgabe des Perl-Magazins $foo erschienen. Inhalt der 16. Ausgabe: Zeitbasierte Konfiguration Bis 20 Uhr soll diese Konfiguration g&#xC3;&#xBC;ltig sein, danach jene Konfiguration. Kein Problem. Dieser Artikel zeigt einen L&#xC3;&#xB6;sungsansatz f [...]
+</content:encoded>
+<dcterms:modified>2010-11-01T18:45:00Z</dcterms:modified>
+</item>
+<item>
+<title>Dan Bolser (faceface): Problems with your local perl install?</title>
+<link>http://bioblog5000.blogspot.com/2010/11/problems-with-your-local-perl-install.html</link>
+<author>Dan Bolser (faceface)</author>
+<guid isPermaLink="true">http://bioblog5000.blogspot.com/2010/11/problems-with-your-local-perl-install.html</guid>
+<content:encoded>Try the following uber 1337 commands:&#x3C;br/&#x3E;
+&#x3C;br/&#x3E;
+mv ~/perl5 ~/notperl5&#x3C;br/&#x3E;
+wget -O - http://cpanmin.us | perl - -L ~/perl5 --self-upgrade local::lib&#x3C;br/&#x3E;
+&#x3C;br/&#x3E;
+&#x3C;br/&#x3E;
+ZOMG!&#x3C;br/&#x3E;
+&#x3C;br/&#x3E;
+&#x3C;br/&#x3E;
+&#x3C;br/&#x3E;
+OK, now add your ~/perl5 dir into git...&#x3C;br/&#x3E;
+cd ~/perl5/ ; git init ; git add . ; git commit -m &#x27;initial import&#x27;&#x3C;br/&#x3E;
+&#x3C;br/&#x3E;
+This wi [...]
+</content:encoded>
+<dcterms:modified>2010-11-01T18:23:00Z</dcterms:modified>
+</item>
+</channel>
+</rss>

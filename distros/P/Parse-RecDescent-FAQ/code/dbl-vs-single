@@ -1,0 +1,22 @@
+
+ use strict;
+ use warnings;
+ 
+ $::RD_TRACE = 1;
+ 
+ use Parse::RecDescent;
+ 
+ my $grammar = q{
+ 
+    input:  number(s) { $return = $item{ number } } | <error>
+ 
+    number: <skip: '\.*'> /\d+/ 
+ 
+ };
+
+ my $parser = new Parse::RecDescent($grammar);
+ 
+ my $test_string = qq{1.2.3.5.8};
+
+ print join( "\n", @{ $parser -> input( $test_string ) } );
+

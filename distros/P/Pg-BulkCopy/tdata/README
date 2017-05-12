@@ -1,0 +1,2 @@
+The test data for Pg-BulkCopy is not included as part of the distribution.
+It is distributed as Pg-BulkCopyTest on cpan. You should restore the contents to this directory to run the tests.

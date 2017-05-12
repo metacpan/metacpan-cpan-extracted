@@ -1,0 +1,60 @@
+#
+# code formatter should catch this comment
+#
+
+=head1 test1
+
+text
+
+=head1 test2
+
+=head2 a
+
+=head3 b
+
+=head4 c
+
+=head1 test3
+
+ code
+ code
+ code
+
+=head1 test4
+
+=begin perl
+
+ if ($var) {print TRUE}
+
+=end perl
+
+=head1 test5
+
+=over
+
+=item *
+
+1st
+
+=item *
+
+2nd
+
+=back
+
+=head1 test5
+
+L<http://example.com>
+L<Link|http://example.com>
+
+=head1 test6
+
+=begin html
+
+<object none>
+ <media file="none"/>
+</object>
+
+=end html
+
+=cut

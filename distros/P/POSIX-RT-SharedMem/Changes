@@ -1,0 +1,37 @@
+Revision history for POSIX-RT-SharedMem
+
+0.10      2014-08-16 13:44:46+02:00 Europe/Amsterdam
+          Set locale to "C" for predictable error messages
+          Converted tests to Test::Fatal
+
+0.09      2014-08-07 18:33:07+02:00 Europe/Amsterdam
+          Remove Const::Fast dependency
+          Update documentation to include description, see also and proper formatting
+
+0.08      2011-12-11 15:35:19 Europe/Amsterdam
+          Add a flags parameter to shared_open
+
+0.07      2011-11-28 23:42:36 Europe/Amsterdam
+          Conditionally link to librt (darwin bugfix)
+          Work around bugs on FreeBSD and OS X
+
+0.06      2011-09-10 11:44:19 Europe/Amsterdam
+          Fixed creation mode and permission
+          Converted to Dist::Zilla
+
+0.04    2010-09-03
+        Handle modes correctly
+        Converted from Readonly to Const::Fast
+        Added some more tests
+
+0.03    2010-03-08
+        Fixed linking options on BSD
+        Handle error conditions in Perl land
+        Added offset option
+
+0.02    2010-02-28
+        Fixed missing dependency
+
+0.01    2010-02-28
+        First version, released on an unsuspecting world.
+

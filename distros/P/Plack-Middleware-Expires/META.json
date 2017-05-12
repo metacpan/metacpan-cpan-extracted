@@ -1,0 +1,83 @@
+{
+   "abstract" : "mod_expires for plack",
+   "author" : [
+      "Masahiro Nagano <kazeburo {at} gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v1.1.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Expires",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Date" : "0",
+            "HTTP::Status" : "0",
+            "Plack" : "0.9937",
+            "Try::Tiny" : "0.06",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::Expires" : {
+         "file" : "lib/Plack/Middleware/Expires.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazeburo/Plack-Middleware-Expires/issues"
+      },
+      "homepage" : "https://github.com/kazeburo/Plack-Middleware-Expires",
+      "repository" : {
+         "url" : "git://github.com/kazeburo/Plack-Middleware-Expires.git",
+         "web" : "https://github.com/kazeburo/Plack-Middleware-Expires"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "Lee Aylward <lee@laylward.com>",
+      "Kjetil Kjernsmo <kjetil@kjernsmo.net>",
+      "Masahiro Nagano <kazeburo@gmail.com>"
+   ]
+}

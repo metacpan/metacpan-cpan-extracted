@@ -1,0 +1,10 @@
+MANIFEST
+Makefile.PL
+Pod/Rtf.pm
+README
+brace_count.plx
+perl_eg.hpj
+pod2rtf
+t/script.t
+t/testpod.rtf
+t/testpod.pod

@@ -1,0 +1,72 @@
+0.53 - 0.54
++ some deprecated stuff fixed
+
+0.52 - 0.53
++ selection out of box bug in Popup_menu fixed
+
+0.50 - 0.52 
++ Popup_menu widget added (perldoc Popup_menu)
++ added cursor_color option for Text_entry and Textbox
++ german documentation outdated. If you really need it,
+  please tell me
++ abs_x, abs_y parameter for Popup Widget added
++ minor bugfixes
+
+0.47 - 0.50
++ code cleanup 
++ progressbar widget+example added
++ filedialog Text_entry fixed
++ Text_entry callback fixed
++ Textbox completely rewritten 
+  (ideas from Arthur Corliss Curses::Widgets Code, thanx)
+
+0.46 - 0.47
++ German Documentation added
++ Documentation updated
++ small Bug in text-entry code fixed
+
+0.45 - 0.46
++ fixed segfault in window test with old curses-lib - again :-( 
+  thanx again Paul.
+
+0.41 - 0.45
++ cool examples added ;-)
++ abs_move_widget added
++ get_widget_pos added
++ more test's added
++ set_color added
+
+0.4 - 0.41
++ Bug in documentation fixed (no title for boxes but for windows)
++ Crash on Power PC at "make test" fixed
+  (I hope so) thank you schinder@pobox.com
+
+0.3 - 0.4
++ splitted into single files
++ Makefile added
++ Tests added
++ english documentation
++ license set to GPL
++ loading up to CPAN
+
+0.2 - 0.3
++ set_focus Method added
++ Documentation added
++ heavy changes in box/window Code
++ Terminal resize handler added
++ Timefunction added
++ minor bugfixes
+
+0.1 - 0.2
++ Textfield added (read only)
++ Popup Box added
++ Boxes (packer) added
++ File Dialog added
++ main_loop Function added.
++ Statusbar added
++ examples added
++ window-titel added
++ heavy changes in key-press handling
++ heavy changes in draw widget routine
++ color for rows of a listbox added
++ minor bugfixes

@@ -1,0 +1,822 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800px" height="600px" preserveAspectRatio="xMidYMid meet" zoomAndPan="magnify" version="1.0" contentScriptType="text/ecmascript" contentStyleType="text/css">
+  <defs>
+    <style type="text/css">
+			/* Style sheet */
+                        /* SVG style sheets are not very widely supported */
+		</style>
+  </defs>
+  <rect x="0" y="0" width="100%" height="100%" style="fill: white" />
+  <!-- Header text -->
+  <text style="font-family: sans-serif; font-size: 14pt; font-weight: bold" x="10" y="22">Boot chart for zerolap (Wed Jun 29 16:31:37 CEST 2005)</text>
+  <g style="font-family: sans-serif; font-size: 9pt; fill: #000000" transform="translate(10, 24)">
+    <text dy="1.2em">uname: Linux 2.6.9 #4 Sun Mar 6 16:42:04 CET 2005 i686</text>
+    <text dy="2.4em">release: Debian GNU/Linux testing/unstable  </text>
+    <text dy="3.6em">CPU: Intel(R) Pentium(R) M processor 1.70GHz (1)</text>
+    <text dy="4.8em">kernel options: root=/dev/hda1 ro init=/sbin/bootchartd</text>
+    <text dy="6em">time: 0:41</text>
+  </g>
+  <!-- Process dependency chart -->
+  <g transform="translate(0, 130)" style="fill: none">
+    <g transform="translate(0, -30)">
+      <rect x="2" y="3" width="10px" height="10px" style="fill: #668cb2" />
+      <text style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="15px" dy="1em">Running (%cpu)</text>
+      <rect x="120" y="3" width="10px" height="10px" style="fill: #c27a7a; fill-opacity: 0.25" />
+      <text style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="135px" dy="1em">Unint.sleep (I/O)</text>
+      <rect x="240" y="3" width="10px" height="10px" style="fill: #f0f0f0" />
+      <text style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="255px" dy="1em">Sleeping</text>
+      <rect x="360" y="3" width="10px" height="10px" style="fill: #787878" />
+      <text style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="375px" dy="1em">Zombie</text>
+    </g>
+    <!-- Process axis labels -->
+    <text style="font-family: sans-serif; font-size: 9pt; fill: #000000; opacity: 0.7" x="0" y="0" dy="-3">0s</text>
+    <text style="font-family: sans-serif; font-size: 9pt; fill: #000000; opacity: 0.7" x="125" y="0" dx="-0.5em" dy="-3">5s</text>
+    <text style="font-family: sans-serif; font-size: 9pt; fill: #000000; opacity: 0.7" x="250" y="0" dx="-0.75em" dy="-3">10s</text>
+    <text style="font-family: sans-serif; font-size: 9pt; fill: #000000; opacity: 0.7" x="375" y="0" dx="-0.75em" dy="-3">15s</text>
+    <text style="font-family: sans-serif; font-size: 9pt; fill: #000000; opacity: 0.7" x="500" y="0" dx="-0.75em" dy="-3">20s</text>
+    <text style="font-family: sans-serif; font-size: 9pt; fill: #000000; opacity: 0.7" x="625" y="0" dx="-0.75em" dy="-3">25s</text>
+    <text style="font-family: sans-serif; font-size: 9pt; fill: #000000; opacity: 0.7" x="750" y="0" dx="-0.75em" dy="-3">30s</text>
+    <rect style="fill: #ffffff; stroke: #e0e0e0; padding: 10px" x="0" y="0" width="100%" height="100%" />
+    <g style="stroke: #e6e6e6; stroke-width: 1px" transform="translate(0.5, 0.5)">
+      <!-- Process time ticks and delimiter lines -->
+      <line style="stroke: #d0d0d0" x1="0" y1="0" x2="0" y2="470" />
+      <line x1="25" y1="0" x2="25" y2="470" />
+      <line x1="50" y1="0" x2="50" y2="470" />
+      <line x1="75" y1="0" x2="75" y2="470" />
+      <line x1="100" y1="0" x2="100" y2="470" />
+      <line style="stroke: #d0d0d0" x1="125" y1="0" x2="125" y2="470" />
+      <line x1="150" y1="0" x2="150" y2="470" />
+      <line x1="175" y1="0" x2="175" y2="470" />
+      <line x1="200" y1="0" x2="200" y2="470" />
+      <line x1="225" y1="0" x2="225" y2="470" />
+      <line style="stroke: #d0d0d0" x1="250" y1="0" x2="250" y2="470" />
+      <line x1="275" y1="0" x2="275" y2="470" />
+      <line x1="300" y1="0" x2="300" y2="470" />
+      <line x1="325" y1="0" x2="325" y2="470" />
+      <line x1="350" y1="0" x2="350" y2="470" />
+      <line style="stroke: #d0d0d0" x1="375" y1="0" x2="375" y2="470" />
+      <line x1="400" y1="0" x2="400" y2="470" />
+      <line x1="425" y1="0" x2="425" y2="470" />
+      <line x1="450" y1="0" x2="450" y2="470" />
+      <line x1="475" y1="0" x2="475" y2="470" />
+      <line style="stroke: #d0d0d0" x1="500" y1="0" x2="500" y2="470" />
+      <line x1="525" y1="0" x2="525" y2="470" />
+      <line x1="550" y1="0" x2="550" y2="470" />
+      <line x1="575" y1="0" x2="575" y2="470" />
+      <line x1="600" y1="0" x2="600" y2="470" />
+      <line style="stroke: #d0d0d0" x1="625" y1="0" x2="625" y2="470" />
+      <line x1="650" y1="0" x2="650" y2="470" />
+      <line x1="675" y1="0" x2="675" y2="470" />
+      <line x1="700" y1="0" x2="700" y2="470" />
+      <line x1="725" y1="0" x2="725" y2="470" />
+      <line style="stroke: #d0d0d0" x1="750" y1="0" x2="750" y2="470" />
+      <line x1="775" y1="0" x2="775" y2="470" />
+      <line x1="800" y1="0" x2="800" y2="470" />
+    </g>
+    <!-- Process chart -->
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(0,0)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="1025" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="1025" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+      </g>
+      <title content="structured text">1 init
+			Start time: 00:00.000
+			Duration: 00:41.184</title>
+    </g>
+    <text transform="translate(0,0)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="0" y="0">init</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(0,16)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="800" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="273" y="0" width="6" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="319" y="0" width="7" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="382" y="0" width="5" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="387" y="0" width="8" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="395" y="0" width="8" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="429" y="0" width="5" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="444" y="0" width="5" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="693" y="0" width="5" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="749" y="0" width="5" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="881" y="0" width="5" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="1025" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-3" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="8" x2="-3" y2="-4" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="-4" x2="0" y2="-4" />
+      </g>
+      <title content="structured text">2 ksoftirqd/0
+			Start time: 00:00.000
+			Duration: 00:41.184</title>
+    </g>
+    <text transform="translate(0,16)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="0" y="0">ksoftirqd/0</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(0,32)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="1025" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="1025" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-3" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="8" x2="-3" y2="-20" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="-20" x2="0" y2="-20" />
+      </g>
+      <title content="structured text">3 events/0
+			Start time: 00:00.000
+			Duration: 00:41.184</title>
+    </g>
+    <text transform="translate(0,32)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="0" y="0">events/0</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(0,48)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="1025" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="1025" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-3" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="8" x2="-3" y2="-4" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="-4" x2="0" y2="-4" />
+      </g>
+      <title content="structured text">4 khelper
+			Start time: 00:00.000
+			Duration: 00:41.184</title>
+    </g>
+    <text transform="translate(0,48)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="0" y="0">khelper</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(324,64)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="12" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="12" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-324" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-324" y1="8" x2="-324" y2="0" />
+      </g>
+      <title content="structured text">2163 hotplug
+			Start time: 00:13.050
+			Duration: 00:00.504</title>
+    </g>
+    <text transform="translate(324,64)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="12" y="0">hotplug</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(514,80)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="15" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="15" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-514" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-514" y1="8" x2="-514" y2="-16" />
+      </g>
+      <title content="structured text">3930 khelper
+			Start time: 00:20.660
+			Duration: 00:00.634</title>
+    </g>
+    <text transform="translate(514,80)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="15" y="0">khelper</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(514,96)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="15" height="16" />
+        <rect style="fill: #c27a7a; fill-opacity: 0.25" x="0" y="0" width="6" height="16" />
+        <rect style="fill: #c27a7a; fill-opacity: 0.25" x="6" y="0" width="5" height="16" />
+        <rect style="fill: #c27a7a; fill-opacity: 0.25" x="11" y="0" width="5" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="15" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-3" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="8" x2="-3" y2="-4" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="-4" x2="0" y2="-4" />
+      </g>
+      <title content="structured text">3931 modprobe
+			Start time: 00:20.660
+			Duration: 00:00.634</title>
+    </g>
+    <text transform="translate(514,96)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="15" y="0">modprobe</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(110,112)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="914" height="16" />
+        <rect style="fill: #c27a7a; fill-opacity: 0.25" x="178" y="0" width="5" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="227" y="0" width="9" height="16" />
+        <rect style="fill: #c27a7a; fill-opacity: 0.25" x="673" y="0" width="5" height="16" />
+        <rect style="fill: #c27a7a; fill-opacity: 0.25" x="678" y="0" width="5" height="16" />
+        <rect style="fill: #c27a7a; fill-opacity: 0.25" x="683" y="0" width="5" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="914" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-110" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-110" y1="8" x2="-110" y2="-96" />
+      </g>
+      <title content="structured text">704 kjournald
+			Start time: 00:04.450
+			Duration: 00:36.734</title>
+    </g>
+    <text transform="translate(110,112)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="0" y="0">kjournald</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(130,128)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="894" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="750" y="0" width="6" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="894" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-130" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-130" y1="8" x2="-130" y2="-112" />
+      </g>
+      <title content="structured text">718 udevd
+			Start time: 00:05.250
+			Duration: 00:35.934</title>
+    </g>
+    <text transform="translate(130,128)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="0" y="0">udevd</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(478,144)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="127" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="127" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-348" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-348" y1="8" x2="-348" y2="0" />
+      </g>
+      <title content="structured text">3698 udev
+			Start time: 00:19.230
+			Duration: 00:05.114</title>
+    </g>
+    <text transform="translate(478,144)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="127" y="0">udev</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(135,160)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="525" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="525" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-135" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-135" y1="8" x2="-135" y2="-144" />
+      </g>
+      <title content="structured text">722 init
+			Start time: 00:05.460
+			Duration: 00:21.134</title>
+    </g>
+    <text transform="translate(135,160)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="0" y="0">init</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(135,176)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="525" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="525" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-3" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="8" x2="-3" y2="-4" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="-4" x2="0" y2="-4" />
+      </g>
+      <title content="structured text">723 rcS
+			Start time: 00:05.460
+			Duration: 00:21.134</title>
+    </g>
+    <text transform="translate(135,176)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="0" y="0">rcS</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(169,192)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="71" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="71" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-34" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-34" y1="8" x2="-34" y2="0" />
+      </g>
+      <title content="structured text">1567 rcS
+			Start time: 00:06.820
+			Duration: 00:02.864</title>
+    </g>
+    <text transform="translate(169,192)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="71" y="0">rcS</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(169,208)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="71" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="71" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-3" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="8" x2="-3" y2="-4" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="-4" x2="0" y2="-4" />
+      </g>
+      <title content="structured text">1568 hwclock
+			Start time: 00:06.820
+			Duration: 00:02.864</title>
+    </g>
+    <text transform="translate(169,208)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="71" y="0">hwclock</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(220,224)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="20" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="20" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-51" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-51" y1="8" x2="-51" y2="-16" />
+      </g>
+      <title content="structured text">1639 grep
+			Start time: 00:08.850
+			Duration: 00:00.834</title>
+    </g>
+    <text transform="translate(220,224)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="20" y="0">grep</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(245,240)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="32" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="32" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-110" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-110" y1="8" x2="-110" y2="-48" />
+      </g>
+      <title content="structured text">1673 S20module-init-
+			Start time: 00:09.880
+			Duration: 00:01.294</title>
+    </g>
+    <text transform="translate(245,240)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="32" y="0">S20module-init-</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(292,256)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="62" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="62" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-157" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-157" y1="8" x2="-157" y2="-64" />
+      </g>
+      <title content="structured text">1929 S36discover
+			Start time: 00:11.770
+			Duration: 00:02.494</title>
+    </g>
+    <text transform="translate(292,256)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="62" y="0">S36discover</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(320,272)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="17" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="0" y="0" width="6" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="11" y="0" width="6" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="17" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-28" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-28" y1="8" x2="-28" y2="0" />
+      </g>
+      <title content="structured text">2150 modprobe
+			Start time: 00:12.870
+			Duration: 00:00.684</title>
+    </g>
+    <text transform="translate(320,272)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="17" y="0">modprobe</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(342,288)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="12" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="7" y="0" width="6" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="12" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-50" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-50" y1="8" x2="-50" y2="-16" />
+      </g>
+      <title content="structured text">2381 sync
+			Start time: 00:13.750
+			Duration: 00:00.514</title>
+    </g>
+    <text transform="translate(342,288)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="12" y="0">sync</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(375,304)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="118" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="118" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-240" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-240" y1="8" x2="-240" y2="-112" />
+      </g>
+      <title content="structured text">2597 S40hotplug
+			Start time: 00:15.090
+			Duration: 00:04.774</title>
+    </g>
+    <text transform="translate(375,304)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="118" y="0">S40hotplug</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(375,320)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="68" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="53" y="0" width="5" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.05" x="58" y="0" width="5" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="68" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-3" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="8" x2="-3" y2="-4" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="-4" x2="0" y2="-4" />
+      </g>
+      <title content="structured text">2600 pci.rc
+			Start time: 00:15.090
+			Duration: 00:02.734</title>
+    </g>
+    <text transform="translate(375,320)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="68" y="0">pci.rc</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(400,336)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="27" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="27" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-25" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-25" y1="8" x2="-25" y2="0" />
+      </g>
+      <title content="structured text">2956 pci.agent
+			Start time: 00:16.090
+			Duration: 00:01.124</title>
+    </g>
+    <text transform="translate(400,336)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="27" y="0">pci.agent</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(401,352)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="26" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="26" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-1" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-1" y1="8" x2="-1" y2="0" />
+      </g>
+      <title content="structured text">2979 modprobe
+			Start time: 00:16.130
+			Duration: 00:01.084</title>
+    </g>
+    <text transform="translate(401,352)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="26" y="0">modprobe</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(412,368)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="16" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="16" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-11" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-11" y1="8" x2="-11" y2="0" />
+      </g>
+      <title content="structured text">3130 sh
+			Start time: 00:16.570
+			Duration: 00:00.644</title>
+    </g>
+    <text transform="translate(412,368)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="16" y="0">sh</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(412,384)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="16" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="0" y="0" width="6" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="6" y="0" width="5" height="16" />
+        <rect style="fill: #668cb2" fill-opacity="0.0" x="11" y="0" width="5" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="16" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-3" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="8" x2="-3" y2="-4" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="-4" x2="0" y2="-4" />
+      </g>
+      <title content="structured text">3131 modprobe
+			Start time: 00:16.570
+			Duration: 00:00.644</title>
+    </g>
+    <text transform="translate(412,384)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="16" y="0">modprobe</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(448,400)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="46" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="46" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-73" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-73" y1="8" x2="-73" y2="-80" />
+      </g>
+      <title content="structured text">3576 usb.rc
+			Start time: 00:18.010
+			Duration: 00:01.854</title>
+    </g>
+    <text transform="translate(448,400)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="46" y="0">usb.rc</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(448,416)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="20" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="20" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-3" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="8" x2="-3" y2="-4" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="-4" x2="0" y2="-4" />
+      </g>
+      <title content="structured text">3585 sleep
+			Start time: 00:18.010
+			Duration: 00:00.834</title>
+    </g>
+    <text transform="translate(448,416)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="20" y="0">sleep</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(498,432)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="31" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="31" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-363" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-363" y1="8" x2="-363" y2="-240" />
+      </g>
+      <title content="structured text">3888 S40networking
+			Start time: 00:20.040
+			Duration: 00:01.254</title>
+    </g>
+    <text transform="translate(498,432)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="31" y="0">S40networking</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(503,448)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="26" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="26" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-5" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-5" y1="8" x2="-5" y2="0" />
+      </g>
+      <title content="structured text">3896 ifup
+			Start time: 00:20.240
+			Duration: 00:01.054</title>
+    </g>
+    <text transform="translate(503,448)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="26" y="0">ifup</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(514,464)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="15" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="15" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-11" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-11" y1="8" x2="-11" y2="0" />
+      </g>
+      <title content="structured text">3924 run-parts
+			Start time: 00:20.660
+			Duration: 00:00.634</title>
+    </g>
+    <text transform="translate(514,464)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="15" y="0">run-parts</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(514,480)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="15" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="15" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-3" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="8" x2="-3" y2="-4" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="-4" x2="0" y2="-4" />
+      </g>
+      <title content="structured text">3926 wireless-tools
+			Start time: 00:20.660
+			Duration: 00:00.634</title>
+    </g>
+    <text transform="translate(514,480)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="15" y="0">wireless-tools</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(514,496)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="15" height="16" />
+        <rect style="fill: #c27a7a; fill-opacity: 0.25" x="0" y="0" width="6" height="16" />
+        <rect style="fill: #c27a7a; fill-opacity: 0.25" x="6" y="0" width="5" height="16" />
+        <rect style="fill: #c27a7a; fill-opacity: 0.25" x="11" y="0" width="5" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="15" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-3" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="8" x2="-3" y2="-4" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="-4" x2="0" y2="-4" />
+      </g>
+      <title content="structured text">3927 iwconfig
+			Start time: 00:20.660
+			Duration: 00:00.634</title>
+    </g>
+    <text transform="translate(514,496)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="15" y="0">iwconfig</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(534,512)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="25" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="25" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-399" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-399" y1="8" x2="-399" y2="-320" />
+      </g>
+      <title content="structured text">3995 S43portmap
+			Start time: 00:21.480
+			Duration: 00:01.044</title>
+    </g>
+    <text transform="translate(534,512)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="25" y="0">S43portmap</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(539,528)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="21" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="21" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-5" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-5" y1="8" x2="-5" y2="0" />
+      </g>
+      <title content="structured text">4004 sleep
+			Start time: 00:21.680
+			Duration: 00:00.844</title>
+    </g>
+    <text transform="translate(539,528)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="21" y="0">sleep</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(564,544)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="45" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="45" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-429" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-429" y1="8" x2="-429" y2="-352" />
+      </g>
+      <title content="structured text">4037 rcS
+			Start time: 00:22.700
+			Duration: 00:01.844</title>
+    </g>
+    <text transform="translate(564,544)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="45" y="0">rcS</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(564,560)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="40" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="40" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-3" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="8" x2="-3" y2="-4" />
+        <line style="stroke-dasharray: 3,3" x1="-3" y1="-4" x2="0" y2="-4" />
+      </g>
+      <title content="structured text">4040 sleep
+			Start time: 00:22.700
+			Duration: 00:01.644</title>
+    </g>
+    <text transform="translate(564,560)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="40" y="0">sleep</text>
+    <!-- Process position -->
+    <g style="stroke: #c8c8c8; fill: none" transform="translate(640,576)">
+      <g style="stroke: none">
+        <!-- Process timeline -->
+        <rect style="fill: #f0f0f0" x="0" y="0" width="15" height="16" />
+      </g>
+      <!-- Process border -->
+      <rect x="0" y="0" width="15" height="16" transform="translate(0.5, 0.5)" />
+      <!-- Process name -->
+      <g style="stroke: #c0c0c0; stroke-width: 1px; stroke-offset: 0; stroke-dasharray: 3,3" transform="translate(0.5, 0.5)">
+        <!-- Parent process connector lines -->
+        <line style="stroke-dasharray: 3,3" x1="0" y1="8" x2="-505" y2="8" />
+        <line style="stroke-dasharray: 3,3" x1="-505" y1="8" x2="-505" y2="-384" />
+      </g>
+      <title content="structured text">4190 S51ntpdate
+			Start time: 00:25.750
+			Duration: 00:00.634</title>
+    </g>
+    <text transform="translate(640,576)" style="font-family: sans-serif; font-size: 9pt; fill: #000000" dx="2" dy="15" x="15" y="0">S51ntpdate</text>
+  </g>
+  <!--<text x="0" y="100%" dx="5" dy="-5" style="font-family: sans-serif; font-size: 11pt; fill: #000000; opacity: 0.4">www.bootchart.org</text>-->
+</svg>

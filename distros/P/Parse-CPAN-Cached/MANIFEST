@@ -1,0 +1,13 @@
+MANIFEST
+Makefile.PL
+README
+Changes
+LICENSE
+lib/Parse/CPAN/Cached.pm
+t/01_basic.t
+t/02_version.t
+t/98_pod.t
+t/asset/authors/00whois.xml
+t/asset/authors/01mailrc.txt.gz
+t/asset/modules/02packages.details.txt.gz
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,229 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Slide-View</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Slide-Views</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<B>SlideView</B><BR>
+<P>
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.   A presentation is based on
+<A HREF=../slide/index.html>slides</A>, which are shown on
+<A HREF=../viewport/index.html>viewports</A>.
+<P>
+PPresenter is able to show a slide on more than one viewport at the same time,
+maybe in different styles, on different devices, in different fonts and
+fontsizes.  So: for each viewport, a slide has a
+<STRONG>slide-view</STRONG>, which is written in a
+specific <A HREF=../style/index.html>style</A>.
+<P>
+On the slide-page you find <A HREF=../slide/index.html#examples>examples
+for one viewport presentations</A>.  Read this page for examples on
+multiple screen presentations.
+<P>
+
+    </TD></TR>
+<TR><TD VALIGN=top>
+
+<UL>
+<LI><A HREF=../slide/index.html#options>slide options</A>
+</UL>
+<A HREF=../style/index.html>style</A> options:
+<UL>
+<LI><A HREF=../decoration/index.html>decorations</A>
+<LI><A HREF=../dynamic/index.html>dynamics</A>
+<LI><A HREF=../fontset/index.html>fontsets</A>
+<LI><A HREF=../formatter/index.html>formatters</A>
+<LI><A HREF=../template/index.html>templates</A>
+</UL>
+
+    </TD><TD VALIGN=top>
+
+<H2>How it works</H2>
+
+Basically, a slide-view is the representation of
+one <A HREF=../slide/index.html>slide</A>
+on one specific <A HREF=../viewport/index.html>viewport</A>.
+<P>
+In case of one viewport for the show, the specification of slide
+options is simple, but on the moment you have more viewports, then
+you might want to show a slide on one, on all, or on a subset, possibly
+with different flags.
+<P>
+To be able to specify the viewport, you can use the options:
+<DL>
+<DT><B>-viewport =&gt;</B> <I>string</I>
+<DT><B>-viewports =&gt; [</B> <I>string, ...</I> <B>]</B>
+<DD>As alternative, you are allowed to use the option names
+    <CODE>-screen</CODE> and <CODE>-screens</CODE> which may be a
+    bit more intuitive names, but differs from the internal naming
+    of the PPresenter software.
+    <P>
+    The default is <CODE>'OTHER'</CODE>, which means: all viewports
+    excluding those which I specified explicitly, and excluding the
+    viewports which show slidenotes..
+    The value <CODE>'ALL'</CODE> can also be defined, but is rarely
+    used (OTHER is doing a good job as default).
+</DL>
+Next to this extra option you have to use nexted option specifications.
+Here is starts to become complicated.  Examples show the possibilities
+best.
+
+<H2><A NAME=examples>Examples</A></H2>
+
+First we need a few <A HREF=../viewport/index.html>viewports</A>:
+<PRE>
+  use PPresenter;
+  my $show = PPresenter->new(-name =&gt; 'demo'
+      , -controlDisplay =&gt; $ENV{DISPLAY});
+  $show->addViewport(-name =&gt; 'first');
+  $show->addViewport(-name =&gt; 'second');
+  $show->addViewport(-name =&gt; 'third');
+</PRE>
+OK, now we have 4 viewports: one control viewport, which shows slidenotes.
+The control viewport is created because there is a display defined for it.
+<P>
+Furthermore, there are three windows on my screen, ready to display slides.
+You need more options: for instance to specify geometry and such if you
+want to try this out.  But we try to demonstrate slide-view specifications
+and not the creation of viewports.
+<P>
+<H4>Example 1: slide on all viewports</H4>
+
+<PRE>
+   $show->addSlide(-title =&gt; 'slide 1');
+   $show->addSlide(-title =&gt; 'slide 2'
+       , -viewports =&gt; 'ALL');
+   $show->addSlide(-title =&gt; 'slide 3'
+       , -viewports =&gt; 'OTHER');
+</PRE>
+Three times the same: of course you prefer the first notation.
+
+<H4>Example 2: on only one viewport</H4>
+
+<PRE>
+   $show->addSlide(-title =&gt; 'slide 4'
+       , -viewport =&gt; 'first');
+</PRE>
+
+This was simple, wasn't it.  To add a slide to two viewports is
+left as an excercise.
+
+<H4>Example 3: all viewports, but a bit different</H4>
+
+Now we need nesting in our specification.  Nesting is done by adding
+a hash <STRONG>always to the end</STRONG> of an option list.  For instance:
+<PRE>
+   $show->addSlide(-title =&gt; 'slide 5'
+       , -template =&gt; 'tm'
+       , -bgcolor  =&gt; 'red'
+       , { -viewport =&gt; 'first'
+         , -main     =&gt; 'text 1'
+         }
+       , { -viewports =&gt; [ 'second', 'third' ]
+         , -template  =&gt; 'tlr'
+         , -left      =&gt; 'text 2'
+         , -right     =&gt; 'text 3'
+         }
+       );
+</PRE>
+The slide general options shall be but before (outside) the nestings.  All
+three viewports will have a red background.  Viewport 'first' will use
+template <CODE>tm</CODE>, but this is overruled for the both other viewports.
+<P>
+The same could be written as:
+<PRE>
+   $show->addSlide(-title =&gt; 'slide 6'
+       , { -viewport =&gt; 'first'
+         , -template =&gt; 'tm'
+         , -main     =&gt; 'text 1'
+         , -bgcolor  =&gt; 'red'
+         }
+       , { -template  =&gt; 'tlr'
+         , -left      =&gt; 'text 2'
+         , -right     =&gt; 'text 3'
+         , -bgcolor  =&gt; 'red'
+         }
+       );
+</PRE>
+The default viewport is <CODE>'OTHER'</CODE>.
+
+<H4>Example 4: one viewport differs</H4>
+
+Another way to write the same as in the previous example:
+<PRE>
+   $show->addSlide(-title =&gt; 'slide 7'
+       , -template  =&gt; 'tlr'
+       , -left      =&gt; 'text 2'
+       , -right     =&gt; 'text 3'
+       , -bgcolor   =&gt; 'red'
+       , { -viewport =&gt; 'first'
+         , -template =&gt; 'tm'
+         , -main     =&gt; 'text 1'
+         }
+       );
+</PRE>
+This shows one viewport which is a bit different: the main option-level
+has no viewports specified, hence defaults to viewports is
+<CODE>'OTHER'</CODE>.
+
+<H4>Example 5: use only two viewports differently</H4>
+
+The following works, because the options of the nesting (describing
+the future contents of the second screen) overrule those of the first):
+<PRE>
+   $show->addSlide(-title =&gt; 'slide 7'
+       , -template  =&gt; 'tlr'
+       , -viewport  =&gt; 'first'
+       , -left      =&gt; 'text 2'
+       , -right     =&gt; 'text 3'
+       , -bgcolor   =&gt; 'red'
+       , { -viewport =&gt; 'second'
+         , -template =&gt; 'tm'
+         , -main     =&gt; 'text 1'
+         }
+       );
+</PRE>
+However, it is nicer to write:
+<PRE>
+   $show->addSlide(-title =&gt; 'slide 7'
+       , -bgcolor   =&gt; 'red'
+       , -viewport  =&gt; 'NONE'
+       , { -viewport =&gt; 'first'
+         , -template =&gt; 'tlr'
+         , -left     =&gt; 'text 2'
+         , -right    =&gt; 'text 3'
+         }
+       , { -viewport =&gt; 'second'
+         , -template =&gt; 'tm'
+         , -main     =&gt; 'text 1'
+         }
+       );
+</PRE>
+If you forget the viewport 'NONE', then the general options are used to
+destroy the other viewports: the third, in this case.
+<P>
+The second example showed how easy it is as both views are equal.
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

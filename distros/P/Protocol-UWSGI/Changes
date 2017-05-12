@@ -1,0 +1,32 @@
+Revision history for Protocol-UWSGI
+
+1.000     2014-08-11 18:04:41+01:00 Europe/London
+	Note that this version drops the constructor.
+	API should be stable now, any further changes will
+	be backward-compatible.
+
+	API CHANGES:
+	* Removed constructor entirely.
+	* This is now a standalone module which exports functions.
+
+	Performance improvements:
+	* extract_frame is now about 2.5x faster
+
+0.002     2014-08-06 15:40:28+01:00 Europe/London
+	Note that this version changes the return value
+	of extract_modifier/extract_frame.
+
+	API CHANGES:
+	* extract_modifier and extract_frame now return
+	the environment directly, rather than a hashref
+	with env and url keys.
+	* Undef hash entries now cause an exception
+	rather than being reported via warn().
+
+	New features:
+	* Helper method for extracting URI information
+	from an existing environment (uri_from_env)
+
+0.001     2013-09-28 19:58:18 Europe/London
+	Initial CPAN release
+

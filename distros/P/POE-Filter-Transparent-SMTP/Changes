@@ -1,0 +1,13 @@
+Revision history for POE-Filter-Transparent-SMTP
+
+2009-01-28  George Nistorica
+	* SMTP.pm: *** Added EscapeSingleInputDot parameter to escape
+          single dot on a line in message bodies ***
+
+2008-05-03  George Nistorica
+
+	* SMTP.pm: *** empty log message ***
+
+	* SMTP.pm: New file.
+
+Initial commit

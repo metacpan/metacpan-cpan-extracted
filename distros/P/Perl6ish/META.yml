@@ -1,0 +1,33 @@
+---
+abstract: 'Some Perl6 programming in Perl5 code.'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perl6ish
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  B::Hooks::Parser: 0.08
+  Data::Bind: 0.3
+  Devel::BeginLift: 0.001002
+  Devel::Caller: 2.03
+  Devel::Declare: 0.003004
+  List::Util: 1.19
+  Perl6::Caller: 0.04
+  Perl6::Contexts: 0.4
+  Perl6::Junction: 1.4
+  Perl6::Perl: 0.01
+  Perl6::Slurp: 0.03
+  Perl6::Take: 0.04
+  Readonly: 1.03
+  Scalar::Util: 1.19
+version: 0.02

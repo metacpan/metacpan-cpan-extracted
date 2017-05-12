@@ -1,0 +1,11 @@
+<!-- START OF FOOTER .............................................. -->
+		<table width="100%" cellspacing="0" cellpadding="0" border="0">
+			<tr>
+				<td height="15" width="15" bgcolor="#BEDCEC"><span class="vsmall"> </span></td>
+				<td height="15" class="small" bgcolor="#BEDCEC">session id: <span petal:replace="session/id">id</span></td>
+				<td height="15" class="small" bgcolor="#BEDCEC"><?if name="session/user"?>logged in as: $session/user/name<?else?>not logged in<?end?></td>
+				<td height="15" class="small" bgcolor="#BEDCEC"><?if name="session/user"?><a href="/logout.html">logout</a><?else?><a href="/login.html">login</a><?end?></td>
+			</tr>
+		</table>
+<!-- END OF FOOTER ................................................ -->
+

@@ -1,0 +1,166 @@
+#!/usr/bin/perl
+
+$^W=1;
+use strict;
+
+# sub POE::Kernel::TRACE_EVENTS () {1}
+# sub POE::Kernel::TRACE_RETURNS () {1}
+use POE::Kernel;
+
+eval {
+    POE::Component::IKC::Responder->spawn();
+    Test::Client->spawn(@ARGV);
+    $poe_kernel->run();
+};
+warn $@ if $@;
+
+################################################################
+package Test::Client;
+use strict;
+
+use POE::Component::IKC::Client;
+use POE::Component::IKC::Responder;
+use POE::Session;
+
+sub DEBUG { 0 }
+
+
+sub spawn 
+{
+    my($package, $type, $port)=@_;
+
+    $port ||= 1338;
+
+    POE::Session->create(
+        args=>[$type, $port],
+        package_states=>[
+            $package=>[qw(_start posting calling callback _stop
+                 subscribing subscribed unsubscribed YOW
+                 registered)],
+        ]
+    );
+
+}
+
+sub _start
+{
+    DEBUG and warn "Client: _start\n";
+    my($kernel, $heap, $type, $port)=@_[KERNEL, HEAP, ARG0, ARG1];
+
+    $kernel->alias_set('Client');
+    my %args;
+
+    DEBUG and warn "$$: type=$type";
+    if( $type =~ m/0$/ ) {
+        $args{protocol} = 'IKC0';
+    }
+
+    my $rname=$heap->{name}=ucfirst $type;
+    $rname =~ s/\d+$//;
+    $heap->{rname} = $rname;
+
+
+    if($type =~ /^ikc/) {
+        $args{serializer}='POE::Component::IKC::Freezer';
+#        $kernel->post(IKC=>'monitor', 'Inet'=>{register=>'registered'});
+#    } else {
+    }
+    DEBUG and warn "$$: Looking for $rname";
+    $kernel->post(IKC=>'monitor', $rname=>{register=>'registered'});
+
+    $args{name} = "$heap->{name}Client";
+
+    if($type =~ /^unix/) {
+        $args{unix}=($ENV{TMPDIR}||$ENV{TEMP}||'/tmp').'/IKC-test.pl';
+    } 
+    else {                    # ikc AND inet
+        $args{port}=$port;
+    }
+    POE::Component::IKC::Client->spawn(%args);
+}
+
+sub _stop
+{
+    DEBUG and warn "Client: _stop\n";
+}
+
+sub registered
+{
+    DEBUG and warn "Client: registered\n";
+    my($kernel, $heap)=@_[KERNEL, HEAP];
+    sleep(0);
+    $kernel->yield('posting');
+}
+
+########################################################
+sub posting
+{
+    DEBUG and warn "Client: posting\n";
+    my($kernel, $heap)=@_[KERNEL, HEAP];
+    $kernel->post(IKC=>'post', "poe://$heap->{rname}/test/posted"=>
+                    ['posted', $heap->{name}]);
+
+    sleep(0);
+    $kernel->yield('calling');
+}
+
+
+########################################################
+sub calling
+{
+    DEBUG and warn "Client: calling\n";
+    my($kernel, $heap)=@_[KERNEL, HEAP];
+    sleep(0);
+    $kernel->call( IKC=>'call', 
+                    "poe://$heap->{rname}/test/called"=>'called',
+                    'poe:callback' 
+                 );
+}
+
+sub callback
+{
+    DEBUG and warn "Client: callback\n";
+    my($kernel, $heap)=@_[KERNEL, HEAP];
+    sleep(0);
+    $kernel->yield('subscribing');
+}
+
+########################################################
+sub subscribing
+{
+    DEBUG and warn "Client: subscribing ($$)\n";
+    my($kernel, $heap)=@_[KERNEL, HEAP];
+    $kernel->post(IKC=>'monitor', $heap->{rname}=>{
+                subscribe=>'subscribed',
+                unsubscribe=>'unsubscribed'
+            });
+
+    $kernel->post(IKC=>'publish', Client=>[qw(YOW)]);
+    $kernel->post(IKC=>'subscribe', "poe://$heap->{rname}/test");
+}
+
+sub subscribed
+{
+    DEBUG and warn "Client: subscribed\n";
+    my($kernel, $heap)=@_[KERNEL, HEAP];
+    # warn "$INC{'POE/Component/IKC/Proxy.pm'}";
+    $kernel->post("poe://$heap->{rname}/test" => 'method', {type => 'method'});
+}
+
+sub YOW
+{
+    DEBUG and warn "Client: YOW\nClient: unsubscribing\n";
+    my($kernel, $heap)=@_[KERNEL, HEAP];    
+    $kernel->post(IKC=>'retract', Client=>[qw(YOW)]);
+    $kernel->post(IKC=>'unsubscribe', "poe://$heap->{rname}/test");
+}
+
+sub unsubscribed
+{
+    DEBUG and warn "Client: unsubscribed\n";
+    my($kernel, $heap)=@_[KERNEL, HEAP];
+    $kernel->call(IKC=>'post', "poe://$heap->{rname}/test/done");
+    $kernel->post(IKC=>'shutdown');
+}
+
+

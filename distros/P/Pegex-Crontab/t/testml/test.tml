@@ -1,0 +1,17 @@
+%TestML 1.0
+
+Plan = 1;
+
+*cron.parse.yaml.clean == *data;
+
+=== Basic
+--- cron
+# use /bin/bash to run commands, instead of the default /bin/sh
+SHELL=/bin/bash
+# mail any output to `paul', no matter whose crontab this is
+MAILTO=paul
+
+# run five minutes after midnight, every day
+5 0 * * *       $HOME/bin/daily.job >> $HOME/tmp/out 2>&1
+--- data
+O YEAH!!

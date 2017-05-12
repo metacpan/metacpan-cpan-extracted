@@ -1,0 +1,54 @@
+
+Changes in 1.4.0
+----------------
+
+Version 1.4.0 was prepared by Ernst Rohlicek (ernst.rohlicek@inode.at)
+who is bravely taking on primary developer duties on Parallel::Pvm.
+Ernst has also started including a Gentoo ebuild file for the module.
+To him go the glory - and the questions! 
+
+Contexts:
+	pvm_getcontext() pvm_newcontext() pvm_setcontext() pvm_freecontext()
+
+Message Handlers:
+	pvm_addmhf() pvm_delmhf()
+	
+	From Ernst Rohlicek:
+	Unimplemented - don't know how to give a Perl function pointer to a 
+	C function (and have it work additionally).
+
+	int
+	pvm_regmhf()
+
+	int
+	pvm_delmhf()
+
+Message Mailboxes:
+	pvm_putinfo() pvm_recvinfo() pvm_delinfo() pvm_getmboxinfo()
+
+Spawn Siblings:
+	pvm_siblings()
+
+Missing:
+	Tests for those new functions
+	Still contains runtime text relocations, but couldn't find any info on this.
+	Documentation for new functions in Pvm.pm missing
+
+
+1.3.0 is a completely user-contributed release! 
+-----------------------------------------------
+
+Large parts of Parallel::Pvm were rewritten by Ulrich Pfeifer,
+while preserving the original API. (And a great job he did!)
+- unpack() now accepts an extra parameter for the size of the
+  message, removing the previous 100.000 char limit.
+- The pvm group functions are now implemented.
+- Memory leaks in the config(), tasks() and hostsync() functions 
+  were fixed.
+- There is now also a very nice setup for test scripts - they
+  reside in the "t" directory. 
+This work was sponsored by Neopoly AG.
+
+Benjamin Holzman contributed support for the pmv_start_pvmd()
+API call.
+

@@ -1,0 +1,110 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Panotools::Script;
+use Image::Size;
+
+my $opts = {};
+
+while (@ARGV)
+{
+    my ($key, $value) = split ('=', shift);
+    $opts->{$key} = $value;
+}
+
+my $usage =
+"Takes an equirectangular image and produces a .pto file suitable for
+extracting six cube faces.
+
+Usage:
+   $0 --erect=myerectangular.tif --ptofile=cubic.pto
+
+Options:
+   --filespec (panotools format, defaults to 'TIFF_m')
+   --roll     (degrees)
+   --pitch    (degrees, use -90 if nadir is in centre)
+   --yaw      (degrees, adjust position of first cubeface)
+   --face     (cubeface size in pixels, defaults to optimum)
+";
+
+my $roll  = $opts->{'--roll'}  || 0;
+my $pitch = $opts->{'--pitch'} || 0;
+my $yaw   = $opts->{'--yaw'}   || 0;
+my $filespec = $opts->{'--filespec'} || 'TIFF_m';
+my $erect = $opts->{'--erect'} or die $usage;
+my $ptofile = $opts->{'--ptofile'} or die $usage;
+
+my ($width, $height) = imgsize ($erect);
+
+my $face = $opts->{'--face'} || 8 * int ($width / 3.14159265 / 8);
+
+my $p = new Panotools::Script;
+$p->Panorama->Set (v => 90, f => 0, u => 0, w => $face, h => $face, n => "\"$filespec\"");
+
+$p->Image->[0] = new Panotools::Script::Line::Image;
+$p->Image->[0]->Set (w => $width, h => $height, v => 360, f => 4, r => 0, p => 0, y => 0, n => "\"$erect\"");
+
+$p->Image->[0]->Transform ($roll, $pitch, $yaw);
+
+$p->Image->[1] = $p->Image->[0]->Clone;
+$p->Image->[1]->Transform (0, 0, -90);
+$p->Image->[2] = $p->Image->[0]->Clone;
+$p->Image->[2]->Transform (0, 0, 180);
+$p->Image->[3] = $p->Image->[0]->Clone;
+$p->Image->[3]->Transform (0, 0, 90);
+$p->Image->[4] = $p->Image->[0]->Clone;
+$p->Image->[4]->Transform (0, -90, 0);
+$p->Image->[5] = $p->Image->[0]->Clone;
+$p->Image->[5]->Transform (0, 90, 0);
+
+$p->Write ($ptofile);
+
+0;
+
+__END__
+
+=head1 NAME
+
+erect2cubic - creates a hugin .pto file for converting equirectangular to cubic
+
+=head1 Synopsis
+
+  erect2cubic --erect=panorama.tif --ptofile=cube_project.pto
+  nona -o cube_prefix cube_project.pto
+
+=head1 DESCRIPTION
+
+Takes an equirectangular image and produces a .pto file suitable for
+extracting six cube faces in TIFF_m format.
+
+Cube faces are produced in front, right, back, left, up & down
+order.  The cube edge length is set to the sphere diameter reduced
+to the nearest multiple of 8.  Prerotate the scene with --roll,
+--pitch and --yaw parameters if required.
+
+  erect2cubic --erect=panorama.tif --ptofile=cube_project.pto
+  nona -o cube_prefix cube_project.pto
+
+=head1 Calling syntax
+
+  cubic2erect --erect=panorama.tif --ptofile=cube_project.pto \
+    [--roll=12] [--pitch=34] [--yaw=56] [--filespec=PNG] [--face=1024]
+
+=head1 License
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 See Also
+
+L<http://panotools.sourceforge.net/>
+
+=head1 Author
+
+Bruno Postle, E<lt>bruno (at) postle.netE<gt>
+
+=cut
+

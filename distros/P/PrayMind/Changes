@@ -1,0 +1,6 @@
+Revision history for Perl extension Religion::Islam::PrayMind.
+
+1.01  Thu Feb  7 10:09:49 2002
+	- original version; created by h2xs 1.21 with options
+		-A -O -X -n Religion::Islam::PrayMind -v 1.01
+

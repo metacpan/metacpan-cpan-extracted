@@ -1,0 +1,12 @@
+Revision history for Parse-Daemontools-Service
+
+0.03  2014-03-12 15:17:10 JST
+    [INCOMPATIBLE CHANGES]
+       - Returns seconds and start_at as integer instead of an instance of Math::BigInt
+
+0.02  2014-01-06 18:30:50 JST
+        - Support 32bit architectures (fixed #1)
+
+0.01  2013-12-09 13:42:29 JST
+    [NEW FEATURES]
+        - Initial version

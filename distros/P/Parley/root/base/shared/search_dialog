@@ -1,0 +1,92 @@
+<!-- SEARCH DIALOG -->
+<script type="text/javascript">
+YAHOO.namespace("parley.search");
+
+function search_dialog_init() {
+	// Define various event handlers for Dialog
+	var handleSubmit = function() {
+		this.submit();
+	};
+	var handleCancel = function() {
+		this.cancel();
+	};
+	var handleSuccess = function(o) {
+	};
+	var handleFailure = function(o) {
+		alert("Submission failed: " + o.status);
+	};
+
+	// Instantiate the Dialog
+	YAHOO.parley.search.search_dialog = new YAHOO.widget.Dialog(
+        'search_dialog', 
+        {
+            postmethod : 'form',
+            fixedcenter : true,
+            visible : false, 
+            modal: false,
+            constraintoviewport : true,
+            buttons : [
+                { text:'[%l('Search')%]', handler:handleSubmit, isDefault:true },
+                { text:'[%l('Cancel')%]', handler:handleCancel }
+            ]
+        }
+    );
+	
+	// Validate the entries in the form to require that both first and last name are entered
+	YAHOO.parley.search.search_dialog.validate = function() {
+		var data = this.getData();
+		if (data.search_terms == "") {
+			alert("Please enter something to search for");
+			return false;
+		} else {
+			return true;
+		}
+	};
+
+	// Wire up the success and failure handlers
+	YAHOO.parley.search.search_dialog.callback = { success: handleSubmit,
+												 failure: handleFailure };
+	
+	// Render the Dialog
+	YAHOO.parley.search.search_dialog.render();
+}
+
+YAHOO.util.Event.onDOMReady(search_dialog_init);
+</script>
+
+<div id="search_dialog">
+<div class="hd">[%l('Search')%]</div>
+<div class="bd">
+    <form action="search/forum" method="post" name="search_form" class="search_dialog_form">
+        <fieldset>
+            <label for="search_terms"><b>[%l('Search For')%]:</b></label>
+            <input type="text" id="search_terms" name="search_terms" style="width: 25em;" class="input_text" />
+            <br />
+        </fieldset>
+
+        <fieldset style="background-color:transparent; text-align: center; margin-top: 5px;">
+            <label for="search_forum"><em>[%l('in')%]:</em></label>
+            <select id="search_forum" name="search_forum">
+                <optgroup label="[%l('General')%]">
+                    [% IF current_forum %]<option value="[% current_forum.id %]">[%l('Current Forum')%]</option>[% END %]
+                    <option value="">[%l('All Forums')%]</option>
+                </optgroup>
+                [% IF available_forums %]
+                [% SET dummy=available_forums.reset %]
+                <optgroup label="[%l('Forums')%]">
+                [% WHILE (forum = available_forums.next) %]
+                <option value="[% forum.id %]">[% forum.name %]</option>
+                [% END %]
+                </optgroup>
+                [% END %]
+            </select>
+            <br />
+        </fieldset>
+    </form>
+
+    <div style="background-color:transparent; text-align: right;">
+        <a href="[%c.uri_for('/search/advanced')%]">Advanced Search</a>
+    </div>
+</div>
+</div>
+<!-- SEARCH DIALOG -->

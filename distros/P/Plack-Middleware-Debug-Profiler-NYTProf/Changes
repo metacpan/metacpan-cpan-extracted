@@ -1,0 +1,20 @@
+Revision history for Perl extension Plack::Middleware::Debug::Profiler::NYTProf
+
+0.06
+        Sat Mar 26 11:39:00 2011
+        - Contributions by Nuba Princigalli (base_URL, minimal, no_merge_evals, bugfixes) 
+
+0.05    Tue Oct 12 22:20:00 2010
+        - cleanup
+
+0.04    Tue Oct 12 22:00:00 2010
+        - cleanup
+
+0.03    Mon Oct 11 22:00:13 2010
+        - cpan account
+
+0.02    Mon Oct 11 22:00:13 2010
+        - cpan upload
+
+0.01    Thu Jul  1 11:00:13 2010
+        - original version

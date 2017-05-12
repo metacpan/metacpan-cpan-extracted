@@ -1,0 +1,5 @@
+<p>
+  <b petal:omit-tag="string:0">This tag should not be omited (false expr)</b>
+  <b petal:omit-tag="string:1">This tag should be omited (true expr)</b>
+  <b petal:omit-tag="">Is this a bug?</b>
+</p>

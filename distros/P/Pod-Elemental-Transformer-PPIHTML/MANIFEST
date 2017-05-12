@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Pod/Elemental/Transformer/PPIHTML.pm
+t/00-compile.t
+t/000-report-versions-tiny.t
+xt/release/changes_has_content.t
+xt/release/pod-syntax.t

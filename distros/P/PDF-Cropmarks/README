@@ -1,0 +1,31 @@
+PDF-Cropmarks
+
+This module prepares PDF for printing adding the cropmarks, usually on
+a larger physical page, doing the same thing the LaTeX package "crop"
+does. It also takes care of the paper thickness, shifting the logical
+pages to compensate the folding.
+
+It comes with a ready-made script, pdf-cropmarks.pl
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc PDF::Imposition
+
+LICENSE
+
+This module is free software and is published under the same terms as
+Perl itself.
+
+

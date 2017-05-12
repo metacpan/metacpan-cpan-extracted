@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               Pod-POM-View-DocBook
+version:            0.08
+abstract:           DocBook View for POD Object Model
+author:
+    - Andrew Ford <A.Ford@ford-mason.co.uk>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Accessor:      0
+    File::Slurp:          0
+    FindBin:              0
+    List::MoreUtils:      0
+    Pod::POM::Constants:  0
+    Pod::POM::View:       0
+    Test::XML:            0
+    Text::Wrap:           0
+    XML::LibXML:          0
+    YAML::Any:            0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,159 @@
+NAME
+    Parcel::Track - Driver-based API for tracking parcel
+
+VERSION
+    version 0.005
+
+SYNOPSIS
+        # Create a tracker
+        my $tracker = Parcel::Track->new( 'KR::Test', '64537-0301-2020' );
+
+        # ID & URI
+        print $tracker->id . "\n";
+        print $tracker->uri . "\n";
+    
+        # Track the information
+        my $result = $tracker->track;
+    
+        # Get the information what you want.
+        if ( $result ) {
+            print "$result->{from}\n";
+            print "$result->{to}\n";
+            print "$result->{result}\n";
+            print "$_\n" for @{ $result->{descs} };
+            print "$_\n" for @{ $result->{htmls} };
+        }
+        else {
+            print "Failed to track information\n";
+        }
+
+DESCRIPTION
+    "Parcel::Track" is intended to provide a driver-based single API for
+    tracking parcel information. The intent is to provide a single API
+    against which to write the code to track the parcel information.
+
+    "Parcel::Track" drivers are installed seperately.
+
+    The design of this module is almost stolen from SMS::Send.
+
+ATTRIBUTES
+  driver
+    Returns loaded driver object. You can access attributes and methods of
+    specific driver.
+
+        $tracker = Parcel::Track->new( 'MyDriver', '123-456-789-012',
+            _username => 'keedi',
+            _password => 'keedi',
+        );
+        $tracker->driver->username; # NOT _username BUT username
+        $tracker->driver->password; # NOT _password BUT password
+        $tracker->driver->foo( $dummy1 );
+        $tracker->driver->bar( $dummy2, $dummy3 );
+
+METHODS
+  new
+        # The most basic tracker
+        $tracker = Parcel::Track->new( 'Test', '123-456-789-012' );
+    
+        # Indicate regional driver with ::
+        $tracker = Parcel::Track->new( 'KR::Test', '123-456-789-012' );
+    
+        # Pass arbitrary params to the driver
+        $tracker = Parcel::Track->new( 'MyDriver', '123-456-789-012',
+            _username => 'keedi',
+            _password => 'keedi',
+        );
+
+    The "new" constructor creates a new Parcel tracker.
+
+    It takes as its first parameter a driver name. These names map the class
+    names. For example driver "Test" matches the testing driver
+    Parcel::Track::Test.
+
+    It takes as its second parameter a tracking number.
+
+    Any additional params should be key/value pairs, split into two types.
+
+    Params without a leading underscore are "public" options and relate to
+    standardised features within the Parcel::Track API itself. At this time,
+    there are no usable public options.
+
+    Params with a leading underscore are "private" driver-specific options
+    and will be passed through to the driver without the underscore.
+
+        $tracker = Parcel::Track->new( 'MyDriver', '123-456-789-012',
+            _username => 'keedi',
+            _password => 'keedi',
+        );
+        $tracker->driver->username; # NOT _username BUT username
+        $tracker->driver->password; # NOT _password BUT password
+
+    Returns a new Parcel::Track object, or dies on error.
+
+  id
+    Returns tracking number.
+
+  uri
+    Returns official link to track parcel.
+
+  track
+    Returns "HASHREF" which contains information of tracking the parcel.
+
+        my $tracker = Parcel::Track->new( 'KR::Test', '64537-0301-2020' );
+        my $info = $tracker->track;
+        print "$info->{from}\n";
+        print "$info->{to}\n";
+        print "$info->{result}\n";
+        print "$_\n" for @{ $info->{htmls} };
+        print "$_\n" for @{ $info->{descs} };
+
+    "HASHREF" MUST contain following key and value pairs.
+
+    *   "from": "SCALAR".
+
+    *   "to": "SCALAR".
+
+    *   "result": "SCALAR".
+
+    *   "htmls": "ARRAYREF".
+
+    *   "descs": "ARRAYREF".
+
+SEE ALSO
+    *   Parcel::Track::KR::CJKorea
+
+    *   Parcel::Track::KR::Dongbu
+
+    *   Parcel::Track::KR::Hanjin
+
+    *   Parcel::Track::KR::KGB
+
+    *   Parcel::Track::KR::PostOffice
+
+    *   Parcel::Track::KR::Yellowcap
+
+    *   SMS::Send
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/keedi/Parcel-Track/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/keedi/Parcel-Track>
+
+      git clone https://github.com/keedi/Parcel-Track.git
+
+AUTHOR
+    김도형 - Keedi Kim <keedi@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2015 by Keedi Kim.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,57 @@
+MODULE
+
+  PDF::FDF::Simple - Read and write (Acrobat) FDF files.
+
+ABOUT
+
+  PDF::FDF::Simple helps creating and extracting FDF files. It is
+  meant to be a simple replacement for the Adobe FdfToolkit when you
+  just want to read or create fdf files.
+
+  After the extraction process the content is available within a hash
+  reference.
+
+  For creating FDF files it currently only supports setting text
+  values. Anyway, this should be enough to create fdf-files with text
+  fields, text areas, checkboxes and radio buttons. See pod
+  documentation.
+
+SYNOPSIS
+
+  my $fdf = new PDF::FDF::Simple ({ filename     => '/tmp/test.fdf' });
+  $fdf->{content} = {
+                      'name'                 => 'Fred Madison',
+                      'organisation'         => 'Luna Lounge Ltd.',
+                      'dotted.field.name'    => 'Hello world.',
+                      'language.radio.value' => 'French',
+                      'my.checkbox.value'    => 'On'   # 'On' / 'Off'
+                    };
+  $fdf->save or print $fdf->errmsg;
+  my $fdfcontent = $fdf->load;
+
+PREREQUISITES
+
+  Parse::RecDescent (1.94)
+  Class::Accessor
+  Compress::Zlib (since PDF::FDF::Simple v0.18)
+
+AUTHOR
+
+  Steffen Schwigon <ss5@renormalist.net>
+  Tim Schreier
+
+REPOSITORY
+
+  The public repository is hosted on github:
+    git clone git://github.com/renormalist/pdf-fdf-simple.git
+
+LICENSE
+
+  Copyright (c) 2004..2009 Steffen Schwigon. All rights reserved.
+  This program is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.
+
+BUGS
+
+  Too simple?
+  I'm interested in comments/enhancements/bugfixes.

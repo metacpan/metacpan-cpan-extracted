@@ -1,0 +1,154 @@
+NAME
+    POE::Component::Server::SimpleHTTP::PreFork - PreForking support for
+    SimpleHTTP
+
+SYNOPSIS
+            use POE;
+            use POE::Component::Server::SimpleHTTP::PreFork;
+
+            # Start the server!
+            POE::Component::Server::SimpleHTTP::PreFork->new(
+                    'ALIAS'         =>      'HTTPD',
+                    'ADDRESS'       =>      '192.168.1.1',
+                    'PORT'          =>      11111,
+                    'HOSTNAME'      =>      'MySite.com',
+                    'HANDLERS'      =>      [
+                            {
+                                    'DIR'           =>      '^/bar/.*',
+                                    'SESSION'       =>      'HTTP_GET',
+                                    'EVENT'         =>      'GOT_BAR',
+                            },
+                            {
+                                    'DIR'           =>      '^/$',
+                                    'SESSION'       =>      'HTTP_GET',
+                                    'EVENT'         =>      'GOT_MAIN',
+                            },
+                            {
+                                    'DIR'           =>      '^/foo/.*',
+                                    'SESSION'       =>      'HTTP_GET',
+                                    'EVENT'         =>      'GOT_NULL',
+                            },
+                            {
+                                    'DIR'           =>      '.*',
+                                    'SESSION'       =>      'HTTP_GET',
+                                    'EVENT'         =>      'GOT_ERROR',
+                            },
+                    ],
+
+                    # In the testing phase...
+                    'SSLKEYCERT'            =>      [ 'public-key.pem', 'public-cert.pem' ],
+
+                    # In the testing phase...
+                    'FORKHANDLERS'          =>      { 'HTTP_GET' => 'FORKED' },
+                    'MINSPARESERVERS'       =>      5,
+                    'MAXSPARESERVERS'       =>      10,
+                    'MAXCLIENTS'            =>      256,
+                    'STARTSERVERS'          =>      10,
+                    'IPC_GLUE'              =>      'uniq',
+            ) or die 'Unable to create the HTTP Server';
+
+ABSTRACT
+            Subclass of SimpleHTTP for PreForking support
+
+New Constructor Options
+    "MINSPARESERVERS"
+                 An integer that tells the server how many spares should be in the pool at any given
+                 time. Processes are forked off at a rate of 1 a second until this limit is met.
+
+    "MAXSPARESERVERS"
+                 An integer that tells the server the maximum number of spares that may be in the pool
+                 at any given time. It is possible for more than this number of spares to exist, but at the very
+                 least the parent will stop forking requests off and the children will start to die eventually.
+
+                 If this value is less than MINSPARESERVERS then it is set to MINSPARESERVERS + 1.
+
+    "MAXCLIENTS"
+                 An integer that tells the server the maximum number of clients that will be
+                 created. After this limit is reached, no more spares will be forked, even if the number drops below
+                 MINSPARESERVERS.
+
+    "STARTSERVERS"
+                 An integer that tells the server how many processes to prefork at startup.
+
+    "FORKHANDLERS"
+                 A HASH where the keys are sessions and the values are events. When a child forks,
+                 before it begins accepting connections it will call these events on the specified
+                 sessions. This allows you to setup per-process resources (such as database
+                 connections, ldap connects, etc). These events will never be called for the
+                 parent.
+
+    "IPC_GLUE"
+                 A string containing either an integer or 4 characters specifying the key/glue
+                 for the underlying parent/child IPC communication.
+                 Running multiple instances of POE::Component::Server::SimpleHTTP::PreFork
+                 on the same host without using this option with different values
+                 almost guarantees some chaos.
+
+  New Events
+    "ISCHILD"
+                Returns true if you are inside a child, false if you are in the parent.
+
+    "GETFORKHANDLERS"
+                This event accepts 2 arguments: the session + event to send the response to.
+
+                This even will send back the current FORKHANDLERS hash ( deep-closed via
+                Storable::dclone ).
+
+                The resulting hash can be played around to your tastes, then once you are done...
+
+    "SETFORKHANDLERS"
+                This event accepts only one argument: reference to FORKHANDLERS hash.
+
+                BEWARE: this event is disabled in a forked child.
+
+Miscellaneous Notes
+            BEWARE: HANDLERS munging is disabled in a forked child. Also, handlers changed in
+            the parent will not appear in the already forked children.
+
+            BEWARE: for a child, calling {STOP,START}LISTEN does not {destroy,recreate} the
+            SOCKETFACTORY like it does in the parent. Instead, the child will {pause,resume}
+            accepting connections on the current SOCKETFACTORY. Also, {STOP,START}LISTEN does
+            not have any effect on the scoreboard calculations: this child will still
+            be marked a spare if it finishes all its requests.
+
+            The shutdown event is altered a little bit
+                    GRACEFUL -> sends a TERM signal to all remaining children and waits for their death
+                    NOARGS -> kills all remaining children with prejudice
+
+            Keep in mind that being forked means any global data is not shared between processes and etc. Please see perlfork for all the implications on your platform.
+
+New Compile-time constants
+    Checking spares every second may be a bit too much for you. You can
+    override this behavior by doing this:
+
+            sub POE::Component::Server::SimpleHTTP::PreFork::CHECKSPARES_INTERVAL () { 10 }
+            use POE::Component::Server::SimpleHTTP::PreFork;
+
+    If the prefork failed because it could not obtain shared memory for the
+    scoreboard, then if retries after 5 seconds. You can override this
+    behavior by doing this:
+
+            sub POE::Component::Server::SimpleHTTP::PreFork::PREFORK_INTERVAL () { 10 }
+            use POE::Component::Server::SimpleHTTP::PreFork;
+
+    If you would like to see the contents of the scoreboard every second
+    then do this:
+
+            sub POE::Component::Server::SimpleHTTP::PreFork::DEBUGSB () { 1 }
+            use POE::Component::Server::SimpleHTTP::PreFork;
+
+  EXPORT
+    Nothing.
+
+SEE ALSO
+            L<POE::Component::Server::SimpleHTTP>
+
+AUTHOR
+    Apocalypse <apocal@cpan.org> Stephen Butler <stephen.butler@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright 2006 by Apocalypse + Stephen Butler
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

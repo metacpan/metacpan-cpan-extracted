@@ -1,0 +1,112 @@
+NAME
+    Plack::Middleware::GepokX::ModSSL - roughly compatible with
+    Plack::Middleware::Apache2::ModSSL
+
+SYNOPSIS
+     builder
+     {
+         enable "GepokX::ModSSL",
+             vars => [ Plack::Middleware::GepokX::ModSSL->all ];
+         $app;
+     };
+
+DESCRIPTION
+    This middleware attempts to recreate for Gepok, some of the SSL
+    information which Apache's mod_ssl would put into the Plack $env hashref.
+
+    It supports the following variables, as defined by
+    <http://httpd.apache.org/docs/2.0/mod/mod_ssl.html>.
+
+    *   `SSL_CIPHER`
+
+    *   `SSL_CIPHER_USEKEYSIZE`
+
+    *   `SSL_CLIENT_CERT`
+
+    *   `SSL_CLIENT_I_DN`
+
+    *   `SSL_CLIENT_I_DN_C`
+
+    *   `SSL_CLIENT_I_DN_CN`
+
+    *   `SSL_CLIENT_I_DN_Email`
+
+    *   `SSL_CLIENT_I_DN_L`
+
+    *   `SSL_CLIENT_I_DN_O`
+
+    *   `SSL_CLIENT_I_DN_ST`
+
+    *   `SSL_CLIENT_M_SERIAL`
+
+    *   `SSL_CLIENT_M_VERSION`
+
+    *   `SSL_CLIENT_S_DN`
+
+    *   `SSL_CLIENT_S_DN_C`
+
+    *   `SSL_CLIENT_S_DN_CN`
+
+    *   `SSL_CLIENT_S_DN_Email`
+
+    *   `SSL_CLIENT_S_DN_L`
+
+    *   `SSL_CLIENT_S_DN_O`
+
+    *   `SSL_CLIENT_S_DN_ST`
+
+    *   `SSL_CLIENT_VERIFY`
+
+    *   `SSL_CLIENT_V_END`
+
+    *   `SSL_CLIENT_V_START`
+
+    *   `SSL_PROTOCOL`
+
+    Nothing is done by default. You need to tell the module which variables
+    you want:
+
+     builder
+     {
+         enable "GepokX::ModSSL",
+             vars => [qw( SSL_CIPHER SSL_CIPHER_USEKEYSIZE )];
+         $app;
+     };
+
+    If you want it all, then:
+
+     builder
+     {
+         enable "GepokX::ModSSL",
+             vars => [ Plack::Middleware::GepokX::ModSSL->all ];
+         $app;
+     };
+
+    Though bear in mind that some variables are more computationally expensive
+    than others. Cheap ones are: `SSL_PROTOCOL`, `SSL_CIPHER`,
+    `SSL_CIPHER_USEKEYSIZE`, `SSL_CLIENT_CERT`, `SSL_CLIENT_VERIFY`.
+
+BUGS
+    Please report bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Plack-Middleware-GepokX-ModSSL
+    >.
+
+SEE ALSO
+    Plack, Gepok (version 0.20 required), Plack::Middleware::Apache2::ModSSL.
+
+    <http://httpd.apache.org/docs/2.0/mod/mod_ssl.html>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

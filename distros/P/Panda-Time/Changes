@@ -1,0 +1,14 @@
+3.1.1     13.03.2017
+           - compile with all warnings enabled, fix warnings
+3.1.0     09.03.2017
+           - refactoring, no visible changes
+           - removed igmtime, itimegm, itimegml from C++ interface
+3.0.2     30.01.2017
+           - use panda::likely/unlikely instead of macros
+           - update embedded timezones (applies for MS Windows).
+3.0.1     05.07.2016
+           - bugfix (reading timezones). Thanks to Vladimir Timofeev (vovkasm) for patch
+           - update embedded timezones (applies for MS Windows).
+3.0.0     03.02.2015
+           - This module has been split from Panda::Date. No changes compared to it inside Panda::Date v2.9
+           - Started at version 3.0.0, to avoid conflicts with Panda::Time embedded to Panda::Date prior to 3.0.0

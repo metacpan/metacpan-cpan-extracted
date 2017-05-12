@@ -1,0 +1,56 @@
+# examples/Eyapplanguageref/Lhs.eyp
+# eyapp -C Lhs.eyp
+# ./Lhs.pm -t -c '2+3'
+# ./Lhs.pm -t -c 'a=3'
+
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+
+%token NUM = { /\G([0-9]+(?:\.[0-9]+)?)/gc   and return(NUM => bless { attr => $1}, 'NUM'); }
+%token VAR = { /\G([A-Za-z][A-Za-z0-9_]*)/gc and return(VAR => bless {attr => $1}, 'VAR');  }
+
+%defaultaction { 
+  my $self = shift;
+  my $name = $self->YYName();
+  bless { children => [ grep {ref($_)} @_] }, $name; 
+}
+
+%%
+input:    
+            /* empty */
+              { [] }
+        |   input line  
+              { 
+                push @{$_[1]}, $_[2] if defined($_[2]);
+                $_[1]
+              } 
+;
+
+line:     '\n'       { } 
+        | exp '\n'   {  $_[1] } 
+        | exp ''     {  $_[1] }  # '' stands for end of input
+;
+
+exp:        
+            NUM   { $_[1] } 
+        |   VAR   { $_[1] } 
+        |   %name ASSIGN
+            VAR '=' exp         
+        |   %name PLUS
+            exp '+' exp         
+        |   %name MINUS
+            exp '-' exp        
+        |   %name TIMES
+            exp '*' exp       
+        |   %name DIV
+            exp '/' exp      
+        |   %name UMINUS
+            '-' exp %prec NEG 
+        |  '(' exp ')'  { $_[2] }
+;
+
+%%
+
+$Data::Dumper::Indent = 1;

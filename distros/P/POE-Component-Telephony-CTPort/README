@@ -1,0 +1,401 @@
+NAME
+    POE::Component::Telephony::CTPort - Non-blocking telephony programming
+    in Perl
+
+SYNOPSIS
+            use POE qw(Compoent::Telephony::CTPort);
+        
+            POE::Session->create(
+                    inline_states => {
+                            _start => sub {
+                                    my $kernel = $_[KERNEL];
+                                
+                                    POE::Component::Telephony::CTPort->spawn({
+                                            alias => 'ctport',
+                                            port => 1,
+                                    });
+                                
+                                    $kernel->post(ctport => 'connect');
+                            },
+                            connected => sub {
+                                    my $kernel = $_[KERNEL];
+                        
+                                    print "connected to ctserver on port 1\n";
+                            },
+                            input => sub {
+                                    my ($kernel, $in) = @_[KERNEL, ARG0];
+                                
+                                    # all events are sent here, this is a good
+                                    # spot to use Data::Dumper
+                                    if ($in->{rly} eq 'ring') {
+                                            $kernel->yield(ring => $in);
+                                    }
+                            },
+                            ring => sub {
+                                    my $kernel = $_[KERNEL];
+                        
+                                    # pick up phone
+                                    $kernel->post(ctport => 'off_hook');
+                                
+                                    # play beep
+                                    $kernel->post(ctport => play => 'beep');
+                                
+                                    # record
+                                    $kernel->post(ctport => record =>
+                                            # to this file
+                                            'prompt.wav',
+                                            # for 15 seconds
+                                            15,
+                                            # or until they hit #
+                                            '#',
+                                            # or 3 seconds of silence
+                                            3,
+                                    );
+                                
+                                    # play it back to them
+                                    $kernel->post(ctport => play => 'prompt.wav');
+                                
+                                    # play 3 beeps
+                                    $kernel->post(ctport => play => 'beep beep beep');
+                                
+                                    # hangup
+                                    $kernel->post(ctport => 'on_hook');
+                                
+                                    # shutdown
+                                    $kernel->post(ctport => 'disconnect');
+                                    $kernel->post(ctport => 'shutdown');
+                            },
+                    }
+            );
+
+DESCRIPTION
+    This module implements a non blocking perl interface to CTserver, a
+    server that controls voictronix card operation.
+
+    *****NOTE*****
+
+    You need a voicetronix card, the voictronix driver, and ctserver
+    installed to use this module!
+
+    *****NOTE*****
+
+CONSTRUCTOR
+            POE::Component::Telephony::CTPort->spawn({
+                    alias => 'ctport',
+                    port => 1 
+            });
+
+    Don't start ctserver yourself, on the first spawn of CTPort, ctserver
+    will be launched in a fork(). To not run ctserver from this module,
+    specify no_ctserver_fork => 1 as a parameter.
+
+    You can specify all or none of the parameters:
+
+    *   ctserver - the path to the ctserver binary, 'ctserver' is the
+        default (in the path)
+
+    *   alias - name to address the component, 'ctport' is the default
+
+    *   paths - search paths for the play event, as an array ref: [
+        '/mnt/cdrom0', '/mnt/cdrom1' ]
+
+    *   default_ext - default extension for sound files (default is '.au')
+
+    *   reply_to - allows you to specify a different session id to send
+        events to
+
+    *   hostname - default is localhost
+
+    *   port - a port number from 1 to 4 (1 is default)
+
+    *   ignore_dtmf - 1 _or_ 0 (inital setting, used for playing sounds)
+
+    *   no_ctserver_fork - 1 _or_ 0 (0 is default)
+
+    spawn() returns a reference to the internal session, but do not keep a
+    copy of it. Instead call the ID method and save that:
+
+    $heap->{ctport} = POE::Component::Telephony::CTPort->spawn()->ID;
+
+    If you spawn more than one CTPort session, change the alias! Like this:
+
+    POE::Component::Telephony::CTPort->spawn({ alias => 'ct1' });
+    POE::Component::Telephony::CTPort->spawn({ alias => 'ct2' });
+    POE::Component::Telephony::CTPort->spawn({ alias => 'ct3' });
+    POE::Component::Telephony::CTPort->spawn({ alias => 'ct4' });
+
+    This will spawn four sessions and you are ready to tell each one to
+    connect to a different ctserver port. See the 'connect' event.
+
+NOTES
+    Any 'blocking' mentioned in this document is only related to the port
+    does not send or receive commands, POE will NOT block for any of these
+    events.
+
+    It takes alot of experimenting with this module and ctserver to get a
+    working routine down. My advice is to start off with 1 command, and
+    analize the results and setup your script to watch for those results
+    before sending the next command. Firing off the commands without knowing
+    what is happening doesn't work well. :)
+
+    The alias 'ctserver' is used internally for spawning and handling
+    ctserver. Do not use this alias in your scripts. Its ok to fire its
+    shutdown event to start a safe shutdown.
+
+    This will module will probably not work on win32. (windows)
+
+RECEIVING EVENTS
+    Your session will receive an event 'ct_input' ARG0 will be a parsed
+    version of ARG1. ARG1 is the raw text from the server.
+
+    Heres a dump of ARG0, a response from a off_hook event:
+
+            {
+                    'src' => '3',
+                    'rly' => 'ctanswer',
+                    'args' => [
+                            'OK'
+                    ],
+                    'dst' => '3',
+                    'argc' => '1'
+            }
+
+    This is ARG1 from the above dump.
+
+            rly=ctanswer src=3 dst=3 arg1=OK argc=1
+
+    You need to check the first arg of args to see if it is an event like
+    the one listed below.
+
+  dtmf
+  1, 2, 3, 4, 5, 6, 7, 8, 9, 0, *, #
+  hangup
+  loopdrop
+  ring
+  pickup
+  timer
+  cid
+  flash
+  toneend
+SENDING EVENTS
+  connect
+    Connects to the ctserver and port specified in the spawn constructor.
+    You can also pass a hash ref of hostname and port(1-4) to override.
+
+  disconnect
+    Disconnects from the ctserver.
+
+    Note: Disconnecting doesn't stop a currently running record, play, ect.
+
+  off_hook
+    Takes port off hook, like picking up the phone.
+
+  on_hook
+    Puts the port on hook, like hanging up the phone.
+
+  wait_for_ring
+    Blocks until port detects a ring, then returns. The caller ID (if
+    present) will be returned.
+
+  wait_for_dial_tone
+    Blocks until dial tone detected on port, then returns.
+
+  play_tone => $type
+    Plays a tone. $type can be busy, dialx, dial, or ringback. A warning is
+    produced if you supply an invalid tone.
+
+  stop_tone
+    Stops a playing tone
+
+  play_stop
+    Stops current playback.
+
+  play => $file _or_ play => \@files _or_ play => [ $file1, $file2, $file3 ]
+    Plays audio files, playing stops immediately if a DTMF key is pressed.
+    Any digits pressed while playing will be added to the digit buffer.
+
+    It accepts a space seperated list of files: $kernel->post(ctport => play
+    => "1 2 3");
+
+    or an array of files: $kernel->post(ctport => play => ['hello',
+    'world']);
+
+    Filename extensions:
+
+    *   The default is .au, can be redefined by posting/calling the
+        default_ext event with the file extension as the first parameter.
+        For example: $kernel->post(ctport => default_ext => '.wav');
+
+    *   You can override the default by providing the extension:
+        $kernel->post(ctport => play => "hello.wav");
+
+    Searches for file in:
+
+    *   The paths defined by set_path event or as an option to the spawn
+        constructor: { path => '/var/audio/files/' }
+
+    *   The current directory
+
+    *   The "prompts" sub dir (relative to the current directory)
+
+    *   full path supplied by caller
+
+    *   /var/ctserver/UsMEng
+
+    You can play multiple files
+
+    $kernel->post(ctport => play => "Hello World"); (assumes you have
+    Hello.au and World.au files available) (depending on what the default
+    extension is set to)
+
+    You can "speak" a limited vocabulary: $kernel->post(ctport => play => "1
+    2 3");
+
+    See the /var/ctserver/UsMEng directory for the list of included files
+    that defines the vocabulary.
+
+  record => $file_name => $seconds => $digits
+    Records $file_name for $seconds seconds or until any of the digits in
+    $digits are pressed. The path of $file_name is considered absolute if
+    there is a leading /, otherwise it is relative to the current directory.
+
+  record_stop
+    Stops recording on the current port.
+
+  sleep => $seconds
+    Blocks for $seconds, unless a DTMF key is pressed in which case it
+    returns immediately. If $ctport->event() is already defined it returns
+    immediately without sleeping.
+
+  clear
+    Clears the DTMF digit buffer. (It may clear events too!)
+
+  clear_events
+    Clears the event queue.
+
+  collect => $max_digits => $max_seconds
+    Returns up to $max_digits by waiting up to $max_seconds. Will return as
+    soon as either $max_digits have been collected or $max_seconds have
+    elapsed. On return, the event() method will return undefined.
+
+    DTMF digits pressed at any time are collected in the digit buffer. The
+    digit buffer is cleared by the clear method. Thus it is possible for
+    this function to return immediately if there are already $max_digits in
+    the digit buffer.
+
+  dial => $number
+    Dials a DTMF string. Valid characters are 1234567890#*,&
+
+    *   , gives a 1 second pause, e.g. $ctport->dial(",,1234) will wait 2
+        seconds, then dial extension 1234.
+
+    *   & generates a hook flash (used for transfers on many PBXs):
+
+        $kernel->post(ctport => dial => '&,1234'); will send a flash, wait
+        one second, then dial 1234.
+
+  wait_for_event
+    Blocks, waits for an event to happen. (probably not useful in POE)
+
+  send_event => $port => $event
+    Sends an event or message to another port.
+
+  start_timer => $seconds
+    Starts a timer that will send an event in $seconds seconds.
+
+  stop_timer
+    Stops the current timer.
+
+  join => $port1 => $port2
+    Bridges $port1 and $port2.
+
+  bridge => $port
+    Hardware bridges the connected port to $port.
+
+  unbridge => $port
+    Unbridges the connected port and $port.
+
+  join_conference => $port
+    Joins a port to a conference.
+
+  leave_conference => $port
+    Removes $port from a conference.
+
+  start_ring
+    Starts ringing the connected port.
+
+  stop_ring
+    Stops the connected port from ringing.
+
+  ring_once
+    Rings the connected port once.
+
+  grunt_on
+    Turns grunt (non-silence) detection on.
+
+  grunt_off
+    Turns grunt (non-silence) detection on.
+
+  default_ext => '.wav'
+    Changes default extension for playing files.
+
+  ignore_dtmf => 1 _or_ 0
+    Turns on/off the ability for the caller to stop playback with dtmf.
+
+  set_script_name => $name
+    This allows you to set a name on this port. Shown in a port_status
+    event.
+
+  send_cid => $number => $name
+    Sends caller id
+
+  listen_for_cid_jp
+    Call after teh first ring on trunk port to start listening for caller
+    ID. I'm not sure what JP is, but its not the same as the command below.
+
+  listen_for_cid
+    Call after teh first ring on trunk port to start listening for caller
+    ID. After the second ring, you should call read_cid to get the caller id
+    if it's available.
+
+  read_cid
+    Call this after the second ring on a trunk port to receive a caller id
+    event.
+
+  port_status => $port
+    Requests port status on a port, if $port is undef or -2, all ports are
+    polled for status
+
+  roll_log
+    Tells ctserver to close the current log, and open a new one with the
+    current date
+
+  ser_version
+    Requests the server version from ctserver
+
+  shutdown
+    Shutsdown the server and the connection.
+
+TODO
+    The docs are lacking somewhat, so use the source if you get confused.
+
+    Automation of the caller_id events into a more simple structure.
+
+BUGS
+    Please report any bugs to the author. Patches are welcome.
+
+AUTHOR
+    David Davis, <xantus@cpan.org>
+
+    If you use this module, please send comments, complaints or suggetions
+    to the author.
+
+SEE ALSO
+    POE
+
+    Telephony::CTPort (v0.3 doesn't work with the new ctserver)
+
+    ctserver, http://www.voicetronix.com.au/open-source.htm#ctserver
+
+    teknikill, http://teknikill.net/
+

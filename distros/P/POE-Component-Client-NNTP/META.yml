@@ -1,0 +1,29 @@
+---
+abstract: 'A POE component that implements an RFC 3977 NNTP client.'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  Test::More: 0.47
+  Test::POE::Server::TCP: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200018, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-Client-NNTP
+requires:
+  POE: 0.9999
+  POE::Component::Pluggable: 0.03
+  POE::Component::Pluggable::Constants: 0
+  POE::Driver::SysRW: 0
+  POE::Filter::Line: 0
+  POE::Wheel::ReadWrite: 0
+  POE::Wheel::SocketFactory: 0
+  perl: 5.006
+resources:
+  homepage: https://github.com/bingos/poe-component-client-nntp
+  repository: https://github.com/bingos/poe-component-client-nntp.git
+version: 2.22

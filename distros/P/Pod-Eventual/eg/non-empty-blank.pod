@@ -1,0 +1,7 @@
+=pod
+
+The line after this contains whitespace only.
+    
+...but that doesn't prevent this from being a new paragraph.
+
+=cut

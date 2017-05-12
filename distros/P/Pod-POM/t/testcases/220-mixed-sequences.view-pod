@@ -1,0 +1,16 @@
+=head1 NAME
+
+220-mixed-sequences
+
+=head1 TESTCASES
+
+This is B<bold and I<bold italic>>.
+
+This is I<italic and B<bold italic>>.
+
+This is code with a replacable text as italic: C<function(I<argument>)>.
+
+This is an bold with embedded escapes: B<bold E<amp> bold>.
+
+Code within non-breaking space sequence: S<< C<< code code code >> >>
+

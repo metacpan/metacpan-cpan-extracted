@@ -1,0 +1,35 @@
+in the image:
+-------------
+
+- install cpan modules PITA::XML and PITA::Scheme (including dependencies)
+- wget http://svn.o3.phase-n.com/svn/pita/trunk/doc/sample-launch-script.pl
+- cp sample-launch-script.pl /root/zpita
+- chmod a+x /root/zpita
+- ln -s /root/zpita /etc/rc2.d/S99zpita
+- ln -s /root/zpita /etc/rc3.d/S99zpita (just to be sure :-)
+- mkdir /mnt/injector
+
+now backup image
+
+
+in the host:
+------------
+
+- cd svn/trunk/PITA/t/util
+- cp qemu-run.pl my-run.pl
+- vi my-run.pl (paths, etc.)
+- perl my-run.pl
+
+you may want to comment the line with '-nographic' in PITA::Guest::Driver::Qemu
+to see the error messages from the zpita script
+
+
+
+open issues / bugs:
+-------------------
+
+(at least in the debian-sarge image) qemu does not quit when the image
+shuts down, so "perl my-run.pl" never ends.
+
+If you have started qemu without '-nographic', press Ctrl-Alt-2 and type
+"quit". This ends qemu.

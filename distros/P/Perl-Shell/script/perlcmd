@@ -1,0 +1,13 @@
+#!/usr/bin/perl
+
+use 5.006;
+use strict;
+use Perl::Shell ();
+
+use vars qw{$VERSION};
+BEGIN {
+	$VERSION = '0.04';
+}
+
+# Hand off to the module
+Perl::Shell::shell();

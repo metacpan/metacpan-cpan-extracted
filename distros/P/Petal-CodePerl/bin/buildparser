@@ -1,0 +1,17 @@
+#! /usr/bin/perl
+
+use strict;
+
+use Parse::RecDescent;
+
+my $grammar = do "grammar" || die "No grammar";
+
+local $Parse::RecDescent::skip = "";
+Parse::RecDescent->Precompile($grammar, "Petal::CodePerl::Parser");
+
+if (@ARGV)
+{
+	print "hit enter to install ...";
+	<>;
+}
+rename("Parser.pm", "lib/Petal/CodePerl/Parser.pm") || die "Couldn't rename, $!";

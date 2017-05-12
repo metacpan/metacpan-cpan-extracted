@@ -1,0 +1,9 @@
+^Pigment-
+^\.
+^blib\b
+^build\b
+^Makefile$
+^MANIFEST.bak$
+^pm_to_blib$
+\.(?:bs|o|old|swp)$
+^xs/.*\.c$

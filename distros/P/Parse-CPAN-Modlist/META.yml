@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name: Parse-CPAN-Modlist
+version: 0.9
+author:
+  - Copyright (c) 2004,
+  - Simon Wistow <simon@thegestalt.org>
+  - based on code from C<CPANPLUS> by Jos Boumans.
+abstract: Parse 03packages.data.gz
+license: perl
+requires:
+  Class::Accessor::Fast: 0
+  Test::More: 0
+provides:
+  Parse::CPAN::Modlist:
+    file: lib/Parse/CPAN/Modlist.pm
+    version: 0.9
+  Parse::CPAN::Modlist::Module:
+    file: lib/Parse/CPAN/Modlist/Module.pm
+    version: 0.1
+generated_by: Module::Build version 0.25

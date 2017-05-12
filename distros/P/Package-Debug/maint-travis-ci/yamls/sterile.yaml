@@ -1,0 +1,19 @@
+language: perl
+perl:
+  - "5.16"
+  - "5.14"
+  - "5.18"
+  - "5.19"
+env:
+  matrix:
+    - STERILIZE_ENV=0
+    - STERILIZE_ENV=1
+before_install:
+  - time perl ./maint-travis-ci/sterilize_env.pl
+install:
+  - time cpanm --quiet --notest --mirror http://cpan.metacpan.org/ --installdeps .
+branches:
+  only:
+    - "build/master"
+    - "releases"
+

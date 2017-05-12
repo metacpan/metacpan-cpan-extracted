@@ -1,0 +1,44 @@
+TYPEMAP
+
+URI*           XT_PANDA_URI
+URIx*          XT_PANDA_URI_STRICT_AUTO
+URI::UserPass* XT_PANDA_URI_STRICT
+URI::httpX*    XT_PANDA_URI_STRICT
+URI::http*     XT_PANDA_URI_STRICT
+URI::https*    XT_PANDA_URI_STRICT
+URI::ftp*      XT_PANDA_URI_STRICT
+XSURIWrapper*  XT_PANDA_URI_WRAPPER
+
+panda::uri::URI*           XT_PANDA_URI
+panda::uri::URIx*          XT_PANDA_URI_STRICT_AUTO
+panda::uri::URI::UserPass* XT_PANDA_URI_STRICT
+panda::uri::URI::httpX*    XT_PANDA_URI_STRICT
+panda::uri::URI::http*     XT_PANDA_URI_STRICT
+panda::uri::URI::https*    XT_PANDA_URI_STRICT
+panda::uri::URI::ftp*      XT_PANDA_URI_STRICT
+xs::uri::XSURIWrapper*     XT_PANDA_URI_WRAPPER
+
+######################################################################
+OUTPUT
+
+XT_PANDA_URI_WRAPPER : T_OWRAPPER(basetype=xs::uri::XSURIWrapper*)
+    $arg = new $subtype($var);
+    
+XT_PANDA_URI : T_OEXT(basetype=panda::uri::URI*, refcnt, wrapper=xs::uri::XSURIWrapper*, backref)
+
+XT_PANDA_URI_STRICT : XT_PANDA_URI
+    CLASS = (char*)"Panda::${ my $a = $type; $a =~ s/\s*\*//; \$a }";
+
+XT_PANDA_URI_STRICT_AUTO : XT_PANDA_URI
+    SV* CLASS;
+    CLASS = xs::uri::XSURIWrapper::get_perl_class(aTHX_ $var);
+
+######################################################################
+INPUT
+
+XT_PANDA_URI_WRAPPER : T_OWRAPPER(basetype=xs::uri::XSURIWrapper*)
+    $var = $arg->uri;
+
+XT_PANDA_URI : T_OEXT(basetype=panda::uri::URI*, refcnt, wrapper=xs::uri::XSURIWrapper*, backref)
+
+XT_PANDA_URI_STRICT : XT_PANDA_URI

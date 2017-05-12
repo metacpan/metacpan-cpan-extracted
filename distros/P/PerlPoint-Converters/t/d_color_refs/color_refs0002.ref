@@ -1,0 +1,40 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!-- ZOOMSTOP -->
+
+<HTML>
+
+<!-- *** Created by pp2html, build 1.21 from PerlPoint-Converters 1.0202  -->
+
+<HEAD>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+
+<!-- ZOOMRESTART -->
+
+
+
+<TITLE>Colored References</TITLE>
+</HEAD>
+
+<!-- ************************************************************** -->
+<BODY bgcolor="#FFFFFF" text="#000000" link="#0000CC" vlink="#AAAAAA" alink="#FF0000">
+<a name="Colored References"></a>
+
+<H1>Colored References
+</H1>
+
+
+<P>
+not ok
+<FONT COLOR=green><A HREF="color_refs0001.htm#Read Notes">read notes (no color)<CODE></CODE></A></FONT>
+</P>
+
+
+<P>
+<CODE><FONT COLOR=green></FONT><A HREF="color_refs0001.htm#Read Notes">read notes (green)</A></CODE>
+</P>
+</BODY>
+</HTML>

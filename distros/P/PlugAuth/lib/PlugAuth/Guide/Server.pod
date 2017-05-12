@@ -1,0 +1,234 @@
+# ABSTRACT: Guide for setting up a PlugAuth server.
+# VERSION
+# PODNAME: PlugAuth::Guide::Server
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+PlugAuth::Guide::Server - Guide for setting up a PlugAuth server.
+
+=head1 VERSION
+
+version 0.35
+
+=head1 DESCRIPTION
+
+This document provides a quickstart guide for setting up a PlugAuth server using
+the default authentication and authorization plugins.  In addition to installing
+L<PlugAuth> you will need to have L<PlugAuth::Client> installed which comes as a
+separate distribution.
+
+=head2 Default
+
+Here is a quick start for setting up L<PlugAuth> with the default plugins.
+
+=over 4
+
+=item * create directory
+
+You will need to create directories for the server configuration as well as the
+authentication and authorization database.  You can use the per-user configuration
+(~/etc/PlugAuth.conf) or the system-wide configuration (/etc/PlugAuth.conf).  In
+this guide, we will use the per-user configuration.
+
+ % mkdir ~/etc
+ % mkdir -p ~/var/plugauth
+
+=item * create configuration
+
+Create the configuration file ~/etc/PlugAuth.conf using your favorite 
+editor.
+
+ ---
+ url: http://localhost:3000
+ 
+ user_file: <%= home %>/var/plugauth/user.txt
+ group_file: <%= home %>/var/plugauth/group.txt
+ resource_file: <%= home %>/var/plugauth/resource.txt
+ host_file: <%= home %>/var/plugauth/host.txt
+
+Note this configuration is a template using L<Mojo::Template> and is in L<YAML> format.
+In this example, I'm using the C<home> helper from L<Clustericious::Config::Helpers>
+to dynamically find the user's home directory, so that if the user's home directory
+is moved, or a different user is used later the configuration does not need to be changed.
+
+=item * create database files
+
+Create empty database files for the users, groups, resources and hosts.  To start
+out with they only need to be empty files:
+
+ % touch ~/var/plugauth/{user,group,resource,host}.txt
+
+=item * run server
+
+Start the PlugAuth service using the default L<hypnotoad> web server.  Note that the
+service will be running I<without> authentication or authorization running so be
+sure it is listening only to localhost:
+
+ % plugauth start
+
+=item * create admin user
+
+Create an admin user, and give that user permission to change passwords, and administrate
+users, groups and permissions:
+
+ % plugauthclient create_user --user admin --password secret
+ --- ok
+ % plugauthclient grant admin change_password /user
+ --- ok
+ % plugauthclient grant admin accounts /
+ --- ok
+
+Make sure that the password is correct using the L<plugauthclient> auth command.
+
+ % plugauthclient auth
+ Username for  at localhost :  [default bob] admin
+ Password: ********
+ --- ok
+
+=item * stop server
+
+Stop the PlugAuth service.
+
+ % plugauth stop
+
+=item * configure
+
+Make PlugAuth authenticate and authorize against itself using the 
+I<plug_auth> configuration.  Your PlugAuth.conf should look like this:
+
+ ---
+ url: http://localhost:3000
+ 
+ user_file: <%= home %>/var/plugauth/user.txt
+ group_file: <%= home %>/var/plugauth/group.txt
+ resource_file: <%= home %>/var/plugauth/resource.txt
+ host_file: <%= home %>/var/plugauth/host.txt
+ plug_auth:
+   url: http://localhost:3000
+
+(the last two lines having been added).
+
+=item * restart server
+
+Restart the PlugAuth server, this time optionally listening to multiple addresses
+now that it has been locked down and only the admin user can modify the 
+authentication and authorization for the PlugAuth server.
+
+ % plugauth start
+
+=item * create user
+
+Create a regular user.  This time PlugAuth should ask you for a username and password.
+
+ % plugauthclient create_user --user foo --password bar
+ Username for "PlugAuth" at localhost :	[default bob] admin
+ Password: --- ok
+ % plugauthclient user
+ ---
+ - admin
+ - foo
+
+=back
+
+=head2 More Secure
+
+Instead of creating the admin account using L<plugauthclient>, you can use the Apache
+htpasswd command and a basic text editor.  
+
+=over 4
+
+=item * create configuration
+
+Do as above, but create your configuration initially with I<plug_auth> set in your 
+PlugAuth.conf file:
+
+ ---
+ url: http://localhost:3000
+ user_file: <%= home %>/var/plugauth/user.txt
+ group_file: <%= home %>/var/plugauth/group.txt
+ resource_file: <%= home %>/var/plugauth/resource.txt
+ host_file: <%= home %>/var/plugauth/host.txt
+ plug_auth:
+   url: http://localhost:3000
+
+=item * create admin user
+
+Use htpasswd to create the admin user:
+
+ % htpasswd -m ~/var/plugauth/user.txt admin
+ New password: 
+ Re-type new password: 
+ Adding password for user admin
+
+B<Note>: If you have access to the user.txt file you can use this mechanism for creating
+users and changing passwords as an alternative to L<plugauthclient>.
+
+Using your favorite text editor, add these lines to the ~/var/plugauth/resource.txt file:
+
+ /user (change_password) : admin
+ /user (accounts) : admin
+ /group (accounts) : admin
+ /grant (accounts) : admin
+
+=back
+
+=head2 LDAP
+
+You can use an LDAP server for authentication instead of or in addition to the flat files
+provided by the default plugin.  This requires L<PlugAuth::Plugin::LDAP>, which is NOT
+included with the L<PlugAuth> distribution.
+
+=over 4
+
+=item * create configuration
+
+Just like the default configuration, but add a ldap stanza to the configuration.
+
+ ---
+ url: http://localhost:3000
+ user_file: <%= home %>/var/plugauth/user.txt
+ group_file: <%= home %>/var/plugauth/group.txt
+ resource_file: <%= home %>/var/plugauth/resource.txt
+ host_file: <%= home %>/var/plugauth/host.txt
+ plug_auth:
+   url: http://localhost:3000
+ ldap:
+   server: ldap://1.2.3.4:389
+   dn: uid=%s, ou=people, dc=users, dc=foo, dc=com
+   authoritative: 1
+
+Set authoritative to 1 to ignore the user.txt file for authentication (though it will still
+be used as a list of users), and set it to 0 to use both user.txt and LDAP for authentication.
+
+=back
+
+=head2 Others
+
+There are other plugins for details on how they work, see the plugin documentation.
+
+L<PlugAuth::Plugin::DBIAuth>, L<PlugAuth::Plugin::AuthenSimple>. L<PlugAuth::Plugin::LDAP>
+
+=for stopwords auth
+
+=head1 SEE ALSO
+
+L<PlugAuth>
+
+=head1 AUTHOR
+
+Graham Ollis <gollis@sesda3.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by NASA GSFC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

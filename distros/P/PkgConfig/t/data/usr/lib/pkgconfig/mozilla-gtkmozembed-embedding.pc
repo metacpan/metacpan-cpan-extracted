@@ -1,0 +1,8 @@
+prefix=/usr
+sdkdir=/usr/lib/xulrunner-devel-1.9.1
+includedir=/usr/include/xulrunner-1.9.1
+
+Name: mozilla-gtkembedmoz
+Description: Static version-independent Mozilla Embedding Widget for Gtk+
+Version: 1.9.1.16
+Requires: libxul-embedding-unstable = 1.9.1.16

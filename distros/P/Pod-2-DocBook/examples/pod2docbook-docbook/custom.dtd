@@ -1,0 +1,11 @@
+<!-- Load docbook lite -->
+<!ENTITY % docbook-lite SYSTEM "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd">
+%docbook-lite;
+
+<!-- Load the entities available -->
+<!ENTITY % entities SYSTEM "entities.mod">
+%entities;
+
+<!-- Add support for XInclude -->
+<!ENTITY % xinclude SYSTEM "xinclude.mod">
+%xinclude;

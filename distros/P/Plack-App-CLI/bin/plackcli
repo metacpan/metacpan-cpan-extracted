@@ -1,0 +1,51 @@
+#!/usr/bin/perl 
+
+use strict; 
+use warnings; 
+
+use Plack::App::CLI; 
+use Getopt::Std; 
+
+sub help {
+	print "usage: plackcli app.psgi [ OPTIONS ] REQUEST_PATH\n";
+	exit(0); 
+}
+
+my $options = {};
+getopt("h", $options);
+
+if ( $options->{h} ) {
+	help;
+}
+
+my $file = shift; 
+
+help unless defined $file; 
+
+Plack::App::CLI->run($file);
+__END__
+
+=head1 SYNOPIS 
+
+plackcli - PSGI Command Line interface using Plack::App::CLI
+
+=head1 USAGE 
+
+	plackcli app.psgi [ OPTIONS ] REQUEST_PATH 
+
+=head1 OPTIONS 
+
+=over 4 
+
+=item -h 
+
+	Show help
+
+For other options, see L<Plack::App::CLI>
+
+=back
+
+=head1 AUTHOR 
+
+Dalibor Horinek E<lt>dal@horinek.netE<gt>
+

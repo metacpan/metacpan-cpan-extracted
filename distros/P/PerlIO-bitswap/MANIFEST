@@ -1,0 +1,20 @@
+.cvsignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/PerlIO/.cvsignore
+lib/PerlIO/bitswap.pm
+lib/PerlIO/bitswap.xs
+t/eof.t
+t/partial.t
+t/pod_cvg.t
+t/pod_syn.t
+t/read.t
+t/seek.t
+t/tell.t
+t/write.t
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,13 @@
+Revision history for Perinci-Sub-Property-arg-cmdline
+
+0.02    2016-05-11 (PERLANCAR)
+
+	- [dist] Bump prereq version Perinci::Sub::Normalize to 0.17,
+	  Perinci::Sub::PropertyUtil to 0.11 (incompatible change due to
+	  schema for Rinci function now in
+	  Sah::Schema::rinci::function_meta instead of Sah::Schema::Rinci.
+
+
+0.01     2016-01-22 (PERLANCAR)
+
+         - First release.

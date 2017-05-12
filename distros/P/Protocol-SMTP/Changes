@@ -1,0 +1,18 @@
+
+Revision history for Protocol-SMTP
+
+0.002     2014-04-20 21:42:52+01:00 Europe/London
+	Bug fixes:
+	* Only apply BODY= in MAIL FROM line if we have an encoding (currently,
+	this is always the case but it will change in future)
+
+	Tests:
+	* Reimplemented all the tests so we actually have some coverage
+	and don't need external servers or non-CPAN deps
+
+	Dependencies:
+	* Added Test::Fatal for tests
+
+0.001     2014-04-20 16:28:55+01:00 Europe/London
+	Initial CPAN release
+

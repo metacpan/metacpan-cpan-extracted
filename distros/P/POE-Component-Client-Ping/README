@@ -1,0 +1,66 @@
+--------
+Abstract
+--------
+
+POE::Component::Client::Ping is an asynchronous, event driven client
+for ICMP ping.  It accepts events containing the specifics of ICMP
+ping requests, and it returns events carrying the results of those
+pings.
+
+------------
+Requirements
+------------
+
+This module requires POE.  It also requires root privilege, or your
+operating system's equivalent, so that it can open a socket for ICMP
+ping.  Knowing what this means, how to achieve it, and the potential
+hazards of doing so are left as exercises for the reader.
+
+------------------
+Basic Installation
+------------------
+
+POE::Component::Client::Ping may be installed through the CPAN shell
+in the usual CPAN shell manner.  This typically is:
+
+  $ perl -MCPAN -e 'intstall POE::Component::Client::Ping'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme POE::Component::Client::Ping
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install POE::Component::Client::Ping
+
+-------------------
+Manual Installation
+-------------------
+
+POE::Component::Client::Ping can also be installed manually.
+<ftp://ftp.cpan.org/pub/CPAN/authors/id/R/RC/RCAPUTO/> or a similarly
+named directory at your favorite CPAN mirror should hold the latest
+version.
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+The test program, t/01_ping.t, makes an excellent sample program.  In
+fact, it was adapted from the sample program used to debug this
+component.  If you would like to see more details about the test's
+operation, edit t/01_ping.t and set the DEBUG constant to any value
+Perl considers "true".
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+
+Thanks for reading!
+
+-- Rocco Caputo / troc@netrus.net / poe.perl.org / poe.sourceforge.net

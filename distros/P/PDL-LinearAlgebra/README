@@ -1,0 +1,32 @@
+PDL/LinearAlgebra version 0.08_01
+=================================
+
+This module provides a PDL interface to some routines of BLAS and LAPACK library.
+Moreover it provides some linear algebra based routines (transcendental functions for matrices)
+and some easy constructors for well known matrices.
+BLAS and LAPACK libraries can be retrieved for example at www.netlib.org.
+
+
+INSTALLATION
+
+To install this module edit Real/Makefile.PL, Complex/Makefile.PL and Trans/Makefile.PL
+to reflect your local BLAS and LAPACK installation and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires PDL and working BLAS and LAPACK libraries.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2007 Grégory Vanuxem
+Copyright (C) 2013 Chris Marshall
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the Perl Artistic License as in the file Artistic_2
+in this distribution.
+

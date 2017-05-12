@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3f0ca043e66eba2b055d36f683cc52d83f1a5736 Build.PL
+SHA1 e2176ddc2dd1ad6b621e29a135028262b1f760da Changes
+SHA1 a174928e84308ecca1e244fda30c56960b1e31e2 LICENSE
+SHA1 f67ab1492d6bbbf2b9be1b40aedd7e089845dd2d MANIFEST
+SHA1 ede5fe6c5c33b5e0b3b2707db79afbc3c7b845f3 MANIFEST.SKIP
+SHA1 14c4b69562ef84d84bc70fdcd499bfe1a187c6af META.json
+SHA1 a73f862c6da30f6ca3f47d04ed13695359fcc3dc META.yml
+SHA1 5f16e9dbddfe815dd9813938932fbcf53d8ab286 Makefile.PL
+SHA1 56475b7d482e69c1f2fe3829a42f6c93c91f3956 README
+SHA1 c10f7448ac633aa8eadfa98cadc09c7f5c64ad03 README.md
+SHA1 4ae49c76b9fc5e4a9d98d35ae3f123e11534d08b examples/apt-proxy.psgi
+SHA1 024e21e67dbb3cee487092ab36270ad15796b98e examples/proxy.psgi
+SHA1 de045038cc65abaf86cf60b3a31ed2bc4b6f8adf lib/Plack/Middleware/Proxy/Requests.pm
+SHA1 9a5476cdcf3d722330b43c334a68fb9944470c4a t/010_use.t
+SHA1 d1b6ef1d4541ea96d5bedb6370caaa8f32f69d4e t/100_proxy_url.t
+SHA1 8259fd967411a9d13ee842b1adb8913153fc39f1 t/test.pl
+SHA1 90353a99ac0f719b6f3e58029804d8556cedc2ab xt/check_changes.t
+SHA1 1c27e5840b0154e44120bc2edc02fbb507c76819 xt/consistent_version_numbers.t
+SHA1 67bb4c141ea95809f3db2d526ce91d9e6d894756 xt/copyright.t
+SHA1 650dccfa9b6f5a98cf731c89041bea8935dbc623 xt/cover.pl
+SHA1 e6cd4b4bbadcfddd26f7f2fa3c6b48339be8343f xt/cpan_changes.t
+SHA1 4f8f90e1c421bfd592e6806ec4d0a75f3d56406a xt/cpan_meta.t
+SHA1 48a67f01c35122165bb633264cba72d984d7a89e xt/dist_manifest.t
+SHA1 f5aac658ae1888964274e68d179413782082b7ad xt/distribution.t
+SHA1 af47b82dbac975ba494dfe6849d17d1e02941ac6 xt/eol.t
+SHA1 44147122d52fef90ab3a2c65ebba4f89342174f8 xt/kwalitee.t
+SHA1 6e7f9dde7560793bcb40acc41561e07d163ad6d1 xt/minimumversion.t
+SHA1 1a1cd76027c4cc73ec56beadaf56680bbac1fd4a xt/no_tabs.t
+SHA1 e8daa0c73cfc304c240fad2d2c2b1b628175a89d xt/perlcritic.t
+SHA1 60e137a38d4857dc797f0202770af780bdec3cc8 xt/perlcriticrc
+SHA1 2a9c6eaa7c99bcd501bc1f0d1b34821cb0fd9a3b xt/pod_coverage.t
+SHA1 bef7d46eb5cbc3e67956d4e823ec199f41ab9268 xt/pod_spell.t
+SHA1 e4c04dee16d660081f46faa82e201a792c31b990 xt/pod_spellrc
+SHA1 87cb53d4ad0162a872d5c70013fc41719e030555 xt/pod_syntax.t
+SHA1 a38994922fda6d64e2ee75198fadc464a221fea9 xt/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlGfX7sACgkQhMHHe8CxClvAHQCfQtaHA1B76B/VFcn9O/teztfh
+BvoAoLcjOmSGbaETaOa15JTsbiHM/w9b
+=n+Ky
+-----END PGP SIGNATURE-----

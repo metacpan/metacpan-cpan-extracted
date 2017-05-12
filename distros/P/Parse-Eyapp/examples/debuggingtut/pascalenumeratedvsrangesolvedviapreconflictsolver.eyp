@@ -1,0 +1,126 @@
+%{
+my $enum = 0;
+
+sub rangeORenum {
+  my $self = shift; 
+  # Goal. Towrite this code as: 
+  #           $enum = $self->YYPreParse('enum');
+  #  Will parse using as start symbol 'enum', without changing the 
+  #  parsing position. Returns true if it matches. Has the same effect
+  #  than the following code:
+
+  # Use Regexp::Grammars. You have an attribute of $self: RGPATTERNS
+  # keys: the names of the syntactic variables involved in the conflict
+  #  %starts enum OR %nested enum
+  # The values are the Regexp::Grammar expressions describing
+  # the syntactic variable (including the FOLLOWS)
+  # Of course, this implies that the sub grammar can't be left recursive
+
+  for (${$self->input()}) {
+    if (m{(?=             # look forward 
+              \G\s*\(     # open parenthesis
+                       \s*\w+             # ID
+                             (\s*,\s*\w+)*
+                 \s*\)\s* # closing parenthesis
+                 ;        # semicolon
+          )
+         }x) { 
+      $enum = 1;
+    }
+    else {
+      $enum = 0;
+    }
+  }
+}
+
+%}
+
+%conflict rangeORenum {
+  if ($enum) { $self->YYSetReduce([',', ')'], 'ID:ENUM' ); }
+  else { $self->YYSetReduce([',', ')'], 'ID:RANGE' ); }
+} 
+
+%token ID  = /([A-Za-z]\w*)/
+%token NUM = /(\d+)/
+
+%left   ','
+%left   '-' '+'
+%left   '*' '/'
+
+%expect-rr 2
+
+%%
+
+type_decl : 'type' ID '=' type ';'
+;
+
+type : 
+      %name ENUM
+      # %code rangeORenum
+      PRErangeORenum '(' id_list ')'
+    | %name RANGE
+      # %code rangeORenum
+      PRErangeORenum expr '..' expr
+;
+
+enum:
+      '(' id_list ')'
+;
+
+PRErangeORenum:
+   /* empty */  
+     {
+       goto &rangeORenum;
+     }
+;
+
+id_list : 
+      %name ID:ENUM
+      ID                      %PREC rangeORenum
+    | id_list ',' ID
+;
+
+expr : '(' expr ')'   { $_[2] } /* bypass */
+    | %name PLUS     expr '+' expr
+    | %name MINUS    expr '-' expr
+    | %name TIMES    expr '*' expr
+    | %name DIV      expr '/' expr
+    | %name COMMA    expr ',' expr
+    | %name ID:RANGE
+      ID                     %PREC rangeORenum
+    | %name NUM      NUM
+;
+
+%%
+
+=head1 SYNOPSIS
+
+See 
+
+=over 2
+
+=item * File pascalenumeratedvsrange.eyp in examples/debuggintut/
+
+=item * The Bison manual L<http://www.gnu.org/software/bison/manual/html_mono/bison.html>
+
+=back
+
+Compile it with something like:
+
+      eyapp -TC pascalenumeratedvsrangesolvedviapreconflictsolver.eyp
+
+Run it with this options:
+
+    $ ./pascalenumeratedvsrangesolvedviapreconflictsolver.pm -t -i -m 1 -c 'type e = (x, y, z);'
+
+Try also these inputs:
+
+                type e = (x) .. (y);
+                type r = (x) ..  y ;
+                type r = (x+2)*3 ..  y/2 ;
+                type e = (x, y, z);
+                type e = (x);
+                type e = (x, y, z) .. (u+v);
+
+=cut
+

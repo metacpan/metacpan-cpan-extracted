@@ -1,0 +1,11 @@
+[AGENT]
+
+Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:6.0.2) Gecko/20100101 Firefox/6.0.2
+
+'os'          => 'Intel Mac OS X 10.6',
+'toolkit'     => ['Gecko','20100101','20100101.000'],
+'version_raw' => '6.0.2',
+'version'     => '6.000002',
+'mozilla'     => ['6.0.2','6.000002'],
+'name'        => 'Firefox',
+parser        => 'firefox',

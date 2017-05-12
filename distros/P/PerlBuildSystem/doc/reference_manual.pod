@@ -1,0 +1,1427 @@
+=comment
+DOCUMENTATION
+	#clean the modules
+	user manual
+	reference manual
+		design manual
+			'.' the root of everything
+			document that pbs make real recursive build systems
+				how to put things (and get them from) somewhere else
+		node name limitations (__ \s)
+		source directories
+			overriding a file
+		build directories
+		
+		Rules
+			perl code vs make like
+			meta rules
+			post depend 
+				what are they good for
+				warning about not using them too much
+			Builders
+				pure perl builder
+					running shell commands
+				hosted builders
+			AddRule
+				creator
+				pure perl rules
+					regex
+					dependent matcher
+					composit dependent matcher
+				simplified rules
+				dependers
+				post_depender
+			RemoveRule
+			Using rules dynamically
+		Triggers
+			Definition
+			Importing
+		Digest
+		default build
+			Depend
+			Check
+				user check function
+				digest
+			user defined build
+		Pbsfile
+			functions available in Pbsfiles
+			override
+		sub Pbs
+			overridding
+			NON_RELOCATABLE_PBSFILE
+			
+		functions
+		wizards
+		run (switches)
+		debugging explained
+			command line switches
+			log
+			regex
+			breakpoint
+			perl debugger
+	examples
+	add pod documentation for each function in the modules
+=cut
+
+=pod
+
+=head1 TO_BE_ADDED
+
+IMMEDIATE_BUILD
+
+ChildPbs
+
+PBSFILE_CONTENT
+
+subpbs
+{
+COMMAND_LINE_DEFINITIONS => { a => 1 , b=>2 } 
+}
+
+=head1 NAME
+
+I<PBS>     - Perl Build System (PBS).
+
+I<pbs.pl>  - Front end to PBS.
+
+=head1 DESCRIPTION
+
+I<pbs.pl> is a script that handles command line switches and starts PBS. It runs under Linux and in Cygwin.
+If using Cygwin be careful to use the Perl that comes with Cygwin. No port to the Windows is planned but it should be trivial.
+
+This is version '.01' of this document. Please help us to make it better.
+
+=head1 INTRODUCTION
+
+B<PBS>/I<pbs.pl> (I<pbs> from this point) is a build utility in the same spirit as  'make'. The main difference is it implementation language 
+and a different rule definition language. I<pbs> uses Perl exclusively for defining rules. If you have used 'make', I<pbs> should be easy to understand and use.
+
+I<PBS> is B<not> compatible with 'make' and B<works completely differently>!
+
+=head2 DO I NEED TO KNOW PERL TO USE I<pbs>?
+
+Not for simple projects, the examples in this documentation should get you going. A working knowledge of perl will allow
+you to use the advanced functionality of B<PBS>
+
+I<pbs.pl> and B<PBS> are still under development. No guaranties of any sort follow with this software. Your ideas, remarks and critics are very welcome.
+
+=head1 SYNOPSIS
+
+perl I<pbsl.pl > all
+
+perl pbs.pl -c -o --build_directory /somewhere/out --sd /sd1/ --sd /sd2 --bi --  all
+
+perl I<pbsl.pl > -c --tree a.c all
+
+=head1 INPUT
+
+I<pbsl.pl > takes switches and targets on the command line. I<pbsl.pl > -h displays all the accepted switches (60+) and 
+a short description of what the switch does.
+
+=head1 Pbsfile
+
+To drive B<PBS> you write a Pbsfile (in analogy to a Makefile). Pbsfiles are package less perl scripts. Pbsfile can have any name you operating system supports. 
+If no Pbsfile is given, I<pbs> will load a file called I<Pbsfile.pl>. If no I<Pbsfile.pl> is found, I<pbs> exits with an error message.
+
+=head1 RULES
+
+=head2 B<NO BUILT-IN RULES!>
+
+Unlike other build systems, PBS doesn't define any Built-in rule. It is very easy to define and use libraries of rules.
+Those become I<your> Built-in rules. I<pbs> comes with some examples for such libraries. In fact I<pbs>
+has most of the rules you need to build your C projects. Those rules are simply not used by default.
+
+=head2 Adding a rule
+
+Rules are the main way to control your build system. Two functions exist to define rules.
+
+B<AddRule>, which takes the following parameters:
+
+=over 2
+
+=item 1 Rule name
+
+=item 2 Depender
+
+=item 3 Builder (optional)
+
+=item 4 Arguments to builder (optional)
+
+=back
+
+	Ex: AddRule 'exe',
+			[exe => undef],
+			\&BuildAnExe, 
+			[ 1, 2, 3 ] ;
+		
+
+B<AddRule> will add this rule to a rule namespace (explained bellow) called 'User'. PBS will know this rule as:
+PBS::'User'::'Exe'. To specify the rule name space, you use B<AddRuleTo>, which takes the following parameters:
+
+=over 2
+
+=item 2 Rule namespace
+
+=item 2 Rule name
+
+=item 3 Depender
+
+=item 4 Builder
+
+=item 5 Arguments to builder
+
+=back
+
+	Ex: AddRuleTo 'Builtin', 'exe',
+			[exe => ],
+			\&BuildAnExe, 
+			[ 1, 2, 3 ] ;
+
+=head2 AddRule[To] parameters explained
+
+=head3 Rule namespace
+
+The names space is a string describing the type of rules in it. The namespaces naming is just a convention.
+
+=head4 Special namespaces
+
+=head5 'User'
+
+All the rules added through I<AddRule> are added to this namespace.
+
+=head5 'Builtin'
+
+This is a namespace that the Default B<Build> (explained bellow) uses in conjonction to the 'User' namespace.
+The namespaces are conventions. Except for the default Build using them, they are in no diffrent from other namespaces.
+
+=head5 'CommandLineDefinitions'
+
+All the definitions made through the -D switch on the command line are stored in this namespace. All the definitions throught the command line are 
+merged in sub Pbs even if those have use B<LockConfigMerge()>.
+
+=head3 name
+
+This is the name of the rule, a string. The name will be used by PBS when displaying information about the build.
+The name must be unique.
+
+=head3 depender
+
+B<AddRule> and B<AddRuleTo> will generate a depender from the argument you give it.
+
+This argument can be on of the following:
+
+=head4 An array
+
+	Ex: AddRule 'a.o_rule name',
+		[a.o => 'a.c', '/somewhere/a.c2', '[path]/subdir/prefix_[basename].c3'], ...
+
+
+For I<'/path_to_a/a.o'>, the depender will generate these dependencies :
+
+	'a.c'                           => '/path_to_a/a.c' # relativ path
+	'/somewhere/a.c2'                => '/somewhere/a.c2'# full path
+	[path]/subdir/prefix_[basename].c3'  => '/path_to_a/subdir/prefix_a.c3'
+
+if your node has no dependencies use I<undef> as in the example bellow,.
+
+	AddRuleTo 'Builtin', [VIRTUAL], 'install',  [install => undef], \&Installer ;
+
+=head5 Globbing
+
+	AddRuleTo 'BuiltIn', 'o_c', ['*.o' => '*.c'] ;
+
+This is equivalent to
+
+	['*.o' => '[path]/[basename].c'], ...
+
+=head4 A sub.
+
+If you know perl, you can write your own depender as a perl sub. The argument is a sub reference so you
+can define your sub inline or refer to an already existing sub. You get total control of the dependency list 
+generation.
+
+The sub receives the following arguments:
+
+=over 2 
+
+=item 1 The name to check for dependency
+
+=item 2 The current config.
+
+=item 3 A reference to the node being depended
+
+=item 4 A reference to all the nodes in the dependency tree
+
+=back
+
+Argument 3 and 4 are for advanced use, you can safely ignore them, their are used by PBS
+to handle certain types of rules.
+
+The depender sub should return:
+
+=over 2
+
+=item 1  an array reference containing:
+
+=over 4
+
+=item 1	1/true if the name to check matched
+
+=item 2 A list of dependency (which can be empty, in that case the special B<undef> should be used).
+	I<Each dependency must be encapsulated in an array reference>!
+
+=back
+
+=item 2  A builder reference to override the buider defined in the rule
+
+=item 3  A scalar representing arguments to overide the arguments defined in the rule
+
+=back
+
+Argument 2 and 3 are for advanced use, you can safely ignore them.
+
+	Ex:
+	AddRuleTo 'Builtin', 'C_to_H_H2', 
+	  sub
+	  {
+	  my $file_to_depend = shift ;
+	  my $config         = shift ;
+	
+	  if($file_to_depend =~ /(.*).c$/)
+		  {
+		  return 
+		    (
+		       # argument 0: match flag and dependency list
+		       [
+		       1 # matched '.c' file
+		       , (["$1.h"], ["$1.h2"]) # note the encapsulation into arrays
+		       ]
+		       # argument 1: optional builder override
+		       # argument 2: optional arguments override
+		    ) ;
+		  }
+	  }
+
+	Ex2: AddRuleTo 'Builtin', 'exe', \&SomePerlPackage::SomeDepender, ...
+
+=head4 pure perl rules
+
+if the dependent regex is a regex or a sub, PBS considers the rule to be a pure perl rule.
+
+The dependencies can then be defined in term of:
+	 $path $basename $name $ext
+ 
+=head5 dependent regex
+
+[qr<\.c$> => '$path/$name.xxx']
+
+=head5 dependent sub
+
+[ sub{return($_[0] =~ qr <\.c$>)} => '$path/$name.xxx']
+
+the sub is passed the dependent name as first argument and %TARGET_PATH as a second argument. it returns true if the depender matched
+
+=head5 dependent matchers
+
+in Dependers/Matchers, the following rules are defined:
+
+AnyMach: takes a list of regexes, returns true if any regex matches
+	[AnyMatch(qr<\.c$>, qr<\.s$>) => ...]
+
+NoMatch: takes a list of regexes, returns false if any matches
+	[NoMatch(qr<\.c$>) => ...]
+
+AndMatch: takes a list of regexes of dependent matcher subs.  Ands (&&) all the results of the matching.
+
+	[AndMatch(qr<\.c$>, NoMatch(qr<^somepath/>)) => ...]
+
+
+=head4 An array with a sub
+
+B<PBS> allows you to give a reference to a sub instead for defining the dependencies inline with the rules.
+The sub will be called only if the dependent
+part matches (in the example bellow, only if the node is named 'a.o').
+
+	Ex: AddRule 'a.o_rule name',
+		['a.o' => \&SpecialDepender], ...
+
+You can also pass dependencies to the sub, simply define them in the array.
+
+	Ex: AddRule 'a.o_rule name',
+		['a.o' => 'a.c', '/path/file', \&SpecialDepender], ...
+
+Only one sub is allowed within the dependency definition. The sub receives the following arguments:
+
+=over 2 
+
+=item 1 The name to check for dependency
+
+=item 2 The current config.
+
+=item 3 A reference to an array with the dependencies defined in the rule.
+
+=item 4 A reference to the node being depended
+
+=item 5 A reference to all the nodes in the dependency tree
+
+=back
+
+Argument 4 and 5 are for advanced use, you can safely ignore them, their are used by PBS
+to handle certain types of rules.
+
+The depender sub should return:
+
+=over 2
+
+=item 1  an array reference containing:
+
+=over 4
+
+=item 1	1/true if the name to check matched
+
+=item 2 A list of dependency (which can be empty, in that case the special B<undef> should be used).
+	I<Each dependency must be encapsulated in an array reference>!
+
+=back
+
+=item 2  A builder reference to override the buider defined in the rule
+
+=item 3  A scalar representing arguments to overide the arguments defined in the rule
+
+=back
+
+retrn variables 2 and 3 are for advanced use, you can safely ignore them (return only the first variable).
+
+This construct allow us to handle the case of generated c files quite easily. Say we have a c file that is
+generated from a flex file. We need to generate the c file before the I<'c depender'> kicks in. The 
+I<'c depender'> is a B<POST_DEPEND> rule so we know it is going to be runafter all the non B<POST_DEPEND> dependers.
+
+Uncomplete example!!!
+
+# flex example
+
+AddRule 'a.flex', ['a.c' => 'a.flex', \&GenerateWithFlex], BuildOk("flex to C generator") ;
+
+sub GenerateWithFlex
+{
+my ($dependent, $config, $all_dependencies, $tree, $inserted_file, $arguments) = @_ ;
+PrintInfo "GenWithFlex: $dependent\n" ;
+
+# check if file exists in a source dir
+# check if flex file exists
+# should do this in the build directory
+
+my $flex_command = "flex -.... -.... $dependent" ;
+
+if(system($flex_command))
+	{
+	die ERROR "Error runnning flex command: '$flex_command'.\n" ;
+	}
+	
+ForceDigestGeneration($dependent) ;
+
+return([1, @$all_dependencies]) ;
+}
+
+=head4 WARNING! All dependers are run!
+
+If multiple rules match a node/file, the sum of the dependencies returned by matching dependers will become the node/file dependencies.
+Unlike I<gmake> PBS dependers match only on one side of the rules. if the following rules:
+
+	AddRule 'o_c', ['*.o' => '*.c'] ;
+	AddRule 'o_s', ['*.o' => '*.s'] ;
+
+are used on file I<compress.c>, the dependers would generate the following dependencies: I<compress.c> B<and> I<compress.s>.
+
+I<gmake> is IMO too magical in its way of handling your rules. I don't mean it is wrong but that it simply doesn't fit the I<pbs> way of 
+generating dependencies.
+
+=head3 META_RULE
+
+	EX:
+	AddRuleTo 'BuiltIn', 'o_c', ['*.o' => '*.c'] ;
+	AddRuleTo 'BuiltIn', 'o_s', ['*.o' => '*.s'] ;
+	
+	AddRuleTo 'BuiltIn', [META_RULE], 'o_meta', ['o_c', 'o_s'], \&FirstAndOnlyOneOnDisk ;
+
+When you define the above 'o_meta' rule, B<PBS> removes rule 'o_c' and rule 'o_s' from it's rule list (in the current
+package only). I<FirstAndOnlyOneOnDisk> will be called with a reference to the slaves rules as arguments. This allows you 
+to define your own 'magic'. I<FirstAndOnlyOneOnDisk> source code can be found in the distribution.
+
+=head3 Cyclic dependencies
+
+If B<PBS> find a cyclic dependency in your system, it will stop and display a message.
+                            
+	$ perl -Mblib pbs.pl -p test.pl -c -ns test_cyclic
+	...
+	**Depending**
+	
+	**Checking**
+	Cyclic dependency detected on './a'!
+	
+	'__NAME' => './a',
+	      '__NAME' => './xx',
+	             '__NAME' => './nadim',
+	                     '__NAME' => './nadim2',
+	                             '__NAME' => './nadim3',
+	                             './a' => $Cyclic dependency,
+
+=head3 Builder
+
+A builder is a sub called to build a node/file. You define the builder in the same rule as the depender or you can 
+define it elsewhere and give a reference instead.
+
+The sub receives the following arguments:
+
+=over 2 
+
+=item 1 A reference to a hash containing configuration data
+
+=item 2 The name of the node/file to build
+
+=item 3 What dependencies the node/file has
+
+=item 4 What dependencies are newer thant the node/file
+
+=item 5 The arguments for this node/file if any
+
+=back
+
+and should return:
+
+=over 2
+
+=item 1 1/true if the build succeeded
+
+=item 2 A message string
+
+=back
+
+	Ex:
+	sub BuildAnExe {...} ;
+	AddRuleTo 'Builtin', 'exe', ['all' => 'exe'], \&BuildAnExe ;
+
+	Ex2:
+	AddRuleTo 'Builtin', 'exe',  ['all' => 'exe'],
+	  sub
+	  {
+	  my $config        = shift ;
+	  my $file_to_build = shift ;
+	  
+	  #build steps
+	  ...
+	  
+	  if($success)
+	    {
+	    return(1, 'Did this and that  ...') ,
+	    }
+	  else
+	    {
+	    return(0, $error_that_occured_during_the_build) ;
+	    }
+	  } ;
+
+=head4 Shell commands
+
+=head5 Using the shell
+
+You might just want to run shell commands in your builder. B<PBS::Shell::Shell> is a function that helps you  
+write those commands in a simple way. PBS::Shell::Shell handles the mechanics of calling the command and returning from the Builder 
+if an error occurred.
+
+	Ex:
+	AddRuleTo 'Builtin', 'rule_name',  \&MyDepender,
+	  sub
+	  {
+	  ...
+	  # do an 'ls'
+	  PBS::Shell::Shell('ls -lsa') ;
+	  
+	  # generates an error and return to PBS.
+	  PBS::Shell::Shell('non existing_application') ;
+	  
+	  # this point is never reached because of the error above.
+	  return( ...) ;
+	  } ;
+
+=head5 Simple shell commands
+
+B<PBS> allows you to define simple shell commands directly in the rule definition. If the rule argument is an array (reference),
+B<PBS> will consider each element of the array to be a shell command.
+
+	Ex:
+	AddRule 'c_objects', [ '*.o' => '*.c' ],
+	   ['CC CFLAGS -c -o FILE_TO_BUILD DEPENDENCY_LIST'] ;
+
+I<'CC CFLAGS -c -o $file_to_build $dependency_list'> is parsed by B<PBS> and:
+
+=over 2 
+
+=item 1 Upper case names are checked with the current configuration, if a match is found, the name is replaced by
+the value found in the configuration.
+
+=item 2 FILE_TO_BUILD is interpolated.
+
+=item 3 DEPENDENCY_LIST is interpolated (dependencies are joined with a space)
+
+=back
+
+=head4 What builder is run?
+
+If multiple rules match the node/file, the last defined builder will be used to build the node
+
+=head3 Argument to builder
+
+The last argument passed to I<AddRules> is passed as an argument to the builder.
+
+	ex:
+	AddRuleTo 'Builtin', 'o_c', ['*.o' => '*.c'], \&BuildAnObject ;
+
+It is up to the builder to interpret the argument (a scalar that can point to other perl types if you want it to).
+The argument to builder allows to do something special on a specific node. For example, you'd like 
+to compile a specific C file with a -O2 switch to the compiler. You could use the following rules:
+
+	# General rule to build object file
+	AddRuleTo 'Builtin', 'o_c', ['*.o' => '*.c'], \&BuildAnObject ;
+	
+	#specific rule 
+	AddRuleTo 'Builtin', 'special_o_file', ['special_file.o' => 'special_file.c'], undef, '-O2';
+
+All the .o files will be generated by I<BuildAnObject> builder. When building 'special_file.o', I<BuildAnObject> 
+will be passed the argument '-O2'.
+
+=head4 What arguments are passed to the builders?
+
+The last defined argument for a node/file is passed to the builder. PBS will warn you if multiple arguments are selected.
+
+=head3 Node Attribute Checking
+
+You can give attributes to the nodes, the attribute is declare by following the node name with a colon and a textual attribute (see the example bellow). When B<PBS> finds such an attribute,
+it calls a user sub registrated via I<RegisterUserCheckSub>. The user sub receives the following arguments:
+
+=over 2 
+
+=item 1 The full name for the node (path and name)
+
+=item 2 The attribute declared in the rule
+
+=back
+
+The sub should return a file full name (path/name) this is most often the first argument it receives, or die with an error message. The node attribute could be used to, for example,
+verify the version of a node.
+
+	Ex:
+	PBS::Rules::AddRule 'all_lib',['all' => 'x.lib:1.0', 'y.lib']
+
+	RegisterUserCheckSub
+	(
+	sub
+		{
+		my ($full_name, $user_attribute) = @_ ;
+		
+		# open file and extract version from it
+		# die if the version is no equal to $user_attribute
+		
+		return($_[0]) ; # must return a file name
+		}
+	) ;
+
+
+
+=head2 Complete rules example
+
+	!! extract from Philip make system.
+
+=head1 CONFIGURATION
+
+B<PBS::Config::AddConfigTo> and B<PBS::Config::AddConfig> let you add configuration variable in PBS. B<PBS::Config::AddConfigTo> accepts 
+the following arguments :
+
+=over 2 
+
+=item 1 a namespace name.
+
+=item 2 an initialization list
+
+=back
+
+B<PBS::Config::AddConfig> takes an initialization list only and stores the configuration in namespace 'User'.
+
+	Ex:
+	AddConfigTo 'BuiltIn',
+	  (
+	    cc => 'gcc'
+	  , ld => 'ld'
+	  ) ;	
+	  
+	AddConfig (perl => '/usr/local/bin/perl') ; # added to the User namespace
+	
+=head2 How do I defined my compiler, archiver, etc... so my builders can user them?
+
+The current configuration is automatically passed to the builders. What the 'current' configuration means depends on what Build() sub 
+you are using? If you are using the default Build(), your configuration should be in the 'Builtin' or 'User' namespace. If 
+you defined your own Build() sub, it is up to you to choose where to store your configuration; you can access it directly through PBS::Config::GetConfig(). It is still a good idea to 
+use the 'Builtin' and 'User' namespace.
+
+See also B<PBS:Config.pm> documentation.
+
+=head2 Can I acces environement variables?
+
+ Yes, through the %ENV hash.
+ 
+	Ex:
+	PBS::Config::AddConfig 'BuiltIn', (cc => $ENV{COMPILER}, 'outdir' => "/somewhere/...") ;
+
+=head2 How do I access my config variables in my builders?
+
+Use the configuration variable passed to the builder.
+
+	Ex:
+	AddRuleTo 'Builtin', 'O_C',  '.o:.c',
+	  sub
+	  {
+	  my $config                  = shift ;
+	  my $file_to_build           = shift ;
+	  my $dependencies            = shift ;
+	  my $triggering_dependencies = shift ;
+	  my $arguments               = shift || '' ;
+	
+	  my $compiler = $config->{cc} ;
+	  
+	  my $, = ' ' ;
+	  Shell("$compiler -c @$dependencies -o $file_to_build $arguments") ;
+	  } ;
+
+=head1 Pbsfiles are dynamic!
+
+Remember that your Pbsfile is a program an not a static rule description. When defining a rule or adding a configuration 
+variable, you can use any of the constructs perl allows. Remember only that Pbsfile are package less perl scripts.
+
+=head1 WHAT IS A NODE and WHAT IS THE DIFFERENCE BETWEEN A NODE AND A FILE?
+
+PBS builds a dependency tree from the top level target and your rules. Each node in the tree is 
+recursively traversed to check if it has dependencies itself. The depender you define return a dependency list.
+PBS doesn't specially treat the dependencies as files. For PBS, they are just nodes with names.
+
+When PBS checks the dependency tree, it uses a function to check if a node is older than its dependencies. The default build 
+uses a timestamp comparison (thus considering the node as a file).
+
+=head2 VIRTUAL, LOCAL and FORCED nodes
+
+A problem can occur if the node name is also an existing  file.
+You consider it to be B<VIRTUAL> but when PBS checks the B<file> tree, it see a physical file and might not B<Build> your B<VIRTUAL> node.
+You can force a node to be virtual. The node will only be build if one of its dependencies triggers. Unlike other build systems, PBS will display a 
+warning message if a file with the same name as you node exists in the file system. To make a node virtual, declare one of the rules generating the node 
+as B<VIRTUAL>. 
+
+If a node exists in one of your source directories and has no dependencies that trigger its rebuild, B<PBS> will _not_ 
+copy it in your build directory. Instead it will reference it from the directory where it is located. If you want to 
+force a node/file to be present in your build directory, declare it as B<LOCAL>.
+
+You can also foce the build of a node by declaring one of the rules generating it as B<FORCED>. The node will
+always be build (if it exists in the dependency tree). This is used, for example, when you need a 'test' target; you don't want any file to be called test
+so you declare the node to be 'VIRTUAL' but if none of the 'test 'target triggers, the node will not be build, you have to for its build with the 'FORCED' keyword
+
+	Ex:
+	AddRuleTo 'Builtin', [VIRTUAL], 'install',   [install => undef], \&Installer ;
+	AddRule              [LOCAL],   'os_binary', ['os.bin' => ....] ;
+	AddRule              [FORCED],   'O_C',      '.o:.c', ...
+	AddRule              [VIRTUAL, FORCED],   'test',  ...
+
+See also switch B<--bi>.
+
+=head2 POST_DEPEND and __REMOVE_DEPENDENCIES_AND_BUILDERS / __ERROR_IF_DEPENDENCIES
+
+You can also use POST_DEPEND to force a dependers to be run last. In the dependency list,
+you can insert __REMOVE_DEPENDENCIES_AND_BUILDERS or __ERROR_IF_DEPENDENCIES. __REMOVE_DEPENDENCIES_AND_BUILDERS
+removes all the dependencies that were added by the other dependers. __ERROR_IF_DEPENDENCIES will stop the
+build with an error message if any dependency was added to the node. 
+
+POST_DEPEND and __REMOVE_DEPENDENCIES_AND_BUILDERS / __ERROR_IF_DEPENDENCIES were implemented while doing a test
+and they are left in B<PBS> in case they are helpfull.
+
+	Ex:
+	AddRule 'all', [all => 'a.o'] ;
+	AddRule [POST_DEPEND], 'post_all', [all => '__REMOVE_DEPENDENCIES_AND_BUILDERS', 'z.o'] ;
+	AddRule 'all2', [all => 'b.o'] ;
+	
+the above rules give the following display when run with the --dd switch:
+
+	$ perl -Mblib pbs.pl -p test.pl -dd all
+	**Depending**
+	./all has dependencies [./a.o], rule 2:all
+	./all has dependencies [./b.o], rule 3:all2
+	POST_DEPEND rule: 'post_all' at ./test.pl:22 is Running __REMOVE_DEPENDENCIES_AND_BUILDERS command for node './all'
+	    Removing dependency: './a.o'
+	    Removing dependency: './b.o'
+	./all has dependencies [./z.o], rule 5:post_all
+	./z.o has no locally defined dependencies
+
+=head1 REUSING RULES, CONFIG AND BUILDERS
+
+PBS having no built-in rules, it would be cumbersome to have to redefine the rules you use in all the Pbsfiles. PBS support in include mechanism 
+that resembles '#include' in C or 'use' in perl. B<PbsUse> takes the name of a file which contains rules or 
+configurations definitions.
+
+	Ex: If Rules/C.pm contains:
+	AddRuleTo 'BuiltIn', 'exe', [exe => undef], \&BuildAnExe ;
+	AddRuleTo 'BuiltIn', 'O_to_C', '.o:.c' ;
+	AddRuleTo 'BuiltIn', 'C_to_H', '.c:.h' ;
+	
+You can then include it in you Pbsfile.
+
+	Ex: 
+	# this is Pebsfile.pl
+	PbsUse('Rules/C') ; 
+	
+
+B<PbsUse> will automatically append '.pm' at the end of the file name. If the file can't be found in the same
+directory as the Pbsfile, the -plp option will be used to point to the root directory where the files are to be searched. 
+
+I recommend that you keep all your rules in the library directory. It is possible to have rules and configuration definitions in the same lib file 
+but it is better to keep them separated.
+
+Please contribute your B<rules> to PBS.
+
+=head1 DIRECTORIES
+
+=head2 Build directory
+
+Using B<--build_directory>, you can have PBS place the generated files in a directory different from the current directory. 
+This allows you to separate your source files from the generated files.
+
+=head2 Source directory
+
+Using B<--source_directory> or B<--sd>, you can direct B<PBS> to search for files in other source directories than the current 
+directory. You can specify multiple B<--sd> switches. B<PBS> will search the directories in the order you specify them. 
+
+See B<Digest> bellow.
+
+=head2 Default directories
+
+If no build or source directory is specified, B<PBS> will use the current directory. If you specify a source directories, 
+B<PBS> will search exclusively in the specified directories. The curren directory is not searched. If you want the 
+current directory and other directories to be searched, you must specify the current directory too.
+
+When no default build and/or source directory is given, I<pbs> will issue a warning.
+
+=head2 Examples
+
+	$> pwd
+	/temp/PerlBuildSystem-0.05
+	
+	$> perl pbs.pl -o -sd /d1 -sd /d2 -b -dsi -dd -fb -- T
+	No Build directory! Using '/temp/PerlBuildSystem-0.05'.
+	No user defined [PBS] Build, using default Build() with [BuiltIn, User] rules and config.
+	**Depending**
+	./T has dependencies [./test], rule 6:T : User : PBS : './Pbsfile.pl' : 22
+	./test has dependencies [], rule 7:test : User : PBS : './Pbsfile.pl' : 23
+	**Checking**
+	Trying ./T @  /d1/T: not found.
+	Trying ./T @  /d2/T: not found.
+	Trying ./test @  /d1/test: not found.
+	Trying ./test @  /d2/test: not found.
+	Final Location for ./test @ /temp/PerlBuildSystem-0.05/test
+	Final Location for ./T @ /temp/PerlBuildSystem-0.05/T
+	Final Location for __./Pbsfile.pl @ /temp/PerlBuildSystem-0.05/__./Pbsfile.pl
+	**Building**
+	Building /temp/PerlBuildSystem-0.05/test :
+	Building /temp/PerlBuildSystem-0.05/test : BUILD_FAILED : No builder.
+
+See switches B<--dsd --dsi --daa>.
+
+=head1 HIERARCHICAL BUILDS
+
+If you Organize your source code (or whatever you want to build) in a hierarchy, you can use PBS to build your system. Let take an example.
+
+You have the following files:
+
+	/source/lib/lib.c
+	/source/lib/lib2.c
+	/source/lib/test.c
+	/source/application.c
+
+You wan to:
+
+=over 2 
+
+=item 1 Build a library from lib.c
+
+=item 2 Build a test for the library
+
+=item 3 Build an application using the library
+
+=back
+
+You want to write a /source/Pbsfile  that uses /lib/Pbsfile to generate the library.
+
+This is very easy to do with B<PBS> and was one of the goals of the project. /source/Pbsfile could look like this.
+
+	AddRule 'application',['a.o' => './lib/lib.lib', 'a.c'], \&Builder ;
+	AddRule 'lib', {NODE_REGEX => 'lib.lib', PBSFILE => '/lib/Pbsfile.pl', PACKAGE => 'LIB'} ;
+
+When you build your application, B<PBS> sees you are using 'lib/lib.lib', it will load '/lib/Pbsfile.pl' and run it.
+
+Some points are worth noting.
+
+=over 2
+
+=item 1 No new process is started when using /lib/Pbsfile
+
+=item 2 '/lib/Pbsfile' is not special in any way (See bellow in B<USER DEFINED BUILD> for an explanation).
+
+=back
+
+=head2 Packages
+
+PBS will automatically push your script in a package. This is done to separate rules and configurations 
+when doing a hierarchical build. If your build system isn't hierarchical, your Pbsfile will be placed in the PBS package. 
+
+=head2 Rule definition for sub depend
+
+Within a pair of matching curly braquets'{}', list:
+
+=over 2
+
+=item 1 Mandatory. The node name => the Pbsfile name.
+
+=item 2 Mandatory. Package => the sub package in which to run the sub build.
+
+=item 3 Optional. Extra variables you would like to set in the sub depend
+
+=back
+
+	Ex:
+	AddRule 'sub_depend',
+		{
+		   NODE_REGEX => 'x.lib'
+		 , PBSFILE  => './P2.pl'
+		 , PACKAGE => 'LIB'
+		 , BUILD_DIRECTORY => '/bd_P2'
+		 , SOURCE_DIRECTORIES=> ['/sd_P2_2', '/sd_P2_1']
+		 } ;
+
+
+=head2 Which rules are used in the child depend step?
+
+I</lib/Pbsfile> will use it's own rules, as if it was not part of a sub build. 
+
+=head2 Which configuration is used in the child dependers?
+
+When B<PBS> starts a sub I<Pbsfile>, B<PBS> pushes (merges) the the parent configuration in the child Pbs. This is done automatically by B<PBS> just before
+calling the child B<Build()> sub or the B<default Build()> sub.
+
+=head2 Locking your config
+
+By calling B<LockConfigMerge()> in your Pbsfile, you disable the configuration merging that PBS does when loading your Pbsfile.
+B<PBS> will display a warning message. Definitions done throught the -D switch are always available in the sub Pbs configuration
+even if locked.
+
+=head2 B<PBS> Build flow for the above example
+
+=over 2
+
+=item 1 Load the top level I<Pbsfile>.
+
+=item 2 Set the top level configuration data.
+
+=item 3 Run the dependency step.
+
+=item 4 If during, the dependency step, a sub I<Pbsfile> is to be loaded
+
+=over 4
+
+=item 1 Load the sub I<Pbsfile>
+
+=item 2 Set the sub I<Pbsfile> configuration data
+
+=item 3 Inject the parent's configuration data, possibly overwriting some or all of the sub build configuration data.
+
+=item 4 run the sub I<Pbsfile> B<Build()> sub if defined or the default B<Build()>.
+
+=item 4 return from the sub I<PbsFile>
+
+=back
+
+=item 5 run the check step (in the top PBS).
+
+=item 6 run the build step (in the top PBS).
+
+=back
+
+See also B<PBS.html>.
+
+=head2 Test run
+
+Must show an output here !!
+
+=head3 Switches that help you understand what is going on.
+
+See B<--dpl --dds --dd>
+
+=head1 Node Triggers
+
+=head2 Rule definition
+
+=head2 Importing and Exporting Triggers
+
+ImportTriggers('./Pbsfiles/sub_trigger.pl') ;
+
+sub ExportTriggers
+{
+AddTrigger 'T2', ['Y' => 'z2'] ;
+AddRule 'sub_trigger_Y',
+	{
+	  NODE_REGEX => 'Y'
+	, PBSFILE => './Pbsfiles/sub_trigger.pl'
+	, PACKAGE => 'Y'
+	} ;
+} # end ExportTriggers
+
+=head1 DEFAULT BUILD
+
+We have learned how to define rules and set configurations. We have also see how to write 'Builder' in perl.
+B<PBS> uses those definitions and 'builders' to build your system. In 'B<PBS> Program flow',
+I introduced the inner working of B<PBS> (B<'depend - check - build'>). The function that runs the B<'depend - check - build'>
+steps is called the I<default Build()>. 
+
+=head2 'User' and 'Builtin' names spaces.
+
+Your rules and configuration are stored by B<PBS> in namespaces. The I<default Build()> uses the rules and configurations that _you_ store in the 'User' and 'Builtin' namespace. 
+If you store your definitions in other namespaces, B<PBS> will _not_ use them. Most of the build system you will define will use the I<default Build()> so remember to use the 
+'User' and 'Builtin' namespaces. All the rules added by B<AddRule> automatically end in the 'User' namespace.
+
+When B<PBS> can't find a B<user defined Build()>, it displays the following message:
+
+	No user defined [PBS] Build, using default Build() with [BuiltIn, User] rules and config.
+
+This tells us that the B<Pbsfile> we use doesn't define any I<Build()> and that it was automatically pushed in the package B<[PBS]>. When running hierarchical builds, B<PBS> 
+will show you if sub B<Pbsfiles> define a I<Build()> or not. Ex:
+
+	$> perl pbs.pl all
+	No user defined [PBS] Build, using default Build() with [BuiltIn, User] rules and config.
+	...
+	No user defined [PBS::LIBS] Build, using default Build() with [BuiltIn, User] rules and config.
+	...
+	No user defined [PBS::LIBS] Build, using default Build() with [BuiltIn, User] rules and config.
+
+Here some B<sub Pbsfile>, without I<user defined Build()> is used twice (it's loaded in memory in memory only once. See switch B<--dpl>).
+
+See also switches B<--dur --dar --dc --dac --dr>.
+
+=head1 USER DEFINED BUILD
+
+I<In this section and sections bellow, a working knowledge of perl is needed. I think any programmer with some experience can experiment with perl.>
+
+Sometimes you just can seem to get  your build system to do what you want, however intricate rules you write!
+B<PBS> Let's you take control by defining a I<user Build()> function. When such a function is found,
+b<PBS> calls it instead for the default Build() function. You are now in control and B<PBS> will not interfere any more if not called from your function.
+if you define an empty I<Build()> .
+
+	sub Build {}
+
+running I<pbs> would give the following.
+
+	$> perl pbs.pl --dpl -- all
+	No Build directory! Using '.....'.
+	No source directory! Using '....'.
+	=>Loading Pbsfile: ./Pbsfile.pl [PBS]
+	Found user defined Build.
+	$>
+
+=head2 Taking control of the build
+
+By defining your own I<Build()> function, you state your will to take control over all the part of the build.
+You are not using B>PBS> as a build system any more but using it as a library. I will now explain how to 
+do some routine work within your I<Build()> then I will give an example or two. Please contribute your examples to B<PBS>.
+
+There are two ways of programming your own build.
+
+=over 2
+
+=item 1 Manipulate the rules and config, eventually generating rules and interacting with the outside world,
+and then call the I<default Build()>. You can also manipulated the I<default Build()> arguments.
+This is quite easy to do and will certainly answer 90% of your advanced needs.
+
+=item 2 Call the low level functionality exposed by B<PBS> instead for calling the I<default Build()>.
+This is quite advanced, requires that you understand perl and B<PBS> architecture well.  The low level functions receive a config argument,
+that argument should be a snapshot of the config (a copy) for the package at the moment the user defined build is run.
+
+=back
+
+=head3 Arguments passed to your I<Build()> function
+
+=over 2
+
+=item 1 $targets
+
+A reference to an array containing the names of the target to build.
+
+=item 2 $build_directory
+
+A string containing the name of the build directory
+
+=item 3 $source_directories
+
+A reference to a list of source directories.
+
+=item 4 $inserted_files
+
+A reference to hash that contains the files already inserted in your dependency tree.
+
+=item 5 $dependency_tree
+
+A reference to a hash, that is to be used as your dependency tree. 
+
+=item 6 $depend_and_build
+
+A boolean Flag that tells you if you should run the build step or only depend the targets. See L<Behave correctly as a sub build.>.
+
+=back
+
+=head3 What Package is my I<Build()> running in?
+
+__PACKAGE__ (see perl documentation) will contain your running package. You should normally not have to take of what 'package' you are running inside. B<PBS> lets you peak into other packages rules
+ and configuration variables but you should consider them to be read-only.
+
+=head3 Configuring your system and other management tasks
+
+The first part of your I<Build()> function should handle your build configuration. This is different from case to case. Look at the 'Examples' section. This might be the right place to check for
+new source code availability or get a unique build number from a database.
+
+=head4 User switches
+
+B<PBS> lets you pass variables to your I<Build()> through the command line and switch B<-u>.
+
+	Ex:
+	perl pbs.pl -c -u clean='yes' -u heap_size=16 all
+	
+	Inside your Build() you can access those variables:
+
+	if(defined $PBS::user_options{clean})
+		{
+		# do some cleaning
+		}
+	my $heap_size = $PBS::user_options{heap_size} || 32 ;
+	
+
+=head3 Adding rules dynamically
+
+You can call  B<AddRule> from inside your I<Build()> function.
+B<PBS> is extremely flexible because it is programmed and programmable with perl.
+B<AddRule> accepts functions references as depender, builder or argument.
+Those can be dynamically created at run time if you so wish.
+Rules are often added depending on the command line arguments.
+
+=head3 Calling the default Build()
+
+In most cases you want to manipulate the rules and config and then call the I<default Build()>. Here is an example.
+
+	Ex:
+	sub Build
+	{
+	my ($Pbsfile, $package, $package_config, $targets, $inserted_files, $dependency_tree, $depend_and_build) = @_ ;
+	...
+	
+	PBS::DefaultBuild::DefaultBuild
+		(
+		  $Pbsfile
+		, $package
+		, $package_config
+		, ['BuiltIn', 'User']
+		, ['BuiltIn', 'User', 'CommandLineDefinitions']
+		# target will be inserted by rule 'BuiltIn::__ROOT
+		, $inserted_files
+		, $dependency_tree
+		, $depend_and_build
+		) ;
+	}
+
+If I<pbs> is called as: perl pbs.pl -u extra_objects all, The I<Build > above will add a.o, b.o and c.o to 'exe' dependencies.
+'a.o' and the other object files will be recursively depended with the rules define in your system.
+B<PBS::DefaultBuild::DefaultBuild> takes three (3) extra arguments compared with the user build.
+
+=over 2
+
+=item * at position zero (0), the names of the rules namespaces to use during the default build.
+
+=item * at position zero (1), the names of the configuration namespaces to use during the default build.
+
+=item * at last position,  the names the package to build. This should always be __PACKAGE__.
+
+=back
+
+=head3 Examples
+
+=head4 User interaction
+
+=head4 Depending source files
+
+=head4 Version control
+
+=head1 ADVANCED USER DEFINED BUILD
+
+You can write advanced I<Build()> but you must know what B<PBS> data structures look like and how to use them. 
+You are now navigating the darker waters of B<PBS> development.
+
+=head2 Rules and config
+
+=head3 Getting rules and config.
+
+You can query B<PBS> for the rules and config that are defined when you I<Build()> is run.
+
+B<PBS::Rules::GetRules> takes 2 arguments.
+
+=over 2 
+
+=item 1 A package name, this should be '__PACKAGE__'
+
+=item 2 A list of rule namespaces
+
+=back
+
+B<PBS::Rules::GetRules> will return a list of rule structures used internaly by B<PBS> that match your request.
+
+
+B<PBS::Config::GetConfig> takes 2 arguments.
+
+=over 2 
+
+=item 1 A package name, this should be '__PACKAGE__'
+
+=item 2 A list of config namespaces
+
+=back
+
+B<PBS::Config::GetConfig> will return a list of all the configuration variables.
+
+=head3 Removing rules
+
+B<PBS::Rules::RemoveRule> allows you to remove a rule if you know its name and namespace.
+
+B<PBS::Rules::RemoveRule> takes 3 arguments.
+
+=over 2 
+
+=item 1 The package name (use __PACKAGE__ for the current package name)
+
+=item 2 The namespace (ex: 'Builtin', 'User')
+
+=item 3 The name of the rule to remove, if no name is given, all the rules are removed.
+
+=back
+
+=head3 Removing configuration
+
+B<PBS::Config::Removeconfig> takes 3 arguments.
+
+=over 2 
+
+=item 1 A package name, this should be '__PACKAGE__'
+
+=item 2 A namespace name
+
+=item 3 A configuration variable name
+
+=back
+
+=head2 Calling low level B<PBS> functions.
+
+B<PBS> functionality is build around 3 low level  functions:
+
+=over 2
+
+=item * PBS::Depend::CreateDependencyTree
+
+=item * PBS::Check::CheckDependencyTree
+
+You are also allowed to define another trigger rule instead for the built-in time stamp checking.
+
+=item * PBS::Build::BuildSequence
+
+=back
+
+Those 3 functions are used in B<PBS::DefaultBuild::DefaultBuild()>. which serves as a good example on how to use them. The functions are further 
+documented in their respective modules.
+
+=head2 Behaving correctly as a sub build.
+
+When writing a user I<Build()> function that doesn't call the I<default Build()>, make sure the function behavior is right when being used as a sub build. 
+The last argument passed to the I<Build()> function tell it if it should run the check and build step or not. If you need to access the low level functionality, make sure
+you have the latest version of B<PBS> and use B<PBS::DefaultBuild::DefaultBuild()> as a template for your function.
+
+=head2 Advanced Example
+
+=head1 Documenting your Pbsfiles
+
+Document your Pbsfile! Pod is the favorite documentation format for perl scripts and modules and for I<Pbsfiles>. Check your perl documentation 
+for how to use pod. By documenting your I<Pbsfiles> and build system you will help making your system maintainable.
+
+=head2 Helping your users.
+
+I<pbs.pl> handle two switches that help you when you document your I<Pbsfiles>.
+
+=head3 Online help
+
+The B<--hu> switch  will extract the section that starts with I<=head1 PBSFILE USER HELP>
+
+Comments that you put in a I<=pod> or I<=comment> sections are not extracted. The help is dumped on STDERR.
+
+	$>perl pbs.pl -hu
+
+	==== PBSFILE USER HELP ====
+	
+	
+	==   *Pbsfile.pl*   ==
+	
+	    *Pbsfile.pl* is to be used with the Perl Build System (``PBS'').
+	
+	
+	==   Description   ==
+	
+	    This *Pbsfile* come with PBS distribution. It contains some examples of
+	    what you can do with *pbs.pl* and ``PBS''
+	
+	
+	==   Uses rules and Config from   ==
+	
+	* Rules/C
+	* Configs/ShellCommands
+	* Configs/gcc
+	
+	
+	==   Uses sub *Pbsfile*   ==
+	
+	* ./P2.pl
+	
+	
+	==   Documentations for User Build   ==
+	
+		Example ...
+	
+		blah ...
+	
+		User options:
+	
+			-u something to do something
+			-u something_else ....
+
+=head3 Html help
+
+If you write I<Pbsfiles> for a lot of users, you might want to distribute a html (or other format) documentation. I<pbs.pl> will dump raw pod for section B<'PBSFILE USER HELP'> if you use the
+B<--hur> switch
+
+	$>perl pbs.pl -hur | pod2html > document_name.html
+
+=head1 Digest
+
+When B<PBS> check if a node is to be rebuild, it first checks if any dependency is newer, in that case the node is
+rebuild. If no dependencies force a rebuild, B<PBS> checks if the node corresponds to a file on disk. If the file is found,
+B<PBS> verifies if the file found on disk is compatible with the current build. To do this checking, B<PBSW> reads a digest corresponding
+to the file from the disk. If no digest is found, the node is rebuild. The digest is generated automatically when a node is build.
+The digest contains the following elements:
+
+=over 2
+
+=item 1 md5 of the Pbsfile that generated it
+
+=item 2 md5 of the files that have been included through I<PbsUse>
+
+=item 3 Any element you have specified through the I<Add...Dependencies> functions
+
+=back
+
+If all the elements needed to build the node are found in the file's digest, B<PBS> uses it, otherwise the 
+node is rebuild.
+
+Items 1 and 2 are automatically inserted in the digest by B<PBS> (this might change if we feel we want to give you even more control).
+Sometimes, you know of dependencies that B<PBS> can't find out or you want to mark the build node with the versions of some tools.
+B<PBS> let you define such dependencies throught the following functions:
+
+I<AddFileDependencies()> : B<PBS> will compute an md5 for each file in the list you pass as argument and add it to the digest.
+
+I<AddEnvironmentDependencies()>: B<PBS> will add each environement variable you name in the list passed as argument. If the
+environnement variable is not set, B<PBS> will add the variable to the digest and give it the empty string value.
+
+I<AddSwitchDependencies()> : : B<PBS> will add the veriables and their values to the digest. Only Defined (-D) and User Defines (-u) can
+be added.
+	
+	Ex:
+	AddSwitchDependencies('-D*') ; # depend on all command line defines 
+	AddSwitchDependencies('-u*') ; # depend on all user variables from the command line
+	AddSwitchDependencies('-u something', '-D debug', -D clean) ; # add only the given variables to the digest
+
+I<AddVariableDependency()> : This allows you to insert a variable name and it's value into the digest. For example, this could be used 
+if you are cross compiling for an embeded platform from diffrent OSes. The cross compilers would have diffrent md5 on the 
+OSes, so you can't add the cross compiler throught I<AddFileDependencies()>.
+
+	Ex:
+	my $compiler_version = GetCompilerNameAndVersion(...) ;
+	AddVariableDependency('compiler_version' => $compiler_version) ;
+
+
+B<PBS> will expects a digest for all nodes/files. We have to tell B<PBS> how to make the diffrence between a generated file and
+a source file (or any file for which a digest makes no sense).
+
+I<ExcludeFromDigestGeneration()> allows you to exampt a certain type of files from the digest.
+
+	Ex: ExcludeFromDigestGeneration('c_files' => qr/\.c$/) ;
+
+The first argument is a description string, the second one a reference to a regex object. Node names matching the regex will be exampted.
+
+Some source files are automatically generated (ex by flex, yacc, your own generators, ...), you can selectively
+re-impose a digest on a certain file that would have been exampted by I<ExcludeFromDigestGeneration>. I<ForceDigestGeneration()> lets
+you do that.
+
+	Ex: ForceDigestGeneration( 'a.c is generated' => qr/a\.c$/) ;
+
+The first argument is a description string, the second argument is a reference to a regex object.
+
+=head1 INTEGRATING PBS in another application
+
+The best example is B<pbs.pl>. You should read it source code and start from there. Feel free to mail me you questions. I also recommend to run B<PBS> 
+inside an I<eval> block as it 'die's when a serious error occurs..
+
+The source code is best read with tab size = 3. All lines should match /^\t*[^\s]/.
+
+=head2 Reading the source
+
+Look at B<PBS.POD> for a quick introduction to how B<PBS> works. All the modules are documented. The Author welcomes your remarks, suggestions and critics. 
+Html or man page documentation should be installed automatically when you install the Perl Build System.
+
+=head1 DEBUGGING
+
+use strict ;
+use warnings ;
+
+=head2 The ultimate debugger.
+
+perl has a built debugger, t=you can use it to look at how your build system is working.
+
+=head1 COMMAND LINE ARGUMENTS
+
+=head2 targets
+
+=head2 composite targets
+
+pbs -p xx b@all
+
+=head2 switches
+
+On-line documentation for the PBS switches is available through --hs.
+
+=head3 Debug Switches
+
+Some switches are considered by I<PBS> to be debug flags. When a debug flag is set, only the depend phase is run. To force a complete build us e the B<--fb> switch
+
+=head1 GENERATING TREE GRAPHS
+
+=head1 AUTHOR 
+
+Khemir Nadim ibn Hamouda. <nadim@khemir.net>
+
+=head1 COPYRIGHT and LICENSE 
+
+=cut
+
+

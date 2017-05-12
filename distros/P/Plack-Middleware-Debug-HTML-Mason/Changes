@@ -1,0 +1,15 @@
+Revision history for Plack-Middleware-Debug-HTML-Mason
+
+0.3 Tue Feb 24 2015
+	Update metadata to include the minimal perl version (5.14).
+	
+	Set a flag in the psgi env (psgi.middleware.debug.htmlmason) when the
+	panel is active.  This is helpful for only loading the plugin when you
+	need it.
+	
+0.2 Mon Feb 23 2015
+	Show a (hopefully) helpful error message when the plugin wasn't loaded
+	into mason.
+
+0.1 Mon Feb 23 2015
+	Initial Release

@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+use strict;
+use lib '../../..';
+
+die "Usage: $0 Key Value\n" unless($ARGV[1]);
+
+use Proc::PersistentControl;
+
+sub type {
+    print "$_[0]:\n";
+    open(T, $_[0]);
+    print while (<T>);
+    close(T);
+}
+
+sub printInfo {
+    my $r = shift;
+    foreach my $k (keys(%$r)) {
+	my $v = $r->{$k};
+	print "$k=$v\n";
+    }
+    type($r->{_dir} . '/STDOUT');
+    type($r->{_dir} . '/STDERR');
+}
+
+my $tp = Proc::PersistentControl->new();
+
+foreach my $p ($tp->ProcList($ARGV[0], $ARGV[1])) {
+    print '=' x 78, "\n";
+    print "FindId found ", $p->{_PPCUID}, "\n";
+    printInfo($p->Info());
+    print '=' x 78, "\n";
+}

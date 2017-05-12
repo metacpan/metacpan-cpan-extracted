@@ -1,0 +1,34 @@
+		<!--menu-->
+		<p>Please select the fields you wish the query to return.</p>
+		<script LANGUAGE="JavaScript">
+			function selectAll(master){
+				var object;
+				var i = 1;
+				while(1){
+					eval('object = document.fieldForm.field' + i);
+					if(object){
+						if(master.checked == true){object.checked = true;}
+						else{object.checked = false;}
+					}
+					else{break;}
+					i++;
+				}
+			}	
+		</script>
+		<form action="<!--self-->" method="POST" name="fieldForm">
+			<input type="hidden" name="key" value="<!--key-->">
+			<input type="hidden" name="action" value="selectchoosecriteria">
+			<table class="inputtable">
+				<tr>
+					<th>
+						<input type="checkbox" name="selectAllBox" value="" onclick="selectAll(document.fieldForm.selectAllBox);">
+					</th>
+					<td>(Select all)</td>
+				</tr>
+				<!--fieldlist-->
+			</table>
+			<br>
+			<table class="inputtable">
+				<tr><td><input type="submit" value="Continue"></td></tr>
+			</table>
+		</form>

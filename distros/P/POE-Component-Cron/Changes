@@ -1,0 +1,18 @@
+Revision history for Perl extension POE::Component::Cron.
+
+0.019 Sat May  3 00:25:49 MDT 2008
+    - fix #35422: DateTime::Event::Cron not loaded automatically
+
+0.018 Sat Jun  9 20:59:10 MDT 2007
+    - Fix bug poointed out by joseki on IRC that prevented argument passing
+      to handlers from the schdule from working.
+    - Added tests to ensure that pasing arguments from ->add and
+      ->from_cron actualy work.
+
+0.012 Sat Nov 27 16:37:29 MST 2004
+    - clean up some doc and add dependancies re cpansmoker
+
+0.01  Wed Jun  2 16:19:36 2004
+    - original version; created by h2xs 1.23 with options
+		-XA -n POE::Component::Cron
+

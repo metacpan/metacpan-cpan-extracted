@@ -1,0 +1,35 @@
+==================================================
+Changes from 2013-11-05 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.31 at 2014-11-05 22:15:09 +0000
+-----------------------------------------
+
+  Change: 2426ad49a3814a03a028a109dae6ce412acf1f70
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-05 14:14:55 +0000
+
+    fix pod so tests pass 
+
+  Change: 645e7310223adbee48a5945fdd59e03d6e39dc9c
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-05 13:37:27 +0000
+
+    tweaks 
+
+  Change: 9e5b2b81598741c4937611e086b515f5dff78d75
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-05 12:17:48 +0000
+
+    code cleanups 
+
+  Change: 7a798db7651d1de18e7c5ca8ced7ce3dc71400a9
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2011-04-24 13:26:46 +0000
+
+    include @INC in the forked process' perl 
+
+===============================================
+Plus 1 release after 2013-11-05 00:00:00 +0000.
+===============================================

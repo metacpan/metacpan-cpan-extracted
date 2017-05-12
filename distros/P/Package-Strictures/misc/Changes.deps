@@ -1,0 +1,98 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.000001
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - File::Spec
+ - perl 5.006
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+ [Removed / runtime requires]
+ - utf8
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+1.000000 2014-04-30T12:36:53Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - Import::Into
+ - constant
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - lib
+ - namespace::clean
+ - version
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 0.98 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4003
+
+ [Removed / configure requires]
+ - Module::Build 0.4003
+
+ [Removed / runtime requires]
+ - Moose 0.92
+ - MooseX::ClassAttribute 0.10
+ - namespace::autoclean 0.09
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.01001319 2012-12-02T14:23:20Z
+ [Added / build requires]
+ - Module::Build 0.4003
+
+ [Added / configure requires]
+ - Module::Build 0.4003
+
+ [Added / runtime requires]
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Added / test requires]
+ - B::Deparse
+ - File::Find
+ - File::Temp
+ - FindBin
+ - Test::Fatal
+ - Test::More 0.98
+
+ [Removed / runtime requires]
+ - B::Deparse
+ - FindBin
+ - Test::Exception 0.27
+ - Test::More
+
+0.01001318 2009-11-10T22:49:10Z
+ [Changed / runtime requires]
+ - namespace::autoclean 0.9 → 0.09
+
+0.01000019 2009-10-28T23:22:41Z
+ [Added / runtime requires]
+ - namespace::autoclean 0.9

@@ -1,0 +1,6 @@
+Name: wmlib
+Description: FIXME: What do I write here?
+Version: 0.92.0
+Requires: wrlib
+Libs: -L/usr/lib  -lWUtil  
+Cflags: -I/usr/include 

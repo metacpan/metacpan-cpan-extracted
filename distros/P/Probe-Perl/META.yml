@@ -1,0 +1,23 @@
+---
+abstract: 'Information about the currently running perl'
+author:
+  - 'Ken Williams <kwilliams@cpan.org>'
+build_requires:
+  Test: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Probe-Perl
+requires:
+  Config: 0
+  File::Spec: 0
+  strict: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Probe-Perl
+  repository: git://github.com/kenahoo/Probe-Perl.git
+version: 0.03

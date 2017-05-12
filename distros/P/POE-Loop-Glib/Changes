@@ -1,0 +1,26 @@
+0.038	- Apocalypse is now maintaining this module, thanks to Martijn for letting me do that!
+	- Lots of misc tweaks to POD/Build.PL/stuff :)
+	- Removed Module::Install in favor of Module::Build - yell at me if you have problems!
+	- Added patch from RT#55279 to fix 'POE_EVENT_LOOP="Glib" perl -MPOE -e 1' bug
+	- Added patch from RT#53302 to fix filehandle watcher bug
+	- Bumped POE::Test::Loops prereq to 1.034 so we can use the new =begin/=end syntax and more tests!
+	- Fixed RT#49742 'POE::Kernel->run() doesn't return immed. if no sessions', thanks Rocco Caputo for the fix!
+
+0.037   - fix provides so PAUSE picks up our version again.
+0.0036  - Suppress redefinition warnings
+        - Update our POE::Test::Loops requirement since it has new tests
+0.0035  - Use new POE::Test::Loops to generate the tests at build time
+
+0.0034  - Switch to Module::Install
+
+0.0033  - Include the POE::Test::Loops tests in the dist for now
+
+0.0031	- Merge GlibCommon.pm into Glib.pm since there are no other Glib
+	  based loops anymore
+	- improve kwalitee
+	- list POE::Test::DondeEstan as (build) requirement
+
+0.0030	- Use POE::Test::Loops
+	- Add an exeption handler to exit the loop and rethrows the exeption
+
+earlier	- lost in the mists of time

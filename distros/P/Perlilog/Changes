@@ -1,0 +1,16 @@
+Revision history for Perlilog:
+
+0.1 -- First release (Alpha): 8 Feb 2003
+
+0.2 -- Beta release: 10 Nov 2003
+ * Added support of the 'viasource' property
+ * Added support of inheritdir()
+ * Fixed linebreak(), so that a final "\n" is passed through to output
+
+0.3 -- Beta release: 11 Nov 2003
+ * Added the 'equivalent' property, allowing several objects to share
+   a single Verilog module (multi-instantiation)
+ * Fixed namespace bug for instantiations
+ * Obsoleted the 'insname' property
+ * Changed addins() and suggestins() to become exactly like addvar()
+   and suggestvar() (for the time being).

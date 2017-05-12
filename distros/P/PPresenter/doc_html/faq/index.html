@@ -1,0 +1,76 @@
+
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; FAQ</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>FAQ</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<B>FAQ</B><BR>
+<P>
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.  It is a complicated packages, which requires a study off the
+supplied documentation.  However, after that, still some questions may
+remain which are not directly part of the PPresenter software, but are related to
+running it.  I try to answer these questions on this page(s).
+
+    </TD></TR>
+<TR><TD VALIGN=top>
+
+    </TD><TD VALIGN=top>
+
+<H2>Questions</H2>
+<OL>
+<LI><A HREF=#borders>How can I get rid of the borders?</A><BR>
+</OL>
+
+<H2>Answers</H2>
+<OL>
+<LI><FONT COLOR=green><A NAME=borders>How can I get rid of the borders?</A></FONT>
+    <P>
+    This can not be handled by PPresenter itself, but is a task of your
+    windowing system (in UNIX's case the window-manager you are running)
+    For each windowing system, the way to achieve this is different.
+    Please contribute to the next list:
+    <P>
+    <DL>
+    <DT><STRONG>WindowMaker</STRONG>
+    <DD>Run your application. Select "Attributes..." from the menu you
+        get when you push the right mouse button on the title bar.
+        Choose "Window Attributes" for the selection-box, and then
+        flag "Disable titlebar".  If you have accepted that, your border
+        will disappear.
+        <P>
+    <DT><STRONG>Fvmw2</STRONG> (thanks to Slaven Radic)
+    <DD>Add the line
+<PRE>
+   Style "Coll"    NoTitle, NoHandles, BorderWidth 0
+</PRE>
+        to the configuration file <CODE>~/.fvwm2rc</CODE>, where
+        <CODE>Coll</CODE> should be replaced by the capitalized name
+        of your presentation script.
+    </DL>
+</DL>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

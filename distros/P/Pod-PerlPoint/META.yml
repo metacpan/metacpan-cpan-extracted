@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Pod-PerlPoint
+version:      0.06
+version_from: 
+installdirs:  site
+requires:
+    Getopt::ArgvFile:              1.06
+    Getopt::Long:                  2.32
+    Pod::Simple:                   0.96
+    Pod::Usage:                    1.14
+    Test::Harness:                 1.25
+    Test::More:                    0.11
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

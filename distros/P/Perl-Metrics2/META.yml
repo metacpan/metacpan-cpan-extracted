@@ -1,0 +1,46 @@
+---
+abstract: 'Perl metrics storage and processing engine'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Perl::Metrics2
+name: Perl-Metrics2
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  CPAN::Mini::Visit: 0.02
+  Class::Inspector: 1.23
+  File::Find::Rule: 0.30
+  File::Find::Rule::Perl: 1.09
+  File::Find::Rule::VCS: 1.06
+  File::HomeDir: 0.82
+  File::Next: 1.04
+  File::ShareDir: 1.00
+  File::Spec: 0.80
+  ORLite: 1.21
+  ORLite::Migrate: 0.02
+  Params::Util: 1.00
+  Process: 0.27
+  Process::Delegatable: 0.27
+  Process::Storable: 0.27
+  Time::Elapsed: 0.24
+  Time::HiRes: 1.9718
+  perl: 5.8.5
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Perl-Metrics2
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Perl-Metrics2
+version: 0.06

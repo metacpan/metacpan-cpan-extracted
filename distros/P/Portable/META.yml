@@ -1,0 +1,32 @@
+---
+abstract: 'Perl on a Stick'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  Class::Inspector: 1.22
+  ExtUtils::MakeMaker: 6.59
+  LWP::Online: 1.07
+  Test::Exception: 0.27
+  Test::More: 0.42
+  Test::NoWarnings: 0.084
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Portable
+name: Portable
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  CPAN::Mini: 0.575
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.22

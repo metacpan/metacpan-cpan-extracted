@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+Solaris.pm
+Solaris.xs
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

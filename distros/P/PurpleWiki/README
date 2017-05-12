@@ -1,0 +1,149 @@
+PurpleWiki version 0.93
+=======================
+
+PurpleWiki is a WikiWikiWeb that adds purple numbers to paragraphs,
+headers, lists, and other fine-grained elements on a Wiki page.  These
+numbers can be used to create links to these specific elements.
+Features include:
+
+  * Fine-grained addressability via purple numbers.
+
+  * Transclusions.
+
+  * Blog integration (MovableType and blosxom)
+
+  * Single sign-on via Identity Commons i-names.
+
+  * Modular architecture for maximum customizability.
+
+  * Template based presentation.
+
+DOWNLOAD AND DOCUMENTATION
+
+PurpleWiki is available at:
+
+  http://www.blueoxen.org/tools/purplewiki/
+
+More information and documentation is available at:
+
+  http://purplewiki.blueoxen.net/
+
+INSTALLATION
+
+To install PurpleWiki, you must first install the modules, then
+install and configures the scripts you will use.
+
+PurpleWiki has several requirements:
+
+  * A web server that can run CGI programs.
+
+  * Perl version 5.6.0 or greater.
+
+  * The following CPAN modules:
+
+    + AppConfig
+    + Algorithm::Diff
+    + CGI
+    + CGI::Carp
+    + CGI::Session
+    + DB_File
+    + LWP::UserAgent
+    + Template
+    + Text::Diff
+    + Text::Wrap
+    + XML::RSS
+
+To install the modules, first unpack the distribution.  This will
+create a PurpleWiki-0.93 directory.  Change directories, and execute
+the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+To install the Wiki:
+
+  1. Copy the wikidb directory included in the distribution wherever
+     you want it.  Copy the directory and all its contents, including
+     subdirectories. This directory must be writeable by the web server
+     when running CGI scripts.  It should not be in the publically
+     accessible htdocs directory.
+
+  2. Edit wiki.pl, changing $CONFIG_DIR to the directory you just
+     created.
+
+  3. Copy wiki.pl to your cgi-bin directory.
+
+  4. Edit the config file:
+
+    + Change ScriptName to the URL path of the Wiki CGI
+      (e.g. http://foo.bar/cgi-bin/wiki.pl).  It must be a fully
+      qualified URL.
+
+    + Change SiteName to the name of the Wiki.
+
+  5. If you would like to change the look-and-feel of the site, edit
+     the templates in wikidb/templates.  More information is available
+     in docs/Templates.wiki.
+
+The Wiki should now be installed.  To test, point your web browser to
+the PurpleWiki URL.  You should see a page called FrontPage that says,
+"Describe the new page here."  Clicking "Edit text of this page" will
+allow you to edit this page.  Add some text, and click save.  If
+everything works, your installation is a success!
+
+If you plan to take advantage of Search modules beyond the default,
+read the documentation found within the modules to be found in the
+Search directory of your PurpleWiki installation in site_perl or 
+elsewhere in @INC. Those files include additional configuration
+requirements.
+
+For more information see:
+
+  http://purplewiki.blueoxen.net/cgi-bin/wiki.pl?InstallationTips
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2002-2004 Blue Oxen Associates.
+
+PurpleWiki is derived from:
+
+  UseModWiki v0.92          (c) Clifford A. Adams 2000-2001
+  AtisWiki v0.3             (c) Markus Denker 1998
+  CVWiki CVS-patches        (c) Peter Merel 1997
+  The Original WikiWikiWeb  (c) Ward Cunningham
+
+PurpleWiki is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation; either version 2 of the License, or (at your
+option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the:
+
+   Free Software Foundation, Inc.
+   59 Temple Place, Suite 330
+   Boston, MA 02111-1307 USA
+
+ACKNOWLEDGEMENTS
+
+PurpleWiki was inspired by two other derivatives of UseModWiki:
+
+  Wookee
+    http://wiki.beyondunreal.com/wiki/Wookee
+
+  TmNetWiki
+    http://www.technomanifestos.net/index.pl?The_Network/Source
+
+AUTHORS
+
+Chris Dent <cdent@blueoxen.org>
+Eugene Eric Kim <eekim@blueoxen.org>
+
+$Id: README,v 1.8 2004/01/21 23:24:08 cdent Exp $

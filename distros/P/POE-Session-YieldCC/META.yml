@@ -1,0 +1,34 @@
+---
+abstract: 'POE::Session extension for using continuations'
+author:
+  - 'Benjamin Smith <bsmith@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Session-YieldCC
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+provides:
+  POE::Session::YieldCC:
+    file: lib/POE/Session/YieldCC.pm
+    version: 0.202
+  POE::Session::YieldCC::Continuation:
+    file: lib/POE/Session/YieldCC.pm
+requires:
+  Coro: 5.131
+  POE: 1.004
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/rkitover/poe-session-yieldcc.git
+version: 0.202

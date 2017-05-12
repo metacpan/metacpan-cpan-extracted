@@ -1,0 +1,265 @@
+#!/usr/local/perl5.8/bin/perl -w
+
+
+
+# = HISTORY SECTION =====================================================================
+
+# ---------------------------------------------------------------------------------------
+# version | date   | author   | changes
+# ---------------------------------------------------------------------------------------
+# 0.01    |10.12.02| JSTENZEL | new.
+# ---------------------------------------------------------------------------------------
+
+# = POD SECTION =========================================================================
+
+=head1 NAME
+
+B<pod2pp> - a POD to PerlPoint translator
+
+=head1 VERSION
+
+This manual describes version B<0.01>.
+
+=head1 DESCRIPTION
+
+This is a translator in the tradition of the various C<pod2...>, translating POD
+into PerlPoint files.
+
+=head1 SYNOPSIS
+
+Currently, usage is very straight forward. Just pass the sources you want to process.
+
+ pod2pp file1.pod Module.pm
+
+In case you want to process C<STDIN>, omit the list of POD files.
+
+ pod2pp
+
+=head2 Options
+
+=over 4
+
+
+=item -help
+
+displays an online help and terminates the script.
+
+=item -nocopyright
+
+suppresses the copyright message;
+
+=item -noinfo
+
+supresses runtime informations;
+
+=item -nowarn
+
+supresses warnings;
+
+=item -quiet
+
+a shortcut for "-nocopyright -noinfo -nowarn": all non critical runtime messages are suppressed;
+
+=item -outfile
+
+Results are written to C<STDOUT>, except when option B<C<-outfile outfile>> is used, in which
+case I<all> output is redirected to the file specified.
+
+ pod2pp -outfile file.pp file.pod
+
+C<-outfile> may be abbreviated.
+
+=item -parserversion
+
+Accepts the version of C<PerlPoint::Parser> to produce for. If this option is omitted,
+it is assumed that a parser prior to 0.39 will be used.
+
+ Example: -parserversion 0.40
+
+Note: for parsers from 0.40 on, this option is I<required> to get readable results. See
+C<Pod::PerlPoint> for details.
+
+=back
+
+
+=head2 Option files
+
+C<pod2pp> options can be passed by files, which makes repeated calls easier. Just write
+options into a file, spread or in one line, as if you would do in the command line. Newlines,
+empty lines and comment lines (beginning with a C<#>) are allowed.
+
+  -outfile /tmp/perlpoint.result
+
+To pass the option file, enter its name, preceded by an C<@>.
+
+  pod2pp @options
+
+In case options should become standard, store them in a file C<.pod2pp> in your
+home directory. To make settings valid for all users, store them in a C<.pod2pp>
+file in the directory of C<pod2pp> itself. C<.pod2pp> files will be read automatically.
+
+Option files can be nested and cascaded, see C<Getopt::ArgvFile> for further details.
+
+
+
+=head1 NOTES
+
+C<pod2pp> uses C<Pod::PerlPoint>, which is strongly based on C<Pod::Simple::Text>.
+Thanks to its author Sean M. Burke.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item B<Pod::PerlPoint>
+
+The module this script is based upon.
+
+=item B<pp2pod>
+
+A PerlPoint to POD translator that comes with C<PerlPoint::Package>.
+
+=item B<Bundle::PerlPoint>
+
+A bundle of packages to deal with PerlPoint documents.
+
+
+=back
+
+
+=head1 AUTHOR
+
+Copyright (c) Jochen Stenzel (perl@jochen-stenzel.de), 2002-2004. All rights reserved.
+
+
+
+=head1 SUPPORT
+
+A PerlPoint mailing list is set up to discuss usage, ideas,
+bugs, suggestions and translator development. To subscribe,
+please send an empty message to perlpoint-subscribe@perl.org.
+
+If you prefer, you can contact me via perl@jochen-stenzel.de
+as well.
+
+
+=head1 AUTHOR
+
+Copyright (c) Jochen Stenzel (perl@jochen-stenzel.de), 2002-2004.
+All rights reserved.
+
+This script is free software, you can redistribute it and/or modify it
+under the terms of the Artistic License distributed with Perl version
+5.003 or (at your option) any later version. Please refer to the
+Artistic License that came with your Perl distribution for more
+details.
+
+The Artistic License should have been included in your distribution of
+Perl. It resides in the file named "Artistic" at the top-level of the
+Perl source tree (where Perl was downloaded/unpacked - ask your
+system administrator if you dont know where this is).  Alternatively,
+the current version of the Artistic License distributed with Perl can
+be viewed on-line on the World-Wide Web (WWW) from the following URL:
+http://www.perl.com/perl/misc/Artistic.html
+
+
+=head1 DISCLAIMER
+
+This software is distributed in the hope that it will be useful, but
+is provided "AS IS" WITHOUT WARRANTY OF ANY KIND, either expressed or
+implied, INCLUDING, without limitation, the implied warranties of
+MERCHANTABILITY and FITNESS FOR A PARTICULAR PURPOSE.
+
+The ENTIRE RISK as to the quality and performance of the software
+IS WITH YOU (the holder of the software).  Should the software prove
+defective, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR
+CORRECTION.
+
+IN NO EVENT WILL ANY COPYRIGHT HOLDER OR ANY OTHER PARTY WHO MAY CREATE,
+MODIFY, OR DISTRIBUTE THE SOFTWARE BE LIABLE OR RESPONSIBLE TO YOU OR TO
+ANY OTHER ENTITY FOR ANY KIND OF DAMAGES (no matter how awful - not even
+if they arise from known or unknown flaws in the software).
+
+Please refer to the Artistic License that came with your Perl
+distribution for more details.
+
+=cut
+
+
+# set version
+$VERSION=0.01;
+
+
+# pragma
+use strict;
+
+
+# load modules
+use Pod::Usage;
+use Getopt::Long;
+use File::Basename;
+use Pod::PerlPoint;
+use Getopt::ArgvFile 1.07 home=>1, default=>1;
+
+# declarations
+my (%options);
+
+# get options
+GetOptions(\%options,
+           "help",              # display help;
+           "nocopyright",       # suppress copyright message;
+           "noinfo",            # suppress runtime informations;
+           "nowarn",            # suppress runtime warnings;
+           "outfile|o=s",       # output filename;
+           "parserversion=f",   # the version of the target parser;
+           "quiet",             # suppress all runtime messages except of error ones;
+          ) or die "\n";
+
+
+# propagate options as necessary
+@options{qw(nocopyright noinfo nowarn)}=() x 3 if exists $options{quiet};
+
+
+# display copyright unless suppressed
+warn "\n",
+     basename($0), ' ',
+     do {no strict 'refs'; ${join('::', __PACKAGE__, 'VERSION')}},
+     ", (c) J. Stenzel (perl\@jochen-stenzel.de) 2002-2004. \n\n"
+  unless exists $options{nocopyright};
+
+
+
+# display help, if necessary
+pod2usage(0) if exists $options{help};
+
+
+
+# build a translator
+my $translator=new Pod::PerlPoint;
+
+
+# configure translator as necessary
+if (exists $options{outfile})
+ {
+  my $outfile=$options{outfile};
+  open RESULT, ">$outfile" or die "Can't write to $outfile: $!";
+  $translator->output_fh(\*RESULT);
+ }
+
+# prepare fo modern parsers, if possible
+if (exists $options{parserversion} and $options{parserversion}>=0.40)
+ {$translator->configure(parser40=>1);}
+
+# act argument dependend
+if (@ARGV)
+ {
+  # transform the file
+  $translator->parse_file($_) for @ARGV;
+ }
+else
+ {
+  # transform STDIN
+  $translator->parse_file(*STDIN);
+ }
+
+

@@ -1,0 +1,19 @@
+Revision history for Perl extension Plack::App::PHPCGI
+
+0.05 2015-01-28T07:09:30Z
+
+        - check php-cgi before installing #2
+
+0.04 2013-12-09T00:46:57Z
+
+        - re-packaging with Minilla
+        - add version to Plack::App::PHPCGIFile RT#91240
+
+0.03    Mon Jan 7 23:18:56 2013
+        - fixed SYNOPSIS of Plack::App::PHPCGIFile
+
+0.02    Fri Dec 28 13:06:46 2012
+        - added Plack::App::PHPCGIFile, It's serves PHP script from a directory
+
+0.01    Thu Dec 27 00:26:15 2012
+        - original version

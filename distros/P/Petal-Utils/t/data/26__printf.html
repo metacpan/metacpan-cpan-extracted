@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns:tal="http://purl.org/petal/1.0/">
+  <body>
+    <!--? Printf -->
+    <div>
+      printf1: <p tal:replace="printf:'%s' $dog">name of dog</p>
+      printf2: <p tal:replace="printf:'%02d' $children_count"># of children</p>
+      printf3: <p tal:replace="printf:'%0.2f' $bank_balance">bank acct</p>
+      printf4: <p tal:replace="printf:'$%0.2f' $bank_balance">bank acct</p>
+      printf5: <p tal:replace="printf:'Balance = $%0.2f' $bank_balance">bank acct</p>
+      printf6: <p tal:replace="printf:'%s and %s' $dad $mom">love</p>
+    </div>
+  </body>
+</html>
+

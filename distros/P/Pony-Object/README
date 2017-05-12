@@ -1,0 +1,533 @@
+NAME
+    Pony::Object - An object system.
+
+OVERVIEW
+    If you wanna protected methods, abstract classes and other OOP stuff,
+    you may use Pony::Object. Also Pony::Objects are strict and modern.
+
+SYNOPSIS
+      # Class: MyArticle (Example)
+      #   Abstract class for articles.
+      package MyArticle {
+        use Pony::Object qw(-abstract :exceptions);
+        use MyArticle::Exception::IO; # Based on Pony::Object::Throwable class.
+    
+        protected date => undef;
+        protected authors => [];
+        public title => '';
+        public text => '';
+    
+        # Function: init
+        #   Constructor.
+        #
+        # Parameters:
+        #   date - Int
+        #   authors - ArrayRef
+        sub init : Public($this) {
+          ($this->date, $this->authors) = @_;
+        }
+    
+        # Function: getDate
+        #   Get formatted date.
+        #
+        # Returns:
+        #   Str
+        sub getDate : Public($this) {
+          return $this->dateFormat($this->date);
+        }
+    
+        # Function: dateFormat
+        #   Convert Unix time to good looking string. Not implemented.
+        #
+        # Parameters:
+        #   date - Int
+        #
+        # Returns:
+        #   String
+        sub dateFormat : Abstract;
+    
+        # Function: from_pdf
+        #   Trying to create article from pdf file.
+        #
+        # Parameters:
+        #   file - Str - pdf file.
+        sub from_pdf : Public($this, $file) {
+          try {
+            open F, $file or
+              throw MyArticle::Exception::IO(action => "read", file => $file);
+        
+            # do smth
+        
+            close F;
+          } catch {
+            my $e = shift; # get exception object
+        
+            if ($e->isa('MyArticle::Exception::IO')) {
+              # handler for MyArticle::Exception::IO exceptions
+            }
+          };
+        }
+      }
+  
+      1;
+
+Methods and properties
+  has
+    Keyword "has" declares new property. Also you can define methods via
+    "has".
+
+      package News;
+      use Pony::Object;
+    
+        # Properties:
+        has 'title';
+        has text => '';
+        has authors => [ qw/Alice Bob/ ];
+    
+        # Methods:
+        has printTitle => sub {
+          my $this = shift;
+          say $this->title;
+        };
+    
+        sub printAuthors {
+          my $this = shift;
+          print @{$this->authors};
+        }
+      1;
+
+
+
+      package main;
+      use News;
+      my $news = new News;
+      $news->printAuthors();
+      $news->title = 'Sensation!'; # Yep, you can assign property's value via "=".
+      $news->printTitle();
+
+  new
+    Pony::Objects hasn't method "new". In fact, of course they has. But
+    "new" is an internal function, so you should not use "new" as name of
+    method.
+
+    Instead of this Pony::Objects has "init" methods, where you can write
+    the same, what you wish write in "new". "init" is after-hook for "new".
+
+      package News;
+      use Pony::Object;
+    
+        has title => undef;
+        has lower => undef;
+    
+        sub init {
+          my $this = shift;
+          $this->title = shift;
+          $this->lower = lc $this->title;
+        }
+    
+      1;
+
+      package main;
+      use News;
+      my $news = new News('Big Event!');
+      print $news->lower;
+
+  public, protected, private properties
+    You can use "has" keyword to define property. If your variable starts
+    with "_", variable becomes protected. "__" for private.
+
+      package News;
+      use Pony::Object;
+  
+        has text => '';
+        has __authors => [ qw/Alice Bob/ ];
+    
+        sub getAuthorString {
+          my $this = shift;
+          return join(' ', @{$this->__authors});
+        }
+    
+      1;
+
+
+
+      package main;
+      use News;
+      my $news = new News;
+      say $news->getAuthorString();
+
+    The same but with keywords "public", "protected" and "private".
+
+      package News;
+      use Pony::Object;
+    
+        public text => '';
+        private authors => [ qw/Alice Bob/ ];
+    
+        sub getAuthorString {
+          my $this = shift;
+          return join(' ', @{$this->authors});
+        }
+    
+      1;
+
+
+
+      package main;
+      use News;
+      my $news = new News;
+      say $news->getAuthorString();
+
+  Public, Protected, Private methods
+    Use attributes "Public", "Private" and "Protected" to define method's
+    access type.
+
+      package News;
+      use Pony::Object;
+    
+        public text => '';
+        private authors => [ qw/Alice Bob/ ];
+    
+        sub getAuthorString : Public
+          {
+            return shift->joinAuthors(', ');
+          }
+    
+        sub joinAuthors : Private
+          {
+            my $this = shift;
+            my $delim = shift;
+        
+            return join( $delim, @{$this->authors} );
+          }
+    
+      1;
+
+
+
+      package main;
+      use News;
+      my $news = new News;
+      say $news->getAuthorString();
+
+  Static properties
+    Just say ""static"" and property will the same in all objects of class.
+
+      package News;
+      use Pony::Object;
+    
+        public static 'default_publisher' => 'Georgy';
+        public 'publisher';
+    
+        sub init : Public
+          {
+            my $this = shift;
+            $this->publisher = $this->default_publisher;
+          }
+    
+      1;
+
+
+
+      package main;
+      use News;
+  
+      my $n1 = new News;
+      $n1->default_publisher = 'Bazhukov';
+      my $n2 = new News;
+      print $n1->publisher; # "Georgy"
+      print $n2->publisher; # "Bazhukov"
+
+Default methods
+  toHash or to_h
+    Get object's data structure and return this as a hash.
+
+      package News;
+      use Pony::Object;
+    
+        has title => 'World';
+        has text => 'Hello';
+    
+      1;
+
+
+
+      package main;
+      use News;
+      my $news = new News;
+      print $news->toHash()->{text};
+      print $news->to_h()->{title};
+
+  dump
+    Shows object's current struct.
+
+      package News;
+      use Pony::Object;
+    
+        has title => 'World';
+        has text => 'Hello';
+    
+      1;
+
+
+
+      package main;
+      use News;
+      my $news = new News;
+      $news->text = 'Hi';
+      print $news->dump();
+
+    Returns
+
+      $VAR1 = bless( {
+        'text' => 'Hi',
+        'title' => 'World'
+      }, 'News' );
+
+  Without Objects
+    If you like functions "say", "dump", "try"/"catch", you can use them
+    without creating object. Use ":noobject" option to enable them but do
+    not create object/making class.
+
+      use Pony::Object qw/:noobject :try/;
+  
+      my $a = {deep => [{deep => ['structure']}]};
+      say dump $a;
+  
+      my $data = try {
+        local $/;
+        open my $fh, './some/file' or die;
+        my $slurp = <$fh>;
+        close $fh;
+        return $slurp;
+      } catch {
+        return '';
+      };
+  
+      say "\$data: $data";
+
+Classes
+  Inheritance
+    You can define base classes via "use" params. For example, "use
+    Pony::Object 'Base::Class';"
+
+      package BaseCar;
+      use Pony::Object;
+    
+        public speed => 0;
+        protected model => "Base Car";
+    
+        sub get_status_line : Public {
+          my $this = shift;
+          my $status = ($this->speed ? "Moving" : "Stopped");
+          return $this->model . " " . $status;
+        }
+    
+      1;
+
+
+
+      package MyCar;
+      # extends BaseCar
+      use Pony::Object qw/BaseCar/;
+    
+        protected model => "My Car";
+        protected color => undef;
+    
+        sub set_color : Public {
+          my $this = shift;
+          ($this->color) = @_;
+        }
+    
+      1;
+
+
+
+      package main;
+      use MyCar;
+      my $car = new MyCar;
+      $car->speed = 20;
+      $car->set_color("White");
+      print $car->get_status_line();
+      # "My Car Moving"
+
+  Singletons
+    Pony::Object has simple syntax for singletons . You can declare this via
+    "use" param;
+
+      package Notes;
+      use Pony::Object 'singleton';
+    
+        protected list => [];
+    
+        sub add : Public {
+          my $this = shift;
+          push @{ $this->list }, @_;
+        }
+    
+        sub show : Public {
+          my $this = shift;
+          say for @{$this->list};
+        }
+    
+        sub flush : Public {
+          my $this = shift;
+          $this->list = [];
+        }
+    
+      1;
+
+
+
+      package main;
+      use Notes;
+  
+      my $n1 = new Notes;
+      my $n2 = new Notes;
+  
+      $n1->add(qw/eat sleep/);
+      $n1->add('Meet with Mary at 8 o`clock');
+  
+      $n2->flush;
+  
+      $n1->show();  # Print nothing.
+                    # Em... When I should meet Mary?
+
+  Abstract methods and classes
+    You can use abstract methods and classes follows way:
+
+      # Let's define simple interface for texts.
+      package Text::Interface;
+      use Pony::Object -abstract; # Use 'abstract' or '-abstract'
+                                  # params to define abstract class.
+    
+        sub getText : Abstract; # Use 'Abstract' attribute to
+        sub setText : Abstract; # define abstract method.
+    
+      1;
+
+
+
+      # Now we can define base class for texts.
+      # It's abstract too but now it has some code.
+      package Text::Base;
+      use Pony::Object qw/abstract Text::Interface/;
+    
+        protected text => '';
+    
+        sub getText : Public {
+          my $this = shift;
+          return $this->text;
+        }
+    
+      1;
+
+
+
+      # In the end we can write Text class.
+      package Text;
+      use Pony::Object 'Text::Base';
+    
+        sub setText : Public {
+          my $this = shift;
+          $this->text = shift;
+        }
+  
+      1;
+
+
+
+      # Main file.
+      package main;
+      use Text;
+      use Text::Base;
+  
+      my $textBase = new Text::Base;  # Raises an error!
+  
+      my $text = new Text;
+      $text->setText('some text');
+      print $text->getText();   # Returns 'some text';
+
+    Don't forget, that perl looking for functions from left to right in list
+    of inheritance. You should define abstract classes in the end of
+    Pony::Object param list.
+
+  Exceptions
+    See Pony::Object::Throwable.
+
+  Inside
+   ALL
+    If you wanna get all default values of Pony::Object-based class, you can
+    call "ALL" method. I don't know why you need them, but you can.
+
+      package News;
+      use Pony::Object;
+    
+        has 'title';
+        has text => '';
+        has authors => [ qw/Alice Bob/ ];
+    
+      1;
+
+
+
+      package main;
+      my $news = new News;
+      print for keys %{ $news->ALL() };
+
+   META
+    One more internal method. It provides access to special hash %META. You
+    can use this for Pony::Object introspection. It can be changed in next
+    versions.
+
+      my $news = new News;
+      say dump $news->META;
+
+   $Pony::Object::DEFAULT
+    This is a global variable. It defines default Pony::Object's params. For
+    example you can set "$Pony::Object::DEFAULT-"{''}->{withExceptions} = 1>
+    to enable exceptions (try, catch, finally blocks) by default. Use it
+    carefully.
+
+      # Startup script
+      ...
+      use Pony::Object;
+  
+      BEGIN {
+        # Use exceptions by default.
+        $Pony::Object::DEFAULT->{''}->{withExceptions} = 1;
+        # All classes will extends Default::Base.
+        $Pony::Object::DEFAULT->{''}->{baseClass} = [qw/Default::Base/];
+        # All classes in namespace "Default::NoBase" will not.
+        $Pony::Object::DEFAULT->{'Default::NoBase'}->{baseClass} = [];
+      }
+      ...
+
+    One more example:
+
+      # Startup script
+      ...
+      use Pony::Object;
+  
+      BEGIN {
+        $Pony::Object::DEFAULT->{'My::Awesome::Project'} = {
+          withExceptions => 1,
+          baseClass => [],
+        };
+    
+        $Pony::Object::DEFAULT->{'My::Awesome::Project::Model'} = {
+          withExceptions => 1,
+          baseClass => [qw/My::Awesome::Project::Model::Abstract/],
+        };
+      }
+      ...
+
+SEE
+    Git <https://github.com/bugov/pony-object>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011 - 2017, Georgy Bazhukov.
+
+    This program is free software, you can redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+

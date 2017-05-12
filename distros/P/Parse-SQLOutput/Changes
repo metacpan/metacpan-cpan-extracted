@@ -1,0 +1,25 @@
+0.08 Sat Aug 16 11:46:31 PDT 2014
+ - Meta 0.0.2
+
+0.07 Fri Aug 15 21:23:54 PDT 2014
+ - Remove t/use_ok.t
+
+0.06 Fri Aug 15 16:10:21 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.05 Fri Aug  8 19:26:31 PDT 2014
+ - Fix swim errors
+
+0.04 Fri Aug  8 12:53:12 PDT 2014
+ - Switch hashbang to '#!/usr/bin/env perl'
+
+0.03 Sun Jul 27 18:41:44 PDT 2014
+ - Add Mo as a dep
+
+0.02 Sat Jul 26 21:53:54 PDT 2014
+ - Switch to Zilla-Dist
+
+0.01 Fri Jul  6 18:38:49 PDT 2012
+ - First Release
+

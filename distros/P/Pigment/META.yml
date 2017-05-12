@@ -1,0 +1,25 @@
+---
+abstract: 'User interfaces with embedded multimedia'
+author:
+  - 'Florian Ragwitz'
+configure_requires:
+  ExtUtils::Depends: 0
+  ExtUtils::PkgConfig: 0
+  File::Spec::Functions: 0
+  Gtk2::CodeGen: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pigment
+no_index:
+  directory:
+    - examples
+    - ext
+    - inc
+    - t
+requires:
+  Gtk2: 0
+version: 0.01

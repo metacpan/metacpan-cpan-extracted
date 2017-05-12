@@ -1,0 +1,7 @@
+---
+notes: >
+  Lists consist of =over/=back sequences containing =items.
+view-html:
+  todo: definition lists not working properly yet
+view-text:
+  todo: itemized lists not working properly yet

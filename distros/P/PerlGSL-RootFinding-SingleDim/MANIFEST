@@ -1,0 +1,10 @@
+Build.PL
+Changes
+lib/PerlGSL/RootFinding/ppport.h
+lib/PerlGSL/RootFinding/SingleDim.pm
+lib/PerlGSL/RootFinding/SingleDim.xs
+MANIFEST			This list of files
+META.json
+META.yml
+README.pod
+t/basic.t

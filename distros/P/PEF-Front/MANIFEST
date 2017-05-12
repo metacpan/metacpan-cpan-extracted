@@ -1,0 +1,42 @@
+Changes
+lib/PEF/Front.pm
+lib/PEF/Front/Ajax.pm
+lib/PEF/Front/Cache.pm
+lib/PEF/Front/Captcha.pm
+lib/PEF/Front/Config.pm
+lib/PEF/Front/Connector.pm
+lib/PEF/Front/File.pm
+lib/PEF/Front/Guide/QuickStart.pm
+lib/PEF/Front/Headers.pm
+lib/PEF/Front/Model.pm
+lib/PEF/Front/NLS.pm
+lib/PEF/Front/Oauth.pm
+lib/PEF/Front/Oauth/Facebook.pm
+lib/PEF/Front/Oauth/GitHub.pm
+lib/PEF/Front/Oauth/Google.pm
+lib/PEF/Front/Oauth/LinkedIn.pm
+lib/PEF/Front/Oauth/Msn.pm
+lib/PEF/Front/Oauth/Paypal.pm
+lib/PEF/Front/Oauth/VKontakte.pm
+lib/PEF/Front/Oauth/Yandex.pm
+lib/PEF/Front/Preload.pm
+lib/PEF/Front/RenderTT.pm
+lib/PEF/Front/Request.pm
+lib/PEF/Front/Response.pm
+lib/PEF/Front/Route.pm
+lib/PEF/Front/SecureCaptcha.pm
+lib/PEF/Front/Session.pm
+lib/PEF/Front/Validator.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+nls/export-js.pl
+nls/export-po.pl
+nls/import-po.pl
+nls/nls.sql
+nls/tt-scan-make-pot.pl
+README.pod
+t/01_ok.t
+t/02_chain_links.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

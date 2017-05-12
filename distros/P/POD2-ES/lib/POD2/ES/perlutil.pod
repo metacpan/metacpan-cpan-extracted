@@ -1,0 +1,266 @@
+=encoding utf8
+
+=head1 NAME
+
+perlutil - Utilidades incluidas en la distribución de Perl
+
+=head1 DESCRIPCIÓN
+
+Además del intérprete de Perl, la distribución de Perl incluye varias
+utilidades que se instalan en el sistema; algunas de ellas se usan durante el
+proceso de instalación de la distribución. Este documento contiene una
+descripción de las utilidades y referencias a la documentación de cada
+módulo (si existe).
+
+=head1 LISTA DE UTILIDADES
+
+=head2 Documentación
+
+=over 3
+
+=item L<perldoc|perldoc>
+
+Como ya sabe, la interfaz principal de la documentación de Perl es C<perldoc>.
+F<perldoc> extrae y aplica formato a la documentación de cualquier archivo del
+directorio actual, cualquier módulo Perl instalado en el sistema o cualquiera
+de las páginas de documentación estándar, como ésta. Para obtener
+información sobre cualquiera de las utilidades descritas en este documento,
+use C<perldoc E<lt>nombreE<gt>>.
+
+=item L<pod2man|pod2man> y L<pod2text|pod2text>
+
+Cuando se ejecuta desde un terminal, normalmente F<perldoc> llama a F<pod2man>
+para convertir el formato POD (Plain Old Documentation; consulte L<perlpod>
+para ver una descripción) en una página de manual, y después ejecuta F<man>
+para mostrarla; si F<man> no está disponible, se usa F<pod2text> y el
+resultado se canaliza a través de su paginador favorito.
+
+=item L<pod2html|pod2html>
+
+Además de estos dos conversores, hay otro más: F<pod2html> genera páginas
+HTML a partir de POD.
+
+=item L<pod2usage|pod2usage>
+
+Si sólo quiere saber cómo se usan las utilidades aquí descritas,
+F<pod2usage> solo extraerá la sección "USAGE" (USO); algunas de estas
+utilidades llamarán automáticamente a F<pod2usage> si las llama con el
+modificador C<-help>.
+
+=item L<podselect|podselect>
+
+F<pod2usage> es un caso especial de F<podselect>, una utilidad que permite
+extraer secciones con nombre de documentos escritos en formato POD. Por
+ejemplo, a diferencia de las utilidades que tienen secciones "USAGE", los
+módulos Perl generalmente tienen secciones "SYNOPSIS" (SINOPSIS): C<podselect
+-s "SYNOPSIS" ...> extrae la sección correspondiente de un archivo
+especificado.
+
+=item L<podchecker|podchecker>
+
+Al redactar documentación POD puede usar la utilidad F<podchecker> para
+detectar errores de marcas POD.
+
+=item L<splain|splain>
+
+F<splain> es una interfaz de L<perldiag>; si le pasa un mensaje de error
+mostrará una descripción más completa.
+
+=item C<roffitall>
+
+La utilidad C<roffitall> no se instala en el sistema, pero puede encontrarla en
+el directorio F<pod/> del kit de código fuente de Perl. Esta utilidad
+convierte toda la documentación de la distribución al formato F<*roff> y a
+partir de esto genera código fuente PostScript o un archivo de texto.
+
+=back
+
+=head2 Conversores
+
+Para convertir programas antiguos a Perl más moderno puede utilizar la
+utilidad L<pl2pm|pl2pm>, que le ayudará a convertir bibliotecas antiguas de
+Perl 4 a módulos de Perl 5 modernos.
+
+=head2 Administración
+
+=over 3
+
+=item L<libnetcfg|libnetcfg>
+
+Para mostrar y modificar la configuración de libnet, ejecute el comando
+libnetcfg.
+
+=item L<perlivp>
+
+El programa F<perlivp> se configura en tiempo de compilación del código
+fuente de Perl para comprobar la versión de Perl con la que se generó. Se
+puede usar después de ejecutar C<make install> (o el procedimiento equivalente
+para su plataforma) para comprobar que perl y sus bibliotecas se han instalado
+correctamente.
+
+=back
+
+=head2 Desarrollo
+
+A continuación se describe un conjunto de utilidades que ayudan a desarrollar
+programas Perl y, en particular, a extender Perl con código C.
+
+=over 3
+
+=item L<perlbug|perlbug>
+
+La manera recomendada de notificar errores del intérprete perl o de cualquier
+módulo de la biblioteca estándar a sus programadores es usar F<perlbug>; pero
+antes de usar F<perlbug> debe leer con atención su documentación.
+
+=item L<perlthanks|perlbug>
+
+Este programa proporciona una manera sencilla de enviar un mensaje de
+agradecimiento a las personas que se encargan de desarrollar y mantener perl.
+No es más que F<perlbug> instalado con otro nombre.
+
+=item L<h2ph|h2ph>
+
+Mucho antes de que existiera en Perl el sistema XS para conectar bibliotecas C,
+los programadores tenían que leer los archivos de encabezado de C para obtener
+las constantes de biblioteca. Es posible que se encuentre código en el que se
+usa C<require 'syscall.ph'> o algo similar; para crear el archivo F<.ph> se
+debe ejecutar F<h2ph> en el archivo F<.h> correspondiente. Consulte la
+documentación de F<h2ph> para obtener más información sobre la manera de
+convertir varios archivos de encabezado a la vez.
+
+=item L<c2ph|c2ph> y L<pstruct|pstruct>
+
+F<c2ph> y F<pstruct> son en realidad el mismo programa, pero se comportan de
+manera distinta en función de cómo se invoquen. Proporcionan otra manera de
+incorporar código C en Perl: convierten declaraciones de estructuras y uniones
+de C en código Perl. Han quedado obsoletos desde que surgió F<h2xs>.
+
+=item L<h2xs|h2xs>
+
+F<h2xs> convierte archivos de encabezado de C en módulos XS y agrega gran
+parte del código necesario para la comunicación entre bibliotecas C y
+módulos Perl. También resulta muy útil para crear la estructura inicial de
+módulos Perl puros.
+
+=item L<enc2xs>
+
+F<enc2xs> genera una extensión Perl para Encode a partir de archivos de
+asignación de caracteres Unicode (.ucm) o de archivos de codificación Tcl
+(.enc). F<enc2xs> se usa internamente durante el proceso de compilación del
+módulo Encode; también lo puede usar para agregar su propia codificación a
+perl. Para ello no tiene que saber cómo funciona XS.
+
+=item L<xsubpp>
+
+F<xsubpp> es un compilador que permite convertir código XS de Perl en código
+C. Lo suelen ejecutar los archivos makefile generados por
+L<ExtUtils::MakeMaker>.
+
+F<xsubpp> compila el código XS y genera código C; para ello, incrusta las
+construcciones necesarias para que las funciones C puedan manipular valores
+Perl y agregar el código necesario para que Perl pueda acceder a esas
+funciones.
+
+=item L<prove>
+
+F<prove> es una interfaz de línea de comandos de la funcionalidad de
+ejecución de pruebas de F<Test::Harness>. Es una alternativa a C<make test>.
+
+=item L<corelist>
+
+Este front-end de línea de comandos de C<Module::CoreList> permite consultar
+la lista de módulos incluidos en versiones específicas de perl.
+
+=back
+
+=head2 Herramientas de propósito general
+
+También se distribuyen con perl algunas herramientas de propósito general,
+básicamente porque forman parte de módulos incluidos en la distribución de
+perl.
+
+=over 3
+
+=item L<piconv>
+
+B<piconv> es una versión Perl de B<iconv>, un conversor de codificaciones de
+caracteres de uso muy extendido en el mundo Unix. Este script era
+principalmente una demostración de tecnología en Perl v5.8.0, pero puede usar
+piconv en lugar de iconv prácticamente en todos los casos.
+
+=item L<ptar>
+
+F<ptar> es un programa tar escrito en código Perl puro.
+
+=item L<ptardiff>
+
+F<ptardiff> es una pequeña utilidad que genera las diferencias entre un
+archivo de almacenamiento extraído y uno sin extraer. (Tenga en cuenta que
+esta utilidad requiere el módulo C<Text::Diff> para funcionar correctamente;
+este módulo no se distribuye con perl, pero está disponible en CPAN).
+
+=item L<ptargrep>
+
+F<ptargrep> es una utilidad que aplica detección de patrones al contenido de
+un archivo de almacenamiento tar.
+
+=item L<shasum>
+
+Esta utilidad, que se incluye con el módulo C<Digest::SHA>, se usa para
+imprimir o comprobar sumas de control SHA.
+
+=item L<zipdetails>
+
+L<zipdetails> muestra información sobre la estructura de registros interna de
+un archivo zip. No muestra detalles sobre los datos comprimidos que se
+encuentran almacenados en dicho archivo zip.
+
+=back
+
+=head2 Instalación
+
+Estas utilidades ayudan a administrar módulos Perl adicionales que no se
+incluyen en la distribución de perl.
+
+=over 3
+
+=item L<cpan>
+
+F<cpan> es una interfaz de línea de comandos de CPAN.pm. Permite hacer muchas
+cosas, como instalar módulos o distribuciones de CPAN, o simplemente obtener
+información sobre ellas. Es similar al modo de línea de comandos del módulo
+L<CPAN>,
+
+    perl -MCPAN -e shell
+
+=item L<instmodsh>
+
+Esta utilidad ofrece una interfaz sencilla de ExtUtils::Installed, que permite
+examinar módulos instalados, validar las listas de paquetes e incluso crear un
+archivo de almacenamiento tar a partir de un módulo instalado.
+
+=back
+
+=head1 VEA TAMBIÉN
+
+L<perldoc|perldoc>, L<pod2man|pod2man>, L<perlpod>, L<pod2html|pod2html>,
+L<pod2usage|pod2usage>, L<podselect|podselect>, L<podchecker|podchecker>,
+L<splain|splain>, L<perldiag>, C<roffitall|roffitall>,
+L<File::Find|File::Find>, L<pl2pm|pl2pm>, L<perlbug|perlbug>, L<h2ph|h2ph>,
+L<c2ph|c2ph>, L<h2xs|h2xs>, L<enc2xs>, L<xsubpp>, L<cpan>, L<instmodsh>,
+L<piconv>, L<prove>, L<corelist>, L<ptar>, L<ptardiff>, L<shasum>,
+L<zipdetails>
+
+=cut
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

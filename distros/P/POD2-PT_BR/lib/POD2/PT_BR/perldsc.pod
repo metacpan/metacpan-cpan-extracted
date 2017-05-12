@@ -1,0 +1,848 @@
+=encoding utf8
+
+=head1 NOME
+
+perldsc - Perl Data Structures Cookbook (estruturas de dados complexas)
+
+=head1 DESCRIÇÃO
+
+A mais importante funcionalidade que infelizmente faltava em Perl, até a versão 5.0, 
+era a capacidade de lidar com estrutura de dados complexas. Mesmo sem suporte 
+direto na linguagem, alguns bravos programadores conseguiram emular seu 
+funcionamento, mas era um trabalho árduo e não era para os de coração fraco.
+
+Você poderia ocasionalmente se virar com a notação C<$m{$AoA,$b}>, emprestada
+de B<awk>, e, que as chaves eram a string concatenada C<"$AoA$b">, mas
+transversar e ordenar era difícil.
+
+Programadores mais desesperados chegaram a hackear a tabela de símbolos de Perl
+diretamente, uma estratégia que se mostrava difícil de desenvolver e manter -- para
+dizer o mínimo.
+
+A versão 5.0 de Perl nos permite ter estruturas de dados complexas. Você agora pode
+escrever alguma coisa como isso, e, do nada, ter um array de três dimensões!
+
+    for $x (1 .. 10) {
+    for $y (1 .. 10) {
+        for $z (1 .. 10) {
+        $AoA[$x][$y][$z] =
+            $x ** $y + $z;
+        }
+    }
+    }
+
+[N.T.: O nome da variável AoA vem do inglês "Array of Arrays", e foi mantido conforme o original.
+O mesmo acontecerá com variáveis chamadas AoH ("Array of Hashes"), HoA ("Hash of Arrays")
+e HoH ("Hash of Hashes")]
+
+Por mais simples que isso possa parecer, existem detalhes escondidos muito mais
+elaborados do que vêem os olhos!
+
+Como você imprime isso? Por que você não pode simplesmente dizer C<print @AoA>? 
+Como você ordena isso? Como você pode passar isso para uma função, ou obter um
+desses de uma função?  Isso é um objeto? Você pode salvá-lo no disco para obtê-lo de
+volta mais tarde? Como você acessa as linhas e colunas dessa matriz? Todos os valores
+precisam ser numéricos?
+
+Como você pode ver, é fácil ficar confuso. Embora uma pequena parte da dificuldade
+pudesse ser atribuída à implementação baseada em referências, era muito mais devido
+a ausência de documentação com exemplos escritos para o iniciante.
+
+Este documento tem como objetivo ser um tratamento detalhado porém compreensível
+de muitos tipos de estruturas de dados que você poderá precisar. Ele também serve
+como um "livro de receitas", ou de exemplos. Dessa forma, quando você precisar criar
+uma dessas estruturas complexas, você pode simplesmente selecionar um dos
+exemplos disponíveis aqui.
+
+Vamos ver cada uma dessas possíveis estruturas em detalhe. Temos seções separadas
+para cada um desses itens:
+
+=over 5
+
+=item * arrays de arrays
+
+=item * hashes de arrays
+
+=item * arrays de hashes
+
+=item * hashes de hashes
+
+=item * estruturas mais elaboradas
+
+=back
+
+Mas, por enquanto, vamos dar uma olhada em questões mais gerais, comuns a todos
+estes tipos de estruturas de dados.
+
+=head1 REFERÊNCIAS
+
+A coisa mais importante para compreender todas as estruturas de dados em Perl
+-- incluindo as arrays multidimensionais -- é que, embora possa não parecer, os
+C<@ARRAY>s e C<%HASH>es em Perl são sempre unidimensionais; eles só podem
+guardar valores escalares (strings, números ou referências). Eles não podem conter
+outras arrays ou hashes, mas, ao invés disso, podem conter I<referências> para
+outros arrays e hashes.
+
+Você não pode usar uma referência para um array ou um hash exatamente da 
+mesma maneira que você usaria um array ou hash diretamente. Para programadores 
+de C ou C++ isso pode parecer confuso. Se for o caso, pense que existe uma 
+diferença entre a estrutura e o ponteiro para a estrutura. (N.T.: É como aquele ditado zen 
+que diz: "O dedo aponta para a lua, mas ai daquele que confundir o dedo com a lua.")
+
+Você pode (e deve) ler mais sobre referências em L<perlref>. Basicamente, referências
+são como ponteiros, pois elas sabem para quem estão apontando. (Objetos também 
+são um tipo de referência, mas nós não iremos precisar deles por enquanto.)
+
+Isso significa que quando você tem algo que parece conter uma estrutura de duas ou
+mais dimensões, o que você tem, na verdade, é simplesmente uma estrutura
+unidimensional contendo referências para o próximo nível. Na prática, é como se você
+pudesse usá-la como se fosse multidimensional. (É assim que a maioria das arrays
+multidimensionais em C também funcionam.)
+
+    $array[7][12]           # array of arrays
+    $array[7]{string}           # array of hashes
+    $hash{string}[7]            # hash of arrays
+    $hash{string}{'another string'} # hash of hashes
+
+Agora, como o nível superior contém apenas referências, se você tentar imprimir
+sua array com uma função print(), você vai obter algo não muito bonito, como:
+
+    @AoA = ( [2, 3], [4, 5, 7], [0] );
+    print $AoA[1][2];
+  7
+    print @AoA;
+  ARRAY(0x83c38)ARRAY(0x8b194)ARRAY(0x8b1d0)
+
+Isso acontece porque Perl nunca dereferencia  implicitamente suas variáveis.
+Se você quer a coisa para a qual a referência está apontando, então você
+precisa indicar isso explicitamente, com "prefix typing indicators" como
+C<${$blah}>, C<@{$blah}>, C<@{$blah[$i]}>, ou "postfix pointer arrows",
+como C<$a-E<gt>[3]>, C<$h-E<gt>{fred}>, ou mesmo
+C<$ob-E<gt>method()-E<gt>[3]>.
+
+=head1 ERROS COMUNS
+
+Os dois erros mais comuns ao construir algo como uma array de arrays
+são a) acidentalmente contar o número de elementos ou b) obter uma
+referência para a mesmo alocação de memória repetidamente.
+
+Aqui está o exemplo em que você obtêm uma contagem ao invés de 
+uma lista aninhada:
+
+    for $i (1..10) {
+    @array = somefunc($i);
+    $AoA[$i] = @array;  # ERRADO!
+    }
+
+Isto é simplesmente o mesmo que que atribuir um array a um escalar
+e obter sua contagem de elementos. Se fosse isso que você quisesse
+fazer, você poderia muito bem ser um pouquinho mais explícito, assim:
+
+    for $i (1..10) {
+    @array = somefunc($i);
+    $counts[$i] = scalar @array;
+    }
+
+Aqui está o outro exemplo, de obter uma referência para a mesma
+alocação de memória, de novo e de novo:
+
+    for $i (1..10) {
+    @array = somefunc($i);
+    $AoA[$i] = \@array; # ERRADO!
+    }
+
+Mas, qual é o problema com isso? Parece certo, não parece? Afinal,
+eu acabei de dizer que você precisaria de um array de referências,
+então, por deus, você me deu uma!
+
+Infelizmente, embora isso seja verdade, ainda não funciona. Todas as
+referências em @AoA se referem a I<exatamente o mesmo lugar>, e
+por isso irá conter o que quer que fique em @array no final. É similar
+ao problema demonstrado nesse programa em C:
+
+    #include <pwd.h>
+    main() {
+    struct passwd *getpwnam(), *rp, *dp;
+    rp = getpwnam("root");
+    dp = getpwnam("daemon");
+
+    printf("daemon name is %s\nroot name is %s\n",
+        dp->pw_name, rp->pw_name);
+    }
+
+Que irá imprimir
+
+    daemon name is daemon
+    root name is daemon
+
+O problema é que ambos C<rp> e C<dp> são ponteiros para a mesma
+locação da memória! Em C, você teria que lembrar de malloc() alguma memória
+nova. Em Perl, você usa o construtor de array C<[]> ou o construtor de
+hash C<{}>.
+
+Esta é a maneira correta de se fazer o código anterior funcionar:
+
+    for $i (1..10) {
+    @array = somefunc($i);
+    $AoA[$i] = [ @array ];
+    }
+
+Os colchetes fazem uma referência para uma nova array com uma I<cópia>
+do que está em @array no momento da atribuição. É isso o que você quer.
+
+[N.T.: O trecho a seguir está confuso.]
+
+Note que isto irá produzir um resultado similar, embora seja bem mais
+difícil de ler:
+
+    for $i (1..10) {
+    @array = 0 .. $i;
+    @{$AoA[$i]} = @array;
+    }
+
+É a mesma coisa? Talvez sim, talvez não. A diferença sutil é que quando
+você atribui alguma coisa em colchetes, você tem certeza de que é uma
+nova referência com uma I<cópia> dos dados. Algo completamente
+diferente pode acontecer com a dereferência do lado esquerdo da
+atribuição (C<@{$AoA[$i]}}>). Tudo dependeria se C<$AoA[$i]> 
+estivesse indefinido, para começar, ou se já contivesse uma referência.
+Se @AoA já estivesse populada, como em
+
+    $AoA[3] = \@another_array;
+
+Nesse caso a atribuição com a dereferência do lado esquerdo usaria
+a referência que já estava lá:
+
+    @{$AoA[3]} = @array;
+
+É claro que isso I<teria> o efeito "interessante" de sobrescrever ("clobbering")
+@another_array. (Você já reparou que quando um programador diz que
+alguma coisa é "interessante", ao invés de significar "intrigante", é muito mais
+provável que signifique "perturbador", "difícil", ou os dois? :-))
+
+Então, lembre-se apenas de sempre usar os construtores de array e de hash
+com C<[]> ou C<{}>, e você estará bem, mesmo que não seja optimamente
+eficiente.
+
+Surpreendentemente, a seguinte construção de aparência perigosa vai 
+funcionar muito bem:
+
+    for $i (1..10) {
+        my @array = somefunc($i);
+        $AoA[$i] = \@array;
+    }
+
+Isso acontece por que my() é mais uma declaração de tempo de execução do que
+de tempo de compilação I<por si>. Isso significa que a variável em my()  é
+renovada constantemente, a cada volta do loop. Assim, embora I<parecesse>
+que você estava guardando a mesma variável cada vez, na verdade não era isso
+que você estava fazendo! Esta distinção sutil pode produzir código mais eficiente,
+sob o risco de enganar todos exceto os programadores mais experientes. Por isso,
+eu normalmente recomendo não ensinar isso para iniciantes. De fato, a não ser 
+quando vou passar argumentos para uma função, eu nunca gosto de ver o
+operador "me-dá-uma-referência" (a contrabarra) por todo o código. Ao invés disso,
+eu recomendo aos iniciantes que eles (e a maioria de nós) tentem usar os
+construtores muito mais legíveis C<[]> e C<{}>, ao invés de esperar que o
+escopo léxico (ou dinâmico) e a contagem de referências façam a coisa certa por
+trás das cenas. 
+
+Em resumo:
+
+    $AoA[$i] = [ @array ];  # usualmente melhor
+    $AoA[$i] = \@array;     # perilous; exatamente como my() estava naquele array?
+    @{ $AoA[$i] } = @array; # modo bastante complicado para muitos programadores
+
+=head1 PROBLEMA DE PRECEDÊNCIA
+
+Por falar em coisas como C<@{$AoA[$i]}>, os dois exemplos a seguir são, na 
+verdade, a mesma coisa:
+
+    $aref->[2][2]   # claro
+    $$aref[2][2]    # confuso
+
+Isso acontece pois as regras de precedência do Perl em relação aos seus
+cinco dereferenciadores (que parecem xingamento: C<$ @ * % &>) fazem
+com que eles sejam avaliados antes dos índices entre colchetes ou chaves! 
+Isso certamente virá como um grande choque para programadores C ou C++,
+familiarizados com C<*a[i]> significando aquilo que é apontado pelo I<i-ésimo>
+elemento de C<a>. Isto é, eles primeiro pegam o índice e só então dereferenciam
+a coisa naquela posição. É assim em C, mas não estamos falando de C.
+
+A construção aparentemente equivalente em Perl, C<$$aref[$i]> primeiro
+dereferencia $aref, fazendo com que use $aref como referência para um
+array, e então dereferencia isso, e finalmente te diz o I<i-ésimo> valor do
+array apontado pelo $AoA. Se você quisesse fazer como em C, teria que
+escrever C<${$AoA[$i]}> para forçar C<$AoA[$i]> a ser avaliado antes do
+dereferenciador C<$> do início.
+
+=head1 POR QUE VOCÊ DEVE SEMPRE USAR C<use strict>
+
+Se tudo isso está começando a parecer mais assustador do que vale a pena,
+relaxe. Perl tem algumas características para ajudá-lo a evitar os erros mais
+comuns. A melhor maneira de evitar confusão é iniciar todo programa assim:
+
+    #!/usr/bin/perl -w
+    use strict;
+
+Desse modo, você será forçado a declarar todas as suas variáveis com my()
+e também impedirá a "dereferência simbólica" acidental. Portanto, se você
+tivesse feito isso:
+
+    my $aref = [
+    [ "fred", "barney", "pebbles", "bambam", "dino", ],
+    [ "homer", "bart", "marge", "maggie", ],
+    [ "george", "jane", "elroy", "judy", ],
+    ];
+
+    print $aref[2][2];
+
+O compilador avisaria o erro imediatamente, I<em tempo de compilação>,
+porque você estaria acessando acidentalmente C<@aref>, uma variável
+não declarada, e você seria então lembrado para escrever da seguinte 
+forma:
+
+    print $aref->[2][2]
+
+=head1 DEPURAÇÃO
+
+Antes da versão 5.002, o debugger padrão de Perl não fazia um bom trabalho
+ao imprimir estruturas de dados complexas. Com 5.002 e acima, o debugger
+inclui várias funcionalidades novas, incluindo edição de linha de comando bem
+como o comando C<x> para imprimir estruturas de dados complexas. Por
+exemplo, dada a atribuição para $AoA acima, aqui está a saída do debugger:
+
+    DB<1> x $AoA
+    $AoA = ARRAY(0x13b5a0)
+       0  ARRAY(0x1f0a24)
+      0  'fred'
+      1  'barney'
+      2  'pebbles'
+      3  'bambam'
+      4  'dino'
+       1  ARRAY(0x13b558)
+      0  'homer'
+      1  'bart'
+      2  'marge'
+      3  'maggie'
+       2  ARRAY(0x13b540)
+      0  'george'
+      1  'jane'
+      2  'elroy'
+      3  'judy'
+
+=head1 EXEMPLOS DE CÓDIGO
+
+Apresentados com poucos comentários (estes receberão suas próprias páginas
+de documentação algum dia), aqui estão pequenos exemplos de código que
+ilustram vários tipos de estruturas de dados.
+
+=head1 ARRAYS DE ARRAYS
+
+=head2 Declaração de uma ARRAY DE ARRAYS
+
+ @AoA = (
+        [ "fred", "barney" ],
+        [ "george", "jane", "elroy" ],
+        [ "homer", "marge", "bart" ],
+      );
+
+=head2 Geração de uma ARRAY DE ARRAYS
+
+ # lendo de um arquivo
+ while ( <> ) {
+     push @AoA, [ split ];
+ }
+
+ # chamando uma função
+ for $i ( 1 .. 10 ) {
+     $AoA[$i] = [ somefunc($i) ];
+ }
+
+ # usando variáveis temporárias
+ for $i ( 1 .. 10 ) {
+     @tmp = somefunc($i);
+     $AoA[$i] = [ @tmp ];
+ }
+
+ # adição uma linha existente
+ push @{ $AoA[0] }, "wilma", "betty";
+
+=head2 Acesso e Impressão de uma ARRAY DE ARRAYS
+
+ # um elemento
+ $AoA[0][0] = "Fred";
+
+ # outro elemento
+ $AoA[1][1] =~ s/(\w)/\u$1/;
+
+ # imprimir tudo com refs
+ for $aref ( @AoA ) {
+     print "\t [ @$aref ],\n";
+ }
+
+ # imprimir tudo com índices
+ for $i ( 0 .. $#AoA ) {
+     print "\t [ @{$AoA[$i]} ],\n";
+ }
+
+ # imprimir tudo de um em um
+ for $i ( 0 .. $#AoA ) {
+     for $j ( 0 .. $#{ $AoA[$i] } ) {
+         print "elt $i $j is $AoA[$i][$j]\n";
+     }
+ }
+
+=head1 HASHES DE ARRAYS
+
+=head2 Declaração de um HASH DE ARRAYS
+
+ %HoA = (
+        flintstones        => [ "fred", "barney" ],
+        jetsons            => [ "george", "jane", "elroy" ],
+        simpsons           => [ "homer", "marge", "bart" ],
+      );
+
+=head2 Geração de um HASH DE ARRAYS
+
+ # lendo de um arquivo
+ # flintstones: fred barney wilma dino
+ while ( <> ) {
+     next unless s/^(.*?):\s*//;
+     $HoA{$1} = [ split ];
+ }
+
+ # lendo de um arquivo; mais variáveis temporárias
+ # flintstones: fred barney wilma dino
+ while ( $line = <> ) {
+     ($who, $rest) = split /:\s*/, $line, 2;
+     @fields = split ' ', $rest;
+     $HoA{$who} = [ @fields ];
+ }
+
+ # chamando uma função que retorna uma lista
+ for $group ( "simpsons", "jetsons", "flintstones" ) {
+     $HoA{$group} = [ get_family($group) ];
+ }
+
+ # idem, mas usando variáveis temporárias
+ for $group ( "simpsons", "jetsons", "flintstones" ) {
+     @members = get_family($group);
+     $HoA{$group} = [ @members ];
+ }
+
+ # adiciona novos membros na família
+ push @{ $HoA{"flintstones"} }, "wilma", "betty";
+
+=head2 Acesso e Impressão de um HASH DE ARRAYS
+
+ # um elemento
+ $HoA{flintstones}[0] = "Fred";
+
+ # outro elemento
+ $HoA{simpsons}[1] =~ s/(\w)/\u$1/;
+
+ # imprimir todas as coisas
+ foreach $family ( keys %HoA ) {
+     print "$family: @{ $HoA{$family} }\n"
+ }
+
+ # imprimir na totalidade com índices
+ foreach $family ( keys %HoA ) {
+     print "family: ";
+     foreach $i ( 0 .. $#{ $HoA{$family} } ) {
+         print " $i = $HoA{$family}[$i]";
+     }
+     print "\n";
+ }
+
+ # imprimir na totalidade ordenado por número dos membros
+ foreach $family ( sort { @{$HoA{$b}} <=> @{$HoA{$a}} } keys %HoA ) {
+     print "$family: @{ $HoA{$family} }\n"
+ }
+
+ # imprimir na totalidade ordenado pelo número e nome dos membros
+ foreach $family ( sort {
+                @{$HoA{$b}} <=> @{$HoA{$a}}
+                    ||
+                    $a cmp $b
+        } keys %HoA )
+ {
+     print "$family: ", join(", ", sort @{ $HoA{$family} }), "\n";
+ }
+
+=head1 ARRAYS DE HASHES
+
+=head2 Declaração de um ARRAY DE HASHES
+
+ @AoH = (
+        {
+            Lead     => "fred",
+            Friend   => "barney",
+        },
+        {
+            Lead     => "george",
+            Wife     => "jane",
+            Son      => "elroy",
+        },
+        {
+            Lead     => "homer",
+            Wife     => "marge",
+            Son      => "bart",
+        }
+  );
+
+=head2 Geração de um ARRAY DE HASHES
+
+ # lendo de um arquivo
+ # formato: LEAD=fred FRIEND=barney
+ while ( <> ) {
+     $rec = {};
+     for $field ( split ) {
+         ($key, $value) = split /=/, $field;
+         $rec->{$key} = $value;
+     }
+     push @AoH, $rec;
+ }
+
+
+ # lendo de um arquivo
+ # formato: LEAD=fred FRIEND=barney
+ # sem temp
+ while ( <> ) {
+     push @AoH, { split /[\s+=]/ };
+ }
+
+ # chamando uma função que retorna uma lista de pares chave/valor como
+ # "lead","fred","daughter","pebbles"
+ while ( %fields = getnextpairset() ) {
+     push @AoH, { %fields };
+ }
+
+ # idem, mas sem usar variáveis temporárias 
+ while (<>) {
+     push @AoH, { parsepairs($_) };
+ }
+
+ # adiciona chave/valor a um elemento
+ $AoH[0]{pet} = "dino";
+ $AoH[2]{pet} = "santa's little helper";
+
+=head2 Acesso e Impressão de um ARRAY DE HASHES
+
+ # um elemento
+ $AoH[0]{lead} = "fred";
+
+ # outro elemento
+ $AoH[1]{lead} =~ s/(\w)/\u$1/;
+
+ # imprime tudo com refs
+ for $href ( @AoH ) {
+     print "{ ";
+     for $role ( keys %$href ) {
+         print "$role=$href->{$role} ";
+     }
+     print "}\n";
+ }
+
+ # imprime tudo com índices
+ for $i ( 0 .. $#AoH ) {
+     print "$i is { ";
+     for $role ( keys %{ $AoH[$i] } ) {
+         print "$role=$AoH[$i]{$role} ";
+     }
+     print "}\n";
+ }
+
+ # imprime tudo, um por vez
+ for $i ( 0 .. $#AoH ) {
+     for $role ( keys %{ $AoH[$i] } ) {
+         print "elt $i $role is $AoH[$i]{$role}\n";
+     }
+ }
+
+=head1 HASHES DE HASHES
+
+=head2 Declaração de um HASH DE HASHES
+
+ %HoH = (
+        flintstones => {
+        lead      => "fred",
+        pal       => "barney",
+        },
+        jetsons     => {
+        lead      => "george",
+        wife      => "jane",
+        "his boy" => "elroy",
+        },
+        simpsons    => {
+        lead      => "homer",
+        wife      => "marge",
+        kid       => "bart",
+    },
+ );
+
+=head2 Geração de um HASH DE HASHES
+
+ # lendo de um arquivo
+ # flintstones: lead=fred pal=barney wife=wilma pet=dino
+ while ( <> ) {
+     next unless s/^(.*?):\s*//;
+     $who = $1;
+     for $field ( split ) {
+         ($key, $value) = split /=/, $field;
+         $HoH{$who}{$key} = $value;
+     }
+
+
+ # lendo de um arquivo; mais temps
+ while ( <> ) {
+     next unless s/^(.*?):\s*//;
+     $who = $1;
+     $rec = {};
+     $HoH{$who} = $rec;
+     for $field ( split ) {
+         ($key, $value) = split /=/, $field;
+         $rec->{$key} = $value;
+     }
+ }
+
+ # chamando uma função que retorna um hash chave,valor
+ for $group ( "simpsons", "jetsons", "flintstones" ) {
+     $HoH{$group} = { get_family($group) };
+ }
+
+ # idem, mas usando variáveis temporárias
+ for $group ( "simpsons", "jetsons", "flintstones" ) {
+     %members = get_family($group);
+     $HoH{$group} = { %members };
+ }
+
+ # adiciona novos membros a família existente
+ %new_folks = (
+     wife => "wilma",
+     pet  => "dino",
+ );
+
+ for $what (keys %new_folks) {
+     $HoH{flintstones}{$what} = $new_folks{$what};
+ }
+
+=head2 Acesso e Impressão de um HASH DE HASHES
+
+ # um elemento
+ $HoH{flintstones}{wife} = "wilma";
+
+ # outro elemento
+ $HoH{simpsons}{lead} =~ s/(\w)/\u$1/;
+
+ # imprime tudo
+ foreach $family ( keys %HoH ) {
+     print "$family: { ";
+     for $role ( keys %{ $HoH{$family} } ) {
+         print "$role=$HoH{$family}{$role} ";
+     }
+     print "}\n";
+ }
+
+ # imprime tudo reordenado
+ foreach $family ( sort keys %HoH ) {
+     print "$family: { ";
+     for $role ( sort keys %{ $HoH{$family} } ) {
+         print "$role=$HoH{$family}{$role} ";
+     }
+     print "}\n";
+ }
+
+
+ # imprime tudo reordenado pelo número de membros
+ foreach $family ( sort { keys %{$HoH{$b}} <=> keys %{$HoH{$a}} } keys %HoH ) {
+     print "$family: { ";
+     for $role ( sort keys %{ $HoH{$family} } ) {
+         print "$role=$HoH{$family}{$role} ";
+     }
+     print "}\n";
+ }
+
+ # estabelece um critério de ordenação (rank) para cada parte
+ $i = 0;
+ for ( qw(lead wife son daughter pal pet) ) { $rank{$_} = ++$i }
+
+ # agora imprime tudo ordenado pelo números dos membros
+ foreach $family ( sort { keys %{ $HoH{$b} } <=> keys %{ $HoH{$a} } } keys %HoH ) {
+     print "$family: { ";
+     # e imprime estes de acordo com a ordem do rank
+     for $role ( sort { $rank{$a} <=> $rank{$b} }  keys %{ $HoH{$family} } ) {
+         print "$role=$HoH{$family}{$role} ";
+     }
+     print "}\n";
+ }
+
+
+=head1 ESTRUTURAS MAIS ELABORADAS
+
+=head2 Declaração de ESTRUTURAS MAIS ELABORADAS
+
+Aqui está um exemplo mostrando como criar e usar um registro ("record")
+cujos campos são de muitos tipos diferentes:
+
+     $rec = {
+     TEXT      => $string,
+     SEQUENCE  => [ @old_values ],
+     LOOKUP    => { %some_table },
+     THATCODE  => \&some_function,
+     THISCODE  => sub { $_[0] ** $_[1] },
+     HANDLE    => \*STDOUT,
+     };
+
+     print $rec->{TEXT};
+
+     print $rec->{SEQUENCE}[0];
+     $last = pop @ { $rec->{SEQUENCE} };
+
+     print $rec->{LOOKUP}{"key"};
+     ($first_k, $first_v) = each %{ $rec->{LOOKUP} };
+
+     $answer = $rec->{THATCODE}->($arg);
+     $answer = $rec->{THISCODE}->($arg1, $arg2);
+
+     # cuidado de bloco extra de colchetes na referência a filehandle
+     print { $rec->{HANDLE} } "a string\n";
+
+     use FileHandle;
+     $rec->{HANDLE}->autoflush(1);
+     $rec->{HANDLE}->print(" a string\n");
+
+=head2 Declaração de um HASH DE ESTRUTURAS COMPLEXAS
+
+     %TV = (
+        flintstones => {
+            series   => "flintstones",
+            nights   => [ qw(monday thursday friday) ],
+            members  => [
+                { name => "fred",    role => "lead", age  => 36, },
+                { name => "wilma",   role => "wife", age  => 31, },
+                { name => "pebbles", role => "kid",  age  =>  4, },
+            ],
+        },
+
+        jetsons     => {
+            series   => "jetsons",
+            nights   => [ qw(wednesday saturday) ],
+            members  => [
+                { name => "george",  role => "lead", age  => 41, },
+                { name => "jane",    role => "wife", age  => 39, },
+                { name => "elroy",   role => "kid",  age  =>  9, },
+            ],
+         },
+
+        simpsons    => {
+            series   => "simpsons",
+            nights   => [ qw(monday) ],
+            members  => [
+                { name => "homer", role => "lead", age  => 34, },
+                { name => "marge", role => "wife", age => 37, },
+                { name => "bart",  role => "kid",  age  =>  11, },
+            ],
+         },
+      );
+
+=head2 Geração de um HASH DE ESTRUTURAS COMPLEXAS
+
+     # Lendo de um arquivo
+     # this is most easily done by having the file itself be
+     # in the raw data format as shown above.  perl is happy
+     # to parse complex data structures if declared as data, so
+     # sometimes it's easiest to do that
+
+     # aqui está acumulado fragmento por fragmento
+     $rec = {};
+     $rec->{series} = "flintstones";
+     $rec->{nights} = [ find_days() ];
+
+     @members = ();
+     # assume este arquivo na sintaxe field=value
+     while (<>) {
+         %fields = split /[\s=]+/;
+         push @members, { %fields };
+     }
+     $rec->{members} = [ @members ];
+
+     # agora guarde de tudo
+     $TV{ $rec->{series} } = $rec;
+
+     ###########################################################
+     # Agora, você provavelmente quer fazer campos extras interessantes que
+     # incluem ponteiros de volta na mesma estrutura de dados, então se
+     # mudar uma peça, muda em todo local, como por exemplo
+     # se você quis um campo {kids} que fosse uma referência
+     # para um array de registros kids sem ter que duplicar
+     # registros e sem ter problemas de atualização
+     ###########################################################
+     foreach $family (keys %TV) {
+         $rec = $TV{$family}; # ponteiro temporário
+         @kids = ();
+         for $person ( @{ $rec->{members} } ) {
+             if ($person->{role} =~ /kid|son|daughter/) {
+                 push @kids, $person;
+             }
+         }
+         # LEMBRE-SE: $rec e $TV{$family} apontam para os mesmos dados!!
+         $rec->{kids} = [ @kids ];
+     }
+
+     # Você copiou o array, mas o array em si contém ponteiros
+     # para objetos não copiados. Isso significa que se você fazer Bart envelhecer via:
+
+     $TV{simpsons}{kids}[0]{age}++;
+
+     # Então isso também mudaria em
+     print $TV{simpsons}{members}[2]{age};
+
+     # pois $TV{simpsons}{kids}[0] e $TV{simpsons}{members}[2]
+     # ambos apontam para a mesma tabela hash anônima
+
+     # Imprime tudo
+     foreach $family ( keys %TV ) {
+         print "the $family";
+         print " is on during @{ $TV{$family}{nights} }\n";
+         print "its members are:\n";
+         for $who ( @{ $TV{$family}{members} } ) {
+             print " $who->{name} ($who->{role}), age $who->{age}\n";
+         }
+         print "it turns out that $TV{$family}{lead} has ";
+         print scalar ( @{ $TV{$family}{kids} } ), " kids named ";
+         print join (", ", map { $_->{name} } @{ $TV{$family}{kids} } );
+         print "\n";
+     }
+
+=head1 Ligação de Banco de Dados
+
+Você não pode facilmente amarrar uma estrutura de dados multi-nível (como hashes de hashes) para um
+arquivo dbm. O primeiro problema é que todos menos GBDM e o Berkeley DB tem limitações de tamanho,
+mas além disso, você também tem problemas em como referências vão se representadas no disco. Um módulo
+experimental que faz uma tentativa parcial de resolver esse necessidade é o MLDBM. Cheque o site CPAN mais
+próximo como descrito em L<perlmodlib> para o código fonte do MLDBM. 
+
+=head1 VEJA TAMBÉM
+
+L<perlref>, L<perllol>, L<perldata>, L<perlobj>
+
+=head1 AUTOR
+
+Tom Christiansen <F<tchrist@perl.com>>
+
+
+=head1 TRADUÇÃO
+
+Nicholas Amorim <nicholasamorim@gmail.com>
+
+Nelson Ferraz <nferraz@gmail.com>
+
+Joênio Costa
+
+Breno G. de Oliveira <garu@cpan.org>
+
+Ronaldo Lima
+
+Marco Lima
+

@@ -1,0 +1,11 @@
+Revision history for Perl extension Pod-Perldoc-Cache
+
+0.02 2014-04-23T12:27:59Z
+
+    - append parser module name to suffix of the cache file
+
+
+0.01 2014-04-23T02:29:50Z
+
+    - original version
+

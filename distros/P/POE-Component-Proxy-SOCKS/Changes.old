@@ -1,0 +1,32 @@
+POE::Component::Proxy::SOCKS
+============================
+
+1.02  Fri Nov 27 16:05:10 GMT 2009
+  - Applied patch from Nick Syberia(?) RT #52104#
+
+1.00	Wed May 27 22:17:41 BST 2009
+	- Pod tidying & Makefile.PL updates
+	- Fix from Rob Bloodgood [RT #37145]
+
+0.08	Mon May 19 17:35:18 BST 2008
+	- removed kwalitee test
+	- added license information
+
+0.06	Fri Apr  4 14:39:10 BST 2008
+	- Kwalitee fixes.
+
+0.05	Thu Nov  1 09:28:53 GMT 2007
+	- Updated Module::Install to 0.68
+
+0.04	Sat Jul 28 13:00:01 BST 2007
+	- Fixed abstract_from and build_requires in Makefile.PL
+
+0.03	Mon Feb 19 17:06:07 GMT 2007
+	- Added kwalitee test.
+
+0.02	Tue Dec 12 10:14:37 GMT 2006
+	- Documentation fixes.
+	- Added time out on BIND sockets.
+
+0.01	Mon Dec 11 14:30:01 GMT 2006
+	- Initial CPAN release.

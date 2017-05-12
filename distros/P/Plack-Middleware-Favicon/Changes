@@ -1,0 +1,18 @@
+Revision history for Perl extension Plack::Middleware::Favicon
+
+0.05    Sun Jan 18 17:50:52 JST 2015
+        - new option: 'callback' for filtering image
+        - add MIDDLEWARE OPTIONS documents
+
+0.04    Sat Jan 17 12:31:42 JST 2015
+        - fix tests: if system doesn't have lib*** for Imager.
+
+0.03    Fri Jan 16 08:49:01 JST 2015
+        - fix and enhance test
+        - add LICENSE file
+
+0.02    Sun Jan 11 12:57:48 JST 2015
+        - generate cache in prepare_app phase with the cache option
+
+0.01    Sat Jan 10 17:20:05 2015
+        - original version

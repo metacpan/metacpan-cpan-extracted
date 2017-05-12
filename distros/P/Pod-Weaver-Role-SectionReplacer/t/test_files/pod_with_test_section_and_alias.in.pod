@@ -1,0 +1,27 @@
+=pod
+
+=head1 PRE-TEST SECTION
+
+This is the pre-test section.
+
+=head1 TEST SECTION
+
+This is a test section.
+
+=head1 POST-TEST SECTION
+
+This is the post-test section.
+
+=head1 PRE-TEST-ALIAS SECTION
+
+This is the pre-test-alias section.
+
+=head1 TEST SECTION ALIAS
+
+This is an aliased test section.
+
+=head1 POST-TEST-ALIAS SECTION
+
+This is the post-test-alias section.
+
+=cut

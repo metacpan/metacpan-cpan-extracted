@@ -1,0 +1,42 @@
+---
+abstract: 'Notify feed updates to Slack'
+author:
+  - 'zoncoen <zoncoen@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plagger-Plugin-Notify-Slack
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plagger::Plugin::Notify::Slack:
+    file: lib/Plagger/Plugin/Notify/Slack.pm
+    version: '0.03'
+requires:
+  Encode: '0'
+  JSON: '0'
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Plagger: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: ssh://git@github.com/zoncoen/Plagger-Plugin-Notify-Slack/issues
+  homepage: ssh://git@github.com/zoncoen/Plagger-Plugin-Notify-Slack
+  repository: ssh://git@github.com/zoncoen/Plagger-Plugin-Notify-Slack.git
+version: '0.03'
+x_authority: cpan:ZONCOEN

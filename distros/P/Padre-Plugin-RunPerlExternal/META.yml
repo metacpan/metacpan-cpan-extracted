@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               Padre-Plugin-RunPerlExternal
+version:            0.54
+abstract:           Runs perl-document in external window. No need for config-switching 
+author:
+    - Matthias Ries <riesm@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Test::More:  0
+requires:
+    Padre:       0.57
+    Test::More:  0
+resources:
+    repository:
+        url:  https://github.com/matthiasries/Padre-Plugin-RunPerlExternal.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+x_screenshots:
+    - http://www.imagebanana.com/view/3tndocxg/Padre_018.png
+    - http://www.imagebanana.com/view/xiglvtu7/Auswahl_021.png

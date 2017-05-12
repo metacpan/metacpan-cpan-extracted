@@ -1,0 +1,59 @@
+---
+abstract: 'HTML Template Engine + Custom HTML Elements'
+author:
+  - 'Carlos Fernando Avila Gratz <cafe@kreato.com.br>'
+build_requires:
+  Test::Exception: '0.43'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plift
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plift:
+    file: lib/Plift.pm
+    version: '0.15'
+  Plift::Context:
+    file: lib/Plift/Context.pm
+  Plift::Handler::Include:
+    file: lib/Plift/Handler/Include.pm
+  Plift::Handler::Meta:
+    file: lib/Plift/Handler/Meta.pm
+  Plift::Handler::Render:
+    file: lib/Plift/Handler/Render.pm
+  Plift::Handler::Snippet:
+    file: lib/Plift/Handler/Snippet.pm
+  Plift::Handler::Wrap:
+    file: lib/Plift/Handler/Wrap.pm
+requires:
+  Class::Load: '0'
+  JSON: '0'
+  Moo: '0'
+  Path::Tiny: '0'
+  Ref::Util: '0'
+  URI: '0'
+  XML::LibXML::jQuery: '0.08'
+  namespace::clean: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/cafe01/template-plift/issues
+  homepage: https://github.com/cafe01/template-plift
+  repository: git://github.com/cafe01/template-plift.git
+version: '0.15'
+x_authority: cpan:CAFEGRATZ
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         POE-Session-Attribute
+version:      0.02
+version_from: lib/POE/Session/Attribute.pm
+installdirs:  site
+license:      perl
+requires:
+    Class::Data::Inheritable:      0
+    Class::Inspector:              0
+    POE:                           0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.20

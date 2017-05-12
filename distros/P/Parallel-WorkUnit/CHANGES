@@ -1,0 +1,61 @@
+1.009 - Apr 23, 2016
+ * Switched from TryCatch to Try::Tiny to maintain compatibility
+   with Perl 5.24.0-RC1 (TryCatch depends on Scope::Upper which
+   was broken by perl core changes)
+
+1.008 - Mar 13, 2016
+Joel C. Maslak <jmaslak@antelope.net>
+ * Win32: Really fix the compatibility issue.  There is no
+   select() on Win32 that works with sockets, so we simulate
+   this with Thread::Queue (Thanks, CPAN Testers!)
+
+1.007 - Mar 7, 2016
+Joel C. Maslak <jmaslak@antelope.net>
+ * Win32: Fix Win32 compatibility issue introduced in 1.006.
+   (Thanks, CPAN Testers!)
+ * Win32: waitone() no longer waits only for the first running
+   thread to stop but waits instead for the first finishing
+   thread.
+
+1.006 - Mar 2, 2016
+Joel C. Maslak <jmaslak@antelope.net>
+ * Add waitone() method, which allows you to wait for one and exactly
+   one child thread to return.  This is useful in building worker
+   pools.
+ * Add count() method, which returns the number of outstanding
+   threads running or waiting to send output.  This is also usesful
+   for building worker pools.
+
+1.005 - July 15, 2015
+Joel C. Maslak <jmaslak@antelope.net>
+ * This version doesn't have any functionality changes from 1.002
+ * This beats up the smoke tests hosts (particularly Windows and
+   Solaris) a lot less, by spawning fewer processes during tests.
+
+1.004 - July 13, 2015
+Joel C. Maslak <jmaslak@antelope.net>
+ * Correct missing tests in 1.003
+
+1.003 - July 13, 2015
+Joel C. Maslak <jmaslak@antelope.net>
+ * This version doesn't have any functionality changes from 1.002
+ * A test failed on some shells due to insecure $ENV in taint mode
+ * Minor documentation changes
+
+1.002 - July 12, 2015
+Joel C. Maslak <jmaslak@antelope.net>
+ * Windows compatibility fixes
+ * Don't use SIG{CHLD} = 'IGNORE'
+     (bug 105823, reported by SREZIC)
+ * Relaxed Perl minimum version requirements
+     (bug 105824, reported by SREZIC)
+ * Returned better error messages in cases where freeze() fails
+     (bug 105825, reported by SREZIC)
+ * Minor code cleanup/formatting
+
+1.001 - July 12, 2015
+Joel C. Maslak <jmaslak@antelope.net>
+ * Changed behavior for reads, so that the return value can be ready by
+   multiple read() calls.  This aids robustness if a signal comes in at
+   a bad time, particularly in Perl 5.14.
+

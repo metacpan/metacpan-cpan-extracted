@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         POE-Component-Server-FTP
+version:      0.08
+version_from: FTP.pm
+installdirs:  site
+requires:
+    Filesys::Virtual:              0.06
+    IO::Scalar:                    
+    IO::Socket::INET:              
+    POE:                           
+    Socket:                        
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

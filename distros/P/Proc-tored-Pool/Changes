@@ -1,0 +1,26 @@
+0.07 2017-03-09
+- Bump proc::tored to 0.15 for improvements to reliability and process safety
+
+0.06 2017-03-02
+- Bump Proc::tored to 0.12 to address test failures caused by some older
+  versions
+
+0.05 2017-02-23
+- Tasks that exec() now supported, callback result is 'zero but true'
+
+0.04 2017-02-21
+- Fixed bug in which data ref from ForkManager was not checked before deref
+
+0.03 2017-02-20
+- Update with API changes in Proc::tored 0.08
+- Better, faster tests
+
+0.02 2017-02-18
+
+- Parallel::ForkManager to 1.19 due to use of 'start_child' method
+- Proc::tored to 0.07 for bugfixes
+- Drop Worker class
+
+0.01 2017-02-16
+
+- Initial release

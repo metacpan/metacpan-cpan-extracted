@@ -1,0 +1,11 @@
+<html>
+<body bgcolor="#ffffff">
+<h1>NAME</h1>
+
+<p>160-begin-block</p>
+<h1>EXAMPLES</h1>
+
+<p>This is an HTML-only block</p>
+<p>[EOF]</p>
+</body>
+</html>

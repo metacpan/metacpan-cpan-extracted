@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+lib/Password/Policy/Encryption/SHA1.pm
+t/000-load.t
+t/release-pod-syntax.t
+t/release-synopsis.t
+t/sha1.t

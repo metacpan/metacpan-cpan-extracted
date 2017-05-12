@@ -1,0 +1,26 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-ClassSniff\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-11 20:11+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Jérôme Quelin <jquelin@gmail.com>\n"
+"Language-Team: jérôme quelin <jquelin@cpan.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: French\n"
+"X-Poedit-Country: FRANCE\n"
+
+#: lib/Padre/Task/ClassSniff.pm:69
+msgid "Could not determine class to run Sniff on.\n"
+msgstr "Ne peut pas déterminer sur quelle classe lancer Sniff.\n"
+
+#: lib/Padre/Plugin/ClassSniff.pm:60
+msgid "About"
+msgstr "A propos"
+
+#: lib/Padre/Plugin/ClassSniff.pm:61
+msgid "Print Report"
+msgstr "Afficher le rapport"
+

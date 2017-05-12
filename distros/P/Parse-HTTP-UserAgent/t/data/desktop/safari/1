@@ -1,0 +1,83 @@
+[AGENT]
+
+# this is a mobile agent
+Mozilla/5.0 (SymbianOS/9.1; U; en-us) AppleWebKit/413 (KHTML, like Gecko) Safari/413 UP.Link/6.3.1.15.0
+
+'parser'           => 'safari',
+'strength'         => 'U',
+'os'               => 'SymbianOS/9.1',
+'extras'           => ['KHTML, like Gecko','UP.Link/6.3.1.15.0'],
+'version_raw'      => '413',
+'lang'             => 'en-us',
+'version'          => '413.000',
+'name'             => 'Safari',
+'toolkit'          => ['AppleWebKit','413','413.000']
+
+[AGENT]
+
+Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/525.27.1 (KHTML, like Gecko) Version/3.2.1 Safari/525.27.1
+
+
+'parser'           => 'safari',
+'strength'         => 'U',
+'os'               => 'Windows XP',
+'extras'           => ['Windows','KHTML, like Gecko','Safari/525.27.1'],
+'version_raw'      => '3.2.1',
+'lang'             => 'en-US',
+'version'          => '3.002001',
+'name'             => 'Safari',
+'toolkit'          => ['AppleWebKit','525.27.1','525.027001']
+
+[AGENT]
+
+Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en) AppleWebKit/124 (KHTML, like Gecko) Safari/125.1
+
+'parser'           => 'safari',
+'strength'         => 'U',
+'os'               => 'PPC Mac OS X',
+'extras'           => ['Macintosh','KHTML, like Gecko'],
+'version_raw'      => '125.1',
+'lang'             => 'en',
+'version'          => '125.100',
+'name'             => 'Safari',
+'toolkit'          => ['AppleWebKit','124','124.000']
+
+[AGENT]
+
+Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en) AppleWebKit/106.2 (KHTML, like Gecko) Safari/100.1
+
+'parser'           => 'safari',
+'strength'         => 'U',
+'os'               => 'PPC Mac OS X',
+'extras'           => ['Macintosh','KHTML, like Gecko'],
+'version_raw'      => '100.1',
+'lang'             => 'en',
+'version'          => '100.100',
+'name'             => 'Safari',
+'toolkit'          => ['AppleWebKit','106.2','106.200']
+
+[AGENT]
+
+Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en-us) AppleWebKit/74 (KHTML, like Gecko) Safari/74
+
+'parser'           => 'safari',
+'strength'         => 'U',
+'os'               => 'PPC Mac OS X',
+'extras'           => ['Macintosh','KHTML, like Gecko'],
+'version_raw'      => '74',
+'lang'             => 'en-us',
+'version'          => '74.000',
+'name'             => 'Safari',
+'toolkit'          => ['AppleWebKit','74','74.000']
+
+[AGENT]
+
+Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/534.51.22 (KHTML, like Gecko) Version/5.1.1 Safari/534.51.22
+
+'parser'      => 'safari',
+'os'          => 'Intel Mac OS X 10_6_8',
+'extras'      => ['Macintosh','KHTML, like Gecko', 'Safari/534.51.22'],
+'toolkit'     => ['AppleWebKit','534.51.22','534.051022'],
+'version_raw' => '5.1.1',
+'version'     => '5.001001',
+'name'        => 'Safari',

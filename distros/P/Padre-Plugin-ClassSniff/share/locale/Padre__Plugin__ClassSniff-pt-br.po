@@ -1,0 +1,24 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-ClassSniff\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-11 20:11+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Breno G. de Oliveira <garu@cpan.org>\n"
+"Language-Team: brazilian portuguese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Task/ClassSniff.pm:69
+msgid "Could not determine class to run Sniff on.\n"
+msgstr "Não foi possível determinar classe em que rodar o Sniff.\n"
+
+#: lib/Padre/Plugin/ClassSniff.pm:60
+msgid "About"
+msgstr "Sobre"
+
+#: lib/Padre/Plugin/ClassSniff.pm:61
+msgid "Print Report"
+msgstr "Exibir Relatório"
+

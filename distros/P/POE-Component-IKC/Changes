@@ -1,0 +1,307 @@
+Revision history for Perl extension POE::Component::IKC.
+
+0.2402 7 Jul 2014
+    - Don't test POD
+    - Better handling of EADDRINUSE on Win32
+    - Win32 doesn't have open "-|", skip that test for now
+
+0.2401 16 May 2014
+    - Fixed the code in thunking that depended on a non-released version of POE
+    - Use $Test::Builder::Level
+
+0.2400 16 May 2014
+    - Bumped version
+    - Copyright 2014
+    - Added Server/on_error
+    - Added error monitor
+    - create_ikc_* functions now output deprecation warnings
+    - Fixed a timing issue when changing filters on an IKC channel
+    - Drop all use of Data::Dumper
+    - Remove hard coded ports
+
+0.2305 10 Feb 2013
+    - Forgot Devel::Size in PREREQs
+
+0.2303 16 Jan 2013
+    - Cleaned up cookie crumbs
+    - Removed erroneous call to _select_define in Server::accept
+        Thank you rbhardwaj (rt82685)
+
+0.2302 26 Aug 2011
+    - Forgot IKC::Protocol  GAH!
+        Thank you Gregor Herrmann
+
+0.2301 26 Aug 2011
+    - Bump copyright year
+
+0.2300 26 Aug 2011
+    - Fixed thunk checking for 1.311
+    - Added IKC::Timing, temporarily
+    - Created a new, faster protocol (IKC0) which sends all info on one line
+      as opposed to multiple lines as before (IKC)
+    - Channel session will detach itself from Client session
+
+0.2200 08 May 2009
+    - Better concurrency handling
+    - We now have a reusable thunk session
+    - Added test cases for above
+    - Reworked t/30_concurrency.t Seems it was failing on Win32
+    - Added ClientLite->responded()
+
+0.2102 06 May 2009
+    - IKC::Channel uses presence of IKC alias, not {shutdown}, to unregister
+    - Added a _child to shut up POE::Session
+    - Changed the DEPRECATED messages that fluster everybody into
+        pointers to IKC/monitor.  I'm not going to remove on_connect nor
+        on_error.
+    - Allow IKC::Server port=0
+
+0.2101 01 May 2009
+    - IKC::Channel stops work during shutdown
+            Fixes http://rt.cpan.org/Public/Bug/Display.html?id=44104
+            Thank you, acferen [...] yahoo.com
+
+0.2100 01 May 2009
+    - LICENSE in Makefile.PL
+    - Added concurrency to IKC::Server
+    - Moved all tests to Test::More 
+    - Added POD tests
+    - Updated copyright year
+    - Cleanup dist
+    - Removed checks for ancient versions of POE
+    - Require POE 1.000
+
+0.2003 03 April 2009
+    - IKC::Channel->spawn returns session ID
+    - Only keep channel IDs in IKC::Responder
+
+    - Several changes to improve shutdown behaviour :
+        - Register channels with the IKC::Responder before they negociate
+        - Shutdown a IKC::Client when its Channel closes, so that IKC 
+            shutdown will also shutdown the channels
+        - Give Clients aliases to help debuging
+        - Shutdown IKC::Server when the last channel goes away and 
+            there's no wheel
+    
+0.2002 26 November 2008
+    - Added call to $kernel->_data_sig_initialize, otherwise child processes
+        will never exit
+
+0.2001 16 January 2008
+    - Added copyright and license notices to all POD, as requested by
+        Ernesto Hernandez-Novich.
+
+0.2000 29 November 2007
+    - FreezeThaw::thaw has started to return an array.  We only want the first
+        element... 
+            Thank you Faiz Kazi
+    - Better timeout handling in IKC::ClientLite.
+    - Documented the above
+
+0.1905 8 August 2007
+    - It was possible for a IKC::Server child process to inherit
+        some delay()s, clear those also.
+    - Clear all delay()s at the least provocation (INT, TERM, errors, etc)
+    - Created IKC::Server::_delete_wheel
+    - Use POE::Component::Daemon->peek
+
+0.1904 16 November 2006
+    - Channel now reacts better to IKC1 connections
+
+0.1903 16 November 2006
+    - Added t/01_specifier.t
+    - Fixed callback example in IKC.pod
+    - Allow 'poe:'-less specifiers
+
+0.1902 1 November 2006
+    - Forgot $VERSION in IKC.pm
+
+0.1901 3 October 2006
+    - Tweak the POD
+    - Forgot IKC.pm in MANIFEST
+
+0.1900 3 October 2006
+    - The memory leaks (big and small) are now verified as gone with
+        POE 0.37 and perl 5.8.8.  (Thank you dw for test case.)
+    - Remove Channel aliases.  DUH!
+
+0.1804 29 August 2006
+    - Added IKC.pm
+    - Check the POE leak
+
+0.1803 2 November 2005
+    - Use Scalar::Util
+    - Better debug messages
+
+0.18 21 June 2005
+    - ClientLite was looking for freeze before nfreeze, which broke 
+        cross-platform usage (Thank you Philip Dobranski)
+    - Channels weren't being shut down properly after X connections
+    - Channels couldn't be shut down from a Client
+
+0.16 - 0.17 Internal releases
+
+0.1501 23 Mar 2005
+    - Fixup some of the DEBUG messages
+    - Changed from use of internal {pending} to wheel->get_driver_out_octets
+    - Added WORK AROUND for wheel leak issue
+    - LocalKernel now removes it's alias, to be tidy
+    - Removed myself element of Responder's heap.  What was it going to be
+        used for?
+    - Responder's {monitors} wasn't being cleaned up, fixed
+    - Server _select_define now uses {pause,resume}_select, which
+        is better behaved then the internal hackery previous
+    - Slight reworking of pre-forking code
+    - All tests pass
+
+0.15 26 May 2004
+    - Added on_error, which is automatically deprecated for the monitor stuff
+    - Fixed some of the test
+     13 May 2004
+    - Moved to signal_handled
+
+0.14 17 Oct 2002
+    - Nothing changed
+
+0.14pre3 18 Oct 2002
+    - Uses sig_handled() where appropriate
+
+0.14pre2 16 Oct 2002
+    - Now uses *Event rather then *State
+
+0.14pre1 2 may 2002
+    - inform_monitor is now an event
+    - IKC::Proxy post()s to inform_monitor in _start
+    - IKC::Proxy call()s inform_monitor in _stop
+    - Merged up alias listing in publish/retract
+
+0.1303 26 Oct 2001
+    - IKC::Responder->spawn returns true on success
+    - IKC::Responder->spawn documented
+    - Checking to make sure a publishing session has an alias.  if not, use ID
+    - First babysitting happens at startup, doesn't wait
+    - check_kernel brought in line w/ new kernel internals
+
+0.1302 6 Sept 2001
+    - Meaningless version change
+
+0.1301 24 July 2001
+    - unix domain paths in kernel names now have / and \ turned into _
+    - Local kernel gets many names
+    - Make sure sockets are open before syswrite during neg phase of 
+        ClientLite, allowing better error handling
+    - IKC::Responder::spawn now checks that only one responder exists
+    - alias_list is only supported after 0.15
+    - Added win32 support (WSAEAFNOSUPPORT)
+    - IKC::Responder has better state dumping
+    - Better specifier matching
+    - Added test for ClientLite
+
+0.13  13 July 2001
+    - Added and repaired serializer selection for clients
+    - Added doco for ClientLite
+    - Sungo is happy with this release... onto CPAN it goes.
+
+0.13pre9  5 July 2001
+    - Doco fixes
+
+0.13pre8  4 July 2001
+    - Fixed the deprecated use of defined(@array) in IKC/Responder.pm
+    - Added doco about SENDER
+    - create_ikc_channel now takes an arrayref of aliases, 
+      so that IKC::Client and IKC::Server can accept a longer list of
+      pre-defined names.
+    - IKC/post2 now expects SENDER to come before [state, args]
+    - Added doco to the effect that callback states are temporarily published
+    - Updated code that turned off the socket_factory... Dngor had
+      changed SocketFactory's implementation on me!  This is what you get
+      for doing bad stuff.
+
+0.13pre7  20 June 2001
+    - Added IKC/published, for sungo
+    - Fixed doco a bit
+    - Added a prereq for POE 0.1403
+
+0.13pre6  6 June 2001
+    - ADDED TESTS!
+        Woot woot!  Now make test verifies something meaningful.
+    - No longer thunking sessions that don't publish any states
+    - Finally did unsubscribe... turns out retract was available all along
+    - Added IKC::{Client,Proxy,Responder,Server}->spawn method, to 
+        be used in favour of create_ikc_*mumble*
+    - Added IKC/post2 .... internal use only
+    - Added FlushedState handler to IKC::Channel.  This way, wheel isn't
+        destroyed until all data is flushed.  This means you can post
+        events to remote kernels and then IKC/shutdown right away.  I hope.
+
+0.13pre5  4 June 2001
+    - Added IKC/shutdown and attendant bouffonery (see shut-{server,client})
+    - IKC::Proxy for 'poe://somekernel/somesession' is now also aliased
+      as 'somesession'
+    - Added unix-domain sockets... don't know if i've got this right
+        see u{server,client}
+
+0.13pre2-4  May 2001
+    - Fixed doco and monitor stuff
+
+0.13pre1 19 Apr 2001
+    - Added the IKC/monitor stuff
+    - Added some doco
+    - ikc-use.txt is now IKC.pod
+
+0.12  March 2001
+    - Updated Changes, README.  Added FUTUR
+    - Improved warning messages
+    - IKC::ClientLite::disconnect no longer calls IKC/unregister to remote
+      (doing it was unneed, server does it automatically when socket dies)
+
+0.11  Nov 16 2000
+    - IKC/ClientLite now sets $/ and $\ to "\r\n"
+    - wantarray() now gets propagated... is this tested?
+    - babysitting now knows of "defunct" children
+    - children now turn off SIGCHLD and SIGINT... dunce :)
+    - check_kernel debuging subroutine
+
+0.10  May 26 2000
+    - Added $$ to all the warnings to help isolate problems
+    - Converted IKC::Server to package methods
+    - Split signals into sig_INT, sig_CHLD...
+    - Improved babysitting code (rogues)
+
+0.09  24 May 2000
+    - Fixed things that POE 0.0906 broke
+    - Added more babysitting code to pre-forking server.  Will document soon.
+    
+0.08  24 Jan 2000
+    - Fixed non-forking server code :)
+    - 0.0808 changed Wheel::SocketFactory internals
+
+0.07  Dec 1999
+    - Added pre-forking server
+    - Added IKC::ClientLite::post_respond
+
+0.06  Saturday Dec 18 1999
+    - Fixed some warning conditions
+
+0.05  Saturday Nov 06 1999
+    - Chanels are now being closed when a remote kernel unregisters
+      (this was a TODO, but previously only EPIPE or socket errors
+      would cause this to happen and it was leaking ram)
+    - Small cosmetic changes
+
+0.04  Sep 23 1999
+    - IKC::ClientLite
+    - Some changes :)
+
+0.03  Thr May 20 22:32 1999
+    - Added the object interface
+    - Documented the publish/subscribe
+    - Added access restrictions so that only published
+      states may be posted
+
+0.02  Wed May 19 xxxx 1999
+    - Added publish/subscribe 
+
+0.01  Tue May 11 21:18:04 1999
+	- original version; created by h2xs 1.18
+

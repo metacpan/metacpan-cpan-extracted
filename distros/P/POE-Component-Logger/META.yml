@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               POE-Component-Logger
+version:            1.10
+abstract:           A POE logging class
+author:
+    - Matt Sergeant <matt@sergeant.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Test::Builder:     0
+    Test::More:        0
+    Test::NoWarnings:  0
+requires:
+    base:                 0
+    Carp:                 0
+    File::Spec:           0
+    Log::Dispatch:        2.26
+    Log::Dispatch::Config:  1.03
+    perl:                 5.008
+    POE:                  1.293
+resources:
+    homepage:    http://github.com/dolmen/POE-Component-Logger
+    repository:  http://github.com/dolmen/POE-Component-Logger
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

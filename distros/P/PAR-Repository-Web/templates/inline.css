@@ -1,0 +1,85 @@
+        body {
+            font-family: "Bitstream Vera Sans", "Trebuchet MS", Verdana,
+                         Tahoma, Arial, helvetica, sans-serif;
+            color: #eee;
+            background-color: #eee;
+            margin: 0px;
+            padding: 0px;
+        }
+        :link, :link:hover, :visited, :visited:hover {
+            color: #eee;
+        }
+        div.box {
+            position: relative;
+            background-color: #ccc;
+            border: 1px solid #aaa;
+            padding: 4px;
+            margin: 8px;
+            -moz-border-radius: 8px;
+        }
+        div.error {
+            background-color: #977;
+            border: 1px solid #755;
+            padding: 4px;
+            margin: 4px;
+            margin-bottom: 6px;
+            -moz-border-radius: 8px;
+        }
+        div.credits {
+            background-color: #779;
+            border: 1px solid #557;
+            padding: 4px;
+            margin: 4px;
+            -moz-border-radius: 8px;
+        }
+        div.heading {
+            background-color: #557;
+            border: 1px solid #335;
+            padding: 4px;
+            margin: 4px;
+            -moz-border-radius: 8px;
+        }
+        div.heading h1, div.credits p {
+            margin: 0;
+        }
+        div.content {
+            background-color: #575;
+            border: 1px solid #353;
+            padding: 4px;
+            margin: 4px;
+            margin-bottom: 6px;
+            -moz-border-radius: 8px;
+        }
+        table.content {
+            border: 1px solid #353;
+            border-collapse: collapse;
+        }
+        td.content, th.content {
+            border: 1px solid #353;
+            padding: 3px;
+        }
+        form.selection{
+          padding: 0px;
+          margin: 0px;
+        }
+        h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: medium;
+            font-weight: bold;
+            text-decoration: underline;
+        }
+        h1 {
+            font-size: large;
+            font-weight: normal;
+        }
+        /* from http://users.tkk.fi/~tkarvine/linux/doc/pre-wrap/pre-wrap-css3-mozilla-opera-ie.html */
+        /* Browser specific (not valid) styles to make preformatted text wrap */
+        pre { 
+            white-space: pre-wrap;       /* css-3 */
+            white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+        }
+

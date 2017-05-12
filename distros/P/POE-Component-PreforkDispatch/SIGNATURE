@@ -1,0 +1,32 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9948041bbb377245876a8ff940e07864fb49a86d Build.PL
+SHA1 e7483f25dd02958fb2b2da68979c71b5ea135195 Changes
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 ce453a97fe44455d730a4ea0b84ce1cedddb6a7a MANIFEST
+SHA1 74d0df948ce19cc69a6c9bb416f59bf10d717d03 META.yml
+SHA1 cd14ada78fb37a0d926edd86eddcdf7f939de582 Makefile.PL
+SHA1 025a0edc2187ec6023a789b1950177ae93b273f1 README
+SHA1 a0386acd299a18acc0af63bc04223dc73d7999cf lib/POE/Component/PreforkDispatch.pm
+SHA1 3ed4ece3ee10c9a3be63037440829b66e78c68bc t/1-test.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.1 (GNU/Linux)
+
+iD8DBQFHJeviHHIpFH/pKkIRAoeHAJ9mWuI0XtxJCzAIW8RCGeK1qEx42ACdE1/e
+p0yjiIM4kyb4I6oYXsjV2rs=
+=v8h1
+-----END PGP SIGNATURE-----

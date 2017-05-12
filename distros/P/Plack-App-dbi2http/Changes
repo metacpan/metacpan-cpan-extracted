@@ -1,0 +1,39 @@
+Revision history for Plack-App-dbi2http
+
+0.06    2015-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.05     2014-06-18 (SHARYANTO)
+
+         - No functional changes. Fix typos and expand Synopsis.
+
+
+0.04     2014-06-17 (SHARYANTO)
+
+         - bin/dbi2http: Some small tweaks and fixes (remove generated config
+           file at the end, fix Getopt spec).
+
+
+0.03     2014-06-17 (SHARYANTO)
+
+         - No functional changes.
+
+         - bin/dbi2http: Add --version.
+
+
+0.02     2014-06-16 (SHARYANTO)
+
+         - Add command-line script 'bin/dbi2http'.
+
+         - Several fixes (typos, filename).
+
+
+0.01     2014-06-15 (SHARYANTO)
+
+         - First release.

@@ -1,0 +1,262 @@
+=encoding utf-8
+
+=for stopwords
+	MultiLang-pod
+	addindex
+	buildhtml
+	buildtitle
+	escapeHtml
+	escapeUrl
+	html
+	langs
+	makelink
+	makelinkanchor
+	mlpod
+	plainize
+	poddir
+	resolveLink
+	resolvePodEscape
+	unescapeHtml
+	utf-8
+	verbmsg
+	xhtml
+
+=head1 NAME
+
+Pod::MultiLang::Html - turn MultiLang-pod into html
+J<< ja;Pod::MultiLang::Html_ja - 多言語 Pod を html に変換 >>
+
+=head1 SYNOPSIS
+
+ $parser = Pod::MultiLang::Html->new(%opts);
+ $parser->parse_from_file($infile,$outfile);
+
+=head1 DESCRIPTION
+
+Pod::MultiLang::Html translates pod into html.
+This inherits L<Pod::MultiLang> and it inherits L<Pod::Parser>, 
+usage is same as Pod::Parser.
+J<< ja;
+L<Pod::MultiLang> を継承する html へのトランスレータです. 
+Pod::MultiLang は L<Pod::Parser> を基底としているので, 
+基本的な使用方法はそれにならいます. 
+>>
+
+command/verbatim/textblock methods only do push paragraphs 
+into an array, and end_pod method do conversion.
+(these process is in Pod::MultiLang.)
+J<< ja;
+command/verbatim/textblock では配列への蓄積のみを行いっていて, 
+変換処理は end_pod で行っている. (command/verbatim/textblock の
+処理は Pod::MultiLang が行っている.)
+>>
+
+prepare (listing up headings, setup index words, etc.) at 
+$parser->rebuild(), and generate at $parser->output_html();
+J<< ja;
+Pod::MultiLang::Html では, 生成の準備(見出しのリストアップ, 
+索引語の生成等)を $parser->rebuild() において行い, 
+$parser->output_html() が生成した情報から出力のみを行う
+という二段になっている.
+>>
+
+generate html is xhtml 1.1 ^^;
+J<< ja;
+xhtml 1.1 を生成してたり^^;
+>>
+
+=head1 OPTIONS
+
+method new takes follow arguments:
+J<< ja;
+new の引数は以下のものがあります. 
+>>
+
+=over
+
+=item langs
+
+ langs => [qw(ja en)]
+
+inherited from Pod::MultiLang.
+pass to Pod::MultiLang->new(). 
+see L<Pod::MultiLang/new>.
+J<< ja;
+Pod::MultiLang から引き継いでいるオプション. 
+Pod::MultiLang->new() に渡されます. 
+L<Pod::MultiLang/new> を参照してください.
+>>
+
+specify languages. 
+paragraphs which exist in mlpod document but not selected with
+C<langs> are ignored in result.
+J<< ja;
+使用する言語を指定します. 
+指定されなかった言語は, mlpod 中にあっても無視されます. 
+>>
+
+=item made
+
+  made => 'mailto:example@example.com'
+
+embed into Z<><link rev="made" href="" />. 
+J<< ja;
+Z<><link rev="made" href="" /> に埋め込まれます. 
+>>
+
+=item css
+
+  css => 'style/podstyle.css'
+
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="style/podstyle.css" />
+
+relative path between specified location and location that 
+output file is generated.
+J<< ja;
+html には位置は出力するファイルと指定したcssファイルとの
+相対位置で埋め込まれます.
+>>
+
+=item poddir
+
+  poddir => [qw(html/pod html/pragma html/lib)]
+
+directories for existence check of file linked from pod.
+by array reference.
+J<< ja;
+リンク先の存在確認に使うディレクトリを指定します.
+配列リファレンスを指定します.
+>>
+
+=item missing_poddir
+
+used when no link target found in poddir and link target seems 
+perl core documents.
+J<< ja;
+poddir にリンク先が見つからなかったときに, 
+それが perl ドキュメントらしかったときに代わりに
+リンク先に使うディレクトリを指定します.
+>>
+
+if omitted then missing_dir is used.
+J<< ja;
+省略時には missing_dir が使われます.
+>>
+
+=item missing_pragmadir
+
+used when no link target found in poddir and link target seems 
+pragma documents.
+J<< ja;
+poddir にリンク先が見つからなかったときに, 
+それが pragma ドキュメントらしかったときに代わりに
+リンク先に使うディレクトリを指定します.
+>>
+
+省略時には missing_dir が使われます.
+
+=item missing_dir
+
+used when no link target found in poddir.
+J<< ja;
+poddir にリンク先が見つからなかったときに, 
+代わりにリンク先に使うディレクトリを指定します.
+>>
+
+=item in_charset
+
+encoding for input document.
+default is utf-8. 
+J<< ja;
+入力ファイルのエンコーディングを指定します.
+デフォルトでは utf-8 です.
+>>
+
+=item out_charset
+
+encoding for output document.
+default is utf-8.
+J<< ja;
+出力ファイルのエンコーディングを指定します.
+デフォルトでは utf-8 です.
+>>
+
+and embed as 
+Z<><meta content="Content-Type" value="text/html; charset=" /> .
+J<< ja;
+Z<><meta content="Content-Type" value="text/html; charset=" /> 
+にも埋め込まれます.
+>>
+
+=item default_lang
+
+language for outsize of JZ<><> interior sequence.
+J<< ja;
+JZ<><> で囲まれていない文章に対する言語を指定します.
+>>
+
+=back
+
+=head1 METHODS
+
+=head2 new
+
+create new instance.
+
+=head1 OVERRIDES
+
+This module implements L<Pod::Parser>.
+
+=over 4
+
+=item begin_pod
+
+=item end_pod
+
+=item interior_sequence
+
+=back
+
+=head1 PRIVATE FUNCTIONS
+
+=over 4
+
+=item rebuild
+
+=item buildtitle
+
+=item buildhtml
+
+=item addindex
+
+=item output_html
+
+=item escapeHtml
+
+=item escapeUrl
+
+=item makelink
+
+=item makelinkanchor
+
+=item plainize
+
+=item resolveLink
+
+=item resolvePodEscape
+
+=item unescapeHtml
+
+=item verbmsg
+
+=back
+
+=head1 SEE ALSO
+
+L<Pod::MultiLang>
+J<< ja;
+L<Pod::MultiLang>
+>>
+
+

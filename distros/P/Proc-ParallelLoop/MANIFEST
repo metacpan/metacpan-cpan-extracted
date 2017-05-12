@@ -1,0 +1,15 @@
+bin/pardo
+Changes
+examples/example1.pl
+examples/example2.pl
+examples/example3.pl
+lib/Proc/ParallelLoop.pm
+LICENSE
+Makefile.PL
+MANIFEST
+man/man1/pardo.1
+README
+t/01_ini.t
+t/02_status.t
+t/03_nesting.t
+t/04_biglist.t

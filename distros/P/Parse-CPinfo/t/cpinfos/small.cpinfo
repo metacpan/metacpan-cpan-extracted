@@ -1,0 +1,1159 @@
+************************************************************************
+                    Check Point Support Information.                    
+                           CPinfo 5.0 Build 911000040                           
+
+                        (Last Mod.: Aug  9 2006 11:29:05)                              
+
+  When needed, you will be asked to send the output of this program to  
+                        support@ts.CheckPoint.com                       
+
+************************************************************************
+
+==============================================
+CP components
+==============================================
+SPSHARED                 :		Yes	Ver:6.0		SP:0		MSP:0		
+FireWall-1               :		Yes	Ver:6.0		SP:0		MSP:0		
+SecurePlatform           :		Yes	Ver:6.0		SP:0		MSP:0		
+FW1_41_BC                :		Unknown
+NGCMP                    :		Yes	Ver:6.0		SP:0		MSP:0		
+VSXCMP                   :		Yes	Ver:6.0		SP:0		MSP:0		
+R55WCmp                  :		Yes	Ver:6.0		SP:0		MSP:0		
+PROVIDER-1               :		Yes	Ver:6.0		SP:0		MSP:0		
+CPinfo                   :		Yes	Ver:5.0		SP:9		MSP:0		
+Provider-1               :		Yes	Ver:5.0		SP:0		MSP:0		
+
+==============================================
+CP Status
+==============================================
+
+------------------------
+CP Status - FW
+------------------------
+
+-----------------------
+CP Status - FW (/opt/CPshrd-R61/bin/cpstat -f policy fw)
+-----------------------
++=========+=========+  stderr +=========+=========+
+ No product has flag 'fw'
+
++=========+=========+=========+=========+=========+
+
+-----------------------
+CP Status - FW (/opt/CPshrd-R61/bin/cpstat -f perf fw)
+-----------------------
++=========+=========+  stderr +=========+=========+
+ No product has flag 'fw'
+
++=========+=========+=========+=========+=========+
+
+-----------------------
+CP Status - FW (/opt/CPshrd-R61/bin/cpstat -f hmem fw)
+-----------------------
++=========+=========+  stderr +=========+=========+
+ No product has flag 'fw'
+
++=========+=========+=========+=========+=========+
+
+-----------------------
+CP Status - FW (/opt/CPshrd-R61/bin/cpstat -f kmem fw)
+-----------------------
++=========+=========+  stderr +=========+=========+
+ No product has flag 'fw'
+
++=========+=========+=========+=========+=========+
+
+-----------------------
+CP Status - FW (/opt/CPshrd-R61/bin/cpstat -f inspect fw)
+-----------------------
++=========+=========+  stderr +=========+=========+
+ No product has flag 'fw'
+
++=========+=========+=========+=========+=========+
+
+-----------------------
+CP Status - FW (/opt/CPshrd-R61/bin/cpstat -f cookies fw)
+-----------------------
++=========+=========+  stderr +=========+=========+
+ No product has flag 'fw'
+
++=========+=========+=========+=========+=========+
+
+-----------------------
+CP Status - FW (/opt/CPshrd-R61/bin/cpstat -f chains fw)
+-----------------------
++=========+=========+  stderr +=========+=========+
+ No product has flag 'fw'
+
++=========+=========+=========+=========+=========+
+
+------------------------
+CP Status - VPN
+------------------------
+
+-----------------------
+CP Status - VPN (/opt/CPshrd-R61/bin/cpstat -f product vpn)
+-----------------------
++=========+=========+  stderr +=========+=========+
+ No product has flag 'vpn'
+
++=========+=========+=========+=========+=========+
+
+-----------------------
+CP Status - VPN (/opt/CPshrd-R61/bin/cpstat -f general vpn)
+-----------------------
++=========+=========+  stderr +=========+=========+
+ No product has flag 'vpn'
+
++=========+=========+=========+=========+=========+
+
+-----------------------
+CP Status - VPN (/opt/CPshrd-R61/bin/cpstat -f IKE vpn)
+-----------------------
++=========+=========+  stderr +=========+=========+
+ No product has flag 'vpn'
+
++=========+=========+=========+=========+=========+
+
+-----------------------
+CP Status - VPN (/opt/CPshrd-R61/bin/cpstat -f ipsec vpn)
+-----------------------
++=========+=========+  stderr +=========+=========+
+ No product has flag 'vpn'
+
++=========+=========+=========+=========+=========+
+
+-----------------------
+CP Status - VPN (/opt/CPshrd-R61/bin/cpstat -f fwz vpn)
+-----------------------
++=========+=========+  stderr +=========+=========+
+ No product has flag 'vpn'
+
++=========+=========+=========+=========+=========+
+
+-----------------------
+CP Status - VPN (/opt/CPshrd-R61/bin/cpstat -f accelerator vpn)
+-----------------------
++=========+=========+  stderr +=========+=========+
+ No product has flag 'vpn'
+
++=========+=========+=========+=========+=========+
+
+==============================================
+CP Product keys
+==============================================
+
+------------------------
+CPshared
+------------------------
+key:	 CPDIR          		/opt/CPshrd-R61
+key:	 ISCONFIGURED   		1
+
+------------------------
+FW1
+------------------------
+key:	 AddSnmp        		Failed to find the value
+key:	 Auth           		Failed to find the value
+key:	 Encryption     		Failed to find the value
+key:	 FireWall       		Failed to find the value
+key:	 FWDIR          		/opt/CPsuite-R61/fw1
+key:	 FWManagement   		1
+key:	 IsConfigured   		1
+key:	 Management     		1
+key:	 Primary        		1
+key:	 ProductName    		Failed to find the value
+key:	 Unlimit        		Failed to find the value
+key:	 VSX            		Failed to find the value
+
+------------------------
+Provider-1
+------------------------
+key:	 PRODDIR        		/opt/CPmds-R61
+key:	 FWDIR          		/opt/CPmds-R61
+key:	 InitiallyConfigured		1
+
+==============================================
+VPN-1 Version Information
+==============================================
+This is Check Point VPN-1(TM) NGX (R61) - Build 103
+
+==============================================
+FireWall-1 Management (fwm) Version Information
+==============================================
+This is Check Point SmartCenter Server NGX (R61) - Build 183
+
+==============================================
+FireWall-1 Version Information
+==============================================
+This is Check Point VPN-1(TM) & FireWall-1(R) NGX (R61) - Build 207
+
+==============================================
+CPShared Version Information
+==============================================
+This is Check Point SVN Foundation (R) Version NGX (R61) - Build 202
+
+==============================================
+System Information
+==============================================
+
+------------------------
+date
+------------------------
+
+Issuing 'date' :  
+
+Wed Feb  7 22:20:01 CST 2007
+
+------------------------
+hostname
+------------------------
+
+Issuing 'hostname' :  
+
+p1
+
+------------------------
+uname -a
+------------------------
+
+
+Issuing 'uname -a' :
+
+Linux p1 2.4.21-21cp #1 Thu Feb 16 10:50:56 IST 2006 i686 i686 i386 GNU/Linux
+
+------------------------
+hostid
+------------------------
+
+Issuing 'hostid' :  
+
+a8c00a01
+
+------------------------
+OS data from file : /etc/issue
+------------------------
+[H[J
+\R
+\w
+
+
+------------------------
+w -u
+------------------------
+
+Issuing 'w -u' :  
+
+ 22:20:01  up 5 min,  1 user,  load average: 0.07, 0.12, 0.07
+USER     TTY      FROM              LOGIN@   IDLE   JCPU   PCPU  WHAT
+admin    tty1     -                10:15pm  3.00s  0.38s  0.01s  /bin/sh /bin/cp
+
+------------------------
+uptime
+------------------------
+
+Issuing 'uptime' :  
+
+ 22:20:01  up 5 min,  1 user,  load average: 0.07, 0.12, 0.07
+
+------------------------
+ps auxww
+------------------------
+
+
+Issuing 'dops' :
+
+USER       PID %CPU %MEM   VSZ  RSS TTY      STAT START   TIME COMMAND
+root         1  1.5  0.0  1520  508 ?        S    22:14   0:05 init [
+root         2  0.0  0.0     0    0 ?        SW   22:14   0:00 [keventd]
+root         3  0.0  0.0     0    0 ?        SW   22:14   0:00 [kapmd]
+root         4  0.0  0.0     0    0 ?        SWN  22:14   0:00 [ksoftirqd/0]
+root         7  0.0  0.0     0    0 ?        SW   22:14   0:00 [bdflush]
+root         5  0.0  0.0     0    0 ?        SW   22:14   0:00 [kswapd]
+root         6  0.0  0.0     0    0 ?        SW   22:14   0:00 [kscand]
+root         8  0.0  0.0     0    0 ?        SW   22:14   0:00 [kupdated]
+root         9  0.0  0.0     0    0 ?        SW   22:14   0:00 [mdrecoveryd]
+root        17  0.0  0.0     0    0 ?        SW   22:14   0:00 [kjournald]
+root        84  0.0  0.0     0    0 ?        SW   22:14   0:00 [khubd]
+root       156  0.0  0.0     0    0 ?        SW   22:14   0:00 [kjournald]
+root       157  0.0  0.0     0    0 ?        SW   22:14   0:00 [kjournald]
+root       158  0.0  0.0     0    0 ?        SW   22:14   0:00 [kjournald]
+root       159  0.0  0.0     0    0 ?        SW   22:14   0:00 [kjournald]
+root       487  0.0  0.0     0    0 ?        SW   22:14   0:00 [vpntmodd]
+root       588  0.0  0.1  1612  636 ?        S    22:14   0:00 syslogd -m 0 -f /var/run/syslog.conf
+root       593  0.0  0.0  1528  472 ?        S    22:14   0:00 klogd -x -c 1
+root      1097  0.0  0.2  3056 1372 ?        S    22:14   0:00 /usr/sbin/sshd
+root      1135  0.0  0.0  1540  508 ?        S    22:14   0:00 crond
+root      1182  0.2  2.2 194460 11400 ?      S    22:15   0:00 /opt/CPshrd-R61/bin/cpd
+root      1183  0.3  2.2 171992 11724 ?      S    22:15   0:00 /opt/CPmds-R61/bin/fwd -n
+root      1184  1.0  5.8 372020 29780 ?      S    22:15   0:03 /opt/CPmds-R61/bin/fwm mds
+root      1243  0.0  0.1  2716  904 ?        S    22:15   0:00 /bin/sh /opt/spwm/bin/cpwmd_wd
+root      1247  0.0  0.8 10988 4400 ?        S    22:15   0:00 cpwmd -D -app SPLATWebUI
+root      1325  0.0  0.1  2224  768 ?        S    22:15   0:00 /bin/csh -fb /opt/CPshrd-R61/bin/cprid_wd
+root      1333  0.0  0.8  7580 4184 ?        S    22:15   0:00 /opt/CPshrd-R61/bin/cprid
+root      1393  0.0  0.2  2416 1060 ?        S    22:15   0:00 login -- admin     
+root      1394  0.0  0.0  1528  488 tty2     S    22:15   0:00 /sbin/agetty 9600 tty2
+root      1395  0.0  0.0  1524  488 tty3     S    22:15   0:00 /sbin/agetty 9600 tty3
+root      1396  0.0  0.1  2708  884 ?        S    22:15   0:00 /bin/bash /bin/console_agetty
+root      1403  0.0  0.0  1524  488 ttyS0    S    22:15   0:00 /sbin/agetty 9600 ttyS0 vt100
+root      1430  0.1  1.2 144760 6216 ?       S    22:15   0:00 cpca
+root      1433  0.0  0.2  2184 1232 tty1     S    22:15   0:00 -cpshell
+root      1460  0.0  0.2  2728 1172 tty1     S    22:15   0:00 bash
+root      2035  0.5  0.1  1184  656 tty1     S    22:19   0:00 /bin/sh /bin/cpinfo_start
+root      2077  3.0  0.4  4904 2084 tty1     R    22:19   0:00 cpinfo
+root      2174  0.0  0.1  2736  720 tty1     R    22:20   0:00 ps auxww
+
+------------------------
+vmstat 1 10
+------------------------
+
+Issuing 'vmstat 1 10' :  
+
+procs                      memory      swap          io     system         cpu
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in    cs us sy wa id
+ 1  0      0 398932   6600  66020    0    0   191    65  118    77  2  8  6 84
+ 0  0      0 398932   6600  66020    0    0     0     0  101    27  0  0  0 100
+ 0  0      0 398932   6628  66020    0    0     0   264  110    46  0  0  0 100
+ 0  0      0 398932   6628  66020    0    0     0     0  101    28  0  0  0 100
+ 0  0      0 398932   6628  66020    0    0     0     0  101    29  0  0  0 100
+ 0  0      0 398932   6628  66020    0    0     0     0  101    26  0  0  0 100
+ 0  0      0 398932   6628  66020    0    0     0     0  101    28  0  0  0 100
+ 0  0      0 398932   6636  66020    0    0     0    16  104    48  0  1  0 99
+ 0  0      0 398932   6636  66020    0    0     0     0  101    29  0  0  0 100
+ 0  0      0 398932   6636  66020    0    0     0     0  101    28  0  0  0 100
+
+------------------------
+lsdev -C
+------------------------
+
+Issuing 'lsdev -C' :  
+
+could not find\execute lsdev -C
+
+------------------------
+Additional System information
+------------------------
+
+Number of processors:
+ Total:
+ 1
+On-Line:
+ 1
+
+------------------------
+env
+------------------------
+
+Issuing 'env' :  
+
+INFODIR=/opt/CPinfo-10
+SU_Major='NGX'
+CPMDIR=/opt/CPshrd-R61
+SHELL=/bin/bash
+TERM=linux
+CD_MV='NGX (R61)'
+SUDIR=/opt/CPsuite-R61/fw1/sup
+APPNAME=cpshell
+CD_SP=''
+HISTFILESIZE=0
+LD_LIBRARY_PATH=/opt/CA/avengine/ino/lib:/opt/CA/avengine/ino/config:/opt/CA/avengine/ino/lib:/opt/CA/avengine/ino/config:/opt/spwm/lib:/opt/CPshrd-R61/lib:/opt/CPsuite-R61/fw1/lib:/opt/CPsuite-R61/fg1/lib:/opt/CPmds-R61/lib:/opt/CPsuite-R61/fw1/lib:/opt/CPsuite-R61/fg1/lib:/opt/CPmds-R61/lib
+TMOUT=600
+SUPPRESS_BLIP=y
+COLUMNS=80
+CD_FP='NGX_(R61)'
+PATH=/opt/CPinfo-10/bin:/opt/spwm/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/CPshrd-R61/bin:/opt/CPshrd-R61/util:/opt/CPsuite-R61/fw1/bin:/opt/CPsuite-R61/fg1/bin:/opt/CPmds-R61/bin:/opt/CPmds-R61/scripts:/opt/CPsuite-R61/fw1/bin:/opt/CPsuite-R61/fg1/bin:/opt/CPmds-R61/bin:/usr/bin:/usr/ucb:/usr/sbin:/usr/proc/bin
+MAIL=/var/mail/admin
+SYSTEM_TYPE=Enterprise
+PWD=/home/admin
+MSP_SOMEIP_ADDR=192.168.1.10
+MDSDIR=/opt/CPmds-R61
+CD_BUILD=133
+BASH_LOGGER=ON
+LINES=25
+FWDIR=/opt/CPmds-R61
+MDS_TEMPLATE=/opt/CPsuite-R61/fw1
+SUROOT=/var/suroot
+FW_BOOT_DIR=/etc/fw.boot
+HOME=/home/admin
+SHLVL=2
+CPDIR=/opt/CPshrd-R61
+MDS_SYSTEM=/opt/CPmds-R61/system
+FWDIR40=
+LOGNAME=admin
+MDSVERUTIL=/opt/CPmds-R61/system/shared/MDSVerUtil
+FGDIR=/opt/CPsuite-R61/fg1
+WEBISDIR=/opt/spwm
+MDS_CPDIR=/opt/CPshrd-R61
+SU_Minor='R61'
+CD_VER=SecurePlatform
+_=/opt/CPinfo-10/bin/cpinfo
+CPREGDIR=/opt/CPshrd-R61/registry
+
+------------------------
+df -k
+------------------------
+
+Issuing 'df -k' :  
+
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/sda2               600864    121632    448712  22% /
+none                    600864    121632    448712  22% /dev/pts
+/dev/sda1               147766      6739    133398   5% /boot
+/dev/sda6              1541680    294808   1168560  21% /opt
+none                    255856         0    255856   0% /dev/shm
+/dev/sda5              1541680    225560   1237808  16% /sysimg
+/dev/sda7              3391744    562252   2657200  18% /var
+
+------------------------
+df -k /opt/CPsuite-R61/fw1
+------------------------
+
+Issuing 'df -k /opt/CPsuite-R61/fw1' :  
+
+Filesystem           1K-blocks      Used Available Use% Mounted on
+/dev/sda6              1541680    294808   1168560  21% /opt
+
+------------------------
+Package Manager Report (rpm)
+------------------------
+i2c_support-1-3cp
+setup-2.5.7-4cp
+basesystem-8.0-2cp
+beecrypt-3.0.1-0.20030630cp
+chkconfig-1.3.11-3cp
+db1-1.85-8cp
+dos2unix-3.1-16cp
+elfutils-libelf-0.89-1cp
+expat-1.95.5-6cp
+gdbm-1.8.0-20cp
+glib2-2.2.3-2.1cp
+iputils-20020927-11cp
+libattr-2.2.0-1cp
+libstdc++-3.2.3-34cp
+lvm-1.0.8-19cp
+mount-2.11y-31.2cp
+net-tools-1.60-20cp
+popt-1.8.2-12cp
+pwdb-0.61.1-4cp
+termcap-11.0.1-17cp
+bash-2.05b-29cp
+cd_ver-1-602000133
+cpio-2.5-3cp
+findutils-4.1.7-9cp
+grep-2.5.1-25cp
+isdn4k-utils-3.1-1cp
+gzip-1.3.3-9cp
+nvi-1.79-6cp
+rarpd-ss981107-14cp
+s3500-2.1.0-35
+sed-4.0.7-3cp
+spinst-1-602000103
+tftp-0.32-5cp
+tzdata-2003c-1cp
+cracklib-dicts-2.7-23cp
+zlib-1.1.4-8.1cp
+openssl-libcrypto-0.9.7a-35cp
+coreutils-4.5.3-26cp
+dev-3.3.12-1cp
+modutils-2.4.25-13cp
+ntp-4.1.0-5cp
+CPshell-1-602000101
+libuser-0.51.7-1cp
+ppp-2.4.1-4cp
+procps-2.0.17-10cp
+sysklogd-1.4.1-12.5cp
+tcsh-6.12-4cp
+usermode-1.68-5cp
+initscripts-7.31.16-3cp
+kernel-2.4.21-21cp_45
+dhcp-3.0pl2-6.17cp
+lkcdutils-4.1-1cp
+nut-2.0.0-8cp
+openssh-server-3.6.1p2-33.30.36cp
+postsetup-1-081610132004cp
+spwm-1-602000112
+spwm_fw1-1-602000112
+spwm_splat-1-602000128
+vixie-cron-3.0.1-74cp
+CPsuite-R61-00
+CPngcmp-R61-00
+CPR55WCmp-R61-00
+CPinfo-10-00
+hwdata-0.101.12-6cp
+libgcc-3.2.3-34cp
+filesystem-2.2.1-2cp
+glibc-2.3.2-95.32cp
+bzip2-libs-1.0.2-11cp
+cracklib-2.7-23cp
+db4-4.1.25-8cp
+e2fsprogs-1.32-15cp
+ethtool-1.8-3cp
+ftp-0.17-17cp
+glib-1.2.10-12cp
+hdparm-5.4-1cp
+ksymoops-2.4.9-1cp
+libacl-2.2.3-1cp
+losetup-2.11y-31.2cp
+mktemp-1.5-18cp
+ncurses-5.3-9.3cp
+pcre-3.9-10cp
+psmisc-21.3-1cp
+shadow-utils-4.0.3-20cp
+libtermcap-2.0.8-35cp
+bridge-utils-0.9.5-36cp
+cp-release-1-R61
+diffutils-2.8.1-8cp
+gawk-3.1.1-9cp
+iproute-2.4.7-11cp
+less-378-11cp
+MAKEDEV-3.3.12-1cp
+grub-0.93-6cp
+rootfiles-7.2-3cp
+scis-1-602000103
+sharutils-4.2.1-16cp
+tar-1.13.25-13cp
+traceroute-1.4a12-20cp
+words-2-21cp
+zebra-0.93b-6cp
+file-3.39-9cp
+bind-utils-9.2.4-21cp
+CPbackup-1-591000074
+dhcpcd-1.3.18pl8-15cp
+mkinitrd-3.5.13-1cp
+pam-0.75-58cp
+kudzu-1.1.22.4-11cp
+passwd-0.68-3cp
+pptp-client-1.0.3-8cp
+rpm-4.2.3-12cp
+SysVinit-2.85-4.3cp
+util-linux-2.11y-31.2cp
+which-2.14-8cp
+kbd-1.08-10.2cp
+CPsplatIS-R61-00
+kernel-utils-2.4-8.37.6cp
+net-snmp-5.0.9-2.30.22cp
+openssh-3.6.1p2-33.30.36cp
+pciutils-2.1.10-7cp
+rp-pppoe-3.3-3cp
+spwm_dev_mgmt-1-602000114
+spwm_network-1-602000114
+tcpdump-3.7.2-7.2cp
+vlan-1.6-2cp
+CPEdgecmp-R61-00
+CPvsxngxcmp-R61-00
+CPmds-R61-00
+
+------------------------
+List PCI devices -lspci -v
+------------------------
+00:00.0 Host bridge: Intel Corp. 440BX/ZX/DX - 82443BX/ZX/DX Host bridge (rev 01)
+	Subsystem: VMWare Inc: Unknown device 1976
+	Flags: bus master, medium devsel, latency 0
+	Memory at e8000000 (32-bit, prefetchable) [size=64M]
+	Capabilities: [a0] AGP version 1.0
+
+00:01.0 PCI bridge: Intel Corp. 440BX/ZX/DX - 82443BX/ZX/DX AGP bridge (rev 01) (prog-if 00 [Normal decode])
+	Flags: bus master, 66Mhz, medium devsel, latency 0
+	Bus: primary=00, secondary=01, subordinate=01, sec-latency=64
+
+00:07.0 ISA bridge: Intel Corp. 82371AB/EB/MB PIIX4 ISA (rev 08)
+	Subsystem: VMWare Inc: Unknown device 1976
+	Flags: bus master, medium devsel, latency 0
+
+00:07.1 IDE interface: Intel Corp. 82371AB/EB/MB PIIX4 IDE (rev 01) (prog-if 8a [Master SecP PriP])
+	Subsystem: VMWare Inc: Unknown device 1976
+	Flags: bus master, medium devsel, latency 64
+	I/O ports at 1470 [size=16]
+
+00:07.2 USB Controller: Intel Corp. 82371AB/EB/MB PIIX4 USB (prog-if 00 [UHCI])
+	Subsystem: VMWare Inc: Unknown device 1976
+	Flags: bus master, medium devsel, latency 64, IRQ 9
+	I/O ports at 1060 [size=32]
+
+00:07.3 Bridge: Intel Corp. 82371AB/EB/MB PIIX4 ACPI (rev 08)
+	Subsystem: VMWare Inc: Unknown device 1976
+	Flags: medium devsel, IRQ 9
+
+00:0f.0 VGA compatible controller: VMWare Inc [VMWare SVGA II] PCI Display Adapter (prog-if 00 [VGA])
+	Subsystem: VMWare Inc [VMWare SVGA II] PCI Display Adapter
+	Flags: medium devsel
+	I/O ports at 1460 [size=16]
+	Memory at f0000000 (32-bit, non-prefetchable) [size=128M]
+	Memory at ec000000 (32-bit, non-prefetchable) [size=8M]
+	Expansion ROM at <unassigned> [disabled] [size=32K]
+
+00:10.0 SCSI storage controller: BusLogic BT-946C (BA80C30) [MultiMaster 10] (rev 01)
+	Subsystem: BusLogic BT-946C (BA80C30) [MultiMaster 10]
+	Flags: medium devsel, IRQ 11
+	I/O ports at 1440 [size=32]
+	Memory at ec800000 (32-bit, non-prefetchable) [size=32]
+	Expansion ROM at <unassigned> [disabled] [size=16K]
+
+00:11.0 Ethernet controller: Advanced Micro Devices [AMD] 79c970 [PCnet32 LANCE] (rev 10)
+	Subsystem: Advanced Micro Devices [AMD] PCnet - Fast 79C971
+	Flags: bus master, medium devsel, latency 64, IRQ 10
+	I/O ports at 1080 [size=128]
+	Expansion ROM at <unassigned> [disabled] [size=64K]
+
+00:12.0 Multimedia audio controller: Ensoniq ES1371 [AudioPCI-97] (rev 02)
+	Subsystem: Ensoniq Creative Sound Blaster AudioPCI64V, AudioPCI128
+	Flags: ?? devsel, IRQ 9
+	I/O ports at 1400 [size=64]
+
+
+------------------------
+Free Memory Information - free -k -t
+------------------------
+             total       used       free     shared    buffers     cached
+Mem:        511712     117028     394684          0       6704      70228
+-/+ buffers/cache:      40096     471616
+Swap:      1044216          0    1044216
+Total:     1555928     117028    1438900
+
+------------------------
+Slab Information (slabinfo)
+------------------------
+slabinfo - version: 1.1
+kmem_cache            71    105    108    3    3    1
+ip_fib_hash           10    112     32    1    1    1
+urb_priv               0      0     64    0    0    1
+ext3_xattr             0      0     44    0    0    1
+journal_head         101    924     48    4   12    1
+revoke_table           5    250     12    1    1    1
+revoke_record          0    112     32    0    1    1
+clip_arp_cache         0      0    256    0    0    1
+ip_mrt_cache           0      0    128    0    0    1
+tcp_tw_bucket          0      0    128    0    0    1
+tcp_bind_bucket       26    112     32    1    1    1
+tcp_open_request       0     30    128    0    1    1
+inet_peer_cache        1     58     64    1    1    1
+secpath_cache          0      0    128    0    0    1
+xfrm_dst_cache         0      0    256    0    0    1
+ip_dst_cache           7     15    256    1    1    1
+arp_cache              2     15    256    1    1    1
+flow_cache             0      0    128    0    0    1
+blkdev_requests     2976   3000    128  100  100    1
+kioctx                 0      0    128    0    0    1
+kiocb                  0      0    128    0    0    1
+dnotify_cache          0      0     20    0    0    1
+file_lock_cache       18     41     92    1    1    1
+async_poll_table       0      0    140    0    0    1
+fasync_cache           0      0     16    0    0    1
+uid_cache              0    112     32    0    1    1
+skbuff_head_cache     74     92    168    4    4    1
+sock                  50     60   1408   10   12    2
+sigqueue               0     29    132    0    1    1
+kiobuf                 1     30    128    1    1    1
+cdev_cache            49     58     64    1    1    1
+bdev_cache             7     58     64    1    1    1
+mnt_cache             16     58     64    1    1    1
+inode_cache         1686   1687    512  241  241    1
+dentry_cache        3321   3330    128  111  111    1
+dquot                  0      0    128    0    0    1
+filp                 884    900    128   30   30    1
+names_cache            0      5   4096    0    5    1
+buffer_head         6862   7272    104  201  202    1
+mm_struct             23     30    384    3    3    1
+vm_area_struct      1520   1848     68   28   33    1
+fs_cache              22     58     64    1    1    1
+files_cache           23     28    512    4    4    1
+signal_cache          38     58     64    1    1    1
+sighand_cache         32     40   1408    7    8    2
+pte_chain           4412   5580    128  148  186    1
+size-131072(DMA)       0      0 131072    0    0   32
+size-131072            1      1 131072    1    1   32
+size-65536(DMA)        0      0  65536    0    0   16
+size-65536             0      0  65536    0    0   16
+size-32768(DMA)        0      0  32768    0    0    8
+size-32768             0      1  32768    0    1    8
+size-16384(DMA)        1      1  16384    1    1    4
+size-16384            20     31  16384   20   31    4
+size-8192(DMA)         0      0   8192    0    0    2
+size-8192             16     20   8192   16   20    2
+size-4096(DMA)         0      0   4096    0    0    1
+size-4096             34     38   4096   34   38    1
+size-2048(DMA)         0      0   2048    0    0    1
+size-2048             44     80   2048   26   40    1
+size-1024(DMA)         0      0   1024    0    0    1
+size-1024             39     44   1024   10   11    1
+size-512(DMA)          0      0    512    0    0    1
+size-512              59     72    512    8    9    1
+size-256(DMA)          0      0    256    0    0    1
+size-256              18     75    256    2    5    1
+size-128(DMA)          1     30    128    1    1    1
+size-128             731    750    128   25   25    1
+size-64(DMA)           0      0    128    0    0    1
+size-64               98    120    128    4    4    1
+size-32(DMA)          17     58     64    1    1    1
+size-32              255    290     64    5    5    1
+
+------------------------
+Additional Memory Information (meminfo)
+------------------------
+        total:    used:    free:  shared: buffers:  cached:
+Mem:  523993088 119836672 404156416        0  6864896 71917568
+Swap: 1069277184        0 1069277184
+MemTotal:       511712 kB
+MemFree:        394684 kB
+MemShared:           0 kB
+Buffers:          6704 kB
+Cached:          70232 kB
+SwapCached:          0 kB
+Active:          86676 kB
+ActiveAnon:      28744 kB
+ActiveCache:     57932 kB
+Inact_dirty:     15668 kB
+Inact_laundry:    3336 kB
+Inact_clean:         0 kB
+Inact_target:    21136 kB
+HighTotal:           0 kB
+HighFree:            0 kB
+LowTotal:       511712 kB
+LowFree:        394684 kB
+SwapTotal:     1044216 kB
+SwapFree:      1044216 kB
+HugePages_Total:     0
+HugePages_Free:      0
+Hugepagesize:     4096 kB
+
+------------------------
+Additional Cpu Information (cpuinfo)
+------------------------
+processor	: 0
+vendor_id	: GenuineIntel
+cpu family	: 6
+model		: 13
+model name	: Intel(R) Pentium(R) M processor 1.86GHz
+stepping	: 8
+cpu MHz		: 1861.962
+cache size	: 0 KB
+fdiv_bug	: no
+hlt_bug		: no
+f00f_bug	: no
+coma_bug	: no
+fpu		: yes
+fpu_exception	: yes
+cpuid level	: 2
+wp		: yes
+flags		: fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat clflush dts acpi mmx fxsr sse sse2 ss nx
+bogomips	: 3656.90
+
+
+==============================================
+IP Interfaces
+==============================================
+
+------------------------
+ifconfig -a 
+------------------------
+eth0      Link encap:Ethernet  HWaddr 00:0C:29:3B:C3:74  
+          inet addr:192.168.1.10  Bcast:192.168.1.255  Mask:255.255.255.0
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:567 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:130 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:741415 (724.0 Kb)  TX bytes:12032 (11.7 Kb)
+          Interrupt:10 Base address:0x1080 
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:152 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:152 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:30989 (30.2 Kb)  TX bytes:30989 (30.2 Kb)
+
+
+==============================================
+Netstat Information
+==============================================
+
+------------------------
+netstat -rnv 
+------------------------
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags   MSS Window  irtt Iface
+192.168.1.0     0.0.0.0         255.255.255.0   U         0 0          0 eth0
+127.0.0.0       0.0.0.0         255.0.0.0       U         0 0          0 lo
+0.0.0.0         192.168.1.1     0.0.0.0         UG        0 0          0 eth0
+
+------------------------
+netstat -i 
+------------------------
+Kernel Interface table
+Iface       MTU Met    RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg
+eth0       1500   0      567      0      0      0      130      0      0      0 BMRU
+lo        16436   0      152      0      0      0      152      0      0      0 LRU
+
+------------------------
+netstat -s 
+------------------------
+Ip:
+    718 total packets received
+    0 forwarded
+    0 incoming packets discarded
+    714 incoming packets delivered
+    281 requests sent out
+Icmp:
+    4 ICMP messages received
+    0 input ICMP message failed.
+    ICMP input histogram:
+        destination unreachable: 4
+    4 ICMP messages sent
+    0 ICMP messages failed
+    ICMP output histogram:
+        destination unreachable: 4
+Tcp:
+    7 active connections openings
+    9 passive connection openings
+    0 failed connection attempts
+    2 connection resets received
+    12 connections established
+    709 segments received
+    273 segments send out
+    2 segments retransmited
+    0 bad segments received.
+    0 resets sent
+Udp:
+    0 packets received
+    4 packets to unknown port received.
+    0 packet receive errors
+    4 packets sent
+TcpExt:
+    ArpFilter: 0
+    24 delayed acks sent
+    2 packets directly queued to recvmsg prequeue.
+    2 packets directly received from prequeue
+    534 packets header predicted
+    TCPPureAcks: 24
+    TCPHPAcks: 54
+    TCPRenoRecovery: 0
+    TCPSackRecovery: 0
+    TCPSACKReneging: 0
+    TCPFACKReorder: 0
+    TCPSACKReorder: 0
+    TCPRenoReorder: 0
+    TCPTSReorder: 0
+    TCPFullUndo: 0
+    TCPPartialUndo: 0
+    TCPDSACKUndo: 0
+    TCPLossUndo: 0
+    TCPLoss: 0
+    TCPLostRetransmit: 0
+    TCPRenoFailures: 0
+    TCPSackFailures: 0
+    TCPLossFailures: 0
+    TCPFastRetrans: 0
+    TCPForwardRetrans: 0
+    TCPSlowStartRetrans: 0
+    TCPTimeouts: 2
+    TCPRenoRecoveryFail: 0
+    TCPSackRecoveryFail: 0
+    TCPSchedulerFailed: 0
+    TCPRcvCollapsed: 0
+    TCPDSACKOldSent: 0
+    TCPDSACKOfoSent: 0
+    TCPDSACKRecv: 0
+    TCPDSACKOfoRecv: 0
+    TCPAbortOnSyn: 0
+    TCPAbortOnData: 0
+    TCPAbortOnClose: 1
+    TCPAbortOnMemory: 0
+    TCPAbortOnTimeout: 0
+    TCPAbortOnLinger: 0
+    TCPAbortFailed: 0
+    TCPMemoryPressures: 0
+
+------------------------
+netstat -na 
+------------------------
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+tcp        0      0 192.168.1.10:256        0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:1024       0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:18208      0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:18209      0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:257        0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:18210      0.0.0.0:*               LISTEN      
+tcp        0      0 127.0.0.1:60706         0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:18183      0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:18184      0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:18187      0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:18221      0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:18190      0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:18191      0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:18192      0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:18196      0.0.0.0:*               LISTEN      
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:18264      0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:18265      0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:8989       0.0.0.0:*               LISTEN      
+tcp        0      0 127.0.0.1:65535         0.0.0.0:*               LISTEN      
+tcp        0      0 192.168.1.10:1024       192.168.1.10:32772      ESTABLISHED 
+tcp        0      0 192.168.1.10:1024       192.168.1.10:32774      ESTABLISHED 
+tcp        0      0 192.168.1.10:8989       192.168.1.10:32771      ESTABLISHED 
+tcp        0      0 192.168.1.10:8989       192.168.1.10:32770      ESTABLISHED 
+tcp        0      0 192.168.1.10:8989       192.168.1.10:32769      ESTABLISHED 
+tcp        0      0 192.168.1.10:8989       192.168.1.10:32768      ESTABLISHED 
+tcp        0      0 192.168.1.10:32772      192.168.1.10:1024       ESTABLISHED 
+tcp        0      0 192.168.1.10:32774      192.168.1.10:1024       ESTABLISHED 
+tcp        0      0 192.168.1.10:32770      192.168.1.10:8989       ESTABLISHED 
+tcp        0      0 192.168.1.10:32771      192.168.1.10:8989       ESTABLISHED 
+tcp        0      0 192.168.1.10:32768      192.168.1.10:8989       ESTABLISHED 
+tcp        0      0 192.168.1.10:32769      192.168.1.10:8989       ESTABLISHED 
+Active UNIX domain sockets (servers and established)
+Proto RefCnt Flags       Type       State         I-Node Path
+unix  4      [ ]         DGRAM                    944    /dev/log
+unix  3      [ ]         STREAM     CONNECTED     3008   
+unix  3      [ ]         STREAM     CONNECTED     3007   
+unix  3      [ ]         STREAM     CONNECTED     2970   
+unix  3      [ ]         STREAM     CONNECTED     2969   
+unix  2      [ ]         STREAM     CONNECTED     2966   
+unix  3      [ ]         STREAM     CONNECTED     2963   
+unix  3      [ ]         STREAM     CONNECTED     2962   
+unix  3      [ ]         STREAM     CONNECTED     2219   
+unix  3      [ ]         STREAM     CONNECTED     2218   
+unix  2      [ ]         DGRAM                    1370   
+unix  2      [ ]         DGRAM                    952    
+
+------------------------
+arp -a
+------------------------
+? (192.168.1.1) at 00:50:56:C0:00:01 [ether] on eth0
+
+==============================================
+Source File versions
+==============================================
+
+------------------------
+fw
+------------------------
+
+------------------------
+modules
+------------------------
+
+==============================================
+Checksum report
+==============================================
+
+------------------------
+/opt/CPsuite-R61/fw1/bin/fw
+------------------------
+55073    37
+
+------------------------
+/etc/fw.boot/modules/fwmod.2.2.x.o
+------------------------
++=========+=========+  stderr +=========+=========+
+/usr/bin/sum: /etc/fw.boot/modules/fwmod.2.2.x.o: No such file or directory
+
++=========+=========+=========+=========+=========+
+
+==============================================
+FireWall-1 Status
+==============================================
+Local host is not a FireWall-1 module
+
+------------------------
+Corrent Turbocard Information
+------------------------
+
+SecureXL Turbocard (Corrent S3500) Driver Versions
+==================================================
+  SecureXL Turbocard (Corrent S3500) RPM : s3500-2.1.0-35
+  CR7120 Driver      : 
+  CRCPSW             : 
+  NPCPSW             : 
+  NPBootloader       : 
+  NPU RunTime Imag   : 
+  S3500 NIC Driver   : 
+
+Status of NPU Sync Driver
+  crsync_status = 
+  crsyncdrvr_md5 OK...Installed and Recorded MD5 Sums match
+  crsyncdrvr_smp_md5 OK...Installed and Recorded MD5 Sums match
+
+Status of CR7120 Driver
+  cr7120_version = 
+  cr7120_md5 OK...Installed and Recorded MD5 Sums match
+  cr7120_smp_md5 OK...Installed and Recorded MD5 Sums match
+
+Status of CRCPSW
+  crcpsw_version = 
+  crcpsw_md5 OK...Installed and Recorded MD5 Sums match
+  crcpsw_smp_md5 OK...Installed and Recorded MD5 Sums match
+
+Status of NPCPSW
+  crnpcpsw_version = 
+  crnpcpsw_md5 OK...Installed and Recorded MD5 Sums match
+  crnpcpsw_smp_md5 OK...Installed and Recorded MD5 Sums match
+Status of NPBootloader
+  crnpbootldr_version = 
+Status of NPU RunTime Image
+  crnpruntime_version = 
+
+Status of NIC
+  crnic_version = 
+  crnic_md5 OK...Installed and Recorded MD5 Sums match
+  crnic_smp_md5 OK...Installed and Recorded MD5 Sums match
+
+SecureXL Turbocard (Corrent S3500) Driver Stats
+==================================================
+
+------------
+
+------------
+
+------------
+
+------------
+
+------------
+
+/proc/meminfo:
+        total:    used:    free:  shared: buffers:  cached:
+Mem:  523993088 124264448 399728640        0  6930432 77119488
+Swap: 1069277184        0 1069277184
+MemTotal:       511712 kB
+MemFree:        390360 kB
+MemShared:           0 kB
+Buffers:          6768 kB
+Cached:          75312 kB
+SwapCached:          0 kB
+Active:          87120 kB
+ActiveAnon:      29020 kB
+ActiveCache:     58100 kB
+Inact_dirty:     20400 kB
+Inact_laundry:    3580 kB
+Inact_clean:         0 kB
+Inact_target:    22220 kB
+HighTotal:           0 kB
+HighFree:            0 kB
+LowTotal:       511712 kB
+LowFree:        390360 kB
+SwapTotal:     1044216 kB
+SwapFree:      1044216 kB
+HugePages_Total:     0
+HugePages_Free:      0
+Hugepagesize:     4096 kB
+/proc/grub.conf
+# grub.conf generated by anaconda
+#
+# Note that you do not have to rerun grub after making changes to this file
+# NOTICE:  You have a /boot partition.  This means that
+#          all kernel and initrd paths are relative to /boot/, eg.
+#          root (hd0,0)
+#          kernel /vmlinuz-version ro root=/dev/hda2
+#          initrd /initrd-version.img
+#boot=/dev/sda
+default=0
+timeout=10
+menutitle=Provider-1/SiteManager-1 NGX R61
+background 777777
+serial --unit=0 --speed=9600 --word=8 --parity=no --stop=1
+terminal --silent --timeout=5 console serial
+password --md5 $1$iho6qyOb$j5v9s/3QJb/lCbGRhrYLE.
+splashimage=(hd0,0)/grub/splash.xpm.gz
+
+title Start in normal mode
+	root (hd0,0)
+	kernel /vmlinuz ro root=LABEL=/ console=SERIAL 3
+	initrd /initrd
+
+title Start in maintenance mode
+	lock
+	root (hd0,0)
+	kernel /vmlinuz ro root=LABEL=/ console=CURRENT debug 7 single
+	initrd /initrd
+
+title Start in debug mode
+	root (hd0,0)
+	kernel /vmlinuz ro root=LABEL=/ console=CURRENT kdb=on 3
+	initrd /initrd
+
+title Snapshot Image Management
+	lock
+	root (hd0,0)
+	configfile /grub/submenus/snapshots.lst
++=========+=========+  stderr +=========+=========+
+cat: /proc/net/s3500/cr7120_version: No such file or directory
+cat: /proc/net/s3500/crcpsw_version: No such file or directory
+cat: /proc/net/s3500/crnpcpsw_version: No such file or directory
+cat: /proc/net/s3500/crnpbootldr_version: No such file or directory
+cat: /proc/net/s3500/crnpruntime_version: No such file or directory
+cat: /proc/net/s3500/crnic_version: No such file or directory
+cat: /proc/net/s3500/crsync_status: No such file or directory
+cat: /proc/net/s3500/cr7120_version: No such file or directory
+cat: /proc/net/s3500/crcpsw_version: No such file or directory
+cat: /proc/net/s3500/crnpcpsw_version: No such file or directory
+cat: /proc/net/s3500/crnpbootldr_version: No such file or directory
+cat: /proc/net/s3500/crnpruntime_version: No such file or directory
+cat: /proc/net/s3500/crnic_version: No such file or directory
+cat: /proc/net/s3500/stats/debug: No such file or directory
+cat: /proc/net/s3500/stats/discard: No such file or directory
+cat: /proc/net/s3500/stats/ipsec: No such file or directory
+cat: /proc/net/s3500/stats/notif: No such file or directory
+cat: /proc/net/s3500/stats/port: No such file or directory
+
++=========+=========+=========+=========+=========+
+
+==============================================
+Overlapping Encryption Domains
+==============================================
+
+------------------------
+Traditional Overlapping Encryption Domains
+------------------------
+
+------------------------
+Communities Overlapping Encryption Domains
+------------------------
+
+==============================================
+CPmad version informaton
+==============================================
+
+Check Point Malicious Activity Detection Version NGX (R61) - Build 101
+
+==============================================
+Package Repository Information
+==============================================
+
+Vendor          Product              Version    OS                   Minor Version
+----------------------------------------------------------------------------------
+
+==============================================
+CP License
+==============================================
+Host             Expiration  Features            
+
+
+
+======================================================================
+ Check Point product trial period will expire in 6 days.
+ Until then, you will be able to use the complete Check Point Product Suite.
+ Please obtain a permanent license from Check Point User Center at:
+ https://usercenter.checkpoint.com/pub/usercenter/get_started.html
+======================================================================
+
+==============================================
+FloodGate-1 Information
+==============================================
+
+------------------------
+FloodGate-1 Version Information
+------------------------
+This is Check Point FloodGate-1(TM) NGX (R61) - Build 108
++=========+=========+  stderr +=========+=========+
+ Failed to obtain kernel build information: Operation not permitted
+
++=========+=========+=========+=========+=========+
+
+------------------------
+FloodGate-1 Fetch
+------------------------
++=========+=========+  stderr +=========+=========+
+No QoS Policy file to fetch.
+
++=========+=========+=========+=========+=========+
+

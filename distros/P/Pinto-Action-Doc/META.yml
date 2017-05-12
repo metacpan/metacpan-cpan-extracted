@@ -1,0 +1,27 @@
+---
+abstract: 'Generate html docs from the dists in a stack'
+author:
+  - 'Andy Gorman <agorman@cpan.org>'
+build_requires:
+  File::DirCompare: 0
+  File::Spec: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pinto-Action-Doc
+requires:
+  Pinto: 0.090
+  Pod::ProjectDocs: 0.40
+resources:
+  bugtracker: https://github.com/agorman/Pinto-Action-Doc/issues
+  repository: git://github.com/agorman/Pinto-Action-Doc.git
+version: 0.004

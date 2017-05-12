@@ -1,0 +1,151 @@
+NAME
+    Property::Lookup - Object property lookup across multiple layers
+
+VERSION
+    version 1.101400
+
+SYNOPSIS
+        use Property::Lookup;
+
+        my %opt;
+        GetOptions(\%opt, '...');
+
+        my $config = Property::Lookup->new;
+        $config->add_layer(file => 'conf.yaml');
+        $config->add_layer(hash => \%opt);
+        $config->default_layer({
+            foo => 23,
+        });
+
+        my $foo = $config->foo;
+
+        # ...
+
+        use Property::Lookup::Local;
+        local %Property::Lookup::Local::opt = (bar => 'baz');
+
+DESCRIPTION
+    This module provides a way to look up an object property in a layer of
+    objects. The user can define various layers; when the user asks this
+    main object to look up a key, it will ask each layer in turn whether it
+    has a value for the given key. When a layer responds, that answer will
+    be returned to the user and no more layers will be asked.
+
+    This is useful in application configuration. Suppose you have a
+    configuration file, which is your primary mechanism for configuring the
+    application. But the user should also be able to override individual
+    values using command line arguments. And even if a key is found neither
+    on the command line nor in the configuration file, you want to provide a
+    default.
+
+    This scenario is easy to implement with this module.
+
+    Because application configuration is the primary intended use, this
+    module is a singleton.
+
+METHODS
+  new
+    Creates the singleton object.
+
+  instance
+    Synonymous for "new".
+
+  init
+    Called when the object is constructed, it initializes the local and
+    default layers.
+
+  local_layer
+        local %Property::Lookup::Local::opt = (bar => 'baz');
+
+    This is initialized as a Property::Lookup::Local object. It can be used
+    to temporarily override lookup values; if you use "local", the values
+    will automatically forgotten at the end of the current scope. When a
+    property is looked up via "AUTOLOAD", this layer is always checked
+    first.
+
+  default_layer
+        my $config = Property::Lookup->new;
+        $config->default_layer({ foo => 42 });
+
+    This is initialized as a Property::Lookup::Hash object. It can be used
+    to set default values. When a property is looked up via "AUTOLOAD", this
+    layer is always checked last.
+
+  add_layer
+    This method adds a layer to the singleton lookup object. The first
+    argument determines which kind of layer is added; the rest are arguments
+    passed to the layer. The first argument can be "file" to construct a
+    file lookup layer, or "hash" to construct a hash lookup layer.
+
+        my $config = Property::Lookup->new;
+        $config->add_layer(file => 'conf.yaml');
+
+    With "file", a layer of class Property::Lookup::File is constructed. The
+    second argument is the name of the YAML file from which values are
+    taken.
+
+        my $config = Property::Lookup->new;
+        $config->add_layer(hash => \%opt);
+
+    With "hash", a layer of class Property::Lookup::Hash is constructed. The
+    second argument is the name of the YAML file from which values are
+    taken.
+
+    If the layer-specific arguments are wrong, or the layer type is not one
+    of the names given above, an exception occurs.
+
+  get_layers
+    Returns the list of layer objects. The local layer is special; it always
+    comes first, no matter which layers have been specified. Likewise for
+    the default layer, which always comes last.
+
+  get_config
+    This method calls "get_config()" on all layers and accumulates the data
+    in a hash, which is then returned. The individual "get_config()" methods
+    are supposed to return the data with which a layer was configured with:
+    The options hash for the "Local" layer; the hash for a Hash layer.
+
+  AUTOLOAD
+    Determines which method was called, then asks every layer in turn. It
+    returns the first defined answer it finds. The local layer is special -
+    it always comes first, no matter which layers have been specified.
+    Likewise for the default layer, which always comes last.
+
+  DEFAULTS
+    This accessor is used by Class::Accessor::Constructor. It is defined as
+    an empty list here so "AUTOLOAD" won't try to handle it.
+
+  FIRST_CONSTRUCTOR_ARGS
+    This accessor is used by Class::Accessor::Constructor. It is defined as
+    an empty list here so "AUTOLOAD" won't try to handle it.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Property-Lookup>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Property-Lookup/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Property-Lookup/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2009 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

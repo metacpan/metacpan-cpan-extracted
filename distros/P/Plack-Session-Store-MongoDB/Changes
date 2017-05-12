@@ -1,0 +1,22 @@
+Revision history for Plack-Session-Store-MongoDB
+
+1.000000  2014-04-01 00:46:23+03:00 Asia/Jerusalem
+	- Checking if MongoDB version is v0.502.0 or higher and using
+	  MongoDB::MongoClient instead of MongoDB::Connection if so.
+
+0.4       2012-11-19 01:33:51 Asia/Jerusalem
+	- Now allows passing a MongoDB::Connection object instead of having
+	  the module creating one by itself (older behavior still available
+	  though)
+
+0.3       2011-02-02 01:10:02 Asia/Jerusalem
+	- Now allows passing options to MongoDB::Connection's new() method
+	- BACKWORDS COMPATIBILITY BROKEN: the 'db_name' option for new()
+	  is changed to 'session_db_name'. Read the note in the new()
+	  method's documentation.
+
+0.2       2010-09-15 17:05:19 Asia/Jerusalem
+	- Fixed bug causing test modules to be listed as prereqs, thus causing tests to fail
+
+0.1       2010-08-10 20:42:20 Asia/Jerusalem
+	- initial release

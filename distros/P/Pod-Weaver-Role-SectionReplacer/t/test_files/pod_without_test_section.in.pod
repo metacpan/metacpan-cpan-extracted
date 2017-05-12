@@ -1,0 +1,7 @@
+=pod
+
+=head1 NO TEST SECTION
+
+This is the pod without any test section.
+
+=cut

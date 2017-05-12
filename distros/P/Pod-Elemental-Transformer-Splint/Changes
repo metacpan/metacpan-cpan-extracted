@@ -1,0 +1,74 @@
+Revision history for Pod-Elemental-Transformer-Splint
+
+0.1201 2016-02-03T10:27:59Z UTC
+ [Documentation]
+ - Remove empty section.
+
+ [Requirements]
+ - Require List::Util+List::MoreUtils instead of List::AllUtils.
+
+0.1200 2016-02-02T21:11:41Z UTC
+ [Requirements]
+ - Now works 5.10+ (skips tests that require 5.14).
+ - Kavorka::TraitFor::Parameter::doc downgraded from recommends to
+   suggests.
+
+0.1100 2016-01-12T22:17:40Z UTC
+ [API Changes]
+ - Breaking change: html_attribute_renderer is replaced by
+   attribute_renderer.
+ - Breaking change: html_method_renderer is replaced by method_renderer.
+
+ [Documentation]
+ - Document weaver.ini configuration options.
+
+ [New Features]
+ - The new render settings in weaver.ini makes it possible to render to
+   many formats.
+
+ [Other Changes]
+ - ::HtmlRenderer: Minor improvements to rendered html.
+
+ [Requirements]
+ - New prereq: Module::Load
+ - New prereq: Types::Standard
+ - New prereq: Ref::Util
+
+0.1003 2016-01-11T21:39:31Z UTC
+ [Other Changes]
+ - Converted to use latest Dist::Iller::Config::Author::CSSON
+
+0.1002 2015-01-18T00:37:18Z CET
+ [Enhancements]
+ - Improved the order that attributes are rendered.
+ - Improve output for method parameters that are hash or array refs, and
+   have a default value.
+ - Ensure whitespace before [ in type definitions for better legibility.
+ - AttributeRenderer/HtmlDefault: Add a note if an attribute is not
+   available in the constructor.
+ - MethodRenderer/HtmlDefault: Use (mildly) different colours in the three
+   headings
+
+ [New Features]
+ - (Undocumented feature: ':splint methods' will try to render metadata on
+   all methods.)
+
+ [Requirements]
+ - Added new requirements List::UtilsBy and Try::Tiny.
+ - Bump required version of Syntax-Feature-Qs to 0.2003.
+
+0.1001 2015-01-14T03:06:07Z CET
+ [Documentation]
+ - Fixed Moops class example.
+
+ [Enhancements]
+ - Uses 'pseudo colspan'. Metacpan seem to remove colspan attributes.
+
+ [Meta]
+ - Fixed test prereqs.
+ - Fixed no-op test to actually test.
+ - Setup build on travis.
+
+0.1000 2015-01-14T00:58:31Z CET
+ - Initial release
+

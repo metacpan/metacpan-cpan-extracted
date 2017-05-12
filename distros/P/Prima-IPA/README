@@ -1,0 +1,41 @@
+DESCRIPTION
+===========
+
+IPA stands for Image Processing Algorithms and represents the library of image
+processing operators and functions.  IPA is based on the Prima toolkit (
+http://www.prima.eu.org ), which in turn is a perl-based graphic library. IPA
+is designed for solving image analysis and object recognition tasks with perl.
+
+SOURCE DISTRIBUTION INSTALLATION
+================================
+
+Create a makefile by running Makefile.PL using perl
+and then run make:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+MORE INFORMATION
+================
+
+Visit http://www.prima.eu.org/IPA for the recent versions
+of the library. The mailing list on the library is avialable,
+you can ask questions there. See the homepage for details.
+
+COPYRIGHT AND LICENSE
+=====================
+
+(c) 1997-2002 The Protein Laboratory, University of Copenhagen
+(c) 2003-2009 Dmitry Karasik
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+AUTHORS
+=======
+
+Anton Berezin  <tobez@tobez.org>
+Vadim Belman   <voland@lflat.org>
+Dmitry Karasik <dmitry@karasik.eu.org>

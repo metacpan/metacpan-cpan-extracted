@@ -1,0 +1,59 @@
+PostScript-LabelSheet
+
+This module generates PostScript code to layout duplicate labels on a sheet of
+paper. It can be used to print labels for jars of marmelade, or tickets for an
+event. The design of a single label should be provided as an Encapsulated
+PostScript file, and can be generated from an SVG design with the help of
+Inkscape. Given the size of the sheet, the desired number of columns and rows,
+the module calculates the scale and position of each label on the sheet. 
+
+There is also a possibility to print numbered labels.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc PostScript::LabelSheet
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=PostScript-LabelSheet
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/PostScript-LabelSheet
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/PostScript-LabelSheet
+
+    Search CPAN
+        http://search.cpan.org/dist/PostScript-LabelSheet/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Cédric Bouvier
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,335 @@
+<HTML>
+<HEAD>
+<TITLE>PDF::TableXMoose driven table generation module that is uses famous PDF::API2</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff" TEXT="#000000">
+<UL>
+<LI><A HREF="#NAME">NAME
+
+</A><LI><A HREF="#VERSION">VERSION
+
+</A><LI><A HREF="#SYNOPSIS">SYNOPSIS
+
+</A><LI><A HREF="#ATTRIBUTES">ATTRIBUTES
+
+</A><UL>
+<LI><A HREF="#Style%20Definitions">Style Definitions
+
+</A><LI><A HREF="#Placing%20%26%20Behaviour">Placing &amp; Behaviour
+
+</A></UL>
+<LI><A HREF="#METHODS">METHODS
+
+</A><UL>
+<LI><A HREF="#cycle_background_color">cycle_background_color
+
+</A></UL>
+<LI><A HREF="#EXTENDING%20THE%20MODULE">EXTENDING THE MODULE
+
+</A><LI><A HREF="#AUTHOR">AUTHOR
+
+</A><LI><A HREF="#BUGS">BUGS
+
+</A><LI><A HREF="#SUPPORT">SUPPORT
+
+</A><LI><A HREF="#ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS
+
+
+</A><LI><A HREF="#COPYRIGHT%20%26%20LICENSE">COPYRIGHT &amp; LICENSE
+
+</A></UL>
+<HR>
+<H1><A NAME="NAME">NAME
+
+</A></H1>
+
+<P>PDF::TableXMoose driven table generation module that is uses famous PDF::API2
+
+</P><H1><A NAME="VERSION">VERSION
+
+</A></H1>
+
+<P>Version 0.01
+
+
+</P><H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1>
+
+<P>The module provides capabilities to create tabular structures in PDF files.
+It is similar to PDF::Table module, however extends its functionality adding OO
+interface and allowing placement of any element inside table cell such as image,
+another pdf, or nested table.
+
+</P>
+<P>Sample usage:
+
+</P>
+<PRE>	use PDF::API2;
+	use PDF::TableX;
+
+	my $pdf		= PDF::API2-&gt;new();
+	my $table = PDF::TableX-&gt;new(40,40);     # create 40 x 40 table
+	$table
+		-&gt;padding(3)                           # set padding for cells
+		-&gt;border_width(2)                      # set border width
+		-&gt;border_color('blue');                # set border color
+	$table[0][0]-&gt;content(&quot;Sample text&quot;);    # place &quot;Sample text&quot; in cell 0,0 (first cell in first row)
+	$table[0][1]-&gt;content(&quot;Some other text&quot;; # place &quot;Some other text&quot; in cell 0,1
+	$table-&gt;draw($pdf, 1);                   # place table on the first page of pdf
+
+	$pdf-&gt;save_as('some/file.pdf');</PRE>
+<H1><A NAME="ATTRIBUTES">ATTRIBUTES
+
+</A></H1>
+
+<P>All attributes when set return $self allowing chaining of the calls.
+
+</P><H2><A NAME="Style%20Definitions">Style Definitions
+
+</A></H2>
+
+<P>Following attributes take as argument either array reference with four values describing the style
+in each cell side in followin order [TOP, RIGHT, BOTTOM, LEFT]. Alternatively a scalar value can be
+provided in which case it is coerced to ARRAY REF
+
+</P><DL><DT><A NAME="*%20padding%20%3d%3e%20%5b1%2c1%2c1%2c1%5d">* padding =&gt; [1,1,1,1]
+
+</A></DT>
+<DD>
+
+<PRE>	# set padding for all cells
+	$table-&gt;padding(2);
+	# the same as
+	$table-&gt;paddin([2,2,2,2]);
+	# set padding of the first row
+	$table-&gt;[0]-&gt;padding(4);
+	# set padding of the first column
+	$table-&gt;col(0)-&gt;padding(4);
+	# set padding of single cell
+	$table-&gt;[0][0]-&gt;padding(2);</PRE>
+</DD>
+<DT><A NAME="*%20border_width%20%3d%3e%20%5b1%2c1%2c1%2c1%5d">* border_width =&gt; [1,1,1,1]
+
+</A></DT>
+<DD>
+
+<PRE>	$table-&gt;border_width(2);
+	$table-&gt;border_width([2,3,4,5]);</PRE>
+</DD>
+<DT><A NAME="*%20border_color%20%3d%3e%20%5b'black'%2c'black'%2c'black'%2c'black'%5d">* border_color =&gt; ['black','black','black','black']
+
+</A></DT>
+<DD>
+
+<PRE>	$table-&gt;border_color('red');
+	$table-&gt;border_color(['#cccccc','white','green','blue']);</PRE>
+</DD>
+<DT><A NAME="*%20border_style%20%3d%3e%20%5b'solid'%2c'solid'%2c'solid'%2c'solid'%5d">* border_style =&gt; ['solid','solid','solid','solid']
+
+</A></DT>
+<DD>
+Currently the only supported style is 'solid'.
+
+</DD>
+<DT><A NAME="*%20margin%20%3d%3e%20%5b10%2f25.4*72%2c10%2f25.4*72%2c10%2f25.4*72%2c10%2f25.4*72%5d">* margin =&gt; [10/25.4*72,10/25.4*72,10/25.4*72,10/25.4*72]
+
+</A></DT>
+<DD>
+
+<P>Margin is used currently to determine the space between top and bottom of the page.
+
+</P>
+<PRE>	$table-&gt;margin(20);
+	$table-&gt;margin([20,10,10,2]);</PRE>
+</DD>
+</DL>
+
+<P>Following attributes require single value.
+
+</P><DL><DT><A NAME="*%20background_color%20%3d%3e%20''">* background_color =&gt; ''
+
+</A></DT>
+<DD>
+
+<PRE>	$table-&gt;background_color('blue');
+		
+</PRE>
+</DD>
+<DT><A NAME="*%20text_align%20%3d%3e%20'left'">* text_align =&gt; 'left'
+
+</A></DT>
+<DD>
+
+<P>Allowed values are: 'left', 'right', 'center', 'justify'
+
+</P>
+<PRE>	# set text align in whole table
+	$table-&gt;text_align('left');
+	# set text align in single row
+	$table-&gt;[0]-&gt;text_align('left');
+	# set text align in single column
+	$table-&gt;col(0)-&gt;text_align('left');</PRE>
+</DD>
+<DT><A NAME="*%20font%20%3d%3e%20'Times'">* font =&gt; 'Times'
+
+</A></DT>
+<DD>
+
+<P>Allowed values are the names of PDF::API2 corefonts: Courier, Courier-Bold, Courier-BoldOblique,
+Courier-Oblique, Helvetica, Helvetica-Bold, Helvetica-BoldOblique, Helvetica-Oblique, Symbol,
+Times-Bold, Times-BoldItalic, Times-Italic, Times-Roman, ZapfDingbats
+
+</P>
+<PRE>	$table-&gt;font('ZapfDingbats');</PRE>
+</DD>
+<DT><A NAME="*%20font_color%20%3d%3e%20'black'">* font_color =&gt; 'black'
+
+</A></DT>
+<DD>
+
+<PRE>	$table-&gt;font_color('green');</PRE>
+</DD>
+<DT><A NAME="*%20font_size%20%3d%3e%2012">* font_size =&gt; 12
+	
+</A></DT>
+<DD>
+
+<PRE>	$table-&gt;font_size(10);
+	
+</PRE>
+</DD>
+</DL>
+<H2><A NAME="Placing%20%26%20Behaviour">Placing &amp; Behaviour
+
+</A></H2>
+
+<P>Following attributes control placing of the table and its behaviour
+
+
+</P><DL><DT><A NAME="*%20width%20-%20width%20of%20the%20table">* width - width of the table
+
+</A></DT>
+<DD>
+</DD>
+<DT><A NAME="*%20start_x%20-%20x%20position%20of%20the%20table">* start_x - x position of the table
+
+</A></DT>
+<DD>
+</DD>
+<DT><A NAME="*%20start_y%20-%20y%20position%20of%20the%20table">* start_y - y position of the table
+
+</A></DT>
+<DD>
+</DD>
+<DT><A NAME="*%20rows%20-%20number%20of%20table%20rows">* rows - number of table rows
+
+</A></DT>
+<DD>
+</DD>
+<DT><A NAME="*%20cols%20-%20number%20of%20table%20columns">* cols - number of table columns
+
+</A></DT>
+<DD>
+</DD>
+<DT><A NAME="*%20repeat_header%20-%20shall%20the%20header%20be%20repeated%20on%20every%20new%20page%20(default%20is%200%2c%20set%201%20to%20repeat)">* repeat_header - shall the header be repeated on every new page (default is 0, set 1 to repeat)
+
+</A></DT>
+<DD>
+</DD>
+</DL>
+<H1><A NAME="METHODS">METHODS
+
+</A></H1>
+<H2><A NAME="cycle_background_color">cycle_background_color
+
+</A></H2>
+
+<P>Set the background colors of rows. The method takes the list of colors and applies them to
+subsequent rows. There is no limit to style e.g. only in odd/even fashio.
+
+</P>
+<PRE>	# set odd and even background colors to black and white
+	$table-&gt;cycle_background_color('black','white');
+
+	# set the background color of rows to cycle with three colors: black, white, red
+	$table-&gt;cycle_background_color('black','white','red');</PRE>
+<H1><A NAME="EXTENDING%20THE%20MODULE">EXTENDING THE MODULE
+
+</A></H1>
+
+<P>PDF::TableX uses Moose::Role(s) to define the styles and placing of the table. They can be 
+relatively extended providing capabilites beyond those already available. Below code snipped
+creates the role that uses elliptical background shape instead of rectangle.
+
+</P>
+<PRE>	package EllipsedBackground;
+	use Moose::Role;
+
+	sub draw_background {
+		my ($self, $x, $y, $gfx, $txt) = @_;
+		$gfx-&gt;linewidth(0);
+		$gfx-&gt;fillcolor('yellow');
+		$gfx-&gt;ellipse($x+$self-&gt;width/2, $y-$self-&gt;height/2, $self-&gt;width/2, $self-&gt;height/2);
+		$gfx-&gt;fill();
+	}
+
+	use Moose::Util qw( apply_all_roles );
+	use PDF::TableX;
+	use PDF::API2;
+
+	my $table = PDF::TableX-&gt;new(2,2);
+	my $pdf		= PDF::API2-&gt;new();
+	$pdf-&gt;mediabox('a4');
+
+	# set some styles
+	$table-&gt;padding(10)-&gt;border_width(1)-&gt;text_align('center');
+
+	# apply moose roles to specific cells
+	apply_all_roles( $table-&gt;[0][0], 'ElipsedBackground' );
+	apply_all_roles( $table-&gt;[0][1], 'ElipsedBackground' );
+
+	# set some content to those roles
+	$table-&gt;[0][0]-&gt;content(&quot;Some text&quot;);
+	$table-&gt;[0][1]-&gt;content(&quot;Some other text&quot;);
+
+	# and finally draw it
+	$table-&gt;draw($pdf, 1);
+	# and save it
+	$pdf-&gt;saveas('some/output.pdf');</PRE>
+<H1><A NAME="AUTHOR">AUTHOR
+
+</A></H1>
+
+<P>Grzegorz Papkala, <CODE>&lt;grzegorzpapkala at gmail.com&gt;</CODE>
+
+</P><H1><A NAME="BUGS">BUGS
+
+</A></H1>
+
+<P>Please report any bugs or feature requests at: <A HREF="https://github.com/grzegorzpapkala/PDF-TableX/issues">https://github.com/grzegorzpapkala/PDF-TableX/issues</A>
+
+</P><H1><A NAME="SUPPORT">SUPPORT
+
+</A></H1>
+
+<P>PDF::TableX is hosted on GitHub <A HREF="https://github.com/grzegorzpapkala/PDF-TableX">https://github.com/grzegorzpapkala/PDF-TableX</A>
+
+
+</P><H1><A NAME="ACKNOWLEDGEMENTS">ACKNOWLEDGEMENTS
+
+
+</A></H1>
+<H1><A NAME="COPYRIGHT%20%26%20LICENSE">COPYRIGHT &amp; LICENSE
+
+</A></H1>
+
+<P>Copyright 2013 Grzegorz Papkala, all rights reserved.
+
+</P>
+<P>This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+</P>
+</BODY>
+</HTML>

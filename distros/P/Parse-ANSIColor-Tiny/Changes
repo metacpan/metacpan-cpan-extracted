@@ -1,0 +1,35 @@
+Revision history for Parse-ANSIColor-Tiny
+
+0.600     2016-04-25T04:38:24Z
+
+  - Add support for 256 colors.
+    Thanks to Dmitry Fedin for the pull request! (gh-1)
+
+0.501     2014-03-16T01:28:17Z
+
+  - Improve parsing (removal) of non-color escapes.
+  - More tests.
+
+0.500     2014-03-16T00:23:43Z
+
+  [Backward Incompatible Changes]
+  - By default escape sequences not relating to colors are removed.
+    This can be disabled with a constructor argument.
+  - Process 39/49 as foreground/background reset.
+
+0.400     2011-11-19T18:11:12Z
+
+  [Enhancements]
+  - Add 'auto_reverse' option
+  - Add colors(), foreground_colors(), and background_colors()
+
+  [Fixes]
+  - Treat empty sequences as 0 (clear)
+  - Limit exports to @EXPORT_OK rather than any sub
+  - Localize $_ before using map
+  - Turn reverse off with esc code 27
+  - More tests
+
+0.302     2011-11-14T18:34:58Z
+
+  - Initial release

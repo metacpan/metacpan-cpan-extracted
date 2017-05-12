@@ -1,0 +1,47 @@
+
+=pod
+
+=head1 COOKBOOK
+
+This document is  a work in progress.
+
+=head1 DESCRIPTION
+
+=head2 Writting good Pbsfiles
+
+=head3 Planning your work
+
+=head3 Hierarchical builds
+
+=head3 Configuration
+
+=head3 Separating your rules
+
+=head3 Refactoring
+
+=head2 Working with windows
+
+=head2 Language specific
+
+=head3 C
+
+=head3 Java
+
+The java examples were written by Ulf Olsson. It's suprizing to see how a modern language can
+be so complex to handle in a build system. More surprizing were the , rather dumb, tools used.
+
+=head4 Java class
+
+=head4 Java jar
+
+=head4 Java jni
+
+=head3 Generated C files
+
+=head3 Swig wrappers
+
+=head3 Flex
+
+=cut
+
+

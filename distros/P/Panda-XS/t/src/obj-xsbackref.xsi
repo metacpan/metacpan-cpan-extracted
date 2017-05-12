@@ -1,0 +1,107 @@
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::PTRBRUnit
+PROTOTYPES: DISABLE
+
+PTRBRUnit* PTRBRUnit::new (int id) {
+    RETVAL = new BRUnit(id);
+}
+
+PTRBRUnit* new_enabled (SV* CLASS, int id) {
+    RETVAL = new BRUnitEnabled(id);
+}
+
+int PTRBRUnit::id (SV* newval = NULL) {
+    if (newval) THIS->id = SvIV(newval);
+    RETVAL = THIS->id;
+}
+
+void PTRBRUnit::DESTROY ()
+
+
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::BRUnit
+PROTOTYPES: DISABLE
+
+BRUnit* BRUnit::new (int id) {
+    RETVAL = new BRUnit(id);
+}
+
+BRUnit* new_enabled (SV* CLASS, int id) {
+    RETVAL = new BRUnitEnabled(id);
+}
+
+uint64_t BRUnit::br_addr () {
+    xs::XSBackref* xsbr = panda::dyn_cast<xs::XSBackref*>(THIS);
+    if (!xsbr) croak("no xsbr");
+    RETVAL = (uint64_t)xsbr->perl_object;
+}
+
+int BRUnit::rcnt_c () {
+    RETVAL = THIS->refcnt();
+}
+
+int BRUnit::rcnt_sv () {
+    xs::XSBackref* xsbr = panda::dyn_cast<xs::XSBackref*>(THIS);
+    if (!xsbr) croak("no xsbr");
+    //printf("xsbr=%llu\n", xsbr);
+    RETVAL = SvREFCNT(xsbr->perl_object);
+}
+
+int BRUnit::id (SV* newval = NULL) {
+    if (newval) THIS->id = SvIV(newval);
+    RETVAL = THIS->id;
+}
+
+void BRUnit::DESTROY () {
+    //printf("BRUnit::DESTROY id=%d\n", THIS->id);
+}
+
+
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::PTRBRStorage
+PROTOTYPES: DISABLE
+
+PTRBRStorage* PTRBRStorage::new () {
+    RETVAL = new BRStorage();
+}
+
+PTRBRUnit* PTRBRStorage::unit (PTRBRUnit* unit = NULL) {
+    if (items > 1) {
+        THIS->set_unit(unit);
+        XSRETURN_UNDEF;
+    }
+    const char* CLASS = "Panda::XS::Test::PTRBRUnit";
+    RETVAL = THIS->get_unit();
+}
+
+void PTRBRStorage::set_unit_with_id (int id) {
+    THIS->set_unit_with_id(id);
+}
+
+void PTRBRStorage::DESTROY ()
+
+
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::BRStorage
+PROTOTYPES: DISABLE
+
+BRStorage* BRStorage::new () {
+    RETVAL = new BRStorage();
+}
+
+BRUnit* BRStorage::unit (BRUnit* unit = NULL) {
+    if (items > 1) {
+        THIS->set_unit(unit);
+        XSRETURN_UNDEF;
+    }
+    const char* CLASS = "Panda::XS::Test::BRUnit";
+    RETVAL = THIS->get_unit();
+}
+
+void BRStorage::set_unit_with_id (int id) : ALIAS(set_unit_with_id2=1) {
+    if (ix == 1) THIS->set_unit_with_id2(id);
+    else THIS->set_unit_with_id(id);
+}
+
+void BRStorage::DESTROY () {
+    //printf("BRStorage::DESTROY\n");
+}

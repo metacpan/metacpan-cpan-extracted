@@ -1,0 +1,26 @@
+lib/PBS/Client.pm
+bin/run
+bin/runrc
+t/command.sh
+t/command.t
+t/copy.t
+t/declare.sh
+t/declare.t
+t/io.t
+t/io.sh
+t/nodes_1.sh
+t/nodes_2.sh
+t/nodes.t
+t/pack.t
+t/resources_1.sh
+t/resources_2.sh
+t/resources_3.sh
+t/resources_4.sh
+t/resources.t
+t/use.t
+MANIFEST
+Changes
+Makefile.PL
+README
+INSTALL
+META.yml                                 Module meta-data (added by MakeMaker)

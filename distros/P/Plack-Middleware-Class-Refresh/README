@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Plack-Middleware-Class-Refresh,
+version 0.01:
+
+  Refresh your app classes with Class::Refresh before requests
+
+This software is copyright (c) 2011 by Jesse Luehrs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

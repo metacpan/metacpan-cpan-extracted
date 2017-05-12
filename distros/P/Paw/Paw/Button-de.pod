@@ -1,0 +1,94 @@
+=head1 Button Widget
+
+B<$button=Paw::Button::new([$color], [$name], [\&callback], [$label]);>
+
+B<Parameter>
+
+     $color   => Das Farbpaar (colorpair) muss mit
+                 Curses::init_pair(pair_nr, COLOR_fg, COLOR_bg)
+                 erzeugt werden[optional]
+
+     name     => Name des button [optional]
+
+     callback => Reference auf die Function die beim druecken des
+                 Button aufgerufen wird. [optional]
+
+     label    => Text in dem Button. Wenn der Button einen Text
+                 enthaelt, ist optisch nicht mehr feststellbar,
+                 ob der Button gedrueckt ist. [optional]
+
+B<Beispiel>
+
+     $button=Paw::Button::new(callback=>\&button_callback);
+
+B<Callback>
+
+Wird der Button betaetigt, so wird die Callback-Funktion angesprungen.
+
+     sub button_callback {
+         my $this = shift;             # Referenz to the button
+         
+         $data = $edit->get_text();
+         $box->add_row($data);
+         return;
+     }
+
+=head2 set_button()
+
+Setzt den Button in den definierten Zustand ``gedrueckt''.
+
+B<Beispiel>
+
+     $button->set_button();      # [x]
+
+=head2 release_button()
+
+Setzt den Button in den definierten Zustand ``nicht gedrueckt''
+
+B<Beispiel>
+
+     $button->release_button();      # [ ]
+
+=head2 push_button()
+
+Der Button wechselt seinen Zustand.
+
+B<Beispiel>
+
+     $button->push_button();      # [x]->[ ], [ ]->[x]
+
+=head2 abs_move_widget($new_x, $new_y)
+
+Das Widget verschiebt sich auf die neue absolute Schirm Position.
+Wird nur einer der Parameter angegeben, so behaelt der andere seinen Wert bei.
+
+B<Beispiel>
+
+     $button->abs_move_widget( new_x=>5 );      #y-pos bleibt wie sie ist
+
+=head2 get_widget_pos()
+
+Gibt ein Array mit den beiden Wertde (x-Position, y-Position) zurueck. 
+
+B<Beispiel>
+
+     ($xpos,$ypos)=$button->get_widget_pos();   
+
+=head2 set_color($color_pair)
+
+Setzt ein neues color_pair.
+
+B<Beispiel>
+
+     $button->set_color(3);
+
+=head2 set_border([``shade''])
+
+aktiviert den Rahmen der Box. Optional auch mit Schatten. 
+
+B<Beispiel>
+
+     $box->set_border("shade"); or $win->set_border();
+
+=cut
+

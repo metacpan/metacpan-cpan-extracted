@@ -1,0 +1,80 @@
+NAME
+    Parse::PhoneNumber - Parse Phone Numbers
+
+SYNOPSIS
+     use Parse::PhoneNumber;
+     my $number = Parse::PhoneNumber->parse( number => $phone );
+ 
+     print $number->human;
+
+ABSTRACT
+    Parse phone numbers. Phone number have a defined syntax (to a point), so
+    they can be parsed (to a point).
+
+DESCRIPTION
+  Methods
+   new
+    Create a new Parse::PhoneNumber object. Useful if a lot of numbers have
+    to be parsed.
+
+   parse
+    Accepts a list of arguments. "number" is the phone number. This method
+    will return "undef" and set "errstr" on failure. On success, a
+    "Parse::PhoneNumber::Number" object is returned. "assume_us" will have
+    the country code default to 1 if none is given. This is due to the fact
+    that most people in the US are clueless about such things.
+
+   errstr
+    Returns the last error reported, or undef if no errors have occured yet.
+
+  Parse::PhoneNumber::Number Objects
+    The objects returned on a successful parse.
+
+   orig
+    The original string passed to "parse".
+
+   cc
+    The Country Code
+
+   num
+    The phone number, including the trunk pointer, area code, and subscriber
+    number.
+
+   ext
+    An extension, if one is present.
+
+   opensrs
+    The format an OpenSRS Registrar must make a phone number for some TLDs.
+
+   human
+    Human readable format.
+
+BUGS
+    Currently only accept phone numbers in International format. If a number
+    isn't given in international format, a false positive could occur.
+
+    Please report bugs to the CPAN RT instance at
+    <https://rt.cpan.org/Dist/Display.html?Queue=Parse-PhoneNumber>
+
+SEE ALSO
+    Number::Phone
+
+AUTHOR
+    Casey West <casey@geeknest.com>
+
+    Maintained by Tim Wilde <cpan@krellis.org>
+
+COPYRIGHT
+    Copyright (c) 2003 Casey West <casey@geeknest.com>.
+
+    Portions Copyright (c) 2005 Dynamic Network Services, Inc.
+
+    Portions Copyright (c) 2011 Tim Wilde
+
+    Portions Copyright (c) 2012 Google, Inc.
+
+    All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

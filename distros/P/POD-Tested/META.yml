@@ -1,0 +1,32 @@
+---
+name: POD-Tested
+version: 0.06.4
+author:
+  - 'Khemir Nadim ibn Hamouda. <nadim@khemir.net>'
+abstract: Test the code in your POD and generates POD.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  File::Copy: 0
+  IO::String: 0
+  Lexical::Persistence: 0
+  Readonly: 0
+  Sub::Exporter: 0
+build_requires:
+  Data::TreeDumper: 0.35
+  Directory::Scratch: 0
+  File::Slurp: 0
+  Test::Block: 0
+  Test::Exception: 0
+  Test::NoWarnings: 0
+  Test::Warn: 0
+  Text::Diff: 0
+provides:
+  POD::Tested:
+    file: lib/POD/Tested.pm
+    version: 0.06
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

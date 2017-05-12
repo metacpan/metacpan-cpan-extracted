@@ -1,0 +1,222 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::XMPP::Stream
+at lib/Protocol/XMPP/Stream.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Protocol::XMPP::Stream - handle XMPP protocol stream
+
+=head1 VERSION
+
+Version 0.006
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 new
+
+Instantiate a stream object. Used for interacting with the underlying XMPP stream.
+
+Takes the following parameters as callbacks:
+
+=over 4
+
+=item * on_queued_write - this will be called whenever there is data queued to be written to the socket
+
+=item * on_starttls - this will be called when we want to switch to TLS mode
+
+=back
+
+and the following scalar parameters:
+
+=over 4
+
+=item * user - username (not the full JID, just the first part)
+
+=item * pass - password
+
+=back
+
+=head2 on_data
+
+Data has been received, pass it over to the SAX parser to trigger any required events.
+
+=head2 queue_write
+
+Queue up a write for this stream. Adds to the existing send buffer array if there is one.
+
+When a write is queued, this will send a notification to the on_queued_write callback if one
+was defined.
+
+=head2 write_buffer
+
+Returns the contents of the current write buffer without changing it.
+
+=head2 extract_write
+
+Retrieves next pending message from the write buffer and removes it from the list.
+
+=head2 ready_to_send
+
+Returns true if there's data ready to be written.
+
+=head2 reset
+
+Reset this stream.
+
+Clears out the existing SAX parsing information and sets up a new L<Protocol::XMPP::Handler> ready to accept
+events. Used when we expect a new C<< <stream >>> element, for example after authentication or TLS upgrade.
+
+=head2 dispatch_event
+
+Call the appropriate event handler.
+
+Currently defined events:
+
+=over 4
+
+=item * features - we have received the features list from the server
+
+=item * login - login was completed successfully
+
+=item * message - a message was received
+
+=item * presence - a presence notification was received
+
+=item * subscription - a presence notification was received
+
+=item * transfer_request - a file transfer request has been received
+
+=item * file - a file was received
+
+=back
+
+=head2 preamble
+
+Returns the XML header and opening stream preamble.
+
+=head2 jid
+
+Returns the full JID for our user.
+
+If given a parameter, will set the JID to that value, extracting hostname and user by splitting the domain.
+
+=head2 user
+
+Username for SASL authentication.
+
+=head2 pass
+
+Password for SASL authentication.
+
+=head2 hostname
+
+Name of the host
+
+=head2 resource
+
+Fragment used to differentiate this client from any other active clients for this user (as defined by bare JID).
+
+=head2 write_xml
+
+Write a chunk of XML to the stream, converting from the internal representation to XML
+text stanzas.
+
+=head2 write_text
+
+Write raw text to the output stream.
+
+=head2 login
+
+Process the login.
+
+Takes optional named parameters:
+
+=over 4
+
+=item * user - username (not the full JID, just the user part)
+
+=item * password - password or passphrase to use in SASL authentication
+
+=back
+
+=head2 is_authorised
+
+Returns true if we are authorised already.
+
+=head2 is_loggedin
+
+Returns true if we are logged in already.
+
+=head2 stream
+
+Override the ->stream method from the base class so that we pick up our own methods directly.
+
+=head2 next_id
+
+Returns the next ID in the sequence for outgoing requests.
+
+=head2 on_tls_complete
+
+Continues the next part of the connection when TLS is complete.
+
+=head2 compose
+
+Compose a new outgoing message.
+
+=head2 subscribe
+
+Subscribe to a new contact. Takes a single JID as target.
+
+=head2 unsubscribe
+
+Unsubscribe from the given contact. Takes a single JID as target.
+=cut
+
+sub unsubscribe {
+	my $self = shift;
+	my $to = shift;
+	Protocol::XMPP::Contact->new(	
+		stream	=> $self,
+		jid	=> $to,
+	)->unsubscribe;
+}
+
+=head2 authorise
+
+Grant authorisation to the given contact. Takes a single JID as target.
+
+=head2 deauthorise
+
+Revokes auth for the given contact. Takes a single JID as target.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Protocol::XMPP::Base>
+
+L<debug|Protocol::XMPP::Base/debug>, L<new_future|Protocol::XMPP::Base/new_future>
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2010-2014. Licensed under the same terms as Perl itself.

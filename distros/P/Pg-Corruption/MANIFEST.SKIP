@@ -1,0 +1,14 @@
+script/makefile
+MYMETA$
+MAKEFILE$
+^Build$
+^_build
+Makefile$
+TODO
+inc/*
+t/save/*
+blib/*
+.swp$
+.old$
+.bak$
+.tar.gz$

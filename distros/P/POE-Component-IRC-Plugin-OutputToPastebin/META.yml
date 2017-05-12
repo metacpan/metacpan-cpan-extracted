@@ -1,0 +1,28 @@
+---
+abstract: 'easily pastebin output from your bot'
+author:
+  - 'Zoffix Znet <zoffix@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-IRC-Plugin-OutputToPastebin
+provides:
+  POE::Component::IRC::Plugin::OutputToPastebin:
+    file: lib/POE/Component/IRC/Plugin/OutputToPastebin.pm
+    version: 0.002
+requires:
+  Carp: 1.04
+  POE: 0.9999
+  POE::Component::IRC::Plugin: 0.1
+  POE::Component::WWW::Pastebin::Bot::Pastebot::Create: 0.002
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.002

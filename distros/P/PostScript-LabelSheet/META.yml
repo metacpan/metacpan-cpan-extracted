@@ -1,0 +1,24 @@
+---
+abstract: 'print multiple labels on a sheet, starting from PostScript label template.'
+author:
+  - 'Cédric Bouvier <cbouvi@cpan.org>'
+build_requires:
+  Class::Accessor: 0
+  Template: 0
+  Test::More: 0
+  parent: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PostScript-LabelSheet
+provides:
+  PostScript::LabelSheet:
+    file: lib/PostScript/LabelSheet.pm
+    version: 0.02
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

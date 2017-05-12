@@ -1,0 +1,12 @@
+
+
+This archive contains the distribution PostgreSQL-PLPerl-Trace, version
+1.001:
+
+  Trace execution of PostgreSQL PL/Perl code statements
+
+This software is copyright (c) 2010 by Tim Bunce <Tim.Bunce@pobox.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

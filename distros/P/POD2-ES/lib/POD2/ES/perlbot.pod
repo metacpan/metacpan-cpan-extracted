@@ -1,0 +1,27 @@
+=encoding utf8
+
+=head1 NAME
+
+perlbot - Vínculos a información sobre programación orientada a objetos en
+Perl
+
+=head1 DESCRIPCIÓN
+
+Para obtener más información sobre la programación orientada a objetos en
+Perl, vea L<perlootut> y L<perlobj>.
+
+(Estos documentos sustituyen al tutorial que se incluía anteriormente en
+perlbot).
+
+=cut
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

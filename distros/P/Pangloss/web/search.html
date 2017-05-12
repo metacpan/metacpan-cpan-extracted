@@ -1,0 +1,496 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+
+	<head>
+		<title>Pangloss : Search</title>
+		<link rel="stylesheet" href="pcie.css"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	</head>
+
+	<body bottommargin="0" topmargin="0" leftmargin="0" rightmargin="0" marginheight="0" marginwidth="0">
+
+		<?var name="set: srequest   session/search_request"?>
+		<?var name="set: pending    string:?"?>
+		<?var name="set: approved   string:o"?>
+		<?var name="set: rejected   string:x"?>
+		<?var name="set: deprecated string:d"?>
+
+		<xi:include href="./header.html"/>
+
+		<form method="get" action="search.html">
+
+		<!--? this is connected to the header -->
+		<table width="100%" cellspacing="0" cellpadding="0" border="0">
+			<tr>
+				<td width="15" align="left">     </td>
+				<td>
+					<table class="body-header" width="100%" cellspacing="0" cellpadding="1" border="0">
+						<tr>
+							<td width="15" align="left">     </td>
+							<td align="left">
+								<span class="medium">
+									Keyword: <input value="$srequest/keyword" name="q" type="text" size="30"/>
+									<input width="10" alt="go" src="gfx/right_arrow.gif" name="go" type="image" height="10"/>
+								</span>
+							</td>
+							<td width="15" align="center">     </td>
+							<td align="right">
+								<span class="medium">
+									Url: <input value="$srequest/document_uri" name="uri" type="text" size="40"/>
+									<input width="10" alt="go" src="gfx/right_arrow.gif" name="go" type="image" height="10"/>
+								</span>
+							</td>
+							<td width="15" align="right">     </td>
+						</tr>
+					</table>
+				</td>
+				<td width="15" align="right">     </td>
+			</tr>
+		</table>
+
+<!-- START OF PAGE BODY .............................................. -->
+
+		<table border="0" cellpadding="0" cellspacing="0" width="100%" height="90%">
+			<tr>
+				<td valign="top" height="19"><span class="vsmall"> </span></td>
+			</tr>
+			<tr>
+				<td valign="top" width="15"><span class="vsmall"> </span></td>
+				<td valign="top" petal:if="view">
+					<table border="0" cellpadding="0" cellspacing="0" width="100%">
+						<tr>
+<!-- START OF LEFT NAV .............................................. -->
+							<td width="200" valign="top">
+								<!-- form method="get" action="search.html" -->
+									<table border="0" cellpadding="0" cellspacing="0">
+										<tr>
+											<td>
+
+												<!-- CATEGORIES BOX -->
+												<table width="200" cellpadding="0" cellspacing="0" border="0">
+													<tr>
+														<td width="40%" bgcolor="#BEDCEC"><span class="medium">  Categories</span></td>
+														<td width="60%" height="15"><span class="medium">           </span></td>
+													</tr>
+												</table>
+												<table width="200" border="0" cellpadding="1" cellspacing="0">
+													<tr>
+														<td bgcolor="#BEDCEC">
+															<table border="0" cellpadding="0" cellspacing="0" width="199" bgcolor="#ffffff">
+																<tr petal:if="view/categories">
+																	<td width="4"><span class="vsmall"> </span></td>
+																	<td width="50%" valign="top">
+																		<span class="small" petal:repeat="category view/categories">
+																			<div petal:if="repeat/odd">
+																				<input class="medium" type="checkbox" name="category_$category/key" petal:attributes="checked true: $srequest/is_category_selected category;"/><span class="medium">$category/name</span>
+																			</div>
+																		</span>
+																	</td>
+																	<td width="4"><span class="vsmall"> </span></td>
+																	<td width="50%" valign="top">
+																		<span class="small" petal:repeat="category view/categories">
+																			<div petal:if="repeat/even">
+																				<input class="medium" type="checkbox" name="category_$category/key" petal:attributes="checked true: $srequest/is_category_selected category;"/><span class="medium">$category/name</span>
+																			</div>
+																		</span>
+																	</td>
+																</tr>
+																<tr>
+																	<td colspan="4" align="right">
+																		<input type="image" name="go" width="10" height="10" src="gfx/right_arrow.gif" alt="go"/>
+																	</td>
+																</tr>
+															</table>
+														</td>
+													</tr>
+												</table>
+
+												<table width="200" border="0" cellpadding="0" cellspacing="0">
+													<tr>
+														<td height="15"><span class="vsmall"> </span></td>
+													</tr>
+												</table>
+
+												<!-- LANGUAGES BOX -->
+												<table width="200" cellpadding="0" cellspacing="0" border="0">
+													<tr>
+														<td width="40%" bgcolor="#BEDCEC"><span class="medium">  Languages</span></td>
+														<td width="60%" height="15"><span class="medium">           </span></td>
+													</tr>
+												</table>
+												<table width="200" border="0" cellpadding="1" cellspacing="0">
+													<tr>
+														<td bgcolor="#BEDCEC">
+															<table border="0" cellpadding="0" cellspacing="0" width="199" bgcolor="#ffffff">
+																<tr petal:if="view/languages">
+																	<td width="4"><span class="vsmall"> </span></td>
+																	<td width="50%" valign="top">
+																		<span class="medium" petal:repeat="language view/languages">
+																			<div petal:if="repeat/odd">
+																				<input class="medium" type="checkbox" name="language_$language/key" petal:attributes="checked true: $srequest/is_language_selected language;"/><span class="medium">$language/name <span class="small"><span class="search-result-lang-$language/iso_code">($language/iso_code)</span></span></span>
+																			</div>
+																		</span>
+																	</td>
+																	<td width="4"><span class="vsmall"> </span></td>
+																	<td width="50%" valign="top">
+																		<span class="medium" petal:repeat="language view/languages">
+																			<div petal:if="repeat/even">
+																				<input class="medium" type="checkbox" name="language_$language/key" petal:attributes="checked true: $srequest/is_language_selected language;"/><span class="medium">$language/name <span class="small"><span class="search-result-lang-$language/iso_code">($language/iso_code)</span></span></span>
+																			</div>
+																		</span>
+																	</td>
+																</tr>
+																<tr>
+																	<td colspan="4" align="right">
+																		<input type="image" name="go" width="10" height="10" src="gfx/right_arrow.gif" alt="go"/>
+																	</td>
+																</tr>
+															</table>
+														</td>
+													</tr>
+												</table>
+
+												<table width="200" border="0" cellpadding="0" cellspacing="0">
+													<tr>
+														<td height="15"><span class="vsmall"> </span></td>
+													</tr>
+												</table>
+
+												<!-- STATUS BOX -->
+												<table width="200" cellpadding="0" cellspacing="0" border="0">
+													<tr>
+														<td width="40%" bgcolor="#BEDCEC"><span class="medium"> Status</span></td>
+														<td width="60%" height="15"><span class="medium">   </span></td>
+													</tr>
+												</table>
+												<table width="200" border="0" cellpadding="1" cellspacing="0">
+													<tr>
+														<td bgcolor="#BEDCEC">
+															<table border="0" cellpadding="0" cellspacing="0" width="199" bgcolor="#ffffff">
+																<tr>
+																	<td width="4"><span class="vsmall"> </span></td>
+																	<td width="50%" valign="top">
+																		<div><input class="medium" type="checkbox" name="status_approved" petal:attributes="checked true: $srequest/is_status_selected $view/status_codes/approved;"/><span class="medium">Approved <span class="small">($approved)</span></span></div>
+																		<div><input class="medium" type="checkbox" name="status_pending"  petal:attributes="checked true: $srequest/is_status_selected $view/status_codes/pending;" /><span class="medium">Pending <span class="small">($pending)</span></span></div>
+																	</td>
+																	<td width="4"><span class="vsmall"> </span></td>
+																	<td width="50%" valign="top">
+																		<div><input class="medium" type="checkbox" name="status_rejected"   petal:attributes="checked true: $srequest/is_status_selected $view/status_codes/rejected;"  /><span class="medium">Rejected <span class="small">($rejected)</span></span></div>
+																		<div><input class="medium" type="checkbox" name="status_deprecated" petal:attributes="checked true: $srequest/is_status_selected $view/status_codes/deprecated;"/><span class="medium">Deprecated <span class="small">($deprecated)</span></span></div>
+																	</td>
+																</tr>
+																<tr>
+																	<td colspan="4" align="right">
+																		<input type="image" name="go" width="10" height="10" src="gfx/right_arrow.gif" alt="go"/>
+																	</td>
+																</tr>
+															</table>
+														</td>
+													</tr>
+												</table>
+
+												<table width="200" border="0" cellpadding="0" cellspacing="0">
+													<tr>
+														<td height="15"><span class="vsmall"> </span></td>
+													</tr>
+												</table>
+
+												<!-- TRANSLATORS BOX -->
+												<table width="200" cellpadding="0" cellspacing="0" border="0">
+													<tr>
+														<td width="40%" bgcolor="#BEDCEC"><span class="medium">  Translators</span></td>
+														<td width="60%" height="15"><span class="medium">           </span></td>
+													</tr>
+												</table>
+												<table width="200" border="0" cellpadding="1" cellspacing="0">
+													<tr>
+														<td bgcolor="#BEDCEC">
+															<table border="0" cellpadding="0" cellspacing="0" width="199" bgcolor="#ffffff">
+																<tr petal:if="view/translators">
+																	<td width="4"><span class="vsmall"> </span></td>
+																	<td width="50%" valign="top">
+																		<span class="small" petal:repeat="user $view/translators">
+																			<div petal:if="repeat/odd">
+																				<input class="medium" type="checkbox" name="translator_$user/key" petal:attributes="checked true: $srequest/is_translator_selected user;"/><span class="medium">$user/name</span>
+																			</div>
+																		</span>
+																	</td>
+																	<td width="4"><span class="vsmall"> </span></td>
+																	<td width="50%" valign="top">
+																		<span class="small" petal:repeat="user view/translators">
+																			<div petal:if="repeat/even">
+																				<input class="medium" type="checkbox" name="translator_$user/key" petal:attributes="checked true: $srequest/is_translator_selected user;"/><span class="medium">$user/name</span>
+																			</div>
+																		</span>
+																	</td>
+																</tr>
+																<tr>
+																	<td colspan="4" align="right">
+																		<input type="image" name="go" width="10" height="10" src="gfx/right_arrow.gif" alt="go"/>
+																	</td>
+																</tr>
+															</table>
+														</td>
+													</tr>
+												</table>
+
+												<table width="200" border="0" cellpadding="0" cellspacing="0">
+													<tr>
+														<td height="15"><span class="vsmall"> </span></td>
+													</tr>
+												</table>
+
+												<!-- PROOFREADERS BOX -->
+												<table width="200" cellpadding="0" cellspacing="0" border="0">
+													<tr>
+														<td width="40%" bgcolor="#BEDCEC"><span class="medium">  Proofreaders</span></td>
+														<td width="60%" height="15"><span class="medium">           </span></td>
+													</tr>
+												</table>
+												<table width="200" border="0" cellpadding="1" cellspacing="0">
+													<tr>
+														<td bgcolor="#BEDCEC">
+															<table border="0" cellpadding="0" cellspacing="0" width="199" bgcolor="#ffffff">
+																<tr petal:if="view/proofreaders">
+																	<td width="4"><span class="vsmall"> </span></td>
+																	<td width="50%" valign="top">
+																		<span class="small" petal:repeat="user view/proofreaders">
+																			<div petal:if="repeat/odd">
+																				<input class="medium" type="checkbox" name="proofreader_$user/key" petal:attributes="checked true: $srequest/is_proofreader_selected user;"/><span class="medium">$user/name</span>
+																			</div>
+																		</span>
+																	</td>
+																	<td width="4"><span class="vsmall"> </span></td>
+																	<td width="50%" valign="top">
+																		<span class="small" petal:repeat="user view/proofreaders">
+																			<div petal:if="repeat/even">
+																				<input class="medium" type="checkbox" name="proofreader_$user/key" petal:attributes="checked true: $srequest/is_proofreader_selected user;"/><span class="medium">$user/name</span>
+																			</div>
+																		</span>
+																	</td>
+																</tr>
+																<tr>
+																	<td colspan="4" align="right">
+																		<input type="image" name="go" width="10" height="10" src="gfx/right_arrow.gif" alt="go"/>
+																	</td>
+																</tr>
+															</table>
+														</td>
+													</tr>
+												</table>
+
+												<table width="200" border="0" cellpadding="0" cellspacing="0">
+													<tr>
+														<td height="15"><span class="vsmall"> </span></td>
+													</tr>
+												</table>
+
+												<table width="200" cellpadding="0" cellspacing="0" border="0">
+													<tr>
+														<td align="center"><input type="submit" name="search" value="go"/></td>
+													</tr>
+												</table>
+
+											</td>
+										</tr>
+									</table>
+								<!-- /form -->
+							</td>
+<!-- END OF LEFT NAV .............................................. -->
+
+							<td valign="top" width="15"><span class="vsmall"> </span></td>
+
+<!--  START OF SEARCH RESULTS AREA .............................................. -->
+							<?var name="set: results view/search_results_pager"?>
+							<td valign="top" petal:if="true: results/is_empty">
+								<table border="0" cellpadding="0" cellspacing="0" width="100%">
+									<tr>
+										<td height="15"><span class="vsmall"> </span></td>
+									</tr>
+								</table>
+								<table border="0" cellpadding="1" cellspacing="0" width="100%" bgcolor="#B2DFBD">
+									<tr>
+										<td>
+											<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+												<tr>
+													<td height="50" align="center" valign="middle">
+														<span class="medium">No search results available.</span>
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+							</td>
+							<td valign="top" petal:if="true: results/not_empty">
+								<table border="0" cellpadding="0" cellspacing="0" width="100%">
+									<tr>
+										<td height="15"><span class="vsmall"> </span></td>
+									</tr>
+								</table>
+
+								<!-- PREVIOUS/SUBSEQUENT PAGE SELECTION -->
+								<table border="0" cellpadding="1" cellspacing="0" width="100%" bgcolor="#B2DFBD">
+									<tr>
+										<td>
+											<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+												<tr>
+													<td width="5"	align="left"> </td>
+													<td width="33%"	height="15" valign="middle">
+														<span class="medium">  Displaying $results/start_number-$results/end_number of $results/total_size  </span>
+													</td>
+													<td width="33%" height="15" valign="middle" align="center">
+														<span class="medium">
+															<a petal:if="true: results/prev_page"
+																 href="$pager_uri&page=${uri_escape: results/prev_page}" class="medium" alt="previous">&lt;&lt;</a>
+															|<?repeat name="page results/pages_list"?>
+															<?if name="equal: $page $results/page"?><span class="medium_strong">$page</span><?else?><a href="$pager_uri&page=${uri_escape: page}" class="medium">$page</a><?end?>
+															<span class="medium" petal:if="false: repeat/end"> - </span>
+															<?end?>|
+															<a petal:if="true: results/next_page"
+																 href="$pager_uri&page=${uri_escape: results/next_page}" class="medium" alt="next">&gt;&gt;</a>
+														</span>
+													</td>
+													<td width="33%"	height="15" valign="middle" align="right">
+														<span class="medium">  Displaying $results/start_number-$results/end_number of $results/total_size  </span>
+													</td>
+													<td width="5"	align="right"> </td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+
+								<table border="0" cellpadding="0" cellspacing="0" width="100%">
+									<tr>
+										<td height="15"><span class="vsmall"> </span></td>
+									</tr>
+								</table>
+
+								<?repeat name="concept results/page_concepts/sorted_list"?>
+								<!-- START OF CONCEPT #$__count__ $concept/key -->
+								<table width="100%" cellpadding="0" cellspacing="0" border="0">
+									<tr>
+										<td width="100%" valign="bottom">
+											<table width="100%" cellpadding="0" cellspacing="0" border="0">
+												<tr>
+													<td valign="bottom" align="left" width="40%">
+														<span class="search-result-concept">
+															<a class="search_title" href="/edit/concept.html?selected_concept=${uri_escape: concept/key}&get_concept=1" id="bold">$concept/name</a>
+														</span>
+													</td>
+													<td valign="bottom" align="right" width="30%">
+														<a class="medium" href="/edit/category.html?selected_category=${uri_escape: concept/category}&get_category=1"
+															 petal:if="concept/category">$concept/category</a>
+														<span class="medium" petal:if="false: concept/category"><i>no category</i></span>
+													</td>
+													<td width="5"	align="right"> </td>
+													<td valign="bottom" align="right" width="10">
+														<a class="medium" href="/edit/add_term.html?selected_concept=${uri_escape: concept/key}&get_concept=1&list_concepts=1&list_languages=1" alt="add translation"
+															 petal:if="session/user/is_translator" id="bold">+</a>
+													</td>
+													<td width="2"	align="right"> </td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<table width="100%" border="0" cellpadding="1" cellspacing="0">
+									<tr>
+										<td class="search-result-terms">
+											<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+												<?repeat name="language results/page_languages/sorted_list"?>
+												<!-- START OF LANGUAGE #$__count__ $language/key -->
+												<tr class="search-result-lang-$language/iso_code" petal:repeat="term sort: results/list_by $concept/key $language/key">
+													<!-- START OF TERM #$__count__ $concept/key $language/key-->
+													<td width="4" height="15"><span class="vsmall"> </span></td>
+													<td width="25" valign="middle">
+														<span petal:if="__is_first__" class="medium" id="bold"><?var name="uc: $term/language"?></span>
+													</td>
+													<td width="8"><span class="vsmall"> </span></td>
+													<td width="15" valign="middle">
+														<span class="medium" id="bold" petal:if="term/status/is_pending">$pending</span>
+														<span class="medium" id="bold" petal:if="term/status/is_approved">$approved</span>
+														<span class="medium" id="bold" petal:if="term/status/is_rejected">$rejected</span>
+														<span class="medium" id="bold" petal:if="term/status/is_deprecated">$deprecated</span>
+													</td>
+													<td width="8"><span class="vsmall"> </span></td>
+													<td width="45%" valign="middle">
+														<a href="/edit/term.html?selected_term=${uri_escape: term/key}&get_term=1&list_languages=1&list_concepts=1" class="medium">$term/name</a>
+													</td>
+													<td width="8"><span class="vsmall"> </span></td>
+													<td width="10%" valign="middle">
+														<a href="/edit/user.html?selected_user=${uri_escape: term/creator}&get_user=1" class="medium">$term/creator</a>
+													</td>
+													<td width="8"><span class="vsmall"> </span></td>
+													<td width="35%" valign="middle">
+														<span class="medium">$term/notes</span>
+													</td>
+													<!-- END OF TERM #$__count__ -->
+												</tr>
+												<!-- END OF LANGUAGE #$__count__ $language/key -->
+												<?end?>
+											</table>
+										</td>
+									</tr>
+								</table>
+								<table border="0" cellpadding="0" cellspacing="0" width="100%">
+									<tr>
+										<td height="15"><span class="vsmall"> </span></td>
+									</tr>
+								</table>
+								<!-- END OF CONCEPT #$__count__ $concept/key -->
+								<?end?>
+
+								<!-- PREVIOUS/SUBSEQUENT PAGE SELECTION -->
+								<table border="0" cellpadding="1" cellspacing="0" width="100%" bgcolor="#B2DFBD">
+									<tr>
+										<td>
+											<table border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+												<tr>
+													<td width="5"	align="left"> </td>
+													<td width="33%"	height="15" valign="middle">
+														<span class="medium">  Displaying $results/start_number-$results/end_number of $results/total_size  </span>
+													</td>
+													<td width="33%" height="15" valign="middle" align="center">
+														<span class="medium">
+															<a petal:if="true: results/prev_page"
+																 href="$pager_uri&page=${uri_escape: results/prev_page}" class="medium" alt="previous">&lt;&lt;</a>
+															|<?repeat name="page results/pages_list"?>
+															<?if name="equal: $page $results/page"?><span class="medium_strong">$page</span><?else?><a href="$pager_uri&page=${uri_escape: page}" class="medium">$page</a><?end?>
+															<span class="medium" petal:if="false: repeat/end"> - </span>
+															<?end?>|
+															<a petal:if="true: results/next_page"
+																 href="$pager_uri&page=${uri_escape: results/next_page}" class="medium" alt="next">&gt;&gt;</a>
+														</span>
+													</td>
+													<td width="33%"	height="15" valign="middle" align="right">
+														<span class="medium">  Displaying $results/start_number-$results/end_number of $results/total_size  </span>
+													</td>
+													<td width="5"	align="right"> </td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+
+							</td>
+<!-- END OF SEARCH RESULTS AREA .............................................. -->
+
+						</tr>
+					</table>
+				</td>
+				<td valign="top" petal:if="false: view">
+					<div class="error">Application Error: no view present!</div>
+				</td>
+				<td valign="top" width="15"><span class="vsmall"> </span></td>
+			</tr>
+		</table>
+<!-- END OF PAGE BODY .............................................. -->
+
+		</form>
+
+		<xi:include href="./footer.html"/>
+
+  </body>
+</html>

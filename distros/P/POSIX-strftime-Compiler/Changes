@@ -1,0 +1,73 @@
+Revision history for Perl extension POSIX-strftime-Compiler
+
+0.42 2016-07-11T10:04:37Z
+
+   - import musl patch
+
+0.41 2015-01-05T03:25:28Z
+
+   - fixed synopsis
+
+0.40 2014-08-21T01:25:32Z
+
+   - fix test. accept ACST as Australia/Darwin's timezone
+     Because Australian eastern time zone abbr changed in tzdata 2014f
+     ref http://mm.icann.org/pipermail/tz-announce/2014-August/000023.html
+
+0.32 2014-06-09T01:53:19Z
+
+    - change perl version requirements to 5.8.1
+
+0.31 2014-02-24T06:27:11Z
+
+    - bugfix on solaris. Solaris does not have %s.
+
+0.30 2014-01-25T16:46:06Z
+
+    - not require int(sec), improve performance
+
+0.13 2014-01-24T01:12:31Z
+
+    - bugfix on cygwin. osname is cygwin. not Cygwin.
+
+0.12 2014-01-23T08:21:39Z
+
+    - fix bug around %s on windows. require "(" ")"
+
+0.11 2014-01-23T06:18:58Z
+
+    - Escape unkown characters with '%%'
+    - fix '%' escaping
+    - maybe test fixed on netbsd. six arguments required for '%Z'?
+
+0.10 2014-01-21T01:41:51Z
+
+    - release as non-trial version
+    - use sprintf if format only has simple characters
+    - add benchmark_tz.pl
+
+0.06 2014-01-20T02:26:07Z
+
+    - add GNU compatibility for Windows
+
+0.05 2014-01-17T06:03:45Z
+
+    - behave as POSIX::strftime wrapper.
+      faster than use POSIX::strftime with setlocale
+
+0.04 2014-01-15T15:19:20Z
+
+    - suppress warnings in test
+
+0.03 2014-01-15T15:11:57Z
+
+    - use POSIX::tzname for trial
+
+0.02 2014-01-15T01:45:07Z
+
+    - update documents
+
+0.01 2014-01-15T01:24:31Z
+
+    - original version
+

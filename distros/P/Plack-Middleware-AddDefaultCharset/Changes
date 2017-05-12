@@ -1,0 +1,7 @@
+Revision history for Perl extension Plack::Middleware::AddDefaultCharset
+
+0.02
+	- use response_cb for compatibility with streaming response
+
+0.01
+	- initial release

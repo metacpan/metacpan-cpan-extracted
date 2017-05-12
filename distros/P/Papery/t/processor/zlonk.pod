@@ -1,0 +1,8 @@
+=meta pod_meta some meta
+
+=head1 Title 1
+
+some paragraph
+
+=cut
+

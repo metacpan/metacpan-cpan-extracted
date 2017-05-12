@@ -1,0 +1,15 @@
+SYNOPSIS
+
+     use Perinci::Sub::GetArgs::Array;
+    
+     my $res = get_args_from_array(array=>\@ary, meta=>$meta, ...);
+
+DESCRIPTION
+
+    This module provides get_args_from_array(). This module is used by,
+    among others, Perinci::Sub::GetArgs::Argv.
+
+SEE ALSO
+
+    Perinci
+

@@ -1,0 +1,32 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [-SortSections]
+     section=NAME
+     section=VERSION
+     section=SYNOPSIS
+     section=DESCRIPTION
+     ; put everything else here
+     section=/./
+     section=FUNCTIONS
+     section=EXPORTS
+     section=ATTRIBUTES
+     section=METHODS
+     section=ENVIRONMENT
+     section=FILES
+     section=HOMEPAGE
+     section=SOURCE
+     section=BUGS
+     section=SEE ALSO
+     section=AUTHOR
+     section=COPYRIGHT AND LICENSE
+
+DESCRIPTION
+
+    This plugin lets you sort POD sections.
+
+SEE ALSO
+
+    Pod::Weaver::Role::SortSections
+

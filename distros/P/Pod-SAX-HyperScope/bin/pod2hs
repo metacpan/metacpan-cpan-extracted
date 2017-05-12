@@ -1,0 +1,13 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Pod::SAX;
+use Pod::SAX::HyperScope;
+
+my $file = shift || die "Usage: $0 file.pod\n";
+
+my $text = "";
+my $h = Pod::SAX::HyperScope->new( output => \$text );
+my $p = Pod::SAX->new( Handler => $h );
+$p->parse_uri($file);
+print $text;

@@ -1,0 +1,27 @@
+Changes
+examples/TimedAccessLog.pm
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/GithubMeta.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Plack/Middleware/.EasyHooks.pm.swp
+lib/Plack/Middleware/EasyHooks.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/10-inline.t
+t/20-inherit.t
+t/30-noop.t
+t/40-header.t
+t/Apps.pm
+t/Middleware/Inherit.pm

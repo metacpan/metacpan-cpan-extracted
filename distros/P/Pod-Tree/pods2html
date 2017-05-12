@@ -1,0 +1,337 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+use File::Find;
+use File::Path;
+use Getopt::Long;
+use HTML::Stream;
+use IO::File;
+use Pod::Tree::HTML;
+use File::Spec;
+
+my %Options = (
+	bgcolor => '#ffffff',
+	text    => '#000000',
+	hr      => 1,
+	toc     => 1
+);
+
+my $ok = GetOptions(
+	\%Options, "base:s", "css:s", "bgcolor:s", "empty", "index:s",
+	"module",  "text:s", "toc!",  "hr:i",      "variables:s"
+);
+$ok or die "Bad command line options\n";
+
+my %Index;
+my @Dirs;
+my ( $PodDir, $HTMLDir, $Template, @Variables ) = @ARGV;
+$HTMLDir or die "pods2html PodDir HTMLDir\n";
+
+$PodDir  = canonpath File::Spec $PodDir;
+$HTMLDir = rel2abs File::Spec $HTMLDir;
+
+mkpath($HTMLDir);
+
+do $Options{variables} if $Options{variables};
+
+for (@Variables) {
+	chomp;
+	my ( $name, $value ) = split /=/, $_, 2;
+	$name =~ s(^\$)();
+	${ $Pod::Tree::HTML::{$name} } = $value;
+}
+
+umask 0022;
+find(
+	{
+		wanted   => \&Translate,
+		no_chdir => 1
+	},
+	$PodDir
+);
+Index() if $Options{index};
+Cleanup() unless $Options{empty};
+
+sub Translate {
+	-d and &Translate_Dir;
+	-f and &Translate_POD;
+}
+
+sub MkDir {
+	my $dir = shift;
+
+	-d $dir and return;
+	mkdir $dir, 0755 or die "Can't mkdir $dir: $!\n";
+	push @Dirs, $dir;
+}
+
+sub Translate_Dir {
+	my $dir = $File::Find::name;
+
+	if ( $HTMLDir eq rel2abs File::Spec $dir) {
+		$File::Find::prune = 1;
+		return;
+	}
+
+	if ( $Options{module} and ( m(/t$) or m(/blib$) ) ) {
+		$File::Find::prune = 1;
+		return;
+	}
+
+	$dir =~ s/^\Q$PodDir/$HTMLDir/o;
+	-d $dir or MkDir $dir;
+	print "$File::Find::name\n";
+}
+
+sub Translate_POD {
+	m( \.(pm|pod)$ )x or return;
+	my $source = $File::Find::name;
+
+	Hidden($source) and return;
+	print "$source\n";
+
+	my $dest = $source;
+	$dest =~ s/^\Q$PodDir/$HTMLDir/o;
+	$dest =~ s( \.\w+$ )(.html)x;
+
+	my $depth = Depth($source);
+
+	my $pod = $source;
+	$pod =~ s(^$PodDir/)();
+	$pod =~ s( \.\w+$ )()x;
+	$Index{$pod} = 1;
+
+	my $html = Pod::Tree::HTML->new( $source, $dest, %Options );
+	$html->set_options( depth => $depth );
+	$html->translate($Template);
+}
+
+sub Hidden {
+	my $source = shift;
+	$source =~ m(\.pm$) or return 0;
+	$source =~ s(\.pm$)(.pod);
+	-e $source;
+}
+
+sub Depth {
+	my $source = shift;
+	my $tree   = Pod::Tree->new;
+	$tree->load_file($source);
+	my $children = $tree->get_root->get_children;
+	my @pod      = grep { is_pod $_ } @$children;
+	my $node1    = $pod[1];
+	$node1 or return '';
+
+	my $text = $node1->get_deep_text;
+	my ($name) = split m(\s+-+\s+), $text;
+	$name =~ s(^\s+)();
+
+	my @name = split /::/, $name;
+	@name - 1;
+}
+
+sub Index {
+	my $index = "$HTMLDir/index.html";
+	my $fh    = IO::File->new(">$index");
+	defined $fh or die "Can't open $index: $!\n";
+
+	my $stream = HTML::Stream->new($fh);
+
+	my $title   = $Options{index};
+	my $bgcolor = $Options{bgcolor};
+	my $text    = $Options{text};
+
+	$stream->HTML->HEAD;
+	$stream->TITLE->text($title)->_TITLE;
+	$stream->_HEAD->BODY( BGCOLOR => $bgcolor, TEXT => $text );
+	$stream->H1->t($title)->_H1;
+
+	Emit_Entries($stream);
+
+	$stream->_BODY->_HTML;
+}
+
+sub Emit_Entries {
+	my $stream = shift;
+
+	$stream->UL;
+
+	for my $entry ( sort keys %Index ) {
+		$stream->LI->A( HREF => "$entry.html" )->t($entry)->_A->_LI;
+	}
+
+	$stream->_UL;
+}
+
+sub Cleanup {
+	while (@Dirs) {
+		my $dir = pop @Dirs;
+		rmdir $dir;    # does nothing unless $dir is empty
+	}
+}
+
+__END__
+
+=head1 NAME
+
+pods2html - translate a tree of PODs to HTML
+
+
+=head1 SYNOPSIS
+
+C<pods2html>
+[C<--base> I<url>]
+[C<--css> I<url>]
+[C<--empty>]
+[C<--index> I<title>]
+[C<--module>]
+[C<-->[C<no>]C<toc>] [C<--hr> I<level>] 
+[C<--bgcolor> I<#rrggbb>] [C<--text> I<#rrggbb>]
+[C<--variables> I<values.pl>]
+I<PODdir> I<HTMLdir> [F<template> [I<variable>=I<value> ...]]
+
+
+=head1 DESCRIPTION
+
+C<pods2html> finds all the F<.pod> and F<.pm> files in the 
+directory tree rooted at I<PODdir>.
+It translates each POD to HTML,
+and writes it to a parallel directory tree rooted at I<HTMLdir>
+
+It makes the HTML files world-readable.
+
+If a F<template> file is provided,
+then F<template> will be filled in by the C<Text::Template> module and written to F<dest>.
+Here is a minimal template, showing all the variables that are set by C<pods2html>.
+
+  <html>
+   <head>
+    <base href="{$base}">
+    <link href="{$css}" rel="stylesheet" type="text/css">
+    <title>{$title}</title>
+   </head>
+   <body bgcolor="{$bgcolor}" text="{$text}">
+    {$toc}
+    {$body}
+   </body>
+  </html>
+
+If the C<--variables> option is provided, then the file I<values.pl> will be executed with a C<do>
+call before the template is filled in. I<values.pl> may contain arbitrary Perl code.
+The program fragments in the template are evaulted in the C<Pod::Tree::HTML> package.
+Any variables that I<values.pl> sets in this package will be available to the template.
+
+Additional scalar variables may be set on the command line with the I<variable>=I<value> syntax.
+Variables set on the command line override variables set in I<values.pl>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--base> I<url>
+
+Specifies a base URL for HTML links.
+
+
+=item C<--css> I<url>
+
+Specifies a Cascanding Style Sheet for the generated HTML pages.
+Here are example rules for all the different HTML elements that may appear in a POD.
+
+    a:link { background: #ff8080 }
+    body   { background: #f0f0f0 }
+    code   { background: #c0ffc0 }
+    dd     { background: #ffffe0 }
+    dl     { background: #fffff0 }
+    dt     { background: #ffffc0 }
+    h1     { background: #ffc0c0 }
+    h2     { background: #ffe0e0 }
+    hr     { background: #ff0000; height: 5px }
+    i      { background: #ffc0c0 }
+    li     { background: #e0e0e0 }
+    ol     { background: #fff0ff }
+    p      { background: #f0f0ff }
+    pre    { background: #f0fff0 }
+    ul     { background: #f0ffff }
+
+
+=item C<--empty>
+
+Creates HTML files for empty PODs.
+If this option is not provided, then no HTML file is created for empty PODs.
+
+
+=item C<--index> I<title>
+
+Writes an index of all the HTML files to I<HTMLDir>F</index.html>.
+I<title> is used as the title of the index page.
+
+
+=item C<--module>
+
+Ignores files in directories named F<t/> and F<blib/>.
+Useful for translating PODs in a module development directory.
+
+
+=item C<-->[C<no>]C<toc>
+
+Includes or omits the table of contents.
+Default is to include the TOC.
+
+
+=item C<--hr> I<level>
+
+Controls the profusion of horizontal lines in the output, as follows:
+
+    level   horizontal lines
+    0 	    none
+    1 	    between TOC and body
+    2 	    after each =head1
+    3 	    after each =head1 and =head2
+
+Default is level 1.
+
+
+=item C<--bgcolor> I<#rrggbb>
+
+Set the background color to I<#rrggbb>.
+Default is white.
+
+
+=item C<--text> I<#rrggbb>
+
+Set the text color to I<#rrggbb>.
+Default is black.
+
+=back
+
+
+=head1 REQUIRES
+
+L<C<Pod::Tree::HTML>>,
+L<C<HTML::Stream>>
+
+
+=head1 BUGS
+
+The recursion check doesn't work on Win32.
+This means that the program will enter an infinite recursion
+if I<HTMLdir> is a subdirectory of I<PODdir>.
+
+
+=head1 SEE ALSO
+
+L<C<pod2html>>,
+L<C<Pod::Tree::HTML>>
+
+
+=head1 AUTHOR
+
+Steven McDougall, <swmcd@world.std.com>
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 1999-2010 by Steven McDougall.  This program is free software;
+you can redistribute it and/or modify it under the same terms as Perl.

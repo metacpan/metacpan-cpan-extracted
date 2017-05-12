@@ -1,0 +1,19 @@
+Changes
+lib/Perl6/Say.pm
+Build.PL
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/01_stdout.t
+t/01_stdout-mod.t
+t/02_file.t
+t/03_list.t
+t/04_file_list.t
+t/05_scalar_ref.t
+t/06_io.t
+t/07_select.t
+t/08_iohandle_say.t
+t/09_ors.t
+t/lib/Perl6/Say/Auxiliary.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,66 @@
+Master
+======
+
+% pts creategroup pkgforge_incoming
+
+% pts createuser -name pkgforge_incoming.ardbeg.inf.ed.ac.uk -id 28276
+% pts adduser -user pkgforge_incoming.ardbeg.inf.ed.ac.uk -group pkgforge_incoming
+
+Build Daemons
+=============
+
+% pts creategroup pkgforge_builder
+
+% pts createuser -name pkgforge_builder.bigfan.inf.ed.ac.uk -id 28251
+% pts adduser -user pkgforge_builder.bigfan.inf.ed.ac.uk -group pkgforge_builder
+
+Web Interface
+=============
+
+% pts creategroup pkgforge_web
+
+% pts createuser -name pkgforge_web.ardbeg.inf.ed.ac.uk -id 28173
+% pts adduser -name pkgforge_web.ardbeg.inf.ed.ac.uk -group pkgforge_web
+
+
+Directory permissions:
+
+mkdir -p /afs/inf.ed.ac.uk/pkgs/pkgforge
+mkdir -p /afs/inf.ed.ac.uk/pkgs/pkgforge/incoming
+mkdir -p /afs/inf.ed.ac.uk/pkgs/pkgforge/accepted
+mkdir -p /afs/inf.ed.ac.uk/pkgs/pkgforge/results
+
+fs setacl -clear -dir /afs/inf.ed.ac.uk/pkgs/pkgforge -acl\
+                 ascobie:mp-unit       rlidwka\
+                 system:administrators rlidwka\
+                 pkgforge_incoming     read\
+                 pkgforge_builder      read\
+                 pkgforge_web          read\
+                 inf:sysman            read\
+                 system:authuser       read
+
+fs setacl -clear -dir /afs/inf.ed.ac.uk/pkgs/pkgforge/incoming -acl\
+                 ascobie:mp-unit       rlidwka\
+                 system:administrators rlidwka\
+                 pkgforge_incoming     write\
+                 inf:sysman            rli\
+                 system:authuser       read
+
+fs setacl -clear -dir /afs/inf.ed.ac.uk/pkgs/pkgforge/accepted -acl\
+                 ascobie:mp-unit       rlidwka\
+                 system:administrators rlidwka\
+                 pkgforge_incoming     write\
+                 pkgforge_builder      read\
+                 pkgforge_web          read\
+                 inf:sysman            read\
+                 system:authuser       read
+
+fs setacl -clear -dir /afs/inf.ed.ac.uk/pkgs/pkgforge/results -acl\
+                 ascobie:mp-unit       rlidwka\
+                 system:administrators rlidwka\
+                 pkgforge_incoming     write\
+                 pkgforge_builder      write\
+                 pkgforge_web          read\
+                 inf:sysman            read\
+                 system:authuser       read
+

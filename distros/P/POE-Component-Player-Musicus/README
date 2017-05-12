@@ -1,0 +1,34 @@
+POE-Component-Player-Musicus version 1.32
+=========================================
+
+This POE component is used to manipulate the musicus audio player
+from within a POE application.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  * POE
+  * POE::Component::Child (1.39 or greater)
+  * Text::Balanced
+  * musicus (1.11 or greater) - http://muth.org/Robert/Musicus/
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2004-2006 Curtis "Mr_Person" Hawthorne.
+
+This product is distributed under the MIT License. A copy of this
+license was included in a file called LICENSE. If for some reason,
+this file was not included, please see
+http://www.opensource.org/licenses/mit-license.html to obtain a
+copy of this license.
+

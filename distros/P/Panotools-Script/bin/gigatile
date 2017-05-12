@@ -1,0 +1,170 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use File::Spec;
+use Panotools::Script;
+use Panotools::Makefile;
+
+my $path_mk;
+my $path_prefix;
+my $apikey = 'PUTAPIKEYHERE';
+my $help = 0;
+
+my $pix_tiff = 4096;
+my $pix_jpeg = 256;
+
+GetOptions ('o|output=s' => \$path_mk,
+            'p|prefix=s' => \$path_prefix,
+            'apikey=s' => \$apikey,
+            'h|help' => \$help);
+
+pod2usage (-verbose => 2) if $help;
+pod2usage (2) unless (defined $path_mk and defined $path_prefix and scalar @ARGV);
+
+my $path_input = shift @ARGV;
+
+my $pto = new Panotools::Script;
+$pto->Read ($path_input);
+
+$pto->{panorama}->{S} = join (',', '0', $pto->{panorama}->{w}, '0', $pto->{panorama}->{h}) unless defined $pto->{panorama}->{S};
+
+for my $image (@{$pto->Image})
+{
+    $image->{n} = '"'. $image->Path ($path_input) .'"';
+}
+
+my $pix_width = $pto->Panorama->{w};
+my $pix_height = $pto->Panorama->{h};
+
+my $pix_size = $pix_tiff;
+my $levels = 0;
+while ($pix_size < $pix_width || $pix_size < $pix_height)
+{
+    $pix_size *= 2;
+    $levels +=1;
+}
+
+my ($v, $d, $f) = File::Spec->splitpath ($path_prefix);
+mkdir File::Spec->catpath ($v, $d) if ($d);
+
+my $mk = new Panotools::Makefile;
+
+my $rule_all = $mk->Rule ('all');
+$rule_all->Prerequisites ('html', 'jpegs');
+
+my $rule_tile_pto = $mk->Rule ('ptos');
+my $rule_tile_mk = $mk->Rule ('mks');
+my $rule_tile_tiff = $mk->Rule ('tiffs');
+my $rule_tile_jpeg = $mk->Rule ('jpegs');
+my $rule_tile_html = $mk->Rule ('html');
+my $rule_clean = $mk->Rule ('clean');
+
+my $rule_phony = $mk->Rule ('.PHONY');
+$rule_phony->Prerequisites ('all', 'ptos', 'mks', 'tiffs', 'jpegs', 'clean');
+
+my $index_html = File::Spec->catpath ($v, $d, 'index.html');
+$f = './' unless $f;
+my $rule = $mk->Rule ($index_html);
+$rule->Command ('gmaptemplate', '--title', $path_prefix, '--initialzoom', $levels, '--apikey', $apikey,
+  '--prefix', $f,  '--maxzoom', 4 + $levels, '--maxzoomp1', 5 + $levels, '--minres', $levels, '>', $index_html);
+$rule_tile_html->Prerequisites ($index_html);
+
+dotile ($path_prefix, 0, $pix_size, 0, $pix_size);
+
+sub dotile
+{
+    my ($prefix, $left, $right, $top, $bottom) = @_;
+    my $pto_tmp = $pto->Clone;
+    $pto_tmp->Panorama->{n} = 'TIFF';
+
+    # don't bother rendering tiles outside panorama area
+    return if ($left > $pto->Panorama->{w} or $top > $pto->Panorama->{h});
+    # don't bother rendering tiles outside Crop area
+    my @S = split (/,/, $pto->Panorama->{S});
+    return if ($right < $S[0] or $left > $S[1] or $bottom < $S[2] or $top > $S[3]);
+
+    my ($v, $d, $f) = File::Spec->splitpath ($prefix);
+
+    if ($right - $left == $pix_tiff and $bottom - $top == $pix_tiff)
+    {
+        $pto_tmp->Panorama->{S} = "$left,$right,$top,$bottom";
+        $pto_tmp->Write ($prefix .'.pto');
+        $rule_tile_pto->Prerequisites ($prefix .'.pto');
+
+        my $rule = $mk->Rule ($prefix .'.pto.mk');
+        $rule->Prerequisites ($prefix .'.pto');
+        $rule->Command ('pto2mk', '-o', $prefix .'.pto.mk', '-p', $prefix, $prefix .'.pto');
+        $rule_tile_mk->Prerequisites ($prefix .'.pto.mk');
+
+        $rule = $mk->Rule ($prefix .'.tif');
+        $rule->Prerequisites ($prefix .'.pto', $prefix .'.pto.mk');
+        $rule->Command ('$(MAKE)', '-f', $prefix .'.pto.mk', $prefix .'.tif');
+        $rule_tile_tiff->Prerequisites ($prefix .'.tif');
+
+        $rule_clean->Command ('-', '$(MAKE)', '-f', $prefix .'.pto.mk', 'clean');
+
+        $rule = $mk->Rule ($prefix);
+        $rule->Prerequisites ($prefix .'.tif');
+        $rule->Command ('entile', $prefix .'.tif', $prefix, $pix_jpeg);
+        $rule_phony->Prerequisites ($prefix);
+        $rule_tile_jpeg->Prerequisites ($prefix);
+
+        $rule = $mk->Rule ($prefix .'.html');
+        $rule_tile_html->Prerequisites ($prefix .'.html');
+        $rule->Command ('gmaptemplate', '--title', $prefix, '--initialzoom', 0, '--apikey', $apikey,
+          '--prefix', $f,  '--maxzoom', 4, '--maxzoomp1', 5, '--minres', 0, '>', $prefix .'.html');
+
+        $rule_clean->Command ('-', 'rm', $prefix .'.tif');
+    }
+    elsif (($right - $left) > $pix_tiff and ($bottom - $top) > $pix_tiff)
+    {
+        dotile ($prefix .'q', $left, ($left+$right)/2, $top, ($top+$bottom)/2);
+        dotile ($prefix .'r', ($left+$right)/2, $right, $top, ($top+$bottom)/2);
+        dotile ($prefix .'s', ($left+$right)/2, $right, ($top+$bottom)/2, $bottom);
+        dotile ($prefix .'t', $left, ($left+$right)/2, ($top+$bottom)/2, $bottom);
+    }
+}
+
+$mk->Write ($path_mk);
+
+__END__
+
+=head1 NAME
+
+gigatile - stitch a Hugin project as multi-resolution tiles
+
+=head1 SYNOPSIS
+
+gigatile -o project.pto.mk -p prefix project.pto
+
+ Options:
+  -o | --output name    Filename of created Makefile.
+  -p | --prefix         prefix for output files, can be a directory name.
+  --apikey              a Google Maps API key (required to use online).
+  -h | --help           Outputs help documentation.
+
+=head1 DESCRIPTION
+
+B<gigatile> is a tool with the same CLI as pto2mk.  Instead of creating rules
+for stitching a single panorama, the project is split into 4096x4096 tiles
+which are rendered independently, these tiles are then split to a pyramid of
+256x256 JPEG tiles.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+=head1 AUTHOR
+
+Bruno Postle - January 2010.
+
+=cut

@@ -1,0 +1,114 @@
+Revision history for Perl extension POE::Component::Server::SimpleHTTP.
+
+Switched to new Changes log from SVN
+
+* 1.16
+
+	Kwalitee fixes.
+
+* 1.15	
+
+	Changed SSLify to require instead of use.
+
+* 1.14
+
+	Changed the defaults for the Prefork and SSLify to 'no'. 
+	Applied streaming support patches from eriam.
+	Converted Makefile.PL to Module::Install.
+
+* 1.13
+
+	learned about the difference between ref $self and ref( $self )
+	Kwalitee-related fixes
+
+* 1.12
+
+	Finally use a Changes file - thanks RT #18981
+	Added some debug stuff
+	Cleanup of POD files
+	Fixed a long-standing bug of closing requests if they sent a EOF
+	Removed the PreFork test ( cannot disable if told installer to not install it! )
+
+* 1.11
+
+	Fixed the bug where no HEADERS resulted in a explosion, thanks BinGOs!
+	PreForking added, look at SimpleHTTP::PreFork, thanks Stephen!
+
+* 1.10
+
+	Rearranged some DEBUG printouts
+	Added some more 'return 1;' for POEization
+	Fixed STOPLISTEN/STARTLISTEN error
+	Added experimental SSL support via PoCo::SSLify
+
+* 1.09
+
+	Fixed a small bug regarding the timing of SHUTDOWN GRACEFUL
+	I always forget to supply the session parameter to $kernel->call() :X
+
+* 1.08
+
+	Made the SHUTDOWN event more smarter with the 'GRACEFUL' argument
+	Added the STARTLISTEN event to complement the STOPLISTEN event
+	Caught a minor bug -> If the client closed the socket and SimpleHTTP got an socket error, it will delete the wheel, resulting in confusion when we get the DONE/CLOSE event
+	Added $response->connection->dead boolean argument to check for the presence of a dead client
+	Re-jigging of internals ;)
+	Documented the only way to leak memory in SimpleHTTP ( hopefully heh )
+	Added the end-run leak checking to bite programmers that discard SimpleHTTP::Response objects :-)
+
+	I am considering putting SimpleHTTP::Response, HTTP::Request, SimpleHTTP::Connection into one super-object, called SimpleHTTP::Request
+	This object will have the HTTP::Request, HTTP::Response, SimpleHTTP::Connection objects hanging off it:
+		$client->request()	# HTTP::Request
+		$client->response()	# HTTP::Response
+		$client->connection()	# SimpleHTTP::Connection
+
+	If I get enough ayes from people, I will go ahead and implement this change for a cleaner design.
+	E-MAIL me your opinion or it will be ignored :)
+
+* 1.07
+
+	Added the STOPLISTEN event, to make it shutdown the listening socket to help larger programs shutdown cleanly
+	Removed the CHANGES file, as it is redundant :)
+	Added "return 1;" everywhere I could to avoid the nasty copy-on-exit POE bug squashed in 1.05
+
+* 1.06
+
+	Fixed SHUTDOWN to cleanly kill sockets, checking for definedness first
+	Fixed new() to remove options that exist, but is undef -> results in croaking when DEBUG is on
+	Added the CLOSE event to kill sockets without sending any output
+
+* 1.05
+
+	Got rid of POE::Component::Server::TCP and replaced it with POE::Wheel::SocketFactory for speed/efficiency
+	As the documentation for POE::Filter::HTTPD says, updated POD to reflect the HTTP::Request/Response issue
+	Got rid of SimpleHTTP::Request, due to moving of the Connection object to Response
+		->	Found a circular leak by having SimpleHTTP::Connection in SimpleHTTP::Request, to get rid of it, moved it to Response
+		->	Realized that sometimes HTTP::Request will be undef, so how would you get the Connection object?
+	Internal tweaking to save some memory
+	Added the MAX_RETRIES subroutine
+	More extensive DEBUG statements
+	POD updates
+	Paul Visscher tracked down the HTTP::Request object leak, thanks!
+	Cleaned up the Makefile.PL
+	Benchmarked and found a significant speed difference between post()ing and call()ing the DONE event
+		-> The call() method is ~8% faster
+		-> However, the chance of connecting sockets timing out is greater...
+
+* 1.04
+
+	Fixed a bug reported by Tim Wood about socket disappearing
+	Fixed *another* bug in the Connection object, pesky CaPs! ( Again, reported by Tim Wood )
+
+* 1.03
+
+	Added the GETHANDLERS/SETHANDLERS event
+	POD updates
+	Fixed SimpleHTTP::Connection to get rid of the funky CaPs
+
+* 1.02
+
+	Small fix regarding the Got_Error routine for Wheel::ReadWrite
+
+* 1.01
+
+	Initial Revision

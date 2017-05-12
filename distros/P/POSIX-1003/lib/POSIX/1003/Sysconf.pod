@@ -1,0 +1,339 @@
+=encoding utf8
+
+=head1 NAME
+
+POSIX::1003::Sysconf - POSIX access to sysconf()
+
+=head1 INHERITANCE
+
+ POSIX::1003::Sysconf
+   is a POSIX::1003::Module
+
+=head1 SYNOPSIS
+
+  use POSIX::1003::Sysconf; # load all names
+
+  use POSIX::1003::Sysconf qw(sysconf);
+  # keys are strings!
+  $ticks = sysconf('_SC_CLK_TCK');
+
+  use POSIX::1003::Sysconf qw(sysconf _SC_CLK_TCK);
+  $ticks  = _SC_CLK_TCK;   # constants are subs
+
+  use POSIX::1003::Sysconf '%sysconf';
+  my $key = $sysconf{_SC_CLK_TCK};
+  $sysconf{_SC_NEW_KEY} = $key_code;
+  $ticks  = sysconf($key);
+
+  print "$_\n" for keys %sysconf;
+
+=head1 DESCRIPTION
+
+The C<sysconf()> interface can be used to query system information
+in numerical form, where C<confstr()> returns strings.
+
+See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
+ 
+=over 4
+
+=item POSIX::1003::Sysconf-E<gt>B<exampleValue>(NAME)
+
+See L<POSIX::1003::Module/"METHODS">
+
+=item $obj-E<gt>B<import>()
+
+See L<POSIX::1003::Module/"METHODS">
+
+=back
+
+=head1 FUNCTIONS
+
+=head2 Standard POSIX
+
+=over 4
+
+=item B<sysconf>(NAME)
+
+Returns the sysconf value related to the NAMEd constant.  The NAME
+must be a string. C<undef> will be returned when the NAME is not
+known by the system.
+
+example: 
+
+  my $ticks = sysconf('_SC_CLK_TCK') || 1000;
+
+=back
+
+=head2 Additional
+
+=over 4
+
+=item B<sysconf_names>()
+
+Returns a list with all known names, unsorted.
+
+=back
+
+=head1 CONSTANTS
+
+=over 4
+
+=item B<%sysconf>
+
+This exported variable is a tied HASH which maps C<_SC_*> names
+on unique numbers, to be used with the system's C<sysconf()> function.
+
+=back
+
+The following constants where detected on your system when the
+module got installed.  The second column shows the value which
+where returned at that time.
+
+=for comment
+#TABLE_SYSCONF_START
+
+  _SC_2_C_BIND                      200809
+  _SC_2_C_DEV                       200809
+  _SC_2_C_VERSION                   undef
+  _SC_2_CHAR_TERM                   200809
+  _SC_2_FORT_DEV                    undef
+  _SC_2_FORT_RUN                    undef
+  _SC_2_LOCALEDEF                   200809
+  _SC_2_PBS                         undef
+  _SC_2_PBS_ACCOUNTING              undef
+  _SC_2_PBS_CHECKPOINT              undef
+  _SC_2_PBS_LOCATE                  undef
+  _SC_2_PBS_MESSAGE                 undef
+  _SC_2_PBS_TRACK                   undef
+  _SC_2_SW_DEV                      200809
+  _SC_2_UPE                         undef
+  _SC_2_VERSION                     200809
+  _SC_ADVISORY_INFO                 200809
+  _SC_AIO_LISTIO_MAX                undef
+  _SC_AIO_MAX                       undef
+  _SC_AIO_PRIO_DELTA_MAX            20
+  _SC_ARG_MAX                       2097152
+  _SC_ASYNCHRONOUS_IO               200809
+  _SC_ATEXIT_MAX                    2147483647
+  _SC_AVPHYS_PAGES                  102307
+  _SC_BARRIERS                      200809
+  _SC_BASE                          undef
+  _SC_BC_BASE_MAX                   99
+  _SC_BC_DIM_MAX                    2048
+  _SC_BC_SCALE_MAX                  99
+  _SC_BC_STRING_MAX                 1000
+  _SC_C_LANG_SUPPORT                undef
+  _SC_C_LANG_SUPPORT_R              undef
+  _SC_CHAR_BIT                      8
+  _SC_CHAR_MAX                      127
+  _SC_CHAR_MIN                      -128
+  _SC_CHARCLASS_NAME_MAX            2048
+  _SC_CHILD_MAX                     61461
+  _SC_CLK_TCK                       100
+  _SC_CLOCK_SELECTION               200809
+  _SC_COLL_WEIGHTS_MAX              255
+  _SC_CPUTIME                       200809
+  _SC_DELAYTIMER_MAX                2147483647
+  _SC_DEVICE_IO                     undef
+  _SC_DEVICE_SPECIFIC               undef
+  _SC_DEVICE_SPECIFIC_R             undef
+  _SC_EQUIV_CLASS_MAX               undef
+  _SC_EXPR_NEST_MAX                 32
+  _SC_FD_MGMT                       undef
+  _SC_FIFO                          undef
+  _SC_FILE_ATTRIBUTES               undef
+  _SC_FILE_LOCKING                  undef
+  _SC_FILE_SYSTEM                   undef
+  _SC_FSYNC                         200809
+  _SC_GETGR_R_SIZE_MAX              1024
+  _SC_GETPW_R_SIZE_MAX              1024
+  _SC_HOST_NAME_MAX                 64
+  _SC_INT_MAX                       2147483647
+  _SC_INT_MIN                       -2147483648
+  _SC_IOV_MAX                       1024
+  _SC_IPV6                          200809
+  _SC_JOB_CONTROL                   1
+  _SC_LEVEL1_DCACHE_ASSOC           8
+  _SC_LEVEL1_DCACHE_LINESIZE        64
+  _SC_LEVEL1_DCACHE_SIZE            32768
+  _SC_LEVEL1_ICACHE_ASSOC           8
+  _SC_LEVEL1_ICACHE_LINESIZE        64
+  _SC_LEVEL1_ICACHE_SIZE            32768
+  _SC_LEVEL2_CACHE_ASSOC            8
+  _SC_LEVEL2_CACHE_LINESIZE         64
+  _SC_LEVEL2_CACHE_SIZE             262144
+  _SC_LEVEL3_CACHE_ASSOC            12
+  _SC_LEVEL3_CACHE_LINESIZE         64
+  _SC_LEVEL3_CACHE_SIZE             6291456
+  _SC_LEVEL4_CACHE_ASSOC            0
+  _SC_LEVEL4_CACHE_LINESIZE         0
+  _SC_LEVEL4_CACHE_SIZE             0
+  _SC_LINE_MAX                      2048
+  _SC_LOGIN_NAME_MAX                256
+  _SC_LONG_BIT                      64
+  _SC_MAPPED_FILES                  200809
+  _SC_MB_LEN_MAX                    16
+  _SC_MEMLOCK                       200809
+  _SC_MEMLOCK_RANGE                 200809
+  _SC_MEMORY_PROTECTION             200809
+  _SC_MESSAGE_PASSING               200809
+  _SC_MONOTONIC_CLOCK               200809
+  _SC_MQ_OPEN_MAX                   undef
+  _SC_MQ_PRIO_MAX                   32768
+  _SC_MULTI_PROCESS                 undef
+  _SC_NETWORKING                    undef
+  _SC_NGROUPS_MAX                   65536
+  _SC_NL_ARGMAX                     4096
+  _SC_NL_LANGMAX                    2048
+  _SC_NL_MSGMAX                     2147483647
+  _SC_NL_NMAX                       2147483647
+  _SC_NL_SETMAX                     2147483647
+  _SC_NL_TEXTMAX                    2147483647
+  _SC_NPROCESSORS_CONF              4
+  _SC_NPROCESSORS_ONLN              4
+  _SC_NZERO                         20
+  _SC_OPEN_MAX                      1024
+  _SC_PAGE_SIZE                     4096
+  _SC_PAGESIZE                      4096
+  _SC_PASS_MAX                      8192
+  _SC_PHYS_PAGES                    1971256
+  _SC_PII                           undef
+  _SC_PII_INTERNET                  undef
+  _SC_PII_INTERNET_DGRAM            undef
+  _SC_PII_INTERNET_STREAM           undef
+  _SC_PII_OSI                       undef
+  _SC_PII_OSI_CLTS                  undef
+  _SC_PII_OSI_COTS                  undef
+  _SC_PII_OSI_M                     undef
+  _SC_PII_SOCKET                    undef
+  _SC_PII_XTI                       undef
+  _SC_PIPE                          undef
+  _SC_POLL                          undef
+  _SC_PRIORITIZED_IO                200809
+  _SC_PRIORITY_SCHEDULING           200809
+  _SC_RAW_SOCKETS                   200809
+  _SC_RE_DUP_MAX                    32767
+  _SC_READER_WRITER_LOCKS           200809
+  _SC_REALTIME_SIGNALS              200809
+  _SC_REGEX_VERSION                 undef
+  _SC_REGEXP                        1
+  _SC_RTSIG_MAX                     32
+  _SC_SAVED_IDS                     1
+  _SC_SCHAR_MAX                     127
+  _SC_SCHAR_MIN                     -128
+  _SC_SELECT                        undef
+  _SC_SEM_NSEMS_MAX                 undef
+  _SC_SEM_VALUE_MAX                 2147483647
+  _SC_SEMAPHORES                    200809
+  _SC_SHARED_MEMORY_OBJECTS         200809
+  _SC_SHELL                         1
+  _SC_SHRT_MAX                      32767
+  _SC_SHRT_MIN                      -32768
+  _SC_SIGNALS                       undef
+  _SC_SIGQUEUE_MAX                  61461
+  _SC_SINGLE_PROCESS                undef
+  _SC_SPAWN                         200809
+  _SC_SPIN_LOCKS                    200809
+  _SC_SPORADIC_SERVER               undef
+  _SC_SS_REPL_MAX                   undef
+  _SC_SSIZE_MAX                     32767
+  _SC_STREAM_MAX                    16
+  _SC_STREAMS                       undef
+  _SC_SYMLOOP_MAX                   undef
+  _SC_SYNCHRONIZED_IO               200809
+  _SC_SYSTEM_DATABASE               undef
+  _SC_SYSTEM_DATABASE_R             undef
+  _SC_T_IOV_MAX                     undef
+  _SC_THREAD_ATTR_STACKADDR         200809
+  _SC_THREAD_ATTR_STACKSIZE         200809
+  _SC_THREAD_CPUTIME                200809
+  _SC_THREAD_DESTRUCTOR_ITERATIONS  4
+  _SC_THREAD_KEYS_MAX               1024
+  _SC_THREAD_PRIO_INHERIT           200809
+  _SC_THREAD_PRIO_PROTECT           200809
+  _SC_THREAD_PRIORITY_SCHEDULING    200809
+  _SC_THREAD_PROCESS_SHARED         200809
+  _SC_THREAD_ROBUST_PRIO_INHERIT    undef
+  _SC_THREAD_ROBUST_PRIO_PROTECT    undef
+  _SC_THREAD_SAFE_FUNCTIONS         200809
+  _SC_THREAD_SPORADIC_SERVER        undef
+  _SC_THREAD_STACK_MIN              16384
+  _SC_THREAD_THREADS_MAX            undef
+  _SC_THREADS                       200809
+  _SC_TIMEOUTS                      200809
+  _SC_TIMER_MAX                     undef
+  _SC_TIMERS                        200809
+  _SC_TRACE                         undef
+  _SC_TRACE_EVENT_FILTER            undef
+  _SC_TRACE_EVENT_NAME_MAX          undef
+  _SC_TRACE_INHERIT                 undef
+  _SC_TRACE_LOG                     undef
+  _SC_TRACE_NAME_MAX                undef
+  _SC_TRACE_SYS_MAX                 undef
+  _SC_TRACE_USER_EVENT_MAX          undef
+  _SC_TTY_NAME_MAX                  32
+  _SC_TYPED_MEMORY_OBJECTS          undef
+  _SC_TZNAME_MAX                    6
+  _SC_UCHAR_MAX                     255
+  _SC_UINT_MAX                      4294967295
+  _SC_UIO_MAXIOV                    1024
+  _SC_ULONG_MAX                     undef
+  _SC_USER_GROUPS                   undef
+  _SC_USER_GROUPS_R                 undef
+  _SC_USHRT_MAX                     65535
+  _SC_V6_ILP32_OFF32                undef
+  _SC_V6_ILP32_OFFBIG               undef
+  _SC_V6_LP64_OFF64                 1
+  _SC_V6_LPBIG_OFFBIG               undef
+  _SC_V7_ILP32_OFF32                undef
+  _SC_V7_ILP32_OFFBIG               undef
+  _SC_V7_LP64_OFF64                 1
+  _SC_V7_LPBIG_OFFBIG               undef
+  _SC_VERSION                       200809
+  _SC_WORD_BIT                      32
+  _SC_XBS5_ILP32_OFF32              undef
+  _SC_XBS5_ILP32_OFFBIG             undef
+  _SC_XBS5_LP64_OFF64               1
+  _SC_XBS5_LPBIG_OFFBIG             undef
+  _SC_XOPEN_CRYPT                   1
+  _SC_XOPEN_ENH_I18N                1
+  _SC_XOPEN_LEGACY                  1
+  _SC_XOPEN_REALTIME                1
+  _SC_XOPEN_REALTIME_THREADS        1
+  _SC_XOPEN_SHM                     1
+  _SC_XOPEN_STREAMS                 undef
+  _SC_XOPEN_UNIX                    1
+  _SC_XOPEN_VERSION                 700
+  _SC_XOPEN_XCU_VERSION             4
+  _SC_XOPEN_XPG2                    1
+  _SC_XOPEN_XPG3                    1
+  _SC_XOPEN_XPG4                    1
+
+
+=for comment
+#TABLE_SYSCONF_END
+
+
+
+
+
+=head1 SEE ALSO
+
+This module is part of POSIX-1003 distribution version 0.98,
+built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights 2011-2013 on the perl code and the related documentation
+ by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

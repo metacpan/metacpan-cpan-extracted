@@ -1,0 +1,98 @@
+NAME
+    Proc::PidUtil - PID file management utilities
+
+SYNOPSIS
+      use Proc::PidUtil qw(
+            if_run_exit
+            is_running
+            make_pidfile
+            zap_pidfile
+            get_script_name
+            :all
+      );
+
+DESCRIPTION
+    Proc::PidUtil provides utilities to manage PID files
+
+    * $rv = if_run_exit('path',$message);
+      This routine checks for a file named:
+
+        '(scriptname).pid
+
+      in the the $path directory. If a file is found and the PID found in
+      the file is currently a running job, there is no return, the
+      subroutine prints the (scriptname): $pid, $message to STDERR and
+      exits.
+
+      If there is no file or the PID does not match a running job, run_exit
+      returns true.
+
+        input:        path for pidfiles
+        return:       true if not running
+                      else exits
+
+      Note: also exits if $path is false
+
+    * $rv = is_running('path2pidfile');
+      Check that the job described by the pid file is running.
+
+        input:        path 2 pid file
+        returns:      pid or false (0) if not running
+
+    * $rv = make_pidfile('path2pidfile',$pid);
+      Open a pid file and insert the pid value.
+
+        input:        path 2 pid file,
+                      pid value || $$
+        returns:      pid or false (0) on error
+
+    * $rv = zap_pidfile($path);
+        input:        path for pidfiles
+        returns:      return value of 'unlink'
+
+    * $me = get_script_name();
+      This function returns the script name portion of the path found in $0;
+
+        input:        none
+        returns:      script name
+
+        i.e.  if the script name is:
+        /usr/local/stuff/scripts/sc_admin.pl
+
+        $me = get_script_name();
+
+        returns ('sc_admin.pl')
+
+DEPENDENCIES
+            none
+  
+EXPORT_OK
+            if_run_exit
+            is_running
+            make_pidfile
+            zap_pidfile
+            get_script_name
+
+EXPORT_TAGS
+            :all
+
+COPYRIGHT
+    Copyright 2003 -2014, Michael Robinton <michael@bizsystems.com>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 2 of the License, or (at your
+    option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+AUTHOR
+    Michael Robinton <michael@bizsystems.com>
+

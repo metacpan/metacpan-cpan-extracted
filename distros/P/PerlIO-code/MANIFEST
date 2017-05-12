@@ -1,0 +1,25 @@
+.cvsignore
+Changes
+code.xs
+example/benchmark.pl
+example/toupper.pl
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/PerlIO/code.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+ppport.h
+README
+t/00_load.t
+t/01_code.t
+t/02_with_arg.t
+t/99_pod-coverage.t
+t/99_pod.t
+test.pl

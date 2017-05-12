@@ -1,0 +1,38 @@
+#!/usr/bin/perl -w
+use KDE;
+import KDE::app;
+
+my $nb = new KDE::NoteBook;
+$nb->setDirectionsReflectsPage(1);
+$nb->setEnablePopupMenu(1);
+$nb->setEnableArrowButtons(1);
+$nb->setOkButton;
+$nb->setCancelButton;
+$nb->setDefaultButton;
+$nb->setHelpButton;
+$app->connect($nb, 'okclicked()', 'quit()');
+$app->connect($nb, 'cancelclicked()', 'quit()');
+for $i (1 .. 10) {
+    my $tab = new Qt::Tab;
+    $tab->setLabel("$i. tab");
+    $tab->setEnabled(1);
+    $nb->addTab($tab);
+    $tab->continue;	# Don't let Perl delete $tab
+    for $j (1 .. $i) {
+	my $l = new Qt::Label($nb);
+	$l->setAlignment(Qt::AlignCenter);
+	$l->setText("This is page $j\nin a section with $i pages");
+	$l->setMinimumSize(300, 200);
+	my $p = new KDE::WizardPage;
+	$p->setWidget($l);
+	$p->setTitle("$j. page");
+	$p->setEnabled(1);
+	$nb->addPage($p);
+	$p->continue;	# Don't let Perl delete $p
+    }
+}
+
+$app->setMainWidget($nb);
+$nb->adjustSize;
+$nb->show;
+exit $app->exec;

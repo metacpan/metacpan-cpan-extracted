@@ -1,0 +1,88 @@
+{
+   "abstract" : "A Metabase relay server component",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "POE-Component-Metabase-Relay-Server",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.42",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.42"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Testers::Report" : "1.999",
+            "DBD::SQLite" : "1.29",
+            "DBI" : "1.609",
+            "Data::UUID" : "1.203",
+            "JSON" : "2.17",
+            "JSON::XS" : "2.29",
+            "Metabase::Fact" : "0.011",
+            "Metabase::User::Profile" : "0.003",
+            "Metabase::User::Secret" : "0.003",
+            "Module::Load::Conditional" : "0",
+            "Moose" : "1.01",
+            "Moose::Util::TypeConstraints" : "1.01",
+            "MooseX::POE" : "0.205",
+            "MooseX::Types::Path::Class" : "0.05",
+            "MooseX::Types::URI" : "0.03",
+            "POE" : "1.299",
+            "POE::Component::Client::HTTP" : "0.948",
+            "POE::Component::Client::Keepalive" : "0.271",
+            "POE::Component::EasyDBI" : "1.23",
+            "POE::Component::Metabase::Client::Submit" : "0.12",
+            "POE::Component::Resolver" : "0.921",
+            "Params::Util" : "1.01",
+            "Storable" : "0",
+            "Test::POE::Server::TCP" : "1.12",
+            "Time::HiRes" : "0",
+            "URI" : "1.52",
+            "base" : "0",
+            "perl" : "v5.6.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/poe-component-metabase-relay-server",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/poe-component-metabase-relay-server.git",
+         "web" : "https://github.com/bingos/poe-component-metabase-relay-server"
+      }
+   },
+   "version" : "0.36",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

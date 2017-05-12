@@ -1,0 +1,53 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::XMPP::Contact
+at lib/Protocol/XMPP/Contact.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Protocol::XMPP::Stream - handle XMPP protocol stream
+
+=head1 VERSION
+
+Version 0.006
+
+=head1 METHODS
+
+=head2 authorise
+
+Authorise a contact by sending a 'subscribed' presence response.
+
+=head2 subscribe
+
+Request subscription for a contact by sending a 'subscribe' presence response.
+
+=head2 unsubscribe
+
+Reject or unsubscribe a contact by sending an 'unsubscribed' presence response.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Protocol::XMPP::Base>
+
+L<debug|Protocol::XMPP::Base/debug>, L<dispatch_event|Protocol::XMPP::Base/dispatch_event>, L<is_authorised|Protocol::XMPP::Base/is_authorised>, L<is_loggedin|Protocol::XMPP::Base/is_loggedin>, L<new|Protocol::XMPP::Base/new>, L<new_future|Protocol::XMPP::Base/new_future>, L<next_id|Protocol::XMPP::Base/next_id>, L<stream|Protocol::XMPP::Base/stream>, L<write_text|Protocol::XMPP::Base/write_text>, L<write_xml|Protocol::XMPP::Base/write_xml>
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2010-2014. Licensed under the same terms as Perl itself.

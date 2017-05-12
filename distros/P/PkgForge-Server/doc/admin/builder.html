@@ -1,0 +1,303 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <title>PkgForge Admin - Package Builder</title>
+  <meta name="author" content="Stephen Quinney">
+</head>
+
+<body>
+<h1>PkgForge Admin - Package Builder</h1>
+
+<p>Before any package builders can be configured the following steps
+must be taken:</p>
+
+<ol>
+  <li><a href="/doc/server/admin/filesystem.html">Configure the PkgForge filesystem</a></li>
+  <li><a href="/doc/registry/client.html">Configure client access for the PkgForge Registry database</a></li>
+</ol>
+
+<h2>Installing the Software</h2>
+
+<p>The PkgForge, PkgForge-Registry and PkgForge-Server packages must
+be installed. These are provided as RPMs but it is also possible to
+build and install them from the <code>.tar.gz</code> format in the
+same way as any other Perl module.</p>
+
+<p>Perl version 5.8.8 or newer is required. The PkgForge-Server
+package requires the following modules.</p>
+
+<ul>
+  <li>File::Copy</li>
+  <li>File::Find::Rule</li>
+  <li>File::Path</li>
+  <li>File::Temp (&gt;= 0.22)</li>
+  <li>IPC::Run</li>
+  <li>Log::Dispatch (&gt;= 2.21)</li>
+  <li>MIME::Lite::TT</li>
+  <li>Moose</li>
+  <li>MooseX::Getopt</li>
+  <li>MooseX::LogDispatch</li>
+  <li>MooseX::Types</li>
+  <li>Readonly</li>
+  <li>Template</li>
+  <li>Try::Tiny</li>
+  <li>UNIVERSAL::require</li>
+</ul>
+
+<p>If you wish to build from SRPMs (currently this is the only
+supported package format) you will also need the Perl RPM2 module
+installed.</p>
+
+<p>If you are using LCFG this can all be installed by including
+the <code>lcfg/options/pkgforge-builder.h</code> header.</p>
+
+<h2>Configuration</h2>
+
+<p>
+As with the software installation, if you are using LCFG this can all
+be configured correctly by using
+the <code>lcfg/options/pkgforge-builder.h</code> header.
+</p>
+
+<p>The basic layout of the filesystem (as described in the
+separate <a href="/doc/server/admin/filesystem.html">filesystem
+information</a>) should be configured using
+the <code>/etc/pkgforge/pkgforge.yml</code> YAML file. It should look
+something like this:</p>
+
+<pre>
+--- 
+"accepted": '/afs/example.org/pkgs/pkgforge/accepted/'
+"incoming": '/afs/example.org/pkgs/pkgforge/incoming/'
+"results": '/afs/example.org/pkgs/pkgforge/results/'
+</pre>
+
+<p>If you are using the LCFG pkgforge component then this is done
+using the <code>pkgforge.incoming</code>, <code>pkgforge.accepted</code>
+and <code>pkgforge.results</code> resources.</p>
+
+<p>
+If AFS is being used to provide the filesystem for the pkgforge
+service then you will need a Kerberos principal and an associated AFS
+user. As with Kerberised access to the Registry database the Kerberos
+keytab can be managed using the LCFG kerberos component. If you
+already have this setup for DB access you do not need a second keytab
+for AFS access. The following configuration will create a keytab:
+</p>
+
+<pre>
+!pkgforge.keytab_buildd   mSET(&lt;%pkgforge.configdir%>/pkgforge_builder.keytab)
+
+!kerberos.keys                       mADD(pkgforge_builder)
+kerberos.keytab_pkgforge_builder    &lt;%pkgforge.keytab_builder%>
+kerberos.keytabuid_pkgforge_builder &lt;%pkgforge.user%>
+kerberos.keytabgid_pkgforge_builder &lt;%pkgforge.group%>
+</pre>
+
+<p>
+Alternatively the principal and keytab can be created manually using
+the kadmin tool. You will need to ensure that the UID and GID and the
+permissions are correct for the keytab or k5start will not work.
+</p>
+
+<p>A package builder is configured using
+the <code>/etc/pkgforge/buildd.yml</code> YAML file and also a
+platform-specific YAML file
+(e.g. <code>/etc/pkgforge/buildd-bressler_sl6.yml</code>). The
+registry database access configuration section has already been
+discussed in the
+<a href="/doc/registry/client.html">client configuration</a> page. The
+general buildd configuration should look something like:</p>
+
+<pre>
+--- 
+"init": '/etc/init.d/pkgforge-buildd'
+"keytab": '/etc/pkgforge/pkgforge_builder.keytab'
+"registry": 
+  "host": 'pkgforge'
+  "name": 'pkgforge'
+  "user": 'pkgforge_builder'
+"start": 'yes'
+</pre>
+
+<p>
+The <code>init</code>, <code>keytab</code> and <code>start</code>
+options are not used by the daemon, they are purely instructions for
+the LCFG pkgforge component.
+<p>
+
+<p>
+The important file is <code>/etc/sysconfig/pkgforge-buildd</code>
+which controls how the <code>/etc/init.d/pkgforge-buildd</code>
+init-script starts the daemon. If the LCFG pkgforge component is being
+used then the sysconfig file will be configured automatically. The
+sysconfig file should look something like:
+</p>
+
+<pre>
+NAMES="bressler_sl6 bressler_sl664"
+RUNAS="pkgforge"
+KRB5_KEYTAB="/etc/pkgforge/pkgforge_builder.keytab"
+</pre>
+
+<p>The following options can be modified via the sysconfig file but
+mostly they have sensible defaults.</p>
+
+<ul>
+  <li><code>NAMES</code> - <strong>This MUST be specified</strong></li>
+  <li><code>KRB5_KEYTAB</code> - <code>/etc/pkgforge/pkgforge_builder.keytab</code></li>
+  <li><code>KRB5_CCACHE</code> - <code>/var/lib/pkgforge/krb5cache-buildd</code></li>
+  <li><code>PIDFILE</code> - <code>/var/run/pkgforge/k5start-buildd.pid</code></li>
+  <li><code>SCRIPT</code> - <code>/usr/sbin/pkgforge-buildd</code></li>
+  <li><code>RUNAS</code> - <code>pkgforge</code></li>
+</ul>
+
+<p>A host can have multiple build daemons running (more than one per
+processor/core is a bad idea), the names of all the build daemons must
+be specified and the init-script will start them all in turn.</p>
+
+<p>
+Note that, by default, some files are stored in
+the <code>/var/lib/pkgforge/</code>
+and <code>/var/run/pkgforge/</code> directories. Those directories
+must be writable by whichever unix user is used to run the daemon.
+</p>
+
+<h3>Builder-specific Options</h3>
+
+<p>As well as the general configuration which applies to all build
+daemons on a host each daemon has its own specific configuration, this
+is stored in a file which references the name of the build daemon
+(like <code>/etc/pkgforge/buildd-bressler_sl6.yml</code>). The
+configuration will look something like this:
+
+<pre>
+--- 
+"builder": 'RPM'
+"checks": 
+  - 'RPMLint'
+"name": 'bressler_sl6'
+"reports": 
+  - 'Email'
+"submitters": 
+  - 'PkgSubmit'
+"timeout": '3600'
+</pre>
+
+<p>The build process works in phases and the command(s) issued during
+each phase are carried out using modules found in
+the <code>PkgForge::BuildCommand</code> namespace. The phases are configured per-build daemon and are run in the following order:</p>
+
+<ol>
+  <li><strong>builder</strong> - There must be a single builder command
+(e.g. <code>PkgForge::BuildCommand::Builder::RPM</code>.</li>
+  <li><strong>checks</strong> - There may be zero or more check commands (e.g.  <code>PkgForge::BuildCommand::Check::RPMLint</code>).</li>
+  <li><strong>submitters</strong> - There may be zero or more package submitters (e.g. <code>PkgForge::BuildCommand::Submitter::PkgSubmit</code>).</li>
+  <li><strong>reports</strong> - There may be zero or more reporters which are run at the end of the entire process to report success or fail
+(e.g. <code>PkgForge::BuildCommand::Reporter::Email</code>).</li>
+</ol>
+
+<p>A timeout can be set for the build process, in the case of the RPM
+builder this is passed to the rpmbuild command and limits the maximum
+time the building of a single package may take.</p>
+
+<p>If the LCFG pkgforge component is being used then this will be
+configured automatically by
+the <code>lcfg/options/pkgforge-builder.h</code> header. It can be
+specified like this:</p>
+
+<pre>
+!pkgforge.builders          mADD(f13)
+pkgforge.type_f13           RPM
+pkgforge.name_f13           &lt;%%sysinfo.node%%>_f13
+pkgforge.checks_f13         RPMLint
+pkgforge.submitters_f13     PkgSubmit
+pkgforge.reports_f13        Email
+</pre>
+
+<p>By default a builder will be added which matches the host platform
+and architecture combination (e.g. f13/i386). If the architecture of
+the host is x86_64 then it will also get a default builder for the
+same platform but for the i386 architecture. It is typically possible
+to build for earlier platforms using hosts based on newer
+(e.g. building for SL5 on SL6) but not the other way around.</p>
+
+<h3>Temporary Files</h3>
+
+<p>
+At various points the daemon generates temporary files. For security
+each build daemon uses a specific temporary directory (which is a
+sub-directory of <code>/var/tmp/pkgforge</code> by default,
+e.g. <code>/var/tmp/pkgforge/bressler_sl6</code>). This directory must
+be writable by whichever unix user is used to run the daemon. The
+location can be changed by setting the <code>tmpdir</code> attribute
+in the <code>/etc/pkgforge/buildd.yml</code> YAML file (or the
+builder-specific configuration file), that is not currently modifiable
+using the LCFG pkgforge component.
+</p>
+
+<h3>Logging</h3>
+
+<p>
+By default the build daemon log is kept in
+the <code>/var/log/pkgforge/buildd.log</code> file. You need to ensure
+that the log directory is writable by whichever unix user is used to
+run the daemon. Logs for each individual build are also stored in a
+daemon-specific directory
+(e.g. <code>/var/log/pkgforge/bressler_sl6</code>). Once a build has
+completed the log is copied into the relevant results directory so you
+may wish to regularly cull this directory using tmpwatch or similar.
+</p>
+
+<p>
+The logs from the build daemon are configured via
+the <code>/etc/pkgforge/log-buildd.cfg</code> configuration
+file. For details on how to modify the style see the documentation for
+the Log::Dispatch and MooseX::LogDispatch Perl modules.
+</p>
+
+<h2>Starting/Stopping the Daemon</h2>
+
+<p>
+Once the configuration files are in place the build daemons can be
+started using the init-script provided in the package. This is
+normally <code>/etc/init.d/pkgforge-buildd</code>.
+</p>
+
+<p>
+Currently the init-script assumes that Kerberos authentication is
+required and it will attempt to start the k5start daemon
+first. Patches welcome to remove this limitation.
+</p>
+
+<p>
+If the LCFG pkgforge component is being used then the daemon should be
+managed using <code>om</code> and the init-script should not be called
+directly, for example:
+</p>
+
+<pre>
+% om pkgforge start
+% om pkgforge stop
+</pre>
+
+<p>
+For the component to actually start the daemon
+the <code>pkgforge.start_buildd</code> resource must be set
+to <code>yes</code>.
+</p>
+
+<p>
+If any configuration or code changes are made then the daemon will
+need to be completely restarted. This is done with
+the <em>restart</em> method.
+</p>
+
+<p>
+Without the LCFG pkgforge component the init-script should be used
+directly. The usual <code>start</code>, <code>stop</code>
+and <code>restart</code> methods are available.
+</p>
+
+</body>
+</html>

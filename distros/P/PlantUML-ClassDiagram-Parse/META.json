@@ -1,0 +1,98 @@
+{
+   "abstract" : "PlantUML class diagram syntax parser",
+   "author" : [
+      "@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PlantUML-ClassDiagram-Parse",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : "0.34",
+            "perl" : "5.008001"
+         },
+         "suggests" : {
+            "Text::Xslate" : "v3.3.9"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "PlantUML::ClassDiagram::Class" : {
+         "file" : "lib/PlantUML/ClassDiagram/Class.pm"
+      },
+      "PlantUML::ClassDiagram::Class::Base" : {
+         "file" : "lib/PlantUML/ClassDiagram/Class/Base.pm"
+      },
+      "PlantUML::ClassDiagram::Class::Factory" : {
+         "file" : "lib/PlantUML/ClassDiagram/Class/Factory.pm"
+      },
+      "PlantUML::ClassDiagram::Class::Method" : {
+         "file" : "lib/PlantUML/ClassDiagram/Class/Method.pm"
+      },
+      "PlantUML::ClassDiagram::Class::Variable" : {
+         "file" : "lib/PlantUML/ClassDiagram/Class/Variable.pm"
+      },
+      "PlantUML::ClassDiagram::Parse" : {
+         "file" : "lib/PlantUML/ClassDiagram/Parse.pm",
+         "version" : "0.1"
+      },
+      "PlantUML::ClassDiagram::Relation" : {
+         "file" : "lib/PlantUML/ClassDiagram/Relation.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Kesin11/plantuml_class_digram_parse/issues"
+      },
+      "homepage" : "https://github.com/Kesin11/plantuml_class_digram_parse",
+      "repository" : {
+         "url" : "git://github.com/Kesin11/plantuml_class_digram_parse.git",
+         "web" : "https://github.com/Kesin11/plantuml_class_digram_parse"
+      }
+   },
+   "version" : "0.1",
+   "x_contributors" : [
+      "Kenta Kase <kesin1202000@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27202"
+}

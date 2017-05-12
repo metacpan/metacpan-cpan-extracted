@@ -1,0 +1,30 @@
+# Chinese translations for Padre-Plugin-PerlCritic package.
+# Copyright (C) 2009 THE Padre-Plugin-PerlCritic'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Padre-Plugin-PerlCritic package.
+# BlueT - Matthew Lien - 練喆明 <BlueT@bluet.org>, 2009.
+# 
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-PerlCritic\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-19 02:34+0800\n"
+"PO-Revision-Date: 2009-05-19 02:38+0800\n"
+"Last-Translator: BlueT - Matthew Lien - 練喆明 <BlueT@bluet.org>\n"
+"Language-Team: Chinese (traditional) <bluet@ubuntu-tw.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit"
+
+#: lib/Padre/Plugin/PerlCritic.pm:31
+msgid "Run PerlCritic"
+msgstr "執行 PerlCritic"
+
+#: lib/Padre/Plugin/PerlCritic.pm:43
+msgid "Document is not a Perl document"
+msgstr "此文件並不是一個 Perl 文件"
+
+#: lib/Padre/Plugin/PerlCritic.pm:43
+msgid "Error"
+msgstr "錯誤"
+

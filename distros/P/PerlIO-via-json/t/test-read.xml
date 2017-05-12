@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- this XML taken from XML::XML2JSON tests -->
+<test>
+        <data attr1="test">some test text</data>
+        <empty a="b"><inner c="d"/></empty>
+        <private some="value" />
+        <censored foo="secret"/>
+        <array perl="awesome" hidden="secret">
+                <item index="0"/>
+                <item index="1"/>
+                <item index="2"/>
+        </array>
+</test>

@@ -1,0 +1,58 @@
+Revision history for Perl extension Parallel::Prefork.
+
+0.18
+	- fix the broken $pm->wait_all_children without timeout (by shogo82148)
+
+0.17
+	- fix the broken $pm->wait_all_children with timeout
+
+0.16
+	- $pm->wait_all_children takes an optional argument specifying a timeout value (in seconds) (by karupanerura)
+
+0.15
+	- fix bug in Parallel::Prefork::SpareWorkers that did not spawn proceses up to the given maximum number
+	- fix crash in Parallel::Prefork::SpareWorkers when it receives a signal while reading the status file (by Perlover)
+
+0.14
+	- fix doc issues
+
+0.13
+	- repackage 0.12 (tar xf fails with 0.12 on some platforms)
+
+0.12
+	- support for pre/post fork callbacks
+
+0.11
+	- suppress warning in perl < 5.10
+
+0.10
+	- support new style: $pm->start(sub { ... }) (thanks to confound)
+	- collect zombie processes without any delay when spawn_interval is nonzero
+	- do not sleep spawn_interval seconds when a worker process exits non-zero and if err_repawn_interval < spawn_interval
+
+0.09
+	- support for slow startup (with the new spawn_interval parameter) and slow shutdown (by passing arrayrefs as values of the trap_signals hashref)
+
+0.08
+	- fix test (compatibility with older versions of Test::More, timing was too severe)
+
+0.07
+	- fix compilation error on perl 5.10.0
+
+0.06
+	- add Parallel::Prefork::SpareWorkers
+
+0.05 - Wed Sep 23 20:25:00 JST 2009
+	- do not die on fork failure
+
+0.04 - Mon Sep 29 13:04:00 JST 2008
+	- add on_child_reap callback (by lestrrat)
+
+0.03 - Fri Apr 11 14:30:00 JST 2008
+	- declare dependency against Class::Accessor::Fast
+
+0.02 - Mon Apr 07 00:00:00 JST 2008
+	- only delay respawning a new worker process if prev. exited abnormally
+
+0.01 - Fri Apr 04 00:00:00 JST 2008
+	- initial release

@@ -1,0 +1,8 @@
+"id","parent_id","name","vertical","is_actionable"
+"1","","Alpha","Auto","0"
+"2","1","Epsilon","Auto","0"
+"3","2","Kappa","Auto","1"
+"4","2","Kappa","Auto","1"
+"5","1","Zeta","Auto","0"
+"6","5","Lambda","Auto","1"
+"7","5","Mu","Auto","1"

@@ -1,0 +1,21 @@
+0.04 2015-10-13T15:23:16+02:00
+ - Add Task::PYX to SEE ALSO section in doc.
+ - Add output image to example.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Move pyx2graphviz to App::PYX::GraphViz distribution.
+ - Update Module::Install to 1.16 version.
+
+0.03 2015-01-18T17:44:55+01:00
+ - Update copyright years.
+ - Rewrite to new PYX::Parser 0.02 (callbacks).
+ - Rewrite to new PYX::Parser 'non_parser_options' parameter.
+
+0.02 2014-11-29T09:04:56+01:00
+ - Add test for constructor.
+ - XXX Move GraphViz.pm in distribution to lib/PYX/GraphViz.pm due
+   Module::Install requires command problem with GraphViz.pm, which isn't
+   GraphViz module.
+
+0.01 2014-11-26T23:45:00+01:00
+ - First version.

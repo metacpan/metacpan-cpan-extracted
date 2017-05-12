@@ -1,0 +1,136 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Panotools::Script;
+
+for my $path_pto (@ARGV)
+{
+    my $pto = new Panotools::Script;
+    $pto->Read ($path_pto);
+    print STDOUT "---\nHugin project file: $path_pto\n";
+
+    # general project info
+    print STDOUT "Project:\n";
+    print STDOUT '    Number of images: '. scalar (@{$pto->Image}) ."\n";
+    for my $item (@{$pto->Panorama->Report}, @{$pto->Option->Report}, @{$pto->Mode->Report})
+    {
+        print STDOUT '    '. (join ': ', @{$item}) ."\n";
+    }
+
+    print STDOUT '    Number of stacks: '. scalar (@{$pto->Stacks}) ."\n";
+    for my $index (0 .. @{$pto->Stacks} -1)
+    {
+        print STDOUT "    Stack $index: ". join (', ', @{$pto->Stacks->[$index]}) ."\n";
+    }
+
+    print STDOUT '    Number of exposure layers: '. scalar (@{$pto->ExposureLayers}) ."\n";
+    for my $index (0 .. @{$pto->ExposureLayers} -1)
+    {
+        print STDOUT "    Layer $index: ". join (', ', @{$pto->ExposureLayers->[$index]}) ."\n";
+    }
+
+    my $connected_groups = $pto->ConnectedGroups;
+    print STDOUT '    Number of connected group(s): '. scalar (@{$connected_groups}) ."\n";
+    for my $index (0 .. @{$connected_groups} -1)
+    {
+        print STDOUT "    Group $index: ". join (', ', @{$connected_groups->[$index]}) ."\n";
+    }
+
+    # summarise control points
+    my $results = {};
+    for my $control (@{$pto->Control})
+    {
+        my $t = $control->{t};
+        $results->{$t} += 1;
+    }
+    print STDOUT "    Normal control points: ". $results->{0} ."\n" if (defined $results->{0});
+    delete $results->{0};
+    my ($total, $min, $max, $average, $sigma) = $pto->Stats;
+    print STDOUT "    Average normal control point error: $average\n";
+    print STDOUT "    Maximum normal control point error: $max\n";
+    print STDOUT "    Horizontal control points: ". $results->{1} ."\n" if (defined $results->{1});
+    delete $results->{1};
+    print STDOUT "    Vertical control points: ". $results->{2} ."\n" if (defined $results->{2});
+    delete $results->{2};
+    print STDOUT "    Straight lines: ". scalar (keys %{$results}) ."\n" if (scalar keys %{$results});
+
+    for my $index (0 .. scalar (@{$pto->Image}) - 1)
+    {
+        # summarise input image
+        print STDOUT "Image $index:\n";
+        my @items = @{$pto->Image->[$index]->Report};
+        push @items, @{$pto->ImageMetadata->[$index]->Report} if defined $pto->ImageMetadata->[$index];
+        push @items, @{$pto->Variable->Report ($index)};
+        for my $item (@items)
+        {
+            print STDOUT '    '. (join ': ', @{$item}) ."\n";
+        }
+
+        # summarise control points for this image
+        my $results = {};
+        for my $control (@{$pto->Control})
+        {
+            my $N = $control->{N};
+            my $n = $control->{n};
+            next unless ($n == $index or $N == $index);
+            $results->{$N} += 1;
+            $results->{$n} += 1;
+        }
+        delete $results->{$index};
+        for my $key (sort keys %{$results})
+        {
+            print STDOUT "    Connections to image $key: ". $results->{$key} ."\n";
+        }
+        # summarise masks for this image
+        my $id_mask = 0;
+        for my $mask (@{$pto->Mask})
+        {
+            next unless $mask->{i} == $index;
+            print STDOUT '    Mask: '. $id_mask ."\n";
+            for my $item (@{$mask->Report})
+            {
+                print STDOUT '        '. (join ': ', @{$item}) ."\n";
+            }
+            $id_mask++;
+        }
+    }
+}
+
+__END__
+
+=head1 NAME
+
+ptoinfo - Prints human readable reports for .pto files
+
+=head1 Synopsis
+
+  ptoinfo project1.pto [project2.pto ...]
+
+=head1 DESCRIPTION
+
+Takes one or more hugin .pto projects and outputs a text report on STDOUT,
+the report is incidentally in YAML format.
+
+=head1 Calling syntax
+
+  ptoinfo <pto-file> <pto-file> ...
+
+=head1 License
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 See Also
+
+L<http://panotools.sourceforge.net/>
+
+=head1 Author
+
+Bruno Postle, E<lt>bruno (at) postle.netE<gt>
+
+=cut
+

@@ -1,0 +1,209 @@
+Revision history for Perl extension PDF::Reuse
+
+0.39 Tues Sept 26 2016
+     This release simply corrects the rev number
+
+0.38 Mon Sept 26 2016
+     118069: MYMETA must not be included
+
+0.37 Fri Sept 23 2016
+     101145 	Add support for IO::String and "in memory" files
+     107301 	prStrWidth returns undef when string is '0'
+     41287 	It seems that filehandles of TTF files are not closed
+     79703 	Allow a handle to be provided instead of a file name
+     107299 	Warnings on empty strings in prStrWidth/prText
+     117892 	Could not open 'Reuse.pm' (0.36_02)
+     93049 	PDF::Reuse Bookmarks bug and fix
+     97290 	fix for uninitialized value $param{"Index"} when reading PDF version 1.5 file
+     43232 	Wrong prototype for findFont()
+     46202 	PDF-Reuse 0.35 prDoc/xrefSection problem
+     48804 	Bad PDF Spins CPU
+     59359 	qQ imbalance in Reuse.pm
+     104874 	prMbox() not dealing with 0 ux/uy
+
+     Thanks to all who contributed patches for these fixes!
+
+0.36 Wed Dec 10 2014
+     Added binary blob handling to prJpeg
+     Added prAltJpeg to allow for insertion of alternate low-res images for display
+     Added support for grayscale images to prJpeg after suggestions from Ingo Lachmann
+     Removing depricated define(@array) syntax per suggestion from Nigel Gourlay
+     Updating copyright notices
+
+0.35 Mon Jul 3 2008
+     Thanks to Yunliang Yu Outlines mode is turned on, if bookmarks are added
+     and a minor bug with bookmarks and another one with the creation of pages
+     are corrected.
+
+0.34 June 2008
+     Thanks to Grant McLean prTTFont method is added to support embedding
+     TrueType fonts and using UTF8 text with prText (only works if Font::TTF and
+     Text::PDF are installed)
+
+0.33 Tue Nov 15 2005
+     Corrected a "bug" with prField. Changed the documentation a little.
+     The address to the mailing list is given. 
+
+0.32 Fri Jul 22 2005
+     prText has 1 more parameter, rotation, parameter 4 now only handles alignment.
+     prDoc has new functionality. If there are "contents" available, it is added to
+     the array of streams of the first included page. (This was developed for a specific
+     task with support from the Electoral Enrolment Centre, Wellington, New Zealand.)
+     prSinglePage is a new function. It is a variant of prDoc for one page. It also
+     has a counter of pages and last page extracted from a document, so it has more or 
+     less the ability to loop through a document if necessary.
+     A new output definition for Apache2, thanks to Matisse Enzer.
+     
+0.30 Thu Jun 3
+     Changes to the documentation. Fonts are handled a little differently.
+     If prFont is called in list context, a reference to all fonts known to 
+     the current program is also returned.
+
+0.29 Mon May 10
+     A bug with fonts corrected, minor changes to the documentation.
+
+0.28 Fri Apr 23 2004
+     New annotations, which are repeated on many pages, are defined only once.
+     You can tie the request object to the output file, thanks to Matisse Enzer.
+     Compress::Zlib is included in the code with 'use'. There was some problem with
+     'autouse', and I couldn't solve it. Minor changes to the the code to improve
+     performance a little. 
+
+0.27 Fri Apr 16 2004
+     A potential bug with links removed. Repeated links are stored only once.
+     Unnecessary line feeds removed.
+
+0.26 Thu Apr 15 2004
+     Bugs fixed. When an image was imported, the program could become confused
+	  about standard fonts. Importing of JavaScripts failed. Corrected.
+
+0.25 Sat Apr 10 2004
+     -"prLink" added, to add and merge hyper links into a document
+     -prStrWidth added. You get string width calculated for some predefined fonts.
+     -A new parameter to prText added, so you can center, right adjust and rotate
+     texts.
+     If the text is not rotated you can get from- and to- positions of text strings
+     -New parameters to prFile to control how a document is initially displayed
+     -MediaBox is defined at the top of the page tree also. 
+     -Special characters in values to prField are hex-encoded when they are
+     transferred to the new document, and unescaped from within JavaScript.
+     So special characters might be handled in a new way ! 
+
+0.24 Tue Mar 9 2004
+     Corrected a warning about when JavaScripts can be added to a document
+
+0.23 Tue Feb 3 2004
+     Added warnings in the documentation about JavaScript and webpdf.api
+
+0.22 Sun Jan 11 2004
+     Corrected an error introduced in version 0.15. Resources were not inherited
+     the way they should.  
+     Changes to the documentation. The examples have been moved from this
+     distribution to PDF::Reuse::Tutorial.
+
+0.21 Fri Dec 26 2003
+     -prFontSize will accept sizes with decimal point. 
+     -The constant IS_MODPERL has been added. It is taken from $ENV{MOD_PERL}.
+      If it is set, STDOUT can be tied to Apache.
+
+0.20 Sun Dec 14 2003
+     -You can extract pages or split documents with the help of two
+     new parameters to prDoc. 
+     -prField can have a snippet of JavaScript code instead of a value.
+     -Bugs removed. Internal changes.
+     
+0.19 Fri Nov 21 2003
+     Code produced for prField is now prepared with "extra" backslashes for 
+     \n \r and \'. Improved precision in the "formula" for rotation.
+
+0.18  Tue Nov 11 2003
+      Several new parameters for forms and images, so they can be resized, moved
+     and rotated. 
+
+0.17  Sat Nov 1 2003
+     A bug removed. The module sometimes got confused when it was reconstructing
+     forms and was switching between different files. This was an error 
+     introduced with version 0.15
+
+0.16  Tue Oct 21 2003
+     Added backslashes to the 4 special characters in the comment line, which is 
+     written to every file produced by PDF::Reuse. If not escaped,
+     they caused Red Hat (8.0) Linux to terminate the run with the error message:
+     "Wide character in syswrite ... PDF/Reuse.pm line 268".
+     A changed regex to find object references. Some global variables 
+     have been removed. If you use the function prCompress(1), new JavaScripts
+     are also compressed.
+     You can have a new parameter with prInit, so the initiation code is shown
+     at document level. By default (now, but not before) it is not shown. 
+
+ 
+0.15  Fri Oct 10 2003
+     First steps to adjust the module to PDF-1.5 (Acrobat 6.0). Lots of changes to
+     the code. 
+     If you try to update a field with prField and the field can't be found, the
+     field is just ignored. Before the change, you had a JavaScript error and a
+     subsequent interruption.
+
+0.14  Mon Sep 15 2003
+     The added parameter for prInit from version 0.12 had to be withdrawn.
+     Sometimes it caused Acrobat/Acrobat Reader to crash.
+
+0.12  Tue Sep 9 2003
+     Corrected a "bug". The "typeof info.moddate" can give another result than
+     1 year ago, so an important test at initiation had to be changed.
+     You can have a new parameter with prInit, so the initiation code is shown
+     at document level. By default (now, but not before) it is not shown. 
+
+0.11  Wed Sep 3 2003
+     You can have your bookmarks closed with a new parameter.
+     Changes to the documentation.
+
+0.10  Tue Aug 26 2003
+     Added a function to define bookmarks. 
+     Corrected a bug with object numbers.
+     Sometimes the module reserved an object number and didn't need it. Subsequent
+     procedures continued with new object numbers and there was a gap ..
+     Changes to the documentation. "Experimental" has been removed from the 
+     interactive functions.
+      
+0.09  Mon Jul 21 2003
+     If no file name is given to the function prFile, output is written to STDOUT. 
+
+0.08  Sun Jun 29
+     Corrected bugs which occurred when a font was going to be reused. The function
+     prInitVars has been added. changes to the documentation.
+
+0.07  Tue Jun 17
+     You can add JavaScripts as strings, not only as files. Corrected bugs which
+     occurred 1) when JavaScripts were added and 2) when the log for prAdd was
+     produced.
+
+0.06 Mon Jun 2
+     Corrected a bug in prText: when you tried to print '0' it was transformed
+     to ''. Minor changes to the barcode font. Changed documentation referring
+     to GD::Barcode and the modules in that group
+
+0.05 Wed May 21 15:45 
+     Tried to make the module backwards compatible with Perl 5.6.1
+     Changed use 5.008 to use 5.006, constants are individually defined and
+     AutoLoader is used instead of SelfLoader.
+
+0.03 Tue Apr 29 16:50:00 2003
+   - Corrected an error that occurred when a form was used many times in different
+     documents. (Translation of old => new object number)
+   - Some preparations for using PDF::Reuse as an COM-object (ActiveX object)
+     (In version 0.02 of PDF::Reuse::Tutorial there will be examples)
+
+0.02  Fri Apr 25 20:49:50 2003
+   - I had to put all PDF documents and generated modules used in the examples 
+     in a zip file, to hide them from the normal processing around the upload to CPAN.
+
+0.01  Thu Apr  3 12:21:26 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n PDF::Reuse
+
+ 
+
+
+     
+     

@@ -1,0 +1,15 @@
+Q: I'm trying to read the "datebook.dat", "address.dat", "todo.dat" or
+   "memopad.dat" files created by the HotSync desktop tool, but it
+   doesn't work.
+
+A: Those files aren't PDB files, so these modules can't read them. It
+   looks as if the HotSync conduits don't store a backup PDB file of
+   the database.
+	In any case, I don't know what format those files are in.
+
+   http://web.archive.org/web/20050718081526/http://www.geocities.com/Heartland/Acres/3216/palmrecs.htm
+   appears to have information about the file formats used by HotSync.
+
+	The Pilot:: Perl package by John Wiegley might also prove
+   useful. See:
+	https://metacpan.org/release/Pilot

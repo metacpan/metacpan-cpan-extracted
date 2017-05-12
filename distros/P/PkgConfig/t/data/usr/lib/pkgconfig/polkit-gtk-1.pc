@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: polkit-gtk-1
+Description: PolicyKit GTK+ widgets
+Version: 0.101
+Libs: -L${libdir} -lpolkit-gtk-1
+Cflags: -I${includedir}/polkit-gtk-1
+Requires: polkit-gobject-1

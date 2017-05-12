@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+README.html
+t/PerlSpeak.t
+lib/PerlSpeak.pm
+META.yml                                 Module meta-data (added by MakeMaker)

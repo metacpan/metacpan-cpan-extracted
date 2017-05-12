@@ -1,0 +1,62 @@
+NAME
+
+    Plack::Middleware::P3P - Add standard (or custom) P3P header to
+    response
+
+VERSION
+
+    version 0.001
+
+SYNOPSIS
+
+        use Plack::Builde;
+        use Plack::Middleware::P3P
+    
+        builder {
+            enable 'P3P';
+            $app;
+        }
+
+    or with custom policies:
+
+        builder {
+           enable 'P3P', policies => 'FBI CIA NSA';
+           $app;
+        }
+
+    or with an array of custom policies:
+
+        builder {
+           enable 'P3P', policies => ['FBI', 'CIA', 'NSA'];
+           $app;
+        }
+
+DESCRIPTION
+
+    This Plack::Middleware adds a P3P header to all responses (see the W3C
+    page <http://www.w3.org/P3P/>). By default at adds the CAO, PSA and OUR
+    policies. The default policies are enough to make Internet Explorer
+    accept cookies from an iframe, the raison d'etre for this module.
+
+CONFIGURATION
+
+    policies
+
+      Sets custom policies in the P3P header. Policies can be specified as
+      a string or as an array of strings.
+
+SEE ALSO
+
+    Plack::Middleware, Plack::Middleware::Headers
+
+AUTHOR
+
+    Hans Staugaard <staugaard@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Hans Staugaard.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,98 @@
+Revision history for POE-Component-RSSAggregator
+
+1.11    6/30/2008
+        - add POE as a prereq (duh)
+        - clarified some documentation
+
+1.1     6/30/2008
+        - perlcritic updates
+            - move pod below __END__
+            - added two constants
+                - use constant DEFAULT_TIMEOUT => 60;
+                - use constant REDIRECT_DEPTH  => 2;
+            - remove trailing whitespace from lines
+            - added implicit returns from subs that didn't have them
+            - fix uninterpolated string warnings ("" to '')
+            - added use strict/use warnings to tests
+            - change quoted regexp to use {} instead of ()
+        - Update README
+
+1.022   11/06/2006
+        - No need to update, cpants META.yml fix, needed to update to
+          ExtUtils::MakeMaker 6.31 for META.yml update (part deux)
+
+1.021   11/05/2006
+        - No need to update, cpants META.yml fix, needed to update to
+          ExtUtils::MakeMaker 6.31 for META.yml update
+
+1.02    11/01/2006
+        - Fixed cpants META.yaml issue
+
+1.01    - Missed renaming a fetch to _fetch when the delay was set
+          Thanks to Kester Edmonds for reporting it.
+
+1.0     - Wrote decent pod for the module (finally)
+        - Updated pod template to perl best practices template
+        - renamed methods that should have only be internal
+            - renamed fetch to internal _fetch
+            - renamed response to internal _response
+
+0.3     - Added POE::Component::Client::DNS as a dependency
+
+0.29
+	- New shutdown event to clean things up
+	- New feed_list method to get the current feeds
+	- Updated some of the debug messages
+	- Fix to to pause_feed in case there isn't a feed to pause
+	- The begins of a PoCo::Server::HTTP test suite so I can actually 
+	  write tests for it
+	- Defaulted POE::Component::Client::HTTP to FollowRedirects => 2, 
+	  and allow to set the number of redirects via 
+
+	      POE::Component::RSSAggregator->new(
+	        ...
+		follow_redirects => 4,
+	      );
+
+	- Need to write MUCH, MUCH, better documentation... its next!
+
+0.28    - Squelched uninitialized -d test on tmpdir when its not
+	  defined.
+
+0.27    - Updated pod (removed reference to XML::RSS::Feed::Factory)
+	- removed calls to failed_to_fetch and failed_to_parse
+
+0.26    - fixed 'remove_feed' so that it when it yielded 'pause_feed'
+	  that it would actually work.
+	- updated pod to show 'alias' as a new() param
+
+0.25    - ATTENTION! new() param 'feeds' has been deprecated, use 
+	  add_feed instead
+
+	      $heap->{rssagg} = POE::Component::RSSAggregator->new(
+		  debug    => 1,
+		  callback => $session->postback("handle_feed"),
+		  tmpdir   => '/tmp', # optional caching
+	      );
+
+	    $kernel->post('rssagg','add_feed',$_) for @feeds;
+	
+	- fixed the pod not to use XML::RSS::Feed::Factory in the example
+
+0.20    - ATTENTION! You no longer need to use XML::RSS::Feed::Factory
+	  to defined 'feeds', just pass an array ref of hash refs 
+	  for each feed you'd like to watch.
+	- Fixed POD example so it actually works :D
+	- added 'tmpdir' param to pass to XML::RSS::Feed objects to 
+	  cache XML on DESTROY and to attempt to load and parse old
+	  headlines when the object is initialized.
+	- added 'feed' accessor method to fetch XML::RSS::Feed objects
+
+0.10    - Now use XML::RSS::Headline instead of XML::RSS::Feed::Headline
+	- added an accessor 'feeds' for to the hash of rss feeds
+	- use delay_set instead of delay_add.  This is for the future
+	  support of adding, reloading, removing feeds.
+	- use POE postback instead of sub reference for callback
+	- updated the pod with a POE session example
+
+0.01    - First version, released on an unsuspecting world.

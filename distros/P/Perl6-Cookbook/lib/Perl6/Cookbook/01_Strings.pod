@@ -1,0 +1,136 @@
+package Perl6::Cookbook::Strings;
+
+
+=head1 01 Accessing Substrings
+
+   #!/usr/bin/perl6
+   use v6;
+   
+   my $s = 'The black cat climbed the green tree';
+   
+   my $z;
+   $z = substr $s, 4, 5;                   # $z = black
+   $z.say;
+   
+   $z = substr $s, 4, -11;                 # $z = black cat climbed the 
+   $z.say;
+   $z = substr $s, 14;                     # $z = climbed the green tree
+   $z.say;
+   $z = substr $s, -4;                     # $z = tree
+   $z.say;
+   $z = substr $s, -4, 2;                  # $z = tr
+   $z.say;
+   
+   # This does not sem to work in Perl 6
+   # TODO what is the replacement?
+   # substr can also change the string
+   #$z = substr $s, 14, 7, "jumped from";
+   #$z.say;                                 # $z = climbed
+   #$s.say;                                 # $s = The black cat jumped from the green tree
+   
+   # TODO: see also unpack for faster extraction
+
+
+=cut
+
+
+=head1 01 Accessing Substrings unpack
+
+   #!/usr/bin/perl6
+   use v6;
+   
+   my $s = 'The black cat climbed the green tree';
+   
+   my $z = unpack("A2", $s);
+   $z.say;                    # Th
+   
+   my ($x, $y) = unpack("A2 x2 A5", $s);
+   $x.say;                                  # Th
+   $y.say;                                  # black
+
+
+=cut
+
+
+=head1 02 Establishing a Default Value
+
+   #!/usr/bin/perl6
+   use v6;
+   
+   my $z;
+   $z //= 'DEFAULT VALUE';
+   say "done $z";                             # done DEFAULT VALUE
+   
+
+
+=cut
+
+
+=head1 03 Exchanging Values Without Using Temporary Variables
+
+   #!/usr/bin/perl6
+   use v6;
+   
+   my $x = 23;
+   my $y = 42;
+   my $z = 'foo';
+   
+   ($x, $y) = ($y, $x);
+   
+   say $x;    # 42
+   say $y;    # 23
+   
+   
+   ($x, $y, $z) = ($y, $z, $x);
+   say $x;    # 23
+   say $y;    # foo
+   say $z;    # 42
+
+
+=cut
+
+
+=head1 04 Converting Between Characters and Values
+
+   #!/usr/bin/perl6
+   use v6;
+   
+   # ASCII
+   
+   say ord('a');       # 97
+   say ord('bab');     # 98    (that of the first letter)
+   say chr(97);        # a
+   
+   printf("%c\n", 97); # a
+   printf("%d %c\n", 97, 97); # 97 a
+   
+   # TODO pack("C*", ) unpack() Unicode: U
+   
+   ord('a').say;       # 97
+   
+   # TODO: in perl 5 this was:
+   # printf("%vd\n", "ab0\x{0123}"); # 97.98.48.291
+   # printf("%vx\n", "ab0\x{0123}"); # 61.62.30.123
+
+
+=cut
+
+
+=head1 06 Processing a String One Character at a Time
+
+   #!/usr/bin/perl6
+   use v6;
+   
+   my @a = split('', "abc");        # // is disallowed in Perl 6
+   @a[0].say;                       # a
+   @a[1].say;                       # b
+   @a[2].say;                       # c
+   
+   
+   # TODO unpack solution as well
+
+=cut
+
+
+1;
+

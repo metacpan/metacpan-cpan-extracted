@@ -1,0 +1,29 @@
+#========================================================================
+#
+# TODO 
+#
+# DESCRIPTION
+#   Feature requests and outstanding bugs for Pod::POM::View::DocBook module.
+#
+# AUTHOR
+#   Andrew Ford   <A.Ford@ford-mason.co.uk>
+#
+#------------------------------------------------------------------------
+# $Id: TODO 4095 2009-02-24 22:10:39Z andrew $
+#========================================================================
+
+
+* The following features are not fully implemented
+
+  - links
+
+  - lists (should check list items for the common style)
+
+* document (and review) mapping of Pod to DocBook markup
+
+* make some mappings customizable
+
+* flesh out the documentation
+
+* increase test coverage
+

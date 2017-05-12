@@ -1,0 +1,25 @@
+Revision history for POE-Component-Client-CouchDB
+
+0.05    May 12 2008
+        Eliminated dependancy on HTTP::Server::Simple::Dispatched for testing,
+        we now use a mocked up Client::HTTP object that returns what we tell
+        it to.  Also fixed document attachments not to cook their responses
+        and added a test for that bug case.
+
+0.04    May 9 2008
+        Updated the pod-coverage test to not fail for some things it was
+        failing for - CountParents is now on, and BUILD and DEMOLISH are
+        considered private.
+
+0.03    May 8 2008
+        Reversioned everything per suggestion from confound, versions from
+        here forward will all be the same (use perl-reversion --bump from
+        Perl::Version)
+
+0.02    May 7 2008
+        Fixed a bug in the test that was causing it to fail instead of skip
+        with no HTTP test server
+        Fixed a documentation bug.
+
+0.01    May 6 2008
+        Initial release.

@@ -1,0 +1,58 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-PerlTidy\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-25 14:42+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Breno G. de Oliveira <garu@cpan.org>\n"
+"Language-Team: Brazilian Portuguese\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/PerlTidy.pm:39
+msgid "Perl Tidy"
+msgstr "Perl Tidy"
+
+#: lib/Padre/Plugin/PerlTidy.pm:45
+msgid "Tidy the active document\tAlt+Shift+F"
+msgstr "Organizar documento ativo\tAlt+Shift+F"
+
+#: lib/Padre/Plugin/PerlTidy.pm:46
+msgid "Tidy the selected text\tAlt+Shift+G"
+msgstr "Organizar texto selecionado\tAlt+Shift+G"
+
+#: lib/Padre/Plugin/PerlTidy.pm:49
+msgid "Export active document to HTML file"
+msgstr "Exportar documento ativo para HTML"
+
+#: lib/Padre/Plugin/PerlTidy.pm:51
+msgid "Export selected text to HTML file"
+msgstr "Exportar texto selecionado para HTML"
+
+#: lib/Padre/Plugin/PerlTidy.pm:67
+#: lib/Padre/Plugin/PerlTidy.pm:194
+msgid "Document is not a Perl document"
+msgstr "Documento não é um documento Perl"
+
+#: lib/Padre/Plugin/PerlTidy.pm:97
+#: lib/Padre/Plugin/PerlTidy.pm:226
+msgid "PerlTidy Error"
+msgstr "Erro do PerlTidy"
+
+#: lib/Padre/Plugin/PerlTidy.pm:166
+msgid "Save file as..."
+msgstr "Salvar como..."
+
+#: lib/Padre/Plugin/PerlTidy.pm:177
+msgid "File already exists. Overwrite it?"
+msgstr "Arquivo existente. Sobrescrever?"
+
+#: lib/Padre/Plugin/PerlTidy.pm:177
+msgid "Exist"
+msgstr "Existe"
+
+#~ msgid "Error"
+#~ msgstr "Erro"
+

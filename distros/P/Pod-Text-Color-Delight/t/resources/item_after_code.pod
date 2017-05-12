@@ -1,0 +1,9 @@
+=head1 foo
+
+C<< user >>
+
+=over
+
+=item type is secret
+
+=back

@@ -1,0 +1,90 @@
+NAME
+    Pod::Elemental::Transformer::WikiDoc - a transformer to replace
+    "wikidoc" data regions with Pod5 elements
+
+VERSION
+    version 0.093004
+
+SYNOPSIS
+      my $document = Pod::Elemental->read_string( $string );
+      Pod::Elemental::Transformer::Pod5->new->transform_node( $document );
+
+      Pod::Elemental::Transformer::WikiDoc->new->transform_node( $document );
+
+    ...and if you had a section like this:
+
+      =begin wikidoc
+
+      == Look, a header!
+
+      * Foo
+      * Bar
+      * Baz
+
+      =end wikidoc
+
+    ...you now have something more like this:
+
+      =head2 Look, a header!
+
+      =over 4
+  
+      =item Foo
+
+      =item Bar
+
+      =item Baz
+
+      =back
+
+    For complete documentation on this dialect, see Pod::WikiDoc.
+
+    Possibly the most succinct, powerful use case is this:
+
+      =head2 some_method
+
+      This B<public> method takes the following arguments:
+
+      =for wikidoc
+      * name
+      * rank
+      * serial_number
+
+      =cut
+
+ATTRIBUTES
+  format_name
+    This attribute indicates the format name of regions to be transformed
+    from WikiDoc. By default, the transformer will look for regions of the
+    format "wikidoc."
+
+METHODS
+  transform_node
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Pod-Elemental-Transformer-WikiDoc/issues>.
+    You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Pod-Elemental-Transformer-WikiDoc>
+
+      git clone https://github.com/dagolden/Pod-Elemental-Transformer-WikiDoc.git
+
+AUTHOR
+    Ricardo SIGNES <rjbs@cpan.org>
+
+CONTRIBUTORS
+    *   David Golden <dagolden@cpan.org>
+
+    *   Kent Fredric <kentfredric@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2015 by Ricardo SIGNES.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

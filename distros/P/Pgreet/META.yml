@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Pgreet
+version:      1.0.0
+version_from: 
+installdirs:  site
+requires:
+    Apache::Htpasswd:              1.5.5
+    Config::General:               2.19
+    Date::Pcalc:                   1.2
+    Digest::MD5:                   2.17
+    Embperl:                       2.0
+    I18N::AcceptLanguage:          1.00
+    Log::Dispatch:                 2.06
+    MIME::Lite:                    2.117
+    String::Checker:               0.03
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

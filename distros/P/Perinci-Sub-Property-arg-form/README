@@ -1,0 +1,16 @@
+SYNOPSIS
+
+    In function Rinci metadata:
+
+     args => {
+         arg1 => {
+             ...,
+             'form.widget' => ...,
+         },
+     }
+
+DESCRIPTION
+
+    This property is to allow form-related attributes in argument
+    specification.
+

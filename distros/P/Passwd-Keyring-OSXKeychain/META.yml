@@ -1,0 +1,45 @@
+---
+abstract: 'Password storage implementation based on OSX/Keychain.'
+author:
+  - 'Marcin Kasperski <Marcin.Kasperski@mekk.waw.pl>'
+build_requires:
+  Module::Build: '0.19'
+  Test::More: '0'
+  Test::Most: '0'
+  Test::Pod::Coverage: '1.0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - passwords
+  - security
+  - secure-storage
+  - keyring
+  - Mac
+  - OSX
+  - keychain
+  - keyring
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Passwd-Keyring-OSXKeychain
+provides:
+  Passwd::Keyring::OSXKeychain:
+    file: lib/Passwd/Keyring/OSXKeychain.pm
+    version: '0.3002'
+  Passwd::Keyring::OSXKeychain::PasswordTranslate:
+    file: lib/Passwd/Keyring/OSXKeychain/PasswordTranslate.pm
+requires:
+  Capture::Tiny: '0.20'
+  Encode: '0.00'
+  IPC::System::Simple: '1.18'
+  perl: '5.006'
+resources:
+  bugtracker: https://bitbucket.org/Mekk/perl-keyring-osxkeychain/issues
+  homepage: http://bitbucket.org/Mekk/perl-keyring-osxkeychain
+  license: http://dev.perl.org/licenses/
+  repository: http://bitbucket.org/Mekk/perl-keyring-osxkeychain
+version: '0.3002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,13 @@
+The tutorial in this directory is written in pod.
+
+You can view it in the usual ways:
+
+- pod2man tutorial.pod | nroff -man | less
+  or
+- pod2man tutorial.pod | nroff -man | less -r
+  or
+- pod2html tutorial.pod > tutorial.html
+
+Enjoy.
+
+Vincenzo Zocca

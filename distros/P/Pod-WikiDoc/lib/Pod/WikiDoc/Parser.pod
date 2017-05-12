@@ -1,0 +1,73 @@
+# PODNAME: Pod::WikiDoc::Parser
+# ABSTRACT: precompiled recursive descent parser for Pod::WikiDoc
+# VERSION
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Pod::WikiDoc::Parser - precompiled recursive descent parser for Pod::WikiDoc
+
+=head1 VERSION
+
+version 0.21
+
+=head1 SYNOPSIS
+
+    use Pod::WikiDoc::Parser;
+
+    my $parser = Pod::WikiDoc::Parser->new();
+
+    my $tree = $parser->WikiDoc( $text );
+
+=head1 DESCRIPTION
+
+Pod::WikiDoc::Parser is a precompiled L<Parse::RecDescent> parser for use with
+L<Pod::WikiDoc>.
+
+A copy of the Parse::RecDescent grammar used is appended to the
+Pod::WikiDoc::Parser source and this Pod file for reference or reuse by
+others.
+
+=head1 USAGE
+
+This module is a support module for Pod::WikiDoc and is not intended for
+general use.  Given a string containing WikiDoc markup text, the parser
+produces a data structure representing the parsed content.  The data structure
+returned is an array of references to hashes.  Keys in the hash are:
+
+=over
+
+=item *
+
+type: the parser rule that generated the hash
+
+=item *
+
+content: either a reference to another AoH or a string of text
+
+=item *
+
+level: (only for "Header" type hashes) the level of the header
+
+=back
+
+See L<Pod::WikiDoc> for details of the markup.
+
+=head1 AUTHOR
+
+David A Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by David A Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

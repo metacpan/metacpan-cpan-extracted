@@ -1,0 +1,22 @@
+Build.PL
+Changes
+lib/Perl/Critic/Compatibility.pm
+lib/Perl/Critic/Policy/Compatibility/ProhibitThreeArgumentOpen.pm
+MANIFEST			This list of files
+README
+t/Compatibility/ProhibitThreeArgumentOpen.run
+t/policies.t
+xt/author/consistent_version_numbers.t
+xt/author/copyright.t
+xt/author/distribution.t
+xt/author/kwalitee.t
+xt/author/perlcritic-code.t
+xt/author/perlcritic-tests.t
+xt/author/perlcriticrc-code
+xt/author/perlcriticrc-tests
+xt/author/pod_coverage.t
+xt/author/pod_spelling.t
+xt/author/pod_syntax.t
+xt/author/README
+Makefile.PL
+META.yml

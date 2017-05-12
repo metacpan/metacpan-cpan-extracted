@@ -1,0 +1,70 @@
+
+Perl files found:                4
+
+Counts
+------
+total code lines:        515
+lines of non-sub code:   151
+packages found:          4
+subs/methods:            29
+
+Subroutine/Method Size
+----------------------
+min:                  3 lines
+max:                  82 lines
+mean:                 12.55 lines
+std. deviation:       14.47
+median:               8.00
+
+McCabe Complexity
+-----------------
+Code not in any subroutine::
+min:                  1
+max                   3
+mean:                 1.75
+std. deviation:       0.83
+median:               1.50
+
+Subroutines/Methods:
+min:                  1
+max:                  21
+mean:                 3.69
+std. deviation:       3.88
+median:               2.00
+
+Tab-delimited list of subroutines, with most complex at top
+-----------------------------------------------------------
+complexity	sub	path	size
+21	start	lib/Proc/Launcher.pm	82
+11	tail	lib/Proc/Launcher/Manager.pm	33
+7	pid	lib/Proc/Launcher.pm	20
+6	is_running	lib/Proc/Launcher.pm	19
+6	write_my_pid	lib/Proc/Launcher.pm	15
+4	write_pipe	lib/Proc/Launcher.pm	8
+4	is_running	lib/Proc/Launcher/Manager.pm	18
+4	start	lib/Proc/Launcher/Manager.pm	15
+3	stop	lib/Proc/Launcher.pm	11
+3	force_stop	lib/Proc/Launcher.pm	10
+3	_debug	lib/Proc/Launcher.pm	8
+3	register	lib/Proc/Launcher/Manager.pm	12
+3	read_log	lib/Proc/Launcher/Manager.pm	7
+3	{code not in named subroutines}	lib/Proc/Launcher.pm	80
+2	restart	lib/Proc/Launcher.pm	7
+2	stopped	lib/Proc/Launcher.pm	6
+2	remove_pidfile	lib/Proc/Launcher.pm	6
+2	read_log	lib/Proc/Launcher.pm	9
+2	disable	lib/Proc/Launcher.pm	7
+2	enable	lib/Proc/Launcher.pm	7
+2	is_enabled	lib/Proc/Launcher.pm	5
+2	daemons	lib/Proc/Launcher/Manager.pm	8
+2	stop	lib/Proc/Launcher/Manager.pm	8
+2	force_stop	lib/Proc/Launcher/Manager.pm	8
+2	disable	lib/Proc/Launcher/Manager.pm	8
+2	enable	lib/Proc/Launcher/Manager.pm	8
+2	monitor	lib/Proc/Launcher/Supervisor.pm	8
+2	{code not in named subroutines}	lib/Proc/Launcher/Manager.pm	43
+1	rm_zombies	lib/Proc/Launcher.pm	3
+1	daemon	lib/Proc/Launcher/Manager.pm	4
+1	daemons_names	lib/Proc/Launcher/Manager.pm	4
+1	{code not in named subroutines}	lib/Proc/Launcher/Roles/Launchable.pm	12
+1	{code not in named subroutines}	lib/Proc/Launcher/Supervisor.pm	16

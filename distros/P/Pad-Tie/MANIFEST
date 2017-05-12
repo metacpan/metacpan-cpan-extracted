@@ -1,0 +1,19 @@
+t/00-load.t
+t/basic.t
+lib/Pad/Tie/Plugin/Scalar.pm
+lib/Pad/Tie/Plugin/ScalarAttr.pm
+lib/Pad/Tie/Plugin/ArrayAttr.pm
+lib/Pad/Tie/Plugin/HashAttr.pm
+lib/Pad/Tie/Plugin/Base/HashObjectAttr.pm
+lib/Pad/Tie/Plugin/ArrayRef.pm
+lib/Pad/Tie/Plugin/Self.pm
+lib/Pad/Tie/Plugin/List.pm
+lib/Pad/Tie/Plugin/HashRef.pm
+lib/Pad/Tie/Plugin.pm
+lib/Pad/Tie/LP.pm
+lib/Pad/Tie.pm
+Makefile.PL
+examples/mech.pl
+MANIFEST
+Changes
+META.yml                                 Module meta-data (added by MakeMaker)

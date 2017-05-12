@@ -1,0 +1,35 @@
+Artistic
+Changes
+Copying
+fonts/Bitstream_Vera_License.txt
+fonts/VeraMono-Bold-Italic.ttf
+fonts/VeraMono-Bold.ttf
+fonts/VeraMono-Italic.ttf
+fonts/VeraMono.ttf
+lib/PhysicsPerl.pm
+lib/PhysicsPerl/Astro/Body.pm
+lib/PhysicsPerl/Astro/BodyRenderer2D.pm
+lib/PhysicsPerl/Astro/System.pm
+lib/PhysicsPerl/Astro/System.pm.PERLOPS_PERLTYPES
+lib/PhysicsPerl/Astro/System.pm.PERLOPS_PERLTYPES_SSE
+lib/PhysicsPerl/Astro/SystemRenderer2D.pm
+lib/PhysicsPerl/Config.pm
+lib/PhysicsPerl/Test/Astro_NBody/n_body_good_00.pl
+lib/PhysicsPerl/Test/Astro_NBody/n_body_good_01.pl
+lib/PhysicsPerl/Test/Astro_NBody/n_body_good_02.pl
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+script/demo/link_astro_CPPOPS_CPPTYPES.sh
+script/demo/link_astro_CPPOPS_CPPTYPES_SSE.sh
+script/demo/link_astro_PERLOPS_PERLTYPES.sh
+script/demo/link_astro_PERLOPS_PERLTYPES_SSE.sh
+script/demo/n_body.pl
+script/demo/unlink_astro.sh
+t/00_depend.t
+t/01_changes.t
+t/02_interpret_execute.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

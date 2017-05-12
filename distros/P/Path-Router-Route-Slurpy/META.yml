@@ -1,0 +1,29 @@
+---
+abstract: 'Slurpy routing for Path::Router'
+author:
+  - 'Andrew Sterling Hanenkamp <hanenkamp@cpan.org>'
+build_requires:
+  Moose::Util::TypeConstraints: 0
+  Path::Router: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Path-Router-Route-Slurpy
+requires:
+  Carp: 0
+  List::MoreUtils: 0
+  Moose: 0
+  Path::Router::Route: 0
+  Path::Router::Route::Match: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Path-Router-Route-Slurpy
+  repository: git://github.com/zostay/Path-Router-Route-Slurpy.git
+version: 0.141330

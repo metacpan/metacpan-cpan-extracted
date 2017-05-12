@@ -1,0 +1,179 @@
+2011-04-17	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.30
+
+	edit config using -e, support --(global|project) for writing config values
+	fix for regression on project modules compilation
+	daemon scripts autogeneration
+	renamed distribution => instance
+	script related imports
+	support for new Class::Easy
+	bugfix
+
+2011-04-05	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.29
+
+	add proper message for updatedb before project init
+	fix regression with bin/status
+
+2011-03-26	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.28
+
+	class-easy new logging system
+	automatic creation of entity packages and scripts
+	helper: little refactoring
+	helper: datasource selection in updatedb
+	helper: oracle db template
+	sys::sigaction usage for db connections
+
+2011-02-07	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.25
+
+	various fixes for entity/collection
+
+2011-01-31	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.24
+
+	moved RDBMS code to DB package
+
+2010-12-10	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.23
+
+	added sql launch after connection establishing
+	added optional package to db config for instantiate
+
+
+2010-11-24	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.22
+
+	various fixes for entities/collections
+	fixed reconnection after DBI error
+	added setuid/setgid for daemon
+
+
+2010-11-02	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.21
+
+	daemon fork package
+
+
+2010-03-28	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.20
+
+	minor fix for io::easy
+
+
+2010-03-28	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.19
+
+	windows fixes
+
+2010-03-16	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.18
+
+	fix for Apache
+	
+2009-12-15	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.17
+
+	fix for Apache2
+
+2009-12-15	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.16
+
+	dependency fix
+
+2009-11-05	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.15
+
+	minor changes
+
+2009-11-05	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.14
+
+	fix for virtual collections; be quiet about virtual
+	
+2009-10-30	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.13
+
+	support for virtual entities
+	
+	fix for project-easy script
+
+2009-10-26	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.12
+
+	database handling fixes
+	now we create default db connector after creating package
+
+2009-10-26	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.11
+
+	project-easy script added to manifest
+
+2009-10-25	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.09
+
+	now with cli config editor
+	
+	changed database config layout
+
+2009-10-11	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.08
+
+	added project-easy script
+	
+	strict configuration
+
+2009-10-02	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.07
+
+	minor configuration issue
+
+2009-10-02	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.06
+
+	parser api
+	minor 0.05 issues
+	fixed migration issues (lib => distribution/lib) * internal
+	
+2009-09-25	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.05
+
+	added ability to host fixup config outside of project root
+
+
+2009-02-11	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.4
+
+	fixed running without apache2 environment
+
+
+2009-02-11	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.1
+
+	Initial revision

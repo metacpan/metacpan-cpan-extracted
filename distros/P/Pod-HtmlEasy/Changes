@@ -1,0 +1,193 @@
+Revision history for Perl extension Pod::HtmlEasy.
+
+1.0111  Sat Jan 11 16:03:37 PST 2014
+           RT ticket 92035; eliminate carp for known error message
+           RT ticket 92034: eliminate complaint about experimental switch
+            given/when. Use of 'no warnings' is problemantic, but I'm 
+            darned if I'm going to complicate the code to kow-tow to 5.18.
+
+1.0110  2013-01-06
+           RT ticket 82400 Fix Perl 5.16 switch bug.
+
+1.0109   2011-08-09
+           RT ticket 70172. Missing dependency for Getopt::Auto
+           RT ticket 70173. Missing dependency for HTML::EasyTags,
+            List::MoreUtils, Uniq. 
+           RT ticket 79176 fix usage of =stopwords, 
+            that was confusing pod2man.
+
+1.0108   2010-06-13
+           Ooooh! A bugreport. Someone's actually using this stuff!
+           RT ticket 58274. User names with embedded '.' are not
+           parsed correctly. rather than improving the RE, I wanted to
+           use Regexp::Common::Email::Address. It's the perl way, 
+           be lazy. Alas, there's a bug there, so I fixed the local RE.
+           Shamefully, I discovered that the last item in 
+           test 12 of t/html.t included a dot-containing address,
+           which was parsed incorrectly.
+         2010-07-11
+           - Replaced ExtUtils::MakeMaker (deprecated) with Module::Build
+           - Added scripts/pod2indexed_html.pl to be installed. 
+             Other scripts are useful only for debugging use of the module. 
+
+1.0107   2009-11-05
+           Changed generated HTML for C<> to use <code> instead of font change.
+         2010-01-19
+           Changed item index generation. Squeeze all \s to replace it
+           with single space. Problem with =item *..foo @bar triggered
+           mailto: for foo@bar.
+
+1.0106   2009-06-09
+           =item L<foobar> caused confused output because the href was
+           converted twice.
+
+1.0105   2009-05-16
+           HTML in the index entry resulted in the inclusion of \c
+           =index * followed by a long paragraph resulted in a long index
+           entry if index_item was selected. Added index_length (default 60)
+           to permit the entry to be truncated.
+
+1.0104   2008-09-01
+           =item * followed by URL produced funny output.
+
+1.0103   2008-06-04
+           [36642] Perlpod states that hyperlinks can be in
+           the format of: L<text|name>. podhtmleasy.pl doesn't create
+           <a href="name">text</a>, but rather <a href="name">name</a>.
+           Resolved: user was using v0.9
+         2008-08-06
+         - =item C<< <IFRAME SRC=...> >> causes all sorts of confusion.
+           Need to encode the result of parselink() before evt_on_L().
+         - Added pod2indexed_html.pl to scripts/
+
+1.0102   2008-05-28
+         - Change literal /usr/bin/perl to $EXECUTABLE_NAME to overcome
+           seemingly random CPAN test failures.
+
+1.0101   2008-05-23
+         - Add IPC::Run to Makefile.PL
+
+1.0100   2008-05-21
+         - Release to CPAN. This is the last release to say "use 5.006002".
+           Subsequent releases will support 5.10 and subsequent. If anyone
+           has a serious problem with this, email the Maintainer.
+
+1.0005   2008-05-13
+         - Fix errors in =begin/=end processing.
+         - Add "output" option; optional second arg support removed
+
+1.0004  2008-04-27
+         - Silently ignore =begin or =end without command
+
+1.0003  2008-04-14
+         - Support absent file parameter to imply STDIN
+
+1.0002  2008-04-08
+         - Support "-" as file parameter, meaning read from STDIN
+         - Related changes to test suite
+         - Correct text returned by Data::podon
+         - Replace "touch" in test options.t with explicit create; n/a in Windoze
+
+1.0001  2008-02-15
+         - Use Exporter::Easy to provide a usage that satisfies perl 5.6.2
+
+1.0000  2008-02-14
+         - Many changes, but here are some of them
+         - Cleaned up default css. It just defines what's needed.
+         - Rewrote index/toc generation; badly-managed tree replaced by simple
+           list, as the order is established by order in the POD.
+         - Workaround for issue with Regexp::Common, RT #32489, handling of %xx
+         - Squeeze multiple spaces/tabs out of =item and =head search
+           targets so that L<foo bar> finds =head1 foo  bar
+         - Repaired handling of DOS-format text file EOL (\n\r)
+         - Introduced use of version.pm
+         - Fixed: URL in verbatim text not displayed
+         - Fixed: =item * implies use of following text as item label
+         - Fixed: =item * foo => use foo as item label, without *
+         - Re-wrote test suite. Data.pm here mirroirs HtmlEasy/Data.pm
+           to catch errors in static output.
+         - Removed support for "=include". Not mentioned by perlpodspec.
+         - Added HtmlEasy/Data.pm in order to make the static output of POD
+           conversion available to the test suite.
+         - Removed TieHandler.pm. Conversion output now goes directly to
+           a list variable.
+
+0.0914   2008-01-15
+         - Set Perl version. Tests OK in 5.6.2 
+
+0.0913  2007-12-28
+         - Fix Readonly syntax.
+
+0.0912  2007-12-25
+         - Fix [#31784] again. Misinterpreted intent of option.
+           Hat tip to ITO Nobuaki.
+ 
+0.0911  2007-12-24
+         - Fix [#31784]. </body> appears if -only_content selected.
+ 
+0.091   2007-04-03
+         - Updated dependencies in Makefile.PL. No change to package version.
+
+0.09    2007-04-01
+        - Subject code to perltidy and perlcritic.
+        - Refactor to deal with perlcritic criticism.
+        - Re-write link processing for efficiency
+        - Remove code that caused L<...> and E<...> to be interpolated
+          in verbatim paragraphs.
+        - Add head1 processing to extract title
+        - Add preprocessing to extract VERSION and PACKAGE
+
+0.08_03 2006-11-13
+       - Make value of $VERSION a floating-point number
+
+0.08_02 2006-11-12
+       - Fix [21646]
+
+0.08_01 2006-09-25
+      - Changes made by GLEACH
+      - Minor cleanup in test.pl
+      - Replaced test/1.simple.html; S<> formatting was incorrect.
+      - Updated test/2.graphic.pod; source of test file, made it a jpg
+      - Added test/graphic-file.jpg
+      - Added test/3.bugs.pod
+      - podhtmleasy.pl: added shebang and fixed warnings. [6062]
+      - HtmlEasy.pm fixed warnings [6062]
+      - HtmlEasy/Parser.pm fixed warnings [6062]
+      - Added support for X<...> [20078]
+      - Added support for =head4, =begin, =end
+
+
+0.07  2004-10-10
+      - Fixed a minor bug when the input is '' and isn't file,
+            that make Pod::Parser to read from STDIN.
+      - Added option for basic_entities and common_entities at pod2html().
+
+
+0.06  2004-05-09
+      - Fixed minor bug for argument _on_item that should be on_item. [6223]
+
+
+0.05  2004-05-09
+      - Added support to =for [6064]
+      - Added support to =item * [6065]
+
+
+0.04  2004-02-05
+      - Fixed some simple bugs.
+      - Added item on index.
+
+
+0.03  2004-01-15
+      - Added EXE_FILES key to MakeFile.PL (forgot to put in 0.02 version).
+
+
+0.02  2004-01-13
+      - Added script podhtmleasy.pl
+      - item titles, by default, are bold now.
+      - Added support for E<>, F<> [6065]
+      - Added option to extend the commands (=word) and formatters (X<>).
+
+
+0.01  2004-01-11 19:07:08
+      - original version;
+

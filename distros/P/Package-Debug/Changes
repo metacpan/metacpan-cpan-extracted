@@ -1,0 +1,119 @@
+Release history for Package-Debug
+
+0.2.2 2013-09-26T06:54:05Z
+ [00 Minor]
+ - Rebuild to get latest Test::Compile to maybe avoid some Win32 bugs.
+
+ [Dependencies::Added / test requires]
+ - File::Spec
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.8.2 → v1.8.3
+
+ [Dependencies::Changed / runtime requires]
+ - Package::Stash 0.35 → 0.36
+
+ [Dependencies::Changed / test requires]
+ - Test::Fatal 0.010 → 0.013
+
+ [!Major]
+ - Noisiness of output during general usage reduced.
+ - Additional sanity checks in place to warn if anything that *would* be loaded via bootstrap, is unable to be bootstrapped due to wrong plugin order.
+ - Tests regenerated with newer toolkit.
+
+ [Dependencies::Added / develop requires]
+ - Test::CPAN::Changes 0.19
+ - Test::Kwalitee 1.08
+
+ [Dependencies::Added / runtime requires]
+ - lib
+
+ [Dependencies::Added / test requires]
+ - IO::Handle
+ - IPC::Open3
+
+ [Dependencies::Changed / build requires]
+ - Module::Build 0.4004 → 0.4007
+
+ [Dependencies::Changed / configure requires]
+ - Module::Build 0.4004 → 0.4007
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.2 → v1.8.3
+
+ [Dependencies::Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.2.1 2013-08-30T21:04:58Z
+ [!Minor]
+ - Bump to get new Test::Compile
+ - Increase deps on Test-essential things to try rule out weird silent
+   failures on a few targets
+
+ [Dependencies::Added / develop requires]
+ - Test::Kwalitee 1.08
+
+ [Dependencies::Added / test requires]
+ - IO::Handle
+ - IPC::Open3
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.8.0 → v1.8.2
+
+ [Dependencies::Changed / runtime requires]
+ - Package::Stash 0 → 0.35
+
+ [Dependencies::Changed / test requires]
+ - Test::Fatal 0 → 0.010
+ - Test::Output 0 → 1.02
+
+ [Dependencies::Removed / test requires]
+ - Capture::Tiny
+ - blib
+
+0.2.0 2013-08-09T22:47:30Z
+ [!Major]
+ - runtime_switchable feature removed in favour of more general purpose
+   code, that is performant even *with* runtime switchability being on by
+   default.
+ - Class methods starting with full_ removed as they're no longer used.
+ - Additionally, loading `Readonly` to implement above feaures usually
+   costed more than it saved.
+ - Internals changes now means that only ~90 statements are required to
+   execute during ->import() whereas previously it was more like ~500
+   statements.
+
+ [Dependencies::Added / runtime requires]
+ - Package::Stash
+
+ [Dependencies::Added / test requires]
+ - Capture::Tiny
+ - blib
+
+ [Dependencies::Changed / build requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Dependencies::Changed / configure requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.4 → v1.8.0
+
+ [Dependencies::Removed / runtime requires]
+ - B
+ - Readonly
+ - Scalar::Util
+
+ [Dependencies::Removed / test requires]
+ - File::Find
+ - File::Temp
+
+ [Internals]
+ - Package stash mangling now done by Package::Stash
+ - '_has' attribute generator removed in favor of hand-inlined methods,
+   which is easier to profile and debug.
+
+0.1.0 2013-07-31T03:19:56Z
+ - First version.
+

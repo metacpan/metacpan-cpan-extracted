@@ -1,0 +1,50 @@
+{
+   "abstract" : "Client for PowerDNS::API",
+   "author" : [
+      "Ask Bj\u00c3\u00b8rn Hansen <ask@develooper.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PowerDNS-API-Client",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Request" : 0,
+            "JSON" : "2.0",
+            "LWP::UserAgent" : 0,
+            "Moose" : "1.0",
+            "URI" : 0,
+            "namespace::clean" : "0.20"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/abh/PowerDNS-API-Client/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/PowerDNS-API-Client/",
+      "repository" : {
+         "url" : "http://github.com/devel/PowerDNS-API-Client"
+      }
+   },
+   "version" : "0.10"
+}
+

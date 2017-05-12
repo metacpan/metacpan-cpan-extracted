@@ -1,0 +1,17 @@
+%semantic token '+' = /(\+)/
+%semantic token '-' '*' '?'
+%syntactic token '['  ']'
+%token NUM = /\d+/
+
+%%
+
+s:   s '+' 
+   | s '-'
+   | s '*'
+   | s '?'
+   | s '[' ']'
+   | NUM
+;
+
+%%
+

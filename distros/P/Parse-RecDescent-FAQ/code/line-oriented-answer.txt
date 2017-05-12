@@ -1,0 +1,21 @@
+<skip> tells RecDescent what to skip before trying each 
+terminal. Normally that's any optional whitespace matched by the 
+pattern C</\s*/>. 
+ 
+But, if newlines (which would normally be skipped by the above 
+pattern) are significant in your syntax, then you need to change the 
+skipping pattern so that RecDescent doesn't skip newlines. And then 
+match the newlines explicitly. 
+ 
+For example: 
+ 
+     program : <skip: qr/[^\S\n]/>    # Ignore non-newline whitespace 
+               statement(s) 
+ 
+     statement : command arg(s) "\n" 
+ 
+     command: /\w+/ 
+ 
+     args  :  /\d+/ | alphanum 
+ 
+     alphanum :  /[A-Za-z0-9/ 

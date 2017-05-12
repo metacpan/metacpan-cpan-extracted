@@ -1,0 +1,2052 @@
+Project: meganizer
+Action: cms2vm
+Packages: meganizer
+
+Management of meganizer 0.3-0.20100901182045 (rev flat)
+Extracting /home/packager/meganizer.tar.gz in /home/packager/pb/meganizer/delivery/meganizer-0.3 ... OK
+Generating fake ChangeLog for test version
+Build files are being generated for ...
+ ... centos-5-i386,centos-5-x86_64,debian-5.0-i386,debian-5.0-x86_64,fedora-13-i386,fedora-13-x86_64,mandriva-2010.1-i386,opensuse-11.3-i386,opensuse-11.3-x86_64,ubuntu-10.04-i386,ubuntu-10.04-x86_64
+No Build files found for gentoo-nover-x86_64
+Delivering and compressing patches 
+Creating meganizer tar files compressed... OK
+Under /home/packager/pb/meganizer/delivery/meganizer-0.3.tar.gz
+Creating pbconf tar files compressed... OK
+Under /home/packager/pb/meganizer/delivery/meganizer-0.3.pbconf.tar.gz
+Packages: meganizer
+Launching the VM /mnt/chroot/ubuntu-10.04-i386.qemu... OK
+Waiting 45 s for VM ubuntu-10.04-i386 to come up... OK
+VM /mnt/chroot/ubuntu-10.04-i386.qemu launched (pid 14240)
+Packages: meganizer
+Sources handled (VMbuild): /home/packager/pb/meganizer/delivery/meganizer-0.3.tar.gz /home/packager/pb/meganizer/delivery/meganizer-0.3.pbconf.tar.gz /home/packager/pb/meganizer/pbconf/0.3.0/meganizer.pb /home/packager/pb/meganizer/delivery/0.3-0.20100901182045.pb /home/packager/.pbrc /home/packager/pb/meganizer/delivery/pbrc /home/packager/pb/meganizer/delivery/pbscript
+Preparing pb/meganizer/delivery on packager@localhost:pb/meganizer/delivery... OK
+VMbuild delivery in packager@localhost:pb/meganizer/delivery... OK
+Executing pbscript on packager@localhost:pb/meganizer/delivery if needed...
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/materialpersonsmodel.cpp:250: warning: unused parameter ‘object’
+[ 24%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/materialperson.cpp.o
+[ 24%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editdialog.cpp.o
+[ 24%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/detailswidget.cpp.o
+[ 25%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/detailswidgetnamedesc.cpp.o
+[ 25%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editgenres.cpp.o
+[ 25%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editmanufacturers.cpp.o
+[ 25%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editmanufacturersdetailswidget.cpp.o
+[ 25%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editmaterialpersons.cpp.o
+[ 26%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editmaterialpersonsdetailswidget.cpp.o
+[ 26%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editroles.cpp.o
+[ 26%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/edituserdetailswidget.cpp.o
+[ 26%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/edituser.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/edituser.cpp:39: warning: unused parameter ‘parent’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/edituser.cpp:39: warning: unused parameter ‘flags’
+[ 26%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/connectmediasearch.cpp.o
+[ 27%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/connectmediasearchdialog.cpp.o
+[ 27%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/connectmediasearchsettings.cpp.o
+[ 27%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/addmedium.cpp.o
+[ 27%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumexport.cpp.o
+[ 27%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/selectexportformat.cpp.o
+[ 28%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/searchexternalapp.cpp.o
+[ 28%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/program.cpp.o
+[ 28%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/openfileexternal.cpp.o
+[ 28%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mimetype.cpp.o
+[ 28%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mimetypemodel.cpp.o
+[ 29%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/buydata.cpp.o
+[ 29%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumtitlewidget.cpp.o
+[ 29%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediummanufacturerwidget.cpp.o
+[ 29%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumgenrewidget.cpp.o
+[ 29%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumminwidget.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/mediumminwidget.cpp:68: warning: unused parameter ‘typeId’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/mediumminwidget.cpp:73: warning: unused parameter ‘name’
+[ 30%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumwishwidget.cpp.o
+[ 30%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumimagewidget.cpp.o
+[ 30%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/scaledimage.cpp.o
+[ 30%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumpersonswidget.cpp.o
+[ 30%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumdescriptionwidget.cpp.o
+[ 30%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumliteraturewidget.cpp.o
+[ 31%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumgiftwidget.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/mediumgiftwidget.cpp: In member function ‘void MediumGiftWidget::setMedium(Medium*)’:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/mediumgiftwidget.cpp:135: warning: unused variable ‘person’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/mediumgiftwidget.cpp:142: warning: unused variable ‘person’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/mediumgiftwidget.cpp: In member function ‘bool MediumGiftWidget::store()’:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/mediumgiftwidget.cpp:171: warning: unused variable ‘mediumOwnerChanged’
+[ 31%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumlistpricewidget.cpp.o
+[ 31%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumboughtpricewidget.cpp.o
+[ 31%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumevaluationwidget.cpp.o
+[ 31%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumloanwidget.cpp.o
+[ 32%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumloandialog.cpp.o
+[ 32%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/loanitem.cpp.o
+[ 32%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/loanmodel.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/loanmodel.cpp:176: warning: unused parameter ‘child’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/loanmodel.cpp:197: warning: unused parameter ‘parent’
+[ 32%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/searchdetailswidget.cpp.o
+[ 32%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/person.cpp.o
+[ 33%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/personsmodel.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/personsmodel.cpp:26: warning: unused parameter ‘parent’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/personsmodel.cpp:142: warning: unused parameter ‘index’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/personsmodel.cpp:142: warning: unused parameter ‘value’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/personsmodel.cpp:142: warning: unused parameter ‘role’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/personsmodel.cpp:163: warning: unused parameter ‘child’
+[ 33%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumownerwidget.cpp.o
+[ 33%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumownerdialog.cpp.o
+[ 33%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/sqlconstraint.cpp.o
+[ 33%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/maction.cpp.o
+[ 34%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mpushbutton.cpp.o
+[ 34%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumwidget.cpp.o
+[ 34%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/shoppingcartdelegate.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/shoppingcartdelegate.cpp:64: warning: unused parameter ‘option’
+[ 34%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/dbbackup.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/dbbackup.cpp: In member function ‘bool DBBackup::dumpTable(QString, QTextStream&)’:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/dbbackup.cpp:323: warning: comparison between ‘enum QVariant::Type’ and ‘enum QMetaType::Type’
+[ 34%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/dbbackupdialog.cpp.o
+[ 35%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/msqldatabase.cpp.o
+[ 35%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/setupwizarddbdump.cpp.o
+[ 35%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/minvalidator.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/minvalidator.cpp:110: warning: unused parameter ‘pos’
+[ 35%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/modulelistwidgetitem.cpp.o
+[ 35%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediummin.cpp.o
+[ 36%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editmintypes.cpp.o
+[ 36%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/minmodel.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/minmodel.cpp:174: warning: unused parameter ‘view’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/minmodel.cpp:303: warning: unused parameter ‘parent’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/minmodel.cpp:338: warning: unused parameter ‘child’
+[ 36%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/delegatemin.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/delegatemin.cpp:48: warning: unused parameter ‘option’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/delegatemin.cpp:48: warning: unused parameter ‘index’
+[ 36%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/progressstatuswidget.cpp.o
+[ 36%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/querythread.cpp.o
+[ 37%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/queryworker.cpp.o
+[ 37%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editmedium.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.cpp:20:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+[ 37%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/searchbutton.cpp.o
+[ 37%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumeditwidget.cpp.o
+Linking CXX shared library ../../lib/libmeganizer.so
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 37%] Built target libmeganizer
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 37%] Generating dbtestinit.moc
+[ 38%] Generating modeltest.moc
+Scanning dependencies of target libmeganizertests
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 38%] Building CXX object src/libmeganizertests/CMakeFiles/libmeganizertests.dir/modeltest.cpp.o
+[ 38%] Building CXX object src/libmeganizertests/CMakeFiles/libmeganizertests.dir/dbtestinit.cpp.o
+Linking CXX shared library ../../lib/liblibmeganizertests.so
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 38%] Built target libmeganizertests
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 38%] Generating editmediumtest.moc
+Scanning dependencies of target editmediumtest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 38%] Building CXX object src/libmeganizer/tests/CMakeFiles/editmediumtest.dir/editmediumtest.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/tests/editmediumtest.cpp:22:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+Linking CXX executable ../../../bin/editmediumtest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 38%] Built target editmediumtest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 38%] Generating materialpersonsmodeltest.moc
+Scanning dependencies of target materialpersonsmodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 38%] Building CXX object src/libmeganizer/tests/CMakeFiles/materialpersonsmodeltest.dir/materialpersonsmodeltest.cpp.o
+Linking CXX executable ../../../bin/materialpersonsmodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 38%] Built target materialpersonsmodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 39%] Generating mediamodeltest.moc
+Scanning dependencies of target mediamodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 39%] Building CXX object src/libmeganizer/tests/CMakeFiles/mediamodeltest.dir/mediamodeltest.cpp.o
+Linking CXX executable ../../../bin/mediamodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 39%] Built target mediamodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 39%] Generating mediumownerwidgettest.moc
+Scanning dependencies of target mediumownerwidgettest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 39%] Building CXX object src/libmeganizer/tests/CMakeFiles/mediumownerwidgettest.dir/mediumownerwidgettest.cpp.o
+Linking CXX executable ../../../bin/mediumownerwidgettest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 39%] Built target mediumownerwidgettest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 40%] Generating qrc_images.cxx
+[ 40%] Generating mediumtest.moc
+Scanning dependencies of target mediumtest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 40%] Building CXX object src/libmeganizer/tests/CMakeFiles/mediumtest.dir/mediumtest.cpp.o
+[ 40%] Building CXX object src/libmeganizer/tests/CMakeFiles/mediumtest.dir/qrc_images.cxx.o
+Linking CXX executable ../../../bin/mediumtest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 40%] Built target mediumtest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 40%] Generating mimetypemodeltest.moc
+Scanning dependencies of target mimetypemodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 40%] Building CXX object src/libmeganizer/tests/CMakeFiles/mimetypemodeltest.dir/mimetypemodeltest.cpp.o
+Linking CXX executable ../../../bin/mimetypemodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 40%] Built target mimetypemodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 41%] Generating minmodeltest.moc
+Scanning dependencies of target minmodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 41%] Building CXX object src/libmeganizer/tests/CMakeFiles/minmodeltest.dir/minmodeltest.cpp.o
+Linking CXX executable ../../../bin/minmodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 41%] Built target minmodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 41%] Generating minvalidatortests.moc
+Scanning dependencies of target minvalidatortests
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 41%] Building CXX object src/libmeganizer/tests/CMakeFiles/minvalidatortests.dir/minvalidatortests.cpp.o
+Linking CXX executable ../../../bin/minvalidatortests
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 41%] Built target minvalidatortests
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 41%] Generating personsmodeltest.moc
+Scanning dependencies of target personsmodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 41%] Building CXX object src/libmeganizer/tests/CMakeFiles/personsmodeltest.dir/personsmodeltest.cpp.o
+Linking CXX executable ../../../bin/personsmodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 41%] Built target personsmodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 41%] Generating qrc_iconset.cxx
+[ 41%] Generating mediendb.moc
+[ 41%] Generating setupwizard.moc
+[ 42%] Generating dbinit.moc
+[ 42%] Generating setupuserwidget.moc
+[ 42%] Generating setupuser.moc
+[ 42%] Generating modulestate.moc
+[ 42%] Generating resultsummary.moc
+[ 43%] Generating searchwidget.moc
+[ 43%] Generating settingsdialog.moc
+[ 43%] Generating settingsgeneral.moc
+[ 43%] Generating shoppingcart.moc
+[ 43%] Generating shoppingcartlistview.moc
+[ 44%] Generating insertmanualmediums.moc
+[ 44%] Generating summary.moc
+[ 44%] Generating loansummary.moc
+[ 44%] Generating statisticssummary.moc
+[ 44%] Generating projects.moc
+[ 45%] Generating project.moc
+[ 45%] Generating projectsmodel.moc
+[ 45%] Generating about.moc
+[ 45%] Generating helpcenter.moc
+[ 45%] Generating dependencies.moc
+[ 46%] Generating modulestatedialog.moc
+[ 46%] Generating updatenoticedialog.moc
+[ 46%] Generating ui_mediendb.h
+[ 46%] Generating ui_setupwizard.h
+[ 46%] Generating ui_modulestate.h
+[ 47%] Generating ui_resultsummary.h
+[ 47%] Generating ui_searchwidget.h
+[ 47%] Generating ui_settingsdialog.h
+[ 47%] Generating ui_settingsgeneral.h
+[ 47%] Generating ui_insertmanualmediums.h
+[ 48%] Generating ui_projects.h
+[ 48%] Generating ui_about.h
+[ 48%] Generating ui_dependencies.h
+[ 48%] Generating ui_updatenoticedialog.h
+[ 48%] Generating meganizer_de.qm
+Updating '/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/meganizer_de.qm'...
+    Generated 217 translation(s) (217 finished and 0 unfinished)
+[ 49%] Generating meganizer_en.qm
+Updating '/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/meganizer_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 217 untranslated source text(s)
+[ 49%] Generating qrc_meganizer.cxx
+Scanning dependencies of target meganizer
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 49%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/main.cpp.o
+[ 49%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/mediendb.cpp.o
+[ 49%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/setupwizard.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/setupwizard.cpp:101: warning: unused parameter ‘event’
+[ 49%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/dbinit.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/dbinit.cpp:390: warning: unused parameter ‘thisName’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/dbinit.cpp:402: warning: unused parameter ‘thisName’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/dbinit.cpp:437: warning: unused parameter ‘thisName’
+[ 50%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/setupuserwidget.cpp.o
+[ 50%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/setupuser.cpp.o
+[ 50%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/modulestate.cpp.o
+[ 50%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/resultsummary.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/resultsummary.cpp:33:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/resultsummary.cpp:357: warning: unused parameter ‘index’
+[ 50%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/searchwidget.cpp.o
+[ 51%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/settingsdialog.cpp.o
+[ 51%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/settingsgeneral.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/settingsgeneral.cpp:48: warning: unused parameter ‘showButtons’
+[ 51%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/shoppingcart.cpp.o
+[ 51%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/shoppingcartlistview.cpp.o
+[ 51%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/insertmanualmediums.cpp.o
+[ 52%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/summary.cpp.o
+[ 52%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/loansummary.cpp.o
+[ 52%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/statisticssummary.cpp.o
+[ 52%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/projects.cpp.o
+[ 52%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/project.cpp.o
+[ 53%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/projectsmodel.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/projectsmodel.cpp:181: warning: unused parameter ‘parent’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/projectsmodel.cpp:194: warning: unused parameter ‘child’
+[ 53%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/about.cpp.o
+[ 53%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/helpcenter.cpp.o
+[ 53%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/dependencies.cpp.o
+[ 53%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/modulestatedialog.cpp.o
+[ 54%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/updatenoticedialog.cpp.o
+[ 54%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/qrc_meganizer.cxx.o
+[ 54%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/qrc_iconset.cxx.o
+Linking CXX executable ../../bin/meganizer
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 54%] Built target meganizer
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 54%] Generating eanvalidatorplugin_en.qm
+Updating '/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidatorplugin_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 1 untranslated source text(s)
+[ 54%] Generating eanvalidator.moc
+[ 54%] Generating eanvalidatorplugin_de.qm
+Updating '/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidatorplugin_de.qm'...
+    Generated 1 translation(s) (1 finished and 0 unfinished)
+Scanning dependencies of target eanvalidator
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 55%] Building CXX object src/meganizer/eanvalidatorplugin/CMakeFiles/eanvalidator.dir/eanvalidator.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidator.cpp:42: warning: unused parameter ‘toType’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidator.cpp:47: warning: unused parameter ‘min’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidator.cpp:47: warning: unused parameter ‘toType’
+Linking CXX shared library ../../../lib/libeanvalidator.so
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 55%] Built target eanvalidator
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 55%] Generating eanvalidatortests.moc
+Scanning dependencies of target eanvalidatortests
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 55%] Building CXX object src/meganizer/eanvalidatorplugin/CMakeFiles/eanvalidatortests.dir/eanvalidatortests.cpp.o
+[ 56%] Building CXX object src/meganizer/eanvalidatorplugin/CMakeFiles/eanvalidatortests.dir/eanvalidator.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidator.cpp:42: warning: unused parameter ‘toType’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidator.cpp:47: warning: unused parameter ‘min’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidator.cpp:47: warning: unused parameter ‘toType’
+Linking CXX executable ../../../bin/eanvalidatortests
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 56%] Built target eanvalidatortests
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 57%] Generating project.moc
+[ 57%] Generating projectsmodeltest.moc
+[ 57%] Generating projectsmodel.moc
+Scanning dependencies of target projectsmodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 58%] Building CXX object src/meganizer/tests/CMakeFiles/projectsmodeltest.dir/projectsmodeltest.cpp.o
+[ 58%] Building CXX object src/meganizer/tests/CMakeFiles/projectsmodeltest.dir/__/projectsmodel.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/projectsmodel.cpp:181: warning: unused parameter ‘parent’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/meganizer/projectsmodel.cpp:194: warning: unused parameter ‘child’
+[ 58%] Building CXX object src/meganizer/tests/CMakeFiles/projectsmodeltest.dir/__/project.cpp.o
+Linking CXX executable ../../../bin/projectsmodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 58%] Built target projectsmodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 58%] Generating books_en.qm
+Updating '/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/books_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 40 untranslated source text(s)
+[ 58%] Generating books.moc
+[ 58%] Generating booksdb.moc
+[ 59%] Generating book.moc
+[ 59%] Generating booksearchwidget.moc
+[ 59%] Generating booksmodel.moc
+[ 59%] Generating bookedit.moc
+[ 59%] Generating ui_booksearchwidget.h
+[ 60%] Generating books_de.qm
+Updating '/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/books_de.qm'...
+    Generated 40 translation(s) (40 finished and 0 unfinished)
+Scanning dependencies of target books
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 60%] Building CXX object src/mediaplugins/books/CMakeFiles/books.dir/books.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/books.cpp:35: warning: unused parameter ‘parent’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/books.cpp:100: warning: unused parameter ‘materialType’
+[ 60%] Building CXX object src/mediaplugins/books/CMakeFiles/books.dir/booksdb.cpp.o
+[ 60%] Building CXX object src/mediaplugins/books/CMakeFiles/books.dir/book.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/bookedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/book.cpp:25:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/book.cpp:120: warning: unused parameter ‘userId’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/book.cpp:340: warning: unused parameter ‘format’
+[ 61%] Building CXX object src/mediaplugins/books/CMakeFiles/books.dir/booksearchwidget.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/booksearchwidget.cpp:38: warning: unused parameter ‘supportPersons’
+[ 61%] Building CXX object src/mediaplugins/books/CMakeFiles/books.dir/booksmodel.cpp.o
+[ 61%] Building CXX object src/mediaplugins/books/CMakeFiles/books.dir/bookedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/bookedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/bookedit.cpp:21:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+Linking CXX shared library ../../../lib/libbooks.so
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 61%] Built target books
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 61%] Generating isbnvalidatorplugin_en.qm
+Updating '/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/isbnvalidatorplugin/isbnvalidatorplugin_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 1 untranslated source text(s)
+[ 61%] Generating isbnvalidator.moc
+[ 61%] Generating isbnvalidatorplugin_de.qm
+Updating '/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/isbnvalidatorplugin/isbnvalidatorplugin_de.qm'...
+    Generated 1 translation(s) (1 finished and 0 unfinished)
+Scanning dependencies of target isbnvalidator
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 62%] Building CXX object src/mediaplugins/books/isbnvalidatorplugin/CMakeFiles/isbnvalidator.dir/isbnvalidator.cpp.o
+Linking CXX shared library ../../../../lib/libisbnvalidator.so
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 62%] Built target isbnvalidator
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 63%] Generating isbnvalidatortests.moc
+Scanning dependencies of target isbnvalidatortests
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 63%] Building CXX object src/mediaplugins/books/isbnvalidatorplugin/CMakeFiles/isbnvalidatortests.dir/isbnvalidatortests.cpp.o
+[ 63%] Building CXX object src/mediaplugins/books/isbnvalidatorplugin/CMakeFiles/isbnvalidatortests.dir/isbnvalidator.cpp.o
+Linking CXX executable ../../../../bin/isbnvalidatortests
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 63%] Built target isbnvalidatortests
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 64%] Generating booksearchwidget.moc
+[ 64%] Generating booksmodeltest.moc
+[ 65%] Generating booksmodel.moc
+[ 65%] Generating book.moc
+[ 65%] Generating books.moc
+[ 65%] Generating bookedit.moc
+[ 65%] Generating booksdb.moc
+Scanning dependencies of target booksmodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 65%] Building CXX object src/mediaplugins/books/tests/CMakeFiles/booksmodeltest.dir/booksmodeltest.cpp.o
+[ 65%] Building CXX object src/mediaplugins/books/tests/CMakeFiles/booksmodeltest.dir/__/booksmodel.cpp.o
+[ 65%] Building CXX object src/mediaplugins/books/tests/CMakeFiles/booksmodeltest.dir/__/book.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/bookedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/book.cpp:25:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/book.cpp:120: warning: unused parameter ‘userId’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/book.cpp:340: warning: unused parameter ‘format’
+[ 66%] Building CXX object src/mediaplugins/books/tests/CMakeFiles/booksmodeltest.dir/__/books.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/books.cpp:35: warning: unused parameter ‘parent’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/books.cpp:100: warning: unused parameter ‘materialType’
+[ 66%] Building CXX object src/mediaplugins/books/tests/CMakeFiles/booksmodeltest.dir/__/bookedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/bookedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/bookedit.cpp:21:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+[ 66%] Building CXX object src/mediaplugins/books/tests/CMakeFiles/booksmodeltest.dir/__/booksdb.cpp.o
+[ 66%] Building CXX object src/mediaplugins/books/tests/CMakeFiles/booksmodeltest.dir/__/booksearchwidget.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/books/booksearchwidget.cpp:38: warning: unused parameter ‘supportPersons’
+Linking CXX executable ../../../../bin/booksmodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 66%] Built target booksmodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 66%] Generating music_en.qm
+Updating '/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/music_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 86 untranslated source text(s)
+[ 66%] Generating cds.moc
+[ 66%] Generating cdsdb.moc
+[ 67%] Generating cd.moc
+[ 67%] Generating cdsearchwidget.moc
+[ 67%] Generating cdsmodel.moc
+[ 67%] Generating cdedit.moc
+[ 67%] Generating track.moc
+[ 68%] Generating tracksmodel.moc
+[ 68%] Generating trackedit.moc
+[ 68%] Generating editdevices.moc
+[ 68%] Generating tracksview.moc
+[ 68%] Generating parentview.moc
+[ 68%] Generating ui_cdsearchwidget.h
+[ 69%] Generating ui_parentview.h
+[ 69%] Generating music_de.qm
+Updating '/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/music_de.qm'...
+    Generated 86 translation(s) (81 finished and 5 unfinished)
+Scanning dependencies of target cds
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 69%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/cds.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cds.cpp:36: warning: unused parameter ‘parent’
+[ 69%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/cdsdb.cpp.o
+[ 69%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/cd.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:25:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:145: warning: unused parameter ‘userId’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:487: warning: unused parameter ‘format’
+[ 69%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/cdsearchwidget.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdsearchwidget.cpp:58: warning: unused parameter ‘supportPersons’
+[ 70%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/cdsmodel.cpp.o
+[ 70%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/cdedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:23:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:123: warning: unused parameter ‘medium’
+[ 70%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/track.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:25:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:132: warning: unused parameter ‘userId’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:349: warning: unused parameter ‘format’
+[ 70%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/tracksmodel.cpp.o
+[ 70%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/trackedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.cpp:21:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+[ 71%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/editdevices.cpp.o
+[ 71%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/tracksview.cpp.o
+[ 71%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/parentview.cpp.o
+Linking CXX shared library ../../../lib/libcds.so
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 71%] Built target cds
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 71%] Generating upcvalidatorplugin_en.qm
+Updating '/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/upcvalidatorplugin/upcvalidatorplugin_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 1 untranslated source text(s)
+[ 71%] Generating upcvalidator.moc
+[ 72%] Generating upcvalidatorplugin_de.qm
+Updating '/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/upcvalidatorplugin/upcvalidatorplugin_de.qm'...
+    Generated 1 translation(s) (1 finished and 0 unfinished)
+Scanning dependencies of target upcvalidator
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 72%] Building CXX object src/mediaplugins/music/upcvalidatorplugin/CMakeFiles/upcvalidator.dir/upcvalidator.cpp.o
+Linking CXX shared library ../../../../lib/libupcvalidator.so
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 72%] Built target upcvalidator
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 72%] Generating upcvalidatortests.moc
+Scanning dependencies of target upcvalidatortests
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 72%] Building CXX object src/mediaplugins/music/upcvalidatorplugin/CMakeFiles/upcvalidatortests.dir/upcvalidatortests.cpp.o
+[ 72%] Building CXX object src/mediaplugins/music/upcvalidatorplugin/CMakeFiles/upcvalidatortests.dir/upcvalidator.cpp.o
+Linking CXX executable ../../../../bin/upcvalidatortests
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 73%] Built target upcvalidatortests
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 73%] Generating parentview.moc
+[ 73%] Generating cdsmodeltest.moc
+[ 73%] Generating cdsmodel.moc
+[ 73%] Generating cd.moc
+[ 73%] Generating tracksmodel.moc
+[ 74%] Generating track.moc
+[ 74%] Generating trackedit.moc
+[ 74%] Generating cds.moc
+[ 74%] Generating cdedit.moc
+[ 74%] Generating editdevices.moc
+[ 75%] Generating cdsdb.moc
+[ 75%] Generating cdsearchwidget.moc
+[ 75%] Generating tracksview.moc
+Scanning dependencies of target cdsmodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 75%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/cdsmodeltest.cpp.o
+[ 75%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/cdsmodel.cpp.o
+[ 76%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/cd.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:25:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:145: warning: unused parameter ‘userId’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:487: warning: unused parameter ‘format’
+[ 76%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/tracksmodel.cpp.o
+[ 76%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/track.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:25:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:132: warning: unused parameter ‘userId’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:349: warning: unused parameter ‘format’
+[ 76%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/trackedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.cpp:21:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+[ 76%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/cds.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cds.cpp:36: warning: unused parameter ‘parent’
+[ 77%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/cdedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:23:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:123: warning: unused parameter ‘medium’
+[ 77%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/editdevices.cpp.o
+[ 77%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/cdsdb.cpp.o
+[ 77%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/cdsearchwidget.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdsearchwidget.cpp:58: warning: unused parameter ‘supportPersons’
+[ 77%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/tracksview.cpp.o
+[ 78%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/parentview.cpp.o
+Linking CXX executable ../../../../bin/cdsmodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 78%] Built target cdsmodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 78%] Generating cdtest.moc
+Scanning dependencies of target cdtest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 78%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/cdtest.cpp.o
+[ 79%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/cd.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:25:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:145: warning: unused parameter ‘userId’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:487: warning: unused parameter ‘format’
+[ 79%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/cdedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:23:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:123: warning: unused parameter ‘medium’
+[ 79%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/editdevices.cpp.o
+[ 79%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/cdsmodel.cpp.o
+[ 79%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/cds.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cds.cpp:36: warning: unused parameter ‘parent’
+[ 80%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/cdsdb.cpp.o
+[ 80%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/cdsearchwidget.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdsearchwidget.cpp:58: warning: unused parameter ‘supportPersons’
+[ 80%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/tracksmodel.cpp.o
+[ 80%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/track.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:25:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:132: warning: unused parameter ‘userId’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:349: warning: unused parameter ‘format’
+[ 80%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/trackedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.cpp:21:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+[ 81%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/tracksview.cpp.o
+[ 81%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/parentview.cpp.o
+Linking CXX executable ../../../../bin/cdtest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 83%] Built target cdtest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 83%] Generating tracksmodeltest.moc
+Scanning dependencies of target tracksmodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 83%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/tracksmodeltest.cpp.o
+[ 83%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/tracksmodel.cpp.o
+[ 83%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/track.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:25:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:132: warning: unused parameter ‘userId’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:349: warning: unused parameter ‘format’
+[ 83%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/trackedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.cpp:21:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+[ 84%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/cds.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cds.cpp:36: warning: unused parameter ‘parent’
+[ 84%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/cdsdb.cpp.o
+[ 84%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/cd.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:25:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:145: warning: unused parameter ‘userId’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:487: warning: unused parameter ‘format’
+[ 84%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/cdsearchwidget.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdsearchwidget.cpp:58: warning: unused parameter ‘supportPersons’
+[ 84%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/cdsmodel.cpp.o
+[ 85%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/cdedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:23:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:123: warning: unused parameter ‘medium’
+[ 85%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/editdevices.cpp.o
+[ 85%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/tracksview.cpp.o
+[ 85%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/parentview.cpp.o
+Linking CXX executable ../../../../bin/tracksmodeltest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 88%] Built target tracksmodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 89%] Generating tracktest.moc
+Scanning dependencies of target tracktest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 89%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/tracktest.cpp.o
+[ 89%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/track.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:25:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:132: warning: unused parameter ‘userId’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/track.cpp:349: warning: unused parameter ‘format’
+[ 89%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/trackedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/trackedit.cpp:21:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+[ 90%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/tracksmodel.cpp.o
+[ 90%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/cds.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cds.cpp:36: warning: unused parameter ‘parent’
+[ 90%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/cdsdb.cpp.o
+[ 90%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/cdsearchwidget.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdsearchwidget.cpp:58: warning: unused parameter ‘supportPersons’
+[ 90%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/cd.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:25:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:145: warning: unused parameter ‘userId’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cd.cpp:487: warning: unused parameter ‘format’
+[ 91%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/cdsmodel.cpp.o
+[ 91%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/cdedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.h:24,
+                 from /home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:23:
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:60: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/libmeganizer/editmedium.h:66: warning: unused parameter ‘medium’
+/home/packager/pb/meganizer/build/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:123: warning: unused parameter ‘medium’
+[ 91%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/editdevices.cpp.o
+[ 91%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/tracksview.cpp.o
+[ 91%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/parentview.cpp.o
+Linking CXX executable ../../../../bin/tracktest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 93%] Built target tracktest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 93%] Generating qrc_amazon.cxx
+[ 93%] Generating amazonsettings.moc
+[ 94%] Generating amazonconntypesettings.moc
+[ 94%] Generating amazongeneralsettings.moc
+[ 94%] Generating amazon.moc
+[ 94%] Generating connectmaterialtype.moc
+[ 94%] Generating connectmaterialtypedialog.moc
+[ 95%] Generating purchase.moc
+[ 95%] Generating ui_connectmaterialtype.h
+[ 95%] Generating ui_amazonconntypesettings.h
+[ 95%] Generating ui_purchase.h
+[ 95%] Generating amazon_de.qm
+Updating '/home/packager/pb/meganizer/build/meganizer-0.3/src/searchplugins/amazon/amazon_de.qm'...
+    Generated 110 translation(s) (110 finished and 0 unfinished)
+[ 96%] Generating amazon_en.qm
+Updating '/home/packager/pb/meganizer/build/meganizer-0.3/src/searchplugins/amazon/amazon_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 110 untranslated source text(s)
+Scanning dependencies of target amazon
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 96%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/amazonsettings.cpp.o
+[ 96%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/amazonconntypesettings.cpp.o
+[ 96%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/amazongeneralsettings.cpp.o
+[ 96%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/itemsearch.cpp.o
+[ 96%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/amazon.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/searchplugins/amazon/amazon.cpp:46: warning: unused parameter ‘parent’
+[ 97%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/connectmaterialtype.cpp.o
+[ 97%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/connectmaterialtypedialog.cpp.o
+[ 97%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/purchase.cpp.o
+[ 97%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/qrc_amazon.cxx.o
+Linking CXX shared library ../../../lib/libamazon.so
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 97%] Built target amazon
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 97%] Generating amazonconntypesettings.moc
+[ 97%] Generating itemsearchtests.moc
+[ 97%] Generating amazon.moc
+[ 97%] Generating connectmaterialtypedialog.moc
+[ 97%] Generating connectmaterialtype.moc
+[ 98%] Generating purchase.moc
+[ 98%] Generating amazonsettings.moc
+[ 98%] Generating amazongeneralsettings.moc
+Scanning dependencies of target itemsearchtest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 98%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/itemsearchtests.cpp.o
+[ 98%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/itemsearch.cpp.o
+[ 98%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/amazon.cpp.o
+/home/packager/pb/meganizer/build/meganizer-0.3/src/searchplugins/amazon/amazon.cpp:46: warning: unused parameter ‘parent’
+[ 99%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/connectmaterialtypedialog.cpp.o
+[ 99%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/connectmaterialtype.cpp.o
+[ 99%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/purchase.cpp.o
+[ 99%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/amazonsettings.cpp.o
+[ 99%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/amazongeneralsettings.cpp.o
+[100%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/amazonconntypesettings.cpp.o
+Linking CXX executable ../../../../bin/itemsearchtest
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[100%] Built target itemsearchtest
+make[2]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[1]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+# to run on fake x server
+dh build --after dh_auto_test
+ fakeroot debian/rules binary
+dh binary
+   dh_testroot
+   dh_prep
+   dh_installdirs
+   dh_auto_install
+make[1]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[2]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 37%] Built target libmeganizer
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 38%] Built target libmeganizertests
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 38%] Built target editmediumtest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 38%] Built target materialpersonsmodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 39%] Built target mediamodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 39%] Built target mediumownerwidgettest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 40%] Built target mediumtest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 40%] Built target mimetypemodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 41%] Built target minmodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 41%] Built target minvalidatortests
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 41%] Built target personsmodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 54%] Built target meganizer
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 55%] Built target eanvalidator
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 56%] Built target eanvalidatortests
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 58%] Built target projectsmodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 61%] Built target books
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 62%] Built target isbnvalidator
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 63%] Built target isbnvalidatortests
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 66%] Built target booksmodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 71%] Built target cds
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 72%] Built target upcvalidator
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 73%] Built target upcvalidatortests
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 78%] Built target cdsmodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 83%] Built target cdtest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 88%] Built target tracksmodeltest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 93%] Built target tracktest
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[ 97%] Built target amazon
+make[3]: Betrete Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+make[3]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+[100%] Built target itemsearchtest
+make[2]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+Install the project...
+-- Install configuration: "Release"
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/lib/libmeganizer.so
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/libmeganizer_de.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/libmeganizer_en.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/depends/libmeganizer.xml
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/bin/meganizer
+-- Removed runtime path from "/home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/bin/meganizer"
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/meganizer_de.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/meganizer_en.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/depends/meganizer.xml
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/pixmaps/meganizer.png
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/applications/Meganizer.desktop
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/lib/meganizer/minvalidator/libeanvalidator.so
+-- Removed runtime path from "/home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/lib/meganizer/minvalidator/libeanvalidator.so"
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/eanvalidatorplugin_de.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/eanvalidatorplugin_en.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/lib/meganizer/libbooks.so
+-- Removed runtime path from "/home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/lib/meganizer/libbooks.so"
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/books_de.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/books_en.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/depends/books.xml
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/lib/meganizer/minvalidator/libisbnvalidator.so
+-- Removed runtime path from "/home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/lib/meganizer/minvalidator/libisbnvalidator.so"
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/isbnvalidatorplugin_de.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/isbnvalidatorplugin_en.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/lib/meganizer/libcds.so
+-- Removed runtime path from "/home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/lib/meganizer/libcds.so"
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/music_de.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/music_en.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/depends/cds.xml
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/lib/meganizer/minvalidator/libupcvalidator.so
+-- Removed runtime path from "/home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/lib/meganizer/minvalidator/libupcvalidator.so"
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/upcvalidatorplugin_de.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/upcvalidatorplugin_en.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/lib/meganizer/libamazon.so
+-- Removed runtime path from "/home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/lib/meganizer/libamazon.so"
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/amazon_de.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/lang/amazon_en.qm
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/meganizer/depends/amazon.xml
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/man/man1/meganizer.1
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/man/man5/meganizer.5
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/man/de/man1/meganizer.de.1
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/man/de/man5/meganizer.de.5
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/doc/meganizer/meganizer.qhc
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/doc/meganizer/meganizer.qch
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/doc/meganizer/meganizer_de.qhc
+-- Installing: /home/packager/pb/meganizer/build/meganizer-0.3/debian/meganizer/usr/share/doc/meganizer/meganizer_de.qch
+make[1]: Verlasse Verzeichnis '/home/packager/pb/meganizer/build/meganizer-0.3'
+   dh_install
+   dh_installdocs
+   dh_installchangelogs
+   dh_installexamples
+   dh_installman
+   dh_installcatalogs
+   dh_installcron
+   dh_installdebconf
+   dh_installemacsen
+   dh_installifupdown
+   dh_installinfo
+   dh_pysupport
+   dh_installinit
+   dh_installmenu
+   dh_installmime
+   dh_installmodules
+   dh_installlogcheck
+   dh_installlogrotate
+   dh_installpam
+   dh_installppp
+   dh_installudev
+   dh_installwm
+   dh_installxfonts
+   dh_bugfiles
+   dh_lintian
+   dh_gconf
+   dh_icons
+   dh_perl
+   dh_usrlocal
+   dh_link
+   dh_compress
+   dh_fixperms
+   dh_strip
+   dh_makeshlibs
+   dh_shlibdeps
+dpkg-shlibdeps: Warnung: Kann Name und Version aus Bibliotheksnamen »libmeganizer.so« nicht entnehmen
+dpkg-shlibdeps: Warnung: Kann Name und Version aus Bibliotheksnamen »libmeganizer.so« nicht entnehmen
+dpkg-shlibdeps: Warnung: Kann Name und Version aus Bibliotheksnamen »libmeganizer.so« nicht entnehmen
+dpkg-shlibdeps: Warnung: Kann Name und Version aus Bibliotheksnamen »libmeganizer.so« nicht entnehmen
+dpkg-shlibdeps: Warnung: Kann Name und Version aus Bibliotheksnamen »libmeganizer.so« nicht entnehmen
+dpkg-shlibdeps: Warnung: Kann Name und Version aus Bibliotheksnamen »libmeganizer.so« nicht entnehmen
+dpkg-shlibdeps: Warnung: Kann Name und Version aus Bibliotheksnamen »libmeganizer.so« nicht entnehmen
+dpkg-shlibdeps: Warnung: Kann Name und Version aus Bibliotheksnamen »libmeganizer.so« nicht entnehmen
+dpkg-shlibdeps: Warnung: Kann Name und Version aus Bibliotheksnamen »libmeganizer.so« nicht entnehmen
+dpkg-shlibdeps: Warnung: Kann Name und Version aus Bibliotheksnamen »libmeganizer.so« nicht entnehmen
+dpkg-shlibdeps: Warnung: Kann Name und Version aus Bibliotheksnamen »libmeganizer.so« nicht entnehmen
+dpkg-shlibdeps: Warnung: Kann Name und Version aus Bibliotheksnamen »libmeganizer.so« nicht entnehmen
+dpkg-shlibdeps: Warnung: Kann Name und Version aus Bibliotheksnamen »libmeganizer.so« nicht entnehmen
+dpkg-shlibdeps: Warnung: Kann Name und Version aus Bibliotheksnamen »libmeganizer.so« nicht entnehmen
+dpkg-shlibdeps: Warnung: Abhängigkeit von libdl.so.2 könnte vermieden werden, falls »debian/meganizer/usr/lib/meganizer/libcds.so debian/meganizer/usr/bin/meganizer debian/meganizer/usr/lib/meganizer/minvalidator/libeanvalidator.so debian/meganizer/usr/lib/libmeganizer.so debian/meganizer/usr/lib/meganizer/minvalidator/libupcvalidator.so debian/meganizer/usr/lib/meganizer/minvalidator/libisbnvalidator.so debian/meganizer/usr/lib/meganizer/libbooks.so debian/meganizer/usr/lib/meganizer/libamazon.so« nicht unnötigerweise dagegen gelinkt wäre (es verwendet keines seiner Symbole).
+dpkg-shlibdeps: Warnung: Abhängigkeit von libgcc_s.so.1 könnte vermieden werden, falls »debian/meganizer/usr/lib/meganizer/libcds.so debian/meganizer/usr/bin/meganizer debian/meganizer/usr/lib/meganizer/minvalidator/libeanvalidator.so debian/meganizer/usr/lib/libmeganizer.so debian/meganizer/usr/lib/meganizer/minvalidator/libupcvalidator.so debian/meganizer/usr/lib/meganizer/minvalidator/libisbnvalidator.so debian/meganizer/usr/lib/meganizer/libbooks.so debian/meganizer/usr/lib/meganizer/libamazon.so« nicht unnötigerweise dagegen gelinkt wäre (es verwendet keines seiner Symbole).
+dpkg-shlibdeps: Warnung: Abhängigkeit von libX11.so.6 könnte vermieden werden, falls »debian/meganizer/usr/lib/meganizer/libcds.so debian/meganizer/usr/bin/meganizer debian/meganizer/usr/lib/meganizer/minvalidator/libeanvalidator.so debian/meganizer/usr/lib/libmeganizer.so debian/meganizer/usr/lib/meganizer/minvalidator/libupcvalidator.so debian/meganizer/usr/lib/meganizer/minvalidator/libisbnvalidator.so debian/meganizer/usr/lib/meganizer/libbooks.so debian/meganizer/usr/lib/meganizer/libamazon.so« nicht unnötigerweise dagegen gelinkt wäre (es verwendet keines seiner Symbole).
+dpkg-shlibdeps: Warnung: Abhängigkeit von librt.so.1 könnte vermieden werden, falls »debian/meganizer/usr/lib/meganizer/libcds.so debian/meganizer/usr/bin/meganizer debian/meganizer/usr/lib/meganizer/minvalidator/libeanvalidator.so debian/meganizer/usr/lib/libmeganizer.so debian/meganizer/usr/lib/meganizer/minvalidator/libupcvalidator.so debian/meganizer/usr/lib/meganizer/minvalidator/libisbnvalidator.so debian/meganizer/usr/lib/meganizer/libbooks.so debian/meganizer/usr/lib/meganizer/libamazon.so« nicht unnötigerweise dagegen gelinkt wäre (es verwendet keines seiner Symbole).
+dpkg-shlibdeps: Warnung: Abhängigkeit von libpthread.so.0 könnte vermieden werden, falls »debian/meganizer/usr/lib/meganizer/libcds.so debian/meganizer/usr/bin/meganizer debian/meganizer/usr/lib/meganizer/minvalidator/libeanvalidator.so debian/meganizer/usr/lib/libmeganizer.so debian/meganizer/usr/lib/meganizer/minvalidator/libupcvalidator.so debian/meganizer/usr/lib/meganizer/minvalidator/libisbnvalidator.so debian/meganizer/usr/lib/meganizer/libbooks.so debian/meganizer/usr/lib/meganizer/libamazon.so« nicht unnötigerweise dagegen gelinkt wäre (es verwendet keines seiner Symbole).
+   dh_installdeb
+   dh_gencontrol
+   dh_md5sums
+   dh_builddeb
+dpkg-deb: Baue Paket »meganizer« in »../meganizer_0.3-0.20100901170754_amd64.deb«.
+ dpkg-genchanges  >../meganizer_0.3-0.20100901170754_amd64.changes
+dpkg-genchanges: Warnung: die aktuelle Version (0.3-0.20100901170754) ist kleiner als die vorhergehende (0.3-1)
+dpkg-genchanges: füge kompletten Quellcode beim Hochladen hinzu
+dpkg-buildpackage: Alles hochzuladen; Debian-native-Paket (komplette Quellen enthalten)
+
+Checking validity of debs with lintian... child (lintian ../meganizer_0.3-0.20100901170754_*.changes ) exited with value 2
+internal error: control invoked in wrong directory
+warning: collect info source-control-file about package meganizer failed
+warning: skipping check of source package meganizer
+W: meganizer: package-name-doesnt-match-sonames libmeganizer
+W: meganizer: latest-debian-changelog-entry-without-new-version
+W: meganizer: extended-description-line-too-long
+W: meganizer: manpage-has-errors-from-man usr/share/man/de/man5/meganizer.de.5.gz 20: warning: macro `It' not defined
+W: meganizer: manpage-has-errors-from-man usr/share/man/man5/meganizer.5.gz 19: warning: macro `It' not defined
+W: meganizer: shlib-without-versioned-soname usr/lib/libmeganizer.so libmeganizer.so
+
+
+Get package names in packager@localhost:pb/meganizer/build... OK
+Recovery of package meganizer_0.3-0.20100901170754.dsc in /home/packager/pb/meganizer/build/ubuntu/10.04... OK
+Recovery of package meganizer_0.3-0.20100901170754.tar.gz in /home/packager/pb/meganizer/build/ubuntu/10.04... OK
+Recovery of package meganizer_0.3-0.20100901170754_*.deb in /home/packager/pb/meganizer/build/ubuntu/10.04... OK
+Recovery of package meganizer_0.3-0.20100901170754_*.changes in /home/packager/pb/meganizer/build/ubuntu/10.04... OK
+VMbuild cleanup... OK
+Packages: meganizer
+Sources handled (Packages): ubuntu/10.04/meganizer_0.3-0.20100901170754.dsc ubuntu/10.04/meganizer_0.3-0.20100901170754.tar.gz ubuntu/10.04/meganizer_0.3-0.20100901170754_*.deb ubuntu/10.04/meganizer_0.3-0.20100901170754_*.changes /home/packager/pb/meganizer/build/pbscript
+Use of uninitialized value in concatenation (.) or string at /usr/bin/pb line 1296.
+Preparing /var/www/de.engsas.ftp/unstable//ubuntu/10.04 on packager@admin.falaba.de:/var/www/de.engsas.ftp/unstable//ubuntu/10.04... OK
+Packages delivery in packager@admin.falaba.de:/var/www/de.engsas.ftp/unstable//ubuntu/10.04... OK
+Executing pbscript on packager@admin.falaba.de:/var/www/de.engsas.ftp/unstable//ubuntu/10.04 if needed... OK
+
+This account is restricted by rssh.
+Allowed commands: scp 
+
+If you believe this is in error, please contact your system administrator.
+
+
+VM ubuntu-10.04-x86_64 halt (pid 3398)... sudo: unable to resolve host ubuntu-10.04-x86-64
+OK
+
+Waiting 45 s for VM opensuse-11.3-i386 ... OK
+Executing(%prep): /bin/sh -e /var/tmp/rpm-tmp.fFMc2e
++ umask 022
++ cd /home/packager/pb/meganizer/build/BUILD
++ cd /home/packager/pb/meganizer/build/BUILD
++ rm -rf meganizer-0.3
++ /bin/tar -xf -
++ /usr/bin/gzip -dc /home/packager/pb/meganizer/build/SOURCES/meganizer-0.3.tar.gz
++ STATUS=0
++ '[' 0 -ne 0 ']'
++ cd meganizer-0.3
++ /bin/chmod -Rf a+rX,u+w,g-w,o-w .
++ exit 0
+Executing(%build): /bin/sh -e /var/tmp/rpm-tmp.qdK5CG
++ umask 022
++ cd /home/packager/pb/meganizer/build/BUILD
++ /bin/rm -rf /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64
+++ dirname /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64
++ /bin/mkdir -p /home/packager/pb/meganizer/build/BUILDROOT
++ /bin/mkdir /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64
++ cd meganizer-0.3
++ cmake -DBUILD_PACKAGE=ON -DL10N_ALL=1 -DWITH_ALL=1 -DBINDINGS_KDE=0 -DCMAKE_INSTALL_PREFIX=/usr
+-- The C compiler identification is GNU
+-- The CXX compiler identification is GNU
+-- Check for working C compiler: /usr/bin/gcc
+-- Check for working C compiler: /usr/bin/gcc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working CXX compiler: /usr/bin/c++
+-- Check for working CXX compiler: /usr/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+Disabling Debug mode, because Packagemode succeed over BUILD_DEBUG
+-- checking for module 'qca2'
+--   found qca2, version 2.0.2
+-- Found QCA2: /usr/lib64/libqca.so
+-- Looking for Q_WS_X11
+-- Looking for Q_WS_X11 - found
+-- Looking for Q_WS_WIN
+-- Looking for Q_WS_WIN - not found.
+-- Looking for Q_WS_QWS
+-- Looking for Q_WS_QWS - not found.
+-- Looking for Q_WS_MAC
+-- Looking for Q_WS_MAC - not found.
+-- Found Qt-Version 4.6.3 (using /usr/bin/qmake)
+-- Looking for _POSIX_TIMERS
+-- Looking for _POSIX_TIMERS - found
+Cleanup *.gcda
+Found AWS AccessKey and AWS Secret
+Reading collection config file...
+Generating help for ../html/meganizer/meganizer.qhp...
+Building up file structure...
+Insert custom filters...
+Insert help data for filter section (1 of 1)...
+Insert files...
+Insert contents...
+Insert indices...
+Documentation successfully generated.
+Creating collection file...
+Reading collection config file...
+Generating help for ../html/meganizer_de/meganizer_de.qhp...
+Building up file structure...
+Insert custom filters...
+Insert help data for filter section (1 of 1)...
+Insert files...
+Insert contents...
+Insert indices...
+Documentation successfully generated.
+Creating collection file...
+######################################################
+
+CONFIGURATION
+
+CMAKE_SHARED_LINKER_FLAGS:  -Wl,--no-undefined -Wl,--fatal-warnings -lc
+CMAKE_CXX_FLAGS:            -Wnon-virtual-dtor -Wno-long-long -Wundef -Wcast-align -Wchar-subscripts -Wall -W -Wpointer-arith -Wformat-security -fno-exceptions -DQT_NO_EXCEPTIONS -fno-check-new -fno-common -ansi
+
+OPTIONS:
+  Name                     Wanted       Used
+  BUILD_DEBUG:                          OFF
+  BUILD_PACKAGE:           ON           ON
+  BUILD_DEV:                            OFF
+  BINDINGS_KDE:                         0
+  WITH_HANDBOOK:                        ON
+  WITH_ALL_PLUGINS:                     ON
+    WITH_BOOKS:                         ON
+    WITH_MUSIC:                         ON
+    WITH_AMAZON:                        ON
+  L10N_ALL:                1            1
+    L10N_DE:                            ON
+    L10N_EN:                            ON
+
+######################################################
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/packager/pb/meganizer/build/BUILD/meganizer-0.3
++ make
+[  0%] Generating libmeganizer_en.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/libmeganizer_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 309 untranslated source text(s)
+[  0%] Generating mdialog.moc
+[  1%] Generating mobject.moc
+[  1%] Generating mwidget.moc
+[  1%] Generating delegateforeignkey.moc
+[  1%] Generating delegateuser.moc
+[  1%] Generating settingswidget.moc
+[  2%] Generating sqlinit.moc
+[  2%] Generating sqllogin.moc
+[  2%] Generating setupwizardobject.moc
+[  2%] Generating setupwizardwidget.moc
+[  2%] Generating setupwizarddb.moc
+[  3%] Generating dbsettings.moc
+[  3%] Generating dbupdatewidget.moc
+[  3%] Generating medium.moc
+[  3%] Generating mediamodel.moc
+[  3%] Generating materialpersonsmodel.moc
+[  4%] Generating materialperson.moc
+[  4%] Generating editdialog.moc
+[  4%] Generating detailswidget.moc
+[  4%] Generating detailswidgetnamedesc.moc
+[  4%] Generating editgenres.moc
+[  5%] Generating editmanufacturers.moc
+[  5%] Generating editmanufacturersdetailswidget.moc
+[  5%] Generating editmaterialpersons.moc
+[  5%] Generating editmaterialpersonsdetailswidget.moc
+[  5%] Generating editroles.moc
+[  6%] Generating edituserdetailswidget.moc
+[  6%] Generating edituser.moc
+[  6%] Generating connectmediasearch.moc
+[  6%] Generating connectmediasearchdialog.moc
+[  6%] Generating connectmediasearchsettings.moc
+[  7%] Generating addmedium.moc
+[  7%] Generating mediumexport.moc
+[  7%] Generating selectexportformat.moc
+[  7%] Generating searchexternalapp.moc
+[  7%] Generating openfileexternal.moc
+[  8%] Generating mimetypemodel.moc
+[  8%] Generating mediumtitlewidget.moc
+[  8%] Generating mediummanufacturerwidget.moc
+[  8%] Generating mediumgenrewidget.moc
+[  8%] Generating mediumminwidget.moc
+[  8%] Generating mediumwishwidget.moc
+[  9%] Generating mediumimagewidget.moc
+[  9%] Generating scaledimage.moc
+[  9%] Generating mediumpersonswidget.moc
+[  9%] Generating mediumdescriptionwidget.moc
+[  9%] Generating mediumliteraturewidget.moc
+[ 10%] Generating mediumgiftwidget.moc
+[ 10%] Generating mediumlistpricewidget.moc
+[ 10%] Generating mediumboughtpricewidget.moc
+[ 10%] Generating mediumevaluationwidget.moc
+[ 10%] Generating mediumloanwidget.moc
+[ 11%] Generating mediumloandialog.moc
+[ 11%] Generating loanitem.moc
+[ 11%] Generating loanmodel.moc
+[ 11%] Generating searchdetailswidget.moc
+[ 11%] Generating person.moc
+[ 12%] Generating personsmodel.moc
+[ 12%] Generating mediumownerwidget.moc
+[ 12%] Generating mediumownerdialog.moc
+[ 12%] Generating maction.moc
+[ 12%] Generating mpushbutton.moc
+[ 13%] Generating mediumwidget.moc
+[ 13%] Generating shoppingcartdelegate.moc
+[ 13%] Generating dbbackup.moc
+[ 13%] Generating dbbackupdialog.moc
+[ 13%] Generating setupwizarddbdump.moc
+[ 14%] Generating minvalidator.moc
+[ 14%] Generating mediummin.moc
+[ 14%] Generating editmintypes.moc
+[ 14%] Generating minmodel.moc
+[ 14%] Generating delegatemin.moc
+[ 15%] Generating progressstatuswidget.moc
+[ 15%] Generating querythread.moc
+[ 15%] Generating queryworker.moc
+[ 15%] Generating editmedium.moc
+[ 15%] Generating searchbutton.moc
+[ 16%] Generating mediumeditwidget.moc
+[ 16%] Generating ui_sqllogin.h
+[ 16%] Generating ui_dbsettings.h
+[ 16%] Generating ui_dbupdatewidget.h
+[ 16%] Generating ui_detailswidgetnamedesc.h
+[ 17%] Generating ui_editmanufacturersdetailswidget.h
+[ 17%] Generating ui_editmaterialpersonsdetailswidget.h
+[ 17%] Generating ui_edituserdetailswidget.h
+[ 17%] Generating ui_connectmediasearch.h
+[ 17%] Generating ui_connectmediasearchsettings.h
+[ 18%] Generating ui_addmedium.h
+[ 18%] Generating ui_selectexportformat.h
+[ 18%] Generating ui_searchexternalapp.h
+[ 18%] Generating ui_mediumcheckwidget.h
+[ 18%] Generating ui_mediumpricewidget.h
+[ 19%] Generating ui_mediumownerwidget.h
+[ 19%] Generating ui_mediumgiftwidget.h
+[ 19%] Generating ui_dbbackup.h
+[ 19%] Generating ui_mediumminwidget.h
+[ 19%] Generating ui_progressstatuswidget.h
+[ 20%] Generating ui_editmedium.h
+[ 20%] Generating libmeganizer_de.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/libmeganizer_de.qm'...
+    Generated 301 translation(s) (300 finished and 1 unfinished)
+
+    Ignored 8 untranslated source text(s)
+Scanning dependencies of target libmeganizer
+[ 20%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mdialog.cpp.o
+[ 21%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mobject.cpp.o
+[ 21%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mwidget.cpp.o
+[ 21%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/delegateforeignkey.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/delegateforeignkey.cpp:139:10: warning: unused parameter 'option'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/delegateforeignkey.cpp:139:10: warning: unused parameter 'index'
+[ 21%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/delegateuser.cpp.o
+[ 21%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/settingswidget.cpp.o
+[ 22%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/sqlfield.cpp.o
+[ 22%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/sqlinit.cpp.o
+[ 22%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/sqllogin.cpp.o
+[ 22%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/sqltable.cpp.o
+[ 22%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/setupwizardobject.cpp.o
+[ 23%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/setupwizardwidget.cpp.o
+[ 23%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/setupwizarddb.cpp.o
+[ 23%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/dbsettings.cpp.o
+[ 23%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/dbupdatewidget.cpp.o
+[ 23%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/medium.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/medium.cpp:34:0:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/medium.cpp:622:10: warning: unused parameter 'role'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/medium.cpp:828:6: warning: unused parameter 'format'
+[ 24%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediamodel.cpp.o
+[ 24%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/materialpersonsmodel.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/materialpersonsmodel.cpp:205:6: warning: unused parameter 'role'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/materialpersonsmodel.cpp:218:5: warning: unused parameter 'parent'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/materialpersonsmodel.cpp:250:6: warning: unused parameter 'object'
+[ 24%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/materialperson.cpp.o
+[ 24%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editdialog.cpp.o
+[ 24%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/detailswidget.cpp.o
+[ 25%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/detailswidgetnamedesc.cpp.o
+[ 25%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editgenres.cpp.o
+[ 25%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editmanufacturers.cpp.o
+[ 25%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editmanufacturersdetailswidget.cpp.o
+[ 25%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editmaterialpersons.cpp.o
+[ 26%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editmaterialpersonsdetailswidget.cpp.o
+[ 26%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editroles.cpp.o
+[ 26%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/edituserdetailswidget.cpp.o
+[ 26%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/edituser.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/edituser.cpp:39:1: warning: unused parameter 'parent'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/edituser.cpp:39:1: warning: unused parameter 'flags'
+[ 26%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/connectmediasearch.cpp.o
+[ 27%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/connectmediasearchdialog.cpp.o
+[ 27%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/connectmediasearchsettings.cpp.o
+[ 27%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/addmedium.cpp.o
+[ 27%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumexport.cpp.o
+[ 27%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/selectexportformat.cpp.o
+[ 28%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/searchexternalapp.cpp.o
+[ 28%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/program.cpp.o
+[ 28%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/openfileexternal.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/openfileexternal.cpp: In member function 'QString OpenFileExternal::searchApp(MimeType*)':
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/openfileexternal.cpp:147:12: warning: converting 'false' to pointer type for argument 1 of 'QString::QString(const char*)'
+[ 28%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mimetype.cpp.o
+[ 28%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mimetypemodel.cpp.o
+[ 29%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/buydata.cpp.o
+[ 29%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumtitlewidget.cpp.o
+[ 29%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediummanufacturerwidget.cpp.o
+[ 29%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumgenrewidget.cpp.o
+[ 29%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumminwidget.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/mediumminwidget.cpp:68:6: warning: unused parameter 'typeId'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/mediumminwidget.cpp:73:6: warning: unused parameter 'name'
+[ 30%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumwishwidget.cpp.o
+[ 30%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumimagewidget.cpp.o
+[ 30%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/scaledimage.cpp.o
+[ 30%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumpersonswidget.cpp.o
+[ 30%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumdescriptionwidget.cpp.o
+[ 30%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumliteraturewidget.cpp.o
+[ 31%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumgiftwidget.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/mediumgiftwidget.cpp: In member function 'void MediumGiftWidget::setMedium(Medium*)':
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/mediumgiftwidget.cpp:135:12: warning: unused variable 'person'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/mediumgiftwidget.cpp:142:12: warning: unused variable 'person'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/mediumgiftwidget.cpp: In member function 'bool MediumGiftWidget::store()':
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/mediumgiftwidget.cpp:171:7: warning: unused variable 'mediumOwnerChanged'
+[ 31%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumlistpricewidget.cpp.o
+[ 31%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumboughtpricewidget.cpp.o
+[ 31%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumevaluationwidget.cpp.o
+[ 31%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumloanwidget.cpp.o
+[ 32%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumloandialog.cpp.o
+[ 32%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/loanitem.cpp.o
+[ 32%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/loanmodel.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/loanmodel.cpp:176:13: warning: unused parameter 'child'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/loanmodel.cpp:197:6: warning: unused parameter 'parent'
+[ 32%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/searchdetailswidget.cpp.o
+[ 32%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/person.cpp.o
+[ 33%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/personsmodel.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/personsmodel.cpp:26:1: warning: unused parameter 'parent'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/personsmodel.cpp:142:6: warning: unused parameter 'index'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/personsmodel.cpp:142:6: warning: unused parameter 'value'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/personsmodel.cpp:142:6: warning: unused parameter 'role'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/personsmodel.cpp:163:13: warning: unused parameter 'child'
+[ 33%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumownerwidget.cpp.o
+[ 33%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumownerdialog.cpp.o
+[ 33%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/sqlconstraint.cpp.o
+[ 33%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/maction.cpp.o
+[ 34%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mpushbutton.cpp.o
+[ 34%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumwidget.cpp.o
+[ 34%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/shoppingcartdelegate.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/shoppingcartdelegate.cpp:64:7: warning: unused parameter 'option'
+[ 34%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/dbbackup.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/dbbackup.cpp: In member function 'bool DBBackup::dumpTable(QString, QTextStream&)':
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/dbbackup.cpp:323:40: warning: comparison between 'enum QVariant::Type' and 'enum QMetaType::Type'
+[ 34%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/dbbackupdialog.cpp.o
+[ 35%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/msqldatabase.cpp.o
+[ 35%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/setupwizarddbdump.cpp.o
+[ 35%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/minvalidator.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/minvalidator.cpp:110:19: warning: unused parameter 'pos'
+[ 35%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/modulelistwidgetitem.cpp.o
+[ 35%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediummin.cpp.o
+[ 36%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editmintypes.cpp.o
+[ 36%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/minmodel.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/minmodel.cpp:174:6: warning: unused parameter 'view'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/minmodel.cpp:303:5: warning: unused parameter 'parent'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/minmodel.cpp:338:13: warning: unused parameter 'child'
+[ 36%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/delegatemin.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/delegatemin.cpp:48:10: warning: unused parameter 'option'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/delegatemin.cpp:48:10: warning: unused parameter 'index'
+[ 36%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/progressstatuswidget.cpp.o
+[ 36%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/querythread.cpp.o
+[ 37%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/queryworker.cpp.o
+[ 37%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/editmedium.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.cpp:20:0:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+[ 37%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/searchbutton.cpp.o
+[ 37%] Building CXX object src/libmeganizer/CMakeFiles/libmeganizer.dir/mediumeditwidget.cpp.o
+Linking CXX shared library ../../lib/libmeganizer.so
+[ 37%] Built target libmeganizer
+[ 37%] Generating dbtestinit.moc
+[ 38%] Generating modeltest.moc
+Scanning dependencies of target libmeganizertests
+[ 38%] Building CXX object src/libmeganizertests/CMakeFiles/libmeganizertests.dir/modeltest.cpp.o
+[ 38%] Building CXX object src/libmeganizertests/CMakeFiles/libmeganizertests.dir/dbtestinit.cpp.o
+Linking CXX shared library ../../lib/libmeganizertests.so
+[ 38%] Built target libmeganizertests
+[ 38%] Generating editmediumtest.moc
+Scanning dependencies of target editmediumtest
+[ 38%] Building CXX object src/libmeganizer/tests/CMakeFiles/editmediumtest.dir/editmediumtest.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/tests/editmediumtest.cpp:22:0:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+Linking CXX executable ../../../bin/editmediumtest
+[ 38%] Built target editmediumtest
+[ 38%] Generating materialpersonsmodeltest.moc
+Scanning dependencies of target materialpersonsmodeltest
+[ 38%] Building CXX object src/libmeganizer/tests/CMakeFiles/materialpersonsmodeltest.dir/materialpersonsmodeltest.cpp.o
+Linking CXX executable ../../../bin/materialpersonsmodeltest
+[ 38%] Built target materialpersonsmodeltest
+[ 39%] Generating mediamodeltest.moc
+Scanning dependencies of target mediamodeltest
+[ 39%] Building CXX object src/libmeganizer/tests/CMakeFiles/mediamodeltest.dir/mediamodeltest.cpp.o
+Linking CXX executable ../../../bin/mediamodeltest
+[ 39%] Built target mediamodeltest
+[ 39%] Generating mediumownerwidgettest.moc
+Scanning dependencies of target mediumownerwidgettest
+[ 39%] Building CXX object src/libmeganizer/tests/CMakeFiles/mediumownerwidgettest.dir/mediumownerwidgettest.cpp.o
+Linking CXX executable ../../../bin/mediumownerwidgettest
+[ 39%] Built target mediumownerwidgettest
+[ 40%] Generating qrc_images.cxx
+[ 40%] Generating mediumtest.moc
+Scanning dependencies of target mediumtest
+[ 40%] Building CXX object src/libmeganizer/tests/CMakeFiles/mediumtest.dir/mediumtest.cpp.o
+[ 40%] Building CXX object src/libmeganizer/tests/CMakeFiles/mediumtest.dir/qrc_images.cxx.o
+Linking CXX executable ../../../bin/mediumtest
+[ 40%] Built target mediumtest
+[ 40%] Generating mimetypemodeltest.moc
+Scanning dependencies of target mimetypemodeltest
+[ 40%] Building CXX object src/libmeganizer/tests/CMakeFiles/mimetypemodeltest.dir/mimetypemodeltest.cpp.o
+Linking CXX executable ../../../bin/mimetypemodeltest
+[ 40%] Built target mimetypemodeltest
+[ 41%] Generating minmodeltest.moc
+Scanning dependencies of target minmodeltest
+[ 41%] Building CXX object src/libmeganizer/tests/CMakeFiles/minmodeltest.dir/minmodeltest.cpp.o
+Linking CXX executable ../../../bin/minmodeltest
+[ 41%] Built target minmodeltest
+[ 41%] Generating minvalidatortests.moc
+Scanning dependencies of target minvalidatortests
+[ 41%] Building CXX object src/libmeganizer/tests/CMakeFiles/minvalidatortests.dir/minvalidatortests.cpp.o
+Linking CXX executable ../../../bin/minvalidatortests
+[ 41%] Built target minvalidatortests
+[ 41%] Generating personsmodeltest.moc
+Scanning dependencies of target personsmodeltest
+[ 41%] Building CXX object src/libmeganizer/tests/CMakeFiles/personsmodeltest.dir/personsmodeltest.cpp.o
+Linking CXX executable ../../../bin/personsmodeltest
+[ 41%] Built target personsmodeltest
+[ 41%] Generating qrc_iconset.cxx
+[ 41%] Generating mediendb.moc
+[ 41%] Generating setupwizard.moc
+[ 42%] Generating dbinit.moc
+[ 42%] Generating setupuserwidget.moc
+[ 42%] Generating setupuser.moc
+[ 42%] Generating modulestate.moc
+[ 42%] Generating resultsummary.moc
+[ 43%] Generating searchwidget.moc
+[ 43%] Generating settingsdialog.moc
+[ 43%] Generating settingsgeneral.moc
+[ 43%] Generating shoppingcart.moc
+[ 43%] Generating shoppingcartlistview.moc
+[ 44%] Generating insertmanualmediums.moc
+[ 44%] Generating summary.moc
+[ 44%] Generating loansummary.moc
+[ 44%] Generating statisticssummary.moc
+[ 44%] Generating projects.moc
+[ 45%] Generating project.moc
+[ 45%] Generating projectsmodel.moc
+[ 45%] Generating about.moc
+[ 45%] Generating helpcenter.moc
+[ 45%] Generating dependencies.moc
+[ 46%] Generating modulestatedialog.moc
+[ 46%] Generating updatenoticedialog.moc
+[ 46%] Generating ui_mediendb.h
+[ 46%] Generating ui_setupwizard.h
+[ 46%] Generating ui_modulestate.h
+[ 47%] Generating ui_resultsummary.h
+[ 47%] Generating ui_searchwidget.h
+[ 47%] Generating ui_settingsdialog.h
+[ 47%] Generating ui_settingsgeneral.h
+[ 47%] Generating ui_insertmanualmediums.h
+[ 48%] Generating ui_projects.h
+[ 48%] Generating ui_about.h
+[ 48%] Generating ui_dependencies.h
+[ 48%] Generating ui_updatenoticedialog.h
+[ 48%] Generating meganizer_de.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/meganizer_de.qm'...
+    Generated 202 translation(s) (201 finished and 1 unfinished)
+
+    Ignored 15 untranslated source text(s)
+[ 49%] Generating meganizer_en.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/meganizer_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 217 untranslated source text(s)
+[ 49%] Generating qrc_meganizer.cxx
+Scanning dependencies of target meganizer
+[ 49%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/main.cpp.o
+[ 49%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/mediendb.cpp.o
+[ 49%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/setupwizard.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/setupwizard.cpp:101:6: warning: unused parameter 'event'
+[ 49%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/dbinit.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/dbinit.cpp:390:6: warning: unused parameter 'thisName'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/dbinit.cpp:402:6: warning: unused parameter 'thisName'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/dbinit.cpp:437:6: warning: unused parameter 'thisName'
+[ 50%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/setupuserwidget.cpp.o
+[ 50%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/setupuser.cpp.o
+[ 50%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/modulestate.cpp.o
+[ 50%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/resultsummary.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/resultsummary.cpp:33:0:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/resultsummary.cpp:357:6: warning: unused parameter 'index'
+[ 50%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/searchwidget.cpp.o
+[ 51%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/settingsdialog.cpp.o
+[ 51%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/settingsgeneral.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/settingsgeneral.cpp:48:1: warning: unused parameter 'showButtons'
+[ 51%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/shoppingcart.cpp.o
+[ 51%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/shoppingcartlistview.cpp.o
+[ 51%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/insertmanualmediums.cpp.o
+[ 52%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/summary.cpp.o
+[ 52%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/loansummary.cpp.o
+[ 52%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/statisticssummary.cpp.o
+[ 52%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/projects.cpp.o
+[ 52%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/project.cpp.o
+[ 53%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/projectsmodel.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/projectsmodel.cpp:181:5: warning: unused parameter 'parent'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/projectsmodel.cpp:194:13: warning: unused parameter 'child'
+[ 53%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/about.cpp.o
+[ 53%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/helpcenter.cpp.o
+[ 53%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/dependencies.cpp.o
+[ 53%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/modulestatedialog.cpp.o
+[ 54%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/updatenoticedialog.cpp.o
+[ 54%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/qrc_meganizer.cxx.o
+[ 54%] Building CXX object src/meganizer/CMakeFiles/meganizer.dir/qrc_iconset.cxx.o
+Linking CXX executable ../../bin/meganizer
+[ 54%] Built target meganizer
+[ 54%] Generating eanvalidatorplugin_en.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidatorplugin_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 1 untranslated source text(s)
+[ 54%] Generating eanvalidator.moc
+[ 54%] Generating eanvalidatorplugin_de.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidatorplugin_de.qm'...
+    Generated 1 translation(s) (1 finished and 0 unfinished)
+Scanning dependencies of target eanvalidator
+[ 55%] Building CXX object src/meganizer/eanvalidatorplugin/CMakeFiles/eanvalidator.dir/eanvalidator.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidator.cpp:42:6: warning: unused parameter 'toType'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidator.cpp:47:9: warning: unused parameter 'min'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidator.cpp:47:9: warning: unused parameter 'toType'
+Linking CXX shared library ../../../lib/libeanvalidator.so
+[ 55%] Built target eanvalidator
+[ 55%] Generating eanvalidatortests.moc
+Scanning dependencies of target eanvalidatortests
+[ 55%] Building CXX object src/meganizer/eanvalidatorplugin/CMakeFiles/eanvalidatortests.dir/eanvalidatortests.cpp.o
+[ 56%] Building CXX object src/meganizer/eanvalidatorplugin/CMakeFiles/eanvalidatortests.dir/eanvalidator.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidator.cpp:42:6: warning: unused parameter 'toType'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidator.cpp:47:9: warning: unused parameter 'min'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/eanvalidatorplugin/eanvalidator.cpp:47:9: warning: unused parameter 'toType'
+Linking CXX executable ../../../bin/eanvalidatortests
+[ 56%] Built target eanvalidatortests
+[ 57%] Generating project.moc
+[ 57%] Generating projectsmodeltest.moc
+[ 57%] Generating projectsmodel.moc
+Scanning dependencies of target projectsmodeltest
+[ 58%] Building CXX object src/meganizer/tests/CMakeFiles/projectsmodeltest.dir/projectsmodeltest.cpp.o
+[ 58%] Building CXX object src/meganizer/tests/CMakeFiles/projectsmodeltest.dir/__/projectsmodel.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/projectsmodel.cpp:181:5: warning: unused parameter 'parent'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/meganizer/projectsmodel.cpp:194:13: warning: unused parameter 'child'
+[ 58%] Building CXX object src/meganizer/tests/CMakeFiles/projectsmodeltest.dir/__/project.cpp.o
+Linking CXX executable ../../../bin/projectsmodeltest
+[ 58%] Built target projectsmodeltest
+[ 58%] Generating books_en.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/books_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 40 untranslated source text(s)
+[ 58%] Generating books.moc
+[ 58%] Generating booksdb.moc
+[ 59%] Generating book.moc
+[ 59%] Generating booksearchwidget.moc
+[ 59%] Generating booksmodel.moc
+[ 59%] Generating bookedit.moc
+[ 59%] Generating ui_booksearchwidget.h
+[ 60%] Generating books_de.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/books_de.qm'...
+    Generated 40 translation(s) (40 finished and 0 unfinished)
+Scanning dependencies of target books
+[ 60%] Building CXX object src/mediaplugins/books/CMakeFiles/books.dir/books.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/books.cpp:35:1: warning: unused parameter 'parent'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/books.cpp:100:13: warning: unused parameter 'materialType'
+[ 60%] Building CXX object src/mediaplugins/books/CMakeFiles/books.dir/booksdb.cpp.o
+[ 60%] Building CXX object src/mediaplugins/books/CMakeFiles/books.dir/book.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/bookedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/book.cpp:25:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/book.cpp:120:6: warning: unused parameter 'userId'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/book.cpp:340:6: warning: unused parameter 'format'
+[ 61%] Building CXX object src/mediaplugins/books/CMakeFiles/books.dir/booksearchwidget.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/booksearchwidget.cpp:38:9: warning: unused parameter 'supportPersons'
+[ 61%] Building CXX object src/mediaplugins/books/CMakeFiles/books.dir/booksmodel.cpp.o
+[ 61%] Building CXX object src/mediaplugins/books/CMakeFiles/books.dir/bookedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/bookedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/bookedit.cpp:21:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+Linking CXX shared library ../../../lib/libbooks.so
+[ 61%] Built target books
+[ 61%] Generating isbnvalidatorplugin_en.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/isbnvalidatorplugin/isbnvalidatorplugin_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 1 untranslated source text(s)
+[ 61%] Generating isbnvalidator.moc
+[ 61%] Generating isbnvalidatorplugin_de.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/isbnvalidatorplugin/isbnvalidatorplugin_de.qm'...
+    Generated 1 translation(s) (1 finished and 0 unfinished)
+Scanning dependencies of target isbnvalidator
+[ 62%] Building CXX object src/mediaplugins/books/isbnvalidatorplugin/CMakeFiles/isbnvalidator.dir/isbnvalidator.cpp.o
+Linking CXX shared library ../../../../lib/libisbnvalidator.so
+[ 62%] Built target isbnvalidator
+[ 63%] Generating isbnvalidatortests.moc
+Scanning dependencies of target isbnvalidatortests
+[ 63%] Building CXX object src/mediaplugins/books/isbnvalidatorplugin/CMakeFiles/isbnvalidatortests.dir/isbnvalidatortests.cpp.o
+[ 63%] Building CXX object src/mediaplugins/books/isbnvalidatorplugin/CMakeFiles/isbnvalidatortests.dir/isbnvalidator.cpp.o
+Linking CXX executable ../../../../bin/isbnvalidatortests
+[ 63%] Built target isbnvalidatortests
+[ 64%] Generating booksearchwidget.moc
+[ 64%] Generating booksmodeltest.moc
+[ 65%] Generating booksmodel.moc
+[ 65%] Generating book.moc
+[ 65%] Generating books.moc
+[ 65%] Generating bookedit.moc
+[ 65%] Generating booksdb.moc
+Scanning dependencies of target booksmodeltest
+[ 65%] Building CXX object src/mediaplugins/books/tests/CMakeFiles/booksmodeltest.dir/booksmodeltest.cpp.o
+[ 65%] Building CXX object src/mediaplugins/books/tests/CMakeFiles/booksmodeltest.dir/__/booksmodel.cpp.o
+[ 65%] Building CXX object src/mediaplugins/books/tests/CMakeFiles/booksmodeltest.dir/__/book.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/bookedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/book.cpp:25:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/book.cpp:120:6: warning: unused parameter 'userId'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/book.cpp:340:6: warning: unused parameter 'format'
+[ 66%] Building CXX object src/mediaplugins/books/tests/CMakeFiles/booksmodeltest.dir/__/books.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/books.cpp:35:1: warning: unused parameter 'parent'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/books.cpp:100:13: warning: unused parameter 'materialType'
+[ 66%] Building CXX object src/mediaplugins/books/tests/CMakeFiles/booksmodeltest.dir/__/bookedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/bookedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/bookedit.cpp:21:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+[ 66%] Building CXX object src/mediaplugins/books/tests/CMakeFiles/booksmodeltest.dir/__/booksdb.cpp.o
+[ 66%] Building CXX object src/mediaplugins/books/tests/CMakeFiles/booksmodeltest.dir/__/booksearchwidget.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/books/booksearchwidget.cpp:38:9: warning: unused parameter 'supportPersons'
+Linking CXX executable ../../../../bin/booksmodeltest
+[ 66%] Built target booksmodeltest
+[ 66%] Generating music_en.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/music_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 86 untranslated source text(s)
+[ 66%] Generating cds.moc
+[ 66%] Generating cdsdb.moc
+[ 67%] Generating cd.moc
+[ 67%] Generating cdsearchwidget.moc
+[ 67%] Generating cdsmodel.moc
+[ 67%] Generating cdedit.moc
+[ 67%] Generating track.moc
+[ 68%] Generating tracksmodel.moc
+[ 68%] Generating trackedit.moc
+[ 68%] Generating editdevices.moc
+[ 68%] Generating tracksview.moc
+[ 68%] Generating parentview.moc
+[ 68%] Generating ui_cdsearchwidget.h
+[ 69%] Generating ui_parentview.h
+[ 69%] Generating music_de.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/music_de.qm'...
+    Generated 71 translation(s) (65 finished and 6 unfinished)
+
+    Ignored 15 untranslated source text(s)
+Scanning dependencies of target cds
+[ 69%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/cds.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cds.cpp:36:1: warning: unused parameter 'parent'
+[ 69%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/cdsdb.cpp.o
+[ 69%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/cd.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:25:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:145:6: warning: unused parameter 'userId'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:487:6: warning: unused parameter 'format'
+[ 69%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/cdsearchwidget.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdsearchwidget.cpp:58:9: warning: unused parameter 'supportPersons'
+[ 70%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/cdsmodel.cpp.o
+[ 70%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/cdedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:23:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:123:6: warning: unused parameter 'medium'
+[ 70%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/track.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:25:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:132:6: warning: unused parameter 'userId'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:349:6: warning: unused parameter 'format'
+[ 70%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/tracksmodel.cpp.o
+[ 70%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/trackedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.cpp:21:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+[ 71%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/editdevices.cpp.o
+[ 71%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/tracksview.cpp.o
+[ 71%] Building CXX object src/mediaplugins/music/CMakeFiles/cds.dir/parentview.cpp.o
+Linking CXX shared library ../../../lib/libcds.so
+[ 71%] Built target cds
+[ 71%] Generating upcvalidatorplugin_en.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/upcvalidatorplugin/upcvalidatorplugin_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 1 untranslated source text(s)
+[ 71%] Generating upcvalidator.moc
+[ 72%] Generating upcvalidatorplugin_de.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/upcvalidatorplugin/upcvalidatorplugin_de.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 1 untranslated source text(s)
+Scanning dependencies of target upcvalidator
+[ 72%] Building CXX object src/mediaplugins/music/upcvalidatorplugin/CMakeFiles/upcvalidator.dir/upcvalidator.cpp.o
+Linking CXX shared library ../../../../lib/libupcvalidator.so
+[ 72%] Built target upcvalidator
+[ 72%] Generating upcvalidatortests.moc
+Scanning dependencies of target upcvalidatortests
+[ 72%] Building CXX object src/mediaplugins/music/upcvalidatorplugin/CMakeFiles/upcvalidatortests.dir/upcvalidatortests.cpp.o
+[ 72%] Building CXX object src/mediaplugins/music/upcvalidatorplugin/CMakeFiles/upcvalidatortests.dir/upcvalidator.cpp.o
+Linking CXX executable ../../../../bin/upcvalidatortests
+[ 73%] Built target upcvalidatortests
+[ 73%] Generating parentview.moc
+[ 73%] Generating cdsmodeltest.moc
+[ 73%] Generating cdsmodel.moc
+[ 73%] Generating cd.moc
+[ 73%] Generating tracksmodel.moc
+[ 74%] Generating track.moc
+[ 74%] Generating trackedit.moc
+[ 74%] Generating cds.moc
+[ 74%] Generating cdedit.moc
+[ 74%] Generating editdevices.moc
+[ 75%] Generating cdsdb.moc
+[ 75%] Generating cdsearchwidget.moc
+[ 75%] Generating tracksview.moc
+Scanning dependencies of target cdsmodeltest
+[ 75%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/cdsmodeltest.cpp.o
+[ 75%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/cdsmodel.cpp.o
+[ 76%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/cd.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:25:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:145:6: warning: unused parameter 'userId'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:487:6: warning: unused parameter 'format'
+[ 76%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/tracksmodel.cpp.o
+[ 76%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/track.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:25:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:132:6: warning: unused parameter 'userId'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:349:6: warning: unused parameter 'format'
+[ 76%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/trackedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.cpp:21:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+[ 76%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/cds.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cds.cpp:36:1: warning: unused parameter 'parent'
+[ 77%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/cdedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:23:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:123:6: warning: unused parameter 'medium'
+[ 77%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/editdevices.cpp.o
+[ 77%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/cdsdb.cpp.o
+[ 77%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/cdsearchwidget.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdsearchwidget.cpp:58:9: warning: unused parameter 'supportPersons'
+[ 77%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/tracksview.cpp.o
+[ 78%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdsmodeltest.dir/__/parentview.cpp.o
+Linking CXX executable ../../../../bin/cdsmodeltest
+[ 78%] Built target cdsmodeltest
+[ 78%] Generating cdtest.moc
+Scanning dependencies of target cdtest
+[ 78%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/cdtest.cpp.o
+[ 79%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/cd.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:25:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:145:6: warning: unused parameter 'userId'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:487:6: warning: unused parameter 'format'
+[ 79%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/cdedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:23:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:123:6: warning: unused parameter 'medium'
+[ 79%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/editdevices.cpp.o
+[ 79%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/cdsmodel.cpp.o
+[ 79%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/cds.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cds.cpp:36:1: warning: unused parameter 'parent'
+[ 80%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/cdsdb.cpp.o
+[ 80%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/cdsearchwidget.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdsearchwidget.cpp:58:9: warning: unused parameter 'supportPersons'
+[ 80%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/tracksmodel.cpp.o
+[ 80%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/track.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:25:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:132:6: warning: unused parameter 'userId'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:349:6: warning: unused parameter 'format'
+[ 80%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/trackedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.cpp:21:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+[ 81%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/tracksview.cpp.o
+[ 81%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/cdtest.dir/__/parentview.cpp.o
+Linking CXX executable ../../../../bin/cdtest
+[ 83%] Built target cdtest
+[ 83%] Generating tracksmodeltest.moc
+Scanning dependencies of target tracksmodeltest
+[ 83%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/tracksmodeltest.cpp.o
+[ 83%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/tracksmodel.cpp.o
+[ 83%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/track.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:25:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:132:6: warning: unused parameter 'userId'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:349:6: warning: unused parameter 'format'
+[ 83%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/trackedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.cpp:21:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+[ 84%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/cds.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cds.cpp:36:1: warning: unused parameter 'parent'
+[ 84%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/cdsdb.cpp.o
+[ 84%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/cd.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:25:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:145:6: warning: unused parameter 'userId'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:487:6: warning: unused parameter 'format'
+[ 84%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/cdsearchwidget.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdsearchwidget.cpp:58:9: warning: unused parameter 'supportPersons'
+[ 84%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/cdsmodel.cpp.o
+[ 85%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/cdedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:23:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:123:6: warning: unused parameter 'medium'
+[ 85%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/editdevices.cpp.o
+[ 85%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/tracksview.cpp.o
+[ 85%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracksmodeltest.dir/__/parentview.cpp.o
+Linking CXX executable ../../../../bin/tracksmodeltest
+[ 88%] Built target tracksmodeltest
+[ 89%] Generating tracktest.moc
+Scanning dependencies of target tracktest
+[ 89%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/tracktest.cpp.o
+[ 89%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/track.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:25:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:132:6: warning: unused parameter 'userId'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/track.cpp:349:6: warning: unused parameter 'format'
+[ 89%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/trackedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/trackedit.cpp:21:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+[ 90%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/tracksmodel.cpp.o
+[ 90%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/cds.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cds.cpp:36:1: warning: unused parameter 'parent'
+[ 90%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/cdsdb.cpp.o
+[ 90%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/cdsearchwidget.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdsearchwidget.cpp:58:9: warning: unused parameter 'supportPersons'
+[ 90%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/cd.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:25:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:145:6: warning: unused parameter 'userId'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cd.cpp:487:6: warning: unused parameter 'format'
+[ 91%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/cdsmodel.cpp.o
+[ 91%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/cdedit.cpp.o
+In file included from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.h:24:0,
+                 from /home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:23:
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:60:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/libmeganizer/editmedium.h:66:16: warning: unused parameter 'medium'
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/mediaplugins/music/cdedit.cpp:123:6: warning: unused parameter 'medium'
+[ 91%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/editdevices.cpp.o
+[ 91%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/tracksview.cpp.o
+[ 91%] Building CXX object src/mediaplugins/music/tests/CMakeFiles/tracktest.dir/__/parentview.cpp.o
+Linking CXX executable ../../../../bin/tracktest
+[ 93%] Built target tracktest
+[ 93%] Generating qrc_amazon.cxx
+[ 93%] Generating amazonsettings.moc
+[ 94%] Generating amazonconntypesettings.moc
+[ 94%] Generating amazongeneralsettings.moc
+[ 94%] Generating amazon.moc
+[ 94%] Generating connectmaterialtype.moc
+[ 94%] Generating connectmaterialtypedialog.moc
+[ 95%] Generating purchase.moc
+[ 95%] Generating ui_connectmaterialtype.h
+[ 95%] Generating ui_amazonconntypesettings.h
+[ 95%] Generating ui_purchase.h
+[ 95%] Generating amazon_de.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/searchplugins/amazon/amazon_de.qm'...
+    Generated 110 translation(s) (110 finished and 0 unfinished)
+[ 96%] Generating amazon_en.qm
+Updating '/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/searchplugins/amazon/amazon_en.qm'...
+    Generated 0 translation(s) (0 finished and 0 unfinished)
+
+    Ignored 110 untranslated source text(s)
+Scanning dependencies of target amazon
+[ 96%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/amazonsettings.cpp.o
+[ 96%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/amazonconntypesettings.cpp.o
+[ 96%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/amazongeneralsettings.cpp.o
+[ 96%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/itemsearch.cpp.o
+[ 96%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/amazon.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/searchplugins/amazon/amazon.cpp:46:1: warning: unused parameter 'parent'
+[ 97%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/connectmaterialtype.cpp.o
+[ 97%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/connectmaterialtypedialog.cpp.o
+[ 97%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/purchase.cpp.o
+[ 97%] Building CXX object src/searchplugins/amazon/CMakeFiles/amazon.dir/qrc_amazon.cxx.o
+Linking CXX shared library ../../../lib/libamazon.so
+[ 97%] Built target amazon
+[ 97%] Generating amazonconntypesettings.moc
+[ 97%] Generating itemsearchtests.moc
+[ 97%] Generating amazon.moc
+[ 97%] Generating connectmaterialtypedialog.moc
+[ 97%] Generating connectmaterialtype.moc
+[ 98%] Generating purchase.moc
+[ 98%] Generating amazonsettings.moc
+[ 98%] Generating amazongeneralsettings.moc
+Scanning dependencies of target itemsearchtest
+[ 98%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/itemsearchtests.cpp.o
+[ 98%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/itemsearch.cpp.o
+[ 98%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/amazon.cpp.o
+/home/packager/pb/meganizer/build/BUILD/meganizer-0.3/src/searchplugins/amazon/amazon.cpp:46:1: warning: unused parameter 'parent'
+[ 99%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/connectmaterialtypedialog.cpp.o
+[ 99%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/connectmaterialtype.cpp.o
+[ 99%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/purchase.cpp.o
+[ 99%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/amazonsettings.cpp.o
+[ 99%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/amazongeneralsettings.cpp.o
+[100%] Building CXX object src/searchplugins/amazon/tests/CMakeFiles/itemsearchtest.dir/__/amazonconntypesettings.cpp.o
+Linking CXX executable ../../../../bin/itemsearchtest
+[100%] Built target itemsearchtest
++ exit 0
+Executing(%install): /bin/sh -e /var/tmp/rpm-tmp.EBuaoT
++ umask 022
++ cd /home/packager/pb/meganizer/build/BUILD
++ cd meganizer-0.3
++ /bin/rm -rf /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64
++ make DESTDIR=/home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64 install
+[ 37%] Built target libmeganizer
+[ 38%] Built target libmeganizertests
+[ 38%] Built target editmediumtest
+[ 38%] Built target materialpersonsmodeltest
+[ 39%] Built target mediamodeltest
+[ 39%] Built target mediumownerwidgettest
+[ 40%] Built target mediumtest
+[ 40%] Built target mimetypemodeltest
+[ 41%] Built target minmodeltest
+[ 41%] Built target minvalidatortests
+[ 41%] Built target personsmodeltest
+[ 54%] Built target meganizer
+[ 55%] Built target eanvalidator
+[ 56%] Built target eanvalidatortests
+[ 58%] Built target projectsmodeltest
+[ 61%] Built target books
+[ 62%] Built target isbnvalidator
+[ 63%] Built target isbnvalidatortests
+[ 66%] Built target booksmodeltest
+[ 71%] Built target cds
+[ 72%] Built target upcvalidator
+[ 73%] Built target upcvalidatortests
+[ 78%] Built target cdsmodeltest
+[ 83%] Built target cdtest
+[ 88%] Built target tracksmodeltest
+[ 93%] Built target tracktest
+[ 97%] Built target amazon
+[100%] Built target itemsearchtest
+Linking CXX shared library CMakeFiles/CMakeRelink.dir/libmeganizer.so
+Linking CXX shared library CMakeFiles/CMakeRelink.dir/libmeganizertests.so
+Linking CXX executable CMakeFiles/CMakeRelink.dir/meganizer
+Linking CXX shared library CMakeFiles/CMakeRelink.dir/libeanvalidator.so
+Linking CXX shared library CMakeFiles/CMakeRelink.dir/libbooks.so
+Linking CXX shared library CMakeFiles/CMakeRelink.dir/libisbnvalidator.so
+Linking CXX shared library CMakeFiles/CMakeRelink.dir/libcds.so
+Linking CXX shared library CMakeFiles/CMakeRelink.dir/libupcvalidator.so
+Linking CXX shared library CMakeFiles/CMakeRelink.dir/libamazon.so
+Install the project...
+-- Install configuration: "Release"
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/lib/libmeganizer.so
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/libmeganizer_de.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/libmeganizer_en.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/depends/libmeganizer.xml
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/lib/libmeganizertests.so
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/bin/meganizer
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/meganizer_de.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/meganizer_en.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/depends/meganizer.xml
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/pixmaps/meganizer.png
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/applications/Meganizer.desktop
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/lib/meganizer/minvalidator/libeanvalidator.so
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/eanvalidatorplugin_de.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/eanvalidatorplugin_en.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/lib/meganizer/libbooks.so
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/books_de.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/books_en.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/depends/books.xml
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/lib/meganizer/minvalidator/libisbnvalidator.so
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/isbnvalidatorplugin_de.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/isbnvalidatorplugin_en.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/lib/meganizer/libcds.so
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/music_de.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/music_en.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/depends/cds.xml
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/lib/meganizer/minvalidator/libupcvalidator.so
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/upcvalidatorplugin_de.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/upcvalidatorplugin_en.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/lib/meganizer/libamazon.so
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/amazon_de.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/lang/amazon_en.qm
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/meganizer/depends/amazon.xml
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/man/man1/meganizer.1
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/man/man5/meganizer.5
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/man/de/man1/meganizer.de.1
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/man/de/man5/meganizer.de.5
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/doc/meganizer/meganizer.qhc
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/doc/meganizer/meganizer.qch
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/doc/meganizer/meganizer_de.qhc
+-- Installing: /home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/share/doc/meganizer/meganizer_de.qch
++ /usr/lib/rpm/brp-lib64-linux
+sf@suse.de: if you find problems with this script, drop me a note
+/home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/lib/libmeganizertests.so:     file format elf64-x86-64
+/home/packager/pb/meganizer/build/BUILDROOT/meganizer-0.3-0.20100901102638.opensuse11.3.x86_64/usr/lib/libmeganizertests.so: should be in */lib64
+error: Bad exit status from /var/tmp/rpm-tmp.EBuaoT (%install)
+
+
+RPM build errors:
+    Bad exit status from /var/tmp/rpm-tmp.EBuaoT (%install)
+
+rpm packages generated:

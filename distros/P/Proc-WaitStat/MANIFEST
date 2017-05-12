@@ -1,0 +1,9 @@
+ $Id: MANIFEST,v 1.1 1997-05-20 22:14:23-04 roderick Exp $
+
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+WaitStat.pm
+t/waitstat.t

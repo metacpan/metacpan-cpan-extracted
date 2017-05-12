@@ -1,0 +1,35 @@
+Changes
+lib/Poker/Card.pm
+lib/Poker/Dealer.pm
+lib/Poker/Deck.pm
+lib/Poker/Hand.pm
+lib/Poker/Eval.pm
+lib/Poker/Eval/Badugi.pm
+lib/Poker/Eval/Badugi27.pm
+lib/Poker/Eval/BlackMariah.pm
+lib/Poker/Eval/Chinese.pm
+lib/Poker/Eval/Community.pm
+lib/Poker/Eval/HighSuit.pm
+lib/Poker/Eval/Omaha.pm
+lib/Poker/Eval/Wild.pm
+lib/Poker/Score.pm
+lib/Poker/Score/Badugi.pm
+lib/Poker/Score/Badugi27.pm
+lib/Poker/Score/Bring/High.pm
+lib/Poker/Score/Bring/Low.pm
+lib/Poker/Score/Bring/Wild.pm
+lib/Poker/Score/Chinese.pm
+lib/Poker/Score/High.pm
+lib/Poker/Score/HighSuit.pm
+lib/Poker/Score/Low27.pm
+lib/Poker/Score/Low8.pm
+lib/Poker/Score/LowA5.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

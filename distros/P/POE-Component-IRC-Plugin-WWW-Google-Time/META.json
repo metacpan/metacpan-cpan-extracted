@@ -1,0 +1,49 @@
+{
+   "abstract" : "access time data from Google via IRC",
+   "author" : [
+      "Zoffix Znet <zoffix@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-IRC-Plugin-WWW-Google-Time",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "POE" : "0.9999",
+            "POE::Component::IRC::Plugin::BasePoCoWrap" : "0.004",
+            "POE::Component::WWW::Google::Time" : "0.0101",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "POE::Component::IRC::Plugin::WWW::Google::Time" : {
+         "file" : "lib/POE/Component/IRC/Plugin/WWW/Google/Time.pm",
+         "version" : "0.0102"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.0102"
+}

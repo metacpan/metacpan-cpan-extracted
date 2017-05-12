@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Proc-PersistentControl.t
+lib/Proc/PersistentControl.pm
+lib/Proc/PersistentControl/examples/FindId                                                         
+lib/Proc/PersistentControl/examples/Info                                                           
+lib/Proc/PersistentControl/examples/Kill                                                           
+lib/Proc/PersistentControl/examples/MakeTest                                                       
+lib/Proc/PersistentControl/examples/psleep                                                         
+lib/Proc/PersistentControl/examples/Reap                                                           
+lib/Proc/PersistentControl/examples/StartProc                                                      
+lib/Proc/PersistentControl/RELEASE                                                                 
+lib/Proc/PersistentControl/winjob.pl  

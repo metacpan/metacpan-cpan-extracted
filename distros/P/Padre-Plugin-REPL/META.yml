@@ -1,0 +1,32 @@
+---
+name: Padre-Plugin-REPL
+version: 0.01
+author:
+  - 'Ryan Niebur <ryanryan52@gmail.com>'
+abstract: read-evaluate-print plugin for Padre
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Capture::Tiny: 0
+  Class::Unload: 0
+  Devel::REPL: 0
+  Padre: 0
+  Wx: 0
+build_requires:
+  Locale::Msgfmt: 0.08
+  Test::More: 0
+provides:
+  Padre::Plugin::REPL:
+    file: lib/Padre/Plugin/REPL.pm
+    version: 0.01
+  Padre::Plugin::REPL::History:
+    file: lib/Padre/Plugin/REPL/History.pm
+    version: 0.01
+  Padre::Plugin::REPL::Panel:
+    file: lib/Padre/Plugin/REPL/Panel.pm
+    version: 0.01
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

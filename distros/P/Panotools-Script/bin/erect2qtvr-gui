@@ -1,0 +1,80 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Image::Size;
+
+my $cwd = `cat \$HOME/.erect2qtvr-gui` || $ENV{'HOME'};
+chomp $cwd;
+
+unless (`which erect2qtvr`)
+{
+    `zenity --error --text='erect2qtvr not found in your \$PATH'`;
+    exit 1;
+}
+
+my $erect;
+
+if (@ARGV)
+{
+    $erect = shift;
+}
+else
+{
+    $erect = `zenity --file-selection \\
+                       --filename=$cwd/ \\
+                       --title='Select equirectangular image to convert to QTVR'` || exit 0;
+    chomp $erect;
+    $cwd = $erect;
+    $cwd =~ s/\/[^\/]*$//;
+    $cwd =~ s/\\\//\//g;
+    `echo '$cwd' > \$HOME/.erect2qtvr-gui` if ($cwd =~ /^\//);
+}
+
+my ($width, $height) = imgsize ($erect);
+
+unless ($width and $height and $width == 2 * $height)
+{
+    `zenity --error --text='Image must have 2:1 aspect ratio'`;
+    exit 1;
+}
+
+my $name    = `zenity --entry \\
+                      --title='Enter title' \\
+                      --entry-text='My panorama' \\
+                      --text='What is the title of your panorama?'`;
+chomp $name;
+$name =~ s/'//g;
+
+my $quality = `zenity --entry \\
+                      --title='Enter quality' \\
+                      --entry-text=70 \\
+                      --text='Set the JPEG quality (1-100)'`;
+chomp $quality;
+
+my $pitch   = `zenity --entry \\
+                      --title='Enter transform' \\
+                      --entry-text=0 \\
+                      --text='Pre-tilt the panorama (degrees).  Set this to -90 if the nadir is in the centre of your panorama'`;
+chomp $pitch;
+
+my $yaw =     `zenity --entry \\
+                      --title='Enter yaw' \\
+                      --entry-text=0 \\
+                      --text='Select initial yaw (degrees)'`;
+chomp $yaw;
+$yaw = 0.01 unless ($yaw);
+
+`erect2qtvr --erect='$erect' --name='$name' --quality=$quality --pitch=$pitch --yaw=$yaw | \\
+     zenity --progress \\
+            --title='Creating QTVR' \\
+            --auto-close \\
+            --pulsate \\
+            --text='Assembling: $name'`;
+
+`zenity --info \\
+        --title='QTVR created' \\
+        --text='$erect'`;
+
+exit 0;
+

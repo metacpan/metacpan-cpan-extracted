@@ -1,0 +1,23 @@
+CHANGES
+dynamic.pm
+inc/ExtUtils/AutoInstall.pm
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+SIGNATURE			Public-key signature (added by MakeMaker)
+t/1use.t
+t/2basic.t
+t/3gc.t
+t/4gc-array.t

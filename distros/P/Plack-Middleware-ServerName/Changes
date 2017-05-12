@@ -1,0 +1,8 @@
+Revision history for Perl extension Plack::Middleware::ServerName
+
+0.02    Mon Sep 19 02:10:30 2011
+        - does not override multiple headers with the same name
+        - ability to order the headers
+
+0.01    Sun Sep 18 22:46:51 2011
+        - original version

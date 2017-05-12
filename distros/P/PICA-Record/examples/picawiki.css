@@ -1,0 +1,27 @@
+body { font-size:small; font-family:sans-serif; margin:0; padding:0; height:100%; }
+#page-base { height:5em; }
+#head-pase { height:5em; margin-left:12em; margin-top:-5em; }
+#content { margin-left:12em; padding:1em; line-height:1.5em; border: 1px solid #0AD; }
+#head { position:absolute; right:0; top:0; width:100%; }
+#bodyContent { }
+#panel { left:0; position:absolute; top:4em; width:12em; }
+div.portal { padding: 0; }
+div.portal h5 { color:#666666; font-size:118%; font-weight:normal; margin:0; padding:2em 0 0 1.25em; }
+div.portal div { margin:0 0 0 1.25em; padding-top:0.5em; }
+div.portal div ul { list-style: none; margin:0; padding:0; }
+div.portal div ul li { margin:0; overflow:hidden; padding:0 0 0.5em; }
+#personal { position:absolute; right:0.75em; top:0; }
+#left-navigation { left:12em; position:absolute; top:3em; }
+#left-navigation ul { list-style: none; height:100%; padding:0; margin:0; }
+#left-navigation ul li {
+float: left;
+  margin: 0.2em 0em;
+  padding: 0em 1em 0em 1em;
+ display:block; 
+}
+#title { padding: 0.5em; display:block; height:3em; width:12em; }
+#title h1 { font-size: 188%; font-weight: bold; }
+div.error { border: 1px solid #a00; padding: 0.5em; color: #a00; background: #fcc; margin-bottom: 1em;}
+h2 { padding-bottom: 0.25em; margin: 0; border-bottom: 1px solid #0AD; }
+pre { background: #eee; font-size: 150%; padding: 0.5em; border: 1px dotted #aaa; } 
+a.deleted { color: #ff0000; }

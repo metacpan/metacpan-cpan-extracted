@@ -1,0 +1,10 @@
+# not a perl file
+# $Header: /Library/VersionControl/CVS/Perl-Metrics-Simple/t/test_files/not_a_perl_file,v 1.2 2006/09/03 17:13:29 matisse Exp $
+# $Revision: 1.2 $
+# $Author: matisse $
+# $Source: /Library/VersionControl/CVS/Perl-Metrics-Simple/t/test_files/not_a_perl_file,v $
+# $Date: 2006/09/03 17:13:29 $
+###############################################################################
+
+This file is not a Perl file. It is part of the test data, but should not
+be found in any analysis.

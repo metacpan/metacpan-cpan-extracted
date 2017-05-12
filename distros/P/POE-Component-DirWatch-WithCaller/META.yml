@@ -1,0 +1,23 @@
+---
+abstract: 'An extension to POE::Component::DirWatch to pass through the name of the calling DirWatch instance, useful for cases where DirWatch sessions may be dynamically created while sharing callback functions whose behaviour may differ in small ways depending on the caller.'
+author:
+  - 'Matthew Connelly <maff@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-DirWatch-WithCaller
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  POE::Component::DirWatch: '0.300001'
+  perl: '5.006'
+version: '1.00'

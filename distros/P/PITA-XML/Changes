@@ -1,0 +1,109 @@
+Revision history for Perl extension PITA-XML
+
+0.52 Mon 8 Apr 2013
+	- Switch to Test::XML
+
+0.51 Mon 28 Mar 2011
+	- Added missing Config::Tiny dependency
+
+0.50 Thu 10 Mar 2011
+	- Temporarily make XML::Validator::Schema validation optional to allow
+	  PITA::XML and PITA as a whole to run on Windows.
+
+0.44 Tue  2 Feb 2011
+	- Fixes to PITA::XML::Guest->driver_available
+	- Track XML source directory for guests
+
+0.43 Tue  2 Feb 2011
+	- Updated to Module::Install 1.00
+	- General cleanup, both code and dependencies
+
+0.41 Wed 22 Jul 2009
+	- Updated to Module::Install 0.91
+	- Generate proper request ids
+
+0.40 Sun  1 Jul 2007
+	- Updated for the 0.40 release (minor tweaks only)
+	- Updated to Module::Install 0.65
+
+0.30 Sat 18 Jun 2006
+	- Updated to match changes to XML::SAX::Writer
+	- Updated to Module::Install 0.63
+
+0.29 Sat 11 Mar 2006
+	- Moved PITA::XML::File to PITA::XML::Storable
+	- Created skeleton PITA::XML::File for <guest><file> tags
+	- Wrote Data::Digest, and added a dependency on it
+
+0.20 Thu  2 Feb 2006
+	- Synchronising versions for PITA 0.20 release
+
+0.19 Tue 21 Jan 2006
+	- Incremental release just in case I changed something in the recent
+	  massive refactorings to ::Scheme and ::Image
+
+0.18 Thu 26 Jan 2006
+	- Requirement on File::Flock (which I'll be needing later on)
+	  was blocking building PITA-XML on Win32. Removed.
+
+0.17 Mon 23 Jan 2006
+	- Allow namespaces in driver names
+
+0.16 Sun 22 Jan 2006
+	- Adding PITA::XML::Request->find_file method
+
+0.15 Sun 22 Jan 2006
+	- Add support for identifiers for Request objects
+
+0.14 Sun 22 Jan 2006
+	- Forgot to add support for the 0.13 changes to SAXDriver.pm
+
+0.13 Sun 22 Jan 2006
+	- Added support for ->filename and <filename> to below <guest>
+	- Added support for ->md5sum   and <md5sum>   to below <guest>
+	- Added support for ->config   and <config>   to below <guest>
+
+0.12 Sun 15 Jan 2006
+	- Removing the use of Config::Tiny as an alternative
+	  serialization for for PITA::XML::Request objects now
+	  that it's trivial to do them natively in XML.
+
+0.11 Sun 15 Jan 2006
+	- Added PITA::XML::Guest (basic form)
+
+0.10 Sat 14 Jan 2006
+	- Name change to PITA::XML.
+	- Refactoring to support multiple roots for the document,
+	  and to allow for expansion to additional uses.
+
+0.07 Mon  2 Jan 2005
+	- Added the missing Class::Autouse dependency
+	- 13_configtiny.t failed without Config::Tiny
+	  (skipped wrong number of tests)
+
+0.06 Mon  2 Jan 2005
+	- Fixed a bug in the distname param-check regex
+
+0.05 Sun  1 Jan 2005
+	- More flexibility for the stdout and stderr params to Command and Test
+	- Fixed some documentation mistakes
+
+0.04 Sat 31 Dec 2005
+	- Various small tweaks and bug fixes
+	- Upgraded to newer M:I with Cygwin fixes
+
+0.03 Fri 30 Dec 2005
+	- Added the ability for PITA::XML::Request objects to coerce to
+	  and from Config::Tiny objects.
+
+0.02 Wed 28 Dec 2005
+	- Completed a reasonable first pass.
+	- Object model is done and working
+	- SAX Driver creates well-formed XML
+	- SAX Parser round-trips back to the objects
+	- Ready for the public to start poking.
+
+0.01_01 Mon 29 Nov 2005
+	- Initial demonstration implementation
+	- Implements basic structure
+	- Supports only the <platform> and <distribution> tags

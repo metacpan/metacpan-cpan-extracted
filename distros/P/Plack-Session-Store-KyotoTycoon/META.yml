@@ -1,0 +1,25 @@
+---
+abstract: 'Plack::Session storage for Kyoto Tycoon'
+author:
+  - 'Lenz Gschwendtner <lenz@springtimesoft.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Session-Store-KyotoTycoon
+requires:
+  Cache::KyotoTycoon: 0
+  MIME::Base64: 0
+  Plack::Session::Store: 0
+  Storable: 0
+  Try::Tiny: 0
+  parent: 0
+  perl: 5.010
+resources:
+  repository: git://github.com/norbu09/Plack_Session_Store_KyotoTycoon.git
+version: 0.1

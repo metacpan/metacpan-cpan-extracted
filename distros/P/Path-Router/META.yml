@@ -1,0 +1,440 @@
+---
+abstract: 'A tool for routing paths'
+author:
+  - 'Stevan Little <stevan@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Fatal: '0.012'
+  Test::More: '1.001013'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Path-Router
+provides:
+  Path::Router:
+    file: lib/Path/Router.pm
+    version: '0.15'
+  Path::Router::Route:
+    file: lib/Path/Router/Route.pm
+    version: '0.15'
+  Path::Router::Route::Match:
+    file: lib/Path/Router/Route/Match.pm
+    version: '0.15'
+  Path::Router::Shell:
+    file: lib/Path/Router/Shell.pm
+    version: '0.15'
+  Path::Router::Types:
+    file: lib/Path/Router/Types.pm
+    version: '0.15'
+  Test::Path::Router:
+    file: lib/Test/Path/Router.pm
+    version: '0.15'
+requires:
+  B: '0'
+  Carp: '1.32'
+  Clone::PP: '1.04'
+  Data::Dumper: '2.154'
+  Eval::Closure: '0.13'
+  File::Spec::Unix: '3.40'
+  Moo: '2.000001'
+  Sub::Exporter: '0.981'
+  Term::ReadLine: '1.11'
+  Test::Builder: '1.001013'
+  Test::Deep: '0.113'
+  Try::Tiny: '0.19'
+  Type::Tiny: '1.000005'
+  Types::Standard: '1.000005'
+  constant: '1.24'
+  namespace::clean: '0.23'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/stevan/Path-Router/issues
+  homepage: http://metacpan.org/release/Path-Router
+  repository: git://github.com/stevan/Path-Router.git
+version: '0.15'
+x_Dist_Zilla:
+  perl:
+    version: '5.018001'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@DOY/TestMoreDoneTesting'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename: []
+          exclude_match: []
+          follow_symlinks: '0'
+          include_dotfiles: '0'
+          prefix: ''
+          prune_directory: []
+          root: .
+      name: '@DOY/GatherDir'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@DOY/PruneCruft'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@DOY/ManifestSkip'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@DOY/MetaYAML'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@DOY/License'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@DOY/Readme'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@DOY/RunExtraTests'
+      version: '0.027'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@DOY/ExecDir'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@DOY/ShareDir'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@DOY/MakeMaker'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@DOY/Manifest'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@DOY/TestRelease'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@DOY/ConfirmRelease'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@DOY/MetaConfig'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@DOY/MetaJSON'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@DOY/NextRelease'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@DOY/CheckChangesHasContent'
+      version: '0.006'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@DOY/PkgVersion'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@DOY/Authority'
+      version: '1.009'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@DOY/PodCoverageTests'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@DOY/PodSyntaxTests'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::Test::NoTabs
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          filename: xt/author/no-tabs.t
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+            - ':TestFiles'
+      name: '@DOY/Test::NoTabs'
+      version: '0.09'
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      config:
+        Dist::Zilla::Plugin::Test::EOL:
+          filename: xt/release/eol.t
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+            - ':TestFiles'
+          trailing_whitespace: '1'
+      name: '@DOY/EOLTests'
+      version: '0.18'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@DOY/Test::Compile'
+      version: '2.039'
+    -
+      class: Dist::Zilla::Plugin::Metadata
+      name: '@DOY/Metadata'
+      version: '3.03'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@DOY/MetaResources'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      config:
+        Dist::Zilla::Plugin::Git::Check:
+          untracked_files: die
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty: []
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@DOY/Git::Check'
+      version: '2.028'
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: changelog
+          time_zone: local
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - dist.ini
+            - Changes
+          allow_dirty_match: []
+          changelog: Changes
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@DOY/Git::Commit'
+      version: '2.028'
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          signed: 0
+          tag: '0.15'
+          tag_format: '%v'
+          tag_message: ''
+          time_zone: local
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@DOY/Git::Tag'
+      version: '2.028'
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      config:
+        Dist::Zilla::Plugin::Git::NextVersion:
+          first_version: '0.01'
+          version_by_branch: '0'
+          version_regexp: (?^:^(\d+\.\d+)$)
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: .
+      name: '@DOY/Git::NextVersion'
+      version: '2.028'
+    -
+      class: Dist::Zilla::Plugin::ContributorsFromGit
+      name: '@DOY/ContributorsFromGit'
+      version: '0.006'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@DOY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: '5.037'
+        Dist::Zilla::Role::MetaProvider::Provider:
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+      name: '@DOY/MetaProvides::Package'
+      version: '1.15000003'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.004'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.004'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@Default/SingleEncoding'
+              version: '4.004'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@Default/Name'
+              version: '4.004'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@Default/Version'
+              version: '4.004'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/prelude'
+              version: '4.004'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.004'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.004'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.004'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.004'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.004'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.004'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@Default/Leftovers'
+              version: '4.004'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/postlude'
+              version: '4.004'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@Default/Authors'
+              version: '4.004'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@Default/Legal'
+              version: '4.004'
+      name: '@DOY/PodWeaver'
+      version: '4.006'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@DOY/UploadToCPAN'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@DOY/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: '5.037'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '5.037'
+x_authority: cpan:STEVAN
+x_contributors:
+  - 'Daisuke Maki (lestrrat) <daisuke@endeworks.jp>'
+  - 'Dylan William Hardison <dylan@hardison.net>'
+  - 'Fitz Elliott <felliott@fiskur.org>'
+  - 'Hans Dieter Pearcey <hdp@weftsoar.net>'
+  - 'Jesse Luehrs <doy@tozt.net>'
+  - 'Mike Raynham <enquiries@mikeraynham.co.uk>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'Oliver Charles <oliver.g.charles@googlemail.com>'
+  - 'Ricardo SIGNES <rjbs@cpan.org>'
+  - 'Stevan Little <stevan.little@gmail.com>'
+  - 'Stevan Little <stevan.little@iinteractive.com>'
+  - 'Stevan Little <stevan@Macintosh.local>'
+  - 'Stevan Little <stevan@localhost.(none)>'
+  - 'Tim Bunce <Tim.Bunce@pobox.com>'

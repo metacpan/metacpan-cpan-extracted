@@ -1,0 +1,10 @@
+Revision history for Perlbal-Plugin-TrustHeader
+
+0.02    2009-10-21
+
+  Add Net::Netmask as a prerequisite
+
+0.01    2009-09-11
+
+  Initial version
+

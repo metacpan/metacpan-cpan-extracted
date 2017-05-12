@@ -1,0 +1,9 @@
+SYNOPSIS
+
+     use Parse::Services qw(parse_services);
+     my $res = parse_services();
+
+SEE ALSO
+
+    parse-services from App::ParseServices, CLI script.
+

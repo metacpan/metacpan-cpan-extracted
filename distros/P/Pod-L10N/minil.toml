@@ -1,0 +1,3 @@
+[no_index]
+directory = ["t"]
+package = ["Pod::Simple::XHTML::LocalPodLinks", "Pod::L10N::Model"]

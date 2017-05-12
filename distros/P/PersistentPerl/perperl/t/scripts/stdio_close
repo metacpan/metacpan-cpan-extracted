@@ -1,0 +1,5 @@
+if ($ARGV[0]) {
+    print STDERR "$$\n";
+} else {
+    print "$$\n";
+}

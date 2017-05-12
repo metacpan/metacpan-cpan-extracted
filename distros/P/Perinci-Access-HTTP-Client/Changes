@@ -1,0 +1,164 @@
+Revision history for Perinci-Access-HTTP-Client
+
+0.23    2016-03-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Re-pass lint-prereqs (core modules must now be listed).
+
+
+0.22    2015-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.21    2014-10-24 (PERLANCAR)
+
+	- Add attribute: riap_version.
+
+
+0.20    2014-10-23 (PERLANCAR)
+
+	- Add Riap 1.2 support (strip Riap attributes from result metadata,
+	  decoding of base64-encoded result).
+
+
+0.19     2014-08-06 (SHARYANTO)
+
+         - [Bugfix] Handle marked/prefixed chunk from the server when
+           X-Riap-Logging is set by the server.
+
+
+0.18     2014-08-06 (SHARYANTO)
+
+         - Also accept HTTP auth user/pass on a per-request basis.
+
+         - Also accept HTTP auth user/pass in parse_url().
+
+
+0.17     2014-06-11 (SHARYANTO)
+
+         - Add attributes: ssl_cert_file, ssl_ca_file.
+
+
+0.16     2014-03-21 (SHARYANTO)
+
+         [REMOVED FEATURES]
+
+         - Remove 'lwp_implementor' attribute. The class now hides LWP details
+           and support connecting to http-over-Unix-socket automatically by
+           detecting the URL syntax.
+
+
+0.15     2014-03-21 (SHARYANTO)
+
+         - No functional changes.
+
+         [BUG FIXES]
+
+         - Setting lwp_implementor didn't work.
+
+
+0.14     2013-12-21 (SHARYANTO)
+
+         - Support Riap::HTTP 1.1.22.
+
+         [BUG FIXES]
+
+         - Handle internal request retry when LWP gets 401 status.
+
+
+0.13     2013-11-26 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Replace URI with URI::Split in parse_url(). This causes
+           incompatibility because there is no longer URI object.
+
+         [BUG FIXES]
+
+         - Add 'use experimental smartmatch' for perl 5.18+.
+
+
+0.12     2013-08-22 (SHARYANTO)
+
+         - No functional changes. Adjust to Perinci::Access::Base 0.29.
+
+
+0.11     2013-08-13 (SHARYANTO)
+
+         - Bug fix for parse_url().
+
+
+0.10     2013-08-13 (SHARYANTO)
+
+         - Support parse_url().
+
+
+0.09     2013-08-11 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Observe environment variables PERINCI_HTTP_{USER,PASSWORD}.
+
+
+0.08     2013-04-04 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Forgot to empty __buffer.
+
+
+0.07     2013-04-04 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Adjust to Perinci-Access-HTTP-Server 0.27. The way log messages is
+           sent to the client is now different (chunk type is now 'l'/'r' +
+           <bytes> + ' ' instead of just 'L'/'R' which is not reliable because
+           HTTP chunking is not done 1:1 on different PSGI servers. This client
+           is thus incompatible with older server.
+
+
+0.06     2013-03-15 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Instead of passing HTTP auth credentials via \%opts in request(), it
+           is now stored in object's attributes, for convenience.
+
+
+0.05     2013-03-01 (SHARYANTO)
+
+         - Send 'ua' Riap request key to identify client ("Perinci/x.yy").
+
+
+0.04     2013-03-01 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add options to pass HTTP basic auth.
+
+
+0.03     2012-07-25 (SHARYANTO)
+
+         - Sleep (retry_delay) only when going to retry.
+
+         - Adjust to newer Perinci::Access::Base.
+
+
+0.02     2012-04-04 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Follow Perinci::Access request() interface instead of putting server
+           URL as object attribute.
+
+
+0.01     2012-04-04 (SHARYANTO)
+
+         - First release (adjusted from Sub-Spec-URI-http).

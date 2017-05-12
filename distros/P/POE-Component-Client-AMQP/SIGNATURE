@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9ef0611becfc092292c8af0a95cfab0c26feee75 Build.PL
+SHA1 1cc2f12d95e977c5d2cd944aac72ebd98ed9cbca CHANGES
+SHA1 f235ba4160673bcb7c9d58c2f09dbc7fc0efadea LICENSE
+SHA1 a82ca013c6d388fc4115ea713bef64d6b99503ca MANIFEST
+SHA1 072cf60a2d21db971b66acd91de10391afd6aa51 META.json
+SHA1 6a5a22af555d92d1442ab38b7ab5ca18be64d70a META.yml
+SHA1 9fa7916b771b6b22d684acab640dcea37b5e0624 Makefile.PL
+SHA1 88704b3a4e050951b1a66fc9cc17dfbb0137f874 README
+SHA1 742242796eaae1219e92b836282f11a346f1b686 examples/README
+SHA1 5ac17ea0ad3f43cb7588c5baeade3c0f28992b00 examples/ack.pl
+SHA1 6db5f6c7768cb094d95f5e1517954b821a93e052 examples/clock.pl
+SHA1 5ab10ab562d78c21da23a0f99cc211721bcae39f examples/dequeue.pl
+SHA1 298af3067c90a93909a32a54ab7909529bd9caa3 examples/enqueue.pl
+SHA1 4607fb39b22fb32ab9a6c8dca406c3972bfb7520 examples/examples.pm
+SHA1 4cc1a9dc88e98b0e958e782c8a92d0c823a499f6 examples/pingpong.pl
+SHA1 c7ba04aa675538f09ea5926aeaaf42790f6ee61b examples/stocks.pl
+SHA1 70048735a509c668ebb64ee9970ea0ec3139eb7d lib/POE/Component/Client/AMQP.pm
+SHA1 731291e8c87279695b0c50da9c91d3a069ad7f4d lib/POE/Component/Client/AMQP/Channel.pm
+SHA1 cf1fbad134c74c5d0d6c6f1af9e7c2dbc6f8486e lib/POE/Component/Client/AMQP/Queue.pm
+SHA1 4b439e25de408ec650e49482e6c6a0d5892bc893 lib/POE/Component/Client/AMQP/TCP.pm
+SHA1 9f01bf50f319f76eb4574ce1e28e8e96fa1f9dbb t/01_basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk/kk5sACgkQHHIpFH/pKkKAEgCdEcccq338/6rvkiLKcFZ4OEWN
+1gIAn1nwm2JyYFC25Sgbxwv09sQBQxka
+=Ccf1
+-----END PGP SIGNATURE-----

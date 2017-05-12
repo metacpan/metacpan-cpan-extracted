@@ -1,0 +1,54 @@
+---
+abstract: "VDB's plugin bundle"
+author:
+  - 'Van de Bugger <van.de.bugger@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::DiagINC: '0.002'
+  Test::More: '0'
+  blib: '1.01'
+  if: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Weaver-PluginBundle-Author-VDB
+provides:
+  Pod::Weaver::PluginBundle::Author::VDB:
+    file: lib/Pod/Weaver/PluginBundle/Author/VDB.pm
+    version: v0.3.4
+requires:
+  Pod::Elemental::Transformer::List: '0'
+  Pod::Weaver::Config::Assembler: '0'
+  Pod::Weaver::Plugin::SingleEncoding: '0'
+  Pod::Weaver::Plugin::Transformer: '0'
+  Pod::Weaver::PluginBundle::CorePrep: '0'
+  Pod::Weaver::Section::Authors: '0'
+  Pod::Weaver::Section::Collect: '0'
+  Pod::Weaver::Section::Generic: '0'
+  Pod::Weaver::Section::Leftovers: '0'
+  Pod::Weaver::Section::Legal: '0'
+  Pod::Weaver::Section::Name: '0'
+  Pod::Weaver::Section::Region: '0'
+  Pod::Weaver::Section::Version: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-PluginBundle-Author-VDB
+  homepage: https://metacpan.org/release/Pod-Weaver-PluginBundle-Author-VDB
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  repository: https://vandebugger.fedorapeople.org/hg/perl-Pod-Weaver-PluginBundle-Author-VDB
+version: v0.3.4
+x_serialization_backend: 'YAML::Tiny version 1.69'

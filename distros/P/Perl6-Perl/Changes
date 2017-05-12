@@ -1,0 +1,9 @@
+#
+# $Id: Changes,v 0.1 2006/12/23 23:08:18 dankogai Exp dankogai $
+#
+Revision history for Perl extension Perl6::Perl.
+
+0.01  Sun Dec 24 06:15:48 2006
+	- original version; created by h2xs 1.23 with options
+		-XA Perl6::Perl
+

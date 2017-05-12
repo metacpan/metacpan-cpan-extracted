@@ -1,0 +1,96 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Notation of Strings</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Notation of Strings</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<A HREF=index.html>Tutorial</A><BR>
+<B>Strings</B>
+<P>
+<A HREF=#example>Examples</A>
+
+    </TD><TD VALIGN=top>
+
+<A HREF=../../>Portable Presenter</A> is a package designed to give
+presentations.  The presentation is written in Perl/Tk.
+<A HREF=http://www.perl.org>Perl</A> is a weird language, and that's an
+understatement: there are a few hundred ways to denote your information.
+<P>
+Basically, writing a presentation with PPresenter is writing option-lists.
+On this page, I show a few ways how to denote these option-lists.
+
+    </TD></TR>
+<TR><TD VALIGN=top>
+
+    </TD><TD VALIGN=top>
+
+<H2><A NAME=examples>Examples</A></H2>
+Now a few alternatives which each produce exactly the same result.
+<PRE>
+1.  $show->addSlide(-title   => 'my first show',
+                    -reqtime => 30,
+                    -text    => "These are two\nlines of text\n");
+</PRE>
+is equivalent to
+<PRE>
+2.  $show->addSlide('-title', 'my first show',
+                    '-reqtime', 30,
+                    '-text', 'These are two
+    lines of text
+    ');
+</PRE>
+is equivalent to
+<PRE>
+3.  $show->addSlide
+        ( -title     => "my first show"
+        , -reqtime   => '30'
+        , -text      => &lt;&lt;TEXT
+    These are two
+    lines of text
+    TEXT
+        );
+</PRE>
+is equivalent to
+<PRE>
+4.  $show->addSlide(
+        -title     => "my first show",
+        -reqtime   => 30,
+        -text      => &lt;&lt;TEXT);
+    These are two
+    lines of text
+    TEXT
+</PRE>
+is equivalent to
+<PRE>
+5.  my @x = ( -title => "my first show", -reqtime => 30, '-text');
+    $show->addSlide(@x, &lt;&lt;TEXT);
+    These are two
+    lines of text
+    TEXT
+</PRE>
+Perl is a weird language...  Be very careful with the comma's and
+semi-colons in relation to here-documents.  I prefer the third
+notation, but this is just a very personal decission, which I violate
+myself whenever I like.
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

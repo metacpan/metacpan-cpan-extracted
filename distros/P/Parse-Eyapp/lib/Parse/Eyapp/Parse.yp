@@ -1,0 +1,1642 @@
+%{# (c) Copyright Casiano Rodriguez-Leon 
+# Based on the original yapp by Francois Desarmenien 1998-2001
+# (c) Parse::Yapp Copyright 1998-2001 Francois Desarmenien, all rights reserved.
+# (c) Parse::Eyapp Copyright 2006-2008 Casiano Rodriguez Leon, all rights reserved.
+%}
+
+%{
+require 5.004;
+
+use Carp;
+
+my (
+  $input,
+  $lexlevel, # Used by the lexical analyzer. Controls in which section we are:
+             # head (0), body(1) or tail (2)
+  @lineno,   # Used by the lexical analyzer. $lineno[0] is the lione number for 
+             # the beginning of the token, $lineno[1] the end
+  $nberr,    # Number of errors up to now
+  $prec,
+  $labelno);
+
+my $syms;
+my $head;    # list of texts inside header sections
+my $tail;
+my $token;
+my $term;    # hash ref. key: token, value: an array describing the assoc and priority { '-' => [ 'LEFT' 1 ], '*' => [ 'LEFT' 2 ], }
+my $termdef; # token definitions. key is token, value is regexp
+
+my $whites;      # string with the code for white spaces (when automatic generated lexer)
+my $lexer;       # boolean: true if %lexer was used
+my $incremental; # build an incremental lexer: one that reads in chunks from $self->YYInputFile
+
+my $nterm;
+my $rules;
+my $precterm; # hash ref. key token used in %prec. value: priority
+my $start;
+my $nullable;
+my $semantic; # hash ref. Keys are the tokens. Value: 0 = syntactic 1 = semantic
+my $dummy = []; # array ref. the dummy tokens
+
+my ($expect);
+my $namingscheme;
+my $defaultaction;
+my $filename;
+my $tree = 0; # true if %tree or %metatree
+my $metatree = 0;
+my $flatlists = 0; # true if flat list semantic for * + and ? operators
+my $bypass = 0;
+my $prefix = ''; # yyprefix
+my $buildingtree = 0;
+my $alias = 0;
+my $accessors = {}; # Hash for named accessors when %tree or %metatree is active { exp::left => 0 }
+my $strict = 0; # When true, all tokens must be declared or a warning will be issued
+my $nocompact; # Do not compact action tables. No DEFAULT field for "STATES"
+
+my %nondeclared; # Potential non declared token identifiers appearing in the program
+my %conflict;    # Hash of conflict name => { codeh => 'code handler', line => #line, #prodnumber1 => [pos1, pos2], #prodnumber2 => [pos1,pos2,pos3], ... }
+
+sub not_an_id {
+  my $id = shift;
+
+  !defined($id) or $id !~ m/^[a-zA-Z_][[a-zA-Z_0-9]*$/;
+}
+
+# When using %metatree, i.e. generating a Translation Scheme
+# returns true if $code was preceded by a %begin directive
+sub is_begin_code {
+  my $code = shift;
+
+  return (UNIVERSAL::isa($code, 'ARRAY') and exists($code->[2]) and $code->[2] eq 'BEGINCODE');
+}
+
+# Produces the text containing the declarations
+# and initializations of the associated variables
+sub prefixcode {
+  my  %index = @_;
+
+  # When TS var $lhs refers to the father node
+  my $text = ($metatree)? 'my $lhs = $_[0]; ' : '';
+
+  # No identifiers were associated with the attributes if %index is empty
+  return $text unless %index;
+
+  $text .= join "", (map { "my \$$_ = \$_[$index{$_}]; " } (keys(%index)));
+
+  # The former line produces the code for initialization of the attribute 
+  # variables so that a production like:
+  #                   exp: VAR.left '='.op exp.right { ... semantic action }
+  # will produce s.t. like:
+  #        sub {
+  #            my $left = $_[1]; my $right = $_[3]; my $op = $_[2];  
+  #            ... semantic action
+  #        }
+
+  return $text;
+}
+
+# Computes the hash %index used in sub 'prefixcode' 
+# $index{a} is the index of the symbol associated with 'a' in the right hand side
+# of the production. For example in 
+#                              R: B.b A.a
+# $index{a} will be 2.
+sub symbol_index {
+  my $rhs = shift || [];
+  my $position = shift || @$rhs;
+  my %index;
+
+  local $_ = 0;
+  for my $value (@{$rhs}) {
+    $_++ unless (($value->[0] eq 'CODE') and $metatree) or ($value->[0] eq 'CONFLICTHANDLER');
+    my $id = $value->[1][2];
+    if (defined($id)) {
+        _SyntaxError(
+          2, 
+          "Error: attribute variable '\$$id' appears more than once", 
+          $value->[1][1]) 
+      if exists($index{$id});
+      $index{$id} = $_;
+    }
+    last if $_ >= $position;
+  }
+
+  return %index;
+}
+
+# Computes the hash %index holding the position in the generated
+# AST (as it is build by YYBuildAST) of the node associated with
+# the identifier. For ex. in "E: E.left '+' E.right"
+# $index{right} will be 1 (remember that '+' is a syntactic token)
+sub child_index_in_AST {
+  my $rhs = shift || [];
+  my %index;
+
+  local $_ = 0;
+  for my $value (@{$rhs}) {
+    my ($symb, $line, $id) = @{$value->[1]};
+
+    # Accessors will be build only for explictly named attributes
+    # Hal Finkel's patch
+    next unless $$semantic{$symb};
+    $index{$id} = $_ if defined($id);
+    $_++ ;
+  }
+
+  return %index;
+}
+
+# This sub gives support to the "%tree alias" directive.
+# Expands the 'accessors' hash relation 
+# for the current production. Uses 'child_index_in_AST'
+# to build the mapping between names and indices
+sub make_accessors {
+  my $name = shift;
+  return unless ($tree and $alias and defined($name) and $name->[0] =~m{^[a-zA-Z_]\w*$});
+
+  my $rhs = shift;
+
+  my %index = child_index_in_AST($rhs);
+  for (keys(%index)) {
+    $accessors->{"$name->[0]::$_"} = $index{$_};
+  }
+}
+
+# Gives support to %metatree
+sub insert_delaying_code {
+  my $code = shift;
+
+  # If %begin the code will be executed at "tree time construction"
+  return if is_begin_code($$code);
+  if ($$code) {
+    $$code = [ 
+      # The user code is substituted by a builder of a node referencing the
+      # actual sub
+      "push \@_,  sub { $$code->[0] }; goto &Parse::Eyapp::Driver::YYBuildTS; ", 
+      $$code->[1]
+    ]; 
+  }
+  else {
+    $$code = [ ' goto &Parse::Eyapp::Driver::YYBuildTS ', $lineno[0]]
+  }
+}
+
+# Called only from _AddRules
+sub process_production {
+  my ($rhs) = @_;
+
+  my $position = $#$rules;
+  my @newrhs = ();
+
+  my $m = 0;
+  for my $s (0..$#$rhs) {
+      my($what,$value)=@{$$rhs[$s]};
+
+      if ($what eq 'CODE') { # TODO: modify name scheme: RULE_POSITION
+          my($tmplhs)='@'.$position."-$s";
+
+          if ($value) {
+
+            # The auxiliary production generated for 
+            # intermediate actions has access to the
+            # attributes of the symbols to its left
+            # Not needed if generating a TS
+            my @optarg = $metatree? () : ($s+1); 
+
+            # Variable declarations
+            my %index = symbol_index($rhs, @optarg);
+            $value->[0] = prefixcode(%index).$value->[0];
+          }
+
+          insert_delaying_code(\$value) if $metatree;
+
+          #                       rhs prec   name   code
+          push(@$rules,[ $tmplhs, [], undef, undef, $value ]);
+          push(@newrhs, $tmplhs);
+          next;
+      }
+     elsif ($what eq 'CONFLICTHANDLER') {
+       my $ch = $value->[0];
+       push @{$conflict{$ch}{production}{-$position}}, $m; 
+       next;
+     }
+#     elsif ($what eq 'CONFLICTVIEWPOINT') {
+#     }
+      
+      push(@newrhs, $$value[0]);
+      $m++;
+  }
+  return \@newrhs;
+}
+
+# Receives a specification of the RHS of a production like in:
+#       rhs([ $A, $val], name => $_[2], code => $code_rec, prec => $prec)
+# Returns the data structure used to represent the RHS:
+#      [ @rhs, $arg{prec}, $arg{name}, $arg{code}]
+sub rhs {
+  my @rhs = @{shift()};
+
+  my %arg = @_;
+  $arg{prec} = exists($arg{prec})? token($arg{prec}): undef;
+  $arg{name} = undef unless exists($arg{name});
+  $arg{code} = exists($arg{code})? token($arg{code}): undef;
+ 
+  @rhs = map { ['SYMB', $_] } @rhs;
+
+  return [ @rhs, $arg{prec}, $arg{name}, $arg{code}];
+}
+
+sub token {
+  my $value = shift;
+
+  return [ $value,  $lineno[0]];
+}
+
+sub symbol {
+  my $id = shift;
+
+  return ['SYMB', $id];
+}
+
+# To be used with the %lexer directive
+sub make_lexer {
+  my ($code, $line) = @_;
+
+  my $errline = $line + ($code =~ tr/\n//);
+
+my $lexertemplate = << 'ENDOFLEXER';
+__PACKAGE__->YYLexer( 
+  sub { # lexical analyzer
+    my $self = $_[0]; 
+    for (${$self->input()}) {  # contextualize
+#line <<line>> "<<filename>>"
+      <<code>>       
+<<end_user_code>>
+      return ('', undef) if ($_ eq '') || (defined(pos($_)) && (pos($_) >= length($_)));
+      die("Error inside the lexical analyzer. Line: <<errline>>. File: <<filename>>. No regexp matched.\n");
+    } 
+  } # end lexical analyzer
+);
+ENDOFLEXER
+
+  $lexertemplate =~ s/<<code>>/$code/g;
+  $lexertemplate =~ s/<<line>>/$line/g;
+  $lexertemplate =~ s/<<errline>>/$errline/g;
+  $lexertemplate =~ s/<<filename>>/$filename/g;
+  $lexertemplate =~ s/<<end_user_code>>/################ @@@@@@@@@ End of User Code @@@@@@@@@ ###################/g;
+
+  return $lexertemplate;
+}
+
+sub explorer_handler {
+              my ($name, $code) = @_;
+              my ($cn, $line) = @$name;
+
+
+              my ($c, $li) = @$code;
+
+              # TODO: this must be in Output
+              my $conflict_header = <<"CONFLICT_EXPLORER";
+  my \$self = \$_[0];
+  for (\${\$self->input()}) {  
+#line $li "$filename" 
+CONFLICT_EXPLORER
+              $c =~ s/^/$conflict_header/; # }
+
+              # {
+              # follows the closing curly bracket of the for .. to contextualize!!!!!!                 v
+              $c =~ s/$/\n################ @@@@@@@@@ End of User Code @@@@@@@@@ ###################\n  }\n/;
+              #$code->[0] = $c;
+              $conflict{$cn}{explorer} = $c;
+              $conflict{$cn}{explorerline} = $line;
+
+              # TODO: error control. Factorize!!!!!
+              $$syms{$cn} = $line;
+              $$nterm{$cn} = undef;
+
+              undef;
+            }
+
+%}
+
+%token ASSOC         /* is %(left|right|nonassoc) */
+%token BEGINCODE     /* is %begin { Perl code ... } */
+%token CODE          /* is { Perl code ... } */
+%token CONFLICT      /* is %conflict */
+%token DEFAULTACTION /* is %defaultaction */
+%token EXPECT        /* is %expect */
+%token HEADCODE      /* is %{ Perl code ... %} */
+%token IDENT         /* is [A-Za-z_][A-Za-z0-9_]* */
+%token LABEL         /* is :[A-Za-z0-9_]+ */
+%token LITERAL       /* is a string literal like 'hello' */
+%token METATREE      /* is %metatree */
+%token NAME          /* is %name */             
+%token NAMINGSCHEME  /* is %namingscheme */             
+%token NOCOMPACT     /* is %nocompact */
+%token NUMBER        /* is \d+ */
+%token OPTION        /* is (%name\s*([A-Za-z_]\w*)\s*)?\? */
+%token PLUS          /* is (%name\s*([A-Za-z_]\w*)\s*)?\+ */
+%token PREC          /* is %prec */
+%token PREFIX        /* is %prefix\s+([A-Za-z_][A-Za-z0-9_:]*::) */
+%token SEMANTIC      /* is %semantic\s+token */
+%token STAR          /* is (%name\s*([A-Za-z_]\w*)\s*)?\* */
+%token START         /* is %start */
+%token STRICT        /* is %strict */
+%token SYNTACTIC     /* is %syntactic\s+token */
+%token TAILCODE      /* is { Perl code ... } */
+%token TOKEN         /* is %token */
+%token TREE          /* is %tree */
+%token TYPE          /* is %type */
+%token UNION         /* is %union */
+
+%start eyapp
+
+%%
+
+# Main rule
+eyapp: head body tail ;
+
+#Common rules:
+
+symbol: LITERAL {
+                    my($symbol,$lineno)=@{$_[1]};
+                        exists($$syms{$symbol})
+                    or  do {
+                        $$syms{$symbol} = $lineno;
+                        $$term{$symbol} = undef;
+
+                        # Warning! 
+                        $$semantic{$symbol} = 0 unless exists($$semantic{$symbol});
+                    };
+                    $_[1]
+                }
+    |   ident   #default action
+;
+
+ident:  IDENT   {
+                    my($symbol,$lineno)=@{$_[1]};
+                        exists($$syms{$symbol})
+                    or  do {
+                        $$syms{$symbol} = $lineno;
+                        $$term{$symbol} = undef;
+
+                        # Warning! 
+                        $$semantic{$symbol} = 1 unless exists($$semantic{$symbol});
+                        # Not declared identifier?
+                        $nondeclared{$symbol} = 1 unless (exists($$nterm{$symbol}) or $$term{$symbol});
+                    };
+                    $_[1]
+                }
+;
+
+prodname:  IDENT 
+      |   LABEL
+      |   IDENT LABEL
+            {
+              $_[1][0] .= $_[2][0];
+              $_[1];
+            }
+;
+
+# Head section:
+head: headsec '%%'
+;
+
+#perlidents: /* empty */
+#      | perlidents perlident
+#;
+
+perlident:  
+          IDENT 
+      |   perlident '::' IDENT
+            {
+              $_[1][0] .= "::".$_[3][0];
+              $_[1];
+            }
+;
+
+headsec:    #empty  #default action
+    |       decls   #default action
+;
+
+decls:  decls decl  #default action
+    |   decl        #default action
+;
+
+decl:  '\n'                 #default action
+    |   SEMANTIC typedecl toklist '\n'
+            {
+                for (@{$_[3]}) {
+                    my($symbol,$lineno, $def)=@$_;
+
+                    #    exists($$token{$symbol})
+                    #and do {
+                    #    _SyntaxError(0,
+                    #            "Token $symbol redefined: ".
+                    #            "Previously defined line $$syms{$symbol}",
+                    #            $lineno);
+                    #    next;
+                    #};
+                    $$token{$symbol}=$lineno;
+                    $$term{$symbol} = [ ];
+                    $$semantic{$symbol} = 1;
+                    $$termdef{$symbol} = $def if $def;
+                }
+                undef
+            }
+    |   SYNTACTIC typedecl toklist '\n'
+            {
+                for (@{$_[3]}) {
+                    my($symbol,$lineno, $def)=@$_;
+
+                    #    exists($$token{$symbol})
+                    #and do {
+                    #    _SyntaxError(0,
+                    #            "Token $symbol redefined: ".
+                    #            "Previously defined line $$syms{$symbol}",
+                    #            $lineno);
+                    #    next;
+                    #};
+                    $$token{$symbol}=$lineno;
+                    $$term{$symbol} = [ ];
+                    $$semantic{$symbol} = 0;
+                    $$termdef{$symbol} = $def if $def;
+                }
+                undef
+            }
+    |   DUMMY typedecl toklist '\n'
+            {
+                for (@{$_[3]}) {
+                    my($symbol,$lineno, $def)=@$_;
+
+                    $$token{$symbol}=$lineno;
+                    $$term{$symbol} = [ ];
+                    $$semantic{$symbol} = 0;
+                    push @$dummy, $symbol;
+                    $$termdef{$symbol} = $def if $def;
+                }
+                undef
+            }
+    |   TOKEN typedecl toklist '\n'
+            {
+                for (@{$_[3]}) {
+                    my($symbol,$lineno, $def)=@$_;
+
+                        exists($$token{$symbol})
+                    and do {
+                        _SyntaxError(0,
+                                "Token $symbol redefined: ".
+                                "Previously defined line $$syms{$symbol}",
+                                $lineno);
+                        next;
+                    };
+                    $$token{$symbol}=$lineno;
+                    $$term{$symbol} = [ ];
+                    $$termdef{$symbol} = $def if $def;
+                }
+                undef
+            }
+    |   ASSOC typedecl symlist '\n'  
+            {
+                for (@{$_[3]}) {
+                    my($symbol,$lineno)=@$_;
+
+                        defined($$term{$symbol}[0])
+                    and do {
+                        _SyntaxError(1,
+                            "Precedence for symbol $symbol redefined: ".
+                            "Previously defined line $$syms{$symbol}",
+                            $lineno);
+                        next;
+                    };
+                    $$token{$symbol}=$lineno;
+                    $$term{$symbol} = [ $_[1][0], $prec ];
+                }
+                ++$prec;
+                undef
+            }
+    |   START ident '\n'                
+            { 
+              $start=$_[2][0] unless $start; 
+              undef 
+            }
+    |   PREFIX '\n'                
+            {
+              # TODO: Instead of ident has to be a prefix!!!
+              $prefix=$_[1][0]; 
+              undef 
+            }
+    |   WHITES CODE '\n'                
+            {
+              push @{$_[2]}, 'CODE';
+              $whites = $_[2]; 
+            }
+    |   WHITES REGEXP '\n'                
+            {
+              push @{$_[2]}, 'REGEXP';
+              $whites = $_[2]; 
+            }
+    |   WHITES '=' CODE '\n'                
+            {
+              push @{$_[3]}, 'CODE';
+              $whites = $_[3]; 
+            }
+    |   WHITES '=' REGEXP '\n'                
+            {
+              push @{$_[3]}, 'REGEXP';
+              $whites = $_[3]; 
+            }
+    |   NAMINGSCHEME CODE '\n'
+            {
+              $namingscheme = $_[2];
+              undef  
+            }
+    |   HEADCODE '\n'                   { push(@$head,$_[1]); undef }
+    |   UNION CODE '\n'                 { undef } #ignore
+    |   DEFAULTACTION CODE '\n'         { $defaultaction = $_[2]; undef } 
+    |   INCREMENTAL '\n'                { 
+                                           $incremental = ''; 
+                                           undef 
+                                        }
+    |   INCREMENTAL LITERAL '\n'        { 
+                                           $incremental = $_[2][0]; 
+                                           undef 
+                                        }
+    |   LEXER CODE '\n'                 { 
+                                           my ($code, $line) = @{$_[2]};
+                                           push @$head, [ make_lexer($code, $line), $line]; 
+                                           $lexer = 1;
+                                           undef 
+                                         } 
+    |   TREE '\n'    
+          { 
+            $tree = $buildingtree = 1;
+            $bypass = ($_[1][0] =~m{bypass})? 1 : 0;
+            $alias = ($_[1][0] =~m{alias})? 1 : 0;
+            $defaultaction = [ ' goto &Parse::Eyapp::Driver::YYBuildAST ', $lineno[0]]; 
+            undef 
+          } 
+    |   METATREE '\n'    
+          { 
+            $metatree = $tree = $buildingtree = 1;
+            undef 
+          } 
+    |   STRICT '\n'    
+          { 
+            $strict = 1;
+            undef 
+          } 
+    |   NOCOMPACT '\n'    
+          { 
+            $nocompact = 1;
+            undef 
+          } 
+    |   TYPE typedecl identlist '\n'
+            {
+                for ( @{$_[3]} ) {
+                    my($symbol,$lineno)=@$_;
+
+                        exists($$nterm{$symbol})
+                    and do {
+                        _SyntaxError(0,
+                                "Non-terminal $symbol redefined: ".
+                                "Previously defined line $$syms{$symbol}",
+                                $lineno);
+                        next;
+                    };
+                    delete($$term{$symbol});   #not a terminal
+                    $$nterm{$symbol}=undef;    #is a non-terminal
+                }
+            }
+    |   CONFLICT ident CODE '\n'
+            {
+              my ($name, $code) = @_[2,3];
+              my ($cn, $line) = @$name;
+
+
+              my ($c, $li) = @$code;
+
+              # TODO: this must be in Output
+              my $conflict_header = <<"CONFLICT_HEADER";
+  my \$self = \$_[0];
+  for (\${\$self->input()}) {  
+#line $li "$filename" 
+CONFLICT_HEADER
+              $c =~ s/^/$conflict_header/; # }
+
+              # {
+              # follows the closing curly bracket of the for .. to contextualize!!!!!!                 v
+              $c =~ s/$/\n################ @@@@@@@@@ End of User Code @@@@@@@@@ ###################\n  }\n/;
+              #$code->[0] = $c;
+              $conflict{$cn}{codeh} = $c;
+              $conflict{$cn}{line} = $line;
+
+              $$syms{$cn} = $line;
+              #$$nterm{$cn} = undef;
+
+              undef;
+            }
+        # conflict syntacticvariable?  prodname : prodname
+    |   CONFLICT ident perlident '?' prodname ':' prodname '\n'
+            {
+              #print "<@{$_[2]} @{$_[3]} @{$_[5]} @{$_[7]}>\n";
+            
+              my $conflict = $_[2];
+              my ($startsymbol, $line) = @{$_[3]};
+              my @prodname = ($_[5][0], $_[7][0]);
+
+              my $cn = $conflict->[0];
+
+              my $c = <<"CONFLICT_HEADER";
+  my \$self = \$_[0];
+  for (\${\$self->input()}) {  
+#line $line "$filename" 
+    \$self->YYIf('$startsymbol', '$prodname[0]', '$prodname[1]');
+################ @@@@@@@@@ End of User Code @@@@@@@@@ ###################
+  }
+CONFLICT_HEADER
+
+              $conflict{$cn}{codeh} = $c;
+              $conflict{$cn}{line} = $line;
+
+              $$syms{$cn} = $line;
+              $$nterm{$cn} = undef;
+
+              #$$nterm{$startsymbol} = undef;
+              #delete $$syms{$startsymbol};
+
+
+              if ($startsymbol eq 'EMPTY') {
+              $c = <<"NESTEDPARSING";
+{ \$self->YYIs('EMPTY', 1); }
+NESTEDPARSING
+              }
+              else {
+              $c = <<"NESTEDPARSING";
+{ \$self->YYNestedParse('$startsymbol'); }
+NESTEDPARSING
+              }
+
+              explorer_handler($conflict, [$c, $line]);
+
+              undef;
+            }
+    |   CONFLICT ident neg REGEXP '?' prodname ':' prodname '\n'
+            {
+            
+              my $conflict = $_[2];
+              my $neg = $_[3];
+              my ($regexp, $line) = @{$_[4]};
+              my @prodname = ($_[6][0], $_[8][0]);
+
+              my $cn = $conflict->[0];
+
+              my $c = <<"CONFLICT_HEADER";
+  my \$self = \$_[0];
+  for (\${\$self->input()}) {  
+#line $line "$filename" 
+    \$self->YYIf('.regexp', '$prodname[0]', '$prodname[1]');
+################ @@@@@@@@@ End of User Code @@@@@@@@@ ###################
+  }
+CONFLICT_HEADER
+
+              $conflict{$cn}{codeh} = $c;
+              $conflict{$cn}{line} = $line;
+
+              $$syms{$cn} = $line;
+              $$nterm{$cn} = undef;
+              $regexp = substr($regexp,1,-1);
+
+              if (!$neg) {
+                $regexp = "\\G(?=$regexp)"; 
+              }
+              else {
+                $regexp = "\\G(?!$regexp)"; 
+              }
+
+              $c = <<"NESTEDPARSING";
+{ \$self->YYNestedRegexp('$regexp'); }
+NESTEDPARSING
+
+              explorer_handler($conflict, [$c, $line]);
+
+              undef;
+            }
+    /*********************************************/
+    |   EXPLORER ident CODE '\n' # research testing
+            {
+              my ($name, $code) = @_[2,3];
+
+              explorer_handler($name, $code);
+            }
+    |   EXPLORER ident LITERAL '\n' # 
+            {
+              my ($name, $startsymbol) = @_[2,3];
+
+              my $c = <<"NESTEDPARSING";
+{ \$self->YYNestedParse($startsymbol->[0]); }
+NESTEDPARSING
+              my $li = $startsymbol->[1];
+
+              explorer_handler($name, [$c, $li]);
+            }
+    |   EXPLORER ident perlident '\n' # research testing: copy paste: factorize!
+            {
+              my ($name, $startsymbol) = @_[2,3];
+
+              my $c = <<"NESTEDPARSING";
+{ \$self->YYNestedParse('$startsymbol->[0]'); }
+NESTEDPARSING
+              my $li = $startsymbol->[1];
+
+              explorer_handler($name, [$c, $li]);
+            }
+    |   EXPLORER ident perlident LITERAL '\n' # research testing: copy paste: factorize!
+            {
+              my ($name, $startsymbol, $file) = @_[2,4];
+
+              my $c = <<"NESTEDPARSING";
+{ \$self->YYNestedParse('$startsymbol->[0]', $file->[0]); }
+NESTEDPARSING
+              my $li = $startsymbol->[1];
+
+              explorer_handler($name, [$c, $li]);
+            }
+    /*********************************************/
+
+    |   EXPECT NUMBER '\n'             { $expect=$_[2][0]; undef }
+    |   EXPECT NUMBER NUMBER '\n'      { $expect= [ $_[2][0], $_[3][0]]; undef }
+    |   EXPECTRR NUMBER '\n'           { 
+                                          $expect = 0 unless defined($expect);
+                                          croak "Number of reduce-reduce conflicts is redefined (line $_[2][1], file: $filename)\n" if ref($expect);
+                                          $expect= [ $expect, $_[2][0]]; 
+                                          undef 
+                                        }
+    |   error '\n'                     { $_[0]->YYErrok }
+;    
+
+neg:
+      /* empty */ {}
+    | '!'         { 1; }
+;
+typedecl:   #empty
+    |       '<' IDENT '>'
+;
+
+symlist:    symlist symbol  { push(@{$_[1]},$_[2]); $_[1] }
+    |       symbol          { [ $_[1] ] }
+;
+
+toklist:    toklist tokendef        { push(@{$_[1]},$_[2]); $_[1] }
+    |       tokendef                { [ $_[1] ] }
+;
+
+tokendef:   ident '=' REGEXP     { 
+                                    push @{$_[3]}, 'REGEXP';
+                                    push @{$_[1]}, $_[3]; 
+                                    $_[1] 
+                                 } 
+    |       ident '=' '%' REGEXP { 
+                                    push @{$_[4]}, 'CONTEXTUAL_REGEXP';
+                                    push @{$_[1]}, $_[4]; 
+                                    $_[1] 
+                                 } 
+    |       ident '=' '%' REGEXP '=' IDENT { 
+                                    push @{$_[4]}, 'CONTEXTUAL_REGEXP_MATCH';
+                                    push @{$_[4]}, $_[6];
+                                    push @{$_[1]}, $_[4]; 
+                                    $_[1] 
+                                 } 
+    |       ident '=' '%' REGEXP '!' IDENT { 
+                                    push @{$_[4]}, 'CONTEXTUAL_REGEXP_NOMATCH';
+                                    push @{$_[4]}, $_[6];
+                                    push @{$_[1]}, $_[4]; 
+                                    $_[1] 
+                                 } 
+    |       ident '=' CODE      { 
+                                    push @{$_[3]}, 'CODE';
+                                    push @{$_[1]}, $_[3]; 
+                                    $_[1] 
+                                 } 
+    |       symbol               {
+                                   push @{$_[1]}, [ @{$_[1]}, 'LITERAL'];
+                                   $_[1];
+                                 }
+;
+
+identlist:  identlist ident { push(@{$_[1]},$_[2]); $_[1] }
+    |       ident           { [ $_[1] ] }
+;
+
+# Rule section
+body:   
+      rulesec '%%'
+        {
+                $start
+            or  $start=$$rules[1][0];
+
+                ref($$nterm{$start})
+            or  _SyntaxError(2,"Start symbol $start not found ".
+                                "in rules section",$_[2][1]);
+
+            # Add conflict handlers
+            # [ left hand side,   right hand side,  precedence, rulename, code, ]
+            for my $A (keys %conflict) { 
+
+              if  (defined($conflict{$A}{explorer}))  {
+                  if (!$conflict{$A}{totalviewpoint}) {
+                      my $code = $conflict{$A}{codeh};
+                      $conflict{$A}{codeh} = "{ $conflict{$A}{explorer} }\n{ $code }";
+                      delete $$syms{$A};
+                      delete $$nterm{$A};
+                      delete $$term{$A};
+                      delete $conflict{$A}{explorer};
+                  }
+                  else {
+                    my $lhs = [$A, $conflict{$A}{explorerline}];
+                    my $code = $conflict{$A}{explorer};
+                    my $rhss = [ rhs([], name => $lhs, code => $code), ];
+                    _AddRules($lhs, $rhss);
+                    delete $conflict{$A}{explorer};
+                  }
+              }
+              else {
+                 delete $$syms{$A};
+                 delete $$nterm{$A};
+                 delete $$term{$A};
+              }
+            }
+
+            # # If exists an @identifiers that is not a nterm and not a term is a warn
+            if ($strict) {
+              for (keys %nondeclared) {
+                  warn "Warning! Non declared token $_ at line $$syms{$_} of $filename\n" 
+                unless ($_ eq 'error' || $$term{$_} || exists($$nterm{$_}) || exists($conflict{$_}));
+              }
+            }
+            # Superstart rule
+            # [ left hand side,   right hand side,  precedence, rulename, code, ]
+            $$rules[0]=[ '$start', [ $start, chr(0) ], undef, undef, undef,];  
+
+        }
+    |   '%%'    { _SyntaxError(2,"No rules in input grammar",$_[1][1]); }
+;
+
+rulesec:  rulesec rules #default action
+    |     startrules    #default action
+;
+
+startrules:  IDENT ':' 
+                        { $start = $_[1][0] unless $start; } 
+                      rhss ';'  
+                        { _AddRules($_[1],$_[4]); undef }
+  | error ';'          { $_[0]->YYErrok }
+;
+
+rules:  IDENT ':' rhss ';'  { _AddRules($_[1],$_[3]); undef }
+  | error ';'               { $_[0]->YYErrok }
+;
+
+rhss: rhss '|' rule   { push(@{$_[1]},$_[3]); $_[1] }
+  | rule            { [ $_[1] ] }
+;
+
+rule:   optname rhs prec epscode 
+          { 
+            my ($name, $rhs, $prec, $code) = @_[1..4];
+
+            my %index = symbol_index($rhs);
+            $code->[0] = prefixcode(%index).$code->[0] if ($code);
+
+            insert_delaying_code(\$code) if $metatree;
+            make_accessors($name, $rhs);
+            
+            push(@{$rhs}, $prec, $name, $code);  # only three???? what with prefixofcode?
+            $rhs
+          }
+    |   optname rhs         
+          {
+            my ($name, $rhs) = @_[1, 2];
+            my $code;
+
+            # Be careful: $defaultaction must be replicated per action
+            # to emulate "yacc/yapp" true behavior.
+            # There was a previous bug when %metatree and %defaultaction
+            # were activated ------------------V
+            $code = $defaultaction && [ @$defaultaction ];
+
+                defined($rhs)
+            and $rhs->[-1][0] eq 'CODE'
+            and $code = ${pop(@{$rhs})}[1];
+
+            my %index = symbol_index($rhs);
+            $code->[0] = prefixcode(%index).$code->[0] if ($code);
+            make_accessors($name, $rhs);
+
+            insert_delaying_code(\$code) if $metatree;
+            
+            push(@{$rhs}, undef, $name, $code);
+
+            $rhs
+        }
+;
+
+rhs:    #empty      #default action (will return undef)
+    |   rhselts     #default action
+;
+
+rhselts:    rhselts rhseltwithid  
+              { 
+                push(@{$_[1]},$_[2]);
+                $_[1] 
+              }
+    |   rhseltwithid              { [ $_[1] ] }
+;
+
+rhseltwithid : 
+      rhselt '.' IDENT 
+        {
+          push @{$_[1][1]}, $_[3][0];
+          $_[1]
+        }
+    | '$' rhselt  
+        {
+          # check that is an identifier
+            _SyntaxError(2,"\$ is allowed for identifiers only (Use dot notation instead)",$lineno[0]) 
+          if not_an_id($_[2][1][0]);
+          push @{$_[2][1]}, $_[2][1][0];
+          $_[2]
+        }
+    | '$' error { _SyntaxError(2,"\$ is allowed for identifiers only",$lineno[0]) }
+
+    | rhselt
+       {
+         $_[1];
+       }
+;
+
+rhselt:     symbol    { [ 'SYMB', $_[1] ] }
+    | code    { [ 'CODE', $_[1] ] }
+    | DPREC ident 
+        { 
+           my $cname = $_[2][0];
+           $conflict{$cname}{total}++;
+           [ 'CONFLICTHANDLER', $_[2] ] 
+        }
+    #************** research *****************#
+    | VIEWPOINT 
+        { 
+           $conflict{$_[1][0]}{totalviewpoint}++;
+           [ 'CONFLICTVIEWPOINT', $_[1] ] 
+        }
+    #************** research *****************#
+    | '(' optname rhs ')' 
+        { 
+           my ($name, $rhs) = @_[2, 3];
+
+
+           my $code = $defaultaction && [ @$defaultaction ];
+           $code =[ ' goto &Parse::Eyapp::Driver::YYActionforParenthesis', $lineno[0]] unless $metatree;
+
+             defined($rhs)
+           and $rhs->[-1][0] eq 'CODE'
+           and $code = ${pop(@$rhs)}[1];
+
+           my %index = symbol_index($rhs);
+           $code->[0] = prefixcode(%index).$code->[0] if ($code);
+
+           insert_delaying_code(\$code) if $metatree;
+            
+           my $A = token('PAREN-'.++$labelno);
+           _AddRules($A, [[@$rhs, undef, $name, $code]]);
+
+           [ 'SYMB', $A] 
+        }
+    | rhselt STAR 
+        { 
+          my ($what, $val) = @{$_[1]};
+          _SyntaxError(1, "Star(*) operator can't be applied to an action", $lineno[0]) 
+            if $what eq 'CODE';
+          my $A = token('STAR-'.++$labelno);
+          my $code_rec = ' goto &Parse::Eyapp::Driver::YYActionforT_TX1X2 ';
+          my $code_empty = ' goto &Parse::Eyapp::Driver::YYActionforT_empty ';
+
+          my $rhss = [
+                      rhs([ $A, $val], name => $_[2], code => $code_rec),
+                      rhs([],          name => $_[2], code => $code_empty),
+                    ];
+          _AddRules($A, $rhss);
+          [ 'SYMB', $A]
+        }
+    | rhselt '<' STAR symbol '>' 
+        { 
+          my ($what, $val) = @{$_[1]};
+          _SyntaxError(1, "Star(*) operator can't be applied to an action", $lineno[0]) 
+            if $what eq 'CODE';
+          my $B = token('STAR-'.++$labelno);
+          my $code_rec = ' goto &Parse::Eyapp::Driver::YYActionforT_TX1X2 ';
+          my $code_single = ' goto &Parse::Eyapp::Driver::YYActionforT_single ';
+          my $rhss = [#rhs [token , [value, line]] ...,   prec,  name,  code ]
+                      rhs([ $B, $_[4], $val], name => $_[3], code => $code_rec),
+                      rhs([ $val],            name =>  $_[3], code => $code_single),
+                    ];
+          _AddRules($B, $rhss);
+
+          my $A = token('STAR-'.++$labelno);
+          my $code_empty = ' goto &Parse::Eyapp::Driver::YYActionforT_empty ';
+          $code_single = ' { $_[1] } # optimize '."\n";
+
+          $rhss = [
+              rhs([ $B ], name => $_[3], code => $code_single ),
+              rhs([],     name => $_[3], code => $code_empty),
+          ];
+          _AddRules($A, $rhss);
+          [ 'SYMB', $A ]
+        }
+    | rhselt OPTION 
+        {
+          my ($what, $val) = @{$_[1]};
+          _SyntaxError(1, "Question(?) operator can't be applied to an action", $lineno[0]) 
+            if $what eq 'CODE';
+          my $A = token('OPTIONAL-'.++$labelno);
+          my $code_single = ' goto &Parse::Eyapp::Driver::YYActionforT_single ';
+          my $code_empty = ' goto &Parse::Eyapp::Driver::YYActionforT_empty ';
+
+          my $rhss = [
+                      rhs([ $val], name => $_[2], code => $code_single),
+                      rhs([],      name => $_[2], code => $code_empty),
+                    ];
+          _AddRules($A, $rhss);
+          [ 'SYMB', $A]
+        }
+    | rhselt '<' PLUS symbol '>' 
+        { 
+          my ($what, $val) = @{$_[1]};
+          _SyntaxError(1, "Plus(+) operator can't be applied to an action", $lineno[0]) 
+            if $what eq 'CODE';
+          my $A = token('PLUS-'.++$labelno);
+          my $code_rec = ' goto &Parse::Eyapp::Driver::YYActionforT_TX1X2 ';
+          my $code_single = ' goto &Parse::Eyapp::Driver::YYActionforT_single ';
+
+          my $rhss = [
+            rhs([$A, $_[4], $val], name => $_[3], code => $code_rec),
+            rhs([$val],            name => $_[3], code => $code_single),
+          ];
+          _AddRules($A, $rhss);
+          [ 'SYMB', $A]
+        }
+    | rhselt PLUS 
+        {
+           my ($what, $val) = @{$_[1]};
+           _SyntaxError(1, "Plus(+) operator can't be applied to an action", $lineno[0]) 
+             if $what eq 'CODE';
+           my $A = token('PLUS-'.++$labelno);
+           my $code_rec = ' goto &Parse::Eyapp::Driver::YYActionforT_TX1X2 ';
+           my $code_single = ' goto &Parse::Eyapp::Driver::YYActionforT_single ';
+
+           my $rhss = [
+             rhs([$A, $val], name => $_[2], code => $code_rec),
+             rhs([$val],     name => $_[2], code =>  $code_single)
+           ];
+
+           _AddRules($A, $rhss);
+           [ 'SYMB', $A]
+        }
+    ;
+
+optname: /* empty */
+       | NAME IDENT 
+         { 
+                      # save bypass status
+           $_[2][2] = $_[1][0];
+           $_[2] 
+         }
+       | NAME IDENT LABEL
+         {  # LABELs are used for dynamic conflict resolution
+                      # save bypass status
+           $_[2][2] = $_[1][0];
+           # 0: identifier 1: line number 2: bypass 
+           # concat the label to the name
+           $_[2][0] .= "$_[3][0]";
+
+           $_[2] 
+         }
+       | NAME LABEL
+         {  # LABELs are used for dynamic conflict resolution
+                      # save bypass status
+           $_[2][2] = $_[1][0];
+           $_[2] 
+         }
+;
+
+prec: PREC symbol
+        {
+                        defined($$term{$_[2][0]})
+                    or  do {
+                        _SyntaxError(1,"No precedence for symbol $_[2][0]",
+                                         $_[2][1]);
+                        return undef;
+                    };
+
+                    ++$$precterm{$_[2][0]};
+                    $$term{$_[2][0]}[1];
+        }
+;
+
+epscode:      { $defaultaction }
+    | code    { $_[1] }
+;
+
+code:   
+    CODE      { $_[1] }
+  | BEGINCODE 
+      {
+        _SyntaxError(2, "%begin code is allowed only when metatree is active\n", $lineno[0])
+          unless $metatree;
+        my $code = $_[1];
+        push @$code, 'BEGINCODE';
+        return $code;
+      }
+;
+
+# Tail section:
+
+tail:       /*empty*/
+        |   TAILCODE    { $tail=$_[1] }
+;
+
+%%
+sub _Error {
+    my($value)=$_[0]->YYCurval;
+
+    my $token = $$value[0];
+    my($what)= $token ? "input: '$token'" : "symbol";
+
+    _SyntaxError(1,"Unexpected $what",$$value[1]);
+}
+
+sub slurp_perl_code {
+  my($level,$from,$code);
+
+  $from=pos($$input);
+
+  $level=1;
+  while($$input=~/([{}])/gc) {
+          substr($$input,pos($$input)-1,1) eq '\\' #Quoted
+      and next;
+          $level += ($1 eq '{' ? 1 : -1)
+      or last;
+  }
+      $level
+  and  _SyntaxError(2,"Unmatched { opened line $lineno[0]",-1);
+  $code = substr($$input,$from,pos($$input)-$from-1);
+  $lineno[1]+= $code=~tr/\n//;
+  return [ $code, $lineno[0] ];
+}
+
+my %headertoken = (
+  start => 'START',
+  expect => 'EXPECT',
+  token => 'TOKEN',
+  strict => 'STRICT',
+  type => 'TYPE',
+  union => 'UNION',
+  namingscheme => 'NAMINGSCHEME',
+  metatree => 'METATREE',
+  nocompact => 'NOCOMPACT',
+  conflict => 'CONFLICT',
+  whites    => 'WHITES',
+);
+
+# Used for <%name LIST_of_STH +>, <%name OPT_STH ?>
+my %listtoken = (
+  '*' => 'STAR',
+  '+' => 'PLUS',
+  '?' => 'OPTION',
+);
+
+my $ID = qr{[A-Za-z_][A-Za-z0-9_]*};
+my $LABEL = qr{:[A-Za-z0-9_]+};
+my $STRING = qr {
+   '             # opening apostrophe
+   (?:[^'\\]|    # an ordinary character
+        \\\\|    # escaped \ i.e. \\
+         \\'|    # escaped apostrophe i.e. \'
+          \\     # escape i.e. \
+  )*?            # non greedy repetitions
+  '              # closing apostrophe
+}x;
+
+# Head section: \n separates declarations
+my $HEADERWHITESPACES = qr{ 
+  (?:  
+      [\t\ ]+     # Any white space char but \n
+    | \#[^\n]*    # Perl like comments
+    |   /\*.*?\*/ # C like comments
+  )+
+}xs;
+
+# Head section: \n is not significant
+my $BODYWHITESPACES = qr{
+  (?:
+      \s+        # Any white space char, including \n
+    | \#[^\n]*   # Perl like comments
+    |  /\*.*?\*/ # C like comments
+  )+
+}xs;
+
+my $REGEXP = qr{
+   /             # opening slash
+   (?:[^/\\]|    # an ordinary character
+        \\\\|    # escaped \ i.e. \\
+         \\/|    # escaped slash i.e. \/
+          \\     # escape i.e. \
+  )*?            # non greedy repetitions
+  /              # closing slash
+}xs;
+
+sub _Lexer {
+ 
+    #At EOF
+        pos($$input) >= length($$input)
+    and return('',[ undef, -1 ]);
+
+    #In TAIL section
+        $lexlevel > 1
+    and do {
+        my($pos)=pos($$input);
+
+        $lineno[0]=$lineno[1];
+        $lineno[1]=-1;
+        pos($$input)=length($$input);
+        return('TAILCODE',[ substr($$input,$pos), $lineno[0] ]);
+    };
+
+    #Skip blanks
+            $lexlevel == 0
+        ?   $$input=~m{\G($HEADERWHITESPACES)}gc
+        :   $$input=~m{\G($BODYWHITESPACES)}gc
+    and do {
+        my($blanks)=$1;
+
+        #Maybe At EOF
+        pos($$input) >= length($$input) and return('',[ undef, -1 ]);
+
+        $lineno[1]+= $blanks=~tr/\n//;
+    };
+
+    $lineno[0]=$lineno[1];
+
+            $$input=~/\G($LABEL)/gc
+        and return('LABEL',[ $1, $lineno[0] ]);
+
+        $$input=~/\G($ID)/gc
+    and return('IDENT',[ $1, $lineno[0] ]);
+
+
+        $$input=~/\G($STRING)/gc
+    and do {
+        my $string = $1;
+
+        # The string 'error' is reserved for the special token 'error'
+        $string eq "'error'" and do {
+            _SyntaxError(0,"Literal 'error' ".
+                           "will be treated as error token",$lineno[0]);
+            return('IDENT',[ 'error', $lineno[0] ]);
+        };
+
+        my $lines = $string =~ tr/\n//;
+        _SyntaxError(2, "Constant string $string contains newlines",$lineno[0]) if $lines;
+        $lineno[1] += $lines;
+
+        $string = chr(0) if $string eq "''";
+
+        return('LITERAL',[ $string, $lineno[0] ]);
+    };
+
+    # New section: body or tail
+        $$input=~/\G(%%)/gc
+    and do {
+        ++$lexlevel;
+        return($1, [ $1, $lineno[0] ]);
+    };
+
+        $$input=~/\G\s*{/gc and return ('CODE', &slurp_perl_code());  # }
+
+    if($lexlevel == 0) {# In head section
+
+        $$input=~/\G%(left|right|nonassoc)/gc and return('ASSOC',[ uc($1), $lineno[0] ]);
+
+            $$input=~/\G%{/gc
+        and do {
+            my($code);
+
+            $$input=~/\G(.*?)%}/sgc or  _SyntaxError(2,"Unmatched %{ opened line $lineno[0]",-1);
+
+            $code=$1;
+            $lineno[1]+= $code=~tr/\n//;
+            return('HEADCODE',[ $code, $lineno[0] ]);
+        };
+
+        $$input=~/\G%prefix\s+([A-Za-z_][A-Za-z0-9_:]*::)/gc and return('PREFIX',[ $1, $lineno[0] ]);
+
+            $$input=~/\G%(tree((?:\s+(?:bypass|alias)){0,2}))/gc
+        and do {
+          my $treeoptions =  defined($2)? $2 : '';
+          return('TREE',[ $treeoptions, $lineno[0] ])
+        };
+
+        $$input=~/\G%(?:(semantic|syntactic|dummy)(?:\s+token)?)\b/gc and return(uc($1),[ undef, $lineno[0] ]);
+
+        $$input=~/\G%(?:(incremental)(?:\s+lexer)?)\b/gc and return(uc($1),[ undef, $lineno[0] ]);
+
+        $$input=~/\G%(lexer|defaultaction|union)\b\s*/gc   and return(uc($1),[ undef, $lineno[0] ]);
+
+        $$input=~/\G([0-9]+)/gc   and return('NUMBER',[ $1, $lineno[0] ]);
+
+        $$input=~/\G%expect-rr/gc and return('EXPECTRR',[ undef, $lineno[0] ]);
+
+        $$input=~/\G%(explorer)/gc and return('EXPLORER',[ undef, $lineno[0] ]);
+
+        $$input=~/\G%($ID)/gc     and return($headertoken{$1},[ undef, $lineno[0] ]);
+
+        $$input=~/\G($REGEXP)/gc  and return('REGEXP',[ $1, $lineno[0] ]);
+
+        $$input=~/\G::/gc and return('::',[ undef, $lineno[0] ]);
+
+    }
+    else {  # In rule section
+
+            # like in <%name LIST_of_STH *>
+            # like in <%name LIST_of_STH +>
+            # like in <%name OPT_STH ?>
+            # returns STAR or PLUS or OPTION
+            $$input=~/\G(?:<\s*%name\s*($ID)\s*)?([*+?])\s*>/gc
+        and return($listtoken{$2},[ $1, $lineno[0] ]);
+
+            # like in %name LIST_of_STH *
+            # like in %name LIST_of_STH +
+            # like in %name OPT_STH ?
+            # returns STAR or PLUS or OPTION
+            $$input=~/\G(?:%name\s*($ID)\s*)?([*+?])/gc
+        and return($listtoken{$2},[ $1, $lineno[0] ]);
+
+            $$input=~/\G%no\s+bypass/gc
+        and do {
+          #my $bp = defined($1)?0:1; 
+          return('NAME',[ 0, $lineno[0] ]);
+        };
+
+            $$input=~/\G%(prec)/gc
+        and return('PREC',[ undef, $lineno[0] ]);
+
+            $$input=~/\G%(PREC)/gc
+        and return('DPREC',[ undef, $lineno[0] ]);
+
+            $$input=~/\G%name/gc
+        and do {
+          # return current bypass status
+          return('NAME',[ $bypass, $lineno[0] ]);
+        };
+
+    # Now label is returned in the "common" area
+    #       $$input=~/\G($LABEL)/gc
+    #   and return('LABEL',[ $1, $lineno[0] ]);
+
+            $$input=~/\G%begin\s*{/gc  # }
+        and return ('BEGINCODE', &slurp_perl_code());
+
+        #********** research *************#
+            $$input=~/\G%([a-zA-Z_]\w*)\?/gc
+        and return('VIEWPOINT',[ $1, $lineno[0] ]);
+
+
+    }
+
+    #Always return something
+        $$input=~/\G(.)/sg
+    or  die "Parse::Eyapp::Grammar::Parse: Match (.) failed: report as a BUG";
+
+    my $char = $1;
+
+    $char =~ s/\cM/\n/; # dos to unix
+
+    $char eq "\n" and ++$lineno[1];
+
+    ( $char ,[ $char, $lineno[0] ]);
+
+}
+
+sub _SyntaxError {
+    my($level,$message,$lineno)=@_;
+
+    $message= "*".
+              [ 'Warning', 'Error', 'Fatal' ]->[$level].
+              "* $message, at ".
+              ($lineno < 0 ? "eof" : "line $lineno")." at file $filename\n";
+
+        $level > 1
+    and die $message;
+
+    warn $message;
+
+        $level > 0
+    and ++$nberr;
+
+        $nberr == 20 
+    and die "*Fatal* Too many errors detected.\n"
+}
+
+# _AddRules
+# There was a serious error I introduced between versions 171 and 172 (subversion
+# numbers).  I delayed the instruction
+#       my ($tmprule)=[ $lhs, [], splice(@$rhs,-3)];
+# with catastrophic consequences for the resulting
+# LALR tables.
+# The splice of the ($precedence, $name, $code)
+# must be done before this line, if not the counts of nullables 
+# will no work!
+#          @$rhs
+#       or  do {
+#           ++$$nullable{$lhs};
+#           ++$epsrules;
+#       };
+
+sub _AddRules {
+    my($lhs,$lineno)=@{$_[0]};
+    my($rhss)=$_[1];
+
+        ref($$nterm{$lhs})
+    and do {
+        _SyntaxError(1,"Non-terminal $lhs redefined: ".
+                       "Previously declared line $$syms{$lhs}",$lineno);
+        return;
+    };
+
+        ref($$term{$lhs})
+    and do {
+        my($where) = exists($$token{$lhs}) ? $$token{$lhs} : $$syms{$lhs};
+        _SyntaxError(1,"Non-terminal $lhs previously ".
+                       "declared as token line $where",$lineno);
+        return;
+    };
+
+        ref($$nterm{$lhs})      #declared through %type
+    or  do {
+            $$syms{$lhs}=$lineno;   #Say it's declared here
+            delete($$term{$lhs});   #No more a terminal
+    };
+    $$nterm{$lhs}=[];       #It's a non-terminal now
+    
+    # Hal Finkel's patch: a non terminal is a semantic child
+    $$semantic{$lhs} = 1; 
+
+    my($epsrules)=0;        #To issue a warning if more than one epsilon rule
+
+    for my $rhs (@$rhss) {
+        #               ($precedence, $name, $code)
+        my ($tmprule)=[ $lhs, [], splice(@$rhs,-3)];
+
+        # Warning! the splice of the ($precedence, $name, $code)
+        # must be done before this line, if not the counts of nullables 
+        # will no work!
+            @$rhs
+        or  do {
+            ++$$nullable{$lhs};
+            ++$epsrules;
+        };
+
+        # Reserve position for current rule
+        push(@$rules, undef);
+        my $position = $#$rules;
+
+        # Expand to auxiliary productions all the intermediate codes
+        $tmprule->[1] = process_production($rhs);
+        $$rules[$position] = $tmprule; 
+        push(@{$$nterm{$lhs}},$position);
+    }
+
+        $epsrules > 1
+    and _SyntaxError(0,"More than one empty rule for symbol $lhs",$lineno);
+}
+
+# This sub is called fro Parse::Eyapp::Grammar::new
+#       0       1      2          3         4     5          6               7                  8
+# Args: object, input, firstline, filename, tree, nocompact, lexerisdefined, acceptinputprefix, start
+#  See the call to thsi sub 'Parse' inside sub new in module Grammar.pm 
+sub Parse {
+    my($self)=shift;
+
+        @_ > 0
+    or  croak("No input grammar\n");
+
+    my($parsed)={};
+
+    $input=\$_[0]; # we did a shift for $self, one less
+
+    $lexlevel=0;
+    my $firstline = $_[1];
+    $filename = $_[2] or croak "Unknown input file";
+    @lineno= $firstline? ($firstline, $firstline) : (1,1);
+
+    $tree = $_[3];
+    if ($tree) { # factorize!
+      $buildingtree = 1;
+      $bypass = 0;
+      $alias = 0;
+      $defaultaction = [ ' goto &Parse::Eyapp::Driver::YYBuildAST ', 0]; 
+      $namingscheme = [ '\&give_rhs_name', 0];
+    }
+
+    $nocompact = $_[4];
+
+    $nberr=0;
+    $prec=0;
+    $labelno=0;
+
+    $head=[];
+    $tail="";
+
+    $syms={};
+    $token={};
+    $term={};
+    $termdef={};
+    $nterm={};
+    $rules=[ undef ];   #reserve slot 0 for start rule
+    $precterm={};
+
+    $start="";
+    $start = $_[7] if ($_[7]); 
+
+    $nullable={};
+    $expect=0;
+    $semantic = {};
+    $strict = 0;
+
+    pos($$input)=0;
+
+
+    $self->YYParse(yylex => \&_Lexer, yyerror => \&_Error); #???
+
+        $nberr
+    and _SyntaxError(2,"Errors detected: No output",-1);
+
+    @$parsed{ 'HEAD', 'TAIL', 'RULES', 'NTERM', 'TERM',
+              'NULL', 'PREC', 'SYMS',  'START', 'EXPECT', 
+              'SEMANTIC', 'BYPASS', 'ACCESSORS', 'BUILDINGTREE',
+              'PREFIX',
+              'NAMINGSCHEME',
+              'NOCOMPACT',
+              'CONFLICTHANDLERS',
+              'TERMDEF',
+              'WHITES',
+              'LEXERISDEFINED',
+              'INCREMENTAL',
+              'STRICT',
+              'DUMMY',
+            }
+    =       (  $head,  $tail,  $rules,  $nterm,  $term,
+               $nullable, $precterm, $syms, $start, $expect, 
+               $semantic, $bypass, $accessors, $buildingtree,
+               $prefix,
+               $namingscheme,
+               $nocompact,
+               \%conflict,
+               $termdef,
+               $whites,
+               $lexer,
+               $incremental,
+               $strict,
+               $dummy,
+            );
+
+    undef($input);
+    undef($lexlevel);
+    undef(@lineno);
+    undef($nberr);
+    undef($prec);
+    undef($labelno);
+    undef($incremental);
+
+    undef($head);
+    undef($tail);
+
+    undef($syms);
+    undef($token);
+    undef($term);
+    undef($termdef);
+    undef($whites);
+    undef($nterm);
+    undef($rules);
+    undef($precterm);
+
+    undef($start);
+    undef($nullable);
+    undef($expect);
+    undef($defaultaction);
+    undef($semantic);
+    undef($buildingtree);
+    undef($strict);
+
+    $parsed
+}
+

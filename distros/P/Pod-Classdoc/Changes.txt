@@ -1,0 +1,4 @@
+Change History for Pod::Classdoc
+
+Version 1.01	2007-Aug-20		D. Arnold
+	Coded.

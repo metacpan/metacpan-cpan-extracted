@@ -1,0 +1,571 @@
+#!/usr/bin/env perl
+
+use PPI::Xref;
+
+use strict;
+use warnings;
+
+use File::Basename qw[basename];
+my $ME = basename($0);
+
+use Getopt::Long;
+Getopt::Long::Configure(qw[no_auto_abbrev]);
+
+use PPI::Xref::Help;
+
+sub short_help {
+    PPI::Xref::Help::short_help($ME, *DATA);
+}
+
+sub long_help {
+    PPI::Xref::Help::long_help($ME, *DATA);
+}
+
+sub man_help {
+    PPI::Xref::Help::man_help($ME, *DATA);
+}
+
+my %OptDefault = (
+    separator => "\t",
+    recurse => 1,
+    report_title => 1,
+    missing_modules => 1,
+    parse_errors => 1,
+    auto_semicolon => 1,
+ );
+
+my %Opt = %OptDefault;
+
+short_help()
+    unless GetOptions('files' => \$Opt{files},
+                      'subs' => \$Opt{subs},
+                      'packages' => \$Opt{packages},
+                      'modules' => \$Opt{modules},
+                      'missing_modules!' => \$Opt{missing_modules},
+                      'parse_errors!' => \$Opt{parse_errors},
+                      'total_lines' => \$Opt{total_lines},
+                      'files_lines' => \$Opt{files_lines},
+                      'subs_files' => \$Opt{subs_files},
+                      'packages_files' => \$Opt{packages_files},
+                      'incs_files' => \$Opt{incs_files},
+                      'incs_chains' => \$Opt{incs_chains},
+                      'incs_chains_reverse' => \$Opt{incs_chains_reverse},
+                      'files_counts' => \$Opt{files_counts},
+                      'modules_counts' => \$Opt{modules_counts},
+                      'incs_deps' => \$Opt{incs_deps},
+                      'parse' => \$Opt{parse},
+                      'report_all' => \$Opt{report_all},
+                      'report_prefix=s' => \$Opt{report_prefix},
+                      'report_title!' => \$Opt{report_title},
+                      'INC=s' => \$Opt{INC},
+                      'cache_directory=s' => \$Opt{cache_directory},
+                      'code=s' => \$Opt{code},
+                      'auto_semicolon!' => \$Opt{auto_semicolon},
+                      'files_from_file=s' => \$Opt{files_from_file},
+                      'files_from_cache' => \$Opt{files_from_cache},
+                      'files_from_system' => \$Opt{files_from_system},
+                      'cache_read_only' => \$Opt{cache_read_only},
+                      'process_verbose' => \$Opt{process_verbose},
+                      'recurse_verbose' => \$Opt{recurse_verbose},
+                      'cache_verbose' => \$Opt{cache_verbose},
+                      'summary' => \$Opt{summary},
+                      'separator=s' => \$Opt{separator},
+                      'recurse!' => \$Opt{recurse},
+                      'column' => \$Opt{column},
+                      'finish' => \$Opt{finish},
+                      'help' => \$Opt{short_help},
+                      'short_help' => \$Opt{short_help},
+                      'long_help' => \$Opt{long_help},
+                      'man' => \$Opt{man_help},
+    );
+
+short_help() if $Opt{short_help};
+long_help()  if $Opt{long_help};
+man_help()   if $Opt{man_help};
+
+my @ACTION = qw[files subs packages modules missing_modules parse_errors
+                subs_files packages_files files_lines total_lines
+                files_counts modules_counts
+                incs_files incs_deps incs_chains incs_chains_reverse];
+                       
+if ($Opt{report_all}) {
+    @Opt{@ACTION} = (1) x @ACTION;
+}
+
+use List::Util qw[any];
+short_help() unless (any { $Opt{$_} }
+                     grep { ! $OptDefault{$_} }
+                     @ACTION) ||
+                     $Opt{parse};
+
+$Opt{separator} = "\t" if $Opt{separator} eq '\t';  # Nicer to type in shells.
+
+if ($Opt{process_verbose} ||
+    $Opt{recurse_verbose} ||
+    $Opt{cache_verbose} ||
+    $Opt{summary}) {
+    select(STDOUT); $| = 1;
+}
+
+my $xref_opt = {
+   process_verbose => $Opt{process_verbose},
+   recurse_verbose => $Opt{recurse_verbose},
+   cache_verbose => $Opt{cache_verbose},
+   cache_read_only => $Opt{cache_read_only},
+   recurse => $Opt{recurse},
+};
+
+if (defined $Opt{INC}) {
+    $xref_opt->{INC} = [ split(',', $Opt{INC}) ];
+}
+
+if (defined $Opt{cache_directory}) {
+  unless (-d $Opt{cache_directory} && -r $Opt{cache_directory} && -w $Opt{cache_directory}) {
+    warn "$ME: Not a read-write directory --cache_directory='$Opt{cache_directory}'\n";
+  }
+  $xref_opt->{cache_directory} = $Opt{cache_directory};
+} else {
+    warn "$ME: No --cache_directory specified\n";
+}
+
+my $xref = PPI::Xref->new($xref_opt);
+
+package Times {
+    use Time::HiRes ();
+    sub get { bless [ Time::HiRes::time(), times() ] }
+    sub diff {
+        my @d = map { $_[0]->[$_] - $_[1]->[$_] } 0..2;
+        return (@d, $d[1] + $d[2]);
+    }
+}
+
+my $t0 = Times->get();
+
+if (defined $Opt{files_from_file}) {
+    my $fh;
+    if ($Opt{files_from_file} eq '-') {
+        $fh = *STDIN;
+    } elsif (!open($fh, '<', $Opt{files_from_file})) {
+        warn "$ME: Failed to open --files_from_file='$Opt{files_from_file}': $!\n";
+    }
+    use Scalar::Util qw[openhandle];
+    if (openhandle($fh)) {
+        while (<$fh>) {
+            chomp;
+            unless ($xref->process($_)) {
+                warn "$ME: Failed to process '$_'\n";
+            }
+        }
+    } else {
+        help();
+    }
+}
+
+my $processed;
+
+if (defined $Opt{files_from_cache}) {
+    $xref->process_files_from_cache();
+    $processed++;
+}
+if (defined $Opt{files_from_system}) {
+    $xref->process_files_from_system();
+    $processed++;
+}
+if (defined $Opt{code}) {
+    if ($Opt{auto_semicolon}) {
+        unless ($Opt{code} =~ /[;}]\s*$/) {
+            $Opt{code} .= ';';
+        }
+    }
+    $xref->process(\$Opt{code});
+    $processed++;
+}
+if (@ARGV) {
+    $xref->process(@ARGV);
+    $processed++;
+}
+unless ($processed) {
+    die <<__EOF__
+$ME: Nothing processed: use one of more of:
+--code=...
+--files_from_system
+--files_from_cache
+filename arguments
+__EOF__
+}
+
+my $t1 = Times->get();
+
+sub emit {
+    my ($xref, $opt, $cb) = @_;
+    my $fh;
+    if (defined $Opt{report_prefix}) {
+        my $fn = $Opt{report_prefix} . "$opt.txt";
+        open($fh, ">", $fn) or die qq[$0: Failed to create "$fn": $!\n];
+        print "$ME: Created $fn\n";
+    } else {
+        $fh = *STDOUT;
+    }
+    my $report_title = $Opt{report_title};
+    if (($opt eq 'missing_modules' && !$xref->missing_modules) ||
+        ($opt eq 'parse_errors' && !$xref->parse_errors_files)) {
+        $report_title = 0;
+    }
+    print { $fh } "=== $opt ===\n" if $report_title;
+    $cb->($xref, $fh);
+}
+
+unless ($Opt{parse}) {
+    my %cb = (
+        files => sub {
+            my ($xref, $fh) = @_;
+            for my $f ($xref->files) {
+                print { $fh } $f, "\n";
+            }
+        },
+        subs => sub{
+            my ($xref, $fh) = @_;
+            for my $s ($xref->subs) {
+                print { $fh } $s, "\n";
+            }
+        },
+        packages => sub {
+            my ($xref, $fh) = @_;
+            for my $p ($xref->packages) {
+                print { $fh } $p, "\n";
+            }
+        },
+        modules => sub {
+            my ($xref, $fh) = @_;
+            for my $p ($xref->modules) {
+                print { $fh } $p, "\n";
+            }
+        },
+        total_lines => sub {
+            my ($xref, $fh) = @_;
+            print { $fh } $xref->total_lines, "\n";
+        },
+        files_lines => sub {
+            my ($xref, $fh) = @_;
+            for my $f ($xref->files) {
+                print { $fh } $f, $Opt{separator}, $xref->file_lines($f), "\n";
+            }
+        },
+        files_counts => sub {
+            my ($xref, $fh) = @_;
+            for my $f ($xref->files) {
+                print { $fh } $f, $Opt{separator}, $xref->file_count($f), "\n";
+            }
+        },
+        modules_counts => sub {
+            my ($xref, $fh) = @_;
+            for my $f ($xref->modules) {
+                print { $fh } $f, $Opt{separator}, $xref->module_count($f), "\n";
+            }
+        },
+        missing_modules => sub {
+            my ($xref, $fh) = @_;
+            for my $m ($xref->missing_modules) {
+                print { $fh } $m, $Opt{separator}, $xref->missing_module_count($m), $Opt{separator}, join($Opt{separator}, $xref->missing_module_lines($m)), "\n";
+            }
+        },
+        parse_errors => sub {
+            my ($xref, $fh) = @_;
+            for my $f ($xref->parse_errors_files) {
+                my %e = $xref->file_parse_errors($f);
+                my @e = map { defined $e{$_} ? "$e{$_}" : $_ }
+                        sort { $a cmp $b || $e{$a} cmp $e{$b} }
+                        sort keys %e;
+                print { $fh } $f, $Opt{separator}, "@e\n";
+            }
+        },
+        incs_deps => sub {
+            my ($xref, $fh) = @_;
+            my $id = $xref->incs_deps;
+            for my $f ($id->files) {
+                print { $fh } $f, $Opt{separator}, $id->file_kind($f), "\n";
+            }
+        },
+        subs_files => sub {
+            my ($xref, $fh) = @_;
+            my $sfi = $xref->subs_files_iter({separator => $Opt{separator},
+                                              column => $Opt{column},
+                                              finish => $Opt{finish}});
+            while (my $sf = $sfi->next) {
+                print { $fh } $sf->string, "\n";
+            }
+        },
+        packages_files => sub {
+            my ($xref, $fh) = @_;
+            my $pfi = $xref->packages_files_iter({separator => $Opt{separator},
+                                                  column => $Opt{column},
+                                                  finish => $Opt{finish}});
+            while (my $pf = $pfi->next) {
+                print { $fh } $pf->string, "\n";
+            }
+        },
+        incs_files => sub {
+            my ($xref, $fh) = @_;
+            my $ifi = $xref->incs_files_iter({separator => $Opt{separator},
+                                              column => $Opt{column},
+                                              finish => $Opt{finish}});
+            while (my $if = $ifi->next) {
+                print { $fh } $if->string, "\n";
+            }
+        },
+        incs_chains => sub {
+            my ($xref, $fh) = @_;
+            my $ici = $xref->incs_chains_iter({separator => $Opt{separator}});
+            while (my $ic = $ici->next) {
+                print { $fh } $ic->string, "\n";
+            }
+        },
+        incs_chains_reverse => sub {
+            my ($xref, $fh) = @_;
+            my $ici = $xref->incs_chains_iter({separator => $Opt{separator},
+                                               reverse_chains => 1});
+            while (my $ic = $ici->next) {
+                print { $fh } $ic->string, "\n";
+            }
+        },
+    );
+    for my $opt (@ACTION) {
+        if ($Opt{$opt}) {
+            die qq[$ME: Unexpected callback '$opt'\n] unless defined $cb{$opt};
+            emit($xref, $opt, $cb{$opt});
+        }
+    }
+}
+
+my $t2 = Times->get();
+
+if ($Opt{summary}) {
+    my ($dw1, $du1, $ds1, $dc1) = $t1->diff($t0);
+    printf("$ME: files=%d lines=%d subs=%d\n",
+                 $xref->files || 0,
+                 $xref->total_lines || 0,
+                 $xref->subs || 0);
+    printf("$ME: docs_created=%d cache reads=%d writes=%d updates=%d creates=%d deletes=%d\n",
+                 $xref->docs_created,
+                 $xref->cache_reads,
+                 $xref->cache_writes,
+                 $xref->cache_updates,
+                 $xref->cache_creates,
+                 $xref->cache_deletes);
+    printf("$ME: parse: wall=%.2fs user=%.2fs system=%.2fs cpu=%.2fs\n",
+           $dw1, $du1, $ds1, $dc1);
+    my ($dw2, $du2, $ds2, $dc2) = $t2->diff($t1);
+    printf("$ME: output: wall=%.2fs user=%.2fs system=%.2fs cpu=%.2fs\n",
+           $dw2, $du2, $ds2, $dc2);
+}
+
+exit(0);
+
+__DATA__
+=pod
+
+=head1 NAME
+
+ppixref - frontend for PPI::Xref for indexing and querying Perl code
+
+=head2 Usage
+
+$ME [--files|--subs|--packages|--modules|--missing_modules|--parse_errors] ...
+
+$ME [--subs_files|--packages_files] ...
+
+$ME [--files_lines|--total_lines] ...
+
+$ME [--incs_files|--incs_chains|--incs_chains_reverse|--incs_deps] ...
+
+$ME [--files_founts|--modules_counts] ...
+
+$ME [--code=... [--auto_semicolon|--noauto_semicolon]]
+
+$ME --parse
+
+$ME --report_all
+
+$ME --report_title --noreport_title
+
+$ME --report_prefix=prefix
+
+$ME --INC=dir,dir,dir
+
+$ME --cache_directory=dir
+
+$ME [--process_verbose|--recurse_verbose|--cache_verbose|--summary]
+
+$ME [--separator=s|--column|--finish]
+
+$ME --recurse|--norecurse
+
+$ME [--help|--short_help|--long_help]
+
+=head2 Description
+
+The ... in the usage message is either a list of files, or
+--code='...', or --files_from_file=file, or --files_from_cache,
+or --files_from_system (the @INC).
+
+If --code is used, the filename is faked to be '-' in the reports.
+The --files_from_file=file specifies a file to read the filenames
+from, filename per line.  If the filename is '-', STDIN is used.
+
+Note that the --code argument must be complete, e.g. 'use utf8;' must
+have the semicolon.  For convenience, a semicolon is automatically added
+unless there already is one, or the code argument ends in an end brace.
+This can be disabled with --noauto_semicolon.
+
+The --parse can be used to just parse the inputs (and possibly cache
+the results, if --cache_directory is specified) but not to output
+anything (except the --*verbose or --summary output).  One or more
+of --parse or one of the report options (--packages et cetera,
+read on) must be specified.
+
+An "inc" is a "file inclusion", any of the C<use>/C<no>/C<require>/C<do>.
+
+=over 4
+
+=item *
+
+--packages shows seen package statements, while the --modules shows
+module names included via use/no/require.
+
+=item *
+
+--missing_modules (default: on) shows the missing modules (in addition
+  to warning about them during scan).  Use --nomissing_modules to suppress.
+
+=item *
+
+--parse_errors (default: on) shows the parse errors modules (in addition
+  to warning about them during scan).  Use --noparse_errors to suppress.
+
+=item *
+
+--subs_files, --packages_files, and --incs_files by default show only
+  the start line, with --finish they show also the finish, and with
+  --column also the column(s).  The --incs_chains only shows the start lines.
+
+=item *
+
+--incs_files shows only the first level, the --incs_chains shows the
+  full inclusion chains.  Warning: the number of inclusion chains can be
+  even for the simplest codes.  Enjoy responsibly.
+
+=item *
+
+--incs_chains_reverse instead of --incs_chains generates reversed
+  inclusion chains, for inspecting reverse dependencies.
+
+=item *
+
+--total_lines tells the total number of lines seen, while the
+  --files_lines tells the lines per file.
+
+=item *
+
+--files_counts and --modules_counts show how many times each file
+  or module is referred to (first-level).
+
+=item *
+
+--incs_deps shows what kind of tree node (root, branch, leaf, singleton)
+  each file is in the total dependency tree.  It does not attempt to draw
+  the actual tree graph.
+
+=item *
+
+--report_all turns on all the reports.  By default these reports go
+  to STDOUT, with --report_prefix you can direct them to files starting
+  with the specified prefix.  The report titles ("===...===") can be
+  turned off with --noreport_title.
+
+=item *
+
+--cache_directory=dir can be used to cache the PPI processing results
+under a directory.  This is usually much faster than processing the
+files from scratch with PPI.  For paranoia, the directory must exist.
+
+=item *
+
+--cache_read_only means that the cache files are read as-is, but no
+cache writes happen.  (As optimization, neither will any
+(re)processing of files happen, because where would we put the
+results.)  This option is useful if you just want to query the
+currently computed (and hopefully cached) results.
+
+=item *
+
+--INC=dir,dir,dir can be used to specify an \@INC different from the
+standard one.  Note the comma-separation.
+
+=item *
+
+--separator default is the tabulator.
+
+=item *
+
+The default is to recurse through use/no/require/do statements,
+use --norecurse to not to.
+
+=item *
+
+The --summary (default: on) turns on summary report at the end.
+
+
+=item *
+
+The --processverbose turns on display on processing progress.
+
+=item *
+
+The --cacheverbose turns on verbose cache access.
+
+=back
+
+=head2 Common warnings
+
+Certain warnings happen reasonably often, but the reasonable
+default action is just to live with them.  In certain cases
+one could report the issue as a PPI issue.
+
+=over 4
+
+=item *
+
+PPI::Xref::__process_id: warning: Failed to find file ... in ...
+
+If the file not found is something that depends on runtime values
+(e.g. some variable), PPI::Xref is not going to find it.
+
+=item *
+
+PPI::Xref::__process_id: warning: Failed to find module '...' in ...
+
+If the module is somehow optional, for example dependent on the
+operating system or not a core module, it may not be found on every
+installation.
+
+=item *
+
+PPI::Xref::__parse_error: PPI::Document incomplete in ...
+
+PPI::Xref checks whether a file was parsed as 'complete', meaning that
+all braces and parentheses and similar were balanced.  If there was a
+parsing error in the file, completeness will not happen.  This one you
+might want to report as a bug in PPI itself since PPI should be able
+to parse any valid Perl code.  Please distill the failure to the
+smallest possible snippet before reporting it.
+
+=item *
+
+PPI::Xref::__parse_error: PPI::Document creation failed in ...
+
+The said file could not be parsed at all by PPI.  Are you certain
+it contains valid Perl code?
+
+=back
+
+=cut

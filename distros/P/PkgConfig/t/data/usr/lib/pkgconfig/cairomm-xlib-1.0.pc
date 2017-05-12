@@ -1,0 +1,4 @@
+Name: cairomm-xlib
+Description: C++ wrapper for cairo - xlib support
+Requires: cairomm-1.0 cairo-xlib
+Version: 1.8.4

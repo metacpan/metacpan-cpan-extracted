@@ -1,0 +1,179 @@
+<!-- user/profile -->
+<h1>[%l('User Profile')%]</h1>
+[% IF profiled_user %]
+    <div class="yui-gf top_padded">
+        <div class="yui-u first align_right">
+            [% INCLUDE shared/user_avatar person=profiled_user %]
+        </div>
+        <div class="yui-u">
+
+            <div class="yui-gf">
+                <div class="yui-u first align_right">
+                    [%l('Nickname')%]:
+                </div>
+                <div class="yui-u">
+                    [% profiled_user.forum_name %]
+                </div>
+            </div>
+
+            [% IF profiled_user.suspended %]
+            <div class="yui-gf top_padded">
+                <div class="yui-u first align_right">
+                &nbsp;
+                </div>
+                <div class="yui-u">
+                    [%l('Suspended')%]
+                </div>
+            </div>
+            [% END %]
+
+            <div class="yui-gf top_padded">
+                <div class="yui-u first align_right">
+                    [%l('Posts Made')%]:
+                </div>
+                <div class="yui-u">
+                    [% profiled_user.post_count %]
+                </div>
+            </div>
+
+            <div class="yui-gf top_padded">
+                <div class="yui-u first align_right">
+                    [%l('Last Post')%]:
+                </div>
+                <div class="yui-u">
+                    [% IF profiled_user.last_post %]
+                    <a href="thread/view?thread=[% profiled_user.last_post.thread.id %]">[% ForumCode.escape(profiled_user.last_post.thread.subject) |truncate(55) %]</a>
+                    <br />
+                    [% nicedate(profiled_user.last_post.created) %]
+                    [% ELSE %]
+                    [%l('Never Posted')%] 
+                    [% END %]
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    [% IF authed_user.is_site_moderator || authed_user.can_suspend_account %]
+        <h2>[%l('Administration')%]</h2>
+
+        [% IF authed_user.can_suspend_account %]
+            <div class="yui-gf top_padded">
+                <div class="yui-u first align_right">
+                [%l('Suspend Account')%]
+                </div>
+                <div class="yui-u">
+                <input
+                    type="checkbox"
+                    name="suspend_account"
+                    id="suspend_account"
+                    value="[%profiled_user.id%]"
+                    [% IF profiled_user.suspended %]checked="true"[% END %]
+                >
+                </div>
+            </div>
+            [% IF profiled_user.suspended %]
+                <div class="yui-gf top_padded">
+                    <div class="yui-u first align_right">
+                        [%l('Reason for suspension')%]:
+                    </div>
+                    <div class="yui-u">
+                        [% ForumCode.escape(profiled_user.last_suspension.message) ||l('No reason given') %]
+                    </div>
+                </div>
+            [% END %]
+        [% END %]
+    [% END %]
+
+    [% IF authed_user.can_ip_ban %]
+        [% SET ips = profiled_user.ips_posted_from %]
+        <h2>[%l('IP Addresses')%]</h2>
+        <div class="yui-gf top_padded">
+            <div class="yui-u first align_right">
+                [% IF ips.size %]
+                    [%l('User has posted from')%]
+                [% ELSE %]
+                    [%l('User has never posted')%]
+                [% END %]
+            </div>
+            <div class="yui-u">
+                [% IF ips.size %]
+                    [% FOR ip IN ips %]
+                    <span id="ctx_[%ip%]">
+                        <a href="[%c.uri_for('/site/ip_info',{'address'=>ip})%]">[% ip %]</a>
+                    </span>[% UNLESS loop.last %], [% END %]
+                    <script type="text/javascript">
+                        YAHOO.namespace("example.container");
+                        [% SET people_posting = c.model('ParleyDB::Post').people_posting_from_ip("$ip") %]
+                        [% SET ttTxt = '' %]
+                        [% WHILE (post = people_posting.next) %]
+                        [% ttTxt = "${ttTxt} <li>$post.creator.forum_name</li>" %]
+                        [% END %]
+                        YAHOO.example.container.tt1 = new YAHOO.widget.Tooltip(
+                            "tt_[%ip%]",
+                            {
+                                context:"ctx_[%ip%]",
+                                text:"Users posting from [%ip%]: <ul>[%ttTxt%]</ul>"
+                            }
+                        );
+                    </script>
+                    [% END %]
+                [% END %]
+            </div>
+        </div>
+    [% END %]
+
+    [% IF authed_user.is_site_moderator %]
+        <h2>[%l('Forum Moderation')%]</h2>
+
+        [% SET dummy=available_forums.reset %]
+        [% WHILE (forum = available_forums.next) %]
+            <div class="yui-gf top_padded forum_moderator_list">
+                <div class="yui-u first align_right">
+                [%forum.name%]
+                </div>
+                <div class="yui-u">
+                <input
+                    type="checkbox"
+                    class="fmod_checkbox"
+                    name="moderate_forum"
+                    id="moderateforum_[%forum.id%]"
+                    [%IF profiled_user.can_moderate_forum(forum.id)%]checked="true"[% END %]
+                >
+                    <span id="status_[%forum.id%]"></span>
+                </div>
+            </div>
+        [% END %]
+    [% END %]
+
+    [% IF authed_user.is_site_moderator %]
+        <h2>[%l('User Roles')%]</h2>
+
+        <a href="[%c.uri_for('/site/user',{pid=>0})%]">[%l('Manage user roles')%]</a>
+    [% END %]
+[% ELSE %]
+    <p>[%l('PROFILE NOT FOUND')%]</p>
+[% END %]
+<!-- end : user/profile -->
+
+
+<script type="text/javascript" src="[%c.uri_for('/static/script/user_suspend.js')%]"></script>
+<script type="text/javascript">
+    var person = {
+        id: [%profiled_user.id%]
+    };
+</script>
+<script type="text/javascript" src="[%c.uri_for('/static/script/user_forum_moderate.js')%]"></script>
+
+<div id="suspend_reason_dialog" style="visibility:hidden;">
+    <div class="hd">Please enter suspension information</div>
+    <div class="bd">
+        <form method="POST" action="assets/post.php">
+            <label for="suspension_reason">[%l('Reason for suspension')%]:</label>
+            <br />
+            <textarea id="suspension_reason" cols="30" rows="6"></textarea>
+        </form>
+    </div>
+</div>
+
+[% PROCESS shared/ajax_dialog %]

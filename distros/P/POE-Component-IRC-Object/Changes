@@ -1,0 +1,6 @@
+
+0.02
+    - Fixed bug where params were passed wrong
+
+0.01
+    - Initial CPAN Release

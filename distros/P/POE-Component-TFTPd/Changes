@@ -1,0 +1,21 @@
+Revision history for Perl module POE-Component-TFTPd
+
+0.0302   Tue May 17 16:22:17 EST 2011
+     - Added patch to stop "Sorcerer's Apprentice Syndrome"
+
+0.0301   Sun Feb  6 19:40:27 CET 2011
+     - Applied patch from RT65090, regarding resetting
+       $client->retries on ACK instead of server send.
+
+0.03     Sat Apr  3 13:16:32 CEST 2010
+     - Update t/
+     - Fixed repo structure
+
+0.02   Mon Mar 16 13:44:46 CET 2009
+     - Fix wrong event name: check
+     - Remove _ prefix from object attributes.
+     - Fix "check_connections" event (was not called)
+
+0.01   Mon Apr 28 23:40:30 CEST 2008
+     - Commited first version of POE::Component::TFTPd
+

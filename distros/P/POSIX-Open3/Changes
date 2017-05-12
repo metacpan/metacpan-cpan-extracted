@@ -1,0 +1,8 @@
+Revision history for POSIX-Open3
+
+0.01    Mon Dec 20 12:34:45 WET 2010
+        - Copy of IPC::Open3 from blead Perl (IPC::Open3 v1.08)
+        - Applied 'POSIX' patch from
+          http://rt.perl.org/rt3/Ticket/Display.html?id=66224
+        - Added a test to the patch
+

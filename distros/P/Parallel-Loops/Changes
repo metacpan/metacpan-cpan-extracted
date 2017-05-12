@@ -1,0 +1,60 @@
+Version 0.08 on Mar 6 2016:
+    - Introduce $finishSub for while() to make it easy/possible to report
+      progress in the parent.
+Version 0.07 on Mar 23 2011:
+    - Use IO::Select if select works, and temp files otherwise (e.g. on
+      Windows)
+Version 0.06 on Mar 17 2011:
+    - Avoid deadlock sitations by reading from pipes as soon as possible and
+      don't wait for processes to end which they may not be able to do if
+      nobody is reading the pipe they're trying to write to.
+      Thanks to Marko Nordberg
+    - Fix problem where inc/Module/Install.pm wasn't included in tarball
+    - Updated 'Performance and properties of the loop body' POD section to
+      explain that this forks for every iteration, so if each iteration is
+      tiny, you may get worse performance from Parallel::Loops than a pure
+      sequential run
+    - createTarball.pl: Use 'make all test manifest dist' instead of making the
+      tarball ourselves
+    - Remove: use Scalar::Util
+    - Mention repository in Makefile.PL since there is a field for that
+Version 0.05 on Mar 9 2011:
+    - Close pipe file handles to prevent too many open files
+      This fixes:
+      Bug #66487: Error "Couldn't open a pipe" when more input parameters are
+                  given
+      https://rt.cpan.org/Public/Bug/Display.html?id=66487
+    - Fixed UNIVERSAL import warning in perl 5.12
+    - Throw exception when trying to share blessed objects
+      Thanks to Alexander Hartmaier <abraxxa@cpan.org>
+    - Modernize tests
+      Thanks to Alexander Hartmaier <abraxxa@cpan.org>
+      Since, the dependency on Test::Fatal was removed
+    - Converted to Module::Install
+      Thanks to Alexander Hartmaier <abraxxa@cpan.org>
+    - Declare that this module requires perl version 5.8 minimum, as we rely on
+      Tie::ExtraHash which (apparently) was introduced in perl 5.8. Patches to
+      this requirement are welcome.
+    - Moved Exception POD down below general Description
+Version 0.04 on Feb 9 2011:
+    - foreach() now gives the loop correct $_ values
+      This fixes:
+      Bug #60384: foreach fails when @parameters doesn't use numbers
+                  starting with zero
+      https://rt.cpan.org/Public/Bug/Display.html?id=60384
+      and
+      Bug #60659: Does not work with string parameters
+      https://rt.cpan.org/Public/Bug/Display.html?id=60659
+    - Handle fatal errors in children e.g. if the die()
+    - Detect if child didn't print any results e.g. because 'exit' was called
+    - Don't allow $pl->share() to clobber any values that may already be in the
+      refs - preserve the initial contents
+    - Put in perldoc about two children setting same key
+Version 0.03 on Jun 30 2010:
+    - Forgot to update README
+Version 0.02 on Jun 30 2010:
+    - Renamed tieOutput to share (API change!)
+    - Let both while and foreach return values from the children
+    - Use Storable instead of Data::Dumper
+Version 0.01 on Jun 25 2010:
+    - Initial version

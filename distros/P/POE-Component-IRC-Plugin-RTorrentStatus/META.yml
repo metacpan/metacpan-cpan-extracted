@@ -1,0 +1,36 @@
+---
+abstract: 'A PoCo-IRC plugin which prints RTorrent status messages to IRC'
+author:
+  - 'Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>'
+build_requires:
+  Test::More: 1.07
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-IRC-Plugin-RTorrentStatus
+no_index:
+  directory:
+    - t
+    - xt
+    - utils
+requires:
+  Capture::Tiny: 0
+  DateTime: 0
+  DateTime::Format::Human::Duration: 0
+  Format::Human::Bytes: 0
+  List::Util: 0
+  POE: 0
+  POE::Component::IRC: 0
+  POE::Component::IRC::Plugin::FollowTail: 6.22
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-IRC-Plugin-RTorrentStatus
+  homepage: http://metacpan.org/release/POE-Component-IRC-Plugin-RTorrentStatus
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hinrik/poe-component-irc-plugin-rtorrentstatus.git
+version: 0.17
+x_authority: cpan:HINRIK

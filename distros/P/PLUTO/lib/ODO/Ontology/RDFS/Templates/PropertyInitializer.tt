@@ -1,0 +1,35 @@
+[%#
+#
+# Copyright (c) 2005 IBM Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+# 
+# File:        $Source: /var/lib/cvs/ODO/lib/ODO/Ontology/RDFS/Templates/PropertyInitializer.tt,v $
+# Created by:  Stephen Evanchik( <a href="mailto:evanchik@us.ibm.com">evanchik@us.ibm.com </a>)
+# Created on:  03/02/2005
+# Revision:	$Id: PropertyInitializer.tt,v 1.1 2009-09-22 18:05:05 ubuntu Exp $
+# 
+# Contributors:
+#     IBM Corporation - initial API and implementation
+#
+%]
+	if(   exists($properties{'[%- shortName -%]'})
+	   && defined($properties{'[%- shortName -%]'})) {
+	
+		unless(UNIVERSAL::isa($properties{'[%- shortName -%]'}, '[%- packageName -%]')) {
+			return undef;
+		}
+		
+		unless($self->can('properties')) {
+			return undef;
+		}
+		
+		unless($self->properties()->can('[%- shortName -%]')) {
+			return undef;
+		}
+		
+		$self->properties()->[%- shortName -%]( $properties{'[%- shortName -%]'} );
+	}

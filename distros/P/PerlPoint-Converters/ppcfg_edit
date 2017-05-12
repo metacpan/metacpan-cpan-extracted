@@ -1,0 +1,391 @@
+#!/usr/bin/env perl
+$^W = 1;
+#
+# $Id: ppcfg_edit,v 1.1 2001/11/30 00:46:22 lorenz Exp $
+#
+# $Author: lorenz $
+#
+# Revision History and POD: See end of file
+#===================================================================
+
+use lib "$ENV{'HOME'}/lib/perl5";
+use Pod::Text;
+use Tk;
+use Tk::Dialog;
+use Tk::NoteBook;
+use Getopt::ArgvFile qw(argvFile);
+use Getopt::Long;
+use MessageDialog;
+
+use Data::Dumper;
+use strict;
+
+(my $me = $0) =~ s#.*/##;
+
+my $top = MainWindow->new();
+
+my $md = MessageDialog -> new($top);
+
+my $VERSION = sprintf("%d.%02d", q/$Revision: 1.1 $/ =~ /(\d+)\.(\d+)/);
+my $nix = "";                      # for using RCS keys in Usage, ...
+my $Date = "Date ";
+
+$top -> configure( -title => "$me   Revision: $VERSION");
+#============================================================= Usage
+
+sub Usage {
+  my $opt = shift; # if called on command line with --help
+
+  no strict;
+  $^W = 0;
+
+  if ($opt) {
+    pod2text( $0 );
+    exit;  # we're done
+  }
+  my @MM;
+  open(HELP, "pod2text $0  |") or die "Cannot open pipe for help:$!\n";
+  while(<HELP>) {
+    push @MM, $_;
+  }
+  close(HELP);
+  $md -> start ("$me   Revision: $VERSION", \@MM);
+
+} # Usage
+
+
+#==================================================== Parameter Loop
+
+my %OPT;
+
+argvFile( home => 1, default => 1);
+
+GetOptions(
+  \%OPT,
+  "debug",
+  "help",
+  "version",
+);
+
+#======================================================= Script Body
+Usage(1) if ($OPT{help});
+if ($OPT{version}) {
+  print "This is $me version $VERSION\n";
+  print "$Date: 2001/11/30 00:46:22 $nix\n";
+  exit;
+}
+
+my %PAGE;
+my %OPT_DEFAULT;
+my %TV;
+my %pg;
+
+scan_menues(); # get all options, and their positions in the menues
+
+# Menubar
+# -------
+my $menubar = $top->Frame( -relief => "raised", -borderwidth => 2);
+
+my $notebook;
+########
+# File #
+########
+my $mb_file = $menubar->Menubutton(
+  -text      => "File",
+  -underline => 0,
+);
+
+$mb_file->command(
+  -label     => "Open", 
+  -command   => \&open_hdl,
+  -underline => 0,
+);
+$mb_file->command(
+  -label     => "Save", 
+  -command   => \&save_hdl,
+  -underline => 0,
+);
+$mb_file->separator();
+$mb_file->command(
+  -label     => "Exit", 
+  -command   => sub { exit 0} ,
+  -underline => 0,
+);
+#-------
+
+########
+# Help #
+########
+my $mb_help = $menubar->Menubutton(
+  -text      => "Help",
+  -underline => 0,
+);
+$mb_help->command(
+  -label     => "Contents",
+  -command   => \&Usage,
+  -underline => 0,
+);
+$mb_help->separator();
+$mb_help->command(
+  -label   => "About $me",
+  -command => sub {
+    my $okButton = "OK";
+    my $dia = $top->Dialog(
+      -title          => "About $me",
+      -text           => "Autor: Lorenz Domke, lorenz.domke\@pixel.de\n\n" .
+           "Revision: $VERSION \n$Date: 2001/11/30 00:46:22 $nix",
+      -bitmap         => 'info',
+      -buttons        => [ $okButton, " KK"],
+      -default_button => $okButton,
+      ) -> Show();
+    },
+  -underline => 0,
+);
+#-------
+
+# Application window
+# ------------------
+$menubar -> pack(-side => "top", -fill => 'x');
+$mb_file -> pack(-side => "left");
+$mb_help -> pack(-side => "right");
+
+$notebook = $top->NoteBook(
+      -width => 500,
+      -ipadx => 2,
+      -ipady => 2,
+      );
+$notebook -> pack();
+
+create_pages(); # create notebook pages
+#print STDERR Dumper %pg, "\n";
+
+
+# Status line
+# -----------
+my $status = "";
+my $lb_status_line = $top->Label(
+  -textvariable => \$status,
+  -relief       => 'sunken',
+);
+
+# --------
+$lb_status_line -> pack(-side => 'bottom', -expand => 'yes', -fill => 'x');
+
+# Main Event Loop
+# ---------------
+MainLoop;
+
+exit 0;
+#================================================== Handler Routines
+
+#-------------------------------------------------------------------
+sub save_hdl {
+  print "save called ...\n";
+  foreach my $page ( sort keys %PAGE){
+    print "## $page ------------------------\n";
+    foreach my $optref ( @{$PAGE{$page}}){
+      my $val =  defined $TV{$$optref{option_name}} ?  $TV{$$optref{option_name}} :  "";
+      printf "--%-20s %s\n", $$optref{option_name}, $val;
+    }
+    print "\n";
+  }
+} # save_hdl
+
+#-------------------------------------------------------------------
+sub open_hdl {
+  print "open called ...\n";
+} # open_hdl
+
+#-------------------------------------------------------------------
+sub scan_menues {
+  print STDERR "scan menues ...\n";
+  my $file = "pp2html";
+  my $skip = 1;
+  my $page_head;
+  my $opt_name;
+
+  open (D, "$file")  or die "cannot open $file: $!\n";
+  while(<D>){
+    if (/my \%OPT =/){
+      $skip = 0;
+      next;
+    }
+    if (/my \@OPTIONS =/){
+      $skip = 0;
+      next;
+    }
+
+    last if /END OPTIONS/;
+    $skip = 1 if /END DEFAULTS/;
+
+    next if $skip;
+
+    if (/^\s*(\w+)\s*=>\s*(\S+)/){  # option default
+      $opt_name = $1;
+      my $defval = $2;
+      $defval =~ s/,//g;
+      $defval =~ s/"//g;
+      $OPT_DEFAULT{$opt_name} = $defval;
+      $TV{$opt_name} = $defval;
+      next;
+    }
+
+    if (/--- (\w+)/){  # new page in notebook
+      $page_head = $1;
+      last if $page_head eq "Special";
+      next;
+    }
+
+    if (/"(\w+)/){  # option name
+      $opt_name = $1;
+      my $len=0;
+      if (exists $PAGE{$page_head}){
+         $len = scalar( @{$PAGE{$page_head}});
+      }
+      $PAGE{$page_head}[$len]->{option_name} = $opt_name;
+      $PAGE{$page_head}[$len]->{option_text} = $opt_name;
+      if (/=[is]/){
+        $PAGE{$page_head}[$len]->{option_type}="s";
+      } else {
+        $PAGE{$page_head}[$len]->{option_type}="b";
+      }
+      if (/#\s*(.*)/){
+        $PAGE{$page_head}[$len]->{option_text} = $1;
+      }
+    }
+  }
+  close(D);
+} # scan_menues
+
+sub create_pages {
+  print STDERR "create pages ...\n";
+  my $page;
+  foreach $page (sort keys %PAGE){
+  print STDERR " $page ...\n";
+    $pg{$page} = $notebook->add($page,
+      -label => $page,
+      -anchor => 'e',
+      );
+    # $pg{$page}->pack();    
+      ## warning: Loosing Tk::Frame=HASH(0x8489968) ...
+                             ## don't know why
+## order of objects ... (Mark Overmeer)
+    my $opt;
+    my $opt_name;
+    my $opt_text;
+    my $opt_type;
+    my $rw = 1;
+
+    foreach my $href (@{$PAGE{$page}} ) {
+#print STDERR "$page ...";
+      $opt_name = $$href{option_name};
+#print STDERR Dumper $href;
+      $opt_text = $$href{option_text};
+      $opt_type = $$href{option_type};
+      $opt = $pg{$page} -> Label(
+         -text => $opt_text,
+      );
+      $opt-> grid(  -row, $rw, -column, 1, -sticky, "w" );
+
+      $opt = $pg{$page} -> Entry(
+         -textvariable => \$TV{$opt_name},
+      );
+      $opt-> grid(  -row, $rw, -column, 2, -sticky, "w" );
+
+      $opt = $pg{$page} -> Button(
+        #-bitmap => "questhead",
+         -text => "Help",
+         -background => "white",
+         -command => sub{ display_help($opt_name) },
+      );
+      $opt-> grid(  -row, $rw, -column, 3, -sticky, "w" );
+
+      $rw++;
+    }
+    print STDERR " pack $page ...";
+    $pg{$page}->pack();    
+  }
+
+} # create_pages
+
+#-------------------------------------------------------------------
+sub display_help {
+  my ($opt_name) = @_;
+} # display_help
+
+#===================================================================
+__END__
+
+=head1 NAME
+
+TK
+
+=head1 SYNOPSYS
+
+TK [options]
+
+=head1 DESCRIPTION
+
+tell something about TK ...
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>
+
+Output of Usage
+
+=item B<--version>
+
+Output of version
+
+=back
+
+
+=head1 EXAMPLES
+
+if any ...
+
+=head1 FILES
+
+=over 4
+
+=item F<$PATH/.TK>
+
+Global options file for C<TK>
+
+=item F<$HOME/.TK>
+
+Private options file. Here you can set most of the options
+which do not change frequently.
+
+=back
+
+=head1 AUTHOR
+
+Lorenz Domke, <lorenz.domke@pixel.de>
+
+=head1 SEE ALSO
+
+L<TK>
+
+=cut
+
+
+
+--------------------------------------------------------------------
+Revision History:
+
+$Log: ppcfg_edit,v $
+Revision 1.1  2001/11/30 00:46:22  lorenz
+new cvs version
+
+Revision 1.1  2001/04/15 08:34:27  lorenz
+Initial revision
+
+
+Revision 1.1  1998/05/27 10:42:17  ldomke
+Initial revision
+
+

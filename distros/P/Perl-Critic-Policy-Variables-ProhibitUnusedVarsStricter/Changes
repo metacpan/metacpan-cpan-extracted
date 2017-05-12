@@ -1,0 +1,40 @@
+0.100		2016-07-06	T. R. Wyant
+  Refactor the logic that discovers which variables are interpolated
+    into double-quotish strings into PPIx::QuoteLike. This does not
+    include regular expressions, which are already handled by
+    PPIx::Regexp.
+
+  Survive variable declarations that declare nothing. These can appear
+    if (e.g.) PPI mis-parses an attribute list, and that attribute list
+    contains something like 'Arg(state)'.
+
+0.006		2016-04-20	T. R. Wyant
+  Allow 'return ( my $x = 0 )'
+
+    This construction can be used to return a temporary value from an lvalue
+    subroutine. The case 'return my $x = 0' is equivalent, but was not
+    recognized as defining a variable. Now both are recognized and accepted
+    by default.
+
+    If you want to reject these, there is a new Boolean configuration item,
+    prohibit_returned_lexicals.
+
+0.005		2016-01-22	T. R. Wyant
+  Improve performance on really, really long strings This was done by
+    rewriting the regular expression that finds interpolations to
+    minimize backtracking.
+
+0.004		2016-01-08	T. R. Wyant
+  Add GitHub repository to module metadata.
+
+0.003		2014-12-12	T. R. Wyant
+  Fix author test for the presence of recommended modules.
+
+0.002		2013-10-08	T. R. Wyant
+  Required Perl::Critic version 1.119, since its scope computation is
+    adequate for our needs. Got rid of our own scope computation code.
+
+  Converted Changes file to CPAN::Changes::Spec format.
+
+0.001		2013-06-23	T. R. Wyant
+  Initial production release.

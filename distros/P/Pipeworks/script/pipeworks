@@ -1,0 +1,26 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use lib qw( lib );
+
+use Pipeworks::Pipeline;
+use Pipeworks::Message::MyDoc;
+
+my $pipeline = Pipeworks::Pipeline->new( 'MyDoc' );
+
+# same as Pipeworks::Stage::FetchURL->new( ... )
+$pipeline->register( 'FetchURL' );
+$pipeline->register( 'GetDocumentBody' );
+$pipeline->register( sub {
+	my $message = shift;
+
+	warn( "body:\n" . $message->body );
+} );
+
+# same as Pipeworks::Message::MyDoc->new( ... )
+my $message = $pipeline->message( {
+	url => 'http://localhost/',
+} );
+my $result = $pipeline->process( $message );
+

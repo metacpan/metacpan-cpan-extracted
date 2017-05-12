@@ -1,0 +1,83 @@
+NAME
+    Poem - Don't let Perl stand in poets' way!
+
+SYNOPSIS
+      use Poem;
+      Just Another Perl Poet
+      no Poem; # get back to work
+
+DESCRIPTION
+    This module practically make perl accept any poem in any language. Yes,
+    I mean any language. It even accepts poems in Unicode!
+
+  Options
+    Without import options, it prints your poem.
+
+      use Poem;
+      There are more than one way to Do it. -- Larry Wall
+      no Poem;
+
+    -review
+      But you can let perl review your poem via "-review".
+
+        use Poem qw/-review/;
+        There are more than one way to Do it. -- Larry Wall
+        no Poem;
+
+    -strict
+      With this option stricture will apply.
+
+        # this works
+        use Poem qw/-review/;
+        $Perl = "Practical Extractaction and Report Language";
+        no Poem;
+
+        # but not under stricture
+        use Poem qw/-review -strict/;
+        $Perl = "Pathologically Eclectic Rubbish Lister";
+        no Poem;
+
+    -deparse
+      If you don't grok your own poem, let perl deparse it.
+
+        # Let perl deparse it
+        use Poem qw/-review -deparse/;
+        Just Another Perl Poet
+        no Poem;
+
+    -act
+      If you are an activist rather an a poet, this optin is for you.
+
+        # Who said talk is cheap?
+        use Poem qw/-review -act/;
+        Just Another Perl Poet
+        no Poem;
+
+    -utf8
+      Even if your poem is written in non-ascii, Poem works. But if you want
+      perl to review it, you probably need this option as well. See
+      t/unicode.pl to find out what I mean.
+
+    -quiet
+      This is a no-op. Consider that a poet's way of saying "=pod" - "=cut"
+
+        use Poem -quiet;
+        Just Another Perl Poet
+        no Poem;
+
+  EXPORT
+    None by default.
+
+SEE ALSO
+    Filter::Util::Call
+
+AUTHOR
+    Dan Kogai, <dankogai@dan.co.jp>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Dan Kogai
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,15 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Build.PL
+lib/PerlIO/via/SeqIO.pm
+t/001_passthru.t
+t/002_seqio.t
+t/003_gzip.t
+t/test.fas
+t/test.fas.gz
+t/test.embl
+t/test.bls
+META.yml

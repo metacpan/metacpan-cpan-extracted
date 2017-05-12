@@ -1,0 +1,133 @@
+{
+   "abstract" : "pure Perl TLS protocol implementation",
+   "author" : [
+      "Vladimir Lettiev <thecrux@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.4.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Protocol-TLS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::X509" : "0",
+            "CryptX" : "0",
+            "MIME::Base64" : "0",
+            "Module::Runtime" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent" : "7.00",
+            "Test::More" : "0.98",
+            "Test::TCP" : "2.06"
+         }
+      }
+   },
+   "provides" : {
+      "Protocol::TLS" : {
+         "file" : "lib/Protocol/TLS.pm",
+         "version" : "0.04"
+      },
+      "Protocol::TLS::Alert" : {
+         "file" : "lib/Protocol/TLS/Alert.pm"
+      },
+      "Protocol::TLS::Application" : {
+         "file" : "lib/Protocol/TLS/Application.pm"
+      },
+      "Protocol::TLS::ChangeCipherSpec" : {
+         "file" : "lib/Protocol/TLS/ChangeCipherSpec.pm"
+      },
+      "Protocol::TLS::Client" : {
+         "file" : "lib/Protocol/TLS/Client.pm"
+      },
+      "Protocol::TLS::Compression" : {
+         "file" : "lib/Protocol/TLS/Compression.pm"
+      },
+      "Protocol::TLS::Connection" : {
+         "file" : "lib/Protocol/TLS/Connection.pm"
+      },
+      "Protocol::TLS::Constants" : {
+         "file" : "lib/Protocol/TLS/Constants.pm"
+      },
+      "Protocol::TLS::Context" : {
+         "file" : "lib/Protocol/TLS/Context.pm"
+      },
+      "Protocol::TLS::Crypto" : {
+         "file" : "lib/Protocol/TLS/Crypto.pm"
+      },
+      "Protocol::TLS::Crypto::CryptX" : {
+         "file" : "lib/Protocol/TLS/Crypto/CryptX.pm"
+      },
+      "Protocol::TLS::Extension" : {
+         "file" : "lib/Protocol/TLS/Extension.pm"
+      },
+      "Protocol::TLS::Extension::ServerName" : {
+         "file" : "lib/Protocol/TLS/Extension/ServerName.pm"
+      },
+      "Protocol::TLS::Handshake" : {
+         "file" : "lib/Protocol/TLS/Handshake.pm"
+      },
+      "Protocol::TLS::Protection" : {
+         "file" : "lib/Protocol/TLS/Protection.pm"
+      },
+      "Protocol::TLS::RecordLayer" : {
+         "file" : "lib/Protocol/TLS/RecordLayer.pm"
+      },
+      "Protocol::TLS::Server" : {
+         "file" : "lib/Protocol/TLS/Server.pm"
+      },
+      "Protocol::TLS::Trace" : {
+         "file" : "lib/Protocol/TLS/Trace.pm"
+      },
+      "Protocol::TLS::Utils" : {
+         "file" : "lib/Protocol/TLS/Utils.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vlet/p5-Protocol-TLS/issues"
+      },
+      "homepage" : "https://github.com/vlet/p5-Protocol-TLS",
+      "repository" : {
+         "url" : "git://github.com/vlet/p5-Protocol-TLS.git",
+         "web" : "https://github.com/vlet/p5-Protocol-TLS"
+      }
+   },
+   "version" : "0.04",
+   "x_authority" : "cpan:CRUX"
+}

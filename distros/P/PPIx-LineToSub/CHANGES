@@ -1,0 +1,7 @@
+Revision history for Perl module PPIx::LineToSub:
+
+0.33 Tue May 20 00:20:43 JST 2008
+     - remove Perl6::Say (noticed by Jesse Vincent)
+
+0.32 Sat May 17 15:39:17 JST 2008
+     - initial release

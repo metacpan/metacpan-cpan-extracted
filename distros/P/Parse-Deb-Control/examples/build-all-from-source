@@ -1,0 +1,55 @@
+#!/bin/bash
+
+set -x
+set -e
+
+PKG=$1
+
+if [ "$PKG" = "" ]; then
+    echo "usage: $0 libsome-module-perl"
+    exit 1;
+fi
+
+export VISUAL=autochangelog
+
+# rebuild our local repo
+OLD_PWD=$PWD
+cd /var/cache/pbuilder/result \
+    && dpkg-scanpackages . /dev/null > Packages \
+    && dpkg-scansources . > Sources \
+    && sudo apt-get update
+cd $OLD_PWD
+
+[ -d $PKG-* ] || get-all-source-dependecies --prefix=opl- $PKG
+rm *diff.gz *.dsc
+ls | while read F; do mv "$F" "opl-$F"; done
+ls | while read F; do
+    if [ -d $F ]; then
+        cd $F
+        dh_listpackages | while read DPKG; do
+            ls debian/$DPKG.* | perl -lane 'next if not -f; die if not m{^debian/(.+)$}; system(qq{mv "$_" "debian/opl-$1" });';
+            find debian  -maxdepth 1 -type f -not -name control -not -name changelog -exec perl -i -lane "s{$DPKG([^-]|\$)}{opl-$DPKG\$1}g; print" {} \;
+            perl -i -lane 'print; if (m/dh_installexamples/) { s/(dh_install)examples.*$/$1tests/;s/^(\s*)#/$1/; print; }' debian/rules
+            # perl -i -lane "s{/debian/tmp}{/debian/opl-$DPKG}g; print" debian/rules # no good
+        done
+        [ "$?" == "0" ] || exit 1
+        cd ..
+    fi
+done
+[ "$?" == "0" ] || exit 1
+
+ls */debian/control | while read F; do deb-control-prefix-perl --maintainer=automat@localhost '--prefix=opl-' "$F" > control.tmp; mv control.tmp "$F"; done
+[ "$?" == "0" ] || exit 1
+
+# replace all /usr
+find */debian -maxdepth 1 -type f -exec perl -i -lane 's{(^|\s|/)usr}{$1opt/perl}g if not m{(/usr/bin/make|/usr/share/common-licenses|changelog:|/usr/doc|usr/share/doc|/usr/share/dpatch|/usr/share/quilt/|/usr/share/cdbs/|www\.perl\.org|debusr|usr/bin/printf|usr/bin/python)};print;' {} \;
+# cdbs
+find */debian -type f -exec perl -i -lane 's{(cdbs/1/class/)(perlmodule.*\.mk)}{$1opl$2}g; print' {} \;
+# changelog
+ls | while read F; do
+    if [ -d $F ]; then
+        cd $F; DEBEMAIL=automat@localhost dch --force-distribution --distribution unstable --bpo; cd ..;
+    fi
+done
+
+build-pkg "opl-$PKG"

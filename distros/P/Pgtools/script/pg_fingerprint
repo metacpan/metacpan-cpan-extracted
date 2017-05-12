@@ -1,0 +1,137 @@
+#!/usr/bin/env perl
+
+use 5.021;
+use strict;
+use warnings;
+use Getopt::Long qw(:config posix_default no_ignore_case gnu_compat);
+use Pgtools;
+use Pgtools::Fingerprint;
+
+our $VERSION = Pgtools->VERSION;
+$| = 1;
+
+my $help = 0;
+my $version = 0;
+my $query = "";
+GetOptions(
+    'help|h'    => \$help,
+    'version|v' => \$version,
+    'query|q=s' => \$query,
+);
+
+if($help){
+    &print_help;
+    exit;
+}
+if($version){
+    print "Version: ".$VERSION."\n";
+    exit;
+}
+
+if ((@ARGV < 1 && $query eq "") || (@ARGV > 1 && $query ne "")) {
+    die "Insufficient arguments.\nPlease check pg_fingerprint -help\n";
+}
+my $filename = shift @ARGV;
+
+my $s = Pgtools::Fingerprint->new();
+$s->exec($query, $filename);
+
+sub print_help {
+    print <<OUT;
+    pg_fingerprint [-hv] (-query arg1 | file_name)
+
+    This command converts the values into a placeholders.
+
+    Options:
+      -help: show this help.
+      -version: show Pg-tools version.
+      -query: spefy a query with command-line.
+
+	(Example)
+
+    \$ pg_fingerprint queries_file
+    SELECT * FROM user WHERE id = ?;
+    SELECT * FROM user2 WHERE id = ? LIMIT ?;
+    SELECT * FROM user2 WHERE point = ?;
+    SELECT * FROM user2 WHERE expression IS ?;
+
+OUT
+}
+
+
+__END__
+
+
+
+=head1 NAME
+
+Pgtools::pg_config_diff - compare plural PostgreSQL settings. 
+
+=head1 VERSION
+
+Version 0.009
+
+
+=head1 SYNOPSIS
+
+    This command converts the values into a placeholders.
+
+    (Example)
+    $ pg_fingerprint -query "SELECT * FROM users WHERE id < 10;"
+    SELECT * FROM users WHERE id < ?;
+
+    $ pg_fingerprint queries_file
+    SELECT * FROM user WHERE id = ?;
+    SELECT * FROM user2 WHERE id = ? LIMIT ?;
+    SELECT * FROM user2 WHERE point = ?;
+    SELECT * FROM user2 WHERE expression IS ?;
+
+
+=head1 AUTHOR
+
+Tomoaki Otsuka, C<< <otsuka.tt at gmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to the Github page.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Pgtools::pg_fingerprint
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=./>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/./>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/./>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/.//>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016 Tomoaki Otsuka.
+
+This program is free software;
+
+
+=cut
+
+1

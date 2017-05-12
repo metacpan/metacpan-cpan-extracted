@@ -1,0 +1,63 @@
+Revision history for Perl extension PerlBean.
+
+1.0 Thu Sep  4 06:42:32 CEST 2003
+ - Major redesign.
+ - Interface changed slightly but remains backward compatible (until 4th of
+   April 2004)
+ - Added PerlBean::Method::Factory
+ - PerlBean::Attribute implements PerlBean::Method::Factory
+
+0.7 Mon Mar 24 20:59:17 CET 2003
+ - Added PerlBean::Symbol
+ - Added PerlBean::Dependency::Import
+ - Added PerlBean::Dependency::Require
+ - Added PerlBean::Dependency::Use
+ - Added PerlBean::Described::ExportTag
+ - Added use_perl_version in PerlBean
+ - Added singleton attribute in PerlBean
+ - Added documented attribute in PerlBean and PerlBean::Attribute
+ - Fixed style bug setIdx -> set_idx
+ - Fixed style bug setNum -> set_num
+ - Fixed style bug in PerlBean::Attribute::Multi::Ordered::write_push_doc()
+
+0.6 Sun Feb 16 20:29:26 CET 2003
+ - MAJOR changes
+ - Added PerlBean::Style (now complient to perlstyle)
+ - Made generated code to take PerlBean::Style into account
+ - Made modules compliant to perlstyle. The interface had to change.
+ - Added PerlBean::Method::Constructor
+
+0.4 Sat Jan 11 05:29:29 CET 2003
+ - Fixed bug in PerlBean::Attribute: valuesBean should have been
+   valuesPerlBean
+ - Updated MANIFEST
+ - Fixed bug in Changes 0.3.0.1 should have been 0.3
+
+0.3 Sun Jan  5 22:36:25 CET 2003
+ - Added PerlBean::Method
+ - Added PerlBean::Attribute::Multi::Unique::Associative::MethodKey
+ - Regenerated and checked all PerlBean modules
+
+0.2.0.2 Sat Dec 21 14:27:33 CET 2002
+ - Fixed bug with CVS Revision in pod generation
+
+0.2.0.1 Sat Dec 21 13:57:02 CET 2002
+ - Renamed CodeGen::PerlBean to PerlBean
+ - Added PerlBean::Collection
+ - Added tutorial
+ - Added class for multi, unique associative attributes
+ - Interfaces changed significantly
+ - Many many bugs found in this course
+
+0.1.0.2 Mon Nov 25 21:56:45 CET 2002
+ - BUG: Added Error in PREREQ_PM in Makefile.PL
+ - BUG: Set package name in attributes in PerlBean.pm
+ - BUG: Spell error in constraint documentation for Multi attributes
+ - Added file TODO
+ - Added cvs Revision to Makefile.PL
+
+0.1.0.1 Sun Nov 10 21:17:49 CET 2002
+ - Added actual code
+
+0.01  Fri Nov  8 21:22:42 2002
+ - original version; created by h2xs 1.21 with options -X CodeGen::PerlBean

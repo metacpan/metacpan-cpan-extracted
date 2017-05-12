@@ -1,0 +1,35 @@
+Build.PL
+Changes
+examples/proxy.psgi
+lib/Plack/App/Proxy/Backend/HTTP/Tiny.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+README.md
+t/010_use.t
+t/100_proxy.t
+xt/check_changes.t
+xt/consistent_version_numbers.t
+xt/copyright.t
+xt/cover.pl
+xt/cpan_changes.t
+xt/cpan_meta.t
+xt/dist_manifest.t
+xt/distribution.t
+xt/eol.t
+xt/kwalitee.t
+xt/minimumversion.t
+xt/no_tabs.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod_coverage.t
+xt/pod_spell.t
+xt/pod_spellrc
+xt/pod_syntax.t
+xt/portability_files.t
+xt/signature.t
+Makefile.PL
+LICENSE
+META.yml
+META.json
+SIGNATURE    Added here by Module::Build

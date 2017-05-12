@@ -1,0 +1,35 @@
+---
+name: addcslashes
+
+synopsis: | >
+  my $slashed = addcslashes( $not_escaped, $charlist );
+
+docs: |
+  Returns a string with backslashes before characters that are listed
+  in C<$charlist>.
+
+code: |
+    sub addcslashes
+    {
+        my ($str, $charlist) = validate_pos( @_,
+            STRING, STRING,
+        );
+
+        my @patterns = split /(.\.\..)/, $charlist;
+        for (@patterns) {
+            if ( m/ \A (.)\.\.(.) \z /x ) {
+                if ( ord $1 > ord $2 ) {
+                    $_ = "\Q$1$2.";
+                } else {
+                    $_ = "\Q$1\E-\Q$2\E";
+                }
+            } else {
+                $_ = "\Q$_";
+            }
+        }
+        my $tr = join '', @patterns;
+        $str =~ s/([$tr])/\\$1/g;
+
+        return $str;
+    }
+

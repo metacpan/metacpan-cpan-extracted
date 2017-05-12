@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Plack::Middleware::ModuleInfo>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Plack-Middleware-ModuleInfo"><img src="https://secure.travis-ci.org/bayashi/Plack-Middleware-ModuleInfo.png?_t=1426254400"/></a> <a href="https://coveralls.io/r/bayashi/Plack-Middleware-ModuleInfo"><img src="https://coveralls.io/repos/bayashi/Plack-Middleware-ModuleInfo/badge.png?_t=1426254400&branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Plack::Middleware::ModuleInfo installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Plack::Middleware::ModuleInfo
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Plack::Middleware::ModuleInfo documentation is available as in POD. So you can do:
+
+    % perldoc Plack::Middleware::ModuleInfo
+
+
+=head1 REPOSITORY
+
+Plack::Middleware::ModuleInfo is hosted on github
+L<http://github.com/bayashi/Plack-Middleware-ModuleInfo>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

@@ -1,0 +1,16 @@
+					<div petal:if="view/category/error" class="error">
+						<?if name="view/category/error/isInvalid"?>
+							Validation Error:
+							<ul>
+								<li petal:if="view/category/error/isNameRequired">Category name required!</li>
+								<li petal:if="view/category/error/isCreatorRequired">Category creator required!</li>
+								<li petal:if="view/category/error/isDateRequired">Category date required!</li>
+							</ul>
+						<?else?>
+						  Error:
+							<ul>
+								<li petal:if="view/category/error/isExists">A category named &quot;$view/category/error/category/name&quot; already exists!</li>
+								<li petal:if="view/category/error/isNonExistent">No category named &quot;$view/category/error/category/name&quot; exists!</li>
+							</ul>
+						<?end?>
+					</div>

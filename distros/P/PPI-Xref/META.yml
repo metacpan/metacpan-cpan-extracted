@@ -1,0 +1,28 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PPI-Xref
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  List::Util: '1.33'
+  PPI: '0'
+  Sereal::Decoder: '0'
+  Sereal::Encoder: '0'
+  perl: '5.014'
+version: '0.010'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.017'

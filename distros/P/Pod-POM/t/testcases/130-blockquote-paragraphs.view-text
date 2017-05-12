@@ -1,0 +1,20 @@
+NAME
+    130-blockquote-paragraphs
+
+EXAMPLES
+    Text before blockquote paragraph.
+
+        Blockquote paragraph.
+
+    Text between blockquote paragraphs.
+
+        Multi-paragraph blockquote.
+
+        Here is the second paragraph in the blockquote.
+
+        Here is the third paragraph in the blockquote.
+
+            Nested blockquote paragraph.
+
+    [EOF]
+

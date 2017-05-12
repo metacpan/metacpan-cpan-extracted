@@ -1,0 +1,126 @@
+#!/usr/bin/perl
+
+pp_addpm({At=>Top},<<'EOD');
+
+$PDLA::onlinedoc->scan(__FILE__) if $PDLA::onlinedoc;
+
+=head1 NAME
+
+PDLA::GSL::CDF - PDLA interface to GSL Cumulative Distribution Functions
+
+=head1 DESCRIPTION
+
+This is an interface to the Cumulative Distribution Function package present in the GNU Scientific Library. 
+
+=head1 SYNOPSIS
+
+    use PDLA;
+    use PDLA::GSL::CDF;
+
+    my $p = gsl_cdf_tdist_P( $t, $df );
+
+    my $t = gsl_cdf_tdist_Pinv( $p, $df );
+
+=cut
+
+EOD
+
+pp_addhdr('
+#include <gsl/gsl_cdf.h>
+
+');
+
+my ($header) = `gsl-config --cflags` =~ m/-I(.+)$/;
+$header .= '/gsl/gsl_cdf.h';
+# for win32. Thanks Sisyphus!
+$header =~ s/"//g;
+
+open my $fh, "< $header" or die "$!";
+
+local $/ = undef;
+my $h = <$fh>;
+my @functions = $h =~ m/\n(double .+? ;)\n/xmsg;
+
+my %p_type = (
+  'double'       => 'double',
+  'unsigned int' => 'ushort',
+);
+
+for (@functions) {
+  s/\n\s+/ /xmsg;
+  s/const //g;
+  if (m/^(\w+)\ (\w+)\ \( (.+) \)\;$/xs) {
+    my ($out_type, $function, $pars) = ($1, $2, $3);
+    my @pars = split /,/, $pars;
+    for (@pars) {
+      if (m/^(.+)( \w+)$/) {
+        my ($type, $par) = ($1, $2);
+        s/^ | $//g for ($type, $par);
+        $par = lc $par;
+          # numbers interfere with $ISGOOD in BadCode
+        $par =~ s/1/a/g;
+        $par =~ s/2/b/g;
+        $_ = [$p_type{$type}, $par];
+      }
+    }
+    my ($p, $code, $badcode) = print_ppdef( $out_type, $function, @pars );
+    pp_def($function,
+      HandleBad => 1,
+      GenericTypes => [D],
+      Pars => $p,
+      Code => $code,
+      BadCode => $badcode,
+      Doc  => '',
+    );
+  }
+}
+
+sub print_ppdef {
+  my ($out_type, $function, @pars) = @_;
+ 
+  my ($pars, $code, $badcode);
+
+  for (@pars) {
+    my ($type, $par) = @$_;
+    $pars .= "$type $par(); ";
+  }
+  $pars .= "$out [o]out()";
+
+  $code = "\$out() = $function( ";
+  $code .= "\$" . $_->[1] . "(), "
+    for (@pars);
+  $code .= ");";
+  $code =~ s/, \);/ );/;
+
+  $badcode
+    = "if ( " . join(' && ', map { "\$ISGOOD($_->[1]())" } @pars ) . " ) {\n";
+  $badcode .= '  ' . $code . "\n}\n";
+  $badcode .= "else {\n  \$SETBAD(out());\n}";
+ 
+#  print "pp_def('$function',\n";
+#  print "  HandleBad => 1,\n";
+#  print "  GenericTypes => [D],\n";
+#  print "  Pars => '$pars',\n";
+#  print "  Code => '\n$code\n',\n";
+#  print "  BadCode => '\n$badcode\n',\n";
+#  print "  Doc  => '',\n";
+#  print ");\n\n";
+  return ($pars, $code, $badcode);
+}
+
+pp_addpm({At=>Bot},<<'EOD');
+
+=head1 AUTHOR
+
+Copyright (C) 2009 Maggie J. Xiong <maggiexyz users.sourceforge.net>
+
+The GSL CDF module was written by J. Stover.
+
+All rights reserved. There is no warranty. You are allowed to redistribute this software / documentation as described in the file COPYING in the PDLA distribution.
+
+=cut
+
+EOD
+
+pp_done();
+

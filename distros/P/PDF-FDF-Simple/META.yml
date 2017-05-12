@@ -1,0 +1,32 @@
+---
+name: PDF-FDF-Simple
+version: 0.21
+author:
+  - 'Steffen Schwigon <ss5@renormalist.net>,'
+abstract: Read and write (Acrobat) FDF files.
+license: perl
+resources:
+  repository: git://github.com/renormalist/pdf-fdf-simple.git
+requires:
+  Class::Accessor::Fast: 0
+  Compress::Zlib: 0
+  File::ShareDir: 0
+  Parse::RecDescent: 1.94
+  Test::More: 0
+  perl: 5.6.1
+build_requires:
+  File::Copy: 0
+provides:
+  PDF::FDF::Simple:
+    file: lib/PDF/FDF/Simple.pm
+    version: 0.21
+  PDF::FDF::Simple::Builder:
+    file: lib/PDF/FDF/Simple/Builder.pm
+  PDF::FDF::Simple::Grammar:
+    file: lib/PDF/FDF/Simple/Grammar.pm
+  Parse::RecDescent::PDF::FDF::Simple::Grammar:
+    file: lib/PDF/FDF/Simple/Grammar.pm
+generated_by: Module::Build version 0.3201
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

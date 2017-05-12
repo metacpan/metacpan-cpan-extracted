@@ -1,0 +1,25 @@
+---
+abstract: 'turns source code into stylish HTML'
+author:
+  - 'Joel Dalley <joeldalley@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pistachio
+requires:
+  Carp: 0
+  Exporter: 0
+  HTML::Entities: 0
+  Module::Load: 0
+  PPI::Tokenizer: 0
+  constant: 0
+  strict: 0
+  warnings: 0
+version: 0.10

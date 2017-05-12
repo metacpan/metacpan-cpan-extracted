@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Pod-Weaver-Section-BugsRT,
+version Program fragment delivered error ``[DZ] attempted to set version twice at /home/mschout/perl5/lib/perl5/x86_64-linux-gnu-thread-multi/Moose/Meta/Method/Delegation.pm line 108'':
+
+  Add a BUGS pod section for rt.cpan.org
+
+This software is copyright (c) 2010 by Michael Schout.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

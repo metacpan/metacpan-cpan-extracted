@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/POD2-LT.t
+lib/POD2/LT.pm
+lib/POD2/LT/perlintro.pod
+lib/POD2/LT/perlreref.pod
+lib/POD2/LT/perl582delta.pod
+lib/POD2/LT/perl583delta.pod
+lib/POD2/LT/lwpcook.pod

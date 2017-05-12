@@ -1,0 +1,17 @@
+%token NUM = /(\d+)/
+%token OP  = /([-+*\/])/
+
+%%
+
+S:
+     $S x        { $S + 1 }
+  |   x          { 1 }  
+;
+
+x:
+     NUM
+  |  x OP NUM
+;
+%%
+
+

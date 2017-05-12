@@ -1,0 +1,128 @@
+[%#
+#
+# Copyright (c) 2005 IBM Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+# 
+# File:        $Source: /var/lib/cvs/ODO/lib/ODO/Ontology/OWL/Lite/Templates/OWLLiteConstructor.tt,v $
+# Created by:  Stephen Evanchik( <a href="mailto:evanchik@us.ibm.com">evanchik@us.ibm.com </a>)
+# Created on:  03/02/2005
+# Revision:	$Id: OWLLiteConstructor.tt,v 1.1 2009-09-22 18:04:57 ubuntu Exp $
+# 
+# Contributors:
+#     IBM Corporation - initial API and implementation
+#
+%]
+#
+# Description: [%- description -%]
+#
+# Schema URI: [%- schemaURI -%]
+#
+sub new {
+
+	my $self = shift;
+	
+	my $resource = shift;
+	my $graph = shift;
+	
+	$self = $self->SUPER::new($resource, $graph, @_);
+	
+	return undef
+		unless(ref $self);
+	
+	$self->propertyContainerName( '[%- propertyContainerName -%]' );
+	$self->properties(bless {}, '[%- propertyContainerName -%]');
+
+	$self->properties()->{'parent'} = $self;
+
+[% IF classIntersections %]
+	if([% FOREACH class = classIntersections %] !$self->isOfType('[%- class -%]') || [% END %] 0) {
+		die('Could not instantiate object for URI: ' . $self->subject()->value() . ' because it is not of type: [% FOREACH class = classIntersections %] [%- class -%], [% END %] ');
+	}
+[% END -%]
+[% IF cardinalityRestrictions %]
+[% FOREACH restriction = cardinalityRestrictions %]
+	[% IF restriction.minCardinality %]$self->setMinCardinality('[%- restriction.propertyName -%]', [%- restriction.minCardinality -%]);[% END %]
+	[% IF restriction.maxCardinality %]$self->setMaxCardinality('[%- restriction.propertyName -%]', [%- restriction.maxCardinality -%]);[% END %]
+[% END -%]
+[% END -%]
+[% IF propertyInitializers %]
+	my %properties = @_;
+	
+	foreach my $TMP_property ( {}, [% FOREACH property = propertyInitializers %] { shortName=> '[%- property.shortName -%]', packageName=> '[%- property.packageName -%]' }, [% END %] ) {
+	
+		next unless(exists($TMP_property->{'shortName'}));
+
+		my $TMP_shortName = $TMP_property->{'shortName'};
+		my $TMP_packageName = $TMP_property->{'packageName'};
+		
+		if(defined($properties{$TMP_shortName})) {
+		
+			unless(UNIVERSAL::isa($properties{$TMP_shortName}, $TMP_packageName)) {
+				die("$TMP_shortName parameter is not a valid $TMP_packageName object");
+			}
+			
+			unless($self->can('properties')) {
+				die('Cannot access properties container');
+			}
+			
+			unless($self->properties()->can($TMP_shortName)) {
+				die('Property container does not contain a method named: ' . $TMP_shortName);
+			}
+			
+			# Do not check whether or not the property can be added based on the cardinality
+			# restraints here because the property container method will check that
+			$self->properties()->$TMP_shortName( $properties{$TMP_shortName} );
+		}
+		elsif($self->isRequiredProperty($TMP_packageName)) {
+			die("Property \"$TMP_shortName\" is required for this object");
+		}
+		else {
+			# Nothing to do
+		}
+	}
+[% END %]
+	
+	return $self;
+}
+
+sub queryString {
+[% IF queryString %]
+	return '[%- queryString -%]';
+[% ELSE %]
+	return undef;
+[% END %]
+}
+
+sub objectURI {
+	return '[% URI %]';
+}
+
+sub to_statement_group {
+	my $self = shift;
+
+	require Class::ISA;
+	
+	my $stmt_group = ODO::Statement::Group->new($self->subject());
+	foreach my $my_super (Class::ISA::super_path($self)) {
+	
+		next 
+			unless ($my_super->can('to_statement_group'));
+		
+		$stmt_group->merge( $my_super->to_statement_group() );
+	}
+	
+	foreach my $propertyName ( '', [% FOREACH p = properties %] '[%- p.shortName -%]', [% END %]) {
+
+		next
+			unless($propertyName);
+		
+		my $prop = $self->properties()->$propertyName();
+		$stmt_group->addProperty($self->objectURI(), $prop->subject());
+	}
+	
+	return $stmt_group;
+}

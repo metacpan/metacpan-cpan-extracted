@@ -1,0 +1,102 @@
+=head1 NAME
+
+PLP::HowTo - Some examples of common web things in PLP.
+
+=head1 HOW TO...
+
+Additional Perl functionality is often available in modules. All of the modules
+used in this document are available (for free) at CPAN: http://search.cpan.org/
+
+=head2 send a cookie
+
+ <: 
+     BEGIN {
+	 use CGI::Cookie;
+	 AddCookie(
+	     CGI::Cookie->new(
+		 -name => 'ID',
+		 -value => 123456,
+		 -domain => 'foo.com',
+		 -path => '/'
+	     )->as_string
+	 );
+     }
+ :>
+
+=head2 get a cookie
+
+ Your user ID is <:= $cookie{ID} :>
+
+=head2 set a header
+
+ <:
+     BEGIN {
+         $header{Content_Type} = 'text/plain';
+     }
+ :>
+
+=head2 use a database
+
+Use DBI, and alternatively, one of the many simplifying modules. Drivers for
+DBI are in the DBD:: namespace. DBI loads the driver automatically, but it has
+to be available. If you need a fast full-featured file-base database, use
+DBD::SQLite, it's the instant database :).
+
+ <:
+     use DBIx::Simple; # and read its documentation for examples.
+ :>
+
+=head2 allow a user to upload a file
+
+Use CGI.pm, which can be used with CGI::Upload to make things easier
+
+ <:
+     use CGI;         # and don't use %post in your PLP document.
+     use CGI::Upload; # and read its documentation for examples.
+     my $cgi = CGI->new;
+     my $upload = CGI::Upload->new($cgi);
+     ...
+ :>
+
+=head2 download a file into a variable
+
+ <:
+     use LWP::Simple;
+     my $page = get 'http://foo.com/bar.html';
+ :>
+
+=head2 implement basic authentication
+
+This only works with PLP under mod_perl. For CGI installations, it's useless.
+
+ <:
+     use MIME::Base64;
+
+     BEGIN {
+         my $r = Apache->request;
+
+         my ($type, $login) = split / /, $r->header_in('Authorization');
+         my ($user, $pass) = split /:/, decode_base64 $login, 2;
+
+         unless ($user eq 'foo' and $pass eq 'bar') {
+             $header{Status} = '401 Authorization Required';
+             $header{WWW_Authenticate} = 'Basic realm="Top secret :)"';
+             print '<h1>Authorization Required</h1>';
+             exit;
+         }
+     }
+ :>
+
+(It is possible to use something similar with CGI, but it's not easy. Headers
+are communicated to your script via C<%ENV>, and having credentials in there
+would be insecure, so Apache removes them. To get C<$ENV{HTTP_AUTHORIZATION}>,
+you need to recompile Apache with -DSECURITY_HOLE_PASS_AUTHORIZATION, or use
+mod_rewrite to set the environment variable. Short answer: just use mod_perl.)
+
+=head1 FEEDBACK
+
+If you have good, simple examples of how to do common things with PLP, please
+send them! <perl@shiar.org>
+
+=cut
+

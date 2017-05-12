@@ -1,0 +1,74 @@
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Poet::Manual - Index of Poet documentation
+
+=head1 MANUALS
+
+=over
+
+=item L<Poet::Manual::Tutorial|Poet::Manual::Tutorial>
+
+Provides a tour of Poet by showing how to build a micro-blog website.
+
+=item L<Poet::Manual::Intro|Poet::Manual::Intro>
+
+An introduction to Poet features with links to other documentation.
+
+=item L<Poet::Manual::Configuring|Poet::Manual::Configuring>
+
+A list of Poet configuration options.
+
+=item L<Poet::Manual::Subclassing|Poet::Manual::Subclassing>
+
+A guide to customizing Poet behavior via subclassing.
+
+=back
+
+=head1 REFERENCE DOCUMENTATION
+
+=over
+
+=item L<Poet::Environment|Poet::Environment>
+
+=item L<Poet::Conf|Poet::Conf>
+
+=item L<Poet::Script|Poet::Script>
+
+=item L<Poet::Mason|Poet::Mason>
+
+=item L<Poet::Log|Poet::Log>
+
+=item L<Poet::Cache|Poet::Cache>
+
+=item L<Poet::Util::Debug|Poet::Util::Debug>
+
+=item L<Poet::Util::File|Poet::Util::File>
+
+=item L<Poet::Util::Web|Poet::Util::Web>
+
+=item L<poet|poet>
+
+=back
+
+=head1 SEE ALSO
+
+L<Poet|Poet>
+
+=head1 AUTHOR
+
+Jonathan Swartz <swartz@pobox.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Jonathan Swartz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

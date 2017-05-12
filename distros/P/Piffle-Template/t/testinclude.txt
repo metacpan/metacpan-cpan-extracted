@@ -1,0 +1,5 @@
+file included ok
+<?perl
+  $var1 = "interp in included file ok";
+  $var2 = "interp in including template ok";
+?>var1: {$var1}

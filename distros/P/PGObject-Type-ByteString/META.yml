@@ -1,0 +1,26 @@
+---
+abstract: 'Wrapper for raw strings mapping to BYTEA columns'
+author:
+  - 'Erik Huelsmann <ehuels@gmail.com>'
+build_requires:
+  File::Slurp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PGObject-Type-ByteString
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBD::Pg: '1.20'
+  PGObject: v1.403.2
+resources:
+  repository: https://github.com/ledgersmb/PGObject-Type-ByteString.git
+version: v1.1.2

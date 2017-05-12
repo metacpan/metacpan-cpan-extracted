@@ -1,0 +1,15 @@
+$Header: /Users/matisse/Desktop/CVS2GIT/matisse.net.cvs/Perl-Metrics-Simple/INSTALL,v 1.2 2008/08/10 16:31:29 matisse Exp $
+
+Installing  Perl::Metrics::Simple
+
+perl Build.PL
+./Build
+./Build test verbose=1
+./Build install
+
+If you do not have Module::Build installed, then try:
+
+perl Makefile.PL
+make
+make test TEST_VERBOSE=1
+make install

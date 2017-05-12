@@ -1,0 +1,57 @@
+grp:3;3
+fd:2
+ifd:2
+dp:.
+ts:,
+cs:£
+ics:GBP
+csa:l
+css:0
+ns:-
+ps:+
+dtf:%a %d %b %Y %H:%M:%S %Z
+df:%d/%m/%y
+tf:%H:%M:%S
+apf:
+amu:
+pmu:
+aml:
+pml:
+lm1:Mys Genver
+lm2:Mys Whevrel
+lm3:Mys Merth
+lm4:Mys Ebrel
+lm5:Mys Me
+lm6:Mys Evan
+lm7:Mys Gortheren
+lm8:Mye Est
+lm9:Mys Gwyngala
+lm10:Mys Hedra
+lm11:Mys Du
+lm12:Mys Kevardhu
+sm1:Gen
+sm2:Whe>
+sm3:Mer
+sm4:Ebr
+sm5:Me
+sm6:Evn
+sm7:Gor
+sm8:Est
+sm9:Gwn
+sm10:Hed
+sm11:Du
+sm12:Kev
+ld1:De Sul
+ld2:De Lun
+ld3:De Merth
+ld4:De Merher
+ld5:De Yow
+ld6:De Gwener
+ld7:De Sadorn
+sd1:Sul
+sd2:Lun
+sd3:Mth
+sd4:Mhr
+sd5:Yow
+sd6:Gwe
+sd7:Sad

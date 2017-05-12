@@ -1,0 +1,20 @@
+Changes
+COPYING
+lib/Protect/Unwind.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
+README
+t/die-in-unwind.t
+t/die.t
+t/exit.t
+t/goto-from-cb.t
+t/goto.t
+t/last.t
+t/nested.t
+t/normal.t
+t/return.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

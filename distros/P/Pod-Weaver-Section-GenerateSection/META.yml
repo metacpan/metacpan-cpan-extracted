@@ -1,0 +1,41 @@
+---
+abstract: 'add pod section from an interpolated piece of text.'
+author:
+  - 'Carnë Draug <cdraug@cpan.org>'
+build_requires:
+  Dist::Zilla::Plugin::GatherDir: '0'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::DZil: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Weaver-Section-GenerateSection
+requires:
+  Dist::Zilla::Role::TextTemplate: '0'
+  Moose: '0'
+  MooseX::AttributeShortcuts: '0'
+  MooseX::Types::Moose: '0'
+  Pod::Elemental::Element::Nested: '0'
+  Pod::Elemental::Element::Pod5::Ordinary: '0'
+  Pod::Weaver::Role::Section: '0'
+  namespace::autoclean: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/carandraug/pod-weaver-section-generatesection/issues
+  homepage: https://github.com/carandraug/pod-weaver-section-generatesection
+  repository: git://github.com/carandraug/pod-weaver-section-generatesection.git
+version: '1.06'

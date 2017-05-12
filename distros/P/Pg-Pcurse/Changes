@@ -1,0 +1,135 @@
+Revision history for Perl extension Pg::Pcurse.
+
+0.25  Mon Oct 17 04:01:03 2011
+	   - new Makefile.PL
+	   - added a few expect tests for pcurse(1)
+
+0.24  Sun Aug 29 01:05:01 2011
+       - Added prereqs 
+
+0.23  Sun Aug 29 01:05:01 2011
+       - Regular upkeep: changed installer, changed and added tests
+
+0.22  Wed Jul 23 21:48:23 2008
+        - Fixed license entry (to perl)
+
+0.20  Thu Jun 26 02:23:59 2008
+        - In vacuum mode, Ctrl-L shows configuration settings
+        - In vacuum mode, fixed listing of tables so they are ordered
+        - In vacuum mode, Ctrl-T shows table statistics
+        - In vacuum mode, changed main display to show vac and analyze
+        - Old selction values in listboxes are now sticky ( when same params)
+
+0.19  Sat May 31 02:01:56 2008
+	- fsm displays names of relations in other db's by its name
+          insted of relfileno
+	- In buffers mode, Ctrl-L shows fsm relations
+	- In buffers mode, Ctrl-T shows fsm and Checkpoint Stats
+	- In buffers mode, 'd' shows fsm pages
+
+0.18  Sun May 25 07:47:58 2008
+	- Added index definition
+	- In statistics mode, added pg_stats for Ctrl-T and Ctrl-L
+	- In tables mode, added pg_statio for Ctrl-T 
+	- In rules mode, added pg_rewrite for Ctrl-T 
+	- Re-arranged buffers mode. Added filters and more info
+          in big display; 'd' shows summary; Ctrl-F shows stats and settings.
+	- In settings mode, Ctrl-L views fsm rations
+
+0.17  Thu May 22 23:48:15 2008
+        - added format info about pgfouine's log_line_prefix
+        - Added the missing Defaults.pm file
+        - show num of default buffers TODO
+        - Ctrl-F in buffers mode, it displays statistics about checkpoints
+        - Fixed indexes mode
+        - Added 'dict' mode for text search dictionaries
+
+0.15  Thu May 15 20:37:08 2008
+        - minor display fixes
+        - Ctrl-H displays Help screen
+        - Ctrl-F appends the contents of the bottom display to /tmp/pcurse.out
+        - Ctrl-L replaces Shift-d , it displays the last 20 updates in table
+        - Ctrl-A replaces Shift-a , it analyses  a table or database
+        - Ctrl-V replaces Shift-v , it vacuums   a table or database
+        - Ctrl-R replaces Shift-r , it reindexes a table or database
+        - vacuum, and auto_vacuum dates are properly displayed
+        - In settings mode, added 'changed' that selects only the parameters
+          set differently than the default postgresql.conf (mine is from Debian)
+
+0.13  Wed May 14 10:28:45 2008
+        - fixed use 5.008 in Makefile.PL
+	- Mode databases still works, but under development
+
+
+0.12  Mon May 12 06:52:36 2008
+        - schema table is disable for user mode
+        - added extra_desc for settings mode
+        - In tables mode, 'D' displays the youngest 20 rows of table
+        - In rules mode, beautify rule definition
+        - In settings mode, settings are now searchable by context
+        - In indexes mode, changed or added more fields
+        - In procedures mode, 'D' also displays the src
+
+0.11  Wed May  9 06:48:31 2008
+        - Display postmaster start time in some modes
+        - Display txid_current in some modes
+        - Prevent crashes with restricted databases
+
+0.10  Wed May  8 09:39:46 2008
+	- In 'database' mode, 'D' displays count of objects
+	- In 'settings' mode, 'D' displays fsm rel and pages
+	- less clutter in standard 'database' mode
+	- bief summary for buffercache (if available)
+	- Schema table is disabled when not needed
+
+0.09  Wed May  7 08:55:42 2008
+	- minor code refactoring
+	- query refactoring
+
+0.08  Man May  5 06:53:22 2008
+	- Attemp to read passwd from ~/.pgpass
+	- CLI invocation enhancements
+
+0.07  Fri May  2 06:31:03 2008
+	- Renamed mode 'overview' to 'databases'
+	- Fixed calculation of row sizes 
+	- Added more fields to 'd' tables
+	- Display updates after analyze & vacuum 
+
+0.06  Man May  2 05:57:37 2008
+	- Lost of micro-features, here are some:
+	  'd' on schema display shows permissions
+	  'D' on big display shows records
+	  'A' attempts to analyze a table or database
+	  'V' attempts to vacuum a table or database
+	  Bucardo, trigger, and views modes
+	  Always display what mode we are int
+	  Better vacuum submode
+	  Prevent terminal blur on failed startup (invalid db credentials) 
+
+0.05  Man Apr 21 03:52:35 2008
+	- changed the blue screen of 'tables' to statsof()
+	- Fixed module dependacies
+
+0.04  Sun Apr 20 20:39:33 2008
+	- Added 'rules' mode
+	- Better lexer for sql stataments
+	- added ' ' in keyscan for shcema box
+	- added 'h' to un-pop the menu display
+	- added acl display for schema box
+	- The shcema choice is remembered (when possible) accross 
+          round of selections
+	- Fixed the default mode back to 'tables'
+
+0.03  Sun Apr 20 04:12:49 2008
+	- Added 'views' mode
+	- procedure arg type are shown in english names
+
+0.02  Sat Apr 19 19:08:32 2008
+	- Corrected module dependencies
+	- Fixed usage documentation
+
+0.01  Thu Apr 17 23:06:48 2008
+	- original version; created by h2xs 1.23 with options
+		-AXn Pg::Pcurse
+

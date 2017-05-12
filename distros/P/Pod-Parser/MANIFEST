@@ -1,0 +1,54 @@
+ANNOUNCE     -- announcement of end of support for this package
+CHANGES      -- Change history
+README       -- Main information file
+MANIFEST     -- This shipping list
+TODO         -- Tentative "to do" list for future development
+Makefile.PL  -- Perl Makefile template
+
+lib/Pod/InputObjects.pm -- Input objects for Pod::Parser
+lib/Pod/Parser.pm    -- The Pod::Parser module source
+lib/Pod/ParseUtils.pm -- The Pod::ParseUtils module source
+lib/Pod/Select.pm    -- The Pod::Select module source
+lib/Pod/PlainText.pm -- The Pod::PlainText module source
+lib/Pod/Find.pm      -- The Pod::Find module source
+
+scripts/podselect.PL -- Script to print selected sections of pod docs in raw
+                        pod format (a command-line interface to podselect()).
+
+t/pod/testcmp.pl      -- module used to compare output against expected results
+t/pod/testp2pt.pl     -- module used to test Pod::PlainText for a given file
+t/pod/testpchk.pl     -- module used to test Pod::Checker for a given file
+t/pod/empty.xr        -- expected result for selfcheck (empty file)
+t/pod/emptycmd.t      -- test-input file for an empty pod directive
+t/pod/emptycmd.xr     -- expected result from processing emptycmd.t
+t/pod/contains_pod.t  -- test for Pod::Find::contains_pod
+t/pod/contains_pod.xr -- test file
+t/pod/find.t          -- test for Pod::Find
+t/pod/for.t           -- test-input file for =for directives
+t/pod/for.xr          -- expected result from processing for.t
+t/pod/headings.t      -- test-input file for =head directives
+t/pod/headings.xr     -- expected result from processing headings.t
+t/pod/include.t       -- test-input file for an =included file
+t/pod/include.xr      -- expected result from processing include.t
+t/pod/included.t      -- test-input file for =including another file
+t/pod/included.xr     -- expected result from processing included.t
+t/pod/lref.t          -- test-input file for L<...> sequences
+t/pod/lref.xr         -- expected result from processing lref.t
+t/pod/multiline_items.t  -- test-input file for multiline =items
+t/pod/multiline_items.xr -- expected result from processing multiline_items.t
+t/pod/nested_items.t  -- test-input file for nested =items
+t/pod/nested_items.xr -- expected result from processing nested_items.t
+t/pod/nested_seqs.t   -- test-input file for nested interior sequences
+t/pod/nested_seqs.xr  -- expected result from processing nested_seqs.t
+t/pod/oneline_cmds.t  -- test-input file for ==cmds 
+t/pod/oneline_cmds.xr -- expected result from processing oneline_cmds.t
+t/pod/podselect.t     -- test input file for processing podselect.PL
+t/pod/podselect.xr    -- expected result from processing podselect.PL
+t/pod/selfcheck.t     -- run our own POD through podchecker
+t/pod/special_seqs.t  -- test-input file for "special" interior sequences
+t/pod/special_seqs.xr -- expected result from processing special_seqs.t
+t/pod/twice.t         -- make sure Pod::Parser is re-entrant
+t/pod/testpods/lib/Pod/Stuff.pm -- test POD for t/pod/find.t
+t/pod/contains_bad_pod.xr -- expected results
+
+META.yml                                Module meta-data (added by MakeMaker)

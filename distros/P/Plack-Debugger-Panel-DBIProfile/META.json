@@ -1,0 +1,58 @@
+{
+   "abstract" : "A DBI::Profile panel for Plack::Debugger",
+   "author" : [
+      "Dave Baird <dave@zerofive.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-Debugger-Panel-DBIProfile",
+   "prereqs" : {
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI::Profile" : "2.010494",
+            "Plack::Debugger::Panel" : "0.01",
+            "Time::HiRes" : "1.9712",
+            "parent" : "0.220",
+            "perl" : "5.008001",
+            "warnings" : "1.05_01"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.75",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/davebaird/plack-debugger-panel-dbiprofile/issues"
+      },
+      "homepage" : "https://github.com/davebaird/plack-debugger-panel-dbiprofile",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/davebaird/plack-debugger-panel-dbiprofile.git",
+         "web" : "https://github.com/davebaird/plack-debugger-panel-dbiprofile"
+      }
+   },
+   "version" : "0.01"
+}
+

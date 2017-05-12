@@ -1,0 +1,15 @@
+Build.PL
+ChangeLog
+examples/drop.pl
+lib/Privileges/Drop.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/critic.t
+t/dropuidgid.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.json

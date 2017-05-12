@@ -1,0 +1,29 @@
+---
+abstract: 'Parameterizable packages'
+author:
+  - 'mst - Matt S. Trout (cpan:MSTROUT) <mst@shadowcat.co.uk>'
+build_requires:
+  Test::Fatal: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Package-Variant
+no_index:
+  directory:
+    - t
+    - xt
+  package:
+    - string
+requires:
+  Carp: '0'
+  Import::Into: '1.000000'
+  Module::Runtime: '0.013'
+  perl: '5.006'
+  strictures: '2.000000'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Package-Variant
+  repository: git://git.shadowcat.co.uk/p5sagit/Package-Variant.git
+version: '1.003002'

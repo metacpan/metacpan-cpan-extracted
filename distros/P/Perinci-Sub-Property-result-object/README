@@ -1,0 +1,118 @@
+SYNOPSIS
+
+    In function Rinci metadata:
+
+     result => {
+         object => {
+             spec => {
+                 summary => "Account information",
+                 fields  => {
+                     id => {
+                         summary => "Account ID",
+                         schema  => ['int*', {min=>1000}],
+                         req     => 1,
+                     },
+                     name => {
+                         summary => "Account name",
+                         schema  => 'str*',
+                         req     => 1,
+                     },
+                     account => {
+                         summary => "Alias for name, for backward-compat",
+                         schema  => "str*",
+                     },
+                     plan => {
+                         summary => "Account's plan name",
+                         schema  => 'str*',
+                     },
+                     is_disabled => {
+                         summary => "Whether the account is disabled",
+                         schema  => 'bool*',
+                     },
+                     disk_usage => {
+                         summary => "Current disk usage, in MB",
+                         schema  => 'float',
+                     },
+                     bw_usage => {
+                         summary => "Current month's data transfer, in GB",
+                         schema  => 'float',
+                     },
+                 },
+             },
+             # allow_extra_fields => 0,
+             # allow_underscore_fields => 0,
+         },
+         ...
+     }
+
+DESCRIPTION
+
+    This property is similar to Perinci::Sub::Property::result::table
+    except that it describes a single row (or object a la JavaScript
+    object, or a hash):
+
+     {
+         id          => 1001,
+         name        => "steven",
+         account     => "steven",
+         plan        => "BIZ A",
+         is_disabled => 0,
+         disk_usage  => 3788,
+         bw_usage    => 120,
+     }
+
+    This module offers several things:
+
+      * (NOT YET IMPLEMENTED) When you generate documentation, the object
+      specification is also included in the documentation.
+
+      (NOT YET IMPLEMENTED, IDEA) The user can also perhaps request the
+      object specification, e.g. yourfunc --help=result-object-spec,
+      yourfunc --result-object-spec.
+
+      * (NOT YET IMPLEMENTED) The wrapper code can optionally validate your
+      function result, making sure that your resulting object/hash conforms
+      to the specification.
+
+SPECIFICATION
+
+    The value of the object property should be a DefHash. Known properties:
+
+      * spec => DEFHASH
+
+      Required. Object data specification, currently follows TableDef
+      except that the <pos> property is not used.
+
+      * allow_extra_fields => BOOL (default: 0)
+
+      Whether to allow the function to return extra fields other than the
+      ones specified in spec.
+
+      * allow_underscore_fields => BOOL (default: 0)
+
+      Like allow_extra_fields, but regulates whether to allow any extra
+      fields prefixed by an underscore. Underscore-prefixed keys
+
+FAQ
+
+ Why not use the schema property in the result property?
+
+    That is, in your function metadata:
+
+     result => {
+         schema => ['hash*', keys => {
+             id          => 'int*',
+             name        => 'str*',
+             account     => 'str*',
+             plan        => 'str*',
+             id_disabled => 'bool*',
+             disk_usage  => 'float',
+             bw_usage    => 'float',
+         },
+         req_keys => [qw/id name plan/]],
+     },
+
+    Actually you can. But with the object result property, the intent
+    becomes clearer that we want to return object/hash. And this module
+    provides the hooks for generating documentation.
+

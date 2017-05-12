@@ -1,0 +1,391 @@
+Put changes under the appropriate header. Headers can include API CHANGES, 
+DIFFERENT BEHAVIOR, BUG FIXES, DEPENDENCIES, ENHANCEMENTS, NEW FEATURES, and
+OTHER. Entries should be in chronological order, i.e. oldest at the top
+
+0.16 2014-08-25
+
+  - Fixed Changes file to conform to the spec
+
+
+
+0.15 2014-08-25
+
+  - Added a $VERSION to each module in the distribution.
+
+
+
+0.14 2014-08-25
+
+  [API CHANGES]
+  
+  - Meaningful drawing now happens in the draw_plot method. Changes in the title 
+    drawing revealed a subtle bug in the on_paint method. This bug is most 
+    easily solved by factoring the plot drawing code into its own function. 
+    Subclasses of Prima::Plot that wish to modify how the widget implements its 
+    drawing should override draw_plot, not on_paint.
+  
+  [DEPENDENCIES]
+  
+  - The latest version of Prima, v1.40, provides Prima::Drawable::Subcanvas.
+    This is needed to get proper subfigure drawing for postscript output, as
+    well as proper EPS output format.
+  
+  [DIFFERENT BEHAVIOR]
+  
+  - You can now specify the fill color for the ppair::Histogram plot type via
+    the backColor or backColors property. Normal rectangles do not appear to
+    pay any attention to this property, so now a set of bars are drawn with
+    the backColor before the rectangles are rendered.
+  
+  - As mentioned in the NEW FEATURES, it is now possible to specify the title
+    font specification with much greater precision. I have never been very happy
+    with the default title font or spacing, so with this change I have taken the
+    liberty of updating it. The font height now scales with the size of the plot
+    widget, and the title space now scales with the font size, making the title
+    size and spacing much more sensible for user interaction (i.e. resizing).
+    This is expected to have negative impacts for animations if not handled
+    carefully, but those impacts have not been benchmarked yet.
+  
+  - The rainbow palette now runs for hue values from 0 to 300 instead of 0 to
+    360. The problem with the original behavior is that the smallest and largest
+    values were nearly identical, and indistinguishable. However, it also
+    removes a sixth of the color spectrum from the palette.
+  
+  - The save-as-postscript dialog now refers to Encapsulated Postscript
+    files, with the file extension .eps. A default file extension is
+    appended if the .eps extension is missing. This usually Does What You
+    Mean, but also means that users cannot use their own file extension when
+    using the save-as-postscript dialog.
+  
+  [NEW FEATURES]
+  
+  - There is a new property for setting the title's font, called titleFont. In
+    addition to the normal settings, you can also indicate that the font size,
+    width, and/or height should be percentages of the canvas's width or height,
+    or a multiple of the canvas's font's feature.
+  
+  - The titleSpace property is now much more flexible. In additon to the integer
+    number of pixels for the title space, the property now accepts either a
+    subref that is expected to compute the titleSpace (in pixels) or a specially
+    formatted string for a set of pre-canned calculations.
+  
+  - Added tick labeling callback (thanks Vikas!). Now users can specify an
+    arbitrary tick labeling function that will be called for each tick that 
+    needs to be labeled, allowing the user to return a string with the desired 
+    label.
+  
+  - Added pal::RainbowSV to make less-than-bright rainbow palettes eaiser to
+    create.
+  
+  - Added a new Propeties dialog box and associated entry to the pop-up menu.
+    The dialog box lets the user set the title, axis labels, axis extrema,
+    and axis scaling type. Furthermore, the user can continue manipulating
+    the plot with their mouse, and the properties will automatically update
+    to the currently displayed values.
+  
+  - If you simply want to specify an axis label, you can now specify it as
+    x => $x_label rather than x => { label => $x_label }
+  
+  [ENHANCEMENTS]
+  
+  - Different means for rendering a plot on a raster image are now documented
+    and tested.
+  
+  - Added a Changes file.
+  
+  - Made file output *much* more robust. Postscript and raster file outputs now
+    give results that look nearly identical or identical compared with the
+    figure in the original plot window. Also, a window is not created
+    unnecessarily if the script only uses Prima to create the images.
+  
+  - Added proper handling of weird/bad values for annotation positions. Now, if
+    you specify a position that includes 'bad, 'inf', or 'nan', the annotation
+    machinery will Just Work, by skipping the annotation drawing.
+  
+  - Postscript output uses a feature of Prima v1.40 to set the postscript
+    output as EPS. This is important for proper rendering through LaTeX and
+    on Mac Preview.
+  
+  [BUG FIXES]
+  
+  - Fixed png and ps example scripts. These spuriously called PDL::IO::Pic due
+    some experiments I was running. These changes never should have gone into
+    the distribution. Oops.
+  
+  - The twiddle() method of Simple now does nothing if Simple's plot() method is
+    overwritten. Overwriting the plot() method is supported, but code that
+    called twiddle() after calling said overwritten plot() would cause the
+    script to hang with no way to exit the event loop.
+  
+  - The default apply() method in PDL::Graphics::Prima::Palette now correctly
+    supplies its arguments to the supplied subref.
+  
+  - Logarithmic scaling detection works for ds::Grid (fixed assignment typo).
+
+
+
+0.13 2013-03-13
+
+  [API CHANGES]
+  
+  - Deprecated lm::Hold to make way for a new limit, lm::NextTick, to be
+    developed in the future.
+  
+  - Renamed ds::Set to ds::Dist.
+  
+  - Removed pset::CDF; see ds::Dist.
+  
+  [DIFFERENT BEHAVIOR]
+  
+  - Slightly repositioned the x-axis label so that tails on letters like 'y'
+    are no longer clipped with postscript output.
+  
+  [ENHANCEMENTS]
+  
+  - Made palettes much more robust.
+  
+  - Numerous property handling improvements.
+  
+  - Reduced the number of circular dependencies (and therefore memory leaks).
+    I'm sure there are other circular references, but at least a good many of
+    them were removed.
+  
+  - Made annotation datasets more robust.
+  
+  - Axis Component objects can now have arbitrary names.
+  
+  - Improved ReadLine detection and integration, and added support for twiddling.
+  
+  - Improved binning behavior for ppair::Histogram when bin boundaries are
+    not identical.
+  
+  - Lots of documentation updates.
+  
+  [BUG FIXES]
+  
+  - Fixed non-functioning matrix_plot and imag_plot, which had been broken
+    since December of 2011!
+  
+  [NEW FEATURES]
+  
+  - Added bin types for ds::Dist, including bt::CDF, bt::Linear, bt::Log,
+    and bt::StrictLog.
+  
+  - Created ds::Dist, which inherits from ds::Pair and can use all plot types
+    from that distribution type.
+
+
+
+0.12 2013-01-21
+
+  [BUG FIXES]
+  
+  - Included PDL::Graphics::Prima::ReadLine in the MANIFEST file.
+
+
+
+0.11 2013-01-20
+
+  [BUG FIXES]
+  
+  - Inherited autoscaling now works with Callback plot type.
+  
+  [ENHANCEMENTS]
+  
+  - We now have usable postscript output, though it's not perfect.
+
+
+
+0.10 Not Released
+
+  - Another version bump gone awry.
+
+
+
+0.09 2012-08-06
+
+  [BUG FIXES]
+  
+  - Finally got save-to-image behavior working, thanks to Dmitry!
+  
+  [ENHANCEMENTS]
+  
+  - PDL::Drawing::Prima saw an extensive overhaul with the release of PDP v0.07,
+    one which handles singular as well as plural properties, and correctly
+    restores the canvas state after the drawing operation is complete. That
+    allowed me to simplify the canvas property handling in PDL::Graphics::Prima.
+    It also means that singular properties Just Work now! :-D
+
+
+
+0.08 2012-07-01
+
+  [ENHANCEMENTS]
+  
+  - Build.PL is more specific about its requirements.
+  
+  - Super-simple pairwise api functions now accept single piddles as arguments,
+    taking them as y-values and creating sequential x-values.
+
+
+
+0.07 2012-06-25
+
+  [BUG FIXES]
+  
+  - The Palette suffered a divide by zero bug when sent data with identical
+    values. Also, empty piddles sent to Palette are now handled more gracefully.
+  
+  - Linear scaling now handles degenerate input more gracefully. In particular,
+    when the data is all the same *negative* value, it now gives useful minima
+    and maxima.
+  
+  - A recent revision in x autoscaling generated a bug in y autoscaling, such
+    that y-axes would autoscale even when I explicitly set their min and/or max.
+  
+  [ENHANCEMENTS]
+  
+  - The plot constructor now accepts axis objects. Before, it only accepted a
+    hash with the axis properties.
+  
+  - Histogram autoscaling now performs the correct threaded calculations.
+  
+  [NEW FEATURES]
+  
+  - Added image_plot to the Simple interface.
+
+
+
+0.06 Not Released
+
+  - I hadn't realized that I had already incremented the version number. Oops.
+
+
+
+0.05 2012-03-15
+
+  - Minor docs typo fixes and bug fixes
+
+
+
+0.04 2012-02-29
+
+  - Added dependency on Prima in the Build.PL file
+
+
+
+0.03 2012-02-28
+
+  - Added dependency on PDL in the Build.PL file
+
+
+
+0.02 2012-02-26
+
+  - First CPAN release
+  
+  - Switched to Module::Build
+  
+  [API CHANGES]
+  
+  - Changed naming from pt::<Type> to pseq::<Type>.
+
+  - Differentiated datasets and introduced short-form dataset constructors.
+  
+  - Switched name from pseq::<Type> to ppair::<Type>.
+  
+  - Lots of naming consolidation.
+  
+  [ENHANCEMENTS]
+  
+  - Added first tests to check that the modules load.
+  
+  - Smooth axis movement.
+  
+  - Improved autoscaling.
+  
+  [NEW FEATURES]
+  
+  - Added ds::Func, ds::Image, and ds::Grid.
+  
+  - Added pimage::Basic and pgrid::matrix.
+  
+  - Preliminary postscript output.
+  
+
+
+0.01 2011-12-22
+
+  - Added pt::NGons, renamed to pt::Symbols; added lots of derived plot types;
+    added pt::TrendLines.
+  
+  - Simple API now includes plot, line_plot, circle plot, triangle_plot,
+    square_plot, diamond_plot, cross_plot, X_plot, asterisk_plot, hist_plot,
+    matrix_plot, and func_plot.
+  
+  - Right-click menu added.
+  
+  - Postscript and clipboard output added.
+
+
+
+0.00_05 2011-10-25
+
+  - Windows is now preliminarily supported.
+  
+  - DataSets are now plotted in asciibetical order, by name.
+
+
+
+0.00_04 2011-10-19
+
+  - Added PDL::Graphics::Prima::Simple and PDL::Graphics::Prima::Palette.
+  
+  - Pushed label handling from a plot responsibility to an axis responsibility.
+  
+  - Implemented collation-based autoscaling.
+
+
+
+0.00_03 2011-09-20
+
+  - Added pt::Spikes, pt::CallBack, pt::ErrorBars, pt::ColorGrid
+  
+  - Switched DataSet handling from being a tied array to a tied hash.
+  
+  - Renamed from Prima::Ex::Graph to PDL::Graphics::Prima and shuffled the files
+    into a more standard CPAN distribution layout.
+  
+  - Moved PDL::PP code into PDL::Drawing::Prima
+  
+  - Added logarithmic scaling
+
+
+
+0.00_02 2011-02-03
+
+  - First realization as a widget is completed under the name Prima::Ex::Graph.
+    The primary components of the library included Axis.pm, DataSet.pm,
+    Graph.pm, Limits.pm, PlotType.pm, Scaling.pm, and pdlprima.pd.
+  
+  - Plot types included pt::Lines, pt::Blobs, and pt::Histogram
+  
+  - Scaling.pm included linear scaling, but not yet logarithmic.
+
+
+
+0.00_01 2011-01-20
+
+  - Basic line plotting, histogram binning and drawing, and axes scaling and
+    tick drawing were prototyped in per-widget onDraw callbacks. These callbacks
+    were added systematically to a widget via the endow_widget function.
+  
+  - Very first plotting interface was a Prima::Drawable method called graph(),
+    followed shortly by an additional Drawable method called bin()
+
+
+
+0.00_00 2011-01-15
+
+  - Initially conceived as PDL::PrimaPoly, a set of PDL bindings to Prima's
+    polyline method. This would eventually grow into PDL::Drawing::Prima.

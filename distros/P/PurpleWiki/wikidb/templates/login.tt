@@ -1,0 +1,12 @@
+[% INCLUDE common/header.tt
+           title = "Login"
+%]
+
+<form method="POST" action="[% baseUrl %]" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="enter_login" value="1" />
+<p>Username: <input type="text" name="p_username"  size="15" maxlength="50" /><br />
+Password: <input type="password" name="p_password"  size="15" maxlength="50" /><br />
+<input type="submit" name="Login" value="Login" /></p>
+</form>
+
+[% INCLUDE common/footer.tt %]

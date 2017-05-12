@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: Rarian
+Description: Documentation metadata access library
+Version: 0.8.1
+Libs: -L${libdir} -lrarian
+Cflags: -I${includedir}/rarian

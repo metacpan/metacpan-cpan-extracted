@@ -1,0 +1,233 @@
+#!/usr/bin/perl -w
+use KDE;
+import KDE::app;
+
+package TestWidget;
+
+use Qt::slots 'changeOrientation()', 'changeHomo()',
+	'removeSpace()', 'addSpace()', 'addButton()',
+	'showComplexLayout()';
+
+@ISA = qw(KDE::ContainerLayout);
+
+$SIZETOFIT = 0;
+$PACK = 'packEnd';
+
+sub new {
+    my $class = shift;
+    my $orientation = shift || KDE::ContainerLayout::Horizontal;
+    my $homogeneos = shift || 0;
+    my $spacing = shift || 5;
+    my $self = $class->SUPER::new(undef, "",
+	$orientation, $homogeneos, $spacing);
+
+    $self->setStartOffset(20);
+    $self->setEndOffset(40);
+    # Pack a few buttons
+    my $b = Qt::PushButton->new($self);
+    $b->setText("orientation");
+    $self->packEnd($b);
+    $self->connect($b, 'clicked()', 'changeOrientation()');
+    $b = Qt::PushButton->new($self);
+    $b->setText("homo");
+    $self->$PACK($b);
+    $self->connect($b, 'clicked()', 'changeHomo()');
+    $b = Qt::PushButton->new($self);
+    $b->setText("+space");
+    $self->$PACK($b);
+    $self->connect($b, 'clicked()', 'addSpace()');
+    $b = Qt::PushButton->new($self);
+    $b->setText("-space");
+    $self->$PACK($b);
+    $self->connect($b, 'clicked()', 'removeSpace()');
+    $b = Qt::PushButton->new($self);
+    $b->setText("add button");
+    $self->$PACK($b);
+    $self->connect($b, 'clicked()', 'addButton()');
+
+    # make it small, since the layout mechanism will grow it apropriately ;)
+
+    $self->resize(10, 10);
+    $self->show();
+
+    return $self;
+}
+
+sub changeOrientation {
+    my $self = shift;
+    if($self->orientation == KDE::ContainerLayout::Horizontal) {
+	$self->setOrientation(KDE::ContainerLayout::Vertical);
+    } else {
+	$self->setOrientation(KDE::ContainerLayout::Horizontal);
+    }
+    $self->sizeToFit() if $SIZETOFIT;
+}
+
+sub changeHomo {
+    my $self = shift;
+    $self->setHomogeneos(!$self->homogeneos);
+    $self->sizeToFit() if $SIZETOFIT;
+}
+
+sub addSpace {
+    my $self = shift;
+    $self->setSpacing($self->spacing + 2);
+    $self->sizeToFit() if $SIZETOFIT;
+}
+
+sub removeSpace {
+    my $self = shift;
+    $self->setSpacing((($self->spacing - 2) > 0) ? $self->spacing - 2 : 0);
+    $self->sizeToFit() if $SIZETOFIT;
+}
+
+sub addButton {
+    my $self = shift;
+    my $b = Qt::PushButton->new($self);
+    $b->setText("dialogbox");
+    $b->show();
+    $self->packStart($b);
+    $self->connect($b, 'clicked()', 'showComplexLayout()');
+    $self->sizeToFit() if $SIZETOFIT;
+}
+
+sub showComplexLayout {
+    my $self = shift;
+    my $test = TopLevelTest->new;
+    $test->exec();
+    $test->delete;
+}
+
+package TopLevelTest;
+
+@ISA = qw(Qt::Dialog);
+
+sub new {
+    my $self = shift->SUPER::new(undef, "dialog", 1);
+    my $container = KDE::ContainerLayout->new($self, "topbox",
+	KDE::ContainerLayout::Vertical, 1, 0);
+    my $box = KDE::ContainerLayout->new($container, "box1",
+	KDE::ContainerLayout::Horizontal, 0, 0);
+    $box = KDE::ContainerLayout->new($container, "box2",
+	KDE::ContainerLayout::Horizontal, 0, 0);
+    my $label = Qt::Label->new($box);
+    $label->setText("container with 1,0");
+    $box->packStart($label);
+    $container->packStart($box);
+    $box->show();
+
+    $box = KDE::ContainerLayout->new($container, "box2",
+	KDE::ContainerLayout::Horizontal, 0, 0);
+    my $b = Qt::PushButton->new($box);
+    $b->setText("pack");
+    $box->packStart($b, 0, 0, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("FALSE");
+    $box->packStart($b, 0, 0, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("FALSE");
+    $box->packStart($b, 0, 0, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("0");
+    $box->packStart($b, 0, 0, 0);
+    $container->packStart($box);
+    $box->show();
+
+    $box = KDE::ContainerLayout->new($container, "box3",
+        KDE::ContainerLayout::Horizontal, 0, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("pack");
+    $box->packStart($b, 1, 0, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("TRUE");
+    $box->packStart($b, 1, 0, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("FALSE");
+    $box->packStart($b, 1, 0, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("0");
+    $box->packStart($b, 1, 0, 0);
+    $container->packStart($box);
+    $box->show();
+
+    $box = KDE::ContainerLayout->new($container, "box4",
+        KDE::ContainerLayout::Horizontal, 0, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("pack");
+    $box->packStart($b, 1, 1, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("TRUE");
+    $box->packStart($b, 1, 1, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("TRUE");
+    $box->packStart($b, 1, 1, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("0");
+    $box->packStart($b, 1, 1, 0);
+    $container->packStart($box);
+    $box->show();
+
+    $box = KDE::ContainerLayout->new($container, "box5",
+        KDE::ContainerLayout::Horizontal, 1, 0);
+    $label = Qt::Label->new($box);
+    $label->setText("container with 1,0");
+    $box->packStart($label);
+    $container->packStart($box);
+    $box->show();
+
+    $box = KDE::ContainerLayout->new($container, "box6",
+        KDE::ContainerLayout::Horizontal, 1, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("pack");
+    $box->packStart($b, 1, 0, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("TRUE");
+    $box->packStart($b, 1, 0, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("FALSE");
+    $box->packStart($b, 1, 0, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("0");
+    $box->packStart($b, 1, 0, 0);
+    $container->packStart($box);
+    $box->show();
+
+    $box = KDE::ContainerLayout->new($container, "box7",
+        KDE::ContainerLayout::Horizontal, 1, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("pack");
+    $box->packStart($b, 1, 1, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("TRUE");
+    $box->packStart($b, 1, 1, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("TRUE");
+    $box->packStart($b, 1, 1, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("0");
+    $box->packStart($b, 1, 1, 0);
+    $container->packStart($box);
+    $box->show();
+
+    $box = KDE::ContainerLayout->new($container, "box8",
+        KDE::ContainerLayout::Horizontal, 0, 0);
+    $b = Qt::PushButton->new($box);
+    $b->setText("OK");
+    $box->packStart($b, 1);
+    $self->connect($b, 'clicked()', 'accept()');
+    $container->packStart($box);
+    $box->show();
+
+    $container->show();
+
+    $self->resize(10, 10);
+
+    return $self;
+}
+
+package main;
+
+$test = TestWidget->new(KDE::ContainerLayout::Horizontal, 1, 5);
+$app->setMainWidget($test);
+$test->show();
+exit $app->exec();

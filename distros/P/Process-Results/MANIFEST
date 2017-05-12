@@ -1,0 +1,12 @@
+MANIFEST
+Changes
+META.yml
+LICENSE
+README
+Build.PL
+Makefile.PL
+t/tests.t
+lib/Process/Results.pm
+lib/Process/Results.pod
+lib/Process/Results/Holder.pod
+lib/Process/Results/Holder.pm

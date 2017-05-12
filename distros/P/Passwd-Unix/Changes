@@ -1,0 +1,43 @@
+Revision history for Perl extension Passwd::Unix.
+
+0.7	  Mon, 22 Nov 2012 18:52
+	- Fixed methods: unused_gid unused_uid.
+
+0.60  Mon, 09 May 2011 10:51:50 +0200
+	- Methods for finding free UID and GID (in a given range).
+	- Better error handling.
+	- Some little fixes.
+
+0.52  Sun, 02 Aug 2009 17:11:20 +0200
+	- Logins with a dot are now allowed.
+
+0.51  Mon, 11 May 2009 13:01:58 +0200
+	- Added support for removing users from group and gshadow files.
+
+0.5   Sat, 09 May 2009 03:10:16 +0200
+	- Fixed some typos.
+
+0.481  Fri, 08 May 2009 23:40:33 +0200
+	- Little changes in a documentation.
+
+0.48   Fri, 08 May 2009 22:21:29 +0200
+	- Some security fixes.
+
+0.47   Wed, 01 Apr 2009 15:49:04 +0200
+	- Support for gshadow file added.
+
+0.43..0.46	???
+	- Some cosmetic changes.
+
+0.42   Tue, 25 Nov 2008 20:53:52 +0100
+	- Fixed bug in 'group' method. Thanks to piaff33z.
+
+0.41   Thu May 27 23:40:55 CEST 2008
+	- Added option for many instances. Thanks to Foudil BRÉTEL for some remarks, suggestions as well as supplying relevant patch!
+
+0.40   ???
+	- Thanks to Artem Russakovskii for reporting a bug.
+	- Fixed bug in order of users.
+
+0.01   Sat Mar 16 21:20:19 EDT 2008
+	- First release.

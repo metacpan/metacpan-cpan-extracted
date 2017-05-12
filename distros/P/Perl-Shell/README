@@ -1,0 +1,113 @@
+NAME
+    Perl::Shell - A Python-style "command line interpreter" for Perl
+
+SYNOPSIS
+      C:\Document and Settings\adamk> perlthon
+      Perl 5.10.1 (Sat Oct 17 22:14:49 2009) [Win32 strawberryperl 5.10.1.0 #1 33 i386]
+      Type "help;", "copyright;", or "license;" for more information.
+      
+  >>> print "Hello World!\n";
+      Hello World!
+      
+  >>>
+
+DESCRIPTION
+    THIS MODULE IS HIGHLY EXPERIMENTAL AND SUBJECT TO CHANGE.
+
+    YOU HAVE BEEN WARNED
+
+    This module provides a lookalike implementation of a "command line
+    interpreter" for Perl, in the style of the Python equivalent.
+
+    This is part an attempt to make Perl more approachable (both in general
+    and specifically for Python programmers), partly an exercise to force
+    myself to explore Python's usability aspects, partly a way to provide
+    Strawberry Perl with a "Perl (command line)" start menu entry, and
+    partly as fodder for a funny lightning talk.
+
+    On the command line, you can start the shell with "perlthon".
+
+  Features
+    Multi-line statements are supported correctly by using PPI to detect
+    statement boundaries (something it can do very reliably).
+
+      >>> print
+      ... "Hello World!\n"
+      ... ;
+      Hello World!
+      
+  >>>
+
+    Lexical variables are supported correctly across multiple statements.
+
+      >>> my $foo = "Hello World!\n";
+      
+  >>> print $foo;
+      Hello World!
+      
+  >>>
+
+    Package scoping and state are correctly preserved across multiple
+    statments.
+
+      >>> package Foo;
+      
+  >>> sub bar {
+      ...     print "Hello World!\n";
+      ... }
+      
+  >>> Foo::bar();
+      Hello World!
+      
+  >>>
+
+FUNCTIONS
+  shell
+      Perl::Shell::shell();
+
+    The "shell" function starts up the command line shell. It takes no
+    parameters and returns when the user does an exit().
+
+    Lexical and package persistance is NOT maintained between multiple shell
+    runs.
+
+  complete
+      my $done = Perl::Shell::complete(@code);
+
+    The "complete" function takes one or more strings of Perl code (which it
+    will join as lines if there are more than one) and uses PPI to determine
+    is the code is a "complete" Perl document.
+
+    That is, does the code represent a string of Perl where the topmost
+    level of nesting ( i.e. sub { ... } ) and the end of the string marks a
+    natural statement boundary.
+
+    Returns true if the code is a complete document, or false if not.
+
+    This function is documented and supported as a convenience for other
+    people implementing similar functionality (and may be moved into PPI
+    itself at a later time).
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Perl-Shell>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+ACKNOWLEGEMENTS
+    Thanks to Ingy for suggesting that this module should exist.
+
+COPYRIGHT
+    Copyright 2008 - 2010 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

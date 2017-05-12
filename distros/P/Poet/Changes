@@ -1,0 +1,119 @@
+Revision history for Poet
+
+** denotes an incompatible change
+
+0.16  Jan 7, 2015
+
+* Fixes
+  - Fix --access-log in Poet/Server.pm (jomo666)
+
+0.15  Feb 26, 2014
+
+* Fixes
+  - respect array attribute default when no value is passed in (A Kobame)
+
+0.14  Feb 1, 2014
+
+* Fixes
+  - use Plack::Runner instead of IPC::System::Simple::run - perl-poet/issues/5 (hstaugaard)
+  - fix log documentation - RT #83627 (Allan Engelhardt)
+  - Replace deprecated Class::MOP methods with Class::Load
+
+0.13  Oct 7, 2012
+
+* Improvements
+  - Add standard error pages and 500 error response for errors in live mode
+
+* Fixes
+  - Retain response object ($m->res) when creating subrequests via $m->go and $m->visit
+
+0.12  Aug 15, 2012
+
+* Fixes
+  - Fix overriding of Conf and Import
+  - Require Mason::Plugin::Cache 0.04, for $m->cache
+  - Fix pod typos - RT #77676 (Florian)
+  - Add missing make_immutable calls
+
+* Documentation
+  - Add Poet::Plack::Request and Poet::Plack::Response to list of subclasses
+    (Tomohiro Hosaka)
+
+0.11  Jun 5, 2012
+
+* Improvements
+  - Change $env to $poet to avoid confusion for existing PSGI developers. $env still works
+    and will be supported indefinitely for backward compatibility. RT #77592 (Matt Trout)
+
+0.10  Jun 4, 2012
+
+* Improvements
+  - Add $conf->get_secure, for sensitive configuration entries
+  - Add $conf->generate_dynamic_config, for generating configuration files for external software
+
+0.09  May 15, 2012
+
+* Improvements
+  - Referring to an unknown conf key in ${interpolated} syntax throws error instead of
+    inserting blank string
+
+* Fixes
+  - Allow for older File::Path versions - RT #77206 (Gavin Carr)
+  - Fix PSGIHandler test from using the same component paths for multiple test cases
+
+0.08  May 9, 2012
+
+* Fixes
+  - Handle Log::Any::Adapter::Log4perl being missing as well
+  - Use #!/usr/bin/perl for poet, MakeMaker will adjust on install
+  - Handle .svn and .git in share/generate.skel
+
+* Documentation
+  - Fix blog article date/time issue in tutorial (Pat McNamee)
+
+0.07  May 6, 2012
+
+* Fixes
+  - Fix for Moose 2.06 - RT #76793 (doy)
+
+0.06  May 6, 2012
+
+* Fixes
+  - Require Mason 2.19
+
+* Documentation
+  - Improve clarity of tutorial (Horia Cristescu)
+  - Include tutorial files in distro, in eg/blog (Debi)
+
+0.05  May 1, 2012
+
+* Fixes
+  - Generate the appropriate shebang line in bin/*.pl via Config
+
+* Improvements
+  - Various changes to scaffolding produced by 'poet new'
+
+0.04  Apr 26, 2012
+
+* Improvements
+  - DWIM with lowercase and/or underscored argument to "poet new"
+
+* Fixes
+  - Fix #! line on get.pl (Pedro Melo)
+
+* Documentation
+  - Various documentation and generated environment tweaks
+
+* Backend
+  - Remove some files from pause indexing
+  - Switch to Test::Class::Most for all tests
+
+0.02  Apr 23, 2012
+
+- Add JSON::XS dependency, remove use of JSON.pm
+- Fix $m->cache to use Poet::Cache / MyApp::Cache
+
+0.01  Apr 20, 2012
+
+- Initial version
+

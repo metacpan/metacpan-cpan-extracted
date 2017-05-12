@@ -1,0 +1,48 @@
+NAME
+    Plack::Middleware::LogWarn - converts to warns to log messages
+
+VERSION
+    version 0.001002
+
+SYNOPSIS
+     builder {
+        enable 'LogWarn';
+        $app;
+     }
+
+     # use it with another logger middleware
+
+     builder {
+        enable 'LogWarn';
+        enable 'Log4perl', category => 'plack', conf => '/path/to/log4perl.conf';
+        $app;
+     }
+
+DESCRIPTION
+    LogWarn is a "Plack::Middleware" component that will help you get
+    warnings into a logger. You probably want to use some sort of real
+    logging system such as Log::Log4perl and another "Plack::Middleware"
+    such as Plack::Middleware::Log4perl.
+
+CONFIGURATION
+    logger
+        optional, "coderef" that will capture warnings. By default it uses
+        "$env->{'psgix.logger'}" with a level of "warn".
+
+SEE ALSO
+    Plack::Middleware::Log4perl
+
+CREDITS
+    Thanks to Micro Technology Services, Inc. for funding the initial
+    development of this module and frew (Arthur Axel "fREW" Schmidt
+    <frioux@gmail.com>) for his extensive patience and assistance.
+
+AUTHOR
+    Geoffrey Darling <geoffreydarling@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Geoffrey Darling.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

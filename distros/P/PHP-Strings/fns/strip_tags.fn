@@ -1,0 +1,49 @@
+docs: |
+    You really want L<HTML::Scrubber>.
+
+    This function tries to return a string with all HTML
+    tags stripped from a given string. It errors on the
+    side of caution in case of incomplete or bogus tags.
+
+    You can use the optional second parameter to specify
+    tags which should not be stripped. 
+
+    For more control, use L<HTML::Scrubber>.
+
+synopsis: my $clean = strip_tags( $html, '<a><b><i><u>' );
+
+requirements:
+   HTML::Scrubber: 0.06
+   HTML::Entities: 1.27
+
+code: |
+    sub strip_tags
+    {
+        require HTML::Scrubber;
+        require HTML::Entities;
+
+        my ( $html, $allowed ) = validate_pos( @_,
+            STRING,
+            {
+                %{+STRING},
+                optional => 1,
+                regex => qr{^(<\w+>)+$},
+            },
+        );
+
+        my @allow = ();
+        @allow = $allowed =~ /<(\w+)>/g if defined $allowed;
+
+        my $scrubber = HTML::Scrubber->new(
+            @allow ? ( allow => \@allow ) : ()
+        );
+
+        $scrubber->$_(1) for qw( comment process script style );
+
+        $scrubber->default(
+            undef,
+            { '*' => 1 },
+        );
+
+        return HTML::Entities::decode_entities( $scrubber->scrub( $html ) );
+    }

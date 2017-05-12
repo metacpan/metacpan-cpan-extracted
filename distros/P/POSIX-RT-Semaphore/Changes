@@ -1,0 +1,59 @@
+Revision history for Perl extension POSIX::RT::Semaphore.
+
+BV := Bijan Vakili <bvakili#oanda_com>
+ER := Eric Rybski <rybskej#yahoo_com>
+
+0.05 Thu May 21 20:48:11 2009
+	- version 0.05
+	- portability: ppport.h updated to perl-5.10, Makefile.PL favors librt
+	  by default, hints/ files updated appropriately; this should fix
+	  linking on FreeBSD and Solaris (thx BV).
+	- Semaphore.xs:  use HAVE_SEM_* defines to determine feature set, as
+	  Makefile.PL now searches for actually present functions (nod to
+	  Net-Pcap).  Export _SC constants.
+	- Semaphore.pm/POD: Note FreeBSD 14 character name limit, correct
+	  NSEMS typo, document _SC constants.
+	- t/: verify _SC macro export, use shorter semaphore names (thx BV), 
+	  accomodate Darwin's ENOSYS sem_getvalue().
+
+0.04 Sun Aug 7 00:40:43 2006
+	- version 0.04
+	- Semaphore.pm: Update CAVEATs with portability concerns.  Remove
+	  debugging prints from 0.03.
+	- t/: util.pl accomodates dec_osf name choice.  No lingering named psems
+	  on system.  fork-* silence child's Test::More output.  skip-count
+	  cleanup following much varied ENOSYS exposure.  Beware SIGSYS, though.
+	- hints/:  Initial hints dir:  solaris, hpux and dec_osf support.
+
+0.03 Sat Aug 5 13:14:20 2006
+	- version 0.03
+	- Anonymous sems allocated in anon, shared memory if possible
+	  (MAP_SHARED or mmap /dev/zero).
+	- Semaphore.xs: allow sem_timedwait under __CYGWIN__ (thx ER).
+	  newCONSTSUB implementation of exportables, conditionally including
+	  SEM_NAME_LEN (Darwin) and SEM_NAME_MAX (Tru64, others).
+	- Semaphore.pm: dynamically build @EXPORT_OK.  POD documents constants,
+	  attempted anon shared allocation of unnamed sems.
+	- t/: use_const.t modified to drop "no_macro" croak check.  fork-inherit
+	  tests for both named and unnamed sems.  01util.t modified to sidestep
+	  older Test::More installations.  ctors.t works around cygwin
+	  implementation.
+
+0.02  Thu Jul 19 00:45:52 2006
+	- version 0.2
+	- restructure named and unnamed psems as classes with a common virtual
+	  ancestor class.  Calling the "wrong" deallocator (e.g.,
+	  $named_sem->destroy) still croaks, but now b/c the requested method is
+	  not found, rather than as a safety precaution.
+	- getvalue() returns undef on failure
+	- SIZEOF_SEM_T (undocumented)
+	- Semaphore.xs: check _POSIX_TIMEOUTS for timedwait() and __CYGWIN__
+	  for unlink() (thx ER).  General legibility improvements.
+	- Semaphore.pm: POD cleanup
+	- t/:  corrected *cough* boolean inversion in tests (thx ER).
+	  Substantially expanded test suite.
+
+0.01  Sun Oct 19 20:02:08 2003
+	- original version; created by h2xs 1.22 with options
+		-cn POSIX::RT::Semaphore
+

@@ -1,0 +1,8 @@
+Revision history for Pod-Simpler-Aoh
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.05    23/03/2017
+        - Fix for the failing tests. 
+        - decides on this occasion to remove the switch statement and replaces with an if/else.

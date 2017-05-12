@@ -1,0 +1,27 @@
+---
+abstract: 'A simple web viewer for PAR::Repository'
+author:
+  - '-2008 by Steffen Mueller <smueller@cpan.org>'
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: PAR-Repository-Web
+no_index:
+  directory:
+    - inc
+    - t
+    - examples
+    - examples
+requires:
+  Catalyst::Action::RenderView: 0
+  Catalyst::Plugin::ConfigLoader: 0
+  Catalyst::Plugin::Static::Simple: 0
+  Catalyst::Runtime: 5.7014
+  Config::General: 0
+  PAR::Repository::Client: 0.18
+  PAR::Repository::Query: 0.13
+  parent: 0
+version: 0.01

@@ -1,0 +1,133 @@
+<style type="text/css">
+<!--
+
+
+.dummy_class_for_firefox { color: white; }
+.wo {
+	color: #999999;
+}
+.tl {
+	color: #9900FF;
+}
+.su {
+	color: #9900FF;
+}
+.sg {
+	color: #999999;
+}
+.re {
+	color: #9900FF;
+}
+.pg {
+	color: #990000;
+}
+.pd {
+	color: #008080;
+}
+.op {
+	color: #DD7700;
+}
+.nm {
+	color: #990000;
+}
+.mt {
+	color: #9900FF;
+}
+.mg {
+	color: #0099FF;
+}
+.ll {
+	color: #999999;
+}
+.ln {
+	color: #666666;
+}
+.kw {
+	color: #0000FF;
+}
+.ip {
+	color: #999999;
+}
+.ht {
+	color: #FF0000;
+}
+.hc {
+	color: #FF0000;
+}
+.hd {
+	color: #FF0000;
+}
+.db {
+	color: #999999;
+}
+.co {
+	color: #FF0000;
+}
+.ct {
+	color: #008080;
+}
+.cs {
+	color: #339999;
+}
+
+.popupdiv {
+    font-family: fixed, Courier;
+    font-size: 8pt;
+    font-style: normal;
+    /* lineheight: 10pt; */
+    border:solid 1px #666666;
+    padding:4px;
+    position:absolute;
+    z-index:100;
+    visibility: hidden;
+    color: black;
+    top:10px;
+    left:20px;
+    width:auto;
+    height:auto;
+    background-color:#ffffcc;
+    layer-background-color:#ffffcc;
+/*    opacity: .9;
+    filter: alpha(opacity=90); */
+    overflow : hidden;	// to keep FF on OS X happy
+}
+
+.folddiv {
+    position: absolute;
+    visibility: hidden;
+    overflow : hidden;	// to keep FF on OS X happy
+}
+
+.bodypre {
+    font-family: fixed, Courier;
+    font-size: 9pt;
+    line-height: 13pt;
+    text-align: left;
+    color:  black;
+}
+
+.lnpre {
+    font-family: fixed, Courier;
+    font-size: 9pt;
+    line-height: 13pt;
+    text-align: right;
+    color: #666666;
+}
+
+.foldfill {
+    font-family: fixed, Courier;
+    font-size: 8pt;
+    font-style: italic;
+    line-height: 13pt;
+    color: blue;
+}
+
+.foldbtn {
+    font-family: fixed, Courier;
+    font-size: 9pt;
+    line-height: 13pt;
+    color: blue;
+}
+
+-->
+</style>

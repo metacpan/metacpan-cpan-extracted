@@ -1,0 +1,82 @@
+Revision history for Parse-Syslog-Mail
+
+0.17    2008.09.11 - Sebastien Aperghis-Tramoni (SAPER)
+        [TESTS] Modified t/10fields.t to adapt to some cases.
+
+0.16    2008.04.16 - Sebastien Aperghis-Tramoni (SAPER)
+        [BUGFIX] Handle records where local hostname is replaced by the
+        host IP address, thanks to a report from Imacat.
+
+0.15    2008.03.27 - Sebastien Aperghis-Tramoni (SAPER)
+        [FEATURE] Handle clone records, thanks to a report from Imacat.
+        [TESTS] t/10fields.t now accepts files in argument, for running
+        the tests only on these.
+
+0.14    2008.01.06 - Sebastien Aperghis-Tramoni (SAPER)
+        [TESTS] Modified t/cpan-rt-28807.t so it passes on CPAN Testers
+        smoke boxes.
+
+0.13    2008.01.05 - Sebastien Aperghis-Tramoni (SAPER)
+        [TESTS] Fixed t/10fields.t and t/11values.t so their pass
+        under old Perls where glob() is broken under taint mode.
+
+0.12    2008.01.04 - Sebastien Aperghis-Tramoni (SAPER)
+        [BUGFIX] CPAN-RT#28807: Logs of bounced mails were not 
+        correctly parsed. Thanks to salagadoola.
+        [DOC] Modified the email addresses in order to avoid spam.
+
+0.11    2007.02.14 - Sebastien Aperghis-Tramoni (SAPER)
+        [TESTS] Fixed t/03diag.t to avoid locale problems.
+        [TESTS] Fixed t/podspell.t
+        [TESTS] Added taint check to most test scripts.
+        [DOC] Added pointer to an small article by Philippe Bruhat.
+
+0.10    2007.01.07 - Sebastien Aperghis-Tramoni (SAPER)
+        [FEATURE] Removed an overzealous check to allow all the input 
+        that Parse::Syslog can handle. 
+        [TESTS] Fixed t/10fields.t and t/11values.t to avoid warnings.
+        [DOC] Fixed a Pod nit.
+
+0.09    2005.08.13 - Sebastien Aperghis-Tramoni (SAPER)
+        [FEATURE] Added support for a specific case of Sendmail logs 
+        (ruleset=%s, arg1=%s) in order to gather that information.
+        [FEATURE] Added support for recognized other kinds of status.
+        [TESTS] Modified 03diag.t so that it skips if one of Test::Warn or 
+        Test::Exception is not installed.
+
+0.08    2005.08.03 - Sebastien Aperghis-Tramoni (SAPER)
+        [BUGFIX] D'oh! Non mailer related lines were not skipped...
+        [TESTS] Reduced the number of read lines in 10fields.t
+
+0.07    2005.07.25 - Sebastien Aperghis-Tramoni (SAPER)
+        [BUGFIX] Previous release was broken regarding Sendmail/Postfix logs.
+        [FEATURE] Added primitive support for Courier logs (UNTESTED)
+
+0.06    2005.07.24 - Sebastien Aperghis-Tramoni (SAPER)
+        [FEATURE] Added support for Qmail logs. Thanks to Laurent Bauer for 
+        providing excerpts.
+
+0.05    2005.07.13 - Sebastien Aperghis-Tramoni (SAPER)
+        [BUGFIX] Now skipping a few more garbage lines.
+        [TESTS] Improved t/10fields.t in order t oexecute tests with local logs.
+        [DOC] Updated documentation.
+
+0.04    2005.06.04 - Sebastien Aperghis-Tramoni (SAPER)
+        [BUGFIX] CPAN-RT#12775 (Jason T Hardy): Odd number of elements in hashref 
+        because of map and split bug
+        [FEATURE] Now restricting fields names to words (/^[\w-]$/)
+        [TESTS] Renamed t/10parse.t to t/11values.t
+        [TESTS] Added t/10fields.t
+
+0.03    2005.04.07 - Sebastien Aperghis-Tramoni (SAPER)
+        [BUGFIX] Parsing was improved a bit.
+        [TESTS] Improved t/01api.t
+
+0.02    2005.04.03 - Sebastien Aperghis-Tramoni (SAPER)
+        [TESTS] Corrected t/01api.t
+        [TESTS] Added t/03diag.t, t/10parse.t
+        [DOC] Updated documentation.
+
+0.01    2005.03.21 - Sebastien Aperghis-Tramoni (SAPER)
+        First version, released on an unsuspecting world.
+

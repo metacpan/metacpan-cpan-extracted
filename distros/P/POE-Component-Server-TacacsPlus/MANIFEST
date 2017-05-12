@@ -1,0 +1,15 @@
+Changes
+examples/client.pl
+examples/log4perl.conf
+examples/server.pl
+examples/userdb.txt
+lib/POE/Component/Server/TacacsPlus.pm
+lib/POE/Filter/TacacsPlus.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-distribution.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

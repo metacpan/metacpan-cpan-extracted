@@ -1,0 +1,45 @@
+<HTML>
+<HEAD>
+<TITLE>Head 1 text</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff" TEXT="#000000">
+<H1><A NAME="HEAD1">HEAD1
+
+</A></H1>
+
+<P>Head 1 text
+
+</P><H2><A NAME="HEAD2">HEAD<I>2</I>
+
+</A></H2>
+
+<P>Head2 <B>text</B>
+
+</P>
+<PRE>    +------------------------------+
+    | This is a verbatim paragraph |
+    +------------------------------+
+
+
+    +----------------------------------+
+    | Anda nother verbatim paragraph   |
+    +----------------------------------+
+
+    +----------------------------------+
+    | Stella nother verbatim paragraph |
+    +----------------------------------+
+</PRE>
+<H3><A NAME="HEAD3">HEAD3
+    
+</A></H3>
+
+<P>Sub head
+
+</P><H4><A NAME="HEAD4">HEAD4
+
+</A></H4>
+
+<P>Sub sub head
+</P>
+</BODY>
+</HTML>

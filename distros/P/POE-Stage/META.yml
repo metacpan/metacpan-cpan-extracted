@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               POE-Stage
+version:            0.060
+abstract:           a prototype of a successor to POE::Component
+author:
+    - Rocco Caputo <rcaputo@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Attribute::Handlers:  0.78
+    Devel::LexAlias:      0.04
+    Hash::Util::FieldHash:  1.03
+    Lexical::Persistence:  0.95
+    Net::DNS:             0.53
+    PadWalker:            1
+    POE:                  1.007
+    Scalar::Util:         1.18
+    Test::More:           0
+resources:
+    license:     http://dev.perl.org/licenses/
+    repository:  http://thirdlobe.com/svn/poe-stage/trunk
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

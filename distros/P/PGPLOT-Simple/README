@@ -1,0 +1,44 @@
+PGPLOT-Simple version 0.05
+==========================
+
+PGPLOT::Simple is a simple interface to the PGPLOT library ala Perl, making
+simple things easy and difficult things possible.
+
+Why simple? Because it has a simple and intiutive interface to the most common
+things you will need from PGPLOT, but also allowing you low-level access to
+the PGPLOT Library.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Perl modules:
+
+  PGPLOT 2.18
+  Carp
+  List::Util
+  List::MoreUtils
+  Scalar::Util
+
+Libraries:
+
+  PGPLOT Fortran Library 5.2
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2007 by Florian Merges <fmerges@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

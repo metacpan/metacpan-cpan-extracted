@@ -1,0 +1,58 @@
+Prospect version 0.92
+=====================
+
+Prospect:: is an application programmer interface (API) to the PROSPECT Pro threading application.
+The modules provide for program execution, results parsing, multiple sequence alignments inferred 
+from pairwise sequence-structure alignments, and rudimentary homology models. 
+
+For more information on PROSPECT Pro:
+Kim, D., Xu, D., Guo, J., Ellrott, K. and Xu, Y. (2003) PROSPECT II: Protein structure prediction 
+method for genome-scale applications. Protein Eng., 16(9), 641-50. Commercial versions available 
+from Bioinformatics Solutions, Inc. (http://www.bioinformaticssolutions.com/).
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+	 <configure the Prospect::Init module>
+   make test
+   make install
+
+CONFIGURATION
+
+After installation,
+1) configure the Prospect::Init module with your system specifics.
+2) run the bin/processPdbFiles script to generate processed PDB files.  These processed files are necessary
+for generating rudimentary backbone-only homology models in PDB format by mapping the aligned residues onto the 3D template.
+Make sure that you have defined the PROSPECT_PATH, PDB_PATH, and PROCESSED_PDB_PATH variables correctly within the
+Prospect::Init module.
+
+Something akin to this bash command will build all of processed PDB files.
+	export PROSPECT_PATH=<top-level of your prospect install>;
+	find $PROSPECT_PATH -name \*.xml | 
+	sed -e 's/^.*\///;s/\.xml$//' | 
+	xargs perl -I ../.. processPdbFiles
+
+
+DEPENDENCIES
+This module requires these other modules and libraries:
+
+- XML::Parser, XML::Simple, Digest::MD5 (available from http://www.cpan.org) and bioperl (http://www.bioperl.org). 
+
+- For remote threading, SOAP::Lite (http://www.soaplite.com/) and SOAP::Transport::HTTP::Daemon (http://www.cpan.org) are required. 
+- Colorized multiple sequence alignments requires mview (http://mathbio.nimr.mrc.ac.uk/~nbrown/mview/). 
+- Viewing sequence-structure alignments requires rasmol (http://www.openrasmol.org/).
+
+AUTHORS
+David S. Cavanaugh (cavs@gene.com) and Reece K. Hart (rkh@gene.com)
+
+FOR MORE INFORMATION
+
+see http://share.gene.com
+
+COPYRIGHT AND LICENCE
+Needs to be addded
+

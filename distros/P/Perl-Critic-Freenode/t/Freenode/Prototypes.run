@@ -1,0 +1,30 @@
+## name WithPrototype
+## failures 1
+## cut
+
+sub foo ($) { ... }
+
+## name WithSignature
+## failures 0
+## cut
+
+use feature 'signatures';
+sub foo ($foo) { ... }
+
+## name NoPrototype
+## failures 0
+## cut
+
+sub foo { ... }
+
+## name EmptyPrototype
+## failures 0
+## cut
+
+sub foo () { ... }
+
+## name SubPrototype
+## failures 0
+## cut
+
+sub foo (&;@) { ... }

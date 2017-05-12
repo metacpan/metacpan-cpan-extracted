@@ -1,0 +1,9 @@
+Revision history for Perl extension POE::Component::Client::Stomp::Utils.
+
+0.01  Tue Sep  4 13:23:35 2007
+	- original version; created by h2xs 1.23 with options
+		-AX -n POE::Component::Client::Stomp::Utils
+
+0.02  04-Apr-2011 K.Esteb
+      Updated Makefile.PL to reference Net::Stomp as a dependence.
+      

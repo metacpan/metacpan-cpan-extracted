@@ -1,0 +1,3 @@
+<h1>[%l('Registration Not Allowed')%]</h1>
+
+[%l('Registrations are not permitted from [_1]', c.request.address)%]

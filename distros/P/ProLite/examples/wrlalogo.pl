@@ -1,0 +1,75 @@
+#!/usr/local/bin/perl
+
+use lib '.';
+use Sign;
+
+$| = 1;
+
+my $s = new Sign(id=>1, device=>'/dev/ttyS0');
+
+$s->connect();
+
+print "Sending...";
+
+$s->wakeUp();
+$s->setClock();
+
+$logo1 = "<GA>".
+	"RRBBRRBBRRBBGGGGGG" .
+	"RRBBRRBBRRBBGGGGGG" .
+	"RRBBRRBBRRBBGGBBBG" .
+	"RRBBRRBBRRBBGGGGGG" .
+	"RRBBRRBBRRBBGGGGGB" .
+	"RRRRRRRRRRBBGGBBGG" .
+	"BRRRBBRRRBBBGGBBBG";
+
+$logo2 = "<GB>".
+	"BBBYYBBBBBBBBBRRBB" .
+	"GBBYYBBBBBBBBRRRRB" .
+	"GBBYYBBBBBBBBRRRRB" .
+	"GBBYYBBBBBBBRRBBRR" .
+	"BBBYYBBBBBBBRRRRRR" .
+	"BBBYYYYYYBBRRBBBBR" .
+	"GBBYYYYYYBBRRBBBBR";
+
+$logo3 = "<GC>".
+	"BBBBBBBBBBBBBBBBBB" .
+	"BBBBBYYYBBBYYYBBBB" .
+	"BBBBYBBBYBYBBBYBBB" .
+	"BBBBBYYYBBBYYYBBYB" .
+	"BBBBYBBBYBBBBBYBBB" .
+	"RBBBBYYYBBBYYYBBBB" .
+	"RBBBBBBBBBBBBBBBBB";
+
+$logo4 = "<GD>".
+	"BBBBBBBGGGGGGBBBGG" .
+	"YYYBBBBGGGGGGBBGGG" .
+	"BBBYBBBGGBBBBBBGGG" .
+	"BYYBBBBGGGGBBBBGGB" .
+	"BBBYBBBGGGGBBBBGGB" .
+	"YYYBBBBGGBBBBBBGGB" .
+	"BBBBBBBGGBBBBBBGGB";
+
+$logo5 = "<GE>".
+	"GBBGGGBBBBBBBBBBBB" .
+	"GGGGGGGBBBBBBBBBBB" .
+	"BGGBBGGBBBBBBBBBBB" .
+	"BGGBBGGBBBBBBBBBBB" .
+	"BGGBBGGBBBBBBBBBBB" .
+	"BBBBBGGBBBBBBBBBBB" .
+	"BBBBBGGBBBBBBBBBBB";
+
+$s->sendCommand($logo1);
+$s->sendCommand($logo2);
+$s->sendCommand($logo3);
+$s->sendCommand($logo4);
+$s->sendCommand($logo5);
+
+$s->setPage(1, RESET, "  <BA><BB><BC><BD><BE>  ");
+
+$s->runPage(1);
+
+print "DoneB\n";
+
+sleep 1;
+

@@ -1,0 +1,126 @@
+0.585   2014-01-15
+        - fixed use of dist-zilla (don't encode test files)
+        - omit failing XML test
+0.584   2012-10-09
+        - migrated to dist-zilla
+        - removed deprecated methods
+        - fixed sorting/holdings
+0.583   2012-03-10
+        - fixed sorting of level 2 fields
+        - renamed all_fields to fields in PICA::Record
+        - renamed (to|as)_string to string
+0.582   2012-02-02
+        - fix in winibw2pica
+0.581   2012-01-09
+        - migrated from XML::Parser to XML::SAX and improved SRU
+0.56    2011-11-02
+        - fixed some unit tests
+0.55    2010-03-23
+        - improved methods 'field' (Record) and 'update' (Record and Field)
+        - PICA::Record is now subclassable
+        - started to add statistic function to PICA::Writer and 'parsepica'
+        - fixed unAPI
+0.54    2010-02-10
+        - added the useful functions pgrep and pmap
+        - removed deprecated methods (copy_record, local_records, replace)
+        - added parameter 'config' and 'auto' in parsepica
+        - added iktLink and ppnLink for PSI sources
+        - empty fields are allowed now
+        - fixed sorting of fields and subfields
+0.53    2009-12-09
+        - minor additions to XMLParser and readpicarecord
+        - extended winibw2pica to correctly read WinIBW3 "utf8"
+        - added PICA::Source->iktQuery for PSI
+0.52    2009-10-02
+        - PICA::Record fixes and additions (replace, update, read, write, iln)
+        - minor updates in picaimport and PICA::Writer
+0.511   2009-08-18
+        - fixed make (winibw2pica was missing)
+        - removed some deprecated methods
+0.51    2009-08-17   
+        - added winibw2pica
+        - filter functions are also allowed in Record->field
+        - added some operator overloading and removed deprecated methods
+        - minor fixes in PICA::PlainParser
+        - fixed UTF-8 when reading via PSI-XML
+0.502   2009-08-05
+        - minor fixes to reduce the number of failing tests
+0.50    2009-07-28
+        - rewrote picaimport to replace picawebcat, removed Filemap
+        - added getrecord method to parse one single record from file
+        - clarified utf8 encoding/decoding and other encodings
+        - _ and $ both allowed to query subfields
+        - Combined values() and subfields() method in PICA::Record
+        - added support of Namespaces in XMLParser
+        - added PPN semantic check (only one per record)
+0.49    2009-07-17 
+        - added SQLiteStore, SOAPServer, SOAPClient and first buggy PICA+Wiki
+        - added missing method PICA::Field->occ[urrence]
+        - renamed local_records to holdings and copy_records to items
+0.48    2009-07-06
+        - enhanced pica2html.xsl with syntax highlighting
+        - added to_html() (first draft), ppn(), and epn()
+        - fixed dependency (Encode 2.33) and several bugs
+        - in PICA::Writer renamed reset_handler to output, removed writefield
+        - removed PICA::XMLWriter and use XML::Writer to write XML
+        - added PSI as PICA::Source
+0.47    2009-05-07
+        - rewrote PICA::SRUResponseParser and changed PICA::Source
+        - cqlQuery and z3950Query of PICA::Source now return a PICA::Parser
+0.46    2009-04-16
+        - added PICA::Field->purged and PICA::Record->appendif
+        - added PICA::Filemap and support of maps in picawebcat
+        - normalize whitespace in subfield values
+0.45    2009-03-05
+        - added and improved error handlers in PICA::PlainParser
+        - added support of webcat.conf config file in PICA::Store
+        - started to fix XML and Unicode output mess
+        - fixed bugs in PICA::Field (to_xml and fields without subfields)
+        - improved parsepica and picawebcat scripts (installed as executables)
+        - temporarily disabled Limit and Offset parameter
+0.43    2009-02-10
+        - updated webcat.pl command line client
+        - added example pica2bibtex.pl
+        - added limit parameter to PICA::Record->field / subfield
+        - parsers and PICA::Record->new now support IO::Handle
+        - added unAPI support in PICA::Source
+0.4     2009-01-28
+        - improved support of normalized PICA+ parsing
+        - updated PICA::Store
+0.3.9   2008-11-25
+        - renamed PICA::Webcat to PICA::Store (more generic)
+        - renamed PICA::Server to PICA::Source (more generic)
+        - In PICA::Store fixed SOAP message and added connection type
+        - simplified methods of PICA::Field
+        - added 'sf' and 'f' shortcuts
+        - added 'Offset' and 'Limit' parameter (PICA::Parser)
+        - removed 'Strict' parameter (PICA::Parser)
+        - removed special handling of empty records
+0.3.8   2008-10-08
+        - added PICA::Webcat, removed PICA::Tutorial
+        - moved examples to example directory
+        - removed PICA::Field->set_tag($tag), now tag($tag)
+        - minor changes and bugfixes in the Parser
+0.3.6   2008-03-27
+        - added Z39.50 support to parsepica.pl
+        - fixed Z39.50 client and parser
+        - added better holding handling: local_records() and copy_records()
+0.3.5   2008-03-17
+        - added SRU support to parsepica.pl
+        - Added Proceed-mode for parsers
+        - exportable functions parsedata() and parsefile()
+        - now also reads from zip files and raw dumpfiles
+0.3.4   2008-03-06
+        - added two more field syntax in PICA::Field
+        - added Z39.50 example
+0.3.2   2007-12-05
+        - avoid memory leak in PICA::Server->getPPN (caused by SRUSearchParser->new)
+        - renamed PICA::Record->fields() to PICA::Record->all_fields()
+        - renamed PICA::Record->subfields() to PICA::Record->all_subfields()
+        - added PICA::Field->copy() for cloning Fields
+        - fixed several typos in the documentation
+        - added another example with bin/gbvholdings.pl
+0.3     2007-07-20
+        - first public release
+0.2     2007-04-03
+        - first internal release

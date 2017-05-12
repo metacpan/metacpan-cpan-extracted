@@ -1,0 +1,589 @@
+========================
+2009-02-26 16:24:08 1.56
+========================
+
+  2009-02-26 16:21:41 (r140) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Changes M
+
+    ADDRESS was not being passed through to the SocketFactory as an
+    option. It does now
+
+========================
+2009-01-23 07:27:00 1.54
+========================
+
+  2009-01-23 07:23:17 (r138) by bingos
+  lib/POE/Component/Server/SimpleHTTP/PreFork.pm M; t/05_post.t M;
+  t/04_run_close.t M; t/04_run_keepalive.t M;
+  lib/POE/Component/Server/SimpleHTTP/Response.pm M;
+  lib/POE/Component/Server/SimpleHTTP/Connection.pm M;
+  lib/POE/Component/Server/SimpleHTTP.pm M; Makefile.PL M; Changes M
+
+    Move testsuite to use POE::Filter::HTTP::Parser, perltidy everything,
+    bump version
+
+===========================
+2009-01-22 08:50:54 1.53_03
+===========================
+
+  2009-01-22 08:50:31 (r136) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    Bump development release version
+
+  2009-01-22 08:49:21 (r135) by bingos
+  t/04_run_keepalive.t M; lib/POE/Component/Server/SimpleHTTP.pm M;
+  Makefile.PL M; Changes M
+
+    Ran perltidy against SimpleHTTP.pm, fixed keepalive test
+
+===========================
+2009-01-21 14:05:58 1.53_02
+===========================
+
+  2009-01-21 14:05:18 (r133) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Makefile.PL M; Changes M
+
+    Forgot the dependency on Test::POE::Client::TCP for the new tests.
+    doh.
+
+===========================
+2009-01-20 16:07:32 1.53_01
+===========================
+
+  2009-01-20 16:06:43 (r131) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    Give it a development version and ship for the CPAN Testers to smoke
+
+  2009-01-20 16:00:37 (r130) by bingos
+  t/05_post.t A; t/02_simple.t A; t/08_post.t D; t/04_run_close.t A;
+  t/04_run_keepalive.t A; t/03_pod_coverage.t D;
+  lib/POE/Component/Server/SimpleHTTP.pm M; t/03_bad_request.t A;
+  MANIFEST M; Changes M; t/99_pod.t A; t/07_bad_request.t D;
+  t/11_keepalive.t D; t/04_test_kwalitee.t D; t/05_run.t D;
+  t/99_pod_coverage.t A; Makefile.PL M; t/02_pod.t D; t/03_bad_handler.t
+  A
+
+    Houston we appear to have a refactored testsuite. Yes, it really
+    works. And consistently as well. hurrah
+
+  2009-01-19 21:23:03 (r128) by bingos
+  t/05_run.t M; t/07_bad_request.t M; t/11_keepalive.t M
+
+    Hopefully fixed mysteriously failing tests, by making the STDOUT
+    "hot" in the forked process
+
+  2009-01-19 21:07:42 (r126) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Changes M
+
+    Fix [rt.cpan.org #42444] reported by pravus
+
+========================
+2008-12-17 10:42:57 1.50
+========================
+
+  2008-12-17 10:39:28 (r124) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    Fix applied for RT #41780
+
+  2008-11-15 08:53:26 (r123) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Makefile.PL M; Changes M
+
+    Some code tidying
+
+========================
+2008-09-05 15:39:31 1.48
+========================
+
+  2008-09-05 15:36:56 (r121) by bingos; Makefile.PL M
+
+    Added makemaker_args() directive to Makefile.PL, thanks to Matt Trout
+    for that tip
+
+  2008-09-05 15:34:46 (r120) by bingos
+  lib/POE/Component/Server/SimpleHTTP/PreFork.pm M;
+  lib/POE/Component/Server/SimpleHTTP/Response.pm M;
+  lib/POE/Component/Server/SimpleHTTP/Connection.pm M;
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    Removed the FATAL => 'all' from use warnings. suggested by Andreas
+    Gudmundsson
+
+  2008-09-05 15:24:08 (r119) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Changes M
+
+    Downstream Debian patch applied RT #38743 by Martin Ferrari
+
+========================
+2008-04-14 12:09:28 1.46
+========================
+
+  2008-04-14 12:08:42 (r117) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Changes M
+
+    Fixed PROXYMODE setting handling
+
+========================
+2008-04-14 11:30:47 1.44
+========================
+
+  2008-04-14 11:27:08 (r115) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Makefile.PL M; Changes M
+
+    Added PROXYMODE setting
+
+  2008-04-03 15:18:15 (r114) by eriam
+  lib/POE/Component/Server/SimpleHTTP/Response.pm M;
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    Dont flush option added in the Response object and corrected case.
+
+  2008-02-22 01:12:35 (r113) by agaran; todo A
+
+    - BinGOs, dont kill me, but i like to have todo to consider 
+
+  2008-02-22 00:42:03 (r112) by agaran; t/11_keepalive.t M
+
+    - random port used for testing, helped for me in few cases 
+
+  2008-02-20 20:49:27 (r111) by agaran
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    - missed one letter 
+
+  2008-02-20 17:16:43 (r110) by agaran
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    - new LOG2HANDLER which is fired after servicing request 
+
+========================
+2008-02-13 08:42:59 1.42
+========================
+
+  2008-02-13 08:29:28 (r108) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Makefile.PL M
+
+    Increased the requirement of PoCo-Client-HTTP to version 0.82 as per
+    RT#33201
+
+========================
+2008-01-17 15:32:57 1.40
+========================
+
+  2008-01-17 15:31:39 (r106) by bingos
+  t/01_load.t M; lib/POE/Component/Server/SimpleHTTP.pm M; Changes M
+
+    "Fixed" the uppercase options annoyance. Hurrah. 
+
+========================
+2008-01-17 14:53:21 1.38
+========================
+
+  2008-01-17 14:45:39 (r104) by bingos
+  t/09_prefork_maxrequestperchild.t M;
+  lib/POE/Component/Server/SimpleHTTP.pm M; Changes M
+
+    Amended the test count in 09_prefork test, reported by UltraDM. 
+
+========================
+2008-01-14 21:26:41 1.36
+========================
+
+  2008-01-14 21:25:39 (r102) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Changes M
+
+    Applied a patch from Maciej Pijanka (agaran) 
+
+========================
+2008-01-09 15:29:51 1.34
+========================
+
+  2008-01-09 09:41:15 (r100) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Makefile.PL M; Changes M
+
+    Bumped required version of POE to 0.9999 to fix problem with
+    POE::Filter::HTTPD and bad requests
+
+========================
+2008-01-08 10:13:14 1.32
+========================
+
+  2008-01-08 10:11:41 (r98) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Changes M
+
+    Fixed problem with bad requests, reported by agaran
+
+========================
+2007-12-21 16:59:05 1.30
+========================
+
+  2007-12-21 16:56:40 (r96) by bingos
+  t/09_prefork_maxrequestperchild.t M;
+  lib/POE/Component/Server/SimpleHTTP.pm M; t/06_stream.t M; Makefile.PL
+  M; Changes M; t/10_prefork_stream.t M
+
+    Minor amendments prior to CPAN Release
+
+  2007-12-20 02:28:51 (r95) by leolo; Makefile.PL M
+
+    Added build_requires LWP::ConnCache
+
+  2007-12-20 02:27:49 (r94) by leolo
+  lib/POE/Component/Server/SimpleHTTP.pm M; MANIFEST M; t/11_keepalive.t
+  A
+
+    Added HTTP/1.1 keep-alive support. 
+
+    - Off by default, turn on with KEEPALIVE=>1
+
+    - Added t/11_keepalive.t to test above Created Fix_Headers() which
+    adds default response headers for both stream
+
+    and normal responses. Responses to HEAD requests shouldn't have
+    Content-Length set! Default content-type is now text/plain
+
+  2007-12-17 15:26:10 (r93) by leolo
+  t/05_run.t M; lib/POE/Component/Server/SimpleHTTP/Connection.pm M;
+  lib/POE/Component/Server/SimpleHTTP.pm M; t/06_stream.t M
+
+    Changed the on_close interface to 'SETCLOSEHANDLER' which is closer
+    to the normal SimpleHTTP interface. 
+
+  2007-12-14 20:41:39 (r92) by leolo
+  t/05_run.t M; lib/POE/Component/Server/SimpleHTTP/Connection.pm M;
+  lib/POE/Component/Server/SimpleHTTP.pm M; t/06_stream.t M
+
+    Added Server::SimpleHTTP::Connection->ID Added
+    Server::SimpleHTTP::Connection->on_close Modified t/05_run.t and
+    t/06_stream.t to test the above Documented the above
+
+========================
+2007-12-13 13:56:17 1.28
+========================
+
+  2007-12-13 13:55:58 (r90) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Changes M
+
+    Bump version for release
+
+===========================
+2007-12-13 13:05:37 1.27_03
+===========================
+
+  2007-12-13 13:05:20 (r88) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Changes M
+
+    Made setting an ALIAS optional
+
+===========================
+2007-12-13 09:45:04 1.27_02
+===========================
+
+  2007-12-13 09:44:15 (r85) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; t/06_stream.t M; Makefile.PL
+  M
+
+    Only make PoCo-Client-HTTP a build_prereq if explicitly requested or
+    Prefork support has been requested
+
+  2007-12-13 08:22:38 (r83) by bingos
+  t/05_run.t M; t/08_post.t M; lib/POE/Component/Server/SimpleHTTP.pm M;
+  t/07_bad_request.t M
+
+    Adjusted timing of the tests.
+
+========================
+2007-12-11 17:42:57 1.26
+========================
+
+  2007-12-11 17:42:24 (r81) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    Bump version for release
+
+  2007-12-11 17:40:36 (r80) by bingos
+  t/05_run.t M; t/08_post.t M; lib/POE/Component/Server/SimpleHTTP.pm M;
+  t/06_stream.t M; t/07_bad_request.t M
+
+    Refactored all tests apart from the Prefork tests to use
+    POE::Wheel::Run or equivalent instead of fork().
+
+  2007-12-11 13:42:26 (r79) by bingos; t/05_run.t M; Changes M
+
+    Refactored 05_run.t to remove fork() and use POE::Wheel::Run instead.
+
+========================
+2007-11-29 12:11:45 1.25
+========================
+
+  2007-11-29 12:10:14 (r77) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Changes M; t/07_bad_request.t
+  M
+
+    Fixed one of the test cases for MSWin32
+
+========================
+2007-11-01 15:08:54 1.24
+========================
+
+  2007-11-01 15:07:15 (r75) by bingos
+  t/05_run.t M; t/08_post.t M; lib/POE/Component/Server/SimpleHTTP.pm M;
+  t/06_stream.t M; Makefile.PL M; t/07_bad_request.t M
+
+    Changes to skip fork tests on MSWin32
+
+  2007-07-13 10:27:38 (r74) by bingos
+  t/5_run.t D; t/9_prefork_maxrequestperchild.t D; t/08_post.t A;
+  t/03_pod_coverage.t A; t/1_load.t D; t/06_stream.t A; MANIFEST M;
+  t/2_pod.t D; t/07_bad_request.t A; t/04_test_kwalitee.t A; t/05_run.t
+  A; t/09_prefork_maxrequestperchild.t A; t/8_post.t D; t/01_load.t A;
+  t/3_pod_coverage.t D; t/6_stream.t D; t/02_pod.t A;
+  t/10_prefork_stream.t M; t/7_bad_request.t D; t/4_test_kwalitee.t D
+
+    Fixed the skipall in the tests requiring IPC::Shareable. Renumbered
+    tests
+
+  2007-07-12 18:53:12 (r73) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; MANIFEST M
+
+    Made ADDRESS parameter optional, thanks to Zach Roberts for pointing
+    that out. Updated the documentation. Fixed MANIFEST
+
+  2007-07-08 09:09:11 (r72) by eriam
+  t/9_prefork_maxrequestperchild.t M; t/10_prefork_stream.t M
+
+    Added SKIP and tweaked the test that forks childs so I does not mess
+    up with Test::More
+
+  2007-07-07 20:58:46 (r71) by avinash240
+  lib/POE/Component/Server/SimpleHTTP/PreFork.pm M;
+  t/9_prefork_maxrequestperchild.t A; t/8_post.t A;
+  lib/POE/Component/Server/SimpleHTTP/Response.pm M;
+  lib/POE/Component/Server/SimpleHTTP.pm M; t/6_stream.t M;
+  t/10_prefork_stream.t A
+
+    Merging in PUSH branch, DO NOT push out to CPAN before making sure
+    test cases are Prefork aware and 7_bad_request.t pass.
+
+  2007-06-07 16:42:36 (r60) by bingos; t/3_pod_coverage.t A
+
+    Added back t/3_pod_coverage.t 
+
+  2007-04-30 23:54:04 (r51) by avinash240; t/7_bad_request.t M
+
+    Saved bad request test, which cannot be commited til new version of
+    POE is release.
+
+  2007-04-27 22:01:30 (r50) by avinash240
+  Makefile.PL M; t/7_bad_request.t A
+
+    Committing failing test case which illustrates issue with external
+    Wheel which SimpleHTTP uses for handing off HTTP::Requests to it's
+    Got_Input handler.
+
+  2007-04-27 18:37:56 (r49) by avinash240
+  t/7_stream_dont_flush.pl D;
+  lib/POE/Component/Server/SimpleHTTP/Response.pm M; t/3_pod_coverage.t
+  D; lib/POE/Component/Server/SimpleHTTP.pm M; t/6_stream.t M; Changes M;
+  t/7_stream_dont_flush.t D
+
+    Removing push branch work from trunk. It is now under branches/push.
+
+  2007-04-26 08:40:39 (r45) by eriam
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    + new api + dont_flush option + POD !!
+
+  2007-04-26 08:29:53 (r44) by eriam
+  lib/POE/Component/Server/SimpleHTTP/Response.pm M
+
+    + dont_flush option
+
+  2007-04-26 08:29:12 (r43) by eriam; t/7_stream_dont_flush.t A
+
+    ! extension name ..
+
+  2007-04-26 08:28:30 (r42) by eriam; t/7_stream_dont_flush.pl A
+
+    + new api + option for giving the user the ability to do his
+    callbacks on his own
+
+  2007-04-26 08:27:36 (r41) by eriam; t/6_stream.t M
+
+    + new api 
+
+  2007-03-21 18:20:53 (r36) by bingos; t/3_pod_coverage.t A; Changes M
+
+    Forgot to add pod_coverage test to svn
+
+========================
+2007-03-21 18:02:05 1.23
+========================
+
+  2007-03-21 17:59:56 (r34) by avinash240
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    Bumping up version number.
+
+  2007-03-21 17:54:25 (r33) by avinash240; Makefile.PL M
+
+    Fixing build requirement issues for streaming tests.
+
+========================
+2007-03-21 08:44:13 1.22
+========================
+
+  2007-03-21 08:42:20 (r31) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; MANIFEST M; Changes M
+
+    Added files to MANIFEST. Bumped version number for release. 
+
+  2007-03-20 18:39:13 (r30) by eriam; t/6_stream.t A
+
+    + test for streaming ..
+
+  2007-03-19 19:36:47 (r29) by eriam
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    + pod and modified parameters passed to the stream event (everything
+    is contained in a hash)
+
+  2007-03-19 19:34:41 (r28) by eriam; examples/stream.pl A
+
+    sample of the streaming feature
+
+  2007-03-16 10:49:44 (r27) by eriam
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    + test for streamed wheel + POST stream event to foreign session
+
+  2007-03-16 10:48:09 (r26) by eriam
+  lib/POE/Component/Server/SimpleHTTP/Response.pm M
+
+    added STREAM_SESSION to allow other POE session to register the
+    STREAM event
+
+========================
+2007-03-15 19:36:38 1.21
+========================
+
+  2007-03-15 19:35:12 (r24) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    Bumped the version number for release
+
+  2007-03-08 14:27:26 (r23) by avinash240
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    Updated POD in regards to the Log Handler session and how its
+    arguments changed based on malformed client requests.
+
+  2007-03-08 04:29:40 (r22) by avinash240
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    Server now handles malformed requests better. Will not try to
+    dispatch to a handler when receiving a malformed request.
+
+  2007-03-06 09:25:04 (r21) by bingos; Changes M
+
+    Changes updated from release. 
+
+========================
+2007-03-06 09:17:46 1.20
+========================
+
+  2007-03-06 09:14:40 (r19) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Changes M
+
+    Bumped the version number
+
+  2007-03-06 03:56:13 (r18) by avinash240
+  t/5_run.t M; lib/POE/Component/Server/SimpleHTTP.pm M
+
+    Server no longer dies if it cannot find a handler for a path, now it
+    returns a response with a 404 code along with the content '404 Not
+    Found' per RFC description.
+
+  2007-03-05 00:02:24 (r17) by avinash240
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    Server will now croak if it has a handler registered for the
+    directory but has a problem posting to it.
+
+========================
+2007-02-15 17:23:44 1.19
+========================
+
+  2007-02-15 17:22:33 (r14) by bingos
+  t/5_run.t A; lib/POE/Component/Server/SimpleHTTP.pm M; MANIFEST M
+
+    Added avinash240's test from branch/push 
+
+  2007-02-15 17:12:36 (r12) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; Changes M
+
+    Hacked to make the HEAP an object and added some methods
+
+========================
+2007-02-15 14:47:56 1.17
+========================
+
+  2007-02-15 14:46:02 (r10) by bingos; t/4_test_kwalitee.t A
+
+    Added kwalitee test. 
+
+  2007-02-15 14:45:34 (r9) by bingos
+  tools A; Changes.old A; lib/POE/Component/Server/SimpleHTTP.pm M;
+  META.yml D; MANIFEST M; tools/svn-log.perl A; Changes R
+
+    Added LOGHANDLER directive for general logging duties. Deprecated the
+    Changes to Changes.old, added svn logging for the future Changes
+    file. 
+
+  2007-02-05 21:36:44 (r8) by eriam
+  lib/POE/Component/Server/SimpleHTTP/Response.pm M
+
+    ! is_streaming
+
+  2007-02-03 19:02:35 (r7) by eriam
+  lib/POE/Component/Server/SimpleHTTP.pm M
+
+    + is_streaming needs a 1 to be initialized
+
+  2007-02-03 19:01:03 (r6) by eriam
+  lib/POE/Component/Server/SimpleHTTP/Response.pm M
+
+    ! is_streaming can now be used to test if a response is actually in
+    streaming mode
+
+========================
+2007-01-29 15:13:13 1.16
+========================
+
+  2007-01-29 15:07:26 (r4) by bingos
+  lib/POE/Component/Server/SimpleHTTP.pm M; MANIFEST M; Changes M; inc D
+
+    Kwalitee fixes
+
+  2007-01-19 16:10:20 (r1) by svn
+  README A; inc/Module A; /trunk A; lib/POE/Component/Server A;
+  inc/Module/Install/WriteAll.pm A; t A;
+  lib/POE/Component/Server/SimpleHTTP/Response.pm A; t/1_load.t A;
+  lib/POE/Component/Server/SimpleHTTP.pm A; t/2_pod.t A; inc A;
+  lib/POE/Component/Server/SimpleHTTP/PreFork.pm A; examples A;
+  inc/Module/Install.pm A; /branches A;
+  lib/POE/Component/Server/SimpleHTTP A; lib/POE/Component A;
+  inc/Module/Install/Makefile.pm A; examples/server.pl A;
+  inc/Module/Install/Metadata.pm A;
+  lib/POE/Component/Server/SimpleHTTP/Connection.pm A; inc/Module/Install
+  A; lib A; MANIFEST A; Changes A; inc/Module/Install/Fetch.pm A;
+  inc/Module/Install/Can.pm A; inc/Module/Install/Win32.pm A; META.yml A;
+  Makefile.PL A; lib/POE A; inc/Module/Install/Base.pm A; /tags A
+
+    Initial repository layout
+
+==============
+End of Excerpt
+==============

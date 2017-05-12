@@ -1,0 +1,86 @@
+SYNOPSIS
+
+       use strict;
+       use warnings;
+       use POE qw(Component::Client::Whois);
+       use Data::Dumper;
+    
+       POE::Session->create(
+            package_states => [
+                    'main' => [ qw(_start _response) ],
+            ],
+       );
+    
+       $poe_kernel->run();
+       exit 0;
+    
+       sub _start {
+         my ($kernel,$heap) = @_[KERNEL,HEAP];
+    
+         POE::Component::Client::Whois->whois( host => "whois.nic.uk",
+                                               query => 'bingosnet.co.uk',
+                                               event => '_response',
+                                               _arbitary => [ qw(moo moo moo) ] );
+         undef;
+       }
+    
+       sub _response {
+          print STDERR Dumper( $_[ARG0] );
+       }
+
+DESCRIPTION
+
+    POE::Component::Client::Whois provides a lightweight one shot
+    non-blocking RFC 812 WHOIS query to other POE sessions and components.
+    The component will attempt to guess the appropriate whois server to
+    connect to based on the query string passed.
+
+    If no guess can be made it will connect to whois.internic.net for
+    domains, whois.arin.net for IPv4 addresses and whois.6bone.net for IPv6
+    addresses.
+
+CONSTRUCTOR
+
+    whois
+
+      Creates a POE::Component::Client::Whois session. Takes two mandatory
+      arguments and a number of optional:
+
+        'query', the string query to send to the whois server; # Mandatory
+        'event', the event name to emit on success/failure; # Mandatory
+        'port', the port on the whois server to connect to, defaults to 43;
+        'session', a session or alias to send the above 'event' to, defaults to calling session;
+        'host', the whois server to query; # Automagically determined by the component
+        'referral', indicates to the poco whether to follow ReferralServer; # Default is 1
+        'referral_only', indicates whether the poco should only return the results of querying
+                         the referral server; # default is 0
+
+      One can also pass arbitary data to whois() which will be passed back
+      in the response event. It is advised that one uses an underscore
+      prefix to avoid clashes with future versions.
+
+OUTPUT
+
+    ARG0 will be a hashref, which contains the original parameters passed
+    to whois() ( including any arbitary data ), plus either one of the
+    following two keys:
+
+      'reply', an arrayref of response lines from the whois server, assuming no error occurred;
+      'error', in lieu of a valid response, this will be defined with a brief description of
+               what went wrong;
+
+    No parsing is undertaken on the returned data, this is an exercise left
+    to the reader >;]
+
+KUDOS
+
+    ketas, for first suggesting this module; buu, decay and hazard from
+    #perl @ freenode, for helpful suggestions;
+
+    This module is based on the linux whois client from
+    http://www.linux.it/~md/software/.
+
+SEE ALSO
+
+    RFC 812 http://www.faqs.org/rfcs/rfc812.html.
+

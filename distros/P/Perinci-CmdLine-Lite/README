@@ -1,0 +1,99 @@
+SYNOPSIS
+
+    #RENDER_TEMPLATE: file=>"share/templates/synopsis.txt",
+    context=>{module=>"Perinci::CmdLine::Lite"}
+
+DESCRIPTION
+
+    #RENDER_TEMPLATE: file=>"share/templates/description.txt"
+
+    Perinci::CmdLine::Lite is the default backend implementation. Another
+    implementation is the heavier Perinci::CmdLine::Classic which has a
+    couple of more features not yet incorporated into ::Lite, e.g.
+    transactions.
+
+    You normally should use Perinci::CmdLine::Any instead to be able to
+    switch backend on the fly.
+
+REQUEST KEYS
+
+    All those supported by Perinci::CmdLine::Base, plus:
+
+ATTRIBUTES
+
+    All the attributes of Perinci::CmdLine::Base, plus:
+
+ log => bool (default: from env or 0)
+
+    Whether to enable logging. This currently means setting up
+    Log::Any::Adapter to display logging (set in hook_after_parse_argv, so
+    tab completion skips this step). To produce log, you use Log::Any in
+    your code.
+
+    The default is off. If you set LOG=1 or LOG_LEVEL or
+    TRACE/DEBUG/VERBOSE/QUIET, then the default will be on. It defaults to
+    off if you set LOG=0 or LOG_LEVEL=off.
+
+ log_level => str (default: from env, or 'warning')
+
+    Set default log level. The default can also be set via
+    LOG_LEVEL/TRACE/DEBUG/VERBOSE/QUIET.
+
+ validate_args => bool (default: 1)
+
+METHODS
+
+    All the methods of Perinci::CmdLine::Base, plus:
+
+ENVIRONMENT
+
+    All the environment variables that Perinci::CmdLine::Base supports,
+    plus:
+
+ DEBUG
+
+    Set log level to 'debug'.
+
+ VERBOSE
+
+    Set log level to 'info'.
+
+ QUIET
+
+    Set log level to 'error'.
+
+ TRACE
+
+    Set log level to 'trace'.
+
+ LOG_LEVEL
+
+    Set log level.
+
+ PROGRESS => BOOL
+
+    Explicitly turn the progress bar on/off.
+
+ FORMAT_PRETTY_TABLE_COLUMN_ORDERS => array (json)
+
+    Set the default of table_column_orders in format_options in result
+    metadata, similar to what's implemented in Perinci::Result::Format and
+    Data::Format::Pretty::Console.
+
+RESULT METADATA
+
+    All those supported by Perinci::CmdLine::Base, plus:
+
+ x.hint.result_binary => bool
+
+    If set to true, then when formatting to text formats, this class won't
+    print any newline to keep the data being printed unmodified.
+
+SEE ALSO
+
+    Perinci::CmdLine::Any
+
+    Perinci::CmdLine::Classic
+
+    Perinci::CmdLine::Inline
+

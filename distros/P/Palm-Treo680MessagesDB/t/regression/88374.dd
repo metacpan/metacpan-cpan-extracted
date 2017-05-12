@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1203530313,
+          'number' => '+440200814254',
+          'time' => '17:58',
+          'date' => '2008-02-20',
+          'name' => 'John XXXX (M)',
+          'phone' => '+440200814254',
+          'device' => 'Treo 680',
+          'direction' => 'outbound',
+          'timestamp' => 1203530313,
+          'text' => 'gindevils without the "the" is better, I think. They\'re *nearly* free. About 2.5 quid a year iirc. Want me to get \'em then?',
+          'type' => '0x0002',
+          'category' => 0,
+          'id' => 7107817,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 88374
+        };

@@ -1,0 +1,45 @@
+Revision history for PERLANCAR-HTML-Tree-Examples
+
+1.0.3   2016-04-07 (PERLANCAR)
+
+	- [Removed] Remove old function alias gen_sample_html because it
+	  was not exported by Exporter::Rinci anyway after all (no
+	  metadata).
+
+
+1.000.002  2016-04-03 (PERLANCAR)
+
+	   - No functional changes.
+
+	   - Follow Examples::Generator spec.
+
+
+1.000.001  2016-04-01 (PERLANCAR)
+
+           - No data changes.
+
+           - Include overview of available sample data in POD.
+
+           - Remove unneeded argument ('backend', copy-paste leftover).
+
+           - Mention accompanying CLI: show-perlancar-sample-html-tree.
+
+
+1.000   2016-04-01 (PERLANCAR)
+
+        - Bump version number (use 3-digit minor).
+
+        - Forgot to adjust elements for size=medium1.
+
+
+0.05    2016-04-01 (PERLANCAR)
+
+        - Tweak/modify examples in PERLANCAR::Tree::Examples and
+          PERLANCAR::HTML::Tree::Examples to be more equivalent to each other.
+
+        - Synchronize version number with PERLANCAR::Tree::Examples.
+
+
+0.001   2016-04-01 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,8 @@
+Changelog for POE::Component::Server::Inet
+==========================================
+
+0.04	Tue May  6 11:59:54 BST 2008
+	- Removed kwalitee test and added License information
+
+0.02	Mon Apr 14 14:42:59 BST 2008
+	- Initial CPAN Release

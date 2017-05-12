@@ -1,0 +1,57 @@
+grp:3
+fd:3
+ifd:3
+dp:.
+ts:,
+cs:د.ج.
+ics:DZD
+csa:l
+css:1
+ns:-
+ps:+
+dtf:%A, %d %B %Y %H:%M:%S
+df:%d.%m.%Y
+tf:%H:%M:%S
+apf:
+amu:
+pmu:
+aml:
+pml:
+lm1:yanvar
+lm2:fevral
+lm3:mart
+lm4:aprel
+lm5:may
+lm6:iyun
+lm7:iyul
+lm8:avqust
+lm9:sentyabr
+lm10:oktyabr
+lm11:noyabr
+lm12:dekabr
+sm1:Yan
+sm2:Fev
+sm3:Mar
+sm4:Apr
+sm5:May
+sm6:İyn
+sm7:İyl
+sm8:Avq
+sm9:Sen
+sm10:Okt
+sm11:Noy
+sm12:Dek
+ld1:bazar günü
+ld2:birinci gün
+ld3:ikinci gün
+ld4:üçüncü gün
+ld5:dördüncü gün
+ld6:beşinci gün
+ld7:altıncı gün
+sd1:baz
+sd2:bir
+sd3:iki
+sd4:üçü
+sd5:dör
+sd6:beş
+sd7:alt

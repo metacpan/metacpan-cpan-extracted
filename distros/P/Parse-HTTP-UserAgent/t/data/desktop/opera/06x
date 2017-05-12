@@ -1,0 +1,70 @@
+[AGENT]
+
+Mozilla/5.0 (Windows 98; U) Opera 6.0 [en]
+
+'parser'           => 'opera_post',
+'strength'         => 'U',
+'os'               => 'Windows 98',
+'version_raw'      => '6.0',
+'lang'             => 'en',
+'version'          => '6.000',
+'name'             => 'Opera'
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 5.0; Windows XP) Opera 6.05 [en]
+
+'parser'           => 'opera_post',
+'os'               => 'Windows XP',
+'version_raw'      => '6.05',
+'lang'             => 'en',
+'version'          => '6.050',
+'name'             => 'Opera'
+
+[AGENT]
+
+Mozilla/4.78 (Windows XP; U) Opera 6.05 [en]
+
+'parser'           => 'opera_post',
+'strength'         => 'U',
+'os'               => 'Windows XP',
+'version_raw'      => '6.05',
+'lang'             => 'en',
+'version'          => '6.050',
+'name'             => 'Opera'
+
+[AGENT]
+
+Mozilla/5.0 (Windows XP; U) Opera 6.05 [en]
+
+'parser'           => 'opera_post',
+'strength'         => 'U',
+'os'               => 'Windows XP',
+'version_raw'      => '6.05',
+'lang'             => 'en',
+'version'          => '6.050',
+'name'             => 'Opera'
+
+[AGENT]
+
+Opera/6.05 (Windows XP; U) [en]
+
+'parser'           => 'opera_pre',
+'strength'         => 'U',
+'os'               => 'Windows XP',
+'version_raw'      => '6.05',
+'lang'             => 'en',
+'version'          => '6.050',
+'name'             => 'Opera'
+
+[AGENT]
+
+Opera/6.03 (Linux 2.4.18-4GB i686; U) [en]
+
+'parser'           => 'opera_pre',
+'strength'         => 'U',
+'os'               => 'Linux 2.4.18-4GB i686',
+'version_raw'      => '6.03',
+'lang'             => 'en',
+'version'          => '6.030',
+'name'             => 'Opera'

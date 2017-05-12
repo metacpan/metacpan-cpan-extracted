@@ -1,0 +1,21 @@
+Revision history for Parcel-Track
+
+0.005     2015-02-02 13:12:37+09:00 Asia/Seoul
+    - Update document: add Parcel::Track::KR::* link
+        - Parcel::Track::KR::Dongbu
+        - Parcel::Track::KR::Hanjin
+        - Parcel::Track::KR::KGB
+        - Parcel::Track::KR::Yellowcap
+
+0.004     2015-01-29 18:02:56+09:00 Asia/Seoul
+    - Update document: add Parcel::Track::KR::CJKorea link
+
+0.003     2015-01-28 16:14:53+09:00 Asia/Seoul
+    - Fix typo in POD document: driver private parameters
+
+0.002     2015-01-28 11:35:46+09:00 Asia/Seoul
+    - Fix typo in POD document
+    - Remove need-less comment
+
+0.001     2015-01-27 20:57:36+09:00 Asia/Seoul
+    - first release

@@ -1,0 +1,8 @@
+MANIFEST
+COPYING
+INSTALL
+Makefile.PL
+lib/Printer.pm
+lib/Printer/Win32.pm
+lib/Printer/Unix.pm
+META.yml                                 Module meta-data (added by MakeMaker)

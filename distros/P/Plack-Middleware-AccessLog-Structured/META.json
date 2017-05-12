@@ -1,0 +1,70 @@
+{
+   "abstract" : "Access log middleware which creates structured log messages",
+   "author" : [
+      "Manfred Stock <mstock@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-AccessLog-Structured",
+   "no_index" : {
+      "file" : [
+         "perlcritic.rc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime" : "0",
+            "JSON" : "0",
+            "MRO::Compat" : "0",
+            "Net::Domain" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Util::Accessor" : "0",
+            "Time::HiRes" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack::Test" : "0",
+            "Test::Class" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mstock/Plack-Middleware-AccessLog-Structured.git",
+         "web" : "https://github.com/mstock/Plack-Middleware-AccessLog-Structured"
+      }
+   },
+   "version" : "0.001000"
+}
+

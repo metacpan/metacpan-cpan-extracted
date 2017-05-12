@@ -1,0 +1,40 @@
+<html>
+    <head>
+        <title>[% c.appname | html %]</title>
+    </head>
+    <body>
+
+        <a href="/">/</a><br />
+
+        <h1>exists</h1>
+
+        <h3>auto dispatch</h3>
+
+        <a href="/">/</a><br />
+        <a href="/foo">/foo</a><br />
+        <a href="/my/">/my/</a><br />
+        <a href="/my/foo">/my/foo</a><br />
+        <a href="/my/some/">/my/some/</a><br />
+        <a href="/my/some/foo">/my/some/foo</a><br />
+        <a href="/my/some/klass/">/my/some/klass/</a><br />
+        <a href="/my/some/klass/foo">/my/some/klass/foo</a><br />
+
+        <h3>routes.pl</h3>
+
+        <a href="/item/1">/item/1</a><br />
+        <a href="/my/item/2">/my/item/2</a><br />
+        <a href="/my/some/item/3">/my/some/item/3</a><br />
+        <a href="/my/some/klass/item/4">/my/some/klass/item/4</a><br />
+
+        <h1>not exists</h1>
+
+        <a href="/bar">/bar</a><br />
+        <a href="/my">/my</a><br />
+        <a href="/my/bar">/my/bar</a><br />
+        <a href="/my/some">/my/some</a><br />
+        <a href="/my/some/bar">/my/some/bar</a><br />
+        <a href="/my/some/klass">/my/some/klass</a><br />
+        <a href="/my/some/klass/bar">/my/some/klass/bar</a><br />
+
+    </body>
+</html>

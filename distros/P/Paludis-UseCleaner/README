@@ -1,0 +1,118 @@
+NAME
+    Paludis::UseCleaner - Remove cruft from your use.conf
+
+VERSION
+    version 0.01000307
+
+SYNOPSIS
+    This module handles the core behaviour of the Use Cleaner, to be
+    consumed inside other applications.
+
+    For a "Just Use it" interface, you want paludis-usecleaner.pl and
+    Paludis::UseCleaner::App
+
+        my $cleaner = Paludis::UseCleaner->new(
+            input     => somefd,
+            output    => somefd,
+            rejects   => somefd,
+            debug     => fd_for_debugging
+            dot_trace => fd_for_dot_traces,
+          ( # Optional
+            display_ui => $object_to_handle_debug_messages
+            display_ui_class => $classname_to_construct_a_display_ui
+            display_ui_generator => $coderef_to_generate_object_for_display_ui
+          )
+        );
+
+        $cleaner->do_work();
+
+METHODS
+  do_work
+        $cleaner->do_work();
+
+    Executes the various transformations and produces the cleaned output
+    from the input.
+
+ATTRIBUTES
+  input
+        $cleaner->input( \*STDIN );
+        $cleaner->input( $read_fh );
+
+  output
+        $cleaner->output( \*STDOUT );
+        $cleaner->output( $write_fh );
+
+  rejects
+        $cleaner->rejects( \*STDOUT );
+        $cleaner->rejects( $write_fh );
+
+  debug
+        $cleaner->debug( \*STDERR );
+        $cleaner->debug( $write_fh );
+
+  dot_trace
+        $cleaner->dot_trace( \*STDERR );
+        $cleaner->dot_trace( $write_fh );
+
+  display_ui
+        $cleaner->display_ui( $object );
+
+  display_ui_class
+        $cleaner->display_ui_class( 'Some::Class::Name' );
+
+  display_ui_generator
+        $cleaner->display_ui_generator( sub {
+            my $self = shift;
+            ....
+            return $object;
+        });
+
+PRIVATE METHODS
+  __tokenize
+        my @line = __tokenize( $line );
+
+    STRIPPED: This method is made invisible to outside code after compile.
+
+  __is_empty_line
+        if( __is_empty_line(@line) ){ }
+
+    STRIPPED: This method is made invisible to outside code after compile.
+
+  __is_star_rule
+        if( __is_star_rule(@line) ){ }
+
+    STRIPPED: This method is made invisible to outside code after compile.
+
+  __tokenparse
+        my ( $spec, $use, $extras ) = __tokenparse( @line );
+
+    STRIPPED: This method is made invisible to outside code after compile.
+
+  __extract_flags
+        my ( @flags ) = __extract_flags( \@tokens );
+
+    STRIPPED: This method is made invisible to outside code after compile.
+
+  __extract_label
+        my ( $label ) = __extract_label( \@tokens );
+
+    STRIPPED: This method is made invisible to outside code after compile.
+
+  _build_display_ui_class
+        my $class = $cleaner->_build_display_ui_class();
+
+  _build_display_ui_generator
+        my $generator  $cleaner->_build_display_ui_generator();
+
+  _build_display_ui
+        my $object = $cleaner->_build_display_ui();
+
+AUTHOR
+    Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Kent Fredric <kentnl@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

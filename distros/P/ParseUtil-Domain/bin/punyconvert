@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+
+
+use Modern::Perl;
+
+use ParseUtil::Domain ':simple';
+
+my @input;
+if (@ARGV) {
+    @input = @ARGV;
+}
+else {
+    @input = <>;
+}
+
+foreach my $domain (@input) {
+    chomp $domain;
+    my $parsed;
+    local $@;
+    eval { say puny_convert($domain); };
+    if ( my $e = $@ ) {
+        print STDERR "# " . $domain . ":\t" . $e;
+    }
+}
+exit(0);
+
+__END__
+
+=head1 NAME
+
+
+=encoding utf8
+
+    punyconvert - Commandline puny encoder/decoder.
+
+=head1 USAGE
+
+    punyconvert xn--fa-hia.de
+    faß.de
+
+=head1 DESCRIPTION
+
+    This program converts domains to and from puny encoding. Useful for
+    commandline and or batch operations with text files.
+
+

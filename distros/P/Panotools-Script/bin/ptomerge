@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Panotools::Script;
+
+my $path_base = shift @ARGV;
+my $path_out = pop @ARGV;
+
+my $base = new Panotools::Script;
+$base->Read ($path_base);
+
+for my $image (@{$base->Image})
+{
+    $image->{n} = '"'. $image->Path ($path_base) .'"';
+}
+
+for my $path_extra (@ARGV)
+{
+    my $extra = new Panotools::Script;
+    $extra->Read ($path_extra);
+    for my $image (@{$extra->Image})
+    {
+        $image->{n} = '"'. $image->Path ($path_extra) .'"';
+    }
+    $base->Merge ($extra);
+}
+
+$base->Write ($path_out);
+
+__END__
+
+=head1 NAME
+
+ptomerge - merges pto projects
+
+=head1 Synopsis
+
+  ptomerge infile1.pto infile2.pto infile3.pto [...] outfile.pto
+
+=head1 DESCRIPTION
+
+Takes a list of .pto projects and joins them together into a single .pto
+project.  Projects at the begining of the list get priority, existing image
+entries are not clobbered by subsequent entries.
+
+Images are identified by file paths (n parameters).
+
+Control points are imported anyway even if points already exist in other
+projects, duplicates points are however not imported.
+
+=head1 Calling syntax
+
+  ptomerge <pto-file> <pto-file ...> <pto-file>
+
+=head1 License
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 See Also
+
+L<http://hugin.sourceforge.net/>
+
+=head1 Author
+
+Bruno Postle, E<lt>bruno (at) postle.netE<gt>
+
+=cut
+

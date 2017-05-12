@@ -1,0 +1,150 @@
+time    : Tue Aug  7 22:10:39 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:10:39 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:10:39 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:10:39 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:10:39 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:10:39 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:10:39 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:10:39 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:10:39 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:11:21 2001
+host    : tardis-a1.ee.ethz.ch
+program : ftpd
+pid     : 14025
+text    : FTPD: command: NOOP^M
+
+time    : Tue Aug  7 22:11:21 2001
+host    : tardis-a1.ee.ethz.ch
+program : ftpd
+pid     : 14025
+text    : <--- 200 
+
+time    : Tue Aug  7 22:11:21 2001
+host    : tardis-a1.ee.ethz.ch
+program : ftpd
+pid     : 14025
+text    : NOOP command successful.
+
+time    : Tue Aug  7 22:11:24 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:11:24 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:11:24 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:11:24 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:11:24 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:11:24 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:11:24 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:11:24 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:11:24 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:11:24 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Aug  7 22:12:11 2001
+host    : tardis-a3.ee.ethz.ch
+program : sshd
+pid     : 16925
+text    : Could not reverse map address 129.132.166.193.
+
+time    : Tue Aug  7 22:12:11 2001
+host    : tardis-a3.ee.ethz.ch
+program : sshd
+pid     : 16925
+text    : Accepted password for haemmluk from 129.132.166.193 port 50395
+
+time    : Tue Aug  7 22:12:14 2001
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+

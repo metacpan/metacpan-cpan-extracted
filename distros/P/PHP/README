@@ -1,0 +1,204 @@
+NAME
+    PHP - embedded PHP interpreter
+
+DESCRIPTION
+    The module makes it possible to execute PHP code, call PHP functions and
+    methods, manipulate PHP arrays, and create PHP objects.
+
+SYNOPSIS
+            use PHP;
+
+    General use
+
+            # evaluate arbitrary PHP code; exception is thrown
+            # and can be caught via standard eval{}/$@ block 
+            PHP::eval(<<EVAL);
+            function print_val(\$arr,\$val) {
+                    echo \$arr[\$val];
+            }
+
+            # evaluate PHP expressions
+            $answer = PHP::eval_return('7*(1+2+3);');
+        
+            class TestClass {
+                    function TestClass ( $param ) {}
+                    function method(\$val) { return \$val + 1; }
+            };
+            EVAL
+
+            # catch output of PHP code
+            PHP::options( stdout => sub {
+                    print "PHP says: $_[0]\n";
+            });
+            PHP::eval('echo 42;');
+
+    Arrays, high level
+
+            # create a php array
+            my $array = PHP::array;
+
+            # access pseudo-hash content
+            $array-> [1] = 42;
+            $array-> {string} = 43;
+        
+            # pass arrays to function
+            # Note - function name is not known by perl in advance, and
+            # is called via AUTOLOAD
+            PHP::print_val($array, 1);
+            PHP::print_val($array, 'string');
+
+    Arrays, low level
+
+            # create a php array handle
+            my $array = PHP::ArrayHandle-> new();
+            # tie it either to an array or a hash
+            my ( @array, %hash);
+            $array-> tie(\%hash);
+            $array-> tie(\@array);
+
+            # access array content
+            $array[1] = 42;
+            $hash{2} = 43;
+
+    Objects and properties
+
+            my $TestClass = PHP::Object-> new('TestClass');
+            print $TestClass-> method(42), "\n";
+        
+            $TestClass-> tie(\%hash);
+            # set a property
+            $hash{new_prop} = 'string';
+
+API
+    eval $CODE
+        Feeds embedded PHP interpreter with $CODE, throws an exception on
+        failure.
+
+    call FUNCTION ...
+        Calls PHP function with list of parameters. Returns exactly one
+        value.
+
+    include, include_once, require, require_once
+        Shortcuts to the identical PHP constructs.
+
+    array [ $REFERENCE ]
+        Returns a handle to a newly created "PHP::Array" object, which can
+        be accessed both as array and hash reference:
+
+                $_ = PHP::array;
+                $_->[42] = 'hello';
+                $_->{world} = '!';
+
+        If $REFERENCE is a "PHP::ArrayHandle" instance, then the newly
+        created object is a pheudo-hash alias to the PHP array behind the
+        $REFERENCE. If no $REFERENCE is given, a new PHP array is created.
+
+    PHP::Object->new($class_name, @parameters)
+        Instantiates a PHP object of PHP class $class_name and returns a
+        handle to it. The methods of the class can be called directly via
+        the handle:
+
+                my $obj = PHP::Object-> new( 'MyClass', @params_to_constructor);
+                $object-> method( @some_params);
+
+        The relevant class constructor is called, if available, according to
+        PHP specification, that is different between v4 and v5. The v4
+        constructor has identical name with the class name; the v5
+        constructor can also be named "__construct".
+
+    PHP::Entity->tie($array_handle, $tie_to)
+        Ties existing handle to a PHP entity to either a perl hash or a perl
+        array. The tied hash or array can be used to access PHP pseudo_hash
+        values indexed either by string or integer value.
+
+        The PHP entity can be either an array, represented by
+        "PHP::ArrayHandle", or an object, represented by "PHP::Object". In
+        the latter case, the object properties are represented as hash/array
+        values.
+
+    PHP::Entity->link($original, $link)
+        Records a reference to an arbitrary perl scalar $link as an alias to
+        $original "PHP::Entity" object. This is used internally by
+        "PHP::TieHash" and "PHP::TieArray", but might be also used for other
+        purposes.
+
+    PHP::Entity::unlink($link)
+        Removes association between a "PHP::Entity" object and $link.
+
+    PHP::Array->tie($self, $tie_to)
+        Same as PHP::Entity->tie, but operates on "PHP::Array" objects.
+
+    PHP::Array->handle
+        Returns PHP array handle, a "PHP::ArrayHandle" object.
+
+    PHP::options
+        Contains set of internal options. If called without parameters,
+        returns the names of the options. If called with a single parameter,
+        return the associated value. If called with two parameters, replaces
+        the associated value.
+
+        debug $integer
+            If set, loads of debugging information are dumped to stderr
+
+            Default: 0
+
+        stdout/stderr $callback
+            "stdout" and "stderr" options define callbacks that are called
+            when PHP decides to print something or complain, respectively.
+
+            Default: undef
+
+        header $callback
+            callback when PHP header() function is called, when PHP wants
+            to set a response header
+
+        version
+            Read-only option; returns the version of PHP library compiled
+            with .
+
+DEBUGGING
+    Environment variable "P5PHPDEBUG", if set to 1, turns the debug mode on.
+    The same effect can be achieved programmatically by calling
+
+            PHP::options( debug => 1);
+
+INSTALLATION
+    The module uses php-embed SAPI extension to inter-operate with PHP
+    interpreter. That means php must be configured with '--enable-embed'
+    parameters prior to using the module. Also, no '--with-apxs' must be
+    present in to configuration agruments either, otherwise the PHP library
+    will be linked with Apache functions, and will be unusable from the
+    command line.
+
+    The "sub dl_load_flags { 0x01 }" code in PHP.pm is required for PHP to
+    load correctly its extensions. If your platform does RTLD_GLOBAL by
+    default and croaks upon this line, it is safe to remove the line.
+
+WHY?
+    While I do agree that in general it is absolutely pointless to use PHP
+    functionality from within Perl, scenarios where one must connect an
+    existing PHP codebase to something else, are not something unusual.
+    Also, this module might be handy for people who know PHP but are afraid
+    of switching to Perl, or want to reuse their old PHP code.
+
+    Currently, not all of PHP functionality is implemented, but OTOH I don't
+    really expect this module to grow that big, because I believe it is
+    easier to call "PHP::eval" rather than implement all the subtleties of
+    Zend API. There are no callbacks to Perl from PHP code, and I don't
+    think these are needed, because one thing is to be lazy and not to
+    rewrite PHP code, and another is to make new code in PHP that uses Perl
+    when PHP is not enough. As I see it, the latter would kill all incentive
+    to switch to Perl, so I'd rather leave callbacks unimplemented.
+
+SEE ALSO
+    Using Perl code from PHP:
+    <http://www.zend.com/php5/articles/php5-perl.php>
+
+COPYRIGHT
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Dmitry Karasik <dmitry@karasik.eu.org>
+
+ 

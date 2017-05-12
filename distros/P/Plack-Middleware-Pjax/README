@@ -1,0 +1,76 @@
+NAME
+    Plack::Middleware::Pjax - PJAX for your Plack
+
+VERSION
+    version 1.114400
+
+SYNOPSIS
+        use Plack::Builder;
+        builder {
+            enable 'Plack::Middleware::Pjax';
+            $app
+        }
+
+DESCRIPTION
+    Plack::Middleware::Pjax adds easy support for serving chromeless pages
+    in combination with jquery-pjax. For more information on what pjax is,
+    check the SEE ALSO links below.
+
+    It does this by filtering the generated response through
+    Marpa::R2::HTML. If the x-pjax http header is set, only the title and
+    InnerHTML of the pjax-container are sent to the client.
+
+    Although you take a small processing hit adding an html parsing pass
+    into the response cycle, using Plack::Middleware::Pjax saves you from
+    adding any view specific logic in your plack applications.
+
+    See demo/ in the dist directory for a plack port of
+    <http://pjax.heroku.com/>
+
+    Thanks to the authors of rack-pjax, as it is the source of inspiration
+    (also docs and tests) for the creation of this module.
+
+DETAILS
+        <head>
+          ...
+          <script src="/javascripts/jquery.js"></script>
+          <script src="/javascripts/jquery.pjax.js"></script>
+          <script type="text/javascript">
+            $(function(){
+              $('a:not([data-remote]):not([data-behavior]):not([data-skip-pjax])').pjax('[data-pjax-container]')
+            })
+          </script>
+          ...
+        </head>
+        <body>
+          <div data-pjax-container>
+            ...
+          </div>
+        </body>
+
+    Include the above in your applications layout wrapper. When any link is
+    hit with a pushstate <http://caniuse.com/#search=pushstate/> enabled
+    browser, Plack::Middleware::Pjax will return a fragment like:
+
+        <title>foo</title>
+        bar baz
+
+SEE ALSO
+    *   <https://github.com/eval/rack-pjax>
+
+    *   Marpa::R2::HTML
+
+    *   <http://pjax.heroku.com/>
+
+    *   <https://github.com/defunkt/jquery-pjax>
+
+AUTHOR
+    Matthew Phillips <mattp@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2015 by Matthew Phillips
+    <mattp@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

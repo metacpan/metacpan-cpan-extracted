@@ -1,0 +1,94 @@
+# file: GeneratorD.eyp
+# compile with: eyapp -C GeneratorD.eyp
+# then run: ./Generator.pm
+# division checked
+%left   '-' '+'
+%left   '*' '/'
+%right  '^'
+
+%defaultaction {
+  my $parser = shift;
+
+  return Paste(@_);
+}
+
+%{
+use Test::LectroTest::Generator qw(:all);
+use base q{Parse::Eyapp::TokenGen};
+%}
+
+%%
+
+exp:
+    NUM                
+  | exp '+' exp        
+  | exp '-' exp        
+  | exp '*' exp        
+  | exp.n '/' exp.d 
+      {
+        Gen(
+          sub {
+            my ($denexp, $e);
+            do {
+              $denexp = $d->generate(); # generate an expression
+              $e = eval($denexp);       # evaluate it
+            } while ($e == 0);
+            return $n->generate()."/$denexp";
+          }
+        )
+      }
+  | exp '^' exp        
+  | '('   { $_[0]->pushdeltaweight('(' => -1, ')' => +1, '+' => +1, ); } 
+      $exp 
+    ')'
+      {
+         $_[0]->popweight; 
+         Paste(Unit("("), $exp, Unit(")"))
+      }
+;
+
+%%
+
+use Getopt::Long;
+sub main {
+  my $package = shift;
+
+  my $debug = shift || 0;
+  my $numtimes = shift || 1;
+  my $result = GetOptions (
+    "debug!" => \$debug,  
+    "times=i" => \$numtimes,  
+  );
+
+  $debug = 0x1F if $debug;
+
+  my $parser = $package->new();
+
+
+  my $expg = $parser->YYParse( 
+      # LexerGen receives the pairs 
+      #   token => [weight, generator] or token => weight
+      # and sets the weight and generator attributes of the tokens.
+      yylex => $parser->LexerGen(
+        NUM => [ 2, Int(range=>[0, 9], sized=>0)],
+        VARDEF => [ 
+                    2,  
+                    String( length=>[1,2], charset=>"A-NP-Z", size => 100 )
+              ],
+        '=' => 2, '-' => 1, '+' => 2, 
+        '*' => 4, '/' => 2, '^' => 0.5, 
+        ';' => 1, '(' => 1, ')' => 2, 
+        ''  => 2, 'error' => 0,
+      ),
+      yydebug => $debug, # 0x1F
+    );
+
+  for (1..$numtimes) {
+    my $exp = $expg->generate();
+
+    print "$exp\n";
+
+  }
+}
+
+

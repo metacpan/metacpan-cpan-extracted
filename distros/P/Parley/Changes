@@ -1,0 +1,314 @@
+This file documents the revision history for Parley.
+
+1.2.1   Wed Apr 29 19:41:25 BST 2009
+    - fix test case in t/04_forumcode.t (output no longer suffers from &quot;
+      issue)
+
+1.2.0   Wed Apr 29 19:24:12 BST 2009
+    - moved tables into "parley" namespace
+    - removed deprecated modules
+    - fixed post/view (incorrectly using unassigned stash value)
+    - upgraded YUI to 2.7.0b
+
+1.1.0   Wed Apr 22 21:53:52 BST 2009
+    - added Advanced Search page
+    - added Add This (www.addthis.com) to thread/view page
+      (if username set in configuration)
+    - modified CSS for "user information"; now the header is a fixed-width we
+      can place this div inside it (instead of flushed to the RHS of the
+      page/window)
+    - added Google Analytics (configurable via parley.conf)
+    - switch to using Catalyst::Controller::Validation::DFV for form re-fill
+    - use mk_accessors instead of home-grown rubbish
+    - added reCaptcha to signup screen
+    - added check for unique username/forumname (signup)
+    - added "Login and X" buttons in thread view
+    - removed a couple of "use base 'Catalyst::Controller'" calls for classes
+      that "use base" another module that already inherits from it
+      (result of upgrading to 5.80001)
+
+1.0.4   Wed Dec 24 18:54:24 GMT 2008
+    - fixed skin2
+    - remove yui/ softlink
+    - made yui_2.6.0/ into yui/
+
+1.0.3   Tue Dec 23 09:34:32 GMT 2008
+    - switch to database store for sessions
+    - upgrade to YUI 2.6.0
+    - use Test::Aggregate
+      - aggregate controller_*.t tests
+      - aggregate t/schema/*.t tests
+    - use HTML::ForumCode for post preview
+    - added /forumcode/preview
+    - make "Posted from a.b.c.d" a clickable link to site/ip_info
+    - CSS/layout tweaks and improvements
+    - added template skinning [beta]
+    - added example skins: skin1, skin2, skin3
+      - skin1 - CSS only
+      - skin2 - copy of all template files
+      - skin3 - one template file overridden
+    - added user "skin" preference choice
+
+1.0.2   Thu Oct  9 14:52:26 BST 2008
+    - fixed "vanishing '+' symbol" issue in Message Preview
+    - removed ->dumper() calls that were overlooked and caused fatal errors
+    - specified minimum version numbers for most dependencies
+
+1.0.1   Wed Oct  8 00:26:29 BST 2008
+    - added config options to use quote_char and name_sep in DB calls
+    - updated order_by params in searches to work with quote_char
+    - removed config block in Model::ParleyDB (it comes from parley.conf, and
+      this saves confusion)
+    - fixed CSS list (ol, ul) item display issue
+
+1.0.0   Mon Oct  6 19:08:22 BST 2008
+    - upgrade to YUI 2.5.1
+    - moved README.* into doc/
+    - added parley.sites-enabled
+    - switched from Graphics::Magick to Image::Magick
+    - resolved some bugs and errors when deploying from scratch
+    - added more comprehensive instructions for getting started
+    - updated to new Authentication and Authorization modules
+    - added recent i18n translations (.it and .nl)
+    - extended ::ForumCode to work with bbcode/explosm [URL] and [IMG] syntax
+
+
+After knackering up the version numbers towards the end of 0.59
+I've taken the bold step of declaring the next release v1.0.0
+
+
+0.59.03 Fri Apr 11 00:13:36 BST 2008
+    - removed console.log() javascript calls
+
+0.59.02 Thu Apr 10 22:56:04 BST 2008
+    - require minimum version of JSON (2.04) for to_json() method
+
+0.59.01 Thu Apr 10 22:38:43 BST 2008
+    - added Catalyst::Plugin::Authorization::Roles to Makefile.PL
+
+0.59    Thu Apr 10 18:56:19 BST 2008
+    - added Dutch translation (Thanks Rob!)
+    - forum moderators can be assigned and removed through the UI
+    - user roles can now be assigned and removed
+    - users can have their "suspended" flag set and removed
+    - application can now prevent login/signup/posting/access by IP
+    - user profile lists IPs posted from
+    - new action (site/ip_info) to list users posting from a given IP
+
+0.58    Fri Feb  8 07:47:31 GMT 2008
+    - re-work the UI design to be cleaner
+    - added an application logo
+    - more efficient database querying (a la DBIC's prefetch)
+    - added first part of .it i18n (Thanks Darius!)
+    - add browser and user driven language selection
+    - upgraded to YUI 2.4.1
+    - modify ::Schema so that we can export mysql and sqlite schemas
+    - rename DB columns to be more sensible
+    - make the display of the time zone independant of the time_format string
+    - limit thread subject length on user profile page
+    - factored out MessagePreview javascript into single included file
+    - fix uri_for() error on user/login 
+    - fix DBIC field error during lostpassword process
+    - fix DBIC field errors during signup
+    - fix issues with email notifications
+    - [bug] fix user's last post information (profile page)
+    - [bug] fix issue with forum-limited searches
+    - [bug] fix error when trying to post new thread with no subject line
+
+0.57    Wed Oct 31 19:15:06 GMT 2007
+    - added T&Cs to application
+    - added T&C editor/updater (site_moderator only)
+    - added "Accept T&C" functionality (for logged in users)
+    - after accepting T&Cs you should be taken to your original destination
+    - fixed error handling for unknown user in pwd reset
+    - after password reset, you are now taken directly to the login screen
+      and an appropriate message is displayed
+    - added extra ForumCode markup: pre, code, quote
+    - upgrade YUI to 2.3.1 (from 2.3.0)
+    - some fixes and improvements for Editable.js
+    - display extra information in Recent Posts list
+    - show forum name on thread/view page
+    - added (inline) message preview to new thread/post/reply page
+    - use COMPILE_DIR setting for Template in parley.yml
+    - add Contributors POD file
+    - UI tweaks and validation fixes
+    - added i18n support
+    - improved test suite coverage
+
+0.56    Fri Sep 14 08:44:05 BST 2007
+    - replaced Dojo toolkit with YUI toolkit
+
+0.55    Fri Aug 31 08:06:25 BST 2007
+    - users can now upload an avatar image (from my/preferences)
+    - properly fixed Password Reset process
+    - added database updating for edit-fields on "Your Details" in
+      my/preferences
+    - removed (redundant) root/static/magic/src-0.4.2/ directory
+
+0.54    Thu Aug  9 09:01:48 BST 2007
+    - fixed Password Reset process [DFV profile out of date]
+    - factored out some common functionality (DFV contraints and "intervals")
+    - added "<interval> ago" to post information displayed in thread/view
+    - fix bug where we don't store IP for thread/add (first post)
+    - added paging to forum/view page
+    - added paging to thread/recent page
+    - added thread/watches; moving functionality out of my/preferences
+    - added initial help pages
+    - more UI, layout and CSS modifications
+
+0.53    Wed Jul  4 08:55:12 BST 2007
+    - added a basic profile page for users
+    - added more missing dependencies to Makefile.PL
+    - added more time/TZ options for user
+    - automatically add thread-watch on new thread/post
+      (checkbox value defaults to appropriate pref value for user)
+    - fixed output when no threads are watched (Watches in Preferences)
+    - fix for bug with person.preference not being set when new user is created
+    - improved preference screen (time, watch info, notifications)
+    - improved Template::Plugin::ForumCode (markup and docs)
+    - improve form handling for prefs
+    - navigation is now through the dojo menu widget; #navigation and #extra areas are now empty
+    - person preference data now created at sign-up time
+    - preferences are now in a tabbed container
+    - reimplemented post/edit
+    - reimplemented post/edit (lost in the 0.5 rewrite)
+    - schema tweaks and fixes
+    - store the IP address of each post author
+    - tidied up CSS and layout
+
+0.52    Fri May  4 19:00:32 BST 2007
+
+    - added DB configuration to parley.yml
+    - added missing dependencies to Makefile.PL
+    - added Quick Start guide
+
+0.51    Fri May  4 08:27:57 BST 2007
+
+    - added initial moderator code
+    - added moderator actions on forum/thread views (lock/stick)
+    - moderators can lock threads at posting time (lock + reason)
+    - raise error when trying to reply to a locked thread (prevent "Evil Hackers" replying)
+    - hide Reply and Quote buttons for locked thread
+    - added pager and reply button to bottom of thread/view
+    - added "Thread Locked" to thread/view if thread is locked
+    - added thread/recent for list of all recently updated threads
+    - added thread/recent?forum=X for list of all recently updated threads in a
+      given forum
+    - post_count for forums now incremented with new posts
+    - basic search functionality added
+
+0.50    Thu Apr  5 08:31:04 BST 2007
+
+    THIS RELEASE ENCOMPASSES A GROUND-UP RE-WRITE. Previous functionality may
+    not yet have been re-implemented.
+
+    - written email daemon to send queued Parley emails
+    - thread-watchers now get an email queued to tell them there's something to
+      read
+    - login_if_required() now uses detach() instead of redirect()
+    - last_post_in_list() [Schema::Post] no longer uses slice()
+    - try to display user avatar image in a [% TRY/CATCH %] block, showing
+      nothing if it fails (i.e. user has no avatar)
+    - update DFV profile for DFV 4.50
+    - logged-in users get bounced from user/signup to the default_uri
+    - moved send_email() out to Parley::Communication::Email
+    - send_email() now uses queue_email() to insert pending emails into
+      database queue instead of sending immediately
+    - consolidate schema and patches
+    - add email_queue table to database and modify
+      Schema::EmailQueue accordingly
+    - fix post/view to work with [new?] uri_for() syntax
+    - re-implement, starting from a fresh call to catalyst.pl
+    - use Schema based model
+    - general tidy-up of existing methods
+
+    - thread/add: start work on new message notification
+    - thread/watch: set/remove a watch on a thread (in preparation for
+      notification emails)
+    - thread/next_post: continue reading a thread from where you last saw it
+    - thread/view: if logged in keep track of thread viewing progress
+    - started moving from Prototype to Dojo
+    - added thread_post_count(), thread_position() and page_containing_post()
+      to Post model class
+    - added /post/view action, used to redirect to a thread page containing the
+      specified post
+    - /thread/view now detach()es to /post/view if we have a current_post in
+      the stash
+
+0.09  Thu May 11 17:50:07 BST 2006
+    - make email column unique
+      ** this may cause problems if you already have a large amount of user data **
+    - added lost password functionality in Controller::User::LostPassword
+    - factored signup functionality out into Controller::User::SignUp
+    - start moving towards use of <fieldset> instead of <table> for form layout
+    - use a floating loginbox instead of a separate screen (as inspired by
+      calendarhub.com)
+    - added visual feedback when TZ preference is updated
+    - show time-formatting sample in my/preferences
+    - store the referer when visiting my/preferences making it easier to return
+      to where we were previously
+    - added about/modules, an easier way to obtain version information for
+      loaded modules
+    - modify log-in check in auto() to use Auth::DBIC calling style
+    - use ConfigLoader plugin to load application config
+    - add authed_user() function, and alter instances of
+      $c->session->{authed_user} accordingly
+    - added new function to Parley::App::Helper - application_email_address()
+    - update dependencies/versions in Makefile.PL
+    - added Template::Plugin::ForumCode (not all BBCode functionality is
+      complete yet)
+    - use ForumCode plugin to process various display elements
+    - email from-address for emails is now set in config file
+    - new helper function application_email_address()
+    - small layout fixes
+    - change name of session file
+    - ammend statusbar and post-edit templating to work correctly with new
+      storage location of authed_user object
+
+0.08  Tue Jan 31 08:54:32 GMT 2006
+    - move to using uri_for(...) in redirects
+    - hide per-post actions in a locked thread
+    - allow users to edit their own posts
+    - show if a post has been edited
+    - added paging for long threads (fixed to 10 posts/thread for the moment)
+    - if we have a post when viewing thread, go to last page in thread
+      [ideally we'd like to go to the page containing the post, but we don't
+      know how to work this out yet]
+
+0.07  Thu Jan 26 08:49:19 GMT 2006
+    - added preference table to main schema
+    - added patch file for moving from 0.06 to 0.07 db schema
+    - nicedate() sets timezone to value in user's preference
+    - added my/preferences page, to allow setting of timezone area
+    - fixed behaviour with login_if_required() in auto()
+    - store updated and valid timezone prefs
+    - update schema to include new columns (post.reply_to, person.last_post,
+      person.post_count)
+    - update person.count after a new post or reply
+    - alter thread view layout and include post count for person
+    - store user's last post (not sure why we might want this, it just feels
+      useful)
+    - make "reply to post" button work as expected
+    - allow users to quote a previous reply, and display quoted text with post
+      in thread view
+
+0.06  Sun Jan 22 23:14:31 GMT 2006
+    - added and updated module dependencies in Makefile.PL
+    - added application warning if using known 'bad version' of
+      DBIx::Class::Loader
+    - display thread's first post on reply screen
+    - re-copied end() feom DefaultEnd plugin, and applied local additions
+      This fixed an unexplained bug when logging out
+    - removed / from form actions in login and signup
+    - remove signup table width to avoid IE 100% bug
+    - warn if using buggy DBIx::Class::Loader
+    - fixed authed_user info fetch to use joins
+    - added sticky and locked columns to thread table
+    - order thread list to show sticky threads first
+    - don't show Reply row if a thread is locked
+    
+    There's no interface method for setting a thread sticky/locked yet
+
+
+0.01  Wed Jan  4 09:39:38 2006
+        - initial revision, generated by Catalyst

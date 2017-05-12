@@ -1,0 +1,23 @@
+---
+abstract: "Implements the Perl 6 'form' built-in"
+author:
+  - 'Damian Conway <DCONWAY@CPAN.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl6-Form
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Perl6::Export: '0'
+  perl: '5.008001'
+version: '0.06'

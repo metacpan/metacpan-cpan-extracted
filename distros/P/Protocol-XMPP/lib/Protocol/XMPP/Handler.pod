@@ -1,0 +1,45 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::XMPP::Handler
+at lib/Protocol/XMPP/Handler.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+=head1 SYNOPSIS
+
+=head1 VERSION
+
+Version 0.006
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 start_element
+
+=head2 end_element
+
+=head2 characters
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<XML::SAX::Base>
+
+L<attlist_decl|XML::SAX::Base/attlist_decl>, L<attribute_decl|XML::SAX::Base/attribute_decl>, L<comment|XML::SAX::Base/comment>, L<doctype_decl|XML::SAX::Base/doctype_decl>, L<element_decl|XML::SAX::Base/element_decl>, L<end_cdata|XML::SAX::Base/end_cdata>, L<end_document|XML::SAX::Base/end_document>, L<end_dtd|XML::SAX::Base/end_dtd>, L<end_entity|XML::SAX::Base/end_entity>, L<end_prefix_mapping|XML::SAX::Base/end_prefix_mapping>, L<entity_decl|XML::SAX::Base/entity_decl>, L<entity_reference|XML::SAX::Base/entity_reference>, L<error|XML::SAX::Base/error>, L<external_entity_decl|XML::SAX::Base/external_entity_decl>, L<fatal_error|XML::SAX::Base/fatal_error>, L<get_content_handler|XML::SAX::Base/get_content_handler>, L<get_decl_handler|XML::SAX::Base/get_decl_handler>, L<get_document_handler|XML::SAX::Base/get_document_handler>, L<get_dtd_handler|XML::SAX::Base/get_dtd_handler>, L<get_entity_resolver|XML::SAX::Base/get_entity_resolver>, L<get_error_handler|XML::SAX::Base/get_error_handler>, L<get_feature|XML::SAX::Base/get_feature>, L<get_features|XML::SAX::Base/get_features>, L<get_handler|XML::SAX::Base/get_handler>, L<get_lexical_handler|XML::SAX::Base/get_lexical_handler>, L<get_options|XML::SAX::Base/get_options>, L<ignorable_whitespace|XML::SAX::Base/ignorable_whitespace>, L<internal_entity_decl|XML::SAX::Base/internal_entity_decl>, L<no_op|XML::SAX::Base/no_op>, L<notation_decl|XML::SAX::Base/notation_decl>, L<parse|XML::SAX::Base/parse>, L<parse_file|XML::SAX::Base/parse_file>, L<parse_string|XML::SAX::Base/parse_string>, L<parse_uri|XML::SAX::Base/parse_uri>, L<processing_instruction|XML::SAX::Base/processing_instruction>, L<resolve_entity|XML::SAX::Base/resolve_entity>, L<set_content_handler|XML::SAX::Base/set_content_handler>, L<set_decl_handler|XML::SAX::Base/set_decl_handler>, L<set_document_handler|XML::SAX::Base/set_document_handler>, L<set_document_locator|XML::SAX::Base/set_document_locator>, L<set_dtd_handler|XML::SAX::Base/set_dtd_handler>, L<set_entity_resolver|XML::SAX::Base/set_entity_resolver>, L<set_error_handler|XML::SAX::Base/set_error_handler>, L<set_feature|XML::SAX::Base/set_feature>, L<set_handler|XML::SAX::Base/set_handler>, L<set_lexical_handler|XML::SAX::Base/set_lexical_handler>, L<skipped_entity|XML::SAX::Base/skipped_entity>, L<start_cdata|XML::SAX::Base/start_cdata>, L<start_document|XML::SAX::Base/start_document>, L<start_dtd|XML::SAX::Base/start_dtd>, L<start_entity|XML::SAX::Base/start_entity>, L<start_prefix_mapping|XML::SAX::Base/start_prefix_mapping>, L<supported_features|XML::SAX::Base/supported_features>, L<unparsed_entity_decl|XML::SAX::Base/unparsed_entity_decl>, L<warning|XML::SAX::Base/warning>, L<xml_decl|XML::SAX::Base/xml_decl>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2010-2014. Licensed under the same terms as Perl itself.

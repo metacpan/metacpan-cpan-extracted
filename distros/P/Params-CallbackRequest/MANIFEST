@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/Params/Callback.pm
+lib/Params/CallbackRequest.pm
+lib/Params/CallbackRequest/Exceptions.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/01basic.t
+t/02priority.t
+t/03keys.t
+t/04errors.t
+t/05object.t
+t/06object_request.t
+t/07combined.t
+t/08apache.t
+t/09pod.t

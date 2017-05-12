@@ -1,0 +1,17 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Pipeline
+version:      3.12
+version_from: lib/Pipeline.pm
+installdirs:  site
+requires:
+    Data::UUID:                    0.01
+    Scalar::Util:                  0.01
+    IO::String:                    0.01
+    IO::Null:                      0.01
+    Error:                         0.15
+    Data::Structure::Util:         0.04
+    Test::More:                    0.01
+    Class::ISA:                    0.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

@@ -1,0 +1,24 @@
+NAME
+       ProgressBar::Stack - Progress bar implementation with stack support and
+       useful loop wrappers
+
+DESCRIPTION
+       "ProgressBar::Stack" creates a convenient framework for adding progress
+       bars to long processes.  Sometimes you have long process which consists
+       of several subprocesses, some of which have cycles (including nested
+       ones), some called several times and so on. If you want to display con-
+       tinuous progress bar from 0% to 100% for such complex process, you will
+       have bad times calculating current percentage for each subprocess.
+       "ProgressBar::Stack" does much of dirty work for you.
+
+       There are two interfaces provided: one object-oriented, the other
+       don't. Non-OO interface actually creates single object and delegates
+       all calls to it. Practically using non-OO interface is enough in many
+       cases, especially taking into account that different threads will have
+       independent progress bars, but for some windowed applications several
+       progress bars might be necessary.
+
+COPYRIGHT
+       Copyright (c) 2009-2010 Tagir Valeev <lan@nprog.ru>. All rights
+       reserved.  This program is free software; you can redistribute it
+       and/or modify it under the same terms as Perl itself.

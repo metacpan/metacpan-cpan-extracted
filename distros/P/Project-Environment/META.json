@@ -1,0 +1,65 @@
+{
+   "abstract" : "Set and detect project environment via .environment file.",
+   "author" : [
+      "Roman F. <romanf@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Project-Environment",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoTabs" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Inspector" : "0",
+            "File::Spec" : "0",
+            "Module::Path" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "MooseX::Role::Flyweight" : "0",
+            "MooseX::Types::Path::Tiny" : "0",
+            "Path::FindDev" : "0",
+            "Path::Tiny" : "0",
+            "overload" : "0",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "lib::abs" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-project-environment at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Project-Environment"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/moltar/Project-Environment.git",
+         "web" : "https://github.com/moltar/Project-Environment"
+      }
+   },
+   "version" : "v1.2.0"
+}
+

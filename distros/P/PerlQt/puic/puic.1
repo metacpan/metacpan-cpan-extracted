@@ -1,0 +1,78 @@
+.\" Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.\" Please adjust this date whenever revising the manpage.
+.\" 
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.TH "PUIC" "1" "August 21, 2003" "Lutz Badenheuer <lutz.badenheuer@t-online.de>" ""
+.SH "NAME"
+puic \- perl user interface compiler
+.SH "SYNOPSIS"
+.B puic [options] [mode] <uifile>
+
+.SH "DESCRIPTION"
+This manual page documents briefly the
+.B puic
+command.
+.PP 
+\fBpuic\fP is a program you can use to compile .ui and .ui.h 
+files (from Qt Designer) into perl (actually, PerlQt) code. This 
+enables you to draw your application using Qt Designer, compile 
+and then run it. 
+
+PerlQt is an API for Perl to the Qt toolkit from Trolltech. With 
+PerlQt, you can use Qt widgets in perl code, thus giving a GUI to 
+your perl programs. 
+.SH "OPTIONS"
+\fBGenerate implementation:\fR
+   puic  [options] <uifile>
+
+\fBGenerate image collection:\fR
+   puic  [options] \-embed <project> <image1> <image2> <image3> ...
+        <project>       project name
+        <image[0..n]>   image files
+
+
+\fBGenerate subclass implementation:\fR
+   puic  [options] \-subimpl <classname> <uifile>
+        <classname>     name of the subclass to generate
+
+
+.TP 
+.B Options:
+.TP 
+.B \-o file 
+Write output to file rather than stdout
+.TP 
+.B \-p indent 
+Set the indent in spaces (0 to use a tab)
+.TP 
+.B \-nofwd 
+Omit imports of custom widgets
+.TP 
+.B \-tr func 
+Use func(...) rather than trUtf8(...) for i18n
+.TP 
+.B \-x 
+Generate extra code to test the class
+.TP 
+.B \-version 
+Display version of puic
+.TP 
+.B \-help 
+Show summary of options
+.SH "SEE ALSO"
+http://perlqt.sourceforge.net/
+.SH "AUTHOR"
+This manual page was written by Lutz Badenheuer <Lutz.Badenheuer@t\-online.de>,
+for the Debian project (but may be used by others).

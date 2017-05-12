@@ -1,0 +1,428 @@
+MODULE = Panda::Date                PACKAGE = Panda::Date
+PROTOTYPES: DISABLE
+
+#///////////////////////////// STATIC FUNCTIONS ///////////////////////////////////
+
+Date* now () {
+    static SV* CLASS = newSVpv_share(DATE_CLASS, 0);
+    RETVAL = Date::now();
+}
+
+Date* today () {
+    static SV* CLASS = newSVpv_share(DATE_CLASS, 0);
+    RETVAL = Date::today();
+}
+
+ptime_t today_epoch () {
+    datetime date;
+    localtime(time(NULL), &date);
+    date.sec = 0;
+    date.min = 0;
+    date.hour = 0;
+    RETVAL = timelocall(&date);
+}
+
+Date* date (SV* date = NULL, SV* zone = NULL) {
+    static SV* CLASS = newSVpv_share(DATE_CLASS, 0);
+    if (date) RETVAL = date_new(aTHX_ date, tzget_optional(aTHX_ zone));
+    else      RETVAL = new Date();
+}
+
+const char* string_format (SV* newval = NULL) {
+    if (newval) {
+        if (SvOK(newval) && SvTRUE(newval)) Date::string_format(SvPV_nolen(newval));
+        else Date::string_format(NULL);
+    }
+    RETVAL = Date::string_format();
+}    
+
+bool range_check (SV* newval = NULL) {
+    if (newval) Date::range_check(SvTRUE(newval));
+    RETVAL = Date::range_check();
+}
+
+#///////////////////////////// OBJECT METHODS ///////////////////////////////////
+
+Date* Date::new (SV* date = NULL, SV* zone = NULL) {
+    if (date) RETVAL = date_new(aTHX_ date, tzget_optional(aTHX_ zone));
+    else      RETVAL = new Date();
+}
+
+void Date::set (SV* arg, SV* zone = NULL) {
+    date_set(aTHX_ arg, tzget_optional(aTHX_ zone), THIS);
+}
+
+ptime_t Date::epoch (SV* newval = NULL) {
+    if (newval) THIS->epoch(SvMIV(newval));
+    RETVAL = THIS->epoch();
+}    
+    
+int32_t Date::year (SV* newval = NULL) {
+    if (newval) THIS->year(SvMIV(newval));
+    RETVAL = THIS->year();
+}    
+
+int32_t Date::_year (SV* newval = NULL) {
+    if (newval) THIS->_year(SvMIV(newval));
+    RETVAL = THIS->_year();
+}
+
+int8_t Date::yr (SV* newval = NULL) {
+    if (newval) THIS->yr(SvMIV(newval));
+    RETVAL = THIS->yr();
+}
+
+uint8_t Date::month (SV* newval = NULL) : ALIAS(mon=1) {
+    if (newval) THIS->month(SvMIV(newval));
+    RETVAL = THIS->month();
+    PERL_UNUSED_VAR(ix);
+}
+
+uint8_t Date::_month (SV* newval = NULL) : ALIAS(_mon=1) {
+    if (newval) THIS->_month(SvMIV(newval));
+    RETVAL = THIS->_month();
+    PERL_UNUSED_VAR(ix);
+}    
+
+uint8_t Date::day (SV* newval = NULL) : ALIAS(mday=1, day_of_month=2) {
+    if (newval) THIS->day(SvMIV(newval));
+    RETVAL = THIS->day();
+    PERL_UNUSED_VAR(ix);
+}
+
+uint8_t Date::hour (SV* newval = NULL) {
+    if (newval) THIS->hour(SvMIV(newval));
+    RETVAL = THIS->hour();
+}
+
+uint8_t Date::min (SV* newval = NULL) : ALIAS(minute=1) {
+    if (newval) THIS->min(SvMIV(newval));
+    RETVAL = THIS->min();
+    PERL_UNUSED_VAR(ix);
+}
+
+uint8_t Date::sec (SV* newval = NULL) : ALIAS(second=1) {
+    if (newval) THIS->sec(SvMIV(newval));
+    RETVAL = THIS->sec();
+    PERL_UNUSED_VAR(ix);
+}
+
+uint8_t Date::wday (SV* newval = NULL) : ALIAS(day_of_week=1) {
+    if (newval) THIS->wday(SvMUV(newval));
+    RETVAL = THIS->wday();
+    PERL_UNUSED_VAR(ix);
+}    
+
+uint8_t Date::_wday (SV* newval = NULL) {
+    if (newval) THIS->_wday(SvMUV(newval));
+    RETVAL = THIS->_wday();
+}
+
+uint8_t Date::ewday (SV* newval = NULL) {
+    if (newval) THIS->ewday(SvMUV(newval));
+    RETVAL = THIS->ewday();
+}
+
+uint16_t Date::yday (SV* newval = NULL) : ALIAS(day_of_year=1) {
+    if (newval) THIS->yday(SvMUV(newval));
+    RETVAL = THIS->yday();
+    PERL_UNUSED_VAR(ix);
+}
+
+uint16_t Date::_yday (SV* newval = NULL) {
+    if (newval) THIS->_yday(SvMUV(newval));
+    RETVAL = THIS->_yday();
+}
+
+bool Date::isdst () : ALIAS(daylight_savings=1) {
+    RETVAL = THIS->isdst();
+    PERL_UNUSED_VAR(ix);
+}
+
+const char* Date::to_string (...) : ALIAS(as_string=1, string=2) {
+    RETVAL = THIS->toString();
+    PERL_UNUSED_VAR(ix);
+}    
+
+bool Date::to_bool (...) {
+    RETVAL = THIS->error() == E_OK ? true : false;
+}
+
+ptime_t Date::to_number (...) {
+    RETVAL = THIS->error() == E_OK ? THIS->epoch() : 0;
+}
+
+const char* Date::strftime (const char* format) {
+    RETVAL = THIS->strftime(format, NULL, 0);
+}
+
+const char* Date::monthname () : ALIAS(monname=1) {
+    RETVAL = THIS->strftime("%B", NULL, 0);
+    PERL_UNUSED_VAR(ix);
+}
+
+const char* Date::wdayname () : ALIAS(day_of_weekname=1) {
+    RETVAL = THIS->strftime("%A", NULL, 0);
+    PERL_UNUSED_VAR(ix);
+}
+
+const char* Date::iso () : ALIAS(sql=1) {
+    RETVAL = THIS->iso();
+    PERL_UNUSED_VAR(ix);
+}
+
+const char* Date::mysql ()
+
+const char* Date::hms ()
+
+const char* Date::ymd ()
+
+const char* Date::mdy ()
+
+const char* Date::dmy ()
+
+const char* Date::ampm ()
+
+const char* Date::meridiam ()
+
+int Date::gmtoff ()
+
+const char* Date::tzabbr ()
+
+string Date::tzname () {
+    RETVAL = THIS->timezone()->name;
+}
+
+bool Date::tzlocal () {
+    RETVAL = THIS->timezone()->is_local;
+}
+
+HV* Date::tz (SV* newzone = NULL) : ALIAS(timezone=1, zone=2) {
+    if (newzone) {
+        THIS->timezone(tzget_required(aTHX_ newzone));
+        XSRETURN_UNDEF;
+    }
+    RETVAL = export_timezone(aTHX_ THIS->timezone());
+    PERL_UNUSED_VAR(ix);
+}
+
+void Date::to_tz (SV* newzone) : ALIAS(to_timezone=1, to_zone=2) {
+    THIS->to_timezone(tzget_required(aTHX_ newzone));
+    PERL_UNUSED_VAR(ix);
+}
+
+void Date::array () {
+    EXTEND(SP, 6);
+    mPUSHi(THIS->year());
+    mPUSHu(THIS->month());
+    mPUSHu(THIS->day());
+    mPUSHu(THIS->hour());
+    mPUSHu(THIS->min());
+    mPUSHu(THIS->sec());
+    XSRETURN(6);
+}
+
+AV* Date::aref () {
+    RETVAL = newAV();
+    av_extend(RETVAL, 5);
+    av_store(RETVAL, 0, newSViv(THIS->year()));
+    av_store(RETVAL, 1, newSVuv(THIS->month()));
+    av_store(RETVAL, 2, newSVuv(THIS->day()));
+    av_store(RETVAL, 3, newSVuv(THIS->hour()));
+    av_store(RETVAL, 4, newSVuv(THIS->min()));
+    av_store(RETVAL, 5, newSVuv(THIS->sec()));
+}
+
+void Date::struct () {
+    EXTEND(SP, 9);
+    mPUSHu(THIS->sec());
+    mPUSHu(THIS->min());
+    mPUSHu(THIS->hour());
+    mPUSHu(THIS->day());
+    mPUSHu(THIS->_month());
+    mPUSHi(THIS->_year());
+    mPUSHu(THIS->_wday());
+    mPUSHu(THIS->_yday());
+    mPUSHu(THIS->isdst() ? 1 : 0);
+    XSRETURN(9);
+}
+
+AV* Date::sref () {
+    RETVAL = newAV();
+    av_extend(RETVAL, 8);
+    av_store(RETVAL, 0, newSVuv(THIS->sec()));
+    av_store(RETVAL, 1, newSVuv(THIS->min()));
+    av_store(RETVAL, 2, newSVuv(THIS->hour()));
+    av_store(RETVAL, 3, newSVuv(THIS->day()));
+    av_store(RETVAL, 4, newSVuv(THIS->_month()));
+    av_store(RETVAL, 5, newSViv(THIS->_year()));
+    av_store(RETVAL, 6, newSVuv(THIS->_wday()));
+    av_store(RETVAL, 7, newSVuv(THIS->_yday()));
+    av_store(RETVAL, 8, newSVuv(THIS->isdst() ? 1 : 0));
+}
+
+void Date::hash () {
+    EXTEND(SP, 12);
+    mPUSHp("year", 4);
+    mPUSHi(THIS->year());
+    mPUSHp("month", 5);
+    mPUSHu(THIS->month());
+    mPUSHp("day", 3);
+    mPUSHu(THIS->day());
+    mPUSHp("hour", 4);
+    mPUSHu(THIS->hour());
+    mPUSHp("min", 3);
+    mPUSHu(THIS->min());
+    mPUSHp("sec", 3);
+    mPUSHu(THIS->sec());
+    XSRETURN(12);
+}
+
+HV* Date::href () {
+    RETVAL = newHV();
+    hv_store(RETVAL, "year",  4, newSViv(THIS->year()), 0);
+    hv_store(RETVAL, "month", 5, newSVuv(THIS->month()), 0);
+    hv_store(RETVAL, "day",   3, newSVuv(THIS->day()), 0);
+    hv_store(RETVAL, "hour",  4, newSVuv(THIS->hour()), 0);
+    hv_store(RETVAL, "min",   3, newSVuv(THIS->min()), 0);
+    hv_store(RETVAL, "sec",   3, newSVuv(THIS->sec()), 0);
+}
+
+Date* Date::clone (SV* diff = NULL, SV* zoneSV = NULL) {
+    HV* CLASS = SvSTASH(SvRV(ST(0)));
+    if (diff) {
+        const Timezone* zone = tzget_optional(aTHX_ zoneSV);
+        if (SvROK(diff)) RETVAL = date_clone(aTHX_ diff, zone, THIS);
+        else RETVAL = THIS->clone(zone);
+    }
+    else RETVAL = THIS->clone();
+}
+
+SV* Date::month_begin () {
+    THIS->month_begin();
+    XSRETURN(1);
+}
+
+Date* Date::month_begin_new () {
+    HV* CLASS = SvSTASH(SvRV(ST(0)));
+    RETVAL = THIS->month_begin_new();
+}
+
+SV* Date::month_end () {
+    THIS->month_end();
+    XSRETURN(1);
+}
+
+Date* Date::month_end_new () {
+    HV* CLASS = SvSTASH(SvRV(ST(0)));
+    RETVAL = THIS->month_end_new();
+}
+
+int Date::days_in_month () {
+    RETVAL = THIS->days_in_month();
+}
+
+uint8_t Date::error () {
+    RETVAL = (uint8_t) THIS->error();
+}
+
+const char* Date::errstr ()
+
+SV* Date::truncate () {
+    THIS->truncate();
+    XSRETURN(1);
+}    
+
+Date* Date::truncate_new () {
+    HV* CLASS = SvSTASH(SvRV(ST(0)));
+    RETVAL = THIS->truncate_new();
+}
+
+int Date::compare (SV* arg, bool reverse = false) {
+    if (sv_isobject(arg)) {
+        if (sv_isa(arg, DATE_CLASS)) RETVAL = THIS->compare(typemap_incast<Date*>(arg));
+        else croak("Panda::Date: cannot '<=>' or 'cmp' - object isn't a Panda::Date object");
+    }
+    else {
+        Date tmp((ptime_t) 0);
+        date_set(aTHX_ arg, THIS->timezone(), &tmp);
+        RETVAL = THIS->compare(tmp);
+    }
+    
+    if (reverse) RETVAL = -RETVAL;
+}
+
+Date* Date::add_new (SV* arg, ...) {
+    HV* CLASS = SvSTASH(SvRV(ST(0)));
+    if (sv_isobject(arg)) {
+        if (sv_isa(arg, DATEREL_CLASS)) RETVAL = THIS->add_new(typemap_incast<DateRel*>(arg));
+        else croak("Panda::Date: cannot '+' - object isn't a Panda::Date::Rel object");
+    }
+    else {
+        DateRel tmp;
+        daterel_set(aTHX_ arg, &tmp);
+        RETVAL = THIS->add_new(&tmp);
+    }
+}
+
+SV* Date::add (SV* arg, ...) {
+    if (sv_isobject(arg)) {
+        if (sv_isa(arg, DATEREL_CLASS)) THIS->add(typemap_incast<DateRel*>(arg));
+        else croak("Panda::Date: cannot '+=' - object isn't a Panda::Date::Rel object");
+    }
+    else {
+        DateRel tmp;
+        daterel_set(aTHX_ arg, &tmp);
+        THIS->add(&tmp);
+    }
+    XSRETURN(1);
+}
+
+SV* Date::subtract_new (SV* arg, bool reverse = false) {
+    if (sv_isobject(arg)) { // reverse is impossible here
+        if (sv_isa(arg, DATEREL_CLASS)) {
+            RETVAL = typemap_outcast<Date*, HV* CLASS>(THIS->subtract_new(typemap_incast<DateRel*>(arg)), SvSTASH(SvRV(ST(0))));
+        }
+        else if (sv_isa(arg, DATE_CLASS)) {
+            RETVAL = typemap_outcast<DateInt*, const char* CLASS>(new DateInt(typemap_incast<Date*>(arg), THIS), DATEINT_CLASS);
+        }
+        else croak("Panda::Date: cannot '-' unsupported object type");
+    }
+    else if (reverse) { // only date supported for reverse
+        Date tmp((ptime_t) 0);
+        date_set(aTHX_ arg, THIS->timezone(), &tmp);
+        RETVAL = typemap_outcast<DateInt*, const char* CLASS>(new DateInt(THIS, &tmp), DATEINT_CLASS);
+    }
+    else if (looks_like_number(arg)) {
+        Date* ret = THIS->clone();
+        RETVAL = typemap_outcast<Date*, HV* CLASS>(ret, SvSTASH(SvRV(ST(0))));
+        ret->epoch(THIS->epoch() - SvMIV(arg));
+    }
+    else { // date or rdate scalar
+        const char* argstr = SvPV_nolen(arg);
+        if (looks_like_relative(argstr)) { // not a date -> reldate
+            DateRel tmp;
+            daterel_set(aTHX_ arg, &tmp);
+            RETVAL = typemap_outcast<Date*, HV* CLASS>(THIS->subtract_new(&tmp), SvSTASH(SvRV(ST(0))));
+        } else { // date
+            Date tmp((ptime_t) 0);
+            date_set(aTHX_ arg, THIS->timezone(), &tmp);
+            RETVAL = typemap_outcast<DateInt*, const char* CLASS>(new DateInt(&tmp, THIS), DATEINT_CLASS);
+        }
+    }
+}
+
+SV* Date::subtract (SV* arg, ...) {
+    if (sv_isobject(arg)) {
+        if (sv_isa(arg, DATEREL_CLASS)) THIS->subtract(typemap_incast<DateRel*>(arg));
+        else croak("Panda::Date: cannot '-=' unsupported object type");
+    }
+    else {
+        DateRel tmp;
+        daterel_set(aTHX_ arg, &tmp);
+        THIS->subtract(&tmp);
+    }
+    XSRETURN(1);
+}
+
+void Date::DESTROY ()

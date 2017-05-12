@@ -1,0 +1,23 @@
+==============================
+2012-06-27 00:04:11 +0100 1.04
+==============================
+
+  commit ba334826537dfbe92d677e605956630eb0682e9a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Wed Jun 27 00:02:57 2012 +0100
+  
+    Update SYNOPSIS and convert dist to dzil 
+
+==============================
+2009-04-08 12:15:26 +0100 1.02
+==============================
+
+  commit 9376fe5893019cf36bdb7f37212c75891d9dbee3
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Wed Apr 8 12:15:26 2009 +0100
+  
+    Make auto_set_repository() only run at author-time 
+
+====================================
+End of changes in the last 1825 days
+====================================

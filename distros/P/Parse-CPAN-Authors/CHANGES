@@ -1,0 +1,23 @@
+CHANGES file for Parse::CPAN::Authors
+
+2.27 Sun Jun  1 11:00:25 BST 2008
+  - parse the email addresses by hand (patch by Kenichi Ishigaki)
+
+2.26 Thu May 15 10:32:24 JST 2008
+  - move to Email::Adress to fix names with dots (noticed by Karl Y. Pradene)
+  
+2.25 Mon May  8 13:52:29 BST 2006
+  - no changes, just reupload as it was somehow deleted from CPAN
+
+2.24 Thu Sep 23 16:55:29 BST 2004
+  - more docs
+  - increased test coverage
+  - new tests for Pod checking & coverage
+
+2.22 Mon Jul  5 17:10:50 BST 2004
+  - fix small typo in docs
+  - silence warnings produced by Mail::Address
+  - use IO::Zlib to read compressed files
+
+2.20 Sat Mar  6 20:24:14 GMT 2004
+  - first release

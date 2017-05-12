@@ -1,0 +1,157 @@
+## an example of how to use PApp with SSL, contributed by
+## Stefan Traby <oesi@plan9.de> and is still copyrighted
+## by him.
+
+##
+##  SSL Support
+##
+##  When we also provide SSL we have to listen to the 
+##  standard HTTP port (see above) and to the HTTPS port
+##
+<IfDefine SSL>
+Listen 80
+Listen 443
+Listen 444
+</IfDefine>
+
+# The following magic rewrites "/" so that it points
+# to a PApp application. I haven't looked into it,
+# but it seems the normal apache directory directives
+# would have sufficed...
+RewriteEngine on
+RewriteRule ^/$ /index.papp [PT]
+RewriteRule ^/index.html$ /index.papp [PT]
+
+PerlModule PApp::Apache
+<Perl>
+        configure PApp;
+</Perl>
+
+<Perl>
+        mount_appset PApp "secure_apps";
+</Perl>
+
+#
+#   Some MIME-types for downloading Certificates and CRLs
+#   Not required for PApp, but maybe nice to have ;)
+#
+<IfDefine SSL>
+AddType application/x-x509-ca-cert .crt
+AddType application/x-pkcs7-crl    .crl
+</IfDefine>
+
+<IfModule mod_ssl.c>
+
+#   Pass Phrase Dialog:
+#   Configure the pass phrase gathering process.
+#   The filtering dialog program (`builtin' is a internal
+#   terminal dialog) has to provide the pass phrase on stdout.
+SSLPassPhraseDialog  builtin
+
+#   Inter-Process Session Cache:
+#   Configure the SSL Session Cache: First either `none'
+#   or `dbm:/path/to/file' for the mechanism to use and
+#   second the expiring timeout (in seconds).
+#SSLSessionCache        none
+#SSLSessionCache        shm:/share/www/logs/ssl_scache(512000)
+SSLSessionCache         dbm:/share/www/logs/ssl_scache
+SSLSessionCacheTimeout  300
+
+#   Semaphore:
+#   Configure the path to the mutual explusion semaphore the
+#   SSL engine uses internally for inter-process synchronization. 
+SSLMutex  file:/share/www/logs/ssl_mutex
+
+#   Pseudo Random Number Generator (PRNG):
+#   Configure one or more sources to seed the PRNG of the 
+#   SSL library. The seed data should be of good random quality.
+#   WARNING! On some platforms /dev/random blocks if not enough entropy
+#   is available. This means you then cannot use the /dev/random device
+#   because it would lead to very long connection times (as long as
+#   it requires to make more entropy available). But usually those
+#   platforms additionally provide a /dev/urandom device which doesn't
+#   block. So, if available, use this one instead. Read the mod_ssl User
+#   Manual for more details.
+SSLRandomSeed startup builtin
+SSLRandomSeed connect builtin
+#SSLRandomSeed startup file:/dev/random  512
+#SSLRandomSeed startup file:/dev/urandom 512
+#SSLRandomSeed connect file:/dev/random  512
+#SSLRandomSeed connect file:/dev/urandom 512
+
+#   Logging:
+#   The home of the dedicated SSL protocol logfile. Errors are
+#   additionally duplicated in the general error log file.  Put
+#   this somewhere where it cannot be used for symlink attacks on
+#   a real server (i.e. somewhere where only root can write).
+#   Log levels are (ascending order: higher ones include lower ones):
+#   none, error, warn, info, trace, debug.
+SSLLog      /share/www/logs/ssl_engine_log
+SSLLogLevel info
+
+</IfModule>
+
+<IfDefine SSL>
+
+##
+## SSL Virtual Host Context
+##
+
+<VirtualHost _default_:443>
+DocumentRoot "/share/www/htdocs"
+ServerName www.plan9.de
+ServerAdmin oesi@plan9.de
+ErrorLog /share/www/logs/error_log.443
+TransferLog /share/www/logs/access_log.443
+SSLEngine on
+SSLCipherSuite HIGH:MEDIUM
+SSLCertificateFile /share/www/conf/ssl.crt/server.crt
+SSLCertificateKeyFile /share/www/conf/ssl.key/server.key
+SSLCACertificateFile /share/www/conf/ssl.crt/ca.crt
+SSLCARevocationPath /share/www/conf/ssl.crl
+SSLVerifyDepth  1
+
+SetEnvIf User-Agent ".*MSIE.*" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+CustomLog /share/www/logs/ssl_request_log.443 \
+          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+<Perl>
+        mount_appset PApp "secure_apps";
+        mount_appset PApp "default";
+</Perl>
+</VirtualHost>                                  
+
+SSLOptions +StdEnvVars
+
+<VirtualHost _default_:444>
+DocumentRoot "/share/www/htdocs"
+ServerName www.plan9.de
+ServerAdmin oesi@plan9.de
+ErrorLog /share/www/logs/error_log.444
+TransferLog /share/www/logs/access_log.444
+SSLEngine on
+SSLCipherSuite HIGH:MEDIUM
+SSLCertificateFile /share/www/conf/ssl.crt/server.crt
+SSLCertificateKeyFile /share/www/conf/ssl.key/server.key
+SSLCACertificateFile /share/www/conf/ssl.crt/ca.crt
+SSLCARevocationPath /share/www/conf/ssl.crl
+SSLVerifyDepth  1
+SSLVerifyClient require
+
+SetEnvIf User-Agent ".*MSIE.*" \
+         nokeepalive ssl-unclean-shutdown \
+         downgrade-1.0 force-response-1.0
+CustomLog /share/www/logs/ssl_request_log.444 \
+          "%t %h %{SSL_PROTOCOL}x %{SSL_CIPHER}x \"%r\" %b"
+<Perl>
+        mount_appset PApp "secure_apps";
+        mount_appset PApp "default";
+</Perl>
+</VirtualHost>                                  
+
+</IfDefine>
+
+<Perl>
+        configured PApp;
+</Perl>

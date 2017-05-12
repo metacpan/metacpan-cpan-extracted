@@ -1,0 +1,56 @@
+{
+   "abstract" : "set of extensions for Perl6::Pod",
+   "author" : [
+      "Zahatski Aliaksandr zag@cpan.org"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl6-Pod-Lib",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl6::Pod" : "0.71",
+            "Test::Class" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Perl6::Pod::Lib" : {
+         "file" : "lib/Perl6/Pod/Lib.pm",
+         "version" : "0.13"
+      },
+      "Perl6::Pod::Lib::Image" : {
+         "file" : "lib/Perl6/Pod/Lib/Image.pm",
+         "version" : "0.01"
+      },
+      "Perl6::Pod::Lib::Include" : {
+         "file" : "lib/Perl6/Pod/Lib/Include.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Perl6::Pod::Lib"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/zag/p5-Perl6-Pod-Lib.git"
+      }
+   },
+   "version" : "0.13"
+}

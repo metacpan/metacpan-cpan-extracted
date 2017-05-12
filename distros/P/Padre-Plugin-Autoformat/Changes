@@ -1,0 +1,40 @@
+Revision history for Padre-Plugin-Autoformat
+
+1.22   2010.12.06
+ - Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+
+1.21   2010.11.01
+ - Switched to Dist::Zilla (AZAWAWI)
+ - Added proper share folder support using File::ShareDir (AZAWAWI)
+
+1.2.0 Sat Aug 14 19:41:54 CEST 2010
+ - Renamed to the new Padre 0.43 PO naming scheme (azawawi)
+ - updated to make it work with padre 0.68 api
+ - added translations:
+   - Chinese (Traditional) (BLUET)
+   - brazilian portuguese
+   - french
+   - polish
+   - Arabic (azawawi)
+   - Spanish (BRUNOV)
+
+1.1.2 Sun Apr  5 12:05:46 CEST 2009
+ - fix typo in plugin name
+
+1.1.1 Wed Apr  1 16:35:33 CEST 2009
+ - fixing method name in padre's plugin interface
+
+1.1.0 Tue Mar 31 18:51:18 CEST 2009
+ - providing plugin icon for new padre's plugin manager
+
+1.0.0 Fri Mar 27 12:24:51 CET 2009
+ - current_paragraph() moved to padre::wx::editor
+
+0.2.1 Fri Mar 13 15:35:31 CET 2009
+ - forgot a spot when renaming a sub
+
+0.2.0 Fri Mar 13 15:31:24 CET 2009
+ - autoformat paragraph if no selection
+
+0.1.0 Fri Mar 13 14:40:04 CET 2009
+ - First version: autoformat selection

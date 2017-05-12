@@ -1,0 +1,15 @@
+Revision history for Perl extension POD2::IT::Getopt::Long.
+
+Legenda:
+   + = new feature
+   ! = updated feature/bug fix
+   * = incompatible changes
+   - = removed feature
+
+1.02  Mon Sep 15 12:00:00 2008 
+	- First CPAN public release
+
+0.01  Sun Mar 26 17:20:10 2006
+	- original version; created by h2xs 1.23 with options
+		-X -A -n POD2::IT::Getopt::Long
+

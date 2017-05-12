@@ -1,0 +1,12 @@
+This directory contains a longer example of how to use
+Parse::Eyapp. It contains a compiler for a simplified C-like 
+language. Only lexical analysis, syntax analysisi, scope analysis
+and type checking are implemented. To use it 
+decompress the tar.gz file:
+
+  gunzip Simple-Types-0.4.tar.gz
+
+
+and then extract the files:
+
+  tar xvf Simple-Types-0.4.tar

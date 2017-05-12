@@ -1,0 +1,12 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use XMLRPC::Lite;
+
+print XMLRPC::Lite
+  -> proxy('http://localhost:42042/?session=pinger')
+  -> call("weblogUpdates.ping", "OpenWeblog Information", "http://openweblog.info/")
+  -> result;
+print "\n";

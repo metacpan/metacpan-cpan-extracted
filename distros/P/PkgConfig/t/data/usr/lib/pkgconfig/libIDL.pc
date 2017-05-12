@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+
+Name: libIDL
+Description: IDL parsing library
+Version: 0.6.8
+Requires: glib
+Libs: -L${libdir} -lIDL
+Cflags: -I${includedir}

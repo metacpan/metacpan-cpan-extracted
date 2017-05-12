@@ -1,0 +1,62 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with MooseSub
+at t/lib/MooseSub.pod
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with MooseSub
+at t/lib/MooseSub.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=head1 NAME
+
+MooseSub - Sub Moose class
+
+=head1 SYNOPSIS
+
+Blah
+
+=head1 DESCRIPTION
+
+Blah
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<MooseBase>
+
+anattribute
+
+=item L<Moose::Object>
+
+BUILDALL, BUILDARGS, DEMOLISHALL, DESTROY, DOES, does, dump
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Deep::Name::Space::Base>
+
+L<from_base|Deep::Name::Space::Base/from_base>
+
+=back
+
+=head1 AUTHOR
+
+James Mastros <james@mastros.biz>
+
+=head1 LICENSE
+
+Stuff
+

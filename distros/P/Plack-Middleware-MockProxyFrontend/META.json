@@ -1,0 +1,57 @@
+{
+   "abstract" : "virtualhost-aware PSGI app developer tool",
+   "author" : [
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-MockProxyFrontend",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Server::PSGI" : "0",
+            "IO::Socket::SSL" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Util" : "0",
+            "Plack::Util::Accessor" : "0",
+            "URI::Split" : "0",
+            "parent" : "0",
+            "perl" : "5.014",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ap/Plack-Middleware-MockProxyFrontend/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ap/Plack-Middleware-MockProxyFrontend.git",
+         "web" : "https://github.com/ap/Plack-Middleware-MockProxyFrontend"
+      }
+   },
+   "version" : "0.002"
+}
+

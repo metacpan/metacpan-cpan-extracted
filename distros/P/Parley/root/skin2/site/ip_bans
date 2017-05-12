@@ -1,0 +1,85 @@
+<h1>[%l('IP Bans')%]</h1>
+[% WHILE (ban_type = ip_ban_types.next) %]
+    [% role_name = 'ip_ban_' _ ban_type.name %]
+    [% has_role  = authed_user.check_any_user_role('site_moderator', role_name) %]
+    [% IF has_role %][% eclass="editable" %][% ELSE %][% eclass="noneditable" %][% END %]
+    [% bans      = ban_type.ip_bans_rs %]
+
+<h2 class="top_padded">
+    [% ban_type.description %]
+</h2>
+    [% IF has_role %]
+    <img src="/static/images/icons/page_edit.png" width="16" height="16" />
+    [% ELSE %]
+    <img src="/static/images/icons/lock.png" width="16" height="16" />
+    [% END %]
+    [% IF bans.count %]
+        [% WHILE (ip_ban = bans.next) %]
+        <span id="ipban_[%ip_ban.id%]" class="[%eclass%]">[%ip_ban.ip_range%]</span>
+        [% END %]
+    [% ELSE %]
+        <span id="ipbannewtype_[%ban_type.id%]" class="[%eclass%]">None</span>
+    [% END %]
+[% END %]
+
+
+[% PROCESS shared/ajax_dialog %]
+
+
+<script type="text/javascript" src="[%c.request.base%]/static/Editable-min.js"></script>
+<script type="text/javascript">
+    var E  = new YAHOO.widget.EditableElement;
+    E.config.input_type = 'textarea';
+
+    E.callback = function(){
+        var handleSuccess = function(o) {
+            YAHOO.parley.small_loading.wait.hide();
+            var data = eval('(' + o.responseText + ')');
+            // if we didn't update reset the field value
+            if (data.updated != 1) {
+                o.argument.node.innerHTML = data.old_value;
+            }
+            if (data.error) {
+                try {
+                    YAHOO.parley.ajax_dialog.dlg.show_message( data.error );
+                } catch(e) { alert('handleSuccess: ' + e); }
+            }
+        };
+        var handleFailure =  function(o) {
+            YAHOO.parley.small_loading.wait.hide();
+            try {
+                YAHOO.parley.ajax_dialog.dlg.show_message( o );
+            } catch(e) { alert('handleFailure: ' + e); }
+        };
+
+        // let the user know something is happening
+        YAHOO.parley.small_loading.wait.show();
+
+        // where to post to
+        var sUrl = "[%c.uri_for('/site/saveBanHandler')%]";
+
+        // postdata is a query string ... how irksome!!
+        var postData =
+               'value='     + this.contents_new
+            + '&ovalue='    + this.contents
+            + '&fieldname=' + this.clicked.id
+        ;
+
+        //var msg_node = YAHOO.util.Dom.get('result');
+
+        var request = YAHOO.util.Connect.asyncRequest(
+            'POST',
+            sUrl,
+            {
+                success:  handleSuccess,
+                failure:  handleFailure,
+                argument: {
+                    node:     this.clicked
+                }
+            },
+            postData
+        );
+    };
+
+    E.init();
+</script>

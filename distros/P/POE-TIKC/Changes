@@ -1,0 +1,8 @@
+Revision history for POE::TIKC
+
+0.02 Wed Oct 27 16:42:00 2004
+	- added remove action to clean up after clients that exit
+	- mock sessions are cleaned up better now
+
+0.01 Wed Oct 27 11:01:00 2004
+	- first version

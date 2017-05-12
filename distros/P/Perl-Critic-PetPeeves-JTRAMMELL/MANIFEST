@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Perl/Critic/PetPeeves/JTRAMMELL.pm
+lib/Perl/Critic/Policy/Variables/ProhibitUselessInitialization.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/0load.t
+t/array.t
+t/boilerplate.t
+t/lib/PerlCriticTestUtils.pm
+t/pod-coverage.t
+t/pod.t
+t/scalar.t

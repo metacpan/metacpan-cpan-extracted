@@ -1,0 +1,6 @@
+this text should be *bold
+and span multiple lines*
+#--------------------------------------------------------------------------#
+this text should be B<bold
+and span multiple lines>
+

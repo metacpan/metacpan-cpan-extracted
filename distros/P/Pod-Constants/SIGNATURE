@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 e563a7924512719c2e50a84b7530456ce27b9925 Changes
+SHA1 3dba87fdd2fcb5c3cc93f325c7d938f24e976af1 LICENSE
+SHA1 3943ceff484fc4d2c42b74a2cfb846a2b0cea38d MANIFEST
+SHA1 751c679d0b6e3919bbb0585ad479d44275ec9b0b META.json
+SHA1 e07f94caca70e85d68b0fa2c8d6fe306fcf0712d META.yml
+SHA1 bb361567958c2640ef696fe1653a7a2473106cc1 Makefile.PL
+SHA1 983803d908fb541523c860546b884df95b91587c README
+SHA1 d2df14f059a4a2d3ca1fc8a5870e3ebbb3c3b42c lib/Pod/Constants.pm
+SHA1 2abf0122aae5a7dbf65c8b0ea19ceb0188cdadb0 t/01-constants.t
+SHA1 abbcb128b38cc71f3b14af2fc27eae0ecdb8ed08 t/Cheese.pm
+SHA1 96922df29d248ea8e0802c0dc66a21fb9f924101 t/ReEntrancyTest.pm
+SHA1 50c15fa93feff80bdce09aa350965a2e86476591 t/cheese.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIcBAEBCgAGBQJXfBrzAAoJEMoENb5ewbNiVtMP/AzsTM733xZoX7auThjh8wik
+Fm8twE/2/Yf3L8pGN/PslEfF2SnNLZjX4AK0QndoSL/e75xAmZIeg9qMtdcct/tu
+gtf9qMql2drpMoKZz+or45+HWasTr6W+Z1/6GRePpXmrkWDR8zS20lvIAsoJ5FTu
++9rAsUXS9nc8vHZyeLFJMf9fMUURSynj9AkynQJBQ6dY7qjndifV/W8e81ZiuCj3
+Lp7v0ND96/YkSPA9Mmt7PJw8bODWicnpjcEES595BW2Vz3nKGAKfiIBLPhDYFWdM
+AHyq0feoukeDm8dyfzl4k8ys249CG6zv0pikRCsDn+2BvPaDa8NP2gqVK7t07N+y
+/hetjX8NSAI2+t1BoAWTqk3lSkuonbbmsx6c+pxs2zB92YX5jjYpUj3UOXBDDpJ9
+uuHF16adyuEoSrjPm3brL6Sj+f6AB/TSt6aFLUklqe+pHiShyuH97jdGSbJ6P02c
+VAiTrqQZ6tjOXPX6F+EpoMY90SotCycsh775wBpgAxKj9DoexJ3+xMx1uVlYp5LK
+hS/B6W6mISqJnapRmf3fuAfFjStHCNN1GxQpBpsWknOZSpR+FCfRqzepflow9Cwz
+NVM/4yu9RDhwcILpbs3wrKoU68u5QQzvAW/lLuyUWqYbTWO77kiUxG/cq/cl5/px
+GUmz009+zI7oGh1XjKJA
+=dsO0
+-----END PGP SIGNATURE-----

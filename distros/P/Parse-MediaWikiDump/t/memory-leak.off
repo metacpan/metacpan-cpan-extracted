@@ -1,0 +1,25 @@
+#!perl
+
+use strict;
+use warnings;
+
+use Parse::MediaWikiDump;
+use Devel::Cycle;
+
+my $dump1 = Parse::MediaWikiDump->revisions('t/pages_test.xml');
+my $NUM_TESTS = 10000;
+my $i = 0;
+
+find_cycle($dump1);
+
+#exit 1;
+
+while ($i++ < $NUM_TESTS) {
+	my $dump = Parse::MediaWikiDump->pages('t/pages_test.xml');
+
+	while($dump->next) { }
+	
+	$dump = Parse::MediaWikiDump->pages('t/pages_test.xml');
+
+	$dump->next;
+}

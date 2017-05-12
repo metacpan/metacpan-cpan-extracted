@@ -1,0 +1,29 @@
+---
+abstract: 'Parse the text representation of a stack trace into an'
+author:
+  - 'Max Kanat-Alexander <mkanat@cpan.org>'
+build_requires:
+  File::Spec: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-StackTrace
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Exception::Class: 0
+  List::Util: 0
+  Math::BigInt: 0
+  Moose: 0
+  MooseX::AttributeHelpers: 0
+  Scalar::Util: 0
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.07

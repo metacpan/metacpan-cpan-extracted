@@ -1,0 +1,6 @@
+Changelog for POE-Filter-KennySpeak
+===================================
+
+1.00 Wed Apr 15 10:21:39 BST 2009
+     - Bump to a 'stable' release
+     - Set the repository in META.yml

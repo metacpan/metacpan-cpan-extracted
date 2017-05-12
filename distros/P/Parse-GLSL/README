@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Parse-GLSL,
+version 0.002:
+
+  Parse OpenGL Shader Language files into an abstract syntax tree
+
+This software is copyright (c) 2012 by Tom Molesworth.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

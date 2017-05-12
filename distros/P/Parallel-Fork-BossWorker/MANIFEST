@@ -1,0 +1,7 @@
+Changes
+lib/Parallel/Fork/BossWorker.pm
+Makefile.PL
+MANIFEST
+README
+t/Parallel-Fork-BossWorker.t
+META.yml                                 Module meta-data (added by MakeMaker)

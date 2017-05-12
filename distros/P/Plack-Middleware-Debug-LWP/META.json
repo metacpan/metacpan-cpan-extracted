@@ -1,0 +1,56 @@
+{
+   "abstract" : "LWP Profiling Panel",
+   "author" : [
+      "Chris Reinhardt <crein@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-Middleware-Debug-LWP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWPx::Profile" : "0",
+            "Plack::Middleware::Debug::Base" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/ctriv/perl-Plack-Middleware-Debug-LWP",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ctriv/perl-Plack-Middleware-Debug-LWP.git",
+         "web" : "https://github.com/ctriv/perl-Plack-Middleware-Debug-LWP"
+      }
+   },
+   "version" : "0.2",
+   "x_contributors" : [
+      "Mark Ng <cpan@markng.co.uk>"
+   ]
+}
+

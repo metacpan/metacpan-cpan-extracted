@@ -1,0 +1,120 @@
+SYNOPSIS
+
+DESCRIPTION
+
+    This module formats enveloped result to YAML, JSON, etc. It uses
+    Data::Format::Pretty for the backend. It is used by other Perinci
+    modules like Perinci::CmdLine and Perinci::Access::HTTP::Server.
+
+    The default supported formats are:
+
+      * json
+
+      Using Data::Format::Pretty::CompactJSON.
+
+      * json-pretty
+
+      Using Data::Format::Pretty::JSON.
+
+      * text-simple
+
+      Using Data::Format::Pretty::SimpleText.
+
+      * text-pretty
+
+      Using Data::Format::Pretty::Text.
+
+      * text
+
+      Using Data::Format::Pretty::Console.
+
+      * yaml
+
+      Using Data::Format::Pretty::YAML.
+
+      * perl
+
+      Using Data::Format::Pretty::Perl.
+
+      * phpserialization
+
+      Using Data::Format::Pretty::PHPSerialization.
+
+      * ruby
+
+      Using Data::Format::Pretty::Ruby.
+
+VARIABLES
+
+%Perinci::Result::Format::Formats => HASH
+
+    Contains a mapping between format names and Data::Format::Pretty::*
+    module names + MIME type.
+
+$Enable_Decoration => BOOL (default: 1)
+
+    Decorations include color or other markup, which might make a data
+    structure like JSON or YAML string become invalid JSON/YAML. This
+    should be turned off if one wants to send the formatting over network.
+
+$Enable_Cleansing => BOOL (default: 0)
+
+    If enabled, cleansing will be done to data to help make sure that data
+    does not contain item that cannot be handled by formatter. for example,
+    JSON format cannot handle circular references or complex types other
+    than hash/array.
+
+FUNCTIONS
+
+    None is currently exported/exportable.
+
+format($res, $format[ , $is_naked=0 ]) => STR
+
+    Format enveloped result $res with format named $format.
+
+    Result metadata ($res->[3]) is also checked for key named
+    format_options. The value should be a hash like this { FORMAT_NAME =>
+    OPTS, ... }. FORMAT_NAME can be any to mean any format. This way,
+    function results can specify the details of formatting. An example
+    enveloped result:
+
+     [200, "OK", ["foo", "bar", "baz"], {
+         format_options => {
+             "text"        => {list_max_columns=>1},
+             "text-pretty" => {list_max_columns=>1},
+         }
+     }]
+
+    The above result specifies that if it is displayed using text or
+    text-pretty format, it should be displayed in one columns instead of
+    multicolumns.
+
+RESULT METADATA
+
+      * property: format_options => HASH
+
+FAQ
+
+ How to list supported formats?
+
+    Simply:
+
+     my @supported_formats = keys %Perinci::Result::Format::Formats;
+
+ How to add support for new formats?
+
+    First make sure that Data::Format::Pretty::<FORMAT> module is available
+    for your format. Look on CPAN. If it's not, i't also not hard to create
+    one.
+
+    Then, add your format to %Perinci::Result::Format::Formats hash:
+
+     use Perinci::Result::Format;
+    
+     # this means format named 'xml' will be handled by Data::Format::Pretty::XML
+     $Perinci::Result::Format::Formats{xml} = ['XML', 'text/xml'];
+
+SEE ALSO
+
+    Data::Format::Pretty
+

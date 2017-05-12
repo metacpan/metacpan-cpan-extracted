@@ -1,0 +1,12 @@
+^\.natural
+^docs
+\.komodoproject$
+^\.git
+^_build
+^blib
+^Build$
+\.bak$
+^script\/clean_repo$
+^MYMETA\.yml$
+^MYMETA\.json$
+\.tar\.gz$

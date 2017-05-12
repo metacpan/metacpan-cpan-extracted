@@ -1,0 +1,19 @@
+PCGI version 0.28
+=================
+
+This is Perl module for fastest and full safely works with Common
+Gateway Interface. Required little memory for work, and can safely
+parsing a big or giant POST query's.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+AUTHOR
+
+Andrian Zubko aka Ondr, <ondr@cpan.org>

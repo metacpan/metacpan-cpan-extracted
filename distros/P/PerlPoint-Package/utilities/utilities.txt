@@ -1,0 +1,7 @@
+
+This directory includes:
+
+PerlPoint.clp          - a NoteTab clipbook file
+PerlPoint.vim          - adds PerlPoint syntax highlighting to vim
+perlpoint-hilit19.lisp - suggestion to add PerlPoint syntax highlighting to emacs
+

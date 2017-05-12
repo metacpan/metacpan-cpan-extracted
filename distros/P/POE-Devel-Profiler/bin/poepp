@@ -1,0 +1,115 @@
+#!/usr/bin/perl
+
+# Standard stuff to catch errors
+use strict qw(subs vars refs);				# Make sure we can't mess up
+use warnings FATAL => 'all';				# Enable warnings to catch errors
+
+# Initialize our version
+our $VERSION = '0.01';
+
+# Okay, get the visualizer
+my $visualizer = shift( @ARGV );
+
+# Sanity checking
+if ( ! defined $visualizer ) {
+	print "Please specify a Visualizer to use\n";
+	print "E.x. poepp BasicSummary\n";
+	exit 1;
+}
+
+# Check if we can load the visualizer
+eval "require POE::Devel::Profiler::Visualizer::$visualizer";
+if ( $@ ) {
+	chomp( $@ );
+	print "Unable to load the Visualizer $visualizer\n";
+	print "The error is: '$@'\n";
+	exit 1;
+}
+
+# Give the visualizer the opportunity to manipulate arguments
+( 'POE::Devel::Profiler::Visualizer::' . $visualizer )->GET_ARGS();
+
+# Allright, parse the file!
+require POE::Devel::Profiler::Parser;
+my $data = undef;
+eval {
+	$data = POE::Devel::Profiler::Parser::load_profile( 'poep.out' );
+};
+if ( $@ ) {
+	chomp( $@ );
+	print "Unable to parse the dump file 'poep.out'\n";
+	print "The error is: '$@'\n";
+	exit 1;
+}
+
+# Hand over control to the visualizer
+( 'POE::Devel::Profiler::Visualizer::' . $visualizer )->OUTPUT( $data );
+
+# We're done!
+exit 0;
+__END__
+=head1 NAME
+
+poepp - Interprets POE::Devel::Profiler output
+
+=head1 SYNOPSIS
+
+	perl -MPOE::Devel::Profiler myPOEapp.pl
+	poepp BasicSummary
+
+=head1 CHANGES
+
+=head2 0.01
+
+	First release!
+
+=head1 ABSTRACT
+
+	Interprets and visualizes the data POE::Devel::Profiler produces
+
+=head1 DESCRIPTION
+
+This small program handles parsing the data and passing it to a Visualization module. Included in this distribution
+is one Visualizer, 'BasicSummary'. As I have time, more visualizers will be added, hopefully some nice graphs :)
+
+The desired Visualizer must be the first argument, and the rest of the arguments will be passed intact to the
+Visualizer for further processing.
+
+=head1 Visualizer Developer Documentation
+
+Okay, you want to code your own Visualizer! All you need to do is look at POE::Devel::Profiler::Visualizer::BasicSummary
+to get a general idea of what to do.
+
+=head2 Requirements
+
+	The visualizer must reside in the POE::Devel::Profiler::Visualizer namespace
+
+	The visualizer must define 2 subroutines: GET_ARGS and OUTPUT
+		GET_ARGS will be called at the start, the Visualizer can grab arguments from @ARGV
+		OUTPUT will be called with a pointer to the massive data structure :)
+
+=head2 Data Structure??
+
+For now, the source to POE::Devel::Profiler::Parser contains the entire data structure, play around with Devel::Dumper
+if necessary :(
+
+=head1 SEE ALSO
+
+	L<POE>
+
+	L<POE::Devel::Profiler::Parser>
+
+	L<POE::Devel::Profiler::Visualizer::BasicSummary>
+
+=head1 AUTHOR
+
+Apocalypse E<lt>apocal@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2004 by Apocalypse
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,21 @@
+2.0.31    2015-10-01 21:52:28+01:00 Europe/London
+    - Maintenance release. No new features.
+    
+    - Code clean-up.
+    
+    - POD moved.
+    
+    - Extend test coverage stmt 100% / bran 80% / cond 91.6%
+
+2.0.30    2015-09-08 21:09:46+01:00 Europe/London
+
+    - Returning to Semantic Versioning.
+
+2.152500  2015-09-07 21:15:29+01:00 Europe/London
+
+    - POD expansion and improvements.
+    
+2.152460  2015-09-03 20:09:27+01:00 Europe/London
+
+    - This distribution is now being managed using Dist::Zilla and I've decided to 
+      use the AuthVersion plugin to generate version numbers.

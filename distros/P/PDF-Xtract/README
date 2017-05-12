@@ -1,0 +1,99 @@
+PDF/Xtract version 0.08
+=======================
+
+PDF Xtract is an enhancement of the PDF::Extract module.  It is about 100 times
+faster than PDF::Extract!
+
+PDF Extract is a group of methods that allow the user to quickly grab pages
+as a new PDF document from a pre-existing multi page PDF document.
+
+With PDF::Xtract a new PDF document can be.
+    assigned to a scalar variable with getPDFExtract.
+    saved to disk with savePDFExtract.
+    
+These methods can be called with or without arguments. The methods 
+will not work unless they know the location of the original PDF document and the 
+pages to extract. There are no default values.
+
+The following code can save paqges 1 to 10 and 15 from my.pdf to output.pdf.
+
+use PDF::Xtract;
+@pages=(1..10,15); $pages=\@pages;
+$pdf = new PDF::Xtract( PDFDoc =>"/docs/my.pdf", PDFSaveAs="output.pdf", PDFPages =>$pages ) ;
+
+INSTALLATION
+
+To install this module, just copy the Xtract.pm to your @INC/PDF folder.
+(/perl/lib/PDF or /perl/site/lib/PDF )
+
+DEPENDENCIES
+
+Uses the following modules:
+ strict;
+ vars qw($VERSION);
+ File::Temp;
+
+Release: For minor bugs.
+
+HISTORY
+-------
+
+Fri Apr 15 21:15:17 IST 2005
+
+Version 0.07
+
+Trying to accelerate output generation, which seems to be the remaining bottleneck. 
+
+--------------------------------------------------
+Thu Apr  7 15:02:22 IST 2005
+
+Version 0.06
+
+Noticed that Xtract fails with very large PDFs (>~500MB).  It is now fixed by changing the way the file is read and
+understood.  Fringe benefit: module uses less memory than before.  Additional variable is introduced: PDFReadSize,
+specify the number of bytes to read at a time when reading the input file.
+
+Documentation updated and corrected.  Test script added to distribution.
+
+--------------------------------------------------
+Thu Mar  10 15:02:47 IST 2005
+
+Noticed a problem with include objects!  Work around done.
+
+--------------------------------------------------
+Wed Mar  9 10:50:35 IST 2005
+
+No change in code, but making the distribution more acceptable for testing.
+
+--------------------------------------------------
+Thu Feb  20 15:02:47 IST 2005
+
+Operational sequences within the module is being changed.  New organisation will be as below:
+
+Essentioal variable for doing anything is PDFDoc.
+Extraction and making of document will run as and when PDFPages is defined.  It will be generated into
+the disk file named as PDFSaveAs if one exist, else will be taken to default extract file named as
+$TempExtractFile.
+
+Populating the PDFExtract is now secondary!  If some one ask for that, we will return the content of the
+file $TempExtractFile
+
+--------------------------------------------------
+Wed Mar  9 11:05:47 IST 2005
+
+Version 0.03 : Just made the distribution more acceptale for CPAN testing.
+
+--------------------------------------------------
+Mon Feb 28 20:53:03 IST 2005
+
+First beta release. (Version 0.02) Result of reworking Noel Sharrock's PDF::Extract when it was found
+to be extreamly slow!
+
+PDF::Xtract is at least 100 times faster than PDF::Extract in most cases.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Sunil S
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

@@ -1,0 +1,7 @@
+Changes
+lib/PCX/Loader.pm
+Makefile.PL
+MANIFEST
+t/00-load-module.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

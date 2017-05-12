@@ -1,0 +1,34 @@
+Each class tokenizer returns:
+  undef - on error
+  0 - Did stuff ourself, you don't have to do anything
+  1 - this char is part of me
+  name of the next token's class
+    if the name of the class is the same to the name of the current class, append this char to the current token
+    finalize token (if exists) and make a new token with this class
+
+_finalize_token
+  Returns the name of the current zone
+    many tokens do
+    $t->_finalize_token->__TOKENIZER__on_char( $t );
+    for letting the next token to process this char. (as it is not part of them)
+
+__TOKENIZER__commit
+    1. if we *know* that the next token is of that type, then this
+    function will parse the rest of the token in a single pass, and
+    should return 0 for "done it myself"
+    2. the function should create a new token, with the new class, and
+    read it as a whole
+
+_new_token
+    _finalize_token if there exists a token, and create a new one
+
+Need to know:
+    three _previous_significant_tokens, their types and content.
+        for example, looking for 'Word' token that contain the word 'sub'.
+    the HereDoc token need to store the lines until the HereDoc token.
+        these lines are hiden from the token tree
+        these lines should be added back on serializing
+
+Comment: __TOKENIZER__commit:
+    Why would be a line without a newline in the end?
+

@@ -1,0 +1,257 @@
+package Perinci::CmdLine::Manual::FAQ; # just to make podweaver happy
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: FAQs
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perinci::CmdLine::Manual::FAQ - FAQs
+
+=head1 VERSION
+
+This document describes version 1.50 of Perinci::CmdLine::Manual::FAQ (from Perl distribution Perinci-CmdLine), released on 2016-12-10.
+
+=head1 NOMENCLATURE
+
+C<[PC::Classic]> denotes that the answer applies to L<Perinci::CmdLine::Classic>
+only and not L<Perinci::CmdLine::Lite>. C<[PC::Lite]> denotes that the answer is
+specific to Perinci::CmdLine::Lite. C<[PC::Any]> denotes that the answer is
+specific to L<Perinci::CmdLine::Any>.
+
+=head1 GENERAL
+
+=head2 Why are there multiple frameworks/flavors for Perinci::CmdLine?
+
+There are currently 3 (three) flavors of the framework:
+L<Perinci::CmdLine::Classic>, L<Perinci::CmdLine::Lite>, and
+L<Perinci::CmdLine::Inline>. Which one you should use depends on your needs,
+because sadly, there is no one-size-fits-all.
+
+B<Perinci::CmdLine::Classic.> Perinci::CmdLine::Classic (hereby called
+PC:Classic) is the first flavor which I developed (and it used to be called just
+Perinci::CmdLine). It has the most complete features as well as the prettiest
+output, but as it grows in features, other things like startup overhead and
+dependencies also grow.
+
+B<Perinci::CmdLine::Lite.> So another project is started,
+L<Perinci::CmdLine::Lite> (hereby called PC::Lite) that focuses on keeping
+startup overhead low to avoid making tab completion delay noticeable. PC:Lite
+aims to make CLI scripts typically start below 0.05s, while PC:Classic-based
+scripts currently start in about 0.2-0.5s which causes a noticeable delay when
+doing tab completion. PC:Lite also tries to reduce the number of dependencies
+(from 100+ down to 30+ or so). Some PC:Classic features are still missing in
+PC:Lite (see next question).
+
+PC:Lite stays more lightweight by avoiding the use of libraries that have large
+dependencies or add too much to startup overhead. This includes replacing
+L<Perinci::Access> with L<Perinci::Access::Lite> for metadata access, avoiding
+L<Text::ANSITable> for formatting results, and replacing L<Log::Any::App> (which
+uses the relatively heavy L<Log::Log4perl>) with L<Log::Any::Adapter::Screen>
+for logging.
+
+Implementation-wise, the two share a lot of common code in the form of their
+base class, L<Perinci::CmdLine::Base>. The interface is also 99% the same.
+
+It is possible that in the future the two versions will merge.
+
+B<Perinci::CmdLine::Inline.> There is another flavor called PC:Inline. The goal
+of this flavor is to make your CLI scripts depend on nothing but Perl and the
+core modules. (It is also possible to make PC:Classic- or PC:Lite-based CLI
+script to also be freestanding by techniques like fatpacking or datapacking, but
+the resulting packed script will be much larger.) It has the lowest number of
+dependencies and the fastest startup overhead (around 0.01s). But currently it
+also has the least features.
+
+It reduces startup overhead further by skipping the Riap layer and prefetching
+the Rinci metadata, precomputing the command-line options, and embedding all
+these in the scripts.
+
+See L<Perinci::CmdLine::Inline> for more details of the features it currently
+supports. This flavor is suitable for simple CLI scripts that need to be as lean
+and fast as possible, for example: L<hr> (in L<App::hr>) or L<gen-uuids> (in
+L<App::UuidUtils>).
+
+All the flavors share the basic concept: running your L<Rinci>-described
+functions on the command-line.
+
+So which one should you choose? PC:Lite is the sane default choice, unless you
+need features that are currently not supported by PC:Lite, in which case you can
+consider using PC:Classic. If you really need fast startup, you can opt for
+PC:Inline. But note that when the backend function's Rinci metadata changes, you
+will need to rebuild the script because the metadata is embedded in the script
+(while in PC:Lite and PC:Classic, the script simply request the Rinci metadata
+during runtime).
+
+=head2 What Classic features are currently still missing in Lite?
+
+=over
+
+=item * More sophisticated formatting
+
+Instead of L<Perinci::Result::Format> (especially for 'text*' formats which use
+L<Data::Format::Pretty::Console> and L<Text::ANSITable>), to keep dependencies
+minimal and formatting quick, PC::Lite uses the following simple rules that work
+for a significant portion of common data structures:
+
+1) if result is undef, print nothing.
+
+2) if result is scalar, print it (with newline automatically added).
+
+3) if result is an array of scalars (check at most 5 first rows), print it one
+line for each element.
+
+4) if result is a hash of scalars (check at most 5 keys), print a two column
+table, first column is key and second column is value. Keys will be sorted.
+
+5) if result is an array of hashes of scalars (check at most 5 elements), print
+as table.
+
+6) if result is an array of arrays of scalars (check at most 5 elements), print
+as table.
+
+7) otherwise print as JSON (after cleaning it with L<Data::Clean::JSON>).
+
+YAML and the other formats are not supported.
+
+Table is printed using the more lightweight and much faster
+L<Text::Table::Tiny>.
+
+PC::Classic supports more sophisticated formatting, can keep colored and
+full-width Unicode characters stay aligned in a table.
+
+=item * Support for extra protocols
+
+Instead of L<Perinci::Access>, PC::Lite uses the more lightweight alternative
+L<Perinci::Access::Lite> which does not support some URL schemes (riap+tcp,
+riap+unix, riap+pipe). http/https and local are supported though.
+
+=item * Extra stuffs that Perinci::Sub::Wrapper adds
+
+PC::Classic uses function wrapper to automatically adds argument validation,
+dependency checking, and so on. However, this adds too much overhead so PC:Lite
+avoids it and do some of the stuffs by itself to avoid the overhead.
+
+PC:Lite does argument validation, as well as dependency checking. But there are
+other stuffs that Perinci::Sub::Wrapper adds that are not available, including:
+result validation, validation of input stream (streaming argument) as well as
+output stream (streaming result).
+
+=item * Color themes
+
+=item * Undo
+
+=item * More advanced logging
+
+Only logging to screen is currently supported by PC::Lite, using
+L<Log::Any::Adapter::Screen>. PC::Classic, using L<Log::Any::App> can log to
+files, directories, syslog, and other outputs.
+
+=item * I18N
+
+=item * The following environment variables
+
+ PERINCI_CMDLINE_COLOR_THEME
+ PERINCI_CMDLINE_SERVER
+ COLOR
+ UTF8
+
+=back
+
+=head2 What is Perinci::CmdLine::Any then?
+
+This is a module that allows you to select PC::Classic or PC::Lite. So your
+scripts do not need to be modified when user wants to switch between the two.
+
+=head2 How does Perinci::CmdLine compare with other CLI-app frameworks?
+
+The main difference is that Perinci::CmdLine accesses your code through L<Riap>
+protocol, not directly. This means that aside from local Perl code,
+Perinci::CmdLine can also provide CLI for code in remote hosts/languages. For a
+very rough demo, download and run this PHP Riap::TCP server
+https://github.com/sharyanto/php-Phinci/blob/master/demo/phi-tcpserve-terbilang.php
+on your system. After that, try running:
+
+ % peri-run riap+tcp://localhost:9090/terbilang --help
+ % peri-run riap+tcp://localhost:9090/terbilang 1234
+
+Everything from help message, calling, argument checking, tab completion works
+for remote code as well as local Perl code.
+
+=head2 But my application is OO? But I want an OO framework?
+
+This framework is currently function-centric. There are already several OO-based
+command-line frameworks on CPAN.
+
+=head1 DEBUGGING
+
+=head2 How do I enable/view log messages?
+
+The framework produces log messages using L<Log::Any>. You can display them on
+the screen, e.g. using L<Log::Any::Adapter::Screen> like:
+
+ % perl -MLog::Any::Adapter=Screen,min_level,trace /path/to/yourscript.pl
+
+or:
+
+ % TRACE=1 PERL5OPT=-MLog::Any::Adapter::Screen yourscript.pl
+
+Log::Any::Adapter::Screen has a few other options and observes a few other
+environment variables (e.g. for prefixing with timestamp, etc). See its
+documentation for more details.
+
+For sending logs to files, there are other Log::Any adapters you can look at.
+Also take a look at L<Log::Any::App>.
+
+=head2 How do I debug my CLI script?
+
+To see stack trace on error, you can use L<Devel::Confess>.
+Perinci::CmdLine::Base detects if Devel::Confess is loaded and will return the
+stack trace for you:
+
+ % perl -d:Confess /path/to/yourscript.pl
+
+or:
+
+ % PERL5OPT='-d:Confess' yourscript.pl
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-CmdLine>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Perinci::CmdLine::Manual>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+
+
+if (!(-e "code.pen")) {
+	print "You must have a file called code.pen, in your";
+	print "\ncurrent directory that contains perl code to be\n";
+	print "executed.\n";
+	exit(1);
+}
+
+use Penguin::Easy;
+print "Enter your PGP Password: ";
+system("stty -echo");
+my $sig = <STDIN>;
+chop $sig;
+system("stty echo");
+print "\nThanks..\n";
+open(FILE, "code.pen");
+{ local $/ = undef; $code = <FILE> }
+close(FILE);
+
+print "Executing....\n";
+############### Easy Penguin starts here ####################################
+my $ep = new Penguin::Easy Sig => $sig,
+			   Title => 'James\'s Program',
+			   Name => 'James Duncan',
+			   Code => $code;
+$results = $ep->run(Host => 'localhost');
+############## Easy Penguin ends here   ####################################
+print "Results received:\n$results";

@@ -1,0 +1,29 @@
+[AGENT]
+
+Mozilla/5.0 (Macintosh; U; PPC Mac OS X Mach-O; en-US; rv:1.7.2) Gecko/20040825 Camino/0.8.1
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'PPC Mac OS X Mach-O',
+'extras'           => ['Macintosh'],
+'version_raw'      => '0.8.1',
+'lang'             => 'en-US',
+'mozilla'          => [ '1.7.2','1.007002'],
+'version'          => '0.008001',
+'name'             => 'Camino',
+'toolkit'          => ['Gecko','20040825','20040825.000']
+
+[AGENT]
+
+Mozilla/5.0 (Macintosh; U; Intel Mac OS X; en; rv:1.8.1.14) Gecko/20080409 Camino/1.6 (like Firefox/2.0.0.14)
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Intel Mac OS X',
+'extras'           => ['Macintosh','like Firefox/2.0.0.14'],
+'toolkit'          => ['Gecko','20080409','20080409.000'],
+'version_raw'      => '1.6',
+'lang'             => 'en',
+'version'          => '1.600',
+'mozilla' => ['1.8.1.14','1.008001014'],
+'name'             => 'Camino',

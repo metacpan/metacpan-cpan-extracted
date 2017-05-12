@@ -1,0 +1,32 @@
+NAME
+    P5U::Command::Peek - p5u extension to peek at SVs
+
+SYNOPSIS
+      p5u peek '[]'
+
+      p5u peek 'my @arr; push @arr, 1; \@arr'
+
+DESCRIPTION
+    This is a simple wrapper around Devel::Peek.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=P5U-Command-Peek>.
+
+SEE ALSO
+    P5U.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

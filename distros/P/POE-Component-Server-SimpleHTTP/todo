@@ -1,0 +1,14 @@
+- look if ADDRESS stuff is really unnecesary because that makes impossible to bind to certain ip
+ (it might be optional but possible to give)
+- Support for ucfirst lc $arguments not only uppercase ones? (or check if that works in all cases)
+
+- indents in everywhere and one coding style (which one?)
+
+- cleanup logging methods, currently:
+ * LOGHANDLER is fired on request (which place could be used for ACLs not loggers)
+ * LOG2HANDLER is fired after servicing request BUT NOT for Streams (need to be fixed)
+
+- maybe after first fail for any session/event post that handler should be disabled? 
+  or maybe triggerable behaviour
+
+any other ideas?

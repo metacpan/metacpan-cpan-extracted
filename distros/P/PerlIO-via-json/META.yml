@@ -1,0 +1,23 @@
+---
+abstract: 'PerlIO layer to convert to and from JSON'
+author:
+  - 'Scott Lanning <slanning@cpan.org>.'
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PerlIO-via-json
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  JSON::XS: 2.231
+requires:
+  XML::XML2JSON: 0.05
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

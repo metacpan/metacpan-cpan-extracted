@@ -1,0 +1,67 @@
+Revision history for Padre-Plugin-Git
+
+0.12 2013-09-15
+ - various tweaks after running xt's
+ - add typo found by perlbotics++
+ - remove an unwanted 0.11, that crepped in from an update-version script,
+   this is also a test (BOWTIE)
+ - turn off message echo to term [0e2335e]
+ - tweak contents, remove core modules [cd5db46]
+ - update POD
+ - Update Version [30df3d8]
+
+0.11 2012-11-29
+ - silly me forgot to add install share to Makrfile.PL (BOWTIE)
+
+0.10 2012-11-29
+ - silly me left some test code visable (BOWTIE)
+
+0.09 2012-11-29
+ - Oops Add Artistic accreditation (BOWTIE)
+ - use 64x64 in About Dialogue (BOWTIE)
+ - Add Local Stage Patch for dod++ (BOWTIE)
+ - Add Local Commit Patch to complement the Stage Patch (BOWTIE)
+ - Add Message Dialogue for commit messages, 
+ - also offer to load previous message from .git/COMMIT_EDITMSG (BOWTIE)
+
+0.08 2012-11-25
+ - Unescaped left brace in regex is deprecated, passed through in regex
+   (BOWTIE)
+ - Add a plugin icon for use in Plugin Manager (BOWTIE)
+ - Add blame for current file for dod++ (BOWTIE)
+ - Add a git icon to About Dialog (BOWTIE)
+ - Add Perl programming -> TIOBE (BOWTIE)
+
+0.07 2012-11-03
+ - Fix-typo use of pbp return in sub cause a clocaking effect of menu
+   (BOWTIE)
+
+0.06 2012-11-01
+ - Add some Branching 
+ - Make Dialogue Bigger (BOWTIE)
+ - Add auto update Changes on git commit if {{$NEXT}} exists (BOWTIE)
+ - Update Makefile.PL with requirments (BOWTIE)
+
+0.05 2012-09-26
+ - Add missing dependencies (BOWTIE)
+
+0.04 2012-09-08
+ - Update to Padre-Plugin Api 2.2 (BOWTIE)
+ - event_on_context_menu now works, short cut (BOWTIE)
+ - switch to menu_plugins_simple all items work (BOWTIE)
+ - git local functions, done (BOWTIE)
+ - git remote functions, using padre-task (BOWTIE)
+ - enable git-hub pull request with external credentials (BOWTIE)
+
+0.03 2010-08-20
+ - Compatibility with new Padre (CHORNY)
+ - chdir to file directory before commit (CHORNY)
+
+0.02 2009-03-25
+ - Add necessary diff methods for file and dir (kaare)
+ - Add inc/* and META.yml to MANIFEST (and there-for the tar-ball) (ryan52)
+
+0.01 2009-03-13
+ - First version, released on an unsuspecting world.
+ - Based on Padre-Plugin-SVK
+

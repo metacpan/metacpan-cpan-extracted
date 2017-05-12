@@ -1,0 +1,29 @@
+=pod
+
+=for stopwords vewy wabbits
+
+=cut
+
+=head1 FUDD
+
+Be vewy vewy quiet... I'm hunting wabbits
+
+=for stopwords jumpingbunny
+
+=head1 DESCRIPTION
+
+This is a simple document meant to be used in testing Pod::Weaver.
+
+It does not do very much.
+
+=for :stopwords bouncingrabbit
+
+=head1 SYNOPSIS
+
+This should probably get moved up front.
+
+=for :stopwords fluffybunny
+
+=for stopwords sillyrabbit
+
+=cut

@@ -1,0 +1,28 @@
+---
+abstract: 'The great new Plack::Middleware::AMF!'
+author:
+  - 'Takuho Yoshizu <yoshizu@s2factory.co.jp>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-AMF
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::AMF: 0.03
+  Plack: 0
+  Plack::Request: 0
+  UNIVERSAL::require: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

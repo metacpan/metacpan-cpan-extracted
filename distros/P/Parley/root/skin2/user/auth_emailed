@@ -1,0 +1,8 @@
+<h1>[%l('USER ALMOST THERE')%]</h1>
+
+<p>[%l('Thanks for signing up')%] [% newdata.first_name %]!</p>
+
+<p>
+[%l('An email has been sent to')%] <i>[% newdata.email %]</i>.<br />
+[%l('USER ACTIVATE')%].
+</p>

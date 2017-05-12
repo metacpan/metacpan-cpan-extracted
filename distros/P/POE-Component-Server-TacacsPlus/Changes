@@ -1,0 +1,66 @@
+Revision history for Perl extension Net::TacacsPlus.
+
+1.11 2011-07-03
+    - Update Makefile.PL to list all required modules.
+
+1.10 2011-07-02
+    - server_msg available (thanks to Neal Gooch)
+    - allow password change within authenticate method call (thanks to Neal Gooch)
+    - #63021 faster Net::TacacsPlus::Constants (thanks to Douglas Christopher Wilson)
+    - POE::Component::Server::TacacsPlus and POE::Filter::TacacsPlus have been
+      moved the the distribution POE-Component-Server-TacacsPlus
+
+1.09  Thu Jul 15 19:00:00 2010
+    - added rem_addr and port arguments to authenticate(), authorize() and account()
+    - implemented recv_reply method for receiving TAC+ reply packet from the server.
+      recv_reply is more robust and can deal with interrupted system calls and
+      packet fragmentation.
+    - #59411 using plain ^ instead of non-existing Math::XOR (thanks to Derik)
+
+1.08  Thu Mar 12 00:00:00 2009
+    - 
+
+1.07  Mon Oct 29 22:18:00 2007
+    - changes for cpants
+      added pod.t and pod-coverage.t
+      MANIFEST
+      use strict
+      6.36 ExtUtils::MakeMaker used
+    - removed version from use_ok because not working in debian sarge
+
+1.06  Tue Oct 02 20:56:00 2007
+    - unpack bug that was causing from time to time authentication failures even credentials were ok
+    - change objects to use base Class::Accessor::Fast
+    - POE server module
+
+1.05  Fri Sep 07 21:20:00 2007
+    - authorize no more modifies args but has optional thirt parameter to return back the args from server
+    - tests for authorization and accounting
+    - separated Packet packages to more files
+    - ASCII authentication uninitialized variable fix
+    - ASCII authentication test
+
+1.04  Sun Sep 02 00:48:00 2007
+    - use strict !!! for ::Client...
+    - fixed broken authentication
+    - real authentication done in tests when ENV set properly
+
+1.03  Tue Aug 28 16:08:14 2007
+    - Added TACACS+ authorization and accounting
+    - minor code changes to existing code to be able to
+      support authorization and accounting
+    - TACACS+ session is now initialized each time a call is
+      made to authenticate(), authorize() or account() making it
+      possible to reuse the same Net::TacacsPlus::Client object.
+    - removed srand because not needed according to the rand perl doc
+    - rewrote some 'die' statements to 'croak' instead
+
+1.02  Mon Jul 30 15:29:00 2007
+    - removed Log4Perl, created Net::TacacsPlus
+    - more pods, tests, cleanup, dependecies fix, MANIFEST fix
+    - this was more cleanup than fixes so that it cpan tests will run fine
+
+1.00  Fri Nov  3 13:32:06 2006
+    - original version; created by h2xs 1.23 with options
+      --omit-autoload --omit-XS --name Net::TacacsPlus::Client -b 5.6.0
+

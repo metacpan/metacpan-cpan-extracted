@@ -1,0 +1,16 @@
+Revision history for Personality-Type-MBTI
+
+0.05	2007-06-12
+	Fixed documentation and distribution meta files
+
+0.04	2007-06-12
+	Algorithm to calculate dominant/auxiliar function
+
+0.03	2007-05-31
+	Accept negative values (e.g. "-1i", "-2s", etc)
+
+0.02	2007-05-30
+	Accept weighted options (e.g. "2e", "3n", etc)
+
+0.01    2007-05-29
+        First version, released on an unsuspecting world.

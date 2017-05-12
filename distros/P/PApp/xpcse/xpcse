@@ -1,0 +1,311 @@
+#!/usr/bin/perl
+
+$XMESSAGE = "xmessage";
+$TERMINAL = $ENV{XPCSE_TERMINAL} || "rxvt -g 90x25 -e";
+$EDITOR   = $ENV{EDITOR} || "vi";
+
+=head1 NAME
+
+xpcse 
+
+=head1 DESCRIPTION
+
+The goal of xpcse is to edit files, database content etc.
+on the client-side with locally installed software.
+
+=head1 CONFIGURATION
+
+=head2 ENVIRONMENT
+
+Environment variables can be used to change the behavior of xpcse.
+These variables are C<EDITOR> and C<XPCSE_TERMINAL>.
+
+Examples: 
+
+  export XPCSE_TERMINAL='rxvt -g 90x25 -e'
+  export EDITOR=vi
+
+=head2 FILES
+
+=over 4
+
+=item ~/.mailcap or /etc/mailcap
+
+You need to add this line to any of these files to launch xpcse properly
+from within your browser:
+
+  application/x-xpcse; /location/of/xpcse '%s'
+
+=item ~/.mailcap.xpcse or /etc/mailcap.xpcse
+
+These entries have the same form as standard mailcap entries and can be
+used to override xcpse's idea of what programs should be used to display
+certain content types.
+
+For example, to use a different program to edit jpeg files with xpcse 
+than the one defined in the standard mailcap file, use this line;
+
+  image/jpeg; xv -maxpect '%s'; edit=/location/of/program/to/edit '%s'
+
+=back
+
+=cut
+
+use POSIX ":sys_wait_h";
+use LWP::UserAgent;
+use File::Temp qw(tempdir);
+use IO::Handle;
+use Fcntl;
+use Config;
+
+# 1. init
+
+our $TEMPDIR;
+
+our $check_ms = 100;
+our $on_exit_only = 0;
+our $dirty_wait = 1;
+our $quiet = 0;
+our $line = "";
+
+our $PROTOCOL_VERSION = "1.1";
+our $VERSION = 1.0;
+
+BEGIN {
+   $TEMPDIR = tempdir TEMPDIR => 1;
+   chmod 0700, $TEMPDIR
+      or die "unable to chmod $TMPDIR: $!";
+}
+
+END {
+   system "rm", "-rf", $TEMPDIR;
+}
+
+my $msg_pid = -1;
+sub msgbox {
+   kill 9, $msg_pid unless $msg_pid == -1;
+   exec $XMESSAGE, "-buttons", "OK", "-default", "OK", "-name", @_ unless $msg_pid = fork;
+   select undef, undef, undef, 0.25; # avoid extreme loops on uncommited messages (does not happen, just to be sure).
+}
+
+sub prompt {
+   my ($msg1, $msg2) = @_;
+   my $cmd = "/bin/echo \Q$msg1\E; /bin/echo -n \Q$msg2\E; stty -echo; read answer; /bin/echo -n \$answer >$TEMPDIR/answer";
+   system "$TERMINAL sh -c \Q$cmd\E";
+   open my $answer, "<", "$TEMPDIR/answer"
+      or die "error while prompting user\n";
+   unlink "$TEMPDIR/answer";
+   <$answer>;
+}
+
+$SIG{__DIE__} = sub {
+   (my $msg = $_[0]) =~ s/\n$//;
+   msgbox "xpcse_error", $_[0];
+   exit 1;
+};
+
+sub parse_header($) {
+   local $/ = "\015\012\015\012";
+   my $full = $_[0]->getline;
+   my (%hdr);
+   $hdr{lc $1} .= "$2"
+      while $full =~ /\G
+                      ([^:\000-\040]+):
+                      [\011\040]*
+                      ((?: [^\015\012]+ | \015\012[\011\040] )*)
+                      \015\012
+                     /gxc;
+
+   $full =~ /\G\015\012$/
+      or return;
+
+   %hdr;
+}
+
+my %auth;
+
+# subclass useragent
+@useragent::ISA = LWP::UserAgent;
+sub useragent::get_basic_credentials {
+   my ($self, $realm, $uri) = @_;
+   my $netloc = $uri->host_port;
+
+   my ($user, $pass) = @{$auth{$netloc}{$realm} || []};
+   
+   if (!(defined $user and defined $pass)) {
+      $user = prompt "A username for '$realm' at '$netloc' is required.", "Username: ";
+      $pass = prompt "A password for '$realm' at '$netloc' is required.", "Password: ";
+
+      $auth{$netloc}{$realm} = [$user, $pass];
+   }
+
+   ($user, $pass);
+}
+
+sub request {
+   my ($ua, $req) = @_;
+
+   for (;;) {
+      my $res = $ua->request ($req);
+
+      if ($res->code == &HTTP::Status::RC_UNAUTHORIZED
+          || $res->code == &HTTP::Status::RC_PROXY_AUTHENTICATION_REQUIRED) {
+         %auth = ();
+      } else {
+         return $res;
+      }
+   }
+}
+
+my $ua = new useragent;
+$ua->env_proxy;
+
+my $nodename = (POSIX::uname)[1];
+$nodename =~ tr/[\000-\040\177-\377]//d;
+
+my $ch = "&ostype=unix&pver=$PROTOCOL_VERSION&node=$nodename";
+
+$ua->agent("xpcse/$VERSION; unix-perl");
+
+sub download {
+   my ($url, $file) = @_;
+
+   $http_headers->content_type("application/octet-stream");
+   my $res = request ($ua, new HTTP::Request GET => "$hdr{url}?command=fetch$ch", $http_headers, "");
+
+   if($res->is_success) {
+      open my $fh, ">", $file or die "can't open file '$file' $!";
+      binmode $fh;
+      print $fh $res->content;
+   } else {
+      die $res->error_as_HTML;
+   }
+}
+
+# 2. parse
+
+open my $request, "<", $ARGV[0]
+   or die "unable to open submitted command file: $!\n";
+
+binmode $request;
+
+our %hdr = parse_header $request;
+close $request;
+#unlink $ARGV[0]; # marc says you'll have a better life without this
+
+for (qw(url extension content-type xpcse-protocol-version)) {
+   exists $hdr{$_} or die "protocol error: required header \"$_\" missing";
+}
+
+$hdr{'xpcse-protocol-version'} >= 1
+   and $hdr{'xpcse-protocol-version'} < 2
+   or die "illegal protocol version $hdr{'xpcse-protocol-version'}";
+
+my $TEMP;
+
+$hdr{extension} =~ s/[^\.a-zA-Z0-9\-_]//g; # security .)
+
+$TEMP ||= "$TEMPDIR/xpcse$hdr{extension}";
+
+# @@@
+
+$dirty_wait   = $hdr{"dirty-wait"} if $hdr{dirty_wait} =~ /^\d+$/;
+$quiet        = $hdr{quiet} if $hdr{quiet} =~ /^\d+$/;
+$on_exit_only = $hdr{"on-exit-only"} if $hdr{"on-exit-only"} =~ /^\d+$/;
+$check_ms     = $hdr{"check-ms"} if $hdr{"check-ms"} =~ /^\d+$/ && $hdr{"check-ms"} > 65;
+
+$line         = "+$hdr{line}" if $hdr{line} =~ /^\d+$/;
+
+$http_headers = new HTTP::Headers;
+$http_headers->authorization_basic      ($hdr{"auth-username"},       $hdr{"auth-password"})
+   if exists $hdr{"auth-username"};
+$http_headers->proxy_authorization_basic($hdr{"proxy-auth-username"}, $hdr{"proxy-auth-password"})
+   if exists $hdr{"proxy-auth-username"};
+
+# 3. create local file
+
+download $hdr{url}, $TEMP;
+
+die "no file $TEMP" unless -f $TEMP;
+
+my $MTIME;
+
+$MTIME = time - 1;
+utime $MTIME, $MTIME, $TEMP;
+
+# 4. start editor
+
+my $editpid;
+
+if (0 == ($editpid = fork)) {
+   if ($hdr{'content-type'} eq "text/plain") {
+      exec "$TERMINAL $EDITOR $line $TEMP";
+   } else {
+      local $ENV{MAILCAPS} = "$ENV{HOME}/.mailcap.xpcse:$ENV{HOME}/.mailcap:$ENV{MAILCAPS}:/etc/mailcap.xpcse:/etc/mailcap";
+      my $rm = -x "$Config{sitebin}/run-mailcap" ? "$Config{sitebin}/run-mailcap" : "run-mailcap";
+      exec "$TERMINAL $rm --action=edit $hdr{'content-type'}:$TEMP";
+   }
+   exit(255);
+} elsif (!defined $editpid) {
+   die "error while starting editor: $!\n";
+}
+
+# 5. poll file && upload
+
+sub upload {
+   my $file = do {
+      local $/;
+      open my $fh, "<", $TEMP
+         or die "$TEMP: $!";
+      binmode $fh;
+      <$fh>
+   };
+
+   # stat just before uploading, so we don't miss changes also change
+   # filetime to a somewhat earlier point in time, so we really don't miss
+   # any changes.
+   $MTIME = (stat $TEMP)[9] - 1;
+   utime $MTIME, $MTIME, $TEMP;
+
+   $http_headers->content_type ($hdr{'content-type'});
+   $http_headers->content_length (length $file);
+   my $res = request ($ua, new HTTP::Request POST => "$hdr{url}?command=store$ch", $http_headers, $file);
+
+   if ($res->is_success) {
+      my $content = $res->content;
+      $content =~ s/^-+//;
+      
+      if ($res->code == 200 && length ($content) < 100) {
+         $quiet or msgbox "xpcse_ok", -timeout => 1, $content;
+      } else {
+         msgbox "xpcse_ok", $content;
+      }
+   } else {
+      msgbox "xpcse_error", "UPLOAD FAILED\n" . $res->as_string;
+   }
+}
+
+my ($dirty, $dwait) = (0, 0);
+
+do {
+   for (my $movecheck = 0; $movecheck < 15; $movecheck++) {
+        select undef, undef, undef, $check_ms/1000;
+        $MTIME2 = (stat $TEMP)[9];
+        last if defined $MTIME2;
+   }
+   if ($MTIME2 != $MTIME) {
+      ($dirty, $dwait) = (1, 0);
+      $MTIME = $MTIME2;
+   } else {
+      if (!$on_exit_only && $dirty) {
+         if (++$dwait > $dirty_wait) {
+            ($dirty, $dwait) = (0, 0);
+            upload;
+         }
+      }
+   }
+} while $editpid != waitpid $editpid, WNOHANG;
+
+($dirty or (stat $TEMP)[9] != $MTIME) and upload;
+
+

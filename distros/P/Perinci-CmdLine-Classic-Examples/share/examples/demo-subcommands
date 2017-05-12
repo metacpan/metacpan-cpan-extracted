@@ -1,0 +1,105 @@
+#!/usr/bin/perl
+
+use 5.010;
+use strict;
+use utf8;
+use warnings;
+
+use Perinci::CmdLine::Classic;
+
+our %SPEC;
+
+$SPEC{foo} = {
+    v => 1.1,
+    args => {
+        a1 => {},
+        a2 => {},
+    },
+};
+sub foo {
+    my %args = @_;
+    [200];
+}
+
+$SPEC{foo_fr} = {
+    v => 1.1,
+    summary => "Return something French",
+};
+sub foo_fr {
+    my %args = @_;
+    [200, "OK", "c'est intéressant!"];
+}
+
+$SPEC{foo_zh} = {
+    v => 1.1,
+    summary => "Return something Chinese",
+};
+sub foo_zh {
+    my %args = @_;
+    [200, "OK", "很有趣的！"];
+}
+
+my @more_sc = (
+    sc10 => {url=>'/main/foo'},
+    sc11 => {url=>'/main/foo'},
+    sc12 => {url=>'/main/foo'},
+    sc13 => {url=>'/main/foo'},
+    sc14 => {url=>'/main/foo'},
+    sc15 => {url=>'/main/foo'},
+    sc16 => {url=>'/main/foo'},
+    sc17 => {url=>'/main/foo'},
+    sc18 => {url=>'/main/foo'},
+    sc19 => {url=>'/main/foo'},
+);
+
+Perinci::CmdLine::Classic->new(
+    description => <<'_',
+
+Try running this program with:
+
+* (without any argument)
+
+* --help
+
+* --help --verbose
+
+* sc1 --help
+
+* sc1 --help --verbose
+
+* HIDE_S* MORE_SUBCOMMANDS=1
+
+_
+    subcommands => {
+        sc1 => {
+            url => '/main/foo',
+            summary => 'Summary for sc1',
+            tags => ['category:Foo'],
+        },
+        sc2_a_subcommand_with_a_rather_long_name => {
+            url => '/main/foo',
+            summary => 'Summary for sc2',
+            tags => ['category:Foo'],
+        },
+        "sc3-with-dash" => {
+            url => '/main/foo',
+            show_in_help => 0,
+        },
+        sc4 => {
+            url => '/main/foo_fr',
+            summary => 'Summary for sc4',
+            "summary.alt.lang.id_ID" => 'Ringkasan untuk sc4',
+            "summary.alt.lang.fr_FR" => 'Résumé pour sc4',
+            "summary.alt.lang.zh_CN" => 'sc4的摘要',
+            tags => ['category:Bar'],
+            # should be unnecessary, will use use_utf8 attribut esetting
+            #use_utf8 => 1,
+        },
+        sc5 => {
+            url => '/main/foo_zh',
+            # should be unnecessary, will use use_utf8 attribut esetting
+            #use_utf8 => 1,
+        },
+        ($ENV{MORE_SUBCOMMANDS} ? @more_sc : ()),
+    },
+)->run;

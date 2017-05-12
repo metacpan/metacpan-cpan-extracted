@@ -1,0 +1,168 @@
+
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Viewport with Controls</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Viewports</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<A HREF=index.html>Viewport</A><BR>
+<B>with controls</B>
+<P>
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.   A presentation is based on
+<A HREF=../slide/index.html>slides</A>, which are shown on viewports.
+<P>
+There are two kinds of viewports:
+<UL>
+<LI>viewports <A HREF=index.html>without any controls</A>, and
+<LI>one viewport with controls, showing
+    the show's progress, with a background-menu, etc.
+</UL>
+
+    </TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=#howto>how to...</A><BR>
+<A HREF=index.html#options>viewport&nbsp;options</A><BR>
+<A HREF=#options>control options</A><BR>
+<A HREF=phase.html>phase options</A><BR>
+<A HREF=#examples>examples</A><BR>
+<P>
+    </TD><TD VALIGN=top>
+
+<H2><A NAME=howto>How to</A> create a viewport with controls</H2>
+
+For this, you should read <A HREF=index.html#howto>how to create
+viewports</A>, and the <A HREF=#examples>examples below</A>.  A typical
+example of a control viewport look like:
+</TD></TR>
+<TR><TD COLSPAN=2 ALIGN=right><IMG SRC=control.gif WIDTH=639
+     HEIGHT=479></TD></TR>
+<TR><TD>&nbsp;</TD><TD VALIGN=top>
+
+A control window contains a various controls:
+<UL>
+<LI>a background menu,
+<LI>control <A HREF=popup.html>popup</A> (optional),
+<LI><A HREF=popup.html#tagcontrol>tag control</A> (unless control-popup),
+<LI><A HREF=popup.html#slidecontrol>slide control</A> (unless control-popup),
+<LI><A HREF=phase.html>slide phase</A>,
+<LI>slide notes,
+<LI>progress bar,
+<LI>slide button bar, and
+<LI>neighbour names bar.
+</UL>
+
+<H2><A NAME=options>Options for control viewports</H2>
+
+Viewports with control have all <A HREF=index.html#options>options of
+the usual viewports</A>, but often with other defaults, but have a
+few more which are used for the various controls which are displayed:
+<DL>
+<DT>
+<DT><B>-includeControls =&gt;</B> <I>boolean</I>
+<DD>This flag determines wheter the
+    <A HREF=slidecontrol.html>slide-control</A> and
+    <A HREF=tagcontrol.html>tag-control</A> should
+    be included in the control-window or via a popup.<BR>
+    The default is in a seperate popup, but the implicit generated
+    control viewport will contain these controls.
+    <P>
+<DT><B>-showPhases =&gt;</B> <I>boolean</I>
+<DD>Specifies if you want to see how many phases still has to be done
+    to complete this slide.  Read the special page about the possibilities
+    on location and shape of the <A HREF=phase.html>representation of
+    phases</A>.
+    <P>
+<DT><B>-showProgressBar =&gt;</B> <I>boolean</I>
+<DT><B>-showSlideButtons =&gt;</B> <I>boolean</I>
+<DT><B>-showNeighbours =&gt;</B> <I>boolean</I>
+<DD>By default, the control viewport shows these bars, but you can
+    turn them off using the background-menu or by setting these flags.
+    <P>
+<DT><B>-progressColors =&gt; [</B> <I>color, percent, ..., color</I> <B>]</B>
+<DD>When time tics away, the required time for a slide, or the available
+    time for the show is running out.  With colors this is expressed.  You
+    will find the same colors in the progress-bar and in the slide-timings
+    of the slide-control window.
+    <P>
+    The default is:
+<PRE>
+  [ qw/white 0.5 yellow 0.7 green 0.9 orange 1.1 red/ ]
+</PRE>
+which means: white until 50% of the time is consumed, then yellow till 70%,
+then green till 90%, oranje till 20% too much time spent, and after
+that it turns to red.  With this option you can change this.
+    <P>
+<DT><B>-progressLineWidth =&gt;</B> <I>pixels</I>
+<DD>The thickness of the line which is shown in the progress-bar.  The
+    height of the bar is a little wider than twice this thickness.
+    <P>
+<DT><B>-progressBackground =&gt;</B> <I>color</I>
+<DD>Color of the background of all the control-bars.
+    <P>
+<DT><B>-slideButtonBackground =&gt;</B> <I>color</I>
+<DD>Color of button representing the selected slide.
+    Defaults to <CODE>'green'</CODE>.
+    <P>
+<DT><B>-neighbourNameColor =&gt;</B> <I>color</I>
+<DD>Color or names shown: the previous, current, and next slide.
+    <P>
+<DT><B>-neighbourNameSize =&gt;</B> <I>pixel-size</I>
+<DD>Size in which the names of the previous, current, and next slide
+    is printed.  The size should be in pixels (default is <CODE>'10p'</CODE>,
+    because on the time this bar is created, there is no style (hence no
+    fontset) defined. Sorry.
+</DL>
+
+Viewports with control have all <A HREF=index.html#options>options of
+the usual viewports</A>, but often with other defaults.  Futhermore, there
+are some <A HREF=phase.html>options related to phases</A>.
+
+<H2><A NAME=examples>Examples</A></H2>
+
+You can create a control viewport implicit:
+<PRE>
+   use PPresenter;
+   my $show = PPresenter->new
+       (-controlDisplay =&gt; 'xterm:0');
+</PRE>
+which is equivalent to the explicit:
+<PRE>
+   use PPresenter;
+   my $show = PPresenter->new;
+   $show->addViewport
+     ( -name            => 'control'
+     , -display         => 'xterm:0'
+     , -geometry        => '640x480'
+     , -hasControl      => 1
+     , -includeControls => 1
+     , -style           => 'slidenotes'
+     , -showSlideNotes  => 1
+     );
+</PRE>
+In both cases, a viewport for slides is automatically added.
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

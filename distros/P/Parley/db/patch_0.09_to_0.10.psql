@@ -1,0 +1,75 @@
+-- Patch:
+--   From: 0.09
+--   To:   0.10
+--
+-- Description:
+--  new table for tracking when a viewer has last viewed a thread
+
+BEGIN;
+
+-- patch starts here --
+
+CREATE TABLE thread_view (
+    thread_view_id      SERIAL      not null        primary key,
+    person              integer     not null        references person,
+    thread              integer     not null        references thread,
+    timestamp           timestamp with time zone    not null
+                        default CURRENT_TIMESTAMP,
+
+    watched             boolean     not null        default False,
+    last_notified       timestamp with time zone
+                        default NULL,
+
+    unique(person, thread)
+);
+
+
+-- overall it's better to queue outgoing emails, and have a separate process
+-- deal with them
+CREATE TABLE email_queue (
+    email_queue_id      SERIAL      not null        primary key,
+    queued              timestamp with time zone    not null
+                        default CURRENT_TIMESTAMP,
+
+    recipient           integer     not null        references person,
+    cc                  integer                     references person,
+    bcc                 integer                     references person,
+
+    sender              text        not null,
+
+    subject             text        not null,
+    text_content        text        not null,
+    html_content        text,
+
+    -- delivery statuses
+    attempted_delivery  boolean     not null        default False
+
+);
+
+-- a table of acceptable TZ strings
+CREATE TABLE preference_time_string (
+    preference_time_string_id     SERIAL      primary key,
+    time_string                   text        not null,
+    sample                        text        not null,
+    comment                       text
+);
+-- some TZ strings
+INSERT INTO preference_time_string (time_string, sample) VALUES ('%A %d %B %Y at %R', 'Thursday 13 July 2006 at 18:15');
+INSERT INTO preference_time_string (time_string, sample) VALUES ('%F %T', '2006-07-13 18:15:00');
+INSERT INTO preference_time_string (time_string, sample, comment) VALUES ('%c','Thu 13 Jul 2006 18:15:00 BST','locale\'s date and time'); 
+INSERT INTO preference_time_string (time_string, sample) VALUES ('%A at %R', 'Thursday at 18:15');
+INSERT INTO preference_time_string (time_string, sample) VALUES ('%a, %d %b; %R', 'Thu, 13 Jul; 18:15');
+
+-- add time_format_string to user preferences
+ALTER TABLE preference
+ADD COLUMN time_format integer
+    references preference_time_string
+;
+ALTER TABLE preference
+ADD COLUMN show_tz boolean
+    default True
+;
+
+-- patch ends here --
+
+COMMIT;

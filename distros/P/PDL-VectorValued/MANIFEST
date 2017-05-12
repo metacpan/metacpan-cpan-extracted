@@ -1,0 +1,22 @@
+ChangeLog
+MANIFEST
+MANIFEST.SKIP
+README.txt
+Makefile.PL
+pdlmaker.plm
+VectorValued.pm
+VectorValued/Dev.pm
+VectorValued/Version.pm
+VectorValued/Makefile.PL
+Utils/Makefile.PL
+Utils/utils.pd			# Utils/Utils.pm
+Utils/Utils.pm
+t/common.plt
+t/00_basic.t
+t/01_rlevec.t
+t/02_cmpvec.t
+t/03_setops.t
+t/04_types.t
+t/05_vcos.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,45 @@
+0.14  2014-01-11 11:17:24 PST
+        twitter JSON gone, extract tweets with HTML instead
+
+0.13  2013-06-24 10:35:08 PDT
+        remove vim tip check from test
+        add one liner to POD
+
+0.12  2013-06-17 14:41:23 PDT
+        add vim.t test
+
+0.11  2013-06-10 11:03:36 PDT
+        replace tests with basic.t. TODO: write tests
+
+0.10  2013-06-09 00:04:12 PDT
+        Update 00-load.t to use all prereq modules...will it help?
+
+0.09  2013-06-08 21:06:05 PDT
+        use Perl 5.8, not 5.6 / remove my name from contributers
+
+0.08  2013-06-01 10:57:54 PDT
+        Update external links and remove version from POD
+
+0.07  2013-05-28 07:30:36 PDT
+        Rename module as POE::Component::IRC::Plugin::WWW::Vim::Tips
+
+0.06    2013-04-25
+        Forgot to bump version in POD
+
+0.05    2013-02-07
+        Ack, I left a backup folder that Dist::Zilla found
+
+0.04    2013-02-07
+        Convert to Dist::Zilla
+        Remove debug content
+
+0.03    2013-02-02
+        Switch from HTML::TreeBuilder::XPath to Mojo::JSON
+
+0.02    2013-01-13
+        Don't forget to list dependencies in Makefile.PL
+
+0.01    2013-28-01
+        First version
+
+

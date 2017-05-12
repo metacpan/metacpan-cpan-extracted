@@ -1,0 +1,22 @@
+%token ID COMMA COLON
+
+%%
+def:    param_spec return_spec COMMA
+        ;
+param_spec:
+             type
+        |    name_list COLON type
+        ;
+return_spec:
+             type
+        |    ID COLON type
+        ;
+type:        ID
+        ;
+name:        ID
+        ;
+name_list:
+             name
+        |    name COMMA name_list
+        ;
+%%

@@ -1,0 +1,40 @@
+0.0020 Friday June 15 16:24:34 PDT 2012:
+    - Switch to using Class::Load instead of (potentially) hidden Mouse::Util interface
+
+0.0019 Friday June 11 23:32:55 PDT 2010:
+    - Added Clone prerequisite
+
+0.0018 Thursday June 10 22:00:39 PDT 2010:
+    - Added ::Lexicon & ->lexicon
+    - Remove "Subroutine * redefined" during t/02-install.t
+
+0.0017 Wednesday June 09 15:55:13 PDT 2010:
+    - Fleshed out ->install documentation
+    - Changed behavior of ->install to be sane and have saner documentation
+    - Added tests for ->install that reflect documentation
+
+0.0016 Saturday June 05 21:16:11 PDT 2010:
+    - Missed Any::Moose requirement (for Loader)
+    - Replaced Class::MOP with Mouse::Util
+    - Using Mouse proper instead of Any::Moose
+
+0.0015 Thursday June 03 09:24:33 PDT 2010:
+    - Fixed bug with exporting <.* (modification of read-only value)
+
+0.0014 Wednesday June 02 18:54:53 PDT 2010:
+    - Added stealth _into option to ->install (Usaginator)
+    - Added loader
+    - Fixed bug with exporter
+    - ->package is now ->name
+
+0.0013 Thursday May 13 17:48:00 PDT 2010:
+    - ->package can now deal with the blessed
+
+0.0012 Thursday May 13 16:46:13 PDT 2010:
+    - Added ->package functionality
+
+0.0011 Monday May 10 12:35:28 PDT 2010:
+    - Include Class::MOP as a prerequisite
+
+0.0010 Monday May 10 12:15:00 PDT 2010:
+    - Initial release

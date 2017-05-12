@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 c6fc90c5b57e039d6185f854c1d07b74e0fd1c82 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 55abb168786bef11a36c64d0db8395e2415fd329 Changes
+SHA1 5a443b8acb92d29b0255c70bf04b0ccf40175379 INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 aa9ebb3a0feea7c868cfc21eb96adf24d713689c MANIFEST
+SHA1 dcfb6545393dc7fda2c62243135d839795e14ad3 META.json
+SHA1 e2967c0a2bfde30f52508a662881511cc6c8fc67 META.yml
+SHA1 a2528de8ac9287ad37a745fc0e855436e202fe96 Makefile.PL
+SHA1 8b689ff53412f0757a62211b9ca0af3cf3480898 README
+SHA1 fc933da566f6f0f3a770ae73786067edf2e4f45a dist.ini
+SHA1 9f9fa655ea295f06058e48a90c839abc49283273 doap.ttl
+SHA1 f5a72c37f29143d4a6e3384fafa8d6a6d112476b examples/advanced.psgi
+SHA1 0e60ff3db9adcf001f3b6644a06af0fe4ce1be18 examples/basic.psgi
+SHA1 fe301fdb5bd4af9607a2ae3867b95495572e69b9 lib/Plack/Middleware/Auth/Bitcard.pm
+SHA1 dbd89b8437dc2ded24182d49eb532f92bbe3f4a9 t/01basic.t
+SHA1 4a7419170f11bd4e6de612a07c10e5f21c92a192 t/02bitcard.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQ2jQACgkQzr+BKGoqfTkGiQCeMtnlAwxOKaX/DRxTaJK36YQ6
+kiUAoIF6GLCOuiNUgVMWksGG/bTUTSWb
+=WPkp
+-----END PGP SIGNATURE-----

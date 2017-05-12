@@ -1,0 +1,82 @@
+2003-08-30  Richard Dale  <Richard_Dale@tipitina.demon.co.uk>
+
+	* Applied Germain Garand's patch to no longer rename operator methods 
+	  in the QGlobalSpace pseudo class
+
+2003-08-21  Alexander Kellett  <lypanov@kde.org>
+
+	* Added .kidl generation option (dcopidl replacement)
+	* Handled of several new constructs in the parsing:
+	*    k_dcop: / k_dcop_signals: / K_DCOP:
+	* Use STDERR not STDOUT thus removing need for temporary file
+
+2003-08-21  Richard Dale  <Richard_Dale@tipitina.demon.co.uk>
+
+	* Added missing getClassLoader() call to Proxy constructor
+
+2003-08-21  Richard Dale  <Richard_Dale@tipitina.demon.co.uk>
+
+	* Rewritten java code generation for a Dynamic Proxy based SMOKE adaptor version of QtJava.
+	* Based on David Faure's SMOKE generation code in the '-fsmoke' option.
+
+2003-08-11  Richard Dale  <Richard_Dale@tipitina.demon.co.uk>
+
+	* Removed old SWIG style ruby generation option
+
+2003-08-09  Alexander Kellett  <lypanov@kde.org>
+
+	* Parse static friend operator methods and place into a pseudo class (for smoke)
+
+2002-06-03  David Faure  <faure@kde.org>
+
+	* The Smoke generation is in good shape. Removed old PerlPig and PerlQK
+	modules.
+
+2002-04-23  Richard Dale <duke@tipitina.demon.co.uk>
+
+	* Added patch from David Faure to correctly handle nested struct
+         or class names in perl .pig generation
+
+2002-03-15  Richard Dale <duke@tipitina.demon.co.uk>
+	* Added C# P/Invoke bindings generation option from Adam Treat
+2002-02-10  Richard Dale <duke@tipitina.demon.co.uk>
+	* Improved C destructor code generation
+	* QCanvasItemList mapped onto java.util.ArrayList
+	* 'bool *' type converted to java 'boolean[]' type.
+2002-02-03  Richard Dale <duke@tipitina.demon.co.uk>
+ 	
+	* More fixes to .pig generation from Germain. Perl porting now 
+         motoring 24*7...
+2002-02-02  Richard Dale <duke@tipitina.demon.co.uk>
+	* Various improvements to Perl .pig generation from Germain Garand
+2002-01-31  Richard Dale <duke@tipitina.demon.co.uk>
+	* Fixed bug in code generation for NULL default arguments
+	* Added some new KDE 3 types
+2002-01-26  Richard Dale <duke@tipitina.demon.co.uk>
+	* Perl .pig generation improved
+2002-01-25  Richard Dale <duke@tipitina.demon.co.uk>
+	* Added '-fperl' option to autogenerate .pig (Perl Interface 
+         Generator) files, suitable for generating Ashley Winters' PerlQt/KDEQt 
+         bindings
+2002-01-23  Richard Dale <duke@tipitina.demon.co.uk>
+	* Made dispose() public, added isDisposed() after SWT.
+2002-01-23  Richard Dale <duke@tipitina.demon.co.uk>
+	* Added generation of dispose() methods, to allow large resources,
+         such as pixmaps, to be freed before finalize() is called.
+2002-01-20  Richard Dale <duke@tipitina.demon.co.uk>
+	* Ruby bindings generation - initial checkin.
+2002-01-04  Richard Dale <duke@tipitina.demon.co.uk>
+	* Fixed bug in parsing decimal point in default argument values
+2001-12-29  Richard Dale <duke@tipitina.demon.co.uk
+	* JNI event handling methods are now generated.
+	* Some additions for KDevelop types. 
+	* Removed assumption that a class ending in '..Interface' should always 
+         be a java interface.
+2001-12-17  Richard Dale <duke@tipitina.demon.co.uk
+	* Improved code generation for String f'ns with default arguments.
+	* An implementation is no longer generated for classes which are
+         just interfaces.
+2001-12-03  Richard Dale <duke@tipitina.demon.co.uk
+	* Added new KDE 3 data types
+	* Improved code generation for classes defined within namespaces
+

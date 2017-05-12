@@ -1,0 +1,37 @@
+		<!--menu-->
+		<p>Insert record.</p>
+		<form action="<!--self-->" method="POST">
+			<input type="hidden" name="key" value="<!--key-->">
+			<input type="hidden" name="action" value="insertform">
+			<table>
+				<tr>
+					<td>
+						Select the table you wish to insert into.
+					</td>
+					<td>
+						<table class="inputtable">
+							<tr>
+								<th>Table</th>
+								<td>
+									<select name="tables">
+										<!--tablelist-->
+									</select>
+								</td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						Continue to record entry form
+					</td>
+					<td>
+						<table class="inputtable">
+							<tr>
+								<td><input type="submit" value="Continue"></td>
+							</tr>
+						</table>
+					</td>
+				</tr>
+			</table>
+		</form>

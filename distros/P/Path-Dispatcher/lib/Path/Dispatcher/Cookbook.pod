@@ -1,0 +1,90 @@
+=pod
+
+=head1 NAME
+
+Path::Dispatcher::Cookbook - A cookbook for Path::Dispatcher
+
+=head1 RECIPES
+
+=head2 How can I change the path delimiter from a space ' ' to a slash '/'?
+
+When importing the L<Path::Dispatcher::Declarative> sugar, specify the
+C<token_delimiter> option for the C<default> group.
+
+    package My::Dispatcher;
+    use Path::Dispatcher::Declarative -base, -default => {
+        token_delimiter => '/',
+    };
+
+Or define a subclass of L<Path::Dispatcher::Declarative> with a
+C<token_delimiter> method:
+
+    package Web::Dispatcher::Maker;
+    use base 'Path::Dispatcher::Declarative';
+
+    use constant token_delimiter => '/';
+
+
+    package My::Dispatcher;
+    use Web::Dispatcher::Maker -base;
+
+=head2 How can I do rule chaining (like in Catalyst)?
+
+You can use a C<chain> rule approximate chaining behavior:
+
+    package MyDispatcher;
+    use Path::Dispatcher::Declarative -base;
+
+    under show => sub {
+        chain {
+            print "Displaying ";
+        };
+        on inventory => sub {
+            print "inventory:\n";
+            ...
+        };
+        on score => sub {
+            print "score:\n";
+            ...
+        };
+    };
+
+    package main;
+
+    MyDispatcher->run("show inventory"); # "Displaying inventory:\n ..."
+
+    MyDispatcher->run("show score"); # "Displaying score:\n ..."
+
+=head2 How can I configure tab completion for shells?
+
+First add a dispatcher rule for generating completions based on the path. Here
+we name it _gencomp, so that if the user types "app _gencomp hel" it will print
+out the various completions of "hel".
+
+    on qr/^_gencomp\s*(.*)/ => sub {
+        my $prefix = shift->pos(1);
+        $prefix = "" if !defined($prefix);
+        print "$_\n" for dispatcher->complete($prefix);
+    };
+
+Then tell your shell about how to use _gencomp. For zsh it might look
+like this (replace "APP" with your binary name):
+
+    /usr/share/zsh/site-functions/_APP:
+        #compdef APP
+        typeset -a APP_completions
+        APP_completions=($($words[1] _gencomp $words[2,-1]))
+        compadd $APP_completions
+
+For bash it might look like this:
+
+    /etc/bash_completion.d/APP.bash:
+        function _APP_()
+        {
+            COMPREPLY=($($1 _gencomp ${COMP_WORDS[COMP_CWORD]}))
+        }
+
+        complete -F _APP_ APP
+
+=cut
+

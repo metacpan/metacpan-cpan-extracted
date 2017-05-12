@@ -1,0 +1,326 @@
+=head1 NOME
+
+perlnewmod - preparare un nuovo modulo per distribuirlo
+
+=head1 DESCRIZIONE
+
+Questo documento vi dE<agrave> alcuni suggerimenti su come procedere per scrivere 
+moduli Perl, prepararli per distribuirli e renderli disponibili attraverso 
+CPAN.
+
+Una delle cose che rendono il Perl davvero potente E<egrave> il fatto che gli 
+hacker del Perl tendono a voler condividere le soluzioni ai problemi che 
+hanno giE<agrave> affrontato, cosicchE<eacute> voi non dobbiate combatterci di 
+nuovo.
+
+Il modo principale per realizzare questa condivisione E<egrave> mediante un'astrazione 
+della soluzione in un modulo Perl. Se non sapete cos'E<egrave> una di queste cose, il 
+resto di questo documento non vi sarE<agrave> di molta utilitE<agrave>. Vi manca inoltre la 
+conoscenza di una cospicua quantitE<agrave> di codice utile; considerate l'idea di 
+dare un'occhiata a L<perlmod>, L<perlmodlib> e L<perlmodinstall> prima di 
+ritornare qua.
+
+Quando avete trovato che non c'E<egrave> un modulo disponibile per quello che 
+state cercando di fare e voi stessi siete stati costretti a scrivere il 
+codice, prendete in considerazione di fare un pacchetto della soluzione, 
+farlo diventare un modulo e caricarlo su CPAN in maniera che altri possano 
+beneficiarne.
+
+=head2 Avvertimenti
+
+In questa sede andremo a concentrarci principalmente sui moduli scritti unicamente 
+in Perl, piuttosto che moduli XS. I moduli XS servono ad uno scopo piuttosto 
+differente e potreste prendere in considerazione differenti aspetti 
+prima di distribuirli: la popolaritE<agrave> delle librerie che state unendo tra loro, 
+la portabilitE<agrave> su altri sistemi operativi e cosE<igrave> via. Ad ogni modo, le note 
+sulla preparazione del lato Perl del modulo, il renderlo un pacchetto e 
+distribuirlo si applicano ugualmente bene sia ad un modulo XS che ad uno 
+di solo Perl.
+
+=head2 Cosa dovrei mettere in un modulo?
+
+Dovreste mettere in un modulo tutto quel codice che pensate sarE<agrave> utile 
+agli altri. Tutto quello che E<egrave> verosimile riempia un buco nella liberia 
+della comunitE<agrave> e che qualcun altro possa introdurre direttamente nei 
+propri programmi. Qualsiasi parte del vostro codice che potete isolare, 
+estrarre e inserire in qualcos'altro, E<egrave> un candidato adatto.
+
+Facciamo un esempio. Supponiamo di leggere dei dati da un formato 
+di dati locale ad un hash di hash in Perl, trasformarlo in un albero, 
+traversare l'albero e poi riversare ogni nodo in un Server Transmogrifero 
+della Acme.
+
+Ora, un bel numero di persone hanno il Transmogrifero della Acme e e voi avete 
+bisogno di scrivere da zero qualcosa che parli il protocollo - vorrete quasi 
+certamente farne un modulo. Il livello al quale lo imposterete E<egrave> lasciato 
+a voi: potreste volere dei moduli a livello di protocollo analoghi a 
+L<Net::SMTP|Net::SMTP> che poi comunicano a moduli di alto livello analoghi 
+a L<Mail::Send|Mail::Send>. La scelta E<egrave> vostra ma voi volete assolutamente 
+tirare fuori un modulo per il protocollo di quel server.
+
+Nessun altro sul pianeta comunicherE<agrave> utilizzando il vostro formato locale, 
+dunque questo aspetto possiamo ignorarlo. Ma che dire di tutto quel che c'E<egrave> 
+in mezzo? Costruire strutture ad albero a partire da variabili Perl e poi 
+traversarle, E<egrave> un problemino carino e generale, e se nessuno sta giE<agrave> scrivendo 
+un modulo che fa questo, potreste voler modularizzare anche questo codice.
+
+CosE<igrave>, se tutto va bene, ora avete alcune idee su cosa sia buono da 
+modularizzare. Ora andiamo a vedere come si fa.
+
+=head2 Passo passo: Preparare il terreno
+
+Prima ancora di partire a grattar via il codice, ci sono alcune cose 
+che dovremmo fare in anticipo.
+
+=over 3
+
+=item Guardatevi intorno
+
+Fate delle ricerca in un po' di moduli per vedere come sono stati scritti.
+Suggerirei di partire con L<Text::Tabs|Text::Tabs>, visto che si trova 
+nella libreria standard, E<egrave> simpatico ed E<egrave> semplice, e poi date un'occhiata a 
+qualcosa di un po' piE<ugrave> complesso come L<File::Copy|File::Copy>. C<WWW::Mechanize> 
+ed i moduli C<Email::*>, infine, forniscono buoni esempi di codice orientato agli 
+oggetti.
+
+Questi dovrebbero darvi una idea generale su come i moduli vanno 
+impostati e scritti.
+
+=item Controllate che sia inedito
+
+Ci sono un sacco di moduli su CPAN ed E<egrave> facile non accorgersi di uno che 
+E<egrave> simile a quello che state pianificando di scrivere. Date una bella arata  
+in L<http://search.cpan.org> e siate sicuri di non reinventare la ruota!
+
+=item Discutetene la necessitE<agrave>
+
+Potreste amarlo. Potreste avere l'impressione che chiunque lo desideri. 
+Ma potrebbe davvero non esserci alcuna vera esigenza per questo 
+modulo. Se non siete sicuri sull'esigenza che si avrE<agrave> del vostro modulo, 
+prendete in considerazione il fare un sondaggio sul newsgroup 
+C<comp.lang.perl.modules>, oppure come ultima spiaggia chiedete nella lista di 
+discussione sui moduli su C<modules@perl.org>. 
+Ricordatevi che questa E<egrave> una lista chiusa con un tempo di evasione 
+molto lungo - preparatevi ad aspettare un bel po' per una risposta.
+
+=item Scegliete un nome
+
+I moduli Perl inclusi in CPAN hanno una gerarchia dei nomi alla quale 
+dovreste cercare di adattarvi. Date un'occhiata a 
+L<perlmodlib> per maggiori dettagli su come questo funzioni e fatevi un giro 
+su CPAN e sulla lista dei moduli per farvi un'idea. Come ultimissima cosa, 
+ricordatevi questo: i moduli dovrebbero avere la prima lettera di ogni 
+stringa in maiuscolo ["Title capitalised", NdT], (Questo::Modo), 
+inserirsi in una categoria e va spiegato il loro scopo in maniera concisa.
+
+=item Controllate di nuovo
+
+Mentre state facendo questo, assicuratevi di nuovo di non esservi lasciati 
+sfuggire un modulo simile a quello che state scrivendo.
+
+Quando avete vagliato il nome e siete sicuri che il modulo sia 
+voluto e non disponibile al momento, E<egrave> tempo di iniziare a scrivere codice.
+
+=back
+
+=head2 Passo passo: Fare il modulo
+
+=over 3
+
+=item Iniziare con F<module-starter> oppure F<h2xs>
+
+L'utility F<module-starter> viene distribuita come parte del pacchetto 
+CPAN denominato L<Module::Starter|Module::Starter>. Essa crea una 
+directory con parti di tutti i file necessari ad iniziare un nuovo 
+modulo, in conformitE<agrave> con le recenti "best practice" 
+[prassi migliori, NdT] per lo sviluppo di moduli, e viene invocato 
+da linea di comando, dunque:
+
+    module-starter --module=Pippo::Pluto \
+       --author="Tuo Nome" --email=tuonome@cpan.org
+
+Se non volete installare da CPAN il pacchetto 
+L<Module::Starter|Module::Starter>, F<h2xs> E<egrave> uno strumento piE<ugrave> vecchio, 
+inteso in origine per lo sviluppo di moduli XS, che si trova come pacchetto 
+nella distribuzione Perl.
+
+Una tipica invocazione di L<h2xs|h2xs> per un modulo di solo Perl E<egrave>:
+
+    h2xs -AX --skip-exporter --use-new-tests -n Pippo::Pluto 
+
+Il C<-A> omette il codice Autoloader, C<-X> omette gli elementi XS,
+C<--skip-exporter> omette il codice Exporter, C<--use-new-tests> allestisce 
+un ambiente moderno per i test e C<-n> specifica il nome del modulo.
+
+=item Usare L<strict|strict> e L<warnings|warnings>
+
+Il codice di un modulo deve essere sottoposto a warning e a strict, 
+visto che non potete garantire le condizioni sotto le quali sarE<agrave> usato. 
+Inoltre, non vorrete comunque distribuire del codice che non sia 
+sottoposto a warning e a strict, vero?
+
+=item Usare L<Carp|Carp>
+
+Il modulo L<Carp|Carp> vi permette di presentare i vostri messaggi di 
+errore dalla prospettiva del chiamante; questo vi fornisce un modo per 
+segnalare un problema con il chiamante e non con il vostro modulo. Per 
+esempio, se dichiarate questo:
+
+    warn "Non e` stato dato il nome dell'host";
+
+l'utente vedrE<agrave> qualcosa come questo:
+
+    Non e` stato dato il nome dell'host at /usr/local/lib/perl5/site_perl/5.6.0/Net/Acme.pm
+    line 123.
+
+che sembra come se il vostro modulo stia facendo qualcosa di sbagliato. 
+Invece, volete dare la colpa all'utente, dicendo questo:
+
+    Non e` stato dato il nome dell'host at cattivo_codice, line 10.
+
+Questo si fa usando L<Carp|Carp> e sostituendo i vostri C<warn> con dei 
+C<carp>. Se avete la necessitE<agrave> di usare C<die>, dichiarate invece C<croak>. 
+Ad ogni modo, mantenete C<warn> e C<die> al loro posto per i vostri controlli interni - 
+dove il vostro modulo E<egrave> davvero colpevole.
+
+=item Usare L<Exporter|Exporter> - assennatamente!
+
+L<Exporter|Exporter> vi fornisce un modo standard per esportare simboli 
+e subroutine dal vostro modulo al namespace del chiamante. Per esempio, 
+dire C<use Net::Acme qw(&gingillo)> importerebbe la subroutine 
+C<gingillo>.
+
+La variabile di package C<@EXPORT> determinerE<agrave> quali simboli saranno 
+esportati quando il chiamante dichiara semplicemente C<use Net::Acme> - 
+difficilmente vorrete metterci qualcosa. C<@EXPORT_OK>, dall'altro lato, 
+specifica quali simboli siete disposti ad esportare. Se volete esportare 
+parecchi simboli, usate gli C<%EXPORT_TAGS> e definite un insieme 
+di esportazione standard - date un'occhiate a L<Exporter> per maggiori 
+dettagli.
+
+=item Usare la L<plain old documentation|perlpod> ["semplice vecchia documentazione", NdT]
+
+Il lavoro non E<egrave> finito fino a che le scartoffie non sono a posto e 
+avrete la necessitE<agrave> di dedicare del tempo a scrivere della documentazione 
+per il vostro modulo. C<module-starter> oppure C<h2xs> vi forniranno 
+uno schema da riempire; se non siete sicuri sul formato, date un'occhiata 
+a L<perlpod> per un'introduzione. Si E<egrave> soliti fornire nel codice una buona 
+sinossi di come funziona il vostro modulo, una descrizione, e poi delle 
+note sulla sintassi e funzionamento delle singole subroutine o metodi. 
+Utilizzate i commenti Perl per le note agli sviluppatori e POD per le 
+note agli utenti finali.
+
+=item Scrivere i test
+
+Siete incoraggiati a creare dei test automatici per il vostro modulo 
+per assicurarvi che funzioni come stabilito sulla miriade di piattaforme 
+supportate dal Perl; se effettuate un upload del vostro modulo su CPAN, 
+una schiera di tester ne effetuerE<agrave> il build e vi manderE<agrave> i risultati 
+dei test. Di nuovo, C<module-starter> e C<h2xs> forniranno una 
+infrastruttura per i test che potete estendere - dovrete fare qualcosa 
+di piE<ugrave> del semplice controllo che il vostro modulo compili.
+L<Test::Simple|Test::Simple> e L<Test::More|Test::More> sono dei buoni 
+punti da cui partire quando si sta scrivendo un insieme di programmi 
+di test.
+
+=item Scrivere il file README [LEGGIMI, NdT]
+
+Se state effettuando un upload su CPAN, dei gremlin automatizzati 
+estrarranno il file README e lo metteranno nella vostra directory su 
+CPAN. ApparirE<agrave> anche nelle directory principali F<by-module> e 
+F<by-category> ["per modulo" e "per categoria", NdT] se lo avete inserito 
+nella lista dei moduli. E<Egrave> una buona idea mettervi, in dettaglio, quello 
+che il modulo svolge effettivamente, ed i cambiamenti che l'utente puE<ograve> 
+notare dall'ultima versione.
+
+=back
+
+=head2 Passo passo: distribuire il vostro modulo
+
+=over 3
+
+=item Ottenere un identificativo utente per CPAN
+
+Ogni sviluppatore che pubblica dei moduli su CPAN necessita di un 
+identificativo CPAN. Visitate C<http://pause.perl.org/>, selezionate 
+"Request PAUSE Account" ["Richiesta di un Account PAUSE", NdT] ed 
+aspettate che la vostra richiesta venga approvata dagli amministratori 
+di PAUSE.
+
+=item C<perl Makefile.PL; make test; make dist>
+
+Ancora una volta, C<module-starter> oppure C<h2xs> hanno fatto tutto il 
+lavoro per voi. Essi producono il C<Makefile.PL> standard che potete 
+vedere quando scaricate e installate dei moduli e questo produce un 
+Makefile con un target di C<dist>.
+
+Una volta che vi siete assicurati che il vostro modulo abbia passato 
+i propri test - E<egrave> sempre una buona cosa assicurarsene -  potete eseguire 
+un C<make dist> e il Makefile, se tutto va bene, produrrE<agrave> una simpatica 
+tarball [il file creato con l'utility tar, NdT] del vostro modulo, pronto 
+per effettuarne l'upload.
+
+=item Fare un upload della tarball
+
+L'email che avete ottenuto quando avete ricevuto il vostro ID di CPAN 
+vi rivela come effettuare il login su PAUSE, il Perl Authors Upload SErver 
+["Server di Upload degli Autori di Perl", NdT]. Qui, dal menu, potete 
+fare un upload del vostro modulo su CPAN.
+
+=item Fare un annuncio sulla lista di discussione sui moduli
+
+Una volta caricato, il modulo resterE<agrave> nella vostra directory autore 
+senza essere notato. Se volete che venga connesso al resto di CPAN, 
+dovrete andare su "Register Namespace" ["Registrare il Namespace", NdT] 
+su CPAN. Una volta registrati, il vostro modulo apparirE<agrave> nell'elenco di 
+quelli by-module e by-category su CPAN.
+
+=item Fare un annuncio su clpa
+
+Se avete un bruciante desiderio di dire al mondo della vostra versione 
+del modulo, inviate un annuncio sul newgroup moderato 
+C<comp.lang.perl.announce>.
+
+=item Eliminare i bug!
+
+Una volta che avete iniziato a mettere assieme utenti, questi vi 
+manderanno segnalazioni di bug. Se siete fortunati, vi manderanno 
+anche delle correzioni. Benvenuti alle gioie della manutenzione di 
+un progetto software...
+
+=back
+
+=head1 AUTORE
+
+Simon Cozens, C<simon@cpan.org>
+
+Aggiornato da Kirrily "Skud" Robert, C<skud@cpan.org>
+
+=head1 CONSULTATE ANCHE
+
+L<perlmod>, L<perlmodlib>, L<perlmodinstall>, L<h2xs>, L<strict>,
+L<Carp>, L<Exporter>, L<perlpod>, L<Test::Simple>, L<Test::More>
+L<ExtUtils::MakeMaker>, L<Module::Build>, L<Module::Starter>
+http://www.cpan.org/ , il tutorial di Ken Williams su come costruire 
+il proprio modulo su http://mathforum.org/~ken/perl_modules.html
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlnewmod
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di dree.
+
+=head2 Revisore
+
+Revisione a cura di Flavio Poletti.
+
+=cut

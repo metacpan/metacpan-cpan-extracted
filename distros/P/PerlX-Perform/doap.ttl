@@ -1,0 +1,110 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Perform/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-bugs:issue      <http://purl.org/NET/cpan-uri/rt/ticket/75022>;
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Perform>;
+	doap:created         "2012-02-06"^^xsd:date;
+	doap:download-page   <https://metacpan.org/release/PerlX-Perform>;
+	doap:homepage        <https://metacpan.org/release/PerlX-Perform>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      [
+		a foaf:Person;
+		foaf:mbox <mailto:tobyink@cpan.org>;
+		foaf:name "Toby Inkster";
+	];
+	doap:name            "PerlX-Perform";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/PerlX-Perform/v_0-001>, <http://purl.org/NET/cpan-uri/dist/PerlX-Perform/v_0-003>, <http://purl.org/NET/cpan-uri/dist/PerlX-Perform/v_0-004>, <http://purl.org/NET/cpan-uri/dist/PerlX-Perform/v_0-005>, <http://purl.org/NET/cpan-uri/dist/PerlX-Perform/v_0-006>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-perlx-perform>;
+	];
+	doap:shortdesc       "syntactic sugar for if (defined ...) { ... }".
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Perform/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:issued            "2012-02-06"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Perform-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Perform/v_0-003>
+	a                    doap:Version;
+	dc:issued            "2012-02-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Reduce dependencies. No longer require 'common::sense', 'parent', 'Scalar::Util' or 'utf8', but do require 'strict'. No longer require Perl 5.10, but require Perl 5.6."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/PerlX-Perform/v_0-001>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Perform-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Perform/v_0-004>
+	a                    doap:Version;
+	dc:issued            "2012-03-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Documentation;
+			rdfs:label "See Also links"@en;
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/75022>;
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Add 'whenever' as an alias for 'wherever'."@en;
+		], [
+			rdfs:label "%EXPORT_TAGS now has tags :default, :all, :wherever and :whenever."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/PerlX-Perform/v_0-003>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Perform-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Perform/v_0-005>
+	a                    doap:Version;
+	dc:issued            "2012-03-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Documentation;
+			rdfs:label "Remove space incorrectly included in a POD L<...> link."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/PerlX-Perform/v_0-004>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Perform-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Perform/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "PerlX-Perform-0.006"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Perform-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/75022>
+	a                    doap-bugs:Issue;
+	rdfs:label           "More See Also links";
+	dc:created           "2012-02-15T09:43:23"^^xsd:dateTime;
+	dc:modified          "2012-03-05T09:59:20"^^xsd:dateTime;
+	doap-bugs:assignee   [ a foaf:Agent; foaf:nick "TOBYINK" ];
+	doap-bugs:id         "75022"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=75022>;
+	doap-bugs:reporter   [ a foaf:Agent; foaf:mbox <mailto:dolmen@cpan.org> ];
+	doap-bugs:status     <http://purl.org/NET/cpan-uri/rt/status/resolved>.
+

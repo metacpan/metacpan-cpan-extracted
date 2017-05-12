@@ -1,0 +1,50 @@
+-- Patch:
+--   From: 0.53
+--   To:   0.57
+--
+-- Description:
+--  new time t&c schema
+
+BEGIN;
+
+-- patch starts here --
+
+CREATE TABLE terms (
+    id              serial      primary key,
+    created         timestamp with time zone
+                    default CURRENT_TIMESTAMP
+                    not null,
+
+    content         text        not null,
+
+    change_summary  text
+);
+
+CREATE TABLE terms_agreed (
+    id              serial      primary key,
+
+    person_id       integer     not null
+                    references person(person_id),
+    terms_id        integer     not null
+                    references terms(id),
+
+    accepted_on     timestamp with time zone
+                    default CURRENT_TIMESTAMP
+                    not null,
+
+    UNIQUE(person_id, terms_id)
+);
+
+
+-- insert a default set of terms
+INSERT INTO terms (content) VALUES ('[b]Parley Terms and Conditions[/b]
+[list]
+[1]Be nice
+[1]Don''t be an idiot
+[1][b]Be nice[/b]
+[/list]'
+);
+
+-- patch ends here --
+
+COMMIT;

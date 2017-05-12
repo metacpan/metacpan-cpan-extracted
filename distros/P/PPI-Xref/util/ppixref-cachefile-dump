@@ -1,0 +1,130 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use File::Basename qw[basename];
+my $ME = basename($0);
+
+use Getopt::Long;
+Getopt::Long::Configure(qw[no_auto_abbrev]);
+
+sub usage {
+  die "$ME: Usage: $ME [--data_dumper|--dd|--json|--yaml] [--show_filenames] [--cache_directory=... [cachefile|srcfile] ...\n";
+}
+
+my %Opt =
+  (
+   'data_dumper' => 0,
+   'json' => 0,
+   'yaml' => 0,
+  );
+
+usage() unless
+GetOptions(
+           'data_dumper' => \$Opt{data_dumper},
+           'dd' => \$Opt{data_dumper},
+           'json' => \$Opt{json},
+           'yaml' => \$Opt{yaml},
+           'show_filenames' => \$Opt{show_filenames},
+           'cache_directory=s' => \$Opt{cache_directory},
+          );
+
+usage() unless @ARGV;
+
+my $dump_method_sum = $Opt{data_dumper} + $Opt{json} + $Opt{yaml};
+
+if ($dump_method_sum > 1) {
+  die "$ME: Mutually exclusive: --data_dumper --json --yaml\n";
+} elsif ($dump_method_sum == 0) {
+  $Opt{data_dumper} = 1;  # Silent default.
+}
+
+use Sereal::Decoder;
+
+my $decoder = Sereal::Decoder->new();
+
+use Fcntl qw[O_RDONLY];
+
+sub decode_file {
+  my ($fn) = @_;
+  my $fh;
+  unless (sysopen($fh, $fn, O_RDONLY)) {
+    warn "$ME: sysopen $fn: $!\n";
+    return;
+  }
+  my $size = -s $fh;
+  my $blob;
+  unless (sysread($fh, $blob, $size)) {
+    warn "$ME: sysread $fn: $!\n";
+    next;
+  }
+  unless (close($fh)) {
+    warn "$ME: close $fn: $!\n";
+    return;
+  }
+  return $decoder->decode($blob);
+}
+
+my $dumper;
+
+if ($Opt{data_dumper}) {
+  # Nothing yet.
+} elsif ($Opt{json}) {
+  require JSON;  # Optional.
+  $dumper = JSON->new();
+} elsif ($Opt{yaml}) {
+  require YAML;  # Optional.
+  $dumper = YAML->new();
+} else {
+  warn "$ME: No dump method\n";
+}
+
+my $xref;
+
+if (defined $Opt{cache_directory}) {
+  require PPI::Xref;  # Optional.
+  $xref = PPI::Xref->new({cache_directory => $Opt{cache_directory}});
+}
+
+my $unlikely_skip = 0;
+
+for my $fn (@ARGV) {
+  if (-f $fn) {
+    if (defined $xref) {
+      if ($xref->looks_like_cache_file($fn)) {
+        # Fine.
+      } elsif ($fn =~ /\.p[lm]$/) {
+        $fn = $xref->__cache_filename($fn);
+      }
+    } else {
+      if ($fn =~ m{[._]p[lm]\.cache$}) {  # Leap of faith here.
+        # Fine.
+      } else {
+        warn "$ME: Skipping unlikely cache file '$fn'\n";
+        $unlikely_skip++;
+        next;
+      }
+    }
+  }
+  print "$fn:\n" if $Opt{show_filenames};
+  my $ref = decode_file($fn);
+  unless (defined $ref) {
+    warn "$ME: Failed to decode '$fn'\n";
+  }
+  if ($Opt{data_dumper}) {
+    use Data::Dumper ();
+    $dumper = Data::Dumper->new([$ref]);
+    print $dumper->Terse(1)->Indent(2)->Dump($ref);
+  } elsif ($Opt{json}) {
+    print $dumper->encode($ref);
+  } elsif ($Opt{yaml}) {
+    print $dumper->Dump($ref);
+  }
+}
+
+if ($unlikely_skip > 0 && ! defined $Opt{cache_directory}) {
+  warn "$ME: You may consider specifying --cache_directory\n";
+}
+
+exit(0);

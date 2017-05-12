@@ -1,0 +1,13 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+libsqueeze_api_version=0.2
+
+Name: Squeeze
+Description: Archiving library for Squeeze
+Requires: glib-2.0 thunar-vfs-1
+Version: 0.2.3
+Libs: -L${libdir} -lsqueeze-${libsqueeze_api_version}
+Cflags: -I${includedir}/libsqueeze-${libsqueeze_api_version}

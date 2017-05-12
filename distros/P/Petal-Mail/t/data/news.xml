@@ -1,0 +1,30 @@
+<Message
+  xmlns="http://www.openhealth.org/xmtp#"
+  xmlns:petal="http://purl.org/petal/1.0/"
+  >
+  <Content-Type>text/plain; charset=utf-8; format=flowed</Content-Type>
+  <Content-Disposition>inline</Content-Disposition>
+  <Content-Transfer-Encoding>8bit</Content-Transfer-Encoding>
+  <X-Copyright>Copyright &copy; 2005 MKDoc Ltd.</X-Copyright>
+  <Content-Language>en</Content-Language>
+  <MIME-Version>1.0</MIME-Version>
+
+  <From petal:content="string:${from_name} &lt;${from_email}&gt;">News team &lt;newsletter@example.com&gt;</From>
+  <To petal:content="string:${to_name} &lt;${to_email}&gt;">Fred Flintstone &lt;fred.flintstone@example.com&gt;</To>
+  <Subject
+    petal:content="string:${subject}"
+  >MKDoc Daily Email Update</Subject>
+
+  <body xmlns="http://www.w3.org/1999/xhtml">
+  <p>
+    Dear <span petal:replace="string:${to_name}">Fred Flintstone</span>,
+  </p>
+
+  <p>
+    Here are some unicode characters: <span petal:content="string:${joined}">ascii</span>
+  </p>
+  <pre>
+    Here are some more unicode characters: $joined
+  </pre>
+  </body>
+</Message>

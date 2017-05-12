@@ -1,0 +1,4 @@
+docs: |
+    Equivalent to:
+
+        lc($a) cmp lc($b)

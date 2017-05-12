@@ -1,0 +1,17 @@
+
+plugin t::Ptest as foo_
+	name foo
+	c2 blaf
+
+plugin t::Ptest as bar_
+	name bar
+	hasplugins 1
+
+plugin t::Ptest as baz_
+	name baz
+
+baz_c2	blorf
+
+bar_plugin t::Ptest as barbar_
+	name barbar
+

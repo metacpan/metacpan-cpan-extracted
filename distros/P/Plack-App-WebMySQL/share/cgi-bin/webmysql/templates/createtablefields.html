@@ -1,0 +1,95 @@
+		<!--menu-->
+		<p>Table creation for <b><!--tables--></b></p>
+		<table>
+			<tr>
+				<td valign="top">Current table layout:</td>
+				<td>
+					<table class="inputtable">
+						<tr><th>Field</th><th>Type</th><th>Null</th><th>Key</th><th>Default</th><th>Extra</th></tr>
+						<!--currentfields-->
+					</table>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td valign="top">Add a new field:</td>
+				<td>
+					<form action="<!--self-->" method="POST">
+						<input type="hidden" name="key" value="<!--key-->">
+						<input type="hidden" name="action" value="createtableaddfield">
+						<table class="inputtable">
+							<tr><th>Name</th><td><input type="text" name="fname"></td></tr>
+							<tr>
+								<th>Type</th>
+								<td>
+									<select name="ftype">
+										<option value="TINYINT">Tiny integer</option>
+										<option value="SMALLINT">Small integer</option>
+										<option value="MEDIUMINT">Medium integer</option>
+										<option value="INT">Integer</option>
+										<option value="BIGINT">Big integer</option>
+										<option value="FLOAT">Floating point</option>
+										<option value="DOUBLE">Double-precision floating point</option>
+										<option value="DECIMAL">Decimal number</option>
+										<option value="DATE">Date</option>
+										<option value="DATETIME">Date and time</option>
+										<option value="TIMESTAMP">Timestamp</option>
+										<option value="TIME">Time</option>
+										<option value="YEAR">Year</option>
+										<option value="CHAR">Char</option>
+										<option value="VARCHAR">Varchar</option>
+										<option value="TINYBLOB">Tiny blob</option>
+										<option value="BLOB">Blob</option>
+										<option value="MEDIUMBLOB">Medium blob</option>
+										<option value="LONGBLOB">Long blob</option>
+										<option value="TINYTEXT">Tiny text</option>
+										<option value="TEXT">Text</option>
+										<option value="MEDIUMTEXT">Medium text</option>
+										<option value="LONGTEXT">Long text</option>
+										<option value="ENUM">Enum</option>
+										<option value="SET">Set</option>
+									</select>
+								</td>
+							</tr>
+							<tr><th>Size</th><td><input type="text" name="fsize"></td></tr>
+							<tr><th>Null</th><td><input type="checkbox" name="fnull"></td></tr>
+							<tr><td colspan="2" align="center"><input type="submit" value="Add field"></td></tr>
+						</table>
+					</form>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td valign="top">Remove a field:</td>
+				<td>
+					<form action="<!--self-->" method="POST">
+						<input type="hidden" name="key" value="<!--key-->">
+						<input type="hidden" name="action" value="createtableremovefield">
+						<table class="inputtable">
+							<tr>
+								<th>Name</th>
+								<td>
+									<select name="fname">
+										<!--removefields-->
+									</select>
+								</td>
+							</tr>
+							<tr><td colspan="2" align="center"><input type="submit" value="Remove field"></td></tr>
+						</table>
+					</form>
+				</td>
+			</tr>
+			<tr><td colspan="2">&nbsp;</td></tr>
+			<tr>
+				<td>Create this table now using the current layout:</td>
+				<td>
+					<form action="<!--self-->" method="POST">
+						<input type="hidden" name="key" value="<!--key-->">
+						<input type="hidden" name="action" value="createtablenow">
+						<table class="inputtable">
+							<tr><td><input type="submit" value="Create table"></td></tr>
+						</table>
+					</form>
+				</td>
+			</tr>
+		</table>

@@ -1,0 +1,32 @@
+-- Patch:
+--   From: 0.08
+--   To:   0.09
+--
+-- Description:
+--   new table for password_reset requests
+
+BEGIN;
+
+-- patch starts here --
+
+-- new table used during forgotten password process
+CREATE TABLE password_reset (
+    password_reset_id       text        primary key,
+    recipient               integer     not null
+                            references person,
+    expires                 timestamp
+);
+
+-- email address should be unique
+-- you may run into trouble here if you've got non-unique values here already
+-- SORRY!
+
+-- a nasty, evil option would be:
+--  update person set email = forum_name || '-' || email where person_id > 0;
+ALTER TABLE person
+  ADD UNIQUE(email)
+;
+
+-- patch ends here --
+
+COMMIT;

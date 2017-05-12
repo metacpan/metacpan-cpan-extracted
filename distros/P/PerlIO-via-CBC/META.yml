@@ -1,0 +1,20 @@
+---
+name: PerlIO-via-CBC
+version: 0.08
+author:
+  - 'Sascha Kiefer, C<esskar@cpan.org>'
+abstract: PerlIO layer for reading/writing CBC encrypted files
+license: perl
+requires:
+  Crypt::CBC: 2.12
+  Crypt::DES: 2.03
+generated_by: Module::Build version 0.2801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  PerlIO::via::CBC:
+    file: lib/PerlIO/via/CBC.pm
+    version: 0.08
+resources:
+  license: http://dev.perl.org/licenses/

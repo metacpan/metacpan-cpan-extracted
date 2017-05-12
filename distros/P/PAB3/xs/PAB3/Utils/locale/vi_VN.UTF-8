@@ -1,0 +1,57 @@
+grp:3;3
+fd:0
+ifd:0
+dp:,
+ts:.
+cs:₫
+ics:VND
+csa:r
+css:0
+ns:-
+ps:+
+dtf:%A, %d %B Năm %Y %H:%M:%S %Z
+df:%d/%m/%Y
+tf:%H:%M:%S
+apf:%I:%M %p
+amu:AM
+pmu:PM
+aml:am
+pml:pm
+lm1:Tháng một
+lm2:Tháng hai
+lm3:Tháng ba
+lm4:Tháng tư
+lm5:Tháng năm
+lm6:Tháng sáu
+lm7:Tháng bảy
+lm8:Tháng tám
+lm9:Tháng chín
+lm10:Tháng mười
+lm11:Tháng mười một
+lm12:Tháng mười hai
+sm1:Th01
+sm2:Th02
+sm3:Th03
+sm4:Th04
+sm5:Th05
+sm6:Th06
+sm7:Th07
+sm8:Th08
+sm9:Th09
+sm10:Th10
+sm11:Th11
+sm12:Th12
+ld1:Chủ nhật
+ld2:Thứ hai
+ld3:Thứ ba
+ld4:Thứ tư
+ld5:Thứ năm
+ld6:Thứ sáu
+ld7:Thứ bảy
+sd1:CN
+sd2:T2
+sd3:T3
+sd4:T4
+sd5:T5
+sd6:T6
+sd7:T7

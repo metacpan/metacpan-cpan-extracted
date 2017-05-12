@@ -1,0 +1,8 @@
+<body xmlns:tal="http://purl.org/petal/1.0/">
+  <p tal:replace="replace">yo</p>
+  <p tal:content="content">yo</p>
+  <p attribute="attribute" tal:attributes="attribute attribute">yo</p>
+  <ul tal:condition="elements">
+    <li tal:repeat="element elements" tal:content="element" />
+  </ul>
+</body>

@@ -1,0 +1,118 @@
+\documentclass{report}
+
+\usepackage[a4paper]{geometry}
+\usepackage{a4wide}
+\usepackage{makeidx}
+\makeindex
+\usepackage{graphicx}
+\usepackage{titlesec}
+
+\begin{document}
+
+\titleformat{\chapter}[display]
+{}{}{0pc}
+{
+\Huge\bfseries
+\ifnum \thechapter>0
+  \thechapter\space\space\space
+\fi
+}
+
+\author{Dmitry Karasik}
+\title{Prima - the perl graphic toolkit}
+\maketitle
+\thispagestyle{empty}
+\clearpage
+
+\tableofcontents
+\sloppy
+
+\chapter{Introduction}
+
+\subsubsection{Preface}
+
+Prima is an extensible Perl toolkit for multi-platform GUI development.
+Platforms supported include Linux, Windows NT/9x/2K, and UNIX/X11 
+workstations (FreeBSD, IRIX, SunOS, Solaris and others).
+The toolkit contains a rich set of standard widgets and has emphasis on 2D 
+image processing tasks. A Perl program using PRIMA looks and behaves identically 
+on X11 and Win32.
+
+The Prima project was started in 1997 in Protein Laboratory, Copenhagen,
+by Anton Berezin, Dmitry Karasik, and Vadim Belman.
+
+This document describes programming with Prima graphic toolkit, and is a
+collection of manual pages of Prima application program interface ( API ),
+written by D.Karasik, except Prima::IniFile and Prima::ScrollBar, written
+by A.Berezin.
+
+\subsubsection{Requirements}
+
+Prima supports perl versions 5.004 and above. The recommended perl 
+versions are 5.005 and above. In UNIX(tm) environments, Prima can use 
+the following graphic libraries: libjpeg, libgif, libtiff, libpng, libXpm.
+
+\subsubsection{Installation}
+
+The toolkit can be downloaded from \texttt{http://www.prima.eu.org} in
+source and binary forms. Before installing, check the content of README file
+in the distribution. The installation from the source is performed by
+executing commands
+\begin{verbatim}
+  perl Makefile.PL
+  make
+  make test
+  make install
+\end{verbatim}
+
+There is a mailing list dedicated for various Prima-related discussions, 
+prima@prima.eu.org. This list is also a proper place to send bug reports to. 
+To subscribe to the list, send mail to \texttt{<majordomo@prima.eu.org>} and 
+include \texttt{subscribe prima <optional address>} in the body of your message.
+
+\subsubsection{Authors}
+
+Dmitry Karasik,
+Anton Berezin,
+Vadim Belman
+
+\subsubsection{Credits}
+
+David Scott,
+Kai Fiebach,
+Johannes Blankenstein,
+Teo Sankaro,
+Mike Castle,
+H.Merijn Brand,
+Richard Morgan
+Kevin Ryde
+Chris Marshall
+Slaven Rezic
+Waldemar Biernacki
+Andreas Hernitscheck
+David Mertens
+Teo Sankaro
+Gabor Szabo
+Fabio D'Alfonso
+Rob "Sisyphus"
+Chris Marshall
+Reini Urban
+Nadim Khemir
+Vikas N Kumar
+Upasana Shukla
+Sergey Romanov
+Mathieu Arnold
+Petr Pisar
+Judy Hawkins
+Myra Nelson
+Sean Healy
+Ali Yassen
+Maximilian Lika
+
+-- thank you for your help.
+
+\subsubsection{Copyright}
+
+(c) 1997-2003 The Protein Laboratory, University of Copenhagen
+(c) 1997-2007 Dmitry Karasik
+

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="iso-8859-2"?>
+<pml_schema version="1.1" xmlns="http://ufal.mff.cuni.cz/pdt/pml/schema/">
+  <revision>1.1</revision>
+  <root name="pmltq_cgi_config">
+    <structure>
+      <member name="limit">
+        <cdata format="nonNegativeInteger"/>
+      </member>
+      <member name="row_limit">
+        <cdata format="nonNegativeInteger"/>
+      </member>
+      <member name="timeout">
+        <cdata format="nonNegativeInteger"/>
+      </member>
+      <member name="tree_print_service">
+        <cdata format="anyURI"/>
+      </member>
+      <member name="nodes_to_query_service">
+        <cdata format="anyURI"/>
+      </member>
+      <member name="configurations">
+        <sequence>
+          <element name="dbi" type="dbi-config.type"/>
+        </sequence>
+      </member>
+    </structure>
+  </root>
+  <type name="dbi-config.type">
+    <structure>
+      <member as_attribute="1" name="id" required="1" role="#ID">
+        <cdata format="ID"/>
+      </member>
+      <member as_attribute="1" name="public">
+        <cdata format="boolean"/>
+      </member>
+      <member as_attribute="1" name="featured">
+        <cdata format="integer"/>
+      </member>
+      <member as_attribute="1" name="anonymous_access">
+        <cdata format="boolean"/>
+      </member>
+      <member name="description">
+        <structure>
+          <member as_attribute="1" name="moreinfo">
+            <cdata format="anyURI"/>
+          </member>
+          <member name="title" required="1">
+            <cdata format="any"/>
+          </member>
+          <member name="abstract">
+            <cdata format="any"/>
+          </member>
+        </structure>
+      </member>
+      <member name="driver">
+        <cdata format="NMTOKEN"/>
+      </member>
+      <member name="host">
+        <cdata format="anyURI"/>
+      </member>
+      <member name="port">
+        <cdata format="integer"/>
+      </member>
+      <member name="database">
+        <cdata format="NMTOKEN"/>
+      </member>
+      <member name="username">
+        <cdata format="NMTOKEN"/>
+      </member>
+      <member name="password">
+        <cdata format="any"/>
+      </member>
+      <member name="layout_version">
+        <cdata format="integer"/>
+      </member>
+      <member name="resources">
+        <list ordered="1">
+          <cdata format="anyURI"/>
+        </list>
+      </member>
+      <member name="documentation">
+        <list ordered="1">
+          <container>
+            <attribute name="title" required="1">
+              <cdata format="any"/>
+            </attribute>
+            <cdata format="anyURI"/>
+          </container>
+        </list>
+      </member>
+      <member name="sources">
+        <alt>
+          <container>
+            <attribute name="schema">
+              <cdata format="NMTOKEN"/>
+            </attribute>
+            <cdata format="anyURI"/>
+          </container>
+        </alt>
+      </member>
+      <member name="environment">
+        <list ordered="0">
+          <container>
+            <attribute name="name" required="1">
+              <cdata format="NMTOKEN"/>
+            </attribute>
+            <cdata format="any"/>
+          </container>
+        </list>
+      </member>
+    </structure>
+  </type>
+</pml_schema>

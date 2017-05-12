@@ -1,0 +1,47 @@
+{
+   "abstract" : "A no-frills converter between 1D and 2D spaces using the Hilbert curve",
+   "author" : [
+      "\"PWBENNETT\" <paul.w.bennett@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Path-Hilbert",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::Simple" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Math::BigInt" : "0",
+            "integer" : "0",
+            "perl" : "5.012",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "2.000",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

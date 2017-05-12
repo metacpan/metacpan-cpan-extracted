@@ -1,0 +1,11 @@
+<p
+  i18n:translate="stuff"
+>
+  Here be stuff
+  <input
+    type="submit"
+    value="Save"
+    i18n:attributes="value save;"
+  />
+</p>
+

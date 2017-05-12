@@ -1,0 +1,20 @@
+---
+abstract: 'Process::Results - standardized structure for returning results of a process'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: Process-Results
+provides:
+    Process::Results:
+        file: lib/Process/Results.pm
+        version: 0.2
+    Process::Results::Holder:
+        file: lib/Process/Results/Holder.pm
+        version: 0.2
+requires:
+    B: 1.42_02
+    JSON::Tiny: 0.50
+    Test::Most: 0.34
+    perl: 5.003
+version: 0.2

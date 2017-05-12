@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use PPI;
+use PPI::Transform::Doxygen;
+
+unless ( $ARGV[0] ) {
+    warn "usage: ppi_transform_doxygen <perl source file>\n";
+    exit(1);
+}
+
+PPI::Transform::Doxygen->new()->file($ARGV[0] => \*STDOUT);

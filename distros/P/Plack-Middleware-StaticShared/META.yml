@@ -1,0 +1,48 @@
+---
+abstract: 'concat some static files to one resource'
+author:
+  - cho45
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-StaticShared
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::StaticShared:
+    file: lib/Plack/Middleware/StaticShared.pm
+    version: '0.06'
+requires:
+  DateTime: '0'
+  DateTime::Format::HTTP: '0'
+  Digest::SHA1: '0'
+  Filter::Util::Call: '0'
+  Path::Class: '0'
+  Plack: '0'
+  Plack::Request: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/cho45/Plack-Middleware-StaticShared/issues
+  homepage: https://github.com/cho45/Plack-Middleware-StaticShared
+  repository: git://github.com/cho45/Plack-Middleware-StaticShared.git
+version: '0.06'
+x_contributors:
+  - 'onishi <yasuhiro.onishi@gmail.com>'
+  - 'shiba_yu36 <shibayu36@gmail.com>'
+  - 'motemen <motemen@gmail.com>'
+  - 'cho45 <cho45@lowreal.net>'

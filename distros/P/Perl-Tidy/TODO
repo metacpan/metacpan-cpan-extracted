@@ -1,0 +1,39 @@
+Perltidy TODO List
+    This is a partial "wish-list" of features to add and things to do. For
+    the latest list of bugs and feature requests at CPAN see:
+
+    https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Tidy
+
+  Improved Vertical Alignment
+    There are still many opportunities for improving vertical alignment.
+
+  Documentation
+    A FAQ is needed to explain some of the more subtle formatting issues,
+    and to give examples of different styles.
+
+    The -formatter callback object documentation is incomplete.
+
+  HTML writer
+    The HTML writer does not colorize interpolated identifiers in here
+    documents or quoted strings. The tokenizer outputs interpolation
+    information for here docs; it still needs to be updated to do this for
+    multi-line quotes. Then code needs to be written to scan for and markup
+    identifiers.
+
+Things which have been suggested but will not be done
+  Recursive file processing
+    A -r flag might be nice, but this is best handled by an exterior shell
+    script.
+
+  Make perltidy support the syntax of module XXX
+    This generally won't be done unless the module is part of the core perl
+    distribution because it is such an open-ended problem. Compounding the
+    problem is the fact that perltidy often is invoked within an editor on
+    small snippets of code, so it must to work correctly without seeing any
+    particular 'use xxx' statement. Therefore, any syntax changes that
+    conflict with standard Perl syntax can't easily be handled.
+
+    However, an effort is being made to make perltidy generally more
+    tolerant of extensions to perl syntax. Also, the pre- and post-filter
+    capabilities of the Tidy.pm module may help.
+

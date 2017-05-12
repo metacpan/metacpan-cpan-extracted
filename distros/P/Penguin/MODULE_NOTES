@@ -1,0 +1,29 @@
+Penguin uses the following modules:
+
+1.  Graham Barr's IO:: module (IO::Socket, IO::Filehandle, etc.)
+
+    Penguin uses this to implement the TCP/IP channel.  You
+    don't actually need this if you don't plan to use TCP/IP
+    with Penguin (i.e. you're writing Penguin applets and
+    relying on the web browser/server to move them around).
+
+    All recent versions of Perl include the IO module.  I
+    strongly recommend upgrading your Perl if you don't have
+    an included IO.
+
+2.  PGP.  Well, it's not exactly a module so much as an
+    entirely separate cryptosystem.  Any version after 2.6
+    should work.
+
+    The PGP support shipped with Penguin does not do any
+    kind of encryption, and only uses PGP to digitally sign
+    code.
+
+3.  Malcolm Beattie and Tim Bunce's Safe module
+
+    This is distributed with recent Perls.  If you don't
+    have it, get the latest Perl.
+
+In the future, I expect all of this stuff to be bundled in
+such a manner that you don't have to worry about it any
+longer.

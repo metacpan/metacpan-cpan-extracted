@@ -1,0 +1,16 @@
+MANIFEST
+README
+Makefile.PL
+test.pl
+script/yalalr
+t/basic.t
+lib/Parse/YALALR/Build.pm
+lib/Parse/YALALR/Common.pm
+lib/Parse/YALALR/Dump.pl
+lib/Parse/YALALR/Explain.pl
+lib/Parse/YALALR/Kernel.pm
+lib/Parse/YALALR/Parser.pm
+lib/Parse/YALALR/Read.pm
+lib/Parse/YALALR/Run.pm
+lib/Parse/YALALR/Vector.pm
+lib/Parse/YALALR/Generate/C.pm

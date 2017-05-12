@@ -1,0 +1,353 @@
+-----cut----------cut----------cut----------cut----------cut----------cut-----
+Completion support
+
+Ted Zlatanov to recdescent:
+
+Maybe P::RD could have better built-in completion support,
+similar to the way <autotree> works: something you can access when a
+rule fails that tells you how far it got and what was successfully
+parsed.  Basically a $was_expecting variable, set automatically.
+
+-----cut----------cut----------cut----------cut----------cut----------cut-----
+
+Clean up parser object's unique namespace (i.e. delete all methods) when
+object is destroyed
+
+-----cut----------cut----------cut----------cut----------cut----------cut-----
+
+Generalize repetitions to allow parse-time expressions in counts
+
+-----------cut-----------cut-----------cut-----------cut-----------cut----------
+
+provide some mechanism to easily specify required vs optional repeated
+alternatives and mutually exclusive alernatives
+
+-----------cut-----------cut-----------cut-----------cut-----------cut----------
+
+Detect (and flag as an error) the use of return() is wrong in an action
+(e.g. "Did you mean '$return =' instead?"
+
+-----------cut-----------cut-----------cut-----------cut-----------cut----------
+
+Fix line counter.
+
+-----------cut-----------cut-----------cut-----------cut-----------cut----------
+
+Fix truncation of traces
+
+-----------cut-----------cut-----------cut-----------cut-----------cut----------
+
+Allow rules to access the raw string that has been consumed by the rule.
+
+    rule: sub1 sub2 sub3
+            { $return = $RD_CONSUMED }
+
+-----------cut-----------cut-----------cut-----------cut-----------cut----------
+
+Allow <skip: <rule> > to specified what to skip in terms of a rule rather than
+just a raw pattern
+
+-----------cut-----------cut-----------cut-----------cut-----------cut----------
+
+Allow Parse::RecDescent to take a grammar and construct a
+"reconstructor" or "dumper" for autotree'd data structures. For example:
+
+    $parse   = Parse::RecDescent->new($autotree_grammar);
+    $unparse = Parse::RecDescent->antiparser($autotree_grammar);
+
+    $tree = $parse->startrule($text);
+
+    $tree->munge_somehow();
+
+    $text = $unparse->startrule($tree);
+
+(but think of a better method name than "antiparser"!!! ;-)
+
+================================================================================
+
+Require {...} around code blocks within directives in V2
+
+================================================================================
+
+*Remove* (i.e. don't just disable) tracing code if not <trace>
+
+================================================================================
+
+Provide a ->Grammar() method to reconstruct the grammar string from a
+(possibly extended) parser object. E.g.:
+
+    say $parser->Grammar()
+
+prints out entire grammar from which $parser was built.
+
+Also provide a '-depth' option:
+
+    say $parser->Grammar(-depth => $N)
+
+that prints out rules to a given depth in the grammar
+(also allow: -depth => -1 means all but pure terminals)
+
+================================================================================
+
+<singlerules> directive to prevent "re-opening" of rules by subsequent
+definitions. I.e. if <singlerules> present all rules must have only one
+definition
+
+================================================================================
+
+Update meta-grammar to capture current features
+
+================================================================================
+
+* in "was expecting" error message, add alternatives for zero or more
+  options. For example:
+
+    command option(s?) end
+
+   prints:
+
+    ...was expecting "end".
+
+  should print
+
+    ...was expecting "option" or "end".
+
+================================================================================
+
+* Consider <autoerror> and $RD_AUTOERROR to automatically add an <error> production
+  to "pre-terminal" rules. May need to be smarter than just "every
+  non-terminal" (analyse grammar tree and only add error messages to
+  penultimate nodes? or is this just a bad idea?)
+
+================================================================================
+
+* Implement common prefix extraction (CPE) for cases like:
+
+    ifstat: 'if' cond 'then' stat 'else' stat 'endif'
+          | 'if' cond 'then' stat 'endif'
+
+  This would avoid rematching items 1 to 4 of the 2nd prod,
+  by just reusing @item[1..4] from the previous production
+
+  Document use of simple <reject> to subvert CPE. E.g.:
+
+    ifstat: 'if' cond 'then' stat 'else' stat 'endif'
+          | <reject>
+          | 'if' cond 'then' stat 'endif'
+
+  doesn't use CPE.
+
+================================================================================
+
+* Add backtracking to rules containing repetition specifiers (in
+  order to overcome repetitions "incorrigible" greed)?
+
+================================================================================
+
+* <autocommit> directive to insert <commit>s after common prefixes
+
+================================================================================
+
+* Handle left-recursion (preferably without rearranging grammar)
+  No idea how to do this though ;=)
+
+
+================================================================================
+
+Add a pass-by-name iterface to the constructor (pass in a hash-ref).
+I expect the constructor will take at least the following flags:
+
+    -error      Same as $::RD_ERROR (and defaults to it)
+    -warn       Same as $::RD_WARN (and defaults to it)
+    -hint       Same as $::RD_HINT (and defaults to it)
+    -trace      Same as $::RD_TRACE (and defaults to it)
+    -autostub   Same as $::RD_AUTOSTUB (and defaults to it)
+    -autoaction Same as $::RD_AUTOACTION (and defaults to it)
+    -source     Specifies source of grammar (may be a file name or subroutine reference)
+    -module     Specifies name of separate parser module to create (rather than generating an "on-the-fly" parser).
+    -nodefaults Don't use defaults
+
+Likewise, let grammar rules called as methods on the pasrer object
+also take named args:
+
+    -text       Text to parse (defaults to first non-flag arg)
+    -line       Line at which text starts (defaults to second non-flag arg)
+    -file       File from which text taken
+    -args       Arguments to appear as @arg/%arg in rule (defaults to non-flag args 2..N)
+
+Document this as the standard (and preferred) interface, with the current
+positional interface relegated to "backwards compatibility".
+
+-----------cut-----------cut-----------cut-----------cut-----------cut----------
+
+<fail> and <fail?> directives to immediately cause the entire parse to
+fail (with error messages, if any are pending). (or maybe <fatal>)
+
+-----------cut-----------cut-----------cut-----------cut-----------cut----------
+
+Generate #line directives to tie errors back into original file.
+
+-----------cut-----------cut-----------cut-----------cut-----------cut----------
+
+Pluggable debugger?
+
+Maybe all you need is for rules to call:
+
+    # at the start of a rule...
+    $thisparser->{tracer}->enter($rulename, $posInText)
+        if $thisparser->{tracer};
+
+    # at a successful match of a rule...
+    $thisparser->{tracer}->match($rulename, $posInText, $production_num)
+        if $thisparser->{tracer};
+
+    # at the end of a rule...
+    $thisparser->{tracer}->exit($rulename, $posInText)
+        if $thisparser->{tracer};
+
+    # ETC.
+
+So then, by giving the parser a different tracer object, you can
+instantly provide a new tracing mechanism.
+
+
+-----------cut-----------cut-----------cut-----------cut-----------cut----------
+
+Grammar namespaces:
+
+   >   So ... I'm looking for a way which I can break the parser into several
+   > logical pieces ... and only compile what changes each time - using make.
+   >   Any ideas on the best way to do this ?
+
+Currently there is no good way to do this. Others have asked for this too,
+so I will definitely provide some solution in the next release. That solution
+will probably consist of allowing parts of a grammar to be specified in
+different namespaces. For example:
+
+    <namespace: general>
+
+        startrule: rule(s)
+
+            rules: R1::rule | R2::rule | R3::rule
+
+    <namespace: R1>
+
+        rule: prefix middle suffix
+
+    <namespace: R2>
+
+        rule: middle suffix
+
+    <namespace: R3>
+
+        rule: prefix middle
+
+    <namespace:>    # unnamed namespace is common
+
+        prefix: /blah/ blah 'blah'
+        middle: /BLAH/ BLAH 'BLAH'
+        suffix: /blah/ blah 'blah'
+
+Apart from the obvious benefit of allowing names to be reused, this would also
+solve your precompilation problem, since the various namespaces would be
+compiled as separate modules. The Precompile method would then take an extra
+optional argument, specifying which namespace/module to precompile.
+
+Then your makefile might look like:
+
+    VHDL: general.pm R1.pm R2.pm R3.pm
+
+    general.pm: general.rd
+        perl -MParse::RecDescent - general.rd VHDL general
+
+    R1.pm: R1.rd
+        perl -MParse::RecDescent - R1.rd VHDL R1
+
+    R2.pm: R2.rd
+        perl -MParse::RecDescent - R2.rd VHDL R2
+
+    etc.
+
+
+Does this sound like a good solution to your problem?
+
+Damian
+
+-----------cut-----------cut-----------cut-----------cut-----------cut----------
+
+<insensitive> dircetive to add /i to all terminals (including literals)
+
+-----------cut-----------cut-----------cut-----------cut-----------cut----------
+
+Allow a second kind of unconditional autoaction...
+
+Feedback:
+
+   > (3) Wish to have: I realize that AUTOACTION is executed for a matching
+   > rule only when no action is defined for that rule.  But I ran into
+   > situations where a universal kind of action would be useful (mostly for
+   > debugging purposes but where setting the TRACE flag seems overkill).  By
+   > 'universal' I mean an action that is executed for ALL matching rules
+   > regardless of whether individual action exists.  This 'universal' action
+   > can either precede or follow the execution of individual action.
+
+-----------cut-----------cut-----------cut-----------cut-----------cut----------
+
+Allow multiple lhs's for a rule. That is,
+instead of:
+
+    keyword: /\w+/
+    ident:   /\w+/
+    name:    /\w+/
+
+allow:
+
+    (keyword ident name): /\w+/
+
+(Thanks Colin)
+
+
+-----cut----------cut----------cut----------cut----------cut----------cut-----
+
+Hi Damian,
+
+I stumbled over a possible bug in your module: It doesn't seem to like
+raw "<<" or "<<=" inside actions. They work fine inside quoted strings
+though.
+
+
+Here is the stripped down version of the grammar which triggers the problem:
+
+-------------------------------------------------------
+use strict;
+use warnings;
+use Parse::RecDescent;
+
+$::RD_HINT  = 1;
+$::RD_TRACE = 1;
+my $parser = Parse::RecDescent->new(<<'END_OF_GRAMMAR'
+
+rule1: rule2 {
+        # BEGIN TEST CODE
+        my $dummy = 1 << 2;
+        # END TEST CODE
+       }
+
+rule2: /^\w+/
+
+END_OF_GRAMMAR
+                   )
+  or die "Can't compile grammar\n";
+-------------------------------------------------------
+
+This is caused by a bug in Text::Balanced:
+https://rt.cpan.org/Ticket/Display.html?id=74714
+
+-----cut----------cut----------cut----------cut----------cut----------cut-----
+
+Support named options to Precompile and other public methods
+
+-----cut----------cut----------cut----------cut----------cut----------cut-----
+
+Separate out "runtime" stuff to avoid the "#ifndef RUNTIME" hack
+inside of Precompile.

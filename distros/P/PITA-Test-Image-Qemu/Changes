@@ -1,0 +1,18 @@
+Revision history for Perl extension PITA::Test::Image::Qemu
+
+0.41 Thu 28 Aug 2008
+	- Updating to Module::Install 0.77
+	- Updating to File::ShareDir 1.00
+
+0.40 Sun  1 Jul 2007
+	- Updating to Module::Install 0.65
+	- Adding a Perl version dependency
+	- Cleaning up tests a little
+
+0.02 Fri 21 Apr 2006
+	- Added new custom-built image (Damian Mascord)
+	- Added power support
+	- Upgrading to Module::Install 0.63
+
+0.01 Mon 13 Feb 2006
+	- Initial implementation

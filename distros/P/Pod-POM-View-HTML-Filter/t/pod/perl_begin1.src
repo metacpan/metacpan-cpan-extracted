@@ -1,0 +1,18 @@
+=begin filter perl
+
+# now in full colour!
+$A++;
+
+=end filter
+__RESULT__
++perl
+<html><body bgcolor="#ffffff">
+<pre><span class="c"># now in full colour!</span>
+<span class="i">$A</span>++<span class="sc">;</span></pre>
+</body></html>
+__RESULT__
+-perl
+<html><body bgcolor="#ffffff">
+<pre># now in full colour!
+$A++;</pre>
+</body></html>

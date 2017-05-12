@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <title>Thread Update Notification</title>
+    </head>
+
+    <body>
+        <p>[% person.first_name %],</p>
+
+        <p>The thread "[% post.thread.subject %]"
+        has received a new reply by [% post.creator.forum_name %].</p>
+
+        <p>Choose one of the following actions:
+        <ul>
+            <li>
+            <a href="[% c.req.base %]thread/next_post?thread=[% post.thread.id %]">Continue reading "[% post.thread.subject %]" from your last position</a>
+            </li>
+            <li>
+            <a href="[% c.req.base %]post/view?post=[% post.id %]">View "[% post.thread.subject %]" from the new post</a>
+            </li>
+        </ul>
+        </p>
+
+        <p>Please note: You <b>will not</b> receive any further notifications for this thread until you view the post above
+        or any posts created after it.</p>
+
+        <p>Regards,</p>
+
+        <p>The [% c.config.name %] team.</p>
+    </body>
+</html>

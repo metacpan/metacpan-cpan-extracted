@@ -1,0 +1,36 @@
+Revision history for Parallel-Downloader
+
+0.132071  2013-07-26 15:20:09 Europe/Berlin
+    - test doesn't touch network anymore
+
+0.132070  2013-07-26 14:11:58 Europe/Berlin
+    - fix issue of too few workers not processing all requests
+
+0.130560  2013-02-25 12:56:39 Europe/Berlin
+    - fixed response order by preventing changes to request order on creation
+
+0.130530  2013-02-22 16:28:51 Europe/Berlin
+    - sort responses by default and provide option to disable sorting
+    - don't consume the input array while downloading
+    - restrict changes to package variables to scope of downloading process
+
+0.121560  2012-06-04 13:48:22 Europe/Berlin
+    - doc fixes
+	- added build response object parameter to enable customization of
+      post-request actions
+
+0.121540  2012-06-02 21:27:11 Europe/Berlin
+    - updated requirement on type provider module
+    - documented the object attributes
+
+0.120120  2012-01-12 12:16:26 Europe/Berlin
+    - switched to CC0 license
+
+0.120102  2012-01-10 23:50:40 Europe/Berlin
+    - shortened abstract
+
+0.120101  2012-01-10 22:04:52 Europe/Berlin
+    - documented the purpose of the module
+
+0.120100  2012-01-10 12:36:41 Europe/Berlin
+    - first release

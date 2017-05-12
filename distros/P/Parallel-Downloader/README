@@ -1,0 +1,145 @@
+NAME
+    Parallel::Downloader - simply download multiple files at once
+
+VERSION
+    version 0.132071
+
+SYNOPSIS
+        use HTTP::Request::Common qw( GET POST );
+        use Parallel::Downloader 'async_download';
+
+        # simple example
+        my @requests = map GET( "http://google.com" ), ( 1..15 );
+        my @responses = async_download( requests => \@requests );
+
+        # complex example
+        my @complex_reqs = ( ( map POST( "http://google.com", [ type_id => $_ ] ), ( 1..60 ) ),
+                           ( map POST( "http://yahoo.com", [ type_id => $_ ] ), ( 1..60 ) ) );
+
+        my $downloader = Parallel::Downloader->new(
+            requests => \@complex_reqs,
+            workers => 50,
+            conns_per_host => 12,
+            aehttp_args => {
+                timeout => 30,
+                on_prepare => sub {
+                    print "download started ($AnyEvent::HTTP::ACTIVE / $AnyEvent::HTTP::MAX_PER_HOST)\n"
+                }
+            },
+            debug => 1,
+            logger => sub {
+                my ( $downloader, $message ) = @_;
+                print "downloader sez [$message->{type}]: $message->{msg}\n";
+            },
+        );
+        my @complex_responses = $downloader->run;
+
+DESCRIPTION
+    This is not a library to build a parallel downloader on top of. It is a
+    downloading client build on top of AnyEvent::HTTP.
+
+    Its goal is not to be better, faster, or smaller than anything else. Its
+    goal is to provide the user with a single function they can call with a
+    bunch of HTTP requests and which gives them the responses for them with
+    as little fuss as possible and most importantly, without downloading
+    them in sequence.
+
+    It handles the busywork of grouping requests by hosts and limiting the
+    amount of simultaneous requests per host, separate from capping the
+    amount of overall connections. This allows the user to maximize their
+    own connection without abusing remote hosts.
+
+    Of course, there are facilities to customize the exact limits employed
+    and to add logging and such; but "async_download" is the premier piece
+    of API and should be enough for most uses.
+
+FUNCTIONS
+  async_download
+    Can be requested to be exported, will instantiate a Parallel::Downloader
+    object with the given parameters, run it and return the results. Its
+    parameters are as follows:
+
+   requests (required)
+    Reference to an array of HTTP::Request objects, all of which will be
+    downloaded.
+
+   aehttp_args
+    A reference to a hash containing arguments that will be passed to
+    AnyEvent::HTTP::http_request.
+
+    Default is an empty hashref.
+
+   conns_per_host
+    Sets the number of connections allowed per host by changing the
+    corresponding AnyEvent::HTTP package variable.
+
+    Default is '4'.
+
+   debug
+    A boolean that determines whether logging operations are a NOP or
+    actually run. Set to any true value to activate the logging.
+
+    Default is '0'.
+
+   logger
+    A reference to a sub that will receive a hash containing logging
+    information. Whether that sub then prints them to screen or into a
+    database or other targets is up to the user.
+
+    Default is a sub that prints to the screen.
+
+   workers
+    The amount of workers to be used for downloading. Useful for controlling
+    the global amount of connections your machine will try to establish.
+
+    Default is '10'.
+
+   build_response
+    A reference to a sub that will be called on completion of a request to
+    build the response variable that will be returned for this request. It
+    receives as parameters the body of the response, a hash ref of the
+    response headers and the original request.
+
+    Default is a sub that returns the parameters wrapped in an array
+    reference.
+
+   sorted
+    A boolean that determines whether the returned responses are sorted in
+    the same order as the input requests. Can be useful to disable if
+    build_response was overridden to not return an array or not return the
+    request as the third element of the response array.
+
+    Default is '1'.
+
+METHODS
+  run
+    Runs the downloads for the given parameters and returns an array of
+    array references, each containing the decoded contents, the headers and
+    the HTTP::Request object.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Parallel-Downloader>.
+    You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/wchristian/parallel-downloader>
+
+      git clone https://github.com/wchristian/parallel-downloader.git
+
+AUTHOR
+    Christian Walde <walde.christian@googlemail.com>
+
+COPYRIGHT AND LICENSE
+    Christian Walde has dedicated the work to the Commons by waiving all of
+    his or her rights to the work worldwide under copyright law and all
+    related or neighboring legal rights he or she had in the work, to the
+    extent allowable by law.
+
+    Works under CC0 do not require attribution. When citing the work, you
+    should not imply endorsement by the author.
+

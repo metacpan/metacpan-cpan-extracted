@@ -1,0 +1,26 @@
+---
+abstract: 'A DBI::Profile panel for Plack::Debugger'
+author:
+  - 'Dave Baird <dave@zerofive.co.uk>'
+build_requires:
+  Test::More: '0.75'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Debugger-Panel-DBIProfile
+requires:
+  DBI::Profile: '2.010494'
+  Plack::Debugger::Panel: '0.01'
+  Time::HiRes: '1.9712'
+  parent: '0.220'
+  perl: '5.008001'
+  warnings: 1.05_01
+resources:
+  bugtracker: https://github.com/davebaird/plack-debugger-panel-dbiprofile/issues
+  homepage: https://github.com/davebaird/plack-debugger-panel-dbiprofile
+  repository: https://github.com/davebaird/plack-debugger-panel-dbiprofile.git
+version: '0.01'

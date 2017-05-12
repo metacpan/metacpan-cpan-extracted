@@ -1,0 +1,7 @@
+[% INCLUDE common/header.tt
+           title = "Logged Out"
+%]
+
+<p>[% prevUserName %] logged out.</p>
+
+[% INCLUDE common/footer.tt %]

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Simple Report that fills in Document Information
+    Author: Cosimo Streppone <cosimo@cpan.org>
+    Date: 2006-03-14
+    $Id: info.xml,v 1.1 2006/03/14 17:14:24 cosimo Exp $
+-->
+<report>
+
+    <definition>
+        <name>A Simple Report</name>
+        <destination>info.pdf</destination>
+        <paper>A4</paper>
+        <orientation>portrait</orientation>
+        <font>Helvetica</font>
+        <default_font>Helvetica</default_font>
+        <default_font_size>10</default_font_size>
+
+        <!-- Document information -->
+        <info>
+            <ModDate>2006-06-14</ModDate>
+            <CreationDate>2006-06-14</CreationDate>
+            <Creator>Vim 6.3</Creator>
+            <Author>A. U. Thor</Author>
+            <Keywords>Asimov Trantor Daneel Foundation Mule</Keywords>
+            <Subject>An example report</Subject>
+            <Title>Document Information Report</Title>
+        </info>
+
+    </definition>
+
+    <data>
+
+        <cell_borders>1</cell_borders>
+        <page>
+            <header>
+                <cell index="0">
+                    <text>My First Document Information Report</text>
+                    <percent>80</percent>
+                    <font_size>20</font_size>
+                    <colour>blue</colour>
+                    <align>left</align>
+                    <height>100</height>
+                </cell>
+
+                <!-- Absolutely positioned cell -->
+                <cell index="1" x="50" y="500">
+                    <font>Helvetica</font>
+                    <font_size>8</font_size>
+                    <text>No other information on this page but, check out your PDF reader document information</text>
+                    <percent>100</percent>
+                    <align>center</align>
+                </cell>
+            </header>
+        </page>
+
+    </data>
+
+</report>

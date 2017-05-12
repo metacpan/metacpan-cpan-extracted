@@ -1,0 +1,7 @@
+Changes for Perl extension Parse-CPAN-MirroredBy
+
+0.02 Fri  5 Sep 2008
+	- Adding more-complete documentation
+
+0.01 Wed  2 Jul 2008
+	- Creating initial implementation

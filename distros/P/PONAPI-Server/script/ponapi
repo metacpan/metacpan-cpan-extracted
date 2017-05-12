@@ -1,0 +1,123 @@
+#!/usr/bin/env perl
+# ABSTRACT: ponapi utility
+# PODNAME: ponapi
+#
+# This is a convenience script installed alongside PONAPI::Server.
+# For more details about how to use PONAPI, go to the following URL:
+#
+#   https://metacpan.org/pod/PONAPI::Server
+use PONAPI::CLI;
+PONAPI::CLI->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+ponapi - ponapi utility
+
+=head1 VERSION
+
+version 0.003001
+
+=head1 SYNOPSIS
+
+    ponapi gen ...              # Initialize a new PONAPI server environment
+    ponapi manual               # Opens the server manual
+    ponapi demo -s              # Starts a demo server
+    ponapi demo -q              # Runs a query against the demo server
+
+=head1 SUBCOMMANDS
+
+=head2 gen
+
+This can be used to easily generate a PONAPI::Server environment.
+
+=over 4
+
+=item --dir $path
+
+(Required) Directory where the environment will be placed.
+
+=item --repo $module_name
+
+If you've already written L<a repository for your data|PONAPI::Manual/"CREATING A REPOSITORY">
+then you can just specify the class name here.
+Required if C<--new_repo> was not specified.
+
+=item --new_repo $module_name
+
+If you haven't written a repo yet, this will generate one with the minimal
+boilerplate, and write the name in the generated configuration.
+Required if C<--repo> was not specified.
+
+=item conf $path
+
+(Optional) Copies an B<existing> configuration file into the generated
+environment.  A new configuration with default values will be created
+if this is not present.
+
+=item psgi $path
+
+(Optional) Copies an B<existing> psgi file into the generated
+environment.  A new configuration with default values will be created
+if this is not present.
+
+=back
+
+=head2 demo
+
+=over 4
+
+=item --server|-s
+
+Launches a demo instance of L<PONAPI::Server>.
+
+=item --query|-q
+
+Launches a query against the demo server, and shows the result.
+
+=item --json|-j
+
+JSON-only output mode (better for JSON parsing tools).
+
+=item --port=$i
+
+Specifies which port should be used, either to bind the server or to
+communicate with it.  Defaults to 5000.
+
+=back
+
+=head2 manual
+
+Opens the L<PONAPI::Server> manual.  Same as running C<perldoc PONAPI::Manual>.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Mickey Nasriachi <mickey@cpan.org>
+
+=item *
+
+Stevan Little <stevan@cpan.org>
+
+=item *
+
+Brian Fraser <hugmeir@cpan.org>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Mickey Nasriachi, Stevan Little, Brian Fraser.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

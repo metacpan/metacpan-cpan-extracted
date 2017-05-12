@@ -1,0 +1,27 @@
+POE::Filter::LOLCAT
+===================
+
+1.10  Tue Aug 25 16:38:10 BST 2009
+  - Fix the malformed META.yml file
+
+1.08  Thu Jul 16 11:01:32 BST 2009
+  - Updated tests for newer version of Acme::LOLCAT
+
+1.06	Mon Apr 20 23:07:30 BST 2009
+	- Set repository in META.yml
+	- tidy up POD.
+
+1.04	Thu May  8 10:59:24 BST 2008
+	- Removed kwalitee test and added LICENSE information
+
+1.02	Fri Mar  7 08:19:04 GMT 2008
+	- Kwalitee fixes.
+
+1.00	Fri Jan  4 10:07:52 GMT 2008
+	- Added clone() method and updated tests
+
+0.02	Wed Oct 31 12:40:33 GMT 2007
+	- Updated Module::Install to 0.68;
+
+0.01	Mon Oct 29 12:50:21 GMT 2007
+	- Initial CPAN Release

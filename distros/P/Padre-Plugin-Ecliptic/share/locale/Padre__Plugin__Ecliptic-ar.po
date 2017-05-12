@@ -1,0 +1,130 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Ecliptic\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-12-17 21:20+0200\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"Language-Team: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Arabic\n"
+
+#: lib/Padre/Plugin/Ecliptic.pm:19
+msgid "Ecliptic"
+msgstr "برنامج اكليبتيك"
+
+#: lib/Padre/Plugin/Ecliptic.pm:96
+msgid "Quick Assist\tCtrl-Shift-L"
+msgstr "المساعدة السريعة\tCtrl-Shift-L"
+
+#: lib/Padre/Plugin/Ecliptic.pm:103
+msgid "Quick Outline Access\tCtrl-4"
+msgstr "الوصول السريع للمخطط\tCtrl-4"
+
+#: lib/Padre/Plugin/Ecliptic.pm:110
+msgid "Quick Module Access\tCtrl-5"
+msgstr "الوصول السريع للوحدة\tCtrl-5"
+
+#: lib/Padre/Plugin/Ecliptic.pm:120
+msgid "About"
+msgstr "عن"
+
+#: lib/Padre/Plugin/Ecliptic.pm:136
+msgid "Provides Eclipse-like useful features to Padre.\n"
+msgstr "يقدم مزايا مفيدة ومشابهة لبرنامج Eclipse  لبرنامج Padre.\n"
+
+#: lib/Padre/Plugin/Ecliptic/QuickAssistDialog.pm:30
+msgid "Quick Assist"
+msgstr "المساعدة السريعة"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:33
+msgid "Quick Module Access"
+msgstr "الوصول السريع للوحدة"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:127
+msgid "&Type a module name to access:"
+msgstr "اطبع اسم مادة الوحدة للوصول اليها:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:134
+msgid "&Matching modules:"
+msgstr "الوحدات المطابقة:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:245
+msgid "Reading modules. Please wait..."
+msgstr "جاري قراءة الوحدات. الرجاء الانتظار..."
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:257
+msgid "Finished Searching"
+msgstr "تم البحث"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:269
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:273
+msgid " item(s) found"
+msgstr "مواد عثر عليها"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:271
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:275
+msgid "No items found"
+msgstr "لا يوجد أي مادة"
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:32
+msgid "Quick Outline Access"
+msgstr "الوصول السريع للمخطط"
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:118
+msgid "&Type a Outline item name to access:"
+msgstr "اطبع اسم مادة المخطط للوصول اليها:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:125
+msgid "&Matching Outline Items:"
+msgstr "مواد المخطط المطابقة:"
+
+#~ msgid "Quick Fix\tCtrl-Shift-1"
+#~ msgstr "الحل السريع\tCtrl-Shift-1"
+#~ msgid "No filename"
+#~ msgstr "لا يوجد اسم للملف"
+#~ msgid "Error"
+#~ msgstr "خطأ"
+#~ msgid "Quick Fix"
+#~ msgstr "الحل السريع"
+#~ msgid "No suggestions"
+#~ msgstr "بلا اقتراحات"
+#~ msgid "Open Resource\tCtrl-Shift-R"
+#~ msgstr "فتح المصدر\tCtrl-Shift-R"
+#~ msgid "Quick Menu Access\tCtrl-3"
+#~ msgstr "الوصول السريع للقائمة\tCtrl-3"
+#~ msgid "Open in File Browser\tCtrl-6"
+#~ msgstr "افتح في متصفح الملفات\tCtrl-6"
+#~ msgid "Failed to execute process\n"
+#~ msgstr "فشل تشغيل البرنامج\n"
+#~ msgid "Open Resource"
+#~ msgstr "فتح المورد"
+#~ msgid "&Select an item to open (? = any character, * = any string):"
+#~ msgstr "اختر مادة للفتح (? = أي حرف, * = أي متسلسة حرفية):"
+#~ msgid "&Matching Items:"
+#~ msgstr "المواد المطابقة:"
+#~ msgid "Current Directory: "
+#~ msgstr "الدليل الحالي:"
+#~ msgid "Skip VCS files"
+#~ msgstr "تخطي ملفات VCS"
+#~ msgid "Skip using MANIFEST.SKIP"
+#~ msgstr "تخطي بواسطة MANIFEST.SKIP"
+#~ msgid "Quick Menu Access"
+#~ msgstr "الوصول السريع للقائمة"
+#~ msgid "Error while trying to perform Padre action"
+#~ msgstr "خطأ عند محاولة تأدية عمل Padre"
+#~ msgid "&Type a menu item name to access:"
+#~ msgstr "اطبع اسم مادة القائمة للوصول اليها:"
+#~ msgid "&Matching Menu Items:"
+#~ msgstr "مواد القائمة المطابقة:"
+#~ msgid "Ignore CVS/.svn/.git/blib folders"
+#~ msgstr "تجاهل مجلدات  CVS/.svn/.git/blib"
+#~ msgid " items selected"
+#~ msgstr " مواد مختارة"
+#~ msgid "Reading items. Please wait..."
+#~ msgstr "جاري قراءة المواد. الرجاء الانتظار..."
+#~ msgid "List Key Bindings"
+#~ msgstr "قائمة اختصارات المفاتيح"
+

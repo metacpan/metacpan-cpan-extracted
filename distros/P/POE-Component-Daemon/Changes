@@ -1,0 +1,64 @@
+Revision history for Perl extension POE::Component::Daemon.
+
+0.1400 2013/Jul/21
+    - Fixed max/min spare setting and defaults (RT 86900) 
+
+0.1300 2011/May/18
+    - Removed dependence on POE::API::Peek
+    - Fixed, tested and working on POE 1.311
+
+0.1204 2011/Fev/18
+    - Moved all ->yield( 'shutdown' ) to ->do_shutdown();
+    - daemon_shutdown is now expedited with ->call()
+    - Tweak cookie crumbs
+
+0.1203 2011/Jan/06
+    - Check for a working shmget() in Makefile.PL
+
+0.1201 2010/Dec/13
+    - Fixed test cases!
+    - Stronger exit code for detach
+
+0.1200 2010/Dec/13
+    - shutdown is also a signal
+    - only remove alias once
+    - tweak verbose cookie crumbs
+    - moved clutter into eg/
+
+0.1100 2009/Sep/16
+    - Use Port=>0 so that the OS assigns us a port number.  This way
+        maybe we won't always fail on darwin.
+    - use POE::Kernel->sig_child()
+
+0.1008 2009/May/6
+    - Make CPANTS happier
+
+0.1007 2008/Nov/25
+    - Added a call to poe_kernel->_data_sig_initialize to work around a bug
+        in POE 1.003
+    - A transition req->long or long->req no longer counted a request
+
+0.1006 2007/Aug/01
+    - Added daemon_HUP
+
+0.1004 2007/Jun/29
+    - Clean up dupped sig_TERM
+
+0.1003 2006/Nov/15
+    - Use $^X in test cases
+
+0.1002 2006/Nov/09
+    - Reconciled with SVN
+
+0.1001 2006/Sep/14
+    - Remove signal handlers so that kernel can still exit.  This is 
+      required in the new, refcount on sig kernels (post 0.36)
+      Thank you Andrew Hoying
+
+0.10 2006/Feb/22
+    - First public release
+
+0.01  Wed Apr  7 15:38:51 2004
+	- original version; created by h2xs 1.22 with options
+		-AX -b 5.4.5 POE::Component::Daemon
+

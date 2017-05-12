@@ -1,0 +1,7 @@
+[% INCLUDE common/header.tt
+           title = "Error!"
+%]
+
+<h2>Invalid URL</h2>
+
+[% INCLUDE common/footer.tt %]

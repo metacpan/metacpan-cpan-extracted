@@ -1,0 +1,3 @@
+:
+
+ls example | sed 's/^/L</; s/$/>/'

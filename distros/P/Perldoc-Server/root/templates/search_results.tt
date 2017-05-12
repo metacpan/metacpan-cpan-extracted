@@ -1,0 +1,11 @@
+[% IF query %]
+  <h1>No results found</h1>
+  <p>
+    Sorry, no documents were found for your query '<strong>[% query %]</strong>'.
+  </p>
+[% ELSE %]
+  <h1>No query specified</h1>
+  <p>
+    Please enter a search query and try again.
+  </p>
+[% END %]

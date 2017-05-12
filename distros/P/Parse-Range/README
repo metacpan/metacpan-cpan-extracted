@@ -1,0 +1,89 @@
+NAME
+    Parse::Range - Parse text range definitions
+
+SYNOPSIS
+      use Parse::Range qw(parse_range);
+  
+      my @range = parse_range('1,3,5-7');
+      # @range = qw(1 3 5 6 7);
+  
+      @range = parse_range('1-7,^2,^4');
+      # @range = qw(1 3 5 6 7);
+  
+      @range = parse_range('1-7,^(2,4)');
+      # @range = qw(1 3 5 6 7);
+  
+DESCRIPTION
+    This module parses range definitions and returns an array of individual
+    numbers.
+
+    It is intended to be used in command line applications where the user
+    should be able to select one or more options from a list or in any other
+    application where such a situation occurs.
+
+FUNCTIONS
+    By default no functions are exported.
+
+  parse_range
+    The one and only function this module provides. It accepts one or more
+    strings which are concatenated by a comma. Ranges, blocks and numbers
+    are expected to be seperated by comma.
+
+    Now the parsing takes place. Strings can be nested to any depth using
+    parentheses. Not matching parentheses are being repaired if possible.
+    Ranges can be expressed using the minus sign `-'. Use `^' to exclude
+    numbers or ranges from the current range. Negative numbers are expressed
+    using the minus sign. This is a valid expression `-4--2' which will
+    result in an array from minus four to minus two. `(-4)-(-2)' works as
+    well. The string is parsed from left to right.
+
+EXAMPLES
+      parse_range('1-7,^(2,4)');
+  
+    This will first add the numbers from one to seven to the range and then
+    exclude the numbers two and 4. The result is `1 3 5 6 7'.
+
+      parse_range('^(2,4),1-7');
+
+     This is the same example as above except that it is the other way round. The exception of two and four
+     is a noop in this case because there is no range from which to exclude the numbers. The result is
+     therefore C<1 2 3 4 5 6 7>.
+ 
+       parse_range('1-9,^(5-9,^(8-9))');
+ 
+     This is a more advanced example. From a range from one to nine we exclude a block which consists
+     of a range from five to nine from which eight and nine are excluded.
+     The result is C<1 2 3 4 8 9>.
+ 
+AUTHOR
+    Moritz Onken, `<onken at netcubed.de>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-Parse-Range at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Parse-Range. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Parse::Range
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parse-Range
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Parse-Range
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Parse-Range
+
+    * Search CPAN
+        http://search.cpan.org/dist/Parse-Range/
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Moritz Onken, all rights reserved.
+

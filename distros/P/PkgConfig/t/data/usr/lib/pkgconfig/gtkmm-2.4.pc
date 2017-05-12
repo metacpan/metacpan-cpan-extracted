@@ -1,0 +1,19 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+datarootdir=${prefix}/share
+datadir=${datarootdir}
+includedir=${prefix}/include
+
+docdir=${datarootdir}/doc/gtkmm-2.4
+doxytagfile=${docdir}/reference/gtkmm-2.4.tag
+htmlrefdir=${docdir}/reference/html
+htmlrefpub=http://library.gnome.org/devel/gtkmm/unstable/
+
+Name: gtkmm
+Description: C++ binding for the GTK+ toolkit
+Version: 2.20.3
+URL: http://www.gtkmm.org/
+Requires: giomm-2.4 >= 2.24 pangomm-1.4 >= 2.26 gtk+-2.0 >= 2.20.0 gtk+-unix-print-2.0 atkmm-1.6 gdkmm-2.4
+Libs: -L${libdir} -lgtkmm-2.4
+Cflags: -I${includedir}/gtkmm-2.4 -I${libdir}/gtkmm-2.4/include

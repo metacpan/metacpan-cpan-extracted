@@ -1,0 +1,16 @@
+Changes for Perl extension PPI-XS
+
+0.904 Mon Apr 10 11:50:43 EDT 2017
+	- Fix Makefile.PL for perls without '.' in @INC
+
+0.903 Mon Apr 10 10:50:00 EDT 2017
+	- bad tarball
+
+0.902 Tue 26 Feb 2013
+	- Fix "defined @array" deprecation warning
+
+0.901 Tue  5 May 2009
+	- Incremental release to flush out packaging bugs
+
+0.900 Fri 28 Jan 2005
+	- Created initial implementation

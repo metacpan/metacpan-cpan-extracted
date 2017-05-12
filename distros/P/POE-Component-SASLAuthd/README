@@ -1,0 +1,43 @@
+POE-Component-SASLAuthd
+
+This module implements a POE component that speaks Cyrus saslauthd protocol.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc POE::Component::SASLAuthd
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-SASLAuthd
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/POE-Component-SASLAuthd
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/POE-Component-SASLAuthd
+
+    Search CPAN
+        http://search.cpan.org/dist/POE-Component-SASLAuthd
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Kirill Miazine
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

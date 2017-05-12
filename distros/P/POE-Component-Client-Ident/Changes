@@ -1,0 +1,57 @@
+Changelog for POE::Component::Client::Ident:-
+=============================================
+
+1.14	Sat May 17 15:23:36 BST 2008
+	- Updated test case to use Test::POE::Server::TCP
+	- Removed kwalitee test.
+	- Added license information
+
+1.12	Wed Mar  5 09:24:15 GMT 2008
+	- We had no explicit return values, I'm shocked it worked at all.
+
+1.10	Thu Jan 31 11:23:41 GMT 2008
+	- Enabled perl-5.5.5 compatibility.
+
+1.08	Thu Jan 17 14:16:39 GMT 2008
+	- Fixed up test script naming.
+
+1.07	Wed Oct 31 17:19:56 GMT 2007
+	- Updated Module::Install to 0.68
+
+1.06	Sun Aug 05 11:44:11 BST 2007
+	- Fixed abstract_from and build_requires in Makefile.PL
+
+1.04 	Thu Dec  7 17:27:17 GMT 2006
+	- Ident-Agent was hanging on to a reference to the spawning
+	session. Changed to session->ID.
+
+1.02    Fri Sep  1 10:27:59 BST 2006
+        - Rearranged distribution file structure.
+	- Added test pod and pod coverage.
+	- Fixed documentation coverage.
+
+1.01	Fri May 19 16:41:56 BST 2006
+	- Minor bug in Agent.pm was causing two error events to be
+	  generated in the case of a socket error.
+
+1.00	Wed Apr 26 13:48:34 BST 2006
+	- Minor code revisions
+	- switched test script to Test::More
+
+0.8	Thu Nov  3 12:55:56 GMT 2005
+	- Changed Ident-Agent API to be objectified.
+
+0.7	Fri Apr 29 10:51:22 BST 2005
+	- Amended Ident.pm so that it only stashes child session IDs
+	  not the session objects themselves.
+	- Doh, had forgotten to include 'use Socket' in Ident.pm.
+
+0.6	Fri Apr 22 12:00:56 BST 2005
+	- Hopefully fixed the issues that _pRiVi was having.
+
+0.5	Sat Apr 16 11:26:37 BST 2005
+	- _pRiVi @ MAGnet teased a bug in _time_out.
+
+0.4	Tue Feb  8 12:55:40 GMT 2005
+	- Added an additional delay _time_out to Ident-Agent.pm, so
+	  that it'll properly timeout on firewalled hosts/ports.

@@ -1,0 +1,20 @@
+abstract: Parse QT/KDE preprocessed headers
+author: 'Dongxu Ma <dongxu.ma@gmail.com>'
+build_requires:
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: artistic
+name: Parse-QTEDI
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Exporter: 0
+  Fcntl: 0
+  Parse::RecDescent: 1.94
+  YAML: 0.62
+  perl: 5.005
+version: 0.13

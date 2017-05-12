@@ -1,0 +1,36 @@
+=encoding iso-8859-1
+
+=head1 NAME/NOM
+
+perlbook - Livres concernant Perl
+
+=head1 DESCRIPTION
+
+Le Camel Book (livre du chameau), officiellement appelé I<Programming
+Perl, Third Edition>, par Larry Wall et al, est la référence ultime en
+ce qui concerne Perl. Vous pouvez le commander ainsi que d'autres
+livres sur Perl chez O'Reilly & Associates, 1-800-998-9938 (aux
+usa). Pour l'international, +1 707 829 0515. Si vous pouvez récupérer
+un bon de commande O'Reilly, vous pouvez aussi leur faxer à +1 707 829
+0104. Si vous êtes connecté au Web, vous pouvez même surfer sur
+<http://www.oreilly.com/> et trouver un bon de commande en ligne.
+
+D'autres livres concernant Perl provenant de divers éditeurs et
+auteurs peuvent être trouvés dans L<perlfaq2> ou sur le web
+<http://books.perl.org>.
+
+=head1 TRADUCTION
+
+=head2 Version
+
+Cette traduction française correspond à la version anglaise distribuée avec
+perl 5.8.8.  Pour en savoir plus concernant ces traductions, consultez
+L<http://perl.enstimac.fr/>.
+
+=head2 Traducteur
+
+Mathieu Arnold <arn_mat@club-internet.fr>. Paul Gaborit <Paul.Gaborit @ enstimac.fr>.
+
+=head2 Relecture
+
+Gérard Delafond

@@ -1,0 +1,28 @@
+---
+abstract: 'A no-frills converter between 1D and 2D spaces using the Hilbert curve'
+author:
+  - '"PWBENNETT" <paul.w.bennett@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Simple: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Path-Hilbert
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Math::BigInt: '0'
+  integer: '0'
+  perl: '5.012'
+  utf8: '0'
+version: '2.000'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

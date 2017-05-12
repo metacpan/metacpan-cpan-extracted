@@ -1,0 +1,25 @@
+NAME
+
+	PDL::RungeKutta - Solve N-th order M dimensional ordinary differential 
+	equations using adaptive stepsize Runge Kutta method.
+
+DESCRIPTION
+
+	This module allows to solve N-th order M dimensional ordinary
+	differential  equations. It uses the  adaptive stepsize control for
+	fifth order Cash-Karp Runge-Kutta  algorithm described in  "Numerical
+	Recipes in Fortran 77: The Art of Scientific Computing" Ch. 16.2 The
+	errors are estimated as the difference between fifth order results and
+	the embeded forth order results. To solve N-th order equations, you
+	must first turn it into a system of N first order equations.
+
+INSTALL
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+More documentation included with module in POD format. 
+
+Dragos Constantinescu <dragos@venus.nipne.ro>

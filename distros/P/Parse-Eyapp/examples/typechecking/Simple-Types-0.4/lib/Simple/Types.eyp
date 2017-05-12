@@ -1,0 +1,831 @@
+/* 
+File: Simple/Types.eyp
+Full Type checking
+To build it, Do make or:
+  eyapp -m Simple::Types Types.eyp; 
+  treereg -m Simple::Types Trans
+*/
+%{
+use strict;
+use Carp;
+use warnings;
+use Data::Dumper;
+use List::MoreUtils qw(firstval);
+use Simple::Trans;
+use Parse::Eyapp::Scope qw(:all);
+use Parse::Eyapp::Base qw(insert_function insert_method);
+our $VERSION = "0.4";
+
+my $debug = 1;
+my %reserved = (
+  int => "INT",
+  char => "CHAR",
+  if => "IF",
+  else => "ELSE",
+  break => "BREAK",
+  continue => "CONTINUE",
+  return => "RETURN",
+  while => "WHILE"
+);
+
+my %lexeme = (
+  '='  => "ASSIGN",
+  '+'  => "PLUS",
+  '-'  => "MINUS",
+  '*'  => "TIMES",
+  '/'  => "DIV",
+  '%'  => "MOD",
+  '|'  => "OR",
+  '&'  => "AND",
+  '{'  => "LEFTKEY",
+  '}'  => "RIGHTKEY",
+  ','  => "COMMA",
+  ';'  => "SEMICOLON",
+  '('  => "LEFTPARENTHESIS",
+  ')'  => "RIGHTPARENTHESIS",
+  '['  => "LEFTBRACKET",
+  ']'  => "RIGHTBRACKET",
+  '==' => "EQ",
+  '+=' => "PLUSASSIGN",
+  '-=' => "MINUSASSIGN",
+  '*=' => "TIMESASSIGN",
+  '/=' => "DIVASSIGN",
+  '%=' => "MODASSIGN",
+  '!=' => "NE",
+  '<'  => "LT",
+  '>'  => "GT",
+  '<=' => "LE",
+  '>=' => "GE",
+  '++' => "INC",
+  '--' => "DEC",
+  '**' => "EXP"
+);
+
+my %rlexeme = reverse %lexeme;
+
+
+# Build a tree instead of a string?
+sub build_type {
+  my $bt = shift;
+  my @arrayspec = shift()->children();
+
+  my $type = '';
+  for my $s (@arrayspec) {
+    $type .= "A_$s->{attr}[0](";
+  }
+  if ($type) {
+    $type = "$type$bt".(")"x@arrayspec);
+  }
+  else {
+    $type = $bt;
+  }
+  return $type;
+}
+
+my ($tokenbegin, $tokenend);
+my %type; # Hash for types: type expression => tree
+my %st;   # Global symbol table for identifiers
+my $ids;  # scope manager object for identifiers
+
+my $loops; # scope manager object for loops, breaks and continues
+
+my $depth = 0;
+
+sub build_function_scope { 
+  my ($funcDef, $returntype) = @_;
+
+  my $function_name = $funcDef->{function_name}[0];
+  my @parameters = @{$funcDef->{parameters}};
+  my $lst = $funcDef->{symboltable};
+  my $numargs = scalar(@parameters);
+
+  #compute type
+  my $partype = "";
+  my @types = map { $lst->{$_}{type} } @parameters;
+  $partype .= join ",", @types if @types;
+
+  my $type = "F(X_$numargs($partype),$returntype)";
+
+  #insert it in the hash of types
+  $type{$type} = Parse::Eyapp::Node->hnew($type);
+  $funcDef->{type} = $type;
+  $funcDef->{t} = $type{$type};
+
+  #insert it in the global symbol table
+  die "Duplicated declaration of $function_name at line $funcDef->{function_name}[1]\n" 
+    if exists($st{$function_name});
+  $st{$function_name}->{type} = $type;
+  $st{$function_name}->{line} = $funcDef->{function_name}[1];
+
+  return $funcDef;
+}
+
+sub declare_instance_and_build_node {
+  my ($parser, $Variable) = @_[0,1];
+  
+  $ids->scope_instance($Variable); 
+  goto &Parse::Eyapp::Driver::YYBuildAST;
+}
+
+# Reset file scope variables
+sub reset_file_scope_vars {
+  %st = (); # reset symbol table
+  ($tokenbegin, $tokenend) = (1, 1);
+  %type = ( INT  => Parse::Eyapp::Node->hnew('INT'), 
+            CHAR => Parse::Eyapp::Node->hnew('CHAR'),
+            VOID => Parse::Eyapp::Node->hnew('VOID'),
+          );
+  $depth = 0;
+  $ids = Parse::Eyapp::Scope->new(
+           SCOPE_NAME => 'block', 
+           ENTRY_NAME => 'info',
+           SCOPE_DEPTH => 'depth',
+  );
+  $loops = Parse::Eyapp::Scope->new(
+           SCOPE_NAME => 'exits', 
+  );
+  $ids->begin_scope(); 
+  $loops->begin_scope(); # just for checking
+}
+
+%}
+
+%syntactic token RETURN BREAK CONTINUE
+
+%nonassoc '(' '['
+%right '=' '+=' '-=' '*=' '/=' '%='
+%left '|'
+%left '&'
+%left '==' '!='
+%left '<' '>' '>=' '<='
+%left '+' '-'
+%left '*' '/' '%'
+%right '**'
+%right '++' '--'
+%right 'ELSE'
+
+%tree
+
+%%
+program:
+      { 
+        reset_file_scope_vars();
+      }
+    definition<%name PROGRAM +>.program
+      { 
+        $program->{symboltable} = { %st };  # creates a copy of the s.t.
+        $program->{depth} = 0;
+        $program->{line}  = 1;
+        $program->{types} = { %type };  
+        $program->{lines} = $tokenend;  
+
+        my ($nondec, $declared) = $ids->end_scope($program->{symboltable}, $program, 'type');
+
+        if (@$nondec) {
+          warn "Identifier ".$_->key." not declared at line ".$_->line."\n" for @$nondec;
+          die "\n";
+        }
+
+        # Type checking: add a direct pointer to the data-structure
+        # describing the type
+        $_->{t} = $type{$_->{type}} for @$declared;
+
+        my $out_of_loops = $loops->end_scope($program);
+        if (@$out_of_loops) {
+          warn "Error: ".ref($_)." outside of loop at line $_->{line}\n" for @$out_of_loops;
+          die "\n";
+        }
+
+        # Check that are not dangling breaks
+        reset_file_scope_vars();
+
+        $program;
+      }
+;
+
+definition:
+    $funcDef 
+      { 
+        build_function_scope($funcDef, 'INT');
+      }
+  | %name FUNCTION
+    $basictype $funcDef
+      { 
+        build_function_scope($funcDef, $basictype->type);
+      }
+  | declaration 
+     { 
+       #control duplicated declarations
+       my $message;
+       die $message if $message = is_duplicated(\%st, $_[1]);
+       %st = (%st,  %{$_[1]}); # improve this code
+       return undef; # will not be inserted in the AST
+     }
+;
+
+basictype:
+    %name INT 
+    INT
+  | %name CHAR 
+    CHAR
+;
+
+funcDef:
+    $ID 
+       { 
+         $ids->begin_scope(); 
+       }
+    '('  $params  ')' 
+      $block
+    {
+       my $st = $block->{symboltable}; 
+       my @decs = $params->children(); 
+       $block->{parameters} = [];
+       while (my ($bt, $id, $arrspec) = splice(@decs, 0, 3)) {
+           $bt = ref($bt); # The string 'INT', 'CHAR', etc.
+           my $name = $id->{attr}[0];
+           my $type = build_type($bt, $arrspec);
+           $type{$type} = Parse::Eyapp::Node->hnew($type); 
+
+           # control duplicated declarations
+             die "Duplicated declaration of $name at line $id->{attr}[1]\n" 
+           if exists($st->{$name});
+
+           $st->{$name}->{type} = $type;
+           $st->{$name}->{param} = 1;
+           $st->{$name}->{line} = $id->{attr}[1];
+           push @{$block->{parameters}}, $name;
+       }
+       $block->{function_name} = $ID;
+       $block->type("FUNCTION");
+
+       my ($nodec, $dec) = $ids->end_scope($st, $block, 'type');
+
+       # Type checking: add a direct pointer to the data-structure
+       # describing the type
+       $_->{t} = $type{$_->{type}} for @$dec;
+
+       return $block;
+    }
+;
+
+params: 
+    ( basictype ID arraySpec)<%name PARAMS * ','>
+      { $_[1] }
+;
+
+block:
+    '{'.bracket 
+       { $ids->begin_scope(); }
+     declaration<%name DECLARATIONS *>.decs statement<%name STATEMENTS *>.sts '}'
+       { 
+         my %st;
+
+         for my $lst ($decs->children) {
+
+             # control duplicated declarations
+           my $message;
+           die $message if $message = is_duplicated(\%st, $lst);
+
+           %st = (%st, %$lst);
+         }
+         $sts->{symboltable} = \%st;
+         $sts->{line} = $bracket->[1];
+         $sts->type("BLOCK") if (%st); 
+         my ($nondec, $dec) = $ids->end_scope(\%st, $sts, 'type');
+
+         # Type checking: add a direct pointer to the data-structure
+         # describing the type
+         $_->{t} = $type{$_->{type}} for @$dec;
+
+         return $sts; 
+       }
+
+;
+
+declaration:
+    %name DECLARATION
+    $basictype $declList ';' 
+      {  
+         my %st; # Symbol table local to this declaration
+         my $bt = $basictype->type;
+         my @decs = $declList->children(); 
+         while (my ($id, $arrspec) = splice(@decs, 0, 2)) {
+           my $name = $id->{attr}[0];
+           my $type = build_type($bt, $arrspec);
+           $type{$type} = Parse::Eyapp::Node->hnew($type); # too much $type for me!
+
+           # control duplicated declarations
+           die "Duplicated declaration of $name at line $id->{attr}[1]\n" if exists($st{$name});
+           $st{$name}->{type} = $type;
+           $st{$name}->{line} = $id->{attr}[1];
+         }
+         return \%st;
+      }
+;
+
+declList:
+    (ID arraySpec) <%name VARLIST + ','> { $_[1] } 
+;
+
+arraySpec:
+    ( '[' INUM ']')* { $_[1]->type("ARRAYSPEC"); $_[1] }
+;
+
+statement:
+    expression ';' { $_[1] }
+  | ';'
+  | %name BREAK
+    $BREAK ';'
+      {
+        my $self = shift;
+        my $node = $self->YYBuildAST(@_);
+        $node->{line} = $BREAK->[1];
+        $loops->scope_instance($node);
+        return $node;
+      }
+  | %name CONTINUE
+     $CONTINUE ';'
+      {
+        my $self = shift;
+        my $node = $self->YYBuildAST(@_);
+        $node->{line} = $CONTINUE->[1];
+        $loops->scope_instance($node);
+        return $node;
+      }
+  | %name EMPTYRETURN
+    RETURN ';'
+  | %name RETURN
+     RETURN expression ';'
+  | block { $_[1] }
+  | %name IF
+    ifPrefix statement %prec '+'
+  | %name IFELSE
+    ifPrefix statement 'ELSE' statement
+  | %name WHILE
+    $loopPrefix statement
+      {
+        my $self = shift;
+        my $wnode = $self->YYBuildAST(@_);
+        $wnode->{line} = $loopPrefix->{line};
+        my $breaks = $loops->end_scope($wnode);
+        return $wnode;
+      }
+;
+
+ifPrefix:
+    IF '(' expression ')' { $_[3] }
+;
+
+loopPrefix:
+    $WHILE '(' expression ')' 
+      { 
+        $loops->begin_scope;
+        $_[3]->{line} = $WHILE->[1]; 
+        $_[3] 
+      }
+;
+
+expression:
+    binary <+ ','> 
+      { 
+        return $_[1]->child(0) if ($_[1]->children() == 1); 
+        return $_[1];
+      }
+;
+
+Variable:
+    %name VAR
+    ID 
+  | %name  VARARRAY
+    $ID ('[' binary ']') <%name INDEXSPEC +> 
+      {
+        my $self = shift;
+        my $node =  $self->YYBuildAST(@_);
+        $node->{line} = $ID->[1];# $_[1]->[1]
+        return $node;
+      }
+;
+
+Primary:
+    %name INUM
+    INUM 
+  | %name CHARCONSTANT
+    CHARCONSTANT
+  | $Variable 
+      { 
+        $ids->scope_instance($Variable); 
+        return $Variable 
+      }
+  | '(' expression ')' { $_[2] }
+  | $function_call 
+      { 
+        $ids->scope_instance($function_call); 
+        return $function_call  # bypass
+      }
+;
+    
+function_call:  
+  %name 
+    FUNCTIONCALL
+    ID  '(' binary <%name ARGLIST * ','> ')'
+;
+
+Unary:
+    '++' Variable
+  | '--' Variable
+  | Primary { $_[1] }
+;
+
+binary:
+    Unary { $_[1] }
+  | %name PLUS
+    binary '+' binary
+  | %name MINUS
+    binary '-' binary
+  | %name TIMES
+    binary '*' binary
+  | %name DIV
+    binary '/' binary
+  | %name MOD
+    binary '%' binary
+  | %name LT
+    binary '<' binary
+  | %name GT
+    binary '>' binary
+  | %name GE
+    binary '>=' binary
+  | %name LE
+    binary '<=' binary
+  | %name EQ
+    binary '==' binary
+  | %name NE
+    binary '!=' binary
+  | %name AND
+    binary '&' binary
+  | %name EXP
+    binary '**' binary
+  | %name OR
+    binary '|' binary
+  | %name ASSIGN
+    $Variable '=' binary
+      {
+        goto &declare_instance_and_build_node;
+      }
+  | %name PLUSASSIGN
+    $Variable '+=' binary
+      {
+        goto &declare_instance_and_build_node;
+      }
+  | %name MINUSASSIGN
+    $Variable '-=' binary
+      {
+        goto &declare_instance_and_build_node;
+      }
+  | %name TIMESASSIGN
+    $Variable '*=' binary
+      {
+        goto &declare_instance_and_build_node;
+      }
+  | %name DIVASSIGN
+    $Variable '/=' binary
+      {
+        goto &declare_instance_and_build_node;
+      }
+  | %name MODASSIGN
+    $Variable '%=' binary
+      {
+        goto &declare_instance_and_build_node;
+      }
+;
+
+%%
+
+sub _Error {
+  my($token)=$_[0]->YYCurval;
+  my($what)= $token ? "input: '$token->[0]' in line $token->[1]" : "end of input";
+  my @expected = $_[0]->YYExpect();
+  my $expected = @expected? "Expected one of these tokens: '@expected'":"";
+
+  croak "Syntax error near $what. $expected\n";
+}
+
+sub _Lexer {
+  my($parser)=shift;
+
+  my $token;
+  for ($parser->YYData->{INPUT}) {
+      return('',undef) if !defined($_) or $_ eq '';
+
+      #Skip blanks
+      s{\A
+         ((?:
+              \s+       # any white space char
+          |   /\*.*?\*/ # C like comments
+          )+
+         )
+       }
+       {}xs
+      and do {
+            my($blanks)=$1;
+
+            #Maybe At EOF
+            return('', undef) if $_ eq '';
+            $tokenend += $blanks =~ tr/\n//;
+        };
+
+     $tokenbegin = $tokenend;
+
+      s/^('.')//
+              and return('CHARCONSTANT', [$1, $tokenbegin]);
+
+      s/^([0-9]+(?:\.[0-9]+)?)//
+              and return('INUM',[$1, $tokenbegin]);
+
+      s/^([A-Za-z][A-Za-z0-9_]*)//
+        and do {
+          my $word = $1;
+          my $r;
+          return ($r, [$r, $tokenbegin]) if defined($r = $reserved{$word});
+          return('ID',[$word, $tokenbegin]);
+      };
+
+      m/^(\S\S)/ and  defined($token = $1) and exists($lexeme{$token})
+        and do {
+          s/..//;
+          return ($token, [$token, $tokenbegin]);
+        }; # do
+
+      m/^(\S)/ and defined($token = $1) and  exists($lexeme{$token})
+        and do {
+          s/.//;
+          return ($token, [$token, $tokenbegin]);
+        }; # do
+      
+      die "Unexpected character at $tokenbegin\n";
+  } # for
+}
+
+sub compile {
+ my($self)=shift;
+
+ my ($t);
+   
+ $self->YYData->{INPUT} = $_[0];
+
+ $t = $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error, 
+                      #yydebug => 0x1F 
+     );
+
+ # Scope Analysis: Block Hierarchy
+ our $blocks;
+ my @blocks = $blocks->m($t);
+ $_->node->{fatherblock} = $_->father->{node} for (@blocks[1..$#blocks]);
+
+ # Scope Analysis: Return-Function
+ our $retscope; # retscope: /FUNCTION|RETURN/
+ my @returns = $retscope->m($t);
+ for (@returns) {
+   my $node = $_->node;
+   if (ref($node) eq 'RETURN') {
+     my $function = $_->father->node;
+     $node->{function}  = $function;
+     $node->{t} = $function->{t}->child(1);
+   }
+ }
+
+ # Type checking
+ set_types($t);        # Init basic types
+
+ my @typecheck = (     # Check typing transformations for
+   our $inum,          # - Numerical constantss
+   our $charconstant,  # - Character constants
+   our $bin,           # - Binary Operations
+   our $arrays,        # - Arrays
+   our $assign,        # - Assignments
+   our $control,       # - Flow control sentences
+   our $functioncall,  # - Function calls
+   our $statements,    # - Those nodes with void type 
+                       #   (STATEMENTS, PROGRAM, etc.)
+   our $returntype,    # - Return
+ );
+
+ $t->bud(@typecheck);
+
+ # The type checking for trees RETURN exp is made
+ # in adifferent way. Just for fun
+ #our $bind_ret2function;
+ #my @FUNCTIONS = $bind_ret2function->m($t);
+
+ return $t;
+}
+
+sub TERMINAL::value {
+  return $_[0]->{attr}[0];
+}
+
+########## line Support 
+
+sub TERMINAL::line {
+  return $_[0]->{attr}[1];
+}
+
+sub VAR::line {
+  my $self = shift;
+
+  return $self->child(0)->{attr}[1];
+}
+
+insert_function(
+  qw{VARARRAY::line FUNCTIONCALL::line},
+  \&VAR::line
+);
+
+sub PLUS::line {
+  $_[0]->{lines}[0]
+}
+
+insert_method(
+  qw{TIMES DIV MINUS ASSIGN GT IF RETURN},
+  'line',
+  \&PLUS::line
+);
+
+########## Scope Support 
+
+sub VAR::key {
+  my $self = shift;
+
+  return $self->child(0)->{attr}[0];
+}
+
+insert_function(
+  qw{
+    VARARRAY::key FUNCTIONCALL::key 
+  },
+  \&VAR::key
+);
+
+
+sub is_duplicated {
+  my ($st1, $st2) = @_;
+
+  my $id;
+
+    defined($id=firstval{exists $st1->{$_}} keys %$st2)
+  and return "Error. Variable $id at line $st2->{$id}->{line} declared twice.\n";
+  return 0;
+}
+
+############## Debugging and Display
+sub show_trees {
+ my ($t) = shift;
+ my $debug = shift;
+
+ $Data::Dumper::Indent = 1;
+ print Dumper $t if $debug > 3;
+ local $Parse::Eyapp::Node::INDENT = $debug;
+ print $t->str."\n";
+}
+
+sub TERMINAL::info { 
+  my @a = join ':', @{$_[0]->{attr}}; 
+  return "@a"
+}
+
+sub TERMINAL::save_attributes {
+  # $_[0] is a syntactic terminal
+  # $_[1] is the father.
+  push @{$_[1]->{lines}}, $_[0]->[1]; # save the line!
+}
+
+sub PROGRAM::footnote { 
+  return "Types:\n"
+         .Dumper($_[0]->{types}).
+         "Symbol Table:\n"
+         .Dumper($_[0]->{symboltable}) 
+}
+
+sub FUNCTION::info { 
+  return $_[0]->{function_name}[0] 
+}
+
+sub FUNCTION::footnote { 
+  return Dumper($_[0]->{symboltable}) 
+}
+
+sub BLOCK::info {
+  my $info = "$_[0]->{line}:$_[0]->{depth}";
+  my $fatherblock = $_[0]->{fatherblock};
+    $info .= ":".$fatherblock->info 
+  if defined($fatherblock) and UNIVERSAL::can($fatherblock, 'info');
+}
+
+insert_function(
+  qw{
+    BLOCK::footnote
+  },
+  \&FUNCTION::footnote
+);
+
+sub type_info {
+  my $info;
+
+  if (defined $_[0]->{type}) {
+    $info = $_[0]->{type};
+  }
+  else {
+    $info = "No declarado!";
+  }
+  return $info;
+}
+
+sub t_info {
+  my $info;
+
+  local $Parse::Eyapp::Node::INDENT = 0;
+  if (defined $_[0]->{t}) {
+    $info = $_[0]->{t}->str;
+  }
+  else {
+    $info = "No computado!";
+  }
+  return $info;
+}
+
+sub generic_info {
+  my $info;
+
+  $info = "";
+  $info .= $_[0]->type_info if $_[0]->can('type_info');
+  my $sep = $info?":":"";
+  $info .= $sep.$_[0]->t_info if $_[0]->can('t_info');
+
+  $sep = $info?":":"";
+
+  $info .= $sep.$_[0]->{line} if (defined $_[0]->{line});
+  local $" = ',';
+  $info .= "$sep@{$_[0]->{lines}}" if (defined $_[0]->{lines});
+  return $info;
+}
+
+sub WHILE::info {
+  my $self = shift;
+
+  my $i = "";
+  $i .= ref($_).":" for (@{$self->{exits}});
+  return $i;
+}
+
+sub BREAK::info {
+  my $self = shift;
+
+  return ref($self->{exits}).":".$self->{exits}->{line};
+}
+
+insert_function(
+  qw{
+    CONTINUE::info
+  },
+  \&BREAK::info
+);
+
+
+sub WHILE::line {
+  return $_[0]->{line}
+}
+
+insert_function(
+  qw{ FUNCTIONCALL::type_info VARARRAY::type_info VAR::type_info },
+  \&type_info
+);
+
+insert_method(
+  qw{
+    PLUS TIMES DIV MINUS GT 
+    IF IFELSE WHILE VARARRAY 
+    VAR ASSIGN FUNCTIONCALL
+  },
+  't_info',
+  \&t_info
+);
+
+sub lexeme {
+  return $rlexeme{ref($_[0])} if defined($rlexeme{ref($_[0])});
+  return ref($_[0]);
+}
+
+insert_method(
+  # Gives the lexeme for a given operator
+  qw{
+    PLUS TIMES DIV MINUS 
+    GT  EQ NE
+    IF 
+    IFELSE 
+    WHILE 
+    VARARRAY VAR ASSIGN
+    FUNCTIONCALL
+  },
+  'lexeme',
+  \&lexeme
+);

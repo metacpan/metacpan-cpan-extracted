@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cpan-whois xmlns='http://www.cpan.org/xmlns/whois'
+            last-generated='Wed May 27 16:19:01 2009 GMT'
+            generated-by='Id'>
+ <cpanid>
+  <id>CRITICRE</id>
+  <type>list</type>
+  <asciiname>Perl Critic Release Engineer</asciiname>
+  <email>dev@perlcritic.tigris.org</email>
+  <info>See http://perlcritic.tigris.org/servlets/ProjectMailingListList</info>
+  <has_cpandir>0</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>PARROTRE</id>
+  <type>list</type>
+  <asciiname>Parrot Release Engineers</asciiname>
+  <email>parrot-porters@perl.org</email>
+  <info>See the Parrot website to get started hacking on Parrot: http://www.parrotcode.org/docs/gettingstarted.html</info>
+  <has_cpandir>0</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>BIOPERLML</id>
+  <type>list</type>
+  <asciiname>Bioperl-l</asciiname>
+  <email>bioperl-l@lists.open-bio.org</email>
+  <info>Visit http://bioperl.org/mailman/listinfo/bioperl-l to subscribe.</info>
+  <has_cpandir>0</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>ORAOCI</id>
+  <type>list</type>
+  <asciiname>oracle-oci</asciiname>
+  <email>oracle-oci@perl.org</email>
+  <info>oracle-oci-help@perl.org</info>
+  <has_cpandir>0</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>MPB</id>
+  <type>list</type>
+  <asciiname>mod_perl book (Doug and Lincoln)</asciiname>
+  <email>book@modperl.com</email>
+  <info>Not a mailing list, just a feedback address for the mod_perl book by Doug MacEachern and Lincoln Stein</info>
+  <has_cpandir>0</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>CAIDA</id>
+  <type>list</type>
+  <asciiname>CAIDA team</asciiname>
+  <email>cpan@caida.org</email>
+  <info>This is a closed list.</info>
+  <has_cpandir>0</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>RISCOSML</id>
+  <type>list</type>
+  <asciiname>The Risc-OS perl porters mailing list</asciiname>
+  <email>riscos@perl.org</email>
+  <info>Mail to riscos-request@perl.org with body subscribe</info>
+  <has_cpandir>0</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>PERL4LIB</id>
+  <type>list</type>
+  <asciiname>A Mailing List for Librarians Interested in the Perl Programming</asciiname>
+  <email>perl4lib@vims.edu</email>
+  <info>To subscribe to the list send the command
+ &quot;subscribe perl4lib yourname&quot;
+as the body of your message to
+ listproc@vims.edu.
+Please visit http://www.vims.edu/perl4lib for details.
+</info>
+  <has_cpandir>0</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>XMLML</id>
+  <type>list</type>
+  <asciiname>Perl-XML Mailing List</asciiname>
+  <email>perl-xml@listserv.ActiveState.com</email>
+  <info>Send mail to subscribe-perl-xml@lyris.activestate.com</info>
+  <has_cpandir>0</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>COPEML</id>
+  <type>list</type>
+  <asciiname>The CORBA Perl Mailinglist</asciiname>
+  <email>cope@lunatech.com</email>
+  <info>To join the list, send a mail with just the word subscribe in the body to cope-request@lunatech.com (See http://www.lunatech.com/cope)</info>
+  <has_cpandir>0</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>ARSML</id>
+  <type>list</type>
+  <asciiname>The ARSperl Mailing List</asciiname>
+  <email>arsperl@lurch.cit.buffalo.edu</email>
+  <info>See http://arsinfo.cit.buffalo.edu/ for mor info.</info>
+  <has_cpandir>0</has_cpandir>
+ </cpanid>
+</cpan-whois>

@@ -1,0 +1,45 @@
+---
+abstract: 'process runner with RAII pattern'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Proc-Guard
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Proc::Guard:
+    file: lib/Proc/Guard.pm
+    version: '0.07'
+requires:
+  Class::Accessor::Lite: '0.05'
+  Exporter: '5.63'
+  Test::More: '0.94'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokuhirom/Proc-Guard/issues
+  homepage: https://github.com/tokuhirom/Proc-Guard
+  repository: git://github.com/tokuhirom/Proc-Guard.git
+version: '0.07'
+x_contributors:
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

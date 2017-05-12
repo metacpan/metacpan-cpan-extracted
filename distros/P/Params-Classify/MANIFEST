@@ -1,0 +1,25 @@
+.cvsignore
+Build.PL
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Params/.cvsignore
+lib/Params/Classify.pm
+lib/Params/Classify.xs
+t/blessed.t
+t/blessed_pp.t
+t/check.t
+t/check_pp.t
+t/classify.t
+t/classify_pp.t
+t/error.t
+t/error_pp.t
+t/pod_cvg.t
+t/pod_cvg_pp.t
+t/pod_syn.t
+t/ref.t
+t/ref_pp.t
+t/setup_pp.pl
+SIGNATURE    Added here by Module::Build

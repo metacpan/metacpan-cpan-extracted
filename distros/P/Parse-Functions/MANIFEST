@@ -1,0 +1,25 @@
+.travis.yml
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Parse/Functions.pm
+lib/Parse/Functions/CSharp.pm
+lib/Parse/Functions/Java.pm
+lib/Parse/Functions/Perl.pm
+lib/Parse/Functions/Python.pm
+lib/Parse/Functions/Ruby.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/core.t
+t/csharp.t
+t/java.t
+t/perl.t
+t/python.t
+t/ruby.t

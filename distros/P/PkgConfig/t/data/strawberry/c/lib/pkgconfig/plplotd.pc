@@ -1,0 +1,10 @@
+libdir=${pcfiledir}/../../lib
+includedir=${pcfiledir}/../../include/plplot
+drvdir=${pcfiledir}/../../lib/plplot5.10.0/driversd
+
+Name: PLplot 
+Description: Scientific plotting library (double precision)
+Requires: 
+Version: 5.10.0
+Libs: -L${libdir} -lplplotd -L${pcfiledir}/../../lib -lgd -L${pcfiledir}/../../lib -lfreetype -lgdi32 -lcomdlg32 -L${pcfiledir}/../../lib -lfreetype -L${pcfiledir}/../../lib -lfreetype -lcsirocsa -lqsastime
+Cflags: -I${includedir}  -I${pcfiledir}/../../include -I${pcfiledir}/../../include/freetype2  -I${pcfiledir}/../../include/freetype2

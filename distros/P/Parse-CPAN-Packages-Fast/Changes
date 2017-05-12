@@ -1,0 +1,47 @@
+Revision history for Perl extension Parse::CPAN::Packages::Fast
+
+0.09	- stable release almost identical to 0.08_50
+
+0.08_50 - allow also reading an uncompressed 02packages.details.txt file
+
+0.08    - fix in private function _default_packages_file_batch
+	- configuration file for travis-ci
+
+0.07    - stable release with all changes in 0.06_50..0.06_52
+
+0.06_52 - use IO::Uncompress::Gunzip instead of PerlIO::gzip
+
+0.06_51 - another test patch for tempfile problems under cygwin
+
+0.06_50 - a test patch for possible hanging test (RT #66555, again)
+
+0.06	- minor _default_packages_file_batch improvements
+
+0.05_53 - changed temporary file handling in fast module lookup
+	- don't die if package could not be found in fast module lookup
+	- fast module lookup shortcuts as soon as possible
+
+0.05_52 - no code changes, just protecting from test failures
+
+0.05_51 - fast module lookup (experimental)
+	- new test scripts
+
+0.05_50 - fix for possible hanging test (RT#66555)
+	- use CPAN::Version instead of version.pm
+	  (because is more forgiving) (RT#70577)
+
+0.05
+	- don't die when asked for nonexisting packages
+	  (patch by Dennis Kaarsemaker)
+
+0.04
+	- implemented contains method
+
+0.03
+	- protect from test failures because
+
+0.02
+	- implemented prefix, *_count methods
+
+0.01
+	- initial release

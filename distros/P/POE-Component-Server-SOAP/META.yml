@@ -1,0 +1,29 @@
+---
+name: POE-Component-Server-SOAP
+version: 1.14
+author:
+  - 'Apocalypse E<lt>apocal@cpan.orgE<gt>'
+abstract: An easy to use SOAP/1.1 daemon for POE-enabled programs
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  POE: 0
+  POE::Component::Server::SimpleHTTP: 1.54
+  POE::Session: 0
+  SOAP::Constants: 0
+  SOAP::Lite: 0.55
+  perl: 5.006
+dynamic_config: 0
+provides:
+  POE::Component::Server::SOAP:
+    file: lib/POE/Component/Server/SOAP.pm
+    version: 1.14
+  POE::Component::Server::SOAP::Response:
+    file: lib/POE/Component/Server/SOAP/Response.pm
+    version: 1.14
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

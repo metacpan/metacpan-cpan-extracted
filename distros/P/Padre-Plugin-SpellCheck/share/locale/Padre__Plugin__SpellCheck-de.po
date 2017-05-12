@@ -1,0 +1,82 @@
+# German translations for Padre-Plugin-SpellCheck package.
+# Copyright (C) 2010 THE Padre COPYRIGHT HOLDER
+# This file is distributed under the same license as Padre.
+# Zeno Gantner <zeno.gantner@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-SpellCheck\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-07-19 14:47+0200\n"
+"PO-Revision-Date: 2010-07-19 14:47+0200\n"
+"Last-Translator: Zeno Gantner <zeno.gantner@gmail.com>\n"
+"Language-Team: German\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: lib/Padre/Plugin/SpellCheck.pm:32 lib/Padre/Plugin/SpellCheck.pm:54
+msgid "Spell check"
+msgstr "Rechtschreibprüfung"
+
+#: lib/Padre/Plugin/SpellCheck.pm:55
+msgid "Check spelling\tF7"
+msgstr "Rechtschreibung prüfen\tF7"
+
+#: lib/Padre/Plugin/SpellCheck.pm:56
+msgid "Preferences"
+msgstr "Einstellungen"
+
+#: lib/Padre/Plugin/SpellCheck.pm:78
+msgid "No document opened."
+msgstr "Kein Dokument geöffnet."
+
+#: lib/Padre/Plugin/SpellCheck.pm:95 lib/Padre/Plugin/SpellCheck/Dialog.pm:303
+msgid "Spell check finished."
+msgstr "Rechtschreibprüfung abgeschlossen."
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:47
+#, perl-format
+msgid "Spelling (%s)"
+msgstr "Rechtschreibung (%s)"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:208
+msgid "Add to dictionary"
+msgstr "Zum Wörterbuch hinzufügen"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:209
+msgid "Replace"
+msgstr "Ersetzen"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:210
+msgid "Replace all"
+msgstr "Alle ersetzen"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:211
+msgid "Ignore"
+msgstr "Ignorieren"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:212
+msgid "Ignore all"
+msgstr "Alle ignorieren"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:213
+msgid "Close"
+msgstr "Schließen"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:243
+msgid "Not in dictionary:"
+msgstr "Nicht im Wörterbuch:"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:265
+msgid "Suggestions"
+msgstr "Vorschläge"
+
+#: lib/Padre/Plugin/SpellCheck/Preferences.pm:39
+msgid "Spelling preferences"
+msgstr "Rechtschreibungs-Einstellungen"
+
+#: lib/Padre/Plugin/SpellCheck/Preferences.pm:139
+msgid "Dictionary:"
+msgstr "Wörterbuch"

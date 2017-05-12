@@ -1,0 +1,22 @@
+Revision history for Perinci-Sub-Gen
+
+0.03    2015-09-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.02     2014-08-04 (SHARYANTO)
+
+         - Make 'name' argument optional (it's only required if we do install).
+
+
+0.01     2012-08-10 (SHARYANTO)
+
+         - First release. Split to avoid circular dependency problem of Perinci
+           -> Setup::Symlink -> Perinci::Sub::Gen::Undoable -> Perinci::Sub::Gen
+           (in Perinci-Sub-Gen-AccessTable -> Perinci::CmdLine ->
+           Perinci::Access (in Perinci)). Boy, dependency is hard. :)

@@ -1,0 +1,49 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!-- ZOOMSTOP -->
+
+<HTML>
+
+<!-- *** Created by pp2html, build 1.21 from PerlPoint-Converters 1.0202  -->
+
+<HEAD>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+
+<!-- ZOOMRESTART -->
+
+
+
+<TITLE>Version 0.10   06/16/2001</TITLE>
+</HEAD>
+
+<!-- ************************************************************** -->
+<BODY bgcolor="#FFFFFF" text="#000000" link="#0000CC" vlink="#AAAAAA" alink="#FF0000">
+<a name="Version 0.10   06/16/2001"></a>
+
+<H1>Version 0.10   06/16/2001
+</H1>
+
+<UL>
+<LI>Nested tags bug fixed: it was not possible to use \I, \C inside a link \L tag. NOTE: It is still not possible to have an \X tag in the body of a \L tag!</LI>
+<LI>Require <CODE>PerlPoint::Parser 0.3427</CODE></LI>
+<LI>Using new tag definition Module: <CODE>PerlPoint::Tags::HTML, PerlPoint::Tags::LaTeX</CODE></LI>
+<LI>Comment with version numbers in each created file</LI>
+<LI>Bugfix: \C, \I, \B, ... etc in headers was not correctly handled in former versions</LI>
+<LI>--box_border option (for border width of text boxes)</LI>
+<LI>--style_sheet option (still as an experiment; the behaviour of pp2html may change when style sheets are used)</LI>
+<LI>die when wrong options have been specified</LI>
+<LI>workaround for bug in TreeApplet: / was not possible in headers. now slashes are replaced with commas.</LI>
+<LI>Empty fields in tables are now filled with &quot;&amp;nbsp;&quot; so that the border will be displayed</LI>
+<LI>--style_dir and --style options Support for styles (pre-defined sets of template and configuration files)</LI>
+<LI>Bug with list indentation fixed: if the last item in a list is shifted (i.e. shift_level &gt; 1) then the following text or block was indented. Now the shift_level is automatically reduced.</LI>
+<LI>Some new Keywords which are replaced when templates are copied to the target directory: TOP_LEFT_TXT, TOP_MIDDLE_TXT, TOP_RIGHT_TXT, same for BASE, and LOGO_IMAGE_FILENAME; corresponding options: --top_left_txt, ...</LI>
+<LI>Option --slide_md5: all filenames have the form &lt;slide_prefix&gt;&lt;md5-checksum&gt;.&lt;slide_suffix&gt; *  Nested tables are now supported (see <CODE>PerlPoint::Parser</CODE> Docu)</LI>
+<LI>Variables can now be used in template Files, see the ex_std_norm-top.tpl for an example: VAR(AUTHOR)</LI>
+<LI>support of hierarchical anchor names for slide headers</LI>
+<LI>pp2latex: fix for formatting of URLs included (thanks to Alex Sigel)</LI>
+</UL>
+</BODY>
+</HTML>

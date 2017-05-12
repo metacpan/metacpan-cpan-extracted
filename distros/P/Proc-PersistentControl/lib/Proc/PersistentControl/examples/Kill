@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+use strict;
+use lib '../../..';
+
+use Proc::PersistentControl;
+
+my $tp = Proc::PersistentControl->new();
+
+my @Procs = $tp->ProcList();
+my $n = 0;
+foreach my $p (@Procs) {
+    print ++$n, ". ", $p->{_PPCUID}, "\n";
+}
+print "Kill list item #: ";
+my $k = int(<>);
+
+if ($k > 0 and $k <= $n) {
+    my $p = $Procs[$k - 1];
+    print "Killing ", $p->{_PPCUID}, "...\n";
+    print "Killed: ", $p->Kill(), "\n";
+}

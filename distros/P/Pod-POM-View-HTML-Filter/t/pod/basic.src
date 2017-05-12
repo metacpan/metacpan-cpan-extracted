@@ -1,0 +1,50 @@
+=head1 accusantium sit doloremque
+
+nostrum cumque irure temporibus adipisci culpa necessitatibus provident
+mollitia duis fugiat quibusdam est ullam maxime totam reprehenderit
+
+=for filter html <hr />
+
+eveniet cum dolorum doloribus numquam voluptas quam dicta ipsam voluptates
+proident sit dignissimos quas natus
+
+=begin html
+
+eiusmod voluptatibus aliqua <b>incididunt</b> excepturi
+do iusto omnis facilis iure
+
+=end html
+
+repudiandae sint ab eos recusandae sequi dolore quo quos quia incididunt
+
+=for ignored zlonk bam kapow
+
+=for html <hr />
+
+quisquam voluptate proident cupidatat libero soluta optio
+
+=begin zlonk
+
+harum totam rem magna cumque aliquid tempora
+
+=end zlonk
+
+doloremque adipisicing perspiciatis deleniti at provident alias qui itaque
+
+__RESULT__
+
+<html><body bgcolor="#ffffff">
+<h1>accusantium sit doloremque</h1>
+
+<p>nostrum cumque irure temporibus adipisci culpa necessitatibus provident
+mollitia duis fugiat quibusdam est ullam maxime totam reprehenderit</p>
+<p>eveniet cum dolorum doloribus numquam voluptas quam dicta ipsam voluptates
+proident sit dignissimos quas natus</p>
+<p>eiusmod voluptatibus aliqua <b>incididunt</b> excepturi
+do iusto omnis facilis iure</p>
+<p>repudiandae sint ab eos recusandae sequi dolore quo quos quia incididunt</p>
+<hr />
+
+<p>quisquam voluptate proident cupidatat libero soluta optio</p>
+<p>doloremque adipisicing perspiciatis deleniti at provident alias qui itaque</p>
+</body></html>

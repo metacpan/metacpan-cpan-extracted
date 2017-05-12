@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# Look for missing slotnums in the output from perperl_dump.pl
+# Run with: ./perperl_dump.pl | ./missing_slots
+#
+awk -F= '
+$1 ~ / *slotnum/ {
+    found[int($2)] = 1;
+}
+$1 ~ / *slots_alloced/ {
+    alloced = $2
+}
+$1 ~ / *type/ {
+    count[$2]++;
+}
+END {
+    missing = 0;
+    for(i = 1; i <= alloced; ++i) {
+	if (!found[i]) {
+	    printf("slot %d is missing\n", i);
+	    missing++;
+	}
+    }
+    printf("%d slots allocated, %d missing\n", alloced, missing);
+    for (x in count) {
+	printf("%10s = %d\n", x, count[x]);
+    }
+}' |
+sort

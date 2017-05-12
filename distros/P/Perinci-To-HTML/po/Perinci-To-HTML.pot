@@ -1,0 +1,38 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Steven Haryanto
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Perinci-To-HTML 0.01\n"
+"Report-Msgid-Bugs-To: stevenharyanto@gmail.com\n"
+"POT-Creation-Date: 2013-12-13 17:59+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Perinci/To/HTML.pm:68 lib/Perinci/To/HTML.pm:119
+msgid "Name"
+msgstr ""
+
+#: lib/Perinci/To/HTML.pm:78 lib/Perinci/To/HTML.pm:127
+msgid "Summary"
+msgstr ""
+
+#: lib/Perinci/To/HTML.pm:102 lib/Perinci/To/HTML.pm:136
+msgid "Description"
+msgstr ""
+
+#: lib/Perinci/To/HTML.pm:144
+msgid "Parameters"
+msgstr ""
+
+#: lib/Perinci/To/HTML.pm:156
+msgid "default"
+msgstr ""

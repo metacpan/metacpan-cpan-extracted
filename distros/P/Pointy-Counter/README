@@ -1,0 +1,119 @@
+NAME
+    Pointy::Counter - funny syntax for loops
+
+SYNOPSIS
+      use Pointy::Counter;
+
+      my $i = counter;
+      while ($i --> 10)
+      {
+        say "\$i is $i";
+      }
+  
+      # says $i is 1
+      # says $i is 2
+      # ...
+      # says $i is 10
+
+DESCRIPTION
+    Pointy::Counter is a class that provides objects which seem to act like
+    numbers, but have a special `-->` operator to count up to a particular
+    value.
+
+    OK, confession time... `-->` is not really an operator. It's a
+    post-increment followed by a greater than sign.
+
+      $i --> 10
+
+    is parsed by Perl like:
+
+      ($i--) > 10
+
+    Then the Pointy::Counter class overloads `--` to increment rather than
+    decrement, and overloads `>` to act as a less-than. If you try to perform
+    any other maths, it should just act as a normal scalar. In particular,
+    note that this means that while `$i--` will do a counter increment; `$i -=
+    1` will act completely differently, decrementing the counter and restoring
+    it to a normal Perl scalar.
+
+  Constructor
+    `Pointy::Counter->new($initial)`
+        Creates a new counter, with the initial value (defaults to 0). Note
+        that the counter will have value $initial before the loop starts, but
+        within the body of the loop, it will be `$initial+1`, `$initial+2`,
+        etc.
+
+    `counter $initial`
+        This module exports a function which can be called as a shortcut for
+        the constructor.
+
+  Methods
+    `value`
+        Returns current value as a plain old Perl scalar. This is an lvalue
+        subroutine, so you can, for example, reset a counter using:
+
+         $i->value = 0;
+
+    `continue`
+        Really does decrement the counter. This is used to solve a small
+        niggling problem:
+
+         my $x = counter;       
+         while ($x --> 2)
+         {
+           say "Counter is $x (loop A)";
+         }
+         while ($x --> 4)
+         {
+           say "Counter is $x (loop B)";
+         }
+
+        Will output:
+
+         Counter is 1 (loop A)
+         Counter is 2 (loop A)
+         Counter is 4 (loop B)
+
+        Why doesn't it output a line for when its value is 3? That's because
+        it only takes the value 3 *between* the two loops. The solution is to
+        decrement the counter before starting loop B:
+
+         my $x = counter;       
+         while ($x --> 2)
+         {
+           say "Counter is $x (loop A)";
+         }
+         $x -> continue;
+         while ($x --> 4)
+         {
+           say "Counter is $x (loop B)";
+         }
+
+        This gives you:
+
+         Counter is 1 (loop A)
+         Counter is 2 (loop A)
+         Counter is 3 (loop B)
+         Counter is 4 (loop B)
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Pointy-Counter>.
+
+SEE ALSO
+    overload, perlsyn.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2011 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Perldoc-Search
+version:      0.01
+version_from: lib/Perldoc/Search.pm
+installdirs:  site
+requires:
+    File::Temp:                    0
+    Pod::Simple::TextContent:      0
+    Shell::POSIX::Select:          0
+    SWISH::API::Common:            0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

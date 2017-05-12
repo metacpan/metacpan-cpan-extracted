@@ -1,0 +1,66 @@
+{
+   "abstract" : "Capture exceptions and present them as HTML or JSON",
+   "author" : [
+      "Thomas Klausner <domm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-Middleware-PrettyException",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Headers" : "0",
+            "HTTP::Status" : "0",
+            "JSON::MaybeXS" : "0",
+            "Log::Any" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Util" : "0",
+            "Plack::Util::Accessor" : "0",
+            "Scalar::Util" : "0",
+            "parent" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "FindBin" : "0",
+            "HTTP::Request::Common" : "0",
+            "HTTP::Throwable::Factory" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0",
+            "base" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/domm/Plack-Middleware-PrettyException.git",
+         "web" : "https://github.com/domm/Plack-Middleware-PrettyException"
+      }
+   },
+   "version" : "1.002",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

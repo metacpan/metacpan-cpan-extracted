@@ -1,0 +1,28 @@
+SYNOPSIS
+
+    In weaver.ini:
+
+     [-PatchModule]
+
+DESCRIPTION
+
+    This plugin is used when building patch modules (modules that use
+    Module::Patch to bundle a set of monkey patches, for example
+    File::Which::Patch::Hide or perl-LWP-UserAgent-Patch-FilterMirror). It
+    currently does the following:
+
+      * Create "PATCH CONTENTS" from information given by patch_data
+
+      * Create "PATCH CONFIGURATION" from list of configuration given by
+      patch_data
+
+      * Mention some modules in See Also section
+
+      e.g. Module::Patch> (the convention/standard), the target module.
+
+SEE ALSO
+
+    Module::Patch
+
+    Dist::Zilla::Plugin::PatchModule
+

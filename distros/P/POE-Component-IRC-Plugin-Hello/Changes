@@ -1,0 +1,15 @@
+0.001003 2015-02-21T23:23+02:00
+ - Add more greetings
+ - Add perlcritic tests and make code compliant
+ - Improve unicode capabilities
+
+0.001002 2014-06-07T23:42+03:00
+ - Allow ! or . after a greeting
+ - Update indentation
+ - Make Changes follow the CPAN::Changes::Spec format
+
+0.001001 2013-09-24T14:07:08+03:00
+ - Replace "niihau" with "ni hao"
+
+0.001 2013-07-11
+ - Initial release

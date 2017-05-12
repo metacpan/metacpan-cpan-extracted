@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+use Getopt::Long qw( GetOptions );
+use File::Spec::Functions qw( catfile catdir rel2abs );
+
+my $debug = 0;
+my $help  = 0;
+my $home  = get_pangloss_home();
+my $lib   = catdir($home, 'lib');
+
+GetOptions( 'd|debug+' => \$debug,
+	    'h|help'   => \$help, );
+
+pod2usage if ($help);
+
+warn "using home directory: $home\n" if $debug;
+
+eval "use lib '$lib'";
+die  "Error loading Pangloss libraries from '$lib' - $@!" if ($@);
+
+warn "using Pangloss libraries from $lib\n" if $debug;
+require Pangloss::Shell;
+$Pangloss::DEBUG{'Pangloss::Shell'} = 1 if $debug;
+$Pangloss::DEBUG{ALL} = 1 if $debug > 1;
+
+exit Pangloss::Shell->new->event_loop;
+
+sub get_pangloss_home {
+    return $ENV{PANGLOSS_HOME} if ($ENV{PANGLOSS_HOME});
+    return $ENV{PG_HOME} if ($ENV{PG_HOME});
+    require File::Basename;
+    my $dir = File::Basename::dirname( rel2abs( $0 ) );
+    $dir    =~ s/\W?bin\W?\z//i;
+    return $dir;
+}
+
+__END__
+
+=head1 NAME
+
+pg_admin - Pangloss admin shell
+
+=head1 SYNOPSIS
+
+  pg_admin [options]
+
+=head2 options:
+
+=over 4
+
+=item -h, --help
+
+print usage and exit.
+
+=item -d, --debug
+
+increase debugging level, defaults to C<0>.
+
+=back
+
+Help is also available by typing 'help' at the prompt.
+
+=head1 DESCRIPTION
+
+Offline administration interface for Pangloss.
+
+=head1 AUTHOR
+
+Steve Purkis <spurkis@epn.nu>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2003, Quiup Ltd.
+
+This module is free software; you can redistribute it or modify it under
+the same terms as Perl itself.
+
+=cut
+

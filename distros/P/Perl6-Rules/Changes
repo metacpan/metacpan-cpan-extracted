@@ -1,0 +1,17 @@
+Revision history for Perl extension Perl6::Rules.
+
+0.01  Mon Apr 12 08:02:09 GMT 2004
+	- original version
+
+
+
+0.02	Mon Apr 12 13:23:18 2004
+
+	- Updated requirement to 5.8.3
+
+	- Removed stupid 'use strict' ;-)
+
+
+0.03	Mon Apr 12 20:02:57 2004
+
+	- Fixed stupid version requirement

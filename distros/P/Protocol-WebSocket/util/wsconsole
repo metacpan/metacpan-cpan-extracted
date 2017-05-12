@@ -1,0 +1,102 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use lib 'lib';
+
+use Devel::Hexdump ();
+use AnyEvent;
+use AnyEvent::Socket;
+use AnyEvent::Handle;
+use Protocol::WebSocket::Client;
+
+$|++;
+
+sub debug { warn "$_[0]\n" }
+
+sub debug_hex {
+    debug('v' x 10);
+    debug(Devel::Hexdump::xd($_[0]));
+    debug('^' x 10);
+}
+
+my $cv = AnyEvent->condvar;
+
+my ($url, $version) = @ARGV;
+die "Usage: $0 <url> <version>" unless $url;
+
+my $client = Protocol::WebSocket::Client->new(url => $url, version => $version);
+my $ws_handle;
+
+debug("! Using version '$version'");
+
+debug(
+    "! Connecting to '" . $client->url->host . ':' . $client->url->port . "'");
+my ($host, $port) = ($client->url->host, $client->url->port);
+tcp_connect $host, $port, sub {
+    my ($fh) = @_ or return $cv->send("Connect failed: $!");
+
+    debug("! Connected");
+
+    $ws_handle = AnyEvent::Handle->new(
+        fh     => $fh,
+        on_eof => sub {
+            debug("! Server disconnected");
+            $cv->send;
+        },
+        on_error => sub {
+            debug("! Error: " . $_[1]);
+            $cv->send;
+        },
+        on_read => sub {
+            my ($handle) = @_;
+
+            my $buf = delete $handle->{rbuf};
+
+            debug("< Reading");
+            debug_hex($buf);
+
+            $client->read($buf);
+        }
+    );
+
+    $client->on(
+        write => sub {
+            my $client = shift;
+            my ($buf) = @_;
+
+            debug("> Writing");
+            debug_hex($buf);
+
+            $ws_handle->push_write($buf);
+        }
+    );
+    $client->on(
+        read => sub {
+            my $self = shift;
+            my ($buf) = @_;
+
+        }
+    );
+    $client->connect;
+};
+
+my $stdin = AnyEvent::Handle->new(
+    fh      => \*STDIN,
+    on_read => sub {
+        my $handle = shift;
+
+        my $buf = delete $handle->{rbuf};
+
+        $client->write($buf);
+    },
+    on_eof => sub {
+        $client->disconnect;
+
+        $ws_handle->destroy;
+        $cv->send;
+    }
+);
+
+$cv->wait;

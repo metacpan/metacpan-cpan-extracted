@@ -1,0 +1,290 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Catalyst\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-09-24 20:22+0200\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Sebastian Willing\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+
+#: lib/Padre/Plugin/Catalyst.pm:48
+#: lib/Padre/Plugin/Catalyst/NewApp.pm:67
+msgid "New Catalyst Application"
+msgstr "Neues Catalyst Projekt"
+
+#: lib/Padre/Plugin/Catalyst.pm:53
+msgid "Create new..."
+msgstr "Neu..."
+
+#: lib/Padre/Plugin/Catalyst.pm:54
+msgid "Model"
+msgstr "Model"
+
+#: lib/Padre/Plugin/Catalyst.pm:58
+msgid "View"
+msgstr "View"
+
+#: lib/Padre/Plugin/Catalyst.pm:62
+msgid "Controller"
+msgstr "Controller"
+
+#: lib/Padre/Plugin/Catalyst.pm:68
+msgid "Start Web Server"
+msgstr "Web-Server starten"
+
+#: lib/Padre/Plugin/Catalyst.pm:69
+msgid "Stop Web Server"
+msgstr "Web-Server beenden"
+
+#: lib/Padre/Plugin/Catalyst.pm:71
+msgid "Catalyst Online References"
+msgstr "Catalyst Onlinereferenz"
+
+#: lib/Padre/Plugin/Catalyst.pm:72
+msgid "Beginner's Tutorial"
+msgstr "Anleitung für Anfänger"
+
+#: lib/Padre/Plugin/Catalyst.pm:73
+msgid "Overview"
+msgstr "Übersicht"
+
+#: lib/Padre/Plugin/Catalyst.pm:76
+msgid "1. Introduction"
+msgstr "1. Einführung"
+
+#: lib/Padre/Plugin/Catalyst.pm:79
+msgid "2. Catalyst Basics"
+msgstr "2. Catalyst Grundlagen"
+
+#: lib/Padre/Plugin/Catalyst.pm:82
+msgid "3. More Catalyst Basics"
+msgstr "3. Mehr Grundlagen"
+
+#: lib/Padre/Plugin/Catalyst.pm:85
+msgid "4. Basic CRUD"
+msgstr "4. Einfaches CRUD"
+
+#: lib/Padre/Plugin/Catalyst.pm:88
+msgid "5. Authentication"
+msgstr "5. Authentisierung"
+
+#: lib/Padre/Plugin/Catalyst.pm:91
+msgid "6. Authorization"
+msgstr "6. Autorisierung"
+
+#: lib/Padre/Plugin/Catalyst.pm:94
+msgid "7. Debugging"
+msgstr "7. Debugging"
+
+#: lib/Padre/Plugin/Catalyst.pm:97
+msgid "8. Testing"
+msgstr "8. Tests"
+
+#: lib/Padre/Plugin/Catalyst.pm:100
+msgid "9. Advanced CRUD"
+msgstr "9. Erweitertes CRUD"
+
+#: lib/Padre/Plugin/Catalyst.pm:103
+msgid "10. Appendices"
+msgstr "10. Anlagen"
+
+#: lib/Padre/Plugin/Catalyst.pm:107
+msgid "Catalyst Cookbook"
+msgstr "Catalyst Kochbuch"
+
+#: lib/Padre/Plugin/Catalyst.pm:110
+msgid "Recommended Plugins"
+msgstr "Empfohlene Plugins"
+
+#: lib/Padre/Plugin/Catalyst.pm:113
+msgid "Catalyst Community Live Support"
+msgstr "Catalyst Community Live Support"
+
+#: lib/Padre/Plugin/Catalyst.pm:116
+msgid "Examples"
+msgstr "Beispiele"
+
+#: lib/Padre/Plugin/Catalyst.pm:119
+msgid "Catalyst Wiki"
+msgstr "Catalyst Wiki"
+
+#: lib/Padre/Plugin/Catalyst.pm:122
+msgid "Catalyst Website"
+msgstr "Catalyst Website"
+
+#: lib/Padre/Plugin/Catalyst.pm:127
+msgid "Update Application Scripts"
+msgstr "Project-Scripte aktualisieren"
+
+#: lib/Padre/Plugin/Catalyst.pm:129
+msgid "About"
+msgstr "Über"
+
+#: lib/Padre/Plugin/Catalyst.pm:170
+#, perl-format
+msgid ""
+"Catalyst development web server not found at\n"
+"%s\n"
+"\n"
+"Please make sure the active document is from your Catalyst project."
+msgstr ""
+"Der Catalyst Entwicklungs-Webserver konnte an folgender Stelle nicht gefunden werden:\n"
+"%s\n"
+"\n"
+"Dies funktioniert nur, wenn das aktive Dokument zum Catalyst-Projekt gehört."
+
+#: lib/Padre/Plugin/Catalyst.pm:173
+msgid "Server not found"
+msgstr "Server nicht gefunden"
+
+#: lib/Padre/Plugin/Catalyst.pm:193
+msgid "Web server appears to be running. Launch web browser now?"
+msgstr "Web-Server läuft, soll jetzt ein Browser gestartet werden?"
+
+#: lib/Padre/Plugin/Catalyst.pm:194
+msgid "Start Web Browser?"
+msgstr "Web-Browser starten?"
+
+#: lib/Padre/Plugin/Catalyst/NewApp.pm:21
+msgid ""
+"To use the Catalyst development tools including catalyst.pl and the\n"
+"generated script/myapp_create.pl you need Catalyst::Helper, which is\n"
+"part of the Catalyst-Devel distribution. Please install this via a\n"
+"vendor package or by running one of -\n"
+"\n"
+"  perl -MCPAN -e 'install Catalyst::Devel'\n"
+"  perl -MCPANPLUS -e 'install Catalyst::Devel'\n"
+msgstr ""
+"Um die Catalyse Entwicklungswerkzeuge (einschliesslich\n"
+"catalyst.pl und dem generierten script/myapp_create.pl) nutzen\n"
+"zu können, muss Catalyst::Helper installiert sein.\n"
+"Catalyst::Helper ist nicht Teil des Catalyst-Devel - Paketes. Bitte\n"
+"installiere ein passendes Paket des Betriebssystems oder nutze\n"
+"\n"
+"  perl -MCPAN -e 'install Catalyst::Devel'\n"
+"oder\n"
+"  perl -MCPANPLUS -e 'install Catalyst::Devel'\n"
+
+#: lib/Padre/Plugin/Catalyst/NewApp.pm:42
+msgid "Application Name:"
+msgstr "Projektname:"
+
+#: lib/Padre/Plugin/Catalyst/NewApp.pm:46
+msgid "Parent Directory:"
+msgstr "Übergeordnetes Verzeichnis:"
+
+#: lib/Padre/Plugin/Catalyst/NewApp.pm:47
+msgid "Pick parent directory"
+msgstr "Übergeordnetes Verzeichnis wählen"
+
+#: lib/Padre/Plugin/Catalyst/NewApp.pm:50
+msgid "short names"
+msgstr "Abkürzungen"
+
+#: lib/Padre/Plugin/Catalyst/NewApp.pm:103
+msgid "Invalid Application name"
+msgstr "Ungültiger Name für ein Projekt"
+
+#: lib/Padre/Plugin/Catalyst/NewApp.pm:103
+#: lib/Padre/Plugin/Catalyst/NewApp.pm:107
+msgid "missing field"
+msgstr "fehlender Wert"
+
+#: lib/Padre/Plugin/Catalyst/NewApp.pm:107
+msgid "You need to select a base directory"
+msgstr "Ein Stammverzeichnis muss ausgewählt werden"
+
+#: lib/Padre/Plugin/Catalyst/NewApp.pm:144
+#: lib/Padre/Plugin/Catalyst/Helper.pm:308
+#, perl-format
+msgid "%s apparently created. Do you want to open it now?"
+msgstr "Anscheinend wurde %s erstellt, soll es jetzt geöffnet werden?"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:33
+msgid "Create New Component"
+msgstr "Neue Komponente erstellen"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:54
+msgid "Model Name:"
+msgstr "Model Name:"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:58
+#: lib/Padre/Plugin/Catalyst/Helper.pm:85
+#: lib/Padre/Plugin/Catalyst/Helper.pm:109
+msgid "Type"
+msgstr "Typ"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:62
+#: lib/Padre/Plugin/Catalyst/Helper.pm:113
+msgid "Additional Parameters:"
+msgstr "Weitere Parameter:"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:81
+msgid "View Name:"
+msgstr "View Name:"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:89
+msgid "force"
+msgstr "erzwingen"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:105
+msgid "Controller Name:"
+msgstr "Controller Name:"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:130
+#: lib/Padre/Plugin/Catalyst/Helper.pm:157
+msgid "[none]"
+msgstr "[leer]"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:237
+#, perl-format
+msgid "You must provide a name for your %s module"
+msgstr "Es muß ein Name für das %s-Modul angegeben werden"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:238
+msgid "Module name required"
+msgstr "Modulname erforderlich"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:252
+#, perl-format
+msgid ""
+"Catalyst helper script not found at\n"
+"%s\n"
+"\n"
+"Please make sure the active document is from your Catalyst project."
+msgstr ""
+"Catalyst Hilfsscript konnte nicht gefunden werden:\n"
+"%s\n"
+"\n"
+"Dies funktioniert nur, wenn das aktive Dokument zu einem Catalyst-Projekt gehört."
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:255
+msgid "Helper not found"
+msgstr "Hilfsscript nicht gefunden"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:288
+msgid "running:"
+msgstr "läuft:"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:298
+msgid "Catalyst helper script ended."
+msgstr "Catalyst Hilfsscript beendet"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:309
+msgid "Done"
+msgstr "Fertig"
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:324
+#, perl-format
+msgid "Error creating %s. Please check the error output and try again"
+msgstr "Fehler beim Erstellen von %s, bitte die Ausgabe prüfen und erneut versuchen."
+
+#: lib/Padre/Plugin/Catalyst/Helper.pm:325
+msgid "Error"
+msgstr "Fehler"
+

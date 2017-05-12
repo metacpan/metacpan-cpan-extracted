@@ -1,0 +1,49 @@
+{
+   "abstract" : "Provides an interface to control the PowerDNS daemon.",
+   "author" : [
+      "Augie Schwer <augie@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PowerDNS-Control-Server",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Temp" : 0,
+            "IO::Socket" : 0,
+            "Net::CIDR" : 0,
+            "POSIX" : 0,
+            "Test::More" : 0,
+            "Unix::PID" : 0,
+            "Unix::Syslog" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}

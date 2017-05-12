@@ -1,0 +1,7 @@
+
+====== version history of POSIX::Util
+
+0.10: Thu Jul 26 13:49:14 CEST 2012
+	- initial version
+	- received readfd_all() and writefd_all() from POSIX::1003::FdIO,
+	  with quite a number of fixed in those two functions.

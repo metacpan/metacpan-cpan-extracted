@@ -1,0 +1,158 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+use Config;
+use Getopt::Long;
+use Pod::Tree::PerlBin;
+use Pod::Tree::PerlDist;
+use Pod::Tree::PerlFunc;
+use Pod::Tree::PerlLib;
+use Pod::Tree::PerlMap;
+use Pod::Tree::PerlPod;
+use Pod::Tree::PerlTop;
+
+my %Opts;
+$Opts{toc} = 1;
+my $ok = GetOptions( \%Opts, "v:i", "toc!", "hr:i", "bgcolor:s", "text:s" );
+
+$ok or die "Bad command line options\n";
+
+my ( $Perl_Dir, $HTML_Dir ) = @ARGV;
+$HTML_Dir or die "perl2html Perl_Dir HTML_Dir\n";
+
+$Perl_Dir =~ s( /$ )()x;
+$HTML_Dir =~ s( /$ )()x;
+
+$| = 1;
+umask 0022;
+-d $HTML_Dir or mkdir $HTML_Dir, 0777 or die "Can't mkdir $HTML_Dir: $!\n";
+
+my ($Perl_Map);
+my ( $Perl_Bin, $Perl_Dist, $Perl_Func, $Perl_Lib, $Perl_Pod, $Perl_Top );
+
+$Perl_Map = Pod::Tree::PerlMap->new;
+
+$Perl_Bin = Pod::Tree::PerlBin->new( $Perl_Dir, $HTML_Dir, $Perl_Map, %Opts );
+$Perl_Dist = Pod::Tree::PerlDist->new( $Perl_Dir, $HTML_Dir, $Perl_Map, %Opts );
+$Perl_Func = Pod::Tree::PerlFunc->new( $Perl_Dir, $HTML_Dir, $Perl_Map, %Opts );
+$Perl_Lib = Pod::Tree::PerlLib->new( $Perl_Dir, $HTML_Dir, $Perl_Map, %Opts );
+$Perl_Pod = Pod::Tree::PerlPod->new( $Perl_Dir, $HTML_Dir, $Perl_Map, %Opts );
+$Perl_Top = Pod::Tree::PerlTop->new( $Perl_Dir, $HTML_Dir, $Perl_Map, %Opts );
+
+$Perl_Pod->scan;
+$Perl_Bin->scan( split /$Config{path_sep}/, $ENV{PATH} );
+$Perl_Dist->scan;
+$Perl_Func->scan;
+$Perl_Lib->scan(@INC);
+
+$Perl_Bin->index;
+$Perl_Dist->index;
+$Perl_Func->index;
+$Perl_Lib->index;
+$Perl_Pod->index;
+$Perl_Top->index( $Perl_Top, $Perl_Pod, $Perl_Lib, $Perl_Bin, $Perl_Dist );
+
+$Perl_Bin->translate;
+$Perl_Dist->translate;
+$Perl_Func->translate;
+$Perl_Lib->translate;
+$Perl_Pod->translate;
+$Perl_Top->translate;
+
+__END__
+
+=head1 NAME
+
+perl2html - generate Perl documentation in HTML
+
+=head1 SYNOPSIS
+
+B<perl2html> 
+[B<-->[B<no>]B<toc>] 
+[B<--hr> I<level>] 
+[B<--bgcolor> B<#>I<rrggbb>] 
+[B<--text> B<#>I<rrggbb>] 
+[B<--v> I<verbosity>]
+I<PerlDir> I<HTMLDir>
+
+=head1 DESCRIPTION
+
+B<perl2html> translates Perl documentation to HTML.
+I<PerlDir> is the root of the Perl source tree.
+The HTML pages are organized into a directory tree rooted at I<HTMLDir>.
+A top-level index is written to I<HTMLDir>C</index.html>
+
+In addition to the Perl sources,
+B<perl2html> searches C<@INC> for module PODs,
+and C<$ENV{PATH}> for program PODS.
+
+All the HTML pages are created world-readable.
+
+I<Perldir> and I<HTMLDir> must be absolute path names.
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<-->[C<no>]C<toc>
+
+Includes or omits a table of contents in each page.
+Default is to include the TOC.
+
+=item C<--hr> I<level>
+
+Controls the profusion of horizontal lines in the output, as follows:
+
+    level   horizontal lines
+    0 	    none
+    1 	    between TOC and body
+    2 	    after each =head1
+    3 	    after each =head1 and =head2
+
+Default is level 1.
+
+=item C<--bgcolor> I<#rrggbb>
+
+Set the background color to I<#rrggbb>.
+Default is off-white.
+
+=item C<--text> I<#rrggbb>
+
+Set the text color to I<#rrggbb>.
+Default is black.
+
+=item C<--v> I<verbosity>
+
+Verbosity level: 0, 1, 2, 3
+
+=back
+
+=head1 REQUIRES
+
+Perl 5
+L<C<Getopt::Long>>,
+
+
+=head1 SEE ALSO
+
+L<C<pods2html>>, 
+L<C<Pod::Tree>>,
+L<C<Pod::Tree::HTML>>,
+L<C<Pod::Tree::PerlBin>>,
+L<C<Pod::Tree::PerlDist>>,
+L<C<Pod::Tree::PerlFunc>>,
+L<C<Pod::Tree::PerlLib>>,
+L<C<Pod::Tree::PerlMap>>,
+L<C<Pod::Tree::PerlPod>>,
+L<C<Pod::Tree::PerlTop>>
+
+
+=head1 AUTHOR
+
+Steven McDougall, swmcd@world.std.com
+
+=head1 COPYRIGHT
+
+Copyright 2000 by Steven McDougall.  This program is free software;
+you can redistribute it and/or modify it under the same terms as Perl.

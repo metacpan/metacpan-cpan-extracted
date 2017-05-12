@@ -1,0 +1,21 @@
+Revision history for Pod-Weaver-Plugin-Sah-Schemas
+
+0.04    2016-05-08 (PERLANCAR)
+
+        - [Incompatible change] Rename dist from
+          Pod-Weaver-Plugin-Sah-Schema{,s}. Follow Sah::Schemas convention.
+
+
+0.03    2016-03-08 (PERLANCAR)
+
+	- Fix perl syntax mistake, derp.
+
+
+0.02    2016-03-08 (PERLANCAR)
+
+	- Add some skips.
+
+
+0.01    2016-03-08 (PERLANCAR)
+
+        - First release.

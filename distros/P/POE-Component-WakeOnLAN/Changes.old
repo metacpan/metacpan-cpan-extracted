@@ -1,0 +1,14 @@
+ChangeLog for POE::Component::WakeOnLAN:
+========================================
+
+1.02	Mon Apr 13 23:07:49 BST 2009
+	- auto set the repository in META.yml
+
+1.00	Fri Sep 19 10:41:55 BST 2008
+	- Only a version update. This deserves a 'stable' release.
+
+0.04	Mon May 12 14:04:30 BST 2008
+	- Removed kwalitee test and added LICENSE information.
+
+0.02	Tue Apr  8 09:51:32 BST 2008
+	- Initial CPAN Release

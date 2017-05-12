@@ -1,0 +1,34 @@
+0.06    2017-02-14 (PERLANCAR)
+
+	- In a forked module, put the original module's
+	  BUGS/AUTHOR/COPYRIGHT (which I rename as ORIGMODULE'S
+	  BUGS/AUTHOR/COPYRIGHT) before our own BUGS/AUTHOR/COPYRIGHT.
+
+
+0.05    2016-12-31 (PERLANCAR)
+
+	- Sort SPECIFICATION VERSION before VERSION.
+
+	- [doc] Mention Pod::Weaver::Plugin::SortSections.
+
+
+0.04    2016-10-13 (PERLANCAR)
+
+	- Recognize sections TODO, TODOS.
+
+	- Sample benchmark results et al should be put after Description.
+
+
+0.03    2016-10-07 (PERLANCAR)
+
+	- Put HISTORY section near HOMEPAGE/SEE ALSO.
+
+
+0.02    2016-01-19 (PERLANCAR)
+
+	- Recognize BENCHMARK DATASETS section.
+
+
+0.01    2015-01-17 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+"http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+<!ENTITY % entities SYSTEM "entities.mod">
+%entities;
+<!ENTITY % xinclude SYSTEM "xinclude.mod">
+%xinclude;
+]>
+
+<book>
+    <title>&pod2docbook;</title>
+
+    <bookinfo>
+        <authorgroup>
+            <author>
+                <firstname>Jozef</firstname>
+                <surname>Kutej</surname>
+            </author>
+        </authorgroup>
+
+        <copyright>
+            <year>2008</year>
+            <holder>Jozef Kutej. All rights reserved.</holder>
+        </copyright>
+
+        <legalnotice>
+            <para>
+                Copyright Notice: This document contains information about &pod2docbook;
+                Perl module.
+                All parts of this document may be photocopied, otherwise reproduced,
+                or translated to another language without the prior written consent.
+            </para>
+        </legalnotice>
+
+        <revhistory>
+            <revision>
+                <revnumber>0.01</revnumber>
+                <date>2008-07-03</date>
+                <authorinitials>Jozef Kutej</authorinitials>
+                <revremark>
+                    Initial draft started.
+                </revremark>
+            </revision>
+            <revision>
+                <revnumber>0.02</revnumber>
+                <date>2008-07-06</date>
+                <authorinitials>Jozef Kutej</authorinitials>
+                <revremark>
+                    Added "Usage" chapter.
+                </revremark>
+            </revision>
+        </revhistory>
+    </bookinfo>
+
+    <!-- External entity refs -->
+    <xi:include href="chapters/introduction.xml" />
+    <xi:include href="chapters/usage.xml" />
+    <xi:include href="chapters/development.xml" />
+    <xi:include href="chapters/appendix-a.xml" />
+
+</book>

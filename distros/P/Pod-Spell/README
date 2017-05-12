@@ -1,0 +1,235 @@
+NAME
+
+    Pod::Spell - a formatter for spellchecking Pod
+
+VERSION
+
+    version 1.20
+
+SYNOPSIS
+
+            use Pod::Spell;
+            Pod::Spell->new->parse_from_file( 'File.pm' );
+    
+            Pod::Spell->new->parse_from_filehandle( $infile, $outfile );
+
+    Also look at podspell
+
+            % perl -MPod::Spell -e "Pod::Spell->new->parse_from_file(shift)" Thing.pm |spell |fmt
+
+    ...or instead of piping to spell or ispell, use >temp.txt, and open
+    temp.txt in your word processor for spell-checking.
+
+DESCRIPTION
+
+    Pod::Spell is a Pod formatter whose output is good for spellchecking.
+    Pod::Spell rather like Pod::Text, except that it doesn't put much
+    effort into actual formatting, and it suppresses things that look like
+    Perl symbols or Perl jargon (so that your spellchecking program won't
+    complain about mystery words like "$thing" or "Foo::Bar" or "hashref").
+
+    This class provides no new public methods. All methods of interest are
+    inherited from Pod::Parser (which see). The especially interesting ones
+    are parse_from_filehandle (which without arguments takes from STDIN and
+    sends to STDOUT) and parse_from_file. But you can probably just make do
+    with the examples in the synopsis though.
+
+    This class works by filtering out words that look like Perl or any form
+    of computerese (like "$thing" or "N>7" or "@{$foo}{'bar','baz'}",
+    anything in C<...> or F<...> codes, anything in verbatim paragraphs
+    (code blocks), and anything in the stopword list. The default stopword
+    list for a document starts out from the stopword list defined by
+    Pod::Wordlist, and can be supplemented (on a per-document basis) by
+    having "=for stopwords" / "=for :stopwords" region(s) in a document.
+
+METHODS
+
+ new
+
+ stopwords
+
+            $self->stopwords->isa('Pod::WordList'); # true
+
+ parse_from_filehandle($in_fh,$out_fh)
+
+    This method takes an input filehandle (which is assumed to already be
+    opened for reading) and reads the entire input stream looking for
+    blocks (paragraphs) of POD documentation to be processed. If no first
+    argument is given the default input filehandle STDIN is used.
+
+    The $in_fh parameter may be any object that provides a getline() method
+    to retrieve a single line of input text (hence, an appropriate wrapper
+    object could be used to parse PODs from a single string or an array of
+    strings).
+
+ parse_from_file($filename,$outfile)
+
+    This method takes a filename and does the following:
+
+      * opens the input and output files for reading (creating the
+      appropriate filehandles)
+
+      * invokes the parse_from_filehandle() method passing it the
+      corresponding input and output filehandles.
+
+      * closes the input and output files.
+
+    If the special input filename "", "-" or "<&STDIN" is given then the
+    STDIN filehandle is used for input (and no open or close is performed).
+    If no input filename is specified then "-" is implied. Filehandle
+    references, or objects that support the regular IO operations (like
+    <$fh> or $fh-<Egtgetline>) are also accepted; the handles must already
+    be opened.
+
+    If a second argument is given then it should be the name of the desired
+    output file. If the special output filename "-" or ">&STDOUT" is given
+    then the STDOUT filehandle is used for output (and no open or close is
+    performed). If the special output filename ">&STDERR" is given then the
+    STDERR filehandle is used for output (and no open or close is
+    performed). If no output filehandle is currently in use and no output
+    filename is specified, then "-" is implied. Alternatively, filehandle
+    references or objects that support the regular IO operations (like
+    print, e.g. IO::String) are also accepted; the object must already be
+    opened.
+
+ENCODINGS
+
+    Pod::Parser, which Pod::Spell extends, is extremely naive about
+    character encodings. The parse_from_file method does not apply any
+    PerlIO encoding layer. If your Pod file is encoded in UTF-8, your data
+    will be read incorrectly.
+
+    You should instead use parse_from_filehandle and manage the input and
+    output layers yourself.
+
+            binmode($_, ":utf8") for ($infile, $outfile);
+            $my ps = Pod::Spell->new;
+            $ps->parse_from_filehandle( $infile, $outfile );
+
+    If your output destination cannot handle UTF-8, you should set your
+    output handle to Latin-1 and tell Pod::Spell to strip out words with
+    wide characters.
+
+            binmode($infile, ":utf8");
+            binmode($outfile, ":encoding(latin1)");
+            $my ps = Pod::Spell->new( no_wide_chars => 1 );
+            $ps->parse_from_filehandle( $infile, $outfile );
+
+ADDING STOPWORDS
+
+    You can add stopwords on a per-document basis with "=for stopwords" /
+    "=for :stopwords" regions, like so:
+
+      =for stopwords  plok Pringe zorch   snik !qux
+      foo bar baz quux quuux
+
+    This adds every word in that paragraph after "stopwords" to the
+    stopword list, effective for the rest of the document. In such a list,
+    words are whitespace-separated. (The amount of whitespace doesn't
+    matter, as long as there's no blank lines in the middle of the
+    paragraph.) Plural forms are added automatically using
+    Lingua::EN::Inflect. Words beginning with "!" are deleted from the
+    stopword list -- so "!qux" deletes "qux" from the stopword list, if it
+    was in there in the first place. Note that if a stopword is
+    all-lowercase, then it means that it's okay in any case; but if the
+    word has any capital letters, then it means that it's okay only with
+    that case. So a Wordlist entry of "perl" would permit "perl", "Perl",
+    and (less interestingly) "PERL", "pERL", "PerL", et cetera. However, a
+    Wordlist entry of "Perl" catches only "Perl", not "perl". So if you
+    wanted to make sure you said only "Perl", never "perl", you could add
+    this to the top of your document:
+
+      =for stopwords !perl Perl
+
+    Then all instances of the word "Perl" would be weeded out of the
+    Pod::Spell-formatted version of your document, but any instances of the
+    word "perl" would be left in (unless they were in a C<...> or F<...>
+    style).
+
+    You can have several "=for stopwords" regions in your document. You can
+    even express them like so:
+
+      =begin stopwords
+    
+      plok Pringe zorch
+    
+      snik !qux
+    
+      foo bar
+      baz quux quuux
+    
+      =end stopwords
+
+    If you want to use E<...> sequences in a "stopwords" region, you have
+    to use ":stopwords", as here:
+
+      =for :stopwords
+      virtE<ugrave>
+
+    ...meaning that you're adding a stopword of "virtù". If you left the
+    ":" out, that would mean you were adding a stopword of "virtE<ugrave>"
+    (with a literal E, a literal <, etc), which will have no effect, since
+    any occurrences of virtE<ugrave> don't look like a normal
+    human-language word anyway, and so would be screened out before the
+    stopword list is consulted anyway.
+
+BUGS AND LIMITATIONS
+
+ finding stopwords defined with =for
+
+    Pod::Spell makes a single pass over the POD. Stopwords must be added
+    before they show up in the POD.
+
+ finding the wordlist
+
+    Pod::Spell uses File::ShareDir::ProjectDistDir if you're getting errors
+    about the wordlist being missing, chances are it's a problem with its
+    heuristics. Set PATH_ISDEV_DEBUG=1 or PATH_FINDDEV_DEBUG=1, or both in
+    your environment for debugging, and then file a bug with
+    File::ShareDir::ProjectDistDir if necessary.
+
+HINT
+
+    If you feed output of Pod::Spell into your word processor and run a
+    spell-check, make sure you're not also running a grammar-check --
+    because Pod::Spell drops words that it thinks are Perl symbols, jargon,
+    or stopwords, this means you'll have ungrammatical sentences, what with
+    words being missing and all. And you don't need a grammar checker to
+    tell you that.
+
+SEE ALSO
+
+    Pod::Wordlist
+
+    Pod::Parser
+
+    podchecker also known as Pod::Checker
+
+    perlpod, perlpodspec
+
+CONTRIBUTORS
+
+      * David Golden <dagolden@cpan.org>
+
+      * Kent Fredric <kentfredric@gmail.com>
+
+      * Mohammad S Anwar <mohammad.anwar@yahoo.com>
+
+      * Olivier Mengué <dolmen@cpan.org>
+
+      * Paulo Custodio <pauloscustodio@gmail.com>
+
+AUTHORS
+
+      * Sean M. Burke <sburke@cpan.org>
+
+      * Caleb Cushing <xenoterracide@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2016 by Olivier Mengué.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

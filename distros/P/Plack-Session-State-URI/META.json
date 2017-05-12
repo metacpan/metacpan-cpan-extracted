@@ -1,0 +1,81 @@
+{
+   "abstract" : "uri-based session state",
+   "author" : [
+      "Shinichiro Aska <s.aska.org {at} gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Session-State-URI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTML::StickyQuery" : "0",
+            "Plack" : "0",
+            "Plack::Middleware::Session" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Session::State::URI" : {
+         "file" : "lib/Plack/Session/State/URI.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/s-aska/p5-Plack-Session-State-URI/issues"
+      },
+      "homepage" : "https://github.com/s-aska/p5-Plack-Session-State-URI",
+      "repository" : {
+         "url" : "git://github.com/s-aska/p5-Plack-Session-State-URI.git",
+         "web" : "https://github.com/s-aska/p5-Plack-Session-State-URI"
+      }
+   },
+   "version" : "0.06",
+   "x_authority" : "cpan:ASKADNA",
+   "x_contributors" : [
+      "Steffen Schwigon <ss5@renormalist.net>",
+      "Shinichiro Aska <s.aska.org@gmail.com>"
+   ]
+}

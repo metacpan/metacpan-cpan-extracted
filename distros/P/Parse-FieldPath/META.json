@@ -1,0 +1,53 @@
+{
+   "abstract" : "Perl module to extract fields from objects",
+   "author" : [
+      "Paul Boyd <pboyd@dev3l.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parse-FieldPath",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Moose" : "0"
+         },
+         "requires" : {
+            "Hash::Merge" : "0.11",
+            "List::Util" : "0",
+            "Parse::RecDescent" : "1.963",
+            "Scalar::Util" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moose" : "0",
+            "MooseX::Test::Role" : "0.02",
+            "Test::Deep" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pboyd/Parse-FieldPath.git",
+         "web" : "https://github.com/pboyd/Parse-FieldPath"
+      }
+   },
+   "version" : "0.005"
+}
+

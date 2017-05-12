@@ -1,0 +1,27 @@
+<html>
+<head>
+<title>[% c.config.name %]</title>
+<meta http-equiv="Content-Language" content="en" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style type="text/css">
+    [% INSERT inline.css %]
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <div class="heading"><h1>[% c.config.name %]</h1></div>
+        
+        <div class="content">
+        <ul class="content">
+        [% FOREACH r = rows %]
+        <li><a href="repos/[% r.alias %]">[% r.name %]</a></li>
+        [% END %]
+        </ul>
+        </div>
+
+        <div class="credits"><p>PAR::Repository::Web implementing <i>[% c.config.name %]</i> using the Catalyst web framework</p></div>
+    </div>
+    </div>
+</body>
+</html>

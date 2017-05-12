@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOFTPKG NAME="PPI" VERSION="1,117,0,0">
+  <TITLE>PPI</TITLE>
+  <ABSTRACT>Parse, Analyze and Manipulate Perl (without perl)</ABSTRACT>
+  <AUTHOR>Adam Kennedy &lt;cpan@ali.as&gt;, L&lt;http://ali.as/&gt;</AUTHOR>
+  <IMPLEMENTATION>
+    <DEPENDENCY NAME="List-MoreUtils" VERSION="0,13,0,0" />
+    <DEPENDENCY NAME="Task-Weaken" VERSION="0,0,0,0" />
+    <DEPENDENCY NAME="Clone" VERSION="0,17,0,0" />
+    <DEPENDENCY NAME="IO-String" VERSION="1,07,0,0" />
+    <DEPENDENCY NAME="Params-Util" VERSION="0,10,0,0" />
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <CODEBASE HREF="http://theoryx5.uwinnipeg.ca/ppms/x86/PPI.tar.gz" />
+    <PROVIDE NAME="PPI::" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Cache" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Document" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Document::File" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Document::Fragment" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Document::Normalized" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Dumper" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Element" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Find" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Lexer" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Node" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Normal" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Normal::Standard" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Statement" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Statement::Break" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Statement::Compound" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Statement::Data" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Statement::End" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Statement::Expression" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Statement::Include" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Statement::Null" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Statement::Package" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Statement::Scheduled" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Statement::Sub" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Statement::Unknown" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Statement::UnmatchedBrace" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Statement::Variable" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Structure" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Structure::Block" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Structure::Condition" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Structure::Constructor" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Structure::ForLoop" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Structure::List" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Structure::Subscript" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Structure::Unknown" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::ArrayIndex" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Attribute" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Cast" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Comment" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::DashedWord" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Data" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::End" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::HereDoc" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Label" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Magic" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Number" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Operator" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Pod" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Prototype" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Quote" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Quote::Double" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Quote::Interpolate" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Quote::Literal" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Quote::Single" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::QuoteLike" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::QuoteLike::Backtick" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::QuoteLike::Command" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::QuoteLike::Readline" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::QuoteLike::Regexp" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::QuoteLike::Words" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Regexp" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Regexp::Match" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Regexp::Substitute" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Regexp::Transliterate" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Separator" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Structure" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Symbol" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Unknown" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Whitespace" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::Word" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::_QuoteEngine" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::_QuoteEngine::Full" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Token::_QuoteEngine::Simple" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Tokenizer" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Transform" VERSION="1.117" />
+    <PROVIDE NAME="PPI::Util" VERSION="1.117" />
+  </IMPLEMENTATION>
+</SOFTPKG>

@@ -1,0 +1,15 @@
+Revision history for Perl-Critic-Policy-HTTPCookies
+
+0.53 2017-01-04
+  - Detect indirect method calls
+
+0.52 2016-11-08
+  - Update a URL in the documentation
+  - No end-user functional changes
+
+0.51 2016-11-07
+  - Fix dependencies
+  - No end-user functional changes
+
+0.50 2016-04-09
+  - Initial release to CPAN

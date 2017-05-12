@@ -1,0 +1,36 @@
+=head1 NOME
+
+perlbook - Informazioni sui libri dedicati a Perl
+
+=head1 DESCRIZIONE
+
+Il Camel Book [Libro del Cammello, N.d.T.], ufficialmente conosciuto come I<Programming Perl, Third Edition>,
+[Programmare Perl, Terza Edizione, N.d.T.] scritto da Larry Wall ed altri, E<egrave> sicuramente il lavoro
+di riferimento che copre quasi tutto sul Perl. Potete ordinarlo insieme ad altri
+libri dedicati a Perl da O'Reilly & Associates, 1-800-998-9938. Locali/oltre oceano +1 707 829 0515.
+Se trovate un modulo di ordinazione O'Reilly, potete anche mandare un fax a +1 707 829 0104.
+Se siete connessi ad internet, potete anche gironzolare su L<http://www.oreilly.com/> per fare ordini online.
+
+Altri libri sul Perl editi da varie case editrici ed autori,
+possono esser trovati in L<perlfaq2> o nel web su L<http://books.perl.org/>.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlbook
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Daniele Ludovici.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

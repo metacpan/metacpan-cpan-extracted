@@ -1,0 +1,33 @@
+---
+abstract: 'strftime with GNU extensions'
+author:
+  - 'Piotr Roszatycki <dexter@cpan.org>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  ExtUtils::CChecker: '0'
+  Test::More: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POSIX-strftime-GNU
+provides:
+  POSIX::strftime::GNU:
+    file: lib/POSIX/strftime/GNU.pm
+    version: '0.0305'
+  POSIX::strftime::GNU::PP:
+    file: lib/POSIX/strftime/GNU/PP.pm
+    version: '0.0305'
+  POSIX::strftime::GNU::XS:
+    file: lib/POSIX/strftime/GNU/XS.pm
+    version: '0.0305'
+requires:
+  XSLoader: '0'
+  perl: '5.006'
+resources:
+  bugtracker: http://github.com/dex4er/perl-POSIX-strftime-GNU/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/dex4er/perl-POSIX-strftime-GNU
+version: '0.0305'

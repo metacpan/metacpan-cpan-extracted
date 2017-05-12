@@ -1,0 +1,111 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Pry/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-suggestion [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008001"^^doap-deps:CpanId ], [ doap-deps:on "Exporter::Shiny"^^doap-deps:CpanId ], [ doap-deps:on "Devel::StackTrace"^^doap-deps:CpanId ], [ doap-deps:on "PadWalker"^^doap-deps:CpanId ], [ doap-deps:on "Reply"^^doap-deps:CpanId ], [ doap-deps:on "Term::ANSIColor"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Pry>;
+	doap:created         "2014-08-30"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Pry>;
+	doap:homepage        <https://metacpan.org/release/Pry>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Pry";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Pry/v_0-001_000>, <http://purl.org/NET/cpan-uri/dist/Pry/v_0-001_001>, <http://purl.org/NET/cpan-uri/dist/Pry/v_0-002000>, <http://purl.org/NET/cpan-uri/dist/Pry/v_0-003000>, <http://purl.org/NET/cpan-uri/dist/Pry/v_0-003001>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-pry>;
+	];
+	doap:shortdesc       "intrude on your code".
+
+<http://purl.org/NET/cpan-uri/dist/Pry/v_0-001_000>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	rdfs:label           "Preview release";
+	dc:identifier        "Pry-0.001_000"^^xsd:string;
+	dc:issued            "2014-08-30"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Pry-0.001_000.tar.gz>;
+	doap:revision        "0.001_000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Pry/v_0-001_001>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "Pry-0.001_001"^^xsd:string;
+	dc:issued            "2014-08-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Prevent Pry from being re-invoked from within the REPL.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Improved chatting.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Pry-0.001_001.tar.gz>;
+	doap:revision        "0.001_001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Pry/v_0-002000>
+	a                    doap:Version;
+	rdfs:label           "First release";
+	dc:identifier        "Pry-0.002000"^^xsd:string;
+	dc:issued            "2014-08-30"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Pry-0.002000.tar.gz>;
+	doap:revision        "0.002000"^^xsd:string;
+	rdfs:comment         "No functional changes".
+
+<http://purl.org/NET/cpan-uri/dist/Pry/v_0-003000>
+	a                    doap:Version;
+	dc:identifier        "Pry-0.003000"^^xsd:string;
+	dc:issued            "2014-10-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "pry() now accepts a list of variable names as parameters.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Include `our` variables as well as `my`.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Provide Pry::Dump() and $Pry::Dumper.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Pry-0.003000.tar.gz>;
+	doap:revision        "0.003000"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Pry/v_0-003001>
+	a                    doap:Version;
+	dc:identifier        "Pry-0.003001"^^xsd:string;
+	dc:issued            "2014-10-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Promote the 'Package Variable' heading to =head2.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Pry-0.003001.tar.gz>;
+	doap:revision        "0.003001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

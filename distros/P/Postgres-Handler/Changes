@@ -1,0 +1,16 @@
+Revision history for Perl extension Postgres::Handler (was PGHandler).
+See the pod for PGHandler for more revision details.
+
+1.10  Jun 2005
+        Moved to Postgres::Handler namespace
+        - Patches by Lance P. Cleveland, Charleston Software Associates
+1.00  May 2005
+        - Patches by Lance P. Cleveland, Charleston Software Associates
+0.9   Wed Apr 27 22:56:57 2005
+        - Patches by Lance P. Cleveland, Charleston Software Associates
+0.8   Tue Apr 26 22:56:57 2005
+        - Patches by Lance P. Cleveland, Charleston Software Associates
+0.7   Mon Apr 25 18:26:57 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n PGHandler
+

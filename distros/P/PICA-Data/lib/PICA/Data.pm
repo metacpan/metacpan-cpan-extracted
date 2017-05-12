@@ -1,0 +1,466 @@
+package PICA::Data;
+use strict;
+use warnings;
+
+our $VERSION = '0.31';
+
+use Exporter 'import';
+our @EXPORT_OK = qw(pica_parser pica_writer pica_path pica_xml_struct
+    pica_values pica_value pica_fields pica_holdings pica_items);
+our %EXPORT_TAGS = (all => [@EXPORT_OK]); 
+
+our $ILN_PATH = PICA::Path->new('101@a');
+our $EPN_PATH = PICA::Path->new('203@/**0');
+
+use Carp qw(croak);
+use Scalar::Util qw(reftype blessed);
+use List::Util qw(first);
+use IO::Handle;
+use PICA::Path;
+
+sub pica_values {
+    my ($record, $path) = @_;
+
+    $path = eval { PICA::Path->new($path) } unless ref $path;
+    return unless ref $path;
+
+    return $path->record_subfields($record);
+}
+
+sub pica_fields {
+    my ($record, $path) = @_;
+
+    $path = eval { PICA::Path->new($path) } unless ref $path;
+    return [] unless defined $path;
+
+    return $path->record_fields($record);
+}
+
+sub pica_value {
+    my ($record, $path) = @_;
+
+    $record = $record->{record} if reftype $record eq 'HASH';
+    $path = eval { PICA::Path->new($path) } unless ref $path;
+    return unless defined $path;
+
+    foreach my $field (@$record) {
+        next unless $path->match_field($field);
+        my @values = $path->match_subfields($field);
+        return $values[0] if @values;
+    }
+
+    return;
+}
+
+sub pica_items {
+    my ($record) = @_;
+    
+    my $blessed = blessed($record);
+    $record = $record->{record} if reftype $record eq 'HASH';
+    my (@items, $current, $occurrence);
+
+    foreach my $field (@$record) {
+        if ($field->[0] =~ /^2/) {
+            
+            if ( ($occurrence // '') ne $field->[1] ) {
+                if ($current) {
+                    push @items, $current;
+                    $current = undef;
+                }
+                $occurrence = $field->[1];
+            }
+            
+            $current //= { record => [] };
+
+            push @{$current->{record}}, [ @$field ];
+            if ($field->[0] eq '203@') {
+                ($current->{_id}) = $EPN_PATH->match_subfields($field);
+            }
+        } elsif ($current) {
+            push @items, $current;
+            $current    = undef;
+            $occurrence = undef;
+        }
+    }
+
+    push @items, $current if $current;
+
+    if ($blessed) {
+        bless $_, $blessed for @items; 
+    }
+
+    return \@items;
+}
+
+sub pica_holdings {
+    my ($record) = @_;
+
+    my $blessed = blessed($record);
+    $record = $record->{record} if reftype $record eq 'HASH';
+    my (@holdings, $field_buffer, $iln);
+
+    foreach my $field (@$record) {
+        my $tag = substr $field->[0], 0, 1;
+        if ($tag eq '0') {
+            next;
+        } elsif ($tag eq '1') {
+            if ($field->[0] eq '101@') {
+                my ($id) = $ILN_PATH->match_subfields($field);
+                if ( defined $iln && ($id // '') ne $iln ) {
+                    push @holdings, { record => $field_buffer, _id => $iln };
+                }
+                $field_buffer = [ [@$field] ];
+                $iln = $id;
+                next;
+            }
+        }
+        push @$field_buffer, [@$field];
+    }
+
+    if (@$field_buffer) {
+        push @holdings, { record => $field_buffer, _id => $iln };
+    }
+
+    if ($blessed) {
+        bless $_, $blessed for @holdings; 
+    }
+
+    return \@holdings;
+}
+
+*values   = *pica_values;
+*value    = *pica_value;
+*fields   = *pica_fields;
+*holdings = *pica_holdings;
+*items    = *pica_items;
+
+use PICA::Parser::XML;
+use PICA::Parser::Plus;
+use PICA::Parser::Plain;
+use PICA::Parser::Binary;
+use PICA::Writer::XML;
+use PICA::Writer::Plus;
+use PICA::Writer::Plain;
+use PICA::Writer::Binary;
+
+sub pica_parser {
+    _pica_module('PICA::Parser', @_)
+}
+
+sub pica_writer {
+    _pica_module('PICA::Writer', @_)
+}
+
+sub pica_path {
+    PICA::Path->new(@_)
+}
+
+sub _pica_module {
+    my $base = shift;
+    my $type = lc(shift) // '';
+
+    if ( $type =~ /^(pica)?plus$/ ) {
+        "${base}::Plus"->new(@_);
+    } elsif ( $type eq 'binary' ) {
+        "${base}::Binary"->new(@_);
+    } elsif ( $type =~ /^(pica)?plain$/ ) {
+        "${base}::Plain"->new(@_);
+    } elsif ( $type =~ /^(pica)?xml$/ ) {
+        "${base}::XML"->new(@_);
+    } else {
+        croak "unknown PICA parser type: $type";
+    }
+}
+
+sub write {
+    my $pica = shift;
+    my $writer = $_[0];
+    unless (blessed $writer) {
+        $writer = pica_writer(@_ ? @_ : 'plain');
+    }
+    $writer->write($pica);
+}
+
+sub string {
+    my ($pica, $type, %options) = @_;
+    my $string = "";
+    $type ||= 'plain';
+    $options{fh} = \$string;
+    $options{start} //= 0;
+    pica_writer( $type => %options )->write($pica);
+    return $string;
+}
+
+sub pica_xml_struct {
+    my ($xml, %options) = @_;
+    my $record;
+
+    foreach my $f (@{$xml->[2]}) {
+        next unless $f->[0] eq 'datafield';
+        push @$record, [
+            map ( { $f->[1]->{$_} } qw(tag occurrence) ),
+            map ( { $_->[1]->{code} => $_->[2]->[0] } @{$f->[2]} )
+        ]
+    }
+
+    my ($id) = map { $_->[-1] } grep { $_->[0] =~ '003@' } @$record;
+    $record = { _id => $id, record => $record };
+    bless $record, 'PICA::Data' if !!$options{bless};
+    return $record;
+}
+
+1;
+__END__
+
+=head1 NAME
+
+PICA::Data - PICA record processing
+
+=begin markdown 
+
+[![Build Status](https://travis-ci.org/gbv/PICA-Data.png)](https://travis-ci.org/gbv/PICA-Data)
+[![Coverage Status](https://coveralls.io/repos/gbv/PICA-Data/badge.png)](https://coveralls.io/r/gbv/PICA-Data)
+[![Kwalitee Score](http://cpants.cpanauthors.org/dist/PICA-Data.png)](http://cpants.cpanauthors.org/dist/PICA-Data)
+
+=end markdown
+
+=head1 SYNOPSIS
+
+    use PICA::Data ':all';
+    $parser = pica_parser( xml => 'picadata.xml' );
+    $writer = pica_writer( plain => \*STDOUT );
+   
+    use PICA::Parser::XML;
+    use PICA::Writer::Plain;
+    $parser = PICA::Parser::XML->new( @options );
+    $writer = PICA::Writer::Plain->new( @options );
+
+    # parse records
+    while ( my $record = $parser->next ) {
+        
+        # function accessors
+        my $ppn      = pica_value($record, '003@0');
+        my $holdings = pica_holdings($record);
+        my $items    = pica_items($record);
+        ...
+
+        # object accessors (if parser option 'bless' enabled)
+        my $ppn      = $record->{_id};
+        my $ppn      = $record->value('003@0');
+        my $holdings = $record->holdings;
+        my $items    = $record->items;
+        ...
+
+        # write record
+        $writer->write($record);
+        
+        # write record via method (if blessed)
+        $record->write($writer);
+        $record->write( xml => @options );
+        $record->write; # default "plain" writer
+
+        # stringify record
+        my $plain = $record->string;
+        my $xml = $record->string('xml');
+    }
+  
+    # parse single record from string
+    my $record = pica_parser('plain', \"...")->next;
+
+=head1 DESCRIPTION
+
+PICA::Data provides methods, classes, and functions to process PICA+ records
+in Perl.
+
+PICA+ is the internal data format of the Local Library System (LBS) and the
+Central Library System (CBS) of OCLC, formerly PICA. Similar library formats
+are the MAchine Readable Cataloging format (MARC) and the Maschinelles
+Austauschformat fuer Bibliotheken (MAB). In addition to PICA+ in CBS there is
+the cataloging format Pica3 which can losslessly be convert to PICA+ and vice
+versa.
+
+Records in PICA::Data are encoded either as array of arrays, the inner
+arrays representing PICA fields, or as an object with two fields, C<_id> and
+C<record>, the latter holding the record as array of arrays, and the former
+holding the record identifier, stored in field C<003@>, subfield C<0>. For
+instance a minimal record with just one field C<003@>:
+
+    {
+      _id    => '12345X',
+      record => [
+        [ '003@', undef, '0' => '12345X' ]
+      ]
+    }
+
+or in short form:
+
+    [ [ '003@', undef, '0' => '12345X' ] ]
+
+PICA path expressions (see L<PICA::Path>) can be used to facilitate processing
+PICA+ records.
+
+=head1 FUNCTIONS
+
+The following functions can be exported on request (use export tag C<:all> to
+get all of them):
+
+=head2 pica_parser( $type [, @options] )
+
+Create a PICA parsers object (see L<PICA::Parser::Base>). Case of the type is
+ignored and additional parameters are passed to the parser's constructor:
+
+=over
+
+=item 
+
+L<PICA::Parser::Plus> for type C<plus> or C<picaplus> (normalized PICA+)
+
+=item 
+
+L<PICA::Parser::Plain> for type C<plain> or C<picaplain> (human-readable PICA+)
+
+=item 
+
+L<PICA::Parser::XML> for type C<xml> or C<picaxml> (PICA-XML)
+
+=item 
+
+L<PICA::Parser::PPXML> for type C<ppxml> (PicaPlus-XML)
+
+=back
+
+=head2 pica_xml_struct( $xml, %options )
+
+Convert PICA-XML, expressed in L<XML::Struct> structure into an (optionally
+blessed) PICA record structure.
+
+=head2 pica_writer( $type [, @options] )
+
+Create a PICA writer object (see L<PICA::Writer::Base>) in the same way as
+C<pica_parser> with one of
+
+=over
+
+=item 
+
+L<PICA::Writer::XML> for type C<xml> or C<picaxml> (PICA-XML)
+
+=item 
+
+L<PICA::Writer::Plus> for type C<plus> or C<picaplus> (normalized PICA+)
+
+=item 
+
+L<PICA::Writer::Plain> for type C<plain> or C<picaplain> (human-readable PICA+)
+
+=back
+
+=head2 pica_path( $path )
+
+Equivalent to L<PICA::Path>-E<gt>new($path).
+
+=head2 pica_value( $record, $path )
+
+Extract the first subfield values from a PICA record based on a PICA path
+expression. Also available as accessor C<value($path)>.
+
+=head2 pica_values( $record, $path )
+
+Extract a list of subfield values from a PICA record based on a PICA path
+expression. The following are virtually equivalent:
+
+    pica_values($record, $path);
+    $path->record_subfields($record);
+    $record->values($path); # if $record is blessed
+
+=head2 pica_fields( $record, $path )
+
+Returns a PICA record (or empty array reference) limited to fields specified in
+a PICA path expression. The following are virtually equivalent:
+
+    pica_fields($record, $path);
+    $path->record_fields($record);
+    $record->fields($path); # if $record is blessed
+
+=head2 pica_holdings( $record )
+
+Returns a list (as array reference) of local holding records. Also available as
+accessor C<holdings>.
+
+=head2 pica_items( $record )
+
+Returns a list (as array reference) of item records. Also available as
+accessor C<items>.
+
+=head1 ACCESSORS
+
+All accessors of C<PICA::Data> are also available as L</FUNCTIONS>, prefixed
+with C<pica_> (see L</SYNOPSIS>).
+
+=head2 values( $path )
+
+Extract a list of subfield values from a PICA record based on a L<PICA::Path>
+expression.
+
+=head2 value( $path )
+
+Same as C<values> but only returns the first value.
+
+=head2 fields( $path )
+
+Returns a PICA record limited to fields specified in a L<PICA::path>
+expression.  Always returns an array reference.
+
+=head2 holdings
+
+Returns a list (as array reference) of local holding records (level 1 and 2),
+where the C<_id> of each record contains the ILN (subfield C<101@a>).
+
+=head2 items
+
+Returns a list (as array reference) of item records (level 1),
+where the C<_id> of each record contains the EPN (subfield C<203@/**0>).
+
+=head1 METHODS
+
+=head2 write( [ $type [, @options] ] | $writer )
+
+Write PICA record with given L<PICA::Writer::Base|PICA::Writer::> or
+PICA::Writer::Plain by default. This method is a shortcut for blessed
+record objects:
+
+    pica_writer( xml => $file )->write( $record );
+    $record->write( xml => $file ); # equivalent if $record is blessed 
+
+=head1 CONTRIBUTORS
+
+Johann Rolschewski, C<< <rolschewski@gmail.com> >>
+
+Jakob Voss C<< <voss@gbv.de> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2014- Johann Rolschewski and Jakob Voss
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+=over
+
+=item
+
+L<PICA::Record> (deprecated) implemented an alternative framework for
+processing PICA+ records.
+
+=item 
+
+Use L<Catmandu::PICA> for processing PICA records with the L<Catmandu> toolkit,
+for instance to convert PICA XML to plain PICA+:
+
+   catmandu convert PICA --type xml to PICA --type plain < picadata.xml
+
+=back
+
+=cut

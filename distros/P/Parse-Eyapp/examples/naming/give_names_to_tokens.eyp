@@ -1,0 +1,63 @@
+%{
+=head1 SYNOPSIS
+
+This example illustrates a way to set a naming scheme for
+the grammar productions using C<give_token_name>.
+give_token_name: The name of the production is the Left Hand Side
+of the Production Rule followed by the word _is_ followed by the
+concatenation of the names of the tokens in the right hand side
+(separated by underscores).
+
+Compile it with:
+
+                $ eyapp -C give_names_to_tokens.eyp 
+
+and run it:
+                  $ ./give_names_to_tokens.pm -t -i -c '*a = b'
+
+It will produce an output like:
+
+    s_is_ASSIGN(l_is_STAR(r_is_l(l_is_VAR(TERMINAL[a]))),r_is_l(l_is_VAR(TERMINAL[b])))
+
+The main difference between this file and C<give_token_names.eyp>
+is that here  C<'='> and C<'*'> are used and therefore we must associate
+with them identifiers via the method C<tokennames>.
+
+=cut
+%}
+
+%token VAR = /([A-Za-z][A-Za-z0-9_]*)/
+
+%namingscheme { 
+  #Receives a Parse::Eyapp object describing the grammar
+  my $self = shift;
+
+  $self->tokennames(
+    '=' => 'ASSIGN',
+    '*' => 'STAR',
+  );
+
+  # returns the handler that will give names 
+  # to the right hand sides
+  \&give_token_name; 
+}
+
+%tree
+
+%%
+s:
+    l '=' r
+  | r
+;
+
+l:
+    '*' r
+  | VAR
+;
+
+r:
+    l
+;
+
+%%
+

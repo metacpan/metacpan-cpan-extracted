@@ -1,0 +1,27 @@
+Summary of important user-visible changes for Pod::Weaver::Section::GenerateSection
+-----------------------------------------------------------------------------------
+
+1.06      2017-02-07 19:41:10+00:00 Europe/London
+  * Remove dependency on perl 5.10 which was only required for the tests.
+
+1.05      2017-02-01 18:36:14+00:00 Europe/London
+  * Declare missing Dist::Zilla:Plugin::PodWeaver dependency for
+    testsuite.
+  * Fix testsuite for Windows systems (actually, systems with a file
+    separator other than /).
+
+1.04      2017-02-01 15:58:37+00:00 Europe/London
+  * Fix regex in tests for compatibility with perl 5.22.
+
+1.03      2017-01-31 18:36:49+00:00 Europe/London
+  * Explicitly import required modules.
+  * Added test suite.
+
+1.02      2016-07-24 00:13:33+01:00 Europe/London
+  * The use of Moose::Autobox has been removed.
+
+1.01      2013-03-27 01:10:59 Europe/Dublin
+  * Introduced option to use no heading with a head value of 0 (zero).
+
+1.00      2013-03-21 22:42:01 Europe/Dublin
+  * Initial release.

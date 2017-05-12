@@ -1,0 +1,92 @@
+0.14    2017-02-10 (PERLANCAR)
+
+	- Split Parse::Netstat::darwin.
+
+
+0.13    2017-02-09 (PERLANCAR)
+
+        - Add support for freebsd (Mac flavor), thanks LBE [RT#119959].
+
+
+0.12    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.11    2014-12-02 (PERLANCAR)
+
+        - No functional changes.
+
+        - Tweak Rinci metadata (add negative summary for CLI).
+
+
+0.10    2014-12-01 (PERLANCAR)
+
+        - Refactor into per-flavor modules (Parse::Netstat::{linux,freebsd,win32}).
+
+        - Add support for Solaris flavor of netstat [RT#100618].
+
+        - Include sample data and output in each flavor module's POD.
+
+        - Split CLI bin/parse-netstat to its own distribution App-ParseNetstat
+          to keep this distribution's dependencies small.
+
+
+0.09    2014-11-30 (PERLANCAR)
+
+        - Parse FreeBSD (9.2, 10.1)'s output [RT#100607].
+
+
+0.08    2014-11-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch cli scripts to using Perinci::CmdLine::Lite.
+
+
+0.07     2014-08-16 (SHARYANTO) - Happy 19th CPAN Day!
+
+         - [build] CLI scripts are now generated automatically using
+           Dist::Zilla::Plugin::ScriptFromFunc. The plugin is still at 0.01 so the
+           generated script is not as polished as it should be. Stay tuned.
+
+
+0.06    2014-02-07 (SHARYANTO)
+
+        - Add support for parsing output of Windows netstat (thanks Chris
+          Rettger).
+
+        - Add command-line script: parse-netstat-win.
+
+
+0.05    2014-02-07 (SHARYANTO)
+
+        - Fix parsing UDP line (state was not parsed).
+
+        - Add command-line script: parse-netstat.
+
+        - Minor updates and tweaks.
+
+
+0.04    2012-03-23 (SHARYANTO)
+
+        - No functional changes. Replace Sub::Spec with Rinci.
+
+
+0.03    2011-09-29 (SHARYANTO)
+
+        - Fix parsing: allow whitespace in 'program' field.
+
+
+0.02    2011-09-29 (SHARYANTO)
+
+        - No functional changes. Add sample result in Synopsis.
+
+
+0.01    2011-09-29 (SHARYANTO)
+
+        - First release.

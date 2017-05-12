@@ -1,0 +1,10 @@
+<html>
+<body>
+	<!-- pass vars back to the templating engine in petal:replace statements: -->
+	Object 0: <span petal:replace="test/object_type foo">replace me</span>
+	Object 1: <span petal:replace="test/sub_test/object_type foo">replace me</span>
+	Object 2: <span petal:replace="test/object_type foo/bar">replace me</span>
+	Object 3: <?var name="test/object_type foo"?>
+	Object 4: <?var name="test/object_type foo/bar"?>
+</body>
+</html>

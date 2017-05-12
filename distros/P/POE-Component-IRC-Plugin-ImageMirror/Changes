@@ -1,0 +1,51 @@
+0.15  Fri May 20 10:12:01 GMT 2011
+    - Replace our own buggy image shack mirroring code with Image::ImageShack
+
+0.14  Wed Sep 29 08:09:44 GMT 2010
+    - Post mirror urls in chronological order
+
+0.13  Tue Sep 28 08:53:01 GMT 2010
+    - Update SYNOPSIS to reflect App-Pocoirc changes
+
+0.12  Thu Sep 9 06:25:16 GMT 2010
+    - Mention App::Pocoirc in the SYNOPSIS
+
+0.11  Mon Sep 6 04:30:41 GMT 2010
+    - Handle Unicode channel names in 'Channels' parameter
+
+0.10  Thu Sep 2 21:42:24 UTC 2010
+    - Use POE::Quickie instead of LWP::UserAgent::POE and POE::Wheel::Run
+    - Try every web request 3 times before giving up
+
+0.09  Tue Aug 17 22:54:25 GMT 2010
+    - Use Dist::Zilla
+    - Make all warnings fatal
+
+0.08 Sun Jun 27 06:41:56 GMT 2010
+    - Require URI_subst to be a hash
+
+0.07 Sat Jun 26 05:20:02 GMT 2010
+    - Allow text arguments to URI_match and URI_subst
+
+0.06 Tue Mar  2 22:39:26 GMT 2010
+    - Fix a fatal error when mirroring more than one URI at a time
+    - Remove Perl 5.10-isms so it won't fail on <5.10 
+
+0.05 Mon Mar  1 02:48:21 GMT 2010
+    - Allow uploading to a specific Imgur account
+
+0.04 Mon Mar  1 00:16:07 GMT 2010
+    - Mirror to imgur.com as well
+    - Add 'Eat' parameter
+    - Make URI::Title use optional
+
+0.03 Sat Feb 27 06:39:24 GMT 2010
+    - Add licensing info to Pod
+    - Don't mirror unwanted URIs
+    - Allow specifying which channels the plugin will operate in
+
+0.02 Sat Feb 27 02:01:26 GMT 2010
+    - Respect the Method parameter
+
+0.01 Sat Feb 27 01:51:06 GMT 2010
+    - First CPAN release

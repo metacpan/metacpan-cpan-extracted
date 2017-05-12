@@ -1,0 +1,34 @@
+use strict ;
+use warnings ;
+
+=head1 Config::Hierarchical cookbook
+
+=head2 Simple usage
+
+=begin common
+
+  use Config::Hierarchical ;
+   
+  my $config = new Config::Hierarchical(); 
+  $config->Set(NAME => 'CC', VALUE => 'acc') ;
+  
+  my $cc_value = $config->Get(NAME => 'CC') ;
+  print "CC = '$cc_value'\n" ;
+
+=end common
+
+Result:
+
+=begin test
+
+  my $expected_output = 'acc' ;
+  is($cc_value, $expected_output, 'expected value') ;
+  
+  generate_pod("  CC = '$expected_output'\n\n") ;
+  
+  use Data::TreeDumper ;  
+  generate_pod($config->GetHistoryDump(NAME => 'CC')) ;
+
+=end test
+
+=cut

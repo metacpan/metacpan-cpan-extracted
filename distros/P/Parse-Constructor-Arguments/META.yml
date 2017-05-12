@@ -1,0 +1,15 @@
+---
+abstract: A PPI based module for parsing Moose-style constructor arguments
+author:
+- Nicholas Perez <nperez@cpan.org>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.091260
+license: perl
+name: Parse-Constructor-Arguments
+requires:
+  Moose: '0.79'
+  MooseX::Types: '0.10'
+  PPI: '1.203'
+  Test::Exception: '0.27'
+resources:
+  repository: git://github.com/nperez/parse-constructor-arguments.git
+version: '0.091570'

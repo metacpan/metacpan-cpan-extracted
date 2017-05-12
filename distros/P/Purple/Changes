@@ -1,0 +1,10 @@
+Revision history for Purple
+
+1.0     April 17, 2008
+        Bug fix in t/client.t from Yi Ma Mao.
+        Pass parameters properly when creating the server.
+        Since there has been no significant activity in two years
+          make a stable release.
+
+0.9     February 23, 2006
+        First version, released on an unsuspecting world.

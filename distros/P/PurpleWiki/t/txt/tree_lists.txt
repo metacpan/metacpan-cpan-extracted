@@ -1,0 +1,45 @@
+* Lists are an excellent test.
+* Yessirreebob.
+  More of second item.
+** This is a sublist.
+** This is item two of the sublist.
+** Item three of the sublist
+   should be
+one sentence.
+*** This is a subsublist.
+** This is item four of the sublist.
+
+# How about numbered lists?
+# What about them?
+## Will it parse correctly?
+### I sure hope so.
+## Only one way to find out.
+
+* Mixed list.
+* Second item.
+## Now do numbered list.
+## Again.
+* Back to unordered list.
+
+# Ordered list.
+# Number two.
+** Now do unordered.
+** Again.
+# Number three.
+
+;definition lists:Will definition lists parse correctly?
+;testing:This is a test.
+;;indented definition:This should be indented again.
+
+Okay, a mixed paragraph and list.
+* This ought to work.
+Did it?
+
+:Indented text.
+::Double indented text.
+::Another paragraph of double indented text.
+  Continuation.
+More continuation.
+:::Triple indented text.
+
+Text after indentation.

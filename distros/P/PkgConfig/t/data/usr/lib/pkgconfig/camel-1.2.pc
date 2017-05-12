@@ -1,0 +1,14 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+privlibdir=${libdir}/evolution-data-server-2.30
+privincludedir=${includedir}/evolution-data-server-2.30
+
+Name: camel
+Description: the Evolution MIME message handling library
+Version: 2.30.3
+Requires: glib-2.0 libedataserver-1.2 sqlite3 nss nspr
+Libs: -L${libdir} -lcamel-1.2
+Cflags: -I${privincludedir}

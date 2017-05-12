@@ -1,0 +1,31 @@
+[% INCLUDE common/header.tt
+           title = "Editing Preferences"
+%]
+
+<form method="post" action="[% baseUrl %]" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="edit_prefs" value="1" />
+
+<p><b>User Information:</b><br />
+UserName: 
+[% IF userName %]
+[% userName %]
+[% ELSE %]
+<input type="text" name="p_username" size="20" maxlength="50" />
+(blank to remove, or valid page name)
+[% END %]
+<br />
+Set Password: <input type="password" name="p_password" size="15" maxlength="50" />
+(blank to remove password)<br />
+(Passwords allow sharing preferences between multiple systems. Passwords are completely optional.)</p>
+
+<p><b>RecentChanges:</b><br />
+Default days to display: <input type="text" name="p_rcdays" value="[% rcDefault %]" size="4" maxlength="9" /></p>
+
+<p><b>Misc:</b><br />
+Server time: [% serverTime %]<br />
+Time Zone offset (hours): <input type="text" name="p_tzoffset" value="[% tzOffset %]" size="4" maxlength="9" /></p>
+
+<p><input type="submit" name="Save" value="Save" /></p>
+</form>
+
+[% INCLUDE common/footer.tt %]

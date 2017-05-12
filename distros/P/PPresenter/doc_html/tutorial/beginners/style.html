@@ -1,0 +1,116 @@
+
+<HTML>
+<HEAD>
+<TITLE>PPresenter; Beginners; Styles</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Selecting a Style</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../../index.html>PPresenter</A><BR>
+<A HREF=../../manual.html>Manual</A><BR>
+<A HREF=../index.html>Tutorials</A><BR>
+<A HREF=index.html>Beginners</A><BR>
+<P>
+<A HREF=define.html>Subject</A><BR>
+<A HREF=design.html>Design</A><BR>
+<A HREF=create.html>Creation</A><BR>
+<B>Styles</B><BR>
+<A HREF=slide.html>Adding Slides</A><BR>
+<A HREF=change.html>Changing&nbsp;defaults</A><BR>
+<A HREF=timing.html>Timing</A><BR>
+<A HREF=tagging.html>Tagging</A><BR>
+<A HREF=dday.html>DDay</A><BR>
+
+    </TD><TD VALIGN=top>
+
+Next thing to consider is selecting a <EM>style</EM>.  In PPresenter, you can
+design styles; like in LaTeX or other text-processors, the style describes
+<EM>how</EM> to display the slides and you are concerned <EM>what</EM> is
+displayed.
+<P>
+This approach of PPresenter differs a lot from many modern text-processors and
+presentation programs, which are refered to as WYSIWYG: "What You See Is
+What You Get".
+The PPresenter and WYSIWYG approaches both have their own advantages and
+problems, and this is not the place to debate about that.
+Of course, my preference (and I hope yours too, otherwise you're in for
+a hard time) is PPresenter's approach.
+
+<H3>Styles</H3>
+
+A <A HREF=../../style/index.html>style</A> describes how to display a
+<A HREF=../../slide/index.html>slide</A>.
+A style is based a number of style-elements, each responsible for a part of
+the total style:
+<DL>
+<DT><A HREF=../../decoration/index.html>Decorations</A>:
+<DD>This style-element defines background and foreground colors and images.
+    There are different defaults for beamers and LCD-projection devices.
+    We can change this later, so skip this for now.
+    <P>
+<DT><A HREF=../../fontset/index.html>Fontsets</A>:
+<DD>The most complicated (and still to be improved) elements of style, because
+    using the right fonts is important however very system dependent.  Large,
+    nice fonts do not come easy on most systems.  Do not bother about the
+    font right now: this is easy to change later.
+    <P>
+<DT><A HREF=../../template/index.html>Templates</A>:
+<DD>They describe the layout of a slide has to have.  You will have to know
+    which are available from the first slide you write.  Each template
+    divides the screen in named parts.
+    <P>
+<DT><A HREF=../../formatter/index.html>Formatters</A>:
+<DD>When you add text for a slide, you will feel te need for some layout.
+    You can create your own way of specifying text, but may consider to learn
+    how to use the default <A HREF=../../formatter/markup.html>markup
+    formatter</A>, which has a lot in common with HTML.
+    <P>
+    You can not change the formatter later, unless you are willing to
+    rewrite the content of all slides.   However, you may change the formatter
+    you use per slide.
+    <P>
+<DT><A HREF=../../dynamic/index.html>dynamics</A>:
+<DD>When a slide is shown, you may want make steps (PPresenter calls them
+    <EM>phases</EM>) and have moving text.  Not of primary consideration, and
+    use it sparsely (or not at all).
+</UL>
+<P>
+If your company or organization prescribes a style, you can specify it with
+the <CODE>new</CODE> call.  In most cases you will use the default style: you
+do not need to specify anything.
+<PRE>
+   use PPresenter;
+   my $show = PPresenter-&gt;<A HREF=../../show/new.html>new</A>
+      ( -name    =&gt; 'my first show'
+      , -style   =&gt; 'PPresenter::Style::MyOwn'
+      );
+</PRE>
+In this example, you see that I also added an option <CODE>-name</CODE>, to
+give the show a name which is shown on the title-bar.  I'll tell more about
+options in the next chapter.
+<P>
+In the example above, I specify a style which is described in a file
+called <CODE>PPresenter/<WBR>Style/<WBR>MyOwn.pm</CODE>.  The path to the
+file is relative to the current directory, or to any of the default
+library directories of Perl.
+
+<P>
+Next: <A HREF=slide.html>Adding Slides</A>.
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

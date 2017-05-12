@@ -1,0 +1,637 @@
+Revision history for Provision-Unix
+
+1.08      2015-05-01 11:05:31-07:00 America/Los_Angeles
+
+1.08      2015-05-01
+  - change version of Apache::Admin::Config from 1 -> 0.95
+
+1.07      2014-10-10
+  - packaging updates
+
+1.06      2013-04-19
+  - packaging updates
+  - better detection of Windows, to avoid test failures
+
+1.05      2011-11-30
+  - require version 1 of utf8 (weed out ancient perl versions)
+  - required v2.08 of File::Path (resolve some test failures)
+
+1.04      2011-11-27
+  - test suite updates b/c Dist::Zilla doesn't make it easy to exclude testing
+    on win32/cygwin platform.
+  - not finding a test process running is not a test failure
+
+1.03      2011-11-07
+  - dependency updates so tests work on perl < 5.8 
+  - chown api changes due to M:T:U import
+  - when destroying users on Darwin (Mac), flush the cache before testing if the command succeeded.
+  - when setting a test quota, use the test user.
+  - quota_set: renamed param username -> user to match use
+  - dist.ini: added autoprereqs & use utf8
+  - P:U:DNS:tinydns: added comments for tinydns-data record formats
+  - P:U:DNS: renamed fully_qualify -> qualify
+
+1.02 Nov 04, 2011
+  - FreeBSD user functions make secure backups
+
+1.01 Nov 01, 2011
+  - remove Switch from Xen::Config
+  - Utility::ask allows undefined default to be passed in
+  - packaging changes related to switching to Dist::Zilla
+
+0.99 Oct 20, 2010
+  - added syntax checking for all modules in lib as part of 'make test'
+  - synced Utility.pm with Mail::Toaster
+  - quoted gecos field in P:U:U:FreeBSD - thx Alan Ferrency
+
+0.98 Jun 23, 2010
+  - fixed syntax error in OpenVZ module
+
+0.97 Jun 22, 2010
+  - added a 'xm destroy' method, stop_forcefully when deleting a xen vps
+  - updated docs in P:U:V:L:Virtuozzo
+  - when enabling an ovz container, enable the config file before starting
+  - when migrating a xen container, add container ID to publish ARP invocation
+
+0.96 May 17, 2010 
+  - added unmount_inactive_snapshots to P:U:V:L:Xen
+  - when creating a new xen snapshot, if snapshot exists and fails 
+    to unmount, fail before attemping to create a new one
+  - when unmounting a xen disk volume, attempt to destroy snapshots first
+  - added defined-ness test to $templates in t/VirtualOS.t
+
+0.95 Apr 21, 2010
+  - OpenVZ transition function was not working as designed. Fixed.
+
+0.94 Apr 19, 2010
+  - t/linux.t failed on systems with no detected hypervisor. Added test.
+  - added Cygwin to list of unsupported operating systems
+
+0.93 Apr 16, 2010
+  - an extra test file snuck into the dist before its time. Fixes so that
+    the tests work as planned.
+
+0.92 Apr 15, 2010
+  - added arpsend to xen untransition
+  - added xen_create_snapshot.t
+  - added MANIFEST.SKIP to distro
+
+0.91 Apr 12, 2010
+  - updated P:U:V:L:Virtuozzo call to set_nameservers (moved to $vos)
+  - added methods get_fs_root and get_ve_home to P:U:V:L:Virtuozzo
+  - P:U:VirtualOS::set_nameservers would fail if ! -f resolv.conf, fixed.
+  - added P:U:V:L:[OpenVZ|Xen]::transition - temporary methods
+  - when migrating openvz accounts, don't start migrated VPS on remote node
+    unless it's running on the existing node (preserve running state).
+
+0.90 Feb 12, 2010
+  - fixed typo in P:U:V:L:Xen module.
+
+0.89 Feb 12, 2010
+  - instead of using system calls result code, check if xen disk image is 
+    mounted after attempt to unmount it.
+  - increased test VPS disk size from 2 to 4GB
+
+0.88 Jan 18, 2010
+  - missed an instance of $xen_conf->read_file  whose exception was unhandled
+  - allow VE reinstall via prov_virtual CLI
+
+0.87 Jan 14, 2010
+  - added eval around $xen_conf->read_file, as it throws an exception if it
+    fails to find the config file.
+  - xen destroy would sometimes fail because the disk image was marked as in
+    use, despite the VE being shut down. Running 'xm destroy' clears that, so 
+    always run 'xm destroy' when stopping a xen VE.
+
+0.86 Jan 06, 2010
+  - if OpenVZ destroy using vzctl fails, attempt to manually destroy
+  - when generating a xen config file, use the current MAC address if available
+  - return MAC address in xen probe results
+
+0.85 Dec 17, 2009
+  - when doing a xen reinstall, destroy any snapshots that exist. They prevent
+    the disk image from being removed, which causes the reinstall to fail.
+  - added ram, disk_size to VE creation tests
+  - deprecate P:U:V:L:OpenVZ::set_nameservers in favor of P:U:V:set_nameservers
+  - when modifying an OpenVZ VE, use Linux::set_ips method
+
+0.84 Dec 09, 2009
+  - added ability to pass the following command line arguments to prov_virtual
+    --modify: ram, disk_size, cpu, nameservers, searchdomain
+  - added cpu to list of command line arguments of prov_virtual -create
+  - added gecos (comment) field to xen console users
+  - chown console users home dir after creation
+  - strip off any spaces from prov_virtual --action param
+
+0.83 Dec 02, 2009
+  - skip get_the_date( bump => 1 ) test if day of month > 27
+  - added additional debug messages to remoteagent
+  - when creating a xen VE snapshot, skip sync if VE is not running
+  - declare methods in P:U:V that are eligible to run via remoteagent
+  - RAM and disk were not being passed properly by prov_virtual CLI RT#1581201
+  - added get_config method for Xen & OpenVZ classes, returns config file
+  - added publish_arp method, that updates switch/routers after moving an IP
+  - after migrating an account, run the publish_arp on the new HW node
+  - moved xen snapshot dir from $HOME/mnt to $HOME/snap
+
+0.82 Nov 30, 2009
+  - changed openvz to expect disk_space to be provided in MB (was GB).
+  - if config level not passed to openvz create, use ram & disk to generate
+    config file (previously assigned a default config)
+  - ignore is_process_running test if it fails
+
+0.81 Nov 23, 2009
+  - added in P:U:V class, added AUTOLOAD method, which prevents having to add
+    several more to make P:U:V:* subclass methods publicly available, deleted
+    get_console,is_present,is_running (they now use AUTOLOAD).
+  - in P:U:V, renamed mount_disk_image to mount
+  - in P:U:V, renamed unmount_disk_image to unmount
+  - in P:U:V, renamed get_console to console
+  - added P:U:V:probe, which is an alias for get_status
+  - enhanced and expanded documentation in prov_virtual
+  - enhanced and expanded docs in P:U:VirtualOS
+  - added a fix for P:U:V:O:modify, nameserver param wasn't being parsed
+  - P:U:V::modify didn't have mac_address listed as an optional param
+  - added test for 'file', and skip archive_expand test if missing (cygwin)
+  - when creating a VE with prov_virtual, if config is not provided, prompt
+    for RAM and disk space
+
+0.80 Nov 18, 2009
+  - altered t/01 so that dist passes CPAN tests more reliably
+  - made xen destroy console user throw an error instead of exception
+  - updated P:U:Utility.pm (sync with M:T)
+ 
+0.79 Nov 11, 2009
+  - suppress some unnecessary debug output
+  - remoteagent was exiting improperly when a request exited improperly but
+    did not throw an exception.
+  - fixed a bug causing set_password to exit with an error, despite succeeding
+  - when deleting a user, don't remove homedir if it's set to /tmp (sigh)
+  - added VirtualOS::set_ssh_key (allow setting the SSH key independently of
+    the root password.
+  - when referring to a VE/VPS/container/jail, consistently use the term 'VE'
+  - renamed $vos->*_virtualos to $vos->* (dropped the _virtualos suffix)
+  - removed a bunch of .pl suffixes from scriptnames in pod docs (match change
+    made to script filenames a while back).
+  - P:U:V:modify method had disk_size listed in required and optional scalars
+  - add POD docs to P:U:V class
+  - added additional pod docs to P:U class
+  - added t/01-syntax.t
+
+0.78 Nov 10, 2009
+  - fixed a bug causing Xen password updates to fail
+  - when migrating, set new VE to same state as initial VE
+  - added mount,unmount, and console to prov_virtual CLI prompt
+  - always unmount disk image after Xen migration
+  - abstracted duplicate xen VE password logic into set_password_ methods
+  - xen console ssh key auth wasn't working b/c .ssh dir didn't have owner set
+  - if hypervm is installed, use lxxen for console login shell
+
+0.76 Nov 05, 2009
+  - when doing migration, don't try to preserve ACL and ATTR during initial
+    rsync. Do try on the final rsync. (seems to fail the first time, for
+    unknown reasons).
+  - removed test for deprecated P:U:V:Mail
+  - fixed bug in P:U:V:L:Xen::set_hostname, was passing invalid arg to method
+  - moved do_connectivity_test to P:U:V from P:U:V:L:Xen (shared method)
+  - added support for OpenVZ migrations (untested)
+
+0.75 Nov 02, 2009
+  - completed xen VPS migration feature
+  - added option to archive a VPS when disabling it (xen only, for now)
+  - added Xen::unmount_snapshot
+  - other additions for migration support
+  - allow create requests to use a URL for the template (as ovz does)
+  - added P:U:V:L:Xen::create_snapshot, creates Xen snapshots
+  - added Xen::destroy_snapshot, and mount_snapshot.
+  - removed Mail.pm and Mail/* stubs. No ETA for start or completion.
+  - added new_node & connection_test options to prov_virtual, for use with
+    --migrate feature.
+  - updated syntax for find_bin to make the binary a positional argument
+
+0.74 Oct 26, 2009
+  - initial changes to support migrating Xen VEs between HW nodes.
+  - more robust detection of when a xen VE is actually shut down (versus when 
+    xm utils claims it is).
+  - added check to prevent mounting a LVM when its still attached to a dumU
+  - added ability to set VE password via command line
+  - first argument to Utility::syscmd is positional instead of named parameter
+  - added more concise and detailed audit messages for VirtualOS class loading
+  - added VirtualOS::create skip_start option (create a VE but don't start it)
+  - virtualOS test barks and exits if a v_type that requires templates runs
+    on a HW node with no templates.
+
+0.73 Oct 13, 2009
+  - resolved an issue that caused 'make test' to fail on Virtuozzo nodes. 
+  - added ability to resize Xen volumes using LVM tools
+  - automatically subtract swap partition from disk_size allotment
+
+0.72 Oct 12, 2009
+  - added timestamp and 'created by P:U' to generated VE config files
+  - made P:U:V:L:OpenVZ a better OO citizen, so P:U:V:L:Virtuozzo inheritance
+    works properly.
+  - further enhancements to modify, tested and working on OpenVZ
+
+0.71 Oct 06, 2009
+  - if linux disto isn't passed to methods in P:U:V:L class, detect linux distro
+  - when doing a openvz modify, use P:U:V:L:set_ips instead of vzctl --ipadd
+  - formatting changes to increase readability
+  - added cpu to options passed in to create, reinstall, or modify a VE
+  - added set_hostname and set_ips methods to P:U:V:L:Xen
+  - openvz call to $user->install_ssh_key had incorrect directory specified
+  - fixed typo (250 vs 256) in P:U:V:L:OpenVZ::gen_config
+  - renamed P:U:V:L:Xen::install_config_file to gen_config (same as OpenVZ)
+
+0.70 Sep 29, 2009
+  - updated API for $util->ask
+  - bin/install_deps no longer dependent on P:U:Utility
+  - dropped Solaris Container stubs
+  - prov_user no longer requires a uid/gid to succeed
+  - added method stubs in P:U:V:F:Jail for methods required to pass tests
+  - added note in P:U:V:F:Jails that it's not supported yet. (prevent test
+    suite from running).
+  - added method P:U:V:F:Ezjai::get_ve_home
+  - added enable/disable functions for prov_web & apache
+  - fail gracefully when reporting last error, if no errors exist
+  - overwrite /etc/rc.local when creating a new VE
+
+0.69 Sep 25, 2009
+  - OpenVZ template fetching via URL needs to strip off .tar.gz from the
+    template filename before using it with vzctl create.
+
+0.68 Sep 24, 2009
+  - Xen get_fs_root method failed to pass $name argument
+  - report errors in P:U:V:L:X:get_fs_* methods
+  - P:U:User:Linux::exists* methods failed for and uig/gid of zero
+  - P:U:V, added @std_opts and %std_opts, removing 75 lines of redundant code
+  - replace curl with $util->get_url to fetch kernel modules in P:U:V:L.
+  - added dir param to $util->get_url, moves d/l file to that dir
+  - use killall to kill nscd, the pid in the pidfile is oft stale
+  - added LWP method in $util->get_url if LWP::Simple and URI are installed
+  - reworked the template fetching logic to be simpler
+
+0.67 Sep 19, 2009
+  - clean up coding style.
+  - whittled out 500 lines of code from P:U:Utility
+  - fixed bug in OpenVZ destroy, wasn't detecting suspended config files
+
+0.66 Sep 18, 2009
+  - allow ovz suspended config file to be .suspended (as well as .suspend)
+  - when enabling, disabling, starting, and stopping a VE, succeed if the VE
+    is already in the target state. Previously, if a 'disable' request was 
+    issued on an already disabled VE, it would throw an error. Etc.
+  - for xen VE, check for alternate names of kernel and ramdisk, resorting to
+    a glob of /boot if none of the predefined names exist.
+  - try unmounting Xen disk images before start (start often fails b/c disk
+    image is already mounted. This works around that).
+  - when creating Xen accounts, add dom0 user for xen console
+  - added method P:U:V:L:Xen:create_console_user
+  - added method P:U:V:L:Xen:set_nameservers
+  - added method P:U:V:L:set_ips_debian
+  - added method P:U:V:L:set_hostname_debian
+  - added method P:U:V:L:set_hostname_redhat
+  - Xen create method now sets up console user, ips, and hostname
+  - Xen create now starts up the VE after creation
+  - fixed bug in P:U:U:Linux where the homedir was detected properly
+  - provided a better error message when a remoteagent request fails
+  - created a default set_nameservers method in P:U:VirtualOS. If the method
+    exists in the subclass, it gets called. Otherwise, use the default.
+  - added method P:U:V:L:install_kernel_modules
+  - added method P:U:V:L:set_ips_redhat
+  - added test for P:U:V:set_nameservers
+  - added method P:U:V:setup_log_files (zeroes out /var log files)
+  - added method P:U:V:setup_ssh_host_keys
+  - added method P:U:V:L:Xen::get_fs_root
+  - added method P:U:V:L:Xen::is_mounted
+  - added method P:U:V:L:Xen::set_libc
+  - removed method P:U:V:L:Xen::set_ips (moved into Linux.pm)
+  - added P:U:V:L:set_rc_local
+  - added P:U:V:L:setup_inittab
+  - modified P:U:U:file_write to write the file to a .tmp file first and then
+    move that onto the existing file to be created/updated. Safer in cases 
+    where a volume is [mostly] full and the write fails part way through.
+  - added P:U:V:mount_disk_image
+  - added better error handling when template extraction fails
+  - remoteagent returns the last error encountered instead of a generic error
+  - added method P:U:V:L:set_ips_gentoo
+  - added method P:U:V:L:set_hostname_gentoo
+  - modify upstart serial file and disable so console works properly
+  - added P:U:dump_errors
+  - added optional kernel_version parameter to P:U:V:create method
+  - pass the kernel version in calls to P:U:V:L::install_kernel_modules
+  - added methods P:U:V:L:X:get_kernel_dir & get_kernel_version
+  - kernel modules tarballs are now relative, provide the full path to tar -C
+    when extracting.
+  - completed support for configuring networking on Gentoo
+  - updated the P:U error handling to provide more succint error messages
+  - allow passing in of MAC address to Xen creates
+  - if Xen volume destroy fails, wait 3 secs and try again
+  - cleaned up a bunch more errors there weren't properly handled
+  - added optional mac_address to P:U:V:create method
+  - add all IPs to Xen vif config section (previously only added the first)
+  - added method P:U:V:L:setup_autologin 
+  - added ssh key restrictions for console logins
+  - finished setup of Xen console accounts
+  - cleanup Xen console accounts upon destruction of VE
+  - P:U:U:file_write safe mode additions weren't safe when append option
+    selected. fixed.
+  - P:U:User:Linux, restart nscd after altering passwd files
+  - P:U:U:L, create /etc/group account before user account
+  - added call to P:U:V:set_nameservers in P:U:V:L:X:create
+  - added symlink in /etc/xen/auto for new Xen VEs, and rm it after destroy
+  - always install custom /etc/rc.local upon VE creation
+  - added prov_virtual --action=console method (drops shell user into VE)
+
+0.65 Aug 11, 2009
+  - updated remoteagent, much simpler script now, and no longer requires a 
+    recent version of Getopt::Long (any version will do). 
+  - fixed test error in t/VirtualOS.t
+  - added more audit messages to virtualos->get_status requests
+  - on Linux, when install libwww, rename port from standard perl-libwww to
+    perl-libwww-perl (who thought that one up?)
+  - added get_version VirtualOS call, which returns the P:U version.
+
+0.64 Aug 07, 2009
+  - fixed bug in get_template_list. Local templates where returned as a scalar
+    list where remote templates were returned as a hash list. Return as hashes.
+
+0.63 Aug 04, 2009
+  - report disabled xen VE as 'disabled' instead of 'broken'
+  - report ovz state if config file renamed to .suspended (instead of .suspend)
+  - reworded some ovz audit statements for clarity
+  - remoteagent will use JSON if JSON::XS is not installed
+  - updated prov_virtual docs to match interface
+  - updated OS template fetching logic to retrieve the remote template if it's
+    newer than the locally cached version.
+  - added additional error handling logic to get_template and get_template_list
+  - added --version and --help options to bin/prov_* apps
+ 
+0.62  Jul 21, 2009
+  - added pod docs to bin/prov_virtual
+  - added OpenVZ gen_config method
+  - added OpenVZ upgrade method
+  - worked around a bug where Proc::ProcessTable would load but not work
+  - added OpenVZ unmount_disk_image and is_mounted methods. Before a reinstall
+    and disable actions, check if disk is mounted and unmount it.
+  - added a few conditionals to skip tests that fail on IRIX and cygwin
+
+0.61  Jul 08, 2009
+  - disable, enable, password, and destroy methods accept disk_root param now
+  - added LWP::UserAgent to the list of dependencies
+  - made t/utility.t chmod tests non-fatal
+
+0.60  Jul 07, 2009
+  - fixed a bug in the DNS test
+
+0.59  Jul 05, 2009
+  - if an ovz VE is already suspended/disabled, succeed at subsequent attempts
+  - if an ovz VE is suspended, enable it before destroying (vzctl requires it)
+  - switched default DNS server to NicTool (was tinydns) causing DNS tests to
+    fail on systems w/o NicTool installed. Added error handling to prevent test
+    suite breakage under these circumstances, and reset the default DNS server.
+
+0.58  Jun 23, 2009
+  - fixes for homedir setting on OpenVZ VPS creation
+
+0.57  Jun 11, 2009
+  - cleaned up audit trail, show less debug info if debug option not specified
+  - fixed OpenVZ config file creation
+  - more reliable fetching of templates from remote servers.
+
+0.56  Jun 11, 2009
+  - fixed a get_the_date test error that caused the test suite to fail
+  - OpenVZ will create a reasonable default config and use it for new VEs if a
+    config is not specific (was causing test builds to fail if the template 
+    was too large)
+  - bumped required perl version to 5.8.0 (testing showed failures with 5.6)
+
+0.55  Jun 10, 2009
+  - added ability to fetch templates from repo via HTTP
+  - added extra='console=xvc0' to new Xen ve config files
+
+0.54  May 29, 2009
+  - do not --save openvz nameservers (causes user customized /etc/resolv.conf
+    to get overwritten after each reboot/restart.
+  - added 'url' option to get_template_list, adding support to get template
+    list and fetch templates from a central repo
+
+0.53  Apr 30, 2009
+  - further enhancements to error reporting
+  - VirtualOS/Xen was reporting non-existent ve as 'missing', changed to
+    'non-existent' for consistency
+  - added empty is_present methods to FreeBSD virtualos/*, so they pass tests
+
+0.52  Apr 14, 2009
+  - DNS/NicTool was calling get_zone_id but sub was named get_zone
+  - abstracted gen_salt out of get_crypted_password and added logic to choose
+    MD5 on platforms where it's available and fall back to DES if not
+  - added tests for get_salt and get_crypted_password
+  - push errors onto the audit stack as well (as error stack)
+  - added Config::Tiny to list of modules in install_prov_unix.pl
+  - removed 'message => ' named parameter in calls to error ( brevity)
+  - enhancements to Xen.pm for better error handling and reporting
+
+0.51  Apr 07, 2009
+  - added bin/set_vps_password.pl
+  - Xen set_password only tries to set the console password if the user exists
+  - replaced specific state checks in OpenVZ start with is_running checks
+  - OpenVZ startup tests are more reliable now.
+  - don't check results of vzctl --userpassword, since it doesn't return a
+    valid result.
+  - added a set_password test to VirtualOS.t
+  - pass the $user->exists tests, even if the user is missing. Some CPAN
+    testers like to configure their test environs in interesting ways.
+  - removed audit calls before syscmd calls b/c syscmd calls audit itself
+    (remove duplicated messages in audit log).
+  - removed leading alpha character test for usernames (Linux allows it)
+
+0.50  Apr 03, 2009
+  - added support for installing SSH keys on OpenVZ 
+  - added support for updating User passwords on Linux
+  - a section of pod that was inadvertantly being displayed on CPAN web page,
+    wrapped in a heredoc instead.
+  - 'xm create' doesn't return anything predictable on busy nodes. Instead,
+    retry testing to see if the Xen VE has started for up to 15 seconds, 
+    waiting for it to start.
+  - moved sub install_ssh_key to P:U:User, with calls from P:U:U:Linux,
+    P:U:V:L:Xen, and P:U:V:L:OpenVZ.
+  - V:Xen now sets the console password as well as the root password
+  - updated install_prov_unix. Now installs LWP::UserAgent, instead of failing
+    to get the latest P:U version. Will also specify the latest version using
+    the CPAN dist syntax.
+
+0.49  Apr 01, 2009
+  - bug fix for crypted passwords
+
+0.48  Apr 01, 2009
+  - added ssh_key parameter to virtualOS create
+  - added xen::set_password
+  - added xen::set_fstab
+  - passing fatal into more Xen methods to trap and handle errors better
+  - made Digest::MD5 a dependency 
+  - don't test after deleting a group on Darwin, the system has it cached and
+    thus the test to verify deletion fails.
+  - fixed command line creation of NicTool domains
+  - fixed command line creation of Apache vhosts
+
+0.47  Mar 04, 2009
+  - corrected the regexp from =~ to !~ in Win32 platform check
+
+0.46  Mar 03, 2009
+  - added fatal => 0 to syscmd calls b/c xm operations don't always
+    return valid exit codes. In fact, sometimes they don't ever return.
+  - added a timeout. Xm shutdown likes to hang forever. Timeout and try
+    an XM destroy. Don't trust the exit status, run a test afterwards
+    and see if it succeeded. *sigh*
+  - skip system mkdir test on windows
+  - check for $user to be set instead of EVAL_ERROR for loading P:U:User
+
+0.45  Feb 17, 2009
+  - added fatal => 0 to syscmd calls b/c vzctl operations don't always
+    return valid exit codes.
+  - return disk results in K and not MB (leave the display units and
+    conversions to higher level apps)
+
+0.44  Feb 05, 2009
+  - Xen.pm, changed a bunch of $name.vm instances to get_ve_name()
+  - OpenVZ, added get_disk_usage
+  - Xen, a shutdown VE doesn't show up in 'xm list'. Adjust get_status
+    to return a status of 'shutdown' if the VE exists but isn't running
+  - OpenVZ, formatted state result value to be consistent with other
+    virtualization methods
+  - get_status also returns disk usage in results
+  - state now reports non-existent and suspended ve's
+  - status now reports OS template for openvz nodes
+  - added OS reinstall option in OpenVZ.pm
+
+0.43  Feb 02, 2009
+  - updated install_prov_unix, run CPAN install if new version detection
+    fails.
+  - Xen, updated get_status to use get_ve_config_path sub. More reliable
+    detection of VE config file.
+  - VOS tests clean up test VE at the end of the tests
+  - xen 'blocked' state reports as running
+  - get_template_dir returns a (true) message if the template dir setting
+    isn't defined in provision.conf
+  - added ezjail_template_dir = /usr/jails/flavours in provision.conf
+  - only test for templates on virt platforms that have them
+
+0.42  Jan 30, 2009
+  - vzctl lies. :( In some instances, it will do exactly what you tell it,
+    but fail to return an exit code stating such. Thus, we no longer base
+    our tests on its result codes but on subsequent test we run.
+  - $u->error defaults to print the last error message on the stack when
+    called with no message param
+  - added template selection based on contents of template cache instead of
+    hard coded template names
+  - syscmd now traps STDERR output and only displays it if the command failed
+  - added a custom create for V:L:Virtuozzo. It requires a
+    different invocation for container creation than OpenVZ
+
+0.41  Jan 29, 2009
+  - test suites are the most wonderful things! Mine blew up, and
+    rightfully so. VirtualOS tests now go find a template in the 
+    configured or detected template directory. 
+  - A number of xen config file tests were failing because they weren't
+    all in sync. moved logic into get_config_file_path which is called 
+    from numerous methods.
+  - added P:U:V:L:Virtuozzo (inherits OpenVZ)
+  - added better error handling and reporting for OpenVZ container
+    methods, added DNS server type detection, and better error handling for
+    DNS and Web tests when provision.conf isn't configured.
+
+0.40  Jan 23, 2009
+  - added P:U:V:S:C->new()
+  - updated dependency lists to match what's being used
+  - Changed LWP call from decoded_content to content (more compatible with
+    older versions of LWP::UserAgent).
+  - a few tweaks for Xen container control
+  - is_process_running doesn't use a -w on Solaris (unsupported)
+
+
+0.39  Jan 21, 2009
+  - More descriptive error messages when tests are skipped
+  - changed #!perl to #!/usr/bin/env perl (hopefully more portable)
+  - prov_virtual prints out the result object from $prov invocations
+  - lowered min perl version to 5.6 to see what tests blow up
+  - print diagnostic info if is_process_running fails
+  - updated version of remoteagent
+  - added version support to install_deps and Getopt::Long dependency
+  - a missing provision.conf is no longer fatal.
+
+
+0.38    Jan 18, 2009
+  more tweaks so that 'make test' completes successfully on more
+  OS platforms
+
+0.37    Jan 16, 2009
+  t/Utility had group hard coded as wheel. Failed on some Linux distros
+  imported Max's Xen::Config
+    P:U:V:L:Xen->get_status now returns the containers ips
+      and disk volumes (as element disks)
+  added bin/install_prov_unix
+  added P:U:V:X:Config.pm - read/write Xen config files
+
+0.36    Jan 14, 2009
+  Commented out unused DNS::TinyDNS code (I wrote my own)
+  replaced ExtUtils::MakeMaker with Module::Install
+    - more control over META.yml
+    - optional requirements can be specified as such
+    - additional control over indexing functions
+  added bin/remoteagent
+  upgraded bin/install_deps
+  virtualization type is now detected instead of a config file setting
+    - t/VirtualOS.t updated accordingly
+  template_dir settings in provision.conf are now honored
+  Added module::install to bin/install_deps.pl
+  Darwin->exists_group is more reliable
+  added bin/update_prov_unix installer script
+    - shares code from bin/install_deps, moved 2 subs into Utility.pm
+
+0.35    Dec 29, 2008
+  added more logic to tests to suppress false positive failures
+  fixed a few places where ternary operator was misused
+  specified bin/prov_*.pl in Makefile.PL, EXE_FILES so they get
+   installed with 'make install'
+
+0.34    Dec 16, 2008
+  added is_enabled method to Xen.pm
+  added P:U:V:Linux.pm class
+  added supporting code for Xen provisioning
+  added options to create: nameservers, searchdomain, ram
+  added $prov->{etc_dir} setting
+  P:U->audit returns audit arrayref when called
+
+0.33    Dec 10, 2008
+  refinements and a test suite for OpenVZ
+  added disable, enable methods to OpenVZ
+  added modify method to OpenVZ
+
+0.32    Dec 07, 2008
+  added openvz creation support for linux
+  added user creation support for Linux
+
+0.31    Nov 12, 2008
+  fixed Darwin user creation bug: 
+  http://rt.cpan.org/Ticket/Display.html?id=40189
+
+0.30    Nov 10, 2008
+  added license=>'perl' to Makefile.PL
+  initial coding of VirtualOS module begun
+  added Virtual::OS::FreeBSD::Ezjail
+  created Ezjail->create
+
+0.29    Oct 19, 2008
+  added bin/prov_dns.pl, add zones & records, delete zones
+
+0.28    Oct 09, 2008
+  reworked guts of user creation modules
+  altered t/utility.t so tests will pass on systems w/o sudo installed
+  tests pass for user/group. create/destroy works on Darwin & FreeBSD
+
+0.27    Sep 28, 2008
+  Initial release on CPAN
+
+0.01   Jun 28, 2008
+  Imported provision related functions
+  wrote a new terminal based status bar for providing interactive feedback

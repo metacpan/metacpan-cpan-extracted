@@ -1,0 +1,28 @@
+---
+abstract: 'sugary dispatcher'
+author:
+  - 'Shawn M Moore, C<< <sartak at bestpractical.com> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Path-Dispatcher-Declarative
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Any::Moose: 0
+  Path::Dispatcher: 1.02
+  Sub::Exporter: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bestpractical/path-dispatcher-declarative
+version: 0.03

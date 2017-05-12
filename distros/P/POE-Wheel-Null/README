@@ -1,0 +1,49 @@
+NAME
+    POE::Wheel::Null - POE Wheel that does put()s data nowhere, and sends
+    nothing.
+
+SYNOPSIS
+    As a primary use whenever you would normally...
+
+     delete $heap->{wheel};
+
+    or something equivalent, instead do...
+
+     $heap->{wheel} = POE::Wheel::Null->new();
+
+    to prevent calls to $heap->{wheel} from causing runtime errors in perl.
+    This seems to be a Good Idea (tm) when working with long running
+    programs in the traditional POE way.
+
+DESCRIPTION
+    POE::Wheel::Null creates a wheel which doesn't do anything upon put(),
+    and doesn't send any events to the current session.
+
+PUBLIC METHODS
+    new
+      The new() method creates a new null wheel.
+
+    ID
+      Returns the wheel unique ID
+
+    put
+      Does nothing (intended)
+
+EVENTS AND PARAMETERS
+    None
+
+SEE ALSO
+    POE::Wheel, POE
+
+BUGS
+    Roughly zero.
+
+AUTHOR
+    Jonathan Steinert hachi@cpan.org
+
+LICENSE
+    Copyright 2004 Jonathan Steinert (hachi@cpan.org)
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

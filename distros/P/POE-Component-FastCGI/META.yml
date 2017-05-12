@@ -1,0 +1,23 @@
+---
+abstract: 'POE FastCGI server'
+author:
+  - 'David Leadbeater <cpan@dgl.cx>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200009, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-FastCGI
+requires:
+  CGI::Util: 0
+  HTTP::Request: 0
+  HTTP::Response: 0
+  POE: 0
+resources:
+  homepage: http://github.com/bingos/poe-component-fastcgi
+  repository: http://github.com/bingos/poe-component-fastcgi
+version: 0.19

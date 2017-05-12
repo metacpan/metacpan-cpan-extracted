@@ -1,0 +1,47 @@
+NAME
+    Plack::Middleware::Debug::DBIProfile - DBI::Profile panel
+
+VERSION
+    version 0.102
+
+SYNOPSIS
+        enable 'Debug::DBIProfile'
+
+    is the same as:
+
+        enable 'Debug::DBIProfile', profile => 1;
+
+    Using 1 is very cheap, hence the default, but you'll find "<profile ="
+    2>> much more interesting!
+
+DESCRIPTION
+    Enables DBI::Profile on all DBI handles for the duration of the request.
+
+    The "profile" parameter specifies the 'profile path'. It may be an
+    integer or a string. The default is 1, which simply measures the time
+    spent inside the DBI. For more detail try "<profile =" 2>> (or "<profile
+    =" "!Statement">>) to get a per-statement breakdown. See "ENABLING A
+    PROFILE" in DBI::Profile for more information.
+
+    The Panel tab shows a summary of the profile data. For example:
+
+        DBI Profile
+        0.227 s (14%) #5
+
+    Where 0.227 is the time spent within the DBI during this request. And
+    "14%" is that time expressed as a percentage of the total time spent
+    handling the request (from the perspective of this middleware). And the
+    "#5" shows the number of items in the profile results, if greater than
+    one. For example, with profile set to 2, the number reflects the number
+    of distinct statements profiled.
+
+    The Panel contents show the profile results.
+
+NOTES
+    Prior to DBI 1.616, using DBI profiling while also using DBI tracing
+    with the "SQL" flag, you'll find extra "dbi_profile" lines will be
+    written into the DBI log.
+
+SEE ALSO
+    Plack::Middleware::Debug and Plack::Middleware::Debug::DBITrace
+

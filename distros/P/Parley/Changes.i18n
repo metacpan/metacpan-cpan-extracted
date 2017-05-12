@@ -1,0 +1,144 @@
+This file documents additions and changes to files and templates related to
+Parley's i18n.
+
+The inention is for 'en' to be the main/key language for the application with
+other translations being made from it.  As a consequence of this, i-default
+will be used as the 'en' i18n file.
+It's unlikely that we'll need an 'en' file in the project.
+
+1.0.1
+
+    Differences are now tracked and reported using a script that compares
+    a given language with 'i_default'.
+    The comparisons are generated and viewed as follows:
+
+       ./script/update_i18n_todo.sh
+       more todo.i18n/*
+
+    (2008-10-06)
+
+1.0.0
+
+    i_default.po:
+        - added:
+            - "User has never posted"
+            - "Manage user roles"
+            - "Unauthorized!"
+
+    it.po:
+        - added:
+            - "Access Denied"
+            - "Administration"
+            - "IP Bans"
+            - "IP Information"
+            - "Invalid %1"
+            - "Invalid requested value"
+            - "Login Not Allowed"
+            - "Logins are not permitted from %1"
+            - "Manage"
+            - "Manage user roles"
+            - "No Moderators"
+            - "No reason given"
+            - "Please enter suspension information"
+            - "Posting Not Allowed"
+            - "Posting is not permitted from %1"
+            - "Reason for suspension"
+            - "Registration Not Allowed"
+            - "Registrations are not permitted from %1"
+            - "Snippet"
+            - "Suspend Account"
+            - "Suspended"
+            - "Unauthorized!"
+            - "User Roles"
+            - "User has never posted"
+            - "Users"
+            - "view"
+            - "views"
+            - "We're not in Kansas any more"
+            - "You don't have the required privileges to do that"
+
+    nl.po:
+        - fixed:
+            - "Searching for"
+
+        - added:
+            - "IP Information"
+            - "Manage user roles"
+            - "Unauthorized!"
+            - "User has never posted"
+
+0.59
+    i_default.po:
+        - added:
+            - "ADMIN LOCK POST"
+            - "Locked Post"
+            - "Post Edited By"
+            - "Manage"
+            - "Users"
+            - "User Roles"
+            - "We're not in Kansas any more"
+            - "Invalid %1"
+            - "Invalid requested value"
+            - "Administration"
+            - "Suspend Account"
+            - "Please enter suspension information"
+            - "Reason for suspension"
+            - "You don't have the required privileges to do that"
+            - "Suspended"
+            - "No reason given"
+            - "Logins are not permitted from %1"
+            - "Login Not Allowed"
+            - "Registrations are not permitted from %1"
+            - "Registration Not Allowed"
+            - "Posting is not permitted from %1"
+            - "Posting Not Allowed"
+            - "Access Denied"
+            - "Access to this application is not permitted from %1"
+            - "IP Bans"
+            - "IP Information"
+
+    it.po:
+        - added:
+            - "ADMIN LOCK POST"
+            - "Locked Post"
+            - "Post Edited By"
+
+    nl.po:
+        - full translation from i_default.po (v0.58)
+
+0.58
+    (en renamed to i_default)
+
+    it.po:
+        - full translation from i_default.po
+        - added:
+            - 'or'
+            - 'Cancel'
+            - 'in'
+            - 'Please choose a language' (babelfish)
+            - "%quant(%1,Forum)"
+
+    i_default.po:
+        - added:
+            - 'or'
+            - "%1 wrote:"
+            - "%quant(%1,reply)"
+            - "%quant(%1,view)"
+            - "%quant(%1,Forum)"
+            - "created by (%1)"
+            - "last post by (%1)"
+            - "Posted from %1"
+            - "Replying To"
+            - 'There is no current forum to view'
+            - 'There is no current thread to view'
+            - 'No Moderators'
+            - 'Page %1 of %2'
+            - 'Cancel'
+            - 'in'
+            - 'Please choose a language'
+
+        - removed:
+            - "Posted From"
+
+0.57
+    - initial i18n inplementation (en only)

@@ -1,0 +1,302 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>ThreadContext - Framework for easy creation of multithreaded Perl programs.</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#features">Features</a></li>
+	<ul>
+
+		<li><a href="#version">version</a></li>
+		<li><a href="#start">start</a></li>
+		<li><a href="#end">end</a></li>
+		<li><a href="#addjobstoqueue">addJobsToQueue</a></li>
+		<li><a href="#finalizequeue">finalizeQueue</a></li>
+		<li><a href="#reservelock">reserveLock</a></li>
+		<li><a href="#releaselock">releaseLock</a></li>
+		<li><a href="#getcontextname">getContextName</a></li>
+		<li><a href="#getnoprocessors">getNoProcessors</a></li>
+		<li><a href="#sharevariable">shareVariable</a></li>
+		<li><a href="#yieldruntime">yieldRuntime</a></li>
+		<li><a href="#pausecurrentthread">pauseCurrentThread</a></li>
+		<li><a href="#println">println</a></li>
+		<li><a href="#abortcurrentthread">abortCurrentThread</a></li>
+	</ul>
+
+	<li><a href="#synopsis">Synopsis</a></li>
+	<li><a href="#description">Description</a></li>
+	<li><a href="#bugs_and_caveats">Bugs and Caveats</a></li>
+	<li><a href="#author">Author</a></li>
+	<li><a href="#copyright">Copyright</a></li>
+	<li><a href="#history">History</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>ThreadContext - Framework for easy creation of multithreaded Perl programs.</p>
+<p>
+</p>
+<hr />
+<h1><a name="features">Features</a></h1>
+<p>
+</p>
+<h2><a name="version">version</a></h2>
+<pre>
+  return the current version information for this module
+  
+  arguments: none
+  
+  returns:
+    version info of this module</pre>
+<p>
+</p>
+<h2><a name="start">start</a></h2>
+<pre>
+  create and run a thread group to perform specific queue jobs 
+  all threads in the group will run the same code with different data and will share the same queue and same locks
+  we say that they run in the same context.
+  
+  arguments:
+    reference to code to be executed by each thread (mandatory)
+    reference to array data (jobs) to be distributed to each thread (mandatory)
+    number of threads to be started (mandatory)
+    name to assign to this context of execution (optional, default context is assumed otherwise)
+  
+  returns: none</pre>
+<p>
+</p>
+<h2><a name="end">end</a></h2>
+<pre>
+  terminate execution in the given context
+  all affected threads will be asked to return (eventually wait till they have finished processing the queue)
+  
+  arguments:
+    name of context (optional, default context is assumed otherwise)
+  
+  returns:
+    reference to hash containing the return values from each exited thread (thread id is hash key)</pre>
+<p>
+</p>
+<h2><a name="addjobstoqueue">addJobsToQueue</a></h2>
+<pre>
+  push additional jobs onto the queue in the given context
+  
+  arguments:
+    reference to array data (jobs) which will be pushed onto the queue (mandatory)
+    name of context (optional, default context is assumed otherwise)
+  
+  returns: none</pre>
+<p>
+</p>
+<h2><a name="finalizequeue">finalizeQueue</a></h2>
+<pre>
+  prevent adding jobs in the given context (irreversible)
+  affected threads will then known that their task is done and they can safely return as soon as queue is empty
+  
+  arguments:
+    name of context (optional, default context is assumed otherwise)
+  
+  returns: none</pre>
+<p>
+</p>
+<h2><a name="reservelock">reserveLock</a></h2>
+<pre>
+  request and lock a resource
+  any attempt to reserve the same lock will block until lock is released
+  required for synchronisation of threads in the same context
+  
+  arguments:
+    name of lock to be reserved (mandatory)
+    name of context (optional, default context is assumed otherwise)
+  
+  returns: none</pre>
+<p>
+</p>
+<h2><a name="releaselock">releaseLock</a></h2>
+<pre>
+  release a previously locked resource
+  any attempt to reserve the same lock will succeed after lock is released
+  required for synchronisation of threads in the same context
+  
+  arguments:
+    name of lock to be released (mandatory)
+    name of context (optional, default context is assumed otherwise)
+  
+  returns: none</pre>
+<p>
+</p>
+<h2><a name="getcontextname">getContextName</a></h2>
+<pre>
+  returns the name of context where calling thread is currently executed
+  
+  arguments: none
+  
+  returns:
+    context name</pre>
+<p>
+</p>
+<h2><a name="getnoprocessors">getNoProcessors</a></h2>
+<pre>
+  returns the number of machine processors as returned by underlying OS
+  Most of Windows and UNIX-like systems supported
+  
+  arguments: none
+  
+  returns:
+    number of processors on machine</pre>
+<p>
+</p>
+<h2><a name="sharevariable">shareVariable</a></h2>
+<pre>
+  Make the variable (scalar, array, hash) referenced by the given argument visible to all threads (shared variable)
+  A depth of up to 10 references is allowed (reference to reference to ... to variable)
+  
+  arguments:
+    reference to variable to be shared (mandatory)
+  
+  returns: none</pre>
+<p>
+</p>
+<h2><a name="yieldruntime">yieldRuntime</a></h2>
+<pre>
+  ask threads in the given context to yield some runtime to threads in other contexts
+  how long they will let processor to other threads depend on the underlying OS
+  
+  arguments:
+    name of context (optional, default context is assumed otherwise)
+  
+  returns: none</pre>
+<p>
+</p>
+<h2><a name="pausecurrentthread">pauseCurrentThread</a></h2>
+<pre>
+  pause the calling thread for the given time length in seconds.</pre>
+<pre>
+  arguments:
+    time length the thread shall pause
+  
+  returns: none</pre>
+<p>
+</p>
+<h2><a name="println">println</a></h2>
+<pre>
+  print the given message by indicating source (Thread ID) and timestamp.</pre>
+<pre>
+  arguments:
+    message to be printed out
+    
+  returns: none</pre>
+<p>
+</p>
+<h2><a name="abortcurrentthread">abortCurrentThread</a></h2>
+<pre>
+  abort calling thread and print the given message by indicating source (Thread ID) and timestamp before</pre>
+<pre>
+  arguments:
+    message to be printed before exit
+    
+  returns: none</pre>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">Synopsis</a></h1>
+<pre>
+  <span class="keyword">use</span> <span class="variable">Parallel::ThreadContext</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="keyword">my</span> <span class="variable">$counter</span> <span class="operator">=</span> <span class="number">0</span><span class="operator">;</span>
+  <span class="keyword">my</span> <span class="variable">$counter_ref</span> <span class="operator">=</span> <span class="operator">\</span><span class="variable">$counter</span><span class="operator">;</span>
+  
+  <span class="keyword">sub</span><span class="variable"> op1
+  </span><span class="operator">{</span>
+    <span class="keyword">my</span> <span class="variable">$job</span> <span class="operator">=</span> <span class="keyword">shift</span> <span class="variable">@_</span><span class="operator">;</span>
+    <span class="variable">Parallel::ThreadContext::abortCurrentThread</span><span class="operator">(</span><span class="string">"I am tired of living"</span><span class="operator">)</span> <span class="keyword">if</span> <span class="operator">(</span><span class="variable">$job</span> <span class="operator">==</span> <span class="number">30</span><span class="operator">);</span>
+    <span class="variable">Parallel::ThreadContext::println</span><span class="operator">(</span><span class="string">"performing job $job in Context "</span><span class="operator">.</span><span class="variable">Parallel::ThreadContext::getContextName</span><span class="operator">());</span>
+    <span class="variable">Parallel::ThreadContext::pauseCurrentThread</span><span class="operator">(</span><span class="number">1</span><span class="operator">);</span>
+    <span class="variable">Parallel::ThreadContext::reserveLock</span><span class="operator">(</span><span class="string">"counterlock"</span><span class="operator">,</span><span class="string">"computation"</span><span class="operator">);</span>
+    <span class="variable">$counter</span><span class="operator">++;</span>
+    <span class="variable">Parallel::ThreadContext::releaseLock</span><span class="operator">(</span><span class="string">"counterlock"</span><span class="operator">,</span><span class="string">"computation"</span><span class="operator">);</span>
+  <span class="operator">}</span>
+  
+  <span class="variable">$Parallel::ThreadContext::debug</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+  <span class="keyword">print</span> <span class="variable">STDOUT</span> <span class="variable">Parallel::ThreadContext::version</span><span class="operator">();</span>
+  <span class="keyword">my</span> <span class="variable">$nbthreads</span> <span class="operator">=</span> <span class="variable">Parallel::ThreadContext::getNoProcessors</span><span class="operator">();</span>
+  <span class="keyword">if</span> <span class="operator">(</span><span class="keyword">defined</span> <span class="variable">$nbthreads</span><span class="operator">)</span>
+  <span class="operator">{</span>
+  <span class="variable">$nbthreads</span> <span class="operator">*=</span> <span class="number">3</span><span class="operator">;</span> <span class="comment">#3 threads per processor</span>
+  <span class="operator">}</span>
+  <span class="keyword">else</span>
+  <span class="operator">{</span>
+  <span class="variable">$nbthreads</span> <span class="operator">=</span> <span class="number">3</span><span class="operator">;</span>
+  <span class="operator">}</span>
+  <span class="variable">Parallel::ThreadContext::shareVariable</span><span class="operator">(</span><span class="variable">$counter_ref</span><span class="operator">);</span>
+  <span class="variable">Parallel::ThreadContext::start</span><span class="operator">(\&amp;</span><span class="variable">op1</span><span class="operator">,</span><span class="operator">[</span><span class="number">1</span><span class="operator">..</span><span class="number">10</span><span class="operator">]</span><span class="operator">,</span><span class="variable">$nbthreads</span><span class="operator">,</span><span class="string">"computation"</span><span class="operator">);</span>
+  <span class="variable">Parallel::ThreadContext::addJobsToQueue</span><span class="operator">(</span><span class="operator">[</span><span class="number">11</span><span class="operator">..</span><span class="number">20</span><span class="operator">]</span><span class="operator">,</span><span class="string">"computation"</span><span class="operator">);</span>
+  <span class="variable">Parallel::ThreadContext::pauseCurrentThread</span><span class="operator">(</span><span class="number">2</span><span class="operator">);</span>
+  <span class="variable">Parallel::ThreadContext::addJobsToQueue</span><span class="operator">(</span><span class="operator">[</span><span class="number">21</span><span class="operator">..</span><span class="number">26</span><span class="operator">]</span><span class="operator">,</span><span class="string">"computation"</span><span class="operator">);</span>
+  <span class="variable">Parallel::ThreadContext::pauseCurrentThread</span><span class="operator">(</span><span class="number">4</span><span class="operator">);</span>
+  <span class="variable">Parallel::ThreadContext::end</span><span class="operator">(</span><span class="string">"computation"</span><span class="operator">);</span> <span class="comment">#would give a warning if queue in the context is still open (not finalized yet)</span>
+  <span class="variable">Parallel::ThreadContext::addJobsToQueue</span><span class="operator">(</span><span class="operator">[</span><span class="number">27</span><span class="operator">..</span><span class="number">30</span><span class="operator">]</span><span class="operator">,</span><span class="string">"computation"</span><span class="operator">);</span> <span class="comment">#warning since mentioned context does no longer exist</span>
+  <span class="variable">Parallel::ThreadContext::addJobsToQueue</span><span class="operator">(</span><span class="operator">[</span><span class="number">27</span><span class="operator">..</span><span class="number">30</span><span class="operator">]</span><span class="operator">,</span><span class="string">"computation"</span><span class="operator">);</span>
+  <span class="variable">Parallel::ThreadContext::start</span><span class="operator">(\&amp;</span><span class="variable">op1</span><span class="operator">,</span><span class="operator">[]</span><span class="operator">,</span><span class="number">1</span><span class="operator">,</span><span class="string">"computation2"</span><span class="operator">);</span>
+  <span class="variable">Parallel::ThreadContext::finalizeQueue</span><span class="operator">(</span><span class="string">"computation2"</span><span class="operator">);</span>
+  <span class="variable">Parallel::ThreadContext::yieldRuntime</span><span class="operator">(</span><span class="string">"computation2"</span><span class="operator">);</span>
+  <span class="variable">Parallel::ThreadContext::end</span><span class="operator">(</span><span class="string">"computation2"</span><span class="operator">);</span>
+  <span class="variable">Parallel::ThreadContext::println</span><span class="operator">(</span><span class="string">"final counter value is $counter"</span><span class="operator">);</span>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">Description</a></h1>
+<pre>
+  This module provides a framework and some utilities for easy creation of multithreaded Perl programs.
+  It introduces and uses the concept of context based concurrent threads. 
+  A context specifies a kind of name and work space for thread execution and consists of a queue + threads working on that queue + locks used by threads working on that queue.
+  User can freely define as many contexts as he wants depending on its application logic e.g. 'prefetch', 'decode', 'execute', ...
+  In each context threads are performing concurrent similar jobs on the same queue.
+  All threads in the same context represent a thread group. Of course a group can consist of one thread only.
+  Resources locked in one context do not affect other contexts.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="bugs_and_caveats">Bugs and Caveats</a></h1>
+<pre>
+  No known bugs at this time, but this doesn't mean there are aren't any. Use it at your own risk.
+  Note that there may be other bugs or limitations that the author is not aware of.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">Author</a></h1>
+<pre>
+  Serge Tsafak &lt;tsafserge2001@yahoo.fr&gt;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">Copyright</a></h1>
+<pre>
+  This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="history">History</a></h1>
+<pre>
+ <span class="variable">Version</span> <span class="number">0</span><span class="operator">.</span><span class="number">0</span><span class="operator">.</span><span class="number">1</span><span class="operator">:</span> <span class="variable">first</span> <span class="variable">release</span><span class="operator">;</span> <span class="variable">August</span> <span class="number">2008</span>
+</pre>
+
+</body>
+
+</html>

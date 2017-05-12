@@ -1,0 +1,6 @@
+Revision history for Perl extension Pollute::Persistent.
+
+0.01  Tue Aug 21 13:18:06 2001
+	- original version; created by h2xs 1.21 with options
+		-A -X Pollute::Persistent
+

@@ -1,0 +1,89 @@
+!!!! This package is seriously outdated !!!!
+
+Note (2011-03-26 andk): This package once implemented sort of a
+poor man's git in the times when perl sources were kept in a Perforce
+repository. Since the perl repo itself switched to git in 2008 this
+package is outdated and hardly of use for anybody. It will probably be
+removed from CPAN soon.
+
+
+About this distro
+-----------------
+
+This collection of scripts and modules provides access to the APC
+(Archive of Perl Changes).
+
+Data Prerequisites
+------------------
+
+You need to mirror parts of the APC repository to your local disk.
+This is described in the buildaperl manpage.
+
+Scripts
+-------
+
+patchaperlup                 a low level script that only builds
+                             new perl sources from old perl
+                             sources by applying numerically
+                             sorted patchfiles.
+
+buildaperl                   a wrapper around patchaperlup that
+                             is able to compile and install a new
+                             perl into its own cache area.
+
+binsearchaperl               a wrapper around buildaperl that is
+                             able to run already built perls from the
+                             cache area as well as build new perls via
+                             buildaperl and compare their
+                             functionality. If there is a different
+                             behaviour between two perls, the script
+                             is able to determine the exact patch
+                             number that caused the change.
+
+perlpatch2svn                *** DEPRECATED ***
+                             parse a stream of patches from the
+                             APC and feed them into a Subversion
+                             repository. Pedantically reconstruct
+                             as much as possible from the
+                             Perforce repository, binary files
+                             that are missing in the APC are
+                             restored from a dump.
+
+apc2svn                      *** DEPRECATED ***
+                             a wrapper around perlpatch2svn which
+                             has a concept how a future
+                             subversion repository might look
+                             like. It is able to import the whole
+                             APC into an empty or prepopulated
+                             repository. Incremental updates from
+                             APC into this repository supported.
+                             **Use with caution**, the repository
+                             layout itself is still subject to
+                             change.
+
+
+Modules
+-------
+
+Perl::Repository::APC        provides methods to get at the
+                             important metadata of the
+                             APC--branches, perl versions and
+                             patches.
+
+Perl::Repository::APC2SVN    *** DEPRECATED ***
+                             a collection of utility functions
+                             for the scripts that deal with
+                             importing the APC into a Subversion
+                             repository.
+
+Perl::Repository::APC::BAP   Rules how to translate arguments
+                             5.6.0@5666, 5.7.3@, @17000, etc. as
+                             short names for patched perl
+                             versions. Only used by buildaperl.
+
+Copyright
+---------
+
+Code and data are copyright (C) 2002,2003,2005,2006,2007,2008 Andreas
+Koenig and Rafael Garcia-Suarez. They can be used, modified, and
+redistributed under the same terms as Perl itself.

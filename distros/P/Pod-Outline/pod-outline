@@ -1,0 +1,30 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+pod-outline - Dumps a POD file in outline form
+
+=cut
+
+use warnings;
+use strict;
+
+use Getopt::Long;
+use Pod::Usage;
+use Pod::Outline ();
+
+my @actions;
+my $absolute;
+my $show_paragraphs = 1;
+
+GetOptions(
+    help            => sub { pod2usage(1); },
+    'V|version'     => sub { print_version(); exit; },
+    'paragraphs!'   => \$show_paragraphs,
+) or pod2usage(2);
+
+my $filter = Pod::Outline->filter( @ARGV );
+
+sub print_version {
+    printf( "pod-outline v%s\n", $Pod::Outline::VERSION );
+}

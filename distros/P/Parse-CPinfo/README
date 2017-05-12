@@ -1,0 +1,71 @@
+=====================================================================
+Parse::CPinfo 
+=====================================================================
+I created this module to parse the output from cpinfo.  cpinfo is a
+troubleshooting tool commonly used on Check Point* products.
+
+cpinfo files are created by running 'cpinfo' from the command-line on
+a Check Point product and redirecting the output to a file.
+
+For example:
+cpinfo > /var/cpinfo.txt
+
+---------------------------------------------------------------------
+INSTALLATION
+---------------------------------------------------------------------
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+---------------------------------------------------------------------
+DEPENDENCIES
+---------------------------------------------------------------------
+This module no longer requires any external modules.  Thanks
+to the authors of Net::CIDR, Net::IPv4Addr, and Regexp::Common, I was
+able to incorporate their methods subroutines into Parse::CPInfo.
+
+---------------------------------------------------------------------
+TODO
+---------------------------------------------------------------------
+Better testing coverage.  This module has only been tested against
+the cpinfo from the following devices:
+
+    Hardware: VMWare Virtual Machine
+          OS: SecurePlatform R61
+  CP Version: NGX R61 HFA_01
+ CPinfo Size: 39560 bytes
+Parsing Time: 0m0.793s
+
+    Hardware: Dell Optiplex               
+          OS: SecurePlatform NGAI R55   
+  CP Version: NGX R55 HFA_19
+ CPinfo Size: 16282007
+Parsing Time: 7m27.051s (7.45085m) 2,185,254 bytes/min
+   
+	Hardware: Dell PowerEdge 2950
+          OS: SecurePlatform NGX R60 Build 244
+  CP Version: NGX R60 HFA_05
+ CPinfo Size: 19498045
+Parsing Time: 7m17.349s (7.028915m) 2,773,976 bytes/min
+
+
+---------------------------------------------------------------------
+BUGS 
+---------------------------------------------------------------------
+I don't promise that you won't find bugs.  If you do, please file
+a bug report at http://rt.cpan.org or automatically report test
+failures via CPAN::Reporter.
+
+
+---------------------------------------------------------------------
+COPYRIGHTS AND LICENSE
+---------------------------------------------------------------------
+Copyright (C) 2007 by Matthew M. Lange
+This library is licensed under the GNU Public License.
+
+* Check Point is a registered trademark of Check Point Software Technologies, Ltd.
+

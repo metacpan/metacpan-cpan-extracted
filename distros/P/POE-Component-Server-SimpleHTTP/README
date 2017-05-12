@@ -1,0 +1,569 @@
+NAME
+
+    POE::Component::Server::SimpleHTTP - Perl extension to serve HTTP
+    requests in POE.
+
+VERSION
+
+    version 2.26
+
+SYNOPSIS
+
+            use POE;
+            use POE::Component::Server::SimpleHTTP;
+    
+            # Start the server!
+            POE::Component::Server::SimpleHTTP->new(
+                    'ALIAS'         =>      'HTTPD',
+                    'PORT'          =>      11111,
+                    'HOSTNAME'      =>      'MySite.com',
+                    'HANDLERS'      =>      [
+                            {
+                                    'DIR'           =>      '^/bar/.*',
+                                    'SESSION'       =>      'HTTP_GET',
+                                    'EVENT'         =>      'GOT_BAR',
+                            },
+                            {
+                                    'DIR'           =>      '^/$',
+                                    'SESSION'       =>      'HTTP_GET',
+                                    'EVENT'         =>      'GOT_MAIN',
+                            },
+                            {
+                                    'DIR'           =>      '^/foo/.*',
+                                    'SESSION'       =>      'HTTP_GET',
+                                    'EVENT'         =>      'GOT_NULL',
+                            },
+                            {
+                                    'DIR'           =>      '.*',
+                                    'SESSION'       =>      'HTTP_GET',
+                                    'EVENT'         =>      'GOT_ERROR',
+                            },
+                    ],
+    
+                    'LOGHANDLER' => { 'SESSION' => 'HTTP_GET',
+                                      'EVENT'   => 'GOT_LOG',
+                    },
+    
+                    'LOG2HANDLER' => { 'SESSION' => 'HTTP_GET',
+                                      'EVENT'   => 'POSTLOG',
+                    },
+    
+                    # In the testing phase...
+                    'SSLKEYCERT'    =>      [ 'private-key.pem', 'public-cert.pem' ],
+                    'SSLINTERMEDIATECACERT' =>      'intermediate-ca-cert.pem',
+            ) or die 'Unable to create the HTTP Server';
+    
+            # Create our own session to receive events from SimpleHTTP
+            POE::Session->create(
+                    inline_states => {
+                            '_start'        =>      sub {   $_[KERNEL]->alias_set( 'HTTP_GET' );
+                                                            $_[KERNEL]->post( 'HTTPD', 'GETHANDLERS', $_[SESSION], 'GOT_HANDLERS' );
+                                                    },
+    
+                            'GOT_BAR'       =>      \&GOT_REQ,
+                            'GOT_MAIN'      =>      \&GOT_REQ,
+                            'GOT_ERROR'     =>      \&GOT_ERR,
+                            'GOT_NULL'      =>      \&GOT_NULL,
+                            'GOT_HANDLERS'  =>      \&GOT_HANDLERS,
+                            'GOT_LOG'       =>      \&GOT_LOG,
+                    },
+            );
+    
+            # Start POE!
+            POE::Kernel->run();
+    
+            sub GOT_HANDLERS {
+                    # ARG0 = HANDLERS array
+                    my $handlers = $_[ ARG0 ];
+    
+                    # Move the first handler to the last one
+                    push( @$handlers, shift( @$handlers ) );
+    
+                    # Send it off!
+                    $_[KERNEL]->post( 'HTTPD', 'SETHANDLERS', $handlers );
+            }
+    
+            sub GOT_NULL {
+                    # ARG0 = HTTP::Request object, ARG1 = HTTP::Response object, ARG2 = the DIR that matched
+                    my( $request, $response, $dirmatch ) = @_[ ARG0 .. ARG2 ];
+    
+                    # Kill this!
+                    $_[KERNEL]->post( 'HTTPD', 'CLOSE', $response );
+            }
+    
+            sub GOT_REQ {
+                    # ARG0 = HTTP::Request object, ARG1 = HTTP::Response object, ARG2 = the DIR that matched
+                    my( $request, $response, $dirmatch ) = @_[ ARG0 .. ARG2 ];
+    
+                    # Do our stuff to HTTP::Response
+                    $response->code( 200 );
+                    $response->content( 'Some funky HTML here' );
+    
+                    # We are done!
+                    # For speed, you could use $_[KERNEL]->call( ... )
+                    $_[KERNEL]->post( 'HTTPD', 'DONE', $response );
+            }
+    
+            sub GOT_ERR {
+                    # ARG0 = HTTP::Request object, ARG1 = HTTP::Response object, ARG2 = the DIR that matched
+                    my( $request, $response, $dirmatch ) = @_[ ARG0 .. ARG2 ];
+    
+                    # Check for errors
+                    if ( ! defined $request ) {
+                            $_[KERNEL]->post( 'HTTPD', 'DONE', $response );
+                            return;
+                    }
+    
+                    # Do our stuff to HTTP::Response
+                    $response->code( 404 );
+                    $response->content( "Hi visitor from " . $response->connection->remote_ip . ", Page not found -> '" . $request->uri->path . "'" );
+    
+                    # We are done!
+                    # For speed, you could use $_[KERNEL]->call( ... )
+                    $_[KERNEL]->post( 'HTTPD', 'DONE', $response );
+            }
+    
+            sub GOT_LOG {
+                    # ARG0 = HTTP::Request object, ARG1 = remote IP
+                    my ($request, $remote_ip) = @_[ARG0,ARG1];
+    
+                    # Do some sort of logging activity.
+                    # If the request was malformed, $request = undef
+                    # CHECK FOR A REQUEST OBJECT BEFORE USING IT.
+            if( $request ) {
+            {
+                    warn join(' ', time(), $remote_ip, $request->uri ), "\n";
+            } else {
+                    warn join(' ', time(), $remote_ip, 'Bad request' ), "\n";
+            }
+    
+                    return;
+            }
+
+DESCRIPTION
+
+    This module makes serving up HTTP requests a breeze in POE.
+
+    The hardest thing to understand in this module is the HANDLERS. That's
+    it!
+
+    The standard way to use this module is to do this:
+
+            use POE;
+            use POE::Component::Server::SimpleHTTP;
+    
+            POE::Component::Server::SimpleHTTP->new( ... );
+    
+            POE::Session->create( ... );
+    
+            POE::Kernel->run();
+
+ Starting SimpleHTTP
+
+    To start SimpleHTTP, just call it's new method:
+
+            POE::Component::Server::SimpleHTTP->new(
+                    'ALIAS'         =>      'HTTPD',
+                    'ADDRESS'       =>      '192.168.1.1',
+                    'PORT'          =>      11111,
+                    'HOSTNAME'      =>      'MySite.com',
+                    'HEADERS'       =>      {},
+                    'HANDLERS'      =>      [ ],
+            );
+
+    This method will die on error or return success.
+
+    This constructor accepts only 7 options.
+
+    ALIAS
+
+      This will set the alias SimpleHTTP uses in the POE Kernel. This will
+      default to "SimpleHTTP"
+
+    ADDRESS
+
+      This value will be passed to POE::Wheel::SocketFactory to bind to,
+      will use INADDR_ANY if it is nothing is provided.
+
+    PORT
+
+      This value will be passed to POE::Wheel::SocketFactory to bind to.
+
+    HOSTNAME
+
+      This value is for the HTTP::Request's URI to point to. If this is not
+      supplied, SimpleHTTP will use Sys::Hostname to find it.
+
+    HEADERS
+
+      This should be a hashref, that will become the default headers on all
+      HTTP::Response objects. You can override this in individual requests
+      by setting it via $request->header( ... )
+
+      For more information, consult the HTTP::Headers module.
+
+    HANDLERS
+
+      This is the hardest part of SimpleHTTP :)
+
+      You supply an array, with each element being a hash. All the hashes
+      should contain those 3 keys:
+
+      DIR -> The regexp that will be used, more later.
+
+      SESSION -> The session to send the input
+
+      EVENT -> The event to trigger
+
+      The DIR key should be a valid regexp. This will be matched against
+      the current request path. Pseudocode is: if ( $path =~ /$DIR/ )
+
+      NOTE: The path is UNIX style, not MSWIN style ( /blah/foo not
+      \blah\foo )
+
+      Now, if you supply 100 handlers, how will SimpleHTTP know what to do?
+      Simple! By passing in an array in the first place, you have already
+      told SimpleHTTP the order of your handlers. They will be tried in
+      order, and if a match is not found, SimpleHTTP will return a 404
+      response.
+
+      This allows some cool things like specifying 3 handlers with DIR of:
+      '^/foo/.*', '^/$', '.*'
+
+      Now, if the request is not in /foo or not root, your 3rd handler will
+      catch it, becoming the "404 not found" handler!
+
+      NOTE: You might get weird Session/Events, make sure your handlers are
+      in order, for example: '^/', '^/foo/.*' The 2nd handler will NEVER
+      get any requests, as the first one will match ( no $ in the regex )
+
+      Now, here's what a handler receives:
+
+      ARG0 -> HTTP::Request object
+
+      ARG1 -> POE::Component::Server::SimpleHTTP::Response object
+
+      ARG2 -> The exact DIR that matched, so you can see what triggered
+      what
+
+      NOTE: If ARG0 is undef, that means POE::Filter::HTTPD encountered an
+      error parsing the client request, simply modify the HTTP::Response
+      object and send some sort of generic error. SimpleHTTP will set the
+      path used in matching the DIR regexes to an empty string, so if there
+      is a "catch-all" DIR regex like '.*', it will catch the errors, and
+      only that one.
+
+      NOTE: The only way SimpleHTTP will leak memory ( hopefully heh ) is
+      if you discard the SimpleHTTP::Response object without sending it
+      back to SimpleHTTP via the DONE/CLOSE events, so never do that!
+
+    KEEPALIVE
+
+      Set to true to enable HTTP keep-alive support. Connections will be
+      kept alive until the client closes the connection. All HTTP/1.1
+      connections are kept-open, unless you set the response Connection
+      header to close.
+
+          $response->header( Connection => 'close' );
+
+      If you want more control, use
+      POE::Component::Server::HTTP::KeepAlive.
+
+    LOGHANDLER
+
+      Expects a hashref with the following key, values:
+
+      SESSION -> The session to send the input
+
+      EVENT -> The event to trigger
+
+      You will receive an event for each request to the server from
+      clients. Malformed client requests will not be passed into the
+      handler. Instead undef will be passed. Event is called before ANY
+      content handler is called.
+
+      The event will have the following parameters:
+
+      ARG0 -> HTTP::Request object/undef if client request was malformed.
+
+      ARG1 -> the IP address of the client
+
+    LOG2HANDLER
+
+      Expect a hashref with the following key, values:
+
+      SESSION -> The session to send the input
+
+      EVENT -> The event to trigger
+
+      You will receive an event for each response that hit DONE call.
+      Malformed client requests will not be passed into the handler. Event
+      is after processing all content handlers.
+
+      The event will have the following parameters:
+
+      ARG0 -> HTTP::Request object
+
+      ARG1 -> HTTP::Response object
+
+      That makes possible following code:
+
+              my ($login, $password) = $request->authorization_basic();
+              printf STDERR "%s - %s [%s] \"%s %s %s\" %d %d\n",
+                      $response->connection->remote_ip, $login||'-', POSIX::strftime("%d/%b/%Y:%T %z",localtime(time())),
+                      $request->method(), $request->uri()->path(), $request->protocol(),
+                      $response->code(), length($response->content());
+
+      Emulate apache-like logs for PoCo::Server::SimpleHTTP
+
+    SETUPHANDLER
+
+      Expects a hashref with the following key, values:
+
+      SESSION -> The session to send the input
+
+      EVENT -> The event to trigger
+
+      You will receive an event when the listener wheel has been setup.
+
+      Currently there are no parameters returned.
+
+    SSLKEYCERT
+
+      This should be an arrayref of only 2 elements - the private key and
+      public certificate locations. Now, this is still in the experimental
+      stage, and testing is greatly welcome!
+
+      Again, this will automatically turn every incoming connection into a
+      SSL socket. Once enough testing has been done, this option will be
+      augmented with more SSL stuff!
+
+    SSLINTERMEDIATECACERT
+
+      This option is needed in case the SSL certificate references an
+      intermediate certification authority certificate.
+
+    PROXYMODE
+
+      Set this to a true value to enable the server to act as a proxy
+      server, ie. it won't mangle the HTTP::Request URI.
+
+ Events
+
+    SimpleHTTP is so simple, there are only 8 events available.
+
+    DONE
+
+              This event accepts only one argument: the HTTP::Response object we sent to the handler.
+      
+              Calling this event implies that this particular request is done, and will proceed to close the socket.
+      
+              NOTE: This method automatically sets those 3 headers if they are not already set:
+                      Date            ->      Current date stringified via HTTP::Date->time2str
+                      Content-Type    ->      text/html
+                      Content-Length  ->      length( $response->content )
+      
+              To get greater throughput and response time, do not post() to the DONE event, call() it!
+              However, this will force your program to block while servicing web requests...
+
+    CLOSE
+
+              This event accepts only one argument: the HTTP::Response object we sent to the handler.
+      
+              Calling this event will close the socket, not sending any output
+
+    GETHANDLERS
+
+              This event accepts 2 arguments: The session + event to send the response to
+      
+              This event will send back the current HANDLERS array ( deep-cloned via Storable::dclone )
+      
+              The resulting array can be played around to your tastes, then once you are done...
+
+    SETHANDLERS
+
+              This event accepts only one argument: pointer to HANDLERS array
+      
+              BEWARE: if there is an error in the HANDLERS, SimpleHTTP will die!
+
+    SETCLOSEHANDLER
+
+          $_[KERNEL]->call( $_[SENDER], 'SETCLOSEHANDLER', $connection,
+                            $event, @args );
+
+      Calls $event in the current session when $connection is closed. You
+      could use for persistent connection handling.
+
+      Multiple session may register close handlers.
+
+      Calling SETCLOSEHANDLER without $event to remove the current
+      session's handler:
+
+         $_[KERNEL]->call( $_[SENDER], 'SETCLOSEHANDLER', $connection );
+
+      You must make sure that @args doesn't cause a circular reference.
+      Ideally, use $connection-ID> or some other unique value associated
+      with this $connection.
+
+    STARTLISTEN
+
+              Starts the listening socket, if it was shut down
+
+    STOPLISTEN
+
+              Simply a wrapper for SHUTDOWN GRACEFUL, but will not shutdown SimpleHTTP if there is no more requests
+
+    SHUTDOWN
+
+              Without arguments, SimpleHTTP does this:
+                      Close the listening socket
+                      Kills all pending requests by closing their sockets
+                      Removes it's alias
+      
+              With an argument of 'GRACEFUL', SimpleHTTP does this:
+                      Close the listening socket
+                      Waits for all pending requests to come in via DONE/CLOSE, then removes it's alias
+
+    STREAM
+
+              With a $response argument it streams the content and calls back the streaming event
+              of the user's session (or with the dont_flush option you're responsible for calling
+              back your session's streaming event).
+      
+              To use the streaming feature see below.
+
+ Streaming with SimpleHTTP
+
+    It's possible to send data as a stream to clients (unbuffered and
+    integrated in the POE loop).
+
+    Just create your session to receive events from SimpleHTTP as usually
+    and add a streaming event, this event will be triggered over and over
+    each time you set the $response to a streaming state and once you
+    trigger it:
+
+       # sets the response as streamed within our session which alias is HTTP_GET
+       # with the event GOT_STREAM
+       $response->stream(
+          session     => 'HTTP_GET',
+          event       => 'GOT_STREAM',
+          dont_flush  => 1
+       );
+    
+       # then you can simply yield your streaming event, once the GOT_STREAM event
+       # has reached its end it will be triggered again and again, until you
+       # send a CLOSE event to the kernel with the appropriate response as parameter
+       $kernel->yield('GOT_STREAM', $response);
+
+    The optional dont_flush option gives the user the ability to control
+    the callback to the streaming event, which means once your stream event
+    has reached its end it won't be called, you have to call it back.
+
+    You can now send data by chunks and either call yourself back (via POE)
+    or shutdown when your streaming is done (EOF for example).
+
+       sub GOT_STREAM {
+          my ( $kernel, $heap, $response ) = @_[KERNEL, HEAP, ARG0];
+    
+          # sets the content of the response
+          $response->content("Hello World\n");
+    
+          # send it to the client
+          POE::Kernel->post('HTTPD', 'STREAM', $response);
+    
+          # if we have previously set the dont_flush option
+          # we have to trigger our event back until the end of
+          # the stream like this (that can be a yield, of course):
+          #
+          # $kernel->delay('GOT_STREAM', 1, $stream );
+    
+          # otherwise the GOT_STREAM event is triggered continuously until
+          # we call the CLOSE event on the response like that :
+          #
+          if ($heap{'streaming_is_done'}) {
+             # close the socket and end the stream
+             POE::Kernel->post('HTTPD', 'CLOSE', $response );
+          }
+       }
+
+    The dont_flush option is there to be able to control the frequency of
+    flushes to the client.
+
+ SimpleHTTP Notes
+
+    You can enable debugging mode by doing this:
+
+            sub POE::Component::Server::SimpleHTTP::DEBUG () { 1 }
+            use POE::Component::Server::SimpleHTTP;
+
+    Also, this module will try to keep the Listening socket alive. if it
+    dies, it will open it again for a max of 5 retries.
+
+    You can override this behavior by doing this:
+
+            sub POE::Component::Server::SimpleHTTP::MAX_RETRIES () { 10 }
+            use POE::Component::Server::SimpleHTTP;
+
+    For those who are pondering about basic-authentication, here's a tiny
+    snippet to put in the Event handler
+
+            # Contributed by Rocco Caputo
+            sub Got_Request {
+                    # ARG0 = HTTP::Request, ARG1 = HTTP::Response
+                    my( $request, $response ) = @_[ ARG0, ARG1 ];
+    
+                    # Get the login
+                    my ( $login, $password ) = $request->authorization_basic();
+    
+                    # Decide what to do
+                    if ( ! defined $login or ! defined $password ) {
+                            # Set the authorization
+                            $response->header( 'WWW-Authenticate' => 'Basic realm="MyRealm"' );
+                            $response->code( 401 );
+                            $response->content( 'FORBIDDEN.' );
+    
+                            # Send it off!
+                            $_[KERNEL]->post( 'SimpleHTTP', 'DONE', $response );
+                    } else {
+                            # Authenticate the user and move on
+                    }
+            }
+
+ EXPORT
+
+    Nothing.
+
+ABSTRACT
+
+            An easy to use HTTP daemon for POE-enabled programs
+
+SEE ALSO
+
+            L<POE>
+    
+            L<POE::Filter::HTTPD>
+    
+            L<HTTP::Request>
+    
+            L<HTTP::Response>
+    
+            L<POE::Component::Server::SimpleHTTP::Connection>
+    
+            L<POE::Component::Server::SimpleHTTP::Response>
+    
+            L<POE::Component::Server::SimpleHTTP::PreFork>
+    
+            L<POE::Component::SSLify>
+
+AUTHOR
+
+    Apocalypse <APOCAL@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Apocalypse, Chris Williams,
+    Eriam Schaffter, Marlon Bailey and Philip Gwyn.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

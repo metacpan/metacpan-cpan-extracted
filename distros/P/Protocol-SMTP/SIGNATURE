@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 655018cbf06bf3080e48514cdadaace5770ec7ac Changes
+SHA1 f83a2295d49d3a9ef3041a98bf11784b6bcaab02 INSTALL
+SHA1 b94f06af32c2cebe5696645fe2a782b88b5b6f40 LICENSE
+SHA1 4f025cc485d33f6f9a74fa5f94deb75d89b55053 MANIFEST
+SHA1 fd4a4a1aac483a356fbcc5b6f4d9ff1280bbaeba META.json
+SHA1 05b12f1448bfffe288aa3996f101301560b46496 META.yml
+SHA1 feaa02460213e3c331f47b2bc4b0d244361742c1 Makefile.PL
+SHA1 8f1ab3846ef576f167ae45d16fcfad43d953647d README
+SHA1 14adc5f97eca4305a9b85eea20cf2875385c18b9 cpanfile
+SHA1 07879e6dd439f1333c97a1fd69fc69007788f99d dist.ini
+SHA1 18b3c198387942b28b89bc44319e10724dcf6de1 examples/nasmtp.pl
+SHA1 c54ac5dec72de2e0db376c8fc72bdef08526972a lib/Protocol/SMTP.pm
+SHA1 6f7a57fa0622938e046c014851a8ea9f57c1aac8 lib/Protocol/SMTP/Client.pm
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 d0496a37f82987cfcf3000a2f6433d68d1b5fbc5 t/00-compile.t
+SHA1 ff27fac33fdc208e3026cb9d70dc7c3040decc62 t/client-auth.t
+SHA1 61c123f34b2ab65a93d20acd5bed0e64b4981bee t/client-encoding.t
+SHA1 23a918d9346eb42997f07e4e9f8d39ec6bcde3ca t/client-future.t
+SHA1 8b8b1c27a23dee769de6185bb196489faae4763b t/client-impl.t
+SHA1 edee4489b2fa026a1cdf55f1975c074f78e998f0 t/client-send.t
+SHA1 d44ca822f9ccf704d9b422ec6a1dbffc3d886dc5 t/client-task.t
+SHA1 95bb34983c539529c334048b8e2a6098e3608f6e t/client.t
+SHA1 c56cb3bc847e512dcec236c309f4e0b6455c3dc0 xt/author/test-eol.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 b7765bceaa12210a7ca4da2a4bb4aef53812be9c xt/release/new-version.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 fd1fa776fca35fc8f1bdd24ee3fbaa1eca755a44 xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJTVDFOAAoJEFKElMNpjtyDnjMIAJ5iH2UzOgBwXUaON3mqPzVZ
+1N67gLqS6aEZ0iSBg1KjEJLmPqgUXeepaggP013WkANzJuKAzqbVYROfepwP9jeP
+F7m1AIudy/exHSxfBx4uGA3y6fNiw7Yb7d6XM+lYi2LiGA8YVGEhw73/F5ImZY1T
+hHaLIVaIelibFd1Z3x1by2MZ+Bd4LIrt491slTHmozKgVn8fA9euk7fmnY64KczU
+LuCZwOf+HA0NyfC/HGQOdl3JCq+zIH0WZnAQMyTJenN7ioOu5VmlDspm/Pi/WBVi
+pxF5TVina6BSHqYbyw3aEJW8yjKXX2SsNvD/ZlUuL70AJijwlxa5URu2NvpJhNI=
+=SKHR
+-----END PGP SIGNATURE-----

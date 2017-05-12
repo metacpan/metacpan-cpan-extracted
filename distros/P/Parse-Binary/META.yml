@@ -1,0 +1,13 @@
+abstract: Binary data structure parser
+author: Audrey Tang <cpan@audreyt.org>
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: Parse-Binary
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  Scalar::Util: 0
+version: 0.10

@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               Parse-MediaWikiDump
+version:            1.0.6
+abstract:           Tools to process MediaWiki dump files
+author:
+    - Tyler Riddle <triddle@gmail.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Devel::Cycle:         1.11
+    List::Util:           1.21
+    PadWalker:            1.9
+    Scalar::Util:         1.21
+    Test::Exception:      0.27
+    Test::Memory::Cycle:  1.04
+    Test::More:           0.94
+    Test::Warn:           0.21
+    XML::Parser:          2.36
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

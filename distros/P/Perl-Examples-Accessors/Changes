@@ -1,0 +1,70 @@
+Revision history for Perl-Examples-Accessors
+
+0.12    2016-11-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- test: Skip Moops in t/00-compile.t.
+
+
+0.11    2016-11-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Bump prereq version of Evo::Class from 0 to 0.0256 due to failure
+	  in older versions [RT#118962].
+
+	- Downgrade prereq Moops to recommends due to failure to install on
+	  perl 5.24+ [RT#118963].
+
+
+0.10    2016-11-25 (PERLANCAR)
+
+	- Add classes: Perl::Examples::Accessors::{ClassStruct,EvoClass,Moops,
+          Moos,ObjectTiny,ObjectTinyRW,ObjectTinyRWXS,ObjectTinyXS}.
+
+
+0.09    2016-09-29 (PERLANCAR)
+
+	- Add class: Perl::Examples::Accessors::MojoBaseXS.
+
+
+0.08    2016-09-09 (PERLANCAR)
+
+	- Add class: Perl::Examples::Accessors::ClassTiny.
+
+
+0.07    2016-09-09 (PERLANCAR)
+
+	- [optimize] Optimize manual (Hash/Array) accessors.
+
+
+0.06    2016-06-26 (PERLANCAR)
+
+	- Add classes: Perl::Examples::Accessors::SimpleAccessor.
+
+
+0.05    2016-04-14 (PERLANCAR)
+
+	- Add classes: Perl::Examples::Accessors::{MojoBase,ObjectSimple}.
+
+
+0.04    2016-04-14 (PERLANCAR)
+
+	- Add class: Perl::Examples::Accessors::ClassInsideOut.
+
+
+0.03    2016-03-29 (PERLANCAR)
+
+	- Remove Class::Build::Array::Glob (it will be re-added if I
+	  resolve the implementation issue).
+
+
+0.02     2016-03-29 (PERLANCAR)
+
+         - Add classes: PEA:ClassAccessorArray, PEA:ClassAccessorArrayGlob.
+
+
+0.01     2016-03-28 (PERLANCAR)
+
+         - First release.

@@ -1,0 +1,11 @@
+SYNOPSIS
+
+    Use the included gen-phplive-reports to generate HTML report files.
+
+DESCRIPTION
+
+    PHP Live! is a web-based live chat/live support application,
+    http://www.phplivesupport.com/. As of this writing, version 4.4.7, the
+    reports it generates are quite limited. This module produces additional
+    reports for your PHP Live! installation.
+

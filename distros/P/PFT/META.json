@@ -1,0 +1,67 @@
+{
+   "abstract" : "Hacker friendly static blog generator",
+   "author" : [
+      "Giovanni Simoni (dacav at openmailbox)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PFT",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Encode" : "0",
+            "Encode::Locale" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "IO::File" : "0",
+            "Scalar::Util" : "0",
+            "Text::Markdown" : "0",
+            "YAML::Tiny" : "0",
+            "perl" : "5.01"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dacav/PFT.git",
+         "web" : "https://github.com/dacav/PFT"
+      }
+   },
+   "version" : "v1.2.0",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

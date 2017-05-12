@@ -1,0 +1,160 @@
+#!/usr/bin/env perl
+# Copyright (C) 2008 Ioannis Tambouras <ioannis@cpan.org>. All rights reserved.
+# # LICENSE:  GPLv3, eead licensing terms at  http://www.fsf.org .
+
+#use lib qw( ../blib/lib ) ;
+use v5.10;
+use Curses;
+use Pg::Pcurse;
+use Pg::Pcurse::Widget;
+use Data::Dumper;
+#use Getopt::Compact;
+use strict;
+use warnings;
+
+use Pg::Pcurse::Misc;
+use Pg::Pcurse::Query0;
+use Pg::Pcurse::Query1;
+use Pg::Pcurse::Query3;
+
+*VERSION= *Pg::Pcurse::VERSION;
+
+*addstr = \&Curses::Widgets::addstr;
+
+$opt = process_options( get_getopt(), @ARGV);
+
+
+## Test connection 
+unless (my $dh = dbconnect ( $opt, form_dsn($opt, '' ) ) ) {
+	print 'Could not connect to database. Exiting...';
+	print Dumper $opt;
+	init_screen; endwin;
+	exit(0);
+}
+
+#print Dumper vac_settings ( $opt ); exit;
+#print Dumper table3_of($opt, 'people' , 'public', 'person') ; exit;
+#print Dumper tables_vacuum($opt, 'people','public'); exit;
+
+init_screen;
+$::mwh  = create_root;
+my $dbs  = [ databases2 $opt ];
+my $main = form_dbmenu ($dbs);
+undef $::db;
+$::mode='stats';
+$::mode='vacuum';
+$::mode='tables';
+
+init_mini_root;
+
+
+while(2) {
+	$main->execute($::mwh);
+
+	# $main::db is initialized from  _Database_Menu_Choice()
+        $::dbname  = $main::db || $opt->{dbname} || $dbs->[0] || 'template1';
+
+        display_strings ( $::mwh, $opt, $::mode, $::dbname);
+
+	# act according to ::mode
+	eval { execute_mode( $::mode); };
+}
+
+
+
+
+END { 
+	if (defined $::mwh) {
+		$::mwh->addstr(23,1,'Thank you for flying Pcurse!');
+		$::mwh->refresh;  
+	}
+        endwin() 
+}
+
+sub display_strings {
+	my ( $win, $o, $mode, $dbname) = @_ ;
+        $win->addstr(5,10, sprintf 'Mode  : %-13s', ' '   );
+        $win->addstr(6,10, sprintf 'DBase : %-13s' , ' '   );
+        $win->addstr(5,10, sprintf 'Mode  : %-13s', ucfirst$mode );
+        $win->addstr(6,10, sprintf 'DBase : %-8s', $dbname       );
+        $win->addstr(7,10, sprintf 'User  : %-8s', $o->{user}    );
+        $win->addstr(8,10, sprintf 'Host  : %-8s', $o->{host}    );
+	$main->draw($win,0);
+}
+1;
+__END__
+
+=head1 NAME
+
+pcurse - Monitor  Postgres  databases
+
+=head1 SYNOPSIS
+
+ $ pcurse  [options]   [dbname]   [user]
+ for example:
+ $ pcurse -h localhost  template1  john  --passwd apple
+
+=head2 options
+
+      --passwd      Default is read from ~/.pgpass
+      --dbname      Default is template1
+      --host        Default is localhost
+      --user        Default is getlogin() 
+      --port        Default is 5432
+
+
+=head1 DESCRIPTION
+
+pcurse(1) monitors a Postgres database cluster. 
+It shows statistics on tables, indexes, vacuuming, buffers, etc,.
+
+=head1 INVOCATION
+
+
+
+
+=head1 USAGE
+
+
+It is too simple:
+
+1. Select a 'MODE' from the menu.
+   To navigate, use arrow keys, the vi keys (j ,k , m ), or ENTER .
+   TAB (or 'l') moves you to the next window.
+
+2. Most modes requires to select a namespace from the the 'Schemas' listbox.
+   Use arrows, vi keys, ENTER (or SPACE, or ' ' ) seals the selection.
+   Press 'd' to view more acl permissions on schema
+   TAB (or 'l') moves you to the button window.
+
+3. The results are displayed in the bottom window.
+   Use arrows, vi keys, ENTER (or SPACE, or ' ' ) seals the selection.
+   Pressing 'd' to view more results.
+   Ctrl-H displays Help screen
+   Ctrl-F appends the contents of the bottom display to /tmp/pcurse.out
+   In tables mode Ctrl-L displays the last 20 updates in table
+   In tables and database mode Ctrl-A analyses at table or database
+   In tables and database mode Ctrl-V analyses at table or database
+   Press 'd' to exit from any of the above tables.
+   TBB (or 'l') takes you back to the starting menu.
+
+4. Press 'q' to quit the program. Thank you for flying Pcurse!
+
+
+
+=head1 SEE ALSO
+
+=head1 AUTHOR
+
+Ioannis Tambouras, E<lt>ioannis@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2008 by Ioannis Tambouras
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms of GPLv3
+
+
+=cut
+

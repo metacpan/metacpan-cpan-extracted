@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 03ac4fd84d9f9cf25ae7848ac160b827b5a4a2fc Build.PL
+SHA1 fdfc607c64842eb9421d1c89ad52643af41042ca Changes
+SHA1 0512d05135838d70d7c4ed703370a390b2cac5c9 MANIFEST
+SHA1 388e4c00964def9ea19c33bd18bbcd7d3abf15aa META.yml
+SHA1 481e935c0833e32680ff3678842287837b1ace9b Makefile.PL
+SHA1 987d0a557e9bd1bb6f3a0065b8de4684c97ceecc README
+SHA1 fb23a28fbe8ab50b6a539f150941d79fe1371e94 examples/ex1.gif
+SHA1 ff93cd2ccc7d0a419eb79fd6c5c6bfc3b834e705 examples/ex2.gif
+SHA1 ebb6752d4206ec6a181941633561a8aef123e0d7 examples/ex3.png
+SHA1 c6a3f468c8683f4ac2bfb79bd30d200368e0d872 examples/ex4.png
+SHA1 502845dff1e66d22e1cbd41e25fbb6f6a54c0670 examples/example1.pl
+SHA1 28c0c2bc10b1a93f10dcf4ef15a7561aad5b5ef8 examples/example2.pl
+SHA1 a308fd39f1e4a75321cf353a506c608f05692adb lib/Physics/Particles.pm
+SHA1 f5d714a3b4c255038d4091218b7b281d125c07e9 t/00pod.t
+SHA1 8f599b7e35a7c13d0b1393f05b7856a2697e5871 t/00podcover.t
+SHA1 2bf65ddedca8d91173d4fba58ef383e8bae6f225 t/11base.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.3 (GNU/Linux)
+
+iD8DBQFF+uNlZCuimE51gxcRAlJLAJ4smvQvWvrE2Yh/kAENNxNYwqXvQgCfVtun
+beQDx9u2Od/ECS3Rjpx1fAA=
+=S1Hq
+-----END PGP SIGNATURE-----

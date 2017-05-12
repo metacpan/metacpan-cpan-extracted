@@ -1,0 +1,33 @@
+---
+name: Pod-2-DocBook
+version: 0.03
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+abstract: Convert Pod data to DocBook SGML
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pod-2-DocBook
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jozef/pod-2-docbook.git
+requires:
+  CPAN::Version: 0
+  Digest::MD5: 0
+  List::MoreUtils: 0
+  Pod::ParseLink: 0
+  Pod::Parser: 0
+  Text::ParseWords: 0
+  Text::Wrap: 0
+build_requires:
+  Test::More: 0
+  XML::LibXML: 0
+provides:
+  Pod::2::DocBook:
+    file: lib/Pod/2/DocBook.pm
+    version: 0.03
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+keywords:
+  - pod
+  - docbook

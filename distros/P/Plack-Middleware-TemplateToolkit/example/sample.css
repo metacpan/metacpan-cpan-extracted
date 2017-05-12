@@ -1,0 +1,14 @@
+a { 
+  text-decoration: none; 
+}
+#header {
+  border-bottom: 1px solid #666; 
+  font-weight: bold;
+}
+#footer {
+  border-top: 1px solid #666; 
+  font-size:small;
+}
+#header, #main, #footer {
+  padding: 5px;
+}

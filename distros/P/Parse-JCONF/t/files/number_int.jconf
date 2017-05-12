@@ -1,0 +1,17 @@
+# this is test for
+# integer numbers
+
+numner1 = 999
+number2 = -23 # negative
+
+super_number = 1111
+zero = 0, hero = -0
+
+big_number # oh shi~, number value on the next line
+	=	1234567890
+
+	strange_number
+		=
+		8
+
+	# THE END

@@ -1,0 +1,45 @@
+Installation via
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+NAME
+    Physics::Lorentz - Package for 4-vectors and transformations
+
+SYNOPSIS
+      use Physics::Lorentz;
+      my $rotation = Physics::Lorentz::Transformation->rotation_euler(
+        $alpha, $beta, $gamma
+      );
+      my $vector = Physics::Lorentz::Vector->new([$t, $x, $y, $z]);
+      my $rotated = $rotation->apply($vector);
+      # or: $rotated = $rotation * $vector;
+  
+      ...
+
+DESCRIPTION
+    This package mainly just loads Physics::Lorentz::Transformation and
+    Physics::Lorentz::Vector. The whole of the "Physics::Lorentz"
+    distribution is intended to help with dealing with 4-vectors and
+    (Poincare) transformations in the associated vector space.
+
+    Vectors and transformations are implemented as PDL objects internally.
+
+  EXPORT
+    None.
+
+SEE ALSO
+    PDL, Physics::Lorentz::Vector, Physics::Lorentz::Transformation
+
+AUTHOR
+    Steffen Müller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Steffen Müller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6 or, at your
+    option, any later version of Perl 5 you may have available.
+

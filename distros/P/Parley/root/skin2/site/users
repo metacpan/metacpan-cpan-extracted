@@ -1,0 +1,65 @@
+<h1>User Management</h1>
+
+<h2>Administration Rights</h2>
+
+
+<form action="[%c.uri_for('/site/user/')%]" onsubmit="return YAHOO.example.ACJson.validateForm();">
+    <div id="ysearch">
+		<label>User Search: </label>
+		<input id="ysearchinput" type="text">
+		<input id="ac_personid" type="hidden" value="zx" name="pid">
+		<input id="ysearchsubmit" type="submit" value="Submit Query">
+		<div id="ysearchcontainer"></div>
+    </div>
+</form>
+
+<h2>Restrictions, Bans and Suspensions</h2>
+
+<script type="text/javascript">
+YAHOO.example.ACJson = new function(){
+    // Instantiate an XHR DataSource and define schema as an array:
+    //     ["Multi-depth.object.notation.to.find.a.single.result.item",
+    //     "Query Key",
+    //     "Additional Param Name 1",
+    //     ...
+    //     "Additional Param Name n"]
+    this.oACDS = new YAHOO.widget.DS_XHR("/site/users_autocomplete/", ["ResultSet.person","forum_name"]);
+    this.oACDS.queryMatchContains = true;
+    this.oACDS.forceSelection = true;
+    this.oACDS.typeAhead = true;
+    this.oACDS.animSpeed = 0.1;
+    //this.oACDS.scriptQueryAppend = "output=json&results=100"; // Needed for YWS
+
+    // Instantiate AutoComplete
+    this.oAutoComp = new YAHOO.widget.AutoComplete("ysearchinput","ysearchcontainer", this.oACDS);
+    this.oAutoComp.useShadow = true;
+    this.oAutoComp.formatResult = function(oResultItem, sQuery) {
+        return oResultItem[1].forum_name
+            + " ("
+            + oResultItem[1].first_name
+            + " "
+            + oResultItem[1].last_name
+            + ")";
+    };
+    this.oAutoComp.doBeforeExpandContainer = function(oTextbox, oContainer, sQuery, aResults) {
+        var pos = YAHOO.util.Dom.getXY(oTextbox);
+        pos[1] += YAHOO.util.Dom.get(oTextbox).offsetHeight + 2;
+        YAHOO.util.Dom.setXY(oContainer,pos);
+        return true;
+    };
+
+    this.oAutoComp.itemSelectEvent.subscribe(
+        function(oSelf, elItem, oData) {
+            YAHOO.util.Dom.get('ac_personid').value = elItem[2][1].id;
+        },
+        this,
+        false
+    );
+
+    // Stub for form validation
+    this.validateForm = function() {
+        // Validation code goes here
+        return true;
+    };
+};
+</script>

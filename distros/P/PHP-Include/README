@@ -1,0 +1,45 @@
+Config version 0.01
+===================
+
+PHP::Include builds on the shoulders of Filter::Simple and Parse::RecDescent to
+provide a Perl utility for including very simple PHP Files from a Perl program.
+
+When working with Perl and PHP it is often convenient to be able to share
+configuration data between programs written in both languages.  One solution to
+this would be to use a language independent configuration file (did I hear
+someone say XML?). Another solution is to use Perl's flexibility to read PHP
+and rewrite it as Perl. PHP::Include does the latter with the help of
+Filter::Simple and Parse::RecDescent to rewrite very simple PHP as Perl.
+
+Filter::Simple is used to enable macros (at the moment only one) which 
+cause PHP to be interpolated into your Perl source code, which is then parsed
+using a Parse::RecDescent grammar to generate the appropriate Perl.
+
+PHP::Include was designed to allow the more adventurous to add grammars that 
+extend the complexity of PHP that may be included. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Filter::Simple
+    Parse::RecDescent
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2002 Ed Summers
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

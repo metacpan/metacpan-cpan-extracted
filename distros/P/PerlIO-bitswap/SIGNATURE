@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3e0ce1793296985d780613d3f10571814a57e443 .cvsignore
+SHA1 cbb7cf9ecab45886006af27d809d59177a1c9fc0 Build.PL
+SHA1 f5dd0e02e1f70364ef8564b8b11af760f40a9ee2 Changes
+SHA1 e160d0b1caff0d0fe52cf604d54b11fd61bf8013 MANIFEST
+SHA1 7a7ed12b2af3720ecd83ae75985783bb97bbfbfd META.json
+SHA1 0c4ea27bdfd69bf60981c45949cd354889f4ab57 META.yml
+SHA1 ac10abef4842e562f11f09847244c1a1b1bcca06 Makefile.PL
+SHA1 f90c881415a0ebf373db0ef57e7465924526bed5 README
+SHA1 e37012666de213f1c1a8172c4bac305af20e9c15 lib/PerlIO/.cvsignore
+SHA1 88407011420a2b76505613b4a89fc10a1854dcfa lib/PerlIO/bitswap.pm
+SHA1 b67fb45e7552fb7387fcce8e9ac935e47280ff6c lib/PerlIO/bitswap.xs
+SHA1 1042e7b337c21a0505f17f7395a4f8a573b3d3cc t/eof.t
+SHA1 aa96f7ea3727e3f8c6c960df21f1c98657945af8 t/partial.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 5d899bac238aa4de41865f01abf254f3fd86bdd9 t/read.t
+SHA1 2980a1c991f0632e99b81358f5d7dacb82d48bd6 t/seek.t
+SHA1 765b0dfff3855765c4b81099211218940056551b t/tell.t
+SHA1 d46725ef0b0606269b0a505b7e4c3f2a695ddaba t/write.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk4clqgACgkQOV9mt2VyAVFhCACgidbbrGpUIGbFS+UX/pQoG1mL
+GXUAnR+Bq2mU0f+rlHYsCZAJKYEkFuJa
+=MGS4
+-----END PGP SIGNATURE-----

@@ -1,0 +1,28 @@
+Makefile.PL	used to generate Makefile or descrip.mms file
+MANIFEST	This file, listing package contents
+MANIFEST.SKIP	Files to be skipped from distribution package
+Pod/Dsr.pm	Pod::Dsr module (uses Pod::Parser)
+Pod/Hlp.pm	Pod::Hlp module
+README		General instructions
+README.runoff   Pointers to documentation for RUNOFF and DSR
+find.plx	Test prototype for pod2hlb re-write && pod2mem
+pod2hlp		Utility driver script to run Pod::Hlp
+pod2hlb		Utility driver script to run Pod::Find and pod2hlp
+pod2rno.PL	Utility driver script to run Pod::Dsr
+t/dsr.t		Test Pod::Dsr && pod2rno
+t/hlp.t		Test Pod::Hlp && pod2hlp
+t/testpod0.pod  source pod file for pod torture test
+t/testpod0.dsr	dsr torture test reference
+t/testpod0.ref	hlp torture test reference
+t/platin1.pod	source pod file for punctuations and Latin-1 test
+t/platin1.dsr	dsr Latin 1 MCS reference
+t/platin1.ref	hlp Latin 1 MCS reference
+t/finibusi.pod	1st book Cicero's De finibus bonorum et malorum
+t/finibusi.dsr	dsr De finibus reference
+t/finibusi.ref	hlp De finibus reference
+t/pod2hlb.dsr	dsr pod2hlb reference
+t/pod2hlb.ref	hlp pod2hlb reference
+t/pod2hlp.dsr	dsr pod2hlp reference
+t/pod2hlp.ref	hlp pod2hlp reference
+t/pod2rno.dsr	dsr pod2rno reference
+t/pod2rno.ref	hlp pod2rno reference

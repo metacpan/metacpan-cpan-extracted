@@ -1,0 +1,4 @@
+Revision history for Perl extension Plack::Middleware::ChromeLogger
+
+0.01    Tue Apr  1 10:14:24 JST 2014
+        - original version

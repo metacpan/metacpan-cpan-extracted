@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<request xmlns='http://ali.as/xml/schema/pita-xml/0.29'>
+    <scheme>perl5.make</scheme>
+    <distname>PITA-Test-Dummy-Perl5-Make</distname>
+    <file>
+    	<filename>PITA-Test-Dummy-Perl5-Make-1.01.tar.gz</filename>
+    	<resource>package</resource>
+    	<digest>MD5.d7aa6a943cd762ac9c18d57653653e31</digest>
+    </file>
+    <authority>cpan</authority>
+    <authpath>/authors/id/A/AD/ADAMK/PITA-Test-Dummy-Perl5-Make-1.01.tar.gz</authpath>
+</request>

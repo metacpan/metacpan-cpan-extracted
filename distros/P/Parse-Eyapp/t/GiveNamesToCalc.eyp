@@ -1,0 +1,77 @@
+%{
+# GiveNamesToCalc.eyp
+=head1 SYNOPSIS
+
+This example illustrates a way to set a naming scheme for
+the grammar productions.
+
+Compile it with:
+
+  $ eyapp -C GiveNamesToCalc.eyp 
+
+and execute it with:
+
+  $ ./GiveNamesToCalc.pm -t -i -c 'a=2*3'
+
+
+It will produce an output like:
+
+  line_is_exp(var_is_VAR[a],exp_is_TIMES(exp_is_NUM[2],exp_is_NUM[3]))
+
+=cut
+%}
+
+%token NUM = /([0-9]+(?:\.[0-9]+)?)/
+%token VAR = /([A-Za-z][A-Za-z0-9_]*)/
+
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+%right  '^'
+
+%tree bypass
+
+%namingscheme { 
+  #Receives a Parse::Eyapp object describing the grammar
+  my $self = shift;
+
+  $self->tokennames(
+    '=' => 'ASSIGN',
+    '+' => 'PLUS',
+    '*' => 'TIMES',
+    '-' => 'MINUS',
+    '/' => 'DIV',
+    '^' => 'EXP',
+  );
+
+  # returns the handler that will give names 
+  # to the right hand sides
+  \&give_token_name; 
+}
+%%
+
+line:       
+    exp 
+;
+
+exp:
+    NUM                
+  | VAR                
+  | var '=' exp        
+  | exp '+' exp        
+  | exp '-' exp        
+  | exp '*' exp        
+  | exp '/' exp        
+  | %no bypass exp_is_NEG
+     '-' exp %prec NEG  
+  | exp '^' exp        
+  | '(' exp ')'        
+;
+
+var:
+    VAR
+;
+%%
+
+

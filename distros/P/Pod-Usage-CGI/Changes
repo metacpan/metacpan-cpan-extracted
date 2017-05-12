@@ -1,0 +1,10 @@
+Fri July 15 14:00:00 2005 - 1.010
+	- Require Pod::Xhtml 1.41 and update unit tests
+
+Mon Mar 14 16:06:13 2005 - 1.009
+	- Test script cgi_usage.t now handles file paths containing spaces
+	  correctly in Windows.
+
+Fri Mar 11 12:37:18 2005 - 1.008
+	- Initial release to CPAN
+

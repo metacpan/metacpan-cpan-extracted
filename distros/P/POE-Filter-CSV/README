@@ -1,0 +1,74 @@
+NAME
+
+    POE::Filter::CSV - A POE-based parser for CSV based files.
+
+VERSION
+
+    version 1.18
+
+SYNOPSIS
+
+        use POE::Filter::CSV;
+    
+        my $filter = POE::Filter::CSV->new();
+        my $arrayref = $filter->get( [ $line ] );
+        my $arrayref2 = $filter->put( $arrayref );
+
+DESCRIPTION
+
+    POE::Filter::CSV provides a convenient way to parse CSV files. It is a
+    wrapper for the module Text::CSV.
+
+    A more comprehensive demonstration of the use to which this module can
+    be put to is in the examples/ directory of this distribution.
+
+CONSTRUCTOR
+
+    new
+
+      Creates a new POE::Filter::CSV object. Any arguments given are passed
+      through to the constructor for Text::CSV.
+
+METHODS
+
+    get
+
+    get_one_start
+
+    get_one
+
+      Takes an arrayref which is contains lines of CSV formatted input.
+      Returns an arrayref of lists of fields.
+
+    put
+
+      Takes an arrayref containing arrays of fields and returns an arrayref
+      containing CSV formatted lines.
+
+    clone
+
+      Makes a copy of the filter, and clears the copy's buffer.
+
+SEE ALSO
+
+    POE
+
+    Text::CSV
+
+    POE::Filter
+
+    POE::Filter::Line
+
+    POE::Filter::Stackable
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

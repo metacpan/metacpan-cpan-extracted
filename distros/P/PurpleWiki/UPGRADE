@@ -1,0 +1,188 @@
+If you are upgrading from version 0.1 please see the 'UPGRADING FROM
+V0.1' information, further below. 0.1 users will need to perform all
+of the tasks listed in this document. 
+
+UPGRADING FROM V0.9.2
+=====================
+
+v0.93 has a completely new user database and session management
+system along with a template driven presentation system.
+You will need to upgrade old installations to the new format. 
+There are a large number of changes in this version that allow a
+great deal of new features.
+
+Perform the following required steps:
+
+1. Run:
+
+    createUsernameIndex.pl /path/to/wikidb
+
+   This will clean up your user database, consolidating duplicate
+   usernames and removing user ID locks.  Make sure all of the files
+   in this directory is readable and writeable by your web server.
+   
+2. Create a sessions directory in wikidb. Make sure this directory
+   is writeable by your web server.
+   
+3. Copy the wikidb/templates directory included in the distribution
+   into your old wikidb directory.
+
+   a. Adjust wikidb/templates/comment/header.tt so that the 
+      stylesheet link points to your preferred stylesheet.
+      You may wish to use the etc/purplewiki.css file included
+      in the distribution as a reference. The default templates
+      use many id and class attributes to allow for flexible
+      presentation. If you do not include these in your
+      own stylesheet, your wiki pages will not look as good
+      as they could.
+
+   b. If you display an image with your wikipages, this is now
+      controlled by the templates instead of the config file.
+      Look in wikidb/templates/comment/header.tt for:
+
+      <!-- img tag would go here if you have a logo -->
+
+      Replace that with an HTML <img> tag.
+
+   c. See docs/Templates.wiki in the distribution for more 
+      information about the Template system.
+
+4. Edit the config file.
+
+   a. Change ScriptName to include the entire URL.
+
+   b. Add the following variables:
+
+      ScriptDir
+      TemplateDriver
+      TemplateDir
+    
+      LoginToEdit
+      UseINames
+      CreateLinkBefore
+      CreateLinkText
+      ServiceProviderName
+      ServiceProviderKey
+      ReturnUrl
+
+      You can use the config file included in the distribution as
+      reference. You can comment out the last four variables unless
+      you are planning to use i-names.
+
+      If you wish to require users to login to be able to edit,
+      leave LoginToEdit set, otherwise comment it out.
+
+   c. Remove the following variables, as they are no longer used 
+      (this is not required, but will keep the file more organized):
+
+      CookieName
+      LogoUrl
+      StyleSheet
+      SiteBase
+      EmailFrom
+      SendMail
+      AdminPass
+      EditPass
+      FooterNote
+      EditNote
+      UserGotoBar
+      AdminDelete
+      EmailNotify
+      EmbedWiki
+      LogoLeft
+      UseLookup
+
+   d. Change KeepDays from the original default of 14 days to 30, 90
+      or even 365. This is the expiration time for old versions of pages. 
+      The old low number proved unhelpful in the battle against
+      spam. We recommend 365. By the end of that time, there will be a 
+      more robust data storage system for PurpleWiki.
+
+5. If you use PurpleWiki::Apache1Handler or PurpleWiki::Apache2Handler
+   to present wiki formatted text files, see the documentation included in
+   the modules for changes to their configuration. The configuration
+   file is now found by an environment variable.
+
+6. If you use the experimental RemoteSequenceURL,
+   PurpleWiki::Apache1NidHandler and PurpleWiki::Apache2NidHandler
+   have been collapsed to PurpleWiki::NidHandler. See the documentation
+   included in the modules for configuration information. The 
+   URL interface remains the same.
+
+UPGRADING FROM V0.9.1
+=====================
+
+There is one new directive in the PurpleWiki config file:
+LocalSequenceDir.  Make sure you add the following line to your config
+file when upgrading from v0.9.1:
+
+  LocalSequenceDir = $DataDir
+
+UPGRADING FROM V0.9
+===================
+
+PurpleWiki v0.9.1 uses the same format as v0.9 and requires no 
+changes to the content or data files. One significant change
+is REQUIRED in the config file.
+
+The Wiki search function has been modularized to allow searches of
+the wiki titles and content, blogs associated with the wiki (through
+the MovableType and Bloxsom plugins), google and whatever else
+you can think of: The system is set up to allow individuals to create
+their own modules for searching. See the documentation within
+PurpleWiki::Search::Engine and PurpleWiki::Search::Interface.
+
+Which search modules are used is controlled by the configuration
+file. To get the default 0.1 and 0.9 behavior of searching the
+the wiki titles and content from either the search box or clicking on
+page title, you MUST add the following line to the config file:
+
+  SearchModule    =    Wiki
+
+(case matters).
+
+The sample config file in the etc file of this distribution includes
+other search configuration examples. Each Search module may require
+additional configuration items. These are described in the
+documentation associated with each module. Each module may also have
+additional Perl module requirements. See each module to find out 
+what is required.
+
+UPGRADING FROM V0.1
+===================
+
+PurpleWiki v0.9 has a new scheme for NIDs.  In PurpleWiki v0.1, NIDs
+were locally unique to each page.  In PurpleWiki v0.9, NIDs are unique
+across the entire site.  In other words, the NID of a paragraph on one
+Wiki page will not be used anywhere else on the site.
+
+This has a few ramifications.  First, the lastnid metadata tag is no
+longer required.  This will simplify things for users.  Second,
+copying and pasting nodes between pages is easier, because you don't
+have to worry about deleting and regenerating NIDs.  Third, it enables
+transclusions.
+
+PurpleWiki v0.9 also uses a new syntax for NIDs: braces instead of
+brackets.  See the thread starting at:
+
+  http://purplewiki.blueoxen.net/forums/devel/2003-07/msg00004.html
+
+for an explanation.
+
+Because of the new syntax and addressing scheme, users of PurpleWiki
+v0.1 will have to convert their site to the new format.  Additionally,
+we are using a new config file format.  The config format is
+straightforward; you should be able to manually convert your config
+file fairly easily.
+
+After you have converted your config file, you can use the
+purpleConvert.pl script (located in the extras directory) to convert
+your site's NID information:
+
+  purpleConvert.pl /path/to/wikidb http://your.host
+
+For the URL, just provide the hostname and port (if not 80).
+purpleConvert.pl will use the path specified by ScriptName in your
+config file.
+
+$Id: UPGRADE,v 1.2 2004/01/21 23:24:08 cdent Exp $

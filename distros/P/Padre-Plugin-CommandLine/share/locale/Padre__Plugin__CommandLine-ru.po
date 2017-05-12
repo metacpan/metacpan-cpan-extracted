@@ -1,0 +1,24 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: padre-plugin-commandline\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-11 20:14+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Anatoly Sharifulin <sharifulin@gmail.com>\n"
+"Language-Team: Russian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/CommandLine.pm:60
+msgid "About"
+msgstr "О проекте"
+
+#: lib/Padre/Plugin/CommandLine.pm:61
+msgid "Show Prompt\tAlt-`"
+msgstr "Показать строку ввода\tAlt-`"
+
+#: lib/Padre/Plugin/CommandLine.pm:85
+msgid "Command Line"
+msgstr "Командная строка"
+

@@ -1,0 +1,95 @@
+2008-02-15  Andreas Koenig  <k@andreas-koenigs-computer.local>
+
+	* the way we build the apc struct: this line is not quite correct now:
+
+    next unless $dirent =~ /^5/;
+
+	Instead we must visit the perl-* directories. But there are pairs that
+	exclude each other, like the symlink 5.9.0 and perl-current-diffs.
+	Up to now we have only visited 5.9.0 and not the symlink target but we
+	must start to visit the other one because nobody creates symlinks
+	anymore and we are already missing something that leads us to 5.10.x for
+	x>0.
+
+	So define the pairs, say mutexdirs. When both of a pair exist, visit the
+	perl-* thing. But book it under the 5.* name for the perlbase.
+	
+
+2008-02-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Learn what the symlinks are on the other end and treat the symlink
+	name and the directory name as just one object, even if it isn't a
+	symlink locally. This might be a prereq for rsync-less operation.
+
+	* Nice to have: work even when the user has not rsynced anything, just
+	has an APC directory.
+
+2008-01-19  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* In
+	http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2007-12/msg00791.html
+	Jan Dubois explained that he wants more APC metadata in modules to
+	lessen the overhead for the maintainance.
+
+	Here is one idea how we might want to proceed: add some sort of table to
+	P:R:APC that overrules the directory structure where necessary. Add the
+	capability to mirror tarballs from the internet into our own directory.
+
+	The first step would be a prove of concept that fetches 5.9.0 and builds
+	some 5.9.x@xxxxx. Need to find out a result, build it now and after the
+	fix and the comparison would have to prove that we got the same result.
+
+	I expect that patchaperlup needs no change because it has already enough
+	magic to find out the last patch from the Changes file. buildaperl would
+	have to be our main target.
+
+	Recap: an arbitrary example tells me perl-5.7.3@17122 was on the trunk.
+	According to Module::Corelist 2.13 5.007003 was released on 2002-03-05
+	and reached 5.007003 => [perl => 15039], repository browser says 17122
+	was made on 2002/06/08.
+
+	In my archive I find these:
+
+5.7.3@17122/
+5.7.3@17384/
+5.8.0@17639/
+5.8.0@17705/
+
+	apc-overview says
+
+Branch                 Perl-Version     1st   last (patchcount)
+perl                          5.7.3   11358  15039 (3101)
+perl                          5.8.0   15040  17638 (2206)
+
+	I think this illustrates well enough that the name before the @ is
+	always the perl we're building on and not the one that the patch would
+	finally lead to.
+
+2003-09-14 andk <andk@cpan.org>
+
+	* 5.6.2 and 5.6.3 are currently both branched from 5.6.1. We have no
+	metadata that tell us this fact, the program needs to know it. Rev. 124
+	enables us to survive under this condition for a while, but it seems
+	that we need to address this sooner or later. I expect the next breakage
+	when 5.6.2 will be out. Then we will probably not be able to build
+	5.6.3.
+	
+	At least rev 127 will be able to handle 5.6.2 both for buildaperl and
+	apc2svn. To get the current state of 5.6.2, you want to call
+	
+	buildaperl --branch maint-5.6/perl-5.6.2 @
+	
+	For the record: buildaperl started to work again in rev 124, apc2svn
+	seems to work before I'm committing 127. Both were not working for 5.6.2
+	in rev 123. binsearchaperl also needed a special case for 5.6.2 which I
+	committed in rev 130.
+
+
+
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "BUGS"
+	tab-width: 2
+	left-margin: 2
+	End:
+	

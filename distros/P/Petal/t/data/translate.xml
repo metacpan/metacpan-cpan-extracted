@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<html xmlns:i18n="http://xml.zope.org/namespaces/i18n" i18n:domain="testdomain">
+<span i18n:translate="">Fedora Core 4 RPMs added (<a 
+href="http://download.gna.org/kvpnc/kvpnc-0.8.2.1-1.fc4.i386.rpm">RPM</a>, <a 
+href="http://download.gna.org/kvpnc/kvpnc-debuginfo-0.8.2.1-1.fc4.i386.rpm">Debug 
+RPM</a>).</span>
+</html>

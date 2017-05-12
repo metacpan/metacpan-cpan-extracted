@@ -1,0 +1,25 @@
+=head1 NAME
+
+This is a pod paragraph
+
+=begin wikidoc
+
+= DESCRIPTION
+
+Wikidoc paragraph
+
+=end wikidoc
+
+=cut
+#--------------------------------------------------------------------------#
+=pod
+
+=head1 NAME
+
+This is a pod paragraph
+
+=head1 DESCRIPTION
+
+Wikidoc paragraph
+
+

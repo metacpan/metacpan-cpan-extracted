@@ -1,0 +1,13 @@
+
+my $x = 1;
+
+
+my $y = 2;
+
+__END__
+
+=pod
+
+This is mid-code!
+
+=cut

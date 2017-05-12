@@ -1,0 +1,7 @@
+prefix=/usr
+exec_prefix=${prefix}
+version=1.6.1
+
+Name: m17n-db
+Description: The m17n database used by the m17n library.
+Version: ${version}

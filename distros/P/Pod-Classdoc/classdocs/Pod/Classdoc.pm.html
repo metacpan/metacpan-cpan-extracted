@@ -1,0 +1,1492 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta name="robots" content="noarchive">
+<link type='text/css' rel='stylesheet' href='../css/ppicf.css' />
+<script type='text/javascript' src='../js/ppicf.js'></script>
+ 
+</head>
+<body bgcolor="#FFFFFF" text="#000000">
+<div id='ft1' class='folddiv'><pre id='preft1'><span class="pd">=pod
+ 
+=begin classdoc
+ 
+Generate javadoc-like class documentation from embedded POD.
+Uses &lt;cpan&gt;PPI::Find&lt;/cpan&gt; to locate POD, packages, and methods, then
+processes the extracted POD into a javadoc-ish HTML format. Classdoc POD
+is defined within &lt;code&gt;=begin classdoc&lt;/code&gt; and 
+&lt;code&gt;=end classdoc&lt;/code&gt; sections. Each such section is associated
+with its immediately succeding package or method statement, unless
+the &lt;code&gt;@xs&lt;/code&gt; directive is specified, in which case
+the classdoc is assumed to be for an external (e.g., XS) method.
+Multiple external method classdoc sections may be specified within a single
+&lt;code&gt;=pod ... =cut&lt;/code&gt; section, with the final such classdoc section
+associated with any trailing method definition.
+ 
+@author Dean Arnold
+@see &lt;cpan&gt;PPI&lt;/cpan&gt;
+@see &lt;cpan&gt;PPI::Find&lt;/cpan&gt;
+@see &lt;a href='http://java.sun.com/j2se/javadoc/writingdoccomments/'&gt;&quot;How to Write Doc Comments for the Javadoc Tool&quot;&lt;/a&gt;
+@since 2007-Jun-10
+@instance hash
+@self $self
+ 
+=end classdoc
+ 
+=cut
+ </span></pre></div>
+<div id='ft30' class='folddiv'><pre id='preft30'><span class="kw">
+use</span> <span class="wo">PPI</span>;
+<span class="kw">use</span> <span class="wo">PPI::Document</span>;
+<span class="kw">use</span> <span class="wo">PPI::Find</span>;
+<span class="kw">use</span> <span class="wo">File::Path</span>;
+ 
+<span class="kw">use</span> <span class="pg">strict</span>;
+<span class="kw">use</span> <span class="pg">warnings</span>;
+</pre></div>
+<div id='ft78' class='folddiv'><pre id='preft78'><span class="ct">#</span>
+<span class="ct">#   our default color theme; change these
+#   for different look
+# </span></pre></div>
+<div id='ft83' class='folddiv'><pre id='preft83'><span class="ct">
+#</span>
+<span class="ct">#   our database:
+#       key is class name
+#       contents are
+#           author =&gt; '',
+#           since =&gt; '',
+#           version =&gt; '',
+#           InheritsFrom =&gt; {},
+#           SubclassedBy =&gt; {},
+#           Description =&gt; '',
+#           File =&gt; '',
+#           Line =&gt; '',
+#           see =&gt; [],
+#           deprecated =&gt; undef|1,
+#           exports =&gt; [],
+#           imports =&gt; [],
+#           members =&gt; [],
+#           instance =&gt; '',
+#           self =&gt; '',
+#           Methods =&gt;
+#           {
+#               $name =&gt;
+#               {
+#                   Description =&gt; '',
+#                   File =&gt; '',
+#                   Line =&gt; '',
+#                   static =&gt; undef|1,
+#                   self =&gt; '',
+#                   deprecated =&gt; undef|1,
+#                   see =&gt; [],
+#                   since =&gt; '',
+#                   param =&gt; [ 'name', 'description', ... ],
+#                   return =&gt; 'description',
+#                   returnlist =&gt; 'description',
+#                   simplex =&gt; undef|1,
+#                   urgent =&gt; undef|1,
+#                   constructor =&gt; 1|undef
+#               }
+#           }
+#</span>
+ 
+<span class="pd">=pod
+ 
+=begin classdoc
+ 
+Creates a new empty Pod::Classdoc object.
+ 
+@constructor
+ 
+@optional $path directory path for output documents; default is './classdocs'
+@optional $title title string to use for head of classdocs
+@optional $verbose if true, enables diagnostic output (default false)
+ 
+@return a new Pod::Classdoc object
+ 
+=end classdoc
+ 
+=cut
+ </span></pre></div>
+<div id='ft155' class='folddiv'><pre id='preft155'><span class="pd">
+=pod
+ 
+=begin classdoc
+ 
+Scan the provided text for Perl packages, adding the packages
+to the current collection of classes. When a package is located,
+it is scanned for its inherited classes and classdoc'd methods.
+ 
+@param $txt the package text as either a scalar string, or an arrayref of
+    the lines of the package
+@optional $file full path of source file
+ 
+@return the PPI::Document object generated from the input text
+ 
+=end classdoc
+ 
+=cut
+ </span></pre></div>
+<div id='ft178' class='folddiv'><pre id='preft178'><span class="ct">#</span>
+<span class="ct">#   grab version as for MakeMaker;
+#   note only one version per source file
+# </span></pre></div>
+<div id='ft229' class='folddiv'><pre id='preft229'><span class="pd">
+=pod
+ 
+=begin classdoc
+ 
+Load the specified package file.
+ 
+@param $path    path to the package file.
+@param $pkg     Perl name of the package
+ 
+@return the PPI::Document object generated from the input file
+ 
+=end classdoc
+ 
+=cut
+ </span></pre></div>
+<div id='ft263' class='folddiv'><pre id='preft263'><span class="pd">
+=pod
+ 
+=begin classdoc
+ 
+Load all the package files within a specified project directory.
+Recurses into subdirectories as needed.
+ 
+@param @projects    list of pathnames of root project directories
+ 
+@return this Pod::Classdoc object
+ 
+=end classdoc
+ 
+=cut
+ </span></pre></div>
+<div id='ft417' class='folddiv'><pre id='preft417'><span class="ct">#</span>
+<span class="ct">#   if a prior namespace defined, save its body and recover any
+#   inheritance info; we should really try to use PPI here...
+# </span></pre></div>
+<div id='ft461' class='folddiv'><pre id='preft461'><span class="ct">#</span>
+<span class="ct">#   if a prior namespace defined, save its body and recover any
+#   inheritance info; we should really try to use PPI here...
+# </span></pre></div>
+<div id='ft484' class='folddiv'><pre id='preft484'><span class="pd">
+=pod
+ 
+=begin classdoc
+ 
+Get or set the output directory path for rendered documents.
+ 
+@optional $path root directory where classdocs are to be written; if not provided,
+        a Get operation is executed
+ 
+@returns    for a Get operation, the current output path;
+            for a Set operation, the prior output path
+ 
+=end classdoc
+ 
+=cut
+ </span></pre></div>
+<div id='ft510' class='folddiv'><pre id='preft510'><span class="pd">
+=pod
+ 
+=begin classdoc
+ 
+Render the loaded packages into classdocs. Creates
+subdirectories for subordinate classdocs as needed.
+Package files containing multiple package definitions
+will result in individual files for each package.
+ 
+@optional $use_private  include private methods. By default,
+    only public methods are included in the output; setting this flag
+    causes any documented private methods (methods beginning with an
+    underscore) to be included as well. Note that constructors
+    are always considered public.
+ 
+@returns    on success, a hashref mapping classnames to an arrayref 
+            of the classdoc formatted output, the input source file name and line number
+            of the class's associated classdoc'd package definition, and
+            a hashref mapping method names to an arrayref of source file name and
+            linenumber; 
+            undef on failure, with error message in $@
+ 
+=end classdoc
+ 
+=cut
+ </span></pre></div>
+<div id='ft584' class='folddiv'><pre id='preft584'><span class="pd">
+=pod
+ 
+=begin classdoc
+ 
+Clear this object. Removes all currently loaded packages.
+ 
+@return this object
+ 
+=end classdoc
+ 
+=cut
+ </span></pre></div>
+<div id='ft603' class='folddiv'><pre id='preft603'><span class="pd">
+=pod
+ 
+=begin classdoc
+ 
+Write out a toplevel container document for the TOC and
+classdoc frames. Assumes the TOC is named 'toc.html'.
+ 
+@param $container name of output file without path; path is taken
+    from the path specified via &lt;method&gt;new&lt;method&gt;() or 
+    &lt;method&gt;path&lt;method&gt;()
+@optional $home pathname of a toplevel document to be included in index
+ 
+@return this object on success, undef on failure, with error message in $@
+ 
+=end classdoc
+ 
+=cut
+ </span></pre></div>
+<div id='ft633' class='folddiv'><pre id='preft633'><span class="pd">
+=pod
+ 
+=begin classdoc
+ 
+Generate a toplevel container document for the TOC and
+classdoc frames. Assumes the TOC is named 'toc.html'.
+ 
+@optional $home pathname of a toplevel document to be included in index
+ 
+@return the frame container document
+ 
+=end classdoc
+ 
+=cut
+ </span></pre></div>
+<div id='ft672' class='folddiv'><pre id='preft672'><span class="pd">
+=pod
+ 
+=begin classdoc
+ 
+Write out an table of contents document for the current collection of
+classdocs as a nested HTML list. The output filename is 'toc.html'.
+The caller may optionally specify the order of classes in the menu.
+ 
+@optional @order    list of packages in the order in which they should appear in TOC; if a partial list,
+                    any remaining packages will be appended to the TOC in alphabetical order
+@return this object on success, undef on failure, with error message in $@
+ 
+=end classdoc
+ 
+=cut
+ </span></pre></div>
+<div id='ft700' class='folddiv'><pre id='preft700'><span class="pd">
+=pod
+ 
+=begin classdoc
+ 
+Generate a table of contents document for the current collection of
+classdocs as a nested HTML list. Caller may optionally specify
+the order of classes in the menu.
+ 
+@optional @order    list of packages in the order in which they should appear in TOC; if a partial list,
+                    any remaining packages will be appended to the TOC in alphabetical order
+@return the TOC document
+ 
+=end classdoc
+ 
+=cut
+ </span></pre></div>
+<div id='ft808' class='folddiv'><pre id='preft808'><span class="pd">
+=pod
+ 
+=begin classdoc
+ 
+Write out the documents for the current collection of
+classdocs. Renders the current set of classdocs before
+writing.
+ 
+@optional $use_private  include private methods. By default,
+    only public methods are included in the output; setting this flag
+    causes any documented private methods (methods beginning with an
+    underscore) to be included as well. Note that constructors
+    are always considered public.
+ 
+@return undef on failure, with error message in $@; otherwise, a hashref
+    mapping classnames to an arrayref of the full pathname of the classdoc formatted output file,
+    the input source file name and line number of the class's associated classdoc'd package 
+    definition, and a hashref mapping method names to an arrayref of source file name and
+    linenumber.
+ 
+=end classdoc
+ 
+=cut
+ </span></pre></div>
+<div id='ft853' class='folddiv'><pre id='preft853'><span class="pd">
+=pod
+ 
+=begin classdoc
+ 
+Generate fully qualified pathname of output classdoc
+file for a given package name. Also creates the path
+if needed.
+ 
+@param $class   package name to be resolved to output classdoc file
+ 
+@return the fully qualified pathname to the classdocs for $class,
+    with a '.html' qualifier.
+ 
+=end classdoc
+ 
+=cut
+ </span></pre></div>
+<div id='ft1016' class='folddiv'><pre id='preft1016'><span class="ct">
+#</span>
+<span class="ct">#   process imports
+# </span></pre></div>
+<div id='ft1276' class='folddiv'><pre id='preft1276'><span class="ct">#</span>
+<span class="ct">#   generate a path from a class, along with
+#   an updir path from the class
+# </span></pre></div>
+<div id='ft1289' class='folddiv'><pre id='preft1289'><span class="ct">#</span>
+<span class="ct">#   expand all &lt;cpan&gt;, &lt;member&gt;, &lt;method&gt;, and &lt;package&gt; tags
+#   NOTE: need a nesting level to construct updir prefixes
+# </span></pre></div>
+<table border=0 width='100%' cellpadding=0 cellspacing=0>
+<tr>
+    <td width=40 bgcolor='#E9E9E9' align=right valign=top>
+    <pre id='lnnomargin' class='lnpre'>
+	</pre>
+</td>
+<td width=8 bgcolor='#E9E9E9' align=right valign=top>
+<pre id='btnmargin' class='lnpre'>
+</pre>
+</td>
+<td bgcolor='white' align=left valign=top>
+<pre class='bodypre'><span id='src1' class='foldfill'>Folded lines 1 to 28</span>
+<a name='Pod::Classdoc'></a><span class="kw">package</span> <span class="wo">Pod::Classdoc</span>;
+<span id='src30' class='foldfill'>Folded lines 30 to 38</span>
+<span class="kw">our</span> $VERSION <span class="op">=</span> <span class="sg">'1.01'</span>;
+ 
+<span class="kw">my</span> %validpkgtags <span class="op">=</span> (qw(
+    author 2
+    deprecated 1
+    exports 1
+    ignore 1
+    imports 1
+    instance 1
+    member 1
+    see 2
+    self 1
+    since 1
+));
+ 
+<span class="kw">my</span> %validsubtags <span class="op">=</span> (qw(
+    author 2
+    constructor 1
+    deprecated 1
+    ignore 1
+    param 1
+    optional 1
+    return 1
+    returnlist 1
+    see 2
+    self 1
+    simplex 1
+    since 1
+    static 1
+    urgent 1
+));
+ 
+<span class="kw">my</span> %secttags <span class="op">=</span> ( 
+    <span class="sg">'export'</span> <span class="op">=&gt;</span> <span class="sg">'_e_'</span><span class="op">,</span> 
+    <span class="sg">'import'</span> <span class="op">=&gt;</span> <span class="sg">'_i_'</span><span class="op">,</span> 
+    <span class="sg">'member'</span> <span class="op">=&gt;</span> <span class="sg">'_m_'</span><span class="op">,</span> 
+    <span class="sg">'method'</span> <span class="op">=&gt;</span> <span class="sg">'_f_'</span><span class="op">,</span> 
+    <span class="sg">'package'</span> <span class="op">=&gt;</span> <span class="sg">'_p_'</span> 
+);
+<span id='src78' class='foldfill'>Folded lines 78 to 81</span>
+<span class="kw">my</span> $aqua <span class="op">=</span> <span class="sg">'#98B5EB'</span>;
+<span id='src83' class='foldfill'>Folded lines 83 to 142</span>
+<a name='Pod::Classdoc::new'></a><span class="kw">sub</span> <span class="wo">new</span> {
+    <span class="kw">my</span> ($class<span class="op">,</span> $path<span class="op">,</span> $title<span class="op">,</span> $verbose) <span class="op">=</span> <span class="mg">@_</span>;
+    $path <span class="op">||=</span> <span class="sg">'./classdocs'</span>;
+    $path<span class="op">=~</span><span class="su">s/\/+$//</span> <span class="wo">unless</span> ($path <span class="op">eq</span> <span class="sg">'/'</span>);
+    <span class="kw">my</span> $self <span class="op">=</span> {
+        <span class="wo">_path</span> <span class="op">=&gt;</span> $path<span class="op">,</span>
+        <span class="wo">_classes</span> <span class="op">=&gt;</span> {}<span class="op">,</span> 
+        <span class="wo">_title</span> <span class="op">=&gt;</span> $title<span class="op">,</span> 
+        <span class="wo">_verbose</span> <span class="op">=&gt;</span> $verbose <span class="op">||</span> <span class="nm">0</span><span class="op">,</span>
+    };
+    <span class="kw">return</span> <span class="wo">bless</span> $self<span class="op">,</span> $class;
+}
+<span id='src155' class='foldfill'>Folded lines 155 to 173</span>
+<a name='Pod::Classdoc::add'></a><span class="kw">sub</span> <span class="wo">add</span> {
+    <span class="kw">my</span> ($self<span class="op">,</span> $txt<span class="op">,</span> $file) <span class="op">=</span> <span class="mg">@_</span>;
+    $txt <span class="op">=</span> <span class="wo">join</span>(<span class="db">&quot;\n&quot;</span><span class="op">,</span> <span class="cs">@</span>$txt)
+        <span class="wo">if</span> <span class="wo">ref</span> $txt;
+<span id='src178' class='foldfill'>Folded lines 178 to 181</span>
+    <span class="kw">my</span> $version;
+    <span class="wo">if</span> ($txt<span class="op">=~</span><span class="mt">/\n\s*((my|our|local)\s+)?\$[\w\:\']*?\bVERSION\s*?\=([^;]+?);/</span>) {
+        <span class="wo">eval</span> <span class="db">&quot;\$version = $3;&quot;</span>;
+    }
+ 
+    $self<span class="op">-&gt;</span>{<span class="wo">_state</span>} <span class="op">=</span> <span class="nm">0</span>;
+    $self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>} <span class="op">=</span> <span class="sg">''</span>;
+    $self<span class="op">-&gt;</span>{<span class="wo">_currpod</span>} <span class="op">=</span> <span class="sg">''</span>;
+    $self<span class="op">-&gt;</span>{<span class="wo">_currsub</span>} <span class="op">=</span> <span class="sg">''</span>;
+    $self<span class="op">-&gt;</span>{<span class="wo">_currloc</span>} <span class="op">=</span> <span class="co">undef</span>;
+    $self<span class="op">-&gt;</span>{<span class="wo">_currtext</span>} <span class="op">=</span> $txt;
+    $self<span class="op">-&gt;</span>{<span class="wo">_currfile</span>} <span class="op">=</span> $file;
+    $self<span class="op">-&gt;</span>{<span class="wo">_nosubs</span>} <span class="op">=</span> <span class="nm">0</span>;
+ 
+    <span class="kw">my</span> $Document <span class="op">=</span> <span class="wo">PPI::Document</span><span class="op">-&gt;</span><span class="wo">new</span>(<span class="cs">\</span>$txt) <span class="op">or</span> <span class="wo">die</span> <span class="db">&quot;Can't process into PPI::Document&quot;</span>;
+ 
+<span class="ct">    # Create the Find object</span>
+    <span class="kw">my</span> $Finder <span class="op">=</span> <span class="wo">PPI::Find</span><span class="op">-&gt;</span><span class="wo">new</span>( <span class="kw">sub</span> { $self<span class="op">-&gt;</span><span class="wo">_wanted</span>(<span class="mg">@_</span>); } ) <span class="op">or</span> <span class="wo">die</span> <span class="db">&quot;Can't create PPI::Find&quot;</span>;
+<span class="ct"># Use the object as an iterator</span>
+    $Finder<span class="op">-&gt;</span><span class="wo">start</span>($Document) <span class="op">or</span> <span class="wo">die</span> <span class="db">&quot;Failed to execute search&quot;</span>;
+<span class="ct">#</span>
+<span class="ct">#   process any trailing classdoc section
+#</span>
+    $self<span class="op">-&gt;</span>{<span class="wo">_nosubs</span>} <span class="op">+=</span> <span class="wo">_processClassdocs</span>(<span class="co">undef</span><span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_currpod</span>}<span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_currloc</span>}<span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_currloc</span>}<span class="op">,</span> $file<span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}<span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>})
+        <span class="wo">if</span> $self<span class="op">-&gt;</span>{<span class="wo">_currpod</span>};
+<span class="ct">#</span>
+<span class="ct">#   process any open package
+#</span>
+    $self<span class="op">-&gt;</span><span class="wo">_processPackage</span>() <span class="wo">if</span> $self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>};
+ 
+    <span class="wo">warn</span> <span class="db">&quot;$self-&gt;{_nosubs} classdoc sections found without matching methods.&quot;</span> 
+        <span class="wo">if</span> $self<span class="op">-&gt;</span>{<span class="wo">_nosubs</span>} <span class="op">&amp;&amp;</span> $self<span class="op">-&gt;</span>{<span class="wo">_verbose</span>};
+ 
+    <span class="wo">if</span> ($self<span class="op">-&gt;</span>{<span class="wo">_verbose</span>} <span class="op">&gt;</span> <span class="nm">1</span>) {
+ 
+        <span class="wo">foreach</span> <span class="wo">my</span> $currpkg (<span class="wo">sort</span> <span class="wo">keys</span> <span class="cs">%</span>{$self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}}) {
+            <span class="kw">my</span> $pkg <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}{$currpkg};
+            <span class="wo">print</span> <span class="db">&quot;Package $currpkg at line $pkg-&gt;{File}:$pkg-&gt;{Line}:\n$pkg-&gt;{Description}\n\nhas the following methods:\n\n&quot;</span>;
+            <span class="kw">my</span> $sub;
+            $sub <span class="op">=</span> $pkg<span class="op">-&gt;</span>{<span class="wo">Methods</span>}{<span class="mg">$_</span>}<span class="op">,</span>
+            <span class="wo">print</span> <span class="db">&quot;**********\n$_ at line $sub-&gt;{File}:$sub-&gt;{Line}:\n$sub-&gt;{Description}\n\n&quot;</span>
+                <span class="wo">foreach</span> (<span class="wo">sort</span> <span class="wo">keys</span> <span class="cs">%</span>{$pkg<span class="op">-&gt;</span>{<span class="wo">Methods</span>}});
+        }
+    }
+ 
+    <span class="kw">return</span> $Document;
+}
+<span id='src229' class='foldfill'>Folded lines 229 to 244</span>
+<a name='Pod::Classdoc::open'></a><span class="kw">sub</span> <span class="wo">open</span> {
+    <span class="kw">my</span> ($self<span class="op">,</span> $path<span class="op">,</span> $pkg) <span class="op">=</span> <span class="mg">@_</span>;
+ 
+    <span class="kw">my</span> $file <span class="op">=</span> $pkg <span class="op">?</span> <span class="db">&quot;$path/$pkg&quot;</span> <span class="op">:</span> $path;
+    $file<span class="op">=~</span><span class="su">s/::/\//g</span>;
+    $file <span class="op">.=</span> <span class="sg">'.pm'</span> <span class="wo">if</span> $pkg;
+    <span class="mg">$@</span> <span class="op">=</span> <span class="db">&quot;Cannot open $file: $!&quot;</span> <span class="op">and</span>
+    <span class="kw">return</span> <span class="co">undef</span>
+        <span class="wo">unless</span> <span class="wo">open</span>(<span class="wo">INF</span><span class="op">,</span> $file);
+ 
+    <span class="kw">my</span> $oldsep <span class="op">=</span> <span class="mg">$/</span>;
+    <span class="mg">$/</span> <span class="op">=</span> <span class="co">undef</span>;
+    <span class="kw">my</span> $doc <span class="op">=</span> &lt;INF&gt;;
+    <span class="wo">close</span> <span class="wo">INF</span>;
+    <span class="mg">$/</span> <span class="op">=</span> $oldsep;
+ 
+    <span class="kw">return</span> $self<span class="op">-&gt;</span><span class="wo">add</span>($doc<span class="op">,</span> $file);
+}
+<span id='src263' class='foldfill'>Folded lines 263 to 278</span>
+<a name='Pod::Classdoc::openProject'></a><span class="kw">sub</span> <span class="wo">openProject</span> {
+    <span class="kw">my</span> $self <span class="op">=</span> <span class="co">shift</span>;
+ 
+    $self<span class="op">-&gt;</span><span class="wo">_getSubDirs</span>(<span class="mg">$_</span>)
+        <span class="wo">foreach</span> <span class="mg">@_</span>;
+    <span class="kw">my</span> $dirs <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_dirs</span>};
+    <span class="wo">print</span> <span class="db">&quot;Scanning &quot;</span><span class="op">,</span> <span class="wo">join</span>(<span class="db">&quot;\n&quot;</span><span class="op">,</span> <span class="cs">@</span>$dirs)<span class="op">,</span> <span class="db">&quot;\n&quot;</span>
+        <span class="wo">if</span> $self<span class="op">-&gt;</span>{<span class="wo">_verbose</span>};
+ 
+    <span class="kw">my</span> @files <span class="op">=</span> ();
+    <span class="wo">foreach</span> <span class="wo">my</span> $path (<span class="cs">@</span>$dirs) {
+        <span class="wo">unless</span> (<span class="wo">opendir</span>(<span class="wo">PATH</span><span class="op">,</span> $path)) {
+            <span class="wo">warn</span> <span class="db">&quot;directory $path not found&quot;</span>
+                <span class="wo">if</span> $self<span class="op">-&gt;</span>{<span class="wo">_verbose</span>};
+            <span class="wo">next</span>;
+        }
+<span class="ct">#</span>
+<span class="ct">#   glob the directory for all .pm files;
+#</span>
+        <span class="kw">my</span> @tfiles <span class="op">=</span> <span class="wo">readdir</span> <span class="wo">PATH</span>;
+        <span class="wo">closedir</span> <span class="wo">PATH</span>;
+ 
+        <span class="wo">push</span> @files<span class="op">,</span> <span class="wo">map</span> <span class="db">&quot;$path/$_&quot;</span><span class="op">,</span> <span class="wo">grep</span> <span class="mt">/\.pm$/</span><span class="op">,</span> @tfiles;
+    }
+ 
+    <span class="wo">foreach</span> (@files) {
+        <span class="kw">return</span> <span class="co">undef</span>
+            <span class="wo">unless</span> $self<span class="op">-&gt;</span><span class="wo">open</span>(<span class="mg">$_</span>);
+    }
+    <span class="kw">return</span> $self;
+}
+ 
+<a name='Pod::Classdoc::_processClassdocs'></a><span class="kw">sub</span> <span class="wo">_processClassdocs</span> {
+    <span class="kw">my</span> ($currsub<span class="op">,</span> $currpod<span class="op">,</span> $podloc<span class="op">,</span> $subloc<span class="op">,</span> $file<span class="op">,</span> $packages<span class="op">,</span> $currpkg) <span class="op">=</span> <span class="mg">@_</span>;
+<span class="ct">#</span>
+<span class="ct">#   collect all classdocs first, there may be a list of @xs before a real sub
+#</span>
+    <span class="kw">my</span> @classdocs <span class="op">=</span> $currpod <span class="op">?</span> 
+        ($currpod<span class="op">=~</span><span class="mt">/\n=begin\s+classdoc[ \r\t]*\n(.*?)\n=end\s+classdoc[ \r\t]*\n/gs</span>) <span class="op">:</span>
+        ();
+    <span class="wo">if</span> ($currsub) {
+<span class="ct">#</span>
+<span class="ct">#   if a real sub, grab the last one...but make sure it isn't for @xs
+#</span>
+        $currpod <span class="op">=</span> <span class="wo">pop</span> @classdocs;
+        <span class="wo">if</span> ((<span class="op">!</span>$currpod) <span class="op">||</span> ($currpod<span class="op">=~</span><span class="mt">/\n\s*\@xs\s+/</span>)) {
+            <span class="wo">push</span> @classdocs<span class="op">,</span> $currpod <span class="wo">if</span> $currpod;
+            <span class="wo">_processSub</span>($currsub<span class="op">,</span> <span class="co">undef</span><span class="op">,</span> $subloc<span class="op">,</span> $file<span class="op">,</span> $packages<span class="op">,</span> $currpkg);
+        }
+        <span class="wo">else</span> {
+            <span class="wo">_processSub</span>($currsub<span class="op">,</span> $currpod<span class="op">,</span> $subloc<span class="op">,</span> $file<span class="op">,</span> $packages<span class="op">,</span> $currpkg);
+        }
+    }
+    <span class="kw">my</span> $nosubs <span class="op">=</span> <span class="nm">0</span>;
+    <span class="wo">foreach</span> (@classdocs) {
+<span class="ct">#</span>
+<span class="ct">#   flag unexpected classdocs
+#</span>
+        <span class="wo">if</span> (<span class="su">s/\n\s*\@xs\s+([\w\:]+)[ \t\r]*\n/\n/s</span>) {
+            <span class="wo">_processSub</span>(<span class="mg">$1</span><span class="op">,</span> <span class="mg">$_</span><span class="op">,</span> $podloc<span class="op">,</span> $file<span class="op">,</span> $packages<span class="op">,</span> $currpkg);
+        }
+        <span class="wo">else</span> {
+            $nosubs<span class="op">++</span>;
+        }
+    }
+    <span class="kw">return</span> $nosubs;
+}
+ 
+<a name='Pod::Classdoc::_processSub'></a><span class="kw">sub</span> <span class="wo">_processSub</span> {
+    <span class="kw">my</span> ($currsub<span class="op">,</span> $currpod<span class="op">,</span> $subloc<span class="op">,</span> $file<span class="op">,</span> $packages<span class="op">,</span> $currpkg) <span class="op">=</span> <span class="mg">@_</span>;
+<span class="ct">#</span>
+<span class="ct">#   need to check for fully qualified sub name
+#</span>
+    <span class="kw">my</span> @parts <span class="op">=</span> <span class="wo">split</span> <span class="mt">/\:\:/</span><span class="op">,</span> $currsub;
+    <span class="wo">if</span> (@parts <span class="op">&gt;</span> <span class="nm">1</span>) {
+        $currsub <span class="op">=</span> <span class="wo">pop</span> @parts;
+        $currpkg <span class="op">=</span> <span class="wo">join</span>(<span class="sg">'::'</span><span class="op">,</span> @parts);
+    }
+    $packages<span class="op">-&gt;</span>{$currpkg} <span class="op">=</span> {
+        <span class="wo">File</span> <span class="op">=&gt;</span> <span class="sg">''</span><span class="op">,</span>
+        <span class="wo">Line</span> <span class="op">=&gt;</span> <span class="nm">0</span><span class="op">,</span>
+        <span class="wo">Description</span> <span class="op">=&gt;</span> <span class="co">undef</span><span class="op">,</span>
+        <span class="wo">Methods</span> <span class="op">=&gt;</span> {}
+        }
+        <span class="wo">unless</span> <span class="wo">exists</span> $packages<span class="op">-&gt;</span>{$currpkg};
+ 
+    <span class="wo">if</span> (<span class="wo">exists</span> $packages<span class="op">-&gt;</span>{$currpkg}{<span class="wo">Methods</span>}{$currsub}) {
+        $packages<span class="op">-&gt;</span>{$currpkg}{<span class="wo">Methods</span>}{$currsub}{<span class="wo">File</span>} <span class="op">=</span> $file<span class="op">,</span> 
+        $packages<span class="op">-&gt;</span>{$currpkg}{<span class="wo">Methods</span>}{$currsub}{<span class="wo">Line</span>} <span class="op">=</span> $subloc<span class="op">,</span> 
+        $packages<span class="op">-&gt;</span>{$currpkg}{<span class="wo">Methods</span>}{$currsub}{<span class="wo">Description</span>} <span class="op">=</span> $currpod
+            <span class="wo">unless</span> $packages<span class="op">-&gt;</span>{$currpkg}{<span class="wo">Methods</span>}{$currsub}{<span class="wo">File</span>};
+    }
+    <span class="wo">else</span> {
+        $packages<span class="op">-&gt;</span>{$currpkg}{<span class="wo">Methods</span>}{$currsub} <span class="op">=</span> {
+            <span class="wo">File</span> <span class="op">=&gt;</span> $file<span class="op">,</span> 
+            <span class="wo">Line</span> <span class="op">=&gt;</span> $subloc<span class="op">,</span> 
+            <span class="wo">Description</span> <span class="op">=&gt;</span> $currpod 
+            };
+    }
+}
+ 
+<a name='Pod::Classdoc::_wanted'></a><span class="kw">sub</span> <span class="wo">_wanted</span> {
+    <span class="kw">my</span> ($self<span class="op">,</span> $token<span class="op">,</span> $parent) <span class="op">=</span> <span class="mg">@_</span>;
+    
+    <span class="wo">print</span> <span class="db">&quot;*** Got a &quot;</span><span class="op">,</span> <span class="wo">ref</span> $token<span class="op">,</span> <span class="db">&quot;\n&quot;</span> 
+        <span class="wo">if</span> ($self<span class="op">-&gt;</span>{<span class="wo">_verbose</span>} <span class="op">&gt;</span> <span class="nm">2</span>) <span class="op">&amp;&amp;</span> ($token<span class="op">-&gt;</span><span class="wo">significant</span> <span class="op">||</span> $token<span class="op">-&gt;</span><span class="wo">isa</span>(<span class="sg">'PPI::Token::Pod'</span>));
+ 
+    <span class="kw">return</span> <span class="nm">0</span> <span class="wo">if</span> ($self<span class="op">-&gt;</span>{<span class="wo">_state</span>} <span class="op">==</span> <span class="nm">0</span>) <span class="op">&amp;&amp;</span> (<span class="op">!</span>$token<span class="op">-&gt;</span><span class="wo">isa</span>(<span class="sg">'PPI::Token::Pod'</span>));
+ 
+    <span class="kw">my</span> $content;
+    <span class="wo">if</span> ($self<span class="op">-&gt;</span>{<span class="wo">_state</span>} <span class="op">==</span> <span class="nm">0</span>) {
+        $content <span class="op">=</span> $token<span class="op">-&gt;</span><span class="wo">content</span>;
+        <span class="kw">return</span> <span class="nm">0</span> <span class="wo">unless</span> $content<span class="op">=~</span><span class="mt">/\n=begin\s+classdoc[ \r\t]*\n.*?\n=end\s+classdoc[ \r\t]*\n/s</span>;
+        <span class="wo">print</span> <span class="db">&quot;** Process a new POD\n&quot;</span>
+            <span class="wo">if</span> ($self<span class="op">-&gt;</span>{<span class="wo">_verbose</span>} <span class="op">&gt;</span> <span class="nm">1</span>);
+        $self<span class="op">-&gt;</span>{<span class="wo">_currpod</span>} <span class="op">=</span> $content;
+        $self<span class="op">-&gt;</span>{<span class="wo">_currloc</span>} <span class="op">=</span> <span class="cs">$</span>{$token<span class="op">-&gt;</span><span class="wo">location</span>}[<span class="nm">0</span>];
+        $self<span class="op">-&gt;</span>{<span class="wo">_state</span>} <span class="op">=</span> <span class="nm">1</span>;
+    }
+    <span class="wo">elsif</span> ($self<span class="op">-&gt;</span>{<span class="wo">_state</span>} <span class="op">==</span> <span class="nm">1</span>) {
+<span class="ct">#</span>
+<span class="ct">#   we'll support dangling classdocs and nested POD (have to, to support @xs!)
+#</span>
+        <span class="wo">if</span> ($token<span class="op">-&gt;</span><span class="wo">isa</span>(<span class="sg">'PPI::Token::Pod'</span>)) {
+            $content <span class="op">=</span> $token<span class="op">-&gt;</span><span class="wo">content</span>;
+            <span class="kw">return</span> <span class="nm">0</span> <span class="wo">unless</span> $content<span class="op">=~</span><span class="mt">/\n=begin\s+classdoc[ \r\t]*\n.*?\n=end\s+classdoc[ \r\t]*\n/s</span>;
+<span class="ct">#</span>
+<span class="ct">#   process prior classdoc section
+#</span>
+            <span class="wo">print</span> <span class="db">&quot;** Process a new dangling POD\n&quot;</span>
+                <span class="wo">if</span> ($self<span class="op">-&gt;</span>{<span class="wo">_verbose</span>} <span class="op">&gt;</span> <span class="nm">1</span>);
+            $self<span class="op">-&gt;</span>{<span class="wo">_nosubs</span>} <span class="op">+=</span> <span class="wo">_processClassdocs</span>(<span class="co">undef</span><span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_currpod</span>}<span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_currloc</span>}<span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_currloc</span>}<span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_currfile</span>}<span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}<span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>});
+            $self<span class="op">-&gt;</span>{<span class="wo">_currpod</span>} <span class="op">=</span> <span class="mg">$1</span>;
+            $self<span class="op">-&gt;</span>{<span class="wo">_currloc</span>} <span class="op">=</span> <span class="cs">$</span>{$token<span class="op">-&gt;</span><span class="wo">location</span>}[<span class="nm">0</span>];
+        }
+        <span class="wo">elsif</span> ($token<span class="op">-&gt;</span><span class="wo">isa</span>(<span class="sg">'PPI::Statement::Package'</span>)) {
+            <span class="wo">print</span> <span class="db">&quot;** Process a Package\n&quot;</span>
+                <span class="wo">if</span> ($self<span class="op">-&gt;</span>{<span class="wo">_verbose</span>} <span class="op">&gt;</span> <span class="nm">1</span>);
+<span id='src417' class='foldfill'>Folded lines 417 to 420</span>
+            $self<span class="op">-&gt;</span><span class="wo">_processPackage</span>(<span class="cs">$</span>{$token<span class="op">-&gt;</span><span class="wo">location</span>}[<span class="nm">0</span>])
+                <span class="wo">if</span> $self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>};
+            $self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>} <span class="op">=</span> $token<span class="op">-&gt;</span><span class="wo">namespace</span>;
+ 
+            <span class="wo">if</span> (<span class="wo">exists</span> $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}{$self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>}}) {
+                $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}{$self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>}}{<span class="wo">File</span>} <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_currfile</span>}<span class="op">,</span>
+                $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}{$self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>}}{<span class="wo">Line</span>} <span class="op">=</span> <span class="cs">$</span>{$token<span class="op">-&gt;</span><span class="wo">location</span>}[<span class="nm">0</span>]<span class="op">,</span>
+                $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}{$self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>}}{<span class="wo">Description</span>} <span class="op">=</span> 
+                    ($self<span class="op">-&gt;</span>{<span class="wo">_currpod</span>} <span class="op">&amp;&amp;</span> $self<span class="op">-&gt;</span>{<span class="wo">_currpod</span>}<span class="op">=~</span><span class="mt">/\n=begin\s+classdoc[ \r\t]*\n(.*?)\n=end\s+classdoc[ \r\t]*\n/gs</span>) <span class="op">?</span> <span class="mg">$1</span> <span class="op">:</span> <span class="co">undef</span>
+                    <span class="wo">unless</span> $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}{$self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>}}{<span class="wo">File</span>};
+            }
+            <span class="wo">else</span> {
+                $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}{$self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>}} <span class="op">=</span> {
+                    <span class="wo">File</span> <span class="op">=&gt;</span> $self<span class="op">-&gt;</span>{<span class="wo">_currfile</span>}<span class="op">,</span>
+                    <span class="wo">Line</span> <span class="op">=&gt;</span> <span class="cs">$</span>{$token<span class="op">-&gt;</span><span class="wo">location</span>}[<span class="nm">0</span>]<span class="op">,</span>
+                    <span class="wo">Description</span> <span class="op">=&gt;</span> ($self<span class="op">-&gt;</span>{<span class="wo">_currpod</span>} <span class="op">&amp;&amp;</span> $self<span class="op">-&gt;</span>{<span class="wo">_currpod</span>}<span class="op">=~</span><span class="mt">/\n=begin\s+classdoc[ \r\t]*\n(.*?)\n=end\s+classdoc[ \r\t]*\n/gs</span>) <span class="op">?</span> <span class="mg">$1</span> <span class="op">:</span> <span class="co">undef</span><span class="op">,</span>
+                    <span class="wo">Methods</span> <span class="op">=&gt;</span> {}
+                    };
+            }
+            $self<span class="op">-&gt;</span>{<span class="wo">_currpod</span>} <span class="op">=</span> <span class="sg">''</span>;
+            $self<span class="op">-&gt;</span>{<span class="wo">_currloc</span>} <span class="op">=</span> <span class="co">undef</span>;
+            $self<span class="op">-&gt;</span>{<span class="wo">_state</span>} <span class="op">=</span> <span class="nm">0</span>;
+        }
+        <span class="wo">elsif</span> ($token<span class="op">-&gt;</span><span class="wo">isa</span>(<span class="sg">'PPI::Statement::Sub'</span>)) {
+            <span class="wo">die</span> <span class="db">&quot;Unexpected sub $content at line &quot;</span> <span class="op">.</span> <span class="cs">$</span>{$token<span class="op">-&gt;</span><span class="wo">location</span>}[<span class="nm">0</span>]
+                <span class="wo">unless</span> $self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>};
+ 
+            <span class="wo">print</span> <span class="db">&quot;** Process a Sub\n&quot;</span>
+                <span class="wo">if</span> ($self<span class="op">-&gt;</span>{<span class="wo">_verbose</span>} <span class="op">&gt;</span> <span class="nm">1</span>);
+            $self<span class="op">-&gt;</span>{<span class="wo">_nosubs</span>} <span class="op">+=</span> <span class="wo">_processClassdocs</span>($token<span class="op">-&gt;</span><span class="wo">name</span><span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_currpod</span>}<span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_currloc</span>}<span class="op">,</span> <span class="cs">$</span>{$token<span class="op">-&gt;</span><span class="wo">location</span>}[<span class="nm">0</span>]<span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_currfile</span>}<span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}<span class="op">,</span> $self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>});
+            $self<span class="op">-&gt;</span>{<span class="wo">_currpod</span>} <span class="op">=</span> <span class="sg">''</span>;
+            $self<span class="op">-&gt;</span>{<span class="wo">_currloc</span>} <span class="op">=</span> <span class="co">undef</span>;
+            $self<span class="op">-&gt;</span>{<span class="wo">_state</span>} <span class="op">=</span> <span class="nm">0</span>;
+        }
+    }
+    <span class="kw">return</span> <span class="nm">1</span>;
+}
+ 
+<a name='Pod::Classdoc::_processPackage'></a><span class="kw">sub</span> <span class="wo">_processPackage</span> {
+    <span class="kw">my</span> ($self<span class="op">,</span> $end) <span class="op">=</span> <span class="mg">@_</span>;
+<span id='src461' class='foldfill'>Folded lines 461 to 464</span>
+    <span class="kw">my</span> $pkg <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}{$self<span class="op">-&gt;</span>{<span class="wo">_currpkg</span>}};
+    <span class="kw">my</span> $txt <span class="op">=</span> <span class="db">&quot;\n&quot;</span> <span class="op">.</span> 
+        (<span class="co">defined</span> $end <span class="op">?</span> 
+            <span class="wo">substr</span>($self<span class="op">-&gt;</span>{<span class="wo">_currtext</span>}<span class="op">,</span> $pkg<span class="op">-&gt;</span>{<span class="wo">Line</span>}<span class="op">,</span> $end <span class="op">-</span> $pkg<span class="op">-&gt;</span>{<span class="wo">Line</span>}) <span class="op">:</span> 
+            <span class="wo">substr</span>($self<span class="op">-&gt;</span>{<span class="wo">_currtext</span>}<span class="op">,</span> $pkg<span class="op">-&gt;</span>{<span class="wo">Line</span>}));
+ 
+    <span class="kw">my</span> @parents <span class="op">=</span> ($txt<span class="op">=~</span><span class="mt">/\n\s*use\s+base\s+([^;]+);/gs</span>);
+    <span class="wo">foreach</span> <span class="wo">my</span> $base (@parents) {
+        <span class="kw">my</span> @bases <span class="op">=</span> ();
+        <span class="wo">eval</span> <span class="db">&quot;\@bases = $base;&quot;</span>;
+        <span class="wo">map</span> $pkg<span class="op">-&gt;</span>{<span class="wo">InheritsFrom</span>}{<span class="mg">$_</span>} <span class="op">=</span> <span class="nm">1</span><span class="op">,</span> @bases;
+    }
+    @parents <span class="op">=</span> ($txt<span class="op">=~</span><span class="mt">/\n\s*(?:(?:my|our)\s+)?\@ISA\s+=\s+([^;]+);/gs</span>);
+    <span class="wo">foreach</span> <span class="wo">my</span> $base (@parents) {
+        <span class="kw">my</span> @bases <span class="op">=</span> ();
+        <span class="wo">eval</span> <span class="db">&quot;\@bases = $base;&quot;</span>;
+        <span class="wo">map</span> $pkg<span class="op">-&gt;</span>{<span class="wo">InheritsFrom</span>}{<span class="mg">$_</span>} <span class="op">=</span> <span class="nm">1</span><span class="op">,</span> @bases;
+    }
+}
+<span id='src484' class='foldfill'>Folded lines 484 to 500</span>
+<a name='Pod::Classdoc::path'></a><span class="kw">sub</span> <span class="wo">path</span> {
+    <span class="kw">my</span> ($self<span class="op">,</span> $path) <span class="op">=</span> <span class="mg">@_</span>;
+    
+    <span class="kw">return</span> $self<span class="op">-&gt;</span>{<span class="wo">_path</span>} <span class="wo">unless</span> $path;
+    $path<span class="op">=~</span><span class="su">s/\/+$//</span> <span class="wo">unless</span> ($path <span class="op">eq</span> <span class="sg">'/'</span>);
+    <span class="kw">my</span> $old <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_path</span>};
+    $self<span class="op">-&gt;</span>{<span class="wo">_path</span>} <span class="op">=</span> $path;
+    <span class="kw">return</span> $old;
+}
+<span id='src510' class='foldfill'>Folded lines 510 to 536</span>
+<a name='Pod::Classdoc::render'></a><span class="kw">sub</span> <span class="wo">render</span> {
+    <span class="kw">my</span> ($self<span class="op">,</span> $use_private) <span class="op">=</span> <span class="mg">@_</span>;
+ 
+    <span class="kw">my</span> $descr;
+    <span class="kw">my</span> $version <span class="op">=</span> <span class="sg">''</span>;
+    <span class="kw">my</span> $accum <span class="op">=</span> <span class="sg">''</span>;
+    <span class="kw">my</span> $indoc;
+    <span class="kw">my</span> $inpod;
+    <span class="kw">my</span> $classes <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>};
+    <span class="kw">my</span> ($class<span class="op">,</span> $content);
+    <span class="kw">my</span> $path <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_path</span>};
+<span class="ct">#</span>
+<span class="ct">#   now create crossref of inherits/subclasses
+#</span>
+    <span class="wo">foreach</span> $class (<span class="wo">keys</span> <span class="cs">%</span>$classes) {
+        <span class="wo">foreach</span> (<span class="wo">keys</span> <span class="cs">%</span>$classes) {
+            $classes<span class="op">-&gt;</span>{$class}{<span class="wo">SubclassedBy</span>}{<span class="mg">$_</span>} <span class="op">=</span> <span class="nm">1</span>
+                <span class="wo">if</span> <span class="wo">exists</span> $classes<span class="op">-&gt;</span>{<span class="mg">$_</span>}{<span class="wo">InheritsFrom</span>}{$class};
+        }
+    }
+<span class="ct">#</span>
+<span class="ct">#   parse each description for tags
+#</span>
+    <span class="kw">my</span> ($method<span class="op">,</span> $info);
+    <span class="wo">foreach</span> $class (<span class="wo">keys</span> <span class="cs">%</span>$classes) {
+        <span class="wo">if</span> ($classes<span class="op">-&gt;</span>{$class}{<span class="wo">Description</span>}) {
+            $self<span class="op">-&gt;</span><span class="wo">_parseTags</span>($class<span class="op">,</span> $classes<span class="op">-&gt;</span>{$class}<span class="op">,</span> <span class="cs">\</span>%validpkgtags);
+        }
+        <span class="wo">elsif</span> ($self<span class="op">-&gt;</span>{<span class="wo">_verbose</span>} <span class="op">&gt;</span> <span class="nm">1</span>) {
+            <span class="wo">warn</span> <span class="db">&quot;No classdoc for $class\n&quot;</span>;
+        }
+ 
+        <span class="wo">while</span> (($method<span class="op">,</span> $info) <span class="op">=</span> <span class="wo">each</span> <span class="cs">%</span>{$classes<span class="op">-&gt;</span>{$class}{<span class="wo">Methods</span>}}) {
+            <span class="wo">if</span> ($info<span class="op">-&gt;</span>{<span class="wo">Description</span>}) {
+                $self<span class="op">-&gt;</span><span class="wo">_parseTags</span>($class<span class="op">,</span> $info<span class="op">,</span> <span class="cs">\</span>%validsubtags);
+            }
+            <span class="wo">elsif</span> ($self<span class="op">-&gt;</span>{<span class="wo">_verbose</span>} <span class="op">&gt;</span> <span class="nm">1</span>) {
+                <span class="wo">warn</span> <span class="db">&quot;No classdoc for $class\::$method\n&quot;</span>;
+            }
+        }
+    }
+    <span class="kw">my</span> %classlist;
+    $classlist{<span class="mg">$_</span>} <span class="op">=</span> $self<span class="op">-&gt;</span><span class="wo">_generateDoc</span>(<span class="mg">$_</span><span class="op">,</span> $path<span class="op">,</span> $use_private)
+        <span class="wo">foreach</span> (<span class="wo">keys</span> <span class="cs">%</span>$classes);
+ 
+    <span class="kw">return</span> <span class="cs">\</span>%classlist;
+}
+<span id='src584' class='foldfill'>Folded lines 584 to 596</span>
+<a name='Pod::Classdoc::clear'></a><span class="kw">sub</span> <span class="wo">clear</span> {
+    <span class="kw">my</span> $self <span class="op">=</span> <span class="co">shift</span>;
+ 
+    $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>} <span class="op">=</span> {};
+    <span class="kw">return</span> $self;
+}
+<span id='src603' class='foldfill'>Folded lines 603 to 621</span>
+<a name='Pod::Classdoc::writeFrameContainer'></a><span class="kw">sub</span> <span class="wo">writeFrameContainer</span> {
+    <span class="kw">my</span> ($self<span class="op">,</span> $container<span class="op">,</span> $home) <span class="op">=</span> <span class="mg">@_</span>;
+    <span class="kw">my</span> $path <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_path</span>};
+    <span class="mg">$@</span> <span class="op">=</span> <span class="db">&quot;Can't open $path/$container: $!&quot;</span><span class="op">,</span>
+    <span class="kw">return</span> <span class="co">undef</span>
+        <span class="wo">unless</span> <span class="wo">CORE::open</span>(<span class="wo">OUTF</span><span class="op">,</span> <span class="db">&quot;&gt;$path/$container&quot;</span>);
+ 
+    <span class="wo">print</span> <span class="wo">OUTF</span> $self<span class="op">-&gt;</span><span class="wo">getFrameContainer</span>($home);
+    <span class="wo">close</span> <span class="wo">OUTF</span>;
+    <span class="kw">return</span> $self;
+}
+<span id='src633' class='foldfill'>Folded lines 633 to 648</span>
+<a name='Pod::Classdoc::getFrameContainer'></a><span class="kw">sub</span> <span class="wo">getFrameContainer</span> {
+    <span class="kw">my</span> ($self<span class="op">,</span> $home) <span class="op">=</span> <span class="mg">@_</span>;
+ 
+    <span class="kw">my</span> $path <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_path</span>};
+    <span class="kw">my</span> $title <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_title</span>};
+ 
+    <span class="kw">return</span> $home <span class="op">?</span>
+<span class="db">&quot;&lt;html&gt;&lt;head&gt;&lt;title&gt;$title&lt;/title&gt;&lt;/head&gt;
+&lt;frameset cols='15%,85%'&gt;
+&lt;frame name='navbar' src='toc.html' scrolling=auto frameborder=0&gt;
+&lt;frame name='mainframe' src='$home'&gt;
+&lt;/frameset&gt;
+&lt;/html&gt;
+&quot;</span> <span class="op">:</span>
+<span class="db">&quot;&lt;html&gt;&lt;head&gt;&lt;title&gt;$title&lt;/title&gt;&lt;/head&gt;
+&lt;frameset cols='15%,85%'&gt;
+&lt;frame name='navbar' src='toc.html' scrolling=auto frameborder=0&gt;
+&lt;frame name='mainframe'&gt;
+&lt;/frameset&gt;
+&lt;/html&gt;
+&quot;</span>;
+ 
+}
+<span id='src672' class='foldfill'>Folded lines 672 to 688</span>
+<a name='Pod::Classdoc::writeTOC'></a><span class="kw">sub</span> <span class="wo">writeTOC</span> {
+    <span class="kw">my</span> $self <span class="op">=</span> <span class="co">shift</span>;
+    <span class="kw">my</span> $path <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_path</span>};
+    <span class="mg">$@</span> <span class="op">=</span> <span class="db">&quot;Can't open $path/toc.html: $!&quot;</span><span class="op">,</span>
+    <span class="kw">return</span> <span class="co">undef</span>
+        <span class="wo">unless</span> <span class="wo">CORE::open</span>(<span class="wo">OUTF</span><span class="op">,</span> <span class="db">&quot;&gt;$path/toc.html&quot;</span>);
+ 
+    <span class="wo">print</span> <span class="wo">OUTF</span> $self<span class="op">-&gt;</span><span class="wo">getTOC</span>(<span class="mg">@_</span>);
+    <span class="wo">close</span> <span class="wo">OUTF</span>;
+    <span class="kw">return</span> $self;
+}
+<span id='src700' class='foldfill'>Folded lines 700 to 716</span>
+<a name='Pod::Classdoc::getTOC'></a><span class="kw">sub</span> <span class="wo">getTOC</span> {
+    <span class="kw">my</span> $self <span class="op">=</span> <span class="co">shift</span>;
+ 
+    <span class="kw">my</span> @order <span class="op">=</span> <span class="mg">@_</span>;
+    <span class="kw">my</span> $path <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_path</span>};
+    <span class="kw">my</span> $title <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_title</span>};
+    <span class="kw">my</span> $base;
+    <span class="kw">my</span> $doc <span class="op">=</span>
+<span class="db">&quot;&lt;html&gt;
+&lt;body&gt;
+&lt;small&gt;
+&lt;!-- INDEX BEGIN --&gt;
+&lt;ul&gt;
+&quot;</span>;
+    <span class="kw">my</span> %ordered <span class="op">=</span> ();
+    $ordered{<span class="mg">$_</span>} <span class="op">=</span> <span class="nm">1</span> <span class="wo">foreach</span> (@order);
+    <span class="wo">foreach</span> (<span class="wo">sort</span> <span class="wo">keys</span> <span class="cs">%</span>{$self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}}) {
+        <span class="wo">push</span> @order<span class="op">,</span> <span class="mg">$_</span> <span class="wo">unless</span> <span class="wo">exists</span> $ordered{<span class="mg">$_</span>};
+    }
+        
+    <span class="wo">foreach</span> <span class="wo">my</span> $class (@order) {
+<span class="ct">#</span>
+<span class="ct">#   due to input @order, we might get classes that don't exist
+#</span>
+        <span class="wo">next</span> <span class="wo">unless</span> <span class="wo">exists</span> $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}{$class};
+ 
+        $base <span class="op">=</span> $class;
+        $base <span class="op">=~</span><span class="su">s/::/\//g</span>;
+        $doc <span class="op">.=</span>  <span class="db">&quot;&lt;li&gt;&lt;a href='$base.html' target='mainframe'&gt;$class&lt;/a&gt;
+        &lt;ul&gt;
+        &lt;li&gt;&lt;a href='$base.html#summary' target='mainframe'&gt;Summary&lt;/a&gt;&lt;/li&gt;
+        &quot;</span>;
+        <span class="kw">my</span> $info <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}{$class};
+        <span class="kw">my</span> %t;
+        <span class="kw">my</span> ($k<span class="op">,</span> $v);
+        <span class="wo">if</span> (<span class="wo">exists</span> $info<span class="op">-&gt;</span>{<span class="wo">exports</span>} <span class="op">&amp;&amp;</span> <span class="cs">@</span>{$info<span class="op">-&gt;</span>{<span class="wo">exports</span>}}) {
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;li&gt;&lt;a href='$base.html#exports' target='mainframe'&gt;Exports&lt;/a&gt;
+            &lt;ul&gt;
+            &quot;</span>;
+            %t <span class="op">=</span> <span class="cs">@</span>{$info<span class="op">-&gt;</span>{<span class="wo">exports</span>}};
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;li&gt;&lt;a href='$base.html#_e_$_' target='mainframe'&gt;$_&lt;/a&gt;&lt;/li&gt;\n&quot;</span>
+                <span class="wo">foreach</span> (<span class="wo">sort</span> <span class="wo">keys</span> %t);
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;/ul&gt;\n&lt;/li&gt;\n&quot;</span>;
+        }
+        <span class="wo">if</span> (<span class="wo">exists</span> $info<span class="op">-&gt;</span>{<span class="wo">imports</span>} <span class="op">&amp;&amp;</span> <span class="cs">@</span>{$info<span class="op">-&gt;</span>{<span class="wo">imports</span>}}) {
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;li&gt;&lt;a href='$base.html#imports' target='mainframe'&gt;Imports&lt;/a&gt;
+            &lt;ul&gt;
+            &quot;</span>;
+            %t <span class="op">=</span> <span class="cs">@</span>{$info<span class="op">-&gt;</span>{<span class="wo">imports</span>}};
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;li&gt;&lt;a href='$base.html#_i_$_' target='mainframe'&gt;$_&lt;/a&gt;&lt;/li&gt;\n&quot;</span>
+                <span class="wo">foreach</span> (<span class="wo">sort</span> <span class="wo">keys</span> %t);
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;/ul&gt;\n&lt;/li&gt;\n&quot;</span>;
+        }
+        <span class="wo">if</span> (<span class="wo">exists</span> $info<span class="op">-&gt;</span>{<span class="wo">member</span>} <span class="op">&amp;&amp;</span> <span class="cs">@</span>{$info<span class="op">-&gt;</span>{<span class="wo">member</span>}}) {
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;li&gt;&lt;a href='$base.html#members' target='mainframe'&gt;Public Members&lt;/a&gt;
+            &lt;ul&gt;
+            &quot;</span>;
+            %t <span class="op">=</span> <span class="cs">@</span>{$info<span class="op">-&gt;</span>{<span class="wo">member</span>}};
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;li&gt;&lt;a href='$base.html#_m_$_' target='mainframe'&gt;$_&lt;/a&gt;&lt;/li&gt;\n&quot;</span>
+                <span class="wo">foreach</span> (<span class="wo">sort</span> <span class="wo">keys</span> %t);
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;/ul&gt;\n&lt;/li&gt;\n&quot;</span>;
+        }
+        <span class="wo">if</span> (<span class="wo">exists</span> $info<span class="op">-&gt;</span>{<span class="wo">constructors</span>} <span class="op">&amp;&amp;</span> <span class="cs">%</span>{$info<span class="op">-&gt;</span>{<span class="wo">constructors</span>}}) {
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;li&gt;&lt;a href='$base.html#constructor_detail' target='mainframe'&gt;Constructors&lt;/a&gt;
+            &lt;ul&gt;
+            &quot;</span>;
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;li&gt;&lt;a href='$base.html#_f_$_' target='mainframe'&gt;$_&lt;/a&gt;&lt;/li&gt;\n&quot;</span>
+                <span class="wo">foreach</span> (<span class="wo">sort</span> <span class="wo">keys</span> <span class="cs">%</span>{$info<span class="op">-&gt;</span>{<span class="wo">constructors</span>}});
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;/ul&gt;\n&lt;/li&gt;\n&quot;</span>;
+        }
+        <span class="wo">if</span> (<span class="wo">exists</span> $info<span class="op">-&gt;</span>{<span class="wo">Methods</span>} <span class="op">&amp;&amp;</span> <span class="cs">%</span>{$info<span class="op">-&gt;</span>{<span class="wo">Methods</span>}}) {
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;li&gt;&lt;a href='$base.html#method_detail' target='mainframe'&gt;Methods&lt;/a&gt;
+            &lt;ul&gt;
+            &quot;</span>;
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;li&gt;&lt;a href='$base.html#_f_$_' target='mainframe'&gt;$_&lt;/a&gt;&lt;/li&gt;\n&quot;</span>
+                <span class="wo">foreach</span> (<span class="wo">sort</span> <span class="wo">keys</span> <span class="cs">%</span>{$info<span class="op">-&gt;</span>{<span class="wo">Methods</span>}});
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;/ul&gt;\n&lt;/li&gt;\n&quot;</span>;
+        }
+        $doc <span class="op">.=</span>  <span class="db">&quot;&lt;/ul&gt;\n&lt;/li&gt;\n&quot;</span>;
+    }
+ 
+    $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;/ul&gt;
+&lt;!-- INDEX END --&gt;
+&lt;/small&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+&quot;</span>;
+ 
+    <span class="kw">return</span> $doc;
+}
+<span id='src808' class='foldfill'>Folded lines 808 to 832</span>
+<a name='Pod::Classdoc::writeClassdocs'></a><span class="kw">sub</span> <span class="wo">writeClassdocs</span> {
+    <span class="kw">my</span> ($self<span class="op">,</span> $use_private) <span class="op">=</span> <span class="mg">@_</span>;
+    
+    <span class="kw">my</span> $classdocs <span class="op">=</span> $self<span class="op">-&gt;</span><span class="wo">render</span>($use_private)
+        <span class="op">or</span> <span class="kw">return</span> <span class="co">undef</span>;
+ 
+    <span class="kw">my</span> $path <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_path</span>};
+    <span class="wo">foreach</span> (<span class="wo">sort</span> <span class="wo">keys</span> <span class="cs">%</span>$classdocs) {
+        <span class="kw">my</span> $fname <span class="op">=</span> $self<span class="op">-&gt;</span><span class="wo">makeClassPath</span>(<span class="mg">$_</span>);
+ 
+        <span class="mg">$@</span> <span class="op">=</span> <span class="db">&quot;Cannot open $fname: $!&quot;</span><span class="op">,</span>
+        <span class="kw">return</span> <span class="co">undef</span>
+            <span class="wo">unless</span> <span class="wo">CORE::open</span>(<span class="wo">OUTF</span><span class="op">,</span> <span class="db">&quot;&gt;$fname&quot;</span>);
+ 
+        <span class="wo">print</span> <span class="wo">OUTF</span> $classdocs<span class="op">-&gt;</span>{<span class="mg">$_</span>}[<span class="nm">0</span>];
+        <span class="wo">close</span>(<span class="wo">OUTF</span>);
+        $classdocs<span class="op">-&gt;</span>{<span class="mg">$_</span>}[<span class="nm">0</span>] <span class="op">=</span> $fname;
+    }
+    <span class="kw">return</span> $classdocs;
+}
+<span id='src853' class='foldfill'>Folded lines 853 to 870</span>
+<a name='Pod::Classdoc::makeClassPath'></a><span class="kw">sub</span> <span class="wo">makeClassPath</span> {
+    <span class="kw">my</span> ($self<span class="op">,</span> $class) <span class="op">=</span> <span class="mg">@_</span>;
+    <span class="kw">my</span> $path <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_path</span>};
+    $class<span class="op">=~</span><span class="su">s!::!/!g</span>;
+    $class <span class="op">=</span> <span class="wo">join</span>(<span class="sg">'/'</span><span class="op">,</span> $path<span class="op">,</span> $class);
+    <span class="kw">my</span> ($dir) <span class="op">=</span> ($class<span class="op">=~</span><span class="mt">/^(.*)\/[^\/]+$/</span>);
+    <span class="wo">mkpath</span> $dir 
+        <span class="wo">unless</span> <span class="op">-d</span> $dir;
+    <span class="kw">return</span> <span class="db">&quot;$class.html&quot;</span>;
+}
+ 
+<a name='Pod::Classdoc::_generateDoc'></a><span class="kw">sub</span> <span class="wo">_generateDoc</span> {
+    <span class="kw">my</span> ($self<span class="op">,</span> $class<span class="op">,</span> $path<span class="op">,</span> $use_private) <span class="op">=</span> <span class="mg">@_</span>;
+    <span class="kw">my</span> $info <span class="op">=</span> $self<span class="op">-&gt;</span>{<span class="wo">_classes</span>}{$class};
+    <span class="kw">my</span> @parts <span class="op">=</span> <span class="wo">split</span> <span class="mt">/\:\:/</span><span class="op">,</span> $class;
+    <span class="kw">my</span> $fname <span class="op">=</span> <span class="wo">pop</span> @parts;
+    <span class="kw">my</span> $dir <span class="op">=</span> @parts <span class="op">?</span> <span class="wo">join</span>(<span class="sg">'/'</span><span class="op">,</span> @parts) <span class="op">:</span> <span class="sg">''</span>;
+<span class="ct">#</span>
+<span class="ct">#   create nav path prefix
+#</span>
+    <span class="kw">my</span> $pfxcnt <span class="op">=</span> <span class="nm">1</span> <span class="op">+</span> ($dir<span class="op">=~</span><span class="tl">tr'/''</span>);
+    <span class="kw">my</span> $pathpfx <span class="op">=</span> <span class="sg">'../'</span> <span class="op">x</span> $pfxcnt;
+ 
+    <span class="kw">my</span> ($constrsum<span class="op">,</span> $constrdet<span class="op">,</span> $methsum<span class="op">,</span> $methdet) <span class="op">=</span> 
+        (
+        <span class="db">&quot;&lt;a href='#constructor_summary'&gt;CONSTR&lt;/a&gt;&quot;</span><span class="op">,</span>
+        <span class="db">&quot;&lt;a href='#constructor_detail'&gt;CONSTR&lt;/a&gt;&quot;</span><span class="op">,</span>
+        <span class="db">&quot;&lt;a href='#method_summary'&gt;METHOD&lt;/a&gt;&quot;</span><span class="op">,</span>
+        <span class="db">&quot;&lt;a href='#method_detail'&gt;METHOD&lt;/a&gt;&quot;</span>
+        );
+ 
+    <span class="kw">my</span> $doc <span class="op">=</span> <span class="db">&quot;
+&lt;html&gt;
+&lt;head&gt;
+&lt;title&gt;$class&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;table width='100%' border=0 CELLPADDING='0' CELLSPACING='3'&gt;
+&lt;TR&gt;
+&lt;TD VALIGN='top' align=left&gt;&lt;FONT SIZE='-2'&gt;
+ SUMMARY:&amp;nbsp;$constrsum&amp;nbsp;|&amp;nbsp;$methsum
+ &lt;/FONT&gt;&lt;/TD&gt;
+&lt;TD VALIGN='top' align=right&gt;&lt;FONT SIZE='-2'&gt;
+DETAIL:&amp;nbsp;$constrdet&amp;nbsp;|&amp;nbsp;$methdet
+&lt;/FONT&gt;&lt;/TD&gt;
+&lt;/TR&gt;
+&lt;/table&gt;&lt;hr&gt;
+&lt;h2&gt;Class $class&lt;/h2&gt;
+&quot;</span>;
+<span class="ct">#</span>
+<span class="ct">#   process InheritsFrom
+#</span>
+    <span class="kw">my</span> $base;
+    <span class="kw">my</span> @bases <span class="op">=</span> ();
+    <span class="wo">foreach</span> (<span class="wo">keys</span> <span class="cs">%</span>{$info<span class="op">-&gt;</span>{<span class="wo">InheritsFrom</span>}}) {
+        $base <span class="op">=</span> <span class="mg">$_</span>;
+        $base<span class="op">=~</span><span class="su">s/::/\//g</span>;
+<span class="ct">#       $base=~s/^$dir\///; # remove matching headers</span>
+        <span class="wo">push</span> @bases<span class="op">,</span> <span class="db">&quot;&lt;a href='$pathpfx$base.html'&gt;$_&lt;/a&gt;&quot;</span>;
+    }
+ 
+    $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;p&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;b&gt;Inherits from:&lt;/b&gt;
+&lt;dd&gt;&quot;</span> <span class="op">.</span> <span class="wo">join</span>(<span class="db">&quot;&lt;/dd&gt;\n&lt;dd&gt;&quot;</span><span class="op">,</span> @bases) <span class="op">.</span> <span class="db">&quot;&lt;/dd&gt;
+&lt;/dt&gt;
+&lt;/dl&gt;
+&quot;</span>
+        <span class="wo">if</span> <span class="wo">scalar</span> @bases;
+<span class="ct">#</span>
+<span class="ct">#   process SubclassedBy
+#</span>
+    @bases <span class="op">=</span> ();
+    <span class="wo">foreach</span> (<span class="wo">keys</span> <span class="cs">%</span>{$info<span class="op">-&gt;</span>{<span class="wo">SubclassedBy</span>}}) {
+        $base <span class="op">=</span> <span class="mg">$_</span>;
+        $base<span class="op">=~</span><span class="su">s/::/\//g</span>;
+<span class="ct">#       $base=~s/^$dir\///; # remove matching headers</span>
+        <span class="wo">push</span> @bases<span class="op">,</span> <span class="db">&quot;&lt;a href='$pathpfx$base.html'&gt;$_&lt;/a&gt;&quot;</span>;
+    }
+ 
+    $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;p&gt;
+&lt;dl&gt;
+&lt;dt&gt;&lt;b&gt;Known Subclasses:&lt;/b&gt;
+&lt;dd&gt;&quot;</span> <span class="op">.</span> <span class="wo">join</span>(<span class="db">&quot;&lt;/dd&gt;\n&lt;dd&gt;&quot;</span><span class="op">,</span> @bases) <span class="op">.</span> <span class="db">&quot;&lt;/dd&gt;
+&lt;/dt&gt;
+&lt;/dl&gt;
+&quot;</span>
+        <span class="wo">if</span> <span class="wo">scalar</span> @bases;
+<span class="ct">#</span>
+<span class="ct">#   process package tags
+#</span>
+    $doc <span class="op">.=</span>  <span class="sg">'
+&lt;hr&gt;
+'</span>;
+    $doc <span class="op">.=</span>  <span class="db">&quot;&lt;b&gt;Deprecated.&lt;/b&gt;&quot;</span> <span class="op">.</span>
+        (($info<span class="op">-&gt;</span>{<span class="wo">deprecated</span>} <span class="op">ne</span> <span class="sg">'1'</span>) <span class="op">?</span> <span class="db">&quot; &lt;i&gt;$info-&gt;{deprecated}&lt;/i&gt;\n&quot;</span> <span class="op">:</span> <span class="db">&quot;\n&quot;</span>) <span class="op">.</span>
+        <span class="db">&quot;&lt;p&gt;\n&quot;</span>
+        <span class="wo">if</span> $info<span class="op">-&gt;</span>{<span class="wo">deprecated</span>};
+ 
+    $doc <span class="op">.=</span>  <span class="db">&quot;
+$info-&gt;{Description}
+&lt;p&gt;
+&quot;</span>
+        <span class="wo">if</span> $info<span class="op">-&gt;</span>{<span class="wo">Description</span>};
+ 
+    $doc <span class="op">.=</span>  <span class="sg">'
+&lt;dl&gt;
+'</span>;
+    $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;dt&gt;&lt;b&gt;Author:&lt;/b&gt;&lt;/dt&gt;
+    &lt;dd&gt;$info-&gt;{author}&lt;/dd&gt;
+&quot;</span>
+        <span class="wo">if</span> $info<span class="op">-&gt;</span>{<span class="wo">author</span>};
+ 
+    $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;dt&gt;&lt;b&gt;Version:&lt;/b&gt;&lt;/dt&gt;
+    &lt;dd&gt;$info-&gt;{Version}&lt;/dd&gt;
+&quot;</span>
+        <span class="wo">if</span> $info<span class="op">-&gt;</span>{<span class="wo">Version</span>};
+ 
+    $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;dt&gt;&lt;b&gt;Since:&lt;/b&gt;&lt;/dt&gt;
+    &lt;dd&gt;$info-&gt;{since}&lt;/dd&gt;
+&quot;</span>
+        <span class="wo">if</span> $info<span class="op">-&gt;</span>{<span class="wo">since</span>};
+ 
+    $doc <span class="op">.=</span>  <span class="wo">join</span>(<span class="sg">''</span><span class="op">,</span> <span class="db">&quot;
+&lt;dt&gt;&lt;b&gt;See Also:&lt;/b&gt;&lt;/dt&gt;
+    &lt;dd&gt;&quot;</span><span class="op">,</span> <span class="wo">_makeSeeLinks</span>($info<span class="op">-&gt;</span>{<span class="wo">see</span>}<span class="op">,</span> $pathpfx)<span class="op">,</span> <span class="db">&quot;&lt;/dd&gt;
+&quot;</span>)
+        <span class="wo">if</span> $info<span class="op">-&gt;</span>{<span class="wo">see</span>};
+ 
+    $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;p&gt;
+&lt;i&gt;Class instances are $info-&gt;{instance} references.&lt;/i&gt;
+&lt;p&gt;&quot;</span>
+        <span class="wo">if</span> $info<span class="op">-&gt;</span>{<span class="wo">instance</span>};
+ 
+    $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;p&gt;
+&lt;i&gt;Unless otherwise noted, &lt;code&gt;$info-&gt;{self}&lt;/code&gt; is the object instance variable.&lt;/i&gt;
+&lt;p&gt;&quot;</span>
+        <span class="wo">if</span> $info<span class="op">-&gt;</span>{<span class="wo">self</span>};
+<span id='src1016' class='foldfill'>Folded lines 1016 to 1019</span>
+    $doc <span class="op">.=</span>  <span class="wo">join</span>(<span class="sg">''</span><span class="op">,</span> <span class="db">&quot;
+&lt;a name='imports'&gt;&lt;/a&gt;
+&lt;table border=1 cellpadding=3 cellspacing=0 width='100%'&gt;
+&lt;tr bgcolor='$aqua'&gt;&lt;th colspan=2 align=left&gt;&lt;font size='+2'&gt;Imported Symbols&lt;/font&gt;&lt;/th&gt;&lt;/tr&gt;
+&quot;</span><span class="op">,</span> <span class="wo">_makeExportDesc</span>($info<span class="op">-&gt;</span>{<span class="wo">imports</span>}<span class="op">,</span> <span class="sg">'_i_'</span>)<span class="op">,</span> <span class="db">&quot;
+&lt;/table&gt;
+&lt;p&gt;
+&quot;</span>)
+        <span class="wo">if</span> $info<span class="op">-&gt;</span>{<span class="wo">imports</span>};
+<span class="ct">#</span>
+<span class="ct">#   process exports
+#</span>
+    $doc <span class="op">.=</span>  <span class="wo">join</span>(<span class="sg">''</span><span class="op">,</span> <span class="db">&quot;
+&lt;a name='exports'&gt;&lt;/a&gt;
+&lt;table border=1 cellpadding=3 cellspacing=0 width='100%'&gt;
+&lt;tr bgcolor='$aqua'&gt;&lt;th colspan=2 align=left&gt;&lt;font size='+2'&gt;Exported Symbols&lt;/font&gt;&lt;/th&gt;&lt;/tr&gt;
+&quot;</span><span class="op">,</span> <span class="wo">_makeExportDesc</span>($info<span class="op">-&gt;</span>{<span class="wo">exports</span>}<span class="op">,</span> <span class="sg">'_e_'</span>)<span class="op">,</span> <span class="db">&quot;
+&lt;/table&gt;
+&lt;p&gt;
+&quot;</span>)
+        <span class="wo">if</span> $info<span class="op">-&gt;</span>{<span class="wo">exports</span>};
+<span class="ct">#</span>
+<span class="ct">#   process members
+#</span>
+    $doc <span class="op">.=</span>  <span class="wo">join</span>(<span class="sg">''</span><span class="op">,</span> <span class="db">&quot;
+&lt;a name='members'&gt;&lt;/a&gt;
+&lt;table border=1 cellpadding=3 cellspacing=0 width='100%'&gt;
+&lt;tr bgcolor='$aqua'&gt;&lt;th colspan=2 align=left&gt;&lt;font size='+2'&gt;Public Instance Members&lt;/font&gt;&lt;/th&gt;&lt;/tr&gt;
+&quot;</span><span class="op">,</span> <span class="wo">_makeExportDesc</span>($info<span class="op">-&gt;</span>{<span class="wo">member</span>}<span class="op">,</span> <span class="sg">'_m_'</span>)<span class="op">,</span> <span class="db">&quot;
+&lt;/table&gt;
+&lt;p&gt;
+&quot;</span>)
+        <span class="wo">if</span> $info<span class="op">-&gt;</span>{<span class="wo">member</span>};
+<span class="ct">#</span>
+<span class="ct">#   collect method map info before processing
+#</span>
+    <span class="kw">my</span> %methodmap <span class="op">=</span> ();
+    <span class="wo">while</span> (<span class="kw">my</span>($sub<span class="op">,</span> $methodinfo) <span class="op">=</span> <span class="wo">each</span> <span class="cs">%</span>{$info<span class="op">-&gt;</span>{<span class="wo">Methods</span>}}) {
+        $methodmap{$sub} <span class="op">=</span> [ $methodinfo<span class="op">-&gt;</span>{<span class="wo">File</span>}<span class="op">,</span> $methodinfo<span class="op">-&gt;</span>{<span class="wo">Line</span>} ]
+            <span class="wo">unless</span> (<span class="op">!</span>$use_private) <span class="op">&amp;&amp;</span> 
+                (<span class="wo">substr</span>($sub<span class="op">,</span> <span class="nm">0</span><span class="op">,</span> <span class="nm">1</span>) <span class="op">eq</span> <span class="sg">'_'</span>) <span class="op">&amp;&amp;</span> 
+                (<span class="op">!</span>$methodinfo<span class="op">-&gt;</span>{<span class="wo">constructor</span>});
+    }
+<span class="ct">#</span>
+<span class="ct">#   process constructors. Scan for methods with descriptions with '@constructor'
+#</span>
+    $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;a name='summary'&gt;&lt;/a&gt;
+&quot;</span>;
+    
+    <span class="kw">my</span> %constructors <span class="op">=</span> ();
+    <span class="kw">my</span> $constructor;
+    <span class="kw">my</span> $anchored;
+    <span class="wo">foreach</span> (<span class="wo">sort</span> <span class="wo">keys</span> <span class="cs">%</span>{$info<span class="op">-&gt;</span>{<span class="wo">Methods</span>}}) {
+        <span class="wo">next</span>
+            <span class="wo">unless</span> <span class="wo">exists</span> $info<span class="op">-&gt;</span>{<span class="wo">Methods</span>}{<span class="mg">$_</span>}{<span class="wo">constructor</span>};
+        $anchored <span class="op">=</span> <span class="nm">1</span><span class="op">,</span>
+        $doc <span class="op">.=</span> <span class="db">&quot;
+&lt;a name='constructor_summary'&gt;&lt;/a&gt;
+&quot;</span><span class="op">,</span>
+            <span class="wo">unless</span> $anchored;
+ 
+        $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;table border=1 cellpadding=3 cellspacing=0 width='100%'&gt;
+&lt;tr bgcolor='$aqua'&gt;&lt;th align=left&gt;&lt;font size='+2'&gt;Constructor Summary&lt;/font&gt;&lt;/th&gt;&lt;/tr&gt;
+&quot;</span>
+            <span class="wo">unless</span> $constructor;
+ 
+        $constructor <span class="op">=</span> $constructors{<span class="mg">$_</span>} <span class="op">=</span> <span class="wo">delete</span> $info<span class="op">-&gt;</span>{<span class="wo">Methods</span>}{<span class="mg">$_</span>};
+ 
+        $doc <span class="op">.=</span>  <span class="wo">join</span>(<span class="sg">''</span><span class="op">,</span> <span class="db">&quot;
+&lt;tr&gt;&lt;td align=left valign=top&gt;
+&lt;code&gt;&lt;a href='#_f_$_'&gt;$_&lt;/a&gt;&quot;</span><span class="op">,</span> <span class="wo">_makeParamList</span>($constructor<span class="op">-&gt;</span>{<span class="wo">param</span>})<span class="op">,</span> <span class="db">&quot;&lt;/code&gt;
+&quot;</span>);
+        <span class="wo">if</span> ($constructor<span class="op">-&gt;</span>{<span class="wo">deprecated</span>}) {
+            $doc <span class="op">.=</span>  <span class="sg">'
+&lt;BR&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;B&gt;Deprecated.&lt;/B&gt;&amp;nbsp;'</span> <span class="op">.</span>
+                (($constructor<span class="op">-&gt;</span>{<span class="wo">deprecated</span>} <span class="op">ne</span> <span class="sg">'1'</span>) <span class="op">?</span> <span class="db">&quot;&lt;i&gt;$constructor-&gt;{deprecated}&lt;/i&gt;&quot;</span> <span class="op">:</span> <span class="sg">''</span>);
+        }
+        <span class="wo">elsif</span> ($constructor<span class="op">-&gt;</span>{<span class="wo">Description</span>}) {
+            <span class="kw">my</span> $descr <span class="op">=</span>  $constructor<span class="op">-&gt;</span>{<span class="wo">Description</span>};
+            <span class="kw">my</span> $brief <span class="op">=</span> <span class="wo">_briefDescription</span>(($descr<span class="op">=~</span><span class="mt">/^\s*Constructor\.\s*(.*)$/s</span>) <span class="op">?</span> <span class="mg">$1</span> <span class="op">:</span> $descr);
+            $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;BR&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;$brief
+&quot;</span>;
+        }
+        $doc <span class="op">.=</span>  <span class="db">&quot;&lt;/td&gt;&lt;/tr&gt;\n&quot;</span>;
+    } <span class="ct"># end for constructors</span>
+    $info<span class="op">-&gt;</span>{<span class="wo">constructors</span>} <span class="op">=</span> <span class="cs">\</span>%constructors;
+    <span class="wo">if</span> ($constructor) {
+        $doc <span class="op">.=</span>  <span class="db">&quot;&lt;/table&gt;&lt;p&gt;\n&quot;</span> 
+    }
+    <span class="wo">else</span> {
+        $doc<span class="op">=~</span><span class="su">s!&lt;a href='#constructor_summary'&gt;CONSTR&lt;/a&gt;!CONSTR!</span>;
+        $doc<span class="op">=~</span><span class="su">s!&lt;a href='#constructor_detail'&gt;CONSTR&lt;/a&gt;!CONSTR!</span>;
+    }
+<span class="ct">#</span>
+<span class="ct">#   process methods
+#</span>
+    <span class="kw">my</span> @methods <span class="op">=</span> <span class="wo">sort</span> <span class="wo">keys</span> %methodmap;
+    <span class="kw">my</span> $methcount <span class="op">=</span> @methods;
+    <span class="wo">if</span> ($methcount) {
+        $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;a name='method_summary'&gt;&lt;/a&gt;
+&lt;table border=1 cellpadding=3 cellspacing=0 width='100%'&gt;
+&lt;tr bgcolor='$aqua'&gt;&lt;th align=left&gt;&lt;font size='+2'&gt;Method Summary&lt;/font&gt;&lt;/th&gt;&lt;/tr&gt;
+&quot;</span>;
+        <span class="wo">foreach</span> (@methods) {
+            <span class="kw">my</span> $method <span class="op">=</span> $info<span class="op">-&gt;</span>{<span class="wo">Methods</span>}{<span class="mg">$_</span>};
+            $doc <span class="op">.=</span>  <span class="wo">join</span>(<span class="sg">''</span><span class="op">,</span> <span class="db">&quot;
+&lt;tr&gt;&lt;td align=left valign=top&gt;
+&lt;code&gt;&lt;a href='#_f_$_'&gt;$_&lt;/a&gt;&quot;</span><span class="op">,</span> <span class="wo">_makeParamList</span>($method<span class="op">-&gt;</span>{<span class="wo">param</span>})<span class="op">,</span> <span class="db">&quot;&lt;/code&gt;
+&quot;</span>);
+            <span class="wo">if</span> ($method<span class="op">-&gt;</span>{<span class="wo">deprecated</span>}) {
+                $doc <span class="op">.=</span>  <span class="sg">'
+&lt;BR&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;B&gt;Deprecated.&lt;/B&gt;&amp;nbsp;'</span> <span class="op">.</span>
+                (($method<span class="op">-&gt;</span>{<span class="wo">deprecated</span>} <span class="op">ne</span> <span class="sg">'1'</span>) <span class="op">?</span> <span class="db">&quot;&lt;i&gt;$method-&gt;{deprecated}&lt;/i&gt;&quot;</span> <span class="op">:</span> <span class="sg">''</span>);
+            }
+            <span class="wo">elsif</span> ($method<span class="op">-&gt;</span>{<span class="wo">Description</span>}) {
+                <span class="kw">my</span> $descr <span class="op">=</span> ($method<span class="op">-&gt;</span>{<span class="wo">static</span>} <span class="op">?</span> <span class="db">&quot;&lt;i&gt;(class method)&lt;/i&gt; &quot;</span> <span class="op">:</span> <span class="sg">''</span>) <span class="op">.</span> $method<span class="op">-&gt;</span>{<span class="wo">Description</span>};
+                <span class="kw">my</span> $brief <span class="op">=</span> <span class="wo">_briefDescription</span>($descr);
+                $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;BR&gt;
+&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;$brief
+&quot;</span>;
+            }
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;/td&gt;&lt;/tr&gt;\n&quot;</span>;
+        }
+        $doc <span class="op">.=</span>  <span class="db">&quot;&lt;/table&gt;
+&lt;p&gt;
+&quot;</span>;
+    }
+    <span class="wo">else</span> {
+        $doc<span class="op">=~</span><span class="su">s!&lt;a href='#method_summary'&gt;METHOD&lt;/a&gt;!METHOD!</span>;
+        $doc<span class="op">=~</span><span class="su">s!&lt;a href='#method_detail'&gt;METHOD&lt;/a&gt;!METHOD!</span>;
+    }
+ 
+    <span class="wo">if</span> (<span class="wo">keys</span> %constructors) {
+        $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;a name='constructor_detail'&gt;&lt;/a&gt;
+&lt;table border=1 cellpadding=3 cellspacing=0 width='100%'&gt;
+&lt;tr bgcolor='$aqua'&gt;
+    &lt;th align=left&gt;&lt;font size='+2'&gt;Constructor Details&lt;/font&gt;&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/table&gt;
+&quot;</span>;
+        <span class="wo">foreach</span> (<span class="wo">sort</span> <span class="wo">keys</span> %constructors) {
+            <span class="kw">my</span> $method <span class="op">=</span> $constructors{<span class="mg">$_</span>};
+            <span class="kw">my</span> $returns <span class="op">=</span> $method<span class="op">-&gt;</span>{<span class="kw">return</span>};
+            <span class="kw">my</span> $descr <span class="op">=</span>  $method<span class="op">-&gt;</span>{<span class="wo">Description</span>} <span class="op">||</span> <span class="sg">'&amp;nbsp;'</span>;
+            $descr<span class="op">=~</span><span class="su">s/^\s*Constructor\.\s*//</span>;
+            $doc <span class="op">.=</span>  <span class="wo">join</span>(<span class="sg">''</span><span class="op">,</span> <span class="db">&quot;
+&lt;a name='_f_$_'&gt;&lt;/a&gt;
+&lt;h3&gt;$_&lt;/h3&gt;
+&lt;pre&gt;
+$_&quot;</span><span class="op">,</span> <span class="wo">_makeParamList</span>($method<span class="op">-&gt;</span>{<span class="wo">param</span>})<span class="op">,</span> <span class="db">&quot;
+&lt;/pre&gt;&lt;p&gt;
+&lt;dl&gt;
+&lt;dd&gt;$descr
+&lt;p&gt;
+&lt;dd&gt;&lt;dl&gt;
+&quot;</span>);
+            $doc <span class="op">.=</span>  <span class="wo">join</span>(<span class="sg">''</span><span class="op">,</span> <span class="db">&quot;&lt;dt&gt;&lt;b&gt;Parameters:&lt;/b&gt;\n&quot;</span><span class="op">,</span> <span class="wo">_makeParamDesc</span>($method<span class="op">-&gt;</span>{<span class="wo">param</span>}))
+                <span class="wo">if</span> $method<span class="op">-&gt;</span>{<span class="wo">param</span>};
+ 
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;dt&gt;&lt;b&gt;Returns:&lt;/b&gt;&lt;dd&gt;$returns&lt;/dd&gt;\n&quot;</span>
+                <span class="wo">if</span> $returns;
+ 
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;dt&gt;&lt;b&gt;Since:&lt;/b&gt;&lt;/dt&gt;&lt;dd&gt;$method-&gt;{since}&lt;/dd&gt;\n&quot;</span>
+                <span class="wo">if</span> $method<span class="op">-&gt;</span>{<span class="wo">since</span>};
+ 
+            $doc <span class="op">.=</span>  <span class="wo">join</span>(<span class="sg">''</span><span class="op">,</span> <span class="db">&quot;&lt;dt&gt;&lt;b&gt;See Also:&lt;/b&gt;&lt;/dt&gt;&lt;dd&gt;&quot;</span><span class="op">,</span> <span class="wo">_makeSeeLinks</span>($method<span class="op">-&gt;</span>{<span class="wo">see</span>}<span class="op">,</span> $pathpfx)<span class="op">,</span> <span class="db">&quot;&lt;/dd&gt;\n&quot;</span>)
+                <span class="wo">if</span> $method<span class="op">-&gt;</span>{<span class="wo">see</span>};
+ 
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;/dl&gt;&lt;/dd&gt;&lt;/dl&gt;&lt;hr&gt;\n&quot;</span>;
+        }
+        $doc <span class="op">.=</span>  <span class="db">&quot;\n&lt;p&gt;\n&quot;</span>;
+    } <span class="ct"># end if constructor</span>
+ 
+    <span class="wo">if</span> ($methcount) {
+        $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;a name='method_detail'&gt;&lt;/a&gt;
+&lt;table border=1 cellpadding=3 cellspacing=0 width='100%'&gt;
+&lt;tr bgcolor='$aqua'&gt;
+    &lt;th align=left&gt;&lt;font size='+2'&gt;Method Details&lt;/font&gt;&lt;/th&gt;
+&lt;/tr&gt;&lt;/table&gt;
+&quot;</span>;
+        <span class="wo">foreach</span> (@methods) {
+            <span class="kw">my</span> $method <span class="op">=</span> $info<span class="op">-&gt;</span>{<span class="wo">Methods</span>}{<span class="mg">$_</span>};
+            <span class="kw">my</span> $returns <span class="op">=</span> $method<span class="op">-&gt;</span>{<span class="kw">return</span>};
+            <span class="kw">my</span> $returnlist <span class="op">=</span> $method<span class="op">-&gt;</span>{<span class="wo">returnlist</span>};
+            <span class="kw">my</span> $descr <span class="op">=</span>  ($method<span class="op">-&gt;</span>{<span class="wo">static</span>} <span class="op">?</span> <span class="db">&quot;&lt;i&gt;(class method)&lt;/i&gt; &quot;</span> <span class="op">:</span> <span class="sg">''</span>) <span class="op">.</span>
+                ($method<span class="op">-&gt;</span>{<span class="wo">Description</span>} <span class="op">||</span> <span class="sg">'&amp;nbsp;'</span>);
+            $doc <span class="op">.=</span>  <span class="wo">join</span>(<span class="sg">''</span><span class="op">,</span> <span class="db">&quot;
+&lt;a name='_f_$_'&gt;&lt;/a&gt;
+&lt;h3&gt;$_&lt;/h3&gt;
+&lt;pre&gt;
+$_&quot;</span><span class="op">,</span> <span class="wo">_makeParamList</span>($method<span class="op">-&gt;</span>{<span class="wo">param</span>})<span class="op">,</span> <span class="db">&quot;
+&lt;/pre&gt;&lt;p&gt;
+&lt;dl&gt;
+&lt;dd&gt;$descr
+&lt;p&gt;
+&lt;dd&gt;&lt;dl&gt;
+&quot;</span>);
+ 
+            <span class="wo">if</span> ($method<span class="op">-&gt;</span>{<span class="wo">simplex</span>}) {
+                $doc <span class="op">.=</span>  ($method<span class="op">-&gt;</span>{<span class="wo">urgent</span>} <span class="op">?</span>
+                    <span class="db">&quot;&lt;dt&gt;&lt;b&gt;Simplex, Urgent&lt;/b&gt;&lt;/dt&gt;\n&quot;</span> <span class="op">:</span>
+                    <span class="db">&quot;&lt;dt&gt;&lt;b&gt;Simplex&lt;/b&gt;&lt;/dt&gt;\n&quot;</span>);
+            }
+            <span class="wo">elsif</span> ($method<span class="op">-&gt;</span>{<span class="wo">urgent</span>}) {
+                $doc <span class="op">.=</span>  <span class="db">&quot;&lt;dt&gt;&lt;b&gt;Urgent&lt;/b&gt;&lt;/dt&gt;\n&quot;</span>;
+            }
+ 
+            $doc <span class="op">.=</span>  <span class="wo">join</span>(<span class="sg">''</span><span class="op">,</span> <span class="db">&quot;&lt;dt&gt;&lt;b&gt;Parameters:&lt;/b&gt;\n&quot;</span><span class="op">,</span> <span class="wo">_makeParamDesc</span>($method<span class="op">-&gt;</span>{<span class="wo">param</span>}))
+                <span class="wo">if</span> $method<span class="op">-&gt;</span>{<span class="wo">param</span>};
+ 
+            <span class="wo">if</span> ($returns) {
+                $doc <span class="op">.=</span>  ($returnlist <span class="op">?</span>
+                    <span class="db">&quot;&lt;dt&gt;&lt;b&gt;In scalar context, returns:&lt;/b&gt;&lt;dd&gt;$returns&lt;/dd&gt;\n&quot;</span> <span class="op">:</span>
+                    <span class="db">&quot;&lt;dt&gt;&lt;b&gt;Returns:&lt;/b&gt;&lt;dd&gt;$returns&lt;/dd&gt;\n&quot;</span>);
+            }
+ 
+            $doc <span class="op">.=</span>  ($returns <span class="op">?</span>
+                <span class="db">&quot;&lt;dt&gt;&lt;b&gt;In list context, returns:&lt;/b&gt;&lt;dd&gt;($returnlist)&lt;/dd&gt;\n&quot;</span> <span class="op">:</span>
+                <span class="db">&quot;&lt;dt&gt;&lt;b&gt;Returns:&lt;/b&gt;&lt;dd&gt;($returnlist)&lt;/dd&gt;\n&quot;</span>)
+                <span class="wo">if</span> $returnlist;
+ 
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;dt&gt;&lt;b&gt;Since:&lt;/b&gt;&lt;/dt&gt;&lt;dd&gt;$method-&gt;{since}&lt;/dd&gt;\n&quot;</span>
+                <span class="wo">if</span> $method<span class="op">-&gt;</span>{<span class="wo">since</span>};
+ 
+            $doc <span class="op">.=</span>  <span class="wo">join</span>(<span class="sg">''</span><span class="op">,</span> <span class="db">&quot;&lt;dt&gt;&lt;b&gt;See Also:&lt;/b&gt;&lt;/dt&gt;&lt;dd&gt;&quot;</span><span class="op">,</span> <span class="wo">_makeSeeLinks</span>($method<span class="op">-&gt;</span>{<span class="wo">see</span>}<span class="op">,</span> $pathpfx)<span class="op">,</span> <span class="db">&quot;&lt;/dd&gt;\n&quot;</span>)
+                <span class="wo">if</span> $method<span class="op">-&gt;</span>{<span class="wo">see</span>};
+ 
+            $doc <span class="op">.=</span>  <span class="db">&quot;&lt;/dl&gt;&lt;/dd&gt;&lt;/dl&gt;&lt;hr&gt;\n&quot;</span>;
+        }   <span class="ct"># end foreach method</span>
+    } <span class="ct"># end if methods</span>
+<span class="ct">#</span>
+<span class="ct">#   finish up
+#</span>
+    <span class="kw">my</span> $tstamp <span class="op">=</span> <span class="wo">scalar</span> <span class="wo">localtime</span>();
+ 
+    $doc <span class="op">.=</span>  <span class="db">&quot;
+&lt;small&gt;
+&lt;center&gt;
+&lt;i&gt;Generated by POD::ClassDoc $VERSION on $tstamp&lt;/i&gt;
+&lt;/center&gt;
+&lt;/small&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+&quot;</span>;
+    <span class="kw">return</span> [ $doc<span class="op">,</span> $info<span class="op">-&gt;</span>{<span class="wo">File</span>}<span class="op">,</span> $info<span class="op">-&gt;</span>{<span class="wo">Line</span>}<span class="op">,</span> <span class="cs">\</span>%methodmap ];
+}
+<span id='src1276' class='foldfill'>Folded lines 1276 to 1279</span>
+<a name='Pod::Classdoc::_pathFromClass'></a><span class="kw">sub</span> <span class="wo">_pathFromClass</span> {
+    <span class="kw">my</span> $class <span class="op">=</span> <span class="co">shift</span>;
+    <span class="kw">my</span> @parts <span class="op">=</span> <span class="wo">split</span> <span class="mt">/\:\:/</span><span class="op">,</span> $class;
+    <span class="wo">pop</span> @parts;
+    <span class="kw">return</span> ( <span class="sg">'../'</span> <span class="op">x</span> (<span class="wo">scalar</span> @parts)<span class="op">,</span> <span class="wo">join</span>(<span class="sg">'/'</span><span class="op">,</span> @parts));
+}
+ 
+<a name='Pod::Classdoc::_parseTags'></a><span class="kw">sub</span> <span class="wo">_parseTags</span> {
+    <span class="kw">my</span> ($self<span class="op">,</span> $class<span class="op">,</span> $info<span class="op">,</span> $validtags) <span class="op">=</span> <span class="mg">@_</span>;
+<span id='src1289' class='foldfill'>Folded lines 1289 to 1292</span>
+    <span class="kw">my</span> ($updir<span class="op">,</span> $path) <span class="op">=</span> <span class="wo">_pathFromClass</span>($class);
+    <span class="kw">my</span> @parts <span class="op">=</span> ();
+    <span class="kw">my</span> $method;
+    $updir <span class="op">||=</span> <span class="sg">''</span>;
+    $info<span class="op">-&gt;</span>{<span class="wo">Description</span>}<span class="op">=~</span><span class="su">s!&lt;cpan&gt;([^&lt;]+)&lt;/cpan&gt;!&lt;a href='http://search.cpan.org/perldoc\?$1'&gt;$1&lt;/a&gt;!g</span>;
+    $info<span class="op">-&gt;</span>{<span class="wo">Description</span>}<span class="op">=~</span><span class="su">s!&lt;(export|import|method|member)&gt;(\w+)&lt;/(?:export|import|method|member)&gt;!&lt;a href='#$secttags{$1}$2'&gt;$2&lt;/a&gt;!g</span>;
+    $info<span class="op">-&gt;</span>{<span class="wo">Description</span>}<span class="op">=~</span><span class="su">s!&lt;(export|import|method|member|package)&gt;([\w\:]+)&lt;/(?:export|import|method|member|package)&gt;!
+        { @parts = split('\:\:', $2); $method = ($1 eq 'package') ? '' : pop @parts;
+            &quot;&lt;a href='$updir&quot; . join('/', @parts) . '.html' . (($1 eq 'package') ? '' : &quot;#$secttags{$1}&quot;) . &quot;$method'&gt;$2&lt;/a&gt;&quot; }!egx</span>;
+<span class="ct">#</span>
+<span class="ct">#   process classdoc sections
+#</span>
+    <span class="kw">my</span> $desc <span class="op">=</span> <span class="sg">''</span>;
+    <span class="kw">my</span> @lines <span class="op">=</span> <span class="wo">split</span> <span class="mt">/\n/</span><span class="op">,</span> $info<span class="op">-&gt;</span>{<span class="wo">Description</span>};
+    <span class="kw">my</span> $tag <span class="op">=</span> <span class="sg">'Description'</span>;
+    <span class="kw">my</span> $param;
+    <span class="kw">my</span> ($ttag<span class="op">,</span> $tdesc);
+    <span class="kw">my</span> $sep <span class="op">=</span> <span class="db">&quot;\n&quot;</span>;
+    <span class="wo">foreach</span> (@lines) {
+        <span class="su">s/^#\*?\s*//</span>;
+ 
+        $desc <span class="op">.=</span> <span class="db">&quot;$_$sep&quot;</span><span class="op">,</span>
+        <span class="wo">next</span>
+            <span class="wo">unless</span> <span class="mt">/^\@(\w+)(\s+(.*))?$/</span> <span class="op">&amp;&amp;</span> $validtags<span class="op">-&gt;</span>{<span class="mg">$1</span>};
+ 
+        ($ttag<span class="op">,</span> $tdesc) <span class="op">=</span> (<span class="mg">$1</span><span class="op">,</span> <span class="mg">$3</span>);
+        <span class="wo">if</span> (($tag <span class="op">eq</span> <span class="sg">'param'</span>) <span class="op">||</span> ($tag <span class="op">eq</span> <span class="sg">'optional'</span>) <span class="op">||</span> ($tag <span class="op">eq</span> <span class="sg">'exports'</span>) <span class="op">||</span> ($tag <span class="op">eq</span> <span class="sg">'imports'</span>) <span class="op">||</span> ($tag <span class="op">eq</span> <span class="sg">'member'</span>)) {
+            ($param<span class="op">,</span> $desc) <span class="op">=</span> ($desc<span class="op">=~</span><span class="mt">/^\s*((?:[\\]?[\$\%\@\*\&amp;])?[\w\:]+)\s*(.*)$/s</span>);
+            $tag <span class="op">=</span> <span class="sg">'param'</span><span class="op">,</span>
+            $desc <span class="op">=</span> <span class="sg">'&lt;i&gt;(optional)&lt;/i&gt;'</span> <span class="op">.</span> $desc 
+                <span class="wo">if</span> ($tag <span class="op">eq</span> <span class="sg">'optional'</span>);
+            <span class="wo">push</span> <span class="cs">@</span>{$info<span class="op">-&gt;</span>{$tag}}<span class="op">,</span> $param<span class="op">,</span> $desc;
+        }
+        <span class="wo">elsif</span> ($tag <span class="op">eq</span> <span class="sg">'see'</span>) {
+            <span class="wo">push</span> <span class="cs">@</span>{$info<span class="op">-&gt;</span>{$tag}}<span class="op">,</span> $desc;
+        }
+        <span class="wo">else</span> {
+            <span class="wo">chop</span> $desc<span class="op">,</span> <span class="wo">chop</span> $desc <span class="wo">if</span> ($sep <span class="op">ne</span> <span class="db">&quot;\n&quot;</span>);
+            $info<span class="op">-&gt;</span>{$tag} <span class="op">=</span> $desc;
+        }
+        $tag <span class="op">=</span> $ttag;
+        $desc <span class="op">=</span> $tdesc <span class="op">||</span> <span class="nm">1</span>;
+        $sep <span class="op">=</span> ($validtags<span class="op">-&gt;</span>{$tag} <span class="op">==</span> <span class="nm">1</span>) <span class="op">?</span> <span class="db">&quot;\n&quot;</span> <span class="op">:</span> <span class="db">&quot;,\n&quot;</span>;
+        $desc <span class="op">.=</span> $sep;
+    }
+<span class="ct">#</span>
+<span class="ct">#   don't forget the last one!
+#</span>
+    <span class="wo">if</span> (($tag <span class="op">eq</span> <span class="sg">'param'</span>) <span class="op">||</span> ($tag <span class="op">eq</span> <span class="sg">'optional'</span>) <span class="op">||</span> ($tag <span class="op">eq</span> <span class="sg">'exports'</span>) <span class="op">||</span> ($tag <span class="op">eq</span> <span class="sg">'imports'</span>) <span class="op">||</span> ($tag <span class="op">eq</span> <span class="sg">'member'</span>)) {
+        ($param<span class="op">,</span> $desc) <span class="op">=</span> ($desc<span class="op">=~</span><span class="mt">/^\s*((?:[\\]?[\$\%\@\*\&amp;])?[\w\:]+)\s*(.*)$/s</span>);
+        $tag <span class="op">=</span> <span class="sg">'param'</span><span class="op">,</span>
+        $desc <span class="op">=</span> <span class="sg">'&lt;i&gt;(optional)&lt;/i&gt;'</span> <span class="op">.</span> $desc 
+            <span class="wo">if</span> ($tag <span class="op">eq</span> <span class="sg">'optional'</span>);
+        <span class="wo">push</span> <span class="cs">@</span>{$info<span class="op">-&gt;</span>{$tag}}<span class="op">,</span> $param<span class="op">,</span> $desc;
+    }
+    <span class="wo">elsif</span> ($tag <span class="op">eq</span> <span class="sg">'see'</span>) {
+        <span class="wo">push</span> <span class="cs">@</span>{$info<span class="op">-&gt;</span>{$tag}}<span class="op">,</span> $desc;
+    }
+    <span class="wo">else</span> {
+        <span class="wo">chop</span> $desc<span class="op">,</span> <span class="wo">chop</span> $desc <span class="wo">if</span> ($sep <span class="op">ne</span> <span class="db">&quot;\n&quot;</span>);
+        $info<span class="op">-&gt;</span>{$tag} <span class="op">=</span> $desc;
+    }
+}
+ 
+<a name='Pod::Classdoc::_makeParamList'></a><span class="kw">sub</span> <span class="wo">_makeParamList</span> {
+    <span class="kw">my</span> $params <span class="op">=</span> <span class="co">shift</span>;
+    <span class="kw">my</span> $p <span class="op">=</span> <span class="sg">'('</span>;
+    <span class="kw">my</span> $t;
+    <span class="kw">my</span> $i <span class="op">=</span> <span class="nm">0</span>;
+ 
+    $t <span class="op">=</span> $params<span class="op">-&gt;</span>[$i<span class="op">++</span>]<span class="op">,</span>
+    $i<span class="op">++,</span>
+    $p <span class="op">.=</span> ($t<span class="op">=~</span><span class="mt">/^[\\]?[\$\%\@\*\&amp;]/</span>) <span class="op">?</span> <span class="db">&quot;$t, &quot;</span> <span class="op">:</span> <span class="db">&quot;$t =&amp;gt; &lt;i&gt;value&lt;/i&gt;, &quot;</span>
+        <span class="wo">while</span> ($i <span class="op">&lt;</span> <span class="cs">$#</span>$params);
+ 
+    <span class="wo">chop</span> $p<span class="op">,</span>
+    <span class="wo">chop</span> $p
+        <span class="wo">if</span> (<span class="wo">length</span>($p) <span class="op">&gt;</span> <span class="nm">1</span>);
+ 
+    <span class="kw">return</span> <span class="db">&quot;$p)&quot;</span>;
+}
+ 
+<a name='Pod::Classdoc::_makeParamDesc'></a><span class="kw">sub</span> <span class="wo">_makeParamDesc</span> {
+    <span class="kw">my</span> $params <span class="op">=</span> <span class="co">shift</span>;
+    <span class="kw">my</span> $p <span class="op">=</span> <span class="sg">'&lt;dd&gt;&lt;table border=0&gt;'</span>;
+    <span class="kw">my</span> ($t<span class="op">,</span> $d<span class="op">,</span> $sep);
+    <span class="kw">my</span> $i <span class="op">=</span> <span class="nm">0</span>;
+ 
+    $t <span class="op">=</span> $params<span class="op">-&gt;</span>[$i<span class="op">++</span>]<span class="op">,</span>
+    $d <span class="op">=</span> $params<span class="op">-&gt;</span>[$i<span class="op">++</span>]<span class="op">,</span>
+    $sep <span class="op">=</span> ($t<span class="op">=~</span><span class="mt">/^[\\]?[\$\%\@\*\&amp;]/</span>) <span class="op">?</span> <span class="sg">' - '</span> <span class="op">:</span> <span class="sg">' =&amp;gt; '</span><span class="op">,</span>
+    $p <span class="op">.=</span> <span class="db">&quot;&lt;tr&gt;&lt;td align=left valign=top&gt;&lt;code&gt;$t&lt;/code&gt;&lt;/td&gt;&lt;td valign=top align=center&gt;$sep&lt;/td&gt;&lt;td align=left&gt;$d&lt;/td&gt;&lt;/tr&gt;\n&quot;</span>
+        <span class="wo">while</span> ($i <span class="op">&lt;</span> <span class="cs">$#</span>$params);
+ 
+    <span class="kw">return</span> $p <span class="op">.</span> <span class="db">&quot;&lt;/table&gt;&lt;/dd&gt;\n&quot;</span>;
+}
+ 
+<a name='Pod::Classdoc::_makeExportDesc'></a><span class="kw">sub</span> <span class="wo">_makeExportDesc</span> {
+    <span class="kw">my</span> ($params<span class="op">,</span> $pfx) <span class="op">=</span> <span class="mg">@_</span>;
+    <span class="kw">my</span> $p <span class="op">=</span> <span class="sg">''</span>;
+ 
+    <span class="kw">my</span> %t <span class="op">=</span> <span class="cs">@</span>$params;
+    <span class="kw">return</span> <span class="wo">join</span>(<span class="db">&quot;\n&quot;</span><span class="op">,</span> 
+        <span class="wo">map</span> <span class="db">&quot;&lt;tr&gt;&lt;td align=right valign=top&gt;&lt;a name='$pfx$_'&gt;&lt;/a&gt;&lt;code&gt;$_&lt;/code&gt;&lt;/td&gt;&lt;td align=left valign=top&gt;$t{$_}&lt;/td&gt;&lt;/tr&gt;&quot;</span><span class="op">,</span> <span class="wo">sort</span> <span class="wo">keys</span> %t) <span class="op">.</span> <span class="db">&quot;\n&quot;</span>;
+}
+ 
+<a name='Pod::Classdoc::_getSubDirs'></a><span class="kw">sub</span> <span class="wo">_getSubDirs</span> {
+    <span class="kw">my</span> ($self<span class="op">,</span> $path) <span class="op">=</span> <span class="mg">@_</span>;
+    <span class="mg">$@</span> <span class="op">=</span> <span class="db">&quot;$path directory not found&quot;</span><span class="op">,</span>
+    <span class="kw">return</span> <span class="co">undef</span>
+        <span class="wo">unless</span> <span class="wo">opendir</span>(<span class="wo">PATH</span><span class="op">,</span> $path);
+    <span class="wo">push</span> <span class="cs">@</span>{$self<span class="op">-&gt;</span>{<span class="wo">_dirs</span>}}<span class="op">,</span> $path; 
+<span class="ct">#</span>
+<span class="ct">#   glob the directory for all subdirs
+#</span>
+    <span class="kw">my</span> @files <span class="op">=</span> <span class="wo">readdir</span> <span class="wo">PATH</span>;
+    <span class="wo">closedir</span> <span class="wo">PATH</span>;
+ 
+    <span class="wo">foreach</span> (@files) {
+        <span class="wo">push</span>(<span class="cs">@</span>{$self<span class="op">-&gt;</span>{<span class="wo">_dirs</span>}}<span class="op">,</span> <span class="db">&quot;$path/$_&quot;</span>)
+            <span class="wo">if</span> (<span class="mg">$_</span> <span class="op">ne</span> <span class="sg">'.'</span>) <span class="op">&amp;&amp;</span> (<span class="mg">$_</span> <span class="op">ne</span> <span class="sg">'..'</span>) <span class="op">&amp;&amp;</span> (<span class="op">-d</span> <span class="db">&quot;$path/$_&quot;</span>);
+    }
+    <span class="kw">return</span> $self;
+}
+ 
+<a name='Pod::Classdoc::_makeSeeLinks'></a><span class="kw">sub</span> <span class="wo">_makeSeeLinks</span> {
+    <span class="mg">$_</span>[<span class="nm">0</span>][<span class="nm">-1</span>]<span class="op">=~</span><span class="su">s/,\n$/\n/</span>;
+    <span class="kw">return</span> <span class="wo">join</span>(<span class="db">&quot;&lt;br&gt;\n&quot;</span><span class="op">,</span> <span class="cs">@</span>{<span class="mg">$_</span>[<span class="nm">0</span>]}) <span class="op">.</span> <span class="db">&quot;\n&quot;</span>;
+}
+ 
+<a name='Pod::Classdoc::_briefDescription'></a><span class="kw">sub</span> <span class="wo">_briefDescription</span> {
+    <span class="kw">my</span> $descr <span class="op">=</span> <span class="co">shift</span>;
+    <span class="wo">while</span> ($descr<span class="op">=~</span><span class="mt">/\G.*?((?:&lt;a [^&gt;]*&gt;[^&lt;]*&lt;\/a&gt;)|\.|\?|\!)/igcs</span>) {
+        <span class="kw">return</span> <span class="wo">substr</span>($descr<span class="op">,</span> <span class="nm">0</span><span class="op">,</span> <span class="mg">$+</span>[<span class="nm">1</span>]) <span class="wo">if</span> (<span class="mg">$1</span> <span class="op">eq</span> <span class="sg">'.'</span>) <span class="op">||</span> (<span class="mg">$1</span> <span class="op">eq</span> <span class="sg">'?'</span>) <span class="op">||</span> (<span class="mg">$1</span> <span class="op">eq</span> <span class="sg">'!'</span>);
+    }
+    <span class="kw">return</span> $descr;
+}
+ 
+<span class="nm">1</span>;
+</pre>
+</td></tr></table>
+ 
+<script type='text/javascript'>
+<!--
+ 
+var ppihtml = new ppiHtmlCF([1,30,78,83,155,178,229,263,417,461,484,510,584,603,633,672,700,808,853,1016,1276,1289 ],
+[28,38,81,142,173,181,244,278,420,464,500,536,596,621,648,688,716,832,870,1019,1279,1292 ]);
+ppihtml.renderMargins(1432);
+/*
+ *	all rendered, now selectively open from any existing cookie
+ */
+ppihtml.openFromCookie();
+ 
+-->
+</script>
+</body>
+</html>

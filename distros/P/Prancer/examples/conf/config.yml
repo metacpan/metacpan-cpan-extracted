@@ -1,0 +1,15 @@
+session:
+    state:
+        driver: Prancer::Session::State::Cookie
+        options:
+            session_key: PSESSION
+    store:
+        driver: Prancer::Session::Store::Storable
+        options:
+            dir: /tmp/prancer/sessions
+
+static:
+    dir: /srv/www/resources
+
+# here are MyApp configuration options
+foo: bar

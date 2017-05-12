@@ -1,0 +1,61 @@
+Revision history for Perl extension PGXN-API-Searcher.
+
+0.10.1  2011-11-08T17:48:20Z
+      - Fixed test to be neutral about scores, since Lucy is prone to changing
+        how they're calculatd (as is the case on 0.2.2).
+      - Worked around bug in Lucy 0.2.2's highlighting in the tests.
+
+0.10.0  2011-08-26T17:11:54Z
+      - Upgraded from KinoSearch to Lucy.
+
+0.9.3   2011-05-12T18:11:02Z
+      - Backported to support Perl 5.10.
+
+0.9.2   2011-04-30T20:42:55Z
+      - Updated tests to reflect indexing of user nickname and name in
+        PGXN::API v0.13.0.
+
+0.9.1   2011-04-29T21:15:54Z
+      - Some documentation tweaks.
+      - First release to CPAN.
+
+0.9.0   2011-04-20T05:35:52Z
+      - Switched back to Lucy::Search::QueryParser. It's more tolerant
+        of the crazy stuff users can submit, and with the addition of user
+        lists in the latest version of PGXN::API, we no longer need wildcard
+        searches.
+      - Updated for new field names in the extensions and docs indexes. The
+        old names were `doc` and the new are `docpath`.
+
+0.8.0   2011-04-02T20:32:02Z
+      - Switched to Search::Query::Parser for query parsing. There is a lot
+        more syntax with this parser, including `field=` or `field:` queries,
+        as well as wild cards.
+      - A searcher object is now created for every call to `search()`, rather
+        than just once in `new()`. Parsers are cached from `new()` on,
+        however. This means that consumers can keep a PGXN::API::Searcher
+        object persistent in memory without worrying about index invalidation.
+      - The API document root path passed to `new()` is now retained and
+        accessible via thew `doc_root()` accessor.
+
+0.7.0   2011-03-31T20:55:51Z
+      - Augmented the docs a bit.
+      - Updated for new index names in PGXN::API v0.7.0.
+      - Changed the index parameter name from `index` to `in`. And of course
+        they're now all required to be plural.
+      - Removed the `index` key from the results.
+
+0.6.2   2011-03-29T01:13:48Z
+      - Updated for "doc" changes in PGXN::API v0.6.6:
+        + The "path" key in doc results has been renamed "doc".
+        + The "doc" key has been added to extension results.
+
+0.6.1   2011-03-28T03:07:13Z
+      - The index to query is no longer specified as the first argument to
+        `search()`, but via the new `index` parameter.
+      - The `index` paraemter defaults to "doc" if it's not specified.
+      - Pass parameters to `search()` as a list rather than a hash reference.
+      - Add `index` key to the returned hash.
+
+0.6.0   2011-03-26T03:14:12Z
+      - Initial version.

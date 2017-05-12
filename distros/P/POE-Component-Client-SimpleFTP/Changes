@@ -1,0 +1,28 @@
+Revision history for POE-Component-Client-SimpleFTP
+
+0.004 2014-11-05T06:23:58Z UTC
+ - Updates to the automatically-generated files
+ - Fix the handling of multi-line replies in exceptional circumstances
+ - Renamed public methods to private methods (should have been private in
+   the first place!)
+ - Add the login banner to the authenticated event
+ - Fix the connected event so it only gets the banner not the code
+
+ [STATISTICS]
+ - code churn: 4 files changed, 149 insertions(+), 81 deletions(-)
+
+0.003 2011-05-04T21:39:47Z UTC
+ - Minor pod tweaks
+
+0.002 2011-05-03T20:10:11Z UTC
+ - Add missing documentation for the rmdir command
+ - Add mdtm_parser to ::Utils for the MDTM command
+ - Add feat_parser to ::Utils for the FEAT command
+ - Add a test for the ::Utils module
+ - Improve the pod for commands with sample data
+ - Fix multi-line parsing logic so it correctly includes the first/last
+   lines of the reply
+
+0.001 2011-05-03T06:13:35Z UTC
+ - initial release
+

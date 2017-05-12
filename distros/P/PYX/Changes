@@ -1,0 +1,54 @@
+0.05 2016-02-20T23:27:55+01:00
+ [Common]
+ - Update copyright years.
+
+ [PYX::Format]
+ - First version.
+
+ [PYX::Parser]
+ - Add 'input_encoding' parameter.
+ - Fix dependencies.
+
+0.04 2015-09-27T22:54:17+02:00
+ [Common]
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Remove trailing whitespace.
+ - Update Module::Install to 1.16 version.
+
+0.03 2015-02-06T16:08:16+01:00
+ [PYX]
+ - Add REPOSITORY section to doc.
+ - Fix SEE ALSO section to reality.
+
+ [PYX::Parser]
+ - Add REPOSITORY section to doc.
+ - Add line() method.
+ - Fix SEE ALSO section to reality.
+
+0.02 2015-01-18T17:24:28+01:00
+ [Common]
+ - Fix minimal version of Perl.
+ - Improve AUTHOR and LICENSE AND COPYRIGHT sections in doc.
+ - Update copyright years.
+
+ [PYX]
+ - REWRITE API: Rename start_tag() subroutine to start_element().
+ - REWRITE API: Rename end_tag() subroutine to end_element().
+
+ [PYX::Parser]
+ - REWRITE API: Rewrite raw constructor parameters to 'callbacks' hash
+   reference.
+ - REWRITE API: Rewrite 'start_tag' to 'start_element' callback.
+ - REWRITE API: Rewrite 'end_tag' to 'end_element' callback.
+ - Add 'non_parser_options' parameter.
+ - Add error check for 'output_handler' parameter.
+ - Add test comments for parse_file() method.
+ - Fix SYNOPSIS section in doc.
+ - Fix check for $out variable in parse(), parse_file() and parse_handler()
+   methods.
+ - Rename 'line' parameter to internal name '_line'.
+ - Rename test to right name (parse -> parse_file).
+
+0.01 2014-11-18T07:30:12+01:00
+ - First version.

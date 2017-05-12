@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         PowerTools-Upload-Blob
+version:      0.03
+version_from: lib/PowerTools/Upload/Blob.pm
+installdirs:  site
+requires:
+    Apache::ASP:                   2.59
+    DBD::mysql:                    4.001
+    DBI:                           1.52
+    File::Scan::ClamAV:            1.8
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

@@ -1,0 +1,1172 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<pod xmlns="http://axkit.org/ns/2000/pod2xml">
+
+<head>
+	<title>
+Chapter 9 - Using XML</title>
+</head>
+
+<sect1>
+<title>ABSTRACT</title>
+
+<para>
+This chapter looks at XML.  You may have heard of XML, it's 
+quite popular.
+</para>
+
+</sect1>
+
+<sect1>
+<title>CHAPTER OUTLINE</title>
+
+<list>
+
+<item>
+<itemtext>o</itemtext>
+
+<para>
+Generating XML
+</para>
+
+</item>
+
+<item>
+<itemtext>o</itemtext>
+
+<para>
+XML.RSS plugin
+</para>
+
+</item>
+
+<item>
+<itemtext>o</itemtext>
+
+<para>
+XML.XPath and XML.DOM
+</para>
+
+</item>
+
+<item>
+<itemtext>o</itemtext>
+
+<para>
+Stylesheet-based transformation (views, etc)
+</para>
+
+</item>
+
+</list>
+
+<para>
+XML is becoming one of the most ubiquitous data formats. It is used for
+both data storage and data exchange. Template Toolkit can be used to both create
+XML documents and to convert them into other formats.
+</para>
+
+<para>
+In this chapter we'll take a look at some of the tools that Template Toolkit
+provides for working with XML.
+</para>
+
+</sect1>
+
+<sect1>
+<title>Creating XML Documents</title>
+
+<para>
+We will start be looking at how to create XML documents using Template Toolkit.
+We will use the example of creating an XML document which contains data
+about a TV show. Let's use (to pick a show at random) <emphasis>Buffy the
+Vampire Slayer</emphasis>.
+</para>
+
+<sect2>
+<title>Modelling Data About A TV Show</title>
+
+<para>
+A TV show consists of a number of seasons. Generally one season is made
+each year. Each season will have a regular cast. A season consists of
+a number of episodes. We want to create an XML file which contains all
+of this data about a TV show.
+</para>
+
+<para>
+We won't go into the details of how we access the data about the
+TV show, we'll just assume the existance of a module called TVShow.pm 
+which will be our interface to details about a show. TVShow.pm has a 
+constructor, <code>new</code>, which is passed the name of a show and returns an
+object which contains all of the data we need. It also has access
+methods that return all of these values.
+</para>
+
+<para>
+We'll further assume the existance of Template::Plugin::TVShow which 
+allows us to use a TVShow object in our templates.
+</para>
+
+</sect2>
+
+<sect2>
+<title>DTD for a TV show</title>
+
+<para>
+When designing an XML document, it's useful to create a  (or DTD) that defines what the XML document will look like.
+A DTD simply helps you to focus on the structure of the document. None
+of the Template Toolkit XML tools currently make any use of the DTD.
+</para>
+
+<para>
+Here's the DTD that we'll be using for our XML.
+</para>
+
+<verbatim><![CDATA[
+<!ELEMENT show (name, creator, seasons)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT creator (#PCDATA)>
+<!ELEMENT seasons (season+)>
+<!ELEMENT season (cast, episodes)>
+<!ATTLIST season number CDATA>
+<!ATTLIST season year CDATA>
+<!ELEMENT cast (regular+)>
+<!ELEMENT regular (character, actor)>
+<!ELEMENT character (#PCDATA)>
+<!ELEMENT actor (#PCDATA)>
+<!ELEMENT episodes (episode+)>
+<!ELEMENT episode (name, summary)>
+<!ATTLIST episode number CDATA>
+<!ATTLIST episode date CDATA>
+]]></verbatim>
+
+<para>
+Whilst there are a large number of elements in this DTD it isn't very
+complex. In English, the description looks something like this:
+</para>
+
+<list>
+
+<item>
+<para>
+A TV show consists of a name, a creator and a list of seasons.
+</para>
+
+</item>
+
+<item>
+<para>
+A list of seasons consists of one or more seasons.
+</para>
+
+</item>
+
+<item>
+<para>
+A season consists of a cast and a list of episodes. It has two attributes -
+the season number and the year of broadcast.
+</para>
+
+</item>
+
+<item>
+<para>
+A cast consists of one or more regulars.
+</para>
+
+</item>
+
+<item>
+<para>
+A regular has a character name and an actor name.
+</para>
+
+</item>
+
+<item>
+<para>
+An episode list consists of one or more episodes.
+</para>
+
+</item>
+
+<item>
+<para>
+An episode has a name and a summary. It has two attributes - the episode
+number and the date of first transmission.
+</para>
+
+</item>
+
+</list>
+
+<para>
+For more information on creating and interpreting DTDs see  by Elliotte Rusty Harold and W. Scott Means or  by Eric T. Ray.
+</para>
+
+</sect2>
+
+<sect2>
+<title>XML Template</title>
+
+<para>
+ shows a simple template that will take use the TVShow
+module to create an XML document conforming to our DTD.
+</para>
+
+<verbatim><![CDATA[
+Z<ch10-create-xml>[% USE show = TVShow(name) -%]
+<?xml version="1.0"?>
+<show>
+  <name>[% show.name | html %]</name>
+  <creator>[% show.creator | html %]</creator>
+  <seasons>
+[%- FOREACH season = show.seasons %]
+    <season number="[% loop.count %]"
+            year="[% season.year %]">
+      <cast>
+      [%- FOREACH part = season.regulars %]
+        <regular>
+          <character>[% part.character | html %]</character>
+          <actor>[% part.actor | html %]</actor>
+        </regular>
+      [%- END %]
+      </cast>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<episodes>
+[%- FOREACH episode = season.episodes %]
+  <episode number="[% loop.count %]"
+           date="[% episode.date %]">
+    <name>[% episode.name | html %]</name>
+    <summary>[% episode.summary | html %]</summary>
+  </episode>
+[%- END %]
+</episodes>
+      </season>
+  [% END -%]
+    </seasons>
+  </show>
+]]></verbatim>
+
+<para>
+This template takes one parameter, <code>name</code>, which can be passed in on the 
+command line, so we can create a document for the <emphasis>Buffy the Vampire Slayer</emphasis> 
+using <code>tpage</code> like this:
+</para>
+
+<verbatim><![CDATA[
+$ tpage --define name='Buffy the Vampire Slayer' show.tt > show.xml
+]]></verbatim>
+
+<para>
+ shows an example of the XML created. Repeated sections have 
+been replaced with ellipsis.
+</para>
+
+<verbatim><![CDATA[
+Z<ch10-buffy-xml><?xml version="1.0"?>
+<show>
+  <name>Buffy the Vampire Slayer</name>
+  <creator>Joss Whedon</creator>
+  <seasons>
+    <season number="1"
+            year="1997">
+      <cast>
+        <regular>
+          <character>Buffy Summers</character>
+          <actor>Sarah Michelle Geller</actor>
+        </regular>
+        <regular>
+          <character>Xander Harris</character>
+          <actor>Nicholas Brendon</actor>
+        </regular>
+]]></verbatim>
+
+<verbatim><![CDATA[
+...
+]]></verbatim>
+
+<verbatim><![CDATA[
+</cast>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<episodes>
+  <episode number="1"
+           date="00:00:00 10-03-1997">
+    <name>Welcome to the Hellmouth</name>
+    <summary>Buffy Summers moves to Sunnydale</summary>
+  </episode>
+  <episode number="2"
+           date="00:00:00 17-03-1997">
+    <name>The Harvest</name>
+    <summary>The Master plans to escape by harvesting people</summary>
+  </episode>
+]]></verbatim>
+
+<verbatim><![CDATA[
+...
+]]></verbatim>
+
+<verbatim><![CDATA[
+</episodes>
+      </season>
+]]></verbatim>
+
+<verbatim><![CDATA[
+...
+]]></verbatim>
+
+<verbatim><![CDATA[
+</seasons>
+  </show>
+]]></verbatim>
+
+<para>
+The template itself doesn't do anything complex. It simply uses access
+methods on the TVShow object to get the data that it needs. Notice that 
+it uses the <code>date</code> plugin to format the date and the <code>loop.count</code> variable 
+to create the season and episode numbers..
+</para>
+
+<para>
+Notice also that anywhere that we are displaying text that could
+possibly include characters that have a special meaning in XML (<code>&amp;</code>,
+<code>&lt;</code>, <code>&gt;</code> or <code>&quot;</code>) we use the <code>html</code> filter to convert these
+characters into their equivalent XML entity (<code>&amp;amp;</code>, <code>&amp;lt;</code>, <code>&amp;gt;</code>
+and <code>&amp;quot;</code> respectively).
+</para>
+
+</sect2>
+
+</sect1>
+
+<sect1>
+<title>Processing RSS files with XML.RSS</title>
+
+<para>
+Before we start looking at using Template Toolkit to process arbitrary XML
+documents, let's take a look a plugin that can't be used to handle
+an industry standard XML format - RSS.
+</para>
+
+<para>
+RSS (Rich Site Summary) [footnote: though exact translations of the 
+abbreviation seem to vary on a daily basis] is a method that web sites can 
+use to exchange headlines and other data with each other. Web sites can 
+produce RSS files which other web sites can periodically download and process.
+These files contain information which the subscriber web sites can display 
+along with links to more detailed information on the publisher's web site.
+This gives the subscribers a relatively simple way to have frequently updated
+information on their web site. A good example of this concept are the 
+&quot;slashboxes&quot; that appear on the front page of . You 
+can get more information about RSS from  by Ben Hammersley.
+</para>
+
+<para>
+An RSS file consists of a small number of tags which describe the
+web site that produced the file, together with a list of items. 
+ is an example of an RSS file. This example is taken from the 
+CPAN and it lists the most recent module uploads. You can see the most recent 
+version of this file at . We've 
+removed all but two ofthe modules from the file to keep the example to a 
+manageable size.
+</para>
+
+<verbatim><![CDATA[
+<rss version="0.91">
+  <channel>
+    <title>search.cpan.org</title>
+    <link>http://search.cpan.org</link>
+    <description>The CPAN search site</description>
+    <language>en</language>
+    <image>
+      <title>searchDOTcpan</title>
+      <url>http://search.cpan.org/s/img/cpanrdf.gif</url>
+      <link>http://search.cpan.org</link>
+      <width>88</width>
+      <height>31</height>
+      <description>All Modules, All the time</description>
+    </image>
+    <item>
+      <title>DateTime-Format-Builder-0.62</title>
+      <link>http://search.cpan.org/author/SPOON/DateTime-Format-Builder-0.62</link>
+    </item>
+    <item>
+      <title>VCS-Lite-0.04</title>
+      <link>http://search.cpan.org/author/IVORW/VCS-Lite-0.04</link>
+    </item>
+  </channel>
+</rss>
+]]></verbatim>
+
+<para>
+The structure of this file is easy to understand. The &lt;channel&gt; 
+element contains a number of details about the web site providing the file 
+in the &lt;title&gt;, &lt;link&gt;, &lt;description&gt; and 
+&lt;language&gt; tags. Then we see the &lt;image&gt; tag which contains 
+details of an image that we can use to illustrate our display of the 
+information. Following this there are a number of &lt;item&gt; tags each 
+of which includes information about one recently uploaded CPAN module.
+</para>
+
+<para>
+Template Toolkit's support for RSS is provided by the plugin
+<code>Template::Plugin::XML::RSS</code> which is, in turn, a thin wrapper round
+Jonathan Eisenzopf's <code>XML::RSS</code>.
+</para>
+
+<para>
+The RSS plugin makes it very simple to use RSS files in your templates.
+To use it, you need to add the line
+</para>
+
+<verbatim><![CDATA[
+[% USE rss = XML.RSS(rssfile) %]
+]]></verbatim>
+
+<para>
+Where <code>rssfile</code> is a variable which is set to the filename of the RSS file
+that you want to use. You can then access individual items from the
+file using access methods on the <code>rss</code> object. Here is a very simple
+template to extract a list of the newest modules.
+</para>
+
+<verbatim><![CDATA[
+[% rss.channel.title -%]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[%- FOREACH item = rss.items %]
+* [% item.title -%]
+[% END %]
+]]></verbatim>
+
+<para>
+It's only a little more complex to build an HTML page as shown in
+.
+</para>
+
+<verbatim><![CDATA[
+Z<ch10-rss-html><html>
+  <head>
+[% USE rss = XML.RSS(rssfile) -%]
+    <title>[% rss.channel.title | html %]</title>
+  </head>
+  <body>
+    <h1>[% rss.channel.title | html%]</h1>
+    <p><a href="[% rss.image.link | html %]"><img src="[% rss.image.url | html %]"
+                                           title="[% rss.image.title | html %]"
+                                           alt="[% rss.image.title | html %]" /></a></p>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<ul>
+[%- FOREACH item = rss.items %]
+  <li><a href="[% item.link | html %]">[% item.title |html %]</a></li>
+[% END %]
+</ul>
+    </body>
+  </html>
+]]></verbatim>
+
+<para>
+Notice that as with the XML document we produced in the previous section,
+any text displayed is passed through the <code>html</code> filter to turn 
+dangerous characters into HTML entities.
+</para>
+
+<para>
+From processing one RSS file link this, it's easy to move to 
+processing a number of them on one page to create your own news page.
+</para>
+
+<para>
+There is one slight complication with this scenario. There are a number
+of different versions of the RSS file that you will find on the Internet.
+You will come across versions 0.91, 0.92, 1.0 and 2.0.
+</para>
+
+<para>
+The simple templates we've shown up to now will work with all versions
+equally well, but versions 1.0 and 2.0 have a number extensions which
+allow them to contain more information. The extensions in version 1.0
+are incompatible with those in 2.0. Luckily the <code>XML::RSS</code> plugin gives
+us access to the version attribute from the RSS file so our templates
+can make intelligent decisions on what data to expect to find.
+</para>
+
+<para>
+For more details on the support of the extensions to RSS 1.0 and 2.0, see
+the documentation for <filename>XML::RSS</filename> at .
+</para>
+
+</sect1>
+
+<sect1>
+<title>Processing XML documents with XML.DOM</title>
+
+<para>
+A number of standards for XML document processing. On of the most
+popular ins the 
+</para>
+
+<para>
+Because the DOM is mature standard, there are stable implementations of
+it in many languages. For this reason it is very popular with programmers
+who often switch between different languages. <code>XML::DOM</code> parses the XML
+document into a tree structure which you can then query using a large 
+set of defined method calls.
+</para>
+
+<para>
+To demonstrate the use of the <code>XML.XPath</code> plugin, let's go back to the
+TV show XML document that we created earlier in this chapter.
+ shows a basic template that will transform that XML into 
+an HTML page that describes a particular TV show.
+</para>
+
+<verbatim><![CDATA[
+Z<ch10-dom-html>[% USE date (format = '%d %b %Y') -%]
+[% USE dom = XML.DOM;
+   show = dom.parse('show.xml');
+   name = show.getElementsByTagName('name').0.getFirstChild.getNodeValue -%]
+<html>
+  <head>
+    <title>[% name | html %]</title>
+  </head>
+  <body>
+    <ul>
+    [% FOREACH season = show.getElementsByTagName('season') -%]
+      [% number = season.getAttribute('number') %]
+      <li><a href="#season[% number %]">Season [% number %]</a></li>
+    [%- END %]
+    </ul>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<h1>[% name | html %]</h1>
+<p>Created by [% show.getElementsByTagName('creator').getFirstChild.getNodeValue | html %]</p>
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% FOREACH season = show.getElementsByTagName('season') -%]
+[%- number = season.getAttribute('number') -%]
+<h2><a name="season[% number %]">Season [% number %]</a>
+  ([% season.getAttribute('year') %])</h2>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<h3>Regular Cast</h3>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<ul>
+[% FOREACH part = season.getElementsByTagName('regular', 1) -%]
+  <li><b>[% part.getElementsByTagName('actor').getFirstChild.getNodeValue | html %]</b> as
+    <i>[% part.getElementsByTagName('character').getFirstChild.getNodeValue | html %]</i></li>
+[% END %]
+</ul>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<h3>Episodes</h3>
+[%- FOREACH episode = season.getElementsByTagName('episode',1) %]
+<h4>[% episode.getAttribute('number') %] - 
+  [% episode.getElementsByTagName('name').getFirstChild.getNodeValue | html %]</h4>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<p><i>First broadcast 
+  [% date.format(episode.getAttribute('date')) %]</i><br />
+[% episode.getElementsByTagName('summary',1).getFirstChild.getNodeValue | html %]</p>
+[%- END %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% END %]
+  </html>
+]]></verbatim>
+
+<para>
+The first thing to notice is that we parse the XML document in two stages.
+</para>
+
+<verbatim><![CDATA[
+[% USE dom = XML.DOM;
+   show = dom.parse('show.xml') %]
+]]></verbatim>
+
+<para>
+In the first line we create a DOM parser object called <code>dom</code> and on
+the second line we use that object to parse our input file and create
+a DOM tree which we store in the variable <code>show</code>. We can then call 
+various XML::DOM methods on this object to extract information about
+the show. You'll notice that you will often need to string several
+method calls together to get the information that you need. For example
+to get the name of the show we use the expression
+</para>
+
+<verbatim><![CDATA[
+name = show.getElementsByTagName('name').0.getFirstChild.getNodeValue
+]]></verbatim>
+
+<para>
+The method <code>getElementsByTagName</code> returns a list of all of the elements
+that are children of the <code>show</code> element and have the name <code>name</code>. We
+then take the first node from that list (using the index <code>0</code>) and get 
+the first child of that node. This will be the text node that contains
+the name of the show. We can then use <code>getNodeValue</code> to get the value
+(i.e. the text) of that node.
+</para>
+
+<para>
+As always, when we display any text extracted from the XML document we
+pass it through the <code>html</code> filter to convert dangerous characters to
+their HTML entity equivalents.
+</para>
+
+<para>
+The output from this code is shown in .
+</para>
+
+<verbatim><![CDATA[
+Z<ch10-dom-html-out><html>
+  <head>
+    <title>Buffy the Vampire Slayer</title>
+  </head>
+  <body>
+    <ul>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<li><a href="#season1">Season 1</a></li>
+      </ul>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<h1>Buffy the Vampire Slayer</h1>
+<p>Created by Joss Whedon</p>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<h2><a name="season1">Season 1</a>
+        (1997)</h2>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<h3>Regular Cast</h3>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<ul>
+      <li><b>Sarah Michelle Geller</b> as
+    <i>Buffy Summers</i></li>
+      <li><b>Nicholas Brendon</b> as
+    <i>Xander Harris</i></li>
+]]></verbatim>
+
+<verbatim><![CDATA[
+</ul>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<h3>Episodes</h3>
+<h4>1 - 
+  Welcome to the Hellmouth</h4>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<p><i>First broadcast 
+ 10 Mar 1997</i><br />
+      Buffy Summers moves to Sunnydale</p>
+      <h4>2 - 
+ The Harvest</h4>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<p><i>First broadcast 
+ 17 Mar 1997</i><br />
+      The Master plans to escape by harvesting people</p>
+]]></verbatim>
+
+<verbatim><![CDATA[
+</html>
+]]></verbatim>
+
+<para>
+You can get more details on using the DOM from Template Toolkit by reading 
+the module documentation for <filename>Template::Plugin::XML::DOM</filename> (at
+)
+and <filename>XML::DOM</filename> (at ). There
+is more information about the DOM standard in  by Elliotte Rusty Harold and W. Scott Means.
+</para>
+
+<para>
+As you can see, using the DOM to extract data from an XML document can
+get a little long-winded. Luckily there are other ways to handle XML
+documents in Template Toolkit. In the next section we will look at another.
+</para>
+
+</sect1>
+
+<sect1>
+<title>Processing XML documents with XML.XPath</title>
+
+<sect2>
+<title>Using XML::XPath to Munge XML</title>
+
+<para>
+Another common standard for extracting data from XML documents is called 
+. XPath is structured vaguely like a file system path:  consecutive
+elements are joined with <code>/</code>, beginning at the root, and each element
+in the path is nested below the previous.  The XPath statement:
+</para>
+
+<verbatim><![CDATA[
+/html/head/title/text()
+]]></verbatim>
+
+<para>
+retrieves &quot;Welcome to Foo.com&quot; from the following XML:
+</para>
+
+<verbatim><![CDATA[
+<html>
+  <head>
+    <title>Welcome to Foo.com</title>
+  </head>
+</html>
+]]></verbatim>
+
+<para>
+Template Toolkit has support for XPath via the <code>XML.XPath</code> plugin, which
+wraps around Matt Sergeant's excellent <code>XML::XPath</code> module, available
+from CPAN (see ).  The <code>XML.XPath</code> plugin is given
+either the name of an XML document or a string containing XML..
+</para>
+
+<para>
+ shows a template which uses the XPath plugin to create 
+an HTML page from our XML file containing information about <emphasis>Buffy the 
+Vampire Slayer</emphasis>. This is identical to the one we created in the previous
+section using the DOM (see )..
+</para>
+
+<verbatim><![CDATA[
+Z<ch10-xpath-html>[% USE date (format = '%d %b %Y') -%]
+[% USE show = XML.XPath('show.xml') -%]
+[% name = show.findvalue('/show/name/text()') -%]
+<html>
+  <head>
+    <title>[% name | html %]</title>
+  </head>
+  <body>
+    <ul>
+    [% FOREACH season = show.findnodes('/show/seasons/season') -%]
+      [% number = season.findvalue('@number') %]
+      <li><a href="#season[% number %]">Season [% number %]</a></li>
+    [%- END %]
+    </ul>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<h1>[% name | html %]</h1>
+<p>Created by [% show.findvalue('show/creator/text()') | html %]</p>
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% FOREACH season = show.findnodes('/show/seasons/season') -%]
+[%- number = season.findvalue('@number') -%]
+<h2><a name="season[% number %]">Season [% number %]</a>
+  ([% season.findvalue('@year') %])</h2>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<h3>Regular Cast</h3>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<ul>
+[% FOREACH part = season.findnodes('cast/regular') -%]
+  <li><b>[% part.findvalue('actor/text()') | html %]</b> as
+    <i>[% part.findvalue('character/text()') | html %]</i></li>
+[% END %]
+</ul>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<h3>Episodes</h3>
+[% FOREACH episode = season.findnodes('episodes/episode') -%]
+<h4>[% episode.findvalue('@number') %] - 
+  [% episode.findvalue('name/text()') | html %]</h4>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<p><i>First broadcast 
+  [% date.format(episode.findvalue('@date')) %]</i><br />
+[% episode.findvalue('summary/text()') | html %]</p>
+[%- END %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% END %]
+    </div>
+  </html>
+]]></verbatim>
+
+<para>
+We are basically using three methods from the <code>XML.XPath</code> plugin. The line
+</para>
+
+<verbatim><![CDATA[
+[% USE show = XML.XPath('show.xml') -%]
+]]></verbatim>
+
+<para>
+creates a new <filename>XML::XPath</filename> object based on the file <filename>show.xml</filename>. This
+object is a tree structure which models the XML structure of the XML
+document.  We can then use the methods <code>findvalue</code> and <code>findnodes</code>
+to run XPath queries against this object. <code>findvalue</code> takes an XPath
+expression which will return a single value and returns the result of
+evaluating that expression.  For example, we use
+</para>
+
+<verbatim><![CDATA[
+[% name = show.findvalue('/show/name/text()') -%]
+]]></verbatim>
+
+<para>
+to get the name of the show from the current document. The XPath query
+translates as &quot;get the text for contained in the &lt;name&gt; element
+which is a child of the &lt;show&gt; element which is a child of the
+root.&quot; Any kind of XPath expression can be used. For example we use
+&quot;@number&quot; to get the number attribute of the current node (which just
+happens to be an episode node at that point).
+</para>
+
+<para>
+The <code>findnode</code> method is used to loop over a list of nodes. For example
+we use
+</para>
+
+<verbatim><![CDATA[
+[% FOREACH season = show.findnodes('/show/seasons/season') %]
+]]></verbatim>
+
+<para>
+to get each &lt;season&gt; node that is contained in the document and
+</para>
+
+<verbatim><![CDATA[
+[% FOREACH episode = season.findnodes('episodes.episode') %]
+]]></verbatim>
+
+<para>
+to get each episode in a season. Notice that as <code>findnodes</code> returns
+a list of nodes, we use a variable to store each node in return as we
+work our way across the loop. These nodes are also <code>XML::XPath</code> objects
+and we can therefore run XPath queries against them in exactly the same
+way as we can with the original <code>show</code> object.
+</para>
+
+<para>
+The current node that we are working from is called the .
+Continuing the file system analogy that we mentioned earlier, using a
+context node is like changing your current directory. Any XPath query
+that doesn't start with <code>/</code> is taken to be relative to your context
+node in the same way as a directory path that doesn't start with <code>/</code> is
+taken to be relative to your current directory. Any XPath quer that starts
+with <code>/</code> is taken to be relative to the root node in the same way as a
+directory path that starts with <code>/</code> is taken as realtive to the root
+directory.
+</para>
+
+<para>
+You can get more details on using XPath from Template Toolkit by reading 
+the module documentation for <filename>Template::Plugin::XML::XPath</filename> (at
+)
+and <filename>XML::XPath</filename> (at ). There
+is more information about the XPath standard in  by Elliotte Rusty Harold and W. Scott Means.
+</para>
+
+</sect2>
+
+</sect1>
+
+<sect1>
+<title>Processing XML documents with XML.LibXML</title>
+
+<para>
+All of the XML processors that we have seen up to now are based on the
+Perl module <filename>XML::Parser</filename> which is, in turn, based on James Clark's
+<filename>expat</filename> XML parser. However, <filename>expat</filename>  doesn't have support for
+newer XML features like namespaces and another parser has emerged as
+the first choice for many XML processing tasks. It is called <filename>libxml2</filename>
+and you can find more details at .
+</para>
+
+<para>
+Perl has a module, <filename>XML::LibXML</filename>, which gives access to the <filename>libxml2</filename>
+API and Mark Fowler has written <filename>Template::Plugin::XML::LibXML</filename> which
+allows it to be used from Template Toolkit. Both of these modules can be 
+downloaded from the CPAN at 
+and  respectively.
+</para>
+
+<para>
+<filename>libxml2</filename> contains support for both DOM and XPath so both of the 
+previous examples will work almost unchanged. You will just need to
+alter the lines that load and parse the XML document.
+</para>
+
+</sect1>
+
+<sect1>
+<title>Using Views to Transform XML Content</title>
+
+<para>
+The XML processing methods that we have seen so far are very useful
+for <emphasis>data-centric</emphasis> XML documents. These are documents where the structure is
+very well-defined. This type of file is commonly seem when the file
+is modelling some kind of data structure. They of commonly used for 
+transfering data between different systems, The TV show example was a 
+good example of this as the relationships between the various data
+items in the document was well understood and was unlikely to change.
+</para>
+
+<para>
+There is another type of XML file. These are known as 
+<emphasis>narrative-centric</emphasis>. In these files the data is less well structured.
+A good example of this kind of document is a book. Although a book will
+have some high-level structure (table of contents, chapters, appendices
+and index) once you get down to the text in a chapter, the structure
+is much less defined. A paragraph can contain italic text, bold text,
+references to footnotes, URLs and any number of other types of text
+all of which will need to be processed differently.
+</para>
+
+<para>
+Whilst it is possible to handle these kinds of documents using the
+techniques we have seen previously, using the VIEW directive makes
+it far easier to process narrative-centric XML.
+</para>
+
+<para>
+ shows a narrative-centric XML document.
+</para>
+
+<verbatim><![CDATA[
+Z<ch10-faq-xml><faq>
+  <qna id="q1">
+    <question>
+      What is the ultimate answer to life, the universe and everything?
+    </question>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<answer author="Deep Thought">
+  <para>42</para>
+  <note>The problem may well be that you don't <i>actually</i>
+    know what the question is!</note>
+</answer>
+    </qna>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<qna id="q2">
+  <question>
+    Where shall we have lunch?
+  </question>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<answer author="Milliways Marketing Dept">
+  <para>Have you considered <froody>Milliways</froody>, the restaurant
+  at the end of the universe.</para>
+]]></verbatim>
+
+<verbatim><![CDATA[
+<quote>If you've done six impossible things today then why
+  not top it off with dinner at Milliways?</quote>
+      </answer>
+    </qna>
+  </faq>
+]]></verbatim>
+
+<para>
+Notice that while the higher levels of the document are well-structured,
+once you get into the <code>answer</code> tag then the text is unstructured. The
+<code>para</code>, <code>note</code> and <code>quote</code> tags are used interchangeably and there
+are other tags used - you can see <code>i</code> and <code>froody</code>.
+</para>
+
+<para>
+To process this file we will create a VIEW called 'faq_html' which will
+convert the FAQ to HTML. For our first attempt we will create a &quot;do
+nothing&quot; view that will simply pass the document through unchanged. This
+view is shown in 
+</para>
+
+<verbatim><![CDATA[
+Z<ch01-faq-view1>[% VIEW faq_html notfound='passthru' %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% BLOCK text; item; END %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% BLOCK passthru -%]
+[% item.starttag; item.content(view); item.endtag -%]
+[%- END %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% END %]
+]]></verbatim>
+
+<para>
+The [% VIEW %] directive defines a block which can contain other named
+blocks. In this VIEW we have defined two blocks. The first is called
+<code>text</code>. This is the default name for a block which will be called to
+process text nodes from the document. Our text block is simple and
+just displays the current item. Note that from within a VIEW template
+the current node is available in the <code>item</code> variable and the current
+view is in the <code>view</code> variable.
+</para>
+
+<para>
+The other block we have defined is the block that is called if no
+matching block is found for a node. This is defined using the 
+<code>notfound</code> parameter to the VIEW directive. Our passthru block
+displays the start and end tags for the node and between them it
+calls the current node's <code>content</code> method passing it the current
+view. The <code>content</code> method finds all of the current node's child
+nodes and displays them using the given view. This is an important
+method. If you want child nodes to be processed then your template
+must call it.
+</para>
+
+<para>
+In order to use this template we need to have a parsed XML document.
+VIEWs work well with any of the XML modules that we have seen before,
+but support for the XPath plugin is the most advanced. We can create
+and process an XML::XPath object with code like this:
+</para>
+
+<verbatim><![CDATA[
+[% USE doc=XML.XPath(file => 'faq.xml');
+   node = doc.findnodes('/faq');
+   faq_html.print(node) %]
+]]></verbatim>
+
+<para>
+Calling the <code>print</code> method on the VIEW and passing it the starting
+node, starts the VIEW processing the document. Each type of node in the 
+document is handled handled by the block with the same name. Any type of
+node that doesn't match a block in the VIEW is handled by the <code>notfound</code>
+block.
+</para>
+
+<para>
+Currently our template has no names blocks so all nodes are handled by the
+<code>notfound</code> block. We can add blocks that handle any nodes that need
+more than this default processing.  fills in
+processing for a number of tags.
+</para>
+
+<verbatim><![CDATA[
+Z<ch10-faq-view2>[% VIEW faq_html notfound='xmlstring' %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% BLOCK faq %]<h1>Frequently Asked Questions</h1>
+[%- item.content(view); END %]
+[% BLOCK question %]<h2>[% item.content(view) %]</h2>[% END %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% BLOCK answer %]
+[% item.content(view) %]
+<p>Answer by [% item.getAttribute('author') %]</p>
+[% END %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% BLOCK para %]<p>[% item.content(view) %]</p>[% END %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% BLOCK note -%]
+<p>Note: [% item.content(view) %]</p>
+[%- END %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% BLOCK quote -%]
+<blockquote><i>[% item.content(view) %]</i></blockquote>
+[%- END %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% BLOCK qna; item.content(view); END %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% BLOCK text; item; END %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% BLOCK xmlstring -%]
+[% item.starttag; item.content(view); item.endtag -%]
+[%- END %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% END %]
+]]></verbatim>
+
+<verbatim><![CDATA[
+[% USE doc=XML.XPath(file => 'faq.xml');
+   node=doc.findnodes('/faq');
+   faq_html.print(node) %]
+]]></verbatim>
+
+<para>
+A couple of points to note. Firstly we have created a block for the
+<code>qna</code> node which does nothing but process its children. This is because
+if we left it to the default block, then the opening and closing <code>qna</code>
+tags would be displayed, and we don't want that. Secondly, we haven't 
+defined a block for the <code>i</code> tag. This is because we are happy for
+it to pass through unchanged so it becomes part of the HTML page that
+is created.
+</para>
+
+<para>
+Our input document also contains a <code>froody</code> tag, currently this tag
+is passed through untouched (and presumeably ignored by the browser that
+displays the finished page.) But when the management of Milliway's
+complain that their text should be displayed in a certain manner, it
+will be simple for us to add a block that handles it. For example:
+</para>
+
+<verbatim><![CDATA[
+[% BLOCK froody -%]
+<font size="20" color="red"><i>[% item.content(view) %]</i></font>
+[%- END %]
+]]></verbatim>
+
+<para>
+It is this extensibility that makes <code>VIEW</code>s a perfect tool for 
+processing narrative-centric XML documents. It is very simple to add
+processing for news tags and it doesn't matter whereabouts in the
+document structure that they appear.
+</para>
+
+</sect1>
+
+</pod>
+
+

@@ -1,0 +1,25 @@
+Revision history for Perl extension Pod::ToDocBook.
+#$Id: Changes 385 2008-12-30 15:46:21Z zag $
+
+0.9
+    - adopt code to new ver XML::ExtOn
+0.8
+    -fix rt (#52418)
+0.7
+    - fix tests
+    - fix process itemlists
+    - clean code for ProcessItems.pm 
+    - fix process custom formats
+    - process formatting codes in format "list"
+0.6
+    - add easy defined itemized list (FormatList)
+0.5
+    -process pod sequences at tables
+0.4
+  - add TableDefault plugin
+0.3
+    - fix characters
+0.2 
+    - fix tests, docs
+0.1 
+    - add docs, tests

@@ -1,0 +1,40 @@
+Plack-Middleware-Auth-Complex version 0.002
+===========================================
+
+AuthComplex is an authentication system for Plack applications that
+allows user registration, password changing and password reset.
+
+AuthComplex sets REMOTE_USER if the request includes correct basic
+authentication and intercepts POST requests to some configurable URLs.
+It also sets $env->{authcomplex} to itself before passing the request.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* Authen::Passphrase
+* Bytes::Random::Secure
+* DBI + DBD::SQLite
+* Email::Simple
+* IO::Prompter
+* Plack
+* Tie::Hash::Expire
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,7 @@
+Revision history for Pod-POM-View-Confluence
+
+0.01 Mon Sep  8 10:22:20 CEST 2008
+        [FEATURES]
+        - Turns Pod into a suitable format for Confluence
+          (this isn't perfect yet, see TODO tests)
+

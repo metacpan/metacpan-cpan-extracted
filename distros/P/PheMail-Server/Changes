@@ -1,0 +1,6 @@
+Revision history for Perl extension PheMail::Server.
+
+0.01  Thu Sep  4 23:03:16 2003
+	- original version; created by h2xs 1.21 with options
+		-AX PheMail::Server
+

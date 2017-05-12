@@ -1,0 +1,230 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Pod::Server 'With::AccessTrace', 'On::Continuity';
+use Getopt::Long;
+
+my %opts = (
+  port => 8088,
+);
+
+my $C = \%Pod::Server::CONFIG;
+my $trees = [];
+$C->{tree} = $trees;
+
+GetOptions(
+  $C,
+  "background_color|bg=s",
+  "foreground_color|fg=s",
+  "pre_background_color|pbg=s",
+  "pre_foreground_color|pfg=s",
+  "code_foreground_color|cfg=s",
+  "a_foreground_color|afg=s",
+  "a_hover_foreground_color|ahfg=s",
+  "font_size=s",
+  "sidebar|s=s",
+  "first|f=s",
+  "vim|v=s",
+  "vim_comment=s",
+  "vim_constant=s",
+  "vim_identifier=s",
+  "vim_statement=s",
+  "vim_preproc=s",
+  "vim_type=s",
+  "vim_special=s",
+  "vim_underlined=s",
+  "vim_error_bg=s",
+  "vim_error_fg=s",
+  "vim_todo_bg=s",
+  "vim_todo_fg=s",
+  "title|t=s",
+  "port|p=i",
+  "help|h",
+  "tree=s"
+);
+
+if ($C->{help}) {
+print qq|Start a web server that serves locally installed perl documentation.
+
+Usage: pod_server [OPTION]...
+
+Options:
+
+  -p,    --port NUM                  Port for web server (defaults to 8088)
+  -t,    --title TITLE               Base title for pages (defaults to '$C->{title}')
+
+  --font_size SIZE                   Font size (defaults to '$C->{font_size}') 
+
+  -bg,   --background_color COLOR           (defaults to '$C->{background_color}') 
+  -fg,   --foreground_color COLOR           (defaults to '$C->{foreground_color}') 
+  -pbg,  --pre_background_color COLOR       (defaults to '$C->{pre_background_color}') 
+  -pfg,  --pre_foreground_color COLOR       (defaults to '$C->{pre_foreground_color}') 
+  -cfg,  --code_foreground_color COLOR      (defaults to '$C->{code_foreground_color}') 
+  -afg,  --a_foreground_color COLOR         (defaults to '$C->{a_foreground_color}') 
+  -ahfg, --a_hover_foreground_color COLOR   (defaults to '$C->{a_hover_foreground_color}') 
+
+  --vim_comment COLOR                (defaults to '$C->{vim_comment}')
+  --vim_constant COLOR               (defaults to '$C->{vim_constant}')
+  --vim_identifier COLOR             (defaults to '$C->{vim_identifier}')
+  --vim_statement COLOR              (defaults to '$C->{vim_statement}')
+  --vim_preproc COLOR                (defaults to '$C->{vim_preproc}')
+  --vim_type COLOR                   (defaults to '$C->{vim_type}')
+  --vim_special COLOR                (defaults to '$C->{vim_special}')
+  --vim_underlined COLOR             (defaults to '$C->{vim_underlined}')
+  --vim_error_bg COLOR               (defaults to '$C->{vim_error_bg}')
+  --vim_error_fg COLOR               (defaults to '$C->{vim_error_fg}')
+  --vim_todo_bg COLOR                (defaults to '$C->{vim_todo_bg}')
+  --vim_todo_fg COLOR                (defaults to '$C->{vim_todo_fg}')
+
+  -s, --sidebar POSITION             Sidebar on 'left' or 'right'?
+                                     (defaults to '$C->{sidebar}')
+
+  -f, --first MODULE                 First POD you see in framed mode
+                                     (defaults to '$C->{first}')
+
+  -v, --vim BOOLEAN                  Syntax highlight source code with vim?
+                                     Set to "0" to disable.
+                                     (defaults to '$C->{vim}')
+
+      --tree STRING                  Direcory tree to search. Can occur
+                                     several times. eg --tree dir1 --tree dir2.
+
+  -h, --help                         This help message
+
+Examples:
+
+  Run in "daemonized" mode:
+    ( pod_server > /dev/null 2>&1 ) &
+
+  Use a light colored theme:
+    pod_server -bg '#fff' -fg '#222' -cfg '#224' -pbg '#223' -afg '#48f' -ahfg '#248'
+
+  Use a red theme:
+    pod_server -bg '#100' -pbg '#211' -afg '#f44' -ahfg '#fcc'
+
+|;
+exit 0;
+}
+
+if ($C->{port}) {
+  $opts{port} = $C->{port};
+}
+
+Pod::Server->init;
+Pod::Server->continue(%opts);
+
+=head1 NAME
+
+pod_server - start a web server that serves locally installed perl docs
+
+=head1 SYNOPSIS
+
+Usage:
+
+  pod_server [OPTION]...
+
+Run in "daemonized" mode:
+
+  ( pod_server > /dev/null 2>&1 ) &
+
+Use a light colored theme:
+
+  pod_server -bg '#fff' -fg '#222' -cfg '#224' -pbg '#223' -afg '#48f' -ahfg '#248'
+
+Use a red theme:
+
+  pod_server -bg '#100' -pbg '#211' -afg '#f44' -ahfg '#fcc'
+
+=head1 DESCRIPTION
+
+This script has been provided to make it easy to start Pod::Server.  It's
+name is a homage to C<gem_server> from the Ruby world.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -p, --port NUM
+
+This is the port that the web server should listen on.
+
+=item -t, --title TITLE
+
+This is the base title of the pages.
+
+=item --font_size SIZE
+
+This is the font size for the text
+
+=item -bg, --background_color COLOR
+
+=item -fg, --foreground_color COLOR
+
+=item -pbg, --pre_background_color COLOR
+
+=item -pfg, --pre_foreground_color COLOR
+
+=item -cfg, --code_foreground_color COLOR
+
+=item -afg, --a_foreground_color COLOR
+
+=item -ahfg, --a_hover_foreground_color COLOR
+
+=item --vim_comment COLOR
+
+=item --vim_constant COLOR
+
+=item --vim_identifier COLOR
+
+=item --vim_statement COLOR
+
+=item --vim_preproc COLOR
+
+=item --vim_type COLOR
+
+=item --vim_special COLOR
+
+=item --vim_underlined COLOR
+
+=item --vim_error_bg COLOR
+
+=item --vim_error_fg COLOR
+
+=item --vim_todo_bg COLOR
+
+=item --vim_todo_fg COLOR
+
+I hope all these colors are self-explanatory.  The color argument should
+be expressed in terms that CSS understands.  For example:
+
+  #301
+  #ffffff
+  rgb(128,230,255)
+  blue
+
+=item -s, --sidebar POSITION
+
+When viewing POD in the optional framed mode, you may choose to put the
+sidebar on the 'left' or the 'right'.
+
+=item -f, --first MODULE
+
+When you enter framed mode, you get to see this POD first.
+
+=item -v, --vim BOOLEAN
+
+If this setting is true, vim will be used to syntax highlight the
+source code view.  Set this to "0" to disable vim's syntax highlighting.
+
+=item -h, --help
+
+Display the useful help message.
+
+=back
+
+=head1 AUTHOR
+
+John BEPPU E<lt>beppu@cpan.orgE<gt>
+
+=cut

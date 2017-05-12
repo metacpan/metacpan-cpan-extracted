@@ -1,0 +1,8 @@
+Revision history for Perl extension PerlIO::fse
+
+0.02 Fri May 29 09:13:28 2009
+	- add HISTORY section to the pod
+	- load Encode module in compile-time, expecting to avoid segfault
+
+0.01 Wed May 27 09:13:36 2009
+        - splited from PerlIO::Util

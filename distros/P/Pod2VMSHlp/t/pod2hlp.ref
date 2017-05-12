@@ -1,0 +1,18 @@
+1 pod2hlp
+pod2hlp
+NAME
+    pod2hlp - pod to VMS help file reformatter.
+
+SYNOPSIS
+    perl pod2hlp podfile
+
+DESCRIPTION
+    This program uses the Pod::Hlp module from the Pod2VMSHlp
+    package. This program takes a podfile.TYPE and produces a
+    reformatted podfile.hlp file in the same directory.
+
+AUTHOR
+    Copyright (c) 1999 Peter Prymmer. This program may be used under
+    the same terms as Perl. Peter Prymmer pvhp@best.com 1-MAY-1999.
+    First released with Pod::Hlp Aug 14 1996.
+

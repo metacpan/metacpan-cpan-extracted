@@ -1,0 +1,54 @@
+Pod::SAX Changes
+
+0.14
+    - Lock list of supported URL schemes so you can't do javascript:
+      injection into POD documents
+    - Fixed verbatim to only remove smallest indent
+    - Made sure E<entity> entries are actually utf-8
+    - Added some real and useful documentation ;-)
+
+0.13
+    - Fixed some list issues
+
+0.12
+    - Fixed L<> parsing to do links with text
+
+0.11
+    - Fixed L<> parsing based on very strange TorgoX journal entry ;-)
+    - Some =item fixes
+
+0.10
+    - Added pod2axpoint.xsl for creating AxPoint slides
+    - Added more tests
+    - Fixed bug with non-ending verbatim section
+
+0.09
+    - Line numbers weren't showing up. Fixed
+
+0.08
+    - Added line numbers to error messages (via DocumentLocator)
+    - Better tag nesting error checking
+
+0.07
+    - Minor bug fixes
+
+0.06
+    - Fix for links in =item sections
+
+0.06
+    - Verbatim parsing fixes (make sure they all go into one block)
+    
+0.05
+    - More changes to bring it closer to perlpodspec
+
+0.04
+    - Fixed un-ending =item bug
+
+0.03
+    - Complete re-write to use Pod::Parser
+
+0.02
+    - Work around bug in Pod::Tree when parsing strings
+
+0.01
+    - Initial Release

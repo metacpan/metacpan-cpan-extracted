@@ -1,0 +1,46 @@
+Submitting Patches
+-=-=-=-=-=-=-=-=-=
+
+Here are the basic instructions; get yourself a copy of git (see
+http://git.or.cz; debian/ubuntu users, the package is 'git-core')
+
+  # fetch it
+  git-clone git://utsl.gen.nz/IO-Plumbing
+  cd IO-Plumbing
+  
+  # add the test and check that it works
+  vi t/002-newtest.t
+  perl -Mlib=lib t/002-newtest.t
+  
+  # commit it to your git
+  git-add t/002-newtest.t
+  git-commit -m "Add a (failing) test for blah blah blah..."
+  
+  # configure git-send-email if required
+  git-config sendemail.smtpserver mail.yourhost.com
+  git-config sendemail.to samv@cpan.org
+  
+  # send the patch.
+  git-send-email `git-format-patch origin/master`
+
+If the git:// URL doesn't work, try
+
+  git-clone http://git.utsl.gen.nz/IO-Plumbing
+
+Submitting Bug Reports
+-=-=-=-=-=-=-=-=-=-=-=
+
+Please get a copy of cil, and submit the issue as a patch;
+
+  cil add
+  git add issues
+  git-commit -m "Add my issue"
+
+  # as above - configure git-send-email
+  git-config sendemail.smtpserver mail.yourhost.com
+  git-config sendemail.to samv@cpan.org
+
+  # and send the patch
+  git-send-email `git-format-patch origin/master`
+
+cil is available from http://kapiti.geek.nz/software/cil.html

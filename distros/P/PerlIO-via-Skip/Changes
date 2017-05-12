@@ -1,0 +1,25 @@
+Revision history for Perl extension PerlIO::via::Skip.
+
+0.06  Sat Aug 28 08:08:18 2011
+	   - added author tag in Makefile.PL
+
+0.05  Sat Aug 28 05:05:11 2011
+	   - Regular upkeep: changed installer, changed and added tests
+
+0.04  Thu Jul 24 19:01:53 2008
+       - Fixed Perl version ( to 5.006 )
+       - Fixed License
+       - META file to current specs
+
+0.03  Mon Feb 20 19:07:18 2006
+	- Minor changes to test files
+	
+0.02  Sat Sep 24 01:54:57 2005
+        - Packaging changes to keep CPANTS happy.
+        - Also builds with Module::Build.
+        - Changed META.yaml, and added pod tests and distribution test
+
+0.01  Fri May  6 18:47:35 2005
+	- original version; created by h2xs 1.23 with options
+		-AX -n PerlIO::via::Skip
+

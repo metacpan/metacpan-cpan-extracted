@@ -1,0 +1,42 @@
+Revision history for Perl extension POE::Component::DBIAgent. -*-text-*-
+
+0.25 Doc cleanups. Code cleanups.
+
+0.24 Added patches from fluffle on #poe to add support for
+     returning rows in batches instead of one at a time.  This is a
+     performance speedup, in most cases.
+
+0.23 Internal revision
+
+0.22 Internal revision
+
+0.21 Forgot to add the parameter passing code in the main to complete
+     cookie support.  The HELPER understood it... <sigh>
+
+0.20 Reworked the query() syntax.  Added an optional parameter hash to
+     query(), which obsoleted query_slow in favor of delay => 1.  Also
+     added query cookies, to facilitate more advanced query handling.
+     Added option to return hashref rows instead of listrefs.
+
+0.15 Added query_slow method.  This introduces a 1ms delay between
+     each row of output.  The REASON is that if you are concurrently
+     handling many handles/sockets, the DBI output won't monopolize
+     all traffic, making everybody else wait.
+
+     Updated queue management so that when agents finish their
+     queries, they move to the head of the line for the next query.
+
+     Manages query concurrency MUCH better.  If more queries are run
+     than there are agents, queries are spooled and then run as agents
+     complete their jobs and are freed.
+
+0.14 Finally got rid of Filter::Line!  All communication from the
+     component to the agents is now via Filter::Reference... woo-hoo!
+
+0.13 Added finish() method to signal helper shutdown.
+
+0.12 POE changed the syntax for calling POE::Wheel::Run.  So, syntax updated.
+
+0.11 Initial release, part 2... this one saw daylight. :-)
+
+0.10 Initial release, but it was my first time using PAUSE, so it never saw daylight.

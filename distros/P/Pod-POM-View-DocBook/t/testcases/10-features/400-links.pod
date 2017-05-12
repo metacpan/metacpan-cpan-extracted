@@ -1,0 +1,9 @@
+=head1 NAME
+
+Testing of links
+
+=head1 DESCRIPTION
+
+link to url: L<http://example.com/>
+
+=cut

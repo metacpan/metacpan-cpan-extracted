@@ -1,0 +1,618 @@
+name en-gb Shopify Theme
+
+# % base03            000000
+# % base02            000000
+
+# % base01            ffffff
+# % base00            cccccc
+# % base0             aaaaaa
+# % base1             6666ff
+# % base2             222222
+# % base3             333333
+
+# % yellow            dbd000
+# % orange            ffdd00
+# % red               ff0000
+# % magenta           ffaaaa
+# % violet            00aa00
+# % blue              9999ff
+# % cyan              ccccff
+# % green             00ff00
+
+
+# Padre GUI Colours
+style gui
+SetForegroundColour                               base1
+SetBackgroundColour                               base02
+
+style padre
+StyleSetBackground      STYLE_DEFAULT     base03
+StyleSetForeground      STYLE_DEFAULT     base1
+StyleSetForeground      STYLE_CONTROLCHAR base00
+StyleSetBackground      STYLE_CONTROLCHAR base03
+StyleSetForeground      STYLE_BRACELIGHT      orange
+StyleSetBackground      STYLE_BRACELIGHT      base03
+StyleSetForeground      STYLE_BRACEBAD        base03
+StyleSetBackground      STYLE_BRACEBAD          red
+StyleSetForeground      PADRE_BLACK             base1
+StyleSetForeground      PADRE_BLUE              blue
+StyleSetForeground      PADRE_RED               red
+StyleSetForeground      PADRE_GREEN             green
+StyleSetForeground      PADRE_MAGENTA           magenta
+StyleSetForeground      PADRE_ORANGE            orange
+StyleSetForeground      PADRE_CRIMSON           violet
+StyleSetForeground      PADRE_BROWN             yellow
+StyleSetForeground      PADRE_WARNING           af8000
+StyleSetBackground      PADRE_WARNING           fffff0
+StyleSetItalic          PADRE_WARNING           1
+StyleSetForeground      PADRE_ERROR             af0000
+StyleSetBackground      PADRE_ERROR             fff0f0
+StyleSetItalic          PADRE_ERROR             1
+StyleSetBackground      STYLE_CALLTIP     base02
+StyleSetForeground      STYLE_CALLTIP     base00
+# Code folding margin
+SetFoldMarginColour     1                      base02
+SetFoldMarginHiColour   1                      base02
+MarkerSetForeground     SC_MARKNUM_FOLDEREND      base02
+MarkerSetBackground     SC_MARKNUM_FOLDEREND      base01
+MarkerSetForeground     SC_MARKNUM_FOLDEROPENMID  base02
+MarkerSetBackground     SC_MARKNUM_FOLDEROPENMID  base01
+MarkerSetForeground     SC_MARKNUM_FOLDERMIDTAIL  base01
+MarkerSetBackground     SC_MARKNUM_FOLDERMIDTAIL  base01
+MarkerSetForeground     SC_MARKNUM_FOLDERTAIL     base01
+MarkerSetBackground     SC_MARKNUM_FOLDERTAIL     base01
+MarkerSetForeground     SC_MARKNUM_FOLDERSUB      base01
+MarkerSetBackground     SC_MARKNUM_FOLDERSUB      base01
+MarkerSetForeground     SC_MARKNUM_FOLDER         base01
+MarkerSetBackground     SC_MARKNUM_FOLDER         base02
+MarkerSetForeground     SC_MARKNUM_FOLDEROPEN     base02
+MarkerSetBackground     SC_MARKNUM_FOLDEROPEN     base01
+
+style text/plain
+include padre
+SetCaretForeground                                  base1
+SetCaretLineBackground                              base02
+SetSelBackground        1 base2
+SetWhitespaceForeground 0                           base00
+SetWhitespaceBackground 0                           ff2b36
+StyleSetBackground      STYLE_DEFAULT         base03
+# this is cheating - the NULL lexer sets style to 0 what is the constant for that?
+StyleSetBackground      0                           base03
+StyleSetBackground      STYLE_LINENUMBER      base02
+StyleSetForeground      STYLE_LINENUMBER      base01
+StyleSetForeground      STYLE_INDENTGUIDE     green
+CallTipSetBackground base02
+
+#
+# application/x-perl
+#
+style application/x-perl
+include text/plain
+StyleSetForeground      SCE_PL_DEFAULT            base00
+StyleSetForeground      SCE_PL_ERROR              ff0000
+StyleSetForeground      SCE_PL_COMMENTLINE        base1
+StyleSetForeground      SCE_PL_POD                base00
+StyleSetForeground      SCE_PL_POD_VERB           base00
+StyleSetItalic          SCE_PL_POD_VERB           1
+StyleSetForeground      SCE_PL_NUMBER             orange
+StyleSetForeground      SCE_PL_WORD               green
+StyleSetForeground      SCE_PL_STRING             cyan
+StyleSetForeground      SCE_PL_CHARACTER          violet
+StyleSetForeground      SCE_PL_PUNCTUATION        000000
+StyleSetForeground      SCE_PL_PREPROCESSOR       base00
+StyleSetForeground      SCE_PL_OPERATOR           blue
+StyleSetForeground      SCE_PL_IDENTIFIER         base0
+StyleSetForeground      SCE_PL_SCALAR             yellow
+StyleSetForeground      SCE_PL_ARRAY              red
+StyleSetForeground      SCE_PL_HASH               red
+StyleSetForeground      SCE_PL_SYMBOLTABLE        base2
+StyleSetForeground      SCE_PL_VARIABLE_INDEXER   yellow
+StyleSetForeground      SCE_PL_REGEX              magenta
+StyleSetForeground      SCE_PL_REGSUBST           base1
+StyleSetForeground      SCE_PL_LONGQUOTE          cyan
+StyleSetForeground      SCE_PL_BACKTICKS          orange
+StyleSetForeground      SCE_PL_DATASECTION        cyan
+StyleSetForeground      SCE_PL_HERE_DELIM         cyan
+StyleSetForeground      SCE_PL_HERE_Q             violet
+StyleSetForeground      SCE_PL_HERE_QQ            cyan
+StyleSetForeground      SCE_PL_HERE_QX            orange
+StyleSetForeground      SCE_PL_STRING_Q           violet
+StyleSetForeground      SCE_PL_STRING_QQ          cyan
+StyleSetForeground      SCE_PL_STRING_QX          orange
+StyleSetForeground      SCE_PL_STRING_QR          magenta
+StyleSetForeground      SCE_PL_STRING_QW          violet
+StyleSetForeground      SCE_PL_SUB_PROTOTYPE      orange
+StyleSetForeground      SCE_PL_FORMAT_IDENT       base2
+StyleSetBold            SCE_PL_FORMAT_IDENT 1
+
+StyleSetForeground      SCE_PL_FORMAT             cyan
+StyleSetForeground      SCE_PL_STRING_VAR          yellow
+StyleSetForeground      SCE_PL_XLAT                magenta
+StyleSetItalic          SCE_PL_XLAT                1
+StyleSetForeground      SCE_PL_REGEX_VAR           yellow
+StyleSetForeground      SCE_PL_REGSUBST_VAR        yellow
+StyleSetForeground      SCE_PL_BACKTICKS_VAR       yellow
+StyleSetForeground      SCE_PL_HERE_QQ_VAR         yellow
+StyleSetForeground      SCE_PL_HERE_QX_VAR         yellow
+StyleSetForeground      SCE_PL_STRING_QQ_VAR       yellow
+StyleSetForeground      SCE_PL_STRING_QX_VAR       yellow
+StyleSetForeground      SCE_PL_STRING_QR_VAR       yellow
+
+StyleSetBackground      SCE_PL_DEFAULT            base03
+StyleSetBackground      SCE_PL_ERROR              base03
+StyleSetBackground      SCE_PL_COMMENTLINE        base03
+StyleSetBackground      SCE_PL_POD                base03
+StyleSetBackground      SCE_PL_NUMBER             base03
+StyleSetBackground      SCE_PL_WORD               base03
+StyleSetBackground      SCE_PL_STRING             base03
+StyleSetBackground      SCE_PL_CHARACTER          base03
+StyleSetBackground      SCE_PL_PUNCTUATION        base03
+StyleSetBackground      SCE_PL_PREPROCESSOR       base03
+StyleSetBackground      SCE_PL_OPERATOR           base03
+StyleSetBackground      SCE_PL_IDENTIFIER         base03
+StyleSetBackground      SCE_PL_SCALAR             base03
+StyleSetBackground      SCE_PL_ARRAY              base03
+StyleSetBackground      SCE_PL_HASH               base03
+StyleSetBackground      SCE_PL_SYMBOLTABLE        base03
+StyleSetBackground      SCE_PL_REGEX              base03
+StyleSetBackground      SCE_PL_REGSUBST           base03
+StyleSetBackground      SCE_PL_LONGQUOTE          base03
+StyleSetBackground      SCE_PL_BACKTICKS          base03
+StyleSetBackground      SCE_PL_DATASECTION        base03
+StyleSetBackground      SCE_PL_HERE_DELIM         base03
+StyleSetBackground      SCE_PL_HERE_Q             base03
+StyleSetBackground      SCE_PL_HERE_QQ            base03
+StyleSetBackground      SCE_PL_HERE_QX            base03
+StyleSetBackground      SCE_PL_STRING_Q           base03
+StyleSetBackground      SCE_PL_STRING_QQ          base03
+StyleSetBackground      SCE_PL_STRING_QX          base03
+StyleSetBackground      SCE_PL_STRING_QR          base03
+StyleSetBackground      SCE_PL_STRING_QW          base03
+StyleSetBackground      SCE_PL_FORMAT             base03
+StyleSetBackground      SCE_PL_FORMAT_IDENT       base03
+StyleSetBackground      SCE_PL_SUB_PROTOTYPE      base03
+StyleSetBackground      SCE_PL_POD_VERB           base03
+StyleSetBackground      SCE_PL_VARIABLE_INDEXER   base03
+
+StyleSetBackground      SCE_PL_STRING_VAR         base03
+StyleSetBackground      SCE_PL_XLAT               base03
+StyleSetBackground      SCE_PL_REGEX_VAR          base03
+StyleSetBackground      SCE_PL_REGSUBST_VAR       base03
+StyleSetBackground      SCE_PL_BACKTICKS_VAR      base03
+StyleSetBackground      SCE_PL_HERE_QQ_VAR        base03
+StyleSetBackground      SCE_PL_HERE_QX_VAR        base03
+StyleSetBackground      SCE_PL_STRING_QQ_VAR      base03
+StyleSetBackground      SCE_PL_STRING_QX_VAR      base03
+StyleSetBackground      SCE_PL_STRING_QR_VAR      base03
+
+
+StyleSetBackground       SCE_PL_SUB_PROTOTYPE      base02
+StyleSetBackground       SCE_PL_FORMAT_IDENT       base02
+StyleSetBackground       SCE_PL_FORMAT             base02
+
+## conf
+style text/x-config
+include text/plain
+StyleSetForeground       SCE_CONF_DEFAULT          base00
+StyleSetForeground       SCE_CONF_COMMENT          base01
+StyleSetForeground       SCE_CONF_NUMBER           cyan
+StyleSetForeground       SCE_CONF_IDENTIFIER       yellow
+StyleSetForeground       SCE_CONF_EXTENSION        base0
+StyleSetForeground       SCE_CONF_PARAMETER        magenta
+StyleSetForeground       SCE_CONF_STRING           orange
+StyleSetForeground       SCE_CONF_OPERATOR         base1
+StyleSetForeground       SCE_CONF_IP               green
+StyleSetForeground       SCE_CONF_DIRECTIVE        base0
+StyleSetBackground       SCE_CONF_DEFAULT          base03
+StyleSetBackground       SCE_CONF_COMMENT          base03
+StyleSetBackground       SCE_CONF_NUMBER           base03
+StyleSetBackground       SCE_CONF_IDENTIFIER       base03
+StyleSetBackground       SCE_CONF_EXTENSION        base03
+StyleSetBackground       SCE_CONF_PARAMETER        base03
+StyleSetBackground       SCE_CONF_STRING           base03
+StyleSetBackground       SCE_CONF_OPERATOR         base03
+StyleSetBackground       SCE_CONF_IP               base03
+StyleSetBackground       SCE_CONF_DIRECTIVE        base03
+
+
+## yaml
+style text/x-yaml
+include text/plain
+StyleSetForeground       SCE_YAML_DEFAULT             green
+StyleSetForeground       SCE_YAML_COMMENT             base01
+StyleSetForeground       SCE_YAML_IDENTIFIER          blue
+StyleSetBold             SCE_YAML_IDENTIFIER          1
+StyleSetForeground       SCE_YAML_KEYWORD             violet
+StyleSetForeground       SCE_YAML_NUMBER              red
+StyleSetForeground       SCE_YAML_REFERENCE           cyan
+StyleSetForeground       SCE_YAML_DOCUMENT            green
+StyleSetBackground       SCE_YAML_DOCUMENT            base2
+StyleSetBold             SCE_YAML_DOCUMENT            1
+StyleSetEOLFilled        SCE_YAML_DOCUMENT            1
+StyleSetForeground       SCE_YAML_TEXT                333366
+StyleSetForeground       SCE_YAML_ERROR               green
+StyleSetBackground       SCE_YAML_ERROR               base2
+StyleSetBold             SCE_YAML_ERROR               1
+StyleSetEOLFilled        SCE_YAML_ERROR               1
+StyleSetBackground       SCE_YAML_DEFAULT             base03
+StyleSetBackground       SCE_YAML_COMMENT             base03
+StyleSetBackground       SCE_YAML_IDENTIFIER          base03
+StyleSetBackground       SCE_YAML_KEYWORD             base03
+StyleSetBackground       SCE_YAML_NUMBER              base03
+StyleSetBackground       SCE_YAML_REFERENCE           base03
+StyleSetBackground       SCE_YAML_TEXT                base03
+StyleSetBackground       SCE_YAML_OPERATOR            base03
+
+style text/x-csrc
+include text/plain
+StyleSetForeground      SCE_C_DEFAULT                 base00
+StyleSetBackground      SCE_C_DEFAULT                 base03
+StyleSetForeground      SCE_C_COMMENT                 base01
+StyleSetBackground      SCE_C_COMMENT                 base03
+StyleSetForeground      SCE_C_COMMENTLINE             base01
+StyleSetBackground      SCE_C_COMMENTLINE             base03
+StyleSetForeground      SCE_C_COMMENTDOC              base01
+StyleSetBackground      SCE_C_COMMENTDOC              base03
+StyleSetForeground      SCE_C_NUMBER                  cyan
+StyleSetBackground      SCE_C_NUMBER                  base03
+StyleSetForeground      SCE_C_WORD                    violet
+StyleSetBackground      SCE_C_WORD                    base03
+StyleSetBold            SCE_C_WORD                    1
+StyleSetForeground      SCE_C_STRING                  ff7f00
+StyleSetBackground      SCE_C_STRING                  base03
+StyleSetForeground      SCE_C_CHARACTER               violet
+StyleSetBackground      SCE_C_CHARACTER               base03
+StyleSetForeground      SCE_C_UUID                    violet
+StyleSetBackground      SCE_C_UUID                    base03
+StyleSetForeground      SCE_C_PREPROCESSOR            base1
+StyleSetBackground      SCE_C_PREPROCESSOR            base03
+StyleSetBold            SCE_C_PREPROCESSOR            1
+StyleSetForeground      SCE_C_OPERATOR                blue
+StyleSetBackground      SCE_C_OPERATOR                base03
+StyleSetForeground      SCE_C_IDENTIFIER              green
+StyleSetBackground      SCE_C_IDENTIFIER              base03
+StyleSetForeground      SCE_C_STRINGEOL               red
+StyleSetBackground      SCE_C_STRINGEOL               base03
+StyleSetForeground      SCE_C_VERBATIM                violet
+StyleSetBackground      SCE_C_VERBATIM                base03
+StyleSetForeground      SCE_C_REGEX                   ff007f
+StyleSetBackground      SCE_C_REGEX                   base03
+StyleSetForeground      SCE_C_COMMENTLINEDOC          base01
+StyleSetBackground      SCE_C_COMMENTLINEDOC          base03
+StyleSetForeground      SCE_C_WORD2                   violet
+StyleSetBackground      SCE_C_WORD2                   base03
+StyleSetBold            SCE_C_WORD2                   1
+StyleSetForeground      SCE_C_COMMENTDOCKEYWORD       base00
+StyleSetBackground      SCE_C_COMMENTDOCKEYWORD       base03
+StyleSetForeground      SCE_C_COMMENTDOCKEYWORDERROR  base00
+StyleSetBackground      SCE_C_COMMENTDOCKEYWORDERROR  base03
+StyleSetForeground      SCE_C_GLOBALCLASS             violet
+StyleSetBackground      SCE_C_GLOBALCLASS             base03
+
+
+# text/x-perlxs
+# surely this should be rolled up to text/x-csrc and included by cpp and perlxs ?
+style text/x-perlxs
+include text/x-csrc
+
+style text/x-cpp
+include text/x-csrc
+
+#
+# text/html
+style text/html
+include text/plain
+StyleSetBackground      SCE_H_DEFAULT                 base03
+StyleSetBackground      SCE_H_TAG                     base03
+StyleSetBackground      SCE_H_TAGUNKNOWN              base03
+StyleSetBackground      SCE_H_ATTRIBUTE               base03
+StyleSetBackground      SCE_H_ATTRIBUTEUNKNOWN        base03
+StyleSetBackground      SCE_H_NUMBER                  base03
+StyleSetBackground      SCE_H_DOUBLESTRING            base03
+StyleSetBackground      SCE_H_SINGLESTRING            base03
+StyleSetBackground      SCE_H_OTHER                   base03
+StyleSetBackground      SCE_H_COMMENT                 base03
+StyleSetBackground      SCE_H_ENTITY                  base03
+
+StyleSetForeground      SCE_H_DEFAULT                 base1
+StyleSetForeground      SCE_H_TAG                     base01
+StyleSetForeground      SCE_H_TAGUNKNOWN              red
+StyleSetForeground      SCE_H_ATTRIBUTE               blue
+StyleSetForeground      SCE_H_ATTRIBUTEUNKNOWN        red
+StyleSetForeground      SCE_H_NUMBER                  magenta
+StyleSetForeground      SCE_H_DOUBLESTRING            violet
+StyleSetForeground      SCE_H_SINGLESTRING            cyan
+StyleSetForeground      SCE_H_OTHER                   yellow
+StyleSetForeground      SCE_H_COMMENT                 base00
+StyleSetItalic          SCE_H_COMMENT                 1
+StyleSetForeground      SCE_H_ENTITY                  green
+
+StyleSetBackground      SCE_H_TAGEND                  base03
+StyleSetBackground      SCE_H_XMLSTART                base03
+StyleSetBackground      SCE_H_XMLEND                  base03
+StyleSetBackground      SCE_H_SCRIPT                  base03
+StyleSetBackground      SCE_H_ASP                     base03
+StyleSetBackground      SCE_H_ASPAT                   base03
+StyleSetBackground      SCE_H_CDATA                   base02
+StyleSetEOLFilled       SCE_H_CDATA                   1
+StyleSetBackground      SCE_H_QUESTION                base03
+
+StyleSetForeground      SCE_H_TAGEND                  base01
+StyleSetForeground      SCE_H_XMLSTART                orange
+StyleSetForeground      SCE_H_XMLEND                  orange
+StyleSetForeground      SCE_H_SCRIPT                  magenta
+#StyleSetForeground      SCE_H_ASP 15
+#StyleSetForeground      SCE_H_ASPAT 16
+StyleSetForeground      SCE_H_CDATA                   magenta
+StyleSetForeground      SCE_H_QUESTION                green
+
+
+StyleSetBackground      SCE_H_VALUE                   base02
+StyleSetBackground      SCE_H_XCCOMMENT               base03
+
+#// SGML
+StyleSetBackground      SCE_H_SGML_DEFAULT            base02
+StyleSetBackground      SCE_H_SGML_COMMAND            base02
+StyleSetBackground      SCE_H_SGML_1ST_PARAM          base02
+StyleSetBackground      SCE_H_SGML_DOUBLESTRING       base02
+StyleSetBackground      SCE_H_SGML_SIMPLESTRING       base02
+StyleSetBackground      SCE_H_SGML_ERROR              base02
+StyleSetBackground      SCE_H_SGML_SPECIAL            base02
+StyleSetBackground      SCE_H_SGML_ENTITY             base02
+StyleSetBackground      SCE_H_SGML_COMMENT            base02
+StyleSetBackground      SCE_H_SGML_1ST_PARAM_COMMENT  base02
+StyleSetBackground      SCE_H_SGML_BLOCK_DEFAULT      base02
+
+## 
+StyleSetForeground      SCE_H_SGML_DEFAULT            magenta
+StyleSetForeground      SCE_H_SGML_COMMAND            green
+StyleSetForeground      SCE_H_SGML_1ST_PARAM          orange
+StyleSetForeground      SCE_H_SGML_DOUBLESTRING       violet
+StyleSetForeground      SCE_H_SGML_SIMPLESTRING       base03
+StyleSetForeground      SCE_H_SGML_ERROR              orange
+StyleSetForeground      SCE_H_SGML_SPECIAL            green
+StyleSetForeground      SCE_H_SGML_ENTITY             green
+StyleSetForeground      SCE_H_SGML_COMMENT            base00
+StyleSetItalic          SCE_H_SGML_COMMENT            1
+StyleSetForeground      SCE_H_SGML_1ST_PARAM_COMMENT  base1
+StyleSetForeground      SCE_H_SGML_BLOCK_DEFAULT      magenta
+
+
+#// Embedded Javascript Backgrounds
+StyleSetBackground      SCE_HJ_START                  base02
+StyleSetBackground      SCE_HJ_DEFAULT                base02
+StyleSetBackground      SCE_HJ_COMMENT                base02
+StyleSetBackground      SCE_HJ_COMMENTLINE            base02
+StyleSetBackground      SCE_HJ_COMMENTDOC             base02
+StyleSetBackground      SCE_HJ_NUMBER                 base02
+StyleSetBackground      SCE_HJ_WORD                   base02
+StyleSetBackground      SCE_HJ_KEYWORD                base02
+StyleSetBackground      SCE_HJ_DOUBLESTRING           base02
+StyleSetBackground      SCE_HJ_SINGLESTRING           base02
+StyleSetBackground      SCE_HJ_SYMBOLS                base02
+StyleSetBackground      SCE_HJ_STRINGEOL              base02
+StyleSetBackground      SCE_HJ_REGEX                  base02
+
+StyleSetEOLFilled       SCE_HJ_START                  1
+StyleSetEOLFilled       SCE_HJ_DEFAULT                1
+StyleSetEOLFilled       SCE_HJ_COMMENT                1
+StyleSetEOLFilled       SCE_HJ_COMMENTLINE            1
+StyleSetEOLFilled       SCE_HJ_COMMENTDOC             1
+StyleSetEOLFilled       SCE_HJ_NUMBER                 1
+StyleSetEOLFilled       SCE_HJ_WORD                   1
+StyleSetEOLFilled       SCE_HJ_KEYWORD                1
+StyleSetEOLFilled       SCE_HJ_DOUBLESTRING           1
+StyleSetEOLFilled       SCE_HJ_SINGLESTRING           1
+StyleSetEOLFilled       SCE_HJ_SYMBOLS                1
+StyleSetEOLFilled       SCE_HJ_STRINGEOL              1
+StyleSetEOLFilled       SCE_HJ_REGEX                  1
+
+#// Embedded Javascript
+StyleSetForeground      SCE_HJ_START                  base01
+StyleSetForeground      SCE_HJ_DEFAULT                base1
+StyleSetForeground      SCE_HJ_COMMENT                base01
+StyleSetForeground      SCE_HJ_COMMENTLINE            base01
+StyleSetForeground      SCE_HJ_COMMENTDOC             base00
+StyleSetForeground      SCE_HJ_NUMBER                 orange
+StyleSetForeground      SCE_HJ_WORD                   red
+StyleSetForeground      SCE_HJ_KEYWORD                blue
+StyleSetForeground      SCE_HJ_DOUBLESTRING           orange
+StyleSetForeground      SCE_HJ_SINGLESTRING           yellow
+StyleSetForeground      SCE_HJ_SYMBOLS                magenta
+StyleSetForeground      SCE_HJ_STRINGEOL              violet
+StyleSetForeground      SCE_HJ_REGEX                  magenta
+
+
+
+# text/x-patch
+#
+style text/x-patch
+include text/plain
+
+StyleSetForeground      SCE_DIFF_DEFAULT              base00
+StyleSetForeground      SCE_DIFF_COMMENT              base01
+StyleSetBold            SCE_DIFF_COMMENT              1
+StyleSetItalic          SCE_DIFF_COMMENT              1
+StyleSetEOLFilled       SCE_DIFF_COMMENT              1
+StyleSetUnderline       SCE_DIFF_COMMENT              1
+StyleSetForeground      SCE_DIFF_COMMAND              base1
+StyleSetForeground      SCE_DIFF_HEADER               green
+StyleSetForeground      SCE_DIFF_POSITION             blue
+StyleSetForeground      SCE_DIFF_DELETED              red
+StyleSetForeground      SCE_DIFF_ADDED                cyan
+StyleSetForeground      SCE_DIFF_CHANGED              violet
+
+
+StyleSetBackground      SCE_DIFF_DEFAULT              base03
+StyleSetBackground      SCE_DIFF_COMMENT              base03
+StyleSetBackground      SCE_DIFF_COMMAND              base03
+StyleSetBackground      SCE_DIFF_HEADER               base03
+StyleSetBackground      SCE_DIFF_POSITION             base03
+StyleSetBackground      SCE_DIFF_DELETED              base03
+StyleSetBackground      SCE_DIFF_ADDED                base03
+#StyleSetBackground      SCE_DIFF_CHANGED              base03
+
+# text/x-makefile
+#
+style text/x-makefile
+include text/plain
+
+StyleSetForeground      SCE_MAKE_DEFAULT              base00
+StyleSetForeground      SCE_MAKE_COMMENT              base01
+StyleSetForeground      SCE_MAKE_PREPROCESSOR         base1
+StyleSetForeground      SCE_MAKE_IDENTIFIER           green
+StyleSetForeground      SCE_MAKE_OPERATOR             blue
+StyleSetForeground      SCE_MAKE_TARGET               red
+StyleSetForeground      SCE_MAKE_IDEOL                cyan
+
+StyleSetBackground      SCE_MAKE_DEFAULT              base03
+StyleSetBackground      SCE_MAKE_COMMENT              base03
+StyleSetBackground      SCE_MAKE_PREPROCESSOR         base03
+StyleSetBackground      SCE_MAKE_IDENTIFIER           base03
+StyleSetBackground      SCE_MAKE_OPERATOR             base03
+StyleSetBackground      SCE_MAKE_TARGET               base03
+StyleSetBackground      SCE_MAKE_IDEOL                base03
+
+
+#
+# text/css1
+#
+style text/css
+include text/plain
+
+StyleSetForeground      SCE_CSS_DEFAULT                       base00
+StyleSetForeground      SCE_CSS_TAG                           violet
+  StyleSetBold          SCE_CSS_TAG                           1
+StyleSetForeground      SCE_CSS_CLASS                         blue
+StyleSetForeground      SCE_CSS_PSEUDOCLASS                   base0
+StyleSetItalic          SCE_CSS_PSEUDOCLASS                   1
+StyleSetForeground      SCE_CSS_UNKNOWN_PSEUDOCLASS           base0
+  StyleSetBold          SCE_CSS_UNKNOWN_PSEUDOCLASS           1
+StyleSetForeground      SCE_CSS_OPERATOR                      orange
+   StyleSetBold         SCE_CSS_OPERATOR                      1
+StyleSetForeground      SCE_CSS_IDENTIFIER                    magenta
+StyleSetForeground      SCE_CSS_UNKNOWN_IDENTIFIER            base0
+  StyleSetBold          SCE_CSS_UNKNOWN_IDENTIFIER            1
+StyleSetForeground      SCE_CSS_VALUE                         green
+StyleSetForeground      SCE_CSS_COMMENT                       base01
+StyleSetForeground      SCE_CSS_ID                            cyan
+    StyleSetBold        SCE_CSS_ID                            1
+StyleSetForeground      SCE_CSS_IMPORTANT                     base0
+StyleSetForeground      SCE_CSS_DIRECTIVE                     base0
+StyleSetForeground      SCE_CSS_DOUBLESTRING                  base0
+StyleSetForeground      SCE_CSS_SINGLESTRING                  base0
+StyleSetForeground      SCE_CSS_IDENTIFIER2                   magenta
+StyleSetForeground      SCE_CSS_ATTRIBUTE                     base0
+#StyleSetForeground      SCE_CSS_IDENTIFIER3 17
+#StyleSetForeground      SCE_CSS_PSEUDOELEMENT 18
+#StyleSetForeground      SCE_CSS_EXTENDED_IDENTIFIER 19
+#StyleSetForeground      SCE_CSS_EXTENDED_PSEUDOCLASS 20
+#StyleSetForeground      SCE_CSS_EXTENDED_PSEUDOELEMENT 21
+
+StyleSetBackground           SCE_CSS_DEFAULT                  base03
+StyleSetBackground           SCE_CSS_TAG                      base03
+StyleSetBackground           SCE_CSS_CLASS                    base03
+StyleSetBackground           SCE_CSS_PSEUDOCLASS              base03
+StyleSetBackground           SCE_CSS_UNKNOWN_PSEUDOCLASS      base03
+StyleSetBackground           SCE_CSS_OPERATOR                 base03
+StyleSetBackground           SCE_CSS_IDENTIFIER               base03
+StyleSetBackground           SCE_CSS_UNKNOWN_IDENTIFIER       base03
+StyleSetBackground           SCE_CSS_VALUE                    base03
+StyleSetBackground           SCE_CSS_COMMENT                  base03
+StyleSetBackground           SCE_CSS_ID                       base03
+StyleSetBackground           SCE_CSS_IMPORTANT                base03
+StyleSetBackground           SCE_CSS_DIRECTIVE                base03
+StyleSetBackground           SCE_CSS_DOUBLESTRING             base03
+StyleSetBackground           SCE_CSS_SINGLESTRING             base03
+StyleSetBackground           SCE_CSS_IDENTIFIER2              base03
+StyleSetBackground           SCE_CSS_ATTRIBUTE                base03
+StyleSetBackground           SCE_CSS_IDENTIFIER3              base03
+StyleSetBackground           SCE_CSS_PSEUDOELEMENT            base03
+StyleSetBackground           SCE_CSS_EXTENDED_IDENTIFIER      base03
+StyleSetBackground           SCE_CSS_EXTENDED_PSEUDOCLASS     base03
+StyleSetBackground           SCE_CSS_EXTENDED_PSEUDOELEMENT   base03
+
+style text/x-sql
+include text/plain
+
+StyleSetForeground      SCE_SQL_DEFAULT               base00
+StyleSetForeground      SCE_SQL_COMMENT               base01
+StyleSetForeground      SCE_SQL_COMMENTLINE           base01
+StyleSetForeground      SCE_SQL_COMMENTDOC            base01
+StyleSetForeground      SCE_SQL_NUMBER                orange
+StyleSetForeground      SCE_SQL_WORD                  green
+StyleSetForeground      SCE_SQL_STRING                cyan
+StyleSetForeground      SCE_SQL_CHARACTER             violet
+StyleSetForeground      SCE_SQL_SQLPLUS               base00
+StyleSetForeground      SCE_SQL_SQLPLUS_PROMPT        base00
+StyleSetForeground      SCE_SQL_OPERATOR              blue
+StyleSetForeground      11                              base0  # SCE_SQL_IDENTIFIER
+StyleSetForeground      SCE_SQL_SQLPLUS_COMMENT       base01
+StyleSetForeground      SCE_SQL_COMMENTLINEDOC        base01
+StyleSetForeground      SCE_SQL_WORD2                 yellow  # SCE_SQL_WORD2
+		StyleSetBold    SCE_SQL_WORD2 1
+StyleSetForeground      SCE_SQL_COMMENTDOCKEYWORD     base01
+StyleSetForeground      SCE_SQL_COMMENTDOCKEYWORDERROR    red
+StyleSetForeground      19                              magenta  # SCE_SQL_USER1
+  StyleSetItalic        19				1
+StyleSetForeground      20                              cyan  # SCE_SQL_USER2
+StyleSetForeground      21                              orange  # SCE_SQL_USER3
+		StyleSetItalic  21								1
+#StyleSetForeground      SCE_SQL_USER4                 
+StyleSetForeground      SCE_SQL_QUOTEDIDENTIFIER      cyan
+
+StyleSetBackground      SCE_SQL_DEFAULT               base03
+StyleSetBackground      SCE_SQL_COMMENT               base03
+StyleSetBackground      SCE_SQL_COMMENTLINE           base03
+StyleSetBackground      SCE_SQL_COMMENTDOC            base03
+StyleSetBackground      SCE_SQL_NUMBER                base03
+StyleSetBackground      SCE_SQL_WORD                  base03
+StyleSetBackground      SCE_SQL_STRING                base03
+StyleSetBackground      SCE_SQL_CHARACTER             base03
+StyleSetBackground      SCE_SQL_SQLPLUS               base03
+StyleSetBackground      SCE_SQL_SQLPLUS_PROMPT        base03
+StyleSetBackground      SCE_SQL_OPERATOR              base03
+StyleSetBackground      SCE_SQL_IDENTIFIER            base03
+StyleSetBackground      SCE_SQL_SQLPLUS_COMMENT       base03
+StyleSetBackground      SCE_SQL_COMMENTLINEDOC        base03
+StyleSetBackground      SCE_SQL_WORD2                 base03
+StyleSetBackground      SCE_SQL_COMMENTDOCKEYWORD     base03
+StyleSetBackground      SCE_SQL_COMMENTDOCKEYWORDERROR    base03
+StyleSetBackground      SCE_SQL_USER1                 base03
+StyleSetBackground      SCE_SQL_USER2                 base03
+StyleSetBackground      SCE_SQL_USER3                 base03
+StyleSetBackground      SCE_SQL_USER4                 base03
+StyleSetBackground      SCE_SQL_QUOTEDIDENTIFIER      base03
+
+
+# POVRAY Persistence of Vision Raytracer
+style text/x-povray
+include text/plain
+
+StyleAllBackground      base03
+
+StyleSetForeground      SCE_POV_DEFAULT               base00
+StyleSetForeground      SCE_POV_COMMENT               base0
+StyleSetForeground      SCE_POV_COMMENTLINE           base0
+StyleSetForeground      SCE_POV_NUMBER                orange
+StyleSetForeground      SCE_POV_OPERATOR              blue
+StyleSetForeground      SCE_POV_IDENTIFIER            violet
+StyleSetForeground      SCE_POV_STRING                cyan
+StyleSetForeground      SCE_POV_STRINGEOL             cyan
+StyleSetForeground      SCE_POV_DIRECTIVE             green
+StyleSetBold            SCE_POV_DIRECTIVE  1
+StyleSetForeground      SCE_POV_BADDIRECTIVE          red
+StyleSetForeground      SCE_POV_WORD2 green # object structure 
+StyleSetForeground      SCE_POV_WORD3 violet # patterns
+StyleSetForeground      SCE_POV_WORD4 green # transforms
+StyleSetItalic          SCE_POV_WORD4 1
+StyleSetForeground      SCE_POV_WORD5 magenta # modifiers
+StyleSetForeground      SCE_POV_WORD6 yellow # functions
+StyleSetBold            SCE_POV_WORD6 1
+StyleSetForeground      SCE_POV_WORD7 magenta # reserved identifiers
+StyleSetForeground      SCE_POV_WORD8 magenta
+
+# Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+# LICENSE
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl 5 itself.

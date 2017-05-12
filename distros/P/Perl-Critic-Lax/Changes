@@ -1,0 +1,43 @@
+Revision history for Perl-Critic-Lax
+
+0.013     2017-03-13 08:34:05-04:00 America/New_York
+        - tiny doc change
+
+0.012     2016-08-24 22:47:46-04:00 America/New_York
+        - ProhibitLeadingZeros::ExceptChmod is now just an empty subclass of
+          ProhibitLeadingZeros, which has allowed leading zeroes on args to
+          chmod since 2008
+        - policy ValuesAndExpressions::RequireConstantOnLeftSideOfEquality has
+          been added to allow variables on the left side of `eq` (thanks,
+          Andreas Schröter!)
+
+0.011     2014-07-10 23:40:28-04:00 America/New_York
+          avoid crashing when encountering unusual PPI documents
+
+0.010     2013-10-09 17:09:16 America/New_York
+          update bugtracker and repo metadata
+
+0.009     2012-09-11 10:55:34 America/New_York
+          repackage with Dist::Zilla, primarily to fix busted metadata
+
+0.008     2010-09-04
+          update some policies for modern Perl-Critic
+
+0.007     2007-12-30
+          added ProhibitLeadingZeros::ExceptChmod
+
+0.006     2007-07-27
+          added ProhibitComplexMappings::LinesNotStatements
+
+0.005     2006-11-08
+          fix typo docs, add lax theme
+
+0.003     2006-11-07
+          added ProhibitEmptyQuotes::ExceptAsFallback
+
+0.002     2006-11-07
+          added RequireEndWithTrueConst
+          added RequireExplicitPackage::ExceptForPragmata
+
+0.001     2006-11-06
+          initial release

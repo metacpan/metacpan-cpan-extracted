@@ -1,0 +1,27 @@
+---
+abstract: 'Perl Template Attribute Language - TAL for Perl!'
+author:
+  - 'Jean-Michel Hiver'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Petal
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::MD5: '0'
+  Locale::Maketext::Gettext: '0'
+  MKDoc::XML: '0.72'
+  Scalar::Util: '1.07'
+  Test::Harness: '2.00'
+version: '2.24'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

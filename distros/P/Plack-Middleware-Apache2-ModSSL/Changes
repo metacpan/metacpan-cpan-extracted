@@ -1,0 +1,14 @@
+Plack-Middleware-Apache2-ModSSL
+===============================
+
+Created:      2012-05-02
+Home page:    <https://metacpan.org/release/Plack-Middleware-Apache2-ModSSL>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Plack-Middleware-Apache2-ModSSL>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.002	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.001	2012-05-02	Initial release

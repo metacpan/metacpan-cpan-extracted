@@ -1,0 +1,217 @@
+## name Indented array.
+## failures 0
+## cut
+
+	@test =
+	(
+		'a',
+		'b',
+		'c',
+	);
+
+
+## name Indented qw().
+## failures 0
+## cut
+	@test =
+	qw(
+		a
+		b
+		c
+	);
+
+
+## name Space-indented array.
+## failures 2
+## cut
+
+	@test =
+	(
+	    'a',
+	    'b',
+	);
+
+
+## name Tabified comments.
+## failures 1
+## cut
+
+	@test =
+	(
+		'a',	#this is A.
+	);
+
+
+## name Indented hash.
+## failures 0
+## cut
+
+	%test =
+	(
+		a => 1,
+		b => 2,
+		c => 3,
+	);
+
+
+## name Indent with spaces.
+## failures 1
+## cut
+
+    %test = ();
+
+
+## name Indent with mix of tabs and spaces.
+## failures 2
+## cut
+
+	    %test = ();
+    	%test = ();
+
+
+## name Tabs in comments.
+## failures 2
+## cut
+
+	# A tab is	coming.
+	# A tab is	coming.
+
+
+## name Multiline comment.
+## failures 0
+## cut
+
+# Comment 1.
+# Comment 2.
+# Comment 3.
+
+
+## name Multiline indented comment.
+## failures 0
+## cut
+
+	# Comment 1.
+	# Comment 2.
+	# Comment 3.
+
+
+## name Tab-formatted multiline string.
+## failures 0
+## cut
+
+$string =
+q|
+	Test
+	Test
+	  Test
+|;
+
+
+## name Incorrectly indented tab-formatted multiline string.
+## failures 1
+## cut
+
+	$string =
+  q|
+		Test
+		Test
+			Test
+	|;
+
+
+## name Tab after a space in a multiline string.
+## failures 1
+## cut
+
+	$string =
+	q|
+		Test
+		Test
+			Test	Test
+	|;
+
+
+## name Literal tab in qq|| string.
+## failures 1
+## cut
+
+	$string = qq|	|;
+
+
+## name \t in qq|| string.
+## failures 0
+## cut
+
+	$string = qq|\t|;
+
+
+## name POD.
+## failures 0
+## cut
+=head2 get_test_value()
+
+Return a test value.
+
+	my $value = get_test_value();
+
+=cut
+
+
+## name POD with a tab for alignment.
+## failures 1
+## cut
+
+=head2 get_test_value()
+
+Return a test value.
+
+	my $value = get_test_value();	# Test
+
+=cut
+
+
+## name Heredoc.
+## failures 0
+## cut
+
+$heredoc = <<'HERE';
+	Test
+	  TEST
+HERE;
+
+
+## name Heredoc with a tab for alignment.
+## failures 1
+## cut
+
+$heredoc = <<'HERE';
+	Letter	Number
+	A	1
+	B	2
+HERE;
+
+
+## name Extended regex.
+## failures 0
+## cut
+
+qr/
+	(
+		a
+		|
+		b
+	)
+/x;
+
+
+## name Extended regex with a tab for alignment.
+## failures 1
+## cut
+
+qr/
+	(
+		a	#Test A
+		|
+		b #Test B
+	)
+/x;

@@ -1,0 +1,50 @@
+{namespace rname.sample}
+/**
+  * Comment line
+  * @param par1 Some comment
+ */
+{template .Hello}
+  <div>Test </div> {$par1}
+{/template}
+
+/**
+  * Comment line1
+  * @param par1 Some comment
+ */
+{template .Hello2}
+  <h1>Демонстрация цикла <code>foreach</code></h1>
+  {foreach $a in [1,2,3,4,5]}
+    <h2>Таблица N {$par1}</h2>
+    <input class="btn info" value="Информация" onclick="alert({$a})" type="button" />
+   <table class="zebra-striped">
+   {foreach $i in [1,2,3,4,5,6,7,-100]}
+    <tr>
+       <td>{$i}</td><td> {$i} * 10 = </b>{$i*10}</b></td>
+    </tr>
+   {/foreach}
+ </table>
+ {/foreach}
+   {call .Hello data="all"/}
+  <script type="text/javascript">
+//    alert("ok "+(1+1) + "!");
+  </script>
+{/template}
+
+/**
+  * Титульная 
+ */
+ {template .htm}
+ <!DOCTYPE html>
+ <html><head>
+        <link href="bootstrap.min.css" media="screen" rel="stylesheet" type="text/css" />
+        </head>
+ <body>
+ <div style="margin: 10em;">
+ <blockquote>
+ <p>О сколько нам открытий чудных готовит просвещения дух!</p>
+ <small>Пушкин А.С.</small>
+</blockquote>
+ {call .Hello2 /}
+</body>
+ </html>
+ {/template}

@@ -1,0 +1,44 @@
+0.005		2016-06-23	T. R. Wyant
+  Fix problem handling nested brackets.
+
+  Fix various corner cases, including such things as '${^O}', '${]}',
+    and even '$${$_[0]}', which turned out to be '$$' followed by
+    '$_[0]'.
+
+  Also pulled the variable recognition out into a separate module in
+    anticipation of it being used other places.
+
+  Dumper message if arg does not parse
+
+  Recognize "$^O" (e.g.) as interpolating $^O, not $^ followed by a
+    literal "O".
+
+0.004		2016-06-13	T. R. Wyant
+  Require PPI, which was formerly optional. This is because I decided
+    that the variables() method (which needs it) was one of the
+    fundamental points of the module.
+
+0.003		2016-06-12	T. R. Wyant
+  Another attempt to make old Perls work. Version 0.002 assumed I could
+    have other interpolations in a regex with (??{...}), but this turned
+    out not to be the case if Perl was earlier than 5.18.0. This was
+    actually a step in the wrong direction since (?-1) works back to
+    5.10.0.
+
+  Add PPIx::QuoteLike::Dumper, redo eg/pqldump to use it.
+
+  Recognize postderef slice syntax. This is stuff like $x->@[0,2] (array
+    slice) or $x->@{foo,bar} (hash slice).
+
+  Add methods perl_version_introduced() and perl_version_removed(). As
+    of this release, the former returns '5.000' unless '\F' or postfix
+    dereferencing are detected, and the latter always returns undef.
+
+0.002		2016-06-11	T. R. Wyant
+  Eliminte blockers to running under Perl 5.6. The significant change
+    was replacing (?-1) in a regular expression (introduced in 5.9.5)
+    with (??{...}) (going back to Heaven knows when, and used in
+    Regexp::Common back in 2003).
+
+0.001		2016-06-09	T. R. Wyant
+  Initial release to CPAN.

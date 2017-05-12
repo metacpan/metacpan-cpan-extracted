@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+
+# test program for Proc::Reliable.
+# runs the 'test1slave' program as a subprocess.
+
+my($PROGRAMDIR, $PROGRAMFILE);  # dir/file executed by user
+BEGIN {
+    ($PROGRAMDIR = $0) =~ s/([^\/]+)$//;
+    $PROGRAMFILE = $1;
+    if($PROGRAMDIR eq "") {$PROGRAMDIR = "."}
+
+    push(@INC, $PROGRAMDIR);  # add program dir to module search path
+}
+
+use Proc::Reliable;
+
+$SIG{PIPE} = sub { print(STDERR "\n<SIGPIPE>\n"); };
+
+$myproc = Proc::Reliable->new(num_tries => 3, time_per_try => 4);
+$myproc->want_single_list(0);
+$myproc->time_per_try(3);
+$myproc->num_tries(2);
+$myproc->time_btw_tries(1);
+$myproc->maxtime(15);
+$myproc->allow_shell(1);
+#$myproc->child_exit_time(2);
+#$myproc->sigterm_exit_time(0.001);
+#$myproc->sigkill_exit_time(0.001);
+for($i=0; $i<5; $i++) {
+    $stdin .= "this is a test of the stdin transmission system $i\n";
+}
+print("stdin size: ",length($stdin),"\n");
+($out, $err, $status, $msg) = $myproc->run("./test1slave", $stdin);
+#$out = $myproc->run("./test2", $stdin);
+#$myproc->run("./test2", $stdin);
+#$out = $myproc->stdout();
+#$err = $myproc->stderr();
+#$status = $myproc->status();
+#$msg = $myproc->msg();
+#($out, $err, $status, $msg) = $myproc->run(\&mysub);
+
+print("OUT:\n$out\n");
+print("ERR:\n$err\n");
+print("STATUS:\n$status\n");
+print("MSG:\n$msg\n");
+
+sub mysub() {
+    print("started\n");
+    sleep(1);
+    print("stopped\n");
+    print(STDERR "hello\n");
+    return 34;
+}

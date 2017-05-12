@@ -1,0 +1,37 @@
+Revision history for Perl extension Perl6::Export.
+
+0.01  Sat Oct 11 23:28:24 2003
+	- original version; created by h2xs 1.22 with options
+		-A -P -X -f -n Perl6::Export
+
+
+
+0.02	Thu Nov 20 04:54:30 2003
+
+
+
+0.03	Tue Dec 16 11:54:34 2003
+
+	- Improved handling of tags
+
+	- Added ALWAYS tag
+
+
+0.05	Fri Feb 27 04:10:29 2004
+
+	- Changed groups and ALWAYS to require prefix colon
+	  (as is likely in Perl 6)
+
+
+0.05	Fri Feb 27 04:17:49 2004
+
+
+
+0.06	Tue Mar  9 02:55:46 2004
+
+	- Changed interface in line with Larry's recent design decisions
+
+
+0.07	Tue Mar  9 02:58:16 2004
+
+	- Minor doc bug fix

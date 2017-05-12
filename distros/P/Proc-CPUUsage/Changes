@@ -1,0 +1,10 @@
+Revision history for Proc-CPUUsage
+
+1.001  Sat Oct 10 12:47:18 UTC 2009
+         - Fix CPAN Testers failures: their servers are fast...
+
+1.0    Fri Oct  9 15:14:29 UTC 2009
+         - Feature complete: I don't have nothing more to add
+
+0.1    Thu Oct  8 21:48:20 UTC 2009
+         - First version

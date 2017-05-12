@@ -1,0 +1,328 @@
+Revision history for Perl extension PPM::Make.
+
+0.9904 2017-04-05
+  - Resolved
+    - RT #97088 (work around for PROVIDE)
+    - RT #119132 (Non-ASCII in author name)
+    - RT #119133 (.tar.bz2 distributions)
+    - RT #120921 (Module::Build::Tiny support)
+
+0.9903 2016-06-02
+  - Resolved RT #102518 (confused Makefile parser) and
+    RT #114769 (SHA256 checksum), both by Ralf Neubauer
+  - removed unused modules and other minor cleanup
+  - switched to Test::More
+
+0.9902 2014-08-03
+  - not to depend on dead services at theoryx5 (RT #97053)
+  - use XML::Writer to write ppd/xml files
+  - smoother installation (still WIP)
+
+0.9901  Wed, Feb 2, 2012
+  - hid external package name
+
+0.99  Wed, Feb 2, 2012
+  - fixed local tarball handling (resolved #63257)
+  - updated usage text of make_ppm to use --zip_archive option to
+    create a zip archive (resolved #72919)
+  - META.(yml|json) is now created by MakeMaker
+
+0.98  Thu, Jan 6, 2011
+  - ISHIGAKI took over the maintenance.
+  - Only check Win32::BuildNumber while using ActivePerl
+  - Check ppm.bat in the site/lib directory
+
+0.97  Sat, Sep 19, 2009
+  - In PPM::Make::Meta::parse_make, skip MAN3PODS that can appear 
+    if some words from @wanted found (patch supllied by Serguei Trouchelle)
+  - Address CPAN dist download failure:
+     http://rt.cpan.org/Ticket/Display.html?id=49717
+  - Add no_remote_lookup option, which if specified, will not search
+    remote databases nor CPAN.pm for information not contained in the
+    files of the distribution:
+      http://rt.cpan.org/Ticket/Display.html?id=36798
+
+0.96 Fri, Dec 26, 2008
+  - if distro misses NAME, use DISTNAME if available (patch provided by 
+    Serguei Trouchelle)
+  - fix problem with v-style versions of modules when creating PPD 
+    and tgz/zip bundle with --vsr (patch provided by Serguei Trouchelle)
+  - omit warning when development version of Archive::Tar is used (patch 
+    provided by Serguei Trouchelle).
+  - refactor searching for ppm info into PPM::Make::Search
+  - use META information available from http://cpan.uwinnipeg.ca/
+    so that SOAP::Lite isn't required
+  - add the make_ppm_install script, and associated module
+    PPM::Make::CPAN, for use as the make_install_make_command
+    within CPAN.pm to install modules via ppm.
+
+0.95 Sat, Dec 22, 2007
+  - fix architecture string addition (eg, MSWin32-x86-multi-thread-5.10)
+    so as to work with perl-5.10
+
+0.94 Sun, June 10, 2007
+  - workaround for  a bug in Net::FTP 2.77, which drops the last 
+    character on each line when putting file in ASCII mode (provided 
+    by Serguey Trouchelle)
+  - remove whitespace from version string (provided by Serguey Trouchelle)
+  - have settings in Makefile override those in META.yml; in particular,
+    this avoids problem of version strings not being updated in
+    META.yml (suggested by Serguey Trouchelle)
+
+0.93 Tues, Jan 11, 2007
+  - sort summary files by package name
+
+0.92 Thur, Dec 21, 2006
+
+  - wrap parsing of the ppd files in RepositorySummary.pm
+    around an eval, to catch errors (suggested by
+    Serguey Trouchelle)
+  - use CONTENTS exclusively in parse_bundle of Meta.pm
+    to exract contents of a Bundle file, as some Bundles
+    also include a DESCRIPTION (suggested by
+    Serguey Trouchelle)
+
+0.91 Sat, Nov 18, 2006
+
+  - import HAS_PPM from PPM::Make::Config in PPM::Make::Install
+  - use VERSION from META.yml only as a last resort, as a number
+    of authors forget to update the META.yml:
+        https://rt.cpan.org/Ticket/Display.html?id=22699
+  - rename check_opts of PPM::Make::Install to check_opts_install,
+    to avoid "subroutine redefinition" warning.
+  - use PPM::Make::Meta in PPM::Make::Install
+  - add --skip option to PPM::Make::Install to skip running tests
+
+0.89 Sat, Oct 28, 2006
+
+  - add "return 1" to end of make_ppm of PPM::Make, make_bundle
+    of PPM::Make::Bundle, and ppm_install of PPM::Make::Install,
+    so one can eval() them (suggested by Serguei Trouchelle)
+  - if a distribution name can't be found corresponding to a
+    dist or mod argument, die at a stage before trying to
+    find the non-existent file.
+
+0.88 Wed, Oct 11, 2006
+
+  - fix warnings about an abstract not found in certain cases
+  - try NAME and DISTNAME when trying to get info on modules
+    and packages from SOAP/CPAN.pm
+  - use smaller dummy .tar.gz archives under t/ppms/ for the tests
+
+0.87 Wed, Oct 4, 2006
+
+  - remove PPM::XML::* files from distribution
+  - add a skip option to PPM::Make to skip running the tests
+  - when building up a list of dependencies, ignore those that
+    come with ActivePerl
+  - enable parse_ppd() to parse ppd files with multiple
+    <IMPLEMENTATION> sections, and have PPM::Make::RepositorySummary
+    output summary files with this information
+  - add PPM::Make::Bundle to make a zipped bundle file containing
+    a package and all of its prerequisites
+  - fixes for setting the version number in certain edge cases
+    (thanks to Serguei Trouchelle for the patch)
+  - if fetch_file() fails on assuming the argument passed is a
+    module, try it as a distribution.
+  - split methods used in PPM::Make to obtain meta information
+    about a distribution into PPM::Make::Meta
+  - split functions used in PPM::Make to obtain config information
+    into PPM::Make::Config
+  - if the author meta information is an array ref, dereference it
+    when writing the ppd file
+
+0.83 Fri, Sep 1, 2006
+
+  - use better cross-platform method to guess if a module
+    is installed as a core module (reported by Jeff McCarrell)
+  - introduce no_html option in PPM::Make (--no-html in make_ppm)
+    to disable building of html docs, as some platforms (eg, linux)
+    may not have an installhtmldir specified in Perl's Config
+    (reported by Jeff McCarrell)
+  - introduce --no-cfg as an alias to --no_cfg in make_ppm
+  - allow zipped distributions made with the --zipdist option
+    to be uploaded to a specified location, just as is done
+    with the ppd and tar.gz files
+  - in making up a ppd file, fetch either from the remote
+    soap server or from CPAN.pm a list of modules for the
+    given distribution, and use that to populate PROVIDE
+    elements in the ppd file (introduced in ppm4). This can
+    be disabled by using the no_pp,4 option in PPM::Make,
+    or the --no-ppm4 switch in make_ppm
+  - INCOMPATIBLE change: in PPM::Make, change the zip option
+    to zip_archive, to enable creation of .zip archives,
+    rather than .tar.gz ones.
+  - Add PPM::Make::RepositorySummary to make ppm summary files
+    (summary.ppm, searchsummary.ppm, package.lst, package.xml)
+    for a repository, and add a rep_summary script as an interface
+
+0.79 Mon, Aug 21, 2006
+  - fix bug in xml_encode which led to replacing the '&'
+    in entitities that were already encoded, such as '&lt;'.
+
+0.78 Wed, Aug 2, 2006
+  - drop requirement of PPM, and supply the needed files
+    in the distribution, as the PPM distribution will install
+    a ppm.bat which overwrites an existing (newer) ppm
+    (reported by Serguei Trouchelle)
+  - use HTML::Entities to encode fields in ppd file, so
+    that high ASCII characters get encoded
+    (reported by Serguei Trouchelle)
+  - don't die if error results in loading META.yml file
+  - rename html_escape routine of PPM::Make::Util to
+    xml_encode, to better reflect purpose
+
+0.76 Sat, Jan 8, 2006
+  - add dependency on File::HomeDir to obtain $ENV{HOME}
+  - allow argument to make_ppm accept a local file as the
+    source of a distribution
+  - add capability to make a ppm package for a Bundle/Task file,
+    to install a list of prerequisites
+  - fix loading of CPAN::Config to account for recent CPAN.pm changes
+  - add dependency on PPM
+
+0.75 Sat Sep 4 2004
+  - adjust the routines for getting module and distribution
+    information to accept an array reference of values, and
+    return a corresponding hash reference. This cuts down
+    particularly on repeated calls to the soap server for
+    distributions with more than one prerequisite.
+  - fix bug in calling dist_search/mod_search with wrong
+    args in some cases when guessing author
+  - fix parsing of YAML file in extracting AUTHOR field, if present
+
+0.74 Fri Aug 27 2004
+  - add Net::FTP debug messages (thanks to Jeff McCarrell)
+  - honor presence of $ENV{HOME}, if present, on Win32
+    in looking for the .ppmcfg configuration file (thanks to
+    Jeff McCarrell)
+  - fix bug where the AUTHOR was reported as an ARRAY ref
+    in the ppd file when META.yaml was used
+  - attempt to read Module::Build's information file
+    only when the _build directory is present.
+  - in getting author information, as well as module/distribution
+    mappings, in filling out the ppd file, now first try a remote
+    soap server, and if that fails, fall back to the CPAN indices.
+
+0.71 Fri Apr 2 11:00:00 2004
+  - fix bug in ppm_install for ppm3
+  - use $^X rather than $Config{perlpath} for perl binary
+
+0.70 Tue Mar 23 11:00:00 2004
+  - fix warning in PPM::Make::Util when CPAN.pm is configured
+    but doesn't have a url_list
+  - added more checks in make_zipdist of PPM::Make when
+    the codebase isn't a local file
+
+0.69 Mon Mar 22 23:00:00 2004
+  - use Archive::Zip::AZ_OK(), rather than AZ_OK().
+  - add zipdist option to make a .zip file consisting
+    of the .ppd and the .tar.gz files.
+
+0.68 Sun Jan 11 23:00:00 2004
+  - require Archive::Tar >= 1.08 for Win32 to fix A::T bug
+  - add --vsp and --vsr flags to add version string to
+    ppd and archive files
+  - fix bug on non-Win32 when generating ppm packages for
+    use on Win32 regarding which files to include in the
+    archive [thanks to Mike Schilli]
+
+0.67 Thu Nov 20 20:08:00 2003
+  - fix bug in tk-ppm regarding dialogue_yes_no
+  - on Win32, only list files in making archive (not directories),
+    to quieten newer Archive::Tar
+
+0.66 Wed Sep 10 10:08:00 2003
+  - add documentation for PPM::Make::Install
+  - add version for PPM::Make::Install and PPM::Make::Util
+
+0.65 Mon Jun 23 14:08:00 2003
+  - move the install option of PPM::Make to PPM::Make::Install
+  - add the tk-ppm script
+  - add support for packages using Module::Build
+  - add YAML support
+  - let Getopt::Long handle help and version options
+  - add option to build cpan distribution
+  - add checksum check on downloaded CPAN files
+  - add option to perform case-insensitive module searches
+  - put utility functions in PPM::Make::Util
+
+0.52 Wed Jun 13 14:08:00 2003
+  - add ppm_install script to install via ppm
+  - fix for extracting name from a distribution
+  - try urls as specified in $CPAN::Config
+
+0.48 Wed Feb 18 12:48:00 2003
+
+  - offer to get nmake for Win32, if not present
+  - add capability to upload ppd and archive files
+  - support for ini configuration files added
+  - don't include dependencies if they're part of the core,
+    or are contained in /^perl$/
+  - make no default for "exec" if a script is specified
+  - if the script matches !^(http|ftp)://!, use it as
+    the HREF attribute of INSTALL.
+
+0.41 Wed Dec 16 12:48:00 2002
+
+  - fix parsing of Makefile to avoid unquoted keys
+  - have dependencies report distribution name, rather than module
+
+0.38 Fri Dec  6 20:48:00 2002
+
+  - capability to add version string to ppd and archive filenames
+       [Toby Johnson <Toby.Johnson@mercer.com>]
+  - make possible to omit ARCHITECTURE and OS fields
+       [Mike Schilli <m@perlmeister.com>]
+  - workaround for creating .tar.gz files on non-Win32 for Win32
+       [Mike Schilli <m@perlmeister.com>]
+  - add Perl string to ARCHITECTURE for >= 5.8
+  - omit man pages if OS or ARCHITECTURE is missing
+
+
+0.36 Thu Nov 28 16:48:00 2002
+
+  - better linking of HTML docs, using only Pod::Html
+       [ Mirko <mirko@stranicata.com> ]
+  - make program locations configurable
+       [Toby Johnson <Toby.Johnson@mercer.com>]
+  - don't include man/ directories for a Windows ppm
+       [Mike Schilli <m@perlmeister.com>]
+  - use a more descriptive title for the HTML docs
+
+0.28 Sat Nov 16 15:48:00 2002
+
+  - add option to add files to archive
+  - change make_ppm to use Getopt::Long
+
+0.27 Thu Nov  7 10:55:00 2002
+
+  - use blib/ files to make html
+       [ Mirko <mirko@stranicata.com> ]
+ 
+0.26 Sat Nov  2 10:55:00 2002
+
+  - adjust html path for more than 2-level module name
+       [ Mirko <mirko@stranicata.com> ]
+  - added options to install and clean up files
+       [ Mirko <mirko@stranicata.com> ]
+
+0.25 Thu Sep  5 09:42:48 2002
+
+  - use XML::Parser to parse ppd file
+  - adjusted so as to not remake html unless forced
+
+0.2  Thu Aug 29 11:05:00 2002
+
+  - search for MyConfig.pm in $HOME (suggested by Slaven Rezik)
+  - configurable OS and ARCHITECTURE (suggested by Slaven Rezik)
+  - add script to archive
+  - fixed typo in binary/location
+  - added semi-realistic test
+  - added A::T/C::Z and A::Z to list of prerequisites
+  - added option to insert an architecture-dependent subdirectory
+
+0.1  Sun Jul 14 20:05:00 2002
+  - original version; created by h2xs 1.21 with options
+         -X -n PPM::Make
+

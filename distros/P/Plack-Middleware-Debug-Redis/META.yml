@@ -1,0 +1,55 @@
+---
+abstract: 'Extend Plack::Middleware::Debug with Redis panels'
+author:
+  - 'Anton Gerasimov <chim@cpan.org>'
+build_requires:
+  HTTP::Message: 0
+  Plack: 0.9979
+  Test::MockObject: 0
+  Test::More: 0.98
+  Test::Pod: 1.22
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Debug-Redis
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - examples
+    - corpus
+  namespace:
+    - t::lib
+  package:
+    - DB
+provides:
+  Plack::Middleware::Debug::Redis:
+    file: lib/Plack/Middleware/Debug/Redis.pm
+    version: 0.03
+  Plack::Middleware::Debug::Redis::Info:
+    file: lib/Plack/Middleware/Debug/Redis/Info.pm
+    version: 0.03
+  Plack::Middleware::Debug::Redis::Keys:
+    file: lib/Plack/Middleware/Debug/Redis/Keys.pm
+    version: 0.03
+requires:
+  Carp: 0
+  Plack: 0.9979
+  Plack::Middleware::Debug: 0
+  Redis: 1.955
+  parent: 0
+  perl: 5.008008
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/Wu-Wu/Plack-Middleware-Debug-Redis/issues
+  homepage: https://metacpan.org/release/Plack-Middleware-Debug-Redis
+  repository: git://github.com/Wu-Wu/Plack-Middleware-Debug-Redis.git
+version: 0.03
+x_authority: cpan:CHIM

@@ -1,0 +1,13 @@
+SYNOPSIS
+
+     use Parse::Sums qw(parse_sums);
+     my $res = parse_sums(filename => 'MD5SUMS');
+
+SEE ALSO
+
+    xsum from App::xsum.
+
+    shasum which comes with the perl distribution.
+
+    Unix utilities: md5sum, sha1sum, sha256sum, etc.
+

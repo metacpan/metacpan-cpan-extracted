@@ -1,0 +1,1 @@
+"load from ya-assets";

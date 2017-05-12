@@ -1,0 +1,583 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <msms_pipeline_analysis date="2015-04-09T18:54:11" xmlns="http://regis-web.systemsbiology.net/pepXML" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://sashimi.sourceforge.net/schema_revision/pepXML/pepXML_v117.xsd" summary_xml="/scratch/nesvi_flux/andykong/Pandey_mzXML_ms2/Adult_Adrenalgland_Gel_Elite_49_f01.pep.xml">
+ <msms_run_summary base_name="Sample" msManufacturer="Thermo Scientific" msModel="LTQ Orbitrap Elite" raw_data_type="raw" raw_data=".mzXML">
+ <sample_enzyme name="Trypsin">
+  <specificity cut="KR" no_cut="P" sense="C"/>
+ </sample_enzyme>
+ <search_summary base_name="/scratch/nesvi_flux/andykong/Pandey_mzXML_ms2/Adult_Adrenalgland_Gel_Elite_49_f01" search_engine="Comet" search_engine_version="2015.01 rev. 1" precursor_mass_type="monoisotopic" fragment_mass_type="monoisotopic" search_id="1">
+  <search_database local_path="Ens78plusREV_plusPeps.fa" type="AA"/>
+  <enzymatic_search_constraint enzyme="Trypsin" max_num_internal_cleavages="2" min_number_termini="2"/>
+  <aminoacid_modification aminoacid="M" massdiff="15.994900" mass="147.035385" variable="Y" symbol="*"/>
+  <aminoacid_modification aminoacid="C" massdiff="57.021464" mass="160.030649" variable="N"/>
+  <parameter name="# comet_version " value="2015.01"/>
+  <parameter name="activation_method" value="ALL"/>
+  <parameter name="add_A_alanine" value="0.000000"/>
+  <parameter name="add_B_user_amino_acid" value="0.000000"/>
+  <parameter name="add_C_cysteine" value="57.021464"/>
+  <parameter name="add_Cterm_peptide" value="0.000000"/>
+  <parameter name="add_Cterm_protein" value="0.000000"/>
+  <parameter name="add_D_aspartic_acid" value="0.000000"/>
+  <parameter name="add_E_glutamic_acid" value="0.000000"/>
+  <parameter name="add_F_phenylalanine" value="0.000000"/>
+  <parameter name="add_G_glycine" value="0.000000"/>
+  <parameter name="add_H_histidine" value="0.000000"/>
+  <parameter name="add_I_isoleucine" value="0.000000"/>
+  <parameter name="add_J_user_amino_acid" value="0.000000"/>
+  <parameter name="add_K_lysine" value="0.000000"/>
+  <parameter name="add_L_leucine" value="0.000000"/>
+  <parameter name="add_M_methionine" value="0.000000"/>
+  <parameter name="add_N_asparagine" value="0.000000"/>
+  <parameter name="add_Nterm_peptide" value="0.000000"/>
+  <parameter name="add_Nterm_protein" value="0.000000"/>
+  <parameter name="add_O_ornithine" value="0.000000"/>
+  <parameter name="add_P_proline" value="0.000000"/>
+  <parameter name="add_Q_glutamine" value="0.000000"/>
+  <parameter name="add_R_arginine" value="0.000000"/>
+  <parameter name="add_S_serine" value="0.000000"/>
+  <parameter name="add_T_threonine" value="0.000000"/>
+  <parameter name="add_U_user_amino_acid" value="0.000000"/>
+  <parameter name="add_V_valine" value="0.000000"/>
+  <parameter name="add_W_tryptophan" value="0.000000"/>
+  <parameter name="add_X_user_amino_acid" value="0.000000"/>
+  <parameter name="add_Y_tyrosine" value="0.000000"/>
+  <parameter name="add_Z_user_amino_acid" value="0.000000"/>
+  <parameter name="allowed_missed_cleavage" value="2"/>
+  <parameter name="clear_mz_range" value="0.000000 0.000000"/>
+  <parameter name="clip_nterm_methionine" value="0"/>
+  <parameter name="database_name" value="Ens78plusREV_plusPeps.fa"/>
+  <parameter name="decoy_prefix" value="rev_"/>
+  <parameter name="decoy_search" value="0"/>
+  <parameter name="digest_mass_range" value="600.000000 5000.000000"/>
+  <parameter name="fragment_bin_offset" value="0.400000"/>
+  <parameter name="fragment_bin_tol" value="1.000500"/>
+  <parameter name="isotope_error" value="1"/>
+  <parameter name="mass_type_fragment" value="1"/>
+  <parameter name="mass_type_parent" value="1"/>
+  <parameter name="max_fragment_charge" value="3"/>
+  <parameter name="max_precursor_charge" value="6"/>
+  <parameter name="max_variable_mods_in_peptide" value="5"/>
+  <parameter name="minimum_intensity" value="0"/>
+  <parameter name="minimum_peaks" value="10"/>
+  <parameter name="ms_level" value="2"/>
+  <parameter name="nucleotide_reading_frame" value="0"/>
+  <parameter name="num_enzyme_termini" value="2"/>
+  <parameter name="num_output_lines" value="5"/>
+  <parameter name="num_results" value="100"/>
+  <parameter name="num_threads" value="4"/>
+  <parameter name="output_outfiles" value="0"/>
+  <parameter name="output_pepxmlfile" value="1"/>
+  <parameter name="output_percolatorfile" value="0"/>
+  <parameter name="output_sqtfile" value="0"/>
+  <parameter name="output_sqtstream" value="0"/>
+  <parameter name="output_suffix" value=""/>
+  <parameter name="output_txtfile" value="0"/>
+  <parameter name="override_charge" value="0"/>
+  <parameter name="peptide_mass_tolerance" value="20.000000"/>
+  <parameter name="peptide_mass_units" value="2"/>
+  <parameter name="precursor_charge" value="0 0"/>
+  <parameter name="print_expect_score" value="1"/>
+  <parameter name="remove_precursor_peak" value="0"/>
+  <parameter name="remove_precursor_tolerance" value="1.500000"/>
+  <parameter name="require_variable_mod" value="0"/>
+  <parameter name="sample_enzyme_number" value="1"/>
+  <parameter name="scan_range" value="0 0"/>
+  <parameter name="search_enzyme_number" value="1"/>
+  <parameter name="show_fragment_ions" value="0"/>
+  <parameter name="skip_researching" value="1"/>
+  <parameter name="spectrum_batch_size" value="0"/>
+  <parameter name="theoretical_fragment_ions" value="1"/>
+  <parameter name="use_A_ions" value="0"/>
+  <parameter name="use_B_ions" value="1"/>
+  <parameter name="use_C_ions" value="0"/>
+  <parameter name="use_NL_ions" value="1"/>
+  <parameter name="use_X_ions" value="0"/>
+  <parameter name="use_Y_ions" value="1"/>
+  <parameter name="use_Z_ions" value="0"/>
+  <parameter name="use_sparse_matrix" value="1"/>
+  <parameter name="variable_mod01" value="15.994900 M 0 3 -1 0 0"/>
+  <parameter name="variable_mod02" value="0.000000 X 0 3 -1 0 0"/>
+  <parameter name="variable_mod03" value="0.000000 X 0 3 -1 0 0"/>
+  <parameter name="variable_mod04" value="0.000000 X 0 3 -1 0 0"/>
+  <parameter name="variable_mod05" value="0.000000 X 0 3 -1 0 0"/>
+  <parameter name="variable_mod06" value="0.000000 X 0 3 -1 0 0"/>
+  <parameter name="variable_mod07" value="0.000000 X 0 3 -1 0 0"/>
+  <parameter name="variable_mod08" value="0.000000 X 0 3 -1 0 0"/>
+  <parameter name="variable_mod09" value="0.000000 X 0 3 -1 0 0"/>
+ </search_summary>
+ <spectrum_query spectrum="Adult_Adrenalgland_Gel_Elite_49_f01.00002.00002.2" start_scan="2" end_scan="2" precursor_neutral_mass="669.320103" assumed_charge="2" index="1" retention_time_sec="300.6">
+  <search_result>
+   <search_hit hit_rank="1" peptide="HGDSVR" peptide_prev_aa="R" peptide_next_aa="N" protein="ENSP00000252244" num_tot_proteins="1" num_matched_ions="10" tot_num_ions="10" calc_neutral_pep_mass="669.319437" massdiff="0.000666" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="4924">
+    <search_score name="xcorr" value="1.703"/>
+    <search_score name="deltacn" value="0.218"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="590.8"/>
+    <search_score name="sprank" value="1"/>
+    <search_score name="expect" value="6.07E-03"/>
+   </search_hit>
+   <search_hit hit_rank="2" peptide="HGSDVR" peptide_prev_aa="K" peptide_next_aa="I" protein="rev_ENSP00000293725" num_tot_proteins="4" num_matched_ions="8" tot_num_ions="10" calc_neutral_pep_mass="669.319437" massdiff="0.000666" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="4924">
+    <search_score name="xcorr" value="1.332"/>
+    <search_score name="deltacn" value="0.226"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="299.4"/>
+    <search_score name="sprank" value="2"/>
+    <search_score name="expect" value="1.42E-01"/>
+   </search_hit>
+   <search_hit hit_rank="3" peptide="DGSHVR" peptide_prev_aa="R" peptide_next_aa="M" protein="rev_ENSP00000276594" num_tot_proteins="1" num_matched_ions="8" tot_num_ions="10" calc_neutral_pep_mass="669.319437" massdiff="0.000666" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="4924">
+    <search_score name="xcorr" value="1.030"/>
+    <search_score name="deltacn" value="0.033"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="271.2"/>
+    <search_score name="sprank" value="4"/>
+    <search_score name="expect" value="1.84E+00"/>
+   </search_hit>
+   <search_hit hit_rank="4" peptide="HSDGVR" peptide_prev_aa="R" peptide_next_aa="L" protein="rev_ENSP00000485411" num_tot_proteins="1" num_matched_ions="7" tot_num_ions="10" calc_neutral_pep_mass="669.319437" massdiff="0.000666" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="4924">
+    <search_score name="xcorr" value="0.996"/>
+    <search_score name="deltacn" value="0.074"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="195.2"/>
+    <search_score name="sprank" value="11"/>
+    <search_score name="expect" value="2.46E+00"/>
+   </search_hit>
+   <search_hit hit_rank="5" peptide="HATDAR" peptide_prev_aa="K" peptide_next_aa="I" protein="rev_ENSP00000392024" num_tot_proteins="1" num_matched_ions="6" tot_num_ions="10" calc_neutral_pep_mass="669.319437" massdiff="0.000666" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="4924">
+    <search_score name="xcorr" value="0.922"/>
+    <search_score name="deltacn" value="0.151"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="155.2"/>
+    <search_score name="sprank" value="15"/>
+    <search_score name="expect" value="4.61E+00"/>
+   </search_hit>
+  </search_result>
+ </spectrum_query>
+ <spectrum_query spectrum="Adult_Adrenalgland_Gel_Elite_49_f01.00011.00011.3" start_scan="11" end_scan="11" precursor_neutral_mass="1030.516257" assumed_charge="3" index="2" retention_time_sec="305.2">
+  <search_result>
+   <search_hit hit_rank="1" peptide="RKQEEADR" peptide_prev_aa="R" peptide_next_aa="K" protein="ENSP00000398826" num_tot_proteins="9" num_matched_ions="12" tot_num_ions="28" calc_neutral_pep_mass="1030.515571" massdiff="0.000686" num_tol_term="2" num_missed_cleavages="2" num_matched_peptides="12075">
+    <search_score name="xcorr" value="2.217"/>
+    <search_score name="deltacn" value="0.275"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="435.1"/>
+    <search_score name="sprank" value="4"/>
+    <search_score name="expect" value="4.36E-02"/>
+   </search_hit>
+   <search_hit hit_rank="2" peptide="KREEEDVK" peptide_prev_aa="R" peptide_next_aa="S" protein="rev_ENSP00000387911" num_tot_proteins="6" num_matched_ions="11" tot_num_ions="28" calc_neutral_pep_mass="1031.524738" massdiff="-1.008482" num_tol_term="2" num_missed_cleavages="2" num_matched_peptides="12075">
+    <search_score name="xcorr" value="1.607"/>
+    <search_score name="deltacn" value="0.042"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="324.3"/>
+    <search_score name="sprank" value="15"/>
+    <search_score name="expect" value="1.60E+00"/>
+   </search_hit>
+   <search_hit hit_rank="3" peptide="KRGAEGEER" peptide_prev_aa="R" peptide_next_aa="W" protein="rev_ENSP00000371553" num_tot_proteins="1" num_matched_ions="14" tot_num_ions="32" calc_neutral_pep_mass="1030.515571" massdiff="0.000686" num_tol_term="2" num_missed_cleavages="2" num_matched_peptides="12075">
+    <search_score name="xcorr" value="1.539"/>
+    <search_score name="deltacn" value="0.008"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="400.0"/>
+    <search_score name="sprank" value="9"/>
+    <search_score name="expect" value="2.38E+00"/>
+   </search_hit>
+   <search_hit hit_rank="4" peptide="KMHETSKR" peptide_prev_aa="K" peptide_next_aa="M" protein="rev_ENSP00000353518" num_tot_proteins="1" num_matched_ions="12" tot_num_ions="28" calc_neutral_pep_mass="1031.518198" massdiff="-1.001942" num_tol_term="2" num_missed_cleavages="2" num_matched_peptides="12075">
+    <modification_info modified_peptide="KM[147]HETSKR">
+     <mod_aminoacid_mass position="2" mass="147.035385"/>
+    </modification_info>
+    <search_score name="xcorr" value="1.526"/>
+    <search_score name="deltacn" value="0.004"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="279.6"/>
+    <search_score name="sprank" value="23"/>
+    <search_score name="expect" value="2.56E+00"/>
+   </search_hit>
+   <search_hit hit_rank="5" peptide="QRECRQR" peptide_prev_aa="R" peptide_next_aa="G" protein="rev_ENSP00000364476" num_tot_proteins="2" num_matched_ions="9" tot_num_ions="24" calc_neutral_pep_mass="1031.504295" massdiff="-0.988038" num_tol_term="2" num_missed_cleavages="2" num_matched_peptides="12075">
+    <modification_info modified_peptide="QRECRQR">
+     <mod_aminoacid_mass position="4" mass="160.030649"/>
+    </modification_info>
+    <search_score name="xcorr" value="1.520"/>
+    <search_score name="deltacn" value="0.071"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="166.5"/>
+    <search_score name="sprank" value="61"/>
+    <search_score name="expect" value="2.66E+00"/>
+   </search_hit>
+  </search_result>
+ </spectrum_query>
+ <spectrum_query spectrum="Adult_Adrenalgland_Gel_Elite_49_f01.00060.00060.2" start_scan="60" end_scan="60" precursor_neutral_mass="669.320103" assumed_charge="2" index="3" retention_time_sec="331.2">
+  <search_result>
+   <search_hit hit_rank="1" peptide="HGDSVR" peptide_prev_aa="R" peptide_next_aa="N" protein="ENSP00000252244" num_tot_proteins="1" num_matched_ions="9" tot_num_ions="10" calc_neutral_pep_mass="669.319437" massdiff="0.000666" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="4924">
+    <search_score name="xcorr" value="1.855"/>
+    <search_score name="deltacn" value="0.193"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="483.3"/>
+    <search_score name="sprank" value="1"/>
+    <search_score name="expect" value="5.66E-02"/>
+   </search_hit>
+   <search_hit hit_rank="2" peptide="HGSDVR" peptide_prev_aa="K" peptide_next_aa="I" protein="rev_ENSP00000293725" num_tot_proteins="4" num_matched_ions="7" tot_num_ions="10" calc_neutral_pep_mass="669.319437" massdiff="0.000666" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="4924">
+    <search_score name="xcorr" value="1.498"/>
+    <search_score name="deltacn" value="0.349"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="226.8"/>
+    <search_score name="sprank" value="4"/>
+    <search_score name="expect" value="5.09E-01"/>
+   </search_hit>
+   <search_hit hit_rank="3" peptide="DGSHVR" peptide_prev_aa="R" peptide_next_aa="M" protein="rev_ENSP00000276594" num_tot_proteins="1" num_matched_ions="6" tot_num_ions="10" calc_neutral_pep_mass="669.319437" massdiff="0.000666" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="4924">
+    <search_score name="xcorr" value="0.976"/>
+    <search_score name="deltacn" value="0.028"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="101.2"/>
+    <search_score name="sprank" value="19"/>
+    <search_score name="expect" value="1.26E+01"/>
+   </search_hit>
+   <search_hit hit_rank="4" peptide="HSDGVR" peptide_prev_aa="R" peptide_next_aa="L" protein="rev_ENSP00000485411" num_tot_proteins="1" num_matched_ions="5" tot_num_ions="10" calc_neutral_pep_mass="669.319437" massdiff="0.000666" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="4924">
+    <search_score name="xcorr" value="0.948"/>
+    <search_score name="deltacn" value="0.031"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="103.8"/>
+    <search_score name="sprank" value="17"/>
+    <search_score name="expect" value="1.49E+01"/>
+   </search_hit>
+   <search_hit hit_rank="5" peptide="HATDAR" peptide_prev_aa="K" peptide_next_aa="I" protein="rev_ENSP00000392024" num_tot_proteins="1" num_matched_ions="5" tot_num_ions="10" calc_neutral_pep_mass="669.319437" massdiff="0.000666" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="4924">
+    <search_score name="xcorr" value="0.919"/>
+    <search_score name="deltacn" value="0.042"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="122.9"/>
+    <search_score name="sprank" value="10"/>
+    <search_score name="expect" value="1.79E+01"/>
+   </search_hit>
+  </search_result>
+ </spectrum_query>
+ <spectrum_query spectrum="Adult_Adrenalgland_Gel_Elite_49_f01.00484.00484.3" start_scan="484" end_scan="484" precursor_neutral_mass="1117.501150" assumed_charge="3" index="4" retention_time_sec="555.8">
+  <search_result>
+   <search_hit hit_rank="1" peptide="HGNSHQGEPR" peptide_prev_aa="K" peptide_next_aa="D" protein="ENSP00000269576" num_tot_proteins="1" num_matched_ions="19" tot_num_ions="36" calc_neutral_pep_mass="1117.501317" massdiff="-0.000167" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="4434">
+    <search_score name="xcorr" value="2.267"/>
+    <search_score name="deltacn" value="0.566"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="843.4"/>
+    <search_score name="sprank" value="1"/>
+    <search_score name="expect" value="7.18E-04"/>
+   </search_hit>
+   <search_hit hit_rank="2" peptide="HCPRHCPR" peptide_prev_aa="R" peptide_next_aa="E" protein="ENSP00000417711" num_tot_proteins="1" num_matched_ions="12" tot_num_ions="28" calc_neutral_pep_mass="1118.497435" massdiff="-0.996285" num_tol_term="2" num_missed_cleavages="1" num_matched_peptides="4434">
+    <modification_info modified_peptide="HCPRHCPR">
+     <mod_aminoacid_mass position="2" mass="160.030649"/>
+     <mod_aminoacid_mass position="6" mass="160.030649"/>
+    </modification_info>
+    <search_score name="xcorr" value="0.985"/>
+    <search_score name="deltacn" value="0.030"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="346.9"/>
+    <search_score name="sprank" value="10"/>
+    <search_score name="expect" value="6.37E+00"/>
+   </search_hit>
+   <search_hit hit_rank="3" peptide="RDGEEQEQK" peptide_prev_aa="K" peptide_next_aa="E" protein="ENSP00000367766" num_tot_proteins="1" num_matched_ions="14" tot_num_ions="32" calc_neutral_pep_mass="1117.499980" massdiff="0.001170" num_tol_term="2" num_missed_cleavages="1" num_matched_peptides="4434">
+    <search_score name="xcorr" value="0.956"/>
+    <search_score name="deltacn" value="0.055"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="467.1"/>
+    <search_score name="sprank" value="3"/>
+    <search_score name="expect" value="7.84E+00"/>
+   </search_hit>
+   <search_hit hit_rank="4" peptide="DAAGGGDGINGGR" peptide_prev_aa="R" peptide_next_aa="A" protein="rev_ENSP00000351777" num_tot_proteins="1" num_matched_ions="17" tot_num_ions="48" calc_neutral_pep_mass="1115.495563" massdiff="2.005587" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="4434">
+    <search_score name="xcorr" value="0.904"/>
+    <search_score name="deltacn" value="0.030"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="321.6"/>
+    <search_score name="sprank" value="15"/>
+    <search_score name="expect" value="1.13E+01"/>
+   </search_hit>
+   <search_hit hit_rank="5" peptide="AFGCPTYFR" peptide_prev_aa="K" peptide_next_aa="R" protein="ENSP00000319053" num_tot_proteins="1" num_matched_ions="9" tot_num_ions="32" calc_neutral_pep_mass="1117.501501" massdiff="-0.000350" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="4434">
+    <modification_info modified_peptide="AFGCPTYFR">
+     <mod_aminoacid_mass position="4" mass="160.030649"/>
+    </modification_info>
+    <search_score name="xcorr" value="0.877"/>
+    <search_score name="deltacn" value="0.015"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="156.4"/>
+    <search_score name="sprank" value="64"/>
+    <search_score name="expect" value="1.37E+01"/>
+   </search_hit>
+  </search_result>
+ </spectrum_query>
+ <spectrum_query spectrum="Adult_Adrenalgland_Gel_Elite_49_f01.00496.00496.2" start_scan="496" end_scan="496" precursor_neutral_mass="980.442478" assumed_charge="2" index="5" retention_time_sec="562.1">
+  <search_result>
+   <search_hit hit_rank="1" peptide="AAEEGKDYP" peptide_prev_aa="R" peptide_next_aa="-" protein="ENSP00000400269" num_tot_proteins="1" num_matched_ions="5" tot_num_ions="16" calc_neutral_pep_mass="978.429441" massdiff="2.013037" num_tol_term="2" num_missed_cleavages="1" num_matched_peptides="6271">
+    <search_score name="xcorr" value="0.641"/>
+    <search_score name="deltacn" value="0.059"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="145.4"/>
+    <search_score name="sprank" value="7"/>
+    <search_score name="expect" value="4.26E+00"/>
+   </search_hit>
+   <search_hit hit_rank="2" peptide="TDTDDGKTK" peptide_prev_aa="R" peptide_next_aa="D" protein="rev_ENSP00000371475" num_tot_proteins="5" num_matched_ions="5" tot_num_ions="16" calc_neutral_pep_mass="979.445819" massdiff="0.996659" num_tol_term="2" num_missed_cleavages="1" num_matched_peptides="6271">
+    <search_score name="xcorr" value="0.603"/>
+    <search_score name="deltacn" value="0.118"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="56.5"/>
+    <search_score name="sprank" value="55"/>
+    <search_score name="expect" value="6.54E+00"/>
+   </search_hit>
+   <search_hit hit_rank="3" peptide="ELCLGEMK" peptide_prev_aa="K" peptide_next_aa="E" protein="ENSP00000357707" num_tot_proteins="2" num_matched_ions="5" tot_num_ions="14" calc_neutral_pep_mass="978.451439" massdiff="1.991039" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="6271">
+    <modification_info modified_peptide="ELCLGEMK">
+     <mod_aminoacid_mass position="3" mass="160.030649"/>
+    </modification_info>
+    <search_score name="xcorr" value="0.532"/>
+    <search_score name="deltacn" value="0.015"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="105.7"/>
+    <search_score name="sprank" value="19"/>
+    <search_score name="expect" value="1.47E+01"/>
+   </search_hit>
+   <search_hit hit_rank="4" peptide="CEHPSVPR" peptide_prev_aa="R" peptide_next_aa="T" protein="rev_ENSP00000228347" num_tot_proteins="2" num_matched_ions="4" tot_num_ions="14" calc_neutral_pep_mass="980.449799" massdiff="-0.007321" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="6271">
+    <modification_info modified_peptide="CEHPSVPR">
+     <mod_aminoacid_mass position="1" mass="160.030649"/>
+    </modification_info>
+    <search_score name="xcorr" value="0.524"/>
+    <search_score name="deltacn" value="0.080"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="70.0"/>
+    <search_score name="sprank" value="42"/>
+    <search_score name="expect" value="1.60E+01"/>
+   </search_hit>
+   <search_hit hit_rank="5" peptide="SEFTGPQNT" peptide_prev_aa="K" peptide_next_aa="-" protein="ENSP00000429630" num_tot_proteins="1" num_matched_ions="6" tot_num_ions="16" calc_neutral_pep_mass="979.424690" massdiff="1.017788" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="6271">
+    <search_score name="xcorr" value="0.482"/>
+    <search_score name="deltacn" value="0.006"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="107.9"/>
+    <search_score name="sprank" value="18"/>
+    <search_score name="expect" value="2.56E+01"/>
+   </search_hit>
+  </search_result>
+ </spectrum_query>
+ <spectrum_query spectrum="Adult_Adrenalgland_Gel_Elite_49_f01.00500.00500.5" start_scan="500" end_scan="500" precursor_neutral_mass="3050.262995" assumed_charge="5" index="6" retention_time_sec="564.1">
+  <search_result>
+   <search_hit hit_rank="1" peptide="LGSNDSSKDSDSDSEMRDSAATATVATVAM" peptide_prev_aa="K" peptide_next_aa="-" protein="rev_ENSP00000465267" num_tot_proteins="1" num_matched_ions="26" tot_num_ions="232" calc_neutral_pep_mass="3050.292803" massdiff="-0.029808" num_tol_term="2" num_missed_cleavages="2" num_matched_peptides="1132">
+    <modification_info modified_peptide="LGSNDSSKDSDSDSEM[147]RDSAATATVATVAM[147]">
+     <mod_aminoacid_mass position="16" mass="147.035385"/>
+     <mod_aminoacid_mass position="30" mass="147.035385"/>
+    </modification_info>
+    <search_score name="xcorr" value="1.170"/>
+    <search_score name="deltacn" value="0.105"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="183.5"/>
+    <search_score name="sprank" value="17"/>
+    <search_score name="expect" value="2.22E+00"/>
+   </search_hit>
+   <search_hit hit_rank="2" peptide="CVDGAYFNSRCEYYCSPGYTLKGER" peptide_prev_aa="K" peptide_next_aa="T" protein="ENSP00000367794" num_tot_proteins="3" num_matched_ions="21" tot_num_ions="192" calc_neutral_pep_mass="3051.294963" massdiff="-1.031968" num_tol_term="2" num_missed_cleavages="2" num_matched_peptides="1132">
+    <modification_info modified_peptide="CVDGAYFNSRCEYYCSPGYTLKGER">
+     <mod_aminoacid_mass position="1" mass="160.030649"/>
+     <mod_aminoacid_mass position="11" mass="160.030649"/>
+     <mod_aminoacid_mass position="15" mass="160.030649"/>
+    </modification_info>
+    <search_score name="xcorr" value="1.048"/>
+    <search_score name="deltacn" value="0.137"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="188.4"/>
+    <search_score name="sprank" value="15"/>
+    <search_score name="expect" value="4.24E+00"/>
+   </search_hit>
+   <search_hit hit_rank="3" peptide="EDMCCMLGVLKANWDQDNKMLQGMM" peptide_prev_aa="R" peptide_next_aa="-" protein="rev_ENSP00000429221" num_tot_proteins="1" num_matched_ions="20" tot_num_ions="192" calc_neutral_pep_mass="3049.260404" massdiff="1.002591" num_tol_term="2" num_missed_cleavages="2" num_matched_peptides="1132">
+    <modification_info modified_peptide="EDM[147]CCM[147]LGVLKANWDQDNKMLQGMM">
+     <mod_aminoacid_mass position="3" mass="147.035385"/>
+     <mod_aminoacid_mass position="4" mass="160.030649"/>
+     <mod_aminoacid_mass position="5" mass="160.030649"/>
+     <mod_aminoacid_mass position="6" mass="147.035385"/>
+    </modification_info>
+    <search_score name="xcorr" value="0.905"/>
+    <search_score name="deltacn" value="0.006"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="188.1"/>
+    <search_score name="sprank" value="16"/>
+    <search_score name="expect" value="8.99E+00"/>
+   </search_hit>
+   <search_hit hit_rank="4" peptide="EYSMMSREYSSMMSREAAYSMMMSR" peptide_prev_aa="R" peptide_next_aa="R" protein="rev_ENSP00000348984" num_tot_proteins="4" num_matched_ions="21" tot_num_ions="192" calc_neutral_pep_mass="3047.208382" massdiff="3.054613" num_tol_term="2" num_missed_cleavages="2" num_matched_peptides="1132">
+    <modification_info modified_peptide="EYSMMSREYSSMMSREAAYSMMM[147]SR">
+     <mod_aminoacid_mass position="23" mass="147.035385"/>
+    </modification_info>
+    <search_score name="xcorr" value="0.900"/>
+    <search_score name="deltacn" value="0.061"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="132.5"/>
+    <search_score name="sprank" value="37"/>
+    <search_score name="expect" value="9.23E+00"/>
+   </search_hit>
+   <search_hit hit_rank="5" peptide="MKPNYQWCMRMLEFLMDPCNDPK" peptide_prev_aa="R" peptide_next_aa="D" protein="rev_ENSP00000268035" num_tot_proteins="2" num_matched_ions="20" tot_num_ions="176" calc_neutral_pep_mass="3051.287924" massdiff="-1.024929" num_tol_term="2" num_missed_cleavages="1" num_matched_peptides="1132">
+    <modification_info modified_peptide="M[147]KPNYQWCM[147]RM[147]LEFLMDPCNDPK">
+     <mod_aminoacid_mass position="1" mass="147.035385"/>
+     <mod_aminoacid_mass position="8" mass="160.030649"/>
+     <mod_aminoacid_mass position="9" mass="147.035385"/>
+     <mod_aminoacid_mass position="11" mass="147.035385"/>
+     <mod_aminoacid_mass position="19" mass="160.030649"/>
+    </modification_info>
+    <search_score name="xcorr" value="0.844"/>
+    <search_score name="deltacn" value="0.013"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="136.0"/>
+    <search_score name="sprank" value="34"/>
+    <search_score name="expect" value="1.23E+01"/>
+   </search_hit>
+  </search_result>
+ </spectrum_query>
+ <spectrum_query spectrum="Adult_Adrenalgland_Gel_Elite_49_f01.00501.00501.3" start_scan="501" end_scan="501" precursor_neutral_mass="1800.774496" assumed_charge="3" index="7" retention_time_sec="564.5">
+  <search_result>
+   <search_hit hit_rank="1" peptide="GAGESGEEDPFPSRDPR" peptide_prev_aa="K" peptide_next_aa="S" protein="ENSP00000354671" num_tot_proteins="1" num_matched_ions="22" tot_num_ions="64" calc_neutral_pep_mass="1801.786720" massdiff="-1.012224" num_tol_term="2" num_missed_cleavages="1" num_matched_peptides="3158">
+    <search_score name="xcorr" value="1.601"/>
+    <search_score name="deltacn" value="0.117"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="584.5"/>
+    <search_score name="sprank" value="2"/>
+    <search_score name="expect" value="2.06E+00"/>
+   </search_hit>
+   <search_hit hit_rank="2" peptide="QTAGQGSPCEEQEEPR" peptide_prev_aa="K" peptide_next_aa="A" protein="ENSP00000301067" num_tot_proteins="1" num_matched_ions="20" tot_num_ions="60" calc_neutral_pep_mass="1801.753705" massdiff="-0.979209" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="3158">
+    <modification_info modified_peptide="QTAGQGSPCEEQEEPR">
+     <mod_aminoacid_mass position="9" mass="160.030649"/>
+    </modification_info>
+    <search_score name="xcorr" value="1.413"/>
+    <search_score name="deltacn" value="0.011"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="469.5"/>
+    <search_score name="sprank" value="3"/>
+    <search_score name="expect" value="4.83E+00"/>
+   </search_hit>
+   <search_hit hit_rank="3" peptide="GEMANVCSARHPGMER" peptide_prev_aa="K" peptide_next_aa="Q" protein="rev_ENSP00000425010" num_tot_proteins="10" num_matched_ions="18" tot_num_ions="60" calc_neutral_pep_mass="1800.781792" massdiff="-0.007295" num_tol_term="2" num_missed_cleavages="1" num_matched_peptides="3158">
+    <modification_info modified_peptide="GEMANVCSARHPGMER">
+     <mod_aminoacid_mass position="7" mass="160.030649"/>
+    </modification_info>
+    <search_score name="xcorr" value="1.397"/>
+    <search_score name="deltacn" value="0.100"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="407.1"/>
+    <search_score name="sprank" value="6"/>
+    <search_score name="expect" value="5.20E+00"/>
+   </search_hit>
+   <search_hit hit_rank="4" peptide="MEKLEDSAMEEATMR" peptide_prev_aa="R" peptide_next_aa="A" protein="rev_ENSP00000395483" num_tot_proteins="2" num_matched_ions="15" tot_num_ions="56" calc_neutral_pep_mass="1801.753207" massdiff="-0.978711" num_tol_term="2" num_missed_cleavages="1" num_matched_peptides="3158">
+    <modification_info modified_peptide="MEKLEDSAM[147]EEATM[147]R">
+     <mod_aminoacid_mass position="9" mass="147.035385"/>
+     <mod_aminoacid_mass position="14" mass="147.035385"/>
+    </modification_info>
+    <search_score name="xcorr" value="1.258"/>
+    <search_score name="deltacn" value="0.100"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="230.0"/>
+    <search_score name="sprank" value="29"/>
+    <search_score name="expect" value="9.79E+00"/>
+   </search_hit>
+   <search_hit hit_rank="5" peptide="ELANSPDCPQMCAYK" peptide_prev_aa="K" peptide_next_aa="L" protein="ENSP00000334738" num_tot_proteins="3" num_matched_ions="13" tot_num_ions="56" calc_neutral_pep_mass="1798.732427" massdiff="2.042069" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="3158">
+    <modification_info modified_peptide="ELANSPDCPQM[147]CAYK">
+     <mod_aminoacid_mass position="8" mass="160.030649"/>
+     <mod_aminoacid_mass position="11" mass="147.035385"/>
+     <mod_aminoacid_mass position="12" mass="160.030649"/>
+    </modification_info>
+    <search_score name="xcorr" value="1.132"/>
+    <search_score name="deltacn" value="0.030"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="182.1"/>
+    <search_score name="sprank" value="49"/>
+    <search_score name="expect" value="1.73E+01"/>
+   </search_hit>
+  </search_result>
+ </spectrum_query>
+ <spectrum_query spectrum="Adult_Adrenalgland_Gel_Elite_49_f01.00514.00514.4" start_scan="514" end_scan="514" precursor_neutral_mass="1708.749947" assumed_charge="4" index="8" retention_time_sec="571.3">
+  <search_result>
+   <search_hit hit_rank="1" peptide="KKADDPMEAHADDHK" peptide_prev_aa="-" peptide_next_aa="A" protein="rev_ENSP00000320488" num_tot_proteins="1" num_matched_ions="23" tot_num_ions="84" calc_neutral_pep_mass="1706.768233" massdiff="1.981714" num_tol_term="2" num_missed_cleavages="2" num_matched_peptides="4610">
+    <search_score name="xcorr" value="1.096"/>
+    <search_score name="deltacn" value="0.030"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="258.2"/>
+    <search_score name="sprank" value="2"/>
+    <search_score name="expect" value="1.01E+01"/>
+   </search_hit>
+   <search_hit hit_rank="2" peptide="LLTTNSDHMTFMQR" peptide_prev_aa="R" peptide_next_aa="V" protein="ENSP00000418532" num_tot_proteins="2" num_matched_ions="20" tot_num_ions="78" calc_neutral_pep_mass="1709.786511" massdiff="-1.036564" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="4610">
+    <modification_info modified_peptide="LLTTNSDHM[147]TFMQR">
+     <mod_aminoacid_mass position="9" mass="147.035385"/>
+    </modification_info>
+    <search_score name="xcorr" value="1.063"/>
+    <search_score name="deltacn" value="0.008"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="184.0"/>
+    <search_score name="sprank" value="12"/>
+    <search_score name="expect" value="1.20E+01"/>
+   </search_hit>
+   <search_hit hit_rank="3" peptide="MSYEPNKDPYGSMR" peptide_prev_aa="R" peptide_next_aa="K" protein="ENSP00000320485" num_tot_proteins="5" num_matched_ions="19" tot_num_ions="78" calc_neutral_pep_mass="1705.707577" massdiff="3.042370" num_tol_term="2" num_missed_cleavages="1" num_matched_peptides="4610">
+    <modification_info modified_peptide="M[147]SYEPNKDPYGSM[147]R">
+     <mod_aminoacid_mass position="1" mass="147.035385"/>
+     <mod_aminoacid_mass position="13" mass="147.035385"/>
+    </modification_info>
+    <search_score name="xcorr" value="1.055"/>
+    <search_score name="deltacn" value="0.027"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="145.3"/>
+    <search_score name="sprank" value="23"/>
+    <search_score name="expect" value="1.26E+01"/>
+   </search_hit>
+   <search_hit hit_rank="4" peptide="SDTTDSSQGNGIKYFS" peptide_prev_aa="K" peptide_next_aa="-" protein="ENSP00000450044" num_tot_proteins="1" num_matched_ions="24" tot_num_ions="90" calc_neutral_pep_mass="1705.743124" massdiff="3.006823" num_tol_term="2" num_missed_cleavages="1" num_matched_peptides="4610">
+    <search_score name="xcorr" value="1.027"/>
+    <search_score name="deltacn" value="0.004"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="218.0"/>
+    <search_score name="sprank" value="7"/>
+    <search_score name="expect" value="1.46E+01"/>
+   </search_hit>
+   <search_hit hit_rank="5" peptide="HMSNKGMEHLYSMK" peptide_prev_aa="R" peptide_next_aa="C" protein="ENSP00000342630" num_tot_proteins="5" num_matched_ions="22" tot_num_ions="78" calc_neutral_pep_mass="1707.753102" massdiff="0.996845" num_tol_term="2" num_missed_cleavages="1" num_matched_peptides="4610">
+    <modification_info modified_peptide="HMSNKGMEHLYSM[147]K">
+     <mod_aminoacid_mass position="13" mass="147.035385"/>
+    </modification_info>
+    <search_score name="xcorr" value="1.023"/>
+    <search_score name="deltacn" value="0.084"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="244.1"/>
+    <search_score name="sprank" value="3"/>
+    <search_score name="expect" value="1.50E+01"/>
+   </search_hit>
+  </search_result>
+ </spectrum_query>
+ <spectrum_query spectrum="Adult_Adrenalgland_Gel_Elite_49_f01.00517.00517.3" start_scan="517" end_scan="517" precursor_neutral_mass="1118.491019" assumed_charge="3" index="9" retention_time_sec="572.8">
+  <search_result>
+   <search_hit hit_rank="1" peptide="HGNSHQGEPR" peptide_prev_aa="K" peptide_next_aa="D" protein="ENSP00000269576" num_tot_proteins="1" num_matched_ions="20" tot_num_ions="36" calc_neutral_pep_mass="1117.501317" massdiff="0.989701" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="3916">
+    <search_score name="xcorr" value="2.425"/>
+    <search_score name="deltacn" value="0.511"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="787.7"/>
+    <search_score name="sprank" value="1"/>
+    <search_score name="expect" value="4.95E-03"/>
+   </search_hit>
+   <search_hit hit_rank="2" peptide="HCPRHCPR" peptide_prev_aa="R" peptide_next_aa="E" protein="ENSP00000417711" num_tot_proteins="1" num_matched_ions="15" tot_num_ions="28" calc_neutral_pep_mass="1118.497435" massdiff="-0.006417" num_tol_term="2" num_missed_cleavages="1" num_matched_peptides="3916">
+    <modification_info modified_peptide="HCPRHCPR">
+     <mod_aminoacid_mass position="2" mass="160.030649"/>
+     <mod_aminoacid_mass position="6" mass="160.030649"/>
+    </modification_info>
+    <search_score name="xcorr" value="1.187"/>
+    <search_score name="deltacn" value="0.149"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="457.8"/>
+    <search_score name="sprank" value="4"/>
+    <search_score name="expect" value="5.90E+00"/>
+   </search_hit>
+   <search_hit hit_rank="3" peptide="AMLGSNGDSPR" peptide_prev_aa="K" peptide_next_aa="K" protein="rev_ENSP00000347602" num_tot_proteins="4" num_matched_ions="13" tot_num_ions="40" calc_neutral_pep_mass="1119.497857" massdiff="-1.006838" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="3916">
+    <modification_info modified_peptide="AM[147]LGSNGDSPR">
+     <mod_aminoacid_mass position="2" mass="147.035385"/>
+    </modification_info>
+    <search_score name="xcorr" value="1.010"/>
+    <search_score name="deltacn" value="0.022"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="234.4"/>
+    <search_score name="sprank" value="19"/>
+    <search_score name="expect" value="1.62E+01"/>
+   </search_hit>
+   <search_hit hit_rank="4" peptide="RDNMQNGAAK" peptide_prev_aa="K" peptide_next_aa="Q" protein="rev_ENSP00000340900" num_tot_proteins="2" num_matched_ions="16" tot_num_ions="36" calc_neutral_pep_mass="1119.509090" massdiff="-1.018072" num_tol_term="2" num_missed_cleavages="1" num_matched_peptides="3916">
+    <modification_info modified_peptide="RDNM[147]QNGAAK">
+     <mod_aminoacid_mass position="4" mass="147.035385"/>
+    </modification_info>
+    <search_score name="xcorr" value="0.988"/>
+    <search_score name="deltacn" value="0.027"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="441.9"/>
+    <search_score name="sprank" value="5"/>
+    <search_score name="expect" value="1.84E+01"/>
+   </search_hit>
+   <search_hit hit_rank="5" peptide="DSGHPGHAEGR" peptide_prev_aa="R" peptide_next_aa="E" protein="ENSP00000374387" num_tot_proteins="2" num_matched_ions="12" tot_num_ions="40" calc_neutral_pep_mass="1118.485333" massdiff="0.005685" num_tol_term="2" num_missed_cleavages="0" num_matched_peptides="3916">
+    <search_score name="xcorr" value="0.961"/>
+    <search_score name="deltacn" value="0.009"/>
+    <search_score name="deltacnstar" value="0.000"/>
+    <search_score name="spscore" value="172.1"/>
+    <search_score name="sprank" value="46"/>
+    <search_score name="expect" value="2.14E+01"/>
+   </search_hit>
+  </search_result>
+ </spectrum_query>
+ </msms_run_summary>
+</msms_pipeline_analysis>

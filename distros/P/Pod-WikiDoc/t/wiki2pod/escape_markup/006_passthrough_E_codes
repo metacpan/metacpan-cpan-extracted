@@ -1,0 +1,28 @@
+= Escaping E<euro>
+
+E<raquo> passed through
+
+* More E<laquo>
+
+0 Or E<169>
+#--------------------------------------------------------------------------#
+=head1 Escaping E<euro>
+
+E<raquo> passed through
+
+=over
+
+=item *
+
+More E<laquo>
+
+=back
+
+=over
+
+=item 1.
+
+Or E<169>
+
+=back
+

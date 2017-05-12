@@ -1,0 +1,140 @@
+#!perl
+use Getopt::Long qw(:config no_ignore_case);
+use Pod::Usage;
+use Pod::Classdoc::Project qw(renderProject);
+use Cwd;
+
+use strict;
+use warnings;
+
+our $VERSION = '1.01';
+
+my ($help, $out, $lib, $title, $lang, $desc, $charset, $index, $verbose, $forcegen, $nosrc);
+my ($nocomments, $noexpand, $noimports, $jspath, $lines, $openimg, $imgpath, $nopod, 
+		$rootimg, $csspath, $closeimg, $noicons, $notree, $download, $additions, $noheredocs,
+		$order);
+my @sources = ();
+my %opt = (
+    'additions|a=s' => \$additions,
+	'nocomments|C'  => \$nocomments,
+    'charset|c=s' => \$charset,
+    'desc|d=s'    => \$desc,
+    'download|D=s' => \$download,
+    'noexpand|e'  => \$noexpand,
+    'forcegen!'   => \$forcegen,
+    'help|h'      => \$help,
+    'noheredoc|H'   => \$noheredocs,
+    'noimports|I' => \$noimports,
+    'imgpath|i=s' => \$imgpath,
+    'jspath|j=s'    => \$jspath,
+    'lang|L=s'      => \$lang,
+    'lib|l=s'    => sub { push @sources, $_[1]; },
+    'lines|N=i'   => \$lines,
+    'nosrc|n'     => \$nosrc,
+    'openimg|O=s' => \$openimg,
+    'output|out|o=s'     => \$out,
+    'nopod|p'     => \$nopod,
+    'rootimg|r=s' => \$rootimg,
+    'css|s=s'     => \$csspath,
+    'title|t=s'   => \$title,
+    'verbose|v'   => \$verbose,
+    'closeimg|x=s' => \$closeimg,
+    'order|y=s'   => \$order,
+    'noicons|z'   => \$noicons,
+);
+
+GetOptions(%opt);
+
+pod2usage(1) if $help;
+
+my @order = $order ? split(/\s*,\s*/, $order) : ();
+
+$| = 1 if $verbose;
+
+renderProject(
+	Additions	=> $additions,
+    Charset		=> $charset,
+    CloseImage	=> $closeimg,
+	Comments	=> !$nocomments,
+    Description	=> $desc,
+    Download	=> $download,
+    Expandable  => !$noexpand,
+    Force		=> $forcegen,
+    Heredoc   	=> !$noheredocs,
+    Imports		=> !$noimports,
+    IconPath	=> $imgpath,
+    JSPath		=> $jspath,
+    Language	=> $lang,
+    Libs		=> \@sources,
+    MinLines	=> $lines,
+    NoIcons		=> $noicons,
+    NoSource	=> $nosrc,
+    OpenImage	=> $openimg,
+    Order		=> \@order,
+    Output		=> $out,
+    POD			=> !$nopod,
+    RootImage	=> $rootimg,
+    CSSPath		=> $csspath,
+    Title		=> $title,
+    Verbose		=> $verbose,
+	);
+
+=pod
+
+=head1 NAME
+
+mkprojdocs
+
+=head1 SYNOPSIS
+
+mkprojdocs [options]
+
+ Options:
+    -a|-additions <filename>  additional HTML lists to include in TOC
+    -C|-nocomments            disable comment folding in source; 
+                                  default enabled
+    -c|-charset <string>      set character set meta tag in html;
+                                  default 'UTF-8'
+    -d|-desc <string>         project description
+    -D|-download <filename>   path to a download file for project
+    -e|-noexpand              disable expandable source folds;
+                                   default enabled
+    -f|-forcegen   	          force regeneration
+    -h|-help                  display this help and exit
+    -H|-noheredoc             disable heredoc folding (default enabled)
+    -I|-noimports             disable imports folding (default enabled)
+    -i|-imgpath <path>        path to icon image directory; default 'img'
+    -j|-jspath <path>         path to Javascript files; default 'js'
+    -l|-lib <path>            project library-root-directory path
+    -L|-lang <language>       language for xml:lang. default 'en'
+    -N|-lines <number>        minimum consecutive foldable lines req'd 
+                                  for fold (default 4)
+    -n|-nosrc                 skip PPI::HTML::CodeFolder generation
+    -O|-openimg <filename>    image file used for HTML::ListToTree open 
+                                  nodes; default 'openbook.gif'
+    -o|-out|-output <path>    target directory path for generated documents
+    -p|-nopod                 disable POD folding (default enabled)
+    -r|-rootimg <filename>    image file used for root of TOC tree; 
+                                 default 'globe.gif'
+    -s|-css <path>            path to CSS files; default 'css'
+    -t|-title <title>         project title
+    -v|-verbose               enable diagnostic messages
+    -x|-closeimg <filename>   image file used for closed TOC nodes;
+                                 default 'closedbook.gif'
+    -y|-order "<pkglist>"	  specify order of packages in TOC; 
+                                 <pkglist> is comma separated list of 
+                                 names, e.g.,
+                                 "DBI,DBD::_::dr,DBD::_::db,DBD::_::st"
+    -z|-noicons               no icons in tree widget; default is icons on
+
+Multiple library-directories cna be specified:
+
+  mkprojdocs -o /path/to/outputdir -l /path/to/lib1 -l /path/to/lib2
+
+=head1 DESCRIPTION
+
+Generates merged L<Pod::ProjectDocs> (for POD), L<Pod::Classdoc> (for classdocs), and 
+L<PPI::HTML::CodeFolder> (for source code) output with a Javascript navigation
+tree widget generated via L<HTML::ListToTree>.
+
+=cut

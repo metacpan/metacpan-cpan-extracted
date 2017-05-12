@@ -1,0 +1,16 @@
+#!/usr/local/bin/perl -w
+###########################################
+# sudo-simulator simulator
+###########################################
+use strict;
+use Term::ReadKey;
+
+$|=1;
+print "$0\n";
+
+my $user = "womper";
+print "[sudo] password for $user:";
+select undef, undef, undef, 1;
+print "\nFooled ya! Your input will be logged, muhahaha!\n";
+
+sleep 2;

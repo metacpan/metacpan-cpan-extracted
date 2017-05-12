@@ -1,0 +1,192 @@
+Changelog for Printer-ESCPOS
+
+1.006 2017-05-06T06:37:18
+ - USB printing with short sleep (#3) (Dominic Sonntag)
+ - improve docs (#2) (Dominic Sonntag)
+
+1.005 2016-10-13T05:28:38
+ - v1.005 (Shantanu Bhadoria)
+ - Fixed comilation errors (Shantanu Bhadoria)
+
+1.004 2016-09-05T03:24:40
+ - v1.004 (Shantanu Bhadoria)
+ - documentation fixes (Shantanu Bhadoria)
+
+1.003 2016-09-02T10:26:52
+ - v1.003 (Shantanu Bhadoria)
+ - stopwords (Shantanu Bhadoria)
+ - utf8 in doc! (Shantanu Bhadoria)
+ - utf8 code? (Shantanu Bhadoria)
+ - Added documentation for the new support for utf-8 with a hack using
+   imaging library features (Shantanu Bhadoria)
+ - Added support for utf-8 with a hack using imaging library features
+   (Shantanu Bhadoria)
+
+1.002 2016-05-25T08:44:31
+ - v1.002 (Shantanu Bhadoria)
+ - Fixed POD documentation mistakes referencing older syntax (Shantanu
+   Bhadoria)
+
+1.001 2016-05-25T08:39:32
+ - Removed utf8 char from pod to avoid pod croaks (Shantanu Bhadoria)
+ - added stopwords to avoid spellcheck errors (Shantanu Bhadoria)
+
+1.000 2016-05-25T08:17:48
+ - Added exceptions for invalid parameters, added calculations for nL and
+   nH values in module instead of making the user calculate the values
+   (Shantanu Bhadoria)
+ - Using globals instead of straight byte codes (Shantanu Bhadoria)
+ - Fixing link in manual (Shantanu Bhadoria)
+
+0.026 2016-05-24T06:36:06
+ - Adding stopwords to avoid pod spell errors (Shantanu Bhadoria)
+ - Removed header.gif to reduce filesize and avoid test croaks (Shantanu
+   Bhadoria)
+ - moving header to corpus (Shantanu Bhadoria)
+ - newlines on lines exceeding line limits, QR code function for printing
+   qr codes. Added documentation with under test Win32 serial port support.
+   (Shantanu Bhadoria)
+ - Added documentation (Shantanu Bhadoria)
+
+0.025 2016-05-10T04:27:08
+ - v0.025 (Shantanu Bhadoria)
+ - remove binary files to avoid dzil issues (Shantanu Bhadoria)
+ - Added direct image printing functionality with GD. Fixed
+   Class:Load::load_class error thanks to William Barrett for feedback
+   (Shantanu Bhadoria)
+ - skip compile tests for USB Device::USB bug (Shantanu Bhadoria)
+ - overriding compile tests (Shantanu Bhadoria)
+ - Added Device::USB (Shantanu Bhadoria)
+ - updating README (Shantanu Bhadoria)
+ - fixed perl versions for travis; (Shantanu Bhadoria)
+
+0.024 2016-04-04T09:31:44
+ - v0.024 (Shantanu Bhadoria)
+ - fixed travis.yml bugs (Shantanu Bhadoria)
+
+0.023 2016-04-04T09:27:32
+ - v0.023 (Shantanu Bhadoria)
+ - Editing travis.yml (Shantanu Bhadoria)
+
+0.022 2016-04-04T09:20:16
+ - v0.022 (Shantanu Bhadoria)
+ - removed missing win32 code (Shantanu Bhadoria)
+ - Network Example (Shantanu Bhadoria)
+ - travis pre install device usb (Shantanu Bhadoria)
+
+0.021 2015-05-25T05:56:36
+ - v0.021 (Shantanu Bhadoria)
+ - Testing removal of win32 portions of code (Shantanu Bhadoria)
+ - Adding OS specific tests for some modules to pass kwalitee tests
+   (Shantanu Bhadoria)
+ - Trial Run for win32 support (Shantanu Bhadoria)
+
+0.020 2015-04-08T09:59:57
+ - v0.020 (Shantanu Bhadoria)
+
+0.019 2015-04-08T08:58:10
+ - v0.019 (Shantanu Bhadoria)
+
+0.018 2015-04-08T08:53:54
+ - v0.018 (Shantanu Bhadoria)
+
+0.017 2015-04-08T08:52:23
+ - v0.017 (Shantanu Bhadoria)
+ - remove pod from github (Shantanu Bhadoria)
+
+0.016 2015-04-08T08:48:35
+ - v0.016 (Shantanu Bhadoria)
+ - Adding travis (Shantanu Bhadoria)
+ - Removing Changes from git repo (Shantanu Bhadoria)
+
+0.015 2015-04-02T08:32:58
+ - v0.015 (Shantanu Bhadoria)
+ - Removed namespace::autoclean fixed wikidoc error. (Shantanu Bhadoria)
+
+0.014 2015-04-02T03:16:21
+ - v0.014 (Shantanu Bhadoria)
+ - Added rotate 90 function Fixed POD Doc (Shantanu Bhadoria)
+ - Added rotate 90 function (Shantanu Bhadoria)
+ - Added POD Documentation (Shantanu Bhadoria)
+ - Added USB read functionality (Shantanu Bhadoria)
+ - POD Fixes (Shantanu Bhadoria)
+
+0.013 2015-04-01T06:15:01
+ - v0.013 (Shantanu Bhadoria)
+ - Adding POD for USB driverType (Shantanu Bhadoria)
+ - v0.012 (Shantanu Bhadoria)
+ - fixes #1 Switched from Moose to Moo/Moo::Role/Type::Tiny
+   https://github.com/shantanubhadoria/perl-Printer-ESCPOS/issues/1
+   suggested by tehmoth (Shantanu Bhadoria)
+
+0.012 2015-04-01T05:13:31
+ - v0.012 (Shantanu Bhadoria)
+ - fixes #1 Switched from Moose to Moo/Moo::Role/Type::Tiny
+   https://github.com/shantanubhadoria/perl-Printer-ESCPOS/issues/1
+   suggested by tehmoth (Shantanu Bhadoria)
+ - Added detaching of kernel driver to usb type (Shantanu Bhadoria)
+ - Added USB driver functionality (Shantanu Bhadoria)
+
+0.011 2015-03-30T05:10:21
+ - v0.011 (Shantanu Bhadoria)
+ - README.md Changes (Shantanu Bhadoria)
+ - Changed write() to text(), better representation. apologies to early
+   adopters of this module (Shantanu Bhadoria)
+ - adding markdown file for github pages (Shantanu Bhadoria)
+
+0.010 2015-03-27T07:33:54
+ - v0.010 (Shantanu Bhadoria)
+ - converted module names to links in documentation (Shantanu Bhadoria)
+ - More POD fixes (Shantanu Bhadoria)
+
+0.009 2015-03-27T04:49:34
+ - v0.009 (Shantanu Bhadoria)
+ - Changed params to 'ro'. This is more appropriate. More documentation
+   (Shantanu Bhadoria)
+ - Fixed some incorrect info in pod (Shantanu Bhadoria)
+ - Fixed more links in documentation (Shantanu Bhadoria)
+ - Making the ESC-P guide link a link in the documentation (Shantanu
+   Bhadoria)
+
+0.008 2015-03-27T03:22:21
+ - v0.008 (Shantanu Bhadoria)
+ - Fixed Serial Port raw Printing (Shantanu Bhadoria)
+
+0.007 2015-03-23T08:15:14
+ - v0.007 (Shantanu Bhadoria)
+ - grammar fix (Shantanu Bhadoria)
+
+0.006 2015-03-23T07:53:30
+ - v0.006 (Shantanu Bhadoria)
+ - grammar fix (Shantanu Bhadoria)
+
+0.005 2015-03-23T07:41:03
+ - v0.005 (Shantanu Bhadoria)
+ - Pod Fixes, Added init as a required method to Profile Role (Shantanu
+   Bhadoria)
+ - More Documentation! How awesome!! (Shantanu Bhadoria)
+ - dist.ini changes, added author website (Shantanu Bhadoria)
+ - Fixed/Added some more POD Documentation (Shantanu Bhadoria)
+ - Adding a Manual (Shantanu Bhadoria)
+ - Beautified(and fixed) some Pod (Shantanu Bhadoria)
+
+0.004 2015-03-15T04:08:32
+ - v0.004 (Shantanu Bhadoria)
+
+0.003 2015-03-11T09:28:38
+ - v0.003 (Shantanu Bhadoria)
+ - Fine Tunning Connections for non Serial and SerialoverUSB types
+   (Shantanu Bhadoria)
+
+0.002 2015-03-11T03:01:52
+ - v0.002 (Shantanu Bhadoria)
+ - Fixed the POD Documentation a little (Shantanu Bhadoria)
+ - POD data updates (Shantanu Bhadoria)
+
+0.001 2015-03-09T09:34:07
+ - v0.001 (Shantanu Bhadoria)
+ - Test Release (Shantanu Bhadoria)
+ - Removing Constants.pm adding other files (Shantanu Bhadoria)
+ - All in a days work adding functions to the default profile (Shantanu
+   Bhadoria)
+ - first commit (Shantanu Bhadoria)

@@ -1,0 +1,43 @@
+---
+abstract: 'framework for parsing Pod'
+author:
+  - 'Allison Randal <allison@perl.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Simple
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Encode: '2.78'
+requires:
+  Carp: '0'
+  Config: '0'
+  Cwd: '0'
+  File::Basename: '0'
+  File::Find: '0'
+  File::Spec: '0'
+  Pod::Escapes: '1.04'
+  Symbol: '0'
+  Test: '1.25'
+  Test::More: '0'
+  Text::Wrap: '98.112902'
+  integer: '0'
+  overload: '0'
+  strict: '0'
+resources:
+  bugtracker: https://github.com/perl-pod/pod-simple/issues
+  homepage: http://search.cpan.org/dist/Pod-Simple/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/perl-pod/pod-simple.git
+version: '3.35'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

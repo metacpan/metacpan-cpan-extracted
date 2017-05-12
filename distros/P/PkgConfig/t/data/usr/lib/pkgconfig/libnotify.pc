@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libnotify
+Description: Notifications Library
+Version: 0.5.0
+Requires: gtk+-2.0 >= 2.18, glib-2.0 >= 2.6, dbus-1 >= 0.76, dbus-glib-1 >= 0.76
+Libs: -L${libdir} -lnotify
+Cflags: -I${includedir}
+

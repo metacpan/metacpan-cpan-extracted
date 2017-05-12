@@ -1,0 +1,125 @@
+NAME
+    Parse::CPAN::Cached - Parse CPAN meta files & cache the results
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+    Ensure you already have a CPAN::Mini mirror setup, then:
+
+        use Parse::CPAN::Cached;
+        my $parsers       = Parse::CPAN::Cached->new();
+
+        # $authors is a Parse::CPAN::Authors (or Parse::CPAN::Whois) object
+        my $authors       = $parsers->parse_cpan('authors');
+
+        # $distributions is a Parse::CPAN::Packages object
+        my $distributions = $parsers->parse_cpan('packages');
+
+DESCRIPTION
+    Parsing the CPAN meta data files can take a few seconds if you do it
+    normally:
+
+      my $p = Parse::CPAN::Packages->new($filename);
+
+    this wraps the parsing/loading with App::Cache which in turn stores the
+    initial parse in a storable file.
+
+    Provided the cache hasn't expired, subsequent calls are loaded from this
+    storable file rather than being re-parsed from the original cpan
+    metadata file. If the cache has expired, we re-parse the source.
+
+    This is probably redundant unless you are repeatadly opening these files
+    (in different processes perhaps).
+
+    Note: 02packages.details.txt.gz (circa 2009-03) is ~730KB on disk but
+    13MB as a (App::Cached generated) Storable file. We're trading disk &
+    memory for speed.
+
+CONSTRUCTOR METHODS
+    All are optional.
+
+  cpan_mini_config
+    Defaults to the result of calling CPAN::Mini->read_config. We only use
+    the 'local' value returned, so you could say:
+
+        my $parsers = Parse::CPAN::Cached->new(
+            cpan_mini_config => { local => '/path/to/mini_cpan/' }
+        );
+
+  cache
+    Defaults to App::Cache->new(). If you want to change any of the defaults
+    in App::Cache, construct your own App::Cache first and pass it in.
+
+  info
+    A coderef that is called to emit some information about what is going
+    on. By default, we're silent under normal operation but if you want a
+    little more detail about what is happening pass in a coderef that
+    accepts a single string parameter.
+
+        my $parsers = Parse::CPAN::Cached->new(
+            info => sub { warn @_, "\n" }
+        );
+
+    Currently the only time this is used is when we're about to parse one of
+    the cpan meta data files form scratch, rather than loading in the data
+    via the cache.
+
+METHODS
+    There is only one.
+
+  parse_cpan
+    Give it the key, get back the appropriate Parse::CPAN::Foo object.
+
+        my $parsers = Parse::CPAN::Cached->new();
+        my $result  = $parsers->parse_cpan($key);
+
+    Where $key is one of:
+
+   packages
+    Returns a Parse::CPAN::Packages object.
+
+   authors
+    Returns either a Parse::CPAN::Authors object or a (api compatible)
+    Parse::CPAN::Whois object if the 00whois.xml file exists.
+
+   whois
+    Returns a Parse::CPAN::Whois object.
+
+AUTHOR
+    Sysmon, "<sysmonblog at googlemail.com>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-parse-cpan-cached at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Parse-CPAN-Cached>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Parse::CPAN::Cached
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parse-CPAN-Cached>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Parse-CPAN-Cached>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Parse-CPAN-Cached>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Parse-CPAN-Cached>
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Sysmon, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,2417 @@
+use strict;
+use PDLA::Types;
+
+pp_addpm({At=>'Top'},<<'EOD');
+
+=head1 NAME
+
+PDLA::Image2D - Miscellaneous 2D image processing functions
+
+=head1 DESCRIPTION
+
+Miscellaneous 2D image processing functions - for want
+of anywhere else to put them.
+
+=head1 SYNOPSIS
+
+ use PDLA::Image2D;
+
+=cut
+
+use PDLA;  # ensure qsort routine available
+use PDLA::Math;
+use Carp;
+
+use strict;
+
+EOD
+
+pp_addpm({At=>'Bot'},<<'EOD');
+
+=head1 AUTHORS
+
+Copyright (C) Karl Glazebrook 1997 with additions by Robin Williams
+(rjrw@ast.leeds.ac.uk), Tim Jeness (timj@jach.hawaii.edu),
+and Doug Burke (burke@ifa.hawaii.edu).
+
+All rights reserved. There is no warranty. You are allowed
+to redistribute this software / documentation under certain
+conditions. For details, see the file COPYING in the PDLA
+distribution. If this file is separated from the PDLA distribution,
+the copyright notice should be included in the file.
+
+=cut
+
+EOD
+
+#################################################
+#     BEGIN INTERNAL FUNCTION DECLARATIONS      #
+#################################################
+
+pp_addhdr('
+#define MAXSEC 32
+#define line(x1, x2, y) for (k=x1;k<=x2;k++) \
+	{ /* printf("line from %d to %d\n",x1,x2); */ \
+	image[k+wx*y] = col; }
+#define PX(n) ps[2*n]
+#define PY(n) ps[2*n+1]
+
+void polyfill(PDLA_Long *image, int wx, int wy, float *ps, int n,
+	PDLA_Long col, int *ierr)
+{
+   int ymin, ymax, xmin, xmax, fwrd = 1, i, j, k, nsect;
+   int x[MAXSEC], temp, l;
+   float s1, s2, t1, t2;
+
+   ymin = PY(0); ymax = PY(0);
+   xmin = PX(0); xmax = PX(0);
+   *ierr = 0;
+
+   for (i=1; i<n; i++) {
+     ymin = ymin > PY(i) ? PY(i) : ymin;
+     ymax = ymax < PY(i) ? PY(i) : ymax;
+     xmin = xmin > PX(i) ? PX(i) : xmin;
+     xmax = xmax < PX(i) ? PX(i) : xmax;
+   }
+   if (xmin < 0 || xmax >= wx || ymin < 0 || ymax >= wy) {
+   	*ierr = 1; /* clipping */
+	return;
+   }
+   s1 = PX(n-1);
+   t1 = PY(n-1);
+   for (l=ymin; l<= ymax; l++) {
+	nsect = 0;
+	fwrd = 1;
+	for (i=0; i<n; i++) {
+	  s2 = PX(i);
+	  t2 = PY(i);
+	  if ((t1 < l &&  l <= t2) || (t1 >= l && l > t2)) {
+		if (nsect > MAXSEC) {
+			*ierr = 2; /* too complex */
+			return;
+		}
+		x[nsect] = (s1+(s2-s1)*((l-t1)/(t2-t1)));
+	  	nsect += 1;
+	  }
+	  s1 = s2;
+	  t1 = t2;
+ 	}
+	/* sort the intersections */
+	for (i=1; i<nsect; i++)
+		for (j=0; j<i; j++)
+			if (x[j] > x[i]) {
+				temp = x[j];
+				x[j] = x[i];
+				x[i] = temp;
+			}
+	if (fwrd) {
+		for (i=0; i<nsect-1; i += 2)
+			line(x[i],x[i+1],l);
+		fwrd = 0;
+	} else {
+		for (i=nsect-1; i>0; i -= 2)
+			line(x[i-1],x[i],l);
+		fwrd = 1;
+	}
+   }
+}
+
+');
+
+pp_def('polyfill_pp',
+    HandleBad => 0, # a marker
+	Pars => 'int [o,nc] im(m,n); float ps(two=2,np); int col()',
+	Code => 'int ierr = 0, nerr;
+	         threadloop %{
+		   polyfill($P(im), $SIZE(m), $SIZE(n), $P(ps), $SIZE(np), $col(), &nerr);
+		   ierr = ierr < nerr ? nerr : ierr;
+		 %}
+		 if (ierr) warn("errors during polygonfilling");
+		 ',
+	Doc => undef,
+	PMFunc => ''
+);
+
+my %pnpolyFields = (
+	'pnpoly_pp' => {'pars' => 'a(m,n); ps(k,l); int [o] msk(m,n)', 'special' => '$msk() = c;'},
+	'pnpolyfill_pp' => {'pars' => '[o,nc] a(m,n); ps(k,l); int col()', 'special' => 'if(c) { $a() = $col(); }'}
+);
+
+for my $name (keys %pnpolyFields) {
+	pp_def($name,
+		HandleBad => 0,
+		PMFunc => '',
+		Doc => undef,
+		Pars => $pnpolyFields{$name}->{'pars'},
+		Code => '
+	        int i, j, c, nvert;
+	        nvert = $SIZE(l);
+
+	        #define VERTX(q) $ps(k=>0,l=>q)
+	        #define VERTY(q) $ps(k=>1,l=>q)
+
+			threadloop %{
+				loop(n) %{
+					loop(m) %{
+	                	c = 0;
+	                    for(i=0,j=nvert-1;i<nvert;j=i++) {
+	                        if( ((VERTY(i)>n) != (VERTY(j)>n)) &&
+	                            (m < (VERTX(j)-VERTX(i)) * (n-VERTY(i)) / (VERTY(j)-VERTY(i)) + VERTX(i)) )
+	                            c = !c;
+	                    }
+	                   ' . $pnpolyFields{$name}->{'special'} .'
+					%}
+				%}
+			%}
+
+	        #undef VERTX
+	        #undef VERTY
+	 '
+	);
+}
+
+pp_export_nothing();   # Clear the export list
+
+#################################################
+#      END INTERNAL FUNCTION DECLARATIONS       #
+#################################################
+
+
+pp_addhdr('
+
+#define IsNaN(x) (x != x)
+
+/* Fast Modulus with proper negative behaviour */
+
+#define REALMOD(a,b) {while ((a)>=(b)) (a) -= (b); while ((a)<0) (a) += (b);}
+
+/* rint is missing on some platforms (eg Win32) */
+
+#ifdef NEEDS_RINT
+#define rint(X) floor( X + 0.5 )
+#endif
+
+');
+
+for (keys %PDLA::Types::typehash) {
+    my $ctype = $PDLA::Types::typehash{$_}{ctype};
+    my $ppsym = $PDLA::Types::typehash{$_}{ppsym};
+
+  pp_addhdr << "EOH";
+
+/*
+ * this routine is based on code referenced from
+ * http://www.eso.org/~ndevilla/median/
+ * the original algorithm is described in Numerical Recipes
+*/
+
+#define ELEM_SWAP(a,b) { register $ctype t=(a);(a)=(b);(b)=t; }
+
+$ctype quick_select_$ppsym($ctype arr[], int n)
+{
+    int low, high ;
+    int median;
+    int middle, ll, hh;
+
+    low = 0 ; high = n-1 ; median = (low + high) / 2;
+    for (;;) {
+        if (high <= low) /* One element only */
+            return arr[median] ;
+
+        if (high == low + 1) {  /* Two elements only */
+            if (arr[low] > arr[high])
+                ELEM_SWAP(arr[low], arr[high]) ;
+            return arr[median] ;
+        }
+
+    /* Find median of low, middle and high items; swap into position low */
+    middle = (low + high) / 2;
+    if (arr[middle] > arr[high])    ELEM_SWAP(arr[middle], arr[high]) ;
+    if (arr[low] > arr[high])       ELEM_SWAP(arr[low], arr[high]) ;
+    if (arr[middle] > arr[low])     ELEM_SWAP(arr[middle], arr[low]) ;
+
+    /* Swap low item (now in position middle) into position (low+1) */
+    ELEM_SWAP(arr[middle], arr[low+1]) ;
+
+    /* Nibble from each end towards middle, swapping items when stuck */
+    ll = low + 1;
+    hh = high;
+    for (;;) {
+        do ll++; while (arr[low] > arr[ll]) ;
+        do hh--; while (arr[hh]  > arr[low]) ;
+
+        if (hh < ll)
+        break;
+
+        ELEM_SWAP(arr[ll], arr[hh]) ;
+    }
+
+    /* Swap middle item (in position low) back into correct position */
+    ELEM_SWAP(arr[low], arr[hh]) ;
+
+    /* Re-set active partition */
+    if (hh <= median)
+        low = ll;
+        if (hh >= median)
+        high = hh - 1;
+    }
+}
+
+#undef ELEM_SWAP
+EOH
+
+}
+
+my %init =
+    (
+      i => { size => 'm_size', off => 'poff', init => '1-p_size' },
+      j => { size => 'n_size', off => 'qoff', init => '1-q_size' },
+      );
+
+# requires 'int $var, ${var}2' to have been declared in the c code
+# (along with [pq]off and [pq]_size)
+#
+sub init_map {
+    my $var = shift;
+
+    my $loop = $var;
+    my $loop2 = "${var}2";
+
+    my $href = $init{$var} ||
+	die "ERROR: unknown variable sent to init_map()\n";
+    my $size = $href->{size} ||
+	die "ERROR: unable to find size for $var\n";
+    my $off  = $href->{off} ||
+	die "ERROR: unable to find off for $var\n";
+    my $init = $href->{init} ||
+	die "ERROR: unable to find init for $var\n";
+
+    return
+"for ( $loop = $init; $loop< $size; ${loop}++) {
+    $loop2 = $loop + $off;
+    switch (opt) {
+       case 1:      /* REFLECT */
+          if (${loop2}<0)
+             $loop2 = -${loop2}-1;
+          else if ($loop2 >= $size)
+             $loop2 = 2*${size}-(${loop2}+1);
+          break;
+       case 2:      /* TRUNCATE */
+          if (${loop2}<0 || ${loop2} >= $size)
+             $loop2 = -1;
+          break;
+       case 3:      /* REPLICATE */
+          if (${loop2}<0)
+             $loop2 = 0;
+          if (${loop2} >= $size)
+             $loop2 = $size-1;
+          break;
+       default:
+           REALMOD($loop2,$size);
+    }
+    map${var}\[$loop] = $loop2;
+ }\n";
+
+} # sub: init_map()
+
+sub init_vars {
+    my $href = shift || { };
+    $href->{vars}   = '' unless defined $href->{vars};
+    $href->{malloc} = '' unless defined $href->{malloc};
+    $href->{check}  = '' unless defined $href->{check};
+
+    my $str = $href->{vars};
+    $str .= "int i,j, i1,j1, i2,j2, poff, qoff;";
+    $str .=
+	'int opt = $COMP(opt);
+         int m_size = $COMP(__m_size);
+         int n_size = $COMP(__n_size);
+         int p_size = $COMP(__p_size);
+         int q_size = $COMP(__q_size);
+         int *mapi, *mapj;
+
+         mapi = (int *) malloc((p_size+m_size)*sizeof(int));
+         mapj = (int *) malloc((q_size+n_size)*sizeof(int));
+	 ';
+    $str .= $href->{malloc} . "\n";
+    $str .= "if ($href->{check} (mapi==NULL) || (mapj==NULL))\n";
+    $str .= '  barf("Out of Memory");
+
+         poff = p_size/2; mapi += p_size-1;
+         qoff = q_size/2; mapj += q_size-1;
+';
+
+    return $str;
+} # sub: init_vars()
+
+pp_def('conv2d', Doc=><<'EOD',
+
+=for ref
+
+2D convolution of an array with a kernel (smoothing)
+
+For large kernels, using a FFT routine,
+such as L<fftconvolve()|PDLA::FFT/fftconvolve()> in C<PDLA::FFT>,
+will be quicker.
+
+=for usage
+
+ $new = conv2d $old, $kernel, {OPTIONS}
+
+=for example
+
+ $smoothed = conv2d $image, ones(3,3), {Boundary => Reflect}
+
+=for options
+
+ Boundary - controls what values are assumed for the image when kernel
+            crosses its edge:
+ 	    => Default   - periodic boundary conditions
+                           (i.e. wrap around axis)
+ 	    => Reflect   - reflect at boundary
+ 	    => Truncate  - truncate at boundary
+ 	    => Replicate - repeat boundary pixel values
+
+=cut
+
+EOD
+       BadDoc =>
+'Unlike the FFT routines, conv2d is able to process bad values.',
+       HandleBad => 1,
+        Pars => 'a(m,n); kern(p,q); [o]b(m,n);',
+        OtherPars => 'int opt;',
+        PMCode => '
+
+sub PDLA::conv2d {
+   my $opt; $opt = pop @_ if ref($_[$#_]) eq \'HASH\';
+   die \'Usage: conv2d( a(m,n), kern(p,q), [o]b(m,n), {Options} )\'
+      if $#_<1 || $#_>2;
+   my($a,$kern) = @_;
+   my $c = $#_ == 2 ? $_[2] : $a->nullcreate;
+   &PDLA::_conv2d_int($a,$kern,$c,
+	(!(defined $opt && exists $$opt{Boundary}))?0:
+	(($$opt{Boundary} eq "Reflect") +
+	2*($$opt{Boundary} eq "Truncate") +
+	3*($$opt{Boundary} eq "Replicate")));
+   return $c;
+}
+
+',
+        Code =>
+           init_vars( { vars => 'PDLA_Double tmp;' } ) .
+           init_map("i") .
+           init_map("j") .
+'
+           threadloop %{
+           for(j=0; j<n_size; j++) {
+              for(i=0; i<m_size; i++) {
+                 tmp = 0;
+                 for(j1=0; j1<q_size; j1++) {
+                    j2 = mapj[j-j1];
+
+                    if (j2 >= 0) {
+                       for(i1=0; i1<p_size; i1++) {
+                          i2 = mapi[i-i1];
+                          if (i2 >= 0)
+                             tmp += $a(m=>i2,n=>j2) * $kern(p=>i1,q=>j1);
+		       } /* for: i1 */
+		    } /* if: j2 >= 0 */
+		 } /* for: j1 */
+                 $b(m=>i,n=>j) = tmp;
+	      } /* for: i */
+           } /* for: j */
+           %}
+	   free(mapj+1-q_size); free(mapi+1-p_size);',
+        BadCode =>
+           init_vars( { vars => 'PDLA_Double tmp; int flag;' } ) .
+           init_map("i") .
+           init_map("j") .
+'
+           threadloop %{
+           for(j=0; j<n_size; j++) {
+              for(i=0; i<m_size; i++) {
+                 tmp = 0;
+                 for(j1=0; j1<q_size; j1++) {
+                    j2 = mapj[j-j1];
+
+                    if (j2 >= 0) {
+                       for(i1=0; i1<p_size; i1++) {
+                          i2 = mapi[i-i1];
+                          if (i2 >= 0) {
+			     if ( $ISGOOD(a(m=>i2,n=>j2)) && $ISGOOD(kern(p=>i1,q=>j1)) ) {
+                                tmp += $a(m=>i2,n=>j2) * $kern(p=>i1,q=>j1);
+                                flag = 1;
+			     } /* if: good */
+                          } /* if: i2 >= 0 */
+		       } /* for: i1 */
+		    } /* if: j2 >= 0 */
+		 } /* for: j1 */
+		 if ( flag ) { $b(m=>i,n=>j) = tmp; }
+		 else        { $SETBAD(b(m=>i,n=>j)); }
+	      } /* for: i */
+           } /* for: j */
+           %}
+	   free(mapj+1-q_size); free(mapi+1-p_size);',
+
+); # pp_def: conv2d
+
+pp_def('med2d', Doc=> <<'EOD',
+
+=for ref
+
+2D median-convolution of an array with a kernel (smoothing)
+
+Note: only points in the kernel E<gt>0 are included in the median, other
+points are weighted by the kernel value (medianing lots of zeroes
+is rather pointless)
+
+=for usage
+
+ $new = med2d $old, $kernel, {OPTIONS}
+
+=for example
+
+ $smoothed = med2d $image, ones(3,3), {Boundary => Reflect}
+
+=for options
+
+ Boundary - controls what values are assumed for the image when kernel
+            crosses its edge:
+ 	    => Default   - periodic boundary conditions (i.e. wrap around axis)
+ 	    => Reflect   - reflect at boundary
+ 	    => Truncate  - truncate at boundary
+ 	    => Replicate - repeat boundary pixel values
+
+=cut
+
+EOD
+       BadDoc =>
+'Bad values are ignored in the calculation. If all elements within the
+kernel are bad, the output is set bad.',
+       HandleBad => 1,
+        Pars => 'a(m,n); kern(p,q); [o]b(m,n);',
+        OtherPars => 'int opt;',
+        PMCode => '
+
+sub PDLA::med2d {
+   my $opt; $opt = pop @_ if ref($_[$#_]) eq \'HASH\';
+   die \'Usage: med2d( a(m,n), kern(p,q), [o]b(m,n), {Options} )\'
+      if $#_<1 || $#_>2;
+   my($a,$kern) = @_;
+   croak "med2d: kernel must contain some positive elements.\n"
+       if all( $kern <= 0 );
+   my $c = $#_ == 2 ? $_[2] : $a->nullcreate;
+   &PDLA::_med2d_int($a,$kern,$c,
+	(!(defined $opt && exists $$opt{Boundary}))?0:
+	(($$opt{Boundary} eq "Reflect") +
+	2*($$opt{Boundary} eq "Truncate") +
+	3*($$opt{Boundary} eq "Replicate")));
+   return $c;
+}
+
+',
+        Code =>
+           init_vars( { vars => 'PDLA_Double *tmp, kk; int count;',
+                        malloc => 'tmp = malloc(p_size*q_size*sizeof(PDLA_Double));',
+                        check => '(tmp==NULL) || ' } ) .
+           init_map("i") .
+           init_map("j") .
+'
+           threadloop %{
+           for(j=0; j<n_size; j++) {
+              for(i=0; i<m_size; i++) {
+                 count = 0;
+                 for(j1=0; j1<q_size; j1++) {
+                    j2 = mapj[j-j1];
+
+                    if (j2 >= 0)
+                       for(i1=0; i1<p_size; i1++) {
+                          i2 = mapi[i-i1];
+                          if (i2 >= 0) {
+                             kk = $kern(p=>i1,q=>j1);
+                             if (kk>0) {
+                                tmp[count++] = $a(m=>i2,n=>j2) * kk;
+                             }
+                          } /* if: i2 >= 0 */
+		       } /* for: i1 */
+		 } /* for: j1 */
+
+                 PDLA->qsort_D( tmp, 0, count-1 );
+                 $b(m=>i,n=>j) = tmp[(count-1)/2];
+
+              } /* for: i */
+           } /* for: j */
+           %}
+           free(mapj+1-q_size); free(mapi+1-p_size); free(tmp);
+',
+        BadCode =>
+           init_vars( { vars => 'PDLA_Double *tmp, kk, aa; int count, flag;',
+                        malloc => 'tmp = malloc(p_size*q_size*sizeof(PDLA_Double));',
+                        check => '(tmp==NULL) || ' } ) .
+           init_map("i") .
+           init_map("j") .
+'
+           threadloop %{
+           for(j=0; j<n_size; j++) {
+              for(i=0; i<m_size; i++) {
+                 count = 0;
+                 flag = 0;
+                 for(j1=0; j1<q_size; j1++) {
+                    j2 = mapj[j-j1];
+
+                    if (j2 >= 0)
+                       for(i1=0; i1<p_size; i1++) {
+                          i2 = mapi[i-i1];
+                          if (i2 >= 0) {
+                             kk = $kern(p=>i1,q=>j1);
+                             aa = $a(m=>i2,n=>j2);
+                             if ( $ISGOODVAR(kk,kern) && $ISGOODVAR(aa,a) ) {
+				flag = 1;
+                                if ( kk > 0 ) {
+                                   tmp[count++] = aa * kk;
+			        }
+                             }
+                          } /* if: i2 >= 0 */
+		       } /* for: i1 */
+		 } /* for: j1 */
+		 if ( flag == 0 ) {
+		    $SETBAD(b(m=>i,n=>j));
+                 } else {
+
+                    PDLA->qsort_D( tmp, 0, count-1 );
+                    $b(m=>i,n=>j) = tmp[(count-1)/2];
+
+		 }
+              } /* for: i */
+           } /* for: j */
+           %}
+           free(mapj+1-q_size); free(mapi+1-p_size); free(tmp);
+'
+
+); # pp_def: med2d
+
+pp_def('med2df', Doc=> <<'EOD',
+
+=for ref
+
+2D median-convolution of an array in a pxq window (smoothing)
+
+Note: this routine does the median over all points in a rectangular
+      window and is not quite as flexible as C<med2d> in this regard
+      but slightly faster instead
+
+=for usage
+
+ $new = med2df $old, $xwidth, $ywidth, {OPTIONS}
+
+=for example
+
+ $smoothed = med2df $image, 3, 3, {Boundary => Reflect}
+
+=for options
+
+ Boundary - controls what values are assumed for the image when kernel
+            crosses its edge:
+ 	    => Default   - periodic boundary conditions (i.e. wrap around axis)
+ 	    => Reflect   - reflect at boundary
+ 	    => Truncate  - truncate at boundary
+ 	    => Replicate - repeat boundary pixel values
+
+=cut
+
+EOD
+        Pars => 'a(m,n); [o]b(m,n);',
+	# funny parameter names to avoid special case in 'init_vars'
+        OtherPars => 'int __p_size; int __q_size; int opt;',
+        PMCode => '
+
+sub PDLA::med2df {
+   my $opt; $opt = pop @_ if ref($_[$#_]) eq \'HASH\';
+   die \'Usage: med2df( a(m,n), [o]b(m,n), p, q, {Options} )\'
+      if $#_<2 || $#_>3;
+   my($a,$p,$q) = @_;
+   croak "med2df: kernel must contain some positive elements.\n"
+       if $p == 0 && $q == 0;
+   my $c = $#_ == 3 ? $_[3] : $a->nullcreate;
+   &PDLA::_med2df_int($a,$c,$p,$q,
+	(!(defined $opt && exists $$opt{Boundary}))?0:
+	(($$opt{Boundary} eq "Reflect") +
+	2*($$opt{Boundary} eq "Truncate") +
+	3*($$opt{Boundary} eq "Replicate")));
+   return $c;
+}
+
+',
+        Code =>
+           init_vars( { vars => '$GENERIC() *tmp, kk; int count;',
+                        malloc => 'tmp = malloc(p_size*q_size*sizeof($GENERIC()));',
+                        check => '(tmp==NULL) || ' } ) .
+           init_map("i") .
+           init_map("j") .
+'
+           threadloop %{
+           for(j=0; j<n_size; j++) {
+              for(i=0; i<m_size; i++) {
+                 count = 0;
+                 for(j1=0; j1<q_size; j1++) {
+                    j2 = mapj[j-j1];
+
+                    if (j2 >= 0)
+                       for(i1=0; i1<p_size; i1++) {
+                          i2 = mapi[i-i1];
+                          if (i2 >= 0) {
+                                tmp[count++] = $a(m=>i2,n=>j2);
+                          } /* if: i2 >= 0 */
+		       } /* for: i1 */
+		 } /* for: j1 */
+
+                 $b(m=>i,n=>j) =
+                        quick_select_$TBSULNQFDA(B,S,U,L,N,Q,F,D,A) (tmp, count );
+
+              } /* for: i */
+           } /* for: j */
+           %}
+           free(mapj+1-q_size); free(mapi+1-p_size); free(tmp);
+',
+
+); # pp_def: med2df
+
+pp_addhdr(<<'EOH');
+#define EZ(x) ez ? 0 : (x)
+EOH
+pp_def('box2d',
+       Pars => 'a(n,m); [o] b(n,m)',
+       OtherPars => 'int wx; int wy; int edgezero',
+       Code => '
+                register int nx = 0.5*$COMP(wx);
+                register int ny = 0.5*$COMP(wy);
+                register int xs = $SIZE(n);
+                register int ys = $SIZE(m);
+		register int ez = $COMP(edgezero);
+                double div, sum, lsum;
+                int xx,yy,y,ind1,ind2,first;
+
+		div = 1/((2.0*nx+1)*(2.0*ny+1));
+
+		threadloop %{
+		  first = 1;
+		  for (y=0;y<ys;y++)
+		    for (xx=0; xx<nx; xx++) {
+			ind1 = xs-1-xx;  /* rightmost strip */
+			$b(n=>xx,m=>y) = EZ($a(n=>xx,m=>y));
+			$b(n=>ind1,m=>y) = EZ($a(n=>ind1,m=>y));
+		  }
+		  for (xx=0;xx<xs;xx++)
+		    for (y=0; y<ny; y++) {
+			ind1 = ys-1-y;  /* topmost strip */
+			$b(n=>xx,m=>y) = EZ($a(n=>xx,m=>y));
+			$b(n=>xx,m=>ind1) = EZ($a(n=>xx,m=>ind1));
+		  }
+       		  for (y=ny;y<ys-ny;y++) {
+		    if (first) {
+		       first = 0;
+		       lsum = 0;
+		       for (yy=y-ny;yy<=y+ny;yy++)   /* initialize sum */
+		          for (xx=0;xx<=2*nx;xx++)
+			    lsum += $a(n=>xx,m=>yy);
+		    } else {
+			ind1 = y-ny-1;
+			ind2 = y+ny;
+			for (xx=0;xx<=2*nx;xx++) {
+			    lsum -= $a(n=>xx,m=>ind1); /* remove top pixels */
+			    lsum += $a(n=>xx,m=>ind2); /* add bottom pixels */
+			}
+		    }
+		    sum = lsum;
+		    $b(n=>nx,m=>y) = div*sum;     /* and assign */
+		    for (xx=nx+1;xx<xs-nx;xx++) {     /* loop along line */
+		      ind1 = xx-nx-1;
+		      ind2 = xx+nx;
+		      for (yy=y-ny;yy<=y+ny;yy++) {
+			sum -= $a(n=>ind1,m=>yy); /* remove leftmost data */
+			sum += $a(n=>ind2,m=>yy); /* and add rightmost */
+		      }
+		      $b(n=>xx,m=>y) = div*sum;         /* and assign */
+		    }
+		  }
+		%}',
+       Doc => << 'EOD',
+
+=for ref
+
+fast 2D boxcar average
+
+=for example
+
+  $smoothim = $im->box2d($wx,$wy,$edgezero=1);
+
+The edgezero argument controls if edge is set to zero (edgezero=1)
+or just keeps the original (unfiltered) values.
+
+C<box2d> should be updated to support similar edge options
+as C<conv2d> and C<med2d> etc.
+
+Boxcar averaging is a pretty crude way of filtering. For serious stuff
+better filters are around (e.g., use L<conv2d|conv2d> with the appropriate
+kernel). On the other hand it is fast and computational cost grows only
+approximately linearly with window size.
+
+=cut
+
+EOD
+); # pp_def box2d
+
+=head2 patch2d
+
+=cut
+
+pp_def('patch2d',
+       Doc=><<'EOD',
+
+=for ref
+
+patch bad pixels out of 2D images using a mask
+
+=for usage
+
+ $patched = patch2d $data, $bad;
+
+C<$bad> is a 2D mask array where 1=bad pixel 0=good pixel.
+Pixels are replaced by the average of their non-bad neighbours;
+if all neighbours are bad, the original data value is
+copied across.
+
+=cut
+
+EOD
+       BadDoc =>
+'This routine does not handle bad values - use L<patchbad2d|/patchbad2d> instead',
+       HandleBad => 0,
+        Pars => 'a(m,n); int bad(m,n); [o]b(m,n);',
+        Code =>
+        'int m_size, n_size,  i,j, i1,j1, i2,j2, norm;
+         double tmp;
+
+         m_size = $COMP(__m_size); n_size = $COMP(__n_size);
+
+      threadloop %{
+
+         for(j=0; j<n_size; j++) {
+            for(i=0; i<m_size; i++) {
+
+               $b(m=>i,n=>j) = $a(m=>i,n=>j);
+
+               if ( $bad(m=>i,n=>j)==1 ) {
+                  tmp = 0; norm=0;
+                  for(j1=-1; j1<=1; j1++) {
+		     j2 = j+j1;
+		     if ( j2>=0 && j2<n_size ) {
+                        for(i1=-1; i1<=1; i1++) {
+                           /* ignore central pixel, which we know is bad */
+			   if ( i1!=0 || j1!=0 ) {
+                              i2 = i+i1;
+                              if ( i2>=0 && i2<m_size && $bad(m=>i2,n=>j2)!=1 ) {
+                                 tmp += $a(m=>i2,n=>j2);
+                                 norm++;
+			      }
+			   } /* if: i1!=0 || j1!=0 */
+		        } /* for: i1 */
+		     }
+		  } /* for: j1 */
+
+                  if (norm>0) {  /* Patch */
+                     $b(m=>i,n=>j) = tmp/norm;
+		  }
+
+               } /* if: bad() */
+
+	    } /* for: i */
+         } /* for: j */
+
+      %} /* threadloop */
+
+         ', # Code
+);
+
+pp_def('patchbad2d',
+       Doc=><<'EOD',
+
+=for ref
+
+patch bad pixels out of 2D images containing bad values
+
+=for usage
+
+ $patched = patchbad2d $data;
+
+Pixels are replaced by the average of their non-bad neighbours;
+if all neighbours are bad, the output is set bad.
+If the input piddle contains I<no> bad values, then a straight copy
+is performed (see L<patch2d|/patch2d>).
+
+=cut
+
+EOD
+       BadDoc =>
+'patchbad2d handles bad values. The output piddle I<may> contain
+bad values, depending on the pattern of bad values in the input piddle.',
+       HandleBad => 1,
+        Pars => 'a(m,n); [o]b(m,n);',
+        Code => 'loop(n,m) %{ $b() = $a(); %}', # just copy
+        CopyBadStatusCode => '', # handled by BadCode
+        BadCode =>
+        'int m_size, n_size,  i,j, i1,j1, i2,j2, norm, flag;
+         double tmp;
+         $GENERIC(a) a_val;
+
+         flag = 0;
+         m_size = $COMP(__m_size); n_size = $COMP(__n_size);
+
+      threadloop %{
+
+         for(j=0; j<n_size; j++) {
+            for(i=0; i<m_size; i++) {
+
+	       a_val = $a(m=>i,n=>j);
+               if ( $ISGOODVAR(a_val,a) ) {
+                  $b(m=>i,n=>j) = a_val;
+
+	       } else {
+                  tmp = 0; norm=0;
+                  for(j1=-1; j1<=1; j1++) {
+		     j2 = j+j1;
+		     if ( j2>=0 && j2<n_size ) {
+                        for(i1=-1; i1<=1; i1++) {
+                           /* ignore central pixel, which we know is bad */
+			   if ( i1!=0 || j1!=0 ) {
+                              i2 = i+i1;
+                              if ( i2>=0 && i2<m_size ) {
+                                 a_val = $a(m=>i2,n=>j2);
+                                 if ( $ISGOODVAR(a_val,a) ) {
+                                    tmp += a_val;
+                                    norm++;
+				 }
+			      }
+			   } /* if: i1!=0 || j1!=0 */
+		        } /* for: i1 */
+		     }
+		  } /* for: j1 */
+
+                  /* Patch */
+                  if (norm>0) {
+                     $b(m=>i,n=>j) = tmp/norm;
+		  } else {
+		     $SETBAD(b(m=>i,n=>j));
+                     flag = 1;
+                  }
+
+               } /* if: ISGOODVAR() */
+
+	    } /* for: i */
+         } /* for: j */
+
+      %} /* threadloop */
+
+         /* handle bad flag */
+         if ( flag ) $PDLASTATESETBAD(b);
+         ', # BadCode
+);
+
+pp_def('max2d_ind',
+      Doc=><<'EOD',
+
+=for ref
+
+Return value/position of maximum value in 2D image
+
+Contributed by Tim Jeness
+
+=cut
+
+EOD
+
+      BadDoc=><<'EOD',
+
+Bad values are excluded from the search. If all pixels
+are bad then the output is set bad.
+
+EOD
+
+       HandleBad => 1,
+        Pars => 'a(m,n); [o]val(); int [o]x(); int[o]y();',
+        Code => '
+        double cur; int curind1; int curind2;
+        curind1=0;
+        curind2=0;
+        loop(m) %{
+           loop(n) %{
+           if((!m && !n) || $a() > cur || IsNaN(cur)) {
+                cur = $a(); curind1 = m; curind2 = n;
+              }
+           %}
+        %}
+        $val() = cur;
+        $x()   = curind1;
+        $y()   = curind2;
+        ',
+        BadCode => '
+        double cur; int curind1; int curind2;
+        curind1 = -1;
+        curind2 = -1;
+        loop(m) %{
+           loop(n) %{
+           if( $ISGOOD(a()) && ( (!n && !m) || ($a() > cur) ) ) {
+                cur = $a(); curind1 = m; curind2 = n;
+              }
+           %}
+        %}
+        if ( curind1 < 0 ) {
+          $SETBAD(val());
+          $SETBAD(x());
+          $SETBAD(y());
+        } else {
+          $val() = cur;
+          $x()   = curind1;
+          $y()   = curind2;
+	}
+        ');
+
+pp_def('centroid2d',
+
+        Doc=><<'EOD',
+
+=for ref
+
+Refine a list of object positions in 2D image by centroiding in a box
+
+C<$box> is the full-width of the box, i.e. the window
+is C<+/- $box/2>.
+
+=cut
+
+EOD
+
+        BadDoc=><<'EOD',
+Bad pixels are excluded from the centroid calculation. If all elements are
+bad (or the pixel sum is 0 - but why would you be centroiding
+something with negatives in...) then the output values are set bad.
+
+EOD
+
+       HandleBad => 1,
+	Pars => 'im(m,n); x(); y(); box(); [o]xcen(); [o]ycen();',
+
+	Code => '
+   int i,j,i1,i2,j1,j2,m_size,n_size;
+   double sum,data,sumx,sumy;
+
+   m_size = $SIZE(m); n_size = $SIZE(n);
+
+   i1 = $x() - $box()/2; i1 = i1<0 ? 0 : i1;
+   i2 = $x() + $box()/2; i2 = i2>=m_size ? m_size-1 : i2;
+   j1 = $y() - $box()/2; j1 = j1<0 ? 0 : j1;
+   j2 = $y() + $box()/2; j2 = j2>=n_size ? n_size-1 : j2;
+
+   sum = sumx = sumy = 0;
+   for(j=j1; j<=j2; j++) { for(i=i1; i<=i2; i++) {
+      data = $im(m=>i,n=>j);
+      sum += data;
+      sumx += data*i;
+      sumy += data*j;
+   }}
+   $xcen() = sumx/sum;
+   $ycen() = sumy/sum;
+',
+
+	BadCode => '
+   int i,j,i1,i2,j1,j2,m_size,n_size;
+   double sum,data,sumx,sumy;
+
+   m_size = $SIZE(m); n_size = $SIZE(n);
+
+   i1 = $x() - $box()/2; i1 = i1<0 ? 0 : i1;
+   i2 = $x() + $box()/2; i2 = i2>=m_size ? m_size-1 : i2;
+   j1 = $y() - $box()/2; j1 = j1<0 ? 0 : j1;
+   j2 = $y() + $box()/2; j2 = j2>=n_size ? n_size-1 : j2;
+
+   sum = sumx = sumy = 0;
+   for(j=j1; j<=j2; j++) {
+      for(i=i1; i<=i2; i++) {
+         data = $im(m=>i,n=>j);
+         if ( $ISGOODVAR(data,im) ) {
+            sum += data;
+            sumx += data*i;
+            sumy += data*j;
+	 }
+      }
+   }
+   /*
+    * if sum == 0 then we will flag as bad -- although it could just mean that
+    * there is negative values in the dataset.
+    * - should use a better check than != 0.0  ...
+    */
+   if ( sum != 0.0 ) {
+      $xcen() = sumx/sum;
+      $ycen() = sumy/sum;
+   } else {
+      $SETBAD(xcen());
+      $SETBAD(ycen());
+  }
+'
+);
+
+pp_addhdr('
+
+/* Add an equivalence to a list - used by pdl_ccNcompt */
+
+void AddEquiv ( PDLA_Long* equiv, PDLA_Long i, PDLA_Long j) {
+
+   PDLA_Long k, tmp;
+
+   if (i==j)
+      return;
+
+    k = j;
+    do {
+      k = equiv[k];
+    } while ( k != j && k != i );
+
+    if ( k == j ) {
+       tmp = equiv[i];
+       equiv[i] = equiv[j];
+       equiv[j] = tmp;
+    }
+}
+
+');
+
+pp_add_exported('', 'cc8compt','cc4compt');
+pp_addpm(<<'EOPM');
+
+=head2 cc8compt
+
+=for ref
+
+Connected 8-component labeling of a binary image.
+
+Connected 8-component labeling of 0,1 image - i.e. find separate
+segmented objects and fill object pixels with object number.
+8-component labeling includes all neighboring pixels.
+This is just a front-end to ccNcompt.  See also L<cc4compt|cc4compt>.
+
+=for example
+
+ $segmented = cc8compt( $image > $threshold );
+
+=head2 cc4compt
+
+=for ref
+
+Connected 4-component labeling of a binary image.
+
+Connected 4-component labeling of 0,1 image - i.e. find separate
+segmented objects and fill object pixels with object number.
+4-component labling does not include the diagonal neighbors.
+This is just a front-end to ccNcompt.  See also L<cc8compt|cc8compt>.
+
+=for example
+
+ $segmented = cc4compt( $image > $threshold );
+
+=cut
+
+sub PDLA::cc8compt{
+return ccNcompt(shift,8);
+}
+*cc8compt = \&PDLA::cc8compt;
+
+sub PDLA::cc4compt{
+return ccNcompt(shift,4);
+}
+*cc4compt = \&PDLA::cc4compt;
+
+EOPM
+
+pp_def('ccNcompt',Doc=>'
+
+=for ref
+
+Connected component labeling of a binary image.
+
+Connected component labeling of 0,1 image - i.e. find separate
+segmented objects and fill object pixels with object number.
+See also L<cc4compt|cc4compt> and L<cc8compt|cc8compt>.
+
+The connectivity parameter must be 4 or 8.
+
+=for example
+
+ $segmented = ccNcompt( $image > $threshold, 4);
+
+ $segmented2 = ccNcompt( $image > $threshold, 8);
+
+where the second parameter specifies the connectivity (4 or 8) of the labeling.
+
+=cut
+
+',
+       HandleBad => 0, # a marker
+        Pars => 'a(m,n); [o]b(m,n);',
+        OtherPars => 'int con',
+        Code => '
+
+      PDLA_Long i,j,k;
+      PDLA_Long newlabel;
+      PDLA_Long neighbour[4];
+      PDLA_Long nfound;
+      PDLA_Long pass,count,next,this;
+      PDLA_Long *equiv;
+      PDLA_Long i1,j1,i2;
+      PDLA_Long nx = $SIZE(m);
+      PDLA_Long ny = $SIZE(n);
+
+      if ($COMP(con)!=4 && $COMP(con)!=8)
+         barf("In ccNcompt, connectivity must be 4 or 8, you gave %d",$COMP(con));
+      loop(n) %{ loop(m) %{ /* Copy */
+         $b() = $a();
+      %} %}
+
+      /* 1st pass counts max possible compts, 2nd records equivalences */
+
+      for (pass = 0; pass<2; pass++) {
+
+      if (pass==1) {
+         equiv = (PDLA_Long*) malloc((newlabel+1)*sizeof(PDLA_Long));
+         if (equiv==(PDLA_Long*)0)
+            barf("Out of memory");
+         for(i=0;i<=newlabel;i++)
+             equiv[i]=i;
+      }
+
+      newlabel = 1; /* Running label */
+
+      for(j=0; j<ny; j++) { for(i=0; i<nx; i++) { /* Loop over image pixels */
+
+            nfound = 0; /* Number of neighbour >0 */
+
+            i1 = i-1; j1 = j-1; i2 = i+1; /*West x, North y, East x*/
+
+            if ($b(m=>i, n=>j) > 0) { /* Check 4 neighbour already seen */
+
+               if (i>0 && $b(m=>i1, n=>j)>0) /*West*/
+                   neighbour[nfound++] = $b(m=>i1, n=>j); /* Store label of it */
+               if (j>0 && $b(m=>i, n=>j1)>0) /*North*/
+                   neighbour[nfound++] = $b(m=>i, n=>j1);
+               if (j>0 && i>0  && $b(m=>i1, n=>j1)>0 && $COMP(con)==8) /*North-West*/
+                   neighbour[nfound++] = $b(m=>i1, n=>j1);
+               if (j>0 && i<(nx-1) && $b(m=>i2, n=>j1)>0 && $COMP(con)==8) /*North-East*/
+                   neighbour[nfound++] = $b(m=>i2, n=>j1);
+
+               if (nfound==0)  { /* Assign new label */
+                  $b(m=>i, n=>j) = newlabel++;
+               }
+               else {
+                  $b(m=>i, n=>j) =  neighbour[0];
+                  if (nfound>1 && pass == 1) {  /* Assign equivalents */
+                      for(k=1; k<nfound; k++)
+                         AddEquiv( equiv, (PDLA_Long)$b(m=>i, n=>j),
+                            neighbour[k] );
+                  }
+               }
+            }
+
+            else {  /* No label */
+
+               $b(m=>i, n=>j) = 0;
+            }
+
+      }} /* End of image loop */
+
+      } /* Passes */
+
+      /* Replace each cycle by single label */
+
+       count = 0;
+       for (i = 1; i <= newlabel; i++)
+         if ( i <= equiv[i] ) {
+             count++;
+             this = i;
+             while ( equiv[this] != i ) {
+               next = equiv[this];
+               equiv[this] = count;
+               this = next;
+             }
+          equiv[this] = count;
+         }
+
+
+      /* Now remove equivalences */
+
+      for(j=0; j<ny; j++) { for(i=0; i<nx; i++) { /* Loop over image pixels */
+           $b(m=>i, n=>j)   = equiv[ (PDLA_Long) $b(m=>i, n=>j)  ] ;
+      }}
+
+      free(equiv); /* Tidy */
+');
+
+pp_add_exported('polyfill');
+pp_addpm(<<'EOPM');
+=head2 polyfill
+
+=for ref
+
+fill the area of the given polygon with the given colour.
+
+This function works inplace, i.e. modifies C<im>.
+
+=for usage
+
+  polyfill($im,$ps,$colour,[\%options]);
+
+The default method of determining which points lie inside of the polygon used
+is not as strict as the method used in L<pnpoly|pnpoly>. Often, it includes vertices
+and edge points. Set the C<Method> option to change this behaviour.
+
+=for option
+
+Method   -  Set the method used to determine which points lie in the polygon.
+            => Default - internal PDLA algorithm
+            => pnpoly  - use the L<pnpoly|pnpoly> algorithm
+
+=for example
+
+  # Make a convex 3x3 square of 1s in an image using the pnpoly algorithm
+  $ps = pdl([3,3],[3,6],[6,6],[6,3]);
+  polyfill($im,$ps,1,{'Method' =>'pnpoly'});
+
+=cut
+sub PDLA::polyfill {
+	my $opt;
+	$opt = pop @_ if ref($_[-1]) eq 'HASH';
+	barf('Usage: polyfill($im,$ps,$colour,[\%options])') unless @_==3;
+	my ($im,$ps,$colour) = @_;
+
+	if($opt) {
+		use PDLA::Options qw();
+		my $parsed = PDLA::Options->new({'Method' => undef});
+		$parsed->options($opt);
+		if( $parsed->current->{'Method'} eq 'pnpoly' ) {
+			PDLA::pnpolyfill_pp($im,$ps,$colour);
+		}
+	}
+	else
+	{
+		PDLA::polyfill_pp($im,$ps,$colour);
+	}
+	return $im;
+
+}
+
+*polyfill = \&PDLA::polyfill;
+
+EOPM
+
+pp_add_exported('', 'pnpoly');
+pp_addpm(<<'EOPM');
+
+=head2 pnpoly
+
+=for ref
+
+'points in a polygon' selection from a 2-D piddle
+
+=for usage
+
+  $mask = $img->pnpoly($ps);
+
+  # Old style, do not use
+  $mask = pnpoly($x, $y, $px, $py);
+
+For a closed polygon determined by the sequence of points in {$px,$py}
+the output of pnpoly is a mask corresponding to whether or not each
+coordinate (x,y) in the set of test points, {$x,$y}, is in the interior
+of the polygon.  This is the 'points in a polygon' algorithm from
+L<http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html>
+and vectorized for PDLA by Karl Glazebrook.
+
+=for example
+
+  # define a 3-sided polygon (a triangle)
+  $ps = pdl([3, 3], [20, 20], [34, 3]);
+
+  # $tri is 0 everywhere except for points in polygon interior
+  $tri = $img->pnpoly($ps);
+
+  With the second form, the x and y coordinates must also be specified.
+  B< I<THIS IS MAINTAINED FOR BACKWARD COMPATIBILITY ONLY> >.
+
+  $px = pdl( 3, 20, 34 );
+  $py = pdl( 3, 20,  3 );
+  $x = $img->xvals;      # get x pixel coords
+  $y = $img->yvals;      # get y pixel coords
+
+  # $tri is 0 everywhere except for points in polygon interior
+  $tri = pnpoly($x,$y,$px,$py);
+
+=cut
+
+# From: http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+#
+# Fixes needed to pnpoly code:
+#
+# Use topdl() to ensure piddle args
+#
+# Add POD docs for usage
+#
+# Calculate first term in & expression to use to fix divide-by-zero when
+#   the test point is in line with a vertical edge of the polygon.
+#   By adding the value of $mask we prevent a divide-by-zero since the &
+#   operator does not "short circuit".
+
+sub PDLA::pnpoly {
+	barf('Usage: $mask = pnpoly($img, $ps);') unless(@_==2 || @_==4);
+ 	my ($tx, $ty, $vertx, $verty) = @_;
+
+ 	# if only two inputs, use the pure PP version
+ 	unless( defined $vertx ) {
+		barf("ps must contain pairwise points.\n") unless $ty->getdim(0) == 2;
+
+		# Input mapping:  $img => $tx, $ps => $ty
+		return PDLA::pnpoly_pp($tx,$ty);
+	}
+
+	my $testx = PDLA::Core::topdl($tx)->dummy(0);
+	my $testy = PDLA::Core::topdl($ty)->dummy(0);
+	my $vertxj = PDLA::Core::topdl($vertx)->rotate(1);
+	my $vertyj = PDLA::Core::topdl($verty)->rotate(1);
+	my $mask = ( ($verty>$testy) == ($vertyj>$testy) );
+	my $c = sumover( ! $mask & ( $testx < ($vertxj-$vertx) * ($testy-$verty)
+	                             / ($vertyj-$verty+$mask) + $vertx) ) % 2;
+	return $c;
+}
+
+*pnpoly = \&PDLA::pnpoly;
+
+EOPM
+
+pp_add_exported('', 'polyfillv');
+pp_addpm(<<'EOPM');
+
+=head2 polyfillv
+
+=for ref
+
+return the (dataflown) area of an image described by a polygon
+
+=for usage
+
+  polyfillv($im,$ps,[\%options]);
+
+The default method of determining which points lie inside of the polygon used
+is not as strict as the method used in L<pnpoly|pnpoly>. Often, it includes vertices
+and edge points. Set the C<Method> option to change this behaviour.
+
+=for option
+
+Method   -  Set the method used to determine which points lie in the polygon.
+            => Default - internal PDLA algorithm
+            => pnpoly  - use the L<pnpoly|pnpoly> algorithm
+
+=for example
+
+  # increment intensity in area bounded by $poly using the pnpoly algorithm
+  $im->polyfillv($poly,{'Method'=>'pnpoly'})++; # legal in perl >= 5.6
+
+  # compute average intensity within area bounded by $poly using the default algorithm
+  $av = $im->polyfillv($poly)->avg;
+
+=cut
+
+sub PDLA::polyfillv :lvalue {
+	my $opt;
+	$opt = pop @_ if ref($_[-1]) eq 'HASH';
+	barf('Usage: polyfillv($im,$ps,[\%options])') unless @_==2;
+
+	my ($im,$ps) = @_;
+	barf("ps must contain pairwise points.\n") unless $ps->getdim(0) == 2;
+
+	if($opt) {
+		use PDLA::Options qw();
+		my $parsed = PDLA::Options->new({'Method' => undef});
+		$parsed->options($opt);
+		return $im->where(PDLA::pnpoly_pp($im, $ps)) if $parsed->current->{'Method'} eq 'pnpoly';
+	}
+
+	my $msk = zeroes(long,$im->dims);
+	PDLA::polyfill_pp($msk, $ps, 1);
+	return $im->where($msk);
+}
+*polyfillv = \&PDLA::polyfillv;
+
+EOPM
+
+pp_addhdr('#include "rotate.c"'."\n\n");
+pp_add_exported('','rotnewsz');
+pp_addxs('
+
+void
+rotnewsz(m,n,angle)
+	int m
+	int n
+	float angle
+	PPCODE:
+	int newcols, newrows;
+
+	if (getnewsize(m,n,angle,&newcols,&newrows) != 0)
+		croak("wrong angle (should be between -90 and +90)");
+	EXTEND(sp,2);
+	PUSHs(sv_2mortal(newSVnv(newcols)));
+	PUSHs(sv_2mortal(newSVnv(newrows)));
+');
+
+pp_def('rot2d',
+       HandleBad => 0,
+	Pars => 'im(m,n); float angle(); bg(); int aa(); [o] om(p,q)',
+	Code => 'int ierr;
+		 if ((ierr = rotate($P(im),$P(om),$SIZE(m),$SIZE(n),$SIZE(p),
+			$SIZE(q),$angle(),$bg(),$aa())) != 0) {
+			if (ierr == -1)
+				croak("error during rotate, wrong angle");
+			else
+				croak("wrong output dims, did you set them?");
+		}',
+	# ugly workaround since $SIZE(m) and $SIZE(n) are not initialized
+	# when the redodimscode is called
+	# need to fix this!
+	RedoDimsCode => 'int ncols, nrows;
+			if ($PDLA(im)->ndims < 2)
+				croak("need > 2d piddle");
+			if (getnewsize($PDLA(im)->dims[0],$PDLA(im)->dims[1],
+				$angle(), &ncols,
+				&nrows) != 0)
+			   croak("error during rotate, wrong angle");
+			/* printf("o: %d, p: %d\n",ncols,nrows); */
+			$SIZE(p) = ncols;
+			$SIZE(q) = nrows;',
+	GenericTypes => ['B'],
+	Doc => << 'EOD',
+
+=for ref
+
+rotate an image by given C<angle>
+
+=for example
+
+  # rotate by 10.5 degrees with antialiasing, set missing values to 7
+  $rot = $im->rot2d(10.5,7,1);
+
+This function rotates an image through an C<angle> between -90 and + 90
+degrees. Uses/doesn't use antialiasing depending on the C<aa> flag.
+Pixels outside the rotated image are set to C<bg>.
+
+Code modified from pnmrotate (Copyright Jef Poskanzer) with an algorithm based
+on "A Fast Algorithm for General  Raster  Rotation"  by  Alan Paeth,
+Graphics Interface '86, pp. 77-81.
+
+Use the C<rotnewsz> function to find out about the dimension of the
+newly created image
+
+  ($newcols,$newrows) = rotnewsz $oldn, $oldm, $angle;
+
+L<PDLA::Transform|PDLA::Transform> offers a more general interface to
+distortions, including rotation, with various types of sampling; but
+rot2d is faster.
+
+=cut
+
+EOD
+);
+
+pp_def('bilin2d',
+       HandleBad => 0,
+    Pars => 'I(n,m); O(q,p)',
+    Doc=><<'EOD',
+
+=for ref
+
+Bilinearly maps the first piddle in the second. The
+interpolated values are actually added to the second
+piddle which is supposed to be larger than the first one.
+
+=cut
+
+EOD
+,
+    Code =>'
+  int i,j,ii,jj,ii1,jj1,num;
+  double x,y,dx,dy,y1,y2,y3,y4,t,u,sum;
+
+  if ($SIZE(q)>=$SIZE(n) && $SIZE(p)>=$SIZE(m)) {
+    threadloop %{
+      dx = ((double) ($SIZE(n)-1)) / ($SIZE(q)-1);
+      dy = ((double) ($SIZE(m)-1)) / ($SIZE(p)-1);
+      for(i=0,x=0;i<$SIZE(q);i++,x+=dx) {
+	for(j=0,y=0;j<$SIZE(p);j++,y+=dy) {
+	  ii = (int) floor(x);
+	  if (ii>=($SIZE(n)-1)) ii = $SIZE(n)-2;
+	  jj = (int) floor(y);
+	  if (jj>=($SIZE(m)-1)) jj = $SIZE(m)-2;
+	  ii1 = ii+1;
+	  jj1 = jj+1;
+	  y1 = $I(n=>ii,m=>jj);
+	  y2 = $I(n=>ii1,m=>jj);
+	  y3 = $I(n=>ii1,m=>jj1);
+	  y4 = $I(n=>ii,m=>jj1);
+	  t = x-ii;
+	  u = y-jj;
+	  $O(q=>i,p=>j) += (1-t)*(1-u)*y1 + t*(1-u)*y2 + t*u*y3 + (1-t)*u*y4;
+	}
+      }
+      %}
+  }
+  else {
+    barf("the second matrix must be greater than first! (bilin2d)");
+  }
+');
+
+pp_def('rescale2d',
+       HandleBad => 0,
+    Pars => 'I(m,n); O(p,q)',
+    Doc=><<'EOD',
+
+=for ref
+
+The first piddle is rescaled to the dimensions of the second
+(expanding or meaning values as needed) and then added to it in place.
+Nothing useful is returned.
+
+If you want photometric accuracy or automatic FITS header metadata
+tracking, consider using L<PDLA::Transform::map|PDLA::Transform/map>
+instead: it does these things, at some speed penalty compared to
+rescale2d.
+
+=cut
+
+EOD
+,
+    Code =>'
+int ix,iy,ox,oy,i,j,lx,ly,cx,cy,xx,yy,num;
+double kx,ky,temp;
+
+ix = $SIZE(m);
+iy = $SIZE(n);
+ox = $SIZE(p);
+oy = $SIZE(q);
+
+if(ox >= ix && oy >= iy) {
+  threadloop %{
+    kx = ((double) (ox)) / (ix);
+    ky = ((double) (oy)) / (iy);
+    lx = 0;
+    for(i=0;i<ix;i++) {
+      ly = 0;
+      for(j=0;j<iy;j++) {
+	cx = rint((i+1)*kx)-1;
+	cy = rint((j+1)*ky)-1;
+	for(xx=lx;xx<=cx;xx++)
+	  for(yy=ly;yy<=cy;yy++) {
+/*	    fprintf(stderr,"i: %d, j: %d, xx: %d, yy: %d\n",i,j,xx,yy); */
+	    $O(p=>xx,q=>yy) += $I(m=>i,n=>j);
+	  }
+	ly = cy + 1;
+      }
+      lx = cx + 1;
+    }
+  %}
+}
+else if(ox < ix && oy < iy) {
+  threadloop %{
+    kx = ((double) (ix)) / (ox);
+    ky = ((double) (iy)) / (oy);
+    lx = 0;
+    for(i=0;i<ox;i++) {
+      ly = 0;
+      for(j=0;j<oy;j++) {
+	cx = rint((i+1)*kx)-1;
+	cy = rint((j+1)*ky)-1;
+	temp = 0.0;
+	num = 0;
+	for(xx=lx;xx<=cx;xx++)
+	  for(yy=ly;yy<=cy;yy++) {
+/*	    fprintf(stderr,"i: %d, j: %d, xx: %d, yy: %d\n",i,j,xx,yy); */
+	    temp += $I(n=>yy,m=>xx);
+	    num++;
+	  }
+	$O(p=>i,q=>j) += temp/num;
+	ly = cy + 1;
+      }
+      lx = cx + 1;
+    }
+  %}
+}
+else if(ox >= ix && oy < iy) {
+  threadloop %{
+    kx = ((double) (ox)) / (ix);
+    ky = ((double) (iy)) / (oy);
+    lx = 0;
+    for(i=0;i<ix;i++) {
+      ly = 0;
+      for(j=0;j<oy;j++) {
+	cx = rint((i+1)*kx)-1;
+	cy = rint((j+1)*ky)-1;
+	temp = 0.0;
+	num = 0;
+	for(yy=ly;yy<=cy;yy++) {
+/*	  fprintf(stderr,"1 i: %d, j: %d, xx: %d, yy: %d\n",i,j,xx,yy); */
+	    temp += $I(n=>yy,m=>i);
+	  num++;
+	}
+	for(xx=lx;xx<=cx;xx++) {
+/*	  fprintf(stderr,"2 i: %d, j: %d, xx: %d, yy: %d\n",i,j,xx,yy); */
+	  $O(p=>xx,q=>j) += temp/num;
+	}
+	ly = cy + 1;
+      }
+      lx = cx + 1;
+    }
+  %}
+}
+else if(ox < ix && oy >= iy) {
+  threadloop %{
+    kx = ((double) (ix)) / (ox);
+    ky = ((double) (oy)) / (iy);
+    lx = 0;
+    for(i=0;i<ox;i++) {
+      ly = 0;
+      for(j=0;j<iy;j++) {
+	cx = rint((i+1)*kx)-1;
+	cy = rint((j+1)*ky)-1;
+	temp = 0.0;
+	num = 0;
+	for(xx=lx;xx<=cx;xx++) {
+/*	  fprintf(stderr,"1 i: %d, j: %d, xx: %d, yy: %d\n",i,j,xx,yy); */
+	    temp += $I(n=>j,m=>xx);
+	  num++;
+	}
+	for(yy=ly;yy<=cy;yy++) {
+/*	  fprintf(stderr,"2 i: %d, j: %d, xx: %d, yy: %d\n",i,j,xx,yy); */
+	  $O(p=>i,q=>yy) += temp/num;
+	}
+	ly = cy + 1;
+      }
+      lx = cx + 1;
+    }
+  %}
+}
+else barf("I am not supposed to be here, please report the bug to <chri@infis.univ.ts.it>");
+  ');
+
+# functions to make handling 2D polynomial mappings a bit easier
+#
+pp_add_exported('', 'fitwarp2d applywarp2d');
+
+pp_addpm( '
+
+=head2 fitwarp2d
+
+=for ref
+
+Find the best-fit 2D polynomial to describe
+a coordinate transformation.
+
+=for usage
+
+  ( $px, $py ) = fitwarp2d( $x, $y, $u, $v, $nf. { options } )
+
+Given a set of points in the output plane (C<$u,$v>), find
+the best-fit (using singular-value decomposition) 2D polynomial
+to describe the mapping back to the image plane (C<$x,$y>).
+The order of the fit is controlled by the C<$nf> parameter
+(the maximum power of the polynomial is C<$nf - 1>), and you
+can restrict the terms to fit using the C<FIT> option.
+
+C<$px> and C<$py> are C<np> by C<np> element piddles which describe
+a polynomial mapping (of order C<np-1>)
+from the I<output> C<(u,v)> image to the I<input> C<(x,y)> image:
+
+  x = sum(j=0,np-1) sum(i=0,np-1) px(i,j) * u^i * v^j
+  y = sum(j=0,np-1) sum(i=0,np-1) py(i,j) * u^i * v^j
+
+The transformation is returned for the reverse direction (ie
+output to input image) since that is what is required by the
+L<warp2d()|/warp2d> routine.  The L<applywarp2d()|/applywarp2d>
+routine can be used to convert a set of C<$u,$v> points given
+C<$px> and C<$py>.
+
+Options:
+
+=for options
+
+  FIT     - which terms to fit? default ones(byte,$nf,$nf)
+  THRESH  - in svd, remove terms smaller than THRESH * max value
+            default is 1.0e-5
+
+=over 4
+
+=item FIT
+
+C<FIT> allows you to restrict which terms of the polynomial to fit:
+only those terms for which the FIT piddle evaluates to true will be
+evaluated.  If a 2D piddle is sent in, then it is
+used for the x and y polynomials; otherwise
+C<$fit-E<gt>slice(":,:,(0)")> will be used for C<$px> and
+C<$fit-E<gt>slice(":,:,(1)")> will be used for C<$py>.
+
+=item THRESH
+
+Remove all singular values whose valus is less than C<THRESH>
+times the largest singular value.
+
+=back
+
+The number of points must be at least equal to the number of
+terms to fit (C<$nf*$nf> points for the default value of C<FIT>).
+
+=for example
+
+  # points in original image
+  $x = pdl( 0,   0, 100, 100 );
+  $y = pdl( 0, 100, 100,   0 );
+  # get warped to these positions
+  $u = pdl( 10, 10, 90, 90 );
+  $v = pdl( 10, 90, 90, 10 );
+  #
+  # shift of origin + scale x/y axis only
+  $fit = byte( [ [1,1], [0,0] ], [ [1,0], [1,0] ] );
+  ( $px, $py ) = fitwarp2d( $x, $y, $u, $v, 2, { FIT => $fit } );
+  print "px = ${px}py = $py";
+  px =
+  [
+   [-12.5  1.25]
+   [    0     0]
+  ]
+  py =
+  [
+   [-12.5     0]
+   [ 1.25     0]
+  ]
+  #
+  # Compared to allowing all 4 terms
+  ( $px, $py ) = fitwarp2d( $x, $y, $u, $v, 2 );
+  print "px = ${px}py = $py";
+  px =
+  [
+   [         -12.5           1.25]
+   [  1.110223e-16 -1.1275703e-17]
+  ]
+  py =
+  [
+   [         -12.5  1.6653345e-16]
+   [          1.25 -5.8546917e-18]
+  ]
+
+=head2 applywarp2d
+
+=for ref
+
+Transform a set of points using a 2-D polynomial mapping
+
+=for usage
+
+  ( $x, $y ) = applywarp2d( $px, $py, $u, $v )
+
+Convert a set of points (stored in 1D piddles C<$u,$v>)
+to C<$x,$y> using the 2-D polynomial with coefficients stored in C<$px>
+and C<$py>.  See L<fitwarp2d()|/fitwarp2d>
+for more information on the format of C<$px> and C<$py>.
+
+=cut
+
+# use SVD to fit data. Assuming no errors.
+sub _svd ($$$) {
+    my $basis  = shift;
+    my $y      = shift;
+    my $thresh = shift;
+
+    # if we had errors for these points, would normalise the
+    # basis functions, and the output array, by these errors here
+
+    # perform the SVD
+    my ( $svd_u, $svd_w, $svd_v ) = svd( $basis );
+
+    # remove any singular values
+    $svd_w *= ( $svd_w >= ($svd_w->max * $thresh ) );
+
+    # perform the back substitution
+    #
+    my $tmp = $y x $svd_u;
+    if ( $PDLA::Bad::Status ) {
+	$tmp /= $svd_w->setvaltobad(0.0);
+	$tmp->inplace->setbadtoval(0.0);
+    } else {
+	# not checked
+	my $mask = ($svd_w == 0.0);
+	$tmp /= ( $svd_w + $mask );
+	$tmp *= ( 1 - $mask );
+    }
+
+    my $ans = sumover( $svd_v * $tmp );
+
+    return $ans;
+
+} # sub: _svd()
+
+sub _mkbasis ($$$$) {
+    my $fit    = shift;
+    my $npts   = shift;
+    my $u      = shift;
+    my $v      = shift;
+
+    my $n      = $fit->getdim(0) - 1;
+    my $ncoeff = sum( $fit );
+
+    my $basis = zeroes( $u->type, $ncoeff, $npts );
+    my $k = 0;
+    foreach my $j ( 0 .. $n ) {
+	my $tmp_v = $v**$j;
+	foreach my $i ( 0 .. $n ) {
+	    if ( $fit->at($i,$j) ) {
+		my $tmp = $basis->slice("($k),:");
+		$tmp .= $tmp_v * $u**$i;
+		$k++;
+	    }
+	}
+    }
+    return $basis;
+
+} # sub: _mkbasis()
+
+sub PDLA::fitwarp2d {
+    croak "Usage: (\$px,\$py) = fitwarp2d(x(m);y(m);u(m);v(m);\$nf; { options })"
+	if $#_ < 4 or ( $#_ >= 5 and ref($_[5]) ne "HASH" );
+
+    my $x  = shift;
+    my $y  = shift;
+    my $u  = shift;
+    my $v  = shift;
+    my $nf = shift;
+
+    my $opts = PDLA::Options->new( { FIT => ones(byte,$nf,$nf), THRESH => 1.0e-5 } );
+    $opts->options( $_[0] ) if $#_ > -1;
+    my $oref = $opts->current();
+
+    # safety checks
+    my $npts = $x->nelem;
+    croak "fitwarp2d: x, y, u, and v must be the same size (and 1D)"
+	unless $npts == $y->nelem and $npts == $u->nelem and $npts == $v->nelem
+	    and $x->getndims == 1 and $y->getndims == 1 and $u->getndims == 1 and $v->getndims == 1;
+
+    my $svd_thresh = $$oref{THRESH};
+    croak "fitwarp2d: THRESH option must be >= 0."
+	if $svd_thresh < 0;
+
+    my $fit = $$oref{FIT};
+    my $fit_ndim = $fit->getndims();
+    croak "fitwarp2d: FIT option must be sent a (\$nf,\$nf[,2]) element piddle"
+	unless UNIVERSAL::isa($fit,"PDLA") and
+	    ($fit_ndim == 2 or ($fit_ndim == 3 and $fit->getdim(2) == 2)) and
+	    $fit->getdim(0) == $nf and $fit->getdim(1) == $nf;
+
+    # how many coeffs to fit (first we ensure $fit is either 0 or 1)
+    $fit = convert( $fit != 0, byte );
+
+    my ( $fitx, $fity, $ncoeffx, $ncoeffy, $ncoeff );
+    if ( $fit_ndim == 2 ) {
+	$fitx = $fit;
+	$fity = $fit;
+	$ncoeff = $ncoeffx = $ncoeffy = sum( $fit );
+    } else {
+	$fitx = $fit->slice(",,(0)");
+	$fity = $fit->slice(",,(1)");
+	$ncoeffx = sum($fitx);
+	$ncoeffy = sum($fity);
+	$ncoeff = $ncoeffx > $ncoeffy ? $ncoeffx : $ncoeffy;
+    }
+
+    croak "fitwarp2d: number of points must be >= \$ncoeff"
+	unless $npts >= $ncoeff;
+
+    # create the basis functions for the SVD fitting
+    my ( $basisx, $basisy );
+    $basisx = _mkbasis( $fitx, $npts, $u, $v );
+    if ( $fit_ndim == 2 ) {
+	$basisy = $basisx;
+    } else {
+	$basisy = _mkbasis( $fity, $npts, $u, $v );
+    }
+
+    my $px = _svd( $basisx, $x, $svd_thresh );
+    my $py = _svd( $basisy, $y, $svd_thresh );
+
+    # convert into $nf x $nf element piddles, if necessary
+    my $nf2 = $nf * $nf;
+
+    return ( $px->reshape($nf,$nf), $py->reshape($nf,$nf) )
+	if $ncoeff == $nf2 and $ncoeffx == $ncoeffy;
+
+    # re-create the matrix
+    my $xtmp = zeroes( $nf, $nf );
+    my $ytmp = zeroes( $nf, $nf );
+
+    my $kx = 0;
+    my $ky = 0;
+    foreach my $i ( 0 .. ($nf - 1) ) {
+	foreach my $j ( 0 .. ($nf - 1) ) {
+	    if ( $fitx->at($i,$j) ) {
+		$xtmp->set($i,$j, $px->at($kx) );
+		$kx++;
+	    }
+	    if ( $fity->at($i,$j) ) {
+		$ytmp->set($i,$j, $py->at($ky) );
+		$ky++;
+	    }
+	}
+    }
+
+    return ( $xtmp, $ytmp )
+
+} # sub: fitwarp2d
+
+*fitwarp2d = \&PDLA::fitwarp2d;
+
+sub PDLA::applywarp2d {
+    # checks
+    croak "Usage: (\$x,\$y) = applywarp2d(px(nf,nf);py(nf,nf);u(m);v(m);)"
+	if $#_ != 3;
+
+    my $px = shift;
+    my $py = shift;
+    my $u  = shift;
+    my $v  = shift;
+    my $npts = $u->nelem;
+
+    # safety check
+    croak "applywarp2d: u and v must be the same size (and 1D)"
+	unless $npts == $u->nelem and $npts == $v->nelem
+	    and $u->getndims == 1 and $v->getndims == 1;
+
+    my $nf  = $px->getdim(0);
+    my $nf2 = $nf * $nf;
+
+    # could remove terms with 0 coeff here
+    # (would also have to remove them from px/py for
+    #  the matrix multiplication below)
+    #
+    my $mat = _mkbasis( ones(byte,$nf,$nf), $npts, $u, $v );
+
+    my $x = reshape( $mat x $px->clump(-1)->transpose(), $npts );
+    my $y = reshape( $mat x $py->clump(-1)->transpose(), $npts );
+    return ( $x, $y );
+
+} # sub: applywarp2d
+
+*applywarp2d = \&PDLA::applywarp2d;
+
+' );
+
+## resampling routines taken from v3.6-0 of the Eclipse package
+##   http://www.eso.org/eclipse by Nicolas Devillard
+##
+
+pp_addhdr( '#include "resample.h"' . "\n" );
+
+# pod for warp2d
+# and support routine
+#
+pp_addpm( <<'EOD');
+
+=head2 warp2d
+
+=for sig
+
+  Signature: (img(m,n); double px(np,np); double py(np,np); [o] warp(m,n); { options })
+
+=for ref
+
+Warp a 2D image given a polynomial describing the I<reverse> mapping.
+
+=for usage
+
+  $out = warp2d( $img, $px, $py, { options } );
+
+Apply the polynomial transformation encoded in the C<$px> and
+C<$py> piddles to warp the input image C<$img> into the output
+image C<$out>.
+
+The format for the polynomial transformation is described in
+the documentation for the L<fitwarp2d()|/fitwarp2d> routine.
+
+At each point C<x,y>, the closest 16 pixel values are combined
+with an interpolation kernel to calculate the value at C<u,v>.
+The interpolation is therefore done in the image, rather than
+Fourier, domain.
+By default, a C<tanh> kernel is used, but this can be changed
+using the C<KERNEL> option discussed below
+(the choice of kernel depends on the frequency content of the input image).
+
+The routine is based on the C<warping> command from
+the Eclipse data-reduction package - see http://www.eso.org/eclipse/ - and
+for further details on image resampling see
+Wolberg, G., "Digital Image Warping", 1990, IEEE Computer
+Society Press ISBN 0-8186-8944-7).
+
+Currently the output image is the same size as the input one,
+which means data will be lost if the transformation reduces
+the pixel scale.  This will (hopefully) be changed soon.
+
+=for example
+
+  $img = rvals(byte,501,501);
+  imag $img, { JUSTIFY => 1 };
+  #
+  # use a not-particularly-obvious transformation:
+  #   x = -10 + 0.5 * $u - 0.1 * $v
+  #   y = -20 + $v - 0.002 * $u * $v
+  #
+  $px  = pdl( [ -10, 0.5 ], [ -0.1, 0 ] );
+  $py  = pdl( [ -20, 0 ], [ 1, 0.002 ] );
+  $wrp = warp2d( $img, $px, $py );
+  #
+  # see the warped image
+  imag $warp, { JUSTIFY => 1 };
+
+The options are:
+
+=for options
+
+  KERNEL - default value is tanh
+  NOVAL  - default value is 0
+
+C<KERNEL> is used to specify which interpolation kernel to use
+(to see what these kernels look like, use the
+L<warp2d_kernel()|/warp2d_kernel> routine).
+The options are:
+
+=over 4
+
+=item tanh
+
+Hyperbolic tangent: the approximation of an ideal box filter by the
+product of symmetric tanh functions.
+
+=item sinc
+
+For a correctly sampled signal, the ideal filter in the fourier domain is a rectangle,
+which produces a C<sinc> interpolation kernel in the spatial domain:
+
+  sinc(x) = sin(pi * x) / (pi * x)
+
+However, it is not ideal for the C<4x4> pixel region used here.
+
+=item sinc2
+
+This is the square of the sinc function.
+
+=item lanczos
+
+Although defined differently to the C<tanh> kernel, the result is very
+similar in the spatial domain.  The Lanczos function is defined as
+
+  L(x) = sinc(x) * sinc(x/2)  if abs(x) < 2
+       = 0                       otherwise
+
+=item hann
+
+This kernel is derived from the following function:
+
+  H(x) = a + (1-a) * cos(2*pi*x/(N-1))  if abs(x) < 0.5*(N-1)
+       = 0                                 otherwise
+
+with C<a = 0.5> and N currently equal to 2001.
+
+=item hamming
+
+This kernel uses the same C<H(x)> as the Hann filter, but with
+C<a = 0.54>.
+
+=back
+
+C<NOVAL> gives the value used to indicate that a pixel in the
+output image does not map onto one in the input image.
+
+=cut
+
+# support routine
+{
+    my %warp2d = map { ($_,1) } qw( tanh sinc sinc2 lanczos hamming hann );
+
+    # note: convert to lower case
+    sub _check_kernel ($$) {
+	my $kernel = lc shift;
+	my $code   = shift;
+	barf "Unknown kernel $kernel sent to $code\n" .
+	    "\tmust be one of [" . join(',',keys %warp2d) . "]\n"
+		unless exists $warp2d{$kernel};
+	return $kernel;
+    }
+}
+
+EOD
+
+pp_def(
+    'warp2d',
+    Doc=> undef,
+    HandleBad => 0,
+    Pars => 'img(m,n); double px(np,np); double py(np,np); [o] warp(m,n);',
+    OtherPars => 'char *kernel_type; double noval;',
+    GenericTypes => [ 'F', 'D' ],
+        PMCode => '
+
+sub PDLA::warp2d {
+    my $opts = PDLA::Options->new( { KERNEL => "tanh", NOVAL => 0 } );
+    $opts->options( pop(@_) ) if ref($_[$#_]) eq "HASH";
+
+    die "Usage: warp2d( in(m,n), px(np,np); py(np,np); [o] out(m,n), {Options} )"
+	if $#_<2 || $#_>3;
+    my $img = shift;
+    my $px  = shift;
+    my $py  = shift;
+    my $out = $#_ == -1 ? PDLA->null() : shift;
+
+    # safety checks
+    my $copt   = $opts->current();
+    my $kernel = _check_kernel( $$copt{KERNEL}, "warp2d" );
+
+    &PDLA::_warp2d_int( $img, $px, $py, $out, $kernel, $$copt{NOVAL} );
+    return $out;
+}
+
+',
+    Code => '
+
+    int         	i, j, k ;
+    int         	ncoeff, lx_out, ly_out ;
+    int         	lx_3, ly_3 ;
+    double       	cur ;
+    double       	neighbors[16] ;
+    double       	rsc[8],
+					sumrs ;
+    double       	x, y ;
+    int     		px, py ;
+    int         	tabx, taby ;
+    double              *kernel, *poly ;
+    int		      	da[16], db[16] ;
+
+    /* Generate default interpolation kernel */
+    kernel = generate_interpolation_kernel( $COMP(kernel_type) ) ;
+    if (kernel == NULL) {
+      croak( "Ran out of memory building kernel\n" );
+    }
+
+    /* Compute sizes  */
+    ncoeff = $SIZE(np);
+    lx_out = $SIZE(m);   /* is this right? */
+    ly_out = $SIZE(n);
+    lx_3 = lx_out - 3;
+    ly_3 = ly_out - 3;
+
+    /* Pre compute leaps for 16 closest neighbors positions */
+    da[0]  = -1;  db[0]  = -1;
+    da[1]  =  0;  db[1]  = -1;
+    da[2]  =  1;  db[2]  = -1;
+    da[3]  =  2;  db[3]  = -1;
+
+    da[4]  = -1;  db[4]  =  0;
+    da[5]  =  0;  db[5]  =  0;
+    da[6]  =  1;  db[6]  =  0;
+    da[7]  =  2;  db[7]  =  0;
+
+    da[8]  = -1;  db[8]  =  1;
+    da[9]  =  0;  db[9]  =  1;
+    da[10] =  1;  db[10] =  1;
+    da[11] =  2;  db[11] =  1;
+
+    da[12] = -1;  db[12] =  2;
+    da[13] =  0;  db[13] =  2;
+    da[14] =  1;  db[14] =  2;
+    da[15] =  2;  db[15] =  2;
+
+    /* allocate memory for polynomial */
+    poly = malloc( ncoeff * sizeof(double) );
+    if ( poly == NULL ) {
+      croak( "Ran out of memory\n" );
+    }
+    poly[0] = 1.0;
+
+    /* Loop over the output image */
+    threadloop %{
+	loop(n) %{
+
+	    /* fill in poly array */
+	    for ( k = 1; k < ncoeff; k++ ) {
+		poly[k] = (double) n * poly[k-1];
+            }
+
+	    loop(m) %{
+
+		/* Compute the original source for this pixel   */
+                x = poly2d_compute( ncoeff, $P(px), (double) m, poly );
+                y = poly2d_compute( ncoeff, $P(py), (double) m, poly );
+
+		/* Which is the closest integer positioned neighbor? */
+		px = (int)x ;
+		py = (int)y ;
+
+		if ((px < 1) || (px > lx_3) || (py < 1) || (py > ly_3))
+		    $warp() = ($GENERIC()) $COMP(noval);
+		else {
+
+		    /* Now feed the positions for the closest 16 neighbors  */
+		    for (k=0 ; k<16 ; k++) {
+			i = px + da[k]; j = py + db[k];
+			neighbors[k] = (double) $img( m => i, n => j );
+		    }
+
+		    /* Which tabulated value index shall we use?    */
+		    tabx = (x - (double)px) * (double)(TABSPERPIX) ;
+		    taby = (y - (double)py) * (double)(TABSPERPIX) ;
+
+		    /* Compute resampling coefficients  */
+		    /* rsc[0..3] in x, rsc[4..7] in y   */
+
+		    rsc[0] = kernel[TABSPERPIX + tabx] ;
+		    rsc[1] = kernel[tabx] ;
+		    rsc[2] = kernel[TABSPERPIX - tabx] ;
+		    rsc[3] = kernel[2 * TABSPERPIX - tabx] ;
+		    rsc[4] = kernel[TABSPERPIX + taby] ;
+		    rsc[5] = kernel[taby] ;
+		    rsc[6] = kernel[TABSPERPIX - taby] ;
+		    rsc[7] = kernel[2 * TABSPERPIX - taby] ;
+
+		    sumrs = (rsc[0]+rsc[1]+rsc[2]+rsc[3]) *
+			(rsc[4]+rsc[5]+rsc[6]+rsc[7]) ;
+
+		    /* Compute interpolated pixel now   */
+		    cur =   rsc[4] * (  rsc[0]*neighbors[0] +
+					rsc[1]*neighbors[1] +
+					rsc[2]*neighbors[2] +
+					rsc[3]*neighbors[3] ) +
+			    rsc[5] * (  rsc[0]*neighbors[4] +
+					rsc[1]*neighbors[5] +
+					rsc[2]*neighbors[6] +
+					rsc[3]*neighbors[7] ) +
+			    rsc[6] * (  rsc[0]*neighbors[8] +
+					rsc[1]*neighbors[9] +
+					rsc[2]*neighbors[10] +
+					rsc[3]*neighbors[11] ) +
+			    rsc[7] * (  rsc[0]*neighbors[12] +
+					rsc[1]*neighbors[13] +
+					rsc[2]*neighbors[14] +
+					rsc[3]*neighbors[15] ) ;
+
+		    /* Copy the value to the output image */
+		    $warp() = ($GENERIC()) (cur/sumrs);
+
+		} /* if: edge or interior */
+
+	    %}   /* loop(m) */
+	 %}   /* loop(n) */
+    %}        /* threadloop */
+
+    free(poly);
+    free(kernel) ;
+
+',
+    ); # pp_def: warp2d
+
+pp_addxs( '
+
+int
+_get_kernel_size()
+  PROTOTYPE:
+  CODE:
+    RETVAL = KERNEL_SAMPLES;
+  OUTPUT:
+    RETVAL
+
+');
+
+pp_add_exported('', 'warp2d_kernel');
+pp_addpm( '
+
+=head2 warp2d_kernel
+
+=for ref
+
+Return the specified kernel, as used by L<warp2d|/warp2d>
+
+=for usage
+
+  ( $x, $k ) = warp2d_kernel( $name )
+
+The valid values for C<$name> are the same as the C<KERNEL> option
+of L<warp2d()|/warp2d>.
+
+=for example
+
+  line warp2d_kernel( "hamming" );
+
+=cut
+
+'); # pp_addpm
+
+# this is not very clever, but it's a pain to create a valid
+# piddle in XS code
+#
+pp_def( 'warp2d_kernel',
+    Doc => undef,
+    HandleBad => 0,
+    PMCode => '
+
+sub PDLA::warp2d_kernel ($) {
+    my $kernel = _check_kernel( shift, "warp2d_kernel" );
+
+    my $nelem = _get_kernel_size();
+    my $x     = zeroes( $nelem );
+    my $k     = zeroes( $nelem );
+
+    &PDLA::_warp2d_kernel_int( $x, $k, $kernel );
+    return ( $x, $k );
+
+#    return _get_kernel( $kernel );
+}
+*warp2d_kernel = \&PDLA::warp2d_kernel;
+
+',
+     Pars => '[o] x(n); [o] k(n);',
+     OtherPars => 'char *name;',
+     GenericTypes => [ 'D' ],
+     Code => '
+
+    double     *kernel, xx;
+
+    if ( $SIZE(n) != KERNEL_SAMPLES ) {
+	croak( "Internal error in warp2d_kernel - mismatch in kernel size\n" );
+    }
+
+    kernel = generate_interpolation_kernel($COMP(name));
+    if ( kernel == NULL ) {
+	croak( "unable to allocate memory for kernel" );
+    }
+
+    /* fill in piddles */
+    xx = 0.0;
+    threadloop %{
+	loop (n) %{
+	    $x() = xx;
+	    $k() = kernel[n];
+	    xx += 1.0 / (double) TABSPERPIX;
+	%}
+    %}
+
+    /* free the kernel */
+    free( kernel );
+
+'); # pp_addpm
+
+pp_done();

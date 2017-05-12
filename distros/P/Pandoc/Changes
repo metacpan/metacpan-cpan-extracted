@@ -1,0 +1,49 @@
+Revision history for Pandoc Perl module
+
+0.6.0  2017-01-27 10:51:10 CET
+    - support more expressive version requirements
+
+0.5.0  2016-11-24 14:14:34 CET
+    - add method Pandoc::Version::match
+
+0.4.3  2016-11-09 21:11:53 CET
+    - fix bug with executable not named 'pandoc'
+
+0.4.2  2016-11-09 19:39:45 CET
+    - fix test for pandoc 1.9
+
+0.4.1  2016-11-03 21:14:26 CET
+    - add method highlight_languages
+    - support calling run( $filename, ... )
+    - strip '*' from input/output format names
+
+0.4.0  2016-11-01 20:44:15 CET
+    - add Pandoc::Version module for version numbers
+    - allow setting executable via PANDOC_PATH environment variable
+    - add method file to parse from file
+    - add method libs to access libraries used by pandoc
+    - prepare to adjust Pandoc::Elements for pandoc 1.18
+
+0.3.1  2016-10-26 20:37:24 CEST
+    - add parse method
+    - fix version number comparision
+    - extend documentation
+
+0.3.0  2016-10-21 20:10:30 CEST
+    - support setting default arguments on import
+    - make bin and arguments setters
+    - use File::Which to find executable
+
+0.2.2  2016-10-20 11:20:36 CEST
+    - support default arguments
+
+0.2.1  2016-10-20 10:34:31 CEST
+    - add method input_format and output_format
+    - let version return a version object
+
+0.2.0  2016-10-18 21:58:19 CEST
+    - add alternative calling conventions for pandoc/run
+    - add utility method convert
+
+0.1.0  2016-10-10 10:37:02 CEST
+    - create initial release

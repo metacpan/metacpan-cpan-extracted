@@ -1,0 +1,14 @@
+Revision history for POE-Component-IRC-Plugin-Google-Calculator
+
+0.04    2013-11-15
+        - Minor fixes to comply with specs and Kwalitee game
+
+0.03    2008-03-07
+        - Fixed a minor bug with empty calc requests
+
+0.02	2008-02-12
+	- fixed some documentation discrepancies
+
+0.01    2008-02-12
+        - First version, released on an unsuspecting world.
+

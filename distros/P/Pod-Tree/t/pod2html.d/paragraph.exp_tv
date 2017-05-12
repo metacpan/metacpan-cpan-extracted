@@ -1,0 +1,29 @@
+<html>
+ <head>
+  <base href="">
+  <link href="" rel="stylesheet" type="text/css">
+  <title>Head 1 text</title>
+ </head>
+ <body bgcolor="#ffffff" text="#000000">
+<h1>TEMPLATE</h1>
+red is the color of my true love's hair
+  
+  <H1><A NAME="HEAD1">HEAD1
+
+</A></H1>
+
+<P>Head 1 text
+
+</P><H2><A NAME="HEAD2">HEAD<I>2</I>
+
+</A></H2>
+
+<P>Head2 <B>text</B>
+
+</P>
+<PRE>    +------------------------------+
+    | This is a verbatim paragraph |
+    +------------------------------+</PRE>
+
+ </body>
+</html>

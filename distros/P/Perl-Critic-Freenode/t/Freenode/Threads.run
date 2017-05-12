@@ -1,0 +1,11 @@
+## name UseThreads
+## failures 1
+## cut
+
+use threads;
+
+## name NoThreads
+## failures 0
+## cut
+
+1;

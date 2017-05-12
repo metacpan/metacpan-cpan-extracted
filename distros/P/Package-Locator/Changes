@@ -1,0 +1,58 @@
+0.010     2013-08-23 14:32:30 America/Los_Angeles
+
+    Use proxy settings from the environment, if available.
+
+0.009     2013-06-06 19:23:13 America/Los_Angeles
+
+    Fixed some test failures reported by CPAN Testers.  
+    But no code changes in the library itself.
+
+0.008     2013-06-06 14:04:54 America/Los_Angeles
+
+    Also use IO::Zlib instead of PerlIO::gzip during tests.
+
+0.007     2013-06-05 22:18:56 America/Los_Angeles
+
+    Now uses IO::Zlib instead of PerlIO::gzip so there is one less
+    non-core dependency.
+
+0.006     2012-05-04 16:00:24 America/Los_Angeles
+
+    Added clear_cache() method on the Package::Locator class.
+    This deletes the cached index files, causing subsequent
+    calls to locate() to fetch the index files anew.
+
+    When calling locate() with a distribution path, we actually
+    try and fetch the corresponding URL at each repository.
+    This allows you to find distributions that are not in
+    the index (i.e. older relases).
+
+0.004     2011-12-02 03:12:06 America/Los_Angeles
+
+    Package::Locator::Index does its own parsing of the index file now,
+    and can return the contents as a simple data structure.  Yes,
+    I reinvented that wheel.  I have my reasons.
+
+    The locate() method now uses named arguments.  The old positional
+    argument interface is not supported.
+
+    The "get_latest" attribute is gone.  Instead, you can specify a
+    "latest" argument to the locate() method.
+
+    Fixed some failing tests.  Thanks CPANTESTERS.
+
+0.003     2011-11-23 14:02:56 America/Los_Angeles
+
+    Fixed bug that inadvertenty swallowed all exceptions
+    when calling the locate() method.
+
+    Now requires Try::Tiny.
+
+0.002     2011-11-21 21:50:22 America/Los_Angeles
+
+    Found a bunch of bugs by writing test cases.  The first release
+    didn't really work as advertised.  This one actually has a chance.
+
+0.001     2011-11-21 15:32:09 America/Los_Angeles
+
+    Initial release.

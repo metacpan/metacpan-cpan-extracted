@@ -1,0 +1,1552 @@
+Revision history for Perl extension POE::Component::IRC.
+
+6.88  Sat Jun 28 13:14:00 BST 2014
+    - BotAddressed: Handle being addressed with a prefixed @ or %
+
+6.87  Sat Jun 21 15:08:32 BST 2014
+    - Believe have resolved issues with online test
+
+6.86  Fri Jun 20 11:12:06 BST 2014
+    - Added more diagnostics to the online test
+
+6.85  Thu Jun 19 10:19:07 BST 2014
+    - Added some diagnostics output to the online test
+
+6.84  Tue Jun 17 10:45:38 BST 2014
+    - Plugman: store @$ or else it gets overwritten - Commit: 65ba2a4f3
+
+6.83  Mon May 27 10:40:09 BST 2013
+    - NickServID: React on IRC Message 433 - Commit: ec7cd33736
+    - BotCommand: Support for overriding the Command Handler
+    - BotCommand: Added Support for a Help Modification Callback
+    - BotCommand: Adapted the Help Callback Options so it gets the Command and Arguments
+    - BotCommand: Added Support for Command Aliases
+    - BotCommand: Allowed No Arguments/Only Variable Arguments
+    - Implemented SSL Client Cert Support
+
+6.82  Sat Mar 9 22:15:02 GMT 2013
+    - Add the Prefix to the "Syntax:" line of the command help
+
+6.81  Fri Nov 23 15:53:11 GMT 2012
+    - Resolve hash randomisation issues with v5.17.6
+
+6.80  Thu Sep 20 09:52:59 BST 2012
+    - Add missing prereq
+
+6.79  Wed Sep 19 14:24:03 BST 2012
+    - Argument naming and argument count validation in Plugin::BotCommand
+    - [rt.cpan.org #79745] nick_long_form dies due to a race condition
+
+6.78  Wed Dec 7 20:29:45 GMT 2011
+    - Prevent an IPv6 test failure
+
+6.77  Fri Dec 2 03:55:14 GMT 2011
+    - Prevent a test failure in 06_online.t if the host is K-lined
+
+6.76  Tue Nov 29 03:24:55 GMT 2011
+    - DCC.pm: Fix DCC RESUME, it was broken
+    - NickReclaim.pm: Make it more robust and prevent an error from being
+      raised when we quit from IRC.
+
+6.75  Sun Nov 13 14:24:50 UTC 2011
+    - Win32 fixes to the DCC plugin and netsplit test
+    - You couldn't specify a localaddr without a localport. Fixed.
+
+6.74  Sun Oct 9 20:16:13 GMT 2011
+    - Disable authentication in t/01_base/04_pocosi.t. Fixes test failure.
+
+6.73  Sat Oct 8 04:40:18 GMT 2011
+    - Add missing dependencies to t/inc needed by poco-server-irc
+
+6.72  Fri Oct 7 15:41:53 UTC 2011
+    - Skip IPv6 tests on systems which don't have inet_pton()
+    - Fix regression in t/03_subclasses/01_state.t
+    - Update the poco-server-irc in t/inc to version 1.53
+
+6.71  Sun Sep 18 16:07:33 GMT 2011
+    - Make the component easier to use with dynamic IP interfaces
+    - Fix race condition in 06_state_nick_sync.t
+    - Silence warning due to incorrect use of length() instead of defined()
+    - State.pm: Add a parameter to irc_topic containing the old topic
+
+6.70  Tue Aug 2 03:38:52 GMT 2011
+    - State.pm: Support multiple modes in NAMES replies (NAMESX, multi-prefix)
+    - State.pm: Support nick!user@host in NAMES replies (UHNAMES)
+    - State.pm: Added channel_url()
+    - Fixed a race condition in 06_state_nick_sync.t
+
+6.69  Fri Jul 29 01:52:38 GMT 2011
+    - Whois.pm: Collect info from numerics 307 and 310
+    - Whois.pm: Removed the 'account' key and have the 'identified' key
+      do its thing instead, so that there is one generic way to check if
+      a user is identified, regardless of the network.
+
+6.68  Sun May 22 17:01:21 GMT 2011
+    - REALLY fix it to work with the latest IRC::Utils
+
+6.67  Sun May 22 16:43:27 GMT 2011
+    - Add missing documentation for irc_plugin_(add|del|error) events
+    - IRC.pm: Improved the layout of the documentation
+    - Common.pm: Fix to work with latest IRC::Utils
+
+6.66  Thu May 19 22:32:07 GMT 2011
+    - BotCommand.pm: Allow commands to be \S+, not just \w+
+
+6.65  Thu May 19 01:54:21 GMT 2011
+    - BotCommand.pm: Quote the 'Prefix' before using it in a regex, and add
+      'Bare_private' to allow commands in private without a prefix
+
+6.64  Sun May 15 09:59:12 GMT 2011
+    - Fix incorrect amount of tests skipped in 04_ipv6.t when IPv6 is not
+      supported
+
+6.63  Sun May 15 05:06:57 GMT 2011
+    - Remove vestigial 'unregister' event handler, poco-syndicator handles
+      that now. The latest poco-syndicator release croaks if we try to
+      override its handler, so this was causing failures.
+
+6.62  Tue May 3 10:58:45 GMT 2011
+    - Make use of IPv6 functions from Socket (instead of Socket6) if
+      they are available, and skip the IPv6 test if we don't have an
+      implementation of getaddrinfo(). Thanks to Apocalypse for this.
+    - Add a parameter to irc_snotice which contains the target of the
+      message (usually '*' or 'AUTH' or something).
+    - Qnet/State.pm: Forgot to import parse_user() from IRC::Utils.
+    - IRC.pm: Document the Bitmode parameter and make it 8 (+i) by default.
+    - IRC.pm: Remove a sizable chunk of the code and inherit from
+      POE::Component::Syndicator instead. Got rid of an old backwards
+      compatability workaround in the process: sessions will no longer
+      receive irc_connected/irc_disconnected/irc_shutdown events if they
+      didn't register for them.
+    - Console.pm: Avoid custom stringifications when dumping objects
+    - State.pm: nick_info() was failing when a nick was known but unsynced
+    - Console.pm: Decode all arguments before printing them
+
+6.61  Tue Apr 19 17:02:54 GMT 2011
+    - The changes to the filter test were causing failures on <5.12 due to
+      C<values(ARRAY)>. Fixed it.
+    - Make it so that irc_shutdown is always the last event to be sent
+    - Depend on POE 1.310 to fix failing socket error test on Windows
+    - Improve event queue ordering to make it more predictable. Add new
+      methods, send_event_next() and send_event_now(), to bypass the
+      event queue in different ways.
+    - Replace the functions in Common.pm with wrappers around equivalents
+      from IRC::Utils.
+    - IRC.pm: Add server() and port() accessors.
+
+6.60  Fri Apr 15 06:12:28 GMT 2011
+    - Fix failure (RT #67465) related to the recent irc_snotice change.
+      Added a test for it as well.
+
+6.59  Mon Apr 4 20:22:38 GMT 2011
+    - FollowTail, Logger & DCC: Use rel2abs instead of abs_path to
+      preserve symlinks while still being unaffected by chdir()
+
+6.58  Mon Apr 4 17:48:59 GMT 2011
+    - Fix FollowTail test to work in case /tmp is a symlink
+
+6.57  Sat Apr 2 03:34:04 GMT 2011
+    - FollowTail, Logger & DCC plugins: Expand '~' in filename arguments,
+      and resolve them to absolute paths, in case the process will chdir().
+
+6.56  Fri Apr 1 20:05:14 GMT 2011
+    - irc_snotice has been used for server NOTICEs which do not have a sender
+      prefix. NOTICEs which have a server name as the sender prefix are now
+      irc_snotice too, leaving irc_notice only for notices with a proper
+      nick!user@host sender.
+
+6.55  Fri Apr 1 18:37:49 GMT 2011
+    - State.pm: Store the real nicks of channel members after receiving a
+      NAMES reply. Fixes the issue of undefined nicks being returned by
+      channel_list() before the channel has been synced.
+    - State.pm: Check all arguments for definedness in public methods for
+      easier debugging
+
+6.54  Thu Mar 10 18:20:47 GMT 2011
+    - Fixed all the trailing space 'errors'
+    - Resolve an issue with irc_nick_sync in poco-irc-state, added test
+
+6.52  Fri Nov 5 18:27:16 CET 2010
+    - Fixed typo in shutdown code and added a test to confirm
+
+6.51  Fri Nov 5 12:28:14 CET 2010
+    - Make the t/02_behavior/06_online.t test a TODO, since we can't work
+      around problems such as the user being K-lined from FreeNode
+    - Save the sender id on shutdown, not the sender's reference, avoids
+      a crash when a sender disappears before we complete the shutdown
+
+6.50  Wed Nov 3 02:05:56 GMT 2010
+    - Fix race condition causing a duplicated test in
+      t/04_plugins/12_autojoin/03_banned.t
+    - Console.pm: Dump hashes and arrays recursively
+    - Enable all debugging messages if $ENV{POCOIRC_DEBUG} is true
+    - Make the 'shutdown' event do more work for us, such as forcibly
+      disconnecting after a timeout if the server doesn't disconnect us
+      following a QUIT command
+    - Add an irc_raw_out event, corollary to irc_raw
+    - AutoJoin.pm: Don't require the component to be ::State
+
+6.49  Sat Oct 16 19:05:25 GMT 2010
+    - Add draft-mitchell-irc-capabilities-02.html to docs/
+    - Fix incorrect number of skipped tests in 06_online.t in some cases
+    - Allow IRC server passwords which evaluate to false (e.g. '0')
+    - Prevent possible race conditions in a few tests
+
+6.48  Sun Oct 3 19:49:20 GMT 2010
+    - State.pm: Don't send an undefined value with irc_chan_mode when the
+      mode has no argument
+    - Console.pm: Improve the readability of the output, and show undef
+    - Deliver irc_plugin_error immediately, bypassing the event queue
+
+6.47  Sun Oct 3 15:28:50 GMT 2010
+    - Join arguments to the 'quote' command with spaces. This allows us to
+      send commands with multiple arguments through the Console plugin.
+    - Add support for CAP command/replies. We use it to enable the server's
+      identify-msg feature when we connect.
+    - State.pm: In disconnected/error/socketerr events when no info is
+      available, make ARG1 an empty hash reference instead of undef.
+    - Console.pm: Don't send events to client before they're authed
+    - Console.pm: Pretty-print hash references
+
+6.46  Wed Sep 29 04:57:42 UTC 2010
+    - Document the 'debug' parameter.
+    - Use Object::Pluggable instead of POE::Component::Pluggable. This smooths
+      out an inconsistency between plugins and normal sessions with regard to
+      events where extra arguments have been added.
+
+6.45  Sun Sep 26 03:41:48 GMT 2010
+    - Don't create a POE::Component::Client::DNS object if the user has
+      supplied one. This fixes a regression introduced by yours truly a
+      couple of years ago.
+
+6.44  Sat Sep 25 23:34:11 GMT 2010
+    - Don't fail on IRC servers where a whole class of channel modes is
+      unsupported (e.g. Bitlbee).
+
+6.43  Sat Sep 25 21:30:36 GMT 2010
+    - State.pm: Don't forget to call IRC.pm's implementation of S_disconnected
+      before our own. Due to this, the logged_in() method was reporting
+      incorrect information after disconnecting.
+
+6.42  Sat Sep 25 09:40:21 UTC 2010
+    - ISupport.pm: Don't send a premature irc_isupport event on networks
+      which send us numerics higher than 005 before the actual 005 (e.g Rizon)
+    - NickServID.pm: Send an 'irc_identified' event when we've identified with
+      NickServ. In addition, be a little more permissive when determining if
+      we have identified. Works with Rizon now.
+
+6.41  Thu Sep 23 21:33:17 UTC 2010
+    - Don't use qw() as parentheses, it's deprecated in 5.13.4
+    - Drop CTCPs which don't have a closing delimiter
+
+6.40  Thu Sep 9 06:55:27 UTC 2010
+    - AutoJoin.pm: Wait for a reply from NickServ before joining channels
+      on connect
+
+6.39  Sat Sep 4 02:16:28 UTC 2010
+    - AutoJoin.pm: Allow channel keys to be undefined
+    - Make the 'nickserv' command do the right thing on ratbox ircds
+    - Add a server_version() method
+
+6.38  Fri Sep 3 18:33:50 UTC 2010
+    - Only process the first CTCP chunk we find in a message. This prevents
+      someone from flooding our outgoing queue by having us e.g. reply to 20
+      VERSION requests at a time.
+    - CTCP.pm: Reply to VERSION with "dev-git" when no version is available.
+
+6.37  Tue Aug 17 22:53:22 GMT 2010
+    - Make all warnings fatal
+    - Use real temp files in tests instead of littering the dist directory
+
+6.36  Mon Jul 26 03:53:50 GMT 2010
+    - Added a logged_in() method to see if we're logged into IRC
+
+6.35  Sun Jun 27 09:32:22 GMT 2010
+    - Disconnecting.pod: Mention when it is appropriate to use
+      C<< $irc->yield('shutdown') >>.
+    - Connector.pm: Clear the reconnect timer when the plugin is deleted so
+      that we can actually shut down the IRC component.
+    - Depend on POE::Component::Pluggable 1.26 for irc_plugin_error
+
+6.34  Fri Jun 25 18:16:40 GMT 2010
+    - CTCP.pm: Do "use POE::Component::IRC;" to avoid weird failures when
+      this plugin is compiled by code which hasn't done the same.
+
+6.33  Mon Jun 21 20:27:42 GMT 2010
+    - BotCommand.pm: Allow user to choose how help messages are delivered
+    - BotCommand.pm: Require the command prefix in private messages
+    - BotCommand.pm: Make the help messages more context-sensitive
+    - BotCommand.pm: Add support for custom auth checks
+    - BotCommand.pm: If Eat == 1, we eat everything that looks like a command
+    - Cookbook: Add Gtk2 example by Damian Kaczmarek
+    - Logger.pm: Support a hook for custom log storage
+    - IRC.pm: Remove redundant version() method
+    - Convert distribution over to Dist::Zilla
+
+6.32  Tue May 11 13:43:50 GMT 2010
+    - IRC.pm: Filter out \r in arguments to non-PRIVMSG commands too
+    - IRC.pm: Uppercase REHASH/DIE/RESTART commands before sending them
+    - IRC.pm: Simplify privmsg handler and remove undocumented behavior of
+      concatenating multiple messages.
+
+6.30  Mon May 10 14:34:54 GMT 2010
+    - Proxy.pm: Fix documentation error ('bindaddr' -> 'bindaddress')
+    - IRC.pm: Split long messages on \r as well as \n. Plugs a security hole.
+
+6.28  Sun Mar 14 10:50:43 GMT 2010
+    - Use utf8 encoding in all Pod
+    - Cookbook: Replace the MegaHAL recipe with a Hailo one
+    - Stop using Module::Install::AuthorTests since M::I 0.94 handles it
+      automatically for us
+
+6.26  Sun Mar 14 07:32:23 GMT 2010
+    - Depend on POE 1.287 for FollowTail bugfixes
+    - Updated documentation to mention advice about avoiding the double
+      encoding of non-ASCII channel names
+    - Logger.pm: Avoid double-encoding non-ASCII channel names in logs
+
+6.24  Fri Feb 12 02:45:21 GMT 2010
+    - NickServID.pm: Identification wasn't working after the change a couple
+      of releases ago. Thanks to John O'Brien in RT #54530. (Hinrik)
+
+6.22  Wed Jan 20 01:50:23 GMT 2010
+    - Logger.pm: The 'Restricted' switch had the opposite of the documented
+      effect. Fixed that and also changed the default to true, so nobody who
+      used the default will see a change. (Hinrik)
+
+6.20  Fri Jan 15 18:38:44 GMT 2010
+    - NickServID.pm: Identify correctly when switching nicks on ratbox IRC
+      servers (Hinrik)
+    - Common.pm: Encode::Guess::guess_encoding() doesn't work well with
+      'UTF-8', revert back to 'utf8'. Added tests for it. (Hinrik)
+    - CTCP.pm: It was sending "ARRAY(0x#######)" in reply to CTCP PING.
+      Fixed it and added test for that and CTCP TIME. (Hinrik).
+    - Depend on POE 1.284 so we won't get FAIL test reports from CPAN testers
+      because of the FollowTail plugin. (Hinrik)
+
+6.18  Fri Dec 11 19:23:24 GMT 2009
+    - NickReclaim.pm: Reclaim nick immediately when possible (Hinrik)
+    - Depend on POE::Filter::IRCD 2.42. Fixes parsing of 005 numeric replies
+      from some servers (Hinrik)
+
+6.16  Sun Oct 11 08:57:18 GMT 2009
+    - BotTraffic.pm: Emit 'irc_bot_notice' events for bot notices (Hinrik)
+    - Logger.pm: Log NOTICEs if requested (Hinrik)
+    - Proxy.pm: Fix a regression introduced in 6.05_01. This was causing it
+      to be completely broken. Added a test so it won't happen again
+      unnoticed (Hinrik)
+
+6.14  Thu Sep 24 15:07:05 GMT 2009
+    - More "return" -> "return PCI_EAT_NONE" fixes. This eliminates some
+      harmless (but annoying) warnings. (Hinrik)
+    - State.pm: Fix AwayPoll, which wasn't working at all. Also added a
+      test for it and made the documentation clearer. Thanks to David E.
+      Wheeler for spotting that one. (Hinrik)
+    - IRC.pm: Document which spawn() options can not be passed to the
+      'connect' event. (Hinrik)
+    - IRC.pm: Split PRIVMSGs with newlines into multiple messages. For other
+      commands, don't pass user-supplied newlines through to the IRC server
+      as it allows the user to submit raw IRC commands. (Hinrik)
+
+6.12  Thu Sep 10 09:25:02 BST 2009
+    - Fix localaddr() issue reported in RT #48791 by Michael Andreen
+    - Depend on latest (1.24) POE::Component::Pluggable (Hinrik)
+    - BotCommand.pm: Strip colors/formatting before processing (Hinrik)
+    - Plugin::AutoJoin S_join should return PCI_EAT_NONE if
+      $joiner ne $irc->nick_name() (perigrin)
+
+6.10 Fri Aug 14 21:19:07 BST 2009
+    - Implemented netsplit detection and handling of state on netjoin (bingos)
+    - Refactored the netsplit code for robustness and sanity (bingos)
+    - Added testcase for netsplit handling (bingos)
+    - AutoJoin.pm: Fixed problem with rejoining password-protected channels
+      that were not passed to the plugin constructor (Hinrik)
+    - Removed extended debug output from some tests, they've been behaving
+      for a while (Hinrik)
+    - State and subclasses will use NAMES replies to synchronise
+      channel state as well now. Should help RT #46825 (bingos).
+    - Refactored the netsplit test slightly to try and eliminate
+      race conditions (bingos)
+    - Added netsplit detection code to Qnet::State subclass. (bingos)
+    - Netsplit restoration now triggers irc_nick_sync event (bingos)
+    - Added some diagnostics to the netsplit test. (bingos)
+    - Markup test in netsplit as todo due to race condition (bingos)
+    - Mark one of the netsplit tests TODO (bingos)
+    - Time for a stable release
+
+6.08 Fri May 29 11:46:45 GMT 2009
+    - CTCP.pm: Return an RFC822 date in response to CTCP TIME (Hinrik)
+    - BotCommand.pm: Fix RT #46065, help message wasn't being printed (Hinrik)
+    - Connector.pm: Make the traffic-noticing code more accurate (Hinrik)
+    - PlugMan.pm: Allow custom auth checks for the IRC interface (Hinrik)
+    - PlugMan.pm: Silence some warnings (bingos)
+
+6.06 Thu Apr 30 12:05:04 GMT 2009
+    - NickServID.pm: Update a paragraph in the Pod (Hinrik)
+    - State.pm: Don't delete all state in S_(error|socketerr|disconnected)
+      handlers, removes some warnings (Hinrik)
+    - AutoJoin.pm: Fixed some bugs, added more tests (Hinrik)
+    - PlugMan.pm: Don't rely on State.pm for authentication. Eliminates race
+      condition when receiving channel commands before the channel has been
+      synced (Hinrik)
+    - In jailed environments we can't assume that 127.0.0.1 will be that.
+      reported by Jase Thew (Bazerka).
+    - Logger.pm: Replace slashes with underscores before logging to disk,
+      spotted by Sebastian Mair.
+
+6.05_01 Sat Apr 11 09:18:28 GMT 2009
+    - Compat.pm: Don't emit an extra event or print a misleading debug message
+      for CTCP ACTIONs on FreeNode (Hinrik)
+    - AutoJoin.pm: Only join channels after we have asked the server if it
+      supports FreeNode's CAPAB IDENTIFY-MSG (Hinrik)
+    - BotCommand.pm: Accept commands in private too (Hinrik)
+    - CTCP.pm: Handle CLIENTINFO as well (Hinrik)
+    - Common.pm: Added irc_to_utf8 to decode IRC messages (Hinrik)
+    - Proxy.pm: General cleanup. Also fix a bug introduced in 5.66 that caused
+      it to keep too many welcome messages (Hinrik)
+    - State.pm: General cleanup. Fixed a bug with the order of irc_nick_sync's
+      arguments being reversed (Hinrik)
+
+6.04 Sat Mar  7 23:31:11 GMT 2009
+    - Logger.pm: Only use portable strftime parameters. Fixes log timestamps
+      on Solaris and Windows (Hinrik)
+    - CTCP.pm: Use portable strftime parameters when responding to CTCP TIME
+      requests (Hinrik)
+    - State.pm: Document the extra parameters to irc_disconnected, irc_error,
+      and irc_socketerr. (Hinrik)
+    - Fixed race condition in some tests (Hinrik)
+
+6.02 Fri Mar  6 10:54:22 GMT 2009
+    - Fix RT #43856, variable name typo in PlugMan.pm reported by barnaclebob
+    - Add new test for PlugMan plugin (Hinrik)
+    - Amend a few tests that were failing (Hinrik)
+    - State.pm: Avoid a warning when setting a mode on a channel on which all
+      previous modes have been unset (Hinrik)
+    - Add optional Perl::Critic test for the test scripts (Hinrik)
+
+6.00 Wed Mar  4 23:12:57 GMT 2009
+    - Logger.pm: Fix bug with logging some CTCP ACTIONs (Hinrik)
+    - Logger.pm: Also log own messages in DCC chats. Add test for it (Hinrik)
+    - Added more tests for general IRC activity, and for State.pm (Hinrik)
+    - Added tests for BotCommand and Logger plugin (Hinrik)
+    - Turned off flood control in all the tests, and removed or adjusted many
+      of the delays used. This shaves about 70% off the time needed for a full
+      test suite run (Hinrik)
+
+5.98 Mon Mar  2 22:51:27 GMT 2009
+    - Parse some IRC protocol messages more strictly. Always split on ASCII
+      space rather than \s, since tabs are not considered whitespace by the
+      IRC protocol. (Hinrik)
+    - DCC.pm: Most events now tell you what the peer's IP address is (Hinrik)
+    - DCC.pm: Document the timeout parameter to the dcc command, and fixed
+      some errors in the docs. (Hinrik)
+    - Compat.pm/DCC.pm: Actually provide the whole nick!user@host (not just
+      the nick) with every dcc_request, like the synopsis suggests (Hinrik)
+    - DCC.pm: Fix crash when closing a DCC connection with pending outgoing
+      data, reported by meneldor (Hinrik)
+    - Added test case for the above (Hinrik)
+    - DCC.pm: Don't crash if dcc_close is called with an invalid id, also
+      reported by meneldor (Hinrik)
+    - Logger.pm: Add DCC chat logging (Hinrik)
+    - IRC.pm: Document the 'account' key returned by irc_whois (Hinrik)
+    - IRC.pm: Allow plugins to respond to custom commands without them having
+      to be defined explicitly in IRC.pm. This allows the removal of the last
+      piece of DCC-specific code (Hinrik)
+    - AutoJoin.pm: Add an option for retrying joins when banned (Hinrik)
+    - NickServID.pm: Support ratbox-based ircds (Hinrik)
+    - Synchronised all the version numbering (bingos)
+
+5.96 Wed Jan 28 11:29:28 GMT 2009
+    - Added delays to the two failing tests reported by CPAN Testers,
+      believe we are seeing race conditions. (bingos)
+
+5.94 Tue Jan 27 21:38:51 GMT 2009
+    - Fixed dependency on Date::Format in inc. poco-server-irc (bingos)
+
+5.92 Tue Jan 27 13:18:12 GMT 2009
+    - PlugMan.pm: Only require ::State when 'botowner' is set (Hinrik)
+    - ISupport.pm: Fix parsing of MODES and SILENCE parameters (Hinrik)
+    - AutoJoin.pm: Added 'Rejoin_delay' option (Hinrik)
+    - Connector.pm: Allow adjusting the time to wait before reconnecting,
+      to ease testing. (Hinrik)
+    - Compat.pm: Fix parsing of CTCPs when no prefix is present
+      (i.e. client CTCPs) (Hinrik)
+    - Updated included POE::Component::Server::IRC to 1.36 (Hinrik)
+    - Fixed up some tests to work with it (Hinrik)
+    - Removed ziplink test since PoCo-Server-IRC only supports server
+      ziplinks, not client ones (Hinrik)
+    - Added tests for the following plugins: AutoJoin, BotAddressed,
+      CycleEmpty, CTCP, Connector, ISupport, NickReclaim, Whois (Hinrik)
+
+5.90 Thu Jan 22 10:52:53 GMT 2009
+    - Seen.pod: Recipe for a bot implementing the 'seen' command (Hinrik)
+    - Reload.pod: How to reload your bot with out reconnecting (Hinrik)
+    - Memory leak with stashing $self in $self->{alias}, change to
+      stash a stringified version of $self instead. (bingos)
+
+5.88 Thu Aug 28 15:49:48 BST 2008
+    - MegaHAL.pod: Bare-bones recipe for a MegaHAL bot (Hinrik)
+    - BotCommand.pm: Send responses back via NOTICE, not PRIVMSG (Hinrik)
+    - Filter/CTCP.pm: Removed, as it is deprecated and unmaintained (Hinrik)
+    - IRC.pm: Really propagate the plugin_debug flag (Hinrik)
+    - Filter/IRC/Compat.pm - change to _get_ctcp() as per RT #38773
+
+5.86 Tue Jul 22 09:53:26 BST 2008
+    - Proxy.pm: Remove 'options => {trace => 1}' from constructor (Hinrik)
+    - Compat.pm: Don't handle CAPAB IDENTIFY-MSG with non-ACTION CTCPs (Hinrik)
+
+5.84 Thu Jun 26 19:55:41 BST 2008
+    - BotAddressed.pm: Made it a little smarter (Hinrik)
+    - Common.pm: Make strip_color() strip bg color-only changes (Hinrik)
+    - IRC.pm: Propagate plugin_debug flag to Pluggable (Hinrik)
+    - IRC.pm: Added support for FreeNode's CAPAB IDENTIFY-MSG (Hinrik)
+    - Makefile.PL: Depend on new Pluggable for better debug info (Hinrik)
+    - t/02_behavior/12_delays.t: Shouldn't fail if there's an IRC server
+      running on localhost (Hinrik)
+
+5.82 Sat Jun 14 09:02:11 BST 2008
+    - Depend on new PoCo-Pluggable to fix a regression (Hinrik)
+
+5.80 Thu Jun 13 15:30:08 GMT 2008
+    - CycleEmpty.pm: Renamed cycling() to is_cycling() (Hinrik)
+    - IRC.pm: Documented the squit command (Hinrik)
+    - Only test ziplinks given a proper version of *Zlib::Stream (Hinrik)
+    - DCC.pm: Implemented DCC RESUME support (Hinrik)
+    - Cleaned up and reorganized the test suite (Hinrik)
+    - IRC.pm: Added SERVLIST and SQUERY commands. Should include
+      everything from RFC2812 now. (Hinrik)
+    - Fixed a bug in Proxy plugin (bingos)
+
+5.78  Fri May 30 08:03:30 BST 2008
+    - Logger.pm: Fix the PART thing properly (Hinrik)
+    - README: A few updates (Hinrik)
+    - Proxy.pm: Fixed a small bug (Hinrik)
+    - Common.pm: Fixed the docs for matches_mask_array() and
+      allow it to be exported (Hinrik)
+    - IRC.pm et al: Improved some warning messages (Hinrik)
+    - IRC.pm: Moved DCC support to a plugin (Hinrik)
+    - IRC.pm: Improved the docs some. Better index and more links. (Hinrik)
+    - The plugin system now uses POE::Component::Pluggable (Hinrik)
+
+5.76  Thu Apr 24 15:05:05 GMT 2008
+    - Logger.pm: Fixed serious typo in function name. Grr. (Hinrik)
+    - Logger.pm: Handle PARTs correctly when there's no colon (Hinrik)
+    - State.pm: Only WHO users once even if they join many chans (Hinrik)
+    - State.pm: Added channel_creation_time() method (Hinrik)
+    - State.pm: Made channel_modes() return mode arguments as well (Hinrik)
+    - State.pm: Add is_channel_synced() (Hinrik)
+    - PlugMan.pm - bug in new() spotted by plu (bingos)
+
+5.74  Thu Apr 03 15:14:04 GMT 2008
+    - Logger.pm: Do charset conversion on everything, not just messages. This
+      should handle non-ASCII channel names and nicknames on servers that
+      support such things (Hinrik)
+    - Logger.pm: Allow custom formats to provide their own timestamp in the
+      topic_set_by handler (Hinrik)
+
+5.72  Fri Mar 21 10:33:59 GMT 2008
+    - Compat.pm: Fixed a bug that caused a warning (Hinrik)
+    - Patch applied from Somni [RT #33850] (bingos)
+    - Fixes to two of the tests that were causing intermitent fails (bingos)
+    - Logger.pm: Make logging work again :) (Hinrik)
+    - Logger.pm: Fix topic_change log string (Hinrik)
+    - State.pm: Document new AwayPoll behavior correctly (Hinrik)
+    - Moved author tests to xt/ Module::Install::AuthorTests is now
+      required by maintainers. (bingos)
+
+5.70  Mon Mar 03 10:51:01 GMT 2008
+    - BotAddressed.pm: Fixed a small bug (Hinrik)
+    - BotCommand.pm: A new plugin for handling bot commands (Hinrik)
+    - IRC.pm: Shorten protocol lines that are too long, make the maximum length
+      configurable. (Hinrik)
+    - Amended IRC::Compat to do CTCP parsing. Amended dependent modules. (bingos)
+    - Logger.pm: Use File::Spec for cross-platform file/dir creation. (Hinrik)
+    - Make CTCP plugin respond to SOURCE requests (Hinrik)
+    - Added a Cookbook (Hinrik)
+    - State.pm: Save user hop count from WHO replies (Hinrik)
+    - Connector.pm: Added support for multiple servers (Hinrik)
+    - IRC.pm: Improved dcc_resume documentation, moved some others things
+      around in the docs (Hinrik)
+    - Added Hinrik to the maintainers list in IRC.pm (bingos)
+
+5.68  Wed Feb 20 19:49:58 GMT 2008
+    - IRC.pm: Improved the docs a little, fixed an error in the
+      SYNOPSIS and moved half of it to an example file. Should be
+      less daunting now :) (Hinrik)
+    - State.pm: Lengthen away status polling time to 5 minutes and
+      make the feature optional. (Hinrik)
+    - Common.pm: Improved mIRC color handling code/documentation (Hinrik)
+
+5.66  Mon Feb 18 21:58:48 GMT 2008
+    - Removed Filter::IRC in favor of Filter::IRC::Compat (Hinrik)
+    - Filter/CTCP.pm: Support filenames with spaces in DCCs (Hinrik)
+    - IRC.pm: Always doube-quote sent DCC files for safety (Hinrik)
+    - Compat.pm: Propagate debug flag to internal CTCP filter (Hinrik)
+    - Updated t/perlcriticrc to exlude a few more policies (Hinrik)
+    - Cleaned up all code and documentation. The changes include:
+      everything needed to satisfy Perl::Critic, use carp/croak
+      instead of warn/die where appropriate, use 4-column indents,
+      use consistent coding style everywhere, some refactoring here
+      and there... (Hinrik)
+    - put Filter::IRC back. It is now a Stackable/IRCD/Compat
+      mash-up (bingos)
+    - full regression testing in 1_filter_compat.t yippee. (bingos)
+
+5.64  Sat Feb 16 07:55:34 GMT 2008
+    - Logger.pm: Fix regression regarding utf8 detection (Hinrik)
+    - Logger.pm: Don't log channel modes which have different meanings
+      depending on the IRC network we're on. (Hinrik)
+    - NickServID: Tweak it a little (Hinrik)
+    - Add optional Test::Perl::Critic test to detect risky code.
+      Currently 466 violations in about 16k lines of code, whee! (Hinrik)
+    - ISupport.pm: Fix bug in CHANLIMIT handling (Hinrik)
+    - Logger.pm: Missing S_001 return value (Hinrik)
+    - Compat.pm: Fix missing raw_line (Hinrik)
+    - Filter/CTCP.pm: Stop using POE::Filter::IRC (Hinrik)
+
+5.62  Thu Feb  7 16:31:03 GMT 2008
+    - IRC.pm: Document the nickserv command (Hinrik)
+    - Common.pm: Show some example usage of has_color() (Hinrik)
+    - CycleEmpty.pm: New plugin to cycle empty channels in order to
+      gain channel operator status (Hinrik)
+    - Common.pm: Add more color/formatting codes (Hinrik)
+    - Added plugin test for CycleEmpty (BinGOs)
+
+5.60  Wed Feb  6 13:38:50 GMT 2008
+    - State.pm: Improved the away tracking code (Hinrik)
+    - Logger.pm: Added missing argument preventing quit messages from
+      being logged (Hinrik)
+    - NickReclaim: Fixed regression introduced in 5.58 (Hinrik)
+    - BotTraffic.pm: irc_bot_ctcp_action => irc_bot_action, to be
+      consistent with BotAddressed.pm (Hinrik)
+    - AutoJoin.pm: Delay autojoin if NickServID is loaded, so the user
+      will be cloaked (if applicable) before joining channels (Hinrik)
+    - Common.pm: Add constants and methods for dealing with colors
+      and formatting (Hinrik)
+    - IRC.pm: Add NICKSERV command, mention the new color stuff (Hinrik)
+    - NickServID: Made it behave more sensibly considering upcoming
+      FreeNode policy changes. Also, use a raw NICKSERV command (Hinrik)
+    - Logger.pm: Rename SortByDate to Sort_by_date and add Strip_color,
+      Strip_formatting (Hinrik)
+
+5.58  Mon Feb  4 07:58:14 GMT 2008
+    - State.pm: Workaround for IRC servers (e.g. hybrid, hyperion) which send
+      user WHO replies starting with the name of a random channel that the
+      user is on (which the component might not be on) instead of '*' (Hinrik)
+    - State.pm: Track the away status of channel users and send an event if
+      the status changes (Hinrik)
+    - Projects.pm: Some additions and cleanup (Hinrik)
+    - Logger.pm: Add 'Restricted' argument for restricting read permissions
+      of created files/dirs (Hinrik)
+    - Logger.pm: Add 'Format' argument for specifying a custom log format (Hinrik)
+    - Logger.pm: Close log files after writing to them (Hinrik)
+    - Logger.pm: Omit date from timestamp if sorting log files by date (Hinrik)
+    - Logger.pm: Always use present tense (Hinrik)
+    - NickReclaim.pm: Small fix for an edge case (Hinrik)
+    - BotAddressed.pm: Check for '$nick~ $text' as well (Hinrik)
+    - NickServID.pm: Make it work if it's added before connecting (Hinrik)
+
+5.56  Thu Jan 31 12:30:25 GMT 2008
+    - AutoJoin.pm: Silence some warnings (Hinrik)
+    - Logger.pm: Add SortByDate argument to rotate logs (Hinrik)
+    - Logger.pm: output something in English for every channel mode change (Hinrik)
+    - Logger.pm: made the ACTION syntax distinct from the MODE syntax
+      to allow for sane parsing of log files (Hinrik)
+    - Fix bug causing NickReclaim plugin to only try to reclaim once (Hinrik)
+    - Fix NICK/QUIT logging in Logger plugin (Hinrik)
+    - Minor improvement and documentation update to BotAddressed plugin (Hinrik)
+
+5.54  Sun Jan 27 09:21:27 GMT 2008
+    - Hinrik added numerous groovey plugins. Hinrik++
+
+5.52  Mon Jan 14 07:46:01 GMT 2008
+    - RT #32279: Filter/CTCP.pm doesn't provide raw_line by Hinrik
+
+5.50  Sun Jan 13 10:19:05 GMT 2008
+    - RT #32271 reported by Hinrik
+    - RT #32265 is_away() support by Hinrik
+
+5.48  Thu Jan 10 20:13:10 GMT 2008
+    - Added plugin FollowTail, a tail following plugin
+
+5.46  Thu Jan  3 15:12:21 GMT 2008
+    - 'irc_public' events should now be generated according to ISupport
+      information
+
+5.44  Tue Jan  1 13:58:15 GMT 2008
+    - Enhancement to part command to handle part messages. RT #32029
+      reported by Hinrik
+
+5.42  Mon Dec 31 12:29:50 GMT 2007
+    - Amendments to NickReclaim plugin by Zoffix Znet
+
+5.40  Wed Dec 26 10:55:18 GMT 2007
+    - Applied a patch from Hinrik to fix umode issues with State.pm
+
+5.38  Thu Dec  6 17:24:23 GMT 2007
+    - CPAN Testers reports for dev releases look favourable, bumped for
+      proper release.
+
+5.37_02  Thu Dec  6 08:35:47 GMT 2007
+    - Added is_user_mode_set() method and 'irc_user_mode' event
+
+5.37_01  Wed Dec  5 21:11:46 GMT 2007
+    - Added umode support to IRC::State
+
+5.36  Thu Nov  1 13:51:02 GMT 2007
+    - Updated Module::Install to 0.68
+
+5.34  Wed Jul 25 10:51:45 BST 2007
+    - Fixed abstract_from in Makefile.PL.
+
+5.33_01  Tue Jul 10 17:53:01 BST 2007
+    - Moved documentation for connect() to spawn();
+    - Added CTCP PING to Plugin::CTCP;
+
+5.32  Tue Jun 12 12:20:21 BST 2007
+    - Stable release after working around issues on Solaris.
+
+5.31_05  Mon Jun 11 09:57:09 BST 2007
+    - Fixed an error in the SYNOPSIS example for Qnet::State;
+    - More diagnostics to the ipv6 test to trigger on solaris;
+
+5.31_04  Tue Jun 05 09:29:34 BST 2007
+    - More diagnostics to the ipv6 test to trigger on solaris;
+
+5.31_03  Fri Jun 01 10:37:49 BST 2007
+    - More diagnostics to the ipv6 test to trigger on solaris;
+
+5.31_02  Thu May 31 16:04:06 BST 2007
+    - More diagnostics to the ipv6 test to trigger on solaris;
+
+5.31_01  Fri May 18 10:11:47 BST 2007
+    - Added a warning if UseSSL is specified but SSLify wasn't found,
+      requested by H.Merijn Brand;
+    - Added some diagnostics to the ipv6 test to trigger on solaris;
+
+5.30  Tue May 08 19:25:06 BST 2007
+    - Applied a patch from dec for Plugin::Proxy.pm
+
+5.29  Thu May 03 13:01:01 BST 2007
+    - 'irc_ctcp' events added by Aankhen``
+
+5.28  Tue May 01 14:50:08 BST 2007
+    - Applied a patch from dec to Plugin::Proxy.
+
+5.27  Tue May 01 13:43:39 BST 2007
+    - Fixed a serious bug relating to PoCo-Client-DNS use, reported by dec
+
+5.26  Sun Apr 29 15:19:56 BST 2007
+    - Fixed a bug relating to PoCo-Client-DNS use, reported by dec
+
+5.25  Sun Apr 29 13:03:07 BST 2007
+    - Applied fix for problem with ipv6 support from bsmith
+    - Fixed RT #26735 reported by dec
+
+5.24  Mon Apr 16 13:43:36 BST 2007
+    - Changed the IPv6 support to only be enabled when 'useipv6'
+      is explicitly used.
+
+5.23  Thu Apr 12 16:07:56 BST 2007
+    - Added Test::Kwalitee test.
+    - Added new IP functions to ::Common
+    - IPv6 support for connecting to ipv6 ircds.
+    - New IPv6 connect testcase.
+
+5.22  Fri Feb 02 12:02:36 GMT 2007
+    - Found a bug in ::State that was causing problems during netsplits.
+
+5.21  Thu Feb 01 12:21:45 GMT 2007
+    - More changes to Qnet::State to include AUTH in part/quit/kick
+      events. Suggested by helios.
+
+5.20  Wed Jan 31 17:25:31 GMT 2007
+    - Finally converted Makefile.PL to full Module::Install-ness.
+
+5.19  Wed Jan 31 11:54:36 GMT 2007
+    - Change to ban_mask() method in Qnet::State, suggested by
+      helios.
+
+5.18  Fri Dec 29 10:55:05 GMT 2006
+    - Documentation fix to ::Plugin by Lyndon Miller.
+    - Still a problem with TOPIC command. Fixed.
+
+5.17  Tue Dec 12 22:52:48 GMT 2006
+    - Serious bug in TOPIC handling spotted. Fixed.
+
+5.16  Wed Dec 06 11:54:08 GMT 2006
+    - Refactored the SOCKS code to use $wheel->event() to switch
+      InputEvent. Thanks to dngor for pointing that out.
+
+5.15  Tue Dec 05 19:26:34 GMT 2006
+    - Implemented SOCKS4 support. Requested by netmunky @ Efnet. Somni
+      assisted with the design. Thanks!
+
+5.14  Wed Nov 29 10:56:57 GMT 2006
+    - Found a serious problem with refcounts in the registration
+      code. Fixed with merlyn's help.
+
+5.13  Sun Nov 19 14:20:51 GMT 2006
+    - Fixed long standing bug in 'topic' command.
+
+5.12  Thu Nov 16 14:04:51 GMT 2006 'Hairy COO!'
+    - Documentation fix for ::Pipeline, spotted by Martijn van Beers.
+    - Amended 6_common.t test-case to make sure it covered other edge
+      case reported by 'Elvis Dead' via email.
+    - Setting a delayed command with delay() generates a 'irc-delay_set'
+      event.
+    - Added ability to remove delayed commands.
+
+5.11  Wed Oct 25 16:32:03 BST 2006
+    - Changed plugin processing so that any poco plugin handlers
+      are now in an eval as well. Pesky edge-cases.
+    - Refactored parse_mode_line() to handle dangerous edge cases.
+
+5.10  Tue Oct 24 18:02:46 BST 2006
+    - ::State 'irc_kick' event has ARG4 which is the full nick!user@host
+      of the kicked person. Suggested by helios.
+
+5.09  Tue Oct 24 14:48:07 BST 2006
+    - Forgot a test with the Test::Plugin relocation. Damnit.
+    - Reinstated ::Test::Plugin for the PlugMan tests.
+
+5.08  Mon Oct 23 12:35:04 BST 2006
+    - Remove ::Test::Plugin and relocated code to the actual test.
+    - Removed the optional debug in Pipeline. If there are errors
+      you'll see them now.
+    - New plugin tests, testing running POE sessions in plugins and
+      dying in PCI_register().
+    - Deprecated 1_new.t test by removing it.
+
+5.07  Tue Oct 17 11:37:28 BST 2006
+    - Enabled plugin_debug effect Pipeline.
+    - Added send_event() method for injecting events in the event
+      handling system.
+
+5.06  Thu Oct 12 12:45:06 BST 2006
+    - Adjusted load() in PlugMan, suggested by Stefan Schwarzkopf.
+
+5.05  Fri Oct 06 14:40:37 BST 2006
+    - ISupport documentation fix.
+    - Amendments to plugin processing, plugin debugging should be
+      less noisy now.
+
+5.04  Mon Sep 25 13:30:46 BST 2006
+    - Removed Build.PL
+    - Applied a patch from Ben Jackson which fixes the proxy
+      support. Yay.
+
+5.03  Sat Sep 16 14:17:01 BST 2006
+    - Switched Makefile.PL to using Make::Install. Added Build.PL
+    - Fixed META.yml handling.
+    - Fixed an unregister bug reported via CPAN::Forum. *sigh*
+
+5.02  Fri Sep 08 16:32:12 BST 2006
+    - POE-0.37 has found a serious flaw in the shutdown() handler. Fixed.
+    - ::Test::Harness was registering for HUP signal. Stopped that nonsense.
+
+5.01  Thu Sep 07 17:53:00 BST 2006
+    - Fixed file permissions in the distribution. Again a CPANTS
+      gripe.
+    - Fiddled with State's insides.
+    - Added find_auth_nicks method to Qnet::State, requested by helios.
+
+5.00  Fri Sep 01 02:20:54 BST 2006 YAPC::EU Birmingham 2006 release
+    - Test::Pod::Coverage test added, inspired by CPANTS hackathon,
+      cheers, domm.
+    - Added use strict to ::Constants.
+    - PlugMan plugin will dump $@ when a plugin fails to 'load' now.
+    - Documentation fixes to a lot of modules due to Pod::Coverage.
+
+4.99  Tue Aug 29 17:47:04 BST 2006
+    - Added resync_chan and resync_nick to Qnet::State subclass, as
+      suggested by helios.
+
+4.98  Fri Aug 18 12:30:31 BST 2006
+    - Added support for connecting to ircds that support compressed
+      links; only PCSI does this afaik, so limited use for most peeps.
+    - Applied a patch from dec to fix a bug in ISupport plugin, RT #21058.
+
+4.97  Mon Jul 24 12:46:26 BST 2006
+    - Fixed 'sconnect', it should send 'CONNECT' to the ircd
+      now instead of 'SCONNECT'.
+    - ::State assumed that ircd had returned ISupport info.
+      Set reasonable defaults for ircd's that don't.
+    - Changed 'sl' to 'quote' instead as far as the documented
+      API.
+
+4.96  Sun Jul 16 14:35:34 BST 2006
+    - Fixed a bug in Console plugin.
+    - Minor code changes to Proxy plugin.
+    - Component will automatically register a parent session
+      if spawned from another session. Added testcase for
+      this also.
+    - Removed the deprecated IRC_EVTS registration bit from
+      _start as the component uses plugin API stylee handlers now.
+    - Tidied up PlugMan plugin code.
+    - Updated documentation stipulating that the module is licensed
+      the same as perl is.
+    - Refactored Whois plugin. Added RPL_WHOISACTUALLY support.
+
+4.95  Wed Jul 05 11:46:34 BST 2006
+    - Removed stray Dumper() in IRC.pm.
+    - Fixed serious bug in ISupport plugin.
+
+4.94  Sun Jul 02 10:01:45 BST 2006
+    - Amended the DNS code to implement round-robin type
+      behaviour.
+    - Added POCOIRC_REGISTER and POCOIRC_SHUTDOWN signals
+      for multiple registration and shutdown, respectively.
+      Added applicable tests to the testsuite.
+    - Documentation fixes. Added DIE command.
+    - Added multiple bot SYNOPSIS.
+
+4.93  Tue Jun 13 19:25:45 BST 2006
+    - ::State, invex & excepts sync'ing when we +[qoah].
+    - ::State, documentation fixes.
+    - Added 'irc_shutdown' event.
+    - Bug in Qnet::State spotted by helios. Changed
+      inheritance order and cpoied some code from Qnet to
+      Qnet::State accordingly.
+
+4.92  Sun Jun 11 18:09:13 BST 2006
+    - Added a check to _parseline for spurious blank events,
+      reported by dec.
+    - Added nick_channel_modes method to ::State to return
+      the channel modes (ie. qaohv) of a given nick on a
+      given channel - Lyndon Miller
+    - Added note concerning the issues surrounding the SetAt
+      and SetBy values to CAVEATS in the ::State pod - Lyndon Miller
+    - Improvements to Plugin::PlugMan, it should actually
+      work properly now >:) Thanks to mst and dngor.
+    - ::State, nick_sync now has the channel name as ARG1.
+    - Moved the INVEX and EXCEPTS sync'ing until we are +o'd,
+      created irc_chan_sync_(invex|excepts). irc_chan_sync
+      features the time in seconds taken to sync as ARG1 now.
+
+4.91  Thu Jun 01 21:08:13 BST 2006
+    - Tweak to ::State to deal with ircds that don't report @+
+      status in WHO replies ( like unreal ). Thanks to Lyndon Miller
+      for reporting that.
+    - 'irc_dcc_failed' event was undocumented. Fixed.
+    - Switched the poco-client-dns checks to 'use', so as to
+      ensure that we only load >= 0.99.
+    - Amendments to shutdown so that it sends a quit message
+      to the ircd if we are connected.
+    - Amended Connector plugin so the lag is collected
+      independent of what the ircd sends us back.
+    - Various changes to ::State in order to ensure full RFC
+      compliant channel mode support, including support
+      for channel access lists - Lyndon Miller
+    - Added ::State methods to return channel access lists:
+      channel_ban_list, channel_invex_list, channel_except_list - Lyndon Miller
+    - Using 'use' for the dns checks was fubar. Switched back
+      to 'require' and test the VERSION instead.
+    - Changed the simpleclient.pl script to accept a filename as
+      a second argument to /dump_state command.
+    - Documentation tweaks to ::State by Lyndon Miller
+    - Channel topic support added to ::State. Added the method
+      channel_topic to return a hashref of topic data - Lyndon Miller
+    - Changed 'Time' keys for channel lists and topic to 'SetAt'
+    - Added irc_chan_mode event to ::State to allow everyone
+      to enjoy the mode parsing State does internally - Lyndon Miller
+    - Refactored ::Qnet::State subclass after all - Lyndon Miller
+      changes to ::State.
+    - Refactored ::State slightly to use ARG2 for numerics
+      handlers instead of trying to parse ARG1 ourselves. FTW.
+
+4.90  Mon May 22 13:23:09 BST 2006
+    - Missed the Filter::Stackable in plugins Console and Proxy.
+
+4.89  Mon May 22 09:14:57 BST 2006
+    - A bug in POE-0.35's Filter::Stackable causing problems with
+      ::Test::Harness. Enabled a runaround *sigh*
+
+4.88  Sun May 21 17:57:38 BST 2006
+    - Code cleanup in ::Test::Harness. Workaround for systems
+      without %z in strftime, like Solaris.
+    - Added matches_mask() function to ::Common. Updated 6_common.t
+      to add applicable tests.
+    - Added parse_user() function to ::Common. Updated 6_common.t
+      to add applicable tests.
+    - new() deprecation warning specifies the module name. Saves
+      confusion for people who are using Bot::* modules.
+    - Added LUSERS command.
+    - Major hackery to remove dependency on PoCo-Client-(DNS|Ident).
+
+4.87  Sat May 06 17:03:34 BST 2006
+    - Testsuite 07 and 09 were still skipped on MSWin32. Fixed.
+    - Altered BotAddressed at immute's suggestion. Check docs
+      for details.
+    - Altered Filter::Compat so it won't break with Stackable.
+    - Added 'remove' command a Freenode extension.
+
+4.86  Thu Apr 27 21:18:41 BST 2006
+    - POD fixes and perl dependency as pointed out by Alias.
+    - Tweak so that the poco only shuts down PoCo-Client-DNS
+      if we spawned it.
+    - Spotted a problem with register() it was still stashing
+      POE::Session refs. Bad BinGOs.
+    - shutdown() will unregister all registered sessions now.
+    - Code audits of State and Qnet::State. Lot's of cleanup.
+    - Changed Common.pm u_irc/l_irc to support a casemapping
+      argument, one may specify 'rfc1459', 'strict-rfc1459' or
+      'ascii'. Default is 'rfc1459'.
+    - Changed State and Qnet::State to use casemapping for
+      generating unique state keys.
+    - Removed State::Lite. Deprecated.
+    - Online test reports the server connected to.
+
+4.85  Thu Apr 13 12:37:49 BST 2006
+    - Numerous bug fixes to State and Qnet/State which were
+      causing terminations. Reported by dec.
+    - Tweaks to a number of tests.
+    - Various plugins have been debugged.
+    - Added '/dump_state' command to simpleclient.pl.
+
+4.84  Wed Apr 12 14:24:34 BST 2006
+    - Spotted a bug in Filter::CTCP, it wasn't setting raw_line.
+    - Bug in dcc code meant DCC tests were failing on certain
+      platforms. Fixed.
+    - Changes to DCC tests. Rolled back MSWin32 skip checks.
+    - Added one more DCC test for testing 'nataddr' option.
+
+4.83  Tue Apr 11 20:45:04 BST 2006
+    - Changes to two of the DCC tests. DAMN YOU WINDOWS!
+
+4.82  Tue Apr 11 19:32:45 BST 2006
+    - Sorted out Test::Harness, brought it up to PoCo-Server-IRC-0.3
+      standard.
+    - Added a multiple client test to the testsuite.
+    - Added socketerr test to the testsuite.
+    - Added subclass test to the testsuite.
+    - Added DCC test scripts to the testsuite.
+    - Fixed a bug in DCC code for CHAT.
+    - Added nick and nick_state tests.
+    - Amended processing order in _send_event() so that the
+      poco session can process events *before* the plugins do.
+    - Plugin system will automagically check whether the poco
+      object has any plugin handlers. These get processed first.
+    - Removed the dependency on Date::Format, switched to POSIX::strftime.
+    - Applied a patch from ketas for State.pm.
+    - Fixes to Pipeline, spotted by dec @ MAGnet.
+    - Added resolver() method for accessing the PoCo-Client-DNS object.
+    - Refactored State.pm, Qnet.pm and Qnet/State.pm, handlers are all
+      processed by plugin system now. Implemented better inheritance.
+    - Expanded the SYNOPSIS sections of Qnet.pm, State.pm and Qnet/State.pm.
+    - Added NickReclaim plugin and associated test.
+
+4.81  Fri Mar 31 17:00:38 BST 2006
+    - Added PlugMan plugin manager and associated test.
+    - Fixed the RFC docs in docs/. Spotted by integral. Thanks.
+    - Added session_alias() method as suggested by Chris Thompson.
+    - The component's HEAP is now the object. So is retrievable via
+      $_[SENDER]->get_heap() in event handlers. Thanks to CT for the
+      idea. Now why didn't I think of that sooner =[
+    - Various fixes to Test::Harness ircd.
+    - Expanded the testsuite with 2 new tests. One uses Test::Harness,
+      the other is an online test and tries to connect to freenode.
+    - Fixed all the examples to use POE::Session->create().
+    - Added a warning to Makefile.PL about the online test.
+    - Added delay() method for posting delayed commands.
+    - Added a test to testsuite for ::State.
+    - Added examples to Plugin docs.
+
+4.80  Thu Mar 16 17:00:01 GMT 2006
+    - Code tidy up.
+    - Fixed DCC bug. As reported by helios.
+    - POD fix to ::State, missed two methods.
+    - Changed default alias to "$self". Thanks dngor.
+    - General POD rewrite.
+
+4.79  Sun Jan 15 17:15:01 GMT 2006
+    - Serious bug in _send_event() spotted by ikaros @ freenode.
+      The component wasn't dispatching events to itself since 4.78.
+
+4.78  Tue Jan 10 22:01:09 GMT 2006
+    - Documentation bug. 'irc_topic' event wasn't documented.
+      Reported by bluepunk @ efnet, through dngor :)
+    - Finally got around to switch session registering from using
+      POE::Session ( ew, nasty ) to session IDs instead.
+
+4.77  Mon Dec 26 17:00:01 GMT 2005
+    - Forgot to add use ::Common to Qnet::State. Doh.
+
+4.76  Fri Dec 23 15:20:20 GMT 2005
+    - Documentation bugs in the main IRC.pm SYNOPSIS. Bad BinGOs :(
+      Spotted and reported by Mulander via email.
+    - Added 'plugin_debug' option to dump after plugin evals if
+      applicable.
+    - Spotted a bug with the 'whois' handler. Looks like it has
+      never worked ( properly ). Adjusted 'commasep' for the special
+      case WHOIS <target> mask,mask.
+    - Minor fixes to Filter-IRC-Compat for argument handling.
+    - Minor fixes to Pipeline and plugin_del().
+
+4.75  Sun Dec 04 17:45:20 GMT 2005
+    - Fixed a problem with DCC code. Thanks to ketas for the heads up.
+    - Added disconnect() method with docs.
+    - Code audit to make sure all event handlers return undef.
+    - Updates to Connector plugin to fix timeout issues on connection.
+    - Added tests for the included plugins: Connector,BotAddressed and
+      BotTraffic.
+    - Fixed dicebot.pl in examples/ problem with $SIG{INT}.
+    - Updated docs to proxy support is SOCKS v4.
+    - Added raw_events() method to enable/disable/display current irc_raw.
+    - README updates. Notably to mention PoCo-SSLify for SSL links.
+    - Stole japhy's ISupport plugin for .. erm .. new ISupport plugin >;]
+    - Added CTCP.pm from gumbynet source. Added applicable test for it.
+    - Added Console.pm from gumbynet source. Added applicable test for it.
+    - Moved common functions to Common.pm. Amended relevant code to import
+      functions from there.
+    - Added Proxy.pm from gumbynet source. Hacked to make much more useful
+      and robust. Added applicable test for it and added ircproxy.pl to
+      examples/ folder.
+    - Patch applied to BotTraffic plugin from immute.
+    - Completely rehacked how the component handles parsing irc traffic to
+      events. Now using Filter::IRCD with Filter::IRC::Compat to process all
+      input. Input and output filters are stackable.
+    - Patch applied to BotAddressed plugin from immute.
+
+4.74  Wed Oct 26 09:15:21 BST 2005
+    - *sigh* another problem fixed with the new dns code.
+
+4.73  Wed Oct 26 07:43:03 BST 2005
+    - Minor problem with PoCo-Client-DNS fixed.
+
+4.72  Tue Oct 25 19:01:05 BST 2005
+    - Fix to Filter::IRC for INVITE. Apparently, asuka
+      timestamps after the channel name. Doh. Thanks to
+      Johannes Studt for spotting that.
+    - Fixed the documentation in Projects.pm
+    - Solved Ticket #15058, re: NoDNS and multiple PoCo-Client-DNS
+      sessions.
+
+4.71  Thu Oct 13 19:04:01 BST 2005
+    - Documentation bug in IRC.pm, spotted by cnelson.
+    - Fixed ::State.pm for channel admin/owner support,
+      spotted by Sebastien Wernerus.
+
+4.70  Fri Sep 16 16:45:05 BST 2005
+    - Fixed a bug where 'irc_raw' events were being switched off after
+      a connect() without parameters was called.
+
+4.69  Mon Sep 05 12:30:01 BST 2005
+    - 3_connect.t was causing problems on Cygwin. Skipped this test
+      on Cygwin for now.
+
+4.68  Fri Sep 02 14:00:00 BST 2005
+    - Altered Connector plugin so it starts the auto_ping on
+      'irc_connected' rather than 'irc_001'. Thanks to British
+      Telecom for enabling me to spot that one. >:]
+
+4.67  <Date>
+    - Documentation amendments to Plugin.pm. Well spotted, perigrin :D
+    - Added POD test.
+    - Filter-CTCP.pm fixed. All 'warn's only enabled when debug is set.
+      Thanks to ketas for spotting that one.
+    - Fixed a typo made doing the previous fix. >;)
+    - Added Projects.pm, hopefully a list of PoCo-IRC using projects.
+    - Added placeholder for State::Lite, a lightweight version of State.
+    - Tidied up main PoCo-IRC POD. Added a much better SYNOPSIS.
+
+4.66  Thu Jul 28 17:55:01 BST 2005
+    - Committed patches from Jeff 'japhy' Pinyan who has hacked
+      prioritisation into the plugin system. Check Plugin.pm and
+      Pipeline.pm for details.
+
+4.65  Wed Jul 13 17:47:08 BST 2005
+    - Fixed the anamoly where plugins weren't deleted if shutdown()
+      is called. This should fix plugins that based around POE::Session.
+
+4.64  Tue Jul 05 16:25:01 BST 2005
+    - Fixed POD in Plugin::BotAddressed.
+    - Added BotTraffic.pm plugin.
+
+4.63  Thu Jun 16 21:55:49 BST 2005
+    - Fixed POD in BotAddressed and Connector plugins,
+      thanks integral @ MagNET for spotting that one.
+    - perigrin pointed out a problem with Test::Harness
+      and dependent components. Updated distribution
+      dependencies and amended Test::Harness accordingly.
+
+4.62  Thu Jun 02 16:43:45 BST 2005
+    - Spotted another problem with ::Test::Harness, updated
+      Makefile.PL with Date::Format dependency.
+
+4.61  Thu Jun 02 10:38:05 BST 2005
+    - Found a bug in ::Test::Harness that made it fail tests
+      where POE::Component::Client::DNS wasn't installed. Doh.
+
+4.6   Wed Jun 01 15:28:03 BST 2005
+    - Applied another ketas patch.
+    - Added BotAddressed plugin.
+    - Added ::Test::Plugin.
+    - Added ::Test::Harness, PoCo-Server-IRC in disguise :)
+    - Added tests for the ::Test::*
+
+4.5   Sun May 22 16:21:08 BST 2005
+    - Moved repository from cvs to svn \o/
+    - Applied patch from ketas.
+    - Fixed docs for DCCPorts parameter to connect().
+    - Removed State.pm plugin as it was becoming difficult to
+      keep in sync with State subclass. Eventually hope to replace
+      State subclass with a proper plugin wrapper.
+    - Relocated constants to Constants.pm, tidied up subclasses.
+    - Added Connector.pm plugin. See docs for details.
+    - PoCo-IRC will now send an 'irc_registered' event to
+      registering sessions. ARG0 will the poco's object.
+
+4.4   Thu Apr 28 15:16:03 BST 2005
+    - Added event handlers for PING and PONG IRC commands.
+    - Added connected() method, so punters can query if the
+      component is connected to an IRC server or not.
+    - Applied a patch from Apocalypse re: DNS and SSL.
+    - Fixed Filter::IRC so it now parses PONG properly.
+    - ketas pointed out that in State.pm, the state for a
+      channel wasn't getting deleted when the bot parted or
+      got kicked. Fixed.
+
+4.3   Wed Apr 20 09:25:21 BST 2005
+    - Added 'irc_raw' events and parameter to spawn/connect() to
+      enable them. Thanks to webfox for the idea.
+
+4.2   Thu Apr 14 12:00:00 BST 2005
+    - Minor changes to State.pm to delete the STATE info when
+      we disconnect, error or socketerr.
+    - Reorganised the distribution.
+
+4.1   Mon Apr 11 11:24:44 BST 2005
+    - NATAddr bug spotted by apeiron @ MAGnet. Fixed.
+    - webfox spotted a problem with whois plugin and POE
+      Kernel assert_default. Hopefully fixed.
+
+4.0   Tue Apr 05 10:39:42 BST 2005
+    - Fixed a minor bug in Filter-IRC.pm, where it wasn't
+      decoloning the mode line before splitting it.
+      Thanks to webfox for pointing it out.
+    - Used eval's to make plugins system safe from rogue
+      plugins. *tssk* *tssk*
+    - Plugins system will now try to send events to a plugin
+      method _default() if the call to S_* or U_* fails.
+    - Applied a patch from webfox to enable SSL
+      connections. \o/
+    - Ported SSL patch to all dependent sub-classes.
+    - Teased and fixed a bug in IRC-State.pm. ban_mask()
+      should work properly now.
+    - paulv @ MAGnet pointed out that spawn() and connect()
+      arguments are case-sensitive. Adapted his patch. Args
+      can be in any case now.
+
+3.9   Mon Mar 21 09:17:05 GMT 2005
+    - Applied patches from webfox @ MAGnet for UnrealIRCd
+      support in IRC-State.pm and Plugin-State.pm.
+    - Added plugin_list().
+
+3.8   Mon Mar 14 10:15:22 GMT 2005
+    - Applied ketas' DCC patch, eventually.
+    - Applied a patch from Zsolt Szalai, which adds support
+      for Freenode's 320 whois response.
+    - Added Apocalypse's port of IRC-State.pm using the plugin
+      API, Plugin-State.pm.
+    - Added my plugin for 'irc_whois' and 'irc_whowas'
+      functionality.
+    - Fixed all the necessary modules to use Whois plugin.
+
+3.7   Fri Mar 04 17:37:34 GMT 2005
+    - Applied massive patch from Apocalypse @ MAGnet that
+      adds plugins. Read the docs in Plugins.pm for more info.
+    - Corrected some grammar mistakes in Plugins.pm >:o)
+    - Amended IRC-State.pm so that 'irc_nick' and 'irc_quit'
+      have an additional parameter in ARG2 which is an
+      arrayref of channels that are common with the component.
+
+3.6   Tue Mar 01 17:47:05 GMT 2005 "Y Adeilad Daffydd-Sant"
+				   ( The Saint David Build(ing) )
+    - Applied ketas' patch to IRC-State. Adds channel_modes
+      method and some code tidying.
+    - Spotted that in some cases the component *needs* an
+      alias. Made it use an internal alias unless one is
+      specified.
+    - Applied another ketas patch to IRC.pm, puts a
+      friendly message when we can't allocate a DCC port.
+    - Updated IRC-Qnet-State.pm to use a 'querytype' in the
+      extended WHO command, to specify <channel> or <nick>
+      WHO queries, due to spurious channels appearing in the
+      state. Big thanks to MikeC @ Qnet for the pointers.
+
+3.5   Wed Feb 23 13:28:05 GMT 2005
+    - IRC-State bug spotted and patched by ketas @ MAGnet
+    - Same bug caught and squashed in IRC-Qnet-State by me.
+    - Sorted out DCCPorts. It has to be an arrayref now.
+
+3.4   Fri Feb 18 12:01:58 GMT 2005
+    - Deprecated new() in favour of new constructor spawn().
+      spawn() will except all the same parameters as connect().
+      Moved config stuff to _configure() to save duplication.
+    - Changed all the object constructors about. Bit tedious
+      but now it is alot easier to subclass. See _create().
+    - Added a hack for $self->session_id(). Made 'alias'
+      optional if used with 'spawn'.
+    - Added parameter NATPort so one can specify the NAT
+      address that a bot appears to other IRC clients as
+      for DCC transfers, etc.
+    - Added DCCPorts parameter so that one can specify a
+      range of ports to use for initiating DCC, instead of
+      using 0.
+    - Implemented and added subclass ::State which provides
+      nickname and channel tracking. \o/
+    - Implemented and added subclass ::Qnet::State the ::State
+      ported to the Qnet module.
+    - Fixed the event dispatchers in _sock_up and _sock_down to
+      use _send_event like everyone else. Danke to Apocalypse for
+      spotting that. Amended _send_event so that 'irc_connected'
+      and 'irc_disconnected' get sent to every session not just
+      those that ask for it, as was the original behaviour.
+    - Documentation updates for all the new stuff.
+    - Added CVSLOG which contains all the glorious changes in
+      developing this thingy. :)
+    - Added send_queue() method, as I noticed that merlyn's
+      logfile tailing code was accessing the heap and i moved all
+      heap stuff to the object. *sigh* hacked it so that $heap holds
+      a reference to $self->{send_queue} which should work.
+
+3.3   Wed Feb 02 14:07:03 GMT 2005
+    - Updated IRC-Qnet to a). support new whois/whowas;
+      b). support irc_330 which is the account on ircu.
+
+3.2   Wed Feb 02 11:00:59 GMT 2005
+    - Implemented 'irc_whois' and 'irc_whowas' which
+      gather all the salient data from the numeric replies
+      and send one event containing a hashref.
+      As suggested by numerous bods on #PoE @ MAGnet >;o)
+
+3.1   Fri Jan 21 11:59:56 GMT 2005
+    - Converted _send_event sub to object method.
+    - Added IRC-Qnet, with specific extensions for Quakenet.
+    - Updated README
+
+3.0   Fri Dec 31 09:00:01 GMT 2004
+    - Fixed Filter-IRC so that it groks WALLOPS properly.
+    - Added docs/ and populated it with rfcs applicable to IRC.
+    - Added a slightly more substantial test case, moved it to t/
+    - Converted use of HEAP to OBJECT. PoCo-IRC is *now* an object.
+    - Added a fix for the infamous PART bug. Has to be explicitly enabled
+      by specifying PartFix => 1 in the 'connect' handler.
+    - Added a switch to 'connect' so that the use of PoCo::Client::DNS
+      can be disabled if necessary.
+    - Applied the outstanding patches:
+	- PoCo::Client::DNS patch by Jim Westfall
+	- DCC Resume patch by Bruno Boettcher
+	- Flood doc patch by Rocco Caputo
+	- Debug param patch by Paul Visscher
+	- Proxy Support patch by Jeff Pinyan
+	- Locops patch by Jon Nistor
+
+========== Maintainership changed from Fimm to BinGOs ====================
+
+2.9   Sat Jul 19 13:32:45 PDT 2003
+    - Only one change this time: Adam Foxson's patch to add prioritized
+      notices.
+
+2.8   Sat Jun  7 16:13:25 PDT 2003
+    - Applied dngor's mega-patch, which fixes (among other things): a
+      fix for a nasty lockup, improved error reporting, and better flood
+      control.
+    - Fixed some broken URLs and a couple mistakes in the documentation.
+
+2.7   Sun Feb  2 15:05:28 PST 2003
+    - Fixed up the example scripts to play nicer with POE's new signal
+      handling. Thanks to dngor for bringing this up.
+    - Added a patch by lunartear to properly handle spaces in DCC filenames.
+    - Fixed a bug reported by Robert Rendler regarding CTCP quoting
+      accidentally duplicating backslashes.
+
+2.6   Wed Dec 11 20:27:51 PST 2002
+    - Brian Kelly thoughtfully pointed out an URL in the documentation
+      that was being mangled by pod2html. Should look better now.
+    - Added a note about handling CTCP actions to the POD documentation,
+      since that seems to be a source of confusion for a lot of people.
+    - Added a 'list' event, which I seem to have overlooked entirely
+      until now. Thanks to J.D. McCown for pointing it out.
+    - Attempted to add Jim Westfall's asynchronous DNS patch, but I
+      really need to learn a little more about IPv6 before I attempt to
+      port somebody else's code to it. Hopefully in the next release.
+
+2.5   Sun Oct 27 11:03:57 PST 2002
+    - Added an AIM <-> IRC proxy bot to the example scripts. Share and enjoy!
+    - I just now noticed that POE::Component::IRC sessions never get
+      garbage-collected. DOH. Now you can send them "shutdown" events to
+      make them go away. Too bad it's probably too late to be breaking
+      backwards compatibility on this... sigh.
+    - Added a bug fix from Trym Skaar (those Norwegians get the coolest
+      names!) which fixes a potential crash while closing DCC connections.
+    - Added a mega-patch from the unstoppable Rocco Caputo which prioritizes
+      messages sent to the IRC server by importance. This ensures that
+      pings and login information will always keep flowing, even if your
+      bot's inane chatter has been throttled.
+
+2.4   Thu Oct 10 14:22:04 PDT 2002
+    - Added a patch from dngor to fix a crash caused by IRC servers
+      sometimes inexplicably sending a blank line.
+    - Added a patch from Jim Westfall which speeds up DCC file transfers
+      by a couple orders of magnitude. Yay, Jim!
+
+2.3   Fri Sep  6 07:59:50 PDT 2002
+    - Fixed a rare "uninitialized value" warning in oneoptarg().
+    - Added a patch from Trym Skaar which makes sure that DCC buffers
+      are flushed before closing a connection. Thanks, Trym!
+
+2.2   Fri May 24 13:00:44 PDT 2002
+    - dngor found an excellent page about IRC server numeric codes,
+      which I added a link to in the documentation.
+    - dngor also gave me two more patches: one to avoid some deprecation
+      warnings introduced in the latest version of POE, and another
+      which fixed a bug in one of his earlier patches. He's such a stud.
+
+2.1   Mon Mar  4 17:06:03 PST 2002
+    - Added a long-buried patch from thefly to fix IRCnet channel name
+      parsing. Sorry about the long turnaround on that one.
+    - Applied Scott Beck's patch to Rocco's refcount patch. The whole
+      "sessions not being GCed" brain-damage should be fixed now.
+
+2.0   Fri Feb 22 15:23:23 PST 2002
+    - Rocco Caputo gave me two patches to apply; the first was a fix to
+      his earlier output throttling patch, and the second was a snippet
+      of code that will allow bot-writers to avoid having to set aliases
+      on their control sessions to keep them alive. Cool!
+
+1.9   Wed Dec 12 22:44:13 PST 2001
+    - David Dollar pointed out a bug with DCC using the wrong interface
+      on multihomed hosts. Easy fix.
+
+1.8   Mon Dec 10 16:04:06 PST 2001
+    - Applied dngor's studly patch to throttle line output.
+    - Fixed a bug that would cause events to get thrown away if they
+      came in while the connection to the IRC server was down.
+
+1.7   Sat Jul 21 00:46:06 PDT 2001
+    - Fixed bugs in my initial implementations of the irc_invite event.
+      Sigh. You ever have one of those days where you can't do anything
+      right? Thanks again to the exceedingly patient Rasmus Hansen for
+      pointing out that my updated version still didn't work right.
+    - Fixed a bug in 'dcc_close' which prevented it from calling
+      'irc_dcc_done' handlers properly.
+
+1.5   Thu Jul  5 15:24:31 PDT 2001
+    - Added an irc_invite event -- I knew I'd forgotten something!
+      Thanks to Rasmus Hansen for the bug report.
+    - Fixed a bug in topic() that would accidentally clear the topic
+      when trying to query it. More thanks to Rasmus Hansen.
+
+1.4   Mon Jul  2 17:10:59 PDT 2001
+    - One of the fixes in 1.3 broke newline handling horribly, such that
+      it was sending two sets of line terminators on every line. I am a
+      doofus. Patched by Rocco Caputo.
+
+1.3   Sat Jun 30 17:29:30 PDT 2001
+    - The Indomitable Mark-Jason "Ominous" Dominus sent me so many
+      patches and bug reports I'm almost at a loss to list them all.
+      Among others, DCC SENDs no longer report the local pathname to the
+      client on the other end, multiple concurrent DCC connections work,
+      and some documentation errors have been fixed.
+    - Many thanks to the infinitely studly Kees Cook, who, in addition
+      to having a really cool name, sent me a big patch for lots of DCC
+      bugs. DCC connections will now report errors and close their
+      sockets properly! Woohoo! Also, 'irc_dcc_error' events give you
+      more information about the connection that failed, and the
+      'dcc_accept' event now lets you rename incoming DCC files.
+    - Fixed a silly bug; sl() was sending \n instead of \r\n as a line
+      terminator.
+    - Changed lots of Filter::CTCP die()s to warn()s, on the advice of
+      Peter Barabas. Thanks, Peter!
+
+1.2   Thu May 24 02:36:40 PDT 2001
+    - I have learned a valuable lesson about not including debugging
+      prints in released code. Especially when the debugging code in
+      question consists of somewhat vulgar inside jokes. :-)
+
+1.1   Fri Mar  2 03:07:01 PST 2001
+    - A couple patches from Jonathan Steinert: 'ctcp', 'privmsg', and
+      'notice' will join() their arguments together with spaces, and
+      'kick' will no longer accidentally concatenate the nick onto the
+      kick message. Thanks, Jon!
+
+1.0   Wed Feb 21 15:09:56 PST 2001
+    - Split 'irc_ctcp' messages into 'irc_ctcp' and 'irc_ctcpreply'.
+      My thanks to Jonathan Steinert.
+    - Rocco "dngor" Caputo fixed up my DCC code for me, which was so
+      broken as to exercise POE::Kernel bugs. :-) With his fixes in
+      mind, I rewrote pretty much all the DCC stuff; it's much less
+      hairy now.
+    - Added 'dcc_chat' and 'dcc_accept' commands.
+    - Moved all scripts into the "examples" directory and added a dummy
+      test.pl, so it won't hang during CPAN installations anymore.
+    - Worked around a bug in POE versions <0.1201, which caused DCC
+      SEND/GET connections not to properly respond to pending data.
+    - DCC connections should function properly now. Let me know if you
+      experience problems.
+
+1.0b  Sat Jan 13 14:49:22 PST 2001
+    - This is a beta release. It may not entirely work, and DCC receive
+      is still unimplemented. I'll list the bugs I remember fixing below.
+      1.0 final will have DCC receive capability, I promise!
+    - CTCP event names are now in the form of "irc_ctcp_ping" or
+      whatever. See the POD documentation.
+    - CTCP events now actually include the sender and recipient names.
+    - The infamous "Not an ARRAY reference" bug should now go away. Make
+      sure you're using a recent version of POE! Turned out it was a bug
+      in POE::Filter::Line.
+
+0.15  Tue Aug 10 19:21:58 EDT 1999
+    - Well, it sucked for the first revision, at least. In my eager haste,
+      I released the CTCP code with numerous debugging prints scattered
+      throughout the source, some serious brokenness in mixed-mode
+      messages, and a totally unimplemented put() method. All fixed! You
+      can now actually send CTCP messages with the 'ctcp' and 'ctcpreply'
+      events. Now to hack on DCC...
+
+0.14  Sun Aug  8 18:29:46 EDT 1999
+    - Wrote documentation for POE::Filter::IRC.
+    - Moved Filter.pm to Filter-IRC.pm, in preparation for adding a
+      CTCP filter.
+    - Addi <amh@mbl.is> fixed a nasty bug with public/msg handling in
+      the Filter-IRC module. I am SUCH a neen.
+    - Finally sat down and wrote the bloody CTCP filter, at long last.
+      Don't be surprised if it sucks for the first few revisions... the
+      last one I wrote did, too. On the other hand, this uses big chunks
+      of the working code from that effort, so maybe I'll get lucky this
+      time.
+
+0.13  Fri Jun  4 03:56:13 EDT 1999
+    - Split the parser off into a separate POE::Filter::IRC module.
+      The surgery was surprisingly easy, but I had to do an ugly
+      Makefile.PL hack to get it to install correctly.
+
+0.12  Fri Jun  4 01:16:55 EDT 1999
+    - Wrote a nice README, finally.
+    - Fixed a bug in the test.pl script where I accidentally referred
+      to the 'irc_disconnected' event as 'irc_disconnect'. No wonder it
+      wasn't shutting down properly.
+
+0.11  Thu Jun  3 18:41:51 EDT 1999
+    - Spruced up the parser's regexps with a lot of " +"'s.
+    - Turned off all the massively verbose debugging code.
+    - Realized that I need to write a README.
+
+0.1   Thu Jun  3 16:55:24 EDT 1999
+    - Completely functional, minus CTCP and DCC.
+
+0.1a  Mon May 17 09:11:48 EDT 1999
+    - Released for a little private QA to oznoid and dngor. Moderately
+      functional. Can send every command (I think), and has a
+      half-written parser that handles the most common IRC events, and
+      a few which it wasn't meant to handle.
+
+=============================================================================
+
+Key:
+
+Qnet == Quakenet <irc.quakenet.org>
+MAGnet == MAGnet <irc.perl.org>
+EFNet == efnet <irc.efnet.org>

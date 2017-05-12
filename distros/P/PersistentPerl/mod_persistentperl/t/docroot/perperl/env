@@ -1,0 +1,4 @@
+#!/usr/bin/perperl
+print "Content-type: text/html\n\n";
+print "ENVTEST=", (defined($ENV{ENVTEST}) ? $ENV{ENVTEST} : ''), "\n";
+print "warn=", $^W, "\n";

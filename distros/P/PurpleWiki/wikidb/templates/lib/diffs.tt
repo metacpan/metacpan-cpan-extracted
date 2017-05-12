@@ -1,0 +1,47 @@
+[% IF revision %]
+<p><b>Difference (from revision [% revision %] to current revision)</b>
+[% ELSIF nodiff %]
+<p><b>No diff available -- this is the first [% diffType %] revision</b>
+[% ELSE %]
+<p><b>Difference (from prior [% diffType %] revision)</b>
+[% END %]
+
+[% IF diffLinks.size == 0 %]
+(No diff available)
+[% ELSE %]
+  (
+  [% FOREACH diffLink = diffLinks %]
+    [% IF diffLink.type == 'major' %]
+    <a href="[% diffLink.url %]">major diff</a>
+    [% ELSIF diffLink.type == 'minor' %]
+    <a href="[% diffLink.url %]">minor diff</a>
+    [% ELSIF diffLink.type == 'author' %]
+    <a href="[% diffLink.url %]">author diff</a>
+    [% END %]
+    [% IF NOT loop.last %],[% END %]
+  [% END %]
+  )
+[% END %]
+</p>
+
+[% IF diffs.size == 0 %]
+<p>(The revisions are identical or unavailable.)</p>
+[% ELSE %]
+  [% FOREACH diff = diffs %]
+    [% IF diff.type == 'status' %]
+    <p><b>[% diff.text %]</b></p>
+    [% ELSIF diff.type == 'removed' %]
+    <table width="95%" bgcolor="#ffffaf">
+    <tr><td>
+      [% diff.text %]
+    </td></tr>
+    </table>
+    [% ELSIF diff.type == 'added' %]
+    <table width="95%" bgcolor="#cfffcf">
+    <tr><td>
+      [% diff.text %]
+    </td></tr>
+    </table>
+    [% END %]
+  [% END %]
+[% END %]

@@ -1,0 +1,60 @@
+0.27 Sat Aug 30 23:32:26 MDT 2014
+ - Add tests for top level scalars
+ - Found a serious bug with it and fix
+
+0.26 Sat Aug 30 21:29:04 PDT 2014
+ - Fix issue/2 and support RFC 7159
+ - Top level values can be any JSON value
+
+0.25 Sat Aug 16 14:11:47 PDT 2014
+ - Remove =travis section
+
+0.24 Sat Aug 16 11:54:11 PDT 2014
+ - Meta 0.0.2
+
+0.23 Fri Aug 15 20:22:31 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.22 Sat Aug  2 16:16:55 PDT 2014
+ - Fix Copyright years.
+
+0.21 Wed Jul 16 23:32:16 PDT 2014
+ - Move doc to Swim
+ - Fix Meta and add Contributing file
+
+0.20 Mon Jun 16 21:26:23 PDT 2014
+ - Doc Fix. haarg++
+
+0.19 Mon Jun 16 15:50:38 PDT 2014
+ - Switch to manual versioning and fix travis
+
+0.18 Sat Jun 14 13:55:40 PDT 2014
+ - Switch to Zilla::Dist
+
+0.17 Wed Feb 26 08:37:49 PST 2014
+ - Make API compatible with JSONY.pm
+ - Switch to dzil release
+
+0.16 Thu Nov  8 10:50:06 PST 2012
+ - New Pegex::Module API in Pegex-0.21.
+
+0.15 Sun Sep  9 16:13:29 PDT 2012
+ - Handle string escaping properly including unicode escapes and surrogate
+   pairs.
+
+0.14 Thu Aug 30 00:14:27 PDT 2012
+ - Forgot to update Pegex version
+
+0.13 Thu Aug 30 00:11:00 PDT 2012
+ - Use new Pegex
+
+0.12 Sat Nov  5 01:07:33 PDT 2011
+ - use Pegex::Mo instead of Mo.
+
+0.11 Fri Sep 30 01:54:50 CEST 2011
+ - Support negative numbers in grammar.
+
+0.10 Thu Sep 22 00:09:21 CEST 2011
+ - First Release
+ - Released from Liz++ and Wendy++'s Laundry Room. On the washing machine.
+

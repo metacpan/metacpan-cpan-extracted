@@ -1,0 +1,169 @@
+#!/usr/local/bin/perl
+# browse - Pogo database browser
+# 1999 Sey Nakajima <sey@jkc.co.jp>
+use Pogo;
+use PogoLink;
+use Getopt::Std;
+use strict;
+use vars qw($opt_m);
+
+$| = 1;
+getopts 'm:';
+require "$opt_m.pm" if $opt_m;
+my $Cfgfile = shift || usage();
+my(%Data, %Parent);
+main($Cfgfile);
+
+sub usage {
+	print "usage: $0 [-mModule] cfgfilename\n";
+	exit(1);
+}
+
+sub main {
+	my($cfgfile) = @_;
+	
+	$cfgfile = "$cfgfile.cfg" if !-f $cfgfile && -f "$cfgfile.cfg";
+	die "not exist $cfgfile\n" unless -f $cfgfile;
+	die "cfgfilename must have a '.cfg' extension\n" unless $cfgfile =~ /\.cfg$/;
+	
+	my $pogo = new Pogo $cfgfile;
+	print "$cfgfile opened\n";
+	
+	my $root = $pogo->root_tie;
+	my $location = 'root';
+	my $data = $root;
+	while(1) {
+		($location, $data) = browse($location, $data);
+		last if $location eq 'exit';
+		($location, $data) = ('root', $root) if $location eq 'root';
+	}
+}
+
+sub type {
+	my($data) = @_;
+	my($type, $class, $tiedclass) = Pogo::type_of($data);
+	my $oid = sprintf("%x", Pogo::object_id($data));
+	my $objclass = "($tiedclass)";
+	($type, $class, $objclass, $oid);
+}
+
+sub browse {
+	my($location, $data) = @_;
+	$Data{$location} = $data;
+	my($type, $class, $objclass, $oid) = type($data);
+	my $prompt = "$location=$class($type$objclass($oid))>";
+	while(1) {
+		print $prompt;
+		my $input = <STDIN>;
+		my($cmd, $arg) = $input =~ /(\w+)\s*([\w\.]*)/;
+		if( $cmd eq '' ) {
+			next;
+		} elsif( $cmd eq 'exit' ) {
+			return ('exit');
+		} elsif( $cmd eq 'ls' ) {
+			ls($data, $type, $arg);
+		} elsif( $cmd eq 'cd' ) {
+			my($loc, $dt) = cd($location, $data, $type, $arg);
+			return ($loc, $dt) if $loc || $dt;
+		} else {
+			help();
+		}
+	}
+}
+
+sub ls {
+	my($data, $type, $arg) = @_;
+	$arg ||= '.';
+	if( $type eq 'SCALAR' ) {
+		my $dt = $$data;
+		my($ref, $class, $objclass, $oid) = type($dt);
+		if( !defined $dt ) { print ". = undef\n"; }
+		elsif( $ref ) { print ". = $class($ref$objclass($oid))\n"; } 
+		else { print ". = \"$dt\"\n"; }
+	} elsif( $type eq 'ARRAY' ) {
+		my @invfield;
+		if( (Pogo::type_of($data->[0]))[0] eq 'HASH' ) {
+			for my $key(keys %{$data->[0]}) {
+				$invfield[$data->[0]->{$key}] = $key if $data->[0]->{$key};
+			}
+		}
+		for(my $j = 0; $j < @$data; $j++ ) {
+			if( $j =~ /$arg/ ) {
+				my $dt = $data->[$j];
+				my($ref, $class, $objclass, $oid) = type($dt);
+				my $k = $j;
+				$k .= "($invfield[$j])" if $invfield[$j];
+				if( !defined $dt ) { print "[$k] = undef\n"; }
+				elsif( $ref ) { print "[$k] = $class($ref$objclass($oid))\n"; } 
+				else { print "[$k] = \"$dt\"\n"; }
+			}
+		}
+	} elsif( $type eq 'HASH' ) {
+		while( my($k, $v) = each %$data ) {
+			if( $k =~ /$arg/ ) {
+				my($ref, $class, $objclass, $oid) = type($v);
+				if( !defined $v ) { print "{$k} = undef\n"; }
+				elsif( $ref ) { print "{$k} = $class($ref$objclass($oid))\n"; } 
+				else { print "{$k} = \"$v\"\n"; }
+			}
+		}
+	}
+}
+
+sub cd {
+	my($location, $data, $type, $arg) = @_;
+	my($loc, $dt) = ();
+	if( $arg eq '' ) {
+		$loc = 'root';
+	} elsif( $arg eq '..' ) {
+		$loc = $Parent{$location};
+		$dt = $Data{$loc};
+	} elsif( $type eq 'SCALAR' && $arg eq '.' ) {
+		if( ref($$data) ) {
+			$loc = "$location.";
+			$Parent{$loc} = $location;
+			$dt = $$data;
+		}
+	} elsif( $type eq 'ARRAY' && $arg >= 0 && $arg < @$data ) {
+		if( ref($data->[$arg]) ) {
+			$loc = "$location\[$arg\]";
+			$Parent{$loc} = $location;
+			$dt = $data->[$arg];
+		}
+	} elsif( $type eq 'HASH' ) {
+		unless( exists $data->{$arg} ) {
+			my @cand = grep /^\Q$arg/, keys %$data;
+			my($cand, $line);
+			for $cand(@cand) {
+				print "cd $cand? (y/n/e)";
+				$line = <STDIN>;
+				$arg = $cand, last if $line =~ /y/i;
+				last if $line =~ /e/i;
+			}
+		}
+		if( ref($data->{$arg}) ) {
+			$loc = "$location\{$arg\}";
+			$Parent{$loc} = $location;
+			$dt = $data->{$arg};
+		}
+	}
+	($loc, $dt);
+}
+
+sub help {
+	print <<END;
+  ls [pattern]
+       print key value pairs that key matches the pattern
+         a string value   : key = "value"
+         a reference value: key ->CLASS(TYPE)
+       key is index number(for array) or key string(for hash)
+       pattern is a regular expression
+       no pattern means all
+  cd [key]
+       change current data to a reference which is specified by the key
+       cannot change to a string value
+       key is . or .. or index number(for array) or key string(for hash)
+       no key means root
+  exit
+END
+}

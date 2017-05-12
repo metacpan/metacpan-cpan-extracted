@@ -1,0 +1,6 @@
+Revision history for Perl extension Parse::Text.
+
+0.02  Mon Jan 22 10:10:28 2001
+	- original version; created by h2xs 1.21 with options
+		-XAn Parse::Text
+

@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+
+exit;
+
+=head1 Name
+
+yay - This is the bar, foo
+
+=cut

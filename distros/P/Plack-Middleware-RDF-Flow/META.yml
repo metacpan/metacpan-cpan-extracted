@@ -1,0 +1,42 @@
+---
+abstract: 'Serve RDF as Linked Data for RDF::Flow'
+author:
+  - 'Jakob Voß <voss@gbv.de>'
+build_requires:
+  Data::Dumper: 0
+  English: 0
+  HTTP::Request: 0
+  HTTP::Request::Common: 0
+  Plack::Builder: 0
+  Plack::Test: 0
+  RDF::Flow::Dummy: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-RDF-Flow
+requires:
+  Carp: 0
+  Encode: 0
+  Exporter: 0
+  Log::Contextual: 0
+  Log::Contextual::WarnLogger: 0
+  Plack::Middleware: 0
+  Plack::Request: 0
+  Plack::Util::Accessor: 0
+  RDF::Flow: 0
+  RDF::Trine: 0
+  RDF::Trine::NamespaceMap: 0
+  RDF::Trine::Serializer: 0
+  Scalar::Util: 0
+  Try::Tiny: 0
+  parent: 0
+resources:
+  bugtracker: https://github.com/nichtich/Plack-Middleware-RDF-Flow/issues
+  repository: https://github.com/nichtich/Plack-Middleware-RDF-Flow
+version: 0.171

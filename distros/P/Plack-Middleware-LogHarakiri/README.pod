@@ -1,0 +1,98 @@
+=head1 NAME
+
+Plack::Middleware::LogHarakiri - log when a process is killed
+
+=head1 VERSION
+
+0.0301
+
+=head1 SYNOPSIS
+
+  use Plack::Builder;
+
+  builder {
+
+    enable "LogHarakiri";
+    enable "SizeLimit",  ...;
+
+    $app;
+  };
+
+=head1 INSTALLATION
+
+See
+L<How to install CPAN modules|http://www.cpan.org/modules/INSTALL.html>.
+
+=head2 Required Modules
+
+This distribution requires Perl v5.8.8.
+
+This distribution requires the following modules:
+
+=over 4
+
+=item * L<Capture::Tiny>
+
+=item * L<HTTP::Request::Common>
+
+=item * L<parent>
+
+=item * L<Plack>
+
+=item * L<Plack::Middleware>
+
+=item * L<Process::SizeLimit::Core>
+
+=back
+
+=head1 RECENT CHANGES
+
+=head2 Docmentation
+
+=over 4
+
+=item * 
+
+Added note about Plack::Middleware::SizeLimit 0.06's log_when_limits_exceeded option.
+
+=back
+
+See the F<Changes> file for a longer revision history.
+
+
+=head1 DESCRIPTION
+
+This middleware was written a companion to L<Plack::Middleware::SizeLimit>
+that emits a warning when a process is killed.
+
+When it detects that the current process is killed, it will emit a
+warning with diagnostic information of the form:
+
+  pid %d committed harakiri (size: %d, shared: %d, unshared: %d) at %s
+
+However, L<Plack::Middleware::SizeLimit> version 0.06 supports a
+C<log_when_limits_exceeded> option, which makes this middleware unnecessary
+for that purpose.
+
+Note that this middleware must be enabled before plugins that set the
+"harakiri" flag.
+
+=head1 SEE ALSO
+
+L<PSGI::Extensions>
+
+=head1 AUTHOR
+
+Robert Rothenberg C<< rrwo@thermeon.com >>
+
+=head1 COPYRIGHT
+
+Copyright 2015, Thermeon Worldwide, PLC.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+

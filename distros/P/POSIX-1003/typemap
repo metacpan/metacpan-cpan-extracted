@@ -1,0 +1,6 @@
+mode_t    T_UV
+dev_t     T_UV
+gid_t     T_UV
+uid_t     T_UV
+off_t     T_UV
+pid_t     T_UV

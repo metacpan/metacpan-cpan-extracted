@@ -1,0 +1,12 @@
+<!-- error: /Node incomplete; expecting: <.*</ -->
+<Octothorpe>
+  <colon/>
+  <pipe dollar_sign="£">
+    <fishhooks>
+      <space/>
+      <slash>clunk</slash>
+      <underscore/>
+      <underscore><backslash><umlout>42</umlout></backslash></underscore>
+    </fishhooks>
+  </pipe>
+</Octothorpe>

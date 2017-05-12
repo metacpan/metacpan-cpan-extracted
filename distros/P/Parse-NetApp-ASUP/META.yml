@@ -1,0 +1,37 @@
+---
+abstract: 'Parse NetApp Weekly Auto Support Files'
+author:
+  - 'Phil Pollard <bennie@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.96, CPAN::Meta::Converter version 2.120630'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-NetApp-ASUP
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+provides:
+  Parse::NetApp::ASUP:
+    file: lib/Parse/NetApp/ASUP.pm
+    version: 1.17
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  Digest::MD5: 2.5
+  File::Slurp: 9999.19
+  Test: 0
+  Test::More: 0
+  Test::Simple: 0
+  perl: 5.006
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Parse-NetApp-ASUP
+  repository: git://github.com/bennie/perl-Parse-NetApp-ASUP.git
+version: 1.17

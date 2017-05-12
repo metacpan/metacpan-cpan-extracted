@@ -1,0 +1,51 @@
+= Fighting WikiSpam =
+
+In an ideal Wiki world, the Wiki community is so active, its members
+manually fix vandalism as soon as it happens.  To make this recovery
+process easier, PurpleWiki allows you to overwrite the current
+(presumably vandalized) version of a page with an older version.
+
+You can do this one of two ways.  You can select "View other
+revisions" at the bottom of a page, then select "Edit" of the revision
+you want to recover.  Or, you can view the revision first, and click
+on "Recover this text" at the bottom of that page.
+
+Both of these functions do exactly the same thing: It takes you to an
+edit page with the text of the old revision.  When you save your
+changes, ''it does not overwrite the old revision.''  It creates a new
+version of the page with the old text.
+
+If your Wiki does not host the ideal Wiki community (and most don't),
+there are other mechanisms for fighting WikiSpam.  One is to identify
+the responsible IP address or hostname and place it in a file called
+{{{banlist}}} in your {{{wikidb}}} directory.  Be careful that you are
+not banning an address that is also the source of legitimate users.
+
+Another is to require login to edit pages.  To do this, simply
+uncomment {{{<nowiki>LoginToEdit</nowiki>}}} in your config file.
+You'll also want to modify the common/pagebar.tt so that the "Edit"
+link does not appear if {{{userName}}} is not defined (additions in
+'''bold'''):
+
+{{{
+[% IF editUrl %]
+<div class="pagebar">
+[% IF revision %]
+'''[% IF userName %]'''
+<a href="[% editUrl %]">Recover this text</a> |
+'''[% END %]'''
+<a href="[% pageUrl %]">View current revision</a>
+</div>
+[% ELSE %]
+'''[% IF userName %]'''
+<a href="[% editUrl %]">Edit text of this page</a> |
+'''[% END %]'''
+<a href="[% revisionsUrl %]">View other revisions</a>
+</div>
+[% END %]
+[% ELSIF showDiff %]
+<div class="pagebar">
+<a href="[% revisionsUrl %]">View other revisions</a>
+</div>
+[% END %]
+}}}

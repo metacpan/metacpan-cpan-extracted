@@ -1,0 +1,302 @@
+NAME
+    Person::ID::CZ::RC - Perl class for Czech RC identification.
+
+SYNOPSIS
+     use Person::ID::CZ::RC;
+     my $obj = Person::ID::CZ::RC->new(%params);
+     my $alternate = $obj->alternate;
+     my $checksum = $obj->checksum;
+     my $error = $obj->error;
+     my $is_valid = $obj->is_valid;
+     my $month = $obj->month;
+     my $rc = $obj->rc;
+     my $serial = $obj->serial;
+     my $sex = $obj->sex;
+     my $year = $obj->year;
+
+METHODS
+    "new(%params)"
+             Constructor.
+
+            *       "rc"
+
+                     Input Czech RC identification.
+                     It is required.
+
+    "alternate()"
+             Get flag, that means alternate RC identification.
+             Returns 0/1.
+
+    "checksum()"
+             Get checksum.
+             Returns string with one number character or '-'.
+
+    "day()"
+             Get day of birth.
+             Returns string with day.
+
+    "error()"
+             Get error.
+             Returns error string or undef.
+
+    "is_valid()"
+             Get flag, that means validity of rc identification.
+             Returns 0/1.
+
+    "month()"
+             Get month of birth.
+             Returns string with month.
+
+    "rc()"
+             Get rc identification.
+             Returns string with rc identification.
+
+    "serial()"
+             Get serial part of rc identification.
+             Returns string with three numbers.
+
+    "sex()"
+             Get flag, that means sex of person.
+             Returns male/female string.
+
+    "year()"
+             Get year of birth.
+             Returns string with year.
+
+ERRORS
+     new():
+             Parameter 'rc' is required.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Person::ID::CZ::RC;
+
+     # Object.
+     my $obj = Person::ID::CZ::RC->new(
+             'rc' => '840501/1330',
+     );
+
+     # Get error.
+     my $error = $obj->error || '-';
+
+     # Print out.
+     print "Personal number: ".$obj->rc."\n";
+     print "Year: ".$obj->year."\n";
+     print "Month: ".$obj->month."\n";
+     print "Day: ".$obj->day."\n";
+     print "Sex: ".$obj->sex."\n";
+     print "Serial: ".$obj->serial."\n";
+     print "Checksum: ".$obj->checksum."\n";
+     print "Alternate: ".$obj->alternate."\n";
+     print "Valid: ".$obj->is_valid."\n";
+     print "Error: ".$error."\n";
+
+     # Output:
+     # Personal number: 840501/1330
+     # Year: 1984
+     # Month: 05
+     # Day: 01
+     # Sex: male
+     # Serial: 133
+     # Checksum: 0
+     # Alternate: 0
+     # Valid: 1
+     # Error: -
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Person::ID::CZ::RC;
+
+     # Object.
+     my $obj = Person::ID::CZ::RC->new(
+             'rc' => '840230/1337',
+     );
+
+     # Get error.
+     my $error = $obj->error || '-';
+
+     # Print out.
+     print "Personal number: ".$obj->rc."\n";
+     print "Year: ".$obj->year."\n";
+     print "Month: ".$obj->month."\n";
+     print "Day: ".$obj->day."\n";
+     print "Sex: ".$obj->sex."\n";
+     print "Serial: ".$obj->serial."\n";
+     print "Checksum: ".$obj->checksum."\n";
+     print "Alternate: ".$obj->alternate."\n";
+     print "Valid: ".$obj->is_valid."\n";
+     print "Error: ".$error."\n";
+
+     # Output:
+     # Personal number: 840230/1337
+     # Year: 1984
+     # Month: 02
+     # Day: 30
+     # Sex: male
+     # Serial: 133
+     # Checksum: 7
+     # Alternate: 0
+     # Valid: 0
+     # Error: Date isn't valid.
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Person::ID::CZ::RC;
+
+     # Object.
+     my $obj = Person::ID::CZ::RC->new(
+             'rc' => '840229/1330',
+     );
+
+     # Get error.
+     my $error = $obj->error || '-';
+
+     # Print out.
+     print "Personal number: ".$obj->rc."\n";
+     print "Year: ".$obj->year."\n";
+     print "Month: ".$obj->month."\n";
+     print "Day: ".$obj->day."\n";
+     print "Sex: ".$obj->sex."\n";
+     print "Serial: ".$obj->serial."\n";
+     print "Checksum: ".$obj->checksum."\n";
+     print "Alternate: ".$obj->alternate."\n";
+     print "Valid: ".$obj->is_valid."\n";
+     print "Error: ".$error."\n";
+
+     # Output:
+     # Personal number: 840229/1330
+     # Year: 1984
+     # Month: 02
+     # Day: 29
+     # Sex: male
+     # Serial: 133
+     # Checksum: 0
+     # Alternate: 0
+     # Valid: 0
+     # Error: Checksum isn't valid.
+
+EXAMPLE4
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Person::ID::CZ::RC;
+
+     # Object.
+     my $obj = Person::ID::CZ::RC->new(
+             'rc' => '840229/133',
+     );
+
+     # Get error.
+     my $error = $obj->error || '-';
+
+     # Print out.
+     print "Personal number: ".$obj->rc."\n";
+     print "Year: ".$obj->year."\n";
+     print "Month: ".$obj->month."\n";
+     print "Day: ".$obj->day."\n";
+     print "Sex: ".$obj->sex."\n";
+     print "Serial: ".$obj->serial."\n";
+     print "Checksum: ".$obj->checksum."\n";
+     print "Alternate: ".$obj->alternate."\n";
+     print "Valid: ".$obj->is_valid."\n";
+     print "Error: ".$error."\n";
+
+     # Output:
+     # Personal number: 840229/133
+     # Year: 1984
+     # Month: 02
+     # Day: 29
+     # Sex: male
+     # Serial: 133
+     # Checksum: -
+     # Alternate: 0
+     # Valid: 0
+     # Error: Format of rc identification hasn't checksum.
+
+EXAMPLE5
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Person::ID::CZ::RC;
+
+     # Object.
+     my $obj = Person::ID::CZ::RC->new(
+             'rc' => '840229|1330',
+     );
+
+     # Get error.
+     my $error = $obj->error || '-';
+
+     # Print out.
+     print "Personal number: ".$obj->rc."\n";
+     print "Year: ".$obj->year."\n";
+     print "Month: ".$obj->month."\n";
+     print "Day: ".$obj->day."\n";
+     print "Sex: ".$obj->sex."\n";
+     print "Serial: ".$obj->serial."\n";
+     print "Checksum: ".$obj->checksum."\n";
+     print "Alternate: ".$obj->alternate."\n";
+     print "Valid: ".$obj->is_valid."\n";
+     print "Error: ".$error."\n";
+
+     # Output:
+     # Personal number: 840229|1330
+     # Year: -
+     # Month: -
+     # Day: -
+     # Sex: -
+     # Serial: -
+     # Checksum: -
+     # Alternate: -
+     # Valid: 0
+     # Error: Format of rc identification isn't valid.
+
+DEPENDENCIES
+    Class::Utils, DateTime, English, Error::Pure.
+
+SEE ALSO
+    Business::DK::CPR
+        Danish CPR (SSN) number generator/validator
+
+    No::PersonNr
+        Check Norwegian Social security numbers
+
+    Person::ID::CZ::RC::Generator
+        Perl class for Czech RC identification generation.
+
+    Se::PersonNr
+        Module for validating and generating a Swedish personnummer.
+
+REPOSITORY
+    <https://github.com/tupinek/Person::ID::CZ::RC>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © Michal Špaček 2013-2015
+     BSD 2-Clause License
+
+VERSION
+    0.04
+

@@ -1,0 +1,176 @@
+=head1 NAME
+
+Pots::Tutorial - Perl ObjectThreads tutorial
+
+=head1 DESCRIPTION
+
+This document contains some examples that show typical usage of
+the Perl ObjectThreads classes (or "Pots" for short).
+
+The idea behind Pots was to be able to use Perl ithreads
+in an object-oriented manner, which led to C<Pots::Thread>.
+Then it would be nice to communicate with these threads using
+messages and message queues. C<Pots::Message> and C<Pots::MessageQueue>
+were born.
+What about the desire for inter-thread method calls ? No matter how
+painful that was to play with shared variables, C<Pots::Thread::MethodClient>
+and C<Pots::Thread::MethodServer> came out of the dark.
+
+Enough talking, show me the code !
+
+=head1 SIMPLE THREAD
+
+First, let's create a simple class derived from C<Pots::Thread>.
+
+    package MyThread;
+
+    use strict;
+    use warnings;
+
+    use base qw(Pots::Thread);
+
+    sub run {
+        my $self = shift;
+
+        print "Hello there, I'm thread #", $self->tid(), "\n";
+    }
+
+    1;
+
+    package main;
+
+    my $th = MyThread->new();
+    $th->start();
+    sleep(5);
+    $th->stop();
+
+The important thing to note are:
+
+- You must call "start()" and "stop()" for the thread to start and stop.
+
+=head1 MESSAGES
+
+Now, we're going to use messaging to communicate with our thread.
+It's easy, you call "postmsg()" to send a message, and "getmsg()" to
+read a message. Each thread object has two message queues, one for
+sending and one for receiving. The two methods will automatically
+select the right queue, depending the context (parent or child
+thread) from which they are called.
+
+When you use messaging, it is important to handle special "control"
+messages. For the moment, the only important message is the "quit"
+message, sent when you call "stop()" on the thread object.
+
+Let's see an example.
+
+    package MyThread;
+
+    use strict;
+    use warnings;
+
+    use base qw(Pots::Thread);
+
+    sub run {
+        my $self = shift;
+        my $msg;
+        my $quit = 0;
+
+        while (!$quit) {
+            $msg = $self->getmsg();
+
+            for ($msg->type()) {
+                if (/quit/) {
+                    $quit = 1;
+                } else {
+                    print "Got a message of type ", $msg->type(), "\n";
+                }
+            }
+        }
+    }
+
+    1;
+
+    package main;
+
+    use Pots::Message;
+
+    my $th = MyThread->new();
+    $th->start();
+
+    my $msg = Pots::Message->new('MyMessage');
+    $th->postmsg($msg);
+
+    sleep(5);
+    $th->stop();
+
+Messages are simple objects. They have a type which is set by the first argument
+to "new()" or by the "type()" method. You can then attach any data to the message
+using the "set()" method. See C<Pots::Message> for further information.
+
+=head1 METHOD SERVER AND CLIENT
+
+The C<Pots::Thread::MethodServer> is a class derived from C<Pots::Thread>. It is
+used to expose a class to other threads and allow you to call methods of this
+class using local method calls, that is transparently. It is similar to RPCs.
+
+The following example will show you how to define and use a simple server.
+
+    use strict;
+    use warnings;
+
+    use threads;
+    use threads::shared;
+
+    use Pots::Thread::MethodServer;
+
+    $|=1;
+
+    # Class that will be exposed
+    package Some::Class;
+
+    use base qw(Pots::SharedObject);
+
+    sub method1 {
+        my $self = shift;
+
+        print "method1 called with ", join(' ', @_), "\n";
+
+        return 42;
+    }
+
+    1;
+
+    package main;
+
+    my $ms = Pots::Thread::MethodServer->new(cclass => 'Some::Class');
+    $ms->start() or die "MethodServer failed to start\n";
+
+    my $cli = $ms->client();
+
+    my $ret = $cli->method1("foo", 1234, "bar");
+    print "MAIN: ret = $ret\n";
+
+    sleep(5);
+    $ms->stop();
+
+First, we start by defining a simple class, "Some::Class", to be exposed by
+the method server.
+
+Next we create a method server object, specifying the class to expose, and
+start it.
+
+Finally, the special proxy object, as returned by method server's "client()"
+method, will behave exactly the same as an object of class "Some::Class"
+except that it will trap any method calls and forward them to the method server.
+The server will then call the specified method on the real object and forward
+the results back to the proxy object and to your program.
+
+=head1 AUTHOR and COPYRIGHT
+
+Remy Chibois E<lt>rchibois at free.frE<gt>
+
+Copyright (c) 2004 Remy Chibois. All rights reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

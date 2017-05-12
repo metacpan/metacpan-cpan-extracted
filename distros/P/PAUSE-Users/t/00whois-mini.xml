@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cpan-whois xmlns='http://www.cpan.org/xmlns/whois'
+            last-generated='Sat Nov 16 18:19:01 2013 UTC'
+            generated-by='/home/puppet/pause/cron/cron-daily.pl'>
+ <cpanid>
+  <id>NBERTRAM</id>
+  <type>author</type>
+  <fullname>Neil Bertram</fullname>
+  <email>CENSORED</email>
+  <homepage>http://www.webbedfeet.net.nz/</homepage>
+ </cpanid>
+ <cpanid>
+  <id>NEILB</id>
+  <type>author</type>
+  <fullname>Neil Bowers</fullname>
+  <email>neil@bowers.com</email>
+  <has_cpandir>1</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>NHAINER</id>
+  <type>author</type>
+  <fullname>Neil Hainer</fullname>
+  <email>CENSORED</email>
+ </cpanid>
+</cpan-whois>

@@ -1,0 +1,34 @@
+Revision history for Perl extension Perl6::Currying.
+
+0.01  Tue May 14 16:46:41 2002
+	- original version; created by h2xs 1.20 with options
+		-A -P -X -f -n Perl6::Currying
+
+
+0.02	Wed May 15 10:51:23 2002
+
+	- Added Filter::Simple as a prerequisite
+
+
+0.03	Wed May 15 10:55:24 2002
+
+	- Correctly added Filter::Simple as a prerequisite :-(
+
+
+0.05	Wed May 29 11:40:45 2002
+
+	- Reborn as Perl6::Placeholders after we decided to 
+	  completely change how the currying mechanism worked.
+	  (Thanks Angel!)
+
+	- Optimized placeholder detection regex
+
+0.06    Fri Oct 7  00:22:00 2005
+
+        - Luke Palmer resurrected maintenance of this module.
+        
+        - Fixed a bug where { $^x + $^x } would be a two-parameter function.
+
+0.07    Sat Oct 8  14:47:00 2005
+
+        - Fixed a documentation bug.  Smylers++

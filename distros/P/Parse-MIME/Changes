@@ -1,0 +1,20 @@
+Revision history for Parse-MIME
+
+1.003 Sat 10 Jan 2015
+	- No functional changes
+	- No longer contains INSTALL file with install-as-root instructions
+
+1.002 Mon 05 Jan 2014
+	- No functional changes.
+	- Specified 5.6 minimum Perl requirement.
+	- Cleaned up test suite.
+
+1.001 Thu 10 Jul 2014
+	- Bump Dist::Zilla version and re-release to fix deps.
+	  No code changes. (Spotted by Olaf Alders.)
+
+1.000 Fri 03 Aug 2012
+	- Initial CPAN release.
+
+0.001 Sun 21 Dec 2008
+	- Initial release.

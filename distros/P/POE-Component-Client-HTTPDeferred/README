@@ -1,0 +1,27 @@
+This is Perl module POE::Component::Client::HTTPDeferred.
+
+INSTALLATION
+
+POE::Component::Client::HTTPDeferred installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan POE::Component::Client::HTTPDeferred
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+POE::Component::Client::HTTPDeferred documentation is available as in POD. So you can do:
+
+    % perldoc POE::Component::Client::HTTPDeferred
+
+to read the documentation online with your favorite pager.
+
+Daisuke Murase

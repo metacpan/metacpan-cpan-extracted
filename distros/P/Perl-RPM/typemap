@@ -1,0 +1,36 @@
+# Treat this as -*- text -*-
+
+TYPEMAP
+
+const char *            T_PV
+RPM::Database           T_HvRefPtr
+RPM::Header             T_HvRefPtr
+RPM_Tag                 T_RPM_Tag
+
+INPUT
+T_HvRefPtr
+    {
+        $var = rpm_hvref2ptr(aTHX_ $arg, \"$ntype\");
+        if (!$var)
+            Perl_croak(aTHX_ \"%s: %s is not of type %s\",
+                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+                        \"$var\", \"$ntype\");
+    }
+
+T_RPM_Tag
+    {
+        $var = rpmtag_sv2iv(aTHX_ $arg);
+        if ($var <= 0) {
+            Perl_warn(aTHX_ \"%s: %s\",
+                        ${$ALIAS?\q[GvNAME(CvGV(cv))]:\qq[\"$pname\"]},
+                        SvPV_nolen(rpm_errSV));
+            XSRETURN_EMPTY;
+        }
+    }
+
+OUTPUT
+T_HvRefPtr
+        $arg = rpm_ptr2hvref(aTHX_ $var, \"$ntype\");
+
+T_RPM_Tag
+        $arg = rpmtag_iv2sv(aTHX_ $var);

@@ -1,0 +1,52 @@
+---
+abstract: 'Lightweight Prereqs Scanner for Perl'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  Test::Deep: '0'
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-PrereqScanner-Lite
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Perl::PrereqScanner::Lite:
+    file: lib/Perl/PrereqScanner/Lite.pm
+    version: '0.26'
+  Perl::PrereqScanner::Lite::Constants:
+    file: lib/Perl/PrereqScanner/Lite/Constants.pm
+  Perl::PrereqScanner::Lite::Scanner::Moose:
+    file: lib/Perl/PrereqScanner/Lite/Scanner/Moose.pm
+  Perl::PrereqScanner::Lite::Scanner::Version:
+    file: lib/Perl/PrereqScanner/Lite/Scanner/Version.pm
+requires:
+  CPAN::Meta::Requirements: '2.125'
+  Carp: '0'
+  Compiler::Lexer: '0.22'
+  Module::Path: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/moznion/Perl-PrereqScanner-Lite/issues
+  homepage: https://github.com/moznion/Perl-PrereqScanner-Lite
+  repository: git://github.com/moznion/Perl-PrereqScanner-Lite.git
+version: '0.26'
+x_contributors:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'

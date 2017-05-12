@@ -1,0 +1,22 @@
+Readme for module Package-Subroutine
+------------------------------------
+
+This is a collection of subroutines to work with
+subroutines and packages. It is a very simple wrapper
+around the perl syntax for doing that to improve readabilty
+of the code.
+
+At the very least you should be able to use this set of instructions
+to install the module...
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+
+This module contains as syntactic sugar the 'from' package.
+This module targets not library development and should only be used
+for in house projects.
+
+

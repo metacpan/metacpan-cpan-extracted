@@ -1,0 +1,45 @@
+{
+   "abstract" : "Inter-Kernel Communication for POE",
+   "author" : [
+      "Philip Gwyn <gwyn -at- cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.92, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-IKC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dump" : "1",
+            "Devel::Size" : "0.77",
+            "POE" : "1.311",
+            "Scalar::Util" : "1",
+            "Test::More" : "0.6"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.2402"
+}

@@ -1,0 +1,14 @@
+CHANGES
+MANIFEST
+Makefile.PL
+README
+eg/test-subnet.pl
+lib/POE/Component/Client/Ping.pm
+t/00_info.t
+t/01_ping.t
+t/02_arbitrary_data.t
+t/03_provided_socket.t
+t/04_timeout_retry.t
+t/zz_rt_72055.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

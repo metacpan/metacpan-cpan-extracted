@@ -1,0 +1,26 @@
+<p>
+[% FOREACH page = pageHistory %]
+  Revision [% page.revision %]:
+  <a href="[% page.pageUrl %]">View</a>
+  [% IF page.diffUrl %]
+    <a href="[% page.diffUrl %]">Diff</a>
+  [% ELSE %]
+    Diff
+  [% END %]
+  [% IF page.editUrl %]
+    <a href="[% page.editUrl %]">Edit</a>
+  [% ELSE %]
+    Edit
+  [% END %]
+  . . [% page.dateTime %] by
+  [% IF page.user %]
+    [% page.user %]
+  [% ELSE %]
+    [% page.host %]
+  [% END %]
+  [% IF page.summary %]
+    <b>[% page.summary %]</b>
+  [% END %]
+  <br />
+[% END %]
+</p>

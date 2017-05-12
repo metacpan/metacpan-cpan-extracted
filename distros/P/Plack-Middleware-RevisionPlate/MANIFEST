@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+examples/REVISION
+examples/app.psgi
+lib/Plack/Middleware/RevisionPlate.pm
+minil.toml
+t/00_compile.t
+t/01_fundamental.t
+t/02_plack_test.t
+t/assets/REVISION_FILE
+META.yml
+MANIFEST

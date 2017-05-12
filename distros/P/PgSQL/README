@@ -1,0 +1,41 @@
+
+The PgSQL module is Copyright (c) 1998 Göran Thyni, Sweden.
+All rights reserved.
+
+You may distribute under the terms of either 
+the GNU General Public License version 2 (or later)
+or the Artistic License, as specified in the Perl README file.
+
+For more info on GNU software and the GPL see:
+http://www.gnu.org/
+
+-------------------------------------------------------------------
+
+This is PgSQL a "pure perl" module to access a
+PostgreSQL database written by Göran Thyni <goran@kyla.kiruna.se>.
+
+PLEASE NOTE !!
+This version of the PgSQL module
+uses the protocol of the upcoming PostgreSQL v. 6.4.
+It will not work with older versions.
+
+Version 0.50 is the first public release.
+It still misses some planned features,
+see to ToDo-file.
+Consider this alpha quality software.
+
+Bug reports, bug fixes and contributions welcome,
+write me at <goran@kyla.kiruna.se>.
+
+I'm also following the mailing list:
+pgsql-interfaces@postgresql.org
+For more info on postgresql mailing lists se
+http://www.postgresql.org/
+
+Share and enjoy,
+	Göran.
+
+
+
+
+

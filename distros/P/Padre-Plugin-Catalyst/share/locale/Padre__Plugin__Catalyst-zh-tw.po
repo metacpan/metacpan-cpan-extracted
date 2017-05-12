@@ -1,0 +1,97 @@
+# Chinese translations for PACKAGE package.
+# Copyright (C) 2009 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Matthew Lien <BlueT@bluet.org>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-19 00:04+0800\n"
+"PO-Revision-Date: 2009-05-19 00:05+0800\n"
+"Last-Translator: BlueT - Matthew Lien - 練喆明 <BlueT@bluet.org>\n"
+"Language-Team: Chinese (traditional) <bluet@ubuntu-tw.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/Catalyst.pm:47
+msgid "New Catalyst Application"
+msgstr "新的 Catalyst 軟體"
+
+#: lib/Padre/Plugin/Catalyst.pm:52
+msgid "Create new..."
+msgstr "新增..."
+
+#: lib/Padre/Plugin/Catalyst.pm:53
+msgid "Model"
+msgstr "Model"
+
+#: lib/Padre/Plugin/Catalyst.pm:57
+msgid "View"
+msgstr "檢視"
+
+#: lib/Padre/Plugin/Catalyst.pm:61
+msgid "Controller"
+msgstr "控制器"
+
+#: lib/Padre/Plugin/Catalyst.pm:67
+msgid "Start Web Server"
+msgstr "啟動網頁伺服器"
+
+#: lib/Padre/Plugin/Catalyst.pm:68
+msgid "Stop Web Server"
+msgstr "停止網頁伺服器"
+
+#: lib/Padre/Plugin/Catalyst.pm:70
+msgid "Catalyst Online References"
+msgstr "Catalyst 線上參考"
+
+#: lib/Padre/Plugin/Catalyst.pm:74
+msgid "Catalyst Cookbook"
+msgstr "Catalyst 食譜"
+
+#: lib/Padre/Plugin/Catalyst.pm:77
+msgid "Recommended Plugins"
+msgstr "建議的外掛"
+
+#: lib/Padre/Plugin/Catalyst.pm:80
+msgid "Examples"
+msgstr "範例"
+
+#: lib/Padre/Plugin/Catalyst.pm:83
+msgid "Catalyst Wiki"
+msgstr "Catalyst Wiki"
+
+#: lib/Padre/Plugin/Catalyst.pm:86
+msgid "Catalyst Website"
+msgstr "Catalyst 網站"
+
+#: lib/Padre/Plugin/Catalyst.pm:91
+msgid "About"
+msgstr "關於"
+
+#: lib/Padre/Plugin/Catalyst.pm:109
+#, perl-format
+msgid ""
+"Catalyst development web server not found at\n"
+"%s\n"
+"\n"
+"Please make sure the active document is from your Catalyst project."
+msgstr ""
+"Catalyst 開發用網頁伺服器未找到於\n"
+"%s\n"
+"\n"
+"請確認作用中的文件是來自於你的 Catalyst 專案."
+
+#: lib/Padre/Plugin/Catalyst.pm:112
+msgid "Server not found"
+msgstr "找不到伺服器"
+
+#: lib/Padre/Plugin/Catalyst.pm:132
+msgid "Web server appears to be running. Launch web browser now?"
+msgstr "網頁伺服器似乎是在運作中. 要開起瀏覽器嗎?"
+
+#: lib/Padre/Plugin/Catalyst.pm:133
+msgid "Start Web Browser?"
+msgstr "要啟動網頁伺服器嗎?"

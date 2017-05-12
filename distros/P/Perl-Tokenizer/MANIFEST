@@ -1,0 +1,19 @@
+bin/pfilter
+bin/pl2html
+bin/pl2term
+Build.PL
+Changes
+lib/Perl/Tokenizer.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-perl_lex.t
+t/02-regex.t
+t/03-code.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

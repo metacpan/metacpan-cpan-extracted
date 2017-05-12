@@ -1,0 +1,36 @@
+Math::Calc - Simple example illustrating how to use Parse::Eyapp
+ 
+SYNOPSIS
+ 
+  $ perl Makefile.PL
+  $ make calc
+  $ cd scripts/
+  scripts$ calc.pl
+  Expression:
+  2*3+4
+  10
+
+NOTES
+
+Use 
+ 
+   make myclean
+
+to delete the C<lib/Math/Calc.pm>
+file
+
+LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2006-2008 Casiano Rodriguez-Leon (casiano@ull.es). All rights reserved.
+
+These modules are free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+
+
+

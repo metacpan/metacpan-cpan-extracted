@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Perl6/Variables.pm
+demo.pl
+test.pl

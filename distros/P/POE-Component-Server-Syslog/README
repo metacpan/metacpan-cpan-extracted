@@ -1,0 +1,49 @@
+NAME
+
+    POE::Component::Server::Syslog - syslog services for POE
+
+VERSION
+
+    version 1.22
+
+SYNOPSIS
+
+        POE::Component::Server::Syslog->spawn(
+            Type        => 'udp', # or 'tcp'
+            BindAddress => '127.0.0.1',
+            BindPort    => '514',
+            InputState  => \&input,
+        );
+    
+        sub input {
+            my $message = $_[ARG0];
+            # .. do stuff ..
+        }
+
+DESCRIPTION
+
+    This component provides very simple syslog services for POE.
+
+METHODS
+
+ spawn()
+
+    Spawns a new listener. Requires one argument, Type, which defines the
+    subclass to be invoked. This value can be either 'tcp' or 'udp'. All
+    other arguments are passed on to the subclass' constructor. See
+    POE::Component::Server::Syslog::TCP and
+    POE::Component::Server::Syslog::UDP for specific documentation. For
+    backward compatibility, Type defaults to udp.
+
+AUTHOR
+
+    Matt Cashner (sungo@pobox.com)
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2017 by Matt Cashner (sungo@pobox.com).
+
+    This is free software, licensed under:
+
+      The (three-clause) BSD License
+

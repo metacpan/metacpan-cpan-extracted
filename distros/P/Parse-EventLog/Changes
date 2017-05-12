@@ -1,0 +1,17 @@
+Revision history for Perl extension Parse-EventLog.
+
+0.7  Wed Jul 19 17:52:22 2006
+	- Added detection for SID string length. Fixes bug where
+	  Strings are returned without the first few characters.
+	- Cleaned up POD.
+
+0.6  Sun Mar  6 16:25:33 2005
+	- Corrected UTF string parsing routines (now uses Encode module).
+	- Event fields for Source, Computer, and SID (new!) are now available
+	  and valid.
+	- Rewrote string parsing code to be cleaner and more modular.
+	- Comments cleaned up.
+
+0.5  Sat Jan 15 20:33:45 2005
+	- original version;
+

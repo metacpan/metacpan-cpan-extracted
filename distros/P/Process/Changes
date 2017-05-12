@@ -1,0 +1,99 @@
+Revision history for Perl extension Process
+
+0.30 Thu 27 Oct 2011
+	- Bump File::Remove to 1.51 to get fork safety
+
+0.29 Thu 27 Oct 2011
+	- Updating to Module::Install::DSL 1.04
+	- Use explicit input file instead of STDIN binding
+
+0.28 Sat 26 Feb 2011
+	- Updating to Module::Install::DSL 1.00
+	- Moving Perl::MinimumVersion test to xt and fixing 5.006 dependency
+	- Updating copyright year
+
+0.27 Thu 25 Jun 2009
+	- Updating to Module::Install::DSL 0.91
+	- Explicitly close the temporary filehandles in ->delegate (they leak)
+
+0.26 Tue 14 Apr 2009
+	- Updating to Module::Install::DSL 0.83
+
+0.25 Sun 12 Apr 2009
+	- Catch the error if there IS no output. (CSJEWELL)
+
+0.24 Wed  9 Apr 2009
+	- Upgraded to Module::Install::DSL 0.82
+
+0.23 Tue  8 Apr 2009
+	- Upgraded to Module::Install::DSL 0.81
+	- Incremental cleanup release in preparation for major
+	  refactoring, leading to Process 1.00 (which will have
+	  a modified API).
+	- Moved Process::Serializable to Process::Role::Serializable
+	- Added a basic version of Process::Probe
+	- Removed the use of base.pm
+	- Updating minimum version of Perl to 5.00503
+
+0.22 Wed  2 Jan 2008
+	- Moving from Perl::Exe to Probe::Perl
+
+0.21 Wed  2 Jan 2008
+	- Moving from using $^X to Perl::Exe
+
+0.20 Sun  1 Jul 2007
+	- Upgrading to Module::Install 0.65
+	- Split Process::Backgroundable into a seperate distribution
+
+0.18 Sun  1 Oct 2006
+	- Upgrading to Module::Install 0.64
+
+0.17 Sat 26 Feb 2006
+	- No functional changes.
+	- Resolved #17402: Documentation bug in Process::Delegatable
+
+0.16 Tue 31 Jan 2006
+	- Adding proper tests for Process::Delegatable
+	- Foritfying Process::Launcher against things that die
+
+0.15 Mon 23 Jan 2006
+	- Adding IO::String dependency to Makefile.PL
+
+0.14 Mon 23 Jan 2006
+	- Adding Process::Delegatable.
+	  Currently untested except for the normal compile test
+
+0.13 Tue 17 Jan 2006
+	- Added 'yaml' to Process::Loader (Steffen Müller)
+	- Added tests for 'yaml' which are skipped without Process::YAML (Steffen Müller)
+	- Fixed spelling errors in Process::Packageable (Steffen Müller)
+	- Converted 'storable' and 'yaml' to one unified 'serialized' (Steffen Müller)
+	- Fixed bug with STDIN (Steffen Müller)
+	- Upgraded ::Backgroundable to use serialized (Steffen Müller)
+
+0.12 Tue 17 Jan 2006
+	- Added Process::Packageable (Steffen Müller)
+
+0.11 Sun 15 Jan 2006
+	- Changing to a slightly less evil IO::String workaround
+
+0.10 Sat 14 Jan 2006
+	- Completed Process::Serializable
+	- Completed Process::Storable
+	- Upgraded Process::Launcher and Process::Backgroundable
+	- Completed the documentation (I think)
+	- Completed the full test suite
+
+0.04 Wed 11 Jan 2006
+	- Cleaning up the documentation a bit more and making certain
+	  things a bit clearer.
+
+0.03 Sat  7 Jan 2006
+	- Accidentally left a debugging trick in, cause backgrounded things
+	  to not actually release STDIO. Fixed
+
+0.02 Sat  7 Jan 2006
+	- Added Process::Backgroundable
+
+0.01 Sat  7 Jan 2006
+	- Created initial version

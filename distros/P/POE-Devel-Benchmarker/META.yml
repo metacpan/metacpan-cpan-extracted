@@ -1,0 +1,76 @@
+---
+name: POE-Devel-Benchmarker
+version: 0.05
+author:
+  - 'Apocalypse <APOCAL@cpan.org>'
+abstract: Benchmarking POE's performance ( acts more like a smoker )
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Archive::Tar: 0
+  Class::Accessor::Fast: 0
+  Devel::Hide: 0
+  GD::Graph::colour: 0
+  GD::Graph::lines: 0
+  HTML::LinkExtor: 0
+  LWP::UserAgent: 0
+  Module::Pluggable: 0
+  POE: 0
+  POE::Driver::SysRW: 0
+  POE::Filter::Line: 0
+  POE::Session: 0
+  POE::Session::AttributeBased: 0
+  POE::Wheel::ReadWrite: 0
+  POE::Wheel::SocketFactory: 0
+  Test::More: 0.86
+  Time::HiRes: 0
+  URI::URL: 0
+  YAML::Tiny: 0
+  version: 0
+recommends:
+  EV: 0
+  Event: 0
+  Event::Lib: 0
+  Glib: 0
+  POE::Loop::EV: 0
+  POE::Loop::Event: 0
+  POE::Loop::Event_Lib: 0
+  POE::Loop::Glib: 0
+  POE::Loop::Gtk: 0
+  POE::Loop::Kqueue: 0
+  POE::Loop::Prima: 0
+  POE::Loop::Wx: 0
+  POE::XS::Loop::EPoll: 0
+  POE::XS::Loop::Poll: 0
+  POE::XS::Queue::Array: 0
+  Prima: 0
+  Tk: 0
+  Wx: 0
+dynamic_config: 0
+provides:
+  POE::Devel::Benchmarker:
+    file: lib/POE/Devel/Benchmarker.pm
+    version: 0.05
+  POE::Devel::Benchmarker::GetInstalledLoops:
+    file: lib/POE/Devel/Benchmarker/GetInstalledLoops.pm
+    version: 0.05
+  POE::Devel::Benchmarker::GetPOEdists:
+    file: lib/POE/Devel/Benchmarker/GetPOEdists.pm
+    version: 0.05
+  POE::Devel::Benchmarker::Imager:
+    file: lib/POE/Devel/Benchmarker/Imager.pm
+    version: 0.05
+  POE::Devel::Benchmarker::Imager::BasicStatistics:
+    file: lib/POE/Devel/Benchmarker/Imager/BasicStatistics.pm
+    version: 0.05
+  POE::Devel::Benchmarker::SubProcess:
+    file: lib/POE/Devel/Benchmarker/SubProcess.pm
+    version: 0.05
+  POE::Devel::Benchmarker::Utils:
+    file: lib/POE/Devel/Benchmarker/Utils.pm
+    version: 0.05
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

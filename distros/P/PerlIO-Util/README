@@ -1,0 +1,41 @@
+NAME
+
+PerlIO::Util - A selection of general PerlIO utilities
+
+SYNOPSIS
+
+	use PerlIO::Util;
+
+	# to create $file if needed, and then call flock($in, LOCK_EX)
+	my $in = PerlIO::Util->open('+<:creat :flock', $file); 
+
+	# to multiplex output
+	*STDERR->push_layer(tee => ">> $err_log");
+
+	# to read lines backward
+	my $in = PerlIO::Util->open('<:reverse', $file);
+
+	# to open file encoded to filesystem encoding
+	# (need to set PERLIO_FSE unless using Win32)
+	my $in = PerlIO::Util->open('<:fse', $file);
+
+INSTALLATION
+
+	To install this module, run the following commands:
+
+		perl Makefile.PL
+		make
+		make test
+		make install
+
+
+DEPENDENCIES
+
+	Perl 5.8.1 or later, and a C compiler.
+
+COPYRIGHT AND LICENCE
+
+	Copyright (C) 2008-2010, Goro Fuji <gfuji(at)cpan.org>, Some rights reversed.
+
+	This library is free software; you can redistribute it and/or modify
+	it under the same terms as Perl itself.

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+PalmDoc.pm
+README
+test.pl
+examples/palmpod1.pl
+examples/palmpod2.pl
+examples/palmpod3.pl

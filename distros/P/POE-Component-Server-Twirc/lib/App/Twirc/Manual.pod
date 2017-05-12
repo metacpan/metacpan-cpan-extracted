@@ -1,0 +1,359 @@
+=head1 NAME
+
+App::Twirc::Manual - User guide and reference for Twirc
+
+
+=head1 DESCRIPTION
+
+C<Twirc> is a twitter client.  More precisely, it is an IRC/Twitter gateway that
+makes your favorite IRC client a twitter client.
+
+=head1 FEATURES
+
+=over 4
+
+=item Follow friends timelines
+
+=item Receive replies from friends and non-friends
+
+=item Post status updates
+
+=item Send and receive direct messages
+
+=item Follow, un-follow, block, unblock, and use most other twitter commands
+
+=back
+
+=head1 INSTALLATION
+
+You can install C<twirc> just as you would any other CPAN distribution:
+
+    cpanm POE::Component::Server::Twirc
+
+Or, you can download and unpack C<twirc>, then run it from a directory of your
+choice without running C<make install>.  That's the way the author runs it.  If
+you choose this option, run C<make> to install C<twirc>'s dependencies.
+
+=head1 CONTRIBUTING AND BUILDING
+
+If you'd like to contribute to C<twirc> or just want to build the distribution
+for some other reason, you must have the following Perl modules:
+
+=over 4
+
+=item L<Module::Install>
+
+=item L<Module::Install::Contributors>
+
+=item L<Module::Install::Repository>
+
+=item L<Module::Install::AutoManifest>
+
+=back
+
+=head1 CONFIGURATION
+
+C<Twirc> uses L<Config::Any>, so you can configure C<twirc> using XML, YAML,
+JSON, Apache-style configuration, Windows INI file format, or even Perl code.
+
+A configuration file is not necessary, but is recommended.
+
+Here's an example configuration in YAML:
+
+    state_file: twirc.state
+    log_level: INFO
+
+
+=head2 CONFIGURATION OPTIONS
+
+=over
+
+=item irc_server_name
+
+The name of the IRC server. Defaults to C<twitter.irc>.  Every IRC server has a
+name.  The IRC server included with C<twirc> isn't intended to be accessed
+publicly.  It is for your own personal use.  So, the name is not significant.
+
+=item irc_server_port
+
+The port number the IRC server binds to. Defaults to 6667.
+
+=item irc_server_bindaddr
+
+The local address to bind to. Defaults to all C<127.0.0.1> to prevent others
+from connecting to your C<twirc> IRC server. If you run C<twirc> on a different
+system than your IRC client, you will need to provide this configuration option
+with a suitable address.
+
+=item irc_mask
+
+The IRC user/host mask used to restrict connecting users.  Defaults to
+C<*@127.0.0.1>.  If you run C<twirc> on a different system than your IRC client,
+you will need to provide this configuration option with a suitable mask.
+
+=item irc_password
+
+Password used to authenticate to the IRC server.  If you don't provide this
+option, no password will be required.  It adds a bit of security.  You may want
+to set this option if other users have access to your system.
+
+=item irc_botname
+
+The name of the channel operator bot.  Defaults to C<tweeter>.  Select a name
+that does not conflict with friends, followers, or your own IRC nick.
+
+When running C<twirc>, you interact with a bot in the channel.  The bot carries
+out commands on your behalf and provides feedback, particularly when there are
+errors.
+
+=item irc_botircname
+
+Text to be used as the channel operator bot's IRC full name. Defaults to
+C<"Your Friendly Twitter Agent">.  This is the name that will appear in
+response to an IRC C</whois> command.
+
+=item irc_channel
+
+The name of the channel where your twitter friends' timelines appear.  This is
+the channel where most of your interaction with C<twirc> occurs.  It defaults
+to C<&twitter>.  The IRC convention for channels names is channels local to a
+single server begin with C<&>.  Network channels begin with C<#>.  You can use
+either to name, however C<&> is more appropriate.
+
+=item twitter_alias
+
+An alias to use for displaying incoming status updates from the owning user.
+This is necessary if the user's IRC nickname and Twitter screen name are the
+same.  Defaults to C<me>.
+
+With the default value C<me>, when C<twirc> reads a status message in your
+timeline from your Twitter screen name, it will use C<me> in place of your
+Twitter screen name in the channel.
+
+=item selection_count
+
+How many status messages to display for selection when favoriting, replying, or
+retweeting. Defaults to 3.
+
+=item truncate_to
+
+When displaying a list tweets for selection, for example, in response to the
+L</"favorite"> command, they will be truncated to this length to avoid
+cluttering the screen with long messages that wrap. Defaults to 60.
+
+=item log_channel
+
+If specified, twirc will post log messages to this channel.  If you set this
+option to C<&log>, then you can join the C<&log> channel and see the copious
+debug messages that C<twirc> generates.  This may be useful for trouble
+shooting or problem reporting.
+
+=item log_level
+
+Twirc supports C<log_level> values OFF, FATAL, ERROR, WARN, INFO, DEBUG, and
+TRACE.  The default is WARN.
+
+=item state_file
+
+File used to store state information between sessions, including Twitter OAuth
+access tokens, friends, and followers_ids.
+
+=back
+
+=head1 USING
+
+To use C<twirc> you first need to start the server:
+
+    bin/twirc -b --state_file=twirc.state
+
+The C<-b> option runs C<twirc> in the background.  Drop the C<-b> to see log
+messages to STDERR. (The author runs twirc and his irc client in screen,
+L<http://www.gnu.org/software/screen/>, to monitor log messages to STDERR.)
+
+Next, connect to the server from your IRC client.  I use C<irssi>
+(L<http://www.irssi.org>) and my examples will use C<irssi> commands:
+
+    /connect localhost
+
+On connection, C<twirc> will automatically join you to the configured channel.
+The default C<&twitter> will be assumed, here.
+
+Your friends will be automatically joined to the channel.  Friends who are
+also followers are given voice as a visual clue.  In C<irssi> they appear with
+plus sign (+) in front of their names.
+
+To post a new status update, use the L</"post"> command:
+
+    post My first tweet from twirc!
+
+In general, you enter a command followed by its arguments, if any, as a public
+message in the channel.  There's a handy exception to that rule for sending
+replies.  An entry that begins with a nick name, followed by a colon is treated
+as a reply.  E.g.:
+
+    twirc: you make twitter usable!
+
+Is a shortcut for:
+
+    post @twirc you make twitter usable!
+
+C<twirc> uses the Twitter User Streams API to receive updates in real-time.
+
+Use IRC private messaging to send direct messages.  In C<irssi>:
+
+    /msg friend Watch out, I'm right behind you!
+
+The C<twirc> server stops when you disconnect.  This isn't normal IRC behavior,
+but C<twirc> isn't a normal IRC server.  Its only purpose is to interface with
+Twitter on your behalf and server no useful purpose when you're not connected.
+
+=head1 COMMAND REFERENCE
+
+=over 4
+
+=item post status
+
+Post a status update.  E.g.,
+
+    post Now cooking tweets with twirc!
+
+=item follow twitter_screen_name
+
+Follow a new Twitter user.  This creates a friend relationship and adds the
+friend to the channel.
+
+=item unfollow twitter_screen_name
+
+Stop following a Twitter friend. This destroys the friend relationship and
+removes the friend from the channel.
+
+=cut
+
+=item block twitter_screen_name
+
+Blocks the Twitter user from receiving your Twitter feed.
+
+=item unblock twitter_screen_name
+
+Stop blocking a Twitter user.
+
+=item whois twitter_user
+
+Displays information about Twitter user. C<twitter_user> can be either a screen
+name or email address.
+
+=item notify on|off twitter_screen_name...
+
+Turns device notifications on or off for the list of one or more Twitter
+friends.  The list is space separated.
+
+=item retweets on|off twitter_screen_name...
+
+Turns retweet display on your timeline on or off for the list of one or more
+Twitter friends.  The list is space separated.
+
+=item favorite friend [ count ]
+
+Mark a friend's tweet as a favorite.  Optionally, specify the number of tweets
+to display for selection with C<count>. (C<count> defaults to 3. The default
+can be changed with the L</"favorites_count"> option.)
+
+=item rate_limit_status
+
+Displays information about the remaining number of API requests available in
+the current hour. The C<rate_limit_status> command does not count against the
+limit, itself.
+
+=item help
+
+Display a simple help message listing the available command names.
+
+=back
+
+=head1 TIPS AND TRICKS
+
+=head2 Ignoring
+
+If you're following a particularly noisy friend, you can of course
+L</"unfollow"> her.  Alternatively, you can use your IRC client's features to
+ignore the user.  In C<irssi>:
+
+    /ignore LoudMouth ALL
+    /ignore -except -pattern @YourName LoudMouth ALL
+
+Now, you won't hear from LoudMouth unless she @replies you, and she won't know
+you're ignoring her (unless she reads this tip!).
+
+=head2 Multiple accounts
+
+Although C<twirc> doesn't currently support multiple accounts, there's nothing
+stopping you from running multiple instances of C<twirc>, one for each
+account.
+
+Here's how I do it for accounts C<semifor> (my personal account) and C<twirc>
+(C<twirc>'s feed for update notices, etc.).
+
+First, the pertinent sections of the configuration files (in YAML format).
+
+    # File: semifor.yml
+    irc_server_port: 6667
+    irc_password: secret
+    irc_channel: '&twitter'
+
+    # File: twirc.yml
+    irc_server_port: 6668
+    irc_password: secret
+    irc_channel: '&twirc'
+
+Next, start an instance for each account:
+
+    bin/twirc -c semifor.yml -b
+    bin/twirc -c twirc.yml -b
+
+In your IRC client, connect to both instances (C<irssi> here):
+
+    /connect localhost 6667 secret semifor
+    /connect localhost 6668 secret twirc
+
+Now you've got 2 channels, one for each account---in my case, C<&twitter> for
+C<semifor> and C<&twirc> for C<twirc>.
+
+=head2 PLUGINS
+
+Plugins are modules that are optionally included by specifying them in user
+configuration file in the C<plugins> section.  Some of the plugins included in
+the distribution are:
+
+=over 4
+
+=item SquashWhiteSpace
+
+Squashes whitespace in tweets to a single space. See L<App::Twirc::Plugin::SquashWhiteSpace>.
+
+=item BangCommands
+
+Commands are prefixed with a bang (i.e., exclamation point "!").  Text entered
+without a bang prefix is posted as a status update.  See L<App::Twirc::Plugin::BangCommands>.
+
+=back
+
+=head1 SUPPORT
+
+C<Twirc> is free open source software with no warranty of any kind.  That said,
+it's used by some competent perl coders who may be able to help if you have
+trouble.  Try the C<#net-twitter> channel at C<irc.perl.org>.
+
+The code repository with the development branch is located at
+L<http://github.com/semifor/twirc>.  New features, and bug fixes appear there
+before they hit CPAN, so check the commit log there to see if a problem you've
+found has been addressed.  And feel free to use the development branch.
+
+=head1 CONTRIBUTORS
+
+Peter Roberts <me+dev@peter-r.co.uk>
+
+=head1 AUTHOR
+
+Marc Mims <mmims@cpan.org>
+
+I'm C<semifor> on twitter and IRC.

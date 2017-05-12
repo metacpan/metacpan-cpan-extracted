@@ -1,0 +1,29 @@
+---
+abstract: 'Add a list of roles to your POD.'
+author:
+  - 'Mike Friedman <friedo@friedo.com>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Weaver-Section-Consumes
+requires:
+  Class::Inspector: 0
+  Module::Load: 0
+  Moose: 0
+  Pod::Elemental::Element::Nested: 0
+  Pod::Elemental::Element::Pod5::Command: 0
+  Pod::Weaver::Role::Section: 0
+  aliased: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/friedo/pod-weaver-section-consumes.git
+version: 0.010

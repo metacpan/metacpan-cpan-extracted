@@ -1,0 +1,36 @@
+NAME
+    PPIx::EditorTools - Utility methods and base class for manipulating Perl
+    via PPI
+
+SYNOPSIS
+        See PPIx::EditorTools::*
+
+DESCRIPTION
+    Base class and utility methods for manipulating Perl via PPI. Pulled out
+    from the "Padre::Task::PPI" code.
+
+METHODS
+    new()
+        Constructor. Generally shouldn't be called with any arguments.
+
+AUTHORS
+    Gabor Szabo <gabor@szabgab.com>
+
+  CONTRIBUTORS
+    ADAMK
+
+    AZAWAWI
+
+    BOWTIE
+
+    buff3r
+
+    MGRIMES
+
+    PATRICKAS
+
+    SMUELLER
+
+SEE ALSO
+    "PPIx::EditorTools::*", Padre, App::EditorTools, Padre, and PPI.
+

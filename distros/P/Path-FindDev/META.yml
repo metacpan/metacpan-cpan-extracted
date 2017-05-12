@@ -1,0 +1,45 @@
+---
+abstract: 'Find a development path somewhere in an upper hierarchy.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Path-FindDev
+provides:
+  Path::FindDev:
+    file: lib/Path/FindDev.pm
+    version: v0.5.3
+  Path::FindDev::Object:
+    file: lib/Path/FindDev/Object.pm
+    version: v0.5.3
+recommends:
+  Path::Tiny: '0.058'
+requires:
+  Carp: '0'
+  Class::Tiny: '0.010'
+  Path::IsDev: v0.2.2
+  Path::IsDev::Object: '0'
+  Path::Tiny: '0.054'
+  Scalar::Util: '0'
+  Sub::Exporter: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Path-FindDev/issues
+  homepage: https://github.com/kentnl/Path-FindDev
+  repository: https://github.com/kentnl/Path-FindDev.git
+version: v0.5.3

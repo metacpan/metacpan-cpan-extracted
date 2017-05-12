@@ -1,0 +1,33 @@
+=encoding utf8
+
+=head1 NAME
+
+Perl6::Perldoc::To::Ansi - ANSI-colored text renderer for Perl6::Perldoc
+
+=head1 SYNOPSIS
+
+    use Perl6::Perldoc::Parser;
+    use Perl6::Perldoc::To::Ansi;
+
+    # All Perl6::Perldoc::Parser DOM classes now have a to_ansi() method
+
+=head1 DESCRIPTION
+
+This module is almost identical to the Text renderer, except that many
+constructs are highlighted with ANSI terminal codes. See
+L<Perl6::Perldoc::To::Text> for more information.
+
+=head1 AUTHOR
+
+Hinrik Örn Sigurðsson, L<hinrik.sig@gmail.com>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2006, Damian Conway L<DCONWAY@cpan.org>. All rights reserved.
+
+Copyright (c) 2009, Hinrik Örn Sigurðsson L<hinrik.sig@gmail.com>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=cut

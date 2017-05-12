@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/libjingle-0.3
+
+Name: JingleXmlLite
+Description: Jingle XmlLite Library
+Version: 0.3.11
+Requires: jinglebase-0.3
+Libs: -L${libdir} -ljinglexmllite-0.3
+Cflags: -I${includedir}

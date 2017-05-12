@@ -1,0 +1,18 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Tutorial.pm
+t/1.t
+examples/customerResponse.js
+examples/graphObj_pl
+examples/Lastyear.txt
+examples/paramDiff_pl
+examples/patric.jpg
+examples/persons.txt
+examples/reuseComponent_pl
+examples/script1.js
+examples/weather.dat
+examples/weatherObj_pl
+examples/unzipThis.zip
+META.yml                                 Module meta-data (added by MakeMaker)

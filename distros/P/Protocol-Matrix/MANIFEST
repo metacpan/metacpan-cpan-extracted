@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/Protocol/Matrix.pm
+lib/Protocol/Matrix/HTTP/Federation.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01encode.t
+t/02sign.t
+t/03redact.t
+t/04sign_event.t
+t/10http-federation.t
+t/60known-key.t
+t/99pod.t

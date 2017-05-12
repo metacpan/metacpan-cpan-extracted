@@ -1,0 +1,20 @@
+<ul>
+[% FOREACH module = modules %]
+  <li><a href="#[% module %]">[% module %]</a></li>
+[% END %]
+</ul>
+
+[% FOREACH module = modules %]
+  <h2><a name="[% module %]">[% module %]</a></h2>
+  [% FOREACH result = results.$module %]
+    <p><a href="[% result.url %]">[% result.title %]</a>
+    [% IF result.lastModified %]
+      -- <i>[% result.lastModified %]</i>
+    [% END %]
+    [% IF result.summary %]
+      <br />
+      [% result.summary %]
+    [% END %]
+    </p>
+  [% END %]
+[% END %]

@@ -1,0 +1,31 @@
+---
+abstract: 'Template and layout rendering timer for Dancer'
+author:
+  - 'Peter Mottram (SysPete) <peter@sysnix.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Debug-Dancer-TemplateTimer
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Method::Modifiers: '0'
+  Dancer: '0'
+  Plack::Middleware::Debug: '0'
+  Time::HiRes: '0'
+  perl: '5.006'
+resources:
+  IRC: irc://irc.perl.org/#dancer
+  bugtracker: https://github.com/SysPete/Plack-Middleware-Debug-Dancer-TemplateTimer/issues
+  repository: https://github.com/SysPete/Plack-Middleware-Debug-Dancer-TemplateTimer.git
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

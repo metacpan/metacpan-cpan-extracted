@@ -1,0 +1,230 @@
+#!/usr/local/bin/perl -w
+
+# get rid of the nerveracking "Pseudo hashes are deprecated" warnings,
+# emitted without any reason.
+# no warnings 'deprecated';
+$^W=0;
+no warnings;
+
+# = HISTORY SECTION =====================================================================
+
+# ---------------------------------------------------------------------------------------
+# version | date   | author   | changes
+# ---------------------------------------------------------------------------------------
+# 0.03    |22.04.06| JSTENZEL | new option -version;
+#         |        | JSTENZEL | added missing doc for -help;
+# 0.02    |23.01.06| JSTENZEL | option files now read from the current directory as well;
+# 0.01    |23.05.03| JSTENZEL | derived from pp2sdf 0.11.
+# ---------------------------------------------------------------------------------------
+
+# = POD SECTION =========================================================================
+
+=head1 NAME
+
+B<perlpoint> - a very general PerlPoint converter, using the generator interface
+
+=head1 VERSION
+
+This manual describes version B<0.03>.
+
+=head1 DESCRIPTION
+
+This general converter translates PerlPoint in any target language you have
+PerlPoint::Generator subclasses installed for.
+
+These classes can be installed in the usual Perl library pathes or in a
+template. To get a list of available generators in the Perl path, call
+this script with option "-generators". To see if a template provides an
+additional generator, scan its "lib" subdirectory.
+
+Usually, if you are working with a template, just start the converter as
+described below. If there are libraries missing it will be notified.
+
+=head1 SYNOPSIS
+
+perlpoint [<options>] <PerlPoint sources>
+
+=head2 Options
+
+All options can be abbreviated uniqly.
+
+Please note that there are more options than described below. C<perlpoint>
+just defines bootstrap options. For a complete option list please call
+C<perlpoint> with C<-help> and the appropriate C<-target>, C<-formatter> and
+C<-template> options, the help displayed will be adapted to this call.
+
+=over 4
+
+=item -help
+
+displays a help and terminates. I<The help adapts itself to further options>, so
+for best results it is recommended to enter all options that are intended to
+used, and to add C<-help> additionally.
+
+=item -target <format>
+
+The format that should be produced. The argument is automatically uppercased.
+
+To produce a format "FORMAT", C<PerlPoint::Generator::FORMAT> needs to be installed.
+
+ Examples:
+
+  -format sdf
+  -format HTML
+
+=item -formatter
+
+The generator type to be used. This setting chooses a I<formatter> for the
+target format.
+
+ -formatter nice
+
+Formatter names can be build hierarchically, delimiting hierarchy levels by double
+colons:
+
+ -formatter nice::impression
+
+The arguments first letter of each hierarchy level is automatically uppercased.
+
+ -formatter nice::impression is equivalent to
+ -formatter Nice::Impression.
+
+To produce a format "FORMAT" using a formatter "Nice", C<PerlPoint::Generator::FORMAT::Nice>
+needs to be installed.
+
+This option defaults to C<Default>. By convention there is a C<Default> formatter
+for each supported target format.
+
+=item -styledir
+
+The directory to be searched for styles. Defaults to the start directory.
+
+=item -style
+
+The layout to be used. A layout defines the result format.
+
+=item -version
+
+displays the current program version and the versions of generator, formatter and template
+modules that are loaded according to the remaining options.
+
+=back
+
+=head2 Option files
+
+Options may be loaded from files where they are stored exactly as you write them in the
+command line, but may be spread to several lines and extended by comment lines which start
+with a "#" character. To mark an option file in the commandline, simply enter its (path and)
+name prededed by a "@" character, for example
+
+  perlpoint @myOptions ppfile
+
+  where the file myOptions could look like
+
+  # suppress infos
+  -noinfo
+
+Option files may be nested. To avoid endless recursion, every option file is resolved only
+the first time it is detected.
+
+  # this is an option file which
+  # refers to another option file
+  -noinfo @moreOptions
+
+The script also takes care of I<default option files> which means that usual options can
+be stored in files named C<.perlpoint>. If such a file is placed in the directory where the script itself
+resides, options in the file are read in automatically by all perlpoint calls. These are global
+settings. If you place such a file in your home directory, it is read automatically as well
+but only if perlpoint is called under your account, so this is for personal preferences.
+
+A personal default option file overwrites global settings, and all default options are
+overwritten by options passed to the script call.
+
+
+
+=head1 ENVIRONMENT
+
+=head1 NOTES
+
+=head1 FILES
+
+=head1 SEE ALSO
+
+PerlPoint::Generator
+
+=head1 AUTHOR
+
+Copyright (c) Jochen Stenzel (perl@jochen-stenzel.de), 2003-2006. All rights reserved.
+
+This script is free software, you can redistribute it and/or modify it
+under the terms of the Artistic License distributed with Perl version
+5.003 or (at your option) any later version. Please refer to the
+Artistic License that came with your Perl distribution for more
+details.
+
+The Artistic License should have been included in your distribution of
+Perl. It resides in the file named "Artistic" at the top-level of the
+Perl source tree (where Perl was downloaded/unpacked - ask your
+system administrator if you dont know where this is).  Alternatively,
+the current version of the Artistic License distributed with Perl can
+be viewed on-line on the World-Wide Web (WWW) from the following URL:
+http://www.perl.com/perl/misc/Artistic.html.
+
+
+=head1 DISCLAIMER
+
+This software is distributed in the hope that it will be useful, but
+is provided "AS IS" WITHOUT WARRANTY OF ANY KIND, either expressed or
+implied, INCLUDING, without limitation, the implied warranties of
+MERCHANTABILITY and FITNESS FOR A PARTICULAR PURPOSE.
+
+The ENTIRE RISK as to the quality and performance of the software
+IS WITH YOU (the holder of the software).  Should the software prove
+defective, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR
+CORRECTION.
+
+IN NO EVENT WILL ANY COPYRIGHT HOLDER OR ANY OTHER PARTY WHO MAY CREATE,
+MODIFY, OR DISTRIBUTE THE SOFTWARE BE LIABLE OR RESPONSIBLE TO YOU OR TO
+ANY OTHER ENTITY FOR ANY KIND OF DAMAGES (no matter how awful - not even
+if they arise from known or unknown flaws in the software).
+
+Please refer to the Artistic License that came with your Perl
+distribution for more details.
+
+=cut
+
+# declare script package
+package PerlPoint::Converter::perlpoint;
+
+# declare version and author
+$VERSION=$VERSION=0.03;
+$AUTHOR=$AUTHOR='J. Stenzel (perl@jochen-stenzel.de), 2003-2006';
+
+# pragmata
+use strict;
+
+# load modules
+use PerlPoint::Generator;
+use Getopt::ArgvFile default=>1, home=>1, current=>1;
+use Getopt::Long 2.24 qw(:config pass_through);
+
+# declare option hash
+my (%options);
+
+# get startup options
+GetOptions(
+           \%options,
+                      "formatter=s",                  # formatter;
+                      "help",                         # help request;
+                      "style=s",                      # style name;
+                      "styledir|style_dir=s@",        # style directories;
+                      "target=s",                     # target language;
+                      "version",                      # report version;
+          ); 
+
+# build and run the generator
+PerlPoint::Generator->new(options=>\%options)->run;
+
+
+  
+

@@ -1,0 +1,55 @@
+{
+   "abstract" : "Expand postfix mailgroups.",
+   "author" : [
+      "Petr Kletecka <pek@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300033, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Postfix-Mailgroups-Expand",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AutoLoader" : "0",
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::Slurp" : "0",
+            "List::MoreUtils" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/petrkle/postfix-mailgroups-expand/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/petrkle/postfix-mailgroups-expand.git",
+         "web" : "https://github.com/petrkle/postfix-mailgroups-expand"
+      }
+   },
+   "version" : "1.131020"
+}
+

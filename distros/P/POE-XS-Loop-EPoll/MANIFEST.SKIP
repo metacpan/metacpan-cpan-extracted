@@ -1,0 +1,16 @@
+^run_network_tests$
+~$
+\.svn\b
+\.o$
+\.bs$
+^EPoll\.c$
+\.exists$
+^blib\b
+^pm_to_blib$
+\.bak$
+^Makefile$
+^t/poe_xs_loop_epoll/
+^POE-XS-Loop-EPoll
+^Makefile\.old$
+^typescript$
+^\.#

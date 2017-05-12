@@ -1,0 +1,35 @@
+Revision history for Pod::Weaver::Section::SeeAlso
+
+1.003	2014-10-25 22:12:40 UTC
+
+	Support multiple #SEEALSO comment lines
+
+1.002	2011-02-21 21:48:00 UTC
+
+	Tweaked the actual L<> links to include the text to satisfy Perl::Critic ( thanks LESPEA! )
+
+1.001	2010-12-14 03:06:57 UTC
+
+	Release with updated Dist::Zilla
+	Add attribute to control the link back to the main module
+	Add attribute to specify extra links ( thanks GETTY! )
+	Add the ability to specify extra links as a comment in the file ( thanks GETTY! )
+	Add attribute to specify the introduction text
+
+1.000	2010-05-30 18:05:59 UTC
+
+0.004	2010-05-28 20:09:38 UTC
+
+	Add example hunk of POD
+
+0.003	2010-05-28 18:01:23 UTC
+
+	Fix how we detect existing SEE ALSO section
+
+0.002	2010-05-11 21:09:30 UTC
+
+	re-release with a fixed MANIFEST.SKIP
+
+0.001	2010-05-11 20:53:24 UTC
+
+	initial release

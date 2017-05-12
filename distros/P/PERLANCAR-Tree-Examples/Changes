@@ -1,0 +1,75 @@
+Revision history for PERLANCAR-Tree-Examples
+
+1.0.6   2016-04-14 (PERLANCAR)
+
+	- Add backend: insideout.
+
+
+1.0.5   2016-04-07 (PERLANCAR)
+
+	- [Removed] Remove old function alias gen_sample_tree because it
+	  was not exported by Exporter::Rinci anyway after all (no
+	  metadata).
+
+
+1.000.004  2016-04-03 (PERLANCAR)
+
+	   - No data changes.
+
+	   - Follow Examples::Generator spec.
+
+
+1.000.003  2016-04-02 (PERLANCAR)
+
+           - [Bugfix] Set attributes for array-based object must use
+             accessors, not set via constructor.
+
+
+1.000.002  2016-04-01 (PERLANCAR)
+
+           - No data changes.
+
+           - Show overview of available sample data in POD.
+
+           - Mention accompanying CLI script 'dump-perlancar-sample-tree'.
+
+
+1.000.001  2016-04-01 (PERLANCAR)
+
+           - No data changes.
+
+           - Typo.
+
+
+1.000   2016-04-01 (PERLANCAR)
+
+	- No functional changes.
+
+        - Synchronize version number with PERLANCAR::HTML::Tree::Examples.
+
+
+0.05    2016-04-01 (PERLANCAR)
+
+	- Tweak/modify examples in PERLANCAR::Tree::Examples and
+          PERLANCAR::HTML::Tree::Examples to be more equivalent to each other.
+
+
+0.04    2016-03-31 (PERLANCAR)
+
+	- Switch from Data::Random::Tree to Tree::Create::Size.
+
+
+0.03    2016-03-29 (PERLANCAR)
+
+	- Switch from Class::Build::Array::Glob to
+	  Tree::Object::Array::Glob.
+
+
+0.02    2016-03-27 (PERLANCAR)
+
+	- Add size 'small1'.
+
+
+0.01    2016-03-26 (PERLANCAR)
+
+        - First release.

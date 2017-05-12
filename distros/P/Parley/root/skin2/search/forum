@@ -1,0 +1,17 @@
+<h1>[%l('Search Results')%]</h1>
+
+<h2>[%l('Searching for')%] <em>[% search_terms.raw || '[nothing]' %]</em> in <em>[% search_forum.name || 'all forums' %]</em></h2>
+
+[% IF search_results %]
+    <table class="search_results">
+        <tbody>
+            [% dummy_value = search_results.reset %]
+            [%- WHILE (post = search_results.next) %]
+            [% thread = post.thread %]
+            [% PROCESS shared/postinfo_table_row show_search_data=post %]
+            [% END %]
+        </tbody>
+    </table>
+[% ELSE %]
+[%l('No results found matching specified terms')%].
+[% END %]

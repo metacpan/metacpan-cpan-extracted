@@ -1,0 +1,226 @@
+
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Slide</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Slides</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<B>Slide</B><BR>
+<P>
+<A HREF=#howto>how to...</A><BR>
+<A HREF=#options>options</A><BR>
+<A HREF=#examples>examples</A><BR>
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.   A presentation is based on slides, which are shown on
+<A HREF=../viewport/index.html>viewports</A>.
+<P>
+PPresenter is able to show a slide on more than one viewport at the same time,
+maybe in different styles, on different devices, in different fonts and
+fontsizes.  So: for each viewport, a slide has a
+<A HREF=../slideview/index.html>slide-view</A>, which is written in a
+specific <A HREF=../style/index.html>style</A>.
+<P>
+The information about a slide which is not related to one viewport, but to
+the general functioning of the slide within the show, is stored in the options
+described below.
+
+    </TD></TR>
+<TR><TD VALIGN=top>
+
+Slide options:
+<UL>
+<LI><A HREF=#general>general</A>
+</UL>
+Per <A HREF=../viewport/index.html>viewport</A><BR>
+a <A HREF=../slideview/index.html>slide-view</A><BR>
+which defines a <A HREF=../style/index.html>style</A><BR>
+with options for
+<UL>
+<LI><A HREF=../decoration/index.html>decorations</A>
+<LI><A HREF=../dynamic/index.html>dynamics</A>
+<LI><A HREF=../fontset/index.html>fontsets</A>
+<LI><A HREF=../formatter/index.html>formatters</A>
+<LI><A HREF=../template/index.html>templates</A>
+</UL>
+
+    </TD><TD VALIGN=top>
+
+<H2><A NAME=howto>How to</A> create a slide</H2>
+
+A slide is a collection of options, combining the content and behaviour
+information.  The options have different sources: the depend mainly on
+which <A HREF=../style/index.html>style</A> you have
+<A HREF=../function/select.html>selected</A>.
+<P>
+When you have only one <A HREF=../viewport/index.html>viewport</A> (window)
+to show the slide, the creation of a slide is easy:
+<PRE>
+   $show->addSlide( <I>general options</I>
+                  , <I>style selectors</I>
+                  , <I>style-elem options</I>);
+</PRE>
+The order of the options is not important.
+<P>
+When you have a presentation with multiple viewports involved, then you
+should read the page on
+<A HREF=../slideview/index.html>how to specify slide-views</A>.
+
+<H2><A NAME=general>General</A> slide options</H2>
+<DL>
+<DT><B>-title =&gt;</B> <I>string</I>
+<DT><B>-aliases =&gt; [</B> <I>string, ...</I> <B>]</B>
+<DD>The <STRONG>only obligatory option</STRONG> of each slide is a
+    unique title.  If you think the title is too long to refer to (for
+    instance in the <CODE>-nextSlide</CODE> option), or the title is
+    not unique, you can add a list of aliases.
+    <P>
+<DT><A NAME=timespan><B>-reqtime =&gt;</B> <I>timespan</I></A>
+<DD>The estimation for the time required to present this slide.
+    The default is 60 seconds, which is rather short.  If you specify
+    even shorter timespans, than surely you will have problems keeping
+    to it during your actual presentation.
+    <P>
+    There are various ways you can specify a timespan.  Examples say it
+    all:
+    <TABLE>
+    <TR><TD><CODE>"1h30m"</CODE></TD><TD>=&nbsp;4800&nbsp;sec;&nbsp;</TD>
+        <TD><CODE>"1h30"</CODE></TD><TD>=&nbsp;3630!&nbsp;sec;</TD>
+        <TD><CODE>"30m"</CODE></TD><TD>=&nbsp;1800&nbsp;sec</TD></TR>
+    <TR><TD><CODE>"1:30"</CODE></TD><TD>=&nbsp;90&nbsp;sec;&nbsp;</TD>
+        <TD><CODE>"1:30:0"</CODE></TD><TD>=&nbsp;4800&nbsp;sec;</TD>
+        <TD><CODE>"3:"</CODE></TD><TD>=&nbsp;180&nbsp;sec</TD></TR>
+    <TR><TD><CODE>"2m30s"</CODE></TD><TD>=&nbsp;150&nbsp;sec;&nbsp;</TD>
+        <TD><CODE>2000</CODE></TD><TD>=&nbsp;2000&nbsp;sec;</TD>
+        <TD><CODE>30</CODE></TD><TD>=&nbsp;30&nbsp;sec</TD></TR>
+    </TABLE>
+    <P>
+<DT><B>-proceed =&gt;</B> <CODE>STOP|TIME|NOW|PHASE</CODE>
+<DD>Defines when to proceed to the next slide.  The values are:
+    <UL>
+    <LI><CODE>STOP</CODE>: default. Proceed on user's command only;
+    <LI><CODE>TIME</CODE>: wait until the required time is over
+        (<CODE>-reqtime</CODE>), and then proceed automatically to the next
+        slide.  The user can force to proceed before the time has expired.
+    <LI><CODE>NOW</CODE>: continue immediately.  Only useful when using
+        multiple screens in one presentation.
+    <LI><CODE>PHASE <I>number</I></CODE>: continue when the phase is
+        reached.  This is useful when the show runs on multiple viewports,
+        and you like the next slide to be loaded on a different viewport
+        than this one.
+    </UL>
+    <P>
+<DT><B>-nextSlide =&gt;</B> <I>string</I>
+<DD>The slide to be shown after this one.  This may be a name (the
+    <CODE>-title</CODE> of the slide), an alias name of a slide,
+    a sequence number in the list of slides, or <CODE>'FIRST'</CODE> or
+    <CODE>'LAST'</CODE>.
+    <P>
+<DT><B>-active =&gt;</B> <I>boolean</I>
+<DD>Include the slide in the presentation yes (true, <CODE>1</CODE>
+    --the default) or no (false, <CODE>0</CODE>).  You can also
+    (de-)activate slides with tags and via the control-popup or
+    <A HREF=../viewport/control.html>control window</A>.
+    <P>
+<DT><B>-tag =&gt;</B> <I>string</I>
+<DT><B>-tags =&gt;</B> <B>[</B> <I>string, ...</I> <B>]</B>
+<DD>Tags, used to select (activate) or unselect (deactive) groups of
+    slides.  See the <A HREF../show/new.html>show's new() function</A>
+    how to use the tags.
+    <P>
+<DT><B>-callback =&gt;</B> <I>code</I>
+<DT><B>-callback =&gt; [</B> <I>dynamic, callback</I> <B>]</B>
+<DT><B>-callback =&gt; [ [</B> <I>dynamic, callback</I> <B>], ... ]</B>
+<DT><B>-callbacks</B> equivalent to -callback
+<DD>A callback is a hook into the <A HREF=program.html>program</A> of the
+    slide-display.  You can specify your own perl-code to executed when
+    a certain phase of the slide is reached.
+    <P>
+    The <I>dynamic</I> is a string as accepted by the selected
+    <A HREF=../dynamic/index.html>dynamic</A> style-element, although not
+    all possible strings make sense.
+    <P>
+    The <I>callback</I> is a Tk::Callback as described in the
+    Tk::callbacks manpage. Examples of possible combinations:
+    <DL>
+    <DT><CODE>-callback =&gt; sub {print "hi\n"}</CODE>
+    <DT><CODE>-callback =&gt; [ 'after 10', sub {print "@_\n"}, 'I' ]</CODE>
+    <DD>10 seconds after appearance of the slide, the text `I' is
+        printed on stdout.
+    <DT><CODE>-callback =&gt; [ 'phase 1', 'setRunning', $show->find('main'), 1 ]</CODE>
+    <DD>The result of <CODE>find</CODE> is an object (say $main).  The
+        callback will result in <CODE>$main->setRunning(1)</CODE>.
+    </DL>
+</DL>
+
+<H2><A NAME=examples>Examples</A></H2>
+
+Examples of simple slide-specifications: one viewport, or multiple viewports
+all showing the same.  For more complicated examples, visit the
+<A HREF=../slideview/index.html>slide-view</A> page.
+<P>
+<H4>Example 1</H4>
+<PRE>
+    $show->addSlide( -title    => 'demo'
+                   , -template => 'tm'
+                   , -bgcolor  => 'red'
+                   , -backdrop => 0
+                   , -main     => 'text'
+                   , -reqtime  => 5*60);
+</PRE>
+The <CODE>-title</CODE> flag is the only obligatory argument, although...
+if you forget to mention it, the name will be "Slide <I>number</I>".  With
+the <CODE>-reqtime</CODE> of 5 minutes, these are the real slide options.
+<P>
+The <CODE>-template</CODE> option selects the template style-element
+<CODE>tm</CODE> ("title-main": a screen which show a titlebar and
+the rest of the screen is used as one large piece of text).
+The <CODE>-main</CODE> option describes the text to be shown there.
+The "text" will be handled by the selected formatter, when time comes that
+it has to be displayed.
+<P>
+The other style-elements are not specified, so their respectively selected
+elements are used.  It is not often required to specify another style-element
+then the template: in most cases you use the same for each slide.
+<P>
+The <CODE>-bgcolor</CODE> is consumed by the selected decoration style-element,
+as is the <CODE>-backdrop</CODE> flag.
+<P>
+As you see: it is very important to know which style-elements are selected,
+and which options they take.  Give yourself some time to learn!
+
+<H4>Example 2</H4>
+<PRE>
+    my $slide = $show->addSlide( qw/-title demo2
+       -template m -reqtime 400 -proceed TIME -main/,
+       "the text shown on the screen" );
+    print $slide->tree;
+</PRE>
+
+Just a different way to denote a slide.  In this case, maintenance is
+harder, and it soes not give you any speed benevit.  You also see that
+the slide-structure is returned, and can be used to print the options
+after being processed.
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

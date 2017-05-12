@@ -1,0 +1,9 @@
+Changes					Log of changes
+MANIFEST				This file
+Makefile.PL				Makefile generator
+README					Document to get you going
+ToDo					Stuff I need to do
+lib/Persistent/DBI.pm			Persistent subclass
+t/00pre.t				Test script
+t/90post.t				Test script
+t/common.pl				Test library

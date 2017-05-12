@@ -1,0 +1,56 @@
+## name simple_return
+## failures 0
+## cut
+
+return 37;
+
+## name return_or
+## failures 1
+## cut
+
+return 0 or die "something";
+
+## name return_and
+## failures 1
+## cut
+
+return 1 and die "something";
+
+## name return_xor
+## failures 1
+## cut
+
+return 0 xor die "something";
+
+## name two_lines
+## failures 1
+## cut
+
+return 0
+  or die "something";
+
+## name comment_in_middle
+## failures 1
+## cut
+
+return 0
+  # comment in the middle!
+  or die "something";
+
+## name parenthsized
+## failures 0
+## cut
+
+return (0 or die "something");
+
+## name return_if
+## failures 0
+## cut
+
+return 0 if 1 or 2;
+
+## name return_unless
+## failures 0
+## cut
+
+return 0 unless 1 or 2;

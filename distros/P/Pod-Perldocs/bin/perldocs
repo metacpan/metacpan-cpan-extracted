@@ -1,0 +1,34 @@
+#!/opt/bin/perl
+
+require 5;
+BEGIN { $^W = 1 if $ENV{'PERLDOCDEBUG'} }
+use Pod::Perldocs;
+exit( Pod::Perldocs->run() );
+
+__END__
+
+=head1 NAME
+
+perldocs - web-service-enhanced perldoc
+
+=head1 DESCRIPTION
+
+This script is a drop-in replacement for C<perldoc> based on
+C<Pod::Perldoc>. Usage is the same, except in the case
+when documentation for a module cannot be found on the
+local machine, in which case a query (via LWP or SOAP::Lite) will
+be made to a remote pod repository and, if the documentation is
+found there, the results will be displayed as usual.
+
+=head1 SEE ALSO
+
+L<Pod::Perldoc>.
+
+=head1 COPYRIGHT
+
+This software is copyright 2004, 2009 by Randy Kobes
+E<lt>r.kobes@uwinnipeg.caE<gt>. Usage and redistribution
+is under the same terms as Perl itself.
+
+=cut
+

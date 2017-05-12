@@ -1,0 +1,8 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [ColorThemes::ANSITable]
+
+DESCRIPTION
+

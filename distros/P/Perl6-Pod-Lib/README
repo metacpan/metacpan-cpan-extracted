@@ -1,0 +1,31 @@
+Perl6::Pod::Lib
+=====================
+
+Perl6::Pod - set of extensions for Perl6::Pod
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ Perl6::Pod;
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2010 by Zahatski Aliaksandr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

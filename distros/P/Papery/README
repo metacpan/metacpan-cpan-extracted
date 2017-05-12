@@ -1,0 +1,54 @@
+Papery
+======
+
+Papery is meant to be a very thin layer between a number of Perl modules
+that you can use to generate the files of a static web site.
+
+It is intended to make it very flexible, so that it's easy to add hooks
+and specialized modules to generate any file that is needed for the site.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Papery
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Papery
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Papery
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Papery
+
+    Search CPAN
+        http://search.cpan.org/dist/Papery
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Philippe Bruhat (BooK)
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

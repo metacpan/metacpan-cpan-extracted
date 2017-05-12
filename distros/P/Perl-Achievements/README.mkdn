@@ -1,0 +1,37 @@
+# NAME
+
+Perl::Achievements - whoever die()s with the most badges win
+
+# VERSION
+
+version 0.4.0
+
+# SYNOPSIS
+
+    use Perl::Achievements;
+
+    my $pa = Perl::Achievements->new;
+
+    $pa->scan( $file );
+
+# DESCRIPTION
+
+If you want to use `perl-achievement`, look 
+at [perlachievements](http://search.cpan.org/perldoc?perlachievements).
+
+If you want to implement a new achievement,
+look at [Perl::Achievements::Achievement](http://search.cpan.org/perldoc?Perl::Achievements::Achievement).
+
+WARNING: `Perl::Achievements` is young, rough,
+and subject to change. You've been warned.
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

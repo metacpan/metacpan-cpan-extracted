@@ -1,0 +1,7 @@
+Revision history for PlugAuth-Client-Tiny-Apache2AuthzHandler
+
+0.02      2015-11-11 13:23:46 -0500
+  - fix serious holes in documentation
+
+0.01      2015-11-11 10:41:24 -0500
+  - initial version

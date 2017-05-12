@@ -1,0 +1,22 @@
+Revision history for Perl extension Parallel::Dragons.
+
+0.9.4  2016-06-26
+  - startdocker - the Dragon doesn't detach, but forks childs
+
+0.9.3  2016-06-26
+  - documentation
+
+0.9.2  2016-05-01 19:00:00
+  - expose if the daemon is running in the foreground
+  - BUGfix: _task_done was not called when running in fg
+  - pre_start also runs with startfg
+
+0.9.1  2016-04-26 17:15:00
+  - support for a idle method
+  - expose the number of childs running
+
+0.9.0  2016-04-05 21:00:00
+	- original version; Just imported and rename from what
+      was currently in use.
+
+

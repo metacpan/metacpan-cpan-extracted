@@ -1,0 +1,339 @@
+=pod
+
+=head1 NAME
+
+Pod::Classdoc - Generate Javadoc-like detail class documentation from POD
+
+=head1 SYNOPSIS
+
+	my $classdocs = Pod::Classdoc->new($path, $title, $verbose);
+	#
+	#	generate classdocs for an entire project directory
+	#
+	$classdocs->openProject(@srclibs) or die $@;
+	#
+	#	add source code of a single module
+	#
+	$classdocs->add($some_source, $filename) or die $@;
+	#
+	#	add source code of a single module from its file
+	#
+	$classdocs->open($srcfile) or die $@;
+	#
+	#	render the classdocs for all added/opened modules,
+	#	and write them out
+	#
+	$classdocs->writeClassdocs or die $@;
+	#
+	#	get a table of contents for the classdocs, with modules
+	#	in the order specified
+	#
+	my $toc = $classdocs->getTOC( Order => \@order);
+	#
+	#	write a table of contents for the classdocs
+	#	
+	$classdocs->writeTOC( Order => \@order ) or die $@;
+	#
+	#	get a frame container document
+	#
+	my $frames = $classdocs->getFrameContainer();
+	#
+	#	write a frame container
+	#	
+	$classdocs->writeFrameContainer( 'index.html' ) or die $@;
+	#
+	#	clear out the loaded modules to start anew
+	#	
+	$classdocs->clear();
+	#
+	#	change the output path
+	#	
+	$oldpath = $classdocs->path( $newpath );
+
+=head1 DESCRIPTION
+
+Using either an input filename, or source code as a scalar string,
+or a list of source directories,
+collects and scans the source code for classdoc formatted POD sections
+to retrieve classnames, base classes, exported and imported symbols,
+and public methods and members, as well as any classdoc markup tags. When
+all files have been processed, a subclassing/inheritance cross reference
+is generated, and the accumulated documentation is formatted
+into a HTML document and written to a classdoc directory, along with
+an optional index file.
+
+Where applicable, classdoc tags are the same as javadoc; see
+L<http://java.sun.com/j2se/javadoc/writingdoccomments/>
+for a complete discussion.
+
+Note that the @version and @serial/@serialField/@serialData
+tags are not supported; @version is replaced by the package $VERSION
+variable, and @serial is not relevant.
+
+Also note that @param values are interpretted as hash-based
+arguments if the param name is not preceded by any of [$%@*&].
+
+=head2 Supported Tags
+
+=head4 @author I<Name>
+
+(package level only) Specifies package author
+
+=head4 @constructor
+
+(method level only) Specifies the method is a constructor
+
+=head4 @deprecated
+
+Indicates the package or sub is deprecated.
+
+=head4 @exports I<NAME>  I<description>
+
+(package level only) List symbols exported by the package
+
+=head4 @ignore
+
+Omit the package/method from classdocs.
+
+=head4 @imports I<NAME>  I<description>
+
+(package level only) List symbols that can be imported by the package
+
+=head4 @instance I<array | hash | scalar | handle> 
+
+(package level only) Specifies the base type of an instance; useful
+when public members are specified (see L<@member>)
+
+=head4 @member I<NAME>  I<description>
+
+(package level only) List public members of class instances
+
+=head4 @optional C<variable>  I<description>
+
+(method level only) Specifies an optional parameter
+
+=head4 @param C<variable>  I<description>
+
+(method level only) Specifies a required parameter
+
+=head4 @return I<description>
+
+(method level only) Specifies returned value in scalar context
+
+=head4 @returnlist I<description>
+
+(method level only) Specify returned values in list context
+(if different from scalar context)
+
+=head4 @see I<URL>
+
+Specifies reference documentation links. Note that links to CPAN packages can be abbreviated
+as C<E<lt>cpanE<gt>Package::NameE<lt>/cpanE<gt>>. Links to methods, members, and export or import
+symbols (either local to the class, or as part of another classdoc package)
+can be specified using the tags described in L<Special URL Tags>.
+
+=head4 @self C<$objectvar>
+
+Specify the conventional variable name used for the object's instance
+(e.g., '$this', '$self', '$obj', etc.)
+
+=head4 @simplex
+
+(method level only) to specify a simplex method (for L<Thread::Apartment> or
+L<Thread::Sociable::Apartment> based packages)
+
+=head4 @since I<date>
+
+Specifies original version date.
+
+=head4 @static
+
+(method level only) Specifies the sub is a static class method (rather
+than an instance method).
+
+=head4 @urgent
+
+(method level only) Specifies an urgent method (for L<Thread::Apartment> or
+L<Thread::Sociable::Apartment> based packages)
+
+=head4 @xs C<method_name>
+
+(method level only) Specifies classdocs for XS methods (or any methods without a Perl implementation)
+
+=head2 Source Format
+
+Classdoc sections are introduced by C<=begin classdoc> and closed by
+C<=end classdoc> POD directives. Intervening lines are simple free format text,
+except that classdoc tags must be specified as the first element on a line.
+
+E.g.,
+
+	=pod
+
+	=begin classdoc
+
+	@xs InCaseItsAnXSsub
+
+	Description of the class/interface/method
+	continues up to the first tag, or the end of the
+	classdoc section, and may include HTML tags
+
+	@author	D. Arnold
+	@since	2005-12-09
+	@see	<a href="http://java.sun.com/j2se/javadoc/writingdoccomments/">Javadoc Reference</a>
+	@see	<cpan>Some::Module::On::CPAN</cpan>
+	@see	<method>another_method</method>
+	@see	<method>DBI::errstr</method>
+	@instance hash
+	@self	$obj
+
+	@param  $myVal		a description of the parameter being passed
+		which may wrap to the next
+		few
+		lines
+	@optional $myOptional	a description of an optional parameter
+
+	@return	 the scalar return value description which
+		may flow onto the next lines
+
+	@returnlist	the list context return value description
+
+	=end classdoc
+
+	=cut
+
+A classdoc section immediately preceding a C<package> keyword
+is assumed to be package level; all others are assumed to apply
+to the immediately succeding C<sub>, except for classdocs
+which include an C<@xs> qualifier.
+
+The output is formatted into
+
+=over
+
+=item *
+
+an introductory package/class description
+
+=item *
+
+a listing of exported and imported symbols, and any public instance members,
+with associated descriptions
+
+=item *
+
+a table of constructor and method summaries, which includes only an example
+of the method's usage, and the first sentence
+of the method's description text
+
+=item *
+
+a listing of constructor and method details, which provides the complete
+description and associated markup tags
+
+=back
+
+Note that hash-based parameter list
+elements are presented as "Name => value,".
+
+=head3 Special URL Tags
+
+As a convenience, several special URL tags are supported, including
+
+=over
+
+=item B<E<lt>cpanE<gt>>
+
+"<cpan>modulename</cpan>" will be expanded into
+the equivalent search.cpan.org URL hyperlink for the specified module name.
+
+=item B<E<lt>exportE<gt>>
+
+"<export>name</export>" will be expanded into
+the equivalent internal hyperlink for the specified exported symbol.
+
+"<export>Some::Package::name</export>" will attempt expansion of the
+package name into a filepath, with the internal exports symbol link
+appended.
+
+=item B<E<lt>importE<gt>>
+
+"<import>name</import>" will be expanded into
+the equivalent internal hyperlink for the specified imported symbol.
+
+"<import>Some::Package::name</import>" will attempt expansion of the
+package name into a filepath, with the internal imports symbol link
+appended.
+
+=item B<E<lt>memberE<gt>>
+
+"<member>name</member>" will be expanded into
+the equivalent internal hyperlink for the specified public instance member.
+
+"<member>Some::Package::name</member>" will attempt expansion of the
+package name into a filepath, with the internal member link
+appended.
+
+=item B<E<lt>methodE<gt>>
+
+"<method>name</method>" will be expanded into
+the equivalent internal hyperlink for the specified public method.
+
+"<method>Some::Package::name</method>" will attempt expansion of the
+package name into a filepath, with the internal method link
+appended.
+
+Constructors are tagged as methods.
+
+=item B<E<lt>packageE<gt>>
+
+"<package>Some::Package</package>" will attempt expansion of the
+package name into a filepath.
+
+=back
+
+=head1 METHODS
+
+Refer to the included classdocs for method descriptions.
+
+=head3 Notes
+
+Note that C<@param> and C<@optional> tags should be specified
+in the order they are expected by the method (except for named
+parameter lists, which may be specified in any order).
+
+Also note that embedded HTML tags are preserved in the output, but embedded
+POD tags are B<NOT> processed.
+
+=head1 TO DO
+
+=over
+
+=item *
+
+Support method prototype parsing.
+
+=item *
+
+Support method attribute specification.
+
+=back
+
+=head1 SEE ALSO
+
+L<Pod::ClassDocs::Project> - used to generate complete project
+documents from L<Pod::ProjectDocs> output, merged with classdocs
+rendered from this module, and a table of contents rendered
+from L<HTML::ListToTree>.
+
+L<http://www.presicient.com/classdoc/classdocs> for an example
+of classdocs generated from this package.
+
+=head1 AUTHOR, COPYRIGHT, and LICENSE
+
+Copyright(C) 2007, Dean Arnold, Presicient Corp., USA. All rights reserved.
+
+Permission is granted to use this software under the same terms as Perl itself.
+Refer to the L<Perl Artistic License|perlartistic> for details.
+
+=cut

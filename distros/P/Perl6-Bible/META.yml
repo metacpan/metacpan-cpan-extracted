@@ -1,0 +1,13 @@
+abstract: Perl 6 Design Docs [STALLED] please use Perl6::Doc
+author: Brian Ingerson. All rights reserved.
+distribution_type: module
+generated_by: Module::Install version 0.57
+license: perl
+name: Perl6-Bible
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  perl: 5.000
+version: 0.37

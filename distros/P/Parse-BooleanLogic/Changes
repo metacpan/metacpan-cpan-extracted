@@ -1,0 +1,47 @@
+0.09 2009-03-19
+
+    * don't assume that operand is a HASH, it can be any reference
+
+0.08 2009-03-02
+
+    * partial_solve and walk methods
+
+0.07 2009-01-26
+
+    * quoting and dequoting methods
+
+0.06 2009-01-22
+
+    * add support for @rest in filter, solve and fsolve
+    * fix SYNOPSIS
+    * more examples and docs
+
+0.05 2008-11-21
+    
+    * fix some parsing issues
+    * calling as class methods is NOT allowed anymore
+    * support for custom boolean operators
+    * support for custom parens
+    * more examples, tests and docs
+
+0.04 2008-09-16
+
+    * fsolve method - filter+solve in one
+    * fix problems with boolean operators (AND/OR)
+      in the middle of an operand
+    * parsing speed improvements, almost complete rewrite
+    * fix skip_next logic in solve and filter
+    * cover filter, solve and fsolve with tests
+    * update docs
+
+0.03 2008-06-08
+
+    * filter and solve methods
+    * constructor
+    * doc updates
+    * some incompatible API changes
+
+0.02 2007-11-03
+
+    * initial release
+

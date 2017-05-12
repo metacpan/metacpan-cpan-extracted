@@ -1,0 +1,47 @@
+/* purple.css -- CSS for purple-generated HTML files. */
+/* $Id: purple.css,v 1.2 2004/02/12 17:39:53 cdent Exp $ */
+
+body {
+  padding-bottom: 50em;
+}
+
+h1.title {
+  text-align: center;
+}
+
+h2.subtitle {
+  text-align: center;
+}
+
+p.authors {
+  text-align: center;
+}
+
+p.docinfo {
+  text-align: center;
+}
+
+p {
+  line-height: 120%;
+}
+
+li {
+  line-height: 120%;
+}
+
+a.nid {
+  font-family: "Helvetica", "Arial", sans-serif;
+  font-style: normal;
+  font-weight: bold;
+  font-size: x-small;
+  text-decoration: none;
+  color: #C8A8FF;  /* light purple */
+}
+
+a.nid:before {
+    content: "(";
+}
+
+a.nid:after {
+    content: ")";
+}

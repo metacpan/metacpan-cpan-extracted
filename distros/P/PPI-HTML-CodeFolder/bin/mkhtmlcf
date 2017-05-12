@@ -1,0 +1,344 @@
+#!perl
+
+# Converts Perl to Code-folded HTML using PPI::HTML::CodeFolder
+
+use File::Slurp ();
+use PPI;
+use PPI::HTML::CodeFolder;
+use CSS::Tiny;
+use Getopt::Long qw(:config no_ignore_case permute);
+use File::Path;
+use File::Spec::Functions qw(splitpath);
+use Module::Mapper;
+use Pod::Usage;
+
+use strict;
+use warnings;
+
+my $all = 0;
+my $bare = 0;
+my $closeimg = 'closedbook.gif';
+my $nocomments = 0;
+my $help = 0;
+my $csspath = undef;
+my $noheredocs = 0;
+my $noimports = 0;
+my $jspath = undef;
+my $jstoc = 0;
+my $minlines = 4;
+my $noexpand = 0;
+my $output = '';
+my $openimg = 'openbook.gif';
+my $project = 0;
+my $nopod = 0;
+my $rootimg = 'globe.gif';
+my $root = '';
+my $title = 'My Project';
+my $noicons = 0;
+my $verbose;
+my @srclibs = ();
+my @exes = ();
+my @modules = ();
+my $imgpath = undef;
+my $useinc = undef;
+
+GetOptions(
+	'a|all'         => \$all,
+	'b|bare'        => \$bare,
+	'c|closeimg=s'	=> \$closeimg,
+	'C|nocomments'  => \$nocomments,
+	'e|exes=s'        => sub { push @exes, $_[1]; },
+    'h|help'		=> \$help,
+    'H|noheredocs'	=> \$noheredocs,
+    'i|imgpath=s'	=> \$imgpath,
+    'I|noimports'   => \$noimports,
+    'j|jspath=s'	=> \$jspath,
+    'J|jstoc'		=> \$jstoc,
+	'm|minlines=s'  => \$minlines,
+	'M|module=s'    => sub { push @modules, $_[1]; },
+    'O|openimg=s'	=> \$openimg,
+    'o|out|output=s'	=> \$output,
+    'p|project'     => \$project,
+    'P|nopod'		=> \$nopod,
+	'r|rootimg=s'	=> \$rootimg,
+	's|csspath=s'   => \$csspath,
+    't|title=s'		=> \$title,
+    'u|useinc'      => \$useinc,
+    'v|verbose'		=> \$verbose,
+	'x|noexpand'    => \$noexpand,
+    'z|noicons'		=> \$noicons,
+    '<>'			=> sub { push @srclibs, @_; }
+);
+
+pod2usage(1) if $help;
+
+if ($jstoc) {
+	eval "require HTML::ListToTree;";
+	die "Can't generate Javascript TOC: $@" if $@;
+}
+
+$jspath ||= "$output/js";
+$csspath ||= "$output/css";
+$imgpath ||= "$output/img";
+$output ||= './ppicf';
+
+my %srcs = ();
+my %subdirs = ();
+
+$project = shift @srclibs || '.'
+	if $project;
+
+my $modules = find_sources(
+	All => $all,
+	Scripts => \@exes,
+	Modules => \@modules,
+	Libs => \@srclibs,
+	UseINC => $useinc,
+	Output => $output,
+	Project => $project,
+	Verbose => ($verbose ? sub { print $_[0]; } : undef),
+);
+
+die $@ unless $modules;
+
+#
+#	create full directory trees for output; we trim any
+#	std. prefix directories from Config,as well as any volume name
+#	and then map the source file to its path-qualified target output 
+#
+my %outdirs = ();
+foreach my $dir (values %$modules) {
+	my ($volume, $subdir, $file) = splitpath( $dir->[1] );
+	$outdirs{"$volume$subdir"} = 1 if $subdir; 
+}
+#
+#	save scripts
+#
+my $scripts = listScripts($modules);
+
+print "Creating directory $_...\n" and
+mkpath $_ 
+	foreach (keys %outdirs);
+
+my %tagcolors = (
+    cast => '#339999',
+    comment => '#008080',
+    core => '#FF0000',
+    double => '#999999',
+    heredoc => '#FF0000',
+    heredoc_content => '#FF0000',
+    heredoc_terminator => '#FF0000',
+    interpolate => '#999999',
+    keyword => '#0000FF',
+    line_number => '#666666',
+    literal => '#999999',
+    magic => '#0099FF',
+    match => '#9900FF',
+    number => '#990000',
+    operator => '#DD7700',
+    pod => '#008080',
+    pragma => '#990000',
+    regex => '#9900FF',
+    single => '#999999',
+    substitute => '#9900FF',
+    transliterate => '#9900FF',
+    word => '#999999',
+);
+
+$noexpand = 1 if $bare;
+my $line_nums = (!$bare);
+
+# Create the PPI::HTML object
+my $HTML = PPI::HTML::CodeFolder->new(
+    line_numbers => $line_nums,
+    page         => 1,
+    colors       => \%tagcolors,
+    verbose      => $verbose,
+    fold          => {
+    	Abbreviate    => 1,
+        POD           => (!$nopod),
+        Comments      => (!$nocomments),
+        Expandable    => (!$noexpand),
+        Heredocs      => (!$noheredocs),
+        Imports       => (!$noimports),
+        MinFoldLines  => $minlines,
+        Javascript    => "$jspath/ppicf.js",
+        Stylesheet    => "$csspath/ppicf.css",
+        },
+    )
+    or die "Failed to create HTML syntax highlighter";
+
+foreach (values %$modules) {
+	print "Scanning $_->[0]...\n" if $verbose;
+	my $Document = PPI::Document->new( $_->[0] )
+	    or die "File '$_->[0]' could not be loaded as a document";
+
+# Process the file
+	print "Code folding $_->[0]...\n" if $verbose;
+	$_->[1] .= '.html';
+	my $content = $HTML->html( $Document, $_->[1], $scripts->{$_->[0]} )
+	    or die "Failed to generate HTML for $_->[0]";
+
+	print "Writing $_->[1]...\n" if $verbose;
+	File::Slurp::write_file( $_->[1], $content );
+	print "$_->[0] done\n" if $verbose;
+}
+#
+#	save JS and CSS
+#
+mkpath $jspath;
+File::Slurp::write_file( "$jspath/ppicf.js", $HTML->foldJavascript());
+
+mkpath $csspath;
+File::Slurp::write_file( "$csspath/ppicf.css", $HTML->foldCSS());
+#
+#	generate TOC
+#
+unless ($bare) {
+	if ($jstoc) {
+		my $toc = $HTML->getTOC("$output/toc.html", Order => [ sort values %$scripts ] );
+		($toc) = ($toc=~/^.*<\!-- INDEX BEGIN -->(.+)<\!-- INDEX END/s);
+		my $tree = HTML::ListToTree->new(Text => $title, Link => '', Source => $toc)
+			or die $@;
+
+		mkpath $imgpath;
+
+		$tree->writeJavascript("$jspath/tree.js");
+		$tree->writeCSS("$csspath/tree.css");
+		$tree->writeIcons($imgpath);
+
+		$csspath = pathAdjust($output, $csspath);
+		$jspath = pathAdjust($output, $jspath);
+		my $widget = $tree->render(
+			CloseIcon => $closeimg,
+			CSSPath => "$csspath/tree.css",
+			IconPath => pathAdjust($output, $imgpath),
+			JSPath => "$jspath/tree.js",
+			UseIcons => (!$noicons),
+			OpenIcon => $openimg,
+			RootIcon => $rootimg,
+			) or die $@;
+		
+		die "Can't open $output/toc.html: $!"
+			unless open(OUTF, ">$output/toc.html");
+		print OUTF $widget;
+		close OUTF;
+		
+	}
+	else {
+		$HTML->writeTOC($output, Order => [ sort values %$scripts ]);
+	}
+	$HTML->writeFrameContainer($output, $title, $root) or die $@;
+}
+print "Saved HTML to $output\n" if $verbose;
+
+sub listScripts {
+	my $modules = shift;
+	my %scripts = ();
+
+	foreach (values %$modules) {
+		next if (substr($_->[0], -3) eq '.pm');
+		my @parts = split /[\/\\]/, $_->[0];
+		$scripts{$_->[0]} = $parts[-1];
+	}
+	return \%scripts;
+}
+
+sub pathAdjust {
+	my ($path, $jspath) = @_;
+	return $jspath
+		unless (substr($jspath, 0, 2) eq './') && (substr($path, 0, 2) eq './');
+#
+#	relative path, adjust as needed from current base
+#
+	my @parts = split /\//, $path;
+	my @jsparts = split /\//, $jspath;
+	shift @parts;
+	shift @jsparts;	# remove the relative head
+	my $prefix = '';
+	shift @parts, 
+	shift @jsparts
+		while @parts && @jsparts && ($parts[0] eq $jsparts[0]);
+	return ('../' x scalar @parts) . join('/', @jsparts)
+}
+
+=pod
+
+=head1 NAME
+
+ppihtmlcf
+
+=head1 SYNOPSIS
+
+ppihtmlcf [options] <source-path> [ <source-path> ... ]
+
+ Options:
+    -a|-all                 process all files in subdirectories
+    -b|-bare                no TOC, no frame container, no fold expansion,
+                                no line numbers
+    -c|-closeimg <filename> image file used for HTML::ListToTree closed 
+                                nodes; default 'closedbook.gif'
+    -C|-nocomments          don't fold comments
+    -e|-exe <scriptpath>    process a script; may be used multiple times.
+                                <scriptpath> is a fully qualified pathname
+    -h|-help                display this help and exit
+    -H|-noheredocs          don't fold heredocs
+    -i|-imgpath <path>      path to image directory for ProjectDocs and 
+                                HTML::ListToTree; default <output root>/img
+    -I|-noimports           don't fold imports
+    -j|-jspath <path>       path to Javascript files; defaults to
+                                <output root>/js
+    -J|-jstoc               use Javascript tree for table of contents (via
+                                HTML::ListToTree); default is HTML list
+    -m|-minlines <lines>    minimum consecutive line for a fold
+    -M|-module <pkgname>    process a module/namespace; may be specified 
+                                multiple times. Names are specified in Perl
+                                package format, and may be top level
+                                namespaces (for -a processing)
+    -O|-openimg <filename>  image file used for open tree nodes;
+                                default 'openbook.gif'
+    -o|-out|-output <path>  target root directory path for generated 
+                                documents; default './ppicf'
+    -p|-project             project mode: scan ./bin and ./lib of first 
+                                <source-path> for all modules/scripts; 
+                                any add'l <source-path>s are ignored; 
+                                if no <source-path>, uses './'
+    -P|-nopod               don't fold POD
+    -r|-rootimg <filename>  image file used for root of HTML::ListToTree 
+                                tree; default is openimg
+    -s|-csspath <path>      path to CSS files for PPI::CodeFolder and 
+                                HTML::ListToTree; default <output root>/css
+    -t|-title <title>       project title
+    -u|-useinc              include @INC when scanning for modules
+    -v|-verbose             enable diagnostic messages
+    -x|-noexpand            no fold expansion
+    -z|-noicons             no icons in HTML::ListToTree tree widget;
+                                default is icons on
+
+E.g.:
+
+  ppihtmlcf -a -J -o ./ppicf -p -t "My Project"
+
+processes the local ./lib (for modules) and ./bin (for scripts) as a project
+with a Javascript TOC.
+
+  ppihtmlcf -a -J -o ./ppicf -u -t "My Project" -M PPI ./lib
+
+processes all modules in the PPI namespace within either ./lib, or in @INC
+with a Javascript TOC.
+
+=head1 DESCRIPTION
+
+Converts Perl source code to codefolded, syntax highlighted HTML via 
+L<PPI::HTML::CodeFolder>, with an associated framer container and either
+an HTML table of contents, or a Javascripted tree TOC (via L<HTML::ListToTree>).
+
+The following Javascript and stylesheet files are written to the specified 
+jspath and csspath directories:
+
+    ppicf.js:    codefolder Javascript
+    ppicf.css:   codefolder stylesheet
+    tree.js:     HTML::ListToTree widget Javascript (if -jstoc specified)
+    tree.css:    HTML::ListToTree widget stylesheet (if -jstoc specified)
+
+

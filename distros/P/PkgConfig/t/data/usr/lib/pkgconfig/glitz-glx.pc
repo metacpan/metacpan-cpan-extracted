@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libglitz-glx
+Description: OpenGL compositing library (GLX backend)
+Version: 0.5.6
+Requires: glitz
+Libs: -L${libdir} -lglitz-glx  -lX11 -lGL -lpthread
+Cflags: -I${includedir} 

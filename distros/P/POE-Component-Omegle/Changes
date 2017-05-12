@@ -1,0 +1,9 @@
+Revision history for Perl extension POE::Component::Omegle.
+
+0.02
+	- fix pod
+
+0.01  Sat Apr  4 09:38:03 2009
+	- original version; created by h2xs 1.23 with options
+		-X -b 5.6.0 -n POE::Component::Omegle
+

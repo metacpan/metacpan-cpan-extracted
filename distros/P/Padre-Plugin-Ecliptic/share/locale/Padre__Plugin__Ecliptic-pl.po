@@ -1,0 +1,160 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+#
+# Cezary Morga <cm@therek.net>, 2009.
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Ecliptic\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-06-10 16:04+0300\n"
+"PO-Revision-Date: 2009-06-12 22:10+0200\n"
+"Last-Translator: Cezary Morga <cm@therek.net>\n"
+"Language-Team: Polish <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 0.3\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: lib/Padre/Plugin/Ecliptic.pm:28
+msgid "Ecliptic"
+msgstr "Ecliptic"
+
+#: lib/Padre/Plugin/Ecliptic.pm:69
+msgid "Open Resource\tCtrl-Shift-R"
+msgstr "Otwórz zasób\tCtrl-Shift-R"
+
+#: lib/Padre/Plugin/Ecliptic.pm:76
+msgid "List Key Bindings\tCtrl-Shift-L"
+msgstr "Lista skrótów klawiszowych\tCtrl-Shift-L"
+
+#: lib/Padre/Plugin/Ecliptic.pm:83
+msgid "Quick Menu Access\tCtrl-3"
+msgstr "Szybki dostęp do menu\tCtrl-3"
+
+#: lib/Padre/Plugin/Ecliptic.pm:90
+msgid "Quick Outline Access\tCtrl-4"
+msgstr "Szybki dostęp do planu dokumentu\tCtrl-4"
+
+#: lib/Padre/Plugin/Ecliptic.pm:97
+msgid "Quick Module Access\tCtrl-5"
+msgstr "Szybki dostęp do modułu\tCtrl-5"
+
+#: lib/Padre/Plugin/Ecliptic.pm:104
+msgid "Open in Explorer\tCtrl-6"
+msgstr "Otwórz w Exploratorze\tCtrl-6"
+
+#: lib/Padre/Plugin/Ecliptic.pm:114
+msgid "About"
+msgstr "O wtyczce"
+
+#: lib/Padre/Plugin/Ecliptic.pm:131
+msgid "Provides Eclipse-like useful features to Padre.\n"
+msgstr "Zapewania w środowisku Padre przydatne funkcje z Eclipse.\n"
+
+#: lib/Padre/Plugin/Ecliptic/ListKeyBindingsDialog.pm:32
+msgid "List Key Bindings"
+msgstr "Lista skrótów klawiszowych"
+
+#: lib/Padre/Plugin/Ecliptic/OpenInExplorerAction.pm:39
+msgid "Failed to execute process\n"
+msgstr "Błąd przy próbie wykonania procesu\n"
+
+#: lib/Padre/Plugin/Ecliptic/OpenInExplorerAction.pm:55
+msgid "No filename"
+msgstr "Bez nazwy"
+
+#: lib/Padre/Plugin/Ecliptic/OpenInExplorerAction.pm:55
+#: lib/Padre/Plugin/Ecliptic/OpenInExplorerAction.pm:82
+msgid "Error"
+msgstr "Błąd"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:48
+msgid "Open Resource"
+msgstr "Otwórz zasób"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:133
+msgid "&Select an item to open (? = any character, * = any string):"
+msgstr ""
+"&Wybierz element do otwarcia (? = dowolny znak, * = dowolny ciąg znaków):"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:137
+msgid "Ignore CVS/.svn/.git folders"
+msgstr "Ignoruj katalogi CVS/.svn/.git"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:142
+msgid "&Matching Items:"
+msgstr "&Pasujące elementy:"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:148
+msgid "Current Search Directory: "
+msgstr "Bieżący katalog:"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:203
+msgid " items selected"
+msgstr " zaznaczone elementy"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:224
+msgid "Reading items. Please wait..."
+msgstr "Wczytywanie elementów. Proszę czekać..."
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:248
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:217
+msgid "Finished Searching"
+msgstr "Zakończono wyszukiwanie"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:279
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:241
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:229
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:239
+msgid " item(s) found"
+msgstr " znaleziony(-ch) elementów"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:281
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:243
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:231
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:241
+msgid "No items found"
+msgstr "Nie znaleziono żadnych elementów"
+
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:34
+msgid "Quick Menu Access"
+msgstr "Szybki dostęp do menu"
+
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:120
+msgid "&Type a menu item name to access:"
+msgstr "&Podaj nazwę elementu menu:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:125
+msgid "&Matching Menu Items:"
+msgstr "&Pasujące elementy menu:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:35
+msgid "Quick Module Access"
+msgstr "Szybki dostęp do modułu"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:130
+msgid "&Type a module name to access:"
+msgstr "&Podaj nazwę modułu:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:135
+msgid "&Matching modules:"
+msgstr "&Pasujące moduły:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:213
+msgid "Reading modules. Please wait..."
+msgstr "Wczytywanie modułów. Proszę czekać..."
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:34
+msgid "Quick Outline Access"
+msgstr "Szybki dostęp do planu dokumentu"
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:118
+msgid "&Type a Outline item name to access:"
+msgstr "&Podaj nazwę elementu planu dokumentu:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:123
+msgid "&Matching Outline Items:"
+msgstr "&Pasujące elementy planu dokumentu:"
+

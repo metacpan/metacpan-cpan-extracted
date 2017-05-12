@@ -1,0 +1,156 @@
+#!/usr/bin/perl
+
+use 5.010;
+use strict;
+use utf8;
+use warnings;
+
+use Perinci::CmdLine::Classic;
+
+our %SPEC;
+
+$SPEC{demo_help} = {
+    v => 1.1,
+    summary => 'Demo --help',
+    description => <<'_',
+
+This function contains various options to demo `--help` (and `--help
+--verbose`). Try running the program with these options ([environment
+variables]):
+
+* --help
+
+* --help-verbose
+
+* --help (LANG=id_ID)
+
+* --help (LANG=fr_FR)
+
+* --help (LANG=zh_CN)
+
+* --help (COLOR=0)
+
+* --help (COLUMNS=70)
+
+_
+    examples => [
+        {
+            argv => [qw/--pos0 ate --pos1 apple/],
+            summary => 'This is summary for the first example',
+        },
+        {
+            argv => ['ate', 'banana', '--str1', 'during lunch', '--nobad'],
+            summary => 'Summary for the second example',
+        },
+        {
+            args => {pos0=>"drunk", pos1=>"mango", ary1=>[1,3,77]},
+            summary => 'This is summary for the third and best example',
+        },
+    ],
+    args => {
+        pos0 => {
+            schema => 'str*',
+            req => 1,
+            pos => 0,
+        },
+        pos1 => {
+            schema => ['str*', {
+                in => [qw/apple orange durian mango banana papaya jackfruit
+                          melon watermelon/],
+            }],
+            summary => 'Some summary for pos1',
+            description => <<'_',
+
+The verbose help should display the values of the `in` attribute (the list of
+valid/allowed values).
+
+_
+            req => 1,
+            pos => 1,
+        },
+        ary1 => {
+            schema=>'array*',
+            summary => 'Summary for array argument',
+            description => <<'_',
+
+Array or hash arguments will be displayed as `--NAME-json=val` because normally
+they would be entered as JSON encoding (`--NAME-yaml` is also supported, but
+currently not displayed for brevity, and JSON is more popular currently anyway).
+
+In fact, `--NAME-json` is also supported for strings, numbers, etc to allow one
+entering a null value (`~`).
+
+_
+        },
+        some_long_argument_name => {
+            schema => 'int',
+        },
+        str1 => {
+            schema => 'str*',
+            cmdline_aliases => {
+                S => {
+                    summary => 'Alias for --str1',
+                },
+            },
+        },
+        bad => {
+            schema => 'bool*',
+            summary => 'Some summary for the bool opt',
+            cmdline_aliases => {
+                b => {},
+                pretty => {
+                    code => sub { $_[0]{bad} = 0 },
+                    summary => 'Equivalent to --nobad',
+                    description => <<'_',
+
+Aliases with specified `code` will be displayed as a separate option, because
+they might mean the reverse (like in this example) or generally anything.
+
+_
+                },
+            },
+        },
+        bool2 => {
+            schema => ['bool*' => default=>1],
+            summary => 'Some summary for the bool2 opt',
+            "summary.alt.lang.id_ID" => 'Keterangan untuk opsi bool2',
+            "x.perinci.cmdline.negative_summary" => 'Negative summary for the bool2 opt',
+            "x.perinci.cmdline.negative_summary.alt.lang.id_ID" => 'Keterangan negatif untuk opsi bool2',
+            description => <<'_',
+
+This boolean option has the default value of true. In other words, --bool2 is
+assumed even if not specified on the command-line. To turn this option off, you
+need to use --nobool2. So, only --nobool2 is displayed in help message, and the
+negative summary will be used if available.
+
+_
+        },
+        bool3 => {
+            summary => 'Some summary for the bool3 opt',
+            schema => ['bool' => default=>0],
+        },
+        another_argument_with_extra_long_name => {
+            schema => 'hash',
+            summary => 'In some display it can be truncated',
+        },
+        foo1 => {
+            summary => 'This is a foo-related option',
+            schema => 'num',
+            tags => ['category:Foo'],
+        },
+        foo2 => {
+            summary => 'This is another foo-related option',
+            "summary.alt.lang.id_ID" => 'Ini opsi lain yang terkait dengan foo',
+            "summary.alt.lang.fr_FR" => "C'est une autre option liée à foo",
+            "summary.alt.lang.zh_CN" => '这是另一种跟foo有关的选项',
+            schema => [int => between => [1, 10]],
+            tags => ['category:Foo'],
+        },
+    },
+};
+sub demo_help {
+    my %args = @_;
+    [200];
+}
+
+Perinci::CmdLine::Classic->new(url=>'/main/demo_help')->run;

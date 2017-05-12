@@ -1,0 +1,9 @@
+Changes
+lib/Perl6/Placeholders.pm
+MANIFEST
+Makefile.PL
+test.pl
+demo.pl
+demo_autoformat.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+README

@@ -1,0 +1,5 @@
+DESCRIPTION
+
+    Perinci::Sub::Gen::* namespace is used for modules that generate
+    functions (and their metadata).
+

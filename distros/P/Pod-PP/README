@@ -1,0 +1,47 @@
+                            Pod::PP 0.1
+               Copyright (c) 2000-2001, Raphael Manfredi
+
+------------------------------------------------------------------------
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the Artistic License, a copy of which can be
+    found with perl.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    Artistic License for more details.
+------------------------------------------------------------------------
+
+       *** This is alpha software -- use at your own risks ***
+
+Name           DSLI  Description                                  Info
+-----------    ----  -------------------------------------------- -----
+Pod::PP        adpO  A POD pre-processor                          RAM
+
+The Pod::PP module is an instance of Pod::Parser that adds pre-processing
+support to POD.  It is not run automatically by POD tools: an explicit
+podpp pass is required.
+
+The podpp command-line interface is similar to cpp:
+
+	podpp -DDIR=/tmp -Ih -I../h file.pp > file.pod
+
+The supported directives are the classical cpp directives (if, ifdef,
+define, etc...), plus the following additional ones:
+
+	=pp require "file"
+	=pp image <center> "file.png"
+
+The `require' directive includes a file *once*, and `image' lets you
+introduce pictures in your pod2html translations.
+
+I mostly wrote Pod::PP to add the `image' directive, so that I could
+write a nice online HTML documentation in POD for a big Intranet application
+I developped.  As the documentation grew, I felt the need for the other
+cpp-like features, so I added them.
+
+My thanks go to Brad Appleton, who wrote Pod::Parser, thereby making Pod::PP
+quite easy to write.
+
+-- Raphael Manfredi <Raphael_Manfredi@pobox.com>
+

@@ -1,0 +1,14 @@
+Build.PL
+Changes
+INSTALL
+lib/Parse/PhoneNumber.pm
+Makefile.PL
+MANIFEST
+META.yml
+META.json
+README
+t/bad_numbers.txt
+t/good_numbers.txt
+t/numbers.t
+t/pod.t
+t/us_numbers.t

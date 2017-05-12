@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+
+use PApp;
+use PApp::Config;
+use PApp::SQL;
+use Convert::Scalar ':utf8';
+
+$PApp::SQL::DBH = PApp::statedbh;
+
+# 1. check wether any non-utf8 strings are in the database
+
+$|=1;
+
+print "\nAnalysing your existing translation entries...";
+
+my $s = 0;
+my $u = 0;
+my $v = 0;
+
+sub count {
+   my $st = sql_exec \my($str), $_[0];
+   while ($st->fetch) {
+      $s++;
+      if (utf8_valid $str) {
+         $v++ if length ($str) != utf8_length ($str);
+      } else {
+         $u++;
+      }
+      $l
+   }
+}
+
+count("select id from msgid");
+count("select msg from msgstr");
+
+print " ok\n\n";
+
+# 2. ask user
+
+print "Looking through your i18n database, I could find\n";
+printf "%6d strings,\n%6d of which were not valid utf-8 and\n%6d of which were valid utf-8.\n\n", $s, $u, $v;
+
+print "Chances that some strings are not yet converted are high.\n" if $u;
+print "It is likely that this db is already partially converted.\n" if $u && $v;
+print "The database seems to be fully converted already.\n" if $v && !$u;
+
+print "\nYou have three choices:\n";
+
+print "q: exit program, nothing will be done.\n";
+print "c: checked conversion, only convert strings that are non-valid utf-8.\n";
+print "f: forced conversion, blindly convert all strings\n\n";
+
+print "Your choice <q/c/f>: ";
+$choice = <STDIN>;
+
+# 3. react
+
+print "\n\n";
+
+if ($choice =~ /^c/i) {
+   print "Checked conversion running, please wait... ";
+   $checked = 1;
+} elsif ($choice =~ /^f/i) {
+   print "Forced conversion running, please wait... ";
+   $checked = 0;
+} else {
+   print "exiting...\n";
+   exit;
+}
+
+sub convert {
+   my ($table, $field) = @_;
+   my $st = sql_exec \my($str), "select $field from $table";
+   while ($st->fetch) {
+      utf8_off $str;
+      my $new = $str;
+      utf8_upgrade $new unless $checked && utf8_valid $str;
+      utf8_on $new; utf8_on $str;
+      $new ne $str and ++$converted and
+         sql_exec "update $table set $field=? where $field=?", $new, $str;
+   }
+}
+
+convert qw<msgid id>;
+convert qw<msgstr msg>;
+
+printf " %d strings converted.\n", $converted;
+
+

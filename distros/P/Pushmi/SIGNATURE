@@ -1,0 +1,70 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 06fb47187ae756932cb8f44f6af70b88a61b8962 CHANGES
+SHA1 2b8b815229aa8a61e483fb4ba0588b8b6c491890 LICENSE
+SHA1 fc7da93d9c3a7ab6c77a47b52c81f1d1587d5b99 MANIFEST
+SHA1 a78905a7575e6dd0a727de30df986ae20189e4c3 MANIFEST.SKIP
+SHA1 28ef7fb7af1b50331bf32011b0428b6e1d3017b0 META.yml
+SHA1 1fd3f86dbb520abcc8eefd1fa2b78de16e519811 Makefile.PL
+SHA1 87aac084d0c8ef4fb5f73085989bdf48f9589f93 NOTICE
+SHA1 816d168453342bafaf2c206218eac4a9d6095a8e README
+SHA1 43ffef6aea947992e971a684222d00a7366b7fb4 bin/pushmi
+SHA1 5b52cbdabc56a44e4c0a90a3f5a5609a90d26f84 inc/ExtUtils/AutoInstall.pm
+SHA1 603bb9de29fb8cba7f13409c546750972eff645d inc/Module/AutoInstall.pm
+SHA1 527aa5e20eec84dc92664ac55a10884c08b740d1 inc/Module/Install.pm
+SHA1 ae32c02b539901de91f06366ce9bdbb7a7bd040b inc/Module/Install/AutoInstall.pm
+SHA1 8ea4e37df83fd0c1c050be5c8da75545c3828d9b inc/Module/Install/Base.pm
+SHA1 1da6031583c32f0d1ec073b8376102fc51427dcc inc/Module/Install/Can.pm
+SHA1 b779375b90c16af2f31f38a1dd2b5df223c7f2fb inc/Module/Install/Fetch.pm
+SHA1 6bf0d0d100b94d1a2ce64d010c8813dec26ac480 inc/Module/Install/Include.pm
+SHA1 2054450e1e9c1dd8056362bf4a64ae70d5d71476 inc/Module/Install/Makefile.pm
+SHA1 5d6189b2cad15cf9932a28faafd55130c8247e83 inc/Module/Install/Metadata.pm
+SHA1 8015c2aceacb9b793e8a472036f93d0bac67c0db inc/Module/Install/Scripts.pm
+SHA1 02af973fae2ac3531fa6b704574b2b8cb2a08148 inc/Module/Install/Win32.pm
+SHA1 3a2eab96e91cca8d99938cda7791759ae9d97b3a inc/Module/Install/WriteAll.pm
+SHA1 7008b42290b6f43a3932467a69fb6b10d555f395 lib/Pushmi.pm
+SHA1 fa5e5d3d5bd850b782f060603fcb411cdfb2922e lib/Pushmi/Apache/AuthCache.pm
+SHA1 5218151c5e40cb82e47d8f0ca56661670b6756c9 lib/Pushmi/Apache/AuthCommit.pm
+SHA1 3f1e85700b7095ba229ba44bb3f5fee02e519402 lib/Pushmi/Apache/RelayProvider.pm
+SHA1 23602cc6d975e383a916cc6191026bb7641831d6 lib/Pushmi/Command.pm
+SHA1 7577fdaccf7adf276abebc9c9d80643607f57c61 lib/Pushmi/Command/Help.pm
+SHA1 b7719c2c1fcaef5e1b9378bafff8c875d536e103 lib/Pushmi/Command/Mirror.pm
+SHA1 281471779ab4bf2aa0d239ae08bb0415e641b684 lib/Pushmi/Command/Runhook.pm
+SHA1 625c9c81191201580387b7fca9d981383fc15130 lib/Pushmi/Command/Sync.pm
+SHA1 3a6a3d922c8b73a5128a9336d2e2005a64e6b56d lib/Pushmi/Command/Tryauth.pm
+SHA1 f25a90f46c16c07bcfd3a1eb6a91cb832bfcfaa6 lib/Pushmi/Command/Unlock.pm
+SHA1 907975c6c2de7a5b82afb819d8f3c420218507c6 lib/Pushmi/Command/Verify.pm
+SHA1 6fe98662e993a86de5d70841f90c45fa914b5291 lib/Pushmi/Config.pm
+SHA1 1d8db0dfef17771c24049efc380f4479a8a53dbd lib/Pushmi/Editor/Locker.pm
+SHA1 0f4d83a7a6eb5170b82c8045516ca96bb2a063ac lib/Pushmi/Mirror.pm
+SHA1 1c3eba2f5b7ba2503443fde91323121ad681a48a lib/Pushmi/Test.pm
+SHA1 9a48ed4782e6a29bf79ba54924b32ba7a4b7a385 t/00use.t
+SHA1 5cf02d2a669b0db0ab493611c860ee7e8dcc6ec2 t/auth-relayed.t
+SHA1 edc6c12ebb24a6c849b7b825d1a81d37ebf028a9 t/auth.t
+SHA1 cdbaa31749fde81cde1a203c91cd5118afe84c13 t/basic.t
+SHA1 f33e07832f6609ebee8be04d09acb1c260cc54a7 t/concurrency.t
+SHA1 02fb5bfb186cd8deef7853a4b07393e0488b80aa t/pushmi-log.conf
+SHA1 e0869b50ffeb34e15d1c0a708f54bd1a1abb1b3d t/pushmi.conf
+SHA1 e57278ae012ff29de5ca27570645527d0df7e8cf t/verify.t
+SHA1 dbd6cb10b40683c7c3a67ef1a2dfab4ecff16567 utils/verify-mirror
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFGyT79k1XldlEkA5YRAmWyAJ9CxBdLPf1FCfEKAHE/X43jT/8AZgCeM4qy
+V4H0C25NgdTpMN19Io4uYwk=
+=7CdF
+-----END PGP SIGNATURE-----

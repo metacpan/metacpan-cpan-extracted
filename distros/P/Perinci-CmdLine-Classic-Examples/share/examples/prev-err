@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Classic;
+use Perinci::Sub::Util qw(err);
+
+our %SPEC;
+
+$SPEC{f} = {
+    v => 1.1,
+    summary => 'Demo showing previous error in trace log-level',
+};
+sub f {
+    err(g());
+}
+
+sub g {
+    err(404, h());
+}
+
+sub h {
+    [500, "Can't find magic dust"];
+}
+
+
+Perinci::CmdLine::Classic->new(url => '/main/f')->run;

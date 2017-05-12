@@ -1,0 +1,62 @@
+<!--
+
+    PPM Configuration DTD ($Date: 2000/01/26 17:39:19 $)
+    Revision: $Id: ppmconfig.dtd,v 1.1.1.1 2000/01/26 17:39:19 graham Exp $
+
+    Defines a configuration file for the Perl Package Manager.
+
+-->
+
+<!ELEMENT PPMCONFIG (PPMVER | PLATFORM | REPOSITORY | OPTIONS |
+                     PPMPRECIOUS | PACKAGE)*>
+
+<!ELEMENT PPMVER   (#PCDATA)>
+
+<!ELEMENT PLATFORM  EMPTY>
+<!ATTLIST PLATFORM  OSVALUE     CDATA   #REQUIRED
+                    OSVERSION   CDATA   #REQUIRED
+                    CPU         CDATA   #REQUIRED
+                    LANGUAGE    CDATA   #IMPLIED>
+
+<!ELEMENT REPOSITORY    EMPTY>
+<!ATTLIST REPOSITORY    NAME     CDATA  #REQUIRED
+                        LOCATION CDATA  #REQUIRED
+                        USERNAME CDATA
+                        PASSWORD CDATA>
+
+<!ELEMENT OPTIONS   EMPTY>
+<!ATTLIST OPTIONS   IGNORECASE      CDATA   #REQUIRED
+                    CLEAN           CDATA   #REQUIRED
+                    CONFIRM         CDATA   #REQUIRED
+                    FORCEINSTALL    CDATA   #REQUIRED
+                    ROOT            CDATA   #REQUIRED
+                    BUILDDIR        CDATA   #REQUIRED
+                    MORE            CDATA   #REQUIRED
+                    DOWNLOADSTATUS  CDATA   #IMPLIED
+                    TRACE           CDATA   #IMPLIED
+                    TRACEFILE       CDATA   #IMPLIED
+                    VERBOSE         CDATA   #IMPLIED>
+
+<!ELEMENT PPMPRECIOUS (#PCDATA)>
+
+<!ELEMENT PACKAGE   (LOCATION | INSTDATE | INSTROOT | INSTPACKLIST |
+                     INSTPPD)*>
+<!ATTLIST PACKAGE   NAME    CDATA   #REQUIRED>
+
+<!ELEMENT LOCATION  (#PCDATA)>
+
+<!ELEMENT INSTDATE  (#PCDATA)>
+
+<!ELEMENT INSTROOT  (#PCDATA)>
+
+<!ELEMENT INSTPACKLIST (#PCDATA)>
+
+<!ELEMENT INSTPPD   (#PCDATA)>
+
+
+<!--
+    UNFINISHED!!!
+
+    INSTPPD is allowed to contain a complete PPD file.  Need to update the DTD
+    here to allow for that to happen.
+-->

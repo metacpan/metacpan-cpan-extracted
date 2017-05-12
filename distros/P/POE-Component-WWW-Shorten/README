@@ -1,0 +1,116 @@
+SYNOPSIS
+
+      use POE qw(Component::WWW::Shorten);
+    
+      my $poco = POE::Component::WWW::Shorten->spawn( alias => 'shorten', type => 'Metamark' );
+    
+      POE::Session->create(
+            package_states => [
+                    'main' => [ qw(_start _shortened) ],
+            ],
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+    
+      sub _start {
+            my ($kernel,$heap) = @_[KERNEL,HEAP];
+    
+            $kernel->post( 'shorten' => 'shorten' =>
+              {
+                    url => 'http://reallyreallyreallyreally/long/url',
+                    event => '_shortened',
+                    _arbitary_value => 'whatever',
+              }
+            );
+            undef;
+      }
+    
+      sub _shortened {
+            my ($kernel,$heap,$returned) = @_[KERNEL,HEAP,ARG0];
+    
+            if ( $returned->{short} ) {
+               print STDOUT $returned->{short} . "\n";
+            }
+    
+            print STDOUT $returned->{_arbitary_value} . "\n";
+            undef;
+      }
+
+DESCRIPTION
+
+    POE::Component::WWW::Shorten is a POE component that provides a
+    non-blocking wrapper around WWW::Shorten. It accepts 'shorten' events
+    and will return a shortened url.
+
+    If the type of shortening to do is not specified it uses the
+    WWW::Shorten default which is WWW::Shorten::TinyURL.
+
+CONSTRUCTOR
+
+    spawn
+
+      Takes a number of arguments all are optional. Returns an object.
+
+        'alias', specify a POE Kernel alias for the component;
+        'options', a hashref of POE Session options to pass to the component's session;
+        'type', the WWW::Shorten sub module to use, default is 'TinyURL';
+        'params', the parameter for the makeshortenlink call to WWW::Shorten;
+
+METHODS
+
+    These are for the OO interface to the component.
+
+    shorten
+
+      Requires a hashref as first argument. See 'shorten' event below for
+      details.
+
+    session_id
+
+      Takes no arguments. Returns the POE Session ID of the component.
+
+    shutdown
+
+      Takes no arguments, terminates the component.
+
+INPUT
+
+    What POE events our component will accept.
+
+    shorten
+
+      Requires a hashref as first argument. The hashref should contain the
+      following keyed values:
+
+        'url', the url that you want shortening. ( Mandatory ).
+        'event', the name of the event to send the reply to. ( Mandatory ).
+        'session', optional, an alternative session: alias, ref or ID that the response should be 
+                   sent to, defaults to sending session;
+
+      You may also pass arbitary key/values in the hashref ( as
+      demonstrated in the SYNOPSIS ). Arbitary keys should have an
+      underscore prefix '_'.
+
+    shutdown
+
+      Takes no arguments, terminates the component.
+
+OUTPUT
+
+    Whether the OO or POE API is used the component passes responses back
+    via a POE event. ARG0 will be a hashref with the following key/value
+    pairs:
+
+      'url', the url that you wanted shortening.
+      'short', the shortened version. ( This will be undef if something went wrong ).
+
+    The hashref will also contain any arbitary key/values that were passed
+    in the original query.
+
+SEE ALSO
+
+    POE
+
+    WWW::Shorten
+

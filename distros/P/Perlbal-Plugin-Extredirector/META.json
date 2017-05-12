@@ -1,0 +1,61 @@
+{
+   "abstract" : "Use Squid rules in Perlbal.",
+   "author" : [
+      "Ilmari Vacklin <ilmari@dicole.com>",
+      "Antti V\u00c3\u00a4h\u00c3\u00a4kotam\u00c3\u00a4ki <antti@dicole.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200019, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perlbal-Plugin-Extredirector",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IPC::Open2" : 0,
+            "Net::Netmask" : 0,
+            "Perlbal" : 0,
+            "Socket" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-perlbal-plugin-extredirector at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Perlbal-Plugin-Extredirector"
+      },
+      "homepage" : "https://github.com/dicole/Perlbal-Plugin-Extredirector",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dicole/Perlbal-Plugin-Extredirector.git",
+         "web" : "https://github.com/dicole/Perlbal-Plugin-Extredirector"
+      }
+   },
+   "version" : "v0.0.4",
+   "x_authority" : "cpan:WOLVERIAN"
+}
+

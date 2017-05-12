@@ -1,0 +1,26 @@
+NAME
+    PAR::Repository::Web - A simple web viewer for PAR::Repository
+
+SYNOPSIS
+        cp examples/par_repository_web.pl .
+        cp -r examples/testrepo .
+        script/par_repository_web_server.pl
+
+DESCRIPTION
+    PAR::Repository::Web is a simple (read-only) web interface to a
+    PAR::Repository. It can display the contents of one or more
+    repositories, both local and remote. The displayed information includes
+    the list of distributions, scripts and modules provided.
+
+SEE ALSO
+    PAR::Repository, PAR::Repository::Client, PAR::Repository::Query,
+    PAR::Dist
+
+    Catalyst
+
+COPYRIGHT AND LICENSE
+    Copyright 2006-2008 by Steffen Mueller <smueller@cpan.org>
+
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

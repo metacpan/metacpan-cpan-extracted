@@ -1,0 +1,93 @@
+---
+abstract: 'Interface for all thermal, dot-matrix and other receipt printers that support ESC-POS specification.'
+author:
+  - 'Shantanu Bhadoria <shantanu@cpan.org> L<https://www.shantanubhadoria.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Printer-ESCPOS
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Printer::ESCPOS:
+    file: lib/Printer/ESCPOS.pm
+    version: '1.006'
+  Printer::ESCPOS::Connections::File:
+    file: lib/Printer/ESCPOS/Connections/File.pm
+    version: '1.006'
+  Printer::ESCPOS::Connections::Network:
+    file: lib/Printer/ESCPOS/Connections/Network.pm
+    version: '1.006'
+  Printer::ESCPOS::Connections::Serial:
+    file: lib/Printer/ESCPOS/Connections/Serial.pm
+    version: '1.006'
+  Printer::ESCPOS::Connections::USB:
+    file: lib/Printer/ESCPOS/Connections/USB.pm
+    version: '1.006'
+  Printer::ESCPOS::Manual:
+    file: lib/Printer/ESCPOS/Manual.pm
+    version: '1.006'
+  Printer::ESCPOS::Profiles::Generic:
+    file: lib/Printer/ESCPOS/Profiles/Generic.pm
+    version: '1.006'
+  Printer::ESCPOS::Profiles::SinocanPSeries:
+    file: lib/Printer/ESCPOS/Profiles/SinocanPSeries.pm
+    version: '1.006'
+  Printer::ESCPOS::Roles::Connection:
+    file: lib/Printer/ESCPOS/Roles/Connection.pm
+    version: '1.006'
+  Printer::ESCPOS::Roles::Profile:
+    file: lib/Printer/ESCPOS/Roles/Profile.pm
+    version: '1.006'
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Device::SerialPort: '0'
+  Device::USB: '0'
+  File::Temp: '0'
+  GD::Barcode::QRcode: '0'
+  IO::File: '0'
+  IO::Socket: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Pango: '0'
+  Scalar::Util::Numeric: '0'
+  Time::HiRes: '0'
+  Type::Tiny: '0'
+  aliased: '0'
+  constant: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/shantanubhadoria/perl-printer-escpos/issues
+  homepage: https://metacpan.org/release/Printer-ESCPOS
+  repository: git://github.com/shantanubhadoria/perl-printer-escpos.git
+version: '1.006'
+x_contributors:
+  - 'Dominic Sonntag <dominic@s5g.de>'
+  - 'Shantanu Bhadoria <shantanu att cpan dott org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

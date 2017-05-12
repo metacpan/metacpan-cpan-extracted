@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use PApp;
+use PApp::Config;
+use PApp::SQL;
+use Convert::Scalar ':utf8';
+
+$PApp::SQL::DBH = PApp::statedbh;
+
+# normalize language ids
+
+for $table (qw(msgid msgstr)) {
+   my $st = sql_exec \my($lang), "select distinct lang from $table";
+   while ($st->fetch) {
+      my $norm = PApp::I18n::normalize_langid $lang;
+      if ($norm ne $lang) {
+         warn "updating $lang => $norm\n";
+         sql_exec "update $table set lang = ? where lang = ?", $norm, $lang;
+      }
+   }
+}

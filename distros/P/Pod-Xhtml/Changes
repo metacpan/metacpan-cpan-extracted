@@ -1,0 +1,64 @@
+Thu Jul 29 17:18:22 2010 - 1.61
+    Add dependency on URI::Escape
+
+Wed Jul 28 18:17:36 2010 - 1.60
+    Index entries e.g. X<Topic> should not be rendered
+    Check for both old and new URI::Escape behaviour (RT #56324)
+
+Fri Sep 21 16:43:17 2007 - 1.59
+    honour xhtml content from =begin -> =end blocks, and =for lines
+
+Tue May 15 10:50:27 2007 - 1.56
+    * new TopHeading feature contributed by Jonathan Rockway
+    * added support for Pod::Hyperlink::BounceURL link parser
+
+Wed Jul 12 13:08:01 2006 - 1.52
+    * generated markup now handles lists in index (via MakeIndex => 2) correctly
+    * all head section content is enclosed within a <div> with an id attribute
+      related to the name of the head section it belongs to (e.g. NAME-CONTENT).
+    * several identical id attributes will no longer be generated, instead a
+      number will be appended (ie. NAME-2).
+
+Thu Apr 13 11:09:33 2006 - 1.51
+    Updated misc. unit tests to reflect new output formatting.
+    Generation of definition lists now using single <dd> for each <dt> and various block level elements within.
+    Generated XHTML standards compliant.
+
+Thu Dec  8 16:49:30 2005 - 1.44
+	- Minor fix to POD in t/a.pod
+
+Fri July 15 12:00:00 2005 - 1.43
+	- Fix double html-escaping of links (reported by Lasse Makholm)
+	- Fix =begin/=end behaviour so processor to skip over POD commands, not just
+	  data paragraphs.
+
+Wed June 13 16:50:00 2005 - 1.41
+	- Fixes for index & internal links prompted by Offer Kaye:
+		- Ensure unique IDs on headings (which can occur more than once)
+		- Ensure that links point to the correct headings where possible (if duplicates are involved)
+
+Wed June 01 15:30:00 2005 - 1.40
+	- Correctly nest bulleted lists within non-bulleted lists & vice versa
+	- Apply patch from Shlomi Fish to nest the TOC by heading level
+
+Tue May 31 18:00:00 2005 - 1.38
+	- The following changes from Shlomi Fish via RT Ticket #12718:
+		- Improved index
+		- Replace empty named anchor elements with the 'id' attribute
+		- Fix escaping of HTML metacharacters within markup commands
+	- Switch to XHTML 1.1
+	- Remove obsolete 'lang' attribute (HTML 4)
+
+Wed Apr 27 14:58:54 2005 - 1.37
+	- Add DOCTYPE (XHTML 1.0 Transitional) (Thanks to Brian Cassidy)
+	- Fix XHTML validity - some of the list types were incorrectly nested (Brian Cassidy)
+	- Fix index listing - nested lists must be in an <li> (Brian Cassidy)
+	- Fixed index generation - it no longer creates empty lists
+	- Add content-wrapper <divs> (pod & toc, like search.cpan) (Brian Cassidy)
+
+Fri Dec 10 17:38:22 2004 - 1.36 (no public release)
+	- supports =for/=begin/=end
+
+Fri Oct 22 15:49:15 2004 - 1.35
+	- Public release (CPAN)
+

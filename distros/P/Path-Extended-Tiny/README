@@ -1,0 +1,54 @@
+NAME
+  Path::Extended::Tiny - a Path::Tiny wrapper for Path::Extended
+  compatibility
+
+SYNOPSIS
+      use Path::Extended::Tiny;
+
+      # These objects have the (almost) same methods as Path::Extended
+      # but use Path::Tiny internally.
+      my $file = file('path/to/file.txt');
+      my $dir  = dir('path/to/somewhere');
+
+      # These objects autoload Path::Tiny methods as well.
+      $file->spew('write something to the path');
+      $dir->remove_tree;
+
+      # As for conflicting methods, append _pt to use Path::Tiny ones.
+      $file->slurp_pt;
+
+DESCRIPTION
+  This module reimplements important interfaces of Path::Extended
+  with Path::Tiny to help migration. If you have some utilities that
+  have used Path::Extended and exposed its objects to other
+  modules/applications, this would help you and your users.
+
+  If you write something new, just use Path::Tiny.
+
+METHODS
+  See Path::Extended and Path::Tiny for details.
+
+NOTABLE INCOMPATIBLE METHODS
+  The following methods have incompatibility between Path::Extended
+  and Path::Tiny. For easier migration, you might want to replace
+  them with the ones with _pt suffix step by step. When everything
+  is ready, replace Path::Extended::Tiny with Path::Tiny and remove
+  _pt.
+
+  absolute
+  basename
+  children
+  parent
+  remove
+  slurp
+
+AUTHOR
+  Kenichi Ishigaki, <ishigaki@cpan.org>
+
+COPYRIGHT AND LICENSE
+  This software is copyright (c) 2014 by Kenichi Ishigaki.
+
+  This is free software; you can redistribute it and/or modify it
+  under the same terms as the Perl 5 programming language system
+  itself.
+

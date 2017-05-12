@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Pod-Simple-LaTeX.t
+lib/Pod/Simple/LaTeX.pm
+META.yml                                 Module meta-data (added by MakeMaker)

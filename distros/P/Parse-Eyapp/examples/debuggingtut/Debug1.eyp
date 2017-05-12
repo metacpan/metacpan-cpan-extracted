@@ -1,0 +1,83 @@
+%{
+
+=head1 SYNOPSIS
+
+See http://search.cpan.org/perldoc?Parse::Eyapp::debuggingtut
+This files is almost like Debug.eyp
+It only changes the rules
+
+             ds:
+                 D ';' ds    
+               | D       
+for a left-recursive version. 
+
+Be sure C<DebugTail.pm> is reachable
+compile it with 
+
+      eyapp -b '' Debug1.eyp
+
+Execute the generated modulino with:
+
+      ./Debug1.pm -t
+
+There is an error in the lexical analyzer.
+Can you find it?
+
+Try first with input "D;S" and then 
+with input "D; S" 
+
+
+=head1 See also
+
+    Debug1.eyp Debug2.eyp DebugLookForward.eyp DebugDynamicResolution.eyp
+
+=cut
+
+our $VERSION = '0.01';
+use base q{DebugTail}; 
+
+# This is an exercise:
+# There is an error somewhere below ...
+# Can you find it?
+
+%}
+
+%token D S
+
+%lexer {
+        s{^(\s)}{} and $self->tokenline($1 =~ tr{\n}{});
+
+        return ($1, $1) if s/^(.)//;
+    }
+
+%tree 
+
+%%
+p:
+    %name P
+      ds ';' ss  
+  | %name SS
+      ss
+;
+
+
+ds:
+    %name D2
+      ds ';' D
+  | %name D1
+      D       
+;
+
+ss:
+    %name S2
+    S ';' ss      
+  | %name S1
+    S       
+;
+
+%%
+
+my $prompt = 'Try first "D;S" and then "D; D;  S" '.
+             '(press <CR><CTRL-D> to finish): ';
+__PACKAGE__->main($prompt) unless caller();
+

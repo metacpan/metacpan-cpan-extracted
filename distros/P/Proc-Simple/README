@@ -1,0 +1,311 @@
+######################################################################
+    Proc::Simple 1.32
+######################################################################
+
+NAME
+    Proc::Simple -- launch and control background processes
+
+SYNOPSIS
+       use Proc::Simple;
+
+       $myproc = Proc::Simple->new();        # Create a new process object
+
+       $myproc->start("shell-command-line"); # Launch an external program
+       $myproc->start("command",             # Launch an external program
+                      "param", ...);         # with parameters
+                                        
+       $myproc->start(sub { ... });          # Launch a perl subroutine
+       $myproc->start(\&subroutine);         # Launch a perl subroutine
+       $myproc->start(\&subroutine,          # Launch a perl subroutine
+                      $param, ...);          # with parameters
+
+       $running = $myproc->poll();           # Poll Running Process
+
+       $exit_status = $myproc->wait();       # Wait until process is done
+
+       $proc->kill_on_destroy(1);            # Set kill on destroy
+       $proc->signal_on_destroy("KILL");     # Specify signal to be sent
+                                             # on destroy
+
+       $myproc->kill();                      # Kill Process (SIGTERM)
+
+
+
+       $myproc->kill("SIGUSR1");             # Send specified signal
+
+       $myproc->exit_status();               # Return exit status of process
+
+
+       Proc::Simple::debug($level);          # Turn debug on
+
+DESCRIPTION
+    The Proc::Simple package provides objects mimicing real-life processes
+    from a user's point of view. A new process object is created by
+
+       $myproc = Proc::Simple->new();
+
+    Either external programs or perl subroutines can be launched and
+    controlled as processes in the background.
+
+    A 10-second sleep process, for example, can be launched as an external
+    program as in
+
+       $myproc->start("/bin/sleep 10");    # or
+       $myproc->start("/bin/sleep", "10");
+
+    or as a perl subroutine, as in
+
+       sub mysleep { sleep(shift); }    # Define mysleep()
+       $myproc->start(\&mysleep, 10);   # Launch it.
+
+    or even as
+
+       $myproc->start(sub { sleep(10); });
+
+    The *start* Method returns immediately after starting the specified
+    process in background, i.e. there's no blocking. It returns *1* if the
+    process has been launched successfully and *0* if not.
+
+    The *poll* method checks if the process is still running
+
+       $running = $myproc->poll();
+
+    and returns *1* if it is, *0* if it's not. Finally,
+
+       $myproc->kill();
+
+    terminates the process by sending it the SIGTERM signal. As an option,
+    another signal can be specified.
+
+       $myproc->kill("SIGUSR1");
+
+    sends the SIGUSR1 signal to the running process. *kill* returns *1* if
+    it succeeds in sending the signal, *0* if it doesn't.
+
+    The methods are discussed in more detail in the next section.
+
+    A destructor is provided so that a signal can be sent to the forked
+    processes automatically should the process object be destroyed or if the
+    process exits. By default this behaviour is turned off (see the
+    kill_on_destroy and signal_on_destroy methods).
+
+METHODS
+    The following methods are available:
+
+    new (Constructor)
+        Create a new instance of this class by writing
+
+          $proc = new Proc::Simple;
+
+        or
+
+          $proc = Proc::Simple->new();
+
+        It takes no arguments.
+
+    start
+        Launches a new process. The "start()" method can be used to launch
+        both external programs (like "/bin/echo") or one of your
+        self-defined subroutines (like "foo()") in a new process.
+
+        For an external program to be started, call
+
+         $status = $proc->start("program-name");
+
+        If you want to pass a couple of parameters to the launched program,
+        there's two options: You can either pass them in one argument like
+        in
+
+         $status = $proc->start("/bin/echo hello world");
+
+        or in several arguments like in
+
+         $status = $proc->start("/bin/echo", "hello", "world");
+
+        Just as in Perl's function "system()", there's a big difference
+        between the two methods: If you provide one argument containing a
+        blank-separated command line, your shell is going to process any
+        meta-characters (if you choose to use some) before the process is
+        actually launched:
+
+         $status = $proc->start("/bin/ls -l /etc/initt*");
+
+        will expand "/etc/initt*" to "/etc/inittab" before running the "ls"
+        command. If, on the other hand, you say
+
+         $status = $proc->start("/bin/ls", "-l", "*");
+
+        the "*" will stay unexpanded, meaning you'll look for a file with
+        the literal name "*" (which is unlikely to exist on your system
+        unless you deliberately create confusingly named files :). For more
+        info on this, look up "perldoc -f exec".
+
+        If, on the other hand, you want to start a Perl subroutine in the
+        background, simply provide the function reference like
+
+         $status = $proc->start(\&your_function);
+
+        or supply an unnamed subroutine:
+
+         $status = $proc->start( sub { sleep(1) } );
+
+        You can also provide additional parameters to be passed to the
+        function:
+
+         $status = $proc->start(\&printme, "hello", "world");
+
+        The *start* Method returns immediately after starting the specified
+        process in background, i.e. non-blocking mode. It returns *1* if the
+        process has been launched successfully and *0* if not.
+
+    poll
+        The *poll* method checks if the process is still running
+
+           $running = $myproc->poll();
+
+        and returns *1* if it is, *0* if it's not.
+
+    kill
+        The kill() method:
+
+           $myproc->kill();
+
+        terminates the process by sending it the SIGTERM signal. As an
+        option, another signal can be specified.
+
+           $myproc->kill("SIGUSR1");
+
+        sends the SIGUSR1 signal to the running process. *kill* returns *1*
+        if it succeeds in sending the signal, *0* if it doesn't.
+
+    kill_on_destroy
+        Set a flag to determine whether the process attached to this object
+        should be killed when the object is destroyed. By default, this flag
+        is set to false. The current value is returned.
+
+          $current = $proc->kill_on_destroy;
+          $proc->kill_on_destroy(1); # Set flag to true
+          $proc->kill_on_destroy(0); # Set flag to false
+
+    signal_on_destroy
+        Method to set the signal that will be sent to the process when the
+        object is destroyed (Assuming kill_on_destroy is true). Returns the
+        current setting.
+
+          $current = $proc->signal_on_destroy;
+          $proc->signal_on_destroy("KILL");
+
+    redirect_output
+        Redirects stdout and/or stderr output to a file. Specify undef to
+        leave the stderr/stdout handles of the process alone.
+
+          # stdout to a file, left stderr unchanged
+          $proc->redirect_output ("/tmp/someapp.stdout", undef);
+  
+          # stderr to a file, left stdout unchanged
+          $proc->redirect_output (undef, "/tmp/someapp.stderr");
+  
+          # stdout and stderr to a separate file
+          $proc->redirect_output ("/tmp/someapp.stdout", "/tmp/someapp.stderr");
+
+        Call this method before running the start method.
+
+    pid Returns the pid of the forked process associated with this object
+
+          $pid = $proc->pid;
+
+    t0  Returns the start time() of the forked process associated with this
+        object
+
+          $t0 = $proc->t0();
+
+    t1  Returns the stop time() of the forked process associated with this
+        object
+
+          $t1 = $proc->t1();
+
+    DESTROY (Destructor)
+        Object destructor. This method is called when the object is
+        destroyed (eg with "undef" or on exiting perl). If kill_on_destroy
+        is true the process associated with the object is sent the
+        signal_on_destroy signal (SIGTERM if undefined).
+
+    exit_status
+        Returns the exit status of the process as the $! variable indicates.
+        If the process is still running, "undef" is returned.
+
+    wait
+        The *wait* method:
+
+           $exit_status = $myproc->wait();
+
+        waits until the process is done and returns its exit status.
+
+    debug
+        Switches debug messages on and off -- Proc::Simple::debug(1)
+        switches them on, Proc::Simple::debug(0) keeps Proc::Simple quiet.
+
+    cleanup
+        Proc::Simple keeps around data of terminated processes, e.g. you can
+        check via "t0()" and "t1()" how long a process ran, even if it's
+        long gone. Over time, this data keeps occupying more and more memory
+        and if you have a long-running program, you might want to run
+        "Proc::Simple->cleanup()" every once in a while to get rid of data
+        pertaining to processes no longer in use.
+
+NOTE
+    Please keep in mind that there is no guarantee that the SIGTERM signal
+    really terminates a process. Processes can have signal handlers defined
+    that avoid the shutdown. If in doubt, whether a process still exists,
+    check it repeatedly with the *poll* routine after sending the signal.
+
+Shell Processes
+    If you pass a shell program to Proc::Simple, it'll use "exec()" to
+    launch it. As noted in Perl's "exec()" manpage, simple commands for the
+    one-argument version of "exec()" will be passed to "execvp()" directly,
+    while commands containing characters like ";" or "*" will be passed to a
+    shell to make sure those get the shell expansion treatment.
+
+    This has the interesting side effect that if you launch something like
+
+        $p->start("./womper *");
+
+    then you'll see two processes in your process list:
+
+        $ ps auxww | grep womper
+        mschilli  9126 11:21 0:00 sh -c ./womper *
+        mschilli  9127 11:21 0:00 /usr/local/bin/perl -w ./womper ...
+
+    A regular "kill()" on the process PID would only kill the first process,
+    but Proc::Simple's "kill()" will use a negative signal and send it to
+    the first process (9126). Since it has marked the process as a process
+    group leader when it created it previously (via setsid()), this will
+    cause both processes above to receive the signal sent by "kill()".
+
+Contributors
+    Tim Jenness <t.jenness@jach.hawaii.edu> did
+    kill_on_destroy/signal_on_destroy/pid
+
+    Mark R. Southern <mark_southern@merck.com> worked on EXIT_STATUS
+    tracking
+
+    Tobias Jahn <tjahn@users.sourceforge.net> added redirection to
+    stdout/stderr
+
+    Clauss Strauch <Clauss_Strauch@aquila.fac.cs.cmu.edu> suggested the
+    multi-arg start()-methods.
+
+    Chip Capelik contributed a patch with the wait() method.
+
+    Jeff Holt provided a patch for time tracking with t0() and t1().
+
+    Brad Cavanagh fixed RT33440 (unreliable $?)
+
+AUTHOR
+        1996, Mike Schilli <cpan@perlmeister.com>
+
+LICENSE
+    Copyright 1996-2011 by Mike Schilli, all rights reserved. This program
+    is free software, you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+

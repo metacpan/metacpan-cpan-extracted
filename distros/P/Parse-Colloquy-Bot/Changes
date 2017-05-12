@@ -1,0 +1,18 @@
+Version 0.02 - Monday 22th May 2006
+	+ Added a 'time' field to the resulting output
+	  hash, which will use Time::HiRes if available
+
+	+ Added 4 more unit tests - comprehensive ones
+	  to test all patern matching will follow when
+	  suitable test data has been sorted and prepared
+
+	+ Changed the 'raw' field in the resulting output
+	  hash to always reflect the raw input, even if
+	  the input was slightly "tweaked" for pre-parsing
+
+	+ Very minor POD change
+
+
+Version 0.01 - Friday 19th May 2006
+	+ Initial release
+

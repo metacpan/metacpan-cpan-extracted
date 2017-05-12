@@ -1,0 +1,18 @@
+%semantic token 'c' 
+%tree
+%{
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+%}
+%%
+S:      'c'+  'd'+ 
+           { 
+              print Dumper($_[1]);
+              print Dumper($_[2]);
+           } 
+;
+
+%%
+
+# eyapp -C  List3_tree.yp
+# ./List3_tree.pm -c 'ccdd'

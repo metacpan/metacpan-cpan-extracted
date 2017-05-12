@@ -1,0 +1,36 @@
+NAME
+    Plack::Middleware::Session::RemoveCookies - remove cookies from the
+    requests
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+        enable 'Session::RemoveCookies', key => qr{plack_session}i;
+
+        or
+
+        enable_if {
+            $_[0]->{'HTTP_X_DO-NOT-TRACK'} || $_[0]->{'HTTP_DNT'}
+        } 'Session::RemoveCookies', key => qr{plack_session}i;
+
+DESCRIPTION
+    This middleware allows to remove cookies from the requests which is
+    useful with Plack::App::Proxy.
+
+ACKNOWLEDGMENT
+    Initial development sponsored by 123people Internetservices GmbH -
+    <http://www.123people.com/>
+
+SEE ALSO
+    Plack::Middleware, Plack::Builder
+
+AUTHOR
+    Wallace Reis <wreis@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Wallace Reis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,141 @@
+
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Migration.pod - Migration from other parsers
+
+=head1 HTTP::BrowserDetect to Parse::HTTP::UserAgent migration cheat sheet
+
+=head2 Operating Systems
+
+   win16     N/A (no test data)
+   win3x     $ua->os =~ m{Windows 3}
+   win31     $ua->os eq 'Windows 3.1'
+   win95     $ua->os eq 'Windows 95'
+   win98     $ua->os eq 'Windows 98'
+   winnt     $ua->os =~ m{Windows} && $ua->os !~ m{(?:9[58]|3[.]1|Me)}
+   windows   $ua->os =~ m{Windows}
+   win32     $ua->os =~ m{Windows}
+   win2k     $ua->os eq 'Windows 2000'
+   winxp     $ua->os eq 'Windows XP'
+   win2k3    $ua->os eq 'Windows 2003'
+   winvista  $ua->os eq 'Windows Vista / 2008'
+   winme     $ua->os eq 'Windows Me'
+   dotnet    $ua->dotnet
+   mac       $ua->os =~ m{Mac}i
+   macosx    $ua->os =~ m{Mac OS X}i
+   mac68k    N/A (no test data)
+   macppc    $ua->os =~ m{PowerPC}i
+   os2       N/A (no test data)
+   unix      N/A (no test data)
+   sun       N/A (no test data)
+   sun4      N/A (no test data)
+   sun5      N/A (no test data)
+   suni86    N/A (no test data)
+   irix      N/A (no test data)
+   irix5     N/A (no test data)
+   irix6     N/A (no test data)
+   hpux      N/A (no test data)
+   hpux9     N/A (no test data)
+   hpux10    N/A (no test data)
+   aix       N/A (no test data)
+   aix1      N/A (no test data)
+   aix2      N/A (no test data)
+   aix3      N/A (no test data)
+   aix4      N/A (no test data)
+   linux     $ua->os =~ m{linux}i
+   sco       N/A (no test data)
+   unixware  N/A (no test data)
+   mpras     N/A (no test data)
+   reliant   N/A (no test data)
+   dec       N/A (no test data)
+   sinix     N/A (no test data)
+   freebsd   $ua->os =~ m{FreeBSD}i
+   bsd       $ua->os =~ m{BSD}i
+   vms       N/A (no test data)
+   x11       my @e = $ua->extras; $e[0] && $e[0] eq 'X11'
+   amiga     $ua->os =~ m{Amiga}i
+
+=head2 Devices
+
+Not supported yet.
+
+   palm
+   audrey
+   iopener
+   wap
+   blackberry
+
+=head2 Browsers
+
+   mosaic       N/A
+   netscape     $ua eq 'Netscape'
+   nav2         $ua eq 'Netscape' && $ua >= 2 && $ua < 3
+   nav3         $ua eq 'Netscape' && $ua >= 3 && $ua < 4
+   nav4         $ua eq 'Netscape' && $ua >= 4 && $ua < 5
+   nav4up       $ua eq 'Netscape' && $ua >= 4
+   nav45        $ua eq 'Netscape' && $ua >= 4.5 && $ua < 5
+   nav45up      $ua eq 'Netscape' && $ua >= 4.5
+   nav6         $ua eq 'Netscape' && $ua >= 6 && $ua < 7
+   nav6up       $ua eq 'Netscape' && $ua >= 6
+   navgold      $ua eq 'Netscape' && $ua->version('raw') =~ m{Gold}i;
+   firefox      $ua eq 'Firefox'
+   safari       $ua eq 'Safari'
+   ie           $ua eq 'MSIE'
+   ie3          $ua eq 'MSIE'  && $ua >= 3   && $ua < 4
+   ie4          $ua eq 'MSIE'  && $ua >= 3   && $ua < 4
+   ie4up        $ua eq 'MSIE'  && $ua >= 4
+   ie5          $ua eq 'MSIE'  && $ua >= 5   && $ua < 5.5
+   ie5up        $ua eq 'MSIE'  && $ua >= 5
+   ie55         $ua eq 'MSIE'  && $ua >= 5.5 && $ua < 6
+   ie55up       $ua eq 'MSIE'  && $ua >= 5.5
+   ie6          $ua eq 'MSIE'  && $ua >= 6   && $ua < 7
+   opera        $ua eq 'Opera'
+   opera3       $ua eq 'Opera' && $ua >= 3   && $ua < 4
+   opera4       $ua eq 'Opera' && $ua >= 4   && $ua < 5
+   opera5       $ua eq 'Opera' && $ua >= 5   && $ua < 6
+   opera6       $ua eq 'Opera' && $ua >= 6   && $ua < 7
+   opera7       $ua eq 'Opera' && $ua >= 7   && $ua < 8
+   lynx         TODO
+   links        TODO
+   aol          my @e = $ua->extras; $e[0] && $e[0] =~ m{AOL}i
+   aol3         my @e = $ua->extras; $e[0] && $e[0] =~ m{AOL 3}i
+   aol4         my @e = $ua->extras; $e[0] && $e[0] =~ m{AOL 4}i
+   aol5         my @e = $ua->extras; $e[0] && $e[0] =~ m{AOL 5}i
+   aol6         my @e = $ua->extras; $e[0] && $e[0] =~ m{AOL 6}i
+   neoplanet    N/A (no test data)
+   neoplanet2   N/A (no test data)
+   avantgo      $ua eq 'AvantGo'
+   emacs        TODO
+   mozilla      $ua eq 'Mozilla'
+   gecko        my @tk = $ua->toolkit; $tk[0] && $tk[0] eq 'Gecko'
+   konqueror    $ua eq 'Konqueror'
+
+=head2 Robots
+
+   wget           $ua eq 'Wget'
+   getright       $ua eq 'GetRight'
+   robot          $ua->robot
+   yahoo          $ua =~ m{Yahoo}i
+   altavista      N/A (no test data)
+   lycos          N/A (no test data)
+   infoseek       N/A (no test data)
+   lwp            $ua eq 'libwww-perl'
+   webcrawler     N/A (no test data)
+   linkexchange   N/A (no test data)
+   slurp          $ua =~ m{slurp}i
+   webtv          TODO
+   staroffice     N/A (no test data)
+   lotusnotes     N/A (no test data)
+   icab           $ua eq 'iCab'
+   google         $ua =~ m{google}i
+   java           N/A (no test data)
+
+=head1 SEE ALSO
+
+L<Parse::HTTP::UserAgent>.
+
+=cut

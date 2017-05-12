@@ -1,0 +1,10 @@
+Build.PL
+Makefile.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+README
+lib/POE/Component/PreforkDispatch.pm
+t/1-test.t
+SIGNATURE    Added here by Module::Build

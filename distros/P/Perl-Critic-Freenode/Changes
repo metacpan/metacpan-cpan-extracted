@@ -1,0 +1,72 @@
+0.019     2017-01-29 22:13:34 EST
+  - Add autoderef to DeprecatedFeatures policy
+
+0.018     2016-12-08 21:32:40 EST
+  - Add IndirectObjectNotation policy
+
+0.017     2016-09-29 17:24:15 EDT
+  - DeprecatedFeatures will now consider "use UNIVERSAL;" a policy violation
+  - Add OverloadOptions policy
+
+0.016     2016-07-02 17:53:20 EDT
+  - Support <<>> operator in WhileDiamondDefaultAssignment policy
+  - Fixes for DeprecatedFeatures checking of /xx violations
+
+0.015     2016-07-02 03:20:35 EDT
+  - add ArrayAssignAref policy
+  - update DeprecatedFeatures policy with features deprecated in 5.22 and to be removed in 5.26
+
+0.014     2016-01-26 20:45:18 EST
+  - allow pairwise in DollarAB policy
+  - allow DollarAB pair functions to be extended
+
+0.013     2015-12-17 18:07:03 EST
+  - Add ConditionalDeclarations policy
+
+0.012     2015-10-16 15:13:21 EDT
+  - add IO::Socket::INET6 to discouraged modules
+  - Fix EmptyReturn to avoid reporting violations in void context functions
+  - Add POSIXImports policy
+  - Add ConditionalImplicitReturn policy
+
+0.011     2015-09-15 13:32:44 EDT
+  - add Getopt::Std to discouraged modules
+  - Fix EmptyReturn to catch more cases
+  - Add DeprecatedFeatures policy
+
+0.010     2015-08-28 17:11:40 EDT
+  - Fix Changes
+  - Change installer to Module::Build::Tiny
+
+0.009     2015-08-27 15:09:22 EDT
+  - Add Class::DBI, Error.pm, and Readonly.pm to discouraged modules
+
+0.008     2015-08-25 21:42:10 EDT
+  - Various documentation updates
+  - Add Switch.pm to discouraged modules
+
+0.007     2015-08-15 17:18:23 EDT
+  - fix StrictWarnings parsing of "use VERSION" (Tux)
+  - handle readline/readdir/each in WhileDiamondDefaultAssignment
+
+0.006     2015-07-30 22:34:15 EDT
+  - just use core policy for AmpersandSubCalls
+  - add clarification for policies that are similar to core policies
+
+0.005     2015-07-13 10:49:45 EDT
+  - fix false positives in DollarAB policy
+
+0.004     2015-07-01 17:21:16 EDT
+  - use default strict/warnings importers from Perl::Critic::Utils::Constants
+
+0.003     2015-06-27 17:53:00 EDT
+  - allow prototypes containing &
+  - add Each polciy
+  - make StrictWarnings policy configurable with extra importers
+
+0.002     2015-06-27 00:07:19 EDT
+  - add AmpersandSubCalls policy
+  - add policy abstracts
+
+0.001     2015-06-26 21:01:32 EDT
+  - First release

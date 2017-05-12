@@ -1,0 +1,196 @@
+Revision history for PDF::Create
+
+1.42  2017-04-11 12:15:00 MANWAR
+      - Assigned filehandle encoding to 'utf8' explicitly.
+      - Assigned default font width.
+
+1.41  2016-12-29 15:10:00 MANWAR
+      - Proposed fix for RT #119292 and rollbacked patch for RT #118764.
+
+      Document how close() deals when <filename> or <fh> is involved.
+      i.e. When <fh> is provided then don't try to close the file handle
+      at the end. Leave that for the end user to deal with it outside.
+      Added new method flush() that does exactly this.
+
+1.40  2016-12-20 12:00:00 MANWAR
+      - Proposed fix for RT #118945.
+
+1.39  2016-11-19 07:50:00 MANWAR
+      - Proposed fix for RT #118778 (thanks Andrew Beverley).
+
+1.38  2016-11-17 10:25:00 MANWAR
+      - Proposed fix for RT #118777 (thanks Andrew Beverley).
+
+1.37  2016-11-16 06:25:00 MANWAR
+      - Proposed fix for RT #118776 (thanks Andrew Beverley).
+
+1.36  2016-11-15 09:50:00 MANWAR
+      - Proposed fix for RT #118764 (thanks Andrew Beverley).
+
+1.35  2016-09-09 10:20:00 MANWAR
+      - Merge pull request #10 from zhouzhen1/typo
+
+1.34  2016-08-26 08:40:00 MANWAR
+      - Corrected HelveticaBold font width.
+
+1.33  2016-07-22 12:00:00 MANWAR
+      - Updated pod for package PDF::Font describing constructor.
+
+1.32  2016-06-03 12:00:00 MANWAR
+      - Corrected Helvetica font width.
+
+1.31  2016-05-02 02:45:00 MANWAR
+      - Updated method PDF::Font::_generate_char_width() to load data in sorted order.
+      - Added script "verify-char-width" to test char width in different fonts.
+      - Added section "SYNOPSIS" to the package PDF::Font.
+
+1.30  2016-04-30 08:00:00 MANWAR
+      - Refactored character width handling for supported fonts.
+      - Fixed method block_text() w.r.t line spacing.
+
+1.29  2016-02-12 11:15:00 MANWAR
+      - Updated method block_text() to parameterize paragraph spacing on email request
+        of Joel Goode.
+      - Added example code to the pod for the method block_text().
+
+1.28  2016-02-01 16:10:00 MANWAR
+      - Removed +x attribute from some of the test scripts.
+      - Added test scripts t/meta-json.t and t/meta-yml.t.
+
+1.27  2016-01-14 10:50:00 MANWAR
+      - Added LICENSE file.
+
+1.26  2016-01-03 00:45:00 MANWAR
+      - Merged GitHub Pull Request #9 from ESERTE.
+
+1.25  2016-01-02 01:05:00 MANWAR
+      - Merged GitHub Pull Request #8 from TAISNIF.
+
+1.24  2015-12-14 11:35:00 MANWAR
+      - Documented method version().
+      - Added check for version number.
+      - Added unit test for method version().
+
+1.23  2015-12-05 12:40:00 MANWAR
+      - Added parameter validation check for method new_outline().
+
+1.22  2015-11-25 10:35:00 MANWAR
+      - Fixed the debug level handling.
+      - Updated pod document about the same.
+
+1.21  2015-11-24 14:00:00 MANWAR
+      - Fixed issue RT# 109562.
+
+1.20  2015-11-24 MANWAR
+      - Updated method PDF::Create::Page::string() to handle character/word spacing. (Thanks David Kitcher-Jones).
+      - Updated method PDF::Create::Page::text() to handle font correctly. (Thanks David Kitcher-Jones).
+      - Added new method PDF::Create::Page::block_text() to manage block of text.  (Thanks David Kitcher-Jones).
+      - Updated method PDF::Create::Page::block_text() to handle multiple paragraphs. (MANWAR)
+      - Documented method text() and block_text(). (MANWAR)
+
+1.19  2015-10-28 MANWAR
+      - Added key 'provides' to the Makefile.PL script.
+      - Added standard unit test script (t/00-load.t).
+
+1.18  2015-10-26 MANWAR
+      - Added MIN_PERL_VERSION to the Makefile.PL script.
+      - Tidied up and documented package PDF::Create.
+      - Tidied up and documented package PDF::Create::Page.
+      - Tidied up README file.
+
+1.17  2015-10-25 MANWAR
+      - Renamed file CHANGES to Changes.
+      - Tidied up Changes file.
+      - Added standard unit test for Changes file (t/changes.t).
+
+1.16  2015-10-24 MANWAR
+      - Fixed the warning thrown by method PDF::Image::GIF::UnLZW().
+      - Tidied up example scripts (eg/sample.pl and eg/sample-cgi.pl).
+      - Added sample images used by example scripts.
+      - Added standard unit test for MANIFEST file.
+
+1.15  2015-10-24 MANWAR
+      - Added key 'CreationDate' to the list of valid keys to constructor.
+      - Tidied up pod document of PDF::Create.
+      - Tidied up Makefile.PL script.
+      - Removed MANIFEST from .gitignore file.
+
+1.14  2015-10-23 MANWAR
+      - Added section REPOSITORY, LICENSE to the pod document.
+      - Added standard pod syntax testing script t/pod.t
+      - Added MANIFEST file.
+
+1.13  2015-10-22 MANWAR
+      - Fixed the distribution as earlier v1.12 didn't have any code (MANWAR).
+
+1.12  2015-10-22 MANWAR
+      - Updated repository link in the Makefile.PL script (MANWAR).
+
+1.11  2015-10-02 MANWAR
+      Test cleanups.  (Mohammad S Anwar)
+      Input validation. (Mohammad S Anwar)
+
+1.10  2014-08-22
+      - Fix test that used to use CGI.pm
+
+1.09  2014-08-21
+      - Eliminate the need for CGI.pm in the test RT #98222
+      - Some POD updates.
+      - Eliminate memory leak RT #93412 thanks to Chris Jack.
+
+1.08  2013-12-11
+      - Eliminate pipe from CGI test script t/09
+      - Filehandle => FileHandle typo fixed #91312
+
+1.07  2013-12-10
+      - New maintainer SZABGAB
+      - Tried to reconstruct entries in the CHANGES file
+      - Some more test case
+      - Code clean-up (remove indirect calls)
+      - Remove Build.PL
+      - use warnings;
+      - Officially require perl 5.006.
+      - Move example file to the eg/ directory
+
+1.06  2010-07-06
+
+1.05  2010.02.26
+
+1.04  2009-07-13
+
+1.03  2009-03-24
+
+1.02  2008-07-10
+
+1.01  2008-06-03
+
+1.00  2008-05-31
+
+0.10  2008-05-31
+
+0.09  2007-09-30
+      - Markus Baertschi, markus@markus.org
+      - Added stringml for multi-line strings
+      - Changed get_page_size to case-independent
+
+0.08  2007-09-03
+      - Markus Baertschi, markus@markus.org
+      - Get back in sync with CPAN/PAUSE
+      - Fixed check for open file in Create.pm
+      - Touched up the README
+
+0.07  0000-00-00
+      - Markus Baertschi, markus@markus.org
+      - Added image samples to sample.pl
+      - Touched up the README
+      - Added check for open file in JPEG/GIFImages
+
+0.06  0000-00-00
+      - Fabien Tassin
+      - Added support for JPEG and GIF images
+      - Markus Baertschi, markus@markus.org
+      - Packaged for release on CPAN
+
+0.01  1999-11-05
+      - Fabien Tassin
+      - Original Release

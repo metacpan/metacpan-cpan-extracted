@@ -1,0 +1,41 @@
+---
+abstract: 'transform xml documents by applying xsl stylesheets on the fly'
+author:
+  - unknown
+build_requires:
+  Carp: '0'
+  HTTP::Request: '0'
+  Module::Build: '0.4004'
+  Test::MockObject::Extends: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-TazXSLT
+provides:
+  Plack::Middleware::TazXSLT:
+    file: lib/Plack/Middleware/TazXSLT.pm
+    version: '0.55'
+requires:
+  Capture::Tiny: '0'
+  HTTP::Message::PSGI: '0'
+  HTTP::Response: '0'
+  LWP::UserAgent: '0'
+  Plack::Middleware: '0'
+  Plack::Request: '0'
+  Plack::Response: '0'
+  Plack::Util: '0'
+  Try::Tiny: '0'
+  URI::QueryParam: '0'
+  XML::LibXML: '0'
+  XML::LibXSLT: '1.72'
+  parent: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mdom/Plack-Middleware-TazXSLT
+version: '0.55'

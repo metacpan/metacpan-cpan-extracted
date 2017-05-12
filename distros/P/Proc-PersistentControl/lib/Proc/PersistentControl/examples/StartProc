@@ -1,0 +1,14 @@
+#!/usr/bin/perl -w
+use strict;
+use lib '../../..';
+
+use Proc::PersistentControl;
+
+my $tp = Proc::PersistentControl->new(debug => $ARGV[0]);
+
+my $p1 = $tp->StartProc({ TAG => 'sl19' },   "psleep 19");
+my $p2 = $tp->StartProc({ TAG => 'sl3600' }, "psleep 3600");
+
+print "$0 started two processes:\n";
+print $p1->{_PPCUID}, ": TAG=sl19,   calls \"psleep 19\"\n";
+print $p2->{_PPCUID}, ": TAG=sl3600, calls \"psleep 3600\"\n";

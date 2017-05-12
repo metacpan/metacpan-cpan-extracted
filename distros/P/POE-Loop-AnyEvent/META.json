@@ -1,0 +1,52 @@
+{
+   "abstract" : "AnyEvent event loop support for POE",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : "1",
+   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Loop-AnyEvent",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "POE::Test::Loops" : "1.035"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "POE::Test::Loops" : "1.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "POE" : "1.289",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/poe-loop-anyevent",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/poe-loop-anyevent.git",
+         "web" : "https://github.com/bingos/poe-loop-anyevent"
+      }
+   },
+   "version" : "0.004"
+}
+

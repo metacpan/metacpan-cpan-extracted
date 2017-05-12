@@ -1,0 +1,90 @@
+Revision history for Perl-Version
+
+0.0.1   2007-02-03
+        Initial release.
+
+0.0.2   2007-02-07
+        Minor documentation tidying.
+
+0.0.3   2007-02-23
+        Added machine readable licence.
+
+0.0.4   2007-02-24
+        Doesn't check for vstrings on Perl < 5.8.1 now.
+
+0.0.5   2007-02-24
+        Added perl-reversion example / utility
+        
+0.0.6   2007-02-27
+        Fixed skip condition so vstring tests are properly skipped.
+
+0.0.7   2007-02-28
+        Alpha used to default to three digits, changed to two.
+        
+0.0.8   2007-03-29
+        Documentation fixes
+        Added -dryrun option to perl-reversion [27649]. Thanks to DAXIM
+        for the patch.
+
+1.000   2007-09-03
+        Removed warning about long version numbers not having a mulitple
+        of three digits. Perl 5.00504 doesn't have a multiple of three
+        digits and it shouldn't be discriminated against.
+
+1.001   2007-09-07
+        Added META.yml to perl-reversion's list of target files.
+        
+1.002   2007-09-07
+        Improved META.yml handling. So now it, er, works.
+
+1.003   2007-11-08
+        Removed version.pm dependency.
+        
+1.004   2007-11-08
+        Removed '> 999' warning.
+
+1.005   2008-04-03
+        Fixes for perl-reversion:
+        * Allow any of the version formats as options for displaying or
+          setting/bumping the version.
+        * Display current version in the format found rather than as though
+          -normal had been used.
+        * Allow more specific -bump-<component> options.
+        * Using -current=1.2 no longer matches 1.2.3 in some cases
+
+1.006   2008-04-07
+        Major fix for perl-reversion:
+        * -bump now properly maintains the number of version components;
+          previously, it was treating every version as though it had at least 3
+          components, so e.g. 1.1 was being wrongly bumped to 1.1.1
+        Other fixes for perl-reversion:
+        * -bump -stringify will now properly keep the original version format
+          (it was acting as though -normal had been specified)
+        * noted that -stringify is the effective default for -bump/-set, so
+          those options more accurately report the new version
+
+1.007   2008-04-07
+        Fix for perl-reversion:
+        * try to only find top-level keys in META.yml; this means we will stop
+          catching the version from meta-spec and (hopefully) only catch the
+          dist's version.
+
+1.008   2009-03-07
+        Skip perl-reversion tests on Windows. They need fork.
+        Allow negative indexes on component, increment. See #42181.
+        perl-reversion now checks in bin, script subdirectories. See #28119.
+
+1.009   2009-03-08
+        Make perl-reversion better at inferring version from structured
+        files and not getting confused by unstructured files (like
+        README). See #43946.
+
+1.010   2010-09-19
+        Install perl-reversion by default.
+
+1.011   2011-02-21
+        Remove Build.PL which didn't install perl-reversion.
+
+1.013   2014-02-12
+        Remove File::Slurp, which has a critical security issue (RT 92974)
+

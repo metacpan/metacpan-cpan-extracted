@@ -1,0 +1,10 @@
+=head1 NAME
+
+230-alternate-delimiters
+
+=head1 TESTCASES
+
+Code containing a greater than symbol should be legal:
+
+C<< $obj->clone >> makes a deep copy of the object.
+

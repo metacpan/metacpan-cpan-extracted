@@ -1,0 +1,30 @@
+---
+abstract: 'DBI Authentication back end for PlugAuth'
+author:
+  - 'Graham Ollis <gollis@sesda3.com>'
+build_requires:
+  Test::Clustericious::Cluster: '0.25'
+  Test::More: '0.94'
+  perl: '5.010001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PlugAuth-Plugin-DBIAuth
+requires:
+  Crypt::PasswdMD5: '0'
+  DBI: '0'
+  Log::Log4perl: '0'
+  PlugAuth: '0.32'
+  Role::Tiny: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/clustericious/PlugAuth-Plugin-DBIAuth/issues
+  homepage: http://perl.wdlabs.com/PlugAuth-Plugin-DBIAuth
+  repository: git://github.com/clustericious/PlugAuth-Plugin-DBIAuth.git
+version: '0.05'

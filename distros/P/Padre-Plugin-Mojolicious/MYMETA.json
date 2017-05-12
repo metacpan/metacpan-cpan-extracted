@@ -1,0 +1,59 @@
+{
+   "abstract" : "Mojolicious support for Padre",
+   "author" : [
+      "Breno G. de Oliveira <garu@cpan.org>",
+      "Ahmad M. Zawawi <ahmad.zawawi@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.04, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Padre-Plugin-Mojolicious",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "share",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.6302",
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.6302"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Basename" : 0,
+            "Mojolicious" : "2.34",
+            "Padre" : "0.92",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://padre.perlide.org/"
+      },
+      "homepage" : "http://padre.perlide.org/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://svn.perlide.org/padre/trunk/Padre-Plugin-Mojolicious"
+      }
+   },
+   "version" : "0.06"
+}

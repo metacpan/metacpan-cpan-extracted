@@ -1,0 +1,38 @@
+=head1 NAME
+
+140-lists
+
+=head1 EXAMPLES
+
+An itemized list:
+
+=over 4
+
+=item *
+
+item 1
+
+=item *
+
+item 2
+
+=item *
+
+item 3
+
+=back
+
+A definition list:
+
+=over 4
+
+=item Term 1
+
+description 1
+
+=item Term 2
+
+description 2
+
+=back
+

@@ -1,0 +1,13 @@
+Revision history for Path-Iterator-Rule-RT
+
+0.05    Add subject check
+
+0.04    Add repo link to pod
+
+0.03    Make rt method private to make pod test happy.
+	Add repo link.
+
+0.02    (RT#93399) Added lazy rt config loading. 
+
+0.01    First version, released on an unsuspecting world.
+

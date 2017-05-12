@@ -1,0 +1,20 @@
+Revision history for PITA-Test-Dummy-Perl5-Make
+
+1.05 Tue  2 Sep 2008
+	- More gratuitious CPANTS points
+
+1.04 Sun  1 Jul 2007
+	- Updating for gratuitous CPANTS points
+
+1.03 Tue  2 Jan 2007
+	- Removing a 99_author.t QA test that used Test::More
+
+1.02 Sun  1 Oct 2006
+	- Clearing a couple of possible minor bugs
+
+1.01 Mon  2 Jan 2005
+	- Removed the extra included files
+	- Documented that Mike's head comes off
+
+1.00 Mon  2 Jan 2006
+	- First (and probably only) version

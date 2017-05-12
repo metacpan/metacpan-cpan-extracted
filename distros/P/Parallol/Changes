@@ -1,0 +1,6 @@
+0.3   2012-02-15 23:22:00
+    - Better error handling when dying in on_parallol
+0.2   2012-02-02 13:52:00
+    - Automatically fall back to blocking requests when ioloop is not running
+0.1   2012-01-31 10:59:00
+    - Released upon an unsuspecting world.

@@ -1,0 +1,38 @@
+##################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/distributions/Perl-Critic-More/xt/author/40_perlcriticrc $
+#     $Date: 2013-10-25 13:34:15 -0700 (Fri, 25 Oct 2013) $
+#   $Author: thaljef $
+# $Revision: 4183 $
+##################################################################
+
+profile-strictness = quiet
+severity = 1
+theme = core + more
+verbose = %f: %m at line %l, column %c.  %e.  (Severity: %s, %p)\n
+
+#-----------------------------------------------------------------------------
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = xt/author/perltidyrc
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|AFFILIATION|DESCRIPTION|AUTHOR|COPYRIGHT
+script_sections = NAME|DESCRIPTION|AUTHOR|COPYRIGHT
+
+[Miscellanea::RequireRcsKeywords]
+keywords = URL Date Author Revision
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[Modules::PerlMinimumVersion]
+version = 5.6.1
+
+[Documentation::PodSpelling]
+stop_words = autoflushes BBEdit CGI CPAN CVS Dolan encodings exponentials filename Guzis HEREDOC HEREDOCS HEREDOCs IDE Maxia Mehner Metadata metadata multi-line namespace namespaces PBP perlcritic perlcriticrc PolicyListing postfix programmatically PPI Readonly refactor refactoring runtime sigil sigils SQL STDERR STDIN STDOUT subdirectories TerMarsch Thalhammer TODO UI unblessed vice-versa
+
+[RegularExpressions::ProhibitUnusualDelimiters]
+allow_all_brackets = 1
+
+[RegularExpressions::RequireBracesForMultiline]
+allow_all_brackets = 1

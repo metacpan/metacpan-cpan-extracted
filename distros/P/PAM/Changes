@@ -1,0 +1,17 @@
+ -- dzil fixed build environment from last build, META files were out of date.
+ -- Switch to dzil
+
+0.30
+ -- Make it actually compile and work on OSX
+ -- Make constants problems show up at compile time
+ -- Turn on debugging all the time
+ -- Add dependencies
+
+0.02
+ -- Add conversation support
+ -- Fix a lot of segfaults and memory issues
+ -- Clean up perl interpreter when pam handle is cleaned up
+ -- Add portability? Might work on OSX and Solaris now
+
+0.01
+ -- Spend forever figuring how to embed perl in a plugin to something else.

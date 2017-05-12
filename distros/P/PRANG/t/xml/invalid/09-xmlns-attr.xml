@@ -1,0 +1,9 @@
+<!-- error: /invalid attribute/ -->
+<Octothorpe xmlns:A="uri:type:A" xmlns:C="uri:type:C">
+  <colon/>
+  <A:section_mark C:suspension_points="blah">
+    <section_mark suspension_points="foo">
+      baz
+    </section_mark>
+  </A:section_mark>
+</Octothorpe>

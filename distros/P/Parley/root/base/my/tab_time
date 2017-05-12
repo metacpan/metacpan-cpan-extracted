@@ -1,0 +1,106 @@
+<!-- preferences : time tab -->
+
+    <div style="background-color:#ccc;margin-top:5px;margin-bottom:5px;">
+        &nbsp;
+    </div>
+<div class="top_padded">
+    [%l('PREFS DESIRED LOCATION')%]
+</div>
+
+    <div style="background-color:#ccc;margin-top:5px;margin-bottom:5px;">
+        &nbsp;
+    </div>
+
+<form action="my/preferences/update" method="POST" name="time_format">
+    <input type="hidden" name="form_name" value="time_format">
+
+    [% IF tz_message %]
+    <!-- Message to user -->
+    <div>
+        <b><i>[% tz_message %]</i></b>
+    </div>
+    [% END %]
+
+    <div class="yui-gb top_padded">
+        <div class="yui-u first align_right">
+            <select id="selectZone" name="selectZone">
+                <option value="">[ [%l('Select Zone')%] ]</option>
+                [% FOREACH item=tz_categories %]
+                <option value="[% item %]">[% item %]</option>
+                [% END %]
+            </select>
+        </div>
+        <div class="yui-u align_right">
+            <label for="use_utc">[%l('Use UTC')%]</label>
+            <input type="checkbox" id="use_utc" name="use_utc" value="1" onChange="toggle_timezone_menus(this)"/>
+        </div>
+        <div class="yui-u align_right">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="yui-gb top_padded">
+        <div class="yui-u first align_right">
+            <select id="time_format" name="time_format" style="text-align: center;">
+                <option value="">([%l('Default')%])</option>
+                [% WHILE (tf = time_formats.next) %]
+                <option value="[% tf.id %]">[% tf.sample %]</option>
+                [% END %]
+            </select>
+        </div>
+        <div class="yui-u align_right">
+            <label for="show_tz">[%l('Show timezone')%]</label>
+            <input type="checkbox" id="show_tz" name="show_tz" value="1" />
+        </div>
+        <div class="yui-u align_right">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="yui-gb top_padded">
+        <div class="yui-u first align_right">
+            [%l('Time formatting example')%]:
+        </div>
+        <div class="yui-u align_right">
+            <i>[% nicedate(current_time) %]</i>
+        </div>
+        <div class="yui-u align_right">
+            &nbsp;
+        </div>
+    </div>
+
+    <div style="background-color:#ccc;margin-top:5px;margin-bottom:5px;">
+        &nbsp;
+    </div>
+
+    <div class="yui-gb top_padded">
+        <div class="yui-u first align_right">
+            &nbsp;
+        </div>
+        <div class="yui-u">
+            <input type="submit" value="[%l('Update')%]" name="update" class="input_button" />
+        </div>
+        <div class="yui-u align_right">
+            &nbsp;
+        </div>
+    </div>
+</form>
+
+<script language="JavaScript" type="text/javascript">
+<!-- Begin
+
+    function toggle_timezone_menus(checkbox) {
+        var zone_menu   = document.getElementById('selectZone');
+        //var place_menu  = document.getElementById('selectPlace');
+
+        zone_menu.disabled  = checkbox.checked;
+        //place_menu.disabled = checkbox.checked;
+    }
+
+    // we want to make sure the menus are disabled if they need to be
+    var use_utc_cbox = document.getElementById('use_utc');
+    toggle_timezone_menus(use_utc_cbox);
+    
+// End -->
+</script>
+<!-- (end) preferences : time tab -->

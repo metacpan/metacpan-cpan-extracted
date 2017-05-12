@@ -1,0 +1,6 @@
+#! /bin/sh
+#
+# sysv_init_null  Trivial shell sysvinit script that does nothing.
+#                 Should be usable anywhere completely harmlessly.
+
+: exit 0

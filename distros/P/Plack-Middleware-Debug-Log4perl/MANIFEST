@@ -1,0 +1,22 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Plack/Middleware/Debug/Log4perl.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README.md
+sample/app.psgi
+sample/log4perl.conf
+t/01_basic.t
+t/02_use.t
+t/03_web.t
+t/04_web_threads.t
+t/04_web_with_logging.t
+t/05_web_legacy_config.t

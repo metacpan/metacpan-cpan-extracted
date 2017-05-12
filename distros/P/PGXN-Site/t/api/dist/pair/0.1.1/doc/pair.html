@@ -1,0 +1,150 @@
+<div id="pgxndoc">
+  <div id="pgxntoc">
+    <h3>Contents</h3>
+    <ul class="pgxntocroot">
+      <li><a href="#pair.0.1.1">pair 0.1.1</a>
+        <ul>
+          <li><a href="#Synopsis">Synopsis</a></li>
+          <li><a href="#Description">Description</a>
+            <ul>
+              <li><a href="#Usage">Usage</a></li>
+            </ul>
+          </li>
+          <li><a href="#Support">Support</a></li>
+          <li><a href="#Author">Author</a></li>
+          <li><a href="#Copyright.and.License">Copyright and License</a></li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+  <div id="pgxnbod">
+
+<h1 id="pair.0.1.1">pair 0.1.1</h1>
+
+<h2 id="Synopsis">Synopsis</h2>
+
+<pre><code>% SELECT pair('foo', 'bar');
+    pair    
+------------
+ (foo,bar)
+
+ % SELECT 'foo' ~&amp;gt; 'bar';
+     pair    
+ ------------
+  (foo,bar)
+</code></pre>
+
+<h2 id="Description">Description</h2>
+
+<p>This library contains a single PostgreSQL extension, a key/value pair data
+type called <code>pair</code>, along with a convenience function for constructing
+key/value pairs. It&rsquo;s just a simple thing, really: a two-value composite type
+that can store any type of value in its slots, which are named &ldquo;k&rdquo; and &ldquo;v&rdquo;.</p>
+
+<p>So what&rsquo;s it good for? Well, the main idea is if you have a custom function to
+which you&rsquo;d like to be able to pass any number of key/value pairs. You could
+use <a href="http://www.postgresql.org/docs/current/static/hstore.html">hstore</a> of
+course, but maybe it&rsquo;s overkill, or you need to guarantee the order in which
+the pairs are passed. If so, then this extension is for you.</p>
+
+<p>The <code>pair</code> data type was created as an inspiration, as documented in
+<a href="http://justatheory.com/computers/databases/postgresql/key-value-pairs.html">this blog post</a>.
+Give it a read if you&rsquo;re interested in the context of its creation.</p>
+
+<h2 id="Usage">Usage</h2>
+
+<p>There are two ways to construct key/value pairs: Via the <code>pair()</code> function:</p>
+
+<pre><code>% SELECT pair('foo', 'bar');
+    pair    
+------------
+ (foo,bar)
+</code></pre>
+
+<p>Or by using the <code>~&amp;gt;</code> operator:</p>
+
+<pre><code>% SELECT 'foo' ~&amp;gt; 'bar';
+    pair    
+------------
+ (foo,bar)
+</code></pre>
+
+<p>To access the values, just use the <code>k</code> and <code>v</code> column names:</p>
+
+<pre><code>SELECT ('foo' ~&amp;gt; 'bar').k;
+  k  
+-----
+ foo
+(1 row)
+
+SELECT ('foo' ~&amp;gt; 'bar').v;
+  v  
+-----
+ bar
+</code></pre>
+
+<p>KInd of ugly, huh? Well pairs aren&rsquo;t very useful on their own. Where they
+really come into their own is when used as the last parameter to a variadic
+function.</p>
+
+<p>For example, say you wanted a function to store any number of key/value pairs
+in a table. Here&rsquo;s what it might look like:</p>
+
+<pre><code>CREATE OR REPLACE FUNCTION store(
+    params variadic pair[]
+) RETURNS VOID LANGUAGE plpgsql AS $$
+DECLARE
+    param pair;
+BEGIN
+    FOR param IN SELECT * FROM unnest(params) LOOP
+        UPDATE kvstore
+           SET value = param.v,
+         WHERE key = param.k;
+        CONTINUE WHEN FOUND;
+        INSERT INTO kvstore (key, value) VALUES (param.k, param.v);
+    END LOOP;
+END;
+$$;
+</code></pre>
+
+<p>And to use it, pass in any number of pairs you like:</p>
+
+<pre><code>SELECT store( 'foo' ~&amp;gt; 'bar', 'baz' ~&amp;gt; 1 );
+</code></pre>
+
+<h2 id="Support">Support</h2>
+
+<p>This library is stored in an open <a href="http://github.com/theory/kv-pair">GitHub
+repository</a>. Feel free to fork and
+contribute! Please file bug reports via <a href="http://github.com/theory/kv-pair/issues/">GitHub
+Issues</a>.</p>
+
+<h2 id="Author">Author</h2>
+
+<p><a href="http://justatheory.com/">David E. Wheeler</a></p>
+
+<h2 id="Copyright.and.License">Copyright and License</h2>
+
+<p>Copyright &copy; 2010 David E. Wheeler.</p>
+
+<p>This module is free software; you can redistribute it and/or modify it under
+the <a href="http://www.opensource.org/licenses/postgresql">PostgreSQL License</a>.</p>
+
+<p>Permission to use, copy, modify, and distribute this software and its
+documentation for any purpose, without fee, and without a written agreement is
+hereby granted, provided that the above copyright notice and this paragraph
+and the following two paragraphs appear in all copies.</p>
+
+<p>In no event shall David E. Wheeler be liable to any party for direct,
+indirect, special, incidental, or consequential damages, including lost
+profits, arising out of the use of this software and its documentation, even
+if David E. Wheeler has been advised of the possibility of such damage.</p>
+
+<p>David E. Wheeler specifically disclaims any warranties, including, but not
+limited to, the implied warranties of merchantability and fitness for a
+particular purpose. The software provided hereunder is on an &ldquo;as is&rdquo; basis,
+and David E. Wheeler has no obligations to provide maintenance, support,
+updates, enhancements, or modifications.</p>
+
+ </div>
+</div>

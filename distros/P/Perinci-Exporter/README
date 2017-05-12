@@ -1,0 +1,374 @@
+SYNOPSIS
+
+     package YourModule;
+    
+     # most of the time, you only need to do this
+     use Perinci::Exporter;
+    
+     our %SPEC;
+    
+     # f1 will not be exported by default, but user can import them explicitly using
+     # 'use YourModule qw(f1)'
+     $SPEC{f1} = { v=>1.1 };
+     sub f1 { ... }
+    
+     # f2 will be exported by default because it has the export:default tag
+     $SPEC{f2} = { v=>1.1, tags=>[qw/a export:default/] };
+     sub f2 { ... }
+    
+     # f3 will never be exported, and user cannot import them via 'use YourModule
+     # qw(f1)' nor via 'use YourModule qw(:a)'
+     $SPEC{f3} = { v=>1.1, tags=>[qw/a export:never/] };
+     sub f3 { ... }
+
+DESCRIPTION
+
+    Perinci::Exporter is an exporter which can utilize information from
+    Rinci metadata. If your package has Rinci metadata, consider using this
+    exporter for convenience and flexibility.
+
+    Features of this module:
+
+      * List exportable routines from Rinci metadata
+
+      All functions which have metadata are assumed to be exportable, so
+      you do not have to list them again via @EXPORT or @EXPORT_OK.
+
+      * Read tags from Rinci metadata
+
+      The exporter can read tags from your function metadata. You do not
+      have to define export tags again.
+
+      * Export to different name
+
+      See the 'as', 'prefix', 'suffix' import options of the
+      install_import() function.
+
+      * Export wrapped function
+
+      This allows importer to get additional/modified behavior. See
+      Perinci::Sub::Wrapper for more about wrapping.
+
+      * Export differently wrapped function to different importers
+
+      See some examples in "FAQ".
+
+      * Warn/bail on clash with existing function
+
+      For testing or safety precaution.
+
+      * Read @EXPORT and @EXPORT_OK
+
+      Perinci::Exporter reads these two package variables, so it is quite
+      compatible with Exporter and Exporter::Lite. In fact, it is basically
+      the same as Exporter::Lite if you do not have any metadata for your
+      functions.
+
+EXPORTING
+
+    Most of the time, to set up exporter, you only need to just use() it in
+    your module:
+
+     package YourModule;
+     use Perinci::Exporter;
+
+    Perinci::Exporter will install an import() routine for your package. If
+    you need to pass some exporting options:
+
+     use Perinci::Exporter default_exports=>[qw/foo bar/], ...;
+
+    See install_import() for more details.
+
+IMPORTING
+
+    Default exports. Your module users can import functions in a variety of
+    ways. The simplest form is:
+
+     use YourModule;
+
+    which by default will export all functions marked with export:default
+    tags. For example:
+
+     package YourModule;
+     use Perinci::Exporter;
+     our %SPEC;
+     $SPEC{f1} = { v=>1.1, tags=>[qw/export:default a/] };
+     sub   f1    { ... }
+     $SPEC{f2} = { v=>1.1, tags=>[qw/export:default a b/] };
+     sub   f2    { ... }
+     $SPEC{f3} = { v=>1.1, tags=>[qw/b c/] };
+     sub   f3    { ... }
+     $SPEC{f4} = { v=>1.1, tags=>[qw/a b c export:never/] };
+     sub   f4    { ... }
+     1;
+
+    YourModule will by default export f1 and f2. If there are no functions
+    tagged with export:default, there will be no default exports. You can
+    also supply the list of default functions via the default_exports
+    argument:
+
+     use Perinci::Exporter default_exports => [qw/f1 f2/];
+
+    or via the @EXPORT package variable, like in Exporter.
+
+    Importing individual functions. Your module users can import individual
+    functions:
+
+     use YourModule qw(f1 f2);
+
+    Each function can have import options, specified in a hashref:
+
+     use YourModule f1 => {wrap=>0}, f2=>{as=>'bar', args_as=>'array'};
+     # imports f1, bar
+
+    Importing groups of functions by tags. Your module users can import
+    groups of individual functions using tags. Tags are collected from
+    function metadata, and written with a : prefix to differentiate them
+    from function names. Each tag can also have import options:
+
+     use YourModule 'f3', ':a' => {prefix => 'a_'}; # imports f3, a_f1, a_f2
+
+    Some tags are defined automatically: :default (all functions that have
+    the export:default tag), :all (all functions).
+
+    Importing to a different name. As can be seen from previous examples,
+    the 'as' and 'prefix' (and also 'suffix') import options can be used to
+    import subroutines using into a different name.
+
+    Bailing on name clashes. By default, importing will override existing
+    names in the target package. To warn about this, users can set
+    '-on_clash' to 'bail':
+
+     use YourModule 'f1', f2=>{as=>'f1'}, -on_clash=>'bail'; # dies, imports clash
+    
+     use YourModule 'f1', -on_clash=>'bail'; # dies, f1 already exists
+     sub f1 { ... }
+
+    Customizing wrapping options. Users can specify custom wrapping options
+    when importing functions. The wrapping will then be done just for them
+    (as opposed to wrapped functions which are wrapped using default
+    options, which will be shared among all importers not requesting custom
+    wrapping). See some examples in "FAQ".
+
+    See do_export() for more details.
+
+FUNCTIONS
+
+ install_import(%args)
+
+    The routine which installs the import() routine to caller package.
+
+    Arguments:
+
+      * into => STR (default: caller package)
+
+      Explicitly set target package to install the import() routine to.
+
+      * caller_level => INT (default: 0)
+
+      If into is not set, caller package will be used. The default is to
+      use caller(0), but the caller level can be set using this argument.
+
+      * default_exports => ARRAY
+
+      Default symbols to export.
+
+      You can also set default exports by setting @EXPORT.
+
+      * extra_exports => ARRAY
+
+      Other symbols to export (other than the ones having metadata and
+      those specified with default_exports and @EXPORT).
+
+      You can also set default exports by setting @EXPORT_OK.
+
+      * default_wrap => BOOL (default: 1)
+
+      Whether wrap subroutines by default.
+
+      * default_on_clash => STR (default: 'force')
+
+      What to do when clash of symbols happen.
+
+ do_export($expopts, @args)
+
+    The routine which implements the exporting. Will be called from the
+    import() routine. $expopts is a hashref containing exporter options,
+    constructed by install_import(). @args is the same as arguments passed
+    during import: a sequence of function name or tag name (prefixed with
+    :), function/tag name and export option (hashref), or option (prefixed
+    with -).
+
+    Example:
+
+     do_export('f1', ':tag1', f2 => {import option...}, -option => ...);
+
+    Import options:
+
+      * as => STR
+
+      Export a function to a new name. Will die if new name is invalid.
+      Inapplicable for tags.
+
+      Example:
+
+       use YourModule func => {as => 'f'};
+
+      * prefix => STR
+
+      Export function/tag with a prefix. Will die on invalid prefix.
+
+      Example:
+
+       use YourModule ':default' => {prefix => 'your_'};
+
+      This means, foo, bar, etc. will be exported as your_foo, your_bar,
+      etc.
+
+      * suffix => STR
+
+      Export function/tag with a prefix. Will die on invalid suffix.
+
+      Example:
+
+       use YourModule ':default' => {suffix => '_s'};
+
+      This means, foo, bar, etc. will be exported as foo_s, bar_s, etc.
+
+      * wrap => 0 | 1 | HASH (default: from install_import()'s
+      default_wrap)
+
+      The default is export the wrapped functions. Can be set this to 0 to
+      disable wrapping, or a hash containing custom wrap arguments (to be
+      passed to Perinci::Sub::Wrapper's wrap_sub()).
+
+      Examples:
+
+       use YourModule foo => {}; # export wrapped, with default wrap options
+       use YourModule foo => {wrap=>0}; # export unwrapped
+       use YourModule foo => {args_as=>'array'}; # export with custom wrap
+
+      Note that when set to 0, the exported function might already be
+      wrapped anyway, e.g. when your module uses embedded wrapping (see
+      Dist::Zilla::Plugin::Rinci::Wrap) or wrap its subroutines manually.
+
+      Also note that wrapping will not be done if subroutine does not have
+      metadata.
+
+      * convert => HASH
+
+      This is a shortcut for specifying:
+
+       wrap => { convert => HASH }
+
+      * args_as => STR
+
+      This is a shortcut for specifying:
+
+       wrap => { convert => { args_as => STR } }
+
+      * result_naked => BOOL
+
+      This is a shortcut for specifying:
+
+       wrap => { convert => { result_naked => BOOL } }
+
+      * curry => STR
+
+      This is a shortcut for specifying:
+
+       wrap => { convert => { curry => STR } }
+
+    Options:
+
+      * -on_clash => 'force' | 'bail' (default: from install_import()'s
+      default_on_clash)
+
+      If importer tries to import 'foo' when it already exists, the default
+      is to force importing, without any warnings, like Exporter.
+      Alternatively, you can also bail (dies), which can be more
+      reliable/safe.
+
+      * -prefix => STR
+
+      Like prefix import option, but to apply to all exports.
+
+      * -suffix => STR
+
+      Like suffix import option, but to apply to all exports.
+
+FAQ
+
+ Why use this module as my exporter?
+
+    If you are fine with Exporter, Exporter::Lite, or Sub::Exporter, then
+    you probably won't need this module.
+
+    This module is particularly useful if your subs have Rinci metadata, in
+    which case you'll get some nice features. Some examples of the things
+    you can do with this exporter:
+
+      * Change calling style from argument to positional
+
+       use YourModule func => {args_as=>'array'};
+
+      Then instead of:
+
+       func(a => 1, b => 2);
+
+      your function is called with positional arguments:
+
+       func(1, 2);
+
+      Note: this requires that the function's argument spec puts the 'pos'
+      information. For example:
+
+       $SPEC{func} = {
+           v => 1.1,
+           args => {
+               a => { pos=>0 },
+               b => { pos=>1 },
+           }
+       };
+
+      * Set timeout
+
+       use YourModule ':all' => {wrap=>{convert=>{timeout=>10}}};
+
+      This means all exported functions will be limited to 10s of execution
+      time.
+
+      Note: Perinci::Sub::property::timeout is needed for this.
+
+      * Set retry
+
+       use YourModule ':default' => {wrap=>{convert=>{retry=>3}}};
+
+      This means all exported functions can autoretry up to 3 times.
+
+      Note: Perinci::Sub::property::retry is needed for this.
+
+      * Currying
+
+      Sub::Exporter supports this. Perinci::Exporter does too:
+
+       use YourModule f => {as=>'f_a10', wrap=>{convert=>{curry=>{a=>10}}}};
+
+      This means:
+
+       f_a10();             # equivalent to f(a=>10)
+       f_a10(b=>20, c=>30); # equivalent to f(a=>10, b=>20, c=>30)
+       f_a10(a=>5);         # error, a is already set
+
+      Note: Perinci::Sub::property::curry is needed for this.
+
+ What happens to functions that do not have metadata?
+
+    They can still be exported if you list them in @EXPORT or @EXPORT_OK.
+
+SEE ALSO
+
+    Perinci
+
+    Perinci::Sub::Wrapper
+

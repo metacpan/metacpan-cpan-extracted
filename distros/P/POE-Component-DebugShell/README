@@ -1,0 +1,137 @@
+NAME
+    POE::Component::DebugShell - Component to allow interactive peeking into
+    a running POE application
+
+SYNOPSIS
+        use POE::Component::DebugShell;
+
+        POE::Component::DebugShell->spawn();
+
+DESCRIPTION
+    This component allows for interactive peeking into a running POE
+    application.
+
+    "spawn()" creates a ReadLine enabled shell equipped with various debug
+    commands. The following commands are available.
+
+COMMANDS
+  show_sessions
+     debug> show_sessions
+        * 3 [ session 3 (POE::Component::DebugShell controller) ]
+        * 2 [ session 2 (PIE, PIE2) ]
+
+    Show a list of all sessions in the system. The output format is in the
+    form of loggable session ids.
+
+  session_stats
+     debug> session_stats 2
+        Statistics for Session 2
+            Events coming from: 1
+            Events going to: 1
+
+    Display various statistics for a given session. Provide one session id
+    as a parameter.
+
+  list_aliases
+     debug> list_aliases 2
+        Alias list for session 2
+            * PIE
+            * PIE2
+
+    List aliases for a given session id. Provide one session id as a
+    parameter.
+
+  queue_dump
+     debug> queue_dump
+        Event Queue:
+            * ID: 738 - Index: 0
+                Priority: 1078459009.06715
+                Event: _sigchld_poll
+            * ID: 704 - Index: 1
+                Priority: 1078459012.42691
+                Event: ping
+
+    Dump the contents of the event queue. Add a "-v" parameter to get
+    verbose output.
+
+  help
+     debug> help
+        The following commands are available:
+            ...
+
+    Display help about available commands.
+
+  status
+     debug> status
+        This is POE::Component::DebugShell v1.14
+        running inside examples/foo.perl.
+        This console spawned at Thu Mar 4 22:51:51 2004.
+        There are 3 known sessions (including the kernel).
+
+    General shell status.
+
+  reload
+     debug> reload
+     Reloading...
+
+    Reload the shell
+
+  exit
+     debug> exit
+     Exiting...
+
+    Exit the shell
+
+DEVELOPERS
+    For you wacky developers, I've provided access to the raw command data
+    via the "_raw_commands" method. The underbar at the beginning should let
+    you know that this is an experimental interface for developers only.
+
+    "_raw_commands" returns a hash reference. The keys of this hash are the
+    command names. The values are a hash of data about the command. This
+    hash contains the following data:
+
+    *   short_help
+
+        Short help text
+
+    *   help
+
+        Long help text
+
+    *   cmd
+
+        Code reference for the command. This command requires that a hash be
+        passed to it containing an "api" parameter, which is a
+        "POE::API::Peek" object, and an "args" parameter, which is an array
+        reference of arguments (think @ARGV).
+
+AUTHOR
+    Matt Cashner (sungo@pobox.com)
+
+LICENSE
+    Copyright (c) 2003-2004, Matt Cashner
+
+    Permission is hereby granted, free of charge, to any person obtaining a
+    copy of this software and associated documentation files (the
+    "Software"), to deal in the Software without restriction, including
+    without limitation the rights to use, copy, modify, merge, publish,
+    distribute, sublicense, and/or sell copies of the Software, and to
+    permit persons to whom the Software is furnished to do so, subject to
+    the following conditions:
+
+    The above copyright notice and this permission notice shall be included
+    in all copies or substantial portions of the Software.
+
+    THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+    ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+

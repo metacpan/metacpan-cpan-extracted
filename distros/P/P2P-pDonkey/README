@@ -1,0 +1,53 @@
+P2P::pDonkey version 0.04
+=========================
+
+pDonkey is the set of tools, written in perl, for manipulating 
+eDonkey peer2peer protocol. The main goal of project is to create 
+open source server for eDonkey network and to provide basic API
+for eDonkey network protocol.
+
+At the moment the set includes the following modules:
+
+  P2P::pDonkey::Meta
+    Functions for handling meta data of the protocol.
+
+  P2P::pDonkey::Packet
+    Functions for handling packets of the protocol. 
+
+  P2P::pDonkey::Met
+    Functions for handling *.met files.
+
+INSTALLATION
+
+  To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+  This module requires these other modules and libraries:
+
+    Carp
+    Digest::MD4
+    Data::Hexdumper
+    File::Basename
+    File::Find
+    File::Glob
+    IO::Select
+    IO::Socket
+    POSIX
+    Socket
+    Sys::Hostname
+    Tie::IxHash
+    Video::Info
+
+COPYRIGHT AND LICENCE
+
+    Copyright (c) 2003 Alexey klimkin <klimkin at cpan.org>. 
+    All rights reserved.
+    This program is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+

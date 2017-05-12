@@ -1,0 +1,243 @@
+NAME
+    POE::Component::OpenSSH - Non-blocking SSH Component for POE using
+    Net::OpenSSH
+
+VERSION
+    version 0.11
+
+SYNOPSIS
+    Need non-blocking SSH? You like Net::OpenSSH? Try out this stuff right
+    here.
+
+        use POE::Component::OpenSSH;
+
+        my $ssh = POE::Component::OpenSSH->new( args => [ $host, user => $user ] );
+        $ssh->system( { event => 'read_system_output' }, 'w' );
+
+    Perhaps you want it with debugging and verbose of
+    POE::Component::Generic
+
+        my $ssh = POE::Component::OpenSSH->new(
+            args    => [ 'root@host', passwd => $pass ],
+            verbose => 1, # turns on POE::Component::Generic verbose
+            debug   => 1, # turns on POE::Component::Generic debug
+        );
+
+    What about setting timeout for Net::OpenSSH?
+
+        my $ssh = POE::Component::OpenSSH->new(
+            args => [ 'root@host', passwd => $pass, timeout => 10 ],
+        );
+
+DESCRIPTION
+    This module allows you to use SSH (via Net::OpenSSH) in a non-blocking
+    manner.
+
+    The only differences is that in the *new()* method, you need to indicate
+    OpenSSH args in *args*, and the first arg to a method should be a
+    hashref that includes an *event* to reach with the result.
+
+    I kept having to write this small thing each time I needed non-blocking
+    SSH in a project. I got tired of it so I wrote this instead.
+
+    You might ask 'why put the args in an "args" attribute instead of
+    straight away attributes?' Because Net::OpenSSH has a lot of options and
+    they may collide with POE::Component::Generic's options and I don't feel
+    like maintaining the mess. It's on Github so you can patch it up if you
+    want (I accept patches... and foodstamps).
+
+    Here is a more elaborate example using MooseX::POE:
+
+    (If you know POE::Session, you can use that too)
+
+        package Runner;
+        use MooseX::POE;
+
+        has 'host' => ( is => 'ro', isa => 'Str', default => 'localhost' );
+        has 'user' => ( is => 'ro', isa => 'Str', default => 'root'      );
+        has 'pass' => ( is => 'ro', isa => 'Str', default => 'pass'      );
+        has 'cmd'  => ( is => 'ro', isa => 'Str', default => 'w'         );
+
+        sub START {
+            my $self = $_[OBJECT];
+            my $ssh  = POE::Component::OpenSSH->new(
+                args => [
+                    $self->host,
+                    user   => $self->user,
+                    passwd => $self->passwd,
+                ],
+            );
+
+            $ssh->capture( { event => 'parse_cmd' }, $cmd );
+        }
+
+        event 'parse_cmd' => sub {
+            my ( $self, $output ) @_[ OBJECT, ARG1 ];
+            my $host = $self->host;
+            print "[$host]: $output";
+        };
+
+        package main;
+
+        use POE::Kernel;
+
+        my @machines = ( qw( server1 server2 server3 ) );
+
+        foreach my $machine (@machines) {
+            Runner->new(
+                host => $machine,
+                pass => 'my_super_pass',
+                cmd  => 'uname -a',
+            );
+        }
+
+        POE::Kernel->run();
+
+METHODS
+  new
+    Creates a new POE::Component::OpenSSH object. If you want to access the
+    Net::OpenSSH check *object* below.
+
+    This module (still?) doesn't have a *spawn* method, so you're still
+    required to put it in a POE::Session. The examples use MooseX::POE which
+    does the same thing.
+
+    args
+        The arguments that will go to Net::OpenSSH.
+
+    options
+        The options that will go to POE::Component::Generic's *options*
+        argument, stuff like " { trace =" 1 } >.
+
+    error
+        Event when POE::Component::Generic has an error. Either a hashref
+        with *session* and *event* or a string with the event in the current
+        session.
+
+    alias
+        A session alias to register with the kernel. Default is none.
+
+    debug
+        Shows component debugging information.
+
+    verbose
+        Some stuff about what is happening to Net::OpenSSH. Very useful for
+        debugging the Net::OpenSSH object.
+
+  object
+    This method access the actual Net::OpenSSH object. It is wrapped with
+    POE::Component::Generic, so the first argument is actually a hashref
+    that POE::Component::Generic requires. Specifically, noting which event
+    will handle the return of the Net::OpenSSH method.
+
+    You can reach every method is Net::OpenSSH this way. However, some
+    methods are already delegated to make your life easier. If what you need
+    isn't delegated, you can reach it directing using the object.
+
+    For example, these two methods are equivalent:
+
+        $ssh->object->capture( { event => 'handle_capture' }, 'echo yo yo' );
+
+        $ssh->capture( { event => 'handle_capture' }, 'echo yo yo' );
+
+        # shell_quote isn't delegated
+        $ssh->object->shell_quote(@args);
+
+  args
+    These are the arguments that will go to Net::OpenSSH creation. This is
+    an arrayref.
+
+    For example:
+
+        # using user@host
+        my $ssh = POE::Component::OpenSSH->new( args => [ 'root@remote_host' ] );
+
+        # using separate arguments
+        my $ssh = POE::Component::OpenSSH->new( args => [ 'remote_host, user => 'root' ] );
+
+        # same thing, just with pass, and writing it nicer
+        my $ssh = POE::Component::OpenSSH->new(
+            args => [
+                'remote_host',
+                user   => 'root',
+                passwd => $pass,
+            ],
+        );
+
+  capture
+    This is a delegated method to Net::OpenSSH's capture.
+
+  capture2
+    This is a delegated method to Net::OpenSSH's *capture2*.
+
+  system
+    This is a delegated method to Net::OpenSSH's *system*.
+
+  scp_get
+    This is a delegated method to Net::OpenSSH's *scp_get*.
+
+  scp_put
+    This is a delegated method to Net::OpenSSH's *scp_put*.
+
+  sftp
+    This is a delegated method to Net::OpenSSH's *sftp*.
+
+AUTHOR
+    Sawyer X, "<xsawyerx at cpan.org>"
+
+BUGS
+    There is one known issue I've personally stumbled across which I've yet
+    to figure out and resolve. Using MooseX::POE, running "capture"s from
+    the "START" event works, but running from another event doesn't. The
+    connection fails and hangs. In order to fix it, I use a clearance on the
+    attribute before running the second "capture", so now it works, but I've
+    yet to understand why that happens.
+
+    The Github's issue tracker is available at
+    <http://github.com/xsawyerx/poe-component-openssh/issues>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc POE::Component::OpenSSH
+
+    You can also look for information at:
+
+    *   Github issue tracker
+
+        <http://github.com/xsawyerx/poe-component-openssh/issues>
+
+    *   Github page
+
+        <http://github.com/xsawyerx/poe-component-openssh/tree/master>
+
+SEE ALSO
+    If you have no idea what I'm doing (but you generally know what POE is),
+    check these stuff:
+
+    POE::Component::Generic
+
+    Net::OpenSSH
+
+    If you don't know POE at all, check POE.
+
+DEPENDENCIES
+    Net::OpenSSH
+
+    POE
+
+    POE::Component::Generic
+
+ACKNOWLEDGEMENTS
+    All the people involved in the aforementioned projects and the Perl
+    community.
+
+AUTHOR
+    Sawyer X <xsawyerx@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Sawyer X.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

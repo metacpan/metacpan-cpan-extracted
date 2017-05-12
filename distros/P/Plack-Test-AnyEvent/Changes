@@ -1,0 +1,19 @@
+Revision history for Plack-Test-AnyEvent
+
+0.06 January 26 2015
+     Fix an issue with PSGI conformance (thanks, Daisuke Maki!)
+
+0.05 October 20 2013
+     Allow on_content_received to work for non-streaming responses. Maki-Daisuke++
+
+0.04 May 23 2013
+     Fix broken test.
+
+0.03 August 31 2011
+     Fix to work with AnyEvent 6.
+
+0.02 August 16 2011
+     Added support for uncaught exceptions being thrown in applications.
+
+0.01 June 20 2011
+     Initial release.

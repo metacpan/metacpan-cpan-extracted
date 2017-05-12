@@ -1,0 +1,50 @@
+NAME
+    Plack::Middleware::File::Less - compile LESS templates into CSS
+    stylesheets
+
+SYNOPSIS
+      use Plack::App::File;
+      use Plack::Builder;
+
+      builder {
+          mount "/stylesheets" => builder {
+              enable "File::Less";
+              Plack::App::File->new(root => "./stylesheets");
+          };
+      };
+
+      # Or with Middleware::Static
+      enable "File::Less";
+      enable "Static", path => qr/\.css$/, root => "./static";
+
+DESCRIPTION
+    Plack::Middleware::File::Less is middleware that compiles Less
+    <http://lesscss.org> templates into CSS stylesheet..
+
+    When a request comes in for *.css* file, this middleware changes the
+    internal path to *.less* in the same directory. If the LESS template is
+    found, a new CSS stylesheet is built on memory and served to the
+    browsers. Otherwise, it falls back to the original *.css* file in the
+    directory.
+
+LESS BACKENDS
+    If you have the "lessc" executable available in your PATH, this module
+    automatically uses the command to convert LESS into CSS. If the command
+    is not available and you have CSS::LESSp perl module available, it will
+    be used. Otherwise you'll get an exception during the initialization of
+    this middleware component.
+
+SEE ALSO
+    Plack::App::File CSS::LESSp <http://lesscss.org/>
+
+AUTHORS
+    *   Naoya Ito <lt>i.naoya@gmail.com<gt>
+
+    *   Franck Cuny <lt>https://github.com/franckcuny<gt>
+
+    *   Tatsuhiko Miyagawa <lt>miyagawa@bulknews.net<gt>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

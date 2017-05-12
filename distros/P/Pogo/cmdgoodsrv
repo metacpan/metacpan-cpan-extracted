@@ -1,0 +1,17 @@
+#!/usr/local/bin/perl
+# cmdgoodsrv - send command to goodsrv
+# 1999 Sey Nakajima <sey@jkc.co.jp>
+use strict;
+
+my $Cfgname = shift || usage();
+my $Cmd = shift || usage();
+my $Pipe = "$Cfgname.goodsrv.pipe";
+die "pipe $Pipe not exist\n" unless -p $Pipe;
+open P,">>$Pipe" or die "cannot open $Pipe\n";
+print P "$Cmd\n";
+close P;
+
+sub usage {
+	print "usage: $0 cfgname command\n";
+	exit(1);
+}

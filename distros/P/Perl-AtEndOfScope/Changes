@@ -1,0 +1,10 @@
+Revision history for Perl extension Perl::AtEndOfScope.
+
+0.03  Wed Jun 25 17:23:20 CEST 2008
+	- call the destruction code in an eval block localizing
+	  ($@, $a, $b, $_, $., $!, $^E, $?)
+
+0.01  Tue May 31 13:28:39 2005
+	- original version; created by h2xs 1.23 with options
+		-n Perl::AtEndOfScope -X -b 5.8.0 -A -f
+

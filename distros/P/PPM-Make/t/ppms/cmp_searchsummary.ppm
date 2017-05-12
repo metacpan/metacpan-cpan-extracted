@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<REPOSITORYSUMMARY>
+  <SOFTPKG NAME="ANSIColor" VERSION="1,11,0,0">
+    <TITLE>ANSIColor</TITLE>
+    <ABSTRACT>Color output using ANSI escape sequences</ABSTRACT>
+    <AUTHOR>Russ Allbery (rra@stanford.edu)</AUTHOR>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="AppConfig" VERSION="1,63,0,0">
+    <TITLE>AppConfig</TITLE>
+    <ABSTRACT>AppConfig is a bundle of Perl5 modules for reading configuration files and parsing command line arguments.</ABSTRACT>
+    <AUTHOR>Andy Wardley, (abw@wardley.org)</AUTHOR>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="Archive-Tar" VERSION="1,30,0,0">
+    <TITLE>Archive-Tar</TITLE>
+    <ABSTRACT>Manipulates TAR archives</ABSTRACT>
+    <AUTHOR>Jos Boumans (kane@cpan.org)</AUTHOR>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="Bit-Vector" VERSION="6,4,0,0">
+    <TITLE>Bit-Vector</TITLE>
+    <ABSTRACT>Efficient bit vector, set of integers and ``big int'' math library</ABSTRACT>
+    <AUTHOR>Steffen Beyer (sb@engelschall.com)</AUTHOR>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="File-HomeDir" VERSION="0,58,0,0">
+    <TITLE>File-HomeDir</TITLE>
+    <ABSTRACT>Get the home directory for yourself or other users</ABSTRACT>
+    <AUTHOR>Adam Kennedy (cpan@ali.as)</AUTHOR>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="Win32-TieRegistry" VERSION="0,25,0,0">
+    <TITLE>Win32-TieRegistry</TITLE>
+    <ABSTRACT>Powerful and easy ways to manipulate a registry [on Win32 for now]</ABSTRACT>
+    <AUTHOR>Tye McQueen (tye@metronet.com)</AUTHOR>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="Win32API-Registry" VERSION="0,27,0,0">
+    <TITLE>Win32API-Registry</TITLE>
+    <ABSTRACT>Low-level access to Win32 system API calls from WINREG.H</ABSTRACT>
+    <AUTHOR>Tye McQueen (tye@metronet.com)</AUTHOR>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+</REPOSITORYSUMMARY>

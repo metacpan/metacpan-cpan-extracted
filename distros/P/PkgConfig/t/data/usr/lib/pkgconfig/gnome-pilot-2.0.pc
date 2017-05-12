@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+gnomepilot_plversion=0.12.5
+
+Name: Gnome Pilot
+Description: 
+Version: 2.0.17 (pilot-link version 0.12.5)
+Requires: libgnome-2.0 libgnomeui-2.0
+Libs: -L${libdir} -lgpilotd -lgpilotdcm -lgpilotdconduit -lpisock -lpisync
+Cflags: -I${includedir} 

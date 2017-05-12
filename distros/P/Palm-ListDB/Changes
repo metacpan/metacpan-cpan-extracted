@@ -1,0 +1,15 @@
+Revision history for Perl extension Palm::ListDB.
+
+0.25  Wed Aug 28 19:48:57 2002
+	- 0.24 did not pass CPAN testers,
+	  constants from Palm::StdAppInfo did not get inherited (??)
+
+0.24  Thu Aug 22 18:50:06 2002 
+	- fixed padding of AppInfoBlock
+	- added options to new_Record
+	- fixed typos in pod and README
+	- added artistic license
+	- started Changelog
+
+0.23  Thu Aug 22 7:34:19 2002 
+	- first upload to CPAN

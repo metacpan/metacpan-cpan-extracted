@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+prigraph.dll
+prigraph.lib
+prigraph.def
+libprigraph.a
+win32.pm
+README

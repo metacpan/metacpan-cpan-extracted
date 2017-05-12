@@ -1,0 +1,37 @@
+#!perl
+use strict;
+use lib "lib";
+use POE qw< Component::Client::BigBrother >;
+
+my $bbhost = "localhost";
+
+POE::Session->create(
+    inline_states => {
+        _start => sub {
+            POE::Component::Client::BigBrother->send(
+                host    => $bbhost,
+                event   => "_result",
+                command_type    => "event",
+                command_fields  => {
+                    host        => "front01.domain.net",
+                    service     => "logs",
+                    id          => "default",
+                    persistence => "eph",
+                    activation  => time() - 10,
+                    expiration  => time() + 15 * 60,
+                    color       => "green",
+                    message     => "all logs OK",
+                },
+            );
+        },
+
+        _result => sub {
+            my $result = $_[ARG0];
+            print "* result:\n",
+                map { "    $_: $result->{$_}\n" } sort keys %$result;
+        },
+    },
+);
+
+POE::Kernel->run;
+

@@ -1,0 +1,266 @@
+NAME
+    POE::Component::WWW::DoingItWrongCom::RandImage - non-blocking way to
+    get URIs to random images from <http://www.doingitwrong.com>
+
+SYNOPSIS
+        use strict;
+        use warnings;
+        use POE qw(Component::WWW::DoingItWrongCom::RandImage);
+
+        POE::Component::WWW::DoingItWrongCom::RandImage->spawn(
+            alias => 'wrong',
+        );
+
+        POE::Session->create(
+            package_states => [
+                main => [ qw( _start  got_pic ) ],
+            ],
+        );
+
+        $poe_kernel->run;
+
+        sub _start {
+            $_[KERNEL]->post( wrong => fetch => { event => 'got_pic' } );
+        }
+
+        sub got_pic {
+            my ( $kernel, $input ) = @_[ KERNEL, ARG0 ];
+
+            if ( $input->{error} ) {
+                print "ERROR: $input->{error}\n";
+            }
+            else {
+                print "You are doing it wrong: $input->{out}\n";
+            }
+
+            $kernel->post( wrong => 'shutdown' );
+        }
+
+DESCRIPTION
+    The module is a non-blocking wrapper around
+    WWW::DoingItWrongCom::RandImage which fetches a URI for a random image
+    from <http://www.doingitwrong.com>
+
+CONSTRUCTOR
+  spawn
+        my $poco = POE::Component::WWW::DoingItWrongCom::RandImage->spawn;
+
+        POE::Component::WWW::DoingItWrongCom::RandImage->spawn(
+            alias => 'wrong',
+        );
+
+        POE::Component::WWW::DoingItWrongCom::RandImage->spawn(
+            alias => 'wrong',
+            ua_args => {
+                timeout => 30, # that's the default
+                agent   => 'WrongAgent',
+                # the rest of LWP::UserAgent options can go here.
+            },
+            options => {
+                debug => 1,
+                trace => 1,
+                # POE::Session arguments for the component
+            },
+            debug => 1, # output some debug info
+        );
+
+    The "spawn" method returns a
+    POE::Component::WWW::DoingItWrongCom::RandImage object and takes several
+    aruments *all of which are optional*. The possible arguments are as
+    follows:
+
+   alias
+        POE::Component::WWW::DoingItWrongCom::RandImage->spawn(
+            alias => 'calc'
+        );
+
+    Optional. Specifies a POE Kernel alias for the component.
+
+   ua_args
+        my $poco = POE::Component::WWW::DoingItWrongCom::RandImage->spawn(
+            ua_args => {
+                timeout => 30, # that's the default
+                agent   => 'WrongAgent',
+                # the rest of LWP::UserAgent options can go here.
+            },
+        );
+
+    Optional. The "ua_args" argument takes a hashref as a value which will
+    be passed to LWP::UserAgent object constructor. See LWP::UseAgent
+    documentation for possible keys/values. By default the default
+    LWP::UserAgent's constructor will be used *except* for "timeout" which,
+    unless specified by you, will default to 30 seconds.
+
+   options
+        my $poco = POE::Component::WWW::DoingItWrongCom::RandImage->spawn(
+            options => {
+                trace => 1,
+                default => 1,
+            },
+        );
+
+    A hashref of POE Session options to pass to the component's session.
+
+   debug
+        my $poco = POE::Component::WWW::DoingItWrongCom::RandImage->spawn(
+            debug => 1
+        );
+
+    When set to a true value turns on output of debug messages. Defaults to:
+    0.
+
+METHODS
+    These are the object-oriented methods of the components.
+
+  fetch
+        $poco->fetch( { event => 'got_pic' } );
+
+        $poco->fetch( {
+                event         => 'got_pic',
+                session       => 'other_session',
+                _user_defined => 'something_random',
+                _random       => 'moar_randomness',
+            }
+        );
+
+    Takes hashref of options. See "fetch" event below for description.
+
+  session_id
+        my $poco_id = $poco->session_id;
+
+    Takes no arguments. Returns component's session ID.
+
+  shutdown
+        $poco->shutdown;
+
+    Takes no arguments. Shuts down the component.
+
+ACEPTED EVENTS
+  fetch
+        $poe_kernel->post( wrong => fetch => {
+                event         => 'got_pic',
+                session       => 'other_session',
+                _user_defined => 'something_random',
+                _random       => 'moar_randomness',
+            }
+        );
+
+    Instructs the component to fetch a URI to a random image from
+    <http://www.doingitwrong.com>. Takes one argument which is a hashref of
+    options with keys/values as follows:
+
+   event
+        { event => 'got_pic' }
+
+    Mandatory. An event to send the result to.
+
+   session
+        { session => $some_other_session_ref }
+
+        { session => 'some_alias' }
+
+        { session => $session->ID }
+
+    Optional. An alternative session alias, reference or ID that the
+    response should be sent to, defaults to sending session.
+
+   user defined
+    Optional. Any keys starting with "_" (underscore) will not affect the
+    component and will be passed back in the result intact.
+
+  shutdown
+        $poe_kernel->post( wrong => 'shutdown' );
+
+    Takes no arguments. Tells the component to shut itself down.
+
+OUTPUT
+     $VAR1 = {
+        'out' => bless( do{\(my $o = 'http://www.doingitwrong.com/wrong/20070527-113810.jpg')}, 'URI::http' ),
+        '_num' => 4
+     };
+
+    The event handler set up to handle the event, the name of which you've
+    specified in the "event" parameter of the "fetch()" event/method will
+    recieve the results of the request from "fetch". They will be passed in
+    a form of a hashref in "ARG0". The possible keys will be as follows:
+
+  out
+     {
+        'out' => bless( do{\(my $o = 'http://www.doingitwrong.com/wrong/20070527-113810.jpg')}, 'URI::http' ),
+     }
+
+    If no errors occured, the "out" key will be present and the value will
+    be a URI object for the URI of the random image from
+    <http://www.doingitwrong.com>.
+
+  error
+        { 'error' => '500: Request timed out' }
+
+    If some sort of an error occured during the request, the "error" key
+    will be present and will contain the description of an error.
+
+   user defined
+        { '_num' => 4 }
+
+    Any arguments beginning with "_" (underscore) passed into the "fetch"
+    event/method will be present intact in the result.
+
+SEE ALSO
+    POE, LWP::UserAgent, URI, WWW::DoingItWrongCom::RandImage
+
+PREREQUISITES
+    For healthy life this module requires the following modules/versions:
+
+        'Carp'                            => 1.04,
+        'POE'                             => 0.9999,
+        'POE::Filter::Reference'          => 1.2187,
+        'POE::Filter::Line'               => 1.1920,
+        'POE::Wheel::Run'                 => 1.2179,
+        'WWW::DoingItWrongCom::RandImage' => 0.01,
+
+    The module might work with older versions but that wasn't tested.
+
+AUTHOR
+    Zoffix Znet, "<zoffix at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-poe-component-www-doingitwrongcom-randimage at rt.cpan.org", or
+    through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-WWW-DoingI
+    tWrongCom-RandImage>. I will be notified, and then you'll automatically
+    be notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc POE::Component::WWW::DoingItWrongCom::RandImage
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-WWW-DoingItW
+        rongCom-RandImage>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/POE-Component-WWW-DoingItWrongCom-RandImag
+        e>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/POE-Component-WWW-DoingItWrongCom-Ran
+        dImage>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/POE-Component-WWW-DoingItWrongCom-RandI
+        mage>
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Zoffix Znet, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

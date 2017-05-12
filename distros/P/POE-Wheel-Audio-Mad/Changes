@@ -1,0 +1,43 @@
+Revision history for Perl extension POE::Wheel::Audio::Mad.
+
+0.3  Wed Oct 22 03:27:15 2003
+	- final tweaks,  getting ready for something release 
+	  quality.  more work was done to make sure everything
+	  interoperates smoothly.
+	  
+	- several documentation tweaks to fix outright lies
+	  about decoder behaviour and interface.  also added
+	  a bit more information in on what messages mean.
+
+0.2  Sat Oct 18 09:45:02 2003
+	- updated a good portion of the decoders internal structure,
+	  and also made it more friendly to having a user-specified
+	  alias.  the dual module/session issue was fixed by
+	  completely taking advantage of a wheel's nature.  originally,
+	  this was written as a component,  and I find this new 
+	  design to be infinitely more flixible and intuitive.  yay.
+	  
+	- much documentation added..  most of the options,  messages,
+	  and states were documented.
+
+0.1  Tue Oct 14 23:54:56 2003
+	- added in some pod to help people along with the module.  the
+	  module strucutre really isn't clear,  as there's always two
+	  modules and two sessions being initalized..  make it clearer,
+	  or subclass,  or something..
+	  
+	- documented all code in this package as best I could,  there
+	  are problems yet to be fixed,  and this module is really
+	  only suited to x86 platforms where Audio::OSS is available.
+	  all audio is played with AFMT_S16_LE.
+
+	- transformed the modules to fit inside a new namespace..
+	  POE::Wheel::Audio::Mad
+	  
+	- most of the code here was taken from another project I had
+	  written to create yet another curses mpeg player (but I
+	  wrote mine in perl,  nyah..)
+
+	- original version; created by h2xs 1.22 with options
+		-A -X -n POE::Wheel::Audio::Mad
+

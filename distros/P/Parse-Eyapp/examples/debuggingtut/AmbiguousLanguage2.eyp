@@ -1,0 +1,48 @@
+# ~/LEyapp/examples/debuggingtut$ eyapp -vTC AmbiguousLanguage2.eyp 
+# 1 shift/reduce conflict and 1 reduce/reduce conflict
+# ~/LEyapp/examples/debuggingtut$ eyapp -P ab.eyp 
+# ~/LEyapp/examples/debuggingtut$ ./AmbiguousLanguage2.pm -t -i -m 1 -c 'abbcc'
+
+%conflict AorC ab? shift: BC
+
+#%conflict AorC {
+#   $self->YYIf('ab', 'shift', 'BC');
+#}
+
+#%expect 1 1
+%%
+st:  %AorC? s
+;
+
+#AorC_explorer: {   
+#       $_[0]->YYNestedParse('ab', 'AorC'); 
+#   }   
+#;
+
+s: aeqb 
+ | beqc
+;
+
+aeqb: ab cs
+;
+
+ab: /* empty */ 
+  | 'a'           %PREC AorC 
+       ab 'b'
+;
+
+cs : /* empty */ | cs 'c' 
+;
+
+beqc: as bc
+;
+
+bc: /* empty */ | 'b' bc 'c'
+;
+
+as: %name BC
+    /* empty */   %PREC AorC 
+  | as 'a'
+;
+
+%%

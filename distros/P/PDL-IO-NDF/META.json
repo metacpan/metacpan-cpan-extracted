@@ -1,0 +1,48 @@
+{
+   "abstract" : "Read PDLs from NDF files and write PDLs to NDF files",
+   "author" : [
+      "Tim Jenness <tjenness@cpan.org>",
+      "Douglas Burke <dburke@cfa.harvard.edu>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDL-IO-NDF",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Number::Delta" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Astro::FITS::Header" : "3",
+            "NDF" : "1.51",
+            "PDL" : "v2.4.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/timj/perl-PDL-IO-NDF/tree/master",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/timj/perl-PDL-IO-NDF.git"
+      }
+   },
+   "version" : "1.04"
+}

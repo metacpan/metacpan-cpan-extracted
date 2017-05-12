@@ -1,0 +1,26 @@
+0.004 2011-10
+    * Added Parse::FieldPath::Role
+    * Support for arrays. "array_field/subfield" returns "subfield" from every
+      object in array.
+    * Extract data from hashrefs, instead of just objects.
+
+0.003 2011-09-26
+    * Bug fix. The method to get the full list of available fields was
+      documented as all_fields(), but implemented as field_list(). Going with
+      all_fields().
+
+0.002 2011-09-26
+    * Pre-compile the parser for a speed improvement
+    * Made build_tree private (seems sorta useless to anyone else)
+    * Added some support for "a/*" syntax. "a/*/b" still doesn't work
+    * Call all_fields() on the object to know the valid fields, and which
+      fields to return if a whole object is requested.
+    * Follow a recursive structure up to 512 times, but no more.
+    * Call requested_fields() (if possible) before calling any accessors on an
+      object
+    * Make an empty field_path argument return everything.
+
+0.001 2011-09-21
+    * First release
+    * Parser is mostly working
+    * Major portions of the syntax are unimplemented

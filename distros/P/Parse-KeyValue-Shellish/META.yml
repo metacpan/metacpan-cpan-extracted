@@ -1,0 +1,40 @@
+---
+abstract: 'Parses the key-value pairs like a shell script'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v1.0.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parse-KeyValue-Shellish
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Parse::KeyValue::Shellish:
+    file: lib/Parse/KeyValue/Shellish.pm
+    version: '0.01'
+  Parse::KeyValue::Shellish::Parser:
+    file: lib/Parse/KeyValue/Shellish/Parser.pm
+requires:
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/moznion/Parse-KeyValue-Shellish/issues
+  homepage: https://github.com/moznion/Parse-KeyValue-Shellish
+  repository: git://github.com/moznion/Parse-KeyValue-Shellish.git
+version: '0.01'
+x_authority: cpan:MOZNION

@@ -1,0 +1,79 @@
+Base
+----
+o add Greg's foreign key datatype
+
+o add HTML docs to distributions
+
+o document the add_attribute method better
+    explain the datatypes and args in more detail
+
+o add an example that processes a CGI form submission
+
+o add an example that reports on the CGI form submissions
+    email any submissions that occurred during the last week
+
+o document the restore_where method better for the Base classes
+    explain how to do comparisions with the various datatypes (esp. DateTime)
+
+o better query parser, possibly use SQL::Stmt
+    - fully support SQL WHERE clauses
+
+o add argument to method: restore_where($where, $order_by, $type)
+    where $type = 'SQL' or 'Perl'
+
+o add config attribute: switch for NULL/NOT NULL IDs
+
+o add methods: restore_first, restore_last, restore_prev
+
+o add methods: open_datastore, close_datastore
+
+o fix problem: $person->bday('1970-06-12') does not work
+
+o add methods: insert_attribute, update_attribute, delete_attribute
+
+o modify method: save/insert($override)
+    parameter to save if it already exists
+
+o add method: Memory::update
+    Currently, an update does a delete and insert, which was simple
+    to implement, but not the fastest for performance.
+
+o add class: Persistent::Object for added useability
+    change method: datastore_type -> persistent_class
+    change method: object_type    -> object_class
+    change method: parent_type    -> parent_class
+
+o add named parameters:
+    add_attribute({name     => 'firstname',
+                   type     => 'id',
+                   datatype => 'VarChar',
+                   args     => [undef, 10]});
+
+o fix problem: reset PrevID in datastore method
+    When you change the data store, check to see if it's
+    different from the previous one.  If it is different then reset the
+    PrevID so that updates will not be allowed and the save method will
+    correctly do an insert.
+
+o add method: clone
+
+o add constructor argument: $obj
+
+o add datatypes: Date, Time
+
+o add datatype: Sequence
+
+o add data types: Float, Integer, BigDateTime (uses Date::Manip or Parse)
+
+o add time zones and day light savings (DST) to DateTime data types
+
+File
+----
+o escape newlines (\n) since they are used as line delimiters
+    - String::Escape
+
+o add support for fixed width fields - no field delimiter
+
+DBM
+---
+Nothing.

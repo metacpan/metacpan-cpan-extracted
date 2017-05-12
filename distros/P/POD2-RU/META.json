@@ -1,0 +1,96 @@
+{
+   "abstract" : "Perl \u0414\u043e\u043a\u0443\u043c\u0435\u043d\u0442\u0430\u0446\u0438\u044f \u043f\u043e-\u0440\u0443\u0441\u0441\u043a\u0438\r",
+   "author" : [
+      "Nikolay Mishin < mi@ya.ru >\r"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, Dist::Milla version v1.0.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "POD2-RU",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039",
+            "Test::Pod" : "1.48"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.16",
+            "ExtUtils::Manifest" : "1.70",
+            "List::Util" : "1.41",
+            "Scalar::Util" : "1.41",
+            "Test::Builder" : "1.001006",
+            "Test::Builder::IO::Scalar" : "2.111",
+            "Test::Builder::Module" : "1.001006",
+            "Test::Kwalitee" : "0",
+            "Test::More" : "1.001006",
+            "Test::Pod" : "1.48",
+            "Test::Pod::Coverage" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Synopsis" : "0.11",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::Util" : "1.41",
+            "POD2::Base" : "0.043",
+            "Scalar::Util" : "1.41",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "List::Util" : "1.41",
+            "Scalar::Util" : "1.41",
+            "Test::Builder" : "1.001006",
+            "Test::Builder::IO::Scalar" : "2.111",
+            "Test::Builder::Module" : "1.001006",
+            "Test::More" : "1.001006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mishin/POD-to-RU/issues"
+      },
+      "homepage" : "https://github.com/mishin/POD-to-RU",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mishin/POD-to-RU.git",
+         "web" : "https://github.com/mishin/POD-to-RU"
+      },
+      "x_IRC" : "irc://irc.perl.org/#ru.pm"
+   },
+   "version" : "5.18.0.1.83",
+   "x_contributors" : [
+      "Andrey Asyakin <asan999@gmail.com>",
+      "ira <ira>",
+      "Nikolay Mishin <mi@ya.ru>",
+      "Zoffix Znet <cpan@zoffix.com>"
+   ]
+}
+

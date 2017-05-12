@@ -1,0 +1,63 @@
+[AGENT]
+
+Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/525.13 (KHTML, like Gecko) Chrome/0.2.149.27 Safari/525.13
+
+'parser'           => 'chrome',
+'strength'         => 'U',
+'os'               => 'Windows XP',
+'extras'           => ['Windows','KHTML, like Gecko'],
+'version_raw'      => '0.2.149.27',
+'lang'             => 'en-US',
+'version'          => '0.002149027',
+'name'             => 'Chrome',
+'toolkit'          => ['AppleWebKit','525.13','525.130']
+
+[AGENT]
+
+Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_1) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.54 Safari/535.2
+
+parser      => 'chrome',
+os          => 'Intel Mac OS X 10_7_1',
+extras      => [ 'Macintosh', 'KHTML, like Gecko' ],
+toolkit     => [ 'AppleWebKit', '535.2', '535.200' ],
+version_raw => '15.0.874.54',
+version     => '15.000874054',
+name        => 'Chrome',
+
+[AGENT]
+
+Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US) AppleWebKit/532.5 (KHTML, like Gecko) Chrome/4.0.249.11 Safari/532.5
+
+parser      => 'chrome',
+strength    => 'U',
+os          => 'Windows XP',
+extras      => ['Windows','KHTML, like Gecko'],
+toolkit     => ['AppleWebKit','532.5','532.500'],
+version_raw => '4.0.249.11',
+lang        => 'en-US',
+version     => '4.000249011',
+name        => 'Chrome',
+
+[AGENT]
+
+Mozilla/5.0 (Macintosh; Intel Mac OS X 10_6_8) AppleWebKit/535.1 (KHTML, like Gecko) Chrome/14.0.835.202 Safari/535.1
+
+'parser'      => 'chrome',
+'os'          => 'Intel Mac OS X 10_6_8',
+'extras'      => ['Macintosh','KHTML, like Gecko'],
+'toolkit'     => ['AppleWebKit','535.1','535.100'],
+'version_raw' => '14.0.835.202',
+'version'     => '14.000835202',
+'name'        => 'Chrome',
+
+[AGENT]
+
+Mozilla/5.0 (Windows NT 5.1) AppleWebKit/535.2 (KHTML, like Gecko) Chrome/15.0.874.106 Safari/535.2
+
+extras      => [ 'KHTML, like Gecko' ],
+name        => 'Chrome',
+os          => 'Windows XP',
+parser      => 'chrome',
+toolkit     => [ 'AppleWebKit', '535.2', '535.200' ],
+version     => '15.000874106',
+version_raw => '15.0.874.106',

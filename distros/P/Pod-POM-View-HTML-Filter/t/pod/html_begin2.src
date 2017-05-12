@@ -1,0 +1,18 @@
+=begin filter html
+
+    <!-- now in verbatim -->
+    <b>bold</b><i>italics</i>
+
+=end filter
+__RESULT__
++html
+<html><body bgcolor="#ffffff">
+<pre>    <span class="h-com">&lt;!-- now in verbatim --&gt;</span>
+    <span class="h-ab">&lt;</span><span class="h-tag">b</span><span class="h-ab">&gt;</span>bold<span class="h-ab">&lt;/</span><span class="h-tag">b</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">i</span><span class="h-ab">&gt;</span>italics<span class="h-ab">&lt;/</span><span class="h-tag">i</span><span class="h-ab">&gt;</span></pre>
+</body></html>
+__RESULT__
+-html
+<html><body bgcolor="#ffffff">
+<pre>    &lt;!-- now in verbatim --&gt;
+    &lt;b&gt;bold&lt;/b&gt;&lt;i&gt;italics&lt;/i&gt;</pre>
+</body></html>

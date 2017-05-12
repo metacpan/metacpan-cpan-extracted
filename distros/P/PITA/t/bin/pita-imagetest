@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+# Binary application for the PITA::Guest::Driver::Image::Test driver
+
+use strict;
+use Probe::Perl  ();
+use Getopt::Long ();
+use PITA::Image  ();
+
+
+
+
+
+#####################################################################
+# Options
+
+my $INJECTOR = undef;
+Getopt::Long::GetOptions(
+	"injector=s" => \$INJECTOR,
+	"noserver"   => \$PITA::Image::NOSERVER,
+) or die "Failed to get options";
+
+
+
+
+
+#####################################################################
+# Main Sequence
+
+my $manager = PITA::Image->new(
+	injector => $INJECTOR,
+	cleanup  => 1,
+) or die "Failed to create PITA::Image";
+
+# For platforms, we support the current Perl only
+$manager->add_platform(
+	scheme => 'perl5',
+	path   => Probe::Perl->find_perl_interpreter,
+);
+
+# Run the discover tasks
+$manager->run or die "Failed to run tasks";
+
+# Report the results
+$manager->report or die "Failed to report tasks";
+
+exit(0);

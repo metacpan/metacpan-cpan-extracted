@@ -1,0 +1,202 @@
+To install this module, you can either use cpan (which automates the
+process for you) or manually run the following commands:
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+
+Feel free to email me at yha@cpan.org if you have problems installing this
+module or if you have any other comments or questions. Module documentation
+follows.
+
+---------------------------------------------------------------------------
+
+NAME
+    Pod::Clipper - Extract blocks of POD from a text document
+
+SYNOPSIS
+      use Pod::Clipper;
+      my $clipper = Pod::Clipper->new({ data => $data });
+      my $all_blocks = $clipper->all;
+      foreach (@{$all_blocks}) {
+          # do something with $_->data
+          if ($_->is_pod) {
+              # POD block. do something with the POD data...
+              # e.g. convert it to HTML
+          }
+          else {
+              # non-POD block (code etc). do something else with it...
+              # e.g. syntax-highlight it
+          }
+      }
+
+DESCRIPTION
+    This module allows you to divide a document/string into POD and non-POD
+    blocks of text. This is useful for extracting POD data (or code) from a
+    "mixed" document, like most perl modules on CPAN.
+
+    POD data is identified as per the perlpodspec manpage. Invalid POD is
+    simply ignored. The only case for this is if a line matched "/\A=cut/"
+    without a starting POD command (e.g. "=head1, =head2," etc). That line
+    will be completely ignored. If you want such lines to be included as
+    part of the non-POD blocks, set "ignore_invalid_pod" to false.
+
+    Please note that "Pod::Clipper" doesn't check the POD data itself for
+    validity. For example, you may have a mismatched bracket in your POD
+    like "C<<mismatched>". "Pod::Clipper" only cares about the POD commands
+    that mark the beginning and end of your blocks (i.e. where these blocks
+    should be *clipped*). It doesn't care about the actual POD data. Hence,
+    the only case for invalid POD that "Pod::Clipper" can detect is if you
+    have a dangling "=cut" command (explained in the previous paragraph and
+    below).
+
+    By default, leading and trailing whitespace characters are ignored. To
+    change this, set "ignore_whitespace" to false. You can also use
+    "ignore_leading_whitespace" and "ignore_trailing_whitespace" for more
+    control. See below.
+
+METHODS
+  new
+    This is the "Pod::Clipper" constructor. As with many perl modules,
+    configuration options are passed as a hash reference. The available
+    options are:
+
+    data
+        The data you want to process into POD and non-POD blocks. This is a
+        required option.
+
+    from_file
+        If this option is set (to true), "data" is treated as a filename and
+        your data is pulled from there. If an error occurs (file doesn't
+        exist etc), an exception will be thrown.
+
+          eval { my $c = Pod::Clipper->new({ data => 'Test.pm', from_file => 1 }); };
+          if ($@) {
+              # some IO error occurred. the caught error string ($@) is set to
+              # whatever perl passed in $! after open() failed
+          }
+
+    newline_seq
+        The *line separator* that should be used. The default newline
+        sequence used to separate lines is "\n". In most cases this will do
+        the right thing (perl treats "\n" differently depending on what
+        platform it is running on -- see binmode(1)). However, sometimes you
+        may want to use a different newline sequence. For example, you're
+        running a script on *nix and trying to read a file that was created
+        on Windows. In that case, set newline_seq to "\r\n" in order to get
+        the correct results. If you're running perl 5.10.x or newer, you can
+        use "\R" as your newline sequence and everything should magically
+        work regardless of where the file was created and what platform perl
+        is running on.
+
+    append_newline
+        By default, "Pod::Clipper" excludes the last newline character in
+        each block. For example, if you have the following:
+
+          # line 1
+          # line 2
+          =pod
+  
+          test
+  
+          =cut
+
+        "Pod::Clipper" would divide the text above into these two blocks:
+
+          # line 1
+          # line 2 <--- block ends here (no newline)
+
+        and
+
+          =pod
+  
+          test
+  
+          =cut <--- block ends here (no newline)
+
+        If you set "append_newline" to true, you would get the following
+        blocks instead:
+
+          # line 1
+          # line 2
+          <--- block ends here
+
+        and
+
+          =pod
+  
+          test
+  
+          =cut
+          <--- block ends here
+
+        Please remember that (the last line of) your data may not
+        necessarily end with a newline character, so setting
+        "append_newline" to true may tack an extra one to the last block.
+
+    ignore_whitespace
+        Ignore leading and trailing whitespace characters in your data.
+        Default is true.
+
+    ignore_leading_whitespace
+        Ignore leading whitespace characters in your data. If
+        "ignore_whitespace" is set (to true) this option will be ignored.
+
+    ignore_trailing_whitespace
+        Ignore trailing whitespace characters in your data. If
+        "ignore_whitespace" is set (to true) this option will be ignored.
+
+    ignore_invalid_pod
+        Defaults to true which completely ignores "dangling" "=cut" commands
+        in the data. Setting this option to false causes such lines to be
+        treated as non-POD text.
+
+    Each of the options listed above also have an accessor/mutator method by
+    the same name. For example:
+
+      my $data = $clipper->data; # get
+      $clipper->data($new_data); # set
+
+  rebuild
+    If you want to resuse the same "Pod::Clipper" object for a different
+    document/string, make sure to call "rebuild()" after you update your
+    data and other parameters so that "all(), pod()," and "non_pod()" return
+    the correct results. For example:
+
+      $clipper->data($new_data);
+      $clipper->ignore_whitespace(0);
+      $clipper->rebuild; # parse $new_data and build the new blocks
+      # $clipper->all now reflects the new data
+
+  all
+    This method returns an array reference to all blocks, i.e. the POD and
+    non-POD ones. The order of these blocks as they appear in the original
+    data is preserved.
+
+  pod
+    Same as "all()", but returns only the POD blocks.
+
+  non_pod
+    Same as "all()", but returns only the non-POD blocks.
+
+BUGS
+    There are no known bugs. If you find one, please report it to me at the
+    email address listed below. Any other suggestions or comments are also
+    welcome.
+
+AUTHOR
+    Yousef H. Alhashemi <yha@cpan.org>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    Pod::Clipper::Block
+

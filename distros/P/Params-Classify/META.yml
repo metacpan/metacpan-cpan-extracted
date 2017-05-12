@@ -1,0 +1,40 @@
+---
+abstract: 'argument type classification'
+author:
+  - 'Andrew Main (Zefram) <zefram@fysh.org>'
+build_requires:
+  ExtUtils::ParseXS: 2.2006
+  Module::Build: 0
+  Test::More: 0
+  perl: 5.006001
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0
+  perl: 5.006001
+  strict: 0
+  warnings: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Params-Classify
+provides:
+  Params::Classify:
+    file: lib/Params/Classify.pm
+    version: 0.013
+recommends:
+  XSLoader: 0
+requires:
+  Exporter: 0
+  Scalar::Util: 1.01
+  parent: 0
+  perl: 5.006001
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.013

@@ -1,0 +1,19 @@
+0.9  7/30/2003
+  First version.
+0.9.1 8/19/2003
+  Installer fix, add simple use test
+0.9.2 8/19/2003
+  Add documentation
+0.9.3 7/5/2004
+  Fix problem with patches with spaces in them
+0.9.4 7/5/2004
+  Handle patches with malformed file sections better
+0.9.5 7/17/2004
+  Parse and send function info for -p patches
+0.9.6 4/11/2011
+  Add tests to instantiate all modules and verify parsing of patches
+  Fix POD syntax
+  Fix corruption due to patched lines having a + or - as the first character
+  Fix FixPatchRoot w/DOS eol patches (RT bug #35362, regression from v0.9.3)
+  Attic file support for FixPatchRoot (RT bug #40467)
+  Multiple file patch support (RT bug #47625)

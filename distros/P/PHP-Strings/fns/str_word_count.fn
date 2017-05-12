@@ -1,0 +1,73 @@
+synopsis: |
+    my $wordcount = str_word_count( $string );
+    my @words     = str_word_count( $string, 1 );
+    my %positions = str_word_count( $string, 2 );
+    
+docs: |
+    With a single argument, returns the number of words in that string.
+    Equivalent to:
+    
+        my $wordcount = () = $string =~ m/(\S+)/g;
+
+    With 2 arguments, where the second is the value C<0>,
+    returns the same as with no second argument.
+
+    With 2 arguments, where the second is the value C<1>, returns
+    each of those words.
+    Equivalent to:
+    
+        my @words = $string =~ m/(\S+)/g;
+
+    With 2 arguments, where the second is the value C<2>,
+    returns a hash where the values are the words, and the
+    keys are their position in the string (offsets are 0
+    based).
+
+    If words are duplicated, then they are duplicated.
+    The definition of a word is anything that isn't a space.
+    When I say I<equivalent> above, I mean that's the exact
+    code this function uses.
+
+    This function should really be three different
+    functions, but as PHP already has over 3000, I
+    can only assume they wanted to restrain themselves.
+    Implementation wise, it is three different functions.
+    I just keep them in an array and dispatch appropriately.
+
+code: |
+
+    my @str_word_count = (
+
+        sub { 
+            my $count = () = $_[0] =~ m/(\S+)/g;
+            return $count;
+        },
+
+        sub {
+            my @words = $_[0] =~ m/(\S+)/g;
+            return @words;
+        },
+
+        sub {
+            my %words;
+            while ( $_[0] =~ m/(\S+)/g )
+            {
+                $words{ $-[1] } = $1;
+            }
+            return %words;
+        },
+    );
+
+    sub str_word_count
+    {
+        my ( $string, $format ) = validate_pos( @_,
+            STRING,
+            {
+                %{+NUMBER_RANGE( 0, $#str_word_count )},
+                default => 0,
+            }
+        );
+
+        return $str_word_count[$format]->( $string );
+    }
+

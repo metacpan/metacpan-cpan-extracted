@@ -1,0 +1,18 @@
+Revision history for Perl extension Pod::HtmlTree.
+
+0.97 08/13/2003
+    (ms) Applied a patch by Christoph Reithmair
+         <c.reithmair@arsnavigandi.de> to pick up .pod files also.
+
+0.96 07/19/2003
+    (ms) Applied a patch by CORION <CORION@cpan.org> to enable it to
+         work on non-Unix platforms by using File::Temp
+
+0.95 09/15/2002
+    (ms) pod2htmltree now spits out banner
+
+0.94 04/20/2002
+    (ms) Updated documentation
+
+0.93 04/18/2002 
+    (ms) first public release

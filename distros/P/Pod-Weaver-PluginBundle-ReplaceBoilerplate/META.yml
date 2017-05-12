@@ -1,0 +1,42 @@
+---
+abstract: 'A Pod::Weaver bundle for replacing the boilerplate in a Pod document.'
+author:
+  - 'Sam Graham <libpod-weaver-pluginbundle-replaceboilerplate-perl@illusori.co.uk>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Weaver-PluginBundle-ReplaceBoilerplate
+provides:
+  Pod::Weaver::PluginBundle::ReplaceBoilerplate:
+    file: lib/Pod/Weaver/PluginBundle/ReplaceBoilerplate.pm
+    version: 1.00
+  Pod::Weaver::Section::ReplaceAuthors:
+    file: lib/Pod/Weaver/Section/ReplaceAuthors.pm
+    version: 1.00
+  Pod::Weaver::Section::ReplaceLegal:
+    file: lib/Pod/Weaver/Section/ReplaceLegal.pm
+    version: 1.00
+  Pod::Weaver::Section::ReplaceName:
+    file: lib/Pod/Weaver/Section/ReplaceName.pm
+    version: 1.00
+  Pod::Weaver::Section::ReplaceVersion:
+    file: lib/Pod/Weaver/Section/ReplaceVersion.pm
+    version: 1.00
+requires:
+  Moose: 0
+  Moose::Autobox: 0.11
+  Pod::Elemental: 0.101620
+  Pod::Weaver: 3.101630
+  Pod::Weaver::Role::SectionReplacer: 0
+  Software::License: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/illusori/Perl-Pod-Weaver-PluginBundle-ReplaceBoilerplate
+version: 1.00

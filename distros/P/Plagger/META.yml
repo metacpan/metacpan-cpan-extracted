@@ -1,0 +1,119 @@
+abstract: Pluggable RSS/Atom Aggregator
+author: Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+build_requires: 
+  Test::Base: 0.52
+  Test::More: 0.42
+  YAML: 0
+distribution_type: module
+generated_by: Module::Install version 0.640
+license: perl
+name: Plagger
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  Audio::Beep: 0
+  Cache::FastMmap: 0
+  Config::INI::Simple: 0
+  DBIx::Class::Schema: 0
+  DB_File: 0
+  Data::Serializer: 0
+  Date::Parse: 0
+  DateTime::Format::Epoch: 0
+  DateTime::Locale: 0
+  Email::Address: 0
+  Encode::Detect: 0
+  File::Copy::Recursive: 0
+  Flickr::API: 0
+  HTML::RSSAutodiscovery: 0
+  HTML::ResolveLink: 0.02
+  HTML::Scrubber: 0
+  HTML::TreeBuilder::XPath: 0
+  HTTP::Cookies::Mozilla: 0
+  Hatena::Keyword: 0
+  IPC::Run: 0
+  Image::Info: 0
+  JSON::Syck: 0.1
+  KinoSearch: 0
+  Lingua::ZH::HanDetect: 0
+  List::Util: 0
+  Locale::Language: 0
+  MIME::Lite: 0
+  Mail::Address: 0
+  Mail::IMAPClient: 0
+  Mail::SpamAssassin: 0
+  Net::DNS::Resolver: 0
+  Net::Delicious: 0
+  Net::MovableType: 0
+  Net::NetSend: 0
+  Net::SMTP::TLS: 0
+  PDF::FromHTML: 0
+  POE: 0
+  POE::Component::Client::DNS: 0
+  POE::Component::Client::HTTP: 0
+  POE::Component::IKC::Client: 0
+  POE::Component::IRC: 0
+  Palm::PalmDoc: 0
+  Regexp::Common::profanity_us: 0
+  SVN::Client: 0
+  SVN::Core: 0
+  SWF::Builder: 0
+  Search::Estraier: 0
+  Spreadsheet::WriteExcel: 0
+  Template::Plugin::JavaScript: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  Text::CSV_PP: 0
+  Text::Emoticon: 0
+  Text::Hatena: 0
+  Text::Kakasi: 0
+  Text::Language::Guess: 0
+  Text::Markdown: 0
+  Text::WrapI18N: 0
+  Time::Duration::Parse: 0
+  URI::Find: 0
+  WWW::Babelfish: 0
+  WWW::Mechanize: 0
+  WWW::Mixi: 0.46
+  WebService::Bloglines: 0.11
+  XML::Atom: 0.20
+  XML::FOAF: 0
+  XML::Feed: 0.09
+  XML::LibXML::SAX: 0
+  XML::Liberal: 0.14
+  XML::RSS::Liberal: 0
+  XMLRPC::Lite: 0
+  Xango: 1.04
+requires: 
+  Cache::Cache: 1.04
+  Class::Accessor::Fast: 0
+  Date::Parse: 0
+  DateTime: 0.29
+  DateTime::Format::Mail: 0
+  DateTime::Format::Strptime: 0
+  DateTime::Format::W3CDTF: 0
+  Digest::MD5: 0
+  Encode: 2.1
+  File::Find::Rule: 0
+  File::HomeDir: 0
+  HTML::Parser: 3.51
+  HTML::ResolveLink: 0
+  LWP: 0
+  MIME::Types: 1.16
+  Module::Pluggable::Fast: 0
+  Net::DNS: 0
+  Template: 2.13
+  Template::Provider::Encoding: 0.04
+  Term::Encoding: 0
+  Text::Tags: 0
+  UNIVERSAL::require: 0.1
+  URI::Fetch: 0.071
+  XML::Atom: 0.23
+  XML::Feed: 0.12
+  XML::LibXML: 0
+  XML::RSS::LibXML: 0.2
+  YAML: 0.39
+  perl: 5.8.1
+tests: t/*.t t/*/*.t t/*/*/*.t
+version: 0.7.11

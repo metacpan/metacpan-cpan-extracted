@@ -1,0 +1,40 @@
+Passwd::Keyring::KDEWallet
+
+Passwd::Keyring is about using secure storage for passwords
+and other credentials used in perl scripts and applications.
+
+Passwd::Keyring::KDEWallet uses KDE KWallet API to securely
+preserve passwords and is available to people using KDE
+desktop environment (or at least with installed kwallet).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Passwd::Keyring::KDEWallet
+
+You can also look for information at:
+
+    http://bitbucket.org/Mekk/perl-keyring-kde_wallet
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Marcin Kasperski
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,29 @@
+---
+abstract: 'Return HTTP Status code 200 for errors on request'
+author:
+  - 'Jakob Voß <voss@gbv.de>'
+build_requires:
+  HTTP::Request: 0
+  Plack::Builder: 0
+  Plack::Test: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300023, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-SuppressResponseCodes
+requires:
+  Plack::Middleware: 0
+  Plack::Util: 0
+  parent: 0
+  perl: 5.004
+  strict: 0
+resources:
+  bugtracker: https://github.com/nichtich/Plack-Middleware-SuppressResponseCodes/issues
+  homepage: https://github.com/nichtich/Plack-Middleware-SuppressResponseCodes
+  repository: https://github.com/nichtich/Plack-Middleware-SuppressResponseCodes.git
+version: 0.2

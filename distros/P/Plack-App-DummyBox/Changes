@@ -1,0 +1,22 @@
+Revision history for Perl extension Plack::App::DummyBox
+
+0.041   Sat Dec 01 10:20:00 JST 2012
+    [NO CODE CHANGE]
+        - fixed tests: An image binary size is different according to the library.
+        - fixed POD: only 1 typo
+
+0.04    Fri Nov 23 10:50:00 JST 2012
+    [NO CODE CHANGE]
+        - fixed tests: skip tests why there are no libraries for Imager::formats
+
+0.03    Sun Nov 18 20:16:00 JST 2012
+    [NEW FEATURES]
+        - filter option: You can filter the image as Imager object.
+        - cache option:  You can cache responses by specified cache object.
+
+0.02    Sun Nov 11 20:08:00 JST 2012
+    [NEW FEATURES]
+        - on the image, show the size of image and some text: check `font` option
+
+0.01    Sat Nov 10 19:18:58 2012
+        - original version

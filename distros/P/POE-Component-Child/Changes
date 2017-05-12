@@ -1,0 +1,198 @@
+Revision history for Perl extension POE-Component-Child.
+
+revision 1.38
+- patches as per Curtis Hawthorne <curtis@curtis.hawthorne.name>
+
+revision 1.37
+- small patches
+
+revision 1.36
+- CPAN ticket # 13560 - thanks to MRPERSON@cpan.org for providing the analysis
+  and patch.
+
+revision 1.35
+- adds code to close stdin when shutting down.  this code was contributed so long ago
+  I've lost track of who made the submission.
+- also checks for situations where wheels are undefined
+
+revision 1.34
+date: 2004/06/07 03:13:49;  author: ekkis;  state: Exp;  lines: +4 -3
+- modified sig_child() to return 0 which avoids nasty POE warnings
+
+revision 1.33
+date: 2004/06/03 04:16:35;  author: ekkis;  state: Exp;  lines: +7 -6
+- this patch fixes a children reaping problem as described in rt.cpan.org
+  Ticket #6200.  Thanks to Justin DeVuyst for finding the bug and suggesting
+  the solution.
+- the patch may also fix Ticket #6193 reported by dngor
+
+revision 1.32
+date: 2003/06/25 23:54:25;  author: ekkis;  state: Exp;  lines: +3 -2
+- duh! fixed minor overlook pointed out by Mathieu
+
+revision 1.31
+date: 2003/06/24 19:52:01;  author: ekkis;  state: Exp;  lines: +24 -7
+- revamped kil() method to allow sending other signals to children processes.  T
+hanks to Mathieu Longtin [perl@closetwork.org] for suggesting this!
+- softened default kill() from -9 to TERM
+
+revision 1.30
+date: 2003/06/24 18:16:46;  author: ekkis;  state: Exp;  lines: +4 -2
+- apparently later versions of POE complain about a "deprecation alert" because 
+my SIGCHLD handler did not call sig_handled()... so now it does.  Thanks to Math
+ieu Longtin [perl@closetwork.org] for bringing that up.
+
+revision 1.29
+date: 2003/06/24 02:21:44;  author: ekkis;  state: Exp;  lines: +20 -11
+- fixed a reference to "$PKG::$self->{...}" that was getting badly interpreted. 
+ Thanks to Mathieu Longtin [perl@closetwork.org] for pointing this out.
+
+revision 1.28
+date: 2003/06/23 08:40:51;  author: ekkis;  state: Exp;  lines: +56 -23
+- fixed CPAN bug # 2720 reported by poe@jbs.t0c.de which showed that ::Child iss
+ued C<done> events before receiving the Wheel::Run CloseEvent which caused for l
+oss of output data.  after consultation with dngnand, switched to wait for both 
+events (sigchld & CloseEvent)
+- replaced hard-coded class secret key with __PACKAGE_ name
+- added debugging info (level: 2)
+- POD changes including SUPPORT section
+- switched licensing to GPL
+- warn cleaned test suite
+
+revision 1.27
+date: 2003/06/23 04:30:09;  author: ekkis;  state: Exp;  lines: +4 -4
+- fixed POD misspelling
+
+revision 1.26
+date: 2003/06/18 06:31:51;  author: ekkis;  state: Exp;  lines: +4 -4
+- minor POD fix
+
+revision 1.25
+date: 2003/03/12 00:43:34;  author: ekkis;  state: Exp;  lines: +17 -7
+- now supports setting the working directory for a process
+
+revision 1.24
+date: 2002/12/27 03:15:09;  author: ekkis;  state: Exp;  lines: +13 -6
+- enhanced ->debug() method now level-aware
+- stdio output now on level 2
+
+revision 1.23
+date: 2002/12/10 05:08:50;  author: ekkis;  state: Exp;  lines: +4 -4
+- should be using 0.23 of the POE kernel
+
+revision 1.22
+date: 2002/11/29 01:32:06;  author: ekkis;  state: Exp;  lines: +4 -4
+- now requires POE >= 0.22 in the module itself (instead of just on Makefile.PL which is there for CPAN to figure out dependencies)
+
+revision 1.21
+date: 2002/11/29 00:10:06;  author: ekkis;  state: Exp;  lines: +21 -4
+- added attr() to allow caller to set internal values after call to ->new()
+
+revision 1.20
+date: 2002/11/27 23:53:18;  author: ekkis;  state: Exp;  lines: +83 -78
+- all child data now resides in a $PKG hash to avoid collisions with derived classes
+- C<callbacks> hash renamed as C<events>
+- new() arguments now support C<writemap> which allows for virtual put methods (implemented via AUTOLOAD)
+- removed C<got_write> and C<got_shutdown> events as methods now implement needed work directly
+
+revision 1.19
+date: 2002/11/08 00:04:24;  author: ekkis;  state: Exp;  lines: +14 -17
+modified to make kill()s immediate
+added optional parameter to kill to suppress "died" events
+
+revision 1.18
+date: 2002/10/04 11:09:00;  author: ekkis;  state: Exp;  lines: +38 -13
+- added shutdown functionality to allow for the component to go down
+
+revision 1.17
+date: 2002/10/02 09:55:09;  author: ekkis;  state: Exp;  lines: +18 -8
+- renamed wheel() to wheelid()
+- wheel() now returns wheel reference
+
+revision 1.16
+date: 2002/09/30 01:07:44;  author: ekkis;  state: Exp;  lines: +4 -4
+cosmetic changes
+
+revision 1.15
+date: 2002/09/27 09:46:42;  author: ekkis;  state: Exp;  lines: +7 -4
+added exception to sig_child for when caller issues a quit
+
+revision 1.14
+date: 2002/09/27 08:49:30;  author: ekkis;  state: Exp;  lines: +4 -3
+- added default event name for "died"
+
+revision 1.13
+date: 2002/09/27 08:43:42;  author: ekkis;  state: Exp;  lines: +24 -57
+- StdioFilter now uses a newline for output
+- now fires "died" only when rc > 0, else "done" (regardless of quit)
+- enhancements to debugging output
+
+revision 1.12
+date: 2002/09/27 04:38:54;  author: ekkis;  state: Exp;  lines: +42 -33
+- replaced session refcounts with an alias
+- implemented wheeldestroy()
+
+revision 1.11
+date: 2002/09/25 05:10:45;  author: ekkis;  state: Exp;  lines: +94 -42
+- added holdover refcount to prevent session expiring before use
+- added _stop and _default for debugging
+- added debugging calls
+- "died" event/callback now optional & used to specify interactive children
+- implemented semaphore to destroy wheels
+- only return code provided to sig_child now
+- debug() now shows module name to diff from other output
+- POD change
+
+revision 1.10
+date: 2002/09/24 20:38:37;  author: ekkis;  state: Exp;  lines: +4 -4
+minor fix
+
+revision 1.9
+date: 2002/09/24 20:37:37;  author: ekkis;  state: Exp;  lines: +6 -7
+- StdioFilter now uses default init
+-
+
+revision 1.8
+date: 2002/09/22 03:20:03;  author: ekkis;  state: Exp;  lines: +12 -6
+- had to quote reference to PoCo::Child, even though before => because perl 5.8 doesn't seem to stringify
+- added command to debugging stmt in sig_child
+
+revision 1.7
+date: 2002/09/19 02:33:23;  author: ekkis;  state: Exp;  lines: +38 -24
+cosmetic changes to the POD
+
+revision 1.6
+date: 2002/09/19 00:10:05;  author: ekkis;  state: Exp;  lines: +39 -21
+- standardised parameter passing to events
+- now supports callbacks
+- added support for multiple wheels per instance
+- improvements to sig_child()
+- POD updates
+
+revision 1.5
+date: 2002/09/18 08:35:41;  author: ekkis;  state: Exp;  lines: +148 -49
+changes for support of multiple wheels per component instance
+
+revision 1.4
+date: 2002/09/17 18:37:44;  author: ekkis;  state: Exp;  lines: +4 -4
+moved @args definition
+
+revision 1.3
+date: 2002/09/17 08:08:07;  author: ekkis;  state: Exp;  lines: +12 -7
+now allows for StdioFilter to be set
+
+revision 1.2
+date: 2002/09/17 06:47:30;  author: ekkis;  state: Exp;  lines: +5 -5
+minor changes
+
+revision 1.1
+date: 2002/09/17 06:44:21;  author: ekkis;  state: Exp;
+branches:  1.1.1;
+Initial revision
+
+=============================================================================
+
+0.01  Sat Sep 14 17:13:50 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n POE-Component-Wheel
+

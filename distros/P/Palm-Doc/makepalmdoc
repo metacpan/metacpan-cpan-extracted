@@ -1,0 +1,89 @@
+#!/usr/bin/perl -w
+#
+# perl version of makedoc
+#
+# $Id: makepalmdoc,v 1.5 2005/02/12 16:36:40 cpb Exp $
+
+use strict;
+use Getopt::Std;
+use Palm::PDB;
+use Palm::Doc;
+use Encode 'decode';
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+our ($opt_n,$opt_d) = (0,0);
+getopts('nd');
+
+if( @ARGV < 2 ) {
+	HELP_MESSAGE();
+	exit -1;
+}
+
+if( $opt_d ) {
+	my $doc = new Palm::PDB;
+	$doc->Load( $ARGV[0] );
+	my $text = $doc->text();
+	if( not defined $text ) {
+		print STDERR "This doesn't seem to be a Doc file!\n";
+		exit -1;
+	}
+	open F, "> $ARGV[1]" or die "$!";
+	print F decode( "iso-8859-1", $text, Encode::FB_WARN );
+	close F;
+} else {
+	my $doc = new Palm::Doc;
+	$doc->textfile( $ARGV[0] );
+	$doc->{'name'} = $ARGV[2] if defined $ARGV[2];
+	$doc->Write( $ARGV[1] );
+}
+
+exit 0;
+
+sub HELP_MESSAGE {
+	print <<END
+makepalmdoc <text-file> <pdb-file> <title>
+	convert text files to .PDB format
+makepalmdoc -d <prc/pdb-file> <text-file>
+	convert Doc file back to text file
+END
+}
+
+sub VERSION_MESSAGE {
+	my $VERSION = do {
+		my @r = (q$Revision: 1.5 $ =~ /\d+/g); sprintf "%d."."%02d" x $#r, @r
+	};
+	print $VERSION, "\n";
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+makepalmdoc - convert between text and pdb/prc Palm Doc files
+
+=head1 SYNOPSIS
+
+	makepalmdoc <text-file> <pdb-file> <title>
+	makepalmdoc -d <prc|pdb-file> <text-file>
+
+=head1 DESCRIPTION
+
+makepalmdoc is a simple Palm Doc database generator. It's roughly
+similar to the C++ makedoc, although the compression flag is ignored
+(created databases are always compressed).
+
+=head1 BUGS
+
+Only handles ISO 8859-1 encoded books (i.e. non-asian).
+
+=head1 AUTHOR
+
+Christophe Beauregard E<lt>cpb@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+Palm::Doc(3)
+

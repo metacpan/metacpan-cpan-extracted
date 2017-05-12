@@ -1,0 +1,33 @@
+NAME
+    Proliphix - Talks to Proliphix network thermostats
+
+SYNOPSYS
+      #!/usr/bin/perl
+      use Proliphix;
+  
+      my $thermostat = new Proliphix(ip=>'mythermaddress', password=>'mythermpassword');
+  
+      #requests these OIDs (documented in PDF API available from Proliphix) from the thermostat
+      $thermostat->get_oids([qw/4.3.2.1 4.1.1 4.1.3/]);
+  
+      #sets (writable) OIDs in thermostat. Many values are not writable, see Proliphix documentation.
+      $thermostat->set_oids('10.1.6'=>$ARGV[0]);
+  
+      #lists known values in thermostat. Pounding the device too hard will cause trouble so the module
+      #holds on to values until another call to get_oids
+      $thermostat->values();
+
+DESCRIPTION
+    Module to communicate with Proliphix IP network thermostats. Module is a
+    skeleton at best and should probably be written differently for a
+    multitude of reasons. I wanted to play around with Moose and was
+    disappointed that no one else had written this module, so here's a quick
+    iteration that should handle most cases without too much crying.
+
+BUGS
+    Almost certainly. Let me know, I'll probably fix them, or send me a
+    patch.
+
+AUTHOR
+    John Lifsey, <nebulous@crashed.net>
+

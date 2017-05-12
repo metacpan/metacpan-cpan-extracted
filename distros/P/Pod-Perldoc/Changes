@@ -1,0 +1,468 @@
+Revision history for Pod::Perldoc
+
+3.28 - Thu Mar 16 01:07:42 UTC 2017
+
+    * Commited an alternate fix for GH#28
+    * Rolling a release for 5.26
+
+3.27_02 - Wed Mar 2 01:09:22 UTC 2017
+
+    * Testing a fix for GH#28
+
+3.27_01 - Sun Oct 16 02:41:23 UTC 2016
+
+    * Another fix for t/02 (RT#118401)
+
+3.27 - Wed Aug  3 20:42:54 UTC 2016
+
+    * No changes. Roll an official release.
+
+3.26_02 - Tue Aug  2 16:34:46 UTC 2016
+
+    * Better fix for broken test (GH#27)
+
+3.26_01 - Sat Jul 30 16:08:30 UTC 2016
+
+    * Fix broken test on Windows and FreeBSD (RT#116551)
+
+3.26 - Thu Jul 28 04:14:29 UTC 2016
+
+    * Fix CVE-2016-1238 by temporarily removing '.' from @INC in world writable directories.
+
+3.25_02 - Tue Jan 12 08:55:45 2016 -0600
+
+    * Update MANIFEST
+    * Rename load test so it runs first
+    * Additional smoke test
+    * Fix =head3 appearing in some perlfunc lookups
+    * AmigaOS patches (RT#106798) (RT#110368)
+
+3.25_01 - Tue Jun 2 08:58:40 2015 -0500
+
+    * Fall back to an English perlfunc if translation doesn't exist (RT#104695)
+    * FreeBSD has mandoc too, with UTF-8 support.
+    * -U now documented and implied with -F (RT#87837)
+
+3.25 - Thu Feb 12 03:06:43 UTC 2015
+    * No changes - roll an official
+      release for inclusion in Perl 5.22
+
+3.24_02 - Wed Jan 21 03:12:37 UTC 2015
+    * Dave Mitchell sent a patch to reduce stderr spam
+      during core perl builds. Resolves RT#101493
+
+    * Make perldoc honor the MANPAGER environment
+      variable as documented. Resolves RT#100933
+
+    * Decode command line arguments at UTF-8 data.
+      Resolves RT#9806
+
+3.24_01 - Wed Sep 10 03:13:58 UTC 2014
+    * The 'ToTerm' backend generates terminal escape sequences that
+      the 'less' pager does not display by default. The "-R" option
+      controls this, so pass it in the LESS environment variable
+      to avoid disturbing other pager invocations. Patch by 
+      Niko Tyni. Closes RT#98636
+
+    * Unify filehandle opens and encoding into two methods
+      'open_fh' and 'set_encoding'.  Based on a pull request
+      by Koichi KUBO. Closes RT#98019 better than c3fd47f :)
+
+    * Applied PR by Olivier Mengué to 'use parent' instead 
+      of 'use base'
+
+3.24 - Tue Aug 19 03:38:07 UTC 2014
+    * Release 3.24
+
+    Make sure when we open a filehandle for reading
+    or writing, we set ':encoding(UTF-8)' on it 
+    everywhere.  Closes RT#98019.
+
+3.23_01 - Sat Aug 16 16:47:45 UTC 2014
+    * Test release to test UTF8 filehandles.
+    * Happy CPAN Day!
+
+3.23 - Sun Feb 23 18:54:43 UTC 2014
+    * Release 3.23
+
+    Yes, this is a packaging error. Mea culpa. In the future
+    test releases will be 3.23_01, etc. 
+
+    See https://twitter.com/frioux/status/429245594180128769
+    for context.
+
+3.22_02 - Wed Feb  5 05:08:34 UTC 2014
+    * Add a pager that doesn't redirect stdin RT#85173
+      Added a special pager environment variable for use
+      when perldoc is in the -m mode that doesn't
+      redirect STDIN.  Set PERLDOC_SRC_PAGER to use. 
+      
+      As in:
+
+      PERLDOC_SRC_PAGER=/usr/bin/vim perldoc -m File::Temp
+
+    * Teach ToTerm.pm to get terminal width RT#85467
+      Get a terminal width and pass it to Pod::Text::Termcap
+      from one of these sources (in order):
+          1. An explicit width set from command line with -w
+          2. MANWIDTH environment variable
+          3. stty output
+          4. The default width of 76 (same as Pod::Text)
+
+3.22_01 - Sat Feb  1 05:00:13 UTC 2014
+    * Match =item more carefully when scanning perlfunc. 
+      Fixes RT #86795. Previously matches could be generated 
+      on words like 'size' and 'precision' which are not 
+      Perl functions.
+    * Cleanup code related to mandoc RT #85844
+      Patch by Ingo Schwarze
+    * Re-add '-U' flag to skip attempting to drop 
+      privileges. RT #87837
+    * Do not install to INSTALLDIRS after Perl 5.11 RT #89756
+    * Refactor search_perlop (finds operators like 'q' 
+      'qq' 'tr' and others) RT #86506. Previously most of
+      the text generated was incorrect.
+    * Fix wrong version in DEBUG output from ToTerm.pm RT #85468
+    * Fix POD errors when scanning parts of perlfunc RT #86472
+      Patch by Shlomi Fish.
+
+3.21 - Mon Jan  6 02:17:07 UTC 2014
+    * Add '-a' flag to search through perlapi 
+      documentation. Patch by Matthew Horsfall.
+    * Apply RT #91733 to install perldoc.pod in the 
+      right place. Should fix RT #88898 too. Patch
+      by Dave Mitchell.
+
+3.21_01 - Tue Nov 19 17:07:46 UTC 2013
+    * Do not modify @INC to look for docs perl RT #120357
+      (Patch by Kent Fredric)
+    * Prefer mandoc on bitrig
+    * Fix typos
+
+3.20 - Sat Apr 27 05:25:30 UTC 2013
+    * Make default formatter "ToTerm" instead of "ToMan" for
+      better UTF-8 support
+    * When dynamically building POD from perlfunc (perlvar) 
+      make sure we open filehandles with utf8 and add an
+      =encoding (RT #80527) (RT #80640)
+
+3.19 - Mon Jan 28 04:29:40 UTC 2013
+    * Really put perldoc.pod into man1
+
+3.18 - Mon Jan 28 04:17:26 UTC 2013
+    * Document perldoc behavior in build directories (RT #80376)
+    * Don't blindly force UTF8 to Pod::Man (RT #77465)
+    * Fix is_dos typo (RT #76029)
+    * Put perldoc.pod into man1 RT #77210 (ppisar@redhat.com)
+    * Remove formatting from literal blocks RT #77209 (ppisar@redhat.com)
+
+3.17 - Sun Mar 18 02:49:26 2012
+    * Handle render options set by the user in the '-n' setting RT #75840
+
+3.16 - Sat Mar 17 04:14:30 2012
+    * Make perldoc by itself emit a brief usage RT #75815
+    * Add a space between $ENV{PAGER} and "<" RT #75420
+    * Replace $self->die() with CORE::die in some errors RT #75010
+    * Make load.t use note() instead of diag() RT #74893
+    * Make perldoc -l -q usefully work RT #74254
+    * Fix regex while untainting $0 RT #73580
+
+3.15_15 - Fri Jan  6 15:48:47 UTC 2012
+    * If the name check fails, report the name. RT  #73580
+    * Don't index tests in corpus (RT #73586)
+    * Fix Pod error in GetOptsOO
+    * Add ToANSI and ToTerm to load test
+    * Add Pod check test
+    * Now maintained by Mark Allen <mallen@cpan.org>
+
+3.15_14 - Sun Dec 18 10:06:09 2011
+	* Fix OpenBSD issues. You get to use mandoc. The UTF-8
+	supports sucks though.
+
+3.15_13 - Wed Dec 14 04:07:20 2011
+	* Fix up some issues with switches to nroff/groff (RT 73236)
+
+3.15_12
+	* Now maintained by brian d foy <bdfoy@cpan.org>
+	* Lots of fixes from Mark Allen <mallen@cpan.org>
+	* Most of the changes discard the call to pod2man and use
+	Pod::Man directly.
+	* Preparing Pod::Perldoc to be dual-lived
+
+	* RT  8376   'perldoc -oman' is incorrectly rendered under Cygwin.
+	* RT  9531   perldoc can't find scripts on Windows
+		+ add .bat to scripts
+	* RT 11118   ToMan.pm doesn't quote filename in system command
+	* RT 12024   -m uses the wrong pager on MSWin32
+		+ fixed by ebhanssen@allverden.no
+	* RT 12025   Options (-L) to show location like -l, even when no pod exists
+		+ fixed by Tye McQueen <tyemq@cpan.org>
+	* RT 12769   Pod::Usage::pod2usage -- calling 'perldoc' on $0 is tainted, unsafe
+		+ fixed by Marek Rouchal <Marek.Rouchal@gmx.net>
+	* RT 26121   can't handle =encoding utf8
+	* RT 37347   perldoc -F doesn't correctly handle filenames containing single quotes
+		+ fixed by CHOCOLATE@cpan.org
+	* RT 39000   Support for "pod2man --utf8"
+	* RT 40557   Re: Why are the file test operators in perlfunc?
+		+ fixed by Renee Baecker <renee.baecker@smart-websolutions.de>
+	* RT 53986   perldoc -m option fails if PAGER environment variable value contains white space
+		+ fixed by kruegerm-bitcard@avax.net
+	* RT 61085   Respect MANWIDTH
+		+ fixed by Danijel Tasov <data@cpan.org>
+	* RT 61452   perldoc -m misidentifies files and displays binaries
+		+ fixed by bitcard@volkerschatz.com
+	* RT 67754   perldoc -f getpwnam and shmread no text
+	* RT 72425   groff produces many errors with Unicode output.
+	* RT 73074   ToMan output blocks on perlfunc
+
+3.15_12 - Fri Dec  9 07:02:02 2011
+	* Fix the blocking writes in the groff pipe (RT #73074)
+
+3.15_11 - Tue Nov 29 13:08:10 2011
+	* Add the parent.pm prereq
+	* Remove the 01_about_verbose test, which doesn't test anything
+
+3.15_10 - Sat Nov 19 19:56:21 2011
+	* Merge the changes to use Pod::Man instead of pod2man
+	* Restrict the names we'll allow the program to run under
+	* Patches for most of the items in the RT queue, which we'll
+	enumerate once we know the fixes work.
+
+3.15_09 - Mon Nov 14 13:36:37 2011
+	* Respect MANWIDTH on Linux, if set. RT #61085
+	* This is the start of some internals changes to allow testing.
+
+3.15_08 - Sun Nov 13 17:31:30 2011
+	* Sync with the latest stuff in blead
+	* Re-release as a CPAN module
+	* brian d foy is taking over maintainer duties
+
+3.15_01 - 2009-09-30
+	* 3.15_01 - sync with blead
+
+3.14_08 - 2008-11-01
+	* no code changes from 3.14_07
+	* summary of main changes:
+		- perldoc -v PerlVar
+		- old -v (Verbosely describe) is now -D
+		- 'perldoc intro' will find 'perlintro' page
+		- 'perldoc -L it' can find Italian translations
+		of documentation (if you have them)
+
+3.14_07 - 2008-05-08
+	* Pod::Perldoc now has POD
+	* so does Pod::Perldoc::BaseTo and Pod::Perldoc::GetOptsOO
+
+3.14_06 - 2008-05-02
+	* 'perldoc intro' may find 'perlintro' page
+	  (suggested by Gisle Aas)
+	* -v (Verbosely describe) is now -D
+	* perldoc -v PerlVar
+
+3.14_05 - 2008-04-22
+	* Search perlvar
+	* Applied patch to allow -A for searching perlvar.
+	  (after a patch by Ovid, 2008-02-26)
+	  [rt.cpan.org #33624]
+	* [RFC] the switch name is experimental: I am open
+	to convincing alternatives (other than -v and -V
+	which are already taken).
+
+3.14_04 - 2008-04-16
+	* 'lib' & co. are added to search path if -f Build.PL
+	in current directory (rt.cpan.org #33941)
+	* bug fix: 'blib' directories were never searched
+	because they were tested with -f
+
+3.14_03 - 2007-09-03
+	* typo fix (#31763 by rgs)
+	* warning and debugging code added to add_translator()
+	* the translators now became objects
+	* POD2::Base (if available) provides language-specific
+	support for free
+	* experimental releases, misses documentation of changes
+
+3.14_02 - 2007-08-23
+	* -L becomes more forgiving:
+			  $ perldoc -L it perldocpage
+	  retrieves the standard (English) version if it cannot find
+	  the Italian translation.
+	* applied to bleed as Change #31762
+
+3.14_01 - 2007-08-23
+	* bleedperl changes:
+		+ #31628: a Gentoo patch
+		+ #27878: warn when -f, -q ignore extra arguments
+		+ #26202: document -L
+		+ #26191: new switch -L
+
+3.14 - 2004-11-30  Sean M. Burke  sburke@cpan.org
+	* bugfix for Cygwin
+	* Matt Johnson sends in two patches to accomodate Cygwin.
+	Accepted.
+	* Also changing pathsep for IS_MSWin32 || IS_Dos temp files
+	from '/' to '\'.
+
+3.13 - 2004-04-09  Sean M. Burke  sburke@cpan.org
+	* minor bugfixes
+	
+	Ken Willians notes that Pod::Perldoc::ToMan breaks when the
+	pod2man program isn't in $Config{'scriptdirexp'}.  So I make it
+	look there first, but then fall back to not specifying where it
+	should be found.
+	
+	James Michael Du Pont notes that Carp::croak isn't always loaded
+	by all versions of the modules perldoc uses.  So I add an explicit
+	"require Carp::croak".
+	
+	I add t/01_about_verbose.t just to give more diagnostics.
+
+3.12 - 2003-10-21  Sean M. Burke  sburke@cpan.org
+	* tweak for Linux man.
+	
+	Slaven Rezic notes that Makefile.PL should say INSTALLDIRS => "perl"
+	for perl versions 5.8.1 and newer, to make installation work right
+	on those perls.  Change made.
+	
+	Slaven Rezic notes that -q was generating an erroneous =over 8 ...
+	around the sliced text from perlfaq searched via -q.  Change made
+	-- this =over 8 ... =back stuff is now generated only if you're
+	calling perldoc with -f (for perlfunc sections).
+
+
+3.11 - 2003-10-12  Sean M. Burke  sburke@cpan.org
+    * tweak for Linux man.
+    Brendan O'Dea provides code for Pod/Perldoc/ToMan.pm to sets -rLL
+    to what stty reports for terminal column width.
+
+
+3.10 - 2003-09-10  Sean M. Burke  sburke@cpan.org
+	* bugfix for cygwin
+	Jari Aalto notes a problem with cygwin and the containspod routine
+	-- cygwin apparently pretends there's an executable $filename file
+	when there's really a "$filename.exe" file.  Added a
+	cygwin-specific hack in containspod to trap this case.
+
+
+3.09 - 2003-07-24  Sean M. Burke  sburke@cpan.org
+	* perldoc when run as root no longer dies when it can't manage to
+	drop privileges.  This is by popular demand.
+	* perldoc -f -X now properly sees an -X entry regardless of
+	whether it's coded as =item -X or =item I<-X>.
+	* In README, changed "This is an experimental distribution of
+	Perldoc," to "This is the distribution of Perldoc,"
+	
+	Wee little things:
+	
+	* Added a "use 5.006;" to the start of Perldoc.pm and the
+	Makefile.PL, since we do actually need that version of perl
+	for the module to even compile right.  (Altho backporting is an
+	option later, if we remove the 5.6-isms.)
+	* Perldoc.pm has a new constant IS_Cygwin if we ever need it.
+	* Added a bit of IS_VMS logic.
+	* Minor cosmetic changes to handling of -U.
+	* Added a few comments here and there.
+
+3.08 - 2003-01-18  Sean M. Burke  sburke@cpan.org
+	* Fixed split-related bug in reading $Config{'pager'}.
+	Thanks to Chip Turner <cturner@redhat.com> for pointing it out!
+
+3.07 - 2002-12-01  Sean M. Burke  sburke@cpan.org
+	* Minor typo fix to code in Pod::Perldoc::ToMan.
+	* Added RTFREADER example to Pod::Perldoc::ToRTF docs.
+	* Made Pod::Perldoc::ToTk a bit more tolerant of old Tk::Pod
+	versions (pre-4.0).
+
+3.06 - 2002-11-22  Sean M. Burke  sburke@cpan.org
+	* Made it install to perldoc pand perldoc.pod now.
+	* Added -V
+	* Made -U a no-op switch, for legacy.
+	* Corrected a few minor typoes in the usage messages.
+	* Updated perldoc.pod to document the switches that were
+	previously documented only in perldoc -h
+	
+	* Many thanks to David Hand, Avi Finkel, Iain "Spoon" Truskett,
+	Conrad Heiney, Casey West, Pete Sergeant, David Dyck, Michael
+	Schwern, Slaven Rezic, Hugo van der Sanden, and many others for
+	lots of patient help in working on this.
+
+3.05a - 2002-11-11  Sean M. Burke  sburke@cpan.org
+	* Corrected the logic that suppresses warnings during require's or
+	formattings.
+	* Updated usage messages
+	* Corrected bug that ignored -T when using -m
+
+3.04a - 2002-11-11  Sean M. Burke  sburke@cpan.org
+	* First public release.
+	* Many new features, including the switches: -T, -d, -o, -M, -w
+
+
+3.01 - Sun Nov 10 21:38:09 MST 2002
+	Sean M. Burke <sburke@cpan.org>
+	Massive refactoring and code-tidying.
+	Now it's a module(-family)!
+	Formatter-specific stuff pulled out into Pod::Perldoc::To(Whatever).pm
+	Added -T, -d, -o, -M, -w.
+	Added some improved MSWin funk.
+
+2.05 - Sat Oct 12 16:09:00 CEST 2002
+	Hugo van der Sanden <hv@crypt.org>
+	Made -U the default, based on patch from Simon Cozens
+
+2.04 - Sun Aug 18 13:27:12 BST 2002
+	Randy W. Sims <RandyS@ThePierianSpring.org>
+	allow -n to enable nroff under Win32
+
+2.03 - Sun Apr 23 16:56:34 BST 2000
+	Hugo van der Sanden <hv@crypt.org>
+	don't die when 'use blib' fails
+
+2.02 - Mon Mar 13 18:03:04 MST 2000
+	Tom Christiansen <tchrist@perl.com>
+	Added -U insecurity option
+
+2.01 - Sat Mar 11 15:22:33 MST 2000
+	Tom Christiansen <tchrist@perl.com>, querulously.
+	Security and correctness patches.
+	What a twisted bit of distasteful spaghetti code.
+
+2.0 - ????
+
+
+1.15 - Tue Aug 24 01:50:20 EST 1999
+	Charles Wilson <cwilson@ece.gatech.edu>
+	changed /pod/ directory to /pods/ for cygwin
+	to support cygwin/win32
+
+1.14 - Wed Jul 15 01:50:20 EST 1998
+	Robin Barker <rmb1@cise.npl.co.uk>
+	-strict, -w cleanups
+
+1.13 - Fri Feb 27 16:20:50 EST 1997
+	Gurusamy Sarathy <gsar@activestate.com>
+	-doc tweaks for -F and -X options
+
+1.12 - Sat Apr 12 22:41:09 EST 1997
+	Gurusamy Sarathy <gsar@activestate.com>
+	-various fixes for win32
+
+1.11 - Tue Dec 26 09:54:33 EST 1995
+	Kenneth Albanowski <kjahds@kjahds.com>
+	-added Charles Bailey's further VMS patches, and -u switch
+	-added -t switch, with pod2text support
+
+1.10 - Thu Nov  9 07:23:47 EST 1995
+	Kenneth Albanowski <kjahds@kjahds.com>
+	-added VMS support
+	-added better error recognition (on no found pages, just exit. On
+	missing nroff/pod2man, just display raw pod.)
+	-added recursive/case-insensitive matching (thanks, Andreas). This
+	slows things down a bit, unfortunately. Give a precise name, and
+	it'll run faster.
+
+1.01 - Tue May 30 14:47:34 EDT 1995
+	Andy Dougherty  <doughera@lafcol.lafayette.edu>
+	-added pod documentation.
+	-added PATH searching.
+	-added searching pod/ subdirectory (mainly to pick up perlfunc.pod
+	and friends.

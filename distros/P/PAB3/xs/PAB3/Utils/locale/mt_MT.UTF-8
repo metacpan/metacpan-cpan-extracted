@@ -1,0 +1,57 @@
+grp:3
+fd:2
+ifd:2
+dp:.
+ts:,
+cs:Lm
+ics:MTL
+csa:l
+css:0
+ns:-
+ps:+
+dtf:%A, %d ta %b, %Y %I:%M:%S %p %Z
+df:%A, %d ta %b, %Y
+tf:%I:%M:%S  %Z
+apf:%I:%M:%S %p %Z
+amu:
+pmu:
+aml:
+pml:
+lm1:Jannar
+lm2:Frar
+lm3:Marzu
+lm4:April
+lm5:Mejju
+lm6:Ġunju
+lm7:Lulju
+lm8:Awissu
+lm9:Settembru
+lm10:Ottubru
+lm11:Novembru
+lm12:Diċembru 
+sm1:Jan
+sm2:Fra
+sm3:Mar
+sm4:Apr
+sm5:Mej
+sm6:Ġun
+sm7:Lul
+sm8:Awi
+sm9:Set
+sm10:Ott
+sm11:Nov
+sm12:Diċ
+ld1:il-Ħadd
+ld2:it-Tnejn
+ld3:it-Tlieta
+ld4:l-Erbgħa
+ld5:il-Ħamis
+ld6:il-Ġimgħa
+ld7:is-Sibt
+sd1:Ħad
+sd2:Tne
+sd3:Tli
+sd4:Erb
+sd5:Ħam
+sd6:Ġim
+sd7:Sib

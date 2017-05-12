@@ -1,0 +1,67 @@
+TODO
+ - plugin_disable: go over all open documents and replace document-specific editors by non-specific ones ...
+ - BibTeX:
+   - open corresponding BibTeX files
+   - better support for BibTeX entry completion (cite and friends, show BibTeX entries to complete ...)
+   - automagic BibTeX-ification
+   - automagic entry cleaning
+   - exchange data with DBLP, CiteULike, Zotero, Bibsonomy ...
+   - BibLaTeX support
+ - syntax checking
+   - BibTeX support
+   - explanation of errors (like for Perl 5)
+   - catch "! Emergency stop."
+   - also display warnings
+   - get rid of some duplicate errors
+ - TODO recognizer support
+ - auto-completion:
+   - see whether it works at ":", e.g. with \ref{eq:
+   - add brackets to commands that always need them (e.g. \frametitle{...})
+   - support more Beamer commands
+   - recognize Beamer files, also make Beamer support configurable
+   - analyse dependencies to get available commands
+   - support * variants of environments
+   - support multicolumn
+   - support LaTeX command parameters
+     - support optional commands
+   - support more packages; use options to configure which commands are supported
+   - configure using YAML file, not in code
+ - create DVI, PS, PDF
+   - display errors
+   - jump to error location in file
+   - show missing references and syntax errors
+ - spell checking
+ - integrate a grammar checker
+ - move selected text into new file 
+ - insertion of special characters (menu)
+ - insertion of tables, enumerations, etc. via snippets
+ - special treatment of tabular environment: transpose and swap columns or rows
+   - compare http://www.ctan.org/tex-archive/help/Catalogue/entries/latable.html
+ - document outline
+   - sections/chapter/appendix/abstract
+   - command definitions
+   - include statements
+   - Beamer: frames
+   - tableofcontents, etc.
+   - BibTeX: outline by entry type; then key/title; use Text::BibTeX
+ - function list
+   - command definitions
+ - jump to command definition, bib item, reference label
+ - automatic insertion of '' and ``
+ - pretty printing
+ - Windows support
+ - settings dialog
+ - tool bar integration (or own toolbar)
+   could use some icons from here: http://famfamfam.com/lab/icons/silk/
+ - open included/inserted files
+ - have some kind of notion of LaTeX projects (one directory ...)
+ - use LaTeX::Table for a table generation wizard: http://search.cpan.org/dist/LaTeX-Table/lib/LaTeX/Table.pm
+ - context-sensitive help
+ - check out LaTeX editors/frontends like LyX, vim, emacs, gedit for interesting
+   features
+ - other tools to possibly use
+   - latexmk (run LaTeX the correct number of times)
+   - LaTeX::Encode, TeX::Encode
+   - preview-latex (used by AucTeX)
+   - chktex (typographic errors)
+   - lacheck (simple one-pass checker)

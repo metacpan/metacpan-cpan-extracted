@@ -1,0 +1,6 @@
+# upgrade Apple Support TIL Japan http://til.info.apple.co.jp/
+author: Masafumi Otsune
+handle: http://til\.info\.apple\.co\.jp/cgi-bin/WebObjects/TechInfo\.woa/wa/showTIL\?id=\d+
+extract: <B>タイトル</B><BR>\n\s*<BLOCKQUOTE>([^<]*?)</BLOCKQUOTE>.*?Modified Date:</FONT></TD>.*?<FONT SIZE=1>(\d\d/\d\d/\d\d)</FONT></TD>.*?<HR>(.*?)<!-- START BOTTOM APPLE NAVIGATION -->
+extract_capture: title date body
+extract_date_format: %y/%m/%d

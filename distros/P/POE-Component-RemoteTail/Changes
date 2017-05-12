@@ -1,0 +1,50 @@
+Revision history for Perl extension POE::Component::RemoteTail
+
+0.01011     2009/11/24
+        - repackage its project. ( Due to List::Util::PP ?)
+        - fix a POD a little 
+
+0.01010     2009/09/29
+        - fix a bug at "sub _stop". thanks to Geoff Kramer.
+
+
+0.01009     2009/08/13
+        - change an option of 'tail' command ( tail -F )
+        - add postback_handler ( not only 'child_stdout' but also 'child_stderr' and 'child_close' )
+
+0.01008     2009/06/08
+        - add %SIG trap
+        - improve debug option ( use Debug::STDERROR )  
+        - use ssh protocol 2 on POE::Component::RemoteTail::CustomEngine::NetSSHPerl
+
+0.01007     2009/05/19
+        - remove IO::Pty
+        - fix POD a little
+
+0.01006     2009/03/01
+        - correct a mistake of POD
+
+0.01005     2009/03/01
+        add some improvement about problems argued in perlmonks
+
+         * http://www.perlmonks.org/?node_id=746039
+
+        - ocrrect a mistake of PoCo::RemoteTail::CustomEngine::NetSSHPerl
+        - error handlings are improved slightly
+        - add some parameters to PoCo::RemoteTail::Job to be albe to use command-line options 
+
+0.01004     2008/08/16
+        - correct a mistake of POD, again ( Oops! )
+
+0.01003     2008/08/15
+        - correct a mistake of POD
+        - add some 'build_requires' line at Makefile.PL
+
+0.01002     2008/07/09
+        - add some 'requires' line at Makefile.PL
+
+0.01001     2008/07/08
+        - rewrite all
+
+0.00001_00  2008/06/30
+        - DEVELOPER RELEASE

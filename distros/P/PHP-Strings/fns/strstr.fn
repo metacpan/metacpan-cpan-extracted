@@ -1,0 +1,8 @@
+docs: |
+    Use L<substr()|perlfunc/"substr"> and L<index()|perlfunc/"index"> instead.
+
+        my $strstr = substr( $haystack, index( $haystack, $needle ) );
+
+    Or a regex:
+
+        my ( $strstr ) = $haystack =~ /(\Q$needle\E.*$)/s;

@@ -1,0 +1,95 @@
+SYNOPSIS
+
+    First write your code and add Rinci metadata to them:
+
+     package MyMod::MySubMod;
+    
+     our %SPEC;
+    
+     $SPEC{':package'} = {
+         v => 1.1,
+         summary => 'This package is blah blah',
+     };
+    
+     $SPEC{'$var1'} = {
+         v => 1.1,
+         summary => 'This variable is blah blah',
+     };
+     our $var1;
+    
+     $SPEC{func1} = {
+         v => 1.1,
+         summary => 'This function does blah blah',
+         args => {
+             a => { schema => 'int', req => 1 },
+             b => { schema => 'int' },
+         },
+     };
+     sub func1 {
+         ...
+     }
+     1;
+
+    then access them through Riap:
+
+     use Perinci::Access::Perl;
+     my $pa = Perinci::Access::Perl->new;
+    
+     # call function
+     $res = $pa->request(call => '/MyMod/MySubMod/func1', {args=>{a=>1, b=>2}});
+    
+     # get variables
+     $res = $pa->request(get => '/MyMod/MySubMod/$var1');
+
+DESCRIPTION
+
+    This class allows you to access Perl modules, functions, and variables
+    through Riap. Only those which have Rinci metadata are accessible. The
+    metadata is put in %SPEC package variables, with function names as
+    keys, or :package for package metadata, or $NAME for variables.
+    Functions will be wrapped before executed (unless you pass wrap => 0 to
+    the constructor).
+
+    You should probably use this through Perinci::Access.
+
+FUNCTIONS
+
+ new(%opts) => OBJ
+
+    Constructor. For a list of options, see superclass
+    Perinci::Access::Schemeless except for package_prefix which are not
+    recognized by this class.
+
+ $pa->request($action, $uri, \%extras) => RESP
+
+ $pa->parse_url($url) => HASH
+
+FAQ
+
+ Why %SPEC (instead of %META, %METADATA, %RINCI, etc)?
+
+    The name was first chosen during Sub::Spec era (see BackPAN) in 2011,
+    it stuck. By that time I already had had a lot of code written using
+    %SPEC.
+
+ Why wrap?
+
+    The wrapping process accomplishes several things, among others:
+    checking of metadata, normalization of schemas in metadata, also
+    argument validation and exception trapping in function.
+
+    The function wrapping introduces a small overhead when performing a sub
+    call (typically around several to tens of microseconds on an Intel Core
+    i5 1.7GHz notebook). This is usually smaller than the overhead of
+    Perinci::Access::Perl itself (typically in the range of 100
+    microseconds). But if you are concerned about the wrapping overhead,
+    see the wrap => 0 option.
+
+SEE ALSO
+
+    Perinci::Access::Schemeless
+
+    Perinci::Access
+
+    Riap
+

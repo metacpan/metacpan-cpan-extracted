@@ -1,0 +1,214 @@
+NAME
+    Pod::Stupid - The simplest, stupidest 'pod parser' possible
+
+VERSION
+    version 0.005
+
+SYNOPSIS
+      use Pod::Stupid;
+  
+      my $file = shift; # '/some/file/with/pod.pl';
+      my $original_text = do { local( @ARGV, $/ ) = $file; <> }; # slurp
+  
+      my $ps = Pod::Stupid->new();
+  
+      # in scalar context returns an array of hashes.
+      my $pieces = $ps->parse_string( $original_text );
+  
+      # get your text sans all POD
+      my $stripped_text = $ps->strip_string( $original_text );
+  
+      # reconstruct the original text from the pieces...
+      substr( $stripped_text, $_->{start_pos}, 0, $_->{orig_txt} )
+          for grep { $_->{is_pod} } @$pieces;
+  
+      print $stripped_text eq $original_text ? "ok - $file\n" : "not ok - $file\n";
+
+DESCRIPTION
+    This module was written to do one simple thing: Given some text as
+    input, split it up into pieces of POD "paragraphs" and non-POD
+    "whatever" and output an AoH describing each piece found, in order.
+
+    The end user can do whatever s?he wishes with the output AoH. It is
+    trivially simple to reconstruct the input from the output, and hopefully
+    I've included enough information in the inner hashes that one can easily
+    perform just about any other manipulation desired.
+
+INDESCRIPTION
+    There are a bunch of things this module will NOT do:
+
+    *   Create a "parse tree"
+
+    *   Pod validation (it either parses or not)
+
+    *   Pod cleanup
+
+    *   "Handle" encoded text (but it *should* still parse)
+
+    *   Feed your cat
+
+    However, it may make it easier to do any of the above, with a lot less
+    time and effort spent trying to grok many of the other POD parsing
+    solutions out there.
+
+    A particular design decision I've made is to avoid needing to save any
+    state. This means there's no need or advantage to instantiating an
+    object, except for your own preferences. You can use any method as
+    either an object method or a class method and it will work the same way
+    for both. This design should also discourage me from trying to bloat
+    Pod::Stupid with every feature that tickles my fancy (or yours!) but
+    still, I encourage any feature requests!
+
+METHODS
+  new
+    the most basic object constructor possible. Currently takes no options
+    because the object neither has nor needs to keep any state.
+
+    This is only here if you want to use this module with an OO interface.
+
+  parse_string
+    Given a string, parses for pod and, in scalar context, returns an AoH
+    describing each pod paragraph found, as well as any non-pod.
+
+      # typical usage
+      my $pieces = $ps->parse_string( $text );
+  
+      # to separate pod and non-pod
+      my @pod_pieces     = grep { $_->{is_pod}  } @$pieces;
+      my @non_pod_pieces = grep { $_->{non_pod} } @$pieces;
+
+  strip_string
+    given a string or string ref, and (optionally) an array of pod pieces,
+    return a copy of the string with all pod stripped out and an AoH
+    containing the pod pieces. If passed a string ref, that string is
+    modified in-place. In any case you can still always get the stripped
+    string and the array of pod parts as return values.
+
+      # most typical usage
+      my $txt_nopod = $ps->strip_string( $text );
+  
+      # pass in a ref to change string in-place...
+      $ps->strip_string( \$text );   # $text no longer contains any pod
+  
+      # if you need the pieces...
+      my ( $txt_nopod, $pieces ) = $ps->strip_string( $text );
+  
+      # if you already have the pod pieces...
+      my $txt_nopod = $ps->strip_string( $text, $pod_pieces );
+
+KNOWN LIMITATIONS
+    *   Currently only works on files with unix-style line endings.
+
+TODO
+    This is only what I've thought of... suggestions *very* welcome!!!
+
+    *   Fix aforementioned limitation
+
+    *   More comprehensive tests
+
+    *   A utility module to do common things with the output
+
+CREDITS
+    Uri Guttman for giving me the task that led to my shaving this
+    particular yak
+
+SEE ALSO
+    *   Pod::Simple
+
+    *   Pod::Parser
+
+    *   Pod::Stripper
+
+    *   Pod::Escapes
+
+    *   perlpod
+
+    *   perlpodspec
+
+    *   perldoc
+
+    *   and about a million other things...
+
+POD TERMINOLOGY FOR DUMMIES (aka: me)
+  paragraphs
+    In Pod, everything is a paragraph. A paragraph is simply one or more
+    consecutive lines of text. Multiple paragraphs are separated from each
+    other by one or more blank lines.
+
+    Some paragraphs have special meanings, as explained below.
+
+  command
+    A command (aka directive) is a paragraph whose first line begins with a
+    character sequence matching the regex m/^=([a-zA-Z]\S*)/
+
+    I've actually been a bit more generous, matching m/^=(\w+)/ instead.
+    Don't rely on that though. I may have to change to be closer to the spec
+    someday.
+
+    In the above regex, the type of command would be in $1. Different types
+    of commands have different semantics and validation rules yadda yadda.
+
+    Currently, the following command types (directives) are described in the
+    Pod Spec <http://perldoc.perl.org/perlpodspec.html> and technically, a
+    proper Pod parser should consider anything else an error. (I won't
+    though)
+
+    *   head[\d] (\d is a number from 1-4)
+
+    *   pod
+
+    *   cut
+
+    *   over
+
+    *   item
+
+    *   back
+
+    *   begin
+
+    *   end
+
+    *   for
+
+    *   encoding
+
+  directive
+    Ostensibly a synonym for a command paragraph, I consider it a subset of
+    that, specifically the "command type" as described above.
+
+  verbatim paragraph
+    This is a paragraph where each line begins with whitespace.
+
+  ordinary paragraph
+    This is a prargraph where each line does not begin with whitespace
+
+  data paragraph
+    This is a paragraph that is between a pair of "=begin identifier" ...
+    "=end identifier" directives where "identifier" does not begin with a
+    literal colon (":")
+
+    I do not plan on handling this type of paragraph in any special way.
+
+  block
+    A Pod block is a series of paragraphs beginning with any directive
+    except "=cut" and ending with the first occurence of a "=cut" directive
+    or the end of the input, whichever comes first.
+
+  piece
+    This is a term I'm introducting myself. A piece is just a hash
+    containing info on a parsed piece of the original string. Each piece is
+    either pod or not pod. If it's pod it describes the kind of pod. If it's
+    not, it contains a 'non_pod' entry. All pieces also include the start
+    and end offsets into the original string (starting at 0) as 'start_pos'
+    and 'end_pos', respectively.
+
+AUTHOR
+    Stephen R. Scaffidi <sscaffidi@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Stephen R. Scaffidi.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

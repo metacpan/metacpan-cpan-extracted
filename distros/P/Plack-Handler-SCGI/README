@@ -1,0 +1,19 @@
+NAME
+    Plack::Handler::SCGI - PSGI handler on SCGI daemon
+
+SYNOPSIS
+      plackup -s SCGI --port 22222
+
+DESCRIPTION
+    Plack::Handler::SCGI is a standalone SCGI daemon using SCGI
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Plack::Handler::FCGI SCGI
+

@@ -1,0 +1,126 @@
+Revision history for Perl extension PerlIO::Gzip.
+
+0.01  Sat Feb  3 13:51:15 2001
+	- original version; created by h2xs 1.21 with options
+		-c -n Layer::Gzip /usr/local/include/sfio.h
+
+0.02  Sunday
+      parse gzip header, 40 regression tests
+
+0.03  Tue Feb  6 18:50:01 GMT 2001
+      Change name from Layer::Gzip to PerlIO::gzip following feedback on p5p.
+      Add checks to Makefile.PL to ensure you have 5.7.0 [or later :-)] and
+      PerlIO configure.
+
+0.04  Tue Feb  6 23:56:16 GMT 2001
+      Added autopop mode.  There must be a better name for it.
+      Changed order in PerlIOGzip_pushed to call PerlIObuf first (D'oh)
+      and to pop without error in autopop mode with a write.
+
+0.05  Sun Feb 11 22:12:42 GMT 2001
+      Mmm. CRCs at the ends of files - maybe I should check them?
+      Now gives error on close if the z_stream is at the end and either
+      the CRC or the length recorded in the gzip trailer is wrong.  Doesn't
+      try these checks for files with no gzip header.
+      PROTOTYPES: DISABLE in the .xs
+
+0.06  Fri Feb 16 23:59:18 GMT 2001
+      We have compression!
+      Hmm. Didn't check the return from close on perl.gz - transpires there
+      was a bug in my code to read the length of uncompressed data from the
+      gzip file
+      Hmm. Why was I passing *my* args down to the PerlIOBuf I'm a derived
+      class of? On the other hand, why not? ISA or HASA? My args, HASA, I
+      guess, so I'll give it NULL args.
+
+0.07  Sun Feb 18 23:21:48 GMT 2001
+      s/to/too/ in the BARF message in Makefile.PL [1 character change. Look
+      at the paperwork that generated :-)]
+      use XSLoader rather than Dynaloader.
+
+0.08  Mon Feb 19 21:14:45 GMT 2001
+      fix bug in get_more's return value that basically prevented you from
+      reading any header with embedded filename from an unbuffered layer.
+      [Obscure, but it's supposed to work with unbuffered] However, still
+      problems with unread, so you can't inflate any gzip file with an
+      original filename (or comment) in the header. This is related to the
+      /* fix me */ mentioned in perlio.c. Hopefully it will be soon.
+
+0.09  Sat Apr 21 16:14:54 BST 2001
+      The perlio.c layer API has changed by the 5.7.1 release. 0.08 and earlier
+      won't compile - 0.09 mainly consists of necessary changes to function
+      prototypes and the layer struct. 5.7.1 contains a known bug - when
+      opening a file with layers specified, failure of a layer to push is
+      supposed to cause the open to fail. In 5.7.0 it did. In 5.7.1 it doesn't.
+      Commented the tests that will fail due to this bug.
+      Attempted to detect the "OS" type at compile time to set the default
+      OS for the gzip header.
+
+0.10  Sun Aug 26 13:05:25 BST 2001
+      By 5.7.2 it seems that the pushed argument is passed in as &sv_undef
+      rather than NULL. I wasn't testing SvOK() and was getting use of
+      uninitialized value errors.
+
+0.11  Mon Oct 29 20:28:38 GMT 2001
+      perlio.c layer API has changed again with the addition of a dup()
+      function for cloning layers across. (both within and across ithreads)
+      Currently I don't want to pretend that PerlIO::gzip can cope with this,
+      hence it will croak. Fixing this properly is a TODO.
+
+0.12  Mon Mar 18 21:03:52 GMT 2002
+      Catch up with the 5.7.3 perlio API changes.
+
+0.13  Tue Jul  2 21:55:08 BST 2002
+      Richard Clamp sent me a complete patch to catch up with the 5.8.0-RC2
+      perlio API changes, and sprinkles C<pTHX>ie dust to make it compile for
+      a threaded perl. (But please don't create any threads or fork on Win32
+      while a gzip layer is active, as bad things will happen (duplicate
+      frees))
+
+0.14  Fri Jul 19 23:19:24 BST 2002
+      Whoops. Same undefined behaviour bug in my argument passing code as
+      PerlIO::subfile. No surprise there, as PerlIO::subfile got the code
+      from PerlIO::gzip. So I'll migrate the fix back from there to here.
+      Well spotted valgrind.
+      Use valgrind. http://developer.kde.org/~sewardj/
+      It's far more effective than coffee.
+
+0.15  Tue Jul 15 21:07:11 BST 2003
+      gzip.xs was using PerlIOBuf_close, which isn't on the list of exported
+      symbols. Hence gzip.xs won't link on platforms such as AIX and Windows.
+      This is fixed in 5.8.1 - Inline the code for PerlIOBuf_close when
+      building for 5.8.0.
+
+0.16  Fri Jun 25 09:38:28 BST 2004
+      Merge this in from Sun Nov  4 15:27:24 GMT 2001:
+      Split the tests from test.pl into t/read.t, t/write.t
+      use Test::More; [Happy Schwern? :-)] and loop over several buffering
+      possibilities.
+      
+      Actually unlink the test perl.gz file.
+
+0.17  Wed Jun 30 18:29:30 BST 2004
+      Track down the cause of the problem reported by some Linux users. It's
+      another manifestation of the core perlio bug, whereby perlio loses data
+      if you push another layer onto a file handle with unread data. In this
+      case the layer push is happening on some Linux systems because the stdio
+      layer isn't supporting Perl's fast buffer snooping, presuambly because
+      glibc has decided to use mmap() for the file. Work around is for
+      PerlIO::gzip to push its buffering layer before it calls unread, which
+      is a somewhat messy hack, but works.
+      This means that all the TODO tests can be taken out, as they now pass.
+
+      Fix small typo in read.t
+
+0.18  Sun Oct  1 22:08:32 BST 2006
+      Patch from alexchorny [at] gmail.com (#21469) - write.t fails
+      (I had the skip arguments wrong)
+      TODO 2 tests in read.t which fail. I'm infering that this is because
+      :stdio opens in text mode, and there's no way to tell it to open in
+      binary mode. Time to consult p5p.
+
+0.19  Sat Feb 28 11:31:29 CET 2015
+      Two patches from zefram [at] fysh.org
+      (#92412) - usesfio config removal breaks
+      And whose fault was this anyway? (See core commit 0b39d4dc4ab83828)
+      (#92031) - printf format mismatch

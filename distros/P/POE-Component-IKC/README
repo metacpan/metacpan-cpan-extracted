@@ -1,0 +1,29 @@
+This a first draft if Inter-Kernel Communication for POE.  It is intended
+as a point of reference for discusion of issues involved.  
+
+As "Mythical Man Month" says : Plan to throw one away.
+
+
+You will need the latest version of POE.  IKC has a sneaky way of
+discovering bugs and lacunae in POE :)
+
+
+Quick test :
+perl Makefile.PL
+make
+./server & ./client
+... and wait 
+
+Better yet, run ./server and ./client in seperate windows.  ./client should
+output a . every 10 seconds.  Running many clients will give you an idea of
+the overhead :)
+
+STABILITY 
+
+I used to use IKC full time on my sites.  However, I've moved to exclusively 
+developing Intranet applications.  One of my main apps (http://www.quaero.ca/) 
+has a POEx::HTTP::Server front end and talks IKC with an application server.
+This means IKC handles thousands of requests an hour.  I trust it, but then I
+know what I'm doing.
+
+-Philip Gwyn, <fil@pied.nu>

@@ -1,0 +1,1567 @@
+# PApp translation table 1.0
+#
+#$domain=agni
+msgid ""
+msgstr ""
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain: charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#$lang=deu
+msgid ""
+msgstr ""
+
+# 51539608470/5100004461:164          printf __"\"<tt>%s</tt>\" is a non-standard language id", $self->{lang};
+#$lang=eng
+#$flags=0
+msgid "\"<tt>%s</tt>\" is a non-standard language id"
+msgstr ""
+
+# 51539608470/5100004465:27    <?slink __"&gt;&gt;&gt;NEXT&gt;&gt;&gt;", \$module->{begin} => $module->{begin} + $module->{window}:>
+# 51539608470/5100004465:69    <?slink __"&gt;&gt;&gt;NEXT&gt;&gt;&gt;", \$module->{begin} => $module->{begin} + $module->{window}:>
+#$lang=eng
+#$flags=0
+msgid "&gt;&gt;&gt;NEXT&gt;&gt;&gt;"
+msgstr ""
+
+# 51539608470/5100004465:26    <?slink __"&lt;&lt;&lt;PREV&lt;&lt;&lt;", \$module->{begin} => $module->{begin} > $module->{window} ? $module->{begin} - $module->{window} : 0:> ===
+# 51539608470/5100004465:68    <?slink __"&lt;&lt;&lt;PREV&lt;&lt;&lt;", \$module->{begin} => $module->{begin} > $module->{window} ? $module->{begin} - $module->{window} : 0:> ===
+#$lang=eng
+#$flags=0
+msgid "&lt;&lt;&lt;PREV&lt;&lt;&lt;"
+msgstr ""
+
+# 8589935640/8589934642:1 <?sprintf __"(%d bytes)", length $value:>
+#$lang=eng
+#$flags=0
+msgid "(%d bytes)"
+msgstr ""
+
+# 8589934717/959:11 __"(no file)"
+# 8589934717/8589934641:10 __"(no file)"
+#$lang=eng
+#$flags=0
+msgid "(no file)"
+msgstr ""
+
+# 51539609708/8589934641:44    '($Y, $M, $D, $h, $m, $s) = Add_Delta_DHMS($Y, $M, $D, $h, $m, $s, 0, -1, 0, 0)' => __"1 hour ago",
+#$lang=eng
+#$flags=0
+msgid "1 hour ago"
+msgstr ""
+
+# 51539609708/8589934641:39    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, -7); $h = $m = $s = 0' => __"1 week ago",
+#$lang=eng
+#$flags=0
+msgid "1 week ago"
+msgstr ""
+
+# 8589935313/8589934641:23    '$D = 1; $h = $m = $s = 0;' => __"1. des Monats",
+#$lang=eng
+#$flags=0
+msgid "1. des Monats"
+msgstr ""
+
+# 51539609708/8589934641:35    '$D = 1; $h = $m = $s = 0;' => __"1st of month",
+#$lang=eng
+#$flags=0
+msgid "1st of month"
+msgstr ""
+
+# 51539609708/8589934641:40    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, -2); $h = $m = $s = 0' => __"2 days ago",
+#$lang=eng
+#$flags=0
+msgid "2 days ago"
+msgstr ""
+
+# 51539609708/8589934641:43    '($Y, $M, $D, $h, $m, $s) = Add_Delta_DHMS($Y, $M, $D, $h, $m, $s, 0, -2, 0, 0)' => __"2 hours ago",
+#$lang=eng
+#$flags=0
+msgid "2 hours ago"
+msgstr ""
+
+# 51539609708/8589934641:38    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, -14); $h = $m = $s = 0' => __"2 weeks ago",
+#$lang=eng
+#$flags=0
+msgid "2 weeks ago"
+msgstr ""
+
+# 51539609708/8589934641:37    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, -21); $h = $m = $s = 0' => __"3 weeks ago",
+#$lang=eng
+#$flags=0
+msgid "3 weeks ago"
+msgstr ""
+
+# 51539609708/8589934641:42    '($Y, $M, $D, $h, $m, $s) = Add_Delta_DHMS($Y, $M, $D, $h, $m, $s, 0, -4, 0, 0)' => __"4 hours ago",
+#$lang=eng
+#$flags=0
+msgid "4 hours ago"
+msgstr ""
+
+# 51539609708/8589934641:36    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, -28); $h = $m = $s = 0' => __"4 weeks ago",
+#$lang=eng
+#$flags=0
+msgid "4 weeks ago"
+msgstr ""
+
+# 26/8589934642:4 <?escape_html __"<NULL>":>
+#$lang=eng
+#$flags=0
+msgid "<NULL>"
+msgstr ""
+
+# 4295030112/4294967396:1 <?sprintf __"<b>%s</b> must be present.", $self->{type}->name:>
+#$lang=eng
+#$flags=0
+msgid "<b>%s</b> must be present."
+msgstr ""
+
+# 4295053975/4295053935:8          <h1><?escape_html ($module || __"<default>"):></h1>
+#$lang=eng
+#$flags=0
+msgid "<default>"
+msgstr ""
+
+# 4295054233/4294967396:86                   $obj ? $obj->show : printf __"<error>object %s does not exist</error>", $gid;
+#$lang=eng
+#$flags=0
+msgid "<error>object %s does not exist</error>"
+msgstr ""
+
+# 51539609390/8589934642:4 <?escape_html __"<no creator>":>
+#$lang=eng
+#$flags=0
+msgid "<no creator>"
+msgstr ""
+
+# 51539608470/5100004465:55          $msgstr = __"<not set>" unless defined $msgstr;
+#$lang=eng
+#$flags=0
+msgid "<not set>"
+msgstr ""
+
+# 51539608470/5100004461:79 __"<small>
+#       <b>+selected+</b>: currently selected for editing.<br />
+#       <small>unselected</small>: editing possible.<br />
+#       <em>emphasize</em>: not used by any mounted application.<br />
+#    </small>"
+#$lang=eng
+#$flags=0
+msgid ""
+"<small>\n"
+"      <b>+selected+</b>: currently selected for editing.<br />\n"
+"      <small>unselected</small>: editing possible.<br />\n"
+"      <em>emphasize</em>: not used by any mounted application.<br />\n"
+"   </small>"
+msgstr ""
+
+# 5100002155/4294967396:4       <?ef_submit __"><",
+#$lang=eng
+#$flags=0
+msgid "><"
+msgstr ""
+
+# 833/937:1 __"ALL&#160;OF"
+#$lang=eng
+#$flags=0
+msgid "ALL&#160;OF"
+msgstr ""
+
+# 832/937:1 __"ANY&#160;OF"
+#$lang=eng
+#$flags=0
+msgid "ANY&#160;OF"
+msgstr ""
+
+# 8589935138/4294967396:12 __"Action"</th></tr>
+#$lang=eng
+#$flags=0
+msgid "Action"
+msgstr ""
+
+# 828/4294967396:58       <b>__"Add A Condition"</b><br/>
+#$lang=eng
+#$flags=0
+msgid "Add A Condition"
+msgstr ""
+
+# 8589935138/4294967396:22 <?ef_submit __"Add File", {:
+#$lang=eng
+#$flags=0
+msgid "Add File"
+msgstr ""
+
+# 828/4294967396:35       <?ef_submit __"Add Label",    {:$_[1]->create($_[0], ""):}($factor, $label):>
+#$lang=eng
+#$flags=0
+msgid "Add Label"
+msgstr ""
+
+# 5100004683/25769803918:9 __"Add attachment:"
+#$lang=eng
+#$flags=0
+msgid "Add attachment:"
+msgstr ""
+
+# 828/4294967396:83       <?ef_submit __"Add attribute match", {:
+#$lang=eng
+#$flags=0
+msgid "Add attribute match"
+msgstr ""
+
+# 5100002155/4294967396:26 <?ef_submit __"Add select", {:
+#$lang=eng
+#$flags=0
+msgid "Add select"
+msgstr ""
+
+# 51539610302/4295054043:118    <?ef_submit __"Add to favorites", {:
+#$lang=eng
+#$flags=0
+msgid "Add to favorites"
+msgstr ""
+
+# 750/4295054043:5       my $msg = sprintf __"Agni::show_recursion > %d while executing %s, suspending further execution",
+#$lang=eng
+#$flags=0
+msgid "Agni::show_recursion > %d while executing %s, suspending further execution"
+msgstr ""
+
+# 5100002715/5100002717:11 <h1>__"An error occured"</h1>
+#$lang=eng
+#$flags=0
+msgid "An error occured"
+msgstr ""
+
+# 8589934717/8589934641:42 <?ef_submit __"Attach", -attach => 1:>
+#$lang=eng
+#$flags=0
+msgid "Attach"
+msgstr ""
+
+# 51539609608/4294967299:2    or {{ra/util}}->assert_freetext ($value, __"Authentication User Exit");
+#$lang=eng
+#$flags=0
+msgid "Authentication User Exit"
+msgstr ""
+
+# 51539609609/4294967299:1 {{ra/util}}->assert_integer ($value, __"Authentication User Exit timeout");
+#$lang=eng
+#$flags=0
+msgid "Authentication User Exit timeout"
+msgstr ""
+
+# 51539608470/5100004465:11    <tr><td><?slink __"Back to the translation menu", $env->sa_module (undef):></td></tr>
+# 51539608470/5100004471:11    <tr><td colspan="2"><?slink __"Back to the translation menu", $env->sa_module ({page => "main"}):></td></tr>
+#$lang=eng
+#$flags=0
+msgid "Back to the translation menu"
+msgstr ""
+
+# 51539610300/4295053935:96                      $sub->(__"CSV"),
+#$lang=eng
+#$flags=0
+msgid "CSV"
+msgstr ""
+
+# 51539608574/959:23          <th align="left">__"Capabilities"</th>
+#$lang=eng
+#$flags=0
+msgid "Capabilities"
+msgstr ""
+
+# 31/4295054043:1 <h2><?sprintf __"Classes Implementing %s", $self->name:></h2>
+#$lang=eng
+#$flags=0
+msgid "Classes Implementing %s"
+msgstr ""
+
+# 51539610300/4295053935:103               $sub->(__"Configuration", 
+#$lang=eng
+#$flags=0
+msgid "Configuration"
+msgstr ""
+
+# 47244641103/8589934641:1 __"Configure and Reboot":>&#160;
+#$lang=eng
+#$flags=0
+msgid "Configure and Reboot"
+msgstr ""
+
+# 51539608470/5100004471:72            __"Congrats, there are no more untranslated entries"
+#$lang=eng
+#$flags=0
+msgid "Congrats, there are no more untranslated entries"
+msgstr ""
+
+# 8589934717/8589934641:39 <tr><td>__"Content-Type": </td><td><?ef_string $ct:></td></tr>
+#$lang=eng
+#$flags=0
+msgid "Content-Type"
+msgstr ""
+
+# 51539610300/4295053935:108                     $sub->(slink escape_html __"Credentials"      , $env->sa_module ('scan_config')),
+#$lang=eng
+#$flags=0
+msgid "Credentials"
+msgstr ""
+
+# 8589935642/5100000013:7 <h2>__"Current Object"</h2>
+#$lang=eng
+#$flags=0
+msgid "Current Object"
+msgstr ""
+
+# 828/4294967396:41       <?ef_submit __"DEL", {:
+#$lang=eng
+#$flags=0
+msgid "DEL"
+msgstr ""
+
+# 51539608470/5100004461:152    <?slink __"Delete unused messages and reorganize database", -delete_unused => 1:><br />
+#$lang=eng
+#$flags=0
+msgid "Delete unused messages and reorganize database"
+msgstr ""
+
+# 51539608107/5000000070
+#$lang=eng
+#$flags=0
+msgid "Differences"
+msgstr ""
+
+# 51539610300/4295053935:104                  $sub->(slink escape_html __"Display Config"    , $env->sa_module ('col_config')), 
+#$lang=eng
+#$flags=0
+msgid "Display Config"
+msgstr ""
+
+# 5100004696/5000000070
+#$lang=eng
+#$flags=0
+msgid "Docviewer"
+msgstr ""
+
+# 51539608470/5100004461:130    <h2>__"Domain Management"</h2>
+#$lang=eng
+#$flags=0
+msgid "Domain Management"
+msgstr ""
+
+# 51539608470/5100004471:5          <h2>__"Edit a translation entry"</h2>
+#$lang=eng
+#$flags=0
+msgid "Edit a translation entry"
+msgstr ""
+
+# 51539608470/5100004470:1 <?ef_sbegin:>__"Encoding:" <?ef_string \$self->{encoding}, 12:><?ef_end:>
+#$lang=eng
+#$flags=0
+msgid "Encoding:"
+msgstr ""
+
+# 51539610300/4295053935:94                   $sub->(__"Export", 
+#$lang=eng
+#$flags=0
+msgid "Export"
+msgstr ""
+
+# 51539610300/4295053935:132               $sub->(__"Favorites", @tmp);
+#$lang=eng
+#$flags=0
+msgid "Favorites"
+msgstr ""
+
+# 5100004683/25769803918:5       __"File"     => ${{mercury_nethype/attachment::file}},
+# 8589935138/4294967396:12 <tr><th>__"File"</th><th>
+# 51539610300/4295053935:93               $sub->(__"File", 
+#$lang=eng
+#$flags=0
+msgid "File"
+msgstr ""
+
+# 8589934717/8589934641:40 <tr><td>__"File Size": </td><td><?-s $storage:></td></tr>
+#$lang=eng
+#$flags=0
+msgid "File Size"
+msgstr ""
+
+# 8589935642/5100000013:6 <h1>__"File Upload"</h1>
+#$lang=eng
+#$flags=0
+msgid "File Upload"
+msgstr ""
+
+# 8589935642/5100000013:27 <tr><td>__"File to Upload:" </td>
+#$lang=eng
+#$flags=0
+msgid "File to Upload:"
+msgstr ""
+
+# 8589934717/8589934641:38 <tr><td>__"Filename": </td><td><?ef_string $fn:></td></tr>
+#$lang=eng
+#$flags=0
+msgid "Filename"
+msgstr ""
+
+# 8589935642/5100000013:11 __"Filesize:" <?length $self->{content}:><br />
+#$lang=eng
+#$flags=0
+msgid "Filesize:"
+msgstr ""
+
+# 8589935642/5100000013:13 __"Filetype:" <?$type:><br />
+#$lang=eng
+#$flags=0
+msgid "Filetype:"
+msgstr ""
+
+# 8589935313/8589934641:29    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, -1); $h = $m = $s = 0' => __"Gestern",
+#$lang=eng
+#$flags=0
+msgid "Gestern"
+msgstr ""
+
+# 4295053975/4294967396:18          <?ef_submit __"Goto",
+#$lang=eng
+#$flags=0
+msgid "Goto"
+msgstr ""
+
+# 51539610300/4295053935:119               $sub->(__"Help")
+#$lang=eng
+#$flags=0
+msgid "Help"
+msgstr ""
+
+# 8589935313/8589934641:33    '$h = $m = $s = 0'  => __"Heute",
+#$lang=eng
+#$flags=0
+msgid "Heute"
+msgstr ""
+
+# 8589935642/5100000013:12 __"Image Dimensions:" <?"$w × $h":><br />
+#$lang=eng
+#$flags=0
+msgid "Image Dimensions:"
+msgstr ""
+
+# 25/25769803918:1 __"Insert Object: " <:{{editor/selector}}->select_object ($self->ref_content, 1, "meta"):>
+#$lang=eng
+#$flags=0
+msgid "Insert Object: "
+msgstr ""
+
+# 47244641103/8589934641:1 <?ef_radio $ref, 'inst':><?escape_html __"Installation":>&#160;<?ef_radio $ref, 'conf':><?escape_html 
+#$lang=eng
+#$flags=0
+msgid "Installation"
+msgstr ""
+
+# 5100002744/4295054043:1 <?slink __"Invalidate", {:$self->invalidate:}():>
+#$lang=eng
+#$flags=0
+msgid "Invalidate"
+msgstr ""
+
+# 8589935313/8589935381:11 my @ms = split " ", __"Jan Feb Mär Apr Mai Jun Jul Aug Sep Okt Nov Dez";
+# 51539609708/51539609709:16 my @ms = split " ", __"Jan Feb Mär Apr Mai Jun Jul Aug Sep Okt Nov Dez";
+#$lang=eng
+#$flags=0
+msgid "Jan Feb Mär Apr Mai Jun Jul Aug Sep Okt Nov Dez"
+msgstr ""
+
+# 8589935313/8589935381:10 my @ml = split " ", __"Januar Februar März April Mai Juni Juli August September Oktober November Dezember";
+# 51539609708/51539609709:15 my @ml = split " ", __"Januar Februar März April Mai Juni Juli August September Oktober November Dezember";
+#$lang=eng
+#$flags=0
+msgid "Januar Februar März April Mai Juni Juli August September Oktober November Dezember"
+msgstr ""
+
+# 8589935313/8589934641:34    '0+0+0'             => __"Jetzt",
+#$lang=eng
+#$flags=0
+msgid "Jetzt"
+msgstr ""
+
+# 828/4294967396:31       __"Label:"
+#$lang=eng
+#$flags=0
+msgid "Label:"
+msgstr ""
+
+# 51539608470/5100004465:20 <tr><td>__"Limit view to entries containing"&#160;<?ef_string \$self->{search}:></td></tr>
+#$lang=eng
+#$flags=0
+msgid "Limit view to entries containing"
+msgstr ""
+
+# 5100004645/5100004651:15          <td><?ef_submit __"Login":></td>
+#$lang=eng
+#$flags=0
+msgid "Login"
+msgstr ""
+
+# 828/4294967396:75       <?ef_submit __"Match only specific ticket types", $self->cb_add_factor("match::tickets"):><:
+#$lang=eng
+#$flags=0
+msgid "Match only specific ticket types"
+msgstr ""
+
+# 51539608470/5100004471:131    <tr><th width="48%"><?sprintf __"Message (in language '%s')", $idlang:></th><th width="48%">
+#$lang=eng
+#$flags=0
+msgid "Message (in language '%s')"
+msgstr ""
+
+# 8589935313/8589935381:8 my @ws = split " ", __"Mon Die Mit Don Fre Sam Son";
+# 51539609708/51539609709:13 my @ws = split " ", __"Mon Die Mit Don Fre Sam Son";
+#$lang=eng
+#$flags=0
+msgid "Mon Die Mit Don Fre Sam Son"
+msgstr ""
+
+# 8589935313/8589935381:7 my @wl = split " ", __"Montag Dienstag Mittwoch Donnerstag Freitag Samstag Sonntag";
+# 51539609708/51539609709:12 my @wl = split " ", __"Montag Dienstag Mittwoch Donnerstag Freitag Samstag Sonntag";
+#$lang=eng
+#$flags=0
+msgid "Montag Dienstag Mittwoch Donnerstag Freitag Samstag Sonntag"
+msgstr ""
+
+# 8589935313/8589934641:38    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, 1); $h = $m = $s = 0' => __"Morgen",
+#$lang=eng
+#$flags=0
+msgid "Morgen"
+msgstr ""
+
+# 51539610300/4295053935:109                     $sub->(slink escape_html __"Network Discovery", $env->sa_module ('network_config'))))
+#$lang=eng
+#$flags=0
+msgid "Network Discovery"
+msgstr ""
+
+# 51539610349/25769803918:10         <?ef_submit __"New", {:
+#$lang=eng
+#$flags=0
+msgid "New"
+msgstr ""
+
+# 5100004009/25769803918:1 __"New Context:"&#160;<?ef_string \my $name:>
+#$lang=eng
+#$flags=0
+msgid "New Context:"
+msgstr ""
+
+# 51539608470/5100004471:124        <?ef_submit __"Next", \$P->{next} => 1:>
+#$lang=eng
+#$flags=0
+msgid "Next"
+msgstr ""
+
+# 5100004683/25769803918:4       __"Note"     => ${{mercury_nethype/attachment::note}},
+#$lang=eng
+#$flags=0
+msgid "Note"
+msgstr ""
+
+# 51539609708/8589934641:46    '0+0+0'             => __"Now",
+#$lang=eng
+#$flags=0
+msgid "Now"
+msgstr ""
+
+# 828/4294967396:68       <?ef_submit __"Place a condition on the following Attribute", $self->cb_add_value(\$attr):><:
+#$lang=eng
+#$flags=0
+msgid "Place a condition on the following Attribute"
+msgstr ""
+
+# 51539610300/4295053935:107                     $sub->(slink escape_html __"Poller Config"    , $env->sa_module ('poller_config')),
+#$lang=eng
+#$flags=0
+msgid "Poller Config"
+msgstr ""
+
+# 51539610300/4295053935:98                   $sub->(__"Printable Page"))
+#$lang=eng
+#$flags=0
+msgid "Printable Page"
+msgstr ""
+
+# 5100002755/4295054043:3    <title>__"Progress"</title>
+#$lang=eng
+#$flags=0
+msgid "Progress"
+msgstr ""
+
+# 5100004683/4294967396:19          <?ef_submit __"Publish",
+#$lang=eng
+#$flags=0
+msgid "Publish"
+msgstr ""
+
+# 51539608470/5100004471:120        <?ef_submit __"Refresh", \$P->{refresh} => 1:>
+#$lang=eng
+#$flags=0
+msgid "Refresh"
+msgstr ""
+
+# 828/4294967396:33       <?ef_submit __"Remove Label", {:$_[1]->remove($_[0]):}($factor, $label):>
+#$lang=eng
+#$flags=0
+msgid "Remove Label"
+msgstr ""
+
+# 8589934717/8589934641:32 <tr><td/><td><?ef_submit -f $storage ? __"Replace" : 
+#$lang=eng
+#$flags=0
+msgid "Replace"
+msgstr ""
+
+# 51539610300/4295053935:114               $sub->(slink escape_html __"Report", $env->sa_module (undef))
+#$lang=eng
+#$flags=0
+msgid "Report"
+msgstr ""
+
+# 828/4294967396:88       <?ef_submit __"Require attribute", {:
+#$lang=eng
+#$flags=0
+msgid "Require attribute"
+msgstr ""
+
+# 828/4294967396:60       <?ef_submit __"Require the following Attribute", {:
+#$lang=eng
+#$flags=0
+msgid "Require the following Attribute"
+msgstr ""
+
+# 51539608470/5100004471:121        <?ef_submit __"Reset", \$P->{reset} => 1:>
+#$lang=eng
+#$flags=0
+msgid "Reset"
+msgstr ""
+
+# 51539608470/5100004471:12    <tr><td colspan="2"><?slink __"Return to the directory view", \$module->{page} => "list":></td></tr>
+#$lang=eng
+#$flags=0
+msgid "Return to the directory view"
+msgstr ""
+
+# 51539607582/4294967396:19 <?ef_submit __"Save":>
+# 51539608470/5100004471:122        <?ef_submit __"Save", \$P->{save} => 1:>
+# 51539608574/959:59    <?ef_submit __"Save", {:
+# 51539610300/4295053935:153       <?ef_submit __"Save":>
+#$lang=eng
+#$flags=0
+msgid "Save"
+msgstr ""
+
+# 51539608470/5100004471:123        <?ef_submit __"Save & Next", \$P->{savenext} => 1:>
+#$lang=eng
+#$flags=0
+msgid "Save & Next"
+msgstr ""
+
+# 51539608470/5100004461:132    <?slink __"Scan selected packages",
+#$lang=eng
+#$flags=0
+msgid "Scan selected packages"
+msgstr ""
+
+# 51539607826/4294967396:71    <td colspan="2"><:ef_submit __"Search":></td>
+#$lang=eng
+#$flags=0
+msgid "Search"
+msgstr ""
+
+# 51539608470/5100004461:157    <h2>__"Selected Target Language ID:" <?$self->{lang}:></h2>
+#$lang=eng
+#$flags=0
+msgid "Selected Target Language ID:"
+msgstr ""
+
+# 51539608470/5100004461:97          <td><?ef_submit __"Set":></td>
+# 51539608470/5100004461:102          <td><?ef_submit __"Set":></td>
+#$lang=eng
+#$flags=0
+msgid "Set"
+msgstr ""
+
+# 51539608470/5100004471:145           <?ef_submit __"Skip message (already in the correct language)", \$P->{already} => 1:>
+#$lang=eng
+#$flags=0
+msgid "Skip message (already in the correct language)"
+msgstr ""
+
+# 51539608470/5100004461:53    <h3>__"Source Languages"</h3>
+#$lang=eng
+#$flags=0
+msgid "Source Languages"
+msgstr ""
+
+# 51539610300/4295053935:106                  $sub->(__"System Administration",
+#$lang=eng
+#$flags=0
+msgid "System Administration"
+msgstr ""
+
+# 51539608470/5100004461:86    <h3>__"Target Language"</h3>
+# 51539608470/5100004461:161          echo __"Target Language", ": $trans";
+#$lang=eng
+#$flags=0
+msgid "Target Language"
+msgstr ""
+
+# 4295053975/4295053935:9       __"This module does not exist"
+#$lang=eng
+#$flags=0
+msgid "This module does not exist"
+msgstr ""
+
+# 51539609708/8589934641:45    '$h = $m = $s = 0'  => __"Today",
+#$lang=eng
+#$flags=0
+msgid "Today"
+msgstr ""
+
+# 51539609708/8589934641:50    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, 1); $h = $m = $s = 0' => __"Tomorrow",
+#$lang=eng
+#$flags=0
+msgid "Tomorrow"
+msgstr ""
+
+# 51539608470/5100004461:170       __"Total number of messages": <?$cnt + $cnt2:><br />
+#$lang=eng
+#$flags=0
+msgid "Total number of messages"
+msgstr ""
+
+# 51539608470/5100004471:135             sprintf __"Translation (to language '%s')", $self->{lang}:>
+#$lang=eng
+#$flags=0
+msgid "Translation (to language '%s')"
+msgstr ""
+
+# 51539608470/5100004461:34    <h3>__"Translation Domains"</h3>
+#$lang=eng
+#$flags=0
+msgid "Translation Domains"
+msgstr ""
+
+# 51539608470/5000000070
+#$lang=eng
+#$flags=0
+msgid "Translation Editor"
+msgstr ""
+
+# 51539608470/5100004465:5          <h2>__"Translation Entries"</h2>
+#$lang=eng
+#$flags=0
+msgid "Translation Entries"
+msgstr ""
+
+# 51539608470/5100004461:171       __"Untranslated or fuzzy messages": <?$unt + $cnt2:><br />
+#$lang=eng
+#$flags=0
+msgid "Untranslated or fuzzy messages"
+msgstr ""
+
+# 51539608470/5100004461:151    __"Unused messages": <?$unu:><br />
+#$lang=eng
+#$flags=0
+msgid "Unused messages"
+msgstr ""
+
+# 8589934717/8589934641:32 __"Upload":></td></tr>
+# 8589935642/5100000013:23 <h2>__"Upload"</h2>
+# 8589935642/5100000013:42     <?ef_submit __"Upload",
+# 51539607582/51539607587:13       <td><?ef_submit __"Upload", $app->retlink_p ? $app->sa_restore (1) : () :></td>
+#$lang=eng
+#$flags=0
+msgid "Upload"
+msgstr ""
+
+# 8589934717/8589934641:26 <tr><td>__"Upload:" </td><td><?ef_file {:my ($fhx, $name, $ct, $cta, $cd) = @_;
+#$lang=eng
+#$flags=0
+msgid "Upload:"
+msgstr ""
+
+# 51539610300/4295053935:105                  $sub->(slink escape_html __"User Configuration", $env->sa_module ('user_config')),
+#$lang=eng
+#$flags=0
+msgid "User Configuration"
+msgstr ""
+
+# 51539608470/5100004471:144           <?ef_checkbox \$P->{ok}, "ok", 1:> __"Valid?"
+#$lang=eng
+#$flags=0
+msgid "Valid?"
+msgstr ""
+
+# 51539608470/5100004461:174    <?slink __"View/Edit all translations", $env->sa_module ({ page => "list" }), \$self->{where} => "1=1":><br />
+#$lang=eng
+#$flags=0
+msgid "View/Edit all translations"
+msgstr ""
+
+# 51539608470/5100004461:175    <?slink __"View/Edit non-valid translations", $env->sa_module ({ page => "list" }), \$self->{where} => "(flags is null or flags & 1 = 0)":><br />
+#$lang=eng
+#$flags=0
+msgid "View/Edit non-valid translations"
+msgstr ""
+
+# 8589935313/8589934641:28    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, -2); $h = $m = $s = 0' => __"Vorgestern",
+#$lang=eng
+#$flags=0
+msgid "Vorgestern"
+msgstr ""
+
+# 5100004683/25769803918:6       __"Worktime" => ${{mercury_nethype/attachment::worktime}},
+#$lang=eng
+#$flags=0
+msgid "Worktime"
+msgstr ""
+
+# 51539608470/5100004461:141    <?slink __"Write selected translation domains", 
+#$lang=eng
+#$flags=0
+msgid "Write selected translation domains"
+msgstr ""
+
+# 51539610300/4295053935:95                      $sub->(__"XLS"),
+#$lang=eng
+#$flags=0
+msgid "XLS"
+msgstr ""
+
+# 51539610300/4295053935:97                      $sub->(__"XML")),
+#$lang=eng
+#$flags=0
+msgid "XML"
+msgstr ""
+
+# 8589935309/4295054043:1 <?sprintf __"[%s %s %ds]", escape_html $self->{type}->name, $self->{expr}, $self->{
+#$lang=eng
+#$flags=0
+msgid "[%s %s %ds]"
+msgstr ""
+
+# 47244640281/4295054043:2 <?sprintf __"[%s older than %ds]", escape_html $self->{type}->name, $self->{timediff}:>
+#$lang=eng
+#$flags=0
+msgid "[%s older than %ds]"
+msgstr ""
+
+# 4295054228/5000000001:24                                            {{application::admin}}->sa_module(""):>">__"[ADMIN MENU]"</a>
+#$lang=eng
+#$flags=0
+msgid "[ADMIN MENU]"
+msgstr ""
+
+# 4295054242/4295054254:7                 : __"[BACK]"),
+# 4295054242/5000000085:5           : __"[BACK]"),
+# 51539607582/51539607587:17    <:$app->retlink (__"[BACK]") if $app->retlink_p:>
+#$lang=eng
+#$flags=0
+msgid "[BACK]"
+msgstr ""
+
+# 8589934717/8589934641:21 <?retlink __"[Back]":>
+# 51539608574/959:69    <?slink __"[Back]", $self->sa_module (undef):>
+#$lang=eng
+#$flags=0
+msgid "[Back]"
+msgstr ""
+
+# 4295054228/5000000001:18    <a class="agni_edit_panel" href="<?surl $edit_gid => undef, {{editor/app}}->sa_edit_object($app, "commit"):>">__"[COMMIT]"</a>
+#$lang=eng
+#$flags=0
+msgid "[COMMIT]"
+msgstr ""
+
+# 5100004009/25769803918:3    ef_submit __"[CREATE]", {:
+#$lang=eng
+#$flags=0
+msgid "[CREATE]"
+msgstr ""
+
+# 51539607582/4294967396:6 <?slink __"[DOWNLOAD]", SURL_STYLE_GET, SURL_SUFFIX($self->{filename}), {: 
+# 51539607588/4295054043:1 <?slink __"[DOWNLOAD]", SURL_STYLE_GET, SURL_SUFFIX($self->{filename}), {:
+#$lang=eng
+#$flags=0
+msgid "[DOWNLOAD]"
+msgstr ""
+
+# 4295054228/5000000001:19    <a class="agni_edit_panel" href="<?surl $edit_gid => undef, {{editor/app}}->sa_edit_object($app, "meta"):>">__"[EDIT APPLICATION]"</a>
+#$lang=eng
+#$flags=0
+msgid "[EDIT APPLICATION]"
+msgstr ""
+
+# 4295054228/5000000001:13    <a class="agni_edit_panel" href="<?surl $edit_gid => undef:>">__"[EDIT MODE OFF]"</a>
+#$lang=eng
+#$flags=0
+msgid "[EDIT MODE OFF]"
+msgstr ""
+
+# 4295054228/5000000001:15    <a class="agni_edit_panel" href="<?surl $edit_gid => "":>">__"[EDIT MODE]"</a>
+#$lang=eng
+#$flags=0
+msgid "[EDIT MODE]"
+msgstr ""
+
+# 4/8589934641:33         $arg{link} || __"[EDIT&#160;SOURCE]",
+#$lang=eng
+#$flags=0
+msgid "[EDIT&#160;SOURCE]"
+msgstr ""
+
+# 2/8589934641:1 <?client_edit_slink __"[EDIT]",  $ref, "text/plain", extension => ".txt":>
+# 4294989694/8589934641:3 <:{{editor/app}}->edit_object(__"[EDIT]", $$ref, "configure"):>
+# 5100002189/8589934641:2      $arg{linktext} || __"[EDIT]",
+# 5100002571/8589934641:2      $arg{linktext} || __"[EDIT]",
+#$lang=eng
+#$flags=0
+msgid "[EDIT]"
+msgstr ""
+
+# 8589935640/8589934641:2      $arg{link} || __"[Edit]",
+#$lang=eng
+#$flags=0
+msgid "[Edit]"
+msgstr ""
+
+# 4294989694/8589934642:4 __"[NULL]"
+# 4295048763/8589934641:3                0 => __"[NULL]",
+# 4295048763/8589934642:13    __"[NULL]"
+# 5100000280/8589934641:13                 $arg{allow_null} ? (undef, __"[NULL]") : ();
+# 5100000280/8589934642:8    __"[NULL]"
+# 8589935642/959:33       :>__"[NULL]"<:
+# 8589935642/5100000013:20 __"[NULL]"
+#$lang=eng
+#$flags=0
+msgid "[NULL]"
+msgstr ""
+
+# 4295054228/5000000001:17    <a class="agni_edit_panel" href="<?surl:>">__"[REFRESH]"</a>
+#$lang=eng
+#$flags=0
+msgid "[REFRESH]"
+msgstr ""
+
+# 8589935138/4294967396:17       <td><?slink __"[REMOVE]", {:$self->remove(obj $_[0]):}($gid):></td>
+#$lang=eng
+#$flags=0
+msgid "[REMOVE]"
+msgstr ""
+
+# 8589935642/5100000013:4 <:$env->retlink:> <?slink __"[Refresh]":><br/>
+#$lang=eng
+#$flags=0
+msgid "[Refresh]"
+msgstr ""
+
+# 51539607582/4294967396:17 <?slink __"[UPLOAD]", {{util::show_proxy}}->sa_call ($self, "configure_upload"):>
+#$lang=eng
+#$flags=0
+msgid "[UPLOAD]"
+msgstr ""
+
+# 8589935642/4294967396:19 <?slink __"[Upload]", {{util::show_proxy}}->sa_call ($self, "module_upload"):>
+#$lang=eng
+#$flags=0
+msgid "[Upload]"
+msgstr ""
+
+# 51539608840/51539609515:11          <?slink __"[delete]",
+#$lang=eng
+#$flags=0
+msgid "[delete]"
+msgstr ""
+
+# 51539610300/4295053935:142 #         <?slink escape_html __"[device table]",   $env->sa_module (undef):>
+#$lang=eng
+#$flags=0
+msgid "[device table]"
+msgstr ""
+
+# 51539610300/4295053935:140 #         <?slink escape_html __"[display config]", $env->sa_module ('col_config'):>
+#$lang=eng
+#$flags=0
+msgid "[display config]"
+msgstr ""
+
+# 51539608832/8589934641:11    <?slink $img . " " . __"[fold]" . " " . $img, 
+#$lang=eng
+#$flags=0
+msgid "[fold]"
+msgstr ""
+
+# 51539610300/4295053935:143 #         <?slink escape_html __"[network config]", $env->sa_module ('network_config'):>
+#$lang=eng
+#$flags=0
+msgid "[network config]"
+msgstr ""
+
+# 51539610300/4295053935:144 #         <?slink escape_html __"[poller config]",  $env->sa_module ('poller_config'):>
+#$lang=eng
+#$flags=0
+msgid "[poller config]"
+msgstr ""
+
+# 51539610300/4295053935:139 #         <?slink escape_html __"[scanner config]", $env->sa_module ('scan_config'):>
+#$lang=eng
+#$flags=0
+msgid "[scanner config]"
+msgstr ""
+
+# 51539608832/8589934641:3    <?slink $img . " " . __"[unfold]" . " " . $img, 
+#$lang=eng
+#$flags=0
+msgid "[unfold]"
+msgstr ""
+
+# 51539610300/4295053935:141 #         <?slink escape_html __"[user config]",    $env->sa_module ('user_config'):>
+#$lang=eng
+#$flags=0
+msgid "[user config]"
+msgstr ""
+
+# 51539608574/959:45                         <?ef_submit __"add", {:
+#$lang=eng
+#$flags=0
+msgid "add"
+msgstr ""
+
+# 5100002161/5100002159:15 <?slink __"add class instance", {:
+#$lang=eng
+#$flags=0
+msgid "add class instance"
+msgstr ""
+
+# 5100002161/5100002159:11 <?slink __"add object itself", {:
+#$lang=eng
+#$flags=0
+msgid "add object itself"
+msgstr ""
+
+# 5100004697/8589934641:5       2 => __"all tickets";
+#$lang=eng
+#$flags=0
+msgid "all tickets"
+msgstr ""
+
+# 5/24
+#$lang=eng
+#$flags=0
+msgid "args"
+msgstr ""
+
+# 5100004682/24
+#$lang=eng
+#$flags=0
+msgid "attachments"
+msgstr ""
+
+# 51539609608/24
+#$lang=eng
+#$flags=0
+msgid "auth_userexit"
+msgstr ""
+
+# 51539609609/24
+#$lang=eng
+#$flags=0
+msgid "auth_userexit_timeout"
+msgstr ""
+
+# 51539608575/24
+#$lang=eng
+#$flags=0
+msgid "authenticator"
+msgstr ""
+
+# 47244641103/24
+#$lang=eng
+#$flags=0
+msgid "boot_variant"
+msgstr ""
+
+# 51539610302/4295054043:48 <?ef_submit __"clear", {: $self->{selected_rows} = {} :}():>
+#$lang=eng
+#$flags=0
+msgid "clear"
+msgstr ""
+
+# 4294967312/24
+#$lang=eng
+#$flags=0
+msgid "cols"
+msgstr ""
+
+# 955/24
+# 5100002189/24
+#$lang=eng
+#$flags=0
+msgid "content"
+msgstr ""
+
+# 51539609900/24
+#$lang=eng
+#$flags=0
+msgid "content_type"
+msgstr ""
+
+# 51539608574/959:89       <?slink __"create user", $self->sa_module ("edit_user"), \$self->{edited_user} => undef:>
+#$lang=eng
+#$flags=0
+msgid "create user"
+msgstr ""
+
+# 51539609390/24
+#$lang=eng
+#$flags=0
+msgid "creator"
+msgstr ""
+
+# 51539608837/24
+#$lang=eng
+#$flags=0
+msgid "ctime"
+msgstr ""
+
+# 47244640281/4294967396:15                        86400 => __"d";
+#$lang=eng
+#$flags=0
+msgid "d"
+msgstr ""
+
+# 51539609711/24
+#$lang=eng
+#$flags=0
+msgid "deadline"
+msgstr ""
+
+# 51539608574/959:40                         <?ef_submit __"delete", {:
+#$lang=eng
+#$flags=0
+msgid "delete"
+msgstr ""
+
+# 5100004691/24
+#$lang=eng
+#$flags=0
+msgid "display_info"
+msgstr ""
+
+# 51539608623/24
+#$lang=eng
+#$flags=0
+msgid "dnsupdated_keytab"
+msgstr ""
+
+# 51539608470/5100004465:30       <th align="left" width="10%">__"domain"</th>
+# 51539608470/5100004471:140           __"domain" <?$domain:><br />
+#$lang=eng
+#$flags=0
+msgid "domain"
+msgstr ""
+
+# 51539609421/24
+#$lang=eng
+#$flags=0
+msgid "engineer"
+msgstr ""
+
+# 4294989901/8589934642:1 __"false":>
+#$lang=eng
+#$flags=0
+msgid "false"
+msgstr ""
+
+# 5100002755/4295054043:24 __"finished"
+#$lang=eng
+msgid "finished"
+msgstr "Fertig"
+
+# 51539608470/5100004465:31       <th align="left" width="5%">__"flags"</th>
+#$lang=eng
+#$flags=0
+msgid "flags"
+msgstr ""
+
+# 51539608832/24
+#$lang=eng
+#$flags=0
+msgid "folded"
+msgstr ""
+
+# 4295053824/8589934641:2 __"global":>
+#$lang=eng
+#$flags=0
+msgid "global"
+msgstr ""
+
+# 47244640281/4294967396:14                         3600 => __"h",
+#$lang=eng
+#$flags=0
+msgid "h"
+msgstr ""
+
+# 51539608622/24
+#$lang=eng
+#$flags=0
+msgid "host_keytab"
+msgstr ""
+
+# 8589935313/8589934641:35    '($Y, $M, $D, $h, $m, $s) = Add_Delta_DHMS($Y, $M, $D, $h, $m, $s, 3600)' => __"in 1 Stunde",
+#$lang=eng
+#$flags=0
+msgid "in 1 Stunde"
+msgstr ""
+
+# 8589935313/8589934641:40    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, 7); $h = $m = $s = 0' => __"in 1 Woche",
+#$lang=eng
+#$flags=0
+msgid "in 1 Woche"
+msgstr ""
+
+# 51539609708/8589934641:47    '($Y, $M, $D, $h, $m, $s) = Add_Delta_DHMS($Y, $M, $D, $h, $m, $s, 0, 1, 0, 0)' => __"in 1 hour",
+#$lang=eng
+#$flags=0
+msgid "in 1 hour"
+msgstr ""
+
+# 51539609708/8589934641:52    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, 7); $h = $m = $s = 0' => __"in 1 week",
+#$lang=eng
+#$flags=0
+msgid "in 1 week"
+msgstr ""
+
+# 8589935313/8589934641:36    '($Y, $M, $D, $h, $m, $s) = Add_Delta_DHMS($Y, $M, $D, $h, $m, $s, 2*3600)' => __"in 2 Stunden",
+#$lang=eng
+#$flags=0
+msgid "in 2 Stunden"
+msgstr ""
+
+# 8589935313/8589934641:41    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, 14); $h = $m = $s = 0' => __"in 2 Wochen",
+#$lang=eng
+#$flags=0
+msgid "in 2 Wochen"
+msgstr ""
+
+# 51539609708/8589934641:51    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, 2); $h = $m = $s = 0' => __"in 2 days",
+#$lang=eng
+#$flags=0
+msgid "in 2 days"
+msgstr ""
+
+# 51539609708/8589934641:48    '($Y, $M, $D, $h, $m, $s) = Add_Delta_DHMS($Y, $M, $D, $h, $m, $s, 0, 2, 0, 0)' => __"in 2 hours",
+#$lang=eng
+#$flags=0
+msgid "in 2 hours"
+msgstr ""
+
+# 51539609708/8589934641:53    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, 14); $h = $m = $s = 0' => __"in 2 weeks",
+#$lang=eng
+#$flags=0
+msgid "in 2 weeks"
+msgstr ""
+
+# 8589935313/8589934641:42    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, 21); $h = $m = $s = 0' => __"in 3 Wochen",
+#$lang=eng
+#$flags=0
+msgid "in 3 Wochen"
+msgstr ""
+
+# 51539609708/8589934641:54    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, 21); $h = $m = $s = 0' => __"in 3 weeks",
+#$lang=eng
+#$flags=0
+msgid "in 3 weeks"
+msgstr ""
+
+# 8589935313/8589934641:37    '($Y, $M, $D, $h, $m, $s) = Add_Delta_DHMS($Y, $M, $D, $h, $m, $s, 4*3600)' => __"in 4 Stunden",
+#$lang=eng
+#$flags=0
+msgid "in 4 Stunden"
+msgstr ""
+
+# 8589935313/8589934641:43    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, 28); $h = $m = $s = 0' => __"in 4 Wochen",
+#$lang=eng
+#$flags=0
+msgid "in 4 Wochen"
+msgstr ""
+
+# 51539609708/8589934641:49    '($Y, $M, $D, $h, $m, $s) = Add_Delta_DHMS($Y, $M, $D, $h, $m, $s, 0, 4, 0, 0)' => __"in 4 hours",
+#$lang=eng
+#$flags=0
+msgid "in 4 hours"
+msgstr ""
+
+# 51539609708/8589934641:55    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, 28); $h = $m = $s = 0' => __"in 4 weeks",
+#$lang=eng
+#$flags=0
+msgid "in 4 weeks"
+msgstr ""
+
+# 4295053824/8589934641:2    <?$self->{instance_specific} ? __"instance" : 
+#$lang=eng
+#$flags=0
+msgid "instance"
+msgstr ""
+
+# 4295053825/24
+#$lang=eng
+#$flags=0
+msgid "instance_specific"
+msgstr ""
+
+# 4294989695/24
+#$lang=eng
+#$flags=0
+msgid "journal"
+msgstr ""
+
+# 51539608470/5100004465:32       <th align="left" width="5%">__"lang"</th>
+#$lang=eng
+#$flags=0
+msgid "lang"
+msgstr ""
+
+# 51539609708/8589934641:56    '$D = Days_in_Month($Y,$M); $h = $m = $s = 0' => __"last of month",
+#$lang=eng
+#$flags=0
+msgid "last of month"
+msgstr ""
+
+# 8589935313/8589934641:44    '$D = Days_in_Month($Y,$M); $h = $m = $s = 0' => __"letzer des Monats",
+#$lang=eng
+#$flags=0
+msgid "letzer des Monats"
+msgstr ""
+
+# 5100004499/24
+#$lang=eng
+#$flags=0
+msgid "license_key"
+msgstr ""
+
+# 47244640281/4294967396:13                           60 => __"m",
+#$lang=eng
+#$flags=0
+msgid "m"
+msgstr ""
+
+# 51539608470/5100004465:33       <th align="left" width="40%">__"message"</th>
+#$lang=eng
+#$flags=0
+msgid "message"
+msgstr ""
+
+# 51539608080/24
+#$lang=eng
+#$flags=0
+msgid "mtime_gui"
+msgstr ""
+
+# 24/24
+#$lang=eng
+#$flags=0
+msgid "name"
+msgstr ""
+
+# 5100004681/24
+#$lang=eng
+#$flags=0
+msgid "nickname"
+msgstr ""
+
+# 51539608470/5100004461:74       $slang or echo '<br /><font color="red">', __"no source languages selected", '</font>';
+#$lang=eng
+#$flags=0
+msgid "no source languages selected"
+msgstr ""
+
+# 5100004697/8589934641:3       0 => __"no tickets",
+#$lang=eng
+#$flags=0
+msgid "no tickets"
+msgstr ""
+
+# 51539608470/5100004461:49       $tdom or echo '<br /><font color="red">', __"no translation domain selected", '</font>';
+#$lang=eng
+#$flags=0
+msgid "no translation domain selected"
+msgstr ""
+
+# 4295053950/24
+#$lang=eng
+#$flags=0
+msgid "obj"
+msgstr ""
+
+# 47244640281/4294967396:7 <?escape_html $self->{type}->name:> __"older than" 
+#$lang=eng
+#$flags=0
+msgid "older than"
+msgstr ""
+
+# 5100004697/8589934641:4       1 => __"own tickets",
+#$lang=eng
+#$flags=0
+msgid "own tickets"
+msgstr ""
+
+# 51539607832/24
+# 51539610470/24
+#$lang=eng
+#$flags=0
+msgid "owner"
+msgstr ""
+
+# 5100000431/24
+#$lang=eng
+#$flags=0
+msgid "priority"
+msgstr ""
+
+# 5100004810/24
+#$lang=eng
+#$flags=0
+msgid "privileges"
+msgstr ""
+
+# 51539607844/24
+#$lang=eng
+#$flags=0
+msgid "product_grp"
+msgstr ""
+
+# 47244640281/4294967396:12    ef_selectbox \$div,     1 => __"s",
+#$lang=eng
+#$flags=0
+msgid "s"
+msgstr ""
+
+# 9/24
+#$lang=eng
+#$flags=0
+msgid "sqlcol"
+msgstr ""
+
+# 51539609352/24
+#$lang=eng
+#$flags=0
+msgid "status"
+msgstr ""
+
+# 5100002571/24
+#$lang=eng
+#$flags=0
+msgid "stylesheet"
+msgstr ""
+
+# 51539608920/24
+#$lang=eng
+#$flags=0
+msgid "subject"
+msgstr ""
+
+# 51539608459/4294967396:18          or die __"the passwords do not match!\n";
+#$lang=eng
+#$flags=0
+msgid "the passwords do not match!\n"
+msgstr ""
+
+# 51539608470/5100004465:34       <th align="left" width="40%">__"translation"</th>
+#$lang=eng
+#$flags=0
+msgid "translation"
+msgstr ""
+
+# 4294989836/8589934641:1 __"translation style:"
+#$lang=eng
+#$flags=0
+msgid "translation style:"
+msgstr ""
+
+# 4294989901/8589934642:1 <?$value ? __"true" : 
+#$lang=eng
+#$flags=0
+msgid "true"
+msgstr ""
+
+# 4294989913/24
+#$lang=eng
+#$flags=0
+msgid "type"
+msgstr ""
+
+# 9/8589934641:17 [<?sprintf __"unable to edit, %d attributes of this type exist", $cnt:>]
+#$lang=eng
+#$flags=0
+msgid "unable to edit, %d attributes of this type exist"
+msgstr ""
+
+# 4295053864/24
+#$lang=eng
+#$flags=0
+msgid "usecnt"
+msgstr ""
+
+# 8589935313/8589934641:32    '($Y, $M, $D, $h, $m, $s) = Add_Delta_DHMS($Y, $M, $D, $h, $m, $s, -3600)' => __"vor 1 Stunde",
+#$lang=eng
+#$flags=0
+msgid "vor 1 Stunde"
+msgstr ""
+
+# 8589935313/8589934641:27    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, -7); $h = $m = $s = 0' => __"vor 1 Woche",
+#$lang=eng
+#$flags=0
+msgid "vor 1 Woche"
+msgstr ""
+
+# 8589935313/8589934641:31    '($Y, $M, $D, $h, $m, $s) = Add_Delta_DHMS($Y, $M, $D, $h, $m, $s, -2*3600)' => __"vor 2 Stunden",
+#$lang=eng
+#$flags=0
+msgid "vor 2 Stunden"
+msgstr ""
+
+# 8589935313/8589934641:26    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, -14); $h = $m = $s = 0' => __"vor 2 Wochen",
+#$lang=eng
+#$flags=0
+msgid "vor 2 Wochen"
+msgstr ""
+
+# 8589935313/8589934641:25    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, -21); $h = $m = $s = 0' => __"vor 3 Wochen",
+#$lang=eng
+#$flags=0
+msgid "vor 3 Wochen"
+msgstr ""
+
+# 8589935313/8589934641:30    '($Y, $M, $D, $h, $m, $s) = Add_Delta_DHMS($Y, $M, $D, $h, $m, $s, -4*3600)' => __"vor 4 Stunden",
+#$lang=eng
+#$flags=0
+msgid "vor 4 Stunden"
+msgstr ""
+
+# 8589935313/8589934641:24    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, -28); $h = $m = $s = 0' => __"vor 4 Wochen",
+#$lang=eng
+#$flags=0
+msgid "vor 4 Wochen"
+msgstr ""
+
+# 51539609708/8589934641:41    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, -1); $h = $m = $s = 0' => __"yesterday",
+#$lang=eng
+#$flags=0
+msgid "yesterday"
+msgstr ""
+
+# 8589935313/8589934641:39    '($Y, $M, $D) = Add_Delta_Days($Y, $M, $D, 2); $h = $m = $s = 0' => __"Übermorgen",
+#$lang=eng
+#$flags=0
+msgid "Übermorgen"
+msgstr ""
+

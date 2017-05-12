@@ -1,0 +1,22 @@
+---
+abstract: 'A POE Filter for the Redis protocol'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+  - 'Rocco Caputo <rcaputo@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Filter-Redis
+requires:
+  POE: 1.299
+  perl: v5.8.5
+resources:
+  homepage: http://github.com/bingos/poe-filter-redis/tree
+  repository: git://github.com/bingos/poe-filter-redis.git
+version: 0.02

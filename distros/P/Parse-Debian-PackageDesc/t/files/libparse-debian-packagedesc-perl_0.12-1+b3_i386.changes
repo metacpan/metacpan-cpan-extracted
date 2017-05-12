@@ -1,0 +1,42 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+Format: 1.8
+Date: Tue, 10 Aug 2010 16:40:00 +0200
+Source: libparse-debian-packagedesc-perl (0.12-1)
+Binary: libparse-debian-packagedesc-perl
+Architecture: source all
+Version: 0.12-1+b3
+Distribution: unstable
+Urgency: low
+Maintainer: Esteban Manchado Velázquez (Debian packaging) <estebanm@opera.com>
+Changed-By: Esteban Manchado Velázquez (Debian packaging) <estebanm@opera.com>
+Description: 
+ libparse-debian-packagedesc-perl - Parses Debian changes and source package files
+Changes: 
+ libparse-debian-packagedesc-perl (0.12-1+b3) unstable; urgency=low
+ .
+   * New upstream release
+Checksums-Sha1: 
+ 2631224ab677ef9d0ca7edf4611bfe408464466f 1268 libparse-debian-packagedesc-perl_0.12-1.dsc
+ 17c9e2b39d40a3095c45568a43097586fe2a59e5 7328 libparse-debian-packagedesc-perl_0.12.orig.tar.gz
+ cb5aa66ac6f871e194073842918f30de7f5e23b6 1838 libparse-debian-packagedesc-perl_0.12-1.diff.gz
+ f4aed10351b2acc40efa55489dc6ecd23acaa7af 9248 libparse-debian-packagedesc-perl_0.12-1+b3_all.deb
+Checksums-Sha256: 
+ aa262c5c8e1859ccb3d69c04f514e0c74e06498efcb55aeaab95bd0bf1ab7d29 1268 libparse-debian-packagedesc-perl_0.12-1.dsc
+ deb19523afedf87ac1d22ea84204f364e11e45c9db67188bbc58421073c15495 7328 libparse-debian-packagedesc-perl_0.12.orig.tar.gz
+ 40357dccb74bf1b8f8dbc8ea3eb4ec08c581adaad52bff5ed816a9d1a8588c6e 1838 libparse-debian-packagedesc-perl_0.12-1.diff.gz
+ 54b2150cf3ac6921680b6f0945c88dcb06de2e25c8d38d87a1deb32d606b7744 9248 libparse-debian-packagedesc-perl_0.12-1+b3_all.deb
+Files: 
+ de786854b8c97aa730af2a1f2beea2c8 1268 perl optional libparse-debian-packagedesc-perl_0.12-1.dsc
+ 9ad67f4e4e32b0bbf5b84e1242eab384 7328 perl optional libparse-debian-packagedesc-perl_0.12.orig.tar.gz
+ b8c74f9a31c061c570ed0ea409ecd1ee 1838 perl optional libparse-debian-packagedesc-perl_0.12-1.diff.gz
+ b6b10bd77f08cff5744b7e7e1e8dfead 9248 perl optional libparse-debian-packagedesc-perl_0.12-1+b3_all.deb
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkxhZ+4ACgkQO6uzhIvE4pqeVgCbBwvHLD38i7kIIq+YyB8UQ0kd
+zekAniMDkWB3UU//oBz5MXMyudOvR6D7
+=DpDJ
+-----END PGP SIGNATURE-----

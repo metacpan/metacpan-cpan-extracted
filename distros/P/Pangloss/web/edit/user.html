@@ -1,0 +1,160 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+
+	<head>
+		<title>Pangloss : Editor : User Detail</title>
+		<link rel="stylesheet" href="/pcie.css"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	</head>
+
+	<body bottommargin="0" topmargin="0" leftmargin="0" rightmargin="0" marginheight="0" marginwidth="0">
+
+		<xi:include href="../header.html"/>
+
+<!-- START OF PAGE BODY .............................................. -->
+		<table border="0" cellpadding="0" cellspacing="0" width="100%" height="90%">
+			<tr><td valign="top" height="19"><span class="vsmall"> </span></td></tr>
+			<tr>
+				<td valign="top" width="15"><span class="vsmall"> </span></td>
+				<td valign="top" petal:if="view">
+				  <h1>User Detail</h1>
+
+					<xi:include href="../user-error.html"/>
+
+					<span petal:if="true: view/user">
+
+ 						<?var name="set: can_edit session/user/is_admin"?>
+
+						<form method="post" action="user.html">
+							<input type="hidden" name="selected_user" value="$view/user/key"/>
+							<input type="hidden" name="list_languages" value="1"/>
+							<span petal:if="view/user/modified" style="color: green">User modified.</span>
+							<span petal:if="view/user/removed" style="color: red">User removed.</span>
+							<table style="border: solid 1px" width="50%" cellpadding="0" cellspacing="0">
+								<tr>
+									<td align="left"  style="background-color: lightblue; border-bottom: solid 1px">User Details:</td>
+									<td align="right" style="background-color: lightblue; border-bottom: solid 1px"><input type="submit" name="remove_user" value="remove user" petal:if="true: can_edit; false: view/user/removed"/> </td>
+								</tr>
+								<tr>
+									<td>User Id:</td>
+									<td>
+										<input petal:if="can_edit" type="text" size="20" name="new_user_id" value="$view/user/id"/>
+										<span petal:if="false: can_edit" petal:replace="view/user/id">id</span>
+									</td>
+								</tr>
+								<tr>
+									<td>Full Name:</td>
+									<td>
+										<input petal:if="can_edit" type="text" size="20" name="new_user_name" value="$view/user/name"/>
+										<span petal:if="false: can_edit" petal:replace="view/user/name">name</span>
+									</td>
+								</tr>
+								<tr>
+									<td>Creator:</td>
+									<td>$view/user/creator</td>
+								</tr>
+								<tr>
+									<td>Created:</td>
+									<td><span class="small" petal:content="date: $view/user/date">date</span></td>
+								</tr>
+								<tr><td colspan="2" height="9" class="vsmall"> </td></tr>
+								<tr><td colspan="2" style="background-color: lightblue; border-bottom: solid 1px">Privileges:</td></tr>
+								<tr>
+									<td>Add Concepts:</td>
+									<td>
+										<input petal:if="can_edit" type="checkbox" name="new_user_add_concepts" petal:attributes="checked true: $view/user/privileges/add_concepts;"/>
+										<span petal:if="false: can_edit"><?if name="view/user/privileges/add_concepts"?>yes<?else?>no<?end?></span>
+									</td>
+								</tr>
+								<tr>
+									<td>Add Categories:</td>
+									<td>
+										<input petal:if="can_edit" type="checkbox" name="new_user_add_categories" petal:attributes="checked true: $view/user/privileges/add_categories;"/>
+										<span petal:if="false: can_edit"><?if name="view/user/privileges/add_categories"?>yes<?else?>no<?end?></span>
+									</td>
+								</tr>
+								<tr>
+									<td style="background-color: #d99">Admin:</td>
+									<td style="background-color: #d99">
+										<input petal:if="can_edit" type="checkbox" name="new_user_admin" petal:attributes="checked true: $view/user/privileges/admin"/>
+										<span petal:if="false: can_edit"><?if name="view/user/privileges/admin"?>yes<?else?>no<?end?></span>
+									</td>
+								</tr>
+							</table>
+
+							<p/>
+							<table width="50%" cellpadding="0" cellspacing="0">
+								<tr>
+									<td valign="top" width="49%">
+										<table width="100%" style="border: solid 1px" cellpadding="0" cellspacing="0">
+											<tr><td colspan="2" style="background-color: lightblue; border-bottom: solid 1px">Translate Languages:</td></tr>
+											<tr petal:if="view/languages">
+												<td valign="top" width="50%">
+													<span class="medium" petal:repeat="language view/languages">
+														<div petal:if="__odd__">
+															<span petal:if="can_edit"><input type="checkbox" name="new_user_translate_$language/iso_code" value="$language/iso_code" petal:attributes="checked true: view/user/privileges/can_translate language;"/>$language/name</span>
+															<span petal:if="false: can_edit; true: view/user/privileges/can_translate language;" petal:replace="language/name">name</span>
+														</div>
+													</span>
+												</td>
+												<td valign="top" width="50%">
+													<span class="medium" petal:repeat="language view/languages">
+														<div petal:if="__even__">
+															<span petal:if="can_edit"><input type="checkbox" name="new_user_translate_$language/iso_code" value="$language/iso_code" petal:attributes="checked true: view/user/privileges/can_translate language;"/>$language/name</span>
+															<span petal:if="false: can_edit; true: view/user/privileges/can_translate language;" petal:replace="language/name">name</span>
+														</div>
+													</span>
+												</td>
+											</tr>
+										</table>
+									</td>
+									<td valign="top" width="2%"> </td>
+									<td valign="top" width="49%">
+										<table width="100%" style="border: solid 1px" cellpadding="0" cellspacing="0">
+											<tr><td colspan="2" style="background-color: lightblue; border-bottom: solid 1px">Proofread Languages:</td></tr>
+											<tr petal:if="view/languages">
+												<td valign="top" width="50%">
+													<span class="medium" petal:repeat="language view/languages">
+														<div petal:if="__odd__" petal:set="is_checked view/user/privileges/proofread_languages/en;">
+															<span petal:if="can_edit"><input type="checkbox" name="new_user_proofread_$language/iso_code" value="$language/iso_code" petal:attributes="checked true: view/user/privileges/can_proofread language;"/>$language/name</span>
+															<span petal:if="false: can_edit; true: view/user/privileges/can_proofread language;" petal:replace="language/name">name</span>
+														</div>
+													</span>
+												</td>
+												<td valign="top" width="50%">
+													<span class="medium" petal:repeat="language view/languages">
+														<div petal:if="__even__">
+															<span petal:if="can_edit"><input type="checkbox" name="new_user_proofread_$language/iso_code" value="$language/iso_code" petal:attributes="checked true: view/user/privileges/can_proofread language;"/>$language/name</span>
+															<span petal:if="false: can_edit; true: view/user/privileges/can_proofread language;" petal:replace="language/name">name</span>
+														</div>
+													</span>
+												</td>
+											</tr>
+										</table>
+									</td>
+								</tr>
+							</table>
+							<table width="50%" petal:if="true: can_edit; false: view/user/removed">
+								<tr><td align="center"><input type="submit" name="modify_user" value="modify user"/></td></tr>
+							</table>
+						</form>
+
+					</span>
+
+					<div petal:if="false: view/user" class="error">
+						Application Error: no user present in view!
+					</div>
+
+				</td>
+				<td valign="top" petal:if="false: view">
+					<div class="error">Application Error: no view present!</div>
+				</td>
+				<td valign="top" width="15"><span class="vsmall"> </span></td>
+			</tr>
+		</table>
+<!-- END OF PAGE BODY .............................................. -->
+
+	<xi:include href="../footer.html"/>
+
+  </body>
+</html>

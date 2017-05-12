@@ -1,0 +1,125 @@
+## name Non-bitwise ops are OK
+## failures 0
+## cut
+
+$a->{foo};
+$a++;
+++$a;
+$a--;
+--$a;
+$a ** $b;
+$a =~ m/./;
+$a !~ m/./;
+$a * $b;
+$a / $b;
+$a % $b;
+$a x $b;
+$a + $b;
+$a - $b;
+$a . $b;
+$a > $b;
+$a < $b;
+$a <= $b;
+$a >= $b;
+$a lt $b;
+$a gt $b;
+$a le $b;
+$a ge $b;
+$a == $b;
+$a != $b;
+$a <=> $b;
+$a eq $b;
+$a ne $b;
+$a cmp $b;
+$a ~~ $b;
+$a && $b;
+$a || $b;
+$a // $b;
+$a .. $b;
+$a ... $b;
+$a ? 1 : 2;
+$a = $b;
+$a **= $b;
+$a += $b;
+$a -= $b;
+$a .= $b;
+$a *= $b;
+$a /= $b;
+$a %= $b;
+$a x= $b;
+$a &&= $b;
+$a ||= $b;
+$a //= $b;
+$a, $b;
+$a = { foo => 'bar' };
+$a not $b;
+$a and $b;
+$a or $b;
+$a xor $b;
+
+#-----------------------------------------------------------------------------
+
+## name Bitwise OR failure
+## failures 1
+## cut
+
+$c = $a | $b;
+
+#-----------------------------------------------------------------------------
+
+## name Bitwise AND failure
+## failures 1
+## cut
+
+$c = $a & $b;
+
+#-----------------------------------------------------------------------------
+
+## name Bitwise XOR failure
+## failures 1
+## cut
+
+$c = ^$b;
+
+#-----------------------------------------------------------------------------
+
+## name Bitwise NEGATE failure
+## failures 1
+## cut
+
+$c = ^$b;
+
+#-----------------------------------------------------------------------------
+
+## name Bitwise AUGUMENTED ASSIGNMENT OR failure
+## failures 1
+## cut
+
+$c |= $b;
+
+#-----------------------------------------------------------------------------
+
+## name Bitwise AUGUMENTED ASSIGNMENT AND failure
+## failures 1
+## cut
+
+$c &= 1;
+
+#-----------------------------------------------------------------------------
+
+## name Bitwise AUGUMENTED ASSIGNMENT XOR failure
+## failures 1
+## cut
+
+$c ^= $b;
+
+#-----------------------------------------------------------------------------
+## name All other bitwise ops are OK
+## failures 0
+## cut
+
+$a << 1;
+$a >> 1;
+$a <<= 1;
+$a >>= 1;
+

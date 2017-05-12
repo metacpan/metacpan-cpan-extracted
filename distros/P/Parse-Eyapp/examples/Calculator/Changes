@@ -1,0 +1,6 @@
+Revision history for Perl extension Math::Calc.
+
+0.01  Wed Oct 29 10:07:42 2008
+	- original version; created by h2xs 1.23 with options
+		-XA -n Math::Calc
+

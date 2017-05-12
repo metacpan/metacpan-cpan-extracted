@@ -1,0 +1,45 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" >
+<title>Authentification</title>
+
+<script type="text/javascript" src="../../lib/prototype.js"></script>
+<script type="text/javascript" src="../../lib/scriptaculous.js"></script>
+<script type="text/javascript" src="../../lib/unittest.js"></script>
+<script type="text/javascript" src="../../src/util.js"></script>
+<script type="text/javascript" src="../../src/select_widget.js"></script>
+
+<link rel="stylesheet" href="../test.css" type="text/css" />
+  
+</head>
+<body>
+<p>Test util.js</p>
+<!-- Log output -->
+<div id="testlog"> </div>
+
+<div id="formated">
+</div>
+<script type="text/javascript">
+
+// --------------------------------------------------------
+new Test.Unit.Runner( {
+    
+    // Loaded
+    test_loaded: function() { 
+        this.assertNotNull( SelectWidget.prototype.on_blur, 
+                                    "SelectWidget class is defined" );
+    },
+    
+    // ------------
+    test_last: function() {
+        Element.hide( $( "formated" ) );
+        this.assertNotVisible( $( 'formated' ) );
+    }
+    
+  }, "testlog" );
+
+
+    
+</script>
+</body>

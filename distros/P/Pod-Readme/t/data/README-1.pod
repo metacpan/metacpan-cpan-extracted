@@ -1,0 +1,11 @@
+=head1 NAME
+
+Test - this is a test
+
+=head1 DESCRIPTION
+
+This is a sample file for testing. Please ignore.
+
+=head2 A heading
+
+Nothing to see here.

@@ -1,0 +1,16 @@
+Changes
+lib/PGObject/Type/ByteString.pm
+LICENSE
+Makefile.PL
+MANIFEST                        This list of files
+README
+t/00-load.t
+t/01-constructor.t
+t/02-registration.t
+t/03-dbtests.t
+t/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+t/data/non-ascii-non-utf8
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

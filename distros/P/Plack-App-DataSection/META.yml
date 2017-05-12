@@ -1,0 +1,46 @@
+---
+abstract: 'psgi application for serving contents in data section'
+author:
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+build_requires:
+  HTTP::Message: 0
+  Plack: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.3, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-App-DataSection
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Plack::App::DataSection:
+    file: lib/Plack/App/DataSection.pm
+    version: 0.05
+requires:
+  Data::Section::Simple: 0
+  HTTP::Date: 0
+  MIME::Base64: 0
+  Path::Class: 0
+  Plack: 0
+  autodie: 0
+  parent: 0
+resources:
+  bugtracker: https://github.com/Songmu/p5-Plack-App-DataSection/issues
+  homepage: https://github.com/Songmu/p5-Plack-App-DataSection
+  repository: git://github.com/Songmu/p5-Plack-App-DataSection.git
+version: 0.05

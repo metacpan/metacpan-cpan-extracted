@@ -1,0 +1,15 @@
+0 this text should be %%VERSION%% here
+0 this text should also be %%VERSION%%
+#--------------------------------------------------------------------------#
+=over
+
+=item 1.
+
+this text should be 3.14 here
+
+=item 2.
+
+this text should also be 3.14
+
+=back
+

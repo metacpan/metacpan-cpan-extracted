@@ -1,0 +1,26 @@
+---
+abstract: "a port of Apache2's AddDefaultCharset"
+author:
+  - 'Kazuho Oku <kazuhooku {at} gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.93'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-AddDefaultCharset
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Plack: 0.9925
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

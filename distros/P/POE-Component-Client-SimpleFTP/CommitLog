@@ -1,0 +1,78 @@
+==================================================
+Changes from 2013-11-05 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2014-11-05 06:24:01 +0000
+------------------------------------------
+
+  Change: 9ec2c28325fa155d9f2840343f047b4f0788712c
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 22:23:55 +0000
+
+    fix variable typo 
+
+  Change: e3e79ed6149a35d9159674f0afc295908d192900
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 22:09:53 +0000
+
+    fix more pending command data woes 
+
+  Change: d54cc8e7561e13e4b7b2bafaf5459ab118f7ae70
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 21:52:01 +0000
+
+    dont process input if shutting down 
+
+  Change: 5a96a2df3f9241652280174242d2f1539e163001
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 21:44:35 +0000
+
+    fix the connected event 
+
+  Change: 233d07cb2c153f00c643f742bb4c443201cd3df4
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 21:37:58 +0000
+
+    provide the login banner to the authenticated event 
+
+  Change: 0d271a16470e48f5498d3cc655a1502f808aa42c
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 21:25:24 +0000
+
+    dont include the last multi-line numeric 
+
+  Change: b89e830938b4cd543b6535bb403d0427701b5d17
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 21:19:01 +0000
+
+    handle the case where ftpd sends/closes complex data before the
+    command data 
+
+  Change: c9d946a203564d6c0c2e22453ca356ba31656674
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 20:33:25 +0000
+
+    tweak debug printouts 
+
+  Change: f83ad93115c281934c354ba8ef8a0f9ac7c47254
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 20:30:45 +0000
+
+    fix multi-line handling 
+
+  Change: b7f09be7be3a3ef4668c186170a17c6d65ea0292
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 19:07:31 +0000
+
+    updates 
+
+  Change: 23a8b9bc093e6875a3a28b5526cbe9f2e098d4ec
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2011-05-04 16:52:52 +0000
+
+    minor doc tweak to the yield method 
+
+================================================
+Plus 3 releases after 2013-11-05 00:00:00 +0000.
+================================================

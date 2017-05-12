@@ -1,0 +1,1274 @@
+=head1 NOME
+
+perlpacktut - tutorial su C<pack> e C<unpack>
+
+=head1 DESCRIZIONE
+
+C<pack> e C<unpack> sono due funzioni adatte a trasformare dati
+secondo un modello definito dall'utente, partendo dal modo vincolato
+in cui Perl immagazzina i valori verso una qualche rappresentazione
+ben definita che potrebbe essere richiesto nell'ambito di un
+programma Perl. Sfortunatamente, sono anche due delle funzioni peggio
+comprese e spesso ignorate, disponibili in Perl. Questo tutorial
+provvederE<agrave> a demistificarvele.
+
+=head1 Il Principio Base
+
+La maggior parte dei linguaggi di programmazione non protegge la
+memoria in cui sono immagazzinate le variabili. In C, ad esempio,
+potete prendere l'indirizzo di una variabile, e l'operatore C<sizeof>
+vi dirE<agrave> quanti ottetti le sono allocati. Utilizzando indirizzo e
+dimensione, potete accedere la memoria che la immagazzina come
+vi pare e piace.
+
+In Perl, non potete accedere la memoria cosE<igrave> a casaccio, ma la
+conversione di struttura e di rappresentazione fornita da C<pack> e
+C<unpack> rappresenta un'eccellente alternativa. La funzione C<pack>
+converte i valori verso una sequenza di ottetti che contiene delle
+rappresentazioni in base ad una specifica prestabilita, il cosiddetto argomento
+"modello". C<unpack> E<egrave> il processo inverso, in cui si derivano alcuni
+valori a partire dal contenuto di una stringa di ottetti. (Fate
+attenzione, comunque, perchE<eacute> non tutto ciE<ograve> che viene I<impacchettato>
+puE<ograve> essere I<spacchettato> in maniera pulita - un'esperienza piuttosto
+comune che i viaggiatori esperti possono facilmente confermare).
+
+PerchE<eacute>, potreste chiedere, si dovrebbe avere bisogno di avere un pezzo
+di memoria che contiene valori in rappresentazione binaria? Una buona
+ragione riguarda l'accesso in ingresso ed uscita ad un file, un
+dispositivo o una connessione di rete, laddove questa rappresentazione
+binaria E<egrave> obbligatoria o vi porta qualche beneficio in termini di
+elaborazione. Un'altra ragione puE<ograve> essere il passaggio di dati ad
+una chiamata di sistema che non E<egrave> disponibile come funzione Perl:
+C<syscall> esige che forniate i parametri nel modo in cui si fa
+in un programma C. Anche l'elaborazione di testi (come vedremo nella
+prossima sezione) puE<ograve> risultare piE<ugrave> semplice con un uso oculato
+di queste due funzioni.
+
+Per vedere come funziona l'impacchettamento (o lo spacchettamento),
+cominciamo con un modello semplice dove la conversione E<egrave> basilare:
+tra il contenuto di una sequenza di ottetti ed una stringa di
+caratteri esadecimali. Utilizziamo C<unpack>, poichE<eacute> E<egrave> facile
+che vi ricordi un programma di I<dump> [termine usualmente utilizzato
+per indicare la stampa o il salvataggio di un'area di memoria, NdT],
+o qualche ultimo disperato messaggio quale sono soliti lanciarvi gli sfortunati
+programmi appena prima di volare in paradiso.
+Assumendo che la variabile C<$mem> contenga una sequenza di ottetti
+che vorremmo ispezionare senza fare alcuna ipotesi sul suo significato
+[ossia, sul suo contenuto, NdT], possiamo scrivere
+
+   my( $esadecimale ) = unpack( 'H*', $mem );
+   print "$esadecimale\n";
+
+dove potremmo ritrovarci qualcosa come la seguente, con ciascuna coppia
+di cifre esadecimali corrispondente ad un singolo ottetto:
+
+   41204d414e204120504c414e20412043414e414c2050414e414d41
+
+Cosa c'era in quella zona di memoria? Numeri, caratteri o una mistura dei
+due? Assumendo di trovarci su un computer dove viene utilizzata la
+codifica ASCII (o una simile): i valori esadecimali nell'intervallo
+C<0x40> - C<0x5A> indicano una lettera maiuscola, C<0x20> codifica
+uno spazio. Possiamo quindi assumere che si tratti di un brano di testo,
+che alcuni sono in grado di leggere come un giornale;
+altri, invece, hanno bisogno di mettere le mani su una tabella ASCII
+e rivivere quella sensazione da pivelli. Senza preoccuparci troppo di
+come riuscire a leggerlo, osserviamo che C<unpack> con il codice
+modello C<H> converte il contenuto di una sequenza di ottetti nella
+notazione esadecimale. PoichE<eacute> "una sequenza di" E<egrave> un'indicazione
+piuttosto vaga della quantitE<agrave> di ottetti, C<H> E<egrave> definito per la
+conversione di un'unica cifra esadecimale, a meno che non sia seguito
+da un contatore di ripetizione. Un asterisco come contatore di
+ripetizione significa utilizzare qualsiasi carattere resti.
+
+L'operazione inversa - impacchettare un contenuto in ottetti da una
+stringa di cifre esadecimali - si scrive altrettanto facilmente. Ad
+esempio:
+
+   my $s = pack( 'H2' x 10, map { "3$_" } ( 0..9 ) );
+   print "$s\n";
+
+PoichE<eacute> forniamo a C<pack> una lista di dieci stringhe esadecimali da due
+caratteri l'una, il modello di impacchettamento dovrebbe contenere dieci
+codici. Se lo eseguiamo su un computer con la codifica dei caratteri
+ASCII, stamperE<agrave> C<0123456789>.
+
+
+=head1 Impacchettare Testo
+
+Supponiamo che dobbiate leggere un file di dati come questo:
+
+    Data      |Descrizione                |Entrate|Uscite
+    01/24/2001 Emporio Cammelli di Ahmed               1147.99
+    01/28/2001 Spray per le pulci                        24.99
+    01/29/2001 Giro cammello per turisti   1235.00
+
+Come farlo? Per iniziare, potreste pensare di utilizzare C<split>;
+comunque, poichE<eacute> C<split> raggruppa campi vuoti, non saprete mai se
+un record era relativo alle entrate o alle uscite. Oops. Bene, potreste
+sempre utilizzare C<substr>:
+
+    while (<>) { 
+        my $data    = substr($_,  0, 11);
+        my $descr   = substr($_, 12, 27);
+        my $entrate = substr($_, 40,  7);
+        my $uscite  = substr($_, 52,  7);
+        ...
+    }
+
+Non E<egrave> proprio da ridere, eh? Infatti, E<egrave> peggio di quanto possa
+sembrare: chi ha la vista aguzza puE<ograve> aver notato che il primo campo
+E<egrave> ampio solo 10 caratteri, e che l'errore si E<egrave> propagato
+attraverso gli altri valori - che dobbiamo contare a mano. Quindi, risulta
+soggetto ad errore cosE<igrave> come risulta terribilmente ostile.
+
+Potremmo anche utilizzare alcune espressioni regolari:
+
+    while (<>) { 
+        my($data, $descr, $entrate, $uscite) = 
+            m|(\d\d/\d\d/\d{4}) (.{27}) (.{7})(.*)|;
+        ...
+    }
+
+Urgh. Va un po' meglio ma - beh, vi piacerebbe doverci fare manutenzione?
+
+Ehi, ma Perl non dovrebbe semplificare questo genere di cose? Beh, lo fa
+se utilizzate gli strumenti adatti. C<pack> e C<unpack> sono progettati
+per aiutarvi quando avete a che fare con dati a lunghezza fissa come
+quelli nell'esempio dato. Diamo un'occhiata alla soluzione con C<unpack>:
+
+    while (<>) { 
+        my($data, $descr, $entrate, $uscite) = unpack("A10xA27xA7A*", $_);
+        ...
+    }
+
+Sembra giE<agrave> meglio, ma dobbiamo smontare quello strano modello.
+Da dove l'ho tirato fuori?
+
+OK, diamo di nuovo un'occhiata ad un po' dei dati di origine; di fatto,
+includeremo le intestazioni, ed un comodo righello in modo da tenere
+traccia di dove ci troviamo.
+
+             1         2         3         4         5        
+    1234567890123456789012345678901234567890123456789012345678
+    Data      |Descrizione                |Entrate|Uscite     
+    01/24/2001 Emporio Cammelli di Ahmed               1147.99
+    01/28/2001 Spray per le pulci                        24.99
+
+Da questo possiamo vedere che la colonna della data si estende dalla
+colonna 1 alla colonna 10 - E<egrave> larga 10 caratteri. "Carattere",
+in gergo C<pack>, corrisponde a C<A>, e dieci caratteri sono quindi
+C<A10>. Se volessimo dunque estrarre le sole date, potremmo scrivere:
+
+    my($data) = unpack("A10", $_);
+
+OK, che viene dopo? Tra la data e la descrizione c'E<egrave> una colonna vuota;
+vogliamo saltarla. Il modello C<x> significa "fai un salto in avanti",
+per cui ce ne serve uno. Di seguito, abbiamo un altro po' di caratteri,
+dal 12 al 38. In tutto sono 27 caratteri, da cui C<A27>. (Non commettete
+l'errore sui bordi - ci sono 27 caratteri tra 12 e 38, non 26. Contateli!)
+
+Ora saltiamo un altro carattere e prendiamo i 7 caratteri successivi:
+    
+    my($data,$descrizione,$entrate) = unpack("A10xA27xA7", $_);
+
+Ora arriviamo alla furbata. Le righe nella nostra tabella che
+contengono solo entrate e non spese potrebbero terminare alla colonna
+46. Per questo motivo, non possiamo dire al nostro modello C<unpack>
+che B<abbiamo bisogno> di trovare altri 12 caratteri; diremo solamente
+che "se avanza qualcosa, prendilo". Come potete immaginare conoscendo
+le espressioni regolari, questo E<egrave> quello che C<*> significa: "usa
+qualunque cosa rimanga".
+
+=over 3
+
+=item *
+
+Fate attenzione che, diversamente dalle espressioni regolari, se
+il modello C<unpack> non corrisponde ai dati in ingresso, Perl
+comincerE<agrave> ad urlare e terminerE<agrave> con C<die>.
+
+=back
+
+
+Da qui, mettendo tutto insieme:
+
+    my($data,$descriz,$entrate,$uscite) = unpack("A10xA27xA7xA*", $_);
+
+Ecco infine che i nostri dati sono interpretati. Suppongo che ciE<ograve>
+che potremmo desiderare di fare a questo punto sia di trovare il totale
+di entrate ed uscite, per aggiungere un'altra riga alla fine
+del nostro prospetto - nello stesso formato - indicando quanto abbiamo
+ricavato e quanto abbiamo speso:
+
+    while (<>) {
+        my($data, $descr, $entrate, $uscite) = unpack("A10xA27xA7xA*", $_);
+        $tot_entrate += $entrate;
+        $tot_uscite += $uscite;
+    }
+
+    $tot_entrate = sprintf("%.2f", $tot_entrate); # Trasformazione in
+    $tot_uscite  = sprintf("%.2f", $tot_uscite);  # formato "finanziario"
+
+    $data = POSIX::strftime("%m/%d/%Y", localtime); 
+
+    # OK, possiamo andare
+
+    print pack("A10xA27xA7xA*", $data, "Totali", $tot_entrate, $tot_uscite);
+
+Oh, hmm. Non ha proprio funzionato. Vediamo cos'E<egrave> successo:
+
+    01/24/2001 Emporio Cammelli di Ahmed               1147.99
+    01/28/2001 Spray per le pulci                        24.99
+    01/29/2001 Giro cammello per turisti   1235.00
+    03/23/2001Totali                     1235.001172.98
+
+OK, E<egrave> un inizio, ma che E<egrave> successo agli spazi? Abbiamo messo C<x>, no?
+Non dovrebbe fare un salto in avanti? Diamo un'occhiata a cosa
+dice L<perlfunc/pack>:
+
+    x   A null byte. [Un ottetto nullo, NdT]
+
+Urgh. Nessuna meraviglia che non abbia funzionato. C'E<egrave> una gran
+differenza fra "un ottetto nullo", ossia il carattere zero, ed "uno spazio",
+ossia il carattere 32. Perl ha inserito qualcosa fra data e descrizione -
+ma sfortunatamente non possiamo vederlo!
+
+Quello di cui abbiamo veramente bisgogno E<egrave> di espandere la larghezza
+dei campi. Il formato C<A> aggiunge spazi al posto dei caratteri che
+non esistono, di modo che possiamo utilizzare gli spazi addizionali
+per allineare i nostri campi, come:
+
+    print pack("A11 A28 A8 A*", $data, "Totali", $tot_entrate, $tot_uscite);
+
+(Osservate che potete inserire spazi nel modello per renderlo piE<ugrave>
+leggibile, ma che questi non si traducono in spazi in uscita). Ecco quel
+che abbiamo ottenuto questa volta:
+
+    01/24/2001 Emporio Cammelli di Ahmed               1147.99
+    01/28/2001 Spray per le pulci                        24.99
+    01/29/2001 Giro cammello per turisti   1235.00
+    03/23/2001 Totali                      1235.00 1172.98
+
+Va giE<agrave> meglio, ma abbiamo ancora l'ultima colonna che va spostata un
+po' piE<ugrave> in lE<agrave>. C'E<egrave> un modo semplice per risolvere questa
+situazione: sfortunatamente, non possiamo chiedere a C<pack> di giustificare i
+campi sulla destra, ma possiamo usare C<sprintf>:
+
+    $tot_entrate = sprintf("%.2f", $tot_entrate); 
+    $tot_uscite  = sprintf("%12.2f", $tot_uscite);
+    $data = POSIX::strftime("%m/%d/%Y", localtime); 
+    print pack("A11 A28 A8 A*", $data, "Totali", $tot_entrate, $tot_uscite);
+
+Questa volta otteniamo la risposta corretta:
+
+    01/24/2001 Emporio Cammelli di Ahmed               1147.99
+    01/28/2001 Spray per le pulci                        24.99
+    01/29/2001 Giro cammello per turisti   1235.00
+    03/23/2001 Totali                      1235.00     1172.98
+
+Ecco dunque come possiamo leggere e scrivere dati a larghezza fissa.
+Ricapitolando quel che abbiamo visto di C<pack> e C<unpack> fino
+ad ora:
+
+=over 3
+
+=item *
+
+Utilizzate C<pack> per andare da una moltitudine di dati ad una
+versione a larghezza fissa; utilizzate C<unpack> per trasformare
+un formato a larghezza fissa in una molteplicitE<agrave> di dati.
+
+=item *
+
+Il formato di impacchettamento C<A> significa "un qualsiasi carattere";
+se state impacchettando con C<pack> e avete finito le cose da
+impacchettare, C<pack> riempirE<agrave> il resto di spazi.
+
+=item *
+
+C<x> significa "saltare un ottetto" con C<unpack>; con C<pack>, significa
+"inserire un ottetto nullo" - che probabilmente non E<egrave> quello che vi
+serve quando avete a che fare con del semplice testo.
+
+=item *
+
+Potete aggiungere dei numeri ai formati per specificare quanti
+caratteri dovrebbero essere coinvolti da quel dato formato: C<A12>
+significa "prendere 12 caratteri"; C<x6> significa "saltare 6 ottetti"
+o "carattere 0, per 6 volte".
+
+=item *
+
+Invece di un numero, potete utilizzare C<*> per intendere "leggi
+tutto ciE<ograve> che E<egrave> rimasto".
+
+B<Attenzione>: quando impacchettate una molteplicitE<agrave> di dati,
+C<*> significa solo "leggi tutto quanto avanza del dato corrente".
+Si intende cioE<egrave> che:
+
+    pack("A*A*", $uno, $due)
+
+impacchetta tutto C<$uno> nel primo C<A*> e poi tutto C<$due> nel secondo.
+Questo E<egrave> un principio generale: ciascun carattere di formato corrisponde
+ad una porzione di dati da impacchettare con C<pack>.
+
+=back
+
+
+
+=head1 Impacchettare Numeri
+
+Con i dati testuali abbiamo finito. Arriviamo allora alla "ciccia" vera,
+dove C<pack> e C<unpack> danno il loro meglio: gestire formati binari per
+i numeri. Ovviamente, non esiste un solo formato binario - la vita sarebbe
+troppo semplice - ma Perl farE<agrave> tutto il lavoro certosino al posto vostro.
+
+
+=head2 Interi
+
+Impacchettare ed estrarre numeri implica una conversione verso, e da,
+una qualche rappresentazione binaria I<specifica>. Lasciando perdere i
+numeri a virgola mobile per il momento, le proprietE<agrave> veramente importanti
+di qualunque rappresentazione del genere sono:
+
+=over 4
+
+=item *
+
+il numero di ottetti utilizzati per immagazzinare l'intero,
+
+=item *
+
+se il contenuto va interpretato come numero con segno o privo di segno,
+
+=item *
+
+l'ordine degli ottetti, ossia se il primo ottetto rappresenta il byte
+piE<ugrave> significativo o il meno significativo (o anche, rispettivamente,
+big-endian [finale grande, NdT] o little-endian [finale piccolo, NdT]).
+
+=back
+
+Quindi, ad esempio, per impacchettare il numero 20302 in un intero
+a 16 bit con segno, nella rappresentazione del vostro computer,
+dovete scrivere
+
+   my $ps = pack( 's', 20302 );
+
+Di nuovo, il risultato E<egrave> una stringa, che ora contiene due ottetti. Se
+stampate tale stringa (il che, in generale, non E<egrave> consigliabile) potreste
+vedere C<ON> oppure C<NO> (in base all'ordinamento degli ottetti nel
+vostro sistema) - o qualcosa di completamente differente se il vostro
+computer non utilizza la codifica ASCII. Utilizzare C<unpack> su C<$ps>
+con lo stesso modello restituisce il valore intero originale:
+
+   my( $s ) = unpack( 's', $ps );
+
+Tutto ciE<ograve> vale per tutti i codici di modello numerici. Non vi aspettate
+miracoli, comunque: se il valore impacchettato eccede la capacitE<agrave>
+in ottetti assegnata, i bit piE<ugrave> significativi sono scartati senza
+colpo ferire, ed C<unpack> certamente non ve li ritirerE<agrave> fuori dal
+cilindro. Inoltre, quando impacchettate utilizzando un codice di modello
+come C<s>, un valore in eccesso potrebbe avere come conseguenza che
+il bit di segno venga impostato, per cui lo spacchettamento vi 
+tirerE<agrave> fuori - molto intelligentemente - un valore negativo.
+
+16 bit non vi porteranno molto lontano con gli interi, ma ci sono sempre
+C<l> e C<L> per gli interi con e senza segno a 32 bit. E se non vi
+bastassero nemmeno questi, ed aveste a disposizione interi a 64 bit
+nel vostro sistema, potete spingere i limiti piE<ugrave> vicino all'infinito
+con i codici C<q> e C<Q> di C<pack>. Un'eccezione degna di nota si
+ha con i codici C<i> e C<I> per gli interi con e senza segno della
+varietE<agrave> "locale e personalizzata": un intero che occupa tanti ottetti
+quanto il compilatore C locale si aspetta con C<sizeof(int)>, ma
+utilizzerE<agrave> I<almeno> 32 bit.
+
+Ciascuno dei codici per interi C<sSlLqQ> dE<agrave> come risultato un numero
+fisso di ottetti, indipendentemente da dove eseguiate il vostro 
+programma. Questo fatto puE<ograve> risultare utile per alcune applicazioni,
+ma non E<egrave> un modo portabile per passare strutture dati tra Perl ed i
+programmi C (il che succede di sicuro quando chiamate estensioni
+XS o la funzione Perl C<syscall>), o quando leggete o scrivete file
+binari. CiE<ograve> di cui avete bisogno in questo caso sono dei codici di
+modello che rispecchino quello che viene utilizzato dal vostro
+compilatore C locale quando usate C<short> o C<unsigned long>, ad
+esempio. Tali codici e le relative lunghezze in ottetti sono mostrate
+nella tabella che segue. PoichE<eacute> lo standard C lascia molta libertE<agrave>
+riguardo alle dimensioni relative di questi tipi di dato, i
+valori effettivi possono variare, e questo E<egrave> il motivo per cui i
+valori sono indicati attraverso espressioni in C ed in Perl. (Se
+volete utilizzare i valori da C<%Config> nel vostro
+programma dovete importarla con C<use Config>).
+
+   con segno  senza segno  otteti, in C       ottetti, in Perl       
+     s!            S!      sizeof(short)      $Config{shortsize}
+     i!            I!      sizeof(int)        $Config{intsize}
+     l!            L!      sizeof(long)       $Config{longsize}
+     q!            Q!      sizeof(long long)  $Config{longlongsize}
+
+I codici C<i!> e C<I!> non sono differneti da C<i> e C<I>, sono solo
+inclusi per completezza.
+
+
+=head2 Spacchettare un Frame dello Stack
+
+[lo Stack E<egrave> la pila di attivazione di un programma, composta da tanti
+"mattoni" chiamati Frame, NdT]
+
+Avere bisogno di un particolare ordinamento degli ottetti potrebbe esservi
+necessario quando lavorate con dati binari che provengono da una qualche
+architettura specifica, laddove il vostro programma potrebbe trovarsi a
+lavorare in un sistema completamente differente. Come esempio, immaginate
+di avere 24 ottetti che contengono uno I<stack frame> come avviene in
+un 8086 Intel:
+
+      +---------+        +----+----+               +---------+
+ TOS: |   IP    |  TOS+4:| FL | FH | FLAGS  TOS+14:|   SI    |
+      +---------+        +----+----+               +---------+
+      |   CS    |        | AL | AH | AX            |   DI    |
+      +---------+        +----+----+               +---------+
+                         | BL | BH | BX            |   BP    |
+                         +----+----+               +---------+
+                         | CL | CH | CX            |   DS    |
+                         +----+----+               +---------+
+                         | DL | DH | DX            |   ES    |
+                         +----+----+               +---------+
+
+Prima di tutto, osserviamo che questa veneranda CPU a 16 bit
+utilizza un ordinamento a finale piccolo [I<little-endian>, NdT], e che
+questo E<egrave> il motivo per cui l'ottetto di ordine basso E<egrave> immagazzinato
+all'indirizzo piE<ugrave> basso. Per spacchettare un intero I<short> (con segno)
+di tal fatta dovremo utilizzare il codice C<v>. Un contatore di ripetizione
+ci consente di spacchettare tutti e 12 gli interi I<short>:
+
+   my( $ip, $cs, $flags, $ax, $bx, $cd, $dx, $si, $di, $bp, $ds, $es ) =
+     unpack( 'v12', $frame );
+
+In alternativa, avremmo potuto utilizzare C<C> per spacchettare i
+registri byte FL, FH, AL, AH, ecc., individualmente accessibili:
+
+   my( $fl, $fh, $al, $ah, $bl, $bh, $cl, $ch, $dl, $dh ) =
+     unpack( 'C10', substr( $frame, 4, 10 ) );
+
+Sarebbe carino se potessimo farlo in un solo passo: spacchettare
+uno I<short>, tornare indietro un po', e poi spacchettare 2 ottetti.
+Visto che Perl I<E<egrave>> carino, mette a disposizione il codice
+di modello C<X> per tornare indietro di un ottetto. Mettendo tutto
+insieme, possiamo allora scrivere:
+
+   my( $ip, $cs,
+       $flags,$fl,$fh,
+       $ax,$al,$ah, $bx,$bl,$bh, $cx,$cl,$ch, $dx,$dl,$dh, 
+       $si, $di, $bp, $ds, $es ) =
+   unpack( 'v2' . ('vXXCC' x 5) . 'v5', $frame );
+
+(La costruzione astrusa del modello puE<ograve> essere evitata - leggete!)
+
+Ci siamo presi la briga di costruire il modello in modo che corrisponda
+al contenuto del nostro I<frame buffer>. Altrimenti o avremmo ottenuto
+valori indefiniti, o C<unpack> non avrebbe potuto fare proprio niente. Se
+C<pack> rimane a corto di elementi, inserirE<agrave> stringhe vuote (che sono
+trasformate in zeri laddove il codice di impacchettamento lo richiede).
+
+
+=head2 Come Mangiare un Uovo su una Rete
+
+Il codice di impacchettamento per il finale grande [I<big-endian>, NdT]
+(ottetto di ordine alto all'indirizzo piE<ugrave> basso) E<egrave> C<n> per interi a 16 bit
+e C<N> per quelli a 32 bit. Utilizzate questi codici se sapete che i vostri
+dati arrivano da un'architettura compatibile ma, abbastanza
+sorprendentemente, dovreste anche utilizzare questi codici se scambiate
+dati binari, in una rete, con qualche sistema di cui non sapete niente.
+La ragione piE<ugrave> semplice E<egrave> che questo ordine E<egrave> stato scelto
+come I<ordine di rete>, e tutti i bravi programmi timorati degli standard
+dovrebbero seguire questa convenzione. (Questo E<egrave>, chiaramente, un
+saldo supporto per uno dei partiti Lillipuziani, e puE<ograve> ben
+influire sugli sviluppi politici di Lilliput). Quindi, se il protocollo
+prevede che mandiate un messaggio inviando prima di tutto la sua
+lunghezza, seguita da quel tal numero di ottetti, potreste scrivere:
+
+   my $buf = pack( 'N', length( $msg ) ) . $msg;
+
+o persino:
+
+   my $buf = pack( 'NA*', length( $msg ), $msg );
+
+e passare C<$buf> alla vostra routine di invio. Alcuni protocolli
+richiedono che il conteggio includa anche la lunghezza del contatore
+stesso: in questo caso basterE<agrave> aggiungere 4 alla lunghezza dei dati.
+(Ma assicuratevi di leggere L<"Lunghezze e Larghezze"> prima di
+fare una cosa del genere!)
+
+
+=head2 Numeri a Virgola Mobile
+
+Per impacchettare numeri in virgola mobile dovete scegliere fra i
+codici C<f> e C<d>, che impacchettano (o spacchettano) in rappresentazioni
+a singola precisione o doppia precisione, cosE<igrave> come fornite dal vostro
+sistema. (Non esiste una vera rappresentazione di rete per i reali, quindi
+se volete inviare i vostri numeri reali oltre i confini di un computer,
+E<egrave> meglio se vi attenete ad una rappresentazione ASCII, a meno che non siate
+assolutamente sicuri di cosa trovate dall'altra parte della linea).
+
+
+
+=head1 Modelli Esotici
+
+
+=head2 Stringhe di Bit
+
+I bit sono gli atomi del mondo della memoria. L'accesso ai bit
+individuali potrebbe essere necessario o come ultima spiaggia o
+perchE<eacute> E<egrave> il modo piE<ugrave> conveniente di trattare i vostri dati.
+L'impacchettamento (o lo spacchettamento) in stringhe di bit
+converte fra stringhe che contengono una serie di caratteri
+C<0> ed C<1> e una sequenza di ottetti, ognuna contenente un gruppo
+di 8 bit. E<Egrave> proprio semplice come sembra, ad eccezione del fatto che
+ci sono due modi in cui il contenuto di un ottetto puE<ograve> essere scritto
+come stringa di bit. Diamo un'occhiata ad un ottetto annotato:
+
+     7 6 5 4 3 2 1 0
+   +-----------------+
+   | 1 0 0 0 1 1 0 0 |
+   +-----------------+
+    MSB           LSB
+
+[MSB sta per I<Most Significant Bit>, ossia il bit piE<ugrave> significativo,
+quello di peso piE<ugrave> alto; analogamente, LSB sta per
+L<Least Significant Bit>, ossia bit meno significativo. NdT]
+
+Si tratta di nuovo di mangiar uova: alcuni pensano che, come stringa
+di bit, questo ottetto debba essere scritto come "10001100", ossia
+a partire dal bit piE<ugrave> significativo, mentre altri insistono per
+avere "00110001". Bene, Perl non fa preferenze, per cui abbiamo due
+codici per le stringhe di bit:
+
+   $byte = pack( 'B8', '10001100' ); # inizia con MSB
+   $byte = pack( 'b8', '00110001' ); # inizia con LSB
+
+Non E<egrave> possibile impacchettare o spacchettare campi di bit - solo
+ottetti interi. C<pack> parte sempre dal bordo dell'ottetto successivo,
+ed "arrotonda" al multiplo successivo di 8 aggiungendo degli zero se
+necessario. (Se proprio volete i campi di bit, esiste sempre la
+funzione L<perlfunc/vec>. In alternativa, potreste implementare la
+gestione del campo di bit a livello di stringa di caratteri, utilizzando
+C<split>, C<substr> e la concatenazione su stringhe di bit spacchettati).
+
+Per illustrare lo spacchettamento di stringhe di bit, effettueremo la
+decomposizione di un semplice registro di stato (un carattere "-" indica
+un bit "riservato"):
+
+   +-----------------+-----------------+
+   | S Z - A - P - C | - - - - O D I T |
+   +-----------------+-----------------+
+    MSB           LSB MSB           LSB
+
+La conversione di questi due ottetti in una stringa puE<ograve> essere
+fatta con il modello di spacchettamento C<'b16'>. Per ottenere i valori
+dei singoli bit dalla stringa di bit utilizziamo C<split> con il pattern
+di separazione vuoto, che suddivide la stringa nei singoli caratteri. I
+valori dei bit dalle posizioni "riservate" sono assegnate semplicemente
+ad C<undef>, una notazione piuttosto comoda per indicare "Non mi importa
+di che fine faccia questo".
+
+   ($carry, undef, $parity, undef, $auxcarry, undef, $zero, $sign,
+    $trace, $interrupt, $direction, $overflow) =
+      split( //, unpack( 'b16', $status ) );
+
+Avremmo anche potuto utilizzare un modello di spacchettamento C<'b12'>,
+poichE<eacute> gli ultimi 4 bit possono essere ignorati.
+
+
+=head2 Uuencode
+
+Un altro strano tipo nell'alfabeto dei modelli di impacchettamento
+e spacchettamento E<egrave> C<u>, che impacchetta una "stringa con uuencode".
+("uu" E<egrave> l'abbreviazione di Unix-to-Unix [da Unix a Unix, NdT]).
+Ci sono buone probabilitE<agrave> che non avrete mai bisogno di questa tecnica
+di encoding, che fu inventata per superare le limitazioni di mezzi
+trasmissivi datati che non supportano altro che semplici dati ASCII.
+La ricetta essenziale E<egrave> semplice: prendete tre ottetti, o 24 bit.
+Divideteli in 4 pacchetti da sei bit l'uno, aggiungendo uno spazio
+(0x20) a ciascuno. Ripetete finchE<eacute> non avete mescolato tutti i dati.
+Ripiegate gruppi di 4 ottetti in righe non piE<ugrave> lunghe di 60
+ottetti, e guarnite aggiungendo all'inizio il conteggio degli ottetti
+originali (incrementati con 0x20), e un C<"\n"> alla fine. - Lo chef
+di C<pack> preparerE<agrave> tutto questo al posto vostro, espresso, quando
+selezionate il codice di impacchettamento C<u> dal menu:
+
+   my $uubuf = pack( 'u', $bindat );
+
+Un indicatore di ripetizione dopo C<u> imposta il numero di ottetti
+da inserire in una riga dopo l'encoding uu, che E<egrave> il massimo di 45 per
+default, ma potrebbe essere impostato ad un qualsiasi multiplo intero
+di tre inferiore a 45. C<unpack> ignora l'indicatore di ripetizione.
+
+
+=head2 Fare le Somme
+
+Un codice di modello persino piE<ugrave> strano E<egrave> C<%>E<lt>I<number>E<gt>.
+Prima di tutto, perchE<eacute> viene utilizzato come prefisso per qualche altro
+codice di modello. Secondo poi, perchE<eacute> non puE<ograve> mai essere
+utilizzato in C<pack>, e terzo, in C<unpack>, non restituisce il dato definito dal
+codice di modello che lo segue. Invece, vi darE<agrave> un intero contenente il
+I<numero> di bit che risulta dal valore del dato mediante delle somme. Per codici
+di spacchettamento numerici, non si ha nessuna caratteristica particolare:
+
+    my $buf = pack( 'iii', 100, 20, 3 );
+    print unpack( '%32i3', $buf ), "\n";  # stampa 123
+
+Per i valori stringa, C<%> restituisce la somma dei valori degli ottetti,
+levandovi dall'impaccio di effettuare un ciclo di somma con C<substr>
+e C<ord>
+
+    print unpack( '%32A*', "\x01\x10" ), "\n";  # prints 17
+
+Sebbene la documentazione del codice C<%> riporti che esso restituisce un
+"checksum" [una somma di controllo, N.d.T.]: non vi fidate di questo
+valore! Anche quando applicato ad un esiguo numero di ottetti, non vi
+garantirE<agrave> una distanza di Hamming notevole.
+
+In connessione con C<b> o C<B>, C<%> non fa altro che aggiungere bit, e
+questo puE<ograve> essere utilizzato per contare insiemi di bit in maniera
+efficiente:
+
+    my $conteggiobit = unpack( '%32b*', $mask );
+
+Ed un bit di paritE<agrave> puE<ograve> essere determinato come segue:
+
+    my $parita = unpack( '%1b*', $mask );
+
+
+=head2  Unicode
+
+Unicode E<egrave> un insieme di caratteri che puE<ograve> rappresentare la maggior
+parte dei caratteri nella maggior parte delle lingue al mondo, avendo spazio
+per piE<ugrave> di un milione di caratteri differenti. Unicode 3.1 specifica 94140
+caratteri: i caratteri Basic Latin [Latino base, NdT] sono posizionati
+ai numeri 0 - 127. Il Supplemento Latin-1, contenente caratteri che sono
+utilizzati in molti linguaggi europei, si trovano nell'intervallo
+successivo, fino a 255. Dopo qualche altra estensione Latin troviamo
+gli insiemi di caratteri da linguaggi che utilizzano alfabeti non Romani,
+intervallati con una varietE<agrave> di insiemi di simboli come i segni per
+le monete, Zapf Dingbat e Braille. (Potreste sempre fare una visita
+su L<www.unicode.org> per dare un'occhiata a qualcuno - i miei
+preferiti sono Telugu e Kannada).
+
+L'insieme di caratteri Unicode associa caratteri ed interi. La codifica
+di questi numeri in un numero equivalente di ottetti avrebbe l'effetto
+di piE<ugrave> che raddoppiare i requisiti di immagazzinamento di testi scritti
+con alfabeti latini. La codifica UTF-8 evita questo spreco immagazzinando
+i caratteri piE<ugrave> comuni (da un punto di vista del mondo occidentale) in
+un singolo ottetto, mentre i piE<ugrave> rari sono immagazzinati in tre o piE<ugrave>
+ottetti.
+
+Dunque, che cosa ha a che fare tutto ciE<ograve> con C<pack>? Bene, se volete
+convertire fra un numero Unicode e la sua rappresentazione UTF-8, potete
+farlo utilizzando il codice C<U>. Come esempio, generiamo la rappresentazione
+UTF-8 del simbolo dell'Euro (codice 0x20AC):
+
+   $UTF8{Euro} = pack( 'U', 0x20AC );
+
+Andando a vedere C<$UTF8{Euro}> possiamo notare che contiene tre
+ottetti: "\xe2\x82\xac". Il giro puE<ograve> essere completato con C<unpack>:
+
+   $Unicode{Euro} = unpack( 'U', $UTF8{Euro} );
+
+Di solito vorrete impacchettare o spacchettare intere stringhe UTF-8:
+
+   # pack e unpack dell'alfabeto Ebraico
+   my $alefbeto = pack( 'U*', 0x05d0..0x05ea );
+   my @ebraico = unpack( 'U*', $utf );
+
+
+=head2 Un'altra Codifica Binaria Portabile
+
+Il codice di impacchettamento C<w> E<egrave> stato aggiunto per supportare
+uno schema di codifica che va al di lE<agrave> dei semplici interi. (Potete
+trovare maggiori dettagli su L<Casbah.org>, il progetto Scarab).
+Un intero senza segno compresso BER (Binary Encoded Representation 
+[Rappresentazine Binaria Codificata, NdT] contiene cifre in base 128,
+con la cifra piE<ugrave> significativa per prima, utilizzando meno cifre
+possibile. L'ottavo bit (quello piE<ugrave> significativo) E<egrave> impostato ad 1
+su tutti gli ottetti eccetto l'ultimo. Non esiste un limite di
+dimensione per la codifica BER, ma Perl non si spingerE<agrave> fino
+agli estremi.
+
+   my $berbuf = pack( 'w*', 1, 128, 128+1, 128*128+127 );
+
+Una stampa esadecimale di C<$berbuf>, con spazi inseriti nei posti
+giusti, E<egrave> 01 8100 8101 81807F. PoichE<eacute> l'ultimo ottetto E<egrave>
+sempre inferiore a 128, C<unpack> sa dove fermarsi.
+
+=head1 Raggruppamento di Modelli
+
+Prima di Perl 5.8, la ripetizione dei modelli doveva esser fatta
+con l'utilizzo dell'operatore C<x> sulle stringhe dei modelli stessi. Ora
+esiste un modo migliore, perchE<eacute> possiamo utilizzare i codici C<(> e C<)>
+in combinazione con un contatore di ripetizione. Il modello C<unpack>
+dall'esempio sullo Stack Frame puE<ograve> scriversi semplicemente cosE<igrave>:
+
+   unpack( 'v2 (vXXCC)5 v5', $frame )
+
+Diamo un'occhiata piE<ugrave> da vicino a questa opportunitE<agrave>. Cominciamo con
+l'equivalente di
+
+   join( '', map( substr( $_, 0, 1 ), @str ) )
+
+che restituisce una stringa composta del primo carattere di ciascuna
+stringa. Utilizzando C<pack>, possiamo scrivere
+
+   pack( '(A)'.@str, @str )
+
+o, viso che il contatore di ripetizione C<*> significa "ripeti
+quanto basta", semplicemente
+
+   pack( '(A)*', @str )
+
+(Osservate che il modello C<A*> abrebbe solo impacchettato C<$str[0]>
+a lunghezza piena).
+
+Per impacchettare le date immagazzinandole come triplette 
+(giorno, mese, anno) da un array C<@date> in una sequenza di ottetto,
+otteto, short [intero breve, costituito da 2 ottetti, NdT] possiamo
+scrivere
+
+   $pd = pack( '(CCS)*', map( @$_, @date ) );
+
+Per invertire coppie di caratteri in una stringa (di lunghezza pari)
+possono essere utilizzate varie tecniche. Per prima cosa, utilizziamo
+C<x> e C<X> per saltare avanti ed indietro:
+
+   $s = pack( '(A)*', unpack( '(xAXXAx)*', $s ) );
+
+Possiamo anche utilizzare C<@> per saltare ad un determinato scostamento
+nella stringa, con 0 che rappresenta la posizione dove ci trovavamo l'ultima
+volta che si E<egrave> encontrato C<(>:
+
+   $s = pack( '(A)*', unpack( '(@1A @0A @2)*', $s ) );
+
+Infine, esiste un approccio completamente differente basato sullo 
+spacchettamento di interi short a finale grande e nel successivo
+re-impacchettamento in ordine di ottetti invertiti:
+
+   $s = pack( '(V)*', unpack( '(n)*', $s );
+
+
+=head1 Lunghezze e larghezze
+
+=head2 Lunghezza delle stringhe
+
+Nella sezione precedente abbiamo visto un messaggio di rete costruito
+mettendo la lunghezza del messaggio binario come prefisso al messaggio
+vero e proprio. Vi capiterE<agrave> di trovare che l'impacchettamento di una
+lunghezza seguita da quel certo numero di ottetti di dati E<egrave> una ricetta
+utilizzata comunemente, perchE<eacute> aggiungere un ottetto nullo in fondo non
+funziona correttamente se gli ottetti nulli possono far parte dei dati
+stessi. Ecco un esempio dove vengono utilizzate entrambe le tecniche:
+dopo due stringhe terminate con ottetti nulli, viene mandato uno
+I<Short Message> (ad un terminale mobile) dopo un ottetto che indica la
+lunghezza:
+
+   my $msg = pack( 'Z*Z*CA*', $src, $dst, length( $sm ), $sm );
+
+Lo spacchettamento di questo messaggio puE<ograve> essere effettuato con lo
+stesso modello:
+
+   ( $src, $dst, $len, $sm ) = unpack( 'Z*Z*CA*', $msg );
+
+C'E<egrave> una sottile trappola che si aggira: aggiungere un altro campo
+dopo lo I<Short Message> (nella variabile C<$sm>) va bene in fase
+di impacchettamento, ma non puE<ograve> essere spacchettato alla leggera:
+
+   # Impacchetta un messaggio
+   my $msg = pack( 'Z*Z*CA*C', $src, $dst, length( $sm ), $sm, $prio );
+
+   # unpack fallisce - $prio rimane non definito!
+   ( $src, $dst, $len, $sm, $prio ) = unpack( 'Z*Z*CA*C', $msg );
+
+Il codice di impacchettamento C<A*> cattura tutti gli ottetti rimanenti,
+e C<$prio> rimane non definito! Prima di lasciarci abbattere il morale:
+Perl ha l'asso per fare anche questo, solo che sta un po' piE<ugrave> su... nella 
+manica. Guardate qui:
+
+   # impacchetta un messaggio: ASCIIZ, ASCIIZ, lunghezza/stringa, ottetto
+   my $msg = pack( 'Z* Z* C/A* C', $src, $dst, $sm, $prio );
+
+   # spacchetta
+   ( $src, $dst, $sm, $prio ) = unpack( 'Z* Z* C/A* C', $msg );
+
+Combinando due codici con una barra (C</>) si associano ad un singolo
+valore dalla lista degli argomenti. In C<pack>, la lunghezza dell'argomento
+viene presa ed impacchettata in accordo al primo codice, mentre l'argomento
+stesso viene aggiunto con la conversione del codice dopo la barra.
+Il tutto ci risparmia la chiamata a C<length>, ma in C<unpack> che
+abbiamo il vero vantaggio: il valore dell'ottetto della lunghezza
+segna la fine della stringa che deve essere estratta dal buffer.
+Questa combinazione non ha senso eccetto che nei casi in cui il secondo
+codice di impacchettamento sia C<a*>, C<A*> o C<Z*>.
+
+Il codice di impacchettamento che precede C</> puE<ograve> essere uno qualsiasi
+fra quelli adatti a rappresentare un numero: tutti i codici di 
+impacchettamento binario dei numeri, e perfino codici testuali come C<A4>
+o C<Z*>:
+
+   # pack/unpack di una stringa preceduta dalla sual lunghezza in ASCII
+   my $buf = pack( 'A4/A*', "Humpty-Dumpty" );
+   # unpack $buf: '13  Humpty-Dumpty'
+   my $txt = unpack( 'A4/A*', $buf );
+
+C</> non E<egrave> presente nelle versioni di Perl precedenti a 5.6, per cui se
+il vostro codice deve essere eseguito in Perl piE<ugrave> vecchi avrete bisogno di
+utilizzare C<unpack( 'Z* Z* C' )> per prendere la lunghezza,
+e poi utilizzare questa per costruire una nuova stringa di spacchettamento.
+Ad esempio
+
+   # impacchetta un messaggio: ASCIIZ, ASCIIZ, lunghezza, stringa, ottetto
+   # (compatibile con la versione 5.005 di Perl)
+   my $msg = pack( 'Z* Z* C A* C', $src, $dst, length $sm, $sm, $prio );
+
+   # spacchetta
+   ( undef, undef, $len) = unpack( 'Z* Z* C', $msg );
+   ($src, $dst, $sm, $prio) = unpack ( "Z* Z* x A$len C", $msg );
+
+Con il secondo C<unpack> stiamo correndo un po' troppo. Non sta utilizzando
+una semplice stringa letterale come modello. Per questo motivo, forse E<egrave> il
+caso di presentarvi...
+
+=head2 Modelli Dinamici
+
+Fino ad ora, abbiamo visto modelli composti di soli letterali. Se la lista
+degli elementi di impacchettamento non ha una lunghezza prefissata, c'E<egrave>
+bisogno di un'espressione che costruisca il modello (in tutti quei casi
+in cui, per qualche motivo, non sia possibile utilizzare C<()*>).
+Ecco un esempio: per immagazzinare stringhe con un nome associato in
+modo che possano essere facilmente comprese da un programma C, creiamo
+una sequenza di nomi e stringhe ASCII terminate da un ottetto nullo, con
+C<=> utilizzato come separatore fra nome e valore, seguito da un ottetto
+nullo addizionale. Ecco come:
+
+   my $env = pack( '(A*A*Z*)' . keys( %Env ) . 'C',
+                   map( { ( $_, '=', $Env{$_} ) } keys( %Env ) ), 0 );
+
+Diamo un'occhiata ai dentini di questo ingranaggio, uno ad uno. C'E<egrave> la
+chiamata a C<map>, che crea gli elementi che vogliamo infilare nel buffer
+C<$env>: per ciascuna chiave (in C<$_>) aggiunge il separatore C<=> ed il
+valore nella hash. Ciascuna tripletta viene impacchettata con la sequenza
+di modello C<A*A*Z*> che viene ripetuta in base al numero di chiavi.
+(Esatto, E<egrave> ciE<ograve> che la funzione C<keys> restituisce in contesto
+scalare). Per avere l'ultimo ottetto nullo di conclusione, aggiungiamo un C<0> alla
+fine della lista di C<pack>, per impacchettarlo con C<C>. (I lettori
+piE<ugrave> attenti potranno aver notato che avremmo potuto anche risparmiarci
+lo 0).
+
+Per l'operazione inversa, dovremo determinare il numero di elementi nel
+buffer prima di lasciare che C<unpack> li tiri fuori:
+
+   my $n = $env =~ tr/\0// - 1;
+   my %env = map( split( /=/, $_ ), unpack( "(Z*)$n", $env ) );
+
+La chiamata a C<tr> conta gli ottetti nulli. La chiamata a C<unpack>
+restituisce una lista di coppie nome-valore, ciascuna delle
+quali viene separata nel blocco C<map>.
+
+
+=head2 Contare le ripetizioni
+
+Piuttosto che aggiungere una sentinella alla fine di un dato (o di una
+lista di elementi), potremmo precedere i dati con un conteggio. Di nuovo,
+impacchettiamo chiavi e valori di una hash, precedendo ciascuno con un
+contatore di lunghezza di tipo intero corto senza segno [unsigned short,
+NdT], ed all'inizio immettiamo il numero di coppie:
+
+   my $env = pack( 'S(S/A* S/A*)*', scalar keys( %Env ), %Env );
+
+Questo semplifica l'operazione inversa, poichE<eacute> il numero di ripetizioni
+puE<ograve> essere estratto con il codice C</>:
+
+   my %env = unpack( 'S/(S/A* S/A*)', $env );
+
+Osservate che questo E<egrave> uno dei rari casi nei quali non potete utilizzare
+lo stesso modello per C<pack> e C<unpack> perchE<eacute> C<pack> non E<egrave> in
+grado di determinare un contatore di ripetizione per il gruppo C<()>.
+
+
+=head1 Impacchettare e Spacchettare Strutture C
+
+Nelle sezioni precedenti abbiamo visto come impacchettare numeri e stringhe
+di caratteri. Se non fosse per un paio di trappole potremmo concludere qui,
+con una nota chiara che le strutture C non contengono nient'altro, e che
+perciE<ograve> giE<agrave> sapete tutto quello che c'E<egrave> da sapere.
+Spiacenti, non E<egrave> cosE<igrave>: leggete e capirete.
+
+=head2 La Fossa dell'Allineamento
+
+In un confronto fra requisiti velocitE<agrave> e memoria la bilancia E<egrave> stata
+spostata verso un'esecuzione piE<ugrave> rapida. CiE<agrave> ha influenzato il modo
+in cui i compilatori C allocano la memoria per le strutture: su architetture
+nelle quali operandi a 16 e 32 bit possono essere spostati piE<ugrave> rapidamente
+fra locazioni di memoria, oppure da/verso registri della CPU, quando questi
+siano allineati ad indirizzi pari, o multipli di quattro o persino multipli
+di otto ottetti, un compilatore vi darE<agrave> questo beneficio di velocitE<agrave>
+inserendo ottetti extra nelle strutture. Se non attraversate la
+banchina del C non vi darE<agrave> problemi (sebbene dobbiate aver cura quando
+progettate strutture dati particolarmente grandi, o volete che il
+vostro codice sia portabile fra le varie architetture (e voi lo volete,
+giusto?)).
+
+Per vedere come questo influisca su C<pack> e C<unpack>, confronteremo
+le seguenti strutture C:
+
+   typedef struct {
+     char     c1;
+     short    s;
+     char     c2;
+     long     l;
+   } groviera_t;
+
+   typedef struct {
+     long     l;
+     short    s;
+     char     c1;
+     char     c2;
+   } densa_t;
+
+Tipicamente, un compilatore C alloca 12 ottetti per una variabile
+C<groviera_t>, ma richiede solo 8 ottetti per una C<densa_t>. Dopo un po'
+di studio, possiamo disegnare le mappe di memoria, che mostrano dove sono
+nascosti questi 4 ottetti aggiuntivi:
+
+   0           +4          +8          +12
+   +--+--+--+--+--+--+--+--+--+--+--+--+
+   |c1|xx|  s  |c2|xx|xx|xx|     l     |    xx = ottetto di riempimento
+   +--+--+--+--+--+--+--+--+--+--+--+--+
+   groviera_t
+
+   0           +4          +8
+   +--+--+--+--+--+--+--+--+
+   |     l     |  h  |c1|c2|
+   +--+--+--+--+--+--+--+--+
+   densa_t
+
+E qui E<egrave> dove colpisce la prima stranezza: i modelli di C<pack> e C<unpack>
+devono essere riempiti con codici C<x> per arrivare a questi ottetti
+di riempimento addizionali.
+
+L'ovvia domanda: "PerchE<eacute> Perl non compensa da solo questi buchi?" merita
+una risposta. Una buona ragione E<egrave> che il compilatore C potrebbe fornire
+delle estensioni (non ANSI) che consentono tutte le varietE<agrave> di
+controllo sul modo in cui le strutture vengono allineate, persino a
+livello di singolo campo della struttura. E, se non fosse giE<agrave> abbastanza,
+esiste una cosa insidiosa chiamata C<union> dove il numero di ottetti
+di riempimento non puE<ograve> essere dedotta solo dall'allineamento dell'elemento
+del prossimo elemento.
+
+OK, via il dente, via il dolore. Ecco un modo per sistemare
+l'allineamento inserendo i codici di modello C<x>, che non prendono
+elementi dalla lista:
+
+  my $gappy = pack( 'cxs cxxx l!', $c1, $s, $c2, $l );
+
+Osservate il C<!> dopo C<l>: vogliamo essere sicuri che impacchettiamo un
+intero lungo [long integer, NdT] come fatto dal nostro compilatore C.
+Persino ora, perE<ograve>, funzionerE<agrave> solamente nelle piattaforme dove il
+compilatore allinea come descritto in precedenza. E qualcuno, da qualche parte, usa
+una piattaforma che non lo fa. (Probabilmente un Cray, dove
+C<short>, C<int> e C<long> sono tutti di 8 ottetti :-)).
+
+Contare gli ottetti e star dietro agli allineamenti in strutture corpose
+E<egrave> destinato ad essere un peso. Non esiste un modo con cui possiamo creare
+un modello utilizzando un semplice programma? Ecco un programmino C che
+fa questo trucco:
+
+   #include <stdio.h>
+   #include <stddef.h>
+
+   typedef struct {
+     char     fc1;
+     short    fs;
+     char     fc2;
+     long     fl;
+   } groviera_t;
+
+   #define Pt(struttura,campo,tchar) \
+     printf( "@%d%s ", offsetof(struttura,campo), # tchar );
+
+   int main() {
+     Pt( groviera_t, fc1, c  );
+     Pt( groviera_t, fs,  s! );
+     Pt( groviera_t, fc2, c  );
+     Pt( groviera_t, fl,  l! );
+     printf( "\n" );
+   }
+
+La linea stampata in uscita puE<ograve> essere utilizzata come modello nella
+chiamata a C<pack> o C<unpack>:
+
+  my $groviera = pack( '@0c @2s! @4c @8l!', $c1, $s, $c2, $l );
+
+Cribbio, un altro codice di modello - come se non ne avessimo abbastanza.
+Ma C<@> ci salva la giornata dandoci modo di specificare gli scostamenti
+dall'inizio del buffer di pack fino all'elemento successivo: questo E<egrave>
+appunto il valore restituito dalla macro C<offsetof> (definita in 
+C<E<lt>stddef.hE<gt>>) quando le viene dato un tipo struttura ed uno
+dei nomi dei suoi campi (in linguaggio standard C il I<member-designator>
+[indicatore di membro, NdT]).
+
+NE<eacute> l'utilizzo degli scostamenti nE<eacute> l'aggiunta di C<x> E<egrave>
+soddisfacente per riempire i buchi. (Provate solo ad immaginare cosa succederebbe se
+cambiasse la struttura). CiE<ograve> di cui abbiamo realmente bisogno E<egrave> un
+sistema per dire "salta quel tanto di ottetti che basta per avere il prossimo
+multiplo di N". In Modellese fluente, potete dirlo con C<x!N>, ove N va
+rimpiazzato con il valore appropriato. Ecco una nuova versione del nostro
+sistema di impacchettamento per strutture:
+
+  my $groviera = pack( 'c x!2 s c x!4 l!', $c1, $s, $c2, $l );
+
+Andiamo indubbiamente meglio, ma dobbiamo ancora sapere quanto sono
+lunghi gli interi, e siamo lontani dalla portabilitE<agrave>. Piuttosto che C<2>,
+ad esempio, vogliamo esprimere "qualsiasi lunghezza sia uno short". Ma
+questo possiamo farlo racchiudendo il codice di impacchettamento appropriato
+fra parentesi quadre: C<[s]>. Quindi, ecco il meglio che possiamo fare:
+
+  my $groviera = pack( 'c x![s] s c x![l!] l!', $c1, $s, $c2, $l );
+
+
+=head2 Allineamento, seconda ripresa
+
+Ho paura che non abbiamo ancora finito con questa storia dell'allineamento.
+L'idra solleva un'altra brutta testaccia quando impacchettate array di
+strutture:
+
+   typedef struct {
+     short    conteggio;
+     char     glifo;
+   } cella_t;
+
+   typedef cella_t buffer_t[BUFLEN];
+
+Dove sta la trappola? Il padding [l'operazione di aggiunta di ottetti per
+raggiungere una determinata lunghezza, NdT] non E<egrave> richiesto nE<eacute>
+prima del primo campo C<counteggio>, nE<eacute> fra questo ed il campo C<glifo>
+successivo, quindi perchE<eacute> non possiamo impacchettare semplicemente come
+segue:
+
+   # something goes wrong here:
+   pack( 's!a' x @buffer,
+         map{ ( $_->{conteggio}, $_->{glifo} ) } @buffer );
+
+Questo impacchetta C<3*@buffer> ottetti, ma alla fine abbiamo che la
+dimensione di C<buffer_t> E<egrave> quattro volte C<BUFLEN>! Il morale della
+storia E<egrave> che l'allineamento richiesto per una struttura o un array viene
+propagato al livello superiore successivo dove dobbiamo considerare di
+effettuare I<padding> anche I<alla fine> di ciascun componente. Per questo
+motivo, il modello corretto E<egrave>:
+
+   pack( 's!ax' x @buffer,
+         map{ ( $_->{conteggio}, $_->{glifo} ) } @buffer );
+
+=head2 Alignment, terza ripresa
+
+Ed anche tenendo tutto questo in conto, ANSI consente ancora che questo:
+
+   typedef struct {
+     char     pippo[2];
+   } pippo_t;
+
+possa avere dimensione variabile. Il vincolo di allineamento della struttura
+puE<ograve> essere maggiore di ciascuno dei suoi elementi. (E se pensate che questo
+non abbia impatti su niente di comune, aprite il prossimo telefono cellulare
+che vedete. Molti hanno processori ARM, e le regole di struttura ARM sono
+tali che C<sizeof(pippo_t)> == 4).
+
+=head2 Puntatori per Come Utilizzarli
+
+Il titolo di questa sezione indica il secondo problema in cui potete
+imbattervi prima o poi, quando impacchettate strutture C. Se la funzione
+che intendete chiamare si aspetta di ricevere, diciamo, un valore
+C<void *>, I<non potete> prendere semplicemente un riferimento ad una
+variabile Perl. (Sebbene il valore sia di sicuro un indirizzo di
+memoria, non E<egrave> l'indirizzo dove sono immagazzinati i contenuti della
+variabile).
+
+Il codice di modello C<P> si impegna ad impacchettare un "puntatore
+ad una stringa di lunghezza fissa". Non E<egrave> quel che vogliamo? Proviamo:
+
+    # alloca un po' di spazio ed impacchetta un puntatore ad esso
+    my $memoria = "\x00" x $dimensione;
+    my $memptr = pack( 'P', $memoria );
+
+Aspettate: C<pack> non restituisce semplicemente una sequenza di ottetti?
+Come facciamo a passare questa stringa di ottetti ad un qualche codice C
+che si aspetta un puntatore che, dopo tutto, altro non E<egrave> che un numero? La
+risposta E<egrave> semplice: otteniamo l'indirizzo numerico dagli ottetti
+restituiti da C<pack>.
+
+    my $ptr = unpack( 'L!', $memptr );
+
+Ovviamente si sta assumendo che sia possibile effettuare una forzatura
+di tipo da puntatore ad intero lungo senza segno, e viceversa, il che
+funziona di frequente ma che non puE<ograve> essere preso come legge universale.
+Ora che abbiamo questo puntatore la prossima domanda E<egrave>: come utilizzarlo
+per bene? Abbiamo bisogno di chiamare una funzione C che si aspetta di
+ricevere un puntatore. Ci viene in mente la chiamata di sistema
+read(2):
+
+    ssize_t read(int fd, void *buf, size_t count);
+
+Dopo aver letto come utilizzare C<syscall> in C<perlfunc>, possiamo scrivere
+questa funzione Perl che copia un file sullo I<standard output>:
+
+    require 'syscall.ph';
+    sub cat($){
+        my $percorso   = shift();
+        my $dimensione = -s $path;
+        my $memoria    = "\x00" x $dimensione;  # alloca un po' di memoria
+        my $ptr = unpack( 'L', pack( 'P', $memoria ) );
+        open( F, $percorso ) || die( "$path:  errore open ($!)\n" );
+        my $fd = fileno(F);
+        my $res = syscall( &SYS_read, fileno(F), $ptr, $dimensione );
+        print $memoria;
+        close( F );
+    }
+
+Non E<egrave> nE<eacute> un esempio di semplicitE<agrave> nE<eacute> un paragone di
+portabilitE<agrave>, ma descrive bene la situazione: siamo in grado di scivolare
+dietro le quinte per accedere alla altrimenti ben sorvegliata memoria di Perl!
+(Una nota importante: la funzione C<syscall> di Perl I<non> vi richiede di
+costruire i puntatori in questa maniera complicata. Passate semplicemente
+una variabile stringa, e Perl fa il resto inoltrando il suo indirizzo).
+
+Come funziona C<unpack> con C<P>? Immaginate un puntatore qualsiasi
+nel buffer che si sta per spacchettare: se non si tratta del puntatore
+nullo (che molto intelligentemente produrrE<agrave> un valore C<undef>) abbiamo
+un indirizzo di partenza - ma poi? Perl non ha modo di sapere quanto
+sia lunga questa "stringa di lunghezza fissa"), per cui sta a voi
+specificare la reale dimensione come lunghezza esplicita dopo C<P>.
+
+   my $mem = "abcdefghijklmn";
+   print unpack( 'P5', pack( 'P', $mem ) ); # stampa "abcde"
+
+Di conseguenza, C<pack> ignora qualsiasi numero o C<*> dopo C<P>.
+
+Ora che abbiamo visto C<P> al lavoro, potremmo fare un giro su C<p>.
+PerchE<eacute> abbiamo bisogno di un secondo codice di modello per impacchettare
+i puntatori? La risposta giace dietro il semplice fatto che una C<unpack>
+con C<p> si impegna a restituire una stringa terminata da un ottetto
+nullo a partire dall'indirizzo preso dal buffer, e questo implica una
+lunghezza per l'elemento di dati che deve essere restituito:
+
+   my $buf = pack( 'p', "abc\x00efhijklmn" );
+   print unpack( 'p', $buf );    # stampa "abc"
+
+
+
+In ogni caso questo porta a della confusione: come risultato del fatto che la
+lunghezza E<egrave> conseguenza della lunghezza della stringa, un numero dopo il
+codice di impacchettamento C<p> E<egrave> un contatore di ripetizione, non una
+lunghezza come dopo C<P>.
+
+
+L'utilizzo di C<pack(..., $x)> con C<P> o C<p> per ottenere l'indirizzo dove
+C<$x> E<egrave> effettivamente immagazzinata, deve essere effettuato con
+circospezione. Il codice interno di Perl considera la relazione fra una
+variabile e quell'indirizzo un qualcosa di veramente privato, e si
+disinteressa se ne abbiamo ottenuto una copia. PerciE<ograve>:
+
+=over 4
+
+=item * 
+
+Non utilizzate C<pack> con C<p> o C<P> per ottenere l'indirizzo di
+una variabile che finirE<agrave> fuori dal campo di visibilitE<agrave>
+[scope, NdT] (e la cui memoria sarE<agrave> pertanto liberata) prima che abbiate
+terminato di utilizzare la memoria a quell'indirizzo.
+
+=item * 
+
+State molto attenti alle operazioni Perl che cambiano il valore della
+variabile. Aggiungere qualcosa alla variabile, ad esempio, potrebbe
+richiedere una riallocazione, lasciandovi con un puntatore verso la
+terra di nessuno.
+
+=item * 
+
+Non pensate di poter accedere al'indirizzo di una variabile Perl quando
+E<egrave> immagazzinata come numero intero o a doppia precisione! C<pack('P', $x)>
+forzerE<agrave> la rappresentazione interna della variabile su una stringa, proprio
+come se aveste scritto qualcosa tipo C<$x .= ''>.
+
+=back
+
+In ogni caso, E<egrave> sicuro utilizzare C<P> o C<p> per impacchettare una
+stringa letterale, perchE<eacute> Perl alloca semplicemente una variabile anonima.
+
+
+
+=head1 Ricette di Impacchettamento
+
+Ecco un po' di ricette preconfezionate (possibilmente) utili per C<pack> e C<unpack>:
+
+    # Converti indirizzi IP per le funzioni sui socket
+    pack( "C4", split /\./, "123.4.5.6" ); 
+
+    # Conta i bit in un segmento di memoria (per esempio un vettore select)
+    unpack( '%32b*', $mask );
+
+    # Determina il tipo di finale del vostro sistema
+    $a_finale_piccolo = unpack( 'c', pack( 's', 1 ) );
+    $a_finale_granden = unpack( 'xc', pack( 's', 1 ) );
+
+    # Determina il numero di bit in un intero nativo
+    $numero_bit = unpack( '%32I!', ~0 );
+
+    # Prepara il parametro per la chiamata di sistema nanosleep
+    my $specifica_temporale = pack( 'L!L!', $secondi, $nanosecondi );
+
+Per una semplice stampata della memoria spacchettiamo alcuni ottetti
+in un numero corrispondente di coppie di cifre esadecimali, ed utilizziamo
+C<map> per gestire la spaziatura tradizionale - 16 ottetti per riga:
+
+    my $i;
+    print map( ++$i % 16 ? "$_ " : "$_\n",
+               unpack( 'H2' x length( $mem ), $mem ) ),
+          length( $mem ) % 16 ? "\n" : '';
+
+
+=head1 Sezione AmenitE<agrave>
+
+    # Estraiamo cifre dal nulla...
+    print unpack( 'C', pack( 'x' ) ),
+          unpack( '%B*', pack( 'A' ) ),
+          unpack( 'H', pack( 'A' ) ),
+          unpack( 'A', unpack( 'C', pack( 'A' ) ) ), "\n";
+
+    # Eccone una utile per la strada ;-)
+    my $consiglio = pack( 'tutto quel che puoi nel furgoncino' );
+
+
+=head1 Autori
+
+Simon Cozens e Wolfgang Laun.
+
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlpacktut
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Flavio Poletti.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut
+

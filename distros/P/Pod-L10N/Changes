@@ -1,0 +1,75 @@
+Revision history for Perl module Pod::L10N
+
+1.03 2015-01-23T19:57:50Z
+
+	- fix substhead.t
+
+1.02 2015-01-23T19:14:45Z
+
+	- adjust tests for Pod-Simple-3.29
+	- add tests
+
+1.01 2013-10-21T18:15:52Z
+
+	- recover pod
+	- adjust license
+
+1.00_01 2013-10-10T08:19:13Z
+
+	- change timestamp (#1)
+	- add private packages to no_index
+
+1.00 2013-10-07T07:48:49Z
+
+	- change base to Pod::Simple
+	- change release base to Minilla-based
+
+0.07 2010-07-22 17:52:18 JST
+
+	- fix bug that head with X<> cannot substitute correctly
+
+0.06 2010-07-01 20:19:50 JST
+
+	- adjust test for Non-Unix
+
+0.05 2009-06-19 23:40:42 JST
+
+	- adjust test for pre-5.8
+	- more support for =encoding
+	- fix bug about headings with formattings codes
+
+0.04 2009-06-05 18:53:26 JST
+
+	- add pod
+
+0.03_02 2009-06-05 00:57:10 JST
+
+	- eliminate some warnings
+
+0.03_01 2009-06-04 00:23:12 JST
+
+	- change base to Pod::Html 1.09_04
+	- add tests from Pod::Html
+
+0.03 2009-05-28 15:53:36 JST
+
+	- release
+
+0.02_02 2009-05-28 00:35:52 JST
+
+	- skip some tests
+
+0.02_01 2009-05-27 17:11:52 JST
+
+	- adjust some tests
+
+0.02 2009-05-27 02:28:18 JST
+
+	- add =item-substitution
+	- suppress link to non-exist modules
+	- add some tests
+
+0.01 2008-07-30 02:40:54 JST
+
+	- initial release (without tests)
+

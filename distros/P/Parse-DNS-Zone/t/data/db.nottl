@@ -1,0 +1,14 @@
+@		IN	3600	SOA	ns1.example.com. hostmaster.example.com. (
+						1234567890	; Serial
+						86400		; Refresh
+						3600		; Retry
+						3600000		; Expire
+						14400  )	; Negative Cache TTL
+
+@		3600		NS	ns1.example.com.
+@		3600		A	127.0.0.1
+
+test-class	42	IN	A	127.0.0.1
+test-ttl	400		A	127.0.0.1
+test-ttlclass	400 	IN	A 	127.0.0.1
+test-ttlclassr	IN	400	A 	127.0.0.1

@@ -1,0 +1,343 @@
+
+NAME
+       Perl6::Contexts - array and hash variables turn into ref-
+       erences to themselves when used in non-numeric scalar con-
+       text or as function arguments
+
+SYNOPSIS
+         my @foo = ( 1 .. 20 );
+         my $foo = @foo;                  # same as my $foo = \@foo;
+         my $foo = 0 + @foo;              # unchanged - length of @foo
+         $obj->some_method(10, 20, @foo); # same as $obj->some_method(10, 20, \@foo);
+         some_function(10, 20, @foo);     # same as some_function(10, 20, \@foo);
+
+DESCRIPTION
+       Perl6::Contexts makes Perl 5 behave more like Perl 6 with
+       reguard to the meaning of array and hash variables when
+       used in scalar context and function calls.
+
+       Using this module to make Perl 5 more like Perl 6 won't go
+       very far towards writing Perl 5 that will run under Perl 6
+       but it will help you get used to some of the changes. (As
+       far as legacy code is concerned, check out the excellent
+       PONIE project - everyones money is on PONIE!).
+
+       This module doesn't add new syntax - it merely changes the
+       meaning of existing syntax.
+
+       Context
+
+       Perl 6 divides scalar context into boolean, numeric,
+       string, and object context, among others.
+
+       Reference Context
+
+       Arrays and hashes used in reference context turn into a
+       reference to themselves.  We assume reference context
+       unless we know better. This vaguely approximates Perl 6's
+       behavior. For example, given a completely spurrious "my
+       $foo = @bar", we assume that $foo should be a reference to
+       @bar.
+
+       Numeric Context
+
+       Arrays used in numeric context return their size, as in
+       Perl 5.  Perl 6 uses the "+" prefix or "num", "int", or
+       "float" keywords to force numeric context.  We don't have
+       those keywords (yet), but "+" and "scalar" do the trick
+       for now.  Numeric context is also supplied by math related
+       operators such as "-", "*", "sin", and so on.
+
+       Force numeric context to get the old Perl 5 behavior of
+       counting the elements in an array or hash:
+
+         scalar @arr;
+         0 + @arr;
+
+       In Perl 6, the 0 is redundant and undesireably ugly but it
+       is required for our purposes so I suggest using "scalar"
+       instead.
+
+       Note that hashes return internal memory allocation infor-
+       mation when used in scalar context - use "scalar keys
+       %hash" to count the number of items it contains.
+
+       Boolean Context
+
+       Boolean context formalizes the murky semantics of "zero
+       but true" for Perl 6 but our implementation doesn't do
+       anything to help with that.  Our boolean context is cur-
+       rently identical to Perl 5's scalar context which is iden-
+       tical to numeric context and is provided by "and", "or",
+       "&&", "||", and other conditionls.
+
+       String Context
+
+       Perl 6 gives arrays, hashes, and objects, among other
+       things, control over how they present themselves when used
+       as a string.  Perl 6 adds interpolation of hashes in
+       quoted text, along with the arrays and scalars that
+       already interpolate in Perl 5.  Each variable can be
+       extended with a trait to control the exact details of its
+       presentation.  Perl 5 allows a minimal amount of presenta-
+       tion control with the global $" variable.  See perldoc
+       perlvar's entry on $" for details.  We don't try to inter-
+       polate hashes in strings but we do "join" on $" to
+       stringify arrays when used as a string. The "." operator,
+       for example, forces string context.
+
+         use Perl6::Contexts;
+         my $t1; my $t2; my $t3;
+         my @arr = ( 1 .. 20 );
+         print '@arr: ' . @arr . "\n";  # note that . is used instead of comma
+
+       "." forces string context on @arr in this example.
+
+       Or:
+
+         use Perl6::Contexts;
+         my $t1; my $t2; my $t3;
+         my @arr = ( 1 .. 20 );
+         $" = '-';
+         @arr =~ m/15-16/ or die;
+
+       "=~" forces string context on @arr in this example. That's
+       a lot more useful than matching on a string representing
+       of the number of things in @arr.
+
+       Yes, the "my $t1" things are needed to use arrays in
+       string context. It's a long story.  See the BUGS section
+       for details if you're curious but it's a limitation I hope
+       to overcome soon. There must be one such variable allo-
+       cated for each string context use of an array in the sin-
+       gle most complex expression in the module (and thus is the
+       sacrifice that must be paid homage to satisify the demons
+       that make this module work).
+
+       Context Summary
+
+       This module cheats a bit in guessing context. Contexts do
+       not propogate (yet) as they do in Perl. Operators such as
+       "||" do not yet apply the context to their operands that
+       they themselves got from somewhere. The point of some con-
+       texts, such as boolean, is entirely missed. In general,
+       the Perl 6 rules and this module come closer to the ideal
+       of "do what I mean".
+
+       Function Calls
+
+       Hashes and arrays as function and method call arguments
+       don't flatten by default. Perl 6 uses the splat operator,
+       "*", to flatten arrays and hashes sent as arguents to
+       functions.  Like Perl 6, we don't flatten implicitly
+       either. Unlike Perl 6, explicit flattening is kind of
+       painful.
+
+         use Perl6::Contexts;
+
+         my @numbers = map int rand 100, 1 .. 100;
+         sub_that_wants_a_bunch_of_numbers(@numbers);   # passes by reference - wrong
+         sub_that_wants_a_bunch_of_numbers(\@numbers);  # same thing - wrong
+
+       In order to flatten things for subroutines that actually
+       want flattened arrays, use one of these tricks:
+
+         sub_that_wants_a_bunch_of_numbers(@numbers[0 .. $#numbers]);
+         sub_that_wants_a_bunch_of_numbers(@numbers->flatten());
+
+       "->flatten()" requires autobox. See below. Perl 6's "*"
+       operator, which forcefully unflattens arrays, is not
+       available in Perl 5 or via this module.
+
+       Subroutines called by code subjected to the rules of
+       Perl6::Contexts must accept references to arrays and
+       hashes unless the array or hash in the call to that sub-
+       routine was explicitly flattened:
+
+         use Perl6::Contexts;
+
+         my @array = ( 1 .. 20 );
+         sub_that_wants_an_array_ref(@array);
+
+         sub sub_that_wants_an_array_ref {
+             my $arrayref = shift;   # @array turned into a reference
+             my @array = @$arrayref; # or use an autobox trick if you like
+         }
+
+       This applies even if the subroutine or method is in
+       another package entirely.  Note that the requirement that
+       @$arrayref be written that way and not $arrayref is an
+       incompleteness of this module though obviously we aren't
+       going to munge modules that don't use us.  See the autobox
+       tricks below and of course $arrayref may be used directly
+       as the array reference that it is.
+
+       autobox Interopation
+
+       This module works with autobox. Normally autobox requires
+       a reference, a scalar, a number, a string, or a code ref-
+       erence, which excludes arrays and hashes:
+
+         use autobox;
+         use autobox::Core;
+         my @arr = ( 1 .. 20);
+         @arr->sum->print;     # doesn't work without Perl6::Contexts
+         (\@arr)->sum->print;  # works without Perl6::Contexts but ugly
+
+       Same goes for hashes.  (While this is a fluke side effect
+       of what we're doing I was aware of the consequence early
+       on and it was a great motiviation to create this module,
+       so autobox integration is a feature beyond any doubt.)
+
+       Often you'll want arrays and hashes to flatten when passed
+       as arguments:
+
+         use Perl6::Contexts;
+
+         my @numbers = map int rand 100, 1 .. 100;
+         sub_that_wants_a_bunch_of_numbers(@numbers);  # passes by reference - wrong
+
+       autobox and autobox::Core may be used to force array flat-
+       tening:
+
+         use Perl6::Contexts;
+         use autobox;
+         use autobox::Core;
+
+         my @numbers = map int rand 100, 1 .. 100;
+         sub_that_wants_a_bunch_of_numbers(@numbers->flatten);  # explicit flattening
+
+       To accomplish this without autobox, you may take a slice
+       of the entire array:
+
+         use Perl6::Contexts;
+
+         my @numbers = map int rand 100, 1 .. 100;
+         sub_that_wants_a_bunch_of_numbers(@numbers[0 .. $#numbers]); # ugly but works
+
+BUGS
+       There are no meaningful texts at this time. That's on the
+       top of the list for 0.2. Consider this a preview release.
+
+       autobox::Core makes assumptions about what Perl 6 will
+       name autoboxed methods on primtive types. As I learn more
+       (and more is published) these examples and autobox::Core
+       will change to be consistent with Perl 6. In other words,
+       do not rely on the interface staying the same until ver-
+       sion 1.0 (and then you're taking your own chances but I'll
+       try my best).
+
+       Scalar variables used in conditionals (such as "if" and
+       "and") don't dereference themselves and reference values
+       are always true (unless you do something special). Hence
+       this will always die:
+
+         use Perl6::Contexts;
+         my @arr = ( );      # completely empty arrays evaluate false
+         my $arrref = @arr;  # takes a reference
+         die if $arrref;     # always dies - ERROR
+
+       You must use " autobox " and " autobox::Core " and write
+       "die if $arrref->flatten()", or else write the old Perl 5
+       stand by,  @$arrref .
+
+       "push", "pop", "exists", "delete", "shift", "unshift",
+       "sort", "map", "join", and "grep" issue compile time warn-
+       ings when used on a scalar even though this scalar could
+       only possibly be a reference.
+
+         push $arrref, 1;
+
+         # diagnostic: Type of arg 1 to push must be array (not scalar dereference)
+
+       Perl 6 handles this correctly. Perl 5 could with replace-
+       ment versions of those statements written in Perl. Perhaps
+       in the next version this module will.  Of course, it would
+       be nice if the core did the "right thing" ;)
+
+       The unary "*" operator doesn't flatten lists as it does in
+       Perl 6.  Instead, autobox and "->flatten" must be used for
+       this, or synonymously, "->elements".
+
+       "scalar" is considered to provide numeric context. This is
+       not consistent with Perl 6, where "string", "bool", "bit",
+       "string", "int", "num", and "float" generate contexts,
+       much like "scalar" does in Perl 5. This module should
+       export those keywords.
+
+       While "0 + @arr" accidentally works to put @arr in numeric
+       context and get its length, no unary "~" (yet) exists to
+       force string context (though it could - it would mean no
+       more negating strings full of bits without calling a func-
+       tion in another module to do it).
+
+       "my @array = $arrayref" should, but doesn't, dereference
+       $arrayref and dump its contents into @array. This can, and
+       should, be done but I haven't gotten to it yet.
+
+       Hashes in strings should interpolate but that's outside
+       the scope of this module.  See Perl6::Interpolators for an
+       implementation.
+
+       Making users create temporaries is a kludge as ugly as
+       any. I plan to roll this ability into B::Generate.  Why
+       are "my $t1", "my $t2", and so on, required?  Perl associ-
+       ates nameless lexical variables with operations to speed
+       up the stack machine.  Each operation has its own virtu-
+       ally private scalar value, array value, hash value, or so
+       on, that it can push to the stack any time it likes with-
+       out having to allocate it. Next time the instruction runs
+       again it knows that it can reuse the same variable.
+       B::Generate isn't able to allocate these for instructions
+       so I have to use preexisting named variables.
+
+VERSION
+       0.1. Versions fixing bugs I've found and adding features I
+       think of will increment the minor version number. 1.0 will
+       be released after a sufficient amount of user feedback
+       suggestions that I'm not as far off in la-la land as I
+       might be for all I know.  This la-la land caveat applies
+       to the Perl 6 specification as well, which I am
+       doubtlessly botching.  Version 1.0 will also include
+       proper tests.
+
+SEE ALSO
+       autobox associates methods with primitive types allowing
+       more complex APIs for types than would be reasonable to
+       create built-in functions for. autoboxing also simplifies
+       complex expressions that would require a lot of parenthe-
+       sis by allowing the expression to be arranged into more a
+       logical structure.
+
+       autobox::Core compliments autobox with wrappers for most
+       built-in functions, some statements, some functionalish
+       methods from core modules, and some Perl 6-ish things.
+
+       Perl 6 is able to take $arrayref[0] to mean
+       "$arrayref.[0]" which is "$arrayref->[0]" in Perl 5. This
+       module won't get you that but see Perl6::Variables.
+
+       Want gives Perl 5 subroutines Perl 6-like information
+       about the context they execute in, including the number of
+       result values expected, boolean context, "BOOL", and
+       various kinds of reference contexts. It is a generalized
+       replacement for the built-in wantarray function.
+
+       B represents Perl internal data structures (including and
+       especially bytecode instructions for the virtual machine)
+       as Perl objects within perl itself. B::Generate extends B
+       with the capability to modify this bytecode from within
+       the running program (!!!). This module uses these two mod-
+       ules to do what it does. Opcode served as a reference, and
+       code was stolen from B::Utils, B::Deparse, and B::Concise
+       (but with implicit permission - yes, Free Software pro-
+       grammers do steal but never uninvited - seriously, I owe a
+       debt of gratitude to those whose work I've built on, espe-
+       cially Simon Cozens and Malcolm Beattie in this case).
+
+       http://perldesignpatterns.com/?PerlAssembly attempts to
+       document the Perl internals I'm prodding so bluntly.
+
+AUTHOR
+       SWALTERS, scott@slowass.net
+

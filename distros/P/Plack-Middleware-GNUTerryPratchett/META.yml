@@ -1,0 +1,22 @@
+---
+abstract: 'Adds automatically an X-Clacks-Overhead header.'
+author:
+  - 'Tiago Peczenyj <tiago.peczenyj@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.132661'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-GNUTerryPratchett
+requires:
+  Plack: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com///github.com/peczenyj/Plack-Middleware-Pratchett/issues
+  homepage: https://github.com///github.com/peczenyj/Plack-Middleware-Pratchett
+  repository: git://github.com///github.com/peczenyj/Plack-Middleware-Pratchett.git
+version: 0.01

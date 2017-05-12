@@ -1,0 +1,49 @@
+Revision history for Perl module POEx-Weather-OpenWeatherMap
+
+0.003002 2016-06-27
+
+  - Drop (unneeded) MooX::late dependency
+
+  - Packaging; switch to cpanfile
+
+0.003001 2015-12-29
+
+  - Add 'set_api_key' for setting/changing 'api_key' after object construction
+
+  - Explicitly clean up cache when Emitter stops; expire stale items if a
+    persistent 'cache_dir' is in use or clear the cache entirely if caching to
+    tempdir
+
+  - carp() about it if constructed without an 'api_key'
+
+0.002002 2015-12-28
+
+  - examples/ fixes
+
+  - Depend on newer Weather::OpenWeatherMap for hourly forecast support
+
+0.002001 2014-08-16
+
+  - Support 'find' requests
+
+0.001005 2014-05-09
+
+  - Add cache support via Weather::OpenWeatherMap::Cache
+
+0.001004 2014-04-25
+
+  - use Defaults::Modern;
+
+0.001003 2014-04-24
+
+  - POD, test tweaks
+
+0.001002 2014-04-23
+
+  - Drop some deprecated leftovers ('_in_shutdown' attr)
+
+  - Packaging fixes; missing MooX::Role::POE::Emitter dependency
+
+0.001001 2014-04-23
+
+  - Initial release

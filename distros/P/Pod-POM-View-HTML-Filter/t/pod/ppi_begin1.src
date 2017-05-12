@@ -1,0 +1,18 @@
+=begin filter ppi
+
+# now in full colour!
+$A++;
+
+=end filter
+__RESULT__
++ppi
+<html><body bgcolor="#ffffff">
+<pre><span class="comment"># now in full colour!
+</span><span class="symbol">$A</span><span class="operator">++</span><span class="structure">;</span></pre>
+</body></html>
+__RESULT__
+-ppi
+<html><body bgcolor="#ffffff">
+<pre># now in full colour!
+$A++;</pre>
+</body></html>

@@ -1,0 +1,22 @@
+=encoding utf8
+
+=head1 NAME
+
+Padre::Plugin::RunPerlExternal~[de] - Startet Perl in einem externen Fenster
+
+=head1 DESCRIPTION
+
+Dieses Plugin startet das Perl Dokument in einem externen Fenster und das
+unabhängig von dem in "Einstellungen" festgelegten Verhalten.
+
+
+=head1 COPYRIGHT & LICENSE
+
+
+This software is copyright (c) 2011 by Matthias Ries
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+1;

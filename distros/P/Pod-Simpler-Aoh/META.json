@@ -1,0 +1,59 @@
+{
+   "abstract" : "Parse pod into an array of hashes.",
+   "author" : [
+      "Robert Acock <thisusedtobeanemail@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Simpler-Aoh",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Metadata" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "1.0010001",
+            "MooX::LazierAttributes" : "0.11",
+            "Pod::Simple" : "3.29",
+            "Type::Tiny" : "1.000006",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Pod::Simpler::Aoh" : {
+         "file" : "lib/Pod/Simpler/Aoh.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ThisUsedToBeAnEmail/Pod-Simpler-Aoh.git",
+         "web" : "https://github.com/ThisUsedToBeAnEmail/Pod-Simpler-Aoh"
+      }
+   },
+   "version" : "0.06"
+}

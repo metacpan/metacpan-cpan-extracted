@@ -1,0 +1,42 @@
+Revision history for Perl extension Paws-Kinesis-MemoryCaller
+
+0.09 2017-01-18T22:05:07Z
+
+    - Support for version 0.30 of Paws
+
+0.08 2016-10-12T15:53:28Z
+
+    - Bugfix: Return correct number of array elements using Limit
+    - Bugfix: Return correct shard iterator using limit
+
+0.07 2016-08-21T18:36:39Z
+
+    - GetRecords now returns correct NextShardIterator when using Limit
+    - Implementation for shortcut method new_kinesis()
+
+0.06 2016-08-19T18:35:39Z
+
+    - Tests use Paws::Credential::Environment, passes in older Paws versions
+
+0.05 2016-08-18T12:00:34Z
+
+    - List Test::Most as a dependency
+
+0.04 2016-08-16T21:33:51Z
+
+    - PutRecord now requires Base64 data.
+    - Improved error messages when StreamName/ShardId doesn't exist
+
+0.03 2016-08-14T19:57:40Z
+
+    - Implementation for PutRecords (as opposed to PutRecord)
+    - Improved tests for TRIM_HORIZON and LATAST ShardIteratorTypes
+
+0.02 2016-08-14T12:35:45Z
+
+    - Add CPAN deps
+
+0.01 2016-08-14T12:19:53Z
+
+    - original version
+

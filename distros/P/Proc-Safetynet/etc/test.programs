@@ -1,0 +1,34 @@
+[
+   {
+      "priority" : "999",
+      "autorestart_wait" : "10",
+      "autostart" : 1,
+      "autorestart" : 1,
+      "name" : "cat",
+      "command" : "/bin/cat"
+   },
+   {
+      "autorestart_wait" : "10",
+      "autostart" : 0,
+      "autorestart" : 1,
+      "name" : "hello",
+      "command" : "cat"
+   },
+   {
+      "priority" : "999",
+      "eventlistener" : 1,
+      "autorestart_wait" : "10",
+      "autostart" : 1,
+      "autorestart" : 1,
+      "name" : "log2",
+      "command" : "/home/dexter/pl/log2.pl >> /tmp/safetynet.log"
+   },
+   {
+      "priority" : "999",
+      "autorestart_wait" : "10",
+      "autostart" : 1,
+      "autorestart" : 1,
+      "name" : "sort",
+      "command" : "/usr/bin/sort"
+   }
+]

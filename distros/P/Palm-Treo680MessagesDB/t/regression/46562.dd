@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1192706305,
+          'number' => '',
+          'time' => '12:18',
+          'date' => '2007-10-18',
+          'name' => 'MoneyAlert',
+          'phone' => '',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1192706305,
+          'text' => 'Take advantage of your new Credit Card limit of £20900. Call 31333189350 and transfer balances at 0.0% p.a. until your July 2008 statement date',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7107300,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 46562
+        };

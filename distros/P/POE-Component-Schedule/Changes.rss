@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:content="http://purl.org/rss/1.0/modules/content/"
+ xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+ xmlns:admin="http://webns.net/mvcb/"
+>
+
+<channel rdf:about="http://search.cpan.org/dist/POE-Component-Schedule/">
+<title>POE-Component-Schedule releases</title>
+<link>http://search.cpan.org/dist/POE-Component-Schedule/</link>
+<description>Revision history for POE-Component-Schedule</description>
+<dc:language>en-us</dc:language>
+<dc:date>2010-05-25T22:37:07+02:00</dc:date>
+<dc:creator>Olivier Mengu&#xE9; &#x3C;dolmen@cpan.org&#x3E;</dc:creator>
+<syn:updatePeriod>weekly</syn:updatePeriod>
+<taxo:topics>
+  <rdf:Bag>
+    <rdf:li resource="http://dmoz.org/Computers/Programming/Languages/Perl/" />
+  </rdf:Bag>
+</taxo:topics>
+<items>
+ <rdf:Seq>
+  <rdf:li rdf:resource="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.95/" />
+  <rdf:li rdf:resource="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.94_03/" />
+  <rdf:li rdf:resource="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.94_02/" />
+  <rdf:li rdf:resource="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.94_01/" />
+  <rdf:li rdf:resource="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.94/" />
+  <rdf:li rdf:resource="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.93_02/" />
+  <rdf:li rdf:resource="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.93_01/" />
+  <rdf:li rdf:resource="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.92/" />
+  <rdf:li rdf:resource="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.91_01/" />
+  <rdf:li rdf:resource="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.03/" />
+  <rdf:li rdf:resource="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.02/" />
+  <rdf:li rdf:resource="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.01/" />
+ </rdf:Seq>
+</items>
+</channel>
+<item rdf:about="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.95/">
+<title>POE-Component-Schedule 0.95</title>
+<link>http://search.cpan.org/~dolmen/POE-Component-Schedule-0.95/</link>
+<description>&#x3C;ul&#x3E;
+&#x3C;li&#x3E;No changes since 0.94_03.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Only change since 0.94 is fix for &#x3C;a href=&#x22;https://rt.cpan.org/Public/Bug/Display.html?id=56447&#x22; title=&#x22;Bug RT#56447&#x22;&#x3E;RT#56447&#x3C;/a&#x3E; (allow POE aliases as target session ID for events).&#x3C;/li&#x3E;
+&#x3C;/ul&#x3E;</description>
+<dc:creator>Olivier Mengu&#xE9; &#x3C;dolmen@cpan.org&#x3E;</dc:creator>
+<dc:date>2010-05-25T22:36+02:00</dc:date>
+</item>
+<item rdf:about="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.94_03/">
+<title>POE-Component-Schedule 0.94_03</title>
+<link>http://search.cpan.org/~dolmen/POE-Component-Schedule-0.94_03/</link>
+<description>&#x3C;ul&#x3E;
+&#x3C;li&#x3E;No functional change since 0.94_01.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Fixed constant functions: added &#x22;()&#x22; prototype to make them inlinable by perl. Should have been like that since 0.91_01. That should improve performance.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Added .perlcriticrc to disable Perl::Critic policies that do not match our style (filled &#x3C;a href=&#x22;https://rt.cpan.org/Public/Bug/Display.html?id=57638&#x22; title=&#x22;Bug RT#57638&#x22;&#x3E;RT#57638&#x3C;/a&#x3E;, &#x3C;a href=&#x22;https://rt.cpan.org/Public/Bug/Display.html?id=57639&#x22; title=&#x22;Bug RT#57639&#x22;&#x3E;RT#57639&#x3C;/a&#x3E;, &#x3C;a href=&#x22;https://rt.cpan.org/Public/Bug/Display.html?id=57640&#x22; title=&#x22;Bug RT#57640&#x22;&#x3E;RT#57640&#x3C;/a&#x3E;, &#x3C;a href=&#x22;https://rt.cpan.org/Public/Bug/Display.html?id=57807&#x22; title=&#x22;Bug RT#57807&#x22;&#x3E;RT#57807&#x3C;/a&#x3E; for issues with default policies).&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Made some suggestions from Perl::Critic. Reduced number of lines, so improved test coverage ratio.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Test coverage: 94.5%.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Author build system: fixed the &#x27;Build tag&#x27;.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Author build system: improved steps to publish &#x27;Changes.rss&#x27; in the Google Code wiki area.&#x3C;/li&#x3E;
+&#x3C;/ul&#x3E;</description>
+<dc:creator>Olivier Mengu&#xE9; &#x3C;dolmen@cpan.org&#x3E;</dc:creator>
+<dc:date>2010-05-25T00:14+02:00</dc:date>
+</item>
+<item rdf:about="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.94_02/">
+<title>POE-Component-Schedule 0.94_02</title>
+<link>http://search.cpan.org/~dolmen/POE-Component-Schedule-0.94_02/</link>
+<description>&#x3C;ul&#x3E;
+&#x3C;li&#x3E;Author build system: Changes.{rss,yml} generation is now automated by extending Module::Build (see &#x27;inc/MY/Build.pm&#x27; and &#x27;inc/MY/Build/Changes.pm&#x27;).&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Added &#x27;t/90-critic.t&#x27; to &#x27;MANIFEST.SKIP&#x27; as it is the main cause of CPAN Testers failures.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Author build system: Drop &#x27;Makefile.PL&#x27; generation by Module::Build.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Author build system: Transformed &#x27;make-svn-tag.pl&#x27; into a Build target (&#x27;tag&#x27;).&#x3C;/li&#x3E;
+&#x3C;/ul&#x3E;</description>
+<dc:creator>Olivier Mengu&#xE9; &#x3C;dolmen@cpan.org&#x3E;</dc:creator>
+<dc:date>2010-05-18T01:02+02:00</dc:date>
+</item>
+<item rdf:about="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.94_01/">
+<title>POE-Component-Schedule 0.94_01</title>
+<link>http://search.cpan.org/~dolmen/POE-Component-Schedule-0.94_01/</link>
+<description>&#x3C;ul&#x3E;
+&#x3C;li&#x3E;&#x3C;a href=&#x22;https://rt.cpan.org/Public/Bug/Display.html?id=56447&#x22; title=&#x22;Bug RT#56447&#x22;&#x3E;RT#56447&#x3C;/a&#x3E; fixed, but I expect to unapply the fix once &#x3C;a href=&#x22;https://rt.cpan.org/Public/Bug/Display.html?id=57314&#x22; title=&#x22;Bug RT#57314&#x22;&#x3E;RT#57314&#x3C;/a&#x3E; (allow aliases in $poe_kernel-&#x3E;refcount_{in,de}crement) is implemented. Test cases added.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Bug references are now linked in &#x27;Changes.rss&#x27;.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Test coverage: 91.6%.&#x3C;/li&#x3E;
+&#x3C;/ul&#x3E;</description>
+<dc:creator>Olivier Mengu&#xE9; &#x3C;dolmen@cpan.org&#x3E;</dc:creator>
+<dc:date>2010-05-09T19:44+02:00</dc:date>
+</item>
+<item rdf:about="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.94/">
+<title>POE-Component-Schedule 0.94</title>
+<link>http://search.cpan.org/~dolmen/POE-Component-Schedule-0.94/</link>
+<description>&#x3C;ul&#x3E;
+&#x3C;li&#x3E;Only minor POD changes in Schedule.pm since 0.93_02.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Increased dependencies versions.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Small tweak to the &#x27;Changes&#x27; file format to make it more parseable and be able to generate &#x27;Changes.yml&#x27; and &#x27;Changes.rss&#x27;.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Added &#x27;Changes.rss&#x27; and &#x27;Changes.yml&#x27;, generated from &#x27;Changes&#x27; using either &#x27;make-Changes-rss.pl&#x27; or &#x27;make-Changes-rss-2.pl&#x27; (see SVN repo).&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Test coverage: 92.1%.&#x3C;/li&#x3E;
+&#x3C;/ul&#x3E;</description>
+<dc:creator>Olivier Mengu&#xE9; &#x3C;dolmen@cpan.org&#x3E;</dc:creator>
+<dc:date>2010-03-13T16:37+01:00</dc:date>
+</item>
+<item rdf:about="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.93_02/">
+<title>POE-Component-Schedule 0.93_02</title>
+<link>http://search.cpan.org/~dolmen/POE-Component-Schedule-0.93_02/</link>
+<description>&#x3C;ul&#x3E;
+&#x3C;li&#x3E;More test coverage, but still only 92.1%. Help still welcome for &#x3C;a href=&#x22;https://rt.cpan.org/Public/Bug/Display.html?id=53925&#x22; title=&#x22;Bug RT#53925&#x22;&#x3E;RT#53925&#x3C;/a&#x3E;.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Improved argument check for -&#x3E;add() (and now, with tests too).&#x3C;/li&#x3E;
+&#x3C;li&#x3E;POE &#x3E;= 1.281 is recommended as it fixes the _child(lose) issue.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Updated POD: removed obsolete warnings, updated copyright.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Updated README: should be more helpful for distribution packagers.&#x3C;/li&#x3E;
+&#x3C;/ul&#x3E;</description>
+<dc:creator>Olivier Mengu&#xE9; &#x3C;dolmen@cpan.org&#x3E;</dc:creator>
+<dc:date>2010-02-13T16:30+01:00</dc:date>
+</item>
+<item rdf:about="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.93_01/">
+<title>POE-Component-Schedule 0.93_01</title>
+<link>http://search.cpan.org/~dolmen/POE-Component-Schedule-0.93_01/</link>
+<description>&#x3C;ul&#x3E;
+&#x3C;li&#x3E;Applied fix for &#x3C;a href=&#x22;https://rt.cpan.org/Public/Bug/Display.html?id=53925&#x22; title=&#x22;Bug RT#53925&#x22;&#x3E;RT#53925&#x3C;/a&#x3E; (Patch by Zeph Gillen).&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Added t/50-subclass.t to try to catch subclassing problems which may affect POE::Component::Cron. Unfortunately it does not catch &#x3C;a href=&#x22;https://rt.cpan.org/Public/Bug/Display.html?id=53925&#x22; title=&#x22;Bug RT#53925&#x22;&#x3E;RT#53925&#x3C;/a&#x3E;. Help needed.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Added strictures in tests.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Updated &#x27;MANIFEST.SKIP&#x27; to match new Module::Build: ignore MYMETA.yml.&#x3C;/li&#x3E;
+&#x3C;/ul&#x3E;</description>
+<dc:creator>Olivier Mengu&#xE9; &#x3C;dolmen@cpan.org&#x3E;</dc:creator>
+<dc:date>2010-02-13T01:55+01:00</dc:date>
+</item>
+<item rdf:about="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.92/">
+<title>POE-Component-Schedule 0.92</title>
+<link>http://search.cpan.org/~dolmen/POE-Component-Schedule-0.92/</link>
+<description>&#x3C;ul&#x3E;
+&#x3C;li&#x3E;Official Release. Have to review doc before 1.00.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Fixed my local YAML.pm to have correct encoding of &#x27;META.yml&#x27;.&#x3C;/li&#x3E;
+&#x3C;/ul&#x3E;</description>
+<dc:creator>Olivier Mengu&#xE9; &#x3C;dolmen@cpan.org&#x3E;</dc:creator>
+<dc:date>2009-11-20T19:17+01:00</dc:date>
+</item>
+<item rdf:about="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.91_01/">
+<title>POE-Component-Schedule 0.91_01</title>
+<link>http://search.cpan.org/~dolmen/POE-Component-Schedule-0.91_01/</link>
+<description>&#x3C;ul&#x3E;
+&#x3C;li&#x3E;Major internal rewrite. No external changes. I love TDD!&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Now the scheduling session is detached from the session from which the session was spawned. This should help to avoid session attachment/references problems as the scheduler is not anymore attached to a particular session. Note that due to a POE bug, _child(lose) is still fired.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Fixed typos in example code. kthakore++&#x3C;/li&#x3E;
+&#x3C;li&#x3E;TODO: add a test that extracts test code from the SYNOPSIS POD section and runs it. Maybe using Test::Pod::Snippets.&#x3C;/li&#x3E;
+&#x3C;/ul&#x3E;</description>
+<dc:creator>Olivier Mengu&#xE9; &#x3C;dolmen@cpan.org&#x3E;</dc:creator>
+<dc:date>2009-11-19T20:55+01:00</dc:date>
+</item>
+<item rdf:about="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.03/">
+<title>POE-Component-Schedule 0.03</title>
+<link>http://search.cpan.org/~dolmen/POE-Component-Schedule-0.03/</link>
+<description>&#x3C;ul&#x3E;
+&#x3C;li&#x3E;Major improvement of POD. Fixed sample code.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Improved test suite to check session reference counting.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Added DESTROY handler for schedule handles to automatically delete handles which are not anymore referenced.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Deprecated -&#x3E;delete().&#x3C;/li&#x3E;
+&#x3C;/ul&#x3E;</description>
+<dc:creator>Olivier Mengu&#xE9; &#x3C;dolmen@cpan.org&#x3E;</dc:creator>
+<dc:date>2009-06-16T19:10+02:00</dc:date>
+</item>
+<item rdf:about="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.02/">
+<title>POE-Component-Schedule 0.02</title>
+<link>http://search.cpan.org/~dolmen/POE-Component-Schedule-0.02/</link>
+<description>&#x3C;ul&#x3E;
+&#x3C;li&#x3E;Changed the default session alias to $class.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Fixed warning in Schedule.pm about new() not being used.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Improved test suite to increase code coverage (added 11-two.t).&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Improved documentation for spawn().&#x3C;/li&#x3E;
+&#x3C;li&#x3E;Thanks to Rob Fugina for discussion.&#x3C;/li&#x3E;
+&#x3C;/ul&#x3E;</description>
+<dc:creator>Olivier Mengu&#xE9; &#x3C;dolmen@cpan.org&#x3E;</dc:creator>
+<dc:date>2009-06-15T23:09+02:00</dc:date>
+</item>
+<item rdf:about="http://search.cpan.org/~dolmen/POE-Component-Schedule-0.01/">
+<title>POE-Component-Schedule 0.01</title>
+<link>http://search.cpan.org/~dolmen/POE-Component-Schedule-0.01/</link>
+<description>&#x3C;ul&#x3E;
+&#x3C;li&#x3E;First release to the world, with Chris Fedde&#x27;s blessing.&#x3C;/li&#x3E;
+&#x3C;li&#x3E;This a fork of POE::Component::Cron 0.019. See &#x3C;a href=&#x22;https://rt.cpan.org/Public/Bug/Display.html?id=44442&#x22; title=&#x22;Bug RT#44442&#x22;&#x3E;RT#44442&#x3C;/a&#x3E;.&#x3C;/li&#x3E;
+&#x3C;/ul&#x3E;</description>
+<dc:creator>Olivier Mengu&#xE9; &#x3C;dolmen@cpan.org&#x3E;</dc:creator>
+<dc:date>2009-06-05T19:56+02:00</dc:date>
+</item>
+</rdf:RDF>

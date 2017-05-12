@@ -1,0 +1,13 @@
+---
+call: CreateVirtualMFADevice
+service: IAM
+tests:
+  - expected: VTNJV09MNTZFSjNRNUlMWUJMVTZOTFROWlIzVjVTQU9XS1E1QU9FUEVRVVVHUUpGVkRRS09BMk43T0FOVEhCUg==
+    op: eq
+    path: VirtualMFADevice.Base32StringSeed
+  - expected: Zm9v
+    op: eq
+    path: VirtualMFADevice.QRCodePNG
+  - expected: arn:aws:iam::419278470775:mfa/ExampleMFADevice
+    op: eq
+    path: VirtualMFADevice.SerialNumber

@@ -1,0 +1,16 @@
+
+%module{PPI::XS::Tokenizer};
+
+// Associate a perl class with a C++ class
+%name{PPI::XS::Tokenizer} class CPPTokenizerWrapper
+{
+  %name{InternalNew} CPPTokenizerWrapper( SV* source );
+  
+  ~CPPTokenizerWrapper();
+
+  SV* get_token();
+  //LineTokenizeResults
+  //tokenizeLine(char* line, unsigned long length(line));
+};
+
+

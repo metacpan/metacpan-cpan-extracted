@@ -1,0 +1,136 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/project>
+	a                    doap:Project;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt"^^doap-deps:CpanId ];
+	doap-deps:runtime-recommendation [ doap-deps:on "PerlX::Maybe::XS"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Maybe>;
+	doap:created         "2012-02-15"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/PerlX-Maybe>;
+	doap:homepage        <https://metacpan.org/release/PerlX-Maybe>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "PerlX-Maybe";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-001>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-002>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-003>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-004>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-999_01>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-999_02>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-000>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-001>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-perlx-maybe>;
+	];
+	doap:shortdesc       "return a pair only if they are both defined".
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:issued            "2012-02-15"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-002>
+	a                    doap:Version;
+	dc:issued            "2012-05-03"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Faster implementation. Tested on Perl 5.10.1 on Linux, the new version is 60% faster. (Not that it was slow to begin with - 'maybe' is a pretty simple function.)"@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-001>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-003>
+	a                    doap:Version;
+	dc:issued            "2013-03-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Use PerlX::Maybe::XS if it's available - roughly 30% faster."@en;
+		], [
+			rdfs:label "Optionally export 'provided' function."@en;
+			doap-changeset:thanks [
+				foaf:name "Darin McBride";
+				foaf:nick "DMCBRIDE";
+			];
+			rdfs:seeAlso <https://rt.cpan.org/Ticket/Display.html?id=83883>;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-002>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-004>
+	a                    doap:Version;
+	dc:issued            "2013-05-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			rdfs:label "Silence warnings under 'perl -w'. (But you shouldn't use 'perl -w' anyway.)"@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-003>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-999_01>
+	a                    doap:Version;
+	dc:issued            "2013-08-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-004>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-0.999_01.tar.gz>;
+	doap:revision        "0.999_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-999_02>
+	a                    doap:Version;
+	dc:issued            "2013-08-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add myself as maintainer rather than developer; this should ensure that I don't get listed in 'x_contributors'."@en;
+		];
+		doap-changeset:versus <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_0-999_01>;
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-0.999_02.tar.gz>;
+	doap:revision        "0.999_02"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-000>
+	a                    doap:Version;
+	dc:issued            "2013-08-27"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-1.000.tar.gz>;
+	doap:revision        "1.000"^^xsd:string;
+	rdfs:comment         "No functional changes.".
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe/v_1-001>
+	a                    doap:Version;
+	dc:issued            "2014-09-23"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Package using newer version of Dist::Inkt."@en;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "use warnings."@en;
+		];
+	];
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-1.001.tar.gz>;
+	doap:revision        "1.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster".
+

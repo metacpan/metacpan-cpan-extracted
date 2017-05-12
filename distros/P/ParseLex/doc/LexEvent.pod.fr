@@ -1,0 +1,92 @@
+#=head1 NAME
+
+C<Parse::LexEvent> - Générateur d'analyseurs lexicaux événementiels (1.00 alpha)
+
+#=head1 SYNOPSIS
+
+  use Parse::LexEvent;
+  
+  sub string {
+    print $_[0]->name, ": $_[1]\n";
+  }
+  sub comment {
+    print $_[0]->name, ": $_[1]\n";
+  }
+  sub remainder {
+    print $_[0]->name, ": $_[1]\n";
+  }
+  
+  $lexer = Parse::LexEvent
+    ->new()->configure(
+  		   From => \*DATA,
+  		   Tokens => 
+  		     [
+  		      Type => 'Simple', Name => 'ccomment', Handler => 'comment',
+		             Regex => '//.*\n',
+  		      Type => 'Delimited', Name => 'comment', Handler => 'comment', 
+		             Start => '/[*]', End => '[*]/',
+  		      Type => 'Quoted', Name => 'squotes', Handler => 'string', Quote => qq!\'!,
+  		      Type => 'Quoted', Name => 'dquotes', Handler => 'string', Quote => qq!\"!,
+  		      Type => 'Simple', Name => 'remainder', 
+		             Regex => '(?s:[^/\'\"]+)', ReadMore => 1,
+  		     ]
+  		  )->parse();
+  __END__
+  /* 
+    C comment 
+  */
+  // C++ comment
+  var d = "string in double quotes";
+  var s = 'string in single quotes';
+  var i = 10;
+  var y = 100;
+
+
+#=head1 DESCRIPTION
+
+C<Parse::LexEvent> génère des analyseurs lexicaux à la manière de
+C<Parse::Lex>, mais les analyseurs générés émettent un événement à
+l'issue de la reconnaissance de chacun des tokens. Cet événement
+correspond à l'appel d'une procédure qui porte le nom du token. Il est
+possible de donner un nom différent à cette procédure en utilisant le
+paramètre C<Handler> lors de la définition d'un token.
+
+Une application utilisatrice de C<Parse::LexEvent> doit définir les
+procédures requises. Ces procédures reçoivent l'objet token en premier
+paramètre et la chaîne de caractères reconnue en second.
+
+C<Parse::LexEvent> hérite de C<Parse::ALex> et possède toutes les
+méthodes décrites dans la documentation de la classe C<Parse::Lex> à
+l'exception des méthodes C<analyze()>, C<every()> C<next()>, et
+C<nextis()>.
+
+#=head2 Methodes
+
+#=over 4
+
+#=item parse()
+
+Cette méthode lance l'analyse des données spécifiées par C<from()>.
+
+#=back
+
+#=head1 EXAMPLES
+
+cparser.pl - Cet analyseur reconnaît trois types de structure : des
+commentaires C ou C++, des chaînes entre guillemets et le reste. Il
+emet un événement spécifique à chacune.  On peut l'utiliser, par
+exemple, pour analyser des programmes C, C++ ou Javascript.
+
+#=head1 SEE ALSO
+
+C<Parse::Lex>, C<Parse::Token>.
+
+#=head1 AUTHOR
+
+Philippe Verdret.
+
+#=head1 COPYRIGHT
+
+Copyright (c) 1999 Philippe Verdret. All rights reserved.  This module
+is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.

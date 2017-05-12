@@ -1,0 +1,71 @@
+Personality-Type-MBTI
+
+Myers-Briggs Type Indicator (MBTI)
+
+
+DESCRIPTION
+
+The Myers-Briggs Type Indicator (MBTI) is a personality test designed
+to assist a person in identifying some significant personal
+preferences.
+
+The Indicator is frequently used in the areas of pedagogy, group
+dynamics, employee training, leadership training, marriage counseling,
+and personal development.
+
+The types the MBTI sorts for, known as dichotomies, are extraversion
+/ introversion, sensing / intuition, thinking / feeling and judging
+/ perceiving. Each of the sixteen types is referred to by a four-letter
+abbreviation, such as ESTJ or INFP, indicating that type's preference
+in each dichotomy.
+
+The MBTI includes 93 forced-choice questions, which means there are
+only two options. Participants may skip questions if they feel they
+are unable to choose. Using psychometric techniques, such as item
+response theory, the MBTI will then be scored and will attempt to
+identify which dichotomy the participant prefers. After taking the
+MBTI, participants are given a readout of their score, which will
+include a bar graph and number of how many points they received on
+a certain scale.
+
+This module calculates the MBTI scores on each scale and, eventually,
+will provide integration with other personality type theories (e.g.
+Keirsey, Big5).
+
+    use Personality::Type::MBTI;
+
+    my $mbti = Personality::Type::MBTI->new();
+
+    # sample results from a questionnaire
+    my @test = qw/i e i e i n s n s n t f t f t p j p j p/;
+
+    # calculate type
+    my $type = $mbti->type( @test );
+
+    print "Your type is '$type'\n";
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with
+the perldoc command.
+
+    perldoc Personality::Type::MBTI
+
+
+COPYRIGHT & LICENSE
+
+Copyright 2007 Nelson Ferraz, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

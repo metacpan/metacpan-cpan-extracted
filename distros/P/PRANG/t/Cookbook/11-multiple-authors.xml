@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<library>
+   <book isbn="978-0-59-600173-5">
+      <title>Perl Best Practices</title>
+      <author>Damian Conway</author>
+      <pages>544</pages>
+      <published year="2005" month="07" day="12" />
+   </book>
+   <book isbn="978-0-59-600027-1">
+      <title>Programming Perl (3rd Edition)</title>
+      <author>Larry Wall</author>
+      <author>Tom Christiansen</author>
+      <author>Jon Orwant</author>
+      <pages>1092</pages>
+      <published year="2000" month="07" day="14" />
+   </book>
+</library>

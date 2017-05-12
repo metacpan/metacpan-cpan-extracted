@@ -1,0 +1,37 @@
+================================
+2013-08-20 19:47:58 -0400 v1_305
+================================
+
+  commit 8068624c6e4bfdee879d89cd80fe56a0c3e5e818
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Aug 20 19:47:58 2013 -0400
+  
+    Bump version for release.
+
+  commit 2a2863de5680dbab7f109dc656d5808ae596ae04
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Aug 20 19:25:56 2013 -0400
+  
+    Update copyright notice and repository URL.
+
+  commit f5ab8443e09b58e9d74634a5786deb498e4a6890
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Aug 20 19:23:35 2013 -0400
+  
+    Update dependencies, and switch CHANGES to git-log.
+
+  commit 79e9dc3f31eafe49973826deca4d565a742a4aeb
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Aug 20 13:41:21 2013 -0400
+  
+    Remove artifact from Snerp::Vortex conversion.
+
+  commit 95fb7fc6664209f0ca76dc8bf6dd97e3502d8c30
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Sep 7 22:06:24 2010 -0400
+  
+    Promote polo-event files to top level. 
+
+==============
+End of Excerpt
+==============

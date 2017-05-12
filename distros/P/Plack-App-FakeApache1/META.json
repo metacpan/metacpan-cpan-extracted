@@ -1,0 +1,117 @@
+{
+   "abstract" : "Perl distro to aid in mod_perl1->PSGI migration",
+   "author" : [
+      "Chisel <chisel@chizography.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-App-FakeApache1",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache::ConfigParser" : "0",
+            "Carp" : "0",
+            "Data::Dump" : "0",
+            "HTTP::Status" : "0",
+            "Moose" : "0",
+            "Package::DeprecationManager" : "0",
+            "Plack::Component" : "0",
+            "Plack::Request" : "0",
+            "Plack::Response" : "0",
+            "Plack::Util" : "0",
+            "Plack::Util::Accessor" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Exporter" : "0",
+            "TryCatch" : "0",
+            "URI::URL" : "0",
+            "attributes" : "0",
+            "parent" : "0",
+            "perl" : "v5.10.1",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Printer" : "0",
+            "FindBin::libs" : "0",
+            "Plack::Test" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::UseAllModules" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Moose::APR::Table" : {
+         "file" : "lib/Plack/App/FakeApache1/Request.pm",
+         "version" : "v0.0.5"
+      },
+      "Plack::App::FakeApache1" : {
+         "file" : "lib/Plack/App/FakeApache1.pm",
+         "version" : "v0.0.5"
+      },
+      "Plack::App::FakeApache1::Constants" : {
+         "file" : "lib/Plack/App/FakeApache1/Constants.pm",
+         "version" : "v0.0.5"
+      },
+      "Plack::App::FakeApache1::Handler" : {
+         "file" : "lib/Plack/App/FakeApache1/Handler.pm",
+         "version" : "v0.0.5"
+      },
+      "Plack::App::FakeApache1::Request" : {
+         "file" : "lib/Plack/App/FakeApache1/Request.pm",
+         "version" : "v0.0.5"
+      },
+      "Plack::App::FakeModPerl1" : {
+         "file" : "lib/Plack/App/FakeModPerl1.pm",
+         "version" : "v0.0.5"
+      },
+      "Plack::App::FakeModPerl1::Dispatcher" : {
+         "file" : "lib/Plack/App/FakeModPerl1/Dispatcher.pm",
+         "version" : "v0.0.5"
+      },
+      "Plack::App::FakeModPerl1::Server" : {
+         "file" : "lib/Plack/App/FakeModPerl1/Server.pm",
+         "version" : "v0.0.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/chiselwright/Plack-App-FakeApache1/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/chiselwright/plack-app-fakeapache1.git",
+         "web" : "https://github.com/chiselwright/plack-app-fakeapache1"
+      }
+   },
+   "version" : "0.0.5"
+}
+

@@ -1,0 +1,99 @@
+==============================
+2012-11-08 14:19:53 -0800 0.18
+==============================
+
+  commit 19a32f8875fdd3a462681aabb6ac7fc71ffff91e
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Thu Nov 8 17:16:46 2012 -0500
+  
+    Upgrade Test::More ok() to cmp_ok() or is().
+
+  commit 91d5dd64f0bc38fee1f8f9b351fda06134910a6d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Nov 8 22:00:59 2012 +0000
+  
+    Some fixes for the ver2 SSL test
+
+  commit 6519cf1b9ebc34151bdbb7f1dc31f37d6e6b935a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Nov 8 21:38:40 2012 +0000
+  
+    The SSL tests sometimes work, sometimes don't make TODO for now
+
+  commit e72f6bc2602c5059b0a9b33a60ba83f08f0ee366
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Nov 8 21:26:48 2012 +0000
+  
+    Fix issue with time outs
+
+  commit 7355ea75d7ddef6dc4bab27b7eb1d31301bccaf3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Nov 8 19:43:51 2012 +0000
+  
+    Convert distribution to Dist::Zilla
+
+  commit 284394eb06327bdfebda179527bcf57f308a3a13
+  Merge: 21cbd6f 46b8819
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Thu Nov 8 12:24:39 2012 -0800
+  
+    Merge pull request #3 from Babar/master
+
+    Test that return codes are returned properly
+
+  commit 46b88194b426ec6dd77347b4cb2bcdfe1a470fa1
+  Author: Babar <babar@cern.ch>
+  Date:   Thu Nov 8 21:19:23 2012 +0100
+  
+    Test that return codes are returned properly
+
+  commit 017bfb087226b2d56868659e562e86727fb624e2
+  Author: Olivier Raginel <github@babar.us>
+  Date:   Thu Nov 8 20:34:14 2012 +0100
+  
+    Update lib/POE/Component/Server/NRPE.pm
+
+    $return is shifted, so needs to test $return, not $status
+
+  commit 7fd14d9c1c53ef4b0c23f5a0d077cd41c0ad82c9
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Thu Nov 8 14:27:15 2012 -0500
+  
+    Document the constants provided.
+
+  commit 82443623bf1916f9ae2429655c9cd303a86f6dae
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Thu Nov 8 14:26:58 2012 -0500
+  
+    Document what NRPE plugins should do.
+
+  commit 5d9fb4b093daea967ba3d4b9da99bb967987b749
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Thu Nov 8 14:26:08 2012 -0500
+  
+    Fix the SYNOPSIS and example to exit() rather than return() from
+    plugins.
+
+  commit 364778437e83f66b35d29193e88905220e741eb4
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Thu Nov 8 14:22:18 2012 -0500
+  
+    Fix the NRPE plugin exit code check.
+
+    Any nonzero exit value would be reported as NRPE_STATE_UNKNOWN.
+    Discovered in http://perlmonks.org/index.pl?node_id=1002942
+    Understood and fixed by Olivier Raginel in irc.perl.org #poe. 
+
+==============================
+2009-04-08 12:22:51 +0100 0.16
+==============================
+
+  commit 83261bb805e45b6e7989bb7ec8efe5fc3b5bf651
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Wed Apr 8 12:22:51 2009 +0100
+  
+    Make auto_set_repository() only run at author-time 
+
+====================================
+End of changes in the last 1825 days
+====================================

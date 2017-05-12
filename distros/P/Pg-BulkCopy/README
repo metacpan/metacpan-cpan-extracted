@@ -1,0 +1,64 @@
+***** WARNING version .015 is still incomplete. *****
+***** There is no pg_bulkcopy.pl included.
+
+
+Pg-BulkCopy
+
+Pg:BulkCopy provides the missing Bulk Load utility for Postgres. It can be accessed in either of two manners -- through the included pg_bulkcopy.pl script, or by use of the Pg::BulkCopy Module, which provides the methods used in pg_bulkcopy.pl. 
+
+Why would you choose this script over the other one? Primarily because this one is designed to just work. The python script and its' perl clone offer more in the way of advanced featers, but they don't just install and go. 
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+	
+TESTING
+
+This module can only be tested when run from a postgres server with access to a database, therefore the tests in t run at install time are minimal. To properly test this bundle you must create a database and manually run the tests in the t2 directory.  	
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Pg::BulkCopy
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pg-BulkCopy
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Pg-BulkCopy
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Pg-BulkCopy
+
+    Search CPAN
+        http://search.cpan.org/dist/Pg-BulkCopy/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 John Karr
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; version 3 or at your option
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+A copy of the GNU General Public License is available in the source tree;
+if not, write to the Free Software Foundation, Inc.,
+59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+

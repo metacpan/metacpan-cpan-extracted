@@ -1,0 +1,28 @@
+---
+abstract: 'OAuth signature validation middleware'
+author:
+  - 'Hideo Kimura <hide@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Auth-OAuth
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  OAuth::Lite: 1.27
+  Plack: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hidek/Plack-Middleware-Auth-OAuth.git
+version: 0.06

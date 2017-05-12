@@ -1,0 +1,26 @@
+NAME
+    PPIx::LineToSub - Find the package and subroutine by line
+
+SYNOPSIS
+      use PPIx::LineToSub;
+      my $document = PPI::Document->new('t/hello.pl');
+      $document->index_line_to_sub;
+
+      my($package, $sub) = $document->line_to_sub(1);
+
+DESCRIPTION
+    PPIx::LineToSub is a module which, given a Perl file and a line number,
+    will return the package and sub in effect.
+
+SEE ALSO
+    PPI.
+
+AUTHOR
+    Leon Brocard, "<acme@astray.com>"
+
+COPYRIGHT
+    Copyright (C) 2008, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

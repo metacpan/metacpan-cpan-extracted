@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Pod-Weaver-PluginBundle-Apocalyptic</name>
+  <shortdesc>Let the apocalypse generate your POD!</shortdesc>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Apocalypse</foaf:name>
+      <foaf:mbox rdf:resource="mailto:APOCAL@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Sergey Romanov</foaf:name>
+      <foaf:mbox rdf:resource="mailto:complefor@rambler.ru" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <homepage rdf:resource="http://search.cpan.org/dist/Pod-Weaver-PluginBundle-Apocalyptic/" />
+  <bug-database rdf:resource="http://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-PluginBundle-Apocalyptic" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/apocalypse/perl-pod-weaver-pluginbundle-apocalyptic" />
+      <location rdf:resource="git://github.com/apocalypse/perl-pod-weaver-pluginbundle-apocalyptic.git" />
+    </GitRepository>
+  </repository>
+  <programming-language>Perl</programming-language>
+</Project>

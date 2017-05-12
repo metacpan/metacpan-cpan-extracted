@@ -1,0 +1,30 @@
+---
+abstract: 'test whether the file beneath a Path::Class::File object has changed'
+author:
+  - 'Peter Karman, <karman@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: http://dev.perl.org/licenses/
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Path-Class-File-Stat
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Path::Class: 0.32
+  Test::More: 0
+  perl: 5.6.0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Path-Class-File-Stat
+  homepage: https://github.com/karpet/path-class-file-stat
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/karpet/path-class-file-stat
+version: 0.05

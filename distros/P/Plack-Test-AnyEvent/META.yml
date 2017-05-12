@@ -1,0 +1,36 @@
+---
+abstract: 'Run Plack::Test on AnyEvent-based PSGI applications'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  File::Spec: '0'
+  HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::Class: '0'
+  Test::More: '0'
+  parent: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Test-AnyEvent
+no_index:
+  package:
+    - Plack::Test::AE
+    - Plack::Test::AnyEvent::Response
+requires:
+  AnyEvent: '0'
+  Plack: '0'
+  autodie: '0'
+  perl: v5.8.8
+resources:
+  bugtracker: https://github.com/hoelzro/plack-test-anyevent/issues
+  homepage: https://github.com/hoelzro/plack-test-anyevent
+  repository: https://github.com/hoelzro/plack-test-anyevent.git
+version: '0.06'

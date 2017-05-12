@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Plack/Middleware/Static/Minifier.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README.pod
+share/face.jpg
+share/foo.txt
+share/try.css
+share/try.js
+t/00_compile.t
+t/01_basic.t
+xt/01_perlcritic.t
+xt/02_pod.t
+xt/02_pod-coverage.t
+META.json

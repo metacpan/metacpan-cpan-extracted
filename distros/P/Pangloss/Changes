@@ -1,0 +1,163 @@
+=====================
+ Pangloss Change Log
+=====================
+
+All changes by Steve Purkis <spurkis@cpan.org> unless otherwise stated.
+
+v0.06
+    +	updated to work with Pipeline 3.09, fixes bug:
+	http://email-lists.org/pipermail/pangloss/2004-May/000155.html
+    +	now encodes uri strings as necessary, fixes bug:
+	http://email-lists.org/pipermail/pangloss/2004-March/000153.html
+    +	moved 'use 5.008;' from Build.PL to Pangloss.pm [reported by
+	anonymous, RT #4045]
+    +	minor fixes to YAML IO layer
+
+v0.05
+    +	fixed multiple-selected items bug (both uri encoded & post) on users,
+	concepts, languages and categories pages
+    +	generalizd uri match in header.html
+    +	"Content-Type: text/html; charset=UTF-8" HTTP header now set
+    +	fixed empty document filter & related bugs
+    +	de-linted html, verified xhtml
+
+v0.04
+    +	more pod updates
+    +	moved Pangloss/Installation.pod --> Pangloss/Install.pm because it
+	replaced the Pangloss front-page on search.span.org!
+    -	removed Pangloss::accessors
+    +	collection list pages (ie: edit/concepts.html) now use sorted lists
+	[suggested by Dan McQuillan]
+    +	fixed bug: reappearing URL in the search box [reported by Dan McQuillan]
+    +	hard-coded $Pangloss::VERSION while we try & resolve a CPAN indexing
+	problem
+
+v0.03
+    +	simplified Html headers [suggested by Dan McQuillan]
+    +	more pod updates
+    +	now relies on accessors pragma from CPAN
+    +	updated Petal-Utils required version (for 'if' modifier)
+    +	fixed bug in Apache::Handler that prevented responses from being sent
+    +	$app->foo_editor->list() now sets 'foo_collection' in the $view
+    +	searcher now uses/sets collections from $view
+    +	modifications to collections: added iterator() & sorted_list(),
+	exists() and get() both take objects as well as keys now, and changed
+	get_values_key() now uses isa()
+    +	refactored search api to make language & concept objects available to
+	the front end (not just keys)
+    +	fixed HTML bugs: category displayed on search page again, currently
+	selected values are preserved in select lists, other minor fixes.
+    -	turned off pixie object cache in editors due to mutex problems.
+    +	updated sample-httpd.conf to include VirtualHost example
+
+v0.02
+    !	pixie stores are *not* be backwards compatible with v0.1 stores!
+    +	finished HTML/URL Search Filter
+    +	using lang_key instead of iso_code in User::Privileges
+    +	added 'use accessors (...)' pragma, replaced all hard-coded accessors
+    +	refactored standalone & apache webapps, now based on common code
+	(test.pl renamed pg_test_server)
+    +	added content-type=utf-8 headers to all html pages
+    +	using Pod::Usage for pg_admin & pg_test_server
+    +	added 'create store <dsn>' to pg_admin
+    +	updated installation docs
+
+See CVS logs for a detailed view of what's happened between v0.01 and 0.2.
+The following is a high-level summary based on those posted to the list:
+
+2003-09-08
+    +	spike implementation of the URL search
+    +	a whole load of stress-testing & profiling; should handle expected
+	load of 25 concurrent users, not pushed any higher at the moment.
+	(see t/benchmark.pl and t/stress-test.pl)
+    -	removed the 'dates' box from the front-end (no time to implement)
+    +	tested with Petal-1.06
+    +	spun off Petal-Utils side project
+
+2003-08-20
+    +	search interface is nearly complete.
+    +	introduced checkboxes to make selecting search criteria more obvious.
+    +	the Pager now works
+    +	wrote a bare-bones off-line admin interface that can create users,
+	list collections, and upload terms.  Pangloss shell can be found in
+	'bin/pg_admin'.
+    +	included a sample set of terms from Dan McQuillan into the test suite.
+    +	lots of little bugfixes.
+    +	started doing load tests.
+
+2003-08-01
+    +	fairly painless integration w/Apache, Pangloss now loads under
+	Apache/mod_perl 1.3.28.
+    +	Added a sample Apache config file: 'conf/sample-httpd.conf'
+    +	updated filters make for more intuitive search navigation.
+    +	switched over to Module::Build from MakeMaker as a build tool.
+    +	rewrote Todo list - it was getting a bit silly.
+
+2003-07-22
+    +	introduced a Pager for the search results
+    +	filters apply as an intersection instead of a union (after a chat
+	with Jean-Michel Hiver)
+
+2003-07-11
+    +	more improvements to the search page.
+    +	selected 'filters' are now highlighted in the left-hand nav.
+    +	search results are organized by category/language/name.
+    +	fixed a bug where proofreaders couldn't update the status
+	of a translation.
+
+2003-06-30
+    +	basic search functionality now working.
+
+2003-06-21
+    +	creator & date required for all objects.
+    +	authentication segments now in place (means translators can add
+	translations, and proofreaders can modify statuses)
+    +	started work on search code in the backend.
+
+2003-06-14
+    +	search page now dynamic, though search functionality still not
+	implemented.
+    +	finished outstanding error handling stuff.
+    +	implementing the long-outstanding modify term status.
+    +	hacked the tab selection (search|concepts|...|users)
+    +	other bug-fixes
+
+2003-06-06
+    +	installation eased by release of OpenFrame-WebApp, Pipeline-Config
+	and acceptance of most patches
+    +	patched version of Petal-0.92 now required to complicate the issue
+	again.
+    +	thought a lot about how data passes from the application layer to 
+	the presentation layer, come up with a decent solution & started to
+	roll it out.
+
+2003-05-15
+    +	other editors begin to fall into place, still not at 100%
+    	(can't update term statuses yet, error reporting is minimal,
+	 no way to see the removed users list, etc...),
+
+2003-05-11
+    +	Language & User editors working
+    +	refactored 'proof of concept' server, moving chunks of code out
+	into tested segments.
+    +	YAML pipeline config file
+
+
+02-05-2003
+    +	spike solution test.pl (edit users only)
+    +	refactor search template [John Lea]
+    +	split search.html into a header & footer, now used in mock-ups
+    !	relying on patches submitted to various CPAN authors
+
+24-04-2003
+    +	basic Pangloss objects: User, Language, Concept, Category, Term
+    +	User editor (yet to tie in templates)
+    +	search HTML template [John Lea, Steve Purkis, based on work by
+	Jean-Michel Hiver].
+
+v0.01
+    +	created template project files & directory structure
+    +	project created 2003/04/02.
+
+__
+EOF

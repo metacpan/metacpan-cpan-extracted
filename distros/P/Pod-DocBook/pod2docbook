@@ -1,0 +1,134 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::DocBook;
+use Pod::Usage;
+
+my $doctype = 'section';
+my $spaces  = 2;
+my ($title, $double_quotes, $help, $no_header);
+
+pod2usage unless GetOptions ('doctype=s'           => \$doctype,
+			     'title=s'             => \$title,
+			     'spaces=i'            => \$spaces,
+			     'fix-double-quotes'   => \$double_quotes,
+			     'no-header'           => \$no_header,
+			     'help'                => \$help,
+			    );
+
+pod2usage if     $help;
+pod2usage unless grep { $doctype eq $_ } qw(article chapter
+					    refentry section);
+pod2usage unless $spaces =~ /^\d+$/;
+
+if (@ARGV == 0) {
+    $title = '' unless defined $title;
+    my $parser = Pod::DocBook->new (title => $title,
+				    doctype => $doctype,
+				    fix_double_quotes => $double_quotes,
+				    header => ! $no_header,
+				    spaces => $spaces);
+    $parser->parse_from_filehandle(\*STDIN);
+}
+
+else {
+    my ($infile, $outfile) = @ARGV;
+
+    ($title) = $infile =~ m!([^/]+)\z! unless defined $title;
+    my $parser = Pod::DocBook->new (title => $title,
+				    doctype => $doctype,
+				    fix_double_quotes => $double_quotes,
+				    header => ! $no_header,
+				    spaces => $spaces);
+
+    if (defined $outfile) {
+	$parser->parse_from_file ($infile, $outfile);
+    }
+
+    else {
+	$parser->parse_from_file ($infile);
+    }
+}
+
+
+=head1 NAME
+
+pod2docbook - Convert POD data to DocBook SGML
+
+=head1 SYNOPSIS
+
+pod2docbook [B<--help>]
+[B<--doctype>=B<article>|B<chapter>|B<section>|B<refentry>]
+[B<--title>=I<title>] S<[B<--spaces>=I<# spaces per indent level>]>
+[B<--fix-double-quotes>] [B<--no-header>] S<[I<infile> [I<outfile>]]>
+
+=head1 DESCRIPTION
+
+B<pod2docbook> converts files from pod format (see L<perlpod>) to
+DocBook 4.2 SGML (see L<http://www.docbook.org/>).  The program itself
+is merely a driver for the Pod::DocBook class; if you're interested in
+details of pod-to-SGML translation see L<Pod::DocBook>.
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over
+
+=item [B<--help>]
+
+Print usage and exit.
+
+=item [B<--doctype>=B<article>|B<chapter>|B<section>|B<refentry>]
+
+Specifies the document type for the output file; the default is
+B<section>.
+
+=item [B<--title>=I<title>]
+
+Specifies the document title.  The default is I<infile>, if it is
+supplied, or empty string otherwise.
+
+=item [B<--spaces>=I<# spaces per indent level>]
+
+Specifies the number of spaces per indent level in the SGML output;
+the default is 2.
+
+=item [B<--fix-double-quotes>]
+
+Replace pairs of double quotes in regular paragraphs with <quote> and
+</quote> (see L<Pod::DocBook> for details).
+
+=item [B<--no-header>]
+
+Omit the DOCTYPE line from the output.
+
+=item I<infile>
+
+The name of the file from which to read pod source; if not supplied,
+STDIN is used for input.
+
+=item I<outfile>
+
+The name of the file to which to write SGML; if not supplied, STDOUT
+is used for output.
+
+=back
+
+=head1 SEE ALSO
+
+L<perlpod>, L<Pod::DocBook>
+
+=head1 AUTHOR
+
+Nandu Shah <nandu@zvolve.com>
+
+=head1 COPYRIGHT
+
+Copyright 2004, Nandu Shah <nandu@zvolve.com>
+
+This program is free software; you may redistribute it and/or modify
+it under the same terms as Perl itself
+
+=cut

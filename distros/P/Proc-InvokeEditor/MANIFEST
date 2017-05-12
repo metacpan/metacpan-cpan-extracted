@@ -1,0 +1,13 @@
+Changes
+lib/Proc/InvokeEditor.pm
+Makefile.PL
+MANIFEST
+LICENSE
+README
+t/01_require.t
+t/02_editor.t
+t/03_pod.t
+t/04_pod_coverage.t
+examples/example.pl
+examples/example2.pl
+META.yml                                 Module meta-data (added by MakeMaker)

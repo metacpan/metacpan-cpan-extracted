@@ -1,0 +1,40 @@
+Revision history for POE-Component-Supervisor
+
+0.09    2015-05-14 06:28:47Z
+    - fixed deprecated / invalid form of foreach loop (Jan Bieron, part of the
+      GitHub Pull Request Challenge)
+
+0.08    2012-01-27 15:01:20Z
+    - remove Test::use::ok
+    - silence qw() warning
+
+0.07    2012-01-26 17:30:21Z
+    - Fix undeclared dependency on Devel::PartialDump
+
+0.06    2010-11-10 18:37:27Z
+    - Fix for recent versions of MooseX::POE
+
+0.05    2008-08-16 06:16:22Z
+    - Refactor into interfaces so that handles are usable with completely
+      different supervisor implementations
+    - Fix a leak relating to incorrect usage of MX::POE
+    - Use terminal signals to terminate sessions instead of internal API
+    - namespace::clean
+    - make_immutable
+    - Hash::Util::FieldHash::Compat instead of Tie::RefHash
+
+0.04    2008-06-14 17:56:28Z
+    - spawned_callback
+    - stopped_callback
+    - yet another attempt at removing bogus test fails, by relying less on
+      timing
+
+0.03    2008-06-13 20:37:20Z
+    - Try to improve robustness of test suite
+    - handle error condition
+
+0.02    2008-06-12 22:14:03Z
+    - Add ::Session to the distribution now that POE 1.0000 is released
+
+0.01    2008-02-29 19:48:29Z
+    - Initial release

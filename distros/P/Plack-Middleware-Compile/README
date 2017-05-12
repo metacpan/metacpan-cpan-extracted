@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Plack-Middleware-Compile,
+version 0.01:
+
+  Compile HAML/SASS/Coffeescript/whatever on demand
+
+This software is copyright (c) 2010 by Paul Driver.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

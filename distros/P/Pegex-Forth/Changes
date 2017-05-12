@@ -1,0 +1,52 @@
+0.15 Sat Aug 16 11:52:49 PDT 2014
+ - Meta 0.0.2
+
+0.14 Sat Aug 16 02:29:35 PDT 2014
+ - Eliminate File::Basename from test/
+
+0.13 Fri Aug 15 21:25:10 PDT 2014
+ - Remove t/use_ok.t
+
+0.12 Fri Aug 15 20:21:56 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.11 Fri Aug  8 12:55:09 PDT 2014
+ - Switch hashbang to '#!/usr/bin/env perl'
+
+0.10 Mon Aug  4 00:09:42 PDT 2014
+ - Remove (c) from Copyright
+
+0.09 Fri Jul 25 16:50:33 PDT 2014
+ - Support words min max mod /mod words /2 clearstack
+ - Add tests for error messages
+
+0.08 Thu Jul 24 18:28:50 PDT 2014
+ - Support words / * pick ?dup -rot 2swap 2over 2dup nip tuck abs
+ - Support words negate lshift rshift arshift emit
+
+0.07 Thu Jul 24 10:49:47 PDT 2014
+ - Support words 0sp dup swap over drop rot
+
+0.06 Tue Jul 22 16:53:54 PDT 2014
+ - Refactor tests
+ - Add .s support
+ - Fix comments a bit
+
+0.05 Tue Jul 22 14:47:16 PDT 2014
+ - Added comment support
+ - Released next to Wendy and Josh in the Perl booth at OSCON. Damian and
+   Peter were lingering some 5 meters away. genehack just walked by. Josh'
+   baby awoke.
+
+0.04 Mon Jul 21 15:39:05 PDT 2014
+ - Put runtime stuff (including dictionary) into ::Runtime class.
+
+0.03 Mon Jul 21 13:17:41 PDT 2014
+ - 02 is unlucky!!
+
+0.02 Sun Jul 20 23:34:21 PDT 2014
+ - Make API more useful
+
+0.01 Sun Jul 20 22:49:42 PDT 2014
+ - First release
+

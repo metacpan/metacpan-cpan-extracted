@@ -1,0 +1,20 @@
+Release history for Path-IsDev-HeuristicSet-FromConfig
+
+0.002000 2013-10-18T11:17:13Z
+ [00 Minor]
+ - Include HomeDir and PerlINC in the default config.
+
+ [Dependencies::Added / runtime requires]
+ - Path::IsDev::NegativeHeuristic::HomeDir 1.000000
+ - Path::IsDev::NegativeHeuristic::PerlINC 1.000000
+
+ [Dependencies::Changed / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.9.0 → 2.000000
+ - Test::Kwalitee 1.08 → 1.12
+
+ [Dependencies::Changed / test requires]
+ - Test::More 0.98 → 0.99
+
+0.001000 2013-10-06T22:33:06Z
+ - First version.
+

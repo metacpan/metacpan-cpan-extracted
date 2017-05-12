@@ -1,0 +1,62 @@
+This is the README file for PAR, a toolkit to create and use perl scripts
+and modules stored inside compressed .par files.
+
+Please type "perldoc PAR" after installation to see the module usage
+information, and "perldoc PAR::FAQ" for frequently answered questions.
+
+For running ".par" files directly, please install PAR-Packer and
+see "perldoc parl".
+
+To generate/execute self-contained perl scripts, install PAR-Packer
+and see "perldoc par.pl" or "perldoc pp".
+
+An extensive "Cross-Platform Packaging and Deployment with PAR" tutorial
+is available as "perldoc PAR::Tutorial".  A slightly outdated version is
+also available online at <http://www.autrijus.org/par-tutorial/>.
+
+* Installation
+
+PAR uses the standard perl module install process:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+* Historic note
+
+With version 0.97 of PAR, the logic for generating stand-alone executables
+has been refactored into the PAR-Packer distribution. It should be available
+from the same source you got PAR from. Hence, for packing scripts with
+prerequisite modules into stand-alone scripts or executables
+(aka PerlApp, Perl2exe, or 'perlcc that works'), see "perldoc pp"
+and "perldoc tkpp".
+
+Since version 0.97 of PAR, you do not need a C compiler any more to build it.
+All logic that required a C compiler previously was moved into the PAR-Packer
+distribution.
+
+* Source Repository
+
+You can check out the most recent revision from PAR's GitHub repository:
+
+    https://github.com/rschupp/PAR
+
+* Contact
+
+You can write
+to the mailing list at <par@perl.org>, or send an empty mail to
+<par-subscribe@perl.org> to participate in the discussion.
+
+Please submit bug reports to <bug-par@rt.cpan.org>.
+
+* Copyright
+
+Copyright 2002-2010 by Audrey Tang <cpan@audreyt.org>.
+
+Copyright 2006-2010 by Steffen Mueller <smueller@cpan.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+See LICENSE.

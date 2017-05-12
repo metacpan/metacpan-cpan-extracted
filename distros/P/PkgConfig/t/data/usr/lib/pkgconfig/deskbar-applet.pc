@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+modulesdir=${prefix}/lib/deskbar-applet/modules-2.20-compatible
+artdir=${prefix}/share/deskbar-applet/art
+
+Name: Deskbar Applet Handlers Location
+Description: Providing the location of deskbar-applet system-wide handlers.
+Requires: pygtk-2.0
+Version: 2.32.0

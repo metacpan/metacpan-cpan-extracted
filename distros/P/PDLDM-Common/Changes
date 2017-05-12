@@ -1,0 +1,6 @@
+Revision history for Perl extension PDLDM::Common.
+
+0.01  Tue Jul 14 12:17:12 2015
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n PDLDM::Common
+

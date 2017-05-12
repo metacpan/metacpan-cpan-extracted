@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/logbench.pl
+lib/Plack/Middleware/AxsLog.pm
+t/00_compile.t
+t/01_basic.t
+t/02_error_only.t
+t/03_ltsv.t
+t/04_format.t
+t/05_format_options.t
+META.yml
+MANIFEST

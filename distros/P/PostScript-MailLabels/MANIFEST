@@ -1,0 +1,17 @@
+MANIFEST
+Makefile.PL
+Changes
+README
+t/Labels.t
+lib/PostScript/MailLabels.pm
+lib/PostScript/MailLabels/BasicData.pm
+demo/AddressBook.pm
+demo/print_addrs
+demo/diskette.pl
+demo/portuguese.pl
+demo/testlabels.pl
+demo/std_business.pl
+demo/copyright.pl
+demo/test5167.pl
+demo/test_papersize.pl
+META.yml                                 Module meta-data (added by MakeMaker)

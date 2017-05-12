@@ -1,0 +1,155 @@
+Revision history for Perl module Parse::Dia::SQL.
+
+0.29 Sun Jan 15 15:44:09 2017 +0100
+    RT #119853 Fix spelling mistakes in the POD. 
+    Thanks to gregor herrmann, Debian Perl Group.
+
+0.28 Tue Jan 10 20:03:04 2017 +0100
+    Updated due to misuse of HTML::Lint 2.26.
+
+0.27 Fri Jan  3 14:37:55 CET 2014
+   - RT #91654 Spelling mistake. Thanks to gregor herrmann and perl 
+     debian team.
+
+0.26 Tue Dec 17 22:07:00 CET 2013
+   - RT #66031 dia changed naming from aggregate_a/b to assoc_type.
+   - added support for bigserial & smallserial under postgresql. 
+   (Thanks to Felix Ostmann)
+
+0.25 Wed Mar 20 09:29:29 CET 2013
+    - Fixed bug in "nullable" implementation introducted in 0.24.
+
+0.24 Mon Mar 18 08:22:54 CET 2013
+    - Added previously unsupported "nullable" feature for non-primary
+      key columns when using Database shape (added in 0.15).
+
+0.23 Tue Aug 28 08:28:19 CEST 2012
+    - RT #79218 Spelling patch from debian downstream (Thanks to
+      Gregor Herrmann).
+
+0.22 Tue Aug  7 09:00:00 CEST 2012
+    - RT #78818 syntax error fixed (thanks to openback).
+    - Makefile.PL - added BUILD_REQUIRES => { 'CPAN::Meta' => 0, },
+      to ensure META.yml is created during build.
+    - Changed META_MERGE => repository to github.com
+
+0.21 Tue Jul 24 09:40:21 CEST 2012
+    - Added 'html' output options (thanks to Peter Langton).
+      Check generated html with XML::DOM::Parser and HTML::Lint.
+    - RT #77115 - Added SQLite3fk emitter that supports foreign key
+      (thanks to Peter Langton).
+
+0.20 Mon Jan 30 14:19:46 CET 2012 
+    - Added `backticks` to constraint creation, drop table, 
+      drop index for MySQL-InnoDB.
+
+0.19 Tue Jan 24 13:19:12 CET 2012
+    - Added `backticks` support for MySQL-InnoDB (tables only).
+
+0.18 Wed Jan 11 15:45:42 CET 2012
+    - Added support for table options (see
+      t/data/table_output_options.dia)
+
+0.17 Wed Feb 16 11:02:44 CET 2011
+    - RT #58189: Enable log level in command line arguments.
+	(reported by ELACOUR@cpan.org) 
+    - RT #62131 (reported by Felix Ostmann):
+      - Associations incorrectly named in many-to-many 
+        relationships.
+      - Add --uml support. 
+    - RT #57842 postgres: serial -> int not working 
+      (reported by shemgp).
+
+0.16 Fri May 21 07:20:43 CEST 2010
+    - RT #57182 Encoding for insert statements in UML components 
+      (reported by Gaudenz Steinlin).
+    - Final preparations for debian release.
+
+0.15 Thu Apr 15 22:32:41 CEST 2010
+    - RT #56357 - Detect Dia database shapes and added 
+      experimental parsing (excluding associations) 
+      (reported by John-Paul Drawneek).
+    - Added LICENSE to conform with debian standards.
+
+0.14 Fri Feb  5 20:13:09 CET 2010
+    - RT #53782 - Add typemap support (reported by Jani Päijänen).
+
+0.13 Sun Dec 20 13:01:41 CET 2009
+    - RT #52755 - Add support for Postgres unique constraints
+      using the smallpackage stereotype (reported by shemgp).
+    - RT #50906 - Added PostgreSQL synonyms int2, int4, int8 to
+      integer, smallint and bigint respectively (reported by Edy
+      Incoletti.
+    - Added ignore_type_mismatch option which allows foreign keys
+      to have a different + type than the primary key it
+      references
+
+0.12 Thu Nov 12 10:51:28 CET 2009 
+    - RT #51433 - Multipicity (sic) not handled correctly 
+      (reported by Edy Incoletti and Jeff Chimene)
+    - Ensure all indices are created before foreign key 
+      constraints (all db platforms, reported by Jeff Chimene)
+
+0.11 Sun Jul 12 21:25:38 CEST 2009 
+    - Bug #47593 Default type for PSQL 'serial' should be 
+      'integer' not 'int' (thanks to Mart van de Wege).
+    - Added support for Dia 0.97 source files.  Added verions
+      checks for each XML element containing it.
+      First reported in bug #47040: Associations are 
+      not generated in Dia 0.97
+
+0.10 Sat May 16 21:03:57 CEST 2009
+    - Use recent (6.50) EU::MM in build to get LICENCE
+      MIN_PERL_VERSION, META_MERGE correctly set.
+
+0.09 Sat May 16 15:29:28 CEST 2009
+    - SQLite3: Fixed a bug in the update constraint trigger
+    - SQLite3: Added 'on delete cascade' support
+    - Added support for index options, which are modelled as
+      a comment on the operation (index).
+    - Fixed bug: Missing associations should bot prevent 
+      index creation.
+
+0.08 Tue Apr 14 14:12:00 CEST 2009
+    - Bugfix in Utils.pm (sqlite -> sqlite3).
+    - Updated Makefile.PL with META_MERGE and LICENSE.
+    - Added MANIFEST.SKIP
+    - Removed TODO in boilerplate test.
+
+0.07 Wed Apr  1 09:47:50 CEST 2009
+    - Added experimental support for SQLite v.3 (thanks to Peter
+      Langton).
+
+0.06 Mon Mar 30 09:59:53 CEST 2009
+    - Fixed bug 'missing role name on PK end' (thanks to Peter
+      Langton).
+    - Fixed foreign key bug for Sybase (case sensitivity issue).
+    - Removed 'experimental' tag on MySQL MyISAM and InnoDB.
+    - Use Text::Table for comment formatting.
+
+0.05  Mon Mar 16 08:58:33 CET 2009
+    - Restrict length of foreign keys in drop statements (see 0.04)
+
+0.04  Fri Mar 13 13:13:13 CET 2009
+    - Made foreign keys 18 chars or less on DB2 (overridable)
+      regardless of name length in dia file.
+        (sub _create_constraint_name)
+    - InnoDB: Added drop foreign keys support.
+    - Reduced number of columns in log output to screen.
+
+0.03  Mon Mar  2 09:57:23 CET 2009
+    - Added table_postfix_options (e.g. 'ENGINE=InnoDB')
+    - Made documentation more consistent.
+    - Removed private subroutines from main documentation.
+    - Made sure parsing is finished before outputting,
+        and updated tests accordingly.
+
+0.02  Fri Feb 27 10:29:36 CET 2009
+    - Fixed package name error.
+    - Added generate_small_package_sql() to Output.pm
+    - Fixed comma-comment bug.
+    - Added CLI client.
+
+0.01  Mon Feb 23 08:18:14 CET 2009
+    - original version
+

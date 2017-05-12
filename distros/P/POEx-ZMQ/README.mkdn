@@ -1,0 +1,158 @@
+# NAME
+
+POEx::ZMQ - Asynchronous ZeroMQ sockets for POE
+
+# SYNOPSIS
+
+    # An example ZMQ_ROUTER socket ->
+    use POE;
+    use POEx::ZMQ;
+
+    POE::Session->create(
+      inline_states => +{
+        _start => sub {
+          # Set up a ROUTER
+          # Save our POEx::ZMQ for creating other sockets w/ shared context later:
+          my $zmq = POEx::ZMQ->new;
+          $_[HEAP]->{zeromq} = $zmq;
+
+          $_[HEAP]->{rtr} = $zmq->socket( type => ZMQ_ROUTER );
+
+          $_[HEAP]->{rtr}->start;
+
+          $_[HEAP]->{rtr}->bind( 'tcp://127.0.0.1:1234' );
+        },
+
+        zmq_recv_multipart => sub {
+          # ROUTER received a message; sender identity is prefixed,
+          # parts are available as a List::Objects::WithUtils::Array ->
+          my $parts = $_[ARG0];
+
+          # Handle the usual ZeroMQ message framing scheme by capturing
+          # prefixed identities including empty message delimiter, followed
+          # by our message body:
+          my $envelope = $parts->items_before(sub { $_ eq '' });
+          my $content  = $parts->items_after(sub { $_ eq '' });
+
+          # $_[SENDER] was the ROUTER socket, send a response back to origin:
+          $_[KERNEL]->post( $_[SENDER], send_multipart =>
+            [ $envelope, '', 'foo' ]
+          );
+        },
+      },
+    );
+
+    POE::Kernel->run;
+
+# DESCRIPTION
+
+A [POE](https://metacpan.org/pod/POE) component providing non-blocking [ZeroMQ](http://www.zeromq.org)
+(versions 3.x & 4.x) integration.
+
+See [POEx::ZMQ::Socket](https://metacpan.org/pod/POEx::ZMQ::Socket) for details on using these sockets and the
+[zmq\_socket(3)](http://man.he.net/man3/zmq_socket) man page regarding behavior of each socket type.
+
+See the [zguide](http://zguide.zeromq.org) for more on using ZeroMQ in
+general.
+
+Each ZeroMQ socket is an event emitter powered by [MooX::Role::POE::Emitter](https://metacpan.org/pod/MooX::Role::POE::Emitter);
+the documentation for that distribution is likely to be helpful.
+
+If you are not using [POE](https://metacpan.org/pod/POE), try [ZMQ::FFI](https://metacpan.org/pod/ZMQ::FFI) for an excellent loop-agnostic
+ZeroMQ implementation.
+
+## import 
+
+Importing this package brings in the full set of [POEx::ZMQ::Constants](https://metacpan.org/pod/POEx::ZMQ::Constants), and
+ensures [POEx::ZMQ::Socket](https://metacpan.org/pod/POEx::ZMQ::Socket) is loaded.
+
+### new
+
+    my $zmq = POEx::ZMQ->new;
+    # POEx::ZMQ::FFI::Context obj is automatically shared:
+    my $frontend = $zmq->socket(type => ZMQ_ROUTER);
+    my $backend  = $zmq->socket(type => ZMQ_ROUTER);
+
+This class can be instanced, in which case it will hang on to the first
+["context"](#context) created (possibly implicitly via a call to ["socket"](#socket)) and use
+that [POEx::ZMQ::FFI::Context](https://metacpan.org/pod/POEx::ZMQ::FFI::Context) instance for all calls to ["socket"](#socket).
+
+### context
+
+    my $ctx = POEx::ZMQ->context(max_sockets => 512);
+
+If called as a class method, returns a new [POEx::ZMQ::FFI::Context](https://metacpan.org/pod/POEx::ZMQ::FFI::Context).
+
+    my $zmq = POEx::ZMQ->new;
+    my $ctx = $zmq->context;
+
+If called as an object method, returns the context object belonging to the
+instance. If none currently exists, a new [POEx::ZMQ::FFI::Context](https://metacpan.org/pod/POEx::ZMQ::FFI::Context) is
+created (and preserved for use during socket creation; see ["socket"](#socket)).
+
+If creating a new context object, `@_` is passed through to the
+[POEx::ZMQ::FFI::Context](https://metacpan.org/pod/POEx::ZMQ::FFI::Context) constructor.
+
+The context object should typically be shared between sockets belonging to the
+same process. However, multiple contexts may exist within the same
+application (and they may have their own respective library `soname`).
+A forked child process must create a new [POEx::ZMQ::FFI::Context](https://metacpan.org/pod/POEx::ZMQ::FFI::Context) with its
+own set of sockets.
+
+The context object provides access to other useful ZeroMQ functionality, such
+as library version number retrieval and CURVE key pair generation. See
+[POEx::ZMQ::FFI::Context](https://metacpan.org/pod/POEx::ZMQ::FFI::Context) for details.
+
+### socket
+
+    my $sock = POEx::ZMQ->socket(context => $ctx, type => ZMQ_ROUTER);
+
+If called as a class method, returns a new [POEx::ZMQ::Socket](https://metacpan.org/pod/POEx::ZMQ::Socket) using either
+a provided `context` or, if missing from arguments, a freshly-created
+[POEx::ZMQ::FFI::Context](https://metacpan.org/pod/POEx::ZMQ::FFI::Context).
+
+    my $sock = $zmq->socket(type => ZMQ_ROUTER);
+
+If called as an object method, returns a new [POEx::ZMQ::Socket](https://metacpan.org/pod/POEx::ZMQ::Socket) that uses
+the [POEx::ZMQ::FFI::Context](https://metacpan.org/pod/POEx::ZMQ::FFI::Context) object belonging to the instance; see
+["new"](#new) & ["context"](#context).
+
+`@_` is passed through to the [POEx::ZMQ::Socket](https://metacpan.org/pod/POEx::ZMQ::Socket) constructor.
+
+# KNOWN BUGS
+
+Dumps core upon process exit on FreeBSD before `10.x`. Do not know why and
+have not debugged, but patches welcome? ;-)
+
+# SEE ALSO
+
+[POEx::ZMQ::Socket](https://metacpan.org/pod/POEx::ZMQ::Socket)
+
+[POEx::ZMQ::Constants](https://metacpan.org/pod/POEx::ZMQ::Constants)
+
+[POEx::ZMQ::Types](https://metacpan.org/pod/POEx::ZMQ::Types)
+
+[POEx::ZMQ::FFI::Socket](https://metacpan.org/pod/POEx::ZMQ::FFI::Socket)
+
+[POEx::ZMQ::FFI::Context](https://metacpan.org/pod/POEx::ZMQ::FFI::Context)
+
+[POEx::ZMQ::FFI](https://metacpan.org/pod/POEx::ZMQ::FFI)
+
+[Text::ZPL](https://metacpan.org/pod/Text::ZPL) for ZeroMQ Property Language support.
+
+[Crypt::ZCert](https://metacpan.org/pod/Crypt::ZCert) for ZeroMQ4+ CURVE certificate management & key pair
+generation.
+
+[Convert::Z85](https://metacpan.org/pod/Convert::Z85) for encoding/decoding CURVE keys (see [zmq\_curve(7)](http://man.he.net/man7/zmq_curve) on
+libzmq4+).
+
+[ZMQ::FFI](https://metacpan.org/pod/ZMQ::FFI) for a lower-level, non-POE interface to ZeroMQ sockets.
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+Significant portions of the [POEx::ZMQ::FFI](https://metacpan.org/pod/POEx::ZMQ::FFI) backend are inspired by or
+derived from [ZMQ::FFI](https://metacpan.org/pod/ZMQ::FFI) (version 0.14) by Dylan Cali (CPAN: CALID).
+
+Licensed under the same terms as Perl.

@@ -1,0 +1,12 @@
+Artistic
+Build.PL
+COPYING
+lib/Pod/Wrap.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+scripts/podwrap
+t/deparse_cmp.t
+
+SIGNATURE    Added here by Module::Build

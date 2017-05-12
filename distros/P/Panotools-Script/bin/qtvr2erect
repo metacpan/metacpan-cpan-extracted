@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use File::Temp qw/tempdir/;
+use File::Spec;
+use Image::Size;
+use Panotools::Script;
+
+for my $mov (@ARGV)
+{
+    my $tempdir = tempdir (CLEANUP => 1);
+    warn $tempdir;
+    my $stubcube = File::Spec->catfile ($tempdir, 'cube');
+    system ('qtvr2img', $mov, $stubcube);
+    $mov = File::Spec->rel2abs ($mov);
+
+    my ($width, $height) = imgsize ($stubcube.'_0.pnm');
+
+    my $erect = new Panotools::Script;
+    $erect->Panorama->Set (h => int ($width * 1.5708),
+                           w => 2 * int ($width * 1.5708),
+                           n => '"TIFF c:DEFLATE"');
+    $erect->Image->[0] = new Panotools::Script::Line::Image;
+    $erect->Image->[0]->Set (f => 0, w => $width, h => $height, v => 90,
+                             r => 0, p => 0, y => 0, n => "\"$stubcube"."_0.pnm\"");
+    $erect->Image->[1] = new Panotools::Script::Line::Image;
+    $erect->Image->[1]->Set (f => 0, w => $width, h => $height, v => 90,
+                             r => 0, p => 0, y => 90, n => "\"$stubcube"."_1.pnm\"");
+    $erect->Image->[2] = new Panotools::Script::Line::Image;
+    $erect->Image->[2]->Set (f => 0, w => $width, h => $height, v => 90,
+                             r => 0, p => 0, y => 180, n => "\"$stubcube"."_2.pnm\"");
+    $erect->Image->[3] = new Panotools::Script::Line::Image;
+    $erect->Image->[3]->Set (f => 0, w => $width, h => $height, v => 90,
+                             r => 0, p => 0, y => -90, n => "\"$stubcube"."_3.pnm\"");
+    $erect->Image->[4] = new Panotools::Script::Line::Image;
+    $erect->Image->[4]->Set (f => 0, w => $width, h => $height, v => 90,
+                             r => 0, p => 90, y => 0, n => "\"$stubcube"."_4.pnm\"");
+    $erect->Image->[5] = new Panotools::Script::Line::Image;
+    $erect->Image->[5]->Set (f => 0, w => $width, h => $height, v => 90,
+                             r => 0, p => -90, y => 0, n => "\"$stubcube"."_5.pnm\"");
+
+    my $pto_temp = "$stubcube.qtvr2erect.$$.pto";
+    $erect->Write ($pto_temp);
+    system ('nona', '-o', "$mov.tif", $pto_temp);
+}
+
+__END__
+
+=head1 NAME
+
+qtvr2erect - Utility to convert a QTVR file to equirectangular
+
+=head1 Synopsis
+
+  qtvr2erect myqtvr.mov
+
+=head1 DESCRIPTION
+
+Given one or more QTVR .mov files, extracts cube-faces with qtvr2img (a tool
+shipped with freepv) and assembles them into a single equirectangular image
+using nona (a tool shipped with hugin).
+
+=head1 Calling syntax
+
+  qtvr2erect <MOV-file> [<MOV-file>] ...
+
+=head1 License
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 See Also
+
+L<http://panotools.sourceforge.net/>
+
+=head1 Author
+
+Bruno Postle, E<lt>bruno (at) postle.netE<gt>
+
+=cut
+

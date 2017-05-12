@@ -1,0 +1,16 @@
+- true multiple dimension array / strings in arrays support
+
+- compatibility mode for generating MIDL-readable data:
+ - strip out pidl-specific properties
+
+- don't be so strict on array boundaries.. arrays can and will be empty when 
+  a (regular) remote error occurs
+ 
+- support nested elements
+ - generate names for anonymous tagged types
+
+- auto-alloc [ref] pointers for Samba4 during pull if they were NULL
+ 
+- replace subcontext() with represent_as()
+
+- --explain-ndr option that dumps out parse tree ?

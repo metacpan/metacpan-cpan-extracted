@@ -1,0 +1,11 @@
+=pod
+
+Hello there
+
+=cut
+---
+<pod_pod
+><pod_para
+>Hello there</pod_para
+></pod_pod
+>

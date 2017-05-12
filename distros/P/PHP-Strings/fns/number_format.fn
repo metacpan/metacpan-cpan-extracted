@@ -1,0 +1,17 @@
+docs: TBD
+code: |
+    sub number_format
+    {
+        my ( $number, $decimals, $dec, $thousands ) = validate_pos( @_,
+            NUMBER,
+            { %{+NUMBER}, optional => 1 },
+            { %{+STRING}, optional => 1, default => '.' },
+            { %{+STRING}, optional => 1, default => ',' },
+        );
+
+        my $format = $decimals ? "%.${decimals}f" : "%d";
+
+        my $formatted = 'XXX';
+
+        return $formatted;
+    }

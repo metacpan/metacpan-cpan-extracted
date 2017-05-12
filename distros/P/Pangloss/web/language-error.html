@@ -1,0 +1,18 @@
+					<div petal:if="view/language/error" class="error">
+						<?var name="set: lang view/language/error/language"?>
+						<?if name="view/language/error/isInvalid"?>
+							Validation Error:
+							<ul>
+								<li petal:if="view/language/error/isIsoCodeRequired">Language ISO code required!</li>
+								<li petal:if="view/language/error/isNameRequired">Language name required!</li>
+								<li petal:if="view/language/error/isDirectionRequired">Language direction required!</li>
+								<li petal:if="view/language/error/isCreatorRequired">Language creator required!</li>
+							</ul>
+						<?else?>
+					  	Error:
+							<ul>
+								<li petal:if="view/language/error/isExists">A language with the ISO code &quot;$view/language/error/language&quot; already exists!</li>
+								<li petal:if="view/language/error/isNonExistent">No language with the ISO code &quot;$view/language/error/language&quot; exists!</li>
+							</ul>
+						<?end?>
+					</div>

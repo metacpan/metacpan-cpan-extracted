@@ -1,0 +1,713 @@
+#!/usr/bin/perl
+# vim: ts=4 sts=4 sw=4:
+#
+#  perl-reversion
+#
+# Update embedded version strings in Perl source
+
+use strict;
+use warnings;
+use Perl::Version;
+use Carp qw(croak);
+use Getopt::Long;
+use Pod::Usage;
+use File::Spec;
+use File::Slurp::Tiny qw(read_lines);
+use File::Basename;
+
+# Files that suggest that we have a project directory. The scores next
+# to each are summed for each candidate directory. The first directory
+# with a score >= 1.0 is assumed to be the project home.
+
+my %PROJECT_SIGNATURE = (
+  'Makefile.PL' => 0.4,
+  'Build.PL'    => 0.4,
+  'dist.ini'    => 0.4,
+  'MANIFEST'    => 0.4,
+  't/'          => 0.4,
+  'lib/'        => 0.4,
+  'Changes'     => 0.4,
+  'xt/'         => 0.4,
+);
+
+my $MODULE_RE = qr{ [.] pm $ }x;
+my $SCRIPT_RE = qr/ \p{IsWord}+ /x;    # filenames
+
+# Places to look for files / directories when processing a project
+
+my %CONSIDER = (
+  'lib/'     => { like => $MODULE_RE },
+  'bin/'     => { like => $SCRIPT_RE },
+  'script/'  => { like => $SCRIPT_RE },
+  'README'   => {},
+  'META.yml' => {},
+);
+
+# Maximum number of levels above current directory to search for
+# project home.
+
+my $MAX_UP = 5;
+
+# Directories to skip during expansion
+my $SKIP = qr{^ [.]svn | CVS | [.]DS_Store | [.]git $}x;
+
+# Subroutines to identify file types
+my @MAGIC = (
+  {
+    name => 'perl',
+    test => sub {
+      my ( $name, $info ) = @_;
+      return 1 if $name =~ m{ [.] (?i: pl | pm | t ) $ }x;
+      my $lines = $info->{lines};
+      return 1 if @$lines && $lines->[0] =~ m{ ^ \#\! .* perl }ix;
+      return;
+    },
+  },
+  {
+    name => 'meta',
+    test => sub {
+      my ( $name, $info ) = @_;
+      return basename( $name ) eq 'META.yml';
+    },
+  },
+  {
+    name => 'plain',
+    test => sub {
+      my ( $name, $info ) = @_;
+      return -T $name;
+    },
+  }
+);
+
+my $man      = 0;
+my $help     = 0;
+my $quiet    = 0;
+my $bump     = undef;
+my $current  = undef;
+my $set      = undef;
+my $dryrun   = undef;
+my $force_to = undef;
+
+my %BUMP = (
+  bump              => 'auto',    # original -bump behavior
+  'bump-revision'   => 0,
+  'bump-version'    => 1,
+  'bump-subversion' => 2,
+  'bump-alpha'      => 3,
+);
+
+GetOptions(
+  'help|?'    => \$help,
+  'man'       => \$man,
+  'current=s' => \$current,
+  'set=s'     => \$set,
+  (
+    map {
+      my $opt = $_;
+      $_ => sub {
+        if ( defined $bump ) {
+          die "Please specify only one -bump option\n";
+        }
+        $bump = $BUMP{$opt};
+       }
+     } keys %BUMP
+  ),
+  (
+    map {
+      my $opt = $_;
+      $_ => sub {
+        if ( defined $force_to ) {
+          die
+           "Please specify only one of -normal, -numify, or -stringify\n";
+        }
+        $force_to = $opt;
+       }
+     } qw(normal numify stringify)
+  ),
+  'dryrun' => \$dryrun,
+  'quiet'  => \$quiet,
+) or pod2usage( 2 );
+
+pod2usage( 1 ) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+die "Please specify either -set or -bump, not both\n"
+ if $set && $bump;
+
+my @files = @ARGV ? expand_dirs( @ARGV ) : find_proj_files();
+
+die "Can't find any files to process. Try naming some\n",
+ "directories and/or files on the command line.\n"
+ unless @files;
+
+if ( my @missing = grep { !-e $_ } @files ) {
+  die "Can't find ", conjunction_list( 'or', @missing ), "\n";
+}
+
+my %documents = map { $_ => {} } @files;
+load_all( \%documents );
+
+if ( my @bad_type
+  = grep { !defined $documents{$_}{type} } keys %documents ) {
+  die "Can't process ", conjunction_list( 'or', @bad_type ), "\n",
+   "I can only process text files\n";
+}
+
+my $versions = find_versions( \%documents, $current );
+my @got = sort keys %$versions;
+
+if ( @got == 0 ) {
+  die "Can't find ", defined $current
+   ? "version string $current\n"
+   : "any version strings\n";
+}
+elsif ( @got > 1 ) {
+  die "Found versions ",
+   conjunction_list( 'and', map { "$versions->{$_}[0]{ver}" } @got ),
+   ". Please use\n",
+   "the --current option to specify the current version\n";
+}
+
+my $new_ver;
+if ( $set ) {
+  $new_ver = Perl::Version->new( $set );
+}
+elsif ( defined $bump ) {
+  $new_ver = $versions->{ $got[0] }[0]{ver};
+  if ( $bump eq 'auto' ) {
+    if ( $new_ver->is_alpha ) {
+      $new_ver->inc_alpha;
+    }
+    else {
+      my $pos = $new_ver->components - 1;
+      $new_ver->increment( $pos );
+    }
+  }
+  else {
+    my $pos = $new_ver->components - 1;
+    if ( $bump > $pos ) {
+      my %NAME = (
+        0 => 'revision',
+        1 => 'version',
+        2 => 'subversion',
+        3 => 'alpha',
+      );
+      my $name = $NAME{$bump};
+      die "Cannot -bump-$name -- version $new_ver does not have "
+       . "'$name' component.\n"
+       . "Use -set if you intended to add it.\n";
+    }
+    $new_ver->increment( $bump );
+  }
+}
+else {
+  my $current_ver = $versions->{ $got[0] }[0]{ver};
+  $current_ver = $current_ver->$force_to if $force_to;
+  note( "Current project version is $current_ver\n" );
+}
+
+if ( defined $new_ver ) {
+  set_versions( \%documents, $versions, $new_ver, $force_to );
+  save_all( \%documents );
+}
+
+sub version_re_perl {
+  my $ver_re = shift;
+
+  return
+   qr{ ^ ( .*?  [\$\*] (?: \w+ (?: :: | ' ) )* VERSION \s* = \D*? )
+                 $ver_re 
+                 ( .* \s*) \z }x;
+}
+
+sub version_re_pod {
+  my $ver_re = shift;
+
+  return qr{ ^ ( .*? (?i: version ) .*? ) $ver_re ( .* \s*) \z }x;
+}
+
+sub version_re_plain {
+  my $ver_re = shift;
+  return qr{ ^ ( .*? ) $ver_re ( .* \s* ) \z }x;
+}
+
+sub version_re_meta {
+  my ( $indent, $ver_re ) = @_;
+  return qr{ ^ ( $indent version: \s* ) $ver_re ( \s* ) }x;
+}
+
+sub set_versions {
+  my $docs        = shift;
+  my $versions    = shift;
+  my $new_version = shift
+   or die "Internal: no version specified";
+  my $force_to = shift;
+
+  if ( $force_to ) {
+    $new_version = Perl::Version->new( $new_version->$force_to );
+  }
+
+  note( "Setting version to $new_version\n" );
+
+  # Edit the documents
+  for my $edits ( values %$versions ) {
+    for my $edit ( @$edits ) {
+      my $info = $edit->{info};
+
+      if ( $force_to ) {
+        $edit->{ver} = $new_version;
+      }
+      else {
+        $edit->{ver}->set( $new_version );
+      }
+
+      $info->{lines}[ $edit->{line} ]
+       = $edit->{pre} . $edit->{ver} . $edit->{post};
+      $info->{dirty}++;
+    }
+  }
+}
+
+sub find_version_for_doc {
+  my ( $ver_found, $version, $name, $info, $machine ) = @_;
+
+  note( "Scanning $name" );
+
+  my $state = $machine->{init};
+  my $lines = $info->{lines};
+
+  LINE:
+  for my $ln ( 0 .. @$lines - 1 ) {
+    my $line = $lines->[$ln];
+
+    # Bail out when we're in a state with no possible actions.
+    last LINE unless @$state;
+
+    STATE: {
+      for my $trans ( @$state ) {
+        if ( my @match = $line =~ $trans->{re} ) {
+          if ( $trans->{mark} ) {
+            my $ver = Perl::Version->new( $2 . $3 . $4 );
+            next if defined $version and "$version" ne "$ver";
+            push @{ $ver_found->{ $ver->normal } },
+             {
+              file => $name,
+              info => $info,
+              line => $ln,
+              pre  => $1,
+              ver  => $ver,
+              post => $5
+             };
+            note( " $ver" );
+          }
+
+          if ( my $code = $trans->{exec} ) {
+            $code->( $machine, \@match, $line );
+          }
+
+          if ( my $goto = $trans->{goto} ) {
+            $state = $machine->{$goto};
+            redo STATE;
+          }
+        }
+      }
+    }
+  }
+  note( "\n" );
+}
+
+sub find_versions {
+  my $docs    = shift;
+  my $version = shift;
+
+  my $ver_re = Perl::Version::REGEX;
+
+  # Filetypes that don't have much to say about what the version
+  # might be.
+  my %uncertain = map { $_ => 1 } qw( plain );
+
+  my %machines = (
+
+    # State machine for Perl source
+    perl => {
+      init => [
+        {
+          re   => qr{ ^ = (?! cut ) }x,
+          goto => 'pod',
+        },
+        {
+          re   => version_re_perl( $ver_re ),
+          mark => 1,
+        },
+      ],
+
+      # pod within perl
+      pod => [
+        {
+          re   => qr{ ^ =head\d\s+VERSION\b }x,
+          goto => 'version',
+        },
+        {
+          re   => qr{ ^ =cut }x,
+          goto => 'init',
+        },
+      ],
+
+      # version section within pod
+      version => [
+        {
+          re   => qr{ ^ = (?! head\d\s+VERSION\b ) }x,
+          goto => 'pod',
+        },
+        {
+          re   => version_re_pod( $ver_re ),
+          mark => 1,
+        },
+
+      ],
+    },
+
+    # State machine for plain text. Matches once then loops
+    plain => {
+      init => [
+        {
+          re   => version_re_plain( $ver_re ),
+          mark => 1,
+          goto => 'done',
+        }
+      ],
+      done => [],
+    },
+
+    # State machine for META.yml.
+    meta => {
+      init => [
+        {
+          re   => qr{^ (\s*) (?! ---) }x,
+          goto => 'version',
+          exec => sub {
+            my ( $machine, $matches, $line ) = @_;
+            $machine->{version} = [
+              {
+                re => version_re_meta(
+                  '\s{' . length( $matches->[0] ) . '}', $ver_re
+                ),
+                mark => 1,
+              },
+            ];
+          },
+        },
+      ],
+    },
+  );
+
+  my $ver_found = {};
+
+  my $scan_like = sub {
+    my ( $version, $filter ) = @_;
+    while ( my ( $name, $info ) = each %$docs ) {
+      next unless $filter->( $info->{type} );
+      my $machine = $machines{ $info->{type} }
+       or die "Internal: can't find state machine for type ",
+       $info->{type};
+      find_version_for_doc( $ver_found, $version, $name, $info,
+        $machine );
+    }
+  };
+
+  $scan_like->( $version, sub { !$uncertain{ $_[0] } } );
+
+  # Can we guess what the version is now?
+  unless ( defined $version ) {
+    my @found = keys %$ver_found;
+    $version = $ver_found->{ $found[0] }[0]{ver}
+     if @found == 1;
+  }
+
+  $scan_like->( $version, sub { $uncertain{ $_[0] } } );
+
+  return $ver_found;
+}
+
+sub guess_type {
+  my ( $name, $info ) = @_;
+  for my $try ( @MAGIC ) {
+    return $try->{name}
+     if $try->{test}->( $name, $info );
+  }
+
+  return;
+}
+
+sub load_all {
+  my $docs = shift;
+
+  for my $doc ( keys %$docs ) {
+
+    #note( "Loading $doc\n" );    
+    $docs->{$doc} = {
+      lines => read_lines( $doc, binmode => ':raw', array_ref => 1 ),
+      dirty => 0,
+    };
+    $docs->{$doc}{type} = guess_type( $doc, $docs->{$doc} );
+
+    #note( "Type is ", $docs->{$doc}{type}, "\n" );
+  }
+}
+
+sub save_all {
+  my $docs = shift;
+
+  for my $doc ( grep { $docs->{$_}{dirty} } keys %$docs ) {
+    if ( $dryrun ) {
+      note( "Would save $doc\n" );
+    }
+    else {
+      note( "Saving $doc\n" );
+      open my $fh, '>:raw', $doc or croak "Could not open file $doc: $!\n";
+      $fh->autoflush(1);
+      print $fh @{ $docs->{$doc}{lines} };
+      close $fh;
+    }
+  }
+}
+
+sub note {
+  print join( '', @_ ) unless $quiet;
+}
+
+sub find_proj_files {
+  if ( my $dir = find_project( File::Spec->curdir ) ) {
+    my @files = ();
+    while ( my ( $obj, $spec ) = each %CONSIDER ) {
+      if ( my $got = exists_in( $dir, $obj ) ) {
+        push @files,
+         expand_dirs_matching( $spec->{like} || qr{}, $got );
+      }
+    }
+    unless ( @files ) {
+      die "I looked at ",
+       conjunction_list( 'and', sort keys %CONSIDER ),
+       " but found no files to process\n";
+    }
+    return @files;
+  }
+  else {
+    die "No files / directories specified and I can't\n",
+     "find a directory that looks like a project home.\n";
+  }
+}
+
+sub conjunction_list {
+  my $conj = shift;
+  my @list = @_;
+  my $last = pop @list;
+  return $last unless @list;
+  return join( " $conj ", join( ', ', @list ), $last );
+}
+
+sub expand_dirs {
+  return expand_dirs_matching( qr{}, @_ );
+}
+
+sub expand_dirs_matching {
+  my $match = shift;
+  my @work  = @_;
+  my @out   = ();
+  while ( my $obj = shift @work ) {
+    if ( -d $obj ) {
+      opendir my $dh, $obj
+       or die "Can't read directory $obj ($!)\n";
+      push @work, map { File::Spec->catdir( $obj, $_ ) }
+       grep { $_ !~ $SKIP }
+       grep { $_ !~ /^[.][.]?$/ } readdir $dh;
+      closedir $dh;
+    }
+    elsif ( $obj =~ $match ) {
+      push @out, $obj;
+    }
+  }
+
+  return @out;
+}
+
+sub exists_in {
+  my ( $base, $name ) = @_;
+
+  my $try;
+
+  if ( $name =~ m{^(.+)/$} ) {
+    $try = File::Spec->catdir( $base, $1 );
+    return unless -d $try;
+  }
+  else {
+    $try = File::Spec->catfile( $base, $name );
+    return unless -f $try;
+  }
+
+  return File::Spec->canonpath( $try );
+}
+
+sub find_dir_like {
+  my $start     = shift;
+  my $max_up    = shift;
+  my $signature = shift;
+
+  for ( 1 .. $max_up ) {
+    my $score = 0;
+    while ( my ( $file, $weight ) = each %$signature ) {
+      $score += $weight if exists_in( $start, $file );
+    }
+    return File::Spec->canonpath( $start ) if $score >= 1.0;
+    $start = File::Spec->catdir( $start, File::Spec->updir );
+  }
+
+  return;
+}
+
+# Find the project directory
+sub find_project {
+  return find_dir_like( shift, $MAX_UP, \%PROJECT_SIGNATURE );
+}
+
+__END__
+
+=head1 NAME
+
+perl-reversion - Manipulate project version numbers
+
+=head1 SYNOPSIS
+
+perl-reversion [options] [file ...]
+
+ Options:
+
+    -help               see this summary
+    -man                view man page for perl-reversion
+    -bump               make the smallest possible increment
+
+    -bump-revision      increment the specified version component
+    -bump-version
+    -bump-subversion
+    -bump-alpha
+
+    -set <version>      set the project version number
+    -current <version>  specify the current version
+
+    -normal             print current version in a specific format OR
+    -numify             force versions to be a specific format,
+    -stringify          with -set or -bump
+
+    -dryrun             just go through the motions, but don't 
+                        actually save files
+
+=head1 DESCRIPTION
+
+A typical distribution of a Perl module has embedded version numbers is
+a number of places. Typically the version will be mentioned in the
+README file and in each module's source. For a module the version may
+appear twice: once in the code and once in the pod.
+
+This script makes it possible to update all of these version numbers
+with a simple command.
+
+To update the version numbers of specific files name them on the command
+line. Any directories will be recursively expanded.
+
+If used with no filename arguments perl-reversion will attempt to update
+README and any files below lib/ in the current project.
+
+=head1 OPTIONS
+
+=over
+
+=item C<< -bump >>
+
+Attempt to make the smallest possible increment to the version. The
+least significant part of the version string is incremented.
+
+    1       =>  2
+    1.1     =>  1.2
+    1.1.1   =>  1.1.2
+    1.1.1_1 =>  1.1.1_2
+
+=item C<< -bump-revision >>
+
+=item C<< -bump-version >>
+
+=item C<< -bump-subversion >>
+
+=item C<< -bump-alpha >>
+
+Increment the specified version component.  Like the C<inc_*> methods of
+L<Perl::Version>, incrementing a component sets all components to the right of
+it to zero.
+
+=item C<< -set <version> >>
+
+Set the version to the specified value. Unless the C<-normal> option is
+also specified the format of each individual version string will be
+preserved.
+
+=item C<< -current <version> >>
+
+Specify the current version. Only matching version strings will
+be updated.
+
+=item C<< -normal >>
+
+=item C<< -numify >>
+
+=item C<< -stringify >>
+
+Use a specific formatting, as in L<Perl::Version/Formatting>.
+
+Alone, these options control how the current (found) version is displayed.
+
+With C<-bump> or C<-set>, also update version strings to have the given
+formatting, regardless of the version format passed to C<-set> or the current
+version (for C<-bump>).
+
+If none of these options are specified, perl-reversion will preserve the
+formatting of each individual version string (the same as C<-stringify>).
+
+=item C<< -dryrun >>
+
+If set, perl-reversion will not save files. Use this to see
+what gets changed before it actually happens.
+
+=back
+
+=head1 AUTHOR
+
+Andy Armstrong  C<< <andy@hexten.net> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2007, Andy Armstrong C<< <andy@hexten.net> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

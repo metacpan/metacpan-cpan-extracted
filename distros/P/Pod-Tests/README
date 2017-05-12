@@ -1,0 +1,179 @@
+NAME
+    Pod::Tests - Extracts embedded tests and code examples from POD
+
+SYNOPSIS
+      use Pod::Tests;
+      $p = Pod::Tests->new;
+
+      $p->parse_file($file);
+      $p->parse_fh($fh);
+      $p->parse(@code);
+
+      my @examples = $p->examples;
+      my @tests    = $p->tests;
+
+      foreach my $example (@examples) {
+          print "The example:  '$example->{code}' was on line ".
+                "$example->{line}\n";
+      }
+
+      my @test_code         = $p->build_tests(@tests);
+      my @example_test_code = $p->build_examples(@examples);
+
+DESCRIPTION
+    This is a specialized POD viewer to extract embedded tests and code
+    examples from POD. It doesn't do much more than that. pod2test does the
+    useful work.
+
+  Parsing
+    After creating a Pod::Tests object, you parse the POD by calling one of
+    the available parsing methods documented below. You can call parse as
+    many times as you'd like, all examples and tests found will stack up
+    inside the object.
+
+  Testing
+    Once extracted, the tests can be built into stand-alone testing code
+    using the build_tests() and build_examples() methods. However, it is
+    recommended that you first look at the pod2test program before embarking
+    on this.
+
+  Methods
+  new
+      $parser = Pod::Tests->new;
+
+    Returns a new Pod::Tests object which lets you read tests and examples
+    out of a POD document.
+
+  parse
+      $parser->parse(@code);
+
+    Finds the examples and tests in a bunch of lines of Perl @code. Once run
+    they're available via examples() and testing().
+
+  parse_file $file
+      $parser->parse_file($filename);
+
+    Just like parse() except it works on a file.
+
+  parse_fh $fh
+      $parser->parse_fh($fh);
+
+    Just like parse() except it works on a filehandle.
+
+  tests
+      @testing  = $parser->tests;
+
+    Returns the tests found in the parsed POD documents. Each element of
+    @testing is a hash representing an individual testing block and contains
+    information about that block.
+
+      $test->{code}         actual testing code
+      $test->{line}         line from where the test was taken
+
+  examples
+      @examples = $parser->examples;
+
+    Returns the examples found in the parsed POD documents. Each element of
+    @examples is a hash representing an individual testing block and
+    contains information about that block.
+
+      $test->{code}         actual testing code
+      $test->{line}         line from where the test was taken
+
+  build_tests
+      my @code = $p->build_tests(@tests);
+
+    Returns a code fragment based on the given embedded @tests. This
+    fragment is expected to print the usual "ok/not ok" (or something
+    Test::Harness can read) or nothing at all.
+
+    Typical usage might be:
+
+        my @code = $p->build_tests($p->tests);
+
+    This fragment is suitable for placing into a larger test script.
+
+    NOTE Look at pod2test before embarking on your own test building.
+
+  build_examples
+      my @code = $p->build_examples(@examples);
+
+    Similar to build_tests(), it creates a code fragment which tests the
+    basic validity of your example code. Essentially, it just makes sure it
+    compiles.
+
+    If your example has an "example testing" block associated with it it
+    will run the the example code and the example testing block.
+
+EXAMPLES
+    Here's the simplest example, just finding the tests and examples in a
+    single module.
+
+      my $p = Pod::Tests->new;
+      $p->parse_file("path/to/Some.pm");
+
+    And one to find all the tests and examples in a directory of files. This
+    illustrates building a set of examples and tests through multiple calls
+    to parse_file().
+
+      my $p = Pod::Tests->new;
+      opendir(PODS, "path/to/some/lib/") || die $!;
+      while( my $file = readdir PODS ) {
+          $p->parse_file($file);
+      }
+      printf "Found %d examples and %d tests in path/to/some/lib\n",
+             scalar $p->examples, scalar $p->tests;
+
+    Finally, an example of parsing your own POD using the DATA filehandle.
+
+      use Fcntl qw(:seek);
+      my $p = Pod::Tests->new;
+
+      # Seek to the beginning of the current code.
+      seek(DATA, 0, SEEK_SET) || die $!;
+      $p->parse_fh(\*DATA);
+
+  SUPPORT
+    This module has been replaced by the newer Test::Inline 2. Most testing
+    code that currently works with "pod2test" should continue to work with
+    the new version. The most notable exceptions are "=for begin" and "=for
+    end", which are deprecated.
+
+    After upgrading, Pod::Tests and "pod2test" were split out to provide a
+    compatibility package for legacy code.
+
+    "pod2test" will stay in CPAN, but should remain unchanged indefinately,
+    with the exception of any minor bugs that will require squishing.
+
+    Bugs in this dist should be reported via the following URL. Feature
+    requests should not be submitted, as further development is now occuring
+    in Test::Inline.
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Pod-Tests>
+
+AUTHOR
+    Michael G Schwern <schwern@pobox.com>
+
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    Test::Inline
+
+    pod2test, Perl 6 RFC 183 http://dev.perl.org/rfc183.pod
+
+    Short set of slides on Pod::Tests
+    http://www.pobox.com/~schwern/talks/Embedded_Testing/
+
+    Similar schemes can be found in SelfTest and Test::Unit.
+
+COPYRIGHT
+    Copyright 2005 - 2008 Adam Kennedy.
+
+    Copyright 2001 - 2003 Michael G Schwern.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

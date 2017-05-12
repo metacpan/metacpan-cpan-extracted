@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Path/Router/Route/Slurpy.pm
+lib/Path/Router/Route/Slurpy/Match.pm
+t/basic.t
+t/caveats.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/validations.t

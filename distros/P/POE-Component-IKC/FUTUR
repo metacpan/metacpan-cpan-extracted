@@ -1,0 +1,43 @@
+IKC developement is sort of stalled right now, for 2 reasons : it does
+everything I currently need (and I don't have the time to add the extra
+features) AND I'm spending some time thinking about how to improve the
+design.
+
+I've come to realise that IKC is 3 things :
+
+- Dealing with a pre-forking POE server and babysitting the children
+  processes
+        This should be factored out into a standalone component.
+
+- Protocol and implementation for sending events between kernels.
+        I want to rework the current protocol (which uses 3 states and is
+slightly fragile if either end misbehaves) and add XML-RPC (and maybe
+SOAP) support.  And add other IPC options (unix sockets).  And clean up
+event parameter handling.
+        The currently version has no access control mechanisms.  This was
+a deliberate choice.  I think access control should be layered on top of
+IKC.  This will have to be dealt with if I decide to expose XML-RPC
+interfaces.
+
+- Dealing with "clusters" of kernels
+        I call these "clouds of kernels".  I would like IKC to be able to
+automagically fall-over to other kernels that publish the same
+sessions/states when a foreign kernels become unavaible.  This means IKC
+has to be able to automatically find/register remote kernels and stuff.  
+Currently, I've only implemented auto-reconnect and proxy sessions.  The
+latter I would like to extend to proxy-objects (object methods get
+converted into calls to remote kernels).
+
+And, off in the far future, I would like to add transaction processing
+and crash recovery.  (This might not be a distant future, because I'm
+going to be reimplement an e-commerce application that does credit card
+validation this spring and transactions would make this much funner).
+
+Ancillary stuff : a distributed application framework (interfaces,
+"scripting", error handling) built on top of IKC.  I'm going to be working
+on this in the next few months.
+
+(Why do I get the feeling I'm reimplementing CORBA? :)
+
+So that's roughly the state of IKC at this moment.  You have been warned.
+

@@ -1,0 +1,360 @@
+use PDF::Reuse;
+use cloud;
+use sun;
+use lightn;
+use wind;
+use thermometer;
+use drop;
+use snow;
+use strict;
+
+prDocDir('doc');
+
+my $infil = 'weather.dat';
+my $line;
+my $size = 0.5;
+
+open (INFIL, "<$infil") || die "Couldn't open $infil, $!\n";
+
+prFile('weatherObj.pdf');
+prCompress(1);
+prMbox(0, 0, 690, 735);              
+prForm( {file   => 'EUSA.pdf',
+         adjust => 1}              # Make the imported page fill all the page
+      );
+
+prFontSize(9); 
+
+#######################################################################
+# The program reads a text file with fields separated by ','
+# name          mandatory
+# xPos          mandatory
+# yPos          mandatory
+# temp          in degrees Celcius
+# sun           sunshine in % '' - 100 ( perhaps a little strange)
+# cloud         % '' - 100
+# rain          mm
+# snow          mm
+# windFrom      a degree '' - 360
+# windStrength  m / sek 
+# thunder       Something or nothing
+#
+# more objects could have been added, but it is only an illustration
+######################################################################### 
+              
+
+while (chomp($line = <INFIL>))
+{   my ($name, $xPos, $yPos, $temp, $sun, $cloud, $rain, $snow,
+        $windFrom, $windStrength, $thunder) = split(/\,/,$line);
+    if ((! defined $name) || (! defined $xPos) || (! defined $yPos))
+    {  next;
+    }
+    showName($name, $xPos, $yPos, $size);
+    thermometer($xPos, $yPos, $temp, $size)             unless( ! defined $temp);
+    sun($xPos, $yPos, $sun, $size)                      unless (! $sun);
+    cloud($xPos, $yPos, $size, $cloud, $rain, $snow)    unless (! $cloud);
+    wind($xPos, $yPos, $size, $windFrom, $windStrength) unless((! $windFrom) 
+                                                            || (! $windStrength));
+    thunder($xPos, $yPos, $size)                        unless (! $thunder);
+    
+}
+
+prEnd();
+
+close INFIL;
+
+
+sub showName
+{   my ($lName, $x, $y, $lSize) = @_;
+    my $height = 8 * $lSize;
+    my $width  = 8 * $lSize;
+    my $str  = "q\n";                          # save graphical state
+    $str    .= "0 0.7 0.7 rg\n";               # bluish green for fill color
+    $str    .= "$x $y $width $height re\n";    # a rectangle 
+    $str    .= "b\n";                          # close path, fill (and stroke)
+    prAdd($str);
+    $x += (14 * $lSize);
+    $y -= (5 * $lSize);
+    prFont('TR');
+    prText($x, $y, $lName);
+    prAdd("Q");                                 # restore graphical state
+
+}
+
+sub thermometer
+{  my ($x, $y, $degree, $lSize) = @_;
+   my $mercury;
+   # move it down to the left a little
+
+   $x -= (20 * $lSize);
+   $y -= (30 * $lSize);
+
+   my ($c1, $c2, $c3, $steps);
+   my $width  = 10 * $lSize;
+   my $height = 60 * $lSize;
+   
+   ######################################
+   # calculate the color
+   #  0 or less   is blue   0 0 1
+   #  5           is green  0 1 0
+   #  18          is yellow 1 1 0
+   #  30 and more is red    1 0 0
+   ######################################
+   
+   if ($degree <= 0)
+   {   $c1 = 0;
+       $c2 = 0;
+       $c3 = 1;
+   }
+   elsif ($degree < 5)
+   {   $c1  = 0;
+       $c2  = 1;       
+       $c3  = 1 - ($degree / 10);
+              
+   }
+   elsif ($degree == 5)
+   {   $c1 = 0;
+       $c2 = 1;
+       $c3 = 0;
+   }
+   elsif ($degree < 18)
+   {   $c1    = ($degree - 5) / 13;
+       $c2    = 1;
+       $c3    = 0;
+   }
+   elsif ($degree == 18)
+   {   $c1 = 1;
+       $c2 = 1;
+       $c3 = 0;
+   }
+   elsif ($degree < 30)
+   {   $steps = 12;
+       $c1    = 1;
+       $c2    = 1 - ($degree / 60);
+       $c3    = 0;
+   }
+   else
+   {   $c1 = 1;
+       $c2 = 0;
+       $c3 = 0;
+   }
+   #################################################
+   # We have to calculate the height of the mercury
+   #################################################
+
+   if ($degree < -40)
+   {  $mercury = 14;
+   }
+   elsif ($degree > 40)
+   {  $mercury = 74;
+   }
+   else
+   {  $mercury = (($degree + 40) * 6 / 8 ) + 14;
+   }
+ 
+   ####################################################################
+   # The program could had been faster if it only created each object
+   # once, and then draw it with different parameters, but it doesn't 
+   # matter here.
+   ####################################################################
+
+   
+   my $t = thermometer->new();
+
+   # Now draw the thermometer
+
+   $t->draw( x        => ($x - 3) ,
+             y        => ($y - 2.5),
+             size     => 0.4,
+             text1    => ($degree . ' C'),
+             line5    => "4.7 $mercury",
+             line6    => "13.6 $mercury",
+             fillRGB3 => "$c1 $c2 $c3",
+             font     => 'TB');
+    
+}
+
+sub sun
+{  my ($x, $y, $perc, $lSize) = @_; 
+   
+   # move it up a little
+
+   $x += (2 * $lSize);
+   $y += (45 * $lSize);
+
+   my ($c1, $c2, $c3, $border, $str);
+      
+   #######################################################
+   # calculate the color
+   #  100%     is yellow 1 1 0
+   #  0  %     is white  1 1 1
+   #   
+   ########################################################
+   
+   if ($perc <= 0)
+   {   return;
+   }
+   elsif ($perc <= 100)
+   {   $c1  = 1;
+       $c2  = 1;       
+       $c3  = 1 - ($perc / 100);
+       $border = 3 * $perc / 100;
+              
+   }
+   else 
+   {   $c1 = 1;
+       $c2 = 1;
+       $c3 = 0;
+       $border = 1;
+   }
+   my $s = sun->new();
+   $s->draw( x          => ($x - 4),
+             y          => ($y - 4),
+             size       => $lSize,
+             fillRGB1   => "$c1 $c2 $c3",
+             strokeRGB1 => "0.98 0.7 0",
+             lineWidth1 => $border);
+   
+}
+
+sub cloud
+{  my ($x, $y, $lSize, $perc, $rain, $snow) = @_;
+   my ($str, $lineColor, $fillColor);
+   my $ySize = $lSize * $perc * 0.01;
+   $fillColor = '0.8 0.8 0.8';
+   if (($rain > 2) || ($snow > 2))
+   {  $fillColor = '0.6 0.6 0.6'; }  
+   if ($perc < 20)
+   {  $lineColor = '0.8 0.8 0.8'; }
+   else
+   {  $lineColor = '0 0 0'; } 
+
+   # move up to the left;
+   $x -= (25 * $lSize);
+   $y += (50 * $lSize); 
+
+   my $c = cloud->new();
+   $c->draw(x          => $x,
+            y          => $y,
+            size       => $lSize,
+            ySize      => $ySize,
+            strokeRGB1 => $lineColor,
+            fillRGB1   => $fillColor);
+   
+   if ($rain > 0)
+   {  rain($x, $y, $lSize, $rain);
+      $y -= (10 * $size);
+   }
+   if ($snow)
+   {  snow($x, $y, $lSize, $snow);
+   }
+
+
+
+}
+
+sub rain
+{  my ($x, $y, $size, $mm) = @_;
+   my $str;
+   
+   $y -= (23 * $size);
+   $x += (70 * $size);
+   $size = $size * 0.55;   
+   my $drop;
+   if ($mm <= 0)
+   {  return;
+   }
+   elsif ($mm <= 4)
+   {  $drop = 1;
+   }
+   else
+   {  if ($mm > 10)
+      {  $drop = 3; }
+      else
+      {  $drop = 2; }
+       
+   } 
+   $x -= $drop * 30 * $size;   
+
+   while ($drop > 0)
+   {   my $d = drop->new();
+       $d->draw( x    => $x,
+                 y    => $y,
+                 size => $size);
+       $drop--;
+       $x = $x + (50 * $size);
+       
+   }
+   
+}
+
+sub snow
+{  my ($x, $y, $size, $mm) = @_;
+   my $str;
+  
+   my $flake;
+   $y -= (35 * $size);
+   $x += (50 * $size);
+   
+   if ($mm <= 0)
+   {  return;
+   }
+   elsif ($mm >= 10)
+   {  $flake = 3;
+   }
+   else
+   {  $flake = sprintf("%.0f", ($mm / 3));
+   }
+   $x -= $flake * 15 * $size; 
+    
+   
+   while ($flake > 0)
+   {    my $s = snow->new();
+        $s->draw( x    => $x,
+                  y    => $y,
+                  size => ($size * 0.5));
+        $flake--;
+        $x = $x + (30 * $size);
+       
+   }
+   
+}
+
+sub wind
+{  my ($x, $y, $lSize, $from, $strength) = @_;
+   $x -= 25;
+   $y += 15;
+   
+   if (! defined $strength)
+   {  $strength = 1; }
+   my $ySize = $strength / 10;
+   my $lineWidth = $ySize;
+   if (($from > 200) && ($from < 330))
+   {  $x -= 15;
+   }
+   
+   
+   my $w = wind->new();
+   $w->draw ( x           => $x,
+              y           => $y,
+              size        => $lSize,
+              ySize       => $ySize,
+              lineWidth1  => $lineWidth,
+              rotate      => $from);
+ 
+
+}
+
+sub thunder
+{  my ($x, $y, $lSize) = @_;
+   $x += 15;
+   $y -= 5;
+   $lSize *= 0.8;
+
+   my $l = lightn->new();
+   $l->draw(x     => $x,
+            y     => $y,
+            size  => $lSize,
+            skewX => 20,
+            skewY => 10); 
+}

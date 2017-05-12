@@ -1,0 +1,86 @@
+<html>
+  <head>
+    <title>Petal Test</title>
+    <style type="text/css">
+      .active {
+        background-color: yellow;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Petal Test</h1>
+
+    <h2>Basic - Passing a hashreference to Petal::process</h2>
+    <table border="1">
+      <tr petal:if="false: arrayref">
+        <td>No elements</td>
+      </tr>
+      <tr petal:if="arrayref" petal:repeat="rec arrayref">
+        <td>$rec/foo</td>
+      </tr>
+    </table>
+
+    <p petal:content="string">String</p>
+    <p petal:content="number">#</p>
+    <p petal:content="foo">foo</p>
+
+
+
+    <h2>Advanced - Invoking methods on objects</h2>
+    <table border="1">
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Active</th>
+      </tr>
+      <tr petal:if="false: records">
+        <td colspan="5">No elements</td>
+      </tr>
+      <tr petal:if="records" petal:repeat="record records" petal:attr="class $record/is_current_id '1' 'active'">
+        <td petal:content="record/id">ID</td>
+        <td petal:content="string:$record/first_name $record/last_name">First Last</td>
+        <td petal:content="record/phone">Phone</td>
+        <td petal:condition="true:record/is_current_id" align="center">x</td>
+      </tr>
+    </table>
+
+    <ul petal:repeat="record records">
+      <li petal:condition="true:record/is_current_id" petal:content="string: Current id = $record/id">Current id</li>
+    </ul>
+
+
+
+
+
+    <h2>Advanced - Using CGI.pm to generate forms</h2>
+    <table cellpadding="0" cellspacing="0" border="0" width="300">
+      <tr>
+        <th>Checkbox group</th>
+        <th>Select group</th>
+        <th>Radio button group</th>
+      </tr>
+      <tr>
+        <td width="100">
+          <span petal:replace="structure query/checkbox_group 'Choices' choices '' 'true'">
+            <input name="Choices" type="checkbox" value="test">Test</input>
+          </span>
+        </td>
+
+        <td width="100" valign="top">
+          <span petal:replace="structure query/popup_menu 'Choices' choices '' 'true'">
+            <input name="Choices" type="checkbox" value="test">Test</input>
+          </span>
+        </td>
+
+        <td valign="top">
+          <span petal:replace="structure query/radio_group 'Choices' choices '' 'true'">
+            <input name="Choices" type="checkbox" value="test">Test</input>
+          </span>
+        </td>
+      </tr>
+    </table>
+
+  </body>
+</html>

@@ -1,0 +1,61 @@
+Revision history for Pod::Weaver::Plugin::StopWords
+
+1.010     2014-12-28T05:09:05Z
+
+  - Remove Moose::Autobox dependency
+  - Fix fragile tests for Pod::Elemental 0.103003
+
+1.009     2014-08-16T13:29:20Z
+
+  [Test Fixes]
+  - Mock is_trial to avoid warnings with newer Pod::Weaver.
+
+1.008     2013-11-05T02:12:56Z
+
+  [Test Fixes]
+  - Fix tests to expect encoding directive for compatibility
+    with Pod::Weaver 4 (compatibility with < 4 retained).
+    No code changes.
+
+1.007     2013-08-17T17:06:49Z
+
+  - Update pod 'ini' example to use the preferred dot separator.
+    Thanks Karen Etheridge!
+
+1.006     2013-04-27T03:49:41Z
+
+  - Update release metadata.  No code changes.
+
+1.005     2012-06-10T03:44:28Z
+
+  - If =encoding directive is the first pod element
+    put collected stopwords after it (instead of before).
+
+1.004     2011-07-15T00:07:12Z
+
+  - Update metadata
+
+1.003     2011-04-14T22:29:08Z
+
+  - Gather stopwords paragraphs from leftovers (Thanks Apocalypse!) [github 2]
+  - Various superficial dist/release changes
+
+1.002     2011-03-07T21:31:54Z
+
+  - Fix test script to account for proposed changes to Pod::Weaver [github 1]
+
+1.001005  2011-01-21T01:12:49Z
+
+  - Document usage with Dist::Zilla::Stash::PodWeaver
+  - Add 'include_copyright_holder' option (like 'include_authors')
+
+1.000002  2010-12-17T03:58:20Z
+
+  - No code changes
+  - Support Module::Build
+  - Specify required (latest) versions for
+    Pod::Weaver, Pod::Elemental, and Test::Differences
+
+1.000001  2010-12-16T16:51:52Z
+
+  - Initial release

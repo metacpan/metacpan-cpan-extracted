@@ -1,0 +1,47 @@
+Revision history for Perinci-Use
+
+0.06    2015-09-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.05    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.04     2014-05-26 (SHARYANTO)
+
+         - No functional changes.
+
+         - App 'use experimental smartmatch' for perl 5.18+.
+
+
+0.03     2012-09-27 (SHARYANTO)
+
+         - (Refactor) Use wrapres().
+
+         - Fix logic error and typo.
+
+         - Add an example script.
+
+
+0.02     2012-02-23 (SHARYANTO)
+
+         - Rename distribution from Sub-Spec-Use to Perinci-Use. Follow Riap.
+
+
+0.02     2012-01-21 (SHARYANTO)
+
+         - No functional changes. Mark deprecated.
+
+
+0.01     2011-10-24 (SHARYANTO)
+
+         - First release.

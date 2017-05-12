@@ -1,0 +1,33 @@
+---
+abstract: 'A Perl extension to allow a bare block after method call'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.97'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PerlX-MethodCallWithBlock
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  B::Hooks::EndOfScope: 0.08
+  B::OPCheck: 0.28
+  Devel::Declare: 0.005011
+  PPI: 1.203
+  autobox: 2.55
+  autobox::Core: 0.6
+  perl: 5.8.1
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: git://github.com/gugod/PerlX-MethodCallWithBlock.git
+version: 0.05

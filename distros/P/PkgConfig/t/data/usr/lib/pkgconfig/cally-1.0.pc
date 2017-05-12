@@ -1,0 +1,17 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib/x86_64-linux-gnu
+includedir=${prefix}/include
+
+apiversion=1.0
+winsys=glx
+soname_infix=glx
+cogl_driver=gl
+requires=cairo-gobject >= 1.10 atk >= 1.17 pangocairo >= 1.20 json-glib-1.0 >= 0.12.0 gdk-pixbuf-2.0 >= 2.0 gl libdrm x11 xext xfixes >= 3 xdamage xcomposite >= 0.4 xi
+
+Name: Cally
+Description: Clutter Accessibility Implementation Library
+Version: 1.6.16
+Libs: -L${libdir} -lclutter-${soname_infix}-${apiversion}
+Cflags: -I${includedir}/clutter-${apiversion}
+Requires: atk clutter-1.0

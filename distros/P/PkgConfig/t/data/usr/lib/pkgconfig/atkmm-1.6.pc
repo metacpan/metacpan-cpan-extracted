@@ -1,0 +1,19 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+datarootdir=${prefix}/share
+datadir=${datarootdir}
+includedir=${prefix}/include
+
+docdir=${datarootdir}/doc/gtkmm-2.4
+doxytagfile=${docdir}/reference/gtkmm-2.4.tag
+htmlrefdir=${docdir}/reference/html
+htmlrefpub=http://library.gnome.org/devel/gtkmm/unstable/
+
+Name: atkmm
+Description: C++ binding for the ATK accessibility toolkit
+Version: 2.20.3
+URL: http://www.gtkmm.org/
+Requires: glibmm-2.4 >= 2.24 atk >= 1.12
+Libs: -L${libdir} -latkmm-1.6
+Cflags: -I${includedir}/atkmm-1.6

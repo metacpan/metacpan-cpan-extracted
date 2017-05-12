@@ -1,0 +1,54 @@
+---
+abstract: 'Ensure that POD has no duplicate section headers.'
+author:
+  - 'Ryan C. Thompson <rct@thompsonclan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  PPI: '0'
+  Pod::Elemental: '0'
+  Pod::Elemental::Selectors: '0'
+  Pod::Elemental::Transformer::Nester: '0'
+  Pod::Elemental::Transformer::Pod5: '0'
+  Pod::Weaver: '0'
+  Scalar::Util: '0'
+  Software::License::Artistic_1_0: '0'
+  Test::Exception: '0'
+  Test::More: '0.94'
+  blib: '1.01'
+  perl: '5.012'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Weaver-Plugin-EnsureUniqueSections
+no_index:
+  directory:
+    - corpus
+provides:
+  Pod::Weaver::Plugin::EnsureUniqueSections:
+    file: lib/Pod/Weaver/Plugin/EnsureUniqueSections.pm
+    version: '0.163250'
+requires:
+  Carp: '0'
+  Lingua::EN::Inflect::Number: '0'
+  Moose: '0'
+  Moose::Autobox: '0.10'
+  MooseX::Has::Sugar: '0'
+  Pod::Weaver::Role::Finalizer: '0'
+  Pod::Weaver::Role::Preparer: '0'
+  Text::Trim: '0'
+  perl: '5.012'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/DarwinAwardWinner/Pod-Weaver-Plugin-EnsureUniqueSections
+  repository: https://github.com/DarwinAwardWinner/Pod-Weaver-Plugin-EnsureUniqueSections.git
+version: '0.163250'

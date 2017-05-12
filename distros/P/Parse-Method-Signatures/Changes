@@ -1,0 +1,87 @@
+Changelog for Parse::Method::Signatures
+
+1.003019 - 2017/04/10
+ - Stable release of fixes in 1.003018_01
+
+1.003018_01 - 2017/04/02
+ - Avoid needing '.' in @INC for Makefile.PL ( RT #120830 )
+
+1.003017 - 2016/05/31
+ - Fix use of unescaped "{" in QR ( RT #114385 )
+
+1.003016 - 2014/01/12
+  - Use Class::Load instead of Class::MOP::load_class() (Zefram)
+
+1.003015 - 2013/03/01
+  - Don't ship MYMETA files
+
+1.003014 - 2011/09/12
+  - Don't look in the stash for type names containing :: (Jesse Luehrs)
+
+1.003013 - 2010/01/08
+  - Add version to List::MoreUtils as we need part() (Leo Lapworth)
+
+1.003012 - 2009/12/16
+  - Pass from_namespace to type constraint class even if there is a callback
+    provided. (This lets the callback be wrapped/extended better.)
+
+1.003011 - 2009/08/18
+  - Resolve aliased type names when a namespace to look aliases up is given.
+
+1.003010 - 2009/07/30
+  - Make it work with upcomming PPI 1.204
+
+1.003009 - 2009/07/16
+  - Fix 'Use of uninitialized value' when using regexps in signatures
+  - Depend on MooseX::Traits 0.06 to remove warning about 'bare has' attribute
+
+1.003008 - 2009/06/25
+  - Fix ppi.t for the __MOP__ object key (Jesse Luehrs).
+
+1.003007 - 2009/05/24
+  - Document Parse::Method::Signatures::Sig (Cory Watson)
+
+1.003006 - 2009/05/19
+  - Copyright notice to make Debian packagers happy
+
+1.003005 - 2009/05/07
+  - Stop using json in META.yml.
+
+1.003004 - 2009/03/26
+  - Better error reporting of invalid TCs.
+  - Better error reporting of not yet defined MX::Types TCs
+  - We now skip leading whitespace at the start of the parse. Whitespce
+    everywhere else is already skipped
+
+1.003003 - 2009/03/16
+  - Re-introduce remaining_input since TryCatch depends upon it
+  - Add more and update docs
+  - Add 'from_namespace' option to streamline use with MooseX::Types
+
+1.003002 - 2009/03/04
+  - Now *really* remove deps on Data::Dump. Not my day w.r.t. dists
+
+1.003001 - 2009/03/04
+  - Remove unmarked test dependency on Data::Dump
+
+1.003000 - 2009/03/03
+  - Port to using PPI to do the parsing
+  - Produces nicer error messages
+  - Refactor internals to be much more readable (thanks to Piers Cawley)
+
+1.002000 - 2009/02/21
+  - Will now build a Moose TC object for types of params
+  - Add a few more docs
+
+1.001001 - 2009/01/31
+  - Handle fat commas in TCs (for MooseX::Types::Structured's Dict)
+  - Add missing dep on Test::Differences
+
+1.001000 - 2009/01/31
+  - Change how TCs are stored and parse for better support in reconstructing
+    types at runtime
+  - Switch to MooseX::Types
+  - Support traits (e.g. does coerce) on params
+
+1.000000 - 2009/01/05
+  - Initial release

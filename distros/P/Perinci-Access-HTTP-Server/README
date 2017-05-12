@@ -1,0 +1,182 @@
+SYNOPSIS
+
+DESCRIPTION
+
+    Perinci::Access::HTTP::Server (PeriAHS for short) is a PSGI application
+    (a set of middlewares in Plack::Middleware::PeriAHS::*, really) to
+    implement Riap::HTTP server. You compose the middlewares, configuring
+    each one and including only the ones you need, in your app.psgi, to
+    create an API service.
+
+    A simple command-line utility, peri-htserve, is also available
+    (distributed separately, see App::PerinciUtils). This utility runs a
+    provided PSGI application with the Gepok or Starman PSGI server so you
+    can quickly export some Perl modules/functions as an API service with
+    one line of command.
+
+    To get started, currently see the source code of peri-htserve to see
+    the basic structure of the PSGI application. Also see each middleware's
+    documentation.
+
+FAQ
+
+ I don't want to have to add metadata to every function!
+
+    The point of Riap::HTTP is to expose metadata over HTTP, so it's best
+    that you write your metadata for every API function you want to expose.
+
+    However, there are tools like Perinci::Gen::ForModule (which the
+    peri-htserve CLI uses) which can generate some (generic) metadata for
+    your existing modules.
+
+ How can I customize URL?
+
+    For example, instead of:
+
+     http://localhost:5000/My/API/Adder/func
+
+    you want:
+
+     http://localhost:5000/adder/func
+
+    or perhaps (if you only have one module to expose):
+
+     http://localhost:5000/func
+
+    You can do this by customizing match_uri when enabling the
+    PeriAHS::ParseRequest middleware (see peri-htserve source code). You
+    just need to make sure that you set $env->{"riap.request"}{uri}.
+
+ I want to let user specify output format from URI (e.g. /api/j/... or
+ /api/yaml/...).
+
+    Again, this can be achieved by customizing the PeriAHS::ParseRequest
+    middleware. You can do something like:
+
+     enable "PeriAHS::ParseRequest"
+         match_uri => [
+             qr!^/api/(?<f>json|yaml|j|y)/
+                      (?<uri>[^?/]+(?:/[^?/]+)?)!x,
+             sub {
+                 my ($env, $m) = @_;
+                 $env->{"riap.request"}{fmt} = $m->{f} =~ /j/ ? 'json' : 'yaml';
+             }
+         ];
+
+    Another example, allowing format by sticking .json or .yaml at the end
+    of Riap URI:
+
+     enable "PeriAHS::ParseRequest"
+         match_uri => qr!^(?<uri>[^?/]+(?:/[^?/]+)?)(?:\.(?<fmt>json|yaml))!x;
+
+ I need even more custom URI syntax.
+
+    You can leave match_uri empty and perform your custom URI parsing in
+    another middleware after PeriAHS::ParseRequest. For example:
+
+     enable "PeriAHS::ParseRequest";
+    
+     # do more URI parsing
+     enable sub {
+         my $app = shift;
+         sub {
+             my $env     = shift;
+             my $rreq    = $env->{"riap.request"};
+             # parse more stuff and put it in $rreq
+             my $res = $app->($env);
+             return $res;
+         };
+     };
+
+ I want to support HTTPS.
+
+    If you use peri-htserve, supply --https_ports, --ssl_key_file and
+    --ssl_cert_file options.
+
+    If you use plackup, use Gepok (-s) as the PSGI server.
+
+    If you use PSGI server other than Gepok, you will probably need to run
+    Nginx, Perlbal, or some other external HTTPS proxy.
+
+ I don't want to run a standalone daemon.
+
+    Use other deployment mechanisms for your PSGI application, of which
+    there are plenty. For example, to deploy as CGI script, see
+    Plack::Handler::CGI. To deploy as FastCGI script (allowing to run under
+    Nginx, for example), see Plack::Handler::FCGI.
+
+ I don't want to expose my subroutines and module structure directly!
+
+    Well, isn't exposing functions the whole point of API?
+
+    If you have modules that you do not want to expose as API, simply
+    disallow it (e.g. using allowed_uris configuration in
+    PeriAHS::ParseRequest middleware. Or, create a set of wrapper modules
+    to expose only the functionalities that you want to expose.
+
+ But I want REST-style!
+
+    Take a look at Serabi.
+
+ I want to support another output format (e.g. XML, MessagePack, etc).
+
+    See Perinci::Result::Format.
+
+ I want to automatically reload modules that changed on disk.
+
+    Use one of the module-reloading module on CPAN, e.g.: Module::Reload or
+    Module::Reload::Conditional.
+
+ I want to authenticate clients.
+
+    Enable Plack::Middleware::Auth::Basic (or other authen middleware you
+    prefer) before PeriAHS::ParseRequest.
+
+ I want to add access control and/or authorize clients.
+
+    Take a look at Plack::Middleware::PeriAHS::ACL (currently unfinished)
+    which allows access control based on various conditions. Normally this
+    is put after authentication and before response creation.
+
+ I want to support new actions.
+
+    Normally you'll need to extend the appropriate Riap clients (e.g.
+    Perinci::Access::Schemeless for this. Again, note that you don't have
+    to resort to subclassing just to accomplish this. You can inject the
+    action_ACTION() method from somewhere else.
+
+ I want to serve static files.
+
+    Use the usual Plack::Builder's mount() and Plack::Middleware::Static
+    for this.
+
+     mount my $app = builder {
+         mount "/api" => builder {
+             enable "PeriAHS::ParseRequest", ...;
+             ...
+         },
+         mount "/static" => builder {
+             enable "Static", path=>..., root=>...;
+         },
+     };
+
+TIPS AND TRICKS
+
+ Proxying API server
+
+    Not only can you serve local modules, you can also serve remote modules
+    ("http://" or "https://" URIs) making your API server a proxy for
+    another.
+
+ Performance tuning
+
+    To be written.
+
+SEE ALSO
+
+    Perinci::Access
+
+    Riap::HTTP
+
+    Serabi
+

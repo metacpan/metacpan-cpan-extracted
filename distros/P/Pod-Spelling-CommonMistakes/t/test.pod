@@ -1,0 +1,25 @@
+=head1 good.pod - A Good document
+
+This is some pod to check, without errors.
+
+=head1 HEADING
+
+Here is C<code>, I<italic>, B<bold>, F<Ignore.html>, and L<link description|link.html>.
+
+I is the abandonning.
+
+=head1 CODE
+
+	my $foo = 'x12'; # asdf
+	
+=head1 LIST
+
+=over 4
+
+=item * Starred.
+
+=back
+
+=head1 AUTHOR
+
+Lee Goddard. Copyright (C) Lee Goddard. All Rights Reserved.

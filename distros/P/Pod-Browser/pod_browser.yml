@@ -1,0 +1,18 @@
+---
+name: Pod::Browser
+
+
+# specify namespaces and include directories
+
+Controller::Root:
+  self: 0      # include $c->path_to('lib')
+  inc: 1       # include @INC
+  namespaces:  # search for specific namespaces
+#   - *        # uncomment this line to get all modules
+               # use with care, it could be very slow if
+               # you include @INC
+#   - pods*    # includes all the perl pods like perlfaq or perlfunc
+    - Catalyst::Manual*
+    - DBIx::Class::Manual*
+    - Pod::Browser* # this application  
+#  dirs:        # specify more include directories

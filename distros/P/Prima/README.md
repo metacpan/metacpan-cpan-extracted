@@ -1,0 +1,194 @@
+DESCRIPTION
+===========
+
+PRIMA is a general purpose extensible graphical user interface toolkit with a
+rich set of standard widgets and an emphasis on 2D image processing tasks. A
+Perl program using PRIMA looks and behaves identically on X11 and Win32.
+
+PREREQUISITES
+=============
+
+Debian/Ubuntu
+-------------
+
+For easy setup, run this:
+
+apt-get install libgtk2.0-dev libtext-bidi-perl libgif-dev libjpeg-dev libtiff-dev libxpm-dev
+
+Graphic libraries
+-----------------
+
+Prima can use several graphic libraries to handle image files.  Compiling Prima
+with at least one library, preferably for GIF files is strongly recommended,
+because internal library images are stored in GIFs. Support for the following
+libraries can be compiled in on all platforms:
+
+   - libXpm
+   - libpng
+   - libjpeg
+   - libgif
+   - libtiff
+   - libX11  - support for native X11 bitmap files
+
+Win32
+-----
+
+Modern Strawberry perl come with all of these libraries already, so nothing
+specific needs to be done. However for the older distributions, or ActiveState,
+or custom builds, CPAN contains binary distributions that can be installed just
+for this purpose:
+
+ - http://search.cpan.org/~karasik/Prima-codecs-win32/
+ - http://search.cpan.org/~karasik/Prima-codecs-win64/
+
+it should work for all MSVC and GCC compilers and for native,
+cygwin, and mingw/strawberry perl runtimes.
+
+Fribidi
+-------
+
+To support bi-directional text input and output you'll need Text::Bidi
+module from CPAN. The module is not a prerequisite; it'll need the
+external fribidi library to build. On windows the library is not installed by
+default, you can grab it here:
+
+  http://prima.eu.org/download/fribidi-win32.zip
+  http://prima.eu.org/download/fribidi-win64.zip
+
+SOURCE DISTRIBUTION INSTALLATION
+================================
+
+Create a makefile by running Makefile.PL using perl and then run make ( or
+gmake, or nmake for Win32):
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If 'perl Makefile.PL' fails, the compilation history along with errors can be
+found in makefile.log. 
+
+If make fails with message
+
+    ** No image codecs found
+
+that means you don't have image libraries that Prima supports in your path.
+See PREREQUISITES section.
+
+If some of the required libraries or include files can not be found,
+INC=-I/some/include and LIBS=-L/some/lib semantics should be used to tell
+Makefile.PL about these. Check ExtUtils::MakeMaker for more.
+
+GTK2
+----
+
+It is recommended to build Prima with GTK2 on X11 installations,
+because in that case Prima will use standard GTK fonts, colors, and file dialogs.
+By default Prima tries to build with it, but if you don't want it, run
+
+    perl Makefile.PL WITH_GTK2=0
+
+BINARY DISTRIBUTION INSTALLATION
+================================
+
+Available only for MSWin32. Please use installation from source for
+the other platforms.
+
+To install the toolkit from the binary distribution run 
+
+    perl ms_install.pl
+
+You have to patch Prima::Config.pm manually if you need to compile
+prima-dependent modules.
+
+USAGE EXAMPLES
+==============
+
+Try running the toolkit examples, by default installed in
+INSTALLSITEARCH/Prima/examples directory ( find it by running perl
+-V:installsitearch ). All examples and programs included into the distribution
+can be run either by their name or with perl as argument - for example,
+..../generic or perl ..../generic .  ( perl ..../generic.bat for win32 )
+
+Typical code starts with
+
+    use Prima qw(Application);
+
+and ends with
+   
+    run Prima;
+
+which is an event loop call. Start from the following code:
+
+    use Prima qw(Application Buttons);
+
+    new Prima::MainWindow(
+       text     => 'Hello world!',
+       size     => [ 200, 200],
+    )-> insert( Button =>
+       centered => 1,
+       text     => 'Hello world!',
+       onClick  => sub { $::application-> close },
+    );
+    
+    run Prima;
+
+Or, alternatively, start the VB program, which is the toolkit visual builder. 
+
+MORE INFORMATION
+================
+
+The toolkit contains set of POD files describing its features, and the
+programming interfaces.  Run 'podview Prima' or 'perldoc Prima' command to
+start with the main manual page.
+
+Visit http://www.prima.eu.org/ for the recent versions of the toolkit. You can
+use cvs update feature to keep in touch. The mailing list on the toolkit is
+available, you can ask questions there. See the Prima homepage for details.
+
+COPYRIGHT
+=========
+
+(c) 1997-2003 The Protein Laboratory, University of Copenhagen
+
+AUTHORS
+=======
+
+ - Dmitry Karasik <dmitry@karasik.eu.org>
+ - Anton Berezin  <tobez@tobez.org>
+ - Vadim Belman   <voland@lflat.org>
+
+CREDITS
+=======
+
+ - David Scott
+ - Teo Sankaro
+ - Kai Fiebach
+ - Johannes Blankenstein
+ - Mike Castle
+ - H.Merijn Brand
+ - Richard Morgan
+ - Kevin Ryde
+ - Chris Marshall
+ - Slaven Rezic
+ - Waldemar Biernacki
+ - Andreas Hernitscheck
+ - David Mertens
+ - Teo Sankaro
+ - Gabor Szabo
+ - Fabio D'Alfonso
+ - Rob "Sisyphus"
+ - Chris Marshall
+ - Reini Urban
+ - Nadim Khemir
+ - Vikas N Kumar
+ - Upasana Shukla
+ - Sergey Romanov
+ - Mathieu Arnold
+ - Petr Pisar
+ - Judy Hawkins
+ - Myra Nelson
+ - Sean Healy
+ - Ali Yassen
+ - Maximilian Lika

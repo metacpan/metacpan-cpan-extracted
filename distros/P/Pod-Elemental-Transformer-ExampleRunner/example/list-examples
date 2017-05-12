@@ -1,0 +1,3 @@
+:
+#FOR: lists the files in example/ (this script!)
+grep '#FOR:'  $( find example/ -type f ) | perl -ne 'next if /Binary file/;s{example/}{}; printf qq[%-25s %s], split /:#FOR:/'

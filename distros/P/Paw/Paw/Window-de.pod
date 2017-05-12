@@ -1,0 +1,161 @@
+=head1 Window
+
+B<$window=Paw::Window::new($height, $width, [$abs_x], [$abs_y], [$color], [$name], [\&callback], [\$statusbar], [$orientation], [\&time_function]);>
+
+B<Parameter>
+
+     $height         => Anzahl der Reihen (Laenge)
+
+     $width          => Anzahl der Spalten (Breite)
+
+     $abs_x          => Absolute x-Koordiante am Schirm [optional]
+
+     $abs_y          => Absolute y-Koordiante am Schirm [optional]
+
+     $color          => Das Farbpaar (colorpair) muss mit
+                        Curses::init_pair(pair_nr, COLOR_fg, COLOR_bg)
+                        erzeugt werden [optional]
+
+     $name           => Name des Fensters [optional]
+
+     \&callback      => Referenz auf Funktion die bei jedem Tastendruck
+                        angesprungen wird. [optional]
+
+     $quit_key       => Taste die das Fenster schliesst [optional]
+
+     \@statusbar     => Referenz auf ein Array mit 10 Eintraegen [optional]
+
+     \$statusbar     => eine Referenz auf ein Scalar welcher als Text
+                        im Statusbar stehen soll [optional]
+                        Da es sich um eine Referenz handelt,
+                        kann sich der Text waehrend der Laufzeit aendern.
+
+     $orientation    => "topleft", "topright", "bottomleft", "bottomright",
+                        "center" und "grow" sind die moeglichen
+                        Parameter. Sie geben an wie sich das
+                        Fenster bei Aenderung des Terminalgroesse
+                        verhaelt. Entweder behaelt es seinen
+                        Abstand zu der angegebenen Seite bei,
+                        es bleibt zentriert oder es waechst
+                        bzw. schrumpft mit der neuen Terminalgroesse.
+                        (default ist "center") [optional].
+
+     $title          => Titel der Box (wird oben links an der Box dargestellt)
+                        [optional]
+
+     \&time_function => Die Funktion wird ca. alle 0,1 s angesprungen
+                        so lange das Fenster den Focus hat.
+
+B<Beispiel>
+
+     $window=Paw::Window::new(height=>20, width=>10,
+                              color=>2, callback=>\&function,
+                              statusbar=>\$status, quit_key=>KEY_F(10));
+
+B<Callback>
+
+Die Callback Methode ist in der Regel eine Schleife die laufend die Tastatur
+abfragt und gedrueckte Tasten an die Widgets im Fenster weitergibt. Die interne Callback Routine
+welche benutzt wird falls keine Callback Function fuer das Fenster definiert wurde
+lautet zum Beispiel :
+
+     sub Paw_main_loop {
+    
+         my $main_win = $_[0];
+     
+         my $i = "";
+         $main_win->_refresh();
+         while ( not $main_win->{close_it} and
+                     ($i ne $main_win->{quit_key}) )
+         {
+             $this->{main_win} = $main_win;
+             $i = getch();                  # read key
+             &{$main_win->{time_function}} if ( defined $main_win->{time_functio
+             if ( $i ne -1 ) {
+                 $main_win->key_press($i);  # keycode to widgetset
+                 $main_win->_refresh();
+             }
+             else {
+                 $main_win->_refresh() if ( defined $main_win->{time_function} )
+             }
+         };
+         Curses::clear();
+         $main_win->{close_it}=0;
+         endwin();
+     }
+
+Empfaengt die getch() Function nach ca. 0.1 Sekunden keinen Tastendruck,
+so wird sie wieder verlassen und die $i Variable enthaelt den Wert "-1".
+Die key_press Methdode reicht die Taste an die Widgets weiter.
+
+=head2 get_window_parameter()
+
+Gibt die wichtigsten Parameter eines Fensters zurueck.
+
+B<Beispiel>
+
+     ($cols, $rows, $color)=$win->get_window_parameter();
+
+=head2 put_dir($direction)
+
+Setzt die Richtung in die das naechste Widget gepackt werden soll. Direction kann ``v'' oder ``h'' fuer vertikal bzw. horizontal sein.
+Diese Funktion kann voellig durch benutzen von Boxen umgangen werden.
+
+B<Beispiel>
+
+     $win->put_dir("h");
+
+=head2 close_win();
+
+Das Fenster verliert den Focus. Wenn kein anderes Fenster den Focus uebernimmt, kommt das dem Programmende gleich.
+
+B<Beispiel>
+
+     $win->close_win();
+
+=head2 put($widget)
+
+Packt das Widget in das Fenster.
+
+B<Beispiel>
+
+     $win->put($button0);
+
+=head2 set_border([``shade''])
+
+aktiviert den Rahmen des Fensters optional auch mit Schatten.
+
+B<Beispiel>
+
+     $win->set_border("shade"); oder $win->set_border();
+
+=head2 set_focus($widget_name)
+
+Setzt den Focus nicht auf das eigentlich naechste Widget,
+sondern auf das Übergebene. Erfordert allerdings das das Widget
+einen Namen hat.
+
+B<Beispiel>
+
+     $win->set_focus($button0);
+
+=head2 abs_move_curs($new_x, $new_y);
+
+Setzt den Packer an die absolute Position im Fenster
+(negative Werte liegen ausserhalb des Fensters).
+
+B<Beispiel>
+
+     $win->abs_move_curs(new_y=>5, new_x=>2);
+
+=head2 rel_move_curs($new_x, $new_y);
+
+Setzt den Packer relativ zur momentanen Position im Fenster
+(auch negative Werte moeglich).
+
+B<Beispiel>
+
+     $win->rel_move_curs(new_x=>-5);
+
+=cut
+

@@ -1,0 +1,18 @@
+Changes
+examples/perl-reversion
+lib/Perl/Version.pm
+Makefile.PL
+MANIFEST
+Notes.txt
+README
+t/00.load.t
+t/05.misc.t
+t/10.regression.t
+t/20.compare.t
+t/30.vstring.t
+t/40.perl-reversion.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

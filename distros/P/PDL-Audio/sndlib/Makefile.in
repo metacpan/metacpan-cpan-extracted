@@ -1,0 +1,68 @@
+srcdir = @srcdir@
+prefix = /usr/local
+libdir = $(prefix)/lib
+includedir = $(prefix)/include
+
+VPATH = @srcdir@
+CC = @CC@
+INSTALL = @INSTALL@
+DEFS = @DEFS@
+CFLAGS = @CFLAGS@
+LDFLAGS = @LDFLAGS@
+LIBS = @LIBS@
+INSTALL = install
+A_LD = @A_LD@
+A_LD_FLAGS = @A_LD_FLAGS@
+
+AUDIO_LIB = @AUDIO_LIB@
+LIB_NAME = @LIB_NAME@
+
+.c.o:
+	$(CC) -c $(DEFS) $(CFLAGS) -DHAVE_SNDLIB $<
+
+SNDLIB_HEADERS = sndlib.h # clm.h
+SNDLIB_O_FILES = headers.o audio.o io.o sound.o # clm.o
+
+all: sndlib.a
+
+sndlib.a: $(SNDLIB_HEADERS) $(SNDLIB_O_FILES)
+	$(A_LD) -r $(LDFLAGS) $(SNDLIB_O_FILES) -o sndlib.a $(A_LD_FLAGS)
+
+$(SNDLIB_O_FILES): $(SNDLIB_HEADERS)
+
+clean:
+	rm -f $(SNDLIB_O_FILES) sndlib.a
+
+sndplay: $(SNDLIB_HEADERS) $(SNDLIB_O_FILES) sndplay.o
+	$(CC) sndplay.c -o sndplay $(libdir)/$(LIB_NAME)
+
+sndrecord: $(SNDLIB_HEADERS) $(SNDLIB_O_FILES) sndrecord.o
+	$(CC) sndrecord.c -o sndrecord $(libdir)/$(LIB_NAME)
+
+sndinfo: $(SNDLIB_HEADERS) $(SNDLIB_O_FILES) sndinfo.o
+	$(CC) sndinfo.c -o sndinfo $(libdir)/$(LIB_NAME)
+
+sndsine: $(SNDLIB_HEADERS) $(SNDLIB_O_FILES) sndsine.o
+	$(CC) sndsine.c -o sndsine $(libdir)/$(LIB_NAME)
+
+audinfo: $(SNDLIB_HEADERS) $(SNDLIB_O_FILES) audinfo.o
+	$(CC) audinfo.c -o audinfo $(libdir)/$(LIB_NAME)
+
+install: sndlib
+	$(INSTALL) sndlib.a $(libdir)/sndlib.a
+	$(INSTALL) sndlib.h $(includedir)/sndlib.h
+
+uninstall:
+	rm -f $(libdir)/sndlib.a
+	rm -f $(libdir)/sndlib.so
+
+
+Makefile: Makefile.in config.status
+	./config.status
+
+config.status: configure
+	./config.status --recheck
+
+configure: configure.in
+	cd $(srcdir); autoconf
+

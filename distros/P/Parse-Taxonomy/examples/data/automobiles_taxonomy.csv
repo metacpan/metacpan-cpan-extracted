@@ -1,0 +1,18 @@
+path,audience_size,cpm,buyable
+"|General Motors","","",0
+"|General Motors|Chevrolet",1000000,0.80,1
+"|General Motors|Chevrolet|Spark",100000,0.15,1
+"|General Motors|Chevrolet|Sonic",150000,0.20,1
+"|General Motors|Chevrolet|Cruze",250000,0.20,1
+"|General Motors|Chevrolet|Malibu",200000,0.25,1
+"|General Motors|Chevrolet|Impala",175000,0.30,1
+"|General Motors|Cadillac",150000,1.00,1
+"|General Motors|Cadillac|Coupe",150000,0.30,1
+"|General Motors|Cadillac|Sedan",150000,0.35,1
+"|General Motors|Cadillac|Crossover",150000,0.40,1
+"|General Motors|Cadillac|Escalade",150000,0.50,1
+"|Toyota","","",0
+"|Toyota|Corolla",800000,0.60,1
+"|Toyota|Camry",600000,0.70,1
+"|Toyota|Prius",400000,0.80,1
+"|Toyota|RAV4",300000,0.50,1

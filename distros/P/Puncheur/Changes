@@ -1,0 +1,40 @@
+Revision history for Perl extension Puncheur
+
+v0.3.0 2015-01-01T17:07:03Z
+
+    - [INCOMPATIBLE] `uri_for` now retruns url-path(not absoulute url).
+    - `abs_uri_for` returns absolute url
+    - change versioning way
+
+0.2.0 2014-05-24T06:03:24Z
+
+    - internal change in Puncheur::Runner
+    - add `run` method
+    - add `to_app` method alias of `to_psgi`
+
+0.1.2 2014-05-21T02:37:11Z
+
+    - fix deps only again
+
+0.1.1 2014-05-20T14:34:13Z
+
+    - fix deps only
+
+0.1.0 2014-05-17T08:13:38Z
+
+    - rewrite Puncheur::Dispatcher::Lite. most of code copied from Amon2::Web::Dispatcher::RouterBoom,
+      remove deps Router::Simple and depends on Router::Boom
+
+0.0.3 2013-08-05T12:58:48Z
+
+    - fix deps
+
+0.0.2 2013-07-29T05:36:54Z
+
+    - update dependencies
+    - update pod
+
+0.0.1 2013-07-28T17:28:43Z
+
+    - original version
+

@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+# Inspired by the script provided by SREZIC (https://rt.cpan.org/Ticket/Display.html?id=110723)
+
+use strict;
+use warnings;
+use Getopt::Long;
+
+use PDF::Create;
+use PDF::Font;
+
+my $usage =<<HELP;
+
+verify-char-width [--font-name=<supported font name>] [--help]
+
+Supported font names are as below:
+    - Courier
+    - Courier-Bold
+    - Courier-BoldOblique
+    - Courier-Oblique
+    - Helvetica
+    - Helvetica-Bold
+    - Helvetica-BoldOblique
+    - Helvetica-Oblique
+    - Times-Bold
+    - Times-BoldItalic
+    - Times-Italic
+    - Times-Roman
+    - Symbol
+HELP
+
+my ($font_name, $help);
+GetOptions("font-name=s" => \$font_name,
+           "help"        => \$help) or die $usage;
+(defined $help) && die $usage;
+
+die "ERROR: Missing font name.\n"              unless defined $font_name;
+die "ERROR: Invalid font name [$font_name].\n" unless (exists $PDF::Font::SUPPORTED_FONTS->{$font_name});
+
+my $pdf  = PDF::Create->new(filename => sprintf("%s.pdf", lc($font_name)));
+my $root = $pdf->new_page(MediaBox => $pdf->get_page_size('A4'));
+my $page = $root->new_page;
+
+my $font;
+if ($font_name eq 'Symbol') {
+    $font = $pdf->font(BaseFont => $font_name, Encoding => $font_name);
+}
+else {
+    $font = $pdf->font(BaseFont => $font_name);
+}
+
+my $x = 20;
+my $y = 800;
+
+foreach my $char (32..126, 160..255) {
+    my $chr = chr($char);
+    my $str = $chr . ':' . $char;
+    my $w = $page->string_width($font, $str) * 20;
+
+    if ($x + 55 > 575) {
+        $x = 20;
+        $y -= 30;
+    }
+
+    $page->string($font, 20, $x, $y, $str);
+    my $w_line = $page->string_width($font, $chr) * 20;
+
+    $page->line($x, $y, $x+$w_line, $y);
+    $page->line($x, $y+20, $x+$w_line, $y+20);
+    $page->line($x, $y, $x, $y+20);
+    $page->line($x+$w_line, $y, $x+$w_line, $y+20);
+
+    $x += 65;
+}
+
+$pdf->close;
+
+__END__

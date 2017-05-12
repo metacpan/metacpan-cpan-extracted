@@ -1,0 +1,260 @@
+NAME
+    POE::Declare - A POE abstraction layer for conciseness and simplicity
+
+SYNOPSIS
+      package MyComponent;
+      
+  use strict;
+      use POE::Declare {
+          foo      => 'Attribute',
+          bar      => 'Internal',
+          Username => 'Param',
+          Password => 'Param',
+      };
+      
+  declare TimeoutError => 'Message';
+      
+  sub hello : Event {
+          print "Hello World!\n";
+          $_[SELF]->hello_timeout_start;
+      }
+      
+  sub hello_timeout : Timeout(30) {
+          print "Alas, I die!\n";
+      
+      # Tell our parent as well
+          $_[SELF]->TimeoutError;
+      }
+      
+  compile;
+
+DESCRIPTION
+    POE is a very powerful and flexible system for doing asynchronous
+    programming. But it has the reputation of being difficult to learn, with
+    a somewhat confusing set of abstractions.
+
+    In particular, it can be tricky to resolve POE's way of programming with
+    the highly abstracted OO structures that many people are used to, with
+    layer stacked upon layer ad-infinitum to produce a delegation heirachy
+    which allows for powerful and complex systems that are relatively easy
+    to maintain.
+
+    This can be particularly noticable as the scale of a POE codebase gets
+    larger. At three levels of abstraction the layering in POE becomes quite
+    difficult, and progess past about the third layer of abstraction becomes
+    extremely difficult.
+
+    POE::Declare is an attempt to resolve this problem by locking down part
+    of the traditional flexibility of POE, and by making it easier to split
+    the implementation of each object between an object-oriented heirachy
+    and a collection of POE sessions.
+
+    The goal is to retain the ability to build deep and complex heirachies
+    of encapsulated functionality in your application while also allowing
+    you to take advantage of the asynchronous nature of POE code.
+
+  General Architecture
+    At the core of any POE::Declare application is an object-oriented
+    heirachy of components. This heirachy exists whether or not the POE
+    kernel is running, and parts of it can be started and stopped as needed.
+
+    When it is spawned, each component will create it's own private
+    POE::Session in which to run its events and store its resources.
+
+    Each instance of a class always has one and only one session. This may
+    be a problem if your application will have thousands of spawned
+    components at once (POE recommends against the use of large numbers of
+    sessions) but should not be a problem as long as you keep it down to a
+    few hundred components.
+
+    Because the POE session is slaved to the POE::Declare::Object, the
+    component can handle being started and stopped many times without the
+    loss of any state data between the creation and destruction of each
+    slave session.
+
+    To allow support for components that have no resources and only act as
+    supervisors, POE::Declare always assigns a POE alias for the session
+    while it is active. The existance of this Alias prevents POE cleaning up
+    the session accidentally, and ensures components have explicit control
+    over when they want to shut down their sessions.
+
+    Each POE component contains a set of named resources. Resources may
+    consist of a different underlying POE resource, or may be made up of
+    multiple resources, and additional data stored in the matching object
+    HASH key. To ensure all the various underlying resources will not clash
+    with each other, all resources must be declared and will be strictly
+    checked.
+
+    At the end of each class, instead of the usual 1; to allow the package
+    to return true, you put instead a "compile;" statement.
+
+    This instructs POE::Declare to inventory the declarations and
+    attributes, combine them with declarations from the parent classes, and
+    then generate the code that will implement the structures.
+
+    Once the class has been compiled, the installed functions will be
+    removed from the package to prevent run-time namespace pollution.
+
+  Import-Time Declaration
+    The cluster of "declare" statements at the beginning of a POE::Declare
+    class can look ugly to some people, and may get annoying to step through
+    in the debugger.
+
+    To resolve this, you may optionally provide a list of slot declarations
+    to the module at compile time. This should be in the form of a simple
+    "HASH" reference with the names as keys and the type as values.
+
+      use My::Module {
+          Foo => 'Param',
+          Bar => 'Param',
+      };
+
+    Event and timeout declarations cannot be provided by this method, and
+    you should continue to use subroutine attributes for these as normal.
+
+  Inheritance
+    The resource model of POE::Declare correctly follows inheritance,
+    similar to the way declarations in Moose are inherited. Resource types
+    in a parent class cannot be overwritten or modified in child classes.
+
+    No special syntax is needed for inheritance, as POE::Declare works
+    directly on top of Perl's native inheritance.
+
+      # Parent.pm - Object that connects to a service
+      package My::Parent;
+      
+  use strict;
+      use POE::Declare {
+          Host           => 'Param',
+          Port           => 'Param',
+          ConnectSuccess => 'Message',
+          ConnectFailure => 'Message',
+      };
+      
+  sub connect : Event {
+          # ...
+      }
+      
+  compile;
+      
+  # Child.pm - Connect to an (optionally) authenticating service
+      package My::Child;
+      
+  use strict;
+      use base 'My::Parent';
+      use POE::Declare {
+          Username     => 'Param',
+          Password     => 'Param',
+          AuthRequired => 'Message',
+          AuthInvalid  => 'Message',
+      };
+      
+  compile;
+
+CLASSES
+    POE::Declare is composed of three main modules, and a tree of
+    slot/attribute classes.
+
+  POE::Declare
+    POE::Declare provides the main interface layer and Domain Specific API
+    for declaratively building your POE::Declare classes.
+
+  POE::Declare::Object
+    POE::Declare::Object is the abstract base class for all classes created
+    by POE::Declare.
+
+  POE::Declare::Meta
+    POE::Declare::Meta implements the metadata structures that describe each
+    of your POE::Declare classes. This is superficially similar to something
+    like Moose, but unlike Moose is fast, light weight and can use
+    domain-specific assumptions.
+
+  POE::Declare::Slot
+      POE::Declare::Meta::Slot
+        POE::Declare::Meta::Internal
+        POE::Declare::Meta::Attribute
+          POE::Declare::Meta::Param
+        POE::Declare::Meta::Message
+        POE::Declare::Meta::Event
+          POE::Declare::Meta::Timeout
+
+  POE::Declare::Meta::Internal
+    POE::Declare::Meta::Internal is a slot class that won't generate any
+    functionality, but allows you to reserve an attribute for internal use
+    so that they won't be used by any sub-classes.
+
+  POE::Declare::Meta::Attribute
+    POE::Declare::Meta::Attribute is a slot class used for readable
+    attributes.
+
+  POE::Declare::Meta::Param
+    POE::Declare::Meta::Attribute is a slot class for attributes that are
+    provided to the constructor as a parameter.
+
+  POE::Declare::Meta::Message
+    POE::Declare::Meta::Message is a slot class for declaring messages that
+    the object will emit under various circumstances. Each message is a
+    param to the constructor that takes a callback in a variety of formats
+    (usually pointing up to the parent object).
+
+  POE::Declare::Meta::Event
+    POE::Declare::Meta::Event is a class for named POE events that can be
+    called or yielded to by other POE messages/events.
+
+  POE::Declare::Meta::Timeout
+    POE::Declare::Meta::Timeout is a POE::Declare::Meta::Event sub-class
+    that is designed to trigger from an alarm and generates additional
+    methods to manage the alarms.
+
+FUNCTIONS
+    For the first few releases, I plan to leave this module undocumented.
+
+    That I am releasing this distribution at all is more of a way to mark my
+    progress, and to allow other POE/OO people to look at the implementation
+    and comment.
+
+  declare
+      declare one   => 'Internal';
+      declare two   => 'Attribute';
+      declare three => 'Param';
+      declare four  => 'Message';
+
+    The "declare" function is exported by default. It takes two parameters,
+    a slot name and a slot type.
+
+    The slot name can be any legal Perl identifier.
+
+    The slot type should be one of "Internal", "Attribute", "Param" or
+    "Message".
+
+    Creates the new slot, throws an exception on error.
+
+  compile
+    The "compile" function indicates that all attributes and events have
+    been defined and the structure should be finalised and compiled.
+
+    Returns true or throws an exception.
+
+SUPPORT
+    Bugs should be always be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Declare>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    POE, <http://ali.as/>
+
+COPYRIGHT
+    Copyright 2006 - 2012 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,32 @@
+SYNOPSIS
+
+     use Perinci::CmdLine::NonOO qw(run_cmdline_app);
+     run_cmdline_app(url => '/Foo/bar');
+
+    which is equivalent to:
+
+     use Perinci::CmdLine::Lite;
+     my $cli = Perinci::CmdLine::Lite->new(url => '/Foo/bar');
+     $cli->run;
+
+STATUS
+
+    Experimental, proof of concept.
+
+DESCRIPTION
+
+    Perinci::CmdLine (or its alternatives Perinci::CmdLine::Lite,
+    Perinci::CmdLine::Any) is a command-line application framework. It
+    "exports" your functions as a CLI application. However,
+    Perinci::CmdLine itself has an OO interface, which can be seen as
+    ironic. This module is an attempt to fix this. It's basically a thin
+    functional interface wrapper over Perinci::CmdLine::Lite.
+
+    Because I'm lazy, it currently uses Perinci::Sub::Gen::FromClass and
+    adds a bit of startup overhead. If you're concerned with startup
+    overhead, you should use Perinci::CmdLine::Lite directly.
+
+SEE ALSO
+
+    Perinci::CmdLine, Perinci::CmdLine::Lite, Perinci::CmdLine::Any
+

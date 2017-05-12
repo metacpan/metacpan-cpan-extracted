@@ -1,0 +1,175 @@
+NAME
+    POE::Component::DHCP::Monitor - A simple POE Component for monitoring
+    DHCP traffic.
+
+VERSION
+    version 1.04
+
+SYNOPSIS
+      use strict;
+      use POE;
+      use POE::Component::DHCP::Monitor;
+      use Net::DHCP::Packet;
+
+      $|=1;
+
+      POE::Session->create(
+            inline_states => {
+                                    _start              => \&_start,
+            _default      => \&_default,
+                                    dhcp_monitor_packet => \&dhcp_monitor_packet,
+            },
+      );
+
+      $poe_kernel->run();
+      exit 0;
+
+      sub _start {
+        my ($kernel,$heap) = @_[KERNEL,HEAP];
+        $heap->{monitor} =
+            POE::Component::DHCP::Monitor->spawn(
+                    alias => 'monitor',       # optional
+                    port1  => 67,             # default shown
+                    port2  => 68,             # default shown
+                    address => '192.168.1.1', # default is INADDR_ANY
+            );
+        return;
+      }
+
+      sub dhcp_monitor_packet {
+        my ($kernel,$heap,$packet) = @_[KERNEL,HEAP,ARG0];
+        print STDOUT $packet->toString();
+        print STDOUT "=============================================================================\n";
+        return;
+      }
+
+      # This should show any unhandled events
+      sub _default {
+        my ($event, $args) = @_[ARG0 .. $#_];
+        my @output = ( "$event: " );
+
+        for my $arg (@$args) {
+            if ( ref $arg eq 'ARRAY' ) {
+                push( @output, '[' . join(', ', @$arg ) . ']' );
+            }
+            else {
+                push ( @output, "'$arg'" );
+            }
+        }
+        print join ' ', @output, "\n";
+        return;
+      }
+
+DESCRIPTION
+    POE::Component::DHCP::Monitor is a simple POE Component for monitoring
+    DHCP traffic. It listens on a specified port ( defaults to 67, which
+    usually requires administrative privilege ). Any DHCP broadcast traffic
+    received will generate an event with a Net::DHCP::Packet object as the
+    first argument. You may then query the objects methods to obtain salient
+    information.
+
+CONSTRUCTOR
+    spawn
+        Starts a new POE::Component::DHCP::Monitor session. If this is
+        called from within another POE session then that session is
+        automagically registered to receive events from the component. Other
+        sessions will have to use the 'register' event listed below.
+
+        Takes a number of arguments:
+
+          'alias', an optional kernel alias to address the poco by;
+          'address', set a particular IP address on a multi-homed box to bind to;
+          'port', set a particular UDP port to listen on, default is 67;
+          'port2', set a particular UDP port to listen on, default is 67;
+          'options', pass a hashref of POE session options;
+          'prefix', optional set the output event prefix, default is 'dhcp_monitor_';
+
+METHODS
+    These methods are available on the POE::Component::DHCP::Monitor object:
+
+    session_id
+        Returns the POE session ID of the poco's session.
+
+    shutdown
+        Terminates the poco, unregistering all registered sessions and
+        closes the listening socket.
+
+    getsockname
+        Returns the packed sockaddr address of this end of the first socket
+        connection.
+
+    getsockname2
+        Returns the packed sockaddr address of this end of the second socket
+        connection.
+
+INPUT EVENTS
+    The component accepts the following events:
+
+    register
+        Takes no arguments. This registers your session with the component.
+        The component will then send the registering session a 'registered'
+        event. The session will forthwith receive applicable events from the
+        component, until either the component is shutdown or the session
+        unregisters.
+
+    unregister
+        Takes no arguments. This unregisters your session with the
+        component. The unregistering session will receive an 'unregistered'
+        event.
+
+    shutdown
+        Terminates the poco, unregistering all registered sessions and
+        closes the listening socket.
+
+OUTPUT EVENTS
+    The component will send the following events:
+
+    dhcp_monitor_socket
+        Sent by the component to 'registered' sessions when the socket is
+        successfully started. ARG0 will be the packed sockaddr address of
+        the socket.
+
+    dhcp_monitor_packet
+        Sent by the component to 'registered' sessions when a DHCP packet is
+        received and successfully parsed. ARG0 will be a Net::DHCP::Packet.
+        ARG1 will be the port number this packet was received on.
+
+    dhcp_monitor_registered
+        Sent by the component to a registering session only on successful
+        registration. ARG0 is the components object.
+
+    dhcp_monitor_unregistered
+        Sent by the component to an unregistering session only on successful
+        unregistration.
+
+    dhcp_monitor_sockbinderr
+        Sent by the component to 'registered' sessions when an error occurs
+        in setting up the listening socket. ARG0 is the error string. The
+        component will shutdown automatically after such an error.
+
+    dhcp_monitor_sockopterr
+        Sent by the component to 'registered' sessions when an error occurs
+        in setting the SOL_SOCKET and SO_BROADCAST options on the socket.
+        ARG0 is the error string. The component will shutdown automatically
+        after such an error.
+
+    dhcp_monitor_sockrecverr
+        Sent by the component to 'registered' sessions when an error occurs
+        in reading a packet from the socket.
+
+    dhcp_monitor_sockpackerr
+        Sent by the component to 'registered' sessions when an error occurs
+        in parsing a received packet using Net::DHCP::Packet.
+
+SEE ALSO
+    Net::DHCP::Packet
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

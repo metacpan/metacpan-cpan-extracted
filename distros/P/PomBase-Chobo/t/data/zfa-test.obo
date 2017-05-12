@@ -1,0 +1,22 @@
+format-version: 1.2
+data-version: releases/2013-08-09
+date: 07:08:2013 12:50
+saved-by: Ceri
+auto-generated-by: OBO-Edit 2.3-beta5
+subsetdef: cell_slim "cell_slim"
+synonymtypedef: PLURAL "PLURAL"
+default-namespace: zebrafish_anatomical_ontology
+treat-xrefs-as-genus-differentia: CARO part_of NCBITaxon:7955
+treat-xrefs-as-genus-differentia: CL part_of NCBITaxon:7955
+treat-xrefs-as-genus-differentia: TAO part_of NCBITaxon:7955
+treat-xrefs-as-genus-differentia: VSAO part_of NCBITaxon:7955
+remark: SVN version: $Revision: 1.100$
+ontology: zfa
+
+[Typedef]
+id: develops_from
+name: develops from
+xref: RO:0002202
+holds_over_chain: part_of develops_from
+is_transitive: true
+transitive_over: part_of ! part of

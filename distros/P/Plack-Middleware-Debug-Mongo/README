@@ -1,0 +1,75 @@
+NAME
+    Plack::Middleware::Debug::Mongo - Extend Plack::Middleware::Debug with
+    MongoDB panels
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+        # inside your psgi app
+        use Plack::Builder;
+
+        my $app = sub {[
+            200,
+            [ 'Content-Type' => 'text/html' ],
+            [ '<html><body>OK</body></html>' ]
+        ]};
+
+        my $options = { host => 'mongodb://mongo.example.com:29111', db_name => 'sampledb' };
+
+        builder {
+            mount '/' => builder {
+                enable 'Debug',
+                    panels => [
+                        [ 'Mongo::ServerStatus', connection => $options ],
+                        [ 'Mongo::Database', connection => $options ],
+                    ];
+                $app;
+            };
+        };
+
+DESCRIPTION
+    This distribution extends Plack::Middleware::Debug with some MongoDB
+    panels. At the moment, listed below panels are available.
+
+PANELS
+  Mongo::ServerStatus
+    Display panel with MongoDB server status information. See
+    Plack::Middleware::Debug::Mongo::ServerStatus for additional
+    information.
+
+  Mongo::Database
+    Display panel with MongoDB database and its collections statistics. See
+    Plack::Middleware::Debug::Mongo::Database for additional information.
+
+BUGS
+    Please report any bugs or feature requests through the web interface at
+    <https://github.com/Wu-Wu/Plack-Middleware-Debug-Mongo/issues>
+
+SEE ALSO
+    Plack::Middleware::Debug::Mongo::ServerStatus
+
+    Plack::Middleware::Debug::Mongo::Database
+
+    Plack::Middleware::Debug
+
+    MongoDB
+
+    MongoDB Server Status Reference
+    <http://docs.mongodb.org/manual/reference/server-status/>
+
+    MongoDB Database Statistics Reference
+    <http://docs.mongodb.org/manual/reference/database-statistics/>
+
+    MongoDB Collection Statistics Reference
+    <http://docs.mongodb.org/manual/reference/collection-statistics/>
+
+AUTHOR
+    Anton Gerasimov <chim@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Anton Gerasimov.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,774 @@
+Distribution: Debian squeeze/sid
+Gnome Release: 2.26.1 2009-04-14 (Debian)
+BugBuddy Version: 2.24.2
+
+System: Linux 2.6.26-2-686 #1 SMP Thu Mar 26 01:08:11 UTC 2009 i686
+X Vendor: The X.Org Foundation
+X Vendor Release: 10601000
+Selinux: No
+Accessibility: Disabled
+GTK+ Theme: Kallisti
+Icon Theme: Gion
+
+Memory status: size: 405041152 vsize: 405041152 resident: 133283840 share:
+43225088 rss: 133283840 rss_rlim: 18446744073709551615
+CPU usage: start_time: 1240647755 rtime: 21025 utime: 17440 stime: 3585
+cutime:0 cstime: 1 timeout: 0 it_real_value: 0 frequency: 100
+
+Backtrace was generated from '/usr/bin/epiphany-browser'
+
+[Thread debugging using libthread_db enabled]
+[New Thread 0xb6a39970 (LWP 20140)]
+[New Thread 0xa6ad0b90 (LWP 22175)]
+[New Thread 0xa62cfb90 (LWP 22170)]
+[New Thread 0xa5aceb90 (LWP 22169)]
+[New Thread 0xabf88b90 (LWP 21969)]
+[New Thread 0xacfffb90 (LWP 20342)]
+[New Thread 0xae1d1b90 (LWP 20151)]
+[New Thread 0xaea91b90 (LWP 20150)]
+[New Thread 0xaf292b90 (LWP 20149)]
+[New Thread 0xb48cfb90 (LWP 20147)]
+0xb7fc6424 in __kernel_vsyscall ()
+#0  0xb7fc6424 in __kernel_vsyscall ()
+#1  0xb7637f0b in waitpid () from /lib/i686/cmov/libpthread.so.0
+#2  0xb75a4763 in IA__g_spawn_sync (working_directory=0x0, argv=0xac4fd350, 
+    envp=0x0, flags=<value optimized out>, child_setup=0, user_data=0x0, 
+    standard_output=0x0, standard_error=0x0, exit_status=0x0, 
+    error=0xbfae2288)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gspawn.c:382
+#3  0xb75a4a6c in IA__g_spawn_command_line_sync (
+    command_line=0xa7584010 "bug-buddy --appname=\"epiphany-browser\"
+--pid=20140", standard_output=0x0, standard_error=0x0, exit_status=0x0, 
+    error=0xbfae2288)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gspawn.c:694
+#4  0xb7fa8473 in ?? () from /usr/lib/gtk-2.0/modules/libgnomebreakpad.so
+#5  0xb7fa8533 in ?? () from /usr/lib/gtk-2.0/modules/libgnomebreakpad.so
+#6  0xb5dca399 in nsProfileLock::LockWithSymlink (this=0xb, 
+    lockFilePath=@0x33, aHaveFcntlLock=-1072693248) at nsProfileLock.cpp:380
+#7  <signal handler called>
+#8  0xb7610e18 in IA__g_type_check_instance_cast (type_instance=0xa7400, 
+    iface_type=158623344)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/gobject/gtype.c:3723
+#9  0xb0c5d7a8 in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+#10 0xb0c6bce6 in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+#11 0xb0fc5a2d in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+#12 0xb0fc5bcf in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+#13 0xb0c5dbd1 in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+#14 0xb0fda514 in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+#15 0xb0c73641 in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+#16 0xb0c5d9f3 in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+#17 0xb756bf76 in g_timeout_dispatch (source=0xa7345118, callback=0xa7400, 
+    user_data=0xb024d000)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gmain.c:3253
+#18 0xb756b848 in IA__g_main_context_dispatch (context=0x97509f8)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gmain.c:1814
+#19 0xb756edab in g_main_context_iterate (context=0x97509f8, block=0, 
+    dispatch=1, self=0x971e430)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gmain.c:2448
+#20 0xb756ef28 in IA__g_main_context_iteration (context=0x97509f8, 
+    may_block=0)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gmain.c:2511
+#21 0xb6457d4c in nsWindow::SetIcon (this=0xa2bed20, aIconSpec=@0x0)
+    at nsWindow.cpp:1337
+#22 0xb646c524 in nsNativeThemeGTK::ThemeSupportsWidget (this=0xa2bed20, 
+    aPresContext=0x0, aFrame=0x13, aWidgetType=0 '\0')
+    at nsNativeThemeGTK.cpp:1278
+#23 0xb646c72d in nsNativeThemeGTK::GetWidgetOverflow (this=0xa2bed20, 
+    aContext=0x97be4a8, aFrame=0xdd95622f, aWidgetType=<value optimized out>, 
+    aOverflowRect=0xbfae2b8c) at ../../../dist/include/gfx/nsCoord.h:352
+#24 0xb6516ba6 in nsComponentManagerImpl::ReadPersistentRegistry (
+    this=0x97be4a8) at nsComponentManager.cpp:887
+#25 0xb64e8cb2 in NS_QuickSort (a=0x97be4a8, n=20, es=3215862792, 
+    cmp=0xb646c858 <ThemeRenderer::NativeDraw(Screen*, unsigned long, Visual*,
+unsigned long, short, short, XRectangle*, unsigned int)+30>, data=0x971eb50)
+    at nsQuickSort.cpp:109
+#26 0xb646c882 in ThemeRenderer::NativeDraw (this=0xa2bed20, 
+    screen=0xbfae2c2f, drawable=1, visual=0x1, colormap=49, 
+    offsetX=<value optimized out>, offsetY=<value optimized out>, 
+    clipRects=0xfa5e7184, numClipRects=3076419972) at nsNativeThemeGTK.cpp:654
+#27 0xb6458120 in nsWindow::Update (this=0xa293f68) at nsWindow.cpp:1219
+#28 0xb75a24ad in g_io_unix_dispatch (source=0xa2bed20, 
+    callback=0xb64580f4 <nsWindow::Scroll(int, int, nsRect*)+136>, 
+    user_data=0xa2bed20)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/giounix.c:162
+#29 0xb756b848 in IA__g_main_context_dispatch (context=0x97509f8)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gmain.c:1814
+#30 0xb756edab in g_main_context_iterate (context=0x97509f8, block=1, 
+    dispatch=1, self=0x971e430)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gmain.c:2448
+#31 0xb756f27a in IA__g_main_loop_run (loop=0x9d2e1c0)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gmain.c:2656
+#32 0xb7a5c209 in IA__gtk_main ()
+    at
+/build/buildd-gtk+2.0_2.16.1-2-i386-NWxSfb/gtk+2.0-2.16.1/gtk/gtkmain.c:1205
+#33 0x08076084 in main (argc=1, argv=0xbfae3f84)
+    at
+/build/buildd-epiphany-browser_2.24.3-2-i386-cByfMF/epiphany-browser-2.24.3/src/ephy-main.c:751
+
+Thread 10 (Thread 0xb48cfb90 (LWP 20147)):
+#0  0xb7fc6424 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb76342e2 in pthread_cond_timedwait@@GLIBC_2.3.2 ()
+   from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb7f7b72e in pt_TimedWait (cv=0x97ceb14, ml=0x97cf378, timeout=4859)
+    at ptsynch.c:280
+        rv = 626335
+        now = {tv_sec = 1240668138, tv_usec = 199045}
+        tmo = {tv_sec = 1240668143, tv_nsec = 58045000}
+        ticks = 1000
+#3  0xb7f7c510 in PR_WaitCondVar (cvar=0x97ceb10, timeout=4859)
+    at ptsynch.c:407
+        rv = <value optimized out>
+        thred = <value optimized out>
+#4  0xb6519b54 in nsThreadManager::QueryInterface (this=0x97cf2c0, aIID=@0x1, 
+    aInstancePtr=0xb48cf284) at nsThreadManager.cpp:71
+        foundInterface = (nsISupports *) 0xad5e8a20
+        status = 626335
+#5  0xb6516c04 in nsComponentManagerImpl::ReadPersistentRegistry (
+    this=0x9fc95b8) at nsComponentManager.cpp:901
+        rv = 159183552
+        mon = {<nsAutoLockBase> = {<No data fields>}, mMonitor = 0x1, 
+  mLockCount = -1265831292}
+        reader = {mCur = 0xb6766414 "\210ð²", mLength = 2908654112, 
+  mNext = 0x97cf2c0 "P;v¶l;v¶\004", 
+  mBase = 0xb48cf258 "\230ò\214´\004lQ¶Àò|\t\001", mLimit = 0xb6519b54
+"ÆG!"}
+        fd = (PRFileDesc *) 0x0
+        file = {<nsCOMPtr_base> = {mRawPtr = 0xb6766414}, <No data fields>}
+        localFile = {<nsCOMPtr_base> = {mRawPtr = 0x1}, <No data fields>}
+        fileSize = -5309343718228299112
+        flen = <value optimized out>
+        registry = 0x97cf378 ""
+        values = {0x97ceb10 "xó|\t", 
+  0xb48cf228 "Xò\214´T\233Q¶\020ë|\tû\022", 0xb7f7c510
+"\211Eð\213\aÇ@P\001", 
+  0x12fb <Address 0x12fb out of bounds>, 0xa79047b8 "¸:v¶\002", 
+  0xb6518e93 "\201Ã\201Õ$"}
+        lengths = {1240668143, 58045000, 1240668138, 199045, -1208437420, 
+  170673936}
+#6  0xb64e8c1c in NS_QuickSort (a=0x9fc95b8, n=1, es=170685380, 
+    cmp=0xa2c73c4, data=0x97bc288) at nsQuickSort.cpp:166
+        pa = 0xb6766414 "\210ð²"
+        pb = 0xb48cf2f8 ""
+        pc = 0x9fc95b8 "¨7v¶ð7v¶\004"
+        pd = 0x0
+        pl = 0x1 <Address 0x1 out of bounds>
+        pm = <value optimized out>
+        pn = 0x0
+        r = -516
+        swaptype = -1233755116
+        swap_cnt = -1265831176
+#7  0xb651736b in nsTHashtable<nsBaseHashtableET<nsHashableHashKey, long long>
+>::s_ClearEntry (table=0x9fc95b8, entry=0xa2c4710)
+    at ../../dist/include/xpcom/nsCOMPtr.h:542
+No locals.
+#8  0xb7f82841 in _pt_root (arg=0xb48cf2f8) at ptthread.c:221
+        detached = 1
+#9  0xb76304e5 in start_thread () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#10 0xb73930de in clone () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 9 (Thread 0xaf292b90 (LWP 20149)):
+#0  0xb7fc6424 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb7633fb5 in pthread_cond_wait@@GLIBC_2.3.2 ()
+   from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb7f7c589 in PR_WaitCondVar (cvar=0xa469ae0, timeout=4294967295)
+    at ptsynch.c:405
+        rv = <value optimized out>
+        thred = (PRThread *) 0xa469b20
+#3  0xb6369594 in ~nsCertOverrideService (this=0xa469a58)
+    at nsCertOverrideService.cpp:126
+No locals.
+#4  0xb6368eee in nsCertOverrideService::HasMatchingOverride (this=0xa469a58, 
+    aHostName=@0xa469b20, aPort=0, aCert=0x0, aOverrideBits=0x5f0, 
+    aIsTemporary=0x0, _retval=0xa45b9a8)
+    at ../../../../dist/include/string/nsTSubstring.h:529
+        hostPort = {<nsFixedCString> = {<nsCString> = {<nsACString_internal> =
+{<nsCSubstring_base> = {<No data fields>}, 
+        mData = 0x15f <Address 0x15f out of bounds>, mLength = 128, 
+        mFlags = 3076734901}, <No data fields>}, mFixedCapacity = 0, 
+    mFixedBuf = 0xaf <Address 0xaf out of bounds>}, 
+  mStorage = "\000\000\000\000¯\000\000\000Tµø·
+\233F\nà\232F\n\211Å÷·ä\232F\n\200\232F\n\001\000\000\000\024dv¶\001\000\000\000ð\005\000\000è\")¯\224\2256¶à\232F\nÿÿÿÿ"}
+        settings = {
+  mAsciiHost = {<nsACString_internal> = {<nsCSubstring_base> = {<No data
+fields>}, mData = 0x3 <Address 0x3 out of bounds>, mLength = 3, 
+      mFlags = 3076730668}, <No data fields>}, mPort = -1356258604, 
+  mIsTemporary = 5, 
+  mFingerprint = {<nsACString_internal> = {<nsCSubstring_base> = {<No data
+fields>}, mData = 0x0, mLength = 1, mFlags = 172399232}, <No data fields>}, 
+  mFingerprintAlgOID = {<nsACString_internal> = {<nsCSubstring_base> = {<No
+data fields>}, mData = 0x1 <Address 0x1 out of bounds>, mLength = 3086529876, 
+      mFlags = 172399392}, <No data fields>}, 
+  mOverrideBits = nsCertOverride::ob_None, 
+  mDBKey = {<nsACString_internal> = {<nsCSubstring_base> = {<No data fields>},
+mData = 0xaf292308 "8#)¯A(ø·X\232F\n \233F\n", mLength = 3057028846, 
+      mFlags = 172399192}, <No data fields>}}
+        fpStr = {<nsFixedCString> = {<nsCString> = {<nsACString_internal> =
+{<nsCSubstring_base> = {<No data fields>}, 
+        mData = 0x26 <Address 0x26 out of bounds>, mLength = 3086512522, 
+        mFlags = 1}, <No data fields>}, mFixedCapacity = 3047854132, 
+    mFixedBuf = 0xb763189e "\201ÃVç"}, 
+  mStorage = "\001\000\000\000ð¼E\nÿÿÿÿ", '\0' <repeats 16 times>,
+"\236\030c·", '\0' <repeats 12 times>,
+",/c·\000\000\000\000\003\000\000\000\000\000\000\000¨\")¯"}
+        rv = <value optimized out>
+#5  0xb7f82841 in _pt_root (arg=0xb7f8b554) at ptthread.c:221
+        detached = 172399392
+#6  0xb76304e5 in start_thread () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#7  0xb73930de in clone () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 8 (Thread 0xaea91b90 (LWP 20150)):
+#0  0xb7fc6424 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb7633fb5 in pthread_cond_wait@@GLIBC_2.3.2 ()
+   from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb7f7c589 in PR_WaitCondVar (cvar=0xa469d28, timeout=4294967295)
+    at ptsynch.c:405
+        rv = <value optimized out>
+        thred = (PRThread *) 0xa469d68
+#3  0xb636a62e in nsRecentBadCertsService::GetRecentBadCert (this=0xa469c78, 
+    aHostNameWithPort=@0x0, aStatus=0x0)
+    at ../../../../dist/include/xpcom/nsAutoLock.h:304
+        foundDER = {type = siClearDataBuffer, data = 0x0, len = 172399756}
+        isDomainMismatch = <value optimized out>
+        isNotValidAtThisTime = <value optimized out>
+        isUntrusted = <value optimized out>
+#4  0xb6368eee in nsCertOverrideService::HasMatchingOverride (this=0xa469c78, 
+    aHostName=@0xa469d68, aPort=0, aCert=0x0, aOverrideBits=0x0, 
+    aIsTemporary=0x0, _retval=0xa469e18)
+    at ../../../../dist/include/string/nsTSubstring.h:529
+        hostPort = {<nsFixedCString> = {<nsCString> = {<nsACString_internal> =
+{<nsCSubstring_base> = {<No data fields>}, 
+        mData = 0x80cd00 <Address 0x80cd00 out of bounds>, mLength = 3, 
+        mFlags = 0}, <No data fields>}, mFixedCapacity = 2930315960, 
+    mFixedBuf = 0x1 <Address 0x1 out of bounds>}, 
+  mStorage = "\200\000\000\000µ?c·", '\0' <repeats 16 times>,
+"Tµø·h\235F\n(\235F\n\211Å÷·,\235F\nÈ\234F\n\000\000\000\000\024dv¶h\235F\nÈ\234F\n"}
+        settings = {
+  mAsciiHost = {<nsACString_internal> = {<nsCSubstring_base> = {<No data
+fields>}, mData = 0xaea912e8 "\b\023©®î\2166¶x\234F\n", mLength =
+3057034798, 
+      mFlags = 172399912}, <No data fields>}, mPort = -1, 
+  mIsTemporary = 172399736, 
+  mFingerprint = {<nsACString_internal> = {<nsCSubstring_base> = {<No data
+fields>}, mData = 0xa469c78 "XXs¶h\235F\nÈ\234F\n(\235F\n", mLength = 1, 
+      mFlags = 0}, <No data fields>}, 
+  mFingerprintAlgOID = {<nsACString_internal> = {<nsCSubstring_base> = {<No
+data fields>}, mData = 0xa469c8c "", mLength = 3086529876, 
+      mFlags = 172399976}, <No data fields>}, 
+  mOverrideBits = nsCertOverride::ob_None, 
+  mDBKey = {<nsACString_internal> = {<nsCSubstring_base> = {<No data fields>},
+mData = 0xaea91308 "8\023©®A(ø·x\234F\nh\235F\n", mLength = 3057028846, 
+      mFlags = 172399736}, <No data fields>}}
+        fpStr = {<nsFixedCString> = {<nsCString> = {<nsACString_internal> =
+{<nsCSubstring_base> = {<No data fields>}, mData = 0x0, mLength = 0, 
+        mFlags = 0}, <No data fields>}, mFixedCapacity = 0, mFixedBuf = 0x0}, 
+  mStorage = '\0' <repeats 60 times>, "¸­\000"}
+        rv = <value optimized out>
+#5  0xb7f82841 in _pt_root (arg=0xb7f8b554) at ptthread.c:221
+        detached = 172399976
+#6  0xb76304e5 in start_thread () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#7  0xb73930de in clone () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 7 (Thread 0xae1d1b90 (LWP 20151)):
+#0  0xb7fc6424 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb7633fb5 in pthread_cond_wait@@GLIBC_2.3.2 ()
+   from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb7f7c589 in PR_WaitCondVar (cvar=0xa494288, timeout=4294967295)
+    at ptsynch.c:405
+        rv = <value optimized out>
+        thred = (PRThread *) 0xa493528
+#3  0xb7f7c607 in PR_Wait (mon=0xa4936e8, timeout=4294967295) at ptsynch.c:584
+        rv = -512
+        saved_entries = 1
+        saved_owner = 2921143184
+#4  0xb6515ec5 in factory_ClearEntry (aTable=0xa4933d8, aHdr=0x1)
+    at nsComponentManager.cpp:263
+No locals.
+#5  0xb6516bd8 in nsComponentManagerImpl::ReadPersistentRegistry (
+    this=0xa4933b8) at nsComponentManager.cpp:894
+        rv = 0
+        mon = {<nsAutoLockBase> = {<No data fields>}, mMonitor = 0x1, 
+  mLockCount = -1373826428}
+        reader = {mCur = 0xb6766414 "\210ð²", mLength = 172570344, 
+  mNext = 0xa4933d8 "è6I\nXoI\nXoI\n\001", 
+  mBase = 0xae1d1258 "\230\022\035®ØkQ¶Ø3I\n\001", 
+  mLimit = 0xb6515ec5 "ë\237\203}\020"}
+        fd = (PRFileDesc *) 0x0
+        file = {<nsCOMPtr_base> = {mRawPtr = 0xb6766414}, <No data fields>}
+        localFile = {<nsCOMPtr_base> = {mRawPtr = 0x1}, <No data fields>}
+        fileSize = -5309343907314855272
+        flen = <value optimized out>
+        registry = 0x0
+        values = {0x1 <Address 0x1 out of bounds>, 
+  0xae1d1228 "X\022\035®Å^Q¶è6I\nÿÿÿÿXoI\nXoI\n\200\226\203\t", 
+  0xb7f7c607 "\211~d\213Uð\211V\\\213]ô\213uø\213}ü\211ì]Ã\215v", 
+  0xa494288 "ì6I\n", 0xffffffff <Address 0xffffffff out of bounds>, 
+  0xae1d1b90 "\220\033\035®¸nI\n\220\033\035®\001"}
+        lengths = {-1208498807, 172573324, 172570348, 12, -1208437420, 
+  172570344}
+#6  0xb64e8c1c in NS_QuickSort (a=0xa4933b8, n=1, es=172569700, 
+    cmp=0xa493464, data=0x97bc288) at nsQuickSort.cpp:166
+        pa = 0xb6766414 "\210ð²"
+        pb = 0xae1d12f8 ""
+        pc = 0xa4933b8 "¨7v¶ð7v¶\005"
+        pd = 0x0
+        pl = 0x1 <Address 0x1 out of bounds>
+        pm = <value optimized out>
+        pn = 0x0
+        r = -512
+        swaptype = -1233755116
+        swap_cnt = -1373826312
+#7  0xb651736b in nsTHashtable<nsBaseHashtableET<nsHashableHashKey, long long>
+>::s_ClearEntry (table=0xa4933b8, entry=0xa493528)
+    at ../../dist/include/xpcom/nsCOMPtr.h:542
+No locals.
+#8  0xb7f82841 in _pt_root (arg=0xae1d12f8) at ptthread.c:221
+        detached = 172569528
+#9  0xb76304e5 in start_thread () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#10 0xb73930de in clone () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 6 (Thread 0xacfffb90 (LWP 20342)):
+#0  0xb7fc6424 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb7388a07 in poll () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#2  0xb7f7e4dc in _pr_poll_with_poll (pds=0x9849fe8, npds=1, 
+    timeout=4294967295) at ptio.c:3916
+        stack_syspoll = {{fd = 18, events = 1, revents = 0}, {fd = 1, 
+    events = 0, revents = 0}, {fd = 0, events = -10099, revents = -18442}, {
+    fd = 159181836, events = -19116, revents = -18440}, {fd = -1392513160, 
+    events = -15296, revents = -18441}, {fd = 159181836, events = -11488, 
+    revents = 2620}, {fd = -1392513224, events = -14720, revents = -18441}, {
+    fd = -1392513228, events = -5160, revents = 2428}, {fd = 1, 
+    events = -19116, revents = -18440}, {fd = -1218242402, events = 1, 
+    revents = 0}, {fd = 159181784, events = -1, revents = -1}, {fd = 0, 
+    events = 0, revents = 0}, {fd = 0, events = 0, revents = 0}, {
+    fd = -1218236628, events = 0, revents = 0}, {fd = -1221457852, 
+    events = 0, revents = 0}, {fd = 1, events = 0, revents = 0}, {fd = 3, 
+    events = -19116, revents = -18440}, {fd = 159183344, events = -7000, 
+    revents = 2427}, {fd = -1392402952, events = 16, revents = -21248}, {
+    fd = 2, events = 25620, revents = -18826}, {fd = -1392513096, 
+    events = -10051, revents = -18442}, {fd = -1233755116, events = -7000, 
+    revents = 2427}, {fd = -1221457852, events = -10099, revents = -18442}, {
+    fd = 170650924, events = 25620, revents = -18826}, {fd = -1221457852, 
+    events = -10099, revents = -18442}, {fd = -1218242402, events = 25620, 
+    revents = -18826}, {fd = -1392330776, events = 16, revents = -21248}, {
+    fd = 2, events = -25096, revents = -21247}, {fd = -1221457852, 
+    events = 4486, revents = -18638}, {fd = -1392508912, events = -25096, 
+    revents = -21247}, {fd = -1392508928, events = -20492, revents = -18606}, 
+  {fd = -1392402952, events = 0, revents = 0}, {fd = -1392236648, 
+    events = 16, revents = -21248}, {fd = -1392402952, events = 16, 
+    revents = -19808}, {fd = -1392513000, events = 10424, revents = -21244}, {
+    fd = 24, events = -18456, revents = -21246}, {fd = -1392512984, 
+    events = 4486, revents = -18638}, {fd = -1392508912, events = -18456, 
+    revents = -21246}, {fd = -1392508928, events = 25620, revents = -18826}, {
+    fd = -1392330776, events = 10136, revents = -21244}, {fd = -1392512952, 
+    events = -16396, revents = -18624}, {fd = -1392508912, events = 10136, 
+    revents = -21244}, {fd = -1392512936, events = 4486, revents = -18638}, {
+    fd = -1392508912, events = 10136, revents = -21244}, {fd = -1221457852, 
+    events = -20492, revents = -18606}, {fd = 0, events = 10136, 
+    revents = -21244}, {fd = -1392512920, events = -15551, revents = -18609}, 
+  {fd = -1392236648, events = 25620, revents = -18826}, {fd = -1392331256, 
+    events = 16, revents = -21248}, {fd = -1392236648, events = 16, 
+    revents = -19808}, {fd = -1392512856, events = -18856, revents = -21246}, 
+  {fd = 272, events = 0, revents = 0}, {fd = -1243494495, events = 25620, 
+    revents = -18826}, {fd = -1392236648, events = 0, revents = 0}, {
+    fd = -1221457852, events = -3880, revents = -21249}, {fd = -1218242402, 
+    events = 0, revents = 0}, {fd = -1221334954, events = -3864, 
+    revents = -21249}, {fd = -1208437420, events = 0, revents = 0}, {fd = 3, 
+    events = -3848, revents = -21249}, {fd = -1208437420, events = 0, 
+    revents = 0}, {fd = -1221334954, events = 13653, revents = -18440}, {
+    fd = -1392512788, events = 0, revents = 0}, {fd = -1392512792, 
+    events = -7403, revents = -18975}, {fd = 174408140, events = 0, 
+    revents = 0}}
+        syspoll = (struct pollfd *) 0xacffeee8
+        index = 1
+        msecs = -1
+        ready = 0
+        start = 2902453984
+        elapsed = <value optimized out>
+#3  0xb5e1e417 in nsSocketTransportService::AddToPollList (this=0x9849b08, 
+    sock=0x1) at nsSocketTransportService2.cpp:220
+No locals.
+#4  0xb5e1e90c in non-virtual thunk to
+nsSocketTransportService::QueryInterface(nsID const&, void**) () at
+nsSocketTransportService2.cpp:401
+No symbol table info available.
+#5  0x09849b08 in ?? ()
+No symbol table info available.
+
+Thread 5 (Thread 0xabf88b90 (LWP 21969)):
+#0  0xb7fc6424 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb76342e2 in pthread_cond_timedwait@@GLIBC_2.3.2 ()
+   from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb7f7b72e in pt_TimedWait (cv=0xa459c44, ml=0xa45bb04, timeout=60000)
+    at ptsynch.c:280
+        rv = 6245
+        now = {tv_sec = 1240668130, tv_usec = 984041}
+        tmo = {tv_sec = 1240668190, tv_nsec = 984041000}
+        ticks = 1000
+#3  0xb7f7c510 in PR_WaitCondVar (cvar=0xa459c40, timeout=60000)
+    at ptsynch.c:407
+        rv = <value optimized out>
+        thred = <value optimized out>
+#4  0xb7f7c607 in PR_Wait (mon=0xa45bb00, timeout=60000) at ptsynch.c:584
+        rv = -516
+        saved_entries = 1
+        saved_owner = 2885192592
+#5  0xb6518848 in nsThread::QueryInterface (this=0x80, aIID=@0x1865, 
+    aInstancePtr=0xabf88284) at ../../dist/include/xpcom/nsID.h:88
+        foundInterface = <value optimized out>
+        status = <value optimized out>
+#6  0xb6516c04 in nsComponentManagerImpl::ReadPersistentRegistry (
+    this=0xad3d1950) at nsComponentManager.cpp:901
+        rv = 172219364
+        mon = {<nsAutoLockBase> = {<No data fields>}, mMonitor = 0x1, 
+  mLockCount = -1409777020}
+        reader = {mCur = 0x1 <Address 0x1 out of bounds>, 
+  mLength = 3061212180, mNext = 0xabf8823c "", mBase = 0xa43dbf0 "", 
+  mLimit = 0x0}
+        fd = (PRFileDesc *) 0x0
+        file = {<nsCOMPtr_base> = {mRawPtr = 0xb6766414}, <No data fields>}
+        localFile = {<nsCOMPtr_base> = {mRawPtr = 0x1}, <No data fields>}
+        fileSize = -5309343718372244840
+        flen = <value optimized out>
+        registry = 0x0
+        values = {0xa43dbe0 "\2009v¶¼9v¶\002", 
+  0xabf88258 "\230\202ø«\004lQ¶àÛC\n\001", 0xb6518848 "ÇEØ\001", 
+  0xa45bb00 "", 0xea60 <Address 0xea60 out of bounds>, 
+  0x1 <Address 0x1 out of bounds>}
+        lengths = {-1208498681, 172334144, 60000, -1409774704, -1233755116, 0}
+#7  0xb64e8c1c in NS_QuickSort (a=0xad3d1950, n=1, es=2907739412, 
+    cmp=0xad509514, data=0x97bc288) at nsQuickSort.cpp:166
+        pa = 0xb6766414 "\210ð²"
+        pb = 0xabf882f8 ""
+        pc = 0xad3d1950 "¨7v¶ð7v¶\005"
+        pd = 0x0
+        pl = 0x1 <Address 0x1 out of bounds>
+        pm = <value optimized out>
+        pn = 0x0
+        r = -516
+        swaptype = -1233755116
+        swap_cnt = -1409776904
+#8  0xb651736b in nsTHashtable<nsBaseHashtableET<nsHashableHashKey, long long>
+>::s_ClearEntry (table=0xad3d1950, entry=0xb2bc9ec0)
+    at ../../dist/include/xpcom/nsCOMPtr.h:542
+No locals.
+#9  0xb7f82841 in _pt_root (arg=0xabf882f8) at ptthread.c:221
+        detached = 1
+#10 0xb76304e5 in start_thread () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#11 0xb73930de in clone () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 4 (Thread 0xa5aceb90 (LWP 22169)):
+#0  0xb7fc6424 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb7633fb5 in pthread_cond_wait@@GLIBC_2.3.2 ()
+   from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb0c6d69f in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+No symbol table info available.
+#3  0xb0d9f8ef in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+No symbol table info available.
+#4  0xb0c6db4d in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+No symbol table info available.
+#5  0xb76304e5 in start_thread () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#6  0xb73930de in clone () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 3 (Thread 0xa62cfb90 (LWP 22170)):
+#0  0xb7fc6424 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb7633fb5 in pthread_cond_wait@@GLIBC_2.3.2 ()
+   from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb0c6d69f in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+No symbol table info available.
+#3  0xb0d9f8ef in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+No symbol table info available.
+#4  0xb0c6db4d in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+No symbol table info available.
+#5  0xb76304e5 in start_thread () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#6  0xb73930de in clone () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 2 (Thread 0xa6ad0b90 (LWP 22175)):
+#0  0xb7fc6424 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb76342e2 in pthread_cond_timedwait@@GLIBC_2.3.2 ()
+   from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb7f7b72e in pt_TimedWait (cv=0x989ad94, ml=0xa51bc40, timeout=60000)
+    at ptsynch.c:280
+        rv = 251
+        now = {tv_sec = 1240668096, tv_usec = 273850}
+        tmo = {tv_sec = 1240668156, tv_nsec = 273850000}
+        ticks = 1000
+#3  0xb7f7c510 in PR_WaitCondVar (cvar=0x989ad90, timeout=60000)
+    at ptsynch.c:407
+        rv = <value optimized out>
+        thred = <value optimized out>
+#4  0xb5e2721e in nsDNSRecord::QueryInterface (this=0xa5de580, 
+    aIID=@0xa6ad02f8, aInstancePtr=0x8020) at nsDNSService2.cpp:90
+        rv = 4294966780
+        table = {{iid = 0x0, offset = 0}, {iid = 0xb5e5e6b6, 
+    offset = -1243225592}, {iid = 0xb5e5e218, offset = -1243224984}}
+#5  0xb5e278e6 in nsHostResolver::GetHostToLookup (this=0xa5de580, 
+    result=0xad019e48) at nsHostResolver.cpp:581
+        start = 3074478400
+        timeout = <value optimized out>
+#6  0xb7f82841 in _pt_root (arg=0xad019e48) at ptthread.c:221
+        detached = 1
+#7  0xb76304e5 in start_thread () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#8  0xb73930de in clone () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 1 (Thread 0xb6a39970 (LWP 20140)):
+#0  0xb7fc6424 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb7637f0b in waitpid () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb75a4763 in IA__g_spawn_sync (working_directory=0x0, argv=0xac4fd350, 
+    envp=0x0, flags=<value optimized out>, child_setup=0, user_data=0x0, 
+    standard_output=0x0, standard_error=0x0, exit_status=0x0, 
+    error=0xbfae2288)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gspawn.c:382
+        outpipe = -1
+        errpipe = -1
+        pid = 23556
+        fds = {__fds_bits = {26, 160, 0, 8, -1218547324, 0, 182087848, 
+    -1079107592, -1218922879, 8, 182087848, 4, -1218547324, 0, -1404054692, 
+    -1079107496, -1218935699, 182087848, -1219019584, 0, -1296039920, 5, 
+    -1577428792, 11, -1079107512, -1079107516, -1404054704, 3, 0, 807543296, 
+    182087848, 6460152}}
+        ret = <value optimized out>
+        outstr = (GString *) 0x0
+        errstr = (GString *) 0x0
+        failed = 0
+        status = <value optimized out>
+        __PRETTY_FUNCTION__ = "IA__g_spawn_sync"
+#3  0xb75a4a6c in IA__g_spawn_command_line_sync (
+    command_line=0xa7584010 "bug-buddy --appname=\"epiphany-browser\"
+--pid=20140", standard_output=0x0, standard_error=0x0, exit_status=0x0, 
+    error=0xbfae2288)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gspawn.c:694
+        retval = 0
+        argv = (gchar **) 0xac4fd350
+        __PRETTY_FUNCTION__ = "IA__g_spawn_command_line_sync"
+#4  0xb7fa8473 in ?? () from /usr/lib/gtk-2.0/modules/libgnomebreakpad.so
+No symbol table info available.
+#5  0xb7fa8533 in ?? () from /usr/lib/gtk-2.0/modules/libgnomebreakpad.so
+No symbol table info available.
+#6  0xb5dca399 in nsProfileLock::LockWithSymlink (this=0xb, 
+    lockFilePath=@0x33, aHaveFcntlLock=-1072693248) at nsProfileLock.cpp:380
+        rv = <value optimized out>
+        inaddr = {s_addr = 3051135835}
+        hostname = '\0' <repeats 224 times>, "ï\000\000\000\001", '\0'
+<repeats 19 times>, "ÄN\022\000\000\000\000"
+        status = <value optimized out>
+        signature = 0x5 <Address 0x5 out of bounds>
+        fileName = 0xb7fe3ff4 "(Ï\001"
+        symlink_rv = 158573908
+        symlink_errno = 5
+        tries = -1079108204
+#7  <signal handler called>
+No symbol table info available.
+#8  0xb7610e18 in IA__g_type_check_instance_cast (type_instance=0xa7400, 
+    iface_type=158623344)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/gobject/gtype.c:3723
+No locals.
+#9  0xb0c5d7a8 in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+No symbol table info available.
+#10 0xb0c6bce6 in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+No symbol table info available.
+#11 0xb0fc5a2d in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+No symbol table info available.
+#12 0xb0fc5bcf in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+No symbol table info available.
+#13 0xb0c5dbd1 in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+No symbol table info available.
+#14 0xb0fda514 in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+No symbol table info available.
+#15 0xb0c73641 in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+No symbol table info available.
+#16 0xb0c5d9f3 in ?? () from /usr/lib/flashplugin-nonfree/libflashplayer.so
+No symbol table info available.
+#17 0xb756bf76 in g_timeout_dispatch (source=0xa7345118, callback=0xa7400, 
+    user_data=0xb024d000)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gmain.c:3253
+No locals.
+#18 0xb756b848 in IA__g_main_context_dispatch (context=0x97509f8)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gmain.c:1814
+No locals.
+#19 0xb756edab in g_main_context_iterate (context=0x97509f8, block=0, 
+    dispatch=1, self=0x971e430)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gmain.c:2448
+        max_priority = 0
+        timeout = 0
+        some_ready = 1
+        nfds = 14
+        allocated_nfds = <value optimized out>
+        fds = (GPollFD *) 0xa76f980
+        __PRETTY_FUNCTION__ = "g_main_context_iterate"
+#20 0xb756ef28 in IA__g_main_context_iteration (context=0x97509f8, 
+    may_block=0)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gmain.c:2511
+        retval = <value optimized out>
+#21 0xb6457d4c in nsWindow::SetIcon (this=0xa2bed20, aIconSpec=@0x0)
+    at nsWindow.cpp:1337
+        iconFile = {<nsCOMPtr_base> = {
+    mRawPtr = 0xb733e856}, <No data fields>}
+        path = {<nsFixedCString> = {<nsCString> = {<nsACString_internal> =
+{<nsCSubstring_base> = {<No data fields>}, mData = 0x972f3d8 "", 
+        mLength = 3076420952, mFlags = 3076420992}, <No data fields>}, 
+    mFixedCapacity = 3215862452, mFixedBuf = 0xb75e7558 "\001"}, 
+  mStorage =
+"\200u^·ü\tu\t\000\000\000\000ø\tu\t\200ùv\n\220ÁW·p3c·\220\030c·ü\tu\t\232ÄV·lw^·\000\000\000\000\000\000\000\000\204q^·ø\tu\t\220\030c·"}
+        iconList = {<nsVoidArray> = {mImpl = 0x0}, <No data fields>}
+        extensions = {"®¿(ïV·\001", "\000\000\0000äq\t", "p3c·\024dv", 
+  "¶ í+\n\000", "\000\000\b+®¿L", "}E¶\000\000\000"}
+#22 0xb646c524 in nsNativeThemeGTK::ThemeSupportsWidget (this=0xa2bed20, 
+    aPresContext=0x0, aFrame=0x13, aWidgetType=0 '\0')
+    at nsNativeThemeGTK.cpp:1278
+No locals.
+#23 0xb646c72d in nsNativeThemeGTK::GetWidgetOverflow (this=0xa2bed20, 
+    aContext=0x97be4a8, aFrame=0xdd95622f, aWidgetType=<value optimized out>, 
+    aOverflowRect=0xbfae2b8c) at ../../../dist/include/gfx/nsCoord.h:352
+        extraSize = {top = -1236959924, right = 0, bottom = 0, 
+  left = -1221334954}
+        m = {top = 19, right = 20, bottom = 0, left = 0}
+        p2a = 685056
+#24 0xb6516ba6 in nsComponentManagerImpl::ReadPersistentRegistry (
+    this=0x97be4a8) at nsComponentManager.cpp:887
+        rv = 170650912
+        mon = {<nsAutoLockBase> = {<No data fields>}, mMonitor = 0x97be4a8, 
+  mLockCount = 0}
+        reader = {mCur = 0x13 <Address 0x13 out of bounds>, 
+  mLength = 170650912, mNext = 0xdd95622f <Address 0xdd95622f out of bounds>, 
+  mBase = 0xbfae2b58 "\230+®¿¦kQ¶ í+\n¨ä{\t", 
+  mLimit = 0xb646c72d
+"\203Ä\020\205À\017\204Qÿÿÿè\aY\224ÿ\211Â)ø;Eè\017\203?ÿÿÿëÔ\211~0WWj"}
+        fd = (PRFileDesc *) 0xb678c824
+        file = {<nsCOMPtr_base> = {mRawPtr = 0xb7f8b554}, <No data fields>}
+        localFile = {<nsCOMPtr_base> = {mRawPtr = 0x1}, <No data fields>}
+        fileSize = -5309344121768498280
+        flen = -1236875805
+        registry = 0x971e430 ""
+        values = {0xb6766414 "\210ð²", 0xbfae2b28 "X+®¿-ÇF¶ í+\n", 
+  0xb646c524
+"ÿN$\211~4\215eø^_]Ã\220U\211å\213E\bÆ@9\0011À]ÃU\211å\213E\bÿ@\0201À]Ã\220U\211å\213E\bÿH\0201À]Ã\220U¸\003@", 
+  0xa2bed20 "Ø\006t¶$\at¶D\at¶\005", 0x0, 0x13 <Address 0x13 out of
+bounds>}
+        lengths = {-1236959924, 0, 0, -1221334954, -1208470187, -1236959943}
+#25 0xb64e8cb2 in NS_QuickSort (a=0x97be4a8, n=20, es=3215862792, 
+    cmp=0xb646c858 <ThemeRenderer::NativeDraw(Screen*, unsigned long, Visual*,
+unsigned long, short, short, XRectangle*, unsigned int)+30>, data=0x971eb50)
+    at nsQuickSort.cpp:109
+        pa = 0xb6766414 "\210ð²"
+        pb = 0x97be4a8 "¨7v¶ð7v¶H\001"
+        pc = <value optimized out>
+        pd = 0x97be4a8 "¨7v¶ð7v¶H\001"
+        pl = 0xbfae2bc8 "è\003"
+        pm = <value optimized out>
+        pn = 0xb6766414 "\210ð²"
+        r = <value optimized out>
+        swaptype = -1236366158
+        swap_cnt = 159114408
+#26 0xb646c882 in ThemeRenderer::NativeDraw (this=0xa2bed20, 
+    screen=0xbfae2c2f, drawable=1, visual=0x1, colormap=49, 
+    offsetX=<value optimized out>, offsetY=<value optimized out>, 
+    clipRects=0xfa5e7184, numClipRects=3076419972) at nsNativeThemeGTK.cpp:654
+        gdk_rect = {x = -1236875176, y = 158460752, width = 11414584, 
+  height = 0}
+        gdk_clip = {x = -1236875134, y = 159114408, width = 20, 
+  height = -1079104504}
+        gdkDpy = <value optimized out>
+        gdkPixmap = <value optimized out>
+#27 0xb6458120 in nsWindow::Update (this=0xa293f68) at nsWindow.cpp:1219
+No locals.
+#28 0xb75a24ad in g_io_unix_dispatch (source=0xa2bed20, 
+    callback=0xb64580f4 <nsWindow::Scroll(int, int, nsRect*)+136>, 
+    user_data=0xa2bed20)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/giounix.c:162
+        buffer_condition = 685056
+#29 0xb756b848 in IA__g_main_context_dispatch (context=0x97509f8)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gmain.c:1814
+No locals.
+#30 0xb756edab in g_main_context_iterate (context=0x97509f8, block=1, 
+    dispatch=1, self=0x971e430)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gmain.c:2448
+        max_priority = 0
+        timeout = 0
+        some_ready = 1
+        nfds = 15
+        allocated_nfds = <value optimized out>
+        fds = (GPollFD *) 0xa76f980
+        __PRETTY_FUNCTION__ = "g_main_context_iterate"
+#31 0xb756f27a in IA__g_main_loop_run (loop=0x9d2e1c0)
+    at
+/build/buildd-glib2.0_2.20.1-1-i386-SPuBUJ/glib2.0-2.20.1/glib/gmain.c:2656
+        self = (GThread *) 0x971e430
+        __PRETTY_FUNCTION__ = "IA__g_main_loop_run"
+#32 0xb7a5c209 in IA__gtk_main ()
+    at
+/build/buildd-gtk+2.0_2.16.1-2-i386-NWxSfb/gtk+2.0-2.16.1/gtk/gtkmain.c:1205
+        tmp_list = (GList *) 0x0
+        functions = (GList *) 0x0
+        init = (GtkInitFunction *) 0x0
+        loop = (GMainLoop *) 0x9d2e1c0
+#33 0x08076084 in main (argc=1, argv=0xbfae3f84)
+    at
+/build/buildd-epiphany-browser_2.24.3-2-i386-cByfMF/epiphany-browser-2.24.3/src/ephy-main.c:751
+        program = <value optimized out>
+        option_context = <value optimized out>
+        option_group = <value optimized out>
+        proxy = <value optimized out>
+        error = (GError *) 0x0
+        user_time = 36271508
+        env = <value optimized out>
+        enable_pango = <value optimized out>
+#0  0xb7fc6424 in __kernel_vsyscall ()
+The program is running.  Quit anyway (and detach it)? (y or n) [answered Y;
+input not from terminal]

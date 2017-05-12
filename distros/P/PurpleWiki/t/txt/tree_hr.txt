@@ -1,0 +1,20 @@
+= Section 1 =
+
+Howdie doody!
+
+----
+
+This is section 2, but there is no header.
+
+----
+
+== Section 3.1 ==
+
+This is section 3.1, not 2.1.
+
+----
+
+This is section 3.2.
+
+= Section 4 =
+

@@ -1,0 +1,30 @@
+Revision history for Perl extension Perl::SAX
+
+0.08 Wed  2 Jul 2008
+	- No functional changes
+	- Upgraded to Module::Install 0.75
+	- Adding missing test dependency on Class::Autouse
+
+0.07 Sat 22 Apr 2006
+	- No functional changes
+	- Moved over from SourceForge CVS to new collaborative SVN
+	- Upgraded to Module::Install 0.62
+
+0.06 Wed 17 Aug 2005
+	- Fixed a major bug which caused infinite recursion in plain statements
+
+0.05 Wed 17 Aug 2005
+	- Upgraded to use the new XML compatibility methods in PPI 0.994
+	- Converted back to Perl::SAX
+
+0.04 Thu 23 Jun 2005
+	- Converted to PPI::SAX
+	- Moved to Source Forge
+	- Updaded...erm..yes! Upgraded! ... to support current the PPI API
+
+0.03 Sat 25 Sep 2004
+	- Filled out most stuff so it does actually generate XML now
+
+0.01 Tue 31 Aug 2004
+	- Created the first placeholder version, containing as much
+	  working code as can be created without writing the PerlML schema.

@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 bea06474cb74894115b6e51c1221b15f86a6e440 Changes
+SHA1 9a5104b706f1aae15ba3bc442dd91ae18725d870 INSTALL
+SHA1 f1c33090fea7accfc015875c6fd83359b0ca5a8f LICENSE
+SHA1 8cd1cfff46ae867cad9d380ea78ef2ba7a3c7be6 MANIFEST
+SHA1 e4e0920f97419ad1ed635febcc37e099c12d2d1b MANIFEST.SKIP
+SHA1 1e33245ede3496f359c0771794a3eed082583e2f META.json
+SHA1 6cf87669f43d699bed58f480229ef3c3bc3cc3a4 META.yml
+SHA1 0bccce23513d02fff42f2d93ce8e852548f597ae Makefile.PL
+SHA1 b6e5240a3a05614d6e363a307645ce810789bd55 README.md
+SHA1 632410b5f74b0bd8a5516412bcd5e922fa00aed7 bin/mccs
+SHA1 2ef851d0a1e764f40fe65546c382db615ea100e8 dist.ini
+SHA1 a0cad282b7dfef6a958545ac3327275dfb45cbf8 lib/Plack/App/MCCS.pm
+SHA1 f4041d47df8caefbf8a3ddcb34bf3b267aae456b lib/Plack/Middleware/MCCS.pm
+SHA1 4a82783357859b46867e383439961dc17849fc86 t/00-load.t
+SHA1 ecb0fbe07c810af1b237b4919405bc3111033eb8 t/01-app.t
+SHA1 3b29bd5cc5471ecd39a01f43e35a52c851164e89 t/02-middleware.t
+SHA1 560bc7c1ce955fdadf9d04b117f7e9db8c9220ff t/release-dist-manifest.t
+SHA1 0259c96137f14a20dac2fac3fb428d7e3a540562 t/rootdir/dir/subdir/script.js
+SHA1 fbf5489838096fd400218afd4e96b12b1a670674 t/rootdir/dir/subdir/smashingpumpkins.txt
+SHA1 e434e95f23ea654911317f89ae6509f6d78b6051 t/rootdir/mccs.png
+SHA1 0259c96137f14a20dac2fac3fb428d7e3a540562 t/rootdir/script.js
+SHA1 08856739cf7a5241ac709dd03d737411bf000970 t/rootdir/script.js.gz
+SHA1 5f14f948cb10e167abbcb2c4c5e2346acbd9531b t/rootdir/style.css
+SHA1 bd104da85d31968480c89f30e75e75157331440c t/rootdir/style.min.css
+SHA1 ad55ebd98348217b263b995b4a06952ebbc5cab5 t/rootdir/style.min.css.gz
+SHA1 f58984c0b87e0a61f1a60ab4c0573756ad8aa95e t/rootdir/style2.less
+SHA1 7d6415605d95f22e50a006820836db02df0cb0de t/rootdir/style3.css
+SHA1 f04198bc59ff693f89086c70c81fad6941efebc4 t/rootdir/text
+-----BEGIN PGP SIGNATURE-----
+
+iF4EAREIAAYFAlgOFqEACgkQa4OHQAFM10cllwD8DpehKcjEiOWSj+1TEY3fTQfh
+5MqwObWZ4XbY5i2FF1wA+wa3YPwRxNdH7Yw946M+CflVQeAvNh5qBNuLapKwhXzo
+=Evur
+-----END PGP SIGNATURE-----

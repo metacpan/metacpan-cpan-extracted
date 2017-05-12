@@ -1,0 +1,5 @@
+=pod
+
+=sql DELETE * FROM toto_table WHERE column >= 'limit' AND column < 'other'
+
+=cut

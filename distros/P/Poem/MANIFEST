@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Poem.t
+t/examples.pl
+t/unicode.pl
+lib/Poem.pm
+META.yml                                 Module meta-data (added by MakeMaker)

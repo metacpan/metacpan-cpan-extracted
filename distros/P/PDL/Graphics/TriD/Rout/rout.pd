@@ -1,0 +1,490 @@
+pp_addpm({At=>Top},<<'EOD');
+=head1 NAME
+
+PDL::Graphics::TriD::Rout - Helper routines for Three-dimensional graphics
+
+=head1 DESCRIPTION
+
+This module is for miscellaneous PP-defined utility routines for
+the PDL::Graphics::TriD module. Currently, there are
+
+EOD
+
+pp_def(
+	'combcoords',
+	GenericTypes => [F,D],
+	DefaultFlow => 1,
+	Pars => 'x(); y(); z();
+		float [o]coords(tri=3);',
+	Code => '
+		$coords(tri => 0) = $x();
+		$coords(tri => 1) = $y();
+		$coords(tri => 2) = $z();
+	',
+	Doc => <<EOT
+=for ref
+
+Combine three coordinates into a single piddle.
+
+Combine x, y and z to a single piddle the first dimension
+of which is 3. This routine does dataflow automatically.
+
+=cut
+
+
+EOT
+
+);
+
+# checks all neighbouring boxes.
+# Returns (r = |dist|+d) a*r^-2 + b*r^-1 + c*r^-0.5
+pp_def(
+	'repulse',
+	GenericTypes => [F,D],
+	Pars => 'coords(nc,np);
+		 [o]vecs(nc,np);
+		 int [t]links(np);',
+	OtherPars => '
+		double boxsize;
+		int dmult;
+		double a;
+		double b;
+		double c;
+		double d;
+	',
+	Code => '
+		double a = $COMP(a);
+		double b = $COMP(b);
+		double c = $COMP(c);
+		double d = $COMP(d);
+		int ind; int x,y,z; SV **svp; SV *sv;
+		int npv;
+		HV *hv = newHV();
+		double boxsize = $COMP(boxsize);
+		int dmult = $COMP(dmult);
+		loop(np) %{
+			int index = 0;
+			$links() = -1;
+			loop(nc) %{
+				$vecs() = 0;
+				index *= dmult;
+				index += (int)($coords()/boxsize);
+			%}
+			/* Repulse old (shame to use x,y,z...) */
+			for(x=-1; x<=1; x++) {
+			for(y=-1; y<=1; y++) {
+			for(z=-1; z<=1; z++) {
+				int ni = index + x + dmult * y +
+					dmult * dmult * z;
+				svp = hv_fetch(hv, (char *)&ni, sizeof(int),
+					0);
+				if(svp && *svp) {
+					ind = SvIV(*svp) - 1;
+					while(ind>=0) {
+						double dist = 0;
+						double dist2;
+						double tmp;
+						double func;
+						loop(nc) %{
+							tmp =
+							   ($coords() -
+							    $coords(np => ind));
+							dist += tmp * tmp;
+						%}
+						dist = sqrt(1/(sqrt(dist)+d));
+						func = c * dist;
+						dist2 = dist * dist;
+						func += b * dist2;
+						dist2 *= dist2;
+						func += a * dist2;
+						loop(nc) %{
+							tmp =
+							   ($coords() -
+							    $coords(np => ind));
+							$vecs() -=
+								func * tmp;
+							$vecs(np => ind) +=
+								func * tmp;
+						%}
+						ind = $links(np => ind);
+					}
+				}
+			}
+			}
+			}
+			/* Store new */
+			svp = hv_fetch(hv, (char *)&index, sizeof(int), 1);
+			if(svp == NULL) {
+				die("Invalid sv from hvfetch");
+			}
+			sv = *svp;
+			if((npv = SvIV(sv))) {
+				npv --;
+				$links() = $links(np => npv);
+				$links(np => npv) = np;
+			} else {
+				sv_setiv(sv,np+1);
+				$links() = -1;
+			}
+		%}
+		hv_undef(hv);
+	', Doc => '
+=for ref
+
+Repulsive potential for molecule-like constructs.
+
+C<repulse> uses a hash table of cubes to quickly calculate
+a repulsive force that vanishes at infinity for many
+objects. For use by the module L<PDL::Graphics::TriD::MathGraph|PDL::Graphics::TriD::MathGraph>.
+For definition of the potential, see the actual function.
+
+=cut
+
+
+'
+);
+
+pp_def(
+	'attract',
+	GenericTypes => [F,D],
+	Pars => 'coords(nc,np);
+		int from(nl);
+		int to(nl);
+		strength(nl);
+		[o]vecs(nc,np);',
+	OtherPars => '
+		double m;
+		double ms;
+	',
+	Code => '
+		double m = $COMP(m);
+		double ms = $COMP(ms);
+		loop(nc,np) %{ $vecs() = 0; %}
+		loop(nl) %{
+			int f = $from();
+			int t = $to();
+			double s = $strength();
+			double dist = 0;
+			double tmp;
+			loop(nc) %{
+				tmp = $coords(np => f) -
+					$coords(np => t);
+				dist += tmp * tmp;
+			%}
+			s *= ms * dist + m * sqrt(dist);
+			loop(nc) %{
+				tmp = $coords(np => f) -
+					$coords(np => t);
+				$vecs(np => f) -= tmp * s;
+				$vecs(np => t) += tmp * s;
+			%}
+		%}
+	', Doc => '
+=for ref
+
+Attractive potential for molecule-like constructs.
+
+C<attract> is used to calculate
+an attractive force for many
+objects, of which some attract each other (in a way
+like molecular bonds).
+For use by the module L<PDL::Graphics::TriD::MathGraph|PDL::Graphics::TriD::MathGraph>.
+For definition of the potential, see the actual function.
+
+=cut
+
+
+'
+);
+
+sub trid {
+	my ($par,$ind) = @_;
+	join ',', map {"\$$par($ind => $_)"} (0..2);
+}
+
+pp_def('vrmlcoordsvert',
+	Pars => 'vertices(n=3)',
+	OtherPars => 	'char* space; char* fd',
+	GenericTypes => [F,D],
+	Code => q@
+		 PerlIO *fp;
+		 IO *io;
+		 PDL_Byte *buf, *bp;
+		 char *spc = $COMP(space);
+		 char formchar = $TFD(' ','l');
+		 char formatstr[25];
+
+		 io = GvIO(gv_fetchpv($COMP(fd),FALSE,SVt_PVIO));
+		 if (!io || !(fp = IoIFP(io)))
+			barf("Can\'t figure out FP");
+		 sprintf(formatstr,"%s%%.3%cf %%.3%cf %%.3%cf,\n",spc,
+			formchar,formchar,formchar);
+
+		threadloop %{
+			PerlIO_printf(fp,formatstr,@.trid(vertices,n).');
+		%}'
+);
+
+pp_addpm(<<'EOD');
+
+=head2 contour_segments
+
+=for ref
+
+This is the interface for the pp routine contour_segments_internal
+- it takes 3 piddles as input
+
+C<$c> is a contour value (or a list of contour values)
+
+C<$data> is an [m,n] array of values at each point
+
+C<$points> is a list of [3,m,n] points, it should be a grid
+monotonically increasing with m and n.  
+
+contour_segments returns a reference to a Perl array of 
+line segments associated with each value of C<$c>.  It does not (yet) handle
+missing data values. 
+
+=over 4
+
+=item Algorthym
+
+The data array represents samples of some field observed on the surface described 
+by points.  For each contour value we look for intersections on the line segments
+joining points of the data.  When an intersection is found we look to the adjoining 
+line segments for the other end(s) of the line segment(s).  So suppose we find an
+intersection on an x-segment.  We first look down to the left y-segment, then to the
+right y-segment and finally across to the next x-segment.  Once we find one in a 
+box (two on a point) we can quit because there can only be one.  After we are done
+with a given x-segment, we look to the leftover possibilities for the adjoining y-segment.
+Thus the contours are built as a collection of line segments rather than a set of closed
+polygons.          
+
+=back
+
+=cut
+
+use strict;
+sub PDL::Graphics::TriD::Contours::contour_segments {
+	my($this,$c,$data,$points) = @_;
+# pre compute space for output of pp routine
+
+  my $segdim = ($data->getdim(0)-1)*($data->getdim(1)-1)*4;
+#  print "segdim = $segdim\n"; 
+  my $segs = zeroes(3,$segdim,$c->nelem);
+  my $cnt = zeroes($c->nelem);
+  contour_segments_internal($c,$data,$points,$segs,$cnt);
+
+#  print "contour segments done ",$points->info,"\n";
+
+  $this->{Points} = pdl->null;
+
+  my $pcnt=0;
+  my $ncnt;
+  for(my $i=0; $i<$c->nelem; $i++){
+	   $ncnt = $cnt->slice("($i)");
+      next if($ncnt==-1);
+
+		$pcnt = $pcnt+$ncnt;
+			      
+		$this->{ContourSegCnt}[$i] =  $pcnt;
+		$pcnt=$pcnt+1;    
+		$this->{Points} = $this->{Points}->append($segs->slice(":,0:$ncnt,($i)")->xchg(0,1));
+	}
+	$this->{Points} = $this->{Points}->xchg(0,1);
+	
+}
+EOD
+
+
+pp_def('contour_segments_internal',
+	Pars => 'c(); 
+            data(m,n); 
+            points(d,m,n); 
+            float [o]segs(d,q);
+				int [o] cnt();',
+	GenericTypes => [F],
+	Code => '
+		int ds, ms, ns;
+		float dist;
+      float a_int[3];
+      int i, j, m1, n1, mr, ml, p, found, p1, a;
+   
+		ds = $SIZE(d);
+		ms = $SIZE(m);
+		ns = $SIZE(n);
+
+		if(ds != 3){
+			croak("Bad first dimension in contour_segments");
+		}	
+		p=0;
+		p1=1;
+		loop(m) %{
+				if(m<ms-1){
+					m1=m+1;
+					loop(n)%{
+                  if(n<ns-1){	
+							n1=n+1;
+
+							/* printf("found %d %d %d\n",found,ml,mr); */
+							found=0;
+
+							if((a=($data() < $c() && $data(m=>m1) >= $c())) ||
+								($data() >= $c() && $data(m=>m1) < $c())){
+
+								/* circle the high if there is a choice of direction */
+				            if(a==0){
+   			            	ml=m;	
+      			         	mr=m1;
+								}else{
+									ml=m1;
+									mr=m;
+               			}	
+
+							/* found an x intersect */
+
+								dist = ($c()-$data())/($data(m=>m1)-$data());
+								loop(d) %{
+								  a_int[d]=$points()+dist*($points(m=>m1)-$points());
+								%}
+								/* now look for the connecting point */
+                     	/* First down and to the left (right) */
+                       
+                        
+								if(($data(m=>ml) < $c() && $data(m=>ml,n=>n1) >= $c()) ||
+									        ($data(m=>ml) >= $c() && $data(m=>ml,n=>n1) < $c())){
+									found=(m==ml)? 1:-1;
+									dist = ($c()-$data(m=>ml))/($data(m=>ml,n=>n1)-$data(m=>ml));
+									loop(d) %{
+  										$segs(q=>p1)=$points(m=>ml)+dist*($points(m=>ml,n=>n1)-$points(m=>ml));
+                              $segs(q=>p) = a_int[d];
+									%}
+		 							p+=2;
+		 							p1=p+1;
+									/* printf("found1 %d %d %d\n",found,ml,mr); 	*/
+								}else{
+	                     	/* down and to the right (left)*/
+									if(($data(m=>mr) < $c() && $data(m=>mr,n=>n1) >= $c()) ||
+										        ($data(m=>mr) >= $c() && $data(m=>mr,n=>n1) < $c())){
+
+										dist = ($c()-$data(m=>mr))/($data(m=>mr,n=>n1)-$data(m=>mr));
+										found=(m==mr)? 1:-1;
+										loop(d) %{
+	  										$segs(q=>p1)=$points(m=>mr)+dist*($points(m=>mr,n=>n1)-$points(m=>mr));
+                              	$segs(q=>p) = a_int[d];
+										%}
+			 							p+=2;
+			 							p1=p+1;
+										/* printf("found2 %d %d %d\n",found,ml,mr);*/
+									}else{
+										/* straight down */
+										found=2;
+										if(($data(n=>n1) < $c() && $data(m=>m1,n=>n1) >= $c()) ||
+											        ($data(n=>n1) >= $c() && $data(m=>m1,n=>n1) < $c())){
+											dist = ($c()-$data(n=>n1))/($data(m=>m1,n=>n1)-$data(n=>n1));
+											loop(d) %{
+	  											$segs(q=>p1)=$points(n=>n1)+dist*($points(m=>m1,n=>n1)-$points(n=>n1));
+                              		$segs(q=>p) = a_int[d];
+											%}
+				 							p+=2;
+				 							p1=p+1;
+
+										}/* straight down */
+									}	/* down and to the right */
+								}	/* First down and to the left */
+							}	/* found an x intersect */
+							if(found<=0){ /* need to check the y-pnt */
+								if(($data() < $c() && $data(n=>n1) >= $c()) ||
+									        ($data() >= $c() && $data(n=>n1) < $c())){
+									dist = ($c()-$data())/($data(n=>n1)-$data());
+									loop(d) %{
+										a_int[d]=$points()+dist*($points(n=>n1)-$points());
+									%}
+									if(($data(n=>n1) < $c() && $data(m=>m1,n=>n1) >= $c()) ||
+									   ($data(n=>n1)>= $c() && $data(m=>m1,n=>n1) <  $c())){
+											dist = ($c()-$data(n=>n1))/($data(m=>m1,n=>n1)-$data(n=>n1));
+
+											loop(d) %{
+												$segs(q=>p1)=$points(n=>n1)+dist*($points(m=>m1,n=>n1)-$points(n=>n1));
+                              		$segs(q=>p) = a_int[d];
+											%}
+				 							p+=2;
+				 							p1=p+1;
+											found = (found==-1)?-3:3;
+									}else if(found==0){
+	  									if(($data(m=>m1) < $c() && $data(m=>m1,n=>n1) >= $c()) ||
+	  									        ($data(m=>m1) >= $c() && $data(m=>m1,n=>n1) < $c())){
+											dist = ($c()-$data(m=>m1))/($data(m=>m1,n=>n1)-$data(m=>m1));
+
+											loop(d) %{
+  												$segs(q=>p1) = $points(m=>m1)+dist*($points(m=>m1,n=>n1)-$points(m=>m1));
+                           	   	$segs(q=>p) = a_int[d];
+											%}
+				 							p+=2;
+				 							p1=p+1;
+											found = 4;
+										}
+									}
+								}
+				
+							} /* need to check the y-pnt */
+
+							if(found==0 || found==1 || found == 3){
+		  						if((($data(m=>m1) < $c() && $data(m=>m1,n=>n1) >= $c()) ||
+	  									        ($data(m=>m1) >= $c() && $data(m=>m1,n=>n1) < $c())) &&
+									(($data(n=>n1) < $c() && $data(m=>m1,n=>n1) >= $c()) ||	
+	  									        ($data(n=>n1) >= $c() && $data(m=>m1,n=>n1) < $c()))){
+											float dist2;
+											dist = ($c()-$data(m=>m1))/($data(m=>m1,n=>n1)-$data(m=>m1));
+											dist2 = ($c()-$data(n=>n1))/($data(m=>m1,n=>n1)-$data(n=>n1));
+
+											loop(d) %{
+  												$segs(q=>p) = $points(m=>m1)+dist*($points(m=>m1,n=>n1)-$points(m=>m1));
+  												$segs(q=>p1)=$points(n=>n1)+dist2*($points(m=>m1,n=>n1)-$points(n=>n1));
+											%}
+											found=5;
+											p+=2;
+											p1=p+1;
+										}
+									}
+						}	 /* n<ns-1 */
+					%}
+				}
+			%}
+			/*printf("p= %d \n",p); */
+			$cnt()=p-1;'
+, 
+       Doc => undef,
+#'
+#=for ref
+#
+#Internal support for contour_segments above.
+#
+#=cut
+#'
+
+
+);
+
+			
+pp_addpm({At=>Bot},<<'EOD');
+
+=head1 AUTHOR
+
+Copyright (C) 2000 James P. Edwards
+Copyright (C) 1997 Tuomas J. Lukka.
+All rights reserved. There is no warranty. You are allowed
+to redistribute this software / documentation under certain
+conditions. For details, see the file COPYING in the PDL
+distribution. If this file is separated from the PDL distribution,
+the copyright notice should be included in the file.
+
+=cut
+
+
+EOD
+
+pp_done();
+
+
+

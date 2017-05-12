@@ -1,0 +1,66 @@
+README for Palm::ListDB
+
+  This is a handler class for ListDB PDB database files.
+  It is a subclass for the Palm::PDB framework.
+
+  ListDB is a lightweight database for PalmOS(tm) handhelds
+  from Andrew Low <roo@magma.ca>.
+
+
+INSTALLATION
+
+  Palm::ListDB can be installed easily by using the CPAN module.
+
+	perl -MCPAN -e "install Palm::ListDB"
+
+  or manually by untarring the archive and running the following
+  commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+  
+  (test won't really test that much so far...)
+
+
+REQUIREMENTS
+
+	Palm::PDB
+	Palm::StdAppInfo
+
+  Those are part of the p5-Palm-1.2.4 package from Andrew Arensburger
+  <arensb@ooblick.com>
+
+
+DOCUMENTATION
+
+  For documentation about this package, read the POD documentation
+  of the module
+
+	perldoc Palm::ListDB
+
+  or check the manpage that will be installed.
+
+
+COPYRIGHT
+
+  Copyright (c) 2002 Rüdiger Peusquens. All rights reserved.
+  This module is free software; you can redistribute it
+  and/or modify it under the terms of the Artistic License.
+  See the file COPYING for details.
+
+
+AUTHOR
+
+  This module was written by Rüdiger Peusquens <rudy@peusquens.net>
+
+  ListDB is written by Andrew Low <roo@magma.ca>.
+
+  Palm::PDB is written by Andrew Arensburger <arensb@ooblick.com>.
+
+SEE ALSO
+
+  listDB -  http://www.magma.ca/~roo
+
+  Palm::PDB, Palm::StdAppInfo

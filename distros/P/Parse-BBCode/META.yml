@@ -1,0 +1,50 @@
+---
+abstract: 'Module to parse BBCode and render it as HTML or text'
+author:
+  - 'Tina Mueller <tinita@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parse-BBCode
+provides:
+  Parse::BBCode:
+    file: lib/Parse/BBCode.pm
+    version: '0.15'
+  Parse::BBCode::HTML:
+    file: lib/Parse/BBCode/HTML.pm
+    version: '0.15'
+  Parse::BBCode::Markdown:
+    file: lib/Parse/BBCode/Markdown.pm
+    version: '0.15'
+  Parse::BBCode::Tag:
+    file: lib/Parse/BBCode/Tag.pm
+    version: '0.15'
+  Parse::BBCode::Text:
+    file: lib/Parse/BBCode/Text.pm
+    version: '0.15'
+  Parse::BBCode::XHTML:
+    file: lib/Parse/BBCode/XHTML.pm
+    version: '0.15'
+recommends:
+  Email::Valid: '0'
+  URI::Find: '0'
+  perl: v5.8.0
+requires:
+  Carp: '0'
+  Class::Accessor::Fast: '0'
+  Exporter: '0'
+  URI::Escape: '0'
+  base: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/perlpunk/Parse-BBCode.git
+version: '0.15'

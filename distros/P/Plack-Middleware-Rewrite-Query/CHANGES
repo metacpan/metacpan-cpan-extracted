@@ -1,0 +1,47 @@
+==================================================
+Changes from 2013-02-07 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.1.1 at 2014-02-07 11:25:16 +0000
+------------------------------------------
+
+  Change: 6a2e3d31522e955169f7992f7bf60c76fb65cf41
+  Author: Jakob Voss <voss@gbv.de>
+  Date : 2014-02-07 12:25:12 +0000
+
+    bump version for relase at CPAN 
+
+  Change: a8fb05c77a23d698b4cf883a1658989a6d6c7e83
+  Author: Jakob Voss <voss@gbv.de>
+  Date : 2014-02-07 12:20:59 +0000
+
+    include Makefile and encoding 
+
+  Change: 3b46d92e7a6b4ce260acd7a41bf22f5ccf3ae4d1
+  Author: Jakob Voss <voss@gbv.de>
+  Date : 2014-02-07 12:10:16 +0000
+
+    recommend Plack::Middleware::Request but don't die if not found 
+
+  Change: d804196fc2223e8b480ea907cd8d2c701e616dda
+  Author: Jakob Voss <voss@gbv.de>
+  Date : 2014-02-07 11:57:23 +0000
+
+    refactored 
+
+  Change: 3418bfb3a2befb408e7f3e0983239b9cd5312bb0
+  Author: Jakob Voss <voss@gbv.de>
+  Date : 2014-02-07 10:56:32 +0000
+
+    renamed module 
+
+  Change: 12d107e582579e411ed9c41c5e39ca7ae480d42f
+  Author: Jakob Voss <voss@gbv.de>
+  Date : 2014-02-07 10:27:43 +0000
+
+    inital commit 
+
+================
+End of releases.
+================

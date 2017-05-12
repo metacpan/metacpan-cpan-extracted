@@ -1,0 +1,16 @@
+prefix=/usr/lib/qt44
+bindir=/usr/lib/qt44/bin
+datadir=/usr/lib/qt44
+demosdir=/usr/lib/qt44/demos
+docdir=/usr/share/doc/qt44
+examplesdir=/usr/lib/qt44/examples
+headerdir=/usr/lib/qt44/include
+libdir=/usr/lib/qt44/lib
+plugindir=/usr/lib/qt44/plugins
+qmake=/usr/lib/qt44/bin/qmake
+sysconfdir=/etc/qt44
+translationdir=/usr/share/qt44/translations
+
+Name: Qt
+Description: Qt Configuration
+Version: 4.4.3

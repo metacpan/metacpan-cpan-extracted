@@ -1,0 +1,631 @@
+0.81    2017-04-19 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Add missing dependencies to Sah type modules [RT#121166].
+
+
+0.80    2016-12-15 (PERLANCAR)
+
+	- Workaround issue in Getopt::Long where gnu_compat disables
+	  bundling as a side effect, so we enable bundling after gnu_compat
+	  (ref: [RT#119165]).
+
+
+0.79    2016-12-11 (PERLANCAR)
+
+	- [Bugfix] Fix determining simple/array-of-simple/hash-of-simple types.
+
+
+0.78    2016-12-10 (PERLANCAR)
+
+	- [dist] Forgot to bump prereq version Perinci::Sub::GetArgs::Array
+	  -> 0.16 (hash support).
+
+
+0.77    2016-12-10 (PERLANCAR)
+
+	- Accept hash argument as --arg key1=val1 --arg key2=val2 ... using
+	  Getopt::Long's '%' desttype.
+
+
+0.76    2016-12-02 (PERLANCAR)
+
+	- Set Getopt::Long configuration gnu_compat to allow setting empty value
+          '--name='.
+
+
+0.75    2016-10-27 (PERLANCAR)
+
+	- Skip generating option for hidden arguments (arguments with tag
+	  'hidden' or 'hidden-cli').
+
+
+0.74    2016-10-07 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Bump minimum prereq of Perinci::Sub::Util (latest
+	  version).
+
+	- fmt: use Markdown autolink with pm:/pod:/prog: URLs in
+	  description so it can be converted to POD's L<...>.
+
+
+0.73    2016-08-24 (PERLANCAR)
+
+        - For argument that has schema containing coerce rules from simple type,
+          recognize it as simple (meaning not creating a --ARG-json or
+          --ARG-yaml option for it but simply --ARG). For example, suppose
+          argument 'foo' has schema ['array', of=>'str',
+          'x.perl.coerce_rules'=>['str_comma_sep']. This means we can specify
+          the value using something like '--foo 1,2,3' instead of "--foo-json
+          '[1,2,3]'".
+
+
+0.72    2016-07-20 (PERLANCAR)
+
+        - Resolve base type of schemas, to support arguments that have schema
+          that is based on another schema.
+
+
+0.71    2016-02-19 (PERLANCAR)
+
+	- [Bugfix] Forgot to option-ize name from arg spec's
+	  x.name.is_singular.
+
+	- [refactor] Use Data::Sah::Util::Type to reduce code duplication.
+
+
+0.70    2015-12-17 (PERLANCAR)
+
+        - [experimental][ux] When schema is array of int/float (should also
+          include bool, date, duration, or string that cannot contain commas),
+          then --opt 1,2,3 will also be accepted. This is more convenient than
+          having to do '--opt 1 --opt 2 --opt 3'.
+
+
+0.69    2015-08-19 (PERLANCAR)
+
+	- Reduce dependencies: replace JSON with JSON::PP (core module),
+	  make YAML::Old also optional.
+
+
+0.68    2015-05-20 (PERLANCAR)
+
+	- Require YAML::Old as fallback for YAML::XS.
+
+
+0.67    2015-05-19 (PERLANCAR)
+
+	- No functional changes.
+
+	- Skip relevant tests when YAML::XS is not available [CT].
+
+
+0.66    2015-05-13 (PERLANCAR)
+
+        - Downgrade YAML::XS dependency as RuntimeRecommends to allow this
+          module to have CoreOrPP status.
+
+        - Don't parse argument of type date/duration as JSON/YAML.
+
+        - Remove args_groups checking, args_groups has been replaced by
+          args_rels and is checked either by Perinci::CmdLine::Lite or
+          Perinci::Sub::Wrapper.
+
+
+0.65    2015-04-02 (PERLANCAR)
+
+	- [ux] Convert option name to singular if the argument
+	  specification indicates that argument name is a plural
+	  (x.name.is_plural, x.name.singular).
+
+
+0.64    2015-03-24 (PERLANCAR)
+
+	- [opt] Shave off +- 2-3ms by avoiding experimental+Carp.
+
+	- Extract negations_for_option routine to Getopt::Long::Negate::EN,
+	  so it's more reusable by other modules.
+
+
+0.63    2015-03-06 (PERLANCAR)
+
+	- Avoid arguments of type 're' to have JSON/YAML option.
+
+
+0.62    2015-02-07 (PERLANCAR)
+
+        - Check against 'deps' argument specification property (currently only
+          'arg' dep type is supported, 'any'/'all'/'none' not yet supported).
+          [Rinci 1.1.72].
+
+        - Check against 'args_groups' property [Rinci 1.1.72].
+
+
+0.61    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.60    2014-12-19 (PERLANCAR)
+
+        - Shut up warning from Getopt::Long (by locally installing a
+          $SIG{__WARN__} handler) when strict=0.
+
+
+0.59    2014-11-20 (PERLANCAR)
+
+	- Add common_opts/neg_opts/pos_opts in func.specmeta, to help
+          Perinci::Sub::To::CLIOptSpec.
+
+
+0.58    2014-11-19 (PERLANCAR)
+
+	- Add --isnt-FOO and --arent-FOO as negation forms for --is-FOO and
+	  --are-FOO (and vice versa) (currently untested).
+
+
+0.57    2014-10-24 (PERLANCAR)
+
+	- Add --ARG-base64 for buf arguments.
+
+	- [ux] Change negated options for with-foo -> without-foo (and vice
+	  versa) instead of the default nowith-foo + no-with-foo.
+
+
+0.56    2014-10-23 (PERLANCAR)
+
+	- No functional changes.
+
+	- Typo: unimplemented status is 501, not 502.
+
+
+0.55    2014-10-11 (PERLANCAR)
+
+	- Support is_flag cmdline_alias property.
+
+	- [Bugfix] cmdline alias handler should also get the same treatment
+	  as arg handler.
+
+
+0.54    2014-10-10 (PERLANCAR)
+
+	- Add support for element_meta (Rinci 1.1.56).
+
+
+0.53    2014-10-10 (PERLANCAR)
+
+	- No functional changes.
+
+        - Optimize gen_getopt_long_spec_from_meta() by avoiding a bunch of calls
+          to parse_getopt_long_opt_spec(), making it about 60% faster for a
+          sample metadata of 5 arguments + 1 cmdline_alias.
+
+        - Add a couple of tests.
+
+
+0.52    2014-10-09 (PERLANCAR)
+
+	- Support argument submetadata (Rinci 1.1.55).
+
+
+0.51     2014-09-03 (PERLANCAR)
+
+         - Add option: ignore_converted_code (this option is needed e.g. by
+           Perinci::Sub::Complete to keep tab completion working even when there
+           is coderef cmdline_aliases property in arg spec).
+
+
+0.50     2014-08-06 (SHARYANTO)
+
+         - Revert previous feature (accept _genres).
+
+
+0.49     2014-08-06 (SHARYANTO)
+
+         - Remove orig_spec key, because we now no longer re-order opts in ospec.
+
+         - get_args_from_argv(): Accept _genres (a temporary dirty hack)
+           argument to avoid doing gen_getopt_long_spec_from_meta() again.
+
+
+0.48     2014-07-25 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - For arguments of type 'array of simple scalars', generate
+           Getopt::Long option spec as 'NAME=s@' instead of just 'NAME=s'; this
+           makes it more evident that the option is repeatable.
+
+
+0.47     2014-07-23 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Getopt::Long::Util 0.77.
+
+
+0.46     2014-07-23 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Adjust to Getopt::Long::Util 0.46 (option ordering).
+
+         - Change 'common_opts' argument form so it is now the same as
+           Perinci::CmdLine's.
+
+
+0.45     2014-07-22 (SHARYANTO)
+
+         - Don't attempt parsing argv as json/yaml if array of simple scalar.
+
+
+0.44     2014-07-18 (SHARYANTO)
+
+         - These changes are to aid completion.
+
+         - gen_getopt_long_spec_from_meta(): Provide 'func.opts_by_arg',
+           'func.opts_by_common', 'func.common_opts' & 'func.func_opts'.
+
+         - get_args_from_argv(): Return gen_getopt_long_spec_from_meta result in
+           func.gen_getopt_long_spec_result to avoid caller having to call
+           gen_getopt_long_spec_from_meta() separately.
+
+         [INCOMPATIBLE CHANGES]
+
+         - gen_getopt_long_spec_from_meta(): func.*opts are now prefixed with
+           --/-.
+
+
+0.43     2014-07-18 (SHARYANTO)
+
+         - gen_getopt_long_spec_from_meta(): Add 'parsed' key (result from
+           Getopt::Long::Util's parse_getopt_long_opt_spec()). Add 'alias_for'
+           key for alias options to trace back original option. Both to aid
+           help/usage generation.
+
+         - [Bugfix] Some bug fixes.
+
+
+0.42     2014-07-18 (SHARYANTO)
+
+         - gen_getopt_long_spec_from_meta(): Add 'orig_spec' to common_opts'
+           alias specmeta to be able to trace back the original key (to aid
+           help/usage generation).
+
+
+0.41     2014-07-18 (SHARYANTO)
+
+         - gen_getopt_long_spec_from_meta(): Add is_alias to alias specmeta, add
+           {,non}code_aliases to non-alias specmeta (to aid help/usage
+           generation).
+
+
+0.40     2014-07-18 (SHARYANTO)
+
+         - No functional changes.
+
+         - Revert previous decision: Deliberately not including YAML::Syck &
+           JSON as prereq to reduce deps. It complicates testing [CT].
+
+
+0.39     2014-07-17 (SHARYANTO)
+
+         - To reduce dependencies, deliberately no longer lists JSON and
+           YAML::Syck as dependencies. These modules are only required when
+           'per_arg_json' and 'per_arg_yaml' are enabled.
+
+         [BUG FIXES]
+
+         - Only try to parse positional command-line arguments as JSON/YAML when
+           per_arg_yaml/per_arg_json is true.
+
+
+0.38     2014-07-12 (SHARYANTO)
+
+         - Add option: 'args', to set initial value for the resulting arguments.
+
+
+0.37     2014-07-09 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Changes the interface and the parsing rules slightly. Since I want to
+           remove --action and the subtle difference of 'extra_getopts_before'
+           and 'extra_getopts_after'. Now we avoid clashes between common
+           options like '--help' and function arguments of the same name (they
+           will be renamed to '--help-arg', or '--help-arg2' and so on upon
+           clash). Clash will also be avoided between '--ARGNAME' and
+           '--ARGNAME-json' should that happen.
+
+         [REMOVED FEATURES]
+
+         - Remove 'check_required_args' option. Now function still returns 200
+           on missing args. Missing args are already reported in the result
+           metadata ('func.missing_args').
+
+         - Remove 'extra_getopts_before' and 'extra_getopts_after', replace it
+           with 'common_opts' (a hash of Getopt::Long specification name and
+           handlers).
+
+         [ENHANCEMENTS]
+
+         - Refactor the code that generates Getopt::Long spec to its own
+           function: gen_getopt_long_spec_from_meta() so it's reusable from e.g.
+           routine that wants to generate usage/help message.
+
+
+0.36     2014-07-08 (SHARYANTO)
+
+         - Adjust to Perinci::Sub::GetArgs::Argv 0.14.
+
+         - Add 'meta_is_normalized' option.
+
+
+0.35     2014-07-04 (SHARYANTO)
+
+         - Still call cmdline_on_getopt routine when value for function argument
+           is specified through command-line argument instead of command-line
+           options. This is usually desired to "catch" all command-line
+           options/arguments (process them through cmdline_on_getopt routine).
+           Note that the Rinci::function standard hasn't said anything about
+           this yet.
+
+         - Provide 'opt' for cmdline_on_getopt routine to let it know whether it
+           is specified as an option (where 'opt' will contain the option name,
+           e.g. '--foo 1' will have 'opt' set to 'foo') or whether it is
+           specified in the command-line argument (where 'opt' will be set to
+           undef).
+
+
+0.34     2014-04-16 (SHARYANTO)
+
+         - Return status 501 when encountering a cmdline_alias where its code
+           has been converted into 'CODE'. This will allow modules like
+           Perinci::CmdLine or App::riap to retry sending argv to the server
+           instead of parsing argv on the client side.
+
+         - Replace each() with for() [ref:
+           http://blogs.perl.org/users/rurban/2014/04/do-not-use-each.html].
+
+
+0.33     2014-04-10 (SHARYANTO)
+
+         - No functional changes.
+
+         - Replace Data::Clone with Function::Fallback::CoreOrPP.
+
+
+0.32     2014-03-15 (SHARYANTO)
+
+         - No functional changes. Rebuild to fix POD documentation (function
+           argument documentation was broken in Perinci-To-POD < 0.42).
+
+
+0.31     2014-01-21 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Interpret true return value from on_missing_required_args hook to
+           mean avoid complaining about missing argument, so we allow argument
+           to be missing in the final result.
+
+
+0.30     2013-12-25 (SHARYANTO)
+
+         - Respect 'cmdline_on_getopt' argument spec (Rinci 1.1.43).
+
+
+0.29     2013-11-13 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - To be consistent, 'argv' elements should also be emptied for
+           positional arguments.
+
+
+0.28     2013-11-08 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - on_missing_required_args hook should also be called for required
+           args, not all missing args.
+
+
+0.27     2013-10-28 (SHARYANTO)
+
+         - Rename result metadata 'func.has_missing_arg' (bool) to
+           'func.missing_arg' (str) to report the name of the missing argument.
+
+
+0.26     2013-10-28 (SHARYANTO)
+
+         - When check_required_args=0 and there is missing argument, provide
+           hint to user via 'func.has_missing_arg' result metadata.
+
+
+0.25     2013-10-15 (SHARYANTO)
+
+         - Use Data::Clean::FromJSON so that Data::Sah-generated validator code
+           in wrapped functions doesn't choke with JSON::{PP,XS}::Boolean
+           objects.
+
+
+0.24     2013-09-20 (SHARYANTO)
+
+         - cmdline_alias for bool doesn't get --noX ("alias!") if it specifies
+           code, which makes more sense.
+
+
+0.23     2013-08-15 (SHARYANTO)
+
+         - Perform JSON/YAML parsing for command-line arguments too.
+
+
+0.22     2013-04-05 (SHARYANTO)
+
+         - Add no_getopt_compat Getopt::Long::Configure to disregard "+" as
+           option starter.
+
+
+0.21     2012-08-09 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Enable Getopt::Long's configuration 'bundling' to get more
+           traditional behavior (e.g. -Ifoo instead of having to use -I foo).
+           This means you no longer can specify -I=foo since it means -I =foo
+           now.
+
+         [FIXES]
+
+         - Fix handling of cmdline_aliases (didn't use the same option handler
+           routine).
+
+
+0.20     2012-08-08 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Change behavior of parsing arguments with type of array-of-scalar,
+           now uses --foo 1 --foo 2 a la Getopt::Long.
+
+         [ETC]
+
+         - Remove user documentation, this module will be "internal" and used
+           from Perinci::CmdLine.
+
+
+0.19     2012-07-23 (SHARYANTO)
+
+         - These changes are made to support `cmdline_src` arg spec key (Rinci
+           1.1.21+). Actual implementation will be done by Perinci::CmdLine.
+
+         - Add 'on_missing_required_args' option.
+
+         - Add 'allow_extra_elems' option.
+
+
+0.18     2012-07-19 (SHARYANTO)
+
+         - Add 'per_arg_json' option.
+
+         - Also try JSON parsing as well as YAML on non-scalar arguments.
+
+
+0.17     2012-04-02 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGE]
+
+         - Change 'extra_getopts_before' and 'extra_getopts_after' from hash to
+           array, because ordering matters in GetOptions().
+
+
+0.16     2012-04-02 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGE]
+
+         - Change $_pa_skip_check_required_args internal flag with
+           'check_required_args' option.
+
+         - Replace extra_getopts with extra_getopts_before and
+           extra_getopts_after.
+
+
+0.15     2012-03-29 (SHARYANTO)
+
+         [FIXES]
+
+         - extra_getopts --foo=s was cut and became --foo.
+
+
+0.14     2012-03-23 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES, REMOVED FEATURES]
+
+         - Argument with underscore (foo_bar) is only represented with --foo-bar
+           and no longer with --foo_bar, because having both disrupts
+           Getopt::Long's ability to autocomplete (e.g. --foo).
+
+
+0.13     2012-03-23 (SHARYANTO)
+
+         - Support arguments with dot (e.g. 'with.dot') using --with-dot syntax.
+
+
+0.12     2012-02-28 (SHARYANTO)
+
+         - Parse arg's 'cmdline_aliases'.
+
+
+0.11     2012-02-22 (SHARYANTO)
+
+         - Rename distribution from Sub-Spec-GetArgs-Argv to
+           Perinci-Sub-GetArgs-Agv.
+
+
+0.10     2012-01-27 (SHARYANTO)
+
+         - No functional changes. Build fix.
+
+
+0.09     2012-01-27 (SHARYANTO)
+
+         - No functional changes. Upgrade to Data-Sah-0.02.
+
+
+0.08     2012-01-20 (SHARYANTO)
+
+         - No functional changes. Mark deprecation.
+
+
+0.07     2011-11-23 (SHARYANTO)
+
+         - No functional changes. Replace Data::Sah::Util with Data::Sah.
+
+
+0.06     2011-08-31 (SHARYANTO)
+
+         - No functional changes. Updated because _parse_schema() is moved from
+           Sub::Spec::Utils to Data::Sah::Util.
+
+
+0.05     2011-08-25 (SHARYANTO)
+
+         - No functional changes. Update to Sub::Spec 0.15.
+
+
+0.04     2011-08-03 (SHARYANTO)
+
+         [NEW FEATURES]
+
+         - Added per_arg_yaml option to allow specifying YAML for scalar types,
+           e.g. --name-yaml '~'.
+
+
+0.03     2011-07-29 (SHARYANTO)
+
+         [FIXES]
+
+         - (build) Add missing test dep: Data::Clone.
+
+         [ETC]
+
+         - Internally now uses Sub::Spec::GetArgs::Array to process arg_pos and
+           arg_greedy arg type clauses.
+
+
+0.02     2011-07-26 (SHARYANTO)
+
+         - No functional changes. Allow Sub::Spec::CmdLine to access an internal
+           variable (yeah, some coupling still exists). Localize
+           Getopt::Long::Configure() effect.
+
+
+0.01     2011-07-26 (SHARYANTO)
+
+         - First release, spun off from Sub::Spec::CmdLine.

@@ -1,0 +1,102 @@
+<!-- DTD for simple slides for PPr documents -->
+
+<!ELEMENT slide	( body+, notes? ) >
+  <!ATTLIST slide
+		title		CDATA	#REQUIRED
+		template	CDATA	#IMPLIED
+		backdrop	CDATA	#IMPLIED
+		tags		CDATA	#IMPLIED
+		appear		CDATA	#IMPLIED
+  >
+
+<!ENTITY % pars1  "p | ul | ol | img | nbsp | br | bq | pre" >
+<!ENTITY % pars2  "blockquote | cite | code" >
+<!ENTITY % pars3  "a | mark | redo" >
+<!ENTITY % pars   "%pars1; | %pars2; | %pars3;" >
+<!ENTITY % atts1  "font | smaller | text | larger | big | huge" >
+<!ENTITY % atts2  "em | strong | i | b | bd | tt" >
+<!ENTITY % atts  "%atts1; | %atts2;" >
+<!ENTITY % text  "( #PCDATA | %pars; | %atts; )*" >
+<!ENTITY % ptext "( #PCDATA | %atts; )*" >
+<!ENTITY % align 'align (left|right|center) "left"' >
+<!ENTITY % name	 "name CDATA #IMPLIED" >
+<!ENTITY % color "color CDATA #IMPLIED" >
+
+<!ELEMENT body	%text; >
+  <!ATTLIST body
+		target		(main|left|right) "main"
+  >
+
+<!ELEMENT notes %text; >
+
+<!-- paragraph level elements -->
+<!ELEMENT p	%text; >
+  <!ATTLIST p	%align; >
+
+<!ELEMENT img	EMPTY >
+  <!ATTLIST img	src		CDATA	#REQUIRED
+		%align;
+		base		CDATA	#IMPLIED
+  >
+
+<!ELEMENT a	%text; >
+  <!ATTLIST a	show		CDATA	#REQUIRED
+		%name;
+  >
+
+<!ELEMENT nbsp  EMPTY >
+<!ENTITY  nbsp  "<nbsp/>" >
+
+<!ELEMENT br    EMPTY >
+
+<!ELEMENT mark	EMPTY >
+  <!ATTLIST mark %name;
+  >
+
+<!ELEMENT redo	%text; >
+  <!ATTLIST redo %name;
+  >
+
+<!ELEMENT pre	%ptext; >
+
+<!-- lists -->
+<!ELEMENT ul    ( li+ ) >
+
+<!ELEMENT ol    ( li+ ) >
+  <!ATTLIST ol	start		CDATA	#IMPLIED
+  >
+
+<!ELEMENT li    %text; >
+  <!ATTLIST li	show		CDATA	#IMPLIED
+  >
+
+<!-- markup attributes -->
+<!ELEMENT smaller	%text; >
+  <!ATTLIST smaller %color; >
+
+<!ELEMENT text		%text; >
+  <!ATTLIST text %color; >
+
+<!ELEMENT font		%text; >
+  <!ATTLIST font %color;
+		size		CDATA	#IMPLIED >
+
+<!ELEMENT larger	%text; >
+  <!ATTLIST larger %color; >
+
+<!ELEMENT big		%text; >
+  <!ATTLIST big %color; >
+
+<!ELEMENT huge		%text; >
+  <!ATTLIST huge %color; >
+
+<!ELEMENT em		%text; >
+<!ELEMENT strong	%text; >
+<!ELEMENT i		%text; >
+<!ELEMENT b		%text; >
+<!ELEMENT bd		%text; >
+<!ELEMENT tt		%text; >
+<!ELEMENT bq		%text; >
+<!ELEMENT blockquote	%text; >
+<!ELEMENT cite		%text; >
+<!ELEMENT code		%text; >

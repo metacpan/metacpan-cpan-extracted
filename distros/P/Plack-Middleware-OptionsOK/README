@@ -1,0 +1,21 @@
+NAME
+         Plack::Middleware::OptionsOK
+
+SYNOPSIS
+         # in app.psgi
+         use Plack::Builder;
+
+         my $app = sub { ... } # as usual
+
+         builder {
+             enable "Plack::Middleware::OptionsOK";
+             $app;
+         };
+
+DESCRIPTION
+       Many reverse Proxy servers (such as Perlbal) use an 'OPTIONS *' request
+       to confirm if a server is running.
+
+       This middleware will respond with a '200' to this request so you do not
+       have to handle it in your app. There will be no further processing
+       after this

@@ -1,0 +1,11 @@
+README
+
+Path::Hilbert
+
+A no-frills converter between 1D and 2D spaces using the Hilbert curve
+
+Most (all?) of the existing CPAN modules state "only works for $foo data",
+"optimized for foo situations", or "designed to work as part of the foo
+framework". This module is based directly on the example algorithm given on
+Wikipedia, and thus is subject only to the single strict limitation of Hilbert
+curves: that the side-length 'n' MUST be an integer power of 2.

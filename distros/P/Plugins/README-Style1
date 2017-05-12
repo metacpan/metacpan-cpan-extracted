@@ -1,0 +1,352 @@
+NAME
+     Plugins::Style1 - Generic plugins framework with linear config files
+
+SYNOPSIS
+     use Plugins::Style1;
+
+     $plugins = Plugins::Style1->new([context => $context])
+     $plugins->readconfig($config_file, self => $self)
+     $plugins->initialize()
+
+     $plugins->invoke($method, @args);
+
+     $plugins->invoke_until($method, sub { scalar(@_) }, @args);
+
+     my $iterator = $plugins->iterator();
+     while (@results = &$iterator(@args)) {
+     }
+
+     for my $plugin ($plugins->plugins()) {
+            $plugin->invoke($method);
+     }
+
+DESCRIPTION
+    Plugins::Style1 is a generic plugins framwork with a simple linear-style
+    configuration file that can support plugins of plugins in the same
+    configuration file.
+
+    It is based on Plugins.
+
+EXAMPLE CONFIG FILE (SIMPLE)
+     sleeptime      1
+
+     plugin SyslogScan::Daemon::BlacklistDetector as bld_
+
+     bld_debug      0
+
+     bld_plugin SyslogScan::Daemon::BlacklistDetector::Postfix
+             rx_ourIP       127\.0\.0\.1
+             logpath        /var/log/mail.log
+             debug          0
+
+     bld_plugin SyslogScan::Daemon::BlacklistDetector::EmailNotify
+             debug          1
+             notify         "John <root@localhost>"
+             renotify_time  7200
+             forget_time    3600
+             sendfrom       root
+             clean_time     1800
+             maxkeep        100
+
+CONSTRUCTION AND INITIALIAZATION
+    In addition to the parameters for "new()" and "readconfig()" documented
+    for Plugins, the following additional parameters may be given...
+
+  %args for new()
+    parse_config_line => \&func
+        The unknown line parser can be specified here or in "readconfig()"'s
+        %args.
+
+  %args for readconfig()
+    self => $self
+        Set "self" to let "readconfig()" know who called it. With that
+        information, "readconfig()" can make callbacks for the other
+        parameters. Without a $self "readconfig()" uses "caller()" to and
+        uses class methods instead of object methods.
+
+    config_prefix => "prefix_"
+        Since the configuration file can support multiple plugins at the
+        same time, we need to distinquish what goes with what plugin. This
+        is done by setting a configuration prefix here or when calling
+        "new()". Only config lines that start with the prefix will be
+        parsed: everything else will be ignored. The root/parent program
+        should have an empty string as its prefix.
+
+        If this is unspecified, "$self->config_prefix()" will be called. If
+        that doesn't exist then an empty-string prefix will be assumed.
+
+        For configuration file readability, your prefix should probably end
+        with an underscore ("_").
+
+    parse_config_line => \&func
+        "readconfig()" knows about lines that start "${prefix}plugin", but
+        for everything else it needs help. The "parse_config_line" parameter
+        should be a reference to a function to be called when there is a
+        configuration line other than "${prefix}plugin".
+
+        If no "parse_config_line" parameter is specified then
+        "$self->parse_config_line()" will be tried. If that doesn't exist
+        either then an unknown configuration line is a fatal error.
+
+        The arguments passed to the "&$parse_config_line()" function are:
+
+        $self/$pkg
+            The object or package of the caller.
+
+        $config_prefix
+            The configuration prefix for the plugin being invoked.
+
+        $configfile
+            The filename of the configuration file
+
+        $line
+            The configuration line. The prefix has not been removed.
+
+        $line_number
+            The line number of the line in the configuration file (for
+            generating nice error messages).
+
+        $seqno
+            An integer that increments each time the same configuration file
+            is read.
+
+CONFIGURATION FILE FORMAT
+    The configuration file parser knows about four types of lines:
+
+    Comments
+        The hash character ("#") denotes a comment and except for within
+        quotes a hash character will end parsing for that line.
+
+    Plugin requests
+        <prefix>plugin </file/name<gt [as <prefix_override>]>
+
+        <prefix>plugin <module_name> [as <prefix_override>]
+
+         plugin Foobar::Baz     # defaults to prefix "fb_"
+         plugin /some/file      # defaults to no prefix
+         plugin a_file          # defaults to no prefix
+
+         fb_plugin Foobar2::Baz as fb2_
+
+        The basic part of a configuation file is a line that starts with the
+        word "plugin". What follows on the same line is the name of a perl
+        module. The word "plugin" may be preceeded by a prefix. The prefix
+        disambiguates whose plugin it is when multiple plugins are sharing a
+        configuration file.
+
+        The prefix is normally given by the "config_prefix()" class method
+        in the plugin module, but it can be overridden (in order) by (1) the
+        config file; or (2) by an argument to readconfig
+        ("readconfig($configfile, config_prefix => 'foobar_')") or (3) as by
+        member data of the caller to readconfig():
+
+         $self->{config_prefix} = "bar_";
+         my $plugins = new Plugins;
+         $plugins->readconfig($configfile, self => $self);
+
+        To override the prefix in the config file, add "as prefix-name" the
+        end of a plugin line.
+
+        Plugins that are fully-fledged perl modules should be named as such.
+        Plugins that are not, (named as files) will be wrapped by Plugins
+        into a perl module. Plugins::Style1 dis-ambiguates between files and
+        modules by looking for the string "::" in module names.
+
+    Plugin search directory directive
+        Plugins that are plain filenames that are not absolute paths are
+        searched for with their own search path. The The directive to add to
+        that path is "plugin_directory".
+
+         plugin_directory /some/path
+         plugin_directory /another/path
+
+        Directory names may not have whitespace in them. Directories that do
+        not exist will be silently ignored.
+
+    Arguments to new()
+        Any indented lines that follow a plugin request will set what
+        arguments are passed to the "new()" when the module is initialized.
+
+        The indented lines a broken up on word boundries except that what is
+        between double-quotes or single-quotes counts as a single word.
+
+         bld_plugin SyslogScan::Daemon::BlacklistDetector::EmailNotify
+                notify          '"David Sharnoff" <muir@idiom.com>'
+                from            root@my.poor.system
+
+        Will produce a call like:
+
+         SyslogScan::Daemon::BlacklistDetector::EmailNotify->new(
+                'notify', 
+                '"David Sharnoff" <muir@idiom.com>', 
+                'from', 
+                'root@my.poor.system');
+
+    Freestanding configuration lines.
+        Lines that that begin in column one that aren't plugin requests, are
+        regular configuration lines. By default they are parsed by the
+        "parse_config_line()" method of the plugin that has called
+        "readconfig()". The function called can be overridden with the %args
+        to "readconfig()". The function will be called as a object method if
+        a $self was provided to "readconfig()". It will be called as a class
+        method otherwise.
+
+        Lines in the configuratin file that being with a plugin prefix will
+        be parsed by that plugin's "parse_config_line()" method (if it has
+        one). This will happen after "new()" is called so
+        "parse_config_line()" will be called as a class method.
+
+        The function to call for these lines defaults to
+        "parse_config_line()" but it can be overridden by passing a function
+        to the call to readconfig:
+
+         my $plugins = new Plugins;
+         $plugins->readconfig($configfile, parse_config_line => \&some_function);
+
+        Or it can be overridden with member data of the caller:
+
+         $self->{parse_config_line} = \&some_parse_function;
+         my $plugins = new Plugins;
+         $plugins->readconfig($configfile, self => $self);
+
+        If no parse_config_line() function is provided, the parser will die
+        on any lines that aren't recognized.
+
+    The same configuration file is potentially re-read for each plugin.
+    Generally plugins that have plugins will need to be calling
+    "readconfig()".
+
+EXAMPLE CONFIG FILE (NOT SO SIMPLE)
+     sleeptime      10
+
+     plugin SyslogScan::Daemon::BlacklistDetector
+            debug           1
+
+     bld_plugin SyslogScan::Daemon::BlacklistDetector::Postfix
+            debug           1
+            rx_ourIP        216\.240\.47\.\d+
+            logpath         /var/log/mail.log
+
+     bld_plugin SyslogScan::Daemon::BlacklistDetector::EmailNotify
+            debug           1
+            notify          you@yourhost.
+            renotify_time   7200
+            forget_time     3600
+            sendfrom        root    # comments are allowed here
+            clean_time      1800
+            maxkeep         100
+
+     bld_plugin SyslogScan::Daemon::BlacklistDetector::KeepTrack
+            # indented comments are allowed here
+            debug           1
+            dbi_dsn         DBI:mysql:database=quarentene;host=localhost 
+            username        quarentene 
+            password        bloorf 
+            table_prefix    kt_
+            # comments can go nearly anywhere
+            postcommand     "(cd /etc/postfix; make)"
+            postfile        /etc/postfix/outbound-problems
+            pool            /etc/postfix/outbound-list
+            latency         10
+            decay_day       3600
+            decay_rate      0.98
+            decay_done      0.2
+
+     # of course, comments are allowed in column 1.
+
+     plugin SyslogScan::Daemon::BlacklistDetector as bld2_
+            debug           1
+
+     bld2_plugin SyslogScan::Daemon::BlacklistDetector::Postfix as x1_
+            debug           1
+
+     x1_rx_ourIP    216\.240\.47\.\d+
+     x1_logpath     /tmp/mail.log
+
+     bld2_plugin SyslogScan::Daemon::BlacklistDetector::EmailNotify as x2_
+            debug           1
+
+     x2_notify      you@yourhost
+     x2_renotify_time       7200
+     x2_forget_time 3600
+     x2_sendfrom    root
+     x2_clean_time  1800
+     x2_maxkeep     100
+
+     bld2_plugin SyslogScan::Daemon::BlacklistDetector::KeepTrack as x3_
+            debug           1
+            postcommand     ''
+
+     x3_dbi_dsn     DBI:mysql:database=quarentene;host=localhost 
+     x3_username    quarentene 
+     x3_password    ''
+     x3_table_prefix        kt2_
+     x3_postfile    /etc/postfix/outbound-problems2
+     x3_pool        /etc/postfix/outbound-list
+     x3_latency     10
+     x3_decay_day   3600
+     x3_decay_rate  0.98
+     x3_decay_done  0.2
+
+WRITING PLUGINS
+  Plugin-defined methods
+    Plugins should be subclasses of "Plugins::Style1".
+
+    config_prefix()
+        This method is used to determine the default configuration-line
+        prefix for the plugin. Defining this method is manditory.
+
+    parse_config_line($prefix, $configfile, $line, $lineno, $seqno)
+        If your want to be able to have configuration directives other than
+        what is passed to "new()", then you'll need to define a
+        "parse_config_line()" method. Eg:
+
+         my $bar = 7;
+
+         sub config_prefix { 'foo_' }
+
+         sub parse_config_line
+         {
+                my ($self, $prefix, $configfile, $line, $lineno, $seqno) = @_;
+                if ($line =~ /^${prefix}bar\s*=\*(\d+)) { 
+                        $bar = $1;
+                } else {
+                        die "illegal config at $configfile line $lineno\n";
+                }
+         }
+
+        One way to get a simple parser like this and also something to
+        handle arguments to "new()" is to use Plugins::SimpleConfig.
+
+  Plugins with plugins
+    One subtle aspect of sharing configuration files is that plugin prefix
+    may be overridden. This is done on a per-configuration file basis. If
+    for some reason you want to un-override your configuration prefix then
+    don't pass that part of the $context:
+
+     $self->{plugins} = new Plugins context => $self->{context}, config_prefix => 'something_else_';
+
+    Since the *child requestors*'s configuration file may get read twice,
+    the "parse_config_line" method may get called twice. To avoid this, pass
+    in a null function for "parse_config_line":
+
+     $self->{plugins} = new Plugins context => $self->{context}, parse_config_line => sub {}
+
+    Or
+
+     $self->{plugins}->readconfig($config, self => $self, parse_config_line => sub {});
+
+    In most cases there probably isn't any harm in this double parsing.
+
+SEE ALSO
+    Plugins
+
+THANK THE AUTHOR
+    If you find this module useful and wish to show your appreciation to the
+    author, please give me a Request-For-Quote on your next high-speed
+    internet pipe order. I have good pricing for T1s, T3s, OC3s etc.
+
+LICENSE
+    Copyright (C) 2006-2007, David Muir Sharnoff <muir@idiom.com>. This
+    module may be used and redistributed on the same terms as Perl itself.
+

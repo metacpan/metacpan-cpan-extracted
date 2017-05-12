@@ -1,0 +1,66 @@
+Revision history for Perl extension Perl6::Say.
+
+0.16  2010-07-14
+    - New maintainer: Alexandr Ciornii
+    - Build.PL added
+    - Tests fixed
+
+-----------------
+
+0.01  Thu Mar 25 22:00:02 2004
+	- original version; created by h2xs 1.22 with options
+		-A -P -X -f -n Perl6::Say
+
+0.02	Sun Mar 28 13:11:42 2004
+	- Fixed bug in Makefile (thanks Stefan!)
+
+0.03	Thu Mar 10 23:26:14 2005
+    - Changed $\ interaction in line with changes in Perl 6 design
+      (C<say @stuff> is now always equivalent to C<print @stuff, "\n">)
+    - Fixed multiple export (added import()) (thanks Schwern)
+
+0.04	Fri Apr  8 04:03:10 2005
+    - Added correct handling of default call to use $_, like print
+      (thanks Schwern)
+
+0.05	Mon Apr 25 22:42:54 2005
+
+
+0.5.1  Sun Jul 16 08:06:28 2006
+    - Fixed doc nit
+    - Corrected handling of C<select>'d default filehandles
+    - Fixed test using Test::Builder (thanks David, Jim, et al.)
+
+0.06 Jul 27 2006 (I think)
+    - First non-beta upload to CPAN by co-maintainer James E Keenan
+    - Many tests added and documentation expanded
+    - Now properly handles select-ed filehandles
+
+0.07 Wed Sep  6 21:49:18 EDT 2006
+    - Made Makefile.PL non-executable, per CPANTS recommendation.
+
+0.08 Sat May  5 12:51:29 EDT 2007
+    - Added SKIP blocks to 3 test files (05-, 07-, 09-) to skip tests that
+      require printing to in-memory file.  Modified POD accordingly.
+
+0.09 Sun May  6 21:03:30 EDT 2007
+    - Corrected calculation of number of skipped tests in t/09.
+
+0.10 Tue Oct 30 21:35:40 EDT 2007
+    - Require 5.6.2.
+
+0.11 Thu Nov  1 19:40:47 EDT 2007
+    - Require 5.6.2 in Makefile.PL.
+
+0.12 Sat Feb  9 19:35:26 AST 2008
+    - Provide documentation and examples on say() in Perl 5.10.
+
+0.13 Sun Mar 15 22:45:45 EDT 2009
+    - Regenerate to get latest META.yml format (per bug report from D.A.
+      Patrick:  https://rt.cpan.org/Public/Bug/Display.html?id=44102).
+
+0.14 Sun Mar 15 23:25:13 EDT 2009
+    - Re-did change in 0.13.
+
+0.15 Sun Mar 29 21:23:44 EDT 2009
+    - Require 5.8, mainly to shut up CPAN test that is failing on 5.6.2.

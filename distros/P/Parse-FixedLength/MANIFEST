@@ -1,0 +1,25 @@
+Changes
+FixedLength.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/alllengths.t
+t/autoload.t
+t/autonum.t
+t/base.t
+t/convert.t
+t/default.t
+t/delim.t
+t/href.t
+t/importall.t
+t/nopack.t
+t/packfmt.t
+t/pod.t
+t/podcov.t
+t/space.t
+t/subclass1.t
+t/subclass2.t
+t/testlib/Parse/FixedLength/FLTest.pm
+t/trim.t
+t/validate.t

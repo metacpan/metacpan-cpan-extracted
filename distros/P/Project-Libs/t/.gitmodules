@@ -1,0 +1,6 @@
+[submodule "modules/Plack"]
+	path = modules/Plack
+	url = https://github.com/miyagawa/Plack.git
+[submodule "modules/Devel-KYTProf"]
+	path = modules/Devel-KYTProf
+	url = git@github.com:onishi/perl5-devel-kytprof.git

@@ -1,0 +1,359 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>PerlSpeak - Perl Module for text to speech with festival, espeak, cepstral and others.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<ul>
+
+		<li><a href="#methods">METHODS</a></li>
+		<li><a href="#properties">PROPERTIES</a></li>
+	</ul>
+
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#changes">CHANGES</a></li>
+	<li><a href="#example">EXAMPLE</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<pre>
+ PerlSpeak - Perl Module for text to speech with festival, espeak, cepstral and others.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+ my $ps = PerlSpeak-&gt;new([property =&gt; value, property =&gt; value, ...]);</pre>
+<p>
+</p>
+<h2><a name="methods">METHODS</a></h2>
+<pre>
+ $ps = PerlSpeak-&gt;new([property =&gt; value, property =&gt; value, ...]);
+ # Creates a new instance of the PerlSpeak object.</pre>
+<pre>
+ $ps-&gt;say(&quot;Text to speak.&quot;);
+ $ps-&gt;say(&quot;file_name&quot;);
+ # The basic text to speech interface.
+ 
+ $ps-&gt;readfile(&quot;file_name&quot;);
+ # Reads contents of a text file.
+ 
+ $ps-&gt;file2wave(&quot;text_file_in&quot;, &quot;audio_file_out&quot;);
+ # Converts a text file to an audio file.</pre>
+<pre>
+ $path = $ps-&gt;filepicker(&quot;/start/directory&quot;);
+ # An audio file selector that returns a path to a file. If &quot;dir_return&quot; is true
+ # &quot;filepicker&quot; may also return the path to a directory.</pre>
+<pre>
+ $path = $ps-&gt;dirpicker(&quot;/start/directory&quot;);
+ # An audio directory selector that returns a path to a directroy.</pre>
+<pre>
+ $chr = $ps-&gt;getchr(); 
+ # Returns next character typed on keyboard</pre>
+<pre>
+ $ps-&gt;menu($prompt =&gt; $callback, ...)
+ # An audio menu executes callback when item is selected</pre>
+<pre>
+ $item = $ps-&gt;menu_list(@list);
+ # Returns element of @list selected by user.</pre>
+<pre>
+ $string = $ps-&gt;getString([$prompt]);
+ # Returns a string speaking each character as you type. Also handles backspaces</pre>
+<pre>
+ $boolean = $ps-&gt;confirm([$prompt]);
+ # Returns boolean. Prompts user to enter Y for yes or N for no.  Enter also returns true.</pre>
+<pre>
+ $ps-&gt;config_voice(&quot;voice_name&quot;, $voice_rate, $voice_volume, $voice_pitch);
+ # Configures voice. Excepts standard parameters for festival and espeak.
+ # For festival:
+ #   The voice rate values should be between 0.50 and 2.00;
+ #   The voice volume values should be between 0.33 and 6.00;
+ #   The voice pitch is not used.
+ # For espeak:
+ #   The voice rate values are words per minute. 160 is a standard setting;
+ #   The voice volume values should be between 0 and 20. 10 is a standard setting;
+ #   The voice pitch values should be between 0 and 99. 50 is a standard setting;
+ 
+ $ps-&gt;config_festival(&quot;voice_name&quot;, $voice_speed, $voice_volume);
+ # See as config_voice above.</pre>
+<pre>
+ $tts = $ps-&gt;tts_engine([&quot;tts_engine&quot;]); # Gets or Sets tts_engine property.
+ $voice = $ps-&gt;set_voice([&quot;voice_name&quot;]); # See config_voice above.
+ $rate = $ps-&gt;set_rate([$rate]); # See config_voice above.
+ $volume = $ps-&gt;set_volume([$volume]); # See config_voice above.
+ $pitch = $ps-&gt;set_pitch([$pitch]); # See config_voice above.</pre>
+<pre>
+ $voices = $ps-&gt;get_voices();
+ # Returns a refrence to a list of available voices in the language of $self-&gt;{lang} property.</pre>
+<pre>
+ $ps-&gt;festival_connect([$host, $port]);
+ # Must be used if using festival_server as the tts_engine.</pre>
+<pre>
+ $mime_type = $ps-&gt;getType($filename); # Returns Mime Type for $filename.</pre>
+<p>
+</p>
+<h2><a name="properties">PROPERTIES</a></h2>
+<pre>
+ # The default property settings should work in most cases. The exception is
+ # if you want to use a tts system other than festival or cepstral. The rest
+ # of the properties are included because I found them usefull in some instances.</pre>
+<pre>
+ $ps-&gt;{tts_engine} =&gt; $text; # Default is &quot;festival_pipe&quot;
+ # Valid values are &quot;festival&quot;, &quot;festival_server&quot;, &quot;festival_pipe&quot;, &quot;espeak&quot; or
+ # &quot;cepstral&quot; Other tts engines can be used by using the tts command properties.
+ 
+ $ps-&gt;{tts_command} =&gt; &quot;command text_arg&quot;; # Default is &quot;&quot;
+ # Command to read a text string. &quot;text_arg&quot; = text string.
+ 
+ $ps-&gt;{tts_file_command} =&gt; &quot;command file_arg&quot; # Default is &quot;&quot;
+ # Command to read a text file. &quot;file_arg&quot;  = path to text file to be read.
+ 
+ $ps-&gt;{file2wave_command} =&gt; &quot;command IN OUT&quot;; # Default is &quot;&quot;
+ # Command for text file to wave file. &quot;IN&quot; = input file &quot;OUT&quot; = output file.
+ # Not needed if tts_engine is festival&quot; or &quot;cepstral.
+ 
+ $ps-&gt;{no_dot_files} =&gt; $boolean; # Default is 1
+ $ Hides files that begin with a '.'
+ 
+ $ps-&gt;{hide_extentions} =&gt; $boolean;  # Default is 0
+ # Will hide file extensions.
+ # NOTE: If hiding extensions the no_dot_files property must be set to 1.
+ 
+ $ps-&gt;{make_readable} =&gt; &quot;regexp pattern&quot;; # default is &quot;[_\\]&quot;  
+ # will substitute spaces for regexp pattern 
+ 
+ $ps-&gt;{browsable} =&gt; $boolean; # Default is 1
+ # If true filepicker can browse other directories via the right and left arrows. 
+ 
+ $ps-&gt;{dir_return} =&gt; $boolean; # Default is 1
+ # If true filepicker may return directories as well as files.
+ 
+ $ps-&gt;{file_prefix} =&gt; $text; # Default is &quot;File&quot;
+ # For filepicker. Sets text to speak prior to file name. 
+ 
+ $ps-&gt;{dir_prefix} =&gt; &quot;text&quot;; # Default is &quot;Folder&quot;
+ # For filepicker and dirpicker. Sets text to speak prior to directory name.</pre>
+<pre>
+ $ps-&gt;{echo_off} =&gt; $boolean; # Default is 0
+ # If set to true, turns off printing of text to screen.</pre>
+<pre>
+ $ps-&gt;{voice} =&gt; $text; # # Use set_voice($voice) instead.
+ # Must be set to a valid voice name for tts_engine used. This is especially
+ # true for festival_server and festival_pipe</pre>
+<pre>
+ $ps-&gt;{lang} =&gt; $text; # Default is &quot;en&quot; for english.
+ # Used only if espeak is the tts_engine.</pre>
+<pre>
+ $ps-&gt;{rate} =&gt; $double; # Use set_rate($rate) instead.</pre>
+<pre>
+ $ps-&gt;{volume} =&gt; $double; # Use set_volume($volume) instead.</pre>
+<pre>
+ $ps-&gt;{pitch} =&gt; $double; # Use set_pitch($pitch) instead.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<pre>
+  PerlSpeak.pm is Perl Module for text to speech with festival or cepstral.
+  (Other tts systems may be used by setting the tts command properties).
+  PerlSpeak.pm includes several useful interface methods like an audio file 
+  selector and menu system. PerlSpeak.pm was developed to use in the 
+  Linux Speaks system, an audio interface to linux for blind users. 
+  More information can be found at the authors website <a href="http://www.joekamphaus.net">http://www.joekamphaus.net</a></pre>
+<p>
+</p>
+<hr />
+<h1><a name="changes">CHANGES</a></h1>
+<pre>
+ 1/9/2007 ver 0.03</pre>
+<pre>
+ * Fixed error handling for opendir and readdir.</pre>
+<pre>
+ * Added property tts_command =&gt; $string 
+    (insert &quot;text_arg&quot; where the text to speak should be.)</pre>
+<pre>
+ * Added property no_dot_files =&gt; $boolean default is 1
+    (Set to 0 to show hidden files)</pre>
+<pre>
+ * Fixed bug in tts_engine =&gt; &quot;cepstral&quot; (previously misspelled as cepstrel)</pre>
+<pre>
+ * Added funtionality to traverse directory tree up as well as down.
+    (user can now use the arrow keys for browsing and selecting
+    up and down browses files in current directory. Right selects the 
+    file or directory. Left moves up one directory like &quot;cd ..&quot;)</pre>
+<pre>
+ * Added property hide_extentions =&gt; $boolean to turn off speaking of file
+    extensions with the filepicker method. Default is 0.
+    (NOTE: If hiding extensions the no_dot_files property must be set to 1)
+    
+ * Added property &quot;make_readable&quot; which takes a regular expression as an
+    argument. PerlSpeak.pm substitues a space for characters that match
+    expression. The default is &quot;[_\\]&quot; which substitutes a space for &quot;\&quot;
+    and &quot;_&quot;.</pre>
+<pre>
+ 1/9/2007 ver 0.50
+ 
+ * Added funtionality for reading a text file. Method &quot;say&quot; will now take
+    text or a file name as an argument. Also added method &quot;readfile&quot; which
+    takes a file name as an argument. The property tts_file_command was also
+    added to accomodate tts systems other than festival or cepstral.</pre>
+<pre>
+ * Added funtionality for converting a text file to a wave file via the
+    &quot;file2wave&quot; method and optionally the &quot;file2wave_command&quot; property.
+ 
+ * Added properties &quot;file_prefix&quot; and &quot;dir_prefix&quot; to enable changing
+    text to speak prior to file and directory names in the &quot;filepicker&quot;
+    and &quot;dirpicker&quot; methods.
+    
+ * Added &quot;browsable&quot;, a boolean property which will togle the browsable feature
+    of the &quot;filepicker&quot; method. 
+    
+ * Added &quot;dir_return&quot;, a boolean property which will allows the &quot;filepicker&quot; 
+    method to return the path to a directory as well as the path to a file.
+    
+ * Changed required version of perl to 5.6. I see no reason why PerlSpeak.pm
+    should not work under perl 5.6, however, this has not yet been tested. If
+    you have problems with PerlSpeak on your version of perl let me know.</pre>
+<pre>
+ 10/10/2007 ver 1.50
+  * Added boolean property echo_off to turn off printing of text said to screen.</pre>
+<pre>
+  * Added method menu_list(@list) Returns element of @list selected by user.</pre>
+<pre>
+  * Added method getString() Returns a string speaking each character as you
+    type. Also handles backspaces.</pre>
+<pre>
+  * Added method conirm(). Returns boolean. Prompts user to enter Y for yes
+    or N for no.  Enter also returns true.</pre>
+<pre>
+  * Added shortcuts to the menu() method. You can press the number of menu
+    index or the letter of the first word in menu item to jump to that item.</pre>
+<pre>
+ 01/02/2008 ver 2.01
+  * Added suport for festival_server, festival_pipe, and espeak text to speech
+    engines. This includes several methods and properties such as voice, pitch
+    volume, and rate.</pre>
+<pre>
+  * Added method getType(filename) Returns mime type for filename.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="example">EXAMPLE</a></h1>
+<pre>
+  # Several examples can be found in the example directory included with the
+  # tarball for this module.</pre>
+<pre>
+  use PerlSpeak;
+  
+  my $ps = PerlSpeak-&gt;new();
+  
+  # Set properties
+  $ps-&gt;{tts_engine} = &quot;festival&quot;; # or cepstrel
+  # Optionally set your own tts command use text_arg where the text goes
+  $ps-&gt;{tts_command} =&gt; &quot;&quot;; 
+  $ps-&gt;{no_dot_files} =&gt; 1;
+  $ps-&gt;{hide_extentions} =&gt; 0;
+    
+   
+  # Audio file selectors
+  my $file = $ps-&gt;filepicker($ENV{HOME}); # Returns a file.
+  my $dir = $ps-&gt;dirpicker($ENV{HOME}); # Returns a directory.
+  
+  $ps-&gt;say(&quot;Hello World!&quot;); # The computer talks.</pre>
+<pre>
+  # Returns the next character typed on the keyboard
+  # May take 2 or 3 calls for escape sequences.
+  print $ps-&gt;getch();</pre>
+<pre>
+  # Make some sub refs to pass to menu  
+  my $email = sub {
+        print &quot;Email\n&quot;;
+  };
+  my $internet = sub {
+        print &quot;Internet\n&quot;;
+  };
+  my $docs = sub {
+        print &quot;Documents\n&quot;
+  };
+  my $mp3 = sub {
+        print &quot;MP3\n&quot;;  
+  };
+  my $cdaudio = sub {
+        print &quot;CD Audio\n&quot;
+  };
+  my $help = sub {
+        print &quot;Browse Help\n&quot;
+  };</pre>
+<pre>
+  # menu is a audio menu
+  # Pass menu a hash of &quot;text to speak&quot; =&gt; $callback pairs
+  $ps-&gt;menu(
+        &quot;E-mail Menu&quot; =&gt; $email,
+        &quot;Internet Menu&quot; =&gt; $internet,
+        &quot;Documents Menu&quot; =&gt; $docs,
+        &quot;M P 3 audio&quot; =&gt; $mp3,
+        &quot;C D audio&quot; =&gt; $cdaudio,
+        &quot;Browse help files&quot; =&gt; $help,
+  };</pre>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<pre>
+  More information can be found at the authors website <a href="http://www.joekamphaus.net">http://www.joekamphaus.net</a>
+  
+  The Festival Speech Synthesis System can be found at:
+    <a href="http://www.cstr.ed.ac.uk/projects/festival/">http://www.cstr.ed.ac.uk/projects/festival/</a></pre>
+<pre>
+  The eSpeak text to speech synthesizer can be found at:
+    <a href="http://espeak.sourceforge.net/">http://espeak.sourceforge.net/</a></pre>
+<pre>
+  Reasonably priced high quality proprietary software voices from Cepstral 
+  can be found at: <a href="http://www.cepstral.com">http://www.cepstral.com</a>.</pre>
+<pre>
+  The Flite (festival-lite) Speech Synthesis System can be found at:
+    <a href="http://www.speech.cs.cmu.edu/flite/index.html">http://www.speech.cs.cmu.edu/flite/index.html</a></pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Joe Kamphaus, &lt;<a href="mailto:joe@joekamphaus.net">joe@joekamphaus.net</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright (C) 2007 by Joe Kamphaus</p>
+<p># This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; version 2 of the License.
+
+</p>
+<p># This module is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+
+</p>
+
+</body>
+
+</html>

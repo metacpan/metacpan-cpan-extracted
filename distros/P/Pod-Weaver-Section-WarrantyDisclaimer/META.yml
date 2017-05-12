@@ -1,0 +1,37 @@
+---
+abstract: 'Add a standard DISCLAIMER OF WARRANTY section (for your Perl module)'
+author:
+  - 'Ryan C. Thompson <rct@thompsonclan.org>'
+build_requires:
+  Carp: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::More: 0.94
+  perl: 5.004
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Weaver-Section-WarrantyDisclaimer
+no_index:
+  directory:
+    - corpus
+requires:
+  Moose: 0
+  Moose::Autobox: 0
+  Pod::Elemental::Element::Nested: 0
+  Pod::Elemental::Element::Pod5::Ordinary: 0
+  Pod::Weaver::Role::Section: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/DarwinAwardWinner/Pod-Weaver-Section-WarrantyDisclaimer
+  repository: https://github.com/DarwinAwardWinner/Pod-Weaver-Section-WarrantyDisclaimer.git
+version: 0.121290

@@ -1,0 +1,9 @@
+<foo xmlns:petal="http://purl.org/petal/1.0/"
+     xmlns:petal-temp="urn:pepsdesign.com:petal:temp">
+	<bar baz="default" 
+	     buzz="default"
+	     quxx="default"
+	     petal:attributes="baz replace; buzz replace; quxx replace"
+	     petal-temp:attributes
+	         ="petal:attributes string:baz ${baz_data}${SC} buzz ${buzz_data}${SC} quxx ${quxx_data}" />
+</foo>

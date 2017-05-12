@@ -1,0 +1,166 @@
+=encoding iso-8859-13
+
+=head1 PAVADINIMAS
+
+perldelta - kas naujo perl v5.8.2
+
+=head1 SANTRAUKA
+
+Ðis dokumentas apraðo skirtumus tarp perlo 5.8.1 ir 5.8.2 versijø.
+
+Pirma perskaitykite L<perl58delta>, jeigu jûs atnaujinate perlà ið 
+senesnës versijos (kaip kad 5.6.1). L<perl58delta> apraðo skirtumus tarp 
+5.6.0 ir 5.8.0 versijø, o  L<perl581delta> -- skirtumus tarp 5.8.0 ir 
+5.8.1.
+
+=head1 Nesuderinami pokyèiai
+
+Tikimës, kad jokiø.
+
+=head1 Branduolio patobulinimai
+
+=head2 Asiociatyviøjø masyvø atsitiktinë tvarka
+
+Pataisyta asociatyviøjø masyvø atsitiktinë tvarka, kuri buvo ávesta 5.8.1 
+versijoje. Pasirodo, jog 5.8.1 versija buvo suderinama su 5.8.0 pirminiø tekstø
+lygyje, taèiau kai kuriais atvejais kompiliuotas kodas nebuvo suderinamas.
+5.8.2 versijoje yra keletas patobulinimø, kuriø pagalba kodas tiek kompiliuotame,
+tiek pirminiame lygyje yra pilnai suderinamas tiek su 5.8.0, tiek su 5.8.1 
+versija. Tuo paèiu ðis sprendimas iðsprendþia potencialià atakos galimybæ, dël 
+kurios ir buvo tobulinamaa asociatyviøjø masyvø atsitiktinë tvarka.
+
+Mes dëkojame Debian projektui uþ suteiktà pagalbà sprendþiant ðias problemas.
+Þiûrëkite L<perlsec/"Algorithmic Complexity Attacks"> jei norite daugiau suþinoti
+apie paèià potencialià atakà.
+
+=head2 Gijos
+
+Pataisyta keletas atminties nutekëjimo klaidø, susijusiø su kintamøjø dalinimusi 
+tarp keleto gijø.
+
+=head1 Moduliai ir Pragmos
+
+=head2 Atnaujinti Moduliai ir Pragmos
+
+Ðie moduliai buvo atnaujinti lyginant su Perl 5.8.1 versija:
+
+=over 4
+
+=item Devel::PPPort
+
+=item Digest::MD5
+
+=item ExtUtils::MakeMaker
+
+Dabar galima generuoti SIGNATURE bylà perduodant WriteMakefile() 
+funkcijai (SIGN => 1) jei yra ádiegtas Module::Signature. (Ðis 
+patobulinimas padarytas Autrijus Tang ið The Perl Foundation
+gautos stipendijos dëka)
+
+=item I18N::LangTags
+
+=item libnet
+
+=item MIME::Base64
+
+=item Pod::Perldoc
+
+=item strict
+
+Pagerinta dokumentacija
+
+=item Tie::Hash
+
+Pagerinta dokumentacija
+
+=item Time::HiRes
+
+=item Unicode::Collate
+
+=item Unicode::Normalize
+
+=item UNIVERSAL
+
+=back
+
+=head1 Rinktiniai klaidø pataisymai
+
+C<require> dabar laiko rezultatus laikinojoje atmintinëje taip kaip ir buvo 
+tikëtasi, jei keletà kartø nesëkmingai bandoma pakrauti modulá.
+
+Parsris dabar teisingai interpretuoja keletà neatpaþintø bylø testavimo 
+operatoriø sintaksës klaidø.
+
+=head1 Vidiniai pokyèiai
+
+Interpretatoriaus inicializacija dabar vyksta korektiðkiau, kai iðjungta 
+-DMULTIPLICITY. Tai turëtø padëti iðspræsti problemà, kai Perlo 
+interpretatorius buvo keletà kartø inicializuojamas ir sunaikinamas tame 
+paèiame procese.
+
+dup2() dabar naudoja PerlLIO abstrakcijos lygmená
+
+=head1 Problemos, susijusios su kai kuriomis platformomis
+
+Pakeisti dinaminiai linkerio nustatymai Soliaris ir OS X sistemose.
+Tai turëtø iðspræsti kai kurias XS moduliø kompiliavimo problemas.
+
+Pataisyti OS/2 lizdø (sockets) ir laikinøjø bylø riktai.
+
+OS X C<setreuid> ir panaðios funkcijos nelabai veikia -- perlas dabar 
+stengiasi kuo geriau apeiti apie ðià problemà.
+
+=head1 Ateities planai
+
+Nuo 5.8.3 mes tikimës iðeisti perlo kodà su maþesniais pokyèiais, bet daþniau.
+Tikimës kad taip greièiau galësime perkelti riktø pataisymus á stabiliàjà kodo
+ðakà ir kartu padarysime perlo atnaujinimo procesà áprastesná ir ne toká 
+skausmingà. Tai leis patiems vartotojams geriau pasirinkti kada jiems 
+patogiau atsinaujinti perlà. Dabartinis kodo uþðaldymo planas yra toks:
+
+=over 4
+
+=item *
+
+5.8.3 23:59:59 GMT, treèiadienis, Gruodþio 31, 2003
+
+=item *
+
+5.8.4 23:59:59 GMT, treèiadienis, Kovo 31, 2004
+
+=item *
+
+5.8.5 23:59:59 GMT, treèiadienis, Birþelio 30, 2004
+
+=back
+
+Po kodo uþðaldymo vyks testavimas, o po to greitai bus iðleidþiamas 
+ir galutinis kodas.
+
+Daugiau informacijos: L<perl581delta/"Future Directions">
+
+=head1 Praneðimai apie riktus
+
+Jeigu jûs manote kad radote riktà, pirma reiktø perþvelgti straipsnius 
+comp.lang.perl.misc naujienø grupëje bei perlo riktø duomenø bazëje
+F<http://bugs.perl.org/>.  Taipogi informacijos galima rasti adresu 
+F<http://www.perl.com/>.
+
+Jeigu manote kad radote riktà, apie kurá dar nebuvo praneðta, pasinaudokite 
+B<perlbug> programa, kuri yra kartu su perlu. Pasistenkite sumaþinti savo 
+rikto apraðymà iki kuo maþesnio testinio scenarijaus.
+Jûsø praneðimas apie riktà, kartu su C<perl -V> rezultatu bus nusiøstas 
+adresu perlbug@perl.org, kur já iðanalizuos perlo programuotojai. Riktus 
+galima narðyti adresu http://bugs.perl.org/
+
+=head1 Tolimesnë informacija
+
+Byloje F<Changes> yra iðsami informacija apie visus pokyèius.
+
+Byloje F<INSTALL> yra apraðymas kaip ádiegti Perlà.
+
+Byloje F<README> yra bendra informacija.
+
+Bylose F<Artistic> ir F<Copying> yra autoriniø teisiø informacija.
+
+=cut

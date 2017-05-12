@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Pod-Xhtml
+version:            1.61
+abstract:           Generate well-formed XHTML documents from POD format documentation
+author:
+    - British Broadcasting Corporation
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Pod::Parser:          0
+    Pod::ParseUtils:      0
+    Test::Assertions::TestScript:  0
+    Test::More:           0
+    URI::Escape:          0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,10 @@
+^.svn
+\/.svn\/
+setenv
+^_build
+\~$
+,v$
+.bak$
+.BAK$
+.old
+Pikeo-API-.*

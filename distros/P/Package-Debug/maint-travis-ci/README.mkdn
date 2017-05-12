@@ -1,0 +1,53 @@
+# ABOUT
+
+This repository contains a directory full of utilities to bolt on
+to CPAN-targeting distributions, to add useful `travis-ci` features to those dists.
+
+# PREREQS
+
+All that is needed at present to get started, is a copy of `git` that provides `git subtree`, and a copy of `Path::FindDev` from `CPAN`.
+
+You don't need `Path::FindDev` during deployment, its just used to streamline
+automated patching.
+
+# INSTALLING
+
+First, check out a copy of these scripts, it can be a temporary directory,
+and you'll only need to do this once.
+
+```shell
+$ mkdir /tmp/tci-scripts
+$ cd    /tmp/tci-scripts
+$ git   clone https://github.com/kentfredric/travis-scripts.git
+```
+
+Then, chdir to the root of your project
+
+```shell
+$ chdir $PROJECT
+```
+
+And lastly, execute the installer
+
+```shell
+$ /tmp/tci-scripts/sync_tree.pl
+```
+
+This will create the folder called `maint-travis-ci` within your distribution,
+with a tree installed by `git subtree`, which will track this distribution.
+
+To update your copy of `/maint-travis-ci` to the latest, simply execute
+
+```shell
+$ $PROJECT/maint-travis-ci/sync_tree.pl
+```
+
+While somewhere in your project.
+
+# CAVEATS
+
+Note, this tool uses `Path::FindDev`, and by proxy, `Path::IsDev` to find a development
+root directory somewhere in the ancestry of `$CWD`.
+
+As such, you will likely need to appease `Path::IsDev` by having a file of some description that
+marks the root of the development tree.

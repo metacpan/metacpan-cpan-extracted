@@ -1,0 +1,41 @@
+Revision history for Perl extension Plack::App::Directory::Markdown
+
+0.11 2017-03-28T10:07:55Z
+        - support prev and next pagination
+
+0.10 2017-03-27T13:23:12Z
+        - update script files
+        - add callback option (bayashi++)
+
+0.09 2015-01-11T16:13:16Z
+        - Make the displayed path clickable so it can be used as navigation (ranguard)
+
+0.08 2015-01-11T11:26:39Z
+        - depends on Plack::Middleware::Bootstrap
+        - change designs
+
+0.07 2013-06-18T02:32:10Z
+        - spelling fixes in synopsis (karenetheridge++)
+        - add dependency Text::Markdown
+
+0.06 2013-06-17T11:32:02Z
+        - Fixup dependencies
+        - some fix in pad-markdown.pl
+
+0.05 2013-05-05T17:41:57Z
+        - Switch to Minilla
+
+0.04    Mon Sep 10 15:06:00 2012
+        - fix SYNOPSIS
+
+0.03    Sun Sep 09 15:34:00 2012
+        - fix Usage of pad-markdown.pl
+        - use Plack::Runner in pad-markdown.pl
+
+0.02    Thu Aug 23 16:37:00 2012
+        - add command script pad-markdown.pl
+        - depend on Plack::App::DataSection
+        - update Bootstrap to 2.1.0
+
+0.01    Fri Aug 17 15:09:00 2012
+        - original version

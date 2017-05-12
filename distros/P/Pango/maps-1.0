@@ -1,0 +1,37 @@
+#
+# this file defines mappings only for types that existed in pango 1.0.x
+#
+
+PANGO_TYPE_ALIGNMENT	PangoAlignment	GEnum	Pango::Alignment
+PANGO_TYPE_ATTR_LIST	PangoAttrList	GBoxed	Pango::AttrList
+PANGO_TYPE_ATTR_TYPE	PangoAttrType	GEnum	Pango::AttrType
+PANGO_TYPE_COLOR	PangoColor	GBoxed	Pango::Color
+PANGO_TYPE_CONTEXT	PangoContext	GObject	Pango::Context
+PANGO_TYPE_COVERAGE_LEVEL	PangoCoverageLevel	GEnum	Pango::CoverageLevel
+PANGO_TYPE_DIRECTION	PangoDirection	GEnum	Pango::Direction
+PANGO_TYPE_FONT_DESCRIPTION	PangoFontDescription	GBoxed	Pango::FontDescription
+PANGO_TYPE_FONT_FACE	PangoFontFace	GObject	Pango::FontFace
+PANGO_TYPE_FONT_FAMILY	PangoFontFamily	GObject	Pango::FontFamily
+PANGO_TYPE_FONT_MAP	PangoFontMap	GObject	Pango::FontMap
+PANGO_TYPE_FONT_MASK	PangoFontMask	GFlags	Pango::FontMask
+PANGO_TYPE_FONT_METRICS	PangoFontMetrics	GBoxed	Pango::FontMetrics
+PANGO_TYPE_FONT	PangoFont	GObject	Pango::Font
+PANGO_TYPE_FONTSET	PangoFontset	GObject	Pango::Fontset
+PANGO_TYPE_GLYPH_STRING	PangoGlyphString	GBoxed	Pango::GlyphString
+PANGO_TYPE_LANGUAGE	PangoLanguage	GBoxed	Pango::Language
+PANGO_TYPE_LAYOUT	PangoLayout	GObject	Pango::Layout
+PANGO_TYPE_SCRIPT	PangoScript	GEnum	Pango::Script
+PANGO_TYPE_STRETCH	PangoStretch	GEnum	Pango::Stretch
+PANGO_TYPE_STYLE	PangoStyle	GEnum	Pango::Style
+PANGO_TYPE_TAB_ALIGN	PangoTabAlign	GEnum	Pango::TabAlign
+PANGO_TYPE_TAB_ARRAY	PangoTabArray	GBoxed	Pango::TabArray
+PANGO_TYPE_UNDERLINE	PangoUnderline	GEnum	Pango::Underline
+PANGO_TYPE_VARIANT	PangoVariant	GEnum	Pango::Variant
+PANGO_TYPE_WEIGHT	PangoWeight	GEnum	Pango::Weight
+PANGO_TYPE_WRAP_MODE	PangoWrapMode	GEnum	Pango::WrapMode
+
+# custom types
+PANGO_TYPE_ATTRIBUTE		PangoAttribute		GBoxed	Pango::Attribute
+PANGO_TYPE_ATTR_ITERATOR	PangoAttrIterator	GBoxed	Pango::AttrIterator
+PANGO_TYPE_LAYOUT_ITER		PangoLayoutIter		GBoxed	Pango::LayoutIter
+PANGO_TYPE_LAYOUT_LINE		PangoLayoutLine		GBoxed	Pango::LayoutLine

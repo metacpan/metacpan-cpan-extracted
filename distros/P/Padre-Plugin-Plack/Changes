@@ -1,0 +1,35 @@
+Revision history for Padre-Plugin-Plack
+
+1.200     2010-11-06 01:31:48 America/New_York
+    * Added Arabic translation (azawawi++)
+    * Added Turkish translation (burak++)
+    * Added Italian translation (sblandin++)
+    * Updated to use new Dist::Zilla::PluginBundle::PDONELAN
+
+0.101150  2010-04-24 21:32:22 EST5EDT
+    * Now works more seamlessly with Padre::Wx::Output
+    * Requires Padre 0.60
+
+0.100970  2010-04-07 15:34:50 EST5EDT
+    * Switched to Dist::Zilla
+
+0.04  2010-03-22
+    * Fixes crashes and weird behaviour with newer versions of Padre
+      (Padre::Document::get_mimetype was renamed to Padre::Document::mimetype)
+    * Adds Dutch translation (ddn123456++)
+    * Adds Brazilian Portuguese translation (garu++)
+    * Updated list of Plack::HandlerS
+    * Updated dot-psgi examples from Plack distro
+
+0.03  2009-12-24
+    * Replace Padre::Debug by Padre::Logger
+    * Removed github references
+    * Updated french translation (jquelin++)
+    * Fixed translation support
+    * Reviewed i18n messages
+
+0.02  2009-12-23
+    * Added french translation (jquelin++)
+
+0.01  2009-12-22
+    * First release

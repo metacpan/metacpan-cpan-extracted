@@ -1,0 +1,13 @@
+Revision history for Podcats-Markup
+
+0.08      2015-11-26 16:50:29 GMT
+
+  - Documented Pod::Cats::Parser::MGC, since I ran `prove t` instead of 
+    `dzil test`
+
+0.07      2015-11-22 14:52:58 GMT
+
+  - Converted to Dist::Zilla
+  - Removed DOM; parser fires events as they happen
+  - Removed given/when
+  - Added warnings about malformed POD

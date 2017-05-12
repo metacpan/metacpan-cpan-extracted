@@ -1,0 +1,19 @@
+POE/Component/SimpleLog
+=======================
+
+Think of this module as Log::Log4perl ( Log4j ).
+But simplified too much and shoehorned into POE's framework...
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+MORE INFO
+
+	# After installing:
+	perldoc POE::Component::SimpleLog

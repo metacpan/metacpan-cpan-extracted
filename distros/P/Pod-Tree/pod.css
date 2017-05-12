@@ -1,0 +1,17 @@
+/* Example style sheet for pod*2html converters */
+
+a:link { background: #ff8080 }
+body   { background: #f0f0f0 }
+code   { background: #c0ffc0 }
+dd     { background: #ffffe0 }
+dl     { background: #fffff0 }
+dt     { background: #ffffc0 }
+h1     { background: #ffc0c0 }
+h2     { background: #ffe0e0 }
+hr     { background: #ff0000; height: 5px }
+i      { background: #ffc0c0 }
+li     { background: #e0e0e0 }
+ol     { background: #fff0ff }
+p      { background: #f0f0ff }
+pre    { background: #f0fff0 }
+ul     { background: #f0ffff }

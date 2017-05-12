@@ -1,0 +1,13 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/gstreamer-0.10
+pluginsdir=${exec_prefix}/lib/farsight2-0.0
+
+Name: Farsight2
+Description: Farsight2 base classes and utilities
+Requires: gstreamer-0.10 gstreamer-base-0.10
+Version: 0.0.21
+Libs: -L${libdir} -lgstfarsight-0.10
+Cflags: -I${includedir}
+

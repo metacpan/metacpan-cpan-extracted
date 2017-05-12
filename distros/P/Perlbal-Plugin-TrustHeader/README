@@ -1,0 +1,48 @@
+Perlbal-Plugin-TrustHeader
+
+
+This module allows you to remove headers unless the client is trusted
+
+You can configure headers to be checked based on each service
+declared, although the service role has to be set to web_server
+
+For each header you want to check,  you have to specify the header
+name and a list of netmasks to trust
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Perlbal::Plugin::TrustHeader
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perlbal-Plugin-TrustHeader
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Perlbal-Plugin-TrustHeader
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Perlbal-Plugin-TrustHeader
+
+    Search CPAN
+        http://search.cpan.org/dist/Perlbal-Plugin-TrustHeader/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2009 Graham Barr
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

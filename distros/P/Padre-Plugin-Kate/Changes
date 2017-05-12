@@ -1,0 +1,25 @@
+Revision history for Padre-Plugin-Kate
+
+0.06   2010.12.06
+    Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+    Added nicer 'About' text (ZENOG)
+
+0.05   2010.10.29
+    Added support for C# (CHORNY)
+    Switched to Dist::Zilla (AZAWAWI)
+    Added compatibility with the latest Padre (AZAWAWI)
+    Added Arabic translation (AZAWAWI)
+
+0.04   2010.08.11
+    make compatible to newer Padre versions (ZENOG)
+    more informative README (ZENOG)
+    added support for BibTeX and Java (ZENOG)
+
+0.03   2010.07.12
+    Use mimetype instead of get_mimetype (Alexandr Ciornii)
+
+0.02   2009.09.18
+    Fix to allow PHP highlighting as well
+
+0.01   2009.07.23
+    First version released to the already suspicious world.

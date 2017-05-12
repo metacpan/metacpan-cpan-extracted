@@ -1,0 +1,38 @@
+#!/usr/bin/perl
+
+use Parse::YALALR::Build;
+
+my $testfile;
+my $language = 'perl';
+
+sub usage (;$) {
+    if (my $msg = shift) {
+	print "$0: $msg\n";
+    }
+    print "usage: $0 [--lang=c|perl] <grammar.y>\n";
+    exit 1;
+}
+
+foreach (@ARGV) {
+    if (/^--lang=(.*)/) {
+	$language = $1;
+    } elsif ($_ eq '-h' || '--help') {
+	usage();
+    } elsif (/^-/) {
+	usage("Unknown -option $_");
+    } elsif (defined $testfile) {
+	usage();
+    } else {
+	$testfile = $_;
+    }
+}
+
+open(SAMPLE, $testfile) or die "open $testfile: $!";
+$::t0 = time;
+my $builder = Parse::YALALR::Build->new($language, \*SAMPLE);
+my $parser = $builder->{parser};
+print "Done: time=".(time-$::t0)." seconds\n";
+
+print $parser->dump_parser();
+$builder->build_table();
+print $parser->stats();

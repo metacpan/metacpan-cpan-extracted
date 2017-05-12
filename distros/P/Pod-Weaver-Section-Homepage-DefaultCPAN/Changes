@@ -1,0 +1,28 @@
+Revision history for Pod-Weaver-Section-Homepage-DefaultCPAN
+
+0.05    2015-04-02 (PERLANCAR)
+
+	- [Bugfix] After we use DZR:AddTextToSection, we now have to add
+	  blank line ourselves.
+
+
+0.04    2015-04-01 (PERLANCAR)
+
+	- Remove Moose::Autobox.
+
+	- [Refactor] Use PWR::AddTextToSection.
+
+
+0.03    2015-01-07 (PERLANCAR)
+
+        - Add 'text' attribute to allow text to be customized (Erik Carlsson).
+
+
+0.02    2013-10-24 (SHARYANTO)
+
+        - No functional changes. Fix/update POD.
+
+
+0.01    2013-10-22 (SHARYANTO)
+
+        - First release.

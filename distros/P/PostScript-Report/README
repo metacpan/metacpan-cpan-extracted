@@ -1,0 +1,58 @@
+PostScript::Report version 0.13, released November 30, 2013
+
+
+PostScript::Report helps you generate nicely formatted reports using
+PostScript. You do not need any knowledge of PostScript to use this
+package (unless you want to create new Component types).
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+  Package                Minimum Version
+  ---------------------- ---------------
+  perl                    5.8.0
+  Carp                    
+  File::Spec              
+  List::Util              
+  Module::Runtime         
+  Moose                   0.90
+  Moose::Role             
+  MooseX::AttributeTree   0.02
+  MooseX::Types           
+  MooseX::Types::Moose    
+  PostScript::File        2.20
+  Scalar::Util            
+  String::RewritePrefix   
+  namespace::autoclean
+
+
+
+CHANGES
+    Here's what's new in version 0.13 of PostScript::Report:
+    (See the file "Changes" for the full revision history.)
+
+	- Builder now uses Module::Runtime to load classes
+	- Fix type library to be compatible with upcoming Moose 2.1200
+	  (fixes RT#90697 & RT#90698)
+	- Localize $@ before eval
+
+
+
+COPYRIGHT AND LICENSE
+
+Copyright 2010 Christopher J. Madsen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

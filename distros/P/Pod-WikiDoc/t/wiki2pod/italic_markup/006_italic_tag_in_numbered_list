@@ -1,0 +1,17 @@
+0 this text should be ~italic~ here
+0 this text should be ~italic and span
+multiple lines~
+#--------------------------------------------------------------------------#
+=over
+
+=item 1.
+
+this text should be I<italic> here
+
+=item 2.
+
+this text should be I<italic and span
+multiple lines>
+
+=back
+

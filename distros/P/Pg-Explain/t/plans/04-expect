@@ -1,0 +1,13 @@
+{
+    'scan_on' => {
+        'index_name' => 'test_pkey',
+        'table_name' => 'test'
+    },
+    'estimated_startup_cost' => '0',
+    'estimated_rows'         => '1',
+    'type'                   => 'Index Scan',
+    'extra_info'             => [ 'Index Cond: (id = 4)' ],
+    'estimated_total_cost'   => '8.27',
+    'estimated_row_width'    => '4',
+    'is_analyzed'            => 0,
+}

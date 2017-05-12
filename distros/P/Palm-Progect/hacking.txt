@@ -1,0 +1,176 @@
+
+This is a rough guide to the current architecture of Palm::Progect.
+
+Scripts
+=======
+- progconv
+   - command line interface to Palm::Progect
+   - finds which DB versions can be handled
+   - finds which Converters are available, and the options they take
+
+
+Modules
+=======
+- Palm::Progect                      # Main Progect user-visible API
+                                     # - brokers between the Palm::Progect::Record
+                                     #   and Palm::Progect::Prefs objects and
+                                     #   the Palm::PDB object
+                                     #   provides load_db/save_db for Progect pdb files
+                                     #   provides import_records/export_records
+                                     #   and import_prefs/export_prefs for other formats
+
+
+- Palm::Progect::Record              # Generic Record, category magic, category class methods
+- Palm::Progect::Prefs               # Generic Prefs
+
+- Palm::Progect::VersionDelegator    # Module that actually delegates to version-specific
+                                     # DB modules
+
+- Palm::Progect::DB_18::Record.pm    # Database v0.18 specific Record
+- Palm::Progect::DB_18::Prefs.pm     # Database v0.18 specific Prefs
+- Palm::Progect::DB_23::Record.pm    # Database v0.23 specific Record
+- Palm::Progect::DB_23::Prefs.pm     # Database v0.23 specific Prefs
+
+- Palm::Progect::Converter           # Generic converter class, delegates to specific converter
+- Palm::Progect::Converter::Text     # Converter for Text format
+- Palm::Progect::Converter::CSV      # Converter for CSV format
+- Palm::Progect::Converter::HTML     # Converter for HTML format (tbd)
+
+- Palm::Progect::Constants           # various constants and types
+- Palm::Progect::Date                # date string parsing and formatting
+
+Palm::Progect
+   | $palm_pdb   (Palm::Raw object - access to raw PDB data)
+   | $version    (Current preferred version to use when loading/saving Progect databases)
+   | @records    (list of record objects)
+   | $prefs      (single prefs object)
+
+   - new
+
+   - load_db (file => $file)
+
+   - save_db (file => $file, version => $version)
+
+   - import_records (type => $type, text => $text, file => $file, %other_args)
+        - some drivers will not support record import (e.g. HTML)
+
+        - $converter = Palm::Progect::Converter( type => $type, %other_args );
+
+        - @records = $converter->load_records(text => $text, file => $file );
+
+   - import_prefs
+        - some drivers will not support prefs import (e.g. HTML)
+
+        - $converter = Palm::Progect::Converter( type => $type )
+
+        - $prefs     = $converter->load_prefs(text => $text, file => $file );
+
+   - export_records ($type, $text)
+        - $converter = Palm::Progect::Converter( type => $type )
+
+        - $text = $converter->save_records(text => $text, file => $file );
+
+   - export_prefs
+        - $converter = Palm::Progect::Converter( type => $type )
+
+        - $prefs     = $converter->load_prefs(text => $text, file => $file );
+
+Palm::Progect::Record
+    # Base Record object - delegates to record type
+      specific to a particular database version,
+      e.g. Palm::Progect::DB_18::Record
+
+    # provides class methods to deal with categories:
+
+    set_categories(@categories) # where @categories is a list of appinfo-style
+                                # hashrefs in the form of:
+                                #     { name => 'Some cat', id => 7, renamed => 'who cares' }
+
+    get_categories()            # returns a list of appinfo-style category hashrefs
+
+    # Although version-specific Record classes handle all of the
+    # attributes of the Progect record (e.g. description, date_due,
+    # etc.), Palm::Progect::Record handles the category_id and
+    # category_name methods
+    # You can set a record's category_name to any string using
+    # $record->category_name.  Internally,
+    # the Palm::Progect::Record class will assign it a category id.
+    # If you know the category_id of the record, you can set it via
+    # $record->category_id.  However in this case, the id you assign
+    # must be the existing id of an existing category.
+
+
+Converter Modules
+=================
+
+Palm::Progect::Converter::*
+
+Each converter can provide class methods to describe its features and
+options in a way that the progconv program can understand.
+
+- provides_import()     # return true if the converter can import data from this format
+- provides_export()     # return true if the converter can export data to this format
+- accepted_extensions() # return a list of strings, each of which is a extension that a
+                        # file in this format would have.  For instance ('txt') for
+                        # text files
+
+- options_spec()        # return a hashref describing the options that
+                        # this converter's constructor accepts.  The hashref
+                        # is in the following format:
+                        #
+                        # <Option Name> => [ <Getopt Spec>, <Default>, <Usage String> ]
+                        #
+                        # Option Name:  name of the parameter as it will
+                        #               be passed to the converter's constructor
+                        #
+                        # Getopt Spec:  specification of the option in the format required by Getopt::Long
+                        #
+                        # Default:      the default value of the option
+                        #
+                        # Usage String: text describing this option which appears when
+                        #               the user types 'progconv --help'
+                        #
+                        # For example:
+                        #
+                        # tabstop => [ 'tabstop=i', 8, '  --tabstop=n Treat tabs as n spaces wide (default is 8)' ]
+
+
+Each converter also provides the following methods:
+
+load_records()   # load records from a file (only if the converter can import)
+save_records()   # save/print records (only if the converter can export)
+
+These are object methods.  Before they are called, the $self object will
+have been set up properly to contain the list of progect records.
+You can reference this list via $self->records;
+
+- load_records($self, $filename, $append)
+
+Load the records from $filename.  Create a new
+Palm::Progect::Record object for each record.
+Push this onto a list and store this list in $self->records.
+
+If the $append flag is true, then instead append this new list of
+records to the records in $self->records:
+
+    push @{$self->records}, @new_record_list;
+
+Otherwise, just assign it:
+
+    $self->records(\@new_record_list);
+
+- save_records($self, $filename, $append)
+
+Take the list of records in $self->records, translate them into the proper
+format, and write them to $filename.
+
+If $append is true, then append the records to $filename, otherwise
+clobber it.
+
+If $filename is not set, then print the list of records to STDOUT
+
+In both methods, you are encouraged to print informational progress
+messages to STDERR, unless the value of $self->quiet is true.
+
+
+

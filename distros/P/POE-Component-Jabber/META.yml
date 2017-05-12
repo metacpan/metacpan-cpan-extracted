@@ -1,0 +1,46 @@
+---
+name: POE-Component-Jabber
+version: 3.00
+author: []
+abstract: A POE Component for communicating over Jabber
+license: gpl
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+requires:
+  Authen::SASL: 2.12
+  Digest::SHA1: 2.11
+  MIME::Base64: 3.07_01
+  POE: 1.003
+  POE::Component::PubSub: 0.05
+  POE::Component::SSLify: 0.15
+  POE::Filter::XML: 0.35
+  perl: 5.10.0
+provides:
+  POE::Component::Jabber:
+    file: lib/POE/Component/Jabber.pm
+    version: 3.00
+  POE::Component::Jabber::Events:
+    file: lib/POE/Component/Jabber/Events.pm
+    version: 3.00
+  POE::Component::Jabber::J14:
+    file: lib/POE/Component/Jabber/J14.pm
+    version: 3.00
+  POE::Component::Jabber::J2:
+    file: lib/POE/Component/Jabber/J2.pm
+    version: 3.00
+  POE::Component::Jabber::Legacy:
+    file: lib/POE/Component/Jabber/Legacy.pm
+    version: 3.00
+  POE::Component::Jabber::Protocol:
+    file: lib/POE/Component/Jabber/Protocol.pm
+    version: 3.00
+  POE::Component::Jabber::ProtocolFactory:
+    file: lib/POE/Component/Jabber/ProtocolFactory.pm
+    version: 3.00
+  POE::Component::Jabber::XMPP:
+    file: lib/POE/Component/Jabber/XMPP.pm
+    version: 3.00
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

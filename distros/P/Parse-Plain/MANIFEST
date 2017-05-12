@@ -1,0 +1,15 @@
+Changes			What's new
+FAQ			Frequently Asked Questions
+lib/Parse/Plain.pm	Parse::Plain implementation
+MANIFEST		This file
+Makefile.PL		Writes the Makefile
+Parse-Plain-3.03.html	HTML documentation for Parse::Plain version 3.03
+README			Please do!
+TODO			ToDo list
+t/plain.t		test case
+t/tmpl/1.tmpl		test template file
+t/tmpl/2.tmpl		test template file
+t/tmpl/3.tmpl		test template file
+t/tmpl/4.tmpl		test template file
+t/tmpl/result		test results to compare
+

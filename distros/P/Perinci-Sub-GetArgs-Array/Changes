@@ -1,0 +1,101 @@
+Revision history for Perinci-Sub-GetArgs-Array
+
+0.16    2016-12-10 (PERLANCAR)
+
+	- Accept hash argument using key1=val1 key2=val2 ...
+
+
+0.15    2015-09-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.14     2014-07-08 (SHARYANTO)
+
+         - No functional changes.
+
+         - Use Perinci::Sub::Normalize to simplify code.
+
+         - Remove internal _args_p, replace with meta_is_normalized.
+
+
+0.13     2014-07-08 (SHARYANTO)
+
+         - No functional changes.
+
+         - Replace Data::Sah with Data::Sah::Normalize to reduce overhead/deps.
+
+
+0.12     2014-04-10 (SHARYANTO)
+
+         - No functional changes.
+
+         - Replace Data::Clone with Function::Fallback::CoreOrPP.
+
+
+0.11     2013-11-13 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Modify/empty 'array' argument (needed by Perinci::Sub::GetArgs::Argv
+           as that module also empties its argv argument).
+
+
+0.10     2013-08-15 (SHARYANTO)
+
+         - Fix metadata, update old arg name 'spec' to 'meta'.
+
+
+0.09     2012-02-22 (SHARYANTO)
+
+         - No functional changes. Minor bug fix.
+
+
+0.08     2012-02-22 (SHARYANTO)
+
+         - Rename distribution from Sub-Spec-GetArgs-Array to
+           Perinci-Sub-GetArgs-Array. Follow Rinci 1.1 specification.
+
+
+0.07     2012-01-27 (SHARYANTO)
+
+         - No functional changes. Update to Data-Sah-0.02.
+
+
+0.06     2012-01-20 (SHARYANTO)
+
+         - No functional changes. Mark deprecated.
+
+
+0.05     2011-11-23 (SHARYANTO)
+
+         - No functional changes. Replace Data::Sah::Util with Data::Sah.
+
+
+0.04     2011-08-31 (SHARYANTO)
+
+         - No functional changes. Updated because _parse_schema() is moved from
+           Sub::Spec::Utils to Data::Sah::Util.
+
+
+0.03     2011-08-25 (SHARYANTO)
+
+         - No functional changes. Update to Sub::Spec 0.15 (attr_hashes ->
+           clause_sets).
+
+
+0.02     2011-08-03 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - For string arg with arg_greedy=1, returned joined elements (with ' ')
+           instead of an arrayref, for convenience.
+
+
+0.01     2011-07-28 (SHARYANTO)
+
+         - First release.

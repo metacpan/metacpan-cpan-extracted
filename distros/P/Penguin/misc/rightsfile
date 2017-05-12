@@ -1,0 +1,15 @@
+# this is an example rightsfile.  It gives me more rights than
+# you may want me to have.  
+
+[Felix S. Gallo <fsg@ultranet.com>]
+:base_core :base_loop print :base_math
+
+# this is my happy blinky little cat.  Inside his cute little
+# cat body lurks the dark heart of evil, so don't give him
+# any good rights.
+[Map Gallo <mapthecat@amicus.com>]
+:base_core
+
+# this is the default case.
+[default]
+:default

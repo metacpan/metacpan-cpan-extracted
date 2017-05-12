@@ -1,0 +1,4 @@
+This is a text email attachment to be used  with 
+POE::Component::Client::SMTP
+
+

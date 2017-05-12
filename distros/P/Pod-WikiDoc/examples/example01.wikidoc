@@ -1,0 +1,26 @@
+# pass this file as an argument to "wikidoc"
+
+=begin wikidoc
+
+= NAME
+
+Foo::Bar - The Foo::Bar module
+
+= SYNOPSIS
+
+    use Foo::Bar;
+    Foo::Bar::wibble();
+
+= USAGE
+
+Using Foo::Bar is really simple:
+* wibble it
+* wobble it
+* wubble it
+
+= SEE ALSO
+
+0 Acme::Doh
+0 Acme::Whoops
+
+=end wikidoc

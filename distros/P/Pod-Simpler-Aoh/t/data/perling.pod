@@ -1,0 +1,46 @@
+=head1 NAME
+
+perlfaq3 - Programming Tools ($Revision: 1.38 $, $Date: 1999/05/23 16:08:30 $)
+
+=head1 DESCRIPTION
+
+This section of the FAQ answers questions related to programmer tools
+and programming support.
+
+=head2 How do I do (anything)?
+
+Have you looked at CPAN (see L<perlfaq2>)?  The chances are that
+someone has already written a module that can solve your problem.
+Have you read the appropriate man pages?  Here's a brief index:
+
+	Basics	        perldata, perlvar, perlsyn, perlop, perlsub
+	Execution	perlrun, perldebug
+	Functions	perlfunc
+	Objects		perlref, perlmod, perlobj, perltie
+	Data Structures	perlref, perllol, perldsc
+	Modules		perlmod, perlmodlib, perlsub
+	Regexes		perlre, perlfunc, perlop, perllocale
+	Moving to perl5	perltrap, perl
+	Linking w/C	perlxstut, perlxs, perlcall, perlguts, perlembed
+	Various 	http://www.perl.com/CPAN/doc/FMTEYEWTK/index.html
+			(not a man-page but still useful)
+
+A crude table of contents for the Perl man page set is found in L<perltoc>.
+
+=head2 How can I use Perl interactively?
+
+The typical approach uses the Perl debugger, described in the
+perldebug(1) man page, on an ``empty'' program, like this:
+
+    perl -de 42
+
+Now just type in any legal Perl code, and it will be immediately
+evaluated.  You can also examine the symbol table, get stack
+backtraces, check variable values, set breakpoints, and other
+operations typically found in symbolic debuggers.
+
+=head2 Is there a Perl shell?
+
+In general, no.  The Shell.pm module (distributed with Perl) makes
+Perl try commands which aren't part of the Perl language as shell
+commands.  perlsh from the source distribution is simplistic and

@@ -1,0 +1,9 @@
+Revision history for Perl extension Plucene::SearchEngine.
+
+1.1   Thu Aug 19 09:52:53 BST 2004
+    - Allow backends to return multiple documents
+
+0.01  Tue Aug  3 15:43:03 2004
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.0 -AX -n Plucene::SearchEngine
+

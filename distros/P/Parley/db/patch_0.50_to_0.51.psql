@@ -1,0 +1,23 @@
+-- Patch:
+--   From: 0.09
+--   To:   0.10
+--
+-- Description:
+--  new table for tracking when a viewer has last viewed a thread
+
+BEGIN;
+
+-- patch starts here --
+
+-- a table of person/forum to show who's a moderator
+CREATE TABLE forum_moderator (
+    person              integer     not null    references person,
+    forum               integer     not null    references forum,
+    can_moderate        boolean     not null    default true,
+
+    unique(person,forum)
+);
+
+-- patch ends here --
+
+COMMIT;

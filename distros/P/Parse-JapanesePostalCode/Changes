@@ -1,0 +1,11 @@
+Revision history for Perl extension Parse::JapaneseZipCode
+
+0.03    2015-08-23T15:47:28+09:00
+        - fixed to town_kana deplication in Kyoto (overlast++ lufia++)
+        - fixed to broken subtown_kan in the rare case (lufia++)
+
+0.02    2013-10-30T18:39:31+09:00
+        - fix failure when opening scalar ref that contains wide character (ytnobody++)
+
+0.01    Thu Aug  9 16:46:19 2012
+        - original version

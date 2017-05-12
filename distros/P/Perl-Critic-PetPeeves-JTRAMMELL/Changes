@@ -1,0 +1,15 @@
+Revision history for Perl-Critic-PetPeeves-JTRAMMELL
+
+0.03 - 2013-03-01
+-----------------
+* fixed parse error for more complicated assignments
+ - see [https://rt.cpan.org/Ticket/Display.html?id=81397]
+
+0.02 - 2011-01-27
+-----------------
+* fixed deps
+
+0.01 - 2008-04-16
+-----------------
+* added ProhibitUselessInitialization
+

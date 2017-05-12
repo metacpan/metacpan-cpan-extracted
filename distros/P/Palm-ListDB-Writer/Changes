@@ -1,0 +1,22 @@
+Revision history for Perl extension Palm::ListDB.
+
+1.13  Tue Apr 11 2017
+
+      Fix test problems with Perl 5.26+.
+
+1.12  Tue Apr 11 2017
+
+      Migrate CVS to Git.
+
+1.11.01  Wed Jun  2 15:31:00 CEST 2010
+        - Added requirement for G::L 2.33.
+
+1.11  Wed Jun  2 08:15:00 CEST 2010
+        - Changes t2 so it may succeed on Windows.
+
+1.xx  Sat Sep 13 11:35:41 CEST 2003
+	- Changed name to Palm::ListDB::Writer and released to CPAN.
+
+0.01  Sun Aug 31 20:49:19 2003
+	- Internal release.
+

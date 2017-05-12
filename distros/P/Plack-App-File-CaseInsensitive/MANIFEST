@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+cpanfile
+dist.ini
+lib/Plack/App/File/CaseInsensitive.pm
+t/Foo
+t/basic.t
+t/file.t
+t/release-pod-syntax.t

@@ -1,0 +1,19 @@
+================================
+2013-11-26 09:14:34 -0500 v1_174
+================================
+
+  commit e1adebfc39c6a164b5245fd5d6fbf68c0c3554a5
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Nov 26 09:14:34 2013 -0500
+  
+    Bump version for release.
+
+  commit 903d4561a669e934b4f66ccab4a5271b3be88b38
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Nov 26 09:04:06 2013 -0500
+  
+    [github #2] Add Chris Prather's example to the MANIFEST. 
+
+==============
+End of Excerpt
+==============

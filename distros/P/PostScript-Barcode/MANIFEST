@@ -1,0 +1,21 @@
+AUTHORS
+Build.PL
+Changes
+lib/PostScript/Barcode.pm
+lib/PostScript/Barcode/azteccode.pm
+lib/PostScript/Barcode/datamatrix.pm
+lib/PostScript/Barcode/GSAPI/Singleton.pm
+lib/PostScript/Barcode/Meta/Types.pm
+lib/PostScript/Barcode/qrcode.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/10-exception.t
+t/10-interface.t
+t/20-bug-empty-data-string.t
+t/20-bug-memleak.t
+t/20-bug-multiple-constructor.t
+t/20-bug-regression1.t
+SIGNATURE    Added here by Module::Build

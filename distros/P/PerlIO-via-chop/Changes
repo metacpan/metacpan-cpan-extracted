@@ -1,0 +1,4 @@
+____________________________________________________________________________
+[  1248] By: autrijus                              on 2002/10/07  14:07:23
+        Log: * perlio-via-chop, version 0.01.
+	   + Makefile.PL README chop.pm t/1-basic.t

@@ -1,0 +1,10 @@
+prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include
+ 
+Name: zzipwrap
+Version: 0.13.56
+Description: Callback Wrappers for ZZipLib
+Requires: zziplib
+Libs: -L${libdir} -lzzipwrap
+Cflags: -I${includedir}

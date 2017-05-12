@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+# vim: ts=8 sts=4 et sw=4 sr sta
+use strict;
+use warnings;
+
+# load required modules
+use YAML qw(LoadFile);
+use Config::General;
+# load the YAML file, parsed into a hash
+my $thingy = LoadFile('parley.yml');
+# create a new C::G object
+my $conf = new Config::General($thingy);
+# write it to disk
+$conf->save_file('parley.conf');

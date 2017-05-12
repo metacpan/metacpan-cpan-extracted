@@ -1,0 +1,208 @@
+Penguin's Security Level
+
+Penguin is designed to implement a layer of security around applications.
+However, a language can't do everything, and Penguin relies on several
+key assumptions which might be used to mount attacks on Penguin-aware
+services.  If you're planning on using Penguin for secure work, you
+should be aware of the risks and what you can do to ensure your security.
+
+The short story is that without privileged access to one of the two machines 
+involved in the transaction, an intruder has no known way to cause a
+drastic failure in Penguin.  Further, without privileged access to your
+machine, an intruder has no way of forcing you to run dangerous code.
+And, in all cases, Penguin does not add appreciably to the danger of
+running a machine connected to an insecure network.
+
+However, please don't take my word for it.  Read the following document
+carefully, mull the issues, read the source code, examine the algorithms
+involved (they're all published and non-proprietary), and decide for yourself
+the risk factor.  After all, Penguin is offered freely, with no warranty,
+and by using it you agree that I am not liable for any damages caused by
+the software, so I've got nothing to lose by lying. :)
+
+THE KNOWN ATTACKS
+
+1.  Alice is sending a Penguin application to Bob.  Maeve, listening
+in on the network, is able to determine
+    a) that Alice is sending an application to Bob,
+    b) that Alice and Bob have Perl 5.002 or greater installed,
+    c) that Alice and Bob have Penguin installed on their machines,
+    d) the text of the source code being sent,
+    e) Alice's public PGP key (if Alice is using the PGP Wrapper)
+    f) that Alice has PGP installed (" " " ")
+    g) the time.
+
+    attacks that can be mounted with this information:
+
+    1.  Maeve can use the fact that Alice is communicating with Bob
+        to mount attacks through other channels (perhaps by calling
+        up Bob on the phone, pretending that she's Alice, adding
+        verisimilitude to her story by talking about the Penguin
+        application)
+
+        What to do: make sure that the fact of your communication
+        does not convey information you're not willing to convey
+        (i.e. don't send Penguin applications to illicit lovers
+        over an insecure network).
+
+    2.  Maeve can use yet-unknown security problems in Perl 
+        to completely infiltrate both machines.
+
+        What to do: don't worry; trust that Perl's been seen by
+        enough people that it doesn't have time bombs that throw
+        open the gates to intruders.  The probability of this
+        attack is vanishingly small compared to others.
+
+    3.  Maeve can use yet-unknown security problems in Penguin
+        to completely infiltrate both machines.
+
+        What to do: examine the source code.  Communicate with
+        strong Perl coders who have examined the source code and
+        get their opinions.  Write code that attempts to overcome
+        the (small, relatively straightforward) Safe module, which
+        is the linchpin of Penguin's security.  Do not trust Penguin
+        just because this ASCII document suggests that it's a good idea.
+
+    4.  Maeve can examine the text of the code being sent and
+        exploit bugs in it to cause security breaches.
+
+        What to do: write good source code.  In the future,
+        you may have the option of encrypting your source code
+        at the same time that you sign it.  However, that will
+        only be security through obscurity.  This attack is easily
+        foiled by not trusting anyone with operations that could
+        conceivably cause security holes; however, I personally
+        feel one can relax enough to trust good coders with
+        most of those operations.  Another thing to do is to
+        wait for encrypted IP.
+
+    5.  Maeve can, knowing Alice's public PGP key, attack it
+        and compromise her secret key.  Maeve can then pretend
+        to be Alice, and can send Bob a Penguin application that
+        uses Alice's rights.
+
+        What to do:  feel relatively safe from this attack.
+        If Alice chooses a large (1536-bit-modulus or greater)
+        PGP key, then it's conjectured that breaking it using
+        known methods is mathematically impossible before
+        the universe collapses.  Read Bruce Schneier's _Applied
+        Cryptography_ for details in this area.
+
+    6.  Maeve can use the fact that Alice uses PGP against her.
+
+    What to do: worry if, and only if, the fact that you use PGP
+    can be used to harm you in some way.  For example, worry if
+    you're the offspring of a U.S. Senator who hates the fact
+    that cryptography is in the hands of the public; your exposure
+    could be embarrassing.  Everyone else should examine his or her
+    own country's laws on encryption and PGP to determine if it's
+    legal.  Commercial users should examine the RSA patents and
+    the PGP copyright to determine legal liability.
+
+    7.  Maeve can discover the time according to Alice's machine.
+
+    What to do: don't worry, unless the time on your machine can
+    be used to breach security through other methods.  As an
+    example, the Kerberos security system relies on all machines
+    across the network having virtually the same time.  An intruder
+    might be able to mount an attack against Kerberos if they know
+    that your machine is sufficiently out of synchronization with
+    another Kerberos machine on the network.
+
+
+2.  Alice is sending a program to Bob.  Maeve is actively on the network,
+and can intercept programs and place fraudulent programs on the net.
+
+    1.  Maeve can make sure the program never gets to Bob, but can
+    forge a return data packet that looks like the code got there.
+    Or, she can change the data packet that Bob does send.
+
+    What to do: only believe in code that is signed by a
+    known signing authority.  Currently, Data packets are not
+    signed, but Code packets can be.  Use other channels to 
+    verify sending and receipt of critical messages.
+
+    2.  Maeve can intercept Alice's program and send her own bogus
+    program.
+
+    What to do: don't worry.  Maeve cannot pretend to be Alice,
+    because Maeve cannot replicate Alice's digital signature or
+    extract it from the program.  Maeve cannot alter the signed
+    code without destroying the digital signature.  Consult the
+    PGP documentation for further discussion.
+
+    3.  Maeve can run a denial-of-service attack against Alice's or
+    Bob's machine by flooding either machine with an onslaught of
+    Penguin traffic.
+
+    What to do: make sure that your machine is properly firewalled
+    against networks accessible to malicious third parties.  This
+    problem is endemic to insecure networks, and cannot be dealt
+    with properly in software; future releases of Penguin daemons
+    which communicate with insecure networks will take whatever
+    measures can be taken to eliminate these.
+
+
+3.  Alice is sending a Penguin application to Bob.  Maeve has
+    non-privileged access to Alice's or Bob's machine.
+
+    There are no known Penguin-related attacks that a user
+    without access to Bob's or Alice's files or processes
+    can mount.  In addition, I personally believe that they
+    have a vanishingly small chance of existing.
+
+
+4.  Alice is sending a Penguin application to Bob (have you noticed
+    that she does this a lot?).  Maeve has privileged access
+    to Alice's or Bob's machine.
+
+    1.  Maeve can perfectly pretend to be the person whose
+    machine she has compromised.
+
+    What to do: don't give people whose machines might be compromised
+    the ability to perform powerful or possibly insecure operations
+    on your machine using Penguin.
+
+    2.  Maeve can perfectly pretend to be everyone else, to
+    the person whose machine she has compromised (by altering
+    the perl binary, the pgp binary, etc.)
+
+    What to do: don't let your machine get compromised.  Set up
+    defenses (such as Tripwire, Cops, MD5 checksums, hardware read-only
+    binary/script directories) in proportion to your perceived
+    loss in the event that such a compromise occurs.
+
+
+5.  Either Alice or Bob is Maeve.
+
+    What to do: trust people only so far.  Don't give powerful
+    rights to people who might be malicious, corrupt, subversive,
+    or merely hideously erroneous (i.e. human), and all other things
+    being equal, you'll only get damaged in proportion to the
+    degree to which you leave yourself open.
+
+6.  Felix Gallo, Malcolm Beattie, Tim Bunce and/or Larry Wall are
+    malicious hackers out to get you.
+
+    What to do: read the source code carefully to ensure that in
+    the event that one of us is malicious, evil, or stupid and
+    has reflected that in the code, that your security is not compromised.
+    If you're not a perl hacker, then ask someone who is to verify
+    the code and warrant its probability of tameness.
+
+
+If you've read this far, then good for you!  You've possibly gained
+some understanding of the issues involved in using and implementing
+a language and protocol designed to work across insecure networks
+with untrusted endpoints.  If you don't trust the Penguin author --
+and with the relatively low amount of public scrutiny my code has 
+received as of this writing, you probably have no good reason to
+do so -- then I urge you to read the code, examine the algorithms,
+understand the motivations, and attempt to break it yourself.  Only
+when enough of that sort of behavior has happened to Penguin will
+it truly be "safe to use".
+
+Felix Gallo
+Thu Apr 11 17:53:31 CDT 1996
+updated Wed Apr 17 14:04:42 CDT 1996
+rechecked Tue May 13 14:53:17 EDT 1997

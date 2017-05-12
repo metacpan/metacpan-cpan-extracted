@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         PowerTools-Data
+version:      0.04
+version_from: lib/PowerTools/Data.pm
+installdirs:  site
+requires:
+    Config::IniHash:               2.8
+    DBD::mysql:                    4.001
+    DBI:                           1.52
+    Time::HiRes:                   1.87
+    Time::Piece:                   1.11
+    Time::Piece::MySQL:            0.03
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

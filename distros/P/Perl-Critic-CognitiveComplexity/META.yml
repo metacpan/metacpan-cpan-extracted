@@ -1,0 +1,50 @@
+---
+abstract: 'Cognitive Complexity, Because Testability != Understandability'
+author:
+  - 'Oliver Trosien'
+build_requires:
+  Devel::Cover: '1.23'
+  Devel::Cover::Report::Clover: '1.01'
+  Minilla: v3.0.0
+  TAP::Harness::Archive: '0.18'
+  Test::More: '1.001014'
+  Test::Perl::Critic: '1.03'
+  experimental: '0.016'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.8, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-CognitiveComplexity
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Perl::Critic::CognitiveComplexity:
+    file: lib/Perl/Critic/CognitiveComplexity.pm
+    version: '0.5'
+  Perl::Critic::Policy::CognitiveComplexity::ProhibitExcessCognitiveComplexity:
+    file: lib/Perl/Critic/Policy/CognitiveComplexity/ProhibitExcessCognitiveComplexity.pm
+    version: '0.5'
+requires:
+  Perl::Critic: '1.126'
+  Readonly: '2.00'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/otrosien/Perl-Critic-CognitiveComplexity/issues
+  homepage: https://github.com/otrosien/Perl-Critic-CognitiveComplexity
+  repository: git://github.com/otrosien/Perl-Critic-CognitiveComplexity.git
+version: '0.5'
+x_authority: cpan:OTROSIEN
+x_contributors:
+  - 'Oliver Trosien <otrosien@epages.com>'

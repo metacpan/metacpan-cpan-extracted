@@ -1,0 +1,6 @@
+CHANGES
+DBI.pm
+Makefile.PL
+MANIFEST			This list of files
+t/no_tests_dont_email_me.t
+META.yml                                 Module meta-data (added by MakeMaker)

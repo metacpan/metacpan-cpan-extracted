@@ -1,0 +1,17 @@
+# $Id: Changes,v 1.3 2003/01/28 07:08:50 ilja Exp $
+
+0.03 2003-01-27
+        Added MQ_OPEN_MAX constant;
+        Added MQ_PRIO_MAX constant;
+        Added more tests.
+
+0.02 2003-01-23
+        Limited support for mq_notify() added;
+        Added blocking() method;
+        Fixed receive() method to return an empty list on error.
+
+0.01 2003-01-03
+        First alpha release.
+
+
+

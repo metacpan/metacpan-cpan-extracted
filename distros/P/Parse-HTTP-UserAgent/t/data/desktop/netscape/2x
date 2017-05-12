@@ -1,0 +1,21 @@
+[AGENT]
+
+Mozilla/2.0 (Win95; I)
+
+'parser'           => 'netscape',
+'strength'         => 'I',
+'os'               => 'Windows 95',
+'version_raw'      => '2.0',
+'version'          => '2.000',
+'name'             => 'Netscape'
+
+[AGENT]
+
+Mozilla/2.02Gold (WinNT; I)
+
+'parser'           => 'netscape',
+'strength'         => 'I',
+'os'               => 'Windows NT',
+'version_raw'      => '2.02Gold',
+'version'          => '2.020',
+'name'             => 'Netscape'

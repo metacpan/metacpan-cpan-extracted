@@ -1,0 +1,70 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!-- ZOOMSTOP -->
+
+<HTML>
+
+<!-- *** Created by pp2html, build 1.21 from PerlPoint-Converters 1.0202  -->
+
+<HEAD>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+
+<!-- ZOOMRESTART -->
+
+
+
+<TITLE>Version 1.01  12/19/2001</TITLE>
+</HEAD>
+
+<!-- ************************************************************** -->
+<BODY bgcolor="#FFFFFF" text="#000000" link="#0000CC" vlink="#AAAAAA" alink="#FF0000">
+<a name="Version 1.01  12/19/2001"></a>
+
+<H1>Version 1.01  12/19/2001
+</H1>
+
+<UL>
+<LI>Many changes ...</LI>
+<LI>Better documentation: run a &quot;make&quot; in <CODE>./doc</CODE> and look into the <CODE>./doc/PPDOC</CODE> subdirectory.</LI>
+<LI>Changes now in PerlPoint format; after &quot;make test&quot; see file <CODE>./doc/Changes.htm</CODE></LI>
+<LI><B>PerlPoint::Converters</B> module (docu and some common functions for converters)</LI>
+<LI>more keywords which are replaced with option values:</LI>
+</UL>
+<UL>
+
+<UL>
+<LI>LABEL_NEXT</LI>
+<LI>LABEL_PREV</LI>
+<LI>LABEL_INDEX</LI>
+<LI>LABEL_CONTENTS</LI>
+<LI>SLIDE_PREFIX</LI>
+<LI>SLIDE_SUFFIX</LI>
+<LI>IMAGE_REF</LI>
+</UL>
+</UL>
+
+<UL>
+<LI>use &quot;<CODE>IMAGE_REF/LOGO_IMAGE_FILENAME</CODE>&quot; in style template files</LI>
+<LI>Bug fixed: bullet images were not always copied to the image directory</LI>
+<LI><CODE>SLIDE_PREFIX</CODE> and <CODE>SLIDE_SUFFIX</CODE> used in frameset templates</LI>
+<LI><B>Bundle::PerlPoint</B> for easy installation via CPAN shell:</LI>
+</UL>
+
+
+<TABLE CELLPADDING=5><TR><TD bgcolor="#E5E5E5"><PRE>
+<B><FONT COLOR="#000000">
+ % perl -MCPAN -e shell
+ <U>cpan&gt;</U> install Bundle::PerlPoint</FONT></B></PRE></TD></TR></TABLE>
+
+<UL>
+<LI>javascript navigation now in a separate file which is included by the navigation templates files</LI>
+<LI>javascript navigation now uses fixed names for the frames instead of numbers (is now more independant from actual frameset layout)</LI>
+<LI>\E&lt; xxx &gt; now be possible in headlines</LI>
+<LI>test suite uses md5 checksums over generated files</LI>
+<LI>Tag \URL{url=target_name} (similar to \L{url=target_name}&lt;target_name&gt;)</LI>
+</UL>
+</BODY>
+</HTML>

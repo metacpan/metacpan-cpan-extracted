@@ -1,0 +1,8 @@
+# This checksums file has the format
+# FILENAME BASE64_MD5_HASH
+# where the file name and the MD5 hash are separated
+# by a TAB character, not arbitrary whitespace!
+modules_dists.dbm.zip	QwpkwtgYiUjglCaTi/x0XA
+scripts_dists.dbm.zip	QxNNauzjy59LZ7W5ow2dOA
+symlinks.dbm.zip	KBkx8SMWJmV7Qct1IoYMsw
+dependencies.dbm.zip	aKi2RJkG+49U76aotwO/fg

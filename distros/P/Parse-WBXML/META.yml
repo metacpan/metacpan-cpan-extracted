@@ -1,0 +1,23 @@
+---
+abstract: 'Support for WBXML as defined by the Open Mobile Alliance specs'
+author:
+  - 'Tom Molesworth <cpan@entitymodel.com>'
+build_requires:
+  Dir::Self: 0
+  File::Slurp: 0
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-WBXML
+requires:
+  I18N::Charset: 1.401
+  Mixin::Event::Dispatch: 0.003
+  Try::Tiny: 0
+  parent: 0
+version: 0.005

@@ -1,0 +1,132 @@
+#!/usr/bin/perl
+
+$^W=1;
+use strict;
+
+# sub POE::Kernel::TRACE_EVENTS () {1}
+# sub POE::Kernel::TRACE_RETURNS () {1}
+use POE::Kernel;
+
+eval {
+    Test::Client->spawn(@ARGV);
+    $poe_kernel->run();
+};
+warn $@ if $@;
+
+################################################################
+package Test::Client;
+use strict;
+
+use POE::Component::IKC::Client;
+use POE::Component::IKC::Responder;
+use POE::Session;
+use Data::Dumper;
+
+sub DEBUG { 0 }
+
+
+sub spawn 
+{
+    my($package, $type, $port)=@_;
+
+    $type .= $$;
+    $port ||= 1338;
+
+    POE::Session->create(
+        args=>[$type, $port],
+        package_states=>[
+            $package=>[qw(_start _stop registered
+                            first resp1 resp2 resp3
+                      )],
+        ]
+    );
+
+}
+
+sub _start
+{
+    DEBUG and warn "Client: _start\n";
+    my($kernel, $heap, $type, $port)=@_[KERNEL, HEAP, ARG0, ARG1];
+
+    $kernel->alias_set('Client');
+    POE::Component::IKC::Responder->spawn();
+
+    $heap->{name}=ucfirst $type;
+
+    my %args=(name=>"$heap->{name}Client");
+
+    DEBUG and warn "Client: $args{name}";
+
+    $kernel->post(IKC=>'monitor', Ikc=>{register=>'registered'});
+    $kernel->post(IKC=>'publish', Client=>[qw(resp1 resp2 resp3)]);
+
+
+    $args{port}=$port;
+    POE::Component::IKC::Client->spawn(%args);
+}
+
+sub _stop
+{
+    DEBUG and warn "Client: _stop\n";
+}
+
+sub registered
+{
+    DEBUG and warn "Client: registered\n";
+    my($kernel, $heap)=@_[KERNEL, HEAP];
+    sleep(0);
+    $kernel->yield('first');
+}
+
+########################################################
+sub first
+{
+    my($kernel, $heap)=@_[KERNEL, HEAP];
+    DEBUG and warn "Client: resp1\n";
+
+    $kernel->post(IKC=>'post', "poe://Ikc/test/post1" => 'I am');
+}
+
+
+########################################################
+sub resp1
+{
+    my($kernel, $heap, $ret)=@_[KERNEL, HEAP, ARG0];
+    DEBUG and warn "Client: resp1\n";
+
+    unless( $ret eq 'I am' ) {
+        die "resp1 got $ret";
+    }
+
+    $kernel->post( IKC=>'post', "poe://Ikc/test/post2" => [ qw( IRON MAN )] );
+}
+
+########################################################
+sub resp2
+{
+    my($kernel, $heap, $iron, $man)=@_[KERNEL, HEAP, ARG0, ARG1];
+    DEBUG and warn "Client: resp2\n";
+
+    unless( $iron eq 'IRON' and $man eq 'MAN' ) {
+        die "resp2 got '$iron', '$man'";
+    }
+
+    $kernel->post( IKC=>'post', "poe://Ikc/test/post3" => [] );
+
+}
+
+########################################################
+sub resp3
+{
+    my($kernel, $heap, $ret)=@_[KERNEL, HEAP, ARG0];
+    DEBUG and warn "Client: resp3\n";
+
+    unless( 'ARRAY' eq ref $ret and 0==@$ret ) {
+        die "resp3 got ", Dumper $ret;
+    }
+
+    $kernel->post( IKC=>'post', "poe://Ikc/test/done" );
+}
+
+__END__
+

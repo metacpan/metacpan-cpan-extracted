@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e133fb056dd6c733e22d30351735b8fa40cc5bce Changes
+SHA1 2b8b815229aa8a61e483fb4ba0588b8b6c491890 LICENSE
+SHA1 6392d1521b8407a9e7fa9424857d4cbb2b858e2c MANIFEST
+SHA1 65fc87768dd4726c04224aaaac361217a62e774e META.yml
+SHA1 e1d3215ff77c5c3b69be4635accbc3736ca09650 Makefile.PL
+SHA1 123290fa214afcf25d2609330423222c3e9c568f README
+SHA1 2fcc58b130624ce696fc3133c852321c21c9ff48 README.mkdn
+SHA1 dc13ce0dbb488a5de81c3f6519ee31acda17397a inc/Module/Install.pm
+SHA1 91c20cbda8ca41b4e8f9e0390faff635c2ebe839 inc/Module/Install/Base.pm
+SHA1 eaf50ccbacecb797f0527deb0221c8264f6c8bd8 inc/Module/Install/Can.pm
+SHA1 363c8931cc183444907684b71d6a379e4fc8edcb inc/Module/Install/Fetch.pm
+SHA1 5fd0e992f3615576d9428dc2ca4a2198b22b2957 inc/Module/Install/GithubMeta.pm
+SHA1 26ae1c0f5f352037b560414f216d7e3ac682f936 inc/Module/Install/Makefile.pm
+SHA1 ff97eb025b44c343d026c2a56a73d50c65319e95 inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 4c5ce519d404e242418f51dfe761287469e18e3a inc/Module/Install/Win32.pm
+SHA1 47a52cf8719a283c0efa2edab0088b5d67e0f23a inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 eed821215a8910a6b379273c93eb9f10d76a4d19 inc/Pod/Markdown.pm
+SHA1 1bfea09e43b2eebf050c39e2de6df87f5ebca11e lib/Process/SizeLimit/Core.pm
+SHA1 41afe2c04bb573b40e283e2b210ed70a47a3f8ba t/0-signature.t
+SHA1 e41b64c2233434a64ed88c40e8fc408551913602 t/1-osx.t
+SHA1 31ff8a42c406f9a8e1e4368b3221499a8f755fe9 t/2-basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlX8WGcACgkQtLPdNzw1AaC3NACeIWd/ynrVchZi+rkM3CRbO0Z9
+8xUAn0IsUAb2pK4addWoHyXSDlnKKFO5
+=Mv+/
+-----END PGP SIGNATURE-----

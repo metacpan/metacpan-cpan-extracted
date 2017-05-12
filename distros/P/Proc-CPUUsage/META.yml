@@ -1,0 +1,17 @@
+---
+abstract: 'measures the percentage of CPU the current process is using'
+author:
+  - 'Pedro Melo'
+generated_by: 'Dist::Zilla version 1.092830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Proc-CPUUsage
+requires:
+  BSD::Resource: 0
+  Test::More: 0.92
+  Time::HiRes: 0
+resources:
+  repository: http://github.com/melo/proc-metrics/
+version: 1.001

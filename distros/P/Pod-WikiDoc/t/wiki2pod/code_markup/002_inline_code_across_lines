@@ -1,0 +1,6 @@
+This {sub {}} should render as {code
+on two lines}
+#--------------------------------------------------------------------------#
+This C<<< sub {} >>> should render as C<<< code
+on two lines >>>
+

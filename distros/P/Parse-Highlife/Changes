@@ -1,0 +1,6 @@
+Revision history for Perl extension Parse::Highlife.
+
+0.01  Thu Aug 23 20:46:08 2012
+	- original version; created by h2xs 1.23 with options
+		-AX Parse::Highlife
+

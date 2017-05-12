@@ -1,0 +1,59 @@
+---
+abstract: 'provision hosting accounts on unix systems'
+author:
+  - 'Matt Simerson <msimerson@cpan.org>'
+build_requires:
+  Dist::Zilla: '1'
+  Dist::Zilla::Plugin::MinimumPerl: '0.1'
+  Test::More: '0.1'
+  Test::Pod: '0.1'
+  perl: '5.006001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Provision-Unix
+recommends:
+  NicTool: '1.02'
+  Proc::ProcessTable: '1'
+  Quota: '0.1'
+requires:
+  Apache::Admin::Config: '0.95'
+  Apache::ConfigFile: '1'
+  CPAN: '0'
+  Config::Tiny: '2'
+  Cwd: '0'
+  Data::Dumper: '0'
+  Date::Format: '0'
+  Digest::MD5: '1'
+  English: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Path: '2.08'
+  File::Spec: '0'
+  File::stat: '0'
+  Getopt::Long: '2.37'
+  LWP::Simple: '0'
+  LWP::UserAgent: '0'
+  Mail::Send: '1'
+  Params::Validate: '0.8'
+  Scalar::Util: '0'
+  Time::Local: '0'
+  URI: '1'
+  base: '0'
+  lib: '0'
+  perl: '5.006001'
+  strict: '0'
+  utf8: '1'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/msimerson/provision-unix/issues
+  homepage: https://github.com/msimerson/provision-unix/wiki
+  repository: git://github.com/msimerson/provision-unix.git
+version: '1.08'

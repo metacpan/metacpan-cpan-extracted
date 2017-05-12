@@ -1,0 +1,65 @@
+{
+   "abstract" : "Perl core essentials in a single import",
+   "author" : [
+      "Ali Anari <ali@anari.me>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Core",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PerlX::Define" : "0",
+            "PerlX::Maybe" : "0",
+            "Sub::Infix" : "0",
+            "Syntax::Feature::Try" : "0",
+            "constant" : "0",
+            "feature" : "0",
+            "match::simple" : "0",
+            "mro" : "0",
+            "perl" : "5.010_000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Modern" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aanari/Perl-Core/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/aanari/Perl-Core.git",
+         "web" : "https://github.com/aanari/Perl-Core"
+      }
+   },
+   "version" : "0.0100"
+}
+

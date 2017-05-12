@@ -1,0 +1,2 @@
+name = "Perl-PrereqScanner-Lite"
+badges = ["travis", "coveralls"]

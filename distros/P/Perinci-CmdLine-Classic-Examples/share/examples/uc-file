@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Classic;
+use Tie::Simple;
+
+our %SPEC;
+
+$SPEC{uc_file} = {
+    v => 1.1,
+    summary => 'Display file content, converted to uppercase',
+    args => {
+        path => {schema=>'str*', req=>1, pos=>0},
+    },
+};
+sub uc_file {
+    my %args = @_;
+    open my($fh), "<", $args{path} or return [500, "Can't open file: $!"];
+    my @ary;
+    tie @ary, "Tie::Simple", undef,
+        SHIFT     => sub { eof($fh) ? undef : uc(~~<$fh> // "") },
+            FETCHSIZE => sub { eof($fh) ? 0 : 1 };
+    [200, "OK", \@ary, {is_stream=>1}];
+}
+
+Perinci::CmdLine::Classic->new(url => '/main/uc_file')->run;
+

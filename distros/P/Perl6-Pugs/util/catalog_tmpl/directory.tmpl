@@ -1,0 +1,61 @@
+<hmtl>
+<head>
+<title>Test Catalog and Documentation cross reference.</title>
+ <link rel="stylesheet" type="text/css" 
+        href="http://dev.perl.org/css/perl.css" 
+        title="Default">
+ <style type="text/css">
+  <!--
+   th.test_pass { background-color: rgb(100, 250, 100); }
+   th.test_fail { background-color: rgb(250, 100, 100); }
+   th.test_todo { background-color: rgb(250, 250, 100); }
+   
+   td.test_pass { color: rgb(0, 250, 0); }
+   td.test_fail { color: rgb(250, 0, 0); }
+   td.test_todo { color: rgb(200, 200, 0); }
+  -->
+</style>
+       
+</head>
+<body>
+<a href="<TMPL_VAR name='parent'>index.html" >&#x2191;</a>
+<h1>  <TMPL_VAR name="directory"> </h1>
+<TMPL_IF name='directories'><h2>Sub-Directories</h2>
+<table>
+<tr valign="top">
+<td>
+<TMPL_LOOP name="directories">
+    <a href='<TMPL_VAR name="title">/index.html'><TMPL_VAR name="title"></a><br />
+    <TMPL_IF name="wrap"></td><td></TMPL_IF>
+</TMPL_LOOP>
+</td></tr>
+</table>
+</TMPL_IF>
+
+<TMPL_IF name='Files'>
+<h2>Files</h2>
+<table>
+<tr>
+  <th>Links</th>
+  <th class="test_pass">Pass</th>
+  <th class="test_todo">Todo</th>
+  <th class="test_fail">Fail</th>
+  <th class="test_skip">Skip</th>
+  <th>File</th>
+</tr>
+
+<TMPL_LOOP name="files">
+    <tr> 
+       <td><TMPL_VAR name="links"></td>
+       <td class="test_pass" title="ok"><TMPL_VAR name="ok"></td>
+       <td class="test_todo" title="todo"><TMPL_VAR name="todo"></td>
+       <td class="test_fail" title="failed"><TMPL_VAR name="failed"></td>
+       <td class="test_skip" title="skipped"><TMPL_VAR name="skipped"></td>
+       <td><a href='<TMPL_VAR name='file'>'><TMPL_VAR name="file"></a></td>
+    </tr>
+</TMPL_LOOP>
+</table>
+</TMPL_IF>
+</body>
+</html>
+

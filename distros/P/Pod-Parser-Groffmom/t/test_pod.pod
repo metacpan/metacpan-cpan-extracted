@@ -1,0 +1,66 @@
+=head1 NAME
+
+Some Doc
+
+=head1 SUBTITLE
+
+Some subtitle
+
+=head1 AUTHOR
+
+Curtis "Ovid" Poe
+
+=head1 COPYRIGHT
+
+2009, Some company
+
+=for mom COVER
+
+=for mom TOC
+
+=head1 This is an attempt to generate a groff_mom file
+
+=head2 This is another subheader
+
+We want POD text to I<automatically> be converted to the correct format.
+
+=over 4
+
+=item * First item
+
+=item * Second item
+
+=back
+
+=item * Second item
+
+=for mom NEWPAGE
+
+=head2 Verbatim sample
+
+ If at first you don't succeed ...
+ :wq
+
+=head2 This is a "subheader
+
+This is a paragraph
+
+=head2 Code sample
+
+=begin highlight Perl
+
+ ok my $parser = Pod::Parser::Groffmom->new,
+   'We should be able to create a new parser';
+ my $file = 't/test_pod.pod';
+ open my $fh, '<', $file or die "Cannot open ($file) for reading: $!";
+ 
+ can_ok $parser, 'parse_from_filehandle';
+ warning_like { $parser->parse_from_filehandle($fh) }
+     qr/^Found \Q(=item * Second item)\E outside of list at line \d+/,
+     '... and it should parse the file with a warning a bad =item';
+ is $parser->mom, get_mom(),
+     '... and it should render the correct mom';
+
+=end highlight
+
+Test name is Salvador FandiE<241>o

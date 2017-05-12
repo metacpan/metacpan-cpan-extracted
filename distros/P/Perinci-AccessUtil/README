@@ -1,0 +1,57 @@
+SYNOPSIS
+
+     use Perinci::AccessUtil qw(
+         strip_riap_stuffs_from_res
+         insert_riap_stuffs_to_res
+         decode_args_in_riap_req
+     );
+    
+     strip_riap_stuffs_from_res([200,"OK",undef,{"riap.v"=>1.1}]); # => [200,"OK",undef]
+     strip_riap_stuffs_from_res([200,"OK",undef,{"riap.foo"=>1}]); # => [501, "Unknown Riap attribute in result metadata: riap.foo"]
+    
+     insert_riap_stuffs_to_res([200,"OK",undef); # => [200,"OK",undef,{"riap.v"=>1.1}]
+    
+     decode_args_in_riap_req({v=>1.2, args=>{"a:base64"=>"AAAA"}}); # => {v=>1.2, args=>{a=>"\0\0\0"}}
+
+DESCRIPTION
+
+FUNCTIONS
+
+ insert_riap_stuffs_to_res($envres[, $def_ver, $nmeta, $decode]) => array
+
+    Starting in Riap protocol v1.2, server is required to return riap.v in
+    result metadata. This routine does just that. In addition to that, this
+    routine also encodes result with base64 when necessary.
+
+    This routine is used by Riap network server libraries, e.g.
+    Perinci::Access::HTTP::Server and Perinci::Access::Simple::Server.
+
+ strip_riap_stuffs_from_res($envres) => array
+
+    Starting in Riap protocol v1.2, client is required to check and strip
+    all riap.* keys in result metadata ($envres->[3]). This routine does
+    just that. In addition, this routine also decode result if
+    riap.result_encoding is set, so the user already gets the decoded
+    content.
+
+    This routine is used by Riap client libraries, e.g.
+    Perinci::Access::Lite, Perinci::Access::Perl, and
+    Perinci::Access::HTTP::Client, Perinci::Access::Simple::Client.
+
+    If there is no error, will return $envres with all riap.* keys already
+    stripped. If there is an error, an error response will be returned
+    instead. Either way, you can use the response returned by this function
+    to user.
+
+ decode_args_in_riap_req($req) => $req
+
+    Replace ARGNAME:base64 keys in arg in Riap request $req with their
+    decoded values. Only done when v key is at least 1.2.
+
+    This routine is used in Riap server libraries like in
+    Perinci::Access::HTTP::Server and Perinci::Access::Simple::Server::*.
+
+SEE ALSO
+
+    Riap, Perinci::Access.
+

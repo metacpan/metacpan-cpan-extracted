@@ -1,0 +1,13 @@
+<html>
+  <body>
+    <div metal:fill-slot="boo">Test Replace</div>
+
+    <div metal:define-macro="testmacro">
+      This should be included in the result,
+      however the following can be defined by
+      the including page:
+
+      <p metal:define-slot="boo">Test</p>
+    </div>
+  </body>
+</html>

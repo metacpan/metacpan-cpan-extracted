@@ -1,0 +1,28 @@
+PDL/NamedArgs version 0.01
+==========================
+
+Check out the POD documentation in NamedArgs.pm for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module is designed for use in conjunction with these other modules 
+and libraries though they are not required:
+   
+   PDL
+
+
+COPYRIGHT AND LICENCE
+
+May be distributed under the same terms as Perl.
+
+Copyright (C) 2001 John Cavanaugh
+

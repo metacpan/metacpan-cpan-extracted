@@ -1,0 +1,4 @@
+Revision history for perl module Plack::Session::Store::Echo
+
+1.00    2014-06-16
+        - Initial public release.

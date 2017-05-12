@@ -1,0 +1,134 @@
+0x406be489 in __wait4 () from /lib/libc.so.6
+#0  0x406be489 in __wait4 () from /lib/libc.so.6
+#1  0x4071c48c in __DTOR_END__ () from /lib/libc.so.6
+#2  0x405e28e5 in waitpid (pid=5139, stat_loc=0xbfffbae0, options=0)
+    at wrapsyscall.c:134
+#3  0x40083131 in gnome_segv_handle () from /usr/lib/libgnomeui.so.32
+#4  0x405e1522 in pthread_sighandler (signo=11, ctx={gs = 0, __gsh = 0, 
+      fs = 0, __fsh = 0, es = 43, __esh = 0, ds = 43, __dsh = 49168, 
+      edi = 134588640, esi = 1087877312, ebp = 3221208264, esp = 3221208160, 
+      ebx = 0, edx = 0, ecx = 3221208252, eax = 0, trapno = 14, err = 4, 
+      eip = 134632610, cs = 35, __csh = 0, eflags = 66198, 
+      esp_at_signal = 3221208160, ss = 43, __ssh = 0, fpstate = 0xbfffbbe0, 
+      oldmask = 2147483648, cr2 = 0}) at signals.c:91
+#5  0x4064c408 in __restore ()
+    at ../sysdeps/unix/sysv/linux/i386/sigaction.c:127
+#6  0x8064bca in mozilla_get_context_menu_type (b=0x894da80, event=0x8585dd4, 
+    img=0xbfffbe80, docshell=0xbfffbe84, link=0xbfffbe88) at mozilla.cpp:626
+#7  0x805a93b in dom_mouse_down_cb ()
+#8  0x401c4e29 in gtk_marshal_BOOL__POINTER () at gtkmarshal.c:470
+#9  0x401f29ed in gtk_handlers_run (handlers=0x85f2dc8, signal=0xbfffbf10, 
+    object=0x894da80, params=0xbfffbf54, after=0) at gtksignal.c:1917
+#10 0x401f1e32 in gtk_signal_real_emit (object=0x894da80, signal_id=160, 
+    params=0xbfffbf54) at gtksignal.c:1477
+#11 0x401eff35 in gtk_signal_emit () at gtksignal.c:234
+#12 0x404ea196 in GtkMozEmbedChromeEventListener::MouseDown ()
+   from /tmp/package/libgtkembedmoz.so
+#13 0x40e07da0 in NSGetModule () from /tmp/package/components/libgklayout.so
+#14 0x40a8f6f0 in NSGetModule () from /tmp/package/components/librdf.so
+#15 0x40a80939 in NSGetModule () from /tmp/package/components/librdf.so
+#16 0x40a80939 in NSGetModule () from /tmp/package/components/librdf.so
+#17 0x40a80939 in NSGetModule () from /tmp/package/components/librdf.so
+#18 0x40a80939 in NSGetModule () from /tmp/package/components/librdf.so
+#19 0x40a80939 in NSGetModule () from /tmp/package/components/librdf.so
+#20 0x40a83332 in NSGetModule () from /tmp/package/components/librdf.so
+#21 0x408c86d8 in GlobalWindowImpl::HandleDOMEvent ()
+   from /tmp/package/libjsdom.so
+#22 0x4101964c in NSGetModule () from /tmp/package/components/libgklayout.so
+#23 0x410300b6 in NSGetModule () from /tmp/package/components/libgklayout.so
+#24 0x40e93ccf in NSGetModule () from /tmp/package/components/libgklayout.so
+#25 0x410300b6 in NSGetModule () from /tmp/package/components/libgklayout.so
+#26 0x40e764a7 in NSGetModule () from /tmp/package/components/libgklayout.so
+#27 0x410300b6 in NSGetModule () from /tmp/package/components/libgklayout.so
+#28 0x40ecf287 in NSGetModule () from /tmp/package/components/libgklayout.so
+#29 0x410300b6 in NSGetModule () from /tmp/package/components/libgklayout.so
+#30 0x40edc5b7 in NSGetModule () from /tmp/package/components/libgklayout.so
+#31 0x410300b6 in NSGetModule () from /tmp/package/components/libgklayout.so
+#32 0x40eda497 in NSGetModule () from /tmp/package/components/libgklayout.so
+#33 0x410300b6 in NSGetModule () from /tmp/package/components/libgklayout.so
+#34 0x40ed37c3 in NSGetModule () from /tmp/package/components/libgklayout.so
+#35 0x410300b6 in NSGetModule () from /tmp/package/components/libgklayout.so
+#36 0x40ecf287 in NSGetModule () from /tmp/package/components/libgklayout.so
+#37 0x410300b6 in NSGetModule () from /tmp/package/components/libgklayout.so
+#38 0x40edc5b7 in NSGetModule () from /tmp/package/components/libgklayout.so
+#39 0x410300b6 in NSGetModule () from /tmp/package/components/libgklayout.so
+#40 0x40eda497 in NSGetModule () from /tmp/package/components/libgklayout.so
+#41 0x410300b6 in NSGetModule () from /tmp/package/components/libgklayout.so
+#42 0x40ed37c3 in NSGetModule () from /tmp/package/components/libgklayout.so
+#43 0x410300b6 in NSGetModule () from /tmp/package/components/libgklayout.so
+#44 0x40e85e4b in NSGetModule () from /tmp/package/components/libgklayout.so
+#45 0x410300b6 in NSGetModule () from /tmp/package/components/libgklayout.so
+#46 0x40e7fb77 in NSGetModule () from /tmp/package/components/libgklayout.so
+#47 0x410300b6 in NSGetModule () from /tmp/package/components/libgklayout.so
+#48 0x40e613a0 in NSGetModule () from /tmp/package/components/libgklayout.so
+#49 0x40e68953 in NSGetModule () from /tmp/package/components/libgklayout.so
+#50 0x410300b6 in NSGetModule () from /tmp/package/components/libgklayout.so
+#51 0x40ec8c4b in NSGetModule () from /tmp/package/components/libgklayout.so
+#52 0x4102c6c2 in NSGetModule () from /tmp/package/components/libgklayout.so
+#53 0x410541cf in NSGetModule () from /tmp/package/components/libgklayout.so
+#54 0x40e4c4c3 in NSGetModule () from /tmp/package/components/libgklayout.so
+#55 0x40e4c332 in NSGetModule () from /tmp/package/components/libgklayout.so
+#56 0x4138f2f9 in CPNBuffer type_info node ()
+   from /tmp/package/components/libgkview.so
+#57 0x4138f29e in CPNBuffer type_info node ()
+   from /tmp/package/components/libgkview.so
+#58 0x4138f29e in CPNBuffer type_info node ()
+   from /tmp/package/components/libgkview.so
+#59 0x41397c5e in CPNBuffer type_info node ()
+   from /tmp/package/components/libgkview.so
+#60 0x4138ecad in CPNBuffer type_info node ()
+   from /tmp/package/components/libgkview.so
+#61 0x40b5e27a in NSGetModule () from /tmp/package/components/libwidget_gtk.so
+#62 0x40b5e1a5 in NSGetModule () from /tmp/package/components/libwidget_gtk.so
+#63 0x40b5e300 in NSGetModule () from /tmp/package/components/libwidget_gtk.so
+#64 0x40b5ee00 in NSGetModule () from /tmp/package/components/libwidget_gtk.so
+#65 0x40b6279f in NSGetModule () from /tmp/package/components/libwidget_gtk.so
+#66 0x40b591d7 in NSGetModule () from /tmp/package/components/libwidget_gtk.so
+#67 0x40b5909a in NSGetModule () from /tmp/package/components/libwidget_gtk.so
+#68 0x4026e56b in gdk_event_dispatch (source_data=0x0, 
+    current_time=0xbffff730, user_data=0x0) at gdkevents.c:2129
+#69 0x4039c1b6 in g_main_dispatch (dispatch_time=0xbffff730) at gmain.c:656
+#70 0x4039c781 in g_main_iterate (block=1, dispatch=1) at gmain.c:877
+#71 0x4039c921 in g_main_run () at gmain.c:884
+#72 0x401c3919 in gtk_main () at gtkmain.c:807
+#73 0x8054651 in main ()
+#74 0x406461eb in __libc_start_main (main=0x8054340 <main>, argc=1, 
+    argv=0xbffff8c4, init=0x8052938 <_init>, fini=0x8067a98 <_fini>, 
+    rtld_fini=0x4000a610 <_dl_fini>, stack_end=0xbffff8bc)
+    at ../sysdeps/generic/libc-start.c:90
+#0  0x406be489 in __wait4 () from /lib/libc.so.6
+No locals.
+#1  0x4071c48c in __DTOR_END__ () from /lib/libc.so.6
+No symbol table info available.
+#2  0x405e28e5 in waitpid (pid=5139, stat_loc=0xbfffbae0, options=0)
+    at wrapsyscall.c:134
+stat_loc = (int *) 0xbfffbae0
+options = 0
+result = 0
+oldtype = 0
+#3  0x40083131 in gnome_segv_handle () from /usr/lib/libgnomeui.so.32
+No symbol table info available.
+#4  0x405e1522 in pthread_sighandler (signo=11, ctx={gs = 0, __gsh = 0, 
+      fs = 0, __fsh = 0, es = 43, __esh = 0, ds = 43, __dsh = 49168, 
+      edi = 134588640, esi = 1087877312, ebp = 3221208264, esp = 3221208160, 
+      ebx = 0, edx = 0, ecx = 3221208252, eax = 0, trapno = 14, err = 4, 
+      eip = 134632610, cs = 35, __csh = 0, eflags = 66198, 
+      esp_at_signal = 3221208160, ss = 43, __ssh = 0, fpstate = 0xbfffbbe0, 
+      oldmask = 2147483648, cr2 = 0}) at signals.c:91
+self = 0x405e86c0
+in_sighandler = 0x0
+#5  0x4064c408 in __restore ()
+    at ../sysdeps/unix/sysv/linux/i386/sigaction.c:127
+No locals.
+#6  0x8064bca in mozilla_get_context_menu_type (b=0x894da80, event=0x8585dd4, 
+    img=0xbfffbe80, docshell=0xbfffbe84, link=0xbfffbe88) at mozilla.cpp:626
+Current language:  auto; currently c++
+event = 0x40d7b0c0
+docshell = (gpointer *) 0x0
+res = 4294966784
+targetNode = {<nsCOMPtr_base> = {mRawPtr = 0xbfffbe6c}, <No data fields>}
+node = {<nsCOMPtr_base> = {mRawPtr = 0x8585dd4}, <No data fields>}
+flags = 140650480
+element = {<nsCOMPtr_base> = {mRawPtr = 0x0}, <No data fields>}
+#7  0x805a93b in dom_mouse_down_cb ()
+No symbol table info available.

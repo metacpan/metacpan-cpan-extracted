@@ -1,0 +1,25 @@
+2.2.5  13.03.2017
+        - compile with all warnings enabled
+2.2.4  30.01.2017
+        - move to C++11
+2.2.3  10.04.2015
+        - bugfix: Panda::Export was coredumping while creating a constant with non-string name
+2.2.2  10.02.2015
+        - doc improvement, no code changes
+2.2.1  03.02.2015
+        - bump version to require win32-friendly Panda::XS/Panda::Install
+2.2.0  01.02.2015
+        - now provides C API, so that you can now easily and efficiently create constants from XS code one-by-one or bulk.
+2.1.1  28.01.2015
+        - make the code support threaded perls
+        - set Panda::Install 0.2.2 as requirements as it has a critical bugfix
+2.1.0  26.09.2014
+        - constants creation speeded up by 25%
+        - constants importing (when 'use Class' or 'use Class ":const"') speeded up by 100%
+        - added support for list syntax when creating constants
+2.0.0  28.03.2014
+        - switch to Panda::Install & Panda::XS
+1.2    02.02.2014
+        - change compiler g++ -> c++
+1.1    09.02.2013
+        - first release

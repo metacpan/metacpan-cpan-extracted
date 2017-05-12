@@ -1,0 +1,14 @@
+Changes for perl/PDL module PDL::SVDSLEPc
+
+v0.003 Thu, 10 Dec 2015 15:33:35 +0100
+	+ fixes for SLEPc v3.2 (e.g. debian wheezy)
+	+ fixes & added docs for libopenmpi 1.6.5-8 (e.g. ubuntu 14.04.2)
+	+ fixes for nconv < nsv (n converged singular values < n requested singular values)
+	+ fixed wrongly succeeding bogus tests with unary ok()
+	  - tests now use Test::More and re-factored common test subroutines
+
+v0.002 Wed, 09 Dec 2015 09:13:29 +0100
+	+ check for libslepc availability with Devel::CheckLib (-> NA if not found)
+
+v0.001 Tue, 08 Dec 2015 15:13:32 +0100
+	+ initial version

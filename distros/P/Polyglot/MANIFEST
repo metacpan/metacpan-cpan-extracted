@@ -1,0 +1,21 @@
+bin/polyglot
+Changes
+examples/itunes.pg
+examples/Polyglot/iTunes.pm
+examples/Polyglot/Tart.pm
+examples/README
+examples/tart.pg
+INSTALL.SKIP
+lib/Polyglot.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/load.t
+t/pod.t
+t/pod_coverage.t
+t/test_manifest
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

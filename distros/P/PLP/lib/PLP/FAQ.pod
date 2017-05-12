@@ -1,0 +1,125 @@
+=head1 NAME
+
+PLP::FAQ - Frequently Asked Questions about PLP
+
+=head1 FAQ
+
+=over 10
+
+=item What does PLP stand for?
+
+PerlPage. The name used to be HTMPL, but HyperText Markup with Perl Language
+was too long.
+
+=item Is PLP hard to install?
+
+No, it actually is very simple and easy. Quick startup hints are in the PLP main
+documentation, extensive installation instructions are on the PLP website.
+
+=item Is Perl code harder than PHP code?
+
+Yes, it is. But when you get used to Perl, you will probably dislike PHP for
+the rest of your life. Perl is faster and far more powerful. For both Perl
+beginners and more advanced Perl coders, PerlMonks is a good Perl forum community.
+(Please note: PLP is not Perl. Perl is a complete programming language and is
+not restricted to web based applications. PLP B<uses> Perl, but many people
+use Perl without PLP.
+
+=item Can PLP be used with mod_perl?
+
+Yes. As of 3.00, PLP can be used with mod_perl! And it's very fast!
+
+=item You seem to promote dirty programming. Can I use strict with PLP?
+
+PLP can be used for quick-and-dirty hacks in a way similar to PHP. However, it
+is suitable for larger applications as well. You can use strict if you want.
+mod_perl Users might like to know that globals are automatically destroyed (as
+long as you do not switch packages).
+
+=item How can I make PLP faster?
+
+With mod_perl or FastCGI, PLP is a lot faster than with CGI.
+Instead of executing a new perl process for each request, the same interpreter
+will serve multiple pages.
+
+=item I already run persistently, can I make my scripts even faster?
+
+Well, you already have scripts that probably are faster than PHP equivalents,
+but speed maniacs always want more. Modules are cached, so with a proper module
+design, you can add a little more speed.
+
+=item Can I use Perl's CGI module with PLP?
+
+You certainly can! If you do not want %get and %post and the like, just don't
+use them. They will be generated on first access, so if you never access them,
+the hashes are never filled.
+
+If you want to use CGI.pm's header functions, C<select STDOUT;> first, to break
+out of PLP's tied C<PLPOUT> filehandle.
+
+=item Why does C<< <($filename)> >> not work?
+
+C<< <(...)> >> is a compile-time tag, opposed to C<include()>, which is evaluated
+at run-time. At compile time, variables are not yet known, and PLP will try to
+include a file literally called C<$filename>.
+
+    <: $filename = 'foo.inc.plp'; include($filename); :>
+
+=item Why do my variables not work in my C<include()>d file?
+
+That is because your variable is lexical (declared with C<my>), and the file is
+evaluated in its own scope, just as with Perl's built-in C<do> and C<require>.
+You can pass variables through subroutine parameters or by using globals
+variables. Another solution is using PLP's C<< <(...)> >> tag.
+
+=item But why do they work with C<< <()> >> then?
+
+Because it places the external file is placed inside of the other,
+B<before> the code is executed (at compile-time).
+
+=item Why do my C<END> blocks never get executed?
+
+These blocks are executed when the interpreter stops, which only occurs if you
+are running as CGI.  To catch the exit of a PLP script, use C<PLP_END> blocks instead.
+Please note that C<PLP_END> is a normal statement, so you may need a semicolon.
+
+    <html><body>
+    <: PLP_END { :>
+        </body></html>
+    <: } :>
+    contents
+
+=item Can I disable the error messages?
+
+You can not disable compile-time errors (syntax errors), but you can disable
+run-time errors. To do so, set the 0-bit (1) of C<$PLP::DEBUG> off. If you only
+want error reporting disabled for a single command, use Perl's C<eval BLOCK>
+function (not C<eval "">, but C<eval {}>, which is not slow or insecure.).
+
+    <: $PLP::DEBUG &= ~1; :>
+
+=item Can I have my own error messages?
+
+Yes, you can! Of course, you can not override compile-time errors like syntax
+errors, but run-time error messages use C<$PLP::ERROR>, which is a reference to a
+sub that gets two arguments: the error message itself, and an html-encoded
+version.
+
+    <:
+        $PLP::ERROR = sub {
+            my ($plain, $html) = @_;
+            print '<font color="red">', $html, '</font>';
+        };
+    :>
+
+=item Is there a way to see the headers that PLP sends?
+
+There is. Set C<$PLP::DEBUG>'s 1-bit (2), and it will output a plain text header
+before outputting the other one.
+
+    <: $PLP::DEBUG |= 2; :>
+
+=back
+
+=cut
+

@@ -1,0 +1,7 @@
+=head1 Some L<Links>
+
+The address for L<http://www.cpan.org/|CPAN>
+is L<http://www.cpan.org/>.
+
+Some other L<Wiki#down|Wiki> page.
+

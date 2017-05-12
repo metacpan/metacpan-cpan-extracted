@@ -1,0 +1,13 @@
+Build.PL
+Changes
+lib/Pod/Strip.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00_load.t
+t/10_strip.t
+t/11_replace_with_comments.t
+t/99_pod.t
+t/99_pod_coverage.t
+TODO

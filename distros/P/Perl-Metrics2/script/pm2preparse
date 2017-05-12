@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+
+# Index and preparse the contents of a minicpan checkout
+
+use 5.008;
+use strict;
+use warnings;
+use File::Find::Rule       ();
+use File::Find::Rule::VCS  ();
+use File::Find::Rule::Perl ();
+use PPI::Cache             ();
+use Perl::Metrics2         -DEBUG;
+use Perl::Metrics2::Parse  ();
+use CPAN::Mini::Visit      ();
+
+our $VERSION = '0.01';
+
+# Check params
+unless ( $ARGV[0] and -d $ARGV[0] ) {
+	die("Missing or invalid minicpan directory");
+}
+unless ( $ARGV[1] and -d $ARGV[1] ) {
+	die("Missing or invalid PPI::Cache directory");
+}
+
+# Run the parsing in a seperate process?
+my $delegate = 1;
+
+# Initialise the metrics instance
+print "Studying Metrics...\n";
+my $metrics = Perl::Metrics2->new(
+	cache => $ARGV[1],
+	study => 1,
+);
+
+# Generate the list of all existing cache documents
+print "Studying PPI Cache...\n";
+my %seen = ();
+foreach my $file ( File::Find::Rule->name('*.ppi')->relative->in( $ARGV[1] ) ) {
+	$file =~ /(\w+)\.ppi$/ or next;
+	$seen{"$1"} = 1;
+}
+print "Found " . scalar(keys %seen) . " PPI documents.\n";
+
+# Identify the distributions we need to unroll
+print "Determining archive list...\n";
+my %need = ();
+foreach my $cpan_file ( Perl::Metrics2::CpanFile->select ) {
+	my $md5 = $cpan_file->md5;
+
+	# Skip if already parsed
+	next if $seen{$md5};
+
+	# Skip if no metrics needed
+	next if $metrics->seen($md5);
+
+	# Need to process this tarball
+	my $release = $cpan_file->release;
+	my $one     = substr($release, 0, 1);
+	my $two     = substr($release, 0, 2);
+	$need{"$one/$two/$release"}++;
+}
+print "Need to process " . scalar(keys %need) . " archives.\n";
+
+# Generate the ignore rule
+# 1. Ignore anything not on the need list
+# 2. Ignore known pathalogical cases
+my $ignore = [ sub { ! $need{$_[0]} }, qr/PDF-API/ ];
+
+# Chop up the parsing on a per-archive basis
+# and process each one in a sub-process to contain the memory bloat.
+CPAN::Mini::Visit->new(
+	minicpan => $ARGV[0],
+	acme     => 1,
+	random   => 1,
+	ignore   => $ignore,
+	callback => sub {
+		my $the = shift;
+		print STDERR "# $the->{counter} - $the->{dist}\n";
+		my @files = File::Find::Rule->ignore_svn->perl_file->in($the->{tempdir});
+		next unless @files;
+
+		# Delegate the PPI processing of the files to a sub-process
+		my $parser = Perl::Metrics2::Parse->new(
+			cache => $ARGV[1],
+			files => [ @files ],
+		);
+		if ( $delegate ) {
+			$parser->delegate;
+		} else {
+			$parser->prepare;
+			$parser->run;
+		}
+		if ( $parser->{messages} ) {
+			print map { "#     $_\n" } @{$parser->{messages}};
+		}
+		if ( $parser->ok ) {
+			print "#     PASS\n";
+		} else {
+			print "#     FAIL\n";
+		}
+	},
+)->run;

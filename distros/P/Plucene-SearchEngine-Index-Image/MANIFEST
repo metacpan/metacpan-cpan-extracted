@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/generic.png
+t/Plucene-SearchEngine-Index-Image.t
+lib/Plucene/SearchEngine/Index/Image.pm
+META.yml                                 Module meta-data (added by MakeMaker)

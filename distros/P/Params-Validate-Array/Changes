@@ -1,0 +1,12 @@
+Revision history for Params-Validate-Array
+
+0.0.3  Sun Mar  8 15:03:26 2014
+  - Module was printing "Params::Validate::Array" from a BEGIN block. Taken
+    out
+
+0.0.2  Sun Mar  8 15:03:26 2014
+  - Corrected some errors in the POD
+
+0.0.1  Sat Mar  8 20:10:15 2014
+       Initial release.
+

@@ -1,0 +1,21 @@
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address               Foreign Address             State       PID/Program name
+tcp        0      0 127.0.0.1:1027              0.0.0.0:*                   LISTEN      -
+tcp        0      0 builder.localdomain:1028    *:*                         LISTEN
+tcp        0      0 127.0.0.1:58159             0.0.0.0:*                   LISTEN      -
+tcp        0      0 127.0.0.1:58160             0.0.0.0:*                   LISTEN      -
+tcp        0      0 127.0.0.1:7634              0.0.0.0:*                   LISTEN      -
+tcp        0      0 0.0.0.0:22                  0.0.0.0:*                   LISTEN      -
+tcp        0      0 0.0.0.0:631                 0.0.0.0:*                   LISTEN      -
+tcp        0      0 127.0.0.1:25                0.0.0.0:*                   LISTEN      1234/program with space
+tcp        0      0 192.168.0.103:44922         1.2.3.4:143                 ESTABLISHED 25820/thunderbird-b
+tcp6       0      0 ::1:1028                    :::*                        LISTEN      -
+udp        0      0 0.0.0.0:631                 0.0.0.0:*                               -
+udp        0      0 192.168.0.103:56668         0.0.0.0:*                               -
+udp        0      0 192.168.0.103:52753         0.0.0.0:*                               8888/opera
+udp6       0      0 :::42069                    :::*                                    -
+Active UNIX domain sockets (servers and established)
+Proto RefCnt Flags       Type       State         I-Node PID/Program name    Path
+unix  2      [ ]         DGRAM                    6906   -                   /var/spool/postfix/dev/log
+unix  2      [ ACC ]     STREAM     LISTENING     650654 -                   /tmp/orbit-t1/linc-76ff-0-3fc1dd3f2f2
+unix  2      [ ACC ]     STREAM     LISTENING     1121541 16933/kate 123     /tmp/orbit-s1/linc-4225-0-267d23358095e

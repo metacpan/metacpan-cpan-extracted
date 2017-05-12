@@ -1,0 +1,352 @@
+= random parrot-targeting notes
+
+AbsPIR: Prototype in P6, cross-compile to P5.
+- nested exprs
+- proper subs and attrs
+- removal of toxic sugar in PIR
+- everything a closure; scoping vars
+- structural unpacking for aggregate types
+- _not_ Pugs-specific
+
+in PMC = invar PMC
+
+inoutvar => invar # because the register never moves
+
+"direction"
+  outvar
+ inconst
+   invar
+    "labelconst" == inconst "I"
+    "labelvar" == invar "I"
+
+[$P0] ==> $P0 (k)
+[$S0] ==> $S0 (s)
+[$S0,$S1] ==> [$S0,$S1] (kc)
+[$P0,$P1] ==> [$P0,$P1] (kc)
+
+$P0->"method"
+$P0."method"
+
+target = sub_call
+targetlist = sub_call
+
+.sub calc_state :immediate
+    $P0 = .new FixedSizePMCArray
+    .return($P0)
+.end
+
+foo = addr LABEL;
+
+.sub Foo
+    .const .Sub some_compile_state = "calc_state"
+    push some_compile_state
+.end
+
+When there is only one key,
+    "p/s" => "k"
+    "sc"  => "sc"   # probably doesn't work
+    "pc"  => "pc"   # probably doesn't work
+    "i"   => "ki"
+    "ic"  => "kic"
+    _     => doesn't happen
+
+"type"
+  i  n p s    kc ::= [in * (i|n|p|s)]
+  |    |
+(ki)  (k)
+
+  (var/const) * (PMC,STR,NUM,INT)
+
+
+kc => key constant
+    ["a";"b"]
+ki => key uo
+
+
+set(in PMC, invar STR)
+set(in PMC, invar STR)
+set(in PMC, inconst STR)
+
+assign(in PMC, in INT)
+            assign(inconst PMC, in INT)
+
+
+cd editor ; make vim-install # very handy
+
+upon class_init, "entry" is bound to the typenum of the current class
+
+"map" means "autobox from" in pmc header
+
+"make archclean" is like "realclean" except no costly pmc regens
+
+"need_ext" is needed for all reference (paramatric) types
+
+We _always_ turn on
+    .pragma n_operators 1       # so prims become value-returning
+    .HLL "Perl6", "pugs_group"  # pugs* PMCs
+
+$Foo::Bar ::= 3;
+
+multi ""
+    newclass F, "^Int"
+    .sub f :multi(^Int, ^Int)
+    subclass()  # statically for SI
+    addparent() # for each parents in MI
+
+Toplevels:
+    - DEFAULT-UNIT-NAMESPACE
+        - "Main" by default, but if somebody did "module Test;"
+          as 1st line, then the entire file is under "Test"
+    - INIT sequence:
+        .namespace []
+
+        .sub _MAIN :main
+            # Initialize all namespaces
+            $P0 = find_global [""], "_INIT"
+            $P0()
+            $P0 = find_global ["Main"], "_INIT"
+            $P0()
+            $P0 = find_global ["Foo"], "_INIT"
+            $P0()
+            # ... go to &Main::MAIN ...
+            $P0 = find_global ["Main"], "&MAIN"
+            .return $P0()
+        .end
+
+        .sub _INIT :load :anon
+            store_global "::Class", _C_CLASS
+            store_global "::Object", _C_OBJECT
+        .end
+
+        .namespace [ "Main" ]
+        .sub _INIT :load :anon
+            .const .Sub _C_MAIN = "_INIT_C_MAIN"
+            .const .Sub _S_FOURTY_FIVE = "_INIT_S_FOURTY_FIVE"
+            # ... objspace setup ...
+            store_global "&MAIN", _C_MAIN
+            store_global "$FOURTY_FIVE", _S_FOURTY_FIVE
+        .end
+
+        # All the constant used in INIT
+        .sub _INIT_S_FOURTY_FIVE :immediate :anon
+            $P0 = new .PugsInt
+            $P0 = 3
+            $P0 = $P0 + 42
+            .return($P0)
+        .end
+
+        # anon sub inside named sub
+        sub f {
+            my ($sym, $sym2);
+            state $sym3 = 3;
+            $sym2 = sub g { $sym };
+            return $sym2;
+        }
+
+        .sub _INIT_C_F :anon :outer("_INIT_C_MAIN")
+            .const .Sub __INIT_INNER_0__ = "_INIT_C_ANON_0"
+            .sym pmc __DYN_INNER_0__
+            __DYN_INNER_0__ = newclosure __INIT_INNER_0__
+        .end
+
+        .sub _INIT_C_ANON_0 :anon :outer("_INIT_C_F")
+            $P0 = find_lex "$sym"
+            .return($P0)
+        .end
+
+
+        # This applies only to Code constants - no ":immediate"
+        .sub _INIT_C_MAIN :anon :outer("_INIT")
+            .const .Sub __SUB__ = "_INIT_C_MAIN"
+            .const .Sub __PRE__ = "_INIT_C_MAIN__PRE"
+            .const .Sub __POST__ = "_INIT_C_MAIN__POST"
+            .sym pmc _S_sym, _S_sym2, _S_sym3
+            .lex "$sym", _S_sym
+            .lex "$sym2", _S_sym2
+            .lex "$sym3", _S_sym3
+
+        FIRST:
+            # ...populate "state" stuff...
+            _S_sym3 = 3
+
+            # horrible hack: reset entry point
+            set_addr __SUB__, PRE
+
+            X = global "foo"
+            global "foo" = X
+
+        PRE:
+            pushmark 110287318023
+            pushaction __POST__
+            pushaction __UNDO__
+            pushaction __CATCH__
+
+            # Perl6's PRE{...} block, triggering on each sub call
+            __PRE__();
+        
+        BODY:
+            # ...main body...
+            $P0 = find_global "$FOURTY_FIVE"
+            $P0.say(); # assuming this works
+
+        KEEP:
+            popmark 110287318023
+            __KEEP__();
+            __POST__();
+            # ...
+
+        .end
+
+        .sub _INIT_C_MAIN__PRE :anon :outer("_INIT_C_MAIN")
+        .end
+        .sub _INIT_C_MAIN__POST :anon :outer("_INIT_C_MAIN")
+        .end
+        .sub _INIT_C_MAIN__CATCH :anon :outer("_INIT_C_MAIN")
+            .param int _seen_exception_
+            # only deal it with _seen_exception_ == 1
+        .end
+        .sub _INIT_C_MAIN__UNDO :anon :outer("_INIT_C_MAIN")
+            .param int _seen_exception_
+            # only deal it with _seen_exception_ == 0
+        .end
+
+
+        .namespace [ "Foo" ]
+        .sub _INIT :load :anon
+            .const .PugsInt _S_Bar = "3"
+            store_global "$Bar", _S_Foo_Bar
+        .end
+
+    - SUBS
+        - &MAIN
+
+For subs:
+    - .namespace [ "Main" ]       # ::Main
+      Sub (name)
+        .sub "SUB_NAME" :outer("OUTER_NAME")
+        .end
+    - .namespace [ "Foo"; "Bar" ] # ::Foo::Bar
+      Sub (unnamed)
+        .sub "__ANON_0__" :anon :outer("OUTER_NAME")
+        .end
+
+Inside Sub:
+    - Constant PMCs
+        .const .PMC_Type identifier = "...some_string..."
+        - ObjectSpace "constants" is loaded right there
+    - Var lookup form
+
+
+say "Hello":
+
+    .const .PugsStr __ANON_PugsStr_0__ = "Hello"
+    __ANON_PugsStr_0__.method();
+
+
+= Plan for extensible attributes
+
+We extend ParrotClass into PugsClass
+We extend ParrotObject into PugsObject
+Foreach PugsClass, a new Hash PMC is attached to it
+
+Foo = newclass "Foo"
+add_attribute Foo, "$.a"
+add_attribute Foo, "$.b"
+add_attribute Foo, "" # extra things! yay!
+                      # note we "don't" emit this under pugs -O (finalized)
+
+INIT-of-class, each object gets fresh SC_.a SC_.b and get are
+    get_attr'd
+
+class Foo {
+    has $.a;
+    has $.b;
+}
+
+# here is runtime
+class Foo is also {
+    has $.c;
+}
+Foo.HOW.add_attribute(...)
+
+So, all $!foo $!bar access need to emit
+    classoffset
+in each method that talks about them.
+
+-- get_attribute_str
+
+= Plan for ProtoObjects
+
+class Foo {
+    has $.x;
+    method bar { say 1 }
+}
+::Foo.x # error
+::Foo.bar # 1
+::Foo.new.x; # works
+::Foo.new.bar # 1
+
+To PugsClass PMC, we have a METHOD get_proto
+    -> returns a PugsObject PMC with class-id at that PugsClass
+    -> _but_ with the pristine vtable obtained by get_attrib_num(PCD_OBJECT_VTABLE)
+    -> _and_ fill in the attr slots with null/error/whatever-larry-prefers
+
+PugsObject
+
+PugsInt.pmc
+    METHOD
+
+$P0 = get_namespace ["parrot"; "String"]
+$P1 = find_global $P0, "lower"
+
+= Either: Hack the NS distribution so that unsigiled is jsut for methods
+
+class Foo {         # ->{str}   typed_ns
+    my $boo;        # $boo      boo#var
+    sub bar {       # &bar      bar#sub
+    }
+    method baz {    # &baz      baz#sub
+                    #  baz
+    }
+    method Blah {}  # &Blah     Blah#sub
+                    #  Blah
+    class Blah {    # ::Blah    Blah#ns
+    }
+}
+
+get_namespace ["Foo";"Blah"]
+get_namespace(get_namespace(()))
+->{"str"}{"str"}
+
+# ALSO MAIL P6I
+# remove_method => del_sub
+# get_method_list => ns->hack_iterate
+# compute_all_applicable_methods => metaclass->get_mro->iterate->>>ns->hack_iterate
+# find_next_method_by_name => not-yet
+    "super"
+        # sketch pseudocode to implement the native "super" opcode
+    shuffle an extra I* to mean the current-index-in-method-mro-chain
+    pass in an MRO-iterator as an extra argument
+
+class Foo { method f {} };
+class Bar is Foo { method f {super}};
+class Baz is Bar
+Baz.new.f
+
+
+Foo.can('bar'); # undef
+
+# for foreign objects, create a PugsObj shim around it and fake
+# the .can cache -- fortunately we are not bridging Python yet.
+
+= Or: hack find_method so that it doesn't go into find_method_direct_1
+
+# tail_yield()
+&foo := &yield; foo()
+
+
+= emit 
+
+MAIL P6I:
+- super
+- tail_yield

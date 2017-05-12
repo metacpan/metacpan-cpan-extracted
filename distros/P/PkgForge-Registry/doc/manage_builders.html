@@ -1,0 +1,188 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <title>PkgForge Admin - Builders</title>
+  <meta name="author" content="Stephen Quinney">
+</head>
+
+<body>
+<h1>PkgForge Admin - Builders</h1>
+
+<p>A platform can have multiple package builders, this is particularly
+useful for handling periods of heavy load (e.g. when porting to a new
+platform). Adding and removing builders is very simple and can be done
+as long as the platform exists. For all the following operations you
+will need to have access to the Registry DB as
+the <em>pkgforge_admin</em> user.</p>
+
+<h2>The builder admin tool</h2>
+
+<p>All package builder administration is done using
+the <em>builder</em> command of the <code>pkgforge</code> tool. This
+will be available on any machine which has the PkgForge-Registry
+software package installed, that includes the pkgforge master, website
+and all package builders.</p>
+
+<p>If you need to know the list of available commands you can type:</p>
+
+<pre>
+% pkgforge
+</pre>
+
+<p>and you will get a list like this:</pre>
+
+<pre>
+Available commands:
+
+    commands: list the application's commands
+        help: display a command's help screen
+
+      buildd: Build the next job in the queue
+     buildd2: Build the next job in the queue
+     builder: Manage builder entries in the registry
+    incoming: Process the incoming package queue
+  initserver: Initialise the Package Forge server environment
+    platform: Manage platform entries in the registry
+      submit: Submit a set of source packages for building
+
+</pre>
+
+<p>Further to this you can get help for a command like this:</p>
+
+<pre>
+% pkgforge help builder
+</pre>
+
+<p>Which will give the list of supported command-line options. For
+example:</p>
+
+<pre>
+pkgforge builder [-?] [long options...]
+
+	--configfile        Configuration file
+	--name              Builder name
+	-? --usage --help   Prints this usage information.
+	--platform          Builder platform name
+	--architecture      Builder platform architecture
+</pre>
+
+<p>If you want to know the list of available sub-commands just enter
+the command without anything else, for example:</p>
+
+<pre>
+% pkgforge builder
+</pre>
+
+<p>This gives the following output:</p>
+
+<pre>
+You must specify an action from: add, delete, list
+</pre>
+
+<p>Not all sub-commands will require all command-line options. You
+will be prompted if anything which is required has not been
+specified.</p>
+
+<h3>Configuration</h3>
+
+<p>By default the configuration for the Registry DB access is found in
+the <code>/etc/pkgforge/registry.yml</code> file. This can be changed
+using the <code>--configfile</code> command-line option. The contents
+of that file can be managed using the LCFG pkgforge
+component. Normally the contents should look something like:</p>
+
+<pre>
+--- 
+"host": 'pkgforge'
+"name": 'pkgforge'
+"user": 'pkgforge_admin'
+</pre>
+
+<p>For admin access to the PkgForge database you will need to
+configure the PostgreSQL <code>pg_ident.conf</code>
+and <code>pg_hba.conf</code> files to allow access to
+the <em>pkgforge_admin</em> user. This can be done in the LCFG profile
+for the host which holds the PkgForge Registry DB using the LCFG
+postgresql component like this:</p>
+
+<pre>
+!postgresql.ident               mADD(pkgf1)
+postgresql.idmap_pkgf1          pkgforge
+postgresql.sysname_pkgf1        user1
+postgresql.pgname_pkgf1         pkgforge_admin
+
+!postgresql.hostssl             mADD(pkgf1)
+postgresql.ssldatabase_pkgf1    pkgforge
+postgresql.ssluser_pkgf1        pkgforge_admin
+!postgresql.ssladdress_pkgf1    mHOSTIP(host1.example.org)
+postgresql.sslnetmask_pkgf1     255.255.255.255
+postgresql.sslauthtype_pkgf1    krb5
+!postgresql.sslauthopt_pkgf1    mSET(map=<%postgresql.idmap_pkgf1%>)
+</pre>
+
+<p>Where <code>user1</code> is your system username
+and <code>host1.example.org</code> is your host name. This example
+users Kerberos authentication but a similar setup could be done using
+password authentication.</p>
+
+<h2>List Current Builders</h2>
+
+<p>To list all the currently registered package builders use the
+following command:</p>
+
+<pre>
+% pkgforge builder list
+</pre>
+
+<p>This will return a list which looks something like:</p>
+
+<pre>
+Builder		Platform	Architecture
+=============================================
+bigfan_f13	f13		i386
+bigfan_f1364	f13		x86_64
+bressler_sl6	sl6		i386
+bressler_sl664	sl6		x86_64
+circle_sl564	sl5		x86_64
+elman_sl5	sl5		i386
+elman_sl564	sl5		x86_64
+gates_f13	f13		i386
+gates_f1364	f13		x86_64
+prague_sl5	sl5		i386
+</pre>
+
+<p>This is just the list of registered builders. It is possible that
+some of the builders are no longer active.</p>
+
+<h2>Adding new Builders</h2>
+
+<p>Adding a new package builder for a platform is very
+straightforward. The name of the platform and the architecture for
+which you intend to build packages are required. A new unique name for
+the builder is also required, normally this is based on the name of
+the machine and the name of the platform (e.g. <code>bigfan_f13</code>
+or <code>bressler_sl664</code>).</p>
+
+<pre>
+% pkgforge builder add --name bigfan_f13 --platform f13 --arch i386
+</pre>
+
+<p>Note that if a platform is not marked as <em>active</em> then new
+jobs will never be registered and the builder will not actually do
+anything.</p>
+
+<p>Once a builder is added to the Registry database then ACLs must be
+added to the PostgreSQL configuration. Information on how to do this
+is given in the <a href="admin.html">registry admin pages.</p>
+
+<h2>Removing Builders</h2>
+
+<p>It is not necessary to ever remove builders from the database but
+it may be desirable for tidiness reasons. It is done like this:</p>
+
+<pre>
+% pkgforge builder delete --name prague_sl5
+</pre>
+
+</body>
+</html>

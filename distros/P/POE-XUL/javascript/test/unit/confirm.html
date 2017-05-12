@@ -1,0 +1,142 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" >
+<title>Authentification</title>
+
+<script type="text/javascript" src="../../lib/prototype.js"></script>
+<script type="text/javascript" src="../../lib/scriptaculous.js"></script>
+<script type="text/javascript" src="../../lib/unittest.js"></script>
+<script type="text/javascript" src="../../src/util.js"></script>
+<script type="text/javascript" src="../../src/formated.js"></script>
+<script type="text/javascript" src="../../src/confirm.js"></script>
+
+<link rel="stylesheet" href="../test.css" type="text/css" />
+  
+</head>
+<body>
+<p>Test util.js</p>
+<!-- Log output -->
+<div id="testlog"> </div>
+
+<div id="confirmations">
+<form>
+    <input type="text" id="honk" name="honk" value="honk" />
+    <input type="text" id="bonk" name="bonk" value="bonk" />
+    <input type="text" id="zonk" name="zonk" value="zonk" />
+    <input type="hidden" id="changed" name="changed" value="XX" />
+</form>
+</div>
+<script type="text/javascript">
+
+function Something ( id ) {
+    this.ID = id;
+}
+
+Something.prototype.validate = function ( on_submit ) {
+    return true;
+}
+
+
+Something.prototype.changed = function () {
+    return true;
+}
+
+formated[ 'zonk' ] = new Something ( 'zonk' );
+
+
+// --------------------------------------------------------
+new Test.Unit.Runner( {
+    
+    // Loaded
+    test_loaded: function() { 
+        this.assertNotNull( ConfirmChange.prototype.validate, 
+                                    "ConfirmChange class is defined" );
+    },
+    
+    // ------------
+    test_build: function() {
+        var o = new ConfirmChange( 'changed', "You can't see this", 
+                                    [ 'honk', 'bonk' ] );
+        this.assertNotNull( o, "Created an object" );
+    },
+
+    // ------------
+    test_nochange: function() {
+        var o = new ConfirmChange( 'changed', "You can't see this", 
+                                    [ 'honk', 'bonk' ] );
+        this.assertNotNull( o, "Created an object" );
+        
+        var ret = o.validate();
+        this.assert( ret, "Only do something on_submit" );
+        
+        ret = o.validate( 1 );
+        this.assert( ret, "Validate is always true" );
+
+        var hidden = $( 'changed' );
+        this.assertEqual( "XX", hidden.value, "No change so nothing verified" );
+    },
+
+    // ------------
+    test_changed: function() {
+        var o = new ConfirmChange( 'changed', "Please press OK", 
+                                    [ 'honk', 'bonk' ] );
+        this.assertNotNull( o, "Created an object" );
+        
+        var honk = $( 'honk' );
+        honk.value = 'something else';
+        
+        var ret = o.validate();
+        this.assert( ret, "Only do something on_submit" );
+
+        var hidden = $( 'changed' );
+        this.assertEqual( "XX", hidden.value, "Not submit, so nothing verified" );
+        
+        ret = o.validate( 1 );
+        this.assert( ret, "Validate is always true" );
+
+        this.assertEqual( "1", hidden.value, "You must press OK" );
+
+        o = new ConfirmChange( 'changed', "Please press Cancel", 
+                                    [ 'honk', 'bonk' ] );
+        this.assertNotNull( o, "Created an object" );
+        
+        honk.value = 'something else again';
+        
+        ret = o.validate( 1 );
+        this.assert( ret, "Validate is always true" );
+
+        this.assertEqual( "0", hidden.value, "You must press Cancel" );
+        hidden.value = 'XX';
+    },
+
+    // ------------
+    test_method: function() {
+        var o = new ConfirmChange( 'changed', "Yes, this is getting annoying", 
+                                    [ 'honk', 'bonk', 'zonk' ] );
+        this.assertNotNull( o, "Created an object" );
+        
+        var ret = o.validate();
+        this.assert( ret, "Only do something on_submit" );
+
+        var hidden = $( 'changed' );
+        this.assertEqual( "XX", hidden.value, "Not submit, so nothing verified" );
+
+        FormatedField.form_validate( 1 );
+        this.assert( ret, "Validate is always true" );
+
+        this.assertNotEqual( "XX", hidden.value );
+    },
+
+    // ------------
+    test_last: function() {
+        Element.hide( $( "confirmations" ) );
+        this.assertNotVisible( $( 'confirmations' ) );
+    }
+    
+  }, "testlog" );
+
+
+    
+</script>
+</body>

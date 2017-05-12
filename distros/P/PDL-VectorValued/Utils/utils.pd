@@ -1,0 +1,1257 @@
+##-*- Mode: CPerl -*-
+
+##======================================================================
+## Header Administrivia
+##======================================================================
+
+#require "../VectorValued/Version.pm"; ##-- use perl-reversion from Perl::Version instead
+my $VERSION = '1.0.6';
+pp_setversion($VERSION);
+
+require "../VectorValued/Dev.pm";
+PDL::VectorValued::Dev->import();
+
+##------------------------------------------------------
+## PDL_Indx type
+my $INDX = vv_indx_sig();
+pp_addhdr( vv_indx_typedef() );
+
+##------------------------------------------------------
+## pm additions
+pp_addpm({At=>'Top'},<<'EOPM');
+
+use strict;
+
+=pod
+
+=head1 NAME
+
+PDL::VectorValued::Utils - Low-level utilities for vector-valued PDLs
+
+=head1 SYNOPSIS
+
+ use PDL;
+ use PDL::VectorValued::Utils;
+
+ ##---------------------------------------------------------------------
+ ## ... stuff happens
+
+=cut
+
+EOPM
+## /pm additions
+##------------------------------------------------------
+
+##------------------------------------------------------
+## Exports: None
+#pp_export_nothing();
+
+##------------------------------------------------------
+## Includes / defines
+pp_addhdr(<<'EOH');
+EOH
+
+
+##======================================================================
+## C Utilities
+##======================================================================
+# (none)
+
+##======================================================================
+## PDL::PP Wrappers
+##======================================================================
+
+##======================================================================
+## Vector-Based Run-Length Encoding and Decoding
+##======================================================================
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head1 Vector-Based Run-Length Encoding and Decoding
+
+=cut
+
+EOPM
+
+##------------------------------------------------------
+## rlevec()
+pp_def('rlevec',
+       Pars => "c(M,N); $INDX \[o]a(N); [o]b(M,N)",
+       Code =><<'EOC',
+  PDL_Indx cn,bn=0, sn=$SIZE(N), matches;
+  loop (M) %{ $b(N=>0)=$c(N=>0); %}
+  $a(N=>0) = 1;
+  for (cn=1; cn<sn; cn++) {
+     matches=1;
+     loop (M) %{
+       if ($c(N=>cn) != $b(N=>bn)) {
+         matches=0;
+         break;
+       }
+     %}
+     if (matches) {
+       $a(N=>bn)++;
+     } else {
+       bn++;
+       loop (M) %{ $b(N=>bn) = $c(N=>cn); %}
+       $a(N=>bn) = 1;
+     }
+   }
+   for (bn++; bn<sn; bn++) {
+     $a(N=>bn) = 0;
+     loop (M) %{ $b(N=>bn) = 0; %}
+   }
+EOC
+       Doc =><<'EOD',
+Run-length encode a set of vectors.
+
+Higher-order rle(), for use with qsortvec().
+
+Given set of vectors $c, generate a vector $a with the number of occurrences of each element
+(where an "element" is a vector of length $M ocurring in $c),
+and a set of vectors $b containing the unique values.
+As for rle(), only the elements up to the first instance of 0 in $a should be considered.
+
+Can be used together with clump() to run-length encode "values" of arbitrary dimensions.
+Can be used together with rotate(), cat(), append(), and qsortvec() to count N-grams
+over a 1d PDL.
+
+See also: PDL::Slices::rle, PDL::Ufunc::qsortvec, PDL::Primitive::uniqvec
+
+EOD
+
+);
+
+
+##------------------------------------------------------
+## rldvec()
+pp_def('rldvec',
+       Pars => 'int a(N); b(M,N); [o]c(M,N)',
+       PMCode=><<'EOC',
+sub PDL::rldvec {
+  my ($a,$b,$c) = @_;
+  if (!defined($c)) {
+# XXX Need to improve emulation of threading in auto-generating c
+    my ($rowlen) = $b->dim(0);
+    my ($size) = $a->sumover->max;
+    my (@dims) = $a->dims;
+    shift(@dims);
+    $c = $b->zeroes($b->type,$rowlen,$size,@dims);
+  }
+  &PDL::_rldvec_int($a,$b,$c);
+  return $c;
+}
+EOC
+       Code =><<'EOC',
+  int i,nrows,bn,cn=0, sn=$SIZE(N);
+  for (bn=0; bn<sn; bn++) {
+    nrows = $a(N=>bn);
+    for (i=0; i<nrows; i++) {
+      loop (M) %{ $c(N=>cn) = $b(N=>bn); %}
+      cn++;
+    }
+   }
+EOC
+       Doc =><<'EOD'
+Run-length decode a set of vectors, akin to a higher-order rld().
+
+Given a vector $a() of the number of occurrences of each row, and a set $c()
+of row-vectors each of length $M, run-length decode to $c().
+
+Can be used together with clump() to run-length decode "values" of arbitrary dimensions.
+
+See also: PDL::Slices::rld.
+
+EOD
+
+  );
+
+##------------------------------------------------------
+## enumvec()
+pp_def('enumvec',
+       Pars => 'v(M,N); int [o]k(N)',
+       Code =><<'EOC',
+  int vn, kn, sn=$SIZE(N), matches;
+  for (vn=0; vn<sn; vn=kn) {
+     for (kn=vn, matches=1; matches && kn<sn; ) {
+       $k(N=>kn) = kn-vn;
+       ++kn;
+       loop (M) %{
+         if ($v(N=>vn) != $v(N=>kn)) {
+           matches=0;
+           break;
+         }
+       %}
+     }
+   }
+EOC
+       Doc =><<'EOD',
+Enumerate a list of vectors with locally unique keys.
+
+Given a sorted list of vectors $v, generate a vector $k containing locally unique keys for the elements of $v
+(where an "element" is a vector of length $M ocurring in $v).
+
+Note that the keys returned in $k are only unique over a run of a single vector in $v,
+so that each unique vector in $v has at least one 0 (zero) index in $k associated with it.
+If you need global keys, see enumvecg().
+
+EOD
+
+);
+
+##------------------------------------------------------
+## enumvecg()
+pp_def('enumvecg',
+       Pars => 'v(M,N); int [o]k(N)',
+       Code =><<'EOC',
+  int vn, vnprev, sn=$SIZE(N), ki;
+  if (sn > 0) {
+    $k(N=>0) = ki = 0;
+    for (vnprev=0, vn=1; vn<sn; vnprev=vn++) {
+       loop (M) %{
+         if ($v(N=>vnprev) != $v(N=>vn)) {
+           ++ki;
+           break;
+         }
+       %}
+       $k(N=>vn) = ki;
+     }
+   }
+EOC
+       Doc =><<'EOD',
+Enumerate a list of vectors with globally unique keys.
+
+Given a sorted list of vectors $v, generate a vector $k containing globally unique keys for the elements of $v
+(where an "element" is a vector of length $M ocurring in $v).
+Basically does the same thing as:
+
+ $k = $v->vsearchvec($v->uniqvec);
+
+... but somewhat more efficiently.
+
+EOD
+
+);
+
+##------------------------------------------------------
+## rleseq()
+pp_def('rleseq',
+       Pars => "c(N); $INDX \[o]a(N); [o]b(N)",
+       Code=><<'EOC',
+  PDL_Indx j=0, sizeN=$SIZE(N);
+  $GENERIC(c) coff;
+  coff     = $c(N=>0);
+  $b(N=>0) = coff;
+  $a(N=>0) = 0;
+  loop (N) %{
+    if ($c() == coff+$a(N=>j)) {
+      $a(N=>j)++;
+    } else {
+      j++;
+      $b(N=>j) = coff = $c();
+      $a(N=>j) = 1;
+    }
+  %}
+  for (j++; j<sizeN; j++) {
+    $a(N=>j) = 0;
+    $b(N=>j) = 0;
+  }
+EOC
+       Doc =><<'EOD',
+Run-length encode a vector of subsequences.
+
+Given a vector of $c() of concatenated variable-length, variable-offset subsequences,
+generate a vector $a containing the length of each subsequence
+and a vector $b containg the subsequence offsets.
+As for rle(), only the elements up to the first instance of 0 in $a should be considered.
+
+See also PDL::Slices::rle.
+
+EOD
+
+);
+
+
+##------------------------------------------------------
+## rldseq()
+pp_def('rldseq',
+       Pars => 'int a(N); b(N); [o]c(M)',
+       PMCode=><<'EOC',
+sub PDL::rldseq {
+  my ($a,$b,$c) = @_;
+  if (!defined($c)) {
+    my $size   = $a->sumover->max;
+    my (@dims) = $a->dims;
+    shift(@dims);
+    $c = $b->zeroes($b->type,$size,@dims);
+  }
+  &PDL::_rldseq_int($a,$b,$c);
+  return $c;
+}
+EOC
+       Code =><<'EOC',
+  size_t mi=0;
+  loop (N) %{
+    size_t     len = $a(), li;
+    for (li=0; li < len; ++li, ++mi) {
+      $c(M=>mi) = $b() + li;
+    }
+  %}
+EOC
+       Doc =><<'EOD'
+Run-length decode a subsequence vector.
+
+Given a vector $a() of sequence lengths
+and a vector $b() of corresponding offsets,
+decode concatenation of subsequences to $c(),
+as for:
+
+ $c = null;
+ $c = $c->append($b($_)+sequence($a->type,$a($_))) foreach (0..($N-1));
+
+See also: PDL::Slices::rld.
+
+EOD
+
+  );
+
+
+##======================================================================
+## Vector Search
+##======================================================================
+
+##------------------------------------------------------
+## vsearchvec() : binary search on a (sorted) vector list
+vvpp_def
+  ('vsearchvec',
+   Pars => 'find(M); which(M,N); int [o]found();',
+   Code =>
+(q(
+ int carp=0;
+threadloop %{
+ long sizeM=$SIZE(M), sizeN=$SIZE(N), n1=sizeN-1;
+ long nlo=-1, nhi=n1, nn;
+ $GENERIC() findval, whichval, whichval1;
+ int cmpval, is_asc_sorted;
+ //
+ //-- get sort direction
+ $CMPVEC('$which(N=>n1)','$which(N=>0)','M','cmpval',var1=>'whichval1',var2=>'whichval');
+ is_asc_sorted = (cmpval > 0);
+ //
+ //-- binary search
+ while (nhi-nlo > 1) {
+   nn = (nhi+nlo) >> 1;
+   $CMPVEC('$find()','$which(N=>nn)','M','cmpval', var1=>'findval',var2=>'whichval');
+   if (cmpval > 0 == is_asc_sorted)
+     nlo=nn;
+   else
+     nhi=nn;
+ }
+ if (nlo==-1) {
+   nhi=0;
+ } else if (nlo==n1) {
+   $CMPVEC('$find()','$which(N=>n1)','M','cmpval', var1=>'findval',var2=>'whichval');
+   if (cmpval != 0) carp = 1;
+   nhi = n1;
+ } else {
+   nhi = nlo+1;
+ }
+ $found() = nhi;
+%}
+ if (carp) warn("some values had to be extrapolated");
+)),
+  Doc=><<'EOD'
+=for ref
+
+Routine for searching N-dimensional values - akin to vsearch() for vectors.
+
+=for usage
+
+ $found   = ccs_vsearchvec($find, $which);
+ $nearest = $which->dice_axis(1,$found);
+
+Returns for each row-vector in C<$find> the index along dimension N
+of the least row vector of C<$which>
+greater or equal to it.
+C<$which> should be sorted in increasing order.
+If the value of C<$find> is larger
+than any member of C<$which>, the index to the last element of C<$which> is
+returned.
+
+See also: PDL::Primitive::vsearch().
+
+EOD
+);
+
+
+
+##======================================================================
+## Vector Sorting and Comparison
+##======================================================================
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head1 Vector-Valued Sorting and Comparison
+
+The following functions are provided for lexicographic sorting of
+vectors, rsp. axis indices.   Note that vv_qsortvec() is functionally
+identical to the builtin PDL function qsortvec(), but also that
+the latter is broken in the stock PDL-2.4.3 distribution.  The version
+included here includes Chris Marshall's "uniqsortvec" patch, which
+is available here:
+
+ http://sourceforge.net/tracker/index.php?func=detail&aid=1548824&group_id=612&atid=300612
+
+=cut
+
+EOPM
+
+##------------------------------------------------------
+## cmpvec() : make vector comparison available in perl
+vvpp_def
+  ('cmpvec',
+   Pars => 'a(N); b(N); int [o]cmp()',
+   Code => q($CMPVEC('$a()','$b()','N','$cmp()')),
+   Doc=><<'EOD'
+Lexicographically compare a pair of vectors.
+
+EOD
+  );
+
+
+
+##======================================================================
+## qsortvec drop-in replacement
+##  + adopted from patched $PDL_SRC_ROOT/Basic/Ufunc/ufunc.pd
+##     - nearly a verbatim copy: C names have been changed to protect the innocent
+##  + includes Chris Marshall's "uniqsortvec" patch, from:
+##     http://sourceforge.net/tracker/index.php?func=detail&aid=1548824&group_id=612&atid=300612
+##======================================================================
+
+# Internal utility sorting routine for median/qsort/qsortvec routines.
+#
+# note: we export them to the PDL Core structure for use in
+#       other modules (eg Image2D)
+foreach (keys %PDL::Types::typehash) {
+    my $ctype = $PDL::Types::typehash{$_}{ctype};
+    my $ppsym = $PDL::Types::typehash{$_}{ppsym};
+
+    pp_addhdr(<<"FOO"
+
+	/*******
+         * qsortvec helper routines
+	 *   --CED 21-Aug-2003
+	 */
+
+	/* Compare a vector in lexicographic order, returning the
+	 *  equivalent of "<=>". 
+ 	 */
+      signed char pdl_vecval_cmpvec_$ppsym($ctype *a, $ctype *b, int n) {
+	int i;
+	for(i=0; i<n; a++,b++,i++) {
+	 if( *a < *b ) return -1;
+	 if( *a > *b ) return 1;
+	}
+	return 0;
+     }	
+
+      void pdl_vecval_qsortvec_$ppsym($ctype *xx, int n, PDL_Indx a, PDL_Indx b) {
+	PDL_Indx i,j, median_ind;
+
+	$ctype t;
+	i = a; 
+	j = b;
+
+	median_ind = (i+j)/2;
+
+	do {
+	  while( pdl_vecval_cmpvec_$ppsym( &(xx[n*i]), &(xx[n*median_ind]), n )  <  0 )
+		i++;
+	  while( pdl_vecval_cmpvec_$ppsym( &(xx[n*j]), &(xx[n*median_ind]), n )  >  0 )
+		j--;
+	  if(i<=j) {
+		int k;
+		$ctype *aa = &xx[n*i];
+	        $ctype *bb = &xx[n*j];
+		for( k=0; k<n; aa++,bb++,k++ ) {
+		  $ctype z;
+		  z = *aa;
+		  *aa = *bb;
+		  *bb = z;
+		}
+
+                if (median_ind==i)
+                  median_ind=j;
+                else if (median_ind==j)
+                  median_ind=i;
+
+	        i++;
+		j--;
+	  }
+	} while (i <= j);
+
+	if (a < j)
+	  pdl_vecval_qsortvec_$ppsym( xx, n, a, j );
+	if (i < b)
+	  pdl_vecval_qsortvec_$ppsym( xx, n, i, b );
+      }
+
+FOO
+	     );
+}
+
+my @vv_target_typechars = (qw(B S U L),
+			   (defined(&PDL::indx) ? 'N' : qw()),
+			   qw(Q F D),
+			  );
+
+# when copying the data over to the temporary array,
+# ignore the bad values and then only send the number
+# of good elements to the sort routines
+#
+sub generic_vecval_qsortvec {
+    my $pdl = shift;
+    my $ndim = shift;
+    return
+      ('$T'.join('',@vv_target_typechars)
+       .'('
+       .join(',', map {'pdl_vecval_qsortvec_'.$_} @vv_target_typechars)
+       .')'
+       .' ($P('.$pdl.'), '.$ndim.', 0, nn);'
+      );
+}
+
+pp_def(
+    'vv_qsortvec',
+    HandleBad => 1,
+    Pars => 'a(n,m); [o]b(n,m);',
+    Code =>
+    'int nn;
+     int nd;
+     loop(n,m) %{ $b() = $a(); %}
+     nn = ($COMP(__m_size))-1;
+     nd = $COMP(__n_size);
+     if ($SIZE(m) > 0) {
+      '.generic_vecval_qsortvec('b','nd').'
+     }',
+    Doc => '
+=for ref
+
+Drop-in replacement for qsortvec(),
+which is broken in the stock PDL-2.4.3 release.
+See PDL::Ufunc::qsortvec.
+',
+    BadDoc =>
+'
+Vectors with bad components should be moved to the end of the array.
+',
+      ); # pp_def vv_qsortvec
+
+
+##======================================================================
+## vv_qsortveci: new
+##  + adopted from patched $PDL_SRC_ROOT/Basic/Ufunc/ufunc.pd
+##======================================================================
+
+# Internal utility sorting routine for vv_qsortveci
+foreach (keys %PDL::Types::typehash) {
+    my $ctype = $PDL::Types::typehash{$_}{ctype};
+    my $ppsym = $PDL::Types::typehash{$_}{ppsym};
+
+    pp_addhdr(<<"FOO"
+      /*-- vector-based sorted index acquisition --*/
+      void pdl_vecval_qsortvec_ind_$ppsym($ctype *xx, PDL_Indx *ix, int n, PDL_Indx a, PDL_Indx b) {
+	PDL_Indx i,j, median_ind, tmpi;
+
+	$ctype t;
+	i = a;
+	j = b;
+
+	median_ind = (i+j)/2; /*-- an index into ix, NOT into xx --*/
+
+	do {
+	  while( pdl_vecval_cmpvec_$ppsym( &(xx[n*ix[i]]), &(xx[n*ix[median_ind]]), n )  <  0 )
+                /*-- xx[ix[i]] < median --*/
+		i++;
+	  while( pdl_vecval_cmpvec_$ppsym( &(xx[n*ix[j]]), &(xx[n*ix[median_ind]]), n )  >  0 ) 
+                /*-- median < xx[ix[j]] --*/
+		j--;
+	  if(i<=j) {
+                tmpi  = ix[i];
+                ix[i] = ix[j];
+                ix[j] = tmpi;
+
+                if (median_ind==i)
+                  median_ind=j;
+                else if (median_ind==j)
+                  median_ind=i;
+
+	        i++;
+		j--;
+	  }
+	} while (i <= j);
+
+	if (a < j)
+	  pdl_vecval_qsortvec_ind_$ppsym( xx, ix, n, a, j );
+	if (i < b)
+	  pdl_vecval_qsortvec_ind_$ppsym( xx, ix, n, i, b );
+      }
+FOO
+	     );
+  }
+
+sub generic_vecval_qsortvec_ind {
+    my $pdl = shift;
+    my $ix  = shift;
+    my $ndim = shift;
+    return
+      ('$T'.join('',@vv_target_typechars)
+       .'('
+       .join(',', map {'pdl_vecval_qsortvec_ind_'.$_} @vv_target_typechars)
+       .')'
+       .'($P('.$pdl.'), $P('.$ix.'), '.$ndim.', 0, nn);'
+      );
+}
+
+pp_def(
+    'vv_qsortveci',
+    HandleBad => 1,
+    Pars => "a(n,m); $INDX \[o]ix(m);",
+    Code =>
+    'int nn, nd;
+     PDL_Indx mi=0;
+     loop(m) %{ $ix() = mi++; %}
+     nn = ($COMP(__m_size))-1;
+     nd = $COMP(__n_size);
+     if ($SIZE(m) > 0) {
+       '.generic_vecval_qsortvec_ind('a','ix','nd').'
+     }',
+    Doc => '
+=for ref
+
+Get lexicographic sort order of a matrix $a() viewed as a list of vectors.
+',
+    BadDoc =>
+'
+Vectors with bad components should be treated as last in  the lexicographic order.
+',
+    ); # pp_def vv_qsortveci
+
+
+##======================================================================
+## Vector-Valued Set Operations
+##======================================================================
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head1 Vector-Valued Set Operations
+
+The following functions are provided for set operations on
+sorted vector-valued PDLs.
+
+=cut
+
+EOPM
+
+##------------------------------------------------------
+## vv_union() : set union
+vvpp_def
+  ('vv_union',
+   Pars => 'a(M,NA); b(M,NB); [o]c(M,NC); int [o]nc()',
+   PMCode=>
+(q(
+ sub PDL::vv_union {
+   my ($a,$b,$c,$nc) = @_;
+   barf("PDL::VectorValued::vv_union(): dimension mismatch") if ($a->dim(-2) != $b->dim(-2));
+   my @adims = $a->dims;
+   if (!defined($c)) {
+     my $ctype = $a->type > $b->type ? $a->type : $b->type;
+     $c = PDL->zeroes($ctype, @adims[0..($#adims-1)], $adims[$#adims] + $b->dim(-1));
+   }
+   $nc = PDL->zeroes(PDL::long(), (@adims > 2 ? @adims[0..($#adims-2)] : 1)) if (!defined($nc));
+   &PDL::_vv_union_int($a,$b,$c,$nc);
+   return ($c,$nc) if (wantarray);
+   return $c->mv(-1,0)->slice("0:".($nc->sclr-1))->mv(0,-1);
+ }
+)),
+   Code =>
+(q(
+ PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
+ $GENERIC() aval, bval;
+ int cmpval;
+ for ( ; nci < sizeNC; nci++) {
+   if (nai < sizeNA && nbi < sizeNB) {
+     $CMPVEC('$a(NA=>nai)','$b(NB=>nbi)','M','cmpval',var1=>'aval',var2=>'bval');
+   }
+   else if (nai < sizeNA) { cmpval = -1; }
+   else if (nbi < sizeNB) { cmpval =  1; }
+   else                   { break; }
+   //
+   if (cmpval < 0) {
+     //-- CASE: a < b
+     loop (M) %{ $c(NC=>nci) = $a(NA=>nai); %}
+     nai++;
+   }
+   else if (cmpval > 0) {
+     //-- CASE: a > b
+     loop (M) %{ $c(NC=>nci) = $b(NB=>nbi); %}
+     nbi++;
+   }
+   else {
+     //-- CASE: a == b
+     loop (M) %{ $c(NC=>nci) = $a(NA=>nai); %}
+     nai++;
+     nbi++;
+   }
+ }
+ $nc() = nci;
+)),
+   Doc=><<'EOD'
+
+Union of two vector-valued PDLs.  Input PDLs $a() and $b() B<MUST> be
+sorted in lexicographic order.
+On return, $nc() holds the actual number of vector-values in the union.
+
+In scalar context, slices $c() to the actual number of elements in the union
+and returns the sliced PDL.
+
+
+EOD
+  );
+
+
+##------------------------------------------------------
+## vv_intersect() : set intersection
+vvpp_def
+  ('vv_intersect',
+   Pars => 'a(M,NA); b(M,NB); [o]c(M,NC); int [o]nc()',
+   PMCode=>
+(q(
+ sub PDL::vv_intersect {
+   my ($a,$b,$c,$nc) = @_;
+   barf("PDL::VectorValued::vv_intersect(): dimension mismatch") if ($a->dim(-2) != $b->dim(-2));
+   my @adims = $a->dims;
+   my $NA = $adims[$#adims];
+   my $NB = $b->dim(-1);
+   if (!defined($c)) {
+     my $ctype = $a->type > $b->type ? $a->type : $b->type;
+     $c = PDL->zeroes($ctype, @adims[0..($#adims-1)], $NA < $NB ? $NA : $NB);
+   }
+   $nc = PDL->zeroes(PDL::long(), (@adims > 2 ? @adims[0..($#adims-2)] : 1)) if (!defined($nc));
+   &PDL::_vv_intersect_int($a,$b,$c,$nc);
+   return ($c,$nc) if (wantarray);
+   return $c->mv(-1,0)->slice("0:".($nc->sclr-1))->mv(0,-1);
+ }
+)),
+   Code =>
+(q(
+ PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
+ $GENERIC() aval, bval;
+ int cmpval;
+ for ( ; nci < sizeNC && nai < sizeNA && nbi < sizeNB; ) {
+   $CMPVEC('$a(NA=>nai)','$b(NB=>nbi)','M','cmpval',var1=>'aval',var2=>'bval');
+   //
+   if (cmpval < 0) {
+     //-- CASE: a < b
+     nai++;
+   }
+   else if (cmpval > 0) {
+     //-- CASE: a > b
+     nbi++;
+   }
+   else {
+     //-- CASE: a == b
+     loop (M) %{ $c(NC=>nci) = $a(NA=>nai); %}
+     nai++;
+     nbi++;
+     nci++;
+   }
+ }
+ $nc() = nci;
+)),
+   Doc=><<'EOD'
+
+Intersection of two vector-valued PDLs.
+Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order.
+On return, $nc() holds the actual number of vector-values in the intersection.
+
+In scalar context, slices $c() to the actual number of elements in the intersection
+and returns the sliced PDL.
+
+EOD
+  );
+
+
+##------------------------------------------------------
+## vv_setdiff() : set difference
+vvpp_def
+  ('vv_setdiff',
+   Pars => 'a(M,NA); b(M,NB); [o]c(M,NC); int [o]nc()',
+   PMCode=>
+(q(
+ sub PDL::vv_setdiff {
+   my ($a,$b,$c,$nc) = @_;
+   barf("PDL::VectorValued::vv_setdiff(): dimension mismatch") if ($a->dim(-2) != $b->dim(-2));
+   my @adims = $a->dims;
+   my $NA = $adims[$#adims];
+   my $NB = $b->dim(-1);
+   if (!defined($c)) {
+     my $ctype = $a->type > $b->type ? $a->type : $b->type;
+     $c = PDL->zeroes($ctype, @adims[0..($#adims-1)], $NA);
+   }
+   $nc = PDL->zeroes(PDL::long(), (@adims > 2 ? @adims[0..($#adims-2)] : 1)) if (!defined($nc));
+   &PDL::_vv_setdiff_int($a,$b,$c,$nc);
+   return ($c,$nc) if (wantarray);
+   return $c->mv(-1,0)->slice("0:".($nc->sclr-1))->mv(0,-1);
+ }
+)),
+   Code =>
+(q(
+ PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
+ $GENERIC() aval, bval;
+ int cmpval;
+ for ( ; nci < sizeNC && nai < sizeNA && nbi < sizeNB ; ) {
+   $CMPVEC('$a(NA=>nai)','$b(NB=>nbi)','M','cmpval',var1=>'aval',var2=>'bval');
+   //
+   if (cmpval < 0) {
+     //-- CASE: a < b
+     loop (M) %{ $c(NC=>nci) = $a(NA=>nai); %}
+     nai++;
+     nci++;
+   }
+   else if (cmpval > 0) {
+     //-- CASE: a > b
+     nbi++;
+   }
+   else {
+     //-- CASE: a == b
+     nai++;
+     nbi++;
+   }
+ }
+ for ( ; nci < sizeNC && nai < sizeNA ; nai++,nci++ ) {
+   loop (M) %{ $c(NC=>nci) = $a(NA=>nai); %}
+ }
+ $nc() = nci;
+)),
+   Doc=><<'EOD'
+
+Set-difference ($a() \ $b()) of two vector-valued PDLs.
+Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order.
+On return, $nc() holds the actual number of vector-values in the computed vector set.
+
+In scalar context, slices $c() to the actual number of elements in the output vector set
+and returns the sliced PDL.
+
+EOD
+  );
+
+
+
+##======================================================================
+## Sorted Vector Set Operations
+##======================================================================
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head1 Sorted Vector Set Operations
+
+The following functions are provided for set operations on
+flat sorted PDLs with unique values.  They may be more efficient to compute
+than the corresponding implenentations via PDL::Primitive::setops().
+
+=cut
+
+EOPM
+
+##------------------------------------------------------
+## v_union() : flat set union
+vvpp_def
+  ('v_union',
+   Pars => 'a(NA); b(NB); [o]c(NC); int [o]nc()',
+   PMCode=>
+(q(
+ sub PDL::v_union {
+   my ($a,$b,$c,$nc) = @_;
+   barf("PDL::VectorValued::v_union(): only 1d vectors are supported") if ($a->ndims > 1 || $b->ndims > 1);
+   $nc = PDL->pdl(PDL::long(), $a->dim(0) + $b->dim(0)) if (!defined($nc));
+   if (!defined($c)) {
+     my $ctype = $a->type > $b->type ? $a->type : $b->type;
+     $c = PDL->zeroes($ctype, ref($nc) ? $nc->sclr : $nc);
+   }
+   &PDL::_v_union_int($a,$b,$c,$nc);
+   return ($c,$nc) if (wantarray);
+   return $c->reshape($nc->sclr);
+ }
+)),
+   Code =>
+(q(
+ PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
+ int cmpval;
+ for ( ; nci < sizeNC; nci++) {
+   if (nai < sizeNA && nbi < sizeNB) {
+     cmpval = $CMPVAL('$a(NA=>nai)', '$b(NB=>nbi)');
+   }
+   else if (nai < sizeNA) { cmpval = -1; }
+   else if (nbi < sizeNB) { cmpval =  1; }
+   else                   { break; }
+   //
+   if (cmpval < 0) {
+     //-- CASE: a < b
+     $c(NC=>nci) = $a(NA=>nai);
+     nai++;
+   }
+   else if (cmpval > 0) {
+     //-- CASE: a > b
+     $c(NC=>nci) = $b(NB=>nbi);
+     nbi++;
+   }
+   else {
+     //-- CASE: a == b
+     $c(NC=>nci) = $a(NA=>nai);
+     nai++;
+     nbi++;
+   }
+ }
+ $nc() = nci;
+)),
+   Doc=><<'EOD'
+
+Union of two flat sorted unique-valued PDLs.
+Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order and contain no duplicates.
+On return, $nc() holds the actual number of values in the union.
+
+In scalar context, reshapes $c() to the actual number of elements in the union and returns it.
+
+EOD
+  );
+
+
+##------------------------------------------------------
+## v_intersect() : flat set intersection
+vvpp_def
+  ('v_intersect',
+   Pars => 'a(NA); b(NB); [o]c(NC); int [o]nc()',
+   PMCode=>
+(q(
+ sub PDL::v_intersect {
+   my ($a,$b,$c,$nc) = @_;
+   barf("PDL::VectorValued::v_intersect(): only 1d vectors are supported") if ($a->ndims > 1 || $b->ndims > 1);
+   my $NA = $a->dim(0);
+   my $NB = $b->dim(0);
+   $nc = PDL->pdl(PDL::long(), $NA < $NB ? $NA : $NB) if (!defined($nc));
+   if (!defined($c)) {
+     my $ctype = $a->type > $b->type ? $a->type : $b->type;
+     $c = PDL->zeroes($ctype, ref($nc) ? $nc->sclr : $nc);
+   }
+   &PDL::_v_intersect_int($a,$b,$c,$nc);
+   return ($c,$nc) if (wantarray);
+   return $c->reshape($nc->sclr);
+ }
+)),
+   Code =>
+(q(
+ PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
+ int cmpval;
+ for ( ; nci < sizeNC && nai < sizeNA && nbi < sizeNB; ) {
+   cmpval = $CMPVAL('$a(NA=>nai)','$b(NB=>nbi)');
+   //
+   if (cmpval < 0) {
+     //-- CASE: a < b
+     nai++;
+   }
+   else if (cmpval > 0) {
+     //-- CASE: a > b
+     nbi++;
+   }
+   else {
+     //-- CASE: a == b
+     $c(NC=>nci) = $a(NA=>nai);
+     nai++;
+     nbi++;
+     nci++;
+   }
+ }
+ $nc() = nci;
+)),
+   Doc=><<'EOD'
+
+Intersection of two flat sorted unique-valued PDLs.
+Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order and contain no duplicates.
+On return, $nc() holds the actual number of values in the intersection.
+
+In scalar context, reshapes $c() to the actual number of elements in the intersection and returns it.
+
+EOD
+  );
+
+
+##------------------------------------------------------
+## v_setdiff() : flat set difference
+vvpp_def
+  ('v_setdiff',
+   Pars => 'a(NA); b(NB); [o]c(NC); int [o]nc()',
+   PMCode=>
+(q(
+ sub PDL::v_setdiff {
+   my ($a,$b,$c,$nc) = @_;
+   barf("PDL::VectorValued::v_setdiff(): only 1d vectors are supported") if ($a->ndims > 1 || $b->ndims > 1);
+   my $NA = $a->dim(0);
+   my $NB = $b->dim(0);
+   $nc    = PDL->pdl(PDL::long(), $NA) if (!defined($nc));
+   if (!defined($c)) {
+     my $ctype = $a->type > $b->type ? $a->type : $b->type;
+     $c = PDL->zeroes($ctype, $NA);
+   }
+   &PDL::_v_setdiff_int($a,$b,$c,$nc);
+   return ($c,$nc) if (wantarray);
+   return $c->reshape($nc->sclr);
+ }
+)),
+   Code =>
+(q(
+ PDL_Indx nai=0, nbi=0, nci=0, sizeNA=$SIZE(NA), sizeNB=$SIZE(NB), sizeNC=$SIZE(NC);
+ int cmpval;
+ for ( ; nci < sizeNC && nai < sizeNA && nbi < sizeNB ; ) {
+   cmpval = $CMPVAL('$a(NA=>nai)','$b(NB=>nbi)');
+   //
+   if (cmpval < 0) {
+     //-- CASE: a < b
+     $c(NC=>nci) = $a(NA=>nai);
+     nai++;
+     nci++;
+   }
+   else if (cmpval > 0) {
+     //-- CASE: a > b
+     nbi++;
+   }
+   else {
+     //-- CASE: a == b
+     nai++;
+     nbi++;
+   }
+ }
+ for ( ; nci < sizeNC && nai < sizeNA ; nai++,nci++ ) {
+   $c(NC=>nci) = $a(NA=>nai);
+ }
+ $nc() = nci;
+)),
+   Doc=><<'EOD'
+
+Set-difference ($a() \ $b()) of two flat sorted unique-valued PDLs.
+Input PDLs $a() and $b() B<MUST> be sorted in lexicographic order and contain no duplicate values.
+On return, $nc() holds the actual number of values in the computed vector set.
+
+In scalar context, reshapes $c() to the actual number of elements in the difference set and returns it.
+
+EOD
+  );
+
+
+##======================================================================
+## Miscellaneous Vector-Valued Operations
+##======================================================================
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head1 Miscellaneous Vector-Valued Operations
+
+=cut
+
+EOPM
+
+##--------------------------------------------------------------
+## vv_vcos()
+my $vv_vcos_code =
+'
+    $GENERIC(vcos) anorm, bnorm, aval, vval;
+
+    threadloop %{
+      /*-- initialize: bnorm --*/
+      bnorm = 0;
+      loop(M) %{
+#ifdef PDL_BAD_CODE
+	if ($ISGOOD(b()))
+#endif
+          bnorm += $b() * $b();
+      %}
+      bnorm = sqrt(bnorm);
+      if (bnorm == 0) {
+         /*-- null-vector b(): set all vcos()=NAN --*/
+         loop (N) %{ $vcos() = NAN; %}
+      }
+      else {
+         /*-- usual case: compute values for N-slice of b() --*/
+         loop (N) %{
+           anorm = 0;
+           vval  = 0;
+           loop (M) %{
+#ifdef PDL_BAD_CODE
+	     if ($ISGOOD(a())) {
+               aval   = $a();
+               anorm += aval * aval;
+               if ($ISGOOD(b()))
+                 vval  += aval * $b();
+             }
+#else
+             aval   = $a();
+             anorm += aval * aval;
+             vval  += aval * $b();
+#endif
+           %}
+
+           /*-- normalize --*/
+           anorm = sqrt(anorm);
+           if (anorm != 0) {
+             /*-- usual case a(), b() non-null --*/
+             $vcos() = vval / (anorm * bnorm);
+           } else {
+             /*-- null-vector a(): set vcos()=NAN --*/
+             $vcos() = NAN;
+           }
+        %}
+      }
+    %}
+';
+
+pp_def('vv_vcos',
+       Pars => join('',
+		    "a(M,N);",            ##-- logical (D,T)
+   		    "b(M);",              ##-- logical (D,1)
+		    "float+ [o]vcos(N);", ##-- logical (T)
+		   ),
+       HandleBad => 1,
+       Code => $vv_vcos_code,
+       BadCode => $vv_vcos_code,
+       CopyBadStatusCode =>
+q{
+   if ( $ISPDLSTATEBAD(a) || $ISPDLSTATEBAD(b) ) {
+     $SETPDLSTATEBAD(vcos);
+   }
+},
+  Doc =>
+q{
+Computes the vector cosine similarity of a dense vector $b() with respect to each row $a(*,i)
+of a dense PDL $a().  This is basically the same thing as:
+
+ ($a * $b)->sumover / ($a->pow(2)->sumover->sqrt * $b->pow(2)->sumover->sqrt)
+
+... but should be must faster to compute, and avoids allocating potentially large temporaries for
+the vector magnitudes.  Output values in $vcos() are cosine similarities in the range [-1,1],
+except for zero-magnitude vectors which will result in NaN values in $vcos().
+
+You can use PDL threading to batch-compute distances for multiple $b() vectors simultaneously:
+
+  $bx   = random($M, $NB);   ##-- get $NB random vectors of size $N
+  $vcos = vv_vcos($a,$bx);   ##-- $vcos(i,j) ~ sim($a(,i),$b(,j))
+
+},
+  BadDoc=>
+q{
+vv_vcos() will set the bad status flag on the output piddle $vcos() if it is set on either of the input
+piddles $a() or $b(), but BAD values will otherwise be ignored for computing the cosine similary.
+},
+);
+
+
+##======================================================================
+## Footer Administrivia
+##======================================================================
+
+##------------------------------------------------------
+## pm additions: footer
+pp_addpm(<<'EOPM');
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+=over 4
+
+=item *
+
+Perl by Larry Wall
+
+=item *
+
+PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
+
+=item *
+
+Code for rlevec() and rldvec() derived from the PDL builtin functions
+rle() and rld() in $PDL_SRC_ROOT/Basic/Slices/slices.pd
+
+=item *
+
+Code for vv_qsortvec() copied nearly verbatim from the builtin PDL functions
+in $PDL_SRC_ROOT/Basic/Ufunc/ufunc.pd, with Chris Marshall's "uniqsortvec" patch.
+Code for vv_qsortveci() based on the same.
+
+=back
+
+=cut
+
+##----------------------------------------------------------------------
+=pod
+
+=head1 KNOWN BUGS
+
+Probably many.
+
+=cut
+
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT
+
+=over 4
+
+=item *
+
+Code for qsortvec() copyright (C) Tuomas J. Lukka 1997.
+Contributions by Christian Soeller (c.soeller@auckland.ac.nz)
+and Karl Glazebrook (kgb@aaoepp.aao.gov.au).  All rights
+reserved. There is no warranty. You are allowed to redistribute this
+software / documentation under certain conditions. For details, see
+the file COPYING in the PDL distribution. If this file is separated
+from the PDL distribution, the copyright notice should be included in
+the file.
+
+
+=item *
+
+All other parts copyright (c) 2007-2015, Bryan Jurish.  All rights reserved.
+
+This package is free software, and entirely without warranty.
+You may redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=back
+
+
+=head1 SEE ALSO
+
+perl(1), PDL(3perl)
+
+=cut
+
+EOPM
+
+
+# Always make sure that you finish your PP declarations with
+# pp_done
+pp_done();
+##----------------------------------------------------------------------

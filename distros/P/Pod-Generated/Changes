@@ -1,0 +1,45 @@
+Revision history for Perl extension Pod-Generated
+
+0.05  Mon 2009.12.07 00:42:50 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+     - reduced dependencies using author tests
+     - better dist engineering (INSTALL, README, README.mkdn etc.)
+
+0.04  Thu, 29 May 2008 12:06:40 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.04
+     - Template::Plugin::Generated: added NAME section to pod
+     - updated t/perlcriticrc
+     - Template::Plugin::Generated: don't assume a sub is inherited if
+       Devel::Peek's CvGV says it's from a different package, i.e., imported
+     - moved generated documentation of interited methods to after
+       documentation of this class' methods so the manpage is more readable
+     - Work around an API change in Attribute::Handlers 0.79, shipped with perl
+       5.10, where a single scalar value is returned as an array ref when
+       ATTR(SCALAR) is used
+     - .shipit: fixed svk.tagpattern
+
+0.03  Sun, 18 Nov 2007 13:19:05 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Now uses Text::Conjunct so that
+       Template::Plugin::PodGenerated->write_inheritance() produces more
+       natural-sounding documentation
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install()
+     - Template::Plugin::PodGenerated: also put the generated package's version
+       number into the stash
+     - updated MANIFEST
+     - made format() produce better-looking output
+     - improved reporting of inherited methods
+     - Template::Plugin::PodGenerated: added version()
+     - t/perlcriticrc: added
+       [-ControlStructures::ProhibitMutatingListFunctions]
+     - Makefile.PL: build_requires YAML
+     - tags: NEWFEATURE
+
+0.02  Mon, 12 Nov 2007 13:28:16 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed newline issue in write_methods()
+     - tags: BUGFIX
+
+0.01  Sun, 11 Nov 2007 21:02:45 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

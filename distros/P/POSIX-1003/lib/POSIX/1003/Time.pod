@@ -1,0 +1,170 @@
+=encoding utf8
+
+=head1 NAME
+
+POSIX::1003::Time - POSIX handling time
+
+=head1 INHERITANCE
+
+ POSIX::1003::Time
+   is a POSIX::1003::Module
+
+=head1 SYNOPSIS
+
+  use POSIX::1003::Time;
+
+  tzset();      # set-up local timezone from $ENV{TZ}
+  ($std, $dst) = tzname;  # timezone abbreviations
+
+  $str = ctime($timestamp);   # is equivalent to:
+  $str = asctime(localtime($timestamp))
+
+  $str = strftime("%A, %B %d, %Y", 0, 0, 0, 12, 11, 95, 2);
+  # $str contains "Tuesday, December 12, 1995"
+
+  $timestamp = mktime(0, 30, 10, 12, 11, 95);
+  print "Date = ", ctime($timestamp);
+
+  print scalar localtime;
+  my $year   = (localtime)[5] + 1900;
+
+  $timespan  = difftime($end, $begin);
+
+=head1 DESCRIPTION
+
+See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
+ 
+=over 4
+
+=item POSIX::1003::Time-E<gt>B<exampleValue>(NAME)
+
+See L<POSIX::1003::Module/"METHODS">
+
+=item $obj-E<gt>B<import>()
+
+See L<POSIX::1003::Module/"METHODS">
+
+=back
+
+=head1 FUNCTIONS
+
+=head2 Standard POSIX
+
+B<Warning:> the functions L<asctime()|POSIX::1003::Time/"Standard POSIX">, L<mktime()|POSIX::1003::Time/"Standard POSIX">, and L<strftime()|POSIX::1003::Time/"Standard POSIX">
+share a weird complex encoding with L<localtime()|POSIX::1003::Time/"Standard POSIX"> and L<gmtime()|POSIX::1003::Time/"Standard POSIX">:
+the month (C<mon>), weekday (C<wday>), and yearday (C<yday>) begin at
+zero.  I.e. January is 0, not 1; Sunday is 0, not 1; January 1st is 0,
+not 1.  The year (C<year>) is given in years since 1900.  I.e., the year
+1995 is 95; the year 2001 is 101.
+
+=over 4
+
+=item B<asctime>(SEC, MIN, HOUR, MDAY, MON, YEAR, ...)
+
+The C<asctime> function uses C<strftime> with a fixed format, to produce
+timestamps with a trailing new-line.  Example:
+
+  "Sun Sep 16 01:03:52 1973\n"
+
+The parameter order is the same as for L<strftime()|POSIX::1003::Time/"Standard POSIX"> without the C<$fmt>:
+
+  my $str = asctime($sec, $min, $hour, $mday, $mon, $year,
+                 $wday, $yday, $isdst);
+
+=item B<clock>()
+
+The amount of spent processor time in microseconds.
+
+=item B<ctime>(TIMESTAMP)
+
+  # equivalent
+  my $str = ctime $timestamp;
+  my $str = asctime localtime $timestamp;
+
+=item B<difftime>(TIMESTAMP, TIMESTAMP)
+
+Difference between two TIMESTAMPs, which are floats.
+
+  $timespan = difftime($end, $begin);
+
+=item B<gmtime>([TIME])
+
+Simply L<perlfunc/gmtime>
+
+=item B<localtime>([TIME])
+
+Simply L<perlfunc/localtime>
+
+=item B<mktime>(SEC, MIN, HOUR, MDAY, MON, YEAR, ...)
+
+Convert date/time info to a calendar time.
+Returns "undef" on failure.
+
+   my $t = mktime(sec, min, hour, mday, mon, year,
+              wday = 0, yday = 0, isdst = -1)
+
+  # Calendar time for December 12, 1995, at 10:30 am
+  $timestamp = mktime(0, 30, 10, 12, 11, 95);
+  print "Date = ", ctime($time_t);
+
+=item B<strftime>(FMT, SEC, MIN, HOUR, MDAY, MON, YEAR, ...)
+
+The formatting of C<strftime> is extremely flexible but the parameters
+are quite tricky.  Read carefully!
+
+  my $str = strftime($fmt, $sec, $min, $hour,
+      $mday, $mon, $year, $wday, $yday, $isdst);
+
+If you want your code to be portable, your format (FMT) argument
+should use only the conversion specifiers defined by the ANSI C
+standard (C89, to play safe).  These are C<aAbBcdHIjmMpSUwWxXyYZ%>.
+But even then, the results of some of the conversion specifiers are
+non-portable.
+
+[0.95_5] This implementation of C<strftime()> is character-set aware,
+even when the LC_TIME table does not match the type of the format string.
+
+=item B<tzname>()
+
+Returns the strings to be used to represent Standard time (STD)
+respectively Daylight Savings Time (DST).
+
+  tzset();
+  my ($std, $dst) = tzname;
+
+=item B<tzset>()
+
+Set-up local timezone from C<$ENV{TZ}> and the OS.
+
+=back
+
+=head1 CONSTANTS
+
+=head2 Constants from time.h
+
+  CLK_TCK CLOCKS_PER_SEC NULL
+
+=head2 Constants from limits.h
+
+  TXNAME_MAX
+
+=head1 SEE ALSO
+
+This module is part of POSIX-1003 distribution version 0.98,
+built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights 2011-2013 on the perl code and the related documentation
+ by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

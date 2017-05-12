@@ -1,0 +1,33 @@
+---
+abstract: 'Load/save PDL from/to CSV file (optimized for speed and large data)'
+author:
+  - 'KMX <kmx@cpan.org>'
+build_requires:
+  Exporter: '5.57'
+  PDL: '2.006'
+  Test::More: '0.88'
+  Test::Number::Delta: '1.06'
+  Text::CSV_XS: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDL-IO-CSV
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter: '5.57'
+  PDL: '2.006'
+  Text::CSV_XS: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/kmx/pdl-io-csv/issues
+  repository: https://github.com/kmx/pdl-io-csv
+version: '0.010'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

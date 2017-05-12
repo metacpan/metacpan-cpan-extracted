@@ -1,0 +1,53 @@
+NAME
+    Perl::WhichPhase
+
+SYNOPSIS
+     use Perl::WhichPhase qw- :in block -;
+
+     if(block eq 'BEGIN') {
+       print "We are in a BEGIN block\n";
+     }
+
+     if(in_END) {
+       print "We are finishing up\n";
+     }
+
+DESCRIPTION
+    This module allows determination of the phase the Perl compiler and
+    interpreter are in, one of BEGIN, INIT, END, or CHECK, or "undef"ined if
+    none of the four apply.
+
+METHODS
+    All of the functions listed here are importable. The import tag ":in"
+    may be used to name all the functions beginning with "in_".
+
+    block
+        This will return one of the four strings BEGIN, INIT, END, or CHECK
+        if Perl is current running that phase. If Perl is not running one of
+        those phases, then this will return "undef".
+
+    in_BEGIN
+        This will return true of the code is being run in a BEGIN block.
+
+    in_CHECK
+        This will return true of the code is being run in a CHECK block.
+
+    in_CODE
+        This will return true if the code is not being run in any of the
+        four phases.
+
+    in_END
+        This will return true of the code is being run in an END block.
+
+    in_INIT
+        This will return true of the code is being run in an INIT block.
+
+AUTHOR
+    James G. Smith <jsmith@cpan.org>
+
+COPYRIGHT
+    Copyright (C) 2002 Texas A&M University. All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

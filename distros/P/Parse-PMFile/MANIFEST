@@ -1,0 +1,33 @@
+Changes
+cpanfile
+lib/Parse/PMFile.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/10_self_check.t
+t/30_multiple_equals.t
+t/31_ignore_version_after_end.t
+t/32_allow_dev_version.t
+t/33_ignore_variable_named_package.t
+t/34_math_version.t
+t/35_scoped_our_version.t
+t/36_long_version.t
+t/40_package_versions.t
+t/50_no_index.t
+t/60_permissions.t
+t/70_vpp.t
+t/71_qv.t
+t/72_vpp_without_using_version.t
+t/73_qv_without_using_version.t
+t/74_vpp_without_using_version_and_our.t
+t/75_vpp_without_our.t
+t/76_qv_without_using_version_and_our.t
+t/77_qv_without_our.t
+t/80_version_overload.t
+t/81_version_overload_with_explicit_vpp.t
+t/90_lossy_warning.t
+t/99_pod.t
+t/99_podcoverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

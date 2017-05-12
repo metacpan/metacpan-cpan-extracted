@@ -1,0 +1,18 @@
+SYNOPSIS
+
+     # in function metadata
+     timeout => 5,
+
+DESCRIPTION
+
+    This property specifies function execution time limit, in seconds. The
+    default is 0, which means unlimited.
+
+    This property's wrapper implementation uses alarm() (ualarm()
+    replacement, for subsecond granularity, will be considered upon
+    demand). If limit is reached, a 504 (timeout) status is returned.
+
+SEE ALSO
+
+    Perinci
+

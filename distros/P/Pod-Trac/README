@@ -1,0 +1,46 @@
+Pod-Trac version 0.0.1
+
+Convert a POD to trac wiki syntax, and create or update a page on a Trac wiki
+with the current documentation of the module.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+Test::More
+version
+Test::Perl::Critic
+File::Util
+URI::Escape
+File::Temp
+HTTP::Request::Common
+LWP::UserAgent
+HTTP::Cookies
+Pod::Simple::Wiki
+Class::Accessor::Fast
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, franck cuny
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

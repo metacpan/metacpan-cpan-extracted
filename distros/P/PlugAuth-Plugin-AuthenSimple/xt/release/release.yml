@@ -1,0 +1,12 @@
+---
+pod_spelling_system:
+  stopwords:
+    - PlugAuth.conf
+    - AuthenSimple
+    - PlugAuth
+    - conf
+
+pod_coverage:
+  private:
+    - PlugAuth::Plugin::AuthenSimple#init
+    - PlugAuth::Plugin::AuthenSimple#check_credentials

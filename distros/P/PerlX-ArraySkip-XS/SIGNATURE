@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 0c3baff0b252915e69a93f6f5f016ec5a5be65d2 COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 13b894704a0324e03a5982fe480fa71c67744b2c Changes
+SHA1 10a012d1ec6d3349664b39685ec975d579f8a7be INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 338a34bd538891eb2a8a48a2630865e8b8c2f869 MANIFEST
+SHA1 3333eb083942d0c23229bed53f4c6279eb17ee4f META.json
+SHA1 df4e4bda66ecbf00846ddf04800b51f7e3087383 META.yml
+SHA1 2953cada1235ab2afdf1ebdd37dceee4bce88497 Makefile.PL
+SHA1 705027690005f2b9db521eb601e32dcf251a3869 README
+SHA1 b5689e33ed922372e2ca43216be78723244561e2 XS.xs
+SHA1 11282adc8a4045fee6c6379ea7a31cd9c32aa47e dist.ini
+SHA1 eb2f4430b2207b2939617844ce1f2cdb87623e8f doap.ttl
+SHA1 da08522868c6aee973f264755c49df4e8fee45e1 fallback/const-c.inc
+SHA1 aa632befa3b4feada95851f4c974ce5dcfdb9983 fallback/const-xs.inc
+SHA1 bc71a709da3a45c70accb046a709c2522043dcd8 lib/PerlX/ArraySkip/XS.pm
+SHA1 e47c5d1952f8ea23ef8be37dfcc448e308e08b24 ppport.h
+SHA1 3f635123afcbbfb86f7e9d372616ef75d2a27a8b t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQYSfsACgkQzr+BKGoqfTki/gCffi2sqBhfGk3mhnhZJ9cIdm1+
+uVcAoJLSXxcMSqJPkeTy+UHFuiKM4EGm
+=IRDG
+-----END PGP SIGNATURE-----

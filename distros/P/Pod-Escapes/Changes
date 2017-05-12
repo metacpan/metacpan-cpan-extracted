@@ -1,0 +1,62 @@
+Revision history for Perl module Pod::Escapes
+
+1.07 2014-12-09 NEILB
+
+    - All changes from Ken Williamson as part of EBCDIC work for 5.22
+    - Fix typo in comment
+    - Reorder structure definitions
+    - Fill %Name2character better for EBCDIC
+    - Generalize for EBCDIC
+    - doc clarification
+
+1.06_01 2014-12-05 NEILB
+
+    - A bunch of changes from KHW++ for EBCDIC support.
+    - Doing a developer release first, to make sure everything's good
+      from CPAN Testers.
+
+1.06 2014-02-14 NEILB
+
+    - e2charnum() was using \d but should use [0-9].
+      RT#70246 report and fix from MARCGREEN
+    - Added a bunch of pod-related links to SEE ALSO
+
+1.05 2014-02-09 NEILB
+
+    * Added PREREQ_PM, MIN_PERL_VERSION, LICENSE and repo to Makefile.PL
+    * Made strict- and warnings-clean.
+    * Fixed syntax error in abstract: RT#49985 from JDHEDDEN
+    * Fixed typo reported in RT#85374 by dsteinbrunner
+    * Renamed this file to Changes and reformatted as per CPAN::Changes::Spec
+    * Deleted META.yml so MakeMaker will generate MYMETA.{yml,json}
+    * Noted in pod that now being maintained by NEILB
+    * Added link to github repo in pod
+
+1.04_01 2014-02-08 NEILB
+
+    * All the changes listed in 1.05 above were first done as a developer
+      release.
+
+1.04 2004-05-07 SBURKE
+
+    * adding support for E<x123> as an alternate form for E<0x123>.
+      Adding the function e2charnum and the hash %Name2character_number.
+
+    * Tests rearranged, and new ones added.
+
+1.03 2002-08-27 SBURKE
+
+    * previous version mistakenly thought that "x4f"
+      was the syntax for hex escapes in Pod.  Perlpod says it's 0x4f, so
+      Pod::Escapes has been changed to support this syntax instead
+      (instead!).
+
+1.02 2001-12-14 SBURKE
+
+    * added %Name2character_number and e2charnum,
+      at the suggestion of Tim Jenness.
+
+1.01 2001-10-24 SBURKE
+
+    * Release 1.01 -- first release version
+

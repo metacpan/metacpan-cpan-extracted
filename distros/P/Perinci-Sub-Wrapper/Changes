@@ -1,0 +1,736 @@
+Revision history for Perinci-Sub-Wrapper
+
+0.83    2016-06-02 (PERLANCAR)
+
+        - No functional changes.
+
+        - Adjust to Data::Sah 0.79 (introduced v in compilation data, modules
+          become array of records).
+
+
+0.82    2016-02-04 (PERLANCAR)
+
+	- [Bugfix] When arg/result is stream, check that schema must be
+	  str/buf/array and when schema is array use the schema specified
+	  in its 'of' clause.
+
+
+0.81    2016-01-22 (PERLANCAR)
+
+	- No functional changes.
+
+	- Show streaming record (input this time) that fails validation, to
+	  aid debugging.
+
+
+0.80    2016-01-20 (PERLANCAR)
+
+	- No functional changes.
+
+	- Show streaming record/sub result that fails validation, to aid
+	  debugging.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.79    2015-09-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.78    2015-05-23 (PERLANCAR)
+
+	- Add wrap options: core, core_or_pp, pp (like in Data::Sah).
+
+
+0.77    2015-05-13 (PERLANCAR)
+
+	- Check args_rels property.
+
+
+0.76    2015-04-25 (PERLANCAR)
+
+        - Make sure we also use ## as trailing comment when debug=1 [RT#103932].
+
+        - Add a couple of benchmark devscripts.
+
+
+0.75    2015-02-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.74    2015-02-19 (PERLANCAR)
+
+        - Ignore entity_date property (produced by Perinci::Access::Perl, for
+          example).
+
+        - Properly handle use/no statements from Data::Sah compilation result,
+          instead of converting them to require statements.
+
+
+0.73    2015-02-18 (PERLANCAR)
+
+	- Make sure we always use ## as trailing comment, to make it easier
+	  for others (like Dist::Zilla::Plugin::Rinci::Wrap) to strip the
+	  comments.
+
+
+0.72    2015-02-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix typo in deps [GH#1].
+
+
+0.71    2015-01-21 (PERLANCAR)
+
+	- No functional changes.
+
+	- Remove debugging diag().
+
+
+0.70    2015-01-17 (PERLANCAR)
+
+	- Support Rinci 1.1.71: streaming input & output now uses coderef only
+          (not filehandle or tied array or IO::Handle-like object). We also
+          support per-record validation of streaming input & output.
+
+
+0.69    2015-01-16 (PERLANCAR)
+
+	- Handle argument validation when stream=1.
+
+
+0.68    2015-01-11 (PERLANCAR)
+
+	- Handle 'result/stream' property, add validation for streaming
+	  result.
+
+
+0.67    2014-12-10 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use new name of renamed/split module SHARYANTO::String::Util ->
+	  String::LineNumber.
+
+
+0.66     2014-10-29 (PERLANCAR)
+
+         [BUG FIXES]
+
+         - Argument specification property 'default' was not used when there is
+           no schema.
+
+         - Typo: unimplemented status is 501, not 502.
+
+
+0.65     2014-10-23 (PERLANCAR)
+
+         [REMOVED FEATURES]
+
+         - Remove support for 'encoding' (removed in Rinci 1.1.62).
+           Handling/encoding binary data will be handled at the Riap level.
+
+
+0.64     2014-10-22 (PERLANCAR)
+
+         - Support result specification property 'encoding' by automatic
+           encoding of result when property is set (Rinci 1.1.61).
+
+         - Support argument specification property 'encoding' by automatic
+           decoding of function arguments when property is set (Rinci 1.1.59).
+
+
+0.63     2014-10-15 (PERLANCAR)
+
+         - Add support for arg submetadata & arg element submetadata (Rinci
+           1.1.56).
+
+         - [Bugfix] schema_is_normalized arg in Sah schema compilation was
+           incorrectly reversed.
+
+
+0.62     2014-09-06 (PERLANCAR)
+
+         - Tweak/fix logic of setting default value for validate_{args,result}.
+           First set default to 0 if the function metadata attribute
+           'x.perinci.sub.wrapper.disable_validate_{args,result}' is defined
+           (this was not done before; it's useful if e.g. args is validated
+           using code inserted by Dist::Zilla::Plugin::Rinci::Validate).
+
+           If that attribute is not defined, set default to 0 if there is
+           previous log of validate args/result ('x.perinci.sub.wrapper.logs').
+           Of course, all of this is only if validate_{args,result} argument for
+           wrap_sub() is not defined.
+
+
+0.61     2014-05-01 (SHARYANTO)
+
+         - No functional changes.
+
+         - Bump prereq version Sah::Schema::Rinci to avoid fail reports [CT].
+
+
+0.60     2014-04-30 (SHARYANTO)
+
+         - [Bugfix] Forgot to ignore internal properties (/^_.+/).
+
+
+0.59     2014-04-30 (SHARYANTO)
+
+         - In this release Perinci::Sub::Wrapper now uses
+         Perinci::Sub::Normalize and several features are removed.
+
+         [REMOVED FEATURES]
+
+         - Conversion of v (1.0 -> 1.1) is now removed. Only v1.1 metadata are
+           accepted. This makes the code simpler and the feature should seldom
+           be used nowadays. Those who still need the functionality can now use
+           Perinci::Sub::Convert::v, which is extracted from this module.
+
+         - Conversion of default_lang is now removed. This makes the code
+           simpler and the feature should seldom be used. Those who still need
+           the functionality can now use Perinci::Sub::Convert::default_lang,
+           which is extracted from this module.
+
+         - Remove the _remove_internal_properties option (which is undocumented
+           anyway).
+
+         - The whole modify_meta code is removed. Metadata should now just be
+           normalized using Perinci::Sub::Normalize instead.
+
+
+0.58     2014-04-10 (SHARYANTO)
+
+         - No functional changes.
+
+         - Replace Data::Clone with Function::Fallback::CoreOrPP.
+
+
+0.57     2014-03-28 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Remove (deprecated) sections: {before,after}_call. They have been
+           replaced with the more fine-grained {before,after}_call_* sections.
+
+         - Add sections: before_call_right_before_call,
+           after_call_right_after_call.
+
+         [ENHANCEMENTS]
+
+         - result property: check unknown result spec properties.
+
+         - result property: Can load Perinci::Sub::Property::result::* modules
+           to handle unknown result spec properties. An example of this is
+           Perinci::Sub::Property::result::table.
+
+
+0.56     2014-03-27 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Rename Rinci attribute 'x.perinci.sub.wrapper.log{,s}' to be more
+           consistent.
+
+
+0.55     2014-03-12 (SHARYANTO)
+
+         - Add section: after_call_after_res_validation.
+
+
+0.54     2014-03-08 (SHARYANTO)
+
+         - deps property: Require Perinci::Sub::DepChecker so it's detectable by
+           DZP::Rinci::Wrap.
+
+
+0.53     2014-03-07 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - In embed mode should also put wrap log.
+
+         [ENHANCEMENTS]
+
+         - Mark embed mode in wrap log, so Perinci::Access::Perl can choose to
+           skip re-wrapping if already wrapped in embed mode.
+
+         - Add _extra_sah_compiler_args option (for passing comment=>0, for
+           Dist::Zilla::Plugin::Rinci::Wrap)/
+
+         - Always keep comments in generated code on their own lines (to make it
+           easier to squish the code, like in Dist::Zilla::Plugin::Rinci::Wrap).
+
+
+0.52     2014-03-07 (SHARYANTO)
+
+         - Fixes for Perinci::Sub::Property::retry.
+
+         - Don't hide/trap the error when requiring property module.
+
+         - When 'sub' as well as 'sub_name' is given, use 'sub' when calling the
+           subroutine. 'sub_name' is used to print out nice name for the sub.
+
+
+0.51     2014-03-06 (SHARYANTO)
+
+         - This release removes some features to make the module simpler and has
+           less overhead for simpler cases. The wrapper is now also able to
+           generate code appropriate for embedding directly into source code
+           during build (see Dist::Zilla::Plugin::Rinci::Wrap for more details).
+
+         [INCOMPATIBLE CHANGES]
+
+         - No longer bless wrapped subroutines to mark it as wrapped (see log=>1
+           instead).
+
+         [NEW FEATURES]
+
+         - New option embed=>1 to generate code suitable for embedding/insertion
+           to existing code. Most users need not use it directly; instead, use
+           Dist::Zilla::Plugin::Rinci::Wrap.
+
+         - Add option log=>1 (enabled by default) to generate wrap log (instead
+           of blessing the subroutine). This log contains information that can
+           help avoid duplicating argument validation, etc.
+
+         [REMOVED FEATURES]
+
+         - Remove option: remove_internal_properties (becomes internal
+           _remove_internal_properties).
+
+         - Remove options: allow_invalid_args and allow_unknown_args (they are
+           now regulated by validate_args).
+
+         - Remove option: normalize_schema (becomes internal
+           _schema_is_normalized).
+
+         - Remove option: skip (unused).
+
+         - Remove option: trap (automatically will generate trap if needed).
+
+         - Remove option: forbid_tags (unused; currently only used to forbid
+           properties that generate 'die', but since we'll trap at the level of
+           Perinci::Access::Perl and Perinci::Access::HTTP::Server instead of
+           function wrapper, this is okay).
+
+         - Remove function: wrap_all_subs() (unused)
+
+         - Remove the reading of _perinci.sub.wrapper.* meta attributes (replace
+           it with x.perinci.sub.wrapper.log).
+
+         - Remove the reading of PERINCI_WRAPPER_VALIDATE_ARGS.
+
+         [INTERNAL]
+
+         - All variables in the generated code are now prefixed by '_w_' to
+           reduce the possibility of clash. The one exception is 'args'
+           (%args/@args/$args).
+
+         - Wrapper code is more minimalistic when there are not much to do (e.g.
+           validate_args=>0, validate_result=>0), to reduce overhead and clutter
+           (especially when embed=>1).
+
+
+0.50     2014-01-03 (SHARYANTO)
+
+         - wrapper: Rethrow (warn()) exception when wrapped function dies, to
+           aid debugging.
+
+
+0.49     2013-12-25 (SHARYANTO)
+
+         - Handle (ignore) argument spec's 'cmdline_on_getopt (Rinci 1.1.43).
+
+
+0.48     2013-11-13 (SHARYANTO)
+
+         - Handle (ignore) argument spec's 'element_completion' property (Rinci
+           1.1.42).
+
+         - Handle argument spec's 'default' property (Rinci 1.1.42).
+
+
+0.47     2013-11-08 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - When compile=0, wrap_sub() didn't return meta.
+
+
+0.46     2013-10-02 (SHARYANTO)
+
+         - Can accept sub_name only instead of sub.
+
+
+0.45     2013-09-07 (SHARYANTO)
+
+         - Handle (ignore) property 'entity_v' (Rinci 1.1.36).
+
+
+0.44     2013-08-12 (SHARYANTO)
+
+         - No functional changes. Remove dependency to Perinci::Util (in 0.35,
+           get_package_meta_accessor is removed).
+
+
+0.43     2013-08-07 (SHARYANTO)
+
+         - No functional changes. Add 'use experimental smartmatch' for 5.18+.
+
+
+0.42     2013-08-06 (SHARYANTO)
+
+         - Handle (ignore) property 'x' in arg spec.
+
+
+0.41     2013-04-11 (SHARYANTO)
+
+         - Handle (ignore) property 'x' (new in Rinci 1.1.35).
+
+
+0.40     2013-03-11 (SHARYANTO)
+
+         - Allow function arguments in the form of 'abc.def' (e.g. produced by
+           Perinci::Sub::Gen::AccessTable).
+
+
+0.39     2013-01-16 (SHARYANTO)
+
+         - No functional changes. Move test to Perinci-Sub-PropertyUtil to avoid
+           circular dependency [RT#82712].
+
+
+0.38     2013-01-15 (SHARYANTO)
+
+         - No functional changes. Update module name in test script [RT#82712].
+
+
+0.37     2013-01-11 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Observe PERINCI_WRAPPER_VALIDATE_ARGS.
+
+         - Observe LINENUM.
+
+         [BUG FIXES]
+
+         - Declare variables needed by validator code.
+
+         - Use Data::Sah 0.10.
+
+
+0.36     2012-11-07 (SHARYANTO)
+
+         - No functional changes. Fix handling argument name that is not
+           alphanum-only (e.g. 'foo.is', 'bar.contains', these are generated by
+           Perinci::Sub::Gen::AccessTable).
+
+
+0.35     2012-11-03 (SHARYANTO)
+
+         - No functional changes. Minor optimization for generated code, add FAQ
+           item.
+
+
+0.34     2012-11-03 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Follow Rinci 1.1.32.
+
+         - Wrapper code now validates result.
+
+         - Wrapper code now rejects invalid args (like 'foo bar') unless new
+           option 'allow_invalid_args' is turned on.
+
+         - Wrapper code now rejects unknown args (those not specified in 'args'
+           metadata property), unless new option 'allow_unknown_args' is turned
+           on.
+
+         - Add options 'validate_args' to allow skipping validating arguments,
+           'validate_result' to allow skipping validating result, 'skip' to skip
+           certain properties, 'allow_unknown_args', 'allow_invalid_args'.
+
+         - Most wrapping options can now be specified in the metadata attributes
+           ('_perinci.sub.wrapper.*', e.g.
+           '_perinci.sub.wrapper.validate_args').
+
+         [REMOVED FEATURES]
+
+         - Move caller() to Perinci-Util (Perinci::Sub::Util) to reduce startup
+           overhead modules which only need caller() and not the whole wrapper.
+
+
+0.33     2012-10-26 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Wrapper code now validates arguments!
+
+
+0.32     2012-08-16 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Change logger setting variable $Log_{Perinci_,}Wrapper_Code
+           (convention).
+
+
+0.31     2012-08-16 (SHARYANTO)
+
+         - No functional changes. Remove sub entry/exit log. Users should now
+           use Log::Any::For::Package for this.
+
+         - Wrapper code is only logged if $Log_Perinci_Wrapper_Code is true. You
+           can set via environment variable LOG_PERINCI_WRAPPER_CODE.
+
+
+0.30     2012-08-09 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Now looks for property handler in Perinci::Sub::Property::* instead
+           of Perinci::Sub::property::* (fix casing).
+
+
+0.29     2012-08-08 (SHARYANTO)
+
+         - Add caller() function.
+
+
+0.28     2012-08-04 (SHARYANTO)
+
+         - Add wrapped() function.
+
+
+0.27     2012-08-02 (SHARYANTO)
+
+         - No functional changes. Update to new Perinci::Role::MetaAccessor
+           interface (0.26).
+
+
+0.26     2012-08-01 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add wrap_all_subs().
+
+
+0.25     2012-07-31 (SHARYANTO)
+
+         [FIXES]
+
+         - Change handling of 'result_naked' property so that 'dies_on_error'
+           property can get result status + message properly.
+
+         [ENHANCEMENTS]
+
+         - Add argument: sub_name (also so that 'dies_on_error' property can
+           display proper die message showing subroutine name).
+
+         - Add argument: forbid_tags.
+
+
+0.24     2012-07-31 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Introduce protocol version which must be specified by all property
+           handlers (assumed to be 1 if unspecified). This is bumped whenever an
+           incompatible change at the basic structure of wrapper code is
+           introduced. Bumping the protocol version will force all existing
+           property handlers to be updated.
+
+         - Bump protocol version from 1 to 2: to return result immediately,
+           handler must now say 'goto RETURN_RES' instead of 'return $res'
+           directly. This is so that some handlers get the last chance to do
+           something to $res before it is returned.
+
+         [ENHANCEMENTS]
+
+         - Introduce section: 'before_return_res'.
+
+
+0.23     2012-07-29 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - When encountering an unknown property, automatically try to require
+           Perinci::Sub::property::PROP first. So you don't have to manually
+           use() the property modules.
+
+         - Add wrap_sub() argument 'debug' to show debugging in generated code.
+           Currently show the handler from which each line comes from.
+
+         - Check known arg spec key.
+
+
+0.22     2012-06-21 (SHARYANTO)
+
+         - features: Require transaction ('-tx_manager' argument) if
+           features->{tx}{req} is 1.
+
+
+0.21     2012-06-07 (SHARYANTO)
+
+         [FIXES]
+
+         - deps: '-undo_trash_dir' argument is not needed when '-tx_manager'
+           argument is given.
+
+
+0.20     2012-06-07 (SHARYANTO)
+
+         - Update to Rinci 1.1.18 (some new deps introduced: 'tmp_dir',
+           'trash_dir', 'undo_trash_dir'; some removed: 'undo_storage').
+
+
+0.19     2012-03-22 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - 'default_lang' also converts language properties in tag metadata in
+           'tags'.
+
+
+0.18     2012-03-21 (SHARYANTO)
+
+         - No functional changes. Rebuild with Perinci PodWeaver plugin enabled.
+
+
+0.17     2012-03-21 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Convert 'default_lang' property.
+
+         - 'remove_internal_properties' now also removes internal properties in
+           'result', 'examples', and 'links'.
+
+
+0.16     2012-03-16 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Convert 1.0 - 1.1: Set argument spec's summary from argument schema.
+
+
+0.15     2012-02-28 (SHARYANTO)
+
+         [NEW FEATURES]
+
+         - Handle 'cmdline_aliases' (Rinci 1.1.8+)
+
+         - Convert 1.0 'arg_aliases' to 'cmdline_aliases'
+
+         - Add 'remove_internal_properties' wrap option.
+
+
+0.14     2012-02-23 (SHARYANTO)
+
+         [NEW FEATURES]
+
+         - Automatically convert metadata v1.0 to v1.1. Finally all the old
+           Sub::Spec specs are now usable again.
+
+
+0.13     2012-02-22 (SHARYANTO)
+
+         [NEW FEATURES]
+
+         - Sah schemas in 'args' and 'result' are now normalized in the new
+           metadata, this is to make it simpler for other code to use the schema
+           (e.g. Perinci-Access when completing args). New metadata is now a
+           deep clone of the old (instead of just a shallow copy), this might
+           increase memory usage.
+
+
+0.12     2012-02-15 (SHARYANTO)
+
+         [REMOVED FEATURES]
+
+         - Remove 'force' argument. wrap_sub() still mark wrapping by blessing
+           the generated wrapper, but will gladly double wrap. I believe caching
+           should be done in the upper layers.
+
+
+0.11     2012-02-13 (SHARYANTO)
+
+         [ETC]
+
+         - Add tweak to work better with 'retry' property wrapper.
+
+
+0.10     2012-02-13 (SHARYANTO)
+
+         [NEW FEATURES]
+
+         - Add wrap option 'compile'.
+
+
+0.09     2012-02-13 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Fix indenting in generated code.
+
+
+0.08     2012-02-12 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Convert keys are now respected even though meta does not have that
+           key.
+
+
+0.07     2012-02-12 (SHARYANTO)
+
+         - Add (or re-enable) unshift_lines()
+
+         - Extract test routine to Test::Perinci::Sub::Wrapper to make it usable
+           from other Perinci-Sub-property-* distributions.
+
+
+0.06     2012-02-12 (SHARYANTO)
+
+         - Rename distribution from Sub-Spec-Wrapper to Perinci-Sub-Wrapper.
+
+
+0.05     2012-01-21 (SHARYANTO)
+
+         - No functional changes. Mark Sub-Spec-Wrapper deprecated.
+
+
+0.04     2011-10-19 (SHARYANTO)
+
+         - No functional changes. Add missing dependency to
+           Sub::Spec::ConvertArgs::Array [thanks cpant & Andreas].
+
+
+0.03     2011-09-22 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Support 'args_as' spec clause (hash/hashref/array/arrayref supported,
+           but object not yet).
+
+
+0.02     2011-08-31 (SHARYANTO)
+
+         - Build and POD fixes.
+
+
+0.01     2011-08-31 (SHARYANTO)
+
+         - First release.

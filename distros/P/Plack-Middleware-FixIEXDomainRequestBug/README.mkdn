@@ -1,0 +1,141 @@
+# NAME
+
+Plack::Middleware::FixIEXDomainRequestBug - Fix IE8/IE9 XDomainRequest Missing Content Type 
+
+# SYNOPSIS
+
+The Following two examples encompass most likely usage
+
+## Specify Mimetype
+
+Specify the mimetype (assumes you control all ends)
+
+    use Plack::Builder;
+    builder {
+      enable 'FixIEXDomainRequestBug',
+        force_content_type => 'application/json';
+      $app;
+    };
+
+## Custom Provider
+
+Use some custom code to provide a valid mimetype
+
+    use Plack::Builder;
+    builder {
+      enable 'FixIEXDomainRequestBug',
+        guess_with  => sub {
+          my $env = shift;
+          if($env->{PATH_INFO} =~ m{^/api}) {
+            return 'application/json';
+          } else {
+            return 'application/x-www-form-urlencoded';
+          }
+        };
+      $app;
+    };
+
+You may also consider strategies where you apply the middleware differently
+under different mount points.
+
+# DESCRIPTION
+
+Here's a good explanation of the issue we are attempting to solve:
+
+[http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx](http://blogs.msdn.com/b/ieinternals/archive/2010/05/13/xdomainrequest-restrictions-limitations-and-workarounds.aspx)
+
+Basically Internet Explorer 8 and 9 have a proprietary approach to allow cross
+domain AJAX safely.  However in the attempt to lock down the interface as much
+as possible Microsoft introduced what is widely considered a major bug, which
+vastly decreases the value of the feature.  What happens is that any type of
+attempt to use the XDomainRequest activeX control sets the request content type
+to nothing or text/plain (the docs say text/plain is the only type allowed, but
+web search and the experience we have seen is that the content type is empty).
+As a result, when a framework like [Catalyst](http://search.cpan.org/perldoc?Catalyst) trys to parse the POST body, it
+can't figure out what to do, so it punts, typically busting this code.  Since
+it is common with web applications to use a Javascript framework to paper over
+browser differences, this means that an application doing cross domain access
+might easily work with Firefox but totally bust with IE 8 or 9 (at the time of
+this writing these browsers are still the most popular for people using Windows
+on the desktop, and typically represent 20%+ total web traffic)
+
+This distribution attempts to solve this problem at the middleware level.  What
+it does is check to see if the user agent identifies itself as Internet Explorer
+8 or 9, AND the method is POST (only GET and POST http methods are allowed with
+XDomainRequest anyway) AND content-type is nothing or text/plain, THEN we do
+of the following:
+
+We create the following custom key
+
+    $env->{'plack.middleware.fixiexdomainrequestbug.overrode_content_type'} = 1
+
+You can test if this value is true to detect if we changed the `content-type`,
+should you wish to know (might be useful for debugging).
+
+Then we change $env->{'CONTENT\_TYPE'} in one of the following ways
+
+If you've specified a `force_content_type` configuration, we always use that,
+and change the http content type to match.
+
+Otherwise, if you've set a `guess_with` configuration we assume that is an
+anonymous sub and invoke that with $env.  That coderef is expected to return
+a string which is a valid `content-type`.  Commonly you may wish to set a
+custom search query parameter as a fallback mechanism for setting the 
+`Content_Type`, or set the expected content-type based on the requested path (
+as seen in the ["SYNOPSIS"](#SYNOPSIS) example.
+
+    use Plack::Builder;
+    builder {
+      enable 'FixIEXDomainRequestBug',
+        guess_with  => sub {
+          my $env = shift;
+          my $req = Plack::Request->new($env);
+
+          ## Assume a request url like "http://myapp.com/path?format=application/json"
+          return $req->query_parameters->get('format')
+        };
+      $app;
+    };
+
+# ATTRIBUTES
+
+This middleware has the following attributes used to inform how a missing or
+invalid HTTP `Content_Type` is altered.  The listing is in order of priority.
+
+It goes without saying that although both attributes are not required, you need
+at least one of them for the middleware to function.
+
+See ["SYNOPSIS"](#SYNOPSIS) for examples.
+
+## force\_content\_type
+
+String: Default is empty, not required.
+
+This is a string which must be, if defined, a valid mimetype suitable for
+populating the HTTP Header `Content_Type`.  If this attribute is set, and
+a request meeting the defined criteria is detected, the `Content_Type` is
+forced to the set value.
+
+## guess\_with
+
+CodeRef: Default is empty, not required.
+
+This coderef is used if you wish to create a custom mechanism for figuring out
+what the `Content_Type` should be when the defined criteria (described above)
+is detected.  It gets passed the [PSGI](http://search.cpan.org/perldoc?PSGI) env and is expected to return a string
+which is suitable as a value for HTTP Header `Content_Type`.
+
+# SEE ALSO
+
+[Plack](http://search.cpan.org/perldoc?Plack), [Plack::Middleware](http://search.cpan.org/perldoc?Plack::Middleware).
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2013, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

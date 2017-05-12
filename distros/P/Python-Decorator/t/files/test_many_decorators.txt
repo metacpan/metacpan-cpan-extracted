@@ -1,0 +1,32 @@
+Python::Decorator filtered the source into:
+-------------------------------
+use Carp qw(confess);
+
+sub loginout {
+    my $f = shift;
+    return sub {
+	print "entering sub\n";
+	&$f(@_);
+	print "leaving sub\n";
+    };
+}
+
+
+
+
+
+{ no strict "refs"; *{__PACKAGE__."::foo"} = loginout(loginout(loginout(loginout( sub  {
+    print "running foo()\n";
+} )))); }
+
+foo();
+-------------------------------
+entering sub
+entering sub
+entering sub
+entering sub
+running foo()
+leaving sub
+leaving sub
+leaving sub
+leaving sub

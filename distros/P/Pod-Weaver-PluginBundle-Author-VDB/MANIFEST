@@ -1,0 +1,12 @@
+# This file was generated with Dist::Zilla::Plugin::Manifest::Write v0.9.7.
+Build.PL                                  #                          3rd party file built by ModuleBuildTiny
+COPYING                                   # Pod-Weaver-PluginBundle-Author-VDB file built by GenerateFile
+Changes                                   # Pod-Weaver-PluginBundle-Author-VDB file added by Manifest::Read
+GPLv3                                     # Pod-Weaver-PluginBundle-Author-VDB file added by Manifest::Read
+MANIFEST                                  #                           metainfo file built by Manifest::Write
+META.json                                 #                           metainfo file built by MetaJSON
+META.yml                                  #                           metainfo file built by MetaYAML
+README                                    # Pod-Weaver-PluginBundle-Author-VDB file built by GenerateFile
+VERSION                                   # Pod-Weaver-PluginBundle-Author-VDB file added by Manifest::Read
+lib/Pod/Weaver/PluginBundle/Author/VDB.pm # Pod-Weaver-PluginBundle-Author-VDB file added by Manifest::Read
+t/00-compile.t                            #                          3rd party file built by Test::Compile

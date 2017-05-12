@@ -1,0 +1,14 @@
+Revision history for Perl extension Plack-App-EventSource
+
+0.03 2017-04-20T22:22:45Z
+
+    - capture writer exceptions
+
+0.02 2015-04-01T08:32:00Z
+
+    - support all field names and documentation fixes (Jakob Voss)
+
+0.01 2015-02-06T11:14:04Z
+
+    - original version
+

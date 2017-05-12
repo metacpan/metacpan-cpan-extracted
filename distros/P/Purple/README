@@ -1,0 +1,39 @@
+Purple -- Granular addressability for the web and beyond
+========================================================
+
+Purple generates stable, immutable identifiers that may be used to
+address granular content.  These identifiers generally manifest
+themselves as "purple numbers."
+
+On the web, you can always link to documents, but linking to granular
+content like paragraphs in a document is a shakier proposition.
+Purple lets you link or transclude granular content on the web.
+
+Purple:
+
+  * Generates identifiers and associates them with a URL.  That
+    identifier can then be used as a stable address, even if the
+    URL changes.
+
+  * Provides an HTTP interface for retrieving and updating identifiers
+    in the database.
+
+More information is available at:
+
+  http://purple.blueoxen.net/
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+COPYRIGHT AND LICENCE
+
+(C) Copyright 2006 Blue Oxen Associates.  All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

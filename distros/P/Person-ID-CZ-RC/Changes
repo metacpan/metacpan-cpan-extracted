@@ -1,0 +1,21 @@
+0.04 2015-09-28T17:50:11+02:00
+ - Add 'readme_from' directive to Makefile.PL.
+ - Add tests.
+ - Fix LICENSE file.
+ - Fix day, month and year numbers. There are ints.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.03 2013-11-07
+ - Add minimal Perl version.
+ - Add some tests.
+
+0.02 2013-09-21
+ - Add Person::ID::CZ::RC::Generator to SEE ALSO section in doc.
+ - Rewrite Changes file to CPAN::Changes::SPEC format.
+
+0.01 2013-09-19
+ - First version.

@@ -1,0 +1,886 @@
+Revision history for Palm-PDB
+
+1.400  2015-03-07  Release by Christopher J. Madsen
+
+	- Bump version number to be greater than all previous releases.
+	  Palm::PDB 1.36 was released in p5-Palm 1.008, but p5-Palm 1.009
+	  contained Palm::PDB 1.009.  Version numbers shouldn't go backwards.
+	  (reported by David Cantrell - GitHub#1)
+
+1.016  2015-01-24  Release by Christopher J. Madsen
+
+	- Move deleted records to end of file (Alan Wehmann - RT#101666)
+	- Use 'our' instead of 'use vars'
+
+1.015  2014-08-09  Release by Christopher J. Madsen
+
+	- Minor documentation improvements
+
+1.014  2014-07-26  Release by Christopher J. Madsen
+
+	- New maintainer Christopher J. Madsen
+	- Palm::PDB & Palm::Raw are now distributed separately from
+	  the other Palm modules
+	- With permission from Andrew Arensburger & Alessandro Zummo
+	  Palm-PDB is now distributed under the same terms as Perl 5
+	- Constant variables in Palm::PDB are now proper constants
+
+1.013  2013-08-21  Release by brian d foy <bdfoy@cpan.org>
+
+	- Add notice that this distribution is in need of a new maintainer
+
+1.012  2010-02-23  Release by brian d foy <bdfoy@cpan.org>
+
+	- Promote to a full release from the latest development cycle
+
+1.011_01  2010-01-02  Trial Release by brian d foy <bdfoy@cpan.org>
+
+	- Palm/Datebook.pm: add support for time zone entries
+	  (Tim Adye <T.J.Adye@rl.ac.uk>)
+
+1.011  2009-08-17  Release by brian d foy <bdfoy@cpan.org>
+
+	- Palm/Datebook.pm: add support for the newer-format Palm Calendar
+	  databases (Tim Adye <T.J.Adye@rl.ac.uk>)
+
+1.009  2007-07-30  Release by brian d foy <bdfoy@cpan.org>
+
+	- cleaned up the pod coverage test.
+	- add License and Author stuff to the distro
+
+1.006  2007-01-15  Release by brian d foy <bdfoy@cpan.org>
+
+	- chromatic sent me some changes living in another distro
+	  (p5-Palm-1.004_000). It catches up 1.003_000 for all of the
+	  changes since November 2002 listed in this file.
+
+1.005  2007-01-13  Release by brian d foy <bdfoy@cpan.org>
+
+	- Cleansed the dist to make it installable by CPAN tools.
+	  It just needs a version without a _ in it.
+	  (http://rt.cpan.org/Ticket/Display.html?id=12837)
+
+1.004  2004-04-15  Various Authors
+
+ The release history before version 1.006 is muddled.
+ These are the changes listed, but it's not clear what was released when.
+
+ 2004-04-15 21:21  christophe
+
+	- Palm/PDB.pm, util/pdbdump: Added some logic to detect broken
+	databases during loading:
+
+	- database names _must_ contain the terminating NUL within the
+	first 32 characters of the header. This catches obviously broken
+	situations like text files renamed to .pdb files (which, oddly
+	enough, happens a lot when you're trying to process text files into
+	Doc files).
+
+	- position offsets mustn't go beyond the end of the database file
+	($pdb->{_size}).  This indicates either truncation of the db or
+	straight corruption.
+
+ 2004-04-08 22:55  christophe
+
+	- Palm/PDB.pm: make it impossible to create a nameless database. It
+	can't be uploaded to the PDA, that's for sure.
+
+ 2003-11-09 20:40  azummo
+
+	- Palm/PDB.pm: Handle uniqueID and uniqueIDseed in the Palm OS way.
+
+ 2003-11-05 15:19  azummo
+
+	- Palm/DateTime.pm: Fixed ISO8601 format in palmtime_to_iso8601
+	Minor stylistical changes
+
+ 2003-10-10 19:19  azummo
+
+	- Palm/Datebook.pm: Fixed alarm documentation (Christophe
+	Beauregard)
+
+ 2003-10-10 07:01  azummo
+
+	- Palm/PDB.pm: Implemented remove_Record() method. Fixed dirty
+	flags handling.
+
+	(Christophe Beauregard)
+
+ 2003-10-10 06:51  azummo
+
+	- Palm/PDB.pm: Added is_Dirty method (Christophe Beauregard).
+
+ 2003-09-16 18:59  azummo
+
+	- MANIFEST, README: Updated in preparation for the new release.
+
+ 2003-09-16 18:56  azummo
+
+	- Makefile.PL: Bumped version number.
+
+ 2003-09-16 18:53  azummo
+
+	- Palm/ZirePhoto.pm: Removed unused methods. The superclass will
+	take care.
+
+ 2003-08-03 13:06  arensb
+
+	- README, Palm/PDB.pm: Added missing section header in POD. Patch
+	contributed by Kurt Starsinic <kstar@cpan.org>
+
+ 2003-06-26 15:21  azummo
+
+	- Palm/Mail.pm: Some headers were left undefined (Christophe
+	Beauregard)
+
+ 2003-06-24 10:28  azummo
+
+	- Palm/ZirePhoto.pm: Added.
+
+ 2002-12-17 19:09  azummo
+
+	- MANIFEST: Added DateTime.pm to manifest.
+
+ 2002-11-07 10:50  arensb
+
+	- Makefile.PL: Updated version number.
+
+ 2002-11-07 09:27  arensb
+
+	- Palm/StdAppInfo.pm: (API) Now supports databases where the last
+	byte of the AppInfo block is data instead of padding.
+	Backwards-compatible.
+
+ 2002-11-07 09:11  arensb
+
+	- Palm/: Address.pm, Datebook.pm, Mail.pm, Memo.pm, ToDo.pm:
+	Rearranged @ISA, so that it'll get the right &ParseAppInfoBlock.
+
+ 2002-11-03 11:43  azummo
+
+	- Palm/: Address.pm, DateTime.pm, Datebook.pm, Mail.pm, Memo.pm,
+	PDB.pm, PQA.pm, Raw.pm, StdAppInfo.pm, ToDo.pm: Changed $VERSION
+	parser.
+
+ 2002-09-03 13:48  azummo
+
+	- Palm/Address.pm: Patch from Brian Johnson (it just adds an else
+	to the if statement to nullify non-existing entities).
+
+ 2002-06-22 09:16  azummo
+
+	- Palm/PDB.pm: now now takes an optional hash with default values.
+
+ 2002-06-16 09:37  azummo
+
+	- Palm/PDB.pm: Added some compatibility code.  Reflected (part of)
+	changes in the POD.
+
+ 2002-06-16 09:26  azummo
+
+	- Palm/PDB.pm: Make some more use of the new attribute names.
+
+ 2002-06-16 08:34  azummo
+
+	- Palm/PDB.pm: Added "official" names to record attributes.
+
+ 2002-06-16 08:19  azummo
+
+	- Palm/PDB.pm: Corrected an attribute flag (open) Added new
+	attributes using "official"  names
+
+ 2002-05-09 11:08  arensb
+
+	- Palm/Address.pm: Again, more sanity-checking and a little less
+	code duplication.
+
+ 2002-05-09 10:33  arensb
+
+	- Palm/Address.pm: More sanity checks, and a somewhat more elegant
+	way of doing things (iterate over field names, rather than
+	duplicating code a bunch of times).
+
+ 2002-05-09 10:24  arensb
+
+	- Palm/StdAppInfo.pm: (bug fix) Used to do some sanity-checking,
+	then ignored it. We now pay attention to our own sanity checks.
+
+ 2002-04-09 20:59  arensb
+
+	- README: Added Keni as a contributor.
+
+ 2002-04-09 20:58  arensb
+
+	- util/pdbdump: Applied Keni's patch: array-handling for parsed
+	records (e.g., Datebook exceptions).
+
+ 2002-04-05 14:59  azummo
+
+	- Palm/DateTime.pm: Hopefully fixed mktime() invocation. (?)
+
+ 2002-03-23 08:38  arensb
+
+	- Palm/Mail.pm: Added extra sanity checks.
+
+ 2002-03-12 15:23  azummo
+
+	- Palm/DateTime.pm: Added Palm/DateTime.pm
+
+ 2002-02-15 09:40  arensb
+
+	- Palm/PDB.pm: (bug fix) Strip everything after the first NUL, not
+	just trailing NULs. Patch submitted by Don Park
+	<donpdonp2@yahoo.com>
+
+ 2002-02-08 09:20  arensb
+
+	- Makefile.PL: Bumped up version number.
+
+ 2002-02-08 08:56  arensb
+
+	- MANIFEST: Added add-memo to distribution.
+
+ 2002-02-08 08:55  arensb
+
+	- util/add-memo: Added first draft of add-memo, to add a memo to an
+	existing MemoDB.pdb.
+
+ 2002-02-01 09:09  arensb
+
+	- Palm/PDB.pm: Comment used to refer to a doc file in ColdSync that
+	no longer exists.  Fixed.
+
+ 2002-01-26 17:25  arensb
+
+	- Palm/Address.pm, Palm/Datebook.pm, Palm/Mail.pm, Palm/Memo.pm,
+	Palm/PDB.pm, Palm/PQA.pm, Palm/Raw.pm, Palm/StdAppInfo.pm,
+	Palm/ToDo.pm, util/pdbdump: CPAN-friendly $VERSION.
+
+ 2002-01-26 17:22  arensb
+
+	- TODO: Added some items.
+
+ 2002-01-26 17:22  arensb
+
+	- Makefile.PL: Rewrote version number in CPAN-friendly format.
+
+ 2001-06-05 09:04  arensb
+
+	- Palm/StdAppInfo.pm: Made addCategory, deleteCategory,
+	renameCategory behave a bit more like the Palm, even when it's
+	brain-damaged.
+
+ 2001-06-05 08:52  arensb
+
+	- TODO: Removed an item.
+
+ 2001-06-02 15:17  arensb
+
+	- Palm/: Datebook.pm, StdAppInfo.pm: Fixed typo in POD.
+
+ 2001-04-04 23:54  arensb
+
+	- Palm/StdAppInfo.pm: Fixed typo.
+
+ 2001-03-30 01:23  arensb
+
+	- Palm/Datebook.pm: Clarified whether date numbers start at 0 or 1.
+	 (bug fix): Fixed year conversion.  (bug fix): Fixed use of
+	undefined value.
+
+ 2001-02-24 18:35  arensb
+
+	- Palm/PDB.pm: In &new, initialize 'baktime' to -$EPOCH_1904, that
+	being the Palm's epoch.
+
+ 2001-02-24 17:59  arensb
+
+	- FAQ: Added pointers to other sources of information about HotSync
+	.dat files.
+
+ 2001-02-24 11:49  arensb
+
+	- Palm/Datebook.pm: Clarified documentation.
+
+ 2001-02-20 06:17  arensb
+
+	- MANIFEST: Added FAQ to distribution.
+
+ 2001-02-20 06:17  arensb
+
+	- Makefile.PL: Incremented version number.
+
+ 2001-02-20 06:17  arensb
+
+	- FAQ: (Added).
+
+ 2001-02-20 06:12  arensb
+
+	- README: Added contributor.
+
+ 2001-02-20 06:12  arensb
+
+	- util/pdbdump: (bug fix): the two NULs are optional.  Fixed typo.
+
+ 2001-02-20 06:11  arensb
+
+	- Palm/StdAppInfo.pm: Added a "to do" comment.
+
+ 2000-11-09 10:32  arensb
+
+	- Palm/PDB.pm: Applied John-David Smith's patch: add the "archive"
+	attribute. Better check for non-NULLness of AppInfo block.
+
+ 2000-09-25 01:06  arensb
+
+	- util/pdbdump: Added "launchable" attribute, for PQAs.  Print
+	database attributes more clearly.
+
+ 2000-09-25 01:05  arensb
+
+	- Palm/PQA.pm: First draft of PQA parser.
+
+ 2000-09-25 01:05  arensb
+
+	- Palm/PDB.pm: Added "launchable" attribute, for PQAs.
+
+ 2000-09-24 12:37  arensb
+
+	- util/pdbdump: Now handles resource databases as well as record
+	databases.
+
+ 2000-09-24 12:25  arensb
+
+	- Palm/: Address.pm, Datebook.pm, Mail.pm, Memo.pm, PDB.pm, Raw.pm,
+	StdAppInfo.pm, ToDo.pm: $VERSION is now a floating-point number,
+	for comparison.
+
+ 2000-09-24 12:24  arensb
+
+	- TODO: Added an item.
+
+ 2000-09-20 10:16  arensb
+
+	- Palm/StdAppInfo.pm: Removed a "to do" comment.
+
+ 2000-09-16 19:58  arensb
+
+	- Makefile.PL: Bumped up patchlevel number.
+
+ 2000-09-16 19:58  arensb
+
+	- Palm/PDB.pm: (bug fix): The two useless NULs are allowed, but not
+	mandated, by the spec. By assuming that they will always be there,
+	this module failed to parse some well-formed PDBs.
+
+ 2000-09-16 19:57  arensb
+
+	- util/pdbdump: Oops! Forgot to fix resources.	Minor cleaning.
+
+ 2000-09-16 19:53  arensb
+
+	- util/pdbdump: (bug fix): The two useless NULs are allowed, but
+	not mandated, by the spec. By assuming that they will always be
+	there, 'pdbdump' failed to parse some well-formed PDBs.
+
+ 2000-09-09 00:52  arensb
+
+	- Makefile.PL: Bumped up version number.
+
+ 2000-09-09 00:50  arensb
+
+	- Palm/StdAppInfo.pm: Added $error variable.  (bug fix): A
+	mis-written test would cause &pack_StdAppInfo to omit unnamed
+	categories. Hence, the category list had fewer than 16 categories,
+	when written.  Fixed typo.  (feature): Added &addCategory,
+	&deleteCategory, &renameCategory.  Removed BUGS section.
+
+ 2000-09-08 22:48  arensb
+
+	- Palm/StdAppInfo.pm: Stop Perl from complaining if there are
+	unnamed categories.
+
+ 2000-09-08 22:47  arensb
+
+	- README: Added author.
+
+ 2000-08-28 23:20  arensb
+
+	- Makefile.PL: Bumped up the version number.
+
+ 2000-08-28 23:19  arensb
+
+	- Palm/StdAppInfo.pm: Changed API: the categories are new arranged
+	as a 16-element array of category structs, the way they logically
+	belong, rather than as disparate arrays, the way they're
+	represented in the file.  Added a lot to the POD.
+
+ 2000-08-28 23:16  arensb
+
+	- TODO: Removed an item.
+
+ 2000-08-28 23:16  arensb
+
+	- TODO: Added an item.
+
+ 2000-08-24 00:57  arensb
+
+	- Palm/PDB.pm: Clarified pod somewhat.
+
+ 2000-08-24 00:29  arensb
+
+	- util/pdbdump: (feature): Expands arrays of hash references
+	recursively.
+
+ 2000-08-13 18:08  arensb
+
+	- Palm/Datebook.pm: Incorporated changes suggested by John Jannotti
+	<jj@lcs.mit.edu>, to avoid warnings under Perl 5.6, when various
+	fields are undefined.
+
+ 2000-08-13 17:59  arensb
+
+	- Palm/: Address.pm, Datebook.pm, Mail.pm, Memo.pm, ToDo.pm:
+	Updated for new &parse_StdAppInfo behavior.
+
+ 2000-08-13 17:59  arensb
+
+	- Palm/StdAppInfo.pm: (bug fix): &parse_StdAppInfo now puts the
+	non-category part of the AppInfo block in $appinfo->{other}. This
+	is so that a script that reads a random .pdb file as a StdAppInfo
+	(and nothing else) can copy it without loss of data.
+	&pack_StdAppInfo uses $appinfo->{other}.  Clarified documentation
+	somewhat.
+
+ 2000-08-04 00:12  arensb
+
+	- Palm/PDB.pm: Fixed expression that made 'perl5.6 -w' print a
+	warning.
+
+ 2000-08-01 23:20  arensb
+
+	- Makefile.PL: Bumped up version number.
+
+ 2000-08-01 23:19  arensb
+
+	- util/pdbdump: (bug fix): Read files in binary mode under Windows,
+	MS-DOS, and other OSes that make that distinction.
+
+ 2000-08-01 23:19  arensb
+
+	- Palm/PDB.pm: (bug fix): Read and write files in binary mode under
+	Windows, MS-DOS, and other OSes that make that distinction.
+
+ 2000-08-01 23:17  arensb
+
+	- Palm/Datebook.pm: Delete raw data field at the end of
+	&ParseRecord.
+
+ 2000-08-01 23:16  arensb
+
+	- TODO: Added, removed some items.
+
+ 2000-07-20 00:17  arensb
+
+	- Makefile.PL: Bumped up version number.
+
+ 2000-07-20 00:17  arensb
+
+	- Palm/Datebook.pm: (Bug fix): Test for undefined record fields, to
+	avoid warnings with databases built from scratch.  Patch supplied
+	by <kkeller@sirius.com>.
+
+ 2000-07-19 00:00  arensb
+
+	- Makefile.PL: Bumped up version number.
+
+ 2000-07-19 00:00  arensb
+
+	- TODO: Removed an item.
+
+ 2000-07-18 23:58  arensb
+
+	- Palm/: Address.pm, Datebook.pm, Mail.pm, Memo.pm, PDB.pm,
+	ToDo.pm: Clarified the documentation for &new_Record.
+
+ 2000-07-18 23:57  arensb
+
+	- TODO: Added an item.
+
+ 2000-07-08 20:25  arensb
+
+	- Palm/PDB.pm: PDB::new now initializes more fields.  PDB::Write
+	prints a warning if writing a zero-length record.
+	PDB::new_Resource: type now defaults to all NULs (instead of four
+	spaces).
+
+ 2000-07-08 20:11  arensb
+
+	- Palm/Datebook.pm: Changed a comment.
+
+ 2000-06-30 11:41  arensb
+
+	- Makefile.PL: Bumped up version number.
+
+ 2000-06-30 11:41  arensb
+
+	- TODO: Added an item.
+
+ 2000-06-30 11:41  arensb
+
+	- Palm/Datebook.pm: Made AppInfo block initialization the same as
+	other modules, even though Datebook doesn't really use categories
+	and such.
+
+ 2000-06-30 11:40  arensb
+
+	- Palm/StdAppInfo.pm: (bug fix): Use of anonymous array instead of
+	a real array caused first category (and first category ID) to be a
+	reference rather than a "real" scalar.
+
+ 2000-05-23 02:56  arensb
+
+	- Makefile.PL: Incremented patchlevel number.
+
+ 2000-05-23 02:55  arensb
+
+	- Palm/: Address.pm, Memo.pm: (bug fix): Don't run
+	StdAppInfo::import(). This prevents StdAppInfo from registering
+	itself as the default handler in generic tools.
+
+ 2000-05-13 16:30  arensb
+
+	- Makefile.PL: Bumped up version number.
+
+ 2000-05-13 16:29  arensb
+
+	- README: Added contributor.
+
+ 2000-05-13 16:29  arensb
+
+	- Palm/Mail.pm: Fixed inconsistency in record member names
+	("replyTo" was sometimes "reply_to", and "sentTo" was sometimes
+	"sent_to").  Patch supplied by Sumant S.R. Oemrawsingh
+	<sikander@stad.dsl.nl>
+
+ 2000-05-13 01:16  arensb
+
+	- Makefile.PL: Incremented patch level.  Added "pdbdump" to the
+	distribution.
+
+ 2000-05-13 01:15  arensb
+
+	- MANIFEST: Ship "pdbdump" instead of "dumpdb".
+
+ 2000-05-13 01:15  arensb
+
+	- util/dumpdb: Some obsolete refinements.
+
+ 2000-05-13 01:14  arensb
+
+	- Palm/StdAppInfo.pm: Added an import() function, so you can say
+	that a function is a Palm::StdAppInfo.
+
+ 2000-05-13 01:12  arensb
+
+	- Palm/Mail.pm: (bug fix): Palm::Mail::new_Record() didn't return a
+	value.	Don't import StdAppInfo, since don't want new PDBs to
+	default to StdAppInfo.
+
+ 2000-05-08 05:48  arensb
+
+	- util/pdbdump: Rewritten from scratch. This is basically just
+	Palm/PDB.pm with trace statements.
+
+ 2000-05-08 05:48  arensb
+
+	- util/pdbdump: intermediate
+
+ 2000-05-07 02:33  arensb
+
+	- Palm/: StdAppInfo.pm, ToDo.pm: Removed unnecessary quoting in
+	class members.
+
+ 2000-05-07 02:33  arensb
+
+	- Palm/Raw.pm: Removed unnecessary quoting in class members.  Added
+	`use strict'.  Rearranged some variables at the top.
+
+ 2000-05-07 02:30  arensb
+
+	- Palm/: Datebook.pm, Mail.pm, Memo.pm, PDB.pm: Removed unnecessary
+	quoting in class members.
+
+ 2000-05-06 17:48  arensb
+
+	- Palm/Address.pm: Removed unnecessary quoting in class members.
+
+ 2000-05-06 17:20  arensb
+
+	- Palm/ToDo.pm: Converted to use StdAppInfo. Fixed man page section
+	in "see also" section.
+
+ 2000-05-06 17:19  arensb
+
+	- Palm/StdAppInfo.pm: Added a "to do" comment.
+
+ 2000-05-06 17:18  arensb
+
+	- Palm/: PDB.pm, Raw.pm: Fixed man page sections for "see also"
+	section.
+
+ 2000-04-29 17:53  arensb
+
+	- Makefile.PL: Bumped up patch level.
+
+ 2000-04-29 17:49  arensb
+
+	- README: Added Robert Norris's patch for empty PDBs.
+
+ 2000-04-29 16:52  arensb
+
+	- Palm/PDB.pm: Applied Robert Norris <rob@nauseum.org>'s patch:
+	_load_appinfo_block used to die if the database contained no
+	records.
+
+ 2000-04-24 06:02  arensb
+
+	- util/pdbdump: (added) This will eventually become the successor
+	to dumpdb.
+
+ 2000-04-24 06:01  arensb
+
+	- util/dumpdb: More AppInfo block processing.
+
+ 2000-04-24 06:01  arensb
+
+	- Palm/StdAppInfo.pm: (added) Class for dealing with the standard
+	part of AppInfo blocks (category support).
+
+ 2000-04-24 06:00  arensb
+
+	- Palm/PDB.pm: Uses `use strict'.  Changed the way $VERSION is
+	generated from RCS tag.  Fixed the POD a bit.
+
+ 2000-04-24 05:59  arensb
+
+	- Palm/: Mail.pm, Memo.pm: Use StdAppInfo.
+
+ 2000-04-24 05:56  arensb
+
+	- Palm/Address.pm: Fixed manual section numbers.
+
+ 2000-04-24 05:56  arensb
+
+	- Palm/: Address.pm, Datebook.pm: Use StdAppInfo.
+
+ 2000-04-24 05:55  arensb
+
+	- TODO: Removed some stuff.
+
+ 2000-04-24 05:55  arensb
+
+	- Makefile.PL: Incremented version number.
+
+ 2000-04-24 05:54  arensb
+
+	- MANIFEST: Added "TODO", "StdAppInfo.pm"
+
+ 2000-04-20 01:42  arensb
+
+	- Palm/Mail.pm: Forgot to mention the subject in the documentation.
+
+ 2000-02-01 23:45  arensb
+
+	- TODO: (added): Things that need to be done.
+
+ 2000-02-01 23:45  arensb
+
+	- README: (added): README file.
+
+ 2000-02-01 23:40  arensb
+
+	- Makefile.PL: Incremented version number.
+
+ 2000-02-01 23:21  arensb
+
+	- Palm/Raw.pm: Rearranged the POD. Inherit &new, &new_Record
+	methods.
+
+ 2000-02-01 23:19  arensb
+
+	- Palm/: Datebook.pm, Mail.pm, Memo.pm, ToDo.pm: Rearranged the
+	POD. Added &new, &new_Record methods.
+
+ 2000-02-01 23:18  arensb
+
+	- Palm/Address.pm: Added placeholder for
+	$pdb->{appinfo}{lastUniqueID}.
+
+ 2000-02-01 07:31  arensb
+
+	- Palm/: Raw.pm, ToDo.pm: Added $VERSION variable, per CPAN.
+
+ 2000-02-01 07:31  arensb
+
+	- Palm/PDB.pm: Renamed &deleteRecord to &delete_Record, for
+	consistency.  &append_Record, &append_Resource, &delete_Record
+	update PDB's mtime.
+
+ 2000-02-01 07:20  arensb
+
+	- Palm/: Mail.pm, Memo.pm: Added $VERSION variable, per CPAN.
+
+ 2000-02-01 07:19  arensb
+
+	- Palm/Address.pm: Added $VERSION to all .pm files, per CPAN.
+	Moved pod documentation to be adjacent to the code, instead of at
+	the end.  Fixed &new so there are always 16 categories, one of
+	which is named "Unfiled" with code 0.
+
+ 2000-01-23 04:18  arensb
+
+	- Palm/PDB.pm: The various _load_*() functions are no longer
+	methods, since they shouldn't be overridden anyway.  Added
+	documentation for new_Record(), append_Record(), new_Resource(),
+	append_resource(), findRecordByID(), deleteRecord().
+
+ 2000-01-23 01:33  arensb
+
+	- util/dumpdb: Bug fix: deal with PDBs without records, and PRCs
+	without resources.  Memo: Dump() now prints the AppInfo and sort
+	blocks, if they exist.	Address: Dump() now prints the field labels
+	in the AppInfo block.  Address: print the record attributes.
+
+ 2000-01-23 01:28  arensb
+
+	- Palm/PDB.pm: Updated copyright.  Fixed function cross-references
+	in the documentation.  new() method now initializes the common
+	fields.  Fiddled with quotes in the documentation some more.
+	Write() method now supplies the two NULs if they're missing.  Added
+	methods: new_Record(), append_Record(), new_Resource(),
+	append_Resource(), findRecordByID(), deleteRecord().
+
+ 2000-01-23 01:24  arensb
+
+	- Palm/Address.pm: Added new() method, to specifically create a new
+	Address PDB.  Added new_Record() method, to create a new Address
+	record.  Bug fix: PackAppInfoBlock() only packed whichever
+	categories were defined. It now makes sure that it packs 16
+	categories.
+
+ 2000-01-23 01:20  arensb
+
+	- Makefile.PL: Incremented version.
+
+ 1999-12-05 23:11  arensb
+
+	- Palm/Address.pm: Fixed documentation to reflect reality.
+
+ 1999-11-18 13:20  arensb
+
+	- Palm/PDB.pm: Added magic $VERSION, to make CPAN happy.
+
+ 1999-11-18 03:29  arensb
+
+	- util/dumpdb: Took out Bitmaps and DopeWars, since those aren't
+	part of the distribution (yet?).
+
+ 1999-11-18 03:28  arensb
+
+	- MANIFEST: Added README.
+
+ 1999-11-18 03:24  arensb
+
+	- Palm/Raw.pm: Clarified the use of "use Palm::Raw;" vs. "use
+	Palm::Raw();" in the documentation.
+
+ 1999-11-18 01:20  arensb
+
+	- Palm/: Address.pm, Datebook.pm, Mail.pm, Memo.pm, PDB.pm, Raw.pm,
+	ToDo.pm: Changed Palm::PDB::<foo> to Palm::<foo> where required.
+
+ 1999-11-18 01:19  arensb
+
+	- Makefile.PL: Changed distribution name to p5-Palm, for clarity.
+	Explicitly set installation method.
+
+ 1999-11-18 00:51  arensb
+
+	- Makefile.PL: Fixed NAME and VERSION.
+
+ 1999-11-18 00:51  arensb
+
+	- MANIFEST: Removed Palm/Makefile.PL
+
+ 1999-11-18 00:48  arensb
+
+	- Palm/Makefile.PL: Deleted. It's not necessary.
+
+ 1999-11-18 00:26  arensb
+
+	- MANIFEST: Fixed after directory shuffle.
+
+ 1999-11-18 00:24  arensb
+
+	- test.pl: Generated by MakeMaker. Not used.
+
+ 1999-11-18 00:23  arensb
+
+	- util/dumpdb: Added RCS comment.  Updated "use" statements to
+	reflect the fact that the Palm stuff is in Palm::<foo>, not
+	Palm::PDB::<foo>.
+
+ 1999-11-18 00:21  arensb
+
+	- util/copydb: Added RCS header.  Took out the "use lib" line, for
+	now.  Changed "use" statements: the Palm stuff is no longer
+	Palm::PDB:<foo>, but rather Palm::<foo>.
+
+ 1999-11-18 00:17  arensb
+
+	- util/dumpdb: Test utility to dump the contents of a PDB.
+
+ 1999-11-18 00:17  arensb
+
+	- util/copydb: Test utility to copy a PDB.
+
+ 1999-11-18 00:16  arensb
+
+	- Palm/ToDo.pm: Module for dealing with ToDo databases.
+
+ 1999-11-18 00:16  arensb
+
+	- Palm/Raw.pm: Module for dealing with "Raw" databases.
+
+ 1999-11-18 00:16  arensb
+
+	- Palm/Memo.pm: Module for dealing with Memo databases.
+
+ 1999-11-18 00:16  arensb
+
+	- Palm/Mail.pm: Module for dealing with Mail databases.
+
+ 1999-11-18 00:16  arensb
+
+	- Palm/Datebook.pm: Module for dealing with DateBook databases.
+
+ 1999-11-18 00:15  arensb
+
+	- Palm/Address.pm: Module for dealing with AddressBook databases.
+
+ 1999-11-18 00:15  arensb
+
+	- Palm/PDB.pm: Base module for dealing with PDBs.
+
+ 1999-11-18 00:14  arensb
+
+	- Palm/Makefile.PL: MakeMaker-generated Makefile.PL.
+
+ 1999-11-18 00:10  arensb
+
+	- Makefile.PL: MakeMaker-generated Makefile.PL.
+
+ 1999-11-18 00:10  arensb
+
+	- MANIFEST: First draft of manifest.

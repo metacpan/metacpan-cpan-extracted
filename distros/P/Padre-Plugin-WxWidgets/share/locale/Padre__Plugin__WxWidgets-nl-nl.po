@@ -1,0 +1,30 @@
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-WxWidgets\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-11-07 11:04+0200\n"
+"PO-Revision-Date: \n"
+"Last-Translator: ddn <ddn123456 at gmail.com>\n"
+"Language-Team: ddn <ddn123456 at gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Dutch\n"
+"X-Poedit-Country: Nederland - België\n"
+
+#: lib/Padre/Plugin/WxWidgets.pm:20
+msgid "wxWidgets Support"
+msgstr "wxWidgets Ondersteuning"
+
+#: lib/Padre/Plugin/WxWidgets.pm:21
+msgid "About"
+msgstr "Omtrent"
+
+#: lib/Padre/Plugin/WxWidgets.pm:29
+msgid "wxWidgets support for Padre"
+msgstr "wxWidgets ondersteuning voor Padre"
+

@@ -1,0 +1,89 @@
+=encoding utf8
+
+=head1 NAME
+
+POSIX::SigAction - represent a struct sigaction
+
+=head1 SYNOPSIS
+
+  $sigset    = POSIX::SigSet->new(SIGINT, SIGQUIT);
+  $sigaction = POSIX::SigAction
+     ->new(\&handler, $sigset, SA_NOCLDSTOP);
+
+  $sigset    = $sigaction->mask;
+  $sigaction->flags(SA_RESTART);
+  $sigaction->safe(1);
+
+=head1 DESCRIPTION
+
+The C<POSIX::SigAction> object corresponds to the C C<struct sigaction>,
+defined by C<signal.h>.
+
+This module is a bit tricky: POSIX.pm contains the same code for
+the C<POSIX::SigAction> namespace. However, we do not need POSIX.pm
+but only the POSIX.xs component which has the namespace hard-coded.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item POSIX::SigAction-E<gt>B<new>(HANDLER, [SIGSET, [FLAGS]])
+
+The first parameter is the handler, a code reference. The second parameter
+is a L<POSIX::SigSet|POSIX::SigSet> object, it defaults to the empty set.  The third
+parameter contains the C<sa_flags>, it defaults to 0.
+
+This object will be destroyed automatically when it is no longer needed.  
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<flags>()
+
+Accessor functions to get/set the values of a SigAction object.
+
+=item $obj-E<gt>B<handler>()
+
+=item $obj-E<gt>B<mask>()
+
+=item $obj-E<gt>B<safe>()
+
+Accessor function for the "safe signals" flag of a SigAction object; see
+L<perlipc> for general information on safe (a.k.a. "deferred") signals.  If
+you wish to handle a signal safely, use this accessor to set the "safe" flag
+in the C<POSIX::SigAction> object:
+
+   $sigaction->safe(1);
+
+You may also examine the "safe" flag on the output action object which is
+filled in when given as the third parameter to
+L<POSIX::1003::Signals::sigaction()|POSIX::1003::Signals/"Standard POSIX">:
+
+  sigaction(SIGINT, $new_action, $old_action);
+  if ($old_action->safe) {
+     # previous SIGINT handler used safe signals
+  }
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of POSIX-1003 distribution version 0.98,
+built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights 2011-2013 on the perl code and the related documentation
+ by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

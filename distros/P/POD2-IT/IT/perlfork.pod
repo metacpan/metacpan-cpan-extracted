@@ -1,0 +1,356 @@
+=head1 NOME
+
+perlfork - L'emulazione di fork() fornita dal Perl
+
+=head1 SINOSSI
+
+    NOTA: Con la versione 5.8.0, l'emulazione di fork() e` considerevolmente
+    maturata. Comunque, ci sono ancora qualche bug conosciuto, e delle
+    differenze rispetto alla fork() reale, che potrebbero riguardarvi.
+    Consultate le sezioni "BUG" e "AVVERTIMENTI E LIMITAZIONI" piu` avanti.
+
+Il Perl fornisce una funzione fork() che corrisponde alla chiamata di
+sistema Unix con lo stesso nome. Sulla maggior parte dei sistemi
+tipo Unix su cui la chiamata di sistema fork() E<egrave> disponibile, Perl
+altro non fa che chiamarla.
+
+Su alcuni sistemi come Windows, dove la chiamata di sistema fork() non
+E<egrave> disponibile, Perl puE<ograve> essere compilato per emulare fork()
+a livello di interprete. BenchE<eacute> l'emulazione sia progettata per
+essere, a livello del programma Perl, il piE<ugrave> compatibile possibile
+con la vera fork(), ci sono alcune importanti differenze, che derivano dal
+fatto che tutti i "processi" pseudofigli creati in questo modo, in
+realtE<agrave>, per quanto concerne il sistema operativo, vivono nello
+stesso processo.
+
+Questo documento offre una panoramica generale delle caratteristiche e
+delle limitazione dell'emulazione di fork(). Va notato che le questioni
+discusse qui non sono applicabili alle piattaforme sulle quali E<egrave>
+disponibile una vera fork() e Perl E<egrave> stato configurato per usarla.
+
+=head1 DESCRIZIONE
+
+L'emulazione di fork() E<egrave> implementata a livello di interprete Perl.
+Questo, in generale, significa che fork() di fatto clona l'interprete
+in esecuzione e tutto il suo stato, e manda in esecuzione l'interprete
+clonato in un thread separato, iniziandone l'esecuzione subito dopo
+il punto in cui fork() era stata chiamata nel processor genitore. D'ora
+in avanti chiameremo pseudoprocesso il thread che implementa questo
+"processo" figlio.
+
+Tutto ciE<ograve> E<egrave> stato progettato in modo da essere trasparente 
+al programma Perl che ha chiamato fork(). Il genitore ritorna dalla fork
+con un ID di pseudoprocesso, il quale puE<ograve> in seguito essere usato
+in qualsiasi funzione di manipolazione del processo; il figlio ritorna
+dalla fork() con un valore C<0> per indicare che E<egrave> lui lo
+pseudoprocesso figlio.
+
+=head2 Comportamento di altre caratteristiche di Perl nello pseudoprocesso risultante dal fork
+
+La maggior parte delle caratteristiche del Perl si comportano in maniera
+normale all'interno dello pseudoprocesso.
+
+=over 8
+
+=item $$ o $PROCESS_ID
+
+Questa variabile speciale viene correttamente impostata all'ID dello
+pseudoprocesso. PuE<ograve> essere usata per identificare uno pseudoprocesso
+all'interno di una determinata sessione. Va notato che questo valore E<egrave>
+soggetto al riutilizzo se degli pseudoprocessi vengono lanciati dopo
+che E<egrave> stata attesa la fine di altri tramite wait().
+
+=item %ENV
+
+Ogni pseudoprocesso ha il suo ambiente virtuale. Le modifiche a
+%ENV influenzano l'ambiente virtuale, e sono visibili solamente
+all'interno di tale pseudoprocesso, ed in qualsiasi processo (o
+pseudoprocesso) lanciato da esso.
+
+=item chdir() e tutte le altre funzioni integrate che accettano nomi di file
+
+Ogni pseudoprocesso ha la sua idea della directory corrente. Un eventuale
+cambiamento della directory corrente utilizzando chdir() E<egrave> visibile
+solamente all'interno di tale pseudoprocesso, ed in qualsiasi processo
+(o pseudoprocesso) lanciato da esso. Tutti gli accessi a file e
+directory effettuati dallo pseudoprocesso effettueranno correttamente
+la mappatura della directory di lavoro virtuale alla reale directory di
+lavoro.
+
+=item wait() e waitpid()
+
+A wait() e waitpid() puE<ograve> essere passato un ID di pseudoprocesso
+restituito da fork(). Le chiamate a queste funzioni attenderanno, correttamente,
+il termine del pseudoprocesso e restituiranno il suo stato.
+
+=item kill()
+
+kill() puE<ograve> essere utilizzato per terminare uno pseudoprocesso passando
+ad essa l'ID restituito da fork(). Essa non dovrebbe essere
+usata tranne che in circostanze estreme poichE<eacute>, quando un thread viene
+terminato, il sistema operativo potrebbe non garantire l'integritE<agrave>
+delle risorse del processo. Ricordate che l'uso di kill() su uno pseudoprocesso
+puE<ograve> causare dei memory leak [perdita di memoria, NdT], poichE<eacute>
+il thread che implementa lo pseudoprocesso non ha avuto la possibilit<agrave> di
+effettuare la pulizia delle sue risorse.
+
+=item exec()
+
+La chiamata ad exec() all'interno di uno pseudoprocesso in realtE<agrave>
+lancia l'eseguibile richiesto in un processo separato ed attende
+che esso termini l'esecuzione prima di uscire con lo stesso valore
+di uscita del processo. CiE<ograve> significa che l'ID del processo indicato
+all'interno del programma in esecuzione sarE<agrave> diverso da ciE<ograve> che
+la funzione fork() di Perl puE<ograve> aver restituito in precedenza.
+Analogamente, ogni funzione di manipolazione del proceso applicata all'ID
+restituito da fork(), influenzerE<agrave> lo pseudoprocesso generato dalla
+chiamata ad exec(), non il vero processo che sta attendendo il ritorno di
+exec().
+
+=item exit()
+
+exit() fa sempre uscire solamente lo pseudoprocesso in esecuzione, dopo aver
+automaticamente atteso il termine di qualsiasi pseudoprocesso figlio
+ancora in esecuzione. Notate che ciE<ograve> significa che il processo
+principale non uscirE<agrave> a meno che tutti i pseudoprocessi non abbiano
+terminato la loro esecuzione.
+
+=item Handle aperti verso file, directory e socket
+
+Tutti gli handle aperti sono duplicati negli pseudoprocessi, dunque
+la chiusura di un handle in un processo non influisce sugli altri.
+PiE<ugrave> avanti sono riportare alcune limitazioni.
+
+=back
+
+=head2 Limiti di risorse
+
+Agli occhi del sistema operativo, gli pseudoprocessi creati tramite
+l'emulazione di fork() sono semplicemente thread nello stesso processo.
+CiE<ograve> significa che qualsiasi limite a livello di processo imposto al
+sistema operativo vale per tutti gli pseudoprocessi messi assieme. Questo
+include qualsiasi limite imposto dal sistema operativo sul numero di file,
+directory e socket aperti, limiti sull'uso di spazio su disco, limiti
+sulle dimensioni in memoria, limiti sull'uso della CPU, ecc.
+
+=head2 Uccidere il processo genitore
+
+Se il processo genitore viene ucciso (usando la funzione kill() di Perl,
+o utilizzando qualche metodo esterno) anche tutti gli pseudoprocessi
+vengono uccisi, e l'intero processo esce.
+
+=head2 Vita del processo genitore e degli pseudoprocessi
+
+Durante il normale corso degli eventi, il processo genitore e tutti gli
+pseudoprocessi da esso generati attenderanno, prima di uscire, che i
+rispettivi pseudofigli terminino la loro esecuzione. CiE<ograve> significa che
+il genitore ed ogni suo pseudofiglio che E<egrave> anche uno pseudogenitore
+usciranno solo dopo che i loro pseudofigli hanno terminato l'esecuzione.
+
+Un modo per marcare gli pseudoprocessi cosicchE<eacute> siano eseguiti
+separatemente dal loro genitore (cosicchE<eacute> il genitore non debba
+attendere il loro termine se non lo desidera) verrE<agrave> fornito in futuro.
+
+=head2 AVVERTIMENTI E LIMITAZIONI
+
+=over 8
+
+=item blocchi BEGIN
+
+L'emulazione di fork() non funziona in maniera del tutto corretta
+se E<egrave> chiamata dall'interno di un blocco BEGIN. La copia ottenuta
+tramite fork() eseguirE<agrave> i contenuti del blocco BEGIN, ma non
+continuerE<agrave> il parsing del codice sorgente dopo tale blocco.
+Ad esempio, considerate il seguente codice:
+
+    BEGIN {
+        fork and exit;		# il padre crea un figlio ed esce
+	print "interno\n";
+    }
+    print "esterno\n";
+
+Questo stamperE<agrave>:
+
+    interno
+
+anzichE<eacute>, come ci si aspetta:
+
+    interno
+    esterno
+
+Questa limitazione nasce da fondamentali difficoltE<agrave> tecniche
+nel clonare e far ripartire gli stack usati dal parser Perl
+nel corso di un'operazione di parsing.
+
+=item Filehandle aperti
+
+Qualsiasi filehandle aperto al momento del fork() viene duplicato. Dunque,
+i file possono essere chiusi indipendentemente nel padre e nel figlio,
+ma ricordate che gli handle duplicati continueranno a condividere
+il puntatore che indica la posizione all'interno del file. Cambiare
+tale posizione nel padre la cambierE<agrave> nel figlio, e viceversa. Questo
+puE<ograve> essere evitato aprendo separatamente, nei processi figli, i file
+che necessitano di puntatori diversi.
+
+=item open() con pipe verso fork non ancora implementata
+
+I costrutti C<open(PIPPO, "|-")> e C<open(PLUTO, "-|")> non sono
+ancora stati implementati. Questa limitazione puE<ograve> essere facilmente
+aggirata via codice, creando esplicitamente una pipe. Il seguente
+esempio mostra come creare un figlio derivante da una fork():
+
+    # simula open(PIPPO, "|-")
+    sub pipe_verso_fork ($) {
+	my $genitore = shift;
+	pipe my $figlio, $genitore or die;
+	my $pid = fork();
+	die "fork() fallita: $!" unless defined $pid;
+	if ($pid) {
+	    close $figlio;
+	}
+	else {
+	    close $genitore;
+	    open(STDIN, "<&=" . fileno($figlio)) or die;
+	}
+	$pid;
+    }
+
+    if (pipe_verso_fork('PIPPO')) {
+	# genitore
+	print PIPPO "pipe_verso_fork\n";
+	close PIPPO;
+    }
+    else {
+	# figlio
+	while (<STDIN>) { print; }
+	close STDIN;
+	exit(0);
+    }
+
+E questo legge dal figlio:
+
+    # simula open(PLUTO, "-|")
+    sub pipe_da_fork ($) {
+	my $genitore = shift;
+	pipe $genitore, my $figlio or die;
+	my $pid = fork();
+	die "fork() fallita: $!" unless defined $pid;
+	if ($pid) {
+	    close $figlio;
+	}
+	else {
+	    close $genitore;
+	    open(STDOUT, ">&=" . fileno($figlio)) or die;
+	}
+	$pid;
+    }
+
+    if (pipe_da_fork('PLUTO')) {
+	# genitore
+	while (<PLUTO>) { print; }
+	close PLUTO;
+    }
+    else {
+	# figlio
+	print "pipe_da_fork\n";
+	close STDOUT;
+	exit(0);
+    }
+
+La funzione open() con pipe verso fork sarE<agrave> supportata in futuro.
+
+=item Stato globale mantenuto dalle XSUB
+
+Le subroutine esterne (XSUB) che mantengono il loro proprio stato
+globale, possono funzionare in maniera non corretta. Tali XSUB avranno
+il bisogno di conservare i lock per proteggere l'accesso simultaneo
+a dati globali da differenti pseudoprocessi, oppure dovranno conservare
+il loro stato sulla tabella dei simboli del Perl, che viene copiata
+di per sE<eacute> quando viene chiamata fork(). Un meccanismo di callback
+[Un I<callback> E<egrave> un riferimento ad una subroutine che viene passato
+come argomento nella chiamata ad un'altra subroutine, in modo da renderla
+piE<ugrave> flessibile, NdT] che fornisce alle estensioni una via per clonare
+il loro stato sarE<agrave> fornito in futuro.
+
+=item Interprete all'interno di un'applicazione piE<ugrave> grande
+
+L'emulazione di fork() puE<ograve> comportarsi in maniera imprevista quando
+viene eseguita in un'applicazione che contiene un interprete Perl
+e chiama delle API Perl che eseguono frammenti di codice. CiE<ograve>
+deriva dal fatto che l'emulazione conosce esclusivamente le strutture
+dati dell'interprete Perl, e non sa invece nulla sullo stato
+dell'applicazione che fa da contenitore. Per esempio, qualsiasi
+stato memorizzato nello stack dell'applicazione E<egrave> fuori portata.
+
+=item Thread-safety delle estensioni [compatibilitE<agrave> delle estensioni con i thread, NdT]
+
+Siccome l'emulazione di fork() esegue codice in thread multipli, le
+estensioni che effettuano chiamate a librerie che non sono thread-safe
+possono funzionare in maniera non affidabile qualora venga chiamata
+fork(). Man mano che il supporto ai thread del Perl si sta diffondendo anche
+sui sistemi in cui esiste una fork() nativa, tali estensioni saranno
+probabilmente corrette in modo da essere thread-safe.
+
+=back
+
+=head1 BUG
+
+=over 8
+
+=item *
+
+Avere interi negativi come ID di pseudoprocesso causa problemi con il
+numero intero C<-1>, poichE<eacute> per le funzioni wait() e waitpid() si
+tratta di un caso speciale. L'assunzione tacita, nell'implementazione corrente,
+E<egrave> che il sistema non alloca mai un ID di thread di C<1> per i thread
+utente. Una rappresentazione migliore per gli ID di pseudoprocesso
+sarE<agrave> implementata in futuro.
+
+=item *
+
+In alcuni casi, gli handle a livello di sistema operativo creati dagli
+operatori pipe(), socket() e accept() non sono duplicati correttamente
+negli pseudoprocessi. CiE<ograve> accade solo in alcune situazioni, ma quando
+accade, puE<ograve> portare a degli stalli tra l'estremo di lettura e quello
+di scrittura delle handle di pipe, o l'impossibilitE<agrave> di inviare o
+ricevere dati attraverso handle di socket.
+
+=item *
+
+Questo documento puE<ograve> essere incompleto in alcuni aspetti.
+
+=back
+
+=head1 AUTORE
+
+Il supporto per interpreti concorrenti per l'emulazione di fork() sono
+stati implementati da ActiveState, grazie a fondi forniti da Microsoft
+Corporation.
+
+Questo documento E<egrave> scritto e mantenuto da Gurusamy Sarathy
+E<lt>gsar@activestate.comE<gt>.
+
+=head1 CONSULTATE ANCHE
+
+L<perlfunc/"fork">, L<perlipc>
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlfork
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Michele Beltrame.
+
+=head2 Revisore
+
+Revisione a cura di Michele Beltrame e dree.
+
+=cut

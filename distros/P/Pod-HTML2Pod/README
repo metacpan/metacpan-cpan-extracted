@@ -1,0 +1,95 @@
+README for Pod::HTML2Pod
+                                        Time-stamp: "2000-10-04 01:51:28 MDT"
+
+[Excerpted from the POD...]
+
+NAME
+     Pod::HTML2Pod -- translate HTML into POD
+
+SYNOPSIS
+       # Use the program 'html2pod' that comes in this dist, or:
+       use Pod::HTML2Pod;
+       print Pod::HTML2Pod::convert(
+         'file' => 'my_stuff.html',  # input file
+         'a_href' => 1,  # try converting links
+       );
+
+DESCRIPTION
+     Larry Wall once said (1999-08-27, on the pod-people list, I
+     do believe): "The whole point of pod is to get people to
+     document stuff they wouldn't document in any other form."
+
+     To that end, I wrote this module so that people who are
+     unpracticed with POD but in a hurry to simply document their
+     programs or modules, could write their documentation in
+     simple HTML, and convert that to POD.  That's what this
+     module does.
+
+     Specifically, this module bends over backwards to try to
+     turn even vaguely plausable HTML into POD -- and when in
+     doubt, it simply ignores things that it doesn't know about,
+     or can't render.
+
+[end POD excerpt]
+
+
+PREREQUISITES
+
+This suite requires Perl 5; I've only used it under Perl 5.004, so for
+anything lower, you're on your own.
+
+Pod::HTML2Pod alse requires HTML::TreeBuilder and HTML::Element 3.05
+or later (to be found in the HTML-Tree dist at CPAN).  It also
+requires a few other modules, but they're either all standard, or
+required by HTML::TreeBuilder.
+
+
+INSTALLATION
+
+You install Pod::HTML2Pod, as you would install any Perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of Pod::HTML2Pod in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL LIB=~/perl
+
+
+DOCUMENTATION
+
+POD-format documentation is included in HTML2Pod.pm.  POD is readable
+with the 'perldoc' utility.  See ChangeLog for recent changes.
+
+
+MACPERL INSTALLATION NOTES
+
+Don't bother with the makefiles.  Just make a Pod directory in your
+MacPerl site_lib or lib directory, and move HTML2Pod.pm into there.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+Pod::HTML2Pod should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of Pod::HTML2Pod is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.
+
+
+Copyright (c) 2000 Sean M. Burke.  All rights reserved.
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+AUTHOR
+     Sean M. Burke, sburke@cpan.org

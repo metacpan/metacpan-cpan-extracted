@@ -1,0 +1,24 @@
+Description
+===========
+This module provides a Perl interface to submit jobs to PBS.
+
+Build and install
+=================
+perl Makefile.PL
+make
+make test
+make install
+
+Prerequisites
+=============
+Data::Dumper v2.121 or later
+File::Temp v0.14 or later
+
+Copyright
+=========
+Copyright (c) 2006-2007, 2010, 2011 Ka-Wai Mak. All rights reserved.
+
+License
+=======
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

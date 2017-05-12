@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: lcms
+Description: LCMS Color Management Library
+Version: 1.18
+Libs: -L${libdir} -llcms
+Cflags: -I${includedir}

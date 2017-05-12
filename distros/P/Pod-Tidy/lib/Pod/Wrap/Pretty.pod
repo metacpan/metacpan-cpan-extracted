@@ -1,0 +1,60 @@
+=head1 NAME
+
+Pod::Wrap::Pretty - reformat Pod to be nicely line wrapped
+
+=head1 SYNOPSIS
+
+    use Pod::Wrap::Pretty;
+
+    my $w = new Pod::Wrap::Pretty;
+
+    $w->parse_from_filehandle($fh);
+    $w->parse_from_file($filename);
+
+=head1 DESCRIPTION
+
+This is a L<Pod::Wrap> subclass, which is in turn a L<Pod::Parser> subclass.
+Please see the Pods of those modules for further API documentation.
+
+This module performs the exact same functionality as L<Pod::Wrap> I<except>
+that all pre-existing newlines are removed prior to line breaking and trailing
+whitespace is removed from the end of paragraphs.  This provides nicely
+formatted paragraphs similar to L<vim>'s C<gq> command.
+
+=head1 DEVELOPER NOTES
+
+These C<Pod::Wrap> subroutines have been overridden.
+
+=over
+
+=item * textblock
+
+=back
+
+=head1 CREDITS
+
+Yuval Kogman <nothingmuch@woobling.org> author of L<Pod::Wrap>
+
+=head1 SUPPORT
+
+Please contact the author directly via e-mail.
+
+=head1 AUTHOR
+
+Joshua Hoblitt <jhoblitt@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005  Joshua Hoblitt. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as Perl
+itself.
+
+The full text of the licenses can be found in the F<LICENSE> file included with
+this module, or in L<perlartistic> and L<perlgpl> Pods as supplied with Perl
+5.8.1 and later.
+
+=head1 SEE ALSO
+
+L<Pod::Wrap>, L<Pod::Parser>
+
+=cut

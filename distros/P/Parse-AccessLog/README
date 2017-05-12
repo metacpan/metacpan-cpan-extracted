@@ -1,0 +1,49 @@
+Parse-AccessLog
+
+Parse Nginx/Apache access logs in "combined" format. Parses web server logs
+created by Apache/nginx in combined format. Assumes no knowledge of the server
+which creates the log entries. Does not perform any validation (i.e. IP
+address, etc). This module only parses log files (and attempts to do that
+well).
+
+Version 0.01
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Parse::AccessLog
+
+You can also look for information at:
+
+    MetaCPAN
+        https://metacpan.org/module/Parse::AccessLog
+
+    GitHub
+        https://github.com/nmarley/Parse-AccessLog
+
+    Search CPAN
+        http://search.cpan.org/dist/Parse-AccessLog/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Nathan Marley
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,36 @@
+---
+abstract: 'Create new quote-like operators in Perl'
+author:
+  - 'Barry Walsh, C<< <draegtun at cpan.org> >>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PerlX-QuoteOperator
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Devel::Declare: '0.006007'
+  Text::Balanced: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/draegtun/PerlX-QuoteOperator/issues
+  homepage: https://github.com/draegtun/PerlX-QuoteOperator
+  repository: https://github.com/draegtun/PerlX-QuoteOperator.git
+version: '0.08'
+x_contributors:
+  - 'Barry Walsh <draegtun@googlemail.com>'
+  - 'draegtun <draegtun@googlemail.com>'
+  - 'Neil Bowers <neil@bowers.com>'

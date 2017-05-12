@@ -1,0 +1,36 @@
+NAME
+    PITA::XML - Create, load, save and manipulate PITA-XML files
+
+STATUS
+    This is an experimental release for demonstration purposes only.
+
+    Please note the .xsd schema file may not install correctly as yet.
+
+DESCRIPTION
+    The "PITA::XML" package supports the various uses of XML throughout the
+    PITA project.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PITA-XML>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>, <http://ali.as/>
+
+SEE ALSO
+    PITA::XML::Report
+
+    The Perl Image-based Testing Architecture (<http://ali.as/pita/>)
+
+COPYRIGHT
+    Copyright 2005 - 2013 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

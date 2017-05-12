@@ -1,0 +1,73 @@
+=head1 NAME
+
+wxpoe.pl - example app for POE::Loop::Wx
+
+=head1 DESCRIPTION
+
+Here is a *rough* little wxPOE sample app that we have used on win32, GTK and 
+OS X.  We wanted a wxPerl and POE environment that allowed parallel 
+non-blocking data transactions in the background (using 
+POE::Component::Client::UserAgent) and wxPerl cross-platform GUIs.  While were
+at it, we want a subscribe/publish data model to allow multiple frames 
+to re-use the same data and/or to allow multiple frames to be refreshed when
+data changed.
+
+In our actual application our DataManager (Brain.pm in this example), we do
+aggressive data caching, avoiding going across the wire for a lot of the calls.
+In turn, we subclassed a number of wxPerl controls to know how to do their own
+data calls on instantiation.  So when a frame/dialog is instantiated, each 
+control (for example a wxChoice) can go and get its data from the DataManager 
+(which may or may not be using cache) and populate itself asynchronously -- 
+so the user gets more immediate visual feedback.  Because we use the parallel
+user agent, a frame that has 10 controls for example will fire off 10 requests 
+at once (configurable) and populate the controls in parallel. 
+
+=head1 SYNOPSIS
+
+Here is a brief summary of what this app should do (thanks to Ed Heil).
+
+It opens a frame, with  "URL" and "key" sections, a "request data" button,
+and a "spawn" button.
+
+The "spawn" button makes more frames like itself.  Try making a few.  (The only
+difference between them and the original one is that if you close the original
+one the app goes away.)
+
+When you click "request data", it  subscribes that frame to a "channel"
+identified by the current subscription key, and then requests that the data
+from that URL be brought back on that channel.
+
+Try clicking "request data" on the first frame -- it will get data from
+google.com (Caveat: we don't have redirect handling working in this example,
+so if you are from another country where google redirects you to a local 
+domain, try some other non-redirecting domain name).
+
+Try opening a new frame.  Leave the subscription key the same, but change the
+URL to something else (say, yahoo.com).  Click "request data."  It will update
+the data both in the new and the old frame, since they're both subscribed to 
+the same subscription key.
+
+Try opening yet another new frame.  This time change the subscription key AND
+the URL.  This third frame will update with new data but will leave the others
+unchanged, because that new data came in on the channel defined by the new
+subscription key, not the old one to which they are subscribed.
+
+Just a proof of concept of the minimum infrastructure we absolutely need to
+implement publish/subscribe.  There are only two POE sessions going on -- the
+main one tracks the components and subscriptions itself.
+
+I implemented some of this functionality by inventing a new class, "Pobject,"
+which is any object of which POE is aware.  Viewer.pm is a Pobject as well as
+a Wx::Frame (multiple inheritance).
+
+Pobjects don't even have to be frames -- frames don't have any special status 
+in this publish/subscribe model. Any subclass we create could conceiveably be
+a Pobject and therefore deal with the Brain (which is the analogue of the
+DataManager in this demo).
+
+=head1 AUTHOR
+
+Ed Heil <ed-cpan@donorware.com>
+
+=cut
+

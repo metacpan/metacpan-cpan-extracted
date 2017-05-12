@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5b4ea75cb6dd66c8cec8b58c782a91db833f5505 AUTHOR_PLEDGE
+SHA1 1dc671b43264120d52fe1ee1c73d9224538fd7b7 CONTRIBUTORS
+SHA1 c1da49f63340436bbf6d9cd8bdf22976e25517b8 Changes
+SHA1 7ad19f69347eb81a6e17ada1e104e054adb1f046 INSTALL
+SHA1 96d23fd0d5fce92a90b5c6cce7a1d10dc7f7afe8 LICENSE
+SHA1 78223ee4314bffb4cc007eaeeb3e59b8d9d4a9d1 MANIFEST
+SHA1 035d1f7de6ca2a2c1c9a987b4fabd3dc796ead3d META.json
+SHA1 660eec69ed5ab2e6424dd3f21d342ce750485ed5 META.yml
+SHA1 a4dd3c17797ec2834d696f9b66281e0405166623 Makefile.PL
+SHA1 0ddc9f12c993ad34c86ca1d667c291433983a014 README
+SHA1 b8b1a22713baa8415d2737b333f0e7074d122165 cpanfile
+SHA1 6b139e62bcaf7c43428549742f07154e65b3b28b doap.xml
+SHA1 45c5809049a30fc5a2b86bf57aed78d7a036641b lib/Pollux.pm
+SHA1 1b4ad917fd9c3b04cb15fa17cf39738785e8b342 lib/Pollux/Action.pm
+SHA1 cda9b7c368d000a38fb364061f24096e632a77fa t/00-compile.t
+SHA1 491fd922cbf8c5fedac78f2aab8f3a9d68d50a6a t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 24b09240981d74440a3022a2e42b192ba68fa300 t/actions.t
+SHA1 cf7fefe2751dcc95ede4e176a86c9f7f83ed74d9 t/lib/Todo.pm
+SHA1 510190445f28c70cc62f11a8e0bb206481263b06 t/middleware.t
+SHA1 5247338fb0e00045b4df3f0a7aa53e4f34203fc2 t/mutability.t
+SHA1 1bf7b381a84a43f77bf224ad88b4af833dfd106e t/reducer.t
+SHA1 9924cbb9782e6fd34d5edf75f9f52019f2c6e0fa t/store.t
+SHA1 4429db26ba725cb88ddca7dc740e6d337c3b9dce t/subscribe.t
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlh9RjkACgkQ34Hwf+GwC4xjOACgre2aGn4d+JEIKHmGZc5Jjrde
+4foAoOSOYH4moqlPEL1qnfYF9Fb1ZbSC
+=DEf6
+-----END PGP SIGNATURE-----

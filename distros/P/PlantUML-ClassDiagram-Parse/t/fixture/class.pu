@@ -1,0 +1,9 @@
+abstract class PlantUML::ClassDiagram::Class {
+  name
+  attribute
+  variables
+  methods
+  relations
+  {static} build()
+  get_parents()
+}

@@ -1,0 +1,60 @@
+{
+   "abstract" : "MongoDB based session store for Plack apps.",
+   "author" : [
+      "Ido Perlmuter <ido@ido50.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Session-Store-MongoDB",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "MongoDB" : "0",
+            "Plack::Session::Store" : "0",
+            "Plack::Util::Accessor" : "0",
+            "parent" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Plack::Middleware::Session" : "0",
+            "Plack::Request" : "0",
+            "Plack::Session" : "0",
+            "Plack::Session::State::Cookie" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ido50/Plack-Session-Store-MongoDB/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Plack-Session-Store-MongoDB",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ido50/Plack-Session-Store-MongoDB.git",
+         "web" : "https://github.com/ido50/Plack-Session-Store-MongoDB"
+      }
+   },
+   "version" : "1.000000"
+}
+

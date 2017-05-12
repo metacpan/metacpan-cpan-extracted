@@ -1,0 +1,44 @@
+%{
+my $INT    = '(int)\b';
+my $ID     = '([a-zA-Z_][a-zA-Z_0-9]*)';
+my $NUM    = '(\d+)';
+%}
+
+%token NUM = /$NUM/
+%token INT = /$INT/
+%token ID  = /$ID/
+
+%right '='
+%left '+'
+
+%%
+
+decl:
+    %name DECLARATOR
+    INT declarator ';'
+  | %name DECLARATORINIT
+    INT declarator '=' expr ';'
+;
+
+
+expr:
+    %name ID:EXP
+    ID        
+  | %name NUM 
+    NUM
+  | %name TYPECAST
+    INT '(' expr ')' /* typecast */ 
+  | %name PLUS
+    expr '+' expr
+  | %name ASSIGN
+    expr '=' expr
+;
+
+declarator:
+    %name ID:DEC
+    ID        
+  | '(' declarator ')'
+;
+
+%%
+

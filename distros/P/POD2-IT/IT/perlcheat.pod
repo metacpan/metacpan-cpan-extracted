@@ -1,0 +1,116 @@
+=head1 NAME
+
+perlcheat - Manabile del Perl 5
+
+=head1 DESCRIZIONE
+
+Questo 'manabile' E<egrave> un comodo riferimento, inteso per i programmatori
+Perl alle prime armi. Non E<egrave> esaustivo, ma 194 caratteristiche possono
+giE<agrave> essere troppe.
+
+=head2 Il Manabile
+
+  CONTESTO  SIGILLI             ARRAY         HASH
+  vuoto     $scalare  totale:   @array        %hash
+  scalare   @array    slice:    @array[0, 2]  @hash{'a', 'b'}
+  lista     %hash     elemento: $array[0]     $hash{'a'}
+            &sub
+            *glob     VALORI SCALARI
+                      numero, stringa, riferimento, glob, undef
+  RIFERIMENTI
+  \     referenzia        $$pippo[1]       ossia $pippo->[1]
+  $@%&* dereferenzia      $$pippo{pluto}   ossia $pippo->{pluto}
+  []    rif. array anon.  ${$$pippo[1]}[2] ossia $pippo->[1]->[2]
+  {}    rif. hash anon.   ${$$pippo[1]}[2] ossia $pippo->[1][2]
+  \()   lista di rif.
+                          NUMERI versus STRINGHE  LINK
+  PRECEDENZA OPERATORI    =             =         perl.plover.com
+  ->                      +             .         search.cpan.org
+  ++ --                   == !=         eq ne          cpan.org
+  **                      < > <= >=     lt gt le ge    pm.org
+  ! ~ \ u+ u-             <=>           cmp            tpj.com
+  =~ !~                                                perldoc.com
+  * / % x                 SINTASSI
+  + - .                   for    (LISTA) { }, FOR (a;b;c) { }
+  << >>                   while  ( ) { }, until ( ) { }
+  op. unarie con nome     if     ( ) { } elsif ( ) { } else { }
+  < > <= >= lt gt le ge   unless ( ) { } elsif ( ) { } else { }
+  == != <=> eq ne cmp     for equivale a foreach (SEMPRE)
+  &
+  | ^              METACARATTERI REGEX        MODIFICATORI REGEX
+  &&               ^     inizio stringa       /i ignora maiusc/minusc.
+  ||               $     fine str. (prima \n) /m ^$ basati su riga
+  .. ...           +     uno o più            /s . comprende \n
+  ?:               *     zero o più           /x ignora spazi bianchi
+  = += -= *= ecc.  ?     zero o uno           /g globale
+  , =>             {3,7} ripeti in intervallo
+  op. su liste     ()    cattura          CLASSI CARATTERI REGEX
+  not              (?:)  no cattura       .  == [^\n]
+  and              []    classe caratt.   \s == [\x20\f\t\r\n]
+  or xor           |     alternative      \w == [A-Za-z0-9_]
+                   \b    limite parola    \d == [0-9]
+                   \z    fine stringa     \S, \W e \D negano
+  FATE
+  use strict         NON FATE          LINK
+  use warnings;      "$foo"            perl.com
+  my $var;           $$nome_variabile  perlmonks.org
+  open() or die $!;  `$input_utente`   use.perl.org
+  use Moduli;        /$input_utente/   perl.apache.org
+                                       parrotcode.org
+  LISTE RESTITUITE DALLE FUNZIONI
+  stat      localtime    caller         VARIABILI SPECIALI
+   0 dev    0 secondo    0 pacchetto    $_    variabile di default
+   1 ino    1 minuto     1 nomefile     $0    nome programma
+   2 mode   2 ora        2 riga         $/    separatore input
+   3 nlink  3 giorno     3 subroutine   $\    separatore output
+   4 uid    4 mese-1     4 ha_argom.    $|    flush automatico
+   5 gid    5 anno-1900  5 wantarray    $!    errore sist./libcall
+   6 rdev   6 g. sett.   6 evaltext     $@    errore eval
+   7 size   7 g. anno    7 is_require   $$    ID processo
+   8 atime  8 ora_leg.   8 suggerim.    $.    numero riga input
+   9 mtime               9 bitmask      @ARGV argomenti di chiamata
+  10 ctime  usate                       @INC  percorsi da includere
+  11 blksz  POSIX::      3..9 solo      @_    argomenti subroutine
+  12 blcks  strftime!    con ESPRESS.   %ENV  ambiente
+
+=head1 RINGRAZIAMENTI
+
+La prima versioe di questo documento E<egrave> apparsa su Perl Monks, dove
+parecchie persone hanno fornito suggerimenti utili. Grazie, Perl Monks.
+
+Un ringraziamento particolare a Damian Conway, che non solo ha suggerito
+cambiamenti importanti, ma si E<egrave> anche preso la briga di contare il numero
+delle caratteristiche incluse e di produrre una versione per Perl 6 per
+mostrare che Perl rimarrE<agrave> Perl.
+
+=head1 AUTORE
+
+Juerd Waalboer <juerd@cpan.org>, con l'aiuto di molti "Monaci"
+[che sono i "monks" di perlmonks.org, N.d.T.] Perl.
+
+=head1 CONSULTATE ANCHE
+
+ http://perlmonks.org/?node_id=216602      l'articolo originale su PM
+ http://perlmonks.org/?node_id=238031      versione Perl 6 di Damian Conway
+ http://juerd.nl/site.plp/perlcheat        home del Manabile Perl
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlcheat
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Flavio Poletti.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

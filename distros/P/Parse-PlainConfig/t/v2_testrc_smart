@@ -1,0 +1,22 @@
+# Scalar tests
+SCALAR 1: value1
+SCALAR 2: "these, are, all one => value"
+SCALAR 3: this is a 
+          continued line.
+SCALAR 4: ASDFKAS234123098ASDFA9082341
+          ASDFIO23489078907SFASDF8A972
+
+# List tests
+LIST 1: value1, value2,
+        value3
+LIST 2: value1, 
+        "two, parts", 
+          value3, 
+        "\"two => parts\""
+LIST 3: value1, 
+        "two, parts", 
+        two => parts
+
+# Hash tests
+HASH 1: one => 1, two => 2, three => "Three for Me! 3 => 2", 
+	four => 4

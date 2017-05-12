@@ -1,0 +1,31 @@
+---
+abstract: 'a HTTP user-agent component'
+author:
+  - 'Rocco Caputo <rcaputo@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-Client-HTTP
+requires:
+  HTTP::Headers: '5.810'
+  HTTP::Request: '5.811'
+  HTTP::Request::Common: '5.811'
+  HTTP::Response: '5.813'
+  HTTP::Status: '5.811'
+  Net::HTTP::Methods: '5.812'
+  POE: '1.312'
+  POE::Component::Client::Keepalive: '0.271'
+  Socket: '2.001'
+  Test::More: '0.96'
+  Test::POE::Server::TCP: '1.14'
+  URI: '1.37'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Client-HTTP
+  repository: git://github.com/rcaputo/poe-component-client-http.git
+version: '0.949'

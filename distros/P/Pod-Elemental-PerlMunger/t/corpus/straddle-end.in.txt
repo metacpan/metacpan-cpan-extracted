@@ -1,0 +1,14 @@
+my $hello = 'world';
+
+=head1 NAME
+
+Hello World
+
+=cut
+
+__END__
+
+=head2 DESCRIPTION
+
+No biggie.
+

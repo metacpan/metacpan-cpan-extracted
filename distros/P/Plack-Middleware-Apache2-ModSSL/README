@@ -1,0 +1,69 @@
+NAME
+    Plack::Middleware::Apache2::ModSSL - pull in $env data from mod_ssl API
+
+SYNOPSIS
+     builder
+     {
+       enable "Apache2::ModSSL",
+              vars => [qw(SSL_CLIENT_CERT)];
+       $app;
+     };
+
+DESCRIPTION
+    Apache mod_ssl provides a bunch of data about the SSL connection. While
+    much of this is often exposed in environment variables, sometimes server
+    configuration (especially the *SSLOptions* configuration directive) will
+    result in some of the data not being available to your application. This
+    module pokes into the mod_ssl API to retrieve the data you need and stash
+    it away in Plack's $env.
+
+    You may be able to tweak your Apache configuration and persuade it to give
+    you the data you want via environment variables, in which case Plack's
+    Apache2 handler will automatically copy them into $env and you don't need
+    this module.
+
+  `vars`
+    Specifies an arrayref listing SSL-related variables to add to $env.
+
+  `server_exts`
+    An arrayref of OIDs which will be exported from the server's certificate.
+    It's incredibly unlikely you need this.
+
+  `client_exts`
+    An arrayref of OIDs which will be exported from the client's certificate.
+    It's pretty unlikely you need this.
+
+BUGS
+    Plack::Middleware::Apache2::ModSSL uses Apache2::ModSSL which is an XS
+    module (and a bit of a pain to build at that). The latter has an oddity in
+    how it loads up the XS part of the module. To counteract the oddity, I've
+    found it necessary to add this to my PSGI, near the top:
+
+     BEGIN { $ENV{MOD_PERL} ||= 'mod_perl' };
+
+    If you get error messages about the `ssl_var_lookup` method not being
+    defined in package Apache2::Connection, then try the above.
+
+    Please report any other bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Plack-Middleware-Apache2-ModSS
+    L>.
+
+SEE ALSO
+    Plack, Apache2::ModSSL.
+
+    <http://httpd.apache.org/docs/2.0/mod/mod_ssl.html>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

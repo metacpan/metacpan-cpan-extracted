@@ -1,0 +1,18 @@
+Revision history for Perl extension PostScript::Columns.
+
+0.1  Wed Dec  8 17:28:52 1999
+	- original version; created by h2xs 1.19
+1.0  Mon Mar  6 12:48:00 2000
+  - first stable version
+1.2  Monday, January 22, 2001
+  - margin order now matches CSS
+	- zero-arguments now handled correctly
+	- minor documentaton changes
+  - ceil() now performed manually, POSIX no longer used
+1.21 Monday, March 12, 2001
+  - fixed error when no margins given
+1.22 Monday, March 12, 2001
+  - changed L/R margin defaults from 15 to 20 
+  - minor documentation changes
+1.23 Friday, August 03, 2001
+  - added page label (same as number) as per DSC

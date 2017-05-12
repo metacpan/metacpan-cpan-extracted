@@ -1,0 +1,104 @@
+Revision history for Perl extension PHP::Session
+
+0.27  Fri Jan 30 11:36:59 PST 2009
+        - Added a shared lock when reading a session file
+          (Thanks to Gergeley Soos)
+
+0.26  Thu Oct  6 02:30:52 UTC 2005
+        - Fixed the support for reference cound and added tests for that
+          (Thanks to Carl Stehle)
+
+0.25  Tue Aug 23 22:13:33 UTC 2005
+        - Documentation improvement
+          http://www.perlmonks.org/?node_id=429647
+
+0.24  Thu Jul  6 20:21:24 PDT 2005
+        - Addded 'R' and 'r' decoding (reference count?)
+          (Thanks to Carl Stehle)
+
+0.23  Thu Apr 14 10:28:06 JST 2005
+	- Added binmode $handle for Win32 platform
+	  (Thanks to Carl Stehle)
+
+0.22  Sun Oct  5 05:33:32 JST 2003
+	* Fixed bug that it fails to decode strings longer than 32766 bytes
+	  (https://rt.cpan.org/Ticket/Display.html?id=3970)
+
+0.21  Wed Oct  1 08:19:55 JST 2003
+	* Fixed bug that it decodes "0123" as integer 123.
+	  (https://rt.cpan.org/Ticket/Display.html?id=3917)
+
+0.20  Tue Apr 15 13:15:36 JST 2003
+	- Minor pod fix
+	* Fixed bug which fails to decode session data with "\n" in it
+	  (Thanks to Andy Lester)
+
+0.19  Tue Feb 25 19:21:10 JST 2003
+	- Optimized decoder using static method
+
+0.18  Tue Feb 25 18:42:40 JST 2003
+	- Fixed test failures due to 5.8 MakeMaker bug (warnings disabled by default)
+
+0.17  Tue Feb 25 16:43:05 JST 2003
+	* Fixed bug that fails to decode strings with "}" in it
+	  This has made me rewrite decoder code from scratch!
+	* Fixed bug in object encoding
+
+0.16  Mon Feb 24 20:35:20 JST 2003
+	* Fixed bug that encodes strings like "20030224203445" as integer
+	  (Thanks to PIA)
+	* Fixed parser bug that string like qq(A\";B) is not restored correctly
+
+0.15  Tue Jan 28 23:22:38 JST 2003
+	* Added new auto_save option in constructor
+
+0.14  Wed Sep 18 17:02:16 JST 2002
+	* Fixed bug that "." is not encoded properly
+	  (Thanks to Tony Mattila)	
+
+0.13  Tue Jul 16 19:35:58 JST 2002
+	- improved documentation
+
+0.12  Tue Jul 16 17:04:46 JST 2002
+	* Fixed bug in double serialization
+	* Fixed bug in double/string/int detection of Perl scalar
+	  (Thanks to Pasha Sadri, Thai Tran and Vincent C. Rubino)
+
+0.11  Wed Jul 10 05:23:19 JST 2002
+	* Fixed bug in hash/array serialization
+	  (Thanks to Pasha Sadri and Thai Tran)
+
+0.10  Mon Jul  1 18:26:54 JST 2002
+	* correctly encode/decode undefined value in PHP
+	  (Thanks to Lupe Christoph)
+
+0.09  Fri Jun 28 04:26:31 JST 2002
+	* Fixed bug in newline handling
+	  (Thanks to Lupe Christoph)
+
+0.08  Tue Jun  4 00:08:40 JST 2002
+	* now this module can create session file, with { create => 1 } option
+	  (Thanks to Andy Lester and Thomas Eibner)
+
+0.07  Sat Apr  6 17:44:38 JST 2002
+	- uses File::Spec for portablity
+
+0.06  Wed Mar 27 01:57:06 JST 2002
+	* exposed Serializer API
+	* Added encoding: Perl array => PHP array
+
+0.05  Mon Mar 18 16:36:27 JST 2002
+	* added Boolean type (ext/var.h in PHP source code)
+
+0.04  Fri Mar 15 16:14:32 JST 2002
+	* added destroy()
+
+0.03  Fri Mar 15 16:01:35 JST 2002
+	* added session ID validation
+	* implemented save()
+
+0.02  Thu Mar 14 04:37:39 JST 2002
+	- added UNIVERSAL::require as PREREQ_PM
+
+0.01  Wed Mar 13 15:54:53 2002
+	- original version

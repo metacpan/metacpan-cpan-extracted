@@ -1,0 +1,480 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Try::Tiny</title>
+<link rel="stylesheet" type="text/css" href="../podstyle.css" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <script type="text/javascript">
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  </script></head>
+<body>
+<div class="box">
+  <h1 class="t1">Docs Test</h1>
+  <table>
+    <tr>
+      <td class="label">Description</td>
+      <td class="cell">manuals and libraries</td>
+    </tr>
+  </table>
+</div>
+<div class="path">
+  <a href="../index.html">Docs Test</a> &gt; Perl Modules &gt;
+  Try-Tiny
+</div>
+<div>
+<a href="../src/Try/Tiny.pm">Source</a>
+</div>
+
+
+<div class="pod">
+<!-- INDEX START -->
+<h3 id="TOP">Index</h3>
+<ul>
+	<li><a href="#NAME">NAME</a></li>
+	<li><a href="#VERSION">VERSION</a></li>
+	<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+	<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+	<li><a href="#EXPORTS">EXPORTS</a></li>
+	<li><a href="#BACKGROUND">BACKGROUND</a><br />
+<ul>
+	<li><a href="#Clobbering">Clobbering $@</a></li>
+	<li><a href="#Localizing_silently_masks_errors">Localizing $@ silently masks errors</a></li>
+	<li><a href="#might_not_be_a_true_value">$@ might not be a true value</a></li>
+</ul>
+</li>
+	<li><a href="#SHINY_SYNTAX">SHINY SYNTAX</a></li>
+	<li><a href="#CAVEATS">CAVEATS</a></li>
+	<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+	<li><a href="#LIGHTNING_TALK">LIGHTNING TALK</a></li>
+	<li><a href="#VERSION_CONTROL">VERSION CONTROL</a></li>
+	<li><a href="#AUTHORS">AUTHORS</a></li>
+	<li><a href="#COPYRIGHT_AND_LICENSE">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<hr />
+<!-- INDEX END -->
+
+<h1 id="NAME">NAME <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p>Try::Tiny - minimal try/catch with proper preservation of $@</p>
+
+<h1 id="VERSION">VERSION <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p>version 0.18</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p>You can use Try::Tiny's <code>try</code> and <code>catch</code> to expect and handle exceptional
+conditions, avoiding quirks in Perl and common mistakes:</p>
+
+<pre>  # handle errors with a catch handler
+  try {
+    die &quot;foo&quot;;
+  } catch {
+    warn &quot;caught error: $_&quot;; # not $@
+  };
+
+</pre><p>You can also use it like a standalone <code>eval</code> to catch and ignore any error
+conditions.  Obviously, this is an extreme measure not to be undertaken
+lightly:</p>
+
+<pre>  # just silence errors
+  try {
+    die &quot;foo&quot;;
+  };
+
+</pre><h1 id="DESCRIPTION">DESCRIPTION <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p>This module provides bare bones <code>try</code>/<code>catch</code>/<code>finally</code> statements that are designed to
+minimize common mistakes with eval blocks, and NOTHING else.</p>
+
+<p>This is unlike <a href="http://search.cpan.org/perldoc?TryCatch">TryCatch</a> which provides a nice syntax and avoids adding
+another call stack layer, and supports calling <code>return</code> from the <code>try</code> block to
+return from the parent subroutine. These extra features come at a cost of a few
+dependencies, namely <a href="http://search.cpan.org/perldoc?Devel%3A%3ADeclare">Devel::Declare</a> and <a href="http://search.cpan.org/perldoc?Scope%3A%3AUpper">Scope::Upper</a> which are
+occasionally problematic, and the additional catch filtering uses <a href="http://search.cpan.org/perldoc?Moose">Moose</a>
+type constraints which may not be desirable either.</p>
+
+<p>The main focus of this module is to provide simple and reliable error handling
+for those having a hard time installing <a href="http://search.cpan.org/perldoc?TryCatch">TryCatch</a>, but who still want to
+write correct <code>eval</code> blocks without 5 lines of boilerplate each time.</p>
+
+<p>It's designed to work as correctly as possible in light of the various
+pathological edge cases (see <a href="#BACKGROUND">BACKGROUND</a>) and to be compatible with any style
+of error values (simple strings, references, objects, overloaded objects, etc).</p>
+
+<p>If the <code>try</code> block dies, it returns the value of the last statement executed in
+the <code>catch</code> block, if there is one. Otherwise, it returns <code>undef</code> in scalar
+context or the empty list in list context. The following examples all
+assign <code>&quot;bar&quot;</code> to <code>$x</code>:</p>
+
+<pre>  my $x = try { die &quot;foo&quot; } catch { &quot;bar&quot; };
+  my $x = try { die &quot;foo&quot; } || { &quot;bar&quot; };
+  my $x = (try { die &quot;foo&quot; }) // { &quot;bar&quot; };
+
+  my $x = eval { die &quot;foo&quot; } || &quot;bar&quot;;
+
+</pre><p>You can add <code>finally</code> blocks, yielding the following:</p>
+
+<pre>  my $x;
+  try { die 'foo' } finally { $x = 'bar' };
+  try { die 'foo' } catch { warn &quot;Got a die: $_&quot; } finally { $x = 'bar' };
+
+</pre><p><code>finally</code> blocks are always executed making them suitable for cleanup code
+which cannot be handled using local.  You can add as many <code>finally</code> blocks to a
+given <code>try</code> block as you like.</p>
+
+<h1 id="EXPORTS">EXPORTS <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p>All functions are exported by default using <a href="http://search.cpan.org/perldoc?Exporter">Exporter</a>.</p>
+
+<p>If you need to rename the <code>try</code>, <code>catch</code> or <code>finally</code> keyword consider using
+<a href="http://search.cpan.org/perldoc?Sub%3A%3AImport">Sub::Import</a> to get <a href="http://search.cpan.org/perldoc?Sub%3A%3AExporter">Sub::Exporter</a>'s flexibility.</p>
+
+<dl>
+	<dt>try (&amp;;@)</dt>
+		<dd><p>Takes one mandatory <code>try</code> subroutine, an optional <code>catch</code> subroutine and <code>finally</code>
+subroutine.</p></dd>
+		<dd><p>The mandatory subroutine is evaluated in the context of an <code>eval</code> block.</p></dd>
+		<dd><p>If no error occurred the value from the first block is returned, preserving
+list/scalar context.</p></dd>
+		<dd><p>If there was an error and the second subroutine was given it will be invoked
+with the error in <code>$_</code> (localized) and as that block's first and only
+argument.</p></dd>
+		<dd><p><code>$@</code> does <strong>not</strong> contain the error. Inside the <code>catch</code> block it has the same
+value it had before the <code>try</code> block was executed.</p></dd>
+		<dd><p>Note that the error may be false, but if that happens the <code>catch</code> block will
+still be invoked.</p></dd>
+		<dd><p>Once all execution is finished then the <code>finally</code> block, if given, will execute.</p></dd>
+	<dt>catch (&amp;;@)</dt>
+		<dd><p>Intended to be used in the second argument position of <code>try</code>.</p></dd>
+		<dd><p>Returns a reference to the subroutine it was given but blessed as
+<code>Try::Tiny::Catch</code> which allows try to decode correctly what to do
+with this code reference.</p></dd>
+<dd><pre>  catch { ... }
+
+</pre></dd>		<dd><p>Inside the <code>catch</code> block the caught error is stored in <code>$_</code>, while previous
+value of <code>$@</code> is still available for use.  This value may or may not be
+meaningful depending on what happened before the <code>try</code>, but it might be a good
+idea to preserve it in an error stack.</p></dd>
+		<dd><p>For code that captures <code>$@</code> when throwing new errors (i.e.
+<a href="http://search.cpan.org/perldoc?Class%3A%3AThrowable">Class::Throwable</a>), you'll need to do:</p></dd>
+<dd><pre>  local $@ = $_;
+
+</pre></dd>	<dt>finally (&amp;;@)</dt>
+<dd><pre>  try     { ... }
+  catch   { ... }
+  finally { ... };
+
+</pre></dd>		<dd><p>Or</p></dd>
+<dd><pre>  try     { ... }
+  finally { ... };
+
+</pre></dd>		<dd><p>Or even</p></dd>
+<dd><pre>  try     { ... }
+  finally { ... }
+  catch   { ... };
+
+</pre></dd>		<dd><p>Intended to be the second or third element of <code>try</code>. <code>finally</code> blocks are always
+executed in the event of a successful <code>try</code> or if <code>catch</code> is run. This allows
+you to locate cleanup code which cannot be done via <code>local()</code> e.g. closing a file
+handle.</p></dd>
+		<dd><p>When invoked, the <code>finally</code> block is passed the error that was caught.  If no
+error was caught, it is passed nothing.  (Note that the <code>finally</code> block does not
+localize <code>$_</code> with the error, since unlike in a <code>catch</code> block, there is no way
+to know if <code>$_ == undef</code> implies that there were no errors.) In other words,
+the following code does just what you would expect:</p></dd>
+<dd><pre>  try {
+    die_sometimes();
+  } catch {
+    # ...code run in case of error
+  } finally {
+    if (@_) {
+      print &quot;The try block died with: @_\n&quot;;
+    } else {
+      print &quot;The try block ran without error.\n&quot;;
+    }
+  };
+
+</pre></dd>		<dd><p><strong>You must always do your own error handling in the <code>finally</code> block</strong>. <code>Try::Tiny</code> will
+not do anything about handling possible errors coming from code located in these
+blocks.</p></dd>
+		<dd><p>Furthermore <strong>exceptions in <code>finally</code> blocks are not trappable and are unable
+to influence the execution of your program</strong>. This is due to limitation of
+<code>DESTROY</code>-based scope guards, which <code>finally</code> is implemented on top of. This
+may change in a future version of Try::Tiny.</p></dd>
+		<dd><p>In the same way <code>catch()</code> blesses the code reference this subroutine does the same
+except it bless them as <code>Try::Tiny::Finally</code>.</p></dd>
+</dl>
+<h1 id="BACKGROUND">BACKGROUND <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p>There are a number of issues with <code>eval</code>.</p>
+
+<h2 id="Clobbering">Clobbering $@</h2>
+
+<p>When you run an <code>eval</code> block and it succeeds, <code>$@</code> will be cleared, potentially
+clobbering an error that is currently being caught.</p>
+
+<p>This causes action at a distance, clearing previous errors your caller may have
+not yet handled.</p>
+
+<p><code>$@</code> must be properly localized before invoking <code>eval</code> in order to avoid this
+issue.</p>
+
+<p>More specifically, <code>$@</code> is clobbered at the beginning of the <code>eval</code>, which
+also makes it impossible to capture the previous error before you die (for
+instance when making exception objects with error stacks).</p>
+
+<p>For this reason <code>try</code> will actually set <code>$@</code> to its previous value (the one
+available before entering the <code>try</code> block) in the beginning of the <code>eval</code>
+block.</p>
+
+<h2 id="Localizing_silently_masks_errors">Localizing $@ silently masks errors</h2>
+
+<p>Inside an <code>eval</code> block, <code>die</code> behaves sort of like:</p>
+
+<pre>  sub die {
+    $@ = $_[0];
+    return_undef_from_eval();
+  }
+
+</pre><p>This means that if you were polite and localized <code>$@</code> you can't die in that
+scope, or your error will be discarded (printing &quot;Something's wrong&quot; instead).</p>
+
+<p>The workaround is very ugly:</p>
+
+<pre>  my $error = do {
+    local $@;
+    eval { ... };
+    $@;
+  };
+
+  ...
+  die $error;
+
+</pre><h2 id="might_not_be_a_true_value">$@ might not be a true value</h2>
+
+<p>This code is wrong:</p>
+
+<pre>  if ( $@ ) {
+    ...
+  }
+
+</pre><p>because due to the previous caveats it may have been unset.</p>
+
+<p><code>$@</code> could also be an overloaded error object that evaluates to false, but
+that's asking for trouble anyway.</p>
+
+<p>The classic failure mode is:</p>
+
+<pre>  sub Object::DESTROY {
+    eval { ... }
+  }
+
+  eval {
+    my $obj = Object-&gt;new;
+
+    die &quot;foo&quot;;
+  };
+
+  if ( $@ ) {
+
+  }
+
+</pre><p>In this case since <code>Object::DESTROY</code> is not localizing <code>$@</code> but still uses
+<code>eval</code>, it will set <code>$@</code> to <code>&quot;&quot;</code>.</p>
+
+<p>The destructor is called when the stack is unwound, after <code>die</code> sets <code>$@</code> to
+<code>&quot;foo at Foo.pm line 42\n&quot;</code>, so by the time <code>if ( $@ )</code> is evaluated it has
+been cleared by <code>eval</code> in the destructor.</p>
+
+<p>The workaround for this is even uglier than the previous ones. Even though we
+can't save the value of <code>$@</code> from code that doesn't localize, we can at least
+be sure the <code>eval</code> was aborted due to an error:</p>
+
+<pre>  my $failed = not eval {
+    ...
+
+    return 1;
+  };
+
+</pre><p>This is because an <code>eval</code> that caught a <code>die</code> will always return a false
+value.</p>
+
+<h1 id="SHINY_SYNTAX">SHINY SYNTAX <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p>Using Perl 5.10 you can use <a href="http://search.cpan.org/perldoc?perlsyn#&quot;Switch statements&quot;">&quot;Switch statements&quot; in perlsyn</a>.</p>
+
+<p>The <code>catch</code> block is invoked in a topicalizer context (like a <code>given</code> block),
+but note that you can't return a useful value from <code>catch</code> using the <code>when</code>
+blocks without an explicit <code>return</code>.</p>
+
+<p>This is somewhat similar to Perl 6's <code>CATCH</code> blocks. You can use it to
+concisely match errors:</p>
+
+<pre>  try {
+    require Foo;
+  } catch {
+    when (/^Can't locate .*?\.pm in \@INC/) { } # ignore
+    default { die $_ }
+  };
+
+</pre><h1 id="CAVEATS">CAVEATS <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<ul>
+	<li><code>@_</code> is not available within the <code>try</code> block, so you need to copy your
+arglist. In case you want to work with argument values directly via <code>@_</code>
+aliasing (i.e. allow <code>$_[1] = &quot;foo&quot;</code>), you need to pass <code>@_</code> by reference:<pre>  sub foo {
+    my ( $self, @args ) = @_;
+    try { $self-&gt;bar(@args) }
+  }
+
+</pre>
+<br /><br />or<pre>  sub bar_in_place {
+    my $self = shift;
+    my $args = \@_;
+    try { $_ = $self-&gt;bar($_) for @$args }
+  }
+
+</pre></li>
+	<li><code>return</code> returns from the <code>try</code> block, not from the parent sub (note that
+this is also how <code>eval</code> works, but not how <a href="http://search.cpan.org/perldoc?TryCatch">TryCatch</a> works):<pre>  sub parent_sub {
+    try {
+      die;
+    }
+    catch {
+      return;
+    };
+
+    say &quot;this text WILL be displayed, even though an exception is thrown&quot;;
+  }
+
+</pre>
+<br /><br />Instead, you should capture the return value:<pre>  sub parent_sub {
+    my $success = try {
+      die;
+      1;
+    };
+    return unless $success;
+
+    say &quot;This text WILL NEVER appear!&quot;;
+  }
+
+</pre>
+<br /><br />Note that if you have a <code>catch</code> block, it must return <code>undef</code> for this to work,
+since if a <code>catch</code> block exists, its return value is returned in place of <code>undef</code>
+when an exception is thrown.</li>
+	<li><code>try</code> introduces another caller stack frame. <a href="http://search.cpan.org/perldoc?Sub%3A%3AUplevel">Sub::Uplevel</a> is not used. <a href="http://search.cpan.org/perldoc?Carp">Carp</a>
+will not report this when using full stack traces, though, because
+<code>%Carp::Internal</code> is used. This lack of magic is considered a feature.</li>
+	<li>The value of <code>$_</code> in the <code>catch</code> block is not guaranteed to be the value of
+the exception thrown (<code>$@</code>) in the <code>try</code> block.  There is no safe way to
+ensure this, since <code>eval</code> may be used unhygenically in destructors.  The only
+guarantee is that the <code>catch</code> will be called if an exception is thrown.</li>
+	<li>The return value of the <code>catch</code> block is not ignored, so if testing the result
+of the expression for truth on success, be sure to return a false value from
+the <code>catch</code> block:<pre>  my $obj = try {
+    MightFail-&gt;new;
+  } catch {
+    ...
+
+    return; # avoid returning a true value;
+  };
+
+  return unless $obj;
+
+</pre></li>
+	<li><code>$SIG{__DIE__}</code> is still in effect.
+<br /><br />Though it can be argued that <code>$SIG{__DIE__}</code> should be disabled inside of
+<code>eval</code> blocks, since it isn't people have grown to rely on it. Therefore in
+the interests of compatibility, <code>try</code> does not disable <code>$SIG{__DIE__}</code> for
+the scope of the error throwing code.</li>
+	<li>Lexical <code>$_</code> may override the one set by <code>catch</code>.
+<br /><br />For example Perl 5.10's <code>given</code> form uses a lexical <code>$_</code>, creating some
+confusing behavior:<pre>  given ($foo) {
+    when (...) {
+      try {
+        ...
+      } catch {
+        warn $_; # will print $foo, not the error
+        warn $_[0]; # instead, get the error like this
+      }
+    }
+  }
+
+</pre>
+<br /><br />Note that this behavior was changed once again in <a href="https://metacpan.org/module/perldelta#given-now-aliases-the-global-_">Perl5 version 18</a>.
+However, since the entirety of lexical <code>$_</code> is now <a href="https://metacpan.org/module/perldelta#Lexical-_-is-now-experimental">considired experimental</a>, it
+is unclear whether the new version 18 behavior is final.</li>
+</ul>
+
+<h1 id="SEE_ALSO">SEE ALSO <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<dl>
+	<dt><a href="http://search.cpan.org/perldoc?TryCatch">TryCatch</a></dt>
+		<dd><p>Much more feature complete, more convenient semantics, but at the cost of
+implementation complexity.</p></dd>
+	<dt><a href="http://search.cpan.org/perldoc?autodie">autodie</a></dt>
+		<dd><p>Automatic error throwing for builtin functions and more. Also designed to
+work well with <code>given</code>/<code>when</code>.</p></dd>
+	<dt><a href="http://search.cpan.org/perldoc?Throwable">Throwable</a></dt>
+		<dd><p>A lightweight role for rolling your own exception classes.</p></dd>
+	<dt><a href="http://search.cpan.org/perldoc?Error">Error</a></dt>
+		<dd><p>Exception object implementation with a <code>try</code> statement. Does not localize
+<code>$@</code>.</p></dd>
+	<dt><a href="http://search.cpan.org/perldoc?Exception%3A%3AClass%3A%3ATryCatch">Exception::Class::TryCatch</a></dt>
+		<dd><p>Provides a <code>catch</code> statement, but properly calling <code>eval</code> is your
+responsibility.</p></dd>
+		<dd><p>The <code>try</code> keyword pushes <code>$@</code> onto an error stack, avoiding some of the
+issues with <code>$@</code>, but you still need to localize to prevent clobbering.</p></dd>
+</dl>
+<h1 id="LIGHTNING_TALK">LIGHTNING TALK <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p>I gave a lightning talk about this module, you can see the slides (Firefox
+only):</p>
+
+<p><a href="http://web.archive.org/web/20100628040134/http://nothingmuch.woobling.org/talks/takahashi.xul">http://web.archive.org/web/20100628040134/http://nothingmuch.woobling.org/talks/takahashi.xul</a></p>
+
+<p>Or read the source:</p>
+
+<p><a href="http://web.archive.org/web/20100305133605/http://nothingmuch.woobling.org/talks/yapc_asia_2009/try_tiny.yml">http://web.archive.org/web/20100305133605/http://nothingmuch.woobling.org/talks/yapc_asia_2009/try_tiny.yml</a></p>
+
+<h1 id="VERSION_CONTROL">VERSION CONTROL <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p><a href="http://github.com/doy/try-tiny/">http://github.com/doy/try-tiny/</a></p>
+
+<h1 id="AUTHORS">AUTHORS <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<ul>
+	<li>Yuval Kogman &lt;nothingmuch@woobling.org&gt;</li>
+	<li>Jesse Luehrs &lt;doy@tozt.net&gt;</li>
+</ul>
+
+<h1 id="COPYRIGHT_AND_LICENSE">COPYRIGHT AND LICENSE <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p>This software is Copyright (c) 2013 by Yuval Kogman.</p>
+
+<p>This is free software, licensed under:</p>
+
+<pre>  The MIT (X11) License
+
+</pre>
+</div><div class="footer">generated by <a href="http://search.cpan.org/perldoc?Pod%3A%3AProjectDocs">Pod::ProjectDocs</a></div></body>
+</html>

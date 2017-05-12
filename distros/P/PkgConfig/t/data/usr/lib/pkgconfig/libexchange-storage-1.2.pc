@@ -1,0 +1,18 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+datarootdir=${prefix}/share
+datadir=${datarootdir}
+
+idldir=${datadir}/idl/evolution-data-server-1.2
+IDL_INCLUDES=-I ${idldir} -I/usr/share/idl/bonobo-2.0 -I/usr/share/idl/bonobo-activation-2.0
+
+privincludedir=${includedir}/evolution-data-server-2.22
+
+Name: libexchange
+Description: Client library for accessing Exchange server through webdav.
+Version: 2.22.3
+Requires: libsoup-2.4 >= 2.3.0 
+Libs: -L${libdir} -lexchange-storage-1.2
+Cflags: -I${privincludedir}/exchange

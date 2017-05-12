@@ -1,0 +1,135 @@
+
+1.25 - Mon Sep  5 09:24:00 UTC 2005
+
+  - Stop QueryParser turning 'notice' into 'NOT ice' (RT#14450)
+
+1.24 - Wed 20 July 2005
+
+  - use pack and unpack to read/write frq and prx files [Minty]
+  - Small doc changes [Minty / TB]
+
+1.23 - Sun 17 July 2005
+
+  - Stop rolling our own sorting in SegmentMerger/merge_term_infos [Minty]
+  - Replace sequence of read_byte() calls in SegmentReader with one
+    direct call to read() [Aaron Crane]
+  - add a fast clone() method to Plucene::Index::TermInfo [TB]
+    - and use it in preference to copy_in() [Minty]
+  - close the file at DESTROY in Input/Output Stream classes [Minty]
+  - Improve POD for Document::Field [Geoff Richards]
+  - minor POD fixes [Minty / TB]
+  - add indexing benchmark script [TB]
+
+1.22 - Tue Jun 28 2005
+
+  - perl 5.8 required
+  - use pack and unpack to read/write 'segments' files in SegmentInfos [TB]
+  - Use string xor to find longest common string prefix in
+    TermInfosWriter [Minty / Nicholas Clark]
+  - switch to direct hash access in comparison methods in
+    Plucene::Index::Term [Minty]
+  - remove some indirection in SegmentTermEnum [TB]
+  - remove Plucene::Index::FieldInfo file [TB]
+  - minor speed tweaks to SegmentMergeInfo, SegmentTermPositions [TB]
+  - minor speed tweaks to SegmentsTermEnum (and split out into own file) [TB]
+  - remove Tie::Array::Sorted from SegmentMerger [TB/MP]
+
+1.21 - Mon 24 Jan 2005
+  - use pack and unpack to read/write FieldInfos files (.fnm). This
+    breaks index compatability with Lucene, as we now use BER
+    compressed integers (but we never really had index compatability
+    anyway). It will also break index compatability with older versions
+    of Plucene if you have documents with more than 127 fields. Hopefully
+    no-one actually does. [MP / TB]
+  - localise $\ in Plucene::Store::OutputStream so -l works [Chris Nandor]
+  - Removed needless new() method from FieldInfo for speed [TB]
+  - Speed up FieldsInfo::_add_internal [TB]
+  - explicitly close lock files immediately after creating them [MP]
+  - remove all remaining catfile() calls [TB]
+  - tweak docs for skipping_doc() [TB]
+  - lots of tiny micro-optimisations [TB]
+
+1.20 - Wed 15 Dec 2004
+  * Just upped the version number, to fix some issues with CGI::Kwiki
+
+1.19 - Wed 21 July 2004
+  * Removed accidentally-included experimental patches
+
+1.18 - Tue 20 July 2004
+  * Downgraded dependencies to work with Perl 5.6.1                       
+  * Fix to delete_term  
+
+1.17 - Tue 27 Apr 2004
+  * Plucene::Search::Hits::hit_doc should call _get_more_hits not get_more_docs
+    (thanks to Kjetil Fikkan for pointing it out)
+
+1.16 - Mon 12 Apr 2004
+  * not released
+
+1.15 - Mon 29 Mar 2004
+  * Remove some needless prereqs.
+  * Removal of Class::HasA completely
+  * Remove use of 'catfile'
+
+1.14 - thu Mar 25 2004
+  * Put Encode::compat in a BEGIN block in the Store classes.
+  * Change the Build.PL to need Encode::compat if < 5.6
+
+1.13 - Thu Mar 25 2004
+  * Remove Encode::compat.
+
+1.12 - Tue Mar 23 2004
+  * Put back Encode::compat
+
+1.11 - Tue Mar 23 2004
+  * More speed up patches (thanks to Marty Pauley and Tony Bowden)
+
+1.10 - Thu Mar 18 2004
+  * Include the test left out for the bug in 1.08
+
+1.09 - Wed Mar 17 2004
+  * Now allows documents of id 0 to be deleted correctly! (Thanks to Steve Rushe for pointing this out)
+
+1.08 - Wed Mar 17 2004
+  * Some speed ups in InputStream (thanks to Marty Pauley)
+
+1.07 - Web Feb 18 2004
+  * Allowed the changing of mergefactor
+
+1.06 - Tue Feb 17 2004
+  * Checked $] in Build.pl to decide if to use Encode::compat
+  * Added create_makefile_pl => 'traditional' to Build.PL
+  * moved from dist_name to module_name to stop warning when running Makefile.PL
+
+1.05 - Fri Feb 13 2004
+  * Remove commented out line in Plucene::Store::InputStream
+  * Removed hardcoded /tmp index directories, moved to File::Temp
+  * Removed system() calls from tests
+
+1.04 - Fri Feb 06 2004
+  * Doc change to clarify what optimize() does to a writer
+  * Removed tell call from Plucene::Store::InputStream::read_byte
+
+1.03 - Thu Feb 05 2004
+
+  * Added in use of Enocde::compat to ensure works with < 5.7
+    (thanks to Simon Cozens)
+  * Added Plucene::Index::IndexSearcher::close()
+
+1.02 - Wed Feb 04 2004
+
+  * Speed up sort (thanks to Tony Bowden)
+  * Move from Class::Accessor to Class::Accessor::Fast (thank to Tony again)
+  * StandardAnalyzer should be a subclass of Analyzer!
+  * StandardTokenizer now tokenizes correctly
+  * IndexSearcher should call TopDocs with a hashref and named keys if no scorer.
+
+1.01 - Tue Feb 03 2004
+
+  * Doc fixes to Plucene.pm, bin/dump_index and README
+  * Remove Lucene::QueryParser from the tests
+  * Added this Changes file.
+
+1.0 - Mon Feb 02 2004
+
+  * Initial release to CPAN

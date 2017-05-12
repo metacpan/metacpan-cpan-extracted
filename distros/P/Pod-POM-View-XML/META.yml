@@ -1,0 +1,45 @@
+---
+abstract: 'XML view of a Pod Object Model'
+author:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Pod::POM: '0'
+  Test::More: '0.88'
+  perl: '5.006'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.023, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-POM-View-XML
+provides:
+  Pod::POM::View::XML:
+    file: lib/Pod/POM/View/XML.pm
+    version: v0.0.2
+requires:
+  Encode: '0'
+  Escape::Houdini: '0'
+  PerlX::Maybe: '0'
+  Pod::POM::View: '0'
+  XML::Writer: '0.620'
+  parent: '0'
+  strict: '0'
+  vars: '0'
+resources:
+  bugtracker: https://github.com/yanick/Pod-POM-View-XML/issues
+  homepage: https://github.com/yanick/Pod-POM-View-XML
+  repository: https://github.com/yanick/Pod-POM-View-XML.git
+version: 0.0.2
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Yanick Champoux <yanick@cpan.org>'

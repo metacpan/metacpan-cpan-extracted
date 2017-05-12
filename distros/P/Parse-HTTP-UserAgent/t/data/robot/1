@@ -1,0 +1,234 @@
+[AGENT]
+# googlebot
+
+Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)
+
+'parser'           => 'generic_compatible',
+'extras'           => ['http://www.google.com/bot.html'],
+'version_raw'      => '2.1',
+'version'          => '2.100',
+'name'             => 'Googlebot',
+'generic'          => 1,
+'robot'            => 1,
+
+[AGENT]
+# googlebot mobile
+
+DoCoMo/1.0/N505i/c20/TB/W20H10 (compatible; Googlebot-Mobile/2.1; +http://www.google.com/bot.html)
+
+'parser'           => 'docomo',
+'mobile'           => 1,
+'extras'           => [ '+http://www.google.com/bot.html' ],
+'version_raw'      => '2.1',
+'robot'            => 1,
+'version'          => '2.100',
+'name'             => 'Googlebot-Mobile',
+
+[AGENT]
+# Yahoo! Slurp
+Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)
+
+'parser'           => 'generic_compatible',
+'extras'           => ['http://help.yahoo.com/help/us/ysearch/slurp'],
+'version_raw'      => 0,
+'name'             => 'Yahoo! Slurp',
+'generic'          => 1,
+'robot'            => 1,
+
+[AGENT]
+
+Baiduspider+(+http://help.baidu.jp/system/05.html)
+
+'parser'           => 'generic_moz_thing',
+'extras'           => ['+http://help.baidu.jp/system/05.html'],
+'version_raw'      => 0,
+'name'             => 'Baiduspider+',
+'generic'          => 1,
+'robot'            => 1,
+
+[AGENT]
+msnbot/1.1 (+http://search.msn.com/msnbot.htm)
+
+'parser'           => 'generic_moz_thing',
+'extras'           => ['http://search.msn.com/msnbot.htm'],
+'version_raw'      => '1.1',
+'version'          => '1.100',
+'name'             => 'msnbot',
+'generic'          => 1,
+'robot'            => 1,
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (Twiceler-0.9 http://www.cuill.com/twiceler/robot.html)
+
+[AGENT]
+
+curl/7.13.0 (i686-suse-linux) libcurl/7.13.0 OpenSSL/0.9.7e zlib/1.2.2
+
+'parser'           => 'generic_moz_thing',
+'extras'           => [ 'i686-suse-linux', 'libcurl/7.13.0', 'OpenSSL/0.9.7e', 'zlib/1.2.2' ],
+'version_raw'      => '7.13.0',
+'version'          => '7.013000',
+'name'             => 'curl',
+'generic'          => 1,
+'robot'       => 1,
+
+[AGENT]
+
+Links (2.1pre15; Linux 2.4.26-vc4 i586; x)
+
+'parser'           => 'generic_moz_thing',
+'extras'           => [ 'Linux 2.4.26-vc4 i586', 'x' ],
+'version_raw'      => '2.1pre15',
+'version'          => '2.115',
+'name'             => 'Links',
+'generic'          => 1,
+
+[AGENT]
+
+Wget/1.4.5
+
+'parser'           => 'generic_name_version',
+'version_raw'      => '1.4.5',
+'version'          => '1.004005',
+'name'             => 'Wget',
+'generic'          => 1,
+'robot'            => 1,
+
+[AGENT]
+
+W3C_Validator/1.183 libwww-perl/5.64
+
+'parser'      => 'moz_only',
+'extras'      => ['libwww-perl/5.64'],
+'version_raw' => '1.183',
+'version'     => '1.183',
+'name'        => 'W3C_Validator',
+
+[AGENT]
+
+libwww-perl/5.11
+
+'parser'           => 'generic_name_version',
+'version_raw'      => '5.11',
+'version'          => '5.110',
+'name'             => 'libwww-perl',
+'generic'          => 1,
+'robot'            => 1,
+
+[AGENT]
+
+GetRight/3.2.1
+
+'parser'           => 'generic_name_version',
+'version_raw'      => '3.2.1',
+'version'          => '3.002001',
+'name'             => 'GetRight',
+'generic'          => 1,
+'robot'            => 1,
+
+[AGENT]
+
+Googlebot/1.0 (googlebot@googlebot.com http://googlebot.com/)
+
+'parser'           => 'generic_moz_thing',
+'extras'           => ['googlebot@googlebot.com http://googlebot.com/'],
+'version_raw'      => '1.0',
+'version'          => '1.000',
+'name'             => 'Googlebot',
+'generic'          => 1,
+'robot'            => 1,
+
+[AGENT]
+
+#TODO: DoCoMo/2.0 N905i(c100;TB;W24H16) (compatible; Googlebot-Mobile/2.1; +http://www.google.com/bot.html)
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (compatible; FriendFeedBot/0.1; +Http://friendfeed.com/about/bot; 179 subscribers; feed-id=1001488174509690116)
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (compatible; Yahoo! Slurp China; http://misc.yahoo.com.cn/help.html)
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (compatible; Yahoo! Slurp/3.0; http://help.yahoo.com/help/us/ysearch/slurp)
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (compatible; YandexBot/3.0; MirrorDetector; +http://yandex.com/bots)
+
+[AGENT]
+
+#TODO: Sogou web spider/4.0(+http://www.sogou.com/docs/help/webmasters.htm#07)
+
+[AGENT]
+
+#TODO: Sogou-Test-Spider/4.0 (compatible; MSIE 5.5; Windows 98)
+
+[AGENT]
+
+#TODO: Gigabot/3.0 (http://www.gigablast.com/spider.html)
+
+[AGENT]
+
+Java/1.6.0_21
+
+parser      => 'generic_name_version',
+version_raw => '1.6.0_21',
+version     => '1.006000_021',
+name        => 'Java',
+generic     => 1,
+
+[AGENT]
+
+#TODO: MLBot (www.metadatalabs.com/mlbot)
+
+[AGENT]
+
+#TODO: Mail.Ru/1.0
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (compatible; Exabot/3.0 (BiggerBetter); +http://www.exabot.com/go/robot)
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (compatible; MJ12bot/v1.3.3; http://www.majestic12.co.uk/bot.php?+)
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (compatible; ScoutJet; +http://www.scoutjet.com/)
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (compatible; YandexBot/3.0; +http://yandex.com/bots)
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (compatible; YoudaoBot/1.0; http://www.youdao.com/help/webmaster/spider/; )
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (compatible; bingbot/2.0; +http://www.bing.com/bingbot.htm)
+
+[AGENT]
+
+#TODO: Sosospider+(+http://help.soso.com/webspider.htm)
+
+[AGENT]
+
+#TODO: Yeti/1.0 (NHN Corp.; http://help.naver.com/robots/)
+
+[AGENT]
+
+#TODO: Mozilla/4.0 (compatible; http://search.thunderstone.com/texis/websearch/about.html)
+
+[AGENT]
+
+#TODO: Mozilla/5.0 (compatible; Yahoo! Slurp; http://help.yahoo.com/help/us/ysearch/slurp)

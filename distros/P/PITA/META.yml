@@ -1,0 +1,59 @@
+---
+abstract: 'The Practical Image Testing Architecture'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>, L<http://ali.as/>'
+build_requires:
+  ExtUtils::MakeMaker: 6.56
+  POE::Declare::HTTP::Client: 0.02
+  Test::More: 0.47
+  Test::POE::Stopping: 1.07
+  Test::Script: 1.02
+configure_requires:
+  ExtUtils::MakeMaker: 6.56
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: PITA
+name: PITA
+no_index:
+  directory:
+    - doc
+    - inc
+    - t
+    - xt
+requires:
+  Archive::Extract: 0.18
+  Carp: 0
+  Data::GUID: 0.042
+  File::Basename: 0
+  File::Copy: 0
+  File::Find::Rule: 0.30
+  File::Flock: 104.111901
+  File::Path: 0
+  File::Remove: 1.51
+  File::Spec: 3.29
+  File::Temp: 0
+  Getopt::Long: 0
+  PITA::Image: 0.60
+  PITA::Scheme: 0.43
+  PITA::XML: 0.50
+  POE::Declare: 0.58
+  POE::Declare::HTTP::Server: 0.05
+  POE::Wheel::Run: 1.299
+  Params::Util: 1.00
+  Probe::Perl: 0.01
+  Process: 0.16
+  Process::YAML: 0
+  Storable: 2.14
+  URI: 1.35
+  perl: 5.8.0
+  version: 0.70
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/PITA
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/PITA
+version: 0.60

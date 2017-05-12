@@ -1,0 +1,19 @@
+Changes for Perl extension Perl-Shell
+
+0.04 Sun 10 Jan 2010
+	- Added support for catching exceptions properly.
+
+0.03 Mon  4 Jan 2010
+	- Persist the package context correctly
+	- Add some functions for copyright and license command,
+	  and the stub of an initial help command.
+	- The command line is no longer limited to 10 commands before
+	  automatically exiting :)
+
+0.02 Fri 11 Dec 2009
+	- Added persistance of lexicals between statements
+	- Updated Module::Install to Module::Install::DSL 0.91
+	- Updated PPI dependency to 1.205 for Perl 5.10 support
+
+0.01 Tue 12 Aug 2008
+	- Creating initial experimental implementation

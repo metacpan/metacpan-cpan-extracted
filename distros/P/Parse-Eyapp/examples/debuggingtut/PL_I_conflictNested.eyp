@@ -1,0 +1,94 @@
+%{
+=head1 SYNOPSIS
+
+This grammar deals with the famous ambiguous PL/I phrase:
+
+                if then=if then if=then
+
+The (partial) solution uses C<YYExpect> in the lexical analyzer to predict the token
+that fulfills the parser expectatives.
+
+Compile it with:
+
+               eyapp -C PL_I_conflictNested.eyp
+               eyapp -P Assign.eyp
+
+Run it with:
+
+               ./PL_I_conflictNested.pm -t -c 'if if=then then then=if'
+
+for more detail:
+
+               ./PL_I_conflictNested.pm -d -t -c 'if if=then then then=if'
+
+and also
+
+               ./PL_I_conflictNested.pm -t -i -c 'if then=if then if=then
+
+The problem arises again
+
+Also try:
+
+                ./PL_I_conflictNested.pm -t -c 'if then=if then if a=b then c=d'
+
+=cut
+
+%}
+
+%strict
+
+%token ID 
+
+# Adaptative lexer
+%lexer {
+      m{\G\s*(\#.*)?\s*}gc;
+
+      m{\G([a-zA-Z_]\w*)}gc and do {
+        my $id = $1;
+
+        return ('then', 'then') if ($id eq 'then') && $self->YYExpects('then');
+
+        return ('if',   'if')   if ($id eq 'if')        && 
+                                   $self->expects('if') && 
+                                   !$self->YYPreParse('Assign');     #, 0xF # debug ); 
+        
+        return ('ID', $id);
+      };
+
+      m{\G(.)}gc and return ($1, $1);
+
+      return('',undef);
+  }
+
+%tree bypass
+%%
+stmt: 
+    ifstmt 
+  | assignstmt
+;
+
+ifstmt: 
+     %name IF
+    'if' expr 'then' stmt
+;
+
+assignstmt: 
+    %name ASSIGN
+    id '=' expr
+;
+
+expr:
+    %name EQ
+    id '=' id
+  | id
+;
+
+id: 
+    %name ID
+    ID
+;
+
+%%
+
+
+

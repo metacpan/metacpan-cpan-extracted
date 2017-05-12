@@ -1,0 +1,34 @@
+---
+name: Papery
+version: 0.01
+author:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+abstract: The thin layer between what you write and what you publish
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/book/Papery
+build_requires:
+  Test::More: 0
+provides:
+  Papery:
+    file: lib/Papery.pm
+    version: 0.01
+  Papery::Analyzer:
+    file: lib/Papery/Analyzer.pm
+  Papery::Processor:
+    file: lib/Papery/Processor.pm
+  Papery::Processor::Pod::POM:
+    file: lib/Papery/Processor/Pod/POM.pm
+  Papery::Pulp:
+    file: lib/Papery/Pulp.pm
+  Papery::Renderer:
+    file: lib/Papery/Renderer.pm
+  Papery::Renderer::Template:
+    file: lib/Papery/Renderer/Template.pm
+  Papery::Util:
+    file: lib/Papery/Util.pm
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

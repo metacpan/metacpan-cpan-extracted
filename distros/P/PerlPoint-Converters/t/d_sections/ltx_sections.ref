@@ -1,0 +1,87 @@
+% Created by pp2latex, build 1.15 from PerlPoint-Converters 1.0205
+\documentclass [11pt] {report}   % 
+\usepackage{german}               % ISO-Latin-Zeichensatz (дцья)
+%\usepackage{isolatin1}            % ISO-Latin-Zeichensatz (дцья)
+\parindent0pt                     % no indentation of first line
+\parskip1ex                       % white space between chapters
+\pagestyle{headings}     %
+\usepackage{epsf}
+\usepackage{makeidx}
+
+% setup for DIN A4
+\oddsidemargin3cm
+\evensidemargin3cm
+\setlength{\hoffset}{-1in}            % compensation of
+\setlength{\voffset}{-2cm}            % printer offset
+
+\textwidth15cm
+\topmargin1cm
+\headheight3ex
+\headsep12pt
+\textheight23cm
+\setlength{\footskip}{1.5cm}
+
+\makeindex
+
+\begin{document}
+
+\begin{flushleft}
+
+
+
+\section{Test of Sectioning}
+\label{PPPage0}
+
+This document has the following sequence of headers:
+\begin{verbatim}
+ \section
+ \subsection
+ \subsubsection
+ \Paragraph
+ \textit
+ \textit
+ ....\end{verbatim}
+
+\subsection{Level 2 Header}
+\label{PPPage1}
+
+This should be a \texttt{$\backslash$subsection}
+
+
+\subsubsection{Level 3 Header}
+\label{PPPage2}
+
+This should be a \texttt{$\backslash$subsubsection}
+
+
+\paragraph{Level 4 Header}
+\label{PPPage3}
+
+This should be a \texttt{$\backslash$paragraph}
+
+
+\textit{Level 5 Header}
+\label{PPPage4}
+
+This should be a \texttt{$\backslash$textit}
+
+
+\textit{Level 6 Header}
+\label{PPPage5}
+
+This should be a \texttt{$\backslash$textit}
+
+
+\section{OK return to Level One}
+\label{PPPage6}
+
+This is a \texttt{$\backslash$section}
+
+\printindex
+
+
+
+\end{flushleft}
+
+
+\end{document}

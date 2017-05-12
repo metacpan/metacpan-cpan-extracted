@@ -1,0 +1,67 @@
+Persistent - A Framework of Persistent Classes for Perl Objects
+    by David Winters and Greg Bossert
+
+WHAT IS THIS?
+
+Persistent is a framework of classes that makes it easier to store and
+retrieve Perl objects to and from various types of data stores.  Using
+the common interface that all of these classes inherit, you can
+store/retrieve objects to/from various types of data stores such as
+text and DBM files, relational databases, LDAP directories and so on,
+all with the same programming interface.
+
+This is the base package of the Persistent framework of classes.  It
+includes subclasses that implement persistence using text files, DBM
+files, and memory (RAM).  There are subclasses that implement
+persistence using databases (MySQL, Oracle, Sybase, mSQL) and LDAP
+directories.  These subclasses are distributed in separate Persistent
+packages that require this Persistent base package.  The database
+subclasses also require the Persistent::DBI package which they inherit
+from.  So be sure to first install this base package before any of the
+other Persistent packages.
+
+HOW DO I INSTALL IT?
+
+Since all other Persistent packages require this base package, install
+this package first by doing the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you want to install a private copy in your home directory, then use
+the PREFIX option when you generate the Makefile like this:
+
+    perl Makefile.PL PREFIX=~/perl_lib
+
+This package does require Perl 5.004 or later.
+
+WHERE IS THE DOCUMENTATION?
+
+You can find the documentation by typing "man Persistent" or "perldoc
+Persistent" after you have installed this software.  If you're looking
+for online documentation, check out:
+
+http://www.bigsnow.org/persistent/
+
+WHERE ARE THE EXAMPLES?
+
+Complete working examples can be found in the "examples" directory
+that is included in this package.  For more examples, check out the
+web site mentioned above.
+
+WARNING!
+
+This software is definitely a work in progress.  (Though, it has been
+used in more than 10 real world applications.)  Because of this, the
+interface is definitely subject to change and bugs may be found.  We
+would definitely love to hear from you regarding bugs or general
+comments.  So please feel free to send mail to:
+
+winters@bigsnow.org
+
+Thanks, have fun, and let me know what you think!
+
+David Winters
+winters@bigsnow.org

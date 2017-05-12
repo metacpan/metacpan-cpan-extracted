@@ -1,0 +1,21 @@
+CHANGES      -- Change history
+README       -- Main information file
+MANIFEST     -- This shipping list
+Makefile.PL  -- Perl Makefile template
+META.yml     -- Module meta-data (added by MakeMaker)
+
+lib/Pod/Checker.pm   -- The Pod::Checker module source
+
+scripts/podchecker.PL -- Script to check syntax of pods in a file
+
+t/pod/testcmp.pl      -- module used to compare output against expected results
+t/pod/testpchk.pl     -- module used to test Pod::Checker for a given file
+t/pod/podchklink.t    -- internal hyperlink checks
+t/pod/poderrs.t       -- test input file for checking some POD errors
+t/pod/poderrs.xr      -- expected result from processing poderrs.t
+t/pod/selfcheck.t     -- run our own POD through podchecker
+t/pod/contains_bad_pod.xr -- expected results
+t/pod/podchkenc.t     -- validate =encoding support
+t/pod/podchkenc.xr    -- expected results for the above
+t/pod/empty.xr        -- expected results (the empty file)
+META.json                                Module JSON meta-data (added by MakeMaker)

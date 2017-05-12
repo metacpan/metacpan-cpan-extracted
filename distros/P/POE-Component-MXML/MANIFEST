@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+MXML.pm
+Makefile.PL
+t/01_base.t
+t/02_tag.t
+t/single_tag.txt

@@ -1,0 +1,8 @@
+# $Id: MANIFEST 22 2005-06-21 18:50:16Z rcaputo $
+CHANGES
+JobQueue.pm
+MANIFEST
+Makefile.PL
+README
+t/01_queues.t
+META.yml                                 Module meta-data (added by MakeMaker)

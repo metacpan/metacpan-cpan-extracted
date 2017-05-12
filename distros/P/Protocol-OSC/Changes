@@ -1,0 +1,35 @@
+0.07
+
+    fix RT#110666 Protocol::OSC drops trailing zeros from OSC packets (Kataoka Haruka)
+
+0.06
+
+    fix Changes
+
+0.05
+
+    fix float (un)pack for some platforms
+
+0.04
+
+    add $VERSION, fix POD
+
+0.03
+
+    bump network tests - unrealiable on non-linux platforms
+
+0.02
+
+    require 5.10 as minimal version + fix network tests
+
+0.01
+
+    make it compatible with older perls
+
+0.002
+
+    fix tests - add anyevent example
+
+0.001
+
+    initial

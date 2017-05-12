@@ -1,0 +1,135 @@
+## name RCS keywords in POD
+## failures 0
+## cut
+
+=pod
+
+  $Revision: 3550 $
+  $Source$
+  $Date: 2009-08-09 14:51:07 -0700 (Sun, 09 Aug 2009) $
+
+=cut
+
+#-----------------------------------------------------------------------------
+
+## name No RCS keywords at all
+## failures 3
+## cut
+
+#just a comment
+$foo = "bar";
+$baz = qq{nuts};
+
+#-----------------------------------------------------------------------------
+
+## name Keywords in comments
+## failures 0
+## cut
+
+# $Revision: 3550 $
+# $Source$
+# $Date: 2009-08-09 14:51:07 -0700 (Sun, 09 Aug 2009) $
+
+#-----------------------------------------------------------------------------
+
+## name Id in comments
+## failures 0
+## cut
+
+# $Id$
+END_PERL
+
+#-----------------------------------------------------------------------------
+
+## name Keywords in literals
+## failures 0
+## cut
+
+'$Revision: 3550 $'
+'$Source: foo/bar $'
+'$Date: 2009-08-09 14:51:07 -0700 (Sun, 09 Aug 2009) $'
+
+#-----------------------------------------------------------------------------
+
+## name Keywords in literals, q{}-style
+## failures 0
+## cut
+
+q{$Revision: 3550 $}
+q{$Source: foo/bar $}
+q{$Date: 2009-08-09 14:51:07 -0700 (Sun, 09 Aug 2009) $}
+
+#-----------------------------------------------------------------------------
+
+## name Keywords in literals, q{}-style, with parms
+## failures 0
+## parms {keywords => 'Revision Author Id'}
+## cut
+
+q{$Revision: 3550 $}
+q{$Author: clonezone $}
+q{$Id: whatever $}
+
+#-----------------------------------------------------------------------------
+
+## name Empty code
+## failures 1
+## parms {keywords => 'Author Id'}
+## cut
+
+#nothing here!
+$policy = 'Miscellanea::RequireRcsKeywords';
+is( pcritique($policy, \$code, \%config), 1, $policy);
+
+#-----------------------------------------------------------------------------
+
+## name Keywords after __END__
+## failures 0
+## cut
+
+__END__
+# $Revision: 3550 $
+# $Source$
+# $Date: 2009-08-09 14:51:07 -0700 (Sun, 09 Aug 2009) $
+
+#-----------------------------------------------------------------------------
+
+## name Keywords in qw$ ... $ (RT 45196)
+## failures 0
+## parms {keywords => 'Revision'}
+## cut
+
+use version; our $VERSION = qv( '1.0.' . qw$Revision: 3550 $ );
+
+#-----------------------------------------------------------------------------
+
+## name Keywords in qw{$ ... $} are invalid (RT 45196)
+## failures 1
+## parms {keywords => 'Revision'}
+## cut
+
+use version; our $VERSION = qv( '1.0.' . qw{ $Revision: 3550 $ } );
+
+#-----------------------------------------------------------------------------
+
+## cut
+
+# The above '## cut' prevents the following lines from being included in the
+# last test's document and producing false negatives (or positives, as the
+# case may be).
+
+##############################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/distributions/Perl-Critic/t/Miscellanea/RequireRcsKeywords.run $
+#     $Date: 2009-08-09 14:51:07 -0700 (Sun, 09 Aug 2009) $
+#   $Author: clonezone $
+# $Revision: 3550 $
+##############################################################################
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab shiftround :

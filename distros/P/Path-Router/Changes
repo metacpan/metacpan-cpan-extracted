@@ -1,0 +1,119 @@
+Revision history for Perl extension Path::Router
+
+0.15 2016-03-01 NEILB
+    - Switched to Moo, done by FELLIOTT++.
+    - Added strict and warnings to Path::Router::Types - MANWAR++
+    - Specified versions when use'ing any third-party modules.
+    - Added minimal doc for route_class() method in Path::Router,
+      and clone() method in Path::Router::Route.
+    - Updated Stevan's email address.
+
+0.14_01  2015-07-03
+    - Switched to Moo, done by FELLIOTT++.
+    - Specified versions when use'ing any third-party modules.
+    - Temporarily dropped NextRelease and Git::NextVersion from the @DOY
+      bundle, so I can specify a developer release version.
+    - Added minimal doc for route_class() method in Path::Router,
+      and clone() method in Path::Router::Route.
+    - Updated Stevan's email address.
+
+0.14  2015-01-13
+    - localize $SIG{__DIE__} so that our exception based
+      flow control does not mess up, or get messed up by, 
+      application exception handling 
+        - thanks to Tim Bunce for finding and reporting 
+          this issue
+
+0.13  2014-08-24
+    - Allow path components to be false values (doy)
+        - added tests for this
+
+0.12  2012-07-16
+    - Fix matching on variable path components with a path where the variable
+      part evaluated to false (for instance, matching '/blog/show/:id' against
+      '/blog/show/0'). Reported by Clay Fouts (RT#78388). (doy)
+
+0.11  2011-10-03
+    - *POSSIBLE BACKWARDS INCOMPATIBILITY*
+      When using uri_for, a match is considered more exact if it is also
+      missing items from the path descriptor that don't appear in the route's
+      defaults or variables. For instance, if a router has /foo with defaults
+      of { 'a' => 'b' } and /bar with defaults of { 'a' => 'b', 'c' => 'd' },
+      then ->uri_for({ 'a' => 'b' }) will always return /foo. Previously, it
+      would return one of them arbitrarily, depending on the definition order.
+      Also, if this new rule doesn't result in a single route being matched
+      (for instance, if /foo had defaults of { 'a' => 'b', 'e' => 'f' }), then
+      an exception will be thrown.
+    - *POSSIBLE BACKWARDS INCOMPATIBILITY*
+      When using match, a path will be considered more exact if it matches more
+      required non-variable path components. For instance, if a router has
+      /foo/bar and /foo/:bar, then ->match('/foo/bar') will always match
+      /foo/bar (and not /foo/:bar). Previously, it would return one of them
+      arbitrarily, depending on the definition order. Also, if this new rule
+      doesn't result in a single route being matched (for instance, if the
+      router contained /:foo/bar and /foo/:bar), then an exception will be
+      thrown.
+    - Warn when creating validations that don't correspond to a path element
+    - Convert to Dist::Zilla
+
+0.10 Wed. Jan. 12, 2011
+    * Path::Router
+      - route_class attribute, to allow easy subclassing
+        (thanks to Dylan Hardison)
+
+0.09 Thurs. Dec. 10, 2009
+    * Path::Router
+      - fixing a minor problem with the path
+        generator and optional parts
+
+0.08 Tues. Dec. 8, 2009
+    * Path::Router
+      - added the include_router method
+        to allow inclusion of other routers
+        - added tests and docs for this
+
+0.07 Tues. Mar. 10, 2009
+    * Path::Router::*
+      - lots of code re-written by Daisuke Maki
+        resulting in an 150% speed increase
+        - matching code is now inlined by default
+          but inlining can be turned off if needed
+    * Path::Router
+      - added insert_route to allow more fine grained
+        control over route ordering (Daisuke Maki)
+    * tests
+      - do not run pod tests unless testing a release
+
+0.06 Sat. January 10, 2009
+    * Path::Router
+      - fix bug with >1 optional path component
+      - simplify and completely redo uri_for matching
+
+0.05 Sat. January 3, 2009
+    * Path::Router
+      - refinements to match correctly in more uri_for edge cases
+    * Test::Path::Router
+      - minor display improvements
+
+0.04 Fri. January 2, 2009
+    * Path::Router
+      - fix uri_for to return undef on match failure instead of ''
+        (empty string)
+
+0.03 Wed. July 16, 2008
+    * Path::Router::Shell
+      - fixed spelling of Term::ReadLine (RT #37693)
+
+0.02 Mon. July 14, 2008
+    * Path::Router
+      - changed DEBUG from a constant sub to $DEBUG
+        a package variable. This is a new module and
+        so easy debugability is important.
+
+    * Path::Router::Route
+      - silly fix to make sure exact paths will match
+        - added tests for this
+
+0.01 Sat. July 12, 2008
+    - copied Ruby on Rails Router, but make it
+      ... better, stronger, faster

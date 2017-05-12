@@ -1,0 +1,160 @@
+Revision history for Perl module Perl::Metrics::Simple
+
+0.18
+  Merged changes by mephinet to support better reporting for projects
+  using Moose, so that a method declared as 'foo' => sub {...} will
+  be reported as a sub named _around_foo instead of being counted
+  as part of the "Code not in any subroutine"
+  Pull request was: https://github.com/matisse/Perl-Metrics-Simple/pull/5
+
+0.17
+  Merten Falk - Added default values for subroutine metrics if
+  there is no subroutine.
+  
+  Clarified terms of license, updated FSF address: 
+    https://rt.cpan.org/Ticket/Display.html?id=80463
+
+  countperl now utilizes Pod::Usage for diagnostic and new --help option
+    https://rt.cpan.org/Ticket/Display.html?id=80462
+
+0.16
+  The countperl script now offers HTML output as well as plain text,
+  thanks to Merten Falk.
+
+  Perl::Metrics::Simple is on github at:
+     https://github.com/matisse/Perl-Metrics-Simple
+
+0.15
+  Changes for https://rt.cpan.org/Public/Bug/Display.html?id=56441
+  Thanks to Maggie J. Xiong for the inquiry, inspiration and patch.
+
+  You can now set:
+    @Perl::Metrics::Simple::Analysis::File::LOGIC_KEYWORDS and OPERATORS
+  to custom values before creating a new 
+    Perl::Metrics::Simple::Analysis::File object.
+
+  Added to the default @LOGIC_KEYWORDS used in calculating complexity:
+    map
+    grep
+
+  Added to the default @LOGIC_OPERATORS used in calculating complexity:
+    !~
+    //
+    <
+    <=>
+    ==
+    =~
+    >
+    cmp
+    eq
+    gt
+    lt
+    ne
+    ~~
+
+  Added two accessors on Perl::Metrics::Simple::Analysis::File to obtain
+  the values in use: 
+    logic_keywords()
+    logic_operators()
+
+0.14
+  Allow using a ref-to-SCALAR of file contents instead of a file path.
+  https://rt.cpan.org/Ticket/Display.html?id=54293
+  Thanks to Alexandr Ciornii for requesting this and supplying patches.
+  Also changes all VERSION numbers to match: 0.14
+
+0.13 Mon May  4 08:25:51 PDT 2009
+  Fixed bug in report output in countperl.
+  Added Copyright notice in form suitable for Debian GNU/Linux. (per Ryan Niebur)
+
+0.12 Sun Aug 10 09:25:38 PDT 2008
+  Added credits to 0.11 notes.
+  Minor changes to README and documentation in Perl/Metrics/Simple.pm
+  Added section on using Makefile.PL to INSTALL notes.
+
+0.11 Sat Jul 19 10:31:21 PDT 2008
+  Fixed http://rt.cpan.org/Public/Bug/Display.html?id=37771
+        countperl dying on empty files
+  Thanks to Mathieu Gagnon, GAGNONM <gagnonm@cpan.org> for reporting this.
+
+  Changes to satisfy Perl::Critic
+  
+  Fixed bug in Perl/Metrics/Simple/Analysis/File.pm where lines after __END__
+  were being counted.
+  Thanks to Elliot Shank, ELLIOTJS perl@galumph.com for reporting this.
+
+  Made line counts platform-independent (using $INPUT_RECORD_SEPARATOR)
+
+0.1 Sun Dec 30 13:30:34 PST 2007
+  No feature changes.
+  Improved test coverage, documentation.
+  Listed core modules as requirements in Build.PL and Makefile.PL
+
+0.034 Thu Nov 22 10:15:05 PST 2007
+  Listed core modules used as dependencies.
+  Added Readonly::XS as a reccomended module in Build.PL
+  Small documentation fix for subs() in Perl::Metrics::Simple::Analysis
+  Set VERSION of all .pm files to 0.034
+
+0.033 Wed May 23 08:35:18 PDT 2007
+ Added EXAMPLES file
+ Added INSTALL file
+ Added Makefile.PL
+
+0.032 Thu May 10 08:07:56 PDT 2007
+ Added    should_be_skipped()  method which causes  find_files()
+ to skip  .svn   CVS  _darcs directories.
+
+ Better documentation about measuring complexity.
+
+0.031 - Thu Dec 14 09:05:15 PST 2006
+ Fixed bug in the  countperl  script. Was reporting the median instead
+ of mean for the summary complexity numbers.
+ Thanks to Ovid for spotting this.
+
+0.03 - Sat Dec  2 09:01:41 PST 2006
+ The "main" stats for each file now have the same format as the stats for
+ a subroutine: Added 'name' and 'path' keys to the hash.
+ The 'name' is always:     {code not in named subroutines}
+
+ Changed the 'countperl' script to use the new data structure to add
+ the {code not in named subroutines} to the list of subroutines it reports.
+
+0.022 - Sun Nov 26 22:08:47 PST 2006
+ Line counts now exclude blank lines, comments and pod.
+ Complexity counts now will be 0 (zero) for code that is only comments/pod.
+
+0.021 - Sat Nov 25 22:46:23 PST 2006
+ Mostly changes to improve Kwalitee. See http://cpants.perl.org/kwalitee.html
+ Added pod.
+ Added tests for Pod and Pod coverage.
+
+0.02
+  Refactored much code into new Perl::Metrics::Simple::Analysis::File
+  Added summary_stats() method to Perl::Metrics::Simple::Analysis
+     provides min/max/mean/median/standard_deviation info.
+  Added  '!' and  'not' to list of logic operators that add t complexity scores.
+  Installs new script 'countperl' which creates report in text format.
+  Made various changes to satisfy perlcritic.
+  Made a change to list_perl_files() to work with old versions of File::Find.
+
+0.014
+  Added 'last', 'next', and 'goto' to list of things that count for complexity.
+  Moved example script from pod in Simple.pm into installed script: bin/countperl
+
+0.013 Fri Oct  6 17:40:57 PDT 2006
+Fixed MANIFEST (Build.PL was missing!)
+Added some pod, including
+ copying the example script into the pod.
+
+Sun Sep 24 11:53:10 PDT 2006
+    - 'for' and 'foreach' count towards complexity score.
+    - measureing length and complexity of 'main' - which is the document - subs.
+
+0.011 Wed Sep  6 07:17:32 PDT 2006
+    - Added mccabe complexity
+    
+0.01 Fri Sep  1 21:19:56 2006
+    - original version; created by ExtUtils::ModuleMaker 0.47
+
+

@@ -1,0 +1,35 @@
+Revision history for Perl6-Export-Attrs
+
+0.0.1  Sun Mar 27 06:48:42 2005
+       Initial release.
+
+
+
+0.0.2  Tue Aug  2 05:52:27 2005
+       No changes logged
+
+
+0.0.3  Tue Aug  2 05:53:06 2005
+       No changes logged
+
+
+0.000004  Sat Oct  3 12:42:22 2015
+
+    * Added export of package variables.
+
+    * Fixed filtering of args to IMPORT block (thanks Smylers)
+
+    * Updated docs to explain the syntactic constraints of the 
+      IMPORT block (thanks Smylers)
+
+    * Updated docs to note incompatibility with Memoize.pm
+      (thanks David)
+
+    * Included META files
+      (thanks Jarkko)
+
+
+0.000005  Tue Nov 24 09:16:01 2015
+
+    * Added dependency for PadWalker 
+      (thanks Dave!)

@@ -1,0 +1,85 @@
+TYPEMAP
+
+nstring *	NSTRING
+Pvar *		PVARARG
+Pscalar *	PVARNEW
+Parray *	PVARNEW
+Phash *		PVARNEW
+Phtree *	PVARNEW
+Pbtree *	PVARNEW
+Pntree *	PVARNEW
+Psnarray *	PVARNEW
+Pogo *		POGO
+callresult	CALLRESULT
+
+OUTPUT
+
+NSTRING
+	if( $var == NULL )	XSRETURN_UNDEF;
+	sv_setpvn( $arg, $var->str, $var->len );
+
+PVARARG
+	if( $var == NULL )	XSRETURN_UNDEF;
+	char* _class = $var->perl_class();
+	if( strcmp(_class, \"_string\") == 0 ) {
+		nstring* _nstr = ((Pstring*)$var)->get();
+		sv_setpvn( $arg, _nstr->str, _nstr->len );
+	} else {
+		sv_setref_pv( $arg, _class, (void*)$var );
+	}
+
+PVARNEW
+	if( $var == NULL )	XSRETURN_UNDEF;
+	$var->set_pclass(CLASS);
+	sv_setref_pv( $arg, CLASS, (void*)$var );
+
+POGO
+	if( $var == NULL )	XSRETURN_UNDEF;
+	sv_setref_pv( $arg, CLASS, (void*)$var );
+
+CALLRESULT
+	sp -= items;
+	int outs = 0;
+	callresult tmp = $var;
+	while( *tmp != NULL ) {
+		XPUSHs(sv_2mortal((SV*)*(tmp++)));
+		outs++;
+	}
+	free($var);
+	XSRETURN(outs);
+
+INPUT
+
+NSTRING
+	nstring _nstr;
+	_nstr.str = SvPV($arg, _nstr.len);
+	$var = &_nstr;
+
+PVARARG
+	if( !SvROK($arg) ) {
+		nstring _nstr;
+		_nstr.str = SvPV($arg, _nstr.len);
+		$var = new Pstring(&_nstr);
+	} else if( sv_isobject($arg) && sv_derived_from($arg, \"Pogo::Var\") ) {
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	} else {
+		warn( \"${Package}::$func_name() -- $var is not a Pogo::Var object\" );
+		XSRETURN_UNDEF;
+	}
+
+PVARNEW
+	if( sv_isobject($arg) && sv_derived_from($arg, \"Pogo::Var\") ) {
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	} else {
+		warn( \"${Package}::$func_name() -- $var is not a Pogo::Var object\" );
+		XSRETURN_UNDEF;
+	}
+
+POGO
+	if( sv_isobject($arg) && sv_isa($arg, \"Pogo\") ) {
+		$var = ($type)SvIV((SV*)SvRV( $arg ));
+	} else {
+		warn( \"${Package}::$func_name() -- $var is not a Pogo object\" );
+		XSRETURN_UNDEF;
+	}
+

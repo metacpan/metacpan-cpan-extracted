@@ -1,0 +1,22 @@
+Revision history for PostScript-ScheduleGrid
+
+0.05   2015-08-22
+	- Document that the output method also accepts an open filehandle.
+	  (This has been true since 0.01; it just wasn't documented here.)
+
+0.04   2013-12-07
+	- Use the function library provided by PostScript::File 2.20
+	- Use Module::Runtime instead of Class::MOP::load_class (RT#90961)
+
+0.03   2013-05-11
+	- Clean up type library
+	- Improve documentation
+	- Warn about conflict between MooseX::Types 0.32 and greater
+	  with Moose versions before 2.0800
+
+0.02   2011-11-20
+	- Add get__PostScript_File method for PostScript::Convert compatibility
+	- Require List::Util 1.20 (DateTime overloads comparison operators)
+
+0.01   2011-11-11
+	- Initial release

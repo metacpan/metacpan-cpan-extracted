@@ -1,0 +1,9 @@
+Revision history for Perl extension Pod::PalmDoc.
+
+0.0.1  Sun Oct 28 2:00:00 2001
+	- original version; VERY quick hack
+
+0.0.2  Mon Oct 29 21:00:00 2001
+	- Added examples
+	- Tweaked Filehandle routines
+	- Dropped outfile method (filename is passed thru parse_from_file)

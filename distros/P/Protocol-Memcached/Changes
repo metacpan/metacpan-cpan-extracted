@@ -1,0 +1,13 @@
+0.004     2012-09-28 10:00:56 Europe/London
+	Basic support for Ketama consistent hashing algorithm
+
+0.003     2011-07-07 22:26:53 Europe/London
+	Some day I'll remember that parent.pm is *not* a core module.
+
+0.002     2011-07-06 00:00:08 Europe/London
+	Add ::Client subclass, and some cleanup.
+	Pass %args to on_read and ->set/->get callbacks, for consistency.
+
+0.001     2011-07-02 21:23:44 Europe/London
+	Preliminary release to CPAN.
+

@@ -1,0 +1,36 @@
+Content-Type: text/html; charset=ISO-8859-1
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>test_pod_usage.cgi</title>
+	
+	
+	
+	
+	
+<link rel="stylesheet" href="http://localhost/some.css"/>
+</head>
+<body>
+<div class="message">a message</div>
+<div class="pod">
+<!-- INDEX START -->
+<h3 id="TOP">Index</h3>
+<ul>
+	<li><a href="#NAME">NAME</a></li>
+	<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+</ul>
+<hr />
+<!-- INDEX END -->
+
+<h1 id="NAME">NAME</h1><p><a href="#TOP" class="toplink">Top</a></p>
+
+<p>test_pod_usage.cgi - minimal usage of POD::Usage::CGI</p>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1><p><a href="#TOP" class="toplink">Top</a></p>
+
+<p>This is a test script</p>
+
+
+</div></body>
+</html>

@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+require 5;
+# Time-stamp: "2000-10-04 01:49:45 MDT"
+use strict;
+use Getopt::Std;
+use Pod::HTML2Pod;
+my %o;
+
+if(!getopts('nhD:', \%o) or @ARGV != 1) {
+  my $self = $0;
+  $self = $1 if $self =~ m<([^/]+)$>s;
+  print "Usage:\n$self [options] words...\n", <<'EOTHING';
+    -n     try to convert <a name="..."> elements
+    -h     try to convert <a href="..."> elements
+    -D 1   put the converter in debug mode (2 for more verbose)
+EOTHING
+  exit 2;
+}
+
+print
+ Pod::HTML2Pod::convert(
+  'file' => $ARGV[0],
+  'a_name' => $o{'n'},
+  'a_href' => $o{'h'},
+  'debug' => $o{'D'} || 0,
+ )
+;

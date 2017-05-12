@@ -1,0 +1,203 @@
+=pod
+
+=head1 NAME
+
+PDF::OCR2 - extract all text and all image ocr from pdf
+
+=head1 SYNOPSIS
+
+   use PDF::OCR2;
+   
+   my $p           = PDF::OCR2->new('./path/to/file.pdf');
+   
+   my $text_all    = $p->text;
+   my @text_pages  = $p->text;
+   
+   my $page_object = $p->page(1);
+
+=head1 DESCRIPTION
+
+This is meant to replace PDF::OCR.
+The backend complexity of this process has been isolated in modules:
+
+   PDF::GetImages
+   PDF::Burst
+   Image::OCR::Tesseract
+   PDF::OCR2::Pages - in this distro.
+
+Why not just modify PDF::OCR??
+This is such a massive breakdown of code hierachy and interdependency, and such a different
+interface, that this made more sense. 
+PDF::OCR was ok. But it was messy and really, after some discussion- this is a lot better.
+
+=head1 METHODS
+
+=head2 new()
+
+Argument is path to pdf file.
+If there are errors opening the file, warns and returns undef.
+
+See L<$PDF::OCR2::CHECK_PDF> and L<$PDF::OCR2::REPAIR_XREF>.
+
+=head2 text()
+
+Takes no argument.
+In scalar context, returns text of all pages, joined with a pagebreak \f character.
+In list context, returns text of pages one per element.
+
+=head2 page()
+
+Argument is page number (starting with 1) or abs path to temporary page file.
+Returns PDF::OCR2::Page object.
+Croaks if you ask for an invalid number.
+
+=head2 pages_count()
+
+Returns number of pages.
+Number of temporary files. 
+Calls PDF::Burst.
+
+=head1 CAVEATS
+
+This only works on posix.
+
+=head1 ERRORS
+
+=head2 If Program dies
+
+You call text() and you get a fatal.
+Loading a 'corrupt' pdf with PDF::API2 can trigger an error such as this;
+
+   Malformed xref in PDF file  at /usr/lib/perl5/site_perl/5.8.8/PDF/API2/Basic/PDF/File.pm line 1198.
+
+This happens because.. All pdfs are equal, but some pdfs are more equal than others.
+There's fifty kinds of pdf doc versions, etc. 
+Sometimes the pdf is deemed to be corrupt by PDF::API2.
+
+You can "fix" this problem with pdftk..
+
+   pdftk $in $out
+
+
+But, this means modifying the original pdf, which is sketchy.
+
+Maybe if the xref table is bad, we should run the operation on a repaired copy!
+
+
+=over 4
+
+=item Try using another burst method
+
+If you have errors with PDF::API2 saying the pdf is corrupt, likely via PDF::Burst..
+Then try this:
+
+   use PDF::OCR2;
+   
+   PDF::Burst::BURST_METHOD = 'CAM_PDF';
+   
+   # and then...
+   my $pdf = PDF::OCR2->new('./pathtofile.pdf');
+   print $pdf->text;
+
+=item Enable checking the pdf.
+
+If you suspect the pdf is broken, or only want to run this on pdf docs that check ok
+with PDF::API2
+
+   use PDF::OCR2;
+   $PDF::OCR2::CHECK_PDF = 1;
+   
+   # and then...
+   my $pdf = PDF::OCR2->new('./pathtofile.pdf');
+   print $pdf->text;
+
+This is not enabled by default because it is more expensive. Maybe it should be.
+
+=back
+
+=head2 $PDF::OCR2::CHECK_PDF
+
+By default this flag is on.
+We check the pdf with an eval to PDF::API2 to make sure the pdf does not have errors.
+This takes a small toll on performance. I suggest to leave it on.
+
+=head2 $PDF::OCR2::REPAIR_XREF
+
+By default this flag is off.
+If the pdf checks bad, we attempt to repair the pdf *to a copy of the file*- this file
+is put alongside the original and is named $filename_repaired_xref_table.pdf, 
+once this is created, we check again.
+
+   So, if both CHECK_PDF and REPAIR_XREF flags are on;
+      1. the pdf is checked for correctness
+      2. if the pdf is bad, we attempt to fix to a copy of the file
+      3. if we can't make a fixed copy, we don't die, but warn and return undef
+
+Thus, if check pdf fails, and repair xref flag is on, we are doing two evals, it could
+be argued this is expensive, and it is- but then- ocr is expensive, period.
+
+
+
+=head1 CRIT AND SUGGESTIONS
+
+The AUTHOR is open to any suggestions and requests.
+
+=head1 SEE ALSO
+
+L<CAM::PDF>
+
+L<PDF::API2>
+
+L<PDF::Burst>
+Split a pdf into pages.
+
+L<PDF::GetImages>
+Split a page into images.
+
+L<PDF::OCR2::Page>
+Part of this distro.
+
+L<pdfcheck>
+Included is a program that may be of use. It helps to check a pdf for problems, stats.
+Very alpha, useful though.
+
+
+=head1 REPLACES
+
+L<PDF::OCR> - deprecated by this module.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 THANKS
+
+These people have made useful inquiries, requests, critiques, code suggestions.
+Ultimately, they help develop this work.
+
+=over 4
+
+=item Long Nguyen
+
+=item Robert Waters
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (c) 2011 Leo Charre. All rights reserved.
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+
+
+

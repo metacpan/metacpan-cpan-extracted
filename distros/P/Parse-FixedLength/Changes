@@ -1,0 +1,138 @@
+Revision history for Perl extension Parse::FixedLength.
+5.39  Wed May 25 16:00:00  2011
+    - Document href option.
+    - Allow href from href option to be used in pack.
+    - add href.t to MANIFEST.
+5.38  Wed May 25 16:00:00  2011
+    - Allow hashref to be passed in to parser.
+5.37  Thu Dec 30 16:00:00  2005
+    - Fix bug in C/c format.
+5.36  Thu Dec  1 16:00:00  2005
+    - Was not always checking correctness of length/start/end.
+      Added test and fixed test error triggered by this fix.
+5.35  Sat May 20 01:00:00  2005
+    - Updated Manifest. Someday I'll automate this.
+5.34  Fri May 20 11:00:00  2005
+    - Added parse_hash(), and parse_newref() convenience methods.
+      Inspired by rt ticket by Curtis "Mr_Person" Hawthorne.
+    - Fixes to pod, and addition of pod tests.
+5.33  Wed Jul 21 17:00:00  2004
+    - Second hash_to_obj call with same keys as first wasn't working.
+    - Fixed tests (changed 'ref' to 'isa') which broke after previous change.
+    - Made example in doc use strict compliant (eliminated bare word string).
+    - Added format_str() to retrieve pack/unpack format string from parser.
+5.32  Fri Jun 11 17:00:00  2004
+    - Allow any valid pack()/unpack() format in the length field
+5.31  Tue Jun 8 17:00:00  2004
+    - To autoload an lvalue method, AUTOLOAD must be
+      declared as an lvalue method.
+5.30  Fri Apr 16 17:00:00  2004
+    - Took out Makefile.PL code for changing name of test
+      module (see if it shows up on CPAN).
+    - Document hash_to_obj() method and various other doc
+      format changes.
+5.29  Thu Apr 15 17:00:00  2004
+    - Doc glitch fix.
+5.28  Thu Apr 15 17:00:00  2004
+    - Any single parser will return the same hash ref on every
+      call to parse(). See Caveats.
+    - Return blessed hash ref object from parse().
+    - Doc cleanup. I may finally be getting the hang of this
+      pod stuff.
+5.27  Mon Oct 6 17:00:00  2003
+    - Just doc fixes. Patch by Terrence Brannon.
+5.26  Tue Sep 25 17:00:00  2001
+    - Changed the way the subclass test module is created. It was bugging me
+      having to un-rename the test module for a 'make tardist' after a
+      'make test'.
+    - added ':all' argument to import argument list. Added test.
+5.25  Mon Sep 24 17:00:00  2001
+    - Added trim option to new method. Added test.
+    - Allow filehandle to be passed to debug option.
+5.24  Wed Sep 19 17:00:00  2001
+    - Added all_lengths option to parser new() method.
+    - Changed subclass*.t tests so that the test module doesn't show up
+      on CPAN. No one else that I can find has seemed to worry about this.
+      I'll be the first :-)
+5.23  Fri Sep 14 18:00:00  2001
+    - If no_pack was true for converter object, passing false to
+      convert method was ignored. Added another test.
+5.22  Fri Sep 14 15:00:00  2001
+    - Allow no_pack argument in convert method, added tests
+5.21  Fri Sep 14 08:00:00  2001
+    - Fixed subclass example.
+    - Added tests for subclassing / import method.
+5.20  Thu Sep 13 18:00:00  2001
+    - Fixed docs.
+5.19  Thu Sep 13 15:25:22  2001
+    - Added import method and allow subclass name to be passed to new()
+      for convenient subclassing.
+    - Fixed the docs.
+5.18  Fri Aug 17 19:25:22  2001
+    - Fixed dumper() for hash-like format with right justification. Thanks
+      to John Cotter for the catch.
+5.16  Mon Aug 13 20:19:36  2001
+    - Found bug in checking for argument type in Parse::FixedLength::new().
+    - took out Scalar::Util::reftype. Could not detect any benefit.
+    - Changed croak()'s to confess()'s.
+5.15  Sun Aug 12 14:13:06 PDT 2001
+    - Better error checking on default argument types in converter method.
+    - Added option to not pack during convert method.
+5.14  Wed Aug  1 Some time later...
+    - Better error checking on start and end positions. If start is present,
+      then both start and end need to be present.
+5.12  Wed Aug  1 08:31:10 PDT 2001
+    - More error checking, this time for duplicate fields in the format, and
+      an option to get around the check.
+    - Added tests for new option.
+5.11  Mon Jul 30 Later on...
+    - Added more tests.
+    - Fixed 'no_validate' option (which wasn't documented yet anyway, along
+      with the start/end validation in general. Add info to docs about this.
+5.10  Mon Jul 30 08:47:49 PDT 2001
+    - Fixed doc examples.
+    - Added more tests.
+    - Right justify with no pad character was not defaulting to space.
+5.09  Fri Jul 27 Not much later...
+    - Eval anonymous subs in convert() for better error reporting.
+5.08  Fri Jul 27 18:31:02 PDT 2001
+    - Some doc fixes.
+    - Various changes after a code review with Graham Barr at TPC,
+      e.g., like adding error checking, making ":" the default delimiter,
+      auto-detecting the formats, and talking me into using Scalar::Util.
+5.07  Thu Jul 26 12:51:11 PDT 2001
+    - Slight efficiency in construction of pack string for (what I
+      think is) the common case.
+    - Allow converter() method to accept a hashref or arrayref as
+      mapping argument.
+    - Allow convert() method to accept a hash reference as input.
+5.06  Wed Jul 25 10:18:57 PDT 2001
+    - Added dump() method.
+    - Separated converter objects from parser objects to make a better
+      cleaner OO universe.
+    - Cleaned up docs, added examples.
+5.05  Tue Jul 24 Later in the day...
+    - For right justification, if the new format is shorter than the data,
+      we need to trim leading 'pad' characters, not just whitespace.
+5.04  Tue Jul 24 12:31:35 PDT 2001
+    - Added right-justification option.
+    - Added the questionable feature of the convert method to facilitate
+      converting fixed length formats along with a corresponding test.
+    - Noticed the similar functionality/purpose of Data::FixedFormat.
+      Oh well, make up your own mind which you'd like to use...I kind
+      of like this one :)
+5.03  Thu Jun 28 08:04:27 PDT 2001
+    - Improved documentation.
+    - Added length method and more examples, took out some temp variables to
+      tighten up code and obfuscate it a bit :)
+5.01  Wed Jun 27 12:06:00 PDT 2001
+    - Took up the original author's offer to rewrite this module, so I've no
+      idea what happened before this change, there were no other notes except
+      the 0.01 entry.
+    - Changed to OO style, now uses unpack instead of substr for efficiency,
+      removed some features (for now?) like the predefined parsing
+      constants, but added others (like optionally returning a list
+      instead of a hashref).
+0.01  Thu Nov 16 13:41:21 2000
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Parse::FixedLength

@@ -1,0 +1,29 @@
+---
+abstract: 'Perl module to extract fields from objects'
+author:
+  - 'Paul Boyd <pboyd@dev3l.net>'
+build_requires:
+  Moose: 0
+  MooseX::Test::Role: 0.02
+  Test::Deep: 0
+  Test::MockObject: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-FieldPath
+recommends:
+  Moose: 0
+requires:
+  Hash::Merge: 0.11
+  List::Util: 0
+  Parse::RecDescent: 1.963
+  Scalar::Util: 0
+resources:
+  repository: git://github.com/pboyd/Parse-FieldPath.git
+version: 0.005

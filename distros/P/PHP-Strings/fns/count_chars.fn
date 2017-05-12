@@ -1,0 +1,56 @@
+docs: |
+    A somewhat daft function that returns counts of characters in a string.
+
+    It's daft because it assumes characters have values in the range 0-255.
+    This is patently false in today's world of Unicode. In fact, the PHP
+    documentation for this function happily talks about characters in one
+    part and bytes in another, not realising the distinction.
+
+    So, I've implemented this function as if it were called C<count_bytes>.
+    It will count raw bytes, not characters.
+
+    Takes two arguments: the byte sequence to analyse and a 'mode' flag that
+    indicates what sort of return value to return. The default mode is C<0>.
+
+       Mode  Return value
+       ----  ------------
+        0    Return hash of byte values and frequencies.
+        1    As for 0, but hash does not contain bytes with frequency of 0.
+        2    As for 0, but hash only contains bytes with frequency of 0.
+        3    Return string composed of used byte-values.
+        4    Return string composed of unused byte-values.
+
+        my %freq = count_chars( $string, 1 );
+
+code: |
+    sub count_chars
+    {
+        my ( $input, $mode ) = validate_pos( @_,
+            STRING,
+            {
+                %{+NUMBER_RANGE( 0, 4 )},
+                optional => 1,
+                default => 0
+            },
+        );
+
+        if ( $mode < 3 ) # Frequency
+        {
+            use bytes;
+            my %freq;
+            @freq{0..255} = (0) x 256 if $mode != 1;
+            $freq{ord $_}++ for split //, $input;
+            if ( $mode == 2 ) {
+                $freq{$_} and delete $freq{$_} for keys %freq;
+            }
+            return %freq;
+        }
+        else
+        {
+            my %freq = count_chars( $input, $mode-2 );
+            return join '', map chr, sort keys %freq;
+        }
+
+        croak "Reached a line we should not have.";
+    }
+

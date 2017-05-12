@@ -1,0 +1,22 @@
+Changes
+fse.xs
+inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/MakeMaker.pm
+inc/Module/Install/Metadata.pm
+lib/PerlIO/fse.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+ppport.h
+README
+t/00_load.t
+t/01_fse.t
+t/util/foo.txt
+xt/01_podspell.t
+xt/02_pod.t
+xt/03_pod-coverage.t
+xt/04_synopsis.t

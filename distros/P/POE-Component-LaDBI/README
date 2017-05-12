@@ -1,0 +1,88 @@
+POE/Component/LaDBI version 1.0
+================================
+
+POE::Component::LaDBI is a POE Component to allow for non-blocking
+access to most of the DBI API. Each LaDBI component session started
+spawns a sub-process which it communicates with via POE::Wheel::Run.
+Multiple DBI database handles can be created in the sub-process, but
+withing the sub-process DBI calls will still block.
+
+If you wish to use two DBI database handles in a non-blocking manner
+at the same time, you will need to instantiate two or more LaDBI
+components. POE::Component::LaDBI could be enhanced to map different
+DBI database handles to separate sub-processes with POE::Wheel::Run.
+However, I chose not to engage the complexity of that implementation.
+
+The client sessions can post events to the POE::Component::LaDBI
+session using it's alias which is 'ladbi' by default. Or you can
+specify your own alias when you call POE::Component::ladbi->create().
+Of course, if you need multiple LaDBI components, you will need to set
+them up with separate aliases.
+
+The 'connect' and 'prepare' LaDBI events will return a uniquely
+identifying ID. This is a generated string and should only be used as
+an opaque cookie to refer to the appropriate database or statement
+handle in the sub-process.
+
+All the data from the DBI calls will be passed to the client event
+specified in the post to the LaDBI session. The data is always 
+returned as a scalar. This scalar is a number, a string, or a reference
+to a more complex data stucture. While DBI has separate calls to return
+arrays versus arrayrefs, LaDBI only has events which return references
+to arrays or hashes.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+When you call 'perl Makefile.PL', you will be prompted with some
+questions. The first is whether you want to test this module against a
+database. If you really want to test this module you will need to answer
+'yes'. Otherwise, the only test will be whether the modules load
+properly with use; all others will be skipped.
+
+If you choose to test POE::Component::LaDBI against a database, you will
+need to specify the DSN (Data Source Name?), a username, and a password
+for that user. The DSN is the same data source value you would pass
+to a regular DBI->connect() call. The DSN needs to specify a database for
+which the username has the rights to create a table, insert into a table,
+and delete the table. The default table name will be 'ladbi_test'. If you
+need to change the table name edit the $TEST_TABLE variable in the
+'ladbi_config.pl' file.
+
+After answering 'yes' to the "do you want to test against a database"
+question, you will be prompted for the DSN, USERNAME, and PASSWORD.
+
+When the tests are run they will output diagnostic info to a file named
+'test.log'. You can 'tail -f test.log' to track the progress of the
+tests. If you really want to see what is happening between the LaDBI
+session and the sub-process you can turn on debugging for the
+sub-process. To do this set the environment variable LADBI_DEBUG=1
+before you run 'make test'. This will create a separate debug output
+file called 'ladbi_run.log'.
+
+
+DEPENDENCIES
+
+POE::Component::LaDBI requires Perl v5.6.0 or newer. I use Perl v5.6.0
+constucts, and don't want to code using features specified as obsolete.
+
+This module requires these other modules and libraries:
+
+Data::Dumper
+POE v0.18
+DBI v1.20
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2002 Sean M. Egan
+

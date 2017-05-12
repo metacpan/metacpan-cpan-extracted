@@ -1,0 +1,17 @@
+---
+abstract: 'decode special characters in postscript strings'
+author:
+  - 'Job van Achterberg <jkva@cpan.org>'
+build_requires:
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102221, CPAN::Meta::Converter version 2.102160'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Postscript-TextDecode
+version: 0.4

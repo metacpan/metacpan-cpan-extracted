@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: Unique
+Description: Create single instance applications
+Version: 1.1.6
+Requires: gtk+-2.0
+Recommends: dbus-glib-1
+Libs: -L${libdir} -lunique-1.0
+Cflags: -I${includedir}/unique-1.0

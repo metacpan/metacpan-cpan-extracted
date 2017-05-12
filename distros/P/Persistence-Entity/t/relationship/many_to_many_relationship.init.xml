@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset load_strategy="INSERT_LOAD_STRATEGY">
+    
+    <seq_generator pk_column="empno" value_column="6" />
+    <seq_generator pk_column="projno" value_column="6" />
+    
+    <dept deptno="10" dname="dept10" loc="loc10" />
+    <dept deptno="20" dname="dept20" loc="loc20" />
+    
+    
+    <emp empno="1" ename="emp1" deptno="10" />
+    <emp empno="2" ename="emp2" deptno="10" />
+    <emp empno="3" ename="emp3" deptno="20" />
+    <emp empno="4" ename="emp4" deptno="20" />
+    <emp empno="5" ename="emp5" deptno="20" />
+    
+    <project projno="1" name="project1" />
+    <project projno="2" name="project2" />
+    <project projno="3" name="project3" />
+    
+    <emp_project projno="1" empno="2" leader="1" />
+    <emp_project projno="1" empno="3" />
+    
+    <emp_project projno="3" empno="2"  />
+    <emp_project projno="3" empno="4"  />
+    <emp_project projno="3" empno="5"  />
+    
+    <emp_project projno="2" empno="5"  />
+    
+    
+    
+</dataset>

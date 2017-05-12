@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: GVNC
+Description: GObject for VNC client connections
+Requires: gobject-2.0 >= 2.10.0
+Version: 0.4.1
+Libs: -L${libdir} -lgvnc-1.0
+Cflags: -I${includedir}/gvnc-1.0

@@ -1,0 +1,222 @@
+---
+abstract: 'CSSComb plugin for Padre'
+author:
+  - 'Alexander Hartmaier <abraxxa@cpan.org>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Padre-Plugin-CSSComb
+requires:
+  LWP: 6.04
+  Padre: 0.96
+resources:
+  repository: https://github.com/abraxxa/Padre-Plugin-CSSComb.git
+version: 0.001
+x_Dist_Zilla:
+  perl:
+    version: 5.016002
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Basic/GatherDir'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Basic/PruneCruft'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Basic/ManifestSkip'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Basic/MetaYAML'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Basic/License'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Basic/Readme'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Basic/ExtraTests'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Basic/ExecDir'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Basic/ShareDir'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Basic/MakeMaker'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Basic/Manifest'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Basic/TestRelease'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Basic/ConfirmRelease'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Basic/UploadToCPAN'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: PodWeaver
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: NextRelease
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::Test::UnusedVars
+      name: '@TestingMania/Test::UnusedVars'
+      version: 2.000003
+    -
+      class: Dist::Zilla::Plugin::Test::Synopsis
+      name: '@TestingMania/Test::Synopsis'
+      version: 2.000002
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      name: '@TestingMania/Test::Portability'
+      version: 2.000003
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@TestingMania/Test::Version'
+      version: 0.002004
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@TestingMania/PodCoverageTests'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::Test::Perl::Critic
+      name: '@TestingMania/Test::Perl::Critic'
+      version: 2.112410
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      name: '@TestingMania/Test::CPAN::Changes'
+      version: 0.005
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
+      name: '@TestingMania/Test::CPAN::Meta::JSON'
+      version: 0.003
+    -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: '@TestingMania/Test::DistManifest'
+      version: 2.000002
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: '@TestingMania/MetaTests'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      name: '@TestingMania/Test::Compile'
+      version: 1.112820
+    -
+      class: Dist::Zilla::Plugin::Test::Kwalitee
+      name: '@TestingMania/Test::Kwalitee'
+      version: 2.03
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      name: '@TestingMania/NoTabsTests'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: '@TestingMania/Test::MinimumVersion'
+      version: 2.000002
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::LinkCheck
+      name: '@TestingMania/Test::Pod::LinkCheck'
+      version: 1.001
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      name: '@TestingMania/Test::EOL'
+      version: 0.07
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@TestingMania/PodSyntaxTests'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: '@TestingMania/MojibakeTests'
+      version: 0.3
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: MetaResources
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300028
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300028

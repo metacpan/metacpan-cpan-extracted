@@ -1,0 +1,48 @@
+%token A = /([aA])/
+%token B = /([bB])/
+
+%lexer {
+      m{\G(\s+)}gc and $self->tokenline($1 =~ tr{\n}{});
+
+      /\G([aA])/gc and return ('A', $1);
+      /\G(.)/gc and return ($1, $1);
+
+      return ('', undef) if ($_ eq '') || (defined(pos($_)) && (pos($_) >= length($_)));
+      /\G\s*(\S+)/;
+      my $near = substr($1,0,10); 
+      die( "Error inside the lexical analyzer near '". $near
+          ."'. Line: ".$self->line()
+          .". File: '".$self->YYFilename()."'. No match found.\n");
+}
+
+%start s
+%%
+s: /* empty */ | a b | C
+;
+
+a: a A | A
+;
+
+b: B
+;
+
+%%
+
+
+=head1 SYNOPSIS
+
+  pl@nereida:~/LEyapp/examples/debuggingtut$ eyapp -TC -S a twostarts.eyp
+  pl@nereida:~/LEyapp/examples/debuggingtut$ ./twostarts.pm -t -i -m 1 -c 'A A B'
+
+  a_is_a_A(
+    a_is_A(
+      TERMINAL[A]
+    ),
+    TERMINAL[A]
+  )
+
+=head1 DESCRIPTION
+
+This example is intended to check the capacity to parse a subexpression
+using any sintactic variable inside the grammar (option C<-S>)
+

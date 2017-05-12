@@ -1,0 +1,8 @@
+Perinci::CmdLine is a command-line application framework. It allows you to
+create full-featured CLI applications easily and quickly.
+
+See L<Perinci::CmdLine::Manual> for more details.
+
+There is also a blog post series on Perinci::CmdLine tutorial:
+L<https://perlancar.wordpress.com/category/pericmd-tut/>
+

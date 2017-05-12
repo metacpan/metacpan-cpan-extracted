@@ -1,0 +1,35 @@
+---
+abstract: 'TextMate-like snippets for Padre'
+author:
+  - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Locale::Msgfmt: 0.15
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Padre-Plugin-Snippet
+no_index:
+  directory:
+    - eg
+    - inc
+    - share
+    - t
+requires:
+  Moose: 2.0402
+  Padre: 0.94
+  YAML: 0.80
+  perl: 5.8.0
+resources:
+  bugtracker: http://padre.perlide.org/
+  homepage: http://padre.perlide.org/trac/wiki/PadrePluginSnippet
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-Snippet
+version: 0.01

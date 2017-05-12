@@ -1,0 +1,16 @@
+-- Patch:
+--   From: a.bb
+--   To:   x.yy
+--
+-- Description:
+--   [outline the purpose of the patch]
+
+BEGIN;
+
+-- update the schema version stored in the database
+UPDATE _schema_info_ SET version='x.yy';
+
+-- patch starts here --
+-- patch ends   here --
+
+COMMIT;

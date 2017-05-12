@@ -1,0 +1,15 @@
+Backend Parent:
+
+	- Spawned by frontend when it decides it needs a backend and a
+		be parent is not running.
+
+	- Signalled by frontend when another backend is needed.
+
+	- Waits for backends to complete and removes their be record
+		from the temp file.
+
+	- If parent is lost (can't be signalled), then the group is
+	 	invalidated
+
+	- Is used to collect signal exit status for killed backends and provide
+		the correct exit status for the frontend

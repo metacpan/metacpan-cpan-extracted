@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<orm entity="emp"  class="Employee" >
+    <column name="empno" attribute="id" />
+    <column name="ename" attribute="name" />
+    <column name="job" attribute="job" />
+    <to_one_relationship  name="dept" attribute="dept" fetch_method="LAZY" cascade="ALL"/>
+</orm>

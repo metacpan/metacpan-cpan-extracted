@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Proc-Safetynet
+version:      0.04
+version_from: lib/Proc/Safetynet.pm
+installdirs:  site
+requires:
+    File::Spec:                    3.12
+    JSON::XS:                      2.21
+    Moose:                         0.51
+    POE:                           1.0003
+    POE::Filter::JSON::Incr:       0.02
+    Test::Exception:               0.25
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

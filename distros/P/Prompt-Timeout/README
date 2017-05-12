@@ -1,0 +1,40 @@
+NAME
+    Prompt::Timeout - prompt() with auto-selecting default value in case of
+    inactivity
+
+SYNOPSIS
+     use Prompt::Timeout;
+     my $res = prompt ( $question, $default, $timeout );
+
+DESCRIPTION
+    This module provides only one function, prompt(), and it's exported by
+    default.
+
+  prompt
+     my $res = prompt ( $question, $default, $timeout );
+
+    Prints a $question and waits for the input. If no keys are pressed
+    during $timeout seconds, $default is assumed. When pressing just Enter
+    key, $default is assumed. If prompt() detects that it is not running
+    interactively, $default will be used without prompting too.
+
+    If you want to disable inactivity timer if any key is pressed during
+    prompt(), you can invoke it with another optional parameter:
+
+     my $res = prompt ( $question, $default, $timeout, 1 );
+
+    Once a key is pressed, inactivity timer is disabled.
+
+    When $timeout value is omitted, it assumes 60 seconds.
+
+AUTHOR
+    Serguei Trouchelle <stro@railways.dp.ua>
+
+    Prompt::Timeout uses partial code from ExtUtils::MakeMaker module.
+
+COPYRIGHT
+    Copyright (c) 2008-2010 Serguei Trouchelle. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

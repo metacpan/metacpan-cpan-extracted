@@ -1,0 +1,84 @@
+NAME
+    PGP::Words::Tiny - Convert data to/from the PGP word list
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+      use PGP::Words::Tiny qw/encode_pgp_hex decode_pgp_hex/;
+
+      say join " ", encode_pgp_hex("0xe582"); # "topmost Istanbul"
+
+      say decode_pgp_hex("topmost Istanbul"); # "0xe582"
+
+DESCRIPTION
+    This module converts octets to or from the PGP word list
+    <http://en.wikipedia.org/wiki/PGP_word_list>, allowing a byte sequence
+    to be conveyed via easily readable words.
+
+    It is similar in function to Crypt::OpenPGP::Words, but without
+    requiring all of Crypt::OpenPGP. This module also provides decoding
+    functions.
+
+USAGE
+    The following functions are available for import. None are imported by
+    default.
+
+  encode_pgp
+      @words = encode_pgp( $octets );
+
+    Returns a list of words drawn from the PGP word list corresponding to
+    each octet in the input string. Even-position octets (starting at octet
+    zero) are drawn from the even word list. Odd-position octets are drawn
+    from the odd word list.
+
+    Proper nouns are capitalized as per the official word list.
+
+  encode_pgp_hex
+      @words = encode_pgp_hex( $hex_string );
+
+    Converts a string of hex digits (with or without leading "0x") to an
+    octet string and returns the result of passing that octet string to
+    "encode_pgp".
+
+  decode_pgp
+      $octets = decode_pgp( @words );  # qw/topmost Istanbul/
+      $octets = decode_pgp( $string ); # qq/topmost Istanbul/
+
+    Returns a string of octets decoded from a list of PGP words or from a
+    space-separated string of PGP words. An exception is thrown if a word is
+    not in the PGP word list or is not in the correct even/odd position.
+
+    Input words are not case sensitive.
+
+  decode_pgp_hex
+      $hex_string = decode_pgp_hex( @words );
+      $hex_string = decode_pgp_hex( $string );
+
+    Returns a string of lowercase hex digits (preceded by "0x") decoded from
+    a list of PGP words. It otherwise functions like "decode_pgp".
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/PGP-Words-Tiny/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/PGP-Words-Tiny>
+
+      git clone https://github.com/dagolden/PGP-Words-Tiny.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

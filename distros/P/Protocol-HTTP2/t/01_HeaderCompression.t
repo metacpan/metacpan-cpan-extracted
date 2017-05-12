@@ -1,0 +1,294 @@
+use strict;
+use warnings;
+use Test::More;
+use lib 't/lib';
+use PH2Test;
+use Protocol::HTTP2::Connection;
+use Protocol::HTTP2::Constants qw(:endpoints :limits :settings);
+
+BEGIN {
+    use_ok( 'Protocol::HTTP2::HeaderCompression',
+        qw(int_encode int_decode str_encode str_decode headers_decode headers_encode)
+    );
+}
+
+subtest 'int_encode' => sub {
+    ok binary_eq( int_encode( 0,     8 ), pack( "C",  0 ) );
+    ok binary_eq( int_encode( 0xFD,  8 ), pack( "C",  0xFD ) );
+    ok binary_eq( int_encode( 0xFF,  8 ), pack( "C*", 0xFF, 0x00 ) );
+    ok binary_eq( int_encode( 0x100, 8 ), pack( "C*", 0xFF, 0x01 ) );
+    ok binary_eq( int_encode( 1337,  5 ), pack( "C*", 31, 154, 10 ) );
+};
+
+subtest 'int_decode' => sub {
+    my $buf = pack( "C*", 31, 154, 10 );
+    my $int = 0;
+    is int_decode( \$buf, 0, \$int, 5 ), 3;
+    is $int, 1337;
+};
+
+subtest 'str_encode' => sub {
+
+    ok binary_eq( str_encode('//ee'), hstr("8361 8297") );
+
+};
+
+subtest 'str_decode' => sub {
+    my $s = hstr(<<EOF);
+    93aa 69d2 9ae4 52a9 a74a 6b13 005d a5c0
+    b5fc 1c7f
+EOF
+    str_decode( \$s, 0, \my $res );
+    is $res, "nghttpd nghttp2/0.4.0-DEV", "str_decode";
+};
+
+subtest 'encode requests' => sub {
+
+    my $con = Protocol::HTTP2::Connection->new(CLIENT);
+    my $ctx = $con->encode_context;
+
+    ok binary_eq(
+        headers_encode(
+            $ctx,
+            [
+                ':method'    => 'GET',
+                ':scheme'    => 'http',
+                ':path'      => '/',
+                ':authority' => 'www.example.com',
+            ]
+        ),
+        hstr(<<EOF) );
+        8286 8441 8cf1 e3c2 e5f2 3a6b a0ab 90f4
+        ff
+EOF
+
+    ok binary_eq(
+        headers_encode(
+            $ctx,
+            [
+                ':method'       => 'GET',
+                ':scheme'       => 'http',
+                ':path'         => '/',
+                ':authority'    => 'www.example.com',
+                'cache-control' => 'no-cache',
+            ]
+        ),
+        hstr(<<EOF) );
+        8286 84be 5886 a8eb 1064 9cbf
+EOF
+
+    ok binary_eq(
+        headers_encode(
+            $ctx,
+            [
+                ':method'    => 'GET',
+                ':scheme'    => 'https',
+                ':path'      => '/index.html',
+                ':authority' => 'www.example.com',
+                'custom-key' => 'custom-value',
+            ]
+        ),
+        hstr(<<EOF) );
+        8287 85bf 4088 25a8 49e9 5ba9 7d7f 8925
+        a849 e95b b8e8 b4bf
+EOF
+
+};
+
+subtest 'encode responses' => sub {
+
+    my $con = Protocol::HTTP2::Connection->new(SERVER);
+    my $ctx = $con->encode_context;
+    $ctx->{max_ht_size} = $ctx->{settings}->{&SETTINGS_HEADER_TABLE_SIZE} = 256;
+
+    ok binary_eq(
+        headers_encode(
+            $ctx,
+            [
+                ':status'       => '302',
+                'cache-control' => 'private',
+                'date'          => 'Mon, 21 Oct 2013 20:13:21 GMT',
+                'location'      => 'https://www.example.com',
+            ]
+        ),
+        hstr(<<EOF) );
+        4882 6402 5885 aec3 771a 4b61 96d0 7abe
+        9410 54d4 44a8 2005 9504 0b81 66e0 82a6
+        2d1b ff6e 919d 29ad 1718 63c7 8f0b 97c8
+        e9ae 82ae 43d3
+EOF
+
+    is $ctx->{ht_size} => 222, 'ht_size ok';
+
+    ok binary_eq(
+        headers_encode(
+            $ctx,
+            [
+                ':status'       => 307,
+                'cache-control' => 'private',
+                'date'          => 'Mon, 21 Oct 2013 20:13:21 GMT',
+                'location'      => 'https://www.example.com',
+            ]
+        ),
+        hstr("4803 3330 37c1 c0bf")
+    );
+
+    is $ctx->{ht_size} => 222, 'ht_size ok';
+
+    ok binary_eq(
+        headers_encode(
+            $ctx,
+            [
+                ':status'          => 200,
+                'cache-control'    => 'private',
+                'date'             => 'Mon, 21 Oct 2013 20:13:22 GMT',
+                'location'         => 'https://www.example.com',
+                'content-encoding' => 'gzip',
+                'set-cookie' =>
+                  'foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1',
+            ]
+        ),
+        hstr(<<EOF) );
+        88c1 6196 d07a be94 1054 d444 a820 0595
+        040b 8166 e084 a62d 1bff c05a 839b d9ab
+        77ad 94e7 821d d7f2 e6c7 b335 dfdf cd5b
+        3960 d5af 2708 7f36 72c1 ab27 0fb5 291f
+        9587 3160 65c0 03ed 4ee5 b106 3d50 07
+EOF
+    is $ctx->{ht_size} => 215, 'ht_size ok';
+
+};
+
+subtest 'decode requests' => sub {
+
+    my $con = Protocol::HTTP2::Connection->new(SERVER);
+    my $ctx = $con->decode_context;
+
+    my $buf = hstr(<<EOF);
+        8286 8441 8cf1 e3c2 e5f2 3a6b a0ab 90f4
+        ff
+EOF
+    is headers_decode( $con, \$buf, 0, length $buf ), length($buf),
+      "correct offset";
+
+    is_deeply $ctx->{emitted_headers},
+      [
+        ':method'    => 'GET',
+        ':scheme'    => 'http',
+        ':path'      => '/',
+        ':authority' => 'www.example.com'
+      ],
+      "emitted headers";
+    $ctx->{emitted_headers} = [];
+    is_deeply $ctx->{header_table}, [ [ ':authority' => 'www.example.com' ] ],
+      "dynamic table";
+    is $ctx->{ht_size}, 57, "correct table size";
+
+    $buf = hstr('8286 84be 5886 a8eb 1064 9cbf');
+    is headers_decode( $con, \$buf, 0, length $buf ), length($buf),
+      "correct offset";
+    is_deeply $ctx->{emitted_headers},
+      [
+        ':method'       => 'GET',
+        ':scheme'       => 'http',
+        ':path'         => '/',
+        ':authority'    => 'www.example.com',
+        'cache-control' => 'no-cache',
+      ],
+      "emitted headers";
+    $ctx->{emitted_headers} = [];
+    is_deeply $ctx->{header_table}, [
+        [ 'cache-control' => 'no-cache' ],
+
+        [ ':authority' => 'www.example.com' ]
+      ],
+      "dynamic table";
+    is $ctx->{ht_size}, 110, "correct table size";
+
+    $buf = hstr(<<EOF);
+        8287 85bf 4088 25a8 49e9 5ba9 7d7f 8925
+        a849 e95b b8e8 b4bf
+EOF
+    is headers_decode( $con, \$buf, 0, length $buf ), length($buf),
+      "correct offset";
+    is_deeply $ctx->{emitted_headers},
+      [
+        ':method'    => 'GET',
+        ':scheme'    => 'https',
+        ':path'      => '/index.html',
+        ':authority' => 'www.example.com',
+        'custom-key' => 'custom-value',
+      ],
+      "emitted headers";
+    is_deeply $ctx->{header_table}, [
+        [ 'custom-key' => 'custom-value' ],
+        [
+            'cache-control' => 'no-cache'
+        ],
+
+        [ ':authority' => 'www.example.com' ]
+      ],
+      "dynamic table";
+    is $ctx->{ht_size}, 164, "correct table size";
+
+};
+
+done_testing();
+__END__
+
+
+subtest 'decode responses' => sub {
+    my $decoder = Protocol::HTTP2::HeaderCompression->new;
+
+    $decoder->{_max_ht_size} = 256;
+
+    is $decoder->headers_decode( \hstr(<<EOF), \my @headers ), 51;
+        4882 4017 5985 bf06 724b 9763 93d6 dbb2
+        9884 de2a 7188 0506 2098 5131 09b5 6ba3
+        7191 adce bf19 8e7e 7cf9 bebe 89b6 fb16
+        fa9b 6f
+EOF
+
+    is_deeply \@headers, [
+        [ ':status'       => '302' ],
+        [ 'cache-control' => 'private' ],
+        [ 'date'          => 'Mon, 21 Oct 2013 20:13:21 GMT' ],
+        [ 'location'      => 'https://www.example.com' ],
+
+    ] or diag explain \@headers;
+
+    @headers = ();
+
+    is $decoder->headers_decode( \hstr("8c"), \@headers ), 1;
+
+    is_deeply \@headers, [ [ ':status' => '200' ], ] or diag explain \@headers;
+
+    @headers = ();
+
+    is $decoder->headers_decode( \hstr(<<EOF), \@headers ), 84;
+    8484 4393 d6db b298 84de 2a71 8805 0620
+    9851 3111 b56b a35e 84ab dd97 ff84 8483
+    837b b1e0 d6cf 9f6e 8f9f d3e5 f6fa 76fe
+    fd3c 7edf 9eff 1f2f 0f3c fe9f 6fcf 7f8f
+    879f 61ad 4f4c c9a9 73a2 200e c372 5e18
+    b1b7 4e3f
+EOF
+
+    is_deeply \@headers,
+      [
+        [ 'cache-control'    => 'private' ],
+        [ 'date'             => 'Mon, 21 Oct 2013 20:13:22 GMT' ],
+        [ 'content-encoding' => 'gzip' ],
+        [ 'location'         => 'https://www.example.com' ],
+        [ ':status'          => '200' ],
+        [
+            'set-cookie' =>
+              'foo=ASDJKHQKBZXOQWEOPIUAXQWEOIU; max-age=3600; version=1'
+        ],
+      ]
+      or diag explain \@headers;
+
+};
+
+done_testing;
+

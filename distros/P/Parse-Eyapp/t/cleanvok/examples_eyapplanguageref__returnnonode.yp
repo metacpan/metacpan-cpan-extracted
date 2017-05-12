@@ -1,0 +1,23 @@
+
+%tree
+%semantic token 'a' 'b' 
+
+%%
+
+S:
+      %name EMPTY
+    | %name AES
+      S A
+    | %name BES
+      S B 
+;
+A:
+      %name A
+      'a' 
+;
+B:
+      %name B
+      'b' 
+;
+
+%%

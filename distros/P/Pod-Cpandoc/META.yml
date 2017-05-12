@@ -1,0 +1,30 @@
+---
+abstract: "perldoc that works for modules you don't have installed"
+author:
+  - 'Shawn M Moore C<code@sartak.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Cpandoc
+no_index:
+  directory:
+    - inc
+requires:
+  HTTP::Tiny: 0
+  IO::Socket::SSL: '1.56'
+  JSON::PP: 0
+  Net::SSLeay: '1.49'
+  perl: 5.8.1
+resources:
+  homepage: https://github.com/sartak/pod-cpandoc/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/sartak/pod-cpandoc.git
+version: '0.16'

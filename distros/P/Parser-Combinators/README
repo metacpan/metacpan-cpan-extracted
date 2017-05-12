@@ -1,0 +1,278 @@
+NAME
+
+    Parser::Combinators - A library of building blocks for parsing text
+
+SYNOPSIS
+
+      use Parser::Combinators;
+    
+      my $parser = < a combination of the parser building blocks from Parser::Combinators >
+      (my $status, my $rest, my $matches) = $parser->($str);
+      my $parse_tree = getParseTree($matches);
+
+DESCRIPTION
+
+    Parser::Combinators is a library of parser building blocks ('parser
+    combinators'), inspired by the Parsec parser combinator library in
+    Haskell (http://legacy.cs.uu.nl/daan/download/parsec/parsec.html). The
+    idea is that you build a parsers not by specifying a grammar (as in
+    yacc/lex or Parse::RecDescent), but by combining a set of small parsers
+    that parse well-defined items.
+
+ Usage
+
+    Each parser in this library , e.g. word or symbol, is a function that
+    returns a function (actually, a closure) that parses a string. You can
+    combine these parsers by using special parsers like sequence and
+    choice. For example, a JavaScript variable declaration
+
+         var res = 42;
+
+    could be parsed as:
+
+        my $p =
+            sequence [
+                symbol('var'),
+                word,
+                symbol('='),
+                natural,
+                semi
+            ]
+
+    if you want to express that the assignment is optional, i.e.  var res;
+    is also valid, you can use maybe():
+
+        my $p =
+            sequence [
+                symbol('var'),
+                word,
+                maybe(
+                    sequence [
+                       symbol('='),
+                       natural
+                       ]
+                ),
+                semi
+            ]
+
+    If you want to parse alternatives you can use choice(). For example, to
+    express that either of the next two lines are valid:
+
+        42
+        return(42)
+
+    you can write
+
+        my $p = choice( number, sequence [ symbol('return'), parens( number ) ] )
+
+    This example also illustrates the `parens()` parser to parse anything
+    enclosed in parenthesis
+
+ Provided Parsers
+
+    The library is not complete in the sense that not all Parsec
+    combinators have been implemented. Currently, it contains:
+
+            whiteSpace : parses any white space, always returns success. 
+    
+            * Lexeme parsers (they remove trailing whitespace):
+    
+            word : (\w+)
+            natural : (\d+)
+            symbol : parses a given symbol, e.g. symbol('int')
+                    comma : parses a comma
+            semi : parses a semicolon
+            
+            char : parses a given character
+    
+            * Combinators:
+    
+            sequence( [ $parser1, $parser2, ... ], $optional_sub_ref )
+            choice( $parser1, $parser2, ...) : tries the specified parsers in order
+            try : normally, the parser consums matching input. try() stops a parser from consuming the string
+            maybe : is like try() but always reports success
+            parens( $parser ) : parser '(', then applies $parser, then ')'
+            many( $parser) : applies $parser zero or more times
+            many1( $parser) : applies $parser one or more times
+            sepBy( $separator, $parser) : parses a list of $parser separated by $separator
+            oneOf( [$patt1, $patt2,...]): like symbol() but parses the patterns in order
+    
+            * Dangerous: the following parsers take a regular expression, so you can mix regexes and other combinators ...                                       
+    
+            upto( $patt )
+            greedyUpto( $patt)
+            regex( $patt)
+
+ Labeling
+
+    You can label any parser in a sequence using an anonymous hash, for
+    example:
+
+        sub type_parser {   
+                    sequence [
+            {Type =>        word},
+            maybe parens choice(
+                    {Kind => natural},
+                                                    sequence [
+                                                            symbol('kind'),
+                                                            symbol('='),
+                                {Kind => natural}
+                                                    ] 
+                                            )        
+                    ] 
+        }
+
+    Applying this parser returns a tuple as follows:
+
+      my $str = 'integer(kind=8), '
+      (my $status, my $rest, my $matches) = type_parser($str);
+
+    Here,$status is 0 if the match failed, 1 if it succeeded. $rest
+    contains the rest of the string. The actual matches are stored in the
+    array $matches. As every parser returns its resuls as an array ref,
+    $matches contains the concrete parsed syntax, i.e. a nested array of
+    arrays of strings.
+
+        show($matches) ==> [{'Type' => 'integer'},['kind','\\=',{'Kind' => '8'}]]
+
+    You can remove the unlabeled matches and convert the raw tree into
+    nested hashes using getParseTree:
+
+      my $parse_tree = getParseTree($matches);
+    
+        show($parse_tree) ==> {'Type' => 'integer','Kind' => '8'}
+
+ A more complete example
+
+    I wrote this library because I needed to parse argument declarations of
+    Fortran-95 code. Some examples of valid declarations are:
+
+          integer(kind=8), dimension(0:ip, -1:jp+1, kp) , intent( In ) :: u, v,w
+          real, dimension(0:7) :: f 
+          real(8), dimension(0:7,kp) :: f,g 
+
+    I want to extract the type and kind, the dimension and the list of
+    variable names. For completeness I'm parsing the `intent` attribute as
+    well. The parser is a sequence of four separate parsers type_parser,
+    dim_parser, intent_parser and arglist_parser. All the optional fields
+    are wrapped in a maybe().
+
+        my $F95_arg_decl_parser =    
+        sequence [
+            whiteSpace,
+            {TypeTup => &type_parser},
+                maybe(
+                        sequence [
+                                comma,
+                    &dim_parser
+                    ], 
+            ),
+                maybe(
+                    sequence [
+                            comma,
+                            &intent_parser
+                    ], 
+                ),
+            &arglist_parser
+            ];
+    
+        # where
+    
+        sub type_parser {   
+                    sequence [
+            {Type =>        word},
+            maybe parens choice(
+                    {Kind => natural},
+                                                    sequence [
+                                                            symbol('kind'),
+                                                            symbol('='),
+                                {Kind => natural}
+                                                    ] 
+                                            )        
+                    ] 
+        }
+    
+        sub dim_parser {
+                    sequence [
+                            symbol('dimension'),
+            {Dim => parens sepBy(',', regex('[^,\)]+')) }
+                    ] 
+        }
+    
+        sub intent_parser {
+                sequence [
+                symbol('intent'),
+             {Intent => parens word}
+                    ] 
+        }
+    
+        sub arglist_parser {
+            sequence [
+                    symbol('::'),
+                {Vars => sepBy(',',&word)}
+            ]
+        }    
+
+    Running the parser and calling getParseTree() on the first string
+    results in
+
+        {
+        'TypeTup' => {
+                    'Type' => 'integer',
+                    'Kind' => '8'
+                },
+        'Dim' => ['0:ip','-1:jp+1','kp'],
+        'Intent' => 'In',
+        'Vars' => ['u','v','w']
+        }
+
+    See the test fortran95_argument_declarations.t for the source code.
+
+  No Monads?!
+
+    As this library is inspired by a monadic parser combinator library from
+    Haskell, I have also implemented bindP() and returnP() for those who
+    like monads ^_^ So instead of saying
+
+        my $pp = sequence [ $p1, $p2, $p3 ]
+
+    you can say
+
+        my $pp = bindP( 
+            $p1, 
+            sub { (my $x) =@_;
+                bindP( 
+                    $p2,  
+                    sub {(my $y) =@_;
+                    bindP(
+                        $p3,
+                        sub { (my $z) = @_;
+                            returnP->($z);
+                            }
+                        )->($y)
+                    }
+                    )->($x);
+                }
+            );
+
+    which is obviously so much better :-)
+
+AUTHOR
+
+    Wim Vanderbauwhede <Wim.Vanderbauwhede@gmail.com>
+
+COPYRIGHT
+
+    Copyright 2013- Wim Vanderbauwhede
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    - The original Parsec library:
+    http://legacy.cs.uu.nl/daan/download/parsec/parsec.html and
+    http://hackage.haskell.org/package/parsec
+

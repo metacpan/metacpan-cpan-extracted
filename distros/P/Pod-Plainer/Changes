@@ -1,0 +1,27 @@
+Revision history for Perl extension Pod::Plainer.
+
+1.04  2014-07-04
+	- added META.json
+	- use Test::More
+
+1.03  2010-08-25
+	- deleted C<use if deprecate> to remove dependency on 'if',
+		which is not available in 5.006, as reported in #RT60721.
+		I think C<deprecate> is only necessary for versions that
+		appear in the core.
+
+1.02  2010-02-11
+	- change email address 
+
+1.01  2009-09-20
+	- added t/pod-coverage.t
+	- added more documentation and Makefile.PL options
+	- resolved CPAN RT #49699 re INSTALLDIRS
+
+1.00  2009-09-13
+	- added C<use deprecate>, updated AUTHOR email
+
+0.01  Sun Sep 13 14:58:42 2009
+	- original version; created by h2xs 1.23 with options
+		-XAn Pod::Plainer
+	- Plainer.pm t/plainer.t Makefile.PL from perl/ext/Pod-Plainer

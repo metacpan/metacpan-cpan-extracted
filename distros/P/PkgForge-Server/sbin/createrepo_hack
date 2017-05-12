@@ -1,0 +1,13 @@
+#!/bin/bash
+
+dir=$1
+
+/usr/bin/createrepo -d -q -x '*.src.rpm' $dir
+retval=$?
+
+if [ "$EUID" -eq 0 ]; then
+   chmod -R g+w $dir
+fi
+
+exit $retval
+

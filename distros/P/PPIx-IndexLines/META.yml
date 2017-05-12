@@ -1,0 +1,40 @@
+---
+abstract: 'Given a line number, returns some basic information about where in the perl document you are'
+author:
+  - 'Alan Young <harleypig@gmail.com>'
+build_requires:
+  Carp: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Path::Class: 0
+  Test::More: 0.94
+  Test::Perl::Critic::Progressive: 0
+  Try::Tiny: 0
+  perl: 5.004
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PPIx-IndexLines
+no_index:
+  directory:
+    - t
+    - xt
+provides:
+  PPIx::IndexLines:
+    file: lib/PPIx/IndexLines.pm
+    version: 0.05
+requires:
+  PPI: 0
+  Scalar::Util: 0
+resources:
+  bugtracker: http://github.com/harleypigs/ppix-indexlines/issues
+  repository: git://github.com/harleypig/ppix-indexlines.git
+version: 0.05

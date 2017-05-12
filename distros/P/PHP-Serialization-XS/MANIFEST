@@ -1,0 +1,27 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+XS.xs
+t/PHP-Serialization-XS.t
+lib/PHP/Serialization/XS.pm
+typemap
+convert.c
+convert.h
+phpserialize/parser/ps_parser.c
+phpserialize/parser/ps_parser.h
+phpserialize/parser/ps_parser_internal.h
+phpserialize/parser/ps_parser_store.h
+phpserialize/parser/stringstore.c
+phpserialize/parser/stringstore.h
+t/01use.t
+t/02basic.t
+t/04arraysRT21218.t
+t/05RT24441.t
+t/07croak.t
+t/08incompletestringRT44700.t
+t/09floatindexRT42029.t
+t/PHP-Serialization-XS.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

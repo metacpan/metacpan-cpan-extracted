@@ -1,0 +1,27 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [-Regexp::Pattern]
+
+DESCRIPTION
+
+    This plugin is to be used when building Regexp::Pattern::*
+    distribution. Currently it does the following:
+
+      * Add a Synopsis section (if doesn't already exist) containing a few
+      examples on how to use the module
+
+      * Add a description about Regexp::Pattern in the Description section
+
+      * Add a Patterns section containing list of patterns contained in the
+      module
+
+CONFIGURATION
+
+SEE ALSO
+
+    Regexp::Pattern
+
+    Dist::Zilla::Plugin::Regexp::Pattern
+

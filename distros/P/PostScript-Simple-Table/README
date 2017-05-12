@@ -1,0 +1,33 @@
+PostScript-Simple-Table version 1.02
+=============================
+
+Adds easy table creation to PostScript::Simple.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  PostScript::Simple
+  PostScript::Metrics
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Aaron Mitti
+Copyright (C) 2005 by Daemmon Hughes
+Copyright (C) 2005 by Rick Measham
+Copyright (C) 2004 by Stone Environmental Inc.
+All Rights Reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+

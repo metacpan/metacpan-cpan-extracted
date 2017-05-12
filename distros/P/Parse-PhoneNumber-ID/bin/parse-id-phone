@@ -1,0 +1,268 @@
+#!perl
+
+# Note: This script is a CLI interface to Riap function /Parse/PhoneNumber/ID/parse_id_phone
+# and generated automatically using App::GenPericmdScript version 0.13
+
+our $DATE = '2015-09-03'; # DATE
+our $DIST = 'Parse-PhoneNumber-ID'; # DIST
+our $VERSION = '0.15'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Any;
+
+Perinci::CmdLine::Any->new(
+    url => "/Parse/PhoneNumber/ID/parse_id_phone",
+)->run;
+
+# ABSTRACT: Alias for extract_id_phones(..., max_numbers=>1)->[0]
+# PODNAME: parse-id-phone
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+parse-id-phone - Alias for extract_id_phones(..., max_numbers=>1)->[0]
+
+=head1 VERSION
+
+This document describes version 0.15 of parse-id-phone (from Perl distribution Parse-PhoneNumber-ID), released on 2015-09-03.
+
+=head1 SYNOPSIS
+
+Usage:
+
+ % parse-id-phone [options] <text>
+
+=head1 DESCRIPTION
+
+Extracts phone number(s) from text. Return an array of one or more parsed phone
+number structure (a hash). Understands the list of known area codes and cellular
+operators, as well as other information. Understands various syntax e.g.
++62.22.1234567, (022) 123-4567, 022-123-4567 ext 102, and even things like
+7123456/57 (2 adjacent numbers).
+
+Extraction algorithm is particularly targetted at classified ads text in
+Indonesian language, but should be quite suitable for any other normal text.
+
+Non-Indonesian phone numbers (e.g. +65 12 3456 7890) will still be extracted,
+but without any other detailed information other than country code.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Configuration options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=back
+
+=head2 Environment options
+
+=over
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=back
+
+=head2 Output options
+
+=over
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=back
+
+=head2 Other options
+
+=over
+
+=item B<--default-area-code>=I<s>
+
+When encountering a number without area code, use this.
+
+If you want to extract numbers that doesn't contain area code (e.g. 7123 4567),
+you'll need to provide this.
+
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--level>=I<i>
+
+How hard should the function extract numbers (1-9).
+
+Default value:
+
+ 5
+
+The higher the level, the harder this function will try finding phone numbers,
+but the higher the risk of false positives will be. E.g. in text
+'123456789012345' with level=5 it will not find a phone number, but with level=9
+it might assume, e.g. 1234567890 to be a phone number. Normally leaving level at
+default level is fine.
+
+
+=item B<--text>=I<s>*
+
+Text containing phone numbers to extract from.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C parse-id-phone parse-id-phone
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete parse-id-phone 'p/*/`parse-id-phone`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 ENVIRONMENT
+
+=head2 PARSE_ID_PHONE_OPT => str
+
+Specify additional command-line options
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at C<~/.config/parse-id-phone.conf>, C<~/parse-id-phone.conf> or C</etc/parse-id-phone.conf> (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features. 
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+List of available configuration parameters:
+
+ default_area_code (see --default-area-code)
+ format (see --format)
+ level (see --level)
+ naked_res (see --naked-res)
+ text (see --text)
+
+=head1 FILES
+
+~/.config/parse-id-phone.conf
+
+~/parse-id-phone.conf
+
+/etc/parse-id-phone.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Parse-PhoneNumber-ID>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Parse-PhoneNumber-ID>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Parse-PhoneNumber-ID>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

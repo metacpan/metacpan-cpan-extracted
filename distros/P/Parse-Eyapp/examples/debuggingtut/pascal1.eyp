@@ -1,0 +1,141 @@
+# Default lexical analyzer
+%lexer {
+      m{\G(\s+)}gc and $self->tokenline($1 =~ tr{\n}{});
+
+      m{\G(type|\.\.|\-|\+|\;|\/|\,|\=|\(|\*|\))}gc and return ($1, $1);
+
+      /\G([A-Za-z]\w*)/gc and return ('ID', $1);
+      /\G(\d+)/gc and return ('NUM', $1);
+
+
+      return ('', undef) if ($_ eq '') || (defined(pos($_)) && (pos($_) >= length($_)));
+      /\G\s*(\S+)/;
+      my $near = substr($1,0,10); 
+      die( "Error inside the lexical analyzer near '". $near
+          ."'. Line: ".$self->line()
+          .". File: '".$self->YYFilename()."'. No match found.\n");
+}
+
+%{
+my $enum = 0;
+
+sub rangeORenum {
+  # Goal. Towrite this code as: 
+  #           $enum = $self->YYPreParse('enum');
+  #  Will parse using as start symbol 'enum', without changing the 
+  #  parsing position. Returns true if it matches. Has the same effect
+  #  than the following code:
+  use Enum;
+
+  my $self = shift;
+
+  my $np = Enum->new();
+
+  my $pos = pos(${$self->{INPUT}});
+  $np->input($self->input());
+
+  $enum = 1;
+  eval {
+    $np->YYParse( yyerror => sub { $enum = 0; });
+  };
+
+}
+
+%}
+
+%conflict rangeORenum {
+  if ($enum) { $self->YYSetReduce([',', ')'], 'ID:ENUM' ); }
+  else { $self->YYSetReduce([',', ')'], 'ID:RANGE' ); }
+} 
+
+%token ID  = /([A-Za-z]\w*)/
+%token NUM = /(\d+)/
+
+%left   ','
+%left   '-' '+'
+%left   '*' '/'
+
+#%expect-rr 2
+
+%%
+
+type_decl : 'type' ID '=' type ';'
+;
+
+type : 
+      %name ENUM
+      # %code rangeORenum
+      PRErangeORenum '(' id_list ')'
+    | %name RANGE
+      # %code rangeORenum
+      PRErangeORenum expr '..' expr
+;
+
+enum:
+      '(' ids ')' ';'
+;
+
+ids : 
+      ID       
+    | ids ',' ID
+;
+
+
+PRErangeORenum:
+   /* empty */  
+     {
+       goto &rangeORenum;
+     }
+;
+
+id_list : 
+      %name ID:ENUM
+      ID                      %PREC rangeORenum
+    | id_list ',' ID
+;
+
+expr : '(' expr ')'   { $_[2] } /* bypass */
+    | %name PLUS     expr '+' expr
+    | %name MINUS    expr '-' expr
+    | %name TIMES    expr '*' expr
+    | %name DIV      expr '/' expr
+    | %name COMMA    expr ',' expr
+    | %name ID:RANGE
+      ID                     %PREC rangeORenum
+    | %name NUM      NUM
+;
+
+%%
+
+
+=head1 SYNOPSIS
+
+See 
+
+=over 2
+
+=item * File pascalenumeratedvsrange.eyp in examples/debuggintut/
+
+=item * The Bison manual L<http://www.gnu.org/software/bison/manual/html_mono/bison.html>
+
+=back
+
+Compile it with something like:
+
+      eyapp -TC pascalenumeratedvsrangesolvedviapreconflictsolver.eyp
+
+Run it with this options:
+
+    $ ./pascalenumeratedvsrangesolvedviapreconflictsolver.pm -t -i -m 1 -c 'type e = (x, y, z);'
+
+Try also these inputs:
+
+                type e = (x) .. (y);
+                type r = (x) ..  y ;
+                type r = (x+2)*3 ..  y/2 ;
+                type e = (x, y, z);
+                type e = (x);
+                type e = (x, y, z) .. (u+v);
+
+=cut
+

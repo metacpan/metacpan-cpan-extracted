@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 Strict//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>[% siteName %]: 
+[% IF expandedPageName %]
+[% expandedPageName %]
+[% ELSIF pageName %]
+[% pageName %]
+[% ELSE %]
+[% title %]
+[% END %]
+</title>
+<link rel="stylesheet" href="/purplewiki.css" />
+</head>
+
+<body>
+
+<div id="header">
+<div class='left'>
+<h1>[% title %]</h1>
+</div>
+<div class='right'>
+<!-- img tag would go here if you have a logo -->
+</div>
+</div>
+
+<div id="menubar">
+<div class='left'>
+[% INCLUDE common/navbar.tt %]
+</div>
+<div class='right'>
+[% INCLUDE common/userbar.tt %]
+</div>
+</div>
+
+<div id="main">
+<div id="body">

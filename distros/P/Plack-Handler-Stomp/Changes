@@ -1,0 +1,52 @@
+1.13      2015-07-23 17:38:50+01:00 Europe/London
+ - if the incoming frame does not declare a content-type, assume
+   application/octet-stream; we could just not include the
+   CONTENT_TYPE PSGI key, but a few consumers (Catalyst, HTTP::Body)
+   seem to assume it exists
+
+1.12      2014-11-11 14:40:06+00:00 Europe/London
+ - use CONTENT_LENGTH instead of HTTP_CONTENT_LENGTH, more closely
+   following the PSGI spec
+
+1.11      2014-07-29 10:38:26+01:00 Europe/London
+ - use SingleEncoding (thanks sergeyromanov)
+
+1.10      2014-07-16 12:35:35+01:00 Europe/London
+ - drop our own StupidLogger, use Net::Stomp::StupidLogger
+
+1.09      2014-07-14 17:18:35+01:00 Europe/London
+ - require Net::Stomp::MooseHelpers 2.6 for newer failover handling
+ - pass the logger to the Net::Stomp object
+
+1.08      2014-02-25 16:52:22 Europe/London
+ - fix real_broker test for compatibility with MooseHelpers 2.2
+
+1.07      2013-03-27 22:59:26 Europe/London
+ - fix nonetwork.t under Win32, see RT #84096
+
+1.06      2013-03-01 15:49:54 Europe/London
+ - better work around exceptions in File::ChangeNotify
+
+1.05      2013-01-31 16:58:52 Europe/London
+ - work around exceptions in File::ChangeNotify
+
+1.04      2012-11-21 17:26:33 Europe/London
+ - test Plack::Handler::Stomp::NoNetwork (and make it work!)
+
+1.03      2012-09-03 19:52:02 Europe/London
+ - work around complicated VERSION comparison
+
+1.02      2012-09-03 11:32:52 Europe/London
+ - compatibility with Net::Stomp::MooseHelpers 1.3
+
+1.01      2012-07-10 13:08:58 Europe/London
+ - use the new ReconnectOnFailure wapper role
+
+1.0       2012-03-27 12:32:30 Europe/London
+ - first non-devel release
+
+0.1_02    2012-03-25 10:55:56 Europe/London
+ - add non-auto-detected test deps
+
+0.1_01    2012-03-14 12:08:59 Europe/London
+ - Initial release

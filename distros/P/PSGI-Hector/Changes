@@ -1,0 +1,57 @@
+PSGI::Hector 1.9 -- 21/01/2017
+
+	The logging functions are now exposed so can be used by other parts of the web app.
+
+
+PSGI::Hector 1.8 -- 09/01/2017
+
+	Now allowing different log levels.
+
+
+PSGI::Hector 1.7 -- 30/12/2016
+
+	No longer using confess().
+
+
+PSGI::Hector 1.6 -- 11/09/2016
+
+	Fixed template toolkit response when calling display() more than once.
+
+
+PSGI::Hector 1.5 -- 01/05/2015
+
+	Fixed recursion bug for session variables.
+
+
+PSGI::Hector 1.4 -- 27/12/2014
+
+	Deprecated getThisUrl()
+	Correct URLs are served when behind a reverse proxy
+	Fixed failing test
+	Added missing dependency.
+	Updated docs.
+
+
+PSGI::Hector 1.3 -- 29/10/2014
+
+	Now supports GET/POST parameters with multiple values.
+	Improved middleware for static assets
+
+
+PSGI::Hector 1.2 -- 01/07/2014
+
+	Now only creates session cookies if sessions are used.
+	
+	Middleware added
+
+
+PSGI::Hector 1.1 -- 03/03/2014
+
+	Fixed env passing to response class
+	
+	Updated docs
+
+
+PSGI::Hector 1.0 -- 22/02/2014
+
+	Initial Release

@@ -1,0 +1,4 @@
+name = "Plack-Middleware-WOVN"
+badges = ["travis", "coveralls"]
+module_maker="ModuleBuildTiny"
+

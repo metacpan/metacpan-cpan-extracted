@@ -1,0 +1,76 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [-Eval]
+     include_modules = ^Foo::Bar$
+     ;include_files  = REGEX
+     code = sub { my ($self, %args)=@_; use Module::Load; load $args{module}; my $document = $args{document}; push @{$document->children}, ... }
+
+DESCRIPTION
+
+    DEPRECATION NOTICE: This module is deprecated in favor of
+    Pod::Weaver::Plugin::Run.
+
+    This plugin evaluates Perl code specified in your weaver.ini (or
+    dist.ini). It can be used to do various stuffs that might be too
+    trivial/short to build a dedicated Pod::Weaver::Plugin for.
+
+    I first created this module to insert list of border styles and color
+    themes contained in %border_styles package variable in
+    Text::ANSITable::BorderStyle::* modules and %color_themes variable in
+    Text::ANSITable::ColorTheme::* modules.
+
+    Yes, it's a dirty (and ugly) hack. But it's quick :-)
+
+CONFIGURATION
+
+ include_files => STR
+
+    Value should be a regex, e.g. /Foo/Bar/.
+
+ include_modules => REGEX
+
+    Value should be a regex, e.g. ^Foo::Bar$.
+
+ code => STR
+
+    Should be something like:
+
+     sub { my ($self, %args) = @_; ... }
+
+    sub { and } will be added if code does not have it. Code will be called
+    with %args containing these keys:
+
+      * filename => STR
+
+      * package => STR
+
+      * module => STR
+
+      Alias for package.
+
+      * args => ARRAY
+
+      The original @_ passed to weave_section(). Note that weave_section()
+      is passed:
+
+       ($self, $document, $input)
+
+      * document => OBJ
+
+      Document object passed to weave_section(). This is the output POD we
+      are building and this is what we're mostly interested in, usually. It
+      can also be retrieved from args.
+
+      * input => OBJ
+
+      The input object passed to weave_section(). It contains information
+      about the input (original) document. Can also be retrieved from args.
+
+SEE ALSO
+
+    Pod::Weaver
+
+    Pod::Weaver::Plugin::Run
+

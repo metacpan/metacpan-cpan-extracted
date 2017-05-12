@@ -1,0 +1,29 @@
+Revision history for POE-Component-Client-WebSocket
+
+0.27	01/05/2017 07:49
+	Connected missing socket_death handler (alerts of upstream disconnected)
+
+0.26	18/03/2017 14:01
+	Had to push version due to error uploading 0.25, see 0.25 for change
+
+0.25	18/03/2017 14:00
+	Updated the connect method to remove POE::HTTP::Parser after lots of long runnning debug problems
+
+0.24	21/03/2017 10:24
+	Updated defaults to make all messages masked and fin by default, also reversed order of Changes to be more standard
+
+0.23	30/01/2016 12:00
+	Forgot to create version entry for this version, unsure what changes (added on 0.24)
+
+0.22    29/01/2016 17:16
+        Checking for mystery extra directory in tarbell, few DOC updates
+
+0.21    29/01/2016 04:50
+        Corrected a few more documentation errors, added parent method
+
+0.20    29/01/2016 04:31
+        Version bump to clean up the make file and related files
+
+0.01    29/01/2016 03:46
+        First version, hackily bashed together in 12 hours, it does work though :)
+

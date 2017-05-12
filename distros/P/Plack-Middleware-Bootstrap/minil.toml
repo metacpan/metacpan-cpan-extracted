@@ -1,0 +1,6 @@
+name = "Plack-Middleware-Bootstrap"
+badges = ["travis"]
+authority="cpan:HITODE"
+
+module_maker="ModuleBuildTiny"
+

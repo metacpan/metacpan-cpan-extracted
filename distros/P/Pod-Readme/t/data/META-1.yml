@@ -1,0 +1,45 @@
+---
+abstract: 'generate README files from POD'
+author:
+  - 'Robert Rothenberg <rrwo@cpan.org>'
+build_requires:
+  Exporter::Lite: 0
+  ExtUtils::MakeMaker: 6.59
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: artistic2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Readme
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  CPAN::Changes: 0
+  CPAN::Meta: 0
+  ExtUtils::MakeMaker: 6.56
+  File::Slurp: 0
+  Hash::Util: 0
+  IO: 0
+  Module::CoreList: 0
+  Moose: 0
+  MooseX::Object::Pluggable: 0
+  MooseX::Types::IO: 0
+  MooseX::Types::Path::Class: 0
+  Path::Class: 0
+  Try::Tiny: 0
+  namespace::autoclean: 0
+  perl: 5.10.1
+  version: 0.77
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Readme
+  license: http://www.perlfoundation.org/artistic_license_2_0
+  repository: git://github.com/bigpresh/Pod-Readme.git
+version: 1.000000_001

@@ -1,0 +1,2 @@
+#!/bin/sh
+API_USER=test API_PASSWORD=hyjkw45g /opt/local/bin/perl5.12.1 -Ilib t/basic.t

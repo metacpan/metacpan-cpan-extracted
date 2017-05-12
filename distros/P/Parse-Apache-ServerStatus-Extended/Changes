@@ -1,0 +1,8 @@
+Revision history for Parse-Apache-ServerStatus-Extended
+
+0.02   Tue Jul 17 23:58:00 2007
+       Fix t/perlcritic.t
+
+0.01   Mon Jul  9 15:35:29 2007
+       Initial release.
+

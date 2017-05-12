@@ -1,0 +1,30 @@
+---
+abstract: Files and code for building Perl 5.12.3
+author:
+  - 'Curtis Jewell <CSJewell@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.33
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perl-Dist-Strawberry-BuildPerl-5123
+provides:
+  Perl::Dist::Strawberry::BuildPerl::5123:
+    file: lib/Perl/Dist/Strawberry/BuildPerl/5123.pm
+    version: 2.5001
+requires:
+  File::ShareDir: 1.02
+  Moose::Role: 0.90
+  Perl::Dist::Strawberry: 2.11_10
+  perl: 5.010
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Dist-Strawberry-BuildPerl-5123
+  homepage: http://csjewell.comyr.com/perl/
+  license: http://dev.perl.org/licenses/
+  repository: http://hg.curtisjewell.name/Perl-Dist-Strawberry-BuildPerl-5123
+version: 2.5001

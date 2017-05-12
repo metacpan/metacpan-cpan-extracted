@@ -1,0 +1,60 @@
+---
+abstract: 'a formatter for spellchecking Pod'
+author:
+  - 'Sean M. Burke <sburke@cpan.org>'
+  - 'Caleb Cushing <xenoterracide@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Spell
+no_index:
+  file:
+    - perlcritic.rc
+provides:
+  Pod::Spell:
+    file: lib/Pod/Spell.pm
+    version: '1.20'
+  Pod::Wordlist:
+    file: lib/Pod/Wordlist.pm
+    version: '1.20'
+requires:
+  Carp: '0'
+  Class::Tiny: '0'
+  File::ShareDir: '0'
+  Lingua::EN::Inflect: '0'
+  POSIX: '0'
+  Path::Tiny: '0'
+  Pod::Escapes: '0'
+  Pod::Parser: '0'
+  Text::Wrap: '0'
+  constant: '0'
+  locale: '0'
+  parent: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/perl-pod/Pod-Spell
+  repository: https://github.com/perl-pod/Pod-Spell.git
+version: '1.20'
+x_contributors:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Kent Fredric <kentfredric@gmail.com>'
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Paulo Custodio <pauloscustodio@gmail.com>'

@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+
+package main;
+
+use FindBin;
+
+# add pcore lib to @INC, if Pcore is dist
+use if -f qq[$FindBin::RealBin/../share/dist.perl] && -d qq[$FindBin::RealBin/../lib/], lib => qq[$FindBin::RealBin/../lib/];
+use Pcore;
+
+sub CLI ($self) {
+    return {
+        abstract => 'Distribution build tool',
+        cmd      => 'Pcore::Dist::CLI::',
+    };
+}
+
+1;
+__END__
+=pod
+
+=encoding utf8
+
+=cut

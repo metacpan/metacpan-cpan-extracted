@@ -1,0 +1,9 @@
+Parse::FieldPath
+================
+
+Parses an XPath inspired field list and extracts those fields from an object
+hierarchy.
+
+Based on the "fields" parameter for the Google+ API:
+http://developers.google.com/+/api/
+

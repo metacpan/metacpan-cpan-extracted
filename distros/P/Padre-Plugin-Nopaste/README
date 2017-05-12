@@ -1,0 +1,106 @@
+NAME
+    Padre::Plugin::Nopaste - NoPaste plugin for Padre, The Perl IDE.
+
+VERSION
+    version 0.08
+
+SYNOPSIS
+    Send code to a nopaste website from Padre.
+
+        $ padre
+        Ctrl+Shift+V
+
+DESCRIPTION
+    This plugin allows one to send stuff from Padre to a nopaste website
+    with Ctrl+Shift+V, allowing for easy code / whatever sharing without
+    having to open a browser.
+
+    It is using "App::Nopaste" underneath, so check this module's pod for
+    more information.
+
+METHODS
+  Standard Padre::Plugin API
+    "Padre::Plugin::Nopaste" defines a plugin which follows "Padre::Plugin"
+    API. Refer to this module's documentation for more information.
+
+    The following methods are implemented:
+
+    *   padre_interfaces()
+
+    *   plugin_icon()
+
+    *   plugin_name()
+
+    *   clean_dialog()
+
+    *   menu_plugins()
+
+    *   plugin_disable()
+
+    *   plugin_enable()
+
+    *   plugin_preferences()
+
+        Spelling preferences window normaly access via Plug-in Manager
+
+    *   event_on_context_menu()
+
+        Add access to spelling preferences window.
+
+  Standard Padre::Role::Task API
+    In order not to freeze Padre during web access, nopasting is done in a
+    thread, as implemented by "Padre::Task". Refer to this module's
+    documentation for more information.
+
+    The following methods are implemented:
+
+    *   paste_it()
+
+    *   on_finish()
+
+        Callback for task runned by nopaste().
+
+  Internal Methods
+    *   _config()
+
+BUGS AND LIMITATIONS
+    event_on_context_menu() is not supported in Padre 0.96 and below.
+
+SEE ALSO
+    Plugin icon courtesy of Mark James, at
+    <http://www.famfamfam.com/lab/icons/silk/>.
+
+    You can also look for information on this module at:
+
+    *   Padre-Plugin-Nopaste web page
+
+        <http://padre.perlide.org/trac/wiki/PadrePluginNopaste>
+
+    *   Our svn repository
+
+        <http://svn.perlide.org/padre/trunk/Padre-Plugin-Nopaste>, and can
+        be browsed at
+        <http://padre.perlide.org/browser/trunk/Padre-Plugin-Nopaste>.
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Padre-Plugin-Nopaste>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Padre-Plugin-Nopaste>
+
+AUTHOR
+    Kevin Dawson <bowtie@cpan.org>
+
+    Jerome Quelin, <jquelin@cpan.org>
+
+  CONTRIBUTORS
+    Ahmad M. Zawawi <ahmad.zawawi@gmail.com>
+
+COPYRIGHT & LICENSE
+    Copyright (c) 2009 Jerome Quelin, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

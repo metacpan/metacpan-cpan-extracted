@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Infringement xsi:schemaLocation="http://www.acns.net/v1.1/ACNS2v1_1.xsd"
+    xmlns="http://www.movielabs.com/ACNS" xmlns:xsi="http://www.w3.org/2001/XMLSchemainstance">
+<Case>
+<ID>A1234567</ID>
+<Ref_URL>http://www.contentowner.com/trackingid.asp?A1234567</Ref_URL>
+<Status>Open</Status>
+<Severity>Normal</Severity>
+</Case>
+<Complainant>
+<Entity>ScannerVendor, Inc.</Entity>
+<Contact>Jonathan Doe</Contact>
+<Address>100 Anywhere Street, Anywhere, CA 90000, USA</Address>
+<Phone>650-555-5555</Phone>
+<Email>notice@scannervendor.com</Email>
+<ContactURL>https://www.scannervendor.com/complaints.php</ContactURL>
+</Complainant>
+<Service_Provider>
+<Entity>GreatISP</Entity>
+<Contact>Jack Doah</Contact>
+<Address>1234 My Street, Everwhere, NY, 10001, USA</Address>
+<Phone>212-555-5555</Phone>
+<Email>abuse@greatisp.net</Email>
+<ContactURL>http://www.greatisp.net/gotanotice</ContactURL>
+</Service_Provider>
+<Source>
+<TimeStamp>2008-08-30T12:34:53Z</TimeStamp>
+<IP_Address>168.1.1.145</IP_Address>
+<Port>21123</Port>
+<DNS_Name>pcp574.nshville.tn.ispbroadband.net</DNS_Name>
+<MAC_Address>00-00-39-B6-00-A4</MAC_Address>
+<Type>BITTORRENT</Type>
+<SubType Protocol="BITTORRENT" Application="Azureus" BaseType="P2P"></SubType>
+<Number_Files>1</Number_Files>
+</Source>
+<Content>
+<Item>
+<TimeStamp>2008-08-30T12:34:53Z</TimeStamp>
+<AlsoSeen Start="2008-08-30T12:34:53Z" End="2008-08-30T14:32:00Z"></AlsoSeen>
+<AlsoSeen Start="2008-08-30T18:04:22Z" End="2008-08-30T20:45:23Z"></AlsoSeen>
+<Title>8 Mile</Title>
+<FileName>8_Mile[2002]DvDrip[Eng].4473459.TPB.torrent</FileName>
+<FileSize>734013472</FileSize>
+<Type>Movie</Type>
+<ExplicitType>Movie</ExplicitType>
+<Hash Type="SHA1">6AF9F5BF5493B6BB72F15F77C2E541D606328AEA</Hash>
+</Item>
+</Content>
+<History>
+<Notice ID="A1234567" TimeStamp="2008-08-30T20:46:00Z"><![CDATA[
+Dear ISP,
+It has come to our attention that on August 30, 2008 a subscriber was 
+uploading the movie 8 Mile using Azureus.  We respectfully request that you 
+ask your subscriber to delete this file and stop making it available on P2P 
+networks.
+The specifics follow:
+Notice: A1234567
+Time first seen: 2008-08-30T12:34:53Z
+Title: 8 Mile
+FileName: 8_Mile[2002]DvDrip[Eng].4473459.TPB.torrent
+FileSize" 734013472
+Type: Movie
+SHA1 hash: 6AF9F5BF5493B6BB72F15F77C2E541D606328AEA
+If you have any questions, please contact:
+Jonathan Doe
+ScannerVendor, 
+100 Anywhere Street
+Anywhere, CA 90000, USA
+650-555-5555
+notice@scannervendor.com
+or use your login to 
+https://www.scannervendor.com/complaints.php and reference notice A1234567
+Best Regards,
+Jon
+]]>
+</Notice>
+</History>
+<Type Retraction="false" Comments="Informational Notice">INFO</Type>
+<Detection>
+<Asset>
+<OriginalAssetName>8 Mile</OriginalAssetName>
+<OriginalAssetID type="ISAN">0000-0000-F23C-0000-J-0000-0000-H</OriginalAssetID>
+</Asset>
+<ContentMatched Fingerprint="true" Video="true" Audio="true" MatchThreshold="100" Human="true"/>
+<HashMatched>true</HashMatched>
+<MetadataMatched>true</MetadataMatched>
+<VerificationID> SuperMatcher v2.7 Build 302</VerificationID>
+</Detection>
+<InternalTracking InternalCaseNumber="ISP1234567" CurrentSequence="1">
+<PrimarySubject>
+<SubjectContact>
+<Entity>Subject Contact Inc.</Entity>
+<Contact>Joe Pirate</Contact>
+<Address>100 My Street, Anywhere, CA 90000</Address>
+<Phone>310-555-5555</Phone>
+<Email>joe_pirate@isp.net</Email>
+</SubjectContact>
+<SubjectID type="SubscriberNum">Sub123549991</SubjectID>
+</PrimarySubject>
+<Disposition Start="2008-12-17T09:30:47.0Z" End="2008-12-17T09:30:47.0Z"  Sequence="0">
+<InternalStatus>2nd Notice</InternalStatus>
+<Comments>Having difficulty reaching subscriber</Comments>
+<Contact>
+<Entity>ISP Inc</Entity>
+<Contact>Julie Doe, Abuse Coordinator</Contact>
+<Phone>310-555-5556</Phone>
+<Email>julie_doe@isp.net</Email>
+</Contact>
+</Disposition>
+<Mapping OriginalIP="168.0.0.143" OriginalPort="21123"
+MappedIP="10.1.223.17" MappedPort="6881" LeaseTime="12:00:00.0"
+LeaseHeld="16:20:00.0Z" Time="2008-08-30T12:35:00Z"  />
+</InternalTracking>
+<TextNotice><![CDATA[
+Dear ISP,
+It has come to our attention that on August 30, 2008 a subscriber was 
+uploading the movie 8 Mile using Azureus.  We respectfully request that you 
+ask your subscriber to delete this file and stop making it available on P2P 
+networks.
+The specifics follow:
+Notice: A1234567
+Time first seen: 2008-08-30T12:34:53Z
+Title: 8 Mile
+FileName: 8_Mile[2002]DvDrip[Eng].4473459.TPB.torrent
+FileSize" 734013472
+Type: Movie
+SHA1 hash: 6AF9F5BF5493B6BB72F15F77C2E541D606328AEA
+If you have any questions, please contact:
+Jonathan Doe
+ScannerVendor, 
+100 Anywhere Street
+Anywhere, CA 90000, USA
+650-555-5555
+notice@scannervendor.com
+or use your login to 
+https://www.scannervendor.com/complaints.php and reference notice A1234567
+Best Regards,
+Jon
+]]></TextNotice>
+</Infringement>

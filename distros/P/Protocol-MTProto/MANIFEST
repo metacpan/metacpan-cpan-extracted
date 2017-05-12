@@ -1,0 +1,15 @@
+Build.PL
+lib/Protocol/MTProto.pm
+lib/Protocol/MTProto/TLSchemaParser.pm
+MANIFEST			This list of files
+t/00use.t
+t/10parser-builtins.t
+t/11parser-conditional.t
+t/12parser-polymorphic.t
+t/13parser-sections.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

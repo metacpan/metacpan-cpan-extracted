@@ -1,0 +1,21 @@
+Revision history for Perl extension Plack::Middleware::ETag
+
+0.05    Tue Jul 14 2015
+        - Update to correct version
+
+0.04    Tue Jul 14 2015
+        - Fix off-by-one error while checking the result of the `stat` function.
+          We were looking for the inode information at the wrong index. This
+          change fixes bug https://rt.cpan.org/Ticket/Display.html?id=105035
+          reported by skaji@cpan.org.
+
+0.03    Thu Apr 14 17:25:26 2011
+        - add check_last_modified_header (patch by Ranguard)
+        http://code.google.com/speed/page-speed/docs/caching.html#LeverageBrowserCaching
+        recommends not having both Last-Modified and ETag
+
+0.02    Sat Jan 22 10:22:50 2011
+        - add cache-control as suggested by ingy and miyagawa
+
+0.01    Sun Feb 28 10:25:01 2010
+        - original version

@@ -1,0 +1,59 @@
+<Message>
+  <Content-Type>text/plain; charset=utf-8; format=flowed</Content-Type>
+  <Content-Disposition>inline</Content-Disposition>
+  <Content-Transfer-Encoding>8bit</Content-Transfer-Encoding>
+  <Content-Language>en</Content-Language>
+  <MIME-Version>1.0</MIME-Version>
+  <From>Mark Conway &lt;mark@bruce.csse.monash.edu.au&gt;</From>
+  <To>Yourself &lt;your@self.net&gt;</To>
+  <Subject>Please help me with important transaction</Subject>
+  <User-Agent>MKDoc::Mail 0.1</User-Agent>
+  <Precedence>bulk</Precedence>
+  <Organization>Rather Messy</Organization>
+
+  <body xmlns="http://www.w3.org/1999/xhtml">
+<p>Dear yourself,</p>
+
+<p>My name is Mark Conway. I am one of Damian Conway's illegitimate sons, the
+very famous Perl hacker who bringed tons of great crazy Perl modules.</p>
+
+<p>Unfortunately Damian, as you are aware, has been trampled by a Camel on a
+holiday to egypt. However, I had the surprise of being sent a letter from
+Damian. Not forgetting his secret son.</p>
+
+<p>Damian left me the incredible amounts of FIFTY MILLION LINES OF OBFUSCATED
+PERL CODE (OPC 50,000,000.00) so that I can be seen as a great hacker and get
+some acknowledgement too.</p>
+
+<p>However I currently cannot publish this code because of USA and European
+patent law. Since you live in Nigeria, I would request your cooperation for a
+mutually profitable business.</p>
+
+<p>The operation would proceed as follows:</p>
+
+<dl>
+  <dt>CPAN Account</dt>
+  <dd>You give me your CPAN account username and password</dd>
+
+  <dt>Login</dt>
+  <dd>I log in CPAN as you</dd>
+
+  <dt>Upload</dt>
+  <dd>I remove all the code from... euh... I upload the FIFTY MILLION LINES OF OBFUSCATED
+PERL CODE (OPC 50,000,000.00) in your CPAN account</dd>
+
+  <dt>Which gives...</dt>
+  <dd>Fame!</dd>
+</dl>
+
+<p>Of course, as a compensation, I will subscribe myself as a module co-author,
+effectively grabbing about half the fame you'll get for these modules. Which
+will still leave you a whopping TWENTY FIVE MILLION LINES OF OBFUSCATED PERL
+CODE (OPC 25,000,000.00)</p>
+
+<pre>-- 
+Yours Faithfully,
+Mark Damian, Illegitimate Son</pre>
+
+  </body>
+</Message>

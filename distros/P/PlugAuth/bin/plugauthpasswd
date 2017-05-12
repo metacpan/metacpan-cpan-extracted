@@ -1,0 +1,90 @@
+#!/usr/bin/env perl
+
+# PODNAME: plugauthpasswd
+# ABSTRACT: Change your PlugAuth password
+our $VERSION = '0.35'; # VERSION
+
+
+use strict;
+use warnings;
+use 5.010001;
+use Term::Prompt ();
+use File::Spec;
+use File::Basename 'dirname';
+use YAML::XS ();
+
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), 'lib';
+use lib join '/', File::Spec->splitdir(dirname(__FILE__)), '..', 'lib';
+
+use PlugAuth::Client;
+use Clustericious::Client::Command;
+use Clustericious::Log::CommandLine (':all', ':loginit' => <<"EOT");
+           log4perl.rootLogger = INFO, Screen
+           log4perl.appender.Screen = Log::Log4perl::Appender::ScreenColoredLevels
+           log4perl.appender.Screen.layout = Log::Log4perl::Layout::PatternLayout
+           log4perl.appender.Screen.layout.ConversionPattern = [%-5p] %d %F{1} (%L) %m %n
+EOT
+
+my $client = PlugAuth::Client->new;
+my $user = shift(@ARGV) // Term::Prompt::prompt('x', "Username: ", '', $ENV{USER} || $ENV{USERNAME});
+my $old_password = Term::Prompt::prompt('p', "Old Password: ", '', '');
+print "\n";
+my $new_password = Term::Prompt::prompt('p', "New Password: ", '', '');
+print "\n";
+my $vrf_password = Term::Prompt::prompt('p', "Verify New Password: ", '', '');
+print "\n";
+unless($new_password eq $vrf_password)
+{
+  die "New Password and Verify New Password do not match!";
+}
+
+$client->login($user, $old_password);
+print YAML::XS::Dump(
+  $client->change_password($user, $new_password),
+);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+plugauthpasswd - Change your PlugAuth password
+
+=head1 VERSION
+
+version 0.35
+
+=head1 SYNOPSIS
+
+ % plugauthpasswd
+ Username:  [default bob] admin
+ Old Password: ******
+ New Password: ******
+ Verify New Password: ******
+ --- ok
+
+=head1
+
+This program provides an interactive command line interface for changing
+your L<PlugAuth> password.  Simply type I<plugauthpasswd> at the command
+line and answer the prompts correctly.
+
+=head1 SEE ALSO
+
+L<PlugAuth>, L<plugauthclient>
+
+=head1 AUTHOR
+
+Graham Ollis <gollis@sesda3.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by NASA GSFC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,7 @@
+int A,B,C 
+A = 12; 
+hex(B = B1); 
+C = hex(12);
+B = A+C;
+B = HEX(D+C)
+

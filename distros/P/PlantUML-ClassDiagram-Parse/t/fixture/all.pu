@@ -1,0 +1,76 @@
+@startuml
+
+class Base {
+}
+
+/'
+class CommentOutClass {
+}
+'/
+
+class Main {
+  run()
+}
+
+class PlantUML::ClassDiagram::Parse {
+  classes
+  relations
+  {static} parse()
+  _extract_class_strings()
+  _extract_relation_strings()
+}
+
+class PlantUML::ClassDiagram::Class::Factory {
+  {static} create()
+  _check_is_method()
+  _check_is_variable()
+}
+
+class PlantUML::ClassDiagram::Class {
+  attribute
+  parents
+  variables
+  methods
+  build()
+}
+
+abstract class PlantUML::ClassDiagram::Class::Base {
+  name
+  attribute
+  build()
+}
+
+class PlantUML::ClassDiagram::Class::Variable {
+  name
+  attribute
+  build()
+}
+
+class PlantUML::ClassDiagram::Class::Method {
+  name
+  attribute
+  build()
+}
+
+class PlantUML::ClassDiagram::Relation {
+  from
+  to
+  name
+  build()
+}
+
+/'
+class CommentOutClass {
+}
+'/
+
+PlantUML::ClassDiagram::Class *-- PlantUML::ClassDiagram::Class::Variable
+PlantUML::ClassDiagram::Class *-- PlantUML::ClassDiagram::Class::Method
+PlantUML::ClassDiagram::Class <-- PlantUML::ClassDiagram::Relation
+PlantUML::ClassDiagram::Class::Factory <-- PlantUML::ClassDiagram::Class
+PlantUML::ClassDiagram::Class::Factory ..|> PlantUML::ClassDiagram::Class::Variable
+PlantUML::ClassDiagram::Class::Factory ..|> PlantUML::ClassDiagram::Class::Method
+PlantUML::ClassDiagram::Class::Variable -down-|> PlantUML::ClassDiagram::Class::Base
+PlantUML::ClassDiagram::Class::Method -down-|> PlantUML::ClassDiagram::Class::Base
+
+@enduml

@@ -1,0 +1,36 @@
+---
+abstract: 'Deprecated use https://github.com/ossc-db/pg_bulkload/'
+author:
+  - 'John Karr <brainbuz@brainbuz.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0522, CPAN::Meta::Converter version 2.150001'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pg-BulkCopy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp::Always: '0.12'
+  Config::Any: '0'
+  Config::General: '2.5'
+  Config::Std: '0.9'
+  Cwd: '3.33'
+  DBD::Pg: v2.17.0
+  DBIx::Simple: '1.35'
+  File::Copy: '0'
+  Getopt::Long: '2.38'
+  IO::CaptureOutput: '1.1102'
+  Log::Handler: '0'
+  Moose: '2'
+  Test::Exception: '0.31'
+  Test::More: '0.98'
+version: '0.22'
+

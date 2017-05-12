@@ -1,0 +1,42 @@
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test
+PROTOTYPES: DISABLE
+
+I32 test_typemap_incast_av (SV* arg) {
+    AV* arr = typemap_incast<AV*>(arg);
+    arr = typemap_incast<AV*>(arg); arr = typemap_incast<AV*>(arg);
+    RETVAL = av_len(arr)+1;
+}
+
+I32 test_typemap_incast_av2 (SV* arg, SV* arg2) {
+    RETVAL = av_len(typemap_incast<AV*>(arg))+av_len(typemap_incast<AV*>(arg2))+2;
+}
+
+int test_typemap_incast_myrefcounted (SV* arg) {
+    RETVAL = typemap_incast<MyRefCounted*>(arg)->val;
+}
+
+SV* test_typemap_outcast_av (SV* listref) {
+    AV* list = typemap_incast<AV*>(listref);
+    AV* ret = newAV();
+    if (list) for (int i = 0; i <= av_len(list); ++i) av_push(ret, newSViv(1));
+    RETVAL = typemap_outcast<AV*>(ret);
+}
+
+SV* test_typemap_outcast_complex (SV* inobjref) {
+    MyRefCountedChildSP inobj = typemap_incast<MyRefCountedChildSP>(inobjref);
+    AV* ret = newAV();
+    av_push(ret, newSViv(inobj->val));
+    av_push(ret, typemap_outcast<MyBaseSP, const char* CLASS>(MyBaseSP(new MyBase(inobj->val2)), "Panda::XS::Test::MyBaseSP"));
+    RETVAL = typemap_outcast<AV*>(ret);
+}
+
+SV* test_typemap_outcast_wrap (int arg1, int arg2) {
+    RETVAL = typemap_outcast<WChild*, const char* CLASS>(new WChild(arg1, arg2), "Panda::XS::Test::WChild");
+}
+
+void test_typemap_incast_wrap (SV* arg) {
+    WChild* ch = typemap_incast<WChild*>(arg);
+    mXPUSHs(newSViv(ch->val));
+    mXPUSHs(newSViv(ch->val2));
+    XSRETURN(2);
+}

@@ -1,0 +1,110 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+use warnings;
+use PGXN::Meta::Validator;
+use Getopt::Long;
+
+GetOptions(
+    'help|h'    => \my $help,
+    'man|m'     => \my $man,
+    'version|v' => \my $version,
+) or _pod2usage();
+
+_pod2usage(
+    ( $man ? ( '-sections' => '.+' ) : ()),
+    '-exitval' => 0,
+) if $help or $man;
+
+if ($version) {
+    require File::Basename;
+    print File::Basename::basename($0), ' ',
+        PGXN::Meta::Validator->version_string, $/;
+    exit;
+}
+
+my $file = shift || -e 'META.json' ? 'META.json' : _pod2usage();
+die "$file is not a valid, readable filename\n" unless -r $file;
+
+my $pmv = PGXN::Meta::Validator->load_file($file);
+
+if ($pmv->is_valid) {
+    print "$file is OK\n";
+    exit;
+}
+
+print "$file is invalid. Errors:\n  ",
+    join("\n  ", $pmv->errors),
+    "\n";
+exit 1;
+
+sub _pod2usage {
+    require Pod::Usage;
+
+    my $sections = 'Usage|Options';
+    if ($0 =~ /pgxn-validate-meta/) {
+        print "Usage:\n      pgxn validate-meta\n      pgxn validate-meta mumble.json\n\n";
+        $sections = 'Options';
+    }
+    Pod::Usage::pod2usage(
+        '-verbose'  => 99,
+        '-sections' => "(?i:($sections))",
+        '-exitval'  => 1,
+        '-input'    => __FILE__,
+        @_
+    );
+}
+
+1;
+__END__
+
+=head1 Name
+
+validate_pgxn_meta - Validate the structure of a PGXN F<META.json> file
+
+=head1 Usage
+
+  validate_pgxn_meta
+  validate_pgxn_meta mumble.json
+
+=head1 Options
+
+  -h --help     Print a usage statement and exit.
+  -M --man      Print the complete documentation and exit.
+  -v --version  Print the version number and exit.
+
+=head1 Description
+
+Validates a PGXN F<META.json> file against the PGXN meta specification. If a
+file name is passed, that file will be validated. Otherwise, if a file named
+F<META.json> exists in the current directory, it will be validated.
+
+=head1 Output
+
+If F<META.json> valid, the output will be:
+
+  META.json is OK
+
+If it's not valid, the output will look something like:
+
+  META.json is invalid. Errors:
+    Missing mandatory field, 'license' (license) [Validation: 1.0.0]
+
+=head1 See Also
+
+L<PGXN::Meta::Validator> is the class that does the actual validation, and may
+be used programmatically.
+
+=head1 Author
+
+David E. Wheeler <david@justatheory.com>
+
+=head1 Copyright and License
+
+Copyright (c) 2011 David E. Wheeler. Some Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

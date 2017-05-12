@@ -1,0 +1,17 @@
+Revision history for PGObject-Util-PseudoCSV
+
+1.1.1	2014-09-18
+	Corrected inconsistency between license texts
+
+1.1.0   2014-08-06
+        Meta now lists repo
+        Direct to hash api
+        Code cleanup
+        PseudoCSV creation API
+
+1.0.3	2014-08-25
+        Minor documentation fixes
+
+1.0.0	2014-03-03
+        First version, released on an unsuspecting world.
+

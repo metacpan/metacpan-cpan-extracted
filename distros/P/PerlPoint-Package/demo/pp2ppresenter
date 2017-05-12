@@ -1,0 +1,995 @@
+#!/usr/bin/perl -w
+
+# = HISTORY SECTION =====================================================================
+
+# ---------------------------------------------------------------------------------------
+# version | date   | author   | changes
+# ---------------------------------------------------------------------------------------
+# 0.01    |21.10.01| JSTENZEL | derived from my pp2cppp.
+# ---------------------------------------------------------------------------------------
+
+# = POD SECTION =========================================================================
+
+=head1 NAME
+
+B<pp2ppresenter> - translates PerlPoint into XML readable by Mark Overmeers PPresenter
+
+=head1 VERSION
+
+This manual describes version B<0.01>.
+
+=head1 DESCRIPTION
+
+This is a demonstration application of the PerlPoint package. It
+translates PerlPoint into XML readable by Mark Overmeers PPresenter.
+
+=head1 SYNOPSIS
+
+pp2ppresenter [<options>] <PerlPoint sources>
+
+=head2 Options
+
+All options can be abbreviated uniqly.
+
+=over 4
+
+=item -activeContents
+
+PerlPoint sources can embed Perl code which is evaluated while the source is parsed. For
+reasons of security this feature is deactivated by default. Set this option to active
+it. You can use I<-safeOpcode> to fine tune which operations shall be permitted.
+
+=item -cache
+
+parsing of one and the same document several times can be accelerated by activating the
+PerlPoint parser cache by this option. The performance boost depends on your document
+structure.
+
+Cache files are written besides the source and named ".<source file>.ppcache".
+
+It can be useful to (temporarily) deactivate the cache to get correct line numbers in
+parser error messages (currently numbers cannot always reported correctly with activated
+cache because of a special perl behaviour).
+
+=item -cacheCleanup
+
+PerlPoint parser cache files grow (with every modified version of a source parsed)
+because they store expressions for every parsed variant of a paragraph. This is usually
+uncritical but you may wish to clean up the cache occasionally. Use this option to
+perform the task (or remove the cache file manually).
+
+
+=item geometry <geometry setup string>
+
+geometry setting to control the size and proportions of the projector window.
+Defaults to "1024x768". See the PPresenter docs for details.
+
+
+=item -help
+
+displays an online help and terminates the script.
+
+
+=item imageBaseSize <image geometry setup string>
+
+geometry setting to control the base size and proportions of displayed images.
+Defaults to "1024x768". See the PPresenter docs for details.
+
+
+=item -nocopyright
+
+suppresses the copyright message;
+
+=item -noinfo
+
+supresses runtime informations;
+
+=item -nowarn
+
+supresses warnings;
+
+=item -quiet
+
+a shortcut for "-nocopyright -noinfo -nowarn": all non critical runtime messages are suppressed;
+
+=item -safeOpcode <opcode>
+
+If active contents is enabled (I<-activeContents>), Perl code embedded into the translated PerlPoint
+sources will be evaluated. To keep security this is done via an object of class B<Safe> which restricts
+code to permitted operations. By this option you can declare which opcode (or opcode tag) is permitted.
+Please see the B<Safe> and B<Opcode> manual pages for further details. (These modules come with perl.)
+
+Pass C<ALL> to allow I<everything>.
+
+This option can be used multiply.
+
+You may want to store these options in default option files, see below for details.
+
+
+=item -set <flag>
+
+This option allows you to pass certain settings - of your choice - to active contents
+(like conditions) where it can be accessed via the $PerlPoint hash reference. For
+example, your PerlPoint code could contain a condition like
+
+  ? $PerlPoint->{userSettings}{special}
+
+  Special part.
+
+  ? 1
+
+. The special part enclosed by the two conditions would then be processed I<only> if you
+call B<pp2ppresenter> with
+
+  -set special
+
+- and if active contents was enabled by I<-active>, of course.
+
+This option can be used multiply.
+
+
+=item -title <title string>
+
+sets a presentation title.
+
+
+=item -trace [<level>]
+
+activates traces of the specified level. You may use the environment variable SCRIPTDEBUG
+alternatively (but an option overwrites environment settings). The following levels are
+defined  (use the I<numeric> values) - if a description sounds cryptic to you, just ignore
+the setting:
+
+=over 4
+
+=item zero (0)
+
+same as omitting the option: all traces are suppressed.
+
+=item one (1)
+
+paragraph detection,
+
+=item two (2)
+
+lexer traces,
+
+=item four (4)
+
+parsing,
+
+=item eight (8)
+
+semantic actions embedded into parsing,
+
+=item sixteen (16)
+
+active contents,
+
+=item thirtytwo (32)
+
+backend traces.
+
+=back
+
+Using different levels may cause unexpected results.
+
+Several levels are combined by addition.
+
+ # activate lexer and parser traces
+ -trace 6
+
+=back
+
+=head2 Option files
+
+Options may be loaded from files where they are stored exactly as you write them in the
+command line, but may be spread to several lines and extended by comment lines which start
+with a "#" character. To mark an option file in the commandline, simply enter its (path and)
+name prededed by a "@" character, for example
+
+  pp2ppresenter @myOptions ppfile
+
+  where the file myOptions could look like
+
+  # suppress infos
+  -noinfo
+
+Option files may be nested. To avoid endless recursion, every option file is resolved only
+the first time it is detected.
+
+  # this is an option file which
+  # refers to another option file
+  -noinfo @moreOptions
+
+The script also takes care of I<default option files> which means that usual options can
+be stored in files named C<.pp2ppresenter>. If such a file is placed in the directory where the script itself
+resides, options in the file are read in automatically by all pp2ppresenter calls. These are global
+settings. If you place such a file in your home directory, it is read automatically as well
+but only if pp2ppresenter is called under your account, so this is for personal preferences.
+
+A personal default option file overwrites global settings, and all default options are
+overwritten by options passed to the script call.
+
+
+=head1 SUPPORTED TAGS
+
+All supported tags are declared by B<PerlPoint::Tags::SDF> (currently, this shall become
+C<PerlPoint::Tags::XML>). Please see there for a complete list.
+
+B<pp2ppresenter> supports several foreign tags initially introduced by C<pp2html>.
+Support means that they are handled, but possibly different to the original handling.
+
+At the moment, the only tag of this type is C<\L>, which is translated into an HTML
+like hyperlink. Note: PPresenter support of hyperlinks is only assumed yet.
+
+
+=head1 EMBEDDING TARGET CODE
+
+There may be things you want to see in the target document but find no way to express
+them in PerlPoint. Well, PerlPoint lets you embed target code very easily directly into
+the PerlPoint script. Nevertheless, it is recommended to use native PerlPoint wherever
+possible ;-).
+
+Please note that embedded target code intended for certain translators like B<pp2ppresenter>
+may be B<I<ignored>> if the PerlPoint document is processed by I<other> translators.
+pp2html, for example, accepts embedded HTML but ignores embedded XML.
+
+=head2 Embedding XML
+
+Just use the B<\EMBED> and B<\END_EMBED> tags to place native XML if really
+necessary:
+
+  This is \I<PerlPoint> with embedded
+  \EMBED{lang=xml}<B>XML<B/>\END_EMBED.
+
+  \EMBED{lang=xml}
+
+  <UL>
+
+    <LI>This ...<LI/>
+
+    <LI>... and that.<LI/>
+
+  <UL/>
+
+  \END_EMBED
+
+You may as well I<include> complete XML files by B<\INCLUDE>.
+
+  \INLUDE{type=xml file="snippet.xml"}
+
+
+=head2 Embedding other languages
+
+B<pp2ppresenter> will ignore any other embedded or included target language than XML.
+
+
+=head1 PREDECLARED VARIABLES
+
+B<pp2ppresenter> predeclares several variables which can be used like any user defined PerlPoint
+variable.
+
+=over 4
+
+=item CONVERTER_NAME
+
+The name of the converter currently processing the document ("pp2ppresenter").
+
+=item CONVERTER_VERSION
+
+The version of the running converter.
+
+=back
+
+
+=head1 FILES
+
+=head1 ENVIRONMENT
+
+=over 4
+
+=item SCRIPTDEBUG
+
+may be set to a numeric value to activate certain trace levels. You can use option I<-trace>
+alternatively (note that a used option overwrites an environment setting). The several levels
+are described with this option.
+
+=back
+
+=head1 NOTES
+
+PerlPoint allows to process a document by all of its converters. Nevertheless,
+possibly several foreign tags might be ignored. See above for details.
+
+This is a I<demo>. Not all PPresenter features might be supported, but feel free
+to make this software the base of an improved implementation. Just let me know.
+
+
+=head1 FILES
+
+B<pp2ppresenter> activates the PerlPoint parser cache to accelerate repeated translations.
+Because of this the usual PerlPoint parser cache files will be written next to the
+parsed sources (as ".<source file name>.ppcache" in the source directory).
+
+
+=head1 SEE ALSO
+
+The PPresenter homepage (http://ppresenter.org).
+
+PerlPoint::Tags::XML
+
+PerlPoint::Parser
+
+PerlPoint::Backend
+
+
+=head1 AUTHOR
+
+Copyright (c) Jochen Stenzel (perl@jochen-stenzel.de), 2001. All rights reserved.
+
+This script is free software, you can redistribute it and/or modify it
+under the terms of the Artistic License distributed with Perl version
+5.003 or (at your option) any later version. Please refer to the
+Artistic License that came with your Perl distribution for more
+details.
+
+The Artistic License should have been included in your distribution of
+Perl. It resides in the file named "Artistic" at the top-level of the
+Perl source tree (where Perl was downloaded/unpacked - ask your
+system administrator if you dont know where this is).  Alternatively,
+the current version of the Artistic License distributed with Perl can
+be viewed on-line on the World-Wide Web (WWW) from the following URL:
+http://www.perl.com/perl/misc/Artistic.html
+
+
+=head1 DISCLAIMER
+
+This software is distributed in the hope that it will be useful, but
+is provided "AS IS" WITHOUT WARRANTY OF ANY KIND, either expressed or
+implied, INCLUDING, without limitation, the implied warranties of
+MERCHANTABILITY and FITNESS FOR A PARTICULAR PURPOSE.
+
+The ENTIRE RISK as to the quality and performance of the software
+IS WITH YOU (the holder of the software).  Should the software prove
+defective, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR
+CORRECTION.
+
+IN NO EVENT WILL ANY COPYRIGHT HOLDER OR ANY OTHER PARTY WHO MAY CREATE,
+MODIFY, OR DISTRIBUTE THE SOFTWARE BE LIABLE OR RESPONSIBLE TO YOU OR TO
+ANY OTHER ENTITY FOR ANY KIND OF DAMAGES (no matter how awful - not even
+if they arise from known or unknown flaws in the software).
+
+Please refer to the Artistic License that came with your Perl
+distribution for more details.
+
+=cut
+
+# declare script package
+package PerlPoint::Converter::pp2ppresenter;
+
+# declare version
+$VERSION=$VERSION=0.01;
+
+# pragmata
+use strict;
+
+# load modules
+use Carp;
+use Safe;
+use Getopt::Long;
+use XML::Generator;
+use File::Basename;
+use PerlPoint::Tags;
+use PerlPoint::Backend;
+use PerlPoint::Constants;
+use PerlPoint::Tags::SDF;
+use PerlPoint::Parser 0.36;
+use Getopt::ArgvFile qw(argvFile);
+
+
+# declare variables
+my (
+    $tocPosition,               #  1: marks where we currently are (current document position);
+    $toc,                       #  2: TOC structure;
+    $commentString,             #  3: comment buffer;
+
+    @streamData,                #  4: PerlPoint stream;
+    @openLists,
+    @openTags,                  #  5: a buffer used to autoclose / autoopen tags exceeding example lines;
+    @stack,                     #  6: result stack;
+    @headlineNumbers,           #  7: internal headline number memory, used for \LOCALTAG;
+
+    %flags,                     #  8: flag hash;
+    %options,                   #  9: option hash;
+    %table,                     # 10: a table buffer
+    %tagHash,                   # 11: accepted PerlPoint tags;
+   )=(
+      -1,                       #  1
+     );
+
+# resolve option files
+argvFile(default=>1, home=>1);
+
+# get options
+GetOptions(\%options,
+                      "activeContents",    # evaluation of active contents;
+                      "cache",             # control the cache;
+                      "cacheCleanup",      # cache cleanup;
+                      "help",              # online help, usage;
+                      "nocopyright",       # suppress copyright message;
+                      "noinfo",            # suppress runtime informations;
+                      "nowarn",            # suppress runtime warnings;
+                      "quiet",             # suppress all runtime messages except of error ones;
+                      "safeOpcode=s@",     # permitted opcodes in active contents;
+                      "set=s@",            # user settings;
+                      "tagset=s@",         # add a tag set to the scripts own tag declarations;
+                      "title=s",           # presentation title;
+                      "geometry=s",        # presentations screen geometry;
+                      "imageBaseSize=s",   # image base size;
+                      "trace:i",           # activate trace messages;
+          );
+
+# propagate options as necessary
+@options{qw(nocopyright noinfo nowarn)}=() x 3 if exists $options{quiet};
+$options{trace}=$ENV{SCRIPTDEBUG} if not exists $options{trace} and exists $ENV{SCRIPTDEBUG};
+
+# display copyright unless suppressed
+warn "\n",
+     basename($0), ' ',
+     do {no strict 'refs'; ${join('::', __PACKAGE__, 'VERSION')}},
+     ", (c) J. Stenzel (perl\@jochen-stenzel.de) 2001. \n\n"
+  unless exists $options{nocopyright};
+
+# check for a help request
+(exec("pod2text $0 | less") or die "[Fatal] exec() cannot be called: $!\n") if $options{help};
+
+# check usage
+die "[Fatal] Usage: $0 [<options>] <PerlPoint source(s)>\n" unless @ARGV>=1;
+
+# check passed sources
+-r or die "[Fatal] Source file $_ does not exist or is unreadable.\n" foreach @ARGV;
+
+# check options
+die "[Fatal] No title specified.\n" unless exists $options{title};
+
+# set option defaults, if necessary
+$options{geometry}='1024x768'      unless exists $options{geometry};
+$options{imageBaseSize}='1024x768' unless exists $options{imageBaseSize};
+
+# import tags
+PerlPoint::Tags::addTagSets(@{$options{tagset}}) if exists $options{tagset};
+
+# tag translation table
+%tagHash=(
+          # base
+	  B     => 'B',
+	  C     => 'CODE',
+	  I     => 'I',
+
+          # imported tags
+          U     => 'U',
+	 );
+
+
+# build XML generator
+my $xml=new XML::Generator(
+                           escape      => 'true',
+                           pretty      => 2,
+                           conformance => 'strict',
+                          );
+
+# build parser
+my $parser=new PerlPoint::Parser;
+
+# Set up active contents handling. By default, we use a Safe object.
+my $safe=new Safe;
+if (exists $options{safeOpcode})
+ {
+  unless (grep($_ eq 'ALL', @{$options{safeOpcode}}))
+    {
+     # configure compartment
+     $safe->permit(@{$options{safeOpcode}});
+    }
+  else
+    {
+     # simply flag that we want to execute active contents
+     $safe=1;
+    }
+ }
+
+# and call it
+$parser->run(
+             stream          => \@streamData,
+             files           => \@ARGV,
+
+             filter          => 'perl|xml',
+
+             safe            => exists $options{activeContents} ? $safe : undef,
+             activeBaseData  => {
+                                 targetLanguage => 'XML',
+                                 userSettings   => {map {$_=>1} exists $options{set} ? @{$options{set}} : ()},
+                                },
+
+             predeclaredVars => {
+                                 CONVERTER_NAME    => basename($0),
+                                 CONVERTER_VERSION => do {no strict 'refs'; ${join('::', __PACKAGE__, 'VERSION')}},
+                                },
+
+             headlineLinks   => 1,
+             vispro          => 1,
+             cache           =>   (exists $options{cache} ? CACHE_ON : CACHE_OFF)
+                                + (exists $options{cacheCleanup} ? CACHE_CLEANUP : 0),
+             display         =>   DISPLAY_ALL
+                                + (exists $options{noinfo} ? DISPLAY_NOINFO : 0)
+                                + (exists $options{nowarn} ? DISPLAY_NOWARN : 0),
+             trace           =>   TRACE_NOTHING
+                                + ((exists $options{trace} and $options{trace} &  1) ? TRACE_PARAGRAPHS : 0)
+                                + ((exists $options{trace} and $options{trace} &  2) ? TRACE_LEXER      : 0)
+                                + ((exists $options{trace} and $options{trace} &  4) ? TRACE_PARSER     : 0)
+                                + ((exists $options{trace} and $options{trace} &  8) ? TRACE_SEMANTIC   : 0)
+                                + ((exists $options{trace} and $options{trace} & 16) ? TRACE_ACTIVE     : 0),
+            ) or exit(1);
+
+# build a backend
+my $backend=new PerlPoint::Backend(
+                                   name    => 'xml:pp2ppresenter',
+                                   display =>   DISPLAY_ALL
+                                              + (exists $options{noinfo} ? DISPLAY_NOINFO : 0)
+                                              + (exists $options{nowarn} ? DISPLAY_NOWARN : 0),
+                                   trace   =>   TRACE_NOTHING
+                                              + ((exists $options{trace} and $options{trace} & 32) ? TRACE_BACKEND : 0),
+                                   vispro  => 1,
+                                  );
+
+# register backend handlers
+$backend->register(DIRECTIVE_DOCUMENT, \&handleDocument);
+$backend->register(DIRECTIVE_BLOCK, \&handleBlock);
+$backend->register(DIRECTIVE_COMMENT, \&handleComment);
+$backend->register(DIRECTIVE_HEADLINE, \&handleHeadline);
+$backend->register(DIRECTIVE_SIMPLE, \&handleSimple);
+$backend->register(DIRECTIVE_TAG, \&handleTag);
+$backend->register(DIRECTIVE_TEXT, \&handleText);
+$backend->register(DIRECTIVE_VERBATIM, \&handleBlock);
+
+$backend->register($_, \&handleList) foreach (DIRECTIVE_ULIST, DIRECTIVE_OLIST, DIRECTIVE_DLIST);
+$backend->register($_, \&handleListPoint) foreach (DIRECTIVE_UPOINT, DIRECTIVE_OPOINT, DIRECTIVE_DPOINT);
+$backend->register(DIRECTIVE_DPOINT_ITEM, \&handleDListPointItem);
+$backend->register($_, \&handleListShift) foreach (DIRECTIVE_LIST_LSHIFT, DIRECTIVE_LIST_RSHIFT);
+
+
+
+# init several variables
+@flags{qw(listlevel headline headlineSeen comment)}=(1, 0, 0, 0);
+
+# build a translation table
+my %translations=(
+                  "\334" => "&Uuml;",
+                  "\374" => "&uuml;",
+
+                  "\326" => "&Ouml;",
+                  "\366" => "&ouml;",
+
+                  "\304" => "&Auml;",
+                  "\344" => "&auml;",
+
+                  "\337" => "&szlig;",
+                 );
+
+
+
+# get document structure
+$backend->bind(\@streamData);
+$toc=$backend->toc;
+
+# and run it
+$backend->run(\@streamData);
+
+
+# SUBROUTINES ###############################################################################
+
+
+
+# document handler
+sub handleDocument
+ {
+  # get parameters
+  my ($opcode, $mode, @contents)=@_;
+
+  # act mode dependend
+  if ($mode==DIRECTIVE_START)
+    {
+     # print intro
+     print <<EOI;
+<?xml version="1.0"?>
+<!DOCTYPE presentation SYSTEM "ppr-simple.dtd">
+
+<presentation title='$options{title}' geometry='$options{geometry}' imagesizebase='$options{imageBaseSize}'>
+
+EOI
+    }
+  else
+    {
+     # print last slide, if any
+     if (@stack)
+       {
+        # print slide
+        print "\n\n",
+              $flags{headlineSeen} ? $xml->slide(
+                                                 {
+                                                  title    => $stack[0],
+                                                  template => 'dtm',
+                                                 },
+                                                 $xml->body(@stack[1..$#stack]),
+                                                )
+                                   : @stack,
+              "\n\n";
+
+        # clean stack up
+        undef @stack;
+
+        # close document
+        print "\n\n</presentation>\n";
+       }
+    }
+ }
+
+
+# simple directive handlers
+sub handleSimple
+ {
+  # get parameters
+  my ($opcode, $mode, @contents)=@_;
+
+  @contents=map
+             {
+              # complete block lines as necessary
+              if ($flags{block})
+                {
+                 # no open tag: simply add the correct intro
+                 s/\n/\n\t/;
+                }
+
+              # supply result
+              $_;
+             } @contents;
+
+  # simply print the token (preface new lines by a mark within blocks, and buffer them in tables)
+  my $contents=join('', @contents);
+  $contents=~s/$_/\\$translations{$_}/g foreach (keys %translations);
+  present($contents) unless $flags{headline};
+ }
+
+# headlines (are generated with an anchor identical to the title)
+sub handleHeadline
+ {
+  # get parameters
+  my ($opcode, $mode, $level, $contents)=@_;
+
+  # act mode dependend
+  if ($mode==DIRECTIVE_START)
+    {
+     # update headline numbers
+     splice(@headlineNumbers, $level+1); $headlineNumbers[$level]++;
+
+     # print previous slide, if any
+     if (@stack)
+       {
+        # print slide
+        print "\n\n",
+              $flags{headlineSeen} ? $xml->slide(
+                                                 {
+                                                  title    => $stack[0],
+                                                  template => 'dtm',
+                                                 },
+                                                 $xml->body(@stack[1..$#stack]),
+                                                )
+                                   : @stack,
+              "\n\n";
+
+        # clean stack up
+        undef @stack;
+       }
+
+     # start new slide on stack
+     push(@stack, $contents);
+
+     # mark that we process a headline, and that we saw at least one headline
+     $flags{headlineSeen}=$flags{headline}=1;
+    }
+  else
+    {
+     # mark that headline is completed
+     $flags{headline}=0;
+    }
+
+  # new lists start at level 1
+  $flags{listlevel}=1;
+ }
+
+# text
+sub handleText
+ {
+  # get parameters
+  my ($opcode, $mode)=@_;
+
+  # separate paragraphs
+  push(@stack, $xml->p) if $_[1]==DIRECTIVE_START;
+ }
+
+# tags
+sub handleTag
+ {
+  # get parameters
+  my ($opcode, $mode, $tag, $settings)=@_;
+
+  # image tag translation is done straight forward
+  if ($tag eq 'IMAGE')
+    {
+     # compose an image tag
+     push(@stack, $xml->img({%$settings})) if $mode==DIRECTIVE_START;
+
+     # ok, well done
+     return(1);
+    }
+
+  # handle *tables*
+  if ($tag eq 'TABLE')
+    {
+     # act mode dependend
+     if ($mode==DIRECTIVE_START)
+       {
+        # start a new table (in memory)
+        %table=();
+       }
+     else
+       {
+        # get the greatest number of columns
+        my $rowNr=0;
+        $rowNr>=@$_ or $rowNr=@$_ for (@{$table{rows}});
+
+        # print table
+        print "=table $rowNr;;;;;\n";
+        print join(';;;;;', @$_), "\n" foreach (@{$table{rows}});
+
+        # clean up
+        %table=();
+       }
+
+     # ok, well done
+     return(1);
+    }
+  elsif ($tag eq 'TABLE_ROW')
+    {
+     # act mode dependend
+     push(@{$table{rows}}, []) if $mode==DIRECTIVE_START;
+
+     # ok, well done
+     return(1);
+    }
+  elsif ($tag eq 'TABLE_COL')
+    {
+     # act mode dependend
+     push(@{$table{rows}[-1]}, '') if $mode==DIRECTIVE_START;
+
+     # ok, well done
+     return(1);
+    }
+  elsif ($tag eq 'TABLE_HL')
+    {
+     # act mode dependend
+     push(@{$table{rows}[-1]}, '') if $mode==DIRECTIVE_START;
+
+     # ok, well done
+     return(1);
+    }
+  elsif ($tag eq 'L')
+    {
+     # act mode dependend
+     if ($mode==DIRECTIVE_START and exists $tagHash{$tag})
+       {
+        # open the XML tag
+        present(qq(\\<A HREF="$settings->{url}"\\>));
+       }
+     if ($mode==DIRECTIVE_COMPLETE and exists $tagHash{$tag})
+       {
+        # close CPPP tag
+        present("\\</A\\>");
+       }
+
+     # ok, well done
+     return(1);
+    }
+  elsif ($tag eq 'LOCALTOC')
+    {
+     # act mode dependend - we only need to handle this once, there is no tag body
+     if ($mode==DIRECTIVE_START)
+       {
+        # get local toc
+        my $toc=$backend->toc($backend->currentChapterNr, $settings->{depth});
+
+        # anything found?
+        if (@$toc)
+          {
+           # make it a list of the requested format
+           if ($settings->{format} eq 'bullets')
+             {
+              present($xml->ul((map {$xml->li($_->[1])} @$toc)));
+             }
+           elsif ($settings->{format} eq 'enumerated')
+             {present($xml->ol((map {$xml->li($_->[1])} @$toc)));}
+           elsif ($settings->{format} eq 'numbers')
+             {
+              # make a temporary headline number array copy
+              my @localHeadlineNumbers=@headlineNumbers;
+
+              # handle all provided subchapters
+              present($xml->ul(
+                               map
+                                {
+                                 # get level and title
+                                 my ($level, $title)=@$_;
+
+                                 # update headline numbering
+                                 splice(@headlineNumbers, $level+1);
+                                 $headlineNumbers[$level]++;
+
+                                 # build result
+                                 $xml->li(join('.', @headlineNumbers[1..$level]), '. ', $title);
+                                } @$toc
+                              )
+                     )
+             }
+           else
+             {die "[BUG] Unhandled case $settings->{format}."}
+          }
+       }
+
+     # ok, well done
+     return(1);
+    }
+  elsif ($tag eq 'SEQ')
+    {
+     # act mode dependend (all we have to do is to present a number)
+     present($settings->{__nr__}) if $mode==DIRECTIVE_START;
+
+     # ok, well done
+     return(1);
+    }
+
+  # translatable tags: act mode dependend
+  if ($mode==DIRECTIVE_START and exists $tagHash{$tag})
+    {
+     # open the XML tag
+     present("\\<$tagHash{$tag}\\>");
+    }
+  if ($mode==DIRECTIVE_COMPLETE and exists $tagHash{$tag})
+    {
+     # close CPPP tag
+     present("\\</$tagHash{$tag}\\>");
+    }
+ }
+
+# blocks
+sub handleBlock
+ {
+  # get parameters
+  my ($opcode, $mode)=@_;
+
+  # act mode dependend
+  if ($mode==DIRECTIVE_START)
+    {
+     push(@stack, "\n\\<pre\\>\n");
+    }
+  else
+    {
+     push(@stack, "\n\\</pre\\>\n");
+    }
+ }
+
+# list
+sub handleList
+ {
+  # get parameters
+  my ($opcode, $mode, $wishedStartNr, $prevShifter, $prevShiftLevel, $nextShifter, $nextShiftLevel)=@_;
+
+  # update list hints
+  $flags{listpoints}=defined $wishedStartNr ? $wishedStartNr-1 : 0 if $mode==DIRECTIVE_START;
+
+  # open or close the correct list (unless we are at a list shifting edge)
+  my $tag={DIRECTIVE_ULIST()=>'ul', DIRECTIVE_OLIST()=>'ol'}->{$opcode};
+  push(@stack, "\n\\<", ($mode==DIRECTIVE_START ? '' : '/'), $tag, "\\>\n")
+    unless (
+                (
+                     $mode==DIRECTIVE_START
+                 and $prevShifter==DIRECTIVE_LIST_LSHIFT
+                )
+            or  (
+                     $mode==DIRECTIVE_COMPLETE
+                 and $nextShifter==DIRECTIVE_LIST_RSHIFT
+                )
+           );
+ }
+
+# list shift
+sub handleListShift
+ {
+  # get parameters
+  my ($opcode, $mode, $offset)=@_;
+
+  # anything to do?
+  return unless $mode==DIRECTIVE_START;
+
+  # handle operation dependend
+  $flags{listlevel}+=$offset if $opcode==DIRECTIVE_LIST_RSHIFT;
+  $flags{listlevel}-=$offset if $opcode==DIRECTIVE_LIST_LSHIFT;
+  $flags{listlevel}=1 if $flags{listlevel}<1;
+ }
+
+# list point
+sub handleListPoint
+ {
+  # get parameters
+  my ($opcode, $mode, @data)=@_;
+
+  # update list counter if the item begins
+  $openLists[0]++ if $mode==DIRECTIVE_START;
+
+  # update list point counter
+  $flags{listpoints}++;
+
+  # act mode dependend
+  present("\n\\<li\\>")  if $mode==DIRECTIVE_START;
+  present("\n\\</li\\>") if $mode==DIRECTIVE_COMPLETE;
+ }
+
+# definition list point item
+sub handleDListPointItem
+ {
+  # get parameters
+  my ($opcode, $mode, @data)=@_;
+
+  # by default, we simply add a colon to separate it from following explanations
+  print ': ' if $mode==DIRECTIVE_COMPLETE;
+ }
+
+# comment
+sub handleComment
+ {
+  # get parameters
+  my ($opcode, $mode)=@_;
+
+  # act mode dependend
+  if ($mode==DIRECTIVE_START)
+    {
+     # flag that we are in a comment
+     $flags{comment}=1;
+    }
+  else
+    {
+     # reset flag
+     $flags{comment}=0;
+
+     # store comment - and for now, ignore it ("-" make XML trouble!?)
+     # push(@stack, $xml->xmlcmnt($commentString));
+    }
+ }
+
+
+# write output to STDOUT or buffer it
+sub present
+ {
+  # build a string
+  my $string=join('', @_);
+
+  # present result
+  if (%table)
+    {$table{rows}[-1][-1].=$string;}
+  elsif ($flags{comment})
+    {$commentString.=$string;}
+  else
+    {
+     push(@stack, $string);
+    }
+ }
+  

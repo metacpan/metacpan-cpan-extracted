@@ -1,0 +1,16 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include/qt4/QtWebKit
+qt_config=lex yacc uic resources qt release incremental link_prl exceptions no_mocdepend release stl qt_no_framework system-sqlite release shared dll largefile stl precompile_header mmx 3dnow sse sse2 dylib create_prl link_prl depend_includepath QTDIR_build nostrip use_libmysqlclient_r building-libs depend_includepath qt_install_headers qt warn_on depend_includepath qmake_cache target_qt hide_symbols create_libtool create_pc explicitlib x11 link_pkgconfig x11lib x11inc moc thread shared dll
+moc_location=/usr/bin/moc-qt4
+uic_location=/usr/bin/uic-qt4
+
+Name: Qtwebkit
+Description: Qtwebkit Library
+Version: 4.6.3
+Libs: -L${libdir} -lQtWebKit 
+Libs.private: -L/usr/lib -L/usr/X11R6/lib64  -lsqlite3 -lphonon -L/usr/lib -lQtDBus -lQtXml -L/usr/X11R6/lib64 -lQtXmlPatterns -lQtGui -lQtNetwork -lQtCore -lfontconfig -lpthread -lXrender -lfontconfig -lfreetype -lXext -lX11 -lm  
+Cflags: -DQT_SHARED -I/usr/include/qt4 -I${includedir}
+Requires: QtCore QtGui QtNetwork
+

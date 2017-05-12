@@ -1,0 +1,107 @@
+=head1 NAME
+
+MyTestDoc3 - test documentation 3
+
+=head1 SYNOPSIS
+
+    use Pod::HTMLEmbed;
+
+=head1 DESCRIPTION
+
+=head1 UL1
+
+=over
+
+=item * foo
+
+=item * bar
+
+=back
+
+=head1 UL2
+
+=over
+
+=item *
+
+foo
+
+=item *
+
+bar
+
+=back
+
+=head1 UL3
+
+=over
+
+=item * 
+
+foo
+
+bar
+
+=item * 
+
+bar
+
+buzz
+
+=back
+
+=head1 UL4
+
+=over
+
+=item * 
+
+foo
+
+=item * 
+
+bar
+
+    buzz
+
+=back
+
+=head1 OL1
+
+=over
+
+=item 1.
+
+foo
+
+=item 2.
+
+bar
+
+=back
+
+=head1 OL2
+
+=over
+
+=item 1.
+
+foo
+
+=item 2.
+
+bar
+
+buzz
+
+=back
+
+=head1 AUTHOR
+
+Daisuke Murase C<typester@gmail.com>
+
+=head1 SEE ALSO
+
+L<Pod::HTMLEmbed>
+
+=cut

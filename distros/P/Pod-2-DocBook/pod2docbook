@@ -1,0 +1,235 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+our $VERSION = '0.03';
+
+use Getopt::Long;
+use Pod::2::DocBook 0.03;
+use Pod::Usage;
+use List::MoreUtils 'none';
+use CPAN::Version;
+
+exit main();
+
+sub main {
+    my $doctype = 'section';
+    my $spaces  = 2;
+    my ($title, $double_quotes, $help, $no_header, $base_id, $id_version, $parse_title, $skip, $min_version);
+
+    GetOptions(
+        'doctype=s'         => \$doctype,
+        'base-id=s'         => \$base_id,
+        'title=s'           => \$title,
+        'spaces=i'          => \$spaces,
+        'fix-double-quotes' => \$double_quotes,
+        'no-header'         => \$no_header,
+        'help'              => \$help,
+        'id-version=i'      => \$id_version,
+        'parse-title'       => \$parse_title,
+        'skip=s'            => \$skip,
+        'min-version=s'     => \$min_version,
+    ) or pod2usage();
+
+    pod2usage if $help;
+    pod2usage if none { $doctype eq $_ } qw(article chapter refentry section);
+    pod2usage unless $spaces =~ /^\d+$/xms;
+    
+    die 'version "'.$min_version.'" required, this is just "'.$VERSION.'"'."\n"
+        if ($min_version and CPAN::Version->vlt($VERSION, $min_version));
+
+    # TODO refactor this if so that there are no the same patterns in each of
+    #      the branch
+    if (@ARGV == 0) {
+        $title = q{} unless defined $title;
+        my $parser = Pod::2::DocBook->new(
+            title             => $title,
+            doctype           => $doctype,
+            base_id           => $base_id,
+            fix_double_quotes => $double_quotes,
+            header            => !$no_header,
+            spaces            => $spaces,
+            id_version        => $id_version,
+            skip              => $skip,
+        );
+        $parser->parse_from_filehandle(\*STDIN);
+    }
+    else {
+        my ($infile, $outfile) = @ARGV;
+
+        # default doctype element id is the name of the input file
+        $base_id ||= $infile;
+
+        $title = parse_title($infile)
+            if $parse_title;
+        ($title) = $infile =~ m{([^/]+)\z}xms unless defined $title;
+        
+        my $parser = Pod::2::DocBook->new(
+            title             => $title,
+            doctype           => $doctype,
+            base_id           => $base_id,
+            fix_double_quotes => $double_quotes,
+            header            => !$no_header,
+            spaces            => $spaces,
+            id_version        => $id_version,
+            skip              => $skip,
+        );
+
+        if (defined $outfile) {
+            $parser->parse_from_file($infile, $outfile);
+        }
+
+        else {
+            $parser->parse_from_file($infile);
+        }
+    }
+
+    return 0;
+}
+
+sub parse_title {
+    my $filename = shift;
+    
+    open(my $fh, '<', $filename) or die 'failed to open "'.$filename.'"';
+    
+    my $in_name = 0;
+    my $line;
+    while ($line = <$fh>) {
+        # skip empty lines
+        next if $line =~ m/^\s*$/;
+        
+        # we have the title, it's the first text line inside "=head1 NAME"
+        last
+            if ($in_name);
+        
+        # found "=head1 NAME"
+        $in_name = 1
+            if $line =~ m/^=head1 \s+ NAME/xmsi;
+    }
+    
+    close($filename);
+    
+    chomp($line);
+    
+    # remove formating codes from title and xml characters
+    $line =~ s/[IBCLEFSXZ]<(.*)>/$1/xmsg;
+    $line =~ s/&/&amp;/;
+    $line =~ s/</&lt;/;
+    $line =~ s/>/&gt;/;
+    
+    return $line
+        if $line !~ m/^[^-]+-\s+(.+)$/;
+    
+    return $1;
+}
+
+__END__
+
+=head1 NAME
+
+pod2docbook - Convert POD data to DocBook SGML
+
+=head1 SYNOPSIS
+
+pod2docbook [B<--help>]
+[B<--doctype>=B<article>|B<chapter>|B<section>|B<refentry>]
+[B<--title>=I<title>] S<[B<--spaces>=I<# spaces per indent level>]>
+[B<--fix-double-quotes>] [B<--no-header>]
+[B<--base-id>=I<idstring>]
+S<[I<infile> [I<outfile>]]>
+
+=head1 DESCRIPTION
+
+B<pod2docbook> converts files from pod format (see L<perlpod>) to
+DocBook 4.2 SGML (see L<http://www.docbook.org/>).  The program itself
+is merely a driver for the Pod::2::DocBook class; if you're interested in
+details of pod-to-SGML translation see L<Pod::2::DocBook>.
+
+=head1 OPTIONS AND ARGUMENTS
+
+=over
+
+=item [B<--help>]
+
+Print usage and exit.
+
+=item [B<--doctype>=B<article>|B<chapter>|B<section>|B<refentry>]
+
+Specifies the document type for the output file; the default is
+B<section>.
+
+=item [B<--title>=I<title>]
+
+Specifies the document title.  The default is I<infile>, if it is
+supplied, or empty string otherwise.
+
+=item [B<--spaces>=I<# spaces per indent level>]
+
+Specifies the number of spaces per indent level in the SGML output;
+the default is 2.
+
+=item [B<--fix-double-quotes>]
+
+Replace pairs of double quotes in regular paragraphs with <quote> and
+</quote> (see L<Pod::2::DocBook> for details).
+
+=item [B<--no-header>]
+
+Omit the DOCTYPE line from the output.
+
+=item I<infile>
+
+The name of the file from which to read pod source; if not supplied,
+STDIN is used for input.
+
+=item I<outfile>
+
+The name of the file to which to write SGML; if not supplied, STDOUT
+is used for output.
+
+=item [B<--base-id>=I<idstring>]
+
+The root element of the B<--doctype> will have the I<idstring> set for attribute I<id>.
+The default is an input file name "cleaned up" to conform with XML restriction for
+characteds used in id strings. (SEE L<http://www.w3.org/TR/2000/REC-xml-20001006#NT-Name>)
+
+=back
+
+=head1 SEE ALSO
+
+L<pod2docbook>, L<perlpod>, L<Pod::DocBook>,
+SVN repo - L<https://cle.sk/repos/pub/cpan/Pod-2-DocBook/>,
+L<http://www.ohloh.net/projects/pod-2-docbook>,
+F<doc/> + F<examples/pod2docbook-docbook/> for Pod::2::DocBook
+DocBook documentation
+
+DocBook related links: L<http://www.docbook.org/>,
+L<http://www.sagehill.net/docbookxsl/>,
+L<http://developers.cogentrts.com/cogent/prepdoc/pd-axfrequentlyuseddocbooktags.html>
+
+=head1 AUTHOR
+
+Alligator Descartes <descarte@symbolstone.org> wrote a module called
+Pod::2::DocBook, which was later maintained by Jan Iven
+<jan.iven@cern.ch>.  That module was based on the original L<pod2html>
+by Tom Christiansen <tchrist@mox.perl.com>.
+
+Nandu Shah <nandu@zvolve.com> wrote Pod::DocBook, which is
+unrelated to the previous module (even though they both perform the
+same function). (L<http://search.cpan.org/~nandu/Pod-DocBook-1.2/>)
+
+Jozef Kutej <jkutej@cpan.org> renamed the module to Pod::2::DocBook
+because Nandus version was buried in the CPAN archive as an
+"UNAUTHORIZED RELEASE".
+
+=head1 COPYRIGHT
+
+Copyright 2004, Nandu Shah <nandu@zvolve.com>
+
+Copyright 2008, Jozef Kutej <jkutej@cpan.org>
+
+This library is free software; you may redistribute it and/or modify
+it under the same terms as Perl itself
+
+=cut

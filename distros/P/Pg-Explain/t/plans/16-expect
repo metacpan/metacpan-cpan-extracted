@@ -1,0 +1,26 @@
+{
+    'type'                   => 'Bitmap Heap Scan',
+    'estimated_startup_cost' => 39.88,
+    'estimated_total_cost'   => 3946.78,
+    'estimated_rows'         => 1113,
+    'estimated_row_width'    => 323,
+    'is_analyzed'            => 0,
+    'extra_info'             => [ 'Recheck Cond: ((poi_id >= 100) AND (poi_id <= 3000))', ],
+    'scan_on'                => {
+        'table_name'  => 'poi',
+    },
+    'sub_nodes'               => [
+        {
+            'type'                   => 'Bitmap Index Scan',
+            'estimated_startup_cost' => 0,
+            'estimated_total_cost'   => 39.6,
+            'estimated_rows'         => 1113,
+            'extra_info'             => [ 'Index Cond: ((poi_id >= 100) AND (poi_id <= 3000))', ],
+            'estimated_row_width'    => 0,
+            'is_analyzed'            => 0,
+            'scan_on'                => {
+                'index_name'  => 'poi_pkey',
+            },
+        },
+    ]
+}

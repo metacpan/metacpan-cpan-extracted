@@ -1,0 +1,18 @@
+Revision history for Proc-Daemon-Prefork
+
+0.70    2014-12-11 (PERLANCAR)
+
+        - Rename dist from {SHARYANTO-,}Proc-Daemon-Prefork.
+
+
+0.69    2014-04-05 (SHARYANTO)
+
+        - No functional changes.
+
+        - [build] Rebuild because backup file (*~) got included (steven--).
+
+
+0.68    2014-02-17 (SHARYANTO)
+
+        - First release, split from SHARYANTO-Utils to resolve circular
+          dependency problem.

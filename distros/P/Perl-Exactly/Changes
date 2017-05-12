@@ -1,0 +1,15 @@
+Revision history for this software.
+
+0.03 2017-03-05 00:00:00
+  - define NORECURS, PM, and PL_FILES in Makefile.PL
+  - support Perl 5.24
+  - created by INABA Hitoshi
+
+0.02 2015-06-21 00:00:00
+  - support Perl 5.22
+  - support -i switch on command line
+  - created by INABA Hitoshi
+
+0.01 2014-11-19 00:00:00
+  - original version
+  - created by INABA Hitoshi

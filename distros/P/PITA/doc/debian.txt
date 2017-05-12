@@ -1,0 +1,34 @@
+some notes for the next debian install...
+
+
+256 MB RAM, no swap partition, 1GB disk size
+
+
+passwords:
+- empty root password
+- user pita, empty password
+
+
+install:
+- make
+- gcc
+- perl-modules
+- ftp
+- libc6-dev
+- (svn)
+- second perl (5.8.7) -> /opt/pita
+- custom perls -> /opt/perl-5.x.x
+
+
+configuring:
+- Tweak sample-launch-script.pl as needed.
+- Save to ~root/launch_pita.pl and mark executable
+- symlink the launch script to /etc/rc2.d/S99zpita
+  (The z makes it run last without having to disturb the other S99 items)
+
+
+questions:
+- configure CPAN? -> yes, both system and pita perl (prerequs: follow)
+- Timeouts? Does Module::Install play well with default answers to questions?
+
+

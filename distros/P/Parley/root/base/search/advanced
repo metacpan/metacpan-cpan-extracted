@@ -1,0 +1,105 @@
+<h1>Search Forums</h1>
+
+<form method="get" action="[%c.uri_for('/search/advanced')%]" id="advanced_search">
+
+[% BLOCK search_type %]
+<select name="[%name%]">
+    <option value="contains">[%l('CONTAINS')%]</option>
+    <option value="exact">[%l('IS')%]</option>
+</select>
+[% END %]
+
+    [%l('SEARCH FOR MESSAGES MATCHING')%]
+    <select name="match_type">
+        <option value="any">[%l('ANY')%]</option>
+        <option value="all">[%l('ALL')%]</option>
+    </select>
+    [%l('OF THE FOLLOWING CRITERIA')%]:
+
+    <div class="yui-gf top_padded">
+        <div class="yui-u first align_right">
+            [%l('SUBJECT')%]
+        </div>
+        <div class="yui-u">
+            [% INCLUDE search_type name="subject_search_type" %]
+            <input type="text" name="subject_search_terms" />
+        </div>
+    </div>
+
+    <div class="yui-gf">
+        <div class="yui-u first align_right">
+            [%l('MESSAGE')%]
+        </div>
+        <div class="yui-u">
+            [% INCLUDE search_type name="message_search_type" %]
+            <input type="text" name="message_search_terms" />
+        </div>
+    </div>
+
+    <div class="yui-gf">
+        <div class="yui-u first align_right">
+            [%l('AUTHORS_NAME')%]
+        </div>
+        <div class="yui-u">
+            [% INCLUDE search_type name="author_search_type" %]
+            <input type="text" name="author_search_terms" />
+        </div>
+    </div>
+
+    <div class="yui-gf">
+        <div class="yui-u first align_right">
+            [%l('POSTED')%]
+        </div>
+        <div class="yui-u">
+            <select name="search_post_date">
+                <option value="">[%l('AT ANY TIME')%]</option>
+                <option value="last_hour">[%l('IN THE LAST HOUR')%]</option>
+                <option value="last_day">[%l('IN THE LAST DAY')%]</option>
+                <option value="last_month">[%l('IN THE LAST MONTH')%]</option>
+                <option value="last_six_months">[%l('IN THE LAST SIX MONTHS')%]</option>
+                <option value="last_year">[%l('IN THE LAST YEAR')%]</option>
+                <option value="over_a_year">[%l('OVER A YEAR AGO')%]</option>
+            </select>
+        </div>
+    </div>
+
+    <div style="background-color:#ccc;margin-top:5px;margin-bottom:5px;">
+        &nbsp;
+    </div>
+
+    <div class="yui-gf">
+        <div class="yui-u first align_right">
+            [%l('FORUM')%]
+        </div>
+        <div class="yui-u">
+            [% IF available_forums %]
+            <select id="search_forum" name="search_forum" multiple="multiple" class="multiple">
+                [% SET dummy=available_forums.reset %]
+                <optgroup label="[%l('Forums')%]">
+                [% WHILE (forum = available_forums.next) %]
+                <option value="[% forum.id %]">[% forum.name %]</option>
+                [% END %]
+            </select>
+            [% END %]
+        </div>
+    </div>
+
+    <div style="background-color:#ccc;margin-top:5px;margin-bottom:5px;">
+        &nbsp;
+    </div>
+
+    <div class="yui-gf">
+        <div class="yui-u first align_right">
+            &nbsp;
+        </div>
+        <div class="yui-u">
+            <input type="submit" value="[%l('Search')%]" />
+        </div>
+    </div>
+
+    <div style="background-color:#ccc;margin-top:5px;margin-bottom:5px;">
+        &nbsp;
+    </div>
+</form>
+
+[% PROCESS search/results %]

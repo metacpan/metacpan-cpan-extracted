@@ -1,0 +1,637 @@
+=head1 NAME 
+
+Parse::Eyapp::Scope - Support for Scope Analysis
+ 
+=head1 SYNOPSIS
+ 
+  # Fragment of the grammar lib/Simple/Types.eyp
+  # in examples/typechecking/Simple-Types-XXX.tar.gz 
+  funcDef:
+      $ID 
+         { 
+           $ids->begin_scope(); 
+         }
+      '('  $params  ')' 
+        $block
+      {
+         my $st = $block->{symboltable}; 
+         my @decs = $params->children(); 
+         $block->{parameters} = [];
+         while (my ($bt, $id, $arrspec) = splice(@decs, 0, 3)) {
+             $bt = ref($bt); # The string 'INT', 'CHAR', etc.
+             my $name = $id->{attr}[0];
+             my $type = build_type($bt, $arrspec);
+             $type{$type} = Parse::Eyapp::Node->hnew($type); 
+
+             # control duplicated declarations
+               die "Duplicated declaration of $name at line $id->{attr}[1]\n" 
+             if exists($st->{$name});
+
+             $st->{$name}->{type} = $type;
+             $st->{$name}->{param} = 1;
+             $st->{$name}->{line} = $id->{attr}[1];
+             push @{$block->{parameters}}, $name;
+         }
+         $block->{function_name} = $ID;
+         $block->type("FUNCTION");
+
+         my ($nodec, $dec) = $ids->end_scope($st, $block, 'type');
+
+         # Type checking: add a direct pointer to the data-structure
+         # describing the type
+         $_->{t} = $type{$_->{type}} for @$dec;
+
+         return $block;
+      }
+  ;
+ 
+  ...
+
+  Primary:
+      %name INUM
+      INUM 
+    | %name CHARCONSTANT
+      CHARCONSTANT
+    | $Variable 
+        { 
+          $ids->scope_instance($Variable); 
+          return $Variable 
+        }
+    | '(' expression ')' { $_[2] }
+    | $function_call 
+        { 
+          $ids->scope_instance($function_call); 
+          return $function_call  # bypass
+        }
+  ;
+    
+=head1 INTRODUCTION
+
+The examples used in this document can be found in the
+file C<examples/typechecking/Simple-Types-XXX.tar.gz>.
+This distribution contains the front-end of a compiler
+(lexical analysis, syntax analysis, scope analysis and type checking) for
+a small subset of the C language.
+The language has characters, integers, arrays and functions.
+Here is a small example:
+
+  pl@nereida:~/Lbook/code/Simple-Types/script$ cat prueba03.c
+  int a,b,e[10];
+
+  g() {}
+
+  int f(char c) {
+  char d;
+   c = 'X';
+   e[d] = 'A'+c;
+   {
+     int d;
+     d = a + b;
+   }
+   a = b * 2;
+   return c;
+  }
+
+You can find more examples in the C<script/> directory.
+The front-end provided analyzes the input program
+
+  pl@nereida:~/Lbook/code/Simple-Types/script$ usetypes.pl prueba03.c
+
+and produces the decorated abstract tree, i.e. s.t. like:
+
+  PROGRAM^{0}(
+    FUNCTION[g]^{1},
+    FUNCTION[f]^{2}(
+      ASSIGNCHAR(
+        VAR( TERMINAL[c:7]),
+        CHARCONSTANT( TERMINAL['X':7])
+      ),
+      ASSIGNINT(
+        VARARRAY( TERMINAL[e:8], INDEXSPEC(CHAR2INT(VAR(TERMINAL[d:8])))),
+        PLUS(
+          CHAR2INT(CHARCONSTANT(TERMINAL['A':8])),
+          CHAR2INT(VAR(TERMINAL[c:8]))
+        )
+      ),
+      BLOCK[9:3:f]^{3}(
+        ASSIGNINT(
+          VAR(TERMINAL[d:11]),
+          PLUS(VAR(TERMINAL[a:11]),VAR( TERMINAL[b:11])))
+      ),
+      ASSIGNINT(
+        VAR(TERMINAL[a:13]),
+        TIMES(VAR(TERMINAL[b:13]),INUM(TERMINAL[2:13]))),
+      RETURNINT(CHAR2INT(VAR(TERMINAL[c:14])))
+    )
+  )
+  ...... # More descriptions
+
+
+A scope manager helps to compute the mapping function
+that maps the uses (instances) of 
+source objects to their definitions. 
+For instance, 
+
+=over 2
+
+=item * When dealing with I<identifier scope analysis> the problem is to associate
+each occurrence of an identifier with the declaration
+that applies to it. 
+
+=item * Another example is I<loop scope analysis>
+where the problem is to associate each occurrence
+of a C<CONTINUE> or C<BREAK> node with the 
+shallowest C<LOOP> that encloses it. 
+
+=item * Or I<label scope analysis>, the problem to associate a C<GOTO>
+node with the node to jump to, that is,
+the one with the C<STATEMENT> associated with the label.
+
+=back
+
+The scope analysis start by creating the C<Parse::Eyapp::Scope> objects:
+
+  program:
+        {
+          reset_file_scope_vars();
+        }
+      definition<%name PROGRAM +>.program
+        {
+          ..........  # Semantic actions 
+        }
+  ;
+
+Before the analysis of the whole program we call C<reset_file_scope_vars>
+which is in charge to create the scope analyzers for
+I<identifier scope analysis> and I<loop scope analysis>:
+
+  sub reset_file_scope_vars {
+    %st = (); # reset symbol table
+    ($tokenbegin, $tokenend) = (1, 1);
+    %type = ( INT  => Parse::Eyapp::Node->hnew('INT'),
+              CHAR => Parse::Eyapp::Node->hnew('CHAR'),
+              VOID => Parse::Eyapp::Node->hnew('VOID'),
+            );
+    $depth = 0;
+    $ids = Parse::Eyapp::Scope->new(
+             SCOPE_NAME => 'block',
+             ENTRY_NAME => 'info',
+             SCOPE_DEPTH => 'depth',
+    );
+    $loops = Parse::Eyapp::Scope->new(
+             SCOPE_NAME => 'exits',
+    );
+    $ids->begin_scope();
+    $loops->begin_scope(); # just for checking
+  }
+
+
+To take advantage of C<Parse::Eyapp::Scope>, 
+the compiler writer must mark at the appropriate time 
+(for example a new block or new subroutine for I<identifier scope analysis>,
+a new loop for I<loop scope analysis>, etc.) the I<beginning of a new scope>
+calling the method C<begin_scope>.
+For example, the following code deals with the declaration of functions
+
+  funcDef:
+      $ID 
+         { 
+           $ids->begin_scope(); 
+         }
+      '('  $params  ')' 
+        $block
+      {
+         ........ # semantic action code
+      }
+  ;
+
+The call 
+
+            $ids->begin_scope
+
+marks the beginning of a new identifier scope.
+
+From that point on, any I<ocurring instance> of an object 
+(for example,
+variables in expressions for I<identifier scope analysis>, breaks and continues
+for I<loop scope analysis>, etc.) must be declared 
+calling the method C<scope_instance>.
+For example, the following rules deal with the use of 
+of variables and functions inside expressions:
+
+  Primary:
+      ........... # Other production rules
+    | $Variable 
+        { 
+          $ids->scope_instance($Variable); 
+          return $Variable 
+        }
+    | $function_call 
+        { 
+          $ids->scope_instance($function_call); 
+          return $function_call  # bypass
+        }
+  ;
+
+
+The programmer must also mark the I<end of the current scope> 
+at the appropriate time. After the processing of the C<block> 
+following a function declaration an I<identifier scope>
+has finished and we call C<end_scope>:
+
+  funcDef:
+      $ID 
+         { 
+           $ids->begin_scope(); 
+         }
+      '('  $params  ')' 
+        $block
+      {
+         ............................... 
+
+         my ($nodec, $dec) = $ids->end_scope($st, $block, 'type');
+
+         # Type checking: add a direct pointer to the data-structure
+         # describing the type
+         $_->{t} = $type{$_->{type}} for @$dec;
+
+         return $block;
+      }
+  ;
+
+This call is made after each end of scope, including the end of the program:
+
+  program:
+        {
+          reset_file_scope_vars();
+        }
+      definition<%name PROGRAM +>.program
+        {
+          $program->{symboltable} = { %st };  # creates a copy of the s.t.
+          $program->{depth} = 0;
+          $program->{line}  = 1;
+          $program->{types} = { %type };
+          $program->{lines} = $tokenend;
+
+          my ($nondec, $declared) = $ids->end_scope($program->{symboltable}, $program, 'type');
+
+          if (@$nondec) {
+            warn "Identifier ".$_->key." not declared at line ".$_->line."\n" for @$nondec;
+            die "\n";
+          }
+
+          # Type checking: add a direct pointer to the data-structure
+          # describing the type
+          $_->{t} = $type{$_->{type}} for @$declared;
+
+          my $out_of_loops = $loops->end_scope($program);
+          if (@$out_of_loops) {
+            warn "Error: ".ref($_)." outside of loop at line $_->{line}\n" for @$out_of_loops;
+            die "\n";
+          }
+
+          # Check that are not dangling breaks
+          reset_file_scope_vars();
+
+          $program;
+        }
+  ;
+
+=head1 METHODS
+
+=head2 The C<end_scope> method
+
+There are three ways of calling C<$scope-E<gt>end_scope>.
+The first one is for Scope Analysis Problems where
+a symbol table is needed (for example in I<identifier scope analysis>
+and I<label scope analysis> and there is a C<Parse::Eyapp::Node> node 
+that owns the scope.
+
+=head3 The C<end_scope> with first Argument a Symbol Table and Second 
+Argument a Node
+
+For each I<ocurring instance> of an object C<$x>
+that occurred since the last call to C<begin_scope>
+the call to 
+
+  $scope->end_scope(\%symboltable, $definition_node, 'attr1', 'attr2', ... )
+
+decorates the I<ocurring instance> C<$x> with several attributes: 
+
+=over
+
+=item * An entry C<$x-E<gt>{SCOPE_NAME}> is built that will reference C<$definition_node>.
+
+=item * An entry C<$x-E<gt>{ENTRY_NAME}> is built. That
+entry references C<$symboltable{$x-E<gt>key}> (to have a
+faster access from the instance to the attributes of the object).
+The instantiated nodes must have a C<$x-E<gt>key> method which provides
+the entry for the node in the symbol table:
+
+  pl@nereida:~/src/perl/YappWithDefaultAction/examples$ sed -ne '651,657p' Types.eyp
+  sub VAR::key {
+    my $self = shift;
+
+    return $self->child(0)->{attr}[0];
+  }
+
+  *VARARRAY::key = *FUNCTIONCALL::key = \&VAR::key;
+
+=item * For each aditional arguments C<attr#k> an
+entry C<$x-E<gt>{attr#k>} will be built.
+That entry references C<$symboltable{$x-E<gt>key}{attr#k}>. 
+Therefore
+the entry for C<$x> in the symbol table must already 
+have a field named C<attr#k>.
+If the hash referenced by C<$symboltable{$x-E<gt>key}> does not
+have a key C<attr#k> no reference is built.
+
+=back
+
+In a list context C<$scopeE<gt>end_scope> returns
+two references. The first one
+is a reference to a list of node instantiated
+that weren't defined in the current scope.
+The second is a reference to a list of nodes
+that were defined in this scope. 
+In a scalar context returns the first of these two.
+An instance C<$x> is I<defined> if, and only if, 
+C<exists $symboltable{$_-E<gt>key}>.
+
+
+=head3 The C<end_scope> Method with first Argument 
+a Symbol Table and Remaining Arguments strings
+
+For each I<ocurring instance> of an object C<$x>
+that occurred since the last call to  C<begin_scope>
+the call to 
+
+  $scope->end_scope(\%symboltable, 'attr1', 'attr2', ... )
+
+decorates the I<ocurring instance> C<$x> with several attributes: 
+
+=over
+
+=item * An entry C<$x-E<gt>{ENTRY_NAME}> is built. That
+entry references C<$symboltable{$x-E<gt>key}> (to have a
+faster access from the instance to the attributes of the object).
+The instantiated nodes must have a C<$x-E<gt>key> method which provides
+the entry for the node in the symbol table.
+
+=item * For each aditional arguments C<attr#k> an
+entry C<$x-E<gt>{attr#k>} will be built.
+That entry references C<$symboltable{$x-E<gt>key}{attr#k}>. 
+Therefore
+the entry for C<$x> in the symbol table must already 
+have a field named C<attr#k>.
+If the hash referenced by C<$symboltable{$x-E<gt>key}> does not
+have a key C<attr#k> no reference is built.
+
+=back
+
+=head3 The C<end_scope> method for Simple Scope Analysis
+
+Some scope analysis problems do not require the existence
+of a symbol table (for instance, the problem of associating
+a C<RETURN> node with the C<FUNCTION> that encloses it). 
+For such kind of problems C<$scopeE<gt>end_scope> provides
+a second form of call.
+
+The second way to call C<$scopeE<gt>end_scope> is
+
+                 $declared = $scopemanager->end_scope($definition_node);
+
+The only argument is the reference to the node that controls/defines
+the scope. The method returns a reference to the declared
+nodes. Any node instanced with C<scope_instance>
+since the last call to C<begin_scope> is considered I<declared>.
+
+The scope node C<$definition_node> is decorated with an attribute with
+name the value of the attribute C<SCOPE_NAME> of the scope manager
+C<$scopemanager>. The value of the attribute is the anonymous list of references to the instances
+declared in the scope of C<$definition_node> 
+(i.e. the same list referenced by C<$declared>). 
+
+The scope instances in C<@$declared> are decorated with
+an attribute with name the value of the attribute C<SCOPE_NAME> of the scope manager.
+The value is a reference to the scope node C<$definition_node>.
+
+=head2 The C<begin_scope> method
+
+Marks the beginning of an scope.
+Example (file C<Types.eyp> in C<examples/typechecking/Simple-Types-XXX.tar.gz>):
+
+   loopPrefix:
+       $WHILE '(' expression ')'
+         {
+           $loops->begin_scope;
+           $_[3]->{line} = $WHILE->[1]; # Save the line for error diagostic
+           $_[3]
+         }
+
+=head2 The C<scope_instance> method
+
+Declares the node argument to be an occurring instance of the scope:
+
+   nereida:~/doc/casiano/PLBOOK/PLBOOK/code> \
+       sed -ne '375,380p' Simple6.eyp | cat -n
+    1      $Variable '=' binary
+    2        {
+    3          my $parser = shift;
+    4          $ids->scope_instance($Variable);
+    5          $parser->YYBuildAST(@_); # "Manually" build the node
+    6        }
+
+
+=head2 The constructor C<new>
+
+C<Parse::Eyapp::Scope-E<gt>new> returns a scope management object. 
+The scope mapping function is implemented 
+by C<Parse::Eyapp::Scope> through a set of attributes
+that are added to the nodes involved in the scope analysis.
+The names of these attributes can be specified 
+using the parameters of C<Parse::Eyapp::Scope-E<gt>new>.
+The arguments of C<new> are:
+
+=over
+
+=item * C<SCOPE_NAME> 
+is the name chosen for the attribute of the 
+I<node instance>  which will held
+the reference to the I<definition node>.
+If not specified it will take the value C<"scope">.
+
+=item * C<ENTRY_NAME> is the name of the attribute of the
+I<node instance>  which will held
+the reference to the symbol table entry.
+By default takes the value C<"entry">.
+
+=item * C<SCOPE_DEPTH> is the name for an attribute of the 
+I<definition node>. Optional. If not specified it will not be
+defined.
+
+=back
+
+
+
+
+=head1 SEE ALSO
+  
+=over
+
+=item * The project home is at L<http://code.google.com/p/parse-eyapp/>.
+Use a subversion client to anonymously check out the latest project source code:
+
+   svn checkout http://parse-eyapp.googlecode.com/svn/trunk/ parse-eyapp-read-only
+
+=item * The tutorial I<Parsing Strings and Trees with> C<Parse::Eyapp>
+(An Introduction to Compiler Construction in seven pages) in
+L<http://nereida.deioc.ull.es/~pl/eyapsimple/> 
+
+=item * 
+L<Parse::Eyapp>, 
+L<Parse::Eyapp::eyapplanguageref>, 
+L<Parse::Eyapp::debuggingtut>,
+L<Parse::Eyapp::defaultactionsintro>,
+L<Parse::Eyapp::translationschemestut>,
+L<Parse::Eyapp::Driver>,
+L<Parse::Eyapp::Node>,
+L<Parse::Eyapp::YATW>,
+L<Parse::Eyapp::Treeregexp>,
+L<Parse::Eyapp::Scope>,
+L<Parse::Eyapp::Base>,
+L<Parse::Eyapp::datagenerationtut>
+
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/languageintro.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/debuggingtut.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/eyapplanguageref.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/Treeregexp.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/Node.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/YATW.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/Eyapp.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/Base.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/translationschemestut.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/treematchingtut.pdf> 
+
+=item *
+perldoc L<eyapp>, 
+
+=item *
+perldoc L<treereg>,
+
+=item *
+perldoc L<vgg>,
+
+=item * The Syntax Highlight file for vim at L<http://www.vim.org/scripts/script.php?script_id=2453>
+and L<http://nereida.deioc.ull.es/~vim/>
+
+=item * I<Analisis Lexico y Sintactico>, (Notes for a course in compiler 
+construction) by  Casiano Rodriguez-Leon. 
+Available at  L<http://nereida.deioc.ull.es/~pl/perlexamples/>
+Is the more complete and reliable source for Parse::Eyapp. However is in Spanish.
+
+=item *
+L<Parse::Yapp>,
+
+=item *
+Man pages of yacc(1) and
+bison(1),
+L<http://www.delorie.com/gnu/docs/bison/bison.html>
+
+=item *
+L<Language::AttributeGrammar>
+
+=item *
+L<Parse::RecDescent>.
+
+=item *
+L<HOP::Parser>
+
+=item *
+L<HOP::Lexer>
+
+=item * ocamlyacc tutorial at 
+L<http://plus.kaist.ac.kr/~shoh/ocaml/ocamllex-ocamlyacc/ocamlyacc-tutorial/ocamlyacc-tutorial.html>
+
+=back
+
+=head1 REFERENCES
+
+=over
+
+=item *
+The classic Dragon's book I<Compilers: Principles, Techniques, and Tools> 
+by Alfred V. Aho, Ravi Sethi and
+Jeffrey D. Ullman (Addison-Wesley 1986)
+
+=item *
+I<CS2121: The Implementation and Power of Programming Languages>
+(See L<http://www.cs.man.ac.uk/~pjj>, L<http://www.cs.man.ac.uk/~pjj/complang/g2lr.html> 
+and L<http://www.cs.man.ac.uk/~pjj/cs2121/ho/ho.html>) by 
+Pete Jinks
+
+=back
+
+
+=head1 CONTRIBUTORS
+
+=over 2
+
+=item * Hal Finkel L<http://www.halssoftware.com/> 
+
+=item * G. Williams L<http://kasei.us/>
+
+=item * Thomas L. Shinnick L<http://search.cpan.org/~tshinnic/>
+
+=item * Frank Leray
+
+=back
+
+=head1 AUTHOR
+ 
+Casiano Rodriguez-Leon (casiano@ull.es)
+
+=head1 ACKNOWLEDGMENTS
+
+This work has been supported by CEE (FEDER) and the Spanish Ministry of
+I<Educacion y Ciencia> through I<Plan Nacional I+D+I> number TIN2005-08818-C04-04
+(ULL::OPLINK project L<http://www.oplink.ull.es/>). 
+Support from Gobierno de Canarias was through GC02210601
+(I<Grupos Consolidados>).
+The University of La Laguna has also supported my work in many ways
+and for many years.
+
+A large percentage of  code is verbatim taken from L<Parse::Yapp> 1.05.
+The author of L<Parse::Yapp> is Francois Desarmenien.
+ 
+I wish to thank Francois Desarmenien for his L<Parse::Yapp> module, 
+to my students at La Laguna and to the Perl Community. Thanks to 
+the people who have contributed to improve the module (see L<Parse::Eyapp/CONTRIBUTORS>).
+Thanks to Larry Wall for giving us Perl.
+Special thanks to Juana.
+
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2006-2008 Casiano Rodriguez-Leon (casiano@ull.es). All rights reserved.
+
+Parse::Yapp copyright is of Francois Desarmenien, all rights reserved. 1998-2001
+ 
+These modules are free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+

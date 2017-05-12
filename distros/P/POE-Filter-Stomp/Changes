@@ -1,0 +1,20 @@
+Revision history for Perl extension POE::Filter::Stomp.
+
+0.01  Thu Aug 30 09:31:05 2007
+    - original version; created by h2xs 1.23 with options
+        -Axc -n POE::Filter::Stomp
+
+0.02  17-Dec-2007 K.Esteb
+      Fixed the handling of large packets. The internal buffer was not being
+        handled properly and large packets would be terminated.
+      Added serveral tests, thanks lestrrat for providing the basic tests.
+
+0.03  22-Jan-2008 K.Esteb
+      Removed the test for pod-coverage. I don't use that style for writting
+        documentation. Fixes a problem reported by the perl testers.
+
+0.04  08-Apr-2010 K.Esteb
+      Naveed Massjouni came across an issue with transfering frames between
+       different OS's, specifically Windows and Unix. This release addresses 
+       that problem.
+

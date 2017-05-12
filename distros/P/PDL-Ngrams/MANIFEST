@@ -1,0 +1,17 @@
+ChangeLog
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+pdlmaker.plm
+Ngrams.pm
+README.txt
+t/common.plt
+t/00_basic.t
+t/01_delimit.t
+t/02_rotate.t
+t/03_cofreq.t
+Ngrams/Makefile.PL
+Ngrams/ngutils.pd		# Ngrams/Utils.pm
+Ngrams/Utils.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

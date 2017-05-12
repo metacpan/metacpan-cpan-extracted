@@ -1,0 +1,8 @@
+
+# Copy input to stdout or stderr.
+
+my $out = $ARGV[0] ? \*STDERR : \*STDOUT;
+
+while (<STDIN>) {
+    print $out $_;
+}

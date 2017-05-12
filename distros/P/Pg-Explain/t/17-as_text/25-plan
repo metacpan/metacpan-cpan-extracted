@@ -1,0 +1,13 @@
+                                                QUERY PLAN                                                 
+-----------------------------------------------------------------------------------------------------------
+ Result  (cost=0.02..0.06 rows=2 width=4) (actual time=0.006..0.009 rows=2 loops=1)
+   CTE cte_1
+     ->  Result  (cost=0.00..0.01 rows=1 width=0) (actual time=0.000..0.000 rows=1 loops=1)
+   CTE cte_2
+     ->  Result  (cost=0.00..0.01 rows=1 width=0) (actual time=0.000..0.001 rows=1 loops=1)
+   ->  Append  (cost=0.00..0.04 rows=2 width=4) (actual time=0.005..0.008 rows=2 loops=1)
+         ->  CTE Scan on cte_1  (cost=0.00..0.02 rows=1 width=4) (actual time=0.004..0.005 rows=1 loops=1)
+         ->  CTE Scan on cte_2  (cost=0.00..0.02 rows=1 width=4) (actual time=0.001..0.002 rows=1 loops=1)
+ Total runtime: 0.080 ms
+(9 rows)
+

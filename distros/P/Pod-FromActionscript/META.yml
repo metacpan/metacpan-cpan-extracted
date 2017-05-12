@@ -1,0 +1,14 @@
+---
+name: Pod-FromActionscript
+version: 0.53
+author:
+  - 'Clotho Advanced Media, Inc. <cpan@clotho.com>'
+abstract: Convert Actionscript documentation to POD
+license: perl
+build_requires:
+  Test::More: 0
+provides:
+  Pod::FromActionscript:
+    file: lib/Pod/FromActionscript.pm
+    version: 0.53
+generated_by: Module::Build version 0.2611

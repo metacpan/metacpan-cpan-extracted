@@ -1,0 +1,46 @@
+---
+abstract: 'IRC is my Twitter client'
+author:
+  - 'Marc Mims <mmims@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-Server-Twirc
+requires:
+  AnyEvent: '0'
+  AnyEvent::Twitter: '0'
+  AnyEvent::Twitter::Stream: '0.23'
+  Config::Any: '0'
+  Encode: '0'
+  FindBin: '0'
+  HTML::Entities: '0'
+  JSON::MaybeXS: '0'
+  Log::Log4perl: '0'
+  Moose: '0'
+  MooseX::Getopt: '0.15'
+  MooseX::Log::Log4perl::Easy: '0'
+  MooseX::POE: '0.215'
+  MooseX::SimpleConfig: '0'
+  MooseX::Storage: '0'
+  POE::Component::Server::IRC: '0.02005'
+  POE::Component::TSTP: '0'
+  POE::Loop::AnyEvent: '0'
+  Path::Class::File: '0'
+  Proc::Daemon: '0'
+  Regexp::Common::URI: '0'
+  Scalar::Util: '0'
+  String::Truncate: '0'
+  Try::Tiny: '0'
+resources:
+  bugtracker: https://github.com/semifor/twirc/issues
+  repository: https://github.com/semifor/twirc.git
+version: '0.20'
+x_contributors:
+  - 'Adam Prime <adam.prime@utoronto.ca>'
+  - 'Peter Roberts <me+dev@peter-r.co.uk>'

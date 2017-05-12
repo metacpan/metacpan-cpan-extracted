@@ -1,0 +1,58 @@
+NAME
+    Plack::Middleware::Debug::Dancer::TemplateVariables - Debug and inspect
+    your template variables for Dancer
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+    To activate this panel:
+
+        plack_middlewares:
+          Debug:
+            - panels
+            -
+              - Dancer::TemplateVariables
+
+    Or by manually creating an app.psgi, that might contain:
+
+        builder {
+            enable 'Debug', panels => ['Dancer::TemplateVariables'];
+            $app;
+        };
+
+    Note, that no 'use Plack::Middleware::Debug::Dancer::TemplateVariables'
+    is needed.
+
+DESCRIPTION
+    This middleware simply dumps all of the variables, that are passed by
+    Dancer through the template directive. This is achieved by installing a
+    before_layout_render-hook, that saves $tokens for later display.
+
+CAVEATS
+    Everything is mostly untested. Although it worked in conjunction with
+    Template::Toolkit when manually testing it.
+
+INSPIRATION
+    The Idea of Dumping all Template Variables came from
+    Plack::Middleware::Debug::TemplateToolkit which only seems to work in
+    companion with Plack::Middleware::TemplateToolkit.
+
+    Some parts of the code are stolen from Plack::Middleware::Debug::Base.
+    Most notably the vardump-sub. The list-template is also copied, because
+    I wanted to add a simple pre-tag around the dumped variable, which
+    creates a better format.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+AUTHOR
+    Thomas Müller <tmueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Thomas Müller.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

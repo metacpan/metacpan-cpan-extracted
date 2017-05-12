@@ -1,0 +1,17 @@
+[AGENT]
+
+Mozilla/5.0 (Linux; U; Android 3.0.1; en-us; GT-P7100 Build/HRI83) AppleWebKit/534.13 (KHTML, like Gecko) Version/4.0 Safari/534.13
+
+device      => 'GT-P7100',
+extras      => [ 'KHTML, like Gecko', 'Safari/534.13' ],
+lang        => 'en-us',
+mobile      => 1,
+name        => 'Android',
+os          => 'Android 3.0.1 (HRI83)',
+parser      => 'android',
+strength    => 'U',
+tablet      => 1,
+toolkit     => [ 'AppleWebKit', '534.13', '534.130' ],
+version     => '4.000',
+version_raw => '4.0',
+

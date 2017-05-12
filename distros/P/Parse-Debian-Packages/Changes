@@ -1,0 +1,10 @@
+0.03 Sunday 11th March, 2012
+        Make the regex (\S+): as suggested by debian 
+        people (RT #14329, #13251)
+
+0.02 Thursday 23rd June, 2005
+	Made the first part of the regex non-greedy so it would stop
+	at the first colon. (reported by Nick Jensen)
+
+0.01 Monday 17th November, 2003
+	Initial release

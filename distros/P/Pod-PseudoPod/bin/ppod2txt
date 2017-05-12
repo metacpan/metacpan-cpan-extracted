@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+
+######################################################################
+#
+# A sample PseudoPod to text converter script that uses
+# Pod::PseudoPod::Text.
+#
+# usage:
+#
+# $ ppod2txt filename1.pod filename2.pod
+#
+# Will produce one text file for each pod file passed in.
+#
+#   filename1.txt
+#   filename2.txt
+#
+######################################################################
+
+use strict;
+use lib "lib";
+use Pod::PseudoPod::Text;
+use File::Basename;
+
+foreach my $file (@ARGV) {
+	my $parser = Pod::PseudoPod::Text->new();
+
+	# Text output goes to the current working 
+	# directory not the source directory.
+	my $outfile = fileparse( $file, qr{\..*} ) . '.txt';
+	
+	open TXTOUT, ">$outfile" or die "Can't write to $outfile: $!";
+	$parser->output_fh(*TXTOUT);
+
+	$parser->no_errata_section(1); # don't put errors in doc output
+	$parser->complain_stderr(1);   # output errors on STDERR instead
+
+	if (-e $file) {
+		$parser->parse_file($file);
+	} else {
+		die "Unable to open file\n";
+	}
+	close TXTOUT;
+}
+
+exit;

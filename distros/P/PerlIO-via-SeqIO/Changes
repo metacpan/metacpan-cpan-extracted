@@ -1,0 +1,28 @@
+Revision history for Perl module PerlIO::via::SeqIO
+0.0322 Sat Dec 05 15:16:00 2006
+    - specify Bio::Seq, Bio::SeqIO requirements explicitly
+      in Build.PL (may avoid certain failures)
+    - O and T are now exported by default; better one-liners
+      this way
+0.0321 Thu Nov 05 08:40:00 2009
+    - fix 002_seqio.t bug
+0.031 Thu Oct 29 21:24:00 2009
+    - avoid the "unauthorized release" error by pushing a
+      "subclass" package onto the IO::Handle:ISA
+0.03  Fri Oct 23 12:03:00 2009
+    - made open() export optional (only necessary for the 
+      2-argument STDIN/STDOUT/DATA redirect)
+    - converted most under-the-hood filehandles to anonymous
+      symbols (using Symbol)
+    - fixed to allow layers above and below via(SeqIO) to 
+      be processed
+    - passthrough mode parsing fixed for writes
+    - clean up tempfiles
+    - allow O() to use $_ by default
+0.02
+    - added the T() function for writing de novo seq objects
+      to a via(SeqIO::...) stream
+0.01 Sun Oct 18 23:54:24 2009
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

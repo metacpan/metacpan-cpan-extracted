@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Std;
+use POD::Walker;
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "pod-walker 0.0.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+		      "-f <format>\n".
+			  "-i <in dir>\n".
+			  "-o <out dir>\n".
+			  "\n".
+			  "formats: html(default), latex, man, text\n";
+}
+
+#gets the options
+my %opts=();
+getopts('f:i:o:', \%opts);
+my %args;
+
+if (!defined( $opts{f} )) {
+	$opts{f}='html';
+}
+
+my $returned=POD::Walker->run({in=>$opts{i}, out=>$opts{o}, format=>$opts{f} });
+
+if ($returned->{error}) {
+	exit $returned->{error};
+}
+
+=head1 NAME
+
+pod-walker - Walks a directory and runs any Perl files through the specified POD converter.
+
+=head1 SYNOPSIS
+
+pod-waler B<-i> <input directory> B<-o> <output directory> B<-f> <format>
+
+=head1 SWITCHES
+
+=head2 -i
+
+The input directory to process.
+
+=head2 -o
+
+The directory to create the output tree under.
+
+=head2 -f
+
+The output format.
+
+The supported formats are listed below.
+
+    html
+    latex
+    man
+    text
+
+If this is not specified, "html" is used.
+
+=cut
+

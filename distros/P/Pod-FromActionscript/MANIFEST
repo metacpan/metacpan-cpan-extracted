@@ -1,0 +1,15 @@
+index.html
+Build.PL
+ChangeLog
+lib/Pod/FromActionscript.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+script/asdoc2pod
+t/asdoc2pod.t
+t/example/foo.expect
+t/example/foo.in
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,6 @@
+Revision history for Perl extension PowerTools::Data.
+
+0.01  Thu Aug  9 09:43:40 2007
+	- original version; created by h2xs 1.23 with options
+		-AX -m -n PowerTools::Data
+

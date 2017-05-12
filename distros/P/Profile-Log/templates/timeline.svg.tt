@@ -1,0 +1,89 @@
+[% # calculate width of axis
+   scale_size = width / ( data.timescale.max - data.timescale.min );
+   tick_size = scale_size * data.timescale.tick;
+   stroke_size  = scale_size * data.timescale.stroke;
+   pps = scale_size;
+   old_y_pos = y_pos
+%]		
+[% profile_logs = BLOCK %]
+[% y_pos = 0;
+   zero = data.log.0.zero;  # :)
+   GET "<!-- zero = " _ zero _ " -->\n";
+   FOR profile = data.log;
+       PROCESS log.svg.tt; 
+   END %]
+[% END; data_height = y_pos; y_pos = old_y_pos %]
+<!-- y_pos is [% y_pos %] before legend -->
+	<!-- Process dependency chart -->
+[%# <!-- Legend: [% USE dumper; dumper.dump(legend) % ] --> %]
+[%# <!-- Legend Index: [% dumper.dump(legend_index) % ] --> %]
+	<g transform="translate(0, [% y_pos %])" style="fill: none">
+		    [% y_pos_2 = 0;
+		       IF Styles.Legend.show_back %]	
+			<rect [% 'style="' _ class.LegendBack _ '"' %] x="0px" y="0px" width="[% width %]" height="16px">
+		    [% END;
+		       i = 0;
+		       x_pos_2 = 0;
+		       FOR item = legend;
+			  %]
+			<g transform="translate([% x_pos_2 || 2 %], [% y_pos_2 + styles.Legend.leading %])">
+			    <rect x="0" y="0" width="10px" height="10px" style="[% class.Data.$i %]"/>
+			    <text [% 'style="' _ class.LegendText _ '"' %] dx="[% styles.Legend.box_size + styles.Legend.box_padding %]px" dy="0.75em">[% item %]</text>
+			</g>
+		    [% i = i + 1;
+		       x_pos_2 = x_pos_2 + styles.Legend.column_width;
+		       IF (x_pos_2 + styles.Legend.column_width - 1) > width;
+			  y_pos_2 = y_pos_2 + styles.Legend.box_size + styles.Legend.box_padding;
+			  x_pos_2 = 0;
+		       END;
+		       END;
+		       y_pos_2 = y_pos_2 + styles.Legend.box_size + styles.Legend.box_padding %]
+<!-- y_pos_2 is [% y_pos_2 %] after legend -->
+
+<!-- y_pos_2 is [% y_pos_2 %] before axis -->
+<!-- Process axis labels -->
+[% i = data.timescale.min;
+    x = 0;
+    first = 1;
+    USE format;
+    sec = format("%.1fs");
+    WHILE i <= data.timescale.max;
+	label = sec(i);
+	# FIXME - this adjustment needs more consideration, possibly
+	# using textLength
+	dx = label.length / -2;
+	IF (x < width);
+	   dx = dx / 2;
+	END %]
+		<text style="[% class.TimeLabels %]" x="[% x %]" y="[% y_pos_2 %]" [% IF !first %] dx="[% dx %]em"[% END %] dy="1em">[% label %]</text>
+[%- 
+    x = x + stroke_size;
+    i = i + data.timescale.stroke;
+    first = 0;
+    END;
+y_pos_2 = y_pos_2 + styles.Axis.height %]
+		<rect [% 'style="' _ class.ProcessTree _ '"' %] x="0" y="[% y_pos_2 %]" width="100%" height="100%"/>
+		<g [% 'style="' _ class.Tick _ '"' %] transform="translate(0.5, [% y_pos_2 %])">
+
+<!-- Process time ticks and delimiter lines -->
+[% 
+   i = data.timescale.min;
+   x = 0;
+   n = 0;
+   strokes = data.timescale.stroke / data.timescale.tick;
+   WHILE i <= data.timescale.max;
+      is_stroke = !( n % strokes );
+	%]
+      <line [% IF is_stroke %]style="[% class.Stroke %]" [% END %]x1="[% x %]" y1="0" x2="[% x %]" y2="[% data_height %]" />
+[%     x = x + tick_size;
+       i = i + data.timescale.tick;
+       n = n + 1;
+   END %]
+		</g>
+		
+		<!-- Process chart -->
+   <g transform="translate(0, [% y_pos_2 %])">[% profile_logs %]</g>
+[% y_pos_2 = y_pos_2 + data_height;
+   y_pos = y_pos + y_pos_2 %]
+	</g>
+	

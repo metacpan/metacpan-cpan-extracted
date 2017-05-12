@@ -1,0 +1,942 @@
+  * Lars request (see dir contributions): allow AST classes to be Moose or any other OOP framework
+     Node clases inherit from Parse::Eyapp::Node.pm inherit from Moose, wrapping around Node?
+
+  * Lexer generation:
+       %token = /(reg1)(reg)(reg3)/
+
+    return the array of parenthesis not just $1
+
+  * Include PERLCODE as a predefined token in lexer generation
+  * La informacion acerca de los números de línea en el debugger 
+    para la generación del analizador léxico esta hecha un desastre
+
+  * Bug and conceptual errors in contextual tokens: (see t/77. I believe it is solved)
+         * factorize, factorize makeLexer!!!!
+         * There is a "token" synchronization  problem in this case
+           See files:
+           t/forforeacherikcontextual.eyp 
+           t/forforeacherik.eyp 
+           t/forforeacherikcontextual2.eyp
+           t/C.eyp
+
+           creo que hay salvar en self->{POS} la $pos despues del matching
+           en el código del lexer generado para este tipo de tokens
+
+         * %/.../ defines contextual tokens and it is independent of
+                           / ... /=Var
+                           / ... /!Var
+           they must exist independently
+
+         * This technique can be used to parse difficult ambiguous grammars
+                   EQUAB = %//=ab 
+           then in the body of the grammar:
+                         s: EQUAB ab cs | as bc
+           etc.
+
+
+  * Check that Driver and generated parser are compatible. Version numbers
+
+  * Implement support for tie-ins in the generated lexical analyzer
+
+  * AmbiguousLanguage2.eyp usar como contraejemplo a la primera teoria
+    
+    The difficulty of using yacc is extraordinary. See t/noPackratSolvedExpRG2.yp
+
+                        x:
+                             NUM
+                          |  NUM OP x
+
+    making it left recursive ruines the whole plan
+
+  * Do not introduce productions for exploring, use "explorer states" instead
+
+  * The explorer variable has to have the same name of the conflict:
+
+          sub YYNestedParse {
+            my $self = shift;
+            my $parser = shift;
+
+            my $conflictName = $self->YYLhs;
+
+            ...
+
+  * Modifiy Parse::Eyapp::Driver::_Parse 
+    If the state is a conflict state execute the conflict handlers for that state in 
+    the presence of a conflictive token!
+
+    
+  * Option -v in eyapp will produce a navigable grammar.output.html version of the output
+    file
+
+  * EBNF ors must be implemented
+
+  * Artículos:
+      * OOPLAS
+      * reescribir con nueva sintáxis TOPLAS y el comsys
+      * Introducir modificaciones de los referees en los articulos de revista: implementacion, pruebas
+      * conseguir articulo de Ganapanathi "semantic predicates in"
+      * estudiar e introducir comparaciones
+      * insistir en que esta implementado y "verificado": describir implementación
+       
+      * Referees PLDI
+         -- too vague description
+         -- motivation for the YYExpected: explain the problem
+         -- Syntactic analysis that depends on the semantic phase: explain better
+         -- how the PPCR is better than backtracking
+         -- more mathematics, proofs,
+         -- One pass: is not clear to the referee
+         -- Doubts about the implementation: have been implemented paragraph, see example files in 
+            such, and such addresses
+         -- Comparisons with other parsers: Regexp::Grammars, Marpa: execution times, etc.
+            Complexity.
+         -- typos, wording
+         -- two different articles
+
+  * optimize generated lexer for contextual tokens (Expected must be called only once)
+  * debugging: break points, call actual debugger inside semantic actions, etc.
+
+  * Trying to supress the generation of conflict rules when there is no conflict (during nested
+    auxiliary compilation). Count the number of appearances of %PREC conflict . If it is greater
+    than two there is a true conflict. Otherwise the conflict symbols can be ignored.
+    There is however a problem. The translation used by Parse.yp performs some premature 
+    semantic actions that insert the conflict symbols as soon as a production is defined.
+    To solve it we must delay the translation until the whole grammar has been seen.
+
+  * Write code to control the right use of %conflict and %PREC
+      -   x $self->{GRAMMAR}{CONFLICTHANDLERS}                                                                      
+      0  HASH(0x1009898a0)
+         'decORexp' => HASH(0x100c5c1e0)
+            'explorerline' => 14
+            'line' => 14
+            'production' => HASH(0x100c50130)
+               '-12' => ARRAY(0x100c572e0)
+                  0  1
+               '-5' => ARRAY(0x100c50230)
+                  0  1
+            'states' => ARRAY(0x100c4bb50)
+               0  HASH(0x100c5bba0)
+                  28 => ARRAY(0x100c3c5b0)
+                     0  '\')\''
+            'total' => 2
+            'totalviewpoint' => 1
+ 
+       DB<8> x $$self{CONFLICTS}{FORCED}                                                                               
+        0  HASH(0x100c38800)
+           'DETAIL' => HASH(0x100c5b630)
+              28 => HASH(0x100c58030)
+                 'LIST' => ARRAY(0x100c581c0)
+                    0  ARRAY(0x100c581e0)
+                       0  '\')\''
+                       1  '-12'
+                 'TOTAL' => ARRAY(0x100c57d10)
+                    0  empty slot
+                    1  1
+           'TOTAL' => ARRAY(0x100c57da0)
+              0  0
+              1  1
+
+
+      - %PREC in no conflict production or in wrong position
+      - called for reduce-reduce but it is not a reduce-reduce, etc.
+      - Every %conflict has to have at least two associated %PRECs
+
+  * quiza entre la información guardada en CONFLICTHANDLERS deberían ir las etiquetas simbólicas.
+    Esto simplificaría YYSetReduce
+
+
+
+  * Otra API de mas alto nivel sería el caso regexp
+          %conflict conflictname /regexp/ ruleName
+    esta se ejecuta en el punto del conflicto
+
+  * clean tests deleted. Do it gain?
+
+  * examples in MANIFEST: obsolete
+
+  * Use %{ ... %} as syntactic sugar for syntactic code actions
+
+  * Generation of Several Parsers
+      - The lexer must be the one of the main parser
+
+  * The accept state must change
+      A$ -> A
+      A$ -> A.b where b is in the follow of A, means acceptation
+      Where are the follows?. They have been computed somewhere
+
+  * %PREC conflict does not check that a conflict handler has been previously declared
+
+
+  * GLR in eyapp
+
+  * eyapp and PPCR in the Wikipedia
+
+  * Update documentation
+
+  * add eyapp -Y option: equivalent to "%tree bypass"
+
+  * Lalr 
+      # substitute End Of Input by DEFAULT for each state
+      # Will it give a false acceptance? 
+      # I think I shall use an option in eyapp?
+      # make a test
+
+  * Change the API for YYSetReduce and YYSetshift to include the name of the conflict?
+
+  * Bug/limitation: When using -m and -o the output file still uses the original grammar name.
+    It seems more convenient to rename it to the output file suffixed with .output
+
+  * Lexical Analyzer generation:
+      * incremental lexer also influences the way the directive
+                                 %lexer 
+         must behave. Because a lexer written by hand can be incremental
+      * support streams: see lexer in examples/Eyapp/Lhs1.yp
+        - Parse::Eyapp::Driver::input called as a setter receives an open file handler :
+                  prompt!
+        - if the input string is finished it reads from the file handler (controled by $/)
+          otherwise returns the current string
+      * error line numbers-> source code
+      * lexer must support a sub name
+         %lexer mylexer
+      *  Document:
+            =head3 $parser->input YYInput
+            =head3 $parser->YYInputFile
+
+            =head3 $parser->YYPrompt
+
+            =head3 $parser->main
+
+            =head3 $parser->Run
+
+
+  * %tree: 
+     - info  clause (autobuild ::info for TERMINAL) 
+     - naming scheme clause
+
+  * Tests
+     - tests all examples/*/*yp for syntax checking
+     - test for yyfilename
+     - Add tests to check .output tables: actions and gotos against yacc. 
+        I am not confident that some modifications I introduced in Grammar.pm were error free
+     - Automatic naming scheme: tests!
+     - Some rules can be optimized away. Then the name dissapears!!
+     - tests with syntax errors
+     - Debug mode and standalone works?
+
+  *  Debugging: set breakpoints in the code from yydebug=> 1
+
+  * What if the input comes from a stream? then $parser->input is undef
+    Shall I support interactive streams?
+      - YYLookaheads assumes that input comes from $parser->input
+      - The default lexer assumes that input comes from $parser->input
+      Change it to use an input stack
+
+  * PPCR:
+     - The whole implementation approach seems wrong. 
+       Make actions an array. Associate the handler with the state.
+       That allows a syntax like:
+                          %conflict handler {... } 
+                          %shift-reduce prod1 [token1, token2, ...] prod2 [tokens] handler
+                          %reduce-reduce prod3 [token1, token2, ...] prod4 [tokens] otherhandler
+                          ....
+
+     - There is a bug: I have to check that reductions in PPCR only occur inside the conflictive states
+
+     - Warning Grammar.pm 
+         sub Parse::Eyapp::Grammar::conflictHandlers  rewrite! or use Data::Dumper forever?
+
+  * %package directive: equivalent to eyapp -m option 
+
+  * -%modulino directive 
+      %modulino perlinterpreter prompt
+      Equivalent to eyapp -b 'perlinterpreter' and __PACKAGE__->main(prompt) 
+      %modulino '/usr/local/lib/perl/5.10.1/bin/perl5.10.1' 'Try input "type e = (x);": '
+      
+      avoid repetitive __PACKAGE->main when using options -C and -b
+
+  * Article: rewrite, both research and divulgation
+
+  * Documentation
+     - Simpler intro
+     - Separate parsing from tree transformation
+
+
+  * EBNF (a|b|c)*
+    - eyapp option -TREE: same as %tree
+      currently only give_rhs is used, but it has to be parametrized
+
+  * - eyapp option namingscheme
+
+    - eyapp option -start (defines the start symbol)
+       Eyapp -> Lalr -> Grammar -> Options
+                            `----> Parse
+    - intermediate actions in give_rhs_name? check, test
+    
+  * Error message when a conflict handler isn't used is inaccurate:
+
+      ~/LEyapp/examples/debuggingtut$ eyapp dynamicgrammar.eyp 
+      Useless non-terminals:
+
+          rangeORenum, declared line 10
+
+      Useless rules:
+
+          rangeORenum -> 
+
+      1 shift/reduce conflict and 0 reduce/reduce conflicts
+
+  *  Line numbers seem to be in a buggy state.
+     There is also a "bug" with tokenline and the static attribute approach: tokenline
+     attribute is defined to 1 while the static/attribute approach searches while "undef"
+
+  * Lars request (see dir contributions): allow AST classes to be Moose or any other OOP framework
+
+  * Provide a module providing regexp for most common non destructive lexing: NUMs, IDs, etc
+
+      use Parse::Eyapp::LexSupport qw{INT PERLWS ID};
+
+      Created by "new" so that $self is in scope
+
+         $INT = qr{\G(\d+)}gc; $WS = qr{{\G(\s*) (?{  $self->tokenline($1 =~ tr{\n}{}) }) }gxc; etc.
+
+      tokens can be "defined" with:
+
+          %token DOTDOT /(\.\.)/ 
+          %token INT /(\d+)/ 
+
+      The parser will define $DOTDOT = qr{/\G(\.\.)/;
+      and then:
+
+      PERLWS(); # No need to update the line number
+
+      m{\Gtype\b}gic           and return ('TYPE', 'TYPE'); # old way
+
+      m{$ID}gc                 and return ('ID',  $1);
+
+      INT()                    and return ('NUM', $1);
+
+      DOTDOT()                 and return ('DOTDOT',  $DOTDOT);
+
+      m{\G(.)}gc               and return ($1,    $1);
+
+  * Parse::Eyapp::Driver::main 
+     - option to send output to a file
+
+  * bison directives: 
+
+        Directive: %debug
+            In the parser file, define the macro YYDEBUG to 1 if
+            it is not already defined, so that the debugging
+            facilities are compiled.
+
+        Directive: %no-parser
+            Do not include any C code in the parser file; generate
+
+        Directive: %no-lines
+
+        Directive: %output="filename"
+
+
+  * the #line directive in Parse.yp for %lexer is prone to be buggy (worst practice)
+
+
+  * Dynamic conflict resolution: test YYSetShift
+        The case where the default is a reduction is not solved. Investigate
+
+  * Further study YAML (class preservation)
+
+  * Provide debugging support for standalone modules: currently skipped
+
+  * Provide an argument named 
+                                'end_of_input' => [ token list: '', NUM, etc. ]
+
+    to be used in YYParse. When an error is found, if the token is in the set 'end_of_input' the input
+    will be accepted if in the accepting state
+
+  * There is a bug in eyapp with reduce-reduce conflicts?! I am not sure of this
+    with reduce-reduce conflicts. In at least one case is reducing by the second production rule instead 
+    of the first.  It appears in the C++ parser (t/99Cplusplusgrammar.t). Confirm
+
+  * There is a bug with &give_rhs_name in Parse::Eyapp::Grammar and lists *, +, etc. see the example
+      examples/debuggintut/SemanticInfoInTokens.eyp
+
+    Not always a syntactic variable is a valid identifier: e.g. PLUS-1
+    Probably, it is better that the method "tokennames" give names to the syntactic variables
+
+  * str method to produce GraphViz, latex and/or other formats
+
+  * Treereg EXPORT and EXPORT_OK
+
+  * Language generation example examples/generator
+     -- Return a Test::LectroTest::Generator? 
+
+
+  * Check that all the production names (given with %name directives) are different. May be not
+
+  * Combine Flex and eyapp
+
+  * Grammar reuse, grammars as subroutines/methods: a grammar subroutine for variable B 
+    is implemented via 
+
+             B -> FIRST(B) { CALL PARSER FOR B}
+
+     The sublanguage is a set of tokens from the superlanguage perspective. The token attribute is the value
+     returned by the parser. The lexer must be changed to finish when a FOLLOW(B) is found. Line number
+     and input require special consideration
+
+  *  Introduce the directive %input FILE. We need to control line numbers and file names for this.
+     May be we need a full preprocessor for this
+
+  * When using option %delegateaction we must check that the client must have 
+  methods with names the names of the production rules (see example in the Simon's book
+  Advanced programming for this). In fact is a case of "abstract method"
+
+  * There is a generic 'Error' routine: provide it
+
+  * Not sure: eyappoption -t will generate a 'tag' file
+
+  * target 'version' in Makefile.PL: make a vim script
+
+  * PUBLIC_PLACE implies to copy to a remote machine (nereida)
+
+  * Implement the directive
+       %package Math::Calc 
+    (like the option -m of eyapp)
+
+  * common examples generated through the text template. Idem MANIFEST
+
+  * Lexical analyzer seems to be in a mess: line count seem full of bugs
+
+  * delete_method isn't documented
+  * Document generate, new, etc. in treeregexp
+  * Add to Parse::Eyapp::Base function
+             MakeHierarchy('BinaryOp(PLUS, TIMES, MINUS, DIV) Operation(BinaryOp)')
+    that will build a inheritance hierarchy
+
+  * Unify: to support trees and not only dags a symbol table will be helpful
+  * Parse::Eyapp::Node->new: Probably s.t. like
+     TUTU(TITI({ $[0]->{chu} = 4 }) {$_[0]->{k} = "hello"})
+    will be better to initialize the attributes
+
+  * Document Parse::Eyapp::Base
+- Distribution
+  * Attributed Grammars
+  * ABSTRACT 
+  * Output files .pm generated by the tests. Don't
+  * numchildren method
+  * token definitions %token NUM = qr{\d+}
+    It can be used later in the lexer as
+           return ('NUM', $1) if m{($NUM)};
+    That is the $NUM variable will be declared. Scope?
+ 
+  ***** Reorganize the translation of Treeregexp: the code in the "and" and =>
+    clauses will be a method of the classes of the nodes matching the treeregexp
+    - $treereg->classes computes the classes. doing nothing yet
+    - @{$methods{$_}} contain the classes
+    - Methods Parse::Eyapp::Treeregexp::REGEXP_INNER::classes included
+    - Factorize
+
+  * bug in notation x.y and $x
+  * Modifiy Parse::Eyapp::Driver::_Parse 
+    If the state is a conflict state execute the conflict handlers for that state:
+    We need then a hash whose keys will be the conflictive states:
+      {
+        state => { 
+                   handlername => { 
+                     code => conflict handler sub, 
+                     actions => { tokens => [a,b,c], shift 2, reduce 4}
+                   }
+                   ... 
+                 }
+        ...
+      }
+  * No syntactic auxiliary variable will be introduced in the %PREC positions. 
+
+  * The arguments for the 'code' handler will be the parser itself and the conflict name.
+
+
+
+      DB<3> x $self->{CONFLICTHANDLERS}                                                                               
+      0  HASH(0x100b57f30)
+         'ToN' => HASH(0x100b57eb0)
+            '.EMPTY' => ARRAY(0x100b43c90)
+                 empty array
+            'explorerline' => 12
+            'line' => 5
+            'production' => HASH(0x100b57de0)
+               '-6' => ARRAY(0x100b57d80)
+                  0  1
+               '-7' => ARRAY(0x100b57db0)
+                  0  1
+            'states' => ARRAY(0x100b57e80)
+               0  HASH(0x100b57e50)
+                  8 => ARRAY(0x100b57e20)
+                     0  ','
+            'total' => 2
+            'totalviewpoint' => 1
+
+  * Modify the LR parser algorithm:
+
+    my($self)=shift;
+
+    my($rules,$states,$error) = @$self{ 'RULES', 'STATES', 'ERROR' };
+    my($errstatus,$nberror,$token,$value,$stack,$check,$dotpos) = ...
+
+    $$errstatus=0; $$nberror=0; ($$token,$$value)=(undef,undef);
+    @$stack=( [ 0, undef, ] ); $$check='';
+
+    while(1) {
+        my($actions,$act,$stateno);
+
+        $stateno=$$stack[-1][0];
+
+        $self->executeconflicthandlers($stateno) if ($self->is_conflictive($stateno)); #!!!! 
+
+        $actions=$$states[$stateno];
+        ....
+
+
+    
+  * Option -v in eyapp will produce a navigable grammar.output.html version of the output
+    file
+
+  * EBNF ors must be implemented
+
+  * Artículos:
+      * OOPLAS
+      * reescribir con nueva sintáxis TOPLAS y el comsys
+      * Introducir modificaciones de los referees en los articulos de revista: implementacion, pruebas
+      * conseguir articulo de Ganapanathi "semantic predicates in"
+      * estudiar e introducir comparaciones
+      * insistir en que esta implementado y "verificado": describir implementación
+       
+      * Referees PLDI
+         -- too vague description
+         -- motivation for the YYExpected: explain the problem
+         -- Syntactic analysis that depends on the semantic phase: explain better
+         -- how the PPCR is better than backtracking
+         -- more mathematics, proofs,
+         -- One pass: is not clear to the referee
+         -- Doubts about the implementation: have been implemented paragraph, see example files in 
+            such, and such addresses
+         -- Comparisons with other parsers: Regexp::Grammars, Marpa: execution times, etc.
+            Complexity.
+         -- typos, wording
+         -- two different articles
+
+  * optimize generated lexer for contextual tokens (Expected must be called only once)
+  * debugging: break points, call actual debugger inside semantic actions, etc.
+
+  * Trying to supress the generation of conflict rules when there is no conflict (during nested
+    auxiliary compilation). Count the number of appearances of %PREC conflict . If it is greater
+    than two there is a true conflict. Otherwise the conflict symbols can be ignored.
+    There is however a problem. The translation used by Parse.yp performs some premature 
+    semantic actions that insert the conflict symbols as soon as a production is defined.
+    To solve it we must delay the translation until the whole grammar has been seen.
+
+  * Write code to control the right use of %conflict and %PREC
+      -   x $self->{GRAMMAR}{CONFLICTHANDLERS}                                                                      
+      0  HASH(0x1009898a0)
+         'decORexp' => HASH(0x100c5c1e0)
+            'explorerline' => 14
+            'line' => 14
+            'production' => HASH(0x100c50130)
+               '-12' => ARRAY(0x100c572e0)
+                  0  1
+               '-5' => ARRAY(0x100c50230)
+                  0  1
+            'states' => ARRAY(0x100c4bb50)
+               0  HASH(0x100c5bba0)
+                  28 => ARRAY(0x100c3c5b0)
+                     0  '\')\''
+            'total' => 2
+            'totalviewpoint' => 1
+ 
+       DB<8> x $$self{CONFLICTS}{FORCED}                                                                               
+        0  HASH(0x100c38800)
+           'DETAIL' => HASH(0x100c5b630)
+              28 => HASH(0x100c58030)
+                 'LIST' => ARRAY(0x100c581c0)
+                    0  ARRAY(0x100c581e0)
+                       0  '\')\''
+                       1  '-12'
+                 'TOTAL' => ARRAY(0x100c57d10)
+                    0  empty slot
+                    1  1
+           'TOTAL' => ARRAY(0x100c57da0)
+              0  0
+              1  1
+
+
+      - %PREC in no conflict production or in wrong position
+      - called for reduce-reduce but it is not a reduce-reduce, etc.
+      - Every %conflict has to have at least two associated %PRECs
+
+  * quiza entre la información guardada en CONFLICTHANDLERS deberían ir las etiquetas simbólicas.
+    Esto simplificaría YYSetReduce
+
+
+
+  * Otra API de mas alto nivel sería el caso regexp
+          %conflict conflictname /regexp/ ruleName
+    esta se ejecuta en el punto del conflicto
+
+  * clean tests deleted. Do it gain?
+
+  * examples in MANIFEST: obsolete
+
+  * Use %{ ... %} as syntactic sugar for syntactic code actions
+
+  * Generation of Several Parsers
+      - The lexer must be the one of the main parser
+
+  * The accept state must change
+      A$ -> A
+      A$ -> A.b where b is in the follow of A, means acceptation
+      Where are the follows?. They have been computed somewhere
+
+  * %PREC conflict does not check that a conflict handler has been previously declared
+
+
+  * GLR in eyapp
+
+  * eyapp and PPCR in the Wikipedia
+
+  * Update documentation
+
+  * add eyapp -Y option: equivalent to "%tree bypass"
+
+  * Lalr 
+      # substitute End Of Input by DEFAULT for each state
+      # Will it give a false acceptance? 
+      # I think I shall use an option in eyapp?
+      # make a test
+
+  * Change the API for YYSetReduce and YYSetshift to include the name of the conflict?
+
+  * Bug/limitation: When using -m and -o the output file still uses the original grammar name.
+    It seems more convenient to rename it to the output file suffixed with .output
+
+  * Lexical Analyzer generation:
+      * incremental lexer also influences the way the directive
+                                 %lexer 
+         must behave. Because a lexer written by hand can be incremental
+      * support streams: see lexer in examples/Eyapp/Lhs1.yp
+        - Parse::Eyapp::Driver::input called as a setter receives an open file handler :
+                  prompt!
+        - if the input string is finished it reads from the file handler (controled by $/)
+          otherwise returns the current string
+      * error line numbers-> source code
+      * lexer must support a sub name
+         %lexer mylexer
+      *  Document:
+            =head3 $parser->input YYInput
+            =head3 $parser->YYInputFile
+
+            =head3 $parser->YYPrompt
+
+            =head3 $parser->main
+
+            =head3 $parser->Run
+
+
+  * %tree: 
+     - info  clause (autobuild ::info for TERMINAL) 
+     - naming scheme clause
+
+  * Tests
+     - tests all examples/*/*yp for syntax checking
+     - test for yyfilename
+     - Add tests to check .output tables: actions and gotos against yacc. 
+        I am not confident that some modifications I introduced in Grammar.pm were error free
+     - Automatic naming scheme: tests!
+     - Some rules can be optimized away. Then the name dissapears!!
+     - tests with syntax errors
+     - Debug mode and standalone works?
+
+  *  Debugging: set breakpoints in the code from yydebug=> 1
+
+  * What if the input comes from a stream? then $parser->input is undef
+    Shall I support interactive streams?
+      - YYLookaheads assumes that input comes from $parser->input
+      - The default lexer assumes that input comes from $parser->input
+      Change it to use an input stack
+
+  * PPCR:
+     - The whole implementation approach seems wrong. 
+       Make actions an array. Associate the handler with the state.
+       That allows a syntax like:
+                          %conflict handler {... } 
+                          %shift-reduce prod1 [token1, token2, ...] prod2 [tokens] handler
+                          %reduce-reduce prod3 [token1, token2, ...] prod4 [tokens] otherhandler
+                          ....
+
+     - There is a bug: I have to check that reductions in PPCR only occur inside the conflictive states
+
+     - Warning Grammar.pm 
+         sub Parse::Eyapp::Grammar::conflictHandlers  rewrite! or use Data::Dumper forever?
+
+  * %package directive: equivalent to eyapp -m option 
+
+  * -%modulino directive 
+      %modulino perlinterpreter prompt
+      Equivalent to eyapp -b 'perlinterpreter' and __PACKAGE__->main(prompt) 
+      %modulino '/usr/local/lib/perl/5.10.1/bin/perl5.10.1' 'Try input "type e = (x);": '
+      
+      avoid repetitive __PACKAGE->main when using options -C and -b
+
+  * Article: rewrite, both research and divulgation
+
+  * Documentation
+     - Simpler intro
+     - Separate parsing from tree transformation
+
+
+  * EBNF (a|b|c)*
+    - eyapp option -TREE: same as %tree
+      currently only give_rhs is used, but it has to be parametrized
+
+  * - eyapp option namingscheme
+
+    - eyapp option -start (defines the start symbol)
+       Eyapp -> Lalr -> Grammar -> Options
+                            `----> Parse
+    - intermediate actions in give_rhs_name? check, test
+    
+  * Error message when a conflict handler isn't used is inaccurate:
+
+      ~/LEyapp/examples/debuggingtut$ eyapp dynamicgrammar.eyp 
+      Useless non-terminals:
+
+          rangeORenum, declared line 10
+
+      Useless rules:
+
+          rangeORenum -> 
+
+      1 shift/reduce conflict and 0 reduce/reduce conflicts
+
+  *  Line numbers seem to be in a buggy state.
+     There is also a "bug" with tokenline and the static attribute approach: tokenline
+     attribute is defined to 1 while the static/attribute approach searches while "undef"
+
+  * Provide a module providing regexp for most common non destructive lexing: NUMs, IDs, etc
+
+      use Parse::Eyapp::LexSupport qw{INT PERLWS ID};
+
+      Created by "new" so that $self is in scope
+
+         $INT = qr{\G(\d+)}gc; $WS = qr{{\G(\s*) (?{  $self->tokenline($1 =~ tr{\n}{}) }) }gxc; etc.
+
+      tokens can be "defined" with:
+
+          %token DOTDOT /(\.\.)/ 
+          %token INT /(\d+)/ 
+
+      The parser will define $DOTDOT = qr{/\G(\.\.)/;
+      and then:
+
+      PERLWS(); # No need to update the line number
+
+      m{\Gtype\b}gic           and return ('TYPE', 'TYPE'); # old way
+
+      m{$ID}gc                 and return ('ID',  $1);
+
+      INT()                    and return ('NUM', $1);
+
+      DOTDOT()                 and return ('DOTDOT',  $DOTDOT);
+
+      m{\G(.)}gc               and return ($1,    $1);
+
+  * Parse::Eyapp::Driver::main 
+     - option to send output to a file
+
+  * bison directives: 
+
+        Directive: %debug
+            In the parser file, define the macro YYDEBUG to 1 if
+            it is not already defined, so that the debugging
+            facilities are compiled.
+
+        Directive: %no-parser
+            Do not include any C code in the parser file; generate
+
+        Directive: %no-lines
+
+        Directive: %output="filename"
+
+
+  * the #line directive in Parse.yp for %lexer is prone to be buggy (worst practice)
+
+
+  * Dynamic conflict resolution: test YYSetShift
+        The case where the default is a reduction is not solved. Investigate
+
+  * Further study YAML (class preservation)
+
+  * Provide debugging support for standalone modules: currently skipped
+
+  * Provide an argument named 
+                                'end_of_input' => [ token list: '', NUM, etc. ]
+
+    to be used in YYParse. When an error is found, if the token is in the set 'end_of_input' the input
+    will be accepted if in the accepting state
+
+  * There is a bug in eyapp with reduce-reduce conflicts?! I am not sure of this
+    with reduce-reduce conflicts. In at least one case is reducing by the second production rule instead 
+    of the first.  It appears in the C++ parser (t/99Cplusplusgrammar.t). Confirm
+
+  * There is a bug with &give_rhs_name in Parse::Eyapp::Grammar and lists *, +, etc. see the example
+      examples/debuggintut/SemanticInfoInTokens.eyp
+
+    Not always a syntactic variable is a valid identifier: e.g. PLUS-1
+    Probably, it is better that the method "tokennames" give names to the syntactic variables
+
+  * str method to produce GraphViz, latex and/or other formats
+
+  * Treereg EXPORT and EXPORT_OK
+
+  * Language generation example examples/generator
+     -- Return a Test::LectroTest::Generator? 
+
+
+  * Check that all the production names (given with %name directives) are different. May be not
+
+  * Combine Flex and eyapp
+
+  * Grammar reuse, grammars as subroutines/methods: a grammar subroutine for variable B 
+    is implemented via 
+
+             B -> FIRST(B) { CALL PARSER FOR B}
+
+     The sublanguage is a set of tokens from the superlanguage perspective. The token attribute is the value
+     returned by the parser. The lexer must be changed to finish when a FOLLOW(B) is found. Line number
+     and input require special consideration
+
+  *  Introduce the directive %input FILE. We need to control line numbers and file names for this.
+     May be we need a full preprocessor for this
+
+  * When using option %delegateaction we must check that the client must have 
+  methods with names the names of the production rules (see example in the Simon's book
+  Advanced programming for this). In fact is a case of "abstract method"
+
+  * There is a generic 'Error' routine: provide it
+
+  * Not sure: eyappoption -t will generate a 'tag' file
+
+  * target 'version' in Makefile.PL: make a vim script
+
+  * PUBLIC_PLACE implies to copy to a remote machine (nereida)
+
+  * Implement the directive
+       %package Math::Calc 
+    (like the option -m of eyapp)
+
+  * common examples generated through the text template. Idem MANIFEST
+
+  * Lexical analyzer seems to be in a mess: line count seem full of bugs
+
+  * delete_method isn't documented
+  * Document generate, new, etc. in treeregexp
+  * Add to Parse::Eyapp::Base function
+             MakeHierarchy('BinaryOp(PLUS, TIMES, MINUS, DIV) Operation(BinaryOp)')
+    that will build a inheritance hierarchy
+
+  * Unify: to support trees and not only dags a symbol table will be helpful
+  * Parse::Eyapp::Node->new: Probably s.t. like
+     TUTU(TITI({ $[0]->{chu} = 4 }) {$_[0]->{k} = "hello"})
+    will be better to initialize the attributes
+
+  * Document Parse::Eyapp::Base
+- Distribution
+  * Attributed Grammars
+  * ABSTRACT 
+  * Output files .pm generated by the tests. Don't
+  * numchildren method
+  * token definitions %token NUM = qr{\d+}
+    It can be used later in the lexer as
+           return ('NUM', $1) if m{($NUM)};
+    That is the $NUM variable will be declared. Scope?
+ 
+  ***** Reorganize the translation of Treeregexp: the code in the "and" and =>
+    clauses will be a method of the classes of the nodes matching the treeregexp
+    - $treereg->classes computes the classes. doing nothing yet
+    - @{$methods{$_}} contain the classes
+    - Methods Parse::Eyapp::Treeregexp::REGEXP_INNER::classes included
+    - Factorize
+
+  * star treeregexp will be supressed *
+  * Introduce DECLARATION* in treeregexes
+  * "previous" clause for YATW objects when using "bud". The YATW will 
+    be executed before visiting the children. An example of the advantage
+    of doing this is to use "bud" for scope analysis
+  * %default action must have an scope
+  * Factorize YYBuildAST and YYActionforT_TX1X2 etc.
+    There is a problem with TERMINAL::save_attributes ?
+    bypass, plus and star lists, etc. There is no coherent interface
+    at the moment
+  * version numbers
+  * Warning diagnostic (Yure): ID and 'ID' is prone to error
+    Non defined variables are considered terminals: see Identifyattr2.yp. Put info in Output
+  * Better diagnostics: see -v 
+  * Redesign eyapp program structure for documentation (pods): head body legs tail 
+    (or __END__ ?)
+  * .output in HTML (?)
+  * Some data structures inside the Parser object are only required 
+    if the %tree or %metatree directives are active. Otimize them away
+    when they are not used (for example syntax tokens, bypass, etc.).
+  * Change names of _PLUSLIST, etc. Make a directive to name them 
+       %name * => _STAR  + => ... , etc.
+    It may influence optimizations like the PARENTHESIS one?
+  * bypass method for YATW and Node objects
+
+  * Fix the yyprefix consistency problem between new and YYParse (args)
+  * What is YYFilename in Driver.pm
+
+  * Reference manual. Document functions and methods
+    -- Sort by alphabetical order
+    -- User methods and subroutines. Internal documentation
+
+- Treereg Tree grammars and tree walkers
+ 
+
+  * Uniformize 
+     - Lower case in new_grammar, uppercase in Treeregexp new, etc.
+     - Also look at scripts
+
+  * Private methods
+  * Indentation and line numbers. 
+
+- Translation Schemes
+  * Scheme examples: leftrec, etc.
+  * Tests
+    - In TS delete the code refs using treeregexp
+  * Documentation
+  * Executable transscheme
+  * Delete args in YATW objects it seems they are no use
+  * TERMINAL nodes inherit from TS and Node. What if I have two parsers
+    in the same application?
+  * Put option %yaml file when using a translation scheme to save the AST
+
+  * TS: Don't check syntax during the construction phase?
+  * Check syntax option in eyapp
+  * Keep Line Numbers in the tree (for tokens)
+
+  * Factorize lists code
+  * Admitir directivas-especificaciones de si la lista debe ser left-recursive o right-recursive
+  * Esquema de nombres de las reglas temporales:
+      Reservar la numeración de las reglas de la gramática original
+      y usar posiciones adicionales para las reglas temporales.
+  * Hacer una directiva para la generacion de reglas de error en listas
+  
+  * Supress when production code use Data::Dumper;
+  
+  * %packagename %outputfile %numbers, etc.
+  
+- Optimizations:
+  * Driver in C
+  * BuildAST in C
+
+
+************ PROJECTS *********************
+* Human friendly warnings and errors, conflicts, debugger with breaks, etc.
+

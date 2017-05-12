@@ -1,0 +1,56 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-DataWalker\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-10 22:50+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Jérôme Quelin <jquelin@gmail.com>\n"
+"Language-Team: jerome quelin <jquelin@cpan.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: French\n"
+"X-Poedit-Country: FRANCE\n"
+
+#: lib/Padre/Plugin/DataWalker.pm:89
+msgid "About"
+msgstr "A propos"
+
+#: lib/Padre/Plugin/DataWalker.pm:90
+msgid "Browse YAML dump file"
+msgstr "Parcourir le fichier de dump YAML"
+
+#: lib/Padre/Plugin/DataWalker.pm:91
+msgid "Browse current document object"
+msgstr "Parcourir l'objet document courant"
+
+#: lib/Padre/Plugin/DataWalker.pm:92
+msgid "Browse Padre IDE object"
+msgstr "Parcourir l'objet IDE courant"
+
+#: lib/Padre/Plugin/DataWalker.pm:93
+msgid "Browse Padre main symbol table"
+msgstr "Parcourir la table des symboles de Padre"
+
+#: lib/Padre/Plugin/DataWalker.pm:103
+msgid "Open file"
+msgstr "Ouvrir un fichier"
+
+#: lib/Padre/Plugin/DataWalker.pm:119
+#, perl-format
+msgid "Could not find the specified file '%s'"
+msgstr "Ne peut pas trouver le fichier spécifié '%s'"
+
+#: lib/Padre/Plugin/DataWalker.pm:120
+msgid "File not found"
+msgstr "Fichier non trouvé"
+
+#: lib/Padre/Plugin/DataWalker.pm:129
+#, perl-format
+msgid "Could not read the YAML file.%s"
+msgstr "Ne peut pas lire le fichier YAML. %s"
+
+#: lib/Padre/Plugin/DataWalker.pm:130
+msgid "Invalid YAML file"
+msgstr "Fichier YAML invalide"
+

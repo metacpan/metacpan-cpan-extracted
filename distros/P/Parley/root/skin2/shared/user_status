@@ -1,0 +1,19 @@
+<!-- shared/user_status -->
+<p>
+    [% IF (authed_user) %]
+        [%l('Logged in as')%] <b>[% authed_user.first_name %] [% authed_user.last_name %]</b>
+        [% UNLESS authed_user.authentication.authenticated %]
+            (<b><i>[%l('Not Authenticated')%]</i></b>)
+        [% END %]
+        <i><br />[
+        <a href="user/logout">[%l('Logout')%]</a>
+        ]</i>
+    [% ELSE %]
+        <i>[
+        <a href="javascript:;" onclick="javascript:YAHOO.parley.login.login_dialog.show(); return false;">[%l('Login')%]</a>
+        |
+        <a href="user/signup">[%l('Signup')%]</a>
+        ]</i>
+    [% END %] [%# authed_user end %]
+</p>
+<!-- end : shared/user_status -->

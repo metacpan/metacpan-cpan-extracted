@@ -1,0 +1,7 @@
+#!/usr/bin/env perl
+use strict;
+use 5.010;
+use lib 'lib';
+use Pandoc::Elements;
+use Pandoc::Filter;
+pandoc_walk( Header => sub{ say " " x ($_->level-1), $_->string } );

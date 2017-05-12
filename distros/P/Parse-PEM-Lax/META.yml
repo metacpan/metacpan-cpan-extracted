@@ -1,0 +1,19 @@
+---
+abstract: "Extract normalised sections from PEM files"
+author:
+  - 'Bjoern Hoehrmann <bjoern@hoehrmann.de>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-PEM-Lax
+no_index:
+  directory:
+    - t
+    - inc
+resources:
+  repository: https://github.com/hoehrmann/Parse-PEM-Lax.git
+version: 0.01

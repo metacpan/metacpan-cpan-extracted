@@ -1,0 +1,14 @@
+Revision history for Plack-Middleware-PyeLogger
+
+2.000001  2015-08-19 10:36:39+03:00 Asia/Jerusalem
+	- Bugfix: the test had a wrong value for a skip check, causing it
+	  to fail when MongoDB was not installed. Also, it was still dependent
+	  on the MongoDB backend, which is wrong, so the test is now removed
+	  completely until a suitable replacement is created.
+
+2.000000  2015-08-18 19:54:50+03:00 Asia/Jerusalem
+	- Updated according to changes in Pye v2.0.0, specifically,
+	  the "backend" key must be provided when enabling the middleware.
+
+1.000000  2013-12-25 00:29:57 Asia/Jerusalem
+	- First public release

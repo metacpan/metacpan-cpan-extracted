@@ -1,0 +1,59 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-12-03 12:04+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/HTMLExport.pm:48
+msgid "Export Colorful HTML"
+msgstr ""
+
+#: lib/Padre/Plugin/HTMLExport.pm:49
+msgid "Export HTML..."
+msgstr ""
+
+#: lib/Padre/Plugin/HTMLExport.pm:50
+msgid "Configure Color"
+msgstr ""
+
+#: lib/Padre/Plugin/HTMLExport.pm:71
+msgid "Save as HTML..."
+msgstr ""
+
+#: lib/Padre/Plugin/HTMLExport.pm:85
+msgid "File already exists. Overwrite it?"
+msgstr ""
+
+#: lib/Padre/Plugin/HTMLExport.pm:86
+msgid "Exist"
+msgstr ""
+
+#: lib/Padre/Plugin/HTMLExport.pm:103
+#, perl-format
+msgid "%s is not supported"
+msgstr ""
+
+#: lib/Padre/Plugin/HTMLExport.pm:154
+#, perl-format
+msgid "Saved to %s. Do you want to open it now?"
+msgstr ""
+
+#: lib/Padre/Plugin/HTMLExport.pm:155
+msgid "Done"
+msgstr ""
+
+#: lib/Padre/Plugin/HTMLExport.pm:168
+msgid "Not implemented, TODO"
+msgstr ""

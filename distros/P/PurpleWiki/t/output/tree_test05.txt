@@ -1,0 +1,11 @@
+= Section 1 =
+
+Check to see if the WikiText output works correctly.
+
+WikiWord
+
+= Section 2 =
+
+Did it work?
+
+WikiWord""separated from the rest of the text.

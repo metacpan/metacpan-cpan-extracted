@@ -1,0 +1,23 @@
+Revision history for Perl extension Parse::CPinfo.
+
+0.88    Sun Apr  8 19:00:00 2007
+	- Initial public release.
+
+0.881  Mon Apr  9 20:29:35 2007
+	- Updated POD to include correct example using method and not
+	  directly reading variables.
+	- Folded private _parse method into the read function.  Previously,
+	  all data was read into a private _cpinfo_data variable and then
+	  parsed.  Now, data is parsed as it is read, improving speed by a
+	  factor of 3.
+	- Renamed the read function to readfile at the recommendation of 
+	  perlcritic.
+	- Updated README to better show testing coverage.
+	- Accepted some recommendations from perlcritic.
+	- Told Perl that the regular expressions will not be changing via
+	  the /o option.
+
+0.882  Wed Apr 11 17:17:17 2007
+	- Added option to parse hostname
+	- Removed external module dependencies.
+

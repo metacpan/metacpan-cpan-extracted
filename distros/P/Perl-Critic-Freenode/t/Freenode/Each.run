@@ -1,0 +1,11 @@
+## name UseEach
+## failures 1
+## cut
+
+while (($key, $value) = each %hash) { ... }
+
+## name NoEach
+## failures 0
+## cut
+
+foreach my $key (keys %hash) { ... }

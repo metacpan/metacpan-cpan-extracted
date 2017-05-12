@@ -1,0 +1,18 @@
+=head1 USAGE
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+Etiam et urna vitae lacus cursus mollis pellentesque quis velit.
+Pellentesque vel est vitae elit fringilla blandit non nec est.
+
+=head2 An example script 
+
+=pester source well-documented-script
+
+As you can see Nunc varius magna in justo imperdiet non venenatis dolor fermentum.
+
+=head2 Running it, you see:
+
+=pester run well-documented-script
+
+Duis dignissim venenatis diam, sit amet adipiscing turpis mattis quis.
+Mauris sed nibh elit, quis tincidunt enim.

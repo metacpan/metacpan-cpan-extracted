@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: xkbui
+Description: The xkbui Library
+Version: 1.0.2
+Requires: x11 kbproto
+Requires.private: x11 xt
+Cflags: -I${includedir}
+Libs: -L${libdir} -lxkbui

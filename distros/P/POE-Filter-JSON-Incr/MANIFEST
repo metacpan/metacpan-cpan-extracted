@@ -1,0 +1,9 @@
+Changes
+lib/POE/Filter/JSON/Incr.pm
+lib/POE/Filter/JSON/Incr/Error.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/01_filter.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

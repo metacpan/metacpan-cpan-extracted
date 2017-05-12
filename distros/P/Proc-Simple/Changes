@@ -1,0 +1,105 @@
+######################################################################
+    Proc::Simple CHANGES
+######################################################################
+
+          1.32 (2015/11/15)
+            (ms) [rt.cpan.org #108215] open() calls now use the safe form.
+
+          1.31 (2012/11/17)
+            (ms) To better deal with the race condition in the 
+                 previous release, kill the newly created child 
+                 process first, then send a killpg to its process 
+                 group and ignore the outcome.
+
+            (ms) [RT 81203] Jim A Kessler reported a perl 5.16 issue
+                 with the "AutoLoader" line, so I went ahead and removed
+                 all references to "Exporter" and "AutoLoader", as 
+                 Proc::Simple isn't using them at all.
+
+          From 1.29:
+                     [RT 69782] Zefram reported race condition in t/sh-c.t,
+                     fixed by adding polling loop.
+
+                     Found that kill(-sig, pid) sometimes fails with 
+                     'process id not found' although a previous kill(0, pid) 
+                     succeeded. This is a race condition condition caused
+                     by a newly forked child that hasn't called setsid() yet
+                     and therefore its new process group id doesn't exist yet,
+                     although the child responds to poll(). kill() now
+                     deals with this case.
+          From 1.28:
+                     [RT 69103] Typo fix by Salvatore Bonaccorso
+                     Added support for processes called via 'sh -c' by
+                     system() (see "Shell Processes" note in the manpage).
+          From 1.27:
+                     [RT 62802] Pod fix by Salvatore Bonaccorso
+                     [RT 63833] Applied patch to stop reaping PIDs of 
+                       no longer existing processes (submitted by perlbotics).
+                     Added licensizer
+                     [RT 63833] (second part) Added cleanup() class method
+                     to delete timing data of reaped processes, avoiding
+                     infinite memory growth on long-running processes
+
+          From 1.26: [RT 62285] Pod fix for redirect_output()
+                     Fixed github link
+
+          from 1.25: Localize special variables so that the exit status 
+                     from waitpid doesn't leak out, causing exit status 
+                     to be incorrect (RT33440, fixed by Brad Cavanagh).
+
+          from 1.24: Added copyright header
+
+          from 1.23: Applied doc patch by Janne Chr. Schulz
+
+          from 1.22: Applied patch by Jeff Holt, providing start
+                     and end time of the forked process via t0() and t1().
+
+          from 1.21: Added patch by Chip Capelik to provide a wait()
+                     method waiting for a process to terminate.
+
+          from 1.20: Added patch by Tobias Jahn <tjahn@users.sourceforge.net>,
+                     to redirect STDOUT or STDERR of the child process upon
+                     request.
+
+          from 1.19: Fixed bug which occurred on failed fork()s, as 
+                     reported anonymously on the CPAN bug tracker.
+
+          from 1.18: Added multi-arg start method (proposed by
+                     Clauss Strauch <Clauss_Strauch@aquila.fac.cs.cmu.edu>)
+
+          from 1.17: Fixed Version difference between Makefile.PL
+                     and Simple by using VERSION_FROM (thanks
+                     Andreas Koenig)
+
+          from 1.16: Fixed bug with Proc::Simple instances which
+                     were DESTROYED before they were ever started.
+                     Many thanks to Russell Fulton (r.fulton@auckland.ac.nz)
+                     for pointing this out.
+
+          from 1.15: Added %DESTROYED hash for processes which might
+                     still in zombie state right after their objects
+                     went out of business. THE_REAPER will take care
+                     of them.
+
+          from 1.14: Added exit_status() method and a smart
+                     REAPER which reaps only processes we've started before.
+
+          from 1.13: Replaced two erronous uses of 'exists' by 'defined'.
+                     Thanks to Rolf.Beutner@telekom.de for pointing this
+                     out.
+          from 1.12: To fight problems with zombies, replaced the wait()
+                     function by a NOWAIT waitpid on systems that 
+                     support it.
+
+                     Tim Jenness <t.jenness@jach.hawaii.edu> included
+                     kill_on_destroy/sig_on_destroy/pid methods.
+
+          from 1.11: binkley's error: threw out waitpid, wait is
+                     performed by signal handler now.
+
+          from 1.1:  Process is now called Proc::Simple to fit in the
+                     CPAN namespace, corrections Andreas Koenig suggested.
+
+First Release:  05/22/96
+
+Michael Schilli procsimple@perlmeister.com

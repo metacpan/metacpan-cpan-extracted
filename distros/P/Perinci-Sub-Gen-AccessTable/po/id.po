@@ -1,0 +1,251 @@
+# Indonesian translations for Perinci-Sub-Gen-AccessTable package.
+# Copyright (C) 2013 Steven Haryanto
+# This file is distributed under the same license as the Perinci-Sub-Gen-AccessTable package.
+# Automatically generated, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Perinci-Sub-Gen-AccessTable 0.27\n"
+"Report-Msgid-Bugs-To: stevenharyanto@gmail.com\n"
+"POT-Creation-Date: 2014-06-29 19:03+0700\n"
+"PO-Revision-Date: 2013-12-11 17:43+0700\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:131
+#: lib/Perinci/Sub/Gen/AccessTable.pm:149
+#: lib/Perinci/Sub/Gen/AccessTable.pm:165
+#: lib/Perinci/Sub/Gen/AccessTable.pm:241
+msgid "field selection"
+msgstr "pemilihan field"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:132
+msgid "Return field names in each record (as hash/associative array)"
+msgstr "Sertakan nama field di tiap rekord (sebagai larik asosiatif/hash)"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:135
+msgid ""
+"\n"
+"When enabled, function will return each record as hash/associative array\n"
+"(field name => value pairs). Otherwise, function will return each record\n"
+"as list/array (field value, field value, ...).\n"
+"\n"
+msgstr ""
+"\n"
+"Jika opsi ini aktif, fungsi akan mengembalikan tiap rekord sebagai larik\n"
+"asosiatif/hash (pasangan nama field => nilai field). Tanpa opsi ini, fungsi\n"
+"akan mengembalikan tiap rekord sebagai larik/list (nilai field, nilai ...).\n"
+"\n"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:150
+msgid "Return array of full records instead of just ID fields"
+msgstr "Kembalikan daftar record dan tidak hanya daftar nilai field kunci"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:153
+msgid ""
+"\n"
+"By default, only the key (ID) field is returned per result entry.\n"
+"\n"
+msgstr ""
+"\n"
+"Defaultnya, hanya field kunci (ID) yang dikembalikan per entri hasil.\n"
+"\n"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:166
+msgid "Select fields to return"
+msgstr "Pilih field yang ingin dikembalikan"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:175
+#: lib/Perinci/Sub/Gen/AccessTable.pm:191
+msgid "ordering"
+msgstr "pengurutan"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:176
+msgid "Order records according to certain field(s)"
+msgstr "Urutkan rekord berdasarkan field(-field) tertentu"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:178
+msgid ""
+"\n"
+"A list of field names separated by comma. Each field can be prefixed with "
+"'-' to\n"
+"specify descending order instead of the default ascending.\n"
+"\n"
+msgstr ""
+"\n"
+"Daftar nama field dipisahkan oleh koma. Setiap field dapat diawali '-' "
+"untuk\n"
+"menyatakan ingin pengurutan dari besar ke kecil (default dari kecil ke "
+"besar).\n"
+"\n"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:192
+msgid "Return records in random order"
+msgstr "Kembalikan rekord dalam urutan acak"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:201
+#: lib/Perinci/Sub/Gen/AccessTable.pm:211
+msgid "paging"
+msgstr "halaman"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:202
+msgid "Only return a certain number of records"
+msgstr "Hanya kembalikan sejumlah tertentu rekord"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:212
+msgid "Only return starting from the n'th record"
+msgstr "Hanya kembalikan mulai dari rekord posisi ke-n"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:220
+msgid "filtering"
+msgstr "penyaringan"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:221
+msgid "Search"
+msgstr "Cari"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:242
+#, perl-brace-format
+msgid "Show field '{field}'"
+msgstr "Tampilkan field '{field}'"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:251
+#: lib/Perinci/Sub/Gen/AccessTable.pm:266
+#: lib/Perinci/Sub/Gen/AccessTable.pm:281
+#: lib/Perinci/Sub/Gen/AccessTable.pm:291
+#: lib/Perinci/Sub/Gen/AccessTable.pm:304
+#: lib/Perinci/Sub/Gen/AccessTable.pm:315
+#: lib/Perinci/Sub/Gen/AccessTable.pm:328
+#: lib/Perinci/Sub/Gen/AccessTable.pm:339
+#: lib/Perinci/Sub/Gen/AccessTable.pm:350
+#: lib/Perinci/Sub/Gen/AccessTable.pm:361
+#: lib/Perinci/Sub/Gen/AccessTable.pm:374
+#: lib/Perinci/Sub/Gen/AccessTable.pm:385
+#: lib/Perinci/Sub/Gen/AccessTable.pm:397
+#: lib/Perinci/Sub/Gen/AccessTable.pm:408
+#, perl-brace-format
+msgid "filtering for {field}"
+msgstr "penyaringan untuk {field}"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:252
+#, perl-brace-format
+msgid "Only return records where the '{field}' field equals specified value"
+msgstr "Hanya kembalikan rekord yang field '{field}'-nya bernilai tertentu"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:267
+#, perl-brace-format
+msgid ""
+"Only return records where the '{field}' field does not equal specified value"
+msgstr ""
+"Hanya kembalikan rekord yang field '{field}'-nya tidak sama dengan nilai "
+"tertentu"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:282
+#, perl-brace-format
+msgid ""
+"Only return records where the '{field}' field is in the specified values"
+msgstr ""
+"Hanya kembalikan rekord yang field '{field}'-nya salah satu dari nilai-nilai "
+"yang disebutkan"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:292
+#, perl-brace-format
+msgid ""
+"Only return records where the '{field}' field is not in the specified values"
+msgstr ""
+"Hanya kembalikan rekord yang field '{field}'-nya bukan salah satu dari nilai-"
+"nilai yang disebutkan"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:305
+#, perl-brace-format
+msgid ""
+"Only return records where the '{field}' field is an array/list which "
+"contains specified value"
+msgstr ""
+"Hanya kembalikan rekord yang field '{field}'-nya adalah larik yang "
+"mengandung nilai tertentu"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:316
+#, perl-brace-format
+msgid ""
+"Only return records where the '{field}' field is an array/list which does "
+"not contain specified value"
+msgstr ""
+"Hanya kembalikan rekord yang field '{field}'-nya adalah larik yang tidak "
+"mengandung nilai tertentu"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:329
+#, perl-brace-format
+msgid ""
+"Only return records where the '{field}' field is greater than or equal to "
+"specified value"
+msgstr ""
+"Hanya kembalikan rekord yang field '{field}'-nya lebih besar atau sama "
+"dengan nilai tertentu"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:340
+#, perl-brace-format
+msgid ""
+"Only return records where the '{field}' field is less than or equal to "
+"specified value"
+msgstr ""
+"Hanya kembalikan rekord yang field '{field}'-nya lebih kecil atau sama "
+"dengan nilai tertentu"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:351
+#, perl-brace-format
+msgid ""
+"Only return records where the '{field}' field is greater than specified value"
+msgstr ""
+"Hanya kembalikan rekord yang field '{field}'-nya lebih besar dari nilai "
+"tertentu"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:362
+#, perl-brace-format
+msgid ""
+"Only return records where the '{field}' field is less than specified value"
+msgstr ""
+"Hanya kembalikan rekord yang field '{field}'-nya lebih kecil dari nilai "
+"tertentu"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:375
+#, perl-brace-format
+msgid "Only return records where the '{field}' field contains specified text"
+msgstr ""
+"Hanya kembalikan rekord yang field '{field}'-nya mengandung teks tertentu"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:386
+#, perl-brace-format
+msgid ""
+"Only return records where the '{field}' field does not contain specified text"
+msgstr ""
+"Hanya kembalikan rekord yang field '{field}'-nya tidak mengandung teks "
+"tertentu"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:398
+#, perl-brace-format
+msgid ""
+"Only return records where the '{field}' field matches specified regular "
+"expression pattern"
+msgstr ""
+"Hanya kembalikan rekord yang field '{field}'-nya cocok dengan pola regex "
+"tertentu"
+
+#: lib/Perinci/Sub/Gen/AccessTable.pm:409
+#, perl-brace-format
+msgid ""
+"Only return records where the '{field}' field does not match specified "
+"regular expression"
+msgstr ""
+"Hanya kembalikan rekord yang field '{field}'-nya tidak cocok dengan pola "
+"regex tertentu"
+
+#~ msgid "Data is in table form. Table fields are as follow:"
+#~ msgstr "Data berbentuk tabel. Field-field tabel adalah sebagai berikut:"
+
+#~ msgid "ID field"
+#~ msgstr "field kunci"

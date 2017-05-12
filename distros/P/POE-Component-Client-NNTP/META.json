@@ -1,0 +1,52 @@
+{
+   "abstract" : "A POE component that implements an RFC 3977 NNTP client.",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200018, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-Client-NNTP",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.47",
+            "Test::POE::Server::TCP" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "POE" : "0.9999",
+            "POE::Component::Pluggable" : "0.03",
+            "POE::Component::Pluggable::Constants" : 0,
+            "POE::Driver::SysRW" : 0,
+            "POE::Filter::Line" : 0,
+            "POE::Wheel::ReadWrite" : 0,
+            "POE::Wheel::SocketFactory" : 0,
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/poe-component-client-nntp",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/poe-component-client-nntp.git",
+         "web" : "https://github.com/bingos/poe-component-client-nntp"
+      }
+   },
+   "version" : "2.22"
+}
+

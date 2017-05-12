@@ -1,0 +1,33 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Encrypt\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-18 15:37+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"Language-Team: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Arabic\n"
+
+#: lib/Padre/Plugin/Encrypt.pm:18
+msgid "Encrypt <-> Decrpyt"
+msgstr "تشفير <-> فك التشفير"
+
+#: lib/Padre/Plugin/Encrypt.pm:19
+msgid "Encrypt"
+msgstr "تشفير"
+
+#: lib/Padre/Plugin/Encrypt.pm:20
+msgid "Decrypt"
+msgstr "فك التشفير"
+
+#: lib/Padre/Plugin/Encrypt.pm:82
+msgid "Private key is required"
+msgstr "المفتاح الخاص مطلوب"
+
+#: lib/Padre/Plugin/Encrypt.pm:117
+msgid "Error while encrypting/decrypting:"
+msgstr "حدث خطأ خلال عملية التشفير أو فك التشفير"
+

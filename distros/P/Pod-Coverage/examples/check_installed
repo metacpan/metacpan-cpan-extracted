@@ -1,0 +1,27 @@
+#!/usr/bin/perl -w
+
+# code contributed by Kirrily "Skud" Robert <skud@cpan.org>
+
+use strict;
+use Pod::Coverage;
+use ExtUtils::Installed;
+
+my $m = ExtUtils::Installed->new;
+my @modules = $m->modules();
+
+print "Checking POD coverage...\n";
+
+my %coverage;
+foreach my $mod (@modules) {
+    my $pc = new Pod::Coverage package => $mod;
+    $coverage{$mod} = $pc->coverage() || 0;
+}
+
+foreach my $out (sort by_coverage keys %coverage) {
+    my $bar = "*" x ($coverage{$out} * 40);
+    printf("%30s  %3d%%  %s\n", $out, $coverage{$out}*100, $bar);
+}
+
+sub by_coverage {
+    $coverage{$b} <=> $coverage{$a};
+}

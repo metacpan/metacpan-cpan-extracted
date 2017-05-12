@@ -1,0 +1,18 @@
+---
+abstract: 'Parse SQL statements using Parser::MGC'
+author:
+  - 'Tom Molesworth <cpan@entitymodel.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-SQL
+requires:
+  Parser::MGC: 0.09
+  parent: 0
+version: 0.002

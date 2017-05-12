@@ -1,0 +1,154 @@
+<h1>User Signup</h1>
+
+[% IF view.error.message %]
+    [% view.error.message %]
+    <ul>
+        [% FOREACH message IN view.error.messages %]
+            <li>[% message %]</li>
+        [% END %]
+    </ul>
+[% END %]
+
+<form action="[%c.uri_for('user/signup')%]" method="post" name="signup_form">
+    <div>
+        [%l('SIGNUP COMPLETE FORM')%] 
+    </div>
+
+    <div class="yui-gb top_padded">
+        <div class="yui-u first align_right">
+            <label for="username">[%l('SIGNUP USERNAME')%]:</label>
+        </div>
+        <div class="yui-u">
+            <input type="text" id="new_username" name="new_username" class="input_text" />
+            [% form_error.field_error_new_username %]
+        </div>
+        <div class="yui-u">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="yui-gb top_padded">
+        <div class="yui-u first align_right">
+            <label for="password">[%l('SIGNUP PASSWORD')%]:</label>
+        </div>
+        <div class="yui-u">
+            <input type="password" id="new_password" name="new_password" class="input_text" />
+            [% form_error.field_error_new_password %]
+        </div>
+        <div class="yui-u">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="yui-gb top_padded">
+        <div class="yui-u first align_right">
+            <label for="confirm_password">[%l('SIGNUP PASSWORD CONFIRM')%]:</label>
+        </div>
+        <div class="yui-u">
+            <input type="password" id="confirm_password" name="confirm_password" class="input_text" />
+            [% form_error.field_error_confirm_password %]
+        </div>
+        <div class="yui-u">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="yui-gd top_padded">
+        <div class="yui-u first">
+            &nbsp;
+        </div>
+        <div class="yui-u" style="text-align:justify;">
+            [%l('SIGNUP EMAIL USAGE')%] 
+        </div>
+    </div>
+
+    <div class="yui-gb top_padded">
+        <div class="yui-u first align_right">
+            <label for="email">[%l('SIGNUP EMAIL')%]:</label>
+        </div>
+        <div class="yui-u">
+            <input type="text" id="email" name="email" size="40" class="input_text" />
+            [% form_error.field_error_email %]
+        </div>
+        <div class="yui-u">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="yui-gb top_padded">
+        <div class="yui-u first align_right">
+            <label for="confirm_email">[%l('SIGNUP EMAIL CONFIRM')%]:</label>
+        </div>
+        <div class="yui-u">
+            <input type="text" id="confirm_email" name="confirm_email" size="40" class="input_text" />
+            [% form_error.field_error_confirm_email %]
+        </div>
+        <div class="yui-u">
+            &nbsp;
+        </div>
+    </div>
+
+    <div style="background-color:#ccc;margin-top:5px;margin-bottom:5px;">
+        &nbsp;
+    </div>
+
+    <div class="yui-gb top_padded">
+        <div class="yui-u first align_right">
+            <label for="first_name">[%l('First Name')%]:</label>
+        </div>
+        <div class="yui-u">
+            <input type="text" id="first_name" name="first_name" size="40" class="input_text" />
+            [% form_error.field_error_first_name %]
+        </div>
+        <div class="yui-u">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="yui-gb top_padded">
+        <div class="yui-u first align_right">
+            <label for="last_name">[%l('Last Name')%]:</label>
+        </div>
+        <div class="yui-u">
+            <input type="text" id="last_name" name="last_name" size="40" class="input_text" />
+            [% form_error.field_error_last_name %]
+        </div>
+        <div class="yui-u">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="yui-gd top_padded">
+        <div class="yui-u first">
+            &nbsp;
+        </div>
+        <div class="yui-u" style="text-align:justify;">
+            [%l('SIGNUP FORUMNAME DESCRIPTION')%] 
+        </div>
+    </div>
+
+    <div class="yui-gb top_padded">
+        <div class="yui-u first align_right">
+            <label for="forum_name">[%l('SIGNUP FORUMNAME')%]:</label>
+        </div>
+        <div class="yui-u">
+            <input type="text" id="forum_name" name="forum_name" size="40" class="input_text" />
+            [% form_error.field_error_forum_name %]
+        </div>
+        <div class="yui-u">
+            &nbsp;
+        </div>
+    </div>
+
+    <div class="yui-gb top_padded">
+        <div class="yui-u first align_right">
+            &nbsp;
+        </div>
+        <div class="yui-u" style="text-align:center;">
+            <input type="submit" name="form_submit" value="[%l('Register')%]" class="input_button" />
+        </div>
+        <div class="yui-u">
+            &nbsp;
+        </div>
+    </div>
+</form>

@@ -1,0 +1,59 @@
+{
+   "abstract" : "Use Cached Responses of Certain URIs",
+   "author" : [
+      "Ingy döt Net <ingy@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Cache",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt",
+         "example"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Path" : "2.07",
+            "Plack::Middleware" : "0",
+            "Plack::Util" : "0",
+            "Plack::Util::Accessor" : "0",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ingydotnet/plack-middleware-cache-pm/issues"
+      },
+      "homepage" : "https://github.com/ingydotnet/plack-middleware-cache-pm",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ingydotnet/plack-middleware-cache-pm.git",
+         "web" : "https://github.com/ingydotnet/plack-middleware-cache-pm"
+      }
+   },
+   "version" : "0.19"
+}
+

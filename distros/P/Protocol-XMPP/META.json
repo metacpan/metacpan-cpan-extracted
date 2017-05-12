@@ -1,0 +1,70 @@
+{
+   "abstract" : "XMPP/Jabber protocol API",
+   "author" : [
+      "Tom Molesworth <cpan@entitymodel.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Protocol-XMPP",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "Test::Synopsis" : "0",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::SASL" : "2.000",
+            "Future" : "0.29",
+            "MIME::Base64" : "0",
+            "Mixin::Event::Dispatch" : "1.000",
+            "Module::Load" : "0",
+            "POSIX" : "0",
+            "Time::HiRes" : "0",
+            "XML::LibXML::SAX::ChunkParser" : "0.00003",
+            "XML::SAX" : "0",
+            "curry" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::CheckDeps" : "0.010",
+            "Test::Fatal" : "0.010",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-protocol-xmpp at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Protocol-XMPP"
+      },
+      "homepage" : "http://search.cpan.org/dist/Protocol-XMPP/"
+   },
+   "version" : "0.006"
+}
+

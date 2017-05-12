@@ -1,0 +1,17 @@
+Revision history for Perl extension PCX::Loader
+
+0.51    2017-02-02
+        - moved test to t folder
+        - made tests use Test::More
+        - moded module to lib folder
+        - improved Makefile.PL
+        - updated POD
+        - changed POD to (hopefully) allow Metacpan to display it
+        - created a GitHub repository
+        - bumped min perl version to 5.8 (you shouldn't use older Perl plz)
+
+0.50  Tue Aug 22 23:50:31 2000
+        - Original version; created by Josiah Bryan
+        - I simply re-packaged from the PCX code in
+          AI::NeuralNet::BackProp and added POD docs.
+

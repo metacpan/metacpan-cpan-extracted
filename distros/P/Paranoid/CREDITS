@@ -1,0 +1,11 @@
+Credits
+=======
+
+Thanks to Slaven Rezic (srezic@cpan.org) for finding a bug in the plock
+implementation.
+
+Likewise, to theodore@grcrun11.gr for pointing a potential failure mode in
+the IPv6 regex.
+
+Finally, I always appreciate the spell checkers at Debian.  :-)
+

@@ -1,0 +1,168 @@
+{
+   "abstract" : "Parse files in Standard Test Data Format into Perl objects",
+   "author" : [
+      "Erick Jordan  <ejordan@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parse-STDF",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0.28",
+            "Test::More" : 0,
+            "version" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Parse::STDF" : {
+         "file" : "lib/Parse/STDF.pm",
+         "version" : "v0.2.5"
+      },
+      "libstdf" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::dtc_Vn_ele" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_atr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_bps" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_dtr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_eps" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_far" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_ftr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_gdr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_hbr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_header" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_mir" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_mpr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_mrr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_pcr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_pgr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_pir" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_plr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_pmr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_prr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_ptr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_rdr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_sbr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_sdr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_tsr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_unknown" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_wcr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_wir" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdf::rec_wrr" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      },
+      "libstdfc" : {
+         "file" : "lib/libstdf.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ]
+   },
+   "version" : "v0.2.5"
+}

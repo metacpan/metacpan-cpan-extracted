@@ -1,0 +1,283 @@
+=head1 NAME
+
+Lists
+
+=head2 Bullet
+
+=over 4
+
+=item *
+
+foo
+
+=item *
+
+bar
+
+=item *
+
+baz
+
+=back
+
+=head2 Number
+
+=over 4
+
+=item 1
+
+foo
+
+=item 2
+
+bar
+
+=item 3
+
+baz
+
+=back
+
+=head2 Text
+
+=over 4
+
+=item do
+
+a deer, a female deer
+
+=item ray
+
+a drop of goden sun
+
+=item me
+
+me, a name, I call myself
+
+=item fa
+
+a long, long way to run
+
+=back
+
+=over 4
+
+=item * do
+
+a deer, a female deer
+
+=item * ray
+
+a drop of goden sun
+
+=back
+
+=over 4
+
+=item 3 me
+
+me, a name, I call myself
+
+=item 4 fa
+
+a long, long way to run
+
+=back
+
+=head2 Siblings
+
+=over 4
+
+=item *
+
+Star 1 Para 1
+
+Star 1 Para 2
+
+Star 1 Para 3
+
+=item *
+
+Star 2
+
+	Star 2 Verbatim 1
+	Star 2 Verbatim 2
+	Star 2 Verbatim 3
+
+=item *
+
+Star 3
+
+=back
+
+=head2 Markups
+
+=over 4
+
+=item term 1
+
+definition 1
+
+=item I<term 2>
+
+C<definition 2>
+
+=item I<term B<3>>
+
+S<definition 3>
+
+=back
+
+=head2 Nested
+
+=over 4
+
+=item *
+
+Level 1, Star 1 of 2
+
+
+=over 4
+
+=item *
+
+Level 2, Star 1 of 2
+
+=item *
+
+Level 2, Star 2 of 2
+
+=back
+
+
+=item *
+
+
+=over 4
+
+=item 1
+
+Level 2, Number 1 of 2
+
+=item 2
+
+Level 2, Number 2 of 2
+
+=back
+
+
+=back
+
+
+
+=over 4
+
+=item Level 1, term 1 of 2
+
+
+=over 4
+
+=item *
+
+Level 2, Star 1 of 3
+
+=item *
+
+Level 2, Star 2 of 3
+
+=item *
+
+Level 2, Star 3 of 3
+
+=back
+
+
+=item Level 1, term 2 of 2
+
+
+=over 4
+
+=item *
+
+Level 2, Star 1 of 3
+
+
+=over 4
+
+=item 1
+
+Level 3, Number 1 of 2
+
+=item 2
+
+Level 3, Number 2 of 2
+
+=back
+
+
+=item *
+
+Level 2, Star 2 of 3
+
+=item *
+
+Level 2, Star 3 of 3
+
+=back
+
+
+=back
+
+
+
+=head2 Pathological
+
+=over 8
+
+=item *
+
+Over 8
+
+=back
+
+
+=over 4
+
+=item *
+
+Star 1
+
+=item 2
+
+Number 2
+
+=item Term 3
+
+Definition 3
+
+=back
+
+Empty
+
+=over 4
+
+=back
+
+=over 4
+
+No Items
+
+=back
+
+
+=over 4
+
+=item *
+
+Star 1
+
+=item *
+
+No =back
+
+

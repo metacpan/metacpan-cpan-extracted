@@ -1,0 +1,36 @@
+packages-file:
+  meta-section
+  blank-line
+  index-section
+
+meta-section: key-value-pair+
+
+key-value-pair: key / ':' SPACE+ / value EOL
+key: /
+  (File
+  |URL
+  |Description
+  |Columns
+  |Intended-For
+  |Written-By
+  |Line-Count
+  |Last-Updated
+  )
+/
+
+value: / ( ANY* ) /
+
+package-name: / ( NS+ ) +/
+version-number: / ( NS+ ) +/
+dist-path: / ( NS+ ) EOL/
+
+ws: / SPACE /
+
+index-section: index-line+
+
+index-line:
+  package-name
+  version-number
+  dist-path
+
+blank-line: / BLANK* EOL /

@@ -1,0 +1,39 @@
+---
+abstract: 'Module collection to parse Matroska files.'
+author:
+  - 'Kovensky <diogomfranco@gmail.com>'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0.94
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-Matroska
+provides:
+  Parse::Matroska:
+    file: lib/Parse/Matroska.pm
+    version: 0.003
+  Parse::Matroska::Definitions:
+    file: lib/Parse/Matroska/Definitions.pm
+    version: 0.003
+  Parse::Matroska::Element:
+    file: lib/Parse/Matroska/Element.pm
+    version: 0.003
+  Parse::Matroska::Reader:
+    file: lib/Parse/Matroska/Reader.pm
+    version: 0.003
+  Parse::Matroska::Utils:
+    file: lib/Parse/Matroska/Utils.pm
+    version: 0.003
+requires:
+  perl: 5.008
+resources:
+  bugtracker: https://github.com/Kovensky/Parse-Matroska/issues
+  homepage: https://github.com/Kovensky/Parse-Matroska
+  repository: https://github.com/Kovensky/Parse-Matroska.git
+version: 0.003

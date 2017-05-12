@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+policydir=${prefix}/share/PolicyKit/policy/
+
+Name: polkit
+Description: library for querying system-wide policy
+Version: 0.9
+Libs: -L${libdir} -lpolkit
+Cflags: -I${includedir}/PolicyKit

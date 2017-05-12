@@ -1,0 +1,18 @@
+# .licensizer.yml
+
+author: 
+  text: |
+    1996, Mike Schilli <cpan@perlmeister.com>
+  header: AUTHORS
+  mode: verbatim
+
+license: 
+  text: |
+    Copyright 1996-2011 by Mike Schilli, all rights reserved.
+    This program is free software, you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+  header: LEGALESE
+
+path_exclude:
+  - t/
+  - blib/

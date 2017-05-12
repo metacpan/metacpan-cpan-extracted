@@ -1,0 +1,127 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.5.3
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+ [Removed / runtime requires]
+ - utf8
+
+0.5.2 2014-08-16T04:12:22Z
+ [Added / test requires]
+ - File::Spec
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Changed / runtime requires]
+ - Path::Tiny 0.038 → 0.054
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+0.5.1 2014-07-13T17:54:11Z
+
+0.5.0 2014-03-04T11:03:22Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4008
+
+ [Removed / configure requires]
+ - Module::Build 0.4008
+
+ [Removed / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+
+0.4.2 2013-11-09T16:06:27Z
+ [Changed / build requires]
+ - Module::Build 0.4007 → 0.4008
+
+ [Changed / configure requires]
+ - Module::Build 0.4007 → 0.4008
+
+ [Changed / runtime requires]
+ - perl v5.10.0 → 5.006
+
+ [Changed / test requires]
+ - Test::More 0.99 → 1.001002
+
+0.4.1 2013-10-23T19:08:22Z
+ [Changed / test requires]
+ - Test::More 0.98 → 0.99
+
+0.4.0 2013-10-01T22:51:43Z
+ [Changed / runtime requires]
+ - Path::Tiny 0 → 0.038
+
+ [Removed / runtime requires]
+ - File::Spec
+
+0.3.2 2013-09-26T07:21:34Z
+ [Added / test requires]
+ - File::Spec
+
+0.3.1 2013-09-18T18:28:55Z
+ [Changed / runtime requires]
+ - Class::Tiny 0.005 → 0.010
+
+0.3.0 2013-09-18T03:06:21Z
+ [Added / runtime requires]
+ - Class::Tiny 0.005
+
+ [Added / test requires]
+ - IO::Handle
+ - IPC::Open3
+
+ [Changed / build requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Changed / configure requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Removed / runtime requires]
+ - Moo
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.2.0 2013-07-07T16:36:18Z
+ [Added / runtime requires]
+ - Carp
+ - Moo
+ - Path::IsDev::Object
+ - Scalar::Util
+
+ [Changed / runtime requires]
+ - Path::IsDev v0.1.1 → v0.2.2

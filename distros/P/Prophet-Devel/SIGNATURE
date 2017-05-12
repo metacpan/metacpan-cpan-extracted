@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 1b3df03de65c147704f9c9b345330e2bf6e61d6a Build.PL
+SHA1 743e99363554e6d601386a4dae5f6f4487e06af4 Changes
+SHA1 a350555b601d604b84310bb08962b1ef5d7181fc LICENSE
+SHA1 8fc8ce51a52bf3f7b32aea7461910554dc8b5298 MANIFEST
+SHA1 e058644043687905396be4c443bb0963cba83f7f META.json
+SHA1 7170b29758ca8f3a410f6f4c9c55a452e3774763 README.mkdn
+SHA1 689ae36794a4f417416b1b93c046d83b90f1f6b5 bin/prophet-devel-setup
+SHA1 2254be894503a3447f4b8d3939f68e1410bf2dca dist.ini
+SHA1 3df77843644d90f9dd86c11e39e863c909f6a311 lib/Dist/Zilla/PluginBundle/Prophet.pm
+SHA1 94f9297e8c666be8438ef9e35b604a7b10d1cbc1 lib/Pod/Weaver/PluginBundle/Prophet.pm
+SHA1 1748a3cc5d58b8c52c3f721f85006d4c4ebec977 lib/Prophet/Devel.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBCgAGBQJRmY/sAAoJEOpmRc2kYGBPFr8P/RT2QvUvqhTTPIughe86mn+c
+ysqya8R8+nEUMfukC4s0bn419k0gb16+ve8gzqDrTKNX46sE2SUl3HclEnAGCaEl
+XmbsIZ71Z/EtYAZCLeAKnyRLJM+3il3q9nJ3Kpevq/Kz3yf+xQ1zFE2iCuogFv1q
+9/vyYdOPTryjwOrjmldt/kTV717jObXr+yqKpHzFwUq4qDV/XMT3lAcYz/r5dl84
+qZhqQWpOC5H7xuYR6pgUMQsu2iGMSA4DZ50CRwIHdli6nUogXZus/M2Zu7PByd66
+EqmBbdfyEt/x3qR5u9DxEvzYrGNPA792BU0qdinrro7H5KGjZFJTyydf+rxErmy6
+Tb70XQZcn/PyebhctkNBohpSBJvTS8XVz/2jIdp5S3yW4rV5ycpastUj2BWWRPox
+6wAi+Tk8CstHlMwJPwcCcAfeN3LZSZS5w+jJ5QwZtsleYMA3qL8FBRdAJLR7VeWf
+v3HqfYoaYtZp43PInD9nNsQU7CUh71Hfg/i9Bz2o5JGuysLubZgRzFdgZXiYKqVR
+rpdUyXfZpKnqXvzCq6ZZXKyEgqL2J8+7cuClYhDMCJTuBt/o0Ss91tOEAyyqjE/8
+NPfi6rDqa+BUHxAhuxHPZ0yPefIY+tTcVZ/typHZBczQqj8Ky6ucWEWIVeK/WgKu
+MfxmNrhZ/HMHBsdu0rnj
+=fGkH
+-----END PGP SIGNATURE-----

@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+use strict;
+use NetSNMP::agent;
+use NetSNMP::ASN;
+use POE qw< Component::NetSNMP::agent >;
+
+
+use constant {
+    BASE_OID   => ".1.3.6.1.4.1.32272",
+};
+
+my $agent = POE::Component::NetSNMP::agent->spawn(
+    Alias   => "snmp_agent",
+    AgentX  => 1,
+);
+
+$agent->register(BASE_OID, \&agent_handler);
+
+POE::Kernel->run;
+exit;
+
+sub agent_handler {
+    my ($kernel, $heap, $args) = @_[ KERNEL, HEAP, ARG1 ];
+    my ($handler, $reg_info, $request_info, $requests) = @$args;
+
+    # the rest of the code works like a classic NetSNMP::agent callback
+    my $mode = $request_info->getMode;
+
+    for (my $request = $requests; $request; $request = $request->next) {
+        if ($mode == MODE_GET) {
+            $request->setValue(ASN_OCTET_STR, "hello");
+        }
+        elsif ($mode == MODE_GETNEXT) {
+            $request->setOID(BASE_OID.".1");
+            $request->setValue(ASN_OCTET_STR, "hello");
+        }
+        else {
+            $request->setError($request_info, SNMP_ERR_GENERR);
+        }
+    }
+}
+

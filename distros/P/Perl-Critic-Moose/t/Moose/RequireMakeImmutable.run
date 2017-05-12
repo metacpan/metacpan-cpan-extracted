@@ -1,0 +1,50 @@
+## name Passing without parens
+## failures 0
+## cut
+
+use Moose;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+__PACKAGE__->meta->make_immutable;
+
+
+## name Passing with parens
+## failures 0
+## cut
+
+use Moose;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+__PACKAGE__->meta()->make_immutable();
+
+
+## name Basic failure
+## failures 1
+## cut
+
+use Moose;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+## name Failure for custom module.
+## failures 1
+## parms { equivalent_modules => 'Bleu' }
+## cut
+
+use Bleu;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);

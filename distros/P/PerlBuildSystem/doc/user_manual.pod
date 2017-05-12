@@ -1,0 +1,517 @@
+
+=head1 PerlBuildSystem User's Manual
+
+=head1 What is PBS?
+
+PBS is PerlBuildSystem, a powerful tool for making correct and intelligent build systems
+without the pain, failure and insanity such activities would entail had they been attempted with
+I<make(1)>. Rather than a simplistic rule-based build engine, PBS is a meta build system
+-- a Perl API for writing build systems if you like.
+
+One of the biggest limitations with I<make> is that it completely lacks any sensible programming
+constructs, while users always end up needing them. All it has, save a bunch of ad hoc loops
+and primitive string manipulation functions, is global variables and a simplistic rule engine.
+
+PBS is also rule based, but contrary to a Makefile, a Pbsfile is an Perl script.
+This means your Pbsfile has the entire power of the Perl language in its hands, making it easy
+for you to write library modules with high-level functions for your most common tasks and generally
+let you do whatever you need to do. The interface PBS offers you for making a build system,
+while powerful, really revolves around three quite simple to use build system commands, plus a few
+convenience functions for helping you with the most common tasks.
+
+=head1 PBS Concepts
+
+First of all, PBS is really a Perl API, so knowing a bit of Perl will help.
+But don't be intimidated by this if you don't -- you can write Pbsfiles
+using the rule syntax of PBS without knowing you're really writing Perl,
+and it's quite simple too!
+
+Contrary to most versions of I<make>, PBS has I<no> builtin rules. It does however come with a fairly
+advanced library module for figuring out the dependencies of C and C++ files and concluding that an
+object file should probably be built from either a C, C++ or an assembly language source file. But this
+is just an addon (albeit very convenient). If you want to use it you have to say so. For a more detailed
+rant about the shortcomings of I<make>, see 
+XXX<a href="http://blah.blah.blah/PBS/">The PerlBuildSystem Homepage</a>. 
+
+Now, on with the show.
+
+In order to support powerful distributed and parallell build systems, PBS is a three stage rocket.
+It goes through three distinct stages while building whatever it is you're building:
+
+=head2 Depend
+
+During this stage, PBS builds a I<complete> dependency graph of the I<entire> system.
+Nodes are inserted into the dependency graph by running I<all> the in-scope rules until no new dependencies are
+generated. Nodes are just named dependencies of other nodes, and don't necessarily correspond to
+physical files.
+
+=head2 Check
+
+During which PBS figures out what physical files the nodes in the dependency graph
+correspond to, and verifies whether they are up to date or not.
+
+=head2 Build
+
+The process of rebuilding and computing a new digest for any nodes that were for some reason deemed
+out of date during the Check stage.
+
+=head1 Deciding if a node should be rebuilt
+
+The things we build can depend on a number of things, but the modification time
+of the input to our tools is rarely, if ever, one of them. PBS recognises this and ignores
+modification times. Instead, when a node has been built, PBS saves a digest of everything
+the node depends on, not just files. When PBS needs to decide if a node should be rebuilt,
+it computes a digest from the information in the dependency graph and compares it to the node's
+stored digest. Files that are never built by the build system must therefore be excluded from
+this digest generation to tell PBS that they are source files (such as source code, system libraries etc).
+
+PBS considers a node out of date if any of the following hold:
+
+=over 2
+
+=item 1. The node should, but doesn't, exist.
+
+=item 2. The node exists and wasn't excluded from digest generation, but doesn't have a stored digest to prove it is up to date.
+
+=item 3. The node exists, and has a stored digest that differs from the digest computed from the dependency graph.
+
+=item 4. The node has a dependency that was deemed out of date.
+
+=back
+
+If a node representing a file doesn't exist, it obviously needs to be built. If a file exists but lacks a digest,
+PBS cannot reliably say it is up to date, so it is deemed out of date and rebuilt. If both the file and its digest
+exist but the computed and stored digests mismatch, then either a dependency was changed, or the file itself was
+changed. Either way the node is rebuilt. Before we continue it's time we introduce some terminology.
+
+=head1 PBS vocabulary:
+
+=head2 Pbsfile
+
+The file describing how to build your thingy. Contrary to most build systems, PBS doesn't
+just parse rules and macros -- it I<executes> your Pbsfile in its own namespace, which may contain arbitrary
+Perl code. The PBS rule syntax really consists of a set of function calls.
+
+=head2 Target
+
+This is what you tell PBS to build when you start it. It is the first thing PBS will
+try to match against your rules to see if it can infer any dependencies, which brings us to...
+
+=head2 Dependency
+
+A thingy, typically I<but not necessarily> a file, that a dependent depends on.
+I<Make> calls these I<sources>.
+
+=head2 Dependent
+
+The thingy that has dependencies. I<Make> calls this I<target>, too -- at least
+while trying to figure out if it is up to date or not.
+
+=head2 Ancestor
+
+The set of nodes that are directly or indirectly a dependent to a node is called
+the node's ancestors.
+
+=head2 Node
+
+Something that appears in the dependency graph. Everything in the dependency graph is a
+dependency of some dependent -- even the target, which is logically a dependency of the
+invocation of PBS. Note that a node doesn't necessarily correspond to a physical file;
+a node can be I<virtual> (see I<Virtual Rules>).
+
+=head2 Digest
+
+A cryptographic hash (MD5) of all the thingies that affect whether or not a node is considered
+up to date, including the contents of the file corresponding to the node itself. This means
+your build system will notice if you accidentally corrupt a generated file. The digest is stored
+in a plain text file in the same place as the generated file.
+
+=head2  Digest generation
+
+PBS wants a digest for every node it finds, and generates a digest for
+everything that gets built.
+
+=head2 Trigger
+
+The act of marking a node as out of date. When a node is triggered, it will in turn
+trigger all its ancestors
+
+=head2  Trigger (2)
+
+A PBS mechanism for automatically running an other PBS build system as a subpbs
+build in order to create a node in the current build system's dependency graph without knowing the
+details of that other build system.
+
+=head2 Subpbs
+
+The PBS notion of hierarchical builds is called a subpbs. A subpbs is a recursive
+PBS-run, but contrary to typical I<make> usage it doesn't spawn a separate process for each
+step. Instead, it inserts all nodes into a global dependency graph. A subpbs inherits
+the build configuration from its parent, but not rules, variables, functions etc...
+
+=head2 Build directory
+
+The directory where the result of the build and the associated digest files end up. If you don't
+specify a build directory, PBS will generate a name based on your username and create it in the
+current working directory where PBS was invoked.
+
+Now we can look at how to get started with writing a PBS build system.
+
+=head1 Getting started with PBS
+
+Let's start with an example of building an important C program, "hello", from "hello.c".
+A Pbsfile is a real Perl script running in strict mode ("use strict" and "use warnings" in
+Perl speak), without a package name. We could write our simple Pbsfile like this:
+
+  AddRule 'hello', [ 'hello' => 'hello.c' ]
+	=> 'gcc -o %FILE_TO_BUILD %DEPENDENCY_LIST' ;
+
+A bit more verbose than I<make> perhaps, but not too difficult to grasp is it? The first single-quoted
+string after AddRule is the name of the rule. Rules have names, because it makes it easier for you to debug
+your build system when it doesn't work. The last right-arrow before the command to execute can be replaced
+by a comma if you think it's prettier -- '=>' is equivalent to ',' in Perl and a Pbsfile is, after all, real
+Perl code. It is recommended you keep the => operator between the target and the dependencies for clarity,
+however. %FILE_TO_BUILD and %DEPENDENCY_LIST are XXX link to: built-in PBS variables. Whenever such variables
+occur on a command line, PBS expands them to their value.
+
+Let's extend this example to make it a little bit more realistic by building a heavily optimized, i18n hello world:
+
+  my $CFLAGS  = '-O3 -Wall -Werror' ;
+  my $LDFLAGS = '-lintl' ;
+  my $CC      = 'gcc' ;
+  
+  AddRule 'hello',    [ 'hello' => 'hello.o', 'language.o', 'locale.o' ]
+  	=> "$CC -o %FILE_TO_BUILD %DEPENDENCY_LIST $LDFLAGS" ;
+  
+  AddRule '.o-files', [ '*/*.o' => '*.c' ]
+  	=> "$CC $CFLAGS -c -o %FILE_TO_BUILD %DEPENDENCY_LIST" ;
+
+We now link the executable with an i18n library, and use a separate rule to build all object files we need
+from the corresponding C file. This is an example of a I<simplified pattern rule>. The simplified pattern
+syntax is actually just a plugin to PBS to make people used to I<make> happy, and it's just as limited.
+PBS itself uses only Perl regular expressions to express dependencies; we'll get into this later in
+I<Pattern matching rules>. The '*/*.o' in the rule above gets transformed into the same filename with a '.c'
+suffix. In this example we could have written just '*.o' because we only have a few object files all in the
+same directory. The '*/*.o' is necessary to match any leading path components in the name. The details of
+PBS path handling in hierarchical builds are explained in XXX I<Hierarchical builds>. Note how the
+commandlines in the rules above now have double quoted strings. Double quoted strings are subject to
+variable expansion, while single quoted strings aren't, so we need the double quotes to get the value of
+$CFLAGS and $LDFLAGS into our shell commandlines. Otherwise '$CC', '$CFLAGS' etc would be passed verbatim
+into PBS internals and evaluated there, in the wrong context, leading to error messages about
+"Use of uninitialized value in substitution (s///)" and similar. If your build commands don't contain
+Perl variables, single quotes work just fine too. The beauty of Pbsfiles is that you can write arbitrarily
+complex code to do what you want -- you have an entire, powerful scripting language at hand.
+
+=head2 Pattern matching rules
+
+PBS rules are pattern-matching, using powerful Perl regular expressions to generate dependencies.
+In the previous example, we simply matched all files with a .o suffix and said they depend a the
+corresponding .c file with the same relative path, using the simplified syntax. Some people find
+regular expressions hard to read/write/understand, and while it's a pity to throw away the power
+of Perl regular expressions for the sake of saving a few hours of learning, PBS supports this
+simplified pattern-matching syntax with the SimplifyRule plugin. Since the plugin just transforms
+this simplified syntax into a Perl regular expression, we could just as well write it as a pure Perl rule:
+
+  AddRule '.o-files', [ qr/.*\.o/ => '$path/$basename.c' ]
+  	=> "$CC $CFLAGS -c -o %FILE_TO_BUILD %DEPENDENCY_LIST" ;
+
+In a pure Perl rule, $path, $basename, $name and $ext are provided on the dependency side of the
+dependency definition (the stuff to the right of the '=>'). $path contains the path to the node
+matched by the rule, relative the top level of the PBS build. $basename contains the name of the
+matched node, without any extension. $ext is the extension (i.e. everything after the last '.' in the
+filename) of the file, if any. $name is the full filename, including any extension.
+Note the use of single quotes in the dependencies defined by the rule -- we don't want
+'$path/$basename' to be expanded at rule definition-time where they aren't defined (remember Pbsfiles
+are I<executed>!) so we need single quotes. The single-quoted string is evaluated later at depend
+time, when something has matched our regular expression. At that point, the variables are provided
+by PBS.
+
+Already, we are starting to see ugliness starting to creep into our example above. We have hardcoded
+compiler- and linker flags, and reference local variables in commandlines using double quotes mixed with
+PBS' automatic variables %FILE_TO_BUILD and %DEPENDENCY_LIST. Also, we have a generic rule for building
+object files from a C file that we probably want to reuse all over the place -- but it depends on the
+presense of a variable $CFLAGS being in scope wherever it is used. We'd like to move potentially reusable
+code into functions we can include in any Pbsfile when needed, and refer to a I<configuration> rather than
+real Perl variables.
+
+=head2 Using reusable PBS modules
+
+To improve the previous example, we could be rewrite it as follows:
+
+  PbsUse 'Configs/Hello' ;
+  PbsUse 'Rules/C' ;
+  
+  my @objects = qw(hello.o language.o locale.o) ;
+  
+  AddRule 'hello', [ 'hello' => @objects ]
+  	=> '%CC %CFLAGS -o %FILE_TO_BUILD %DEPENDENCY_LIST %LDFLAGS' ;
+
+We have now moved our generic rule for building object files from C sources to a module called
+'C' in a directory called 'Rules' and similarly put our configuration into a module 'Configs/Hello'.
+PbsUse includes a PBS module at the point where the PbsUse directive appears, and its contents
+gets executed just like the rest of the Pbsfile. You can think of it as the PBS equivalent of
+the C preprocessor's #include statement. Modules are loaded at runtime, and you can only PbsUse
+a module once per package, i.e. once per Pbsfile. PBS modules are package-less Perl modules, so
+our modules above would be in the files 'Configs/Hello.pm' and 'Rules/C.pm'. PBS looks for
+modules in all the paths defined with the -plp switch (see section 'prf') , which can be set in a prf file and overridden on the
+commandline. See the XXX PBS module Wizard included with the PBS distribution for an example of
+how to write your own PBS modules. 
+
+=head2 Separating configuration from rules
+
+We earlier said that your Pbsfiles tend to revolve around three easy to use functions.
+AddRule was the first; this leads us to the other two -- AddConfig and GetConfig. In the
+'Configs/Hello' module included in the example above, we have put these statements:
+
+  # Typical, fairly complete configuration for using the GNU toolchain.
+
+  AddConfig(
+						# Compiler toolchain and utilities.
+  	        'CC'           => 'gcc',
+            'AS'           => 'as',
+            'LD'           => 'ld',
+            'CPP'          => 'gcc -E',
+            'CXX'          => 'g++',
+            # Build configuration parameters.
+            'CFLAGS'       => '-O3 -Wall -Werror',
+            'CXXFLAGS'     => '%CFLAGS',
+            'LDFLAGS'      => '-lintl'
+           ) ;
+
+  # Module must end with a 'true' statement to indicate success.
+  1;
+
+Everything you define with AddConfig will be available as %-variables in your commandline strings, so now we
+can use %CC, %CFLAGS, %LDFLAGS etc. in addition to the variables automatically defined by PBS (See
+XXX Builtin variables for a list of special variables defined by PBS). As you can see in the CXXFLAGS
+example above, you can define config variables in terms of other config variables, as long as they are
+already defined. If you try to define a config variable to the value of a config variable that isn't
+defined, PBS will issue a warning. If you want to extract the value of a config variable in a Pbsfile,
+you must use GetConfig:
+
+  my $compiler = GetConfig('CC') ;
+
+In hierarchical build systems, configuration is inherited from the top-level PBS and down. This is explained
+in more detailed in the next chapter.
+
+=head2 Hierarchical build: subpbs
+
+Typically, build systems are hierarchical with a number of subdirectories containing their own Pbsfiles
+defining how to build that part of the system. A Pbsfile can define a special rule to say that any
+matching nodes are depended by a subpbs -- this is PBS' way of expressing a hierarchical build system.
+
+Rather than starting a whole new build process in the subdirectory the way people typically do with
+I<make>, PBS runs a subpbs in the same process and inserts the new dependencies into a single, global
+dependency graph. Rules, Perl code and variables are still private to each subpbs, because PBS
+puts each subpbs into its own namespace (called a 'package' in Perl). Here's an example of a rule to
+build the shared library MyLib.so in the MyLib subdirectory.
+
+  AddRule 'subpbs_example', {
+														# Mandatory parameters.
+														NODE_REGEX => qr(.*/MyLib/MyLib.so),
+														PBSFILE    => 'MyLib/Pbsfile.pl',
+														PACKAGE    => 'MyLib',
+														# Other parameter can go here...
+														} ;
+
+That's a mouthful, but you can add many parameters to a subpbs: See XXX Subpbs in the reference section for
+all options. For the simple task of just adding a subdirectory to your hierarchical build, PBS provides the
+convenience function AddSubPbsRule. It accepts the same parameters as the normal Subpbs definition, but looks
+friendlier when you just need to supply the mandatory parameters:
+
+	AddSubpbsRule 'rule_name', qr(.*/MyLib/MyLib.so), 'MySubDir/Pbsfile.pl', 'MySubDirPackageName' ;
+
+You can add extra subpbs parameters to AddSubpbsRule as well; you just add the extra KEY => 'value' pairs
+at the end of the argument list. You may have noticed that our regular expressions here are delimited with
+parentheses, while at the beginning of this manual we had a qr/.../ expression. For convenience, Perl allows
+many characters to delimit its quote-like operators (See "Quote and Quote-like Operators" in the perlop
+manual page of your Perl distribution for details). Using something other than / as delimiter for
+qr ("quote-regexp") is convenient when you deal with filename patterns containing / as path separator.
+
+An important thing when defining a subpbs rule is making sure the node regex only matches the nodes that
+should be built by the subpbs. When we write rules in a subpbs, we usually want the rules to match regardless
+of whether we are building from the top of the build tree or locally in the subdirectory. With the simplified
+syntax, we do this by saying:
+
+	AddRule 'objects', [ '*/*.o' => '*.c' ], '%CC %CFLAGS -c -o %FILE_TO_BUILD %DEPENDENCY_LIST' ;
+
+If this rule is invoked to depend the node './foo/bar.o', the '*/*.o' ensures that the rule matches.
+Similarly, if we invoke PBS to build 'bar.o' locally in the subdirectory, the node will become './bar.o'
+(since PBS always considers the top of the build tree to be './'), so our '*/*.o' still matches. However,
+it also matches everything else that has the same '.o' extension. Since PBS runs all rules in scope on
+all nodes until no new dependencies are generated, this can cause accidental or even cyclic dependencies
+if the node regex matches too much.
+
+To make it easier to match only the nodes the (sub-)Pbsfile was invoked to depend, PBS provides the
+automatic variable %TARGET_PATH on the dependent side of the dependency definition. It expands to the
+path prefix of the node the Pbsfile was invoked to depend (which is not identical to the relative path
+of the Pbsfile. See XXX %TARGET_PATH in the reference section for details). Note that this variable is
+I<not> available on the dependency side of the definition; with the simplified pattern syntax, %TARGET_PATH
+is automatically prepended to the dependencies. With pure perl regex rules, it is all up to you. You
+have to use $path, $basename, $name and $ext to construct the full dependency names yourself. Since the
+SimplifyRule plugin is just a rule preprocessor, these variables are actually available when using
+the simplified pattern syntax as well, but the plugin will still prepend %TARGET_PATH to the dependency side,
+so it may not work quite as expected. Here are a few example rules to make it more visual:
+
+We invoke a subpbs to depende the node './b/z/foo.o':
+
+  AddRule 'c', [ qr'%TARGET_PATH/foo.o' => '$basename.c'], BuildOk("do nothing");
+
+We have a pure perl rule (since the dependent is a Perl regex), so PBS gives us full control over the
+dependency names. Hence we will get the dependency './b/z/foo.o' => 'foo.c' here.
+
+  AddRule 'c', [ '%TARGET_PATH/foo.o' => '$path/$basename.c'], BuildOk("do nothing");
+
+Now we have a plain text rule, but our variables are still available to construct a name.
+XXX Why do we get the same dependency with $path included?
+
+  AddRule 'c', [ '%TARGET_PATH/foo.o' => '*.c'], BuildOk("do nothing");
+  AddRule 'c', [ '%TARGET_PATH/*.o' => '*.c'], BuildOk("do nothing");
+  AddRule 'c', [ '*/*.o' => '*.c'], BuildOk("do nothing");
+
+  '*/*.o' => './p1/*.o'
+
+These three simplified pattern rules all generate the same dependency; the '*' on the dependency
+side expands to the basename of the dependent and has %TARGET_PATH prepended to it. However, the
+'*/*.o' in the last example will also match any other path.
+
+  AddRule 'c', [ '*.o' => '*.c'], 'echo %FILE_TO_BUILD depends on %DEPENDENCY_LIST';
+
+Now you've seen the most basic parts of a Pbsfile; How to write simplified and pure perl rules, how to define
+configuration variables, and how to include modules. The following chapters discuss these and other PBS
+concepts in greater detail.
+
+###############################################################################
+#
+# Reference manual section starts here
+#
+###############################################################################
+
+=head1 PBS reference manual
+
+=head2 Rules
+
+The full anatomy of an AddRule statement is as follows:
+
+  AddRule [RULE_TYPE,] NAME, DEPENDER [, BUILDER [, NODE_SUB]]
+
+Here, elements enclosed in [] are optional. Some of these elements can be written in a number of ways.
+We explain them one by one:
+
+=head3 Rule types
+
+PBS rules can have an optional type that modify their behaviour in certain ways. Rule types are written
+in all caps. Some types can be combined by separating them by comma. The types are as follows:
+
+=head4 VIRTUAL
+
+This type indicates that the dependent of the rule is virtual -- it doesn't correspond to a
+physical file and there should indeed not be a physical file with that name. It is somewhat similar to
+I<make>'s notion of "PHONY" targets. Typical usage is to build many things in one go by defining a rule
+to build a top-level virtual target 'all' that depends on the things to build but itself doesn't do anything.
+
+=head4  FORCED
+
+A dependent that is FORCED will be rebuilt even when its dependencies are up to date. It's
+a way of wedging unconditional builders into your build system and is typically used in conjunction with
+VIRTUAL; e.g. a virtual target 'stats' which prints a dump of the sizes of the various segments of the
+final executable.
+
+=head4 LOCAL
+
+A LOCAL node is something that must exist in the build directory, even if PBS finds an up to date
+version of it in a source directory. This is primarily a way to get around the fact that if your
+source directories include a directory of pre-compiled objects containing an up to date version of
+your target, you will end up with an empty build directory. This tends to confuse people. Making
+a target LOCAL ensures that PBS will copy the up to date file to your private build directory
+when using binary repositories.
+
+The entire type definition is then written enclosed in square brackets, like this:
+
+  [VIRTUAL] or
+  [VIRTUAL, FORCED]
+
+=head3 Rule names
+
+PBS Rules are named, in order to make it easier to debug your build system. Many commandline switches
+cause PBS to display the name of the rule as it processes Pbsfiles and generates the dependency graph.
+
+=head3 Depender definition
+
+The depender definition defines how to depend a node. That is, how to determine if the rule matches a requested
+node and if so, what dependencies the matching rule should contribute to the node. We have already seen the
+most simple form of depender definition:
+
+[ 'dependent' => 'dependency1', 'dependency2', ... ]
+
+Generally speaking, there are three kinds of depender definitions: a list, a subpbs definition
+and a complete depender sub (a Perl function).
+
+=head4 Dependency list definition
+
+A target-dependency-list is written enclosed in square brackets, as above. The dependent can be either
+a plain string, a full "qr" regular expression, or a reference to a sub (Perl function). The dependent may
+contain the PBS automatic variable %TARGET_PATH, which expands to the path prefix of the node(s) the
+Pbsfile was invoked to depend, relative the top-level. This is not identical to the relative path to the
+Pbsfile itself -- they just tend to coincide, since we usually put one Pbsfile in each directory of a
+source tree and only put rules to build the files in that location in it. That is, if we depend the node
+"./foo/bar.o", %TARGET_PATH expands to "foo/" regardless of where the Pbsfile is located.
+
+The SimplifyRule plugin also provides a simplified pattern matching syntax of the form
+[ '*.ext1' => '*.ext2' ] for simple basename/extension transformations. The syntax '*/*.ext1' is
+used to match nodes that have a path prefix, i.e. in a subpbs. %TARGET_PATH is available in the
+simplified pattern syntax as well, and is sometimes preferrable since it only matches nodes with the
+subpbs' path prefix rather than all nodes with the same extension. Note that %TARGET_PATH is the path
+prefix of the node(s) the Pbsfile was invoked to depend, and 
+
+
+To the right of the dependency arrow '=>' is a simple list of the
+dependencies this rule should contribute to the node; remember, several rules can match a node and they all
+have their dependencies added to the node. Each dependency can be either a string (XXX dependency attributes!)
+or a Perl subroutine reference (XXX elaborate, put under advanced topics?).
+XXX how exactly is %TARGET_PATH (or whatever) prepended to the dependency side names?
+
+=head4 Subpbs definition
+
+A subpbs definition is a list of keywords and values enclosed in curly brackets, as follows:
+
+ {
+  NODE_REGEX => qr//,
+  PBSFILE    => 'Otherpbsfile.pl',
+  PACKAGE    => 'Otherpackage',
+  XXX There's a bunch of other stuff that can go here too!
+ }
+
+=head4 Depender sub
+
+=head3 Builders
+
+=head3 Node subs
+
+=head1 Configuration
+
+=head1 Advanced topics
+
+=head2 Triggers
+
+=head2 Node subs
+
+=head1 Missing in this documentation
+
+=over 2
+
+=item * warp
+
+=item * BuildOk
+
+=item * Post-PBS
+
+=item * Debugging, PBS breakpoints.
+
+=item * commandline switches.
+
+=back
+
+
+=cut
+

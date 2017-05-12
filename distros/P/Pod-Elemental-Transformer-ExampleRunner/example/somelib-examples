@@ -1,0 +1,26 @@
+#! /usr/bin/perl -w
+#FOR: demonstrate ExampleRunner being used as more than one command on the same document
+use strict;
+use warnings; 
+
+use lib qw[ lib ];
+use Pod::Elemental::Transformer::ExampleRunner;
+use Pod::Elemental;
+
+my $pod_document = Pod::Elemental->read_file( 'somelib/lib/SomeLib.pm' );
+my @xforms = map Pod::Elemental::Transformer::ExampleRunner->new($_),
+    {
+        command => 'outside',
+        script_path => 'example/'
+    },
+    {
+        command => 'example',
+        script_path => 'somelib/example/'
+    },
+    {
+        command => 'helper',
+        script_path => 'somelib/bin/'
+    };
+$_->transform_node($pod_document) for @xforms;
+print $pod_document->as_pod_string();
+

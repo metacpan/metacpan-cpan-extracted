@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Pod-HTML2Pod
+version:      4.05
+version_from: lib/Pod/HTML2Pod.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    HTML::Element:                 3.05
+    HTML::Entities:                0
+    HTML::Tagset:                  3.02
+    HTML::TreeBuilder:             3.05
+    integer:                       0
+    UNIVERSAL:                     0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

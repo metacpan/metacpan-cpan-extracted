@@ -1,0 +1,17 @@
+Revision history for Plack::Middleware::BlockHeaderInjection
+
+v0.1.1  2014-08-16
+
+  [Documentation]
+  - Added POD explaining what header injections are.
+
+  - Added ACKNOWLEDGEMENTS section to POD.
+
+  - Reformatted Changes.
+
+  [Other Changes]
+  - Fixed license in Makefile.PL for CPANTS.
+
+v0.1.0  2014-06-26
+
+  - First release on CPAN.

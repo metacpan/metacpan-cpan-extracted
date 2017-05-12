@@ -1,0 +1,43 @@
+---
+abstract: 'PITA Guest Manager for inside system images'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>, L<http://ali.as/>'
+build_requires:
+  ExtUtils::MakeMaker: 6.56
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.56
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: PITA::Image
+name: PITA-Image
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Config::Tiny: 2.00
+  Data::GUID: 0.045
+  File::Remove: 1.51
+  File::Spec: 0.80
+  File::Temp: 0.22
+  File::Which: 0.05
+  HTTP::Tiny: 0.014
+  PITA::Scheme: 0.43
+  PITA::XML: 0.50
+  Params::Util: 1.00
+  Process: 0.29
+  URI: 1.57
+  perl: 5.6.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/PITA-Image
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/PITA-Image
+version: 0.60

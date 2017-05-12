@@ -1,0 +1,24 @@
+Revision history for Parse::IRCLog
+
+1.106     2014-03-20 18:20:52-04:00 America/New_York
+          add dircproxy subclass (thanks, Richard Lewis)
+
+1.105     2013-10-15 21:39:25 America/New_York
+          update repo and bugtracker URLs
+
+1.104     2010-07-10
+          all changes by Jean-Baptiste Mazon:
+
+          fix parsing of action messages containing normal messages
+
+          fix parsing of voiced participants
+
+1.103     2009-08-10
+          patch from Jean-Baptiste Mazon to allow more legal nicks and chans
+
+1.102     2008-04-09
+          packaging fixes
+
+1.101     2006-11-13
+          started a new changelog; previous one was rubbish; ARGH!
+          avoid global fh

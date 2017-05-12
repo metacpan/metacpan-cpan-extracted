@@ -1,0 +1,36 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         PAR-WebStart
+version:      0.19
+version_from: lib/PAR/WebStart.pm
+installdirs:  site
+requires:
+    Archive::Zip:                  1.02
+    File::Which:                   0
+    LWP:                           0
+    Module::Signature:             0
+    PAR:                           0
+    PAR::Packer:                   0
+    XML::SAX::ExpatXS:             0
+license:      perl
+abstract:     Perl implementation of Java's WebStart
+authored_by:
+    - Randy Kobes <r.kobes@uwinnipeg.ca>
+distribution_type: module
+provides:
+    PAR::WebStart:
+        file: lib/PAR/WebStart.pm
+        version: 0.19
+    PAR::WebStart::PNLP:
+        file: lib/PAR/WebStart/PNLP.pm
+        version: 0.19
+    PAR::WebStart::Util:
+        file: lib/PAR/WebStart/Util.pm
+        version: 0.19
+    Apache2::WebStart:
+        file: Apache2/Apache2/WebStart.pm
+        version: 0.19
+no_index:
+    file:
+        - ex/D/lib/D.pm
+generated_by: ExtUtils::MakeMaker version 6.26

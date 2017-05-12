@@ -1,0 +1,499 @@
+MODULE = Panda::Lib                PACKAGE = Panda::Lib::Test::String
+PROTOTYPES: DISABLE
+
+HV* get_allocs (int n = 0) {
+    if (n > 1) croak("idi nahuy pidaras");
+    auto allocs = &test::string::allocs[n];
+    RETVAL = newHV();
+    hv_store(RETVAL, "allocated",              9, newSViv(allocs->allocated), 0);
+    hv_store(RETVAL, "allocated_cnt",         13, newSViv(allocs->allocated_cnt), 0);
+    hv_store(RETVAL, "deallocated",           11, newSViv(allocs->deallocated), 0);
+    hv_store(RETVAL, "deallocated_cnt",       15, newSViv(allocs->deallocated_cnt), 0);
+    hv_store(RETVAL, "reallocated",           11, newSViv(allocs->reallocated), 0);
+    hv_store(RETVAL, "reallocated_cnt",       15, newSViv(allocs->reallocated_cnt), 0);
+    hv_store(RETVAL, "ext_deallocated",       15, newSViv(allocs->ext_deallocated), 0);
+    hv_store(RETVAL, "ext_deallocated_cnt",   19, newSViv(allocs->ext_deallocated_cnt), 0);
+    hv_store(RETVAL, "ext_shbuf_deallocated", 21, newSViv(allocs->ext_shbuf_deallocated), 0);
+    std::memset(allocs, 0, sizeof(*allocs));
+}
+
+
+test::String* new_empty (SV* CLASS) {
+    RETVAL = new test::String();
+}
+
+test::String* new_capacity (SV* CLASS, size_t capacity) {
+    RETVAL = new test::String(capacity);
+}
+
+test::String* new_literal (SV* CLASS) {
+    RETVAL = new test::String(test::string::literal_char);
+}
+
+test::String* new_ptr (SV* CLASS, string_view str, bool with_len = true) {
+    if (with_len) RETVAL = new test::String(str.data(), str.length());
+    else          RETVAL = new test::String(str.data());
+}
+
+test::String* new_external (SV* CLASS, string_view str) {
+    auto len = str.length();
+    char* ext = (char*)malloc(len);
+    std::memcpy(ext, str.data(), len);
+    RETVAL = new test::String(ext, len, len, &test::string::ext_free<char>);
+}
+
+test::String* new_external_custom_buf (SV* CLASS, string_view str) {
+    auto len = str.length();
+    char* ext = (char*)malloc(len);
+    std::memcpy(ext, str.data(), len);
+    auto buf = test::string::shared_buf_alloc<test::String::ExternalShared>();
+    RETVAL = new test::String(ext, len, len, &test::string::ext_free<char>, buf, &test::string::shared_buf_free<char>);
+}
+
+test::String* new_fill (SV* CLASS, size_t len, string_view c) {
+    RETVAL = new test::String(len, c[0]);
+}
+
+test::String* new_copy (SV* CLASS, test::String* other) {
+    RETVAL = new test::String(*other);
+}
+
+test::String* new_copy_other (SV* CLASS, test::String2* other) {
+    RETVAL = new test::String(*other);
+    RETVAL->assign(*other);
+    *RETVAL = *other;
+}
+
+test::String* new_move (SV* CLASS, test::String* from) {
+    RETVAL = new test::String(std::move(*from));
+}
+
+test::String* new_offset (SV* CLASS, test::String* from, size_t offset, size_t len) {
+    PXS_TRY({
+        RETVAL = new test::String(*from, offset, len);
+    });
+}
+
+void test::String::assign_literal () {
+    THIS->assign(test::string::literal_char);
+}
+
+void test::String::op_assign_literal () {
+    *THIS = test::string::literal_char;
+}
+
+void test::String::assign_ptr (string_view str, bool with_len = true) {
+    if (with_len) THIS->assign(str.data(), str.length());
+    else          *THIS = str.data();
+}
+
+void test::String::op_assign_ptr (string_view str, ...) {
+    *THIS = str.data();
+}
+
+void test::String::assign_external (string_view str) {
+    auto len = str.length();
+    char* ext = (char*)malloc(len);
+    std::memcpy(ext, str.data(), len);
+    THIS->assign(ext, len, len, &test::string::ext_free<char>);
+}
+
+void test::String::assign_external_custom_buf (string_view str) {
+    auto len = str.length();
+    char* ext = (char*)malloc(len);
+    std::memcpy(ext, str.data(), len);
+    auto buf = test::string::shared_buf_alloc<test::String::ExternalShared>();
+    THIS->assign(ext, len, len, &test::string::ext_free<char>, buf, &test::string::shared_buf_free<char>);
+}
+
+void test::String::assign_fill (size_t len, string_view c) {
+    THIS->assign(len, c[0]);
+}
+
+void test::String::op_assign_char (string_view c) {
+    *THIS = c[0];
+}
+
+void test::String::assign_copy (test::String* other) {
+    *THIS = *other;
+}
+
+void test::String::op_assign_copy (test::String* other) {
+    *THIS = *other;
+}
+
+void test::String::assign_offset (test::String* other, size_t offset, size_t len = test::String::npos) {
+    PXS_TRY({
+        THIS->assign(*other, offset, len);
+    });
+}
+
+void test::String::assign_move (test::String* other) {
+    THIS->assign(std::move(*other));
+}
+
+void test::String::op_assign_move (test::String* other) {
+    *THIS = std::move(*other);
+}
+
+size_t test::String::length (SV* newlen_sv = NULL) {
+    if (newlen_sv) {
+        THIS->length(SvUV(newlen_sv));
+        XSRETURN_UNDEF;
+    }
+    else RETVAL = THIS->length();
+}
+
+string_view test::String::data () {
+    RETVAL = string_view(THIS->data(), THIS->length());
+}
+
+size_t test::String::capacity () {
+    RETVAL = THIS->capacity();
+}
+
+size_t test::String::shared_capacity () {
+    RETVAL = THIS->shared_capacity();
+}
+
+void test::String::caps () {
+    mXPUSHs(newSVuv(THIS->capacity()));
+    mXPUSHs(newSVuv(THIS->shared_capacity()));
+}
+
+bool test::String::empty () {
+    RETVAL = THIS->empty();
+}
+
+uint32_t test::String::use_count () {
+    RETVAL = THIS->use_count();
+}
+
+SV* test::String::at (size_t pos, string_view new_char = string_view()) {
+    PXS_TRY({
+        if (new_char.length()) {
+            THIS->at(pos) = new_char[0];
+            XSRETURN_UNDEF;
+        }
+        const test::String* cthis = THIS;
+        char c = cthis->at(pos);
+        RETVAL = newSVpvn(&c, 1);
+    });
+}
+
+SV* test::String::op_at (size_t pos, string_view new_char = string_view()) {
+    if (new_char.length()) {
+        (*THIS)[pos] = new_char[0];
+        XSRETURN_UNDEF;
+    }
+    const test::String* cthis = THIS;
+    char c = (*cthis)[pos];
+    RETVAL = newSVpvn(&c, 1);
+}
+
+SV* test::String::front (string_view new_char = string_view()) {
+    if (new_char.length()) {
+        THIS->front() = new_char[0];
+        XSRETURN_UNDEF;
+    }
+    const test::String* cthis = THIS;
+    char c = cthis->front();
+    RETVAL = newSVpvn(&c, 1);
+}
+
+SV* test::String::back (string_view new_char = string_view()) {
+    if (new_char.size()) {
+        THIS->back() = new_char.at(0);
+        XSRETURN_UNDEF;
+    }
+    const test::String* cthis = THIS;
+    char c = cthis->back();
+    RETVAL = newSVpvn(&c, 1);
+}
+
+void test::String::detach () {
+    THIS->buf();
+}
+
+void test::String::shared_detach () {
+    THIS->shared_buf();
+}
+
+void test::String::reserve (size_t capacity) {
+    THIS->reserve(capacity);
+}
+
+void test::String::resize (size_t count, string_view ch = string_view()) {
+    if (ch.size()) THIS->resize(count, ch[0]);
+    else           THIS->resize(count);
+}
+
+void test::String::offset (size_t offset, size_t len = test::String::npos) {
+    PXS_TRY({
+        THIS->offset(offset, len);
+    });
+}
+
+test::String* test::String::substr (size_t offset, size_t len = test::String::npos) {
+    HV* CLASS = SvSTASH(SvRV(ST(0)));
+    PXS_TRY({
+        RETVAL = new test::String();
+        *RETVAL = THIS->substr(offset, len);
+    });
+}
+
+void test::String::clear () {
+    THIS->clear();
+}
+
+void test::String::pop_back () {
+    THIS->pop_back();
+}
+
+void test::String::shrink_to_fit () {
+    THIS->shrink_to_fit();
+}
+
+void test::String::swap (test::String* other) {
+    THIS->swap(*other);
+}
+
+SV* test::String::copy (size_t count, size_t pos = 0) {
+    size_t to_reserve = (count == test::String::npos) ? THIS->length() : count;
+    RETVAL = newSV(to_reserve + 1);
+    SvPOK_on(RETVAL);
+    sv_2mortal(RETVAL);
+    PXS_TRY({
+        auto cnt = THIS->copy(SvPVX(RETVAL), count, pos);
+        SvREFCNT_inc(RETVAL);
+        SvCUR_set(RETVAL, cnt);
+    });
+}
+
+void test::String::erase (size_t pos = 0, size_t count = test::String::npos) {
+    PXS_TRY({
+        THIS->erase(pos, count);
+    });
+}
+
+int test::String::compare (size_t pos1, size_t count1, test::String* str, size_t pos2, size_t count2) {
+    PXS_TRY({
+        RETVAL = THIS->compare(pos1, count1, *str, pos2, count2);
+    });
+}
+
+int op_eq (SV* CLASS, test::String* lhs, test::String* rhs) {
+    RETVAL = *lhs == *rhs;
+    PERL_UNUSED_VAR(CLASS);
+}
+
+int op_ne (SV* CLASS, test::String* lhs, test::String* rhs) {
+    RETVAL = *lhs != *rhs;
+    PERL_UNUSED_VAR(CLASS);
+}
+
+int op_gt (SV* CLASS, test::String* lhs, test::String* rhs) {
+    RETVAL = *lhs > *rhs;
+    PERL_UNUSED_VAR(CLASS);
+}
+
+int op_gte (SV* CLASS, test::String* lhs, test::String* rhs) {
+    RETVAL = *lhs >= *rhs;
+    PERL_UNUSED_VAR(CLASS);
+}
+
+int op_lt (SV* CLASS, test::String* lhs, test::String* rhs) {
+    RETVAL = *lhs < *rhs;
+    PERL_UNUSED_VAR(CLASS);
+}
+
+int op_lte (SV* CLASS, test::String* lhs, test::String* rhs) {
+    RETVAL = *lhs <= *rhs;
+    PERL_UNUSED_VAR(CLASS);
+}
+
+size_t test::String::find (test::String* str, size_t pos = 0) {
+    if (str->length() == 1) RETVAL = THIS->find(str->data()[0], pos);
+    else                    RETVAL = THIS->find(*str, pos);
+}
+
+size_t test::String::rfind (test::String* str, size_t pos = test::String::npos) {
+    if (str->length() == 1) RETVAL = THIS->rfind(str->data()[0], pos);
+    else                    RETVAL = THIS->rfind(*str, pos);
+}
+
+size_t test::String::find_first_of (test::String* str, size_t pos = 0) {
+    if (str->length() == 1) RETVAL = THIS->find_first_of(str->data()[0], pos);
+    else                    RETVAL = THIS->find_first_of(*str, pos);
+}
+
+size_t test::String::find_first_not_of (test::String* str, size_t pos = 0) {
+    if (str->length() == 1) RETVAL = THIS->find_first_not_of(str->data()[0], pos);
+    else                    RETVAL = THIS->find_first_not_of(*str, pos);
+}
+
+size_t test::String::find_last_of (test::String* str, size_t pos = test::String::npos) {
+    if (str->length() == 1) RETVAL = THIS->find_last_of(str->data()[0], pos);
+    else                    RETVAL = THIS->find_last_of(*str, pos);
+}
+
+size_t test::String::find_last_not_of (test::String* str, size_t pos = test::String::npos) {
+    if (str->length() == 1) RETVAL = THIS->find_last_not_of(str->data()[0], pos);
+    else                    RETVAL = THIS->find_last_not_of(*str, pos);
+}
+
+void test::String::append (test::String* str, size_t pos = 0, size_t count = test::String::npos) {
+    THIS->append(*str, pos, count);
+}
+
+void test::String::append_chars (size_t count, string_view ch) {
+    THIS->append(count, ch[0]);
+}
+
+test::String* op_plus_ss (SV* CLASS, test::String* lhs, test::String* rhs) {
+    RETVAL = new test::String();
+    *RETVAL = *lhs + *rhs;
+}
+
+test::String* op_plus_ps (SV* CLASS, string_view lhs, test::String* rhs) {
+    RETVAL = new test::String();
+    *RETVAL = lhs.data() + *rhs;
+}
+
+test::String* op_plus_cs (SV* CLASS, string_view lhs, test::String* rhs) {
+    RETVAL = new test::String();
+    *RETVAL = lhs[0] + *rhs;
+}
+
+test::String* op_plus_sp (SV* CLASS, test::String* lhs, string_view rhs) {
+    RETVAL = new test::String();
+    *RETVAL = *lhs + rhs.data();
+}
+
+test::String* op_plus_sc (SV* CLASS, test::String* lhs, string_view rhs) {
+    RETVAL = new test::String();
+    *RETVAL = *lhs + rhs[0];
+}
+
+test::String* op_plus_mss (SV* CLASS, test::String* lhs, test::String* rhs) {
+    RETVAL = new test::String();
+    *RETVAL = std::move(*lhs) + *rhs;
+}
+
+test::String* op_plus_sms (SV* CLASS, test::String* lhs, test::String* rhs) {
+    RETVAL = new test::String();
+    *RETVAL = *lhs + std::move(*rhs);
+}
+
+test::String* op_plus_msms (SV* CLASS, test::String* lhs, test::String* rhs) {
+    RETVAL = new test::String();
+    *RETVAL = std::move(*lhs) + std::move(*rhs);
+}
+
+test::String* op_plus_pms (SV* CLASS, string_view lhs, test::String* rhs) {
+    RETVAL = new test::String();
+    *RETVAL = lhs.data() + std::move(*rhs);
+}
+
+test::String* op_plus_cms (SV* CLASS, string_view lhs, test::String* rhs) {
+    RETVAL = new test::String();
+    *RETVAL = lhs[0] + std::move(*rhs);
+}
+
+test::String* op_plus_msp (SV* CLASS, test::String* lhs, string_view rhs) {
+    RETVAL = new test::String();
+    *RETVAL = std::move(*lhs) + rhs.data();
+}
+
+test::String* op_plus_msc (SV* CLASS, test::String* lhs, string_view rhs) {
+    RETVAL = new test::String();
+    *RETVAL = std::move(*lhs) + rhs[0];
+}
+
+void test::String::insert (size_t pos, string_view str) {
+    THIS->insert(pos, str.data(), str.length());
+}
+
+void test::String::insert_chars (size_t pos, size_t count, string_view ch) {
+    THIS->insert(pos, count, ch[0]);
+}
+
+void test::String::replace (size_t pos, size_t remove_count, string_view str) {
+    THIS->replace(pos, remove_count, str.data(), str.length());
+}
+
+void test::String::replace_chars (size_t pos, size_t remove_count, size_t insert_count, string_view ch) {
+    THIS->replace(pos, remove_count, insert_count, ch[0]);
+}
+
+int64_t test::String::to_number (size_t pos = 0, size_t count = test::String::npos, int base = 10) {
+    auto res = THIS->to_number(RETVAL, pos, count, base);
+    if (res.ec) XSRETURN_UNDEF;
+}
+
+test::String* from_number (SV* CLASS, int64_t value, int base = 10) {
+    RETVAL = new test::String();
+    *RETVAL = test::String::from_number(value, base);
+}
+
+bool test::String::to_bool () {
+    if (*THIS) RETVAL = true;
+    if (!*THIS) RETVAL = false;
+}
+
+int MAX_SSO_CHARS (...) {
+    RETVAL = test::String::MAX_SSO_CHARS;
+    PERL_UNUSED_VAR(items);
+}
+
+int BUF_SIZE (...) {
+    RETVAL = sizeof(size_t) + sizeof(uint32_t);
+    PERL_UNUSED_VAR(items);
+}
+
+int EBUF_SIZE (...) {
+    RETVAL = 4*sizeof(void*);
+    PERL_UNUSED_VAR(items);
+}
+
+size_t npos (...) {
+    RETVAL = test::String::npos;
+    PERL_UNUSED_VAR(items);
+}
+
+void stdswap (SV* CLASS, test::String* lhs, test::String* rhs) {
+    lhs->swap(*rhs);
+    PERL_UNUSED_VAR(CLASS);
+}
+
+void test::String::DESTROY () {}
+
+
+
+MODULE = Panda::Lib                PACKAGE = Panda::Lib::Test::String2
+PROTOTYPES: DISABLE
+
+test::String2* new_literal (SV* CLASS) {
+    RETVAL = new test::String2(test::string::literal_char);
+}
+
+test::String2* new_ptr (SV* CLASS, string_view str) {
+    RETVAL = new test::String2(str.data(), str.length());
+}
+
+test::String2* new_external (SV* CLASS, string_view str) {
+    auto len = str.length();
+    char* ext = (char*)malloc(len);
+    std::memcpy(ext, str.data(), len);
+    RETVAL = new test::String2(ext, len, len, &test::string::ext_free<char,1>);
+}
+
+test::String2* new_external_custom_buf (SV* CLASS, string_view str) {
+    auto len = str.length();
+    char* ext = (char*)malloc(len);
+    std::memcpy(ext, str.data(), len);
+    auto buf = test::string::shared_buf_alloc<test::String2::ExternalShared>();
+    RETVAL = new test::String2(ext, len, len, &test::string::ext_free<char,1>, buf, &test::string::shared_buf_free<char,1>);
+}
+
+void test::String2::DESTROY () {}

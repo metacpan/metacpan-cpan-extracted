@@ -1,0 +1,106 @@
+#!perl
+
+use warnings;
+use strict;
+
+use Palm::ProjectGutenberg qw(pg2pdb);
+
+use vars qw($VERSION);
+
+$VERSION = '1.01';
+
+my($title, $infile, $outfile) = @ARGV;
+
+if(!-e $infile) { _help(); }
+if(!$outfile) { _help(); }
+
+pg2pdb($title, $infile, $outfile);
+
+sub _help { print qq{
+$0 - convert a Project Gutenberg ebook to Palm PDB format
+
+$0 "Book Title" inputfile.txt outputfile.pdb
+
+This program is copyright 2009 David Cantrell <david\@cantrell.org.uk>.
+
+This software is free-as-in-speech software, and may be used,
+distributed, and modified under the terms of either the GNU
+General Public Licence version 2 or the Artistic Licence.  It's
+up to you which one you use.  The full text of the licences can
+be found in the files GPL2.txt and ARTISTIC.txt, respectively.
+};
+exit(0); }
+
+=head1 NAME
+
+pg2pdb - convert PG text files to Palm Doc format
+
+=head1 DESCRIPTION
+
+This is a very simple wrapper around the Palm::Doc module that
+re-formats files from Project Gutenberg so that they look better
+on a small screen.  It does this by removing line breaks apart
+from at paragraph breaks.
+
+=head1 USAGE
+
+pg2pdb "King Solomon's Mines" 2166.txt king-solomons-mines.pdb
+
+All three parameters are compulsory and are, in order:
+
+=over
+
+=item title
+
+The title of the book
+
+=item input file
+
+The name of a file containing the plain-text of the book.  This should
+not contains HTML markup.  It works best if you choose a plain ASCII
+file instead of ISO 8859-1, as PalmOS doesn't handle weird character
+sets very well.
+
+=item output file
+
+The name of a file to write the encoded version of the text to.  You
+should then hotsync this to your PalmOS device in the usual way.
+
+=back
+
+=head1 LIMITATIONS, BUGS and FEEDBACK
+
+This is subject to the limitations of Palm::Doc - eg that all documents
+produced are compressed.
+
+I welcome feedback about my code, including constructive criticism.
+Bug reports should be made using L<http://rt.cpan.org/> or by email,
+and should include the a brief description of the bug and a small
+text file that provokes it and which I can freely distribute with the
+code as part of its automated test suite in the future.
+
+=head1 SEE ALSO
+
+L<Palm::ProjectGutenberg>
+
+L<Palm::Doc>
+
+L<http://gutenberg.org>
+
+=head1 AUTHOR, COPYRIGHT and LICENCE
+
+David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+
+Copyright 2009 David Cantrell E<lt>david@cantrell.org.ukE<gt>
+
+This software is free-as-in-speech software, and may be used,
+distributed, and modified under the terms of either the GNU
+General Public Licence version 2 or the Artistic Licence.  It's
+up to you which one you use.  The full text of the licences can
+be found in the files GPL2.txt and ARTISTIC.txt, respectively.
+
+=head1 CONSPIRACY
+
+This module is also free-as-in-mason software.
+
+=cut

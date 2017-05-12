@@ -1,0 +1,29 @@
+---
+abstract: 'a POE Component that implements send_nsca functionality'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-Client-NSCA
+requires:
+  POE: '0.38'
+  POE::Filter::Stream: '0'
+  POE::Wheel::ReadWrite: '0'
+  POE::Wheel::SocketFactory: '0'
+  perl: '5.008'
+resources:
+  homepage: https://github.com/bingos/poe-component-client-nsca
+  repository: https://github.com/bingos/poe-component-client-nsca.git
+version: '0.18'
+x_serialization_backend: 'YAML::Tiny version 1.70'

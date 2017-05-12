@@ -1,0 +1,203 @@
+---
+abstract: 'Perl Application Development and Refactoring Environment'
+author:
+  - 'Gabor Szabo'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Locale::Msgfmt: 0.15
+  Test::Exception: 0.27
+  Test::MockObject: 1.09
+  Test::More: 0.98
+  Test::NoWarnings: 1.04
+  Test::Script: 1.07
+  Test::Warn: 0.24
+configure_requires:
+  Alien::wxWidgets: 0.62
+  ExtUtils::Embed: 1.250601
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+keywords:
+  - auto-completion
+  - code
+  - coding
+  - completion
+  - context
+  - cross-platform
+  - development
+  - editor
+  - environment
+  - find
+  - 'function list'
+  - gui
+  - help
+  - highlight
+  - hightlighting
+  - ide
+  - linux
+  - 'mac os'
+  - 'mac os x'
+  - padre
+  - perl
+  - portable
+  - refactoring
+  - replace
+  - syntax
+  - windows
+  - 'version control'
+  - patch
+  - diff
+  - wx
+  - wxwidgets
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Padre
+no_index:
+  directory:
+    - eg
+    - inc
+    - privinc
+    - share
+    - t
+    - xt
+requires:
+  Algorithm::Diff: 1.19
+  App::cpanminus: 0.9923
+  B::Deparse: 0
+  CGI: 3.47
+  Capture::Tiny: 0.06
+  Class::Adapter: 1.05
+  Class::Inspector: 1.22
+  Class::XSAccessor: 1.13
+  Cwd: 3.2701
+  DBD::SQLite: 1.35
+  DBI: 1.58
+  Data::Dumper: 2.101
+  Debug::Client: 0.29
+  Devel::Dumpvar: 0.04
+  Devel::Refactor: 0.05
+  Encode: 2.26
+  ExtUtils::MakeMaker: 6.56
+  ExtUtils::Manifest: 1.56
+  File::Basename: 0
+  File::Copy::Recursive: 0.37
+  File::Find::Rule: 0.30
+  File::Glob: 0
+  File::HomeDir: 0.91
+  File::Path: 2.08
+  File::Remove: 1.40
+  File::ShareDir: 1.00
+  File::Spec: 3.2701
+  File::Spec::Functions: 3.2701
+  File::Temp: 0.20
+  File::Which: 1.08
+  File::pushd: 1.00
+  FindBin: 0
+  Getopt::Long: 0
+  HTML::Entities: 3.57
+  HTML::Parser: 3.58
+  IO::Scalar: 2.110
+  IO::Socket: 1.30
+  IO::String: 1.08
+  IPC::Open2: 0
+  IPC::Open3: 0
+  IPC::Run: 0.83
+  JSON::XS: 2.29
+  LWP: 5.815
+  LWP::UserAgent: 5.815
+  List::MoreUtils: 0.22
+  List::Util: 1.18
+  Module::Build: 0.3603
+  Module::CoreList: 2.22
+  Module::Manifest: 0.07
+  Module::Starter: 1.60
+  ORLite: 1.98
+  ORLite::Migrate: 1.10
+  POD2::Base: 0.043
+  POSIX: 0
+  PPI: 1.215
+  PPIx::EditorTools: 0.18
+  PPIx::Regexp: 0.011
+  Params::Util: 0.33
+  Parse::ErrorString::Perl: 0.18
+  Parse::ExuberantCTags: 1.00
+  Pod::Abstract: 0.16
+  Pod::Functions: 0
+  Pod::POM: 0.17
+  Pod::Perldoc: 3.15
+  Pod::Simple: 3.07
+  Pod::Simple::XHTML: 3.04
+  Probe::Perl: 0.01
+  Sort::Versions: 1.5
+  Storable: 2.16
+  Template::Tiny: 0.11
+  Term::ReadLine: 0
+  Text::Balanced: 2.01
+  Text::Diff: 1.41
+  Text::FindIndent: 0.10
+  Text::Patch: 1.8
+  Time::HiRes: 1.9718
+  URI: 0
+  Wx: 0.9916
+  Wx::Perl::ProcessStream: 0.32
+  Wx::Scintilla: 0.39
+  YAML::Tiny: 1.32
+  perl: 5.011000
+  threads: 1.71
+  threads::shared: 1.33
+  version: 0.80
+resources:
+  bugtracker: http://padre.perlide.org/trac/
+  homepage: http://padre.perlide.org/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre/
+version: 1.00
+x_contributors:
+  - 'Aaron Trevena (TEEJAY)'
+  - 'Adam Kennedy (ADAMK) <adamk@cpan.org>'
+  - 'Ahmad Zawawi أحمد محمد زواوي (AZAWAWI)'
+  - 'Andrew Shitov'
+  - 'Alexandr Ciornii (CHORNY)'
+  - 'Amir E. Aharoni - אמיר א. אהרוני'
+  - 'Blake Willmarth (BLAKEW)'
+  - 'BlueT - Matthew Lien - 練喆明 (BLUET) <bluet@cpan.org>'
+  - 'Breno G. de Oliveira (GARU)'
+  - 'Brian Cassidy (BRICAS)'
+  - 'Burak Gürsoy (BURAK) <burak@cpan.org>'
+  - 'Cezary Morga (THEREK) <cm@therek.net>'
+  - 'Chris Dolan (CHRISDOLAN)'
+  - 'Claudio Ramirez (NXADM) <nxadm@cpan.org>'
+  - 'Dirk De Nijs (ddn123456)'
+  - 'Enrique Nell (ENELL)'
+  - 'Fayland Lam (FAYLAND) <fayland@gmail.com>'
+  - 'Gabriel Vieira (GABRIELMAD)'
+  - 'Gábor Szabó - גאבור סבו (SZABGAB) <szabgab@cpan.org>'
+  - 'György Pásztor (GYU)'
+  - 'Heiko Jansen (HJANSEN) <heiko_jansen@web.de>'
+  - 'Jérôme Quelin (JQUELIN) <jquelin@cpan.org>'
+  - 'Kaare Rasmussen (KAARE) <kaare@cpan.org>'
+  - 'Keedi Kim - 김도형 (KEEDI)'
+  - 'Kenichi Ishigaki - 石垣憲一 (ISHIGAKI) <ishigaki@cpan.org>'
+  - 'Kevin Dawson (BOWTIE) <bowtie@cpan.org>'
+  - 'Kjetil Skotheim (KJETIL)'
+  - 'Marcela Mašláňová (mmaslano)'
+  - 'Marek Roszkowski (EviL) <evil@evil.devil.is-my.name>'
+  - 'Mark Grimes <mgrimes@cpan.org>'
+  - 'Max Maischein (CORION)'
+  - 'Olivier MenguE<eacute> (DOLMEN)'
+  - 'Omer Zak  - עומר זק'
+  - 'Paco Alguacil (PacoLinux)'
+  - 'Patrick Donelan (PDONELAN) <pat@patspam.com>'
+  - 'Paweł Murias (PMURIAS)'
+  - 'Petar Shangov (PSHANGOV)'
+  - 'Peter Lavender (PLAVEN)'
+  - 'Ryan Niebur (RSN) <rsn@cpan.org>'
+  - 'Sebastian Willing (SEWI)'
+  - 'Shlomi Fish  - שלומי פיש (SHLOMIF)'
+  - 'Simone Blandino (SBLANDIN)'
+  - 'Steffen Müller (TSEE) <smueller@cpan.org>'
+  - 'Zeno Gantner (ZENOG)'
+  - 'Chuanren Wu'

@@ -1,0 +1,67 @@
+NAME
+
+    POE::Component::Server::Daytime - A POE component that implements an
+    RFC 867 Daytime server.
+
+VERSION
+
+    version 1.16
+
+SYNOPSIS
+
+     use POE::Component::Server::Daytime;
+    
+     my $self = POE::Component::Server::Daytime->spawn( 
+            Alias => 'Daytime-Server',
+            BindAddress => '127.0.0.1',
+            BindPort => 7777,
+            options => { trace => 1 },
+     );
+
+DESCRIPTION
+
+    POE::Component::Server::Daytime implements a RFC 867
+    http://www.faqs.org/rfcs/rfc867.html TCP/UDP Daytime server, using POE.
+    It is a class inherited from POE::Component::Server::Echo.
+
+METHODS
+
+    spawn
+
+      Takes a number of optional values:
+
+        "Alias", the kernel alias that this component is to be blessed with; 
+        "BindAddress", the address on the local host to bind to, defaults to 
+                       POE::Wheel::SocketFactory default; 
+        "BindPort", the local port that we wish to listen on for requests, defaults 
+                    to 19 as per RFC, this will require "root" privs on UN*X; 
+        "options", should be a hashref, containing the options for the component's session, 
+                   see POE::Session for more details on what this should contain.
+
+BUGS
+
+    Report any bugs through http://rt.cpan.org/.
+
+SEE ALSO
+
+    POE
+
+    POE::Session
+
+    POE::Wheel::SocketFactory
+
+    POE::Component::Server::Echo
+
+    http://www.faqs.org/rfcs/rfc867.html
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

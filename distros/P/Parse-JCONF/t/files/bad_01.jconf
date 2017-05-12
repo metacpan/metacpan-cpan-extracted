@@ -1,0 +1,6 @@
+str = "" # empty str
+
+arr = [
+	1,
+	2,
+	

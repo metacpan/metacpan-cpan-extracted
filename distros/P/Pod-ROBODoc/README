@@ -1,0 +1,102 @@
+NAME
+    Pod::ROBODoc - Convert ROBODoc to Pod.
+
+VERSION
+    0.3
+
+SYNOPSIS
+        use Pod::ROBODoc;
+        my $parser = Pod::ROBODoc->new();
+
+        $parser->convert(
+            input  => '/path/to/inputfile',
+            output => '/path/to/outputfile,
+        );
+
+DESCRIPTION
+    Pod::ROBODoc is a simple ROBODoc-to-Pod converter.
+
+METHODS
+  new( [OPTIONS] )
+    "new" creates a Pod::ROBODoc object. Options are passed as name-value
+    pairs.
+
+    keepsource
+        Boolean indicating whether to keep data found within ROBODoc SOURCE
+        tags. Defaults to false.
+
+    skipblanks
+        Boolean indicating whether to strip out whitespace-only lines from
+        ROBODoc. Defaults to false.
+
+    customtags
+        Reference to an array of custom ROBODoc tag names. Defaults to an
+        empty list.
+
+  filter( [INPUT [,OUTPUT]] )
+    "filter" takes an input stream containing ROBODoc documentation,
+    converts it to Pod, and writes it to the output stream.
+
+    input
+        The input stream containing ROBODoc documentation. If specified,
+        this must be a file name. Defaults to STDIN.
+
+    output
+        The output stream to which the Pod will be written. If specified,
+        this must be a file name. Defaults to STDOUT.
+
+  convert( INPUT )
+    "convert" takes a string containing ROBODoc documentation, converts it
+    to Pod, and returns the Pod string.
+
+    input
+        The input string containing ROBODoc documentation.
+
+CONFIGURATION
+    TODO
+
+DEPENDENCIES
+    Carp, IO::File, IO::String, Params::Validate
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to "bug-Pod-ROBODoc at rt dot
+    cpan dot org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Pod-Robodoc>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+    You may also use this module's github issues tracker at
+    <http://github.com/mgrimm/Pod-ROBODoc/issues>.
+
+    There is currently no support for using filehandles as input and output
+    streams. This is planned for a future release.
+
+TODO
+    *   Write much more extensive tests for generated Pod
+
+    *   Write unit tests for robodoc2pod script
+
+SEE ALSO
+    *   Pod
+
+        <http://perldoc.perl.org/perlpod.html>
+
+    *   ROBODoc
+
+        <http://sourceforge.net/projects/robodoc>
+
+ACKNOWLEDGEMENTS
+    This module was inspired by the following post:
+    <http://www.perlmonks.org/?node_id=536298>
+
+    Much of the module design and test suite were adapted from elements of
+    Pod::WikiDoc.
+
+AUTHOR
+    Matt Grimm, "mgrimm at cpan dot org"
+
+COPYRIGHT AND LICENSE
+    Copyright 2010, Matt Grimm, All rights reserved
+
+    This software is available under the same terms as perl.
+

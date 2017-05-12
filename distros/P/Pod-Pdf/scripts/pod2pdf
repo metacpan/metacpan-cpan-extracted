@@ -1,0 +1,58 @@
+#!usr/bin/perl -w
+
+use Pod::Pdf;
+pod2pdf(@ARGV);
+exit 0;
+
+__END__
+
+=head1 NAME
+
+pod2pdf - Interface file for F<Pod.pm>
+
+=head1 SYNOPSIS
+
+From the shell enter any of the following examples:
+
+
+	$ pod2pdf --verbose 1 --paper usletter <file>
+	$ pod2pdf -verbose 1 -paper usletter <file>
+	$ pod2pdf -v 2 -pa letter <file>
+	$ cat <file> | pod2pdf
+	
+NB F<Pdf.pm> will only process B<single> files
+
+=head1 DESCRIPTION
+
+F<pod2pdf> provides a simple interface to allow the module F<Pdf.pm> to be called from a shell prompt.
+
+=head1 SEE ALSO
+
+F<Pdf.pm>
+
+=head1 AUTHORS
+
+Alan J. Fry and Axel Rose
+
+=item e-mail L<mailto:ajf@afco.demon.co.uk>
+
+=item WWW L<http://www.afco.demon.co.uk>
+
+=item WWW L<http://www.roeslein.de/axel/>
+
+=head1 HISTORY
+
+=item Version 0.01 released 30 May 2000
+
+=head1 VERSION
+
+=item v 0.01 Monday, 30 May 2000
+
+=head1 COPYRIGHT 
+
+=item © Alan J. Fry April 2000
+
+=item This program is distributed under the terms of the Artistic Licence
+
+=cut
+	

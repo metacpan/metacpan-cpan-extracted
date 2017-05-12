@@ -1,0 +1,24 @@
+---
+name: Params-Attr
+version: 1.00
+author:
+  - 'M J Pearce <fluffy@cpan.org>'
+abstract: function signature checking via attributes
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Attribute::Handlers: 0.79
+  Carp: 0
+  List::Util: 1.19
+  Params::Validate: 0.91
+  Scalar::Util: 1.19
+  perl: 5.10.0
+provides:
+  Params::Attr:
+    file: lib/Params/Attr.pm
+    version: 1.00
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

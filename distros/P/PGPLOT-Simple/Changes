@@ -1,0 +1,15 @@
+Revision history for Perl extension PGPLOT::Simple.
+
+0.05  Thu Mar 15 23:27:43 2007
+    - Added the license.
+0.04  Wed Mar 14 23:30:14 2007
+    - META.yml conforms latest specs.
+0.03  Mon Mar 12 11:33:23 2007
+    - Added pod test.
+0.02  Thu Dec 15 22:34:42 2005
+    - Changed color conventions; instead of 'Black' and 'White', we have
+        'Foreground' and 'Background'.
+0.01  Tue Nov 29 21:47:48 2005
+	- Original version; created by h2xs 1.23 with options
+		-X -n PGPLOT::Simple
+

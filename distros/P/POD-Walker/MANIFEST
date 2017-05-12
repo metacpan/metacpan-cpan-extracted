@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/POD/Walker.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+bin/pod-walker

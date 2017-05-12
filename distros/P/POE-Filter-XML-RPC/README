@@ -1,0 +1,53 @@
+NAME
+    POE::Filter::XML::RPC - A POE Filter for marshalling XML-RPC
+
+SYNOPSIS
+        use POE::Filter::XML::RPC;
+        use POE::Filter::XML::RPC::Request;
+        use POE::Filter::XML::RPC::Response;
+        use POE::Filter::XML::RPC::Fault;
+        use POE::Filter::XML::RPC::Value;
+
+        my $filter = POE::Filter::XML::RPC->new();
+
+        # Build/send a request
+        my $request = POE::Filter::XML::RPC::Request->new
+        (
+            'server_method', 
+            POE::Filter::XML::RPC::Value->new({'NamedArgument' => 42})
+        );
+
+        $filter->put($request);
+
+        # Build/send a response
+
+        my $reponse = POE::Filter::XML::RPC::Response->new
+        (
+            POE::Filter::XML::RPC::Value->new([qw/somevalue1 somevalue2/])
+        );
+
+        $filter->put($reponse);
+
+DESCRIPTION
+    POE::Filter::XML::RPC builds upon the work of POE::Filter::XML to parse
+    XML-RPC datagrams and deliver useful objects for the end developer.
+
+    This filter is expected to be used in a chain of filters where it will
+    receive POE::Filter::XML::Nodes on input and output.
+
+PUBLIC METHODS
+    There are no public methods outside of the implemented POE::Filter API
+
+NOTES
+    Response, Request, Fault, and Value are based on POE::Filter::XML::Node.
+    See their individual PODs for more information.
+
+    This filter only implements part of the XMLRPC spec[1], the HTTP portion
+    is not accounted for within this filter and in fact, only concerns
+    itself with POE::Filter::XML::Nodes received or sent.
+
+    [1]: http://www.xmlrpc.com/spec
+
+AUTHOR
+    Copyright 2009 Nicholas Perez. Licensed and distributed under the GPL.
+

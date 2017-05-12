@@ -1,0 +1,49 @@
+{
+   "abstract" : "Use __END__ for working code examples, self testing, executing",
+   "author" : [
+      "David Wright <dvwright@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-RunEND",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Carp" : 0,
+            "Config" : 0,
+            "File::Basename" : 0,
+            "File::Find" : 0,
+            "File::Spec" : 0,
+            "File::Temp" : 0,
+            "Getopt::Long" : 0,
+            "Pod::Usage" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Perl::RunEND" : {
+         "file" : "lib/Perl/RunEND.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.1.0"
+}

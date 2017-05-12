@@ -1,0 +1,33 @@
+Schema Classes
+==============
+
+The schema result classes were auto-generated using
+DBIx::Class::Schema::Loader. Here's what I did:
+
+mkdir /tmp/pkgforge
+dbicdump -o dump_directory=/tmp/pkgforge/lib \
+         -o debug=1 \
+         PkgForge::Registry::Schema \
+         'dbi:Pg:dbname=pkgforge'
+
+
+It is not necessary to have DBIx::Class::Schema::Loader installed on
+the machines using these schema classes, it is only required for
+updating the schema.
+
+The module versions used were:
+
+DBIx::Class 0.08123-1
+DBIx::Class::Schema::Loader 0.07000-1
+
+Documentation
+=============
+
+The database schema was documented using postgresql_autodoc.
+
+postgresql_autodoc -d pkgforge
+
+The most useful bits are the html file and the graphviz .dot file.
+
+dot -Tps pkgforge.dot  > pkgforge.ps
+

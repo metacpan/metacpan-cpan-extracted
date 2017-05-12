@@ -1,0 +1,23 @@
+---
+abstract: 'Superclass handler for Palm MaTirelire databases'
+author:
+  - 'Maxime Soulé <max@ma-tirelire.net>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Palm-MaTirelire
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Palm::PDB: 1.015
+  Palm::StdAppInfo: 1.014
+version: 1.14

@@ -1,0 +1,75 @@
+{
+   "abstract" : "Session store container which provides transparent access",
+   "author" : [
+      "Ichito Nagata <i.nagata110@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Session-Store-Transparent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Plack::Session::Store" : "0.20",
+            "Test::Exception" : "0.32",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Session::Store::Transparent" : {
+         "file" : "lib/Plack/Session/Store/Transparent.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/i110/p5-Plack-Session-Store-Transparent/issues"
+      },
+      "homepage" : "https://github.com/i110/p5-Plack-Session-Store-Transparent",
+      "repository" : {
+         "url" : "git://github.com/i110/p5-Plack-Session-Store-Transparent.git",
+         "web" : "https://github.com/i110/p5-Plack-Session-Store-Transparent"
+      }
+   },
+   "version" : "0.03"
+}

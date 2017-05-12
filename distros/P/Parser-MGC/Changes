@@ -1,0 +1,106 @@
+Revision history for Parser-MGC
+
+0.16    2017/01/10 16:39:02
+        [CHANGES]
+         * Added ->take method
+         * Added ->committed_scope_of method
+         * Added a simple Bencode example
+
+0.15    2015/12/03 16:56:19
+        [CHANGES]
+         * Allow method names as well as CODE references to structure-forming
+           methods
+         * Added worked run-through example documentation and explanation of
+           the expression evaluator parser example
+         * Further expanded Parser::MGC::Tutorial
+
+0.14    2015/08/31 15:29:36
+        [CHANGES]
+         * Many documentation improvements:
+            + More detailed explanation of backtracking behaviour and the use
+              of the ->commit method
+            + Trailing delimiter does not upset ->list_of
+            + Added an as-yet incomplete Parser::MGC::Tutorial
+         * Use Scalar::Util::blessed() to avoid the eval { ->isa } antipattern
+         * Have long-deprecated ->one_of print a deprecation warning
+
+0.13    2015/06/25 19:05:10
+        [CHANGES]
+         * Use File::Slurp::Tiny instead of File::Slurp
+
+0.12    2013/09/01 01:30:13
+        [CHANGES]
+         * Ensure that ->expect / ->maybe_expect with optional capture groups
+           don't yield warnings (thanks BP Jonsson)
+         * Allow setting binmode for ->from_file
+         * Slightly neater examples/parse-xml.pl
+
+0.11    CHANGES:
+         * Allow different toplevel parse methods to the constructor
+         * Added another example showing parsing XML - only a minimal example;
+           do not use this as real code. :)
+
+0.10    CHANGES:
+         * Added ->maybe_expect, for higher performance parsers
+
+0.09    CHANGES:
+         * Added ->pos accessor and ->fail_from to throw failures from other
+           locations
+         * Added ->token_number as a convenience for int or float
+
+0.08    CHANGES:
+         * Give ->list_of and ->sequence_of proper failure-handling semantics
+         * Added ->generic_token
+         * Defer conversion of pos into line/col/text until string-formatting
+           a failure exception - improves performance of backtracking
+         * Make token_float tuneable
+
+0.07    CHANGES:
+         * Allow ->expect to return subgroup captures in list context
+         * Documentation improvements
+        
+        BUGFIXES:
+         * Use Data::Dumper rather than Data::Dump in examples, as the latter
+           is not core; no point pulling in non-core deps simply for examples
+
+0.06    CHANGES:
+         * Renamed ->one_of to ->any_of
+         * Added ->substring_before
+         * Allow ->scope_of to not take a start pattern
+         * Recognise the usual set of character escapes in ->token_string
+         * Added more example scripts to demonstrate:
+            + the use ->substring_before to parse POD-like notation
+            + accumulator variables instead of structural return
+         * Unit-test the example scripts
+
+0.05    CHANGES:
+         * Added ->scope_level
+         * Added ->from_reader as a new potential source of string input
+
+0.04    CHANGES:
+         * Added ->token_float
+         * Optionally parse 0o... ad octal integers
+
+        BUGFIXES:
+         * Match strings non-greedily
+         * Correct exception printing when line indent includes tabs (thanks
+           to Khisanth/#perl)
+
+0.03    CHANGES:
+         * Expanded documentation, more examples
+        
+        BUGFIXES:
+         * Regexp quoting fix for perl >= 5.13.6
+         * Declare dependency on File::Slurp
+
+0.02    CHANGES:
+         * ->expect now returns the consumed string
+         * ->token_int recognises negative integers
+         * ->token_* raises a failure at end-of-scope, rather than returning
+           undef
+
+        BUGFIXES:
+         * 'use overload fallback' to keep Test::More 0.96 happy
+
+0.01    First version, released on an unsuspecting world.
+

@@ -1,0 +1,11 @@
+/* This is the CSS for "skin1" to override portions of parley-min.css */
+
+body {
+    background-color:   #f0983d;
+    font-family:        monospace;
+    color:              red;
+}
+
+div#ft, div#ft p, div#ft a {
+    background-color:   yellow;
+}

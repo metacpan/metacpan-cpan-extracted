@@ -1,0 +1,29 @@
+From: http://site.gravatar.com/site/implement
+
+PERL
+
+Gravatar implementations with PERL are pretty straightforward, however you do
+need to include several external libraries. These are probably already
+installed on your machine, but if they're not, you'll have to download and
+install them.
+
+Let's start by including those library functions that we'll utilize:
+
+use URI::Escape qw(uri_escape);
+use Digest::MD5 qw(md5_hex);
+
+Next, assume the following variables are available to you:
+
+my $email = "someone@somewhere.com";
+my $default = "http://www.somewhere.com/homsar.jpg";
+my $size = 40;
+
+You can construct your gravatar url with the following PERL code:
+
+my $grav_url = "http://www.gravatar.com/avatar.php?
+gravatar_id=".md5_hex($email).
+"&default=".uri_escape($default).
+"&size=".$size;
+
+This only constructs the URL, so don't forget to place it in an img tag before
+printing it.

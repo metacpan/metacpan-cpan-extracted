@@ -1,0 +1,171 @@
+=head1 The Package Forge (PkgForge) software build farm system
+
+=head2 Source Package
+
+All source packages are represented by a class which is within the
+C<PkgForge::Source> name space (e.g. C<PkgForge::Source::SRPM>). The
+aim of these classes is purely to represent the essentials of a source
+package and to provide the ability to ensure validity. There is no
+functionality for building the packages, that is done separately. 
+
+Each class must implement the C<PkgForge::Source> role which requires
+that the class has a C<validate> method, it may also have additional
+functionality. The C<PkgForge::Source> role provides generic
+functionality which is appropriate to all types of source
+package. This is mainly a few simple attributes, such as the file
+name.
+
+The source classes must implement a C<validate> method. This method
+must return 1 when the source package is valid and must die with a
+useful message if the associated file is not a valid package of that
+source type.
+
+=head2 Build Job
+
+The entire build request from the user (the build job) is represented
+by the C<PkgForge::Job> class. Typically a user is likely to want to
+build just a single package in a job but there is support for building
+an entire set of packages in a user specified sequence. This can be
+useful, for example, when using mock to build RPMs where the products
+of one build can be made immediately available as build-dependencies
+for subsequent source packages.
+
+The build job holds information on the target platforms and
+architectures. Normally it would be expected that a source package
+should be buildable on all platforms but support is provided for
+limiting the target platforms.
+
+The target bucket into which the generated products of a successful
+build should be submitted must be specified. For RPMs this is also
+used to control which package repositories are available to fulfil
+build-dependencies.
+
+Each build job is given a unique identifier (UUID) which can be used
+to track the job throughout the build process. Optionally a list of
+email addresses can be specified which are used for sending feedback.
+
+=head2 Handlers
+
+The handlers provide the code which does the work of the various
+stages of processing the submitted jobs, carrying out the validation
+and attempting the builds.
+
+There is a parent class, named C<PkgForge::Handler>, which holds the
+generic information required by all handlers (such as the locations of
+the directories which hold the build jobs). This class also provides
+support for handling configuration data and logging. Each sub-class
+should provide an C<execute> method which does the actual work for
+that stage of the build process.
+
+Handlers are currently provided for: server initialisation
+(C<Handler::Initialise>), processing the submitted build jobs
+(C<Handler::Incoming>) and launching the build process for a job
+(C<Handler::Buildd>). These handlers are designed to be called either
+as a command-line application or, in some cases as daemonised
+processes. For command-line applications there will be an associated
+class under the C<PkgForge::App> name space, for a daemon there will
+be an associated class under the C<PkgForge::Daemon> name space (not
+yet implemented). 
+
+=head3 Server Initialisation
+
+The C<Initialise> handler is normally called via the
+C<App::InitServer> wrapper. This will ensure that all the necessary
+directories exist and have the correct permissions (not yet
+implemented). It can also, optionally, clear the directories of any
+old data remaining.
+
+=head3 Incoming Acceptance
+
+The C<Incoming> handler can be called either as a one-shot (e.g. from
+cron) using the C<App::Incoming> command-line application or run as a
+daemon using C<Daemon::Incoming>.
+
+This handler processes the build jobs after they have been submitted
+by the users. Each job is validated and if it is correct then it is
+transferred into a directory for accepted jobs and registered. It is
+at this stage that the requested platforms and architectures for a
+particular job are selected. When the build job is registered a
+separate I<task> is added for each required platform and architecture.
+
+=head3 Package Building
+
+The C<Buildd> handler can be called either as a one-shot (e.g. from
+cron) using the C<App::Buildd> command-line application or run as a
+daemon using C<Daemon::Buildd>. 
+
+This handler builds jobs for a particular platform and architecture
+(e.g. f13 or f13_64). Multiple build processes can be run on a single
+machine but they must be building for different targets
+(e.g. different architectures). The handler selects the first
+registered task which has not yet been started for that platform and
+attempts to build the source packages using the appropriate tools
+(e.g. mock or rpmbuild). The success or failure of the build is
+logged, full build logs are stored for later retrieval and, if
+required, feedback is given to the specified email addresses. If the
+build was successful then the build products are submitted in the
+standard way for the platform (e.g. using pkgsubmit for RPMs) into the
+bucket requested.
+
+=head2 The Registry
+
+The registry holds information about the available platforms, the
+build handlers for each platform, the accepted build jobs and the
+associated tasks. It is based around a postgresql database which is
+used to drive the various handler processes. This is mainly accessed
+through a set of class in the C<PkgForge::Registry> name space which
+uses the C<DBIx::Class> database API. 
+
+Note that not all information associated with a build job is stored in
+the database. A lot of it is in the meta-data file that comes with
+each submitted job as it's not needed for the database schema.
+
+There are 5 concepts/tables:
+
+=head3 state
+
+This table holds the list of possible states for a build task (needs
+build, building, fail, success, cancelled).
+
+=head3 platform
+
+This table holds the list of platforms available (e.g. sl5 i386, sl5
+x86_64, f13 i386, etc). Note that, to preserve referential integrity,
+a platform cannot be removed from this list once it has been added but
+it can be marked as inactive so that no new tasks will be generated.
+
+=head3 builder
+
+This table holds the list of builders available for each
+platform. This is used to provide an easy way to represent each
+available build process and to track where build tasks are currently
+being executed. Note that it is possible to have multiple builders for
+each platform, this is particularly useful when there lots of packages
+to be built separately (e.g. when doing a port to a new platform).
+
+=head3 job
+
+This table holds the list of registered jobs. Currently this just has
+the unique identifier issued to the user after job submission and the
+user name for the job submitter. This is all that is required to
+retrieve job status information via the command line or web
+interface. It is expected that other attributes from the job metadata
+may need to be mirrored here to keep the implementation of the web
+interface as simple as possible.
+
+=head3 task
+
+This is the table which drives the whole build process. Each job will
+have one or more associated tasks (one per target platform). When a
+job is first registered these tasks will be added for each platform
+with a state of C<needs build>. Once a task has been selected by a
+builder it will switch to C<building>, on completion of the task it
+will either be C<fail> or C<success>. If a task has not been started
+then the user may cancel the job, in which case the state will be
+C<cancelled>.
+
+Note that after all tasks are attempted (or cancelled) the status of
+the entire job will be based on the aggregate of these states. So the
+status of build job can be either I<successful>, I<failed>,
+I<partially failed> or I<cancelled>.
+

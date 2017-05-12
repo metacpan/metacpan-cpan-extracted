@@ -1,0 +1,33 @@
+---
+abstract: 'Create PAR distributions from CPAN'
+author:
+  - 'Steffen Mueller (smueller@cpan.org)'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PAR-Dist-FromCPAN
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Archive::Zip: 0
+  CPAN: 1.84
+  Cwd: 0
+  File::Copy: 0
+  File::Find: 0
+  File::Path: 0
+  File::Spec: 0
+  Module::CoreList: 0
+  PAR::Dist: 0.31
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.11

@@ -1,0 +1,21 @@
+0.04
+	o using $^X in t/run.t instead of "perl"
+
+0.03
+	o created extra perl module Pod::AxPoint, the
+	  script pod2axpoint now just calls it.
+
+	o fixed make test
+
+	o fixed Makefile.PL
+
+
+0.02
+	o renamed distribution to Pod::AxPoint so it
+	  can be better found in cpan.
+
+	o added test case for 'make test'.	
+
+
+0.01
+	o initial version

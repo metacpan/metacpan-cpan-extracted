@@ -1,0 +1,24 @@
+Revision history for PERLANCAR-List-Util-PP
+
+0.04    2015-12-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Remove usage of Carp and strict.
+
+
+0.03    2015-12-18 (PERLANCAR)
+
+	- Use code from old List::Util::PP.
+
+
+0.02    2015-12-18 (PERLANCAR)
+
+        - Rename module/dist from List-Util-PP to PERLANCAR-List-Util-PP before
+          List::Util::PP is already taken (my bad, didn't check beyond normal
+          CPAN search).
+
+
+0.01    2015-12-17 (PERLANCAR)
+
+        - First early release.

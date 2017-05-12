@@ -1,0 +1,57 @@
+{
+   "abstract" : "A Perlish Interface to the GSL 1D Root Finding Library",
+   "author" : [
+      "Joel Berger <joel.a.berger@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PerlGSL-RootFinding-SingleDim",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "PerlGSL::RootFinding::SingleDim" : {
+         "file" : "lib/PerlGSL/RootFinding/SingleDim.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/PerlGSL-RootFinding-SingleDim/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/PerlGSL-RootFinding-SingleDim"
+      }
+   },
+   "version" : "0.001"
+}

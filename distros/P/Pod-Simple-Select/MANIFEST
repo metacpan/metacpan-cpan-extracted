@@ -1,0 +1,11 @@
+MANIFEST
+README
+LICENSE
+INSTALL
+Todo
+Changes
+Makefile.PL
+lib/Pod/Simple/Select.pm
+t/001_load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

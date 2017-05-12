@@ -1,0 +1,222 @@
+NAME
+
+    POE::Component::SmokeBox - POE enabled CPAN smoke testing with added
+    value.
+
+VERSION
+
+    version 0.52
+
+SYNOPSIS
+
+      # A simple smoker that takes modules to smoke from @ARGV
+    
+      use strict;
+      use warnings;
+      use POE;
+      use POE::Component::SmokeBox;
+      use POE::Component::SmokeBox::Smoker;
+      use POE::Component::SmokeBox::Job;
+      use Getopt::Long;
+    
+      $|=1;
+    
+      my $perl;
+    
+      GetOptions( 'perl=s' => \$perl, );
+    
+      die "No 'perl' specified\n" unless $perl;
+    
+      die "No modules specified to smoke\n" unless scalar @ARGV;
+    
+      my $smokebox = POE::Component::SmokeBox->spawn();
+    
+      POE::Session->create(
+            package_states => [
+               'main' => [ qw(_start _stop _results) ],
+            ],
+            heap => { perl => $perl, pending => [ @ARGV ] },
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+    
+      sub _start {
+        my ($kernel,$heap) = @_[KERNEL,HEAP];
+    
+        my $smoker = POE::Component::SmokeBox::Smoker->new( perl => $perl, );
+    
+        $smokebox->add_smoker( $smoker );
+    
+        $smokebox->submit( event => '_results',
+                     job => POE::Component::SmokeBox::Job->new( command => 'smoke', module => $_ ) )
+                            for @{ $heap->{pending} };
+        undef;
+      }
+    
+      sub _stop {
+        $smokebox->shutdown();
+        undef;
+      }
+    
+      sub _results {
+        my $results = $_[ARG0];
+        print $_, "\n" for map { @{ $_->{log} } } $results->{result}->results();
+        undef;
+      }
+
+DESCRIPTION
+
+    POE::Component::SmokeBox is a flexible CPAN Smoke testing framework
+    which provides an extensible method for testing CPAN distributions
+    against various different smoker backends.
+
+    A smoker backend is defined using a POE::Component::SmokeBox::Smoker
+    object and is basically the path to a perl executable that is
+    configured for CPAN Testing and its associated environment settings.
+
+    The perl executable must be configured appropriately to support CPAN
+    testing with any of the currently supported backends,
+    CPANPLUS::YACSmoke, CPAN::YACSmoke or CPAN::Reporter. Additional
+    backends may be supported by inheriting and extending the backend base
+    class POE::Component::SmokeBox::Backend::Base.
+
+    By default, the component will test submitted jobs against each
+    configured smoker in turn. Setting multiplicity to true will enable
+    each job to be run against configured smokers in parallel.
+
+CONSTRUCTOR
+
+    spawn
+
+      Creates a new session and returns an object. Takes a number of
+      parameters:
+
+        'alias', set an alias that you can use to address the component later;
+        'options', a hashref of POE session options;
+        'multiplicity', set to a true value to enable multiplicity, default is false;
+        'smokers', an arrayref of POE::Component::SmokeBox::Smoker objects;
+        'delay', the time in seconds to wait between job runs, default is 0;
+
+METHODS
+
+    session_id
+
+      Returns the POE::Session ID of the smokebox component.
+
+    multiplicity
+
+      Returns true or false depending on whether multiplicity is enabled or
+      not.
+
+      NOTE: If you enable multiplicity, you cannot use "delay" as an
+      argument to SmokeBox::Job->new!
+
+    queues
+
+      Returns a list of POE::Component::SmokeBox::JobQueue objects that are
+      currently active in the smokebox.
+
+    add_smoker
+
+      Takes one mandatory argument, a POE::Component::SmokeBox::Smoker
+      object to add to the smokebox.
+
+    del_smoker
+
+      Takes one mandatory argument, a POE::Component::SmokeBox::Smoker
+      object to remove from the smokebox.
+
+    delay
+
+      Sets the delay in seconds between job runs. Useful to "throttle" your
+      smoker :) If called with no arguments, returns the current delay.
+      This option will work even if multiplicity is enabled.
+
+    submit
+
+      Submits a job to the smokebox. Takes a number of parameters.
+
+        'event', the event name where results should be sent, mandatory;
+        'job', a POE::Component::SmokeBox::Job object to submit, mandatory;
+        'session', optionally specify a different session to send the result event to;
+
+    shutdown
+
+      Terminates the smokebox component.
+
+INPUT EVENTS
+
+    add_smoker
+
+      Takes one mandatory argument, a POE::Component::SmokeBox::Smoker
+      object to add to the smokebox.
+
+    del_smoker
+
+      Takes one mandatory argument, a POE::Component::SmokeBox::Smoker
+      object to remove from the smokebox.
+
+    submit
+
+      Submits a job to the smokebox. Takes a number of parameters.
+
+        'event', the event name where results should be sent, mandatory;
+        'job', a POE::Component::SmokeBox::Job object to submit, mandatory;
+        'session', optionally specify a different session to send the result event to;
+
+    shutdown
+
+      Terminates the smokebox component.
+
+OUTPUT EVENTS
+
+    An event will be sent on process completion with a hashref as ARG0:
+
+      'job', the POE::Component::SmokeBox::Job object of the job;
+      'result', a POE::Component::SmokeBox::Result object containing the results;
+      'submitted', the epoch time in seconds when the job was submitted;
+      'event', the event that will be sent with the results;
+      'session', the session ID the above event will be sent to;
+
+    The results will be same as returned by
+    POE::Component::SmokeBox::Backend. They may be obtained by querying the
+    POE::Component::SmokeBox::Result object:
+
+      $_[ARG0]->{result}->results() # produces a list
+
+    Each result is a hashref:
+
+      'log', an arrayref of STDOUT and STDERR produced by the job;
+      'PID', the process ID of the POE::Wheel::Run;
+      'status', the $? of the process;
+      'start_time', the time in epoch seconds when the job started running;
+      'end_time', the time in epoch seconds when the job finished;
+      'idle_kill', only present if the job was killed because of excessive idle;
+      'excess_kill', only present if the job was killed due to excessive runtime;
+      'term_kill', only present if the job was killed due to a poco shutdown event;
+      'cb_kill', only present if the job was killed due to the callback returning false;
+
+SEE ALSO
+
+    POE::Component::SmokeBox::Smoker
+
+    POE::Component::SmokeBox::Job
+
+    POE::Component::SmokeBox::JobQueue
+
+    POE::Component::SmokeBox::Backend
+
+    POE::Component::SmokeBox::Result
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

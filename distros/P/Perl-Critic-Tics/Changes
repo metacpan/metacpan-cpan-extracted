@@ -1,0 +1,32 @@
+This is the revision history for Perl-Critic-Tics
+
+0.009     2014-07-28 15:20:01-04:00 America/New_York
+        - fix reported line number in ProhibitLongLines
+          (thanks Kent Frederic and Oliver Trosien)
+
+0.008     2013-12-28 22:30:24 America/New_York
+        - hopefully avoid undef warnings by hacking a hack on top of a hack
+          [rt.perl.org #74896]
+
+0.007     2013-07-07 08:50:52 America/New_York
+          repackage, update bugtracker
+
+0.006     2010-02-14
+          do not count lines in __DATA__ for long lines
+
+0.005     2008-04-09
+          correct packaging errors
+
+0.004     2007-08-21
+          ProhibitNestedSubs has become part of the core, removed from Tics
+
+0.003     2007-07-30
+          make ProhibitManyArrows configurable
+          make ProhibitLongLines configurable
+          better reporting of violations from ProhibitLongLines
+
+0.002     2007-07-30
+          fix bug in long line detection
+
+0.001     2007-07-30
+          initial release

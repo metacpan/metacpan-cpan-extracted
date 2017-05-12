@@ -1,0 +1,1 @@
+docs: Use the L<HTML::Entities> module to encode character entities.

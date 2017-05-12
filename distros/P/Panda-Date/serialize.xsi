@@ -1,0 +1,87 @@
+MODULE = Panda::Date                PACKAGE = Panda::Date
+PROTOTYPES: DISABLE
+
+Date* Date::HOOK_CLONE () {
+    HV* CLASS = SvSTASH(SvRV(ST(0)));
+    RETVAL = THIS->clone();
+}
+
+SV* Date::STORABLE_freeze (bool cloning) {
+    size_t len = date_freeze_len(THIS);
+    RETVAL = newSV(len);
+    SvPOK_on(RETVAL);
+    char* buf = SvPVX(RETVAL);
+    date_freeze(THIS, buf);
+    SvCUR_set(RETVAL, len);
+    PERL_UNUSED_VAR(cloning);
+}
+
+Date* STORABLE_attach (const char* CLASS, bool cloning, SV* serialized) {
+    STRLEN len;
+    const char* str = SvPV(serialized, len);
+    ptime_t epoch;
+    const Timezone* zone;
+    date_thaw(&epoch, &zone, str, len);
+    RETVAL = new Date(epoch, zone);
+    PERL_UNUSED_VAR(cloning);
+}
+
+ptime_t Date::TO_JSON () {
+    RETVAL = THIS->epoch();
+}
+
+MODULE = Panda::Date                PACKAGE = Panda::Date::Rel
+PROTOTYPES: DISABLE
+
+DateRel* DateRel::HOOK_CLONE () {
+    HV* CLASS = SvSTASH(SvRV(ST(0)));
+    RETVAL = THIS->clone();
+}
+
+const char* DateRel::STORABLE_freeze (bool cloning) {
+    RETVAL = THIS->to_string();
+    PERL_UNUSED_VAR(cloning);
+}
+
+DateRel* STORABLE_attach (const char* CLASS, bool cloning, SV* serialized) {
+    STRLEN len;
+    const char* str = SvPV(serialized, len);
+    RETVAL = new DateRel(str, len);
+    PERL_UNUSED_VAR(cloning);
+}
+
+MODULE = Panda::Date                PACKAGE = Panda::Date::Int
+PROTOTYPES: DISABLE
+
+DateInt* DateInt::HOOK_CLONE () {
+    HV* CLASS = SvSTASH(SvRV(ST(0)));
+    RETVAL = THIS->clone();
+}
+
+SV* DateInt::STORABLE_freeze (bool cloning) {
+    size_t from_len  = date_freeze_len(THIS->from());
+    size_t total_len = from_len + date_freeze_len(THIS->till()) + 1; // +1 for extra \0 between dates
+    RETVAL = newSV(total_len); 
+    SvPOK_on(RETVAL);
+    char* buf = SvPVX(RETVAL);
+    date_freeze(THIS->from(), buf);
+    date_freeze(THIS->till(), buf + from_len + 1);
+    SvCUR_set(RETVAL, total_len);
+    PERL_UNUSED_VAR(cloning);
+}
+
+DateInt* STORABLE_attach (const char* CLASS, bool cloning, SV* serialized) {
+    STRLEN len;
+    const char* str = SvPV(serialized, len);
+    const char* strend = str + len;
+    ptime_t epoch_from, epoch_till;
+    const Timezone* zone_from;
+    const Timezone* zone_till;
+    str = date_thaw(&epoch_from, &zone_from, str, len) + 1;
+    if ((str-1) == strend || str == strend) croak("Panda::Date: cannot 'thaw' - corrupted data");
+    date_thaw(&epoch_till, &zone_till, str, strend - str);
+    RETVAL = new DateInt();
+    RETVAL->from()->set(epoch_from, zone_from);
+    RETVAL->till()->set(epoch_till, zone_till);
+    PERL_UNUSED_VAR(cloning);
+}

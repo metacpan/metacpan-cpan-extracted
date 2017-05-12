@@ -1,0 +1,46 @@
+%lexer {
+      s/^\s+//;
+
+      s/^([0-9]+(?:\.[0-9]+)?)//   and return('NUM',$1);
+      s/^([A-Za-z][A-Za-z0-9_]*)// and return('VAR',$1);
+      s/^(.)//s                    and return($1,$1);
+    }
+
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+
+%defaultaction { return  "$left $right $op"; }
+
+%%
+line: $exp  { print "$exp\n" }
+;
+
+exp:        $NUM  { $NUM }            
+        |   $VAR  { $VAR }            
+        |   VAR.left '='.op exp.right         
+        |   exp.left '+'.op exp.right         
+        |   exp.left '-'.op exp.right        
+        |   exp.left '*'.op exp.right       
+        |   exp.left '/'.op exp.right      
+        |   '-' $exp                    %prec NEG 
+              { "$exp NEG" }
+        |   '(' $exp ')' { $exp }      
+;
+
+%%
+
+__PACKAGE__->main() unless caller();
+
+=head1 SYNOPSIS
+
+Compile it with:
+
+           eyapp -b Postfix.eyp
+
+Run it with:
+
+           ./Postfix.pm -c 'a =2*3+b'
+
+=cut

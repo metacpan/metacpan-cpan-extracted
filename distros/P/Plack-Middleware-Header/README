@@ -1,0 +1,28 @@
+NAME
+    Plack::Middleware::Header - modify HTTP response headers
+
+SYNOPSIS
+      use Plack::Builder;
+ 
+      my $app = sub {['200', [], ['hello']]};
+      builder {
+          enable 'Header',
+            set => ['X-Plack-One' => '1'],
+            append => ['X-Plack-Two' => '2'],
+            unset => ['X-Plack-Three'];
+          $app;
+      };
+
+DESCRIPTION
+    Plack::Middleware::Header
+
+AUTHOR
+    Masahiro Chiba
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Plack::Middleware Plack::Builder
+

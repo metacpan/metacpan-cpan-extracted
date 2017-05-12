@@ -1,0 +1,147 @@
+{
+   "abstract" : "Socket.IO PSGI application",
+   "author" : [
+      "Viacheslav Tykhanovskyi, C<vti@cpan.org>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.5",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PocketIO",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "Carp" : "0",
+            "JSON" : "2.53",
+            "Protocol::SocketIO" : "0.04",
+            "Protocol::WebSocket" : "0.009006",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "Test::TCP" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PocketIO" : {
+         "file" : "lib/PocketIO.pm",
+         "version" : "0.17"
+      },
+      "PocketIO::Broadcast" : {
+         "file" : "lib/PocketIO/Broadcast.pm"
+      },
+      "PocketIO::Connection" : {
+         "file" : "lib/PocketIO/Connection.pm"
+      },
+      "PocketIO::Exception" : {
+         "file" : "lib/PocketIO/Exception.pm"
+      },
+      "PocketIO::Handle" : {
+         "file" : "lib/PocketIO/Handle.pm"
+      },
+      "PocketIO::Message" : {
+         "file" : "lib/PocketIO/Message.pm"
+      },
+      "PocketIO::Pool" : {
+         "file" : "lib/PocketIO/Pool.pm"
+      },
+      "PocketIO::Pool::Redis" : {
+         "file" : "lib/PocketIO/Pool/Redis.pm"
+      },
+      "PocketIO::Resource" : {
+         "file" : "lib/PocketIO/Resource.pm"
+      },
+      "PocketIO::Room" : {
+         "file" : "lib/PocketIO/Room.pm"
+      },
+      "PocketIO::Socket" : {
+         "file" : "lib/PocketIO/Socket.pm"
+      },
+      "PocketIO::Sockets" : {
+         "file" : "lib/PocketIO/Sockets.pm"
+      },
+      "PocketIO::Test" : {
+         "file" : "lib/PocketIO/Test.pm"
+      },
+      "PocketIO::Transport::Base" : {
+         "file" : "lib/PocketIO/Transport/Base.pm"
+      },
+      "PocketIO::Transport::BasePolling" : {
+         "file" : "lib/PocketIO/Transport/BasePolling.pm"
+      },
+      "PocketIO::Transport::Htmlfile" : {
+         "file" : "lib/PocketIO/Transport/Htmlfile.pm"
+      },
+      "PocketIO::Transport::JSONPPolling" : {
+         "file" : "lib/PocketIO/Transport/JSONPPolling.pm"
+      },
+      "PocketIO::Transport::WebSocket" : {
+         "file" : "lib/PocketIO/Transport/WebSocket.pm"
+      },
+      "PocketIO::Transport::XHRMultipart" : {
+         "file" : "lib/PocketIO/Transport/XHRMultipart.pm"
+      },
+      "PocketIO::Transport::XHRPolling" : {
+         "file" : "lib/PocketIO/Transport/XHRPolling.pm"
+      },
+      "PocketIO::Util" : {
+         "file" : "lib/PocketIO/Util.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vti/pocketio/issues"
+      },
+      "homepage" : "https://github.com/vti/pocketio",
+      "repository" : {
+         "url" : "git://github.com/vti/pocketio.git",
+         "web" : "https://github.com/vti/pocketio"
+      }
+   },
+   "version" : "0.17",
+   "x_contributors" : [
+      "Jens Gassmann <jens.gassmann@atomix.de>",
+      "Audrey Tang <audrey.tang@socialtext.com>",
+      "Uwe Voelker <uwe.voelker@xing.com>",
+      "Oskari Okko Ojala <okko@frantic.com>",
+      "Jason May <jason.a.may@gmail.com>",
+      "Michael FiG <git@michael.fig.org>",
+      "Peter Stuifzand <peter@stuifzand.eu>",
+      "tokubass <tomi21110@gmail.com>",
+      "Mark Grimes <mgrimes@cpan.org>",
+      "vti <viacheslav.t@gmail.com>"
+   ]
+}

@@ -1,0 +1,41 @@
+<stuff xmlns:petal="http://purl.org/petal/1.0/">
+
+<div petal:define="foo
+string: apple">$foo</div>
+<div petal:define="bar string: orange">$bar</div>
+
+<div petal:content="string:
+plum">xxx</div>
+<div petal:content="string: pear">xxx</div>
+
+<div petal:define="
+         a string: ay;
+         b string: bee;
+         c string: cee;
+      "><span petal:replace="a" /> <span petal:replace="b" /> <span petal:replace="c" /></div>
+
+<div petal:define="
+         x
+         string: ex;
+         y string:
+         why;
+         z string: zed;
+      "><span petal:replace="x" /> <span petal:replace="y" /> <span petal:replace="z" /></div>
+
+<div petal:define="g string: foo &amp; bar"><span petal:replace="g" /></div>
+<div petal:define="
+g
+string:
+foo
+&amp;
+bar
+"><span
+petal:replace="
+g
+" /></div>
+
+<link rel="css.css" media="screen &" />
+<link rel="css.css" media="screen
+&" />
+
+</stuff>

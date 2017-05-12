@@ -1,0 +1,28 @@
+sql_queries = [
+	"select * from life"
+	
+	"select * from life
+	inner join death"
+	 
+	 "delete from life where id=$you"
+]
+
+mixed = [1,2,3, "this is smile: \u263A", null,
+true, -1E-1], # comma allowed here
+
+with_comments = [ # open bracket
+	false # are you?
+	"joke\n\u263A" # joke
+	999E-999]
+
+empty = [
+
+
+
+
+
+
+
+]
+
+one_elt = [null,]

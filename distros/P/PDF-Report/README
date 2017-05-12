@@ -1,0 +1,38 @@
+Dist version 1.33
+==================
+
+PDF::Report is written around Alfred Reibenschuh's PDF::API2.  It provides
+methods to create a PDF document with text, lines, color and graphics. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  PDF::API2 >= 0.40.00
+
+  NOTE:	As of PDF-Report 1.30, PDF-API2 versions less than 0.40.00 are 
+        unsupported. If you want to keep using an old PDF-API2, use 
+        PDF-Report 1.2x.  
+
+Optional (If you want to use roman numerals when numbering pages):
+
+  Text::Roman >= 3.02
+
+EXAMPLES 
+
+  See the examples/ directory in the distribution.
+
+COPYRIGHT AND LICENSE
+
+"Perl Artistic License" (included with package)
+
+Copyright (C) 2009 Andrew Orr

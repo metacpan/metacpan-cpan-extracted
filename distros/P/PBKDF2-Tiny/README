@@ -1,0 +1,121 @@
+NAME
+    PBKDF2::Tiny - Minimalist PBKDF2 (RFC 2898) with HMAC-SHA1 or HMAC-SHA2
+
+VERSION
+    version 0.005
+
+SYNOPSIS
+        use PBKDF2::Tiny qw/derive verify/;
+
+        my $dk = derive( 'SHA-1', $pass, $salt, $iters );
+
+        if ( verify( $dk, 'SHA-1', $pass, $salt, $iters ) ) {
+            # password is correct
+        }
+
+DESCRIPTION
+    This module provides an RFC 2898 <https://tools.ietf.org/html/rfc2898>
+    compliant PBKDF2 implementation using HMAC-SHA1 or HMAC-SHA2 in under
+    100 lines of code. If you are using Perl 5.10 or later, it uses only
+    core Perl modules. If you are on an earlier version of Perl, you need
+    Digest::SHA or Digest::SHA::PurePerl.
+
+    All documented functions are optionally exported. No functions are
+    exported by default.
+
+FUNCTIONS
+  derive
+        $dk = derive( $type, $password, $salt, $iterations, $dk_length )
+
+    The "derive" function outputs a binary string with the derived key. The
+    first argument indicates the digest function to use. It must be one of:
+    SHA-1, SHA-224, SHA-256, SHA-384, or SHA-512.
+
+    If a password or salt are not provided, they default to the empty
+    string, so don't do that! RFC 2898 recommends
+    <https://tools.ietf.org/html/rfc2898#section-4.1> a random salt of at
+    least 8 octets. If you need a cryptographically strong salt, consider
+    Crypt::URandom.
+
+    The password and salt should encoded as octet strings. If not (i.e. if
+    Perl's internal 'UTF8' flag is on), then an exception will be thrown.
+
+    The number of iterations defaults to 1000 if not provided. If the
+    derived key length is not provided, it defaults to the output size of
+    the digest function.
+
+  derive_hex
+    Works just like "derive" but outputs a hex string.
+
+  verify
+        $bool = verify( $dk, $type, $password, $salt, $iterations, $dk_length );
+
+    The "verify" function checks that a given derived key (in binary form)
+    matches the password and other parameters provided using a constant-time
+    comparison function.
+
+    The first parameter is the derived key to check. The remaining
+    parameters are the same as for "derive".
+
+  verify_hex
+    Works just like "verify" but the derived key must be a hex string
+    (without a leading "0x").
+
+  digest_fcn
+        ($fcn, $block_size, $digest_length) = digest_fcn('SHA-1');
+        $digest = $fcn->($data);
+
+    This function is used internally by PBKDF2::Tiny, but made available in
+    case it's useful to someone.
+
+    Given one of the valid digest types, it returns a function reference
+    that digests a string of data. It also returns block size and digest
+    length for that digest type.
+
+  hmac
+        $key = $digest_fcn->($key) if length($key) > $block_size;
+        $hmac = hmac( $data, $key, $digest_fcn, $block_size );
+
+    This function is used internally by PBKDF2::Tiny, but made available in
+    case it's useful to someone.
+
+    The first two arguments are the data and key inputs to the HMAC
+    function. Both should be encoded as octet strings, as underlying
+    HMAC/digest functions may croak or may give unexpected results if Perl's
+    internal UTF-8 flag is on.
+
+    Note: if the key is longer than the digest block size, it must be
+    preprocessed using the digesting function.
+
+    The third and fourth arguments must be a digesting code reference (from
+    "digest_fcn") and block size.
+
+SEE ALSO
+    *   Crypt::PBKDF2
+
+    *   Digest::PBDKF2
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/PBKDF2-Tiny/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/PBKDF2-Tiny>
+
+      git clone https://github.com/dagolden/PBKDF2-Tiny.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

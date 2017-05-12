@@ -1,0 +1,217 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Show Initiation</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Show Initiation</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<A HREF=index.html>show</A><BR>
+<B>new()</B>
+
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.  The presentation is written in Perl/Tk, which is Object
+Oriented.  PPresenter is also written object-oriented, although it is not
+following the route which Tk has taken.
+
+    </TD></TR>
+<TR><TD VALIGN=top>
+
+Options:
+<UL>
+<LI><A HREF=#general>General</A>
+<LI><A HREF=#creation>creation</A>
+<LI><A HREF=#running>running</A>
+<LI><A HREF=#images>images</A>
+</UL>
+
+    </TD><TD VALIGN=top>
+
+You create an object by calling the constructor function of the object.
+To create a presentation with PPresenter, you construct a PPresenter object.  All
+other objects are created by the program internally.
+<P>
+So: start your file with:
+<PRE>
+     use PPresenter;
+     my $show = PPresenter->new(<I>..options..</I>);
+</PRE>
+
+<H2><A NAME=general>General</A> options to new()</H2>
+
+You may expect some of the following options to the <CODE>new()</CODE> call
+to be options to <CODE>run()</CODE>, but they aren't: most facts concerning
+the display of the show have to be known in the preparation phase, already.
+So: <CODE>run()</CODE> has no options at all.
+<DL>
+<DT><B>-name =&gt;</B> <I>string</I>
+<DD>The name of the presentation is displayed in the bar of the window, if
+    that bar is shown.  If you get rit of the bar, you have to instruct
+    your window-manager to do so: this is different for each window-manager.
+</DL>
+
+<H2>Options about <A NAME=creation>creation</A> of the show</H2>
+
+<DL>
+<DT><B>-style =&gt;</B> <I>package</I>
+<DT><B>-styles =&gt; [</B> <I>package, ... </I> <B>]</B>
+<DD>Add the specified <A HREF=../style/index.html>style</A> to the list
+    of loaded styles.
+    By default, the list contains the styles
+    <A HREF=../style/default.html>PPresenter::Style::Default</A> and
+    <A HREF=../style/slidenotes.html>PPresenter::Style::SlideNotes</A>.
+    <P>
+    When you have added a style, you can
+    <A HREF=../function/select.html>select</A> it with:
+<PRE>
+   $show->select(style =&gt; <I>name</I>);
+</PRE>
+    A select for a style on the show will change the selection on all
+    viewports, too.  You can also change the style of one viewport:
+<PRE>
+   $show->find(viewport =&gt; <I>something</I>)
+        ->select(style =&gt; <I>name</I>);
+</PRE>
+   or on the moment you explicitly add a
+   <A HREF=../viewport/index.html>viewport</A>
+<PRE>
+   $show->addViewport(...)->select(style =&gt; <I>name</I>);
+</PRE>
+   <P>
+
+<DT><B>-geometry =&gt;</B> <I>geometry</I>
+<DD>Used for a poor mans show creation.  If you do not explicity add
+    any window (excluding control viewports which show slidenotes), then
+    PPresenter adds one for you.  The size and location are derived from this
+    flag.  Default is <CODE>undef</CODE> which results in a window
+    filling the whole screen.
+    <P>
+<DT><B>-controlDisplay =&gt;</B> <I>display</I>
+<DT><B>-controlGeometry =&gt;</B> <I>geometry</I>
+<DD>The simpelest way to get a <A HREF=../viewport/control.html>control
+    viewport</A> is using this display option. If you do
+    not add a control viewport, you will have a popup via the background-menu
+    which shows the data.
+    The default geometry is <CODE>640x480</CODE><BR>
+    A demonstration of this option:
+<PRE>
+   $show->new(-controlDisplay =&gt; \$ENV{DISPLAY});
+</PRE>
+
+<DT><B>-trace =&gt;</B> <I>file</I>
+<DD>The file where a verbatim trace on the internal activities of
+    PPresenter is written to.  Two nice values are <CODE>/dev/null</CODE> (the
+    default), which makes all trace disappear, and <CODE>/dev/tty</CODE>,
+    your screen.
+</DL>
+
+<H2>Options about <A NAME=running>running</A> the show</H2>
+(there are also a lot of run-related options
+which can be specified with the explicit creation of a
+<A HREF=../viewport/control.html>control viewport</A>)
+
+<DL>
+<DT><B>-tags =&gt;</B> <I>string</I>
+<DT><B>-tags =&gt; [</B> <I>string, ...</I> <B>]</B>
+<DD>A tag is a label (a string), which can be specified with each
+    <A HREF=../slide/index.html>slide</A>.  If you specify this option,
+    then only the slides this tag (or one of the list of specified tags)
+    will be selected to be show.<BR>
+    The default is <CODE>'ALL'</CODE>, which is a tag which is automatically
+    added to each slide created.
+    <P>
+<DT><B>-startSlide =&gt;</B> <I>slide</I>
+<DD>Which slide to start the show with.
+    By default this is <CODE>'FIRST'</CODE>, but it may also be a sequence
+    number, a slide's name (or alias), or <CODE>'LAST'</CODE>.
+    <P>
+<DT><B>-flushPhases =&gt;</B> <I>boolean</I>
+<DD>A slide may have more than one phase in appearance: after a press on the
+    space bar, the next phase of the same slide is shown.  If this option is
+    on (true, <CODE>1</CODE>), then all phases are shown at once.
+    <P>
+<DT><B>-clockTics =&gt;</B> <I>seconds</I>
+<DD>When the show is running, there are a lot of counters active concerned
+    with time.  The resolution of the times can be set shorter (fraction
+    of seconds) or longer (to relieve system load).  The default is 1.0
+    second.
+    <P>
+<DT><B>-totaltime =&gt;</B> <I>timespan</I>
+<DD>The time that the presentation shall take.  This may differ considerably
+    from the time your slides require (see the <CODE>-reqtime</CODE> option
+    for <A HREF=../slide/index.html>slide</A> for possible values
+    of <A HREF=../slide/index.html#timespan>timespan</A>).
+    <P>
+    Typical values are <CODE>'45m'</CODE> or <CODE>'1h30m'</CODE>.
+    If you do not specify this value, the required time is computed.
+    <P>
+<DT><B>-halted =&gt;</B> <I>boolean</I>
+<DD>By default, the presentation halts when started, but you can make it
+    run immediately with this flag.
+    <P>
+<DT><B>-enableCallbacks =&gt;</B> <I>boolean</I>
+<DD>By default, callbacks (see the -callbacks option of a
+    <A HREF=../slide/index.html>Slide</A>) are
+    made, but you can change the default with this flag.  You can also
+    turn this on/off via the background-menu `phases/start callbacks'.
+</DL>
+
+<H2>Options on how to handle <A NAME=images>images</A></H2>
+You can have as much control over the way images are treated as you
+like, but usually you leave it to PPresenter.  If you want to have full control,
+then see the <A HREF=../image/index.html>details on images</A>.  The
+following set defaults:
+<P>
+<DL>
+<DT><B>-imageSizeBase =&gt;</B> <I>geometry</I>
+<DD>PPresenter resizes fonts and images to fit to each screen, so you do not
+    have to rewrite you show if the presentation is on a different screen
+    size as where you developed it.<BR>
+    With this option, you can specify the size of the screen you used to
+    design your images.  PPresenter will resize your images to occupy the same
+    percentage of screen during the presentation.
+    <P>
+    You can overrule this option per image with the <CODE>-sizeBase</CODE>
+    option of the <A HREF=../image/index.html>image</A>.  Of course, resizing
+    will not take place when <CODE>-resizeImages</CODE> or
+    <CODE>-enlargeImages</CODE> do not permit resizing.
+    <P>
+<DT><B>-resizeImages =&gt;</B> <I>boolean</I>
+<DD>Resize images by default or don't.   By default resizing is done (true,
+    <CODE>1</CODE>) when enough information is available:
+    the sizeBase (screen size when image was drawn) must be known.<BR>
+    This option is overruled by the <CODE>-resize</CODE> option of an
+    of an <A HREF=../image/index.html>image</A>.
+    <P>
+<DT><B>-enlargeImages =&gt;</B> <I>boolean</I>
+<DD>Enlarging of images often gives a bad result.  By default, this is not
+    permitted.<BR>
+    This option is overruled by the <CODE>-enlarge</CODE> option
+    of an <A HREF=../image/index.html>image</A>.
+    <P>
+<DT><B>-scaledImagesDir =&gt;</B> <I>dirname</I>
+<DD>Scaling images takes time.  This directory is intended to be used to
+    store prepared images between presentations, but is not used yet.
+</DL>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

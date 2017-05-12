@@ -1,0 +1,98 @@
+Revision history for POE-Component-Schedule
+
+0.95    2010-05-25T22:36+02:00    DOLMEN (Olivier Mengué)
+        No changes since 0.94_03.
+        Only change since 0.94 is fix for RT#56447 (allow POE aliases as target
+          session ID for events).
+
+0.94_03 2010-05-25T00:14+02:00    DOLMEN (Olivier Mengué)
+        No functional change since 0.94_01.
+        Fixed constant functions: added "()" prototype to make them inlinable
+          by perl. Should have been like that since 0.91_01. That should
+          improve performance.
+        Added .perlcriticrc to disable Perl::Critic policies that do not match
+          our style (filled RT#57638, RT#57639, RT#57640, RT#57807 for issues
+          with default policies).
+        Made some suggestions from Perl::Critic. Reduced number of lines, so
+          improved test coverage ratio.
+        Test coverage: 94.5%.
+        Author build system: fixed the 'Build tag'.
+        Author build system: improved steps to publish 'Changes.rss' in the
+          Google Code wiki area.
+
+0.94_02 2010-05-18T01:02+02:00    DOLMEN (Olivier Mengué)
+        Author build system: Changes.{rss,yml} generation is now automated by
+          extending Module::Build (see 'inc/MY/Build.pm' and
+          'inc/MY/Build/Changes.pm').
+        Added 't/90-critic.t' to 'MANIFEST.SKIP' as it is the main cause of
+          CPAN Testers failures.
+        Author build system: Drop 'Makefile.PL' generation by Module::Build.
+        Author build system: Transformed 'make-svn-tag.pl' into a Build target
+          ('tag').
+
+0.94_01 2010-05-09T19:44+02:00    DOLMEN (Olivier Mengué)
+        RT#56447 fixed, but I expect to unapply the fix once RT#57314
+          (allow aliases in $poe_kernel->refcount_{in,de}crement) is
+          implemented. Test cases added.
+        Bug references are now linked in 'Changes.rss'.
+        Test coverage: 91.6%.
+
+0.94    2010-03-13T16:37+01:00    DOLMEN (Olivier Mengué)
+        Only minor POD changes in Schedule.pm since 0.93_02.
+        Increased dependencies versions.
+        Small tweak to the 'Changes' file format to make it more parseable
+          and be able to generate 'Changes.yml' and 'Changes.rss'.
+        Added 'Changes.rss' and 'Changes.yml', generated from 'Changes'
+          using either 'make-Changes-rss.pl' or 'make-Changes-rss-2.pl' (see
+          SVN repo).
+        Test coverage: 92.1%.
+
+0.93_02 2010-02-13T16:30+01:00    DOLMEN (Olivier Mengué)
+        More test coverage, but still only 92.1%. Help still welcome for
+          RT#53925.
+        Improved argument check for ->add() (and now, with tests too).
+        POE >= 1.281 is recommended as it fixes the _child(lose) issue.
+        Updated POD: removed obsolete warnings, updated copyright.
+        Updated README: should be more helpful for distribution packagers.
+
+0.93_01 2010-02-13T01:55+01:00    DOLMEN (Olivier Mengué)
+        Applied fix for RT#53925 (Patch by Zeph Gillen).
+        Added t/50-subclass.t to try to catch subclassing problems which may
+          affect POE::Component::Cron. Unfortunately it does not catch
+          RT#53925. Help needed.
+        Added strictures in tests.
+        Updated 'MANIFEST.SKIP' to match new Module::Build: ignore MYMETA.yml.
+
+0.92    2009-11-20T19:17+01:00    DOLMEN (Olivier Mengué)
+        Official Release. Have to review doc before 1.00.
+        Fixed my local YAML.pm to have correct encoding of 'META.yml'.
+
+0.91_01 2009-11-19T20:55+01:00    DOLMEN (Olivier Mengué)
+        Major internal rewrite. No external changes. I love TDD!
+        Now the scheduling session is detached from the session from
+          which the session was spawned. This should help to avoid session
+          attachment/references problems as the scheduler is not anymore
+          attached to a particular session. Note that due to a POE bug,
+          _child(lose) is still fired.
+        Fixed typos in example code. kthakore++
+        TODO: add a test that extracts test code from the
+              SYNOPSIS POD section and runs it. Maybe using
+              Test::Pod::Snippets.
+
+0.03    2009-06-16T19:10+02:00    DOLMEN (Olivier Mengué)
+        Major improvement of POD. Fixed sample code.
+        Improved test suite to check session reference counting.
+        Added DESTROY handler for schedule handles to automatically
+          delete handles which are not anymore referenced.
+        Deprecated ->delete().
+
+0.02    2009-06-15T23:09+02:00    DOLMEN (Olivier Mengué)
+        Changed the default session alias to $class.
+        Fixed warning in Schedule.pm about new() not being used.
+        Improved test suite to increase code coverage (added 11-two.t).
+        Improved documentation for spawn().
+        Thanks to Rob Fugina for discussion.
+
+0.01    2009-06-05T19:56+02:00    DOLMEN (Olivier Mengué)
+        First release to the world, with Chris Fedde's blessing.
+        This a fork of POE::Component::Cron 0.019. See RT#44442.

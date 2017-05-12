@@ -1,0 +1,65 @@
+NAME
+    Plack::Middleware::SSI - PSGI middleware for server side include content
+
+VERSION
+    0.12
+
+DESCRIPTION
+    Will try to handle HTML with server side include directives as well as
+    doing what Plack::Middleware does for "regular files".
+
+SUPPORTED SSI DIRECTIVES
+    See <http://httpd.apache.org/docs/2.0/mod/mod_include.html>,
+    <http://httpd.apache.org/docs/2.0/howto/ssi.html> or
+    <http://en.wikipedia.org/wiki/Server_Side_Includes> for more details.
+
+  set
+        <!--#set var="SOME_VAR" value="123" -->
+
+  echo
+        <!--#echo var="SOME_VAR" -->
+
+  config
+        <!--#config timefmt="..." -->
+        <!--#config errmsg="..." -->
+
+  exec
+        <!--#exec cmd="ls -l" -->
+
+  flastmod
+        <!--#flastmod virtual="index.html" -->
+
+  fsize
+        <!--#fsize file="script.pl" -->
+
+  include
+        <!--#include virtual="relative/to/root.txt" -->
+        <!--#include file="/path/to/file/on/disk.txt" -->
+
+SUPPORTED SSI VARIABLES
+  Standard variables
+    DATE_GMT, DATE_LOCAL, DOCUMENT_NAME, DOCUMENT_URI, LAST_MODIFIED and
+    QUERY_STRING_UNESCAPED.
+
+  Extended by this module
+    Any variable defined in Plack $env will be avaiable in the SSI document.
+    Even so, it is not recommended to use any of those, since it may not be
+    compatible with Apache and friends.
+
+SYNOPSIS
+        $app = builder { enable 'SSI'; $app };
+
+    See Plack::Middleware for more details.
+
+METHODS
+  call
+    Returns a callback which can expand chunks of HTML with SSI directives
+    to a complete HTML document.
+
+COPYRIGHT & LICENSE
+    This library is free software. You can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Jan Henning Thorsen "jhthorsen at cpan.org"
+

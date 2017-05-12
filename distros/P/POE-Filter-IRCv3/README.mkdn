@@ -1,0 +1,197 @@
+# NAME
+
+POE::Filter::IRCv3 - Fast IRCv3.2 parser for POE or stand-alone use
+
+# SYNOPSIS
+
+    my $filter = POE::Filter::IRCv3->new(colonify => 1);
+
+    # Raw lines parsed to hashes:
+    my $array_of_refs  = $filter->get( 
+      [ 
+        ':prefix COMMAND foo :bar',
+        '@foo=bar;baz :prefix COMMAND foo :bar',
+      ]
+    );
+
+    # Hashes deparsed to raw lines:
+    my $array_of_lines = $filter->put( 
+      [
+        {
+          prefix  => 'prefix',
+          command => 'COMMAND',
+          params  => [
+            'foo',
+            'bar'
+          ],
+        },
+        {
+          prefix  => 'prefix',
+          command => 'COMMAND',
+          params  => [
+            'foo',
+            'bar'
+          ],
+          tags => {
+            foo => 'bar',
+            baz => undef,
+          },
+        },
+      ] 
+    );
+
+
+    # Stacked with a line filter, suitable for Wheel usage, etc:
+    my $ircd = POE::Filter::IRCv3->new(colonify => 1);
+    my $line = POE::Filter::Line->new(
+      InputRegexp   => '\015?\012',
+      OutputLiteral => "\015\012",
+    );
+    my $stacked = POE::Filter::Stackable->new(
+      Filters => [ $line, $ircd ],
+    );
+
+    # Functional parser interface:
+    my $event = POE::Filter::IRCv3::parse_one_line(
+      ':foo PRIVMSG #bar :baz quux'
+    );
+
+# DESCRIPTION
+
+A [POE::Filter](https://metacpan.org/pod/POE::Filter) for IRC traffic with support for IRCv3.2 message tags.
+
+Does not rely on regular expressions for parsing.  Benchmarks show this
+approach is generally faster on the most common IRC strings.
+
+Like any proper [POE::Filter](https://metacpan.org/pod/POE::Filter), there are no POE-specific bits involved here
+\-- the filter can be used stand-alone to parse lines of IRC traffic (also see
+[IRC::Toolkit::Parser](https://metacpan.org/pod/IRC::Toolkit::Parser)). 
+
+In fact, you do not need [POE](https://metacpan.org/pod/POE) installed -- if [POE::Filter](https://metacpan.org/pod/POE::Filter) is not
+available, it is left out of `@ISA` and the filter will continue working
+normally.
+
+## POE / Object interface
+
+### new
+
+Construct a new Filter; if the **colonify** option is true, 
+the last parameter will always have a colon prepended.
+(This setting can also be retrieved or changed on-the-fly by calling 
+**colonify** as a method, or changed for specific events by passing a 
+**colonify** option via events passed to ["put"](#put).)
+
+### get\_one\_start, get\_one, get\_pending
+
+Implement the interface described in [POE::Filter](https://metacpan.org/pod/POE::Filter).
+
+See ["get"](#get).
+
+### get
+
+    my $events = $filter->get( [ $line, $another, ... ] );
+    for my $event (@$events) {
+      my $cmd = $event->{command};
+      ## See below for other keys available
+    }
+
+Takes an ARRAY of raw lines and returns an ARRAY of HASH-type references with 
+the following keys:
+
+#### command
+
+The (uppercased) command or numeric.
+
+#### params
+
+An ARRAY containing the event parameters.
+
+#### prefix
+
+The sender prefix, if any.
+
+#### tags
+
+A HASH of key => value pairs matching IRCv3.2 "message tags" -- see 
+[http://ircv3.atheme.org](http://ircv3.atheme.org).
+
+Note that a tag can be present, but have an undefined value.
+
+### put
+
+    my $lines = $filter->put( [ $hash, $another_hash, ... ] );
+    for my $line (@$lines) {
+      ## Direct to socket, etc
+    }
+
+Takes an ARRAY of HASH-type references matching those described in ["get"](#get) 
+(documented above) and returns an ARRAY of raw IRC-formatted lines.
+
+#### colonify
+
+In addition to the keys described in ["get"](#get), the **colonify** option can be 
+specified for specific events. This controls whether or not the last 
+parameter will be colon-prefixed even if it is a single word. (Yes, IRC is 
+woefully inconsistent ...)
+
+Specify as part of the event hash:
+
+    $filter->put([ { %event, colonify => 1 } ]);
+
+### clone
+
+Copy the filter object (with a cleared buffer).
+
+### debug
+
+Turn on/off debug output, which will display every input/output line (and
+possibly other data in the future).
+
+This is enabled by default at construction time if the environment variable
+`POE_FILTER_IRC_DEBUG` is a true value.
+
+## Functional interface
+
+### parse\_one\_line
+
+If the filter is being used as a stand-alone IRC parser and speed is of the
+essence, you can skip method resolution & queue handling by calling the parse
+function directly using the fully-qualified name:
+
+    my $ev = POE::Filter::IRCv3::parse_one_line( $line );
+
+The function takes a single line and returns a HASH whose structure is
+described in the documentation for ["get"](#get), above.
+
+If the given line cannot be parsed, the function returns false (rather than
+throwing an exception, as ["get"](#get) would).
+
+There is currently no functional interface to message string composition
+(["put"](#put)).
+
+# AUTHOR
+
+Jon Portnoy <avenj@cobaltirc.org>
+
+Licensed under the same terms as Perl.
+
+Original implementations were derived from [POE::Filter::IRCD](https://metacpan.org/pod/POE::Filter::IRCD), 
+which is copyright Chris Williams and Jonathan Steinert. This codebase has
+diverged significantly.
+
+Major thanks to the `#ircv3` crew on irc.atheme.org, especially `Aerdan` and
+`grawity`, for various bits of inspiration.
+
+# SEE ALSO
+
+[IRC::Message::Object](https://metacpan.org/pod/IRC::Message::Object)
+
+[POE::Filter](https://metacpan.org/pod/POE::Filter)
+
+[POE::Filter::IRCD](https://metacpan.org/pod/POE::Filter::IRCD)
+
+[POE::Filter::Line](https://metacpan.org/pod/POE::Filter::Line)
+
+[POE::Filter::Stackable](https://metacpan.org/pod/POE::Filter::Stackable)
+
+[IRC::Toolkit](https://metacpan.org/pod/IRC::Toolkit)

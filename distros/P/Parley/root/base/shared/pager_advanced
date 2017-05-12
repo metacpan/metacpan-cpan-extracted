@@ -1,0 +1,60 @@
+[% IF page %]
+<div class="pager_advanced">
+    [% curr_path = '/' _ c.req.path %]
+    [% IF current_thread %]
+    [% extra_url_args = { 'thread' => current_thread.id } %]
+    [% ELSIF current_forum %]
+    [% extra_url_args = { 'forum' => current_forum.id } %]
+    [% ELSE %]
+    [% extra_url_args = { } %]
+    [% END %]
+
+    [%l('Page [_1] of [_2]', [page.current_page, page.last_page])%]
+    [% IF page.last_page > 1 %]
+    [
+        [% UNLESS page.current_page == page.first_page %]
+        [% url_args = { 'page' => page.first_page } %]
+        [% url_args.import(extra_url_args) %]
+        <a href="[%c.uri_for(curr_path,url_args)%]">[%l('First')%]</a>
+        |
+        [% END %]
+
+        [% IF page.previous_page %]
+        [% url_args = { 'page' => page.previous_page } %]
+        [% url_args.import(extra_url_args) %]
+        <a href="[%c.uri_for(curr_path,url_args)%]">[%l('Previous')%]</a>
+        |
+        [% END %]
+
+        [%# pagination majick! %]
+        [% FOREACH jiffy = page_range_spread %]
+            [% IF jiffy %]
+                [% IF page.current_page == jiffy %]
+                <b>[% jiffy %]</b>
+                [% ELSE %]
+                [% url_args = { 'page' => jiffy } %]
+                [% url_args.import(extra_url_args) %]
+                <a href="[%c.uri_for(curr_path,url_args)%]">[%jiffy%]</a>
+                [% END %]
+            [% ELSE %]
+                ...
+            [% END %]
+        [% END %]
+
+        [% IF page.next_page %]
+        |
+        [% url_args = { 'page' => page.next_page } %]
+        [% url_args.import(extra_url_args) %]
+        <a href="[%c.uri_for(curr_path,url_args)%]">[%l('Next')%]</a>
+        [% END %]
+
+        [% UNLESS page.current_page == page.last_page %]
+        |
+        [% url_args = { 'page' => page.last_page } %]
+        [% url_args.import(extra_url_args) %]
+        <a href="[%c.uri_for(curr_path,url_args)%]">[%l('Last')%]</a>
+        [% END %]
+    ]
+    [% END %]
+</div>
+[% END %]

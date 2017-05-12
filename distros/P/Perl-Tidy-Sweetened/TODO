@@ -1,0 +1,6 @@
+TODO list for Perl::Tidy::Sweetend
+
+- Ensure sub name is unique (so we don't erroneously replace a sub).
+- Convert params/clauses to something that tidy can handle (ie, prototypes),
+  then convert back
+- Class definitions?

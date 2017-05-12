@@ -1,0 +1,63 @@
+{
+   "abstract" : "PerlIO layer for length restrictions",
+   "author" : [
+      "WATANABE Hiroaki <hwat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.5, Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PerlIO-via-Limit",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Data::Inheritable" : "0",
+            "Exception::Class" : "0",
+            "PerlIO::via" : "0",
+            "Test::More" : "0.32"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hiroaki/PerlIO-via-Limit/issues"
+      },
+      "homepage" : "https://github.com/hiroaki/PerlIO-via-Limit",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hiroaki/PerlIO-via-Limit.git",
+         "web" : "https://github.com/hiroaki/PerlIO-via-Limit"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "WATANABE Hiroaki <hwat@mac.com>"
+   ]
+}
+

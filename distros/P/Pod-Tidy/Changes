@@ -1,0 +1,98 @@
+Revision history for Perl module Pod::Tidy
+
+0.10 Tue Feb 17 09:36:43 HST 2009
+    - Add support to Pod::Tidy and the podtidy util for setting the width of
+      the output columns
+
+0.09 Sat Jan  7 01:02:51 HST 2006
+    - Pod::Tidy VERSION to '0.09'
+    - Pod::Tidy::Pretty VERSION to '0.03'
+
+0.09_01 Tue Oct 11 00:16:28 HST 2005
+    - Pod::Wrap::Prettys's NAME paragraph doesn't need to be verbatim block
+    - fix podtidy's Pod formatting
+    - change Pod::Wrap::Pretty to match $/ instead of \n
+    - Pod::Tidy VERSION to '0.09_01'
+
+0.08 Mon Oct 10 00:02:39 HST 2005
+    - fix a grammatical error in Pod::Tidy.pod, reported by Grant McLean
+      <grant@mclean.net.nz>
+    - fix some more grammatical errors in Pod::Tidy.pod, reported by Michael
+      Cartmell <Michael.Cartmell@thomson.com>
+    - fix Pod format in podtidy
+    - fix Pod::Tidy::build_pod_queue() tests on Win32, patch from Michael
+      Cartmell <Michael.Cartmell@thomson.com>
+    - swap podtidy's and Pod::Tidy's '=head1 NAME' descriptions
+    - add Larry Denneau to CREDITS for reporting test failures caused by
+      Module::Build stripping the execute bit from scripts/podtidy.  This bug
+      was fixed in the 0.04 release.
+    - change podtidy's CREDITS to refer to Pod::Tidy's CREDITS
+    - add GOTCHAS and Efficiency concerns to podtidy both referring to Pod::Tidy
+    - move $POD_WS_TAIL & $POD_WS_TRIMMED into Test::Pod::Tidy
+    - mangle newlines on all strings in Test::Pod::Tidy with Encode::Newlines
+      to fix tests on Win32, reported by Michael Cartmell
+      <Michael.Cartmell@thomson.com>
+    - add build_requires dep on Encode & Encode::Newlines '0.03'
+    - add a Subversion Working Copies section to podtidy's DEVELOPER NOTES
+    - fix CPANPLUS playing badly with Module::Build's build_requires, reported
+      by <Michael.Cartmell@thomson.com>
+    - Pod::Tidy's VERSION to '0.08'
+
+0.07 Wed Oct  5 23:33:09 HST 2005
+    - fix speling, markup, & grammar in Pod::Tidy.pod
+    - document that whitespace trailing paragraphs is now stripped in
+      Pod::Wrap::Pretty.pod 
+    - podtidy documentation grammar fix
+    - Pod::Wrap::Pretty.pod grammar fix
+    - change Module::Build license spec to 'perl'
+    - change Pod::Tidy.pod BUGS -> GOTCHAS and add a Mangled verbatim blocks
+      section
+    - add DEVELOPER NOTES section to podtidy's documentation
+    - update podtidy's and Pod::Tidy.pod's SEE ALSO documentation
+    - Pod::Tidy VERSION to '0.07'
+
+0.06 Wed Oct  5 00:17:57 HST 2005
+    - fix Pod::Wrap::Pretty's handling of trailing whitespace handling so
+      sending the output of podtidy back through podtidy doesn't cause a
+      non-deterministic result.
+    - Pod::Wrap::Pretty VERSION to '0.02'
+    - change Pod::Tidy::build_pod_queue() to 'canonicalize' all input file paths
+    - add Pod::Tidy::base()
+    - change Pod::Tidy::build_pod_queue()'s ignore pattern matching to try to
+      match on the absolute, relative, and 'base' file/dir paths
+    - document Pod::Tidy::tidy_files(ignore => ...)
+    - Pod::Tidy VERSION to '0.06'
+    - add Text::Glob req.
+    - switch podtidy from --Ignore regex patterns -> Text::Glob::glob_to_regex()
+    - update podtidy Ignore option documentation
+    - podtidy VERSION to '0.04'
+
+0.05 Tue Oct  4 15:22:36 HST 2005
+    - remove build_req on Test::Pod
+    - add recommends Test::Distribution
+    - Pod::Tidy VERSION to '0.05'
+
+0.04 Tue Oct  4 15:11:04 HST 2005
+    - add Makefile.PL
+    - work around Module::Build stripping the execute bit from scripts/podtidy
+      when making a tarball in t/09_podtidy.t
+    - Pod::Tidy VERSION to '0.04'
+
+0.03 Tue Oct  4 14:44:18 HST 2005
+    - document podtidy's --Ignore option
+    - Pod::Tidy & podtidy VERSION to '0.03'
+
+0.02 Tue Oct  4 14:20:40 HST 2005
+    - add META.yml
+    - add ignore param to Pod::Tidy::build_pod_queue()
+    - add Ignore|I option to podtidy
+    - Todo update
+    - minor Pod::Tidy doc update
+    - Pod::Tidy & podtidy VERSION to 0.02
+    - fix Pod::Tidy's recursive handling of directories that do not contain any
+      Pod files
+
+0.01 Sat Sep 17 02:10:08 2005
+    - original version; created by ExtUtils::ModuleMaker 0.39
+
+

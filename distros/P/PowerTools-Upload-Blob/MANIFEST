@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/PowerTools-Upload-Blob.t
+lib/PowerTools/Upload/Blob.pm
+META.yml                                 Module meta-data (added by MakeMaker)

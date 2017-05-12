@@ -1,0 +1,62 @@
+## name Basic passing
+## failures 0
+## cut
+
+use Moose;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+__PACKAGE__->meta->make_immutable;
+
+
+## name Basic failure for Moose
+## failures 1
+## cut
+
+use Moose;
+
+sub new {}
+
+
+## name Basic passing for Moose::Role.
+## failures 0
+## cut
+
+use Moose::Role;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+sub bar {}
+
+## name Basic failure for Moose::Role.
+## failures 1
+## cut
+
+use Moose::Role;
+
+sub new {}
+
+## name Multi-package passing.
+## failures 0
+## cut
+
+use Moose;
+
+package Foo;
+
+sub new {}
+
+## name Failure for custom module.
+## failures 1
+## parms { equivalent_modules => 'Foo' }
+## cut
+
+use Foo;
+
+sub new {}

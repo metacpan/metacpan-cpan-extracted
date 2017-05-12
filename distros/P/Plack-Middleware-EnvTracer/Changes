@@ -1,0 +1,8 @@
+Revision history for Perl extension Plack::Middleware::EnvTracer
+
+0.02    Sun Sep  4 13:40:17 JST 2016
+        - fix test for Perl5.25
+        - sort .travis.yml
+
+0.01    Sun Nov 17 18:50:50 JST 2013
+        - original version

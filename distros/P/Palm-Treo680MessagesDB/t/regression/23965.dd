@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1187973805,
+          'number' => '+440200814254',
+          'time' => '17:43',
+          'date' => '2007-08-24',
+          'name' => 'John XXXX (M)',
+          'phone' => '+440200814254',
+          'device' => 'Treo 680',
+          'direction' => 'outbound',
+          'timestamp' => 1187973805,
+          'text' => 'Download something crap but which you think will be popular, then leave it to seed for a couple if weeks. Make sure that you keep seeding after downloading.',
+          'type' => '0x0000',
+          'category' => 0,
+          'id' => 7107028,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 23965
+        };

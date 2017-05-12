@@ -1,0 +1,62 @@
+{
+   "abstract" : "download and parse the latest USDA National Nutrient Database",
+   "author" : [
+      "Ioan Rogers <ioan.rogers@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300007, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parse-USDA-NNDB",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "File::Fetch" : "0",
+            "File::HomeDir" : "0",
+            "File::Spec" : "0",
+            "Log::Any" : "0",
+            "Text::CSV_XS" : "0",
+            "URI" : "0",
+            "perl" : "v5.10.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ioanrogers/Parse-USDA-NNDB/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ioanrogers/Parse-USDA-NNDB.git",
+         "web" : "https://github.com/ioanrogers/Parse-USDA-NNDB"
+      }
+   },
+   "version" : "0.1"
+}
+

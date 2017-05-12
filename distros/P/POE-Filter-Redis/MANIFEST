@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/POE/Filter/Redis.pm
+t/00-compile.t
+t/01-filter.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

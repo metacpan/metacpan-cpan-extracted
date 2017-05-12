@@ -1,0 +1,4 @@
+= This {sub {}} should render as {code}
+#--------------------------------------------------------------------------#
+=head1 This C<<< sub {} >>> should render as C<<< code >>>
+

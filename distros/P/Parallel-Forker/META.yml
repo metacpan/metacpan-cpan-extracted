@@ -1,0 +1,25 @@
+---
+abstract: 'Parallel job forking and management, with expression based control'
+author:
+  - 'Wilson Snyder <wsnyder@wsnyder.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parallel-Forker
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Proc::ProcessTable: '0.4'
+  Scalar::Util: '0'
+  Test::More: '0'
+  Time::HiRes: '0'
+version: '1.234'

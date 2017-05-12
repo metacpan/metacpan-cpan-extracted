@@ -1,0 +1,88 @@
+# vim: set ft=conf :
+#
+# This is a sample configuration file for pscdcover(1). Copy it to
+# ~/.pscdcoverrc and edit it to meet your requirements.
+#
+# Configuration lines consist of a key and a value, separated by an equal sign
+# (=). Whitespace at the beginning or end of the line, or on either side of the
+# equal sign, is ignored. The key names should correspond to a valid
+# command-line option to pscdcover(1).
+#
+# Comments start with a hash sign (#) or a colon (;). The colon-comments are
+# used to indicate a default value, whereas hash-comments denote embedded
+# documentation.
+
+# ps
+# Specifies the path to the PostScript template.
+; ps = /usr/local/share/pscdcover/pscdcover.ps
+
+# title
+# Provides a title for the CD. The title will be printed on top of the first
+# page, and on the sides of the back label. If this option is omitted, it
+# defaults to the value of the root parameter, or its default value.
+
+# root
+# Specifies the mount point of the CD-ROM.
+; root = /media/cdrom
+
+# files
+# When set, the regular files are also printed, not just the directories.
+; files = 0
+
+# mp3
+# When set, MP3 files will be checked for an ID3 tag. The title of the song
+# together with its length will be printed out instead of the filename. This
+# implies files=1. You must have the MP3::Info Perl module installed to use
+# this option.
+; mp3 = 0
+
+# depth
+# When omitted or set to 0, the program traverses the CD-ROM as deep as
+# possible.  This option allows for limiting the depth of the search. A value
+# of 1 will only ouput the top-level directories, i.e., those just below the
+# directory specified by the root parameter.
+; depth = 0
+depth = 2
+
+# box
+# When set, the edges of the labels are drawn in dim gray.
+; box = 1
+
+# separator
+# When set, prints a line as column separator.
+; separator = 0
+
+# all
+# Forces the printing of all the pages (front and back), even if the whole
+# directory tree could be printed on only the first page.
+; all = 0
+
+# columns
+# Specifies the number of columns to print on each page. When set to 0, the
+# column widths will be calculated dynamically, so that the longest filename in
+# each column fits.
+; columns = 2
+
+# minwidth
+# Specifies the minimum allowed width for a column (in millimeters). If the
+# room left on the right side of the page is lower than this limit, the next
+# column will be printed on the next page, otherwise its content will be
+# clipped to the current page. This option is only relevant with columns = 0.
+; minwidth = 25
+
+# color
+# Generate color output: the CD and folder icons will be drawn in colors, light
+# blue and light yellow respectively. These default colors can be overridden
+# with the cd-color and folder-color parameters.
+; color = 0
+
+# cd-color and folder-color
+# Override the default color for the CD and folder icons respectively. The
+# value should be an hexadecimal triplet representing the shares of red, green
+# and blue in the desired color, like those commonly found in HTML or CSS. The
+# value may optionally be prefixed with 0x, the traditional C prefix for
+# hexadecimal.  Three-digits triplets will be doubled (e.g., 0xC30 is the same
+# as CC3300).  Specifying at least one of these options implies color = 1.
+; cd-color     = 0xccd8e5
+; folder-color = 0xffff80
+

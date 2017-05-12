@@ -1,0 +1,110 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 47e64144e8a9985d0818efeea3a2af43b50111ea Changes
+SHA1 fd016c8ac18602343524079890050115f2f7b305 INSTALL
+SHA1 6b50b30fa6f8d063d96e32c9a81f3f82328925f7 LICENSE
+SHA1 033ffc4ea923cd4014ebc1faa7aa717d9874b368 MANIFEST
+SHA1 3d5a105297d42c93422df8e867d8bb21ebc7f56a META.json
+SHA1 473b13e14c7177b0a75a5e53fe2d20dca23d802f META.yml
+SHA1 6fd56331d8ccf7966b1a39da2cae57aef0d16e89 Makefile.PL
+SHA1 3cfbf8fd0d26601a3b3ed0226c6a9da123e8a871 README
+SHA1 e0eab5f5d1357accc7a7c0634d6d54102fdcaf15 cpanfile
+SHA1 a34b944d65ca1dbda29f81270a2c6ee4bb71c4aa dist.ini
+SHA1 2afd5e4e19567f640b42e6137a3b5d42d5ca6c23 lib/Protocol/XMPP.pm
+SHA1 64c246315bacaefc2138119ad6db35715f2c1672 lib/Protocol/XMPP/Base.pm
+SHA1 0b274d23d0468f27f6ae1539162c4e3ade7470db lib/Protocol/XMPP/Base.pod
+SHA1 6ebebbc7279cae81bb0adc9de06d6fcdef1960fa lib/Protocol/XMPP/Contact.pm
+SHA1 ea13ac1a254d759497801e891b1ae75b55aae845 lib/Protocol/XMPP/Contact.pod
+SHA1 c062259a290b465fbe04595c629ed14775e46717 lib/Protocol/XMPP/Element/Active.pm
+SHA1 1c25b09f48a5ec8c673f59e0f7b660b91316546b lib/Protocol/XMPP/Element/Active.pod
+SHA1 015a4e16866e0d218e2cf6b40d9a07feed4181f8 lib/Protocol/XMPP/Element/Auth.pm
+SHA1 c4e56356188beeb9f083f5e0eb1f289f0f0bc941 lib/Protocol/XMPP/Element/Auth.pod
+SHA1 0ad4143e59809eba5dc1eb5a45670b8ce4c4df6b lib/Protocol/XMPP/Element/Bind.pm
+SHA1 57cffdbb343646deb9f77574b3a43b8b51b97f86 lib/Protocol/XMPP/Element/Bind.pod
+SHA1 b527a4c6f5c883a7fa02cb79ea3b6084bcdbb74d lib/Protocol/XMPP/Element/Body.pm
+SHA1 c7859343190650662d1ec22a18de5d99366fe21f lib/Protocol/XMPP/Element/Body.pod
+SHA1 1c61587bad5e10fc448d37e1348c4075c80992a5 lib/Protocol/XMPP/Element/Challenge.pm
+SHA1 0341b1bf321a13a3a8c7c2fa36bf089f6488a714 lib/Protocol/XMPP/Element/Challenge.pod
+SHA1 dd0eae834b79992b2552d87cbeb21a2b969183f0 lib/Protocol/XMPP/Element/Feature.pm
+SHA1 ae3e07c33b0517dde3fe7255323b138a2f5a8c20 lib/Protocol/XMPP/Element/Feature.pod
+SHA1 fede85a728fb111f68f5285e47318fba9463b3dd lib/Protocol/XMPP/Element/Features.pm
+SHA1 8fe3ed89ed705445cf909d45a8e5460f413b6894 lib/Protocol/XMPP/Element/Features.pod
+SHA1 b528448fbca0bc4467c5b7fed148d567db3014d4 lib/Protocol/XMPP/Element/HTML.pm
+SHA1 7fc044e8c61b23be5a6df3be95cf6393caa92296 lib/Protocol/XMPP/Element/HTML.pod
+SHA1 e61bd877e18641dd483e502da030475da810e2b0 lib/Protocol/XMPP/Element/IQ.pm
+SHA1 fa43e6249721ee4f7991788d6f3183cc706260a4 lib/Protocol/XMPP/Element/IQ.pod
+SHA1 d474833b0f65a096f23ec8b834a9fd8d3be687c1 lib/Protocol/XMPP/Element/JID.pm
+SHA1 e4beb94dcd73804227984400b7b721334b3242e8 lib/Protocol/XMPP/Element/JID.pod
+SHA1 d16028a3ec84f6e51de768ab28cd192ad7744d23 lib/Protocol/XMPP/Element/Mechanism.pm
+SHA1 9aa8cbd848b4327114e8450765016a949b71288b lib/Protocol/XMPP/Element/Mechanism.pod
+SHA1 0376530714789ceae4942683b6be4d2bb517343d lib/Protocol/XMPP/Element/Mechanisms.pm
+SHA1 068db257f52899eb02fdc4fbadb107c34c87dfe6 lib/Protocol/XMPP/Element/Mechanisms.pod
+SHA1 8cd70b09c6abd198c9ec4b2b9852f285a2bd8a82 lib/Protocol/XMPP/Element/Message.pm
+SHA1 a20fb56e61aba479aac2814c09d2171c7ef4545b lib/Protocol/XMPP/Element/Message.pod
+SHA1 b6a51fcbb1e8efd7a44bd0d10ccd2a81f78cde6b lib/Protocol/XMPP/Element/Nick.pm
+SHA1 cfe922f997f2a6fee37de833e751409b6062dc2d lib/Protocol/XMPP/Element/Nick.pod
+SHA1 ed34fa8c9401733f4d41286251a76dd971debe5a lib/Protocol/XMPP/Element/Presence.pm
+SHA1 10d91fba242e5d2807fa9a68501ce63ebae9de9f lib/Protocol/XMPP/Element/Presence.pod
+SHA1 869147b810130ee69fd98048284871f1da0adf98 lib/Protocol/XMPP/Element/Proceed.pm
+SHA1 3a7bca489a68d5d9da8e0262e333d4d1ae3bb8af lib/Protocol/XMPP/Element/Proceed.pod
+SHA1 1fbc8ce6a08c34e1483679c7b834e78fec9bb22e lib/Protocol/XMPP/Element/Register.pm
+SHA1 b51e28c4d4100df38475e4b81036073d08c1ce40 lib/Protocol/XMPP/Element/Register.pod
+SHA1 2cab43480fb777bfa3f8db468c9551f802b01730 lib/Protocol/XMPP/Element/Response.pm
+SHA1 bbab74c56baabee71fdce79ac893ba6099fdb519 lib/Protocol/XMPP/Element/Response.pod
+SHA1 dd9e36681573078457ad6f9cd5270771cac28ce1 lib/Protocol/XMPP/Element/Session.pm
+SHA1 1c43cca06ba741a1476f242c673432d0511141ff lib/Protocol/XMPP/Element/Session.pod
+SHA1 e59fa15a75ca7a1b819b4cd7dc15a683a3f01243 lib/Protocol/XMPP/Element/StartTLS.pm
+SHA1 e7030332ce4198fff857cabaa85965196018d200 lib/Protocol/XMPP/Element/StartTLS.pod
+SHA1 cb584663b210059220d19ac740ebb76096337b3e lib/Protocol/XMPP/Element/Stream.pm
+SHA1 6175005780188fd1a274aebff134b280359a648c lib/Protocol/XMPP/Element/Stream.pod
+SHA1 6f32261711e034c8a294283dbf47d224676bde56 lib/Protocol/XMPP/Element/Subject.pm
+SHA1 8a96dc67520b40e210fe1455aebe78c68008f45d lib/Protocol/XMPP/Element/Subject.pod
+SHA1 9cac13cb59e31a3fa88431b34489d47a31d9471c lib/Protocol/XMPP/Element/Success.pm
+SHA1 ed545f92171fa45ac433173e44cae43ab49138ef lib/Protocol/XMPP/Element/Success.pod
+SHA1 2cca6f41f0ef112eaecbaa557ebbe48c93d96073 lib/Protocol/XMPP/ElementBase.pm
+SHA1 59d5d9a0f110ad649d8aed63432d3e97b2de74c1 lib/Protocol/XMPP/ElementBase.pod
+SHA1 ced07965e547515d3dec09504f0bfe0d822c783a lib/Protocol/XMPP/Handler.pm
+SHA1 82b4a84ebc2ad4040e1a800d0e4b6512c7937343 lib/Protocol/XMPP/Handler.pod
+SHA1 9ba3126950901db56b46adf24fe8d04ae4243e47 lib/Protocol/XMPP/IQ/Roster.pm
+SHA1 9444324ebc8663b6edff43ca47c22e4b9ccb4fef lib/Protocol/XMPP/IQ/Roster.pod
+SHA1 b2953a56db5f198a6250adde6cec63b0f23b960b lib/Protocol/XMPP/Message.pm
+SHA1 0f1708c2bf0c7a8962da16bf436b9cd914987ffb lib/Protocol/XMPP/Message.pod
+SHA1 3211ea12a0d893267fad94aee2bae9f2f961efde lib/Protocol/XMPP/Roster.pm
+SHA1 6762e5312f4ee4414b6a2f7f9c6ff475bf241b28 lib/Protocol/XMPP/Stream.pm
+SHA1 9e4c94e976363307bc644c12e8604c37ea0bb3b0 lib/Protocol/XMPP/Stream.pod
+SHA1 05634182bffad2f53414b2d0738682bad6d10890 lib/Protocol/XMPP/TextElement.pm
+SHA1 d3f2e13f0b9283d0cfbf0e090b575615b7fd13af lib/Protocol/XMPP/TextElement.pod
+SHA1 fe471f930c2a26d43c3d3abd5602d522e2555551 lib/Protocol/XMPP/User.pm
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 919d99f898155fff287568757e71df974c53d6c2 t/00-compile.t
+SHA1 ac9b6d41e27f55bd5c6581a0e28a70112d047fc3 t/000-report-versions-tiny.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJT39APAAoJEFKElMNpjtyDWFEH/RYwsxj0MXGo4GwQQiW74cl2
+mLss61OnLExi+hiqABRO6rKmH11Pjz53DObAcZv6DqDLpQ9gyhIteL+TWeJMH/kP
+GJwOBR7lw7DmrmUY0Bt2ghnKZoxu6k8eyLlV58TCHpav6qCkofhrvdjqYnUo3IY8
+J8YgRvIQWPB5OrNHvVBq322g5ieUZKp9wJzz549BVJbmn9kRFi1T3Sby4rUKsWd2
+c8kdAXtxWUeB/RevxzziErXQvf0bheZIPOe6GVWsgzZIfvyJwU7+qOuURXA16BuF
+ir0m2A2KS9iArViSRQsmysDmsy64ET2tARlwAeLqjoW1Ic0BO+i40Q+tsRJwCKo=
+=AItF
+-----END PGP SIGNATURE-----

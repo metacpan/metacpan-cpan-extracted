@@ -1,0 +1,64 @@
+PDF-API2-Tweaks
+
+PDF::API2::Tweaks provides a number of extensions to PDF::API2.
+
+Most of the extensions deal with producing PDF overlays, to fill in
+forms. For example,
+
+    # Open an existing PDF file
+    my $pdf = PDF::API2->open($form);
+
+    # Retrieve an existing page
+    my $page = $pdf->openpage(1);
+
+    # Add a built-in font to the PDF
+    my $font = $pdf->corefont('Helvetica');
+
+    # Add some text to the page
+    my $text = $page->text();
+    $text->font($font, 10);
+    $text->fillcolor('#000000');
+    $text->strokecolor('#000000');
+
+    # This is all basic PDF::API2. The following Tweaks extension will
+    # produce a series of lines, the first one starting at position
+    # 100,714 and subsequent lines spaced 16 apart:
+    $text->textlist( 100, 714, 16, <<'EOD' );
+    Now is the time
+    for all good man
+    to start using Perl
+    EOD
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc PDF::API2::Tweaks
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=PDF-API2-Tweaks
+
+    Search CPAN
+        http://search.cpan.org/dist/PDF-API2-Tweaks
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 Johan Vromans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

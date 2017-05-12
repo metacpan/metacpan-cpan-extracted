@@ -1,0 +1,72 @@
+{
+   "abstract" : "Perl library for rapid publishing of messages on PubNub.com",
+   "author" : [
+      "Binary.com <fayland@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PubNub-PubSub",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.8",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojolicious" : "5.40"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/binary-com/perl-pubnub-pubsub/issues"
+      },
+      "homepage" : "https://github.com/binary-com/perl-pubnub-pubsub",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/binary-com/perl-pubnub-pubsub.git",
+         "web" : "https://github.com/binary-com/perl-pubnub-pubsub"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "Fayland Lam <fayland@gmail.com>",
+      "Jean-Yves Sireau <jy@binary.com>",
+      "Pavel Shaydo <pavel@regentmarkets.com>"
+   ]
+}

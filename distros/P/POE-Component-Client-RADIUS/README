@@ -1,0 +1,250 @@
+NAME
+    POE::Component::Client::RADIUS - a flexible POE-based RADIUS client
+
+VERSION
+    version 1.04
+
+SYNOPSIS
+       use strict;
+       use Net::Radius::Dictionary;
+       use POE qw(Component::Client::RADIUS);
+
+       my $username = 'bingos';
+       my $password = 'moocow';
+       my $secret = 'bogoff';
+
+       my $server = '192.168.1.1';
+
+       my $dictionary = '/etc/radius/dictionary';
+
+       my $dict = Net::Radius::Dictionary->new( $dictionary );
+
+       die "No dictionary found\n" unless $dict;
+
+       my $radius = POE::Component::Client::RADIUS->spawn( dict => $dict );
+
+       POE::Session->create(
+         package_states => [
+           'main' => [qw(_start _auth)],
+         ],
+       );
+
+       $poe_kernel->run();
+       exit 0;
+
+       sub _start {
+         $poe_kernel->post(
+          $radius->session_id(),
+          'authenticate',
+          event => '_auth',
+          username => $username,
+          password => $password,
+          server => $server,
+                secret => $secret,
+         );
+         return;
+       }
+
+       sub _auth {
+         my ($kernel,$sender,$data) = @_[KERNEL,SENDER,ARG0];
+
+         # Something went wrong
+         if ( $data->{error} ) {
+           warn $data->{error}, "\n";
+           $kernel->post( $sender, 'shutdown' );
+           return;
+         }
+
+         # There was a timeout getting a response back from the RADIUS server
+         if ( $data->{timeout} ) {
+           warn $data->{timeout}, "\n";
+           $kernel->post( $sender, 'shutdown' );
+           return;
+         }
+
+         # Okay we got a response
+         if ( $data->{response}->{Code} eq 'Access-Accept' ) {
+           print "Yay, we were authenticated\n";
+         }
+         elsif ( $data->{response}->{Code} eq 'Access-Reject' ) {
+           print "Boo, the server didn't like us\n";
+         }
+         else {
+           print $data->{response}->{Code}, "\n";
+         }
+
+         print join ' ', $_, $data->{response}->{$_}, "\n" for keys %{ $data->{response} };
+
+         return;
+       }
+
+DESCRIPTION
+    POE::Component::Client::RADIUS is a POE Component that provides Remote
+    Authentication Dial In User Service (RADIUS) client services to other
+    POE sessions and components.
+
+    RADIUS is commonly used by ISPs and corporations managing access to
+    Internet or internal networks and is an AAA (authentication,
+    authorisation, and accounting) protocol.
+
+    The component deals with the transmission and receiving of RADIUS
+    packets and uses the excellent Net::Radius::Packet and
+    Net::Radius::Dictionary modules to construct the RADIUS packets.
+
+    Currently only PAP authentication is supported. Help and advice would be
+    appreciated on implementing others. See contact details below.
+
+CONSTRUCTORS
+    One may start POE::Component::Client::RADIUS in two ways. If you spawn
+    it creates a session that can then broker lots of RADIUS requests on
+    your behalf. Or you may use 'authenticate' and 'accounting' to broker
+    'one-shot' instances.
+
+      POE::Component::Client::RADIUS->spawn( ... );
+
+      POE::Component::Client::RADIUS->authenticate( ... );
+
+      POE::Component::Client::RADIUS->accounting( ... );
+
+    "spawn"
+        Creates a new POE::Component::Client::RADIUS session that may be
+        used lots of times. Takes the following parameters:
+
+          'dict', a Net::Radius::Dictionary object reference, mandatory;
+          'alias', set an alias that you can use to address the component later;
+          'options', a hashref of POE session options;
+
+        Returns an POE::Component::Client::RADIUS object.
+
+    "authenticate"
+        Creates a one-shot POE::Component::Client::RADIUS session that will
+        send an authentication request, receive the response and then
+        terminates. Takes the following mandatory parameters:
+
+          'dict', a Net::Radius::Dictionary object reference;
+          'server', IP address of the RADIUS server to communicate with;
+          'username', the username to authenticate;
+          'password', the user's password;
+          'attributes', a hashref of RADIUS attributes to construct the packet from;
+          'secret', a shared secret between this RADIUS client and the RADIUS server;
+          'event', the event in the calling session that will be triggered with the response;
+
+        'attributes' must be provided, but may be an empty hashref. The
+        component will make up any necessary attributes to send. Check with
+        the RADIUS RFC <http://www.faqs.org/rfcs/rfc2138.html> for details.
+
+        One can also pass arbitary data which will be passed back in the
+        response event. It is advised that one uses an underscore prefix to
+        avoid clashes with future versions.
+
+    "accounting"
+        Creates a one-shot POE::Component::Client::RADIUS session that will
+        send an accounting request, receive the response and then
+        terminates. Takes the following mandatory parameters:
+
+          'dict', a Net::Radius::Dictionary object reference;
+          'server', IP address of the RADIUS server to communicate with;
+          'type', the type of accounting request;
+          'attributes', a hashref of RADIUS attributes to construct the packet from;
+          'secret', a shared secret between this RADIUS client and the RADIUS server;
+          'event', the event in the calling session that will be triggered with the response;
+
+        Check with the RADIUS Accounting RFC
+        <http://www.faqs.org/rfcs/rfc2866.html> for what one may specify as
+        'type' and 'attributes'.
+
+        One can also pass arbitary data which will be passed back in the
+        response event. It is advised that one uses an underscore prefix to
+        avoid clashes with future versions.
+
+METHODS
+    "session_id"
+        Takes no arguments. Returns the POE Session ID of the component.
+
+    "shutdown"
+        Terminates the component.
+
+INPUT EVENTS
+    When "spawn"ed, the component will accept the following events:
+
+    "authenticate"
+        Send an authentication request, receive the response and trigger a
+        result event back to the sending session. Takes the following
+        mandatory parameters:
+
+          'server', IP address of the RADIUS server to communicate with;
+          'username', the username to authenticate;
+          'password', the user's password;
+          'attributes', a hashref of RADIUS attributes to construct the packet from;
+          'secret', a shared secret between this RADIUS client and the RADIUS server;
+          'event', the event in the calling session that will be triggered with the response;
+
+        'attributes' must be provided, but may be an empty hashref. The
+        component will make up any necessary attributes to send. Check with
+        the RADIUS RFC <http://www.faqs.org/rfcs/rfc2138.html> for details.
+
+        One can also pass arbitary data which will be passed back in the
+        response event. It is advised that one uses an underscore prefix to
+        avoid clashes with future versions.
+
+    "accounting"
+        Send an accounting request, receive the response and trigger a
+        result event back to the sending session. Takes the following
+        mandatory parameters:
+
+          'server', IP address of the RADIUS server to communicate with;
+          'type', the type of accounting request;
+          'attributes', a hashref of RADIUS attributes to construct the packet from;
+          'secret', a shared secret between this RADIUS client and the RADIUS server;
+          'event', the event in the calling session that will be triggered with the response;
+
+        Check with the RADIUS Accounting RFC
+        <http://www.faqs.org/rfcs/rfc2866.html> for what one may specify as
+        'type' and 'attributes'.
+
+        One can also pass arbitary data which will be passed back in the
+        response event. It is advised that one uses an underscore prefix to
+        avoid clashes with future versions.
+
+    "shutdown"
+        Terminates the component.
+
+OUTPUT EVENTS
+    The component returns the specified event to all requests to the calling
+    session.
+
+    ARG0 will be a hashref, which contains the original parameters (
+    including any arbitary data ), plus either one of the following two
+    keys:
+
+      'response', will contain a hashref of RADIUS attributes returned by the RADIUS server;
+      'timeout', indicates that the component timed out waiting for a response from the RADIUS server;
+      'error', in lieu of a valid response, this will be defined with a brief description of what went wrong;
+
+    The component will only report an error if there is an error with
+    communicating with the RADIUS server in some way. Please check the
+    contents of the 'response' hashref for the status of authenication
+    requests etc.
+
+BUGS
+    There are bound to be bugs in this. Please report any you find via
+    "bug-POE-Component-Client-RADIUS@rt.cpan.org".
+
+SEE ALSO
+    POE
+
+    <http://en.wikipedia.org/wiki/RADIUS>
+
+    <http://www.faqs.org/rfcs/rfc2138.html>
+
+    <http://www.faqs.org/rfcs/rfc2866.html>
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

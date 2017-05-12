@@ -1,0 +1,42 @@
+To install, execute the sequence
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Win32 users should use the 'make' program on their system.
+
+If you do not have permission to install modules in the
+Perl site tree on your system, you can install this in
+your own library by
+
+   perl Makefile.PL PREFIX=/home/me/perl \
+     INSTALLMAN1DIR=/home/me/man/man1 \
+     INSTALLMAN3DIR=/home/me/man/man3
+   make
+   make test
+   make install
+
+To use modules in this location, either set the PERL5LIB
+environment variable to include your private module
+directory, or else put
+
+   use lib '/home/me/perl/path/to/lib';
+
+at the top of your script.
+
+A Win32 ppm package, suitable for use with ActivePerl
+compatible Perl packages is available at
+    http://theoryx5.uwinnipeg.ca/ppmpackages/
+for ActivePerl 6xx and at
+      http://theoryx5.uwinnipeg.ca/ppms/
+for ActivePerl 8xx. To install, within the ppm shell set the 
+repository to
+      http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer
+for ActivePerl 6xx and to
+      http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer58
+for ActivePerl 8xx, and then
+      ppm> install PPM-Make
+
+Randy Kobes <randy@theoryx5.uwinnipeg.ca>

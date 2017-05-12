@@ -1,0 +1,85 @@
+1.13	2016-05-16
+
+	Bug Fixes
+	* Unescaped left brace in regex is deprecated
+
+	Other
+	* Add Travis-CI
+
+1.12	2015-07-21
+
+	Other
+	* Spelling in POD
+	* Fix Makefile and MANIFEST
+
+1.11	2015-06-11
+
+	Other
+	* Convert to GIT
+
+1.10	2013-08-03
+	New Features
+	* Parse::FSM::Error module to format error and warning messages.
+
+1.09	2013-07-27
+	New Features
+	* Accumulate lines that end with backslash with following lines, so 
+	  that the complete set of continuation lines can be fed to the lexer.
+	  Important to be able to detect cpp-like macro calls that spread across
+	  lines.
+	* Append a \n at the end of the last input line of a file, if it was missing. 
+
+1.08	2013-07-25
+	Bug Fixes
+	* Wrong handling of backslash in strings.
+
+	New Features
+	* Allow special token handlers to be changed by a subclass
+
+1.07	2013-05-28
+	Bug Fixes
+	* Fix: Use of each() on hash after insertion without resetting hash 
+	  iterator results in undefined behavior, Perl interpreter: 
+	  0x8c8010 at blib/lib/Parse/FSM.pm line 401.
+
+1.06	2013-01-06
+	Other
+	* Lexical $_ is deprecated in Perl 5.17, remove usage from code
+
+1.05	2013-01-04
+	Other
+	* Lexical $_ is deprecated in Perl 5.17, remove usage from code
+
+1.04	2013-01-01
+	Other
+	* Lexical $_ is deprecated in Perl 5.17, remove usage from code
+
+1.03	2012-12-30
+	Other
+	* Lexical $_ is deprecated in Perl 5.17, remove usage from code
+
+1.02	2011-04-21
+	Bug Fixes
+	* Tests failed on case-sensitive file systems (data and Data 
+	  directories are the same in Windows, but not in Unix)
+
+1.01	2011-04-17
+	Bug Fixes
+	* FSM-error.t failed on case-sensitive file systems (data and Data 
+	  directories are the same in Windows, but not in Unix)
+
+1.00	2011-04-16
+	Spin-off of the deterministic top-down parser based on a pre-computed
+	finite state machine that was developped for the CPU::Z80::Assembler
+	module. 
+
+	New Features
+	* parse a yacc-like BNF grammar and generate the parser module.
+	  Note: the Parse::FSM::Parser module used to parse the BNF grammar 
+	  is generated using the primitive add_rule from Parse::FSM.
+	* Lexer module based on Perl 5.10 regular expressions, to be subclassed.
+	  The Parse::FSM::Lexer provides the primitives to allow recursive 
+	  file includes and keeping track of current file and line number. A
+	  subclass can override the tokenizer() method that matches the next 
+	  token from a string.
+

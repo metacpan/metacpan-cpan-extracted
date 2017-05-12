@@ -1,0 +1,28 @@
+= Escaping <, >, | and /
+
+Each of <, >, | and / should be escaped
+
+* Like this <, >, | and /
+
+0 Or this <, >, | and /
+#--------------------------------------------------------------------------#
+=head1 Escaping E<lt>, E<gt>, E<verbar> and E<sol>
+
+Each of E<lt>, E<gt>, E<verbar> and E<sol> should be escaped
+
+=over
+
+=item *
+
+Like this E<lt>, E<gt>, E<verbar> and E<sol>
+
+=back
+
+=over
+
+=item 1.
+
+Or this E<lt>, E<gt>, E<verbar> and E<sol>
+
+=back
+

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+Flac.pm
+README
+.cvsignore
+t/1.t
+t/test.wav
+META.yml                                 Module meta-data (added by MakeMaker)

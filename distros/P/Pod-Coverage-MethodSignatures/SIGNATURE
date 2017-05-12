@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1b0fee0cddfefec7ecdf7daafe2be6f9b4a8cf69 Build.PL
+SHA1 888a4b0f13cf21d7aab04675b0054b2822a13429 Changes
+SHA1 92dcb77a0ebff676b9ccb0fe5159d6251b651ca0 LICENSE
+SHA1 9fdbe2961ff9e89e85582d6358db3a192f1c33df MANIFEST
+SHA1 c5adfd15ac29f79bf4c86f864bdb7dbea76bfc2f META.yml
+SHA1 29f012106fc5db1ddca21504a884f4f74eef19a3 README
+SHA1 f42bab496e2011ba692a147db904bfd68e8e18f2 lib/Pod/Coverage/MethodSignatures.pm
+SHA1 30735dd6aa0c9ff828413bde2f4cccaf233dcdc0 t/FooTestFullPod.pm
+SHA1 1dfb86981b1cd262eee29888fa260e4eedc851cc t/FooTestHalfPod.pm
+SHA1 69287a6734388e56aaadc40effd336717b17df46 t/FooTestNoPod.pm
+SHA1 9f61837bd47d5b63791dee7f772c065145c71aa0 t/fullpod.t
+SHA1 3cbe3994b89f02fe9252b5416c55c2575a2902c5 t/halfpod.t
+SHA1 ae7d97aeaa97e9f56e9b407ec432125b9f44fd68 t/nopod.t
+SHA1 e9c6a5881fc60173fbc8d479c1afd2ce3b43bef1 t/pod.t
+SHA1 2da771800a293ae8c9d94237a97a01526081a0c5 t/traceall.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkyP0c4ACgkQjJ7fFJrTQRcVAACgjsNGiAIw43ZNCz2wSWshKqCl
+7nEAoIZGB98W+UA8nSB5BPPBAxTTuoeA
+=Cpyq
+-----END PGP SIGNATURE-----

@@ -1,0 +1,6 @@
+name = "Plack-Middleware-PostErrorToSlack"
+# badges = ["travis"]
+authority="cpan:HITODE"
+
+module_maker="ModuleBuildTiny"
+

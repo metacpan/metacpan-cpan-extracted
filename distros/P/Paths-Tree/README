@@ -1,0 +1,194 @@
+WHAT IS Paths/Tree?
+
+This is Tree.pm, an easy to found the tree paths.
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
+
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module not requires these other modules and libraries exept the some perl. 
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+WHERE ARE THE EXAMPLES?
+
+A collection of examples demonstrating various utils features and
+techniques are in the directory "examples".  
+
+WHERE CAN I LEARN MORE?
+
+Books of Graph or Tree on techniques of structure programming or procedure 
+use debug the some Module.
+
+NAME
+
+=head1 SYNOPSIS
+
+	#!/usr/bin/perl
+
+	my %tree = (	2 => [3,"HELLO"],
+
+			HELLO => ["YOU",WORLD],
+
+			"RAIZ" => [1,2],
+
+	);
+
+	sub show {
+
+		my ($child , $level) = @_;
+
+		print "    " for 0 .. $level; #fifth spaces of level or anything separator;
+
+		print "$child \n";
+
+	}
+
+	use Paths::Tree;
+
+	my $n = Paths::Tree->new(-tree=>\%tree,-sub=>\&show);
+
+	$n->tree("RAIZ");
+
+
+=head1 RECOMMENDED
+
+Understanding the Tree's filosofy and how to trace it. 
+
+Reach for tree's books.
+
+=head1 ABSTRACT
+
+This example show how to generate itself.
+
+=head2 Example tree
+
+	(RAIZ) ----> (1)
+
+	       ----> (2) ---->(HELLO)---->(YOU) 
+
+				     ---->(WORLD)
+
+=head1 DESCRIPTION
+
+This package provides an object class which can be used to get tree paths , with only pure perl code and I don't use other packet or module cpan.
+
+This class generate the paths of a tree from a base node and return in a method , vals in the execution time (tree).
+
+Technically , the tree is composed of childs ans fhathers linked between them.
+
+=head1 PARAMETERS
+
+=head2 $obj->{tree}
+
+Tree hash , the component so strings caracter or numbers. example.
+
+Hash is pass how reference hash.
+
+	my %tree = (	2 => [3,"HELLO"],
+
+			HELLO => ["YOU",WORLD],
+
+			"RAIZ" => [1,2],
+
+	);
+
+	$obj->{tree} = \%tree;
+
+=head2 $obj->{origin}
+
+Origin node what will begin to recursive process tree. 
+
+	$obj->{origin} = "A";
+
+=head2 $obj->{sub}
+
+Receive parameters from object in execution time.
+
+	sub params_receive {
+
+		my ($level , $node) = @_; 
+
+		print " $level , $node \n";
+
+	}
+
+	$obj->{sub} = \&params_receive();
+
+=head2 $obj->tree()
+
+This method is the core of object and unique export for use.
+
+Return in execution time two values level and node.
+
+The method is executed and follow is return parameters while recurcive process live.
+
+	sub show {
+
+		my ($child , $level) = @_;
+
+		print "     " for 0 .. $level; #fifth spaces of level or anything separator;
+
+		print "$child \n";
+
+	}
+
+	use Paths::Tree;
+
+	my $obj = Paths::Tree->new(-tree=>\%tree,-sub=>\&show,-origin=>"RAIZ");
+
+	$obj->tree();
+
+
+=head1 GLOBAL PROCESSING
+
+Using the recursive technique in the object methods.
+
+=head1 EXPORT
+
+This method is exported as follow: tree()
+
+=head1 SEE ALSO
+
+None by default. But can be exported if it's required.
+
+Please report bugs using: <cristian@codigolibre.cl>.
+
+Powerfull features in the future on object method how for example: find_tree() binary_tree().
+
+AUTHOR
+      Cristian Vasquez Diaz
+      CPAN ID: CAVASQUEZ
+      cristian@codigolibre.cl
+      http://www.codigolibre.cl
+
+COPYRIGHT AND LICENSE
+
+Copyright 2004 by Cristian Vasquez Diaz
+
+This library is free software you can redistribute it and/or modify it under the same terms as Perl itself.
+
+
+

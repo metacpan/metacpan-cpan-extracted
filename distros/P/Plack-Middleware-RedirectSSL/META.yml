@@ -1,0 +1,35 @@
+---
+abstract: 'force all requests to use in-/secure connections'
+author:
+  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  HTTP::Request::Common: 0
+  Plack::Builder: 0
+  Plack::Test: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-RedirectSSL
+requires:
+  Plack: 0.9942
+  Plack::Middleware: 0
+  Plack::Request: 0
+  Plack::Util: 0
+  Plack::Util::Accessor: 0
+  parent: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://github.com/ap/Plack-Middleware-RedirectSSL/issues
+  homepage: http://github.com/ap/Plack-Middleware-RedirectSSL
+  repository: git://github.com/ap/Plack-Middleware-RedirectSSL
+version: 1.104

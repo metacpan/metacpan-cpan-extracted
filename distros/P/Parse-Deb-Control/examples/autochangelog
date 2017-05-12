@@ -1,0 +1,3 @@
+sleep 1
+perl -i -lan -e '$line++; s/^/opl-/ if $line == 1;s/Rebuild for Etch backports./repackaged with prefix opl-/; print $_' $2
+

@@ -1,0 +1,187 @@
+=encoding utf8
+
+=head1 NAME
+
+perlpragma - Crear un pragma de usuario
+
+=head1 DESCRIPCIÓN
+
+Un pragma (como C<strict> o C<warnings>) es un módulo que influye en algún
+aspecto del tiempo de compilación o de ejecución en Perl. Antes de Perl 5.10
+solo podíamos usar los pragmas predefinidos; ahora podemos crear pragmas de
+usuario personalizados para modificar el comportamiento de funciones de usuario
+en un ámbito léxico.
+
+=head1 Ejemplo básico
+
+Supongamos que vamos a crear una clase que implementa operadores matemáticos
+sobrecargados y queremos proporcionar nuestro propio pragma, que funcione de
+manera parecida a C<use integer;>. Lo llamaremos C<entero>. Queremos que el
+código siguiente:
+
+    use MisOperadores;
+
+    my $l = MisOperadores->new(1.2);
+    my $r = MisOperadores->new(3.4);
+
+    print "A: ", $l + $r, "\n";
+
+    use entero;
+    print "B: ", $l + $r, "\n";
+
+    {
+        no entero;
+        print "C: ", $l + $r, "\n";
+    }
+
+    print "D: ", $l + $r, "\n";
+
+    no entero;
+    print "E: ", $l + $r, "\n";
+
+devuelva el siguiente resultado:
+
+    A: 4.6
+    B: 4
+    C: 4.6
+    D: 4
+    E: 4.6
+
+Es decir, cuando C<use entero;> esté activo debe modificarse el comportamiento
+predeterminado de las operaciones de suma forzando la conversión del resultado
+a un valor entero. Para restablecer el comportamiento predeterminado se usa
+C<no entero;>
+
+Una implementación mínima del paquete C<MisOperadores> podría ser:
+
+    package MisOperadores;
+    use warnings;
+    use strict;
+    use entero();
+    use overload '+' => sub {
+        my ($l, $r) = @_;
+	# Primer barrido para comprobar un nivel de llamada superior desde aquí
+        if (entero::in_effect(1)) {
+            int($$l) + int($$r);
+        } else {
+            $$l + $$r;
+        }
+    };
+
+    sub new {
+        my ($clase, $valor) = @_;
+        bless \$valor, $clase;
+    }
+
+    1;
+
+Cargamos el pragma de usuario C<entero> con una lista vacía C<()> para impedir
+que se llame a su método C<import>.
+
+La interacción con la compilación de Perl tiene lugar dentro del paquete
+C<entero>:
+
+    package entero;
+
+    use strict;
+    use warnings;
+
+    sub import {
+        $^H{"entero/in_effect"} = 1;
+    }
+
+    sub unimport {
+        $^H{"entero/in_effect"} = 0;
+    }
+
+    sub in_effect {
+        my $nivel = shift // 0;
+        my $hash_pistas = (caller($nivel))[10];
+        return $hash_pistas->{"entero/in_effect"};
+    }
+
+    1;
+
+Los pragmas se implementan como cualquier módulo, por lo que C<use entero;> se
+convierte en:
+
+    BEGIN {
+        require entero;
+        entero->import();
+    }
+
+y C<no entero;> se convierte en:
+
+    BEGIN {
+        require entero;
+        entero->unimport();
+    }
+
+Así, las rutinas C<import> y C<unimport> se llaman en B<tiempo de
+compilación> para el código del usuario.
+
+Los pragmas de usuario almacenan su estado en el hash mágico C<%^H>, por lo
+que se pueden usar estas dos rutinas para manipularlo. La información de
+estado de C<%^H> se almacena en el árbol sintáctico de operaciones y se puede
+recuperar como información de solo lectura en tiempo de ejecución mediante
+C<caller()>, en el índice 10 de la lista de resultados devueltos. En el pragma
+de ejemplo, la recuperación se encapsula en la rutina C<in_effect()>, que usa
+como parámetro el número de marcos de llamadas que hay que subir para
+encontrar el valor del pragma en el script del usuario. La rutina usa
+C<caller()> para determinar el valor que tenía C<$^H{"entero/in_effect"}>
+cuando se llamó a cada línea del script del usuario y, por tanto,
+proporcionar la semántica correcta en la subrutina que implementa la suma
+sobrecargada.
+
+=head1 Nomenclatura de claves
+
+Solo hay un único hash C<%^H>, pero puede haber muchos módulos que deseen
+usar su semántica de definición de ámbito. Para evitar conflictos, deben
+asegurarse de usar claves distintas en el hash. Por ello, se sigue la
+convención de que en un módulo deben usarse únicamente claves que empiecen
+por el nombre del módulo (el nombre del paquete principal) seguido de un
+carácter "/". A continuación de este prefijo de identificación de módulo,
+el resto de la clave queda a discreción del programador del módulo y puede
+incluir cualquier carácter. Por ejemplo, un módulo llamado C<Foo::Bar> debe
+usar claves como C<Foo::Bar/baz> o C<Foo::Bar/$%/_!>. Los módulos que sigan
+esta convención no provocarán conflictos.
+
+En el núcleo de Perl se usan unas cuantas claves de C<%^H> que no siguen esta
+convención, ya que se definieron antes de que esta se estableciera. Las claves
+que sigan la convención no provocarán conflictos con las claves antiguas del
+núcleo.
+
+=head1 Detalles de la implementación
+
+El árbol sintáctico de operaciones se comparte entre hilos de ejecución.
+Esto significa que existe la posibilidad de que el árbol sintáctico de
+operaciones sobreviva al hilo de ejecución (y, por tanto, a la instancia del
+intérprete) que lo creó, por lo que no se pueden almacenar escalares
+auténticos de Perl en dicho árbol. En su lugar se usa una forma compacta que
+solo puede almacenar valores enteros (con signo o sin signo), cadenas o
+C<undef>; las referencias y los valores de punto flotante se convierten en
+cadenas. Si necesita almacenar varios valores o estructuras complejas, debe
+serializarlas (por ejemplo, con C<pack>). La eliminación de una clave de hash
+de C<%^H> se registra y se puede distinguir de la existencia de una clave con
+valor C<undef> mediante C<exists>, de la manera habitual.
+
+B<No> intente almacenar referencias a estructuras de datos como enteros que se
+recuperan a través de C<caller> y se vuelven a convertir, ya que esto no
+garantiza una ejecución segura. Los accesos se harían en la estructura sin
+bloquear (lo cual no es seguro para los escalares de Perl), por lo que la
+estructura acaba por perderse o hay que liberarla cuando finalice el hilo de
+ejecución que la creó; si le sobreviven otros hilos de ejecución, esto puede
+ocurrir antes de que se elimine la referencia al árbol sintáctico de
+operaciones.
+
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

@@ -1,0 +1,9 @@
+Changes
+lib/Plack/Middleware/DiePretty.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01-basic.t
+t/html/error.html
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

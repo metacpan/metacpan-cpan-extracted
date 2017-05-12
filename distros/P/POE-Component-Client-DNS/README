@@ -1,0 +1,242 @@
+NAME
+
+    POE::Component::Client::DNS - non-blocking, parallel DNS client
+
+SYNOPSIS
+
+      use POE qw(Component::Client::DNS);
+    
+      my $named = POE::Component::Client::DNS->spawn(
+        Alias => "named"
+      );
+    
+      POE::Session->create(
+        inline_states  => {
+          _start   => \&start_tests,
+          response => \&got_response,
+        }
+      );
+    
+      POE::Kernel->run();
+      exit;
+    
+      sub start_tests {
+        my $response = $named->resolve(
+          event   => "response",
+          host    => "localhost",
+          context => { },
+        );
+        if ($response) {
+          $_[KERNEL]->yield(response => $response);
+        }
+      }
+    
+      sub got_response {
+        my $response = $_[ARG0];
+        my @answers = $response->{response}->answer();
+    
+        foreach my $answer (@answers) {
+          print(
+            "$response->{host} = ",
+            $answer->type(), " ",
+            $answer->rdatastr(), "\n"
+          );
+        }
+      }
+
+DESCRIPTION
+
+    POE::Component::Client::DNS provides non-blocking, parallel DNS
+    requests via Net::DNS. Using POE, it allows other tasks to run while
+    waiting for name servers to respond.
+
+    For simple name resolution, including smart handling of IPv6 names,
+    please see POE::Component::Resolver instead.
+
+PUBLIC METHODS
+
+    spawn
+
+      A program must spawn at least one POE::Component::Client::DNS
+      instance before it can perform background DNS requests. Each instance
+      represents a connection to one or more name servers. If a program
+      only needs to request DNS requests from one server, then you only
+      need one POE::Component::Client::DNS instance.
+
+      As of version 0.98 you can override the default timeout per request.
+      From this point forward there is no need to spawn multiple instances
+      to affect different timeouts for each request.
+
+      PoCo::Client::DNS's spawn method takes a few named parameters:
+
+      Alias sets the component's alias. Requests will be posted to this
+      alias. The component's alias defaults to "resolver" if one is not
+      provided. Programs spawning more than one DNS client component must
+      specify aliases for N-1 of them, otherwise alias collisions will
+      occur.
+
+        Alias => $session_alias,  # defaults to "resolver"
+
+      Timeout sets the component's default timeout. The timeout may be
+      overridden per request. See the "request" event, later on. If no
+      Timeout is set, the component will wait 90 seconds per request by
+      default.
+
+      Timeouts may be set to real numbers. Timeouts are more accurate if
+      you have Time::HiRes installed. POE (and thus this component) will
+      use Time::HiRes automatically if it's available.
+
+        Timeout => $seconds_to_wait,  # defaults to 90
+
+      Nameservers holds a reference to a list of name servers to try. The
+      list is passed directly to Net::DNS::Resolver's nameservers() method.
+      By default, POE::Component::Client::DNS will query the name servers
+      that appear in /etc/resolv.conf or its equivalent.
+
+        Nameservers => \@name_servers,  # defaults to /etc/resolv.conf's
+
+      HostsFile (optional) holds the name of a specific hosts file to use
+      for resolving hardcoded addresses. By default, it looks for a file
+      named /etc/hosts.
+
+      On Windows systems, it may look in the following other places:
+
+        $ENV{SystemRoot}\System32\Drivers\Etc\hosts
+        $ENV{SystemRoot}\System\Drivers\Etc\hosts
+        $ENV{SystemRoot}\hosts
+
+    resolve
+
+      resolve() requests the component to resolve a host name. It will
+      return a hash reference (described in RESPONSE MESSAGES, below) if it
+      can honor the request immediately (perhaps from a cache). Otherwise
+      it returns undef if a resolver must be consulted asynchronously.
+
+      Requests are passed as a list of named fields.
+
+        $resolver->resolve(
+          class       => $dns_record_class,  # defaults to "IN"
+          type        => $dns_record_type,   # defaults to "A"
+          host        => $request_host,      # required
+          context     => $request_context,   # required
+          event       => $response_event,    # required
+          timeout     => $request_timeout,   # defaults to spawn()'s Timeout
+          nameservers => $nameservers,       # defaults to $resolver's Nameservers
+        );
+
+      The "class" and "type" fields specify what kind of information to
+      return about a host. Most of the time internet addresses are
+      requested for host names, so the class and type default to "IN"
+      (internet) and "A" (address), respectively.
+
+      The "host" field designates the host to look up. It is required.
+
+      The "event" field tells the component which event to send back when a
+      response is available. It is required, but it will not be used if
+      resolve() can immediately return a cached response.
+
+      "timeout" tells the component how long to wait for a response to this
+      request. It defaults to the "Timeout" given at spawn() time.
+
+      "context" includes some external data that links responses back to
+      their requests. The context data is provided by the program that uses
+      POE::Component::Client::DNS. The component will pass the context back
+      to the program without modification. The "context" parameter is
+      required, and may contain anything that fits in a scalar.
+
+    shutdown
+
+      shutdown() causes the component to terminate gracefully. It will
+      finish serving pending requests then close down.
+
+    get_resolver
+
+      POE::Component::Client::DNS uses a Net::DNS::Resolver object
+      internally. get_resolver() returns that object so it may be
+      interrogated or modified. See Net::DNS::Resolver for options.
+
+      Set the resolver to check on nonstandard port 1153:
+
+        $poco_client_dns->get_resolver()->port(1153);
+
+RESPONSE MESSAGES
+
+    POE::Component::Client::DNS responds in one of two ways. Its resolve()
+    method will return a response immediately if it can be found in the
+    component's cache. Otherwise the component posts the response back in
+    $_[ARG0]. In either case, the response is a hash reference containing
+    the same fields:
+
+      host     => $request_host,
+      type     => $request_type,
+      class    => $request_class,
+      context  => $request_context,
+      response => $net_dns_packet,
+      error    => $net_dns_error,
+
+    The "host", "type", "class", and "context" response fields are
+    identical to those given in the request message.
+
+    "response" contains a Net::DNS::Packet object on success or undef if
+    the lookup failed. The Net::DNS::Packet object describes the response
+    to the program's request. It may contain several DNS records. Please
+    consult Net::DNS and Net::DNS::Packet for more information.
+
+    "error" contains a description of any error that has occurred. It is
+    only valid if "response" is undefined.
+
+SEE ALSO
+
+    POE - POE::Component::Client::DNS builds heavily on POE.
+
+    POE::Component::Resolver - A system name resolver, including IPv6
+    support and whatever else your system supports.
+
+    Net::DNS - This module uses Net::DNS internally.
+
+    Net::DNS::Packet - Responses are returned as Net::DNS::Packet objects.
+
+DEPRECATIONS
+
+    The older, list-based interfaces are no longer documented as of version
+    0.98. They are being phased out. The method-based interface, first
+    implementedin version 0.98, will replace the deprecated interfaces
+    after a six-month phase-out period.
+
+    Version 0.98 was released in October of 2004. The deprecated interfaces
+    will continue to work without warnings until January 2005.
+
+    As of January 2005, programs that use the deprecated interfaces will
+    continue to work, but they will generate mandatory warnings. Those
+    warnings will persist until April 2005.
+
+    As of April 2005 the mandatory warnings will be upgraded to mandatory
+    errors. Support for the deprecated interfaces will be removed entirely.
+
+    As of late January 2011, POE::Component::Resolver provides basic system
+    resolver support, including IPv6 and mDNS if your resolver's configured
+    ot use it. The use of POE::Component::Client::DNS for basic resolution
+    is deprecated, however it's still the best option for actual DNS server
+    requests.
+
+BUG TRACKER
+
+    https://rt.cpan.org/Dist/Display.html?Queue=POE-Component-Client-DNS
+
+REPOSITORY
+
+    http://github.com/rcaputo/poe-component-client-dns
+
+OTHER RESOURCES
+
+    http://search.cpan.org/dist/POE-Component-Client-DNS/
+
+AUTHOR & COPYRIGHTS
+
+    POE::Component::Client::DNS is Copyright 1999-2009 by Rocco Caputo. All
+    rights are reserved. POE::Component::Client::DNS is free software; you
+    may redistribute it and/or modify it under the same terms as Perl
+    itself.
+
+    Postback arguments were contributed by tag.
+

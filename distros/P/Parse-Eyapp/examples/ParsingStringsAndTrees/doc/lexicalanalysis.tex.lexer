@@ -1,0 +1,50 @@
+Lexical Analysis decomposes the input stream in a 
+sequence of lexical units called \emph{tokens}.
+Associated with each token is its \emph{attribute}
+which carries the corresponding information.
+In the code example below
+the attribute associated with token \verb|NUM|
+is its numerical value and the attribute associated with 
+token \verb|VAR| is the actual string.
+Each time the \emph{parser}
+requires a new token, the lexer returns
+the couple \code{(token, attribute)} that matched.
+Some tokens - like \verb|PRINT| -  do not carry any special
+information. In such cases, just to keep the protocol
+simple, the lexer returns the couple \verb|(token, token)|.
+Using Eyapp terminology such tokens are called \emph{syntactic tokens}.
+On the other side, \emph{Semantic tokens} are those tokens - like \verb|VAR|
+or \verb|NUM| - whose attributes transport 
+useful information. When the end of input is reached the lexer
+returns the couple \verb|('', undef)|.
+The lexical analyzer can be specified
+through the \verb|%lexer| directive (see
+the head section in file \verb|examples/ParsingStringsAndTrees/Infix.eyp|of the 
+\verb|Parse::Eyapp| distribution):
+
+\begin{verbatim}
+%lexer  {
+    m{\G[ \t]*}gc;
+    m{\G(\n)+}gc                    and $self->tokenline($1 =~ tr/\n//);
+    m{\G([0-9]+(?:\.[0-9]+)?)}gc    and return ('NUM',   $1);
+    m{\Gprint}gc                    and return ('PRINT', 'PRINT');
+    m{\G([A-Za-z_][A-Za-z0-9_]*)}gc and return ('VAR',   $1);
+    m{\G(.)}gc                      and return ($1,      $1);
+  }
+\end{verbatim}
+
+The directive \verb|%lexer| is followed by the code of the lexical analyzer.
+Inside such code the variable \verb|$_| contains the input string. The special
+variable \verb|$self| refers to the parser object. The pair \verb|('', undef)|
+is returned by the generated lexer when the end of input is detected.
+
+When feed it with input \verb|b = 1| the lexer
+will produce the sequence 
+
+\begin{verbatim}
+          (VAR, 'b') ('=', '=') ('NUM', '1') ('', undef)
+\end{verbatim}
+
+Lexical analyzers can have a non negligible impact in 
+the overall performance. Ways to speed up this stage can be found 
+in the works of Simoes \cite{simoes} and Tambouras \cite{Tambouras}.

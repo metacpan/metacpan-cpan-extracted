@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 76f509b388f7281a7bca74de3bbf4995889a31f9 Build.PL
+SHA1 bf75ddc1370a641d8d055cabbcc2e870e55ba231 Changes
+SHA1 651e0979ac6923f1abe7bbc3280a4860d15b9d43 MANIFEST
+SHA1 ab1cb4afae94bd52014fe6bfab823ac87ea6415d META.yml
+SHA1 12cdb266abe00eb440febdef27f72a744de9229b Makefile.PL
+SHA1 a595853bfc01c2153890ae9e671b91470b223b45 README
+SHA1 c51e8369c79d6b321fb308d091d8774661b31f08 examples/2walls2part3spr.pl
+SHA1 bb3d126e505e926d3b7c1b0d88e59f5d03837b81 examples/2walls2part3spr_antiphase.pl
+SHA1 8b44c951caf4c46be6be80d1871a04cfe10236e6 examples/2walls2part3spr_antiphase.png
+SHA1 60bf8bec41cbdbe44275086d28af96999ce7592f examples/2walls2part3spr_inphase.png
+SHA1 60e035364d12158d6b6aacc5f8f15745d17efb95 examples/3part3spr.png
+SHA1 42b96e642726440611f10d45b26963a6d9c4f6b3 lib/Physics/Springs.pm
+SHA1 bb0da54f2b3f2d7955baa41ee458cb3d1887f475 t/00pod.t
+SHA1 2db32c1aac44c2e41530ea63431166d91bd458bf t/00podcover.t
+SHA1 061082e303c8d2c090e9324c955d129bb097e5ed t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (GNU/Linux)
+
+iD8DBQFDSsZVZCuimE51gxcRAm6eAKDK69WCVBnyPCSyxcDJry81dK7nvwCfQ2tH
+TbXglAMv/uycivJ2XFR0UUg=
+=MR17
+-----END PGP SIGNATURE-----

@@ -1,0 +1,82 @@
+==================================================
+Changes from 2013-11-04 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.007 at 2014-11-04 22:34:52 +0000
+------------------------------------------
+
+  Change: 691fd836edbf362a9bb6719f2705e370c6a10d45
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 14:34:25 +0000
+
+    use proper x_IRC method 
+
+  Change: a209a78b9cb0d34137fe69c25cfaf2bc69b5033b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-01 19:28:03 +0000
+
+    fix cpants kwalitee link 
+
+  Change: 5a34737099107e806f2e9ee993c0e32db4cef2d9
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 22:14:39 +0000
+
+    not another README.pod arg 
+
+------------------------------------------
+version 1.006 at 2014-10-26 05:14:00 +0000
+------------------------------------------
+
+  Change: de1654821e9aa30669901b39737403e6c0d61243
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 22:14:00 +0000
+
+    New CPAN release of Pod-Weaver-Section-Support - v1.006
+
+    Documentation tweaks
+
+    Resolve RT#78450 - retrieve IRC information from the dzil metadata if
+    possible ( thanks BBYRD! ) 
+
+  Change: 89972c57690d16159fcc90ea422424574229ef0a
+  Author: Apocalypse <apocalypse@users.noreply.github.com>
+  Date : 2014-10-25 22:11:59 +0000
+
+    Merge pull request #6 from Lx/new-rt-urls
+
+    update rt.cpan.org URLs 
+
+  Change: 6714a6c47f47a31b7f42501cba0668dd2edfe7b5
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 22:04:39 +0000
+
+    cleanup docs and change cpants link to cpanauthors.org 
+
+  Change: 9dd604ee9aa478350ee1b1f5163998f8ea5a1a6b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 21:47:49 +0000
+
+    add ability to pull irc data from metadata 
+
+  Change: b5708edc75ebea1d40f6c91f5324780483646205
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 16:11:46 +0000
+
+    tweak variables so we pass Test::Vars 
+
+  Change: 6312f4f1905487f097b97e713fa10bd90d175293
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 15:49:32 +0000
+
+    updates for new packaging system 
+
+  Change: 5f02e143e1f04789dcbd8f0133d30af9c6733b03
+  Author: Alex Peters <lxp@cpan.org>
+  Date : 2013-05-03 13:54:18 +0000
+
+    update rt.cpan.org URLs 
+
+=================================================
+Plus 16 releases after 2013-11-04 00:00:00 +0000.
+=================================================

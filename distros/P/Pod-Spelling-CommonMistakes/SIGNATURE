@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 12ef555b88f66a2e4c42be5608d4b47f11dcf757 AUTHOR_PLEDGE
+SHA1 b49cb381f6224039ec99763d0fba948fe9a64b13 Build.PL
+SHA1 01cad8ea155c8d1dcc2bdae631b20a51e2071b7d Changes
+SHA1 4ae4ed4ef2b75ef2e26d4e5636044fa48084eeac CommitLog
+SHA1 22ce65e5102cbe45a22a994da657726a53eaffbe INSTALL
+SHA1 e6514e4bc5abd3d1a8c7bd2a782c2f8737b413e7 LICENSE
+SHA1 345a2fd04318937585d36d795c09390eb1a1f3a8 MANIFEST
+SHA1 69b8a0accb85effa4bd5f4ea93e4f2386d10ac8b MANIFEST.SKIP
+SHA1 b0f084e3447d8bb036e4d62b0788d0c8143f1a10 META.json
+SHA1 b50c09fc1e56752191d6095682d6202e09e3e6a9 META.yml
+SHA1 273df7d76eb7f8ef8c2df6e92f97a3083bca7b51 Makefile.PL
+SHA1 fab950be6b33083e632d2dbf51adf6d96936e9d8 README
+SHA1 b01e73878cd7cac62dff3080f66ee9867be4cc06 cpanfile
+SHA1 527124cf049d4dfd826c0fc4ab66d90780ff1315 dist.ini
+SHA1 4ad5aa563fe118a7b6174abd8292541b70b7114a doap.xml
+SHA1 04eb4ffb758bee85281f16694bb6032cdcea6a91 examples/simple.pl
+SHA1 1ba6febc058c5bdbbd9ad87c7ece4ab043e6ea43 lib/Pod/Spelling/CommonMistakes.pm
+SHA1 9c71499e0829de445a6d93518ccc79cfcbf8c5ea t/00-compile.t
+SHA1 ca6417d97ef1ca683f8211b87a85f664734a2126 t/00-report-prereqs.dd
+SHA1 c87e7e359a5fc415930fbbd1d396f09fe3d11a1d t/00-report-prereqs.t
+SHA1 4c32d6e3d55053c0d22e378a08f3968ab6dadc8c t/adapter.t
+SHA1 87e12dd3b45554886105fd3312261421422a1c7d t/apocalypse.t
+SHA1 4dff3aa9eb2576ff333ab052098e9b7f54d6d11c t/test.pod
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRZOoMACgkQGfr7vsGKgxwG6ACeIJqhyh68DMl/jqQxqcYjCI1W
+WOkAoIZJ4dgjTJt1sixJ6KLarb+cmRV7
+=aHBs
+-----END PGP SIGNATURE-----

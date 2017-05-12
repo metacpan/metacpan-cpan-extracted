@@ -1,0 +1,12 @@
+Revision history for Prolog-Utility-FromPerl
+
+1.0.0  Fri May 31 08:56:52 2013
+       Initial release.
+
+1.0.1  Wed Oct 23 21:00:00 2013
+       fixed code to handle 5.18.0 hash randomization
+
+1.0.2  Thu Oct 24 08:30:00 2013
+       minor update to version number and changes to docs
+       added chain_terms method and improved quoting for atoms
+

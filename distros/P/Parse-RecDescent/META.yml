@@ -1,0 +1,27 @@
+---
+abstract: 'Generate Recursive-Descent Parsers'
+author:
+  - 'Damian Conway <DCONWAY@CPAN.org>'
+  - 'Jeremy T. Braun <JTBRAUN@CPAN.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.5702'
+configure_requires:
+  ExtUtils::MakeMaker: '6.5702'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parse-RecDescent
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Test::More: '0'
+  Text::Balanced: '1.95'
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Status=Active&Queue=Parse-RecDescent
+  repository: git://github.com/jtbraun/Parse-RecDescent
+version: '1.967015'

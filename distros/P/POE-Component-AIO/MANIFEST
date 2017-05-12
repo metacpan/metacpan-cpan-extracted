@@ -1,0 +1,8 @@
+MANIFEST
+Changes
+Makefile.PL
+README
+AIO.pm
+t/00_callback.t
+examples/readfile.pl
+META.yml                                 Module meta-data (added by MakeMaker)

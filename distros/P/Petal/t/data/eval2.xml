@@ -1,0 +1,2 @@
+<span petal:on-error="string:booo">$this/aint/gonna/work</span>
+<span petal:on-error="&lt;&lt;">$this/aint/gonna/work</span>

@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1195839491,
+          'number' => '+440273441701',
+          'time' => '17:38',
+          'date' => '2007-11-23',
+          'name' => 'Cockney Wanker (M)',
+          'phone' => '+440273441701',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1195839491,
+          'text' => 'Where is the lbw in 2008?',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7107428,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 57461
+        };

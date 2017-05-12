@@ -1,0 +1,7 @@
+Revision history for Perl extension Plack::Middleware::Auth::QueryString
+
+0.02    Tue Oct 30 02:45:00 2012
+        - Bundle Module::Install 1.06.
+
+0.01    Thu May 24 01:39:26 2012
+        - original version

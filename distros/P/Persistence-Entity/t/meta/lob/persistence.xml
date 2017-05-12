@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence name="test"  connection_name="test" >
+    <entities>
+        <entity_file  file="photo.xml"  />
+    </entities>
+    <mapping_rules>
+        <orm_file file="Photo.xml" />
+    </mapping_rules>
+</persistence>

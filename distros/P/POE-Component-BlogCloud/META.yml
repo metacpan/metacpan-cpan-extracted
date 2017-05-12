@@ -1,0 +1,16 @@
+name: POE-Component-BlogCloud
+version: 0.01
+abstract: Client for blo.gs streaming cloud server
+author: Benjamin Trott <ben+cpan@stupidfool.org>
+license: perl
+distribution_type: module
+requires:
+  POE: 0
+  XML::SAX: 0
+  DateTime: 0
+  Class::Accessor: 0
+no_index:
+  directory:
+    - t
+    - inc
+generated_by: Module::Install version 0.36

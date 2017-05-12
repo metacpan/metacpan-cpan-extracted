@@ -1,0 +1,13 @@
+(loosely priority-ordered)
+
+# Test improvements.
+  - disconnect behavior (check git stash)
+  - peer-to-peer zlib
+
+# Refactor to hide ->wheel
+  (low-priority and probably breaks irssi-bouncer)
+  - Role::HasWheel; wheel -> _wheel
+    wheel_id grabs/caches from _wheel
+    has_wheel & clear_wheel remain as-is
+
+

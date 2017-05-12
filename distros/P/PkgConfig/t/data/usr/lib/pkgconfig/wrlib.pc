@@ -1,0 +1,5 @@
+Name: wrlib
+Description: Image manipulation and conversion library
+Version: 0.92.0
+Libs: -L/usr/lib  -lwraster -ltiff  -lXpm -lpng -lz -ljpeg -lungif -lXinerama -lXext -lX11  -lm
+Cflags: -I/usr/include 

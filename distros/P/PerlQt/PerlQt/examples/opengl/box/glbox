@@ -1,0 +1,90 @@
+
+package GLObjectWindow;
+
+use strict;
+
+use Qt;
+use Qt::isa qw(Qt::Widget);          
+use Qt::attributes qw(
+    file
+    frame
+    menu
+    box
+    xpos
+    ypos
+    zpos
+);
+
+use GLBox;
+
+sub NEW
+{
+    shift->SUPER::NEW(@_);
+
+    # Create a menu
+    file = Qt::PopupMenu( this );
+    file->insertItem( "Exit",  Qt::app(), SLOT 'quit()', Qt::KeySequence(int &CTRL + &Key_Q ));
+
+    # Create a menu bar
+    menu = Qt::MenuBar( this );
+    menu->setSeparator( &Qt::MenuBar::InWindowsStyle );
+    menu->insertItem("&File", file );
+
+    # Create a nice frame to put around the OpenGL widget
+    frame = Qt::Frame( this, "frame" );
+    frame->setFrameStyle( &Qt::Frame::Sunken | &Qt::Frame::Panel );
+    frame->setLineWidth( 2 );
+
+    # Create our OpenGL widget
+    box = GLBox( frame, "glbox");
+
+    # Create the three sliders; one for each rotation axis
+    xpos = Qt::Slider ( 0, 360, 60, 0, &Qt::Slider::Vertical, this, "xsl" );
+    xpos->setTickmarks( &Qt::Slider::Left );
+    Qt::Object::connect( xpos, SIGNAL 'valueChanged(int)', box, SLOT 'setXRotation(int)' );
+
+    ypos = Qt::Slider ( 0, 360, 60, 0, &Qt::Slider::Vertical, this, "ysl" );
+    ypos->setTickmarks( &Qt::Slider::Left );
+    Qt::Object::connect( ypos, SIGNAL 'valueChanged(int)', box, SLOT 'setYRotation(int)' );
+
+    zpos = Qt::Slider ( 0, 360, 60, 0, &Qt::Slider::Vertical, this, "zsl" );
+    zpos->setTickmarks( &Qt::Slider::Left );
+    Qt::Object::connect( zpos, SIGNAL 'valueChanged(int)', box, SLOT 'setZRotation(int)' );
+
+
+    # Now that we have all the widgets, put them into a nice layout
+
+    # Put the sliders on top of each other
+    my $vlayout = Qt::VBoxLayout( 20, "vlayout");
+    $vlayout->addWidget( xpos );
+    $vlayout->addWidget( ypos );
+    $vlayout->addWidget( zpos );
+
+    # Put the GL widget inside the frame
+    my $flayout = Qt::HBoxLayout( frame, 2, 2, "flayout");
+    $flayout->addWidget( box, 1 );
+
+    # Top level layout, puts the sliders to the left of the frame/GL widget
+    my $hlayout = Qt::HBoxLayout( this, 20, 20, "hlayout");
+    $hlayout->setMenuBar( menu );
+    $hlayout->addLayout( $vlayout );
+    $hlayout->addWidget( frame, 1 );
+}
+
+1;
+
+package main;
+
+use Qt;
+use GLObjectWindow;
+
+my $a = Qt::Application(\@ARGV);
+
+my $w = GLObjectWindow;
+$w->resize(350,350);
+$w->show;
+
+$a->setMainWidget( $w);
+
+exit $a->exec;
+

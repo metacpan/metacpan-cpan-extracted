@@ -1,0 +1,54 @@
+[AGENT]
+
+Opera/10.00 (Macintosh; Intel Mac OS X; U; en) Presto/2.2.0
+
+'parser'           => 'opera_pre',
+'strength'         => 'U',
+'os'               => 'Macintosh',
+'extras'           => ['Intel Mac OS X'],
+'toolkit'          => ['Presto','2.2.0','2.002000'],
+'version_raw'      => '10.00',
+'lang'             => 'en',
+'version'          => '10.000',
+'name'             => 'Opera',
+
+[AGENT]
+
+Opera/9.80 (Macintosh; Intel Mac OS X; U; en) Presto/2.2.15 Version/10.00
+
+'parser'           => 'opera_pre',
+'strength'         => 'U',
+'os'               => 'Macintosh',
+'extras'           => ['Intel Mac OS X'],
+'toolkit'          => ['Presto','2.2.15','2.002015'],
+'version_raw'      => '10.00',
+'lang'             => 'en',
+'version'          => '10.000',
+'name'             => 'Opera',
+
+[AGENT]
+
+Opera/9.80 (Windows NT 6.0; U; tr) Presto/2.6.30 Version/10.63
+
+parser      => 'opera_pre',
+strength    => 'U',
+os          => 'Windows Vista / Server 2008',
+toolkit     => [ 'Presto', '2.6.30', '2.006030' ],
+version_raw => '10.63',
+lang        => 'tr',
+version     => '10.630',
+name        => 'Opera',
+
+[AGENT]
+
+Opera/9.80 (X11; Linux i686; U; en) Presto/2.6.30 Version/10.63
+
+parser      => 'opera_pre',
+strength    => 'U',
+os          => 'X11',
+extras      => ['Linux i686'],
+toolkit     => [ 'Presto','2.6.30','2.006030'],
+version_raw => '10.63',
+lang        => 'en',
+version     => '10.630',
+name        => 'Opera',

@@ -1,0 +1,188 @@
+{
+   "abstract" : "Configuration management tool for chef-solo",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300025, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pantry",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd::Setup" : "0.317",
+            "Carp" : "0",
+            "Exporter" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "File::Slurp" : "0",
+            "File::Temp" : "0.22",
+            "Hash::Merge" : "0",
+            "IO::Prompt::Tiny" : "0",
+            "IPC::Cmd" : "0",
+            "JSON" : "2",
+            "List::AllUtils" : "0",
+            "Moose" : "2",
+            "Moose::Role" : "0",
+            "Moose::Util" : "0",
+            "MooseX::Role::Parameterized" : "0",
+            "MooseX::Types::Path::Class::MoreCoercions" : "0.002",
+            "Net::OpenSSH" : "0",
+            "Path::Class" : "0",
+            "Path::Class::Rule" : "0",
+            "Storable" : "0",
+            "autodie" : "0",
+            "namespace::autoclean" : "0",
+            "namespace::clean" : "0",
+            "perl" : "v5.14.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "App::Cmd::Tester" : "0",
+            "App::Cmd::Tester::CaptureExternal" : "0",
+            "File::Find" : "0",
+            "File::pushd" : "1.00",
+            "Test::Deep" : "0.110",
+            "Test::More" : "0.96",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Pantry" : {
+         "file" : "lib/Pantry.pm",
+         "version" : "0.012"
+      },
+      "Pantry::App" : {
+         "file" : "lib/Pantry/App.pm",
+         "version" : "0.012"
+      },
+      "Pantry::App::Command" : {
+         "file" : "lib/Pantry/App/Command.pm",
+         "version" : "0.012"
+      },
+      "Pantry::App::Command::apply" : {
+         "file" : "lib/Pantry/App/Command/apply.pm",
+         "version" : "0.012"
+      },
+      "Pantry::App::Command::create" : {
+         "file" : "lib/Pantry/App/Command/create.pm",
+         "version" : "0.012"
+      },
+      "Pantry::App::Command::delete" : {
+         "file" : "lib/Pantry/App/Command/delete.pm",
+         "version" : "0.012"
+      },
+      "Pantry::App::Command::edit" : {
+         "file" : "lib/Pantry/App/Command/edit.pm",
+         "version" : "0.012"
+      },
+      "Pantry::App::Command::init" : {
+         "file" : "lib/Pantry/App/Command/init.pm",
+         "version" : "0.012"
+      },
+      "Pantry::App::Command::list" : {
+         "file" : "lib/Pantry/App/Command/list.pm",
+         "version" : "0.012"
+      },
+      "Pantry::App::Command::rename" : {
+         "file" : "lib/Pantry/App/Command/rename.pm",
+         "version" : "0.012"
+      },
+      "Pantry::App::Command::show" : {
+         "file" : "lib/Pantry/App/Command/show.pm",
+         "version" : "0.012"
+      },
+      "Pantry::App::Command::strip" : {
+         "file" : "lib/Pantry/App/Command/strip.pm",
+         "version" : "0.012"
+      },
+      "Pantry::App::Command::sync" : {
+         "file" : "lib/Pantry/App/Command/sync.pm",
+         "version" : "0.012"
+      },
+      "Pantry::Model" : {
+         "file" : "lib/Pantry/Model.pm",
+         "version" : "0.012"
+      },
+      "Pantry::Model::Cookbook" : {
+         "file" : "lib/Pantry/Model/Cookbook.pm",
+         "version" : "0.012"
+      },
+      "Pantry::Model::DataBag" : {
+         "file" : "lib/Pantry/Model/DataBag.pm",
+         "version" : "0.012"
+      },
+      "Pantry::Model::EnvRunList" : {
+         "file" : "lib/Pantry/Model/EnvRunList.pm",
+         "version" : "0.012"
+      },
+      "Pantry::Model::Environment" : {
+         "file" : "lib/Pantry/Model/Environment.pm",
+         "version" : "0.012"
+      },
+      "Pantry::Model::Node" : {
+         "file" : "lib/Pantry/Model/Node.pm",
+         "version" : "0.012"
+      },
+      "Pantry::Model::Pantry" : {
+         "file" : "lib/Pantry/Model/Pantry.pm",
+         "version" : "0.012"
+      },
+      "Pantry::Model::Role" : {
+         "file" : "lib/Pantry/Model/Role.pm",
+         "version" : "0.012"
+      },
+      "Pantry::Model::Util" : {
+         "file" : "lib/Pantry/Model/Util.pm",
+         "version" : "0.012"
+      },
+      "Pantry::Role::Runlist" : {
+         "file" : "lib/Pantry/Role/Runlist.pm",
+         "version" : "0.012"
+      },
+      "Pantry::Role::Serializable" : {
+         "file" : "lib/Pantry/Role/Serializable.pm",
+         "version" : "0.012"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/pantry/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Pantry",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dagolden/pantry.git",
+         "web" : "https://github.com/dagolden/pantry"
+      }
+   },
+   "version" : "0.012"
+}
+

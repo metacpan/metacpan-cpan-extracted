@@ -1,0 +1,163 @@
+#!/bin/sh -u
+
+#
+# Build rpm distribution
+#
+# Helpful Documentation:
+#   Maximum RPM 
+#   Taking the Red Hat Package Manager to the Limit
+#   Edward C. Bailey
+#   http://www.redhat.com/docs/books/max-rpm/
+#
+
+umask 022
+
+echo ''
+case "`id`" in
+*root*) ;;
+*)
+    echo    "Warning! 'rpm' may core dump if you are not root."
+    echo -n "Hit enter to continue: "
+    read junk
+    ;;
+esac
+
+get_rpm_version() {
+    rpm -q --queryformat '%{VERSION}' $* 2>/dev/null
+}
+
+# Get distribution name
+distro=RedHat
+echo -n "Linux distribution [$distro]: "
+read ans
+if test "$ans" != ""; then
+    distro=$ans
+fi
+
+# Get distribution version
+rev=`get_rpm_version redhat-release`
+echo -n "Distribution version [$rev]: "
+read ans
+if test "$ans" != ""; then
+    rev=$ans
+fi
+
+# Which release.  Increment every time an rpm is released for the same version.
+release=1
+echo -n "RPM Release [$release]: "
+read ans
+if test "$ans" != ""; then
+    release=$ans
+fi
+
+rpms=${TMPDIR}/RPMS
+build=${TMPDIR}/BUILD
+binroot=${TMPDIR}/binroot
+perlrev=`get_rpm_version perl`
+ver=`echo $VERSION | sed 's/-//g'`
+serial=`echo $ver $release | awk '{print $1 * 1000 + $2}'`
+summary=`grab_summary`
+spec=${TMPDIR}/${PKGNM}-${ver}-${release}.spec
+doc_files="README README.html COPYING Changes"
+group=Development/Languages
+arch=`rpm --showrc | awk '/build arch/ {print $NF; exit}'`
+os=${distro}-$rev
+
+mkdir $rpms $rpms/$arch $build $binroot
+
+file_list() {
+    copy_pkgfiles $binroot "$@"
+    for f in `file_dest "$@"`; do echo "%attr(755,root,root) $f"; done
+}
+
+# Write the spec file
+(
+    cat <<-END
+	Summary: $summary
+	Name: $PKGNM
+	Version: $ver
+	Release: $release
+	Serial: $serial
+	Copyright: $COPYRIGHT
+	Group: $group
+	Requires: perl = $perlrev
+	Prefix: $PREFIX
+	URL: $URL
+	Vendor: $VENDOR
+	%define _topdir $TMPDIR
+	BuildRoot: $binroot
+	END
+
+    # Insert the description from PM file
+    echo '%description'
+    grab_description | sed 's/^/\: /'
+
+    # Files to install
+    echo '%files'
+    file_list $STD_FILES
+
+    # Documentation files
+    cp ${doc_files} ${build}
+    for f in $doc_files; do echo '%doc' $f; done
+
+    if want_apache_package; then
+	# Put the apache files into the build dir
+	copy_pkgfiles $binroot $APACHE_FILES
+
+	APACHE_VERSION_NEXT=`expr $APACHE_VERSION + 1`
+	if test $APACHE_VERSION -gt 1; then
+		apache_pkg=httpd
+	else
+		apache_pkg=apache
+	fi
+
+	# Apache module
+	cat <<-END
+	%package $MODNM
+	Summary: $APACHE_DESC
+	Group: $group
+	Requires: persistentperl = ${ver}, $apache_pkg >= $APACHE_VERSION, $apache_pkg < $APACHE_VERSION_NEXT
+	%description $MODNM
+	$APACHE_DESC
+	END
+
+	# File list
+	echo "%files $MODNM"
+	file_list $APACHE_FILES
+
+	# Apache install script
+	echo "%post $MODNM"
+	apache_install_script '$RPM_INSTALL_PREFIX' 'rpmsave'
+
+	# Apache uninstall script
+	echo "%preun $MODNM"
+	echo "# Don't uninstall during an upgrade"
+	echo 'if test $1 -gt 0; then exit 0; fi'
+	apache_uninstall_script
+    fi
+) >$spec &&
+
+# Build the rpms from the spec
+if test -x /usr/bin/rpmbuild; then
+    rpmbuild -bb $spec
+else
+    rpm -bb $spec
+fi
+if test $? -ne 0; then
+    echo "rpm command failed"
+    adios $?
+fi
+
+# Copy the rpms from the TMPDIR
+for f in `cd $rpms/$arch; echo *.rpm`; do
+    o=$OUTDIR/${os}-$f
+    cp $rpms/$arch/$f $o
+    case $f in
+	*${MODNM}*)
+	    add_desc $o $APACHE_VERSION $os $arch "Apache $APACHE_VERSION"
+	    ;;
+	*)
+	    add_desc $o 0 $os $arch "Perl $perlrev"
+	    ;;
+    esac
+done

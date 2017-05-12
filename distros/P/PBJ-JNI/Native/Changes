@@ -1,0 +1,6 @@
+Revision history for Perl extension PBJ::JNI::Native.
+
+0.1  Mon Oct 22 09:48:04 2001
+	- original version; created by h2xs 1.21 with options
+		-n PBJ::JNI::Native
+

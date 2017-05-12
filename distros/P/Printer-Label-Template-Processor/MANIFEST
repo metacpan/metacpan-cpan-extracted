@@ -1,0 +1,8 @@
+Build.PL
+Changes
+lib/Printer/Label/Template/Processor.pm
+MANIFEST			This list of files
+README
+t/resources/label-zpl.pl
+t/resources/label-zpl.tt2
+t/zpl-from-perl.t

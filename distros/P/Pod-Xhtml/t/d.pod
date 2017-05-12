@@ -1,0 +1,32 @@
+=head1 OFF PAGE
+
+L<name> X
+L<Net::Ping> X
+L<crontab(5)> X
+
+L<name/sec> X
+L<perlsyn/For Loops> X
+L<Net::Ping/Apple Juice> X
+L<crontab(5)/BUGS> X
+
+L<text|name> X
+L<Perl Error Messages|perldiag> X
+L<Is the host up?|Net::Ping> X
+L<User Crontab|crontab(5)> X
+
+L<text|name/sec> X
+L<SWITCH statements|perlsyn/Basic BLOCKs and Switch Statements> X
+
+=head1 ON PAGE
+
+L</BUGS> X
+L</Constructor Options> X
+
+L<text|/sec> X
+L<the various attributes|/Member Data> X
+
+=head1 HYPERLINK
+
+L<http://www.bbc.co.uk/> X
+
+=cut

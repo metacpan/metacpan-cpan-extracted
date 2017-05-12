@@ -1,0 +1,31 @@
+
+# $Id$
+
+severity = 1
+verbose  = 8
+
+#------------------------------------------------------------------------------
+
+[CodeLayout::RequireTidyCode]
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|AFFILIATION|VERSION|DESCRIPTION|CONFIGURATION AND ENVIRONMENT|DEPENDENCIES AND REQUIREMENTS|INCOMPATIBILITIES|BUGS AND LIMITATIONS|BUG REPORTING|TEST AND QUALITY|SEE ALSO|AUTHOR|LICENSE AND COPYRIGHT
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+#Ref: https://logiclab.jira.com/wiki/display/OPEN/Perl-Critic-Policy-ValuesAndExpressions-ProhibitConstantPragma
+[-ValuesAndExpressions::ProhibitConstantPragma]
+
+#I write logicLAB, as logicLAB
+[-NamingConventions::Capitalization]
+
+[-Documentation::RequirePodLinksIncludeText]
+
+# TODO
+
+[-InputOutput::RequireBracedFileHandleWithPrint]
+[-RegularExpressions::RequireDotMatchAnything]
+[-RegularExpressions::RequireExtendedFormatting]
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-InputOutput::RequireCheckedSyscalls]

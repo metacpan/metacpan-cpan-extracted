@@ -1,0 +1,21 @@
+my $VAR1 = {
+    'scan_on' => {
+        'index_name'  => 'proxies_pkey',
+        'table_name'  => 'proxies',
+        'table_alias' => 'proxies'
+    },
+    'estimated_startup_cost' => '0',
+    'estimated_row_width'    => '7',
+    'estimated_total_cost'   => '84834.89',
+    'actual_time_first'      => '9.511',
+    'actual_time_last'       => '468.509',
+    'extra_info'             => [
+        'Index Cond: (source = \'tor\'::ip.proxysource)',
+        'Filter: upper_inf(active_in)'
+    ],
+    'actual_loops'   => '1',
+    'actual_rows'    => '6450',
+    'estimated_rows' => '580011',
+    'type'           => 'Index Only Scan',
+    'is_analyzed'    => 1,
+};

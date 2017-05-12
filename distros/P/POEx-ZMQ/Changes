@@ -1,0 +1,155 @@
+Revision history for Perl module POEx-ZMQ
+
+0.005007 2015-03-11
+
+  - Improved ROUTER/DEALER examples
+
+  - Depend on Math::BigInt 1.997+ (tracking upstream ZMQ::FFI)
+
+0.005006 2015-03-09
+
+  - Support for ARRAY-type objects in send_multipart
+
+  - Bump ZMQ_MSG_SIZE to 128 (tracking upstream ZMQ::FFI)
+
+  - 'use strictures 2;' for saner fatal warnings behavior
+
+0.005005 2015-01-17
+
+  - POD fix
+
+0.005004 2015-01-10
+
+  - Documentation improvements
+
+  - Minor optimizations
+
+0.005003 2014-11-20
+
+  - Deprecate $ctx->generate_keypair in favor of Crypt::ZCert
+
+  - Packaging changes; switch to cpanfile, FFI::CheckLib
+
+  - Minor optimizations
+
+  - Minor test & documentation improvements
+
+0.005002 2014-10-22
+
+  - Documentation fixes
+
+0.005001 2014-10-08
+
+  - Add zmq_curve_keypair support via $context->generate_keypair
+
+  - Support ZeroMQ-4.x SOVERSION change
+
+  - Minor optimizations
+
+0.004001 2014-09-25
+
+  - Delay write retries on EAGAIN/EINTR/EFSM
+
+  - Fix $async_socket->set_socket_opt to return $async_socket
+
+  - Cache FFI objects for a given libzmq
+
+  - Track upstream ZMQ::FFI; use a larger max message size
+
+  - Track upstream ZMQ::FFI; apply flags to each part of a multipart send
+
+  - Minor optimizations & bugfixes
+
+  - Minor test expansion
+
+0.003001 2014-08-16
+
+  - Add SSH tunnel example script from deprecated POEx-ZMQ3 dist
+
+  - Add ZMQEndpoint type to POEx::ZMQ::Types
+
+  - FFI backend optimizations
+
+0.002002 2014-08-13
+
+  - POEx::ZMQ::Constants fixes
+
+0.002001 2014-08-12
+
+  - Support for POEx::ZMQ instances with context sharing between sockets
+
+  - Parameterized ZMQSocket type
+
+  - Expanded tests & POD
+
+  - Minor optimizations
+
+0.001002 2014-08-03
+
+  - Issue a warning when queuing app-side on EFSM.
+    The socket is probably not being used as intended, but since our sockets
+    should never block, it's still maybe valid to queue up messages headed to
+    REP (for example).
+    Application-side queue management is definitely not finalized; this
+    behavior is likely to change.
+
+  - Add 'ipv6' attr to handle appropriate socket options automatically
+
+  - Port a couple of examples/ from the deprecated POEx-ZMQ3 dist
+
+  - Be smarter about choosing ipc:// endpoints for tests
+
+  - Expanded tests (somewhat, test suite is still woefully incomplete)
+
+0.001001 2014-07-31
+
+  - Issue warnings when buffering on EFSM
+
+  - More Constants.pm fixes/cleanups
+
+0.000_006 2014-07-30
+
+  - Add max_queue_size / max_queue_action
+
+  - Test TCP transport
+
+  - Fix constant optimization for maybe-POSIX constants
+
+0.000_005 2014-07-27
+
+  - Provide ->zmq_version method on POEx::ZMQ::Socket objs
+
+  - BAIL_OUT on some other possible linker failures
+
+  - Don't bother trying to clean up sockets & contexts properly if in GD
+
+0.000_004 2014-07-27
+
+  - Fix dep list
+
+  - Requeue on EFSM
+    (Still need proper internal queue management.)
+
+0.000_003 2014-07-27
+
+  - Provide POEx::ZMQ->socket() constructor shortcut
+
+  - Prefer libzmq.so.3 over libzmq.so
+    (Might be reverted. I'm running into systems with libzmq.so pointing to
+    ZMQ2 and libzmq.so.3 available.)
+
+  - Various test expansion/fixes
+
+  - Really fix bad-version BAIL_OUT. ... I think.
+
+  - MetaNoIndex for tools/
+
+0.000_002 2014-07-26
+
+  - Set ZMQ_LINGER to 0 during ->stop
+
+  - BAIL_OUT of test suite if libzmq is too old
+
+0.000_001 2014-07-26
+
+  - Initial development release

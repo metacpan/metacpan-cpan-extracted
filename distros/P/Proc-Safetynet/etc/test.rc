@@ -1,0 +1,9 @@
+id                  = test
+programs            = etc/test.programs
+binpath             = /bin:/usr/bin:/home/dexter/bin
+logpath             = /home/dexter/log/safetynet
+logext_stderr       = .stderr
+logext_stdout       = .stdout
+<unix_server>
+    socket              = /tmp/safetynet.sock
+</unix_server>

@@ -1,0 +1,10 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Plack/Middleware/LogAny.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/simple.t

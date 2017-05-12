@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.mkdn
+dist.ini
+lib/Plack/Middleware/FixIEXDomainRequestBug.pm
+t/basic.t
+t/use.t

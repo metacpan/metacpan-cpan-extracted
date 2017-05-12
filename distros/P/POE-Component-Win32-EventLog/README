@@ -1,0 +1,201 @@
+NAME
+
+    POE::Component::Win32::EventLog - A POE component that provides
+    non-blocking access to Win32::EventLog.
+
+VERSION
+
+    version 1.26
+
+SYNOPSIS
+
+      use POE qw(Component::Win32::EventLog);
+      use Win32::EventLog;
+      use Data::Dumper;
+    
+      my $eventlog = POE::Component::Win32::EventLog->spawn();
+    
+      POE::Session->create(
+        package_states => [
+            'main' => [ qw(_start _getoldest _getnumber _event_logs) ],
+        ],
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+    
+      sub _start {
+            $eventlog->yield( getoldest => { event => '_getoldest' } );
+            undef;
+      }
+    
+      sub _getoldest {
+            my $heap = $_[HEAP];
+            my ($hashref) = $_[ARG0];
+            unless ( $hashref->{result} ) {
+                    $eventlog->yield( 'shutdown' );
+                    return;
+            }
+            $heap->{oldest} = $hashref->{result};
+            $eventlog->yield( getnumber => { event => '_getnumber' } );
+            undef;
+      }
+    
+      sub _getnumber {
+            my $heap = $_[HEAP];
+            my ($hashref) = $_[ARG0];
+            unless ( $hashref->{result} ) {
+                    $eventlog->yield( 'shutdown' );
+                    return;
+            }
+            my $x = 0; my $last = 0;
+            while ( $x < $hashref->{result} ) {
+                    $eventlog->yield( read => { event => '_event_logs', 
+                      args => [ EVENTLOG_FORWARDS_READ|EVENTLOG_SEEK_READ, $heap->{oldest} + $x ], _last => $last } );
+                    $x++;
+                    if ( $x == ( $hashref->{result} - 1 ) ) { $last = 1; }
+            }
+            undef;
+      }
+    
+      sub _event_logs {
+            my $heap = $_[HEAP];
+            my ($hashref) = $_[ARG0];
+    
+            if ( $hashref->{result} ) {
+                    print STDOUT Dumper( $hashref->{result} );
+            }
+            if ( $hashref->{_last} ) {
+                    $eventlog->yield( 'shutdown' );
+            }
+            undef;
+      }
+
+DESCRIPTION
+
+    POE::Component::Win32::EventLog is a POE component that provides a
+    non-blocking wrapper around Win32::EventLog. Each component instance
+    represents a Win32::EventLog object.
+
+    Consult the Win32::EventLog documentation for more details.
+
+CONSTRUCTOR
+
+    spawn
+
+      Takes a number of arguments, all of which are optional.
+
+        'source', SOURCENAME argument for Win32::EventLog, default is 'System' if none is supplied;
+        'system', the SERVERNAME argument for Win32::EventLog;
+        'alias', the kernel alias to bless the component with;
+        'debug', set this to 1 to see component debug information; 
+        'options', a hashref of POE::Session options that are passed to the component's session creator.
+        'dontresolveuser', set to 1 to stop the component automagically resolving the User field from a SID 
+              to a 'proper' username. 
+
+METHODS
+
+    session_id
+
+      Takes no arguments. Returns the ID of the component's session. Ideal
+      for posting events to the component.
+
+    yield
+
+      This method provides an alternative object based means of posting
+      events to the component. First argument is the event to post,
+      following arguments are sent as arguments to the resultant post.
+
+    call
+
+      This method provides an alternative object based means of calling
+      events to the component. First argument is the event to call,
+      following arguments are sent as arguments to the resultant call.
+
+    shutdown
+
+      Terminates the component instance.
+
+INPUT
+
+    These are the events that the component will accept. All require a
+    hashref as the first parameter. All require that the hashref contain
+    the 'event' key which contains the name of the event handler in *your*
+    session that you want the result of the requested operation to go to.
+    If a function requires additional arguments the 'args' key can be used
+    which must be an arrayref of values. Check with Win32::EventLog for
+    details.
+
+    You may pass arbitary key/values in the hashref, please ensure that the
+    keys begin with an underscore. See SYNOPSIS for an example.
+
+    backup
+
+      Backs up the eventlog. You must specify a filename in 'args'
+      arrayref.
+
+    clear
+
+      Clears the eventlog.
+
+    getnumber
+
+      Returns the number of EventLog records in the EventLog.
+
+    getoldest
+
+      Returns the number of the oldest EventLog record in the EventLog.
+
+    read
+
+      Returns the indicated eventlog record from the eventlog.
+
+    report
+
+      Generates an EventLog entry. You must specify a hashref representing
+      the record to be added, using 'args'.
+
+    shutdown
+
+      Terminates the component instance.
+
+OUTPUT
+
+    For each requested operation an event handler is required. ARG0 of this
+    event handler contains a hashref.
+
+    result
+
+      For most cases this will be just a true value. For 'getnumber' and
+      'getoldest' it will be an integer. For 'read', it will be a hashref
+      representing the eventlog record ( see Win32::EventLog for details (
+      the component automagically resolves the User field from a SID to a
+      'proper' username ).
+
+    error
+
+      In the event of an error occurring this will be defined. It is an
+      arrayref which contains the error code and the formatted error
+      relating to that code.
+
+CAVEATS
+
+    This module will only work on Win32. But you guessed that already :)
+
+SEE ALSO
+
+    POE
+
+    Win32::EventLog
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

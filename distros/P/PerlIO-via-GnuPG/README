@@ -1,0 +1,81 @@
+NAME
+
+    PerlIO::via::GnuPG - Layer to try to decrypt on read
+
+VERSION
+
+    This document describes version 0.006 of PerlIO::via::GnuPG - released
+    August 10, 2015 as part of PerlIO-via-GnuPG.
+
+SYNOPSIS
+
+        use PerlIO::via::GnuPG;
+    
+        # dies on error, and if the file is not encrypted
+        open(my $fh, '<:via(GnuPG)', 'secret.txt.asc')
+            or die "cannot open! $!";
+    
+        my @in = <$fh>; # or whatever...
+
+DESCRIPTION
+
+    This is a PerlIO module to decrypt files transparently. It's pretty
+    simple and does not support writing, but works.
+
+    ...and if it doesn't, please file an issue :)
+
+CUSTOM WARNING CATEGORIES
+
+    This package emits warnings from time to time. To disable warnings
+    generated when passing through unencrypted data:
+
+        no warnings 'PerlIO::via::GnuPG::unencrypted';
+
+    Likewise, to disable all warnings issued by this package:
+
+        no warnings 'PerlIO::via::GnuPG';
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * PerlIO::via::GnuPG::Maybe
+
+      * PerlIO
+
+      * PerlIO::via
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/perlio-via-gnupg/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+ I'm a material boy in a material world
+
+    Please note I do not expect to be gittip'ed or flattr'ed for this work,
+    rather it is simply a very pleasant surprise. I largely create and
+    release works like this because I need them or I find it enjoyable;
+    however, don't let that stop you if you feel like it ;)
+
+    Flattr
+    <https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Fperlio-via-gnupg&title=RsrchBoy's%20CPAN%20PerlIO-via-GnuPG&tags=%22RsrchBoy's%20PerlIO-via-GnuPG%20in%20the%20CPAN%22>,
+    Gratipay <https://gratipay.com/RsrchBoy/>, or indulge my Amazon
+    Wishlist <http://bit.ly/rsrchboys-wishlist>... If and *only* if you so
+    desire.
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2013 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

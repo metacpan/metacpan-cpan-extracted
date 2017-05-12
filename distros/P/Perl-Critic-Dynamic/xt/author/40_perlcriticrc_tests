@@ -1,0 +1,65 @@
+##############################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/tags/Perl-Critic-Dynamic-0.05/xt/author/40_perlcriticrc_tests $
+#     $Date: 2009-11-07 22:18:54 -0800 (Sat, 07 Nov 2009) $
+#   $Author: thaljef $
+# $Revision: 3716 $
+##############################################################################
+
+profile-strictness = fatal
+severity = 1
+theme = core
+verbose = %f: %m at line %l, column %c.  %e.  (Severity: %s, %p)\n
+
+#-----------------------------------------------------------------------------
+
+[BuiltinFunctions::ProhibitStringyEval]
+allow_includes = 1
+
+[CodeLayout::ProhibitQuotedWordLists]
+strict = 1
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[-CodeLayout::RequireTidyCode]
+
+[ControlStructures::ProhibitPostfixControls]
+flowcontrol = warn die carp croak cluck confess goto exit plan skip
+
+# None of our tests contain real POD, but POD::Spell gets confused by the code
+# in some of our test files.
+[-Documentation::PodSpelling]
+
+[-Documentation::RequirePodSections]
+
+# Too endemic for me to deal with right now
+[-ErrorHandling::RequireCheckingReturnValueOfEval]
+
+# Wrapping Exception constructor calls across lines runs into 9 lines too quickly.
+[InputOutput::RequireBriefOpen]
+lines = 20
+
+[InputOutput::RequireCheckedSyscalls]
+functions = open close
+
+[Miscellanea::RequireRcsKeywords]
+keywords = URL Date Author Revision
+
+# Character length is not a proper measure of complexity.
+[-RegularExpressions::ProhibitComplexRegexes]
+
+[RegularExpressions::ProhibitUnusualDelimiters]
+allow_all_brackets = 1
+
+[RegularExpressions::RequireBracesForMultiline]
+allow_all_brackets = 1
+
+# Tests are allowed to peek.
+[-Subroutines::ProtectPrivateSubs]
+
+# Tests can be evil.
+[TestingAndDebugging::ProhibitNoWarnings]
+allow = redefine once
+
+# Too endemic for me to deal with right now.
+[-ValuesAndExpressions::ProhibitMagicNumbers]

@@ -1,0 +1,156 @@
+
+<html>
+<head>
+<title>Pod::Classdoc::Project</title>
+</head>
+<body>
+<table width='100%' border=0 CELLPADDING='0' CELLSPACING='3'>
+<TR>
+<TD VALIGN='top' align=left><FONT SIZE='-2'>
+ SUMMARY:&nbsp;CONSTR&nbsp;|&nbsp;<a href='#method_summary'>METHOD</a>
+ </FONT></TD>
+<TD VALIGN='top' align=right><FONT SIZE='-2'>
+DETAIL:&nbsp;CONSTR&nbsp;|&nbsp;<a href='#method_detail'>METHOD</a>
+</FONT></TD>
+</TR>
+</table><hr>
+<h2>Class Pod::Classdoc::Project</h2>
+
+<hr>
+
+
+Generates and merges <a href='http://search.cpan.org/perldoc?Pod::ProjectDocs'>Pod::ProjectDocs</a>, <a href='http://search.cpan.org/perldoc?Pod::Classdoc'>Pod::Classdoc</a>,
+and <a href='http://search.cpan.org/perldoc?PPI::HTML::CodeFolder'>PPI::HTML::CodeFolder</a>output, then generates a Javascripted 
+tree widget (via <a href='http://search.cpan.org/perldoc?HTML::ListToTree'>HTML::ListToTree</a>) to navigate the merged
+manuals, classdocs, and folded/highlighted source code.
+
+
+<p>
+
+<dl>
+
+<dt><b>Author:</b></dt>
+	<dd>Dean Arnold</dd>
+
+<dt><b>See Also:</b></dt>
+	<dd><a href='http://search.cpan.org/perldoc?Pod::ProjectDocs'>Pod::ProjectDocs</a>,
+<br>
+<a href='http://search.cpan.org/perldoc?Pod::Classdoc'>Pod::Classdoc</a>,
+<br>
+<a href='http://search.cpan.org/perldoc?PPI::HTML::CodeFolder'>PPI::HTML::CodeFolder</a>,
+<br>
+<a href='http://search.cpan.org/perldoc?HTML::ListToTree'>HTML::ListToTree</a>
+
+</dd>
+
+<a name='exports'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#98B5EB'><th colspan=2 align=left><font size='+2'>Exported Symbols</font></th></tr>
+<tr><td align=right valign=top><a name='_e_renderProject'></a><code>renderProject</code></td><td align=left valign=top>()	the only public method
+</td></tr>
+
+</table>
+<p>
+
+<a name='summary'></a>
+
+<a name='method_summary'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#98B5EB'><th align=left><font size='+2'>Method Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#_f_renderProject'>renderProject</a>(Additions =&gt; <i>value</i>, Comments =&gt; <i>value</i>, Charset =&gt; <i>value</i>, CloseImage =&gt; <i>value</i>, CSSPath =&gt; <i>value</i>, Description =&gt; <i>value</i>, Download =&gt; <i>value</i>, Expandable =&gt; <i>value</i>, Force =&gt; <i>value</i>, Heredoc =&gt; <i>value</i>, Imports =&gt; <i>value</i>, IconPath =&gt; <i>value</i>, JSPath =&gt; <i>value</i>, Language =&gt; <i>value</i>, Libs =&gt; <i>value</i>, MinFoldLines =&gt; <i>value</i>, NoIcons =&gt; <i>value</i>, NoSource =&gt; <i>value</i>, OpenImage =&gt; <i>value</i>, Order =&gt; <i>value</i>, Output =&gt; <i>value</i>, POD =&gt; <i>value</i>, RootImage =&gt; <i>value</i>, Title =&gt; <i>value</i>, Verbose =&gt; <i>value</i>)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i>(class method)</i> 
+Generates merged project documentation from <a href='http://search.cpan.org/perldoc?Pod::ProjectDocs'>Pod::ProjectDocs</a>,
+<a href='http://search.cpan.org/perldoc?Pod::Classdoc'>Pod::Classdoc</a>, and <a href='http://search.cpan.org/perldoc?PPI::HTML::CodeFOlder'>PPI::HTML::CodeFOlder</a> output,
+with a table of contents widget generated from <a href='http://search.cpan.org/perldoc?HTML::ListToTree'>HTML::ListToTree</a>.
+</td></tr>
+</table>
+<p>
+
+<a name='method_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#98B5EB'>
+	<th align=left><font size='+2'>Method Details</font></th>
+</tr></table>
+
+<a name='_f_renderProject'></a>
+<h3>renderProject</h3>
+<pre>
+renderProject(Additions =&gt; <i>value</i>, Comments =&gt; <i>value</i>, Charset =&gt; <i>value</i>, CloseImage =&gt; <i>value</i>, CSSPath =&gt; <i>value</i>, Description =&gt; <i>value</i>, Download =&gt; <i>value</i>, Expandable =&gt; <i>value</i>, Force =&gt; <i>value</i>, Heredoc =&gt; <i>value</i>, Imports =&gt; <i>value</i>, IconPath =&gt; <i>value</i>, JSPath =&gt; <i>value</i>, Language =&gt; <i>value</i>, Libs =&gt; <i>value</i>, MinFoldLines =&gt; <i>value</i>, NoIcons =&gt; <i>value</i>, NoSource =&gt; <i>value</i>, OpenImage =&gt; <i>value</i>, Order =&gt; <i>value</i>, Output =&gt; <i>value</i>, POD =&gt; <i>value</i>, RootImage =&gt; <i>value</i>, Title =&gt; <i>value</i>, Verbose =&gt; <i>value</i>)
+</pre><p>
+<dl>
+<dd><i>(class method)</i> 
+Generates merged project documentation from <a href='http://search.cpan.org/perldoc?Pod::ProjectDocs'>Pod::ProjectDocs</a>,
+<a href='http://search.cpan.org/perldoc?Pod::Classdoc'>Pod::Classdoc</a>, and <a href='http://search.cpan.org/perldoc?PPI::HTML::CodeFOlder'>PPI::HTML::CodeFOlder</a> output,
+with a table of contents widget generated from <a href='http://search.cpan.org/perldoc?HTML::ListToTree'>HTML::ListToTree</a>.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><table border=0><tr><td align=left valign=top><code>Additions</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>HTML document to be appended to the TOC widget
+</td></tr>
+<tr><td align=left valign=top><code>Comments</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>boolean; if true (the default), fold comments in PPI::HTML::CodeFolder output
+</td></tr>
+<tr><td align=left valign=top><code>Charset</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>specifies character set for Pod::ProjectDocs
+</td></tr>
+<tr><td align=left valign=top><code>CloseImage</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>name of closed node icon in TOC; default 'closedbook.gif'
+</td></tr>
+<tr><td align=left valign=top><code>CSSPath</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>path to CSS files; default is <code>&lt;Output&gt;/css</code>
+</td></tr>
+<tr><td align=left valign=top><code>Description</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>specifies description header for Pod::ProjectDocs
+</td></tr>
+<tr><td align=left valign=top><code>Download</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>specifies a download file to be appended to the TOC widget
+</td></tr>
+<tr><td align=left valign=top><code>Expandable</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>boolean; if true (the default), folds in PPI::HTML::CodeFolder output are expandable
+</td></tr>
+<tr><td align=left valign=top><code>Force</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>boolean; if true, forces generation of all Pod::ProjectDocs documents
+</td></tr>
+<tr><td align=left valign=top><code>Heredoc</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>boolean; if true (the default), fold heredocs in PPI::HTML::CodeFolder output
+</td></tr>
+<tr><td align=left valign=top><code>Imports</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>boolean; if true (the default), fold imports in PPI::HTML::CodeFolder output
+</td></tr>
+<tr><td align=left valign=top><code>IconPath</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>path to icon images for TOC; default is <code>&lt;Output&gt;/img</code>
+</td></tr>
+<tr><td align=left valign=top><code>JSPath</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>path to Javascript files; default is <code>&lt;Output&gt;/js</code>
+</td></tr>
+<tr><td align=left valign=top><code>Language</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>specifies language info for Pod::ProjectDocs
+</td></tr>
+<tr><td align=left valign=top><code>Libs</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>library directories to be processed; defaults to './lib' and './bin'
+</td></tr>
+<tr><td align=left valign=top><code>MinFoldLines</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>minimum number of lines for codefolding; default 4
+</td></tr>
+<tr><td align=left valign=top><code>NoIcons</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>boolean; if true (default false), TOC will not use icons
+</td></tr>
+<tr><td align=left valign=top><code>NoSource</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>boolean; if true (default false), omit PPI::HTML::CodeFolder source processing
+</td></tr>
+<tr><td align=left valign=top><code>OpenImage</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>name of open node icon in TOC; default 'openbook.gif'
+</td></tr>
+<tr><td align=left valign=top><code>Order</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>arrayref of package/script names; TOC nodes will be ordered in same order
+						as this list. Any unlisted packages/scripts will be alphabetically ordered
+						after these nodes are included.
+</td></tr>
+<tr><td align=left valign=top><code>Output</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>root path of output files; default './classdocs'
+</td></tr>
+<tr><td align=left valign=top><code>POD</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>boolean; if true (the default), fold POD in PPI::HTML::CodeFolder output
+</td></tr>
+<tr><td align=left valign=top><code>RootImage</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>name of root node icon in TOC; default 'globe.gif'
+</td></tr>
+<tr><td align=left valign=top><code>Title</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>title string for HTML document, and root node of TOC
+</td></tr>
+<tr><td align=left valign=top><code>Verbose</code></td><td valign=top align=center> =&gt; </td><td align=left><i>(optional)</i>boolean; if true, emits lots of diagnostic info
+
+</td></tr>
+</table></dd>
+</dl></dd></dl><hr>
+
+<small>
+<center>
+<i>Generated by POD::ClassDoc 1.01 on Sat Aug 18 11:02:01 2007</i>
+</center>
+</small>
+</body>
+</html>

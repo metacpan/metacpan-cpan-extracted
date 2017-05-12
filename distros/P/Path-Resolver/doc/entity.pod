@@ -1,0 +1,81 @@
+
+A Resolver turns a Path into an Link
+
+An Link links to one of three types:
+
+  * a Resolver (a directory)
+  * a Redirect (a symlink)
+  * a Regular (a regular file)
+
+You get a link with:
+
+  $resolver->link_at($path); # returns undef or a "Link" to any of the above
+
+These methods get the link, assert that it's the right kind, and return the
+thing linked to.
+
+  $resolver->resolver_at($path); # return undef if !-e, die if !-d ?
+  $resolver->redirect_at($path); # return undef if !-e, die if !-l ?
+  $resolver->regular_at($path);  # return undef if !-e, die if !-f ?
+
+Some resolvers may be sparse.  Imagine a hashref resolver that has a structure
+like this:
+
+  {
+    foo => {
+      bar => {
+        baz => Regular($thing),
+      },
+    },
+  }
+
+We want /foo/bar/baz to resolve to a Regular link to C<$thing>, but we don't
+want to have to put a Resolver link at each of foo and bar.  That's fine,
+because the hash-based resolver can traverse the hashref privately, using its
+own semantics, and only produce a Regular link as needed.
+
+If someone calls L<link_at('/foo')>, a proxy resolver can be generated that
+will store L<[qw(foo)]> and the root resolver as attributes, then responds to
+further link_at calls by prepending the saved path and consulting the original
+resolver.
+
+Note that I<for now> we can just generate these proxy resolvers as needed.
+That means that two calls to C<link_at('/foo')> would produce two distinct link
+objects, with no sufficiently unique identifier between them.  This means we
+can't get the equivalent of the "dev" and "ino" values from the link the way we
+could for a filesystem link with stat.  This will probably not be needed.  For
+now, C<link_at> should be used sparingly, and should be treated as a volatile
+or even a private method.
+
+Note also that we put a real Regular link object in the hashref above, instead
+of generating it dynamically.  This is going to be needed if we ever want to
+store things that would be ambiguous otherwise.  For example, what if the
+Regular link is pointing to another Resolver object?  This should be unusual,
+but we'll probably be a lot happier to have the required link than not.
+
+Resolvers should transparently follow redirects, just as the operating system
+transparently follows symlinks.  They can be retrieved with C<redirect_at> if
+needed, like unix C<readlink>.
+
+Resolvers might (must?) provide a C<mount> method to add a subresolver at a
+given path location.  The path must not exist before mounting.  To perform a
+union mount, you would instead create a new multiplexing-by-order resolver,
+then unmount the old resolver and mount the new one in its place.  (An atomic
+C<replace_mount> method could be provided if needed.)
+
+Resolvers might provide an C<add_link> method, or C<add_X> methods for the
+various link types.  They also might provide an C<unlink> method.
+
+Resolvers might be I<finite>, meaning they can be traversed by a hypothetical
+C<find_all_regular_link_targets> routine that would behave like C<find . -type
+f>.  If a resolver is finite, it should have a predicate like
+C<is_deeply_finite>, or should use something like that as its normal finiteness
+test, so that mounting an infinite resolver somewhere on the finite one causes
+it to no longer report itself as entirely finite.
+
+Resolvers might provide a C<rename> method.
+
+Mounted resolvers should probably know their parents, so that C<..> can work.
+If a single resolver can be mounted at more than one point, then all resolvers
+will probably have to be wrapped in proxies that know the name through with
+the underlying resolvers were accessed.

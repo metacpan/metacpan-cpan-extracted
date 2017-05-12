@@ -1,0 +1,133 @@
+#!/usr/local/bin/perl -w
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
+#
+# This file demonstrates the default templates/
+#
+
+use lib '../..';
+use PPresenter;
+
+my $show = PPresenter->new
+   ( -name       => 'Template demo'
+   , -geometry   => '640x480'
+   );
+
+$show->change(template => 'ALL', -showTemplateOutlines => 3);
+$show->select(fontset  => 'scaling');
+
+$show->addSlide
+   ( -title      => 'default title main'
+   , -template   => 'tm'
+   , -main       => <<MAIN
+aliases:
+<UL>
+<LI>dtm
+<LI>title main
+<LI>tm
+<LI>default
+</UL>
+MAIN
+    );
+
+$show->addSlide
+   ( -title      => 'default title left right'
+   , -template   => 'tlr'
+   , -left       => <<LEFT
+aliases:
+<UL>
+<LI>title left right
+<LI>dtlr
+<LI>tlr
+</UL>
+LEFT
+   , -right      => <<RIGHT
+aliases:
+<UL>
+<LI>default title right left
+<LI>title right left
+<LI>dtrl
+<LI>trl
+</UL>
+more
+RIGHT
+    );
+
+$show->addSlide
+   ( -title      => 'bltr'
+   , -template   => 'bltr'
+   , -left       => <<LEFT
+aliases:
+<UL>
+<LI>dbltr
+<LI>dtrbl
+<LI>bltr
+<LI>trbl
+<LI>big-left title right
+<LI>title right big-left
+</UL>
+LEFT
+   , -right      => 'name:<UL><LI>default big-left title right</UL>'
+    );
+
+$show->addSlide
+   ( -title      => 'brtl'
+   , -template   => 'brtl'
+   , -right      => <<RIGHT
+aliases:
+<UL>
+<LI>dbrtl
+<LI>dtlbr
+<LI>brtl
+<LI>tlbr
+<LI>big-right title left
+<LI>title left big-right
+</UL>
+RIGHT
+   , -left       => 'name:<UL><LI>default big-right title left</UL>'
+    );
+
+$show->addSlide
+   ( -title      => 'default title'
+   , -template   => 'title'
+   , -place      => [ [ 0.1, 0.2, 0.3, 0.5, <<PLACE ] ]
+aliases (shown with <CODE>-place</CODE>)<BR>
+<UL>
+<LI>dt
+<LI>title
+<LI>t
+</UL>
+PLACE
+   );
+
+$show->addSlide
+   ( -title      => 'default main'
+   , -template   => 'main'
+   , -main       => <<MAIN
+name:
+<UL>
+<LI>default main
+</UL>
+<P>
+aliases:
+<UL>
+<LI>dm
+<LI>main
+<LI>m
+</UL>
+MAIN
+    );
+
+$show->addSlide
+   ( -title      => 'default empty'
+   , -template   => 'empty'
+   , -place      => [ [ 0.1, 0.2, 0.3, 0.5, <<PLACE ] ]
+aliases (shown with <CODE>-place</CODE>)<BR>
+<UL>
+<LI>de
+<LI>empty
+<LI>e
+</UL>
+PLACE
+   );
+
+$show->run;

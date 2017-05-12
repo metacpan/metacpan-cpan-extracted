@@ -1,0 +1,8 @@
+#pragma once
+#ifdef seed
+#  undef seed
+#  include <algorithm>
+#  define seed() Perl_seed(aTHX)
+#else
+#  include <algorithm>
+#endif

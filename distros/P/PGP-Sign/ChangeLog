@@ -1,0 +1,270 @@
+2007-04-27  Russ Allbery  <rra@stanford.edu>
+
+	* VERSION.pm: PGP::Sign 0.20 released.
+
+	* t/basic.t: Add reasons for the skipped tests.
+	* t/locale.t: Likewise.
+
+	* t/pod.t: New check for POD formatting.
+
+2007-04-22  Russ Allbery  <rra@stanford.edu>
+
+	* makepm.PL: Unbuffer output since we're prompting the user.
+
+2004-08-08  Russ Allbery  <rra@stanford.edu>
+
+	* VERSION.pm: PGP::Sign 0.19 released.
+
+	* Sign.in: Remove e-mail addresses from HISTORY since the
+	documentation is automatically put on the web.
+
+	* test.pl: Moved to...
+	* t/basic.t: ...here.  Updated the search for the data directory
+	accordingly.  Print more information when detached signatures fail
+	to verify.
+	* t/locale.t: New test.
+
+	* Sign.in (pgp_verify): Replaced verification code for GnuPG with
+	code that uses --status-fd, so that it will work independent of
+	locale.  Documented limitations in the error reporting and
+	recommended setting TMPDIR.
+
+2004-08-04  Russ Allbery  <rra@stanford.edu>
+
+	* VERSION.pm: PGP::Sign 0.18 released.
+
+	* debian/changelog: Add Debian packaging files.
+	* debian/compat: Likewise.
+	* debian/control: Likewise.
+	* debian/copyright: Likewise.
+	* debian/rules: Likewise.
+
+	* Makefile.PL: Also remove trustdb.gpg; GnuPG generates it
+	automatically and the copy we were distributing contained nothing
+	of interest.
+	* data/trustdb.gpg: Delete.
+
+2002-06-28  Russ Allbery  <rra@stanford.edu>
+
+	* VERSION.pm: PGP::Sign 0.17 released.
+
+	* Sign.in: Update CAVEATS to be slightly less optimistic about the
+	chances of a major overhaul.  Add a URL for RFC 2440 and this
+	module's web site.  Add a COPYRIGHT AND LICENSE section.  Update
+	the markup in the documentation.
+
+2000-10-08  Russ Allbery  <rra@stanford.edu>
+
+	* test.pl: Skip test 9 completely under GnuPG, as the whitespace
+	behavior changes from release to release; GnuPG 1.0.2 is back to
+	the previous behavior of releases before GnuPG 1.0.1.
+
+	* Makefile.PL: Added random_seed to @clean, created by GnuPG 1.0.2.
+
+2000-02-12  Russ Allbery  <rra@stanford.edu>
+
+	* VERSION.pm: PGP::Sign 0.16 released.
+
+	* Makefile.PL: Clean up all the additional junk created in data by
+	running the test suite with PGP 6.5.
+
+	* makepm.PL: Also look for PGP 6.5, distinguish between PGP 2 and
+	PGP 6 by checking its output when run without any arguments, and
+	add the PGP6 PGPSTYLE.
+
+	* Sign.in: Added a waitpid() in pgp_verify() to avoid leaving
+	zombies behind.	 Updated comments and documentation for the new
+	support for PGP 6.5.2 and for the change to GnuPG so that it does
+	the same whitespace munging as PGP.
+
+2000-02-06  Russ Allbery  <rra@stanford.edu>
+
+	* test.pl: The signature in test 9 now expected to fail on all
+	versions of PGP, as the release GnuPG was changed to follow PGP in
+	its handling of whitespace.
+
+1999-06-13  Russ Allbery  <rra@stanford.edu>
+
+	* VERSION.pm: PGP::Sign 0.15 released.
+
+	* Sign.in: Added a call to fcntl() to clear close-on-exec on the
+	passphrase pipe in pgp_sign(), needed for Perl 5.005_03.  Added a
+	note to the documentation that PGP may want to write randseed.bin
+	in its key ring directory.
+
+	* Makefile.PL: Sign.in and Sign.pm moved to the root directory,
+	updated ABSTRACT.
+
+	* makepm.PL: Sign.in and Sign.pm moved to the root directory.
+
+1999-02-10  Russ Allbery  <rra@stanford.edu>
+
+	* VERSION.pm: PGP::Sign 0.14 released.
+
+	* PGP/Sign.in: Use long options with GnuPG rather than -bat, add
+	--force-v3-sigs so that generated signatures will be compatible
+	with PGP 5.0, and added documentation of this.
+
+	* makepm.PL: Search for gpg and pgps as well, set both PGPS and
+	PGPV with prompts and guesses for each, prompt for and set
+	PGPSTYLE, and pick up overrides to avoid interactivity from a file
+	rather than from the command line.
+
+	* Makefile.PL: Added support for PGPS, PGPV, and PGPSTYLE settings
+	on the command line, changed to guess a few things if not
+	specified and to pass values to makepm.PL via a separate file
+	rather than the command line.  Ugly hack to fix Makefile
+	dependencies removed, since it's no longer necessary.
+
+1999-02-09  Russ Allbery  <rra@stanford.edu>
+
+	* test.pl: Changed the testing key ID to "testing", added special
+	casing on PGPSTYLE for testing signatures of whitespace-munged
+	data against unmunged data since GnuPG will still consider the
+	signature valid, added two new tests for version 3 and version 4
+	DSS signatures, and had GnuPG skip the PGP 2.6.2 RSA signature
+	check.
+
+	* PGP/Sign.in: Added support for GnuPG and PGP 5.0.  This involves
+	a new PGPSTYLE global variable, support for separate programs for
+	signing and verification, and lots of choosing between styles all
+	over the code.	The documentation has also been updated to reflect
+	this support, including a long note about whitespace munging
+	incompatibilities between different versions and warnings about
+	potential future API changes for this module.  Also added a SEE
+	ALSO section and a thank you to the folks who send in GnuPG
+	support originally.
+
+	* data/message.asc.v4: New file.  Version 4 DSS signature.
+
+	* data/message.asc: New file.  Version 3 DSS signature.
+
+	* data/pubring.gpg: New file.  GnuPG key ring for testing.
+	* data/secring.gpg: New file.
+	* data/trustdb.gpg: New file.
+
+	* data/pubring.pkr: New file.  PGP 5.0 key ring for testing.
+	data/secring.pkr: New file.
+
+	* data/message.sig: Renamed from message.asc; this is the PGP
+	2.6.2 RSA signature.
+
+	* data/pubring.pgp: Change key ID of test key to testing, since
+	GPG requires at least five characters in the key ID.
+	data/secring.pgp: Likewise.
+
+1998-12-04  Russ Allbery  <rra@stanford.edu>
+
+	* VERSION.pm: PGP::Sign 0.13 released.
+
+	* Makefile.PL: Add two ugly hacks, one to let someone set the path
+	to PGP on the command line of "perl Makefile.PL," and the second
+	to strip the resulting extra dependency from the processPL
+	section.  Pass the path to PGP to makepm.PL on the command line if
+	it's given.
+
+	* makepm.PL: Add support for accepting the path to PGP on the
+	command line (and not prompting in that case).
+
+1998-12-02  Russ Allbery  <rra@stanford.edu>
+
+	* VERSION.pm: PGP::Sign 0.12 released.
+
+	* makepm.PL: The path to PGP that the user inputs should override
+	any other path to PGP that we find.
+
+1998-11-27  Russ Allbery  <rra@stanford.edu>
+
+	* VERSION.pm: PGP::Sign 0.11 released.
+
+	* Makefile.PL: Added a MAN3PODS directive to prevent MakeMaker
+	from generating a PGP::PGP::Sign man page, changed the formatting
+	of the 5.005-only section.
+
+1998-11-26  Russ Allbery  <rra@stanford.edu>
+
+	* Makefile.PL: Added ABSTRACT and AUTHOR for Perl versions 5.005
+	and higher.  This is for the PPD to go with a binary distribution,
+	and for Perl Resource Kits.
+
+	* VERSION.pm: PGP::Sign 0.10 released.
+
+	* PGP/Sign.in: Modified to be PGP/Sign.in instead of Sign.pm,
+	added special markers for the path to PGP and the version number,
+	added support for $PGPPATH, fixed a bug in finding the PGP version
+	number of a signature, cleaned up and reformatted the
+	documentation, added a note about PGP environment variables, added
+	bugs concerning our lack of support for PGP v5 and GPG, added a
+	thank you to Andrew Ford in the history section of the
+	documentation.
+
+	* Makefile.PL: Run makepm.PL to generate PGP/Sign.pm, tell
+	MakeMaker where the actual module is, and get our version number
+	from VERSION.pm now.
+
+	* makepm.PL: New file.	Now generate PGP/Sign.pm automatically
+	from this file, which finds and prompts for the path to PGP and
+	grabs the version from VERSION.pm.
+
+	* VERSION.pm: New file.	 We now pull our release version number
+	from here rather than the CVS revision of Sign.in.
+
+	* test.pl: New file.  Added a reasonably good test suite that
+	works with public and private key rings included with the
+	distribution.  Based on work by Andrew Ford.
+
+	* data/message: New file.
+	* data/message.asc: New file.
+	* data/pubring.pgp: New file.
+	* data/secring.pgp: New file.
+
+1998-07-05  Russ Allbery  <rra@stanford.edu>
+
+	* Sign.pm: PGP::Sign 0.9 released.
+
+	* Sign.pm: Fixed the way I was dealing with open3() file handles
+	and $?.	 One needs to keep the PID and do an explicit waitpid(),
+	or the status you get may be something random.	Also cleaned
+	things up a little and explicitly set $/ in case our calling
+	program had it set to something odd.
+
+1997-08-18  Russ Allbery  <rra@stanford.edu>
+
+	* Sign.pm: PGP::Sign 0.8 released.
+	
+	* Sign.pm (pgp_verify): Added a umask 077 (and restoration of
+	umask on completion) since we're creating temporary files.
+	(pgp_sign): Added a check to see if we got a signature at all.
+
+1997-08-15  Russ Allbery  <rra@stanford.edu>
+
+	* Sign.pm: PGP::Sign 0.7 released.
+
+	* Sign.pm (pgp_verify): Changed to use O_EXCL when opening /tmp
+	files to avoid symlink attacks.
+	
+	* Sign.pm: PGP::Sign 0.6 released.
+
+	* Sign.pm: Added output() to munge trailing spaces if $MUNGE is
+	set, modified write_data() to send everything through output()
+	rather than printing it directly, added documentation of the new
+	behavior to the PODs.
+
+1997-07-29  Russ Allbery  <rra@stanford.edu>
+
+	* Sign.pm: Removed $ORS, which was a hack that we don't need any
+	more.  That work should be done by the client, and the client is
+	capable of it.	Added a pgp_error() function (not exported by
+	default) to retrieve the error message, since that's a cleaner
+	user interface.	 Changed the signature verification code to verify
+	detached signatures, which means we now use temporary files.
+	Added a $TMPDIR global variable to specify the directory in which
+	to create temporary files.  Changed the documentation to include
+	notes about all of this.
+
+1997-07-27  Russ Allbery  <rra@stanford.edu>
+
+	* Sign.pm: Broke write_data() off into a separate function, added
+	pgp_verify() and tested it, changed the documentation to mention
+	it as well.  Fixed a few minor bugs, made to use @ERROR correctly,
+	added documentation.

@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Pod/Trial/LinkImg.pm
+lib/Pod/Trial/LinkImg/BrightIdea.png
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,536 @@
+Revision history for Perinci-Access-HTTP-Server
+
+0.60    2016-03-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.59    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.58    2015-04-14 (PERLANCAR)
+
+	- Tweak/fix dependencies in dist.ini [CT].
+
+
+0.57    2015-04-12 (PERLANCAR)
+
+	- Split peri-htserve CLI to App-PerinciUtils distribution.
+
+
+0.56    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.55    2014-11-07 (PERLANCAR)
+
+	- Use clone_and_clean() for cleaning results instead of clean_in_place()
+          for safety, function might return references to persistent object/data
+          etc (e.g. for debugging) that we don't want to clean.
+
+
+0.54    2014-10-24 (PERLANCAR)
+
+	- Only base64-encode binary result when formatting as JSON, as the
+	  other formats are binary safe.
+
+
+0.53    2014-10-23 (PERLANCAR)
+
+	- No functional changes.
+
+	- Bugfix: forgot to use module.
+
+
+0.52    2014-10-23 (PERLANCAR)
+
+	- Add Riap 1.2 support (decoding of base64-encoded arguments,
+	  encoding of binary result, adding of riap.v attribute in result
+	  metadata).
+
+
+0.51     2014-09-06 (PERLANCAR)
+
+         - No functional changes.
+
+         - Adjust to Perinci::Sub::Wrapper (_perinci.sub.wrapper.validate_* is
+           now renamed).
+
+
+0.50     2014-07-22 (SHARYANTO)
+
+         - Switch CLI scripts from using Perinci::CmdLine to
+           Perinci::CmdLine::Any to reduce size of dependencies.
+
+
+0.49     2014-07-04 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - peri-htserve: Change syntax of adding package from "Foo::Bar,noload"
+           (ugly) to "+Foo::Bar".
+
+         [ENHANCEMENTS]
+
+         - peri-htserve: Add hints showing API-endpoint URLs.
+
+         - peri-htserve: Option -m, -M, -I now order-aware (using
+           cmdline_on_getopt).
+
+
+0.48     2014-07-03 (SHARYANTO)
+
+         - peri-htserve: Add options -m & -M.
+
+         - peri-htserve: Allow ',noload' suffix to module, to allow specifying a
+           package and not loading the module (just so it is allowed to be
+           accessed).
+
+
+0.47     2014-06-20 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Instead of using Perinci::Result::Format's $Enable_Cleansing, do
+           response cleansing ourselves because we'll need it somewhere else
+           e.g. in access log.
+
+
+0.46     2014-06-20 (SHARYANTO)
+
+         - peri-htserve: Add options --gepok-start-servers, --metadb (for
+           testing).
+
+
+0.45     2014-06-11 (SHARYANTO)
+
+         - No functional changes.
+
+         - Second attempt at localizing setting -env.
+
+
+0.44     2014-06-11 (SHARYANTO)
+
+         - No functinal changes.
+
+         - Forgot to set JSON's allow_blessed & convert_blessed. D'oh.
+
+
+0.43     2014-06-11 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - PeriAHS::LogAccess middleware: stringify Perl objects when logging,
+           to avoid JSON throwing exceptions when encountering objects (either
+           in arguments or function results).
+
+         - PeriAHS::Respond middleware: set -env locally so it doesn't interfere
+           with other modules, e.g. LogAccess (getting blessed refs).
+
+
+0.42     2014-06-11 (SHARYANTO)
+
+         [NEW FEATURES]
+
+         - PeriAHS::Respond middleware: Add configuration 'pass_psgi_env'
+
+         [BUG FIXES]
+
+         - Fix logic bug that sets port to default 80/443.
+
+
+0.41     2014-04-30 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Perinci::Access::Perl 0.66 (extra_wrapper_convert renamed
+           to set_function_properties).
+
+
+0.40     2014-04-16 (SHARYANTO)
+
+         - Skip logging detail information (args & resp) for unimportant actions
+           (currently: list, info, meta) to reduce clutter.
+
+
+0.39     2014-03-26 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Don't let match_uri override 'uri' request key specified through
+           'X-Riap-Uri' header.
+
+
+0.38     2014-03-26 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - PeriAHS::ParseRequest middleware: riap_uri_prefix must be prepended
+           before we do special handling for PHP clients.
+
+
+0.37     2014-03-21 (SHARYANTO)
+
+         - PeriAHS::ParseRequest middleware: add 'match_uri_errmsg'
+           configuration to show custom error message.
+
+
+0.36     2013-12-21 (SHARYANTO)
+
+         - Support Riap::HTTP 1.1.22.
+
+         - bin/peri-htserve: Add option --noenable-logging.
+
+         - PeriAHS::Respond middleware: add enable_logging configuration to
+           allow server to not support logging.
+
+
+0.35     2013-12-20 (SHARYANTO)
+
+	 - For security, default Riap client used changed from Perinci::Access
+           to Perinci::Access::Schemeless so the Riap server cannot be used to
+           fetch remote URI's.
+
+         - bin/peri-htserve: Set 'allow_paths' of Riap client so users don't see
+           paths of other modules not specified in cmdline argument.
+
+         - Add example scripts: perl-any.psgi and perl-some.psgi.
+
+
+0.34     2013-11-27 (SHARYANTO)
+
+	 - No functional changes. Adjust to newer Perinci::Access::Perl 0.55+.
+
+
+0.33     2013-11-12 (SHARYANTO)
+
+ 	 - No functional changes. Rebuild to fix t/00-compile.t generated by
+	   older DZP::Test::Compile (2.019 < x < 2.033).
+
+
+0.32     2013-10-15 (SHARYANTO)
+
+         - Use Data::Clean::FromJSON because JSON creates JSON::{PP,XS}::Boolean
+           objects that currently trip Data::Sah-generated validator code.
+
+
+0.31     2013-09-16 (SHARYANTO)
+
+         - No functional changes. Replace Perinci::Access::InProcess with ::Perl
+           and ::Schemeless.
+
+
+0.30     2013-09-06 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - ParseRequest: Add deconfuse_php_clients & php_clients_ua_re to handle
+           PHP clients which often send {} instead of [] (or vice versa) due to
+           both being Array() in PHP. The server can now convert argument value
+           [] to {} if the function expects a hash, or {} to [] if the function
+           expects an array.
+
+         - peri-htserve: Add --user and --password option to test giving HTTP
+           auth (not yet working? user/pass entered -> unauthorized)
+
+
+0.29     2013-07-06 (SHARYANTO)
+
+         [ARCH]
+
+         - Push data cleansing one layer down to Perinci::Result::Format (see
+           that module for more details).
+
+         [ENHANCEMENTS]
+
+         - Turn off Text::ANSITable stuffs that make text-pretty format looks
+           nice in terminals but ugly in browser (UNICODE, COLOR, BOX_CHARS)
+
+
+0.28     2013-04-04 (SHARYANTO)
+
+         - This release contains enhancements for self-discoverability,
+           especially for command-line browser (e.g. curl).
+
+         [ENHANCEMENTS]
+
+         - Default action for package entity is now 'list' instead of 'call'.
+
+         - Add text tips on text responses (along with new ParseRequest
+           configurations: riap_uri_prefix, server_{host,port,path},
+           get_http_request_url).
+
+
+0.27     2013-04-04 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Under marklog' Riap request turned on, the server now sends log
+           messages and Riap response in a new encoding (now uses 'l'/'r' +
+           <number-of-bytes> + ' ' + <data> instead of just 'L'/'R' + <data>)
+           since the old encoding is unreliable due to HTTP chunks is not 1:1
+           depending on the PSGI server used.
+
+         - (Temporarily?) requires the correct/updated Riap::HTTP client:
+           Perinci::Access::HTTP::Client 0.07.
+
+
+0.26     2013-03-15 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Log $env->{REMOTE_USER} instead of $env->{HTTP_USER} (typo).
+
+
+0.25     2013-03-08 (SHARYANTO)
+
+         - LogAccess middleware: Support logging to objects which have write(),
+           like File::Write::Rotate (in addition to objects which have
+           syswrite() and log()).
+
+         - peri-htserve: Use File::Write::Rotate for Riap access log instead of
+           plain filehandle (to support self-rotation of log files).
+
+
+0.24     2013-03-07 (SHARYANTO)
+
+         - No functional changes.
+
+         [BUG FIXES]
+
+         - Avoid perl undef warning when uri/action Riap keys are not defined.
+
+
+0.23     2013-03-01 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Avoid sending colored YAML/JSON output.
+
+
+0.22     2013-03-01 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add support for reform (parse_reform argument), currently untested.
+
+         - Add --parse-{path-info,reform,form} options to peri-htserve.
+
+         [BUG FIXES]
+
+         - Only match URI against match_uri if match_uri is set.
+
+         - Several other minor fixes to code/doc.
+
+         [ETC]
+
+         - Add example scripts (auth.psgi, authz.psgi).
+
+
+0.21     2012-08-10 (SHARYANTO)
+
+         - No functional changes. Update dependencies.
+
+
+0.20     2012-08-03 (SHARYANTO)
+
+         - No functional changes. Replace
+           Perinci::Sub::property::result_postfilter with Data::Clean::JSON
+           (works better, less wasteful code generation if there are hundreds+
+           of functions).
+
+
+0.19     2012-08-03 (SHARYANTO)
+
+         - Third time's the charm to work around PAUSE, now uses Module::Patch.
+
+         - Fix srvinfo action, fmt was empty.
+
+
+0.18     2012-08-03 (SHARYANTO)
+
+         No functional changes. Try again.
+
+
+0.17     2012-08-03 (SHARYANTO)
+
+         - No functional changes. Reupload to work around PAUSE (erronous)
+           version checking.
+
+
+0.16     2012-08-02 (SHARYANTO)
+
+         - peri-htserve: Add --library (-I).
+
+
+0.15     2012-08-02 (SHARYANTO)
+
+         - Update to Rinci 1.1.10 (rename scheme pm -> pl).
+
+         - Support passing transaction options to Perinci::Access::InProcess.
+
+         - A couple other fixes.
+
+
+0.14     2012-04-03 (SHARYANTO)
+
+         - No functional changes. Small fixes and tweaks, e.g. respect 'Accept'
+           request header, require at least one module in 'peri-htserve', etc.
+
+
+0.13     2012-03-30 (SHARYANTO)
+
+         - Rename distribution from Sub-Spec-HTTP-Server to
+           Perinci-Access-HTTP-Server. Follow Riap 1.1 specification.
+
+         - Rename/refactor some middlewares.
+
+         - Rename script from 'servepm' to 'peri-htserve'.
+
+         - Formatting now uses Perinci::Result::Format.
+
+         - Can log Riap access log to file or a
+           IO::Handle-/Log::Dispatch::Output-like object.
+
+
+0.12     2012-01-20 (SHARYANTO)
+
+         - No functional changes. Mark deprecation.
+
+
+0.11     2011-10-28 (SHARYANTO)
+
+         - No functional changes. Better error messages when module and/or sub
+           is not specified in URL.
+
+
+0.10     2011-10-24 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - serverpm: Support Starman.
+
+
+0.09     2011-10-24 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add a simple command-line front-end 'servepm'
+
+         [INCOMPATIBLE CHANGES]
+
+         - Rename 'allowable_*' middleware configs to 'allowed_*'.
+
+         [BUG FIXES]
+
+         - Require latest Log::Any::Adapter::Callback to properly filter log
+           messages according to client-specified level.
+
+         - Some other fixes.
+
+
+0.08     2011-10-05 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Support JSONP (using the common http://host/blah?callback=funcName,
+           as supported by jQuery).
+
+
+0.07     2011-09-01 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - To set SS request variables via HTTP header, now use 'X-SS-Req-xxxxx'
+           instead of 'X-SS-xxxxx'.
+
+         - Output format 'php' becomes 'phps'.
+
+         [ENHANCEMENTS]
+
+         - To set SS request variables via HTTP form variables, use
+           '-ss-req-XXXXX'.
+
+         - Implement 'about' command.
+
+         - Implement 'list_subs' command.
+
+         - Implement 'spec command.
+
+         - Implement 'usage' command.
+
+         [INTERNAL]
+
+         - now uses Sub::Spec::URI so can be set as a proxy (access another
+           remote sub).
+
+         [ETC]
+
+         - Specification formalized, separated into Sub-Spec-HTTP.
+
+         - Various fixes.
+
+
+0.06     2011-08-20 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Web server portion refactored out into separate distribution (Gepok).
+           Now PSGI-based and more modular, each phase (e.g. request parsing,
+           module loading, authorization, command execution, etc) separated as
+           middleware. Some commands not yet implemented (help, spec, etc). No
+           tests yet.
+
+
+0.05     2011-06-17 (SHARYANTO)
+
+         - No functional changes. Extract SHARYANTO:: modules to
+           SHARYANTO-Utils.
+
+
+0.04     2011-05-31 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - fix code order to make sure we send chunked response when
+           X-SS-Mark-Chunk or X-SS-Log-Level request header is set to true
+           value.
+
+
+0.03     2011-05-25 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - remove unneeded use statement (Data::Dump::Partial &
+           Data::Dump::OneLine) [cpantesters]
+
+         [ETC]
+
+         - do not log response content on help request, to reduce log size.
+
+
+0.02     2011-05-20 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - before_prefork() didn't get called.
+
+         - (build) Add missing dep: HTTP::Request::AsCGI
+
+         - Lots of other small fixes in code & POD.
+
+
+0.01     2011-05-19 (SHARYANTO)
+
+         - First release.

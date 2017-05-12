@@ -1,0 +1,29 @@
+<h1>[%l('Terms and Conditions')%]</h1>
+
+<p>
+[%l('ACCEPT TERMS')%]:
+</p>
+
+<div class="site_terms">
+    [% ForumCode.forumcode(latest_terms.content) %]
+    <div style="text-align: right;">
+    [%l('Last Modified')%]: [% nicedate(latest_terms.created) %]
+    </div>
+</div>
+
+[% IF latest_terms.change_summary %]
+<h1>[%l('Summary of Changes')%]</h1>
+<div class="site_terms">
+    [% ForumCode.forumcode(latest_terms.change_summary) %]
+</div>
+[% END %]
+
+<div class="site_terms" style="border: none; text-align: center;">
+    <form method="post" action="terms/accept" />
+
+    <input type="submit" name="terms_accept" value="[%l('TERMS AGREE')%]" />
+    <br />
+    <input type="submit" name="terms_reject" value="[%l('TERMS REJECT')%]" />
+
+    </form>
+</div>

@@ -1,0 +1,8 @@
+DESCRIPTION
+
+    Currently used by Perinci::CmdLine::Lite and App::riap. Eventually I
+    want Perinci::CmdLine to use this also (needs prettier and more
+    sophisticated formatting options first though).
+
+SEE ALSO
+

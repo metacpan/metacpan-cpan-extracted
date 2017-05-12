@@ -1,0 +1,57 @@
+grp:3;3
+fd:2
+ifd:2
+dp:.
+ts: 
+cs:man.
+ics:AZM
+csa:r
+css:1
+ns:-
+ps:+
+dtf:%A, %d %B %Y %H:%M:%S
+df:%d.%m.%Y
+tf:%H:%M:%S
+apf:
+amu:
+pmu:
+aml:
+pml:
+lm1:yanvar
+lm2:fevral
+lm3:mart
+lm4:aprel
+lm5:may
+lm6:iyun
+lm7:iyul
+lm8:avqust
+lm9:sentyabr
+lm10:oktyabr
+lm11:noyabr
+lm12:dekabr
+sm1:Yan
+sm2:Fev
+sm3:Mar
+sm4:Apr
+sm5:May
+sm6:İyn
+sm7:İyl
+sm8:Avq
+sm9:Sen
+sm10:Okt
+sm11:Noy
+sm12:Dek
+ld1:bazar günü
+ld2:bazar ertəsi
+ld3:çərşənbə axşamı
+ld4:çərşənbə
+ld5:cümə axşamı
+ld6:cümə
+ld7:şənbə
+sd1:baz
+sd2:ber
+sd3:çax
+sd4:çər
+sd5:cax
+sd6:cüm
+sd7:şnb

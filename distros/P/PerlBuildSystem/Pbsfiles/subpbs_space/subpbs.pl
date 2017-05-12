@@ -1,0 +1,3 @@
+
+AddRule 'something', ['*/something'] ;
+

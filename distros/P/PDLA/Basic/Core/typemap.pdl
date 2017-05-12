@@ -1,0 +1,31 @@
+TYPEMAP
+pdl*	T_PDLA
+pdl *	T_PDLA
+pdl_trans * T_PDLATRANS
+pdl_trans* T_PDLATRANS
+Logical	T_IV
+PDLA_Indx  T_IV
+float	T_NV
+PDLA_Anyval  T_PDLA_ANYVAL
+
+INPUT
+
+T_PDLA
+	$var = PDLA->SvPDLAV($arg)
+T_PDLA_ANYVAL
+	$var = (double)SvNV($arg)
+T_PDLATRANS
+	if(sv_isa($arg,\"PDLA::Trans\"))
+		$var = INT2PTR(pdl_trans *,SvIV(SvRV($arg)));
+	else
+	        croak(\"$var is not of type PDLA::Trans\")
+
+
+OUTPUT
+
+T_PDLA
+	PDLA->SetSV_PDLA($arg,$var);
+T_PDLA_ANYVAL
+	sv_setnv($arg, (double)$var); 
+T_PDLATRANS
+	sv_setref_pv($arg, \"PDLA::Trans\", (void*)$var);

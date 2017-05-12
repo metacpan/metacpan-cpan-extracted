@@ -1,0 +1,50 @@
+2005-09-26 18:29  chris
+
+	* MANIFEST: Fix manifest
+
+2005-09-26 18:28  chris
+
+	* MANIFEST.SKIP, lib/Pod/FromActionscript.pm, t/asdoc2pod.t,
+	  t/example/foo.expect, t/example/foo.in: Add many regression tests
+	  Minor code tweaks
+
+2005-09-20 16:34  chris
+
+	* Build.PL, MANIFEST, MANIFEST.SKIP, lib/Pod/FromActionscript.pm,
+	  t/pod-coverage.t, t/pod.t: v0.52 Cleaned up docs, added SEE ALSO
+	  section Changed the names of many internal methods Added standard
+	  doc tests
+
+2005-08-10 09:31  chris
+
+	* lib/Pod/FromActionscript.pm: Fix regexp to work without
+	  Regexp::Common
+
+2005-08-10 09:26  chris
+
+	* lib/Pod/FromActionscript.pm: v0.51
+
+2005-08-10 09:26  chris
+
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL: Fix MANIFEST Fix
+	  Makefile.PL error
+
+2005-08-10 08:18  chris
+
+	* Build.PL, MANIFEST, Makefile.PL, README, lib/Pod/ASDoc2Pod.pm,
+	  lib/Pod/FromActionscript.pm, script/asdoc2pod, t/asdoc2pod.t:
+	  Change the module name from Pod::ASDoc2Pod to
+	  Pod::FromActionscript
+
+2005-08-09 13:17  chris
+
+	* Build.PL, LICENSE, MANIFEST, MANIFEST.SKIP, Makefile.PL, README,
+	  lib/Pod/ASDoc2Pod.pm, script/asdoc2pod, t/asdoc2pod.t: Initial
+	  revision
+
+2005-08-09 13:17  chris
+
+	* Build.PL, LICENSE, MANIFEST, MANIFEST.SKIP, Makefile.PL, README,
+	  lib/Pod/ASDoc2Pod.pm, script/asdoc2pod, t/asdoc2pod.t: initial
+	  import
+

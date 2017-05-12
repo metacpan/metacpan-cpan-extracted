@@ -1,0 +1,102 @@
+=pod
+
+=head1 NAME
+
+PerlIO::via::Timeout - a PerlIO layer that adds read & write timeout to a handle
+
+=head1 SYNOPSIS
+
+  use Errno qw(ETIMEDOUT);
+  use PerlIO::via::Timeout qw(:all);
+  open my $fh, '<:via(Timeout)', 'foo.html';
+
+  # set the timeout layer to be 0.5 second read timeout
+  read_timeout($fh, 0.5);
+
+  my $line = <$fh>;
+  if ($line == undef && 0+$! == ETIMEDOUT) {
+    # timed out
+    ...
+  }
+
+=head1 DESCRIPTION
+
+This package implements a PerlIO layer, that adds read / write timeout. This
+can be useful to avoid blocking while accessing a handle (file, socket, ...),
+and fail after some time.
+
+=head1 FUNCTIONS
+
+=head2 read_timeout
+
+  # set a read timeout of 2.5 seconds
+  read_timeout($fh, 2.5);
+  # get the current read timeout
+  my $secs = read_timeout($fh);
+
+Getter / setter of the read timeout value.
+
+=head2 write_timeout
+
+  # set a write timeout of 2.5 seconds
+  timeout_layer($fh)->write_timeout(2.5);
+  # get the current write timeout
+  my $secs = timeout_layer($fh)->write_timeout();
+
+Getter / setter of the write timeout value.
+
+=head2 enable_timeout
+
+  enable_timeout($fh);
+
+Equivalent to setting timeout_enabled to 1
+
+=head2 disable_timeout
+
+  timeout_layer($fh)->disable_timeout();
+
+Equivalent to setting timeout_enabled to 0
+
+=head2 timeout_enabled
+
+  # disable timeout
+  timeout_enabled($fh, 0);
+  # enable timeout
+  timeout_enabled($fh, 1);
+  # get the current status
+  my $is_enabled = timeout_enabled($fh);
+
+Getter / setter of the timeout enabled flag.
+
+=head1 SEE ALSO
+
+=over
+
+=item L<PerlIO::via>
+
+=back
+
+=head1 THANKS TO
+
+=over
+
+=item Vincent Pit
+
+=item Christian Hansen
+
+=item Leon Timmmermans
+
+=back
+
+=head1 AUTHOR
+
+Damien "dams" Krotkine
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Damien "dams" Krotkine.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,12 @@
+ChangeLog
+GPL
+lib/POE/Filter/BigBrother.pm
+Makefile.PL
+MANIFEST
+README
+t/01_BigBrother.t
+t/99_distribution.t
+t/99_pod.t
+t/99_pod_coverage.t
+t/TestFilter.pm
+META.yml                                 Module meta-data (added by MakeMaker)

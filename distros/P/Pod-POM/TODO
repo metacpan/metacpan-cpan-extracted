@@ -1,0 +1,58 @@
+* document Pod::POM::View and friends
+
+* add more thorough testing
+
+* fix link generation via L<...>
+
+* handle =encoding
+
+* more views for different styles, formats, etc.
+
+* According to the new podspec: C<< o->foo >> is the same as
+  C<o-E<gt>foo>. adjust Pod::POM to handle this kind of markup
+  also check that this works: S<C<< $aryref->[$foo] >>> (Most likely
+  the text parser needs to be rewritten) [stas]
+
+* you need to escape < and > if they're inside of [A-Z]<...>. Outside
+  of formatting code ([A-Z]<...>) the parser shouldn't complain and
+  leave < and > as is.
+
+* =begin/=end blocks are mishandled, I have a working version but it's
+  imperfect. Parser's rewrite will provide a robust solution [stas]
+
+* some pods may include sequences unrecognized by Pod::POM, currently
+  it spits many undefined var warnings (e.g. add N<foo> to the tests).
+  - should gracefull handle this situation and probably warn about the
+    unknown sequence each time it's encountered with line number.
+  - should probably ignore the sequence, but process what's inside the
+    sequence like the unknown sequence wasn't there. [stas]
+
+* the =over/=item can have very different usages, currently
+  Pod::POM::View::Pod doesn't deparse correctly the following:
+
+  =over
+  
+  =item
+  
+  Cat
+  
+  =item
+  
+  Sat
+  
+  =item
+  
+  Mat
+  
+  =back
+
+  it loses the =item parts, simply copy the rest of the item tests I've
+  recently added to t/htmlview.t to t/complete.t and you will see that
+  the generated pod misses '=item' keys for this section. [stas]
+
+* if the pod doesn't start from the top of the file, but there is some
+  leading text, the parser will report warnings on the line numbers
+  relative to the beginning of the pod and not the absolute linenumber
+  in the file. To make the warnings useful, the parser probably should
+  accomodate for skipped non-pod lines. Think of .pm files with
+  inlined pod (before each function) where this will come very useful.

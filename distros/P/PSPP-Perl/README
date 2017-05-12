@@ -1,0 +1,53 @@
+PSPP version 0.7
+================
+
+This module provides an interface allowing perl programs to create pspp 
+system files.
+
+INSTALLATION
+
+To install you must have first installed and built pspp 0.7.2 or
+later.  Pspp is not required to use this module, only to install
+it. 
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+   make test
+
+For "make test" to succeed, Perl must be able to find
+libpspp-core-$VERSION.so.  It can do so if "make install" has been run
+(as shown above), or if LD_LIBRARY_PATH points to it (e.g. in
+src/.libs).  Running "make check" from the top-level build directory
+will automatically set LD_LIBRARY_PATH.
+
+
+DEPENDENCIES
+
+This module requires the POSIX module.
+
+The modules Test::More, Text::Diff, File::Temp and the pspp source are
+required during installation, but are not needed to run the module.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, 2009 by Free Software Foundation
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 2 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+02110-1301, USA.
+

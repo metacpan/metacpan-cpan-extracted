@@ -1,0 +1,21 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/PDF/Report.pm
+t/00-load.t
+t/pod.t
+examples/barcode.pl
+examples/footer.pl
+examples/image.gif
+examples/image.jpg
+examples/image.pl
+examples/image.png
+examples/image.pnm
+examples/image.tif
+examples/openpdf.pl
+examples/paragraph.pl
+examples/piegraph.pl
+examples/rotate.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

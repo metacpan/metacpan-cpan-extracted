@@ -1,0 +1,27 @@
+proxytest=# explain(analyze, format yaml) select address from ip.proxies
+where source = 'tor' and upper_inf(active_in);
+                     QUERY PLAN                     
+----------------------------------------------------
+ - Plan:                                           +
+     Node Type: "Index Only Scan"                  +
+     Scan Direction: "Forward"                     +
+     Index Name: "proxies_pkey"                    +
+     Relation Name: "proxies"                      +
+     Alias: "proxies"                              +
+     Startup Cost: 0.00                            +
+     Total Cost: 84834.89                          +
+     Plan Rows: 580011                             +
+     Plan Width: 7                                 +
+     Actual Startup Time: 9.511                    +
+     Actual Total Time: 468.509                    +
+     Actual Rows: 6450                             +
+     Actual Loops: 1                               +
+     Index Cond: "(source = 'tor'::ip.proxysource)"+
+     Rows Removed by Index Recheck: 0              +
+     Filter: "upper_inf(active_in)"                +
+     Rows Removed by Filter: 1733831               +
+     Heap Fetches: 0                               +
+   Triggers:                                       +
+   Total Runtime: 469.079
+(1 row)
+

@@ -1,0 +1,29 @@
+---
+abstract: 'Serve static files from document root with directory index using Apaxy'
+author:
+  - 'Keedi Kim - 김도형 <keedi@cpan.org>'
+build_requires:
+  HTTP::Message: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-App-Directory-Apaxy
+requires:
+  Number::Bytes::Human: 0
+  Path::Tiny: 0
+  Plack: 0
+  Time::Piece: 0
+  URI::Escape: 0
+  parent: 0
+resources:
+  bugtracker: https://github.com/keedi/Plack-App-Directory-Apaxy/issues
+  homepage: https://github.com/keedi/Plack-App-Directory-Apaxy
+  repository: https://github.com/keedi/Plack-App-Directory-Apaxy.git
+version: 0.004

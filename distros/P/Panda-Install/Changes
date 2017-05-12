@@ -1,0 +1,61 @@
+1.2.7    11.04.2017
+		   - support CLIB custom make command BUILD_CMD
+1.2.6    17.01.2017
+           - support CPLUS version
+           - support CPLUS version inheritance (by descendant modules)
+1.2.5    29.12.2016
+           - bugfix: now supports FQN names for C++ in typemaps (fix for typemap_in/outcast)
+1.2.4    09.04.2015
+           - bugfix: typemap generation might fail on 32 bit perls in some cases
+1.2.3    30.03.2015
+           - support for non-xs modules
+1.2.2    12.03.2015
+           - bugfix: PREVENT_DEFAULT_DESTROY was sometimes ignored.
+1.2.1    10.03.2015
+           - small bugfix for typemap_outcast
+1.2.0    08.03.2015
+           - ParseXS: rename PRE_OUTPUT to INIT_OUTPUT
+           - remove all SO/DLL binary dependencies from linker's command line for MacOSX(darwin) as it doesn't support that
+           - ParseXS: rename @PREVENT_DEFAULT_DELETE_ON_EMPTY_DESTROY to @PREVENT_DEFAULT_DESTROY
+           - ParseXS: completely refactored typemap-gen code, produce clearer code
+           - ParseXS: add DESTROY {} block support for INPUT typemap.
+           - ParseXS: added eval_input/output_typemap and input/output_typemap_param methods to help writing complex typemaps
+           - ParseXS: typemap params now go directly to vars, instead of $p{name} hash.
+1.1.0    19.02.2015
+           - Change INIT section from one-line to BLOCK-type: "INIT { ... }"
+           - Add PRE_OUTPUT {...} section which goes on top of all output typemap code. Merged in reverse order.
+           - add all SO/DLL binary dependencies to linker's command line (previously this was only done on WIN32)
+1.0.1    02.02.2015
+           Make shared code work on WIN32:
+           - exporting all symbols from module's DLL is a default behaviour now (like on UNIX).
+           - add DLL binary dependencies to linker's command line
+1.0.0    31.01.2015
+           - add pTHX_/aTHX_ param to typemap_in/outcast inline functions to respect threaded perls (NO_GET_CONTEXT)
+           - bump version to release
+0.2.2    28.01.2015
+           - Bugfix: default perl's CCFLAGS weren't bypassed, some windows builds of dependant modules were crashing
+0.2.1    31.10.2014
+           - POD fixes
+0.2.0    30.10.2014
+           - support for typemap_incast<>() and typemap_outcast<>()
+0.1.9    28.10.2014
+           - improved support for C-like XS functions. added PREVENT_DEFAULT_DELETE_ON_EMPTY_DESTROY param and $type_deref var for typemaps
+0.1.8    08.10.2014
+           - bugfix for XS module version detection while building Makefile
+0.1.7    08.10.2014
+           - docs fixes
+0.1.6    07.10.2014
+           - make it possible for xsubpp's typemaps in command-line args to override ExtUtil's default typemap 
+0.1.5    04.10.2014
+           - Add support for automatic binary incompability detection between XS modules
+0.1.4    02.10.2014
+           - Hide internal package (MYSOURCE) from PAUSE
+0.1.3    02.10.2014
+           - Added docs for typemap params (for inheritance)
+           - Added INIT: code feature
+0.1.2    11.09.2014
+           - hide ExtUtils::* from pause
+0.1.1    11.09.2014
+           - support TYPEMAP::SUPER keyword
+0.1.0    18.03.2014
+           - first release

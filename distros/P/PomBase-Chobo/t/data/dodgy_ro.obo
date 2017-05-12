@@ -1,0 +1,32 @@
+format-version: 1.2
+data-version: releases/2016-05-13
+subsetdef: ro-eco ""
+ontology: ro
+
+[Term]
+id: BFO:0000002
+name: continuant
+def: "An entity that exists in full at any time in which it exists at all, persists through time while maintaining its identity and has no temporal parts." []
+
+[Term]
+id: specifically_dependent_continuant
+name: specifically dependent continuant
+def: "A continuant that inheres in or is borne by other entities. Every instance of A requires some specific instance of B which must always be the same." []
+is_a: BFO:0000002 ! continuant
+
+[Term]
+id: BFO:0000019
+name: quality
+is_a: specifically_dependent_continuant
+
+[Term]
+id: GO:0003824
+name: catalytic activity
+
+[Term]
+id: GO:0003824
+name: catalytic activity
+namespace: molecular_function
+synonym: "enzyme activity" EXACT [GOC:dph, GOC:tb]
+xref: Wikipedia:Enzyme
+

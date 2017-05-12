@@ -1,0 +1,340 @@
+#!perl
+
+# NO_PWP_RINCI
+
+our $DATE = '2015-09-09'; # DATE
+our $VERSION = '0.06'; # VERSION
+
+use 5.010;
+use strict;
+use warnings;
+
+our %SPEC;
+
+$SPEC{':package'} = {
+    v => 1.1,
+    summary => 'Test command with multiple subcommands (function embedded in script)',
+};
+
+$SPEC{add} = {
+    v => 1.1,
+    summary => 'A function to add to ints',
+    description => <<'_',
+
+Just a dummy description. Just a dummy description. Yup, just a dummy
+description. Just a dummy description. Just a dummy description. Yeah, just a
+dummy description. Just a dummy description.
+
+_
+    args => {
+        arg1 => {
+            schema => 'int*',
+            req => 1,
+            pos => 0,
+            cmdline_aliases => { a=>{} },
+        },
+        arg2 => {
+            schema => 'int*',
+            req => 1,
+            pos => 1,
+            cmdline_aliases => { b=>{} },
+        },
+    },
+};
+sub add {
+    my %args = @_;
+
+    # we need to do validation ourselves because P::C::Lite currently doesn't do
+    # it for us.
+    my $a1 = $args{arg1}; defined($a1) or return [400, "Please specify arg1"];
+    $a1 =~ /\A[+-]?\d+\z/ or return [400, "Invalid arg1 (not an int)"];
+    my $a2 = $args{arg2}; defined($a2) or return [400, "Please specify arg2"];
+    $a2 =~ /\A[+-]?\d+\z/ or return [400, "Invalid arg2 (not an int)"];
+
+    [200, "OK", $a1 + $a2];
+}
+
+$SPEC{subtract} = {
+    v => 1.1,
+    summary => 'A function to subtract to ints',
+    description => <<'_',
+
+This function also has result_naked and args_as set to array.
+
+_
+    args => {
+        arg1 => {
+            schema => 'int*',
+            req => 1,
+            pos => 0,
+            cmdline_aliases => { a=>{} },
+        },
+        arg2 => {
+            schema => 'int*',
+            req => 1,
+            pos => 1,
+            cmdline_aliases => { b=>{} },
+        },
+    },
+    # not yet supported by P::C::Lite
+    #args_as => 'array',
+    result_naked => 1,
+};
+sub subtract {
+    my %args = @_;
+
+    # we need to do validation ourselves because P::C::Lite currently doesn't do
+    # it for us.
+    my $a1 = $args{a1}; defined($a1) or die [400, "Please specify arg1"];
+    $a1 =~ /\A[+-]?\d+\z/ or die [400, "Invalid arg1 (not an int)"];
+    my $a2 = $args{a2}; defined($a2) or die [400, "Please specify arg2"];
+    $a2 =~ /\A[+-]?\d+\z/ or die [400, "Invalid arg2 (not an int)"];
+
+    $a1 - $a2;
+}
+
+use Perinci::CmdLine::Any;
+Perinci::CmdLine::Any->new(
+    url          => '/main/',
+    subcommands  => {
+        add      => {url => '/main/add'},
+        subtract => {url => '/main/subtract'},
+    },
+)->run;
+
+# ABSTRACT: Test command with multiple subcommands (function embedded in script)
+# PODNAME: peri-eg-multi-embedded-any
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+peri-eg-multi-embedded-any - Test command with multiple subcommands (function embedded in script)
+
+=head1 VERSION
+
+This document describes version 0.06 of peri-eg-multi-embedded-any (from Perl distribution Perinci-Examples-Bin-Any), released on 2015-09-09.
+
+=head1 SYNOPSIS
+
+=head1 SUBCOMMANDS
+
+=head2 B<add>
+
+A function to add to ints.
+
+Just a dummy description. Just a dummy description. Yup, just a dummy
+description. Just a dummy description. Just a dummy description. Yeah, just a
+dummy description. Just a dummy description.
+
+
+=head2 B<subtract>
+
+A function to subtract to ints.
+
+This function also has result_naked and args_as set to array.
+
+=head1 OPTIONS
+
+C<*> marks required options.
+
+=head2 Common options
+
+=over
+
+=item B<--config-path>=I<filename>
+
+Set path to configuration file.
+
+Can be specified multiple times.
+
+=item B<--config-profile>=I<s>
+
+Set configuration profile to use.
+
+=item B<--format>=I<s>
+
+Choose output format, e.g. json, text.
+
+Default value:
+
+ undef
+
+=item B<--help>, B<-h>, B<-?>
+
+Display help message and exit.
+
+=item B<--json>
+
+Set output format to json.
+
+=item B<--naked-res>
+
+When outputing as JSON, strip result envelope.
+
+Default value:
+
+ 0
+
+By default, when outputing as JSON, the full enveloped result is returned, e.g.:
+
+    [200,"OK",[1,2,3],{"func.extra"=>4}]
+
+The reason is so you can get the status (1st element), status message (2nd
+element) as well as result metadata/extra result (4th element) instead of just
+the result (3rd element). However, sometimes you want just the result, e.g. when
+you want to pipe the result for more post-processing. In this case you can use
+`--naked-res` so you just get:
+
+    [1,2,3]
+
+
+=item B<--no-config>
+
+Do not use any configuration file.
+
+=item B<--no-env>
+
+Do not read environment for default options.
+
+=item B<--subcommands>
+
+List available subcommands.
+
+=item B<--version>, B<-v>
+
+Display program's version and exit.
+
+=back
+
+=head2 Options for subcommand add
+
+=over
+
+=item B<--arg1>=I<i>*, B<-a>
+
+=item B<--arg2>=I<i>*, B<-b>
+
+=back
+
+=head2 Options for subcommand subtract
+
+=over
+
+=item B<--arg1>=I<i>*, B<-a>
+
+=item B<--arg2>=I<i>*, B<-b>
+
+=back
+
+=head1 COMPLETION
+
+This script has shell tab completion capability with support for several
+shells.
+
+=head2 bash
+
+To activate bash completion for this script, put:
+
+ complete -C peri-eg-multi-embedded-any peri-eg-multi-embedded-any
+
+in your bash startup (e.g. C<~/.bashrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is recommended, however, that you install L<shcompgen> which allows you to
+activate completion scripts for several kinds of scripts on multiple shells.
+Some CPAN distributions (those that are built with
+L<Dist::Zilla::Plugin::GenShellCompletion>) will even automatically enable shell
+completion for their included scripts (using C<shcompgen>) at installation time,
+so you can immadiately have tab completion.
+
+=head2 tcsh
+
+To activate tcsh completion for this script, put:
+
+ complete peri-eg-multi-embedded-any 'p/*/`peri-eg-multi-embedded-any`/'
+
+in your tcsh startup (e.g. C<~/.tcshrc>). Your next shell session will then
+recognize tab completion for the command. Or, you can also directly execute the
+line above in your shell to activate immediately.
+
+It is also recommended to install C<shcompgen> (see above).
+
+=head2 other shells
+
+For fish and zsh, install C<shcompgen> as described above.
+
+=head1 ENVIRONMENT
+
+=head2 PERI_EG_MULTI_EMBEDDED_ANY_OPT => str
+
+Specify additional command-line options
+
+=head1 CONFIGURATION FILE
+
+This script can read configuration file, which by default is searched at C<~/.config/peri-eg-multi-embedded-any.conf>, C<~/peri-eg-multi-embedded-any.conf> or C</etc/peri-eg-multi-embedded-any.conf> (can be changed by specifying C<--config-path>). All found files will be read and merged.
+
+To disable searching for configuration files, pass C<--no-config>.
+
+Configuration file is in the format of L<IOD>, which is basically INI with some extra features. Section names map to subcommand names. 
+
+You can put multiple profiles in a single file by using section names like C<[profile=SOMENAME]> or C<[SUBCOMMAND_NAME profile=SOMENAME]>. Those sections will only be read if you specify the matching C<--config-profile SOMENAME>.
+
+List of available configuration parameters:
+
+=head2 Common for all subcommands
+
+ format (see --format)
+ naked_res (see --naked-res)
+
+=head2 For subcommand 'add'
+
+ arg1 (see --arg1)
+ arg2 (see --arg2)
+
+=head2 For subcommand 'subtract'
+
+ arg1 (see --arg1)
+ arg2 (see --arg2)
+
+=head1 FILES
+
+~/.config/peri-eg-multi-embedded-any.conf
+
+~/peri-eg-multi-embedded-any.conf
+
+/etc/peri-eg-multi-embedded-any.conf
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Examples-Bin-Any>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Examples-Bin-Any>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Examples-Bin-Any>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

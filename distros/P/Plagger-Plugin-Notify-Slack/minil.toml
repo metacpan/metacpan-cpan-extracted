@@ -1,0 +1,6 @@
+name = "Plagger-Plugin-Notify-Slack"
+# badges = ["travis"]
+authority="cpan:ZONCOEN"
+
+module_maker="ModuleBuildTiny"
+

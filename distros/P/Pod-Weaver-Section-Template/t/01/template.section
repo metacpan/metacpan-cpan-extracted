@@ -1,0 +1,1 @@
+got template with parameter {{ $foo }}

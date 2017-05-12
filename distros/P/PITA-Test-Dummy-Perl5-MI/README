@@ -1,0 +1,53 @@
+NAME
+    PITA::Test::Dummy::Perl5::MI - CPAN Test Dummy for testing
+    Module::Install::With
+
+SYNOPSIS
+        use PITA::Test::Dummy::Perl5::MI;
+    
+        my $name = PITA::Test::Dummy::Perl5::MI->dummy;
+
+DESCRIPTION
+    This module is part of the Perl Image Testing Architecture (PITA) and
+    acts as a test module for seeing if the environment-sensing functionaliy
+    in Module::Install work as expected.
+
+    As such, his Makefile.PL contains some non-standard instrumentation
+    which outputs harmless human-readable testing data to STDOUT for later
+    analysis outside of the installation.
+
+    In addition, it shares the normal functionality of all CPAN Test
+    Dummies.
+
+    1. Contains no functionality, and will never do so.
+
+    2. Has no non-core depencies, and will never have any.
+
+    3. Exists on CPAN.
+
+    Unlike the other Test Dummies, the versioning of Milton loosely matches
+    that of the Module::Install version he was built with ("loosely" because
+    sometimes he gets built with non-production versions of
+    Module::Install).
+
+METHODS
+  dummy
+    Returns the dummy's name, in this case 'Milton'
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SUPPORT
+    No support is available for Milton.
+
+    His head is meant to come off ONLY when called as Makefile.PL :)
+
+SEE ALSO
+    Module::Install, PITA
+
+COPYRIGHT & LICENSE
+    Copyright 2006 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

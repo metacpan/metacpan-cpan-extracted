@@ -1,0 +1,15 @@
+<SOFTPKG NAME="ANSIColor" VERSION="1,11,0,0">
+  <TITLE>ANSIColor</TITLE>
+  <ABSTRACT>Color output using ANSI escape sequences</ABSTRACT>
+  <AUTHOR>Russ Allbery (rra@stanford.edu)</AUTHOR>
+  <IMPLEMENTATION>
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+    <CODEBASE HREF="Term-ANSIColor-1.11-PPM56.tar.gz" />
+  </IMPLEMENTATION>
+  <IMPLEMENTATION>
+    <OS NAME="MSWin32" />
+    <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    <CODEBASE HREF="Term-ANSIColor-1.11-PPM58.tar.gz" />
+  </IMPLEMENTATION>
+</SOFTPKG>

@@ -1,0 +1,78 @@
+Revision history for POE-Component-Client-opentick
+------------------------------------------------------------
+Legend:
+BUG:    An actual found or reported bug fix.
+FIX:    Change toward correct behavior, but unreported.
+DOC:    Changes to documentation.
+NEW:    New, previously non-existent feature.
+------------------------------------------------------------
+
+0.21    Jan 09, 2009
+        BUG: Constant.pm:OTeod() wasn't checking definedness of $data_type
+        BUG: Protocol.pm:_send_notification() did string comp. with ==
+        FIX: OTClient.pm:cancelBookStream() had extraneous crap in it.
+        FIX: Added lexical 'use warnings' throughout.  (No problems were
+            caused; I run locally with PERL5OPT=-w )
+        FIX: opentick.pm was checking a couple of unitialized variables.
+        FIX: Minor warning corrections in Socket.pm, Protocol.pm
+        DOC: Clarified and unified all documentation throughout distribution.
+
+0.20    Nov 23, 2008
+        BUG: I think I fixed the build errors on Solaris, Win32 and Darwin
+                in one fell swoop.  Silly caching network stacks.
+        {
+        BUG: RT #39733: Wrong $field_datatypes for OT_DATATYPE_OHLC, Record.pm
+        BUG: RT #39734: Minor typo in documentation for Record.pm
+        BUG: RT #40364: Broken get_status() when ot_status_changed, opentick.pm
+        BUG: RT #40573: Annoying Dumper() in Protocol.pm
+        } -- thanks, A.L.!
+        FIX: t/13-Output.t would fail on 5.6.2 due to scalar refs; skipped.
+        DOC: Added Frequently Asked Questions list based on email questions.
+
+0.15    Apr 16, 2008
+        BUG: Server redirection implementation was borked; repaired.
+                (Thanks, bt!)
+        TST: Updated tests to reflect new redirection implementation.
+        DOC: Updated doc/implementation-notes.txt with correct info.
+        FIX: Minor optimizations in protocol handling to reduce unnecessary
+                POE messages.
+        FIX: Upped priority of OT_HEARTBEAT due to premature disconnections
+                during testing.
+
+0.12    Apr 13, 2008
+        BUG: Corrected misnamed variables that caused OTClient.pm and
+             examples/OTClient-example.pl to fail.  Thanks, bt!
+        FIX: Changed member variable lifetime in ProtocolMsg.pm
+        DOC: Cleaned up documentation a bit more.
+
+0.11    Apr 3, 2008
+        BUG: Corrected (64-bit) error in pack header for OT_DATATYPE_OHLC
+
+0.10    Mar 20, 2008
+        NEW: Expanded functionality of Record::get_data
+        NEW: Added Record::get_data_as_hashref and ::get_data_as_arrayref
+        NEW: Added Constants::OTTradeIndicator and ::OTQuoteIndicator
+        FIX: Optimized opentick::_send_notification
+        DOC: Corrected, clarified and cleaned up documentation throughout.
+        DOC: Documented arguments of all API events in opentick.pm
+
+0.05    Mar 12, 2008
+        NEW: Reimplemented OTClient::getEntityById for facade interface.
+        FIX: Corrected documentation; was referring to incorrect event IDs.
+
+0.04    Mar 10, 2008
+        BUG: Corrected more 64-bit tests, as reported by cpantesters.
+
+0.03    Mar 10, 2008
+        BUG: Corrected 32/64-bit tests, reported by cpantesters
+        BUG: Corrected 'use lib' in Constants.pm:69, reported by cpantesters
+        FIX: Carp in pre-5.8.x didn't export longmess(); use full package call
+
+0.02    Mar 09, 2008
+        NEW: Added examples/ folder
+        BUG: Corrected META.yml errors reported by CPANTS
+
+0.01    Mar 09, 2008
+        First version, released on an unsuspecting world.
+
+# END OF Changes

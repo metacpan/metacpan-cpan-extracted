@@ -1,0 +1,33 @@
+Revision history for Perl module PDL::IO::Nifti
+
+0.73 	2014-04-02
+
+    *	added 'ExtUtils::F77' as dependency, based on cpan-testers
+
+0.72	2014-03-31
+
+    *	fixed a typo, causing sometimes problems in repeated use
+	
+	2014-03-21
+
+    *   fixed pod-coverage.t (rmeoved -T switch)
+
+0.70    2013-10-30
+
+    *   Nifti now uses PDL as base class, making use of the PDL hash
+        key for the data! This means that any Nifti object is also a
+        piddle, this could break code!  
+
+    *   for typemapping, I used get_datatype, but since the numbers seem
+        to be rather arbitray, this was changed to using type().
+
+
+0.60    2013-09-04
+
+    *   important bug fixes
+
+
+0.52    2013-05-10
+
+    *   First version, released on an unsuspecting world.
+

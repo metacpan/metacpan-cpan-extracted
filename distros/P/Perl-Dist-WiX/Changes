@@ -1,0 +1,401 @@
+Changes for Perl extension Perl-Dist-WiX
+
+1.500002   Sat 04 Jun 2011
+    1. (backported) Remove File::Remove from dependencies.
+
+1.500001   Thu 19 May 2011
+    1. Used to build Strawberry Perl 5.12.3.0/5.10.1.5.
+    2. Includes the 5.12.3 plugin for testing purposes.
+
+1.500   Wed 23 Feb 2011
+    1. Used to build Strawberry Perl October 2010 and February 2011 Beta 1.
+    2. Portable will have it's own dir to use insead of home (CHORNY)
+
+1.250_100   Tue 19 Oct 2010
+    1. Used to build Strawberry Perl October 2010 Beta 1.
+    2. Now uses a "pluggable" interface for building Perl versions.
+       (which means that many of the "share" files are in dists
+        for individual perl versions)
+    3. Add right-click/double-click options to Windows Explorer for
+       .pl files.
+
+1.250   Sun 01 Aug 2010
+    1. Used to build Strawberry Perl July 2010.
+    2. Added ability to have CPAN module links in the release notes.
+	3. Removing pdwix_minicpan script.
+	4. Added ability to specify packlist location (not used yet)
+
+1.200_102   Sun 25 Jul 2010
+    1. Used to build Strawberry Perl Professional Alpha 2.
+    2. Allow use of SQLite indexes when building off a merge module.
+    3. Print time completed at the end, not just a number of seconds.
+	4. Some fixes for merge-module building.
+
+1.200_101   Mon 19 Jul 2010
+    1. Used to build Strawberry Perl July 2010 Beta 2.
+    2. Cache exact directory tree searches for a speedup.
+	3. Icons are now inheritable.
+	4. Checkbox added for README.txt file.
+    5. Fix to allow Start menu links to root directory files.
+    6. Allow README.txt to be read at end of installation.
+
+1.200_100   Fri 28 May 2010
+    1. Used to build Strawberry Perl July 2010 Beta 1.
+    2. Perl 5.12.1 support added.
+    3. Optional Growl for Windows support added during building.
+    4. Added more explanatory text to .msi installers.
+    5. Split up start menu.
+    6. Some tests have been added back in.
+    7. The newest version of Moose revealed some bugs. Fixes have 
+       been included.
+
+1.200002   Wed 02 Jun 2010
+    1. Used to build Strawberry Perl + Padre 0.62.
+    2. New version of Moose revealed some bugs. Fixing.
+
+1.200001   Thu 06 May 2010
+    1. Used to build Bootstrap Perl "April" 2010.
+    2. Used to build Strawberry Perl 5.12.0.1.
+    3. Requires version of Win32::Exe that has 64-bit support.
+       (should have been in 1.200)
+    4. Fixing small bugs in checkpointing.
+
+1.200   Sat 01 May 2010
+    1. Documentation cleanup (including adding when required).
+    2. Supports 5.12.0 final. Removes 5.11.5 support.
+    3. Used to build Strawberry Perl April 2010.
+    4. Checkpointing works again.
+    5. .tar.bz2 files are now usable as parameters to this module.
+    6. (beta, untested) .tar.xz file support has also been added.
+    7. A relocation custom action has been added.
+
+1.102_102   Thu 25 Mar 2010
+    1. Adding 5.12.0 support (based on 5.12.0-RC0 for now).
+    2. Bug fixes to relocation support.
+    3. Used to build Strawberry Perl April 2010 Beta 1
+       (5.12.x versions).
+
+1.102_101   Sat 20 Mar 2010
+    1. Scripts now will go to perl/site/bin.
+    2. perl 5.11.5 support is added.
+    3. Relocation script written in perl has been added.
+    4. Change $Config{installsitebin} from perl/bin to perl/site/bin,
+       and add perl/site/bin to the path.
+    5. Used to build Strawberry Perl April 2010 Beta 1
+       (5.8.x/5.10.x versions).
+
+1.102_100   Fri 19 Feb 2010
+    1. Used to build Strawberry Perl Professional 5.10.1.1 Alpha 1.
+    2. Allow more than one DISTRIBUTIONS.txt file.
+
+1.102002   Sat 30 Jan 2010
+    1. Allow use of previously created merge modules.
+    2. Removal of MooseX::AttributeHelpers as a
+       prerequisite.
+
+1.102001   Fri 29 Jan 2010
+    1. Changes to get Bootstrap to build.
+
+1.102   Thu 28 Jan 2010
+    1. Used to build Strawberry Perl January 2010.
+    2. Fix problems with merge module
+    3. Make updating "smart" - don't delete the site
+       directory unless doing a major upgrade.
+    4. Bring Portable back (install all modules into
+       "perl/site" for it only.)
+    5. Work on "gcc-4" toolchains (not done yet)
+    6. Change to building with Module::Build.	
+
+1.101_001   Wed 11 Nov 2009
+    1. Split most of the build into a merge module.
+    2. Finished the Moosification.
+    3. Added ability to build off a git checkout.
+    4. Started work on documentation. 
+
+1.100   Wed 11 Nov 2009
+    1. Used to make Strawberry Perl October 2009.
+    2. Used to make Padre Standalone 0.50.
+    3. Small fixes (adding prerequisite that _103 missed,
+       removing reordering [had to take out portable for now]
+       and making sure root directory files got installed.)
+
+1.090_103   Sat 26 Sep 2009
+    1. Used to make Strawberry Perl October 2009 Beta 2.
+    2. Portability now works.
+    3. Small bug fixes.
+
+1.090_102   Mon 14 Sep 2009
+    1. Major refactoring. (Now uses Moose rather 
+       than Object::InsideOut.)
+    2. 5.10.1 is now supported.
+    3. Perl::Dist is not a dependency anymore.
+    4. Perl::Dist::WiX now installs its non-core 
+       modules into "perl\vendor" as opposed to 
+       "perl\site"
+       
+1.000   Sat 25 Jul 2009.
+    1. Used to make "Padre Standalone Plus Six" for the
+       Padre Birthday party.
+    2. Major version number jump - this is stable enough
+       to not be a 0.x version anymore. 
+    2. build_number can now be 0.
+    3. minicpan script updated to take command-line options
+       in order to be able to make minicpans for subclasses.
+    4. minicpan script is more "PBP-compliant" (i.e. 
+       the standard meta-options like --help are there)
+    5. The cpan/sources directory is moved to the side when 
+       installing from a minicpan.
+    6. 'six' is now correctly integrated. (Note that 'six'
+       is not guaranteed to be stable or usable.)
+
+0.192   Fri 17 Jul 2009.
+    1. Will be used to make Strawberry Perl July 2009.
+    2. Windows XP is now the minimum supported Windows 
+       version.
+    3. Installs Win32::Process and IPC::System::Simple 
+       if autodie is installed.
+    4. Clears PAR temporary directory.
+    5. Installs requirements for portability individually.
+    6. First attempt at Perl 6 support.
+	
+0.191   Mon 06 Jul 2009
+    1. Was used to make Padre Standalone beta 1.
+    2. Tries to get a DefaultLanguage code for files 
+       that require it.
+    3. Moving the default fragments directory location under 
+       temp_dir rather than output_dir.
+    4. Stop CPAN.pm from following prerequisites during
+       install_module.
+    5. Updated CPANPLUS::Config template.   
+
+0.190   Thu 02 Jul 2009
+    1. Was used to make Strawberry Perl July 2009 
+       Beta 3.
+    2. Throw an exception if Archive::Zip version 1.28 
+       will be installed instead. (Forcing 1.26 did not work.)
+    3. A CPANPLUS::Config has been created that does similar
+       things to the CPAN::Config that is installed.
+    4. Building completely offline can now be successfully done.
+       Because of this, CPAN::SQLite is disabled when actually
+       installing modules during distribution building.
+    5. Will attempt to tell you which directories need to be 
+       added to the msi_directory_tree_additions parameter to 
+	   Perl::Dist::WiX->new when trace is 2 or greater.
+    6. Added a distropref so that certain modules will not
+       be installed when building a distribution. (It is not 
+       installed with the created distribution.)
+
+0.185   Tue 23 Jun 2009
+    1. Force install of Archive::Zip version 1.26 (1.28 
+       has a bug in it.)
+    2. Builds a list of CPAN distributions that were 
+       installed as DISTRIBUTIONS.txt in the root directory
+       of the install.
+    3. A few more files are removed.
+    4. Checks of CPAN use the CPAN passed in, not the 
+       CPAN of the host perl or cpan.strawberryperl.com.
+    5. Required version of Perl::Dist increased to 1.14 
+       (except for Perl::Dist::Util::Toolchain, which has
+	   to be gotten from SVN for now.)
+
+0.184   Tue 16 Jun 2009
+    1. Allow e-mail of builder and build and beta numbers 
+       to be stored in perl configuration.
+    2. Text::Iconv will build correctly, as the DLL
+       file is copied as opposed to moved where libxml
+       needs it.
+    3. Perl::Dist::WiX::Filelist has been removed
+       (actually moved to File::List::Object, so
+       that has been added as a dependency.)
+
+0.183   Thu 28 May 2009
+    1. Perl::Dist::WiX::Installer used a regex 
+	   metacharacter that was only in 5.10.
+	2. Perl requirement increased to 5.8.1, since
+	   recent releases of modules used require 
+	   that version of Perl.
+
+0.182   Thu 28 May 2009
+	1. Used to make Strawberry Perl July 2009 
+	   Beta 2.
+	2. Automatically generates its README file 
+	   using Pod::Readme
+	3. Fix bugs in install_distribution_from_file.
+	4. Updated to Module::Install 0.91.
+
+0.180   Tue 28 Apr 2009
+	1. If the .packlist is missing, attempt to use
+	   the debug.out file from the install stage
+	   to get a file list.
+	2. install_distribution will now use Build.PL
+	   files (and will prefer them to Makefile.PL
+	   files except for version.pm)
+	3. A custom action to clean out the installation
+	   directory is now used on uninstall or upgrade.
+	4. Added wix_dist_dir for stuff that is supposed
+	   to come out of the Perl-Dist-WiX share
+	   directory even if dist_dir is overridden.
+
+0.171   Sat 18 Apr 2009
+	1. Adding ability to create RemoveFolder tag 
+	   independent of shortcuts.
+	2. app_name must be legal filename (as it is used
+	   to create the main .wxs filename)
+	3. Fixed handling of .AAA files in both .zip and 
+	   .msi installers.
+	4. Moved cpan.info file to output_dir.
+	5. Adding generator comment to main .wxs file.
+	6. Can override main .wxs file template.
+	7. Updating to Module::Install 0.84.
+
+0.170   Sat 11 Apr 2009
+	1. Tests updated to create common download 
+	   directory.
+	2. Requirement for Perl-Dist updated to current
+	   svn version. Check it out at:
+	   http://svn.ali.as/cpan/trunk/Perl-Dist
+	3. Added test to detect dlltool problem 
+	   (dlltool will not work within a path
+	   with extensions.)
+	4. Updating to Module::Install 0.82
+
+0.169   Thu 09 Apr 2009
+	1. With previous distributions where build_number 
+	   was the only parameter that was different, 
+	   Product/@Id attribute would be identical.
+	   This was a bug, and is now corrected.
+	2. Some error messages are made clearer, and 
+	   error messages are documented in the pod for 
+	   Perl::Dist::WiX.
+	3. releaserc not included in distribution.
+	4. Additions to main .wxs template to disallow 
+	   downgrading and correctly detect upgrades.
+	5. install_distribution_from_file routine added
+	   to support Perl::Dist::Bootstrap.
+	6. Updating to Module::Install 0.81.
+
+0.162   Fri 27 Mar 2009
+	1. Test and documentation update only.  Do not worry 
+	   about upgrading.
+
+0.161   Thu 26 Mar 2009
+	1. Test and documentation update only.  Do not worry 
+	   about upgrading.
+
+0.160   Sun 22 Mar 2009
+	1. install_cpan_upgrades goes through and gets a 
+	   list of installations to call install_distribution
+	   on instead of installing all of the distributions
+	   at once using CPAN::Shell::uptodate.
+	2. _run3 removes directories containing unzip.exe 
+	   and gzip.exe from the path (causes perl's
+	   'make test' to fail if this is not done).
+	3. Checks for spaces in build directory when testing
+	   perl 5.10.0 (Testing CPANPLUS::Shell will fail)
+	   and 5.8.8 (Installing modules will fail.)
+	   Adds Win32 to dependencies, but it was being used
+	   in testing anyway.
+	4. Add TODO list.
+	5. Add dependency on Alien::WiX.
+
+0.150   Thu  5 Mar 2009
+	1. Added a digit to the version number because 
+	   having a version numbered 0.1401 messed the 
+	   ordering up.
+	   
+0.15	Thu  5 Mar 2009
+	1. Updated PDWix::Parameter error class.
+	2. Used PDWiX::Parameter more places.
+	3. Added code to Perl::Dist::WiX->new to attempt 
+	   to prevent suicide.
+	4. Minimum perl version is now consistently 5.6.0.
+	   This is tested for throughout the whole distribution.
+
+0.1401  Wed 25 Feb 2009
+	1. Got bit by new indexing rules implemented as of
+	   December 2008, so creating tar file with correct
+	   permissions.
+
+0.14	Wed 25 Feb 2009
+	1. Got rid of warning at Directory.pm around line 416
+	   (using comparison with result of Scalar::Util::blessed 
+	   instead of Params::Util::_INSTANCE because _INSTANCE 
+	   returns undef, rather than a numeric.)
+
+0.13_04 Mon 23 Feb 2009
+	1. Added PDWiX::Parameter error class
+	2. Added packlist parameter to install_module
+	   and install_distribution
+	3. Added DirectoryTree->add_root_directory.
+	
+0.13_03 Fri 20 Feb 2009
+	1. Internals use Object::InsideOut (I have to admit 
+	   I was getting confused with all the inheritance.)
+	   Perl::Dist::WiX[::Installer] still uses Object::Tiny
+	   for backwards compatibility.
+	2. Exception::Class also used (Makes it so errors 
+	   change along with the trace level.)
+	   Note that errors generated by Perl::Dist::WiX are 
+	   in the PDWiX class.
+	3. Tests reordered and categorized.
+
+0.13_02 Thu 12 Feb 2009
+	1. Test sequence completed. Passes, as well.
+
+0.13_01 Mon 02 Feb 2009 
+	1. Generates .msi file!
+	2. Added routines to help make sure all files are installed.
+	3. Updated to go with Perl::Dist 1.12 and Perl::Dist::Strawberry 1.09
+	4. Icons handled.
+
+0.11_07 Tue 27 Jan 2009
+	1. Documentation completed.
+	2. Trace now has 6 (0-5) levels.
+	3. Directory creation simplified. (hopefully bug-free)
+	4. Still no .msi yet.
+
+0.11_06 Wed 21 Jan 2009
+	1. Moved Feature.pm up one level, created FeatureTree.pm.   
+	2. Spelling, a little documentation, bug fixes, tests.
+	   (more in _07)
+	3. CPAN icon, get_component_array methods, build number, 
+	   beta number, and msi parameters added.
+	4. Updated Perl::Dist::WiX to match Perl::Dist::Inno 1.11
+	5. Creating all .wixout files required - but no .msi yet 
+	   (files are being counted twice)
+	
+0.11_05 Mon 19 Jan 2009
+	1. Work in progress debugging routines install_win32_extras needs
+	2. Documentation of some low-level modules added
+	3. Compile test updated with all modules.
+	4. Other tests skipped until rewriting done.
+	5. Some parameter-checking added.
+
+0.11_04 Sat 17 Jan 2009
+	- Verified generation of fragments up to step 4 
+	  (install_perl_modules) now. (84 fragments, 900K)
+	- Removed P::D::W::Toolchain, replaced it with ad-hoc
+	  _name_to_module method (I want to affect Perl::Dist 
+	  itself as little as possible)
+	- Added more to list of modules that leave .packlist 
+	  files to check.
+	- Removed create_string_fragment method (not being used)
+
+0.11_03 Sat 17 Jan 2009
+	- perl, the perl licenses, and the individual 
+	  modules of the Perl toolchain are now tested
+	  to generate fragments (now 57 fragments, about 
+	  800K .wxs source.)
+	- Perl::Dist::WiX::Filelist module added to handle
+	  file list arithmetic and operations.
+	  
+0.11_02 Thu 15 Jan 2009
+	- First actual code:
+	  1: Most routines collect file names
+	  2: "low-level" routines create strings that 
+		 "work up the line" and get assembled.
+	  3: Individual portions of the C toolchain are
+		 individual wix fragments.
+
+0.01_01 Sun 12 Oct 2008
+	- Creating initial version

@@ -1,0 +1,97 @@
+Revision history for Perl module PAUSE::Permissions
+
+0.16 2016-02-28 NEILB
+    - Switched to using any() from List::Util (as of 1.33) instead of
+      from List::MoreUtils, since LU is a core module.
+
+0.15 2016-02-14 NEILB
+    - YANICK added a pause-permissions script, which lets you get permissions
+      info from the command line. Thanks Yanick!
+    - Experimenting with not shipping dist.ini to CPAN. Blame Yanick.
+    - Release test was failing because some new modules on CPAN were
+      matching.
+
+0.14 2015-04-17 NEILB
+    - Added the has_permission_for() method, after discussion with
+      ISHIGAKI, following GH#9.
+
+0.13 2015-04-16 NEILB
+    - Added the can_upload(USER,MODULE) method, which returns true
+      if the specified user has permission to upload the module.
+      Ie either the module IS in 06perms.txt and the USER is listed
+      against it (c, f, or m). Or it doesn't appear at all, so the USER
+      would get first-come (f). Requested by ISHIGAKI in GH#8.
+
+0.12 2015-04-16 NEILB
+    - This is the "Ishigaki release", prompted by ISHIGAKI at the QAH.
+    - Added 'preload' attribute, which is used in association with the
+      module_permissions() method. If you set preload to 1, then all
+      permissions data gets loaded into memory the first time you call
+      module_permissions() method, and every further call will just get
+      the in-memory data. Suggested by ISHIGAKI++.
+    - Added cache_path attribute, as distinct from path. The former is
+      the local path where the remote source should be cached, after
+      transformation (we don't use the raw 06perms.txt, but munge it).
+      The 'path' attribute lets you say "hey, just use this file I've already
+      got", effectively providing your own cached version, post-transformation.
+    - Added max_age attribute: within that time we don't even bother checking
+      whether the remote source has changed. Uses Time::Duration::Parse to
+      pause the max_age time specification.
+
+0.11 2015-01-25 NEILB
+    - Changed File::Slurp to Path::Tiny. Thanks to MartinMcGrath.
+    - Moved t/04-live-module-iterator.t to be a release-only test,
+      xt/release/04-live-module-iterator.t.
+
+0.10 2014-09-01 NEILB
+    - Documentation fix: 'filename' was changed to 'path' in 0.05.
+      ISHIGAKI++
+
+0.09 2014-04-07 NEILB
+    - Documentation now says you should use 0.08 or later,
+      to make sure you get the case-insensitive handling of package names.
+    - Using croak() but didn't have "use Carp" - thanks to TOKUHIROM
+
+0.08 2014-03-13 NEILB
+    - Handle package names case-insenstively, as PAUSE now does.
+      Based on two bug reports from RJBS (#1, #2 on github).
+
+0.07 2013-12-06 NEILB
+    - Added 'use 5.10.0' to ModuleIterator, as it's using two features
+      introduced in 5.10. Thank you CPAN Testers.
+    - Added SEE ALSO link to App::PAUSE::CheckPerms
+
+0.06 2013-12-04 NEILB
+    - added module_iterator() method on PAUSE::Permissions,
+      which returns an iterator that will loop over 06perms.txt
+      returning an instance of PAUSE::Permissions::Module each
+      time it's called.
+
+0.05 2013-08-26 NEILB
+    - switched to Moo
+    - BACKWARDS INCOMPATIBLE CHANGES - simplifying things:
+        + merged public 'filename' and private '_path' into 'path'.
+          If you pass to the constructor, it's where we'll read from,
+          other we'll set it based on File::HomeDir->my_dist_data
+        + changed 'uri' to 'url', because that's more accurate
+        + dropped the 'cachedir' parameter
+      Thanks to DAGOLDEN for the suggestions.
+    - Added method entry_iterator() which returns an instance of
+      PAUSE::Permissions::EntryIterator. Iterates over the whole file.
+    - switched from [GitHub::Meta] to [GithubMeta] in dist.ini
+
+0.04 2012-10-21 NEILB
+    - Removed a debugging print statement.
+
+0.03 2012-10-16 NEILB
+    - Forgot to include [AutoPrereqs] and other things in dist.ini,
+      so prereqs not getting declared :-(
+      Thanks to JWRIGHT
+
+0.02 2012-10-15 NEILB
+    - ANDK's surname was coming out mangled on the umlaut, so using E<ouml>
+    - Various documentation tweaks
+
+0.01 2012-10-14 NEILB
+    - initial release to CPAN
+

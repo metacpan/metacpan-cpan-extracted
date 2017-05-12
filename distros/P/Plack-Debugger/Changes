@@ -1,0 +1,19 @@
+Revision history for Perl extension Plack::Debugger
+
+0.03 Monday, 29 December 2014
+    - stop using the anchor (#) to pass data 
+      along in the URL with the injector, switch 
+      to using a "data-*" attribute instead.
+        - thanks to Ricardo Tomasi for the patch
+    - handle 202 responses properly (no content)
+
+0.02 Saturday, 15 November 2014
+    - fixing the missing Test::Warn dependency
+    - adding VERSION and AUTHORITY to the JS file
+
+0.01 Monday, 10 November 2014
+    - First release to an unsuspecting world (well, 
+      not really unsuspecting, I promised this would
+      go out at the London Perl Workshop then took 
+      two days to do it, so really it is to a suspecting
+      world, but that doesn't sound as fun).

@@ -1,0 +1,41 @@
+# examples/Eyapplanguageref/Lhs.eyp
+# eyapp -C Lhs.eyp
+# ./Lhs.pm -t -c '2+3'
+# ./Lhs.pm -t -c 'a=3'
+%right '=' 
+%left '-' '+' 
+%left '*' '/' 
+%left NEG 
+%token NUM =
+%token VAR =
+
+%%
+
+input:
+      /* empty */
+    | input line  
+;
+line:
+      '\n'
+    | exp '\n'
+    | exp ''  # '' stands for end of input
+;
+exp:
+      NUM
+    | VAR
+    | %name ASSIGN
+      VAR '=' exp
+    | %name PLUS
+      exp '+' exp
+    | %name MINUS
+      exp '-' exp
+    | %name TIMES
+      exp '*' exp
+    | %name DIV
+      exp '/' exp
+    | %name UMINUS
+      '-' exp %prec NEG
+    | '(' exp ')' 
+;
+
+%%

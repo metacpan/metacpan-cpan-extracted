@@ -1,0 +1,251 @@
+#!/usr/bin/perl
+
+# bin/pslabelsheet - command line interface to PostScript::LabelSheet
+# Copyright 2009 Cédric Bouvier.
+# 
+# This program is free software; you can redistribute it and/or modify it
+# under the terms of either: the GNU General Public License as published
+# by the Free Software Foundation; or the Artistic License.
+# 
+# See http://dev.perl.org/licenses/ for more information.
+
+use strict;
+
+use Getopt::Long qw/ :config no_ignore_case /;
+use Pod::Usage;
+
+use PostScript::LabelSheet;
+my $sheet = new PostScript::LabelSheet;
+
+# We use GetOptions with callbacks instead of simpler string declarations. This
+# ensures that callbacks are called in order, which is important for --eps and
+# --count used in pairs.
+sub store_option {
+    my ($option, $value) = @_;
+    $sheet->$option($value);
+}
+
+my $eps; # the last file mentionned in a --eps option. Will be used when
+         # encountering the following --count or the next --eps.
+
+GetOptions
+    'help|h!' => sub { pod2usage(-exitstatus => 0, -verbose => 2) },
+    'version|v!' => sub { print "This is pslabelsheet - version $PostScript::LabelSheet::VERSION\n"; exit 0 },
+
+    'eps=s' => sub {
+        # Stores the previous EPS file with count == 1, if any.
+        $sheet->add($eps) if $eps;
+        $eps = $_[1]; # stores patht to new EPS file for later use, in case there's a --count coming up.
+    },
+    'count=i' => sub {
+        $eps or die "Please provide an EPS file first with --eps\n";
+        $sheet->add($eps, $_[1]);
+        $eps = undef;
+    },
+    
+    # Regular options
+    map { $_ => \&store_option } qw/
+        columns=i
+        rows=i
+        label_width|label-width=s
+        label_height|label-height=s
+        width=s
+        height=s
+        v_margin|v-margin=s
+        h_margin|h-margin=s
+        v_spacing|v-spacing=s
+        h_spacing|h-spacing=s
+        v_padding|v-padding=s
+        h_padding|h-padding=s
+        margin=s
+        spacing=s
+        padding=s
+        skip|s=i
+        fill_last_page|fill-last-page!
+        grid!
+        portrait!
+    /
+
+or pod2usage(2);
+
+# no --count was provided for latest --eps: insert it now
+$sheet->add($eps) if $eps;
+
+print $sheet->as_postscript();
+
+
+
+=head1 NAME
+
+pslabelsheet - print sheets of labels from an EPS design.
+
+=head1 SYNOPSIS
+
+    pslabelsheet --rows 10 --columns 3 --design /path/to/design.eps > sheet.ps
+
+=head1 DESCRIPTION
+
+This program is merely a wrapper around the PostScript::LabelSheet module.
+
+=head2 Why this module?
+
+I sometimes have to print a sheet of labels, each label bearing the same
+design, for example to label jars of marmelade. I tried to do this with
+OpenOffice.org writer, in a table. But I had to manually copy and paste the
+design of the first label into every cell, and of course, if I changed the
+design, the changes had to be reported manually to the other cells. And of
+course, changing the dimensions, or adding a column or a row, need some manual
+intervention.
+
+This module is here to easily print a sheet (or sheets) of labels representing
+a repeating pattern. Give it a design in Encapsulated PostScript (EPS), how
+many labels you want, how big they should be or how many should fit in the
+width and heigth of the page, and PostScript::LabelSheet generates the
+PostScript code for you, which you can then directly print.
+
+There are options to print several kinds of labels on the same sheet, each with
+its own design, to draw a grid around the labels for cutting them, and to
+control how they are laid out on the page.
+
+Additionally, labels can be numbered. This can be useful to print numbered
+tickets for a local event for instance.
+
+=head2 Drawing the design
+
+Use inkscape (http://www.inkscape.org) to draw the design that you want to
+print on each label. Keep the original in the SVG format, and export it as
+Encapsulated PostScript for use with PostScript::LabelSheet.
+
+The size of the design is unimportant, as this is vector graphics, the
+generated PostScript program will resize without losing quality so that it fits
+within a label. What is important, however, is that the design occupies all the
+space on the page. The easiest is to draw without giving any thought to the
+page, then adjust the page size to the drawing.  In inkscape, you can use the
+Document Properties dialog box to let the page fit the design exactly (menu
+File, Document Properties, in the Page tab, click the "Fit page to selection"
+button).
+
+To save the design in EPS format, in inkscape, go to menu File, Save a copy,
+and choose the "C<Encapsulated PostScript (*.eps)>" format. Inkscape will show
+a dialog with options for the conversion to EPS. Do check the box "Make
+bounding box around full page", so that the generated EPS code contains
+information about the size of the design. PostScript::LabelSheet needs it to
+work out the scale at which the design should be included on the page.
+
+=head1 OPTIONS
+
+=head2 General options
+
+=over 4
+
+=item B<-h>, B<--help>
+
+Displays this help text and exits.
+
+=item B<-v>, B<--version>
+
+Displays the program's version and exits.
+
+=back
+
+=head2 Adding designs
+
+=over 4
+
+=item B<--eps>=I<PATH>
+
+=item B<--count>=I<INTEGER>
+
+=back
+
+=head2 Labels management
+
+=over 4
+
+=item B<--columns>=I<INTEGER>
+
+=item B<--rows>=I<INTEGER>
+
+Give the number of columns and rows in which the labels should be laid out on
+each page. The labels width and height will be calculated accordingly.
+
+=item B<--label-width>=I<SIZE>
+
+=item B<--label-height>=I<SIZE>
+
+Give the width and height of each label. The program will automatically
+calculate how many labels will fit on each row and column.
+
+=item B<--no-fill-last-page>
+
+Without this option, the last label is repeated until the end of the last page.
+
+=back
+
+=head2 Layout
+
+=over 4
+
+=item B<--width>=I<SIZE>
+
+=item B<--height>=I<SIZE>
+
+Dimensions of the page. Default to S<297 mm> and S<210 mm> (DIN A4).
+
+=item B<--v-margin>=I<SIZE>
+
+=item B<--h-margin>=I<SIZE>
+
+=item B<--margin>=I<SIZE>
+
+Vertical (top and bottom) and horizontal (left and right) margins.
+Default to S<5 mm>.
+Use C<--margin> to set both C<--v-margin> and C<--h-margin> at the same time.
+It is not possible to set the top margin independantly from the bottom
+margin, nor the left margin independantly from the right one.
+
+=item B<--v-spacing>=I<SIZE>
+
+=item B<--h-spacing>=I<SIZE>
+
+=item B<--spacing>=I<SIZE>
+
+Space between columns (C<--h-spacing>) or rows (C<--v-spacing>) of labels.
+Use C<--spacing> to set both C<--h-spacing> and C<--v-spacing> at the same time.
+
+=item B<--v-padding>=I<SIZE>
+
+=item B<--h-padding>=I<SIZE>
+
+=item B<--padding>=I<SIZE>
+
+Space left blank inside each label and around the design within.
+Default to 0.
+Use C<--padding> to set both C<--h-padding> and C<--v-padding> at the same time.
+
+=item B<--skip>=I<INTEGER>
+
+Number of labels to leave blank at the top of the first page. The default is to
+start at the top left of the page.
+
+=item B<--portrait>
+
+Rotate the designs 90 degrees clockwise within each label.
+
+=item B<--grid>
+
+Draws a grid around the labels. This is the default, use C<--no-grid> if you
+want to print borderless labels.
+
+=back
+
+=head1 SEE ALSO
+
+L<PostScript::LabelSheet>
+
+=head1 AUTHOR
+
+Cedric Bouvier C<< <cbouvi@cpan.org> >>.
+
+=cut
+

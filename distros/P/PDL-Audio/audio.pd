@@ -1,0 +1,1926 @@
+$VERSION = '1.2';
+
+pp_setversion $VERSION;
+pp_beginwrap (); # force error with older PPs
+
+pp_addpm {At => Top}, <<'EOD';
+=head1 NAME
+
+PDL::Audio - Some PDL functions intended for audio processing.
+
+=head1 SYNOPSIS
+
+  use PDL;
+  use PDL::Audio;
+
+=head1 DESCRIPTION
+
+Oh well ;) Not much "introductory documentation" has been written yet :(
+
+Installing this distribution also installs F<pdlaudio-demo>, which
+showcases some of the oeprators, and C<pdlaudio-birds>, which imites some
+bird calls with PDL::Audio. You should study them to get the hang of it.
+
+=head2 NOTATION
+
+Brackets around parameters indicate that the respective parameter is
+optional and will be replaced with some default value when absent (or
+C<undef>, which might be different in other packages).
+
+The sampling frequency and duration are by default (see individual
+descriptions) given in cycles/sample (or samples in case of a
+duration). That means if you want to specify a duration of two seconds,
+you have to multiply by the sampling frequency in HZ, and if you want
+to specify a frequency of 440 Hz, you have to divide by the sampling
+frequency:
+
+ # Syntax: gen_oscil duration*, frequency/
+ $signal = gen_oscil 2*HZ, 440/HZ;
+ # with a sampling frequency of 44100 Hertz:
+ $signal = gen_oscil 2*44100, 440/44100;
+
+ print describe_audio $signal, "\n";
+ playaudio $signal->scale2short;
+
+To help you, the required unit is given as a type suffix in the parameter
+name. A "/" means that you have to divide by the sampling frequency (to
+convert from Hertz) and a suffix of "*" indicates that a multiplication is
+required.
+
+Most parameters named "size", "duration" (or marked with "*") can
+be replaced by a piddle, which is then used to give length and from
+(mono/stereo).
+
+=head2 HEADER ATTRIBUTES
+
+The following header attributes are stored and evaluated by most
+functions. PDL::Audio provides mutator methods for all them (e.g.
+ 
+ print "samplerate is ", $pdl->rate;
+ $pdl->comment("set the comment to this string");
+
+=over 4
+
+=item rate
+
+The sampling rate in hz.
+
+=item filetype
+
+The filetype (wav, au etc..). Must be one of:
+
+  FILE_NEXT FILE_AIFC FILE_RIFF FILE_BICSF FILE_NIST FILE_INRS FILE_ESPS
+  FILE_SVX FILE_VOC FILE_SNDT FILE_RAW FILE_SMP FILE_SD2 FILE_AVR
+  FILE_IRCAM FILE_SD1 FILE_SPPACK FILE_MUS10 FILE_HCOM FILE_PSION
+  FILE_MAUD FILE_IEEE FILE_DESKMATE FILE_DESKMATE_2500 FILE_MATLAB
+  FILE_ADC FILE_SOUNDEDIT FILE_SOUNDEDIT_16 FILE_DVSM FILE_MIDI
+  FILE_ESIGNAL FILE_SOUNDFONT FILE_GRAVIS FILE_COMDISCO FILE_GOLDWAVE
+  FILE_SRFS FILE_MIDI_SAMPLE_DUMP FILE_DIAMONDWARE FILE_REALAUDIO
+  FILE_ADF FILE_SBSTUDIOII FILE_DELUSION FILE_FARANDOLE FILE_SAMPLE_DUMP
+  FILE_ULTRATRACKER FILE_YAMAHA_SY85 FILE_YAMAHA_TX16 FILE_DIGIPLAYER
+  FILE_COVOX FILE_SPL FILE_AVI FILE_OMF FILE_QUICKTIME FILE_ASF
+  FILE_YAMAHA_SY99 FILE_KURZWEIL_2000 FILE_AIFF FILE_AU
+
+=item path
+
+The filename (or file specification) used to load or save a file.
+
+=item format
+
+Specifies the type the underlying file format uses. The samples will always be in short or long signed format.
+
+Must be one of
+
+   FORMAT_NO_SND FORMAT_16_LINEAR FORMAT_8_MULAW FORMAT_8_LINEAR
+   FORMAT_32_FLOAT FORMAT_32_LINEAR FORMAT_8_ALAW FORMAT_8_UNSIGNED
+   FORMAT_24_LINEAR FORMAT_64_DOUBLE FORMAT_16_LINEAR_LITTLE_ENDIAN
+   FORMAT_32_LINEAR_LITTLE_ENDIAN FORMAT_32_FLOAT_LITTLE_ENDIAN
+   FORMAT_64_DOUBLE_LITTLE_ENDIAN FORMAT_16_UNSIGNED
+   FORMAT_16_UNSIGNED_LITTLE_ENDIAN FORMAT_24_LINEAR_LITTLE_ENDIAN
+   FORMAT_32_VAX_FLOAT FORMAT_12_LINEAR FORMAT_12_LINEAR_LITTLE_ENDIAN
+   FORMAT_12_UNSIGNED FORMAT_12_UNSIGNED_LITTLE_ENDIAN COMPATIBLE_FORMAT
+
+PDL::Audio conviniently defines the following aliases for the following
+constants, that are already correct for the host byteorder:
+
+   FORMAT_ULAW_BYTE FORMAT_ALAW_BYTE FORMAT_LINEAR_BYTE
+   FORMAT_LINEAR_SHORT FORMAT_LINEAR_USHORT FORMAT_LINEAR_LONG
+   FORMAT_LINEAR_FLOAT FORMAT_LINEAR_DOUBLE
+
+=item comment
+
+The file comment (if any).
+
+=item device
+
+The device to output audio. One of:
+
+   DEV_DEFAULT DEV_READ_WRITE DEV_ADAT_IN DEV_AES_IN DEV_LINE_OUT
+   DEV_LINE_IN DEV_MICROPHONE DEV_SPEAKERS DEV_DIGITAL_IN DEV_DIGITAL_OUT
+   DEV_DAC_OUT DEV_ADAT_OUT DEV_AES_OUT DEV_DAC_FILTER DEV_MIXER
+   DEV_LINE1 DEV_LINE2 DEV_LINE3 DEV_AUX_INPUT DEV_CD_IN DEV_AUX_OUTPUT
+   DEV_SPDIF_IN DEV_SPDIF_OUT
+   
+=back
+
+=head2 EXPORTED CONSTANTS
+
+In addition to the exported constants described above (and later in
+the function descriptions), this module also exports the mathematical
+constants M_PI and M_2PI, so watch out for clashes!
+
+=cut
+EOD
+
+@cconsts = qw(
+   SNDLIB_DEFAULT_DEVICE SNDLIB_READ_WRITE_DEVICE
+   SNDLIB_ADAT_IN_DEVICE SNDLIB_AES_IN_DEVICE
+   SNDLIB_LINE_OUT_DEVICE SNDLIB_LINE_IN_DEVICE
+   SNDLIB_MICROPHONE_DEVICE SNDLIB_SPEAKERS_DEVICE
+   SNDLIB_DIGITAL_IN_DEVICE SNDLIB_DIGITAL_OUT_DEVICE
+   SNDLIB_DAC_OUT_DEVICE SNDLIB_ADAT_OUT_DEVICE
+   SNDLIB_AES_OUT_DEVICE SNDLIB_DAC_FILTER_DEVICE
+   SNDLIB_MIXER_DEVICE SNDLIB_LINE1_DEVICE
+   SNDLIB_LINE2_DEVICE SNDLIB_LINE3_DEVICE
+   SNDLIB_AUX_INPUT_DEVICE SNDLIB_CD_IN_DEVICE
+   SNDLIB_AUX_OUTPUT_DEVICE SNDLIB_SPDIF_IN_DEVICE
+   SNDLIB_SPDIF_OUT_DEVICE
+
+   SNDLIB_NO_SND SNDLIB_16_LINEAR SNDLIB_8_MULAW SNDLIB_8_LINEAR
+   SNDLIB_32_FLOAT SNDLIB_32_LINEAR SNDLIB_8_ALAW SNDLIB_8_UNSIGNED
+   SNDLIB_24_LINEAR SNDLIB_64_DOUBLE SNDLIB_16_LINEAR_LITTLE_ENDIAN
+   SNDLIB_32_LINEAR_LITTLE_ENDIAN SNDLIB_32_FLOAT_LITTLE_ENDIAN
+   SNDLIB_64_DOUBLE_LITTLE_ENDIAN SNDLIB_16_UNSIGNED
+   SNDLIB_16_UNSIGNED_LITTLE_ENDIAN SNDLIB_24_LINEAR_LITTLE_ENDIAN
+   SNDLIB_32_VAX_FLOAT SNDLIB_12_LINEAR SNDLIB_12_LINEAR_LITTLE_ENDIAN
+   SNDLIB_12_UNSIGNED SNDLIB_12_UNSIGNED_LITTLE_ENDIAN
+   SNDLIB_COMPATIBLE_FORMAT
+
+   NeXT_sound_file AIFC_sound_file RIFF_sound_file
+   BICSF_sound_file NIST_sound_file INRS_sound_file
+   ESPS_sound_file SVX_sound_file VOC_sound_file
+   SNDT_sound_file raw_sound_file SMP_sound_file
+   SD2_sound_file AVR_sound_file IRCAM_sound_file
+   SD1_sound_file SPPACK_sound_file MUS10_sound_file
+   HCOM_sound_file PSION_sound_file MAUD_sound_file
+   IEEE_sound_file DeskMate_sound_file DeskMate_2500_sound_file
+   Matlab_sound_file ADC_sound_file SoundEdit_sound_file
+   SoundEdit_16_sound_file DVSM_sound_file MIDI_file
+   Esignal_file soundfont_sound_file gravis_sound_file
+   comdisco_sound_file goldwave_sound_file srfs_sound_file
+   MIDI_sample_dump DiamondWare_sound_file RealAudio_sound_file
+   ADF_sound_file SBStudioII_sound_file Delusion_sound_file
+   Farandole_sound_file Sample_dump_sound_file Ultratracker_sound_file
+   Yamaha_SY85_sound_file Yamaha_TX16_sound_file digiplayer_sound_file
+   Covox_sound_file SPL_sound_file AVI_sound_file
+   OMF_sound_file Quicktime_sound_file asf_sound_file
+   Yamaha_SY99_sound_file Kurzweil_2000_sound_file AIFF_sound_file
+
+   BANDPASS DIFFERENTIATOR HILBERT
+);
+
+for (@cconsts) {
+   local $_ = $_;
+   s/^SNDLIB_(.*)_DEVICE/DEV_$1/;
+   s/^SNDLIB_/FORMAT_/;
+   s/MIDI_file/FILE_MIDI/;
+   s/MIDI_sample_dump/FILE_MIDI_sample_dump/;
+   s/Esignal_file/FILE_Esignal/;
+   s/(.*)_sound_file/FILE_$1/;
+   push @pconsts, uc $_;
+}
+
+@METHODS = qw(
+   waudio cut_leading_silence cut_trailing_silence cut_silence filter_zpolar
+   partials2polynomial scale2short filter_fir filter_iir rfft irfft spectrum
+   filter_comb filter_notch filter_allpass filter_src filter_granulate
+   filter_contrast_enhance describe_audio filter_center ring_modulate
+   amplitude_modulate filter_ppolar design_remez_fir concat
+   gen_oscil gen_sawtooth gen_square gen_triangle gen_asymmetric_fm gen_rand_1f
+   gen_env audiomix gen_sum_of_cosines gen_sine_summation gen_fft_window
+   gen_pulse_train gen_rand gen_from_table gen_from_partials partials2waveshape
+
+);
+@EXPORT = (qw(
+   sound_format_name sound_type_name raudio
+   FORMAT_ULAW_BYTE FORMAT_ALAW_BYTE FORMAT_LINEAR_BYTE
+   FORMAT_LINEAR_SHORT FORMAT_LINEAR_USHORT FORMAT_LINEAR_LONG
+   FORMAT_LINEAR_FLOAT FORMAT_LINEAR_DOUBLE
+   M_PI M_2PI
+), @METHODS, @pconsts);
+
+for (@EXPORT) {
+   pp_add_exported "", $_;
+}
+
+pp_addpm "\@METHODS = qw(@METHODS);\n";
+
+$addboot = "{\nHV *stash = gv_stashpvn(\"PDL::Audio\", 10, TRUE);";
+
+for (0..$#cconsts) {
+   $addboot .= "   newCONSTSUB(stash, \"$pconsts[$_]\", newSViv($cconsts[$_]));\n";
+}
+$addboot .= "   newCONSTSUB(stash, \"M_PI\" , newSVnv(M_PI ));\n";
+$addboot .= "   newCONSTSUB(stash, \"M_2PI\", newSVnv(M_2PI));\n";
+$addboot .= '}
+   mus_set_error_handler (mus_barfer);
+';
+
+pp_add_boot $addboot;
+
+pp_addpm <<'EOD';
+
+use PDL::LiteF;
+use PDL::Complex;
+use Carp;
+
+$bigendian = 0x55 == unpack "S", "\0U";
+
+sub FORMAT_ULAW_BYTE    (){ FORMAT_8_MULAW }
+sub FORMAT_ALAW_BYTE    (){ FORMAT_8_ALAW  }
+sub FORMAT_LINEAR_BYTE  (){ FORMAT_8_UNSIGNED }
+sub FORMAT_LINEAR_SHORT (){ $bigendian ? FORMAT_16_LINEAR   : FORMAT_16_LINEAR_LITTLE_ENDIAN   }
+sub FORMAT_LINEAR_USHORT(){ $bigendian ? FORMAT_16_UNSIGNED : FORMAT_16_UNSIGNED_LITTLE_ENDIAN }
+sub FORMAT_LINEAR_LONG  (){ $bigendian ? FORMAT_32_LINEAR   : FORMAT_32_LINEAR_LITTLE_ENDIAN   }
+sub FORMAT_LINEAR_FLOAT (){ $bigendian ? FORMAT_32_FLOAT    : FORMAT_32_FLOAT_LITTLE_ENDIAN    }
+sub FORMAT_LINEAR_DOUBLE(){ $bigendian ? FORMAT_32_DOUBLE   : FORMAT_32_DOUBLE_LITTLE_ENDIAN   }
+
+sub FILE_AU		(){ FILE_NEXT }
+
+# provide some accessor methods
+for my $field (qw(rate comment filetype path format)) {
+   *{"PDL::$field"} = sub {
+      my $pdl = shift;
+      my $hdr = $pdl->gethdr;
+      if (@_) {
+         $hdr->{$field} = $_[0];
+         $pdl->sethdr($hdr);
+      };
+      $hdr->{$field};
+   };
+}
+
+=head2 sound_format_name format_code
+
+Return the human-readable name of the file format with code C<format_code>.
+
+=head2 sound_type_name type_code
+
+Return the human-readable name of the sample type with code C<type_code>.
+
+=head2 describe_audio piddle
+
+Describe the audio stream contained in piddle and return it as a string. A
+fresh piddle might return:
+
+ mono sound with 27411 samples
+
+Whereas a freshly loaded soundfile might yield:
+
+ stereo sound with 27411 samples, original name "kongas.wav", type 2 (RIFF),
+ rate 11025/s (duration 2.49s), format 7 (8-bit unsigned)
+
+=cut
+
+sub describe_audio($) {
+   my $pdl = shift;
+   my ($channels, $samples) = $pdl->dims;
+   ($channels, $samples) = (1, $channels) unless defined $samples;
+   my $chan = $channels  < 2 ? "mono" :
+              $channels == 2 ? "stereo" :
+              $channels == 4 ? "quad channel" :
+                               "$channels channel";
+   my $desc = "$chan sound with $samples samples";
+   $desc .= sprintf ", original name \"%s\"", $pdl->path if $pdl->path;
+   $desc .= sprintf ", type %d (%s)", $pdl->filetype, sound_type_name($pdl->filetype) if $pdl->filetype;
+   $desc .= sprintf ", rate %d/s (duration %.2fs)", $pdl->rate, $samples/$pdl->rate if $pdl->rate;
+   $desc .= sprintf ", format %d (%s)", $pdl->format, sound_format_name($pdl->format) if $pdl->format;
+   $desc
+}
+
+=head2 raudio path, [option-hash], option => value, ...
+
+Reads audio data into the piddle. Options can be anything, most useful
+values are C<filetype>, C<rate>, C<channels> and C<format>. The returned
+piddle is represents "time" in the outer dimension, and samples in the
+inner (i.e. scalars for mono files, 2-vectors for stereo files):
+   
+ [ [left0, right0], [left1, right1], [left2, right2], ...]
+
+ # read any file
+ $pdl = raudio "file.wav";
+ # read a file. if it is a raw file preset values
+ $pdl = raudio "file.raw", filetype => FILE_RAW, rate => 44100, channels => 2;
+
+=head2 waudio pdl, [option-hash], option => value, ...
+
+Writes a pdl as a file. See L<raudio> for options and format. The path and
+other metadata is taken from the header, whcih cna be overwritten using
+options, e.g.:
+
+ # write a file, using the header of another piddle
+ $pdl->waudio ($orig_file->gethdr);
+ # write pdl as .au file, take rate from the header
+ $pdl->waudio (path => "piddle.au", filetype => FILE_AU, format => FORMAT_16_LINEAR;
+
+=cut
+
+# read a sound file
+sub raudio {
+   my $path = shift;
+   my %hdr = (); %hdr = (%hdr, %{+shift}) if ref $_[0]; %hdr = (%hdr, @_) if @_;
+
+   # for raw files this is necessary
+   mus_set_raw_header_defaults $hdr{rate}    || 44100,
+                               $hdr{channels}|| 1,
+                               $hdr{format}  || FORMAT_LINEAR_SHORT;
+
+   $hdr{path}       = $path;
+   $hdr{filetype}   = sound_header_type $path;
+                         $hdr{filetype} >= 0 or barf "$path: ".audio_error_name audio_error;
+   $hdr{rate}       = sound_srate $path;
+   $hdr{comment}    = sound_comment $path if defined sound_comment $path;
+   $hdr{format}     = sound_data_format $path;
+   my $channels     = sound_chans $path;
+   my $frames       = sound_frames $path;
+
+   my $fd = open_sound_input $path; $fd >= 0 or barf "$path: ".audio_error_name audio_error;
+
+   my $pdl = zeroes long, $frames, $channels;
+   $pdl->clump(-1)->read_sound ($fd, $channels, $frames)
+                                        >= 0 or barf "$path: ".audio_error_name audio_error;
+   (close_sound_input $fd)              >= 0 or barf "$path: ".audio_error_name audio_error;
+   $pdl = $pdl->short->xchg(0,1);
+   $pdl = $pdl->clump(2) if $channels == 1;
+   $pdl->sever;
+   $pdl->sethdr(\%hdr);
+   $pdl
+}
+
+sub _audio_make_plain {
+   my $pdl = shift;
+   if ($pdl->getndims == 1) {
+      ($pdl, 1, $pdl->getdim(0))
+   } else {
+      ($pdl->xchg(0,1)->clump(-1), $pdl->dims)
+   }
+}
+
+sub waudio {
+   my $pdl = shift;
+   my %hdr = %{$pdl->gethdr || {}}; %hdr = (%hdr, %{+shift}) if ref $_[0]; %hdr = (%hdr, @_) if @_;
+   my ($channels, $frames);
+
+   $hdr{filetype}   = FILE_NEXT unless exists $hdr{filetype};
+   $hdr{format}   ||= FORMAT_16_LINEAR;
+   $hdr{rate}     ||= 44100;
+
+   ($pdl, $channels, $frames) = _audio_make_plain $pdl->convert(long);
+
+   1 <= $channels && $channels <= 2
+      or croak "can only write mono or stereo (one or two channel) files, not $channels channel files";
+
+   my $fd = open_sound_output $hdr{path}, $hdr{rate}, $channels, $hdr{format}, $hdr{filetype}, $hdr{comment};
+   $fd >= 0 or barf "$hdr{$path}: ".audio_error_name audio_error;
+   $pdl->clump(-1)->write_sound($fd, $channels, $frames)
+       >= 0 or barf "$path: ".audio_error_name audio_error;
+   (close_sound_output $fd, mus_samples2bytes $hdr{format}, $frames * $channels)
+       >= 0 or barf "$hdr{$path}: ".audio_error_name audio_error;
+}
+
+=head2 cut_leading_silence pdl, level
+
+Cuts the leading silence (i.e. all samples with absolute value < level)
+and returns the resulting part.
+
+=head2 cut_trailing_silence pdl, level
+
+Cuts the trailing silence.
+
+=head2 cut_silence pdl, level
+
+Calls C<cut_leading_silence> and C<cut_trailing_silence> and returns the
+result.
+
+=cut
+
+sub cut_leading_silence {
+   my $pdl = shift;
+   my $level = 1*shift;
+   my $skip = which (abs($pdl) > $level);
+   $skip = $skip->nelem ? $skip->at(0) : 0;
+   $pdl->slice("$skip:-1")
+}
+
+sub cut_trailing_silence {
+   my $pdl = shift;
+   my $level = 1*shift;
+   $level = 400000;
+   my $skip = which (abs($pdl) > $level);
+   $skip = $skip->nelem ? $skip->at(-1) : -1;
+   $skip-- if $skip > 0;
+   $pdl->slice("0:$skip")
+}
+
+sub cut_silence {
+   $_[0]->cut_leading_silence($_[1])
+        ->cut_trailing_silence($_[1])
+}
+
+# have we been a bad boy?
+
+for (@METHODS) {
+   *{"PDL::$_"} = \&$_;
+}
+EOD
+
+for my $d (qw(read write)) {
+   pp_def($d.'_sound',
+          Pars => ($d eq "read" ? '[o]' : '') . 'sample(n)',
+          OtherPars => "int fd; int chans; int frames",
+          GenericTypes => [L],
+          PMCode => '', 
+          Doc => undef,
+          Code => q@
+              int chans = $COMP(chans);
+              int frames = $COMP(frames);
+              int **bufs = malloc (chans * sizeof (int *));
+              int i;
+              dSP;
+
+              /* hmm... */
+              assert (sizeof (PDL_long) == sizeof (int));
+
+              for (i = 0; i < chans; i++)
+                bufs[i] = (int *)$P(sample) + i * frames;
+
+              XPUSHs (sv_2mortal (newSViv (@.$d.q@_sound ($COMP(fd), 0, frames - 1, chans, bufs))));
+
+              free (bufs);
+          @,
+   );
+}
+
+pp_addhdr <<'EOH';
+#include "sndlib/sndlib.h"
+#include "xlib.h"
+
+static void
+mus_barfer (int err_type, char *err_msg)
+{
+  barf ("%s [MUSERR]", err_msg);
+}
+
+EOH
+
+pp_addpm <<'EOP';
+
+=head2 playaudio pdl, [option-hash], option => value ...
+
+Play the piddle as an audio file. Options can be supplied either through
+the option hash (a hash-reference), through the pdl header or the options:
+
+ # play a piddle that has a valid header (e.g. from raudio)
+ $pdl->playaudio;
+ # play it with a different samplerate
+ $pdl->playaudio(rate => 22050);
+
+=cut
+
+EOP
+
+pp_def('playaudio',
+       Pars => 'sample(n)',
+       OtherPars => "int srate; int chans; int format; int dev; int bufsize",
+       GenericTypes => [B,U,S,L],
+       Doc => undef,
+       PMCode => q!
+           sub PDL::playaudio {
+               my $pdl = shift;
+               my %hdr = %{$pdl->gethdr || {}}; %hdr = (%hdr, %{+shift}) if ref $_[0]; %hdr = (%hdr, @_) if @_;
+               my $chans;
+               $hdr{format}  ||= FORMAT_LINEAR_SHORT;
+               ($pdl, $chans) = _audio_make_plain $pdl;
+               &PDL::_playaudio_int($pdl,
+                  $hdr{rate}	|| 44100,
+                  $chans,
+                  $hdr{format},
+                  $hdr{device}	|| DEV_DEFAULT,
+                  $hdr{bufsize}	|| 32768);
+           }
+       !,
+       Code => q@
+           int ns;
+           int line;
+
+           if (sizeof ($GENERIC ()) != mus_format2bytes ($COMP(format)))
+             barf ("pdl datatype and selected audio format do not match");
+
+           if (initialize_audio () < 0)
+             barf ("playaudio: %s", audio_error_name (audio_error ()));
+
+           if ((line = open_audio_output ($COMP(dev), $COMP(srate), $COMP(chans), $COMP(format), $COMP(bufsize))) < 0)
+             barf ("playaudio: %s", audio_error_name (audio_error ()));
+
+           ns = $SIZE(n);
+           threadloop %{
+             if (write_audio (line, (void *)$P(sample), ns * sizeof ($GENERIC())))
+               barf ("playaudio: %s", audio_error_name (audio_error ()));
+           %}
+           if (close_audio (line) < 0) 
+             barf ("playaudio: %s", audio_error_name (audio_error ()));
+           @,
+);
+
+pp_def 'ulaw2linear',
+       Pars => 'byte u(n); short [o] s(n)',
+       GenericTypes => [B],
+       Doc => 'conversion from (m)u-law into signed, linear, 16 bit samples (rather slow)',
+       Code => q! loop(n) %{ $s() = st_ulaw_to_linear ($u()); %} !,
+;
+
+pp_def 'linear2ulaw',
+       Pars => 'short s(n); byte [o] u(n)',
+       GenericTypes => [S],
+       Doc => 'conversion from signed, linear, 16 bit samples into (m)u-law (rather slow)',
+       Code => q! loop(n) %{ $u() = st_linear_to_ulaw ($s()); %} !,
+;
+
+pp_def 'alaw2linear',
+       Pars => 'byte u(n); short [o] s(n)',
+       GenericTypes => [B],
+       Doc => 'conversion from A-law into signed, linear, 16 bit samples (rather slow)',
+       Code => q! loop(n) %{ $s() = st_Alaw_to_linear ($u()); %} !,
+;
+
+pp_def 'linear2alaw',
+       Pars => 'short s(n); byte [o] u(n)',
+       GenericTypes => [S],
+       Doc => 'conversion from signed, linear, 16 bit samples into A-law (rather slow)',
+       Code => q! loop(n) %{ $u() = st_linear_to_Alaw ($s()); %} !,
+;
+
+pp_addpm <<'EOP';
+
+=head2 gen_oscil duration*, freq/, phase-mod, [fm-mod/]
+
+=head2 gen_sawtooth duration*, freq/, phase-mod, [fm-mod/]
+
+=head2 gen_square duration*, freq/, phase-mod, duty, [fm-mod/]
+
+=head2 gen_triangle duration*, freq/, phase-mod, [fm-mod/]
+
+=head2 gen_pulse_train duration*, freq/, phase-mod, [fm-mod/]
+
+=head2 gen_rand duration*, freq/
+
+=head2 gen_rand_1f duration*
+
+All of these functions generate appropriate waveforms with frequency
+C<freq> (cycles/sample) and phase C<phase> (0..1).
+
+The C<duration> might be either a piddle (which gives the form of the
+output) or the number of samples to generate.
+
+The output samples are between -1 and +1 (i.e. "-1 <= s <= +1").
+
+The C<duty> parameter of the square generator influences the duty cycle of
+the signal. Zero means 50%-50%, 0.5 means 75% on, 25% off, -0.8 means 10%
+on, 90% off etc... Of course, the C<duty> parameter might also be a vector
+of size C<duration>.
+
+=cut
+
+# return the time offset for duration, freq, phase, fm_mod
+sub _dur2time($$;$$) {
+   my ($dur, $freq, $phase, $fm_mod) = @_;
+   zeroes($dur)->xvals*$freq+cumusumover($fm_mod)+$phase
+}
+
+sub gen_oscil($$;$$) {
+   my ($dur, $freq, $phase, $fm_mod) = @_;
+   sin M_2PI*_dur2time($dur,$freq,$phase,$fm_mod);
+}
+
+sub gen_sawtooth($$;$$) {
+   my ($dur, $freq, $phase, $fm_mod) = @_;
+   # maybe better use abs?
+   $freq = $fm_mod * $freq if defined $fm_mod;
+   (_dur2time($dur,$freq,$phase,$fm_mod) % 1 - 0.5) * 2;
+}
+
+sub gen_square($$;$$$) {
+   my ($dur, $freq, $phase, $duty, $fm_mod) = @_;
+   (gen_sawtooth($dur,$freq,$phase,$fm_mod) < $duty) * 2 - 1;
+}
+
+sub gen_triangle($$;$$) {
+   my ($dur, $freq, $phase, $fm_mod) = @_;
+   my $st = gen_sawtooth($dur,$freq,$phase,$fm_mod);
+   $st * (($st < 0) * 2 - 1);
+}
+
+sub gen_pulse_train($$;$$) {
+   my ($dur, $freq, $phase, $fm_mod) = @_;
+   my $st = gen_sawtooth($dur,$freq,$phase,$fm_mod);
+   $st < $st->rotate(1);
+}
+
+sub gen_rand($$) {
+   my ($dur, $freq) = @_;
+   my $z = zeroes $dur;
+   my $r = (random zeroes $freq * $z->getdim(0) + 1) * 2 - 1;
+   $r->index($freq * $z->xvals)->sever;
+}
+
+sub gen_rand_1f($) {
+   my ($dur) = @_;
+   $dur = zeroes $dur;
+   _gen_noise_1f($dur);
+   $dur;
+}
+
+=head2 gen_env duration*, xvals, yvals, [base]
+
+Generates an interpolated envelope between the points given by xvals and
+yvals.  When base == 1 (the default) then the values will be linearly
+interpolated, otherwise they follow an exponential curve that is bend
+inwards (base < 1) or outwards (base > 1).
+
+ # generate a linear envelope with attack in the first 10%
+ gen_env 5000, [0 1 2 9 10], [0 1 0.6 0.6 0];
+
+=cut
+
+sub gen_env($;@) {
+   my ($dur, $x, $y, $base) = @_;
+   my $pdl = zeroes $dur;
+   $base ||= 1;
+   $base == 1 or barf "base values != 1 are not yet implemented\n";
+   my @x = ref $x eq "ARRAY" ? @$x : $x->list;
+   my @y = ref $y eq "ARRAY" ? @$y : $y->list;
+   my $f = $pdl->getdim(0) / $x[-1];
+   @x == @y or barf "gen_env: x and y lists have different sizes";
+   my $x0 = 0;
+   my $y0 = 0;
+   for (0..$#x) {
+      my ($x,$y) = (int($x[$_]*$f),$y[$_]);
+      if ($x > $x0) {
+         my $a = $pdl->slice("$x0:".($x-1));
+         if ($y0 != $y) {
+            $a .= $a->xlinvals($y0,$y);
+         } else {
+            $a .= $y;
+         }
+      }
+      ($x0,$y0)=($x,$y);
+   }
+   $pdl;
+}
+
+=head2 gen_adsr duration*, sustain-level, attack-time, decay-time, sustain-time, release-time
+
+Simple ADSR envelope generator. The C<sustain-level> is the amplitude (0
+to 1) of the sustain level. The other for parameters give the relative
+interval times, in any unit you like, only their relative ratios
+are important. Any of these times might be zero, in which case the
+corresponding part is omitted from the envelope.
+
+=cut
+
+sub gen_adsr($$$$$$) {
+   my ($dur, $amp, $a, $d, $s, $r) = @_;
+   my (@x, @y);
+   my $t = 0;
+   push @x, 0; push @y, 0;
+   if ($a > 0) { push @x, $t += $a; push @y,    1 } else { $y[-1] =    1 }
+   if ($d > 0) { push @x, $t += $d; push @y, $amp } else { $y[-1] = $amp }
+   if ($s > 0) { push @x, $t += $s; push @y, $amp } else { $y[-1] = $amp }
+   if ($r > 0) { push @x, $t += $r; push @y,    0 } else { $y[-1] =    0 }
+   zeroes($dur)->xlinvals(0,$t)->linear_interpolate(pdl(@x), pdl(@y));
+}
+
+=head2 gen_asymmetric_fm duration*, freq/, phase, [r , [ratio]]
+
+C<gen_asymmetric_fm> provides a way around the symmetric spectra normally
+produced by FM. See Palamin and Palamin, "A Method of Generating and
+Controlling Asymmetrical Spectra" JAES vol 36, no 9, Sept 88, p671-685.
+
+=cut
+
+sub gen_asymmetric_fm($$;$$$) {
+   my ($dur, $freq, $phase, $r, $ratio) = @_;
+   $r     ||= 1;
+   $ratio ||= 1;
+   my $cosr = 0.5 * ($r - 1/$r);
+   my $sinr = 0.5 * ($r + 1/$r);
+   $phase = zeroes($dur)->xvals*$freq + $phase;
+   my $mth = $phase * $ratio;
+   exp ($cosr * cos $mth) * sin ($phase + $sinr * sin $mth);
+}
+
+=head2 gen_sum_of_cosines duration*, freq/, phase, ncosines, [fm_mod/]
+
+Generates a sum of C<n> cosines C<(1 + 2(cos(x) + cos(2x) + ... cos(nx)) =
+sin((n+.5)x) / sin(x/2))>. Other arguments are similar to to C<gen_oscil>.
+
+=head2 gen_sine_summation duration*, freq/, phase, [nsines, [a, [b_ratio, [fm_mod/]]]]
+
+C<gen_sine_summation> provides a kind of additive synthesis. See
+J.A.Moorer, "Signal Processing Aspects of Computer Music" and "The
+Synthesis of Complex Audio Spectra by means of Discrete Summation
+Formulae" (Stan-M-5). The basic idea is very similar to that used in
+gen_sum_of_cosines generator.
+
+The default value for C<nsines> is 1 (but zero is a valid value), for C<a>
+is 0.5 and for C<b_ratio> is 1.
+
+(btw, either my formula is broken or the output indeed does not lie
+between -1 and +1, but rather -5 .. +5).
+
+=cut
+
+sub gen_sum_of_cosines {
+   my ($dur, $freq, $phase, $cosines, $fm_mod) = @_;
+   $cosines ||= 1;
+   $dur = M_2PI*_dur2time($dur,$freq,$phase+1e-6,$fm_mod);
+   sin ($dur * ($cosines+0.5)) / (sin ($dur * 0.5) * (1+2*$cosines));
+}
+
+sub gen_sine_summation {
+   my ($dur, $freq, $phase, $n, $a, $ratio, $fm_mod) = @_;
+   $n = 1 unless defined $n;
+   $a ||= 0.5;
+   $ratio ||= 1;
+
+   $dur = M_2PI*_dur2time($dur,$freq,$phase+1e-6,$fm_mod);
+   my $an = $n ? $a**($n+1) : 0;
+   my $B  = $dur * $ratio;
+   (sin ($dur)
+    - $a * sin ($dur - $B)
+    - $an * (sin ($dur + $B*($n+1))
+             - $a * sin ($dur + $B*$n)))
+   / (1 + $a*$a - (2*$a*cos($B)));
+}
+
+=head2 gen_from_table duration*, frequency/, table, [phase], [fm_mod/]
+
+C<gen_from_table> generates a waveform by repeating a waveform given
+in C<table>, linearly interpolating between successive points of the
+C<waveform>.
+
+=head2 partials2waveshape size*, partials, amplitudes, [phase], [fm_mod/]
+
+Take a (perl or pdl) list of (integer) C<partials> and a list of
+C<amplitudes> and generate a single wave shape that results by adding
+these partial sines.
+
+This could (and should) be used by the C<gen_from_table> generator.
+
+=head2 gen_from_partials duration*, frequency/, partials, amplitudes, [phase], [fm_mod/]
+
+Take a (perl list or pdl) list of (possibly noninteger) C<partials> and a
+list of C<amplitudes> and generate the waveform resulting by summing up
+all these partial sines.
+
+=cut
+
+sub gen_from_table {
+   my ($dur, $freq, $table, $phase, $fm_mod) = @_;
+   my $r = _dur2time($dur,$freq,$phase,$fm_mod);
+   my $tx = ($table->dims)[0];
+   $table = cat($table, $table->at(0))->clump(-1);
+   $r %= 1; $r += 1; $r %= 1; $r *= $tx;
+   $r->linear_interpolate($table->xvals, $table);
+}
+
+sub partials2waveshape {
+   my $dur = zeroes $_[0];
+   my @idx = ref $_[1] eq "ARRAY" ? @{$_[1]} : $_[1]->list;
+   my @amp = ref $_[2] eq "ARRAY" ? @{$_[2]} : $_[2]->list;
+
+   my $angle = $dur->xvals * (M_2PI/$dur->getdim(0));
+
+   for (0..$#idx) {
+      $dur += $amp[$_] * sin $idx[$_]*$angle;
+   }
+   $dur / max abs $dur;
+}
+
+sub gen_from_partials {
+   my ($dur, $freq, $ti, $ta, $phase, $fm_mod) = @_;
+   my @idx = ref $ti eq "ARRAY" ? @{$ti} : $ti->list;
+   my @amp = ref $ta eq "ARRAY" ? @{$ta} : $ta->list;
+
+   $dur = zeroes $dur;
+
+   my $angle = _dur2time($dur,$freq,$phase,$fm_mod);
+
+   for (0..$#idx) {
+      $dur += $amp[$_] * fast_sin($idx[$_]*$angle);
+   }
+   $dur / max abs $dur;
+}
+
+EOP
+
+pp_def '_gen_noise_1f',
+       Pars => '[o]f(n)',
+       GenericTypes => [F,D],
+       Doc => undef,
+       PMCode => undef,
+       Code => q^
+         static unsigned long ctz[64] = {
+           6, 0, 1, 0, 2, 0, 1, 0,
+           3, 0, 1, 0, 2, 0, 1, 0,
+           4, 0, 1, 0, 2, 0, 1, 0,
+           3, 0, 1, 0, 2, 0, 1, 0,
+           5, 0, 1, 0, 2, 0, 1, 0,
+           3, 0, 1, 0, 2, 0, 1, 0,
+           4, 0, 1, 0, 2, 0, 1, 0,
+           3, 0, 1, 0, 2, 0, 1, 0,
+         };
+         static unsigned int dice[7];
+         static unsigned int total = 0;
+         unsigned int n, prevrand, newrand, seed, k; 
+
+         threadloop %{
+           for (n = 0; n < $SIZE(n); n++)
+             {
+               k = ctz [n & 63];
+
+               prevrand = dice[k];
+               seed = 1664525 * seed + 1013904223;
+               newrand = (seed >> 3);
+               dice[k] = newrand;
+
+               total += newrand - prevrand;
+
+               seed = 1103515245 * seed + 12345;
+               newrand = (seed >> 3);
+
+               $f(n=>n) = ($GENERIC())(total + newrand) * (1./(3<<29)) - 1;
+             }
+         %}
+         ^
+;
+
+pp_def 'filter_one_zero',
+       Pars => 'in(n); [o] out(n)',
+       OtherPars => 'double a0; double a1',
+       GenericTypes => [F,D],
+       Doc => 'apply a one zero filter, y(n) = a0 x(n) + a1 x(n-1)',
+       Code => q!
+          double a0 = $COMP(a0);
+          double a1 = $COMP(a1);
+          double x1 = 0.;
+
+          threadloop %{ loop(n) %{
+             $out() = a0 * $in() + a1 * x1;
+             x1 = $in();
+          %} %}
+       !
+;
+
+pp_def 'filter_one_pole',
+       Pars => 'in(n); [o] out(n)',
+       OtherPars => 'double a0; double b1',
+       GenericTypes => [F,D],
+       Doc => 'apply a one pole filter, y(n) = a0 x(n) - b1 y(n-1)',
+       Code => q!
+          double a0 = $COMP(a0);
+          double b1 = $COMP(b1);
+          double y2 = 0.;
+
+          threadloop %{ loop(n) %{
+             $out() = y2 = a0 * $in() - b1 * y2;
+          %} %}
+       !
+;
+
+pp_def 'filter_two_zero',
+       Pars => 'in(n); [o] out(n)',
+       OtherPars => 'double a0; double a1; double a2',
+       GenericTypes => [F,D],
+       Doc => 'apply a two zero filter, y(n) = a0 x(n) + a1 x(n-1) + a2 x(n-2)',
+       Code => q!
+          double a0 = $COMP(a0);
+          double a1 = $COMP(a1);
+          double a2 = $COMP(a2);
+          double x1 = 0.;
+          double x2 = 0.;
+
+          threadloop %{ loop(n) %{
+             $out() = a0 * $in() + a1 * x1 + a2 * x2;
+             x2 = x1; x1 = $in();
+          %} %}
+       !
+;
+
+pp_def 'filter_two_pole',
+       Pars => 'in(n); [o] out(n)',
+       OtherPars => 'double a0; double b1; double b2',
+       GenericTypes => [F,D],
+       Doc => 'apply a two pole filter, y(n) = a0 x(n) - b1 y(n-1) - b2 y(n-2)',
+       Code => q!
+          double a0 = $COMP(a0);
+          double b1 = $COMP(b1);
+          double b2 = $COMP(b2);
+          double y1 = 0.;
+          double y2 = 0.;
+
+          threadloop %{ loop(n) %{
+             $out() = a0 * $in() - b1 * y1 - b2 * y2;
+             y2 = y1; y1 = $out();
+          %} %}
+       !
+;
+
+pp_def 'filter_formant',
+       Pars => 'in(n); [o] out(n)',
+       OtherPars => 'double radius; double frequency; double gain',
+       GenericTypes => [F,D],
+       Doc => 'apply a formant filter, y(n) = x(n) - r*x(n-2) + 2*r*cos(2*pi*frequency)*y(n-1) - r*r*y(n-2). A good value for C<gain> is 1.',
+       Code => q!
+          threadloop %{
+             double radius = 1. - $COMP(radius);
+             double a0 = $COMP(gain) * sin ($COMP(frequency) * M_2PI) * (1. - (radius * radius));
+             double a2 = -radius;
+             double b1 = -2. * radius * cos ($COMP(frequency) * M_2PI);
+             double b2 = radius * radius;
+             double x1 = 0.;
+             double x2 = 0.;
+             double y1 = 0.;
+             double y2 = 0.;
+
+             loop(n) %{
+                double inval = a0 * $in();
+                $out() = inval + a2 * x2 - b1 * y1 - b2 * y2;
+                y2 = y1; y1 = $out();
+                x2 = x1; x1 = inval;
+             %}
+          %}
+       !
+;
+
+pp_addpm <<'EOP';
+
+=head2 filter_ppolar pdl, radius/, frequency/
+
+apply a two pole filter (given in polar form). The filter has two poles,
+one at (radius,frequency), the other at (radius,-frequency). Radius
+is between 0 and 1 (but less than 1), and frequency is between 0 and
+0.5. This is the standard resonator form with poles specified by the
+polar coordinates of one pole.
+
+=head2 filter_zpolar pdl, radius/, frequency/
+
+apply a two zero filter (given in polar form). See C<filter_ppolar>.
+
+=cut
+
+sub filter_ppolar {
+   my ($pdl, $radius, $freq) = @_;
+   $pdl->filter_two_pole(1, -2*$radius*cos($freq*M_2PI), $radius**2);
+}
+
+sub filter_zpolar {
+   my ($pdl, $radius, $freq) = @_;
+   $pdl->filter_two_zero(1, -2*$radius*cos($freq*M_2PI), $radius**2);
+}
+
+=head2 partials2polynomial partials, [kind]
+
+C<partials2polynomial> takes a list of harmonic amplitudes and returns a
+list of Chebychev polynomial coefficients. The argument C<kind> determines
+which kind of Chebychev polynomial we are interested in, 1st kind or 2nd
+kind. (default is 1).
+
+=cut
+
+sub partials2polynomial {
+   my ($partials, $kind) = @_;
+   $kind = 1 unless defined $kind;
+   my $t0  = zeroes($partials->getdim(0)+1);
+   my $t1  = $t0->copy;
+   my $cc1 = $t0->copy;
+
+   $t0->set(0,1);
+   $t1->set(1,$kind);
+
+   for my $amp ($partials->list) {
+      $cc1 += $amp * $t1;
+      $tn = 2 * $t1->rshift(1) - $t0;
+      $t0 = $t1;
+      $t1 = $tn;
+   }
+   $cc1;
+}
+
+=head2 ring_modulate in1, in2
+
+ring modulates in1 with in2 (this is just a multiply).
+
+=head2 amplitude_modulate am_carrier, in1, in2
+
+amplitude modulates am_carrier and in2 with in1 (this calculates in1 * (am_carrier + in2)).
+
+=cut
+
+sub ring_modulate {
+   $_[0] * $_[1];
+}
+
+sub amplitude_modulate {
+   $_[1] * ($_[0] + $_[2]);
+}
+
+EOP
+
+pp_def 'filter_sir',
+       Pars => 'x(n); a(an); b(bn); [o]y(n)',
+       GenericTypes => [L,F,D],
+       Doc => <<'EOD',
+Generic (short delay) impulse response filter. C<x> is the input signal
+(which is supposed to be zero for negative indices). C<a> contains the
+input (x) coefficients (a0, a1, .. an), whereas C<b> contains the output
+(y) coefficients (b0, b1, ... bn), i.e.:
+
+ y(n) = a0 x(n) - b1 y(n-1) + a1 x(n-1) - b2 y(n-2) + a2 x(n-2) - b3 ...
+
+This can be used to generate fir and iir filters of any length, or even
+more complicated constructs.
+
+C<b0> (then first element of C<b>) is being ignored currently AND SHOULD
+BE SPECIFIED AS ONE FOR FUTURE COMPATIBILITY
+EOD
+       Code => q^
+          int an = $SIZE(an);
+          int bn = $SIZE(bn);
+          int i, n, I;
+          $GENERIC() v;
+
+          threadloop %{
+            for (n = 0; n < $SIZE(n); n++)
+              {
+                v = 0;
+
+                /* apply loop splitting manually later! */
+
+                for (i = 0; i < an; i++)
+                  {
+                    I = n-i;
+                    if (I >= 0)
+                      v += $a(an=>i) * $x(n=>I);
+                  }
+
+                for (i = 0; i < bn; i++)
+                  {
+                    I = n-i;
+                    if (I >= 0)
+                      v -= $b(bn=>i) * $y(n=>I);
+                  }
+
+                $y(n=>n) = v;
+              }
+          %}
+       ^
+;
+
+pp_def 'filter_lir',
+       Pars => 'x(n); int a_x(an); a_y(an); int b_x(bn); b_y(bn); [o]y(n)',
+       GenericTypes => [L,F,D],
+       Doc => <<'EOD',
+
+Generic (long delay) impulse response filter. The difference to
+C<filter_sir> is that the filter coefficients need not be consecutive,
+but instead their indices are given by the C<a_x> and C<b_x> (integer)
+vectors, while the corresponding coefficients are in C<a_y> and
+C<b_y>. (All C<a_x> must be >= 0, while all the C<b_x> must be >= 1, as
+you should expect).
+
+See C<filter_sir> for more info.
+EOD
+       Code => q^
+          int i, n, I;
+          $GENERIC() v;
+
+          threadloop %{
+            for (n = 0; n < $SIZE(n); n++)
+              {
+                v = 0;
+
+                loop(an) %{
+                  I = n-$a_x();
+                  if (I >= 0)
+                    v += $a_y() * $x(n=>I);
+                %}
+
+                loop(bn) %{
+                  I = n-$b_x();
+                  if (I >= 0)
+                    v -= $b_y() * $y(n=>I);
+                %}
+
+                $y(n=>n) = v;
+              }
+          %}
+       ^
+;
+
+pp_addpm <<'EOP';
+
+=head2 filter_fir input, xcoeffs
+
+Apply a fir (finite impulse response) filter to C<input>. This is the same as
+calling:
+
+ filter_sir input, xcoeffs, pdl()
+
+=head2 filter_iir input, ycoeffs
+
+Apply a iir (infinite impulse response) filter to C<input>. This is just
+another way of saying:
+
+ filter_sir input, pdl(1), ycoeffs
+
+That is, the first member of C<ycoeffs> is being ignored AND SHOULD BE
+SPECIFIED AS ONE FOR FUTURE COMPATIBILITY!
+
+=cut
+
+sub filter_fir($$) {
+   filter_sir ($_[0], $_[1], PDL->pdl());
+}
+
+sub filter_iir($$) {
+   filter_sir ($_[0], PDL->pdl(1), $_[1]);
+}
+
+=head2 filter_comb input, delay*, scaler
+
+Apply a comb filter to the piddle C<input>. This is implemented using a
+delay line of length C<delay> (which must be 1 or larger and can be
+non-integer) and a feedback scaler.
+
+ y(n) = x(n-size-1) + scaler * y(n-size)
+
+cf. C<filter_notch> and http://www.harmony-central.com/Effects/Articles/Reverb/comb.html
+
+=head2 filter_notch input, delay*, scaler
+
+Apply a comb filter to the piddle C<input>. This is implemented using a
+delay line of length C<delay> (which must be 1 or larger and can be
+non-integer) and a feedforward scaler.
+
+ y(n) = x(n-size-1) * scaler + y(n-size)
+
+As a rule of thumb, the decay time of the feedback part is
+C<7*delay/(1-scaler)> samples, so to get a decay of Dur seconds,
+C<scaler <= 1-7*delay/(Dur*Srate)>. The peak gain is C<1/(1-(abs
+scaler))>. The peaks (or valleys in notch's case) are evenly spaced at
+C<srate/delay>. The height (or depth) thereof is determined by scaler
+-- the closer to 1.0, the more pronounced. See Julius Smith's "An
+Introduction to Digital Filter Theory" in Strawn "Digital Audio Signal
+Processing", or Smith's "Music Applications of Digital Waveguides"
+
+=head2 filter_allpass input, delay*, scaler-feedback, scaler-feedforward
+
+C<filter_allpass> or "moving average comb" is just like C<filter_comb>
+but with an added feedforward term. If C<scaler-feedback == 0>, we get a
+moving average comb filter. If both scaler terms == 0, we get a pure delay
+line.
+
+ y(n) = feedforward*x(n-1) + x(n-size-1) + feedback*y(n-size)
+
+cf. http://www.harmony-central.com/Effects/Articles/Reverb/allpass.html
+
+=cut
+
+sub _filter_combnotchall {
+   my ($pdl, $size, $scalercomb, $scalernotch, $scalerall) = @_;
+   my $D = int $size;
+   my $F = $size - $D;
+   my $a = zeroes $D+2; $a->set($D,1-$F); $a->set($D+1, $F);
+   my $b = zeroes $D+2; $b->set($D,$F-1); $b->set($D+1,-$F);
+   $a->set(1, $a->at(1) + $scalerall);
+   $b->set(0, 1);
+   $pdl->filter_sir($a*$scalernotch,$b*$scalercomb);
+}
+
+sub filter_comb {
+   _filter_combnotchall $_[0], $_[1], $_[2], 1, 0;
+}
+
+sub filter_notch {
+   _filter_combnotchall $_[0], $_[1], 1, $_[2], 0;
+}
+
+sub filter_allpass {
+   _filter_combnotchall $_[0], $_[1], $_[2], 1, $_[3];
+}
+
+=head2 design_remez_fir filter_size, bands(2,b), desired_gain(b), type, [weight(b)]
+       
+Calculates the optimal (in the Chebyshev/minimax sense) FIR filter
+impulse response given a set of band edges, the desired reponse on those
+bands, and the weight given to the error in those bands, using the
+Parks-McClellan exchange algorithm.
+
+The first argument sets the filter size: C<design_remez_fir> returns as
+many coefficients as specified by this parameter.
+
+C<bands> is a vector of band edge pairs (start - end), which specify the
+start and end of the bands in the filter specification.  These must be
+non-overlapping and sorted in increasing order. Only values between C<0>
+(0 Hz) and C<0.5> (the Nyquist frequency) are allowed.
+
+C<des> specifies the desired gain in these bands.
+
+C<weight> can be used to give each band a different weight. If absent, a
+vector of ones is used.
+
+C<type> is any of the exported constants C<BANDPASS>, C<DIFFERENTIATOR> or
+C<HILBERT> and can be used to select various design types (use C<BANDPASS>
+until this is documented ;)
+
+=cut
+
+sub design_remez_fir {
+   my ($size, $bands, $des, $type, $weight) = @_;
+   $weight = ones $des unless defined $weight;
+   $size = zeroes $size;
+   _design_remez_fir($bands, $des, $weight, $size, $type);
+   $size;
+}
+
+=head2 filter_src input, srate, [width], [sr-mod]
+
+Generic sampling rate conversion, implemented by convoluting C<input> with
+a sinc function of size C<width> (default when unspecified or zero: 5).
+
+C<srate> determines the input rate / output rate ratio, i.e. values > 1
+speed up, values < 1 slow down. Values < 0 are allowed and reverse the
+signal.
+
+If C<sr_mod> is omitted, the size of the output piddle is calculcated
+as C<length(input)/abs(srate)>, e.g. it provides the full stretched or
+shrinked input signal.
+
+If C<sr_mod> is specified it must be as large as the desired output, i.e.
+it's size determines the output size. Each value in C<sr_mod> is added to
+C<srate> at the given point in "time", so it can be used to "modulate" the
+sampling rate change.
+
+ # create a sound effect in the style of "Forbidden Planet"
+ $osc = 0.3 * gen_oscil $osc, 30 / $pdl->rate;
+ $output = filter_src($input, 1, 0, $osc);
+
+=cut
+
+sub filter_src($$;$$) {
+   my ($input, $srate, $width, $sr_mod) = @_;
+
+   $width ||= 5;
+   $width*2 < $input->getdim(0) or barf "src width too large (> 0.5 * input size)";
+
+   my $output;
+
+   if (defined $sr_mod) {
+      $output = zeroes $sr_mod;
+   } else {
+      $output = zeroes ($input->getdim(0) / abs($srate));
+      $sr_mod = PDL->null;
+   }
+
+   _filter_src($input, $output, $sr_mod, $srate, $width);
+
+   $output->rate($input->rate / abs($srate)) if $input->rate;
+   $output;
+}
+
+=head2 filter_contrast_enhance input, enhancement
+
+Contrast-enhancement phase-modulates a sound file. It's like audio
+MSG. The actual algorithm is (applied to the normalised sound)
+C<sin(input*pi/2 + (enhancement*sin(input*2*pi)))>. The result is to
+brighten the sound, helping it cut through a huge mix.
+
+=cut
+
+sub filter_contrast_enhance {
+   my ($pdl, $idx) = @_;
+   $idx = 0.1 unless defined $idx;
+   $pdl = $pdl - min $pdl;
+   $pdl = ($pdl * (M_PI / max $pdl)) - M_PI * 0.5;
+   sin $pdl + $idx * sin $pdl*4;
+}
+
+=head2 filter_granulate input, expansion, [option-hash], option => value...
+
+C<filter_granulate> "granulates" the sound file file. It is the poor
+man's way to change the speed at which things happen in a recorded sound
+without changing the pitches. It works by slicing the input file into
+short pieces, then overlapping these slices to lengthen (or shorten) the
+result; this process is sometimes known as granular synthesis, and is
+similar to the "freeze" function. The duration of each slice is C<length> --
+the longer, the more like reverb the effect. The portion of the length (on
+a scale from 0 to 1.0) spent on each ramp (up or down) is C<ramp>. This can
+control the smoothness of the result of the overlaps. The more-or-less
+average time between successive segments is C<hop>.  The accuracy at which we
+handle this hopping is set by the float C<jitter> -- if C<jitter> is very small,
+you may get an annoying tremolo. The overall amplitude scaler on each
+segment is C<scaler> -- this is used to try to to avoid overflows as we add
+all these zillions of segments together. C<expansion> determines the input
+hop in relation to the output hop; an expansion-amount of C<2.0> should more
+or less double the length of the original, whereas an expansion-amount
+of C<1.0> should return something close to the original speed.
+
+The defaults for the arguments/options are:
+
+ expansion	1.0
+ length(*)	0.15
+ scaler		0.6
+ hop(*)		0.05
+ ramp		0.4
+ jitter(*)	0.5
+ maxsize	infinity
+
+The parameters/options marked with (*) actually depend on the sampling
+rate, and are always multiplied by the C<rate> attribute of the
+piddle internally. If the piddle lacks that attribute, 44100 is
+assumed. NOTE: This is different to most other filters, but should be ok
+since C<filter_granulate> only makes sense for audiofiles.
+
+=cut
+
+sub filter_granulate  {
+   my $input = shift;
+   my $expansion = shift || 1;
+   my %hdr = (); %hdr = (%hdr, %{+shift}) if ref $_[0]; %hdr = (%hdr, @_) if @_;
+
+   my $rate    =  $hdr{rate}   || 44100;
+   my $length  = ($hdr{length} || 0.15) * $rate;
+   my $scaler  =  $hdr{scaler} || 0.6;
+   my $hop     = ($hdr{hop}    || 0.05) * $rate;
+   my $ramp    =  $hdr{ramp}   || 0.4;
+   my $jitter  = ($hdr{jitter} || 0.5) * $rate;
+   my $maxsize =  $hdr{maxsize}|| 0;
+
+   $output = zeroes $expansion * $input->getdim(0);
+
+   _filter_granulate($input, $output,
+                     $expansion, $length, $scaler,
+                     $hop, $ramp, $jitter, $maxsize);
+   $output;
+}
+
+EOP
+
+pp_def '_design_remez_fir',
+       Pars => 'bands(2,b); des(b); weight(b); [o]h(n)',
+       OtherPars => 'int type',
+       GenericTypes => [D],
+       Doc => undef,
+       PMCode => undef,
+       Code => q^
+          int type = $COMP(type);
+
+          if (type != BANDPASS
+              && type != DIFFERENTIATOR
+              && type != HILBERT)
+            barf ("design_remez_fir: illegal type specified (none of BANDPASS, DIFFERENTIATOR, HILBERT)");
+
+          remez ($P(h), $SIZE(n), $SIZE(b), $P(bands), $P(des), $P(weight), type);
+       ^
+;
+
+pp_def '_filter_src',
+       Pars => 'input(n); [o]output(m); sr_mod(m2)',
+       OtherPars => 'double srate; int width',
+       GenericTypes => [D],
+       Doc => undef,
+       PMCode => undef,
+       Code => q!
+          mus_src ($P(input), $SIZE(n), $P(output), $SIZE(m),
+                   $COMP(srate),
+                   $SIZE(m) == $SIZE(m2) ? $P(sr_mod) : 0,
+                   $COMP(width));
+       !
+;
+
+pp_def '_filter_granulate',
+       Pars => 'input(n); [o]output(m)',
+       OtherPars => 'double expansion; double length; double scaler; double hop; double ramp; double jitter; int max_size',
+       GenericTypes => [D],
+       Doc => undef,
+       PMCode => undef,
+       Code => q!
+          mus_granulate ($P(input), $SIZE(n), $P(output), $SIZE(m),
+                         $COMP(expansion), $COMP(length), $COMP(scaler),
+                         $COMP(hop), $COMP(ramp), $COMP(jitter),
+                         $COMP(max_size));
+       !
+;
+
+pp_addpm <<'EOP';
+
+=head2 audiomix pos1, data1, pos2, data2, ...
+
+Generate a mix of all given piddles. The resulting piddle will contain the
+sum of all data-piddles at their respective positions, so some scaling
+will be necessary before or after the mixing operation (e.g. scale2short).
+
+ # mix the sound gong1 at position 0, the sound bass5 at position 22100
+ # and gong2 at position 44100. The resulting piddle will be large enough
+ # to accomodate all the sounds:
+ $mix = audiomix 0, $gong1, 44100, $gong2, 22100,  $gong2
+
+=cut
+
+sub audiomix {
+   my(@x,@p);
+   my($dur,$i,$end,$s,$p);
+   for ($i = 0; $i < @_; $i += 2) {
+      $end = $_[$i] + $_[$i+1]->getdim(0);
+      $dur = $end if $end > $dur;
+   }
+   my $pdl = zeroes $dur;
+   for ($i = 0; $i < @_; $i += 2) {
+      ($s,$p) = (int($_[$i]), $_[$i+1]);
+      ($end = $pdl->slice("$s:".($s+$p->getdim(0)-1))) += $p;
+   }
+   $pdl;
+}
+
+=head2 filter_center piddle
+
+Normalize the piddle so that it is centered around C<y = 0> and has
+maximal amplitude of 1.
+
+=cut
+
+sub filter_center($) {
+   my $piddle = shift;
+   $piddle = $piddle - min $piddle;
+   $piddle * (2 / max $piddle) - 1;
+}
+
+=head2 scale2short piddle
+
+This method takes a sound in any format (preferably float or double) and
+scales it to fit into a signed short value, suitable for playback using
+C<playudio> or similar functions.
+
+=cut
+
+sub scale2short {
+   my $pdl = shift->float;
+   ($pdl * (1 / max abs $pdl) * 32767.5 - 0.5)->short;
+}
+
+=head2 gen_fft_window size*, type, [$beta]
+
+Creates and returns a specific fft window. The C<type> is any of the following.
+These are (case-insensitive) strings, so you might need to quote them.
+
+ RECTANGULAR	just ones (the identity window)
+ HANNING        0.50 - 0.50 * cos (0 .. 2pi)
+ HAMMING	0.54 - 0.46 * cos (0 .. 2pi)
+ WELCH		1 - (-1 .. 1) ** 2
+ PARZEN		the triangle window
+ BARTLETT	the symmetric triangle window
+ BLACKMAN2	blackman-harris window of order 2
+ BLACKMAN3	blackman-harris window of order 3
+ BLACKMAN4	blackman-harris window of order 4
+ EXPONENTIAL	the exponential window
+ KAISER		the kaiser/bessel window (using the parameter C<beta>)
+ CAUCHY		the cauchy window (using the parameter <beta>)
+ POISSON	the poisson window (exponential using parameter C<beta>)
+ RIEMANN	the riemann window (sinc)
+ GAUSSIAN	the gaussian window of order C<beta>)
+ TUKEY		the tukey window (C<beta> specifies how much of the window
+		consists of ones).
+ COSCOS		the cosine-squared window (a partition of unity)
+ SINC 		same as RIEMANN
+ HANN		same as HANNING (his name was Hann, not Hanning)
+
+ LIST		this "type" is special in that it returns a list of all types
+
+=cut
+
+sub gen_fft_window {
+   my ($size, $type, $beta) = @_;
+
+   $beta = 2.5 unless defined $beta;
+
+   $size = $size->getdim(0) if ref $size;
+   $size > 2 or barf "fft window size too small";
+
+   my $midn  = $size >> 1;
+   my $midm1 = ($size-1) >> 1;
+   my $midp1 = ($size+1) >> 1;
+   my $dur   = zeroes $size;
+   my $sf    = ($size-1)/$size;
+   %fft_window = (
+      RECTANGULAR => sub {
+         $dur->ones
+      },
+      HANNING => sub {
+         0.5 - 0.5 * cos $dur->xlinvals(0,M_2PI*$sf)
+      },
+      HAMMING => sub {
+         0.53836 - 0.46164 * cos $dur->xlinvals(0,M_2PI*$sf)
+      },
+      WELCH => sub {
+         1 - $dur->xlinvals(-1,$sf)**2;
+      },
+      PARZEN => sub {
+         1 - abs $dur->xlinvals(-$sf,$sf);
+      },
+      BARTLETT => sub {
+         1 - abs $dur->xlinvals(-1,1);
+      },
+      BLACKMAN2 => sub {
+         my $cx = cos $dur->xlinvals(0,M_2PI*$sf);
+         0.34401 + ($cx * (-0.49755 + ($cx * 0.15844)));
+      },
+      BLACKMAN3 => sub {
+         my $cx = cos $dur->xlinvals(0,M_2PI*$sf);
+         0.21747 + ($cx * (-0.45325 + ($cx * (0.28256 - ($cx * 0.04672)))));
+      },
+      BLACKMAN4 => sub {
+         my $cx = cos $dur->xlinvals(0,M_2PI*$sf);
+         0.084037 + ($cx * (-0.29145 + ($cx * (0.375696 + ($cx * (-0.20762 + ($cx * 0.041194)))))));
+      },
+      EXPONENTIAL => sub {
+         2 ** (1 - abs $dur->xlinvals(-1,$sf)) - 1;
+      },
+      KAISER => sub {
+         bessi0 ($beta * sqrt(1 - $dur->xlinvals(-1,$sf)**2)) / bessi0 ($beta);
+      },
+      CAUCHY => sub {
+         1 / (1 + ($dur->xlinvals(-1,$sf)*$beta)**2);
+      },
+      POISSON => sub {
+         exp (-$beta * abs $dur->xlinvals(-1,$sf));
+      },
+      RIEMANN => sub {
+         my $dur1 = $dur->slice("0:$midm1");
+         my $dur2 = $dur->slice("-1:$midp1:-1");
+         my $cx;
+         $cx = $dur1->xlinvals(M_PI,M_2PI/$size); $dur1 .= sin ($cx) / $cx;
+         $cx = $dur2->xlinvals(M_PI,M_2PI/$size); $dur2 .= sin ($cx) / $cx;
+         ($cx = $dur->slice("$midm1:$midp1")) .= 1;
+         $dur;
+      },
+      GAUSSIAN => sub {
+         exp (-0.5 * ($beta * abs $dur->xlinvals(-1,$sf))**2);
+      },
+      TUKEY => sub {
+         $beta >= 0 && $beta <= 1 or barf "beta must be between 0 and 1 for the tukey window";
+         my $cx = int ($midn * (1 - $beta));
+         my $cX = $size-$cx-1;
+         my $dur1 = $dur->slice("0:".($cx-1));
+         my $dur2 = $dur->slice("-1:".($cX+1).":-1");
+         my $dur3 = $dur->slice("$cx:$cX");
+
+         $dur1 .= 0.5 * (1 - cos $dur1->xlinvals(0, M_PI));
+         $dur2 .= 0.5 * (1 - cos $dur2->xlinvals(0, M_PI));
+         $dur3 .= 1;
+
+         $dur;
+      },
+      COSCOS => sub {
+         (cos $dur->xlinvals(M_PI/-2,M_PI/2))**2;
+      },
+      LIST => sub {
+         grep $_ ne "LIST", keys %fft_window;
+      },
+   );
+
+   $fft_window{SINC} = $fft_window{RIEMANN};
+   $fft_window{HANN} = $fft_window{HANNING};
+
+   $type = uc $type;
+   $fft_window{$type} or barf "$type: no such window";
+   $fft_window{$type}->();
+}
+
+=head2 cplx(2,n) = rfft real(n)
+
+Do a (complex fft) of C<real> (extended to complex so that the imaginary
+part is zero), and return the complex fft result. This function tries
+to use L<PDL::FFTW|PDL::FFTW> (which is faster for large vectors) when
+available, and falls back to L<PDL::FFT|PDL::FFT>, which is likely
+to return different phase signs (due to different kernel functions),
+so beware! In fact, since C<rfft> has to shuffle the data when using
+PDL::FFT, the fallback is always slower.
+
+When using PDL::FFTW, a wisdom file ~/.pdl_wisdom is used and updated, if
+possible.
+
+=head2 real(n) = irfft cplx(2,n)
+
+The inverse transformation (see C<rfft>). C<irfft rfft $pdl == $pdl>
+always holds.
+
+=cut
+
+my $fftw_loaded;
+sub _fftw {
+   defined $fftw_loaded or eval {
+      $fftw_loaded = 0;
+      require PDL::FFTW;
+      PDL::FFTW::load_wisdom("$ENV{HOME}/.pdl_wisdom")
+         if -r "$ENV{HOME}/.pdl_wisdom";
+      $fftw_loaded = 1;
+   };
+   $fftw_loaded;
+}
+
+sub rfft {
+   my $data = $_[0];
+   if (_fftw) {
+      my $x = $data->r2C;
+      $x = PDL::FFTW::fftw $x;
+      $x;
+   } else {
+      require PDL::FFT;
+      my @fft = ($data->copy, $data->zeroes);
+      PDL::FFT::fft(@fft);
+      cat(@fft)->xchg(0,1);
+   }
+}
+
+sub irfft {
+   if (_fftw) {
+      $x = $_[0]->copy;
+      $x = PDL::FFTW::ifftw $x;
+      re $x / $x->getdim(1);
+   } else {
+      require PDL::FFT;
+      my @fft = $_[0]->xchg(0,1)->dog({Break => 1});
+      PDL::FFT::ifft(@fft);
+      $fft[0];
+   }
+}
+
+=head2 spectrum data, [norm], [window], [beta]
+
+Returns the spectrum of a given pdl. If C<norm> is absent (or C<undef>),
+it returns the magnitude of the fft of C<data>. When C<norm> == 1 (or
+C<eq 'NORM'>, case-insensitive), it returns the magnitude, normalized to be
+between zero and one. If C<norm> == 0 (or C<eq 'dB'>, case-insensitive), then
+it returns the magnitude in dB.
+
+C<data> is multiplied with C<window> (if not C<undef>) before calculating
+the fft, and usually contains a window created with C<gen_fft_window>
+(using C<beta>). If C<window> is a string, it is handed over to
+C<gen_fft_window> (together with the beta parameter) to create a window of
+suitable size.
+
+This function could be slightly faster.
+
+=cut
+
+sub spectrum {
+   my ($data, $norm, $window,  $beta) = @_;
+   my $len;
+   if (defined $window) {
+      $window = gen_fft_window ($data->getdim (0), $window, $beta) unless ref $window;
+      $data = $data * $window;
+      $len = $window->getdim (0);
+   } else {
+      $len = $data->getdim (0);
+   }
+   $data = rfft (
+              $data->slice ("0:" . ($len - 1))
+                   ->sever
+           )
+           ->slice (",0:" . int ($len / 2))
+           ->PDL::Complex::Cr2p
+           ->slice ("(0)");
+   if ($norm == 1 || lc $norm eq "norm") {
+      $data / max $data;
+   } elsif (($norm =~ /^[.0]+$/) || (lc $norm eq "db")) {
+      log (1e-37 + $data / max $data) * (20 / log 10);
+   } else {
+      $data;
+   }
+}
+
+=head2 concat pdl, pdl...
+
+This is not really an audio-related function. It simply takes all piddles
+and concats them into a larger one. At the moment it only supports
+single-dimensional piddles and is implemented quite slowly using perl and
+data-copying, but that might change...
+
+=cut
+
+sub concat {
+   my $len = sum pdl map $_->getdim(0), @_;
+   my $r = zeroes $len;
+   my $o = 0;
+   for (@_) {
+      my $e = $o + $_->getdim(0) - 1;
+      (my $t = $r->slice("$o:$e")) .= $_;
+      $o = $e + 1;
+   }
+   $r;
+}
+
+EOP
+
+# TODO: document!
+pp_def 'filter_convolve',
+       Pars => 'input(n); kernel(m); int fftsize(); [o]output(n)',
+       GenericTypes => [D],
+       Code => q!
+          mus_convolve ($P(input), $P(output), $SIZE(n), $P(kernel), $fftsize(), $SIZE(m));
+       !
+;
+
+pp_def 'rshift',
+	Doc => <<'EOD',
+=for ref
+
+Shift vector elements without wrap and fill the free space with a
+constant. Flows data back & forth, for values that overlap.
+
+Positive values shift right, negative values shift left.
+
+EOD
+ 	Pars => 'x(n); int shift(); c(); [oca]y(n)',
+        DefaultFlow => 1,
+        Reversible => 1,
+        PMCode => '
+           sub PDL::rshift {
+              my @a = @_;
+              if($#a == 3) {
+                 &PDL::_rshift_int(@a);@a=();
+              } elsif($#a == 1 || $#a == 2) {
+                 $a[3] = PDL->nullcreate($a[0]);
+                 &PDL::_rshift_int(@a);
+                 $a[3];
+              } else {
+                 barf "Invalid number of arguments for shiftin";
+              }
+           }
+        ',
+        Code=>'
+           int i,j;
+           int n_size = $SIZE(n);
+           for(i = -$shift(), j=0; j < n_size; i++, j++)
+             $y(n=>j) = i >= 0 && i < n_size ? $x(n=>i) : $c();
+        ',
+        BackCode=>'
+           int i,j;
+           int n_size = $SIZE(n);
+           for(i = -$shift(), j=0; j < n_size; i++, j++)
+             if (i >= 0 && i < n_size)
+                $x(n=>i) = $y(n=>j);
+        '
+;
+
+pp_def 'polynomial',
+       Pars => 'coeffs(n); x(m); [o]out(m)',
+       Doc => 'evaluate the polynomial with coefficients C<coeffs> at the position(s) C<x>. C<coeffs[0]> is the constant term.',
+       Code => q!
+          loop(m) %{
+             $GENERIC() x = 1;
+             $GENERIC() o = 0;
+
+             loop(n) %{
+                o += $coeffs() * x;
+                x *= $x();
+             %}
+
+             $out() = o;
+          %}
+       !
+;
+
+pp_def 'linear_interpolate',
+       Pars => 'x(); fx(n); fy(n); [o]y()',
+       GenericTypes => [L,F,D],
+       Doc => '
+Look up the ordinate C<x> in the function given by C<fx> and C<fy>
+and return a linearly interpolated value (somewhat optimized for many
+lookups).
+
+C<fx> specifies the ordinates (x-coordinates) of the function and most be
+sorted in increasing order. C<fy> are the y-coordinates of the function in
+these points.
+       ',
+       Code => q!
+          int d = 0;
+          int D = $SIZE(n) - 1; /* a tribute to PP's stupidity */
+          $GENERIC() xmin =$fx(n=>0);
+          $GENERIC() xmax =$fx(n=>D);
+
+          threadloop %{
+             $GENERIC() x = $x();
+             $GENERIC() x1, x2, y1, y2;
+
+             if (x <= xmin)
+               $y() = $fy(n=>0);
+             else if (x >= xmax)
+               $y() = $fy(n=>D);
+             else
+               {
+                 while ($fx(n=>d) >  x) d--;
+                 while ($fx(n=>d) <= x) d++;
+                 /* 0       < d <= D     */
+                 /* fx(d-1) < x <= fx(d) */
+                 x2 = $fx(n=>d);
+                 y2 = $fy(n=>d);
+                 d--;
+                 x1 = $fx(n=>d);
+                 y1 = $fy(n=>d);
+                 $y() = y1 + (x-x1)*(y2-y1)/(x2-x1);
+               }
+          %}
+       !
+;
+
+pp_def 'bessi0',
+       Pars => 'a(); [o]b()',
+       Doc => 'calculate the (approximate) modified bessel function of the first kind',
+       GenericTypes => [F,D],
+       Code => q!
+          $GENERIC() x = $a();
+          if (x > -3.75 && x < 3.75)
+            {
+              $GENERIC() y = (x / 3.75); y *= y;
+              $b() = 1 + (y * (3.5156229 +
+                               (y * (3.0899424 +
+                                       (y * (1.2067492 +
+                                               (y * (0.2659732 +
+                                                       (y * (0.360768e-1 +
+                                                               (y * 0.45813e-2)))))))))));
+            }
+          else
+            {
+              $GENERIC() ax = x < 0 ? -x : x;
+              $GENERIC() y  = ax / 3.75;
+              $b() = ((exp(ax) / sqrt(ax)) *
+                        (0.39894228 +
+                           (y * (0.1328592e-1 +
+                                   (y * (0.225319e-2 +
+                                           (y * (-0.157565e-2 +
+                                                   (y * (0.916281e-2 +
+                                                           (y * (-0.2057706e-1 +
+                                                                   (y * (0.2635537e-1 +
+                                                                           (y * (-0.1647633e-1 +
+                                                                                   (y * 0.392377e-2)))))))))))))))));
+            }
+       !,
+;
+
+pp_def 'fast_sin',
+       Pars => 'r(n); [o]s(n)',
+       GenericTypes => [F,D],
+       Doc => 'fast sine function (inaccurate table lookup with ~12 bits precision)',
+       Code => q^
+#        define SINE_SIZE 16384
+         static float *sine_table = 0;
+
+         if (!sine_table)
+           {
+             int i;
+             Float phase, incr;
+             sine_table = (float *) calloc (SINE_SIZE + 1, sizeof (float));
+             incr = M_2PI / (Float) SINE_SIZE;
+             for (i = 0, phase = 0.0; i < SINE_SIZE + 1; i++, phase += incr)
+               sine_table[i] = (float) sin (phase);
+           }
+
+         threadloop %{
+           loop(n) %{
+             $s() = sine_table[((int)($r() * (SINE_SIZE / M_2PI)) % SINE_SIZE + SINE_SIZE) % SINE_SIZE];
+           %}
+         %}^
+;
+
+pp_addpm {At => Bot}, <<'EOD';
+
+=head1 AUTHOR
+
+Marc Lehmann <schmorp@schmorp.de>. The ideas were mostly taken from common
+lisp music (CLM), by Bill Schottstaedt C<bil@ccrma.stanford.edu>. I also
+borrowed many explanations (and references) from the clm docs and some
+code from clm.c. Highly inspiring!
+
+=head1 SEE ALSO
+
+perl(1), L<PDL>.
+
+=cut
+EOD
+
+pp_addxs  "\nINCLUDE: xlib.xs\n";
+
+pp_done;
+

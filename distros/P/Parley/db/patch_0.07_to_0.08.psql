@@ -1,0 +1,21 @@
+-- Patch:
+--   From: 0.07
+--   To:   0.08
+--
+-- Description:
+--   add 'edited' column to post table
+
+BEGIN;
+
+-- patch starts here --
+
+
+ALTER TABLE post
+    ADD COLUMN
+        edited  timestamp with time zone
+;
+
+
+-- patch ends here --
+
+COMMIT;

@@ -1,0 +1,114 @@
+port wbport wbm clk_i:clk, rst_i:rst, cyc_o:cyc, stb_o:stb,
+                we_o:we, ack_i:ack, adr_o:adr, dat_i:din, dat_o:dout;
+
+module wb_master(clk, rst, adr, din, dout, 
+		 we, stb, cyc, ack);
+   input [7:0]  din;   
+   input 	ack, clk, rst;
+   output 	cyc, stb, we;
+   output [7:0] adr, dout;
+      
+   reg [7:0] 	adr, dout;
+   reg 		cyc, stb;
+   reg 		we;
+   
+   reg [7:0] 	q;
+   
+   integer 	i;
+       
+   initial
+      begin
+	 // initial values	 
+	 adr  = 8'hxx;
+	 dout = 8'hxx;
+	 cyc  = 1'b0;
+	 stb  = 1'bx;
+	 we   = 1'hx;
+	 
+	 @(posedge rst); // Wait for reset to go up
+	 @(negedge rst); // Wait for reset to go down
+
+	wb_write(1, 0, 25);
+	wb_write(1, 1, 10);
+
+	wb_write(1, 4, 10);
+	wb_write(1, 5, 7);
+
+        for (i=0; i<8; i=i+1)
+	  wb_read(1, i, q);
+
+	$stop;
+      end
+	  
+////////////////////////////////////////////////////////////////////
+//
+// Wishbone write cycle
+//
+
+task wb_write;
+   input        delay;
+   integer 	delay;
+   
+   input [7:0] 	a;
+   input [7:0] 	d;
+   
+   begin
+      
+      repeat(delay) @(posedge clk);
+      #1;
+      adr  = a;
+      dout = d;
+      cyc  = 1'b1;
+      stb  = 1'b1;
+      we   = 1'b1;
+      
+      @(posedge clk);
+      while(~ack)	@(posedge clk);
+      #1;
+      cyc  = 1'b0;
+      stb  = 1'bx;
+      adr  = 8'hxx;
+      dout = 8'hxx;
+      we   = 1'hx;
+      
+   end
+endtask
+   
+   ////////////////////////////////////////////////////////////////////
+   //
+   // Wishbone read cycle
+   //
+   
+   task wb_read;
+      input        delay;
+      integer 	   delay;
+      
+      input [7:0] a;
+      output [ 7:0] d;
+      
+      begin
+	 repeat(delay) @(posedge clk);
+	 #1;
+	 adr  = a;
+	 dout = 8'hxx;
+	 cyc  = 1'b1;
+	 stb  = 1'b1;
+	 we   = 1'b0;
+	 
+	 @(posedge clk);
+	 while(~ack)	@(posedge clk);
+	 #1;
+	 cyc  = 1'b0;
+	 stb  = 1'bx;
+	 adr  = 8'hxx;
+	 dout = 8'hxx;
+	 we   = 1'hx;
+	 d    = din;
+
+	 $display ("Read %d at address %d", d, a);
+      end
+   endtask
+   
+endmodule
+
+

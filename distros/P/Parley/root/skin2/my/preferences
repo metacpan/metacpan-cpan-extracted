@@ -1,0 +1,48 @@
+<h1>[%l('Your Preferences')%]</h1>
+
+[% IF view.error.message %]
+<div class="error_feedback">
+    [% view.error.message %]
+    <ul>
+        [% FOREACH message IN view.error.messages %]
+            <li>[% message %]</li>
+        [% END %]
+    </ul>
+</div>
+[% END %]
+
+<div id="tabbed_prefs" class="yui-navset" style="max-width: 80%; margin-left: auto; margin-right: auto;">
+    [% tab_info = [
+            { label => l('Your Details'),       tab_name => 'tab_you' },
+            { label => l('Time'),               tab_name => 'tab_time' },
+            { label => l('Notifications'),      tab_name => 'tab_notifications' },
+            { label => l('Avatar'),             tab_name => 'tab_avatar' },
+            { label => l('Skin'),               tab_name => 'tab_skin' },
+       ]
+    %]
+    [% SET selected_tab = c.session.show_pref_tab || 'tab_you' %]
+    <!-- selected_tab = [%selected_tab%] -->
+
+    <ul class="yui-nav">
+    [% FOR tab IN tab_info %]
+        <li[% IF tab.tab_name == selected_tab %] class="selected"[%END%]><a href="#[% tab.tab_name %]"><em>[% tab.label %]</em></a></li>
+    [% END %]
+    </ul>            
+
+    <div class="yui-content" style="min-height: 200px;">
+    [% FOR tab IN tab_info %]
+        <div id="[% tab.tab_name %]"><p>[% PROCESS "my/${tab.tab_name}" %]</p></div>
+    [% END %]
+    </div>
+</div>
+<script type="text/javascript">
+    var tabView = new YAHOO.widget.TabView('tabbed_prefs');
+</script>
+
+[% IF c.session.my_pref_came_from %]
+<p>
+<a href="[% c.session.my_pref_came_from %]">[%l('Return to the forum')%]</a>
+</p>
+[% ELSE %]
+<p>&nbsp;</p>
+[% END %]

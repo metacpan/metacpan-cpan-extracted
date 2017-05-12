@@ -1,0 +1,52 @@
+{
+   "abstract" : "Event.pm support for POE.",
+   "author" : [
+      "Rocco Caputo <rcaputo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Loop-Event",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "POE::Test::Loops" : "1.352"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "POE::Test::Loops" : "1.352"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Event" : "1.21",
+            "POE" : "1.356"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/rcaputo/poe-loop-event.git"
+      }
+   },
+   "version" : "1.305"
+}

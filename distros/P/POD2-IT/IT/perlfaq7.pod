@@ -1,0 +1,1043 @@
+=head1 NOME
+
+perlfaq7 - Questioni Generali Sul Linguaggio Perl ($Revision: 1.19 $, $Date: 2009/01/26 17:06:25 $)
+
+=head1 DESCRIZIONE
+
+Questa sezione tratta questioni generali sul linguaggio Perl che non trovano
+posto in nessuna delle altre sezioni.
+
+=head2 E<Egrave> possibile ottenere una BNF/yacc/RE del linguaggio Perl?
+
+Non c'E<egrave> alcuna BNF ma, se siete di animo particolarmente
+coraggioso, E<egrave> possibile arrivarci a tentoni con la grammatica yacc
+che si trova nel file perl.y dei sorgenti. La grammatica puE<ograve> contare
+su codice molto astuto per effettuare la divisione in token (tokenizing), 
+preparatevi dunque ad avventurarvi anche nel file toke.c
+
+Citando Chaim Frenkel: "La grammatica del Perl non puE<ograve> essere ridotta
+alla BNF. Il lavoro di analisi sintattica che fa il perl E<egrave> distribuito 
+tra yacc, il lexer e il gioco delle 3 carte".
+
+=head2 Cosa sono tutti quei segni di punteggiatura $@%&*, e come faccio a sapere quando usarli?
+
+Sono specificatori di tipo, come viene spiegato in dettaglio in perldata:
+
+    $ per i valori scalari (numeri, stringhe o riferimenti)
+    @ per gli array
+    % per gli hash (array associativi)
+    & per le subroutine (altrimenti dette funzioni, procedure, metodi)
+    * per tutti i tipi di quel nome di simboli. Nella versione 4 si usavano
+      come puntatori, ma nei perl moderni si possono usare solo i
+      riferimenti
+
+Ci sono un paio di altri simboli che E<egrave> probabile incontrare che non
+sono specificatori di tipo:
+
+    <> sono usate per leggere un record da un filehandle.
+    \  ottiene un riferimento a qualcosa.
+
+Va notato che <FILE> non E<egrave> uno specificatore di tipo per i file e nemmeno
+il nome dell'handle. E<Egrave> l'operatore C<< <> >> applicato all'handle FILE.
+Legge una linea (o meglio, un record--consultate la voce $/ in L</perlvar/$/>)
+dall'handle FILE se in un contesto scalare, oppure tutte le linee se in un
+contesto di lista. Quando si apre, si chiude, o si esegue un'operazione
+qualunque che non sia C<< <> >> su un file, o anche quando si menziona il
+filehandle, non si devono usare le parentesi angolari. Queste scritture sono
+corrette: C<eof(FH)>, C<seek(FH, 0, 2)> e "copiare da STDIN a FILE".
+
+=head2 Devo sempre/non devo mai mettere tra virgolette le mie stringhe, oppure usare i punti e virgola o le virgole?
+
+Di norma, una parola non posta tra virgolette puE<ograve> rimanere tale, ma
+in molti casi probabilmente dovrebbe essere posta tra virgolette (e deve esserlo se C<use strict> 
+E<egrave> attivo). La chiave di un hash che consiste in una semplice parola 
+(che non E<egrave> il nome di una subroutine definita) e l'operando sinistro
+dell'operatore C<< => >>, perE<ograve>, sono trattati come se fossero tra
+virgolette:
+
+    Questo                  e` come questo
+    ------------            ---------------
+    $pippo{linea}           $pippo{'linea'}
+    pluto => roba           'pluto' => roba
+
+Il punto e virgola finale in un blocco E<egrave> opzionale, cosE<igrave> come
+la virgola finale in una lista. E<Egrave> buono stile (vedete L<perlstyle>)
+metterli, fatta eccezione per il codice costituito da una sola linea:
+
+    if ($ops) { exit 1 }
+    @numeri = (1, 2, 3);
+
+    if ($ops) {
+        exit 1;
+    }
+    @linee = (
+      "Li` giunse Beren dal monte imponente",
+      "E tra le fronde e gli alberi vagabondo` disperso",
+    );
+
+=head2 Come tralascio alcuni valori di ritorno?
+
+Un modo E<egrave> quello di trattare i valori di ritorno come una lista e di
+indicizzarla:
+
+	$dir = (getpwnam($utente))[7];
+
+Un'altra maniera E<egrave> quella di usare undef come elemento nella parte
+sinistra, come in:
+
+    ($dev, $ino, undef, undef, $uid, $gid) = stat($file);
+
+Potete anche usare uno slice di lista per selezionare solo gli elementi che 
+vi servono:
+
+	($dev, $ino, $uid, $gid) = ( stat($file) )[0,1,4,5];
+
+=head2 Come posso disabilitare temporaneamente i warning?
+
+Se state utilizzando Perl 5.6.0 o superiore, la direttiva C<use warnings>
+permette di controllare finemente quali avvertimenti vengono generati.
+Consultate L<perllexwarn> per ulteriori dettagli.
+
+    {
+	no warnings;          # disabilita temporanemente i warning
+	$a = $b + $c;         # questi potrebbero essere undef
+    }
+
+In aggiunta, potete abilitare e disabilitare categorie di warning.
+Potete togliere le categorie che volete ignorare e potete ancora 
+ottenere altre categorie di warning. Consultate L<perllexwarn> per i 
+dettagli completi, inclusi i nomi delle categorie e gerarchie.
+
+	{
+	no warnings 'uninitialized';
+	$a = $b + $c;
+	}
+
+Se avete una versione piE<ugrave> vecchia di Perl, la variabile '$^W'
+(documentata in L<perlvar>) controlla, al momento dell'esecuzione, i warning
+per un blocco:
+
+    {
+	local $^W = 0;        # disabilita temporanemente i warning
+	$a = $b + $c;         # questi potrebbero essere undef
+    }
+
+E<Egrave> da notare che, come per tutte le variabili speciali [quelle
+il cui nome E<egrave> un segno di punteggiatura, NdT], non E<egrave> possibile
+usare my() su '$^W' ma solo local().
+
+=head2 Cos'E<egrave> un'estensione (extension)?
+
+Un'estensione E<egrave> un modo per chiamare da Perl del codice C compilato.
+Leggere L<perlxstut> E<egrave> un buon modo per imparare di piE<ugrave>
+sulle estensioni. 
+
+=head2 PerchE<eacute> gli operatori del Perl hanno una precedenza diversa rispetto a quelli del C? 
+
+In realtE<agrave> non E<egrave> vero. Tutti gli operatori del C che vengono
+riprodotti in Perl hanno la stessa precedenza che hanno in C. Il problema si
+presenta con gli operatori che in C non esistono, in special modo le funzioni
+che conferiscono un contesto di lista a tutto quello che sta alla loro destra,
+ad esempio print, chmod, exec e cosE<igrave> via. Queste funzioni sono
+chiamate "operatori di lista" e appaiono come tali nella tabella delle
+precedenze di perlop.
+
+Un errore comune E<egrave> scrivere:
+
+    unlink $file || die "caos";
+
+Esso viene interpretato come:
+
+    unlink ($file || die "caos");
+
+Per evitare questo problema, usate delle parentesi in piE<ugrave> oppure
+usate l'operatore C<or> che ha una precedenza bassissima:
+
+    (unlink $file) || die "caos";
+    unlink $file or die "caos";
+
+Gli operatori "in lingua inglese" (C<and>, C<or>, C<xor> e C<not>) hanno una
+precedenza volutamente inferiore a quella degli operatori di lista, esattamente
+per le situazione come quella menzionata sopra.
+
+Un altro operatore con una precedenza sorprendente E<egrave> l'operatore di
+elevamento a potenza. Ha una precedenza superiore anche al meno unario,
+facendo sE<igrave> che C<-2**2> produca un quattro negativo anzichE<egrave>
+positivo. Inoltre E<egrave> associativo a destra, e questo vuol dire che
+C<2**3**2> E<egrave> due elevato alla nona potenza, non otto al quadrato.
+
+BenchE<eacute> abbia la stessa precedenza che ha in C, l'operatore C<?:> del
+Perl produce un lvalue [un valore che puE<ograve> trovarsi a sinistra di un
+operatore di assegnamento, NdT]. Questo codice assegna $x a $a o $b, a seconda del
+valore di veritE<agrave> di $forse:
+
+    ($forse ? $a : $b) = $x;
+
+=head2 Come dichiaro/creo una struttura?
+
+In generale, non si "dichiara" una struttura. Si usa un riferimento ad un
+hash (di solito, anonimo). Consultate L<perlref> e L<perldsc> per i dettagli.
+Di seguito c'E<egrave> un esempio:
+
+     $persona = {};                   # nuovo hash anonimo
+     $persona->{ETA}  = 24;           # imposto il campo ETA a 24
+     $persona->{NOME} = "Nat";        # imposto il campo NOME a "Nat"
+
+Se cercate qualcosa un po' piE<ugrave> rigoroso, provate L<perltoot>.
+
+=head2 Come si crea un modulo?
+
+(contributo di brian d foy)
+
+L<perlmod>, L<perlmodlib>, L<perlmodstyle> spiegano i moduli in tutti i 
+sanguinolenti particolari. L<perlnewmod> dE<agrave> una breve panoramica del 
+processo insieme con un paio di suggerimenti sullo stile.
+
+Se avete la necessitE<agrave> di includere del codice C o delle librerie di 
+interfaccia C nei vostri moduli, avrete bisogno di h2xs. h2xs creerE<agrave> la 
+struttura della distribuzione del modulo e gli iniziali file di interfaccia che 
+vi servirranno. L<perlxs> e L<perlxstut> spiegano i dettagli.
+
+Se non avete bisogno di usare del codice C, altri strumenti quali 
+ExtUtils::ModuleMaker e Module::Starter potrebbero aiutarvi a creare uno 
+scheletro di distribuzione del modulo.
+
+Potreste anche voler dare un'occhiata al libro di Sam Tregar 
+"Writing Perl Modules for CPAN" ( http://apress.com/book/bookDisplay.html?bID=14 ) 
+che E<egrave> la migliore guida pratica per la creazione di distribuzioni di moduli.
+
+=head2 Come faccio a creare una classe?
+
+Per una introduzione a classi e oggetti consultate la pagina del manuale
+L<perltoot>; consultate anche L<perlobj> e L<perlbot>.
+
+=head2 Come faccio a stabilire se una variabile E<egrave> potenzialmente dannosa?
+
+Potete usare la funzione tainted() del modulo Scalar::Util, disponibile
+da CPAN (o inclusa con Perl a partire dalla versione 5.8.0).
+Consultate inoltre L<perlsec/"Laundering and Detecting Tainted Data">
+["Rendere puliti e rilevare i dati potenzialmente dannosi", NdT].
+
+=head2 Che cos'E<egrave> una chiusura?
+
+Le chiusure sono documentate in L<perlref>.
+
+I<Chiusura> E<egrave> un termine dell'informatica con un signficato preciso
+ma difficile da spiegare. Le chiusure sono implementate in Perl come
+subroutine anonime che conservano un riferimento persistente a variabili
+lessicali non piE<ugrave> visibili. Queste variabili lessicali, magicamente,
+fanno riferimento alle variabili che erano visibili quando la subroutine
+E<egrave> stata definita (deep binding).
+
+Le chiusure hanno senso in qualunque linguaggio di programmazione nel quale
+il valore di ritorno di una funzione puE<ograve> essere esso stesso una
+funzione, come in Perl. Notate che alcuni linguaggi mettono a disposizione
+le funzioni anonime, ma non sono in grado di fornire chiusure effettive: il
+Python, per esempio [1]. Per ulteriori informazioni sulle chiusure, fate
+riferimento ad un qualunque libro sulla programmazione funzionale. Scheme
+E<egrave> un linguaggio che non solo supporta, ma incoraggia l'uso di chiusure.
+
+Ecco una classica funzione che genera una funzione:
+
+    sub generatore_di_funzione_somma {
+        return sub { shift() + shift() };
+    }
+
+    $funzione_somma = generatore_di_funzione_somma();
+    $somma = $funzione_somma->(4,5);      # $sum ora e` 9.
+
+La chiusura funziona come un template di funzione con dello spazio lasciato libero
+per la personalizzazione, da riempire in seguito. La subroutine anonima
+restituita da generatore_di_funzione_somma() non E<egrave> tecnicamente una
+chiusura poichE<egrave> non fa riferimento ad alcuna variabile lessicale non
+piE<ugrave> visibile.
+
+Paragonate il caso precedente alla seguente funzione crea_sommatore(), nella
+quale la funzione anonima che viene restituita contiene un riferimento ad una
+variabile lessicale non visibile dalla funzione stessa. Questo riferimento
+richiede che Perl restituisca un'opportuna chiusura, bloccando quindi per
+sempre il valore che la variabile lessicale aveva quando la funzione E<egrave>
+stata creata.
+
+    sub crea_sommatore {
+        my $addendo = shift;
+        return sub { shift() + $addendo };
+    }
+
+    $f1 = crea_sommatore(20);
+    $f2 = crea_sommatore(555);
+
+Ora C<&$f1($n)> E<egrave> sempre 20 piE<ugrave> qualunque $n abbiate passato,
+mentre C<&$f2($n)> E<egrave> sempre 555 piE<ugrave> il valore passato.
+
+Le chiusure sono usate spesso per scopi meno esoterici. Ad esempio, quando
+volete passare un po' di codice ad una funzione:
+
+    my $linea;
+    timeout( 30, sub { $linea = <STDIN> } );
+
+Se il codice fosse stato passato come stringa, C<< '$linea = <STDIN>' >>, non
+ci sarebbe stato alcun modo, per l'ipotetica funzione timeout(), di accedere
+alla variabile lessicale $line visibile dal chiamante.
+
+[1] NdT: questa nozione a proposito di Python non E<egrave> piE<ugrave> vera.
+A partire dalla versione 2.2 si possono costruire chiusure con variabili
+di sola lettura. Non conosco gli interpreti Python successivi. Per approfondimenti:
+
+      http://www.norvig.com/python-lisp.html
+
+=head2 Cos'E<egrave> il suicidio di variabile e come si puE<ograve> prevenire?
+
+Questo problema E<egrave> stato risolto nel perl 5.004_05, dunque prevenirlo significa
+aggiornare la vostra versione di perl. ;)
+
+Il suicidio di variabile si ha quando (temporaneamente o permanentemente) si
+perde il valore di una variabile. E<Egrave> causato da questioni di
+visibilitE<agrave> frutto dell'interazione tra my() e local() o con le
+chiusure o con variabili che sono iteratori alias per foreach() e con 
+argomenti di subroutine. Di solito era facile perdere inavvertitamente il
+valore di una variabile in questa modo, ora perE<ograve> E<egrave> piE<ugrave>
+difficile. Prendete questo codice:
+
+     my $f = 'pippo';
+     sub T {
+       while ($i++ < 3) { my $f = $f; $f .= 'pluto'; print $f, "\n" }
+     }
+     T;
+     print "Infine $f\n";
+
+Se state avendo a che fare con il suicidio di variabile, quel C<my $f> nella subroutine
+non tira su una nuova copia di C<$f>, il cui valore E<egrave> C<pippo>. L'output
+mostra che all'interno della subroutine, il valore di C<$f> oltrepassa i limiti
+quando non dovrebbe, come in questo output:
+
+	pippopluto
+	pippoplutopluto
+	pippoplutoplutopluto
+	Infine pippo
+
+La $f a cui E<egrave> stato aggiunto "pluto" per tre volte dovrebbe essere una
+nuova $f. C<my $f> dovrebbe creare una nuova variabile locale ogni volta che
+si compie il ciclo. L'output che ci si aspetta E<egrave>:
+
+	pippopluto
+	pippopluto
+	pippopluto
+	Infine pippo
+
+=head2 Come faccio a passare/restituire una {Funzione, FileHandle, Array, Hash, Metodo, Espressione Regolare}?
+
+Fatta eccezione per le espressioni regolari, dovete passare un riferimento a
+questi oggetti. Consultate L<perlsub/"Pass by Reference"> ["Passato per Riferimento", NdT]
+per tale particolare questione, e L<perlref> per informazioni sui riferimenti.
+
+Consultate il sottostante paragrafo "Passaggio di espressioni regolari",
+per avere informazioni sul passaggio di espressioni regolari. 
+
+=over 4
+
+=item Passaggio di variabili e funzioni
+
+Le variabili e le funzioni sono abbastanza facili da passare: limitatevi
+a passare un riferimento ad una variabile esistente o anonima, oppure
+ad una funzione:
+
+    funz( \$un_certo_scalare );
+
+    funz( \@un_certo_array );
+    funz( [ 1 .. 10 ] );
+
+    funz( \%un_certo_hash );
+    funz( { questo => 10, quello => 20 } );
+
+    funz( \&una_certa_funzione );
+    funz( sub { $_[0] ** $_[1] } );
+
+=item Passaggio di filehandle
+
+Dal perl 5.6, potete rappresentare i filehandle con variabili scalari
+che trattare come ogni altro scalare.
+
+	open my $fh, $nomefile or die "Non posso aprire $nomefile! $!";
+	funz( $fh );
+
+	sub funz {
+		my $fh_passato = shift;
+
+		my $linea = <$fh>;
+		}
+
+Prima del Perl 5.6, dovevate usare le notazioni C<*FH> oppure C<\*FH> .
+Queste sono "typeglob"--per maggiori informazioni, consultate 
+L<perldata/"Typeglobs and Filehandles"> ["Typglob e Filehandle", NdT] e in modo 
+particolare L<perlsub/"Pass by Reference"> ["Passato per Riferimento", NdT].
+
+=item Passaggio di espressioni regolari
+
+Per passare espressioni regolari, E<egrave> necessario usare una versione di
+Perl sufficientemente recente da supportare il costrutto C<qr//>, passare
+stringhe e usare eval in maniera tale che catturi le eccezioni o altrimenti
+essere molto, molto furbi.
+
+Ecco un esempio che mostra come si fa a passare una stringa che deve
+essere verificata con una espressione regolare, usando C<qr//>:
+
+    sub verifica($$) {
+        my ($val1, $regex) = @_;
+        my $retval = $val1 =~ /$regex/;
+        return $retval;
+    }
+    $corrispondenza = verifica("old McDonald", qr/d.*D/i);
+
+Va notato che C<qr//> permette di usare i flag alla fine. Quel pattern viene
+compilato a tempo di compilazione, benchE<eacute> venga eseguito
+successivamente.
+La notazione C<qr//> non E<egrave> stata introdotta che con la versione 5.005.
+In precedenza ci si doveva avvicinare al problema in maniera molto meno
+intuitiva. Ecco lo stesso esempio, nel caso non si abbia C<qr//>:
+
+    sub verifica($$) {
+        my ($val1, $regex) = @_;
+        my $retval = eval { $val1 =~ /$regex/ };
+        die if $@;
+        return $retval;
+    }
+
+    $corrispondenza = verifica("old McDonald", q/($?i)d.*D/);
+
+Assicuratevi di non scrivere mai cose del genere:
+
+    return eval "\$val =~ /$regex/";   # SBAGLIATO
+
+altrimenti qualcuno potrebbe insinuare comandi di shell a causa della
+doppia interpolazione dell'eval e della stringa tra doppi apici.
+Ad esempio:
+
+    $pattern_malefico = 'pericolo ${ system("rm -rf * &") } pericolo';
+
+    eval "\$stringa =~ /$pattern_malefico/";
+
+Chi preferisce essere molto molto furbo puE<ograve> consultare il volume della
+O'Reilly "Mastering Regular Expressions", di Jeffrey Friedl.
+La Build_MathMany_Function(), che si trova a pagina 273, E<egrave> particolarmente
+interessante. Gli estremi completi di questo testo si trovano in L<perlfaq2>.
+
+=item Passaggio di metodi
+
+Per passare un metodo ad una subroutine, potete fare cosE<igrave>:
+
+    chiamata_multipla(10, $un_certo_oggetto, "nome_metodo")
+    sub chiamata_multipla {
+        my ($contatore, $oggetto, $metodo) = @_;
+        for (my $i = 0; $i < $contatore; $i++) {
+            $oggetto->$metodo();
+        }
+    }
+
+Oppure potete usare una chiusura per impacchettare l'oggetto, la
+chiamata al metodo e gli argomenti:
+
+    my $non_manca_niente = sub { $un_certo_oggetto->obfuscate(@args) };
+    funz($non_manca_niente);
+    sub funz {
+        my $codice = shift;
+        &$codice();
+    }
+
+Potete inoltre indagare sul metodo can() della classe UNIVERSAL (inclusa
+nella distribuzione standard di perl).
+
+=back
+
+=head2 Come si crea una variabile statica?
+
+(contributo di brian d foy)
+
+Perl non ha le variabili "statiche", alle quali si puE<ograve> avere accesso solo
+dalla funzione nella quale sono dichiarate. PerE<ograve> potete ottenere lo
+stesso effetto con le variabili lessicali.
+
+Potete simulare una variabile statica usando una variabile lessicale che
+va al di fuori dello scope. In questo esempio, si definisce la subroutine C<contatore>
+che usa la variabile lessicale C<$contatore>. Dato che lo inserite in un blocco BEGIN,
+C<$contatore> E<egrave> definito a tempo di compilazione, ma esso va anche fuori dallo
+scope alla fine del blocco BEGIN. Il blocco BEGIN assicura anche che la subroutine e
+il valore che essa usa sia definito a tempo di compilazione di modo che la subroutine
+sia pronta all'uso proprio come ogni altra subroutine, e si possa inserire questo codice
+nella stessa posizione come per le altre subroutine nel testo del programma (ovvero, di
+solito, alla fine del codice). La subroutine C<contatore> ha ancora un riferimento ai dati e
+questa E<egrave> la sola maniera che avete per accedere al valore (ed ogni volta che lo
+fate, ne incrementate il valore). I dati nella porzione di memoria definita da C<$contatore>
+E<egrave> privata per C<contatore>.
+
+    BEGIN {
+        my $contatore = 1;
+        sub contatore { $contatore++ }
+    }
+
+    my $partenza = contatore();
+
+    .... # codice che chiama contatore();
+
+    my $fine = contatore();
+
+Nell'esempio precedente, avete creato una variabile privata per una funzione
+perch<eacute> solo una funzione si E<egrave> il suo riferimento. Potreste definire
+funzioni multiple mentre la variabile E<egrave> nello scope, ed ogni funzione
+puE<ograve> condividere la variabile "privata". Non E<egrave> davvero "statica" perchE<eacute>
+potete accedervi dal di fuori della funzione finchE<eacute> la variabile lessicale E<egrave>
+nello scope e potete anche creare riferimenti ad essa. In questo esempio, C<incrementa_contatore> e
+C<restituisci_contatore> condividono la variabile. Una funzione incrementa il valore e l'altra
+semplicemente lo restituisce. Entrambe possono accedere a C<$contatore> e visto che esso E<egrave>
+andato al di fuori dello scope, non c'E<egrave> altro modo per accedervi. 
+
+    BEGIN {
+        my $contatore = 1;
+        sub incrementa_contatore  { $contatore++ }
+        sub restituisci_contatore { $contatore }
+    }
+
+Per dichiarare una variabile privata per un file, potete usare ancora una
+variabile lessicale. Un file E<egrave> anche uno scope, dunque una variabile
+lessicale definita nel file non puE<ograve> essere vista da qualsiasi altro file.
+
+Consultate L<perlsub/"Persistent Private Variables"> ["Variabili Private Persistenti", NdT]
+per maggiori informazioni. La discussione sulle chiusure in L<perlref> potrebbe aiutarvi
+anche se non abbiamo usato le subroutine anonime in questa risposta. 
+Consultate L<perlsub/"Persistent Private Variables"> per i dettagli.
+
+=head2 Qual E<egrave> la differenza tra visibilitE<agrave> dinamica e visibilitE<agrave> lessicale (o statica)? Qual E<egrave> la differenza tra local() e my()?
+
+C<local($x)> salvaguarda il vecchio valore della variabile globale C<$x> e
+le assegna un nuovo valore per la durata della subroutine. I<Tale valore
+E<egrave> visibile nelle funzioni chiamate da detta subroutine>. Tutto
+ciE<ograve> viene fatto al momento dell'esecuzione, per cui si parla di
+visibilitE<agrave> dinamica. local() opera sempre su variabili globali,
+che vengono chiamate anche variabili di package o variabili dinamiche.
+
+C<my($x)> definisce una nuova variabile, visibile solo nella subroutine
+corrente. CiE<ograve> viene fatto al momento della compilazione, e dunque
+si parla di visibilitE<agrave> lessicale o statica. my() opera su variabili
+private, chiamate anche variabili lessicali o, in modo improprio, variabili
+con visibilitE<agrave> statica.
+
+Ad esempio:
+
+    sub visibile {
+	print "il valore di var e` $var\n";
+    }
+
+    sub dinamica {
+	local $var = 'locale';	#  nuovo valore temporaneo per la
+	visibile();	        #  variabile $var, che resta globale
+    }
+
+    sub lessicale {
+	my $var = 'privata';    # nouva variabile privata $vatr.
+	visible();              # (invisibile al di fuori dello scopo della subroutine)
+    }
+
+    $var = 'globale';
+
+    visibile();      		# scrive globale
+    dinamica();      		# scrive locale
+    lessicale();      		# scrive globale
+
+Si noti come il valore "privata" non venga mai scritto. CiE<ograve>
+perchE<eacute> tale valore di $var E<egrave> visibile solo all'interno
+del blocco della funzione lessicale() e non nella subroutine chiamata.
+
+In breve, local() non produce ciE<ograve> che probabilmente pensate, ossia
+una variabile privata o locale. local() dE<agrave> un valore temporaneo ad
+una variabile globale. my() E<egrave> ciE<ograve> che state cercando se
+desiderate ottenere delle variabili private.
+
+Consultate anche le sezioni L<perlsub/"Private Variables via my()"> ["Variabili Private tramite my()", NdT]
+e <perlsub/"Temporary Values via local()"> ["Valori Temporanei tramite local()", NdT]
+per i dolorosi dettagli.
+
+=head2 Come posso accedere ad una variabile dinamica quando E<egrave> visibile una variabile lessicale con lo stesso nome?
+
+Se conoscete il package, potete nominarlo esplicitamente, come in
+$Un_Certo_Package::var. Notate che con $::var I<non> si intende
+la variabile dinamica $var nel package corrente, bensE<igrave> quella
+nel package "main", come se aveste scritto $main::var.
+
+	use vars '$var';
+	local $var = "globale";
+	my    $var = "lessicale";
+
+	print "lessicale e` $var\n";
+	print "globale   e` $main::var\n";
+
+Alternativamente potete usare la direttiva del compilatore our() per
+portare una variabile dinamica nello scope lessicale corrente.
+
+	require 5.006; # our() non esiste prima del 5.6
+	use vars '$var';
+
+	local $var = "globale";
+	my $var    = "lessicale";
+
+	print "lessicale e` $var\n";
+
+	{
+	  our $var;
+	  print "globale e` $var\n";
+	}
+
+=head2 Qual E<egrave> la differenza tra il deep binding (legame profondo) e lo shallow binding (legame superficiale)?
+
+Nel deep binding, le variabili lessicali che vengono nominate nelle procedure
+anonime sono le stesse che si trovavano nello scope quando la procedura
+E<egrave> stata creata. Nello shallow binding, esse sono una qualsiasi
+variabile con lo stesso nome, a cui capita di trovarsi nello scope quando
+la procedura viene chiamata. Il Perl usa sempre il deep binding delle
+varaibili lessicali (cioE<egrave> quelle create con my()). Ad ogni modo,
+le variabili dinamiche (dette anche globali, locali, o variabili package)
+sono effettivamente fatte oggetto di shallow binding. Considerate questa
+un'ulteriore ragione per non usarle. Guardate la risposta a
+L<"Cos'E<egrave> una chiusura?">
+
+=head2 PerchE<eacute> "my($pippo) = <FILE>;" non funziona bene?
+
+C<my()> e C<local()> conferiscono un contesto di lista alla parte destra
+dell'assegnamento C<=>. L'operazione di lettura <FH>, come molti altri
+operatori e funzioni del Perl, E<egrave> sensibile al contesto in cui
+E<egrave> stata chiamata, e si comporta di conseguenza. Generalmente la
+funzione scalar() puE<ograve> essere d'aiuto. Questa funzione non ha alcun
+effetto sui dati medesimi (contrariamente alla credenza popolare) ma dice
+ai suoi argomenti di seguire il comportamento che essi devono avere in un
+contesto scalare, qualunque esso sia. Se la funzione non ha un comportamento
+scalare definito, questa tecnica naturalmente non vi aiuterE<agrave> (come
+nel caso di sort()).
+
+Per forzare un contesto scalare in questo caso specifico, ad ogni modo,
+dovete semplicemente togliere le parentesi:
+
+     local($pippo) = <FILE>;           # SBAGLIATO
+     local($pippo) = scalar(<FILE>);   # ok
+     local $pippo  = <FILE>;           # giusto
+
+Probabilmente dovreste usare variabili lessicali, comunque, ma la sostanza
+non cambia:
+
+     my($pippo) = <FILE>;   # SBAGLIATO
+     my $pippo  = <FILE>;   # giusto
+
+=head2 Come si fa a ridefinire una funzione, operatore o metodo predefinito?
+
+PerchE<eacute> volete fare questo? :-)
+
+Se si vuole sovrapporre una funzione predefinita, come open(), allora si
+dovrE<agrave> importare la nuova definizione da un differente modulo. Consultate
+L<perlsub/"Overriding Built-in Functions"> ["Sovrapporre le Funzioni Predefinite", NdT]. 
+C'E<egrave> anche un esempio in L<perltoot/"Class::Template">.
+
+Se volete sovraccaricare un operatore Perl, come C<+> o C<**>, allora
+troverete conveniente usare la direttiva use overload, documentata in
+L<overload>.
+
+Se state parlando di oscure chiamate a metodi in classi genitore, consultate
+L<perltoot/"Overridden Methods"> ["Metodi Sovrapposti", NdT].
+
+=head2 Qual E<egrave> la differenza tra il chiamare una funzione con &pippo e con pippo()?
+
+Quando chiamate una funzione come C<&pippo>, permettete che la funzione
+acceda ai valori correnti contenuti in @_ ed evitate di prendere in
+considerazione i prototipi. La funzione non otterrE<agrave> un
+@_ vuoto--otterrE<agrave> il vostro! [l'array del chiamante, NdT]
+BenchE<eacute> strettamente parlando non si possa dire un bug (E<egrave>
+documentato in questo modo in perlsub), nella maggior parte dei casi
+sarebbe difficile considerarlo una caratteristica.
+
+Quando chiamate una funzione come C<&pippo()>, allora ottenete un
+nuovo @_, ma l'uso dei prototipi viene anche in questo caso aggirato.
+
+Normalmente le funzioni si chiamano usando C<pippo()>. Potete omettere
+le parentesi solo se la funzione E<egrave> giE<agrave> nota al compilatore
+perchE<eacute> ne ha giE<agrave> visto la definizione (usando C<use> e non
+C<require>), o grazie ad un riferimento in avanti, oppure grazie ad una
+dichiarazione use subs. Anche in questo caso otterrete un nuovo @_ senza
+nessuno dei vecchi valori che spunta lE<agrave> dove non dovrebbe.
+
+=head2 Come faccio a realizzare un'istruzione switch o case?
+
+Viene spiegato piE<ugrave> approfonditamente in L<perlsyn>. In sintesi, non
+c'E<egrave> un'istruzione case ufficiale a causa della varietE<agrave> di
+test che sono possibili in Perl (confronto numerico, confronto tra stringhe,
+confronto tra glob, pattern matching, operatori di confronto con piE<ugrave>
+significati, ...). Larry non E<egrave> riuscito a decidere quale fosse il
+modo migliore per farlo, e quindi lo ha lasciato da parte, benchE<eacute>
+sia nella lista dei desideri giE<agrave> dalla prima versione di Perl.
+
+A partire da Perl 5.8 per avere switch e case si deve usare l'estensione
+Switch:
+
+     use Switch;
+
+e si avranno switch e case. Non E<egrave> veloce quanto potrebbe esserlo,
+poichE<eacute> non E<egrave> realmente parte del linguaggio (E<egrave> fatto
+usando i source filter) ma E<egrave> disponibile, ed E<egrave> molto
+flessibile.
+
+Se perE<ograve> si vuole usare Perl puro, la risposta generale E<egrave>
+scrivere un construtto come questo:
+
+     for ( $variabile_da_verificare ) {
+         if    (/pat1/)  { }     # fai qualcosa
+         elsif (/pat2/)  { }     # fai qualcos'altro
+         elsif (/pat3/)  { }     # fai qualcos'altro
+         else            { }     # default
+     }
+
+Ecco un semplice esempio di switch basato su pattern matching, questa volta
+incolonnato in maniera tale che assomigli maggiormente ad una istruzione
+switch. Realizzeremo un costrutto condizionale a piE<ugrave> vie basato sul
+tipo di riferimento memorizzato in $ref:
+
+     SWITCH: for (ref $ref) {
+
+         /^$/        && die "non e` un riferimento";
+
+         /SCALAR/    && do {
+                         print_scalar($$ref);
+                         last SWITCH;
+                     };
+
+         /ARRAY/     && do {
+                         print_array(@$ref);
+                         last SWITCH;
+                     };
+
+         /HASH/      && do {
+                         print_hash(%$ref);
+                         last SWITCH;
+                     };
+
+         /CODE/      && do {
+                         warn "non posso stampare un riferimento a funzione";
+                         last SWITCH;
+                     };
+
+         # DEFAULT
+
+         warn "Tipo definito dall'utente, tralasciato";
+
+      }
+
+Consultate L<perlsyn/"Basic BLOCKs and Switch Statements> ["BLOCK di Base e Istruzioni Switch", NdT] 
+per trovare molti altri esempi in questo stile.
+
+A volte potreste dover modificare la posizione della costante e della
+variabile. Ad esempio, poniamo che vogliate sapere quale tra tante risposte
+avete ricevuto, ma in maniera non dipendete dalle maiuscole/minuscole, e permettendo abbreviazioni.
+Potreste usare la seguente tecnica se le stringhe cominciano tutte con
+caratteri diversi, o se volete ordinare le corrispondenze in maniera tale che
+una abbia la precedenza sull'altra, cosE<igrave> come in questo caso C<SEND>
+ha la precedenza su C<STOP>:
+
+     chomp($answer = <>);
+     if    ("SEND"  =~ /^Q$answer/i) { print "L'azione e` send\n"  }
+     elsif ("STOP"  =~ /^Q$answer/i) { print "L'azione e` stop\n"  }
+     elsif ("ABORT" =~ /^Q$answer/i) { print "L'azione e` abort\n" }
+     elsif ("LIST"  =~ /^Q$answer/i) { print "L'azione e` list\n"  }
+     elsif ("EDIT"  =~ /^Q$answer/i) { print "L'azione e` edit\n"  }
+
+Un approccio del tutto differente consiste nel creare un hash di riferimenti
+a funzione:
+
+     my %commands = (
+         "felice"   => \&gioia,
+         "triste"   => \&grigiore,
+         "finito"   => sub { die "Ci vediamo!" },
+         "matto"    => \&rabbia,
+     );
+
+     print "Come stai? ";
+     chomp($string = <STDIN>);
+     if ($commands{$string}) {
+         $commands{$string}->();
+     } else {
+         print "Non esiste questo comando: $string\n";
+     }
+
+=head2 Come posso intercettare gli accessi a variabili, funzioni o metodi indefiniti?
+
+Il metodo AUTOLOAD, discusso in L<perlsub/"Autoloading"> e in
+L<perltoot/"AUTOLOAD: Proxy Methods"> ["AUTOLOAD: Metodi Proxy", NdT], vi consente
+di catturare le chiamate a funzioni e metodi indefiniti.
+
+Quando invece si tratta di variabili indefinite che genererebbero un
+avvertimento in presenza di C<use warnings>, potete promuovere l'avvertimento 
+in un errore.
+
+        use warnings FATAL => qw(uninitialized);
+
+=head2 PerchE<eacute> non si riesce a trovare un metodo incluso in questo stesso file?
+
+Alcune ragioni possibili: il meccanismo dell'ereditarietE<agrave> si E<egrave>
+confuso, avete scritto male il nome del metodo, oppure l'oggetto E<egrave>
+del tipo sbagliato. Fate riferimento a L<perltoot> per dettagli su ciascuno
+dei casi menzionati. Potreste inoltre usare C<print ref($object)> per sapere
+qual E<egrave> la classe nella quale C<$oject> E<egrave> stato sottoposto
+alla funzione bless().
+
+Un'altra possibile fonte di problemi E<egrave> l'uso della sintassi
+indiretta per gli oggetti (ad esempio C<trova Guru "Samy">) sul nome di una
+classe prima che Perl abbia visto che il relativo package esiste. E<Egrave>
+piE<ugrave> saggio assicurarsi che tutti i vostri package siano definiti,
+prima di usarli. VerrE<agrave> fatto se usate l'istruzione C<use>
+anzichE<eacute> C<require>. Altrimenti, assicuratevi di usare la "notazione
+con freccia" (ad esempio C<< Guru->trova( "Samy" ) >>). La notazione per gli
+oggetti E<egrave> spiegata in L<perlobj>.
+
+Assicuratevi di leggere L<perlmod> a proposito della creazione dei moduli, e
+L<perlobj/"Method invocation"> ["Invocazione di Metodi", NdT] 
+a proposito dei pericoli degli oggetti indiretti.
+
+=head2 Come posso sapere qual E<egrave> il package corrente?
+
+In un programma generico, per conoscere il package dell'unitE<agrave> di
+compilazione corrente potete fare in questo modo:
+
+     my $nome_package = __PACKAGE__;
+
+Ma se si tratta di un metodo e volete stampare un messaggio
+d'errore che menzioni il tipo di oggetto sul quale E<egrave> stato
+invocato (che non E<egrave> necessariamente quello in cui il metodo E<egrave>
+stato compilato):
+
+     sub metodo {
+         my $self  = shift;
+         my $class = ref($self) || $self;
+         warn "Sono stato chiamato da un oggetto $class";
+     }
+
+=head2 Come posso commentare un vasto blocco di codice perl?
+
+Potete usare il POD incorporato nel codice per mettere quest'ultimo da parte.
+Racchiudete i blocchi che volete commentare tra etichette POD. La direttiva 
+<=begin> contrassegna una sezione per uno specifico formattatore. Usate il 
+formato C<comment>, che nessun formattatore dovrebbe pretendere di saper capire 
+(per scelta). Contrassegnate la fine del blocco con <=end>.
+
+    # il programma e` qui
+
+    =begin comment
+
+    Tutte queste cose
+
+    qui saranno ignorate
+    da tutti
+
+    	=end comment
+
+    =cut
+
+    # il programma continua
+
+Le direttive pod non possono andare proprio dappertutto. Dovete
+inserire una direttiva pod dove il parser si aspetta una nuova istruzione,
+non semplicemente nel mezzo di una espressione o di qualche altra produzione grammaticale.
+
+Consultate L<perlpod> per maggiori dettagli.
+
+=head2 Come si cancella un package?
+
+Usate questo codice, fornito da Mark-Jason Dominus:
+
+     sub scrub_package {
+        no strict 'refs';
+        my $pack = shift;
+        die "Non si dovrebbe eliminare il package main"
+            if $pack eq "" || $pack eq "main";
+        my $stash = *{$pack . '::'}{HASH};
+        my $nome;
+        foreach $name (keys %$stash) {
+            my $nomecompleto = $pack . '::' . $nome;
+            # Elimino tutto con quel nome
+            undef $$nomecompleto;
+            undef @$nomecompleto;
+            undef %$nomecompleto;
+            undef &$nomecompleto;
+            undef *$nomecompleto;
+        }
+     }
+
+Oppure, se state usando una versione recente di Perl, al suo posto potete semplicemente
+usare la funzione Symbol::delete_package() .
+
+=head2 Come posso usare una variabile come nome di una variabile?
+
+I principianti spesso ritengono di voler avere una variabile che a sua volta
+contiene il nome di una variabile.
+
+    $fred = 23;
+    $nome_variabile = "fred";
+    ++$$nome_variabile;  # $fred adesso vale 24
+
+I<A volte> funziona, ma E<egrave> un'idea molto sbagliata, per due ragioni.
+
+La prima ragione E<egrave> che I<funziona solo con variabili globali>. Questo
+vuol dire che se nell'esempio precedente $fred fosse una variabile lessicale
+creata con my(), il codice non funzionerebbe per niente: accedereste 
+accidentalmente alla globale, saltando a piE<egrave> pari la variabile
+lessicale privata. Le variabili globali non vanno bene perchE<eacute> possono
+facilmente dar luogo a conflitti accidentali, e in generale rendono il codice
+confuso e non scalabile.
+
+I riferimenti simbolici sono proibiti quando la direttiva C<use strict> E<egrave>
+attiva. Non sono veri riferimenti e di conseguenza non sono soggetti al
+conteggio dei riferimenti e alla garbage collection.
+
+L'altra ragione per cui usare una variabile per mantenere il nome di un'altra
+variabile E<egrave> una cattiva idea E<egrave> che la questione spesso
+scaturisce da una mancanza di comprensione delle strutture dati Perl, in
+particolare degli hash. Se usate i riferimenti simbolici di fatto state
+usando l'hash che contiene la tabella dei simboli del package 
+come C<%main::>) anzichE<eacute> un hash definito dall'utente. La soluzione
+E<egrave> usare un hash vostro oppure un riferimento vero e proprio.
+
+    $VARIABILI_UTENTE{"fred"} = 23;
+    $nome_variabile = "fred";
+    $VARIABILI_UTENTE{ $nome_variabile }++;  # non $$nome_variabile++
+
+Stiamo usando l'hash %VARIABILI_UTENTE anzichE<eacute> i riferimenti
+simbolici. A volte capita durante la lettura di stringhe inserite dall'utente
+che contengono riferimenti a variabili che si vogliono espandere con i valori
+delle variabili del programma. Anche questa E<egrave> una cattiva idea,
+poichE<eacute> confonde gli spazi dei nomi indirizzabili dal programma e
+dall'utente. AnzichE<egrave> leggere una stringa ed espanderla con gli
+effettivi contenuti delle variabili proprie del programma:
+
+    $str = 'qui ci sono $fred e $barney';
+    $str =~ s/(\$\w+)/$1/eeg;   # c'e` bisogno di un doppio eval
+
+sarebbe meglio mantenere un hash come %VARIABILI_UTENTE e far sE<igrave> che
+i riferimenti puntino in effetti ai contenuti di questo hash:
+
+    $str =~ s/\$(\w+)/$VARIABILI_UTENTE{$1}/g;   # nessun /e
+
+E<Egrave> piE<ugrave> veloce, piE<ugrave> pulito e piE<ugrave> sicuro
+dell'approccio precedente. Naturalmente, non c'E<egrave> bisogno del simbolo
+del dollaro. Potete usare uno schema personale per rendere le cose meno
+confuse, come ad esempio dei simboli di percentuale usati a mo' di parentesi,
+ecc.
+
+    $str = 'qui ci sono %fred% e %barney%';
+    $str =~ s/%(\w+)%/$VARIABILI_UTENTE{$1}/g;   # nessun /e
+
+Un'altra ragione per cui le persone a volte pensano di volere una variabile che
+contiene il nome di una variabile E<egrave> che non sanno come costruire
+opportune strutture usando gli hash. Ad esempio, diciamo che in un programma
+si vogliono due hash: %fred e %barney e si vuole adoperare un altro scalare
+per fare riferimento ad esse per nome.
+
+    $nome = "fred";
+    $$nome{MOGLIE} = "wilma";    # imposta %fred
+
+    $nome = "barney";
+    $$nome{MOGLIE} = "betty";    # imposta %barney
+
+C'E<egrave> ancora un riferimento simbolico, ed E<egrave> ancora afflitto dai
+problemi elencati sopra. Sarebbe di gran lungo meglio scrivere:
+
+    $gente{"fred"}{MOGLIE}   = "wilma";
+    $gente{"barney"}{MOGLIE} = "betty";
+
+E usate solo un hash a piE<ugrave> livelli.
+
+Le uniche occasioni in cui I<dovete> assolutamente usare i riferimenti
+simbolici sono quelle in cui ci si deve riferire alla tabella dei simboli.
+Potrebbe essere perchE<eacute> si ha a che fare con qualcosa per cui non
+E<egrave> possibile avere un riferimento, ad esempio il nome di un formato.
+Questa pratica potrebbe essere importante anche per le chiamate ai metodi,
+visto che per essere risolte, passano attraverso la tabella dei simboli.
+
+In questi casi, dovreste disattivare C<strict 'refs'> temporaneamente in
+maniera tale da poter trafficare con la tabella dei simboli. Ad esempio:
+
+    @colori = qw(rosso blu verde giallo arancione porpora viola);
+    for my $nome (@colori) {
+        no strict 'refs';  # chiudi un occhio per tutto il blocco
+        *$nome = sub { "<FONT COLOR='$nome'>@_</FONT>" };
+    }
+
+Tutte queste funzioni (rosso(), blu(), verde(), ecc.) sembrano separate, ma
+il codice della chiusura E<egrave> stato compilato, in realtE<agrave>, una 
+volta sola.
+
+Quindi, a volte potreste voler usare dei riferimenti simbolici per manipolare
+direttamente la tabella dei simboli. Non importa se si tratta di format,
+handle o subroutine, poichE<eacute> sono sempre globali -- non potete usare
+my() su di loro. Per gli scalari, gli array e gli hash, perE<ograve> -- e
+di solito per le subroutine --, probabilmente volete usare solo hard reference.
+
+=head2 Cosa significa "bad interpreter" ["interprete non valido", NdT]?
+
+(contributo di brian d foy)
+
+Il messaggio "bad interpreter" deriva dalla shell, non dal perl. Il messaggio
+vero e proprio puE<ograve> variare a seconda della vostra piattaforma, shell e
+impostazione del locale.
+
+Se vedete "bad interpreter - no such file or directory" ["interprete 
+non valido - file o directory non presente", NdT], la prima linea nel vostro
+script perl (la "shebang") non contiene il corretto percorso al perl (oppure
+qualsiasi altro programma in grado di eseguire degli script).
+Talvota questo avviene quando spostate lo script da una macchina ad un'altra e
+ogni macchina ha un differente percorso al perl---per esempio /usr/bin/perl
+piuttosto che /usr/local/bin/perl per esempio. Potrebbe anche indicare che la 
+macchina sorgente abbia terminatori di linea del tipo CRLF e la macchina 
+destinazione abbia solo i LF: la shell cerca di trovare /usr/bin/perl<CR>, 
+ma non ci riesce.
+
+Se vedete "bad interpreter: Permission denied" [interprete non valido: Permesso 
+negato", NdT], avete bisogno di rendere eseguibile il vostro script.
+
+In entrambi i casi, dovreste essere ancora in grado di eseguire gli script,
+esplicitamente con perl:
+
+	% perl script.pl
+
+Se ottenete un messaggio come "perl: command not found" ["perl: comando non 
+trovato", NdT], perl non E<egrave> nel vostro PATH [percorso, NdT], che potrebbe
+anche significare che la posizione del perl non E<egrave> dove vi aspettate, dunque
+sarE<agrave> necessario modificare la vostra shebang.
+
+=head1 AUTORE E COPYRIGHT
+
+Copyright (c) 1997-2006 Tom Christiansen, Nathan Torkington e altri autori menzionati.
+Tutti i diritti riservati.
+
+Questa documentazione E<egrave> libera; potete ridistribuirla e/o modificarla
+secondo gli stessi termini applicati al Perl.
+
+Indipendentemente dalle modalitE<agrave> di distribuzione, tutti gli esempi di
+codice in questo file sono rilasciati al pubblico dominio. Potete, e siete
+incoraggiati a farlo, utilizzare il presente codice o qualunque forma
+derivata da esso nei vostri programmi per divertimento o per profitto.
+Un semplice commento nel codice che dia riconoscimento alle FAQ sarebbe
+cortese ma non E<egrave> obbligatorio.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlfaq7
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Michele Beltrame.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

@@ -1,0 +1,30 @@
+--- #YAML:1.0
+name:               PasswordMonkey
+version:            0.09
+abstract:           Password prompt responder
+author:
+    - Mike Schilli <cpan@perlmeister.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Expect:             1.21
+    IO::Pty:            1.09
+    IO::Stty:           0.03
+    Log::Log4perl:      1
+    Module::Pluggable:  3.9
+    Term::ReadKey:      2.3
+    Term::ReadLine:     1.01
+resources:
+    repository:  https://github.com/ytoolshed/passwordmonkey-perl
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

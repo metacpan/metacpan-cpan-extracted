@@ -1,0 +1,740 @@
+ROOT 
+{
+   COMMAND head1 
+   {
+      TEXT NAME
+
+
+   }
+   ORDINARY 
+   {
+      TEXT Lists
+
+
+   }
+   COMMAND head2 
+   {
+      TEXT Bullet
+
+
+   }
+   LIST BULLET
+   {
+      ITEM BULLET
+      {
+         TEXT *
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT foo
+
+
+         }
+      ]
+      ITEM BULLET
+      {
+         TEXT *
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT bar
+
+
+         }
+      ]
+      ITEM BULLET
+      {
+         TEXT *
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT baz
+
+
+         }
+      ]
+   }
+   COMMAND head2 
+   {
+      TEXT Number
+
+
+   }
+   LIST NUMBER
+   {
+      ITEM NUMBER
+      {
+         TEXT 1
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT foo
+
+
+         }
+      ]
+      ITEM NUMBER
+      {
+         TEXT 2
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT bar
+
+
+         }
+      ]
+      ITEM NUMBER
+      {
+         TEXT 3
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT baz
+
+
+         }
+      ]
+   }
+   COMMAND head2 
+   {
+      TEXT Text
+
+
+   }
+   LIST TEXT
+   {
+      ITEM TEXT
+      {
+         TEXT do
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT a deer, a female deer
+
+
+         }
+      ]
+      ITEM TEXT
+      {
+         TEXT ray
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT a drop of goden sun
+
+
+         }
+      ]
+      ITEM TEXT
+      {
+         TEXT me
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT me, a name, I call myself
+
+
+         }
+      ]
+      ITEM TEXT
+      {
+         TEXT fa
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT a long, long way to run
+
+
+         }
+      ]
+   }
+   LIST TEXT
+   {
+      ITEM TEXT
+      {
+         TEXT * do
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT a deer, a female deer
+
+
+         }
+      ]
+      ITEM TEXT
+      {
+         TEXT * ray
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT a drop of goden sun
+
+
+         }
+      ]
+   }
+   LIST TEXT
+   {
+      ITEM TEXT
+      {
+         TEXT 3 me
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT me, a name, I call myself
+
+
+         }
+      ]
+      ITEM TEXT
+      {
+         TEXT 4 fa
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT a long, long way to run
+
+
+         }
+      ]
+   }
+   COMMAND head2 
+   {
+      TEXT Siblings
+
+
+   }
+   LIST BULLET
+   {
+      ITEM BULLET
+      {
+         TEXT *
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT Star 1 Para 1
+
+
+         }
+         ORDINARY 
+         {
+            TEXT Star 1 Para 2
+
+
+         }
+         ORDINARY 
+         {
+            TEXT Star 1 Para 3
+
+
+         }
+      ]
+      ITEM BULLET
+      {
+         TEXT *
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT Star 2
+
+
+         }
+         VERBATIM 
+	Star 2 Verbatim 1
+	Star 2 Verbatim 2
+	Star 2 Verbatim 3
+
+
+      ]
+      ITEM BULLET
+      {
+         TEXT *
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT Star 3
+
+
+         }
+      ]
+   }
+   COMMAND head2 
+   {
+      TEXT Markups
+
+
+   }
+   LIST TEXT
+   {
+      ITEM TEXT
+      {
+         TEXT term 1
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT definition 1
+
+
+         }
+      ]
+      ITEM TEXT
+      {
+         SEQUENCE I
+         {
+            TEXT term 2
+         }
+         TEXT 
+
+
+      }
+      [
+         ORDINARY 
+         {
+            SEQUENCE C
+            {
+               TEXT definition 2
+            }
+            TEXT 
+
+
+         }
+      ]
+      ITEM TEXT
+      {
+         SEQUENCE I
+         {
+            TEXT term 
+            SEQUENCE B
+            {
+               TEXT 3
+            }
+         }
+         TEXT 
+
+
+      }
+      [
+         ORDINARY 
+         {
+            SEQUENCE S
+            {
+               TEXT definition 3
+            }
+            TEXT 
+
+
+         }
+      ]
+   }
+   COMMAND head2 
+   {
+      TEXT Nested
+
+
+   }
+   LIST BULLET
+   {
+      ITEM BULLET
+      {
+         TEXT *
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT Level 1, Star 1 of 2
+
+
+
+         }
+         LIST BULLET
+         {
+            ITEM BULLET
+            {
+               TEXT *
+
+
+            }
+            [
+               ORDINARY 
+               {
+                  TEXT Level 2, Star 1 of 2
+
+
+               }
+            ]
+            ITEM BULLET
+            {
+               TEXT *
+
+
+            }
+            [
+               ORDINARY 
+               {
+                  TEXT Level 2, Star 2 of 2
+
+
+               }
+            ]
+         }
+      ]
+      ITEM BULLET
+      {
+         TEXT *
+
+
+
+      }
+      [
+         LIST NUMBER
+         {
+            ITEM NUMBER
+            {
+               TEXT 1
+
+
+            }
+            [
+               ORDINARY 
+               {
+                  TEXT Level 2, Number 1 of 2
+
+
+               }
+            ]
+            ITEM NUMBER
+            {
+               TEXT 2
+
+
+            }
+            [
+               ORDINARY 
+               {
+                  TEXT Level 2, Number 2 of 2
+
+
+               }
+            ]
+         }
+      ]
+   }
+   LIST TEXT
+   {
+      ITEM TEXT
+      {
+         TEXT Level 1, term 1 of 2
+
+
+
+      }
+      [
+         LIST BULLET
+         {
+            ITEM BULLET
+            {
+               TEXT *
+
+
+            }
+            [
+               ORDINARY 
+               {
+                  TEXT Level 2, Star 1 of 3
+
+
+               }
+            ]
+            ITEM BULLET
+            {
+               TEXT *
+
+
+            }
+            [
+               ORDINARY 
+               {
+                  TEXT Level 2, Star 2 of 3
+
+
+               }
+            ]
+            ITEM BULLET
+            {
+               TEXT *
+
+
+            }
+            [
+               ORDINARY 
+               {
+                  TEXT Level 2, Star 3 of 3
+
+
+               }
+            ]
+         }
+      ]
+      ITEM TEXT
+      {
+         TEXT Level 1, term 2 of 2
+
+
+
+      }
+      [
+         LIST BULLET
+         {
+            ITEM BULLET
+            {
+               TEXT *
+
+
+            }
+            [
+               ORDINARY 
+               {
+                  TEXT Level 2, Star 1 of 3
+
+
+
+               }
+               LIST NUMBER
+               {
+                  ITEM NUMBER
+                  {
+                     TEXT 1
+
+
+                  }
+                  [
+                     ORDINARY 
+                     {
+                        TEXT Level 3, Number 1 of 2
+
+
+                     }
+                  ]
+                  ITEM NUMBER
+                  {
+                     TEXT 2
+
+
+                  }
+                  [
+                     ORDINARY 
+                     {
+                        TEXT Level 3, Number 2 of 2
+
+
+                     }
+                  ]
+               }
+            ]
+            ITEM BULLET
+            {
+               TEXT *
+
+
+            }
+            [
+               ORDINARY 
+               {
+                  TEXT Level 2, Star 2 of 3
+
+
+               }
+            ]
+            ITEM BULLET
+            {
+               TEXT *
+
+
+            }
+            [
+               ORDINARY 
+               {
+                  TEXT Level 2, Star 3 of 3
+
+
+               }
+            ]
+         }
+      ]
+   }
+   COMMAND head2 
+   {
+      TEXT Pathological
+
+
+   }
+   LIST BULLET
+   {
+      ITEM BULLET
+      {
+         TEXT *
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT Over 8
+
+
+         }
+      ]
+   }
+   LIST BULLET
+   {
+      ITEM BULLET
+      {
+         TEXT *
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT Star 1
+
+
+         }
+      ]
+      ITEM NUMBER
+      {
+         TEXT 2
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT Number 2
+
+
+         }
+      ]
+      ITEM TEXT
+      {
+         TEXT Term 3
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT Definition 3
+
+
+         }
+      ]
+   }
+   ORDINARY 
+   {
+      TEXT Empty
+
+
+   }
+   LIST 
+   {
+   }
+   LIST 
+   {
+      ORDINARY 
+      {
+         TEXT No Items
+
+
+      }
+   }
+   LIST BULLET
+   {
+      ITEM BULLET
+      {
+         TEXT *
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT Star 1
+
+
+         }
+      ]
+      ITEM BULLET
+      {
+         TEXT *
+
+
+      }
+      [
+         ORDINARY 
+         {
+            TEXT No =back
+
+
+
+         }
+      ]
+   }
+}

@@ -1,0 +1,5 @@
+=pod
+
+=sql SELECT * FROM toto_table WHERE my_date >= '2014-12-31 23:59:59'
+
+=cut

@@ -1,0 +1,12 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+lib/Probe/Perl.pm
+t/author-critic.t
+t/basic.t

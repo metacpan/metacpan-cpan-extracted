@@ -1,0 +1,279 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Panotools::Makefile;
+use Panotools::Script;
+
+my $path_output;
+my $path_mk;
+my $help = 0;
+
+# TODO run panomatic too
+# TODO run vig_optimize conditionally
+# TODO vig_optimize celeste_standalone cpclean options
+
+GetOptions ('o|output=s' => \$path_output,
+            'm|makefile=s' => \$path_mk,
+            'h|help' => \$help);
+
+pod2usage (-verbose => 2) if $help;
+pod2usage (2) unless (defined $path_output and scalar @ARGV);
+
+my $path_prefix = $path_output;
+$path_prefix =~ s/\.[[:alnum:]]+$//;
+
+my $path_input = shift @ARGV;
+
+my $mk = new Panotools::Makefile;
+$mk->Comment ('Command-line tools');
+$mk->Variable ('PTOSPLIT', 'ptosplit');
+$mk->Variable ('PTOMERGE', 'ptomerge');
+$mk->Variable ('PTOVARIABLE', 'ptovariable');
+$mk->Variable ('CPFIND', 'cpfind');
+$mk->Variable ('CPCLEAN', 'cpclean');
+$mk->Variable ('ALIGNIMAGESTACK', 'align_image_stack');
+$mk->Variable ('AUTOOPTIMISER', 'autooptimiser');
+$mk->Variable ('VIGOPTIMIZE', 'vig_optimize');
+$mk->Variable ('RM', '-', 'rm');
+
+$mk->Comment ('Input project file and prefix for output');
+$mk->Variable ('PROJECT_FILE', $path_input);
+$mk->Variable ('PREFIX', $path_prefix);
+$mk->Variable ('PTO_OUT', $path_output);
+
+my $rule = $mk->Rule ('all');
+$rule->Prerequisites ('$(PTO_OUT)');
+
+$mk->Comment ("Files we don't need afterwards");
+my $var_tempfiles = $mk->Variable ('TEMP_FILES');
+
+$rule = $mk->Rule ('clean');
+$rule->Command ('$(RM_SHELL)', '$(TEMP_FILES_SHELL)');
+
+my $pto = new Panotools::Script;
+$pto->Read ($path_input);
+
+my $pix_max = $pto->Option->{cpgenSize} || 1600;
+my $points = $pto->Option->{cpgenNumber} || 25;
+my $ransac = 1;
+$ransac = 0 if (defined $pto->Option->{cpgenRansac} and $pto->Option->{cpgenRansac} eq 'false');
+my @refine = ();
+@refine = ('--refine', '--keep-unrefinable', 0)
+    if (defined $pto->Option->{cpgenRefine} and $pto->Option->{cpgenRefine} eq 'true');
+
+my $tmp;
+$tmp->{$_} = undef for (map {$_->{j} if defined $_->{j}} @{$pto->Image});
+delete $tmp->{''};
+
+if (scalar keys %{$tmp})
+{
+    my $layers;
+    my $stacks;
+    for my $index_photo (0 .. scalar @{$pto->Image} -1)
+    {
+        next if $pto->Image->[$index_photo]->{r} =~ /^=/;
+        push @{$stacks->[$pto->Image->[$index_photo]->{j}]}, $index_photo;
+    }
+
+    $mk->Comment ('A bracketed project can be composed of stacks and exposure layers');
+    my $var_layers = $mk->Variable ('LAYERS');
+    my $var_stacks = $mk->Variable ('STACKS');
+    
+    for my $id_el (0 .. scalar @{$pto->ExposureLayers} -1)
+    {
+        my @id_images = @{$pto->ExposureLayers->[$id_el]};
+        next unless scalar @id_images > 1;
+
+        $ransac = 0 if $pto->Image->[$id_images[0]]->v ($pto) > 60;
+
+        $mk->Comment ('Some intermediate .pto project files for this layer');
+        my $var_layer_a = $mk->Variable ('LAYER_'. $id_el .'_A');
+        $var_layer_a->Values ('$(PREFIX)_layer_'. $id_el .'.a.pto');
+        my $var_layer_b = $mk->Variable ('LAYER_'. $id_el .'_B');
+        $var_layer_b->Values ('$(PREFIX)_layer_'. $id_el .'.b.pto');
+        my $var_layer_d = $mk->Variable ('LAYER_'. $id_el .'_D');
+        $var_layer_d->Values ('$(PREFIX)_layer_'. $id_el .'.d.pto');
+
+        $var_tempfiles->Values ($var_layer_a->NameRef, $var_layer_b->NameRef, $var_layer_d->NameRef);
+
+        $mk->Comment ('Input photos for this layer');
+        my $var_layer_input = $mk->Variable ('LAYER_'. $id_el .'_INPUT');
+        $var_layer_input->Values (map {$pto->Image->[$_]->Path} @id_images);
+
+        $mk->Comment ('Rules to generate control points for this layer');
+        $rule = $mk->Rule ($var_layer_a->NameRef);
+        $rule->Prerequisites ('$(PROJECT_FILE)');
+        $rule->Command ('$(PTOSPLIT_SHELL)', @id_images,
+                            '$(PROJECT_FILE_SHELL)', $var_layer_a->NameRefShell);
+
+        $rule = $mk->Rule ($var_layer_b->NameRef);
+        $rule->Prerequisites ($var_layer_a->NameRef, $var_layer_input->NameRef);
+        $rule->Command ('$(CPFIND_SHELL)', '--celeste', '-o', $var_layer_b->NameRefShell, $var_layer_a->NameRefShell);
+
+        $rule = $mk->Rule ($var_layer_d->NameRef);
+        $rule->Prerequisites ($var_layer_b->NameRef);
+        $rule->Command ('$(CPCLEAN_SHELL)', '-n', 1.5,
+                            '-o', $var_layer_d->NameRefShell, $var_layer_b->NameRefShell);
+
+        $var_layers->Values ($var_layer_d->NameRef);
+    }
+
+    my $stack_id = 0;
+    for my $stack (@{$stacks})
+    {
+        next unless scalar @{$stack} > 1;
+
+        my @projection = ();
+        @projection = ('-e') if ($pto->Image->[$stack->[0]]->f == 2 or $pto->Image->[$stack->[0]]->f == 3);
+        my $deg_fov = $pto->Image->[$stack->[0]]->v ($pto);
+
+        $mk->Comment ('An intermediate .pto project for this stack');
+        my $var_stack = $mk->Variable ('STACK_'. $stack_id);
+        $var_stack->Values ('$(PREFIX)_stack_'. $stack_id .'.pto');
+
+        $var_tempfiles->Values ($var_stack->NameRef);
+
+        $mk->Comment ('Input photos for this stack');
+        my $var_stack_input = $mk->Variable ('STACK_'. $stack_id .'_INPUT');
+        $var_stack_input->Values (map {$pto->Image->[$_]->Path} @{$stack});
+
+        $mk->Comment ('Rule to generate control points for this stack');
+        $rule = $mk->Rule ($var_stack->NameRef);
+        $rule->Prerequisites ($var_stack_input->NameRef);
+        $rule->Command ('$(ALIGNIMAGESTACK_SHELL)', @projection, '-f', $deg_fov,
+               '-p', $var_stack->NameRefShell, $var_stack_input->NameRefShell);
+
+        $var_stacks->Values ($var_stack->NameRef);
+        $stack_id++;
+    }
+
+    $mk->Comment ('Some intermediate .pto project files for merging stacks and layers');
+    $mk->Variable ('MERGED_A', '$(PREFIX)_merged.a.pto');
+    $mk->Variable ('MERGED_B', '$(PREFIX)_merged.b.pto');
+
+    $var_tempfiles->Values ('$(MERGED_A)', '$(MERGED_B)');
+
+    $mk->Comment ('Rules to merge stacks and bracketed layers');
+
+    $rule = $mk->Rule ('$(MERGED_A)');
+    $rule->Prerequisites ('$(PROJECT_FILE)', '$(LAYERS)', '$(STACKS)');
+    $rule->Command ('$(PTOMERGE_SHELL)', '$(PROJECT_FILE_SHELL)',
+                        '$(LAYERS_SHELL)', '$(STACKS_SHELL)', '$(MERGED_A_SHELL)');
+
+    # FIXME -n and just positions should be optimised for single stacks
+    my @autooptimiser_args;
+    @autooptimiser_args = ('-l') if (scalar @{$stacks} > 1);
+
+    # FIXME -a optimises b, d and e for single stacks, bad
+    $rule = $mk->Rule ('$(MERGED_B)');
+    $rule->Prerequisites ('$(MERGED_A)');
+    $rule->Command ('$(AUTOOPTIMISER_SHELL)', @autooptimiser_args, '-a', '-s',
+                        '-o', '$(MERGED_B_SHELL)', '$(MERGED_A_SHELL)');
+
+    $rule = $mk->Rule ('$(PTO_OUT)');
+    $rule->Prerequisites ('$(MERGED_B)');
+    $rule->Command ('$(PTOVARIABLE_SHELL)', '--positions', '--view', '--barrel',
+                        '--output', '$(PTO_OUT_SHELL)', '$(MERGED_B_SHELL)');
+}
+else
+{
+    $ransac = 0 if $pto->Image->[0]->v ($pto) > 60;
+
+    $mk->Comment ('Some intermediate .pto project files');
+    $mk->Variable ('SIMPLE_A', '$(PREFIX)_simple.a.pto');
+    $mk->Variable ('SIMPLE_C', '$(PREFIX)_simple.c.pto');
+    $mk->Variable ('SIMPLE_D', '$(PREFIX)_simple.d.pto');
+    $mk->Variable ('SIMPLE_E', '$(PREFIX)_simple.e.pto');
+    $mk->Variable ('SIMPLE_F', '$(PREFIX)_simple.f.pto');
+
+    $var_tempfiles->Values ('$(SIMPLE_A)', '$(SIMPLE_C)', '$(SIMPLE_D)', '$(SIMPLE_E)', '$(SIMPLE_F)');
+
+    $mk->Comment ('All input photos');
+    $mk->Variable ('INPUT_IMAGES', map {$_->Path} @{$pto->Image});
+
+    $mk->Comment ('Rules to generate control points for simple projects with no bracketed stacks');
+
+    $rule = $mk->Rule ('$(SIMPLE_A)');
+    $rule->Prerequisites ('$(PROJECT_FILE)', '$(INPUT_IMAGES)');
+    $rule->Command ('$(CPFIND_SHELL)', '--celeste', '-o', '$(SIMPLE_A_SHELL)', '$(PROJECT_FILE_SHELL)');
+
+    $rule = $mk->Rule ('$(SIMPLE_C)');
+    $rule->Prerequisites ('$(SIMPLE_A)');
+    $rule->Command ('$(CPCLEAN_SHELL)', '-o', '$(SIMPLE_C_SHELL)', '$(SIMPLE_A_SHELL)');
+
+    $rule = $mk->Rule ('$(SIMPLE_D)');
+    $rule->Prerequisites ('$(SIMPLE_C)', '$(PROJECT_FILE)');
+    $rule->Command ('$(PTOMERGE_SHELL)', '$(PROJECT_FILE_SHELL)', '$(SIMPLE_C_SHELL)', '$(SIMPLE_D_SHELL)');
+
+    $rule = $mk->Rule ('$(SIMPLE_E)');
+    $rule->Prerequisites ('$(SIMPLE_D)');
+    $rule->Command ('$(AUTOOPTIMISER_SHELL)', '-a', '-l', '-s', '-o', '$(SIMPLE_E_SHELL)',
+                        '$(SIMPLE_D_SHELL)');
+
+    $rule = $mk->Rule ('$(SIMPLE_F)');
+    $rule->Prerequisites ('$(SIMPLE_E)');
+    $rule->Command ('$(PTOVARIABLE_SHELL)', '--positions', '--vignetting', '--response', '--exposure', '--view',
+                        '--barrel', '--output', '$(SIMPLE_F_SHELL)', '$(SIMPLE_E_SHELL)');
+
+    $rule = $mk->Rule ('$(PTO_OUT)');
+    $rule->Prerequisites ('$(SIMPLE_F)');
+    $rule->Command ('$(VIGOPTIMIZE_SHELL)', '-o', '$(PTO_OUT_SHELL)', '$(SIMPLE_F_SHELL)');
+}
+
+my $rule_secondary = $mk->Rule ('.SECONDARY');
+$rule_secondary->Prerequisites ('$(TEMP_FILES)');
+
+$mk->Write ($path_mk) if defined $path_mk;
+$mk->DoIt ('--always-make', 'all', 'clean') unless defined $path_mk;
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+ptoanchor - add control points to a Hugin project
+
+=head1 SYNOPSIS
+
+ptoanchor [options] --output output.pto input.pto
+
+ Options:
+  -m | --makefile file  Output Makefile
+  -o | --output file    Output project
+  -h | --help           Outputs help documentation.
+
+=head1 DESCRIPTION
+
+B<ptoanchor> is a wrapper various tools that generates control points and
+optimises a Hugin project using a .pto project as input.  Output is in the form
+of a .pto project.
+
+If the --makefile option is given, rules for generating the project are written
+to a Makefile, if --makefile isn't set then these rules will be executed
+immediately.
+
+Stacks are passed to align_image_stack for processing, but need to be indicated
+with 'i-line' 'j' parameters in the input project file.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+=head1 AUTHOR
+
+Bruno Postle - November 2009.
+
+=cut
+
+=begin perl

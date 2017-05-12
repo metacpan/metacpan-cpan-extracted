@@ -1,0 +1,22 @@
+Build.PL
+examples/barrier-sync.pl
+examples/perl-barrier.pl
+examples/test-child-slice.pl
+examples/test-direct-store.pl
+examples/test-memory-consumption.pl
+examples/test-undef.pl
+lib/PDL/Parallel/threads.pm
+lib/PDL/Parallel/threads.xs
+lib/PDL/Parallel/threads/SIMD.pm
+MANIFEST			This list of files
+ppport.h
+README.pod
+t/00-load.t
+t/01_ref_counting.t
+t/02_non_threaded.t
+t/03_name_munging.t
+t/10_physical_piddles.t
+t/11_memory_mapped.t
+typemap
+META.yml
+META.json

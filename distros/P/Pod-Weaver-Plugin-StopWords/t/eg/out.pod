@@ -1,0 +1,46 @@
+=pod
+
+=head1 NAME
+
+Module::Name - abstract text
+
+=head1 VERSION
+
+version 1.002003
+
+Please pay close attention to the following.
+
+=head1 SYNOPSIS
+
+This should probably get moved up front.
+
+=head1 DESCRIPTION
+
+This is a simple document meant to be used in testing Pod::Weaver.
+
+It does not do very much.
+
+=head1 BE FOREWARNED
+
+This is not supported:
+
+  much at all
+
+Happy hacking!
+
+P.S. These tests plagiarized from Pod::Weaver tests (Pod-Weaver-3.101632).
+
+Thank you for your attention.
+
+=head1 AUTHOR
+
+Randy Stauner <rwstauner@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by PWHolder.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

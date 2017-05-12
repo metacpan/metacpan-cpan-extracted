@@ -1,0 +1,40 @@
+#!/bin/bash
+
+releases="SHANCOCK/Perl-Tidy-20160302 SHANCOCK/Perl-Tidy-20160301 SHANCOCK/Perl-Tidy-20150815 SHANCOCK/Perl-Tidy-20140711 SHANCOCK/Perl-Tidy-20140328 SHANCOCK/Perl-Tidy-20130922"
+[ -d local/cache/SHANCOCK ] || mkdir -p local/cache/SHANCOCK
+for rel in $releases ; do
+    if [ ! -e local/cache/${rel}.tar.gz ] ; then
+        echo Fetching $rel
+        curl -q http://cpan.metacpan.org/authors/id/S/SH/${rel}.tar.gz \
+            > local/cache/${rel}.tar.gz
+    fi
+done
+
+for rel in $releases ; do
+    echo
+    echo
+    echo Testing $rel
+    cpanm -n local/cache/${rel}.tar.gz
+    prove -Q -lmcr -It/lib t
+done
+
+  # SHANCOCK/Perl-Tidy-20130922
+  # SHANCOCK/Perl-Tidy-20130806
+  # SHANCOCK/Perl-Tidy-20130805
+  # SHANCOCK/Perl-Tidy-20130717
+  # SHANCOCK/Perl-Tidy-20121207
+  # SHANCOCK/Perl-Tidy-20120714
+  # SHANCOCK/Perl-Tidy-20120701
+  # SHANCOCK/Perl-Tidy-20120619
+  # SHANCOCK/Perl-Tidy-20101217
+  # SHANCOCK/Perl-Tidy-20090616
+  # SHANCOCK/Perl-Tidy-20071205
+  # SHANCOCK/Perl-Tidy-20070801
+  # SHANCOCK/Perl-Tidy-20070508
+  # SHANCOCK/Perl-Tidy-20070504
+  # SHANCOCK/Perl-Tidy-20070424
+  # SHANCOCK/Perl-Tidy-20060719
+  # SHANCOCK/Perl-Tidy-20060614
+  # SHANCOCK/Perl-Tidy-20031021
+  # SHANCOCK/Perl-Tidy-20030726
+  # SHANCOCK/Perl-Tidy-20021130

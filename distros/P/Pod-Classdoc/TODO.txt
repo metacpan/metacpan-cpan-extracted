@@ -1,0 +1,4 @@
+- Support prototypes
+
+- Use PPI to extract package inheritance info, maybe exports,
+	maybe method attributes

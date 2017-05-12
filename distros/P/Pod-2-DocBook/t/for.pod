@@ -1,0 +1,3 @@
+=for docbook <emphasis>This is important.</emphasis>
+
+=for TODO This should be ignored.

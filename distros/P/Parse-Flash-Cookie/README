@@ -1,0 +1,52 @@
+NAME
+
+  Parse-Flash-Cookie
+
+VERSION
+
+  0.09
+
+DESCRIPTION
+
+Local Shared Object (LSO), sometimes known as flash cookies, is a
+cookie-like data entity used by Adobe Flash Player.  LSOs are stored
+as files on the local file system with the .sol extension.  This
+module reads a Local Shared Object file and return content as a list.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Parse::Flash::Cookie
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parse-Flash-Cookie
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Parse-Flash-Cookie
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Parse-Flash-Cookie
+
+    Search CPAN
+        http://search.cpan.org/dist/Parse-Flash-Cookie
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Andreas Faafeng
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

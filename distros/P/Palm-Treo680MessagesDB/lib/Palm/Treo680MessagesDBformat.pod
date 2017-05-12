@@ -1,0 +1,138 @@
+=head1 NAME
+
+Palm::Treo680MessagesDBformat - record format for the Palm Treo 680
+SMS messages database
+
+=head1 CREATOR
+
+MsSt
+
+=head1 TYPE
+
+MsDb
+
+=head1 DATA TYPES and INDEXES
+
+In the following, all values are assumed to be big-endian unless otherwise
+specified, and indexes start at 0.  So the first byte in a record is byte
+0x00, and the 4th byte is byte 0x03.  Human-readable text is generally
+in ASCIIZ format - that is a sequence of 8 bit characters terminated by an
+ASCII NUL character (hex 0x00).  OK, so it's really some kind of Latin-N
+encoding.
+
+=head1 RECORD TYPES
+
+The database can contain several record types.  The record type is a 16-bit
+number at offset 0x0A.  The structure varies from one record type to
+another.
+
+=head2 TYPE 0x400C (and maybe 0x4009)
+
+This represents an inbound message.  It is possible, that type 0x4009 may
+have the same structure but for outbound messages, as that has appeared
+in message databases from the Treo 650.
+
+Message data starts at offset 0x22, with an ASCIIZ phone number for the
+other party, followed by an ASCIIZ name, and optionally some more 0x00
+bytes.
+
+After the name and its trailing zeroes come four more bytes whose function
+is unknown, then the ASCIIZ message test.
+
+There are two more unknown bytes, then a 32-bit timestamp, a number of seconds
+since the Palm epoch.  0 is in 1904, so substract 2082844800 to get the Unix
+epoch.  We don't believe that the timezone is stored in the database.
+	
+=head2 TYPE 0x0002
+
+This represents an outbound message.
+
+The timestamp is at offset 0x24.
+
+Message data starts at offset 0x46 with an ASCIIZ number immediately
+followed by an ASCIIZ name and some optional trailing zeroes.  The name is
+truncated to 31 characters.  There then follows some gibberish including
+the string 'Trsm', four more bytes, and the ASCIIZ message.
+
+'Trsm' is the creator ID of the Treo 650's messages database.  Coincidence?
+I THINK NOT!
+
+=head3 EXCEPTION
+
+Decoding records as above will sometimes give as the message text the sequence
+0x01 0x4E 0x40.  These records' actual format is unknown.
+
+=head2 TYPE 0x0001
+
+This represents an outbound message.
+
+The timestamp is at offset 0x24.
+
+Message data starts at offset 0x4C.  There is first some *optional* leading
+zeroes, then an ASCIIZ phone number, immediately followed by an ASCIIZ name.
+There is then some unknown data, followed by the sequence 0x20 0x02, a 16-bit
+length word, and an ASCIIZ message.
+
+=head3 EXCEPTION
+
+Decoding records as above will sometimes give an empty phone number.  These
+records' actual format is unknown.
+
+=head2 TYPE 0x0000
+
+There appear to be two distinct record types both with type 0x0000.  Both
+are for outbound messages.
+
+=head3 SUBTYPE 1
+
+The first can be recognised by having a non-NULL character in position 0x40.
+
+The message text is preceded by 0x20 0x02 and a 16-bit length, and is ASCIIZ.
+The timestamp is preceded by 0x80 0x00.
+
+It's not clear how to find the number and name.  A heuristic that seems to
+work is to find the *last* sequence of six or more digits preceded by an
+optional + sign.  This should be an ASCIIZ phone number, followed by an
+ASCIIZ name.
+
+=head3 SUBTYPE 2
+
+The timestamp is at index 0x24.
+
+The number field starts at 0x4C and is ASCIIZ, but may be preceded by some
+extra NULs.  The number is immediately followed by the ASCIIZ name.
+
+The message is preceded by 0x20 0x02 and a 16-bit length word, and is
+ASCIIZ.
+
+=head1 BUGS, LIMITATIONS and FEEDBACK
+
+This documentation has been produced by reverse-engineering data stored
+on a limited number of phones.  Consequently it probably doesn't cover
+all the possibilities and may contain errors.  If you find any errors or
+omissions, blame Palm for not documenting it in the first place, and then
+please send a patch and some sample data either by email or using
+L<http://rt.cpan.org/>.
+
+=head1 SEE ALSO
+
+L<Palm::Treo680MessagesDB>, code implenting this documentation.
+
+L<Palm::SMS>, which handles SMS messages databases on some other models
+of Treo.
+
+=head1 AUTHOR, LICENCE and COPYRIGHT
+
+Copyright 2008 David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+
+This documentation is free-as-in-speech.  It may be used,
+distributed and modified under the terms of the Creative Commons
+Attribution-Share Alike 2.0 UK: England & Wales License, whose
+text you may read at
+L<http://creativecommons.org/licenses/by-sa/2.0/uk/>.
+
+=head1 CONSPIRACY
+
+This is also free-as-in-mason documentation.
+
+=cut

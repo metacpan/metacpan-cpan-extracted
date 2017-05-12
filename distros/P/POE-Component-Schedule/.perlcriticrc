@@ -1,0 +1,32 @@
+# Perl Critic config for POE::Component::Schedule
+# Copyright (c) 2010 Olivier Mengué
+
+# CVS is old school
+[-Miscellanea::RequireRcsKeywords]
+
+# See RT#57638, RT#57640
+[-Subroutines::RequireFinalReturn]
+
+# See RT#57638
+[-Perl::Critic::Policy::Subroutines::ProhibitSubroutinePrototypes]
+
+# Disable due to POE style
+# RT#57639
+[Subroutines::RequireArgUnpacking]
+allow_subscripts = 1
+
+# I like 'unless'
+[-ControlStructures::ProhibitUnlessBlocks]
+
+# I like postfix
+[-ControlStructures::ProhibitPostfixControls]
+
+# I like Perl's advanced boolean operators
+[-ValuesAndExpressions::ProhibitMixedBooleanOperators]
+
+[Variables::ProhibitPunctuationVars]
+allow = $! $^O
+
+# 'no warning' is useful, but must be restricted
+[TestingAndDebugging::ProhibitNoWarnings]
+allow_with_category_restriction = 1

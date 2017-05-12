@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+LICENSE
+README
+lib/Padre/Plugin/RunPerlExternal.pm
+lib/POD2/DE/Padre/Plugin/RunPerlExternal.pod
+t/00-menu.t
+META.yml
+META.json

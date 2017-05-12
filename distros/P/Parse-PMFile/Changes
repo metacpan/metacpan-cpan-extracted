@@ -1,0 +1,154 @@
+Revision history for Parse-PMFile
+
+0.41 2016/11/03
+  - not to count package declaration in a string
+  - treat a package that contains multiple singlequotes correctly
+
+0.40 2016/02/21
+  - silenced "alpha->numify() is lossy" warning
+
+0.39 2016/01/10
+  - no code changes
+  - fixed 34_math_version.t not to fail under perls with -Duselongdouble
+    (RT#111034, srezic++)
+
+0.38 2016/01/09
+  - no code changes
+  - added diagnostic messages to find the reason of sporadic
+    fail reports from Testers with recent perls
+
+0.37 2016/01/07
+  - ported version_ok() implemented in PAUSE to disallow a VERSION
+    that is too long to store correctly in the PAUSE database
+
+0.36 2015/04/16
+  - removed an unnecessary $DB::single line (oalders++)
+
+0.35 2015/01/17
+  - fixed to tolerate version line errors as undef (miyagawa++)
+
+0.34 2015/01/04
+  - fixed a case where our $VERSION is in a block. (ether++, mst++)
+
+0.33 2014/12/13
+  - reverted the change in 0.32 to store overloaded stuff in the object
+    which seems to have caused segfaults under some environments
+
+0.32 2014/12/12
+  - improved version->declare handling (by numifying earlier for Safe
+    not to do with a version object)
+  - stored overloaded stuff in the object
+
+0.31 2014/12/09
+  - fixed cases where version->declare / qv() used in the VERSION line
+    without using version explicitly
+
+0.30 2014/12/05
+  - restore overloaded stuff from version::vpp as well (if necessary)
+    (haarg++)
+
+0.29 2014/10/10
+  - silenced a redefinition warning
+
+0.28 2014/10/08
+  - import qv into main package if UNSAFE
+  - reverted restoring overloaded stuff from version.pm (miyagawa++ for both)
+
+0.27 2014/10/08
+  - added UNSAFE option for older perls plus recent versions of
+    Safe/version
+  - restore overloaded stuff from version.pm
+
+0.26 2014/09/17
+  - version::vpp should also be numified
+
+0.25 2014/09/17
+  - hid charstar from PAUSE
+
+0.24 2014/09/17
+  - improved fatpacked version::vpp support
+
+0.23 2014/09/16
+  - let Safe compartment share charstar:: stuff so that older perls
+    forced to use version::vpp can correctly parse $VERSION declared by
+    version->declare. (miyagawa++)
+
+0.22 2014/09/02
+  - tweak for backward compatibility
+
+0.21 2014/09/02
+  - implemented permission check
+  - constructor options
+
+0.20 2014/08/14
+  - not to consider \$VERSION in a regexp as a $VERSION
+
+0.19 2014/04/30
+  - restore in-core version overloads correctly
+  - bumped up the version requirement slightly (moznion++)
+
+0.18 2014/04/28
+  - make sure to erase stuff in Safe.pm and restore overloaded
+    version.pm stuff so that version.pm works correctly after
+    parsing versions via Parse::PMFile
+  - cpanfile
+
+0.17 2014/04/15
+  - not to fork by default
+
+0.16 2014/04/11
+  - reflected the changes done in PAUSE at QAH 2014
+
+0.15 2014/03/17
+  - no_index for package/namespace hasn't been applied correctly
+
+0.14 2014/03/15
+  - updated MANIFEST and included a few tests for 0.13
+
+0.13 2014/03/15
+  - tweaked to allow math functions in VERSION specification
+    (Acme::Pi uses atan2 to define its package version)
+  - fixed parsing of "package NAME BLOCK", which was not suppported
+    (KENTNL++)
+
+0.12 2014/02/19
+  - fixed *VERSION = *... handling
+
+0.11 2013/11/17
+  - fixed *VERSION = \... handling
+  - fixed VERSION detection to ignore version comparison
+  - keep error infile as well
+  - silenced warnings
+
+0.10 2013/10/12
+  - keep normalization errors as well
+
+0.09 2013/10/10
+  - silenced warnings
+
+0.08 2013/10/10
+  - added a feature to return info about invalid versions
+
+0.07 2013/10/01
+  - made it ignore "$package or" (previously this was wrongly
+    detected as "or" package)
+
+0.06 2013/09/26
+  - included all of the CPAN::Version methods
+    to drop CPAN(::Version) dependency
+
+0.05 2013/07/25
+  - switched to JSON::PP (per request of miyagawa)
+
+0.04 2013/06/15
+  - added minimum protection against Acme::BadExample
+
+0.03 2013/06/15
+  - added $ALLOW_DEV_VERSION for analysis
+  - made it ignore $VERSIONs after __(END|DATA)__
+
+0.02 2013/05/13
+  - tweaked package version detection not to take too much time
+
+0.01 2013/05/05
+  - initial release

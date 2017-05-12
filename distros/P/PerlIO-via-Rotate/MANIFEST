@@ -1,0 +1,13 @@
+MANIFEST
+CHANGELOG
+README
+TODO
+VERSION
+Makefile.PL
+lib/PerlIO/via/Rotate.pm
+t/Rotate1.t
+t/Rotate2.t
+t/Rotate3.t
+t/Rotate4.t
+META.yml                                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

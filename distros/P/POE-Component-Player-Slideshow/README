@@ -1,0 +1,42 @@
+POE-Component-Player-Slideshow version 1.4
+===========================================
+
+This module provies a POE wrapper for the quiv application, allowing
+developers to write Perl applications that remote-control this 
+slideshow viewer.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+1. the POE state engine
+2. the PoCo::Child component
+3. the X11::SendEvent module
+4. the "qiv" application
+5. XFree86 :)
+
+ACKNOWLEDGEMENTS
+
+The test suite in this package includes a number of images that were
+graciously donated by Marion Lane, a most intriguing artist doing some
+unbelievable things with acryllic.  Check out her web site at:
+
+	http://www.marionlane.com
+
+...or look out for her on eBay.  Thanks Marion!  ...and keep up the good work!
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Erick Calder <ecalder@cpan.org>
+
+This product is distributed under the MIT License. A copy of this license
+was included in a file called LICENSE. If for some reason, this file was
+not included, please see http://www.opensource.org/licenses/mit-license.html
+to obtain a copy of this license.

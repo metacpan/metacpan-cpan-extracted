@@ -1,0 +1,91 @@
+1) Test basic template handling for the following:
+  <pdftemplate/>
+
+  ------
+
+  <pdftemplate pagesize="Letter">
+    <pagedef/>
+  </pdftemplate>
+
+  ------
+
+  <pdftemplate pagesize="Letter">
+    <pagedef>
+      <font face="Times-Roman" h="8">
+        <row>
+          <textbox w="100%" text="Hello, World!">
+        </row>
+      </font>
+    </pagedef>
+  </pdftemplate>
+
+2) Build templates to test the following nodes by themselves:
+    * Always
+      - In the middle of the page
+    * Bookmark
+    * Circle
+    * Conditional
+      - if-true
+      - if-false
+      - if-else-true
+      - if-else-false
+    * Footer
+    * Header
+    * HorizontalRule
+    * Image
+    * Line
+    * Loop
+      - Both Y and X directions
+    * PageBreak
+    * Scope
+    * Section
+    * Var
+    * Weblink
+
+3) The following nodes need to be tested together:
+    * Loop and any combination of the following inside:
+        Always (Does this always appear at the same spot in the page?)
+        Footer (where is the loop pagebreaking?)
+        Header (where is the loop starting?)
+        PageBreak
+        PageDef
+        Section
+        Textbox (enough to make the loop run over the page)
+    * Nested loops and the nodes above
+        Outer in Y and Inner in X (and vice-versa)
+    * Pagebreak within a:
+        Always/Footer/Header
+        Section
+        Conditional
+    * Always within a Always/Footer/Header
+    * Footer within a Header (and vice-versa)
+
+4) Handling of context and scoping
+    * Does scoping work?
+    * Will the construct <row h="+2"> work? What about -2, *2, and /2?
+    * Does overriding the value in an inner node work?
+    * Do units work?
+      - inches
+      - centimeters
+      - points
+      - decimal values
+      - negative values
+    * Do percentages work correctly?
+      - negative percentages
+      - percentages > 100%
+
+5) Variables
+    * Do variables work using the <var> tag?
+    * Do variables work using the "$foo" syntax?
+    * Do <textbox> and <image> correctly use attributes over contained TextObjects?
+    * Do system-defined variables work correctly?
+      - __PAGE__
+      - __LAST_PAGE__
+      - __PAGEDEF_PAGE__
+      - Loop: __FIRST__
+      - Loop: __LAST__
+      - Loop: __INNER__
+      - Loop: __ODD__
+    * Do inner loops correctly override the outer-loop's variables?
+      - Is the outer's value used when the inner doesn't specify?
+    * Does DIE_ON_NO_PARAM work correctly?

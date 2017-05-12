@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01_load.t
+t/02_basic.t
+t/03_huge.t
+t/04_content.t
+t/05_put.t
+t/06_put_content.t
+t/07_pending.t
+t/08_nobody.t
+t/09_noheader.t
+t/99_pod.t
+lib/POE/Filter/Stomp.pm
+META.yml                                 Module meta-data (added by MakeMaker)

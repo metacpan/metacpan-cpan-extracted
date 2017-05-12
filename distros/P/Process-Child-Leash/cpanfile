@@ -1,0 +1,11 @@
+## vim: syntax=perl
+
+requires "Mouse";
+requires "Proc::Killfam";
+requires "Unix::PID";
+
+on test => sub {
+    requires "Sub::Override";
+    requires "Test::More";
+    requires "Time::Out";
+};

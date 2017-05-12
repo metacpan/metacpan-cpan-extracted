@@ -1,0 +1,52 @@
+%{
+
+=head1 SYNOPSIS
+
+See the grammar in file C<confusing.eyp> first.
+
+This example illustrates how to solve the conflict using 
+the postponed conflict resolution technique.
+
+Compile the grammar with:
+
+                 eyapp -TC confusingsolvedppcr.eyp
+
+and execute it with:
+
+                ./confusingsolvedppcr.pm -t -i -c 'x y c d'
+                ./confusingsolvedppcr.pm -t -i -c 'x y c f'
+
+
+=head1 SEE ALSO
+ 
+=over 2
+
+=item * The grammar in file C<confusing.eyp> 
+
+=item * http://www.cs.man.ac.uk/~pjj/cs2121/ho/node19.html
+
+=cut
+
+%}
+
+%semantic token 'c' 'd' 'f' 'x' 'y'
+#%expect-rr 1
+
+%conflict DORF /.*?d/? XY:D : XY:F
+
+%%
+A: 
+    %name Bcd
+    B 'c' 'd' 
+  | %name Ecf
+    E 'c' 'f' 
+;
+B:  %name XY:D
+    'x' 'y'       %PREC DORF
+;
+E:  %name XY:F
+    'x' 'y'       %PREC DORF
+;
+
+%%
+

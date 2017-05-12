@@ -1,0 +1,13 @@
+Things I should add to this module before releasing it...
+
+1. Possibly calculate the beginning and ending lines within the text... make it an option for users who want it.
+1a. Make it an option to the main parse method and/or add a method that does it by default?
+2. Make an option/additional method to *extract* the pod from the passed in text.
+
+Other possible things to do...
+ * Split the regexes up in such a way that a user can feed in an array of lines, and/or do "lazy parsing"
+   (However, I think that's going to be too much effort for too little reward given 90% of use-cases.)
+
+  * Add option to pass a filename instead of a raw string and have it open and parse that file.
+
+

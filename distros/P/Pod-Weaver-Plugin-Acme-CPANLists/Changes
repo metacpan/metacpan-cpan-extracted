@@ -1,0 +1,37 @@
+Revision history for Pod-Weaver-Plugin-Acme-CPANLists
+
+0.06    2016-02-21 (PERLANCAR)
+
+        - [doc] Mention Dist::Zilla::Plugin::Acme::CPANLists.
+
+        - Also add links to Acme::CPANLists & acme-cpanlists in target module's
+          See Also POD section.
+
+
+0.05    2016-01-13 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak Abstract & Description.
+
+
+0.04    2015-10-23 (PERLANCAR)
+
+	- Extract functionality to a separate module/dist:
+	  Pod-From-Acme-CPANLists.
+
+
+0.03    2015-10-22 (PERLANCAR)
+
+        - Rename module/dist from PWP:PERLANCAR::CPANLists to
+          PWP:Acme::CPANLists.
+
+
+0.02    2015-06-30 (PERLANCAR)
+
+	- Fix POD L<> syntax.
+
+
+0.01    2015-06-30 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,14 @@
+
+// -- macro declarations: start reading with first headline
++BC:\B<\C<__body__>>
+
+// -- end of "preface"
+
+=0.02
+
+* producing better XHTML: empty tags closed (<tag />);
+	
+
+=0.01
+
+new.

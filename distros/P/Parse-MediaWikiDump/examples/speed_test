@@ -1,0 +1,54 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Parse::MediaWikiDump;
+
+$SIG{ALRM} = \&progress;
+
+$| = 1;
+print '';
+
+my $i = 0;
+my $file = shift(@ARGV);
+
+my $num_iter = shift(@ARGV);
+$num_iter = 10 unless defined($num_iter);
+
+my $start = time;
+my $dump = undef;
+
+alarm(1);
+
+while($i++ < $num_iter) {
+	$start = time;
+
+	print "Iteration $i\r";
+	$dump = Parse::MediaWikiDump::Pages->new($file);
+
+	while($dump->next) { };
+
+	print "\n";
+}
+
+my @times = times;
+
+print $times[0] + $times[1], "\n";
+
+sub progress {
+	return unless defined($dump);
+	my $elapsed = time - $start;
+
+	$elapsed = 1 if $elapsed == 0;
+
+	print "Iteration $i: ";
+
+	print int($dump->current_byte / $dump->size * 100), "% ";
+
+	my $speed = int($dump->current_byte / $elapsed);
+
+	print $speed, " bytes per second \r";
+
+	alarm(1);
+}

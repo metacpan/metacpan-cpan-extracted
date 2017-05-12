@@ -1,0 +1,33 @@
+#!perl
+use strict;
+use lib "lib";
+use Data::Dumper;
+use POE qw< Component::Client::BigBrother >;
+
+my $bbhost = "localhost";
+
+POE::Session->create(
+    inline_states => {
+        _start => sub {
+            POE::Component::Client::BigBrother->send(
+                host    => $bbhost,
+                event   => "_result",
+                command_type    => "status",
+                command_fields  => {
+                    host        => "front01.domain.net",
+                    service     => "cpu",
+                    color       => "red",
+                    message     => "load average is 105.45",
+                },
+            );
+        },
+        _result => sub {
+            my $result = $_[ARG0];
+            print "* result:\n",
+                map { "    $_: $result->{$_}\n" } sort keys %$result;
+        },
+    },
+);
+
+POE::Kernel->run;
+

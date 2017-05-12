@@ -1,0 +1,137 @@
+---
+name: Pinwheel
+version: 0.2.7
+author:
+  - "A&M Network Publishing <DLAMNetPub@bbc.co.uk>"
+abstract: A Rails-like framework for building dynamic web applications in Perl.
+license: perl
+requires:
+  Carp: 0
+  Cwd: 0
+  DBI: 1.52
+  Data::Dumper: 0
+  Exporter: 0
+  File::Basename: 0
+  File::Find: 0
+  File::Slurp: 0
+  File::Spec: 0
+  FindBin: 0
+  Getopt::Std: 0
+  PPI: 1.201
+  Scalar::Util: 0
+  Storable: 0
+  Time::Local: 0
+  XML::XPath: 1.13
+  YAML::Tiny: 1.25
+  perl: 5.8.8
+build_requires:
+  DBD::SQLite: 1.14
+  Module::Build: 0.28
+  Test::Builder: 0
+  Test::Harness: 0
+  Test::More: 0
+  Test::Pod: 1.20
+recommends:
+  Cache::Memcached: 1.24
+  DBD::SQLite: 1.14
+  DBD::mysql: 0
+  HTML::Entities: 0
+  HTTP::Daemon: 0
+  HTTP::Request: 0
+  HTTP::Status: 0
+  Term::ReadLine: 0
+  XML::LibXML: 1.61
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Module::Build::PinwheelApp:
+    file: lib/Module/Build/PinwheelApp.pm
+  Pinwheel:
+    file: lib/Pinwheel.pm
+    version: 0.2.7
+  Pinwheel::Cache:
+    file: lib/Pinwheel/Cache.pm
+  Pinwheel::Cache::Hash:
+    file: lib/Pinwheel/Cache/Hash.pm
+  Pinwheel::Cache::Memcached:
+    file: lib/Pinwheel/Cache/Memcached.pm
+  Pinwheel::Cache::Null:
+    file: lib/Pinwheel/Cache/Null.pm
+  Pinwheel::Commands::Console:
+    file: lib/Pinwheel/Commands/Console.pm
+  Pinwheel::Commands::Routes:
+    file: lib/Pinwheel/Commands/Routes.pm
+  Pinwheel::Commands::Server:
+    file: lib/Pinwheel/Commands/Server.pm
+  Pinwheel::Context:
+    file: lib/Pinwheel/Context.pm
+  Pinwheel::Controller:
+    file: lib/Pinwheel/Controller.pm
+  Pinwheel::Database:
+    file: lib/Pinwheel/Database.pm
+  Pinwheel::Database::Base:
+    file: lib/Pinwheel/Database/Base.pm
+  Pinwheel::Database::Mysql:
+    file: lib/Pinwheel/Database/Mysql.pm
+  Pinwheel::Database::Sqlite:
+    file: lib/Pinwheel/Database/Sqlite.pm
+  Pinwheel::DocTest:
+    file: lib/Pinwheel/DocTest.pm
+  Pinwheel::DocTest::CaptureOut:
+    file: lib/Pinwheel/DocTest.pm
+  Pinwheel::DocTest::Mock:
+    file: lib/Pinwheel/DocTest.pm
+  Pinwheel::Fixtures:
+    file: lib/Pinwheel/Fixtures.pm
+  Pinwheel::Helpers:
+    file: lib/Pinwheel/Helpers.pm
+  Pinwheel::Helpers::Core:
+    file: lib/Pinwheel/Helpers/Core.pm
+  Pinwheel::Helpers::DateTime:
+    file: lib/Pinwheel/Helpers/DateTime.pm
+  Pinwheel::Helpers::List:
+    file: lib/Pinwheel/Helpers/List.pm
+  Pinwheel::Helpers::SSI:
+    file: lib/Pinwheel/Helpers/SSI.pm
+  Pinwheel::Helpers::Tag:
+    file: lib/Pinwheel/Helpers/Tag.pm
+  Pinwheel::Helpers::Text:
+    file: lib/Pinwheel/Helpers/Text.pm
+  Pinwheel::Mapper:
+    file: lib/Pinwheel/Mapper.pm
+  Pinwheel::Model:
+    file: lib/Pinwheel/Model.pm
+  Pinwheel::Model::Base:
+    file: lib/Pinwheel/Model/Base.pm
+  Pinwheel::Model::Date:
+    file: lib/Pinwheel/Model/Date.pm
+  Pinwheel::Model::DateBase:
+    file: lib/Pinwheel/Model/DateBase.pm
+  Pinwheel::Model::Time:
+    file: lib/Pinwheel/Model/Time.pm
+  Pinwheel::ModperlHandler:
+    file: lib/Pinwheel/ModperlHandler.pm
+  Pinwheel::TagSelect:
+    file: lib/Pinwheel/TagSelect.pm
+  Pinwheel::TestHelper:
+    file: lib/Pinwheel/TestHelper.pm
+  Pinwheel::View::Data:
+    file: lib/Pinwheel/View/Data.pm
+  Pinwheel::View::Data::Builder:
+    file: lib/Pinwheel/View/Data.pm
+  Pinwheel::View::Data::Wrapper:
+    file: lib/Pinwheel/View/Data.pm
+  Pinwheel::View::ERB:
+    file: lib/Pinwheel/View/ERB.pm
+  Pinwheel::View::String:
+    file: lib/Pinwheel/View/String.pm
+  Pinwheel::View::Wrap:
+    file: lib/Pinwheel/View/Wrap.pm
+  Pinwheel::View::Wrap::Array:
+    file: lib/Pinwheel/View/Wrap/Array.pm
+  Pinwheel::View::Wrap::Scalar:
+    file: lib/Pinwheel/View/Wrap/Scalar.pm
+resources:
+  license: http://dev.perl.org/licenses/

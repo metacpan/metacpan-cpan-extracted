@@ -1,0 +1,13 @@
+Revision history for perl module Plack::Middleware::Debug::CatalystStash
+
+1.000000 2016-12-29
+    - bumped Catalyst requirement to 5.90100 as this is the version that has fixed the stash middleware issue
+
+0.001002 2014-03-05
+    - use Catalyst to prevent error when loading before Catalyst has been used
+    - added test to check loads ok
+0.001001 2014-02-22
+    - changedd gitub repo url
+
+0.001 2013-12-21
+    - First release

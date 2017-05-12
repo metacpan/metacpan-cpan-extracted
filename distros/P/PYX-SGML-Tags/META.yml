@@ -1,0 +1,42 @@
+---
+abstract: 'Processing PYX data or file and write as SGML via Tags.'
+author:
+  - 'Michal Spacek <skim@cpan.org>'
+build_requires:
+  English: 0
+  Error::Pure::Utils: 0.15
+  ExtUtils::MakeMaker: 6.36
+  File::Object: 0.07
+  Tags::Output::Indent: 0
+  Tags::Output::Raw: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PYX-SGML-Tags
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Class::Utils: 0.05
+  Error::Pure: 0.15
+  PYX::Parser: 0.05
+  PYX::Utils: 0.01
+  Tags::Output::Raw: 0.04
+  perl: 5.6.2
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PYX-SGML-Tags
+  homepage: https://github.com/tupinek/PYX-SGML-Tags
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: git://github.com/tupinek/PYX-SGML-Tags
+version: '0.02'

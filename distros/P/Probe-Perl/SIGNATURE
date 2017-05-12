@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1641b0a12748289f73713f5f446e03b21e1cb189 Changes
+SHA1 730231002579a43ba75250890ad448c4bae80a8a INSTALL
+SHA1 8cb63de1ae4c54a120beb97cacc1fe2efe4d266b LICENSE
+SHA1 b1ad3c2fceb0ece79a87fdcda509cea23bf7d30b MANIFEST
+SHA1 faf65b1e783dddccbb7ef73aa82e68985ce5f160 META.yml
+SHA1 da50a9bb42da213550bfe5a1f28303fd9b6cb8df Makefile.PL
+SHA1 023f084d8895c8c27bdd9efd0dfb5605199d3766 README
+SHA1 3621c42c03a067ef7d95b4ed681792e6ca9ff2b8 dist.ini
+SHA1 a3c8dda4d1320361911c2dc62e4c307ddb7b21eb lib/Probe/Perl.pm
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 3e24f0b5778bc026ffc9d12b30f69aceb25c988d t/basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.17 (Darwin)
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAlIDAi4ACgkQgrvMBLfvlHYR0QCeKVkkLIq4AvhgTjmLis70ysMX
+JWcAoLIVJChV+STpXVRh9Lbx6pTC5lt+
+=HapE
+-----END PGP SIGNATURE-----

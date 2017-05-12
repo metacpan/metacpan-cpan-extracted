@@ -1,0 +1,22 @@
+Revision history for POEx-Tickit
+
+0.04    2016/12/28 22:42:22
+        [BUGFIXES]
+         * Add lib/POEx/Tickit/Driver.pm to MANIFEST
+
+0.03    2016/12/28 19:57:05
+        [CHANGES]
+         * Implement a native POE writer driver to avoid buffer-breaking
+           writes on STDOUT (thanks nshp)
+
+        [BUGFIXES]
+         * Fix examples/unit tests for Tickit 0.58 (thanks nshp)
+         * Use platform-specific /dev/null as fake output device as \my $term
+           upsets POE (thanks nshp)
+
+0.02    CHANGES:
+         * Updated for Tickit 0.32's structural key/mouse events
+         * Implement Tickit->timer() API
+
+0.01    First version, released on an unsuspecting world.
+

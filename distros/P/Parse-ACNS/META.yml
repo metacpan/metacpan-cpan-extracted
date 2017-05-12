@@ -1,0 +1,36 @@
+---
+abstract: 'parser for Automated Copyright Notice System (ACNS) XML'
+author:
+  - 'Ruslan Zakirov <ruz@bestpractical.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  File::Spec: 0
+  Test::More: 0
+  YAML::Any: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.12'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Parse::ACNS
+name: Parse-ACNS
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Carp: 0
+  File::ShareDir: 0
+  File::Spec: 0
+  Scalar::Util: 0
+  XML::Compile::Schema: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/bestpractical/parse-acns
+version: '1.00'

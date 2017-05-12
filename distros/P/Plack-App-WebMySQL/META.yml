@@ -1,0 +1,44 @@
+---
+abstract: 'WebMySQL web application'
+author:
+  - 'MacGyveR <dumb@cpan.org>'
+build_requires:
+  Module::Build::Pluggable::CPANfile: '0.05'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+  Module::Build::Pluggable::CPANfile: '0.05'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-App-WebMySQL
+provides:
+  Plack::App::WebMySQL:
+    file: lib/Plack/App/WebMySQL.pm
+    version: '3.02'
+  Plack::App::WebMySQL::General:
+    file: lib/Plack/App/WebMySQL/General.pm
+  Plack::App::WebMySQL::Key:
+    file: lib/Plack/App/WebMySQL/Key.pm
+  Plack::App::WebMySQL::Sql:
+    file: lib/Plack/App/WebMySQL/Sql.pm
+requires:
+  CGI: '0'
+  CGI::Compile: '0'
+  CGI::Emulate::PSGI: '0'
+  DBD::mysql: '0'
+  DBI: '0'
+  File::Share: '0'
+  File::ShareDir: '1.00'
+  File::Spec: '0'
+  Module::Build::Pluggable: '0'
+  Module::Build::Pluggable::CPANfile: '0'
+  Plack::App::MCCS: '0'
+  Plack::Builder: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/thedumbterminal/Plack-App-WebMySQL
+version: '3.02'

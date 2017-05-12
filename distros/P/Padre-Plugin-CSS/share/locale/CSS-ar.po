@@ -1,0 +1,45 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: padre-plugin-css\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-11 20:07+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"Language-Team: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Arabic\n"
+
+#: lib/Padre/Plugin/CSS.pm:25
+msgid "CSS Minifier"
+msgstr "تقليل ال CSS"
+
+#: lib/Padre/Plugin/CSS.pm:26
+msgid "Validate CSS"
+msgstr "التأكد من صحة ال CSS"
+
+#: lib/Padre/Plugin/CSS.pm:38
+msgid "No Code"
+msgstr "بلا شيفرة"
+
+#: lib/Padre/Plugin/CSS.pm:38
+msgid "Error"
+msgstr "خطأ"
+
+#: lib/Padre/Plugin/CSS.pm:47
+msgid "CSS is valid\n"
+msgstr "ال CSS صحيح\n"
+
+#: lib/Padre/Plugin/CSS.pm:49
+msgid "CSS is not valid\n"
+msgstr "ال CSS غير صحيح\n"
+
+#: lib/Padre/Plugin/CSS.pm:50
+msgid "Errors:\n"
+msgstr "الأخطاء :\n"
+
+#: lib/Padre/Plugin/CSS.pm:60
+msgid "Failed to validate the code\n"
+msgstr "خطأ في التأكد من صحة الشيفرة\n"
+

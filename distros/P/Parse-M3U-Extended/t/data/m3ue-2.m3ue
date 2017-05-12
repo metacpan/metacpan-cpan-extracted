@@ -1,0 +1,14 @@
+#EXTM3U
+#EXT-X-TARGETDURATION:10
+#EXT-X-ALLOW-CACHE:YES
+#EXT-X-VERSION:2
+#EXT-X-MEDIA-SEQUENCE:1
+#EXTINF:10,
+http://svtplay6c-f.example.net/i/world/open/20121215/1215811-016A/FRAGA_DOKTORN_H-016A-6d7a
+#EXTINF:10,
+http://svtplay6c-f.example.net/i/world/open/20121215/1215811-016A/FRAGA_DOKTORN_H-016A-6d7b
+#EXTINF:10,
+http://svtplay6c-f.example.net/i/world/open/20121215/1215811-016A/FRAGA_DOKTORN_H-016A-6d7c
+#EXTINF:7,
+http://svtplay6c-f.example.net/i/world/open/20121215/1215811-016A/FRAGA_DOKTORN_H-016A-6d7d
+#EXT-X-ENDLIST

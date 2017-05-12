@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+use lib 'lib';
+use strict; use warnings;
+use Perldoc;
+
+my ($options, $input_file) = get_options();
+
+if ($options->{version}) {
+    warn "This is perl-doc version '$Perldoc::VERSION'\n";
+}
+elsif ($options->{'kwid-to-html'}) {
+    my @args = $input_file
+    ? (filepath => $input_file)
+    : (filehandle => \*STDIN);
+    print Perldoc->kwid_to_html(@args);
+}
+else {
+    warn usage();
+}
+
+sub usage {
+    <<'...';
+Usage: perl-doc [options] [input-file]
+
+Options:
+
+    -v --version   - Print version of perl-doc
+    --kwid-to-html - Convert input file or STDIN from kwid to html
+...
+}
+
+sub get_options {
+    my $options = {};
+    while (@ARGV) {
+        last unless $ARGV[0] =~ /^-./;
+        my $option = shift(@ARGV);
+        if ($option =~ /^(-v|--version)$/) {
+            $options->{version} = 1;
+        }
+        elsif ($option =~ /^--(kwid-to-html)$/) {
+            $options->{$1} = 1;
+        }
+        else {
+            warn "'$option' is an invalid option\n\n";
+            die usage();
+        }
+    }
+    my $input_file = shift(@ARGV);
+    die usage() if @ARGV;
+    return ($options, $input_file);
+}
+
+=head1 NAME
+
+perl-doc - Perldoc command line tool.
+
+=head1 SYNOPSIS
+
+    > perl-doc --kwid-to-html MyDoc.kwid
+
+=head1 DESCRIPTION
+
+This is the command line tool for the Perldoc suite of modules.
+Eventually it is meant to replace Perl's C<perldoc> commandline tool,
+when it is 100% backwards compatible.
+
+For now, it is merely a way to convert Kwid markup to HTML.
+
+=head1 AUTHOR
+
+Ingy döt Net <ingy@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2006. Ingy döt Net. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See L<http://www.perl.com/perl/misc/Artistic.html>
+
+=cut

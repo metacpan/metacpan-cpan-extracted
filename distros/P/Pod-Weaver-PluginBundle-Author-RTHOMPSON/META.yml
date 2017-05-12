@@ -1,0 +1,42 @@
+---
+abstract: "A bundle that implements RTHOMPSON's preferred L<Pod::Weaver> config"
+author:
+  - 'Ryan C. Thompson <rct@thompsonclan.org>'
+build_requires:
+  Carp: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Scalar::Util: '0'
+  Test::More: '0.94'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Weaver-PluginBundle-Author-RTHOMPSON
+no_index:
+  directory:
+    - corpus
+requires:
+  Moose: '0'
+  Pod::Elemental::Transformer::List: '0'
+  Pod::Weaver::Config::Assembler: '0'
+  Pod::Weaver::Plugin::EnsureUniqueSections: '0'
+  Pod::Weaver::Section::Installation: '0'
+  Pod::Weaver::Section::WarrantyDisclaimer: '0'
+  feature: '0'
+  namespace::autoclean: '0'
+  perl: v5.10.0
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/DarwinAwardWinner/Pod-Weaver-PluginBundle-Author-RTHOMPSON
+  repository: https://github.com/DarwinAwardWinner/Pod-Weaver-PluginBundle-Author-RTHOMPSON.git
+version: '0.151680'

@@ -1,0 +1,10 @@
+---
+call: FilterLogEvents
+service: CloudWatchLogs
+tests:
+  - expected: 1
+    op: eq
+    path: SearchedLogStreams.0.SearchedCompletely
+  - expected: test_stream_name
+    op: eq
+    path: SearchedLogStreams.0.LogStreamName

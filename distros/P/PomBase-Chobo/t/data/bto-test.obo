@@ -1,0 +1,12 @@
+format-version: 1.2
+date: 20:09:2012 12:59
+saved-by: XPMUser
+auto-generated-by: OBO-Edit 2.1-beta1
+synonymtypedef: GE "LANGUAGE GERMAN"
+synonymtypedef: SCI "SCIENTIFIC NAME"
+default-namespace: 
+
+[Typedef]
+id: develops_from
+name: derives from/develops from
+namespace: BrendaTissueOBO

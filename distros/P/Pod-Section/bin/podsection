@@ -1,0 +1,136 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use IO::String;
+use Pod::Perldoc::ToText;
+use Pod::Usage;
+use Pod::Section qw/select_podsection/;
+use Getopt::Std;
+
+exit main();
+
+sub main {
+  my %opts;
+  getopts('uh', \%opts);
+  if ($opts{h} or @ARGV < 2) {
+    print pod2usage(1);
+    return 1;
+  } else {
+    my $pod = select_podsection(@ARGV);
+    unless ($opts{u}) {
+      my $parser = Pod::Perldoc::ToText->new;
+      my $fh = IO::String->new(\$pod);
+      my $out_fh = IO::String->new;
+      $parser->parse_from_file($fh, $out_fh);
+      seek $out_fh, 0, 0;
+      print <$out_fh>;
+    } else {
+      print $pod;
+    }
+    return 0;
+  }
+}
+
+=head1 NAME
+
+podsection -- select sections from Module's POD
+
+=head1 SYNOPSIS
+
+ podsection [-h] [-u] ModuleName SectionName [SectionName ...]
+
+For example:
+
+ podsection Catalyst SYNOPSIS   # as text
+ podsection Catalyst req res    # as text
+ podsection -u Catalyst req res # as plain pod
+
+Don't work with Some module:
+
+ podsection CGI header # doesn't work correctly
+
+Don't work with mixed level section:
+
+ podsection Catalyst SYNOPSIS res  # only show one(in this case, show only SYNOPSIS)
+
+Because Pod::Section only searches name in one level.
+If in one level, one/some of them is/are found, it finishes to search.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -u
+
+Display POD as plain POD.
+
+=item -h
+
+Show this usage.
+
+=back
+
+=head1 AUTHOR
+
+Ktat, C<< <ktat at cpan.org> >>
+
+=head1 BUGS
+
+The way to search section is poor. This cannot find section correctory in some module.
+
+Please report any bugs or feature requests to C<bug-app-podsection at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=App-podsection>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc App::podsection
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=App-podsection>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/App-podsection>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/App-podsection>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/App-podsection/>
+
+=back
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 SEE ALSO
+
+=head2 podselect
+
+This also select section, but cannot search function/method explanation.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Ktat.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut
+
+1;

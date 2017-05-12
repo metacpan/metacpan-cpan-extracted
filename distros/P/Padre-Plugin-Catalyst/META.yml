@@ -1,0 +1,53 @@
+---
+abstract: 'Catalyst helper interface for Padre'
+author:
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+build_requires:
+  Locale::Msgfmt: 0.14
+  Module::Build: 0.3
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+  Padre::PluginBuilder: 0.12
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Padre-Plugin-Catalyst
+provides:
+  Padre::Plugin::Catalyst:
+    file: lib/Padre/Plugin/Catalyst.pm
+    version: 0.09
+  Padre::Plugin::Catalyst::Helper:
+    file: lib/Padre/Plugin/Catalyst/Helper.pm
+    version: 0.09
+  Padre::Plugin::Catalyst::NewApp:
+    file: lib/Padre/Plugin/Catalyst/NewApp.pm
+    version: 0.09
+  Padre::Plugin::Catalyst::Outline:
+    file: lib/Padre/Plugin/Catalyst/Outline.pm
+    version: 0.09
+  Padre::Plugin::Catalyst::Panel:
+    file: lib/Padre/Plugin/Catalyst/Panel.pm
+    version: 0.09
+  Padre::Plugin::Catalyst::Util:
+    file: lib/Padre/Plugin/Catalyst/Util.pm
+    version: 0.09
+  Padre::Wx::Menu::Catalyst:
+    file: lib/Padre/Wx/Menu/Catalyst.pm
+    version: 0.51
+recommends:
+  Task::CatInABox: 0.03
+  Task::Catalyst::Tutorial: 0.06
+requires:
+  Catalyst::Devel: 1
+  Catalyst::Runtime: 5.7
+  ExtUtils::Install: 1.52
+  Module::Pluggable::Object: 3.9
+  Padre: 0.51
+resources:
+  homepage: http://padre.perlide.org/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-Catalyst/
+version: 0.09

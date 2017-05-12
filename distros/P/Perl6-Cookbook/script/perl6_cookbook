@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+=pod
+
+=head1 Perl 6 Cookbook
+
+For now this script only shows the location of the installed examples
+
+=cut
+
+use File::ShareDir;
+printf("The examples can be found in %s\n",
+    File::ShareDir::dist_dir('Perl6-Cookbook'));
+

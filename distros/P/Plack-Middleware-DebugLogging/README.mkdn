@@ -1,0 +1,140 @@
+# NAME
+
+Plack::Middleware::DebugLogging - Catalyst style console debugging for plack apps
+
+# VERSION
+
+version 0.001005
+
+# SYNOPSIS
+
+    use Plack::Builder;
+
+    my $app = sub { ... }
+
+    builder {
+      enable_if { $ENV{PLACK_ENV} eq 'development' } 'DebugLogging';
+      $app;
+    }
+
+curl -XPOST http://0:5000/api/1/2?query=param -d'foo=bar&foo=baz&zap=555'
+
+    "POST" request for "/api/1/2" from "127.0.0.1"
+    Request Headers:
+    .-----------------+------------------------------------------------------.
+    | Header Name     | Value                                                |
+    +-----------------+------------------------------------------------------+
+    | Accept          | */*                                                  |
+    | Host            | 0:5000                                               |
+    | User-Agent      | curl/7.22.0 (i686-pc-linux-gnu) libcurl/7.22.0 Open- |
+    |                 | SSL/1.0.1 zlib/1.2.3.4 libidn/1.23 librtmp/2.3       |
+    | Content-Length  | 23                                                   |
+    | Content-Type    | application/x-www-form-urlencoded                    |
+    '-----------------+------------------------------------------------------'
+
+    Query Parameters are:
+    .-------------------------------------+--------------------------------------.
+    | Parameter                           | Value                                |
+    +-------------------------------------+--------------------------------------+
+    | query                               | param                                |
+    '-------------------------------------+--------------------------------------'
+
+    Body Parameters are:
+    .-------------------------------------+--------------------------------------.
+    | Parameter                           | Value                                |
+    +-------------------------------------+--------------------------------------+
+    | foo                                 | bar, baz                             |
+    | zap                                 | 555                                  |
+    '-------------------------------------+--------------------------------------'
+
+    Response Code: 404; Content-Type: text/plain; Content-Length: unknown
+    Response Headers:
+    .-----------------+------------------------------------------------------.
+    | Header Name     | Value                                                |
+    +-----------------+------------------------------------------------------+
+    | Content-Type    | text/plain                                           |
+    '-----------------+------------------------------------------------------'
+
+# DESCRIPTION
+
+This is a refactoring/stealing of Catalyst's useful debugging output for use in
+any Plack application, sitting infront of a web framework or otherwise. This is
+ideal for development environments. You probably would not want to run this on
+your production application.
+
+One new feature that differentiates from Catalyst is that if serialized content
+is sent via body param, an attempt will be made to deserialize based on the
+Content-Type header with Data::Serializer.
+
+This middleware will use psgix.logger if available in the environment,
+otherwise it will fall back to printing to stderr.
+
+There are a large list of attrs which can be used to control which
+output you want to see:
+
+- debug
+- request
+- response
+- request\_headers
+- request\_parameters
+- response\_headers
+- response\_status\_line
+- keywords
+- uploads
+- body\_params
+- query\_params
+- attempt\_deserialize
+- serializer
+
+# NAME
+
+Plack::Middleware::DebugLogging - Catalyst style console debugging for plack apps
+
+# METHODS
+
+## $self->log\_request
+
+Writes information about the request to the debug logs.  This includes:
+
+- Request method, path, and remote IP address
+- Query keywords (see ["query\_keywords" in Catalyst::Request](https://metacpan.org/pod/Catalyst::Request#query_keywords))
+- Request parameters
+- File uploads
+
+## $self->log\_response
+
+Writes information about the response to the debug logs by calling
+`$self->log_response_status_line` and `$self->log_response_headers`.
+
+## $self->log\_response\_status\_line($response)
+
+Writes one line of information about the response to the debug logs.  This includes:
+
+- Response status code
+- Content-Type header (if present)
+- Content-Length header (if present)
+
+## $self->log\_request\_parameters( query => {}, body => {} )
+
+Logs request parameters to debug logs
+
+## $self->log\_request\_uploads
+
+Logs file uploads included in the request to the debug logs.
+The parameter name, filename, file type, and file size are all included in
+the debug logs.
+
+## $self->log\_headers($type => $headers)
+
+Logs [HTTP::Headers](https://metacpan.org/pod/HTTP::Headers) (either request or response) to the debug logs.
+
+# AUTHOR
+
+Matthew Phillips <mattp@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Matthew Phillips <mattp@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

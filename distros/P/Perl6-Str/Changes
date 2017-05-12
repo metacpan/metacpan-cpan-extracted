@@ -1,0 +1,18 @@
+Revision History for Perl module Perl6::Str
+
+0.0.5 2012-08-18
+- fixed typos in Pod
+
+0.0.4 2011-05-03
+- source now lives on github
+- bumped minimal perl version to 5.8.3, since older perls don't 
+  like my usage of use Exporter qw(import);
+
+0.0.3 Mon Jul 21 22:46:00 CEST 2008
+- fixed Build.PL for older perls
+
+0.0.2 Mon Jul 21 15:50:28 CEST 2008
+- Fixed typos in POD
+
+0.0.1 Mon Jul 21 12:44:30 CEST 2008
+- Initial release

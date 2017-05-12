@@ -1,0 +1,2629 @@
+
+// -- macro declarations: start reading with first headline
++BC:\B<\C<__body__>>
+
++CX:\C<\X<__body__>>
+
++ILLT:\LOCALTOC{type=linked depth=1}
+	
+// -- end of "preface"
+
+
+=0.452
+
+It turned out that 0.451 was still untestable under new developer releases
+of \C<perl> (5.9.5) and above because \C<strict> was changed to use \C<caller>.
+
+Many thanks to Andreas König who figured out which exact developer version
+change caused the new behaviour, for starting a dialog with the core team
+and for suggesting a patch to work around the new behaviour of \C<strict>
+under \C<Safe> control.
+
+The suggested patch is applied in this update.
+
+This update affects the test suite \I<only>.
+
+=0.451
+
+This version is similar to 0.45 in function, it fixes the test suite on UNIX
+systems. Thanks to Andreas König who triggered me to publish this fix.
+
+=0.45
+
+=Fixes
+
+* The chapter delimiter parameter of the \CX<INDEXCLOUD> tag was documented
+  as \C<chapterdelimiter>, not \C<chapter\B<B>elimiter>.
+	
+=0.44
+
+\ILLT
+
+=Features
+
+* New basic tag \CX<INDEXCLOUD>. The tag collects index entries of a chapter
+  range (and all included subchapters) or the whole document. The stream
+  contains all the tag options. Generator based converters can rely on
+  additional informations, which include a list of all index entries in the
+  chapter range specified, and a quick ranking - a unified list of indexed
+  phrases and their occurence number.
+
+* \CX<PP::Generator::SDF> shows an example implementation for \C<\\INDEXCLOUD>
+  in generator based converters. As SDF cannot paint clouds, the tag
+  is transformed into an ordered  ranking list.
+
+* \C<\\INDEXCLOUD> implementations in traditional backend based converters
+  are more expensive and depend on the converters internal index management
+  and data structures, so they can vary. \C<pp2sdf> shall show one
+  possible implementation in future versions.
+
+* New value for \CX<\\INCLUDE>'s \CX<type> option: \CX<parsedexample> works
+  like \CX<example>, but embeds the file contents as a standard block (which
+  is parsed), instead of as a verbatim block like \C<example>. Parsing an
+  example file is especially handy when working with (highlighting) paragraph
+  filters.
+
+
+=Fixes
+
+* \X<SDF> generator had not been adapted to several of the last stream format
+  updates.
+
+* Code passed to \CX<_cnd_> was not accepted if it evaluated to "false" in Perl.
+  Now the valid "0" is handled correctly.
+	
+	
+=0.43
+
+\ILLT
+
+==Features
+
+\ILLT
+
+===Import filter API for the INCLUDE and EMBED tags
+
+PerlPoint supports import filters for other formats since package version
+0.38, via tag option \C<ifilter>:
+
+  \\INCLUDE{type=pp ifilter='pod2pp' file="file.pod"}
+
+Nevertheless, this could be simplified. With the new option C<import>
+this can be written as
+
+  \\INCLUDE{type=pp import=pod file="file.pod"}
+
+, given a module \C<PerlPoint::Import::POD> is installed (note: see the
+\C<Pod::PerlPoint> distribution for this module). The import
+module API is new and requires the module to define a function \C<importFilter()>,
+with the same interface as functions for \C<ifilter>. In fact,
+\C<import=pod> is a shortcut for \C<ifilter="PerlPoint::Import::POD">.
+
+With \C<\\INCLUDE>, the import option can use the \I<source file extension> as the
+source format. This is enforced by using a true numeric value for this option,
+instead of a string:
+
+  \\INCLUDE{type=pp import=1 file="file.pod"}
+
+When both \C<import> and \C<ifilter> are used together \C<import> is ignored.
+
+===Automatic import of entire files
+	
+The new standard import filter API is used to allow automatic import of source
+files in other formats. Import is requested by the special prefix \C<IMPORT:>,
+like in
+
+  > perlpoint ... \B<IMPORT:>source.pod
+
+With the prefix, PerlPoint treats the file extension (\C<pod>) as the name
+of the source format, searches for the related import module (\C<PerlPoint::Import::\B<POD>>,
+again the format is all uppercased in the module name by convention) and
+invokes it automatically.
+
+This feature applies to all existing converters automatically.
+
+	
+===Misc
+
+* new option \BC<-version> for \C<perlpoint> and \C<PerlPoint::Generator>,
+  thanks to Achim Grolms for the suggestion;
+	
+* the default file type for C<\\INCLUDE> and the default language for
+  \C<\\EMBED> are \C<pp> now;
+	
+* all generator based converters now accept the new option \C<-acceptedFormat>,
+  which specifies languages to be accepted in included files or embedded
+  snippets (with \C<\\INCLUDE> or \C<\\EMBED>);
+
+* parser: slight code optimizations;
+
+	
+=0.42
+
+The main intention of this update is to allow the production of better
+structured results (like correct XHTML). On the way to there, fixes and
+improvements were made.
+
+There should be no incompatibility with 0.41.
+
+\ILLT
+	
+==Features
+
+* Tag authors can declare their tags as standalone now. If the parser
+  finds a text paragraph is occupied by such a tag entirely, the
+  paragraph "wrapper" is removed from the stream. This allows to
+  produce better output for tags that are transformed into something
+  that does not fit into a paragraph. (We had this before for images
+  and a few other special tags, but now this is a general mechanism.)
+  Standalone tags not used standalone have no special effect.
+
+* Likewise, if all that is found in a paragraph is an embedded area
+  (\C<\\EMBED{...} ... \\END_EMBED>, the wrapping paragraph directives
+  are removed from the stream.
+
+* \C<IMAGE> tags now get an \C<alt> option by default unless they define
+  their own (the default is "Image").
+	
+* \C<perlpoint> now reads option files from the start directory, allowing to
+  have a \C<.perlpoint> file in a project tree.
+
+	
+	
+==Fixes
+	
+* statistics for list shifters did not work;
+
+* macro default parameters were not documented!
+
+	
+==Misc
+
+* dummy tokens inserted by the parser now are special strings that are filtered
+  out by the backend module, the old string solution injected empty tokens into
+  the stream;
+
+
+=0.41
+
+This is a light update performed with the introduction of \C<PP::Template::TT2>.
+No adaptations should be required except for the name change from \C<pp2tdo> to
+\C<perlpoint>.
+	
+As \CX<pp2tdo> is intended to be one converter for many formats, it is now renamed
+to \CX<perlpoint>. It does \I<not> mean other \C<pp2...> converters are out of
+support in any way which they are not. The idea just came up when thinking about a
+binary package built with pp (from \C<PAR>), for which a name of "perlpoint" seems
+appropriate and memorable.
+
+
+==Features
+
+* \C<PP::Generator> provides a new option \C<-mainstream> which allows to specify
+  an alternative name for the document stream "main" (as a usage example, this
+  helps to produce S5 slides which require DIV areas with certain names)
+
+* main document stream now produces entry and leave point as well, allowing to
+  format this stream a special way in the target format (again, S5 is an example
+  of how this can be used)
+	
+
+==Fixes
+
+* Generator classes did ignore the parsers nested table configuration, therefore no
+  generator based converter could provide nested table support. Fixed.
+
+	
+==Misc
+
+* Updated \C<MANIFEST> and \C<TODO>.
+
+* Prepared for use with \C<PP::Template::TT2>.
+
+* Took care to let the distribution pass more Kwalitee (CPANTS) tests.
+
+
+	
+=0.40
+
+This update has two parts.
+
+First, it is a feature update. It has a few incompatible changes (see below), but
+should require only slight adaptations of existing converters. All converters should
+continue to run or should be adapted soon (as I know there is an adapted Converters
+package on the way).
+
+Second, 0.40 introduces an extended framework, which in this release is in \I<beta state>
+because of lacking tests and incomplete docs. Nevertheless, it is well tested in production
+and should be save to use.
+
+Read on for all the details!
+
+\LOCALTOC
+
+
+==Features
+
+There are lots of new features, most of all an extended framework which should
+make it much easier to write converters.
+
+The new parts are just \I<extensions> of the "old" framework which remains in action
+(and is used by the new parts), so converters using the traditional interface
+should continue to run.
+
+
+==Extended framework 
+
+This version introduces a new converter, \BC<pp2tdo> ("template driven output"),
+and a new part of the module framework, the \C<PerlPoint::Generator>
+hierarchy, which implement a very generic and general converter approach.
+
+See the new section "The formatter approach" in "Writing converters" for
+details about this new model.
+
+Here are a few highlights:
+
+* Object oriented extension design.
+
+* Separation of general function, language specific actions and formatting.
+
+* A clear, simple to use, entity based interface for subclassing of only
+  a few methods to overwrite.
+
+* All the basic work - dealing with parser, stream, backend and backend events
+  - is already done by \C<PerlPoint::Generator>.
+
+* Easy to extend. Generator authors just add formatting.
+
+* Every subclass can add additional options.
+
+* Every subclass can add additional help portions.
+
+* As formatting is determined by the formatter subclass, several templating
+  systems can be used in parallel by just switching the template engine. A
+  general template layer is provided.
+
+* \I<All> generators can use styles.
+
+* General style format with parts for configuration, templates, docs and screenshots.
+
+* Subclasses can be defined even in a style, so a style can come with its
+  own formatters and template systems if necessary.
+
+* Most of the docstreaming and index work is now done a central place, so
+  all generators can use it and do not have to deal with it themselves.
+
+* \I<The "old" approach is still available and supported>, and existing converters
+  will continue to run, as the old part of the framework is the base of the new part.
+  The new generator part just adds an additional level of abstraction, making it easier
+  to focus on the target format and layout.
+
+
+===New SDF generator
+
+As a reference implementation, the functionality of \C<pp2sdf> was reimplemented
+in the generator model. To produce SDF this way, invoke \C<pp2tdo> with option
+\C<-target SDF>.
+
+
+===First pure XML generator(s)
+
+Well, we already had the demo converter that produced XML for PPresenter,
+but now a \I<common> implementation is available, implemented with the
+new generator approach. To produce XML, invoke \C<pp2tdo> with option
+\C<-target XML>.
+
+Best of all, if the result does not meet your needs, it is easy to control
+entity translation by options. If this is not sufficient, it is easy to write
+a modified converter by subclassing \C<PerlPoint::Generator::XML>. See
+\C<PerlPoint::Generator::XML::Default> for an example and "Writing converters"
+for instructions.
+
+Various formatters are available to produce XHTML, paged XHTML and AxPoint.
+These are published as standalone CPAN packages, watch the PerlPoint namespace
+or the project side on SourceForge.
+
+
+===Further reading
+
+To learn more about the new features and generators, please read via \C<perldoc>
+
+* the docs of \C<pp2tdo>;
+
+* the \I<help> of \C<pp2tdo>, activated by option \C<-help>, which adapts itself to
+  the \C<-target>, \C<-formatter> and \C<-template> options:
+
+  Here are a few example calls (each call on one line):
+
+  pp2tdo -target SDF
+  pp2tdo -target XML
+  pp2tdo -target XML -formatter XHTML
+  pp2tdo -target XML -formatter XHTML::Paged
+  pp2tdo -target XML -formatter XHTML::Paged -templatetype Traditional
+         -templatesAccept XML/XHTML::Paged
+  pp2tdo -target XML -formatter AxPoint
+  ...
+
+... and have a look at the example template provided in the \C<demos> subtree.
+
+
+==Incompatibel changes for users
+
+* Empty (reset) variables will no longer be replaced by empty strings.
+  This might become a problem - such variables were occasionally used
+  to start generated text paragraphs, as by Pod::PerlPoint's pod2pp,
+  which wrote:
+
+    $__pod2pp__empty__=
+
+    ${__pod2pp__empty__}Converted POD text ...
+
+  To work around this, use the new optional dot start for text paragraphs:
+
+    .Converted POD text ...
+
+  And please install an updated version of Pod::PerlPoint, please ;-)
+
+* The first chapter now \I<requires> a headline. Comments and all paragraphs
+  not producing visible content (like macro definitions, code fragments and
+  variable asignments) can appear \I<before> the first headline.
+
+
+==Incompatible changes of the converter API
+
+* Modified \I<anchor interface>. Anchors now store the absolute number of
+  the page they are defined in. As this is an internal interface, this
+  does not affect document authors. On the other hand, converters will have
+  to be adapted \I<if> they make use of anchors (as far as I know, mostly
+  converters of this package do, which \I<were> adapted as necessary).
+
+* \C<LOCALTOC> added to the list of standalone tags (which are stripped of
+  of an enveloping text paragraph if they are its only contents);
+
+* \C<\\A> and \C<\\F> are basic tags now, which means they are available to
+  all converters. The original meaning of "F" was \I<\B<f>ont>, but can
+  be generalized now (to "formatting" or something like that). In fact, it
+  formats a selected text, and it is up to the converters how to tranform
+  the various options. (As with \C<\\FORMAT>, conventions will help to
+  establish documents that are portable between converters.)
+
+* \BC<\\A> now checks if it is the innermost tag/macro. This \I<can> break
+  existing sources.
+
+
+==Tutorial
+
+Beginning with this release, a tutorial is part of the package. Being in an early
+state till it already describes the PerlPoint basics. Please have a look. Comments
+are appreciated.
+
+
+==Various
+
+* Anchor objects now can produce "arbitrary" anchor names on request.
+
+* The \I<\\REF> tag now provides the absolute chapter number of the related
+  anchor, in the internal option \C<__chapter__>.
+
+* Backends can register a handler for \I<all> directives (\C<DIRECTIVE_EVERY>).
+  This slows down operation, but allows central prehandling of all stream
+  parts where necessary.
+
+* Headlines provide additional data: their full and shortcut pathes as well as
+  level and page number pathes, plus variables that are valid when the chapter
+  is complete (for templates).
+
+* New warning if the maximum columns number is detected in another line than the
+  first table line (which is the base of normalization).
+
+* New parser option \C<criticalSemanticErrors> treats semantic errors as
+  critical, causing the parser to terminate immediately (as after syntactic
+  errors).
+
+* New parser option \C<skipcomments> excludes comments from the stream.
+
+* Input filters can access the source file by a variable \C<$main::_ifilterFile>
+  now.
+
+* \I<Tag hooks take (provide) an additional parameter>: the absolute number of the
+  page the tag is used on.
+
+* Table directives provide additional hints: \C<__maxColumns__> and \C<__titleColumns__>.
+
+* New directive DIRECTIVE_DPOINT_TEXT now encloses definition point explanations in the
+  stream.
+
+* Text paragraphs can be started by an (optional!) dot now:
+
+   .Text begins.
+
+  This is mostly useful when \I<generating> PerlPoint from other sources,
+  to make sure the first characters of the converted text will not be interpreted
+  as special PerlPoint characters.
+
+* As Clinton Pierce's Perl Projector seems no longer to be supported, the demo
+  converter \C<pp2cppp> and the module \C<PerlPoint::Tags::CPPP> were removed
+  from the distribution.
+
+
+==Bugfixes
+
+* A subtile bug could cause parser crashes when an included document contained
+  just a macro without trailing newlines, in a deeper nesting level. The parser
+  now behaves more robust in this area. Thanks to Heike Metz who reported the
+  crash.
+
+* Docstream "main" was ignored like any other docstream if working in the
+  "docstream ignore" mode.
+
+* Undefind variables were expanded. Fixed. Note: this might turn out
+  to be an incompatible change for you, if you unset an empty variable in order
+  to get an empty string (like Pod::PerlPoint did):
+
+    $empty=
+
+    ${empty}Text starts here ...
+
+  To work around this, use the new optional dot start for text paragraphs instead:
+
+    .Text starts here ...
+
+* There was a general error in variable handling, which caused wrong resolving of
+  backslash preceeded variables in several cases. Thanks to Lorenz for the bug report.
+
+* When continuing an ordered list after returning from a nested list, the continued
+  list was treated as "new". This was not really a bug as it was treated as a new
+  list, but continuation would have been more intuitive - now it is there.
+
+* The \C<alt> option of \CX<\\REF> can handle backslashed commata now - it was not
+  possible before to use headlines with commata as alternatives.
+
+
+
+
+=0.39
+
+This update moves a tag (\C<\\X>) from converter definitions to the basic tags.
+To make use of the new functionality, you need to update to adapted converters.
+Alternativelely and as a workaround, go to the definition lib, e.g.
+\C<PerlPoint::Tags::HTML>, and delete the definition of the \C<\\X> tag.
+(Please note that full support of the new index features \I<needs> updated converters.)
+
+==Bugfixes
+
+* Guarded variables were \I<expanded> if set up. Oops. Fixed, test added.
+
+* \C<pp2sdf> did not print tables ...
+
+* The parser now automatically adds \I<all> composite anchors for a headline,
+  not only for the full headline path. This allows to use partial links like
+  \C<C|D|E> or \C<D|E> for a headline with the full path \C<A|B|C|D|E>.
+
+
+==Changes
+
+* \BC<\\X> became a base tag like it is in POD. Many thanks to
+  Lorenz who implanted it into PerlPoint with his converters. The
+  tag is defined in \C<PerlPoint::Tags::Basic> now. Converters still
+  defining it by their own should be adapted (unless they want to
+  overwrite the basic definition).
+
+* \BC<\\X> now checks if it is the innermost tag/macro.
+
+* New basic tag \BC<INDEX> provides a full index structure. See
+  \C<PerlPoint::Tags::Basic> for details.
+
+* Adapted perlpoint-hilit19.lisp to Emacs 21.x. Unfortunately it
+  enforces a warning, but nevertheless does what expected. Might
+  be someone with Emacs Lisp experience can fix this?
+
+* Parser change to run under perl 5.8 without errors: \C<no utf8>.
+  Does it work under older perls as well?
+
+
+==Features
+
+===Index based references
+
+Introducing new "index based references". What's this? Imagine
+a document collection by many authors. It would be nice to cross
+link related articles. This requires knowledge of all the document
+parts and would usually be arranged by an informed document manager,
+or by using technologies like Topic Maps or the like. In any case,
+it takes time.
+
+But what if the collection is frequently updated, or when it is
+impossible to instrument them for Topic Maps or similar technologies,
+or if there is neither person nor time to investigate all the stuff in
+detail? Then you could use this (still experimental) feature of
+\I<index based references>. 
+
+The idea is that index entries point to documents/chapters with
+substantial information about the index entry. Documents/chapters
+matching in their index entries are probably content related. In
+linking to other documents or chapters speaking about the same indexed
+issues, or to a relevant percentage of the base documents (indexed)
+issues, one can build cross references automatically.
+
+To do so, the package now provides a new base tag \BC<INDEXRELATIONS> which
+builds a list of related pages. Options specify if the keyword base
+should be filled with entries from the start chapter only, or shall include
+all subchapters. Likewise, one can specify if only the index entries
+at other \I<startup> pages should be taken into account, or if \I<all
+their subchapters> should be scanned, too. Finally, there's an option
+to configure a minimal match threshold (absolutely or by percentage).
+
+Converters can take the provided chapter list and present them as
+they like.
+
+The appropriate tests and docs were added.
+
+
+==Docs
+
+* The documentation now mentions explicitly that list indentation is
+  reset \I<automatically> by any subsequent non list paragraph. Thanks
+  to Marcus Holland-Moritz for suggesting this.
+
+
+
+=0.38
+
+This is maintenance update for paragraph filters. If you are using
+paragraph filters, it is strongly recommended to upgrade.
+
+But hopefully the new features make it worth to update for others, too ;-)
+The POD input feature, for example. Or any language you like. Read below.
+
+There are no incompatibilities between \REF{name="0.37"}<0.37> and 0.38.
+All PerlPoint sources which passed 0.37 should pass 0.38 as well. All
+converters should continue to work.
+
+
+==Bugfixes
+
+* Paragraph filters did remove guarded backslashes (\C<\\\\>) and
+  guarded ">" characters (\C<\\>>). Improved.
+
+* Paragraph filters restored the original source with bodies for
+  bodyless tags, fixed.
+
+* Paragraph filters did not reinsert all backslashes (they handled
+  the first occurence only) when restoring the original source.
+
+* Paragraph filters inserted backslashes into verbatim paragraphs
+  when restoring the original source (thanks to Lorenz for the report).
+
+* Empty headlines could cause errors and infinite parser loops.
+
+* \C<pp2sdf>: removed occasional warnings displayed without real
+  reason. Fixed a \C<splice()> usage bug.
+
+
+
+==Changes
+
+* Tags are streamed with an additional information. Both opening and closing
+  directives now provide a body hint telling a backend programmer if the tag
+  has a body or not.
+
+* The lexer makes use of precompiled patterns now, but it seems not to affect
+  the performance of parsing.
+
+* \C<\\INCLUDE>, \C<\\EMBED> and \C<\\TABLE> now support the \C<_cnd_> option,
+  like tags defined externally.
+
+* Embedded parts and included files can be preprocessed by the new "input
+  filters" - snippets of PerlPoint author defined Perl code transforming
+  the included or embedded parts before they are processed as usual. This
+  is a generic implementation of sourcefile import.
+
+  For example, it is possible to process POD sources
+  directly now. Here is a simple filter that does the job:
+
+  \\EMBED{lang=perl}
+
+  use Pod::PerlPoint 0.03;
+
+  sub pod2pp
+   {
+    my ($pod2pp, $result)=(new Pod::PerlPoint());
+    $pod2pp->output_string(\\$result);
+    $pod2pp->parse_string_document(@main::_ifilterText);
+    $result;
+   }
+
+  \\END_EMBED
+
+
+* Or try the new demo source file, \C<demo/perlpods.pp>, with your favourite
+  PerlPoint converter. (Make sure the cache is deactivated and you are using
+  \C<-active -safe ALL>. Depending on your system, this is a CPU, memory and
+  time consuming job producing over 12.000 pages when processed with perl 5.8.0.)
+
+* Demo converters \C<pp2pod>, \C<pp2pp> and \C<pp2tree> got the usual interface
+  (supporting traces etc.).
+
+* New trace switch \C<\X<TRACE_TMPFILES>> avoids removal of temporary files
+  (which are new as well - and written when on includes files via input filters).
+
+
+
+==pp2sdf
+
+* Brackets (\C<[]>) seem to have a special meaning in SDF:
+  \C<sdf> evaluates their contents by \C<eval()>, which causes
+  a lot of confusion in (Perl) example paragraphs - as a
+  workaround, all opening brackets in blocks are now written
+  as \C<\\[>.
+
+* Anchor and links names (in \C<id=> and \C<jump=> specifications)
+  are enclosed by Perls \C<q()> operator now, in the hope to
+  avoid trouble with quotes in the anchor. (But what about
+  parantheses in an anchor name now? It seems to work.)
+
+
+
+=0.37
+
+This is a maintenance update. It can replace version 0.36 transparently
+except for verbatim block paragraph filters and \C<pp2sdf> output handling.
+See next section for details.
+
+
+==Incompatible changes
+
+* Paragraph filters intended to be applied to verbatim paragraphs need
+  to be adapted: they now receive the \I<full> paragraph text
+  \I<including> the enclosing heredoc parts (e.g. \C<<<EOE> and matching
+  \C<EOE>).
+
+* Extended headline stream interface. This only effects converter authors,
+  but not really, because there are just two \I<additional> parameters now.
+  See below.
+
+* \BC<pp2sdf> now needs an explicit result file setup by the new option
+  \C<-sdffile>. Previous versions wrote to \C<STDOUT>.
+
+
+
+
+==Bugfixes
+
+* \C<pp2sdf>: \BC<\\SEQ> did not set an anchor when the \C<name> option
+  was specified.
+
+* A combination of \C<\\REF>, \C<\\SEQ> and activated cache caused trouble
+  illustrating open tasks in the implementation both of finish hooks and
+  anchor objects. This is fixed, see
+  \REF{type=linked name="0.37 | Features | Cache"} below for details.
+
+* For grammatical reasons, paragraph filters applied to blocks or lists
+  could cause trouble in detection of the subsequent paragraph. This is
+  fixed.
+
+* Filtered paragraphs were cached but are made potentially dynamic in an
+  unpredictable way by the filter(s). So they are cached no longer.
+
+* Filtering of headlines and verbatim blocks was not really fully
+  supported yet. Improved.
+
+
+==Features
+
+\LOCALTOC{type=linked}
+
+
+===Document streams
+
+Robert Inder asked how to achieve an HTML layout where notes are
+placed below the slide context. When we discussed several ideas,
+I thought it might be useful to have a general solution which I
+called \I<"document streams">. Thanks, Robert!
+
+So what is a document stream? Consider the following layout:
+
+  -------------------------------------
+  |         header navigation         |
+  -------------------------------------
+  |                                   |
+  |              Title                |
+  |                                   |
+  | Introduction text, points etc.    |
+  |                                   |
+  -------------------------------------
+  |                 |                 |
+  | Here we are     | Here we are     |
+  | talking about   | talking about   |
+  | subtheme 1.     | subtheme 2.     |
+  |                 |                 |
+  -------------------------------------
+  |               notes               |
+  -------------------------------------
+  |         trailer navigation        |
+  -------------------------------------
+
+The kernel parts can be easily generalized into a more abstract scheme:
+
+  -------------------------------------
+  |                                   |
+  |            main stream            |
+  |                                   |
+  -------------------------------------
+  |                 |                 |
+  |  item 1 stream  |  item 2 stream  |
+  |                 |                 |
+  -------------------------------------
+  |              stream 3             |
+  -------------------------------------
+
+This may be used in many ways - to compare software or hardware items,
+to place reader hints besides a main text, to write about the lifes of
+two or more individuals and present certain life parts in parallel, and
+so on.
+
+But how to distinguish document streams in a PerlPoint document? Well,
+here are the simple rules:
+
+* Every headline (re)enters the main stream.
+
+* \I<Stream entry points> enter certain streams. They are a new one line
+  paragraph type, beginning with a \BC<~> character and ending with
+  the line (like comments do):
+
+  =Main stream
+
+  Bla bla
+
+  \B<~The first docstream>
+
+  Blu blu
+
+  \B<~The 2nd doc stream>
+
+  Bli bli
+
+  ==Back to main stream
+
+Converters need to add docstream support, so currently only \C<pp2sdf>
+provides a first (reference) implementation. \I<It is completely up to
+a converter how it supports and "translates" document streams.> But
+to implement generally useful methods in the framework, the parser
+can be set up to transform all docstream entry points into headlines
+(at a sublevel of the current headline level) or to ignore all document
+streams at all (except of the main stream).
+
+More, docstreams can be skipped more selectively as well: the parsers
+\C<run()> method provides a new parameter \BC<docstreams2skip> to pass
+the parts to be ignored. When an ignored docstream is entered, all
+subsequent document parts till the next entry point (or headline) are
+completely ignored (including conditions - take care).
+
+Finally, \I<headline> start directives now provide a list of docstreams
+used in this certain chapter - allowing converter authors to adapt the
+chapters layout dynamically. See "Writing converters" for details.
+
+
+
+===\\INCLUDE
+
+Now it's easy to use a central repository of (macro / variable / code /
+filter / document) libraries:
+
+* \BC<\\INCLUDE> now searches pathes specified by an environment variable
+  \BC<PERLPOINTLIB> (similar to \C<perl>, shells, linkers etc.) if the
+  specified file cannot be found directly. In the tradition of \C<PATH>
+  and \C<PERL5LIB>, pathes are delimited by (optional whitespaces and)
+  semicolons.
+
+  path1\B<;>path2\B<;> path3   \B<;>   path4\B<;>path5
+
+* The new C<PERLPOINTLIB> path feature is available immediately with
+  this package version, regardless of converter adaptations.
+
+* Converters can pass a new parameter \C<libpath> to the parsers method
+  \C<run>. The argument of \C<libpath> should be a reference to an array
+  filled by converter options. I suggest a new conventional option
+  \I<\C<-includelib>> to be invoked multiple times (in the tradition of
+  \C<-I> options available for \C<perl> and various compilers).
+
+* \C<-includelib> needs converter adaptations, so please use
+  \C<PERLPOINTLIB> till updated converters appear.
+
+Pathes specified via \C<-includelib> (or the internal representation
+\C<libpath>, respectively) are searched \I<before> pathes specified via
+\C<PERLPOINTLIB>.
+
+* Pathes of included files are resolved now - circular inclusions caused
+  by links pointing to the same file can be detected earlier this way. As
+  a side effect, the resulting absolute file names improve error messages.
+
+
+===Cache
+
+* Paragraphs containing tags using finish hooks are no longer cached.
+  A tag finished after parsing makes the whole paragraph depending on
+  something that cannot be cached on base of the parsed text.
+
+* Anchors defined by a cached paragraph are cached now as well - and
+  restored after a cache hit.
+
+* The implementation of the mentioned last point required an extension
+  of the internal cache format. Cache files made by versions prior
+  0.37 will be rebuilt automatically next time they are used.
+
+
+
+===pp2sdf
+
+* Avoiding more backslashes in paragraphs starting with an SDF command.
+
+* New option \BC<-result> to specify an output file.
+
+* Supports document streams by three modes: docstreams can be ignored,
+  entry points can be made headlines, or \C<pp2sdf> can produce one
+  document per docstream.
+
+* Provides new conventional converter options \BC<-includelib>,
+  \BC<-docstreaming> and \BC<-skipstream>.
+
+
+===Misc
+
+* Slightly improved the \C<README> file.
+
+* \BC<flagSet()> now takes a \I<list> of flag names and checks if at least one
+  of the flags is set (implicit \I<or> condition). This makes it more handy
+  to write combined conditions. Thanks to Helmut Steinbach to make me
+  thinking about this.
+
+  old:
+
+  ? flagSet('a') or flagSet('b') or flagSet('all')
+
+  new:
+
+  ? flagSet(qw(a b all))
+
+
+* \C<PerlPoint::Anchors> was extended by a logging mode to trace newly
+  added anchors.
+
+* Added tests of condition interface functions (currently \C<flagSet()>
+  and \C<varValue()>).
+
+* Improved headline tests.
+
+* Added paragraph filter tests.
+
+* Paragraph filter functions can access the type of the paragraph
+  using the new variable $main::_pfilterType.
+
+* Empty text paragraphs are no longer made part of the stream.
+
+* Blocks were streamed with a final newline, improved.
+
+* Demos \C<pp2pod> and \C<pp2tree> auto-anchor headlines now (so
+  \C<\\REF> can be used).
+
+* New headline shortcuts. Thanks to Robert Inder who asked for them.
+  A shortcut is a plain string appended to the headline title,
+  separated by a "~". \I<Converters need to be adapted - currently
+  there is no shortcut support available.>
+
+  =A very long headline which may not fit
+   into the navigation bars \B<~ \I<Long headline>>
+
+* Updated \C<hilit19> extensions for Emacs (in the \C<utilities> directory).
+
+* Updated docs.
+
+
+
+=0.36
+
+This is a major update - in the sense that it modifies a lot of internals,
+especially stream handling. Nevertheless, it's almost completely compatible
+with earlier versions of the package (and the few \REF{name="Summary:
+Incompatible changes" type=linked}<incompatible changes> most likely do
+\I<not> affect existing converters).
+
+So \I<this version should run whereever 0.35 could be used.>
+
+While working on this version, I began to make use of the modified internals
+myself. As a result, there are various new \I<visible> features as well.
+See section "\REF{name="Visible Changes" type=linked}" below for all details.
+Internals are described in chapter "\REF{name=Internals type=linked}".
+
+\I<Please note that there's a new dependancy to run the installation tests because I switched to \BC<Test::More>> (included in CPAN package \C<Test::Simple> - do \I<not> install the still available standalone distribution of \C<Test::More>). You may have to update \C<Test::Harness> as well.
+
+
+==Bugfixes
+
+* Several very slight fixes in calls of \C<PerlPoint::Parser::run()>
+  (these bugs caused no errors).
+
+* \C<pp2sdf> embedded native SDF incorrectly into the produced result.
+  Thanks to Lorenz for the bug report.
+
+* \C<pp2sdf>: unintended SDF recognitions caused by ">" characters
+  are now avoided by generating ">" as "{{CHAR:gt}}" (outside verbatim
+  blocks).
+
+* If the only contents of a table cell was a \C<0>, this number was removed.
+  Fixed.
+
+* If a macro overwrote a tag with the same name and a (parsing) hook, the
+  tag hook was invoked when the macro had been used.
+
+* Tag parsing hooks received tag options instead of the tag body.
+
+* Helmut Steinbach found that the closing sequences of verbatim blocks
+  made by Active Content were not recognized correctly. This could be
+  fixed.
+
+* Investigating the previous point I found that is was also impossible
+  to dynamically make a usual example block or a paragraph that starts
+  with a tag or macro. This is now fixed as well.
+
+* Internal bugfix in macro body reparsing. The bug could cause infinite
+  parsing loops.
+
+
+==Internals
+
+This chapter can be safely skipped by "pure" PerlPoint users which might
+like to continue with chapter "\REF{name="0.36 | Visible Changes" type=linked}".
+
+This chapter describes these news:
+
+\LOCALTOC{type=linked}
+
+
+===PerlPoint::Backend, stream format
+
+\B<\I<The format of the intermediate stream was changed.>> I do not know
+of any direct stream access in a converter, but \I<if> anyone did access
+the stream directly, he will need to adapt his code. Code using
+\C<PerlPoint::Backend> does \I<not> need to be adapted.
+
+The stream is still a stream basically, but with additional structural
+hints stored in parallel, which are currently a stream of headline
+index numbers. This way I hope to stay with the performance advantages
+of a stream while enabling things like chapter inspection and arbitrary
+chapter navigation.
+
+For example, \C<pp2html> 0.11 in fact needs to process the stream twice
+because it needs the whole picture of the headline structure when building
+slides. Now it would be possible to inspect headlines in the first pass
+\I<only>, and to process \I<all> tokens in the 2nd pass then. This is a
+common task - \C<pp2html> might be modified or not, but future converters
+can definitely make use of this. (And there's an even better and faster
+way now to grab the TOC, see below.)
+
+To make use of the new structure, \C<PerlPoint::Backend> provides several
+new methods:
+
+* \C<run()> now works in \I<modes>. By default, it processes all tokens
+  as usual. This is called the "token mode". In \I<headline mode>, it
+  processes \I<headlines only>. Switch modes by \BC<mode()> - even from
+  within a callback!
+
+* Navigate within the stream: \BC<reset()> goes back to the very beginning,
+  while \BC<move2chapter()> allows you to jump to a certain chapter.
+
+* Get the number of all headlines by \BC<headlineNr()>, and the number
+  of the current chapter by \BC<currentChapterNr()>.
+
+* The stream data structure is now bound to a backend object while
+  \C<run()> is running. If navigation methods, \C<headlineNr()> or
+  \C<currentChapterNt()> shall be called outside \C<run()> - which
+  means outside a callback - \BC<bind()> can be used to perform
+  this binding manually. 
+
+* Instead of using \C<run()>, converter authors may prefer to process
+  the stream step by step having full control (e.g. to use the stream
+  while presenting instead of in format translation). This is possible
+  by using \C<bind()>, sequential calls of \BC<next()> and finally
+  \BC<unbind()>.
+
+The new backend method \BC<toc()> uses the new features to provide a
+table of contents. If called for a certain chapter, all subchapters are
+listed. The reported depth can be limited.
+
+  # get the complete \I<table of contents>
+  $toc=$backend->\B<toc>;
+
+  # get a list of all \I<current subchapters>
+  $subchapters=$backend->toc($backend->currentChapterNr);
+
+  # get a list of the subchapters \I<one level below the
+  # current one> (do not list the complete tree, if there
+  # are more levels)
+  $subchapters=$backend->toc($backend->currentChapterNr, \B<1>);
+
+All backend extensions are documented both in \C<PerlPoint::Backend>'s
+POD and in the converter tutorial. Hopefully.
+
+
+===More stream enhancements
+
+* Headline start directives provide the full headline title (plained, which
+  means without possibly used tags) as new data.
+
+* Unordered and description list directives now reserve a parameter at the
+  position where \I<ordered list> directives traditionally pass a list startup
+  level. This parameter is currently unused.
+
+* All list directives provide four new additional parameters to give
+  converter authors a hint about subsequent or preceeding \I<list shifts>.
+  For reasons of stream construction, hints about \I<preceeding> level
+  shifts are provided in list \I<start> directives \I<only>, while hints
+  about \I<subsequent> level shifts are provided in list \I<completion>
+  directives \I<only>. (But these are exactly the places where these
+  informations can help, so symmetry is the only thing lost here.) This
+  feature is intended to help a converter to build really \I<nested> lists.
+  (In PerlPoint, a list level shift implicitly closes a previous list,
+  but this is different in various target languages.)
+
+* Parser and backend now interact via directive hints. This is an internal
+  interface. For example, it is used to flag that a tag and / or its contents
+  should be skipped (see below).
+
+
+===New finish hook to complete tags
+
+With the new tag declarations by module introduced by version \REF{name="0.34"
+type=linked}, it became possible to hook into tag parsing. Now there's another
+hook to \I<complete> a tag \I<after> parsing - this means, when all input
+informations are available.
+
+ The new \C<\\REF> macro makes use of this feature
+ to verify links and to complete itself by linked content.
+
+The new hook interface is quite similar to parsing hooks except that it does
+not provide informations only available at parsing time (like the tag body).
+See \C<PerlPoint::Tags> for a detailed doc.
+
+
+===New hook return codes PARSING_IGNORE and PARSING_ERASE
+
+Tag \I<parsing> hooks can return two new codes:
+
+* \BC<PARSING_IGNORE> causes the parser to ignore the tag.
+  The result is just the body.
+
+* \BC<PARSING_ERASE> removes the tag \I<completely> which
+  means together with all its content. See the new basic
+  tag \\HIDE for an example.
+
+Finish hooks can return these codes as well, with exactly the same effect.
+(The tag remains streamed (as well as its body), but will be bypassed by
+the backend.) See \C<PerlPoint::Tags> for a detailed doc.
+
+
+===Hooks can now be interchanged
+
+It is now possible to use hooks of a "foreign" tag (declared by another tag
+module) in your own tag hooks. This helps to emulate other tags, for example
+if an \I<old interface> (tag and option names) shall be preserved but the
+\I<new functionality> shall be used. To invoke a foreign hook, call
+\C<PerlPoint::Tags::call()> anywhere in your own hook, passing tag name, hook
+type and parameters, like so:
+
+ $rc=PerlPoint::Tags::call('TAG', 'hook', @_);
+
+If the tag is not registered, or has no hook of the specified type, an
+undefined value is supplied, otherwise the return code of the invoked
+function.
+
+
+===New anchor management
+
+The parser can relieve converters from anchor management partially now.
+This is an \I<offer>.
+
+* A new minimal class \BC<PerlPoint::Anchors> provides basic anchor
+  collection services. Addresses and related values can be added and
+  queried.
+
+* The parser maintains a \C<PerlPoint::Anchors> object.
+
+* On request, headline titles (stripped off of tags) are automatically
+  added to the parsers anchor collection. (This is inspired by the
+  automatic headline anchors idea by Lorenz, built into \C<pp2html>
+  for versions and already imitated by \C<pp2sdf>. Why not make it a
+  general feature?) To activate this feature call \C<run()> with
+  \C<headlineLinks> set to a true value.
+
+* The parsers anchor collection object is passed to all tag hooks (both
+  parsing and finishing ones), where the collection can be extended (most
+  probably by parsing hooks) or queried (supposedly by finish hooks).
+
+This is the complete management for now. The parsers collection is \I<not>
+made part of the stream. It's just a help to verify links at parsing time,
+and to insert named values into the stream.
+
+  The new \C<\\REF> macro uses the parsers
+  anchor collection to resolve values not
+  available at parsing time, like sequence
+  numbers generated by the new \C<\\SEQ> tag.
+
+Again: with this feature (and tag finish hooks), it becomes easy to reference
+strings defined \I<later> than the reference.
+
+
+
+===Summary: Incompatible changes
+
+Various incompatible modifications might have been mentioned before,
+but it might be useful to have a check list:
+
+* The stream format was \I<significantly> extended, both in structur
+  and semantics. \C<PerlPoint::Backend> manages this for you. (And
+  you already used it, didn't you? ;-)
+
+* List shift paragraphs are no longer streamed by opening \I<and>
+  closing directives. There's only an \I<opening> directive from now
+  on.
+
+* Tag (parsing) hooks have a modified interface: the tag body is now
+  passed by reference, no longer as a list. This was necessary to add
+  new parameters to the interface.
+
+* Tag completion directives in the stream no longer provide exactly
+  the same informations as corresponding start directives, because
+  the new finish hooks are only invoked for startup directives. So,
+  if a tag finish hook modifies tag options, this will affect the
+  startup directive only. (Let me know if this causes problems.)
+
+* Likewise, headline start directives in the stream now provide
+  more informations than related completion directives: the full
+  (plained) headline title is only provided with the startup hint.
+
+* \C<\\TABLE> tags are streamed with additional informations about
+  the separators used (options \C<separator> and options
+  \C<rowseparator>). If they were made from a table \I<paragraph>,
+  there's an additional option \C<_paragraph_> set to 1. These
+  informations are intended to be used when a paragraph is retranslated
+  for a \REF{name="New type of active contents: paragraph
+  filters" type=linked}<paragraph filter>.
+
+
+==Visible Changes
+
+While the modified internals are especially of converter authors interest
+and do not affect existing documents, there are already \I<new> features
+in this version implemented on base of the new internals which \I<might>
+find your interest and help you in writing documents. These new features
+include: 
+
+\LOCALTOC{type=linked}
+
+Please see the \REF{name="0.36 | Misc" type=linked}<"Misc"> section below
+for more visible changes which are not based on the modified internals.
+
+
+===More active content: tags and macros can be made optional
+
+If a tag or macro has an option \BC<_cnd_>, the parser treats this option
+as a \I<condition> to activate the tag/macro or not. The condition is
+evaluated as Active Content. If Active Content is disabled, the condition
+defaults to "false".
+
+  \\IMAGE{_cnd_="$illustrate" src="piegraph.gif"}
+
+Unfortunately, because it is done via option, only tags and macros
+\I<providing> options can be made conditional. So,
+
+  \\I{_cnd_="$italics"}<conditionally italic text>
+
+cannot be written because of a parsing error. That's bad. If anyone
+has an idea for a well fitting general solution, please let me know.
+
+(Hint for converter authors: the condition option is stripped off of
+the options hash if the condition (and therefore the tag) turns out
+to be valid. You cannot evaluate it yourself again.)
+
+
+===New basic tag \\LOCALTOC
+
+\BC<\\LOCALTOC> inserts all subsections of the current chapter (in
+requested depth). Simply say:
+
+  =Parent chapter
+
+  In this chapter:
+
+  \B<\\LOCALTOC>
+
+  ==Subchapter 1
+
+  ===Subchapter 1.1
+
+  ==Subchapter 2
+
+, and a converter will produce results according to \I<this> source:
+
+  =Parent chapter
+
+  In this chapter:
+
+  \B<* Subchapter 1>
+
+  \B<* Subchapter 1.1>
+
+  \B<* Subchapter 2>
+
+  ==Subchapter 1
+
+  ==Subchapter 2
+
+I missed something like this tag for a long time, indeed. Think of all the
+empty pages produced by headlines which just collect various subchapters,
+but without own text. 
+
+It is possible to limit the subhierarchy depth taken into account (suppress
+the display of subchapter 1.1 in the example above by setting \C<depth> to 1),
+to format the produced list in various ways (ordered, unordered, with chapter
+numbers) and even to make the chapter titles hyperlinks to their related
+chapters (if supported by the target format).
+
+The transformation has to be done \I<by the converters>. As I know, the tag
+shall be supported by \C<\PP::Converters> 0.12. For now, you may get an
+impression by using \C<pp2sdf> which as a reference implementation is already
+supporting \C<\\LOCALTOC>.
+
+
+===New basic tag \\SEQ
+
+Generates the next value of a certain sequence "type" which is declared by
+option:
+
+  \\SEQ{type=example}, \\SEQ{type=example}, \\SEQ{type=example}
+
+will produce \C<1, 2, 3>, while
+
+  \\SEQ{type=example}, \\SEQ{type=image}, \\SEQ{type=table}
+
+results in \C<1, 1, 1> (provided no sequence was started before).
+
+It is possible to name the generated number, which makes it easy to reference
+it. Naming is done by option \BC<name>.
+
+  \SEQ{type=image name="Blue water"}
+
+(Note: Converter authors have to deal with this tag a special way because
+the number is passed by a generated tag \I<option>, not by tag body.
+Nevertheless, it's quite simple, see \C<pp2html> for an example and
+"Writing converters" for a description.)
+
+
+===New basic tag \\REF
+
+This is intended to be a very general reference tag. We already have several
+reference tags, mostly introduced by \C<pp2html> - this one is intended to
+continue their tradition a generalized (and generally available) way and is
+implemented on base of new parser features (see \REF{name="0.36 | Internals |
+New anchor management" type=linked}<"anchor management"> above).
+
+There's a complete doc. Here's an overview:
+
+* At least one option is required, which is \C<name>. It specifies what
+  shall be referenced.
+
+* Option \C<type> to say if the result should be made a hyperlink or not.
+  Defaults to \C<"plain"> (text) which means that the value of the
+  referenced object is replied (think of a named sequence number).
+
+* The body is optional in general, but forbidden in conjunction with a
+  \C<"plain"> result formatting (if a body is specified, there's no room
+  for the referenced text).
+
+* Alternative references can be specified via an optional \C<alt> option,
+  delimited by commata. (This delimiter might not be optimal because
+  commata can be used in headlines, I'm open to better ideas.)
+
+  \\REF{name=A alt="B, C, D"}
+
+* The final link is checked by the parser.
+
+* Optional option \C<occasion> (set to a true value) specifies that a
+  missing link is no error. In this case, the tag will be ignored.
+
+
+===New basic tag \\FORMAT
+
+This is another generalized tag, this time in the tradition of \C<pp2html>'s
+tags which configure the rendering of examples. \C<\\FORMAT> is just a
+container which can be filled by various options which represent the
+settings to made.
+
+  \\FORMAT{\B<align=left>}
+
+This should make all following text paragraphs and table cells left justified,
+until the end of the document or another alignment setting is made. So the
+meaning of \C<\\FORMAT> is to configure \I<default> formattings.
+
+As formatting is very target language specific, each converter can define
+valid settings it accepts and evaluates. C<\\FORMAT> may then be used to
+make settings interpreted by \I<various> converters \I<at once>:
+
+  // this example uses imaginary settings
+  \\FORMAT{\B<html_xxx=2 sdf_xxx=5>}
+
+Nevertheless, certain configurations may have a common meaning. I encourage
+converter authors to establish conventions. The first conventional setting
+established is \C<align> which shall accept the values \C<left>, \C<center>,
+\C<justify> and \C<right>.
+
+This tag was invented after Carlos Malvar suggested we could offer
+justification. Thanks, Carlos.
+
+
+
+===New basic tag \\HIDE
+
+This tag removes all its contents. This makes sense if used together
+with a tag condition.
+
+ \\HIDE{_cnd_="$hideSecrets"}<\SECRETS>
+
+
+===New basic tag \\STOP
+
+Another tag that makes most sense if used with tag conditions. It
+raises a syntactical error and thereby stops document processing
+immediately. So, to check if the used parser version meets the needs
+of your up to date document, write
+
+  \\STOP{_cnd_="\$_PARSER_VERSION<0.36"}
+
+
+===New type of active contents: paragraph filters
+
+Carlos Malvar asked me for automatic example highlightning.
+Thinking about how users could afford automatic highlightning
+without having to support various example languages by PerlPoint
+directly, I thought a general solution might meet such needs.
+So now users can declare \I<paragraph filters> which means they
+declare that certain paragraphs should be passed to a specified
+piece of code when parsed. This is, obviously, Active Content.
+The filters results must be valid PerlPoint which will then be
+reparsed.
+
+So finally those filters are there. Here is a complete example to
+demonstrate how this feature can be used. The example document
+contains a verbatim block of Perl code, which is made a block by
+a user filter. The simple filter marks all Perl comments bold
+(using a straight forward comment detection).
+
+  // define the paragraph filter
+  \\EMBED{lang=perl}
+
+  sub formatComments
+   {
+    # $main::_pfilterText is used to
+    # pass the paragraph content
+    $main::_pfilterText=~s/(#.+)$/\\\\B<$1>/mg;
+    $main::_pfilterText;
+   }
+
+  \\END_EMBED
+
+  Now, an example in a verbatim block paragraph:
+
+  \B<||formatComments||><<EOM
+
+    # 1st comment
+    This is my example. # 2nd comment
+
+    Continued.
+
+    # another comment
+    $c=5+10;
+
+  EOM
+
+  Example completed.
+
+Please note the preamble which installs the filter to use.
+
+Here is another filter that automatically numbers example lines:
+
+  sub filter2
+   {
+    # init line counter
+    my $c;
+
+    # transform example text
+    my $t=$main::_pfilterText;
+    $t=~s/^([ \t]*)/join('', ' ', ++$c, ": $1")/mge;
+
+    # provide result
+    $t;
+   }
+
+Filters can be chained by using a single pipe character:
+
+  ||markComments\B<|>numberLines||<<EOM
+
+  ...
+
+  EOM
+
+To try this successfully, Active Content has to be enabled
+(converter option \C<-active>). If Active Content is disabled,
+filters cannot be installed. (Copy the example from a converters
+result, not from this Changelog source to avoid backslash trouble.)
+
+Paragraph filters can be assigned to almost all types of paragraphs,
+not only verbatim blocks. But because they work after a paragraph is
+processed, they make no sense for paragraphs which do not produce
+output directly. So filters are not allowed for conditions,
+alias definitions and variable assignments (for grammatical reasons
+filters \I<can> be assigned to the last mentioned paragraph type,
+but I hope to fix this in future releases).
+
+There is no loop check currently. If a filter produces a filtered
+paragraph, things might end in an endless loop.
+
+As always, feedback is highly appreciated. Documentation and tests
+are planned to be added.
+
+
+
+==pp2sdf
+
+* Supports the new features.
+
+* "{" characters outside verbatim blocks and embedded HTML or SDF are
+  now replaced by SDF escape \C<{{CHAR:lbrace}}> to avoid SDF confusion
+  by unbalanced braces;
+
+
+==New demo converter pp2ppresenter
+
+The first XML converter is here, producing input for PPresenter's XML
+interface. PPresenter is a Perl/Tk presentation software by Mark Overmeer,
+with an XML interface by Johan Vromans. See ppresenter.org for details
+about this software.
+
+This demo is not complete yet, but I hope Mark will take it over ;-)
+
+The XML generation is by no means perfect, but a first proof of XML
+generation from PerlPoint. Suggestions are very welcome, as there are
+various more presenters using XML.
+
+As with all demos feel free to make this a starting point of an own
+converter. Just let us know.
+
+
+==Docs
+
+* "Writing converters" is up to date now, including a reference of the
+  backend callback interface.
+
+* Added \C<\\LOCALTOC>, \C<\\SEQ>, \C<\\REF> and \C<\\HIDE> tag docs.
+  Updated other docs where appropriate.
+
+
+==Misc
+
+* Improved error messages visualize where an error was detected.
+
+  [Error] test.pp, line 6: found " ", expected:
+           =.
+
+          \B<org.: \\IM{src="blibblub.gif"}
+          exp.: \\B<\\C<\\I<\\IMAGE{src "blibblub.gif"}\>\>\>
+                                   ^
+          _________________________|>
+
+
+* Removed \C<Safe> invokation in installation tests where it was unnecessary.
+
+* There's a new dependancy to run the installation tests because I switched
+  to \BC<Test::More> (included in CPAN package \C<Test::Simple>).
+
+* Helmut Steinbach suggested that macro definitions could declare parameters.
+  That's implemented now. To declare defaults, simply add an option list to
+  the macros name:
+
+  +MACRO\B<{value="default value"}>:value is __value__
+
+  Now I'm using the macro the usual way, \MACRO{value=passed}.
+  And the new way: \MACRO.
+
+* Several modules were stored in DOS format (with \r\n line endings). This
+  confused perldoc on Solaris and is fixed. Thanks to Lorenz who detected it.
+
+
+
+
+=0.35
+
+This is a minor update, but it is strongly recommended. You will
+especially enjoy it in case you are running perl 5.00503 or Windows
+(or both ;-).
+
+==Bugfixes
+
+* The lexer did not combine plain strings as completely as
+  possible because of a pattern bug.
+
+* \C<pp2pod> now completes examples ((verbatim) blocks) by
+  additional empty lines.
+
+
+==Features
+
+* Adapted to perl 5.005 (once more ;-). Please note that under
+  perl 5.005, parent classes need to be loaded explicitly, so
+  \I<to make your converter run under this perl version please
+  include a \C<use PerlPoint::Tags;> statement>. See the demos
+  for examples.
+
+* The package now passes all tests under Windows as well. They
+  failed because files need to be prepared by \C<binmode()>
+  under DOS to make \C<seek()> work correctly.
+
+* New demo application \C<pp2cppp> converts PerlPoint into
+  Clinton Pierce's PerlProjector format.
+
+
+==Docs
+
+* New intro \I<"Getting started (with PerlPoint)">.
+
+* Now doc \I<"How to write a PerlPoint converter">.
+
+* Providing a POD version of "Getting started". I'd like to add a POD
+  version of the converter tutorial as well, but unfortunatley there
+  are limitations because POD (as I know it) does support neither
+  tables nor headlines of a level greater than 2.
+
+* Slightly rearranged existing docs.
+
+
+
+=0.34
+
+\B<This is a major release.> It needs adapted translators. Old fashioned
+converters will stop working after installation of package version 0.34.
+
+
+==Bugfixes
+
+* Lorenz detected that \BC<0>'s were not allowed in macro names:
+  fixed (this integrates patch \C<0.3301>);
+
+* Verbatim blocks were documented as something left completely
+  untouched by PerlPoint but variables \I<were> replaced,
+  fixed implicitly with new line reading behaviour (see below).
+
+* Multiline tags in examples are correct PerlPoint but were
+  mistranslated into equivalently multilined SDF tags. Because
+  SDF tags cannot enclose line breaks pp2sdf needs to automatically
+  \I<close> open tags at the end of an example line and to \I<reopen>
+  them in the subsequent line, which is arranged now.
+
+  \I<The example code>
+
+      My tag \\I<encloses
+      line breaks>.
+
+  \I<formerly transformed into>
+
+  E:  My tag {{I:encloses
+  E:  line breaks}}.
+
+  \I<is now made the valid SDF code>
+
+  E:  My tag {{I:encloses\B<}}>
+  E:  \B<{{I:>line breaks}}.
+
+* A bug in an internal stack handling caused several operations to
+  be performed when a macro was replaced, including line number
+  updates and removal of whitespaces following the macro (context
+  dependend). The fix "saves" such whitespaces and accelerates
+  processing, especially if macros are used extensively in a
+  document processed with activated cache.
+
+* Internal table data were not completely reset at the end of a table,
+  thus causing addition of incorrect elements to the stream
+  representation of subsequent tables. Fixed.
+
+* Backslashes in conditions were removed, fixed.
+
+* One column tables were handled incorrectly.
+
+* Headlines couldn't begin with a character that opens a paragraph.
+
+
+==Features
+
+===Tags and macros
+
+* \B<New tag declaration by modules:> options and body can be declared
+  optional, mandatory or disabled, and this influences the parser
+  in searching for parts or not, checking mandatory parts, and
+  invoking user (translator/tag author!) declared functions to
+  check options or body more detailed. Please have a look at the
+  documentation of the new module \B<PerlPoint::Tags> for all the
+  details. This modification improves tag parsing significantly,
+  making it much more flexible. Additionally, there's now a convenient
+  way to share tag definitions between converters and to allow users
+  to use tags unsupported by the current converter but accepted
+  by another one. See next point.
+
+* Translators not declaring tags as mentioned above can be forced
+  by the user to \I<accept> foreign tags syntactically. As a side
+  effect, the experimental \C<\\ACCEPT_ALL> became obsolete and is
+  no longer supported.
+
+* Macros are adapted to the new tag evaluation: they as well are
+  now evaluated depending on their definitions: the parser will
+  no longer recognize an option part unless the definition makes
+  use of parameters, likewise a body is only detected if it was
+  mentioned in the macro definition by \C<__body__>. This rule
+  makes macro usage more intuative and allows simpler embedding
+  into the documents text.
+
+* New basic tag \B<\\READY> uses the new definition features to
+  complete parsing immediately. This means that remaining parts
+  of a document will be \I<ignored>. This can be useful if only
+  parts at the beginning of a document are of interest in certain
+  circumstances:
+
+   ? flagSet(overviewMode)
+
+   \\B<Short Overview>
+
+   This document will give you an impression.
+
+   // ready in overview mode
+   \B<\\READY>
+
+   ? 1
+
+   // usual document
+
+
+===Performance
+
+* Modified lexing to recognize the longest "words" possible.
+  Previous versions supplied real words or even single characters.
+  The "longest possible word" is the complete string before the
+  next character (or string) with a special meaning in the current
+  context. This change accelerates parsing incredibly: there are
+  less lexer calls and less parser states to walk through (and this
+  state machine is by far the slowest part in source processing).
+  Parsing is speed up by about five or seven times, depending on
+  a documents structure. This acceleration is even more impressive
+  if only a few parts were changed and the cache is in use. More,
+  because there are less parts in the stream now, backend processing
+  is significantly accelerated as well!
+
+* Accelerated comment and verbatim block reading: these paragraphs
+  were lexed and parsed for no purpose, so now they are read and
+  streamed line by line.
+
+* Accelerated the parser by replacing a clean object method calls
+  of the used Parse::Yapp parser object by accessing the objects
+  internal USER hash entry directly. This of course breaks encapsulation
+  but is suggested by the Parse::Yapp manual for reasons of efficiency.
+
+
+===Cache
+
+* Improved cache: the usage of variables and macros does no longer
+  prevent a paragraph from being cached, so the cache becomes more
+  effective. In our real life documents, the cache hit rate is
+  increased from about 50 or 60% to about 75%. The cache detects
+  a paragraph hit if the paragraph checksum matches \I<and> the
+  new variables / macro definition checksum match as well. Thanks
+  to \I<Stefan Sautter> who suggested this improvement.
+
+* More cache improvements: until now, it was a little bit dangerous
+  to use something looking like a tag or macro but being none of
+  them, at least if the cache was activated. The cache detected
+  that there was no macro and stored a checksum for the paragraph.
+  Everything worked well until this macro really was defined. Now
+  it would have to be replaced where it was used! But because there
+  was no change in the checksum, and there was no macro in the
+  paragraph before, the cache detected a hit, reusing the \I<old>
+  paragraph stream. So in fact, the new macro definition seemed
+  to be ignored in the paragraph until the cache was disabled or
+  rebuilt. This is all history now - if something looks like a
+  macro in a paragraph, the cache will activate the new macro
+  checksum feature, so whenever a used nonmacro becomes a macro
+  there will be no cache hit after that change (but of course,
+  the \I<new> stream is cached, so the next parsing will profit from
+  the cache again).
+
+* Even more cache improvements: the cache now stores the parser
+  version which built it and the constant declarations version
+  which was used. Likewise, the version of the used Storable
+  module is saved. These data are used to automatically rebuild
+  a cache after cache structure changes. (To demonstrate this
+  feature, version 0.34 introduces an incompatible, modified
+  cache structure and all existing cache files will be rebuilt
+  automatically. Well, or because of the cache improvements
+  described above. ;-)
+
+
+===Docs
+
+* Extended the documentation building set by adding detailed tag
+  documentation. As usual, this is intended to make it easier for
+  translator authors to document their tool and can be integrated
+  into and adapted to their documents. Second, these short documents
+  are hopefully used as templates to document all PerlPoint parts
+  a consistent way.
+
+* Added a portability discussion and more to the FAQ.
+
+* Macros are no longer called experimental.
+
+* It is now documented that macros overwrite tags of the same name.
+
+* It is now documented that "empty lines" containing whitespaces are
+  not recognized as empty by Perls paragraph mode which makes the cache
+  fail especially in examples (subsequent example parts "disappear").
+  Maybe future versions can improve this by either implementing an own
+  "paragraph mode" or handling example caching differently.
+
+
+===Tables
+
+* Table paragraphs are now "normalized": if a table row contains
+  less columns than the headline row, the missed columns are
+  automatically added (this helps converters to detect empty columns).
+
+  @|
+  A | B | C
+  1
+  1 |
+  1 | 2
+  1 | 2 |
+  1 | 2 | 3
+
+  is streamed now exactly as
+
+  @|
+  A | B | C
+  1 |   |
+  1 |   |
+  1 | 2 |
+  1 | 2 |
+  1 | 2 | 3
+
+* Tables built by tag (\C<\\TABLE, \\END_TABLE>) are normalized
+  analogously to table paragraphs (see above).
+
+* Table fields are trimmed now: leading and trailing whitespaces are
+  deleted by the parser (previous versions did pass them to the stream).
+
+* Tables made by tag were streamed different to tables made by paragraph,
+  because as tags they are usually embedded into a text paragraph.
+  Although "correct", it makes no sense to provide the extra text
+  paragraph information in the stream. That's why the extra text
+  information is stripped away now. In other words, the following
+  tables are streamed the same way (except of headline formatting):
+
+  // table by paragraph
+  @|
+  A | B | C
+  1 | 2 | 3
+
+  // table by tag
+  \\TABLE
+  A | B | C
+  1 | 2 | 3
+  \\END_TABLE
+
+* It is now possible to close a tag made table an unusual but correct
+  way by placing the closing tag at the end of the final table row.
+  It's a tag, so this must be possible! And now it is.
+
+  \\TABLE
+  A | B | C
+  1 | 2 | 3\B<\\END_TABLE>
+
+* Tag declared tables can be \I<inlined> now, declaring a string as
+  row separator by the new option \BC<rowseparator>. This means
+  that you can write
+
+  Look at this table! \B<\\TABLE{rowseparator="+++"} A | B | C +++ 1 | 2
+  | 3 \\END_TABLE> Incredible data!
+
+* Inlined tables make it easy to write a macro that is replaced by
+  a table:
+
+  +TWO_VALS:\B<\\TABLE{rowseparator="&"}
+            1st      | 2nd &
+            __val1__ | __val2__
+            \\END_TABLE>
+
+* Without an explicit setting, the row separator defaults to a newline
+  (as before).
+
+* Inlining tables enables us to \I<nest> tables. In fact, this is
+  still blocked by the parser \I<by default> but \I<can> easily be
+  permitted by setting the new parser option \BC<nestedTables>
+  to a true value. The only question is how to handle nested tables
+  converting PerlPoint to languages which do \I<not> support them,
+  like SDF, and that's why it is made optional and is recommended
+  to be implemented as a \I<user> choice.
+
+  \\TABLE{rowseparator="+++"} column 1 | column 2 |
+  \B<\\TABLE{rowseparator="%%%"} n1 | n2 %%% n3 | n4 \\END_TABLE>
+  +++ xxxx | yyyy | zzzzz +++ uuuu | vvvv | wwwww \\END_TABLE
+
+
+===Variables
+
+* Converters now can \I<predeclare variables> to pass converter (call)
+  specific informations to the document. Predeclared variables can
+  be used like user assigned PerlPoint variables. To help users
+  recognize them, they are capitalized by convention.
+
+* The parser as well makes use of variable predeclaration. His
+  settings can be overwritten by converters if necessary. For converter
+  authors convenience, predeclared parser variables begin with an
+  underscore. The first implemented settings are \BC<\$_STARTDIR> which
+  contains the absolute path of the startup directory where parsing
+  was initiated, as provided by Cwd::cwd(), and \BC<\$_PARSER_VERSION>
+  providing the version of PerlPoint::Parser being used.
+
+* \BC<\\INCLUDE> got another special option called \C<"localize">, enabling
+  document authors to declare variables to be restored when the included source
+  is processed completely. This idea was born while building documents from
+  numerous \I<partial> documents by different authors, each of them setting
+  something like \C<$documentAuthor> or \C<$authorMailAddress> by convention.
+  These settings are really helpful but should obviously be restored to their
+  original values after leaving the included source! And that's exactly what
+  this new option does. Just pass a comma separated list of the variables
+  to be "localized" (the term is borrowed from Perl, of course) or pass
+  the keyword \C<"__ALL__"> to restore the current variables \I<completely>.
+
+  \\INCLUDE{type=pp file="nested.pp" \B<localize="docAuthor, docMail">}
+
+  \\INCLUDE{type=pp file="nested.pp" \B<localize=__ALL__>}
+
+* To make variable restoration possible in backends as well, all changes are
+  propagated if \C<var2stream> is set. A new directive is introduced to flag
+  that all variables are reset (or deleted): \BC<DIRECTIVE_VARRESET>.
+
+* The new variable \BC<\$_SOURCE_LEVEL> reflects the sourcefile nesting
+  level. Files passed to a translator reside on level 1, this number
+  is increased with every source nesting. Let's say certain document
+  data should only be processed if the source is parsed as a top
+  level document, this can be done by checking this new variable:
+
+   ? varValue('\B<_SOURCE_LEVEL>')==1
+
+* Umlauts became valid parts of variable names. (If you are using
+  the Emacs \C<hilit19> extension provided in the \C<utilities>
+  subdirectory, please update to the adapted version.)
+
+   $München=Munich
+
+   He comes from $München.
+
+
+===Active contents
+
+* Although \B<Safe> is a great idea and gives detailed control about
+  code embedded into a PerlPoint source, it unfortunately limits code
+  execution. The greatest disadvantage is that you cannot use modules
+  in executed code, especially if they include C libraries. At least
+  I could not find out how. So, to provide both security \I<and> full
+  Perl access, I decided to implement "unlimited code execution"
+  additionally, which in fact means using \C<eval()> and \C<do()>
+  instead of \B<Safe> \I<on request>. Just pass a true non reference
+  value to option \C<safe> of method \C<run()>. It is suggested to
+  make converters that flexible that a \I<user> can decide if he wishes
+  to execute active contents on his system, and on which security level.
+  Using \C<eval()> and \C<do()> would be the lowest level from a
+  security point of view. So, we already have the convention to provide
+  options \C<-activeContents> and \C<-safeOpcode> by all converters.
+  Let's say that the opcode \BC<ALL> switches to code execution by
+  \C<eval()> and \C<do()>.
+
+* Another related convention: converters should avoid using namespace
+  \C<main::> which might possibly be polluted by active contents in case
+  a user chooses "unlimited code execution". As a refuge, the namespace
+  hierarchy \C<PerlPoint::Converter::> is reserved by convention from
+  now on. A converter \C<pp2xyz> should use \C<PerlPoint::Converter::pp2xyz>.
+
+
+===Misc
+
+* installation message now contains package version;
+
+* slight internal optimizations;
+
+* Dealing with tags, tag parsing was optimized in general:
+  it is no longer necessary to guard "<" characters in a tag body.
+  (Unfortunately, this is not true yet for ">". ;-)
+
+<<EOE
+
+  # up to 0.34
+  \I<\<>
+  \B<5\<=\>10>
+
+  # with 0.34 and above
+  \I<<>
+  \B<5<=\>10>
+
+EOE
+
+* Added support for \I<hierarchical> internal links: if several headline
+  titles are identical, it is complicated to point to one of them. An
+  hierarchical link includes the "path" of the headline, which means
+  all its superlevels, separated by a pipe character.
+
+  \\SECTIONREF{name="\B<Level 1 | Level 2 | Target>"}
+  \\SECTIONREF{name="\B<Level 1 | Level 2 | Level 3 | Target>"}
+
+* Implemented first functions of a simplified condition interface
+  which is intended to allow non (Perl) programming users to learn
+  and perform common checks easily. The first function \BC<flagSet()>
+  checks if a certain setting was made. Dealing with Safe was tricky again
+  (and therefore this function has no parameter check), but finally
+  there's a working version!
+
+  old:
+
+   ? exists $PerlPoint->{userSettings}{myFlag}
+
+  new:
+
+   ? \B<flagSet(>myFlag\B<)>
+
+* There's another function \BC<varValue()> providing the value of
+  a passed variable, so now you can write conditions like
+
+   ? \B<varValue(>'privateVar'\B<)> eq 'confidental'
+
+* Text (and derived) paragraph stream representations no longer contain
+  a final whitespace (which was made from the final carriage return character
+  before the paragraph closing empty line). (This might be called a bugfix
+  as well, but the trailing whitespace was never noticed as a bug and caused
+  no trouble.)
+
+* new headline level offset keyword "CURRENT_LEVEL" in PP file imports;
+
+
+==pp2sdf
+
+* Adapted to all modifications mentioned above where appropriate.
+  Option \C<-allTags> is deprecated.
+
+* Predeclares variables \B<\$CONVERTER_NAME> and
+  \B<\$CONVERTER_VERSION>.
+
+* Unnecessary paragraph prefix backslashes are avoided in examples
+  and inlined HTML paragraph startups now.
+
+* Now emulates the behaviour of \C<pp2html> to implicitly make
+  a headline an anchor which can be used as a hyperlink target.
+
+* Now supports \C<pp2html> tags \C<\\A>, \C<\\L>, \C<\\PAGEREF>,
+  \C<\\SECTIONREF>, \C<\\U> and \C<\\XREF>, .
+  This support is not perfect yet for \C<\\L> and \C<\\PAGEREF>,
+  but even there a quite useful approximation which should work
+  better than the old behaviour which did in fact replace all
+  these tags by \I<nothing>.
+  This crossconverter support is as well an example how the new
+  tag definitions can be used to interchange tag syntax declarations.
+
+* pp2sdf is no longer called alpha code.
+
+
+
+=0.33
+
+==Bugfixes
+
+* the value of an variable can now begin with any character:
+
+  $var=/usr/local
+
+* There was still a bug in continued list handling: if continuing
+  points were restored from cache they contained the \I<old>
+  level hint, so if one inserted points before this one after the
+  cache entry was built, the continuing point was restored at a
+  wrong level. This is fixed.
+
+* POD fix: \C<vispro> option of the \C<run()> method works on
+  base of \I<chapters>, not paragraphs.
+
+* If embedded Perl code replied an undefined value this thing
+  was tried to be parsed which caused a perl warning. Now it's
+  completely legal to embed such code, which is especially useful
+  to prepare variables or functions.
+
+* Starting an ordered list by a continuing point (using "##")
+  caused a perl warning. Code fixed.
+
+
+==Features
+
+* Installation now explicitly requires \C<fields.pm> 1.00. I'm not
+  sure if this was the first version of \C<fields> that contained
+  \C<phash()> but it should certainly be a version providing it.
+  An additional requirement hint was added to \C<README>.
+
+* The backend now provides optional process visualization as well
+  as the parser.
+
+* There's a new mailing list. Send an empty message to
+  \C<perlpoint-subscribe@perl.org> to subscribe.
+
+
+==pp2sdf
+
+* adapted to the new backend feature of process visualization;
+
+
+=0.32
+
+==Bugfixes
+
+* README adapted to new pp2sdf installation performed since 0.31;
+
+* Lorenz recognized that macro results sometimes differed from
+  plain usage of the replacements, investigation showed that
+  this was the case if a macro was used without body, for reasons
+  of parsing. The result was that the token after the bodyless
+  macro was parsed before the macro replacement, resulting in
+  sometimes confusing output. (As a workaround, one could use
+  a meaningless body like in \C<\\MACRO\<_\>>.)
+  To make a long story short, the error is fixed with 0.32, so the
+  stream should be correct now even when bodyless macros were used
+  as in \C<\\MACRO\\MACRO\\MACRO\\MACRO\\MACRO\\MACRO\\MACRO>.
+
+* made Changelog pasing the parser again;
+
+
+==Features
+
+* Jeffrey S. Haemer suggested to extend \C<\\INCLUDE> so that external
+  scripts can be placed into PerlPoint without the need to copy their
+  contents and paste it into the presentation source. To relieve
+  presentation authors this way, \C<\\INCLUDE> now supports a special
+  file type of \B<example>.
+
+  \\INCLUDE{\B<type=example> file=script}
+
+* The example is included as a verbatim block. Its lines can be
+  indented by the new special option \B<indent>:
+
+  \\INCLUDE{type=example file=script \B<indent=2>}
+
+* slightly rearranged \C<doc/parser-tags.pp> when adding the
+  example extension;
+
+
+=0.31
+
+==Bugfixes
+
+* fixed POD to be more readable by pod2man (detected by Lorenz);
+
+* bugfix: in special constallations it could happen that
+  headlines after file inclusion with \C<headlinebase=CURRENT_LEVEL>
+  were detected at wrong levels;
+
+* the internal list counter of ordered lists used to find out where
+  a continued list restarts is now reset when a new lists begins
+  (as Lorenz detected, it was not reset correctly before);
+
+* Circular inclusion of PerlPoint sources was blocked too strictly:
+  every source was accepted only once. Now there's a better
+  algorithm checking real nesting: you can use a source file
+  as often as necessary, but not nested.
+
+
+==Features
+
+* added a \B<vim> syntax highlighting file to the \C<utilities>
+  directory, provided by \I<Lorenz Domke> (lorenz.domke@gmx.de);
+
+* Ordered lists now provide the startup level, additionally
+  to the first point which already did this if the list was
+  continued by \C<##>. This makes it easier for translator
+  authors to begin the list by a certain number if necessary.
+
+* added a tiny editing hint to the docs (FAQ);
+
+* added \B<Emacs> lisp code in the \C<utilities> directory as an example
+  how the \C<hilit19> module could be extended for PerlPoint;
+
+* improved \C<Changelog> structure;
+
+* adapted \C<parser-paragraphs.pp> documentation slightly;
+
+* New option \BC<smart> makes the \C<\\INCLUDE> tag
+  working like Perl's \C<require> or \C<use> for nested
+  PerlPoint sources: the file is only read unless it was
+  already seen before.
+
+   \\INCLUDE{type=pp file="macros.pp" \B<smart=1>}
+
+* This feature is \I<not> intended for translated paragraphs but
+  especially useful to make macros available by separate source
+  files included whereever necessary, and to nest source parts
+  which \I<both> load such definitions.
+
+
+==pp2sdf
+
+* pp2sdf: all generated text paragraphs now begin with a backslash
+  to avoid unintended paragraph style interpretation by sdf
+  in case a colon follows the first word like in
+
+     Remember: think twice.
+
+* The only exceptions of this rule are made if the first word
+  is "Note" or "Sign" because the special SDF formattings seem
+  to make sense then.
+
+* pp2sdf is now installed automatically by "make install";
+
+
+=0.30
+
+==Bugfixes
+
+* fixed a bug detected by \I<Lorenz Domke> (lorenz.domke@gmx.de):
+  embedded code can now be included into tags;
+
+* \I<Lorenz Domke> (lorenz.domke@gmx.de) detected unhandled macro
+  modifications when caching was active. I figured out that this
+  really can happen under the following rare circumstances:
+
+>
+
+* You use a string looking like a tag name not currently known
+  as tag or alias and precede it by a backslash, like \C<\\NOALIAS>.
+  The paragraph does not contain any dynamically changing contents.
+
+* Now you proceed the text with active cache. Because the paragraph looks
+  perfectly static it is cached.
+
+* You declare a new alias \C<\\NOALIAS>. The paragraph remains unchanged.
+
+* Now the next time this text is processed with active cache its
+  checksum matches the paragraph stored before. The stream is restored
+  and the new alias is ignored until eiher the paragraph changes or the
+  cache is cleaned up.
+
+<
+
+* Well, this is not perfect. Users should know this at least, so I added
+  a suggestion to clean up the cache after introducing new alias definitions.
+
+
+==Features
+
+* variable settings can be propagated into the stream now;
+
+* improved syntactical error messages;
+
+* According to the PerlPoint language definition tag
+  recognition is now strictly limited to capitals and underscores
+  (previous versions accepted lowercase letters in tag names as well).
+  The restriction makes it easier to use backslashed strings when
+  \I<all> tags are accepted. Formerly, one had to write
+
+    This is \\\\no_tag, be sure!
+
+* Now this can be written
+
+    This is \\no_tag, be sure!
+
+* and only capitalized backslashed strings are still to be guarded:
+
+    This is \\\\NO_TAG, be sure!
+
+* As before, this has only to be taken into account if
+  users prefer to accept everything looking like a tag as a tag
+  (see \C<\\ACCEPT_ALL> for details).
+
+* Consequently, lowercased letters in alias/macro definitions
+  are no longer valid. They are accepted but automatically converted
+  into capitals, while the parser displays a warning.
+
+
+
+==Internals
+
+* internal code cosmetics;
+
+
+==pp2sdf
+
+* "}" characters outside verbatim blocks and embedded HTML
+  are now replaced by SDF escape \C<{{CHAR:rbrace}}> to guard
+  translations of things like \C<\\B\<{key=\>value}\>>
+
+
+
+=0.29
+
+==Features
+
+* modified the parser module a way that its version can be
+  displayed by CPAN;
+
+* New common way to pass basic data to active contents:
+  translator authors can pass a hash of settings which is
+  mirrored in the active contents namespace as \C<\B<%$PerlPoint>>.
+  This makes it easy to pass things like the current target
+  language or call specific user settings.
+
+* Two conventions are already introduced: \I<targetLanguage>
+  and \I<userSettings> (allowing users to control the translation
+  process more detailled by passing simple translator options).
+
+* See \B<pp2sdf> for an example of usage.
+
+* Simplified backslash handling in macros. Before 0.29, each
+  macro level (and each tag level in the macro replacement,
+  of course) added a need of yet another backslash before closing
+  angle brackets (and literal backslashes) in the targetted text,
+  making it difficult to nest a number of macros (especially
+  if they were declared by others).
+
+* So, until now, one had to write
+
+<<EOE
+    \I<$var-\>{key}>
+    \I<\B<$var-\>{key}>>
+EOE
+
+* but
+
+<<EOE
+    \I<$var-\>{key}>
+    \MACRO<\I<$var-\\\>{key}>>
+    \MACRO<\MACRO<\I<$var-\\\\\\\>{key}>>>
+EOE
+
+* - not really handable. And inconsistent (nested \I<tags> never
+  required aditional backslashes, but macros did).
+
+* From now on, only \I<one> backslash is necessary \I<ever>:
+
+<<EOE
+    \I<$var-\>{key}>
+    \I<\B<$var-\>{key}>>
+
+    \MACRO<\I<$var-\>{key}>>
+    \MACRO<\MACRO<\I<$var-\>{key}>>>
+EOE
+
+* \B<Note: existing PerlPoint sources might have to be updated.>
+
+* Accelerated macro handling - earlier versions used to \I<reparse>
+  a macro body which delayed parsing in case of deep macro nesting.
+  From now on, every token is only parsed \I<once>.
+  As an additional benefit, a significant amount of code could be
+  removed and the backend module needs no longer to be used by the
+  parser which accelerates startup time of translators in general.
+
+
+==pp2sdf
+
+* pp2sdf target code embedding is now restricted to SDF and
+  HTML, but these both \I<are> officially supported now (as
+  well as Perl, of course ;-);
+
+
+=0.28
+
+* removed an old POD headline prefix in README which caused
+  CPAN to run pod2html (and to display the related section only)
+
+* made it backwards compatible to perl 5.00503 again;
+
+
+=0.27
+
+* module namespace changed from "PP" into "PerlPoint";
+
+* first CPAN release;
+
+
+=0.26
+
+==Bugfixes
+
+* bugfix in active contents handling: it might happen that
+  lines were ignored;
+
+* bugfix in dynamic contents handling: nested dynamic contents
+  (resolved macros, embedded parts, included parts) might not
+  be handled in the correct order;
+
+* The cache now considers headline level offsets of nested sources.
+  Before 0.26 it might happen that the headline level offset was
+  modified but an \I<old> offset was restored from cache.
+
+* \B<The cache format was modified. You \I<can> still use existing
+  cache files but old data therein will never be referenced. To
+  clean up old caches just remove them or use the parsers cleanup
+  facility.>
+
+
+==Features
+
+* new utilities directory, providing a NoteTab clipbook file
+  initially;
+
+* new dynamic FAQ document;
+
+* new headline level offset keyword "CURRENT_LEVEL" in
+  PP file imports;
+
+* The parser now changes into the directory of a sourcefile
+  when it is processed. This way nested sources can always
+  use relative pathes, so assembling a patchwork document
+  becomes easier. \B<Existing sources including files from
+  other directories may have to be adapted!>
+
+* Example: if a source located in \C<subdir> is processed
+  and includes
+
+      \\INCLUDE{type=pp file="\B<subdir/>subdoc.pp"}
+
+* to nest a file in its own directory, \C<subdir> had to
+  be specified because all pathes were relative to the parsers
+  startup directory. This was not very logical and made it
+  hard to combine nested sources.
+
+* Now the parser changes into the source directory, which
+  means that nested source pathes are relative to the path
+  \I<of the including PerlPoint file>, in our example:
+
+      \\INCLUDE{type=pp file="subdoc.pp"}
+
+* the package now explicitly requires perl 5.6;
+
+
+==pp2sdf
+
+* pp2sdf: avoid unintended SDF phrases (\C<P\<something\>>)
+  now by generating "<" as "{{CHAR:lt}}" (outside verbatim
+  blocks);
+
+
+=0.25
+
+* completed prerequisites list in Makefile.PL;
+
+* added notes about Storable updates to parser documentation;
+
+* cache bugfix;
+
+* trace code bugfix;
+
+* added a new demo application pp2sdf which is a complete
+  translator;
+
+* process visualization: bugfix and improvements;
+
+* new experimental tag setting "\ACCEPT_ALL" switches to a
+  "anything that looks like a tag is processed as a tag" mode
+  to simplify source translation by tools implementing different
+  tag sets;
+
+
+=0.24
+
+* new checksum based incremental parsing accelerates updates
+  (depending on the document structure);
+
+* ordered list can be continued now: simply use \C<##> instead
+  of \C<#> to continue a previously opened list \I<in the same chapter>
+  (needs translator updates to take visible effect);
+
+* new \C<run()> option \C<"vispro"> to activate process visualization;
+
+
+=0.23
+
+* several fixes in embedded code handling, tables can now
+  be inserted dynamically;
+
+* providing a new basic PerlPoint documentation about
+  active contents;
+
+* new trace mode TRACE_ACTIVE (active contents evaluation);
+
+* improved README file;
+
+
+=0.22
+
+* the include directive has a new optional headline level
+  offset parameter;
+
+* several slight bugfixes in trace modes;
+
+* when reading included files, the main file handle is now
+  closed instead of duplicated and reused - perl5.6 run
+  into difficulties in some cases (if several files were
+  included, the file pointer seemed not to reset correctly
+  while switching back to the original handle);
+
+* now providing basic PerlPoint documentation in new "doc"
+  directory, may be included into translator docs;
+
+* added a first README version;
+
+
+=0.21
+
+* completed table paragraph implementation according to the
+  design paper: first row is now automatically streamed as
+  "table headline" (it is up to the backend to format such
+  table cells as it wishes);
+
+* added macro (or alias) feature, call it still experimental
+  because there might still be untested cases;
+
+
+=0.20
+
+* table \I<paragraphs> are implemented now;
+
+
+=0.19
+
+* new condition paragraphs which allow to maintain presentation
+  versions in several languages by one source file, for example;
+
+* bugfix in table handling: table stream structure was wrong
+  (the bug was discovered by \I<Lorenz Domke> (lorenz.domke@gmx.de));
+
+
+=0.18
+
+* fixed an error in Makefile.PL comment;
+
+* embedded Perl code is evaluated now (in a safe, user
+  configurable environment);
+
+* Perl code can now be included as well as embedded;
+
+* PerlPoint can now be embedded as well as included;
+
+* variables are made accessible by included or embedded Perl code;
+
+* added a simple visualizer to the demo directory (pp2tree);
+
+* new optional source line hints in the stream;
+
+* bugfix: backslashes in embedded parts shall not be special
+  (as they were);
+
+* new multi level list shifts (e.g. "<2"), level is optional and
+  defaults to 1;
+
+
+=0.17
+
+* Bugfix release: if a paragraph started with a tag, paragraph
+  openers (like "*", "#", "-" and so on), they were handled as
+  special characters until the tag was closed, which made them
+  invalid inside the tag. Thanks to \I<Lorenz Domke>
+  (lorenz.domke@gmx.de) for the bug report.
+
+* There was also a bug in tag handling which could be fixed by
+  the way.
+
+
+=0.16
+
+* added a tag test which demonstrates the usage (and function)
+  of string parameters ;
+
+* the grammar file became part of the distribution;
+
+* updated parser documentation;
+
+* definition list items were plain strings before, now they are
+  streamed input which means that they can contain tags, for example
+  (thanks to \I<A. Sigel> for the suggestion);
+
+* Added a filter feature to run(). The parser can now suppress
+  included or embedded code of a language different from the
+  target one. Embedded HTML code, for example, makes no sense
+  in a stream passed to a backend which generates LaTeX or PostScript.
+
+
+=0.15
+
+* this is just another attempt to make the package 5.005 clean ...
+  thanks to \I<Lorenz Domke> (lorenz.domke@gmx.de) for his tests;
+
+* added the Changelog part of 0.14 which was prepared but not
+  delivered with 0.14;
+
+
+=0.14
+
+* improved handling of special characters, as a consequence,
+  only backslashes should have to be guarded by a backslash
+  now if they should stay for itself (except of in the
+  beginning of a new paragraph where a number of special
+  characters have to be recognized);
+
+* added new demo script pp2pp in a first version which
+  successfully processes Changelog and TODO file;
+
+* bugfixes: stream contained trailing whitespaces for
+  list points and headlines;
+
+* bugfix: empty lines in verbatim blocks were not streamed;
+
+* bugfix: stream contained leading newline for verbatim blocks;
+
+
+=0.13
+
+* made it backwards compatible with perl 5.00503 again
+  (until more people will have 5.6.1);
+
+
+=0.12
+
+* added demo translator pp2pod;
+
+* leading spaces in list points are ignored now;
+
+* various bugfixes in parser behaviour (success flags);
+
+* made the Changelog file passing the parser ;-)
+
+
+=0.11
+
+* added embedding (enclosed blocks of foreign code);
+
+* added including (embedded files);
+
+* added a first version of tables;
+
+
+=0.10
+
+* fixed various block bugs detected by \I<Lorenz Domke>
+  (lorenz.domke@gmx.de): verbatim block opener was supplied in stream in 0.09,
+  first indentation in blocks was not supplied;
+
+
+=0.09
+
+* started Changelog;
+
+* verbatim blocks now start with a "here document" hint immediately;
+
+* new "definition list point" paragraphs;
+
+* safer tests;
+
+* streamed lists are embedded into list directives now;
+
+* modified syntax of verbatim blocks;
+
+* added variables;
+
+* modified tag syntax: TAG<body> => \\TAG[{parlist}][<body>];
+

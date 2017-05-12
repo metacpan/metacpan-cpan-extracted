@@ -1,0 +1,47 @@
+=encoding utf8
+
+Puede leer este archivo en cualquier editor de texto (verá algunos caracteres
+extraños, pero puede ignorarlos). Está escrito en formato POD (vea
+pod/perlpod.pod), un formato diseñado específicamente para ser legible tal
+cual.
+
+=head1 NAME
+
+perlopenbsd - Perl versión 5 en sistemas OpenBSD
+
+=head1 DESCRIPCIÓN
+
+En este documento se describen varias características de OpenBSD que afectan a
+la compilación y ejecución de Perl versión 5 (en lo sucesivo, Perl).
+
+=head2 OpenBSD vuelca la memoria de trabajo desde getprotobyname_r y getservbyname_r con ithreads
+
+Si Perl está configurado para usar ithreads, las llamadas a biblioteca
+reentrantes tendrán preferencia sobre las versiones no reentrantes. En las
+versiones 3.7 y posteriores de OpenBSD existe una incompatibilidad en las
+funciones C<getprotobyname_r> y C<getservbyname_r> que provocará un SEGV si se
+llama a estas funciones sin haber aplicado antes la función C<bzero> a sus
+estructuras de retorno. Este problema está solucionado en la versión actual
+de Perl, pero afecta a las versiones antiguas (5.8.6 o anteriores) que se
+hayan compilado con compatibilidad con hilos de ejecución. Si desea ejecutar
+una versión de Perl compatible con hilos de ejecución en OpenBSD 3.7 o
+posterior, tendrá que actualizar a Perl 5.8.7 como mínimo.
+
+=head1 AUTOR
+
+Steve Peters <steve@fisharerojo.org>
+
+Para notificar errores, actualizaciones o sugerencias, utilice la dirección
+F<perlbug@perl.org>.
+
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

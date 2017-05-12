@@ -1,0 +1,232 @@
+=encoding utf-8
+
+=for stopwords
+	YAMASHINA
+	Hio
+	AnnoCPAN
+	CPAN
+	RT
+	TODO
+	ja.utf8
+	makelinktext
+	parseLang
+	textblock
+
+=head1 名前
+
+Pod::MultiLang_ja - 多言語対訳Pod
+
+=head1 バージョン
+
+Version 0.14
+
+
+=head1 概要
+
+  use Pod::MultiLang::Html;
+  my $parser = Pod::MultiLang::Html->new(langs=>[qw(ja en)]);
+  $parser->parse_from_file($infile,$outfile);
+
+=head1 説明
+
+pod の装飾符号として, pod 内に複数言語での対訳を記述するために
+JZ<><> を拡張定義します. 
+訳文は JZ<><> という整形符号で囲みます.
+見出しによく使われる単語は自動で訳がつきます.
+これは公式な装飾符号ではなく独自に拡張しているものです.
+
+LZ<><|/> には,
+
+ J<<< ja;
+ L<< text | page /"heading J<ja; japanese heading >" >>
+ >>>
+
+という風に記述します.
+見出し部分にはデフォルトの言語からリンクidが生成されるためです.
+
+連続する直述段落は空行を挟んで１つに連結されます.
+
+=head1 例
+
+(with ja.utf8)
+
+
+  =head1 NAME
+  
+  Example - Example document
+  J<< ja;Example - サンプル >>
+
+  =head1 SEE ALSO
+  
+  L<example/somewhere>
+  J<<< ja;
+  L<< example/somewhere J<ja;どこか> >>
+  >>>
+  
+  =cut
+
+sample output.
+
+
+ en:NAME
+ ja:名前
+ en:  Example - Example document
+ ja:  例 - サンプル
+ en:SEE ALSO
+ ja:関連項目
+ en:  "somewhere" in example (linkto:example/somewhere)
+ ja:  example 内 "どこか" (linkto:example/somewhere)
+
+=begin COMMENT
+
+JZ<><<>>の外をデフォルト言語にして処理.
+
+
+  content
+  J<< xx;content-in-xx >>
+
+とあったときに,
+
+
+  J<< (default-lang);content >>
+  J<< xx;content-in-xx >>
+
+で処理.
+でも,
+
+
+  content
+
+だけなら, 言語指定なしでそのまま
+
+
+  content
+
+で出力.
+
+
+=end COMMENT
+
+=head1 今後の予定
+
+verbatim 段落の多言語化はまだ仕様化されていません.
+
+=begin COMMENT
+
+ default text.
+ 
+ =begin :block
+ 
+ =for mlpodopt lang ja
+ 
+  japanese verbatim block.
+
+ =for mlpodopt lang fr
+ 
+  un bloc verbatim en francais
+
+ =end :block
+
+=end COMMENT
+
+=head1 ユーティリティメソッド.
+
+=head2 makelinktext
+
+ $label = $parser->makelinktext($lang,$text,$name,$sec);
+
+$text が指定されていればそれを, なければ $name と $sec から $lang 用に
+作って返す.
+
+=head2 parseLang
+
+ ($lang,$text) = $parser->parseLang($data);
+ 
+  $parser->parseLang("ja; text"); ==> ('ja', 'text')
+
+=head1 メソッド
+
+=head2 new
+
+create new instance.
+
+
+=head1 OVERRIDES
+
+This module implements L<Pod::Parser>.
+
+
+=over 4
+
+=item begin_pod
+
+=item end_pod
+
+=item command
+
+=item textblock
+
+=item verbatim
+
+=back
+
+=head1 著者
+
+山科 氷魚 (YAMASHINA Hio), C<< <hio at cpan.org> >>
+
+=head1 バグ
+
+バグや要望は C<bug-pod-multilangt.cpan.org> 宛に
+報告してください. 若しくは
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Pod-MultiLang>.
+にある web インターフェースからでもかまいません. 
+そこから私に通知され, そして私が変更を行うことで報告頂いたバグの進捗を
+自動的にあなたに伝えるでしょう.
+
+=head1 サポート
+
+このモジュールのドキュメントは perldoc コマンドで見ることが出来ます.
+
+    perldoc Pod::MultiLang
+
+また, 以下の場所でも見ることが出来ます:
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Pod-MultiLang>
+
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Pod-MultiLang>
+
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pod-MultiLang>
+
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Pod-MultiLang>
+
+
+=back
+
+=head1 関連項目
+
+L<Pod::Parser>, L<Pod::MultiLang::Html>
+
+=head1 著作権及びライセンス
+
+Copyright 2006 YAMASHINA Hio, all rights reserved.
+
+
+このプログラムはフリーソフトウェアです. あなたは Perl と同じライセンスの
+元で再配布及び変更を行うことが出来ます. 
+原文:
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

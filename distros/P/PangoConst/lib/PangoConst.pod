@@ -1,0 +1,47 @@
+=encoding UTF-8
+
+=head1 NAME
+
+PangoConst - the Pango constants without Glib / Gtk2
+
+=head1 SYNOPSIS
+
+    use PangoConst;
+    use Pango;
+    # Don't need Gtk2 at all.
+
+=head1 DESCRIPTION
+
+This module copies the PANGO_* constants from L<Gtk2::Pango> so that
+you can use them without having to import/install the whole of Glib
+and Gtk2.
+
+Don't ask me what the PANGO_* constants are doing in Gtk2 rather than
+in L<Pango> itself. A quote from Gtk2::Pango's documentation: "This
+module shouldn't exist".
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head2 Request
+
+If you'd like to see this module continued, let me know that you're
+using it. For example, send an email, write a bug report, star the
+project's github repository, add a patch, add a C<++> on Metacpan.org,
+or write a rating at CPAN ratings. It really does make a
+difference. Thanks.
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+-2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

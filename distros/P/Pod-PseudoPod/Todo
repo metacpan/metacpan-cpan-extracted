@@ -1,0 +1,11 @@
+TODO list for Perl module Pod::PseudoPod
+
+- Handle X<> tags for html output. They should create an html anchor
+  (randomly generated number?), and an index list at the end of the
+  document.
+
+- Add a utility to generate a table of contents from a list of files
+  (module and script, probably).
+
+- Handle N<> tags so they output document-end footnotes instead of
+  inline text.

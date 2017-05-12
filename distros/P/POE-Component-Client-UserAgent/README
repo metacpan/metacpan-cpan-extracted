@@ -1,0 +1,85 @@
+POE::Component::Client::UserAgent
+---------------------------------
+
+POE::Component::Client::UserAgent is
+Copyright 2001-2010 Rocco Caputo <troc+pcua@pobox.com>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+Abstract
+--------
+
+POE::Component::Client::UserAgent is an asynchronous, event driven
+LWP and LWP::Parallel based user agent POE component. It lets other
+tasks run while making a request to an Internet server and waiting
+for a response, and it lets several requests run in parallel.
+
+Requirements
+------------
+
+This module requires POE, LWP and LWP::Parallel. The component
+requires POE version 0.1402 and LWP::Parallel version 2.51,
+which in turn requires LWP version 2.52 or 2.53.
+
+Availability
+------------
+
+The most recent POE::Component::Client::UserAgent version
+is available on CPAN:
+
+http://search.cpan.org/search?dist=POE-Component-Client-UserAgent
+
+Installation
+------------
+
+Create a makefile:
+
+  perl Makefile.PL
+
+Install the module:
+
+  make install
+
+Alternatively you can install the component using CPAN shell.
+
+You can also extract the archive manually. The component is written
+entirely in Perl and requires no compilation.
+
+Testing
+-------
+
+Run all test scripts:
+
+  make test
+
+If any of the test scripts fails, please run the script like so:
+
+  perl 00test.t 9
+
+where 00test.t is the name of the script that fails and the number
+9 is the debug level. This will create a file with the same name
+as the script and a .log extension. Then send the .log file to the
+component author.
+
+Usage
+-----
+
+An example of usage is found in the built in POD documentation.
+
+Test scripts are also good examples of the component usage.
+
+See Also
+--------
+
+We recommend POE::Component::Client::HTTP as an alternative to this
+module.
+
+POE
+http://poe.perl.org/
+
+LWP
+http://www.linpro.no/lwp/
+
+LWP::Parallel
+http://www.inf.ethz.ch/~langhein/ParallelUA/

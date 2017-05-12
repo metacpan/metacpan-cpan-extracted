@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Pod/Perldoc/Cache.pm
+minil.toml
+t/00_compile.t
+t/01_cache_dir.t
+t/02_calc_pod_md5.t
+t/03_cache.t
+t/Helper.pm
+META.yml
+MANIFEST

@@ -1,0 +1,84 @@
+NAME
+    PYX::SGML::Raw - Processing PYX data or file and write as SGML.
+
+SYNOPSIS
+     use PYX::SGML::Raw;
+     my $obj = PYX::SGML::Raw->new(%parameters);
+     $obj->parse($pyx, $out);
+     $obj->parse_file($input_file, $out);
+     $obj->parse_handle($input_file_handler, $out);
+
+SUBROUTINES
+    "new()"
+             Constructor.
+
+            *       "output_handler"
+
+                     Output handler.
+                     Default value is \*STDOUT.
+
+    "parse($pyx[, $out])"
+             Parse PYX text or array of PYX text.
+             Output is serialization to SGML.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+    "parse_file($input_file[, $out])"
+             Parse file with PYX data.
+             Output is serialization to SGML.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+    "parse_handler($input_file_handler[, $out])"
+             Parse PYX handler.
+             Output is serialization to SGML.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use PYX::SGML::Raw;
+
+     # Input.
+     my $pyx = <<'END';
+     (element
+     -data
+     )element
+     END
+
+     # Object.
+     my $obj = PYX::SGML::Raw->new;
+
+     # Process.
+     $obj->parse($pyx);
+     print "\n";
+
+     # Output:
+     # <element>data</element>
+
+DEPENDENCIES
+    Class::Utils, PYX::Parser, PYX::Utils.
+
+SEE ALSO
+    Task::PYX
+        Install the PYX modules.
+
+AUTHOR
+    Michal Špaček skim@cpan.org.
+
+LICENSE AND COPYRIGHT
+     © 2011-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.02
+

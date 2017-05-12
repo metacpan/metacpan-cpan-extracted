@@ -1,0 +1,35 @@
+Padre::Plugin::InstallPARDist
+
+A plugin for Padre to install PAR archives into
+a local installation of perl from within the editor.
+
+Installation should be done with the standard installation tools
+CPAN.pm or CPANPLUS
+
+Install Padre
+Install LWP
+Install ExtUtils::InferConfig
+Install PAR::Dist
+Install Padre::Plugin::InstallPARDist
+
+-----------------------------------------------------------------------
+If you decide to install the plugin manually, you can do the following
+instead of installing the module into a normal Perl library path:
+
+- Install the prerequisite modules.
+
+- Run:
+
+perl Build.PL
+./Build
+
+- To install the plugin as a single binary for the current user, run:
+
+./Build installplugin
+
+This will install the plugin as InstallPARDist.par into your user's ~/.padre/plugins
+directory.
+
+Similarly, "./Build plugin" will just create the InstallPARDist.par which you can
+then copy manually.
+

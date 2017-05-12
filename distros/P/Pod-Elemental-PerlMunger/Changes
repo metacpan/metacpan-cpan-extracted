@@ -1,0 +1,52 @@
+Revision history for Pod-Elemental-PerlMunger
+
+0.200006  2016-04-24 19:22:40+01:00 Europe/London
+        - strip leading BOM (well, U+FEFF) from input
+        - pass text, not bytes, to PPI
+
+0.200005  2016-04-24 16:17:30+01:00 Europe/London
+        - avoid double-decoding; new pod is already text
+
+0.200004  2016-04-24 10:50:23+01:00 Europe/London
+        - decode the fully new document, not just the Perl part
+          (thanks, van-de-bugger and perlancar)
+
+0.200003  2015-07-17 18:29:02-04:00 America/New_York
+        - replace use of List::AllUtils with List::Util
+
+0.200002  2014-03-20 19:13:01-04:00 America/New_York
+        - the comment replacer now uses "#pod" not "#" to build replacement
+          text, making it easier to strip out with grep (thanks, Karen
+          Etheridge)
+
+0.200001  2014-01-12 15:46:22-05:00 America/New_York
+        - there's now also a post_code_replacer, used to generate replacements
+          for Pod removed after the final bits of code, in case you were only
+          worried about affecting code line numbers
+
+0.200000  2014-01-11 14:23:46-05:00 America/New_York
+        - it's now possible to replace Pod with something rather than nothing
+          when it's extracted from your document; check out the "replacer"
+          attribute
+
+0.100000  2014-01-07 20:02:01-05:00 America/New_York
+        - encode character string input into octets for PPI, then ensure output
+          is also characters
+
+0.093333  2013-10-09 17:17:00 America/New_York
+          update bugtracker and repo data
+
+0.093332  2012-08-24 21:03:56 America/New_York
+          if there's nothing after __END__ but whitespace (after removing POD)
+          then place the munged POD there.  Also, place a blank line
+          between __END__ and the POD (thanks, Christopher J. Madsen!)
+
+0.093331  2011-09-19 15:52:00 America/New_York
+          some speed improvements by changing how we use PPI (thanks, Dave
+          Rolsky!)
+
+0.093330  2009-11-29 08:43:08 America/New_York
+          throw exception if PPI parsing fails
+
+0.093020  2009-10-28
+          first release

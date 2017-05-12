@@ -1,0 +1,99 @@
+[%#
+#
+# Copyright (c) 2005 IBM Corporation.
+#
+# All rights reserved. This program and the accompanying materials
+# are made available under the terms of the Eclipse Public License v1.0
+# which accompanies this distribution, and is available at
+# http://www.eclipse.org/legal/epl-v10.html
+# 
+# File:        $Source: /var/lib/cvs/ODO/lib/ODO/Ontology/RDFS/Templates/Constructor.tt,v $
+# Created by:  Stephen Evanchik( <a href="mailto:evanchik@us.ibm.com">evanchik@us.ibm.com </a>)
+# Created on:  03/02/2005
+# Revision:	$Id: Constructor.tt,v 1.5 2009-11-24 16:44:18 ubuntu Exp $
+# 
+# Contributors:
+#     IBM Corporation - initial API and implementation
+#
+%]
+#
+# Description: [%- description %]
+#
+# Schema URI: [%- schemaURI %]
+#
+sub new {
+	my $self = shift;
+	my ($resource, $graph, %properties) = @_;
+	
+	$self = $self->SUPER::new(@_);
+	
+	return undef
+		unless(ref $self);
+	
+	$self->propertyContainerName( '[%- propertyContainerName -%]' );
+	$self->properties(bless {}, '[%- propertyContainerName -%]');
+
+	$self->properties()->{'parent'} = $self;
+
+[% IF propertyInitializers %][% FOREACH init = propertyInitializers %]
+[% init %]
+[% END %][% END %]
+	return $self;
+}
+
+sub queryString {
+[% IF queryString %]	return '[%- queryString -%]';[% ELSE %]	return '';[% END %]
+}
+
+sub objectURI {
+	return '[% URI %]';
+}
+
+sub value {
+	my $self = shift;
+	
+	return $self->subject()
+		if(UNIVERSAL::isa($self->subject(), 'ODO::Node::Literal'));
+	
+	return $self->__to_statement_array();
+}
+
+sub __to_statement_array {
+	my $self = shift;
+	
+	my $statements = [];
+	
+	foreach my $my_super (@ISA) {
+	
+		next
+			unless(UNIVERSAL::can($my_super, '__to_statement_array'));
+		
+		my $super_func = "${my_super}::__to_statement_array";
+		push @{ $statements }, @{ $self->$super_func() };
+	}
+	
+	my %properties = (''=> '',[% FOREACH p = properties %] '[%- p.shortName -%]'=> '[%- p.packageName -%]', [% END %]);
+	
+	foreach my $propertyName (keys(%properties)) {
+
+		next 
+			unless($propertyName && $propertyName ne '');
+		
+		my $property = $self->properties()->$propertyName();
+		
+		foreach my $p (@{ $property }) {
+			my $p_value = $p->value();
+			
+			my $property_uri = ODO::Node::Resource->new($properties{$propertyName}->objectURI() );
+			if(UNIVERSAL::isa($p_value, 'ODO::Node::Literal')) {
+				push @{ $statements }, ODO::Statement->new($self->subject(), $property_uri, $p_value);
+			}
+			else {
+				push @{ $statements }, ODO::Statement->new($self->subject(), $property_uri, $p->subject());
+				push @{ $statements }, @{ $p_value };
+			}
+		}
+	}
+	
+	return $statements;
+}

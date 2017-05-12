@@ -1,0 +1,64 @@
+{
+   "abstract" : "Open a text file portably",
+   "author" : [
+      "Leon Timmermans <leont@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.120920",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PerlIO-text",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Encode" : "0",
+            "Errno" : "0",
+            "File::Find" : "0",
+            "File::Slurp" : "0",
+            "File::Temp" : "0",
+            "PerlIO::Layers" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-perlio-text at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=PerlIO-text"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/perlio-text.git",
+         "web" : "http://github.com/Leont/perlio-text"
+      }
+   },
+   "version" : "0.007"
+}
+

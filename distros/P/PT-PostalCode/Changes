@@ -1,0 +1,18 @@
+Revision history for Perl extension PT::PostalCode.
+
+0.03  Wed Nov 03 20:09:00 2004
+	- improved the documentation, explaining each function
+	- added pod.t and pod-coverage.t to the tests directory
+
+0.02  Thu Sep 30 23:20:31 2004
+	- Perl required version is now 5.006 (was 5.008)
+	- minor changes in the documentation
+	- added META.yml
+
+0.01  Thu May 15 20:34:31 2004
+	- first release ready
+
+0.01  Thu May 13 23:08:31 2004
+	- original version; created by h2xs 1.22 with options
+		-XAn PT::PostalCode
+

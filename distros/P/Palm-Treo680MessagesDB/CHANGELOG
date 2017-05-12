@@ -1,0 +1,10 @@
+1.02    2015-03-04      Update Palm::PDB dependency - its version
+                          seems to have gone Mysteriously Backwards;
+                        Suppress warnings from recent Data::Hexdumper
+
+1.01    2009-04-10      Added doco on record formats;
+                        Fix bug that only showed up on Win32
+                        Add data and tests (currently skipped) for
+                          MMS support - but no code for 'em yet
+
+1.0     2008-07-10      Original release

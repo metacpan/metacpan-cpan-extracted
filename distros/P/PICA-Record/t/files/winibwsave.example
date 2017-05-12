@@ -1,0 +1,56 @@
+SET: S1 [1] TTL: 1            PPN: 475063376                            SEITE1 .
+
+001@ ƒ050
+001A ƒ00023:16-12-04
+001B ƒ00023:27-04-06ƒt15:27:59.000
+001D ƒ00023:16-12-04
+001U ƒ0utf8
+001X ƒ00
+002@ ƒ0Oau
+003@ ƒ0475063376
+008@ ƒbee
+009A ƒbdeƒcHAB WolfenbüttelƒaM: Mb 2ÿê 5
+009P/03 ƒS1ƒ0htmlƒahttp://diglib.hab.de/drucke/mb-2f-5/start.htm
+010@ ƒafre
+011@ ƒa1781
+011B ƒa2004
+013@/00 ƒ0o3
+016H ƒ0Elektronische Ressource
+019@ ƒaXA-FR
+021A ƒaL' @Anatomie Universelle De Toutes Les Parties Du Corps Humain, Représentée en Figures, & exactement expliquée,ƒhPar le celebre André Du Laurent. Revuë par M. H****, Chirurgien Juré de St. Cosme.
+028A ƒdAndréƒaDu Laurentƒ9133794350ƒ8André@Du Laurens  ; PND-ID: 100183433
+028C/00 ƒ5H****ƒ9142031909ƒ8@H****"
+028L/02 ƒdJ.ƒaValletƒBBeitr. k
+032C ƒa[Electronic ed.]
+033A ƒpParisƒnCrépy
+033B/01 ƒpWolfenbüttelƒnHerzog August Bibliothek
+033J ƒ9474151611ƒ8...@Crépy. - Paris (1781)
+033P ƒpWolfenbüttelƒnHerzog August Bibliothek
+034D ƒa55 S
+034I ƒa2ÿê
+034M ƒazahlr. Ill. (Kupferst.)
+036L/00 ƒaDigitalisierung naturwissenschaftlicher, technischer und medizinischer Texte der Leibnizzeit, Projekt der Herzog August Bibliothek
+037A ƒaEnth. nur gestochenen Text
+037H ƒaDigitalisierungsvorlage: Original
+037I ƒaHerzog August Bibliothek Wolfenbüttel
+044S ƒ7Anatomie
+046G ƒaAutopsie nach Ex. der HAB Wolfenbüttel
+046H ƒaVorlageform des Erscheinungsvermerks: A Paris, Chez Crépy, ruë St. Jacques, près la ruë de la Parcheminerie. à St. Pierre. Avec Approbation et Privilege du Roy. M.D.C.C. L.XXXI.
+[0023      ] hab wolfenbüttel <23>
+101B ƒ027-04-06ƒt15:27:59.000
+101D ƒ027-04-06ƒb2039ƒa0023
+101U ƒ0utf8
+145Z/00 ƒ9508389976ƒ8MED Ba. 4 Lehrbücher [einschl. Tafelwerke]
+208@/01 ƒa16-12-04ƒbk
+201B/01 ƒ016-12-04ƒt10:36:59.000
+201D/01 ƒ016-12-04ƒb2000ƒa0023
+201U ƒ0utf8
+203@/01 ƒ068958427X
+209A/01 ƒaM: Mb 2ÿê 5ƒx03
+209R/01 ƒS1ƒ0htmlƒahttp://diglib.hab.de/drucke/mb-2f-5/start.htm
+237A/01 ƒaStempel: Bibliotheca Colleg: Anatom-Chirurg[...] Brunsvicensis
+244Z/01 ƒaProvenienz: Herzogliches Collegium Anatomico-Chirurgicum <Braunschweig> / Bibliothek / Stempelƒx00
+244Z/01 ƒ9474151948ƒ8|k|Herzogliches Collegium Anatomico-Chirurgicum <Braunschweig> / Bibliothekƒx80
+
+
+

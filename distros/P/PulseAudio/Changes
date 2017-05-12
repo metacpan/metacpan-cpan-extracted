@@ -1,0 +1,29 @@
+Revision history for PulseAudio
+
+0.07	3-22-2013
+			Made it spit out at least the key if object isn't found
+			Now we support hash arg to the exec for Sink and Source
+	
+0.06	12-28-2012
+			Updated Makefile.PL to `require_external_bin`
+
+0.05	12-27-2012
+			Fixed novice mistakes brought to light by SLAVEN (RT#82267)
+
+0.04	12-26-2012
+			updated exec commands to use fork-exec
+			fixed a few pod errors and pod links
+			added additional selectivity in get_$name_by & documented it
+
+0.03	12-25-2012
+			fixed the exec commands
+			attempted to fix pod by renaming pod/ to doc/
+			added a new role which objects do.
+
+0.02	12-25-2012
+			Updated pod, fixed the get_$name_by() to auto-generate, more tests.
+
+0.01	12-24-2012
+			Initial release, includes tests, most commands provided by `pacmd` and
+			base object types.
+

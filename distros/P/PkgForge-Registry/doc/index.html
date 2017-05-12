@@ -1,0 +1,174 @@
+<html>
+<head>
+<title>The Package Forge Registry</title>
+</head>
+<body>
+<h1>The Package Forge Registry</h1>
+
+<p>The Package Forge registry is designed to facilitate the scheduling
+and tracking of build jobs once they have been submitted. It does not
+necessarily contain everything which defines a job (e.g. the list of
+packages or instructions for the specific build daemons).</p>
+
+<p>Once a newly submitted <em>job</em> has been processed and accepted
+a set of associated <em>tasks</em> are registered, one per target
+platform and architecture. As well as the registry of jobs and tasks,
+the registry stores information on the supported platforms and the
+build daemons for those platforms. When a build daemon needs to find a
+new task or update the status of a task it talks directly to the
+database. For simplicity and safety, the database layer handles all
+the necessary locking, transactions and consistency checks, there is
+no middle layer of extra code.</p>
+
+<h2>The Schema</h2>
+
+<p>The full details of the <a href="pkgforge.html">database schema</a>
+are available or you can view a <a href="pkgforge.png">relationship
+diagram</a> generated using
+<a href="http://www.rbt.ca/autodoc/">postgresql_autodoc</a> and
+GraphViz.</p>
+
+<h2>Platforms</h2>
+
+<p>
+  In the Package Forge Registry a <em>platform</em> is a build target
+  which is uniquely identified by the combination of the <em>name</em>
+  and the <em>architecture</em>, for example <code>f13/i386</code>
+  or <code>sl5/x86_64</code>.
+</p>
+
+<p>
+  For new tasks to be registered for a platform it must be marked
+  as <em>active</em>. To maintain referential integrity, a platform
+  should <strong>never</strong> be removed once tasks have been
+  registered. If a platform is no longer supported it should be marked
+  as <em>inactive</em> (i.e. <em>active</em>) is false.
+</p>
+
+<p>
+  As well as the concept of a platform being <em>active</em> there is
+  a secondary attribute (named <em>auto</em>) which controls whether
+  or not tasks are registered for this platform by default. If a
+  platform is in the default set then tasks will be registered unless
+  a user has specifically requested that it should be ignored. If
+  the <em>auto</em> attribute is set to false (which is the default)
+  then a user must either specifically request that platform name or
+  must use the <em>all</em> string to show that tasks should be
+  registered for every active platform.
+</p>
+
+
+<h2>Builders</h2>
+
+<p>
+  In the Package Forge Registry a uniquely named <em>builder</em>
+  entry should exist for each build daemon. Typically, it is expected
+  that there will be one builder per platform but there are no
+  limits. It may well be that there is a period during which there are
+  no builders and new tasks will just be queued as long as the
+  platform is active. It is also possible to register extra builders
+  for a platform which can be used during busy times. Note that having
+  a builder registered does not necessarily mean it will take new
+  jobs. The builder has to have the necessary permissions to be able
+  to talk to the registry database and request new jobs, that must be
+  managed separately (normally via the LCFG postgresql component).
+</p>
+
+<p>
+  When a builder takes on a new task the ID is stored into
+  the <em>current</em> field and an entry is added into the <em>build
+  log</em>. Note that in some circumstances a builder is allowed to
+  give up on a job halfway through without considering this to be a
+  failure. This means that a task can appear in the build log multiple
+  times for the same or different build daemons (as long as they all
+  support the same platform).
+</p>
+
+<h2>Build Jobs</h2>
+
+<p>
+  When a new job is accepted from the incoming queue it is added to
+  the Package Forge Registry along with a subset of the parameters
+  specified in the submission. As it goes through the job life-cycle
+  the <em>status</em> changes to reflect the stage reached. Whenever
+  any aspect of the job changes the <em>modification time</em> is
+  automatically updated.
+</p>
+
+<p>The sequence of allowed job statuses is:</p>
+
+<dl>
+  <dt>incoming</dt>
+  <dd>The job is in the incoming queue and currently being processed.</dd>
+  <dt>valid</dt>
+  <dd>The job is in the incoming queue and has been validated.</dd>
+  <dt>invalid</dt>
+  <dd>The job is in the incoming queue and is invalid.</dd>
+  <dt>accepted</dt>
+  <dd>The job has been validated and accepted.</dd>
+  <dt>registered</dt>
+  <dd>The job has been validated and the associated tasks have been registered.</dd>
+  <dt>partial fail</dt>
+  <dd>At least one associated task has failed to build.</dd>
+  <dt>fail</dt>
+  <dd>All associated tasks have failed.</dd>
+  <dt>partial success</dt>
+  <dd>At least one task has succeeded and none have failed.</dd>
+  <dt>success</dt>
+  <dd>All tasks have succeeded.</dd>
+  <dt>cancelled</dt>
+  <dd>All tasks were cancelled.</dd>
+</dl>
+
+<p>
+  In normal circumstances, the first few stages
+  - <em>incoming</em>, <em>valid</em>, <em>accepted</em>
+  and <em>registered</em> fly by very quickly. The rest can take a
+  while and depend on the availability of the various builders for
+  each platform.
+</p>
+
+<h2>Tasks</h2>
+
+<p>
+  When a newly submitted job has been processed and validated a set of
+  tasks will then be registered, one for each required platform and
+  architecture. Note that tasks are only registered
+  for <em>active</em> platforms. Typically, a job will be submitted
+  for all platforms and architectures in which case a task will be
+  registered for every target platform in the default set. It is
+  possible to restrict the set of build platforms by either name or
+  architecture. Beware that if you submit a job for non-existent or
+  inactive platforms they will just be ignored during the task
+  scheduling stage.
+</p>
+
+<p>
+Unlike the parent job a task has a much more straightforward set of
+statuses.</p>
+
+<dl>
+  <dt>needs build</dt>
+  <dd>The task requires building (default on registration).</dd>
+  <dt>building</dt>
+  <dd>The task is currently building.</dd>
+  <dt>fail</dt>
+  <dd>The task has failed to build.</dd>
+  <dt>success</dt>
+  <dd>The task has been successfully built (and submitted).</dd>
+  <dt>cancelled</dt>
+  <dd>The task has been cancelled.</dd>
+</dl>
+
+<p>
+  Whenever a task status is updated the parent job status is
+  automatically updated within the database. All tasks failed leads
+  to a job <em>fail</em> status, any task failure leads to <em>partial
+  fail</em>. If all tasks succeed then the job status
+  is <em>success</em>, if any succeeds and none has failed then the
+  job status is <em>partial success</em>. If all tasks are cancelled
+  then the job status is set to <em>cancelled</em>.
+</p>
+
+</body>
+</html>

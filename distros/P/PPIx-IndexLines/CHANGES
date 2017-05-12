@@ -1,0 +1,51 @@
+Revision History for PPIx-IndexLines
+====================================
+
+v0.05 2011-01-26
+----------------
+
+commit 31c4fea343ac75d3b9d5048ece74550fd098860c
+Author: Harley Pig <harleypig@gmail.com>
+
+    fixed issues caused by moving out of PPI namespace
+
+v0.04 2010-12-15
+----------------
+
+commit 1a76d59f860f7e96a451bfaa5ce4b0ea9bc9ef10
+Author: Harley Pig <harleypig@gmail.com>
+
+    moved PPI::Document modifications into the PPIx::IndexLines package
+
+v0.03 2010-12-09
+----------------
+
+commit d913ea1a3c5d5d51e16040e22460c5e9d459bb6f
+Author: Harley Pig <harleypig@gmail.com>
+
+    final commit before release
+
+v0.02 2010-12-07
+----------------
+
+commit d9c0aa605c6c48b3874b89254eacd94a1e2463b5
+Author: Harley Pig <harleypig@gmail.com>
+
+    making sure changes are committed
+
+v0.01 2010-11-29
+----------------
+
+commit e31a7d1dee59c004728bfcac128912bb8bf55d02
+Author: Harley Pig <harleypig@gmail.com>
+
+    nearly done
+
+commit e8c96bee1a247c7967d4cef64f0a8bff611043c9
+Author: Harley Pig <harleypig@gmail.com>
+
+    making things work
+
+===================================
+End of changes in the last 365 days
+===================================

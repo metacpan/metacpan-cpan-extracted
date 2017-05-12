@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.74.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 296eb16974082b5600bc58ee165df14656c1390d Changes
+SHA1 1dbed4e369039db325b734e4b8f077b76f051b2f MANIFEST
+SHA1 915ead4d288ae1d222d79eb93a75a66e441ac328 META.yml
+SHA1 edd7d7719bc4d93c801a9b088059a52856690552 Makefile.PL
+SHA1 d1ee9932970ec383f7e56949c29da5c5be671dab README
+SHA1 cb6a039ac117ff8d41b9f31a272dedc53a149a56 README.mkdn
+SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
+SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
+SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
+SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
+SHA1 9892f830ea9b5fb1005ff17e38f9309a94f6ea0d inc/Module/Install/GithubMeta.pm
+SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
+SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
+SHA1 3b9281ddf7dd6d6f5de0a9642c69333023193c80 inc/Module/Install/Package.pm
+SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
+SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
+SHA1 26d58a041cd6b3d21db98b32e8fd1841aae21204 inc/Module/Package.pm
+SHA1 eed821215a8910a6b379273c93eb9f10d76a4d19 inc/Pod/Markdown.pm
+SHA1 bbb7739a3b9af1b448ba04ff97ee5bed1ffae4d9 lib/Plack/Middleware/SizeLimit.pm
+SHA1 41afe2c04bb573b40e283e2b210ed70a47a3f8ba t/0-signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlaNFdIACgkQtLPdNzw1AaApfACdHDXH/1MuQwBbq4X4YT742pyg
+JG0AoKXPFVtFHf03ueHanFrSOiUSALpT
+=k9Z5
+-----END PGP SIGNATURE-----

@@ -1,0 +1,78 @@
+NAME
+    Plack::Middleware::SizeLimit - Terminate processes if they grow too
+    large
+
+SYNOPSIS
+        use Plack::Builder;
+
+        builder {
+            enable SizeLimit => (
+                max_unshared_size_in_kb => '4096', # 4MB
+                # min_shared_size_in_kb => '8192', # 8MB
+                # max_process_size_in_kb => '16384', # 16MB
+                check_every_n_requests => 2,
+                log_when_limits_exceeded => 1
+            );
+            $app;
+        };
+
+DESCRIPTION
+    This middleware is a port of the excellent Apache::SizeLimit module for
+    multi-process Plack servers, such as Starman, Starlet, Gazelle and
+    "uWSGI".
+
+    This middleware only works when the environment "psgix.harakiri" is set
+    to a true value by the Plack server. If it's set to false, then this
+    middleware simply does nothing.
+
+    You must use at least version 0.2006 of Starman (July 2010), and 0.19 of
+    Starlet (June 2013). Earlier versions ignore the flag to stop the
+    process.
+
+CONFIGURATIONS
+    max_unshared_size_in_kb
+        The maximum amount of *unshared* memory the process can use; usually
+        this option is all one needs.
+
+        Experience on one heavily trafficked mod_perl site showed that
+        setting this option and leaving the others unset is the most
+        effective policy.
+
+        This is because it only kills off processes that are truly using too
+        much physical RAM, allowing most processes to live longer and
+        reducing the process churn rate.
+
+    min_shared_size_in_kb
+        Sets the minimum amount of shared memory the process must have.
+
+    max_process_size_in_kb
+        The maximum size of the process, including both shared and unshared
+        memory.
+
+    check_every_n_requests
+        Since checking the process size can take a few system calls on some
+        platforms (e.g. linux), you may specify this option to check the
+        process size every *N* requests. The default value for *N* is 1,
+        i.e. to check after the processing of every request.
+
+    log_when_limits_exceeded
+        When true, the middleware will log a warning whenever it signals to
+        the server that the process is to be terminated. This is false by
+        default.
+
+SEE ALSO
+    Starman, Starlet, Gazelle
+
+AUTHORS
+    Audrey Tang <cpan@audreyt.org>
+
+LICENSE
+    This work is under the CC0 1.0 Universal license.
+
+    To the extent possible under law, 唐鳳 has waived all copyright and
+    related or neighboring rights to Plack::Middleware::SizeLimit.
+
+    This work is published from Taiwan.
+
+    <http://creativecommons.org/publicdomain/zero/1.0>
+

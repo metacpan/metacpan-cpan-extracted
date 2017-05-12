@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name: POE-Component-Spread
+version: 0.02
+author:
+  - |-
+    Copyright (C) 2004, Rob Partington <perl-pcs@frottage.org>
+abstract: handle Spread communications in POE
+license: perl
+requires:
+  POE: 0
+  Spread: 0
+  Test::More: 0
+provides:
+  POE::Component::Spread:
+    file: lib/POE/Component/Spread.pm
+    version: 0.02
+  POE::Driver::Spread:
+    file: lib/POE/Driver/Spread.pm
+    version: 0.01
+  POE::Filter::Spread:
+    file: lib/POE/Filter/Spread.pm
+    version: 0.01
+generated_by: Module::Build version 0.25

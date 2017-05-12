@@ -1,0 +1,9 @@
+Build.PL
+Makefile.PL
+MANIFEST
+META.yml
+lib/POE/Component/Spread.pm
+lib/POE/Driver/Spread.pm
+lib/POE/Filter/Spread.pm
+t/PoCoSpread.t
+t/server.t

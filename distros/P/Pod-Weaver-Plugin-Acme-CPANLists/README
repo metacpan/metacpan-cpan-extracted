@@ -1,0 +1,26 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [-Acme::CPANLists]
+
+DESCRIPTION
+
+    This plugin is used when building Acme::CPANLists::* distributions. It
+    currently does the following:
+
+      * Create "AUTHOR LISTS" POD section from @Author_Lists
+
+      * Create "MODULE LISTS" POD section from @Module_Lists
+
+      * Mention some modules in See Also section
+
+      e.g. Acme::CPANLists (the convention/standard), acme-cpanlists (the
+      CLI tool), etc.
+
+SEE ALSO
+
+    Acme::CPANLists
+
+    Dist::Zilla::Plugin::Acme::CPANLists
+

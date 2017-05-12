@@ -1,0 +1,34 @@
+---
+abstract: 'retrieve PGP keys from different sources'
+author:
+  - 'Markus Benning <ich@markusbenning.de>'
+build_requires:
+  File::Find: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PGP-Finger
+requires:
+  Digest::CRC: 0
+  Digest::SHA: 0
+  IO::File: 0
+  IO::Handle: 0
+  IPC::Run: 0
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+  Moose: 0
+  MooseX::Getopt: 0
+  Net::DNS::Resolver: 0
+  overload: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=PGP-Finger
+  repository: https://github.com/benningm/pgpfinder
+version: 1.1

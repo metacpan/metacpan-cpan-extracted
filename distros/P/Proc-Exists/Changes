@@ -1,0 +1,192 @@
+Revision history for Proc-Exists
+
+1.01  2013-10-22 15:34 GMT  rev. 3371
+   - don't use POSIX just to get EPERM and ESRCH - use %! instead
+   - fix a few problems with the DynaLoader fallback, e.g. $_loader was
+     being set even when DynaLoader failed, fix a do where we meant 
+     eval, and stop relying on $@ checking instead of eval's return value
+   - use Getopt::Long to cleanup examples/pswait
+
+1.00  2009-04-13 02:13 GMT  rev 2421 = old-rev. 621
+   - POD cleanup
+
+0.99_02 09-04-12 04:13 GMT  rev 2415 = old-rev. 615
+   - use DynaLoader instead of XSLoader when the latter doesn't exist
+     for better legacy compatibility (prefer XSLoader if available, 
+     though, as it uses less memory)
+
+0.99_01 09-04-11 22:50 GMT  rev 2403 = old-rev. 603
+   - fix Makefile.PL getcwd redefined warnings on pre 5.6 perls
+   - in Makefile.PL, never try to use Errno - just use POSIX qw(), since 
+     it's been in core since perl 5.
+   - use Getopt::Long to simplify Makefile.PL
+   - add experimental support for gcc w/ non-gcc perl on other
+     (neither solaris nor hpux) OS's
+   - add support for overriding CFLAGS via Makefile.PL -cflags=...
+   - fix cc version display from info.t with perls built by !gcc
+   - tweak the format of the TESTING file
+   - add test cases: dragonflybsd, ia64/Intel CC with gcc perl
+   - better, cleaner detection and handling of the gcc compiler being
+     used with a non-gcc perl case.
+   - silence warnings with old versions of MakeMaker related to
+     LICENSE and NO_META not being understood
+   - fix a bug with the perl version info emitted from info.t
+   - add a configuration value want_pureperl which remembers if we want
+     to use pureperl or XS. this fixes a problem with old/broken XS 
+     modules in the search path.
+   - support gcc with non-gcc perl on hpux
+
+0.99  2009-04-01 05:23 GMT  rev 2337 = old-rev. 537
+   - better handling and detection of XSLoader problems
+   - fix problem with XS on fbsd/4.11 (and other old perls?)
+   - abstract away some redundant XS code into get_pid
+   - cleanups, micro-optimizations, etc.
+   - fix inaccurate system info from info.t (we want the running
+     system, not where perl was built, yikes). also provide some more
+     more information from tests, and rejigger the order in which 
+     things are output, and make the output terser and clearer
+
+0.98  2009-03-29 19:40 GMT  rev 2304 = old-rev. 504
+   - move perlcritic, pod, etc. tests to xt as suggeted by David Golden
+     over a year ago
+
+0.97  2009-03-29 07:49 GMT  rev 2292 = old-rev. 492
+   - document and improve test case for 0/undef returns with 'any' mode
+   - mirror the __scalar_pexists fix from 0.95 in __list_pexists
+   - perldoc updated, tidied and shuffled around a bit
+   - clean up a few egregious offenses caught by Perl::Critic
+
+0.96  2009-03-28 23:39 GMT  rev 2277 = old-rev. 477
+   - fix Configuration.pm magic on perls <5.6 (broken since 0.94/r466)
+   - patch from Serguei Trouchelle for building with MSVC
+
+0.95  2009-03-28 01:57 GMT  rev 2271 = old-rev. 471
+   - finally fix the failures coming from imacat's smoker.
+     language was a red herring. the problem was using the wrong
+     way to determine length.
+
+0.94  2009-03-27 02:52 GMT  rev 2267 = old-rev. 467
+   - FTBFS bugfix release, oi
+
+0.93  2009-03-26 04:53 GMT  rev 2265 = old-rev. 465
+   - DO NOT USE THIS VERSION, IT IS BROKEN.
+   - try again with a "release" version to see if i can catch the
+     probable i18n error with imacat's (or some other) smoker...
+   - various kwalitee tweaks
+
+0.92_01 08-12-17 10:47 GMT  rev 2260 = old-rev. 450
+   - upload for cpants, trying to figure out what's up with
+     http://www.nntp.perl.org/group/perl.cpan.testers/2008/12/msg2840424.html
+     http://www.nntp.perl.org/group/perl.cpan.testers/2009/03/msg3488979.html 
+     pid: 1, out: 0, err: 此項操作並不被允許 (1)
+     ...
+     pid: 12, out: 0, err: 沒有此一程序 (3)
+
+0.92  2008-12-15 13:06 GMT  rev 2258 = old-rev. 448
+   - XS: coerce input pids to int but still check them for sanity
+     (die when asked about a pid '1.23' or 'abc', but '3' is ok)
+     this fixes a bug where using xs and calling pexists('3'); would
+     error out instead of doing the same as pexists(3);
+
+0.91  2008-11-08 22:49 GMT  rev 2249 = old-rev. 437
+   - pureperl Makefile.PL goop: use Errno @ la POSIX if it's available
+   - Makefile.PL now accepts an optional -cc=/path/to/c-compiler
+   - Makefile.PL will try $ENV{CC} if it exists
+   - add warning about HPUX and why we usually need pureperl there
+   - silence warnings when Makefile.PL is invoked with perl -w
+
+0.90  2008-06-23 08:52 GMT  rev 2237 = old-rev. 409
+   - API change: pexists(... {any=>1}) returns pid of process found
+   - API now frozen until 1.00
+   - don't muck with return value on win32 - just warn in place
+   - xs and pp give same error message with non-int PIDs now.
+   - implement _list_pexists in XS for extra speed, minimizing the
+     perl "wrapping" around raw XS in this case
+   - clean up lots of duplication in XS via static inline __pexists in
+     pexists.h
+   - _scalar_pexists now works on win32
+
+0.15  2008-06-21 09:53 GMT  rev 2208 = old-rev. 380
+   - fix XS on perl 5.5.x
+
+0.14  2008-06-21 08:32 GMT  rev 2206 = old-rev. 378
+   - catch unexpected return / errno values in _scalar_pexists
+   - try cc before alternatives. add pcc and lcc to possible alternatives
+   - Makefile.Pl supports --xs and --pureperl arguments, prompts
+     with informative text if not given one (default XS)
+   - improve error handling with invalid PIDs (strings, ints < 0)
+   - fix problem with test suite where installed XS was used in place
+     of the version in blib/
+
+0.13  2008-06-04 10:19 GMT  rev 2187 = old-rev. 359
+   - for speed, i18n, portability, and simplicity, pp_pexists now uses
+     the numeric (not string) value of $! - in particular this fixes the
+     pure perl implementation with non-english locales:
+       http://www.nntp.perl.org/group/perl.cpan.testers/2008/06/msg1569666.html
+       http://www.nntp.perl.org/group/perl.cpan.testers/2008/06/msg1578246.html
+   - better handling of unexpected conditions in both perl and xs 
+   - add misc/gather-info.pl for better portability data gathering
+   - Proc::Exists::Configuration maintains EPERM and ESRCH values
+     so we needn't rely on POSIX. Makefile.PL uses POSIX only if
+     it's available at build time to determine these constants,
+     otherwise we use the common EPERM==1, ESRCH==3
+   - POD updated.
+   - bring PREREQ_PM in line with reality, even for "trivial" modules
+   - solaris10/gcc hacks are no longer triggered on all gnu systems
+   - fix typo in Changes file: 0.12 was released in June, not May
+
+0.12  2008-06-01 01:35 GMT  rev 2166 = old-rev. 338
+   - fix an obvious, and critical bug in t/01.usage.t (raw omelette,
+     yum!), thanks ANDK
+   - various cleanups
+   - minor optimization for the pureperl case
+   - add t/01.info.t so we can glean some info about unusual OS's
+     i don't have access to from smokers.
+
+0.11  2008-05-17 23:35 GMT  rev ~2149 = old-rev. ~321
+   - win32 code made simpler AND faster, w00t.
+   - various hacks to make solaris10 work with a stubbed cc
+     but a real gcc
+
+0.10  2008-02-19 07:27 GMT  rev ~2134 = old-rev. ~299
+   - compatibility with perl 5.5.x
+   - add examples/pswait
+
+0.09  2008-02-02 08:31 GMT  rev ~2125 = old-rev. ~290
+   - nuttin but kwalitee and POD tweaks
+
+0.08  2008-01-30 07:07 GMT  rev ~2117 = old-rev. ~282
+   - more tests
+   - optimized for the many processes case via _scalar_pexists()
+   - tweak errno tests for possibly enhanced portability
+   - commented out roadmap for Mac OS (< X) support
+   - silence some warnings from cygwin/gcc
+
+0.07  2008-01-22 12:39 GMT  rev ~2101 = old-rev. ~266
+   - fix wrong LICENSE - this is perl, not gpl
+
+0.06  2008-01-21 18:28 GMT  rev ~2098 = old-rev. ~263
+   - POD updates and some other minor things.
+   - fast, experimental (read: non-functioning) code in Exists.xs
+     for win32. this release is mostly uploaded just to see if
+     anyone has ideas about how to make that code work ;-)
+
+0.05  2008-01-20 11:41 GMT  rev ~2085 = old-rev. ~247
+   - Win32/XS support
+   - Remove POD/PCritic tests from MANIFEST, distribution (still in svn)
+   - Many Kwalitee, PCritic cleanups, including updating this file ;-)
+   - Add benchmarking info in BENCHMARKS
+   - Micro-mem-optimization - pp_pexists never lives in memory with XS
+
+0.04  2008-01-19 06:39 GMT  rev. ~2070 = old-rev ~232
+   - Fix some failing tests due to Perl::Critic
+
+0.03  2008-01-19 03:13 GMT  rev. ~2064 = old-rev. ~226
+   - Fall back to pureperl when XS is unavailable
+
+0.02  2008-01-18 23:57 GMT  rev. ~2055 = old-rev. ~217
+   - Use kill via XS instead of using /proc
+
+0.01  2008-01-18 18:36 GMT  rev. ~2053 = old-rev. ~215
+   - Initial release.
+

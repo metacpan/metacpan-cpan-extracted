@@ -1,0 +1,40 @@
+README for Perldoc
+
+Version: 3.28
+
+			       Perldoc
+
+This is the distribution of Perldoc, the program for reading Pod
+documentation.
+
+INSTALLATION
+
+You install this module-suite, as you would install any perl module
+library, by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you want to install a private copy of this module-suite in your home
+directory, then you should try to produce the initial Makefile with
+something like this command:
+
+  perl Makefile.PL PREFIX=~/perl
+
+See perldoc perlmodinstall for more information on installing modules.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for this
+module should just be sent to 
+
+   http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pod-Perldoc
+
+AVAILABILITY
+
+The latest version of this module is available from the Comprehensive
+Perl Archive Network (CPAN).  Visit <http://www.perl.com/CPAN/> to
+find a CPAN site near you.

@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+
+$|++; $\ = "\n";
+
+$args{$_}++ for @ARGV;
+
+$_ = "-- echo server --";
+
+print					if $args{"--stdout"};
+print STDERR			if $args{"--stderr"};
+exit($args{"--die"})	if @ARGV;
+
+while (<>) {
+	last if /bye/i;
+	print STDERR;
+	}

@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+RESOURCES
+ROADMAP
+README
+t/00_pods.t
+t/01_utils.t
+t/02_worker.t
+t/03_mr.t
+t/04_pipeline.t
+lib/Parallel/MapReduce/Worker.pm
+lib/Parallel/MapReduce/Worker/FakeRemote.pm
+lib/Parallel/MapReduce/Worker/SSH.pm
+lib/Parallel/MapReduce/Worker/SSHRemote.pm
+lib/Parallel/MapReduce/Utils.pm
+lib/Parallel/MapReduce/Testing.pm
+lib/Parallel/MapReduce/Sequential.pm
+lib/Parallel/MapReduce.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,91 @@
+NAME
+    Passwd::Samba
+
+SYNOPSIS
+            use Passwd::Samba;
+        
+            my $ps = Passwd::Samba->new();
+            my $err = $ps->passwd("example", "_plain_text_secret_" );
+            foreach my $user ($ps->users) {
+                    print "Username: $user\nUID: ", $ps->uid($user), "\n\n";
+            }
+            my $uid = $ps->uid('example');
+            $ps->rename('example', 'new_example');
+            $pu->del('new_example');
+
+            # or 
+
+            use Passwd::Samba qw(del uid maxuid passwd rename users);
+
+            my $err = passwd("example", "_plain_text_secret_" );
+            foreach my $user (users()) {
+                    print "Username: $user\nUID: ", uid($user), "\n\n";
+            }
+            my $uid = uid('example');
+            rename('example', 'new_example');
+            del('new_example');
+
+DESCRIPTION
+    The Passwd::Samba module provides an abstract interface to
+    /etc/samba/smbpasswd format files. It is inspired by Unix::PasswdFile
+    module.
+
+SUBROUTINES/METHODS
+    new( )
+        Constructor. Possible parameters are:
+
+        smbpasswd - path to smbpasswd file; default "/etc/samba/smbpasswd"
+
+    del( USERNAME0, USERNAME1... )
+        This method will delete the list of users. It has no effect if the
+        supplied user does not exist.
+
+    maxuid( )
+        This method returns the maximum UID in use by all users.
+
+    passwd( USERNAME, PASSWD )
+        Modify a user's password. Returns the result of operation (TRUE or
+        FALSE).
+
+    rename( OLDNAME, NEWNAME )
+        This method changes the username for a user. If NEWNAME corresponds
+        to an existing user, that user will be overwritten. It returns FALSE
+        on failure and TRUE on success.
+
+    uid( USERNAME [,UID] )
+        Read or modify a user's UID. Returns the result of operation (TRUE
+        or FALSE) if UID was specified otherwhise returns the UID.
+
+    user()
+        This alias for passwd. User is created if doesn't exists.
+
+    users()
+        This method returns a list of all existing usernames.
+
+    smbpasswd_file([PATH])
+        This method, if called with an argument, sets path to the
+        *smbpasswd* file. Otherwise returns the current PATH.
+
+DEPENDENCIES
+    Crypt::SmbHash
+    Exporter
+
+INCOMPATIBILITIES
+    None known.
+
+BUGS AND LIMITATIONS
+    None known.
+
+THANKS
+    Thanks to Andy Gorman for suggestions as well as supplying relevant
+    patch!
+
+AUTHOR
+    Strzelecki Łukasz <lukasz@strzeleccy.eu>
+
+LICENCE AND COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

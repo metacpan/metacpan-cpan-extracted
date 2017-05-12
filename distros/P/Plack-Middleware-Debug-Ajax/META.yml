@@ -1,0 +1,20 @@
+---
+abstract: 'Show log of ajax requests/responses'
+author:
+  - 'Vincent Launchbury <vincent@cpan.org>'
+build_requires:
+  Test::Exception: 0.31
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Debug-Ajax
+requires:
+  Plack: 1.0016
+  Plack::Middleware::Debug: 0.14
+version: 0.02

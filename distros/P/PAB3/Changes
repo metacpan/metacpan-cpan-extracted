@@ -1,0 +1,59 @@
+Revision history for Perl extension PAB3.
+
+version 3.201
+    - fixed gc activation in session module
+    - fixed broken distribution for unthreaded perl
+
+version 3.2
+    - changed version style
+    - changed format of locale information
+    - updated zoneinfo database
+    - updated locale information database
+    - fixed bug 50324
+
+version 3.1.6
+    - added static linking to crt on windows
+    - fixed bug in session handler module
+    - small improvements in utils class
+    - fixed more type conversations
+    - fixed detection bug on windows
+    - fixed timezone calculation
+
+version 3.1.5
+    - fixed type conversations on 64bit systems
+
+version 3.1.4
+    - fixed memory allocation in the script builder, which did allocate
+      insufficient number of bytes
+
+version 3.1.3
+    - fixed parser which did not correct handle items without directive
+    - fixed memory allocation in the optimizer, which did allocate insufficient
+      number of bytes
+    - fixed type conversations on 32bit system with perl 64bit number support
+
+version 3.1.2
+    - fixed MY_CXT api handling to run with perl/5.9.x
+
+version 3.1.1
+    - bugfix: internal output buffer in PAB3::Utils::strftime was calculated
+      to small - the result string may be cut
+    - fixed return values of several functions in the PAB3::DB::Max module
+    - fixed broken statement error handling in the PAB3::DB module
+    - fixed broken parameter binding in PAB3::DB::Driver::Prosgres::execute()
+      method
+    - fixed broken statement names in the PAB3::DB::Driver::Prosgres module
+    - fixed misplaced code of prepare() and execute() functions in the
+      PAB3::DB::Driver::Mysql module
+    - fixed PAB3::DB::Driver::Sqlite3::execute() method which did return an
+      error on second and further calls
+
+version 3.1.0
+    - template parser rewritten in XS and C
+    - predefined loop "FOR" has been removed
+    - now loops can be written directly in the template without loosing the
+      control over hashmaps
+    - functions PAB3::make_script and PAB3::run_script are deprecated and has
+      been removed
+    - PAB3::HashMapCache has been renamed into PAB3::HashmapCache
+    - support of aliases in locale settings

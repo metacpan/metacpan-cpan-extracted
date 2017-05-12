@@ -1,0 +1,114 @@
+{
+   "abstract" : "Driver-based API for tracking parcel",
+   "author" : [
+      "김도형 - Keedi Kim <keedi@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parcel-Track",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.008"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Params::Util" : "0.14",
+            "Try::Tiny" : "0",
+            "Types::Standard" : "0",
+            "perl" : "5.008",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Spec::Functions" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Parcel::Track" : {
+         "file" : "lib/Parcel/Track.pm",
+         "version" : "0.005"
+      },
+      "Parcel::Track::KR::Test" : {
+         "file" : "lib/Parcel/Track/KR/Test.pm",
+         "version" : "0.005"
+      },
+      "Parcel::Track::Role::Base" : {
+         "file" : "lib/Parcel/Track/Role/Base.pm",
+         "version" : "0.005"
+      },
+      "Parcel::Track::Test" : {
+         "file" : "lib/Parcel/Track/Test.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/keedi/Parcel-Track/issues"
+      },
+      "homepage" : "https://github.com/keedi/Parcel-Track",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/keedi/Parcel-Track.git",
+         "web" : "https://github.com/keedi/Parcel-Track"
+      }
+   },
+   "version" : "0.005",
+   "x_authority" : "cpan:KEEDI"
+}
+

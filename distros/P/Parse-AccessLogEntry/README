@@ -1,0 +1,56 @@
+Parse::AccessLogEntry version 0.05
+=================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+SYNOPSIS
+
+use Parse::AccessLogEntry;
+my $P=Parse::AccessLogEntry::new();
+      
+# $Line is a string containing one line of an access log
+my $Hashref=$P->parse("$Line");
+
+DESCRIPTION
+    
+There are several modules that focus on generating web reports, like
+Apache::ParseLog. There are also several places on the web where you can
+find the regex required to parse the lines on your own. This is simply
+for users who dont want to mess with any of that, and just want to have
+a quick way to implement this functionality in their code.
+    
+This module handles the standard Apache access_log formats, including
+the combined log file format that includes the referrer and user-agent.
+The return form the parse() call is a hashref with key names being the
+fields in the line just parsed.
+    
+$Hashref->{host}    client ip of the request 
+$Hashref->{user}    user logged in ("-" for none) 
+$Hashref->{date}    date of the request 
+$Hashref->{time}    server time of the request 
+$Hashref->{diffgmt} server offset from GMT
+$Hashref->{rtype}   type of request (GET, POST, etc) 
+$Hashref->{file}    file requested 
+$Hashref->{proto}   protocol used (HTTP/1.1, etc)
+$Hashref->{code}    code returned by apache (200, 304, etc)
+$Hashref->{bytes}   number of bytes returned to the client
+$Hashref->{refer}   referrer 
+$Hashref->{agent}   user-agent
+
+If you noticed that the RFC1413 field is missing, you're right. I don't
+plan on including this anytime soon, since hardly anyone uses it.
+    
+This is a pretty early release. But since much of this code is lifted
+from other sources it should be pretty reliable. If anybody has any
+ideas on how to make it more robust then let me know.
+
+AUTHOR
+
+    Marc Slagle - marc.slagle@securelevel.com

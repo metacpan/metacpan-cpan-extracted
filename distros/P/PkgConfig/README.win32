@@ -1,0 +1,97 @@
+=head1 DESCRIPTION
+
+This file contains some tips for using and developing PkgConfig on
+the Microsoft Windows platform (without Cygwin).
+
+=head1 STRAWBERRY PERL
+
+Starting with Strawberry Perl 5.20.0.1, PkgConfig is included as part
+of Strawberry.  It can be run from the command line as pkg-config,
+just as the c version works on Unix style platforms.  Unfortunately,
+the version included with 5.20.0.1 is incompatible with the version
+on CPAN.
+
+This was fixed in the next version of Strawberry.
+
+You may optionally patch the .pc files that come with Strawberry Perl
+5.20.0.1 or earlier to either get the same pkg-config capability which
+will come with future versions of Strawberry (if you are using 5.18
+or earlier) or to fix the incompatibility that was introduced in
+Strawberry 5.20.0.1.  Simply follow these steps:
+
+=over 4
+
+=item 1. install PkgConfig
+
+You will need to tell it to install the script as pkg-config:
+
+ C:\> cpanm PkgConfig --configure-args=--script=pkg-config
+
+You may optionally install the script as ppkg-config as well to match
+the behavior on Unix style platforms, though the main reason for that
+named version is simply to avoid replacing the "real" pkg-config commonly
+available on Unix style platforms.
+
+ C:\> rem alternatively
+ C:\> cpanm PkgConfig --configure--args=--script=pkg-config,ppkg-config
+
+=item 2. patch the .pc files that come with Strawberry
+
+The .pc files that come with older versions of Strawberry include
+references to C</mingw>.  These need to be changes to
+C<${pcfiledir}/../..>.  To make this easy, I have written a script to
+automate the task.
+
+ C:\PkgConfig\> perl win32\fix_old_strawberry.pl
+
+This is not done automatically as part of the install of PkgConfig
+because the current maintainer of PkgConfig feels that these files are
+the domain of the Strawberry team and the user of Strawberry.
+
+This script will make backups of the .pc files with a .bak extension.
+
+This script will refuse to run on newer versions of Strawberry that do
+not need to be patched.
+
+=back
+
+=head1 SYMLINKS
+
+This distribution contains symbolic links for historical reasons, which
+may be inconvenient if you are trying to run one of the scripts in the
+C<script> directory.  Out of respect for the original author, this
+design decision will not be revisited.  There are some work arounds
+that may help.
+
+=over 4
+
+=item run the .pm file
+
+To try simple stuff out you can "run" the .pm file like it is a script.
+
+ C:\PkgConfig\> perl lib\PkgConfig.pm libarchive --cflags
+
+=item create windows symlinks
+
+Symbolic links are available on newer versions of windows that use NTFS
+as the file system.  Unfortunately, it appears to create them requires
+administrator access.  I have provided a script in the C<win32> directory
+which you can use to replace the files in the C<script> directory with
+real symbolic links.  You will need to run this script with administrator
+rights:
+
+ C:\PkgConfig\> perl win32\fix_links.pl
+
+This may not work reliably if you are using the same git repository for
+both MSWin32 and cygwin.
+
+=item run the tests
+
+As of commit cc2a2d8892 you should be able to run the full test suite on
+MSWin32 from a git repository.  This works because lib/PkgConfig.pm is
+used as the script when MSWin32 and the .git directory are detected.
+
+This leaves creating a tarball (C<make dist>) and releasing it as the
+only activities which cannot easily be performed on Windows.
+
+=back

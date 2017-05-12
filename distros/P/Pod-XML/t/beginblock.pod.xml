@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='iso-8859-1'?>
+<pod xmlns="http://axkit.org/ns/2000/pod2xml">
+<head>
+<title>Testing for =begin stripping.</title>
+</head>
+<sect1>
+<title>NAME</title>
+<para>
+Testing for =begin stripping.
+</para>
+</sect1>
+<sect1>
+<title>WHY?</title>
+<para>
+Because we must!
+</para>
+</sect1>
+</pod>

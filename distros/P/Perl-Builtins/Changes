@@ -1,0 +1,12 @@
+Revision history for Perl::Builtins
+
+0.03    2014-11-10
+        - Updated tests to account for different number of functions in Perl versions
+
+0.02    2014-10-29
+        - Changed from static list to Pod::Functions
+        - Updated pod SEE ALSO to include B::Keywords
+
+0.01    2014-10-26
+        - Initial release
+

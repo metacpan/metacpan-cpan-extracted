@@ -1,0 +1,12 @@
+bin/validate_pgxn_meta
+Build.PL
+Changes
+lib/PGXN/Meta/Validator.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/base.t
+t/META.json
+t/validator.t

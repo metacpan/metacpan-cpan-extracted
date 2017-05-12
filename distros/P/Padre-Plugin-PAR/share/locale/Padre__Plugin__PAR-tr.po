@@ -1,0 +1,54 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: tr 0.10\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-19 02:04+0800\n"
+"PO-Revision-Date: 2010-05-17 21:20+0200\n"
+"Last-Translator: Burak Gürsoy <burak@cpan.org>\n"
+"Language-Team: Turkish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Turkish\n"
+"X-Poedit-Country: TURKEY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: lib/Padre/Plugin/PAR.pm:42
+msgid "Create Standalone Exe"
+msgstr "Tek Başına Çalışabilir Exe Oluştur"
+
+#: lib/Padre/Plugin/PAR.pm:43
+msgid "About"
+msgstr "Hakkında"
+
+#: lib/Padre/Plugin/PAR.pm:86
+msgid "Currently we only support exe generation from .pl files"
+msgstr "Şu anda sadece .pl dosyalarından exe oluşturmayı destekliyoruz"
+
+#: lib/Padre/Plugin/PAR.pm:86
+msgid "Cannot create"
+msgstr "Oluşturulamıyor"
+
+#: lib/Padre/Plugin/PAR.pm:92
+#, perl-format
+msgid "Error generating '%s': %s"
+msgstr "'%s' oluşturulurken hata: %s"
+
+#: lib/Padre/Plugin/PAR.pm:92
+msgid "Failed"
+msgstr "Başarısız"
+
+#: lib/Padre/Plugin/PAR.pm:94
+#, perl-format
+msgid "%s generated"
+msgstr "%s oluşturuldu"
+
+#: lib/Padre/Plugin/PAR.pm:94
+msgid "Done"
+msgstr "Bitti"
+

@@ -1,0 +1,10 @@
+use inc::Module::Install;
+all_from 'lib/Plack/Handler/AnyEvent/FCGI.pm';
+readme_from('lib/Plack/Handler/AnyEvent/FCGI.pm');
+requires 'Plack', 0.9970;
+requires 'AnyEvent::FCGI';
+requires 'IO::Handle::Util';
+build_requires 'Test::More', 0.88;
+test_requires 'Test::Requires';
+auto_set_repository();
+WriteAll;

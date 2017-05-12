@@ -1,0 +1,23 @@
+severity = 1
+exclude = RequireTidyCode RequirePodSections ProhibitPostfixControls RequireRcsKeywords RequireExplicitPackage ProhibitNoStrict RequireArgUnpacking ProhibitPunctuationVars RequireInterpolationOfMetachars RequireCarping ProhibitMagicNumbers
+include = Moose::ProhibitMultipleWiths Moose::ProhibitNewMethod Moose::RequireCleanNamespace Moose::RequireMakeImmutable
+color = 1
+verbose = 9
+
+[BuiltinFunctions::ProhibitStringyEval]
+allow_includes = 1
+
+[CodeLayout::ProhibitTrailingWhitespace]
+
+[Documentation::PodSpelling]
+stop_words = tokenised defacto deferrable lexically
+
+[Subroutines::ProhibitUnusedPrivateSubroutines]
+private_name_regex = _(?!build_)\w
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Moose
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Moose
+

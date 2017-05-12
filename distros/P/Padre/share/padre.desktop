@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Padre
+Comment=The Perl IDE
+# change to corresponding path
+Exec=padre
+Icon=/usr/local/share/perl/5.10.1/auto/share/dist/Padre/icons/padre/64x64/logo.png
+Categories=Application;Development;Perl;IDE
+Version=1.0
+Type=Application
+Terminal=0
+

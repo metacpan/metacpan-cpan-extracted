@@ -1,0 +1,9 @@
+# by Van Wyk and Schwerdfeger
+%token ID   = /([a-zA-Z_]\w*)/
+
+%%
+C: ID 's'
+;
+%%
+
+

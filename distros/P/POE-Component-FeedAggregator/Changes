@@ -1,0 +1,33 @@
+Revision history for POE-Component-FeedAggregator
+
+0.902     2011-02-15 17:08:50 Europe/Berlin
+	- Today we learned about ->delay and ->delay_add (dngor++)
+
+0.901     2011-02-15 06:55:27 Europe/Berlin
+	- Added logger docking capability
+	- Added http_agent attribute
+
+0.900     2011-02-08 02:29:24 Europe/Berlin
+	- Fixed a fundamental bug about breaking event chain on failing feed parsing
+
+0.008     2011-02-02 19:24:33 Europe/Berlin
+	- Fixed a problem about urls with no spaces (hardcore removing them)
+
+0.007     2010-11-14 05:23:54 Europe/Berlin
+	- Hups, fixed requirements
+
+0.006     2010-11-13 23:58:18 Europe/Berlin
+	- Added automatic generation of name out of url (1:1 translation into a filename-friendly string)
+	- Added the ignore_first feature for feeds that are not cached so far
+
+0.005     2010-11-08 23:30:37 Europe/Berlin
+	- Fixed tests (BinGOs++, kentnl++)
+
+0.004     2010-11-06 20:50:54 Europe/Berlin
+
+0.003     2010-11-06 19:42:15 Europe/Berlin
+
+0.002     2010-11-06 18:56:13 Europe/Berlin
+
+0.001     2010-11-06 06:49:49 Europe/Berlin
+	- First trail release.. functionality missing

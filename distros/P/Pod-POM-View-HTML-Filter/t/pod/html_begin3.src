@@ -1,0 +1,30 @@
+=begin filter html
+
+    <!-- a longer piece of HTML -->
+    <p>First paragraph</p>
+
+    <p>another para</p>
+
+    <p>End</p>
+
+=end filter
+__RESULT__
++html
+<html><body bgcolor="#ffffff">
+<pre>    <span class="h-com">&lt;!-- a longer piece of HTML --&gt;</span>
+    <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>First paragraph<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+
+    <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>another para<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+
+    <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>End<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
+</body></html>
+__RESULT__
+-html
+<html><body bgcolor="#ffffff">
+<pre>    &lt;!-- a longer piece of HTML --&gt;
+    &lt;p&gt;First paragraph&lt;/p&gt;
+
+    &lt;p&gt;another para&lt;/p&gt;
+
+    &lt;p&gt;End&lt;/p&gt;</pre>
+</body></html>

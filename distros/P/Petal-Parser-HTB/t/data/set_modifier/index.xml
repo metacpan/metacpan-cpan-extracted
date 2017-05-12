@@ -1,0 +1,8 @@
+<html>
+<body>
+    <?var name="set: settest title"?>
+
+    * title : $title
+    * settest : $settest
+</body>
+</html>

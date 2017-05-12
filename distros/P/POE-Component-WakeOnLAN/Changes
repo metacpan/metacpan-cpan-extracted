@@ -1,0 +1,19 @@
+==============================
+2011-11-17 22:49:17 +0000 1.04
+==============================
+
+  commit a218d60e1957b7bdcad69ce873a9a9343df47b13
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Nov 17 22:41:03 2011 +0000
+  
+    Update to dzil distribution
+
+  commit d7af68668000bfdf7419e17d9cc76e606f114743
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Nov 17 15:45:31 2011 +0000
+  
+    Use Net::IP::Minimal instead of Net::IP 
+
+====================================
+End of changes in the last 1825 days
+====================================

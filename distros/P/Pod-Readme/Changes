@@ -1,0 +1,330 @@
+Revision history for Pod-Readme
+
+v1.1.2 2014-12-09 18:55 GMT
+  [Bug Fixes]
+  - Regex in changes plugin fixed to work with Perl 5.21 deprecated
+    syntax [khwilliamson].
+
+v1.1.1 2014-12-04 13:11 GMT
+  [Bug Fixes]
+  - The changes plugin will work with Dist::Zilla {{$NEXT}} tokens.
+
+v1.1.0 2014-12-03 19:08 GMT
+  [Documentation]
+  - Fixed typos in POD for requires plugin.
+
+  [Enhancements]
+  - Pod::Readme::Filter has a zilla attribute for Dist::Zilla objects.
+
+  - The requires plugin will use metadata from the Dist::Zilla object
+    if it is set, rather than looking for a META.yml file (which will
+    not exist, if this is used in a Dist::Zilla plugin).
+
+v1.0.3 2014-11-07 18:58 GMT
+  - Fixed bug with minimum version of Class::Method::Modifiers.
+
+v1.0.2 2014-10-13 22:18 BST
+  - No changes since v1.0.1_08, just a version bump for a release.
+
+  - See the full list of changes since v1.0.0 for more details.
+
+  [Enhancements]
+  - This is a complete rewrite, using modern Perl with Moo.
+
+  - Added support for plugins, along with plugins to insert the module
+    version, prerequisites and the latest changes.
+
+  - Added the ability to generate a README in a variety of formats,
+    such as POD, Markdown, HTML, RTF, etc.
+
+  - Added command-line options to the pod2readme script, including the
+    ability to specify the output format.
+
+  - Switched to semantic versioning.
+
+  - The documentation has been updated accordingly.
+
+  [Incompatabilities]
+  - Perl v5.10.1 is required.
+
+  - This is no longer a subclass of a POD parser, although it has some
+    wrapper methods for compatability with software known to use it.
+
+v1.0.1_08 2014-10-13
+  [Documentation]
+  - More documentation tweaks.
+
+v1.0.1_07 2014-10-10 16:47 BST
+  [Documentation]
+  - More documentation tweaks.
+
+  [Enhancements]
+  - Added a depends_on method that returns a list of files that the
+    README depends on.
+
+  - Added dependencies_updated method to check if dependencies have
+    been updated.
+
+  - The README is only updated if dependencies have been updated.
+
+  - Added a --force option to pod2readme to force updates.
+
+  [Other Changes]
+  - Moved pod2readme tests to xt directory for author tests, due to
+    inconsistent behaviour on different platforms.
+
+v1.0.1_06 2014-10-10
+  [Documentation]
+  - More documentation tweaks.
+
+  - Changed pod2readme usage text to match abstract.
+
+  [Bug Fixes]
+  - Added minimum Perl version to Makefile.PL.
+
+  - Removed use of Path::Class in pod2readme utility.
+
+  [Other Changes]
+  - Added rudimentary tests for pod2readme script.
+
+  [Enhancements]
+  - The requires plugin uses minimum module versions to check if a
+    module is in the core-list.
+
+v1.0.1_05 2014-10-09 19:36 BST
+  [Documentation]
+  - Corrected typos in POD.
+
+  [Bug Fixes]
+  - Disabled use of Test::Kit, since it seems to have problems with
+    Test::Builder 1.301001_056.
+
+v1.0.1_04 2014-10-08 23:27 BST
+  [Documentation]
+  - Changed abstract to make the module's purpose more obvious.
+
+  [Bug Fixes]
+  - Added missing IO::String prereq to tests.
+
+v1.0.1_03 2014-10-08 22:42 BST
+  [Documentation]
+  - Added Acknowledgements section to POD.
+
+  [Bug Fixes]
+  - Added minimum version prereq of Moo to fix issue with undef
+    defaults.
+
+  [Enhancements]
+  - Changed to use Path::Tiny instead of Path::Class.
+
+  - Reverted back to using Exporter, since most core modules already
+    use it.
+
+v1.0.1_02 2014-10-08 00:49 BST
+  [Documentation]
+  - Added missing timestamp to Changes.
+
+  - Updated README.pod.
+
+  [Other Changes]
+  - Changed how versions are defined in modules, to handle quirks of
+    namespace::autoclean.
+
+  - Changed to use Exporter::Lite.
+
+v1.0.1_01 2014-10-08 00:26 BST
+  [Bug Fixes]
+  - Fixed argument name for include command.
+
+  - Changed tests to compare files so they handle different Windows
+    line endings.
+
+  [Documentation]
+  - Fixed POD errors and typos.
+
+  [Enhancements]
+  - Switched to use Type::Tiny-based types, with stricter constraints.
+
+  - Switched to use Moo instead of Moose.
+
+  [Other Changes]
+  - Minor internal code tweaks.
+
+v1.0.0_03 2014-09-24 21:14 BST
+  [Bug Fixes]
+  - The tests for the requires plugin handle non-author builds.
+
+  - Fix for tests on some systems.
+
+  [Enhancements]
+  - Show path of missing META.yml file in requires plugin.
+
+  [Documentation]
+  - Consistent names in POD.
+
+  - Fixed typos in Changes file.
+
+  [Other Changes]
+  - Added hooks for author tests in Makefile.PL.
+
+  - Fixed license metadata error to make CPANTS happy, and to be
+    consistent with license in the POD.
+
+  - Tests use Exporter instead of Exporter::Lite.
+
+  - Tests use Test::Kit rather than Test::Most, and explicitly import
+    the tests modules that they use.
+
+  - Removed redundant prereqs from Makefile.PL.
+
+v1.0.0_02 2014-09-24 14:14 BST
+  [Bug Fixes]
+  - Fixed minimum version of some prerequisites for tests.
+
+  [Enhancements]
+  - Added parse_from_file and parse_from_filehandle methods for
+    backwards compatability.
+
+  [Other Changes]
+  - Added more tests.
+
+  - The bugtracker URL now refers to the GitHub issues list at
+    https://github.com/bigpresh/Pod-Readme/issues
+    instead of RT.
+
+  - Added a version to all modules in the distribution, and a version
+    QA test to the repo.
+
+  [Documentation]
+  - Added missing date to Changes.
+
+  - Fixed typos in POD and README.
+
+  - Added stub POD to Pod::Readme::Filter.
+
+  - Fixed a daft typo in the Changes file.
+
+  - Documented known issue in the requires plugin.
+
+  - The README is now a POD document.
+
+v1.0.0_01 2014-09-23 13:58 BST
+  [Incompatabilities]
+  - Major rewrite, using modern Perl v5.10.1.
+
+  - This module is no longer a subclass of a POD parsing
+    module. Instead, it is a simple POD filter.
+
+  [New Features]
+  - Added support for plugins.
+
+  - Added a "changes" plugin for parsing Changes files.
+
+  - Added a "version" plugin for including the current version.
+
+  - Added a "requires" plugin for listing module requirements.
+
+  - The pod2readme script has been rewritten to take a variety of
+    options, and can generate various formats, such as HTML, Markdown,
+    POD or RTF.
+
+  [Documentation]
+  - Changes rewritten to conform to CPAN::Changes::Spec.
+
+  - README is now in Markdown format.
+
+  [Other Changes]
+  - Switched to semantic versioning.
+
+  - Added MANIFEST.SKIP to distribution.
+
+  - QA tests are no longer part of the distribution.
+
+  - Makefile.PL uses Module::Install.
+
+0.11  2010-12-09
+
+  - Recognise the =encoding directive, rather than dying when it's
+    encountered.
+    TODO: actually take heed of it.
+    Thanks to Ivan Bessarabov for bringing this to my attention!
+
+0.10  2010-05-19
+
+  - David Precious <davidp@preshweb.co.uk> taking over maintainership
+
+  - Apply POD fix patch from RT #38328, thanks to David A. Desrosiers
+
+0.09  2006-11-25
+
+  - uses Regexp::Common for URI parsing for L<> tag
+
+  - added separate check for https, ftps, and svn URIs (rt.cpan.org
+    bugs 23585 and 23613)
+
+0.081 2006-05-07
+
+  - released package without signature, due to Module::Signature
+    issues
+
+0.08  2006-05-01
+
+  - head3/4 headings not recognized
+
+  - went back to using Pod::PlainText
+
+0.07  2006-02-11
+
+  - added min version to use Pod::Text statement in source
+
+  - removed multiple plans from the podcover test
+
+0.06  2006-02-09
+
+  - eliminated a warning about uninitialized values
+
+  - recognizes =head3 and =head4 headings (from Pod::Text)
+
+  - uses Pod::Text instead of Pod::PlainText
+
+  - added internal documentation
+
+  - added various QA tests
+
+  - added "test" and "tests" as a rejected format
+
+0.05 2005-06-07
+
+  - pod2readme will backup an existing README file
+
+  - minor updates to the documentation
+
+0.04  2005-05-18
+
+  - known other formats such as "html" are rejected
+
+  - added missing prereq IO::File in Build.PL
+
+  - added debug option
+
+  - typos and tweaks for documentation
+
+0.03  2005-05-08
+
+  - added documentation to pod2readme script
+
+  - include file start/stop marks are now Regexps
+
+  - added more tests
+
+  - multiple readme types can be specified in a command
+
+0.02  2005-05-06
+
+  - added tests (much needed!)
+
+  - fixed issue with links being changed to refer to manpages
+
+0.01  2005-04-20
+
+  - original version

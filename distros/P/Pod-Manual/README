@@ -1,0 +1,30 @@
+Pod-Manual version 0.08
+
+Pod::Manual is a module that gathers the pod of several 
+modules into a comprehensive manual.  Its primary objective
+is to generate a document that can be printed, but it also
+allow to output the document into other formats (e.g., docbook).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+Object::InsideOut
+XML::XPathScript
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Yanick Champoux
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

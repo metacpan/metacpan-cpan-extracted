@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1212923220,
+          'number' => '',
+          'time' => '12:07',
+          'date' => '2008-06-08',
+          'name' => 'Ocado',
+          'phone' => '',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1212923220,
+          'text' => 'Dear Mr XXXXXXXX. Don\'t forget your Ocado delivery is due tomorrow at 8pm. You have until 10:30pm today to make any last-minute changes to your order.',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7108264,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 127538
+        };

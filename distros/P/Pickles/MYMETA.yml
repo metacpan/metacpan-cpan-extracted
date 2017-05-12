@@ -1,0 +1,33 @@
+---
+abstract: 'simple web application framework'
+author:
+  - 'Tomohiro Ikebe <ikebe {at} livedoor.jp>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+dynamic_config: 0
+generated_by: 'Module::Install version 1.04, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pickles
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Data::Inheritable: 0
+  Class::Trigger: 0
+  Module::Setup: 0.09
+  Plack: 0.99
+  Router::Simple: 0
+  String::CamelCase: 0
+  Text::Xslate: 0
+  Text::Xslate::Bridge::TT2Like: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.09

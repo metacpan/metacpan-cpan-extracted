@@ -1,0 +1,38 @@
+---
+abstract: 'ANSI-colored text renderer for Perl6::Perldoc'
+author:
+  - 'Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perl6-Perldoc-To-Ansi
+no_index:
+  directory:
+    - t
+    - utils
+  namespace:
+    - Perl6::Perldoc::Block
+    - Perl6::Perldoc::FormattingCode
+  package:
+    - Perl6::Perldoc::Ambient
+    - Perl6::Perldoc::Block
+    - Perl6::Perldoc::Config
+    - Perl6::Perldoc::Document
+    - Perl6::Perldoc::FormattingCode
+    - Perl6::Perldoc::Parser::ReturnVal
+    - Perl6::Perldoc::Root
+requires:
+  Perl6::Perldoc: 0.0.5
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl6-Perldoc-To-Ansi
+  homepage: http://search.cpan.org/dist/Perl6-Perldoc-To-Ansi/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hinrik/perl6-perldoc-to-ansi.git
+version: 0.11
+x_authority: cpan:HINRIK

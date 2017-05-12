@@ -1,0 +1,41 @@
+{
+   "abstract" : "A POE Filter for the Redis protocol",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>",
+      "Rocco Caputo <rcaputo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Filter-Redis",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "POE" : "1.299",
+            "perl" : "v5.8.5"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/bingos/poe-filter-redis/tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bingos/poe-filter-redis.git",
+         "web" : "http://github.com/bingos/poe-filter-redis/tree"
+      }
+   },
+   "version" : "0.02"
+}
+

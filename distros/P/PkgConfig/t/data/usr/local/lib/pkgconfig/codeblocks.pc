@@ -1,0 +1,19 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+datarootdir = ${prefix}/share
+plugindir=${datarootdir}/codeblocks/plugins
+sharedir=${datarootdir}
+
+Name: codeblocks
+Description: Code::Blocks IDE
+Version: 1.0svn
+Libs: -L${libdir} -lcodeblocks
+Cflags: -I${includedir}/codeblocks \
+			-I${includedir}/codeblocks/tinyxml \
+			-I${includedir}/codeblocks/scripting/include \
+			-I${includedir}/codeblocks/scripting/bindings \
+			-I${includedir}/codeblocks/scripting/sqplus \
+			-I${includedir}/codeblocks/wxFlatNotebook/include \
+			-I${includedir}/codeblocks/wxscintilla/include

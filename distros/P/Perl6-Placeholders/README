@@ -1,0 +1,61 @@
+==============================================================================
+                Release of version 0.05 of Perl6::Placeholders
+==============================================================================
+
+
+NAME
+    Perl6::Placeholders - Perl 6 implicitly declared parameter syntax for Perl 5
+
+SYNOPSIS
+    use Perl6::Placeholders;
+
+    my $add = { $^a + $^b };        # Create a sub that adds its two args
+
+    print $add->(1,2), "\n";        # Call it
+
+    # Use as map, grep, and sort blocks
+    print join ",", sort { $^y <=> $^x } 1..10;
+    print join "\n", map { $^value**2 } 1..10;
+    print join "\n", map { $data{$_-1}.$^value**2 } 1..10;
+    print join "\n", grep { $data{$^value} } 1..10;
+
+DESCRIPTION
+
+    The Perl6::Placeholders module lets you try out the new Perl 6 implicit
+    parameter declaration syntax in Perl 5.
+
+DEPENDENCIES
+    The module is implemented using Filter::Simple and requires that module
+    to be installed.
+
+AUTHOR
+    Damian Conway (damian@conway.org)
+
+COPYRIGHT
+    Copyright (c) 2002, Damian Conway. All Rights Reserved.
+    This module is free software. It may be used, redistributed
+    and/or modified under the same terms as Perl itself.
+
+
+==============================================================================
+
+CHANGES IN VERSION 0.05
+
+
+	- Reborn as Perl6::Placeholders after we decided to 
+	  completely change how the currying mechanism worked.
+	  (Thanks Angel!)
+
+	- Optimized placeholder detection regex
+
+
+==============================================================================
+
+AVAILABILITY
+
+Perl6::Placeholders has been uploaded to the CPAN
+and is also available from:
+
+	http://www.csse.monash.edu.au/~damian/CPAN/Perl6-Placeholders.tar.gz
+
+==============================================================================

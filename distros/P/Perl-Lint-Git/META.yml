@@ -1,0 +1,40 @@
+---
+abstract: 'Connect git and Perl::Lint to blame the right people for violations.'
+author:
+  - 'Guillaume Aubert <aubertg@cpan.org>'
+build_requires:
+  File::Path: '0'
+  Git::Repository: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::FailWarnings: '0'
+  Test::Git: '0'
+  Test::More: '0'
+  Test::Requires::Git: '1.005'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Lint-Git
+provides:
+  Perl::Lint::Git:
+    file: lib/Perl/Lint/Git.pm
+    version: v1.1.0
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  Git::Repository: '0'
+  Git::Repository::Plugin::Blame: '0'
+  Perl::Lint: '0.21'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/guillaumeaubert/Perl-Lint-Git/issues
+  homepage: https://metacpan.org/release/Perl-Lint-Git
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/guillaumeaubert/Perl-Lint-Git
+version: v1.1.0

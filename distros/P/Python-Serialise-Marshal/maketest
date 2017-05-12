@@ -1,0 +1,176 @@
+#!/usr/bin/perl -w 
+
+#####
+# 
+# Script for generating test files for Python pickling modules
+# (c) Simon Wistow <simon@thegestalt.org>, 2003
+# Released under the same terms as Perl itself
+# 
+# usage: ./maketest <input file>
+#
+#####
+
+use strict;
+
+# the test file named 
+my $number = 0;
+
+# what stage of parsing we're on
+my $in=0;
+
+# expected input, output and the name of the tests
+my (@in, @out, @names);
+
+# test filename, output filename, python file filename
+my ($tfile, $ofile, $pfile);
+
+# check to see we've been passed a file
+die "./maketest <input file>" unless @ARGV;
+
+# make directories if necessary
+mkdir('t/')  unless (-e 't/' && -d 't/');
+mkdir('py/') unless (-e 'py/' && -d 'py/');
+
+while (<>) {
+	
+	# clean up and skip comments and blank lines
+	chomp;
+	next if /^\s*$/;
+	next if /^#/;
+
+	# is this a new section?
+	if (/^^=(.+)\s*$/) {
+		
+		# if this isn't the first section
+		if ($number) {
+			# dump the files
+			finalise_python($pfile, $ofile, \@in);
+			finalise_tests ($tfile, $ofile, \@out,\@names);
+			@in  = ();
+			@out = ();
+		}	
+
+		# get the new name
+		my $name = $1;
+		print "making $name\n";
+		
+		# reset the parser
+		$in=0;
+		
+
+		# work out the file names	
+		$tfile = sprintf "t/%.2d%s.t",++$number,$name;
+		$pfile = sprintf "py/%s.py",$name;
+		$ofile = sprintf "t/%s",$name;
+		next;
+	}
+	
+
+	# the output
+	if ($in==1) {
+		$in=2;
+		push @out, $_;
+	# the name
+	} elsif ($in == 2) {
+		$in=0;
+		push @names, $_;
+	# the input
+	} else {
+		$in=1;
+		push @in, $_;
+	}
+
+
+}
+# do the last section
+finalise_python($pfile, $ofile, \@in);
+finalise_tests ($tfile, $ofile, \@out, \@names);
+
+
+# create the python files to generate the serialised files
+sub finalise_python {
+	my ($pfile, $ofile, $inref) = @_;
+
+
+	open (OUT,">$pfile") or die "Can't open $pfile: $!\n";	
+	print OUT "import marshal\n";
+	print OUT "f=open('$ofile','wb')\n";
+	# dump each input in turn
+	foreach my $in (@$inref) {
+		print OUT "marshal.dump($in,f)\n";
+
+	}
+
+	print OUT "f.close()\n";
+	close OUT;
+	system("python $pfile");
+
+}
+
+# create the test files
+# these read in from python generated files and then 
+# write them out again to a tmp file and then 
+# read our own dog food
+sub finalise_tests {
+	my ($tfile, $ofile, $outref, $nameref) = @_;
+
+	open (OUT,">$tfile") or die "Can't open $tfile: $!\n";
+
+
+	# work out the number of tests
+	my $ntests = (scalar @$outref *3) + (3*2) + 1;
+
+	# hack to make complex number stringification work
+	my $extra = ($ofile =~ /complex$/)? '"".':'';
+
+
+	# boiler plate stuff
+	print OUT "use strict;\n";
+	print OUT "use Test::More tests => $ntests;\n\n";
+	#print OUT "use Test::More qw/no_plan/;\n\n";
+	print OUT "use Math::Complex;\n";
+	print OUT "use_ok('Python::Serialise::Marshal');\n\n";
+
+	# test the python generated stuff
+	my @temp;
+	print OUT "\n\n#testing python generated data\n";
+	print OUT "ok(my \$ps = Python::Serialise::Marshal->new('$ofile'));\n\n";	
+	foreach my $out (@$outref) {
+		my $name = shift @$nameref;
+		print OUT "is_deeply($extra\$ps->load(), $out, '$name');\n";
+		push @temp, $name;
+	}
+	print OUT "ok(\$ps->close());\n";
+
+	$nameref = \@temp;
+
+	my @temp2;
+	# now test writing
+	print OUT "\n\n#testing generating the same data\n";
+	print OUT "ok(my \$ps = Python::Serialise::Marshal->new('>t/tmp'));\n\n";	
+	foreach my $out (@$outref) {
+		my $tmp = $out;
+		if ($out =~ /([\d\.]+)\+([\d\.]+)i/) {
+			$tmp = "Math::Complex->new('$1','$2')";
+		}
+		my $name = shift @$nameref;
+		print OUT "ok(\$ps->dump($tmp), 'write $name');\n";
+		push @temp2, $name;
+	}
+	print OUT "ok(\$ps->close());\n";
+
+	$nameref = \@temp2;
+
+	# then read that back in again
+        print OUT "\n\n#testing python generated data\n";
+ 	print OUT "ok(my \$ps = Python::Serialise::Marshal->new('t/tmp'));\n";
+        foreach my $out (@$outref) {
+		my $name = shift @$nameref;
+		print STDERR "no name for dog food $out\n" unless defined $name;
+                print OUT "is_deeply($extra\$ps->load(), $out, 'dogfood $name');\n";
+        }
+        print OUT "ok(\$ps->close());\n";
+
+	close OUT;
+
+}

@@ -1,0 +1,10 @@
+Each production returns the result of its last rule, so
+
+ character: /\w/ {print "Character: $item[1]\n"}
+
+returns the result of the { print ... } action. You want
+
+ character: /\w/ { print "Character: $item[1]\n" } { $item[1] }
+
+Of course, it doesn't make much sense to print in a production 
+the parser might backtrack through the production.  

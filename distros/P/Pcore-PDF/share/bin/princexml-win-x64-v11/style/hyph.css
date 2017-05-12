@@ -1,0 +1,22 @@
+/*
+    Prince - Hyphenation style sheet
+    http://www.princexml.com
+*/
+
+:root { prince-hyphenate-patterns: url("../hyph/hyph-en-us.pat") }
+
+:lang(da) { prince-hyphenate-patterns: url("../hyph/hyph-da.pat") }
+:lang(de) { prince-hyphenate-patterns: url("../hyph/hyph-de-1996.pat") }
+:lang(en) { prince-hyphenate-patterns: url("../hyph/hyph-en-us.pat") }
+:lang(es) { prince-hyphenate-patterns: url("../hyph/hyph-es.pat") }
+:lang(fi) { prince-hyphenate-patterns: url("../hyph/hyph-fi.pat") }
+:lang(fr) { prince-hyphenate-patterns: url("../hyph/hyph-fr.pat") }
+:lang(is) { prince-hyphenate-patterns: url("../hyph/hyph-is.pat") }
+:lang(it) { prince-hyphenate-patterns: url("../hyph/hyph-it.pat") }
+:lang(lt) { prince-hyphenate-patterns: url("../hyph/hyph-lt.pat") }
+:lang(pl) { prince-hyphenate-patterns: url("../hyph/hyph-pl.pat") }
+:lang(pt) { prince-hyphenate-patterns: url("../hyph/hyph-pt.pat") }
+:lang(ru) { prince-hyphenate-patterns: url("../hyph/hyph-ru.pat") }
+:lang(sl) { prince-hyphenate-patterns: url("../hyph/hyph-sl.pat") }
+:lang(sv) { prince-hyphenate-patterns: url("../hyph/hyph-sv.pat") }
+

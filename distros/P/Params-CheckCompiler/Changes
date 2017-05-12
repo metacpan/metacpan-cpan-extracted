@@ -1,0 +1,61 @@
+0.08     2016-12-06
+
+- This distribution has been renamed to Params::ValidationCompiler, so use
+  that instead. This release of Params::CheckCompiler now dies when its loaded
+  to tell you that.
+
+
+0.07     2016-06-18
+
+- Make the compiled sub for checking named params die if given a single object
+  as an argument, even if the object is implemented using a hashref. However,
+  if the object overloads hash dereferencing then the overloading is
+  used. Reported by Mark Fowler. GitHub #3.
+
+- Renamed compile() to validation_for(). The latter is not a very specific
+  name. Requested by Mark Fowler. GitHub #1.
+
+
+0.06     2016-06-18
+
+- Require Type::Tiny for tests. Reported by Slave Rezic. RT #115413.
+
+- Fix tests when Moose is installed but Devel::PartialDump is not. Reported by
+  Slave Rezic. RT #115413.
+
+
+0.05     2016-06-18
+
+- Removed all remaining uses of Moo.
+
+
+0.04     2016-06-17
+
+- Removed more modules from test prereqs that are only used in optional tests.
+
+- Replace Throwable with Exception::Class.
+
+
+0.03     2016-06-17
+
+- Remove Moose from test prereqs. This is only used for an optional test.
+
+- When generating the source for named params checking, sort the parameters so
+  that the order in which keys are checked is consistent.
+
+- You can now pass a name parameter when creating a check subroutine. This
+  will be used to name the generated subroutine using Sub::Name.
+
+
+0.02     2016-05-28
+
+- Add support for positional parameters.
+
+- Add support for type checking extra parameters.
+
+- Renamed allow_extra to slurpy.
+
+
+0.01     2016-05-24
+
+- First release upon an unsuspecting world.

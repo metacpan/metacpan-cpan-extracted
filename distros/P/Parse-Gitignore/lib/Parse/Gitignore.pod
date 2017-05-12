@@ -1,0 +1,73 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Parse::Gitignore - parse a .gitignore file
+
+=head1 SYNOPSIS
+
+    use Parse::Gitignore;
+
+=head1 DESCRIPTION
+
+Parse a .gitignore file and check whether a file matches it.
+
+=head1 METHODS
+
+=head2 new
+
+    my $pg = Parse::Gitignore->new ('./.gitignore');
+
+=head2 ignored
+
+    if ($pg->ignored ('./Makefile')) {
+	print "Makefile is ignored.\n";
+    }
+
+Check whether a file matches a .gitignore.
+
+=head2 read_gitignore
+
+    $pg->read_gitignore ('.gitignore');
+
+Read a F<.gitignore> file. You can read as many as you like and they
+are accumulated.
+
+=head2 excludesfile
+
+    $pg->excludesfile ('/home/user/.gitignore');
+
+Read an excludesfile which is applied to all directories where .git is
+found.
+
+=head1 HISTORY
+
+I wrote this because I wanted to have a way to ignore generated files
+for a desktop file search application.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head2 Request
+
+If you'd like to see this module continued, let me know that you're
+using it. For example, send an email, write a bug report, star the
+project's github repository, add a patch, add a C<++> on Metacpan.org,
+or write a rating at CPAN ratings. It really does make a
+difference. Thanks.
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

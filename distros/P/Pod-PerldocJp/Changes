@@ -1,0 +1,69 @@
+Revision history for Pod-PerldocJp
+
+0.19 2017/02/06
+  - fixed -F option (patched by robario++)
+
+0.18 2014/04/17
+  - fixed packaging issue
+
+0.17 2014/04/17
+  - applied changes in Pod::Perldoc to support a "-a" option
+    (to show perlapi in Japanese)
+  - refactored internally to use *::Tiny modules
+
+0.16 2014/02/23
+  - stopped tweaking env
+
+0.15 2014/02/23
+  - set -J option (to translate) internally
+
+0.14 2011/03/17
+  - hid a private function
+
+0.13 2010/06/11
+  - better local file handling (suggested by AzureStone)
+
+0.12 2010/04/24
+  - ditch binmode encoding to silence warnings
+
+0.11 2010/04/23
+  - don't assume PERLDOCJP_SERVER have /pod/ in its path;
+    this makes it easier to launch an api server that serves local
+    files
+
+0.10 2010/04/21
+  - encode guessing was broken
+
+0.09 2010/04/20
+  - now you can pass urls directly
+
+0.08 2010/04/20
+  - api server/supported encodings are configurable now
+  - guess encoding if necessary
+
+0.07 2010/04/19
+  - supported other perldoc.jp pods
+
+0.06 2009/12/19
+  - check writability of the directory to store pod
+  - added env_proxy (mattn's request)
+  - added Japanese document
+
+0.05  2009/11/28
+  - there were still modules to spit warnings.
+
+0.04  2009/11/28
+  - use system's temporary directory to store Japanese pods
+    if the share directory for this module is not writable.
+  - fixed wrapper (hopefully).
+
+0.03  2009/11/25
+  - oops, the previous fix was totally wrong.
+    tentatively stopped joining split words.
+
+0.02  2009/11/25
+  - fixed infinite loop
+  - fixed pod
+
+0.01  2009/11/21
+  - initial release

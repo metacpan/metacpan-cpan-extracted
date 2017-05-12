@@ -1,0 +1,27 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+bin/safetynetd.pl
+bin/safetynet-shell.pl
+bin/telnetu.pl
+etc/test.programs
+etc/test.rc
+t/01-basic.t
+t/02-autostart.t
+t/10-program-crud-mem.t
+t/11-program-crud-textfile.t
+t/Safetynet.t
+t/shell.commands
+lib/Proc/Safetynet.pm
+lib/Proc/Safetynet/Event.pm
+lib/Proc/Safetynet/Program.pm
+lib/Proc/Safetynet/ProgramStatus.pm
+lib/Proc/Safetynet/Program/Storage.pm
+lib/Proc/Safetynet/Program/Storage/Memory.pm
+lib/Proc/Safetynet/Program/Storage/TextFile.pm
+lib/Proc/Safetynet/POEWorker.pm
+lib/Proc/Safetynet/RpcSession/Simple.pm
+lib/Proc/Safetynet/RpcServer/Unix.pm
+lib/Proc/Safetynet/Supervisor.pm
+META.yml                                 Module meta-data (added by MakeMaker)

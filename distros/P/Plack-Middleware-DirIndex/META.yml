@@ -1,0 +1,32 @@
+---
+abstract: "Append an index file to request PATH's ending with a /"
+author:
+  - 'Leo Lapworth'
+build_requires:
+  File::Spec: '0'
+  Plack::App::File: '0'
+  Plack::Builder: '0'
+  Plack::Middleware::ErrorDocument: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-DirIndex
+requires:
+  Plack::Middleware: '0'
+  Plack::Util::Accessor: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/ranguard/plack-middleware-dirindex/issues
+  repository: https://github.com/ranguard/plack-middleware-dirindex
+version: '1.00'

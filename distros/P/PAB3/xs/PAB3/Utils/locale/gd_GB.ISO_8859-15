@@ -1,0 +1,57 @@
+grp:3;3
+fd:2
+ifd:2
+dp:.
+ts:,
+cs:£
+ics:GBP
+csa:l
+css:0
+ns:-
+ps:+
+dtf:%a %d %b %Y %H:%M:%S %Z
+df:%d/%m/%y
+tf:%H:%M:%S
+apf:
+amu:
+pmu:
+aml:
+pml:
+lm1:Am Faoilteach
+lm2:An Gearran
+lm3:Am Màrt
+lm4:An Giblean
+lm5:A' Mhàigh
+lm6:An t-Mhìos
+lm7:An t-luchar
+lm8:An Lùnasdal
+lm9:An t-Sultain
+lm10:An Damhair
+lm11:An t-Samhain
+lm12:An Dùbhlachd
+sm1:Fao
+sm2:Gea
+sm3:Màr
+sm4:Gib
+sm5:Mhà
+sm6:OgM
+sm7:luc
+sm8:Lùn
+sm9:Sul
+sm10:Dam
+sm11:Sam
+sm12:Dùb
+ld1:Didòmhnaich
+ld2:Diluain
+ld3:Dimàirt
+ld4:Diciadain
+ld5:Diardaoin
+ld6:Dihaoine
+ld7:Disathairne
+sd1:Dido
+sd2:Dilu
+sd3:Dim
+sd4:Dic
+sd5:Diar
+sd6:Diha
+sd7:Disa

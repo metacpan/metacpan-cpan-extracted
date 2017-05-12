@@ -1,0 +1,29 @@
+---
+abstract: 'Perl Modules Information Extractor'
+author:
+  - 'Nuno Martins <nuno.martins@caixamagica.pt>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.31'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.141170'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PMInfoExtr
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DPKG::Parse: '0'
+  Devel::Modlist: '0'
+  File::Find::Rule: '0'
+  Getopt::Long: '0'
+  JSON: '0'
+  MetaCPAN::API: '0'
+  Moose: '0'
+  UUID::Tiny: '0'
+version: '0.002'

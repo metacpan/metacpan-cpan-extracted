@@ -1,0 +1,43 @@
+---
+abstract: 'Sends events for new articles posted to an NNTP newsgroup'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Email::Date::Format: 0
+  Email::Simple: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.112150'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-Client-NNTP-Tail
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  POE::Component::Client::NNTP::Tail:
+    file: lib/POE/Component/Client/NNTP/Tail.pm
+    version: 0.03
+requires:
+  Carp::POE: 0
+  POE: 0
+  POE::Component::Client::NNTP: 0
+  POE::Component::Server::NNTP: 0
+  Params::Validate: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Client-NNTP-Tail
+  homepage: http://github.com/dagolden/poe-component-client-nntp-tail
+  repository: http://github.com/dagolden/poe-component-client-nntp-tail
+version: 0.03

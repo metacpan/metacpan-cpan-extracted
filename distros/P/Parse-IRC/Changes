@@ -1,0 +1,55 @@
+==================================================
+Changes from 2011-10-18 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.22 at 2016-10-16 11:35:24 +0000
+-----------------------------------------
+
+  Change: 6dc0239ee3042c75a6263d8195e53740fb1472e0
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2016-10-16 12:35:24 +0000
+
+    This be 1.22 
+
+  Change: e58794f08c86cd542632bf6aed0725d5015e7aee
+  Author: pink-mist <andreas.guldstrand@gmail.com>
+  Date : 2016-10-11 09:34:57 +0000
+
+    Allow matching of ipv6 addresses in DCC CHAT/SEND (#1) 
+
+-----------------------------------------
+version 1.20 at 2012-10-20 21:34:38 +0000
+-----------------------------------------
+
+  Change: 5e2ce48e7ed97cd1a4830d3187e9ff15e3288c62
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-10-20 22:34:38 +0000
+
+    Switch to Dist::Zilla instead of Module::Install
+
+    Just a change in packaging, no functional changes.
+
+    Addresses an issue with Module::Install 1.04 as pointed out here:
+    http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-
+    module-install-1-04 
+
+-----------------------------------------
+version 1.18 at 2011-10-20 09:22:19 +0000
+-----------------------------------------
+
+  Change: 604b94852b388681918df6eba580b68a20faddd3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-10-20 10:22:19 +0000
+
+    Bump version to 1.18 
+
+  Change: aeb5f66125b4cb2f5698b9823fb624620802ae16
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-10-20 10:08:38 +0000
+
+    Added ctcp/dcc support 
+
+================================================
+Plus 2 releases after 2011-10-18 00:00:00 +0000.
+================================================

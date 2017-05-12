@@ -1,0 +1,3 @@
+<div>
+  <p class="error" petal:if="error" petal:content="error">Error Message</p>
+</div>

@@ -1,0 +1,43 @@
+---
+abstract: 'Local Perl documentation server'
+author:
+  - 'Jon Allen (JJ) <jj@jonallen.info>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perldoc-Server
+no_index:
+  directory:
+    - inc
+    - root
+    - t
+requires:
+  Catalyst::Action::RenderView: 0
+  Catalyst::Plugin::ConfigLoader: 0
+  Catalyst::Plugin::Session: 0
+  Catalyst::Plugin::Session::State::Cookie: 0
+  Catalyst::Plugin::Session::Store::File: 0
+  Catalyst::Plugin::Static::Simple: 0
+  Catalyst::Runtime: 5.71001
+  Catalyst::View::TT: 0
+  Config::General: 0
+  File::Monitor: 0
+  File::ShareDir: 0
+  File::Slurp: 0
+  HTML::Entities: 0
+  MRO::Compat: 0
+  OpenThought: 0
+  Perl::Tidy: 0
+  Pod::POM: 0.23
+  parent: 0
+  perl: 5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.10

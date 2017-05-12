@@ -1,0 +1,20 @@
+0.06  Wed Sep 1 16:52:24 GMT 2010
+    - Use Dist::Zilla
+    - Make all warnings fatal
+
+0.05 Fri Feb 29 19:06:00 GMT 2008
+    - Handle translation errors
+
+0.04 Sun Feb 24 15:56:45 GMT 2008
+    - Change the interface a little
+    - Remove Makefile
+
+0.03 Sat Feb 23 15:08:13 GMT 2008
+    - Add context hash
+
+0.02 Sat Feb 23 10:26:05 GMT 200
+    - Document the 'alias' argument
+
+0.01 Sat Feb 23 08:59:24 GMT 2008
+    - Initial release
+

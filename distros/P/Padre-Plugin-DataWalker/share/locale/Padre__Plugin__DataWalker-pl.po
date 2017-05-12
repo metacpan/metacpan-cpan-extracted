@@ -1,0 +1,58 @@
+#
+# Cezary Morga <cm@therek.net>, 2009.
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-DataWalker\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-10 22:50+0300\n"
+"PO-Revision-Date: 2009-05-13 20:09+0200\n"
+"Last-Translator: Cezary Morga <cm@therek.net>\n"
+"Language-Team: Polish <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 0.3\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: lib/Padre/Plugin/DataWalker.pm:89
+msgid "About"
+msgstr "O wtyczce"
+
+#: lib/Padre/Plugin/DataWalker.pm:90
+msgid "Browse YAML dump file"
+msgstr "Przeglądaj plik zrzutu YAML"
+
+#: lib/Padre/Plugin/DataWalker.pm:91
+msgid "Browse current document object"
+msgstr "Przeglądaj obiekt bieżącego dokumentu"
+
+#: lib/Padre/Plugin/DataWalker.pm:92
+msgid "Browse Padre IDE object"
+msgstr "Przeglądaj obiekt Padre IDE"
+
+#: lib/Padre/Plugin/DataWalker.pm:93
+msgid "Browse Padre main symbol table"
+msgstr "Przeglądaj głównę tablicę symboli Padre"
+
+#: lib/Padre/Plugin/DataWalker.pm:103
+msgid "Open file"
+msgstr "Otwórz plik"
+
+#: lib/Padre/Plugin/DataWalker.pm:119
+#, perl-format
+msgid "Could not find the specified file '%s'"
+msgstr "Nie odnaleziono wskazanego pliku '%s'"
+
+#: lib/Padre/Plugin/DataWalker.pm:120
+msgid "File not found"
+msgstr "Brak pliku"
+
+#: lib/Padre/Plugin/DataWalker.pm:129
+#, perl-format
+msgid "Could not read the YAML file.%s"
+msgstr "Błąd przy próbie odczytu pliku YAML %s"
+
+#: lib/Padre/Plugin/DataWalker.pm:130
+msgid "Invalid YAML file"
+msgstr "Niepoprawny plik YAML"
+

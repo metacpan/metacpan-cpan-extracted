@@ -1,0 +1,20 @@
+Use files in this directory to create a small (testing) web
+application on your web server. Here is what you need to do:
+
+1. Make sure that the module Proc::Async (and its dependencies) is
+   installed on your web server machine.
+
+2. Make the content of the "cgi-bin" sub-directory available on your
+   web server as the cgi-bin scripts. For example by linking this
+   sub-directory from the "/usr/lib/cgi-bin/" under the name
+   "extester".
+
+3. Make the content of the "html" sub-directory available on your web
+   server as document pages. For example by linking this sub-directory
+   from the "/var/www/" under the name "extester".
+
+4. Edit "html/extester.html" and change there the URL of the cgi-bin
+   script "monitor.pl" (which depends where you put it in the step 2
+   above). There are two places where to edit this URL.
+
+5. Finally, restart your web server.

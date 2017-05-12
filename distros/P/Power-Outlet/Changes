@@ -1,0 +1,65 @@
+Revision history for Perl module Power::Outlet
+
+TODO
+  - RE-write Net::UPnP interfaces as Net:UPnP is not good at error trapping or timeouts.
+  - Update error handling for Power::Outlet::Hue->name
+
+0.16 2015-11-07
+  - Updated MANIFEST - rt108167 <chorny at cpan.org>
+
+0.15 2015-01-07
+  - Cleaned up Philips Hue code and documentation
+
+0.14 2015-01-07
+  - Added support for Philips Hue devices
+
+0.13 2014-12-21
+  - Added script power-outlet-json.cgi
+
+0.12 2013-12-31
+  - Updated Power::Outlet::WeMo->name default value to pull the FriendlyName from UPnP
+  - Updated Power::Outlet::iBootBar->name default value to pull the outletName from SNMP
+  - Updated documentation
+
+0.11 2013-12-29
+  - Fixed WeMo returns to be "ON"|"OFF" vs 0|1.
+
+0.10 2013-12-29
+  - Fixed Power::Outlet::Common->cycle (type-O calling switch method)
+  - Added WeMo capability
+
+0.09 2013-12-27
+  - Fixed Makefile.PL for CPAN testers (Net::SNMP)
+
+0.08 2013-12-27
+  - Fixed Makefile.PL for CPAN testers (Package::New)
+  - Fixed power-outlet.cgi pod documentation
+
+0.07 2013-12-18
+  - Updated Documentation for CPAN
+
+0.06 2013-11-30
+  - Added license file for DCRoundSwitch icons.
+
+0.05 2013-11-30
+  - Updated Power::Outlet::iBootBar to not query device in void context
+
+0.04 2013-11-30
+  - Updated power-outlet.cgi to pull outlets from ini file
+  - Updated power-outlet.cgi to work nicely on iPhone
+  - Updated spec to build RPM perl-Power-Outlet-application-cgi
+
+0.03 2013-11-29
+  - Updated power-outlet.cgi
+  - Added name property
+
+0.02 2013-11-26
+  - Updated Power::Outlet->new to call subclass->new
+  - Added program power-outlet
+  - Added CGI example power-outlet.cgi
+  - Added tests
+  - Added RPM Spec
+
+0.01 2013-11-23
+  - original version; created by ExtUtils::ModuleMaker 0.51
+  - Power::Outlet::iBoot was originally Net:iBoot (now abandoned) as iBoot uses a custom TCP/IP protocol

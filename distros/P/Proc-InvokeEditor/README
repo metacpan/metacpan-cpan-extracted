@@ -1,0 +1,44 @@
+Proc::InvokeEditor version 1.07
+=======================
+
+This module provides a simple API to calling an external text editor
+from within your perl program.
+
+This is a trivial task, but there are potential security issues
+if you don't get it right, and it's fundamentally tedious to write
+any piece of code more than once.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+During the testing process Proc::InvokeEditor will attempt to start
+a text editor for testing. Please save the files opened immediately
+with no changes.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* File::Temp
+* Test::More
+* Carp::Assert
+* File::Spec
+* IPC::Cmd
+
+REPOSITORY
+
+This module lives on github at:
+
+http://github.com/mstevens/Proc--InvokeEditor
+
+COPYRIGHT AND LICENCE
+
+This module is licensed under the same terms as Perl itself.
+
+Copyright (C) 2001,2010,2011,2014 Michael Stevens and others

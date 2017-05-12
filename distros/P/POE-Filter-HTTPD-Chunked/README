@@ -1,0 +1,194 @@
+NAME
+    POE::Filter::HTTPD::Chunked - Drop-in replacement for POE::Filter::HTTPD
+    that also support HTTP1.1 chunked transfer-encoding.
+
+SYNOPSIS
+      #!perl
+
+      use warnings;
+      use strict;
+
+      use POE qw(Component::Server::TCP Filter::HTTPD::Chunked);
+      use HTTP::Response;
+
+      POE::Component::Server::TCP->new(
+        Port         => 8088,
+        ClientFilter => 'POE::Filter::HTTPD::Chunked',
+
+        ClientInput => sub {
+          my $request = $_[ARG0];
+
+          # It's a response for the client if there was a problem.
+          if ($request->isa("HTTP::Response")) {
+            $_[HEAP]{client}->put($request);
+            $_[KERNEL]->yield("shutdown");
+            return;
+          }
+
+          my $request_fields = '';
+          $request->headers()->scan(
+            sub {
+              my ($header, $value) = @_;
+              $request_fields .= (
+                "<tr><td>$header</td><td>$value</td></tr>"
+              );
+            }
+          );
+
+          my $response = HTTP::Response->new(200);
+          $response->push_header( 'Content-type', 'text/html' );
+          $response->content(
+            "<html><head><title>Your Request</title></head>" .
+            "<body>Details about your request:" .
+            "<table border='1'>$request_fields</table>" .
+            "<tr><td>Body</td><td>" . $request->content . "</td>" .
+            "</body></html>"
+          );
+
+          $_[HEAP]{client}->put($response);
+          $_[KERNEL]->yield("shutdown");
+        }
+      );
+
+      print "Aim your browser at port 8088 of this host.\n";
+      POE::Kernel->run();
+      exit;
+
+    For detail and an example of handling partial chunks, see "Handling of
+    partial chunked data" below.
+
+DESCRIPTION
+    POE::Filter::HTTPD::Chunked interprets input streams as HTTP requests.
+    It returns a HTTP::Request object upon successfully parsing a request.
+    On failure, it returns an HTTP::Response object describing the failure.
+    The intention is that application code will notice the HTTP::Response
+    and send it back without further processing. This is illustrated in the
+    SYNOPSIS.
+
+    For output, this module accepts HTTP::Response objects and returns their
+    corresponding streams.
+
+    Please see HTTP::Request and HTTP::Response for details about how to use
+    these objects.
+
+    The following are the major differences between this module and the core
+    POE POE::Filter::HTTPD:
+
+    handling of incoming chunked data
+        POE::Filter::HTTPD has no support for handling 'chunked' requests
+        (part of HTTP1.1 spec), and would return an error (in the form of an
+        HTTP::Response object returned to the POE session). For many
+        applications, this may not be a problem, as they can put an HTTP1.1
+        proxy in front of the application, that will de-chunk the request,
+        and return the normal HTTP/1.0 content-length. This method, however,
+        causes issues with applications that either a/ want to handle
+        partial content for a request as it comes in, b/ don't want to have
+        to artificially adjust request timeouts whilst waiting for the proxy
+        to get the full request or c/ don't want the additional system
+        complexity of having to use a proxy to dechunk.
+
+    support for any request type
+        POE::Filter::HTTPD didn't handle all request types (ie, DELETE).
+        This restriction has been removed in this module.
+
+PUBLIC FILTER METHODS
+    POE::Filter::HTTPD::Chunked implements the basic POE::Filter interface.
+
+Handling of partial chunked data.
+    In order to allow for partial handling of data, if an optional
+    constructor argument of 'event_on_chunk' is passed in with a true value,
+    and a partial chunked request has been received since the last time the
+    wheel causes a 'get' call to be emitted, the partial chunked data is
+    returned back. This is wrapped in a class of HTTP::Request::Chunked,
+    which is just a marker sub-class of HTTP::Request, with the following
+    detail set:
+
+    content
+        Will be set to the partial content that has been received, since the
+        last HTTP::Request::Chunked packet was returned.
+
+    x-chunk-offset header
+        The offset (in bytes) as to where the current partial content
+        starts.
+
+    x-chunk-offset-size header
+        The number of bytes in this partial chunk.
+
+    Note that the final chunk will never be returned as an
+    HTTP::Request::Chunked object. Instead, the full request will be
+    returned as an HTTP::Request object instead.
+
+    An example usage of how partial chunks is as-follows:
+
+     my $filter = POE::Filter::HTTPD::Chunked->new( event_on_chunk => 1 );
+
+     sub input_event {
+         my ( $kernel, $heap, $request ) = @_[ KERNEL, HEAP, ARG0 ];
+
+         if ( $request->isa( 'HTTP::Response' ) ) {
+             # if we get an HTTP::Response object in, this was due to an error
+             # in parsing the request.  Just return to client.
+
+             $heap->{ wheel }->put( $request );
+         } elsif ( $request->isa( 'HTTP::Request::Chunked' ) ) {
+             # more data has come in for the given request.  Can just be used
+             # to reset timeout, or to deal with the data within it.
+
+             $kernel->alarm( 'reset_timer' => time() + 30 );
+
+             printf(
+                "got partial data of '%s' from byte offset %i, with size of %i",
+                $request->content,
+                $request->header( 'x-chunk-offset' ),
+                $request->header( 'x-chunk-offset-size' ),
+            );
+         } else {
+             # got a completed request.  This will be an HTTP::Request object,
+             # populated with all data from the original request, converted to
+             # non-chunked format.  If any body was included in the request, be
+             # it chunked or not, a content-length header will be set, giving
+             # the number of bytes in the body.
+
+             printf(
+                "got complete request of '%s', with size of '%i'",
+                $request->content,
+                $request->header( 'content-length' )
+            );
+         }
+     }
+
+BUGS
+    Many aspects of HTTP 1.0 and higher are not supported, such as
+    keep-alive. A simple I/O filter can't support keep-alive, for example. A
+    number of more feature-rich POE HTTP servers are on the CPAN. See
+    <http://search.cpan.org/search?query=POE+http+server&mode=dist>
+
+SEE ALSO
+    POE::Filter::HTTPD - Original basis for this class. Note that much of
+    the original POE::Filter::HTTPD code is redone for this class, due to
+    different requirements. Assume that any errors that occour in
+    POE::Filter::HTTPD::Chunked are mine, and not based on this module.
+
+    POE::Filter - Superclass, for general Filter API.
+
+    The SEE ALSO section in POE contains a table of contents covering the
+    entire POE distribution.
+
+    HTTP::Request and HTTP::Response explain all the wonderful things you
+    can do with these classes.
+
+AUTHORS AND LICENSE
+    Mark Morgan <makk384@gmail.com>
+
+    Tom Clark <tom@woot.co.uk>
+
+    This modules is bassed off of POE::Filter::HTTPD module, contributed by
+    Arthur Bergman, with documentation provided by Rocco Caputo.
+
+    Thanks to trutap (www.trutap.com) for paying us whilst developing this
+    code, and allowing it to be released.
+
+    Copyright (c) 2008-2010 Mark Morgan. All rights reserved. This program
+    is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+

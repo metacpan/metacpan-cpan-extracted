@@ -1,0 +1,9 @@
+%incremental lexer 'Try aaabbb: ' 
+
+%%
+
+S:
+    | 'a' S 'b' 
+;
+
+%%

@@ -1,0 +1,51 @@
+{
+   "abstract" : "DNS Zone File Parser",
+   "author" : [
+      "Olof Johansson <olof@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parse-DNS-Zone",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/olof/Parse-DNS-Zone/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/olof/Parse-DNS-Zone"
+      }
+   },
+   "version" : "0.60",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

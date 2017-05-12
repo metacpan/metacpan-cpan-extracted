@@ -1,0 +1,160 @@
+#!/usr/bin/perl 
+
+use strict;
+use warnings;
+
+use Pod::Manual;
+use Getopt::Long;
+use Pod::Usage;
+
+my $VERSION = '0.08';
+
+my $title;
+my $output_file = 'manual';
+my $format      = 'pdf';
+my $silent      = 0;
+my $opt_help    = 0;
+my $opt_man     = 0;
+
+GetOptions(
+    'title=s'  => \$title,
+    'output=s' => \$output_file,
+    'format=s' => \$format,
+    'silent!'  => \$silent,
+    'man'      => \$opt_man,
+    'help'     => \$opt_help,
+) or pod2usage(1);
+
+pod2usage(1) if $opt_help;
+pod2usage( -verbose => 2 ) if $opt_man;
+
+my $manual = Pod::Manual->new( { title => $title } );
+
+# the chapters are either passed as arguments,
+# or taken from STDIN
+$manual->add_chapters( @ARGV ? @ARGV : split /\r?\n/, join q{}, <> );
+
+if ( $format eq 'pdf' ) {
+    $output_file =~ s/(\.pdf)?$/.pdf/;    # add .pdf, if missing
+    $manual->save_as_pdf($output_file);
+}
+elsif ( $format eq 'docbook' ) {
+    my $output_fh;
+    if ( $output_file eq 'stdout' ) {
+        open $output_fh, '>-'
+          or die "can't pipe to stdout: $!\n";
+    }
+    else {
+        $output_file .= '.docbook' unless $output_file =~ /\.\w+$/;
+        die "$output_file already exists\n" if -e $output_file;
+        open $output_fh, '>', $output_file
+          or die "can't write to $output_file: $!\n";
+    }
+    print {$output_fh} $manual->as_docbook;
+}
+elsif ( lc($format) eq 'latex' ) {
+    my $output_fh;
+    if ( $output_file eq 'stdout' ) {
+        open $output_fh, '>-'
+          or die "can't pipe to stdout: $!\n";
+    }
+    else {
+        $output_file .= '.tex' unless $output_file =~ /\.\w+$/;
+        die "$output_file already exists\n" if -e $output_file;
+        open $output_fh, '>', $output_file
+          or die "can't write to $output_file: $!\n";
+    }
+    print {$output_fh} $manual->as_latex;
+}
+else {
+    die "format must be 'pdf', 'docbook' or 'LaTeX'\n";
+}
+
+warn "document '$output_file' created\n" unless $silent;
+
+exit;
+
+__END__
+
+=head1 NAME
+
+podmanual - converts pods into docbook or pdf manual
+
+=head1 SYNOPSIS
+
+podmanual [ OPTIONS ] [ module names | pod files ] 
+	
+=head1 DESCRIPTION
+
+Take the pods given as arguments and generate
+a manual out of them. 
+
+The pods can be given as module names or file names. If no
+pods are passed as arguments, C<podmanual> will read them from
+STDIN, assuming a format of one module name per line.
+
+=head2 OPTIONS
+
+=over
+
+=item -format [ pdf | docbook | latex ]  
+
+Output format. 'pdf' is the default.
+
+=item -output I<filename>
+
+Filename of the generated manual. Defaults to 'manual.pdf' or
+'manual.docbook', depending on the choosen format. 
+
+If the format is 'pdf', the suffix '.pdf' will be appended to 
+I<filename>, if not already present. 
+
+If the format is 'docbook' or 'latex', the suffix '.docbook' or '.tex'
+will be appended to I<filename> if no suffix is already present.  Also, the 
+special filename 'stdout' can be given to have the manual printed
+to STDOUT.
+
+=item -title I<manual title>
+
+Set the manual title.  If the option is not invoked, 
+the name of the first module will be used as the title of
+the manual.
+
+=item -silent
+
+Don't output any status message.
+
+=item -man
+
+Output C<podmanual>'s manpage and exit.
+
+=item -help
+
+Output C<podmanual>'s usage and exit.
+
+=back
+
+=head1 VERSION
+
+This document describes podmanual version 0.08
+
+=head1 SEE ALSO
+
+L<Pod::Manual>
+
+=head1 BUGS
+
+Please send bug reports to <bug-pod-manual@rt.cpan.org>,
+or via the web interface at 
+http://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Manual.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Yanick Champoux, <yanick@cpan.org>
+
+=cut
+

@@ -1,0 +1,83 @@
+#!/usr/bin/perl
+
+# Index and preparse the contents of a minicpan checkout
+
+use 5.008;
+use strict;
+use warnings;
+use File::Find::Rule       ();
+use File::Find::Rule::VCS  ();
+use File::Find::Rule::Perl ();
+use PPI::Cache             ();
+use Perl::Metrics2         -DEBUG;
+use CPAN::Mini::Visit      ();
+
+our $VERSION = '0.01';
+
+# Check params
+unless ( $ARGV[0] and -d $ARGV[0] ) {
+	die("Missing or invalid minicpan directory");
+}
+unless ( $ARGV[1] and -d $ARGV[1] ) {
+	die("Missing or invalid PPI::Cache directory");
+}
+
+my $flush = !! ( $ARGV[2] and $ARGV[2] eq 'flush' );
+
+# Initialise the metrics instance
+my $metrics = Perl::Metrics2->new(
+	cache => $ARGV[1],
+	study => $flush ? 0 : 1,
+);
+
+# Drop indexes for speed
+Perl::Metrics2->do('DROP INDEX IF EXISTS cpan_file__release'   );
+Perl::Metrics2->do('DROP INDEX IF EXISTS cpan_file__file'      );
+Perl::Metrics2->do('DROP INDEX IF EXISTS cpan_file__md5'       );
+Perl::Metrics2->do('DROP INDEX IF EXISTS cpan_file__indexable' );
+
+# Flush all entries if we get a flush option
+if ( $flush ) {
+	print STDERR "# Flushing all cpan_file entries...\n";
+	Perl::Metrics2->do('DELETE FROM cpan_file');
+}
+
+# Identify the distributions we have already seen
+my $seen   = Perl::Metrics2->release_index;
+my $ignore = [ sub { $seen->{$_[0]} }, qr/PDF-API/ ];
+
+Perl::Metrics2->begin;
+CPAN::Mini::Visit->new(
+	minicpan => $ARGV[0],
+	acme     => 1,
+	ignore   => $ignore,
+	callback => sub {
+		my $the = shift;
+		print STDERR "# $the->{counter} - $the->{dist}\n";
+		my $files = Perl::Metrics2->perl_files($the->{tempdir});
+		foreach my $file ( sort keys %$files ) {
+			if ( $files->{$file} ) {
+				print "+ $file\n";
+			} else {
+				print "- $file\n";
+			}
+			my $path = File::Spec->catfile($the->{tempdir}, $file);
+			my $md5  = PPI::Util::md5hex_file($file);
+			Perl::Metrics2::CpanFile->create(
+				release   => $the->{dist},
+				file      => $path,
+				md5       => $md5,
+				indexable => $files->{$file},
+			);
+		};
+		return 1 if $the->{counter} % 100;
+		Perl::Metrics2->commit_begin;
+	},
+)->run;
+Perl::Metrics2->commit;
+
+# Restore indexes
+Perl::Metrics2->do('CREATE INDEX IF NOT EXISTS cpan_file__release   on cpan_file ( release   )');
+Perl::Metrics2->do('CREATE INDEX IF NOT EXISTS cpan_file__file      on cpan_file ( file      )');
+Perl::Metrics2->do('CREATE INDEX IF NOT EXISTS cpan_file__md5       on cpan_file ( md5       )');
+Perl::Metrics2->do('CREATE INDEX IF NOT EXISTS cpan_file__indexable on cpan_file ( indexable )');

@@ -1,0 +1,36 @@
+Polycom::App::Push version 0.04
+================================
+
+This module can be used to help write web applications for Polycom's SoundPoint IP, SoundStation IP, and VVX 1500 VoIP phones.
+
+For more information about developing web applications for Polycom SoundPoint IP phones, see 
+http://support.polycom.com/global/documents/support/setup_maintenance/products/voice/Web_Application_Developers_Guide_SIP_3_1.pdf,
+http://support.polycom.com/global/documents/support/setup_maintenance/products/voice/spip_ssip_vvx_Admin_Guide_UCS_v4_0_0.pdf, and
+http://support.polycom.com/global/documents/support/user/products/voice/Polycom_SDK_for_VVX1500_SpectraLink_8400_eng.pdf
+
+INSTALLATION
+
+To install this module, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Class::Accessor
+LWP::UserAgent
+URI
+Test::More
+perl 5.8
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Zachary Blair 
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

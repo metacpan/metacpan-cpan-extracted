@@ -1,0 +1,13 @@
+Release history for Pod-Weaver-PluginBundle-KEEDI
+
+0.004   2013-12-12 21:16:48 Asia/Seoul
+    - Use Pod::Weaver's SingleEncoding module
+
+0.003   2013-01-16 18:35:12 Asia/Seoul
+    - Add README.mkd at project root directory
+
+0.002   2013-01-16 18:32:45 Asia/Seoul
+    - Support list syntax using Pod::Elemental::Transformer::List
+
+0.001   2012-06-19 05:02:03 Asia/Seoul
+    First version, released on unsuspecting world.

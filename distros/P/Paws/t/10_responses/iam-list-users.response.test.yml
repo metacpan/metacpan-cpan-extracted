@@ -1,0 +1,37 @@
+---
+call: ListUsers
+service: IAM
+tests:
+  - expected: Andrew
+    op: eq
+    path: Users.0.UserName
+  - expected: AID2MAB8DPLSRHEXAMPLE
+    op: eq
+    path: Users.0.UserId
+  - expected: 2015-05-15T17:00:00Z
+    op: eq
+    path: Users.0.CreateDate
+  - expected: /division_abc/subdivision_xyz/engineering/
+    op: eq
+    path: Users.0.Path
+  - expected: arn:aws:iam::123456789012:user/division_abc/subdivision_xyz/engineering/Andrew
+    op: eq
+    path: Users.0.Arn
+  - expected: Jackie
+    op: eq
+    path: Users.1.UserName
+  - expected: AIDIODR4TAW7CSEXAMPLE
+    op: eq
+    path: Users.1.UserId
+  - expected: arn:aws:iam::123456789012:user/division_abc/subdivision_xyz/engineering/Jackie
+    op: eq
+    path: Users.1.Arn
+  - expected: /division_abc/subdivision_xyz/engineering/
+    op: eq
+    path: Users.1.Path
+  - expected: 2013-01-17T10:00:00Z
+    op: eq
+    path: Users.1.CreateDate
+  - expected: 0
+    op: eq
+    path: IsTruncated

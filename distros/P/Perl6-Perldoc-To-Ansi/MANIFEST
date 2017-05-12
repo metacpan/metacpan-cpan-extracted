@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+README.pod
+dist.ini
+lib/Perl6/Perldoc/To/Ansi.pm
+t/01_compile.t
+t/release-pod-syntax.t

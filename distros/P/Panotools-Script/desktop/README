@@ -1,0 +1,9 @@
+Linux menu items for gui tools, these need to be installed with something like
+this:
+
+  desktop-file-install --dir=/usr/share/applications ptoinfo-gui.desktop
+  etc...
+
+  update-desktop-database
+  update-mime-database /usr/share/mime
+

@@ -1,0 +1,30 @@
+PDF-Imposition
+
+This module is meant to simplify the so-called imposition, i.e.,
+rearrange the pages of a PDF to get it ready to be printed and folded,
+with more logical pages placed on the sheet, usually (but not
+exclusively) on recto and verso.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc PDF::Imposition
+
+LICENSE
+
+This module is free software and is published under the same terms as
+Perl itself.
+
+
+

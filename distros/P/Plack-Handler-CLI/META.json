@@ -1,0 +1,84 @@
+{
+   "abstract" : "Command line interface to PSGI applications",
+   "author" : [
+      "Goro Fuji (gfx) <gfuji(at)cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.0.56",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Handler-CLI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Request::AsCGI" : "0",
+            "Test::More" : "0.88",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.0.16"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "URI::Escape::XS" : "0.07"
+         },
+         "requires" : {
+            "Mouse" : "0",
+            "Plack" : "0.99",
+            "URI::Escape" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Handler::CLI" : {
+         "file" : "lib/Plack/Handler/CLI.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gfx/p5-Plack-Handler-CLI/issues"
+      },
+      "homepage" : "https://github.com/gfx/p5-Plack-Handler-CLI",
+      "repository" : {
+         "url" : "git://github.com/gfx/p5-Plack-Handler-CLI.git",
+         "web" : "https://github.com/gfx/p5-Plack-Handler-CLI"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Fuji, Goro <g.psy.va@mail.com>",
+      "Mario Domgoergen <mdom@taz.de>",
+      "Fuji, Goro <gfuji@cpan.org>",
+      "Fuji, Goro <g.psy.va@gmail.com>"
+   ]
+}

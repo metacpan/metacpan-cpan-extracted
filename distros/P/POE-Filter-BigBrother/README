@@ -1,0 +1,51 @@
+NAME
+    POE::Filter::BigBrother - protocol abstractions for BigBrother streams
+
+SYNOPSIS
+    To use with POE::Wheel classes, pass a POE::Filter object to one of the
+    /.*Filter$/ constructor parameters.
+
+PUBLIC FILTER METHODS
+    Please see POE::Filter.
+
+SEE ALSO
+    POE::Filter.
+
+    The SEE ALSO section in POE contains a table of contents covering the
+    entire POE distribution.
+
+AUTHOR
+    Yves Blusseau <yblusseau@cpan.org>
+
+BUGS
+    Please report any bugs or feature requests to "bug-POE-Filter-BigBrother
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Filter-BigBrother>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc POE::Filter::BigBrother
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/POE-Filter-BigBrother>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/POE-Filter-BigBrother>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Filter-BigBrother>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/POE-Filter-BigBrother>
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Yves Blusseau. All rights reserved.
+
+    POE::Filter::BigBrother is free software; you may use, redistribute,
+    and/or modify it under the same terms as Perl itself.
+

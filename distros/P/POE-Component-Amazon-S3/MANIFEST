@@ -1,0 +1,11 @@
+lib/POE/Component/Amazon/S3.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_pod.t
+t/02_bucket.t
+t/03_key.t
+t/04_stress.t
+t/05_ssl_bucket.t
+t/06_ssl_key.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,163 @@
+# Copyright (C) 2008 Ioannis Tambouras <ioannis@cpan.org>. All rights reserved.
+# LICENSE:  GPLv3, eead licensing terms at  http://www.fsf.org .
+
+package Pg::Pcurse::Query2;
+use DBIx::Abstract;
+use Carp::Assert;
+use base 'Exporter';
+use Data::Dumper;
+use strict;
+
+our @EXPORT = qw( 
+        get_schemas_all     get_schemas 
+        get_tables2_desc    get_tables2 
+        get_tables_all_desc get_tables_all
+        get_tables2_desc 
+	index2_desc 	    index2 
+	tables_vacuum_desc  tables_vacuum
+        tables_vacuum2 
+);
+
+sub tables_vacuum2 {
+        my $o = shift;
+        my $dh = dbconnect ( $o, form_dsn($o, '')  ) or return;
+        my $h  = $dh->{dbh}->selectall_arrayref(<<"");
+        select 'max database age',
+              (select max(age(datfrozenxid)) from pg_database)::text
+        union
+        select name , setting
+        from pg_settings
+        where name~'vacuum'
+
+        [ map { sprintf '%-35s%20s', @{$_}[0..1]}
+                       @{$h} ];
+}
+
+sub tables_vacuum_desc {
+         sprintf '%-22s%22s%22s', 'NAME', 'vacuum', 'analyze'
+}
+sub tables_vacuum {
+        my ($o, $database , $schema) = @_;
+        $database or $database = $o->{dbname} ;
+        my $dh = dbconnect ( $o, form_dsn($o,$database)  ) or return;
+        $schema = $dh->quote($schema);
+        my $h  = $dh->{dbh}->selectall_arrayref(<<"");
+        select relname,
+                greatest( last_vacuum,  last_autovacuum ) as vacuum,
+                greatest( last_analyze, last_autoanalyze) as analyze
+        from pg_stat_all_tables
+        where schemaname=$schema
+        order by 2, 3, 1
+
+        for my $i (@$h) { $_=to_d($_)   for @$i; }
+        [ map { sprintf '%-22s%22s%22s', @{$_}[0..2]}
+               @{$h} ];
+}
+
+sub index2_desc {
+     sprintf '%-30s%-10s%-10s %-10s %-10s','NAME', 'RELNAME',
+                    'idx_scan', 'idx_tup_read','idx_tup_fetch'
+}
+sub index2 {
+        my ($o, $database , $schema) = @_;
+        my $dh = dbconnect ( $o, form_dsn($o, $database ) ) or return;
+        $schema = $dh->quote( $schema );
+        my $h = $dh->{dbh}->selectall_arrayref( <<"");
+                        select indexrelname, relname,  idx_scan,
+                               idx_tup_read,  idx_tup_fetch, indexrelid
+                         from pg_stat_user_indexes
+                         where schemaname = $schema
+                         order by 3, 2
+
+        [ map { sprintf '%-30s  %-15s  %8s %8s %8s %90s', @{$_}[0..5] }
+              @$h ]
+
+}
+
+sub index2_desc {
+     sprintf '%-30s%-10s%-10s %-10s %-10s','NAME', 'RELNAME',
+                    'idx_scan', 'idx_tup_read','idx_tup_fetch'
+}
+sub index2 {
+        my ($o, $database , $schema) = @_;
+        my $dh = dbconnect ( $o, form_dsn($o, $database ) ) or return;
+        $schema = $dh->quote( $schema );
+        my $h = $dh->{dbh}->selectall_arrayref( <<"");
+                        select indexrelname, relname,  idx_scan,
+                               idx_tup_read,  idx_tup_fetch, indexrelid
+                         from pg_stat_user_indexes
+                         where schemaname = $schema
+                         order by 3, 2
+
+        [ map { sprintf '%-30s  %-15s  %8s %8s %8s %90s', @{$_}[0..5] }
+              @$h ]
+
+}
+
+sub get_tables2_desc {
+          sprintf '%-24s%-8s%4s',  'NAME',  'OWNER', '   I R T';
+}
+sub get_tables_all_desc {
+  sprintf '%-24s%30s','NAME',
+          'pages    tup  idx  att  ch  tr  fk ref  pk  ru sub';
+}
+sub get_tables_all {
+        my ($o, $database , $schema) = @_;
+        $database or $database = $o->{dbname} ;
+        my $dh = dbconnect ( $o, form_dsn($o,$database)  ) or return;
+        $schema = $dh->quote($schema);
+        my $st = $dh->select({
+                     fields => [qw( relname      relpages    reltuples
+                                    relhasindex  relnatts    relchecks
+                                    reltriggers  relfkeys    relrefs
+                                    relhaspkey   relhasrules relhassubclass
+                                   )],
+                     tables => 'pg_class,pg_namespace',
+                     join   => 'pg_class.relnamespace =  pg_namespace.oid',
+                     where  =>  ['pg_namespace.nspname', '=', $schema ,
+                                'and', 'relkind', '=', q('r') ],
+                   });
+        [ sort map { sprintf '%-25s%5s%6s%6s%4s%4s%4s%4s%4s%4s%4s%4s', @{$_}[0..11]}
+               @{$st->fetchall_arrayref}
+        ];
+}
+sub get_schemas {
+        my $database = shift;
+        my $dh = dbconnect ( 'dbi:Pg:dbname='. $database  ) or return;
+        my $h = $dh->select_all_to_hashref(
+                   [qw(nspname nspowner nspacl)], 'pg_namespace');
+        [keys %$h];
+}
+
+
+sub get_schemas_all {
+	# Maybe not used
+	my ($o, $database) = @_;
+	my $dh = dbconnect ( $o, 'dbi:Pg:dbname='. $database  ) or return;
+	my $h = $dh->select_all_to_hashref(
+                   [qw(nspname nspowner nspacl)], 'pg_namespace');
+	my @all;
+	while ( my ($k,$v) = each %$h) {
+	   push @all, sprintf '%-18s%10s  %25s', $k, $v->[0],"@{ $v->[1] ||''}" ;
+	}
+	\@all;
+}
+
+
+sub get_tables2_desc {
+          sprintf '%-24s%-8s%4s',  'NAME',  'OWNER', '   I R T';
+}
+sub get_tables2 {
+	# Maybe not used
+	my ($o, $database , $schema) = @_;
+	my $dh = dbconnect ( $o, 'dbi:Pg:dbname='. $database  ) or return;
+	my $st = $dh->select('*', 'pg_tables',
+                 ['schemaname', '=', $dh->quote($schema) ]);
+	#my $h = $st->fetchall_arrayref;
+	[ map { sprintf '%-24s%-8s%4s%2s%2s', @{$_}[1,2,4,5,6] }
+           @{ $st->fetchall_arrayref} ];
+}
+
+
+1;
+__END__

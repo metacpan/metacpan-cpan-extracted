@@ -1,0 +1,13 @@
+---
+pod_spelling_system:
+  stopwords:
+    - RESTful
+    - url
+    - API
+    - PlugAuth
+    - auth
+    - authz
+
+pod_coverage:
+  private:
+    - PlugAuth::Client::Tiny#new

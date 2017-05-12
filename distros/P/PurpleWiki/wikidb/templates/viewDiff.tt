@@ -1,0 +1,7 @@
+[% INCLUDE common/header.tt
+           title = pageName
+%]
+
+[% INCLUDE lib/diffs.tt %]
+
+[% INCLUDE common/footer.tt %]

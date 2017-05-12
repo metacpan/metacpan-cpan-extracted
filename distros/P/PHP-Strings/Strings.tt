@@ -1,0 +1,340 @@
+package PHP::Strings;
+#line 1 [% template.name %]
+# vim: ft=perl
+use strict;
+use warnings FATAL => 'all';
+our $VERSION = '0.28';
+
+=head1 NAME
+
+PHP::Strings - Implement some of PHP's string functions.
+
+=head1 SYNOPSIS
+
+    use PHP::Strings;
+
+[% FOR syn = synopses -%]
+[% syn %]
+[% END %]
+
+=head1 DESCRIPTION
+
+PHP has many functions. This is one of the main problems with PHP.
+
+People do, however, get used to said functions and when they come to a
+better designed language they get lost because they have to implement
+some of these somewhat vapid functions themselves.
+
+So I wrote C<PHP::Strings>. It implements most of the strings functions
+of PHP. Those it doesn't implement it describes how to do in native
+Perl.
+
+Any function that would be silly to implement has not been and has been
+marked as such in this documentation. They will still be exportable, but
+if you attempt to use said function you will get an error telling you to
+read these docs.
+
+=head1 RELATED READING
+
+=over 4
+
+=item *
+
+"PHP in Contrast to Perl"
+L<http://tnx.nl/php.txt>
+
+=item *
+
+"Experiences of Using PHP in Large Websites" by Aaron Crane, 2002
+L<http://www.ukuug.org/events/linux2002/papers/html/php/>
+
+=item *
+
+"PHP Annoyances" by Neil de Carteret, 2002
+L<http://n3dst4.com/articles/phpannoyances/>
+
+=item *
+
+"I hate PHP" by Keith Devens, 2003
+L<http://keithdevens.com/weblog/archive/2003/Aug/13/HATE-PHP>
+
+=item *
+
+"PHP: A love and hate relationship" by Ivan Ristic, 2002
+L<http://www.webkreator.com/php/community/php-love-and-hate.html>
+
+=item *
+
+"PHP Sucks"
+L<http://czth.net/pH/PHPSucks>
+
+=item *
+
+Nathan Torkington's "list of PHP's shortcomings"
+L<http://nntp.x.perl.org/group/perl.advocacy/1458>
+
+=back
+
+=head1 ERROR HANDLING
+
+All arguments are checked using L<Params::Validate>. Bad arguments will
+cause an error to be thrown. If you wish to catch it, use C<eval>.
+
+Attempts to use functions I've decided to not implement (as distinct
+from functions that aren't implemented because I've not gotten around to
+either writing or deciding whether to write) will cause an error
+displaying the documentation for said function.
+
+=cut
+
+use base qw( Exporter );
+use Carp qw( croak );
+use vars qw( %EXPORT_TAGS @EXPORT @EXPORT_OK @badeggs );
+use Params::Validate qw( :all );
+use Scalar::Util qw( looks_like_number );
+[% FOR import = imports -%]
+use [% import %];
+[% END -%]
+
+use constant STRING => {
+    type => SCALAR,
+};
+use constant INTEGER => {
+    type => SCALAR,
+    regex => qr{^\d+$}
+};
+use constant NUMBER => {
+    type => SCALAR,
+    callbacks => {
+        'is a number' => sub {
+            defined $_[0] and looks_like_number $_[0]
+        }
+    },
+};
+
+sub NUMBER_RANGE ($$) {
+    my ($min, $max) = @_;
+    return {
+        %{+INTEGER},
+        callbacks => {
+            "Number between $min and $max" => sub {
+                $_[0] =~ /^\d+$/ and $min <= $_[0] and $_[0] <= $max
+            }
+        }
+    };
+}
+
+sub death
+{
+    local $_ = shift;
+    s/^=.*$//gm;
+    s/^\n+//g;
+    s/\n+$//g;
+    croak "\n$_\n\n";
+}
+
+=head1 EXPORTS
+
+By default, nothing is exported.
+
+Each function and constant can be exported by explicit name.
+
+    use PHP::Strings qw( str_pad addcslashes );
+
+To get a function and its associated constants as well, prefix them with a colon:
+
+    use PHP::Strings qw( :str_pad );
+    # This grabs str_pad, STR_PAD_LEFT, STR_PAD_BOTH, STR_PAD_RIGHT.
+
+To export everything:
+
+    use PHP::Strings qw( :all );
+
+For more information on what you can add there, consult
+L<Exporter/"Specialised Import Lists">.
+
+=cut
+
+@EXPORT_OK = map { @$_ } values %EXPORT_TAGS;
+
+=head1 FUNCTIONS
+
+[% FOR fn = fns.keys.sort -%]
+[% d = fns.$fn %]
+
+=head2 [% fn %]
+
+L<http://www.php.net/[% fn %]>
+
+[% IF d.badegg -%]
+
+=cut
+
+sub [% fn %] {
+    death(<<'EODEATH');
+
+=pod
+
+B<PHP::Strings::[% fn %] WILL NOT BE IMPLEMENTED>.
+
+[% d.docs %]
+
+=cut
+
+EODEATH
+}
+
+[% ELSE -%]
+[% IF not d.code -%]
+
+B<PHP::Strings::[% fn %] WILL NOT BE IMPLEMENTED>.
+
+[%- END -%]
+
+[% d.synopsis -%]
+
+[% d.docs %]
+
+=cut
+
+[% END -%]
+
+[% IF d.code %]
+
+BEGIN { $EXPORT_TAGS{[% fn %]} = [ qw(
+    [% FOR exp = d.exports %][% exp %] [% END %]
+) ] }
+
+#line 0 fns/[% fn %].fn
+[% d.code %]
+[% ELSIF d.exports %]
+BEGIN { push @badeggs, "[% fn %]" };
+[% ELSE -%]
+# No fn export due to clash with reserved perl keyword.
+[% END -%]
+[% END -%]
+#line 214 [% template.name %]
+
+# ========================================================================
+
+=head1 FUNCTIONS ACTUALLY IMPLEMENTED
+
+Just in case you missed which functions were actually implemented
+in that huge mass of unimplemented functions, here's the condensed list
+of implemented functions:
+
+=over 4
+
+[% FOR fn = fns.keys.sort -%]
+[% d = fns.$fn -%]
+[% IF d.code -%]
+
+=item *
+
+L<"[% fn %]">
+
+[%- END -%]
+[% END -%]
+
+=back
+
+=head1 BAD EGGS
+
+All functions that I think are worthless are still exportable, with the
+exception of any that would clash with a Perl builtin function.
+
+If you try to actually use said function, a big fat error will result.
+
+=cut
+
+BEGIN {
+    $EXPORT_TAGS{$_} = [ $_ ] for @badeggs;
+}
+
+=begin _private
+
+=head1 XS
+
+Some functions are implemented in C. This is done either out of ease of
+programming (L<"money_format"> is just a façade for strfmon(3)), or
+because C is sometimes just the right tool (mainly in dealing with
+individual character manipulation of strings).
+
+=cut
+
+require XSLoader;
+XSLoader::load('PHP::Strings', $VERSION);
+
+=end _private
+
+=cut
+
+1;
+
+__END__
+
+=head1 FOR THOSE WHO HAVE READ THIS FAR
+
+Yes, this module is mostly a joke. I wrote a lot of it after
+being asked for the hundredth time: What's the equivalent to
+PHP's X in Perl?
+
+That said, although it's a joke, I'm happy to receive
+amendments, additions and such. It's incomplete at present,
+and I would like to see it complete at some point.
+
+In particular, the test suite needs a lot of work. (If you
+feel like it. Hint Hint.)
+
+If you want to implement some of the functions that I've
+said will not be implemented, then I'll be happy to include
+them. After all, what I think is worthless is my opinion.
+
+=head1 BUGS, REQUESTS, COMMENTS
+
+Log them via the CPAN RT system via the web or email:
+
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PHP-Strings
+    ( shorter URL: http://xrl.us/4at )
+
+    bug-php-strings@rt.cpan.org
+
+This makes it much easier for me to track things and thus means
+your problem is less likely to be neglected.
+
+=head1 THANKS
+
+Andy Lester (PETDANCE) for taking care of Iain's modules.
+
+Juerd Waalboer (JUERD) for suggesting a link, and the assorted regex
+functions.
+
+Matthew Persico (PERSICOM) for the idea of having the
+functions give their documentation as their error.
+
+=head1 LICENCE AND COPYRIGHT
+
+PHP::Strings modifications from version 0.27 are copyright 
+E<copy> Petras Kudaras, 2004. All rights reserved.
+
+PHP::Strings is copyright E<copy> Iain Truskett, 2003. All rights
+reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.000 or,
+at your option, any later version of Perl 5 you may have available.
+
+The full text of the licences can be found in the F<Artistic> and
+F<COPYING> files included with this module, or in L<perlartistic> and
+L<perlgpl> as supplied with Perl 5.8.1 and later.
+
+=head1 AUTHORS
+
+Iain Truskett <spoon@cpan.org>
+Petras Kudaras <kudarasp@cpan.org>
+
+=head1 SEE ALSO
+
+L<perl>, L<php>.
+
+=cut

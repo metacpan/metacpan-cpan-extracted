@@ -1,0 +1,101 @@
+Revision history for Perl extension Proc::Queue
+
+1.23  7 Jan, 2008
+        - backward compatible 'ignore_childs' sub was not working (bug
+          report and patch by John LoVerso).
+
+1.22  20 Nov 2007
+        - ignore_childs => ignore_children
+
+1.21  19 Mar 2007
+        - pod errors corrected
+        - check pods
+
+1.20  21 Dec 2006
+        - some corrections to the allow_excess implementation
+          (again by Steve Crockett!).
+
+1.19  19 Dec 2006
+        - implement the allow_excess option (feature request an patch
+          by Steve Crockett).
+
+1.18  2 Jun 2006
+        - call POSIX::_exit when exec failed inside system_back
+        - remove file checks inside exec as they ignore the PATH
+
+1.17  12 Apr 2006
+        - corrected bug on system_back. Child process run the parent
+          code when exec failed (reported by Albert Vila).
+
+1.16  13 Apr 2005
+	- added support for "weigh" factor
+
+1.15  18 Oct 2003
+	- package released as stable again as nobody has reported bugs
+	  and reports from CPAN testers are all ok.
+
+1.14_01 4 Oct 2003
+	- added support for Win32! (experimental).
+	- added support for ignored_childs mode
+	- mode subs rewritten
+
+1.13  23 Jul 2003
+	- docs about ripping childs in long running programs
+	- several typos corrected in the docs
+
+1.12  8 May 2003
+	- some typos corrected in the docs
+
+1.11  6 May 2003
+	- version bumped to 1.xx to denote stability
+	- do not ignore CHLD signal documented
+	- rewritten README file
+
+
+0.10  19 Nov 2001
+	- correct some warnings when on debug or trace mode
+
+
+0.09  3 Oct 2001
+	- Added system_back and system_back_now functions
+
+
+0.08
+	- Added delay functionality
+
+
+0.07
+	- Corrected another silly bug caused for the module name change
+	  in the test.pl script
+
+
+0.06
+	- Corrected bug in Makefile.PL that caused the module to
+	  install as Fork::Queue
+
+
+0.05
+	- Module name changed to Proc::Queue from Fork::Queue
+
+
+0.04
+	- Corrected bug that replace waitpid with an unexistant function
+
+
+0.03
+	- New set of high level functions added
+
+
+0.02
+	- Added README file automatically generated from embedded pod
+     	  documentation.
+
+	- Added fork_now function
+
+	- Exporter stuff integrated
+
+
+0.01  Wed Mar 14 21:57:34 2001
+	- original version; created by h2xs 1.20 with options
+		-A -X -O -n Fork::Queue
+

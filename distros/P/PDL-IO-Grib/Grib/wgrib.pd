@@ -1,0 +1,122 @@
+pp_addpm({At=>Top},<<'EOD');
+=head1 NAME
+
+	PDL::IO::Grib::Wgrib - shamelessly stolen code
+
+=head1 SYNOPSIS
+
+	Helper routines for PDL::IO::Grib
+
+=head1 DESCRIPTION
+
+This module is for miscellaneous PP-defined utility routines for
+the PDL::IO::Grib module.
+
+=head1 AUTHOR
+
+Copyright (C) 2000 James P. Edwards
+All rights reserved. There is no warranty. You are allowed
+to redistribute this software / documentation under certain
+conditions. For details, see the file COPYING in the PDL
+distribution. If this file is separated from the PDL distribution,
+the copyright notice should be included in the file.
+
+=cut
+EOD
+
+pp_addhdr('
+void BDS_unpack(float *flt, unsigned char *bits, unsigned char *bitmap,
+	int n_bits, int n, double ref, double scale);
+
+int flt2ibm(float x, unsigned char *ibm);');
+
+
+pp_def(
+	'BDSunpack',
+	Pars => 'byte bits(n1); 
+            byte bitmap(n2); 
+	         int bitcnt();
+            double ref();
+            double scale();
+            float [o] bdsdata(n3); ',
+   GenericTypes => [B,F],
+   Code => 'BDS_unpack($P(bdsdata), $P(bits), $P(bitmap), $bitcnt(), $SIZE(n3), 
+						$ref(), $scale());'	       
+);
+
+
+
+pp_addpm('
+	sub get_ref_val{
+		my($d) = shift;
+      
+		my $do = PDL->zeroes((new PDL::Type(float)),$d->nelem/4);
+		decode_ref_val($d,$do);
+      return($do);
+   }
+');
+
+pp_def(
+	'decode_ref_val',
+	Pars => 'byte datain(m);
+	         float [o] dataout();',
+   
+   RedoDimsCode => '$SIZE(m)=4;',
+   GenericTypes => [B,F],
+   Code => '	
+   int positive, power;
+	unsigned int abspower;
+	long int mant;
+	double value, exp;
+   int m1,m2,m3,m4;
+
+     m1 = 0;
+     m2=m1+1;
+	  m3=m2+1;
+     m4=m3+1;
+  	  positive = ($datain(m=>m1) & 0x80) == 0;
+	  mant = ($datain(m=>m2) << 16) + ($datain(m=>m3) << 8) + $datain(m=>m4);
+	  power = (int) ($datain(m=>m1) & 0x7f) - 64;
+	  abspower = power > 0 ? power : -power;
+
+
+	  /* calc exp */
+	  exp = 16.0;
+	  $dataout() = 1.0;
+	  while (abspower) {
+		  if (abspower & 1) {
+			  $dataout() *= exp;
+		  }
+		  exp = exp * exp;
+		  abspower >>= 1;
+	  }
+
+	  if (power < 0) $dataout() = 1.0 / $dataout();
+	  $dataout() = $dataout() * mant / 16777216.0;
+	  if (positive == 0) $dataout() = -$dataout();
+
+	'
+);
+
+pp_def(
+	'encode_ref_val',
+	Pars => 'float datain();
+	         byte [o] dataout(n);',
+   GenericTypes => [B,F],
+   RedoDimsCode => '$SIZE(n)=4;',
+   Code => 'flt2ibm($datain(),$P(dataout));'
+);
+		      
+pp_addxs('','
+
+int
+flt2ibm(x,ibm)
+	float x
+	unsigned char *ibm
+
+');
+
+
+
+
+pp_done();

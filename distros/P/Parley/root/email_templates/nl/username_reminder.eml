@@ -1,0 +1,13 @@
+[% person.first_name %],
+
+Uw gebruikersbenaming voor [% c.config.name %] is:
+
+  [% person.authentication.username %]
+
+U kunt bezoeken [% c.config.name %] bij:
+
+  [% c.request.base %]
+
+Achting,
+
+Het [% c.config.name %] team.

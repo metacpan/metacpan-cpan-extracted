@@ -1,0 +1,6 @@
+Revision history for Perl extension PDF::CreateSimple.
+
+0.01  Tue Jun 21 12:45:59 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n PDF::CreateSimple
+

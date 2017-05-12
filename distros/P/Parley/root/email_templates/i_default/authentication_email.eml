@@ -1,0 +1,12 @@
+[% person.first_name %],
+
+Thanks for registering with [% c.config.name %]
+To complete your registration please click on the link below.
+
+  [% c.request.base %]user/authenticate/[% regauth.id %]
+
+and follow the on-screen instructions.
+
+Regards,
+
+The [% c.config.name %] team.

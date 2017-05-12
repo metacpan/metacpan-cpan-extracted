@@ -1,0 +1,588 @@
+<html xml:lang="en-gb" lang="en-gb" xmlns="http://www.w3.org/1999/xhtml">
+  <head petal:define='test_encoding string:Hello, "World"'>
+
+
+
+
+
+
+
+
+    <title>
+       MKDoc
+    </title>
+
+    
+    
+
+
+
+    <style type="text/css" media="screen">
+      @import "http://mkdoc.com/.static/css/advanced.css";
+    </style>
+    <style type="text/css">
+      body {
+        color: #003;
+        background: #FFF;
+      }
+    </style>
+    <link rel="stylesheet" href="http://mkdoc.com/.static/css/screen.css" type="text/css" 
+      media="screen" title="Screen Style Sheet" />
+
+
+
+  
+
+   
+    <meta name="keywords" content="MKDoc, information architecture, web site content management system, content management system, CMS, e-Gif, useability, accessibility, metadata, editor, Dublin Core, DC, DCMI, XML, XHTML, WAI, W3, CSS, syndication, web site, creation, perl, software" />
+  
+    <meta name="description" content="MKDoc is a web site building, serving and content management tool that has been designed to encourage the use of good information architecture and the production of accessible web sites." />
+
+
+
+  
+
+    <link rel="schema.DC" href="http://purl.org/dc/elements/1.1/" 
+      title="Dublin Core Metadata Element Set, Version 1.1 (15 elements)" />
+    <link rel="schema.DC" href="http://purl.org/dc/terms/" 
+      title="DCMI elements and DCMI qualifiers (other than those elements defined in the Dublin Core Metadata Element Set, Version 1.1 above)" />
+    <link rel="schema.DC" href="http://purl.org/dc/dcmitype/" 
+      title="DCMI terms in the DCMI Type Vocabulary (a DCMI controlled vocabulary)" />
+    <meta name="DC.Identifier" scheme="URI" content="http://mkdoc.com/" /> 
+    <meta name="DC.Lang" scheme="RFC1766" content="en-gb" />
+    <meta name="DC.Title" xml:lang="en-gb" lang="en-gb"
+       content="MKDoc" />
+    <meta name="DC.Type" scheme="DCMIType" content="Text" />
+    <meta name="DC.Format.medium" scheme="IMT" content="text/html" />
+ 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="MKDoc" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="information architecture" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="web site content management system" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="content management system" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="CMS" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="e-Gif" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="useability" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="accessibility" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="metadata" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="editor" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="Dublin Core" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="DC" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="DCMI" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="XML" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="XHTML" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="WAI" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="W3" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="CSS" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="syndication" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="web site" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="creation" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="perl" /> 
+  
+    <meta name="DC.Subject" xml:lang="en-gb" lang="en-gb"
+       content="software" /> 
+  
+
+    <meta name="DC.Description.abstract" xml:lang="en-gb" lang="en-gb"
+       content="MKDoc is a web site building, serving and content management tool that has been designed to encourage the use of good information architecture and the production of accessible web sites." />
+    <meta name="DC.Creator" 
+       content="Bruno Postle" />
+    <meta name="DC.Date.created" scheme="W3C-DTF" content="2001-Mar-23T18:50:09Z" />
+    <meta name="DC.Date.modified" scheme="W3C-DTF" content="2002-May-28T16:12:44Z" />
+
+  
+    <meta name="DC.Contributor" 
+       content="Hiver, Jean-Michel" /> 
+  
+    <meta name="DC.Contributor" 
+       content="Moran, Adam" /> 
+  
+    <meta name="DC.Contributor" 
+       content="Croome, Chris" /> 
+  
+
+  
+    <meta name="DC.Publisher" xml:lang="en-gb" lang="en-gb" 
+       content="MKDoc Ltd. c/o webarchitects, PO Box 1660, Sheffield, S7 1XF, UK." /> 
+  
+  
+    <meta name="DC.Rights" xml:lang="en-gb" lang="en-gb" 
+       content="Copyright © 2001-2002 MKDoc Ltd." />
+  
+
+
+
+  
+    
+    <meta name="DC.Relation.references" 
+      content="/help/1/" />
+    
+ 
+    
+    <meta name="DC.Relation.references" 
+      content="http://testers.mkdoc.com/signup/" />
+    
+ 
+    
+    <meta name="DC.Relation.references" 
+      content="mailto:solutions@mkdoc.com" />
+    
+ 
+    
+    <meta name="DC.Relation.references" 
+      content="http://download.mkdoc.com/" />
+    
+ 
+    
+    <meta name="DC.Relation.references" 
+      content="http://webarch.net/" />
+    
+ 
+
+
+  
+    
+    <meta name="DC.Relation.replaces" 
+      content="http://mkdoc.com/new-test-document/" />
+    
+ 
+    
+    <meta name="DC.Relation.replaces" 
+      content="http://mkdoc.com/new-test-document/other-test-document/" />
+    
+ 
+    
+    <meta name="DC.Relation.replaces" 
+      content="http://mkdoc.com/features/syndication/other-test-document/" />
+    
+ 
+    
+    <meta name="DC.Relation.replaces" 
+      content="http://mkdoc.com/other-test-document/" />
+    
+ 
+    
+    <meta name="DC.Relation.replaces" 
+      content="http://mkdoc.com/new-test-doc/other-test-document/" />
+    
+ 
+    
+    <meta name="DC.Relation.replaces" 
+      content="http://mkdoc.com/new-test-doc/other-test-document/new-test-doc/" />
+    
+ 
+    
+    <meta name="DC.Relation.replaces" 
+      content="http://mkdoc.com/new-test-doc/" />
+    
+ 
+    
+    <meta name="DC.Relation.replaces" 
+      content="http://mkdoc.com/test/" />
+    
+ 
+    
+    <meta name="DC.Relation.replaces" 
+      content="http://mkdoc.com/about/test/" />
+    
+ 
+    
+    <meta name="DC.Relation.replaces" 
+      content="http://mkdoc.com/about/test-document/" />
+    
+ 
+    
+    <meta name="DC.Relation.replaces" 
+      content="http://mkdoc.com/semantically-rich/" />
+    
+ 
+    
+    <meta name="DC.Relation.replaces" 
+      content="http://mkdoc.com/jobs/" />
+    
+ 
+
+
+
+
+    
+      <meta name="DC.Relation.hasPart" scheme="URI" content="http://mkdoc.com/features/" /> 
+    
+      <meta name="DC.Relation.hasPart" scheme="URI" content="http://mkdoc.com/news/" /> 
+    
+      <meta name="DC.Relation.hasPart" scheme="URI" content="http://mkdoc.com/help/" /> 
+    
+      <meta name="DC.Relation.hasPart" scheme="URI" content="http://mkdoc.com/executive-summary/" /> 
+    
+
+
+
+
+  
+
+
+
+  
+
+    <link rel="meta" href="http://mkdoc.com/dc.rdf" hreflang="en-gb"
+      title="MKDoc : DC RDF Metadata" type="application/xml" />
+
+
+
+    <link rel="alternate" href="http://mkdoc.com/print.html" media="print" hreflang="en-gb" 
+      title="MKDoc : Print version" type="text/html" />
+    <link rel="sitemap" href="http://mkdoc.com/sitemap.html" hreflang="en-gb" 
+      title="MKDoc : Sitemap" type="text/html" />
+    <link rel="alternate sitemap" href="http://mkdoc.com/rss100sitemap.rdf" hreflang="en-gb" 
+      title="MKDoc : RSS sitemap" type="application/xml" />
+    <link rel="syndication" href="http://mkdoc.com/rss100headline.rdf" hreflang="en-gb" 
+      title="MKDoc : RSS 1.00 headlines" type="application/xml" />
+    <link rel="alternate syndication" href="http://mkdoc.com/rss091headline.rdf" hreflang="en-gb" 
+      title="MKDoc : RSS 0.91 headlines" type="application/xml" />
+    <link rel="alternate syndication" href="http://mkdoc.com/rss090headline.rdf" hreflang="en-gb" 
+      title="MKDoc : RSS 0.90 headlines" type="application/xml" />
+
+  
+
+
+    <meta name="generator" content="MKDoc, see mkdoc.com" />
+  </head>
+  <body>
+
+    
+    
+    <div id="mkdoc-header" align="right">
+      <img align="left" src="http://mkdoc.com/.static/images/mkdoc/mkdoc.gif" 
+        alt="MKDoc" border="0" />
+
+    
+    
+<div id="mkdoc-menu">
+  <form action="http://mkdoc.com/search.html" method="get" accept-charset="us-ascii, utf-8">
+    <p xml:lang="en" lang="en" class="lang-en">
+      | <a href="#content" title="Skip the page navigation and go straight to the page content [Accesskey S]." 
+        hreflang="en-gb" accesskey="S">Content</a> |
+    
+       Home |
+    
+      <a href="http://mkdoc.com/sitemap.html" title="The sitemap [Accesskey 3]." 
+        hreflang="en-gb" accesskey="3">Sitemap</a> |
+      <label for="q">Search</label> <input type="text" size="12" name="q" id="q" 
+        title="Enter your search term(s) here [Accesskey 4]." onblur="if(this.value=='')this.value='Keyword(s)';"
+        onfocus="if(this.value=='Keyword(s)')this.value='';"
+        value="Keyword(s)" accesskey="4" /><input type="submit" 
+        value="Go" title="Submit your search term(s) to the search engine." />
+    </p>
+  </form>
+</div>
+
+    
+
+    </div>
+     
+    <br />
+
+    
+
+    <div id="mkdoc-body">
+
+    
+      
+      
+<div id="mkdoc-children" title="Child documents of &quot;MKDoc&quot;.">
+  <ul>
+    
+      <li xml:lang="en-gb" lang="en-gb" 
+        class="lang-en-gb"><a href="http://mkdoc.com/features/" 
+        hreflang="en-gb">Features</a>
+      </li>
+    
+      <li xml:lang="en-gb" lang="en-gb" 
+        class="lang-en-gb"><a href="http://mkdoc.com/news/" 
+        hreflang="en-gb">News</a>
+      </li>
+    
+      <li xml:lang="en-gb" lang="en-gb" 
+        class="lang-en-gb"><a href="http://mkdoc.com/help/" 
+        hreflang="en-gb">Help</a>
+      </li>
+    
+      <li xml:lang="en-gb" lang="en-gb" 
+        class="lang-en-gb"><a href="http://mkdoc.com/executive-summary/" 
+        hreflang="en-gb">Executive Summary</a>
+      </li>
+    
+  </ul>
+</div>
+
+    
+
+      <div id="mkdoc-content">
+          <h1 class="lang-en-gb"><a id="content" name="content"></a>
+            MKDoc
+          </h1>
+
+
+  
+  
+      <div id="mkdoc-1" class="html lang-en-gb"> 
+        
+  <p>
+    MKDoc is a web site content management system that has been designed to make the creation of usable, accessible, semantically rich and valid web sites as easy as possible.
+  </p>
+  <p>
+    MKDoc provides different ways for the public to interact with and navigate between documents including a sitemap, search facility, Dublin Core <abbr title="Resource Description Framework">RDF</abbr> metadata for documents and printer versions of pages.
+  </p>
+  <p>
+    All management of an MKDoc web site, document creation, editing and organising is done via a standard web browser. This site has been created using MKDoc. The look of an MKDoc web site is controlled using templates.
+  </p>
+  <p>
+    Additional <a href="http://mkdoc.com/features/" title="MKDoc is a web site content management system that is very feature rich.
+">features</a> of MKDoc are documented in the <a href="http://mkdoc.com/features/" title="MKDoc is a web site content management system that is very feature rich.
+">features</a> section of this site.
+  </p>
+  <p>
+    Extensive <a href="/help/1/" title="">help for users of MKDoc</a> is available, explaining how to login, create and edit documents on an MKDoc website.
+  </p>
+      </div>
+  
+  
+  
+  
+  
+
+  
+  
+      <div id="mkdoc-2" class="html lang-en-gb"> 
+        
+  <h2>
+    Try it
+  </h2>
+  <p>
+    If you would like to play with MKDoc, you can <a href="http://testers.mkdoc.com/signup/" title="External Link: Signup for a test account on the testers.mkdoc.com website.">sign up for an account</a> on the testers site. If you would like to evaluate MKDoc on your own server please visit the <a href="http://download.mkdoc.com/" title="External Link: Download website for MKDoc.">MKDoc download site</a>.
+  </p>
+      </div>
+  
+   <?include file="included.xml" disk_cache="0"?> 
+  
+  
+  
+
+  
+  
+      <div id="mkdoc-3" class="html lang-en-gb"> 
+        
+  <h2>
+    Buy it
+  </h2>
+  <h3>
+    Buy a hosted solution
+  </h3>
+  <p>
+    Fully managed solutions, including domain name registration, email forwarding and template design, are available from <a href="http://webarch.net/" title="External Link: WebArch - Hosted MKDoc Web Sites.">WebArch.net</a>.
+  </p>
+  <h3>
+    Buy a MKDoc Server License
+  </h3>
+  <p>
+    Once MKDoc is installed on to a server then it is possible to use the software to serve multiple discrete web sites. (Please check the basic server requirements on the <a href="http://download.mkdoc.com/" title="External Link: Download website for MKDoc.">MKDoc download site</a>).
+  </p>
+  <p>
+    We offer 3 different licenses each of which includes email support and software upgrades for one year:
+  </p>
+  <ul>
+    <li>
+      Single Web Site License - <strong>800</strong> Euros
+    </li>
+    <li>
+      10 Web Site License - <strong>4000</strong> Euros - installation included
+    </li>
+    <li>
+      CPU License (unlimited number of web sites) - <strong>8000</strong> Euros - installation included
+    </li>
+  </ul>
+  <p>
+    If you wish to purchase a license please email <a href="mailto:solutions@mkdoc.com" title="Email Adddress: The contact email address for MKDoc.">solutions@mkdoc.com</a> with your requirements.
+  </p>
+      </div>
+  
+  
+  
+  
+  
+
+  
+  
+  
+      <div id="mkdoc-4" class="text lang-en-gb"> 
+        <p></p>
+      </div>
+  
+  
+  
+  
+
+
+      <h2 xml:lang="en" lang="en" class="lang-en">
+        Latest Documents
+      </h2>
+
+      <p xml:lang="en" lang="en" class="lang-en">
+        The latest news about MKDoc developments:
+      </p> 
+
+      <dl>
+
+        <dt xml:lang="en-us" lang="en-us" 
+          class="lang-en-us"><a href="http://mkdoc.com/news/mkdoc-1-4/" 
+          hreflang="en-us">MKDoc version 1.4</a>
+        </dt>
+        <dd xml:lang="en-us" lang="en-us" 
+          class="lang-en-us">MKDoc 1.4. has been released. It features Unicode support, HTTP authentication and a brand new photo component.</dd>
+
+        <dt xml:lang="en-gb" lang="en-gb" 
+          class="lang-en-gb"><a href="http://mkdoc.com/news/booth-centre/" 
+          hreflang="en-gb">Booth Centre website launched</a>
+        </dt>
+        <dd xml:lang="en-gb" lang="en-gb" 
+          class="lang-en-gb">The Booth Centre, a charity for homeless people in Manchester, UK, launched their new website today, it runs MKDoc. </dd>
+
+        <dt xml:lang="en-gb" lang="en-gb" 
+          class="lang-en-gb"><a href="http://mkdoc.com/news/laptopchallenge/" 
+          hreflang="en-gb">Laptop Challenge - the first multi-lingual MKDoc site</a>
+        </dt>
+        <dd xml:lang="en-gb" lang="en-gb" 
+          class="lang-en-gb">Tomorrow the Laptops in the Community Challenge event will start and MKDoc will be used to author web content in multiple languages during the event.</dd>
+
+        <dt xml:lang="en-gb" lang="en-gb" 
+          class="lang-en-gb"><a href="http://mkdoc.com/news/mkdoc-in-japanese/" 
+          hreflang="en-gb">MKDoc in Japanese</a>
+        </dt>
+        <dd xml:lang="en-gb" lang="en-gb" 
+          class="lang-en-gb">The latest version of MKDoc now has full Unicode / UTF-8 support and a Japanese translation is underway.</dd>
+
+        <dt xml:lang="en-gb" lang="en-gb" 
+          class="lang-en-gb"><a href="http://mkdoc.com/news/mkdoc-in-punjabi/" 
+          hreflang="en-gb">MKDoc in Punjabi</a>
+        </dt>
+        <dd xml:lang="en-gb" lang="en-gb" 
+          class="lang-en-gb">Some early development screen shots of a UTF-8 development version MKDoc with Punjabi templates.</dd>
+
+        <dt xml:lang="en-gb" lang="en-gb" 
+          class="lang-en-gb"><a href="http://mkdoc.com/news/mkdoc-1-2/" 
+          hreflang="en-gb">MKDoc version 1.2</a>
+        </dt>
+        <dd xml:lang="en-gb" lang="en-gb" 
+          class="lang-en-gb">MKDoc 1.2 has just been added to the downloads site. It has new features, better speed and  bug-fixes. Be sure to check it out!</dd>
+
+       </dl>
+
+    
+
+      </div>
+    </div>
+    <div class="footnote">
+      <p xml:lang="en" lang="en" class="lang-en">
+        | <a href="http://mkdoc.com/print.html" type="text/html" hreflang="en-gb" 
+          title="Printer formated version of MKDoc.">Printer Version</a> |
+
+        <a href="http://mkdoc.com/dc.rdf" type="application/xml" hreflang="en-gb" 
+          title="Dublin Core RDF Metadata for MKDoc."><abbr 
+          title="Dublin Core Metadata Initiative">DCMI</abbr> <abbr 
+          title="Resource Description Framework">RDF</abbr> Metadata</a>
+|
+        <a href="http://mkdoc.com/rss090headline.rdf" type="application/xml" 
+          title="RSS 0.9 Headlines for MKDoc"><abbr 
+          title="RDF Site Summary">RSS</abbr> 0.9 Headlines</a> |
+        <a href="http://mkdoc.com/rss091headline.rdf" type="application/xml" 
+          title="RSS 0.91 Headlines for MKDoc"><abbr 
+          title="Rich Site Summary">RSS</abbr> 0.91 Headlines</a> |
+        <a href="http://mkdoc.com/rss100headline.rdf" type="application/xml" 
+          title="RSS 1.0 Headlines for MKDoc"><abbr 
+          title="RDF Site Summary">RSS</abbr> 1.0 Headlines</a> |
+        <a href="http://mkdoc.com/rss100sitemap.rdf" type="application/xml" 
+          title="RSS 1.0 Sitemap for MKDoc"><abbr 
+          title="RDF Site Summary">RSS</abbr> 1.0 Sitemap</a>
+
+      |
+      </p>
+      <p xml:lang="en" lang="en" class="lang-en">
+        This page conforms to the <abbr title="World Wide Web Consortium">W3C</abbr>'s
+        <abbr title="Web Accessibility Initiative ">WAI</abbr>
+        <a href="http://www.w3.org/TR/WCAG10/" title="Web Content Accessibility Guidelines 1.0">Accessibility Guidelines</a>,
+        level Double-A, which can be
+        <a href="http://bobby.cast.org/bobby/bobbyServlet?gl=wcag1-aa&amp;URL=http://mkdoc.comhttp://mkdoc.com/" 
+          title="Check this document with the Bobby validator.">checked with Bobby</a>, is
+        <a href="http://validator.w3.org/check/referer" 
+          title="Check the XHTML 1.0 validity of this document with the W3C.">valid <abbr 
+          title="eXtensible HyperText Markup Language">XHTML</abbr> 1.0</a> and uses
+        <a href="http://jigsaw.w3.org/css-validator/check/referer" 
+          title="Check the CSS validity of this document with the W3C.">valid <abbr 
+          title="Cascading Style Sheet">CSS</abbr></a>.
+      </p>
+
+      
+      
+<div id="mkdoc-footnote" title="Page footnote, including date and copyright information.">
+  <address xml:lang="en" lang="en" class="lang-en">
+
+    Last updated by <a href="mailto:adam@webarchitects.co.uk">Adam 
+    Moran</a>
+    on 2002-05-28 17:12:44
+    
+    <br />MKDoc Ltd. c/o webarchitects, PO Box 1660, Sheffield, S7 1XF, UK.
+    
+    
+    <br />Copyright © 2001-2002 MKDoc Ltd.
+    
+  </address>
+</div>
+
+
+    </div>
+  </body>
+</html>
+

@@ -1,0 +1,20 @@
+Parser::AAMVA::License is designed to parse and decode the information
+held on a standard driver's license issued in the US, Canada and parts 
+of Mexico by the American Association of Motor Vehicle Administrators.
+You can find the full definition at http://www.aamva.org.
+
+Magnetic stripe data is typically encoded with 'sentinel' characters at the 
+start and end of each track.  The module will automatically strip newline
+characters, but other characters may be present depending on the 
+programming in your stripe reader.
+
+Only the license holder's name and address are available on Track 1.
+
+The more commonly used birth date, license number and expiration date
+are found on Track 2.
+
+Track 3 contains more personal specifics such as height, weight and 
+eye color. 
+
+Tracks 2 or 3 may not present if the stripe reader cannot read those 
+tracks or if they are turned off.

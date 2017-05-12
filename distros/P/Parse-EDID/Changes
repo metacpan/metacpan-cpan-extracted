@@ -1,0 +1,28 @@
+2013-12-24 1.0.6
+
+	* add a LICENSE section, to please Test::Kwalitee
+
+2013-12-22 1.0.5
+
+	* fix dependencies, requiring a minimal version for Test::More
+
+2012-08-11 1.0.4
+
+	* fix distribution content again...
+
+2012-08-11 1.0.3
+
+	* fix distribution content
+
+2012-08-11 1.0.2
+
+	* rework test suite
+	* add raw edid samples
+
+2012-06-22 1.0.1
+
+	* add explicit GPLv3+ license
+
+2012-05-29 1.0.0
+
+	* initial release

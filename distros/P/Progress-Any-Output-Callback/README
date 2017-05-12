@@ -1,0 +1,34 @@
+SYNOPSIS
+
+     use Progress::Any::Output;
+     Progress::Any::Output->set(
+         'Callback',
+         callback=>sub {
+             my ($self, %args) = @_;
+             ...
+         }
+     );
+
+DESCRIPTION
+
+    This output propagates progress update to your specified callback.
+    Callback will receive what the output's update() receives: $self, %args
+    where %args contains: indicator, message, level, etc.
+
+METHODS
+
+ new(%args) => OBJ
+
+    Instantiate. Usually called through
+    Progress::Any::Output->set("Callback", %args).
+
+    Known arguments:
+
+      * callback => CODE
+
+      Required.
+
+SEE ALSO
+
+    Progress::Any
+

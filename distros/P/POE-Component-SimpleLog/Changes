@@ -1,0 +1,26 @@
+Revision history for Perl extension POE::Component::SimpleLog.
+
+* 1.05
+
+	Kwalitee-related fixes
+
+	fixed a bug with unregistration, thanks Eric Hacker!
+
+* 1.04
+
+	Kwalitee-related fixes
+	Finally use a Changes file - thanks RT #18981
+
+* 1.03
+
+	Rearranged DEBUG printouts
+	Fixed the issue of shutdown not actually working, thanks to Eric!
+	Renamed shutdown to SHUTDOWN
+
+* 1.02
+
+	Caught minor typo when loading Time::HiRes
+
+* 1.01
+
+	Initial Revision

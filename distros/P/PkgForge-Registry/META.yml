@@ -1,0 +1,56 @@
+---
+name: PkgForge-Registry
+version: v1.3.0
+author:
+  - 'Stephen Quinney <squinney@inf.ed.ac.uk>'
+abstract: Package Forge job registry
+license: gpl
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+build_requires:
+  Test::More: 0.87
+requires:
+  DBD::Pg: 0
+  DBIx::Class: 0.08112
+  DateTime::Format::Pg: 0
+  Moose: 0
+  MooseX::Types::Moose: 0
+  Text::Abbrev: 0
+  perl: v5.8.8
+configure_requires:
+  Module::Build: 0.35
+provides:
+  PkgForge::Registry:
+    file: lib/PkgForge/Registry.pm
+    version: v1.3.0
+  PkgForge::Registry::App:
+    file: lib/PkgForge/Registry/App.pm
+    version: v1.3.0
+  PkgForge::Registry::Role:
+    file: lib/PkgForge/Registry/Role.pm
+    version: v1.3.0
+  PkgForge::Registry::Schema:
+    file: lib/PkgForge/Registry/Schema.pm
+    version: v1.3.0
+  PkgForge::Registry::Schema::Result::Builder:
+    file: lib/PkgForge/Registry/Schema/Result/Builder.pm
+    version: v1.3.0
+  PkgForge::Registry::Schema::Result::Job:
+    file: lib/PkgForge/Registry/Schema/Result/Job.pm
+    version: v1.3.0
+  PkgForge::Registry::Schema::Result::JobStatus:
+    file: lib/PkgForge/Registry/Schema/Result/JobStatus.pm
+    version: v1.3.0
+  PkgForge::Registry::Schema::Result::Platform:
+    file: lib/PkgForge/Registry/Schema/Result/Platform.pm
+    version: v1.3.0
+  PkgForge::Registry::Schema::Result::State:
+    file: lib/PkgForge/Registry/Schema/Result/State.pm
+    version: v1.3.0
+  PkgForge::Registry::Schema::Result::Task:
+    file: lib/PkgForge/Registry/Schema/Result/Task.pm
+    version: v1.3.0
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

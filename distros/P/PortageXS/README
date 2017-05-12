@@ -1,0 +1,103 @@
+NAME
+    PortageXS - Portage abstraction layer for perl
+
+VERSION
+    version 0.3.1
+
+NAMING
+    For CPAN users, the name of this module is likely confusing, and
+    annoying.
+
+    *   No prefix
+
+        Ideally, I'd have a proper prefix like "Gentoo::", however, this is
+        a dependency problem, and this package has lived for a while in the
+        "Gentoo" ecosystem as this name, and changing a name will have
+        limitations on adopting downstreams.
+
+    *   No XS
+
+        Though the name says "XS" in it, you'll see there is no "XS"
+        anywhere in the tree. This, I imagine, is a result of naming
+        crossover, and "XS" here means more "Access" or something.
+
+    As such, my preferred name would be "Gentoo::Portage::API", or something
+    like that, but we're stuck for now.
+
+SIGNIFICANT CHANGES
+  0.3.0 Series
+   0.3.0
+   Slurping Overhaul
+    This module contains a lot of file slurping magic, in a few various
+    forms, as well as path mangling and similar things.
+
+    This release is a huge overhaul of how that works, and sufficiently more
+    dependence is now placed on "Path::Tiny"'s head.
+
+    "getFileContents" is now deprecated, and will warn when called.
+
+    However, the nature of this change is likely introduce a few bugs in
+    places I may not have transformed the code properly, which may not be
+    immediately obvservable.
+
+CHOPPING BLOCK
+    I've inherited this module from Gentoo Staff, who are now more-or-less
+    retired, and this code has been bitrotting away for a year.
+
+    Its ugly, its crufty, and it has a lot of bad and evil things that need
+    to die.
+
+    And much of it is on my mental chopping block.
+
+  Exporter based .... roles.
+    Yes. You read correctly. This code uses Exporter to implement
+    mixin-style class-composition, like roles. Just it uses Exporter to do
+    it instead of a more sane "Role" based tool.
+
+    This has the nasty side effect that everywhere you "use PortageXS", you
+    inadvertently inject a whole load of functions you don't want, and will
+    never want, and couldn't use if you did want them, because they all
+    require an invocant in $_[0]
+
+    Will be changed evenutally.
+
+  Poor encapsulation and many classes directly modifying hash keys.
+    All over the codebase there are weird tricks to make sure specific hash
+    keys are present, and populate them lazily, and some tricks are
+    implemented the same way a dozen times.
+
+    All direct hash manipulation is scheduled to be ripped out
+    unceremoniously in a future release, in favour of more sane tools like
+    "Moo" based accessors, lazy loading and things like that.
+
+  Poor concern seperation
+    Every module that has in it its own routine for loading files into
+    strings, is reinventing a bad wheel.
+
+    This module is no exception.
+
+    I plan to remove 90% of the filesystem interaction in favour of using
+    "Path::Tiny" everywhere
+
+    Its 1 more dep, and a whole load of better, and much more throughrougly
+    tested code.
+
+    So if you use "PortageXS" already, and you're using things of the above
+    types, stop now.
+
+        PortageXS::Core::getFileContents <-- will be a deprecated function in a future release.
+
+AUTHORS
+    *   Christian Hartmann <ian@gentoo.org>
+
+    *   Torsten Veller <tove@gentoo.org>
+
+    *   Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by Christian Hartmann.
+
+    This is free software, licensed under:
+
+      The GNU General Public License, Version 2, June 1991
+

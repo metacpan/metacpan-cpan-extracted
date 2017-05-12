@@ -1,0 +1,37 @@
+# Changes for Palm::Magellan::NavCompanion
+
+0.54 - Thu Jan  1 18:28:32 EST 2015
+	* Cut this module loose into the desert. If you want to maintain
+	this module, write to modules@perl.org.
+
+0.53 - Wed Jan 16 04:43:34 2008
+	* Cleanups for the move from CVS to SVN. No need to upgrade.
+
+0.52 - Thu Jan 25 14:34:53 2007
+
+0.51 - Thu Jan 25 14:32:46 2007
+	* fix the last distro which had a bad pattern in MANIFEST.SKIP which
+	prevented MANIFEST from making it into the directory.
+
+0.51 - Wed Jan 10 18:34:57 2007
+	* bumped to a release version
+
+0.50_03 - Fri Mar 11 22:28:59 2005
+	* Added POD coverage tests, fixed issues
+	* No code fixes: no need to update
+
+0.50_02 - Sun Aug 29 15:35:32 2004
+	* Added support for all the record fields I documented.  Oops.
+
+0.50_01 - Sun Aug 29 15:08:50 2004
+	* This is an initial, alpha, developer, not-done-yet release
+	* I can read the "Companion Waypoints.pdb" file, I just can't write
+	it yet
+	* I'm using a Magellan GPS Companion with my Visor Edge.  That's
+	all I have to test with
+	* I have to transfer the file from the Palm to my laptop before
+	I can read it: I can't read it directly from the Palm (wouldn't
+	that be nice?)
+
+
+

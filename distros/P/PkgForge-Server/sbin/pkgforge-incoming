@@ -1,0 +1,19 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+# $Id: pkgforge-incoming.in 15413 2011-01-14 10:09:51Z squinney@INF.ED.AC.UK $
+# $Source:$
+# $Revision: 15413 $
+# $HeadURL: https://svn.lcfg.org/svn/source/tags/PkgForge-Server/PkgForge_Server_1_1_10/sbin/pkgforge-incoming.in $
+# $Date: 2011-01-14 10:09:51 +0000 (Fri, 14 Jan 2011) $
+
+our $VERSION = '1.1.10';
+
+use PkgForge::Daemon::Incoming;
+
+my $daemon = PkgForge::Daemon::Incoming->new_with_options();
+
+$daemon->run();
+
+__END__

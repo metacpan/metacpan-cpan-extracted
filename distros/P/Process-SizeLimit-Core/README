@@ -1,0 +1,31 @@
+NAME
+    Process::SizeLimit::Core - Apache::SizeLimit::Core, repackaged
+
+DESCRIPTION
+    This module is simply a re-packaging of Apache::SizeLimit::Core into its
+    own distribution; please refer to Apache::SizeLimit and
+    Plack::Middleware::SizeLimit for sample usage.
+
+AUTHORS
+    唐鳳 <cpan@audreyt.org>, repackaging this module for
+    Plack::Middleware::SizeLimit.
+
+    Fred Moyer <fred@redhotpenguin.com>, maintainer of Apache::SizeLimit
+    distribution.
+
+    Doug Bagley <doug+modperl@bagley.org>, channeling Procrustes.
+
+    Brian Moseley <ix@maz.org>: Solaris 2.6 support
+
+    Doug Steinwand and Perrin Harkins <perrin@elem.com>: added support for
+    shared memory and additional diagnostic info
+
+    Matt Phillips <mphillips@virage.com> and Mohamed Hendawi
+    <mhendawi@virage.com>: Win32 support
+
+    Dave Rolsky <autarch@urth.org>, maintenance and fixes outside of
+    mod_perl tree (0.9+).
+
+LICENSE
+    Apache License 2.0
+

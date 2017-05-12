@@ -1,0 +1,8 @@
+Proc::Lite - A lightweight module for running processes synchronously
+
+To install this module, use the following steps:
+
+  perl Makefile.PL
+  make
+  make test
+  make install

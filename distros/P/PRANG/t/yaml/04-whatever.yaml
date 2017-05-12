@@ -1,0 +1,32 @@
+--- !!perl/hash:Octothorpe
+colon: ''
+question_mark: !!perl/hash:PRANG::XMLSchema::Whatever
+  contents:
+    - !!perl/hash:PRANG::XMLSchema::Whatever
+      attributes:
+        crash: bang_eth
+      attributes_ns:
+        crash: ''
+      contents:
+        - rip
+        - !!perl/hash:PRANG::XMLSchema::Whatever
+          attributes:
+            ker_plop:
+              - owww
+              - ouch
+              - whack_eth
+          attributes_ns:
+            ker_plop:
+              - uri:type:B
+              - uri:type:X
+              - ''
+      nodenames:
+        - ''
+        - swish
+      nodenames_ns:
+        - ''
+        - uri:type:A
+  nodenames:
+    - aiieee
+  nodenames_ns:
+    - ''

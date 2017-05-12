@@ -1,0 +1,9 @@
+=pod
+
+Some code:
+
+    @ARGV = ( '$c', map { ( $_, '$c.=pop;pop' ) } qw( + + A $ ) );
+    s//pop/eeeeeee;
+
+Back to paragraph.
+

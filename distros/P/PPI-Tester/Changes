@@ -1,0 +1,47 @@
+Revision history for Perl extension PPI::Tester and script ppitester
+
+0.15 Wed  6 May 2009
+	- Upgrading to Module::Install::DSL 0.86
+	- Incremental release
+
+0.14 Wed  3 Sep 2008
+	- Upgrading to Module::Install 0.77
+
+0.13 Sat 10 May 2008
+	- Upgrading to Module::Install 0.73
+
+0.12 Fri 28 Dec 2007
+	- Upgrading to Module::Install 0.65
+	- Cleaning up the Makefile.PL and test script
+	- Adding a compile test for the launcher
+
+0.11 Sun  3 Sep 2006
+	- Removed use of bad constant wxHIDE_READONLY
+	- Added the use of Wx::CheckLauncher
+
+0.10 missing...
+
+0.06 Tue Jan  3 2004
+	- Synchronised with the API changes in 0.840
+	- Updated to use Module::Build MakeFile.PL
+
+0.05 Wed Aug 18 2004
+	- Contributions from DH integrated
+	- Several small changes to various things
+	- Toolbar temporarily has text untils icons work
+	- The load button now works
+	- Updated dependencies to force the latest PPI version
+
+0.04 Wed 21 July 2004
+	- Tweaked the code to make application behave a little more sensibly
+	- Optionally filter out whitespace
+
+0.03 Missing
+
+0.02 Sun Jun 27 2004
+	- Changed the script and module names for release
+	- Created the initial CPAN-uploadable package
+	- Yes, I'm aware that the icons arn't visible
+
+0.01 Sat Jun 26 2004
+	- Create the basics, as a private application only

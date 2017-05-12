@@ -1,0 +1,124 @@
+#!/usr/bin/env perl
+
+use P5U;
+use File::Basename 'basename';
+
+unshift @ARGV, $1
+	if basename($0) =~ /^p5u-(\w+)$/;
+
+P5U->run;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=for stopwords ct MetaCPAN
+
+=head1 NAME
+
+p5u - utilities for Perl 5 development and administration
+
+=head1 SYNOPSIS
+
+Hmmm... what version of the HTML::HTML5::Entities module is installed?
+
+ $ p5u version HTML::HTML5::Entities
+ HTML::HTML5::Entities
+     /opt/perl-5.16.0/lib/site_perl/5.16.0/HTML/HTML5/Entities.pm: 0.003
+
+How is that version doing on CPAN Testers?
+
+ $ p5u testers HTML::HTML5::Entities
+ CPAN Testers results for HTML-HTML5-Entities version 0.003
+ 
+                                   PASS  FAIL   ETC
+ Perl 5.006                           0     0     1
+ Perl 5.008                           6     0     0
+ Perl 5.010                          18     0     0
+ Perl 5.012                          40     0     0
+ Perl 5.014                          24     0     0
+ Perl 5.016                           9     0     0
+ Perl 5.017                           6     0     0
+
+Let's run the HTML-HTML5-Entities test suite against my currently installed
+copy of the module
+
+ $ p5u reprove HTML::HTML5::Entities
+ Reproving HTML-HTML5-Entities/0.003 (TOBYINK)
+ t/01basic.t ..... ok   
+ t/02encoding.t .. ok   
+ t/03decoding.t .. ok   
+ All tests successful.
+ Files=3, Tests=16,  1 wallclock secs
+     ( 0.14 usr  0.02 sys +  0.65 cusr  0.02 csys =  0.83 CPU)
+ Result: PASS
+
+=head1 DESCRIPTION
+
+p5u is a command-line tool which provides a handful of helpful utilities
+for Perl development and administration. For example, reporting on what
+versions of a module are installed locally; which are available on CPAN;
+how the versions compare on the CPAN Testers service, and so on.
+
+This is an early version, so the number of utilities provided is fairly
+limited, but will grow. Thanks to L<App::Cmd>, p5u has a modular
+architecture, so you can write your own P5U plugins, and publish them
+on CPAN.
+
+For a list of supported commands, run:
+
+ p5u commands
+
+For help on a particular command, e.g. the "testers" command, run:
+
+ p5u help testers
+
+Most commands also have abbreviated names, so you can run "p5u ct" instead
+of the longer "p5u testers". To reveal a list of these aliases, run:
+
+ p5u aliases
+
+To see the version numbers and authors of your p5u commands, run:
+
+ p5u about
+
+=head1 BUGS
+
+Please report any bugs to
+L<http://rt.cpan.org/Dist/Display.html?Queue=P5U>.
+
+=head1 SEE ALSO
+
+L<P5U>, L<P5U::Tutorial::Development>.
+
+Find P5U plugins on MetaCPAN:
+L<https://metacpan.org/search?q=P5U::Command>.
+
+=head2 Other Handy Perl Utilities
+
+L<perldoc>,
+C<prove> (L<App::Prove>),
+C<perl-reversion> (L<Perl::Version>),
+C<cpan_upload> (L<CPAN::Uploader>),
+C<cpanm> (L<App::cpanminus>),
+C<cpan-outdated> (L<App::cpanoutdated>).
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2012 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

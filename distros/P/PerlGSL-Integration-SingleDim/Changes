@@ -1,0 +1,8 @@
+Revision history for Perl module PerlGSL::Integration::SingeDim.
+
+0.002  May 22, 2012
+	- Fix memory leak with AV*
+
+0.001  May 9, 2012
+	- Initial release
+

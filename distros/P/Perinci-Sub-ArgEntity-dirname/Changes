@@ -1,0 +1,20 @@
+Revision history for Perinci-Sub-ArgEntity-dirname
+
+0.03    2015-09-17 (PERLANCAR)
+
+	- Adjust to Complete::Util 0.36 (complete_file() split to
+	  Complete-File).
+
+
+0.02    2015-09-06 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.01    2015-03-24 (PERLANCAR)
+
+        - First release.

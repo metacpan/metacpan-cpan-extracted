@@ -1,0 +1,19 @@
+Revision history for Perl extension Pod-Weaver-PluginBundle-Author-RTHOMPSON
+
+0.151680  2015-06-17 15:19:10-07:00 America/Los_Angeles
+    - Properly declare prerequisites (I think!)
+    - Fix a minor typo that may or may not have had an effect
+
+0.132960  2013-10-23 14:44:40 America/Los_Angeles
+    - Add missing dependency on Pod::Elemental::Transformer::List
+    - Add basic load test (00-load.t)
+
+0.132800  2013-10-07 16:32:11 America/Los_Angeles
+    - Rename to [@Author::RTHOMPSON]
+
+0.121510  2012-05-29 17:21:47 America/Los_Angeles
+    - Declare proper dependencies
+    - Don't use the plugin in its own weaver.ini
+
+0.103510  2010-12-17 16:11:40 EST5EDT
+    - Initial CPAN release

@@ -1,0 +1,819 @@
+=encoding iso-8859-1
+
+=head1 NAME/NOM
+
+perlfaq - Foire aux questions sur Perl
+
+=head1 DESCRIPTION
+
+La FAQ Perl comprend plusieurs documents qui répondent aux questions
+les plus courantes concernant Perl et la programmation en Perl. Elle
+est organisée en neuf thèmes majeurs présentés ici.
+
+=head2 Où se procurer ce S<document ?>
+
+La FAQ Perl est fourni dans la distribution standard de Perl. Donc, si
+vous avez Perl, vous devez avoir la FAQ Perl. Vous devez aussi avoir l'outil C<perldoc> qui vous permet de lire toute la S<documentation :>
+
+	$ perldoc perlfaq
+
+Au-delà de votre système local, vous pouvez trouver cette FAQ Perl sur
+le web. Par exemple sur http://perldoc.perl.org/ (ou
+http://perl.enstimac.fr/ pour la présente traduction française).
+
+=head2 Comment contribuer à ce document.
+
+Les corrections, les ajouts ou les suggestions pour la version
+originale doivent être adressés à
+
+C<< <perlfaq-workers AT perl DOT com> >>. Les volontaires utilisent
+cette adresse pour coordonner leurs efforts et suivre le développement
+de la FAQ Perl. Ils sauront apprécier vos contributions mais ils n'ont
+pas le temps de vous aider, n'utilisez donc pas cette adresse pour
+poser des questions sur la FAQ Perl.
+
+Les corrections et les ajouts à la version française doivent être
+adressés aux traducteurs ou à
+C<< <paul.gaborit AT enstimac DOT fr> >>.  Si vous voulez participer à
+l'effort de traduction et de relecture, vous pouvez passer par le même
+canal.
+
+=head2 Que va-t-il se passer si vous envoyez votre problème de Perl aux S<auteurs ?>
+
+Ne faites pas cela !
+
+Si vous avez une question dont la réponse ne semble pas être dans la
+FAQ, vous feriez mieux de lire le chapitre 2 de cette FAQ pour savoir
+où poser votre question.
+
+=head1 CREDITS
+
+Tom Christiansen a écrit la FAQ Perl d'origine qui a ensuite été
+étendue avec l'aide de Nat Torkington. Les perlfaq-workers
+maintiennent les versions actuelles et font des mises à jour. De
+nombreuses personnes ont contribué aux questions, aux corrections et
+aux commentaires et la FAQ indique ces contributions à l'endroit
+approprié.
+
+=head1 Author and Copyright Information
+
+Tom Christiansen a écrit la FAQ Perl d'origine brian d foy C<<
+<bdfoy@cpan.org> >> a écrit cette version. Voir les documents
+eux-mêmes pour les informations précises des droits.
+
+Ce document est disponible sous les mêmes conditions que Perl
+lui-même. Les exemples de codes de tous les documents de la FAQ Perl
+sont dans le domaine public. Utilisez-les comme vous le souhaitez (à
+vos risques et périls).
+
+=head1 Table des matières
+
+=over 4
+
+=item L<perlfaq> - Ce document.
+
+=item L<perlfaq1> - Questions générales sur Perl.
+
+=item L<perlfaq2> - Trouver et apprendre Perl.
+
+=item L<perlfaq3> - Outils de programmation.
+
+=item L<perlfaq4> - Manipulation de données.
+
+=item L<perlfaq5> - Fichiers et formats.
+
+=item L<perlfaq6> - Expressions rationnelles.
+
+=item L<perlfaq7> - Questions générales sur le langage Perl.
+
+=item L<perlfaq8> - Interaction avec le système.
+
+=item L<perlfaq9> - Réseau.
+
+=back
+
+=head1 Toutes les questions
+
+=over
+
+=item L<perlfaq1>: Questions générales sur Perl.
+
+Question et informations très générales sur Perl.
+
+=over 4
+
+=item * Qu'est ce que PerlE<nbsp>?
+
+=item * Qui supporte PerlE<nbsp>?  Qui le développeE<nbsp>?  Pourquoi est-il gratuitE<nbsp>?
+
+=item * Quelle version de Perl dois-je utiliserE<nbsp>?
+
+=item * Qu'est-ce que veut dire perl4, perl5 ou perl6E<nbsp>?
+
+=item * Qu'est-ce que PonieE<nbsp>?
+
+=item * Qu'est-ce que perl6E<nbsp>?
+
+=item * Est-ce que Perl est stableE<nbsp>?
+
+=item * Est-il difficile d'apprendre PerlE<nbsp>?
+
+=item * Est-ce que Perl tient la comparaison avec d'autres langages comme Java, Python, REXX, Scheme ou TclE<nbsp>?
+
+=item * Que puis-je faire avec PerlE<nbsp>?
+
+=item * Quand ne devrais-je pas programmer en PerlE<nbsp>?
+
+=item * Quelle est la différence entre "perl" et "Perl"E<nbsp>?
+
+=item * Parle-t-on de programme Perl ou de script PerlE<nbsp>?
+
+=item * Qu'est ce qu'un JAPHE<nbsp>?
+
+=item * Où peut on trouver une liste des mots d'esprit de Larry
+
+=item * Comment convaincre mon administrateur système/chef de projet/employés d'utiliser Perl/Perl5 plutôt qu'un autre langageE<nbsp>?
+
+=back
+
+=item L<perlfaq2>: Trouver et apprendre Perl.
+
+Où trouver les sources et la documentation de Perl ainsi que de l'aide
+et autres choses similaires.
+
+=over 4
+
+=item * Quelles machines supportent S<perl ?> Où puis-je trouver S<Perl ?>
+
+=item * Comment trouver une version binaire de S<perl ?>
+
+=item * Je n'ai pas de compilateur C sur mon système. Comment puis-je compiler mon propre interpréteur S<Perl ?>
+
+=item * J'ai copié le binaire perl d'une machine sur une autre mais les scripts ne fonctionnent pas.
+
+=item * J'ai récupéré les sources et j'essaie de les compiler mais gdbm/dynamic loading/malloc/linking/... échoue. Comment faire pour que ça S<marche ?>
+
+=item * Quels modules et extensions existent pour Perl ? Qu'est-ce que CPAN ? Que signifie S<CPAN/src/... ?>
+
+=item * Existe-t-il une version de Perl certifiée ISO ou S<ANSI ?>
+
+=item * Où puis-je trouver des informations sur S<Perl ?>
+
+=item * Quels sont les groupes de discussion concernant Perl sur
+S<Usenet ?> Où puis-je poser mes S<questions ?>
+
+=item * Où puis-je poster mon code S<source ?>
+
+=item * Les livres sur Perl
+
+=item * Quels sont les revues ou magazines parlant de S<Perl ?>
+
+=item * Quelles sont les listes de diffusion concernant S<Perl ?>
+
+=item * Où trouver les archives de S<comp.lang.perl.misc ?>
+
+=item * Où puis-je acheter une version commerciale de S<Perl ?>
+
+=item * Où dois-je envoyer mes rapports de S<bugs ?>
+
+=item * Qu'est-ce que S<perl.com ?> Les Perl S<Mongers ?> S<pm.org ?> S<perl.org ?> S<cpan.org ?>
+
+=back
+
+=item L<perlfaq3>: Outils de programmation.
+
+Outils pour le programmeur et support technique.
+
+=over 4
+
+=item * Comment fais-je pour...E<nbsp>?
+
+=item * Comment utiliser Perl de façon interactiveE<nbsp>?
+
+=item * Existe-t-il un shell PerlE<nbsp>?
+
+=item * Comment puis-je connaître les modules installés sur mon système ?
+
+=item * Comment déboguer mes programmes PerlE<nbsp>?
+
+=item * Comment mesurer les performances de mes programmes PerlE<nbsp>?
+
+=item * Comment faire une liste croisée des appels de mon programme PerlE<nbsp>?
+
+=item * Existe-t-il un outil de mise en page de code PerlE<nbsp>?
+
+=item * Existe-t-il un ctags pour PerlE<nbsp>?
+
+=item * Existe-t-il un environnement de développement intégré (IDE) ou un éditeur Perl sous WindowsE<nbsp>?
+
+=item * Où puis-je trouver des macros pour Perl sous viE<nbsp>?
+
+=item * Où puis-je trouver le mode perl pour emacsE<nbsp>?
+
+=item * Comment utiliser des 'curses' avec PerlE<nbsp>?
+
+=item * Comment puis-je utiliser X ou Tk avec PerlE<nbsp>?
+
+=item * Comment rendre mes programmes Perl plus rapidesE<nbsp>?
+
+=item * Comment faire pour que mes programmes Perl occupent moins de mémoireE<nbsp>?
+
+=item * Est-ce sûr de retourner un pointeur sur une donnée localeE<nbsp>?
+
+=item * Comment puis-je libérer un tableau ou une table de hachage pour réduire mon programmeE<nbsp>?
+
+=item * Comment rendre mes scripts CGI plus efficacesE<nbsp>?
+
+=item * Comment dissimuler le code source de mon programme PerlE<nbsp>?
+
+=item * Comment compiler mon programme Perl en code binaire ou CE<nbsp>?
+
+=item * Comment compiler Perl pour en faire du JavaE<nbsp>?
+
+=item * Comment faire fonctionner C<#!perl> sur [MS-DOS,NT,...]E<nbsp>?
+
+=item * Puis-je écrire des programmes Perl pratiques sur la ligne de commandesE<nbsp>?
+
+=item * Pourquoi les commandes Perl à une ligne ne fonctionnent-elles pas sur mon DOS/Mac/VMSE<nbsp>?
+
+=item * Où puis-je en apprendre plus sur la programmation CGI et Web en PerlE<nbsp>?
+
+=item * Où puis-je apprendre la programmation orientée objet en PerlE<nbsp>?
+
+=item * Où puis-je en apprendre plus sur l'utilisation liée de Perl et de CE<nbsp>?
+
+=item * J'ai lu perlembed, perlguts, etc., mais je ne peux inclure du perl dans mon programme C, qu'est ce qui ne va pasE<nbsp>?
+
+=item * Quand j'ai tenté d'exécuter mes scripts, j'ai eu ce message. Qu'est ce que cela signifieE<nbsp>?
+
+=item * Qu'est-ce que MakeMakerE<nbsp>?
+
+=back
+
+=item L<perlfaq4>: Manipulation de données.
+
+Les questions liées à la manipulation des nombres, des dates, des
+chaînes de caractères, des tableaux, des tables de hachage, ainsi qu'à
+divers problèmes relatifs aux données.
+
+=over 4
+
+=item * Pourquoi est-ce que j'obtiens des longs nombres décimaux (ex. 19.9499999999999) à la place du nombre que j'attends (ex. 19.95)E<nbsp>?
+
+=item * Pourquoi int() ne fonctionne pas S<bien ?>
+
+=item * Pourquoi mon nombre octal n'est-il pas interprété S<correctement ?>
+
+=item * Perl a-t-il une fonction round()E<nbsp>? Et ceil() (majoration) et floor() (minoration)E<nbsp>? Et des fonctions S<trigonométriques ?>
+
+=item * Comment faire des conversions numériques entre différentes bases, entre différentes S<représentations ?>
+
+=item * Pourquoi & ne fonctionne-t-il pas comme je le S<veux ?>
+
+=item * Comment multiplier des S<matrices ?>
+
+=item * Comment effectuer une opération sur une série d'S<entiers ?>
+
+=item * Comment produire des chiffres S<romains ?>
+
+=item * Pourquoi mes nombres aléatoires ne sont-ils pas S<aléatoires ?>
+
+=item * Comment obtenir un nombre aléatoire entre X et S<Y ?>
+
+=item * Comment trouver le jour ou la semaine de S<l'année ?>
+
+=item * Comment trouver le siècle ou le millénaire S<actuel ?>
+
+=item * Comment comparer deux dates ou en calculer la S<différence ?>
+
+=item * Comment convertir une chaîne de caractères en secondes depuis l'origine des S<temps ?>
+
+=item * Comment trouver le jour du calendrier S<Julien ?>
+
+=item * Comment trouver la date d'S<hier ?>
+
+=item * Perl a-t-il un problème avec l'an S<2000 ?> Perl est-il compatible an S<2000 ?>
+
+=item * Comment m'assurer de la validité d'une S<entrée ?>
+
+=item * Comment supprimer les caractères d'échappement d'une chaîne de S<caractères ?>
+
+=item * Comment enlever des paires de caractères S<successifs ?>
+
+=item * Comment effectuer des appels de fonction dans une S<chaîne ?>
+
+=item * Comment repérer des éléments appariés ou S<imbriqués ?>
+
+=item * Comment inverser une chaîne de S<caractères ?>
+
+=item * Comment développer les tabulations dans une chaîne de S<caractères ?>
+
+=item * Comment remettre en forme un S<paragraphe ?>
+
+=item * Comment accéder à ou modifier N caractères d'une chaîne de S<caractères ?>
+
+=item * Comment changer la nième occurrence de quelque S<chose ?>
+
+=item * Comment compter le nombre d'occurrences d'une sous-chaîne dans une chaîne de S<caractères ?>
+
+=item * Comment mettre en majuscule toutes les premières lettre des mots d'une S<ligne ?>
+
+=item * Comment découper une chaîne séparée par un [caractère] sauf à l'intérieur d'un [caractère]E<nbsp>?
+
+=item * Comment supprimer des espaces blancs au début/à la fin d'une S<chaîne ?>
+
+=item * Comment cadrer une chaîne avec des blancs ou un nombre avec des S<zéros ?>
+
+=item * Comment extraire une sélection de colonnes d'une chaîne de S<caractères ?>
+
+=item * Comment calculer la valeur soundex d'une S<chaîne ?>
+
+=item * Comment interpoler des variables dans des chaînes de S<texte ?>
+
+=item * En quoi est-ce un problème de toujours placer "$vars" entre S<guillemets ?>
+
+=item * Pourquoi est-ce que mes documents E<lt>E<lt>HERE ne marchent S<pas ?>
+
+=item * Quelle est la différence entre une liste et un S<tableau ?>
+
+=item * Quelle est la différence entre $array[1] et S<@array[1] ?>
+
+=item * Comment supprimer les doublons d'une liste ou d'un S<tableau ?>
+
+=item * Comment savoir si une liste ou un tableau inclut un certain S<élément ?>
+
+=item * Comment calculer la différence entre deux S<tableaux ?> Comment calculer l'intersection entre deux S<tableaux ?>
+
+=item * Comment tester si deux tableaux ou hachages sont S<égaux ?>
+
+=item * Comment trouver le premier élément d'un tableau vérifiant une condition S<donnée ?>
+
+=item * Comment gérer des listes S<chaînées ?>
+
+=item * Comment gérer des listes S<circulaires ?>
+
+=item * Comment mélanger le contenu d'un S<tableau ?>
+
+=item * Comment traiter/modifier chaque élément d'un S<tableau ?>
+
+=item * Comment sélectionner aléatoirement un élément d'un S<tableau ?>
+
+=item * Comment générer toutes les permutations des N éléments d'une S<liste ?>
+
+=item * Comment trier un tableau par (n'importe quoi)E<nbsp>?
+
+=item * Comment manipuler des tableaux de S<bits ?>
+
+=item * Pourquoi defined() retourne vrai sur des tableaux et hachages S<vides ?>
+
+=item * Comment traiter une table S<entière ?>
+
+=item * Que se passe-t-il si j'ajoute ou j'enlève des clefs d'un hachage pendant que j'itère S<dessus ?>
+
+=item * Comment rechercher un élément d'un hachage par sa S<valeur ?>
+
+=item * Comment savoir combien d'entrées sont dans un S<hachage ?>
+
+=item * Comment trier une table de hachage (par valeur ou par clef)E<nbsp>?
+
+=item * Comment conserver mes tables de hachage dans S<l'ordre ?>
+
+=item * Quelle est la différence entre "delete" et "undef" pour des tables de S<hachage ?>
+
+=item * Pourquoi mes tables de hachage liées (par tie()) ne font pas la distinction entre exists et S<defined ?>
+
+=item * Comment réinitialiser une opération each() non S<terminée ?>
+
+=item * Comment obtenir l'unicité des clefs de deux S<hachages ?>
+
+=item * Comment enregistrer un tableau multidimensionnel dans un fichier S<DBM ?>
+
+=item * Comment faire en sorte que mon hachage conserve l'ordre des éléments que j'y S<mets ?>
+
+=item * Pourquoi le passage à un sous-programme d'un élément non défini d'un hachage le crée du même S<coup ?>
+
+=item * Comment faire l'équivalent en Perl d'une structure en C, d'une classe/d'un hachage en C++ ou d'un tableau de hachages ou de S<tableaux ?>
+
+=item * Comment utiliser une référence comme clef d'une table de S<hachage ?>
+
+=item * Comment manipuler proprement des données S<binaires ?>
+
+=item * Comment déterminer si un scalaire est un nombre/entier/à virgule S<flottante ?>
+
+=item * Comment conserver des données persistantes entre divers appels de S<programme ?>
+
+=item * Comment afficher ou copier une structure de données S<récursive ?>
+
+=item * Comment définir des méthodes pour toutes les classes ou tous les S<objets ?>
+
+=item * Comment vérifier la somme de contrôle d'une carte de S<crédit ?>
+
+=item * Comment compacter des tableaux de nombres à virgule flottante simples ou doubles pour le code S<XS ?>
+
+=back
+
+=item L<perlfaq5>: Fichiers et formats.
+
+E/S (Entrées et Sorties) et autres éléments connexesE<nbsp>:
+descripteurs de fichiers, vidage de tampons, formats d'écriture et
+mise en page.
+
+=over 4
+
+=item * Comment vider ou désactiver les tampons en S<sortie ?> Pourquoi m'en S<soucier ?>
+
+=item * Comment changer une ligne, effacer une ligne, insérer une ligne au milieu ou ajouter une ligne en tête d'un S<fichier ?>
+
+=item * Comment déterminer le nombre de lignes d'un S<fichier ?>
+
+=item *  Comment utiliser l'option C<-i> de Perl depuis l'intérieur d'un S<programme ?>
+
+=item * Comment puis-je copier un S<fichier ?>
+
+=item * Comment créer un fichier S<temporaire ?>
+
+=item * Comment manipuler un fichier avec des enregistrements de longueur S<fixe ?>
+
+=item * Comment rendre un descripteur de fichier local à une S<routine ?> Comment passer des descripteurs à d'autres S<routines ?>  Comment construire un tableau de S<descripteurs ?>
+
+=item * Comment utiliser un descripteur de fichier S<indirectement ?>
+
+=item * Comment mettre en place un pied-de-page avec S<write() ?>
+
+=item * Comment rediriger un write() dans une S<chaîne ?>
+
+=item * Comment afficher mes nombres avec des virgules pour délimiter les S<milliers ?>
+
+=item * Comment traduire les tildes (~) dans un nom de S<fichier ?>
+
+=item * Pourquoi les fichiers que j'ouvre en lecture-écriture se voient-ils S<effacés ?>
+
+=item * Pourquoi E<lt>*E<gt> donne de temps en temps l'erreur "Argument list too long"E<nbsp>?
+
+=item * Y a-t-il une fuite / un bug avec glob()E<nbsp>?
+
+=item * Commend ouvrir un fichier dont le nom commence par "E<gt>" ou se termine par des espacesE<nbsp>?
+
+=item * Comment renommer un fichier de façon sûreE<nbsp>?
+
+=item * Comment verrouiller un fichierE<nbsp>?
+
+=item * Pourquoi ne pas faire simplement C<open(FH, "E<gt>file.lock")>E<nbsp>?
+
+=item * Je ne comprends toujours pas le verrouillage. Je veux seulement incrémenter un compteur dans un ficher. Comment S<faire ?>
+
+=item * Je souhaite juste ajouter un peu de texte à la fin d'un fichier. Dois-je tout de même utiliser le S<verrouillage ?>
+
+=item * Comment modifier un fichier binaire S<directement ?>
+
+=item * Comment recupérer la date d'un fichier en S<perl ?>
+
+=item * Comment modifier la date d'un fichier en S<perl ?>
+
+=item * Comment écrire dans plusieurs fichiers S<simultanément ?>
+
+=item * Comment lire le contenu d'un fichier d'un seul S<coup ?>
+
+=item * Comment lire un fichier paragraphe par S<paragraphe ?>
+
+=item * Comment lire un seul caractère d'un S<fichier ?> Et du S<clavier ?>
+
+=item * Comment savoir si un caractère est disponible sur un descripteur de S<fichier ?>
+
+=item * Comment écrire un C<tail -f> en S<perl ?>
+
+=item * Comment faire un dup() sur un descripteur en S<Perl ?>
+
+=item * Comment fermer un descripteur connu par son S<numéro ?>
+
+=item * Pourquoi "C:\temp\foo" n'indique pas un fichier S<DOS ?> Et même "C:\temp\foo.exe" ne marche S<pas ?>
+
+=item * Pourquoi glob("*.*") ne donne-t-il pas tous les S<fichiers ?>
+
+=item * Pourquoi Perl me laisse effacer des fichiers protégés en S<écriture ?> Pourquoi C<-i> écrit-il dans des fichiers S<protégés ?> N'est-ce pas un bug de S<Perl ?>
+
+=item * Comment sélectionner une ligne au hasard dans un S<fichier ?>
+
+=item * Pourquoi obtient-on des espaces étranges lorsqu'on affiche un tableau de S<lignes ?>
+
+=back
+
+=item L<perlfaq6>: Expressions rationnelles.
+
+Cette partie de la FAQ est incroyablement courte car les autres
+parties sont parsemées de réponses concernant les expressions
+rationnelles. Par exemple, décoder une URL ou vérifier si quelque
+chose est un nombre ou non relève du domaine des expressions
+rationnelles, mais ces réponses se trouvent ailleurs que dans ce
+document (dans L<perlfaq9> S<« Comment> décoder ou créer ces
+%-encodings sur le S<web ? »> et dans L<perlfaq4> « Comment déterminer
+si un scalaire est un nombre/entier/à virgule S<flottante ? »>).
+
+=over 4
+
+=item * Comment utiliser les expressions rationnelles sans créer du code illisible et difficile à S<maintenir ?>
+
+=item * J'ai des problèmes pour faire une reconnaissance sur plusieurs lignes. Qu'est-ce qui ne va S<pas ?>
+
+=item * Comment extraire des lignes entre deux motifs qui sont chacun sur des lignes S<différentes ?>
+
+=item * J'ai mis une expression rationnelle dans $/ mais cela ne marche pas. Qu'est-ce qui est S<faux ?>
+
+=item * Comment faire une substitution indépendante de la casse de la partie gauche mais préservant cette casse dans la partie S<droite ?>
+
+=item * Comment faire pour que C<\w> reconnaisse les caractères S<nationaux ?>
+
+=item * Comment reconnaître une version locale-équivalente de S<C</[a-zA-Z]/> ?>
+
+=item * Comment protéger une variable pour l'utiliser dans une expression S<rationnelle ?>
+
+=item * À quoi sert vraiment S<C</o> ?>
+
+=item * Comment utiliser une expression rationnelle pour enlever les commentaires de type C d'un S<fichier ?>
+
+=item * Est-ce possible d'utiliser les expressions rationnelles de Perl pour reconnaître du texte bien S<équilibré ?>
+
+=item * Que veut dire "les expressions rationnelles sont gourmandes"E<nbsp>? Comment puis-je le S<contourner ?>
+
+=item *  Comment examiner chaque mot dans chaque S<ligne ?>
+
+=item * Comment afficher un rapport sur les fréquences de mots ou de S<lignes ?>
+
+=item * Comment faire une reconnaissance S<approximative ?>
+
+=item * Comment reconnaître efficacement plusieurs expressions rationnelles en même S<temps ?>
+
+=item * Pourquoi les recherches de limite de mot avec C<\b> ne marchent pas pour S<moi ?>
+
+=item * Pourquoi l'utilisation de $&, $`, or $' ralentit tant mon S<programme ?>
+
+=item * À quoi peut bien servir C<\G> dans une expression S<rationnelle ?>
+
+=item * Les expressions rationnelles de Perl sont-elles AFD ou S<AFN ?> Sont-elles conformes à S<POSIX ?>
+
+=item * Qu'est ce qui ne va pas avec l'utilisation de grep dans un contexte S<vide ?>
+
+=item * Comment reconnaître des chaînes avec des caractères S<multi-octets ?>
+
+=item * Comment rechercher un motif fourni par S<l'utilisateur ?>
+
+=back
+
+=item L<perlfaq7>: Questions générales sur le langage Perl.
+
+Traite des questions générales sur le langage Perl qui ne trouvent
+leur place dans aucune autre section.
+
+=over 4
+
+=item * Puis-je avoir une BNF/yacc/RE pour le langage S<Perl ?>
+
+=item * Quels sont tous ces $@%&* de signes de ponctuation, et comment savoir quand les S<utiliser ?>
+
+=item * Dois-je toujours/jamais mettre mes chaînes entre guillemets ou utiliser les points-virgules et les S<virgules ?>
+
+=item * Comment ignorer certaines valeurs de S<retour ?>
+
+=item * Comment bloquer temporairement les S<avertissements ?>
+
+=item * Qu'est-ce qu'une S<extension ?>
+
+=item * Pourquoi les opérateurs de Perl ont-ils une précédence différente de celle des opérateurs en S<C ?>
+
+=item * Comment déclarer/créer une S<structure ?>
+
+=item * Comment créer un S<module ?>
+
+=item * Comment créer une S<classe ?>
+
+=item * Comment déterminer si une variable est S<souillée ?>
+
+=item * Qu'est-ce qu'une S<fermeture ?>
+
+=item * Qu'est-ce que le suicide de variable et comment le S<prévenir ?>
+
+=item * Comment passer/renvoyer {une fonction, un handle de fichier, un tableau, un hachage, une méthode, une expression S<rationnelle} ?>
+
+=item * Comment créer une variable S<statique ?>
+
+=item * Quelle est la différence entre la portée dynamique et lexicale S<(statique) ?> Entre local() et S<my() ?>
+
+=item * Comment puis-je accéder à une variable dynamique lorsqu'un
+
+=item * Quelle est la différence entre les liaisons profondes et S<superficielles ?>
+
+=item * Pourquoi "my($foo) = E<lt>FICHIERE<gt>;" ne marche S<pas ?>
+
+=item * Comment redéfinir une fonction, un opérateur ou une méthode S<prédéfini ?>
+
+=item * Quelle est la différence entre l'appel d'une fonction par &foo et par S<foo() ?>
+
+=item * Comment créer une instruction switch ou S<case ?>
+
+=item * Comment intercepter les accès aux variables, aux fonctions, aux méthodes S<indéfinies ?>
+
+=item * Pourquoi une méthode incluse dans ce même fichier ne peut-elle pas être S<trouvée ?>
+
+=item * Comment déterminer mon paquetage S<courant ?>
+
+=item * Comment commenter un grand bloc de code S<perl ?>
+
+=item * Comment supprimer un S<paquetage ?>
+
+=item * Comment utiliser une variable comme nom de S<variable ?>
+
+=item * Que signifie "bad interpreter"E<nbsp>?
+
+=back
+
+=item L<perlfaq8>: Interaction avec le système.
+
+Traite des questions concernant les interactions avec le système
+d'exploitation. Cela inclut les mécanismes de communication
+inter-processus (IPC -- Inter Process Communication en anglais), le
+pilotage de l'interface utilisateur (clavier, écran et souris), et
+d'une façon générale tout ce qui ne relève pas de la manipulation de
+données.
+
+=over 4
+
+=item * Comment savoir sur quel système d'exploitation je S<tourne ?>
+
+=item * Pourquoi ne revient-on pas après un S<exec() ?>
+
+=item * Comment utiliser le clavier/écran/souris de façon S<élaborée ?>
+
+=item * Comment afficher quelque chose en S<couleur ?>
+
+=item * Comment lire simplement une touche sans attendre un appui sur S<"entrée" ?>
+
+=item * Comment vérifier si des données sont en attente depuis le S<clavier ?>
+
+=item * Comment effacer S<l'écran ?>
+
+=item * Comment obtenir la taille de S<l'écran ?>
+
+=item * Comment demander un mot de passe à un S<utilisateur ?>
+
+=item * Comment lire et écrire sur le port S<série ?>
+
+=item * Comment décoder les fichiers de mots de passe S<cryptés ?>
+
+=item * Comment lancer un processus en arrière S<plan ?>
+
+=item * Comment capturer un caractère de contrôle, un S<signal ?>
+
+=item * Comment modifier le fichier masqué (shadow) de mots de passe sous S<Unix ?>
+
+=item * Comment positionner l'heure et la S<date ?>
+
+=item * Comment effectuer un sleep() ou alarm() de moins d'une S<seconde ?>
+
+=item * Comment mesurer un temps inférieur à une S<seconde ?>
+
+=item * Comment réaliser un atexit() ou S<setjmp()/longjmp() ?> (traitement d'exceptions)
+
+=item * Pourquoi mes programmes avec socket() ne marchent pas sous System V S<(Solaris) ?> Que signifie le message d'erreur «E<nbsp>Protocole non supportéE<nbsp>»E<nbsp>?
+
+=item * Comment appeler les fonctions C spécifiques à mon système depuis S<Perl ?>
+
+=item * Où trouver les fichiers d'inclusion pour ioctl() et S<syscall() ?>
+
+=item * Pourquoi les scripts perl en setuid se plaignent-ils d'un problème S<noyau ?>
+
+=item * Comment ouvrir un tube depuis et vers une commande S<simultanément ?>
+
+=item * Pourquoi ne puis-je pas obtenir la sortie d'une commande avec S<system() ?>
+
+=item * Comment capturer la sortie STDERR d'une commande S<externe ?>
+
+=item * Pourquoi open() ne retourne-t-il pas d'erreur lorsque l'ouverture du tube S<échoue ?>
+
+=item * L'utilisation des apostrophes inversées dans un contexte vide
+
+=item * Comment utiliser des apostrophes inversées sans traitement du S<shell ?>
+
+=item * Pourquoi mon script ne lit-il plus rien de STDIN après que je lui ai envoyé EOF (^D sur Unix, ^Z sur MS-DOS)E<nbsp>?
+
+=item * Comment convertir mon script shell en S<perl ?>
+
+=item * Puis-je utiliser perl pour lancer une session telnet ou S<ftp ?>
+
+=item * Comment écrire "expect" en S<Perl ?>
+
+=item * Peut-on cacher les arguments de perl sur la ligne de commande aux programmes comme S<"ps" ?>
+=item * J'ai {changé de répertoire, modifié mon environnement} dans un script perl. Pourquoi les changements disparaissent-ils lorsque le script se S<termine ?> Comment rendre mes changements S<visibles ?>
+
+=item * Comment fermer le descripteur de fichier attaché à un processus sans attendre que ce dernier se S<termine ?>
+
+=item * Comment lancer un processus S<démon ?>
+
+=item * Comment savoir si je tourne de façon interactive ou S<pas ?>
+
+=item * Comment sortir d'un blocage sur événement S<lent ?>
+
+=item * Comment limiter le temps S<CPU ?>
+
+=item * Comment éviter les processus zombies sur un système S<Unix ?>
+
+=item * Comment utiliser une base de données S<SQL ?>
+
+=item * Comment terminer un appel à system() avec un S<control-C ?>
+
+=item * Comment ouvrir un fichier sans S<bloquer ?>
+
+=item * Comment faire la différence entre les erreurs shell et les erreurs S<perl ?>
+
+=item * Comment installer un module du S<CPAN ?>
+
+=item * Quelle est la différence entre require et S<use ?>
+
+=item * Comment gérer mon propre répertoire de S<modules/bibliothèques ?>
+
+=item * Comment ajouter le répertoire dans lequel se trouve mon programme dans le chemin de recherche des modules / S<bibliothèques ?>
+
+=item * Comment ajouter un répertoire dans mon chemin de recherche (@INC) à S<l'exécution ?>
+
+=item * Qu'est-ce que socket.ph et où S<l'obtenir ?>
+
+=back
+
+=item L<perlfaq9>: Réseau.
+
+Traite des questions relatives aux aspects réseau, à internet et un
+peu au web.
+
+=over 4
+
+=item * Quelle est la forme correcte d'une réponse d'un script CGI ?
+
+=item * Mon script CGI fonctionne en ligne de commandes mais pas depuis un navigateur. (500 Server Error)
+
+=item * Comment faire pour obtenir de meilleurs messages d'erreur d'un programme CGIE<nbsp>?
+
+=item * Comment enlever les balises HTML d'une chaîneE<nbsp>?
+
+=item * Comment extraire des URLE<nbsp>?
+
+=item * Comment télécharger un fichier depuis la machine d'un utilisateurE<nbsp>? Comment ouvrir un fichier d'une autre machineE<nbsp>?
+
+=item * Comment faire un menu pop-up en HTMLE<nbsp>?
+
+=item * Comment récupérer un fichier HTMLE<nbsp>?
+
+=item * Comment automatiser la soumission d'un formulaire HTMLE<nbsp>?
+
+=item * Comment décoder ou créer ces %-encodings sur le webE<nbsp>?
+
+=item * Comment rediriger le navigateur vers une autre pageE<nbsp>?
+
+=item * Comment mettre un mot de passe sur mes pages WebE<nbsp>?
+
+=item * Comment éditer mes fichiers .htpasswd et .htgroup en PerlE<nbsp>?
+
+=item * Comment être sûr que les utilisateurs ne peuvent pas entrer de valeurs dans un formulaire qui font faire de vilaines choses à mon script CGIE<nbsp>?
+
+=item * Comment analyser un en-tête de mailE<nbsp>?
+
+=item * Comment décoder un formulaire CGIE<nbsp>?
+
+=item * Comment vérifier la validité d'une adresse électroniqueE<nbsp>?
+
+=item * Comment décoder une chaîne MIME/BASE64E<nbsp>?
+
+=item * Comment renvoyer l'adresse électronique de l'utilisateurE<nbsp>?
+
+=item * Comment envoyer un mailE<nbsp>?
+
+=item * Comment utiliser MIME pour attacher des documents à un S<mail ?>
+
+=item * Comment lire du courrierE<nbsp>?
+
+=item * Comment trouver mon nom de machineE<nbsp>/ nom de domaineE<nbsp>/ mon adresse IPE<nbsp>?
+
+=item * Comment récupérer un article de news ou les groupes actifsE<nbsp>?
+
+=item * Comment récupérer/envoyer un fichier par FTPE<nbsp>?
+
+=item * Comment faire du RPC en PerlE<nbsp>?
+
+=back
+
+=back
+
+=head1 TRADUCTION
+
+=head2 Version
+
+Cette traduction française correspond à la version anglaise distribuée avec
+perl 5.8.8.  Pour en savoir plus concernant ces traductions, consultez
+L<http://perl.enstimac.fr/>.
+
+=head2 Traducteur
+
+Marc Carmier <carmier@immortels.frmug.org>.  Paul Gaborit
+<paul.gaborit at enstimac.fr> (mise à jour).
+
+=head2 Relecture
+
+Pascal Ethvignot <F<pascal@encelade.frmug.org>>

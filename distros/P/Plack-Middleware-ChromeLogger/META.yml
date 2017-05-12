@@ -1,0 +1,36 @@
+---
+abstract: 'The Chrome Logger Middleware for Plack'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  HTTP::Request::Common: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+  Plack::Builder: 0
+  Plack::Test: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-ChromeLogger
+provides:
+  Plack::Middleware::ChromeLogger:
+    file: lib/Plack/Middleware/ChromeLogger.pm
+    version: 0.01
+requires:
+  Plack::Middleware: 0
+  Plack::Util: 0
+  Plack::Util::Accessor: 0
+  Web::ChromeLogger: 0.04
+  perl: 5.008001
+resources:
+  bugtracker: http://github.com/bayashi/Plack-Middleware-ChromeLogger/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Plack-Middleware-ChromeLogger
+version: 0.01

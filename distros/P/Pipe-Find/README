@@ -1,0 +1,58 @@
+SYNOPSIS
+
+     use Pipe::Find qw(find_pipe_processes get_stdout_pipe_process);
+     $procs = find_pipe_processes(); # hashref, key=fd, value=process info hash
+    
+     if ($procs->{0}) {
+         say "STDIN is connected to a pipe";
+         say "pid=$procs->{0}{pid}";
+         say "cmdline=$procs->{0}{cmdline}";
+         say "exe=$procs->{0}{exe}";
+     }
+     if ($procs->{1}) {
+         say "STDOUT is connected to a pipe";
+         ...
+     }
+     if ($procs->{2}) {
+         say "STDERR is connected to a pipe";
+         ...
+     }
+     # ...
+
+DESCRIPTION
+
+FUNCTIONS
+
+    None exported by default, but they are exportable.
+
+ find_pipe_processes([ $pid ]) => \%procs
+
+    List all processes behind the pipes that your process opens. (You can
+    also find pipes for another process by passing its PID.)
+
+    Currently only works on Linux. Works by listing /proc/$$/fd and
+    selecting all fd's that symlinks to pipe:*. Then it will list all
+    /proc/*/fd and find matching pipes.
+
+    STDIN pipe is at fd 0, STDOUT pipe at fd 1, STDERR at fd 2.
+
+ get_stdin_pipe_process() => \%procinfo
+
+    Basically a shortcut to get the fd 0 only, since this is common. Return
+    undef if STDIN is not piped.
+
+    If you plan on getting process information for both STDIN and STDOUT,
+    it's better to use find_pipe_processes() than calling this function and
+    get_stdout_pipe_process(), because the latter will scan twice.
+
+ get_stdout_pipe_process() => \%procinfo
+
+    Basically a shortcut to get the fd 1 only, since this is common. Return
+    undef if STDOUT is not piped.
+
+    If you plan on getting process information for both STDIN and STDOUT,
+    it's better to use find_pipe_processes() than calling this function and
+    get_stdin_pipe_process(), because the latter will scan twice.
+
+SEE ALSO
+

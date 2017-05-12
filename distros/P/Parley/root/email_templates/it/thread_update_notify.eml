@@ -1,0 +1,16 @@
+[% person.first_name %],
+
+Il thread "[% post.thread.subject %]"
+è stato aggiornato con una nuova risposta scritta da [% post.creator.forum_name %].
+
+Clicca qui per continuare a leggere il thread:
+
+ [% c.req.base %]thread/next_post?thread=[% post.thread.id %]
+
+Clicca qui per vedere l'ultimo messaggio nel thread:
+
+ [% c.req.base %]post/view?post=[% post.id %]
+
+NB: Non verranno ricevute altre notificazioni per questo thread finché non sarà stato visto il messaggio sovrastante o un messaggio più recente.
+
+Il team [% c.config.name %].

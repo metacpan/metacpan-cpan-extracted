@@ -1,0 +1,139 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Image::Magick;
+
+my $image = new Image::Magick;
+$image->Read (shift);
+
+my $path_prefix = shift || 't';
+
+my $pix_tile = shift || 256;
+
+my ($pix_width, $pix_height) = $image->Get ('width', 'height');
+
+my $pix_size = 1;
+$pix_size *= 2 while ($pix_size < $pix_width || $pix_size < $pix_height);
+
+unless ($pix_size == $pix_width && $pix_size == $pix_height)
+{
+    my $x_offset = $pix_size - $pix_width +1;
+    my $y_offset = $pix_size - $pix_height +1;
+    $image->Border (geometry => $x_offset .'x'. $y_offset);
+    $image->Crop (geometry => $pix_size .'x'. $pix_size .'+'. $x_offset .'+'. $y_offset);
+    $image->Set (page => '0x0+0+0');
+}
+
+entile ($image, $path_prefix, $pix_tile);
+
+sub entile
+{
+    my $image = shift;
+    my $path_prefix = shift;
+    my $pix_tile = shift;
+
+    my $pix_width = $image->Get ('width');
+    my $w2 = $pix_width/2;
+
+    my $q = $image->Clone;
+    my $r = $image->Clone;
+    my $s = $image->Clone;
+    my $t = $image->Clone;
+
+    $q->Crop (geometry => $w2.'x'."$w2+0+0");
+    $q->Set ( page => '0x0+0+0');
+    $r->Crop (geometry => $w2.'x'."$w2+$w2+0");
+    $r->Set ( page => '0x0+0+0');
+    $s->Crop (geometry => $w2.'x'."$w2+$w2+$w2");
+    $s->Set ( page => '0x0+0+0');
+    $t->Crop (geometry => $w2.'x'."$w2+0+$w2");
+    $t->Set ( page => '0x0+0+0');
+
+    if ($w2 == $pix_tile)
+    {
+        $q->Write ($path_prefix .'q.jpg');
+        $r->Write ($path_prefix .'r.jpg');
+        $s->Write ($path_prefix .'s.jpg');
+        $t->Write ($path_prefix .'t.jpg');
+    }
+    elsif ($w2 < $pix_tile)
+    {
+        exit;
+    }
+    else
+    {
+        entile ($q, $path_prefix .'q', $pix_tile);
+        entile ($r, $path_prefix .'r', $pix_tile);
+        entile ($s, $path_prefix .'s', $pix_tile);
+        entile ($t, $path_prefix .'t', $pix_tile);
+    }
+
+    $image->Scale (width => $pix_tile, height => $pix_tile);
+    $image->Write ($path_prefix .'.jpg');
+}
+
+0;
+
+__END__
+
+=head1 NAME
+
+entile - create a tiled image pyramid
+
+=head1 SYNOPSIS
+
+entile image1 [path_prefix] [pix_size]
+
+=head1 DESCRIPTION
+
+B<entile> takes an image file name and splits it into a collection of equally
+sized JPEG tiles representing the image at all resolutions.
+
+e.g. a 1024x1024 pixel image will be split into the following:
+
+16 full resolution 256x256 tiles
+
+4 half resolution 256x256 tiles
+
+1 quarter resolution 256x256 tile
+
+The default output prefix path is 't', i.e. output files will be prefixed with
+'t' in the current working directory.
+
+The default tile size is 256x256.
+
+Note that input images are expanded to be square and doubled multiples of the
+tile size, i.e. for a 256x256 output tile, the input photos are enlarged be one
+of: 256, 512, 1024, 2048, 4096, 8192, 16384, 32768 etc... pixels square
+
+The naming format is 'keyhole' style, i.e. "q, r, s, t" represent the four
+quadrants clockwise starting top-left:
+
+  q r
+  t s
+
+The next level down reproduces the same pattern:
+
+  qq qr rq rr
+  qt qs rt rs
+  tq tr sq sr
+  tt ts st ss
+
+etc...
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+=head1 AUTHOR
+
+Bruno Postle - January 2010.
+
+=cut

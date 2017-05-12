@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns:tal="http://purl.org/petal/1.0/">
+  <body>
+    <p>
+    <!--? Decode -->
+    decode1: <span tal:if="decode:$str">this appears to do nothing; should we catch it and throw an error?</span>
+    decode2: <span tal:if="decode:$str 'Flipper'" tal:replace="false">false</span>
+
+    <!--? search value is always returned if third argument is undefined -->
+    decode2a: <span tal:replace="decode:$str 'Flipper'">false</span>
+    decode2b: <span tal:replace="decode:$str 'Flip'">false</span>
+
+    <!--? match, return true -->
+    decode3: <span tal:if="decode:$str 'Flipper' 1" tal:replace="string: true">true</span>
+
+    <!--? match, return false -->
+    decode4: <span tal:if="decode:$str 'Flipper' 0" tal:replace="string: false">return false</span>
+    decode5: <span tal:if="decode:$str 'Flipper' false" tal:replace="string: false_string">false</span>
+
+    <!--? no match -->
+    decode6: <span tal:replace="decode:$str 'Dip' 'Heavy' 'Metal'">true</span>
+    decode7: <span tal:if="decode:$str 'Flipped' 1">false</span>
+    decode8: <span tal:if="decode:$str 'Flipped' 0 1" tal:replace="string:true">true</span>
+
+    <!--? multiple search statements -->
+    decode9: <span tal:replace="decode:$str 'Flipped' 'false' 'Flipper' 'true'">true</span>
+    decode10: <span tal:replace="decode:$str 'Flipped' 'false' 'Flipper' 100">true</span>
+    decode11: <span tal:replace="decode:$str 'Flipped' 'false' 'Clipper' 'true' 250">true</span>
+
+    <!--? use a token as the search value -->
+    decode12: <span tal:if="decode:$str $str2 1" tal:replace="string:false">false</span>
+    decode13: <span tal:if="decode:$str $str 1" tal:replace="string:true">true</span>
+
+    <!--? numeric values do not need to be inside parens -->
+    decode14: <span tal:replace="decode:$str $str 1.">true</span>
+    decode15: <span tal:replace="decode:$str $str .1">true</span>
+
+    </p>
+  </body>
+</html>
+

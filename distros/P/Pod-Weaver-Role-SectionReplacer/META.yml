@@ -1,0 +1,28 @@
+---
+abstract: 'A Pod::Weaver section that will replace itself in the original document.'
+author:
+  - 'Sam Graham <libpod-weaver-role-sectionreplacer-perl@illusori.co.uk>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Weaver-Role-SectionReplacer
+provides:
+  Pod::Weaver::Role::SectionReplacer:
+    file: lib/Pod/Weaver/Role/SectionReplacer.pm
+    version: 1.00
+requires:
+  Moose: 0
+  Moose::Autobox: 0.11
+  Pod::Elemental: 0.101620
+  Pod::Weaver: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/illusori/Perl-Pod-Weaver-Role-SectionReplacer
+version: 1.00

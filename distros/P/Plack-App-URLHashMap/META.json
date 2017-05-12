@@ -1,0 +1,44 @@
+{
+   "abstract" : "Map multiple apps in different paths",
+   "author" : [
+      "James Raspass <j.raspass@cv-library.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-App-URLHashMap",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Plack::Component" : "0",
+            "parent" : "0",
+            "perl" : "v5.8.8"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::App::URLHashMap" : {
+         "file" : "lib/Plack/App/URLHashMap.pm",
+         "version" : "0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cv-library/Plack-App-URLHashMap/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/cv-library/Plack-App-URLHashMap.git",
+         "web" : "https://github.com/cv-library/Plack-App-URLHashMap"
+      }
+   },
+   "version" : "0.1"
+}
+

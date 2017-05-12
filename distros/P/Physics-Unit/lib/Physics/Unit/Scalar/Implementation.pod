@@ -1,0 +1,65 @@
+=head1 NAME
+
+Physics::Unit::Scalar::Implementation - This page discusses implementation issues of the Physics/Unit/Scalar.pm module.
+
+=head1 UNITS ASSOCIATED WITH SCALARS
+
+Classes and objects derived from Physics::Unit::Scalar follow these
+rules:
+
+=over
+
+=item *
+
+All objects of a particular class that derives from
+Physics::Unit::Scalar define their values relative to I<the same> Physics::Unit
+object, and thus have the same dimensionality and scale.
+Thus, for example, all objects of type Physics::Unit::Distance use
+the Unit object "meter".  Objects of type
+Physics::Unit::Acceleration use the Unit object "meter / sec^2".
+
+=item *
+
+Objects of the Physics::Unit::Scalar class (and not a derived class)
+each have I<their own> Physics::Unit object to describe the quantity.
+
+=back
+
+=head1 Private Functions
+
+=over
+
+=item InitSubtypes()
+
+This is called during compilation, and creates classes for each of
+the unit types defined in Physics::Unit.
+
+=item MyUnit(I<$arg>)
+
+Returns a reference to the Unit object that is used to define the
+quantity.  C<$arg> can either be a class name or an object that derives
+from Physics::Unit::Scalar.
+
+=item GetMyUnit(I<$class>)
+
+Get the class' MyUnit.
+
+=item GetDefaultUnit(I<$class>)
+
+Get the class' DefaultUnit.
+
+=item ScalarResolve(I<$hash>)
+
+This takes an unblessed reference to a hash as an argument.  The hash
+should have a value member and a MyUnit member.
+
+This determines the proper type of Scalar that the object should be
+(based on MyUnit's type), 'normalizes' the Scalar, blesses it into
+the proper subtype, and returns it.
+
+This is used by ScalarFactory and several of the arithmetic functions
+(whenever the arithmetic function actually changes the dimensionality
+of the unit, and thus the type of scalar).
+
+=back
+

@@ -1,0 +1,69 @@
+Revision history for Perl module POE::Declarative
+
+0.09 Sat Sep 11 11:43:33 2010
+    * Moved to using Dist::Zilla for releases
+    * Fixed the t/call-returns.t test, which fails on later versions of POE
+    * Cleaned up some of the old notes in the POD.
+
+0.08 Sun Oct 14 23:14:27 2007
+    * Getting rid of an extra zero in the verion numbering scheme that was
+      bugging me. I was real tired when I made that decision.
+    * Added t/dynamic-late-mixin-states.t test to reveal some loop-holes in the
+      way mixins work.
+    * Added t/lib/CrazyMixin.pm to help t/dynamic-late-mixin-states.t.
+    * Fixed a problem where "dynamic" state handlers created within in a state
+      using handlers declared in a mixin would end up associated with the mixin
+      package rather than the package the handler had been imported into.
+    * Fixed a problem where a helper subroutine associated with a mixin might be
+      used to create additional per-package handlers after import() is called,
+      but before POE::Kernel->run(). In such cases, the states were mucking up
+      the mixin's main state table (which would have weird side-effects if you
+      declared multiple sessions in a single process using the same mixin and
+      called the helper sub) and were never associated with the calling package.
+      See the count() method in t/lib/CrazyMixin.pm and it's use in
+      t/dynamic-late-mixin-states.t for an example of this situation.
+    * The solution of that last fix uses some deep magic whereby the on() method
+      of POE::Declarative does some call-stack searching to try to
+      Do-What-You-Mean in such cases.
+
+0.007 Sun Oct 14 17:22::28 2007
+    * Added t/late-handler.t to test the ability of POE::Declare to declare a
+      handler late (after POE::Kernel->run has been called).
+    * Altered on() so that states can be added late within states as a
+      POE::Declarative compatible way of calling state() to add handlers after
+      the session has already started.
+
+0.006 Sun Oct 7 21:29:22 2007
+    * Added t/call-returns.t to reveal a problem with capturing return values
+      from handlers that have been call()ed.
+    * Fixed _handle_states() to return results correctly.
+    * Added t/delay.t to reveal a problem with delay(), it won't accept the
+      short syntax for canceling delayed states.
+    * Fixed the prototype for delay() so that it can take a single argument.
+
+0.005 Sun Oct 7 16:53:43 2007
+    * Added support for having multiple handlers for the same state.
+    * Added t/multiple-handlers.t to test the new multiple handler feature.
+
+0.004 Sat Oct 6 12:34:54 2007
+    * Adding the ability to setup a custom heap.
+
+0.003 Fri Oct 5 13:58:43 2007
+    * Fixed the MANIFEST which failed to include t/object-states.t from the
+      previous release.
+    * Added a default heap -> {}
+    * Added POE::Declarative::Mixin for additional mixin support.
+    * Added support for multiple states in on().
+    * Added t/mixins.t and related classes in t/lib to test mixin support.
+    * Added t/on-array.t to test multiple states being passed to on().
+
+0.002 Fri Oct 5 11:43:04 2007
+    * Switched from using inline_states to package_states or object_states
+      depending on whether a package or object is passed to setup().
+    * Added t/object-states.t to test object states.
+
+0.001 Mon Oct 1 21:44:00 2007
+    * Initial release.
+    * Added the POE::Declarative module with get(), call(), delay(), post(),
+      yield(), setup(), on(), and run().
+    * Added some basic tests to get started with.

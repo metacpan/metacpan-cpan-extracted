@@ -1,0 +1,13 @@
+Revision history for Perl extension POE::Component::Server::PreforkTCP.
+
+0.01  Nov 21 2002
+	- original version; a perl script not a package.
+		-A POE::Component::Server::PreforkTCP
+
+0.10  Nov 22 2002
+	- the first package convert from script.
+		-A POE::Component::Server::PreforkTCP
+
+0.11  Nov 29 2002
+	- fix some tiny bug, but have not upgrade to pause_accept...
+

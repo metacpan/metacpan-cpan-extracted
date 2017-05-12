@@ -1,0 +1,47 @@
+{
+   "abstract" : "log when a process is killed",
+   "author" : [
+      "Robert Rothenberg <rrwo@thermeon.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-LogHarakiri",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Plack::Middleware" : "0",
+            "Process::SizeLimit::Core" : "0",
+            "parent" : "0",
+            "perl" : "v5.8.8"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack" : "0",
+            "Test::More" : "0.90"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/robrwo/Plack-Middleware-LogHarakiri/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robrwo/Plack-Middleware-LogHarakiri.git",
+         "web" : "https://github.com/robrwo/Plack-Middleware-LogHarakiri"
+      }
+   },
+   "version" : "0.0301"
+}
+

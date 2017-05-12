@@ -1,0 +1,13 @@
+* Support all LWP features, e.g.,
+  - support setting specific ip address (aargh, need to use Net::HTTP?!)
+  - support non-blocking calls (? no idea what this entails, see above)
+* Improve Tests
+  - Add tests for local writes
+  - Add tests for https
+  - Add tests for POE
+  - Add tests for local ftp via Net::FTPServer::InMem
+* Include HTTP/1.1 support
+  - Add keep-alive support
+  - Add chunked support       (live/jigsaw-chunked.t)
+  - Understand and implement Client-Response-Num header
+  - Implement TE/ZLIB support (live/jigsaw-te.t)

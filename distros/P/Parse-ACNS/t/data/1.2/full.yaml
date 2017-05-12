@@ -1,0 +1,161 @@
+---
+Case:
+  ID: A1234567
+  Ref_URL: http://www.contentowner.com/trackingid.asp?A1234567
+  Severity: Normal
+  Status: Open
+Complainant:
+  Address: '100 Anywhere Street, Anywhere, CA 90000, USA'
+  Contact: Jonathan Doe
+  ContactURL: https://www.scannervendor.com/complaints.php
+  Email: notice@scannervendor.com
+  Entity: 'ScannerVendor, Inc.'
+  Phone: 650-555-5555
+Content:
+  Item:
+    - AlsoSeen:
+        - End: 2008-08-30T14:32:00Z
+          Start: 2008-08-30T12:34:53Z
+          _: ''
+        - End: 2008-08-30T20:45:23Z
+          Start: 2008-08-30T18:04:22Z
+          _: ''
+      ExplicitType: Movie
+      FileName: '8_Mile[2002]DvDrip[Eng].4473459.TPB.torrent'
+      FileSize: 734013472
+      Hash:
+        Type: SHA1
+        _: 6AF9F5BF5493B6BB72F15F77C2E541D606328AEA
+      TimeStamp: 2008-08-30T12:34:53Z
+      Title: 8 Mile
+      Type: Movie
+Detection:
+  Asset:
+    OriginalAssetID:
+      _: 0000-0000-F23C-0000-J-0000-0000-H
+      type: ISAN
+    OriginalAssetName: 8 Mile
+  ContentMatched:
+    Audio: 1
+    Fingerprint: 1
+    Human: 1
+    MatchThreshold: 100
+    Video: 1
+  HashMatched: 1
+  MetadataMatched: 1
+  VerificationID: ' SuperMatcher v2.7 Build 302'
+History:
+  Notice:
+    - ID: A1234567
+      TimeStamp: 2008-08-30T20:46:00Z
+      _: |+2
+        
+        Dear ISP,
+        It has come to our attention that on August 30, 2008 a subscriber was 
+        uploading the movie 8 Mile using Azureus.  We respectfully request that you 
+        ask your subscriber to delete this file and stop making it available on P2P 
+        networks.
+        The specifics follow:
+        Notice: A1234567
+        Time first seen: 2008-08-30T12:34:53Z
+        Title: 8 Mile
+        FileName: 8_Mile[2002]DvDrip[Eng].4473459.TPB.torrent
+        FileSize" 734013472
+        Type: Movie
+        SHA1 hash: 6AF9F5BF5493B6BB72F15F77C2E541D606328AEA
+        If you have any questions, please contact:
+        Jonathan Doe
+        ScannerVendor, 
+        100 Anywhere Street
+        Anywhere, CA 90000, USA
+        650-555-5555
+        notice@scannervendor.com
+        or use your login to 
+        https://www.scannervendor.com/complaints.php and reference notice A1234567
+        Best Regards,
+        Jon
+
+InternalTracking:
+  - CurrentSequence: 1
+    Disposition:
+      Comments: Having difficulty reaching subscriber
+      Contact:
+        Contact: 'Julie Doe, Abuse Coordinator'
+        Email: julie_doe@isp.net
+        Entity: ISP Inc
+        Phone: 310-555-5556
+      End: 2008-12-17T09:30:47.0Z
+      InternalStatus: 2nd Notice
+      Sequence: 0
+      Start: 2008-12-17T09:30:47.0Z
+    InternalCaseNumber: ISP1234567
+    Mapping:
+      LeaseHeld: 16:20:00.0Z
+      LeaseTime: 12:00:00.0
+      MappedIP: 10.1.223.17
+      MappedPort: 6881
+      OriginalIP: 168.0.0.143
+      OriginalPort: 21123
+      Time: 2008-08-30T12:35:00Z
+    PrimarySubject:
+      SubjectContact:
+        Address: '100 My Street, Anywhere, CA 90000'
+        Contact: Joe Pirate
+        Email: joe_pirate@isp.net
+        Entity: Subject Contact Inc.
+        Phone: 310-555-5555
+      SubjectID:
+        _: Sub123549991
+        type: SubscriberNum
+Service_Provider:
+  Address: '1234 My Street, Everwhere, NY, 10001, USA'
+  Contact: Jack Doah
+  ContactURL: http://www.greatisp.net/gotanotice
+  Email: abuse@greatisp.net
+  Entity: GreatISP
+  Phone: 212-555-5555
+Source:
+  DNS_Name: pcp574.nshville.tn.ispbroadband.net
+  IP_Address: 168.1.1.145
+  MAC_Address: 00-00-39-B6-00-A4
+  Number_Files: 1
+  Port: 21123
+  SubType:
+    Application: Azureus
+    BaseType: P2P
+    Protocol: BITTORRENT
+    _: ''
+  TimeStamp: 2008-08-30T12:34:53Z
+  Type: BITTORRENT
+TextNotice: |2
+  
+  Dear ISP,
+  It has come to our attention that on August 30, 2008 a subscriber was 
+  uploading the movie 8 Mile using Azureus.  We respectfully request that you 
+  ask your subscriber to delete this file and stop making it available on P2P 
+  networks.
+  The specifics follow:
+  Notice: A1234567
+  Time first seen: 2008-08-30T12:34:53Z
+  Title: 8 Mile
+  FileName: 8_Mile[2002]DvDrip[Eng].4473459.TPB.torrent
+  FileSize" 734013472
+  Type: Movie
+  SHA1 hash: 6AF9F5BF5493B6BB72F15F77C2E541D606328AEA
+  If you have any questions, please contact:
+  Jonathan Doe
+  ScannerVendor, 
+  100 Anywhere Street
+  Anywhere, CA 90000, USA
+  650-555-5555
+  notice@scannervendor.com
+  or use your login to 
+  https://www.scannervendor.com/complaints.php and reference notice A1234567
+  Best Regards,
+  Jon
+
+Type:
+  Comments: Informational Notice
+  Retraction: 0
+  _: INFO
+schemaVersion: 1.2

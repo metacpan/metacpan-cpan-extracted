@@ -1,0 +1,47 @@
+Revision history for Perl extension Plack::Middleware::StackTrace::LinkedSource
+
+0.14    Fri Apr 15 17:12:18 JST 2016
+        - fix bug: custom source path did not work
+
+0.13    Sun Mar 13 18:34:49 JST 2016
+        - fix regexp(do not use this module before ver 0.12, it's broken)
+
+0.12    Mon Feb 22 15:55:51 JST 2016
+        - fix broken tests
+        - tiny fix
+
+0.11    Sun Feb 21 16:50:44 JST 2016
+        - enhanced POD
+
+0.10    Fri Feb 19 23:08:49 JST 2016
+        - fix POD(remove one line only)
+
+0.09    Fri Feb 19 22:59:41 JST 2016
+        - add force option
+            (If you did not set force option, stack trace would hide in production environment automatically.)
+
+0.08    Fri Feb 19 16:09:22 JST 2016
+        - fix for windows again
+
+0.07    Fri Feb 19 10:34:38 JST 2016
+        - fix test for windows
+
+0.06    Thu Feb 18 21:11:11 JST 2016
+        - fix path regexp
+        - change the module name for testing
+
+0.05    Thu Feb 18 12:36:39 JST 2016
+        - convert file path delimitor for windows
+
+0.04    Tue Feb 16 17:40:17 JST 2016
+        - ignore lib path '.'
+
+0.03    Sun Feb 14 20:40:30 JST 2016
+        - support windows
+        - fix regexp
+
+0.02    Sat Feb 13 07:04:15 JST 2016
+        - enhanced POD
+
+0.01    Fri Feb 12 10:44:47 JST 2016
+        - original version

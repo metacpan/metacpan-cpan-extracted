@@ -1,0 +1,3 @@
+requires 'Pcore',          v0.22.2;
+requires 'AnyEvent::XMPP', v0.0.0;
+requires 'Net::XMPP',      v0.0.0;

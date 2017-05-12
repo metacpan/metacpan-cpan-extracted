@@ -1,0 +1,5 @@
+?package(pdl):\
+ needs="text"\
+ section="Applications/Science/Mathematics"\
+ title="PerlDl"\
+ command="/usr/bin/perldl"

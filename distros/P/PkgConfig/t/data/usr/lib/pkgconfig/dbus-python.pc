@@ -1,0 +1,12 @@
+# This file is currently Python-version-independent.
+prefix=/usr
+exec_prefix=${prefix}
+includedir=${prefix}/include
+datarootdir=${prefix}/share
+datadir=${datarootdir}
+
+Name: dbus-python
+Description: Python bindings for D-Bus
+Requires: dbus-1 >= 1.0
+Version: 0.83.1
+Cflags: -I${includedir}

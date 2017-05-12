@@ -1,0 +1,112 @@
+NAME
+    POE::Declare::HTTP::Client - A simple HTTP client based on POE::Declare
+
+SYNOPSIS
+        # Create the web server
+        my $http = POE::Declare::HTTP::Client->new(
+            Timeout       => 10,
+            MaxRedirect   => 7,
+            ResponseEvent => \&on_response,
+            ShutdownEvent => \&on_shutdown,
+        );
+        
+    # Control with methods
+        $http->start;
+        $http->GET('http://google.com');
+        $http->stop;
+
+DESCRIPTION
+    This module provides a simple HTTP client based on POE::Declare.
+
+    The implemenetation is intentionally minimalist, making this module an
+    ideal choice for creating specialised web clients embedded in larger
+    applications.
+
+METHODS
+  new
+        my $server = POE::Declare::HTTP::Client->new(
+            ResponseEvent => \&on_response,
+            ShutdownEvent => \&on_shutdown,
+        );
+
+    The "new" constructor sets up a reusable HTTP client that can be enabled
+    and disabled repeatedly as needed.
+
+  start
+    The "start" method enables the web server. If the server is already
+    running, this method will shortcut and do nothing.
+
+    If called before POE has been started, the web server will start
+    immediately once POE is running.
+
+  stop
+    The "stop" method disables the web server. If the server is not running,
+    this method will shortcut and do nothing.
+
+  GET
+        $client->GET('http://www.cpan.org/');
+
+    The "GET" method fetches a named URL via a HTTP GET request.
+
+  HEAD
+        $client->HEAD('http://www.cpan.org/');
+
+    The "HEAD" method fetches headers for a named URL via a HTTP HEAD
+    request.
+
+  POST
+        $client->POST('http://www.cpan.org/');
+
+    The "POST" method fetches a named URL via a HTTP POST request.
+
+  PUT
+        $client->PUT(
+            'http://127.0.0.1:12345/upload.txt',
+            Content => 'This is the file content',
+        );
+
+    The "PUT" method uploads content to a named URL via a HTTP PUT request.
+
+  DELETE
+        $client->DELETE('http://www.cpan.org/');
+
+    The "DELETE" method deletes a resource at a URL via a HTTP DELETE
+    request.
+
+  request
+        $client->request( $HTTP_Request );
+
+    The "request" method triggers an arbitrary HTTP request.
+
+    It takes any HTTP::Request object, and will respond with an
+    HTTP::Response object to the "ResponseEvent" message handler once it is
+    completed.
+
+  running
+    The boolean "running" method returns true if the client is both spawned
+    and processing a request, or false if not. Note that it does not
+    distinguish between running and idle, and stopped entirely.
+
+SUPPORT
+    Bugs should be always be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Declare-HTTP-Client>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    POE, <http://ali.as/>
+
+COPYRIGHT
+    Copyright 2011 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

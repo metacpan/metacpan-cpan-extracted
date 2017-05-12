@@ -1,0 +1,57 @@
+#------------------------------------------------------------------------------#
+# ----[ CATEGORY: name/version (foo)
+
+[AGENT]
+
+AmigaVoyager/3.3.50 (AmigaOS/PPC)
+
+'parser'           => 'generic_moz_thing',
+'os'               => 'AmigaOS/PPC',
+'version_raw'      => '3.3.50',
+'version'          => '3.003050',
+'name'             => 'AmigaVoyager',
+'generic'          => 1
+
+[AGENT]
+
+AmigaVoyager (compatible; AmigaVoyager; AmigaOS)
+
+'parser'           => 'generic_compatible',
+'os'               => 'AmigaOS',
+'version_raw'      => 0,
+'name'             => 'AmigaVoyager',
+'generic'          => 1
+
+[AGENT]
+
+AvantGo 3.2 (compatible; AvantGo 3.2)
+
+'parser'           => 'generic_compatible',
+'version_raw'      => '3.2',
+'version'          => '3.200',
+'name'             => 'AvantGo',
+'generic'          => 1
+
+[AGENT]
+
+Nokia7110/1.0 (30.05)
+
+'parser'           => 'generic_moz_thing',
+'extras'           => ['30.05'],
+'version_raw'      => '1.0',
+'version'          => '1.000',
+'name'             => 'Nokia7110',
+'generic'          => 1
+
+[AGENT]
+
+iCab/Pre2.0 (Macintosh; I; PPC)
+
+'parser'           => 'generic_moz_thing',
+'strength'         => 'I',
+'os'               => 'Macintosh',
+'extras'           => ['PPC'],
+'version_raw'      => 'Pre2.0',
+'version'          => '2.000',
+'name'             => 'iCab',
+'generic'          => 1

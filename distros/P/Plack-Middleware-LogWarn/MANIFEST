@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+Makefile.PL
+README
+dist.ini
+lib/Plack/Middleware/LogWarn.pm
+t/basic.t
+t/release-pod-syntax.t

@@ -1,0 +1,6 @@
+Revision history for POE-Component-IRC-Plugin-BaseWrap
+
+1.001001  2014-02-02
+    - Merged POE::Component::IRC::Plugin::BaseWrap
+        and POE::Component::IRC::Plugin::BasePoCoWrap
+        into a single dist, for easier maintenance

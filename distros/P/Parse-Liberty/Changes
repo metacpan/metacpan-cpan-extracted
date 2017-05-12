@@ -1,0 +1,17 @@
+Revision history for Perl extension Parse::Liberty.
+
+0.13  Wed May 22 10:17:32 2015
+	- Minor fixes
+
+0.12  Wed May 21 16:04:17 2015
+	- Fixed 'methods' method in Liberty.pm
+	- Added Liberty/Simple.pm with easy to use wrappers (See Documentation)
+
+0.11  Wed Jun  5 11:50:46 2013
+	- Liberty format overview in documentation
+	- 'eval { require liberty }' in Makefile.PL to stop getting FAIL reports from CPAN Testers
+
+0.1   Tue Feb  5 14:37:28 2013
+	- original version; created by h2xs 1.23 with options
+		-XAn Parse::Liberty
+

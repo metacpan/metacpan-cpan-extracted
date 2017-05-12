@@ -1,0 +1,92 @@
+<head><title>PersistentPerl - Temp File Cleanup</title></head>
+<h1>Temp File Cleanup</h1>
+When various items within the temp file should be cleaned up.
+<p>
+<table border=1>
+
+<tr>
+<th>
+Name
+</th>
+<th>
+Removed
+</th>
+</tr>
+
+<tr>
+<td>
+Persistent temp file
+</td>
+<td>
+When the file is closed and the group list is empty
+</td>
+</tr>
+
+<tr>
+<td>
+Group
+</td>
+<td>
+When a be or fe is removed, and both lists are empty.
+</td>
+</tr>
+
+<tr>
+<td>
+Script list and Group Name
+</td>
+<td>
+<ul>
+    <li>When a group is removed</li>
+    <li>When a group is invalidated
+
+</ul>
+</td>
+</tr>
+
+<tr>
+<td>
+BE Proc Slot
+</td>
+<td>
+If the proc dies prematurely:
+<ul>
+    <li>If this BE is at the beginning of the group's BE list:
+    <ul>
+	<li>When the last BE in the previous group's BE list finishes one
+	    perl run or is about to exit and checks it.
+	<li>When the FE at the front of the fe_wait list in this group is
+	    run or wakes up and checks it.
+    </ul>
+    <li>Otherwise:
+    <ul>
+	<li>When the BE previous to this one in the group's BE list finishes
+	    one perl run or is about to exit and checks it.
+    </ul>
+</ul>
+Otherwise:
+<ul>
+    <li>When the BE exits
+</ul>
+</td>
+</tr>
+
+<tr>
+<td>
+FE Proc Slot
+</td>
+<td>
+If the proc dies prematurely:
+<ul>
+    <li>When a BE tries to wake it up in order to connect
+    <li>When the FE after this one in the fe_wait list runs or wakes
+        up and checks it.
+</ul>
+Otherwise:
+<ul>
+    <li>When it wakes up or is woken up and connects to an available BE.
+</ul>
+</td>
+</tr>
+
+</table>

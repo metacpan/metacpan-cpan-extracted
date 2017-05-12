@@ -1,0 +1,27 @@
+bin/paf
+Changes
+lib/Pod/Abstract.pm
+lib/Pod/Abstract/BuildNode.pm
+lib/Pod/Abstract/Filter.pm
+lib/Pod/Abstract/Filter/add_podcmds.pm
+lib/Pod/Abstract/Filter/clear_podcmds.pm
+lib/Pod/Abstract/Filter/cut.pm
+lib/Pod/Abstract/Filter/uncut.pm
+lib/Pod/Abstract/Filter/overlay.pm
+lib/Pod/Abstract/Filter/unoverlay.pm
+lib/Pod/Abstract/Filter/sort.pm
+lib/Pod/Abstract/Filter/summary.pm
+lib/Pod/Abstract/Filter/find.pm
+lib/Pod/Abstract/Filter/number_sections.pm
+lib/Pod/Abstract/Node.pm
+lib/Pod/Abstract/Parser.pm
+lib/Pod/Abstract/Path.pm
+lib/Pod/Abstract/Serial.pm
+lib/Pod/Abstract/Tree.pm
+Makefile.PL
+MANIFEST
+README
+t/01_compile.t
+t/02_roundtrip.t
+t/03_buildnode.t
+META.yml                                 Module meta-data (added by MakeMaker)

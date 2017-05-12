@@ -1,0 +1,25 @@
+Revision history for Perl extension PSGRAPH.
+
+0.01  Tue Jul  2 16:35:08 2013
+	- original version; created by h2xs 1.23 with options
+		-n PSGRAPH
+0.01  Jul 2014 uploaded to CPAN
+0.02  Mon May  18 10:10:00 2015
+	- Added exploded 2D pies
+	- Uploaded to CPAN
+0.021  Mon May  18 2015
+	- Added Initialdegree to 2Dpies 1 - 4
+0.021  Mon May  18 2015
+	- Corrected the boanding box on pie 4 right
+0.021  Mon May  19 2015
+	- Uploaded to CPAN
+0.03  Wed May 27 2015
+	- Changed all BoundingBox parameters to integers
+0.03  Wed Jul 8 2015
+	- Updated code for 2Dpie 1 for angles > 720
+	- Updated callout line lengths to better handle small slices
+	- Corrected bug in Initialdegree
+0.04  Tuesday Apr 19 2016
+	- corrected chomp error in 2Dpie 3 and eliminated output comments
+0.04  Tuesday Sep 27 2016
+	- Finished debugging pie 31 (pie with percentages in the legend)

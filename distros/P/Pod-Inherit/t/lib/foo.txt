@@ -1,0 +1,3 @@
+# This file is only here to make sure that nothing tries to look
+# at things that aren't .pm files.
+die "foo.txt getting run as perl!?";

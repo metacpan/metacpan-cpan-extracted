@@ -1,0 +1,56 @@
+NAME
+    POE::Filter::JSON - A POE filter using JSON
+
+SYNOPSIS
+        use POE::Filter::JSON;
+
+        my $filter = POE::Filter::JSON->new(
+            json_any => {
+                allow_nonref => 1,  # see the new() method docs
+            },
+            delimiter => 0,
+        );
+        my $obj = { foo => 1, bar => 2 };
+        my $json_array = $filter->put( [ $obj ] );
+        my $obj_array = $filter->get( $json_array );
+
+        use POE qw( Filter::Stackable Filter::Line Filter::JSON );
+
+        my $filter = POE::Filter::Stackable->new();
+        $filter->push(
+            POE::Filter::JSON->new( delimiter => 0 ),
+            POE::Filter::Line->new(),
+        );
+
+DESCRIPTION
+    POE::Filter::JSON provides a POE filter for performing object conversion
+    using JSON. It is suitable for use with POE::Filter::Stackable.
+    Preferably with POE::Filter::Line.
+
+METHODS
+    *   new
+
+        Creates a new POE::Filter::JSON object. It takes arguments that are
+        passed to objToJson() (as the 2nd argument). See JSON for details.
+        This module uses JSON::Any internally. To pass params to JSON::Any's
+        new call, use json_any => { }
+
+    *   get
+
+        Takes an arrayref which is contains json lines. Returns an arrayref
+        of objects.
+
+    *   put
+
+        Takes an arrayref containing objects, returns an arrayref of json
+        linee.
+
+AUTHOR
+    David Davis <xantus@cpan.org>
+
+LICENSE
+    Artistic
+
+SEE ALSO
+    POE, JSON::Any, POE::Filter::Stackable, POE::Filter::Line
+

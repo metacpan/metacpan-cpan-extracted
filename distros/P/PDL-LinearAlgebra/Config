@@ -1,0 +1,6 @@
+%config = (
+
+	CBLAS => 0,
+	WITHOUT_THREAD => 0
+
+);

@@ -1,0 +1,16 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+privlibdir=${libdir}/evolution-data-server-2.30
+extensiondir=${libdir}/evolution-data-server-1.2/extensions
+datarootdir=${prefix}/share
+datadir=${datarootdir}
+privdatadir=${datadir}/evolution-data-server-2.30
+
+execversion=2.30
+
+Name: evolution-data-server
+Description: The evolution data server for the calendar and addressbook
+Version: 2.30.3
+Requires: dbus-glib-1, nss, nspr

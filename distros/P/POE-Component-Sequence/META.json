@@ -1,0 +1,57 @@
+{
+   "abstract" : "Asynchronous sequences with multiple callbacks",
+   "author" : [
+      "Eric Waters <ewaters@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-Sequence",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::MethodMaker" : "1",
+            "POE" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "POE::Component::Sequence" : {
+         "file" : "lib/POE/Component/Sequence.pm",
+         "version" : "0.02"
+      },
+      "POE::Component::Sequence::Nested" : {
+         "file" : "lib/POE/Component/Sequence/Nested.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/ewaters/poe-component-sequence/issues?labels=bug"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/ewaters/poe-component-sequence"
+      }
+   },
+   "version" : "0.02"
+}

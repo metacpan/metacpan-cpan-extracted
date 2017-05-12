@@ -1,0 +1,8 @@
+Revision history for Perl extension Params::Profile
+
+0.11  Mon Jan 30 18:22:08 CET 2012
+        -Fixed rt.cpan.org test bug 43284, is_deeply cannot handle regex
+         objects.
+
+0.1   Thu Aug 31 11:50:31 CEST 2006
+        -First public release, version 0.10

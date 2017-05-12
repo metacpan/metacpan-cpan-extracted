@@ -1,0 +1,9 @@
+Changes
+lib/Proc/Info/Environment.pm
+lib/Proc/Info/Environment/Linux.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/001Basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

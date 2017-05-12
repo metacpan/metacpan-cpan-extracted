@@ -1,0 +1,101 @@
+0.17     2016-06-17
+
+- Remove use of namespace::autoclean.
+
+
+0.16     2016-03-21
+
+- The subs installed into the caller are now named with Sub::Name. This makes
+  these subs appear to be part of the caller, as opposed to an import, which
+  is what we want, since each installed sub is constructed uniquely for a
+  given package.
+
+
+0.15     2015-11-13
+
+- Made this module co-operate with existing import() subs in packages that use
+  this module, as long as you use this module last.
+
+
+0.14     2015-04-18
+
+- Use any() from List::Util 1.33+ instead of List::MoreUtils.
+
+
+0.13     2012-03-09
+
+- Fix dist.ini to not add Test::Spelling as a requirement. (Tomas Doran)
+
+
+0.12     2012-03-04
+
+- Fix tests to pass with Carp 1.25. Reported by Andreas Koenig. RT #75520.
+
+
+0.11     2011-06-19
+
+- Allow an empty hash for the -deprecations parameter.
+
+
+0.10     2010-10-25
+
+- The test suite now uses Test::Fatal instead of Test::Exception. (Karen
+  Etheridge)
+
+
+0.09     2010-10-17
+
+- Added a compilation test, because otherwise all test files could not end up
+  doing skip_all, which may make smokers and test harnesses unhappy.
+
+
+0.08     2010-10-15
+
+- Include Test::Requires in prereq list. Reported by Todd Rinaldo. RT #62173.
+
+
+0.07     2010-10-15
+
+- The use of regular expressions in ignores didn't really work in 0.06.
+
+- Added missing dep on List::MoreUtils.
+
+- Replaced Test::Warn with Test::Output in the tests, and made the tests
+  actually test what I think they should be testing.
+
+
+0.06     2010-10-14
+
+- The -ignore parameter now accepts regular expressions as well as package
+  names.
+
+
+0.05     2010-10-14
+
+- Fixed what looked like a bug in -ignore handling, although I couldn't seem
+  to write a test that triggered it.
+
+- Removed hard dep on Test::Warn for the benefit of Moose.
+
+
+0.04     2010-07-14
+
+- A single feature will now warn more than once if each warning consists of a
+  different error message.
+
+
+0.03     2010-07-14
+
+- Added an -ignore parameter when importing Package::DeprecationManager. This
+  lets you explicitly ignore packages in the call stack when determining where
+  a deprecated feature was called.
+
+
+0.02     2010-07-12
+
+- Made it possible to deprecate any feature, not just a subroutine or method.
+
+
+0.01     2010-07-12
+
+- First release

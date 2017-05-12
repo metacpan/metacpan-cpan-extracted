@@ -1,0 +1,20 @@
+
+   This parrot is dead. It has ceased to be. It's gone to meet it's Maker!
+   THIS IS AN EX-PARROT!
+                           The Dead Parrot Sketch, Monty Python's Flying Circus
+
+Do s/parrot/package/gi and you know the status of this distribution. The
+current version 1.60 has been provided to fix a number of bugs and integrate a
+bunch of useful enhancements, which were mostly provided as patches, thanks to
+the contributers. Pod::Parser is supposed to be deprecated in the Perl core
+distribution with 5.17.x, removed from the core in 5.19.x and continue its 
+humble existence on CPAN only.
+
+But: There is Pod::Simple, which provides a much better and robust parser,
+as well as Unicode support and a lot of other useful things. When thinking
+POD, please (start to) think Pod::Simple!
+
+Some of the other modules bundled here may appear soon in other distributions,
+as soon as they are ported away from Pod::Parser. In 1.60 this happened to
+Pod::Checker and Pod::Usage.
+

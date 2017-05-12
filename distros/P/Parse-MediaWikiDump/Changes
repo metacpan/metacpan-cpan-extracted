@@ -1,0 +1,172 @@
+Revision history for Parse-MediaWikiDump
+
+1.0.6	Dec 04, 2010
+	* Fix for bug #58196 - error "not a MediaWiki link dunp file" due 
+	  to absence of 'LOCK TABLES ...' line in link dump file?
+	* Added option to pass input to ::Pages constructor via named parameters so
+	  that MediaWiki::DumpFile::Compat and ::Pages share the same API 
+	* Software is nearly retired, only need more testing on MediaWiki::DumpFile::Compat;
+	  Please begin using MediaWiki::DumpFile::Compat instead of this package and
+	  report problems if you encounter them. 
+
+1.0.5	Apr 21, 2010 
+	* Updated docs pointing people to MediaWiki::DumpFile::Compat
+
+1.0.4	Jan 04, 2010
+	* Fixed bug #53361: Incorrectly assigned usernames 
+	  with anon edits
+	* Added support for getting access to IP of anonymous
+	  edits
+
+1.0.3	Nov 21, 2009
+	* Fixed bug #51607 "Build failed CPAN smoke test for 
+	  for i686pc solaris" by specifying minimum version 
+	  numbers for all dependencies in Makefile.PL.
+	
+1.0.2	Nov 15, 2009
+	* Fixed bug #51461 "Warnings During Build" - now
+	  the test process squelches the harmless 
+	  warning from Test::Memory::Cycle. 
+
+1.0.1	Nov 11, 2009
+	* CPAN indexer did not like previous version number
+
+1.0.0	Nov 11, 2009
+	* Stable status achieved	
+	* Slight speed tweak on character handler for XML
+	  parser
+	* Added dependency on Devel::Cycle 1.11 as 1.10
+	  causes a false positive to be thrown on the 
+	  memory leak test
+
+0.98 	Oct 28, 2009
+	* Bumped processing speed back up
+	* Fixed possible infinite loop scenario	
+	* Ordered tests
+	* Added test to find circular references
+
+0.97	Oct 23, 2009
+	* Fixed all known memory leaks
+	* No more Object::Destroyer
+	* Cleaned out some old cruft
+
+0.96	Oct 22, 2009
+	* Allowed parsing of 0.4 version XML dump files but not
+	  support for new features
+	* Added in a method to retrieve the version number of
+	  the XML dump file
+
+0.95	Oct 14, 2009
+	* Found and removed a circular reference but it did not
+	  stop the memory leak
+	* Fixed bug 50092 - some times $page->text would return
+	  a reference to an undefined value
+	* Implemented support for compressed file GLOB objects per
+	  bug 50241
+
+0.94	Sep 28, 2009
+	* Fix bug 49979 - "redirect in newer Wikipedia dumps" by allowing
+	  unknown tag names to exist
+	
+0.93	Sep 15, 2009
+	* Made ::Pages a subclass of ::Revisions
+	* Discovered a bug regression: ::Pages and ::Revisions leak 
+	  memory/are not properly garbage collected
+
+0.92	Apr 15, 2009
+	* Completed documentation for all modules
+	* Added test for backwards compatibility to the pre-factory 
+	  Parse::MediaWikiDump interface
+
+0.91	May 13, 2009
+	* Updated documentation to more explicitly list what kind of
+	  dump files each parser object can deal with.
+	* Added dependency on perl 5.8.8 for :utf8 compatibility. 
+	* Split up lib/ into multiple files.
+	* Fix for bug #46054 - using categories method of 
+	  Parse::MediaWikiDump::page object causes script to crash.
+
+0.90    May 07, 2009
+	* Implemented new parsing engine and called it 
+	  Parse::MediaWikiDump::Revisions. Soon it will be replacing
+	  Parse::MediaWikiDump::Pages as a base engine. It is fully backwards
+	  compatible so please feel free to test it in your existing utilities
+	  and report success and failure to the author.
+	* Moved namespace logic into Parse::MediaWikiDump::page and updated
+	  Parse::MediaWikiDump::Pages to support it. 
+
+0.51	May 31, 2008
+	* Fix for bug 36255 "Parse::MediaWikiDump::page::namespace may return
+  	  a string which is not really a namespace" provided by Amir E. Aharoni.
+	* Moved test data into t/ and moved speed_test.pl into examples/
+	* Exceedingly complicated functions (parse_head() and parse_page()) are
+	  not funny. Added some comments on how to rectify that situation.
+	* Tightened up the tests a little bit.
+
+0.50	Jun 27, 2006
+	* Added category links parser.
+	* Removed all instances of shift() from the code.
+
+0.40	Jun 21, 2006
+	* Increased processing speed by around 40%! Thank you
+	  Andrew Rodland. 
+
+0.33	Jun 18, 2006
+	* Added current_byte and size methods to page dumper.
+
+0.32	Feb 25, 2006
+	* Added a line to create a package named Parse::MediaWikiDump so
+	  the module will get listed on CPAN search and the cpan command
+	  line tool.
+
+0.31	Jan 10, 2006
+	* Fix bug 16981 - Parse::MediaWikiDump::page->redirect does not work
+	  with redirects that have a : in them.
+ 	* Fix bug 16981 part two: title with a non-breaking space in it would
+	  come through as undefined.
+
+0.30	December 23, 2005
+	* the Pages and Links class now both use a method named next() to get
+ 	  the next record. The old link() and page() methods are retained for
+	  now but should be migrated away from as soon as is convenient. 
+ 	* Added list of dump files that this module can process to the README
+	  file.
+
+0.24	December 19, 2005
+	* Fixed bug #16616 - the category method only works properly on English
+	  language dump files. 
+
+0.23	December 19, 2005
+	* Fixed email address for author.
+	* Fixed omission of namespace method for pages objects in the 
+	  documentation.
+ 	* Added limitations section to README.
+	* Fixed http://rt.cpan.org bug #16583 - Module dies when parsing 
+	  the 20051211 German Wikipedia dump. 
+	* Added some comments to the source code.
+
+0.22	September 15, 2005
+	* Created some new and more comprehensive examples.
+	* Parse::MediaWikiDump::Pages now dies with a specific error 
+	  if it is asked to parse a comprehensive (full pages) dump file.
+	* Updated Parse::MediaWikiDump::Links to new dump file format.
+	* Added tests for Parse::MediaWikiDump::Links.
+	* Solved a bug: Expat's current_byte method returns a 32 bit
+	  signed integer and the english Wikipedia dumps cause the number to
+          wrap; implemented a work around for this. 
+
+0.21	September 10, 2005
+	* Improve testing of Parse::MediaWikiDump::Pages
+	* Fix silly bug related to opening file handle references
+	* Found new bug: The links dump format has been changed and the
+	  existing code can not parse the new format
+   	* Found new bug: comprehensive dump files like 
+	  20050909_pages_full.xml.gz cause the stack to grow too large and
+	  the module to abort early. 
+
+0.2    September 9, 2005
+	* Add tests and test data
+
+0.1    September 6, 2005
+        * First version, released on an unsuspecting world.
+

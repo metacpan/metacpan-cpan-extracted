@@ -1,0 +1,15 @@
+S"'simple'"
+p0
+.S'"simple"'
+p0
+.S'simple'
+p0
+.S'"simple"'
+p0
+.S'simple space'
+p0
+.S'simple\012new line'
+p0
+.S'simple\012new line'
+p0
+.

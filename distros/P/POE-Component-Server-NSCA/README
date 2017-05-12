@@ -1,0 +1,217 @@
+NAME
+
+    POE::Component::Server::NSCA - a POE Component that implements NSCA
+    daemon functionality
+
+VERSION
+
+    version 0.10
+
+SYNOPSIS
+
+      use strict;
+      use POE;
+      use POE::Component::Server::NSCA;
+      use POSIX;
+    
+      my $nagios_cmd = '/usr/local/nagios/var/rw/nagios.cmd';
+    
+      my $nscad = POE::Component::Server::NSCA->spawn(
+            password => 'moocow',
+            encryption => 1,
+      );
+    
+      POE::Session->create(
+            package_states => [
+               'main' => [qw(_start _message)],
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+    
+      sub _start {
+         $poe_kernel->post( $nscad->session_id(), 'register', event => '_message', context => 'moooo!' );
+         return;
+      }
+    
+      sub _message {
+         my ($message,$context) = @_[ARG0,ARG1];
+    
+         print "Received message from: ", $message->{peeraddr}, "\n";
+    
+         # Send the check to the Nagios command file
+    
+         my $time = time();
+         my $string;
+    
+         if ( $message->{svc_description} ) {
+            $string = "[$time] PROCESS_SERVICE_CHECK_RESULT";
+            $string = join ';', $string, $message->{host_name}, $message->{svc_description}, 
+                        $message->{return_code}, $message->{plugin_output};
+         }
+         else {
+            $string = "[$time] PROCESS_HOST_CHECK_RESULT";
+            $string = join ';', $string, $message->{host_name}, $message->{return_code},
+                        $message->{plugin_output};
+         }
+    
+         print { sysopen (my $fh , $nagios_cmd, POSIX::O_WRONLY) or die "$!\n"; $fh } $string, "\n";
+    
+         return;
+      }
+
+DESCRIPTION
+
+    POE::Component::Server::NSCA is a POE component that implements NSCA
+    daemon functionality. This is the daemon program that accepts service
+    check information from remote machines using send_nsca client or
+    POE::Component::Client::NSCA.
+
+    The component implements the network handling of accepting service
+    check information from multiple clients, but doesn't deal with
+    submitting the service checks to Nagios. Instead you will be provided
+    with the service check results as events and decide how to deal with
+    the results as you see fit.
+
+    It is based in part on code shamelessly borrowed from Net::Nsca and
+    optionally supports encryption using the Mcrypt module.
+
+CONSTRUCTOR
+
+    spawn
+
+      Takes a number of parameters, mandatory ones are indicated:
+
+        'password', password that should be used to encrypt the packet, mandatory;
+        'encryption', the encryption method to use, see below, mandatory;
+        'alias', set an alias on the component;
+        'address', bind the listening socket to a particular address, default is IN_ADDR_ANY;
+        'port', specify a port to listen on, default is 5667;
+        'time_out', specify a time out in seconds for socket connections, default is 60;
+        'access', an arrayref of Net::Netmask objects that will be granted access, default is 'any';
+
+      Returns a POE::Component::Server::NSCA object.
+
+      The 'encryption' method is an integer value indicating the type of
+      encryption to employ:
+
+             0 = None        (Do NOT use this option)
+             1 = Simple XOR  (No security, just obfuscation, but very fast)
+      
+             2 = DES
+             3 = 3DES (Triple DES)
+             4 = CAST-128
+             5 = CAST-256
+             6 = xTEA
+             7 = 3WAY
+             8 = BLOWFISH
+             9 = TWOFISH
+             10 = LOKI97
+             11 = RC2
+             12 = ARCFOUR
+      
+             14 = RIJNDAEL-128
+             15 = RIJNDAEL-192
+             16 = RIJNDAEL-256
+      
+             19 = WAKE
+             20 = SERPENT
+      
+             22 = ENIGMA (Unix crypt)
+             23 = GOST
+             24 = SAFER64
+             25 = SAFER128
+             26 = SAFER+
+
+      Methods 2-26 require that the Mcrypt module is installed.
+
+METHODS
+
+    session_id
+
+      Returns the POE::Session ID of the component.
+
+    shutdown
+
+      Terminates the component. Shuts down the listener and disconnects
+      connected clients and unregisters registered sessions.
+
+    getsockname
+
+      Access to the POE::Wheel::SocketFactory method of the underlying
+      listening socket.
+
+INPUT EVENTS
+
+    These are events from other POE sessions that our component will
+    handle:
+
+    register
+
+      This will register the sending session. Takes a number of parameters:
+
+         'event', the name of the event in the registering session that will be triggered, mandatory;
+         'context', a scalar containing any reference data that your session demands;
+
+      The component will increment the refcount of the calling session to
+      make sure it hangs around for events. Therefore, you should use
+      either unregister or shutdown to terminate registered sessions.
+
+    unregister
+
+      This will unregister the sending session.
+
+OUTPUT EVENTS
+
+    Registered sessions will receive events with the following parameters:
+
+    ARG0
+
+      ARG0 will contain a hashref with the following key/values:
+
+       'version', the version of NSCA protocol in use. Will be 3;
+       'host_name', the hostname for which the check is applicable;
+       'svc_description', the service description, not applicable for host checks;
+       'return_code', the result code of the check;
+       'plugin_output', any output from the check plugin;
+       'peeraddr', the IP address of the client that gave us the check information;
+       'peerport', the IP address of the client that gave us the check information;
+       'crc32', the checksum provided by the client;
+       'checksum', the checksum as the poco calculated it;
+       'timestamp', the clients timestamp;
+
+    ARG1
+
+      ARG1 will contain the value of the 'context' that was specified ( if
+      applicable ) when the session registered.
+
+PROVENANCE
+
+    Based on Net::Nsca by P Kent
+
+    Which was originally derived from work by Ethan Galstad.
+
+SEE ALSO
+
+    POE
+
+    Net::Netmask
+
+    Net::Nsca
+
+    Mcrypt
+
+    http://www.nagios.org/
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams, P Kent and Ethan
+    Galstad.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

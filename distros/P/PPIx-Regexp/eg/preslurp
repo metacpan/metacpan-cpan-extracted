@@ -1,0 +1,321 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Cwd qw{ abs_path getcwd };
+use File::Find;
+use File::Temp;
+use Getopt::Long 2.33 qw{ :config auto_version };
+use IO::File;
+use Pod::Usage;
+use PPI::Document;
+use PPIx::Regexp;
+use PPIx::Regexp::Dumper;
+use PPIx::Regexp::Tokenizer;
+
+our $VERSION = '0.051';
+
+my %opt = (
+    verbose	=> 0,
+);
+
+our $BASE = getcwd();
+our @PREFIX;
+
+GetOptions( \%opt,
+    qw{
+	archive! encoding=s failures! ignore=s include! ordinal!
+	recurse! significant! tokens! verbose+
+    },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+if ( $opt{archive} ) {
+    require Archive::Any;
+}
+
+my @ignore;
+if ( $opt{ignore} ) {
+    my $fh = IO::File->new( $opt{ignore}, '<' )
+	or die "Unable to open $opt{ignore}: $!\n";
+    while ( <$fh> ) {
+	s/ \s+ \z //smx;
+	$_ or next;
+	s/ \A \s+ //smx;
+	'#' eq substr $_, 0, 1
+	    and next;
+	push @ignore, qr{$_}smx;
+    }
+    close $fh;
+}
+
+my %dumper_opt = (
+    encoding	=> $opt{encoding},
+    margin	=> 4,
+    ordinal	=> $opt{ordinal},
+    significant => $opt{significant},
+    verbose	=> $opt{verbose},
+);
+
+my $parser = $opt{tokens} ? 'PPIx::Regexp::Tokenizer' : 'PPIx::Regexp';
+
+if ( $opt{include} ) {
+    push @ARGV, @INC;
+    $opt{recurse} = 1;
+}
+
+$opt{recurse} ||= $opt{archive};
+
+if ( $opt{recurse} ) {
+    @ARGV or push @ARGV, File::Spec->curdir();
+    find(
+	{
+	    no_chdir => 1,
+	    wanted => sub {
+		foreach my $re ( @ignore ) {
+		    $File::Find::name =~ $re and return;
+		}
+		handle_perl( $_ ) || handle_archive( $_ );
+	    },
+	},
+	@ARGV );
+} else {
+    foreach ( @ARGV ) {
+	-T $_ && slurp( $_ );
+    }
+}
+
+sub handle_archive {
+    my ( $fn ) = @_;
+    $opt{archive} or return;
+    -f $fn or return;
+    -T $fn and return;
+    $fn =~ m/ [.] (?: gz | bz2 | zip | tgz | tar ) \z /smx or return;
+    $opt{verbose} and warn "$fn\n";
+    my $arch = Archive::Any->new( $fn ) or return;
+    $arch->is_naughty() and do {
+	warn "$fn is naughty. Skipping.\n";
+	return;
+    };
+    $arch->is_impolite() and do {
+	warn "$fn is impolite. Skipping.\n";
+	return;
+    };
+    my $dir = File::Temp->newdir();
+    eval {
+	$arch->extract( $dir );
+	1;
+    } or do {
+	warn "Extract from $fn failed.\n";
+    };
+
+    local @PREFIX = File::Spec->abs2rel( $fn );
+    local $BASE = $dir;
+
+    find( {
+	    no_chdir => 1,
+	    wanted => sub {
+		foreach my $re ( @ignore ) {
+		    $File::Find::name =~ $re and return;
+		}
+		handle_perl( $_ )
+	    }
+	}, $dir );
+
+    return 1;
+}
+
+sub handle_perl {
+    my ( $fn ) = @_;
+    is_perl( $fn ) or return;
+    $opt{verbose} and warn "$fn\n";
+    slurp( $fn );
+    return 1;
+}
+
+sub is_perl {
+    my ( $fn ) = @_;
+    -T $fn or return;
+    $fn =~ m/ [.] pm \z /smx  and return 1;
+    $fn =~ m/ [.] pl \z /smxi and return 1;
+    open ( my $fh, '<', $fn ) or return;
+    local $_ = <$fh>;
+    close $fh;
+    defined $_ or return;
+    m/ \A [#] ! .*? perl /smx and return 1;
+    m/ \A [#] ! /smx and return;
+    $fn =~ m/ [.] t  \z /smx  and return 1;
+    return;
+}
+
+sub slurp {
+    my ( $fn ) = @_;
+
+    my $doc = PPI::Document->new( $fn )
+	or do {
+	warn "Unable to make a PPI::Document from $fn: ",
+	    PPI::Document->errstr;
+	return;
+    };
+
+    my @found;
+    foreach my $class ( qw{
+	    PPI::Token::QuoteLike::Regexp
+	    PPI::Token::Regexp::Match
+	    PPI::Token::Regexp::Substitute
+	}
+    ) {
+	foreach my $token ( @{ $doc->find( $class )
+		|| [] } ) {
+	    my $display = !$opt{failures};
+	    my @regex = ( $token );
+	    if ( my $re = $parser->new( $token, encoding => $opt{encoding} ) ) {
+		if ( $re->isa( 'PPIx::Regexp::Tokenizer' ) ) {
+		    push @regex, [ $re->tokens() ];
+		} else {
+		    push @regex, $re;
+		}
+		$display ||= $re->failures();
+	    } else {
+		$display = 1;
+		push @regex, $token->class(), ' not handled';
+	    }
+	    $display and push @found, \@regex;
+	}
+    }
+    if ( @found ) {
+	print "\n",
+	    join( ' ', @PREFIX, $fn ),
+	    "\n";
+	foreach ( @found ) {
+	    my ( $thing, $content ) = @{ $_ };
+	    print '  ', $thing->class(), "\t", $thing->content(), "\n";
+	    my $dmp = PPIx::Regexp::Dumper->new( $content, %dumper_opt );
+	    $dmp->print();
+	}
+    }
+    return;
+}
+
+__END__
+
+=head1 NAME
+
+preslurp - Analyze the regular expressions in a bunch of files
+
+=head1 SYNOPSIS
+
+ preslurp -recurse .
+
+For full details on usage, use
+
+ preslurp -help
+
+=head1 DETAILS
+
+This script makes L<PPI::Document|PPI::Document> objects out of files it
+deems are Perl, then does a L<PPIx::Regexp::Dumper|PPIx::Regexp::Dumper>
+dump on all
+L<PPI::Token::StringLike::Regexp|PPI::Token::StringLike::Regexp>,
+L<PPI::Token::Regexp::Match|PPI::Token::Regexp::Match> and
+L<PPI::Token::Regexp::Substitute|PPI::Token::Regexp::Substitute>
+objects it finds.
+
+The following options control its use:
+
+=over
+
+=item -archive
+
+If this option is asserted, it specifies that any archive files found
+should be expanded and their contents searched. This option implies
+C<-recurse>. This option is only available if
+L<Archive::Any|Archive::Any> is installed.
+
+=item -encoding name
+
+This option specifies the encoding of the files. It is passed directly
+to L<PPIx::Regexp|PPIx::Regexp> and
+L<PPIx::Regexp::Dumper|PPIx::Regexp::Dumper>.
+
+=item -failures
+
+If this option is asserted, only regular expressions with parse failures
+are reported.
+
+=item -help
+
+If this option is asserted, this documentation is displayed and the
+script exits.
+
+=item -ignore filename
+
+This option specifies the name of a file containing a list of files to
+ignore. The files are specified as regular expressions, listed one per
+line. Blank lines and lines beginning with '#' are ignored.
+
+=item -include
+
+If this option is asserted, it specifies that the contents of C<@INC> be
+added to the files to be checked. It also causes -recurse to be
+asserted.
+
+=item -ordinal
+
+If this option is asserted, it specifies that the ordinal value of any
+L<PPIx::Regexp::Token::Literal|PPIx::Regexp::Token::Literal> objects be
+displayed in the dump. In reality, this option is simply passed to
+L<PPIx::Regexp::Dumper|PPIx::Regexp::Dumper>.
+
+=item -recurse
+
+If this option is specified, this script recurses into any directories
+found.
+
+=item -significant
+
+If this option is asserted, only significant C<PPIx::Regexp> objects are
+dumped. In reality, this option is simply passed to
+L<PPIx::Regexp::Dumper|PPIx::Regexp::Dumper>.
+
+=item -tokens
+
+If this option is asserted, only
+L<PPIx::Regexp::Token|PPIx::Regexp::Token> objects are dumped. In
+reality, this option is simply passed to
+L<PPIx::Regexp::Dumper|PPIx::Regexp::Dumper>.
+
+=item -verbose
+
+If this option is asserted, you get a more verbose dump, though what
+that means is undocumented. In reality, this option is simply passed to
+L<PPIx::Regexp::Dumper|PPIx::Regexp::Dumper>.
+
+=back
+
+=head1 SUPPORT
+
+Support is by the author. Please file bug reports at
+L<http://rt.cpan.org>, or in electronic mail to the author.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009-2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+
+# ex: set textwidth=72 :

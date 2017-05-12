@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1209143054,
+          'number' => '+440200814254',
+          'time' => '18:04',
+          'date' => '2008-04-25',
+          'name' => 'John XXXX (M)',
+          'phone' => '+440200814254',
+          'device' => 'Treo 680',
+          'direction' => 'outbound',
+          'timestamp' => 1209143054,
+          'text' => 'It\'s Traditional, I have to forget *something* every time :-) will you all be able to come up for a day some time before sprog2 drops?',
+          'type' => '0x0002',
+          'category' => 0,
+          'id' => 7108179,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 118409
+        };

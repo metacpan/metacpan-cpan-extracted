@@ -1,0 +1,85 @@
+msgid ""
+msgstr "Project-Id-Version: _L 10N\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-02-18 22:38+0100\n"
+"PO-Revision-Date: 2011-02-18 22:39+0100\n"
+"Last-Translator: Enrique Nell <blas.gordon@gmail.com>\n"
+"Language-Team: Spanish\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: lib/Padre/Plugin/Autodia.pm:40
+msgid "Autodia UML Support"
+msgstr "Soporte de UML de AutoDia"
+
+#: lib/Padre/Plugin/Autodia.pm:62
+msgid "About"
+msgstr "Acerca de"
+
+#: lib/Padre/Plugin/Autodia.pm:63
+msgid "UML"
+msgstr "UML"
+
+#: lib/Padre/Plugin/Autodia.pm:64
+msgid "Class Diagram (Current File)"
+msgstr "Diagrama de clases (archivo actual)"
+
+#: lib/Padre/Plugin/Autodia.pm:65
+msgid "Class Diagram..."
+msgstr "Diagrama de clases..."
+
+#: lib/Padre/Plugin/Autodia.pm:81
+msgid "Integrating automated documentation into Padre IDE"
+msgstr "Integración de documentación automatizada en el IDE Padre"
+
+#: lib/Padre/Plugin/Autodia.pm:83
+msgid "Copyright 2010"
+msgstr "Copyright 2010"
+
+#: lib/Padre/Plugin/Autodia.pm:134
+msgid "JavaScript Files"
+msgstr "Archivos JavaScript"
+
+#: lib/Padre/Plugin/Autodia.pm:136
+msgid "Perl Files"
+msgstr "Archivos Perl"
+
+#: lib/Padre/Plugin/Autodia.pm:138
+msgid "PHP Files"
+msgstr "Archivos PHP"
+
+#: lib/Padre/Plugin/Autodia.pm:140
+msgid "Python Files"
+msgstr "Archivos Python"
+
+#: lib/Padre/Plugin/Autodia.pm:142
+msgid "Ruby Files"
+msgstr "Archivos Ruby"
+
+#: lib/Padre/Plugin/Autodia.pm:144
+msgid "SQL Files"
+msgstr "Archivos SQL"
+
+#: lib/Padre/Plugin/Autodia.pm:146
+msgid "Text Files"
+msgstr "Archivos de texto"
+
+#: lib/Padre/Plugin/Autodia.pm:148
+msgid "Web Files"
+msgstr "Archivos web"
+
+#: lib/Padre/Plugin/Autodia.pm:161
+#, perl-format
+msgid "%s Files"
+msgstr "Archivos %s"
+
+#: lib/Padre/Plugin/Autodia.pm:163
+msgid "All Files"
+msgstr "Todos los archivos"
+
+#: lib/Padre/Plugin/Autodia.pm:173
+msgid "Open File"
+msgstr "Abrir archivo"

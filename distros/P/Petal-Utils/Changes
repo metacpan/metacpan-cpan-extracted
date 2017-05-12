@@ -1,0 +1,49 @@
+Revision history for Perl extension Petal::Utils.
+
+0.06
+    + Added Contributing section to README [William McKee]
+    + Added new utility function to Base.pm - split_args [William McKee, Warren S.]
+    + Added new test library, t/20__Base.pm [William McKee]
+    + Added limit: and limitr: modifiers and tests [William McKee]
+    + Added create_href: modifier and tests [William McKee]
+    + Added substr: modifier and tests [William McKee]
+    + Added decode: modifier and tests [William McKee, Warren S.]
+    + Added printf: modifier and tests [William McKee, Warren S.]
+
+0.05
+    +	Wrote UriEscape modifier [Steve Purkis]
+    +	Added RELEASE.TASKS file [William McKee]
+    +	Updated Build.PL to create readme [Steve Purkis]
+    +	Cleaned up test area, broke up tests by modifier set [Steve Purkis]
+
+0.04
+(all changes by Steve Purkis)
+    +	Wrote If modifier.
+    +	Added TODO file.
+    *	Updated INSTALL file.
+    +	Added 'use Carp;' to modules that needed it.
+    +	Added $VERSION to all modules.
+
+0.03
+    *	Suppressed warnings when loading plugins, introduced $DEBUG flag.
+	[reported by William McKee, patched by Steve Purkis]
+    +	Wrote get_plugin_class() to make inheriting easier. [Steve Purkis]
+    *	Date::Format moved to required list of modules as Date plugin is in
+	:default set. [Steve Purkis]
+
+0.02
+    *	Renamed to Petal::Utils so Petal doesn't think the Utils package
+	is a Petal Hash modifier. [Steve Purkis]
+    *	Moved to Module::Build. [Steve Purkis]
+    +	Added modifiers: Date Dump Equal(eq) And Like Sort [Steve Purkis]
+    +	Added import() functionality to specify modifier sets. [Steve Purkis]
+    *	Split up modifiers into individual Petal::Utils::<modifier> modules
+	that are loaded as needed. [Steve Purkis]
+    *	Restructured test directory, using File::Spec and more verbose file
+	names. [Steve Purkis]
+    *	Added error handling code to existing modifiers. [Steve Purkis]
+    
+0.01
+    +	Initial project created Fri Sep 5 2003 [William McKee]
+    +	original version; created by h2xs 1.21 with options
+		-X -A -n Petal::Hash::Utils

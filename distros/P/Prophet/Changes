@@ -1,0 +1,79 @@
+0.751 2013-05-19
+ * Nothing really user visible. Using Dist::Zilla, and Prophet::Devel for
+   buildingthe dist. [Ioan Rogers]
+
+0.750 2011-07-06
+ * --progress option to publish command enables rsync's publish flag [Lance Wicks]
+ * PROPHET_EDITOR variable allows customization of editor [Rob Hoelz]
+ * add the ability to color format strings [Christine Spang]
+ * allow one to configure the default server port with server.default-port [Christine Spang]
+ * server command now bails out with a helpful message when port in use [Christine Spang]
+ * don't blindly override $ENV{LESS} or $ENV{MORE} [Jesse Vincent]
+ * various performance improvements [Jesse Vincent]
+
+0.743 2010-06-06
+ * Fix test failures so install works again [spang]
+
+0.742 2010-06-05
+ * Deal with Path::Dispatcher::Declarative being split from P::D [jesse]
+
+0.741 2010-01-13
+ * Actually ship all the javascript and css files for the web frontend. [Christine Spang]
+ * bash and zsh completion, see doc/tab-completion for how to enable [Shawn Moore, Kevin Falcone]
+
+0.74 2010-01-03
+ * Solve double-prompting for username/password in foreign syncs [Christine Spang]
+ * Fixes for Moose compatibility [Christine Spang]
+ * Unbreak with Mouse > 0.40 [Florian Ragwitz]
+ * Some code from SD had accidentially snuck into prophet. rafl++ for alerting me [Jesse Vincent]
+ * make menu links relative [Jesse Vincent]
+ * propagate "server" into child menus [Jesse Vincent]
+ * Announce project_name via Bonjour [Pedro Melo]
+ * allow apps to skip overriding dispatcher_class [Ruslan Zakirov]
+ * return that file doesn't exist only when lwp_get returns undef [Ruslan Zakirov]
+ * Add tab completion for prophet shell [Shawn Moore]
+ * check and store in config username and secret token [franck cuny]
+ * add --as <alias> to clone [franck cuny]
+
+ * Thanks to the following people who contributed to this release:
+    Alex Vandiver, Christine Spang, Florian Ragwitz, Jesse Vincent, Pedro Melo,
+    Ruslan Zakirov, Shawn Moore, and franck cuny.
+
+0.73 2009-09-11
+ * Reimplement alias expansion in terms of lists of argument words. [Nelson Elhage]
+ * First pass at improving UTF8 output in static web views [Jesse Vincent]
+
+0.72 Fri Sep  4 13:20:16 EDT 2009
+ * fix sqlite replica: original_sequence_no can be 0 [sunnavy]
+ * add inc/ back, we should keep it in repo [sunnavy]
+ * Added a couple debugging tools - dump_changesets.idx dump_record.idx [Jesse Vincent]
+ * Prophet::CLI::RecordCommand now checks to make sure you've asked it to operate on a record that actually exists. [Jesse Vincent]
+ * Added a Prophet::Record API for "does this exist?" [Jesse Vincent]
+ * fixing old docs that were out of date [Jesse Vincent]
+ * Made sure that sqlite replicas userdata keys are always lowercase [Jesse Vincent]
+ * Made an "is this replica me?" query case insensitive. [Jesse Vincent]
+ * Prophet::App now has a friendly name for "was asked to characterize an undef replica" [Jesse Vincent]
+ * Prophet::FilesystemReplia's local metadata is now case insensitive [Jesse Vincent]
+ * Failing tests proving that local metadata isn't case insensitive [Jesse Vincent]
+ * more notes to the long and ugly alias value stuff parser [sunnavy]
+ * better alias value parse: to handle ' and " [sunnavy]
+ * add aliases test with quotes [sunnavy]
+ * Support var-args aliases. [Nelson Elhage]
+ * Improve argument expansion in aliases. [Nelson Elhage]
+ * Only expand aliases on word boundaries. [Nelson Elhage]
+ * Remove an unnecessary 'no strict "refs"'. [Nelson Elhage]
+ * Switch to UUID::Tiny 1.02 and remove our temporary fork [Christine Spang]
+ * Reload config after editing [needed in shell] [Christine Spang]
+ * Better error message when pushing to non-existant replica [Christine Spang]
+ * Web templates now default to utf8 [Jesse Vincent]
+
+0.71 Sat Aug 29 23:30:09 EDT 2009
+ * Added --local to prophet clone: list local Bonjour sources [Pedro Melo]
+ * Extract out code for the filesystem replica backends so we can implement an ssh personality for them.
+
+0.70 2009-08-26
+ * Performance improvements for pull-over-HTTP
+ * Small documentation, error message and warnings cleanups
+
+0.69_01 2009-08-21
+* Initial dev release to do CPAN smoking before official release

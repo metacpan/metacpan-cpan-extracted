@@ -1,0 +1,46 @@
+fix the filter names to be more rational
+fix and document the alias names
+describe precisely (and audit) the session state and 
+  linkage of client and server sessions
+
+change test example to e unit test
+  - make testproxy shut down automatically
+
+
+
+audit code once more, remove XXX think about stuff in $self->{}
+and document
+
+
+------------------------------ done
+# to do:
+#   - is_connected_to_server needs to be per client connection! (done)
+- re-write the pod t be accurate and have a very small but complete example
+(text version of proxy)
+- make a cpan type dist that has all the files, makes a dist that has all files,
+installs, tests and runs the demo stuff (done)
+# - put in module CPAN format (done)
+# - Fix manual page to not be for server tcp.pm!
+# - take out comments from pasted code! (almost)
+# - take out object states and package states crap
+# - remove nested code. (done)
+# - does this system work or not work for multiple simultaneous connections? yes!
+# arrange to pass down client filter (and server filter) args
+# put signal hand for ^C (do in app)
+# - write very simple use module test like most of the POE components.
+# ? write all in one test component using PoCo::Server::HTTP
+#   testproxy.pl code, and PoCO::Client:HTTP ? That's a little crazy
+#   but it should be easy. Would anyone mind the module dependency needed
+#   just for testing?
+# document session structure and event flow
+# provide default params so minimAL proxy is trivial
+# rewrite testproxy to use these defaults
+# for each code param indicated which session it runs in.
+# rationalize the session alias names to agree with the names
+#   used in the session structure part of document
+# open issues:
+# - closures which can't be user over written are used because
+#   we wish access to $self variables and don't have especially access to it!
+#   (Except in ClientConnected where the PoCo::Server::TCP does provide
+#    a way to access) (partially fixed now with $heap->{self})
+# move PoeDebug module to somewhere private.

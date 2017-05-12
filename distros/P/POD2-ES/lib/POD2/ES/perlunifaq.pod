@@ -1,0 +1,355 @@
+=encoding utf8
+
+=head1 NAME
+
+perlunifaq - Preguntas más frecuentes sobre Unicode en Perl
+
+=head1 Preguntas y respuestas
+
+Esta lista de preguntas y respuestas sobre Unicode en Perl debe leerse después
+de leer L<perlunitut>.
+
+=head2 En realidad, perlunitut no es un tutorial de Unicode, ¿verdad?
+
+No. Y este documento no contiene preguntas y respuestas sobre Unicode.
+
+Perl incluye una interfaz que abstrae todas las codificaciones de caracteres
+compatibles; este documento es en realidad un tutorial genérico de C<Encode>
+con las preguntas más frecuentes sobre C<Encode>. Pero muchas personas piensan
+que Unicode es algo especial y mágico. Como no quiero que se sientan
+defraudadas, he decidido clasificar este documento como un tutorial de Unicode.
+
+=head2 ¿Qué codificaciones de caracteres admite Perl?
+
+Para averiguar cuáles son las codificaciones de caracteres admitidas por Perl,
+ejecute:
+
+    perl -MEncode -le "print for Encode->encodings(':all')"
+
+=head2 ¿Qué versión de Perl debo utilizar?
+
+Si puede, actualice a la versión más reciente; debe usar como mínimo la
+versión C<5.8.1>. En el tutorial y en las preguntas más frecuentes se supone
+que usa la versión más reciente.
+
+También debe comprobar los módulos y actualizarlos si es necesario. Por
+ejemplo, HTML::Entities requiere la versión >= 1.32 para funcionar
+correctamente, aunque esto no se indica en el registro de cambios.
+
+=head2 ¿Qué pasa con los datos binarios, como las imágenes?
+
+Bueno, aparte de usar C<binmode $fh>, no debe darles ningún tratamiento
+especial (la función binmode es necesaria para evitar que, en sistemas Win32,
+Perl convierta los caracteres de fin de línea).
+
+No obstante, debe evitar combinar cadenas de texto con cadenas binarias. Si
+necesita texto en una secuencia binaria, codifique las cadenas de texto con la
+codificación adecuada y después únalas con cadenas binarias. Vea también:
+"¿Qué pasa si no descodifico?".
+
+=head2 ¿Cuándo debo descodificar o codificar?
+
+Siempre que haya intercambio de texto con alguna entidad externa al proceso de
+perl, como una base de datos, un archivo de texto, un socket u otro programa
+(aunque dicha entidad externa también se haya programado en Perl).
+
+=head2 ¿Qué pasa si no descodifico?
+
+Siempre que la cadena binaria codificada se use junto con una cadena de texto,
+Perl supondrá que la cadena binaria se codificó con ISO-8859-1 (también
+llamada latin-1). Si la codificación no es latin-1, el resultado de la
+conversión de los datos no será lo que se esperaba. Por ejemplo, si la
+codificación es UTF-8, los bytes individuales de los caracteres multibyte se
+verán como caracteres independientes y se volverán a convertir a UTF-8. Esta
+codificación doble es similar a la codificación doble de HTML (C<&amp;gt;>) o
+de URI (C<%253E>).
+
+Se produce una descodificación implícita sin aviso, denominada "promoción".
+Es posible que este nombre sugiera algo positivo, pero es mejor evitar que
+suceda.
+
+=head2 ¿Qué pasa si no codifico?
+
+La cadena de texto se enviará con los bytes del formato interno de Perl. En
+algunos casos Perl le mostrará un mensaje amistoso para avisarle de que está
+haciendo algo mal:
+
+    Wide character in print at ejemplo.pl line 2.
+
+Como el formato interno suele ser UTF-8, es difícil detectar estos errores
+(puesto que normalmente la codificación deseada es UTF-8). Pero no sea
+perezoso; no debe basarse en el hecho de que el formato interno de Perl es
+UTF-8. Codifique explícitamente para evitar errores extraños y para que los
+programadores que van a mantener el código vean que ha pensado en todo.
+
+=head2 ¿Existe alguna manera de descodificar o codificar automáticamente?
+
+Si todos los datos de un determinado identificador de archivo se codifican
+exactamente de la misma manera, puede ordenar al sistema de entrada/salida de
+Perl que descodifique todo automáticamente mediante la capa C<encoding>. Si
+hace esto, no se olvidará de volver a descodificar o codificar cosas que usan
+el identificador de archivo con una capa.
+
+Puede aplicar esta capa al abrir el archivo con C<open>:
+
+  open my $fh, '>:encoding(UTF-8)', $archivo;  # codificación automática al escribir
+  open my $fh, '<:encoding(UTF-8)', $archivo;  # descodificación automática al leer
+
+O bien, si ya tiene un identificador de archivo abierto:
+
+  binmode $fh, ':encoding(UTF-8)';
+
+Algunos controladores de base de datos para DBI también pueden codificar y
+descodificar automáticamente, pero a veces esta funcionalidad está limitada a
+la codificación UTF-8.
+
+=head2 ¿Y si no sé qué codificación se utilizó?
+
+Haga lo que pueda para averiguar cuál es la codificación; adivínela, si no
+queda más remedio (y no olvide agregar un comentario para documentar su
+conjetura).
+
+Puede abrir el documento en un navegador web y probar varios juegos o
+codificaciones de caracteres hasta confirmar visualmente que se ven bien todos
+los caracteres.
+
+No existe una manera fiable de detectar automáticamente la codificación, por
+lo que es mejor enseñar a las personas que le suministran datos a indicar el
+juego de caracteres utilizado.
+
+=head2 ¿Puedo usar Unicode en mi código fuente Perl?
+
+Por supuesto. Si el código fuente está codificado como UTF-8, puede indicarlo
+con el pragma C<use utf8>:
+
+    use utf8;
+
+Esto no afecta ni a la entrada ni a la salida de datos. Solo influye en la
+manera de leer el código fuente. Puede usar Unicode en literales de cadena, en
+identificadores (aunque deben ser "caracteres de palabra" compatibles con
+C<\w>) e incluso en delimitadores personalizados.
+
+=head2 Data::Dumper no restaura la marca UTF8. ¿Es esto un error?
+
+No, el procesamiento de Unicode en Data::Dumper es correcto. Algunas personas
+se han quejado de que no restaura la marca UTF8 cuando se vuelven a leer los
+datos con C<eval>. Sin embargo, no se debe mirar la marca, y no hay ninguna
+razón para que Data::Dumper sea una excepción a esta norma.
+
+Lo que sucede es esto: cuando Perl lee un literal de cadena, mantendrá una
+codificación de 8 bits mientras pueda (aunque la codificación interna de la
+cadena podría ser UTF-8 originalmente, cuando se volcó). Si se agregan otros
+caracteres a la cadena de texto y Perl tiene que renunciar a esta
+codificación, "promueve" la cadena a UTF-8 sin avisar.
+
+Si codifica correctamente las cadenas para la salida, no tiene que preocuparse
+por esto, y puede aplicar C<eval> a los datos volcados, como siempre.
+
+=head2 ¿Por qué algunas veces las clases de caracteres de expresiones regulares solo detectan caracteres ASCII?
+
+Desde Perl 5.14 (y, de forma parcial, desde Perl 5.12), solo tiene que agregar
+C<use feature 'unicode_strings'> al principio del programa. En su ámbito
+léxico, este problema no debería producirse. También se habilita
+automáticamente con C<use feature ':5.12'> o C<use v5.12>, o si se utiliza
+C<-E> en la línea de comandos de Perl 5.12 o una versión posterior.
+
+Esto se hace así para evitar que dejen de funcionar programas antiguos, que se
+basan en el funcionamiento anterior a la creación de Unicode. Esos programas
+antiguos solo usaban el juego de caracteres ASCII, por lo que es posible que no
+funcionen con otros caracteres. Si una cadena está codificada en UTF-8, Perl
+supone que el programa está preparado para trabajar con Unicode, pero si la
+codificación es otra, Perl supone que solo se desea usar ASCII por lo que los
+caracteres que no sean ASCII no se reconocerán como lo que serían en Unicode.
+C<use feature 'unicode_strings'> indica a Perl que debe tratar todos los
+caracteres como Unicode, independientemente de si la cadena está codificada
+como UTF-8 o no, lo que evita el problema.
+
+Sin embargo, en versiones anteriores de Perl, o si pasa cadenas a subrutinas
+fuera del ámbito del pragma C<feature>, puede forzar el uso de reglas Unicode
+cambiando la codificación a UTF-8 mediante C<utf8::upgrade($string)>. Esto se
+puede aplicar de manera segura a cualquier cadena, puesto que comprueba si una
+cadena ya se ha promovido y, en caso afirmativo, no la modifica.
+
+Encontrará una descripción más detallada en L<Unicode::Semantics>
+(disponible en CPAN).
+
+=head2 ¿Por qué algunos caracteres no se convierten a mayúsculas o minúsculas correctamente?
+
+Vea la respuesta a la pregunta anterior.
+
+=head2 ¿Cómo se puede determinar si una cadena es una cadena de texto o una cadena binaria?
+
+No se puede. Hay quien usa la marca UTF8 para esto, pero es un uso incorrecto
+que hace que parezca que hay errores en módulos que funcionan correctamente,
+como Data::Dumper. La marca no debe utilizarse para este fin, ya que se
+desactiva cuando se usa una codificación de 8 bits (de manera predeterminada,
+ISO-8859-1) para almacenar la cadena.
+
+De esto debe encargarse el programador. Podría usar una notación "húngara"
+como ayuda.
+
+=head2 ¿Cómo puedo pasar de la codificación A a la codificación B?
+
+Primero debe convertir la cadena de bytes con la codificación A en una cadena
+de texto y después la cadena de texto en una cadena de bytes con la
+codificación B:
+
+    my $cadena_texto = decode('A', $cadena_A);
+    my $cadena_B     = encode('B', $cadena_texto);
+
+También puede omitir la parte de la cadena de texto y pasar directamente de
+una codificación binaria a otra:
+
+    use Encode qw(from_to);
+    from_to($cadena, 'A', 'B');  # cambia el contenido de $cadena
+
+o dejar que la descodificación y la codificación automáticas se encarguen de
+hacer la conversión:
+
+    open my $fh_A, '<:encoding(A)', 'ejemplo.A.txt';
+    open my $fh_B, '>:encoding(B)', 'ejemplo.B.txt';
+    print { $fh_B } $_ while <$fh_A>;
+
+=head2 ¿Para qué sirven C<decode_utf8> y C<encode_utf8>?
+
+Ofrecen una sintaxis alternativa a C<decode('utf8', ...)> y C<encode('utf8',
+...)>.
+
+=head2 ¿Qué es un "carácter ancho"?
+
+Término utilizado para designar caracteres que ocupan más de un byte.
+
+La advertencia de Perl "Wide character in ..." (Carácter ancho en...) se debe
+a la presencia de un carácter de este tipo. Si no se especifica una capa de
+codificación, Perl intenta que cada carácter ocupe un solo byte. Si no lo
+consigue, emite esta advertencia (si las advertencias están habilitadas), y
+utiliza datos codificados como UTF-8.
+
+Para evitar esta advertencia y evitar la mezcla de distintas codificaciones de
+salida en una sola secuencia, especifique siempre una codificación
+explícitamente (por ejemplo, con una capa de entrada/salida):
+
+    binmode STDOUT, ":encoding(UTF-8)";
+
+=head1 COMPONENTES INTERNOS
+
+=head2 ¿Qué es la "marca UTF8"?
+
+A menos que tenga que trabajar con los componentes internos o depurar cosas
+extrañas, olvídese de la marca UTF8. Esto significa que es muy probable que
+nunca tenga que usar C<is_utf8>, C<_utf8_on> y C<_utf8_off>.
+
+La marca UTF8, conocida también como SvUTF8, es una marca interna que indica
+que la representación interna actual es UTF-8. Sin esta marca, se supone que
+dicha representación es ISO-8859-1. Perl realiza la conversión entre estas
+codificaciones automáticamente. (En realidad, generalmente Perl supone que la
+representación es ASCII; vea la sección L</¿Por qué algunas veces las
+clases de caracteres de expresiones regulares solo detectan caracteres ASCII?>
+anterior).
+
+Resulta que uno de los formatos internos de Perl es UTF-8. Como Perl no se
+calla nada, esto es de dominio público. Y crea muchas confusiones. Es mejor
+imaginar que el formato interno es alguna codificación desconocida y
+acostumbrarse a codificar y descodificar explícitamente siempre.
+
+=head2 ¿Y el pragma C<use bytes>?
+
+No lo use. No tiene sentido trabajar con bytes en una cadena de texto o
+trabajar con caracteres en una cadena de bytes. Realice las conversiones
+apropiadas (mediante descodificación o codificación) y todo saldrá bien:
+contará caracteres para los datos descodificados y bytes para los datos
+codificados.
+
+C<use bytes> suele ser un intento fallido de hacer algo útil. Olvide que
+existe.
+
+=head2 ¿Y el pragma C<use encoding>?
+
+No lo use. Por desgracia, este pragma supone que la codificación utilizada en
+el entorno del programador es la misma que la utilizada en el entorno del
+usuario. Utilizará la misma codificación para el código fuente que para
+STDIN y STDOUT. Cuando se copia un programa a otro equipo, el código fuente no
+cambia, pero podría cambiar el entorno STDIO.
+
+Si necesita utilizar caracteres que no pertenezcan a ASCII en el código
+fuente, codifíquelos como UTF-8 y use el pragma C<use utf8>.
+
+Si necesita establecer la codificación para STDIN, STDOUT y STDERR basándose,
+por ejemplo, en la configuración regional del usuario, use el pragma C<use
+open>.
+
+=head2 ¿En qué se diferencian C<:encoding> y C<:utf8>?
+
+Como UTF-8 es uno de los formatos internos de Perl, a menudo puede omitir el
+paso de codificar o descodificar, y manipular la marca UTF8 directamente.
+
+En lugar de utilizar C<:encoding(UTF-8)>, puede usar simplemente C<:utf8>,
+omitiendo así el paso de codificación cuando los datos ya están
+representados internamente como UTF8. Esto está aceptado universalmente como
+una práctica fiable al escribir, pero puede ser peligroso al leer, ya que crea
+una incoherencia interna cuando hay secuencias de bytes no válidas. El uso de
+C<:utf8> para la entrada puede permitir infracciones de seguridad en algunos
+casos, por lo que se recomienda usar C<:encoding(UTF-8)> en su lugar.
+
+En lugar de C<decode> y C<encode>, puede usar C<_utf8_on> y C<_utf8_off>, pero
+esto se considera poco elegante. En particular, el uso de C<_utf8_on> puede
+resultar peligroso, por las mismas razones que el uso de C<:utf8>.
+
+Existen algunos métodos abreviados para scripts de una línea (I<one-liners>);
+vea la descripción del modificador L<-C|perlrun/-C [numberE<sol>list]> en
+L<perlrun>.
+
+=head2 ¿Cuál es la diferencia entre C<UTF-8> y C<utf8>?
+
+C<UTF-8> es el estándar oficial. C<utf8> es la manera que tiene Perl de
+mostrarse liberal al procesar la entrada. Si tiene que comunicarse con algo que
+no es tan liberal, es posible que sea mejor utilizar C<UTF-8>. Sin embargo, si
+tiene que comunicarse con algo que es demasiado liberal, puede que tenga que
+utilizar C<utf8>. Encontrará información detallada en L<Encode>.
+
+Internamente, C<UTF-8> se denomina C<utf-8-strict>. En este tutorial se usa
+siempre UTF-8, incluso para los casos en que se use utf8 internamente, ya que
+esta distinción puede resultar difícil de apreciar y además suele ser
+irrelevante.
+
+Por ejemplo, se puede usar utf8 para códigos de carácter que no existen en
+Unicode, como 9999999, pero si los codifica en UTF-8, obtendrá caracteres
+sustitutos de manera predeterminada (vea la sección "Handling Malformed Data"
+de L<Encode> para obtener información sobre otras maneras de abordar este
+problema).
+
+Bueno, ya que insiste: el "formato interno" es utf8, no UTF-8 (cuando no es
+otra codificación).
+
+=head2 Me he perdido. ¿Qué codificación se usa realmente para el formato interno?
+
+Eso es una buena señal, ya que no debe esperar que el formato interno tenga
+una codificación específica. Pero para que no se quede con la duda, debe
+saber que, de manera predeterminada la codificación del formato interno es
+ISO-8859-1 (latin-1) o utf8, en función del historial de la cadena. En
+plataformas EBCDIC la codificación puede ser distinta a las mencionadas.
+
+Perl sabe cómo se ha almacenado la cadena internamente, y usará ese
+conocimiento al codificar. En resumen: no intente averiguar cuál es la
+codificación interna de una cadena determinada; solo tiene que codificarla con
+la codificación que desee.
+
+=head1 AUTOR
+
+Juerd Waalboer <#####@juerd.nl>
+
+=head1 VEA TAMBIÉN
+
+L<perlunicode>, L<perluniintro>, L<Encode>
+
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

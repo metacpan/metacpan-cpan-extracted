@@ -1,0 +1,10 @@
+---
+name: An example repository viewer
+Model::Repository:
+  data_source: MemoryCachedRepository
+  data_source_options:
+    auto_update_cache: 1
+  repositories:
+    testrepo:
+      uri: testrepo
+      name: A local testing repository

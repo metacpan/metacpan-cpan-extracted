@@ -1,0 +1,39 @@
+<!-- preferences : notification tab -->
+<form action="my/preferences/update" method="POST" name="notifications">
+    <input type="hidden" name="form_name" value="notifications">
+
+    <div style="background-color:#ccc;margin-top:5px;margin-bottom:5px;">
+        &nbsp;
+    </div>
+
+
+    <div class="yui-gf top_padded">
+        <div class="yui-u first align_right">
+            <input type="checkbox" name="watch_on_post" value="1" [% IF authed_user.preference.watch_on_post %]checked="checked" [% END %] />
+        </div>
+        <div class="yui-u">
+            &nbsp;
+            [%l('PREFS ADD WATCHES')%] 
+        </div>
+    </div>
+
+    <div class="yui-gf top_padded">
+        <div class="yui-u first align_right">
+            <input type="checkbox" name="notify_thread_watch" value="1" [% IF authed_user.preference.notify_thread_watch %]checked="checked" [% END %] />
+        </div>
+        <div class="yui-u">
+            &nbsp;
+            [%l('PREFS EMAIL NOTIFICATION')%] 
+        </div>
+    </div>
+
+    <div class="yui-gf top_padded">
+        <div class="yui-u first align_right">
+            &nbsp;
+        </div>
+        <div class="yui-u">
+            <input type="submit" value="[%l('Update')%]" name="update" class="input_button" />
+        </div>
+    </div>
+</form>
+<!-- (end) preferences : notification tab -->

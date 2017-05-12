@@ -1,0 +1,14 @@
+Build.PL
+CHANGES
+LICENSE
+MANIFEST
+META.json
+README.md
+cpanfile
+lib/Pcore/Core/Log/Pipe/xmpp.pm
+lib/Pcore/Handle/xmpp.pm
+lib/Pcore/XMPP.pm
+share/dist-id.json
+share/dist.perl
+t/001.t
+t/author-pod-syntax.t

@@ -1,0 +1,57 @@
+Revision history for Perl extension PITA
+
+0.60 Thu 27 Oct 2011
+	- Updating to Module::Install::DSL 1.04
+	- Removing Params::Util imports for consistency
+	- Updating File::Remove dependency for fork safety
+	- Updating Process for nested execution on Win32
+	- Completed tests for the storage modules
+	- Full support for Windows hosts
+
+0.50 Thu 10 Mar 2011
+	- Rewrote legacy PITA::POE::SupportServer as PITA::Guest::Server
+	- Minimum version of Perl is now 5.008 (because of POE mainly)
+	- Various dependencies were version-bumped with the merge
+
+0.44 Wed  2 Feb 2011
+	- Upgrading to Module::Install::DSL 1.00
+	- Only do file locking with File::Flock on Unix
+	- Updating copyright year
+	- Try harder to locate images when adding things to storage objects
+
+0.41 Wed 23 Jul 2009
+	- Upgraded to Module::Install 0.91
+	- Updating to use the GUID ids
+
+0.40 Sun  1 Jul 2007
+	- Upgraded to the new PITA::POE::SupportServer
+	- Upgraded Module::Install 0.65
+
+0.22 Sat 22 Apr 2006
+	- Updating to handle the new PITA::XML changes
+	- Upgraded from Data::UUID to far less insane Data::GUID
+	- Upgraded Module::Install to 0.62
+
+0.21 Tue 14 Feb 2006
+	- Changing a few method names to make the naming scheme of
+	  deep subclassed drivers clearer.
+
+0.20 Thu  3 Feb 2006
+	- Added a PITA::Guest abstraction
+	- Added the ability to auto-discover platforms in a Guest
+	- Added and completed the Local driver
+	- Completed ping/discover/test support for Image drivers
+	- Added and complete the Image::Test driver
+	- Partially refactored towards handling multiple tasks
+
+0.10 Sun 15 Jan 2006
+	- Completed the first version stable enough to distribute for
+	  experimenters to play with.
+
+0.01_02 Tue  3 Jan 2006
+	- Starting to add the guts of PITA::Host
+
+0.01_01 Fri 30 Dec 2005
+	- Initial implementation
+	- Currently implemented images all the way up to launch.
+	- Mainly uploading for CPAN Testers to poke at

@@ -1,0 +1,8 @@
+Xmms.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+test.mp3
+t/00_play.t
+META.yml                                 Module meta-data (added by MakeMaker)

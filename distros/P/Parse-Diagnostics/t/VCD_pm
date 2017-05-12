@@ -1,0 +1,975 @@
+
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <title>lib/Verilog/VCD.pm - metacpan.org</title>
+        <link rel="alternate" type="application/rss+xml" title="RSS" href="https://metacpan.org/feed/distribution/Verilog-VCD" />
+        <link href="/_assets/d9ff6fc28efe349c1ffc17c397bd95ca.css" rel="stylesheet" type="text/css">
+        <link rel="search" href="/static/opensearch.xml" type="application/opensearchdescription+xml" title="MetaCPAN">
+        <link rel="shortcut icon" href="/static/icons/favicon.ico">
+        <link rel="apple-touch-icon" sizes="152x152" href="/static/icons/apple-touch-icon.png">
+        <script src="/_assets/a869e92bd8b69760f4c3b0a85075f0f9.js" type="text/javascript"></script>
+        <script>
+          (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+          (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+          m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+          })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+          ga('create', 'UA-27829474-1', {
+              siteSpeedSampleRate : 100
+          });
+          ga('send', 'pageview');
+
+          ga(function() {
+            var cookies=['__utma', '__utmb', '__utmc', '__utmv', '__utmz', '_gat'];
+            for (var i = cookies.length; i--; ) {
+              var cookie = cookies[i]+"=; expires="+(new Date(0)).toGMTString()+"; path=/";
+              document.cookie = cookie;
+              document.cookie = cookie + '; domain=.'+document.domain;
+            }
+          });
+        </script>
+        
+        
+    </head>
+    <body>
+        <nav class="navbar navbar-default" role="navigation">
+            <div class="container-fluid">
+                <ul class="nav navbar-nav">
+                <li class="visible-xs">
+                <a href="#" data-toggle="slidepanel" data-target=".slidepanel">
+                  <i class="fa fa-bars fa-2x icon-slidepanel"></i>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                </a>
+                </li>
+            
+                    <li class="">
+                        <a href="/"><img src="/static/icons/metacpan-icon.png" />                            Home                        </a>
+                    </li>
+                    <li class="">
+                        <a href="/recent"><i class="fa fa-history"></i>                            Recent                        </a>
+                    </li>
+                    <li class="hidden-xs">
+                        <a href="/about/faq"><i class="fa fa-question"></i>                            FAQ                        </a>
+                    </li>
+                    <li class="hidden-xs">
+                        <a href="https://github.com/CPAN-API/metacpan-web/issues"><i class="fa fa-github-alt"></i>                            Github Issues                        </a>
+                    </li>
+                    <li class="hidden-xs">
+                        <a href="/news"><i class="fa fa-rss"></i>                            News                        </a>
+                    </li>
+                    <li class="hidden-xs">
+                        <a href="/lab"><i class="fa fa-rocket"></i>                            Lab                        </a>
+                    </li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <form action="https://metacpan.org/account/logout" method="POST" id="metacpan-logout"></form>
+                    <li class="dropdown logged_in" style="display: none;">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        Account
+                        <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/account/identities">Identities</a></li>
+                            <li><a href="/account/profile">Profile</a></li>
+                            <li><a href="/account/favorite/list">Favorites</a></li>
+                            <li>
+                                <a href="#" onclick="$('#metacpan-logout').submit(); return false">Logout</a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="dropdown logged_out" style="display: none;">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        Sign in
+                        <b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                <a href="https://api.metacpan.org/oauth2/authorize?client_id=metacpan.org&amp;choice=facebook" onclick="return logInPAUSE(this)">
+                                <i class="fa fa-facebook fa-fw"></i>
+                                Facebook
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://api.metacpan.org/oauth2/authorize?client_id=metacpan.org&amp;choice=github" onclick="return logInPAUSE(this)">
+                                <i class="fa fa-github fa-fw"></i>
+                                GitHub
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://api.metacpan.org/oauth2/authorize?client_id=metacpan.org&amp;choice=twitter" onclick="return logInPAUSE(this)">
+                                <i class="fa fa-twitter fa-fw"></i>
+                                Twitter
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://api.metacpan.org/oauth2/authorize?client_id=metacpan.org&amp;choice=google" onclick="return logInPAUSE(this)">
+                                <i class="fa fa-google fa-fw"></i>
+                                Google
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/login/openid">
+                                <i class="fa fa-openid fa-fw"></i>
+                                OpenID
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+
+        
+
+            
+            <div class="row hidden-phone">
+                <div class="head-small-logo col-md-3">
+                    <a href="/" class="small-logo"></a>
+                </div>
+                <div class="col-md-9">
+                    <form action="/search" class="search-form form-horizontal">
+                        <div class="form-group">
+                            <div class="input-group">
+                                <input type="text" name="q" size="41" id="search-input" class="form-control" value="">
+                                <span class="input-group-btn">
+                                    <button class="btn search-btn" type="submit">Search</button>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="form-group search-type">
+                            <label class="radio-inline">
+                                <input type="radio" name="search_type" value="modules" checked 
+                                >
+                                Modules
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="search_type" value="authors"
+                                >
+                                Authors
+                            </label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+
+            <div class="row">
+                <div class="main-content col-md-12">
+                    
+<div class="breadcrumbs">
+    <a data-keyboard-shortcut="g s" href="/source/GSULLIVAN/Verilog-VCD-0.07">GSULLIVAN / Verilog-VCD-0.07</a>
+    
+    
+      / <a href="/source/GSULLIVAN/Verilog-VCD-0.07/lib">lib</a>
+        / <a href="/source/GSULLIVAN/Verilog-VCD-0.07/lib/Verilog">Verilog</a>
+        / VCD.pm
+    
+</div>
+
+<ul class="nav-list slidepanel">
+  <li class="visible-xs">
+    <div>
+    <form action="/search">
+        <input type="search" class="form-control tool-bar-form" placeholder="Search" name="q">
+        <input type="submit" class="hidden">
+    </form>
+</div>
+
+  </li>
+  <li class="nav-header">Tools</li>
+  <li>
+    <a data-keyboard-shortcut="g d" href="/release/GSULLIVAN/Verilog-VCD-0.07/"><i class="fa fa-info-circle fa-fw black"></i>Release Info</a>
+  </li>
+  
+  <li>
+    <a href="/pod/Verilog::VCD"><i class="fa fa-book fa-fw black"></i>Module Documentation</a>
+  </li>
+  
+  <li>
+    <a data-keyboard-shortcut="g a" href="/author/GSULLIVAN"><i class="fa fa-user fa-fw black"></i>Author</a>
+  </li>
+  <li>&nbsp;</li>
+  <li><a href="https://api.metacpan.org/source/GSULLIVAN/Verilog-VCD-0.07/lib/Verilog/VCD.pm"><i class="fa fa-file-text-o fa-fw black"></i>Raw code</a></li>
+  <li>
+    <a href="/raw/GSULLIVAN/Verilog-VCD-0.07/lib/Verilog/VCD.pm?download=1"><i class="fa fa-download fa-fw black"></i>Download</a>
+  </li>
+  
+  <li><button class="btn-link pod-toggle pod-hidden" onclick="togglePod()"><i class="fa fa-exchange fa-fw black"></i><span class="hide-pod">Hide</span><span class="show-pod">Show</span> Pod</button></li>
+  
+  <li class="nav-header">Info</li>
+  <li>253 lines of code</li>
+  <li>210 lines of pod</li>
+  <li>17.88K bytes</li>
+</ul>
+
+<div class="content">
+
+<pre id="source" class="line-numbers pod-toggle pod-hidden" data-pod-lines="303-600"><code class="language-perl">package Verilog::VCD;
+
+use warnings;
+use strict;
+use Carp qw(croak);
+
+require Exporter;
+our @ISA         = qw(Exporter);
+our @EXPORT_OK   = qw(
+                        parse_vcd list_sigs get_timescale get_endtime
+                        get_date get_version get_dumps
+                        get_decl_comments get_sim_comments
+);
+our %EXPORT_TAGS = (all =&gt; \@EXPORT_OK);
+
+our $VERSION = '0.07';
+
+my $timescale;
+my $endtime;
+my $date;
+my $version;
+my @decl_comments;
+my @sim_comments;
+my %dumps;
+
+sub list_sigs {
+    # Parse input VCD file into data structure,
+    # then return just a list of the signal names.
+    my $file = shift;
+    unless (defined $file) {
+        croak('Error: list_sigs requires a filename. It seems like no ',
+              'filename was provided or filename was undefined');
+    }
+    my $vcd = parse_vcd($file, {only_sigs =&gt; 1});
+
+    my @sigs;
+    for my $code (keys %{ $vcd }) {
+        my @nets = @{ $vcd-&gt;{$code}-&gt;{nets} };
+        push @sigs, map { &quot;$_-&gt;{hier}.$_-&gt;{name}&quot; } @nets;
+    }
+    return @sigs;
+}
+
+sub parse_vcd {
+    # Parse input VCD file into data structure.
+    # Also, print t-v pairs to STDOUT, if requested.
+    my ($file, $opt) = @_;
+
+    unless (defined $file) {
+        croak('Error: parse_vcd requires a filename.  It seems like no ',
+              'filename was provided or filename was undefined');
+    }
+
+    if ($opt) {
+        unless (ref($opt) eq 'HASH') {
+            croak('Error: If options are passed to parse_vcd, they must be ',
+                  'passed as a hash reference.');
+        }
+    }
+
+    my $only_sigs = (exists $opt-&gt;{only_sigs}) ? 1 : 0;
+
+    my $all_sigs;
+    my %usigs;
+    if (exists $opt-&gt;{siglist}) {
+        %usigs = map { $_ =&gt; 1 } @{ $opt-&gt;{siglist} };
+        unless (%usigs) {
+            croak('Error: The signal list passed using siglist was empty.');
+        }
+        $all_sigs = 0;
+    }
+    else {
+        $all_sigs = 1;
+    }
+
+    my $use_stdout = (exists $opt-&gt;{use_stdout}) ? 1 : 0;
+
+    open my $fh, '&lt;', $file or croak(&quot;Error: Can not open VCD file $file: $!&quot;);
+
+    # Parse declaration section of VCD file
+    my %data;
+    my $mult;
+    my @hier;
+    @decl_comments = ();
+    while (&lt;$fh&gt;) {
+        if (s/ ^ \s* \$ (\w+) \s+ //x) {
+            my $keyword = $1;
+            my $line = $_;
+            my @lines;
+            push @lines, $_ if length $_;
+            while ($line !~ / \$end \b /x) {
+                $line = &lt;$fh&gt;;
+                push @lines, $line;
+            }
+            for my $line (@lines) {
+                trim($line);
+                $line =~ s/ \s* \$end \b //x;
+            }
+            pop @lines unless length $lines[-1];
+
+            if ($keyword eq 'date') {
+                $date = join &quot;\n&quot;, @lines;
+            }
+            elsif ($keyword eq 'version') {
+                $version = join &quot;\n&quot;, @lines;
+            }
+            elsif ($keyword eq 'comment') {
+                push @decl_comments, join &quot;\n&quot;, @lines;
+            }
+            elsif ($keyword eq 'timescale') {
+                $mult = calc_mult(&quot;@lines&quot;, $opt);
+            }
+            elsif ($keyword eq 'scope') {
+                my $scope = &quot;@lines&quot;;
+                push @hier, (split /\s+/, $scope)[1]; # just keep scope name
+            }
+            elsif ($keyword eq 'upscope') {
+                pop @hier;
+            }
+            elsif ($keyword eq 'var') {
+                my $var = &quot;@lines&quot;;
+                #   $var reg 1 *@ data $end
+                #   $var wire 4 ) addr [3:0] $end
+                my ($type, $size, $code, $name) = split /\s+/, $var, 4;
+                $name =~ s/ \s //xg;
+                my $path = join '.', @hier;
+                my $full_name = &quot;$path.$name&quot;;
+                push @{ $data{$code}{nets} }, {
+                    type =&gt; $type,
+                    name =&gt; $name,
+                    size =&gt; $size,
+                    hier =&gt; $path,
+                } if exists $usigs{$full_name} or $all_sigs;
+            }
+            else { # enddefinitions
+                last;
+            }
+        }
+    }
+
+    my $num_sigs = scalar keys %data;
+    unless ($num_sigs) {
+        if ($all_sigs) {
+            croak(&quot;Error: No signals were found in the VCD file $file.&quot;,
+                  'Check the VCD file for proper $var syntax.');
+        }
+        else {
+            croak(&quot;Error: No matching signals were found in the VCD file $file.&quot;,
+                  ' Use list_sigs to view all signals in the VCD file.');
+        }
+    }
+    if (($num_sigs&gt;1) and $use_stdout) {
+        croak(&quot;Error: There are too many signals ($num_sigs) for output &quot;,
+              'to STDOUT.  Use list_sigs to select a single signal.');
+    }
+
+    unless ($only_sigs) {
+        # Parse simulation section of VCD file
+        # Continue reading file
+        @sim_comments = ();
+        %dumps = ();
+        my $time = 0;
+        while (&lt;$fh&gt;) {
+            trim($_);
+            if (s/ ^ \$ comment \s* //x) {
+                my $line = $_;
+                my @lines;
+                push @lines, $_ if length $_;
+                while ($line !~ / \$end \b /x) {
+                    $line = &lt;$fh&gt;;
+                    push @lines, $line;
+                }
+                for my $line (@lines) {
+                    trim($line);
+                    $line =~ s/ \s* \$end \b //x;
+                }
+                pop @lines unless length $lines[-1];
+                my $comment = join &quot;\n&quot;, @lines;
+                push @sim_comments, {time =&gt; $time, comment =&gt; $comment};
+            }
+            elsif (/ ^ \$ (dump \w+) /x) {
+                push @{ $dumps{$1} }, $time;
+            }
+            elsif (/ ^ [#] (\d+) /x) {
+                $time = $mult * $1;
+            }
+            elsif (/ ^ ([01zx]) (.+) /xi  or / ^ [br] (\S+) \s+ (.+) /xi) {
+                my $value = lc $1;
+                my $code  = $2;
+                if (exists $data{$code}) {
+                    if ($use_stdout) {
+                        print &quot;$time $value\n&quot;;
+                    }
+                    else {
+                        push @{ $data{$code}{tv} }, [$time, $value];
+                    }
+                }
+            }
+        }
+        $endtime = $time;
+    }
+
+    close $fh;
+
+    return \%data;
+}
+
+sub calc_mult {
+    # Calculate a new multiplier for time values.
+    # Return numeric multiplier.
+    # Also sets the package $timescale variable.
+
+    my ($tscale, $opt) = @_;
+
+    my $new_units;
+    if (exists $opt-&gt;{timescale}) {
+        $new_units = lc $opt-&gt;{timescale};
+        $new_units =~ s/\s//g;
+        $timescale = &quot;1$new_units&quot;;
+    }
+    else {
+        $timescale = $tscale;
+        return 1;
+    }
+
+    my $mult;
+    my $units;
+    if ($tscale =~ / (\d+) \s* ([a-z]+) /xi) {
+        $mult  = $1;
+        $units = lc $2;
+    }
+    else {
+        croak(&quot;Error: Unsupported timescale found in VCD file: $tscale.  &quot;,
+              'Refer to the Verilog LRM.');
+    }
+
+    my %mults = (
+        'fs' =&gt; 1e-15,
+        'ps' =&gt; 1e-12,
+        'ns' =&gt; 1e-09,
+        'us' =&gt; 1e-06,
+        'ms' =&gt; 1e-03,
+         's' =&gt; 1e-00,
+    );
+    my $usage = join '|', sort { $mults{$a} &lt;=&gt; $mults{$b} } keys %mults;
+
+    my $scale;
+    if (exists $mults{$units}) {
+        $scale = $mults{$units};
+    }
+    else {
+        croak(&quot;Error: Unsupported timescale units found in VCD file: $units.  &quot;,
+              &quot;Supported values are: $usage&quot;);
+    }
+
+    my $new_scale;
+    if (exists $mults{$new_units}) {
+        $new_scale = $mults{$new_units};
+    }
+    else {
+        croak(&quot;Error: Illegal user-supplied timescale: $new_units.  &quot;,
+              &quot;Legal values are: $usage&quot;);
+    }
+
+    return (($mult * $scale) / $new_scale);
+}
+
+sub trim {
+    # Modify input string in-place
+    $_[0] =~ s/ \s+ \z //x;  # Remove trailing whitespace
+    $_[0] =~ s/ ^ \s+  //x;  # Remove leading  whitespace
+}
+
+sub get_timescale {
+    return $timescale;
+}
+
+sub get_endtime {
+    return $endtime;
+}
+
+sub get_date {
+    return $date;
+}
+
+sub get_version {
+    return $version;
+}
+
+sub get_decl_comments {
+    return @decl_comments;
+}
+
+sub get_sim_comments {
+    return @sim_comments;
+}
+
+sub get_dumps {
+    return %dumps;
+}
+
+
+=head1 NAME
+
+Verilog::VCD - Parse a Verilog VCD text file
+
+=head1 VERSION
+
+This document refers to Verilog::VCD version 0.07.
+
+=head1 SYNOPSIS
+
+    use Verilog::VCD qw(parse_vcd);
+    my $vcd = parse_vcd('/path/to/some.vcd');
+
+=head1 DESCRIPTION
+
+Verilog is a Hardware Description Language (HDL) used to model digital logic.
+While simulating logic circuits, the values of signals can be written out to
+a Value Change Dump (VCD) file.  This module can be used to parse a VCD file
+so that further analysis can be performed on the simulation data.  The entire
+VCD file can be stored in a Perl data structure and manipulated using
+standard hash and array operations.
+
+=head2 Input File Syntax
+
+The syntax of the VCD text file is described in the documentation of
+the IEEE standard for Verilog.  Only the four-state VCD format is supported.
+The extended VCD format (with strength information) is not supported.
+Since the input file is assumed to be legal VCD syntax, only minimal
+validation is performed.
+
+=head1 SUBROUTINES
+
+
+=head2 parse_vcd($file, $opt_ref)
+
+Parse a VCD file and return a reference to a data structure which
+includes hierarchical signal definitions and time-value data for all
+the specified signals.  A file name is required.  By default, all
+signals in the VCD file are included, and times are in units
+specified by the C&lt;$timescale&gt; VCD keyword.
+
+    my $vcd = parse_vcd('/path/to/some.vcd');
+
+It returns a reference to a nested data structure.  The top of the
+structure is a Hash-of-Hashes.  The keys to the top hash are the VCD
+identifier codes for each signal.  The following is an example
+representation of a very simple VCD file.  It shows one signal named
+C&lt;chip.cpu.alu.clk&gt;, whose VCD code is C&lt;+&gt;.  The time-value pairs
+are stored as an Array-of-Arrays, referenced by the C&lt;tv&gt; key.  The
+time is always the first number in the pair, and the times are stored in
+increasing order in the array.
+
+    {
+      '+' =&gt; {
+               'tv' =&gt; [
+                         [
+                           '0',
+                           '1'
+                         ],
+                         [
+                           '12',
+                           '0'
+                         ],
+                       ],
+               'nets' =&gt; [
+                           {
+                             'hier' =&gt; 'chip.cpu.alu.',
+                             'name' =&gt; 'clk',
+                             'type' =&gt; 'reg',
+                             'size' =&gt; '1'
+                           }
+                         ]
+             }
+    };
+
+Since each code could have multiple hierarchical signal names, the names are
+stored as an Array-of-Hashes, referenced by the C&lt;nets&gt; key.  The example above
+only shows one signal name for the code.
+
+
+=head3 OPTIONS
+
+Options to C&lt;parse_vcd&gt; should be passed as a hash reference.
+
+=over 4
+
+=item timescale
+
+It is possible to scale all times in the VCD file to a desired timescale.
+To specify a certain timescale, such as nanoseconds:
+
+    my $vcd = parse_vcd($file, {timescale =&gt; 'ns'});
+
+Valid timescales are:
+
+    s ms us ns ps fs
+
+=item siglist
+
+If only a subset of the signals included in the VCD file are needed,
+they can be specified by a signal list passed as an array reference.
+The signals should be full hierarchical paths separated by the dot
+character.  For example:
+
+    my @signals = qw(
+        top.chip.clk
+        top.chip.cpu.alu.status
+        top.chip.cpu.alu.sum[15:0]
+    );
+    my $vcd = parse_vcd($file, {siglist =&gt; \@signals});
+
+Limiting the number of signals can substantially reduce memory usage of the
+returned data structure because only the time-value data for the selected
+signals is loaded into the data structure.
+
+=item use_stdout
+
+It is possible to print time-value pairs directly to STDOUT for a
+single signal using the C&lt;use_stdout&gt; option.  If the VCD file has
+more than one signal, the C&lt;siglist&gt; option must also be used, and there
+must only be one signal specified.  For example:
+
+    my $vcd = parse_vcd($file, {
+                    use_stdout =&gt; 1,
+                    siglist    =&gt; [(top.clk)]
+                });
+
+The time-value pairs are output as space-separated tokens, one per line.
+For example:
+
+    0 x
+    15 0
+    277 1
+    500 0
+
+Times are listed in the first column.
+Times units can be controlled by the C&lt;timescale&gt; option.
+
+=item only_sigs
+
+Parse a VCD file and return a reference to a data structure which
+includes only the hierarchical signal definitions.  Parsing stops once
+all signals have been found.  Therefore, no time-value data are
+included in the returned data structure.  This is useful for
+analyzing signals and hierarchies.
+
+    my $vcd = parse_vcd($file, {only_sigs =&gt; 1});
+
+=back
+
+
+=head2 list_sigs($file)
+
+Parse a VCD file and return a list of all signals in the VCD file.
+Parsing stops once all signals have been found.  This is
+helpful for deciding how to limit what signals are parsed.
+
+Here is an example:
+
+    my @signals = list_sigs('input.vcd');
+
+The signals are full hierarchical paths separated by the dot character
+
+    top.chip.cpu.alu.status
+    top.chip.cpu.alu.sum[15:0]
+
+=head2 get_timescale( )
+
+This returns a string corresponding to the timescale as specified
+by the C&lt;$timescale&gt; VCD keyword.  It returns the timescale for
+the last VCD file parsed.  If called before a file is parsed, it
+returns an undefined value.  If the C&lt;parse_vcd&gt; C&lt;timescale&gt; option
+was used to specify a timescale, the specified value will be returned
+instead of what is in the VCD file.
+
+    my $vcd = parse_vcd($file); # Parse a file first
+    my $ts  = get_timescale();  # Then query the timescale
+
+=head2 get_endtime( )
+
+This returns the last time found in the VCD file, scaled
+appropriately.  It returns the last time for the last VCD file parsed.
+If called before a file is parsed, it returns an undefined value.
+
+    my $vcd = parse_vcd($file); # Parse a file first
+    my $et  = get_endtime();    # Then query the endtime
+
+=head2 get_date( )
+
+This returns a string corresponding to the date as specified
+by the C&lt;$date&gt; VCD keyword.  It returns the date for
+the last VCD file parsed.  If called before a file is parsed, it
+returns an undefined value.
+
+    my $vcd  = parse_vcd($file); # Parse a file first
+    my $date = get_date();       # Then query the date
+
+=head2 get_version( )
+
+This returns a string corresponding to the version as specified
+by the C&lt;$version&gt; VCD keyword.  It returns the version for
+the last VCD file parsed.  If called before a file is parsed, it
+returns an undefined value.
+
+    my $vcd     = parse_vcd($file); # Parse a file first
+    my $version = get_version();    # Then query the version
+
+=head2 get_decl_comments( )
+
+This returns an array corresponding to the comments as specified by the
+C&lt;$comment&gt; VCD keyword in the declaration section of the VCD file.  There
+may be any number of C&lt;$comment&gt; keywords in the file.  It returns the
+comments for the last VCD file parsed.  If called before a file is parsed,
+it returns an empty array.  If there are no C&lt;$comment&gt; keywords in the
+declaration section of the file, it returns an empty array.
+
+    my $vcd   = parse_vcd($file);    # Parse a file first
+    my @comms = get_decl_comments(); # Then query the comments
+
+=head2 get_sim_comments( )
+
+This returns an array-of-hashes corresponding to the comments as specified
+by the C&lt;$comment&gt; VCD keyword in the simulation section of the VCD file.
+There may be any number of C&lt;$comment&gt; keywords in the file.  It returns
+the comments for the last VCD file parsed.  If called before a file is
+parsed, it returns an empty array.  If there are no C&lt;$comment&gt; keywords in
+the declaration section of the file, it returns an empty array.
+
+    my $vcd   = parse_vcd($file);    # Parse a file first
+    my @comms = get_sim_comments();  # Then query the comments
+
+The time at which the comment occurred is included with each comment.
+An example returned structure is:
+
+    ({time =&gt; 123, comment =&gt; '1st comment'},
+     {time =&gt; 456, comment =&gt; '2nd comment'})
+
+=head2 get_dumps( )
+
+This returns a hash-of-arrays corresponding to the C&lt;$dump*&gt; VCD keywords
+(C&lt;$dumpvars&gt;, C&lt;$dumpon&gt;, etc.) in the simulation section of the VCD
+file.  The keys of the hash are the keywords, and the values are the
+simulation times at which the keywords occurred.  It returns the dump
+commands for the last VCD file parsed.  If called before a file is parsed,
+it returns an empty hash.
+
+    my $vcd   = parse_vcd($file);   # Parse a file first
+    my %dumps = get_dumps();        # Then query the dump commands
+
+=head1 EXPORT
+
+Nothing is exported by default.  Functions may be exported individually, or
+all functions may be exported at once, using the special tag C&lt;:all&gt;.
+
+=head1 DIAGNOSTICS
+
+Error conditions cause the program to die using C&lt;croak&gt; from the
+L&lt;Carp|Carp&gt; Core module.
+
+=head1 LIMITATIONS
+
+The extended VCD format (with strength information) is not supported.
+
+The default mode of C&lt;parse_vcd&gt; is to load the entire VCD file into the
+data structure.  This could be a problem for huge VCD files.  The best solution
+to any memory problem is to plan ahead and keep VCD files as small as possible.
+When simulating, dump fewer signals and scopes, and use shorter dumping
+time ranges.  Another technique is to parse only a small list of signals
+using the C&lt;siglist&gt; option; this method only loads the desired signals into
+the data structure.  Finally, the C&lt;use_stdout&gt; option will parse the input VCD
+file line-by-line, instead of loading it into the data structure, and directly
+prints time-value data to STDOUT.  The drawback is that this only applies to
+one signal.
+
+=head1 BUGS
+
+There are no known bugs in this module.
+
+=head1 SEE ALSO
+
+Refer to the following Verilog documentation:
+
+    IEEE Standard for Verilog (c) Hardware Description Language
+    IEEE Std 1364-2005
+    Section 18.2, &quot;Format of four-state VCD file&quot;
+
+=head1 AUTHOR
+
+Gene Sullivan (gsullivan@cpan.org)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2012 Gene Sullivan.  All rights reserved.
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.  See L&lt;perlartistic|perlartistic&gt;.
+
+=cut
+
+1;
+
+</code></pre>
+
+</div>
+
+                </div>
+            </div>
+
+            <div class="row footer">
+                <div class="hidden-xs hidden-sm col-md-2">&nbsp;</div>
+                <div class="col-xs-2 col-sm-1 col-md-1" style="text-align: center">
+                    <a href="https://github.com/CPAN-API/cpan-api/blob/master/docs/API-docs.md">API</a>
+                </div>
+                <div class="col-xs-5 col-sm-3 col-md-2" style="text-align: center">
+                    <a href="/about">About MetaCPAN</a>
+                </div>
+                <div class="hidden-xs col-sm-2 col-md-2" style="text-align: center">
+                    <a href="/mirrors">CPAN Mirrors</a>
+                </div>
+                <div class="hidden-xs col-sm-3 col-md-2" style="text-align: center">
+                    <a href="https://github.com/CPAN-API/metacpan-web">Fork metacpan.org</a>
+                </div>
+                <div class="hidden-xs col-sm-1 col-md-1" style="text-align: center">
+                    <a href="https://www.perl.org/">Perl.org</a>
+                </div>
+            </div>
+
+            <div class="row" style="padding:15px">
+              <div class="hidden-xs col-md-4 text-right" style="padding:25px">
+                <span class="hidden-phone" style="color: #999">Hosting generously provided by:</span>
+              </div>
+              <div class="col-xs-9 col-md-4" style="padding:25px">
+                <a href="http://www.bytemark.co.uk/r/metacpan.org/" target="_blank">
+                  <img width="210" src="/static/images/sponsors/bytemark_logo.png">
+                </a>
+              </div>
+              <div class="col-xs-9 col-md-4" style="padding:15px">
+                <a target="_blank" href="https://www.liquidweb.com/">
+                  <img width="170" src="/static/images/sponsors/liquidweb_color.png">
+                </a>
+              </div>
+            </div>
+        </div>
+        <div class="modal fade" tabindex="-1" role="dialog" id="keyboard-shortcuts">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h4 class="modal-title">Keyboard Shortcuts</h4>
+              </div>
+              <div class="modal-body row">
+                <div class="col-md-6">
+  <table class="table keyboard-shortcuts">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Global</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="keys">
+          <kbd>s</kbd>
+        </td>
+        <td>Focus search bar</td>
+      </tr>
+      <tr>
+        <td class="keys">
+          <kbd>?</kbd>
+        </td>
+        <td>Bring up this help dialog</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <table class="table keyboard-shortcuts">
+    <thead>
+      <tr>
+        <th></th>
+        <th>Github</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="keys">
+          <kbd>g</kbd> <kbd>p</kbd>
+        </td>
+        <td>Go to pull requests</td>
+      </tr>
+      <tr>
+        <td class="keys">
+          <kbd>g</kbd> <kbd>i</kbd>
+        </td>
+        <td>go to github issues (only if github is preferred repository)</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="col-md-6">
+  <table class="table keyboard-shortcuts">
+    <thead>
+      <tr>
+        <th></th>
+        <th>POD</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="keys">
+          <kbd>g</kbd> <kbd>a</kbd>
+        </td>
+        <td>Go to author</td>
+      </tr>
+      <tr>
+        <td class="keys">
+          <kbd>g</kbd> <kbd>c</kbd>
+        </td>
+        <td>Go to changes</td>
+      </tr>
+      <tr>
+        <td class="keys">
+          <kbd>g</kbd> <kbd>i</kbd>
+        </td>
+        <td>Go to issues</td>
+      </tr>
+      <tr>
+        <td class="keys">
+          <kbd>g</kbd> <kbd>d</kbd>
+        </td>
+        <td>Go to dist</td>
+      </tr>
+      <tr>
+        <td class="keys">
+          <kbd>g</kbd> <kbd>r</kbd>
+        </td>
+        <td>Go to repository/SCM</td>
+      </tr>
+      <tr>
+        <td class="keys">
+          <kbd>g</kbd> <kbd>s</kbd>
+        </td>
+        <td>Go to source</td>
+      </tr>
+      <tr>
+        <td class="keys">
+          <kbd>g</kbd> <kbd>b</kbd>
+        </td>
+        <td>Go to file browse</td>
+      </tr>
+
+    </tbody>
+  </table>
+</div>
+
+              </div>
+              <div class="modal-footer"></div>
+            </div>
+          </div>
+        </div>
+    </body>
+</html>

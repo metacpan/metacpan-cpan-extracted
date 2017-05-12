@@ -1,0 +1,185 @@
+---
+abstract: 'Encrypt/decrypt files in Padre'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
+build_requires:
+  Locale::Msgfmt: 0.15
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Padre-Plugin-Encrypt
+requires:
+  Crypt::Blowfish: 0
+  Crypt::CBC: 0
+  Padre: 0.57
+resources:
+  homepage: http://padre.perlide.org
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-Encrypt/
+version: 0.12
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@PadrePlugin/@Filter/GatherDir'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@PadrePlugin/@Filter/PruneCruft'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@PadrePlugin/@Filter/ManifestSkip'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@PadrePlugin/@Filter/MetaYAML'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@PadrePlugin/@Filter/License'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@PadrePlugin/@Filter/Readme'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@PadrePlugin/@Filter/ExtraTests'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@PadrePlugin/@Filter/ExecDir'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@PadrePlugin/@Filter/ShareDir'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@PadrePlugin/@Filter/Manifest'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@PadrePlugin/@Filter/TestRelease'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@PadrePlugin/@Filter/ConfirmRelease'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@PadrePlugin/@Filter/UploadToCPAN'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::CheckChangeLog
+      name: '@PadrePlugin/CheckChangeLog'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::CheckChangesTests
+      name: '@PadrePlugin/CheckChangesTests'
+      version: 1.100900
+    -
+      class: Dist::Zilla::Plugin::CompileTests
+      name: '@PadrePlugin/CompileTests'
+      version: 1.103030
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@PadrePlugin/EOLTests'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@PadrePlugin/PkgVersion'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@PadrePlugin/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@PadrePlugin/MetaResources'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@PadrePlugin/MetaConfig'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@PadrePlugin/MetaJSON'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@PadrePlugin/NextRelease'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@PadrePlugin/PodSyntaxTests'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      name: '@PadrePlugin/ModuleBuild'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::LocaleMsgfmt
+      name: '@PadrePlugin/LocaleMsgfmt'
+      version: 1.202
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@PadrePlugin/TestMoreDeps'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@PadrePlugin/LocaleMsgfmtDeps'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: '@PadrePlugin/PadreDeps'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.102345
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.102345

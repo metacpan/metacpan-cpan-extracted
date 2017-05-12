@@ -1,0 +1,3 @@
+docs: |
+    L<MIME::QuotedPrint> provides functions for encoding and decoding
+    quoted-printable strings.

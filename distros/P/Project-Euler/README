@@ -1,0 +1,105 @@
+NAME
+    Project::Euler - Solutions for <http://projecteuler.net>
+
+VERSION
+    version 0.20
+
+SYNOPSIS
+        use Project::Euler::Problem::P001;
+        my $problem1 = Project::Euler::Problem::P001->new;
+
+        $problem1->solve;
+        print $problem1->status;
+
+DESCRIPTION
+    This is the base class which will eventually be responsible for
+    displaying the interface to interact with the solutions implemented so
+    far.
+
+    For now, you will have to manually import the problem_solutions and
+    solve them manually.
+
+LIBRARIES
+    These libraries are used by the problem solutions:
+
+    1   Project::Euler::Lib::Utils
+
+    2   Project::Euler::Lib::Types
+
+PROBLEMS
+    These problems are fully implemented so far (extending the base class
+    Project::Euler::Problem::Base)
+
+    1   Project::Euler::Problem::P001
+
+    2   Project::Euler::Problem::P002
+
+    3   Project::Euler::Problem::P003
+
+    4   Project::Euler::Problem::P004
+
+    5   Project::Euler::Problem::P005
+
+AUTHOR
+    Adam Lesperance <lespea@gmail.com>
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Project::Euler
+
+  Websites
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Project-Euler>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Project-Euler>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Project-Euler>
+
+    *   CPAN Forum
+
+        <http://cpanforum.com/dist/Project-Euler>
+
+    *   RT: CPAN's Bug Tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Project-Euler>
+
+    *   CPANTS Kwalitee
+
+        <http://cpants.perl.org/dist/overview/Project-Euler>
+
+    *   CPAN Testers Results
+
+        <http://cpantesters.org/distro/P/Project-Euler.html>
+
+    *   CPAN Testers Matrix
+
+        <http://matrix.cpantesters.org/?dist=Project-Euler>
+
+    *   Source Code Repository
+
+        The code is open to the world, and available for you to hack on.
+        Please feel free to browse it and play with it, or whatever. If you
+        want to contribute patches, please send me a diff or prod me to pull
+        from your repository :)
+
+        <git://github.com/lespea/Project-Euler>
+
+  Bugs
+    Please report any bugs or feature requests to "bug-project-euler at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Project-Euler>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Adam Lesperance.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

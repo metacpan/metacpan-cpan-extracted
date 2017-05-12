@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+#Time-stamp: "2001-05-25 21:28:36 MDT"
+
+use Pod::PXML;
+if(@ARGV == 0) {
+  print '', Pod::PXML::xml2pod(\join '', <STDIN>);
+} elsif(@ARGV == 1) {
+  print '', Pod::PXML::xml2pod($ARGV[0]);
+} else {
+  print STDERR "$0: Too many arguments\n";
+}

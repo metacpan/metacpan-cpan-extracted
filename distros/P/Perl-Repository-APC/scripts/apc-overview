@@ -1,0 +1,60 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Perl::Repository::APC 1.029;
+
+my $Id = q$Id: apc-overview.pl 32 2003-01-26 07:16:55Z k $;
+
+use Getopt::Long;
+our %Opt;
+GetOptions(\%Opt, qw(
+                     h!
+                     version!
+                     wide!
+                    )) or die Usage();
+if ($Opt{h}) {
+  print Usage();
+  exit;
+}
+if ($Opt{version}) {
+  print $Id, "\n";
+  exit;
+}
+
+my $APC = shift || "APC";
+my $apc = Perl::Repository::APC->new($APC);
+printf "%-22s %11s   %5s %6s (%s)\n", qw(Branch Perl-Version 1st last patchcount);
+for my $apcdir ($apc->apcdirs) {
+  if ($Opt{wide}) {
+    printf("%-24s %10s  %6d %6d (%4d) %-15s %s\n",
+           @{$apcdir}{"branch","perl"},
+           $apcdir->{patches}[0],
+           $apcdir->{patches}[-1],
+           scalar @{$apcdir->{patches}},
+           $apcdir->{dir} || "",
+           $apcdir->{diffdir} || "",
+         );
+  } else {
+    printf("%-24s %10s  %6d %6d (%4d)\n",
+           @{$apcdir}{"branch","perl"},
+           $apcdir->{patches}[0],
+           $apcdir->{patches}[-1],
+           scalar @{$apcdir->{patches}},
+         );
+  }
+}
+
+sub Usage {
+  return <<USAGE;
+Usage:
+    $0 [apc-directory]  # show one line info per directory
+    -- or --
+    $0 options
+    Available options:
+    --h              # this help message
+    --version        # print version and exit
+
+    apc-directory defaults to "APC"
+USAGE
+}

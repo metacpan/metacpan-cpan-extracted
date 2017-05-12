@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 66237ac18fdf34533353a45ea6355efaaf9743db Changes
+SHA1 86e161c90a7b82fe1b405ff58bf8d29fcc16f1cd Example.pm
+SHA1 1179f98d0de353aafbd6ac4d01401f030d8a1003 LICENSE
+SHA1 58b0900b9cd1b67cc5e9605eb49dc53c83dba7e5 MANIFEST
+SHA1 2355229b56def9656c946622b96bd101f8d0f432 META.yml
+SHA1 6ba8175dcb65aca31f2ebe170f48728ce215337c Makefile.PL
+SHA1 2dd83620e2ef5b59fcd8c80bc706762733350167 README
+SHA1 b945b0700d46791e1fdc605567b65cf38c05c0ad examples/ex1.pl
+SHA1 cd17d2deadc3f9b92f1dce8027e4574c699e88d9 examples/ex2.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 6b2b8eeb21b564cbe1fddb828a95bec69ed4f949 t/Pod-Example/01-use.t
+SHA1 e22756752cb10a181ec38598ab051ac853e77434 t/Pod-Example/02-version.t
+SHA1 3d55c8ebf5c6e32e50c99ef7b0be2b0fc2e89eaf t/Pod-Example/03-get.t
+SHA1 5c9c0ac49b1f43f181c6b585bf8de3cdf3d82a0a t/modules/Ex1.pm
+SHA1 9ab09b629fb7691e8410ab5a6805650bba0bee59 t/modules/Ex2.pm
+SHA1 97f219dfa504763deced0f6f13bd5cf21237b9a5 t/modules/Ex3.pm
+SHA1 be47e7d578693fdb8737aa104449b2157421fbbc t/modules/Ex4.pm
+SHA1 f1228ac11d9fb3cf86b15ff792edd71c9b53e513 t/modules/Ex5.pm
+SHA1 9c28b7d2a0660ab372e96a14a7a4b2520d91cdf7 t/modules/Ex6.pm
+SHA1 0f7f25b54e70eb2e8f7fd31c417c5e649eadefe5 t/modules/Ex7.pm
+SHA1 b259be47549b9c331a99952d79cdf0311d098ce1 t/modules/Ex8.pm
+SHA1 0d669e52511fac4b591eb1d6dacc22c7f786085e xt/Pod-Example/01-pod_coverage.t
+SHA1 7088d5c992a0d4dfc813cfaf44fa2cb2b969f03b xt/Pod-Example/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWHh6RAAoJEJe+XXKaIuTlokoH/icGbBMNBXr3FFcVfkEArprO
+Y+nsT50QtQf0wfphKdgWXBfEt+5HUqC+BTSK9IliskwUhc264ilrRYLTU4kYGttr
+PfiG7n6kADvgqtQHn0HYPxdWNfuuNPsmzUmExYVUpXiOQNG0X4/fyXmsLFeyJCkn
+ZZKIXPgJJiDpk2HiO4BnxkWay+9f/LhQ13SZD2x3do2ZPvv9FYhdCyI0pSnAOYRW
+pszPO3tRKU6zxFiD6OLpNexgwngH3iW1UKGh4kbwPCRlVniUnVUUcOIQbZV3BASF
+ehq3JXx59NCd0zVT+EWU6L4EybQncGUpf+jkd1829zi+JLmr4AfsS0O3bKUUo78=
+=3hUg
+-----END PGP SIGNATURE-----

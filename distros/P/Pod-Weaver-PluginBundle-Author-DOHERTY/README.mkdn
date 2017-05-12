@@ -1,0 +1,36 @@
+# NAME
+
+Pod::Weaver::PluginBundle::Author::DOHERTY - Pod::Weaver configuration the way DOHERTY does it
+
+# VERSION
+
+version 0.009
+
+# AVAILABILITY
+
+The project homepage is [http://metacpan.org/release/Pod-Weaver-PluginBundle-Author-DOHERTY/](http://metacpan.org/release/Pod-Weaver-PluginBundle-Author-DOHERTY/).
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
+site near you, or see [https://metacpan.org/module/Pod::Weaver::PluginBundle::Author::DOHERTY/](https://metacpan.org/module/Pod::Weaver::PluginBundle::Author::DOHERTY/).
+
+# SOURCE
+
+The development version is on github at [http://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY](http://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY)
+and may be cloned from [git://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY.git](git://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY.git)
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY/issues](https://github.com/doherty/Pod-Weaver-PluginBundle-Author-DOHERTY/issues).
+
+# AUTHOR
+
+Mike Doherty <doherty@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Mike Doherty.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

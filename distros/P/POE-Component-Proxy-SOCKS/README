@@ -1,0 +1,238 @@
+NAME
+
+    POE::Component::Proxy::SOCKS - A POE based SOCKS 4 proxy server.
+
+VERSION
+
+    version 1.04
+
+SYNOPSIS
+
+       use strict;
+       use Net::Netmask;
+       use POE qw(Component::Proxy::SOCKS);
+    
+       $|=1;
+    
+       POE::Session->create(
+          package_states => [
+            'main' => [ qw(_start _default socksd_registered) ],
+          ],
+       );
+    
+       $poe_kernel->run();
+       exit 0;
+    
+       sub _start {
+         my ($kernel,$heap) = @_[KERNEL,HEAP];
+         $heap->{socksd} = POE::Component::Proxy::SOCKS->spawn( alias => 'socksd', ident => 0 );
+         return;
+       }
+    
+       sub socksd_registered {
+         my $socksd = $_[ARG0];
+         my $all = Net::Netmask->new2('any');
+         my $loopback = Net::Netmask->new2('127.0.0.1');
+         my $local = Net::Netmask->new2('192.168.1.0/24');
+         $socksd->add_denial( $all );
+         $socksd->add_exemption( $loopback );
+         $socksd->add_exemption( $local );
+         return;
+       }
+    
+       sub _default {
+         my ($event, $args) = @_[ARG0 .. $#_];
+         my @output = ( "$event: " );
+    
+         foreach my $arg ( @$args ) {
+           if ( ref($arg) eq 'ARRAY' ) {
+              push( @output, "[" . join(" ,", @$arg ) . "]" );
+           } else {
+              push ( @output, "'$arg'" );
+           }
+         }
+         print STDOUT join ' ', @output, "\n";
+         return 0;
+       }
+
+DESCRIPTION
+
+    POE::Component::Proxy::SOCKS is a POE component that implements a SOCKS
+    version 4/4a proxy server. It has IP address based access controls,
+    provided by Net::Netmask, and can use IDENT to further confirm user
+    identity.
+
+    POE sessions may register with the SOCKS component to receive events
+    relating to connections etc.
+
+    The poco supports both SOCKS CONNECT and SOCKS BIND commands.
+
+CONSTRUCTOR
+
+    spawn
+
+      Starts a new SOCKS proxy session and returns an object. If spawned
+      from within another POE session, the parent session will be
+      automagically registered and receive a socksd_registered event. See
+      below for details.
+
+      Takes several optional parameters:
+
+        'alias', a kernel alias to address the poco by;
+        'address', set a particular IP address on a multi-homed box to bind to;
+        'port', set a particular TCP port to listen on, default 1080;
+        'ident', indicate whether ident lookups should be performed, default 0;
+        'options', pass a hashref of POE session options;
+        'time_out', adjust the time out period in seconds, default is 120 seconds;
+
+METHODS
+
+    These methods are available on the returned
+    POE::Component::Proxy::SOCKS object:
+
+    session_id
+
+      Returns the POE session ID of the poco's session.
+
+    shutdown
+
+      Terminates the poco, dropping all connections and pending
+      connections.
+
+    send_event
+
+      Sends an event through the poco's event handling system.
+
+    add_denial
+
+      Takes one mandatory argument. The mandatory argument is a
+      Net::Netmask object that will be used to check connecting IP
+      addresses against.
+
+    del_denial
+
+      Takes one mandatory argument, a Net::Netmask object to remove from
+      the current denial list.
+
+    denied
+
+      Takes one argument, an IP address. Returns true or false depending on
+      whether that IP is denied or not.
+
+    add_exemption
+
+      Takes one mandatory argument, a Net::Netmask object that will be
+      checked against connecting IP addresses for exemption from denials.
+
+    del_exemption
+
+      Takes one mandatory argument, a Net::Netmask object to remove from
+      the current exemption list.
+
+    exempted
+
+      Takes one argument, an IP address. Returns true or false depending on
+      whether that IP is exempt from denial or not.
+
+INPUT EVENTS
+
+    register
+
+      Takes N arguments: a list of event names that your session wants to
+      listen for, minus the 'socksd_' prefix, ( this is similar to
+      POE::Component::IRC ).
+
+      Registering for 'all' will cause it to send all SOCKSD-related events
+      to you; this is the easiest way to handle it.
+
+    unregister
+
+      Takes N arguments: a list of event names which you don't want to
+      receive. If you've previously done a 'register' for a particular
+      event which you no longer care about, this event will tell the SOCKSD
+      to stop sending them to you. (If you haven't, it just ignores you. No
+      big deal).
+
+    shutdown
+
+      Terminates the poco, dropping all connections and pending
+      connections.
+
+OUTPUT EVENTS
+
+    The component generates a number of socksd_ prefixed events that are
+    dispatched to registered sessions.
+
+    socksd_registered
+
+      This event is sent to a registering session. ARG0 is
+      POE::Component::Proxy::SOCKS object.
+
+    socksd_denied
+
+      Generated whenever a client is denied access. ARG0 is the client IP
+      and ARG1 the client port.
+
+    socksd_connection
+
+      Generated when client successfully connects. ARG0 is a unique client
+      ID, ARG1 is the peer address, ARG2 is the peer port, ARG3 is our
+      socket address and ARG4 is our socket port.
+
+    socksd_rejected
+
+      Generated when a SOCKS transaction is rejected. ARG0 is the unique
+      client ID, ARG1 is the SOCKS result code and ARG2 is a reason for the
+      rejection.
+
+    socksd_listener_failed
+
+      Generated if the poco fails to get a listener. ARG0 is the operation,
+      ARG1 is the errnum and ARG2 is the errstr.
+
+    socksd_disconnected
+
+      Generated whenever a client disconnects. ARG0 is the unique client
+      ID.
+
+    socksd_dns_lookup
+
+      Generated whenever the poco services a successful SOCKS 4a DNS
+      lookup. ARG0 is the unique client ID. ARG1 is the hostname resolved
+      and ARG2 is the IP address of that host.
+
+    socksd_sock_up
+
+      Generated when a CONNECT is successful. ARG0 is the unique client ID,
+      ARG1 is the unqiue link ID, ARG2 is the destination IP and ARG3 the
+      destination port.
+
+    socksd_bind_up
+
+      Generated whenever a BIND is succesful. ARG0 is the unique client ID,
+      ARG1 is the unique ID for the listener, ARG2 is our socket IP and
+      ARG3 is our port.
+
+    socksd_sock_down
+
+      Generated whenever a socket to an application server is terminated.
+      ARG0 is the unique client ID, ARG1 is the unqiue link ID, ARG2 is the
+      error string.
+
+SEE ALSO
+
+    http://socks.permeo.com/protocol/socks4.protocol
+
+    http://socks.permeo.com/protocol/socks4a.protocol
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

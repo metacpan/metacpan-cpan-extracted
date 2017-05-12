@@ -1,0 +1,23 @@
+This directory contains example scripts using PPIx::Regexp. Specifically:
+
+README - is this file.
+
+interpolated - is a script that takes as its arguments a list of files
+    and/or directories, and lists all Perl regular expressions which
+    interpolate. If the -once option is asserted, only those expressions
+    which interpolate and do not have the /o modifier are listed.
+
+predump - is a script that takes as its argument a regular expression,
+    and dumps the parse tree. Various command options are available to
+    control the dump. The -help option gets you complete documentation
+    of the script.
+
+prenav - is a script that takes as its single argument a regular
+    expression.  The user can then interactively navigate around the
+    parse tree. The 'help' command gives help.
+
+preslurp - is a script that makes files into PPI::Document objects, then
+    extracts the regular expression tokens from the documents and
+    dumps them. Various command options are available to control the
+    dump. The -help option gets you complete documentation of the
+    script.

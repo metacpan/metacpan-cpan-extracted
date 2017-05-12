@@ -1,0 +1,16 @@
+Revision history for Perl extension Parallel-Async
+
+0.03 2013-10-08T12:59:13Z
+
+  - fixed dependency.
+  - fixed logic for emulate exit code of die.
+  - added daemonize feature.
+
+0.02 2013-09-27T18:00:49Z
+
+  - fixed dependency.
+  - fixed pod.
+
+0.01 2013-09-27T17:39:44Z
+
+  - original version.

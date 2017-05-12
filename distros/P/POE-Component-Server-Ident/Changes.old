@@ -1,0 +1,36 @@
+POE::Component::Server::Ident
+=============================
+
+1.16	Thu May 28 13:35:34 BST 2009
+	- Refactored all the tests to use Test::POE::Client::TCP. 
+	- Fixed a race condition in shutdown().
+
+1.14	Tue Jul  1 08:42:49 BST 2008
+	- Added LICENSE information.
+
+1.12	Fri Jan 18 15:46:38 GMT 2008
+	- Fixed test script naming
+
+1.10	Thu Nov  1 09:44:59 GMT 2007
+	- Updated Module::Install to 0.68
+
+1.09	Sat Jul 28 12:30:01 BST 2007
+	- Fixed abstract_from and build_requires in Makefile.PL
+	- Some documentation amendments
+
+1.08	Mon Feb 19 13:47:28 GMT 2007
+	- Added kwalitee test.
+
+1.07	Thu Jan 18 17:13:47 GMT 2006
+	- Makefile.PL fully M::I-ified.
+	- Major code tidying.
+	- session_id() method.
+
+1.06	Mon Sep 25 15:31:42 BST 2006
+	- Switched to Module::Install
+
+1.05	Sat Sep  9 14:38:54 BST 2006
+	- Rearranged distribution structure.
+	- Added Changes file
+	- Added pod and pod coverage tests.
+	- Fixed pod and coverage.

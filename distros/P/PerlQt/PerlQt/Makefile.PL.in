@@ -1,0 +1,219 @@
+
+### do not edit Makefile.PL, edit Makefile.PL.in
+
+use Config;
+use File::Spec;
+use strict;
+
+my %x;
+$x{'prefix'}  =   '@prefix@';
+$x{'exec_prefix'}='@exec_prefix@';
+$x{'libdir'}  =   '@libdir@';
+$x{'datadir'} =   '@datadir@';
+$x{'qt_libraries'} = '@qt_libraries@';
+$x{'LIBPNG'}  =   '@LIBPNG@';
+$x{'LIBJPEG'} =   '@LIBJPEG@';
+$x{'LIBSM'}   =   '@LIBSM@';
+$x{'LIBSOCKET'} = '@LIBSOCKET@';
+$x{'LIBRESOLV'} = '@LIBRESOLV@';
+$x{'LIB_X11'} =   '@LIB_X11@';
+$x{'X_PRE_LIBS'} = '@X_PRE_LIBS@';
+
+interpolate('LIB_X11', 'exec_prefix', 'libdir', 'datadir');
+
+my $objects='Qt$(OBJ_EXT) handlers$(OBJ_EXT)';
+my $qtlib ='@LIB_QT@';
+
+interpolate(\$qtlib);
+
+my $rpath='@USE_RPATH@';
+
+my $cxx = '@CXX@';
+my $sh= '@SHELL@';
+my $topdir= '@top_builddir@';
+if($^O =~ /solaris/i && $cxx eq 'CC') {
+  # we have Forte/Sunworkshop on Solaris
+  # do we build only static libs?
+  my $only_static = 0;
+  foreach(`$topdir/libtool --config 2>&1`) {
+    /^build_libtool_libs=no/ && $only_static++;
+    /^build_old_libs=yes/ && $only_static++;
+  }
+  # ...then add the C++ runtime lib
+  $qtlib .= ' -lCrun' if($only_static == 2);
+}
+
+my $libtool = File::Spec->catfile( $topdir, "libtool" );
+my $devnull = File::Spec->devnull();
+my $libtool_rpath = `$libtool --mode=link $cxx -o foo.so foo.o -R $x{'libdir'} -R $x{'qt_libraries'} 2>${devnull}`;
+$libtool_rpath = "" unless $libtool_rpath =~ s/.*foo.so foo.o//s;
+chomp $libtool_rpath;
+$rpath = $rpath eq "yes" ? 
+		($libtool_rpath ? 
+			$libtool_rpath : 
+			('@CXX@' eq 'g++' ? 
+				"-Wl,--rpath -Wl,$x{'libdir'} -Wl,--rpath -Wl,$x{'qt_libraries'}" : ""
+			)
+		) : "";
+
+my @scripts = ("bin/pqtsh", "bin/pqtapi");
+
+my $cxxflags = '@CXXFLAGS@';
+   $cxxflags =~ s/ -pedantic / /g;
+   $cxxflags =~ s/ -Wwrite-strings / /g;
+   $cxxflags =~ s/ -Wall / /g;
+
+my $doc_dir_glob;
+
+###
+
+use ExtUtils::MakeMaker;
+use Cwd;
+
+my $pwd = getcwd;
+my @pwd = File::Spec->splitdir( $pwd );
+pop @pwd;
+my $abs_topdir = File::Spec->catdir(@pwd);
+my $localsmoke = File::Spec->catdir($abs_topdir,"smoke","qt",".libs");
+
+
+# See lib/ExtUtils/MakeMaker.pm for details of how to influence
+# the contents of the Makefile that is written.
+
+WriteMakefile(
+    'NAME'		=> 'Qt',
+    'VERSION_FROM'	=> 'Qt.pm', # finds $VERSION
+    'PREREQ_PM'		=> {}, # e.g., Module::Name => 1.1,
+    'INC'		=> '@all_includes@ -I. -I../smoke',
+    'LIBS'		=> ['@all_libraries@'." -L$localsmoke -lsmokeqt ".'@LIBCRYPT@'." $qtlib"],
+#   'XS'		=> {'Qt.xs' => 'Qt.cpp'}, # does not work ... still expects Qt.c 
+    'XSOPT'		=> "-C++",
+    'OBJECT'		=> "$objects",  # Object files
+    'CC'		=> '@CXX@',
+    # use the CC/g++ utility to link if linking is done with cc/gcc
+    ($Config{ld} =~ /cc/ ? (
+      'LD'		=> '@CXX@'
+     ) : ()),
+    'INST_BIN'          => './bin',
+    'DEFINE'            => $cxxflags,
+    'H'                 => ["marshall.h", "perlqt.h", "smokeperl.h"],
+    'ABSTRACT'		=> "An OO interface to Trolltech's Qt toolkit",
+    'dynamic_lib'       => {'OTHERLDFLAGS' => $rpath},
+    ($] >= 5.005 ?    ## Add these new keywords supported since 5.005
+      (
+       AUTHOR     => 'Ashley Winters <qaqortog@nwlink.com>') : ()),
+);
+
+sub MY::clean {
+                   package MY;
+                   my $i = shift->SUPER::clean(@_);
+                   my $pl = '$(PERL) Makefile.PL';
+                   $i =~ s/\n+$/\n\t$pl$&/s;
+                   $i;
+}
+
+sub MY::const_loadlibs {
+                   package MY;
+                   my $i = shift->SUPER::const_loadlibs(@_);
+                   # hacks for linking against a non-yet-installed smoke
+                   $i =~ s/((?:EXTRALIBS|LDLOADLIBS).*?)\n/$1 -L$localsmoke -lsmokeqt\n/gs unless $i =~/-lsmokeqt/;
+                   $i =~ s#(LD_RUN_PATH.*?)(${localsmoke})?\n#"$1".($2?"":":")."$x{'libdir'}\n"#se;
+                   $i;
+}
+
+sub MY::dist {
+		  package MY;
+                   my $i = shift->SUPER::dist(@_);
+                   $i =~ s#(DISTVNAME =).*?\n#$1 \$(distdir)\n#s;
+                   $i;
+}
+
+sub MY::install {
+		  package MY;
+		  my $i = shift->SUPER::install(@_);
+		  my $lng = $ENV{LANG};
+		  my $doc_dir = File::Spec->catdir($x{'datadir'},"PerlQt-3");
+		  my $src= File::Spec->catdir(File::Spec->updir, "doc");
+		  my $found = 0;
+		#  for my $l( split(":", $lng) )
+		#  {
+		#    $l =~ s/^(.*?)_.*$/$1/;
+		#    $l = lc($l);
+		#    if( $l and -d File::Spec->catdir( $src, $l ) )
+		#    {
+		#       $src = File::Spec->catdir( $src, $l);
+		#       $found++;
+		#       last;
+		#    }
+		#  }
+                  $i =~ s/^install\s+::\s+all.*$/$& install_my_perlqt_doc/m;
+		#  $src = File::Spec->catdir( $src, "en" ) unless $found;
+		  $i .= "\ninstall_my_perlqt_doc:\n".
+                        "\t\@echo Installing documentation in ${doc_dir}\n".
+                        "\t\@$^X -MExtUtils::Install -MConfig -e \\\n".
+		        "\t\t'install({ \"$src\" => \"${doc_dir}\" },0,0)' \$(DEV_NULL)\n";
+		  $doc_dir_glob = $doc_dir;
+		  $i;
+}
+
+sub interpolate
+{
+    for( @_ )
+    {
+        my $r = ref( $_ ) ? $_ : \$x{"$_"};
+        $$r =~ s/\$\(\s*(.*?)\s*\)/$x{$1}/g;
+        $$r =~ s/\$\{\s*(.*?)\s*\}/$x{$1}/g;
+    }
+}
+
+#########
+
+for my $s( @scripts )
+{
+    MY->fixin( $s );
+    chmod 0755, $s;
+}
+
+open(IN, ">Qt.pod") or die "couldn't write Qt.pod: $!\n";
+print IN <<STOP;
+
+=head1 Qt
+
+Given the huge size of the Qt module
+(more than 400 classes and 13000 methods)
+it doesn't have any formal documentation.
+
+Instead, it provides two introspection tools
+
+=over 4
+
+=item * pqtapi: 
+
+a command line PerlQt API introspector
+
+=item * pqtsh:  
+
+a graphical PerlQt shell
+
+=back
+
+and a detailed B<tutorial> with comprehensive
+explanations. 
+This is where anyone new to PerlQt
+should start.
+
+The tutorial has been originally installed 
+on this system in C<$doc_dir_glob>, in both B<POD> and
+B<HTML> format.
+
+For a complete IDE allowing RAD and visual programming, 
+check the pqt-designer package.
+
+--- The PerlQt team
+
+http://perlqt.sf.net - PerlQt Project Homepage
+
+=cut
+STOP
+close IN;
+

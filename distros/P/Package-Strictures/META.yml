@@ -1,0 +1,47 @@
+---
+abstract: 'Facilitate toggling validation code at users request, without extra performance penalties.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  B::Deparse: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  lib: '0'
+  namespace::clean: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Package-Strictures
+provides:
+  Package::Strictures:
+    file: lib/Package/Strictures.pm
+    version: '1.000001'
+  Package::Strictures::Register:
+    file: lib/Package/Strictures/Register.pm
+    version: '1.000001'
+  Package::Strictures::Registry:
+    file: lib/Package/Strictures/Registry.pm
+    version: '1.000001'
+requires:
+  Carp: '0'
+  Config::INI::Reader: '0.014'
+  Import::Into: '0'
+  constant: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Package-Strictures/issues
+  homepage: https://github.com/kentnl/Package-Strictures
+  repository: https://github.com/kentnl/Package-Strictures.git
+version: '1.000001'

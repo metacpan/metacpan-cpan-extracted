@@ -1,0 +1,32 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [Source::DefaultGitHub]
+
+    If repository is not specified in dist.ini, will search for github
+    user/repo name from git config file (.git/config).
+
+    To specify a source repository other than https://github.com/USER/REPO,
+    in dist.ini:
+
+     [MetaResources]
+     repository=http://example.com/
+
+DESCRIPTION
+
+    This section plugin adds a SOURCE section, using repository metadata or
+    (if not specified) GitHub.
+
+ATTRIBUTES
+
+ text
+
+    The text that is added. %s is replaced by the repository url.
+
+    Default: Source repository is at L<%s>.
+
+SEE ALSO
+
+    Pod::Weaver::Section::SourceGitHub
+

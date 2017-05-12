@@ -1,0 +1,4 @@
+docs: |
+    Equivalent to:
+
+        $a cmp $b

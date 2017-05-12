@@ -1,0 +1,7 @@
+docs: |
+    Perl's L<printf|perlfunc/"printf"> can be told to which file handle to
+    print.
+
+        printf FILEHANDLE $format, @args;
+
+    See L<perlfunc/"printf"> and L<perlfunc/"print"> for details.

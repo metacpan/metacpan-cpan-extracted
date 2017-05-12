@@ -1,0 +1,76 @@
+Revision history for Pod-Cpandoc
+
+0.15 2013-02-01
+    - Merge changes from Pod::Cpandoc 0.15:
+      - improvements to the metacpan API calls
+
+0.14 2013-01-27
+    - Merge changes from Pod::Cpandoc 0.14:
+      - switch from JSON to JSON::PP to get us back to only core (5.14+) deps
+      - improvements to the metacpan API calls
+
+0.13 2013-01-08
+    - Merge changes from Pod::Cpandoc 0.12 and 0.13:
+      - specifically request POD from metacpan, unless -m (Thomas Sibley++)
+          https://github.com/sartak/pod-cpandoc/pull/7
+      - add -c for reading the Changes of a dist (requested by many users)
+          https://github.com/sartak/pod-cpandoc/issues/2
+    - Use .pod files if they exist in minicpan
+
+0.12 2011-12-15
+    - fork from Pod::Cpandoc
+    - add minicpan support
+
+0.11 2011-07-17
+    - add support for `cpandoc URL` (requested by Claes Jakobsson)
+
+0.10 2011-06-25
+    - link to Japanese translation from @bayashi
+      http://perldoc.jp/docs/modules/Pod-Cpandoc-0.09/Cpandoc.pod
+    - link to my YAPC::NA lightning talk
+      http://sartak.org/talks/yapc-na-2011/cpandoc/
+
+0.09 2011-06-14
+    - give tempfiles a .pm suffix so they syntax highlight
+    - more web-related debug output
+    - put some doc in the cpandoc script which points to Pod::Cpandoc
+
+0.08 2011-06-14
+    - use metacpan's brand new /source/Module::Name endpoint (big
+      thanks to @moritzonken who implemented it)
+      [rt.cpan.org #68770] this enables perldoc -m Acme::BadExample
+
+0.07 2011-06-13
+    - if $CPANDOC_FETCH is true, notify you (via stderr) that cpandoc
+      is doing a web request (requested by Thomas Sibley)
+
+0.06 2011-06-13
+    - hide spurious "No documentation" warning even with unpatched Pod-Perldoc
+      (I found a better hook point, though it requires a little bit of gymnastics)
+    - factor out a live_cpan_url method for better subclassability
+      (or more monkey-patchability, realistically)
+
+0.05 2011-06-11
+    - add a description which explains more of the workings
+      also a response to http://twitter.com/karupanerura/status/79554581553614848
+    - hide spurious "No documentation" warning, but only if you have a
+      patched Pod-Perldoc. see https://github.com/sartak/perl/commit/5a8c16d4aa82
+      [rt.cpan.org #68762]
+    - put downloaded files in a real tempdir instead of .
+    - if -l is specified, don't unlink the tempfile to support
+      vim `perldoc -l Acme::BadExample` [rt.cpan.org #68769]
+
+0.04 2011-06-11
+    - actually declare our dependency on HTTP::Tiny (bayashi)
+    - set user-agent to cpandoc/$VERSION
+
+0.03 2011-06-10
+    - specify a minimum perl version of 5.8.1 since that gets you
+      File::Temp and Pod::Perldoc
+    - give additional cpandoc-specific output under -D
+    - documentation improvements
+
+0.02 2011-06-10
+    - use api.metacpan.org instead of search.cpan.org
+    - use HTTP::Tiny instead of LWP::Simple, Web::Scraper, and URI
+

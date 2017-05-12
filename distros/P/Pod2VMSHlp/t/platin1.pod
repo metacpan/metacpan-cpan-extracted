@@ -1,0 +1,80 @@
+=head1 NAME
+
+Punctuation and Latin 1 pod character escape test
+
+=head1 DESCRIPTION
+
+E<amp> is an ampersand
+E<lt> is a left chevron "angle bracket", less-than
+E<gt> is a right chevron "angle bracket", greater-than
+E<quot> is a double quotation mark
+E<sol> is a solidus (forward slash)
+E<verbar> is a vertical bar
+E<Aacute> is a capital A, acute accent
+E<aacute> is a small a, acute accent
+E<Acirc> is a capital A, circumflex accent
+E<acirc> is a small a, circumflex accent
+E<AElig> is a capital AE diphthong (ligature)
+E<aelig> is a small ae diphthong (ligature)
+E<Agrave> is a capital A, grave accent
+E<agrave> is a small a, grave accent
+E<Aring> is a capital A, ring
+E<aring> is a small a, ring
+E<Atilde> is a capital A, tilde
+E<atilde> is a small a, tilde
+E<Auml> is a capital A, dieresis or umlaut mark
+E<auml> is a small a, dieresis or umlaut mark
+E<Ccedil> is a capital C, cedilla
+E<ccedil> is a small c, cedilla
+E<Eacute> is a capital E, acute accent
+E<eacute> is a small e, acute accent
+E<Ecirc> is a capital E, circumflex accent
+E<ecirc> is a small e, circumflex accent
+E<Egrave> is a capital E, grave accent
+E<egrave> is a small e, grave accent
+E<ETH> is a capital Eth, Icelandic
+E<eth> is a small eth, Icelandic
+E<Euml> is a capital E, dieresis or umlaut mark
+E<euml> is a small e, dieresis or umlaut mark
+E<Iacute> is a capital I, acute accent
+E<iacute> is a small i, acute accent
+E<Icirc> is a capital I, circumflex accent
+E<icirc> is a small i, circumflex accent
+E<Igrave> is a capital I, grave accent
+E<igrave> is a small i, grave accent
+E<Iuml> is a capital I, dieresis or umlaut mark
+E<iuml> is a small i, dieresis or umlaut mark
+E<Ntilde> is a capital N, tilde
+E<ntilde> is a small n, tilde
+E<Oacute> is a capital O, acute accent
+E<oacute> is a small o, acute accent
+E<Ocirc> is a capital O, circumflex accent
+E<ocirc> is a small o, circumflex accent
+E<Ograve> is a capital O, grave accent
+E<ograve> is a small o, grave accent
+E<Oslash> is a capital O, slash
+E<oslash> is a small o, slash
+E<Otilde> is a capital O, tilde
+E<otilde> is a small o, tilde
+E<Ouml> is a capital O, dieresis or umlaut mark
+E<ouml> is a small o, dieresis or umlaut mark
+E<szlig> is a small sharp s, German (sz ligature)
+E<THORN> is a capital THORN, Icelandic
+E<thorn> is a small thorn, Icelandic
+E<Uacute> is a capital U, acute accent
+E<uacute> is a small u, acute accent
+E<Ucirc> is a capital U, circumflex accent
+E<ucirc> is a small u, circumflex accent
+E<Ugrave> is a capital U, grave accent
+E<ugrave> is a small u, grave accent
+E<Uuml> is a capital U, dieresis or umlaut mark
+E<uuml> is a small u, dieresis or umlaut mark
+E<Yacute> is a capital Y, acute accent
+E<yacute> is a small y, acute accent
+E<yuml> is a small y, dieresis or umlaut mark
+
+=head1 AUTHOR
+
+Peter Prymmer pvhp@best.com.
+
+=cut

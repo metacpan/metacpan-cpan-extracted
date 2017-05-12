@@ -1,0 +1,17 @@
+Revision history for Plack-App-ImageMagick
+
+1.110990    Sun Apr 10 00:13:22 2011
+            [INCOMPATIBLE CHANGES]
+                - switch to String::Bash for handling params
+
+            [IMPROVEMENTS]
+                - better error handling and more tests
+                - validate params at object creation (was in prepare_app)
+
+
+1.110920    Sat Apr  2 14:05:15 2011
+            Fix test failures (Image::Magick now required at configure phase)
+
+1.110900    Thu Mar 31 22:21:39 2011
+            First version.
+

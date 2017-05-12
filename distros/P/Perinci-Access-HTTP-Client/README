@@ -1,0 +1,139 @@
+SYNOPSIS
+
+     use Perinci::Access::HTTP::Client;
+     my $pa = Perinci::Access::HTTP::Client->new;
+    
+     ## perform Riap requests
+    
+     # list all functions in package
+     my $res = $pa->request(list => 'http://localhost:5000/api/',
+                            {uri=>'/Some/Module/', type=>'function'});
+     # -> [200, "OK", ['/Some/Module/mult2', '/Some/Module/mult2']]
+    
+     # call function
+     $res = $pa->request(call => 'http://localhost:5000/api/',
+                         {uri=>'/Some/Module/mult2', args=>{a=>2, b=>3}});
+     # -> [200, "OK", 6]
+    
+     # get function metadata
+     $res = $pa->request(meta => 'http://localhost:5000/api/',
+                         {uri=>'/Foo/Bar/multn'});
+     # -> [200, "OK", {v=>1.1, summary=>'Multiple many numbers', ...}]
+    
+     # pass HTTP credentials (via object attribute)
+     my $pa = Perinci::Access::HTTP::Client->new(user => 'admin', password=>'123');
+     my $res = $pa->request(call => '...', {...});
+     # -> [200, "OK", 'result']
+    
+     # HTTP credentials can also be passed on a per-request basis
+     my $pa = Perinci::Access::HTTP::Client->new();
+     my $res = $pa->request(call => '...', {...}, {user=>'admin', password=>'123'});
+    
+     ## parse server URL
+     $res = $pa->parse_url("https://cpanlists.org/api/"); # {proto=>"https", path=>"/App/cpanlists/Server/"}
+
+ATTRIBUTES
+
+      * realm => STR
+
+      For HTTP basic authentication. Defaults to "restricted area" (this is
+      the default realm used by Plack::Middleware::Auth::Basic).
+
+      * user => STR
+
+      For HTTP basic authentication. Default will be taken from environment
+      PERINCI_HTTP_USER.
+
+      * password => STR
+
+      For HTTP basic authentication. Default will be taken from environment
+      PERINCI_HTTP_PASSWORD.
+
+      * ssl_cert_file => STR
+
+      Path to SSL client certificate. Default will be taken from
+      environment SSL_CERT_FILE.
+
+      * ssl_cert_file => STR
+
+      Path to SSL CA certificate. Default will be taken from environment
+      SSL_CA_FILE.
+
+DESCRIPTION
+
+    This class implements Riap::HTTP client.
+
+METHODS
+
+ PKG->new(%attrs) => OBJ
+
+    Instantiate object. Known attributes:
+
+      * retries => INT (default 2)
+
+      Number of retries to do on network failure. Setting it to 0 will
+      disable retries.
+
+      * retry_delay => INT (default 3)
+
+      Number of seconds to wait between retries.
+
+      * log_level => INT (default 0 or from environment)
+
+      Will be fed into Riap request key 'loglevel' (if >0). Note that some
+      servers might forbid setting log level.
+
+      If TRACE environment variable is true, default log_level will be set
+      to 6. If DEBUG, 5. If VERBOSE, 4. If quiet, 1. Else 0.
+
+      * log_callback => CODE
+
+      Pass log messages from the server to this subroutine. If not
+      specified, log messages will be "rethrown" into Log::Any logging
+      methods (e.g. $log->warn(), $log->debug(), etc).
+
+ $pa->request($action => $server_url[, \%extra_keys[, \%client_opts]]) =>
+ $res
+
+    Send Riap request to $server_url. Note that $server_url is the HTTP URL
+    of Riap server. You will need to specify code entity URI via uri key in
+    %extra_keys.
+
+    %extra_keys is optional and contains additional Riap request keys
+    (except action, which is taken from $action).
+
+    %client_opts is optional and contains additional information, like user
+    (HTTP authentication user, overrides one in object attribute), password
+    (HTTP authentication user, overrides one in object attribute).
+
+ $pa->parse_url($server_url[, \%client_opts]) => HASH
+
+ENVIRONMENT
+
+    PERINCI_HTTP_USER.
+
+    PERINCI_HTTP_PASSWORD.
+
+    SSL_CERT_FILE, SSL_CA_FILE.
+
+FAQ
+
+ How do I connect to a HTTP server that listens on a Unix socket?
+
+    This class can switch to using LWP::Protocol::http::SocketUnixAlt when
+    it detects that the server is on a Unix socket, using this syntax
+    (notice the single instead of double slash after http:):
+
+     http:/path/to/unix.sock//uri
+
+ How do I connect to an HTTPS server without a "real" SSL certificate?
+
+    Since this module is using LWP, you can set environment variable
+    PERL_LWP_SSL_VERIFY_HOSTNAME to 0. See LWP for more details.
+
+SEE ALSO
+
+    Perinci::Access::HTTP::Server
+
+    Riap, Rinci
+

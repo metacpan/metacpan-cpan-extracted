@@ -1,0 +1,37 @@
+==============================
+2011-05-24 12:41:58 +0100 1.10
+==============================
+
+  commit 63d72b1c2d401c308d6ce15b766fa9e451d44a45
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue May 24 12:41:58 2011 +0100
+  
+    Fix pod coverage exclusions
+
+  commit 0e8ebe9e512a8ed09d4138bd01619cc96c7c4053
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue May 24 12:01:41 2011 +0100
+  
+    Bye bye README
+
+  commit b26770f1fcefbccf978753fd48a4078fc760f2c7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue May 24 12:00:50 2011 +0100
+  
+    Change dist to Dist::Zilla
+
+  commit 956562a9be4b58353b91bcb0795ec99763d217eb
+  Author: Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>
+  Date:   Sun May 22 11:58:20 2011 +0800
+  
+    Also catch URIs in CTCP ACTION messages
+
+  commit 55f21a2746202d154b77b4b45533a3c7a5982824
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Fri Apr 17 23:33:45 2009 +0100
+  
+    Fix the README file 
+
+====================================
+End of changes in the last 1825 days
+====================================

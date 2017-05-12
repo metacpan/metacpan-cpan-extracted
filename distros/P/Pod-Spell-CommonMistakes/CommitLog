@@ -1,0 +1,97 @@
+==================================================
+Changes from 2013-11-04 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.002 at 2014-11-04 20:39:55 +0000
+------------------------------------------
+
+  Change: eeb9f4d4bd5d5fe69788c33010e300631bdb07d4
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-04 12:35:40 +0000
+
+    remove the Pod::Spelling adapter 
+
+  Change: c9ab1fde3e02cf4f36be00b25427ee0404f697dc
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-31 14:10:06 +0000
+
+    README.pod 
+
+------------------------------------------
+version 1.001 at 2014-10-31 19:12:25 +0000
+------------------------------------------
+
+  Change: d6478a6acd7954b4fdc06c38a0830682ffafaf6d
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-31 12:12:25 +0000
+
+    New CPAN release of Pod-Spell-CommonMistakes - v1.001
+
+    - Updated the wordlist
+
+    - Add support for Pod::Spelling as an adaptor, RT#80625 ( thanks
+
+    RIBASUSHI! )
+
+    [STATISTICS]
+
+    - code churn: 8 files changed, 212 insertions(+), 17 deletions(-) 
+
+  Change: 18e2e365b08a6338fe1f05b650abfcbb4cafd69d
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-31 12:04:59 +0000
+
+    shutup perlcritic 
+
+  Change: 0db55c8d3722732ff57259e84352c8fb32db7a0a
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-31 12:01:59 +0000
+
+    use named classes in regex 
+
+  Change: e9ddb0c6ace092afee39765a6d7d47db07345151
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-31 12:00:48 +0000
+
+    use parent inplace of base.pm 
+
+  Change: 23acc380649270969eac8efc36165c58e174c6a7
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-31 11:54:06 +0000
+
+    tweak the test so it works :) 
+
+  Change: bf9b4dbe23fe4dbaf2a1910877ad6f49b756112c
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-31 11:33:36 +0000
+
+    add test for Pod::Spelling 
+
+  Change: 345622db5b064b4e49710909cd70ee0e5f4af07f
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-31 11:11:11 +0000
+
+    update wordlist 
+
+  Change: 7be077a8f34695bd90cdfe2d01a58c0c088f26cb
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-31 11:10:59 +0000
+
+    add adapter for Pod::Spelling 
+
+  Change: 47a29e3b23e94cc9b88f3100538966055e00576b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-31 10:55:58 +0000
+
+    cleanups and modernization of stuff 
+
+  Change: 0affe595891dad561aa72d48e9f1c82d4368b249
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-31 10:54:26 +0000
+
+    first stab at adaptor for Pod::Spelling 
+
+===============================================
+Plus 1 release after 2013-11-04 00:00:00 +0000.
+===============================================

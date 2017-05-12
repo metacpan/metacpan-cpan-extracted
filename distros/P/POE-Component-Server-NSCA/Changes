@@ -1,0 +1,67 @@
+==================================================
+Changes from 2012-05-06 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.10 at 2017-05-05 11:32:49 +0000
+-----------------------------------------
+
+  Change: 518ceecec5850af90cfaa11a187ccf7b2fe28a14
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-05-05 12:32:49 +0000
+
+    Handle different packet sizes from clients 
+
+  Change: b431b3fb567eefb10420a6dadb438e955ef15e73
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-05-05 09:59:32 +0000
+
+    Switch dist to Dist::Zilla 
+
+  Change: 1c8b46fd09e9c58fe8c72eb1524593d98438caa1
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2015-01-21 16:33:58 +0000
+
+    Merge pull request #3 from sni/add_multiple_packet_support
+
+    add support for multiple packets 
+
+  Change: 0ae3c57d398f76fe37043f1e667a23ced582679c
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2015-01-21 16:28:48 +0000
+
+    Merge pull request #2 from sni/fix_encryption
+
+    fix encryption 
+
+  Change: 139e06d5192c5b0edfd6d49c7476252be5beea9f
+  Author: Sven Nierlein <sven@nierlein.de>
+  Date : 2015-01-20 20:16:41 +0000
+
+    add support for multiple packets
+
+    Using the Block filter, we can accept multiple packets. In order to
+    get consistent data to the callback, we do not send the client, but a
+    new datastructure instead. This implements issue #1. 
+
+  Change: da86fae29e0c31e749a62fa7bb177b580fff0bb5
+  Author: Sven Nierlein <sven@nierlein.de>
+  Date : 2015-01-20 17:40:08 +0000
+
+    fix encryption
+
+    - emit a warning if encryption is used but not loaded instead of
+    silently ignoring it - fix error "mcrypt is not of type MCRYPT" by
+    using the constants from Mcrypt module
+
+    Signed-off-by: Sven Nierlein <sven@nierlein.de> 
+
+  Change: a10a7d2791bda2fc02a45ea823746c337c405970
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-06-19 09:49:49 +0000
+
+    Removed the test kwalitee test 
+
+===============================================
+Plus 1 release after 2012-05-06 00:00:00 +0000.
+===============================================

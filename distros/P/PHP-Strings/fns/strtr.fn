@@ -1,0 +1,84 @@
+docs: |
+    This function, like many in PHP, is really two functions.
+
+    The first is the same as L<the tr operator|perlop/"tr">.
+    And you really should use C<tr> instead of this function.
+
+    The second is more complicated.
+
+code: |
+    sub _make_re_list
+    {
+        return qr/@{[ join '|', map quotemeta, @_ ]}/;
+    }
+
+    sub _strtr_pairs
+    {
+        my ( $string, $pairs ) = @_;
+        my @alternates = reverse sort { length $a <=> length $b } keys %$pairs;
+
+        # Exit quickly if we don't need to stay.
+        return $string unless @alternates;
+
+        my $regex = _make_re_list( @alternates );
+
+        $string =~ s/($regex)/$pairs->{$1}/eg;
+        
+        return $string;
+    }
+
+    sub _strtr_tr
+    {
+        my ( $string, $from, $to ) = @_;
+
+        # Exit quickly if we don't need to stay.
+        return $string unless length $from;
+
+        # Ignore excess characters
+        if ( length $from != length $to )
+        {
+            if ( length $to > length $from ) {
+                substr( $to, (length $from) ) = "";
+            } elsif ( length $from > length $to ) {
+                substr( $from, (length $to) ) = "";
+            }
+        }
+
+        eval "\$string =~ tr/$from/$to/, 1" or die $@;
+
+        return $string;
+    }
+
+    sub strtr
+    {
+        my ( $string, $from, $to ) = validate_pos( @_,
+            STRING,
+            STRING|HASHREF,
+            {
+                %{+STRING},
+                optional => 1,
+            },
+        );
+
+        if ( ref $from eq 'HASH' )
+        {
+            if ( not defined $to )
+            {
+                return _strtr_pairs( $string, $from );
+            }
+            else
+            {
+                croak "Parameter #3 to PHP::Strings::strtr ",
+                    "present when it should not be in 2-argument form.";
+            }
+        }
+        elsif ( defined $from and not defined $to )
+        {
+            croak "Parameter #3 to PHP::Strings::strtr missing from".
+                " 3-argument form.";
+        }
+        else
+        {
+            return _strtr_tr( $string, $from, $to );
+        }
+    }

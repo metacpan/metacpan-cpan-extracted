@@ -1,0 +1,86 @@
+Pod::Tree - Tree-based POD parser
+
+DESCRIPTION
+
+Modules
+
+    Pod::Tree parses a POD into a static syntax tree.
+    Applications walk the tree to recover the structure and content of
+    the POD. 
+
+    Pod::Tree::HTML walks a Pod::Tree and translates it to HTML.
+
+    Pod::Tree::Pod walks a Pod::Tree and translates it back to POD.
+
+    Pod::Tree::Perl* translate the PODs in the Perl distribution to HTML.
+
+Executables
+
+    podtree2html translates a POD file to an HTML file.
+
+    pods2html walks a directory tree, 
+    translates all the PODs that it finds into HTML files,
+    and puts the HTML files into a parallel directory tree.
+
+    perl2html translates the PODs in the Perl distribution to HTML
+
+
+PREREQUISITES
+Perl 5
+File::Find
+HTML::Stream
+IO::File
+IO::String
+Pod::Escapes
+Text::Template
+
+
+HOW TO BUILD AND INSTALL
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+You may see a message like
+
+    Warning: prerequisite HTML::Stream 1.49 not found.
+
+You can ignore this, provided that you actually have HTML::Stream 1.49
+or later installed.
+
+
+TODO
+See the ToDo and ToDo.Not files.
+
+ACKNOWLEDGMENTS
+
+                        <crazyinsomniac@yahoo.com>
+			<joenio@cpan.org>
+Paul Bettinger		<paul@n8geil.de>
+Sean M. Burke		<sburke@spinn.net>
+Brad Choate		<brad@bradchoate.com>
+Havard Eidnes		<he@NetBSD.org>
+Rudi Farkas		<rudif@bluemail.ch>
+Paul Gibeault		<pagibeault@micron.com>
+Jay Hannah		<jhannah@omnihotels.com>
+Martin Hans		<mah@oticon.dk>
+Paul Hawkins		<phawkins@datajunction.com>
+Jost Krieger		<Jost.Krieger@ruhr-uni-bochum.de>
+Marc A. Lehmann		<pcg@goof.com> 
+Jonas Liljegren		<jonas@jonas.rit.se>
+Thomas Linden		<tom@co.daemon.de>
+Johan Lindstrom		<johanl@bahnhof.se>
+Terry Luedtke           <terry_luedtke@nlm.nih.gov>
+Rob Napier		<rnapier@employees.org>
+Kate L Pugh             <kake@earth.li>
+Christopher Shalah	<trance@drizzle.com>
+Blair Sutton		<bsdz@numeninest.com>
+Johan Vromans		<JVromans@Squirrel.nl>
+
+
+COPYRIGHT
+Copyright (c) 1999-2010 by Steven McDougall. This module is free
+software; you can redistribute it and/or modify it under the same
+terms as Perl itself.

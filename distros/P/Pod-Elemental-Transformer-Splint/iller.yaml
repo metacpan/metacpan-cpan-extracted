@@ -1,0 +1,44 @@
+---
+doctype: dist
+
+header:
+  name: Pod-Elemental-Transformer-Splint
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010001
+      - Moose: 2.00
+      - namespace::autoclean
+      - Moose::Role: 2.1400
+      - List::Util
+      - List::MoreUtils
+      - Path::Tiny
+      - Safe::Isa
+      - syntax
+      - Syntax::Feature::Qs: 0.2003
+      - List::UtilsBy
+      - Try::Tiny
+      - Types::Standard
+      - Module::Load
+      - Ref::Util: 0.007
+    recommends:
+      - MooseX::AttributeDocumented: 0.1003
+    suggests:
+      - Kavorka::TraitFor::Parameter::doc: 0.1102
+  test:
+    requires:
+      - Test::More: 0.96
+      - Test::Warnings
+      - Test::Differences
+      - Pod::Elemental
+      - Pod::Elemental::Transformer::Pod5
+
+plugins:
+ - +config: Author::CSSON
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON

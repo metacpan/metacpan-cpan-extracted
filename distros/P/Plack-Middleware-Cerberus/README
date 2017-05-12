@@ -1,0 +1,116 @@
+NAME
+    Plack::Middleware::Cerberus - Include geo, time zone, user-agent and
+    throttling from App::Cerberus
+
+VERSION
+    version 0.04
+
+SYNOPSIS
+        use Plack::Builder;
+
+        my $app = sub {
+            my $env = shift;
+            my $time_zone = $env->{'plack.cerberus'}{tz}{name};
+            ...
+        };
+
+        builder {
+            enable 'Cerberus', servers => 'http://localhost:5001/';
+            $app;
+        };
+
+DESCRIPTION
+    Plack::Middleware::Cerberus adds metadata from an App::Cerberus server
+    to the $env as "$env->{'plack.cerberus'}".
+
+    For instance:
+
+    *   Geo-location
+
+    *   Time zone
+
+    *   User-agent info
+
+    *   Are they a spider?
+
+    *   Are they making too many requests? Should we throttle them?
+
+    It can also be configured to throttle or ban IP address ranges with
+    App::Cerberus::Plugin::Throttle.
+
+CONFIG
+    The basic configuration ("servers" and "timeout") are passed to "new()"
+    in App::Cerberus::Client.
+
+        enable 'Cerberus',
+            servers  => 'http://localhost:5001/',
+            timeout  => 0.1;
+
+    Or
+
+        enable 'Cerberus',
+            servers  => [ 'http://host1:5001/', 'http://host2:5001/']
+            timeout  => 0.1;
+
+    If you are using the App::Cerberus::Plugin::Throttle plugin, then you
+    can also configure:
+
+        enable 'Cerberus',
+            servers => 'http://localhost:5001/',
+            enforce => 1,
+            log_as  => 'warn';
+
+    If "log_as" is one of "debug", "info", "warn", "error" or "fatal", then
+    Throttle messages will be logged at that level. It defaults to "warn".
+    If no logger is configured, then "log_as" is ignored and it always
+    warns.
+
+    If "enforce" is true, then banned IP addresses will receive a "403
+    Forbidden" response and throttled users a "503 Service Unavailable"
+    response, with a "Retry-After: $seconds" header.
+
+ACCESSING CERBERUS INFO
+    The $env variable will contain a key 'plack.cerberus' with any data that
+    App::Cerberus has returned, for instance:
+
+        my $app = sub {
+            my $env        = shift;
+            my $geo_info   = $env->{'plack.cerberus'}{geo};
+            my $time_zone  = $env->{'plack.cerberus'}{tz};
+            my $user_agent = $env->{'plack.cerberus'}{ua};
+            my $throttle   = $env->{'plack.cerberus'}{throttle};
+        };
+
+SEE ALSO
+    *   App::Cerberus
+
+    *   Dancer::Plugin::Cerberus
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Plack::Middleware::Cerberus
+
+    You can also look for information at:
+
+    *   GitHub
+
+        <http://github.com/clintongormley/Plack-Middleware-Cerberus>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Plack-Middleware-Cerberus>
+
+    *   Search MetaCPAN
+
+        <https://metacpan.org/module/Plack::Middleware::Cerberus>
+
+AUTHOR
+    Clinton Gormley <drtech@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Clinton Gormley.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

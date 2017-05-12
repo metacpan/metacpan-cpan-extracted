@@ -1,0 +1,39 @@
+# Copyright 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+
+# This file is part of POSIX-Wide.
+#
+# POSIX-Wide is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 3, or
+# (at your option) any later version.
+#
+# POSIX-Wide is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with POSIX-Wide.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
+
+Source: libposix-wide-perl
+Section: perl
+Priority: optional
+Build-Depends: cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.6
+Homepage: http://user42.tuxfamily.org/posix-wide/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: libposix-wide-perl
+Architecture: all
+Depends: perl (>= 5.8.1), libencode-locale-perl, ${perl:Depends}, ${misc:Depends}
+Breaks: libi18n-langinfo-wide-perl (<< 9)
+Replaces: libi18n-langinfo-wide-perl (<< 9)
+Description: POSIX module functions with wide-char strings
+ This is variations of the POSIX module functions taking and returning
+ Perl wide-char strings rather than locale charset bytes.

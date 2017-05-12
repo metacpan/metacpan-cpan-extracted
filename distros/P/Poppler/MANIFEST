@@ -1,0 +1,12 @@
+Changes
+lib/Poppler.pm
+lib/Poppler/Page/Dimension.pm
+share/Poppler-0.18.typelib
+Build.PL
+MANIFEST
+README.md
+t/poppler.t
+t/test.pdf
+LICENSE
+META.yml
+META.json

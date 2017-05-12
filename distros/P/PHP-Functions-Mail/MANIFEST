@@ -1,0 +1,7 @@
+ChangeLog
+lib/PHP/Functions/Mail.pm
+Makefile.PL
+MANIFEST
+README
+t/PHP-Functions-Mail.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,82 @@
+Revision history for Padre-Plugin-Cookbook
+
+0.24 2013-05-09
+ - update changes to changes-spec (BOWTIE)
+
+0.23 2012-05-13
+ - consolidate to common version in to 0.23
+ - move tests around
+ - add POSIX dependency stkowski++
+ - another POD tweak
+ - POD tweak, forgot to update version in POD
+ - bumped to version 0.23 and had a jiggle about :)
+ - update to delete_where ready for ORLite 2.0
+ - Removed Padre::DB::SyntaxHighlighter from Cookbook Recipe 04
+ - update ConfigDB to clean DebugBreakpoints
+ - Add relation DebugBreakpoints to radio box
+ - tidy up sub _tidy_display,  azawawi++
+ - force Show output to be in colour
+ - changed About dialogs to ShowModal
+ - been reading hence tweak
+ - tweak Composed Method clean_dialog
+ - Add Composed Method clean_dialog
+ - update interfaces to v0.91
+ - Padre::Plugin api 2.2
+ - update interfaces to v0.91
+ - minor tweaks 
+ - update to padre 0.90 as minimum required version 
+ - deleted MANIFEST to enable Makefile.PL to run, Alias++
+ - added comments to Makefile.PL
+ - minor tweaks
+ - tweak POD
+ - tweak tests
+ - wrapped display text with Wx::gettext(...)
+ - added clean for last position in file
+ - tweak POD
+ - added more xt's
+ - added remove missing to history clean
+ - tweak to adjust
+ - lots of spelling typos to
+ - update to plugin interface, 
+ - start using DEBUG
+ - added an icon
+ - minor typo's & tweaks
+ - also removed dead code
+ - reset back to use Moose as Mouse is unstable under Plugin reload 
+ - More, POD tweaks to correspond with guidance from alias++
+ - opps forgot to turn on caller_info, POD tweaks to correspond with
+   guidance, alias++
+ - Slight name change to make it more obvious what kind of cookbook
+ - Removed remaining locations where we change the user's configuration to 
+   selfishly get a maximise button on the output window
+ - Never change the user's preferences without their say so
+ - Moving author tests to xt, removing superfluous dependencies and
+   removing  the unnecesary auto_install
+ - Modified Recipe04 so that it will work with MainFB Dialog, and also a
+   Frame,
+ - Frame works once, but then kills padre. inc fbp's for shared testing, :) 
+ - setup to use dialog stable
+ - added garu suggestion, cleaned up startup, removed commented out code
+   and some other tweaks
+ - tweaking, svn:mime-type, added more credits.
+ - now test's for attributes with {null} values
+ - Config-DB Recipe-04 (Plugin) 
+ - Updated Recipe-04 ConfigDB,
+ - Added cardinality display, SQL limit 127, re irc with Sewi
+ - Updated Recipe-04 ConfigDB to RC1, 
+ - Added status bar support, and guage to clean history
+ - Updated Recipe-04 ConfigDB to RC1, 
+ - Updated Recipe-04 ConfigDB to RC1, included clean options for 
+ - relations: Session, Session_Files & History
+ - tweaking, svn:mime-type
+ - Makefile.PL tweaking, added version
+ - MANIFEST added for use with Makefile.PL
+ - Makefile.PL added as suggested by Sewi
+ - Added Recipe-04 ConfigDB beta for Sewi to Cookbook
+ - Added Recipe-03 to Cookbook
+ - Added Recipe-02 to Cookbook
+ - Altered structure and names to enable multiple Recipes to be contained
+   within ONE Cookbook
+ - Add Cookbook01 to P-P-Cookbook, updated all names, also see wiki
+
+

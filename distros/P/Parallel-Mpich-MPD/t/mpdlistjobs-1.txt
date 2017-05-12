@@ -1,0 +1,89 @@
+jobid    = 62@olavdev_43130
+jobalias = alias-1
+username = alex
+host     = olavdev
+pid      = 9062
+sid      = 9057
+rank     = 0
+pgm      = /home/alex/phenyx/dev/phenyx-core/src/olavtools/mpidbsearch/phenyx-mpidbsearch
+
+jobid    = 62@olavdev_43130
+jobalias = alias-1
+username = alex
+host     = vs-node-1
+pid      = 9060
+sid      = 9058
+rank     = 1
+pgm      = /home/alex/phenyx/dev/phenyx-core/src/olavtools/mpidbsearch/phenyx-mpidbsearch
+
+jobid    = 62@olavdev_43130
+jobalias = alias-1
+username = alex
+host     = vs-node-2
+pid      = 9061
+sid      = 9059
+rank     = 2
+pgm      = /home/alex/phenyx/dev/phenyx-core/src/olavtools/mpidbsearch/phenyx-mpidbsearch
+
+jobid    = 2@olavdev_43130
+jobalias = handle-62970588
+username = alex
+host     = vs-node-0
+pid      = 7905
+sid      = 7900
+rank     = 0
+pgm      = /usr/local/bin/phenyx-mpidbsearch
+
+jobid    = 65@olavdev_43130
+jobalias = alias-1
+username = alex
+host     = olavdev
+pid      = 19062
+sid      = 9057
+rank     = 0
+pgm      = /home/alex/phenyx/dev/phenyx-core/src/olavtools/mpidbsearch/phenyx-mpidbsearch
+
+jobid    = 65@olavdev_43130
+jobalias = alias-1
+username = alex
+host     = vs-node-1
+pid      = 19060
+sid      = 9058
+rank     = 1
+pgm      = /home/alex/phenyx/dev/phenyx-core/src/olavtools/mpidbsearch/phenyx-mpidbsearch
+
+jobid    = 3@olavdev_43130
+jobalias =
+username = joe
+host     = vs-node-0
+pid      = 7907
+sid      = 7900
+rank     = 0
+pgm      = /usr/local/bin/phenyx-mpidbsearch
+
+jobid    = 4@olavdev_43130
+jobalias =
+username = joe
+host     = vs-node-0
+pid      = 7908
+sid      = 7900
+rank     = 0
+pgm      = sleep
+
+jobid    = 5@olavdev_43130
+jobalias = alias3
+username = joe
+host     = vs-node-0
+pid      = 7910
+sid      = 7900
+rank     = 0
+pgm      = sleep
+
+jobid    = 5@olavdev_43130
+jobalias = alias3
+username = joe
+host     = vs-node-1
+pid      = 7911
+sid      = 7900
+rank     = 1
+pgm      = sleep

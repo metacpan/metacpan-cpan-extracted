@@ -1,0 +1,49 @@
+Revision history for POE-Component-OpenSSH
+(in the form of DD/MM/YY)
+
+0.11    15.12.14
+        * Cleanups.
+
+0.10    20.12.11
+        * Removed Moose.
+        * Moved to Dist::Zilla.
+        * Cleaned POD and code.
+
+0.09    10.07.11
+        * No functional changes.
+        * Require earlier version of Module::Build (wu-lee).
+
+0.08    27.03.11
+        * No functional changes, updating changes.
+
+0.07    27.03.11
+        * Removed attribute 'obj' for 'object'.
+        * Removed dependency on MooseX::Aliases.
+        * Updated tests to use POE::Test::Helpers minimal 1.07.
+
+0.06    21.09.09
+        * no Moose, make_immutable
+        * Currying: capture, capture2, system, scp_get, scp_put, and sftp
+        * Updating documentation to reflect this
+
+0.05    10.09.09
+        * Require MooseX::Aliases 0.03 to include important fixes
+        * Some POD changes: explaining things better, hopefully
+
+0.04    07.09.09
+        * Adding 'error' attribute
+        * Adding alias 'object' for 'obj'
+
+0.03    07.09.09
+        * A lot of POD work: examples, METHODS documentation, etc.
+        * I accidently written I use MooseX::POE for it. I don't.
+
+0.02    07.09.09
+        * Adding support for debug, verbose and alias
+        * Fixed test to include timeout skip
+        * Added a lot to POD
+        * Was building obj incorrectly (thanks Perl::Critic)
+
+0.01    03.09.09
+        Hope this works
+

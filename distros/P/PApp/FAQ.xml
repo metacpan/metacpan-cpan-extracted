@@ -1,0 +1,136 @@
+<faq title="PApp Frequently Asked Questions &amp; Tips and Tricks">
+
+<section title="Installation">
+
+<qa q='Why do I need a SYSID?'>
+
+The Agni subsystem in PApp needs unique IDs when creating new objects,
+like users.  To enable you to exchange data with other Agni users, these
+IDs must not collide with IDs from other system. The easiest way is to use
+a unique sysid as part of the object ID. That's the reason why a unique
+system ID is important.
+
+</qa>
+
+<qa q='How do I get a SYSID?'>
+
+One way is to use an officially-assigned (thus unique) IPv4
+address. Another way is to write an email to sysid@nethype.de, informally
+asking for a system ID. If you want, you can provide us with something we
+can identify you, so we can keep records of your sysid, but that's not
+required.
+
+</qa>
+
+</section>
+
+<section title="Common Mistakes">
+
+<qa q='print "____________"; doesn&apos;t work as expected'>
+
+<c>__"..."</c> marks a translation. If this character pattern shows up
+in your source you might get problems. Try to escape it like this
+<c>print "___________\_";</c>
+
+</qa>
+
+<qa q='My application is written in language XYZ, but this language is not shown in the language_selector!'>
+
+All languages used in the source must be declared somewhere. If you use
+<c>lang="*"</c> then you must declare all possible source languages using the
+<c>&lt;language></c> element.
+
+</qa>
+
+<qa q='I try to access %A/%S, a database etc. in a callback, but it does not work.'>
+
+The callback handlers are executed during a very delicate time, before
+the actual page gets executed. <c>%S</c> etc. are meaningless during this
+time.  If you want to access something you should take a reference to it
+and pass it to your callback when you refer() to the callback.
+
+</qa>
+
+</section>
+
+<section title='Features'>
+
+<qa q='How do I get the currently selected language?'>
+
+<c>my $langid = $papp_translator->get_table($PApp::langs)->lang</c>
+
+</qa>
+
+<qa q='How can I quickly get a language selector for all supported languages?'>
+
+<c>&lt;:language_selector $papp_translator:></c>
+
+</qa>
+
+<qa q='How do I include a filename in a surl (e.g. for a nice Save As preset)'>
+
+Use the GET surlstyle together with SURL_SUFFIX, e.g: surl "download",
+SURL_STYLE_GET, SURL_SUFFIX, "doc.ps";
+
+</qa>
+
+<qa q='How can I dynamically initialize the default database used by my app?'>
+
+<p>
+Use a perl section and call the <c>$ppkg->set_database</c> method:
+</p>
+
+<p>
+<c>&lt;perl>$ppkg->set_database(new PApp::SQL::Database ...)&lt;/perl></c>
+</p>
+
+</qa>
+
+</section>
+
+<section title='Unexplainable Errors'>
+
+<qa q='I get an error like "self is not of type PApp::I18n::Table" while my application gets compiled. What gives?'>
+
+You are calling <c>__</c> or <c>gettext</c> in your module initialization
+code. This is too early since there is no user and thus no selected
+language at that point.
+
+</qa>
+
+</section>
+
+<section title='Maintainance'>
+
+<qa q='My machine crashed and my application complains about the state database. I am running MySQL'>
+
+This means that a table in your database is corrupt. Because the
+state table is the most active one, it is also the most likely to be
+corrupted.
+
+You should inqure further about the circumstances that lead to this
+corruption and should ask a qualified database engineer to have a look
+at the problem and decide about ways to repair it.
+
+However, if it is necessary to bring the system back online immediately
+and you don't care about loosing the state information of logged in
+users (everybody will have to log in again after this!), you can try the
+following this procedure at your own risk: 
+
+WARNING: Never do this with any other table save for the state table!!!
+
+  mysql papp
+
+  ( repair table state; /* You can try this step - it might work without
+    having to delete everything */ )
+
+  delete from state;
+
+  quit
+
+</qa>
+
+</section>
+
+</faq>
+

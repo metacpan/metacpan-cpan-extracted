@@ -1,0 +1,24 @@
+PerlModule Apache2::WebStart
+
+<Location /webstart>
+   SetHandler perl-script
+   PerlResponseHandler Apache2::WebStart
+   PerlSetVar WS_codebase "lib/apps"
+   PerlSetVar WS_title "My App"
+   PerlSetVar WS_vendor "me.com"
+   PerlSetVar WS_homepage "docs/hello.html"
+   PerlSetVar WS_description "A Perl WebStart Application"
+   PerlSetVar WS_os "MSWin32"
+   PerlSetVar WS_arch "MSWin32-x86-multi-thread"
+   PerlSetVar WS_par "A.par"
+   PerlAddVar WS_par "C.par"
+   PerlSetVar WS_main "A"
+   PerlSetVar WS_no_sign 1
+   PerlSetVar WS_arg "verbose"
+   PerlAddVar WS_arg "debug"
+   PerlSetVar WS_long_opts 1
+   PerlSetVar WS_module "Tk"
+   PerlAddVar WS_module "LWP"
+</Location>
+
+

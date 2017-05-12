@@ -1,0 +1,8 @@
+shebang passing/parsing
+
+rewind DATA filehandles not in main
+- may hit problems with require.
+
+reset globals (more tree stuff)
+
+test against Inline::Files

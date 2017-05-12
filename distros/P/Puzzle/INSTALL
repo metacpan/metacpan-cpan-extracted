@@ -1,0 +1,73 @@
+INSTALL file for PUZZLE module
+==============================
+
+How to install PUZZLE on a Debian with apache2
+==============================================
+
+Prerequisites
+-------------
+
+apt-get install build-essential
+apt-get install apache2
+apt-get install apache2-threaded-dev
+apt-get install libapache2-mod-perl2-dev
+apt-get install mysql-server
+
+Install Modules
+---------------
+
+- Install HTML::Mason 
+apt-get install libhtml-mason-perl
+
+- Apache2 request module (and Apache2::Cookie)
+apt-get install libapache2-request-perl
+
+- Install YAML Perl module
+apt-get install libyaml-perl
+
+- Install JSON::Any Perl module
+apt-get install libjson-any-perl
+
+- Install XML::Simple Perl module
+apt-get install libxml-simple-perl
+
+- Install Mail::Sendmail Perl module
+apt-get install libmail-sendmail-perl
+
+- Install DBIx::Class/DBIx::Class::Schema/DBIx::Class:Schema::Loader 
+apt-get install libdbix-class-schema-loader-perl
+
+- Install Apache::DBI
+apt-get install libapache-dbi-perl
+
+- Install Apache::Session
+apt-get install libapache-session-perl
+
+- Install Perl database interface to the MySQL database
+apt-get install libdbd-mysql-perl
+
+- INSTALL I18N::AcceptLanguage
+apt-get install libi18n-acceptlanguage-perl
+
+- Install HTML::Template::Pro
+apt-get install libhtml-template-pro-perl
+
+- Install HTML::Template::Pro::Extension
+perl -MCPAN -e 'install HTML::Template::Pro::Extension'
+
+- Set correct permission to Mason Cache directory
+chown www-data:www-data  /var/cache/mason
+
+- Remember that your Apache must load apreq2 module or you got blanck pages
+  and Apache crash without log messages
+ls -al ls -al /etc/apache2/mods-enabled/apreq.load 
+
+- Create a database, update config.yaml with info for accessing db and 
+  create the table for storing web sessione
+CREATE TABLE IF NOT EXISTS `sysSessions` (
+  `id` varchar(32) character set latin1 collate latin1_bin NOT NULL,
+  `a_session` text character set latin1 collate latin1_bin,
+  `ts` timestamp NOT NULL default CURRENT_TIMESTAMP,
+  PRIMARY KEY  (`id`)
+)
+

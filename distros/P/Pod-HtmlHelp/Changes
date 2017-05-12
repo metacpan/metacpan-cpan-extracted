@@ -1,0 +1,4 @@
+____________________________________________________________________________
+[   672] By: autrijus                              on 2002/08/16  18:51:54
+        Log: * first public release.
+	   ! HtmlHelp.pm Makefile.PL README bin/pod2chm t/1-basic.t

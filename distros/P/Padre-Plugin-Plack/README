@@ -1,0 +1,137 @@
+NAME
+    Padre::Plugin::Plack - PSGI/Plack plugin for Padre
+
+VERSION
+    version 1.200
+
+SYNOPSIS
+        # cpan install Padre::Plugin::Plack;
+        # Then enable it via L<Padre>, The Perl IDE:
+        # Padre > Plugins > Plugin Manager > Plack > enable
+
+DESCRIPTION
+    As the name suggests, Padre::Plugin::Plack adds Plack awareness to
+    Padre.
+
+    With the plugin installed, opening *.psgi files causes some special
+    things to happen.
+
+    PSGI files are really just ordinary Perl files, so Padre does its normal
+    Perl lexing/syntax highlighting magic on them, but the real fun starts
+    with the Plack-specific features that appear in the per-file graphical
+    plackup control panel that shows up.
+
+    The panel lets you run your web app in a Plack server at the click of a
+    button, view server output, configure plackup options and launch a web
+    browser on the appropriate port.
+
+    The great thing about Plack/PSGI is that unlike my previous plugin
+    (Padre::Plugin::WebGUI) which was specific to a single web app (albeit a
+    big one), this plugin can be used for any web app built in a web
+    framework that supports Plack (Catalyst, CGI::Application, HTTP::Engine,
+    etc..). This is the same motivating factor that excites
+    Plack::Middleware authors.
+
+    The plugin turns on plackupâs "--reload" option by default, which
+    conveniently causes the plack server to reload every time you modify
+    your source files in Padre. This makes for quite a nice, if somewhat
+    minimal "Plack IDE" experience (this is version 0.01 after all).
+
+    The plugin integrates all of the Plack example "dot-psgiâ"files as
+    templates that can be used to create different types of Plack apps
+    straight from the GUI menu.
+
+    The pre-populated list of Plack servers and the simple start/stop button
+    makes for a nice way of exploring the Plack server ecosystem. You can
+    use the other panel options to enter a specific port to run on, toggle
+    auto-start mode and pass additional options to plackup (options that
+    start with "--" are passed through to the backend server).
+
+    The output panel is similar to the output panel that Padre normally
+    displays when you execute Perl files, except that you get one panel per
+    .psgi file meaning that you can run multiple plack servers
+    simultaneously and independently view their output. The appropriate
+    panel is automatically selected when you click on the corresponding file
+    tab, and running processes are stopped when you close the tab.
+
+    It should be really easy to turn Padre::Plugin::Plack into new plugins
+    that involve the same basic ingredients, namely a file extension and an
+    external command for running those files, with a per-file panel for
+    command options and output. So I encourage anyone who has a similar
+    plugin in mind to steal liberally from Padre::Plugin::Plack (as I did
+    from Padre::Plugin::Catalyst - thanks garu++). Ruby Rack support comes
+    to mind as a trivial example.
+
+    Make Padre your domain-specific IDE today :)
+
+    Blog post with screenshots:
+    <http://blog.patspam.com/2009/padrepluginplack>
+
+METHODS
+  padre_interfaces
+    Declare the Padre interfaces this plugin uses
+
+  registered_documents
+    Declare ourselves as the handler for .psgi files
+
+  menu_plugins
+    Create the plugin menu
+
+  on_app_load
+    Called when Padre loads
+
+  is_psgi_doc
+  editor_enable
+  editor_changed
+  on_panel_load
+  on_panel_close
+  on_doc_load
+    Note that the new tab may or may not exist at this point When triggered
+    by user opening a new file (e.g. from on_app_load), tab does not exist
+    yet Whereas, when triggered by user creating new app from template, tab
+    exists
+
+  on_doc_close
+  on_about_load
+  load_dot_psgi_examples
+  plugin_enable
+  plugin_enable
+  plackup
+  plackdown
+  run_command
+  build_panel
+    This method belonds in Padre::Plugin::Plack::Panel but we keep it here
+    to speed up the dev edit-reload cycle
+
+  TRACE
+CONTRIBUTORS
+    *   Gábor Szabó - גאבור סבו (SZABGAB) <szabgab@gmail.com>
+
+TRANSLATORS
+    Big thanks to all the wonderful translators!
+
+    *   French - Jerome Quelin (jquelin) <jquelin@cpan.org>
+
+    *   Dutch - Dirk De Nijs (ddn123456) <DIRKDN@cpan.org>
+
+    *   Brazilian Portuguese - Breno G. de Oliveira (GARU) <garu@cpan.org>
+
+    *   Arabic - أحمد محمد زواوي Ahmad M. Zawawi (azawawi)
+        <ahmad.zawawi@gmail.com>
+
+    *   Turkish - Burak Gürsoy (burak) <burak@cpan.org>
+
+    *   Italian - Simone Blandino (sblandin)
+
+SEE ALSO
+    Plack, Padre
+
+AUTHOR
+    Patrick Donelan <pdonelan@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Patrick Donelan.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

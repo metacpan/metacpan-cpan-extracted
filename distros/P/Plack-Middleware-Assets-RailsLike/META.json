@@ -1,0 +1,88 @@
+{
+   "abstract" : "Bundle and minify JavaScript and CSS files",
+   "author" : [
+      "Yoshihiro Sasaki"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.5.3",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Assets-RailsLike",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CSS::LESSp" : "0.86",
+            "CSS::Minifier::XS" : "0.08",
+            "Cache::Cache" : "1.06",
+            "Digest::SHA1" : "2.13",
+            "File::Slurp" : "9999.19",
+            "HTTP::Date" : "6.02",
+            "JavaScript::Minifier::XS" : "0.09",
+            "Plack" : "0",
+            "Text::Sass" : "0.97",
+            "Text::Sass::XS" : "0.10",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Name::FromLine" : "0.010",
+            "Test::Time" : "0.04"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::Assets::RailsLike" : {
+         "file" : "lib/Plack/Middleware/Assets/RailsLike.pm",
+         "version" : "0.13"
+      },
+      "Plack::Middleware::Assets::RailsLike::Compiler" : {
+         "file" : "lib/Plack/Middleware/Assets/RailsLike/Compiler.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ysasaki/p5-plack-middleware-assets-railslike/issues"
+      },
+      "homepage" : "https://github.com/ysasaki/p5-plack-middleware-assets-railslike",
+      "repository" : {
+         "url" : "git://github.com/ysasaki/p5-plack-middleware-assets-railslike.git",
+         "web" : "https://github.com/ysasaki/p5-plack-middleware-assets-railslike"
+      }
+   },
+   "version" : "0.13",
+   "x_contributors" : [
+      "ysasaki <aloelight@gmail.com>"
+   ]
+}

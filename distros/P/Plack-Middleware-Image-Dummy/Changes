@@ -1,0 +1,18 @@
+Revision history for Plack::Middleware::Image::Dummy
+
+0.05    Thu Jan 26 16:15:14 2013
+    - Add max_width/max_height options
+
+0.04    Thu Jan 22 19:41:11 2013
+    - Add Imager::File::(PNG|JPEG) to dependent modules
+
+0.03    Thu Jan 20 12:25:57 2013
+    - Change color format from #RRGGBB to RRGGBB
+    - Fix typo
+    - Change test_requires to build_requires
+
+0.02    Thu Jan 20 04:11:15 2013
+    - Add Pod::Select/Readme to configure_requires
+
+0.01    Thu Jan 20 01:26:34 2013
+    - Initial version

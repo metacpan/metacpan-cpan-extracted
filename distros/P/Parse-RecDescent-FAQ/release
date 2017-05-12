@@ -1,0 +1,29 @@
+#!/bin/bash -x
+
+echo
+echo Changes should be made to .tt files *not* .pm files
+echo
+
+echo
+echo I hope you bumped the version number
+echo
+
+# make manifest
+
+export D=lib/Parse/RecDescent/FAQ
+O=$D/Original
+
+./tt.pl $O.tt
+mv $O.tt-out $O.pm
+
+perl Makefile.PL
+make
+make test
+rm *.tar.gz
+make tardist
+
+
+git commit -a -m "`grep 'VERSION =' $D.pm`"
+git push
+
+upload-cpan.pl *.tar.gz

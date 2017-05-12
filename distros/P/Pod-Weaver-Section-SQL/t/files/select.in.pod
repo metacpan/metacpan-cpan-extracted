@@ -1,0 +1,5 @@
+=pod
+
+=sql SELECT * FROM toto_table
+
+=cut

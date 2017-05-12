@@ -1,0 +1,5 @@
+<select id="[% select.id %]" name="[% select.id %]">
+  [% FOREACH item=select.items %]
+  <option value="[% item %]">[% item %]</option>
+  [% END %]
+</select>

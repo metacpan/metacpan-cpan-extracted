@@ -1,0 +1,10 @@
+.cvsignore
+.project
+Changes
+lib/Pod/POM/View/TOC.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-toc.t
+META.yml                                 Module meta-data (added by MakeMaker)

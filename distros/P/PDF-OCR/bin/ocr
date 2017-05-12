@@ -1,0 +1,44 @@
+#!/usr/bin/perl
+use strict;
+use Cwd;
+use lib './lib';
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /(\d+)/g;
+use Image::OCR::Tesseract 'get_ocr';
+
+for (@ARGV){ ### Getting OCR %
+	my $abs_image = Cwd::abs_path($_) or die("$0, [$_] is not resolved by abs path ");
+	my $ocr = get_ocr($abs_image) or warn("nothing inside $abs_image?") and next;
+	print $ocr;
+}
+
+exit;
+
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ocr - read an image file and turn into text
+
+=head1 DESCRIPTION
+
+This is just an interface to make it quick an easy to get ocr output from an image file.
+No matter what image you provide, imagemagick convert is called to turn it into the format
+for tesseract.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 SEE ALSO
+
+L<PDF::OCR>
+L<tesseract>
+
+=cut
+
+

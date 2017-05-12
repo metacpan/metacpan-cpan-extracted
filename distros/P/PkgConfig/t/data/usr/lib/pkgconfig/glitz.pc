@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libglitz
+Description: OpenGL compositing library
+Version: 0.5.6
+Libs: -L${libdir} -lglitz -lm
+Cflags: -I${includedir}

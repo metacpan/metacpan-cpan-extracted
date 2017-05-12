@@ -1,0 +1,34 @@
+---
+abstract: a perl graphic toolkit
+author:
+  - 'Dmitry Karasik <dmitry@karasik.eu.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Prima
+no_index:
+  directory:
+    - t
+    - inc
+    - include
+    - t
+    - img
+    - unix
+    - win32
+  file:
+    - Makefile.PL
+    - ms_install.pl
+requires:
+  perl: 5.01
+resources:
+  homepage: http://www.prima.eu.org/
+  repository: http://github.com/dk/Prima
+version: 1.51
+x_serialization_backend: YAML version 1.15

@@ -1,0 +1,46 @@
+# Copyright 2010, 2011 Kevin Ryde
+#
+# This file is part of Pod-MinimumVersion.
+#
+# Pod-MinimumVersion is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3, or (at
+# your option) any later version.
+#
+# Pod-MinimumVersion is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with Pod-MinimumVersion.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# /usr/share/perl5/Pod/MinimumVersion.pm was previously in
+# libperl-critic-pulp-perl version 48, so "Breaks:" that.
+#
+# Suggest: libperl-critic-pulp-perl as it has
+# Perl::Critic::Policy::Compatibility::PodMinimumVersion using this.
+
+Source: pod-minimumversion
+Section: perl
+Priority: optional
+Build-Depends: libtest-perl | perl (>= 5.004.05), cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42@zip.com.au>
+Standards-Version: 3.9.1
+Homepage: http://user42.tuxfamily.org/pod-minimumversion/index.html
+Bugs: mailto:user42@zip.com.au
+
+Package: pod-minimumversion
+Architecture: all
+Depends: perl (>= 5.004), libio-string-perl, libpod-parser-perl | perl (>= 5.6.0), libscalar-list-utils-perl | perl (>= 5.8), ${perl:Depends}, ${misc:Depends}
+Replaces: libperl-critic-pulp-perl (<= 48)
+Breaks: libperl-critic-pulp-perl (<= 48)
+Suggests: libperl-critic-pulp-perl (>= 49)
+Description: Determine minimum Perl version of POD directives
+ Read a Perl source or pod file and report the minimum Perl version
+ needed to process the POD directives used.
+ .
+ If targetting a particular Perl version this can report on POD
+ directives that might only be recognised by later Perl.  There's a
+ command line program interface and a module.

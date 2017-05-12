@@ -1,0 +1,59 @@
+{
+   "abstract" : "Override REST methods to Plack apps via POST",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
+      "David E. Wheeler <david@justatheory.com>",
+      "Aristotle Pagaltzis <pagaltzis@gmx.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-MethodOverride",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack::Middleware" : "0",
+            "Plack::Request" : "0",
+            "Plack::Util::Accessor" : "0",
+            "parent" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/theory/plack-middleware-methodoverride/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/theory/plack-middleware-methodoverride.git",
+         "web" : "https://github.com/theory/plack-middleware-methodoverride"
+      }
+   },
+   "version" : "0.15"
+}
+

@@ -1,0 +1,8 @@
+Release history for Padre::Plugin::DistZilla
+
+0.02    26 Sep 2010
+        + make plugin compatible with Padre 0.70
+	  thanks to Mike Doherty
+
+0.01    12 Sep 2010
+        + initial release

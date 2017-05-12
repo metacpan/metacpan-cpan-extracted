@@ -1,0 +1,37 @@
+v0.05 2012.05.18
+  Move author tests to xt
+  Avoid sort in scalar context
+  Add perl 5.006 as prerequisite
+
+v0.04 2012.05.16
+  Moved to github
+  ExtUtils::MakeMaker instead of Module::Build
+  Clean up the tests
+  Add version number to all the modules
+
+
+v0.03 2006.09.22
+  New tubes:
+  - grep
+
+  Change the run mode, 
+  my $p = Pipe->cat("file");        # returns a Pipe object
+  $p->run;   # executes the pipe.
+
+  my $p = Pipe->cat("file")->run;   # also works
+
+v0.02 2006.04.14
+  New tubes:
+  - find
+  - print (was not working in previous release)
+  - say
+  - tuple
+
+  Added few examples to the documentation.
+
+
+v0.01 2006.04.12
+
+  Initial release
+
+

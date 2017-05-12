@@ -1,0 +1,56 @@
+---
+doctype: dist
+
+header:
+  name: Pod-Weaver-Section-Badges
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Moose
+      - namespace::autoclean
+      - Types::Standard
+      - Pod::Weaver::Role::Section
+      - Pod::Weaver::Role::AddTextToSection
+      - MooseX::AttributeDocumented
+      - Module::Pluggable: 4.7
+      - List::Util
+      - PerlX::Maybe
+  test:
+    requires:
+      - Test::Differences
+      - PPI
+      - Pod::Elemental
+      - Pod::Weaver
+      - Dist::Zilla::Plugin::PodWeaver
+      - Dist::Zilla::Tester
+      - Test::DZil
+      - Path::Tiny
+      - Badge::Depot: 0.0104
+      - FindBin
+      - File::pushd
+      - syntax
+      - Syntax::Feature::Qi: 0.2004
+  develop:
+    requires:
+      - Badge::Depot: 0.0104
+
+plugins:
+  - +config: Author::CSSON
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+    splint: 1
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+config: Author::CSSON
+always:
+ - /Pod-Weaver-Section-Badges-*

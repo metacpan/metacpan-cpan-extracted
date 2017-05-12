@@ -1,0 +1,7 @@
+Revision history for Perl extension P2P::Transmission::Remote
+
+0.02  Fri Oct 31 19:33:21 PDT 2008
+        - dependencies in Makefile.PL
+
+0.01  Sun Oct 26 22:50:43 2008
+        - original version

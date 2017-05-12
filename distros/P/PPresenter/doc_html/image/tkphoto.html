@@ -1,0 +1,123 @@
+
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Tk::Photo images</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Tk::Photo images</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<A HREF=index.html>Images</A><BR>
+<UL>
+<LI><B>tkPhoto</B>
+<LI><A HREF=magick.html>Magick</A>
+</UL>
+<P>
+Options:
+<UL>
+<LI><A HREF=index.html#general>general</A>
+<LI><A HREF=#options>tkPhoto</A>
+</UL>
+<A HREF=#functions>functions</A><BR>
+<A HREF=#examples>Examples</A>
+<P>
+
+    </TD><TD VALIGN=top>
+
+An important part of the design of
+<A HREF=../../index.html>Portable Presenter</A> is the requirement for
+screen-size independency; fonts and also images are scaled, dependent on
+the actual screen-size.
+<P>
+You can defined Tk::Photo images in two ways:
+<UL>
+<LI>Implicit: use an image in your slide description, for instance
+    with
+<PRE>
+  $show->addSlide(-main =&gt; '&lt;IMG SRC=image.xpm&gt');
+</PRE>
+    In this case, you have created a Tk::Photo object, but are not able
+    to control it, although there are some options which you can use when
+    you use the <A HREF=../formatter/markup.html>markup formatter</A>.
+    <P>
+
+<LI>Explicit: define an image and refer to it later.  For this, you have to
+    know that Tk::Photo objects are related to a MainWindow.  A PPresenter show
+    can contain different <A HREF=../viewport/index.html>viewports</A>, so
+    you have to tell beforehand to which of them the image will be used.
+</UL>
+The explicit way is demonstrated on this page. The implicit way is the
+same for Tk::Photo objects and Image::Magick object, which is described
+on the <A HREF=index.html>main image page</A>.
+
+<H2><A NAME=options>tkPhoto options</A></H2>
+
+There are no special options for tkPhoto objects: the
+<A HREF=index.html#general>general options</A> define all.
+
+<H2><A NAME=functions>tkPhoto functions</A></H2>
+
+Each Tk::Photo object is related to a MainWindow, to one
+<A HREF=../viewport/index.html>viewport</A>.  To create one, you need to
+reach the window, so require the help of PPresenter:
+<PRE>
+   $show-&gt;image($show-&gt;Photo(<I>..options..</I>));
+
+   my $vp = $show-&gt;find(viewport =&gt; 'default');
+   $show-&gt;image($vp-&gt;Photo(<I>..options..</I>));
+
+   my $vp = $show->addViewport(...);
+   my $p  = $vp->Photo(...);
+   $show-&gt;image($p);
+</PRE>
+The problem now, is that the image is defined for only one viewport: the
+`selected viewport' of the show, in the first case (i.e. th&egrave; window
+if you have only one); the viewport named `default' in the second case;
+and the explicitly added viewport in the last case.<BR>
+<P>
+If you want to use an image for more than one viewport, you do not have
+to take care yourself: PPresenter makes a copy for each viewport where it is
+used in.
+<P>
+One PPresenter::Image object is created on the <CODE>image()</CODE> fuction
+call, so you can specify the options for that object there.  For objects
+created this way, the default of <CODE>-resize</CODE> is off (<CODE>0</CODE>).
+
+<H2><A NAME=examples>Examples</A></H2>
+
+<H4>Example 1: Own symbols for unordered lists</H4>
+
+Usually, the dots used to precede a list-item in an unordered list (for
+instance used by the <A HREF=../formatter/markup.html>markup formatter</A>),
+is defined by the <A HREF=../decoration/index.html>decoration</A> option
+<CODE>-nestImages</CODE>.  The dots can be specified as filename or as
+objects.
+<P>
+<PRE>
+   use PPresenter;
+
+   my @p;
+   $p[0] = $show-&gt;Photo(-file => 'redball.gif');
+   $p[1] = $show-&gt;Photo(-file => 'blueball.pct');
+
+   $show-&gt;change( decoration  =&gt; 'ALL'
+                , -nestImages =&gt; [ undef, @p ] )
+</PRE>
+
+<P>
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

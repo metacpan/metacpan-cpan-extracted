@@ -1,0 +1,40 @@
+<div class="user_login">
+    <form action="[%c.uri_for('/user/login')%]" method="post" name="login_form">
+        <fieldset>
+            <p>
+                [% IF login_message %]
+                [% login_message %]<br />
+                [% ELSE %]
+                [% message %]<br />
+                [% END %]
+            </p>
+            <label for="username" accesskey="u"><b>[%l('Username')%]:</b></label>
+            <br />
+            <input type="text" id="login_username" name="username" size="40" class="input_text" tabindex="1" />
+            <br />
+            <br />
+
+            <label for="login_password" accesskey="p"><b>[%l('Password')%]:</b></label>
+            <br />
+            <input type="password" id="login_password" name="password" size="40" class="input_text" tabindex="2" />
+            <br />
+
+            <br />
+            <button type="submit" class="input_button" tabindex="3" />[%l('Login')%]</button>
+
+                <p align="right">
+                <a href="[%c.uri_for('/user/password/forgotten')%]">[%l('Forgotten Password')%]</a>
+                |
+                <a href="[%c.uri_for('/user/signup')%]">[%l('Register')%]</a>
+                </p>
+        </fieldset>
+    </form>
+</div>
+
+<!-- put focus into the username field on the form above -->
+<script language="JavaScript">
+	<!-- Begin
+    document.forms['login_form'].elements['username'].focus();
+	// End -->
+</script>
+

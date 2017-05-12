@@ -1,0 +1,26 @@
+NAME
+    Pod::Perldocs - view remote pod via Pod::Perldoc
+
+DESCRIPTION
+    This is a drop-in replacement for "perldoc" based on "Pod::Perldoc".
+    Usage is the same, except in the case when documentation for a module
+    cannot be found on the local machine, in which case a query (via LWP or
+    SOAP::Lite) will be made to a remote pod repository and, if the
+    documentation is found there, the results will be displayed as usual.
+
+NOTE
+    The values of $pod_server, $soap_uri and $soap_proxy at the top of 
+    this script reflect the location of the remote pod repository.
+
+SERVER
+    See the *CPAN-Search-Lite* project on SourceForge at
+    <http://sourceforge.net/projects/cpan-search/> for the software needed
+    to set up a remote pod repository used by "perldocs".
+
+SEE ALSO
+    Pod::Perldoc.
+
+COPYRIGHT
+    This software is copyright 2004,2009 by Randy Kobes <r.kobes@uwinnipeg.ca>.
+    Usage and redistribution is under the same terms as Perl itself.
+

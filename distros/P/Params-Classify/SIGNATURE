@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2f6a77cc1af0bc60cf87ec5335a995defa3e6eaf .cvsignore
+SHA1 a433f32fb0d0334e4001ec04741f776c4199379d Build.PL
+SHA1 22cbe81208a74303ace05ff63a9243c3cb87221d Changes
+SHA1 2e0cd1c1b78fb8591fde383f023acb4a579cb4dc MANIFEST
+SHA1 1463aa8b2d472d2dca1d6f601e28e874ef95e502 META.yml
+SHA1 0e23f901a8f88cc5f8fd6f9aa29c9122db1c00e4 Makefile.PL
+SHA1 00ef56b107920b1bb435a80247d50dded3c1eace README
+SHA1 91978573e906c90b93752e0733ef8e875f0d1b89 lib/Params/.cvsignore
+SHA1 615202f9e823f139fbfcb4fe46fc7cc8989da9b0 lib/Params/Classify.pm
+SHA1 40b5ef7d1c03d951912097973ecd6b2e095a3c32 lib/Params/Classify.xs
+SHA1 497c90b7b470f8c3a4594265c4a97376000fc2aa t/blessed.t
+SHA1 a3d9a389510faf3bfecb4860a14813988a0eddcd t/blessed_pp.t
+SHA1 e05666c5b2480ce441116ff26e55fa5bb07fb741 t/check.t
+SHA1 ec88f98f2f29c1a6999db46666e5eb7cf9fa46b1 t/check_pp.t
+SHA1 071b996f6953fd005472b99a0ed867404425239a t/classify.t
+SHA1 22c8bb9af38f3eaa604350884e3fcc9c200b5f1b t/classify_pp.t
+SHA1 29b6f328b7b3c928d455f82d1a0708d821445554 t/error.t
+SHA1 fc008cb61eb02798d6ec02df230ef4d59bcdca12 t/error_pp.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 3f447b1d0b8a6247c3a311087f8d66da1c3ca5db t/pod_cvg_pp.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 8a817d64d2098a5dfa7b65ba87b38314f9b3241e t/ref.t
+SHA1 4a19b745e2bcdfb8db18b149e79fcf8c235b24f8 t/ref_pp.t
+SHA1 97157325ac601fe786026cdc319f958c8ea785ae t/setup_pp.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkzi6yMACgkQOV9mt2VyAVE+hQCeOJemX8bpRvhEK7XBeB3YBmkF
+ZhIAoI/InODHqUDzt2Aryvc6tZH1SFNb
+=kZIC
+-----END PGP SIGNATURE-----

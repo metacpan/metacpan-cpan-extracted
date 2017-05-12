@@ -1,0 +1,8 @@
+.git
+.DS_Store
+blib
+.bak$
+Makefile$
+Makefile.old
+PerlSpec*.tar.gz
+t/PerlSpec.t

@@ -1,0 +1,47 @@
+Revision history for Perl extension Perlbal::Plugin::SessionAffinity
+
+0.101   14.10.16
+        * Provide a META.json file.
+
+0.100   15.09.14
+        * Craziness ensued. You can now have almost-random cookie names
+          based on the request's domain.
+
+0.010   18.12.13
+        * Copy over extra_config and extra_headers from the original service.
+        * Document possible incompatibilities.
+
+0.008   21.10.12
+        * Fix breakage of non-XS headers.
+
+0.007   21.10.12
+        * Handle Perlbal::XS::HTTPHeaders too.
+
+0.006   11.10.12
+        * Add "domain mode" - use_domain to handle fragmented cache.
+        * Doc fixes/cleanups.
+
+0.005   01.08.12
+        * Affinity salt is now off by default.
+        * You can now set salt on using AFFINITY_USE_SALT.
+        * Make configurations more relaxed by allowing prefixed spaces.
+        * Remove Carp dependency, it wasn't used.
+
+0.004   15.07.12
+        * Fix crash caused by "use fields" in Perlbal. Pfff...
+
+0.003   14.07.12
+        * Docs reversal.
+
+0.002   12.07.12
+        * affinity_cookie_header and affinity_salt are now production.
+          (the worked before, but now they're documented to be working)
+        * Removing pluggable fetching of backends since Perlbal already
+          picks them up without asking us and the user should actually
+          play with the pool if s/he want such stuff.
+        * Lots of code fixups/cleanups.
+        * Some docs fixups. Expect more. :)
+
+0.001   11.07.12
+        * Works, damn it!
+

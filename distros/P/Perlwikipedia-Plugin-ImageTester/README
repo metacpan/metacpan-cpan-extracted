@@ -1,0 +1,50 @@
+Perlwikipedia::Plugin::ImageTester
+==========================
+
+This is ImageTester, a Perlwikipedia plugin designed to interface with the
+online encyclopedia Wikipedia for purposes of image copyright enforcement.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Some of the test scripts included with this distribution of ImageTester
+require a working Internet connection. If the test phase will not
+complete because you do not have access to wiki.xyrael.net, you can
+(probably) safely install the module anyway.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+WWW::Mechanize
+XML::Simple
+HTML::Entities
+URI::Escape
+Carp
+Encode
+MediaWiki::API
+
+In addition, you must have Perlwikipedia version 1.5.2 or greater for plugin support.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, 2007 by Dan Collins
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.

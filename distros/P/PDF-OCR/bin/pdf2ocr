@@ -1,0 +1,117 @@
+#!/usr/bin/perl -w
+use strict;
+use warnings;
+use lib './lib';
+use base 'LEOCHARRE::CLI';
+use PDF::OCR::Thorough::Cached;
+
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.5 $ =~ /(\d+)/g;
+
+my $conf={};
+my $abs_conf = '/etc/pdf2ocr.conf';
+
+if (-f $abs_conf ){
+
+   $conf = config('/etc/pdf2ocr.conf');
+}
+
+
+my $o= gopts('sna:C');
+
+$conf->{CACHE_BY_SUM} = 1 if $o->{s};
+$conf->{abs_cache} = $o->{a} if $o->{a};
+
+
+
+
+
+my $pdfs = argv_aspaths();
+
+scalar @$pdfs or man();
+
+
+
+for (@$pdfs){
+   my $p = new PDF::OCR::Thorough::Cached($_) or next;
+	$PDF::OCR::Thorough::Cached::ABS_CACHE_DIR = $conf->{abs_cache} if $conf->{abs_cache};
+	$PDF::OCR::Thorough::Cached::CACHE_BY_SUM = $conf->{CACHE_BY_SUM} if $conf->{CACHE_BY_SUM};
+
+   debug("cache by sum? ".$PDF::OCR::Thorough::Cached::CACHE_BY_SUM);
+   debug("abs cache dir? ".$PDF::OCR::Thorough::Cached::ABS_CACHE_DIR);
+
+   my $abs_cache_file = $p->abs_cached;
+   debug("cache file: $abs_cache_file");
+   if ($o->{n}){
+      print STDERR "$abs_cache_file\n";
+      next;
+   }
+   if ($o->{C}){
+      print STDERR ( -f $abs_cache_file ? "$abs_cache_file\n" : "0\n");
+      next;
+   }
+
+   my $text = $p->get_text;
+
+   print $text;
+}
+
+
+
+
+
+
+
+
+
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+pdf2ocr - get text content of pdf document images within
+
+=head1 DESCRIPTION
+
+Argument is a pdf file.
+
+This script assumes that each page in the pdf is one 8.5x11 page.. ONE image
+that's what the calculations are set up for.
+
+=head1 USAGE EXAMPLES
+
+
+=head1 OPTION FLAGS
+
+   
+	-h help
+	-d debug
+	-v version
+
+   -s cache by sum on
+   -n don't do anything, just show where cache file would be
+   -C don't do anything, only show where cache file is if there 
+      basically checking if it's cached or not.
+
+=head1 PARAMETERS
+   -a abs cache dir
+   
+=head1 /etc/pdf2ocr.conf
+
+   ---
+   abs_cache: /tmp/cache
+   CACHE_BY_SUM: 1
+
+=head1 SEE ALSO
+
+PDF::OCR - parent package
+PDF::OCR::Thorough::Cached
+LEOCHARRE::CLI
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=cut

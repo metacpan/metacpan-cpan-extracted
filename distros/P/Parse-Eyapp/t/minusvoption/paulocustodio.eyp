@@ -1,0 +1,37 @@
+%{
+  my $stmt;
+%}
+%%
+prg: stmt * 
+;
+
+sos: 
+   /* empty */ { $stmt++ } 
+;
+
+stmt: 
+    '\n' 
+  | sos 'nop' '\n' 
+;
+
+%%
+
+my @input = ("nop", "\n", "org", "\n");
+sub my_lexer {
+  my $t = shift(@input);
+  ($t, $t);
+}
+
+sub my_error {
+  my($self) = @_;
+  my $t = $self->YYCurval || "eof";
+  my @expected = map { $_ eq "\n"? q{'\\n'} : qq{'$_'} } $self->YYExpect();
+  local $" = ', ';
+  die("Statement $stmt: Syntax error at $t. Expected (@expected).\n");
+}
+
+sub main {
+  __PACKAGE__->new->YYParse( yylex => \&my_lexer, yyerror => \&my_error);
+}
+
+main();

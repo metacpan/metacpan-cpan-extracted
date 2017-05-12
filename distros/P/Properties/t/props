@@ -1,0 +1,5 @@
+socket.local.port = 3333
+socket.local.hostname = localhost
+socket.local.maxconnections = 10
+socket.remote.port = 3334
+socket.remote.hostname = remotehost

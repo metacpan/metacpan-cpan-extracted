@@ -1,0 +1,491 @@
+<?xml version="1.0"?>
+<!DOCTYPE presentation SYSTEM "ppr-simple.dtd">
+
+<presentation title="Open Source Software"><!-- geometry="800x600"-->
+
+<slide title="" template="main">
+ <body>
+  <p align="center"><huge>Open Source Software</huge></p>
+  <p align="center">And the opportunities for ACME</p>
+  <p align="center">&nbsp;</p>
+  <p align="center">
+   <smaller>Johan Vromans<br/>Research &amp; Development</smaller></p>
+ </body>
+</slide>
+
+<slide title="Contents">
+ <body>
+  <ul>
+   <li>History of Open Source</li>
+   <li>Licenses</li>
+   <li>Current status</li>
+   <li>Opportunities for ACME</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="How it all started">
+ <body>
+  <p>Right from the start, lots of people enjoyed writing computer
+  programs.</p>
+  <p>Programs were passed around freely, often with sources
+  included.</p> 
+  <p>Software from commerical organisations is <em>execute only</em>
+   and requires a <em>license</em>.</p>
+  <p>The USENET network and, later, the Internet helped spreading the
+  free software.</p>
+ </body>
+</slide>
+
+<slide title="The opposition">
+ <body>
+  <p>Commercial software vendors didn't like free software, but there
+  was not much they could do.</p>
+  <p>They tell everyone that it is buggy and unreliable, and that
+  there's noone to talk to.</p>
+  <p>This was proven wrong over and over again.</p>
+ </body>
+</slide>
+
+<slide title="Successful free software">
+ <body>
+  <ul>
+   <li>GNU Compilers</li>
+   <li>Linux operating system</li>
+   <li>Apache web server</li>
+   <li>Tools like Perl and GNU Emacs</li>
+   <li show="phase 1 from s 1">The Internet</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="Why so successful?">
+ <body>
+  <p>An almost unlimited number of people participating in the
+  development.</p>
+  <p>Even more people are using the software, provide feedback, even
+  fix bugs.</p>
+  <p>Suitable for reuse of modules and complete products.</p>
+  <p>Because it is fun, the developers are highly
+  motivated. <a show="phase 1">And usually highly skilled.</a> 
+  <a show="phase 2">And often they write it for themselves to use.</a></p> 
+ </body>
+</slide>
+
+<slide title="Free means free">
+ <body>
+  <p>If you have the freedom to do whatever you want to do with free
+   software<mark name="fo"/><a show="phase 1 to e 3">...</a>
+  <redo name="fo"><a show="phase 1 after 3 appear">, you can turn it into a commercial product 
+   and deny others the right to do likewise.</a></redo></p>
+ </body>
+</slide>
+
+<slide title="Richard M. Stallman">
+ <body>
+  <p>Software, like science, must be free.</p>
+  <p><a show="phase 1">Free as in speech, not as in beer.</a></p>
+  <p><a show="phase 2">Initiated the GNU project and the Free Software Foundation.</a></p>
+  <p><a show="phase 3">Defined the GPL: GNU Public License.</a></p>
+  <p><a show="phase 4"><em>Copyleft:</em> What is free, must remain free.</a></p>
+ </body>
+</slide>
+
+<slide title="Richard M. Stallman (2)">
+ <body>
+  <img src="rms.jpg"/>
+  <p align="center">Saint Ignucius</p>
+ </body>
+</slide>
+
+<slide title="Weakness of free software">
+ <body>
+  <p>How to control and moderate?</p>
+  <p>No big investments possible.</p>
+ </body>
+</slide>
+
+<slide title="Eric S. Raymond">
+ <body target="left">
+  <img src="eric.raymond.gif"/>
+ </body>
+ <body target="right">
+  1997. Netscape was desparate for a new strategy against Microsoft.
+  <mark/><a show="phase 1 from s 1" name="hacker">
+   <p><i>Eric Raymond</i>, hacker guru, had one.</p>
+  </a><mark name="foo"/>
+ </body>
+</slide>
+
+<slide title="The Cathedral and the Bazar">
+ <body>
+  <p>Analysis of the way the Linux project is run.</p>
+  <p>Describes the Fetchmail project.</p>
+  <p>Shows that it is possible to control a large group of developers
+  without formal relations.</p>
+ </body>
+</slide>
+
+<slide title="The Open Source movement">
+ <body>
+  <p>In 1997, a group of leaders of the free software community
+  assembled.</p>
+  <p>Their concern was to find a way to promote the ideas surrounding
+  free software.</p>
+  <p>They were concerned that the Free Software Foundation's
+  anti-business message was keeping the world from really
+  appreciating the power of free software.</p>
+ </body>
+</slide>
+
+<slide title="The Open Source movement (2)">
+ <body>
+  <p>The group agreed that what they lacked was a marketing campaign,
+  a campaign to win mind share, not just market share.</p>
+  <p>They defined a new term to describe the software they were
+  promoting: <em>Open Source</em>.</p>
+  <p>OSD: Open Source Definition</p>
+ </body>
+</slide>
+
+<slide title="Open Source">
+ <body>
+  <p>OSD descendant of the "Debian Social Contract".</p>
+  <p>By means of moderation the development process can be controlled.</p>
+  <p>By means of licensing the Open Source software can be mixed with
+  proprietary software.</p>
+  <p><a show="phase 1 from s">Investments become attractive.</a></p>
+  <p><a show="phase 2 from s">Software becomes commodity.</a></p>
+ </body>
+</slide>
+
+<slide title="License types">
+ <body target="left">
+  <ul>
+   <li>OSD</li>
+   <li show="after 5 from sw 2">Perl Artistic</li>
+   <li show="after 3 from nw 4">BSD</li>
+   <li show="after 2 from ne 5">GPL</li>
+   <li show="after 4 from se 3">LGPL</li>
+   <li show="after 3 from e  4">Aladdin</li>
+  </ul>
+ </body>
+ <body target="right">
+  <ul>
+   <li show="after 3 from nw 4">X</li>
+   <li show="after 5 from ne 2">Jikes</li>
+   <li show="after 4 from e  3">NPL</li>
+   <li show="after 2 from w  5">MPL</li>
+   <li show="after 2 from se 5">SCSL</li>
+   <li show="after 3 from nw 4">SleepyCat</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="Characteristics">
+ <body>
+  <ul>
+   <li>Open Source compliancy</li>
+   <li>Fee restrictions</li>
+   <li>Distribution restrictions</li>
+   <li>Virulent</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="BSD">
+ <body>
+  <p><em>Berkeley Software Distribution</em></p>
+  <ul>
+   <li>Open Source compliant</li>
+   <li>No fee restrictions</li>
+   <li>No bundling restrictions</li>
+   <li>Not virulent</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="X">
+ <body>
+  <p><em>X11 Consortium</em></p>
+  <ul>
+   <li>Open Source compliant</li>
+   <li>No fee restrictions</li>
+   <li>No bundling restrictions</li>
+   <li>Not virulent</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="Jikes3">
+ <body>
+  <p><em>IBM</em></p>
+  <ul>
+   <li>Open Source compliant</li>
+   <li>No fee restrictions</li>
+   <li>No distribution restrictions</li>
+   <li>Not virulent</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="GPL">
+ <body>
+  <p><em>Free Software Foundation</em></p>
+  <ul>
+   <li>Open Source compliant</li>
+   <li>No fee restrictions, but ...</li>
+   <li>No bundling restrictions</li>
+   <li>Virulent</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="LGPL">
+ <body>
+  <p><em>Free Software Foundation</em></p>
+  <ul>
+   <li>Open Source compliant</li>
+   <li>No fee restrictions, but ...</li>
+   <li>No bundling restrictions</li>
+   <li>Limited virulent</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="Perl Artistic">
+ <body>
+  <p><em>The Perl Programming Language</em></p>
+  <ul>
+   <li>Open Source compilant</li>
+   <li>Fee restrictions</li>
+   <li>Bundling restrictions</li>
+   <li>Not virulent</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="Aladdin">
+ <body>
+  <p><em>Ghostscript</em></p>
+  <ul>
+   <li>Not Open Source compliant</li>
+   <li>Restricted fees (distribution only)</li>
+   <li>No bundling with commercial products</li>
+   <li>Virulent</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="NPL">
+ <body>
+  <p><em>Netscape Communications</em></p>
+  <ul>
+   <li>Not Open Source compliant</li>
+   <li>No fee restrictions</li>
+   <li>No distribution restrictions</li>
+   <li>Limited virulent</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="MPL">
+ <body>
+  <p><em>Netscape Communications (Mozilla)</em></p>
+  <ul>
+   <li>Open Source compliant</li>
+   <li>No fee restrictions</li>
+   <li>No distribution restrictions</li>
+   <li>Limited virulent</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="SCSL">
+ <body>
+  <p><em>Sun Microsystems</em></p>
+  <ul>
+   <li>Not Open Source compliant</li>
+   <li>Fee restrictions</li>
+   <li>No distribution restrictions</li>
+   <li>Limited virulent</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="Promises of Open Source">
+ <body>
+ <ul>
+  <li>New distributed development paradigm
+   <ul>
+    <li>Unlimited amount of developers</li>
+    <li>Highly motivated and skilled developers</li>
+    <li>Distributed control / moderator</li>
+   </ul></li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="Promises of Open Source (2)">
+ <body>
+ <ul>
+  <li><text color="orange">New distributed development paradigm</text></li>
+  <li>Re-use of software
+   <ul>
+    <li>Embedded modules</li>
+    <li>Complete products</li>
+    <li>Branding</li>
+   </ul></li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="Promises of Open Source (3)">
+ <body>
+ <ul>
+  <li><text color="orange">New distributed development paradigm</text></li>
+  <li><text color="orange">Re-use of software</text></li>
+  <li>Community Web
+   <ul>
+    <li>Loyal, expanding group of users and evangelists</li>
+    <li>Web sites with hosting and other services</li>
+   </ul></li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="Threats">
+ <body>
+  <ul>
+   <li>Contracts</li>
+   <li>Software patents</li>
+   <li>UCITA</li>
+   <li>DMCA</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="The UCITA threat - Liability">
+ <body>
+  <p>A software developer or distributor is completely liable
+  for flaws in a program.</p>
+  <p>A shrink-wrap license may override this.</p>
+  <p>Software companies will use shrink-wrap
+  licenses to avoid liability entirely.</p>
+  <p>But 'free software' developers will be affected.</p>
+  <p>Free software developers won't have any reliable way to avoid the
+  problem.</p>
+ </body>
+</slide>
+
+<slide title="The UCITA threat - Reverse engineering">
+ <body>
+  <p>Software companies may prohibit reverse engineering.</p>
+  <p>Free software developers won't have a lawful way to figure out
+  proprietary file formats and protocols.</p>
+  <p><a show="phase 1">Imagine: No free tools to display Word documents,
+  to show GIF images, to play Audio CDs and MP3's...</a></p>
+ </body>
+</slide>
+
+<slide title="DMCA">
+ <body>
+  <p><em>Digital Millenium Copyright Act</em></p>
+  <p>Content providers can be sued if they provide acces to
+  copyrighted material.</p>
+  <p>They are, however, <em>not</em> liable if they remove the offending
+  material.</p>
+  <p><a show="phase 1">This forces Internet providers to control their
+  customers and remove everything they are not 100% sure of.</a></p>
+ </body>
+</slide>
+
+<slide title="ACME opportunities">
+ <body>
+  <ul>
+   <li>Knowledge management on Open Source
+    <ul>
+     <li>Web site with references and experiences (XML)</li>
+     <li>Share between labs and PS</li>
+     <li>Incorporate Open Source software in products</li>
+    </ul>
+   </li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="ACME opportunities (2)">
+ <body>
+  <ul>
+   <li><text color="orange">Knowledge management on Open Source</text></li>
+   <li>Start, or participate in, Open Souce projects
+    <ul>
+     <li>Scarce resources</li>
+     <li>Shared research / innovation</li>
+    </ul>
+   </li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="ACME opportunities (3)">
+ <body>
+  <ul>
+   <li><text color="orange">Knowledge management on Open Source</text></li>
+   <li><text color="orange">Start, or participate in, Open Souce projects</text></li>
+   <li>Offer infrastructure &amp; Expert service
+    <ul>
+     <li>Infrastructure: hosting, CVS, discussion forms, ...</li>
+     <li>Expertise: Project management</li>
+    </ul>
+   </li>
+  </ul>
+ </body>
+</slide>
+
+<slide title="About this presentation">
+ <body>
+  <p>This presentation was developed and presented using Open Source
+     tools only.</p>
+  <ul>
+   <li show="phase 1 from s 2">W3C Amaya XHTML browser/editor</li>
+   <li show="phase 2 from s 2">GNU Portable Presenter</li>
+   <li show="phase 3 from s 2">GNU Emacs and Perl</li>
+   <li show="phase 4 from s 2">GIMP</li>
+   <li show="phase 5 from s 2">RedHat Linux</li>
+  </ul>
+  The website was automatically produced by the Presenter.
+ </body>
+</slide>
+
+<slide title="" template="main">
+ <body>
+  <p align="center"><huge>Questions</huge></p>
+  <p align="center"><huge>&amp;</huge></p>
+  <p align="center"><huge>Answers</huge></p>
+ </body>
+</slide>
+
+<slide title="" template="main">
+ <body>
+  <p><smaller>&quot;That ideas should freely spread from one to
+  another over the globe, for the moral and mutual instruction of man,
+  and improvement of his condition, seems to have been peculiarly and
+  benevolently designed by nature, when she made them, like fire,
+  expansible over all space, without lessening their density at any
+  point, and like the air in which we breathe, move, and have our
+  physical being, incapable of confinement or exclusive appropriation.
+  Inventions then cannot, in nature, be a subject of
+  property.&quot;</smaller></p>
+
+  <p align='right'><em>Thomas Jefferson</em></p>
+ </body>
+</slide>
+
+</presentation>
+
+<!-- Local Variables: -->
+<!-- Mode: fundamental -->
+<!-- eval: (load-file "xml.el") -->
+<!-- eval: (font-lock-mode t) -->
+<!-- End: -->

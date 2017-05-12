@@ -1,0 +1,538 @@
+#!/opt/bin/perl
+
+=head1 NAME
+
+perl-libextractor - determine perl library subsets for building distributions
+
+=head1 SYNOPSIS
+
+   perl-libextractor ...
+
+General Options:
+
+   -v                verbose
+   --version         display version
+   -I path           prepend path to @INC
+   --no-packlists    do not use packlists
+
+Selection:
+
+   -Mmodule          load and trace module
+   --script progname add executable script
+   --eval | -e str   trace execution of perl string
+   --perl            add perl interpreter itself
+   --core-support    add core support
+   --unicore         add unicore database
+   --core            add perl core library
+   --glob glob       add library files select by glob
+   --filter pat,...  apply include/exclude patterns
+   --runtime-only    remove files not needed for execution
+
+Modes:
+
+   --list            list source and destination paths
+
+   --dstlist         list destination paths
+
+   --srclist         list source paths
+
+   --copy path       copy files to a target path
+      --bindir path     perl executable target ("exe")
+      --dlldir path     shared library target ("dll")
+      --scriptdir path  executable script target ("bin")
+      --libdir path     perl library target ("lib")
+      --strip           strip .pl and .pm files
+      --cache-dir path  cache directory to use
+      --binstrip "..."  strip binaries and dlls
+
+=head1 DESCRIPTION
+
+This program can be used to extract a subset of your perl installation,
+with the intention of building software distributions. Or in other words,
+this module finds all files necessary to run a perl program (library
+files, perl executable, scripts).
+
+The resulting set can then be displayed or copied to another directory,
+while optionally stripping the perl sources to make them smaller.
+
+=head2 OPTIONS
+
+This manpage gives only rudimentary documentation for options that have an
+equivalent in L<Perl::LibExtractor>, so look there for details.
+
+Options are not processed in order specified on the commandline, but in
+multiple phases (e.g., C<-I> gets executed before any C<-M> option).
+
+=head3 GENERAL OPTIONS
+
+These options configure basic settings.
+
+=over 4
+
+=item C<--verbose>
+
+=item C<-v>
+
+Increases verbosity - highly recommended for interactive use.
+
+=item C<--version>
+
+Display the version of L<Perl::LibExtractor>.
+
+=item C<-I> I<path>
+
+Prepends the given path to C<@INC> when searching perl library directories
+(the last C<-I> option is prepended first).
+
+=item C<--no-packlists>
+
+Packlists allow to package all of a distribution, including resource files
+not found through the normal tracing mechanism. This option disaables use
+of packlists (normally highly recommended).
+
+Some especially broken perls (Debian GNU/Linux...) have missing files,
+so this option doesn't work with them, at least not for any packages
+distributed by debian (packages installed through CPAN or any other
+non-dpkg-mechanism work fine).
+
+=back
+
+=head3 SELECTION
+
+These options specify and modify module selections. They are executed in
+the order stated on the commandline, and when in doubt, you should use
+them in the order documented here.
+
+=over 4
+
+=item C<-M>I<module>
+
+Load the named module and trace direct dependencies
+(e.g. F<-MCarp>). Same as C<add_mod> in L<Perl::LibExtractor>.
+
+=item C<--script> I<progname>
+
+Compile the (installed) script I<progname> and trace dependencies
+(e.g. F<corelist>). Same as C<add_bin> in L<Perl::LibExtractor>.
+
+=item C<--eval> I<string>
+
+=item C<-e str> I<string>
+
+Compile and execute the givne perl code, and trace dependencies (e.g. F<-e
+"use AnyEvent; AnyEvent::detect">). Same as C<add_eval> in L<Perl::LibExtractor>.
+
+=item C<--perl>
+
+Adds the perl interpreter itself, including libperl if required to run
+perl. Same as C<add_perl> in L<Perl::LibExtractor>.
+
+=item C<--core-support>
+
+Add all support files needed to support built-in features of perl (such
+as C<ucfirst>), which is usually the minimum you should add from the core
+library. Same as C<add_core_support> in L<Perl::LibExtractor>.
+
+=item C<--unicore>
+
+Add the whole unicore database, which is big, contains many, many files
+and is usually not needed to run a program. Same as C<add_unicore> in
+L<Perl::LibExtractor>.
+
+=item C<--core>
+
+Add the complete perl core library, which includes everything added
+by F<--core-support> and F<--unicore>. Same as C<add_core> in
+L<Perl::LibExtractor>.
+
+Some especially broken perls (Debian GNU/Linux...) have missing files, so
+this option doesn't work with them.
+
+=item C<--glob glob>
+
+Add all files from the perl library directories thta match the given
+extended glob pattern. Same as C<add_glob> in L<Perl::LibExtractor>, also
+see there for the syntax of glob patterns.
+
+Example: add AnyEvent.pm and all AnyEvent::xxx modules installed.
+
+   --glob Coro --glob "Coro::*"
+
+=item C<--filter pat,...>
+
+Apply a comma-separated series of extended glob patterns, prefixed by
+C<+> (include) or C<-> (for exclude patterns).  Same as C<filter> in
+L<Perl::LibExtractor>, also see there for exact semantics and syntax.
+
+Example: remove all F<*.al> files in F<auto/POSIX>, except F<memset.al>.
+
+   --filter "+/lib/auto/POSIX/memset.al,-/lib/auto/POSIX/*.al"
+
+=item C<--runtime-only>
+
+Remove all files not needed to run any scripts, such as debug info
+files, link libraries, pod files and so on. Same as C<runtime_only> in
+L<Perl::LibExtractor>.
+
+=back
+
+=head3 MODES
+
+These options select a specific work mode. Work modes might have specific
+options to control them further.
+
+=over 4
+
+=item C<--list>
+
+Lists all selected files in two columns, first column is destination path,
+second column is source path and first line is a header line.
+
+=item C<--dstlist>
+
+Same as C<--list>, but only list destination paths and has no header -
+intended for scripts.
+
+=item C<--srclist>
+
+Same as C<--list>, but only list source paths and has no header -
+intended for scripts.
+
+=item C<--copy> I<path>
+
+Copy all selected files to the respective position under the directory
+I<path> - previous contents of the directory will be list.
+
+This mode has the following suboptions:
+
+=over 4
+
+=item C<--exedir> I<path>
+
+Specifies the subdirectory for binary executables (the perl interpreter itself), instead of
+the default F<exe/>.
+
+=item C<--dlldir> I<path>
+
+Specifies the subdirectory for shared libraries, instead of
+the default F<dll/>.
+
+=item C<--bindir> I<path>
+
+Specifies the subdirectry for perl scripts, instead of
+the default F<bin/>.
+
+=item C<--libdir> I<path>
+
+Specifies the subdirectory for perl library files, instead of
+the default F<lib/>.
+
+=item C<--strip>
+
+Strip all C<.pm>, C<.pl>, C<.al> files and perl executables, which
+mostly means removal of unecessary whitespace and documentation - see
+L<Perl::Strip> which is used.
+
+=item C<--cache-dir> I<path>
+
+Specify the cache dir to use - the default is F<~/.cache/perlstrip> for
+cached stripped perl files (compatible to the C<perlstrip> program).
+
+=item C<--binstrip> I<"...">
+
+Use the specified program and arguments to strip executables, shared libraries and shared objects.
+
+This is only necessary when your programs were compiled with debugging
+info, but can be used to specify extra treatment for all binary files.
+
+=back
+
+=back
+
+=head1 EXAMPLE
+
+This is how the Deliantra client (L<http://www.deliantra.,net>) is being packages:
+
+   perl-libextractor \
+      --perl --core-support --script deliantra \
+      --runtime-only \
+      --copy distdir --strip --exedir . --dlldir . --bindir pm/bin --libdir pm \
+
+The first line of arguments adds perl, support for core functions (the
+Deliantra client does need the full unicode database or perl core) and
+tells F<perl-libextractor> to parse the installed F<deliantra> script and
+trace all it's dependencies. The script is installed by installed the
+C<Deliantra::Client> module from CPAN.
+
+This finds all required perl dependencies.
+
+The second line of arguments (F<--runtime-only>) then removes all files
+not required for execution, slimming down the distribution.
+
+The last line tells F<perl-libextractor> to copy the resulting files to
+the directory F<distdir>. The argument F<--strip> tells it to stirp all perl sources
+(make them smaller by removing whitespace, comments and documentation, which saves about a megabyte).
+
+The remaining arguments override the default subdirectories for the files,
+as L<Urlader>, which is used for the binary distribution, works best if
+dll's and executables are in the top dir.
+
+After this, the script that builds the distribution does a lot more, for
+example finding shared libraries (such as pango, SDL and so on), renaming
+them on OS X to avoid the severe DLL Hell on that platform, and provides
+a wrapper script that initialises perl so it loads its files from the
+distribution dir and doesn't try to search anything anywhere else.
+
+On GNU/Linux, the binaries and libraries are also patched to remove any
+rpath that Debian might have compiled in and that would keep perl from
+ignoring C<LD_LIBRARY_PATH>.
+
+The wrapper script is called C<run>, and looks a bit like this:
+
+   @INC = ("pm", "."); # "." required by newer AutoLoader grrrr.
+   $ENV{PANGO_RC_FILE} = "pango.rc";
+   require "bin/deliantra";
+   exit 0;
+
+The most important line is the first one, which tells F<perl> where to
+look for library files.
+
+=head1 SEE ALSO
+
+L<App::Staticperl>, L<Urlader>, L<Perl::Strip>.
+
+=head1 AUTHOR
+
+ Marc Lehmann <schmorp@schmorp.de>
+ http://software.schmorp.de/pkg/staticperl.html
+
+=cut
+
+use common::sense;
+
+use Getopt::Long;
+use List::Util ();
+use File::Path ();
+use File::Basename ();
+use File::Copy ();
+
+use Perl::LibExtractor;
+use Perl::Strip;
+
+our @INC;
+
+my $USE_PACKLISTS = 1;
+my $VERBOSE;
+
+my $STRIP;
+my $BINSTRIP;
+my $CACHE;
+my $CACHEDIR;
+
+my %DIR = qw(exe exe dll dll bin bin lib lib);
+
+$|=1;
+
+sub usage {
+   require Pod::Usage;
+
+   Pod::Usage::pod2usage (-output => *STDOUT, -verbose => 1, -exitval => 1, -noperldoc => 1);
+}
+
+@ARGV
+   or usage;
+
+Getopt::Long::Configure ("bundling", "no_auto_abbrev", "no_ignore_case");
+
+my $ex;
+my $set;
+my (@phase0, @phase1, @phase2);
+
+GetOptions
+   "verbose|v"     => sub { ++$VERBOSE },
+   "version"       => sub {
+      warn "This is perl-libextractor version $Perl::LibExtractor::VERSION\n";
+   },
+
+   "exedir=s"      => \$DIR{exe},
+   "dlldir=s"      => \$DIR{dll},
+   "bindir=s"      => \$DIR{bin},
+   "libdir=s"      => \$DIR{lib},
+
+   "I=s"           => sub {
+      my $arg = $_[1];
+      unshift @phase0, sub { unshift @INC, $arg };
+   },
+   "no-packlists"  => sub { $USE_PACKLISTS = 0 },
+
+   "M=s"           => sub {
+      my $arg = $_[1];
+      push @phase1, sub { $ex->add_mod ($arg) };
+   },
+   "script=s"      => sub {
+      my $arg = $_[1];
+      push @phase1, sub { $ex->add_bin ($arg) };
+   },
+   "eval|e=s"      => sub {
+      my $arg = $_[1];
+      push @phase1, sub { $ex->add_eval ($arg) };
+   },
+   "perl"          => sub {
+      push @phase1, sub { $ex->add_perl };
+   },
+   "core-support"  => sub {
+      push @phase1, sub { $ex->add_core_support };
+   },
+   "unicore"       => sub {
+      push @phase1, sub { $ex->add_unicore };
+   },
+   "core"          => sub {
+      push @phase1, sub { $ex->add_core };
+   },
+   "glob=s"        => sub {
+      my $arg = $_[1];
+      push @phase1, sub { $ex->add_glob ($arg) };
+   },
+   "filter=s"      => sub {
+      my $arg = $_[1];
+      push @phase1, sub { $ex->filter (split /,/, $arg) };
+   },
+   "runtime-only"  => sub {
+      push @phase1, sub { $ex->runtime_only };
+   },
+
+   "list"          => sub {
+      push @phase2, \&mode_list;
+   },
+   "dstlist"       => sub {
+      push @phase2, \&mode_dstlist;
+   },
+   "srclist"       => sub {
+      push @phase2, \&mode_srclist;
+   },
+   "copy=s"        => sub {
+      my $arg = $_[1];
+      push @phase2, sub { &mode_copy ($arg) };
+   },
+
+   "strip"         => \$STRIP,
+   "cache-dir=s"   => \$CACHEDIR,
+   "binstrip=s"    => \$BINSTRIP,
+
+   or die "try $0 --help\n";
+
+@phase2
+   or usage;
+
+# for strip_copy
+my $STRIPPER = do {
+   my @cache;
+
+   unless (defined $CACHEDIR) {
+      mkdir "$ENV{HOME}/.cache";
+      $CACHEDIR = "$ENV{HOME}/.cache/perlstrip";
+   }
+
+   new Perl::Strip cache => $CACHEDIR, optimise_size => 1
+};
+
+sub strip_copy($$) {
+   my ($src, $dst) = @_;
+
+   my $text = do {
+      open my $fh, "<:perlio", $src
+         or die "$src: $!\n";
+
+      local $/;
+      <$fh>
+   };
+
+   printf "$dst: %d ", length $text if $VERBOSE >= 2;
+
+   $text = $STRIPPER->strip ($text);
+
+   printf "to %d bytes... ", length $text if $VERBOSE >= 2;
+
+   open my $fh, ">:perlio", $dst
+      or die "$dst: $!\n";
+   length $text == syswrite $fh, $text
+      or die "$dst: $!\n";
+   close $fh;
+
+   print "ok\n" if $VERBOSE >= 2;
+}
+
+sub mode_list {
+   my @keys = sort keys %$set;
+   my $width = List::Util::max map length, @keys;
+
+   printf "%-*.*s %s\n", $width, $width, "SRC", "DST";
+   for (@keys) {
+      printf "%-*.*s %s\n", $width, $width, $_, $set->{$_}[0];
+   }
+}
+
+sub mode_dstlist {
+   print map "$_\n", sort keys %$set;
+}
+
+sub mode_srclist {
+   print map "$set->{$_}[0]\n", sort keys %$set;
+}
+
+sub mode_copy {
+   my $dst = shift;
+   print "deleting $dst.\n" if $VERBOSE;
+   File::Path::rmtree $dst, $VERBOSE >= 2, 0;
+
+   print "populating $dst...\n" if $VERBOSE;
+
+   my %mkdir;
+
+   while (my ($path, $info) = each %$set) {
+      $path =~ m%^([^/]+)(.*)/([^/]+)$%
+         or die "$path: malformed destination path, please report.\n";
+
+      my ($p1, $p2, $f) = ($1, $2, $3);
+
+      my $dstdir = "$dst/$DIR{$p1}$p2";
+
+      File::Path::mkpath $dstdir, $VERBOSE >= 2, 0777
+         unless $mkdir{$dstdir}++;
+
+      my $src = $info->[0];
+
+      if (
+         $STRIP
+         && ($f =~ /\.(?:pm|pl|ix|al)$/
+             || $p1 eq "bin")
+      ) {
+         strip_copy $src, "$dstdir/$f";
+
+      } else {
+         File::Copy::cp $src, "$dstdir/$f"
+            or die "$src => $dstdir/$f: $!";
+
+         if (
+            $f =~ /\.(?:bundle|dyld|so|dll|sl)$/ # TODO
+            || $p1 eq "exe"
+            || $p1 eq "dll"
+         ) {
+            if (defined $BINSTRIP) {
+               system "$BINSTRIP \Q$dstdir/$f";
+            }
+
+            chmod 0777 & ~umask, "$dstdir/$f";
+         }
+      }
+   }
+}
+
+$ex = new Perl::LibExtractor use_packlists => $USE_PACKLISTS;
+
+$_->() for @phase0;
+$_->() for @phase1;
+
+$set = $ex->set;
+
+$_->() for @phase2;

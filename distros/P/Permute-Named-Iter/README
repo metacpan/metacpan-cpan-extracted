@@ -1,0 +1,65 @@
+SYNOPSIS
+
+     use Permute::Named::Iter qw(permute_named_iter);
+    
+     my $iter = permute_named_iter(bool => [ 0, 1 ], x => [qw(foo bar baz)]);
+     while (my $h = $iter->()) {
+         some_setup() if $h->{bool};
+         other_setup($h->{x});
+         # ... now maybe do some tests ...
+     }
+
+DESCRIPTION
+
+    This module is like Permute::Named, except that it offers an iterator
+    interface. Some other differences: 1) it only accepts an even-sized
+    list and not arrayref or hashref; 2) it does not use deep cloning, so
+    if one of the values is a reference and you modify the content of the
+    reference, the next iteration will see the modification; 3) the
+    function permute_named_iter is not exported by default, you have to
+    import it explicitly.
+
+FUNCTIONS
+
+ permute_named_iter(@list) => CODE
+
+    Takes a list of key-specification pairs where the specifications can be
+    single values or references to arrays of possible values. It then
+    returns an iterator (coderef) which you can call repeatedly to permute
+    all key-specification combinations.
+
+    The function expects the pairs as an even-sized list. Each
+    specification can be a scalar or a reference to an array of possible
+    values. The returned iterator can be called and will return a hashref,
+    or undef if all the permutation has been exhausted.
+
+    Example 1:
+
+     my $iter = permute_named_iter(bool => [ 0, 1 ], x => [qw(foo bar baz)]);
+     my @p; while (my $h = $iter->()) { push @p, $h }
+
+    @p will contain:
+
+     ( { bool => 0, x => 'foo' },
+       { bool => 0, x => 'bar' },
+       { bool => 0, x => 'baz' },
+       { bool => 1, x => 'foo' },
+       { bool => 1, x => 'bar' },
+       { bool => 1, x => 'baz' }, )
+
+    Example 2:
+
+     my $iter = permute_named_iter(bool => 1, x => 'foo');
+     my @p; while (my $h = $iter->()) { push @p, $h }
+
+    @p will just contain the one permutation:
+
+     ({bool => 1, x => 'foo'})
+
+SEE ALSO
+
+    Permute::Named, PERLANCAR::Permute::Named and CLI permute-named.
+
+    Set::CrossProduct, Set::Product, et al (see the POD of Set::Product for
+    more similar modules) and CLI cross.
+

@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 21de22949c650fd5e9d216439a6690c96e1e3df2 Changes
+SHA1 0f98d44fc361a80c81a2f1dc5d5f6bb12a51e80a MANIFEST
+SHA1 4f669201c97cc32ecf83220c3f08c4b874eb58c4 META.json
+SHA1 951a4394d4293b66511fb85d289768446fa89867 META.yml
+SHA1 0df0381ff7ac5f14f8cc22806bca3c17d98a4b55 Makefile.PL
+SHA1 aea715b84ee0bea78d46db5a5f2ff9935d2ea33f README
+SHA1 f588a872a4402843c2df1b6d11ed09a8483e2a37 lib/POE/Component/IRC/Plugin/Seen.pm
+SHA1 91f1177be4f60a570e50c05cea28473e9636629b t/POE-Component-IRC-Plugin-Seen.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJV4it0AAoJEMoENb5ewbNiMN0P+QFNL9f298FLSdlJI8LabC55
+X5O6JKd6J9+21tv7ADmaGv5sLmNJK19gJk7/wQiFbkyDGqeZoockFVvPE0Iduhid
+GgmBYmLLhevrNCElYc1KTgiNzv12j9xWhTAOsYJ+aQDMXTNTM2kOut24BGpNPUyw
+CMHv8VXncMRNJKNqUsUpBLOFCmiU13DkcV6jNMm2yn3B6yGBPbh540CXoCzUeh/a
+AwItK6rjX6M5CLNN7mKUZ5FM2/0Gq+69opNx3vBRPatlsVf/1gLy5j+rES9WWHlq
+zqdz1/sm3HKNyTvdVz5KpDf8C5tIQp9cp5vzfWJ1Iiy6ebyhJJ5z7NSUlZyhAxTT
+sDqrR+fP4CykbfoGCZrltdGvzcQybg6E0rrtl+NENz4FpmbAbYapDFzR2QatR257
+39jANyxocdvP2gkX8l0Z111q7oZk3NN/UNoEuyoFvkYYfd9e6NmaMoN32szjU6hH
+uiGeV5yq/DqtU2PGfOqB5IoDOJUe0NnfF23c5boV3IOotu8/DRkq24ynj76ttgPr
+XUtoTv8HiE++BIp/nxLJYFX0Ta8RSLnakDydw6Y8I41Rw2AFV9ch5y5FwA7CdJBp
+4qpsbvFjOEvWaqAhqD+FKdeUsKcXvRvcnykZPlFJPl77NnVmvgSTE9zZO9we5uFx
+rOdXT6epBKc8rGnkJYMq
+=xjMi
+-----END PGP SIGNATURE-----

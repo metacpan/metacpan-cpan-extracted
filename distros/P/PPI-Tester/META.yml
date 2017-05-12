@@ -1,0 +1,33 @@
+---
+abstract: 'A wxPerl-based interactive PPI debugger/tester'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Spec: 0.80
+  Test::More: 0.47
+  Test::Script: 1.02
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.86'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: PPI::Tester
+name: PPI-Tester
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Devel::Dumpvar: 0.04
+  PPI: 1.201
+  Wx: 0.54
+  perl: 5.6.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/PPI-Tester
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/PPI-Tester
+version: 0.15

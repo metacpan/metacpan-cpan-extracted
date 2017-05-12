@@ -1,0 +1,36 @@
+PixieLdap version 0.01
+======================
+
+This is a first and fairly feature full release of PixieLdap, it has been designed by me to make the use of Net::LDAP easier on my many servers so that from the different scripts i have i can make simple calls easily to perfom many common functions. On my website you will find an example of how to use this module with and example menu ldap script.
+www.pixie79.org.uk/sysadmin/perl/PixieLdap/
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+To use ensure you have made a yaml config file with the connection details in, example given in the pod.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Net::LDAP
+Net::LDAPS
+CryptPasswdMD5
+YAML
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Mark Olliver - pixie79
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

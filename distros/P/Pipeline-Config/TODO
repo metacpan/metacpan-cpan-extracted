@@ -1,0 +1,25 @@
+===========================
+ Pipeline-Config Todo List
+===========================
+
+1. More file formats.
+
+2. More tests.
+
+3. YAML parser
+
+    o	set pipeline package names for more useful debug printing
+    o	set/get variables support
+    o	compile -> internal format support (for easy creation of new pipes)
+    o	factor out bits of this that can be used in other parsers if possible
+    	(ie: parsing generic data structures)
+
+x. Miscellaneous
+
+throw a LoadError on non-existent file.
+
+$config->load() should take text refs too.
+
+
++--
+ Steve Purkis <spurkis@epn.nu>

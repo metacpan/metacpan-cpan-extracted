@@ -1,0 +1,65 @@
+NAME
+
+    POE::Component::Client::BigBrother - a POE Component for sending
+    Big Brother commands
+
+
+DESCRIPTION
+
+    POE::Component::Client::BigBrother is a POE component which can be
+    used to send commands to a Big Brother server.
+
+    This module tries to follow POE::Component::Client::NSCA API whenever
+    possible.
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Alternatively, to install with Module::Build, you can use the
+    following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+    After installing, you can find documentation for this module with the
+    perldoc command.
+
+        perldoc POE::Component::Client::BigBrother
+
+    You can also look for information at:
+
+        RT, CPAN's request tracker
+            https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Client-BigBrother
+
+        AnnoCPAN, Annotated CPAN documentation
+            http://annocpan.org/dist/POE-Component-Client-BigBrother
+
+        CPAN Ratings
+            http://cpanratings.perl.org/d/POE-Component-Client-BigBrother
+
+        Search CPAN
+            http://search.cpan.org/dist/POE-Component-Client-BigBrother/
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2010 Sebastien Aperghis-Tramoni
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

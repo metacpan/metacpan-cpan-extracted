@@ -1,0 +1,14 @@
+Bytecode/v21.pm
+Bytecode/v22.pm
+Bytecode/v23.pm
+Bytecode.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+test2.py
+test2.pyc
+test23.py
+test23.pyc
+META.yml                                Module meta-data (added by MakeMaker)

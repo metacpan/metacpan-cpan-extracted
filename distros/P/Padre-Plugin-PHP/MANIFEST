@@ -1,0 +1,21 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/PadrePlugin.pm
+inc/Module/Install/PerlTar.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/With.pm
+inc/Module/Install/WriteAll.pm
+lib/Padre/Document/PHP.pm
+lib/Padre/Plugin/PHP.pm
+lib/Padre/Wx/Dialog/Preferences/PHP.pm
+lib/Padre/Wx/Menu/PHP.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t

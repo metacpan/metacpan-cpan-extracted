@@ -1,0 +1,11 @@
+lib/Pod/Help.pm
+Makefile.PL
+MANIFEST
+README
+examples/helper1.pl
+examples/helper2.pl
+t/Pod-Help.t
+META.yml
+t/7testpod.t
+t/8coverage.t
+Changes

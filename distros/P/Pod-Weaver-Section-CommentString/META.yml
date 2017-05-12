@@ -1,0 +1,28 @@
+---
+abstract: "Add Pod::Weaver section with content extracted from comment with specified keyword\r"
+author:
+  - 'Milan Sorm <sorm@is4u.cz>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Weaver-Section-CommentString
+requires:
+  Moose: 0
+  Pod::Elemental::Element::Nested: 0
+  Pod::Elemental::Element::Pod5::Command: 0
+  Pod::Weaver::Role::Section: 0
+  Pod::Weaver::Role::StringFromComment: 0
+  aliased: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: https://github.com/milsorm/pod-weaver-section-commentstring.git
+version: 0.01

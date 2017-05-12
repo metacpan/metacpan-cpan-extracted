@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         POE-Component-Lightspeed
+version:      0.05
+version_from: lib/POE/Component/Lightspeed.pm
+installdirs:  site
+requires:
+    Carp:                          0
+    Graph:                         0.60
+    POE:                           0.31
+    Socket:                        0
+    Time::HiRes:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

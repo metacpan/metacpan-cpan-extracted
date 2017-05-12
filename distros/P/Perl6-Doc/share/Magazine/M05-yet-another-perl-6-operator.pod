@@ -1,0 +1,277 @@
+=pod
+
+=head1 NAME
+
+Magazine_Article_05 - Yet Another Perl 6 Operator
+
+=head1 AUTHOR
+
+Adriano Ferreira L<a.r.ferreira@gmail.com>
+
+=head1 VERSION
+
+Its published between September 18, 2007 and January 7, 2008 as a series
+of microarticles on perl.com and not changed since. Find the original under:
+
+C<http://www.oreillynet.com/onlamp/blog/2007/09/yet_another_perl_6_operator_th_1.html>
+
+=head1 ARTICLE
+
+=head2 Introduction
+
+You surely heard about the upcoming Perl 6 (L<http://dev.perl.org/perl6/>)
+language. This language will be endowed with a set of features so rich
+that every Greek and Trojan is eager to see a full working implementation.
+Among these features, there are operators, many of them. Perl 6 was even
+said () to be an operator-oriented language, with a yet larger diversity
+than Perl 5 already has.
+
+=head2 The zip operator
+
+Perl 6 has an operator C<Z>, named B<zip>, to interleave elements of two
+or more arrays.
+
+ my @a = 1,2 Z -1,-2; # (1,-1),(2,-2)
+
+The zip is one of the list generating operators that gives the language some
+flavor of functional programming. This gets further as the usual semantics
+for lists is to get lazy generation, which means easy/efficient handling of
+large lists (and also the extreme case of infinite lists).
+
+=head2 String concatenation
+
+Today's operator is a very simple one, the string concatenation operator.
+
+ my $a = 'ab' ~ 'c'; # 'abc'
+
+ my $b = 'def';
+ my $c = $a ~ $b;    # 'abcdef'
+
+=head2 Repeat Operators
+
+Perl 6 has two repeat operators: one for replicating a string/buffer
+and the other for replicating lists.
+
+String repeat C<x> takes a string as the left argument and the number
+of times to replicate as the right argument.
+
+ $string x $count
+
+ my $s = 'a' x 3; # 'aaa'
+ my $empty = 'foo' x 0; # ''
+ my $n = 2; my $dots = '.' x ($n - 3); # '' because ($n-3)<1
+
+=head2 Coercion operators
+
+In Perl 5, we expect values to DWIM ("do what I mean") in various contexts.
+For example, if we use a string containg 42? as a number we expect it
+automagically act as a number. Perl 6 keeps this tradition of DWIMmery and
+introduces several new explicit coercion operations.
+
+ ? to get booleans
+ + to get numbers
+ ~ to get strings
+
+=head2 Comparisons - Part I
+
+As expected, Perl 6 supports the usual comparison operators. This includes
+the numeric comparison operators:
+
+ == != < <= > >=
+
+(where C<!=> is a short for C<!==>, the negated version of C<==>). These
+operators convert their terms into numbers before comparison.
+
+The string comparisons operators are here as well.
+
+=head2 Comparisons - Part II
+
+In the the last article, we've seen some of the usual relational operators
+in Perl 6 and their enhanced syntax through chaining (which allows
+expressions like C<a < b < c>).
+
+Another kind of comparison operators are those that, instead of true/false
+returns, identify the relative order between its operands: C<before>, C<equal>, or
+C<after>.
+
+=head2 Boolean Operators
+
+In the article on coercion operators, we got to know the prefix operator C<?>
+which converts values into C<Bool::True> or C<Bool::False>. Like it happens with C<~>
+for strings, C<?> is recurrent for boolean operators.
+
+In Perl 6, the usual infix boolean operators are:
+
+ ?& - and
+ ?| - or
+ ?^ - xor
+
+=head2 The Default Operator
+
+Among the new Perl 6 operatoars, there is the handy operator C<//>, known as
+defined-or or the default operator. This novelty was anticipated by the
+introduction of this syntactic bit in Perl 5 (see the upcoming 5.10 release)
+so you won't need to wait for Perl 6 to start using it.
+
+ # dor.pl
+ use 5.010;
+ print "arg: '", shift // "?", "'\n";
+
+ $ perl dor.pl one
+ arg: 'one'
+ $ perl dor.pl ""
+ arg: ''
+ $ perl dor.pl
+ arg: '?'
+
+=head2 Range Operators
+
+In Perl 6, you may construct ranges with expressions like
+
+ $min  ..  $max
+ $min ^..  $max
+ $min  ..^ $max
+ $min ^..^ $max
+
+and even
+
+ ^$limit
+    
+=head2 Conditional Operator
+
+The syntax of an if-then-else expression in Perl 6 is composed by the 
+conditional operator.
+
+ say "My answer is: ", $maybe ?? 'yes' !! 'no';
+
+The expression above is equivalent to that, which uses the if-then-else
+statement within a do.
+
+ say "My answer is: ", do {
+     if $maybe {
+         'yes';
+     }
+     else {
+         'no';
+     }
+ };
+
+=head2 The Cross Operator
+
+Perl 6 provides an operator C<X>, the cross operator, which combines its list
+operands into a sort of cartesian product of these arguments.
+
+ 1,2 X 3,4        # (1,3), (1,4), (2,3), (2,4)
+
+ 1,2 X 3,4 X 5,6  # (1,3,5), (1,3,6), (1,4,5), ..., (2,4,6)
+
+=head2 Iterate Operator
+
+If you are wondering how processing the lines of a file will look in Perl 6,
+the answer is something like this:
+
+ my $h = open '<', $filename;
+
+ for =$h {
+    ...
+ }
+
+=head2 Reduce operators
+
+And that's time to take a look at another of the Perl 6 meta-operators: the 
+reduction operator.
+
+By surrounding with square brackets an (associative) infix operator, a new 
+list operator is created.
+
+ [*] 1..10      # that's 1*2*...*10 = 10!
+ [~] <m oo s e> # 'moose' - [~] is basically Perl 5 join
+ [,] 'a'..'e'   # <a b c d e> - [,] is a list builder
+
+=head2 Mutating Operators
+
+We already have seen two Perl 6 meta-operators in articles of this series:
+namely, the negate and the reduction operators. These are two of the five
+standard meta-operators of the language. What makes meta-operators interesting
+is how Perl automatically generates new operators from others (user-defined or
+builtins) with some straightforward semantics derived from the transformation
+of the base operators.
+
+This time, we approach mutating operators, which are a shortcut for typical
+assignments where the assignment target and the first operand are the same
+variable.
+
+ my $s = 'foo';
+ $s x= 3;          # $a = 'foofoofoo'
+
+ my $x;
+ $x //= 'default'; # $x = 'default'
+
+=head2 The Pair Constructor
+
+Binary C<< => >> is no longer just a "fancy comma". In Perl 6, it now constructs 
+a Pair object that can, among other things, be used to pass named arguments 
+to functions.
+
+ my $pair = (one => 1);
+ $pair.isa(Pair)        # Bool::True
+ $pair.key              # 'one'
+ $pair.value            # 1
+
+=head2 Reduce Operators - Part II
+
+In a previous article , we introduced the reduction operators (like C<[*]> and
+C<[~]>) which produced list operators from infix operators (like C<*> and C<~>).
+
+There is a variant of the reduction operator that operates over its list
+argument producing all intermediate results along with the final result of the
+ordinary reduction.
+
+ [\+] 1..5   # (1, 3, 6, 10, 15)
+
+which is equivalent to
+
+ ([+] 1),
+ ([+] 1, 2),
+ ([+] 1, 2, 3),
+ ([+] 1, 2, 3, 4),
+ ([+] 1, 2, 3, 4, 5)
+
+=head2 Filetests?
+
+This article is not about some set of Perl 6 operators, but rather about what
+happened to Perl 5 filetests operators. Short answer: They are not operators
+anymore.
+
+Where programmers were used to write
+
+ # good ol' Perl 5
+ if ( -e $filename ) { print "exists\n" }
+
+they will now use pair methods that may be expressed as methods or smart 
+patterns.
+
+ if $filename.:e { say "exists" }
+ # or
+ if $filename ~~ :e { say "exists" }
+
+=head2 Junction Operators
+
+Perl 6 introduces a new scalar data-type: the B<junction>. A junction is a
+single scalar value that can act like two or more values at once.
+
+ # example               a value which acts like
+
+ any(1,2,3)              1 or 2 or 3
+ all(@vals)              all members of @vals at the same time
+ one(<moe curly larry>)  one of the three stooges
+ none(@bad_guys)         none of the listed bad guys
+
+The operators C<|>, C<&> and C<^> are now junction constructors, providing a
+syntactical complement to the functional variants any, all, one and none.
+
+ $a  | $b                 any($a, $b)
+ $x  & $y                 all($x, $y)
+ $me ^ $you               one($me, $you)
+
+=cut

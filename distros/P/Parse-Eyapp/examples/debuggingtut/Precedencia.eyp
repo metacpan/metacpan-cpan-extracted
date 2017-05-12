@@ -1,0 +1,62 @@
+%{
+=head1 SYNOPSIS
+
+Be sure Math::Tail in examples/Calculator/lib is reachable
+compile it with 
+
+  eyapp -b '/usr/bin/perl -I ../Calculator/lib' Precedencia.eyp
+
+execute the generated modulino with:
+
+      ./Precedencia.pm -nos -c '2@3@4' -info 
+
+Try also with inputs:
+   
+    4@3@5
+    4@3&5
+    4&3@5
+    4&3&5
+
+The result will be the term describing the generated
+Abstract Syntax Tree 
+
+=head1 See also
+
+    http://search.cpan.org/perldoc?Parse::Eyapp::debuggingtut
+
+=cut
+
+our $VERSION = '0.01';
+use base q{Math::Tail};
+
+%}
+
+%token NUM
+%left '@'
+%right '&'  dummy
+
+%tree bypass
+%%
+list
+    : /* empty */
+    | list '\n' {}
+    | $list $e { print $e->str."\n"; 
+                 $e->png(); 
+                 $e; 
+               }
+    ;
+
+e : %name NUM
+      NUM
+  | %name AMPERSAND
+      e '&' e
+  | %name AT
+      e '@' e %prec dummy
+  ;
+
+%%
+
+__PACKAGE__->lexer( \&Math::Tail::lex); 
+__PACKAGE__->main('Input (try st. like 2@3&4<CR><CTRL-D>): ') unless caller();
+
+1;

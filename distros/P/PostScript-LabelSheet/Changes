@@ -1,0 +1,10 @@
+Revision history for PostScript-LabelSheet
+
+0.02    Wed Jan  2 15:59:40 CET 2013
+        - Removed broken functionality (numbered labels) until a better
+          solution is found.
+        - Added working examples
+0.01    Mon Dec 24 14:00:36 CET 2012
+        First functional version. Still missing examples and thorough
+        documentation.
+

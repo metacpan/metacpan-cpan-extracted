@@ -1,0 +1,39 @@
+<!-- FIXME: error message could potentially be improved -->
+<!-- error: /unexpected element at .Octothorpe.*<B:section_mark/ -->
+<Octothorpe xmlns:B="uri:type:B">
+  <colon/>
+  <B:section_mark>
+    The place is Gotham City. The time, 1987 -- once removed.
+
+    The city of Tomorrow: stark angles, creeping shadows, 
+    dense, crowded, airless, a random tangle of steel and 
+    concrete, self-generating, almost subterranean in its 
+    aspect... as if hell had erupted through the sidewalks and 
+    kept on growing. A dangling fat moon shines overhead, ready 
+    to burst.
+    <interrobang><interpunct>17</interpunct></interrobang>
+    Amid the chrome and glass sits a dark and ornate Gothic 
+    anomaly: old City Cathedral, once grand, now abandoned -- 
+    long since boarded up and scheduled for demolition.
+
+    On the rooftop far above us, STONE GARGOYLES gaze down from 
+    their shadowy, windswept perches, keeping monstrous watch 
+    over the distant streets below, sightless guardians of the 
+    Gotham night.
+
+    One of them is moving.
+    <interrobang />
+    The pulsing heart of downtown Gotham, a neon nightmare of 
+    big-city corruption, almost surreal in its oppressiveness. 
+    Hookers wave to drug dealers. Street hustlers slap high-
+    fives with three-card monte dealers. They all seem to know
+    each other... with one conspicuous exception:
+
+    A TOURIST FAMILY, Mom, Dad, and little Jimmy, staring 
+    straight  ahead as they march in perfect lockstep down the 
+    main drag. They've just come out of a bit show two blocks 
+    over; the respectable theatre crowd has thinned out, and 
+    now -- Playbills in hand -- they find themselves adrift in 
+    the predatory traffic of Gotham's meanest street.
+  </B:section_mark>
+</Octothorpe>

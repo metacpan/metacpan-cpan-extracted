@@ -1,0 +1,43 @@
+1 t/testpod0
+t/testpod0
+NAME
+    testpod - test document for pod formaters.
+
+SYNOPSIS
+      pod2xxx testpod.pod
+
+
+DESCRIPTION
+    This document is supposed to exercise all pod features.
+
+2 Bulleted_items
+  Bulleted items
+
+    * Bullet
+    * Sub-bullet
+
+3 Numbered_items
+  Numbered items
+
+    1. Level 1
+    2. Level 2
+
+3 Text_items
+  Text items
+
+    An item
+    A Sub-item
+
+3 Links
+  Links
+
+    See the section on "/"Bulleted items" or the testpod help
+    page/"Bulleted items"
+
+    Text with *italic*, bold, `code', Filename, Zerowidth character,
+    < & >, *Bold in italic.*
+
+    An item not inside an =over
+3 That_is_all_for_now.
+  That is all for now.
+

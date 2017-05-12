@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libvbucket
+Description: A vbucket library for memcached
+Version: 1.8.0.1_5_ga4397f3
+Requires.private: libmemcached
+Libs: -L${libdir} -lvbucket
+Cflags: -I${includedir}/libvbucket

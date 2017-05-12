@@ -1,0 +1,32 @@
+Pod-POM-View-HTML-Filter
+
+Pod::POM::View::HTML::Filter is a Pod::POM view used to filter
+some specially marked pod blocks.
+
+It was first designed to output syntax-hightlighted Perl on some
+static webpages. Look, here: http://articles.mongueurs.net/magazines/
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Philippe "BooK" Bruhat
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

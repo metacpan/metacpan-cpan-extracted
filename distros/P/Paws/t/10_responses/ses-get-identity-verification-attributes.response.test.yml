@@ -1,0 +1,10 @@
+---
+call: GetIdentityVerificationAttributes
+service: SES
+tests:
+  - expected: Pending
+    op: eq
+    path: VerificationAttributes.Map.{domain.com}.VerificationStatus
+  - expected: QTKknzFg2J4ygwa+XvHAxUl1hyHoY0gVfZdfjIedHZ0=
+    op: eq
+    path:  VerificationAttributes.Map.{domain.com}.VerificationToken

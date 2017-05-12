@@ -1,0 +1,24 @@
+Revision history for Perl extension Plack::Middleware::Debug::LazyLoadModules
+
+0.06    Sat Oct 27 22:22:00 JST 2012
+    [NO CODE CHANGES]
+        - fixed for kwalitee
+        - support travis-ci.org
+
+0.05    Sun Apr  8 17:19:00 JST 2012
+        also show preload modules
+        added elements option
+
+0.04    Sun Feb 19 08:18:00 JST 2012
+        [note: NO CODE CHANGE]
+        - added dependancy module in Build.PL
+
+0.03    Sun Feb 19 06:11:00 JST 2012
+        - added class option: change Foo/Bar.pm to Foo::Bar
+
+0.02    Sat Feb 18 18:38:00 JST 2012
+        - fixed POD
+        - added filter option
+
+0.01    Fri Feb 17 08:35:00 JST 2012
+        - original version

@@ -1,0 +1,69 @@
+Revision history for Perl extension PAR::Dist::FromCPAN.
+
+1.11  Sun Jul 19 10:38 2009
+    - More flexible error handling for bad distributions.
+
+1.10  Tue Feb  3 18:24 2009
+    - Add the --perl-version option to manually set the version
+      of perl for which the core modules are checked. By setting
+      this to a low value, you can package dual-lived modules easily.
+
+0.10  Thu Aug 28 15:17 2008
+    - Require Archive::Zip to prevent users from running into
+      RT #24057.
+
+0.09  Wed May 28 22:37 2008
+    - New option to cpan2par: -a or --auto-detect-pure-perl.
+      Automatically flags a distribution as pure-perl if it doesn't
+      seem to contain files that need compilation.
+    - Upgrade to newest Module::Install.
+    - No more SIGNATURE.
+    - Depend on PAR::Dist 0.31.
+
+0.08  Sat Jun 30 17:05 2007
+    - If the --pattern argument to cpan2par is omitted, we look at @ARGV
+      for patterns:
+      "cpan2par Foo::Bar" should now package Foo::Bar
+
+0.07  Wed Jun 20 14:46 2007
+    - Circular dependencies of Email::Simple and Email::MIME caused
+      trouble. From now on, circular deps should be broken and
+      *skipped*.
+
+0.06  Fri Jun  1 15:22 2007
+    - Somehow, 'follow' was still broken...
+
+0.05  Thu May 24 11:22 2007
+    - Fix the 'follow' option as per RT ticket #27246.
+    - Upgrade Module::Install to 0.67
+    - Upgrade dependency on PAR::Dist to 0.22 because of a critical
+      bug fix in PAR::Dist.
+
+0.04  Wed Oct  4 09:00 2006
+    - Upgraded to Module::Install 0.64.
+    All of these changes were provided by Jesse Vincent: (thanks!)
+    - Add a "_diag" method, to clean up all the code that checks
+      'verbose' and send output
+    - Improved dependency resolution
+    - for loop was very unhappy as we modified its list on the fly
+    - actually PAR dependencies _before_ the thing that depends on them
+    - When a module depends on a dual-lifed module that was already in
+      the core as of $^V, use the core version. Without this change,
+      Module::Build can't be autopared
+
+0.03  Thu Jul 21 15:48 2006
+    - Added VERSION to cpan2par.
+    - Added some (probably redundant) dependencies to
+      Makefile.PL (File::Spec, File::Path).
+    - Added the --merge and --no-docs switches and the
+      corresponding parameters to the module.
+    - Added the --skip switch for skipping som modules.
+
+0.02  Thu Jun 11 17:51 2006
+    - cpan2par registered as script in Makefile.PL.
+    - We also need at least CPAN 1.84.
+    - Corrected syntax errors in cpan2par (yuck).
+
+0.01  Thu Jun  1 14:08 2006
+    - original version as uploaded to CPAN
+

@@ -1,0 +1,30 @@
+Parallel-parallel_map version 0.02
+==================================
+
+parallel map
+
+It uses Parallel::DataPipe to implement parallel calculations using familiar map paradigm.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2013 by Oleksandr Kharchenko
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

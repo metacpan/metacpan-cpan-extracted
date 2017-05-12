@@ -1,0 +1,38 @@
+NAME
+    Plack::Middleware::SetEnvFromHeader - Set environment variables from the
+    values of request headers
+
+SYNOPSIS
+        # in app.psgi
+        use Plack::Builder;
+
+        builder {
+            enable 'SetEnvFromHeader' =>
+                REMOTE_USER => "X-Proxy-REMOTE-USER";
+            $app;
+        };
+
+        # with plackup
+        plackup -e 'enable SetEnvFromHeader => REMOTE_USER => "X-Testing-User"' app.psgi
+
+DESCRIPTION
+    SetEnvFromHeader modifies the environment passed to the application by
+    adding your specified keys with the values pulled from the request
+    header.
+
+    This is primarily useful when testing apps under plackup (or similar) in
+    a development environment.
+
+    It may also be desireable in production to provide standard environment
+    values via non-standard headers, but if you're using this for
+    security-sensitive values like "REMOTE_USER" make sure no one can make
+    direct requests to your backend!
+
+AUTHOR
+    Thomas Sibley <tsibley@cpan.org>
+
+LICENSE
+    This library is free software; you may redistribute it and/or modify it
+    under development environment, or for providing standard environment
+    valuthe same terms as Perl itself.
+

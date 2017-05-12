@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Passwd::Keyring::Auto::App;
+
+Passwd::Keyring::Auto::App->new_with_command()->run;
+

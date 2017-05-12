@@ -1,0 +1,39 @@
+==================================================
+Changes from 2010-03-08 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.22 at 2015-03-07 12:04:46 +0000
+-----------------------------------------
+
+  Change: 5814f7f6fa3fd917b6c59fc764776e9d68755cbe
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-03-07 12:04:46 +0000
+
+    Default to TinyURL as Metamark is no more 
+
+  Change: 1984f6e6c6a98b5759221935178d2fea0225d868
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-03-07 11:54:51 +0000
+
+    Convert distribution to dzil 
+
+-----------------------------------------
+version 1.20 at 2010-11-13 22:41:05 +0000
+-----------------------------------------
+
+  Change: e54446bda63ba8383d0abc467e0532150797bbcd
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-11-13 22:41:05 +0000
+
+    Release changes 
+
+  Change: a9b36c7717e610f897ae98829a56a93e18de7d5c
+  Author: Torsten Raudssus <torsten@raudssus.raudssus.de>
+  Date : 2010-11-14 06:33:12 +0000
+
+    Added parameters support for the makeshortenlink call 
+
+===============================================
+Plus 1 release after 2010-03-08 00:00:00 +0000.
+===============================================

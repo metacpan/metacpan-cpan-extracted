@@ -1,0 +1,229 @@
+
+====== version history of POSIX::1003
+
+All changes are made by Mark Overmeer, unless stated otherwise.
+# . ::FS manual needs cleanup, f.i. split lists of constants
+# . the main component of exporter in POSIX::1003 useful enough to become
+#   a separate module.
+# . add epoll/epoll_ctl ?  Sys::Syscall
+# . add sendfile?  Sys::Sendfile
+# . add ioctl?
+# . add (bsd_)glob with its many flags
+# . add POSIX::RT::Semaphore logic?
+# . cleanup exampleValue(), probably doing too much
+# . charset of $!  strerror()  perl#119499
+
+# . implementation of nl_langinfo
+# . change in ::Module of detection of constants which need autogeneration
+# . charset of locale only via nl_langinfo(CODESET)
+
+version 0.98: Tue Dec  3 08:31:16 CET 2013
+	Fixes:
+	- start config for openbsd and gnukfreebsd [cpantesters]
+	- include of limit.h where the platform does not support it.
+
+version 0.97: Sat Nov 30 20:45:44 CET 2013
+	Fixes:
+	- build fixes for FreeBSD
+	  rt.cpan.org#91076 [Slaven Rezic]
+
+version 0.96: Thu Nov 28 14:47:55 CET 2013
+	Fixes:
+	- LOCK_* did not get defined.
+
+	Improvements:
+	- add ::FdIO::truncfd()
+	- POSIX::1003 now also knows the EXPORT_TAGS of each of the
+	  packages, like :stat and :perms
+	- add ::FS::S_ISUID, S_ISGID, S_ISVTX
+	- add ::FS export tag :perms
+
+version 0.95.1: Mon Aug 26 13:16:28 CEST 2013
+	Fixes:
+	- t/28user.t when group is '0' (root)  [cpantesters]
+	  this is an installation blocker
+
+version 0.95: Fri Aug 23 16:49:07 CEST 2013
+	Fixes:
+	- ::Proc  WNOHANG and WUNTRACED are constants, not functions.
+	- ::Proc  W*() functions had wrong prototype
+
+	Improvements:
+	- add ::FdIO::fdopen()
+
+version 0.94_5: Wed Aug 21 13:05:52 CEST 2013
+	Changes:
+	- ::Time::strftime() is now charset aware.
+
+	Fixes:
+	- some makes do not work correctly without existing system.c
+
+	Improvements:
+	- add warning about possible overflow of times()
+	- auto-detect SA_ constants, do not take them from POSIX.pm
+	- added O_TMPFILE (new in Linux kernel 3.11)
+
+version 0.94_4: Wed Jun 12 15:16:33 CEST 2013
+	Improvements:
+	- add ::Fcntl::flock() and ::lockf
+	- add system/freebsd.c
+	- the 'return' in "return XSRETURN_UNDEF" is too much [NormW]
+	- t/32fcntl.t dup test sometimes produces a fh which is >4.
+	  test now more relaxed.
+	- use "blib" in *.PL
+	- use FULLPERL, not FULLPERLRUNINST, in Makefile.PL
+
+version 0.94_3: Mon Jun 10 10:00:29 CEST 2013
+	Improvements:
+	- add ::Fcntl
+	- system/mswin32.c
+	- add EPOLL constants
+	- add O_ACCMODE
+	- add "-I." to compile to CC search path
+	- cpantesters now will show all constants while creating
+	  manual-pages.
+
+version 0.94_2: Fri May 17 10:25:38 CEST 2013
+	Fixes:
+	- make setgroups() support optional
+	- un-trick setre[gu]id confusion caused by CORE/perl.h
+
+	Improvements:
+	- believe CORE/config.h for some settings
+
+version 0.94_1: Thu May 16 14:14:33 CEST 2013
+	Fixes:
+	- more carefully return ENOSYS when a function is not supported
+	  by a platform.
+	- HP-UX compilation improvements [H.Merijn Brand]
+
+	Improvements:
+	- added accidentally missing t/27signals.t
+	- added POSIX::1003::User and t/28user.t
+	- added POSIX::1003::Errno and t/29errno.t
+
+version 0.93: Tue Apr 23 09:00:47 CEST 2013
+	Fixes:
+	- Netware has no strsignal() [NormW]
+	- Windows does not unlink existing $dest at rename(), manual.PL [NormW]
+	- added POSIX::1003::Symbols back to MANIFEST
+
+	Improvements:
+	- Export rename() via ::FS, to document non-compliant behavior on
+	  Windows.
+
+version 0.92: Mon Feb 25 10:50:47 CET 2013
+	Improvements:
+	- support strsignal()
+	  rt.cpan.org#72602 [Roger Leigh]
+	- support for NetWare [NormW]
+	- add libs to PL scripts to simplify debugging [NormW]
+
+version 0.91: Fri Jan  4 10:26:29 CET 2013
+	Fixes:
+	- t/62pathconf.t reduce number of constants expected from at least
+	  10 to at least 5 (Darwin has 9)
+	  reported by [James Keenan]
+	- Darwin use rlimit64 [James Keenan]
+	- Old Linux does not support ulimit(setfsize) [James Keenan]
+	- t/64pathconf.t now uses _PC_LINK_MAX, because _PC_PATH_MAX is
+	  undef on many platforms [H.Merijn Brand]
+	- t/63properties.t now uses _POSIX_VERSION, because _POSIX_NO_TRUNC
+	  is not defined on HP-UX [H.Merijn Brand]
+	- t/70lazy.t still used POSIX::3
+	- POSIX/3* files got accidentally packaged as well
+
+version 0.90: Wed Aug  8 10:10:46 CEST 2012
+	After advice from the Dutch Perl Mongers, the following major changes:
+	- renames:
+	  POSIX::1003		-> POSIX::1003::Module
+	  POSIX::3		-> POSIX::1003
+	  POSIX::3::Symbols	-> POSIX::1003::Symbols
+	- remove POSIX::1003::Symbols from MANIFEST
+
+version 0.13: Thu Jul 26 13:37:37 CEST 2012
+	- export tag ':table' became ':tables'
+	- dynamically detect constants for FdIO, adding SEEK_HOLE and
+	  SEEK_DATA when availale.
+	- dynamically detect S_* and *_OK constants for ::FS, removes
+	  the need for Fcntl
+	- moved ::FdIO::readfd_all and ::writefd_all into separate module
+	  POSIX::Util.
+	- add pod tester
+	- add ::FdIO::rewindfd
+
+version 0.12: Fri May 18 14:05:11 CEST 2012
+	- indent manual text about missing configuration.
+	- setrlimit and ulimit do not always have rights on Linux.
+	  Changed in tests t/64ulimit.t and t/65rlimit.t  [cpantesters]
+
+version 0.11: Wed Jan  4 13:56:04 CET 2012
+	- POSIX::1003::exampleValue($name) as generic way to demonstrate
+	  values for constants
+	- generate signal names via auto-detection, not a static list
+	- POSIX::3::show_posix_names() also show their example values
+	- manuals.PL uses new exampleValue() interface
+	- ::Limit did not define export tag :constants
+	- export problem with _POSIX2 properties
+	- minor tweeks to output of parameter tables
+
+version 0.10: Wed Jan  4 11:26:12 CET 2012
+	- ::Signals split export tag :signals into :signals and :states
+	- let signal names be auto-detected as well.
+
+version 0.09: Wed Jan  4 10:14:57 CET 2012
+	- ::Overview: Signal::More absorbed by POSIX::RT::Signal
+	  [Leon Timmermans]
+	- rewrite manual.PL to be more flexible.
+	- use '_' prototype on math functions [Abeltje]
+	- do re-export each symbol on each request, not lazy
+	  [John van Krieken]
+	- fix processing of poll constants into a manpage.
+
+version 0.08: Thu Dec 29 03:52:09 CET 2011
+	- fix poll_table and related manual
+	- fix exporting of UL_, RLIMIT_ and POLL
+	- include table in ::Properties
+	- store generated constant functions in the namespace for reuse
+
+version 0.07: Wed Dec 28 12:16:03 CET 2011
+	- serious manual-page documentation order problem repaired
+	- manuals.PL had an ^=comment in a here-document, which
+	  caused it to produce a manual-page in metacpan/search.cpan
+	- add ::Events ... poll() needs testing!
+
+version 0.06: Sun Dec 25 23:52:57 CET 2011
+	- getrlimit and setrlimit code was missing from 1003.xs as
+	  fallback when missing from the OS.
+	- variable info insertion in manual page seems only to work
+	  when both lib and blib version of the page get modified.
+	- use variable tables also for the other manuals
+	- implement mknod, major, minor, makedev
+	- enable prototypes on XS functions
+
+version 0.05: Fri Dec 23 23:06:27 CET 2011
+	- implemented POSIX::3 and tables.PL
+	- detected constant names are filled-in in the man-pages.
+	- ::Overview  stdin/stdout/stderr only in POSIX.pm
+	- ::Overview  setpgid also via ::Proc
+	- more consistency in ::Overview
+	- renamed gen.PL into lists.PL
+
+version 0.04: Thu Dec 22 12:22:14 CET 2011
+	- many doc fixed in POSIX::Overview
+	- document %rlimit and other minor mistakes in ::Limit
+	- add utime() to ::FileSystem
+
+version 0.03: Thu Dec 22 10:20:29 CET 2011
+	- fixed formatting of some manual pages, based in search.cpan.org
+	  presentation.
+	- fixed some obvious usage mistakes.
+	- document some ::Termios functions
+	- added ::Limit with ulimit and rlimit functions
+	- added system/ structure for os-dependent work-arounds
+	- added predefined lists of constant names, to remove the need
+	  to scan the header files.
+	- fix and test SigAction and ::Termios
+
+version 0.02: Mon Dec 19 15:57:15 CET 2011
+	- initial implementation.

@@ -1,0 +1,4 @@
+docs: |
+    Instead, use the C<x> operator. See L<perlop> for details.
+
+        my $by_ten = "-=" x 10;

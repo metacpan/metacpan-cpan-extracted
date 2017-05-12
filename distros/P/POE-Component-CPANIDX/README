@@ -1,0 +1,185 @@
+NAME
+
+    POE::Component::CPANIDX - A POE mechanism for querying the CPANIDX
+
+VERSION
+
+    version 0.12
+
+SYNOPSIS
+
+      use strict;
+      use warnings;
+      use POE qw(Component::CPANIDX);
+    
+      my $url = shift or die;
+      my $cmd = shift or die;
+      my $search = shift;
+    
+      my $idx = POE::Component::CPANIDX->spawn();
+    
+      POE::Session->create(
+        package_states => [
+          main => [qw(_start _reply)],
+        ],
+        args => [ $url, $cmd, $search ],
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+    
+      sub _start {
+        my ($URL,$CMD,$SRCH) = @_[ARG0..ARG2];
+    
+        $idx->query_idx(
+          event  => '_reply',
+          url    => $URL,
+          cmd    => $CMD,
+          search => $SRCH,
+        );
+    
+        return;
+      }
+    
+      sub _reply {
+        my $resp = $_[ARG0];
+    
+        use Data::Dumper;
+        $Data::Dumper::Indent=1;
+    
+        unless ( $resp->{error} ) {
+           print Dumper( $resp->{data} );
+        }
+        else {
+           print Dumper( $resp->{error} );
+        }
+        $idx->shutdown;
+        return;
+      }
+
+DESCRIPTION
+
+    POE::Component::CPANIDX is a POE component for querying web servers
+    that are running App::CPANIDX.
+
+CONSTRUCTOR
+
+    spawn
+
+      Creates a new POE::Component::CPANIDX session.
+
+      Takes one optional argument alias so you can set an alias on the
+      component to send it events later.
+
+      Returns an object reference which the following methods can be used
+      on.
+
+METHODS
+
+    session_id
+
+      Takes no arguments. Returns the POE::Session ID of the component.
+
+    shutdown
+
+      Takes no arguments. Terminates the component.
+
+    query_idx
+
+      event
+
+	The name of the event that should be sent to the requesting session
+	with the reply from the CPANIDX server. This is required.
+
+      url
+
+	The base url of the website that is running App::CPANIDX. This is
+	required.
+
+      cmd
+
+	The query command to send to the server. This can be mod, dist,
+	dists, corelist, auth, timestamp mirrors or topten. If no cmd is
+	specified the component will default to timestamp. The first three
+	commands require a search term.
+
+      search
+
+	The search term to use for the mod, dist, dists, auth, corelist
+	commands.
+
+      See OUTPUT EVENTS below for what will be sent to your session in
+      reply.
+
+      You may also set arbitary keys to pass arbitary data along with your
+      request. These must be prefixed with an underscore _.
+
+INPUT EVENTS
+
+    These are POE events that the component will accept.
+
+    shutdown
+
+      Takes no arguments. Terminates the component.
+
+    query_idx
+
+      event
+
+	The name of the event that should be sent to the requesting session
+	with the reply from the CPANIDX server. This is required.
+
+      url
+
+	The base url of the website that is running App::CPANIDX. This is
+	required.
+
+      cmd
+
+	The query command to send to the server. This can be mod, dists,
+	auth, timestamp or topten. If no cmd is specified the component
+	will default to timestamp. The first three commands require a
+	search term.
+
+      search
+
+	The search term to use for the mod, dists, auth commands.
+
+      See OUTPUT EVENTS below for what will be sent to your session in
+      reply.
+
+      You may also set arbitary keys to pass arbitary data along with your
+      request. These must be prefixed with an underscore _.
+
+OUTPUT EVENTS
+
+    The component will send an event in response to query_idx. ARG0 of the
+    event will be a HASHREF containing the key/values of the original
+    request ( including any arbitary key/values passed ). It will also
+    contain either a data key or an error key.
+
+    data
+
+      This will an arrayref of the data returned by the CPANIDX site. If
+      there was no data to return then this will be a 'blank' arrayref.
+
+    error
+
+      If there was an error of some sort then data will not be defined and
+      this will contain a message indicating what the problem was.
+
+SEE ALSO
+
+    App::CPANIDX
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

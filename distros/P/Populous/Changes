@@ -1,0 +1,23 @@
+==================================================
+Changes from 1739-10-12 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2013-07-26 20:21:25 +0000
+------------------------------------------
+
+  Change: 1c13db1be2fd5585c577685d473807f98250f8a1
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-26 16:21:02 +0000
+
+    gitignore and travis config 
+
+  Change: 421d49f34c72243fc05309eec806d41e6ecdb0b6
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-07-26 16:19:51 +0000
+
+    Olympus has fallen 
+
+================
+End of releases.
+================

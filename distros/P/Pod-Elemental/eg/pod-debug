@@ -1,0 +1,14 @@
+#!perl
+use strict;
+use warnings;
+
+use lib 'lib';
+
+use Pod::Elemental;
+use Pod::Elemental::Transformer::Pod5;
+
+my $doc = Pod::Elemental::Transformer::Pod5->transform_node(
+  Pod::Elemental->read_file($ARGV[0]),
+);
+
+print $doc->as_debug_string, "\n";

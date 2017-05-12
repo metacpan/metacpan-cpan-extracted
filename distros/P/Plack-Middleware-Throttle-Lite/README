@@ -1,0 +1,287 @@
+NAME
+    Plack::Middleware::Throttle::Lite - Requests throttling for Plack
+
+VERSION
+    version 0.05
+
+SYNOPSIS
+        # inside your app.psgi
+        my $app = builder {
+            enable 'Throttle::Lite',
+                limits => '100 req/hour', backend => 'Simple',
+                routes => [ qr{^/(host|item)/search}, qr{^/users/add} ],
+                blacklist => [ '127.0.0.9/32', '10.90.90.90-10.90.90.92', '8.8.8.8', '192.168.0.10/31' ];
+            sub {
+                [ 200, ['Content-Type' => 'text/plain'], [ 'OK' ] ];
+            }
+        };
+
+DESCRIPTION
+    This middleware allows to restrict access to PSGI application based on
+    requests per unit of time (hour/day at the moment). Implemetation of the
+    middleware inspired by Plack::Middleware::Throttle.
+
+  FEATURES
+    Blacklisting
+        Requests from specified IPs (including ranges) or CIDRs are rejects
+        immediately with response 403 Forbidden.
+
+    Whitelisting
+        Requests from specified IPs (including ranges) or CIDRs allows to
+        get an unlimited access to the application.
+
+    Flexible and simple throttling policy
+        Access to an application might be configured by using one of the
+        several time measuring units (minute, hour, day).
+
+    Routes configuration
+        Flexible settings for routes matching based on regular expressions.
+
+    Various storage backends
+        There is an API which allows to write and use any database or cache
+        system to manipulate throttling data.
+
+    Very lightweight
+        It will not install "a-half-of-CPAN" or "heavy" dependencies!
+
+CONFIGURATION OPTIONS
+  limits
+    By this option is defined the throttling policy. At the moment, there
+    are two variants in limiting of requests: "per hour", "per day" and "per
+    minute". Value of maximum requests might be pointed as number and
+    measuring units (hour, day, min). Some examples:
+
+        # restrict to 520 request in an hour
+        enable 'Throttle::Lite', limits => '520 req/hour';
+        # ..maybe 10000 requests in a day?
+        enable 'Throttle::Lite', limits => '10000 req/day';
+        # or 30 per minute:
+        enable 'Throttle::Lite', limits => '30 req/min';
+
+    Also valid more short constructions:
+
+        # should not exceed 315 request in an hour
+        enable 'Throttle::Lite', limits => '315 r/h';
+        # ..19999 requests in a day
+        enable 'Throttle::Lite', limits => '19999 r/d';
+        # ..55 requests per minute:
+        enable 'Throttle::Lite', limits => '55 r/m';
+
+    Or even
+
+        # ..it works
+        enable 'Throttle::Lite', limits => '51 req per hour';
+        # ..this one also okay
+        enable 'Throttle::Lite', limits => '99 r per d';
+        # ..and this
+        enable 'Throttle::Lite', limits => '72 r per hour';
+        # ..no space between number and units also allowed
+        enable 'Throttle::Lite', limits => '34r/hour';
+        # ..oops! and this one does not work, yet ;-) sorry..
+        enable 'Throttle::Lite', limits => '100rph';
+
+    If this option is omitted, there are some defaults will be assigned. For
+    maximum requests default value will be 199 and measuring units -
+    req/hour. So this option must be set to desired value to have get
+    correct throttling policy.
+
+    When a client exceeds rate limit, middleware returns a 429 Too Many
+    Requests response with an associated "Rate Limit Exceeded" message in
+    the response body.
+
+  backend
+    Storage backend and its configuration options. Accepted values either
+    string or list reference contains backend name and options as hash
+    reference. Backend name can be pointed in short module name or in fully
+    qualified module name. If module name does not belongs to
+    Plack::Middleware::Throttle::Lite::Backend namespace it can be pointed
+    by adding + (plus) sign before name.
+
+        # means Plack::Middleware::Throttle::Lite::Backend::Simple
+        enable 'Throttle::Lite', backend => 'Simple';
+
+        # means Plack::Middleware::Throttle::Lite::Backend::OwnStore
+        enable 'Throttle::Lite', backend => 'OwnStore';
+
+        # means My::Own::Throttle::Backend
+        enable 'Throttle::Lite', backend => '+My::Own::Throttle::Backend';
+
+    If backend name passed as list reference, the first element will be
+    handle as backend module and the second as options passed to constructor
+    during initialization.
+
+        # treat as Plack::Middleware::Throttle::Lite::Backend::Anything
+        enable 'Throttle::Lite',
+            backend => [
+                'Anything' => { server => 'anything.example.com', port => 23250 }
+            ];
+        # ..as My::Own::Any
+        enable 'Throttle::Lite',
+            backend => [
+                '+My::Own::Any' => { server => 'anything.example.com', port => 23250 }
+            ];
+
+    If no backend specified then will be used in-memory backend
+    Plack::Middleware::Throttle::Lite::Backend::Simple shipped with this
+    distribution.
+
+  routes
+    URL pattern to match request to throttle. Accepted values are scalar
+    (e.g. "/api"), regex ("qr{^/(host|item)/search}") or a list reference
+    with scalar/regex elements. Below some examples:
+
+        # passing routes as scalar..
+        enable 'Throttle::Lite',
+            routes => '/api';
+
+        # ..as regex
+        enable 'Throttle::Lite',
+            routes => qr{^/api/(user|host)};
+
+        # ..shaken, not stirred
+        enable 'Throttle::Lite',
+            routes => [
+                '/foo/bar',
+                qr{^/(host|item)s/search},
+                qr{^/users/add},
+                qr{^/Api/Login}i,
+                '/knock/knock',
+            ];
+
+    All requests will be passed through (won't be handled by this
+    middleware) if no routes given.
+
+  blacklist
+    Blacklist is aimed to restrict some bad guys to have get access to
+    application which uses this middleware. IP addresses can be passed
+    either as string or as list of strings in a different forms. It might be
+    simple IP address (quad-dotted notation), IP block in CIDR notation or
+    range of IP addresses (delimited by a hyphen).
+
+        # passing IP address as string..
+        enable 'Throttle::Lite',
+            blacklist => '127.0.0.1';
+
+        # ..as CIDR block
+        enable 'Throttle::Lite',
+            blacklist => '192.168.10.0/27';
+
+        # ..as a range of IPs
+        enable 'Throttle::Lite',
+            blacklist => '10.90.90.90-10.90.90.92';
+
+        # ..stirred, not shaken
+        enable 'Throttle::Lite',
+            blacklist => [
+                '192.168.1.12/32',
+                '10.90.90.90-10.90.90.92',
+                '127.0.0.1',
+                '10.104.32.64/29',
+            ];
+
+    More details in Net::CIDR::Lite.
+
+    When a client's IP address is in the blacklist, middleware by default
+    returns a 403 Forbidden response with an associated "IP Address
+    Blacklisted" message in the response body.
+
+    Warning! Blacklist has higher priority than "whitelist".
+
+  whitelist
+    Whitelist is aimed to grant some good guys to have get access to
+    application which uses this middleware. Whitelisted client's IP address
+    will receive unlimited access to application. In generated header which
+    is pointed to maximum requests for whitelisted guy will be *unlimited*
+    instead of actually given maximum requests.
+
+    Rules of configuration IP addresses for whitelist the same as for the
+    "blacklist".
+
+    Warning! Whitelist has lower priority than "blacklist". Be sure that IP
+    does not exists in blacklist by adding IP to whitelist.
+
+  header_prefix
+    This one allows to change prefix in output headers. A value should be
+    passed as string. It will be normalized before using. Any alpha-numeric
+    characters and spaces are allowed. The parts of passed string will be
+    capitalized and joined with a hyphen.
+
+        header_prefix => ' tom di*ck harry  ' # goes to X-Tom-Dick-Harry-Limit, X-Tom-Dick-Harry-Used, ..
+        header_prefix => 'lucky 13'           # ..X-Lucky-13-Limit, X-Lucky-13-Used, ..
+        header_prefix => ''                   # ..X-Throttle-Lite-Limit, X-Throttle-Lite-Used, ..
+        header_prefix => '$ @ # & * /| ; '    # also would be X-Throttle-Lite-Limit, X-Throttle-Lite-Used, ..
+        header_prefix => 'a-b-c'              # ..X-Abc-Limit, X-Abc-Used, ..
+        header_prefix => '2.71828182846'      # ..X-271828182846-Limit, X-271828182846-Used, ..
+
+    This option is not required. Default value is Throttle-Lite. Header
+    prefix will be set to the default value in cases of specified value
+    won't pass checks. This option does not affect the Retry-After response
+    header.
+
+METHODS
+  prepare_app
+    See Plack::Middleware
+
+  call
+    See Plack::Middleware
+
+  modify_headers
+    Adds extra headers to each throttled response such as maximum requests
+    (X-Throttle-Lite-Limit), measuring units (X-Throttle-Lite-Units),
+    requests done (X-Throttle-Lite-Used). If maximum requests is equal to
+    requests done X-Throttle-Lite-Expire and Retry-After headers will be
+    injected.
+
+    Headers (except of Retry-After) might be customized by using
+    configuration option "header_prefix".
+
+  reject_request
+    Rejects incoming request with specific code and reason. It might be
+    either request from blacklisted IP or throttled one.
+
+  have_to_throttle
+    Checks if requested PATH_INFO matches the routes list and should be
+    throttled.
+
+  is_remote_blacklisted
+    Checks if the requester's IP exists in the blacklist.
+
+  is_remote_whitelisted
+    Checks if the requester's IP exists in the whitelist.
+
+  is_allowed
+    Checks if client is not exceeded maximum allowed requests.
+
+  requester_id
+    Builds unique (as possible) indentificator of the client based on its IP
+    address and name.
+
+ACKNOWLEDGEMENTS
+    Moritz Lenz (moritz)
+
+BUGS
+    Please report any bugs or feature requests through the web interface at
+    <https://github.com/Wu-Wu/Plack-Middleware-Throttle-Lite/issues>
+
+SEE ALSO
+    Plack
+
+    Plack::Middleware
+
+    RFC 2616 <http://tools.ietf.org/html/rfc2616>
+
+    Hypertext Transfer Protocol - HTTP/1.1. Section 14.37: "Retry-After"
+
+    RFC 6585 <http://tools.ietf.org/html/rfc6585>
+
+    Additional HTTP Status Codes. Section 4: "429 Too Many Requests"
+
+AUTHOR
+    Anton Gerasimov <chim@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Anton Gerasimov.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

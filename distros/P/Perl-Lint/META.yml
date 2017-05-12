@@ -1,0 +1,351 @@
+---
+abstract: 'Yet Another Perl Source Code Linter'
+author:
+  - 'moznion <moznion@gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  File::Temp: '0'
+  Test::Base::Less: '0'
+  Test::Builder::Tester: '1.28'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Lint
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Perl::Lint:
+    file: lib/Perl/Lint.pm
+    version: '0.25'
+  Perl::Lint::Constants::Kind:
+    file: lib/Perl/Lint/Constants/Kind.pm
+  Perl::Lint::Constants::Type:
+    file: lib/Perl/Lint/Constants/Type.pm
+  Perl::Lint::Filter::LikePerlCritic::Brutal:
+    file: lib/Perl/Lint/Filter/LikePerlCritic/Brutal.pm
+  Perl::Lint::Filter::LikePerlCritic::Cruel:
+    file: lib/Perl/Lint/Filter/LikePerlCritic/Cruel.pm
+  Perl::Lint::Filter::LikePerlCritic::Gentle:
+    file: lib/Perl/Lint/Filter/LikePerlCritic/Gentle.pm
+  Perl::Lint::Filter::LikePerlCritic::Harsh:
+    file: lib/Perl/Lint/Filter/LikePerlCritic/Harsh.pm
+  Perl::Lint::Filter::LikePerlCritic::Stern:
+    file: lib/Perl/Lint/Filter/LikePerlCritic/Stern.pm
+  Perl::Lint::Keywords:
+    file: lib/Perl/Lint/Keywords.pm
+  Perl::Lint::Policy:
+    file: lib/Perl/Lint/Policy.pm
+  Perl::Lint::Policy::BuiltinFunctions::ProhibitBooleanGrep:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/ProhibitBooleanGrep.pm
+  Perl::Lint::Policy::BuiltinFunctions::ProhibitComplexMappings:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/ProhibitComplexMappings.pm
+  Perl::Lint::Policy::BuiltinFunctions::ProhibitLvalueSubstr:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/ProhibitLvalueSubstr.pm
+  Perl::Lint::Policy::BuiltinFunctions::ProhibitReverseSortBlock:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/ProhibitReverseSortBlock.pm
+  Perl::Lint::Policy::BuiltinFunctions::ProhibitSleepViaSelect:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/ProhibitSleepViaSelect.pm
+  Perl::Lint::Policy::BuiltinFunctions::ProhibitStringyEval:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/ProhibitStringyEval.pm
+  Perl::Lint::Policy::BuiltinFunctions::ProhibitStringySplit:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/ProhibitStringySplit.pm
+  Perl::Lint::Policy::BuiltinFunctions::ProhibitUniversalCan:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/ProhibitUniversalCan.pm
+  Perl::Lint::Policy::BuiltinFunctions::ProhibitUniversalIsa:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/ProhibitUniversalIsa.pm
+  Perl::Lint::Policy::BuiltinFunctions::ProhibitUselessTopic:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/ProhibitUselessTopic.pm
+  Perl::Lint::Policy::BuiltinFunctions::ProhibitVoidGrep:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/ProhibitVoidGrep.pm
+  Perl::Lint::Policy::BuiltinFunctions::ProhibitVoidMap:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/ProhibitVoidMap.pm
+  Perl::Lint::Policy::BuiltinFunctions::RequireBlockGrep:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/RequireBlockGrep.pm
+  Perl::Lint::Policy::BuiltinFunctions::RequireBlockMap:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/RequireBlockMap.pm
+  Perl::Lint::Policy::BuiltinFunctions::RequireGlobFunction:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/RequireGlobFunction.pm
+  Perl::Lint::Policy::BuiltinFunctions::RequireSimpleSortBlock:
+    file: lib/Perl/Lint/Policy/BuiltinFunctions/RequireSimpleSortBlock.pm
+  Perl::Lint::Policy::ClassHierarchies::ProhibitAutoloading:
+    file: lib/Perl/Lint/Policy/ClassHierarchies/ProhibitAutoloading.pm
+  Perl::Lint::Policy::ClassHierarchies::ProhibitExplicitISA:
+    file: lib/Perl/Lint/Policy/ClassHierarchies/ProhibitExplicitISA.pm
+  Perl::Lint::Policy::ClassHierarchies::ProhibitOneArgBless:
+    file: lib/Perl/Lint/Policy/ClassHierarchies/ProhibitOneArgBless.pm
+  Perl::Lint::Policy::CodeLayout::ProhibitParensWithBuiltins:
+    file: lib/Perl/Lint/Policy/CodeLayout/ProhibitParensWithBuiltins.pm
+  Perl::Lint::Policy::CodeLayout::ProhibitQuotedWordLists:
+    file: lib/Perl/Lint/Policy/CodeLayout/ProhibitQuotedWordLists.pm
+  Perl::Lint::Policy::CodeLayout::RequireTrailingCommas:
+    file: lib/Perl/Lint/Policy/CodeLayout/RequireTrailingCommas.pm
+  Perl::Lint::Policy::ControlStructures::ProhibitCStyleForLoops:
+    file: lib/Perl/Lint/Policy/ControlStructures/ProhibitCStyleForLoops.pm
+  Perl::Lint::Policy::ControlStructures::ProhibitCascadingIfElse:
+    file: lib/Perl/Lint/Policy/ControlStructures/ProhibitCascadingIfElse.pm
+  Perl::Lint::Policy::ControlStructures::ProhibitDeepNests:
+    file: lib/Perl/Lint/Policy/ControlStructures/ProhibitDeepNests.pm
+  Perl::Lint::Policy::ControlStructures::ProhibitLabelsWithSpecialBlockNames:
+    file: lib/Perl/Lint/Policy/ControlStructures/ProhibitLabelsWithSpecialBlockNames.pm
+  Perl::Lint::Policy::ControlStructures::ProhibitMutatingListFunctions:
+    file: lib/Perl/Lint/Policy/ControlStructures/ProhibitMutatingListFunctions.pm
+  Perl::Lint::Policy::ControlStructures::ProhibitNegativeExpressionsInUnlessAndUntilConditions:
+    file: lib/Perl/Lint/Policy/ControlStructures/ProhibitNegativeExpressionsInUnlessAndUntilConditions.pm
+  Perl::Lint::Policy::ControlStructures::ProhibitPostfixControls:
+    file: lib/Perl/Lint/Policy/ControlStructures/ProhibitPostfixControls.pm
+  Perl::Lint::Policy::ControlStructures::ProhibitUnlessBlocks:
+    file: lib/Perl/Lint/Policy/ControlStructures/ProhibitUnlessBlocks.pm
+  Perl::Lint::Policy::ControlStructures::ProhibitUnreachableCode:
+    file: lib/Perl/Lint/Policy/ControlStructures/ProhibitUnreachableCode.pm
+  Perl::Lint::Policy::ControlStructures::ProhibitUntilBlocks:
+    file: lib/Perl/Lint/Policy/ControlStructures/ProhibitUntilBlocks.pm
+  Perl::Lint::Policy::ErrorHandling::RequireCarping:
+    file: lib/Perl/Lint/Policy/ErrorHandling/RequireCarping.pm
+  Perl::Lint::Policy::ErrorHandling::RequireCheckingReturnValueOfEval:
+    file: lib/Perl/Lint/Policy/ErrorHandling/RequireCheckingReturnValueOfEval.pm
+  Perl::Lint::Policy::InputOutput::ProhibitBacktickOperators:
+    file: lib/Perl/Lint/Policy/InputOutput/ProhibitBacktickOperators.pm
+  Perl::Lint::Policy::InputOutput::ProhibitBarewordFileHandles:
+    file: lib/Perl/Lint/Policy/InputOutput/ProhibitBarewordFileHandles.pm
+  Perl::Lint::Policy::InputOutput::ProhibitExplicitStdin:
+    file: lib/Perl/Lint/Policy/InputOutput/ProhibitExplicitStdin.pm
+  Perl::Lint::Policy::InputOutput::ProhibitInteractiveTest:
+    file: lib/Perl/Lint/Policy/InputOutput/ProhibitInteractiveTest.pm
+  Perl::Lint::Policy::InputOutput::ProhibitJoinedReadline:
+    file: lib/Perl/Lint/Policy/InputOutput/ProhibitJoinedReadline.pm
+  Perl::Lint::Policy::InputOutput::ProhibitOneArgSelect:
+    file: lib/Perl/Lint/Policy/InputOutput/ProhibitOneArgSelect.pm
+  Perl::Lint::Policy::InputOutput::ProhibitReadlineInForLoop:
+    file: lib/Perl/Lint/Policy/InputOutput/ProhibitReadlineInForLoop.pm
+  Perl::Lint::Policy::InputOutput::ProhibitTwoArgOpen:
+    file: lib/Perl/Lint/Policy/InputOutput/ProhibitTwoArgOpen.pm
+  Perl::Lint::Policy::InputOutput::RequireBracedFileHandleWithPrint:
+    file: lib/Perl/Lint/Policy/InputOutput/RequireBracedFileHandleWithPrint.pm
+  Perl::Lint::Policy::InputOutput::RequireBriefOpen:
+    file: lib/Perl/Lint/Policy/InputOutput/RequireBriefOpen.pm
+  Perl::Lint::Policy::InputOutput::RequireCheckedClose:
+    file: lib/Perl/Lint/Policy/InputOutput/RequireCheckedClose.pm
+  Perl::Lint::Policy::InputOutput::RequireCheckedOpen:
+    file: lib/Perl/Lint/Policy/InputOutput/RequireCheckedOpen.pm
+  Perl::Lint::Policy::InputOutput::RequireCheckedSyscalls:
+    file: lib/Perl/Lint/Policy/InputOutput/RequireCheckedSyscalls.pm
+  Perl::Lint::Policy::InputOutput::RequireEncodingWithUTF8Layer:
+    file: lib/Perl/Lint/Policy/InputOutput/RequireEncodingWithUTF8Layer.pm
+  Perl::Lint::Policy::Miscellanea::ProhibitFormats:
+    file: lib/Perl/Lint/Policy/Miscellanea/ProhibitFormats.pm
+  Perl::Lint::Policy::Miscellanea::ProhibitTies:
+    file: lib/Perl/Lint/Policy/Miscellanea/ProhibitTies.pm
+  Perl::Lint::Policy::Miscellanea::ProhibitUnrestrictedNoLint:
+    file: lib/Perl/Lint/Policy/Miscellanea/ProhibitUnrestrictedNoLint.pm
+  Perl::Lint::Policy::Miscellanea::ProhibitUselessNoLint:
+    file: lib/Perl/Lint/Policy/Miscellanea/ProhibitUselessNoLint.pm
+  Perl::Lint::Policy::Modules::ProhibitAutomaticExportation:
+    file: lib/Perl/Lint/Policy/Modules/ProhibitAutomaticExportation.pm
+  Perl::Lint::Policy::Modules::ProhibitConditionalUseStatements:
+    file: lib/Perl/Lint/Policy/Modules/ProhibitConditionalUseStatements.pm
+  Perl::Lint::Policy::Modules::ProhibitEvilModules:
+    file: lib/Perl/Lint/Policy/Modules/ProhibitEvilModules.pm
+  Perl::Lint::Policy::Modules::ProhibitExcessMainComplexity:
+    file: lib/Perl/Lint/Policy/Modules/ProhibitExcessMainComplexity.pm
+  Perl::Lint::Policy::Modules::ProhibitMultiplePackages:
+    file: lib/Perl/Lint/Policy/Modules/ProhibitMultiplePackages.pm
+  Perl::Lint::Policy::Modules::RequireBarewordIncludes:
+    file: lib/Perl/Lint/Policy/Modules/RequireBarewordIncludes.pm
+  Perl::Lint::Policy::Modules::RequireEndWithOne:
+    file: lib/Perl/Lint/Policy/Modules/RequireEndWithOne.pm
+  Perl::Lint::Policy::Modules::RequireExplicitPackage:
+    file: lib/Perl/Lint/Policy/Modules/RequireExplicitPackage.pm
+  Perl::Lint::Policy::Modules::RequireFilenameMatchesPackage:
+    file: lib/Perl/Lint/Policy/Modules/RequireFilenameMatchesPackage.pm
+  Perl::Lint::Policy::Modules::RequireNoMatchVarsWithUseEnglish:
+    file: lib/Perl/Lint/Policy/Modules/RequireNoMatchVarsWithUseEnglish.pm
+  Perl::Lint::Policy::Modules::RequireVersionVar:
+    file: lib/Perl/Lint/Policy/Modules/RequireVersionVar.pm
+  Perl::Lint::Policy::NamingConventions::Capitalization:
+    file: lib/Perl/Lint/Policy/NamingConventions/Capitalization.pm
+  Perl::Lint::Policy::NamingConventions::ProhibitAmbiguousNames:
+    file: lib/Perl/Lint/Policy/NamingConventions/ProhibitAmbiguousNames.pm
+  Perl::Lint::Policy::Objects::IndirectSyntax:
+    file: lib/Perl/Lint/Policy/Objects/IndirectSyntax.pm
+  Perl::Lint::Policy::References::ProhibitDoubleSigils:
+    file: lib/Perl/Lint/Policy/References/ProhibitDoubleSigils.pm
+  Perl::Lint::Policy::RegularExpressions::ProhibitCaptureWithoutTest:
+    file: lib/Perl/Lint/Policy/RegularExpressions/ProhibitCaptureWithoutTest.pm
+  Perl::Lint::Policy::RegularExpressions::ProhibitComplexRegexes:
+    file: lib/Perl/Lint/Policy/RegularExpressions/ProhibitComplexRegexes.pm
+  Perl::Lint::Policy::RegularExpressions::ProhibitEnumeratedClasses:
+    file: lib/Perl/Lint/Policy/RegularExpressions/ProhibitEnumeratedClasses.pm
+  Perl::Lint::Policy::RegularExpressions::ProhibitEscapedMetacharacters:
+    file: lib/Perl/Lint/Policy/RegularExpressions/ProhibitEscapedMetacharacters.pm
+  Perl::Lint::Policy::RegularExpressions::ProhibitFixedStringMatches:
+    file: lib/Perl/Lint/Policy/RegularExpressions/ProhibitFixedStringMatches.pm
+  Perl::Lint::Policy::RegularExpressions::ProhibitSingleCharAlternation:
+    file: lib/Perl/Lint/Policy/RegularExpressions/ProhibitSingleCharAlternation.pm
+  Perl::Lint::Policy::RegularExpressions::ProhibitUnusedCapture:
+    file: lib/Perl/Lint/Policy/RegularExpressions/ProhibitUnusedCapture.pm
+  Perl::Lint::Policy::RegularExpressions::ProhibitUnusualDelimiters:
+    file: lib/Perl/Lint/Policy/RegularExpressions/ProhibitUnusualDelimiters.pm
+  Perl::Lint::Policy::RegularExpressions::ProhibitUselessTopic:
+    file: lib/Perl/Lint/Policy/RegularExpressions/ProhibitUselessTopic.pm
+  Perl::Lint::Policy::RegularExpressions::RequireBracesForMultiline:
+    file: lib/Perl/Lint/Policy/RegularExpressions/RequireBracesForMultiline.pm
+  Perl::Lint::Policy::RegularExpressions::RequireDotMatchAnything:
+    file: lib/Perl/Lint/Policy/RegularExpressions/RequireDotMatchAnything.pm
+  Perl::Lint::Policy::RegularExpressions::RequireExtendedFormatting:
+    file: lib/Perl/Lint/Policy/RegularExpressions/RequireExtendedFormatting.pm
+  Perl::Lint::Policy::RegularExpressions::RequireLineBoundaryMatching:
+    file: lib/Perl/Lint/Policy/RegularExpressions/RequireLineBoundaryMatching.pm
+  Perl::Lint::Policy::Subroutines::ProhibitAmpersandSigils:
+    file: lib/Perl/Lint/Policy/Subroutines/ProhibitAmpersandSigils.pm
+  Perl::Lint::Policy::Subroutines::ProhibitBuiltinHomonyms:
+    file: lib/Perl/Lint/Policy/Subroutines/ProhibitBuiltinHomonyms.pm
+  Perl::Lint::Policy::Subroutines::ProhibitExcessComplexity:
+    file: lib/Perl/Lint/Policy/Subroutines/ProhibitExcessComplexity.pm
+  Perl::Lint::Policy::Subroutines::ProhibitExplicitReturnUndef:
+    file: lib/Perl/Lint/Policy/Subroutines/ProhibitExplicitReturnUndef.pm
+  Perl::Lint::Policy::Subroutines::ProhibitManyArgs:
+    file: lib/Perl/Lint/Policy/Subroutines/ProhibitManyArgs.pm
+  Perl::Lint::Policy::Subroutines::ProhibitNestedSubs:
+    file: lib/Perl/Lint/Policy/Subroutines/ProhibitNestedSubs.pm
+  Perl::Lint::Policy::Subroutines::ProhibitReturnSort:
+    file: lib/Perl/Lint/Policy/Subroutines/ProhibitReturnSort.pm
+  Perl::Lint::Policy::Subroutines::ProhibitSubroutinePrototypes:
+    file: lib/Perl/Lint/Policy/Subroutines/ProhibitSubroutinePrototypes.pm
+  Perl::Lint::Policy::Subroutines::ProhibitUnusedPrivateSubroutines:
+    file: lib/Perl/Lint/Policy/Subroutines/ProhibitUnusedPrivateSubroutines.pm
+  Perl::Lint::Policy::Subroutines::ProtectPrivateSubs:
+    file: lib/Perl/Lint/Policy/Subroutines/ProtectPrivateSubs.pm
+  Perl::Lint::Policy::Subroutines::RequireArgUnpacking:
+    file: lib/Perl/Lint/Policy/Subroutines/RequireArgUnpacking.pm
+  Perl::Lint::Policy::Subroutines::RequireFinalReturn:
+    file: lib/Perl/Lint/Policy/Subroutines/RequireFinalReturn.pm
+  Perl::Lint::Policy::TestingAndDebugging::ProhibitNoStrict:
+    file: lib/Perl/Lint/Policy/TestingAndDebugging/ProhibitNoStrict.pm
+  Perl::Lint::Policy::TestingAndDebugging::ProhibitNoWarnings:
+    file: lib/Perl/Lint/Policy/TestingAndDebugging/ProhibitNoWarnings.pm
+  Perl::Lint::Policy::TestingAndDebugging::ProhibitProlongedStrictureOverride:
+    file: lib/Perl/Lint/Policy/TestingAndDebugging/ProhibitProlongedStrictureOverride.pm
+  Perl::Lint::Policy::TestingAndDebugging::RequireTestLabels:
+    file: lib/Perl/Lint/Policy/TestingAndDebugging/RequireTestLabels.pm
+  Perl::Lint::Policy::TestingAndDebugging::RequireUseStrict:
+    file: lib/Perl/Lint/Policy/TestingAndDebugging/RequireUseStrict.pm
+  Perl::Lint::Policy::TestingAndDebugging::RequireUseWarnings:
+    file: lib/Perl/Lint/Policy/TestingAndDebugging/RequireUseWarnings.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitCommaSeparatedStatements:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitCommaSeparatedStatements.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitComplexVersion:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitComplexVersion.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitConstantPragma:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitConstantPragma.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitEmptyQuotes:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitEmptyQuotes.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitEscapedCharacters:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitEscapedCharacters.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitImplicitNewlines:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitImplicitNewlines.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitInterpolationOfLiterals:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitInterpolationOfLiterals.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitLeadingZeros:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitLeadingZeros.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitLongChainsOfMethodCalls:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitLongChainsOfMethodCalls.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitMagicNumbers:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitMagicNumbers.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitMismatchedOperators:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitMismatchedOperators.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitMixedBooleanOperators:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitMixedBooleanOperators.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitNoisyQuotes:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitNoisyQuotes.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitQuotesAsQuotelikeOperatorDelimiters:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitQuotesAsQuotelikeOperatorDelimiters.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitSpecialHeredocTerminator:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitSpecialHeredocTerminator.pm
+  Perl::Lint::Policy::ValuesAndExpressions::ProhibitVersionStrings:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/ProhibitVersionStrings.pm
+  Perl::Lint::Policy::ValuesAndExpressions::RequireConstantVersion:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/RequireConstantVersion.pm
+  Perl::Lint::Policy::ValuesAndExpressions::RequireInterpolationOfMetachars:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/RequireInterpolationOfMetachars.pm
+  Perl::Lint::Policy::ValuesAndExpressions::RequireNumberSeparators:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/RequireNumberSeparators.pm
+  Perl::Lint::Policy::ValuesAndExpressions::RequireQuotedHeredocTerminator:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/RequireQuotedHeredocTerminator.pm
+  Perl::Lint::Policy::ValuesAndExpressions::RequireUpperCaseHeredocTerminator:
+    file: lib/Perl/Lint/Policy/ValuesAndExpressions/RequireUpperCaseHeredocTerminator.pm
+  Perl::Lint::Policy::Variables::ProhibitAugmentedAssignmentInDeclaration:
+    file: lib/Perl/Lint/Policy/Variables/ProhibitAugmentedAssignmentInDeclaration.pm
+  Perl::Lint::Policy::Variables::ProhibitConditionalDeclarations:
+    file: lib/Perl/Lint/Policy/Variables/ProhibitConditionalDeclarations.pm
+  Perl::Lint::Policy::Variables::ProhibitEvilVariables:
+    file: lib/Perl/Lint/Policy/Variables/ProhibitEvilVariables.pm
+  Perl::Lint::Policy::Variables::ProhibitLocalVars:
+    file: lib/Perl/Lint/Policy/Variables/ProhibitLocalVars.pm
+  Perl::Lint::Policy::Variables::ProhibitMatchVars:
+    file: lib/Perl/Lint/Policy/Variables/ProhibitMatchVars.pm
+  Perl::Lint::Policy::Variables::ProhibitPackageVars:
+    file: lib/Perl/Lint/Policy/Variables/ProhibitPackageVars.pm
+  Perl::Lint::Policy::Variables::ProhibitPerl4PackageNames:
+    file: lib/Perl/Lint/Policy/Variables/ProhibitPerl4PackageNames.pm
+  Perl::Lint::Policy::Variables::ProhibitPunctuationVars:
+    file: lib/Perl/Lint/Policy/Variables/ProhibitPunctuationVars.pm
+  Perl::Lint::Policy::Variables::ProhibitReusedNames:
+    file: lib/Perl/Lint/Policy/Variables/ProhibitReusedNames.pm
+  Perl::Lint::Policy::Variables::ProhibitUnusedVariables:
+    file: lib/Perl/Lint/Policy/Variables/ProhibitUnusedVariables.pm
+  Perl::Lint::Policy::Variables::ProtectPrivateVars:
+    file: lib/Perl/Lint/Policy/Variables/ProtectPrivateVars.pm
+  Perl::Lint::Policy::Variables::RequireInitializationForLocalVars:
+    file: lib/Perl/Lint/Policy/Variables/RequireInitializationForLocalVars.pm
+  Perl::Lint::Policy::Variables::RequireLexicalLoopIterators:
+    file: lib/Perl/Lint/Policy/Variables/RequireLexicalLoopIterators.pm
+  Perl::Lint::Policy::Variables::RequireLocalizedPunctuationVars:
+    file: lib/Perl/Lint/Policy/Variables/RequireLocalizedPunctuationVars.pm
+  Perl::Lint::Policy::Variables::RequireNegativeIndices:
+    file: lib/Perl/Lint/Policy/Variables/RequireNegativeIndices.pm
+  Test::Perl::Lint:
+    file: lib/Test/Perl/Lint.pm
+    version: '0.25'
+requires:
+  B::Keywords: '0'
+  Carp: '0'
+  Compiler::Lexer: '0.22'
+  Email::Address: '0'
+  List::Flatten: '0'
+  List::MoreUtils: '0.33'
+  List::Util: '1.41'
+  Module::Load: '0'
+  Module::Pluggable: '0'
+  Path::Tiny: '0.068'
+  Regexp::Lexer: '0.05'
+  String::CamelCase: '0'
+  Test::Builder::Module: '0'
+  Test::Deep::NoTest: '0'
+  Test::More: '0.98'
+  feature: '0'
+  parent: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/moznion/Perl-Lint/issues
+  homepage: https://github.com/moznion/Perl-Lint
+  repository: git://github.com/moznion/Perl-Lint.git
+version: '0.25'
+x_authority: cpan:MOZNION
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Dale Evans <dale.evans@mycanadapayday.com>'
+  - 'James Raspass <jraspass@gmail.com>'
+  - 'Tom Hukins <tom@eborcom.com>'

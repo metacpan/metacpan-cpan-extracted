@@ -1,0 +1,13 @@
+{
+    'scan_on'                => { 'table_name' => 'test' },
+    'estimated_rows'         => '2400',
+    'actual_time_first'      => '0.052',
+    'estimated_total_cost'   => '34',
+    'estimated_row_width'    => '4',
+    'actual_time_last'       => '2.183',
+    'actual_rows'            => '1000',
+    'estimated_startup_cost' => '0',
+    'type'                   => 'Seq Scan',
+    'actual_loops'           => '1',
+    'is_analyzed'            => 1,
+}

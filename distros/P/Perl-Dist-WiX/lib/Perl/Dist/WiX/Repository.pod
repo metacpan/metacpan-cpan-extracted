@@ -1,0 +1,75 @@
+=pod
+
+=head1 NAME
+
+Perl::Dist::WiX::Repository - The repository that is used for Perl::Dist::WiX.
+
+=head1 DESCRIPTION
+
+This documentation describes the repository that Perl::Dist::WiX uses, and 
+the branches that are currently being used as of May 2011.
+
+=head1 REPOSITORY
+
+Perl::Dist::WiX is currently on Curtis Jewell's Mercurial repository, at 
+L<http://hg.curtisjewell.name/Perl-Dist-WiX>
+
+After mercurial revision 1020 on that repository (svn revision r14408) changes 
+will not be mirrored to svn.ali.as.
+
+If you need push access for Perl::Dist::WiX, please e-mail me with what 
+you'd like to do (a patch would be nice) and I'll give you access.
+
+=head1 BRANCHES
+
+=head2 default 
+
+The trunk right now has 4 goals for June 2011:
+
+=over
+
+=item 1.
+
+Continuing to increase the 'pluggability' the supported versions of Perl pluggable. This way, the 
+C<Perl::Dist::WiX> distribution itself is smaller.
+
+=item 2.
+
+5.14.0 support (when it comes out).
+
+=item 3.
+
+Making what distroprefs we have inheritable (probably by making a 
+subdirectory of the build directory to copy them into.)
+
+=item 4.
+
+Being able to have a "feature tree".
+
+=back
+
+=head2 maint-May2011 (May 2011 maintenance branch.)
+
+This branch exists for the sole purpose of rebuilding Strawberry Perl 5.10.1 
+and 5.12.3 if there are major problems before August 2011. Changes on this 
+branch are HIGHLY discouraged.
+
+This branch will end upon the release of the October 2010 versions 
+of Strawberry Perl, and a new branch will be created to maintain that 
+version.
+
+=head1 AUTHORS
+
+Curtis Jewell E<lt>csjewell@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<http://ali.as/>, L<http://csjewell.comyr.com/perl/>
+
+=head1 COPYRIGHT AND LICENSE
+
+The copyright and license is the same as for 
+L<Perl::Dist::WiX|Perl::Dist::WiX>. See that module's documentation for 
+details.
+
+=cut

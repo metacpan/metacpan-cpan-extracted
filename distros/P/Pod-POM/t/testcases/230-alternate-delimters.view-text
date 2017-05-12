@@ -1,0 +1,8 @@
+NAME
+    230-alternate-delimiters
+
+TESTCASES
+    Code containing a greater than symbol should be legal:
+
+    '$obj->clone' makes a deep copy of the object.
+

@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use File::Spec;
+use Panotools::Script;
+
+die "Usage: $0 <roll> <pitch> <yaw> <input.pto> <output.pto>" unless @ARGV == 5;
+my ($roll, $pitch, $yaw, $input, $output) = @ARGV;
+
+my $pano = new Panotools::Script;
+$pano->Read ($input);
+$pano->Transform ($roll, $pitch, $yaw);
+$pano->Write ($output);
+
+__END__
+
+=head1 NAME
+
+transform-pano - Apply a numerical rotational translation to a hugin pto file
+
+=head1 Synopsis
+
+  transform-pano 12.3 45.6 7.89 input.pto output.pto
+
+=head1 DESCRIPTION
+
+Rotates all the individual images in a pto project leaving them in the same
+relative positions.  Rotations are specified as roll, pitch and yaw in that
+order.  Units are degrees.
+
+L<http://hugin.sourceforge.net/>
+
+=head1 License
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 See Also
+
+L<perl>, L<Panotools::Script>
+
+=head1 Author
+
+Bruno Postle <bruno AT postle.net>
+

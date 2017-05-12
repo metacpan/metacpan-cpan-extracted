@@ -1,0 +1,13 @@
+Revision history for Perl extension Options.
+
+0.01  Mon Apr 19 20:06:06 2010
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Options
+
+1.3  Thu Oct 13 16:51:00 2011
+	- added bugfix from <florent.lartet@univ-tlse2.fr>
+	- option values containing dots are also parsed in structure and not treated as a simple value
+
+1.4  Thu Oct 13 19:50:00 2011
+	- Fixed Metainformation failure to successfully be able to upload the package to PAUSE
+	- Added the neq_props to the testsuite for testing the value parsing bug

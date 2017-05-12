@@ -1,0 +1,8 @@
+Revision history for Perl extension Pickles::Dispatcher::Auto
+
+0.03    Mon Jun 25 10:41:41 JST 2012
+        - fix pod, Makefile.PL (add deps)
+0.02    Sun Jun 24 14:49:18 JST 2012
+        - fix pod, Makefile.PL
+0.01    Sun Jun 24 12:18:04 2012
+        - original version

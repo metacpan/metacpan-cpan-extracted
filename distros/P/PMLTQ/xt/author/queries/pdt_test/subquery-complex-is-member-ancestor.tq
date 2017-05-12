@@ -1,0 +1,5 @@
+a-node $n0 :=
+[ 0x ancestor a-node $n1 :=
+     [ ancestor $coord ],
+     ancestor a-node $coord :=
+     [ !afun ~ 'Coord|Apos|Aux[CP]' ] ];

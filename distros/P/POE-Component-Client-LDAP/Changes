@@ -1,0 +1,15 @@
+Revision history for Perl module POE::Component::Client::LDAP
+
+0.01 Tue Mar 30 09:37:05 2004
+	- original version; created by ExtUtils::ModuleMaker 0.32
+
+0.02 Sat Nov 20 05:22:23 2004
+	- major rewrite, weakref no longer necessary... destruction happens properly
+	- documentation added, woohoo!
+	- support for multiple connection attempts and failure handling added
+
+0.03 Mon Nov 14 21:32:33 2005
+	- Change to POE::Component::Client::LDAP from POE::Adaptor::Net::LDAP
+
+0.04 Tue Jan 17 07:21:50 2006
+	- Switch to Module::Install

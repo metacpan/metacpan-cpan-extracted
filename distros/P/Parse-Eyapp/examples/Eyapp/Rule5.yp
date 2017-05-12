@@ -1,0 +1,45 @@
+%{
+=head1 SYNOPSIS
+
+Compile the grammar and tree transformations first:
+
+     $ eyapp Rule5
+     $ treereg Shift
+
+Then execute it with:
+
+     $ ./useruleandshift.pl
+
+Try input: 
+
+     a = b * 8
+
+=cut
+%}
+
+%token NUM = /([0-9]+(?:\.[0-9]+)?)/
+%token VAR = /([A-Za-z][A-Za-z0-9_]*)/
+
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+%tree
+
+%%
+line: exp { $_[1] } 
+;
+
+exp:        %name NUM          NUM 
+        |   %name VAR          VAR 
+        |   %name ASSIGN       VAR '=' exp 
+        |   %name PLUS         exp '+' exp 
+        |   %name MINUS        exp '-' exp 
+        |   %name TIMES        exp '*' exp 
+        |   %name DIV          exp '/' exp 
+        |   %name UMINUS       '-' exp %prec NEG 
+        |   '(' exp ')'                           { $_[2] } 
+;
+
+%%
+

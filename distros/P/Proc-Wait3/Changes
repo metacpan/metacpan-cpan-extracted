@@ -1,0 +1,22 @@
+Revision history for Perl extension Proc::Wait3.
+
+0.05 Tue Nov  3 07:31:43 EST 2015
+        - Updated FSF postal address in the LICENSE file
+          RT Bug #107792, ppisar/redhat
+
+0.04 Wed Feb 16 06:54:47 EST 2011
+        - Clarified license as "GPL and Artistic" per request from
+          Ralf Corsépius
+
+0.03 Tue Aug 28 08:13:50 EDT 2007
+        - Bug fix: divide *.tv_usec by 10^6 (usec) instead of 10^3 (msec)
+          Reported by Frank Burkhardt
+
+0.02 Mon Mar  8 11:03:19 EST 2004
+       - Added a 'block' argument to wait3() so you can choose
+         to block or not to block.
+
+0.01  Thu Jan 29 10:36:29 2004
+	- original version; created by h2xs 1.21 with options
+		-A -c -n Proc::Wait3
+

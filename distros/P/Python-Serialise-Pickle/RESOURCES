@@ -1,0 +1,12 @@
+Some resources I used in making this module
+
+o http://www.python.org/doc/current/lib/module-pickle.html 
+
+o http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/python/python/dist/src/Lib/pickle.py?rev=HEAD&content-type=text/vnd.viewcvs-markup 
+
+o http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/python/python/dist/src/Modules/cPickle.c?rev=HEAD&content-type=text/vnd.viewcvs-markup 
+
+o http://starship.python.net/crew/gandalf/DNET/serial/jp-serial.htm 
+
+o http://www.boost.org/libs/python/doc/v2/pickle.html 
+

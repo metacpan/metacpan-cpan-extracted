@@ -1,0 +1,38 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+# ABSTRACT: dump pdf values as correct answers for tests
+# PODNAME: update_test_results
+
+use Data::Dumper;
+use File::Slurp;
+
+use lib 'lib';
+
+use PDF::Boxer;
+use PDF::Boxer::SpecParser;
+
+my $test = shift @ARGV;
+my $test_dir = 't/full_tests';
+
+my @box_tests = qw! margin_top margin_right margin_bottom margin_left !;
+
+my $parser = PDF::Boxer::SpecParser->new;
+
+my $pdfml = read_file( "$test_dir/$test.pdfml" );
+my $spec = $parser->parse($pdfml);
+my $boxer = PDF::Boxer->new( doc => { file => "$test_dir/$test.pdf" });
+$boxer->add_to_pdf($spec);
+$boxer->finish;
+
+my %boxes;
+foreach my $box ( values %{$boxer->box_register}){
+  my $name = $box->name;
+  foreach (@box_tests){
+    $boxes{$name}{$_} = $box->$_,
+  }
+}
+
+write_file("$test_dir/$test.data", Data::Dumper->Dump([\%boxes], ['data'] ));
+

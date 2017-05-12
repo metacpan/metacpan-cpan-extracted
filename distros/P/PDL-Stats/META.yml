@@ -1,0 +1,28 @@
+---
+abstract: 'a collection of statistics modules in Perl Data Language, with a quick-start guide for non-PDL people.'
+author:
+  - 'Maggie J. Xiong  <maggiexyz users.sourceforge.net>'
+build_requires:
+  PDL::Core: '2.008'
+  Test::More: '0'
+configure_requires:
+  PDL::Core: '2.008'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDL-Stats
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  PDL::Graphics::PGPLOT: '0'
+  PDL::Slatec: '0'
+requires:
+  PDL::Core: '2.008'
+resources:
+  repository: git://github.com/PDLPorters/PDL-Stats
+version: '0.75'

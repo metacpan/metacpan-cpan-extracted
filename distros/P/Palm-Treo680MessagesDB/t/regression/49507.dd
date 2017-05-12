@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1193142898,
+          'number' => '+440200814254',
+          'time' => '13:34',
+          'date' => '2007-10-23',
+          'name' => 'John XXXX (M)',
+          'phone' => '+440200814254',
+          'device' => 'Treo 680',
+          'direction' => 'outbound',
+          'timestamp' => 1193142898,
+          'text' => 'Yes, delete everything out of azureus.',
+          'type' => '0x0002',
+          'category' => 0,
+          'id' => 7107323,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 49507
+        };

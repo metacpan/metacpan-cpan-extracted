@@ -1,0 +1,42 @@
+---
+abstract: 'PITA Testing Schemes'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>, L<http://ali.as/>'
+build_requires:
+  Cwd: 0
+  ExtUtils::MakeMaker: 6.42
+  File::Remove: 1.42
+  Module::Build: 0.28
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: PITA::Scheme
+name: PITA-Scheme
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Archive::Extract: 0.18
+  Data::GUID: 0.045
+  File::Spec: 0.80
+  File::Temp: 0
+  File::Which: 0.05
+  File::pushd: 0.99
+  IPC::Run3: 0.036
+  PITA::XML: 0.43
+  Params::Util: 0.23
+  Process: 0.16
+  perl: 5.6.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/PITA-Scheme
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/PITA-Scheme
+version: 0.43

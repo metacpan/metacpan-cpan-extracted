@@ -1,0 +1,95 @@
+=head1 Label Widget
+
+B<$label=Paw::Label::new($text, [$color], [$name]);>
+
+B<Beispiel>
+
+     $label=Paw::Label::new(text=>"Text", color=>3, name=>"Linux_Label");
+
+B<Parameter>
+
+     text  => Text des Labels
+
+     color => Das Farbpaar (colorpair) muss mit
+              Curses::init_pair(pair_nr, COLOR_fg, COLOR_bg)
+              erzeugt werden[optional]
+
+     name  => Name des Fensters [optional]
+
+=head2 set_text($text)
+
+Ändert den Text des Labels auf den String in $text.
+
+B<Beispiel>
+
+     $label->set_text("changed label text");
+
+=head2 get_text();
+
+Gibt den Text des Labels zurueck.
+
+B<Beispiel>
+
+     $text=$label->get_text();
+
+=head2 abs_move_widget($new_x, $new_y)
+
+the widget moves to the new absolute screen position.
+if you set only one of the two parameters, the other one keeps the old value.
+
+B<Example>
+
+     $label->abs_move_widget( new_x=>5 );      #y-pos is the same
+
+=head2 get_widget_pos()
+
+returns an array of two values, the x-position and the y-position of the widget.
+
+B<Example>
+
+     ($xpos,$ypos)=$label->get_widget_pos();      #y-pos is the same
+
+=head2 set_color($color_pair)
+
+Set a new color_pair for the widget.
+
+B<Example>
+
+     $label->set_color(3);
+
+=head2 abs_move_widget($new_x, $new_y)
+
+Das Widget verschiebt sich auf die neue absolute Schirm Position.
+Wird nur einer der Parameter angegeben, so behaelt der andere seinen Wert bei.
+
+B<Beispiel>
+
+     $label->abs_move_widget( new_x=>5 );      #y-pos bleibt wie sie ist
+
+=head2 get_widget_pos()
+
+returns an array of two values, the x-position and the y-position of the widget.
+Gibt ein Array mit den beiden Wertde (x-Position, y-Position) zurueck. 
+
+B<Beispiel>
+
+     ($xpos,$ypos)=$label->get_widget_pos();      
+
+=head2 set_color($color_pair)
+
+Setzt ein neues color_pair.
+
+B<Beispiel>
+
+     $label->set_color(3);
+
+=head2 set_border([``shade''])
+
+aktiviert den Rahmen der Box. Optional auch mit Schatten. 
+
+B<Beispiel>
+
+     $box->set_border("shade"); or $win->set_border();
+
+=cut
+

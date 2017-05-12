@@ -1,0 +1,75 @@
+# examples/eyapplanguageref/CalcUsingTail.eyp
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+%right  '^'
+
+%{
+my %s; # symbol table
+%}
+
+%%
+start: 
+    input { \%s }
+;
+
+input: line * 
+;
+
+line:       
+  '\n'         { undef }
+  | exp '\n'   { print "$_[1]\n" if defined($_[1]); $_[1] }
+;
+
+exp:
+    $NUM                   { $NUM->[0]     }
+  | $VAR                   { $s{$VAR->[0]} }
+  | $VAR '=' $exp          { $s{$VAR->[0]} = $exp }
+  | exp.x '+' exp.y { $x + $y }
+  | exp.x '-' exp.y { $x - $y }
+  | exp.x '*' exp.y { $x * $y }
+  | exp.x '/' exp.y         
+    {
+       $y and return($x/$y);
+       $_[0]->YYData->{ERRMSG} = "Illegal division by zero at line $_[2][1].\n";
+       $_[0]->YYError; 
+       undef
+    }
+  | '-' $exp %prec NEG  { -$exp }
+  | exp.x '^' exp.y { $x ** $y }
+  | '(' $exp ')'        { $exp }
+;
+
+%%
+
+__PACKAGE__->lexer(sub {
+    my $parser = shift;
+
+    my $beginline = $parser->tokenline;
+    for (${$parser->input}) {
+      m{\G[ \t]*}gc;
+      m{\G([0-9]+(?:\.[0-9]+)?)}gc   and return ('NUM', [$1, $beginline]);
+      m{\G([A-Za-z][A-Za-z0-9_]*)}gc and return ('VAR', [$1, $beginline]);
+      m{\G\n}gc                      and do { $parser->tokenline(1); return ("\n", ["\n", $beginline]) };
+      m{\G(.)}gc                     and return ($1,    [$1, $beginline]);
+
+      return('',undef);
+    }
+  }
+);
+
+# Modulino
+__PACKAGE__->main() unless caller();
+
+=head1 SYNOPSIS
+
+Compile it with:
+
+   eyapp -b '' -o cu.pl CalcUsingTail.eyp 
+
+run it with:
+
+        $ ./cu.pl
+
+=cut

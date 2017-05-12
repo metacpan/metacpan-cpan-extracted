@@ -1,0 +1,78 @@
+$Id: README,v 1.1.1.1 2003/03/20 17:05:13 mah Exp $
+
+--------
+Abstract
+--------
+
+POE::Component::Server::XMLRPC adds asynchronous, event driven
+XMLRPC over HTTP to your POE applications.  It works very well
+with synchronous XMLRPC::Lite clients, even.
+
+-------
+Example
+-------
+
+The example/ping-server script is a "personal ping proxy"
+<http://philringnalda.com/blog/2003/03/allnewer_fast_again_weblogscom.php>
+which takes a ping in the form needed by Weblogs.com and sends it
+out to a list of ping servers.  This saves you the trouble and
+aggrevation of pinging multiple servers.  Updates to the script
+can be found at <http://openweblog.info/>.
+
+------------
+Requirements
+------------
+
+POE::Component::Server::XMLRPC requires the following modules,
+each of which probably has its own requirements.
+
+  POE::Component::Server::HTTP
+  XMLRPC::Lite
+
+It is recommended to use some installation utility such as CPANPLUS,
+CPAN, or ActiveState's PPM to ensure that dependencies are included.
+
+------------------
+Basic Installation
+------------------
+
+POE::Component::Server::XMLRPC may be installed through the CPAN shell
+in the usual CPAN shell manner.  This typically is:
+
+  $ perl -MCPAN -e 'intstall POE::Component::Server::XMLRPC'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme POE::Component::Server::XMLRPC
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install POE::Component::Server::XMLRPC
+
+-------------------
+Manual Installation
+-------------------
+
+This component may also be installed manually.
+<ftp://ftp.cpan.org/pub/CPAN/authors/id/M/MA/MAHEX/> or a
+similarly named directory at your favorite CPAN mirror should
+hold the latest version.
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+When you're ready to install the component:
+
+  make install
+
+Now it should be ready to use.
+
+Thanks for reading!
+
+-- Mark A. Hershberger <mah@everybody.org>
+   (This README is a slightly editted verison of the one included
+   in POE::Component::Server::XMLRPC.)

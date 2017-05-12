@@ -1,0 +1,10 @@
+Changes
+examples/bmi_calc.pm
+examples/example.pm
+examples/megaHAL.pm
+lib/POE/Component/PluginManager.pm
+Makefile.PL
+MANIFEST
+README
+t/POE-Component-PluginManager.t
+META.yml                                 Module meta-data (added by MakeMaker)

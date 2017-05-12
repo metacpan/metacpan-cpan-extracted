@@ -1,0 +1,13 @@
+Changes
+lib/PDL/DateTime.pm
+lib/PDL/DateTime.pod
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/0-load.t
+t/1-basic.t
+t/2-miliseconds.t
+t/3-sequence.t
+t/4-ops.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

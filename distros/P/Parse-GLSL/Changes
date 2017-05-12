@@ -1,0 +1,8 @@
+Revision history for Parse::GLSL
+
+0.002     2012-03-03 21:32:05 Europe/London
+	Improved list of keywords and some basic support for preprocessor
+	statements and macros.
+
+0.001     2011-10-02 03:32:35 Europe/London
+	Initial CPAN release

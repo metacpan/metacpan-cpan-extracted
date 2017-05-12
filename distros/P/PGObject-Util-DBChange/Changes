@@ -1,0 +1,30 @@
+Revision history for PGObject-Util-DBChange
+
+
+0.050.2 2017-01-09
+        Change minimum Perl version dependency (5.10) in Makefile.PL
+
+0.050.1 2017-01-08
+        Update copyright years
+
+0.050   2017-01-08
+        Remove Makefile from MANIFEST
+	Change version number
+	Increase minimum requirement (5.10 from 5.6) due to '//' operator
+
+0.040	2016-08-16
+	Fixing handling of multiple statements in an update file.
+        Fixing copyright notice
+        Harmonizing version numbers across files
+
+0.03	2016-08-15
+	Transaction wrapping cannot possibly work given that a single $dbh->do
+	call cannot wrap transactions, so removing it for now. Also fixing
+	boilerplate.
+
+0.02	2016-07-16
+	Fixed missing files in tests
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

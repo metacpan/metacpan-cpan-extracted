@@ -1,0 +1,278 @@
+
+=encoding utf8
+
+=head1 PRANG CHANGES
+
+This POD file documents a summary of the changes in PRANG.  For the
+full list of changes, refer to the git history.
+
+=head2 VERSION 0.16 - 1 May 2012
+
+=over
+
+=item * 
+
+Lowered minimum versions of some dependencies
+
+=back
+
+=head2 VERSION 0.15 - 26 April 2012
+
+=over
+
+=item *
+
+Fixed a bug that allows PRANG to work with newer Moose versions
+
+=back
+
+=head2 VERSION 0.14 - 10 February 2011
+
+=over
+
+=item *
+
+Increased the minimum required version of Moose.
+
+=back
+
+=head2 VERSION 0.12 - 9 February 2011
+
+=over
+
+=item *
+
+If PRANG is marshalling out a value and it finds an
+L<XML::LibXML::Element> there, it will now happily just throw the
+document fragment into the document being exported.  Of course, you
+probably had to try quite hard to do that...
+
+=item *
+
+Not setting 'required' or 'default' on complex element attributes (ie,
+attributes which contain another node), and which are explicitly or
+implicitly required - using C<xml_min>, C<xml_required>, etc - is now
+considered a declaration error and produces a warning.
+
+=item *
+
+Removed dependency on MooseX::Method::Signatures, and replaced it with
+MooseX::Params::Validate
+
+=item *
+
+Added a 'lax' parsing mode, which ignores any extra attributes or
+elements which aren't defined in your class.
+
+=item *
+
+Allow PRANG classes to define the encoding of the XML document
+emitted.
+
+=back
+
+=head2 VERSION 0.11 - 12 July 2010
+
+=over
+
+=item *
+
+Ignore xsi:schemaLocation; it has no useful meaning.
+    
+xsi:schemaLocation describes "hints as to the physical location of schema
+documents which may be used for ‘assessment’" - ie, it is a hint to a local
+validator as to which schema file contains the XML Schema definition.  On
+XML documents which are transmitted, it is somewhere between a potential
+security risk and totally worthless.  See
+http://www.w3.org/TR/xmlschema-1/#schema-loc for the full story.
+
+=item *
+
+Fixed a bug in L<PRANG::Graph::Meta::Element> which sorted the classes
+badly when using inheritance.  There is still a design issue to be
+solved, if you want to use inheritance and not put new elements on the
+end of the sequence, or if you want to use roles.
+
+=item *
+
+PRANG now happily ignores XML Schema instance C<schemaLocation> and
+C<noNamespaceSchemaLocation> attributes on incoming documents.  They
+are only hints for running unconfigured XML Schema validators anyway.
+
+=back
+
+=head2 VERSION 0.10 - 27 June 2010
+
+=over
+
+=item *
+
+Fix enum support [reported by Heiko Jansen]
+
+=item *
+
+Add support for libxml indenting on to_xml [Heiko Jansen]
+
+=item *
+
+Specifying C<xml_min =E<gt> 0> on an element attribute is now
+equivalent to C<xml_required =E<gt> 0> [Sam Vilain]
+
+=item *
+
+New module L<PRANG::Coerce> for creating coercion rules which are
+convenient for typical PRANG applications [Andy Chilton]
+
+=item *
+
+Support C<YourXML::Language-E<gt>parse_file> and C<-E<gt>parse_fh> for
+convenience's sake [Sam Vilain]
+
+=back
+
+=head2 VERSION 0.09 - 7 May 2010
+
+No changes, just a re-bundling, as an included module was not the
+release version.
+
+=head2 VERSION 0.08 - 7 May 2010
+
+=over
+
+=item *
+
+Distribution now includes all the modules required only for the tests.
+This, along with a bugfix in L<Scriptalicious>, should hopefully close
+the last of the CPAN testers failures for 0.07.
+
+=item *
+
+An addition to L<PRANG::XMLSchema::Types> Str subtypes: C<date>,
+C<time>, and tightening of the C<dateTime> (it was not anchored
+before, so accepted any string containing a dateTime).
+
+=back
+
+=head2 VERSION 0.07 - 26 Apr 2010
+
+=over
+
+=item *
+
+New documentation B<PRANG::XMLSchema::Guide> which provides
+information on manually converting XML Schema specifications to PRANG
+classes.
+
+=item *
+
+Add a coerce rule for C<PRANG::XMLSchema::token> types which
+normalizes whitespace on input values if enabled.
+
+=item *
+
+The C<xmlns> Class property now affects all sub-properties, but not
+the including element.  This mirrors the default behaviour with XML
+Schema.
+
+=back
+
+=head2 VERSION 0.06 - 14 Apr 2010
+
+=over
+
+=item *
+
+Correct the handling of attributes with no prefix.  They should always
+be considered to have no namespace, even if a default xmlns is
+defined, apparently.
+
+=back
+
+=head2 VERSION 0.05 - 14 Apr 2010
+
+=over
+
+=item *
+
+XML namespaces support is now much more complete; lots of cases,
+including wildcarding of both the node name and the XML namespace now
+work.  This is powerful enough to successfully round-trip crazy XML
+Schema specifications such as C<E<lt>any namespace="##any"
+processContents="skip"/E<gt>>
+
+=item *
+
+L<PRANG::Graph::Class> has been deprecated / ripped out.  It was a
+hang-over from the time before C<use PRANG::Graph;> set up the
+metaclass trait.
+
+=item *
+
+It is no longer required to specify the C<xmlns> method, if you do not
+wish to use namespaces.
+
+=item *
+
+Specifying a role as a type now works, so long as the role is used by
+only L<PRANG::Graph> types.
+
+=back
+
+=head2 VERSION 0.04 - 9 Apr 2010
+
+=over
+
+=item *
+
+Much enhanced support for XML namespaces.  Tests and functionality
+added; still lacking is the "Whatever" mapping, required for crazy
+XMLSchema stuff like C<E<gt>any namespace="##any"
+processContents="skip"/E<lt>> - this will be supported in the next
+release.
+
+=item *
+
+Various bug fixes, more rejection of invalid input, and so on.
+
+=back
+
+=head2 VERSION 0.03 - 7 Apr 2010
+
+=over
+
+=item *
+
+Some error message enhancements for from various forms of API
+misunderstanding.
+
+=item *
+
+more missing dependencies added.
+
+=back
+
+=head2 VERSION 0.02 - 25 Mar 2010
+
+=over
+
+=item *
+
+Back-port to work on pre-1.70 XML::LibXML
+
+=item *
+
+some missing dependencies added.
+
+=back
+
+=head1 SEE ALSO
+
+L<PRANG>
+
+=head1 COPYRIGHT
+
+Copyright 2010, NZ Registry Services.  This documentation is licensed
+under the Artistic License v2.0, which permits relicensing under other
+Free Software licenses.
+
+=cut

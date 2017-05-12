@@ -1,0 +1,6 @@
+# quote-set
+# related to https://github.com/ufal/perl-pmltq/issues/1
+t-node $n :=
+[ quot/set_id != '', (!is_generated = 1 or (a/aux.rf $a and is_generated = 1)), a/lex.rf|a/aux.rf a-node $a := [  ] ];
+  >> give distinct $n.quot/set_id,$a.id
+  >> for $1 give $1,count($2) sort by $2 desc,$1

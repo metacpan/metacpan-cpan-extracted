@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+README
+LICENSE
+lib/POE/Component/IRC/Plugin/Google/Calculator.pm
+t/00-load.t
+xt/pod-coverage.t
+xt/pod.t
+xt/kwalitee.t
+examples/calc_bot.pl
+Makefile.PL
+META.yml
+META.json

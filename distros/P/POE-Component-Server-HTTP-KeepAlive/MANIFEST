@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+lib/POE/Component/Server/HTTP/KeepAlive.pm
+lib/POE/Component/Server/HTTP/KeepAlive/SimpleHTTP.pm
+t/00_compile.t
+t/01_pod.t
+t/02_pod_coverage.t
+t/10_object.t
+t/20_poco_http.t
+t/25_poco_simplehttp.t
+t/Client.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

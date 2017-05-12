@@ -1,0 +1,58 @@
+NAME
+    PerlIO::via::CBC - PerlIO layer for reading/writing CBC encrypted files
+
+SYNOPSIS
+      use PerlIO::via::CBC;
+
+      PerlIO::via::CBC->config(
+        'key'             => 'my secret key',
+        'cipher'          => 'Blowfish',
+        'iv'              => '$KJh#(}q',
+        'regenerate_key'  => 0,   # default true
+        'padding'         => 'space',
+        'prepend_iv'      => 0,
+        'pcbc'            => 1  #default 0
+      );
+
+      my $fh;
+      open($fh, '>:via(PerlIO::via::CBC)', $file)
+        or die "Can't open $file for encryption: $!\n";
+      print $fh $lots_of_secret_data;
+      close($fh)
+        or die "Error closing file: $!\n";
+
+      open($fh, '<:via(PerlIO::via::CBC)', $file)
+        or die "Can't open $file for decryption: $!\n";
+      print <$fh>;
+      close($fh)
+        or die "Error closing file: $!\n";
+
+DESCRIPTION
+    This module implements a PerlIO layer that can read and read CBC
+    encrypted files. It uses Crypt::CBC to do the CBC. So check Crypt::CBC
+    for more information.
+
+  config(%args)
+    Allows the configuration of the CBC. Check Crypt::CBC->new() for more
+    information.
+
+OVERRIDEN METHODS
+    This section lists the overriden PerlIO::via methods.
+
+  FILL
+  FLUSH
+  PUSHED
+REQUIRED MODULES
+        Crypt::CBC' => 2.12
+        Crypt::DES' => 2.03
+
+SEE ALSO
+    PerlIO::via
+
+AUTHOR
+    Sascha Kiefer, "esskar@cpan.org"
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

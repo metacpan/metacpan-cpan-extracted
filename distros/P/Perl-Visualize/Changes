@@ -1,0 +1,14 @@
+Revision history for Perl extension Perl::Visualize.
+
+0.01  Sun Jun 15 08:57:01 2003
+	- original version; created by h2xs 1.22 with options
+		-AX -n Perl::Visualize
+
+1.00  Fri Jun 20 10:21:20 2003
+	- release version prepared in time to celebrate GIF patent expiring
+
+1.01  Wed Jul  2 19:11:03 2003
+        - uploaded to CPAN with minor changes to perldoc
+
+1.02  Mon Jul  7 07:58:40 2003
+	- corrected broken URL to Piet (thanks to Xavier Noria)

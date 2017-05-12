@@ -1,0 +1,80 @@
+{
+   "abstract" : "Yet another AccessLog Middleware",
+   "author" : [
+      "Masahiro Nagano <kazeburo {at} gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.11.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-AxsLog",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Apache::LogFormat::Compiler" : "0.30",
+            "HTTP::Message" : "6.06",
+            "Plack" : "1.0023",
+            "perl" : "v5.8.5"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::AxsLog" : {
+         "file" : "lib/Plack/Middleware/AxsLog.pm",
+         "version" : "0.21"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazeburo/Plack-Middleware-AxsLog/issues"
+      },
+      "homepage" : "https://github.com/kazeburo/Plack-Middleware-AxsLog",
+      "repository" : {
+         "url" : "git://github.com/kazeburo/Plack-Middleware-AxsLog.git",
+         "web" : "https://github.com/kazeburo/Plack-Middleware-AxsLog"
+      }
+   },
+   "version" : "0.21",
+   "x_contributors" : [
+      "zentooo <ankerasoy@gmail.com>",
+      "Masahiro Nagano <kazeburo@gmail.com>"
+   ]
+}

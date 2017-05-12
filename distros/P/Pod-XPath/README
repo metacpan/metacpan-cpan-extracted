@@ -1,0 +1,91 @@
+NAME
+    Pod::XPath - use XPath expressions to navigate a POD document
+
+SYNOPSIS
+        use Pod::XPath;
+        my $pod = Pod::XPath->new($podfile);
+
+        my $head1nodes = $pod->find("/pod/sect1");
+
+DESCRIPTION
+    "Pod::XPath" allows accessing elements of a POD document using XPath
+    expressions. The document or string is first turned into XML using
+    "Pod::XML", and then passed to "XML::XPath" to parse.
+
+    All standard XPath expressions can be used to retrieve data from the
+    document. See the Pod::XML manpage for a description of the document
+    produced from the POD document. The object returned from "new" is an
+    instance of "XML::XPath"; see the XML::XPath manpage.
+
+    "Pod::XPath" can be invoked with any one of the following:
+
+    /path/to/file.pod
+        A path to a POD document. If the path is relative, it is taken as
+        relative to the current working directory.
+
+            my $pod = Pod::XPath->new("$ENV{HOME}/lib/MyDoc.pod");
+
+    Module::Name
+        A module name. This has to contain *::*.
+
+            my $pod = Pod::XPath->new("Pod::XPath");
+
+    GLOB ref
+        A filehandle.
+
+            my $pod = Pod::XPath->new(\*STDIN);
+
+EXAMPLES
+    To get all the major sections of a document (i.e., all the "head1"
+    sections), use:
+
+        my $head1_nodeset = $pod->find("/pod/sect1");
+
+    From there, to get subsections:
+
+        for my $head1 ($head1_nodeset->get_nodelist) {
+            print $head1->find("title/text()"), "\n";
+            $head2_nodeset = $head1->find("sect2");
+        
+            for $head2 ($head2_nodeset->get_nodelist) {
+                print "\t", $head2->find("title/text()"), "\n"
+            }
+        }
+
+    To get the SYNOPSIS:
+
+        $synopsis = $pod->find('/pod/sect1[title/text() = "SYNOPSIS"]');
+
+    Or the SEE ALSO list:
+
+        $see_also = $pod->find('/pod/sect1[title/text() = "SEE ALSO"]');
+
+    The author's name:
+
+        print $pod->find('/pod/sect1[title/text() = "AUTHOR"]/para[1]/text()');
+
+    To get the name of the version of "Data::Dumper":
+
+        use Data::Dumper;
+        my $pod = Pod::XPath->new($INC{'Data/Dumper.pm'});
+
+        print $pod->find('/pod/sect1[title/text() = "VERSION"]/para[1]/text()');
+
+SUPPORT
+    "Pod::XPath" is supported by the author.
+
+VERSION
+    This is "Pod::XPath", revision $Revision: 1.4 $.
+
+AUTHOR
+    darren chamberlain <darren@cpan.org>
+
+COPYRIGHT
+    (C) 2003 darren chamberlain
+
+    This library is free software; you may distribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Perl manpage, the XML::XPath manpage, the Pod::XML manpage
+

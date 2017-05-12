@@ -1,0 +1,51 @@
+<h1>Search Forums</h1>
+
+<form method="get" action="[%c.uri_for('/search/advanced')%]">
+
+Search for messages matching
+<select name="match_type">
+    <option value="any">any</option>
+    <option value="all">all</option>
+</select>
+of the following criteria:
+<br />
+
+Subject
+[% INCLUDE search_type name="subject_search_type" %]
+<input type="text" name="subject_search_terms" />
+<br />
+
+Message
+[% INCLUDE search_type name="message_search_type" %]
+<input type="text" name="message_search_terms" />
+<br />
+
+Author's name
+[% INCLUDE search_type name="author_search_type" %]
+<input type="text" name="author_search_terms" />
+<br />
+
+Posted
+<select name="search_post_date">
+    <option value="">at any time</option>
+    <option value="last_hour">in the last hour</option>
+    <option value="last_day">in the last day</option>
+    <option value="last_month">in the last month</option>
+    <option value="last_six_months">in the last six months</option>
+    <option value="last_year">in the last year</option>
+    <option value="over_a_year">over a year ago</option>
+</select>
+<br />
+
+<input type="submit" value="Search" />
+
+[% PROCESS search/results %]
+
+[% BLOCK search_type %]
+<select name="[%name%]">
+    <option value="contains">contains</option>
+    <option value="exact">is</option>
+</select>
+[% END %]
+
+</form>

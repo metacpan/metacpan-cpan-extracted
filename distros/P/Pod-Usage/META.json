@@ -1,0 +1,47 @@
+{
+   "abstract" : "Pod::Usage extracts POD documentation and shows usage information",
+   "author" : [
+      "Brad Appleton  <bradapp@enteract.com>",
+      "Marek Rouchal <marekr@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Usage",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0.82",
+            "Pod::Text" : "4",
+            "Test::More" : "0.6",
+            "blib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.69"
+}

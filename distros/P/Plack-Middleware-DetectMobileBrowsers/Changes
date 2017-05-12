@@ -1,0 +1,19 @@
+
+0.05      2015-01-25 16:55:54+01:00 Europe/Berlin
+	- Updated reg-ex to 2014-08-01 (sorry for the delay)
+	- Optimize reg-ex by omitting backreferences
+
+0.04      2014-01-11 20:19:28 Europe/Berlin
+	- Rudimentary tests added
+
+0.03      2013-09-20 21:47:14 Europe/Berlin
+	- Updated reg-ex to 2013-09-09
+
+0.02      2013-05-16 00:10:19 Europe/Berlin
+	- Fixed stupid bug
+	- Add option to consider tablets as mobile devices
+
+0.01      2013-02-24 19:40:13 Europe/Berlin
+	- Initial release
+	- Using reg-ex 2012-10-18
+

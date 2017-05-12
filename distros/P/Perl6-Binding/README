@@ -1,0 +1,70 @@
+This module creates lexical aliases to items that can be either lexical or
+dynamic. For example, after this statement:
+
+    my $foo := $array[2];
+
+both $foo and $array[2] refer to the same value. If you take references to both
+items, you'll discover that \$foo eq \$array[2]. Changing either of them changes
+the other.
+
+You can also alias entire arrays or hashes:
+
+    my @bar := @$arrayref;
+    my %baz := %{$hoh{'element1'}->{'subelement'}};
+
+You can also alias the contents of an array or a hash, or an array or hash
+slice.
+
+    my ($foo, @bar, %baz) := *@array;
+
+In the above, $array[1] must be an array reference, and $array[2] must be a hash
+reference.
+
+When aliasing the contents of a hash, the names of the aliased variables
+determine the hash members that are aliased.  The following two statements have
+identical effects.
+
+    my ($foo, @bar, %baz) := *%hash;
+    my ($foo, @bar, %baz) := @hash{qw/foo bar baz/};
+
+This version is still an alpha version, released so that I can get some feedback
+on bugs and on the general functionality of the module.
+
+Version 0.02 fixed some minor problems.
+
+Version 0.03 gets the prerequisites right in Makefile.PL.
+
+Version 0.04 corrects a number of bugs, and updates the prerequisite
+for PadWalker to 0.09.
+
+Version 0.05 checks to see if a hash element exists before attempting
+to create an alias for it, and modifies the tests to skip several of them
+due to a problem in PadWalker with Perl 5.8.x.
+
+Version 0.06 fixes a long-standing problem with bindings in recursive
+subroutines. Basically, the underlying XS code was always binding the variable
+in the first call, not the one at the current stack level.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Filter::Util::Call
+    Text::Balanced
+    PadWalker
+
+COPYRIGHT AND LICENCE
+
+Copyright 2003-2004 Kevin Michael Vail
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

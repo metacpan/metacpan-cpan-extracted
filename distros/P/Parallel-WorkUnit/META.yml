@@ -1,0 +1,37 @@
+---
+abstract: 'Provide easy-to-use forking with ability to pass back data'
+author:
+  - 'Joel Maslak <jmaslak@antelope.net>'
+build_requires:
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parallel-WorkUnit
+provides:
+  Parallel::WorkUnit:
+    file: lib/Parallel/WorkUnit.pm
+    version: '1.009'
+requires:
+  Carp: '0'
+  IO::Pipe: '0'
+  IO::Select: '0'
+  Moose: '0'
+  POSIX: '0'
+  Storable: '0'
+  Try::Tiny: '0'
+  autodie: '0'
+  namespace::autoclean: '0'
+  perl: v5.8.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/jmaslak/Parallel-WorkUnit/issues
+  repository: git://github.com/jmaslak/Parallel-WorkUnit.git
+version: '1.009'

@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+use 5.006;
+use strict; use warnings;
+
+use Perl::Tags;
+use Perl::Tags::Hybrid;
+use Perl::Tags::Naive::Moose; # includes ::Naive
+
+## fatpacked file doesn't contain PPI.  Need to investigate
+## this.  In mean time, disabling, which will result in a lighter
+## weight file for editor use in any case.
+# use Perl::Tags::PPI; 
+
+# it is intended to be able to `require` this file, to be called
+# simply from an Editor, and to be fatpackable
+
+1;

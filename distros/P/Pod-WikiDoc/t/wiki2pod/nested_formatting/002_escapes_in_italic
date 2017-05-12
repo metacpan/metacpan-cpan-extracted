@@ -1,0 +1,6 @@
+Nesting ~italic/escapes~
+and ~<other-nested>~ formats
+#--------------------------------------------------------------------------#
+Nesting I<italicE<sol>escapes>
+and I<E<lt>other-nestedE<gt>> formats
+

@@ -1,0 +1,13 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+          
+Name: libgtop
+Description: Portable System Access Library
+Requires: glib-2.0
+Version: 2.28.1
+Libs: -L${libdir} -lgtop-2.0
+Cflags: -I${includedir}/libgtop-2.0
+
+

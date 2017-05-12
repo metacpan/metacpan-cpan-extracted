@@ -1,0 +1,13 @@
+Revision history for Pod-Weaver-PluginBundle-FLORA
+
+0.04  Fri  3 Jul 2015 13:14:36 PDT
+  * remove Pod::Weaver::Plugin::Encoding and depend on Pod::Weaver 4
+
+0.03  Sat, 05 Jun 2010 19:42:36 +0200
+  * Add Pod::Weaver::Plugin::Encoding.
+
+0.02  Thu, 20 May 2010 23:04:07 +0200
+  * Add a TYPES collector section.
+
+0.01  Thu, 06 May 2010 19:42:51 +0200
+  * Initial release.

@@ -1,0 +1,181 @@
+
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Export</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Export</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<B>Export</B><BR>
+<P>
+<A HREF=images/index.html>Images</A><BR>
+<A HREF=websites/index.html>Website</A><BR>
+<P>
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.  Sometimes, you may want to print the slides to create
+hand-outs or for corrections.  You may also want to convert your presentation
+into a website.  All use of the slide-data for other use than an
+actual presentation is covered by this export modules.
+<P>
+<FONT COLOR=red>WARNINGS</FONT>:
+<UL>
+<LI>These exporters will only work on X11 (Unix) systems because it
+    uses <CODE>xwd</CODE> to hardcopy the slides.<BR>
+<LI>These exporters will only work if you have Image::Magick installed.
+<LI>The undocumented exporters contain some problems (bugs/misfeatures).
+</UL>
+<P>
+We are open to contributions.
+&nbsp;
+</TD></TR>
+<TR><TD VALIGN=top>
+<A HREF=#exporters>Exporters</A><BR>
+<A HREF=#using>Using</A><BR>
+<A HREF=#options>Options</A><BR>
+<P>
+</TD>
+    <TD VALIGN=top>
+
+<H2><A NAME=exporters>Export Modules</A></H2>
+
+The following exports are currently implemented, have initial coding,
+or are under study.  
+
+<DL>
+<DT><A HREF=website/html.html>PPresenter::Export::Website::HTML</A>
+<DD>Converts slides and slide-notes into web-pages.  Slides can only be
+    converted to images within the HTML pages.  In the future, it will
+    also be possible to include the slide information as real HTML.
+    <P>
+<DT><A HREF=images/imagemagick.html>PPresenter::Export::Images::ImageMagick</A>
+<DD>Convert all slides into images using Image::Magick.
+    Each slide(view) as one seperate file, in hardly any imaginable format.
+    <P>
+<DT><B>PPresenter::Export::PostScript</B>
+<DD>Convert slides into PostScript using standard Tk.
+    Tk is able to produce real postscript, but only includes text in
+    a character-size which may be close to the size you requested.  Images
+    and such are not included.
+    <P>
+    The results are of such a poor quality that I refuse the documentation
+    of this module to be included.
+    <P>
+<DT><B>PPresenter::Export::IM_PostScript</B>
+<DD>Convert slides into PostScript using Image::Magick, but as images.
+    This produces huge postscript files, and does not work perfectly yet.
+    Apparently some misunderstanding between me and PerlMagick interface.
+    <P>
+    The results are not acceptable yet, but I promise documentation when
+    this module works well enough.
+</DL>
+
+Exporters can only be used when the presentation is run, because most of
+them hardcopy the screen.
+
+<H2><A NAME=using>Using Exporters</A></H2>
+
+Because this functionality is still under development, the use of exporters
+is a bit more complicated than the other modules.
+<P>
+At first, you have to add exporters to your show:
+<PRE>
+    $show->addExporter(<I>package-name, options</I>);
+</PRE>
+You can find the packages in <CODE>PPresenter/<WBR>Export/</CODE>, for
+instance: <CODE>'PPresenter::<WBR>Export::<WBR>IM_Images'</CODE> is a
+valid package-name.
+<P>
+The other way to introduce an exporter is by creating an instance of
+subclass of <CODE>PPresenter::<WBR>Export</CODE> yourself, and then have
+that added:
+<PRE>
+    use PPresenter::Export::IM_Image;
+    my $obj = PPresenter::Export::IM_Image->new(<I>options</I>);
+    $show->addExporter($obj, <I>options</I>);
+</PRE>
+<P>
+When the presentation is run, and you have added some exporters, you can
+start them using the background-<WBR>menu.  If there are no exporters, then
+you will not see the 'export' entry in menu.
+
+<H2><A NAME=options>General Options</A></H2>
+
+The <A HREF=../dynamic/index.html>Dynamic</A> module defines an option
+<B>-exportPhases</B> which describes whether only the final stage of a
+slide should be presented, or all, or a selection.
+<P>
+All exporters share the following options.
+<DL>
+<DT><B>-viewports =&gt;</B> <I>which</I>
+<DD>Which viewports are selected to be included by default.  Possible
+    values for <I>which</I> are:
+    <DL>
+    <DT><B>ALL</B>
+    <DD>All of the visible slides.  If you have slidenotes, but not a
+        visisble display of them, you won't get them because they cannot
+        be copied from the screen.
+    <DT><B>NOTES</B>
+    <DD>Slidenotes, but only if visible on the screen.
+    <DT><B>SLIDES</B>
+    <DD>Viewports which do not show slidenotes.
+    <DT><I>name</I> or <B>[</B> <I>list-of-names</I> <B>]</B>
+    </DL>
+    <P>
+<DT><B>-exportSlide = &gt;</B> <I>which</I>
+<DD>Which slides shall be included.
+    Possible values for <I>which</I> are:
+    <DL>
+    <DT><B>ACTIVE</B>
+    <DD>The currently selected slides.  See the slide-control menu to
+        find-out which slides are selected.  The default.
+    <DT><B>CURRENT</B>
+    <DD>Only the currently visible slide.
+    <DT><B>ALL</B>
+    <DD>All slides, also the not selected slides.
+    </DL>
+    <P>
+<DT><B>-imageFormat =&gt;</B> <I>format</I>
+<DD>The required output format of images.  If you use ImageMagick (and
+    that is the only way to get images on the moment) then you can get
+    nearly all imaginable formats.
+    <P>
+    You may use the format name in upper- or in lowercase.  Common
+    formats are <CODE>gif</CODE> (default), <CODE>jpg</CODE>, and
+    <CODE>png</CODE>.
+    <P>
+<DT><B>-imageQuality =&gt;</B> <I>percentage</I>
+<DD>Some image formats can compress better when they leave some information
+    of the image away.  The smaller the value you specify here, the more
+    image information is left-out.  The number of bytes required to store
+    the image will be smaller, but the quality of the image will suffer.
+    <P>
+<DT><B>-imageWidth =&gt;</B> <I>pixels</I>
+<DD>The width the resulting images will have.  The images are taken from
+    the screen and resized (with anti-aliasing) to the specified size.
+    <P>
+    If you do not specify a size, the images will not be resized.  The
+    height of the image will be resized with the same factor as the width.
+</DL>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

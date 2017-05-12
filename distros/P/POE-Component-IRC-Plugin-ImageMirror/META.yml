@@ -1,0 +1,36 @@
+---
+abstract: 'A PoCo-IRC plugin which uploads select images to a mirror service'
+author:
+  - 'Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-IRC-Plugin-ImageMirror
+no_index:
+  directory:
+    - t
+    - xt
+    - utils
+requires:
+  HTTP::Cookies: 0
+  HTTP::Headers: 0
+  Image::ImageShack: 0
+  POE: 0
+  POE::Component::IRC: 6.22
+  POE::Component::IRC::Plugin::URI::Find: 0
+  POE::Quickie: 0.11
+  Try::Tiny: 0
+  URI::Title: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-IRC-Plugin-ImageMirror
+  homepage: http://search.cpan.org/dist/POE-Component-IRC-Plugin-ImageMirror/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hinrik/poe-component-irc-plugin-imagemirror.git
+version: 0.15
+x_authority: cpan:HINRIK

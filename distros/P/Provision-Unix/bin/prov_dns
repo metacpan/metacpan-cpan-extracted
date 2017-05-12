@@ -1,0 +1,221 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Data::Dumper qw( Dumper );
+use English qw( -no_match_vars );
+use Getopt::Long;
+use Pod::Usage;
+
+use lib "lib";
+use Provision::Unix;
+
+my $prov = Provision::Unix->new( debug => 0 );
+my $dns  = $prov->get_dns;
+my $util = $prov->get_util;
+
+# command line option processing
+Getopt::Long::GetOptions(
+
+    'action=s' => \my $action,
+    'zone=s'   => \my $zone,
+    'type=s'   => \my $type,
+
+    'serial=s'  => \my $serial,
+    'ttl=s'     => \my $ttl,
+    'refresh=s' => \my $refresh,
+    'retry=s'   => \my $retry,
+    'expire=s'  => \my $expire,
+    'minimum=s' => \my $minimum,
+    'nameserver=s' => \my $nameserver,
+    'name=s'     => \my $name,
+    'address=s'  => \my $address,
+    'weight=s'   => \my $weight,
+    'priority=s' => \my $priority,
+    'template=s' => \my $template,
+    'port=s'     => \my $port,
+
+    'verbose'    => \my $debug,
+
+    'help'       => \my $help,
+    'version'    => \my $version,
+
+) or die "error parsing command line options";
+
+pod2usage( { -verbose => 3 } ) if $help;
+$prov->get_version() and exit if $version;
+
+$action ||= $util->ask( "the action to perform: create, delete", default=>'create' );
+$action = lc($action);
+
+my %actions = map { $_ => 1 } qw/ create destroy /;
+pod2usage( { -verbose => 1 } ) if !$actions{$action};
+
+$zone ||= $util->ask( "the zone name" );
+$zone = lc($zone);
+
+$type ||= '';  # suppress possible undef warning
+my %types = map { $_ => 1 } qw/ zone a ptr ns mx txt srv cname aaaa /;
+while ( ! $types{$type} ) {
+    $type = $util->ask( "the DNS entity would you like to $action:
+\t zone, A, PTR, NS, MX, TXT, SRV, CNAME, or AAAA" );
+    $type = lc($type);
+};
+
+  $action eq 'create'   ? dns_create()
+: $action eq 'destroy'  ? dns_destroy()
+#: $action eq 'modify'   ? dns_modify()
+: die "oops, the action ($action) is invalid\n";
+
+
+sub dns_create {
+
+    print "creating!\n";
+
+    my %request = ( zone => $zone, debug => 0, fatal => 0 );
+
+    if ( $type =~ /zone/i ) {
+        
+        my @d = $util->get_the_date(debug=>0);
+
+        if ( $prov->{config}{DNS}{server} ne 'nictool' ) {
+            $request{serial} =  $serial || $util->ask( "the serial number",
+                default  => "$d[2]$d[1]$d[0]01" );
+            $request{ttl}    =  $ttl || $util->ask( "the TTL",
+                default  => $prov->{config}{DNS}{zone_ttl} );
+            $request{refresh} = $refresh || $util->ask( "the zone refresh interval",
+                default  => $prov->{config}{DNS}{zone_refresh} );
+            $request{retry}  =  $retry  || $util->ask( "the zone retry   interval",
+                default  => $prov->{config}{DNS}{zone_retry}  );
+            $request{expire} =  $expire || $util->ask( "the zone expiration time",
+                default  => $prov->{config}{DNS}{zone_expire} );
+            $request{minimum} = $minimum || $util->ask( "the zone minimum",
+                default  => $prov->{config}{DNS}{zone_minimum} );
+            $request{nameserver} = $util->ask( "a nameserver authoritative for this zone",
+                default  => "a.ns.$zone");
+        }
+        else {
+            $request{template} = $template || $util->ask( 
+                "the template to use (basic, wildcard, basic-spf, wildcard-spf)",
+                default  => $prov->{config}{NicTool}{template} );
+            $request{ip} = $util->ask( "the IP of the www host" );
+            $request{mailip} = $util->ask( "the IP of the mail host" );
+        }
+
+        return $dns->create_zone( %request );
+    }
+    
+    # create a zone record (A, AAAA, PTR, NS, MX, TXT, SRV, CNAME)
+    $request{type}    = uc($type);
+    $request{name}    = $name || $util->ask( "the zone record name" );
+    if ( lc( $prov->{config}{DNS}{server} ) ne 'nictool' ) {
+        $request{name} = $dns->qualify( $zone, $request{name} );
+    }
+    $request{address} = $name || $util->ask( "the zone record address" );
+    $request{ttl}     = $name || $util->ask( "the TTL",
+            default  => $prov->{config}{DNS}{ttl} );
+
+    if ( $type =~ /mx|srv/i ) {
+        $request{weight} = $weight || $util->ask( "the zone record weight",
+            default => $prov->{config}{DNS}{weight} );
+    }
+    elsif ($type =~ /srv/i ) {
+        $request{priority} = $priority || $util->ask( "the zone record priority",
+            default => 5 );
+        $request{port} = $port || $util->ask( "the zone record port" )
+            or $prov->error( 'SRV records require a port' );
+    }
+
+    return $dns->create_zone_record( %request );
+}
+
+sub dns_destroy {
+
+    if ( $type =~ /zone/i ) {
+        return $dns->destroy_zone(
+            zone  => $zone,
+            fatal => 0,
+            debug => 0,
+        );
+    }
+
+    # TODO: add support for deleting zone records
+    warn "no support for removing zone records yet.\n";
+}
+
+sub dns_modify {
+}
+
+
+
+=head1 NAME 
+
+prov_dns - a command line interface for provisioning dns zones
+
+=head1 SYNOPSIS
+
+  prov_dns --action=[]
+
+Action is one of the following:
+
+  create  - creates a new dns zone
+  delete  - remove a zone
+
+Other parameters are optional. Unless you specify --noprompt, you will be prompted for fill in any missing values.
+
+   --zone  - the FQDN of the zone to create
+   --serial
+   --ttl
+   --refresh
+   --retry
+   --expire
+   --minimum
+   --nameserver
+
+   --type  - a DNS RR type (A, MX, PTR, etc)
+   --name
+   --address
+   --weight
+   --priority
+   --port
+
+
+=head1 USAGE
+ 
+ prov_dns --action create  
+ prov_dns --action delete
+ 
+
+=head1 DESCRIPTION
+ 
+prov_dns is a command line interface to the Provision::DNS provisioning modules. 
+
+ 
+=head1 CONFIGURATION AND ENVIRONMENT
+ 
+Default settings are found in provision.conf, which should be located in your systems local etc directory (/etc, /usr/local/etc, or /opt/local/etc).
+
+=head1 DEPENDENCIES
+ 
+A list of all the other modules that this module relies upon, including any
+restrictions on versions, and an indication whether these required modules are
+part of the standard Perl distribution, part of the module's distribution,
+or must be installed separately.
+
+
+=head1 AUTHOR
+ 
+Matt Simerson, C<< <matt at tnpi.net> >>
+ 
+ 
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2009 The Network People, Inc. (info@tnpi.net)
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

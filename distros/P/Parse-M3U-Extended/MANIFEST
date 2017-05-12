@@ -1,0 +1,22 @@
+.gitignore
+Changes
+lib/Parse/M3U/Extended.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/01-distribution.t
+t/data/m3u-1.json
+t/data/m3u-1.m3u
+t/data/m3u-2.json
+t/data/m3u-2.m3u
+t/data/m3u-3.json
+t/data/m3u-3.m3u
+t/data/m3ue-1.json
+t/data/m3ue-1.m3ue
+t/data/m3ue-2.json
+t/data/m3ue-2.m3ue
+t/m3u.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

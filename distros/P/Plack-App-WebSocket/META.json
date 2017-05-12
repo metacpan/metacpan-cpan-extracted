@@ -1,0 +1,71 @@
+{
+   "abstract" : "WebSocket server as a PSGI application",
+   "author" : [
+      "Toshio Ito <toshioito@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-App-WebSocket",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "inc"
+      ],
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Prereqs::FromCPANfile" : "0.02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::WebSocket::Server" : "0.06",
+            "Carp" : "0",
+            "Devel::GlobalDestruction" : "0",
+            "Plack::Component" : "0",
+            "Plack::Response" : "0",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "AnyEvent" : "0",
+            "AnyEvent::WebSocket::Client" : "0.20",
+            "Net::EmptyPort" : "0",
+            "Plack::Util" : "0",
+            "Protocol::WebSocket" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/debug-ito/Plack-App-WebSocket/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/debug-ito/Plack-App-WebSocket.git",
+         "web" : "https://github.com/debug-ito/Plack-App-WebSocket"
+      }
+   },
+   "version" : "0.05"
+}

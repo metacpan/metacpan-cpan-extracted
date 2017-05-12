@@ -1,0 +1,25 @@
+<html>
+<body bgcolor="#ffffff">
+<h1>NAME</h1>
+
+<p>130-blockquote-paragraphs</p>
+<h1>EXAMPLES</h1>
+
+<p>Text before blockquote paragraph.</p>
+<blockquote>
+<p>Blockquote paragraph.</p>
+</blockquote>
+<p>Text between blockquote paragraphs.</p>
+<blockquote>
+<p>Multi-paragraph blockquote.</p>
+<p>Here is the second paragraph in
+the blockquote.</p>
+<p>Here is the third paragraph in
+the blockquote.</p>
+<blockquote>
+<p>Nested blockquote paragraph.</p>
+</blockquote>
+</blockquote>
+<p>[EOF]</p>
+</body>
+</html>

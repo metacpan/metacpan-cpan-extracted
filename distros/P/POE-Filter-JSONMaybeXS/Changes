@@ -1,0 +1,40 @@
+==================================================
+Changes from 1741-08-28 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2015-06-12 18:42:37 +0000
+------------------------------------------
+
+  Change: 69712577b351835e4eeb6ed9bf7cb103e3ba888d
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-06-12 20:42:16 +0000
+
+    Yeah better use it together with Filter::Line <sigh> 
+
+  Change: b2dbd18c80736e86ecafb458f9772ccacd623a75
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-06-12 04:07:13 +0000
+
+    Added ABSTRACT 
+
+------------------------------------------
+version 0.001 at 2015-06-12 02:03:38 +0000
+------------------------------------------
+
+  Change: f5d78aafe0dd584b88554d7757b0f8f55d2f1dcb
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-06-12 04:03:38 +0000
+
+    First released, just fixing basic behaviour and making slightly
+    different setup 
+
+  Change: 8d71af6f75db5d61aab6d12140ee34eb78625c22
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-06-12 03:31:43 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,180 @@
+Revision history for POE-Component-SimpleDBI
+
+1.31 2014-11-05T22:15:06Z UTC
+ - Add note about UTF8 connection attributes - thanks RT#43063
+ - Cleanup some code in preparation for future changes - thanks RT#48401
+ - Updates to the auto-generated files
+
+ [STATISTICS]
+ - code churn: 4 files changed, 237 insertions(+), 235 deletions(-)
+
+1.30 2011-02-10T02:58:17Z UTC
+ - Converted to Dist::Zilla for the release process!
+ - Added SYNCHRONOUS_MODE to new() for easier DB debugging - thanks
+   RCAPUTO!
+
+1.29 0000-00-00T00:00:00Z UTC
+ - Added better caching control in the SubProcess - resolves a memory leak,
+   thanks Andrew Feren and wirelessdreamer!
+ - Added the CACHEDKIDS argument to CONNECT
+
+1.28 0000-00-00T00:00:00Z UTC
+ - Minor POD tweaks
+ - Fixed RT#45948 ( Database doesn't reconnect when child died ) - thanks
+   Paul Williams!
+ - Fixed RT#48237 ( use of exit causes crashes in threaded code (MsWin32) )
+   - thanks Andrew Feren!
+ - Fixed RT#48400 ( BAGGAGE not a valid argument for CONNECT ) - thanks
+   Andrew Feren!
+ - BAGGAGE is now a valid argument for CONNECT/DISCONNECT
+
+1.27 0000-00-00T00:00:00Z UTC
+ - Fixed RT#43408 ( fix "Modification of a read-only value attempted at"
+   error at shutdown ) - thanks acferen!
+ - Fixed RT#43442 ( tweak binmode for MSWin32 ) - thanks acferen!
+ - Added link to the github.com repository in the POD
+ - Added link to CPAN::Forum in the POD
+
+1.26 0000-00-00T00:00:00Z UTC
+ - Kwalitee-related fixes ( moved to Test::Apocalypse )
+ - Fixed RT#42890 ( tweaked Wheel::Run arguments on Win32, please yell at
+   me if it doesn't work for you! )
+ - Added sigCHLD management
+
+1.25 0000-00-00T00:00:00Z UTC
+ - Kwalitee-related fixes
+
+1.24 0000-00-00T00:00:00Z UTC
+ - Bumped Test::More prereq to 0.86 because I was getting FAIL reports from
+   outdated people :(
+
+1.23 0000-00-00T00:00:00Z UTC
+ - Switched to Build.PL for the build system
+ - Fixed the stupid test dependencies, thanks BiNGOs!
+ - Added the new EXPERIMENTAL 'ATOMIC' support, please let me know if it's
+   broken on your setup!
+ - Added some more author tests
+ - Added AUTO_COMMIT argument to CONNECT to control the DBI variable (
+   defaults to true )
+
+1.22 0000-00-00T00:00:00Z UTC
+ - Kwalitee-related fixes
+
+1.21 0000-00-00T00:00:00Z UTC
+ - silence warnings when used with DBD::SQLite - thanks to Sjors Gielen for
+   tracking this down!
+
+1.20 0000-00-00T00:00:00Z UTC
+ - Added the INSERT_ID to control $dbh->last_insert_id usage
+
+1.19 0000-00-00T00:00:00Z UTC
+ - Added the PREPARE_CACHED argument to control caching
+
+1.18 0000-00-00T00:00:00Z UTC
+ - Ignore the DBI error for last_insert_id and default to undef
+
+1.17 0000-00-00T00:00:00Z UTC
+ - Added "INSERTID" to the result of DO
+
+1.16 0000-00-00T00:00:00Z UTC
+ - Noticed a glaring documentation bug - SINGLE queries return mixedCaps
+   rows ( not lowercase! ) - MULTIPLE queries return lowercase rows
+ - This makes me *VERY* tempted to fix SINGLE to return lowercase, is this
+   a good idea? Let me know!
+ - Fixed SimpleDBI failure on Win32 - thanks RT #23851
+
+1.15 0000-00-00T00:00:00Z UTC
+ - Thanks to Fred Castellano, who stumbled on a DEADLOCK bug, fixed!
+ - Added sanity tests to CONNECT/DISCONNECT
+
+1.14 0000-00-00T00:00:00Z UTC
+ - learned about the difference between ref $self and ref( $self )
+ - Kwalitee-related fixes
+
+1.13 0000-00-00T00:00:00Z UTC
+ - Finally use a Changes file - thanks RT #18981
+ - Fixed a bug in SINGLE if returned_rows = 0 it will not return undef, but
+   give us blank rows!
+ - Documentation tweaks
+
+1.12 0000-00-00T00:00:00Z UTC
+ - In the SubProcess, added a binmode() to STDIN and STDERR, for the
+   windows attempt
+ - Added code to make SimpleDBI work in Win32 boxes, thanks to the recent
+   Wheel::Run patches!
+ - Documentation tweaks as usual
+
+1.11 0000-00-00T00:00:00Z UTC
+ - Hannes had a problem: His IRC bot logs events to a database, and
+   sometimes there is no events to log after hours and hours of inactivity
+   ( must be a boring channel haha ), the db server disconnected!
+ - The solution was to do a $dbh->ping() before each query, if your DBI
+   driver does it inefficiently, go yell at them!
+ - In the event that a reconnect is not possible, an error will be sent to
+   the CONNECT event handler, look at the updated pod.
+
+1.10 0000-00-00T00:00:00Z UTC
+ - Fixed a bug in the DO routine, thanks to Hannes!
+
+1.09 0000-00-00T00:00:00Z UTC
+ - Removed the abstract LIMIT 1 to the SINGLE query
+ - Removed the silly 5.8.x requirement in Makefile.PL
+ - Made the SubProcess use less memory by exec()ing itself
+ - Added the new CONNECT/DISCONNECT commands
+ - Removed the db connection information from new()
+ - Minor tweaks here and there to not stupidly call() the queue checker
+   when there is nothing to check :)
+ - Added the sysreaderr debugging output
+ - More intelligent SQL/PLACEHOLDERS/BAGGAGE handling
+ - Made the command arguments more stricter, it will only accept valid
+   arguments, instead of just extracting what it needs
+ - Made sure all return data have ID/EVENT/SESSION/ACTION in them for easy
+   debugging
+ - Added the SESSION parameter to all commands for easy redirection
+ - Updated the POD and generally made it better :)
+ - Added a new command -> Clear_Queue ( clears the queue )
+
+1.08 0000-00-00T00:00:00Z UTC
+ - In the SubProcess, removed the select statement requirement
+
+1.07 0000-00-00T00:00:00Z UTC
+ - In the SubProcess, fixed a silly mistake in DO's execution of
+   placeholders
+ - Cleaned up a few error messages in the SubProcess
+ - Peppered the code with *more* DEBUG statements :)
+ - Replaced a croak() with a die() when it couldn't connect to the database
+ - Documented the _child events
+
+1.06 0000-00-00T00:00:00Z UTC
+ - Fixed some typos in the POD
+ - Added the BAGGAGE option
+
+1.05 0000-00-00T00:00:00Z UTC
+ - Fixed some typos in the POD
+ - Fixed the DEBUG + MAX_RETRIES "Subroutine redefined" foolishness
+
+1.04 0000-00-00T00:00:00Z UTC
+ - Got rid of the EVENT_S and EVENT_E handlers, replaced with a single
+   EVENT handler
+ - Internal changes to get rid of some stuff -> Send_Query / Send_Wheel
+ - Added the Delete_Query event -> Deletes an query via ID
+ - Changed the DO/MULTIPLE/SINGLE/QUOTE events to return an ID ( Only
+   usable if call'ed )
+ - Made sure that the ACTION key is sent back to the EVENT handler every
+   time
+ - Added some DEBUG stuff :)
+ - Added the CHANGES section
+ - Fixed some typos in the POD
+
+1.03 0000-00-00T00:00:00Z UTC
+ - Increments refcount for querying sessions so they don't go away
+ - POD formatting
+ - Consolidated shutdown and shutdown_NOW into one single event
+ - General formatting in program
+ - DB connection error handling
+ - Renamed the result hash: RESULTS to RESULT for better readability
+ - SubProcess -> added DBI connect failure handling
+
+1.02 0000-00-00T00:00:00Z UTC
+ - Initial release
+

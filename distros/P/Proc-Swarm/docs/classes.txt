@@ -1,0 +1,34 @@
+
+Proc::Swarm::Package - unit of communication between processes
+    new($object, $type)
+        $type:
+        'new' - add this object to run queue
+        'res' - run result
+        'end' - end request
+        'another' - run another worker request.
+    $type = get_type() - returns object type from package
+    $obj = get_object() - returns the object from the package
+
+Proc::Swarm::Result - unit of completed work
+    new($runtime, $object, $result, $type) - constructor
+        $type:
+        'error' - the result is an error
+        'good' - the result is a good run
+    get_runtime() - returns runtime from Result object
+    get_object() - returns reference object from Result object
+    get_result() - returns result from Result object
+    get_result_type() - returns result type from Result object
+
+Proc::Swarm::Results - packaged set of results
+    new($result1, $result2, $result3, ...) - constructor
+    $count = get_result_count() - number of results in instance
+    @result_objects = get_result_objects() - return all result objects
+    @results = get_results() - returns all results
+    @times = get_result_times() - return all result times
+    $result = get_result($object_id) - return result object that was generated from $object_id as a work value
+
+Proc::Swarm::Queue - communication channel
+    new() - constructor
+    $retcode = send($obj) - send $obj in this channel
+    $obj = receive() - get an object from this channel
+

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution PAM,
+version 0.31:
+
+  Invoke perl code at PAM phases
+
+This software is copyright (c) 2012 by Jonathan Steinert.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

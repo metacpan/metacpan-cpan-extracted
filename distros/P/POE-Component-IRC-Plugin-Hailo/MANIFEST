@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+Makefile.PL
+README
+bin/irchailo-seed
+dist.ini
+lib/POE/Component/IRC/Plugin/Hailo.pm
+t/01_compile.t
+t/02_load.t

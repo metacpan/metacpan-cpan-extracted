@@ -1,0 +1,25 @@
+Changes
+hiredis/COPYING			Just a selection of hiredis's files are shipped
+hiredis/fmacros.h
+hiredis/hiredis.c
+hiredis/hiredis.h
+hiredis/net.c
+hiredis/net.h
+hiredis/README.md
+hiredis/sds.c
+hiredis/sds.h
+hiredis/TODO
+hiredis/util.h
+lib/Protocol/Redis/XS.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+README
+t/redis.t
+t/xs.t
+TODO
+typemap
+XS.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

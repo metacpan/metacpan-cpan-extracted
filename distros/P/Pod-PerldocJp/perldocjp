@@ -1,0 +1,64 @@
+#!perl
+
+require 5;
+BEGIN { $^W = 1 if $ENV{'PERLDOCDEBUG'} }
+use Pod::PerldocJp;
+exit( Pod::PerldocJp->run(opt_J => 1) );
+
+__END__
+
+=encoding utf-8
+
+=head1 名前
+
+perldocjp - 日本語訳されたPerlのドキュメントを読む
+
+=head1 簡単な使い方
+
+  perldocjp    perldebug  # Perlに付属のperldebugの翻訳を読む
+  perldocjp -f print      # print関数の使い方を日本語で読む
+  perldocjp -v $_         # $_変数の使い方を日本語で読む
+  perldocjp -q debug      # debugについてのFAQを日本語で読む
+  perldocjp -a SvOK       # SvOK APIの使い方を日本語で読む
+  perldocjp -l perldebug  # ダウンロードしてきた翻訳のありかを調べる
+  perldocjp -m perldebug  # ダウンロードしてきた翻訳のソースを見る
+
+  perldocjp     perljp     # もともと日本語で書かれているドキュメントもOK
+  perldocjp -h             # コマンド一覧を見る
+
+=head1 Pod::PerldocJpについて
+
+Pod::PerldocJpとperldocjpコマンドは、現在おもにJapanized Perl Resources Projectで翻訳されているPerl付属のドキュメントなどをコマンドライン上でも正しく表示できるようにするためのものです。perldocjpコマンドの使い方は基本的にperldocコマンドと同じですが、http://perldoc.jp/に該当する文書の翻訳があればそれをダウンロードして表示します（現在はPerl 5.10のドキュメントのみ対応していますが、将来的にはその他のバージョンやほかのモジュール類のドキュメントにも対応する予定です）。
+
+また、perldocjpコマンドはもともと日本語で書かれているドキュメントも端末の設定にあわせて正しく表示できます。
+
+その他の使い方についてはperldocjp -hやperldoc perldocをご覧ください。
+
+=head1 参照
+
+L<Pod::Perldoc>, L<Pod::Perldocs>
+
+Japanized Perl Resources Projectについては下記からどうぞ。翻訳を投稿してくださっているすべての方に敬意と感謝を。このツールは肝心の翻訳がなければ何の役にも立ちません。
+
+=over 4
+
+=item L<http://perldoc.jp/>
+
+=item L<http://perldocjp.sourceforge.jp/>
+
+=item L<http://www.freeml.com/perldocjp>
+
+=back
+
+=head1 AUTHOR
+
+Kenichi Ishigaki, E<lt>ishigaki@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Kenichi Ishigaki.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

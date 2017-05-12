@@ -1,0 +1,217 @@
+=head1 NAME
+ 
+PEF::Front::WebSocket - WebSocket framework for PEF::Front
+ 
+=head1 SYNOPSIS
+
+    # startup.pl
+    use PEF::Front::Websocket;
+    # usual startup stuff...
+
+    # $PROJECT_DIR/app/WSTest/WebSocket/Echo.pm
+    package WSTest::WebSocket::Echo;
+    
+    sub on_message {
+        my ($self, $message) = @_;
+        $self->send($message); 
+    }
+
+    1;
+
+=head1 DESCRIPTION
+ 
+This module makes WebSockets really easy. Every kind of WebSocket 
+is in its own module. Default routing scheme is C</ws$WebSocketClass>.
+WebSocket handlers are located in C<$PROJECT_DIR/app/$MyAPP/WebSocket>.
+ 
+=head2 Prerequisites
+ 
+This module requires L<Coro>, L<AnyEvent> and L<PSGI> server that must 
+meet the following requirements.
+ 
+=over
+ 
+=item *
+ 
+C<psgi.streaming> environment is true.
+ 
+=item *
+ 
+C<psgi.nonblocking> environment is true.
+ 
+=item *
+ 
+C<psgix.io> environment holds a valid raw IO socket object. See L<PSGI::Extensions>.
+ 
+=back
+
+L<uwsgi|https://uwsgi-docs.readthedocs.io/en/latest/PSGIquickstart.html> 
+version 2.0.14+ meets all of them with C<psgi-enable-psgix-io = true>.
+ 
+=head1 WEBSOCKET INTERFACE METHODS
+ 
+=head2 on_message($message, $type)
+
+A subroutine that is called on new message from client.
+
+=head2 on_drain()
+ 
+A subroutine that is called when there's nothing to send to 
+client after some successful send.
+
+=head2 on_open()
+
+A subroutine that is called each time it establishes a new
+WebSocket connection to a client.
+
+=head2 on_error($message)
+
+A subroutine that is called when some error
+happens while processing a request.
+
+=head2 on_close()
+ 
+A subroutine that is called on WebSocket close event.
+
+=head2 no_compression()
+
+When defined and true then no compression will be used even when it 
+supported by browser and server.
+ 
+=head1 INHERITED METHODS
+
+Every WebSocket class is derived from C<PEF::Front::Websocket::Base>
+which is derived from C<PEF::Front::Websocket::Interface>. Even when you don't
+derive your class from C<PEF::Front::Websocket::Base> explicitly, 
+this class will be added automatically to hierarchy.
+
+=head2 send($buffer[, $type])
+
+Sends $buffer to client. By default $type is 'text'.
+
+=head2 close()
+
+Closes WebSocket.
+
+=head2 is_defunct()
+
+Returns true when socket is closed or there's some error on it.
+
+=head1 CONFIGURATION
+
+=over
+
+=item cfg_websocket_heartbeat_interval
+
+WebSocket connection has to be B<ping>-ed to stay alive. 
+This paramters specifies a positive number of seconds for B<ping> interval.
+Default is 30.
+
+=item cfg_websocket_max_payload_size
+
+Maximum payload size for incoming messages in bytes.
+Default is 262144.
+
+=item cfg_websocket_deflate_minimum_size
+
+Minimum message size for deflate compression. If message size is less than
+this value then it will not be compressed. Default is 96.
+
+=item cfg_websocket_deflate_window_bits
+
+WindowBits parameter for deflate compression. Default is 12.
+
+=item cfg_websocket_deflate_memory_level
+
+MemLevel parameter for deflate compression. Default is 5.
+
+=back
+
+=head1 EXAMPLE
+
+  #startup.pl
+  use WSTest::AppFrontConfig;
+  use PEF::Front::Config;
+  use PEF::Front::WebSocket;
+  use PEF::Front::Route;
+
+  PEF::Front::Route::add_route(
+    get '/' => '/appWs',
+  );
+  PEF::Front::Route->to_app();
+  
+  
+  # $PROJECT_DIR/app/WSTest/WebSocket/Echo.pm
+  package WSTest::WebSocket::Echo;
+ 
+  sub on_message {
+      my ($self, $message) = @_;
+      $self->send($message); 
+  }
+
+  1;
+  
+  # $PROJECT_DIR/templates/ws.html
+  <html>
+  <head>
+  <script language="Javascript">
+    var s = new WebSocket("ws://[% hostname %]:[% request.port %]/wsEcho");
+    s.onopen = function() {
+        alert("connected !!!");
+        s.send("ciao");
+    };
+    s.onmessage = function(e) {
+        var bb = document.getElementById('blackboard')
+        var html = bb.innerHTML;
+        bb.innerHTML = html + '<br/>' + e.data;
+    };
+    s.onerror = function(e) {
+        alert(e);
+    }
+    s.onclose = function(e) {
+        alert("connection closed");
+    }
+    function invia() {
+        var value = document.getElementById('testo').value;
+        s.send(value);
+    }
+  </script>
+  </head>
+  <body>
+    <h1>WebSocket</h1>
+    <input type="text" id="testo" />
+    <input type="button" value="invia" onClick="invia();" />
+    <div id="blackboard"
+        style="width: 640px; height: 480px; background-color: black; color: white; border: solid 2px red; overflow: auto">
+    </div>
+  </body>
+  </html>
+  
+  # wstest.ini
+  [uwsgi]
+  plugins = coroae
+  chdir = /$PROJECT_DIR
+  logger = file:log/demo.log
+  psgi = bin/startup.pl
+  master = true
+  processes = 4
+  coroae = 1000
+  perl-no-plack = true
+  psgi-enable-psgix-io = true
+  uid = $PROJECT_USER
+  gid = www-data
+  chmod-socket = 664
+
+
+=head1 AUTHOR
+ 
+This module was written and is maintained by Anton Petrusevich.
+
+=head1 Copyright and License
+ 
+Copyright (c) 2016 Anton Petrusevich. Some Rights Reserved.
+ 
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,171 @@
+Things, to do, in order of priority:
+
+
+----------------------------------------------------------------------------------------------------
+
+Changes for a later version ...
+
+- Add examples demonstrating:
+  - text wrapping
+  - delimited group header things
+  - multiple render_data invocations
+
+- Move delimiter key from the cell to the group header definition?
+
+- PDF::ReportWriter uses a 'format' hash, while Gtk2::Ex::Datasheet::DBI uses a 'number' hash
+	to specify numeric formatting. This needs to merge into one somehow
+
+- PDF indexing thingy support
+    We could put things like group headers into the index
+    This would make it easier to navigate a large report
+    Does PDF::API2 support this? Investigate ...
+
+- Multiple ( horizontal / vertical ) sections
+    It would be good to be able to break a page up into multiple sections, particularly horizontal sections.
+    We could then render different data sets into different sections. This could be done by limiting the
+    ( horizontal ) page size before calling setup_cell_definitions().
+    
+- Graphing
+    Are there any Perl graphing libraries that are worth using?
+    Investigate GD. There are a number of GD-based graphing libraries.
+    Does PDF::API2 support:
+        - antialiasing
+        - alpha blending
+    
+- add more options for field headers:
+    - in page header
+    - in group header(s)
+
+- Support other PDF properties, such as maximizing the viewer, zooming to a particular level, etc
+
+- Support multiple-line definitions
+    The easiest way ( I think ) would be to simply keep track of the percentage used for cells, and if
+    the width used exceeds 100%, simply spill to the next line. I also *think* that we wouldn't have to
+    do *too* much to calculate_y_needed() ... if any ... to accomodate this
+
+- BUG: gfx objects aren't available in page footers. why?
+
+- Perl Gtk2 - based report builder ( medium-term )
+    Now that Cosimo has added XML support, it's time to add a GUI report builder
+    At the moment, a simple expandable-tree type of GUI would be good.
+    I don't think I'm up to a WYSIWYG editor at present. We'll see
+
+- We need to be able to specify a chain of formatters, for example:
+    - currency
+    - round to n decimal places
+    - do something else ...
+
+- Get rid of max_cell_height ungodliness
+    We can't possibly be still relying on this now, as calculate_y_needed is used ... everywhere.
+    Get rid of it once and for all
+
+- OPTIMISATION: calculate_y_needed()
+    We seem to be calling this a lot these days.
+    Do we really need to do it in so many places?
+    Maybe we can cache results? Or just not keep calling it so much?
+
+- OPTIMISATION: wrap_text()
+    wrap_text() uses a very simple step-by-step loop to find how much text will fit on one line.
+    Find a better algorithm.
+
+- A nice sexy tick for boolean values would be nice
+    Better to render one than use an image, but probably a lot more work
+
+- add ability to render PDF files or PDF::API2 objects directly into cells
+
+- Re-arrange cell definitions
+    It would be nice to clean up the definitions somewhat. eg:
+    
+    $self->{data}->{fields} could be expanded to something like:
+    
+    $self->{data}->{field_definitions} = {
+                                            cells           => $array_of_cells, # <== old $self->{data}->{fields}   
+                                            upper_buffer    => $upper_buffer,
+                                            lower_buffer    => $lower_buffer
+                                         };
+    
+    This not only looks cleaner and removes general clutter, but it makes it easier to deal
+    with different objects in a more generic way, which is always good. It's a pitty I didn't
+    do this from the start ...
+    
+    Would this just break things for no reason other than cleanliness? Legacy support might be a bit complex.
+    
+- Clean up definitions of buffers
+    Current approach is fragmented. Each cell should have:
+    
+    {
+        internal_buffers => {
+                                upper   => 0,
+                                lower   => 0,
+                                left    => 0,
+                                right   => 0
+                            },
+        external_buffers => {
+                                left    => 0,
+                                lower   => 0
+                            }
+    }
+    
+    internal_buffers should apply to text ( currently text_whitespace )
+    and *maybe* also images ( currently in images->{buffer} )
+    
+    external_buffers should affect the initial cell definitions
+
+- Further optimisation for images:
+    Cache image metadata in a hash with the image path as the key.
+    We current cache this against the actual cell ( cell->{image}->{tmp} ), but this is
+    only useful if the same image is encountered in the same cell, and directly after the
+    last rendering of this image ... ie if another image is rendered in this cell, the image
+    metadata is overwritten and we have to run imgsize() again
+
+
+----------------------------------------------------------------------------------------------------
+
+
+Things that could be done
+
+
+- Optimisation: we currently do a regex for *EACH* field with borders.
+    We should move this into setup_cell_definitions() and store the results.
+    Apparently regex is a little expensive.
+    
+- Support calculating a header's row that contains an unscaled image when determining our $y_needed
+    This situation should be quite rare, and it would need a different approach
+    We'd have to do a dummy render_row pass on each header, or else break out our calculation into
+    another function?
+    NEWSFLASH: We may have already fixed this bug!
+    Check by actually putting unscaled images in a header, and see what happens.
+
+- Add support for custom aggregate functions
+    This was previously requested, but I'm having difficulty actually coming up with a use.
+    If someone gives me an example of a custom function they might want to make use of, I'll
+    consider how I'm going to hook things up
+    
+- Add support for defining paper size per *render* operation instead of per pdf
+    This could be a little tricky with page footers, which are processed after the rest of the
+    report is rendered. Does anyone actually want this functionality? Personally I have no reason,
+    but I've added it as a possibility anyway
+
+- Allow different templates (Cosimo)
+    Allow to define a list of templates to be rotated between pages?
+    (for example even/odd pages with different templates)
+
+- Hyperlinks on images and text (Cosimo)
+
+- Phantom group fields (Cosimo)
+    Now if we define groups on data fields, we must include those fields in the
+    main detail table. Can we define a way to make those grouped fields disappear
+    avoiding their rendering?
+
+- Custom cell formatting (Cosimo)
+    Document the new cell type "custom:{class}" with its API.
+    Should work as follows:
+
+       my $obj = {class}->new();
+       $string = $obj->format($cell, $options, $string);
+
+- Text line height (Cosimo)
+    When handling multi-line text, is there some property that tells us how much
+    to go down in the page? Now font line height is empirically calculated as:
+        
+        line_height = font_size * 1.2

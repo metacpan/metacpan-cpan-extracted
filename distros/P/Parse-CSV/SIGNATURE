@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 91720bb567e345275ddaf6cb05ce3b4652cf905f Build.PL
+SHA1 a936f017c360f68228c4471f85e991b607efbabb Changes
+SHA1 17b9a3aaa590cfd55ad7b12ad6aeb3e80693aa7c INSTALL
+SHA1 15a054113f9fdcb8af2b79062240a7a0f90bf5f1 LICENSE
+SHA1 cca5f83ecd1bbb115eb1168d916629dc2e45bf49 MANIFEST
+SHA1 bffe78a302fb178461e80fb9ebfbd444734a4015 META.yml
+SHA1 3b2bc02655b46f31974eb517df57b0653eb96c3a Makefile.PL
+SHA1 288c3872c29855f87d7646e3f6de643f8526fba5 README
+SHA1 7a97cda2bab98b1bdd17c41b031dae219e8688ba dist.ini
+SHA1 e0f5889c0568451dbd579319c02c058652a9a2db lib/Parse/CSV.pm
+SHA1 b777a52b5967bfaee2f99e9a6efff27937a9d9cc perlcritic.rc
+SHA1 3c5c33067b3b30aa2d405ee46fb16745f8d78c32 t/01_compile.t
+SHA1 be64f383e444c420ec7755a6abf4e794a71fe030 t/02_main.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 fc9da04ffc04d4e0b46e6b7ebdf4767654f0f637 t/data/newlines.csv
+SHA1 3db576757504a8b76cf956632e91e90b5bf4e59d t/data/simple.csv
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+Comment: GPGTools - http://gpgtools.org
+
+iEYEARECAAYFAlWnDWIACgkQgrvMBLfvlHagCQCeJkscXQ09MirSEyJmGmndQKy5
+++QAoLlbpBKC8QSPEq5RFOC0fKHUHrBy
+=A2xj
+-----END PGP SIGNATURE-----

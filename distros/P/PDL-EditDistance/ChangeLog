@@ -1,0 +1,35 @@
+v0.08 Thu, 17 Dec 2015 16:49:06 +0100 moocow
+	+ fixed wrongly succeeding bogus tests with unary ok()
+	  - tests now use Test::More and re-factored common test subroutines
+	+ pdlmaker.plm doesn't distribute generated PM files any more (PDL now does this for us)
+
+v0.07 Wed, 04 Nov 2015 10:29:49 +0100 moocow
+	+ avoid in-place reshaping in _edit_pdl() for PDL >= v2.014 (fixes RT bug #107829)
+	+ added support for UTF-8 strings via unpack('C0C*',...) in _edit_pdl()
+	+ changed _edit_pdl() handling of byte-strings to unpack('U0C*',...) rather than map {ord($_)} split(//,...)
+
+v0.06 Tue, 17 Jun 2014 14:10:45 +0200 moocow
+	+ added additional delete-costs, separate and independent from insert-costs: BREAKS OLD API
+
+v0.05003 Wed, 25 Sep 2013 09:30:08 +0200 moocow
+	+ tweaked t/01_distance.t to avoid RT #76461 ('Error in _edit_distance_full:Wrong dims')
+	  on some combinations of perl+PDL (notably perl-5.16.0 + PDL-2.4.10)
+
+v0.05002 Tue, 24 Sep 2013 10:41:48 +0200 moocow
+	+ use CONFIGURE_REQUIRES{PDL}, PREREQ_PM{PDL}=>0 (fixes RT #88876)
+
+v0.05001 2012-04-12  moocow
+	+ use unpack('C*') instead of map{ord(--color=tty)}split(//) in tests
+	+ use pdlmaker in Makefile.PL
+
+v0.05 Mon, 02 Jan 2012 13:29:34 +0100 moocow
+	+ cpan-friendly distribution with pdlmaker.plm
+
+v0.04 Sun, 03 Aug 2008 00:38:56 +0200
+	+ added LCS (longest common subsequence) matrix, backtrace
+
+v0.03 Wed, 30 Jul 2008 17:07:33 +0200 (moocow)
+	+ fixed doc summary, added edit_pathtrace() function for full path backtrace
+
+v0.01 Fri, 17 Feb 2006 14:00:52 +0100 (moocow)
+	+ initial version

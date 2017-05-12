@@ -1,0 +1,175 @@
+Feb 20 04:05:39 fangorn postfix/pickup[15241]: 0D7037A4: uid=0 from=<root>
+Feb 20 04:05:39 fangorn postfix/cleanup[22877]: 0D7037A4: message-id=<20050220030539.0D7037A4@fangorn.maddingue.net>
+Feb 20 04:05:39 fangorn postfix/qmgr[4225]: 0D7037A4: from=<root@fangorn.maddingue.net>, size=567, nrcpt=1 (queue active)
+Feb 20 04:05:39 fangorn postfix/local[22879]: 0D7037A4: to=<postfix@fangorn.maddingue.net>, orig_to=<root>, relay=local, delay=0, status=sent (delivered to mailbox)
+Feb 20 04:05:39 fangorn postfix/qmgr[4225]: 0D7037A4: removed
+Feb 20 14:56:09 fangorn postfix/pickup[4672]: CCAE27A4: uid=600 from=<cpanplus>
+Feb 20 14:56:09 fangorn postfix/cleanup[5159]: CCAE27A4: message-id=<20050220135609.CCAE27A4@fangorn.maddingue.net>
+Feb 20 14:56:09 fangorn postfix/qmgr[4225]: CCAE27A4: from=<cpanplus@fangorn.maddingue.net>, size=3255, nrcpt=1 (queue active)
+Feb 20 14:56:18 fangorn postfix/smtp[5161]: CCAE27A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=9, status=sent (250 Queued! 1108907778 qp 18309 <20050220135609.CCAE27A4@fangorn.maddingue.net>)
+Feb 20 14:56:18 fangorn postfix/qmgr[4225]: CCAE27A4: removed
+Feb 20 14:56:43 fangorn postfix/pickup[4672]: 0A06A7A4: uid=600 from=<cpanplus>
+Feb 20 14:56:43 fangorn postfix/cleanup[5159]: 0A06A7A4: message-id=<20050220135643.0A06A7A4@fangorn.maddingue.net>
+Feb 20 14:56:43 fangorn postfix/qmgr[4225]: 0A06A7A4: from=<cpanplus@fangorn.maddingue.net>, size=3240, nrcpt=1 (queue active)
+Feb 20 14:56:49 fangorn postfix/smtp[5161]: 0A06A7A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108907809 qp 18358 <20050220135643.0A06A7A4@fangorn.maddingue.net>)
+Feb 20 14:56:49 fangorn postfix/qmgr[4225]: 0A06A7A4: removed
+Feb 20 14:56:55 fangorn postfix/pickup[4672]: CCB5D7A4: uid=600 from=<cpanplus>
+Feb 20 14:56:55 fangorn postfix/cleanup[5159]: CCB5D7A4: message-id=<20050220135655.CCB5D7A4@fangorn.maddingue.net>
+Feb 20 14:56:55 fangorn postfix/qmgr[4225]: CCB5D7A4: from=<cpanplus@fangorn.maddingue.net>, size=3247, nrcpt=1 (queue active)
+Feb 20 14:57:01 fangorn postfix/smtp[5161]: CCB5D7A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108907821 qp 18438 <20050220135655.CCB5D7A4@fangorn.maddingue.net>)
+Feb 20 14:57:01 fangorn postfix/qmgr[4225]: CCB5D7A4: removed
+Feb 20 14:57:14 fangorn postfix/pickup[4672]: D5F157A4: uid=600 from=<cpanplus>
+Feb 20 14:57:14 fangorn postfix/cleanup[5159]: D5F157A4: message-id=<20050220135714.D5F157A4@fangorn.maddingue.net>
+Feb 20 14:57:14 fangorn postfix/qmgr[4225]: D5F157A4: from=<cpanplus@fangorn.maddingue.net>, size=3241, nrcpt=1 (queue active)
+Feb 20 14:57:20 fangorn postfix/smtp[5161]: D5F157A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108907840 qp 18515 <20050220135714.D5F157A4@fangorn.maddingue.net>)
+Feb 20 14:57:20 fangorn postfix/qmgr[4225]: D5F157A4: removed
+Feb 20 14:57:47 fangorn postfix/pickup[4672]: 1AFE47A4: uid=600 from=<cpanplus>
+Feb 20 14:57:47 fangorn postfix/cleanup[5159]: 1AFE47A4: message-id=<20050220135747.1AFE47A4@fangorn.maddingue.net>
+Feb 20 14:57:47 fangorn postfix/qmgr[4225]: 1AFE47A4: from=<cpanplus@fangorn.maddingue.net>, size=3252, nrcpt=1 (queue active)
+Feb 20 14:57:48 fangorn postfix/pickup[4672]: 6DA337C6: uid=600 from=<cpanplus>
+Feb 20 14:57:48 fangorn postfix/cleanup[5159]: 6DA337C6: message-id=<20050220135748.6DA337C6@fangorn.maddingue.net>
+Feb 20 14:57:48 fangorn postfix/qmgr[4225]: 6DA337C6: from=<cpanplus@fangorn.maddingue.net>, size=3268, nrcpt=1 (queue active)
+Feb 20 14:57:52 fangorn postfix/smtp[5161]: 1AFE47A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=5, status=sent (250 Queued! 1108907872 qp 18676 <20050220135747.1AFE47A4@fangorn.maddingue.net>)
+Feb 20 14:57:52 fangorn postfix/qmgr[4225]: 1AFE47A4: removed
+Feb 20 14:57:54 fangorn postfix/smtp[5792]: 6DA337C6: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108907873 qp 18684 <20050220135748.6DA337C6@fangorn.maddingue.net>)
+Feb 20 14:57:54 fangorn postfix/qmgr[4225]: 6DA337C6: removed
+Feb 20 14:58:05 fangorn postfix/pickup[4672]: A00727A4: uid=600 from=<cpanplus>
+Feb 20 14:58:05 fangorn postfix/cleanup[5159]: A00727A4: message-id=<20050220135805.A00727A4@fangorn.maddingue.net>
+Feb 20 14:58:05 fangorn postfix/qmgr[4225]: A00727A4: from=<cpanplus@fangorn.maddingue.net>, size=3249, nrcpt=1 (queue active)
+Feb 20 14:58:11 fangorn postfix/smtp[5161]: A00727A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108907890 qp 18821 <20050220135805.A00727A4@fangorn.maddingue.net>)
+Feb 20 14:58:11 fangorn postfix/qmgr[4225]: A00727A4: removed
+Feb 20 15:02:28 fangorn postfix/pickup[4672]: 7908A7A4: uid=600 from=<cpanplus>
+Feb 20 15:02:28 fangorn postfix/cleanup[6444]: 7908A7A4: message-id=<20050220140228.7908A7A4@fangorn.maddingue.net>
+Feb 20 15:02:28 fangorn postfix/qmgr[4225]: 7908A7A4: from=<cpanplus@fangorn.maddingue.net>, size=3247, nrcpt=1 (queue active)
+Feb 20 15:02:30 fangorn postfix/pickup[4672]: 5A6897C6: uid=500 from=<maddingue>
+Feb 20 15:02:30 fangorn postfix/cleanup[6444]: 5A6897C6: message-id=<20050220140230.5A6897C6@fangorn.maddingue.net>
+Feb 20 15:02:30 fangorn postfix/qmgr[4225]: 5A6897C6: from=<maddingue@fangorn.maddingue.net>, size=3242, nrcpt=1 (queue active)
+Feb 20 15:02:36 fangorn postfix/smtp[6448]: 7908A7A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=8, status=sent (250 Queued! 1108908156 qp 19597 <20050220140228.7908A7A4@fangorn.maddingue.net>)
+Feb 20 15:02:36 fangorn postfix/qmgr[4225]: 7908A7A4: removed
+Feb 20 15:02:37 fangorn postfix/smtp[6554]: 5A6897C6: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=7, status=sent (250 Queued! 1108908157 qp 19604 <20050220140230.5A6897C6@fangorn.maddingue.net>)
+Feb 20 15:02:37 fangorn postfix/qmgr[4225]: 5A6897C6: removed
+Feb 20 15:02:38 fangorn postfix/pickup[4672]: DD6957A4: uid=600 from=<cpanplus>
+Feb 20 15:02:38 fangorn postfix/cleanup[6444]: DD6957A4: message-id=<20050220140238.DD6957A4@fangorn.maddingue.net>
+Feb 20 15:02:38 fangorn postfix/qmgr[4225]: DD6957A4: from=<cpanplus@fangorn.maddingue.net>, size=3251, nrcpt=1 (queue active)
+Feb 20 15:02:44 fangorn postfix/smtp[6448]: DD6957A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108908164 qp 19619 <20050220140238.DD6957A4@fangorn.maddingue.net>)
+Feb 20 15:02:44 fangorn postfix/qmgr[4225]: DD6957A4: removed
+Feb 20 15:03:10 fangorn postfix/pickup[4672]: 3668E7A4: uid=600 from=<cpanplus>
+Feb 20 15:03:10 fangorn postfix/cleanup[6444]: 3668E7A4: message-id=<20050220140310.3668E7A4@fangorn.maddingue.net>
+Feb 20 15:03:10 fangorn postfix/qmgr[4225]: 3668E7A4: from=<cpanplus@fangorn.maddingue.net>, size=3255, nrcpt=1 (queue active)
+Feb 20 15:03:15 fangorn postfix/smtp[6554]: 3668E7A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=5, status=sent (250 Queued! 1108908195 qp 19770 <20050220140310.3668E7A4@fangorn.maddingue.net>)
+Feb 20 15:03:15 fangorn postfix/qmgr[4225]: 3668E7A4: removed
+Feb 20 15:03:39 fangorn postfix/pickup[4672]: CF89F7A4: uid=500 from=<maddingue>
+Feb 20 15:03:39 fangorn postfix/cleanup[6444]: CF89F7A4: message-id=<20050220140339.CF89F7A4@fangorn.maddingue.net>
+Feb 20 15:03:39 fangorn postfix/qmgr[4225]: CF89F7A4: from=<maddingue@fangorn.maddingue.net>, size=3238, nrcpt=1 (queue active)
+Feb 20 15:03:45 fangorn postfix/smtp[6448]: CF89F7A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108908225 qp 19887 <20050220140339.CF89F7A4@fangorn.maddingue.net>)
+Feb 20 15:03:45 fangorn postfix/qmgr[4225]: CF89F7A4: removed
+Feb 20 15:04:38 fangorn postfix/pickup[4672]: 6425F7A4: uid=600 from=<cpanplus>
+Feb 20 15:04:38 fangorn postfix/cleanup[6444]: 6425F7A4: message-id=<20050220140438.6425F7A4@fangorn.maddingue.net>
+Feb 20 15:04:38 fangorn postfix/qmgr[4225]: 6425F7A4: from=<cpanplus@fangorn.maddingue.net>, size=3250, nrcpt=1 (queue active)
+Feb 20 15:04:43 fangorn postfix/smtp[6554]: 6425F7A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=5, status=sent (250 Queued! 1108908283 qp 20090 <20050220140438.6425F7A4@fangorn.maddingue.net>)
+Feb 20 15:04:43 fangorn postfix/qmgr[4225]: 6425F7A4: removed
+Feb 20 15:04:50 fangorn postfix/pickup[4672]: A9E317A4: uid=600 from=<cpanplus>
+Feb 20 15:04:50 fangorn postfix/cleanup[6444]: A9E317A4: message-id=<20050220140450.A9E317A4@fangorn.maddingue.net>
+Feb 20 15:04:50 fangorn postfix/qmgr[4225]: A9E317A4: from=<cpanplus@fangorn.maddingue.net>, size=3258, nrcpt=1 (queue active)
+Feb 20 15:04:52 fangorn postfix/pickup[4672]: A5E077C6: uid=600 from=<cpanplus>
+Feb 20 15:04:52 fangorn postfix/cleanup[6444]: A5E077C6: message-id=<20050220140452.A5E077C6@fangorn.maddingue.net>
+Feb 20 15:04:52 fangorn postfix/qmgr[4225]: A5E077C6: from=<cpanplus@fangorn.maddingue.net>, size=3256, nrcpt=1 (queue active)
+Feb 20 15:04:56 fangorn postfix/smtp[6448]: A9E317A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108908296 qp 20147 <20050220140450.A9E317A4@fangorn.maddingue.net>)
+Feb 20 15:04:56 fangorn postfix/qmgr[4225]: A9E317A4: removed
+Feb 20 15:04:58 fangorn postfix/smtp[6554]: A5E077C6: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108908298 qp 20156 <20050220140452.A5E077C6@fangorn.maddingue.net>)
+Feb 20 15:04:58 fangorn postfix/qmgr[4225]: A5E077C6: removed
+Feb 20 15:05:08 fangorn postfix/pickup[4672]: 2869E7A4: uid=600 from=<cpanplus>
+Feb 20 15:05:08 fangorn postfix/cleanup[6444]: 2869E7A4: message-id=<20050220140508.2869E7A4@fangorn.maddingue.net>
+Feb 20 15:05:08 fangorn postfix/qmgr[4225]: 2869E7A4: from=<cpanplus@fangorn.maddingue.net>, size=3251, nrcpt=1 (queue active)
+Feb 20 15:05:13 fangorn postfix/smtp[6448]: 2869E7A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=5, status=sent (250 Queued! 1108908313 qp 20209 <20050220140508.2869E7A4@fangorn.maddingue.net>)
+Feb 20 15:05:13 fangorn postfix/qmgr[4225]: 2869E7A4: removed
+Feb 20 15:05:24 fangorn postfix/pickup[4672]: D87467A4: uid=500 from=<maddingue>
+Feb 20 15:05:24 fangorn postfix/cleanup[6444]: D87467A4: message-id=<20050220140524.D87467A4@fangorn.maddingue.net>
+Feb 20 15:05:24 fangorn postfix/qmgr[4225]: D87467A4: from=<maddingue@fangorn.maddingue.net>, size=3243, nrcpt=1 (queue active)
+Feb 20 15:05:30 fangorn postfix/smtp[6554]: D87467A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108908330 qp 20243 <20050220140524.D87467A4@fangorn.maddingue.net>)
+Feb 20 15:05:30 fangorn postfix/qmgr[4225]: D87467A4: removed
+Feb 20 15:05:30 fangorn postfix/pickup[4672]: DE5037A4: uid=600 from=<cpanplus>
+Feb 20 15:05:30 fangorn postfix/cleanup[6444]: DE5037A4: message-id=<20050220140530.DE5037A4@fangorn.maddingue.net>
+Feb 20 15:05:30 fangorn postfix/qmgr[4225]: DE5037A4: from=<cpanplus@fangorn.maddingue.net>, size=3253, nrcpt=1 (queue active)
+Feb 20 15:05:36 fangorn postfix/smtp[6448]: DE5037A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108908336 qp 20274 <20050220140530.DE5037A4@fangorn.maddingue.net>)
+Feb 20 15:05:36 fangorn postfix/qmgr[4225]: DE5037A4: removed
+Feb 20 15:06:06 fangorn postfix/pickup[4672]: 4AC087A4: uid=500 from=<maddingue>
+Feb 20 15:06:06 fangorn postfix/cleanup[6444]: 4AC087A4: message-id=<20050220140606.4AC087A4@fangorn.maddingue.net>
+Feb 20 15:06:06 fangorn postfix/qmgr[4225]: 4AC087A4: from=<maddingue@fangorn.maddingue.net>, size=3244, nrcpt=1 (queue active)
+Feb 20 15:06:12 fangorn postfix/smtp[6554]: 4AC087A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108908371 qp 20418 <20050220140606.4AC087A4@fangorn.maddingue.net>)
+Feb 20 15:06:12 fangorn postfix/qmgr[4225]: 4AC087A4: removed
+Feb 20 15:06:23 fangorn postfix/pickup[4672]: 03C817A4: uid=600 from=<cpanplus>
+Feb 20 15:06:23 fangorn postfix/cleanup[6444]: 03C817A4: message-id=<20050220140623.03C817A4@fangorn.maddingue.net>
+Feb 20 15:06:23 fangorn postfix/qmgr[4225]: 03C817A4: from=<cpanplus@fangorn.maddingue.net>, size=3255, nrcpt=1 (queue active)
+Feb 20 15:06:28 fangorn postfix/pickup[4672]: 647967C6: uid=500 from=<maddingue>
+Feb 20 15:06:28 fangorn postfix/cleanup[6444]: 647967C6: message-id=<20050220140628.647967C6@fangorn.maddingue.net>
+Feb 20 15:06:28 fangorn postfix/qmgr[4225]: 647967C6: from=<maddingue@fangorn.maddingue.net>, size=3243, nrcpt=1 (queue active)
+Feb 20 15:06:28 fangorn postfix/smtp[6448]: 03C817A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=5, status=sent (250 Queued! 1108908388 qp 20470 <20050220140623.03C817A4@fangorn.maddingue.net>)
+Feb 20 15:06:28 fangorn postfix/qmgr[4225]: 03C817A4: removed
+Feb 20 15:06:32 fangorn postfix/pickup[4672]: 7FE757A4: uid=600 from=<cpanplus>
+Feb 20 15:06:32 fangorn postfix/cleanup[6444]: 7FE757A4: message-id=<20050220140632.7FE757A4@fangorn.maddingue.net>
+Feb 20 15:06:32 fangorn postfix/qmgr[4225]: 7FE757A4: from=<cpanplus@fangorn.maddingue.net>, size=3255, nrcpt=1 (queue active)
+Feb 20 15:06:34 fangorn postfix/smtp[6554]: 647967C6: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108908394 qp 20505 <20050220140628.647967C6@fangorn.maddingue.net>)
+Feb 20 15:06:34 fangorn postfix/qmgr[4225]: 647967C6: removed
+Feb 20 15:06:38 fangorn postfix/smtp[6448]: 7FE757A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108908398 qp 20572 <20050220140632.7FE757A4@fangorn.maddingue.net>)
+Feb 20 15:06:38 fangorn postfix/qmgr[4225]: 7FE757A4: removed
+Feb 20 15:07:59 fangorn postfix/pickup[4672]: 3E6357A4: uid=600 from=<cpanplus>
+Feb 20 15:07:59 fangorn postfix/cleanup[6444]: 3E6357A4: message-id=<20050220140759.3E6357A4@fangorn.maddingue.net>
+Feb 20 15:07:59 fangorn postfix/qmgr[4225]: 3E6357A4: from=<cpanplus@fangorn.maddingue.net>, size=3272, nrcpt=1 (queue active)
+Feb 20 15:08:03 fangorn postfix/pickup[4672]: A25D37C6: uid=500 from=<maddingue>
+Feb 20 15:08:03 fangorn postfix/cleanup[6444]: A25D37C6: message-id=<20050220140803.A25D37C6@fangorn.maddingue.net>
+Feb 20 15:08:03 fangorn postfix/qmgr[4225]: A25D37C6: from=<maddingue@fangorn.maddingue.net>, size=3250, nrcpt=1 (queue active)
+Feb 20 15:08:04 fangorn postfix/smtp[6554]: 3E6357A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=5, status=sent (250 Queued! 1108908484 qp 20837 <20050220140759.3E6357A4@fangorn.maddingue.net>)
+Feb 20 15:08:04 fangorn postfix/qmgr[4225]: 3E6357A4: removed
+Feb 20 15:08:09 fangorn postfix/smtp[6448]: A25D37C6: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108908489 qp 20852 <20050220140803.A25D37C6@fangorn.maddingue.net>)
+Feb 20 15:08:09 fangorn postfix/qmgr[4225]: A25D37C6: removed
+Feb 20 15:08:30 fangorn postfix/pickup[4672]: 262CA7A4: uid=600 from=<cpanplus>
+Feb 20 15:08:30 fangorn postfix/cleanup[6444]: 262CA7A4: message-id=<20050220140830.262CA7A4@fangorn.maddingue.net>
+Feb 20 15:08:30 fangorn postfix/qmgr[4225]: 262CA7A4: from=<cpanplus@fangorn.maddingue.net>, size=3246, nrcpt=1 (queue active)
+Feb 20 15:08:35 fangorn postfix/smtp[6554]: 262CA7A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=5, status=sent (250 Queued! 1108908515 qp 20937 <20050220140830.262CA7A4@fangorn.maddingue.net>)
+Feb 20 15:08:35 fangorn postfix/qmgr[4225]: 262CA7A4: removed
+Feb 20 15:11:11 fangorn postfix/pickup[4672]: 8A5167A4: uid=600 from=<cpanplus>
+Feb 20 15:11:11 fangorn postfix/cleanup[8765]: 8A5167A4: message-id=<20050220141111.8A5167A4@fangorn.maddingue.net>
+Feb 20 15:11:11 fangorn postfix/qmgr[4225]: 8A5167A4: from=<cpanplus@fangorn.maddingue.net>, size=3243, nrcpt=1 (queue active)
+Feb 20 15:11:17 fangorn postfix/smtp[8768]: 8A5167A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108908677 qp 21486 <20050220141111.8A5167A4@fangorn.maddingue.net>)
+Feb 20 15:11:17 fangorn postfix/qmgr[4225]: 8A5167A4: removed
+Feb 20 15:16:24 fangorn postfix/pickup[4672]: 866AF7A4: uid=600 from=<cpanplus>
+Feb 20 15:16:24 fangorn postfix/cleanup[8937]: 866AF7A4: message-id=<20050220141624.866AF7A4@fangorn.maddingue.net>
+Feb 20 15:16:24 fangorn postfix/qmgr[4225]: 866AF7A4: from=<cpanplus@fangorn.maddingue.net>, size=3253, nrcpt=1 (queue active)
+Feb 20 15:16:30 fangorn postfix/smtp[8941]: 866AF7A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108908990 qp 22461 <20050220141624.866AF7A4@fangorn.maddingue.net>)
+Feb 20 15:16:30 fangorn postfix/qmgr[4225]: 866AF7A4: removed
+Feb 20 15:16:43 fangorn postfix/pickup[4672]: 774CC7A4: uid=600 from=<cpanplus>
+Feb 20 15:16:43 fangorn postfix/cleanup[8937]: 774CC7A4: message-id=<20050220141643.774CC7A4@fangorn.maddingue.net>
+Feb 20 15:16:43 fangorn postfix/qmgr[4225]: 774CC7A4: from=<cpanplus@fangorn.maddingue.net>, size=3243, nrcpt=1 (queue active)
+Feb 20 15:16:47 fangorn postfix/pickup[4672]: 4B3587C6: uid=600 from=<cpanplus>
+Feb 20 15:16:47 fangorn postfix/cleanup[8937]: 4B3587C6: message-id=<20050220141647.4B3587C6@fangorn.maddingue.net>
+Feb 20 15:16:47 fangorn postfix/qmgr[4225]: 4B3587C6: from=<cpanplus@fangorn.maddingue.net>, size=3244, nrcpt=1 (queue active)
+Feb 20 15:16:49 fangorn postfix/smtp[8941]: 774CC7A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108909009 qp 22507 <20050220141643.774CC7A4@fangorn.maddingue.net>)
+Feb 20 15:16:49 fangorn postfix/qmgr[4225]: 774CC7A4: removed
+Feb 20 15:16:53 fangorn postfix/smtp[9290]: 4B3587C6: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108909012 qp 22550 <20050220141647.4B3587C6@fangorn.maddingue.net>)
+Feb 20 15:16:53 fangorn postfix/qmgr[4225]: 4B3587C6: removed
+Feb 20 15:16:58 fangorn postfix/pickup[4672]: 75D4C7A4: uid=600 from=<cpanplus>
+Feb 20 15:16:58 fangorn postfix/cleanup[8937]: 75D4C7A4: message-id=<20050220141658.75D4C7A4@fangorn.maddingue.net>
+Feb 20 15:16:58 fangorn postfix/qmgr[4225]: 75D4C7A4: from=<cpanplus@fangorn.maddingue.net>, size=3242, nrcpt=1 (queue active)
+Feb 20 15:17:00 fangorn postfix/pickup[4672]: 9ED2A7C6: uid=600 from=<cpanplus>
+Feb 20 15:17:00 fangorn postfix/cleanup[8937]: 9ED2A7C6: message-id=<20050220141700.9ED2A7C6@fangorn.maddingue.net>
+Feb 20 15:17:00 fangorn postfix/qmgr[4225]: 9ED2A7C6: from=<cpanplus@fangorn.maddingue.net>, size=3236, nrcpt=1 (queue active)
+Feb 20 15:17:04 fangorn postfix/smtp[8941]: 75D4C7A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108909024 qp 22613 <20050220141658.75D4C7A4@fangorn.maddingue.net>)
+Feb 20 15:17:04 fangorn postfix/qmgr[4225]: 75D4C7A4: removed
+Feb 20 15:17:06 fangorn postfix/smtp[9290]: 9ED2A7C6: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108909026 qp 22622 <20050220141700.9ED2A7C6@fangorn.maddingue.net>)
+Feb 20 15:17:06 fangorn postfix/qmgr[4225]: 9ED2A7C6: removed
+Feb 20 15:17:07 fangorn postfix/pickup[4672]: 8F9947A4: uid=600 from=<cpanplus>
+Feb 20 15:17:07 fangorn postfix/cleanup[8937]: 8F9947A4: message-id=<20050220141707.8F9947A4@fangorn.maddingue.net>
+Feb 20 15:17:07 fangorn postfix/qmgr[4225]: 8F9947A4: from=<cpanplus@fangorn.maddingue.net>, size=3244, nrcpt=1 (queue active)
+Feb 20 15:17:13 fangorn postfix/smtp[8941]: 8F9947A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108909033 qp 22645 <20050220141707.8F9947A4@fangorn.maddingue.net>)
+Feb 20 15:17:13 fangorn postfix/qmgr[4225]: 8F9947A4: removed
+Feb 20 15:20:15 fangorn postfix/pickup[4672]: 9DAE37A4: uid=600 from=<cpanplus>
+Feb 20 15:20:15 fangorn postfix/cleanup[9751]: 9DAE37A4: message-id=<20050220142015.9DAE37A4@fangorn.maddingue.net>
+Feb 20 15:20:15 fangorn postfix/qmgr[4225]: 9DAE37A4: from=<cpanplus@fangorn.maddingue.net>, size=3251, nrcpt=1 (queue active)
+Feb 20 15:20:23 fangorn postfix/smtp[9754]: 9DAE37A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=8, status=sent (250 Queued! 1108909222 qp 23351 <20050220142015.9DAE37A4@fangorn.maddingue.net>)
+Feb 20 15:20:23 fangorn postfix/qmgr[4225]: 9DAE37A4: removed
+Feb 20 15:20:29 fangorn postfix/pickup[4672]: 458BE7A4: uid=600 from=<cpanplus>
+Feb 20 15:20:29 fangorn postfix/cleanup[9751]: 458BE7A4: message-id=<20050220142029.458BE7A4@fangorn.maddingue.net>
+Feb 20 15:20:29 fangorn postfix/qmgr[4225]: 458BE7A4: from=<cpanplus@fangorn.maddingue.net>, size=3241, nrcpt=1 (queue active)
+Feb 20 15:20:35 fangorn postfix/smtp[9754]: 458BE7A4: to=<cpan-testers@perl.org>, relay=mx.develooper.com[63.251.223.176], delay=6, status=sent (250 Queued! 1108909235 qp 23389 <20050220142029.458BE7A4@fangorn.maddingue.net>)
+Feb 20 15:20:35 fangorn postfix/qmgr[4225]: 458BE7A4: removed

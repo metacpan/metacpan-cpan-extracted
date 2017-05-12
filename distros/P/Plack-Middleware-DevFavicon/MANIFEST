@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+example/app.psgi
+lib/Plack/Middleware/DevFavicon.pm
+t/00_compile.t
+t/assets/favicon.ico
+t/assets/favicon.png
+META.yml
+MANIFEST

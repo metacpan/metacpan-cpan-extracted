@@ -1,0 +1,47 @@
+%{
+=head1 SYNOPSIS
+
+This grammar has an unsolved shift-reduce conflict.
+
+Compile it with 
+
+      eyapp -C Debug.eyp
+
+See the C<Debug.output> file generated.
+Execute the generated modulino with:
+
+      ./Debug.pm -d  # to activate debugging
+      ./Debug.pm -h  # for help
+      ./Debug.pm -d -c  'D; S' 
+
+The generated parser will not recognize any input, since its shifts forever.
+Try input C<'D; D; S'>.
+
+=head1 See also
+   
+    http://search.cpan.org/perldoc?Parse::Eyapp::debuggingtut
+
+    Debug1.eyp Debug2.eyp DebugLookForward.eyp DebugDynamicResolution.eyp
+
+=cut
+
+%}
+
+%%
+p:
+    ds ';' ss  
+  | ss
+;
+
+ds:
+    D ';' ds    
+  | D          /* this production is never used */ 
+;
+
+ss:
+    S ';' ss      
+  | S       
+;
+
+%%
+

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Pod-Usage-CommandLine.t
+lib/Pod/Usage/CommandLine.pm
+eg/sample.pl
+eg/sample.output
+META.yml                                 Module meta-data (added by MakeMaker)

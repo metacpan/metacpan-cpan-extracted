@@ -1,0 +1,42 @@
+## name Suspicious but OK
+## failures 0
+## cut
+
+my $one = 1;
+my $two = '# $foo = "bar"';
+# $four is an important variable.
+
+#-----------------------------------------------------------------------------
+
+## name Basic Failure
+## failures 1
+## cut
+
+# my $three = 'three';
+
+#-----------------------------------------------------------------------------
+
+## name Default Regex
+## failures 1
+## parms { commentedcoderegex => q(\$[A-Za-z_].*=) };
+## cut
+
+my $one = 1;
+my $two = '# $foo = "bar"';
+# my $three = 'three';
+# $four is an important variable.
+
+#-----------------------------------------------------------------------------
+
+## name Only look for "Bang"
+## failures 1
+## parms { commentedcoderegex => q(\$bang.*=) };
+## cut
+
+my $one = 1;
+my $two = '# $foo = "bar"';
+# my $three = 'three';
+# my $bang = 'three';
+# $four is an important variable.
+
+#-----------------------------------------------------------------------------

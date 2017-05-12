@@ -1,0 +1,52 @@
+---
+abstract: 'Padre support for perl XS (and perlapi)'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires:
+  Exporter: 5.68
+  ExtUtils::MakeMaker: 6.59
+  File::Find::Rule: 0.33
+  File::Find::Rule::Perl: 1.13
+  File::Slurp: 9999.19
+  Locale::Msgfmt: 0.15
+  Parse::CPAN::Meta: 1.4409
+  Software::LicenseUtils: 0.103008
+  Test::Builder: 1.001002
+  Test::More: 1.001002
+  Test::Requires: 0.07
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Padre-Plugin-XS
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+recommends:
+  ExtUtils::MakeMaker: 6.84
+  File::Spec::Functions: 3.4
+  List::Util: 1.35
+  Test::Pod: 1.48
+  Test::Pod::Coverage: 1.08
+requires:
+  Padre: 1
+  Perl::APIReference: 0.15
+  Try::Tiny: 0.18
+  YAML::Tiny: 1.56
+  constant: 1.27
+  parent: 0.228
+  perl: 5.10.1
+resources:
+  bugtracker: http://padre.perlide.org/
+  homepage: http://padre.perlide.org/trac/wiki/PadrePluginXS
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-XS
+version: 0.12

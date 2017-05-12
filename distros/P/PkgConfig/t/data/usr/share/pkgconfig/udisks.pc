@@ -1,0 +1,4 @@
+
+Name: udisks
+Description: udisks storage daemon
+Version: 1.0.2

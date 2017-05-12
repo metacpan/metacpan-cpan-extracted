@@ -1,0 +1,570 @@
+0.32 20 Apr 2017
+ - Speed up Credential Refreshing (Arthur Axel fREW Schmidt)
+ - Bug fixed: Issue #105. Some API calls where not correctly handling parameters specified in their URI.
+   Notably, this fixes S3 ListObjectsV2. (dakkar)
+ - Bug fixed: RestJSON services support parameters and results in body (streaming responses)
+ - S3 now supports Metadata correctly (PopeFelix)
+ - New API: LexRuntime
+ - New API: Organizations
+ - New API: MTurk (Mechanical Turk)
+ - New API: WorkDocs
+ - New API: ResourceTagging
+ - New API: CodeStar
+ - New API: LexModels
+ - CodeCommit API update
+ - ELBv2 API update
+ - ECS API update 
+ - EC2 API update
+ - StorageGateway API update
+ - DirectConnect API update
+ - CognitoIdentity API update
+ - Config API update
+ - KMS API update
+ - GameLift API update
+ - ElasticBeanstalk API update
+ - ES API update
+ - DynamoDB API update
+ - IAM API update
+ - RDS API update
+ - CloudDirectory API update
+ - DeviceFarm API update 
+ - EMR API update
+ - ApiGateway API update
+ - Pinpoint API update
+ - Discovery API update
+ - CloudTrail API update
+ - Batch API update
+ - CloudFront API update
+ - CloudDirectory API update
+ - CloudWatch API update
+ - ElastiCache API update
+ - ApiGateway API update
+ - Lambda API update
+ - Polly API update
+ - Redshift API update
+ - Rekognition API update
+
+0.31 01 Feb 2017 
+ - Bug fixed: Services that use QueryCaller and EC2Caller were not serializing Booleans correctly
+ - New API: CUR (AWS Cost and Usage Report Service) 
+ - New API: CloudDirectory 
+ - CodeDeploy API update: BlueGreen deployments
+ - RDS API update: create Aurora read replica of an RDS
+ - DynamoDB API update: Tagging for DynamoDB
+ - ACM API update
+ - EC2 API update
+ - CodeCommit API update
+ - ELBv2 API update
+ - ECS API update 
+ - EC2 API update
+ - Rekognition API update
+
+0.30 04 Jan 2017 
+ - Specify minumum perl version (PR #137)
+ - Update RestXmlCaller.pm to fix malformed xml schema issues (PR #133)
+ - Don't trim values coming from APIs (Issue #130)
+ - CodeDeploy API update: IamSessionArn, IamUserArn
+ - ECS API update: Attributes and Placement constraints
+
+0.29 27 Dec 2016
+ - New functionality: Enabled and documented paginators (methods that repeatedly call methods that 
+   return partial responses)
+ - Remove under work warning from JSON-REST services: ApiGateway,CloudSearchDomain,CognitoSync,
+   EFS, ES, ElasticTranscoder, Glacier, IoT, IoTData, Lambda
+   This means that Bugs and error reports for these APIs will be handled with priority, as they
+   would are considered to be functional
+ - Fixed documentation issues with S3, CloudFront and Route53 (ilmari)
+ - Fixed bug (Issue #108): Services that expected strings as parameters would accept numbers,
+   Method(StringParameter => 33), and Paws would generate "StringParameter":33 in the request
+   to the service, but the AWS API would error out, forcing the programmer to stringify his input
+   Method(StringParameter => "33"). Paws will now auto-stringify the contents in these parameters
+   so AWS will accept them correctly, and the programmer doesn't have to worry about stringifying
+   his inputs. Thanks to ilmari and rpcme
+ - Fixed Bug (Issue #107): Some services transmit undef as a valid value in an Array of things (rpcme)
+ - Support for S3 is now much better. Multipart uploads are working (glenveegee)
+ - Don't depend on Crypt::Digest::SHA256. Use Digest::SHA (Grinzz)
+ - New API: Budgets
+ - New API: SMS (Server Migration Service)
+ - New API: AWS Polly
+ - New API: Lightsail
+ - New API: Rekognition
+ - New API: XRay
+ - New API: StepFunctions
+ - New API: Shield
+ - New API: Pinpoint
+ - New API: OpsworksCM
+ - New API: Health
+ - New API: AppStream (v2)
+ - New API: CodeBuild
+ - New API: WAFRegional
+ - New API: Batch
+ - SSM API update: new capabilities like patch applying, inventory, maintenance windows
+ - Snowball API update: Cluster operations
+ - SES API update: Tagging and ConfigurationSets
+ - DirectConnect API update: Tagging
+ - CloudFormation API update
+ - ElasticBeanstalk API update
+ - Gamelift API update: DescribeInstances
+ - ECR API update: DescribeImages
+ - ACM API update: ImportCertificate
+ - RDS API update: DescribeSourceRegions, Add and Remove RoleToDBCluster, more info in DBClusters, copy 
+   encrypted snapshots between regions
+ - ServiceCatalog API update: AccessLevelFilter, Constraint and Portfolio support
+ - CloudFront API update: version 2016-11-25 support
+ - CodePipeline API update: GetPipelineExecution
+ - CognitoIdp API update: UserImportJob operations
+ - Gamelift API update: OperatingSystem for CreateBuild, GetInstanceAccess
+ - Route53 API update: TestDNSAnswer, VPCAssociationAuthorization ops. ListChangeBatches ops gone
+ - CodeDeploy API update
+ - RedShift API update: Enhanced VPC Routing
+ - RDS API update: Timezones and ReadEnpoints
+ - EMR API update: SecurityConfigurations, AutoScaling
+ - IoT API update
+ - CloudFormation API update: RoleArn
+ - EC2 API update: ReservedInstancesExchangeQuote, IPv6 support
+ - S3 API update: Analytics, Inventory and Metrics
+ - ElastiCache API update
+ - IoT API update: DynamoV2 behaviour
+ - CognitoIdp API update: AdminCreateUser, RoleMappings
+ - Kinesis API update: UpdateShardCount, DescribeLimits
+ - ElastiCache API update: authenticated cache clusters
+ - Cloudwatch Logs API update: DescribeMetricFilters and docu
+ - DS API update: SchemaExtension support
+ - SQS API update: FIFO queues
+ - Lambda API update: Environment variables support, GetAccountSettings, DeadLetter
+ - MarketplaceMetering API update
+ - Glacier API update: ProvisionedCapacity ops
+ - ElasticTranscoder API update
+ - CloudTrail API update: EventSelectors
+ - ECS API update: support for Version attribute in tasks
+ - ApiGateway API update
+ - CloudWatch API update
+ - DirectConnect API update: BGP peering
+ - Config: API update
+ - DMS API update: ModifyReplicationTask
+ - CloudWatchLogs API update: TagLogGroups
+ - SSM API update: Patching operations
+ - Discovery API update: Application Discovery
+ - CognitoIdp API update: Groups for user pools
+ - StorageGateway API update: NFS mounts operations
+ - Firehose API update
+ - IAM API update: ServiceSpecificCredential
+
+0.28 30 Aug 2015 23:45:00
+ - On errors 503 XMLResponse would not process the error correctly (returning
+   a non-Paws exception, so the error couldn't be retried. (brianhartsock)
+ - New API: Snowball
+ - New API: KinesisAnalytics
+ - New API: ELBv2 (Application Load Balancer)
+ - Route53: API update: GetDomainSuggestions, RenewDomain, ViewBilling
+ - RDS: API update: RestoreDBClusterFromS3
+ - KMS: API update: DeleteImportedKeyMaterial, GetParametersForImport, ImportKeyMaterial
+ - WorkSpaces API update: DescribeWorkspacesConnectionStatus ModifyWorkspaceProperties StartWorkspaces StopWorkspaces
+ - IoT API update: ThingTypes operations, ListOutgoingCertificates
+ - MarketplaceCommerceAnalytics API update: StartSupportDataExport
+ - GameLift API update: SearchGameSessions
+ - EC2 API update: DescribeHostReservationOfferings DescribeHostReservations GetHostReservationPurchasePreview PurchaseHostReservation
+ - DS API update: AddIpRoutes ListIpRoutes
+ - CognitoIdp API update: AdminForgetDevice AdminGetDevice AdminInitiateAuth AdminListDevices AdminRespondToAuthChallenge AdminUpdateDeviceStatus AdminUserGlobalSignOut ConfirmDevice ForgetDevice ForgotPassword GetDevice GlobalSignOut InitiateAuth ListDevices RespondToAuthChallenge UpdateDeviceStatus
+ - CloudFront API update: CreateDistributionWithTags CreateStreamingDistributionWithTags ListTagsForResource TagResource UntagResource
+ - ApiGateway API update: CreateUsagePlan CreateUsagePlanKey DeleteUsagePlan DeleteUsagePlanKey GetUsage GetUsagePlan GetUsagePlanKey GetUsagePlanKeys GetUsagePlans ImportApiKeys UpdateUsage UpdateUsagePlan
+ - AutoScaling API update: AttachLoadBalancerTargetGroups DescribeLoadBalancerTargetGroups DetachLoadBalancerTargetGroups
+ - MachineLearning API update: extra informational attributes on returned objects
+ - EMR API update: FailureDetails on StepStatus object
+ - ECS API update: MemoryReservation and NetworkMode
+ - ECR API update: Filter on ListImages
+ - ES API update: ElasticsearchVersion support
+
+0.27 25 Jun 2016 
+ - RestXml (S3, f.ex) services now complete responses from headers (shardiwal)
+ - New API: ServiceCatalog
+ - MachineLearning API update: Tagging API
+ - IoT API update: ListPolicyPrincipals
+ - EC2 API update: GetConsoleOutput, DescribeAllSpotFleetRequests 
+ - SSM API update: Tagging
+ - SNS API update: sending SMSs' to international phones
+ - SES API update: SetIdentityHeadersInNotificationsEnabled added
+ - S3 API update: ListObjectsV2 StartAfter attribute fix
+ - DirectConnect API update: DescribeConnectionLoa and DescribeInterconnectLoa operations
+ - DeviceFarm: remote session operations
+ - DS: tagging operations
+ - DMS: certificate operations
+ - CodePipeline: API update
+ - EC2: ID format operations
+ - Config: API update
+ - GameLift: Runtime configuration operations
+ - RDS: API update
+ - SSM: Notification options
+ - EFS: definitive API (Performance parameters added)
+ - ECS: task roles
+ - CloudFormation: docu for new capability CAPABILITY_NAMED_IAM
+ - CognitoIdentity: API update
+ - DynamoDBStreams: API update
+ - ACM: FailureReason added
+ - IoT: DynamoDBAction Operation can be specified
+
+0.26 29 May 2016
+ - New Service: Discovery
+ - New Service: ApplicationAutoScaling
+ - KMS API update
+ - ECS API update
+ - CloudTrail API update
+ - S3 API update: new ListObjectsV2 method
+ - ApiGateway API update: Passthrough behaviour
+ - SSM API update: Modify and Describe DocumentPermission
+ - StorageGateway API update: ListTapes
+ - EC2 API update: DescribeSecurityGroupReferences and DescribeStaleSecurityGroups
+ - CloudFormation API update
+ - EMR API update: ListInstances can filter
+ - Workspaces API update: Tagging operations
+ - EC2 API update: GetConsoleScreenshot and ProvisionedBandwidth
+ - Firehose API update: RetryOptions
+ - RDS API update: Describe and Modify DBClusterSnapshotAttributes
+ - ECS API update: filter by task status
+
+0.25 05 May 2016
+ - Call retries are now done in more cases (Thottling errors, 500, 503, 509). PR #96 (wiof)
+ - New service: Cognito SignUp/Login (CognitoIdp)
+ - Cognito Identity API update: add Cognito Idp support
+ - IoT API update: Delete certificates and registrations
+ - S3 API Update: Bucket Acceleration enabling methods
+ - Kinesis API update: Get iterator from a timestamp and enable/disable enhanced monitoring
+ - ElasticBeanstalk API update: Apply and Describe Managed Actions
+ - Kinesis Firehose API update: ElasticSearch destination support
+ - DeviceFarm API update: support for UnmeteredRemoteAccessDevices
+ - ACM API update: Tagging for certificates
+ - EMR API update: shrink policies
+ - IoT API update: select SQL engine
+ - Route53Domains API update: ReachabilityEmail operations
+ - EC2 API update: ModifyVpcPeeringConnectionOptions and docu
+ - OpsWorks API update: support for instance tenancy
+
+0.24 10 Apr 2016 
+ - t/01-load fails because Class::Unload is not declared for test Issue #95 (eserte)
+ - ApiGateway API update: ImportRestApi and PutRestApi operations
+ - Route53 API Update: Metric Based Health Checks, DNS Failover for Private Hosted Zones, and Configurable Health Check Locations
+ - Lambda API update
+ - Directory Service API update: Simplified Trust Configuration
+ - Elastic Beanstalk API update: deployment options
+ - STS API update: GetCallerIdentity
+
+0.23 04 Apr 2016
+ - t/11_client_exceptions was failing if Furl wasn't installed (andk)
+   We skip the test if the required recorder doesn't load, as this
+   Is causing cpantesters failures and installation failures
+ - t/01-load.t will try to unload classes after using them
+ - Inspector API update: New API published
+ - DeviceFarm API update: Offerings
+ - ElastiCache API update: Modify EC cluster types
+ - RDS API update: SQL Server AD Auth
+ - Redshift API update: ModifyClusterIamRoles
+ - StorageGateway API update: SetLocalConsolePassword
+ - WAF API Update: XssMatchSets
+ - S3 API update: PutObject now returns VersionId
+ - CloudFormation API update: Changesets
+
+0.22 21 Mar 2016
+ - New: Paws::Credential::AssumeRoleWithSAML for using Paws through STS AssumeRoleWithSAML
+        examples/sts-saml has an example of how to retrieve credentials through an ADFS
+ - New: perls 5.10 and 5.12 are working after changing package syntax. They've been setup for
+        travis testing. This should not be thought of as long term commitment to supporting such
+        old perl versions, but at least it can be viewed as we'll know exactly when we stop
+        supporting them (and that will be announced in the changelog). Thanks to ilmari for
+        a 5.10 support PR)
+ - New: Paws::Net::Caller, LWPCaller  and FurlCaller now implement retry logic in case APIs
+        return a retriable HTTP error
+ - New: DynamoDB now benefits from crc-32 errors, and being able to retry the call
+ - Work to get RestJson services. Some can now be called correctly (ES is working, for example
+   others need tests)
+ - Better documentation: show the valid values for an attribute when it's an enum
+ - Fix bug where a call to DescribeAutoScalingGroups would die if the API was not returning the LaunchConfigurationName attribute for the Instance shape (reported by msoriano)
+ - Fix bug where a StrToObj map of complex objects would not instance the object correctly
+ - Fix SimpleDB (SDB) API definitions. AWS provided ones were not working
+ - New Service: ECR (EC2 Container Registry)
+ - New Service: CloudWatch Events
+ - New Service: ACM (AWS Certificate Manager)
+ - New service: GameLift
+ - New service: DMS (Database Migration Service)
+ - New service: Marketplace Metering
+ - EC2 API update: support for NatGateways, VpcClassicLinkDnsSupport, and ScheduledInstances
+ - RDS API update: support for enhanced monitoring, and more new features
+ - CloudFront API update: support for compressing and SSL to origin
+ - CloudFront API update: support for ACM certificates
+ - CloudTrail API update: support for multiregion trails
+ - Config API update
+ - EMR API update: support for VPC EMR
+ - ECS API update: deployment options
+ - IoT API update: Topic rules 
+ - CloudFormation API update: ContinueUpdateRollback method
+ - MarketplaceCommerceAnalytics API update: support for CustomerDefinedValues
+ - WAF API update
+ - Autoscaling API update: lifecycle improvements
+ - CodeDeploy API update: more Batch operations
+ - ApiGateway API update: Authorizers operations
+ - EMR API update: support for EBS volumes
+ - Route53 API update (SNI support) + docu updates
+ - SES API update: support for different encodings
+ - Storagegateway API update: create tapes with barcodes
+ - RDS API update: KMS keys
+ - Lambda update: support for VPC
+ - CloudFormation API update: tagging support + RetainResources on delete
+ - CloudFront ACM cert support
+ - CloudSearch API update: stats
+ - DS API update: support for event topics
+ - DynamoDB API update: DescribeLimits
+ - Redshift API update: DescribeTableRestoreStatus and Restore tables from snapshot
+ - CodeCommit API update: support for triggers
+ - IAM API update: some operations now require stable Ids, instead of names
+ - S3 API update: Incomplete mulitpart upload handling
+ - IoT API update: integrate with CloudWatch and Elasticsearch
+ - CloudHSM API update: support for tags
+ - SES API update: IdentityMailFromDomainAttributes operations
+
+0.21 16 Dec 2015
+ - Bug fix: calls supposed to not return any object were failing since 0.21 (jare)
+ - MojoAsyncCaller starts using Future::Mojo, a better alternative to MojoX::IOLoop::Future
+ - Directory Service API update
+ - Route53 API update: traffic policies
+ - RDS API update: support for PortNumbers
+ - RDS API update: support for KMS encrypted clusters
+ - AutoScaling API update: InstanceProtection from scale in
+
+0.20 3 Dec 2015
+ - S3 can now get and put objects. Entire API should now be working correctly (glenveegee)
+ - Better schema validation in builders (by Oriol Soriano) 
+ - Paws::Credential::File doesn't throw warnings when users don't have $ENV{HOME} (by A.Gimenez)
+ - EC2 docu update
+ - RDS support for cross account snapshot sharing. New instance types too
+ - Inspector API update
+ - DeviceFarm API update
+ - EC2 API update: dedicated hosts
+ - ECS API update
+ - ElasticBeanstalk API update
+
+0.19 12 Nov 2015
+ - Fix issues with POD documentation. Some head2 tags didn't have a newline above
+   them, causing them to not behave as head tags
+ - We were having problems checking error messages for dns and connection failures
+   Different messages on different platforms / locales were making tests fail, and
+   Paws harder to install
+ - Generate JSON API Maps without xml_keys and xml_values. Not needed.
+ - add preloading and immutabilizing to documentation
+ - SQS docu update
+ - ApiGateway support for variables
+ - S3 API Update: support for ServerSideEncryption in UploadPart 
+
+0.18 6 Nov 2015 
+ - Important change: Paws license has been changed to a more permissive Apache 2.0
+ - IAM update: SimulateCustomPolicy updated. Docs updated too
+ - Autoscaling update: Encryption for EBS volumes flag. Docu update too
+ - SSM update: new functionalities (SendCommand) for mangaging Windows boxes in AWS
+ - new API Gateway service
+ - STS docu update
+ - DeviceFarm update: New Update and Delete methods
+ - ELB docu update
+
+0.17 22 Oct 2015
+ - Pass tests on MacOSX by Roger Pettett
+ - BREAKING CHANGE: All API methods and attributes have been properly CamelCased. Before
+   that, some services were being generated with method names and attributes starting with
+   lowercase. For example, in CloudWatchLogs, method DescribeLogGroups would expect:
+     limit => Int, logGroupNamePrefix => Str
+   Now it expects
+     Limit => Int, LogGroupNamePrefix => Str
+   The affected services are CloudSearchDomain, CloudTrail, CloudWatchLogs, CodeCommit,
+   CodeDeploy, CodePipeline, Support, SimpleWorkflow, Glacier, ECS, DirectConnect, 
+   DeviceFarm, DataPipeline, Config. 
+
+   This change also applies to never-released-to-cpan services: MarketplaceCommerceAnalytics,
+   IoT, IoTData, Inspector.
+
+ - loaded classes can be made immutable for better performance vs a bit more load time
+ - services can be preloaded via Paws->preload (see examples/preload.pl)
+ - Experimental Furl caller
+ - Proper linking of documentation to appropiate classes
+ - All classes now have doc (some innner shapes docs were not being generated) 
+ - CloudFront methods had dates appended to them. Now all methods don't have the
+   date appended, so anyone using CloudFront should be aware of that API change
+ - New iterators for EC2 and Glacier
+ - New caller: Paws::Net::FurlCaller. Uses Furl to do HTTP calls
+
+ - S3 API update: Support for ServerSideEncryption 
+ - KMS API update: New operations: CancelKeyDeletion ListRetirableGrants ScheduleKeyDeletion and docu update
+
+0.16 09 Oct 2015
+ - docu fixes by Gimpson
+ - Timeout for all user agents set to 60 seconds. Will be configurable soon
+ - S3 Update: Support for S3 Standard - Infrequent Access 
+ - CloudWatchLogs Update: Export tasks
+ - CloudFormation API Update: support for ResourceTypes
+ - EC2 API update: Update to SpotFleet requests
+ - SES API update: Support for Incoming mail
+ - RDS API update: Changes to API for Aurora DBs (DBCluster operations)
+ - CloudTrail API update: Log File Integrity Verification and Tagging
+ - Workspaces API update: Volume encrytption
+ - New ElasticSearch API (ES)
+ - New WAF API (Web Application Firewall)
+ - New Firehose API
+ - New Inspector API
+ - New MarketplaceCommerceAnalytics API
+ - Config API update: Compliance rules
+ - CloudFront API update
+ - Kinesis API update: adjust the data retention window
+ - EC2 API update: Spot blocks for Defined-Duration workloads
+ - Lambda API update: Support for Aliases
+ - ECS API update: new functionalities
+ - New IoT and IoTData APIs
+
+0.15 16 Sep 2015
+ - fix unicode issues in test t/10_responses.t (ioanrogers)
+ - fix bug handling responses with ArrayRef of Maps (DynamoDB reported by stevecaldwell77)
+ - fix S3 to be able to use temporary credentials (stevecaldwell77)
+ - fix bug that could produce different timestamps in Date and X-Amz-Date headers (ilmari)
+ - Pull Request #53 (karenetheridge): "Update some module dependencies"
+   - JSON Parsing now depending on JSON::MaybeXS
+   - include META.json in package
+   - remove uri_escape code for perl 5.8
+ - ElasticBeanstalk API update: support for Instance and Environment health 
+ - Codepipeline API update: support for encription key
+ - Config API update: ListDiscoveredResources
+ - EC2 API update: Resource oriented bidding for spot instances
+ - StorageGateway API update: tagging
+ - S3 API update: event filtering
+ - IAM API update: Policy simulation methods
+ - Kinesis API update: Appoximate arrival timestamp on Record object
+ - Elastic File System API update
+ - Route53: Child and Inverted Health Checks
+ - EC2 API update: DataEncryptionKeyId and StateMessage in snapshots. Spot fleet allocation strategy
+
+0.14 06 Aug 2015
+ - LWP Caller (Paws::Net::LWPCaller). Paws supports calling behind HTTPS proxies with LWP (dtikhonov)
+ - Maps in JSON type APIS are correctly handled (Issue #40 and #45, PR #46). Thanks to vivus-ignis and dtikhonov
+ - Fixes to Paws.pm documentation (arc)
+ - Glacier API update: support for Vault Locking
+ - EMR API update: Support for new Applications specification 
+ - EC2 API update:
+   - CreateRoute drops the ClientToken param
+   - Support for SpotFleetLaunchSpecification
+ - CloudWatch Logs API update: Support Destinations
+ - RDS API update: Support for Aurora (new DBCluster calls)
+ - Opsworks API update: support for RHEL7
+ - DeviceFarm API update: support for iOS
+ - SimpleWorkflow API update: support for Lambda
+
+0.13 17 Jul 2015
+ - New API: DynamoDB Streams
+ - New API: DeviceFarm
+ - Paws::Credentials::File. Support for changing the filename via ENVIRONMENT (AWS_CONFIG_FILE)
+ - Information for calculating region endpoints is moved into service classes, not the RegionInfo
+   class that holds all endpoint information for all services.
+ - Rename RegionalEndpointCaller role to EndpointResolver
+ - Throw structured exception if an endpoint can't be calculated
+ - Support for STS regional endpoint when used passing a region to $paws->service('STS', region => 'Desired region'). 
+   $paws->service('STS') still uses the global sts.amazonaws.com endpoint
+ - Paws::Credential::AssumeRole and Paws::Credential::STS support new sts_region attribute to select region. Default
+   is to use the global region
+ - Signin service working again (still hand-coded...)
+ - paws cli now displays all attributes for call parameters, and their requiredness
+
+0.12 09 Jul 2015
+ - New API: CodePipeline
+ - New API: CodeCommit
+ - EC2 API update: copy encrypted snapshots between regions
+ - SES API update: support for Sending Authorization
+ - ECS API update
+ - IAM update: support for SSH Keys
+ - Autoscaling update: Support for scaling policies with steps
+ - Fix DeleteMessageBatch,SendMessageBatch and ChangeMessageVisibilityBatch (thanks mbartold)
+
+0.11 02 Jul 2015 
+ - Bump up verion in response to: #105600: Please don't let your version length decrease (mst)
+
+0.10 01 Jul 2015 
+ - Don't dump request in EC2 Caller
+ - Paws::Net::Caller was not correctly handling cases where the API only returns success (1) (osoriano)
+ - Tests don't use Data::Path anymore (using own "mini-implementation")
+
+0.09 25 Jun 2015 17:00:00
+ - API updates from botocore until 2015-06-29
+ - Difference between SQS message AttributeMaps and QueueAttribute maps (thnks codehead) 
+ - Paws now returns structured exceptions (Paws::Exception) with information of errors from
+   the APIs. The exceptions stringify so you don't have to worry about too much breakage. If you
+   were parsing the error message from the exception, you should now use Paws::Exceptions accessors
+   to get the already parsed information
+ - Refactoring in the different callers to move functionalities only where needed
+ - Endpoint resolution support (first version by Iñigo Tejedor)
+ - SQS Maps are now working correctly (QueueMaps were ill defined). Thanks to codehead
+ - Fix bug for JSONCaller: when response doesn't have a body, the operation would succeed, but an
+   invalid json string exception was thrown
+ - longs changed to Moose type Int, instead of Num (longs are 64 bit integers 
+   in Java https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html)
+   Those Ints are passed to AWS as int() instead of Strings, because AWS APIs (CloudWatchLogs
+   for example) isn't able to transform String to long (we get an API error)
+ - Refactored the config attribute of the Paws class. Also documented what you can configure from
+   the config, so now the "config" is official.
+ - BugFix: some Map attributes in JSON APIs were incorrectly being created as Maps of Strings, instead of Maps of Objects.
+   Affected APIs are: CloudSearchDomain, CloudWatchLogs, CognitoIdentity, Config, DataPipeline, DynamoDB, EMR, Kinesis
+   MachineLearning, OpsWorks, S3 and StorageGateway.
+
+0.08 19 May 2015 22:12:00
+ - EC2 SpotFleet API calls
+ - Opsworks support for Windows
+ - Update to ElasticBeanstalk API (ResourceName)
+ - UserAgent now report Paws version number
+
+0.07 15 May 2015 19:30:00
+ - Generate META.yml
+ - Add LICENSE info
+ - Packaging corrections
+ - Lots of documentation updates
+ - Support for new features in CloudWatchLogs, EC2 (VPC endpoint support), CloudFormation
+ - New API: Paws::DS (Directory Service)
+
+0.06 5 May 2015 23:30:00
+ - Fix Map handling in JsonCaller (and add tests)
+ - Add META.* information for CPAN packaging (CHORNY)
+ - Fix cpanfile dependencies for build/test scenarios (CHORNY)
+
+0.05 3 May 2015 23:00:00
+ - Delete files that were leftover from old API generations
+ - Update to DynamoDB: support for expressions
+ - Adapt API generation to new boto layout
+
+0.04
+ - API updates
+
+0.03 10 Apr 2015 22:00:00
+ - Service updates
+ - Support for new services (like MachineLearning and WorkSpaces)
+ - Better documentation for arguments to methods (and caller classes)
+
+0.02 6 Apr 2015 18:30:00
+ - Service updates
+ - Map types were not being passed correctly to APIs
+
+0.01 2 Apr 2015 02:35:00
+ - First version launched to CPAN
+
+2015-02-28
+ - The default CredentialProviderChain will now try to read an ini
+   file in ~/.aws/credentials with the aws credentials
+ - The Credential providers have been moved into Paws::Credential namespace
+ - The role that all Credential Providers have to add is now Paws::Credential
+2015-02-09
+ - Paws->service and $aws->service no longer return a class that
+   has to be constructed. Instead they return an INSTANCE of the
+   class. Attributes for the constructor can be passed as the 
+   subsequent parameters of ->service.
+   A method class_for_service returns the service class in the "old"
+   fashion
+   ->service('X')->new(region => 'Y') is now
+   ->service('X', region => 'Y')
+   or
+   ->class_for_service('X')->new(region => 'Y')
+
+   The recommended one is ->service('X', region => 'Y')
+2015-02-10
+ - Adding paginators broke lots of classes (not loading)
+   deactivated paginators on json, query and restxml classes
+   The only guys who conserves paginators is EC2
+ 

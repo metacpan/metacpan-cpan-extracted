@@ -1,0 +1,19 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 0.8.5 ] */
+
+/* [wxMaxima: input   start ] */
+f(x,u,S,k) := gamma((1+k)/2) /
+ ( gamma(1/2) * %pi^(k/2) * determinant(S)^(1/2) *
+   ( 1 + transpose( x - u) . invert(S) . ( x - u ))^((1+k)/2));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+q:f(matrix([x,y]),matrix([x0,y0]),matrix([s00,s01],[s10,s11]),2);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+fortran(q);
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

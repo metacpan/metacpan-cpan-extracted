@@ -1,0 +1,55 @@
+REFERENCES, HYPE, DISCUSSION
+
+http://perlmonks.org/?node_id=558802 
+    (imp) perlmonks thread that prompted me to get this packaged up
+http://use.perl.org/~mr_bean/journal/30174 
+    (mr_bean) encouraging journal entry
+http://ctags.sourceforge.net/FORMAT
+    (via wolverian) "mainly, the function tag for variables would be nice"
+    (add sigils?  iskeyword+=@-@)
+http://groups.yahoo.com/group/vim/message/68815
+    (ml thread on vim@vim.org, really about perlcomplete, but me and [dm]r_bean appear to have hijacked it to talk Perl::Tags)
+
+Add a function param to variables and the necessary magic to infer what
+function a variable is in.
+
+Figure out if can use sigils in tag name
+
+01:44 < wolverian> anyway, try removing the ^ in to_string, if you want.
+    (to make tags jump to statement instead of line)
+
+    But check that this doesn't cause weird shit upstream!
+
+    -- committed, revert if causes problems
+        - wolv
+
+work out release for P::T::PPI
+
+Do testing with VIM
+Make the repo public :-)
+    05_vim.t
+    (doesn't work in make test/prove, because the output is redirected and vim whines)
+
+02:52 < Alias> Are you compatible with the ctag command line params?
+02:53 < Alias> Because Ultraedit DOES seem to have support for integrating it
+02:53 < Alias> Which means PPI-based ctags on Win32
+02:53 < Alias> shiny
+02:53 < osfameron> there isn't a frontend for Perl::Tags yet
+02:53 -!- Averell [averell@i577B4166.versanet.de] has joined #perl
+02:53 < osfameron> it's basically refactored from pltags.pl which comes distributed with vim
+02:53 < Alias> ok
+02:53 < osfameron> but I guess it wouldn't be hard to write a frontend with a ctags-like interface
+02:53 < Alias> Well then just so you know, we need one :)
+02:53 < Alias> Even if it's a simple one
+
+Make the repo public :-)
+    done - Alias/Wolverian
+
+Make frontend supporting at least "-L %fi -f %fo" for UltraEdit (Alias)
+
+CHANGES:
+added patch 26842 by Ian Tegebo" <ian.tegebo@gmail.com> (tempname)
+added patch 20613 (DMITRI@cpan.org) for parsing use constant declarations
+added patch 20616 (DMITRI@cpan.org) for parsing label declarations
+
+- move ::Naive to another module

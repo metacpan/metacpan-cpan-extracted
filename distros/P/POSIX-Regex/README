@@ -1,0 +1,37 @@
+POSIX::Regex
+============
+
+This is a port of the glibc gnu regex engine into perl.  There are few reasons
+you would need this.  The few I can think of include:
+
+0) You wish to use untrusted user expressions in such a way as to be able to
+catch errors.  Example:  eval { alarm 2;  m/((){1024}){1024}/ } is an instant
+uncatchable segmentation fault.  GNU's regexps will still fail, but in a timeout
+way rather than an instant segfault way.
+
+1) You wish to have POSIX compliance on ... something ...  Perl's regexps are
+slightly different -- arguably better, but different.
+
+
+( ... if you think of anything else, let me know, since reason 0 evaporates under 5.9.3+ ... )
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+glibc and the gnu regex engine
+
+COPYRIGHT AND LICENCE
+
+GPL (see pod for further information)
+
+Copyright (C) 2006 by Paul Miller

@@ -1,0 +1,124 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; default dynamics</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Default dynamics</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<A HREF=index.html>Dynamic</A><BR>
+<B>default</B>
+<P>
+<A HREF=#options>options</A><BR>
+<A HREF=#syntax>syntax</A><BR>
+<A HREF=#example>examples</A><BR>
+<P>
+
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> currently has only
+one style of dynamics: the default.<BR>
+<P>
+The <A HREF=../formatter/index.html>formatter</A> provides the
+user with a way to specify dynamics on part of text and images.
+The formatter passes these strings to this module, which interprets
+the string into a <A HREF=../program/index.html>program</A> which
+can be run when the <A HREF=../slideview/index.html>slide-view</A>
+is being displayed.
+
+<H2>Options</H2>
+
+The Dynamic/Default style-element contains the following options:
+<DL>
+<DT><B>-appear =&gt;</B> <EM>description</EM>
+<DD>How the slide elements are shown by default.<BR>
+    The default is "<CODE>phase 0 appear</CODE>".
+    <P>
+<DT><B>-appearTime =&gt;</B> <EM>seconds</EM>
+<DD>When <CODE>from</CODE> or <CODE>to</CODE> do not carry a time
+    specification.
+    <P>
+<DD>
+</DL>
+
+<H2><A NAME=syntax>Syntax</A></H2>
+
+The exact syntax is one string containing:<BR>
+<CODE>[phase-spec][after <I>secs</I>][from|to <I>dir</I> [<I>secs</I>]][appear|disappear]</CODE>
+<P>
+<UL>
+<LI>The <B><FONT COLOR=green>phase</FONT></B>-specification can be
+    <DL>
+    <DT><B>phase </B><I>number</I> or
+        <B>phase </B><I>number</I><B>-</B>
+    <DD>Show from the specified phase of the slide onwards.
+    <DT><B>phase -</B><I>number</I>
+    <DD>Show until (including) the specified phase.
+    <DT><B>phase </B><I>number1</I><B>-</B><I>number2</I>
+    <DD>Show from phase number1 till phase number2.
+    </DL>
+    <P>
+    A presentation of one <A HREF=../slideview/index.html>slide-view</A>
+    of a slide can contain a few phases.  You enter a next phase of a
+    <A HREF=../slide/index.html>slide</A> (all its slide-views) by pressing
+    the space-bar.
+    <P>
+<LI>With <B><FONT COLOR=green>after</FONT></B>, you specify
+    the number of seconds from the start of the specified phase until the
+    appearance or disappearance of the item.
+    <P>
+<LI>The <B><FONT COLOR=green>from</FONT></B> and
+    <B><FONT COLOR=green>to</FONT></B> cause text and images
+    to move over the screen in a certain direction.  As direction can
+    be used any from n, ne, e, se, s, sw, w, nw.<BR>
+    The time tells how many seconds are to be used, which defaults to
+    the value of -appearTime.
+    <P>
+<LI><B><FONT COLOR=green>appear</FONT></B> and
+    <B><FONT COLOR=green>disappear</FONT></B> are usually implied
+    by the other statements.
+</UL>
+
+<H2><A NAME=example>Examples</A></H2>
+The <A HREF=../formatter/index.html>formatter</A> in use calls this 
+module to translate a string into a program.  For instance, if you use 
+the <A HREF=../formatter/markup.html>markup</A>, you can specify:
+<PRE>
+  &lt;A SHOW="after 5 from ne"&gt;some text&lt;/A&gt;
+</PRE>
+which results in a call for this module with the string
+"<CODE>after 5 from ne</CODE>".  This module translates this into a
+command for the <A HREF=../program/index.html>program</A>, which will
+result in the effect that
+<UL>
+<LI>the text "<CODE>some text</CODE>" will be shown
+<LI>in phase 0 (default),
+<LI>after 5 seconds,
+<LI>entering the screen from north-east,
+<LI>in <CODE>-appearTime</CODE> seconds (default).
+</UL>
+<P>
+
+Other examples:
+<PRE>
+   phase 2-3
+   phase -4 after 2.3 to s 8.45
+   phase 3 disappear
+</PRE>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

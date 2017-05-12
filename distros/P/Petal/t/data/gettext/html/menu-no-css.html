@@ -1,0 +1,66 @@
+<!--?
+
+  Skip Navigation Fragment Template
+
+  This template is used for the additional document navigation 
+  menu for non-CSS browsers.
+
+  $Id$
+
+?-->
+<div 
+  xmlns:petal="http://purl.org/petal/1.0/"
+  xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+  xmlns:metal="http://xml.zope.org/namespaces/metal"
+  metal:define-macro="content"
+  i18n:domain="testdomain"
+  class="no-css"
+>
+  <p>
+
+    <a
+      href="#page_content"
+      title="Skip the navigation and jump straight to the page content [ Accesskey S ]"
+      xml:lang="en"
+      lang="en"
+      accesskey="S"
+      i18n:attributes="xml:lang two-letter-lang-code; 
+                       lang two-letter-lang-code; 
+                       title menu-skip-nav-title"
+      i18n:translate="menu-skip-nav"
+    >Skip Navigation</a>
+
+<!--?
+
+    The following can be copied to create hard coded
+    menu items that don't link to themselves. However
+    IE doesn't support accesskeys on hidden items.
+
+    <bdo 
+      dir="ltr"
+      petal:attributes="dir self/direction"
+      metal:define-slot="seperator"
+    >|</bdo>
+    <a
+      xml:lang="en"
+      lang="en"
+      href="/accessibility/"
+      accesskey="0"
+      title="Accessibility information [ Accesskey 0 ]"
+      petal:omit-tag="true: self/cgi/path_info_eq '/accessibility/'"
+      i18n:attributes="xml:lang two-letter-lang-code; 
+                       lang two-letter-lang-code; 
+                       title menu-access-title"
+    ><span
+      xml:lang="en"
+      lang="en"
+      petal:omit-tag="false: self/cgi/path_info_eq '/contact/'"
+      i18n:attributes="xml:lang two-letter-lang-code; 
+                       lang two-letter-lang-code;" 
+      i18n:translate="menu-access"
+    >Accessibility</span></a>
+
+?-->
+
+  </p>
+</div>

@@ -1,0 +1,21 @@
+---
+abstract: 'Документация PSGI по-русски'
+author:
+  - 'Илья Чесноков, Денис Федосеев, Олег Алистратов, Александр Воронов, Вячеслав Тихановский'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POD2-RU-PSGI
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: 0.003

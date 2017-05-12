@@ -1,0 +1,121 @@
+SYNOPSIS
+
+    Example for err() and caller():
+
+     use Perinci::Sub::Util qw(err caller);
+    
+     sub foo {
+         my %args = @_;
+         my $res;
+    
+         my $caller = caller();
+    
+         $res = bar(...);
+         return err($err, 500, "Can't foo") if $res->[0] != 200;
+    
+         [200, "OK"];
+     }
+
+    Example for die_err() and warn_err():
+
+     use Perinci::Sub::Util qw(warn_err die_err);
+     warn_err(403, "Forbidden");
+     die_err(403, "Forbidden");
+
+    Example for gen_modified_sub():
+
+     use Perinci::Sub::Util qw(gen_modified_sub);
+    
+     $SPEC{list_users} = {
+         v => 1.1,
+         args => {
+             search => {},
+             is_suspended => {},
+         },
+     };
+     sub list_users { ... }
+    
+     gen_modified_sub(
+         output_name => 'list_suspended_users',
+         base_name   => 'list_users',
+         remove_args => ['is_suspended'],
+         output_code => sub {
+             list_users(@_, is_suspended=>1);
+         },
+     );
+
+    Example for gen_curried_sub():
+
+     use Perinci::Sub::Util qw(gen_curried_sub);
+    
+     $SPEC{list_users} = {
+         v => 1.1,
+         args => {
+             search => {},
+             is_suspended => {},
+         },
+     };
+     sub list_users { ... }
+    
+     # simpler/shorter than gen_modified_sub, but can be used for currying only
+     gen_curried_sub('list_users', {is_suspended=>1}, 'list_suspended_users');
+
+append:FUNCTIONS
+
+ caller([ $n ])
+
+    Just like Perl's builtin caller(), except that this one will ignore
+    wrapper code in the call stack. You should use this if your code is
+    potentially wrapped. See Perinci::Sub::Wrapper for more details.
+
+ err(...) => ARRAY
+
+    Experimental.
+
+    Generate an enveloped error response (see Rinci::function). Can accept
+    arguments in an unordered fashion, by utilizing the fact that status
+    codes are always integers, messages are strings, result metadata are
+    hashes, and previous error responses are arrays. Error responses also
+    seldom contain actual result. Status code defaults to 500, status
+    message will default to "FUNC failed". This function will also fill the
+    information in the logs result metadata.
+
+    Examples:
+
+     err();    # => [500, "FUNC failed", undef, {...}];
+     err(404); # => [404, "FUNC failed", undef, {...}];
+     err(404, "Not found"); # => [404, "Not found", ...]
+     err("Not found", 404); # => [404, "Not found", ...]; # order doesn't matter
+     err([404, "Prev error"]); # => [500, "FUNC failed", undef,
+                               #     {logs=>[...], prev=>[404, "Prev error"]}]
+
+    Will put stack_trace in logs only if Carp::Always module is loaded.
+
+ warn_err(...)
+
+    This is a shortcut for:
+
+     $res = err(...);
+     warn "ERROR $res->[0]: $res->[1]";
+
+ die_err(...)
+
+    This is a shortcut for:
+
+     $res = err(...);
+     die "ERROR $res->[0]: $res->[1]";
+
+FAQ
+
+ What if I want to put result ($res->[2]) into my result with err()?
+
+    You can do something like this:
+
+     my $err = err(...) if ERROR_CONDITION;
+     $err->[2] = SOME_RESULT;
+     return $err;
+
+SEE ALSO
+
+    Perinci
+

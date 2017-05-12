@@ -1,0 +1,36 @@
+=head1 NAME
+
+130-blockquote-paragraphs
+
+=head1 EXAMPLES
+
+Text before blockquote paragraph.
+
+=over 4
+
+Blockquote paragraph.
+
+=back
+
+Text between blockquote paragraphs.
+
+=over 4
+
+Multi-paragraph blockquote.
+
+Here is the second paragraph in
+the blockquote.
+
+Here is the third paragraph in
+the blockquote.
+
+=over 4
+
+Nested blockquote paragraph.
+
+=back
+
+=back
+
+[EOF]
+

@@ -1,0 +1,275 @@
+# ABSTRACT: Guide for writing PlugAuth plugins.
+# VERSION
+# PODNAME: PlugAuth::Guide::Plugin
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+PlugAuth::Guide::Plugin - Guide for writing PlugAuth plugins.
+
+=head1 VERSION
+
+version 0.35
+
+=head1 DESCRIPTION
+
+This document serves as a guide for creating plugins for L<PlugAuth> to create
+authentication, authorization mechanisms for PlugAuth, or to extend PlugAuth in
+other ways.  L<PlugAuth> loads plugins as normal Perl classes and introspects them
+with L<Role::Tiny>.  All L<PlugAuth> plugins should consume the L<PlugAuth::Role::Plugin>
+role, and possibly others in the PlugAuth::Role::* namespace, depending on the 
+functionality they implement.  The most common role that you will want to implement
+is L<PlugAuth::Role::Auth>, which allows you to write your own authentication
+mechanism for L<PlugAuth>.
+
+=head2 Auth plugin
+
+For this section we are going to write a authentication plugin for L<PlugAuth>.
+The completed module and test can be found in the examples/plugin directory that
+came with the L<PlugAuth> distribution.
+
+The minimum implementation required to implement an authentication plugin is to
+consume the L<PlugAuth::Role::Auth> role, and write your own C<check_credentials>
+method.  Here is a very basic authentication plugin which allows just two users to be
+authenticated.
+
+ package PlugAuth::Plugin::ExampleAuth;
+ 
+ use strict;
+ use warnings;
+ use Role::Tiny::With;
+ 
+ use Role::Tiny::With;
+ 
+ with 'PlugAuth::Role::Plugin';
+ with 'PlugAuth::Role::Auth';
+ 
+ sub check_credentials
+ {
+   my($self, $user, $pass) = @_;
+   if($user eq 'optimus' && $pass eq 'matrix'
+   || $user eq 'primus'  && $pass eq 'spark')
+   { return 1 }
+   else
+   { return 0 }
+ }
+ 
+ 1;
+
+Although this gets the job done it is better to store the user/password database in
+some sort of structure.  This will make it easier, as we modify this plugin to allow
+creating/modifying/deleting of accounts.  To do this, we can initialize an account
+database in the plugin's C<init> method.  C<init> is called by C<new> after the 
+plugin is blessed into existence.
+
+ sub init
+ {
+   my($self) = @_;
+   $self->{user}->{primus}  = 'spark';
+   $self->{user}->{optimus} = 'matrix';
+ }
+
+ sub check_credentials
+ {
+   my($self, $user, $pass) = @_;
+   return 0 unless defined $user && defined $pass;
+   return 0 unless defined $self->{user}->{$user};
+   ($self->{user}->{$user} eq $pass) ? 1 : 0;
+ }
+
+Here we have changed C<check_credentials> and added C<init> and left the rest of the
+plugin the same.  So far the plugin works exactly the same as the original one, but
+the user/password database is stored in a structure.
+
+One optional method that you may implement is C<all_users>.  This method should return
+a list of all the users that your authentication plugin.  It is optional, because not
+all authentication mechanisms provide a convenient way to get this list, but it is 
+highly recommended that you provide this functionality if you can because it is used
+by the L<PlugAuth>'s authorization plugin.  Here is the implementation for C<all_users>
+for the example plugin:
+
+ sub all_users 
+ {
+   my($self) = @_;
+   keys %{ $self->{user} } 
+ } 
+
+This implementation simply gets the keys of the user/password hash, which is also
+the list of users.
+
+If we want to allow administrators with "accounts" authorization to create and delete 
+users we need to implement C<create_user> and C<delete_user> methods.
+
+ sub create_user
+ {
+   my($self, $user, $pass) = @_;
+   return 0 if defined $self->{user}->{$user};
+   $self->{user}->{$user} = $pass;
+   1;
+ }
+ 
+ sub delete_user
+ {
+   my($self, $user) = @_;
+   return 0 unless defined $self->{user}->{$user};
+   delete $self->{user}->{$user};
+   1;
+ }
+
+And finally, we can allow users with "change_password" authorization to change their
+passwords by implementing the C<change_password> method.
+
+ sub change_password
+ {
+   my($self, $user, $pass) = @_;
+   return 0 unless defined $self->{user}->{$user};
+   $self->{user}->{$user} = $pass;
+   1;
+ }
+
+If you implement part of the authentication API (such as just C<check_credentials>
+or C<check_credentials> and C<all_users>), then you will have to write your own test.
+If you implement all of the optional aspects of the API you can use 
+L<Test::PlugAuth::Plugin::Auth> to test your plugin.  Here is what the .t file would
+look like:
+
+ use Test::PlugAuth::Plugin::Auth;
+ run_tests 'ExampleAuth';
+
+This test can be run using L<prove>:
+
+ grunion% prove -lv t/plug_exampleauth_auth.t
+ 1..14
+ ok 1 - New returns a reference
+ ok 2 - does Plugin
+ ok 3 - does Auth
+ ok 4 - check_credentials (foo:bar) == 0
+ ok 5 - create_user returns 1
+ ok 6 - check_credentials (foo:bar) == 1
+ ok 7 - change_password returns 1
+ ok 8 - check_credentials (foo:bar) == 0
+ ok 9 - check_credentials (foo:baz) == 1
+ ok 10 - all_users == [ foo ]
+ ok 11 - all_users == [ foo, fop ]
+ ok 12 - delete_user returns 1
+ ok 13 - check_credentials (foo:bar) == 0
+ ok 14 - check_credentials (foo:baz) == 0
+ ok
+ All tests successful.
+ Files=1, Tests=14,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.31 cusr  0.02 csys =  0.35 CPU)
+ Result: PASS
+
+This ensures that your plugin does the basic create/check/list/change/delete operations
+required of it.  You will probably also want to write additional tests that are specific
+to your plugin.
+
+For more information on the authentication plugins, see L<PlugAuth::Role::Auth>.
+
+=head2 Authz plugin
+
+Writing an authorization plugin is beyond the scope of this document, and the
+authorization API is (as of this writing) documented, but in a state of flux.  
+If you are undeterred, feel free to poke around to figure out how it works.  A
+good starting point would be L<PlugAuth::Plugin::FlatAuthz>, which is the default
+authorization plugin.  Also of interest will be L<PlugAuth::Role::Authz> and
+L<Test::PlugAuth::Plugin::Authz>.
+
+=head2 Generic plugin
+
+L<PlugAuth> plugins don't need to limit themselves to just authentication and
+authorization.  They have access to the PlugAuth app itself and can add routes
+from the C<init> method just like L<Mojolicious> plugins can to other 
+Mojolicious apps.  Here is a basic example showing how to add a route:
+
+ package PlugAuth::Plugin::ExampleRoute;
+ 
+ use strict;
+ use warnings;
+ use Role::Tiny::With;
+ 
+ with 'PlugAuth::Role::Plugin';
+ 
+ sub init
+ {
+   my($self) = @_;
+ 
+   $self->app->routes->under('/hello')->get(sub {
+     my($c) = @_;
+     $c->render(text => 'hello world!');
+   });
+ }
+ 
+ 1;
+
+This sort of plugin might be useful for adding a web user interface for L<PlugAuth> for example.
+Here is a basic test for this plugin:
+
+ use strict;
+ use warnings;
+ use File::HomeDir::Test;
+ use File::HomeDir;
+ use Test::More tests => 3;
+ use Test::Mojo;
+ use YAML::XS qw( DumpFile );
+ 
+ mkdir File::HomeDir->my_home . '/etc';
+ DumpFile( File::HomeDir->my_home . '/etc/PlugAuth.conf', {
+   plugins => [
+     { 'PlugAuth::Plugin::ExampleRoute' => {} },
+   ],
+ });
+ 
+ my $t = Test::Mojo->new("PlugAuth");
+ 
+ $t->get_ok('/hello')
+   ->status_is(200)
+   ->content_is('hello world!');
+
+We use L<File::HomeDir::Test> to create a temporary home directory for the test.  This
+means that no production configurations will be used by mistake.  Next we create a
+configuration for the test using L<YAML::XS>'s C<DumpFile> function.  Finally we use
+L<Test::Mojo> to make an HTTP GET on /hello and check the status value and content
+of the response.
+
+=head2 Refresh plugin
+
+If your plugin consumes the L<PlugAuth::Role::Refresh> role, then its refresh method
+will be called on every HTTP request made to the L<PlugAuth> server.  This is used
+by the L<FlatAuth|PlugAuth::Plugin::FlatAuth> and L<FlatAuthz|PlugAuth::Plugin::FlatAuthz>
+plugins to reload the authentication and authorization database from flat files if
+they have changed.  There is also a basic test module L<Test::PlugAuth::Plugin::Refresh>
+which can be used to ensure that your plugin correctly implements this role.
+
+=head2 Other examples
+
+Other plugins worth looking at include L<PlugAuth::Plugin::DBIAuth> and 
+L<PlugAuth::Plugin::LDAP>.  This plugins implement the L<PlugAuth::Role::Auth> role,
+but they are not included in the main L<PlugAuth> distribution.
+
+=head1 SEE ALSO
+
+L<PlugAuth>, 
+L<PlugAuth::Role::Plugin>, 
+L<PlugAuth::Role::Auth>, 
+L<PlugAuth::Role::Authz>, 
+L<PlugAuth::Role::Refresh>,
+L<Test::PlugAuth::Plugin::Refresh>,
+L<Test::PlugAuth::Plugin::Auth>
+
+=head1 AUTHOR
+
+Graham Ollis <gollis@sesda3.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by NASA GSFC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

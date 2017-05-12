@@ -1,0 +1,409 @@
+#!/usr/bin/perl
+#PODNAME: parsepica
+#ABSTRACT: fetch, parse and transform PICA+ data
+use strict;
+
+
+use PICA::Record;
+use PICA::Field;
+use PICA::Parser;
+use PICA::Writer;
+use PICA::Source;
+use PICA::Store;
+
+# include other packages
+use Getopt::Long;
+use Pod::Usage;
+
+my ($outfilename, $logfile, $inputlistfile, $verbose, $configfile);
+my ($quiet, $help, $man, $select, $xmlmode, $loosemode, $pretty);
+my ($unapimode, $defaultconfig, $pxml, $nullmode, $countmode, $statmode);
+my ($limit, $offset);
+
+my %fieldstat_a; # all
+my %fieldstat_e; # exist?
+my %fieldstat_r; # number of records
+
+GetOptions(
+    'auto' => \$defaultconfig,
+    'config:s' => \$configfile,
+    "output:s" => \$outfilename,   # print valid records to a file
+    "log:s" => \$logfile,          # print messages to a file
+    "files:s" => \$inputlistfile,  # read names of input files from a file
+    "quiet" => \$quiet,            # suppress status messages
+    "help|?" => \$help,            # show help message
+    "man" => \$man,                # full documentation
+    "select=s" => \$select,        # select a special field/subfield
+    "count" => \$countmode,
+    "stats=s" => \$statmode,
+    "limit=i" => \$limit,
+    "unapi" => \$unapimode,
+    "verbose" => \$verbose,
+    "null" => \$nullmode,
+    #"loose" => \$loosemode,        # loose parsing
+    "pxml:s" => \$pxml,
+    "pretty:s" => \$pretty,
+    "xml:s" => \$xmlmode
+) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-verbose => 2) if $man;
+
+# Logfile
+$logfile = "-" if defined $logfile and $logfile eq "";
+if ( defined $logfile and $logfile ne "-") {
+    open LOG, ">$logfile" 
+        or die("Error opening $logfile\n");
+} elsif( not $quiet and ($logfile eq "-" or $verbose) ) {
+    *LOG = *STDOUT;
+} else {
+    open LOG, '>/dev/null';
+}
+
+$configfile = '-' if $defaultconfig;
+my $source = PICA::Source->new( config => ($configfile eq '-' ? undef : $configfile) ) 
+    if $configfile;
+
+
+# Output writer
+if (defined $pretty) {
+    $outfilename = $pretty unless defined $outfilename || $pretty == "";
+    $pretty = 1;
+}
+if (defined $pxml and $pxml ne "") {
+    $xmlmode = $pxml;
+    $pretty = 1;
+}
+if (defined $xmlmode and $xmlmode ne "") {
+    $outfilename = $xmlmode if not defined $outfilename;
+}
+
+if (defined $statmode or defined $countmode) {
+    $nullmode = 1 if "$outfilename" eq "";
+}
+
+$outfilename = "/dev/null" if $nullmode;
+
+$outfilename = "-" unless defined $outfilename;
+print LOG "Output to $outfilename\n" if $outfilename ne "-";
+my @p = ($outfilename ne "-" ? $outfilename : \*STDOUT);
+push @p, ('format' => 'XML') if defined $xmlmode;
+
+my $writer = PICA::Writer->new( @p, pretty => $pretty, stats => $statmode );
+
+
+# init input file list if specified
+if ($inputlistfile) { 
+    if ($inputlistfile eq "-") {
+        *INFILES = *STDIN;
+    } else {
+        print LOG "Reading input files from $inputlistfile\n";
+        open INFILES, $inputlistfile or die("Error opening $inputlistfile");
+    }
+}
+
+# handlers
+my $_field_handler = \&field_handler;
+my $_record_handler = \&record_handler;
+
+# select mode
+my $field_regex;
+my $subfield_select = "";
+
+if ($select) {
+    my ($tag, $subfield) = ("","");
+
+    if ( $select =~ /^...+[\$_]/ ) {
+        ($tag, $subfield) = split(/[\$_]/,$select);
+    } else {
+        $tag = $select;
+    }
+
+    $field_regex = qr/^$tag$/;
+    $subfield_select = $subfield if $subfield ne "";
+
+    $_field_handler = \&select_field_handler;
+    undef $_record_handler;
+
+    if ($subfield_select ne "") {
+        print LOG "Selecting subfield: $select\n";
+    } else {
+        print LOG "Selecting field: $select\n";
+    }
+}
+
+my $remote_counter = 0;
+
+my %options;
+$limit = 10 if !$limit or $limit <= 0;
+$options{Limit} = $limit;
+$options{Proceed} = 1;
+
+# init parser
+my $parser = PICA::Parser->new(
+    Field => $_field_handler,
+    Record => $_record_handler,
+    %options
+);
+
+# parse files given at the command line, in the input file list or STDIN
+my $filename;
+if (@ARGV > 0) {
+    if ($inputlistfile) {
+        print STDERR "You can only specify either an input file or a file list!\n";
+        exit 0;
+    }
+    if ( $source and $source->baseURL ) {
+        unshift @ARGV, $source->baseURL unless
+            $ARGV[0] =~ /^http:\/\// or
+            $ARGV[0] =~ /^[^\\:]+:\d+/;
+    }
+    while (($filename = shift @ARGV)) {
+        my $remote_parser;
+        if ($filename =~ /^http:\/\//) { # SRU or unAPI (http://...)
+            my $baseurl = $filename;
+            my $query = shift @ARGV || print STDERR "query missing!\n";
+
+            if ( $query =~ /=/) {
+                print LOG "SRU query '$query' to $baseurl\n";
+                my $server = PICA::Source->new( SRU => $baseurl, Limit => $limit );
+                $remote_parser = $server->cqlQuery( $query,
+                    # TODO: better pipe this to another parser (RecordParser)
+                    Field => $_field_handler,
+                    Record => $_record_handler,
+                    Limit  => $limit,
+                );
+            } else {
+                my $prefix = $unapimode ? "gvk" : ""; # TODO: prefix is bad unAPI usage
+                if ($unapimode) {
+                    print LOG "unAPI query '$query' from $baseurl\n";
+                    $source = PICA::Source->new( unAPI => $baseurl ); # TODO: document this
+                } else {
+                    print LOG "PSI get PPN '$query' from $baseurl\n";
+                    $source = PICA::Source->new( PSI => $baseurl ); # TODO: document this
+                }
+                my $r = $source->getPPN( $query, $prefix );
+                $parser->parsedata( $r ) if $r;
+            } 
+        } elsif ($filename =~ /^[^\\:]+:\d+/) { # Z3950 (host:port[/db])
+            my $z3950host = $filename;
+            my $query = shift @ARGV || print STDERR "query missing!\n";
+
+            print LOG "Z3950 query '$query' to $z3950host\n";
+            my $server = PICA::Source->new( Z3950 => $z3950host );
+            $remote_parser = $server->z3950Query( $query,
+                # TODO: better pipe this to another parser (RecordParser)
+                Field => $_field_handler,
+                Record => $_record_handler
+            );
+        } else {
+            print LOG "Reading $filename\n";
+            $parser->parsefile($filename);
+        }
+        $remote_counter += $remote_parser->counter() if defined $remote_parser;
+    }
+} elsif ($inputlistfile) {
+    while(<INFILES>) {
+        chomp;
+        next if $_ eq "";
+        $filename = $_;
+        print LOG "Reading $filename\n";
+        my ($record) = PICA::Parser->parsefile( $filename, Limit => 1)->records;
+    }
+} else {
+    print LOG "Reading standard input\n";
+    $parser->parsefile( \*STDIN ); 
+}
+
+# Finish
+$writer->end();
+
+# Print summary
+# TODO: Input fields: ...
+print LOG "Input records:\t" . ($parser->counter() + $remote_counter) .
+      "\nOutput records:\t" . $writer->counter() .
+      "\nOutput fields:\t" . $writer->fields() .
+      "\n";
+
+if ($countmode) { # TODO: move to writer
+    foreach my $tag (sort keys %fieldstat_a) {
+        print "$tag\t" . $fieldstat_a{$tag} . "\t";
+        print $fieldstat_r{$tag};
+        print "\n";
+    }
+}
+if ($statmode) {
+    print join("\n", $writer->statlines)."\n";
+}
+
+
+#### handler methods ####
+
+# default field handler
+sub field_handler {
+    my $field = shift;
+
+    if ($countmode) {
+        my $tag = $field->tag;
+        if (defined $fieldstat_a{$tag}) {
+            $fieldstat_a{$tag}++;
+        } else {
+            $fieldstat_a{$tag} = 1;
+        }
+        $fieldstat_e{$tag} = 1;
+    }
+
+    return $field;
+}
+
+# selecting field handler
+sub select_field_handler {
+    # TODO: Combine with count/default handler
+
+    my $field = shift;
+    return unless $field->tag() =~ $field_regex;
+
+     if ($subfield_select ne "") {
+        my @sf = $field->subfield( $subfield_select );
+        # TODO: print subfield if output format is XML (?)
+        print { $writer->{io} } join("\n",@sf) . "\n" if @sf;
+    } else {
+        $writer->write($field);
+    }
+
+    return undef;
+}
+
+# default record handler (TODO: directly use a PICA::Writer object)
+sub record_handler {
+    my $record = shift;
+    $writer->write( $record ); 
+
+    if ($countmode) {
+        foreach my $tag (keys %fieldstat_e) {
+            if (defined $fieldstat_r{$tag}) {
+                $fieldstat_r{$tag}++;
+            } else {
+                $fieldstat_r{$tag} = 1;
+            }
+        }
+        %fieldstat_e = ();
+    }
+
+    if ($verbose) {
+        print LOG $parser->counter() ."\n" unless ($parser->counter() % 100);
+    }
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+parsepica - fetch, parse and transform PICA+ data
+
+=head1 VERSION
+
+version 0.585
+
+=head1 SYNOPSIS
+
+parsepica [options] [input file(s) or SRU-Server(s) and queries(s)]
+
+=head1 DESCRIPTION
+
+This script provides a simple command line client to fetch and transform
+PICA+ records. You can parse and transform local files (compressed C<.gz>
+files can directly be read) or query records from a server via various
+protocols. You can also specify a configuration file for L<PICA::Source>
+which includes a pointer to an SRU, Z39.50, PSI, or unAPI source.
+
+The records can then be written to a file or STDOUT in PICA+ or PICA/XML
+format. Instead of writing full records you can select single PICA+ fields.
+Selecting fields with parsepica is around half as fast as using 
+grep, but grep does not really parse and check for wellformedness.
+
+By default input is read from STDIN and written to STDOUT ('-') without
+logging. On request logging information is printed to STDOUT or to a 
+specified logfile. Records that cannot be parseded produce error messages 
+to STDERR.
+
+=head1 OPTIONS
+
+ -input FILE     file with input files on each line ('-': STDIN)
+ -files FILE     read input files from another file ('-': STDIN)
+ -output FILE    print all valid records to a given file ('-': STDOUT)
+ -xml [FILE]     print records in XML
+ -pxml [FILE]    print records in pretty XML (with linebreaks)
+ -pretty [FILE]  print records in pretty format
+ -null           supress record output
+ -quiet          supress logging
+ -select FIELD   select a specific field or subfield (not if XML output)
+ -count          print simple statistics
+ -stats 0|1|2    print full statistics (1: fields, 2: subfields)
+ -config FILE    read configuration from a file ('-': search default file)
+ -auto           use default config file $PICASOURCE or ./pica.conf
+ -log [FILE]     print logging to a given file ('-': STDOUT, default)
+ -help           brief help message
+ -limit N        limit the result set to N records (only for SRU)
+ -man            full documentation with examples
+
+=head1 EXAMPLES
+
+=over 4
+
+=item parsepica file1 -o file2
+
+Read from 'file1' and print parseable records to 'file2'
+
+=item parsepica file1 -px file2.xml
+
+Parse from 'file1' and pretty print XML format to 'file2.xml'.
+
+=item parsepica http://gso.gbv.de/sru/DB=2.1/ pica.isb=3-423-31039-1
+
+Get records with ISBN 3-423-31039-1 via SRU.
+
+=item parsepica -c pica.isb=3-423-31039-1
+
+Get records with ISBN 3-423-31039-1 via SRU if the default config file
+contains C<SRU =.http://gso.gbv.de/sru/DB=2.1/>.
+
+=item parsepica -se 021A -o - -q picadata
+
+Select all fields '021A' from 'picadata' and write to STDOUT.
+
+=item parsepica -log -count -null file1
+
+Parse from 'file1' and count fileds
+
+=item parsepica -log -stat 2 file1
+
+Parse from 'file1' and print detailed statistics
+
+=back
+
+=head1 LIMITATIONS
+
+Error handling for broken records is not fully implemented. If you want to
+parse PICA+ records downloaded via WinIBW, you may need to first clean them 
+with the script L<winibw2pica>.
+
+The limit parameter should also be implemented for other sources but SRU and
+an offset parameter would be useful. Fetching records via other protocols but
+SRU has not been tested. The statistics method can be improved a lot.
+
+=head1 AUTHOR
+
+Jakob Voß <voss@gbv.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Verbundzentrale Goettingen (VZG) and Jakob Voss.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

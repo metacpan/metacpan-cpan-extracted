@@ -1,0 +1,12 @@
+SYNOPSIS
+
+     use Perinci::Sub::ConvertArgs::Array qw(convert_args_to_array);
+    
+     my $res = convert_args_to_array(args=>\%args, meta=>$meta, ...);
+
+DESCRIPTION
+
+    This module provides convert_args_to_array() (and
+    gencode_convert_args_to_array(), upcoming). This module is used by,
+    among others, Perinci::Sub::Wrapper.
+

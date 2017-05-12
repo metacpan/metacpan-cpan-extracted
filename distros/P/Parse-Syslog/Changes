@@ -1,0 +1,101 @@
+Revision history for Perl extension Parse::Syslog.
+
+2007-12-30
+
+     * release 1.10
+     * DST-handling bugfix
+
+2006-01-01
+
+     * release 1.09
+     * t/dst.t: don't use IO::Scalar if not available
+     * fix '-' for STDIN
+
+2005-12-31
+
+     * release 1.08
+     * really fix the DST-handling code (thanks a lot to Randy Smith for the
+       debugging)
+
+2005-12-29
+
+     * released 1.06
+     * fix dst.t test to work when the system timezone is not CET
+     * small documentation fixes
+
+2005-12-26
+
+     * released 1.05
+     * allow passing of a IO::Handle object to new
+     * ignore FreeBSD's [LOG_XXX] string (Artur Penttinen)
+     * fix timewarp during DST switch (reported by Anthony DeRobertis)
+
+2005-09-12
+
+     * internal release 1.04
+     * allow : in hostname for IPv6 (Artur Penttinen)
+     * allow @ in hostname for syslog-ng (Mark Loeser)
+
+2004-07-11
+
+     * released 1.03
+     * support for metalog (based on code by Ralf Geschke)
+     * support FreeBSD's verbose logging
+
+2004-01-19
+
+     * do not allow future dates (if allow_future is not true)
+
+2002-10-28
+
+     * released 1.02
+     * fix off-by-one-hour error when running during daylight saving time switch
+
+2002-05-25
+
+     * released 1.01
+     * added support for localized month names (uchum@mail.ru)
+
+2002-05-02
+
+     * released 1.00
+     * HP-UX fixes (reported by Peter.Barlow@accenture.com)
+
+2002-04-17
+
+     * parse 'above message repeats xx times'
+
+2002-01-29
+
+     * released 0.05
+     * allow space in program name (reported by alian@cpan.org)
+     * low-case month names (reported by alian@cpan.org)
+     * ignore '-- MARK --'  (reported by alian@cpan.org)
+
+2001-10-30
+
+     * released 0.04
+     * repeat "last-message-repeated xx times" for the same host
+     * more robust year-increment algorithm
+     * implemented arrayref option
+     * faster time parsing (cache of timestamp for same day)
+
+2001-08-20
+
+     * released 0.03
+     * implemented GMT option (scoobie@PamperedChef.dhs.org)
+     * add year specification to test scripts
+     * add better test for Solaris 8 message-id
+     * add support for File::Tail objects
+     * test 'last message repeated xx times' without message to repeat
+
+2001-08-19
+
+     * released 0.02
+     * fix 'last message repeated xx times' without message to repeat
+     * fix Solaris 8 message-id (include numbers in regex for local0, etc.)
+
+2001-08-12
+
+     * released 0.01
+     * created by h2xs 1.21 with options -AX -n Parse::Syslog

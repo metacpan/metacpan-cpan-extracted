@@ -1,0 +1,32 @@
+Revision history for Perl module Proc::Guard
+
+0.07 2015-03-25T22:40:00Z
+
+    - Fixed infinite loop
+      (DAGOLDEN)
+
+0.06 2011-08-14
+
+    - localize $? in destructor.
+      (Thanks to gfx++, kazuho++)
+
+0.05 2011-02-22
+
+     - move live tests to xt/
+
+0.04 2010-11-30
+
+    - callback function support
+
+0.03 2010-07-18
+
+    - fixed deps
+
+0.02 2010-06-26
+
+    - fixed testing issue
+
+0.01 2010-06-17
+
+    - original version
+

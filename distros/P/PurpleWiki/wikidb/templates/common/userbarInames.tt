@@ -1,0 +1,10 @@
+<form method="GET" action="[% baseUrl %]">
+[% IF userName %]
+[% userName %]
+ (<a href="[% preferencesUrl %]">preferences</a> |
+<a href="[% baseUrl %]?action=logout">Logout</a>)
+[% ELSE %]
+i-name:
+<input type="text" name="xri_iname" size="20" />
+[% END %]
+</form>

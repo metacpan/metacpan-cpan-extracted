@@ -1,0 +1,40 @@
+---
+abstract: 'Portable, event-loop agnostic eventy networking and multitasking.'
+author:
+  - 'Rocco Caputo <rcaputo@cpan.org>'
+build_requires:
+  POE::Test::Loops: '1.360'
+configure_requires:
+  POE::Test::Loops: '1.360'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE
+no_index:
+  directory:
+    - t
+    - inc
+    - mylib
+requires:
+  Carp: '0'
+  Errno: '1.09'
+  Exporter: '0'
+  File::Spec: '0.87'
+  IO: '1.24'
+  IO::Handle: '1.27'
+  IO::Pipely: '0.005'
+  IO::Tty: '1.08'
+  POE::Test::Loops: '1.360'
+  POSIX: '1.02'
+  Socket: '1.7'
+  Storable: '2.16'
+  Test::Harness: '2.26'
+  Time::HiRes: '1.59'
+resources:
+  homepage: http://poe.perl.org/
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/rcaputo/poe
+version: '1.367'

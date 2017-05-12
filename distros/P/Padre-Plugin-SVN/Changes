@@ -1,0 +1,29 @@
+Revision history for Padre-Plugin-SVN
+
+0.05	2010.05.23
+		* Changed the blame (log) display to show as a tree view.
+		* gettext-ified some messages (Zeno Gantner)
+
+0.04	2009.11.11
+		* Fixed up the handling of the commit message Dialog - You are now prompted when no commit message is provided.
+		* Changed the add message from popup to status bar (SEWI)
+
+0.03	2009.11.07
+		* Added Update Action - (Peter Lavender)
+		* Ask for save before commit (Sewi)
+		* Fixed a Use of uninitlized value for new files added to SVN (Sewi)
+		* Make the successful commit message info priority r8789 (Sewi) 
+
+0.02	2009.08.31 - Peter Lavender (waxhead)
+		Merged in the branch:
+		* Uses SVN::Class for all SVN operations
+		* Reconfigured the Plugin Menuing - flattened to single level as all operations are based on the file in the acitve document
+		* Added "Open Diff in Padre" - required new method in Padre::Main class
+		* Created an "SVNDialog" to handle SVN input and some output - more work to be done
+		* Added some additional documentation
+
+        svn add
+
+0.01    2009.03.07
+        First version, released on an unsuspecting world.
+

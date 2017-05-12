@@ -1,0 +1,16 @@
+Revision history for Pod-Generate-Recursive
+
+0.5    Jun 8, 2015
+       Skip tests if not requested. RT #104851. Thanks Ether!
+
+0.4    Jun 8, 2015
+       Migrate to Dist::Zilla. Fix RT #104851. Thanks SREZIC!
+
+0.3    Dec 1, 2014
+       Adjust version and remove useless include to fix CPAN tests.
+
+0.2    Nov 8, 2014
+       Second release. Fix CPAN test error. 
+
+0.01   Nov 6, 2014
+       First release. Basic options work. 

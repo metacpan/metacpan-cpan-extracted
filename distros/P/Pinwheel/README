@@ -1,0 +1,66 @@
+Pinwheel
+========
+
+A rails-like framework for building dynamic web applications in Perl.
+
+Support for this application is best effort and there is no commitment to maintaining this application framework.
+
+
+INSTALLATION
+------------
+
+	Pinwheel uses Module::Build to build and install the module.
+	To install this module type the following:
+	
+		perl Build.PL
+		./Build
+		./Build test
+		
+	And then as root:
+	
+		./Build install
+
+
+FRAMEWORK TESTS
+---------------
+
+  By default all the framework tests will be run against an SQLite database. 
+  If you would like to run the tests against MySQL (running on localhost):
+  
+		./Build test_mysql
+		
+  Alternatively you can set the PINWHEEL_TEST_DB, PINWHEEL_TEST_USER and PINWHEEL_TEST_PASS
+  environment variables.
+  
+  If you would like to only run the unit or functional tests:
+  
+    ./Build testunit
+    ./Build testfunc
+    
+
+AUTHORS
+-------
+
+  Paul Clifford
+  Nicholas Humfrey
+  Dave Evans
+  Yves Raimond
+  Duncan Robertson
+  Matthew Wood
+  Frank Booth
+
+
+COPYRIGHT AND LICENSE
+---------------------
+
+	Copyright (C) 2007-2010 British Broadcasting Corporation
+
+	This library is free software; you can redistribute it and/or modify it
+	under the same terms as Perl itself, either Perl version 5.005 or, at
+	your option, any later version of Perl 5 you may have available.
+
+
+DISCLAIMER
+----------
+
+  THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM ÒAS ISÓ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.

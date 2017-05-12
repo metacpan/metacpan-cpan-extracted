@@ -1,0 +1,10 @@
+Clustericious
+Crypt::PasswdMD5
+DBI
+ExtUtils::MakeMaker
+Log::Log4perl
+Mojolicious
+PlugAuth
+Role::Tiny
+Test::Clustericious::Cluster
+Test::More

@@ -1,0 +1,88 @@
+{
+   "abstract" : "Some add-on policies for Perl::Critic.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Critic-Pulp",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel",
+         "xt"
+      ],
+      "package" : [
+         "Perl::MinimumVersion"
+      ]
+   },
+   "optional_features" : {
+      "maximum_policies" : {
+         "description" : "Have the policies check as much as possible.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Perl::MinimumVersion" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::String" : "1.02",
+            "List::MoreUtils" : "0.24",
+            "List::Util" : "0",
+            "PPI" : "1.220",
+            "PPI::Document" : "0",
+            "PPI::Dumper" : "0",
+            "Perl::Critic" : "1.084",
+            "Perl::Critic::Policy" : "1.084",
+            "Perl::Critic::Utils" : "1.100",
+            "Perl::Critic::Utils::PPI" : "0",
+            "Perl::Critic::Violation" : "0",
+            "Pod::Escapes" : "0",
+            "Pod::MinimumVersion" : "50",
+            "Pod::ParseLink" : "0",
+            "Pod::Parser" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "suggests" : {
+            "Perl::MinimumVersion" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/perl-critic-pulp/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "93",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

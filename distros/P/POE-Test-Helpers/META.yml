@@ -1,0 +1,36 @@
+---
+abstract: 'Testing framework for POE'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  MooseX::POE: 0
+  POE: 0
+  POE::Kernel: 0
+  Test::Exception: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.101610'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Test-Helpers
+requires:
+  Carp: 0
+  Data::Validate: 0
+  List::AllUtils: 0
+  Moose::Role: 0
+  POE::Session: 0
+  Test::Builder::Module: 0
+  Test::Deep: 0
+  Test::Deep::NoTest: 0
+  Test::More: 0
+  indirect: 0
+  namespace::autoclean: 0
+  parent: 0
+  strictures: 1
+version: 1.11

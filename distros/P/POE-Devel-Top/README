@@ -1,0 +1,60 @@
+NAME
+
+    POE::Devel::Top - Display information about POE sessions and events
+
+
+DESCRIPTION
+
+    This module displays information about the sessions and events handled
+    by the current POE kernel, mimicking the well-known top(1) system
+    utility.
+
+    In this early version, it only prints the information on "STDOUT".
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Alternatively, to install with Module::Build, you can use the
+    following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+    After installing, you can find documentation for this module with
+    the perldoc command.
+
+        perldoc POE::Devel::Top
+
+    You can also look for information at:
+
+        RT, CPAN's request tracker
+            http://rt.cpan.org/Public/Dist/Display.html?Dist=POE-Devel-Top
+
+        AnnoCPAN, Annotated CPAN documentation
+            http://annocpan.org/dist/POE-Devel-Top
+
+        CPAN Ratings
+            http://cpanratings.perl.org/d/POE-Devel-Top
+
+        Search CPAN
+            http://search.cpan.org/dist/POE-Devel-Top
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright 2010 Sebastien Aperghis-Tramoni, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

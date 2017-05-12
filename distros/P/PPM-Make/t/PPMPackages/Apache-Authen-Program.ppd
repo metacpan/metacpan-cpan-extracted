@@ -1,0 +1,11 @@
+<SOFTPKG NAME="Apache-Authen-Program" VERSION="0,93,0,0">
+	<TITLE>Apache-Authen-Program</TITLE>
+	<ABSTRACT>mod_perl external program authentication module</ABSTRACT>
+	<AUTHOR>Mark Leighton Fisher &lt;mark-fisher@fisherscreek.com&gt;</AUTHOR>
+	<IMPLEMENTATION>
+		<DEPENDENCY NAME="mod_perl" VERSION="0,0,0,0" />
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+		<CODEBASE HREF="http://theoryx5.uwinnipeg.ca/ppms/x86/Apache-Authen-Program.tar.gz" />
+	</IMPLEMENTATION>
+</SOFTPKG>

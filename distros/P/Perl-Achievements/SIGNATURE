@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 40c9ea02aa404fa9b59c100987e36b5aec385be4 AUTHOR_PLEDGE
+SHA1 cc545ecd1e3fa01dc53c80432300f333d9c80a46 Build.PL
+SHA1 96b8a9626a218f98c9ab7ea3db3d1c9600c37bf3 Changes
+SHA1 dca45f1350694a55d494910375d4c0f5b81a70b4 INSTALL
+SHA1 33260abc93b43a44581b0b6263d7e4318f4122bb LICENSE
+SHA1 0f11fc0fdfc028d51379c7115e70c757c22c3d57 MANIFEST
+SHA1 ddcedab094c480d0920667d2353c7265153fbf51 MANIFEST.SKIP
+SHA1 7e43c42deeeb477840f0f8157714c887de4c6f15 META.json
+SHA1 a363e57bb7cbc1b838834002d0543ad3c9559a74 META.yml
+SHA1 304a9c790cf66064f6d6ae0bd81efcce1afdb935 README
+SHA1 f54f1efafb0cc4ea5499cae57cd2f27c5954f5a4 README.mkdn
+SHA1 da1b8c990d6dd7a6afffe7cfd9835249d031a122 bin/perlachievements
+SHA1 8a35b2e8becdde50fdd49dab0614cc22023fd257 dist.ini
+SHA1 8e4a394635bd4769a0aa29a6ee875a513d648dee lib/Perl/Achievements.pm
+SHA1 1e75e648504b18c87a031e8fe95c5a7670acdac8 lib/Perl/Achievements/Achievement.pm
+SHA1 18bdf7b66e08d3327f39023d5295c65324a58808 lib/Perl/Achievements/Achievement/Cryptomancer.pm
+SHA1 0c1ea1274d2a1fbe8118b712841050581b7879d8 lib/Perl/Achievements/Achievement/PerlAchiever.pm
+SHA1 0783782f51de907533ae8e4c72579d67e031e3f7 lib/Perl/Achievements/Achievement/PerlHacker.pm
+SHA1 8a7fe7816f76366c40fa6e7568e61b594568169d lib/Perl/Achievements/Achievement/SchwartzianTransform.pm
+SHA1 1da506f0fa4562596ffa24d2d94c04aa832b7eec lib/Perl/Achievements/Achievement/WeekendWarrior.pm
+SHA1 07aece2c866644dc1e0b4928241296cd81a629f3 lib/Perl/Achievements/Command.pm
+SHA1 143d260435ca7f3b6bfc51abd3feb02732cdc432 lib/Perl/Achievements/Command/init.pm
+SHA1 d4adefbaebc649c6a3c027fa2d71cd40782ebb75 lib/Perl/Achievements/Command/report.pm
+SHA1 06f60236565a63d78c56f57be8657afd2e6ab6de lib/Perl/Achievements/Command/scan.pm
+SHA1 9a988036fb6a15252d972a9ab4e6227a4a9242b3 lib/Perl/Achievements/Report/Html.pm
+SHA1 4ca46d79eee0380e9bddda2c562797400a8d202a lib/Perl/Achievements/Role/ConfigItem.pm
+SHA1 addee78947303e66518d9394ea9a4919d5c510e8 lib/Perl/Achievements/Role/Report.pm
+SHA1 21b8382d8e6c6d3e5cdd10c1e6ca575643055d2c lib/Perl/Achievements/User.pm
+SHA1 3cbe905b92fbc69d59a06031d5ce6c837b352aa2 t/00-compile.t
+SHA1 473906254ecd96009795d4b7fbc82fac48c03ecd t/000-report-versions.t
+SHA1 6dd89a19476983311320916c8465d64f4546f988 t/perlhacker.t
+SHA1 bd58dfeb57be2a557dc8dffd3634bb87e5749b9d t/schwartz.t
+SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk/OtNEACgkQ34Hwf+GwC4xjLQCbBxKUJmns+uclDjUq/5vmR4ga
+yIwAoO79s0dPIYKUd4MZBdVjYLbjoRJy
+=TGER
+-----END PGP SIGNATURE-----

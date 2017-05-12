@@ -1,0 +1,20 @@
+Changelog for POE::Component::Server::NSCA
+==========================================
+
+0.08	Fri Jun 19 09:45:58 BST 2009
+	- Updates to the Makefile.PL meta generation. 
+	- POD tidying.
+
+0.06	Tue Sep  9 13:08:42 BST 2008
+	- Issue with the SYNOPSIS code pointed out in RT #39115
+	  by Andreas Fett.
+
+0.04	Tue Apr  8 12:22:29 BST 2008
+	- Kwalitee fixes.
+	- Squashed some bugs as a result of above.
+
+0.02	Thu Jan 24 10:47:18 GMT 2008
+	- Spotted a problem with 'unregister'
+
+0.01	Thu Jan  3 14:14:50 GMT 2008
+	- Initial CPAN Release

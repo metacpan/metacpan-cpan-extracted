@@ -1,0 +1,49 @@
+=head1 HEADING 1
+
+Should be indented 4
+
+=head2 HEADING 2 A (Should be indented 4)
+
+Should be indented 8
+
+=over
+
+=item * Bullet 1
+
+=item * Bullet 2
+
+=back
+
+=head1 HEADING 1 again
+
+=head2 HEADING 2 B (Should be indented 4)
+
+Should be indented 8
+
+=head3 HEADING3 A (should be in 8)
+
+Should be in 12
+
+=head3 HEADING3 B (should be in 8)
+
+Should be in 12
+
+=head4 HEADING4 A (should be in 12)
+
+Should be in 16
+
+=over
+
+=item 1 Mega-indent
+
+=item 2 Mega-indent
+
+=back
+
+=head3 HEADING3 C (should be in 8)
+
+Should be in 12
+
+=head1 HEADING 1 A
+
+Should be indented 4

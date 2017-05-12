@@ -1,0 +1,56 @@
+=pod
+
+README for PDL::CCS
+
+=head1 ABSTRACT
+
+PDL::CCS - Sparse N-dimensional PDLs with Harwell-Boeing compressed column storage
+
+=head1 REQUIREMENTS
+
+=over 4
+
+=item * PDL E<gt>= v2.4.2
+
+Tested version(s) 2.4.2, 2.4.3, 2.4.7_001, 2.4.9_015.
+
+=item * PDL::VectorValued E<gt>= v0.07001
+
+=back
+
+=head1 DESCRIPTION
+
+PDL::CCS is a set of perl modules for representation and manipulation
+of large sparse n-dimensional numeric arrays using PDL.  It includes
+a perl class implementing a subset of the PDL API for memory-efficient
+storage and operations on large sparse arrays, as well as utilities
+for extracting Harwell-Boeing compressed column- and/or row-storage
+"pointers" from/to indexND() vector lists.
+
+=head1 BUILDING
+
+Build this module as you would any perl module, by doing something
+akin to the following:
+
+ gzip -dc distname-XX.YY.tar.gz | tar -xof -
+ cd distname-XX.YY/
+ perl Makefile.PL
+ make
+ make test                                     # optional
+ make install
+
+See L<perlmodinstall>(1) for details.
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005-2013 by Bryan Jurish.  All rights reserved.
+
+This package is free software, and entirely without warranty.
+You may redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=cut

@@ -1,0 +1,227 @@
+#!/usr/bin/perl
+
+package paf;
+use strict;
+use warnings;
+
+use Pod::Abstract;
+use Pod::Abstract::Filter;
+
+use File::Temp qw(tempfile tempdir);
+
+=head1 NAME
+
+paf - Pod Abstract Filter. Transform Pod documents from the command line.
+
+=head1 SYNOPSIS
+
+ sh$>
+  paf summary /usr/bin/paf
+  paf add_podcmds SomeModule.pm
+  paf sort -heading=METHODS Pod/Abstract/Node.pm # METHODS is default
+  paf sort summary Pod/Abstract/Node.pm
+  
+  # See Pod::Abstract::Filter::overlay
+  paf overlay sort cut clear_podcmds SomeClass.pm
+  
+  # -p will emit pod source, instead of spawning perldoc.
+  paf -p sort Pod::Abstract::Node
+  paf -p find hoist Pod::Abstract::Node
+
+=head1 DESCRIPTION
+
+Paf is a small but powerful, modular Pod filter and transformation
+tool. It allows full round-trip transformation of Pod documents using
+the Pod::Abstract library, with multiple filter chains without having
+to serialise/re-parse the document at each step.
+
+Paf comes with a small set of useful filters, but can be extended by
+simply writing new classes in the C<Pod::Abstract::Filter> namespace.
+
+=head1 FILTERS
+
+=head2 add_podcmds
+
+Add explicit =pod commands at the end of each cut section, so that all
+pod sections are started with an =pod command.
+
+=head2 clear_podcmds
+
+Remove all =pod commands that are not ending cut blocks. This will
+clean up documents that have been reduced using the C<cut> filter too.
+
+=head2 cut
+
+Remove all cut nodes, so that only the pod remains.
+
+=head2 overlay
+
+ paf overlay Source.pm
+
+For overlay to work, there must be a C<begin :overlay/end :overlay>
+section in the Source file, with C<=overlay SECTION Module>
+definitions inside. The net effect is that any missing subheadings in
+SECTION are added from the same section in the specified Modules.
+
+Note that this will overlay the whole subheading, INCLUDING CUT NODES,
+so it can add code to the source document. Use C<cut> if you don't
+want this.
+
+Each overlaid section will include a C<=for overlay from> marker, so
+that it can be replaced by a subsequent overlay from the same
+file/module. These sections will be replaced in-place, so ordering of
+sections once first overlaid will be preserved.
+
+=head2 unoverlay
+
+ paf unoverlay Source.pm
+
+Strips B<all> sections marked as overlaid and matching the overlay
+spec from the source.
+
+=head2 sort
+
+ paf sort [-heading=METHODS] Source.pm
+
+Sort all of the subheadings in the named heading (METHODS if not
+provided).
+
+This will move cut nodes around with their headings, so your code will
+mutate. Use C<cut> if you only want pod in the output.
+
+Alternatively, you can also cause sorting of headings to occur by
+including C<=for sorting> at the start of your section (before the
+first subheading).
+
+=head2 summary
+
+Provide an abbreviated summary of the document. If there is a verbatim
+node in the body of a heading containing the heading name, it will be
+considered an example and expanded as part of the summary.
+
+=head2 find
+
+ paf find [-f=]name Source.pm
+
+Find specific sub-sections or list items mentioning name. Used to
+restrict a larger document down to a smaller set that you're
+interested in. If no -f is specified, then the word following find
+will be the search term.
+
+=head2 uncut
+
+ paf uncut Source.pm
+
+Convert cut nodes in the source into verbatim text. Not the inverse of cut!
+
+=head2 number_sections
+
+ paf number_sections Source.pm
+
+Applies simple multipart (3.1.2) section numbering to head1 through
+head4 headings.
+
+Note that number_sections will currently stuff up some of the
+cleverness in things like summary, as the section names won't match
+function names any more.
+
+=cut
+
+sub main {
+    my $filter = undef;
+    my %filter_flags = ( );
+    my %flags = ( );
+
+    my @filters = ( );
+    my @require_params = ( );
+
+    for( my $i = 0; $i < $#ARGV; $i ++ ) { # leave the last argument
+        my $arg = $ARGV[$i];
+        if($arg =~ m/^-([^=]+)(=(.*))?$/) {
+            if($filter) {
+                if(defined $3) {
+                    $filter_flags{$1} = $3;
+                } else {
+                    $filter_flags{$1} = 1;
+                }
+                @require_params = grep { $_ ne $1 } @require_params;
+            } else {
+                if(defined $3) {
+                    $flags{$1} = $3;
+                } else {
+                    $flags{$1} = 1;
+                }
+            }
+        } elsif( @require_params ) {
+            # Allow positional params if they're asked for.
+            my $p_name = shift @require_params;
+            $filter_flags{$p_name} = $arg;
+        } else {
+            my $full_class = "Pod::Abstract::Filter::$arg";
+            eval "use $full_class;";
+            die "$arg: $@" if $@;
+            if($filter) {
+                push @filters, $filter->new(%filter_flags);
+                %filter_flags = ( );
+            }
+            $filter = $full_class;
+            @require_params = $filter->require_params;
+        }   
+    }
+    
+    # Push on the last filter
+    if($filter) {
+        push @filters, $filter->new(%filter_flags);
+        %filter_flags = ( );
+    }
+    
+    my $filename = $ARGV[$#ARGV];
+    die "No filename or filters provided\nTry 'perldoc paf'\n" unless $filename;
+    
+    my $next = undef;
+    if($filename eq '--') {
+        $next = Pod::Abstract->load_filehandle(\*STDIN);
+    } else {
+        unless(-r $filename) {
+            # Maybe a module name?
+            $filename =~ s/::/\//g;
+            $filename .= '.pm' unless $filename =~ m/.pm$/;
+            foreach my $path (@INC) {
+                if(-r "$path/$filename") {
+                    $filename = "$path/$filename";
+                    last;
+                }
+            }
+        }
+        $next = Pod::Abstract->load_file($filename);
+    }
+    foreach my $filter (@filters) {
+        $next = $filter->filter($next);
+    }
+    
+    my $out = \*STDOUT;
+    my $tmpfilename = undef;
+
+    if(!($flags{p} || $flags{d})) {
+        ($out, $tmpfilename) = tempfile;
+    }
+
+    if(eval { $next->isa( 'Pod::Abstract::Node' ) }) {
+        if($flags{d}) {
+            print $out $next->ptree;
+        } else {
+            print $out $next->pod;
+        }
+    } else {
+        print $out $next;
+    }
+    
+    if(!($flags{p} || $flags{d})) {
+        system('perldoc', $tmpfilename);
+        unlink $tmpfilename;
+    }
+}
+
+main();
+
+1;

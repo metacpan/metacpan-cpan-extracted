@@ -1,0 +1,50 @@
+POE::Filter::Zlib
+=================
+
+2.02	Fri May 29 12:10:47 BST 2009
+	- Makefile.PL meta fixes.
+
+2.01	Thu Jun 12 15:30:40 BST 2008
+	- Patch from Martijn van Beers [RT #36655]
+	- Patch from Martijn van Beers [RT #36657]
+
+2.00	Tue Jun 10 11:48:33 BST 2008
+	- Applied patches from Martijn van Beers
+	- Updated license and authorship to include Martijn.
+
+1.96	Tue May 20 11:48:33 BST 2008
+	- removed kwalitee test
+	- added license information
+	- Applied patch from Hinrik Örn Sigurðsson [RT #36037]
+
+1.94	Fri Mar  7 07:42:45 GMT 2008
+	- Kwalitee fixes.
+
+1.93	Thu Jan  3 17:48:40 GMT 2008
+	- Added clone() method and update tests
+
+1.92	Thu Nov  1 12:20:22 GMT 2007
+	- Update Module::Install to 0.68
+
+1.91	Sat Jul 28 12:54:07 BST 2007
+	- Fixes to abstract_from and build_requires in Makefile.PL
+
+1.90	Mon Feb 19 12:01:47 GMT 2007
+	- Makefile.PL fully Module::Install-ified.
+	- Added kwalitee test.
+
+1.8	Tue Nov 21 17:44:04 GMT 2006
+	- Fixed a bug exposed by new Compress::Zlib and Level parameter.
+
+1.7	Tue Sep 26 11:51:46 BST 2006
+	- Switched to Module::Install
+
+1.6	Sun Sep 10 09:14:56 BST 2006
+	- Makefile.PL was executable. Fixed.
+	- Added 'use strict'.
+
+1.5	Fri Sep 01 15:01:19 BST 2006
+	- Added 'use strict' to all modules.
+	- Added Changes file.
+	- Added pod and pod coverage tests.
+	- Fixed documentation.

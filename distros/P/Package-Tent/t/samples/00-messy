@@ -1,0 +1,9 @@
+	use Package::Tent sub {
+      package Mess::1;
+      use constant thing => 7;
+	  1;
+	};
+
+	use Package::Tent sub {
+	  package Mess2; use constant thing => 7; 1; };
+

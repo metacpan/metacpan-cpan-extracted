@@ -1,0 +1,14 @@
+# This file was generated with Dist::Zilla::Plugin::Manifest::Write v0.9.7.
+Build.PL                                       #                       3rd party file built by ModuleBuildTiny
+COPYING                                        # Perl-PrereqScanner-Scanner-Hint file built by GenerateFile
+Changes                                        # Perl-PrereqScanner-Scanner-Hint file added by Manifest::Read
+GPLv3                                          # Perl-PrereqScanner-Scanner-Hint file added by Manifest::Read
+MANIFEST                                       #                        metainfo file built by Manifest::Write
+META.json                                      #                        metainfo file built by MetaJSON
+META.yml                                       #                        metainfo file built by MetaYAML
+README                                         # Perl-PrereqScanner-Scanner-Hint file built by GenerateFile
+VERSION                                        # Perl-PrereqScanner-Scanner-Hint file added by Manifest::Read
+lib/Perl/PrereqScanner/Scanner/Hint.pm         # Perl-PrereqScanner-Scanner-Hint file added by Manifest::Read
+lib/Perl/PrereqScanner/Scanner/Hint/Manual.pod # Perl-PrereqScanner-Scanner-Hint file added by Manifest::Read
+t/00-compile.t                                 #                       3rd party file built by Test::Compile
+t/scanner-hint.t                               # Perl-PrereqScanner-Scanner-Hint file added by Manifest::Read

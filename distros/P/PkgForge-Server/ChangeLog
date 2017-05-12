@@ -1,0 +1,917 @@
+2012-07-03  SVN: new release
+
+	* Release: 1.1.10
+
+2012-07-03 14:26  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, META.yml.in, PkgForge-Server.spec, lcfg.yml,
+	  lib/PkgForge/Handler.pm.in: Reverted most of the previous change.
+	  Took a different approach and patched MooseX::App::Cmd instead
+
+2012-07-03 13:17  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.1.9
+
+2012-07-03 13:17  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, META.yml.in, PkgForge-Server.spec,
+	  lib/PkgForge/Handler.pm.in: Reworked the way we handle the
+	  default configfile attribute for an application to work with
+	  MooseX::App::Cmd >= 0.09. Also bumped the minimum required
+	  version of the core PkgForge module
+
+2011-08-05 08:51  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Reporter/Email.pm.in: minor tweak to
+	  the default email report template
+
+2011-07-18 15:15  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.1.8
+
+2011-07-18 15:14  squinney@INF.ED.AC.UK
+
+	* conf/log-default.cfg,
+	  lib/PkgForge/BuildCommand/Reporter/Email.pm.in: Only display the
+	  package basename not the full path
+
+2011-07-18 14:32  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.1.7
+
+2011-07-18 14:28  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Reporter/Email.pm.in: Further tweaks to
+	  the email template
+
+2011-07-18 14:09  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Reporter/Email.pm.in: Added list of
+	  success/fail packages to the email report
+
+2011-06-30 04:46  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Incoming.pm.in: Made load_queue more robust
+
+2011-06-01 13:07  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.1.6
+
+2011-06-01 13:07  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/App/Buildd2.pm.in, lib/PkgForge/Daemon/Buildd.pm.in,
+	  lib/PkgForge/Daemon/Buildd2.pm.in, sbin/pkgforge-buildd.in:
+	  Removed the rest of the Buildd2 stuff which is now in the main
+	  modules
+
+2011-06-01 12:39  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.1.5
+
+2011-06-01 12:38  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, t/00_load.t: Buildd2 is now considered stable so it
+	  replaces Buildd
+
+2011-06-01 12:36  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd.pm.in,
+	  lib/PkgForge/Handler/Buildd2.pm.in: Switched new Buildd to being
+	  the default (and only) version
+
+2011-05-09 08:21  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.1.4
+
+2011-05-09 08:20  squinney@INF.ED.AC.UK
+
+	* doc/admin/builder.html, doc/admin/incoming.html,
+	  doc/admin/mock.html: docs updates
+
+2011-05-04 11:54  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.1.3
+
+2011-05-04 11:54  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, lcfg.yml: Fixed the inclusion of admin docs
+
+2011-05-04 11:25  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.1.2
+
+2011-05-04 11:25  squinney@INF.ED.AC.UK
+
+	* PkgForge-Server.spec: Added build-dependency on RPM2 perl module
+
+2011-05-04 10:28  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.1.1
+
+2011-05-04 10:27  squinney@INF.ED.AC.UK
+
+	* Build.PL.in: Added various missing deps
+
+2011-05-04 10:27  squinney@INF.ED.AC.UK
+
+	* doc/admin, doc/admin/filesystem.html, doc/admin/incoming.html:
+	  Added docs on how to configure the filesystem and how to configue
+	  the incoming queue processor
+
+2011-04-25 13:34  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Reporter/Email.pm.in: tweaked the email
+	  report subject to be more useful
+
+2011-04-22 14:44  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.1.0
+
+2011-04-22 14:44  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildInfo.pm.in: Added methods to make it easier to
+	  find out how many packages were attempted/succeeded/failed
+
+2011-04-22 14:43  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Incoming.pm.in: More thorough testing of the
+	  writability of the accepted jobs directory. Altered load_queue to
+	  handle the filesystem disappearing for short periods of time
+
+2011-04-22 12:16  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.0.4
+
+2011-04-22 12:16  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Builder/RPM.pm.in: Fixed the logic
+	  which decides when it is necessary to rebuild SRPMs to handle the
+	  rpmlib API change
+
+2011-04-22 11:53  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.0.3
+
+2011-04-22 11:52  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Submitter/PkgSubmit.pm.in: Do not bomb
+	  out if pkgsubmit fails for normal reasons, just log it and return
+	  zero
+
+2011-04-22 11:50  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Check/RPMLint.pm.in: Fixed logging of
+	  error message if rpmlint has failed
+
+2011-04-22 11:25  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.0.2
+
+2011-04-22 11:25  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Check/RPMLint.pm.in: Fixed the handling
+	  of the exit code for rpmlint
+
+2011-04-22 10:57  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.0.1
+
+2011-04-22 10:57  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: Handle build errors correctly
+
+2011-04-22 09:44  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 1.0.0
+
+2011-04-22 09:43  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand.pm.in: Merged the handling of the build
+	  command module names and standardised the stringification
+
+2011-04-22 09:43  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: Added support for digitally
+	  signing packages
+
+2011-04-22 09:42  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Daemon/Buildd2.pm.in: Improved logging of which task
+	  is being started and finished
+
+2011-04-22 09:41  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Builder.pm.in,
+	  lib/PkgForge/BuildCommand/Check.pm.in,
+	  lib/PkgForge/BuildCommand/Reporter/Email.pm.in,
+	  lib/PkgForge/BuildCommand/Signer,
+	  lib/PkgForge/BuildCommand/Submitter.pm.in: Merged the handling of
+	  the build command module names and standardised the
+	  stringification
+
+2011-04-22 08:17  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/PkgForge/App/Buildd2.pm.in,
+	  lib/PkgForge/BuildCommand/Signer.pm.in,
+	  lib/PkgForge/Daemon/Buildd2.pm.in, sbin/pkgforge-buildd.in,
+	  t/00_load.t: Added a build command role for the digital-signing
+	  phase
+
+2011-04-22 08:16  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Builder/RPM.pm.in: Do not block the submission of
+	  SRPMs
+
+2011-04-22 07:08  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: Ensure temporary directory
+	  permissions are always correct on startup
+
+2011-04-22 06:56  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: Added missing 'use' of
+	  File::Temp module
+
+2011-04-22 06:48  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: added missing semi-colon
+
+2011-04-22 06:47  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: Improved test for results
+	  directory writability
+
+2011-04-22 05:30  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: Fixed more typos
+
+2011-04-22 05:29  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: Fixed various small bugs
+
+2011-04-22 05:16  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: Added start of docs
+
+2011-04-22 05:15  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd.pm.in: Docs tweak
+
+2011-04-22 05:10  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: Added in the new build method
+	  and all the DB handling code which is the same as in the previous
+	  generation build daemon
+
+2011-04-22 05:07  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Check/RPMLint.pm.in: Do not enforce
+	  errors from rpmlint for now
+
+2011-04-05 19:31  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: fixed role name for reporter
+	  list
+
+2011-04-05 19:28  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: fixed checks and reports
+	  builder methods
+
+2011-04-05 19:18  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: fixed variable names
+
+2011-04-05 19:16  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: fixed typo
+
+2011-04-05 19:07  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd2.pm.in: Added build methods for the
+	  rest of the commands
+
+2011-04-05 19:05  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Submitter.pm.in: tidied
+
+2011-04-05 16:02  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/PkgForge/Handler/Buildd2.pm.in: made a start on the
+	  new build daemon
+
+2011-04-05 16:01  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler.pm.in: Add MooseX::Getopt role for now
+
+2011-04-05 11:02  squinney@INF.ED.AC.UK
+
+	* t/00_load.t: test tweaks
+
+2011-04-05 11:02  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Check.pm.in: oops, stringify method was
+	  after the END
+
+2011-04-05 10:42  squinney@INF.ED.AC.UK
+
+	* PkgForge-Server.spec, lcfg.yml, lib/PkgForge/Builder.pm.in,
+	  lib/PkgForge/Handler.pm.in, lib/PkgForge/Handler/Buildd.pm.in,
+	  lib/PkgForge/Handler/Incoming.pm.in: Added new pkgforge temporary
+	  directory. Should be more secure and avoid potential clashes
+	  between build daemons
+
+2011-04-05 10:35  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Builder/RPM.pm.in: Set svn:keywords
+
+2011-04-05 10:35  squinney@INF.ED.AC.UK
+
+	* t/01_builder.t: Switched to new Builder module
+
+2011-04-05 10:33  squinney@INF.ED.AC.UK
+
+	* t/00_load.t: Module load tests added for new build command
+	  modules
+
+2011-04-05 10:32  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildInfo.pm.in: More work on the new BuildInfo
+	  class
+
+2011-04-05 10:09  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildLog.pm.in: Added new module to provide an
+	  object which can handle the per-job logging
+
+2011-04-05 10:09  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Builder.pm.in,
+	  lib/PkgForge/BuildCommand/Builder/RPM.pm.in: Added new builder
+	  build command modules
+
+2011-04-05 10:05  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Builder.pm.in: Set svn:keywords
+
+2011-04-05 10:04  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Builder: Added builder command tree
+
+2011-04-05 10:03  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildTopic.pm.in: Added close_on_write option for
+	  logging. Set svn:keywords
+
+2011-04-05 10:02  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Check,
+	  lib/PkgForge/BuildCommand/Check.pm.in,
+	  lib/PkgForge/BuildCommand/Check/RPMLint.pm.in,
+	  lib/PkgForge/Check, lib/PkgForge/Check.pm.in: Moved check modules
+	  to new build command tree
+
+2011-04-05 09:59  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Check, lib/PkgForge/Check.pm.in,
+	  lib/PkgForge/Check/RPMLint.pm.in: Added check modules
+
+2011-04-05 09:58  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Reporter,
+	  lib/PkgForge/BuildCommand/Reporter.pm.in,
+	  lib/PkgForge/BuildCommand/Reporter/Email.pm.in,
+	  lib/PkgForge/Reporter, lib/PkgForge/Reporter.pm.in: moved
+	  reporter modules to new build command tree
+
+2011-04-05 09:56  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Reporter, lib/PkgForge/Reporter.pm.in,
+	  lib/PkgForge/Reporter/Email.pm.in: added report modules
+
+2011-04-05 09:53  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand/Submitter,
+	  lib/PkgForge/BuildCommand/Submitter.pm.in,
+	  lib/PkgForge/BuildCommand/Submitter/PkgSubmit.pm.in,
+	  lib/PkgForge/Submitter, lib/PkgForge/Submitter.pm.in: Moved
+	  submitter modules to new tree
+
+2011-04-05 09:45  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Submitter, lib/PkgForge/Submitter.pm.in,
+	  lib/PkgForge/Submitter/PkgSubmit.pm.in: Added package submission
+	  command
+
+2011-04-05 09:44  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand.pm.in: set svn:keywords
+
+2011-04-05 09:43  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand.pm.in: Added base role for build
+	  commands
+
+2011-04-05 09:36  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildCommand: Added directory for build command
+	  modules
+
+2011-04-04 07:36  squinney@INF.ED.AC.UK
+
+	* doc/incoming.html, lib/PkgForge/BuildInfo.pm.in: Added new
+	  BuildInfo class for managing information related to building a
+	  job
+
+2011-03-31 16:47  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.12.6
+
+2011-03-31 16:44  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Builder/RPM.pm.in: Filter out any SRPMs, we already
+	  have them stored elsewhere as part of the originally submitted
+	  job
+
+2011-02-28 20:13  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Incoming.pm.in: pass thru error message for
+	  logging
+
+2011-02-28 19:52  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.12.5
+
+2011-02-28 19:51  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Daemon.pm.in: progname needed to be lazy
+
+2011-02-18 16:22  squinney@INF.ED.AC.UK
+
+	* PkgForge-Server.spec: Set a new minimum required version of
+	  PkgForge
+
+2011-02-18 16:08  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.12.4
+
+2011-02-18 16:07  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/PkgForge/BuildTopic.pm.in: fixed missing import of
+	  SourcePackageList Moose type
+
+2011-02-18 13:54  squinney@INF.ED.AC.UK
+
+	* doc/incoming.html: added some internal links
+
+2011-02-18 13:43  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.12.3
+
+2011-02-18 12:53  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Builder/RPM.pm.in: The temp directory should be
+	  removed when the object goes out of scope, not when the program
+	  exits
+
+2011-02-18 12:45  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Builder/RPM.pm.in: The path was being put onto the
+	  failure/retry list instead of the source package object, this
+	  prevented the builder from retrying sources later
+
+2011-02-18 10:43  squinney@INF.ED.AC.UK
+
+	* doc/incoming.html: Added description of incoming queue processing
+
+2011-02-01 13:43  squinney@INF.ED.AC.UK
+
+	* conf/log-buildd.cfg, conf/log-incoming.cfg: set the
+	  close_on_write option to true so that logrotate 'just works'
+
+2011-01-28 09:59  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.12.2
+
+2011-01-28 09:58  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/PkgForge/Handler/Buildd.pm.in: Actually send a
+	  report when the job is finished
+
+2011-01-27 14:48  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.12.1
+
+2011-01-27 14:48  squinney@INF.ED.AC.UK
+
+	* PkgForge-Server.spec: Added missing build-requires
+
+2011-01-27 14:04  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.12.0
+
+2011-01-27 14:03  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/PkgForge/Handler/Buildd.pm.in, templates: added
+	  support for sending reports by email
+
+2011-01-27 14:02  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Incoming.pm.in: added another error message
+	  to make it more obvious what is happening
+
+2011-01-27 13:57  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Builder/RPM.pm.in: overload double-quote context so
+	  that the builder object stringifies to the name
+
+2011-01-27 13:56  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Builder.pm.in: Added a stringify method which
+	  returns the builder name, note that the overload has to be done
+	  in the individual classes which implement this role
+
+2011-01-27 13:55  squinney@INF.ED.AC.UK
+
+	* PkgForge-Server.spec: updated requires and buildrequires lists
+
+2011-01-19 14:24  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.11.0
+
+2011-01-19 14:23  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/PkgForge/BuildTopic.pm.in,
+	  lib/PkgForge/Builder.pm.in, lib/PkgForge/Handler/Buildd.pm.in,
+	  t/01_builder.t: Restructured how the per-task logs are written
+	  and stored.
+
+2011-01-19 12:13  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Builder/RPM.pm.in: More logging improvements
+
+2011-01-19 09:22  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.10.5
+
+2011-01-19 05:42  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-buildd, init/pkgforge-incoming, lcfg.yml: Reworked
+	  how pagsh is used for starting daemons
+
+2011-01-19 05:41  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd.pm.in: Return true if tests are
+	  passed
+
+2011-01-19 05:41  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Incoming.pm.in: Added a preflight test for
+	  writability of the accepted jobs directory
+
+2011-01-19 05:38  squinney@INF.ED.AC.UK
+
+	* conf/log-buildd.cfg: added logging configuration for build
+	  daemons
+
+2011-01-18 14:26  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.10.4
+
+2011-01-18 14:10  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, PkgForge-Server.spec: We need a version of
+	  File::Temp which is better than 0.16, only tested 0.22 so make
+	  that the minimum required version
+
+2011-01-18 12:33  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.10.3
+
+2011-01-18 12:33  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/PkgForge/Builder/RPM.pm.in: improved error
+	  reporting
+
+2011-01-18 12:32  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd.pm.in: use File::Temp to ensure we
+	  can write into the results directory
+
+2011-01-18 12:32  squinney@INF.ED.AC.UK
+
+	* sbin/createrepo_hack: needed to quote the createrepo file glob to
+	  avoid the possibility of the shell expansion
+
+2011-01-18 10:03  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Builder/RPM.pm.in: Added support for building source
+	  packages created with recent rpmlib versions on older platforms
+
+2011-01-18 09:34  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildTopic.pm.in: Made the sources attribute rw so
+	  the list can be replaced when necessary
+
+2011-01-18 09:33  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd.pm.in: Support a timeout option which
+	  can be passed on to the package builder object
+
+2011-01-17 19:11  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.10.2
+
+2011-01-17 19:11  squinney@INF.ED.AC.UK
+
+	* Build.PL.in: added missing comma
+
+2011-01-17 19:09  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.10.1
+
+2011-01-17 19:07  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-incoming: kill k5start if the daemon fails to start
+
+2011-01-17 19:07  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-buildd: Run k5start inside pagsh
+
+2011-01-17 19:01  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-incoming: Run k5start within pagsh to get AFS
+	  access working correctly
+
+2011-01-17 14:21  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, PkgForge-Server.spec: The code requires at least
+	  version 2.21 for Log::Dispatch
+
+2011-01-17 12:53  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.10.0
+
+2011-01-17 10:19  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-buildd, init/pkgforge-incoming: explicitly set
+	  KRB5CCNAME after running k5start
+
+2011-01-17 10:11  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-buildd: Reworked init script for build daemons to
+	  use standard functions
+
+2011-01-17 10:11  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-incoming: removed some stuff which is now
+	  unnecessary
+
+2011-01-17 09:59  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-incoming: Added stop message for k5start
+
+2011-01-17 09:55  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-incoming: Reworked the incoming daemon init script
+	  to use the common functions
+
+2011-01-14 15:16  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.9.2
+
+2011-01-14 15:16  squinney@INF.ED.AC.UK
+
+	* sbin/createrepo_hack: added hacky workaround script for
+	  createrepo leaving files not group-writable
+
+2011-01-14 13:57  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.9.1
+
+2011-01-14 13:57  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Builder/RPM.pm.in: return false when the build fails
+
+2011-01-14 13:50  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.9.0
+
+2011-01-14 11:59  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Daemon.pm.in, lib/PkgForge/Daemon/Buildd.pm.in: Made
+	  the daemon status message overridable and do so for the build
+	  daemons so that the name gets embedded
+
+2011-01-14 11:49  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-buildd, init/pkgforge-incoming: Reworked the
+	  checking of the start methods
+
+2011-01-14 11:36  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-buildd: Set as executable
+
+2011-01-14 11:33  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-buildd: Added basic support for managing all build
+	  daemons on a host
+
+2011-01-14 11:20  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-buildd: Added init script for build daemons
+
+2011-01-14 11:20  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Daemon/Buildd.pm.in: Set the default pid file name
+	  differently based on the name of the build daemon
+
+2011-01-14 11:12  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-incoming: Improved output. Fixed runuser/su call by
+	  using a better env variable name
+
+2011-01-14 10:18  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-incoming: fixed shell
+
+2011-01-14 10:18  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Daemon.pm.in: Fixed status method
+
+2011-01-14 10:09  squinney@INF.ED.AC.UK
+
+	* init/pkgforge-incoming, sbin/pkgforge-buildd.in,
+	  sbin/pkgforge-incoming.in: mark scripts as executable
+
+2011-01-14 10:08  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, lcfg.yml: fixed copy/paste error
+
+2011-01-14 10:01  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, PkgForge-Server.spec, init, init/pkgforge-incoming:
+	  Added a basic init script for the pkgforge incoming queue
+	  processor
+
+2011-01-12 17:25  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Daemon.pm.in, lib/PkgForge/Handler/Initialise.pm.in,
+	  lib/PkgForge/Queue.pm.in: A few little code improvements based on
+	  feedback from perlcritic
+
+2011-01-12 17:10  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildTopic.pm.in: Added missing 'use'
+
+2011-01-12 17:03  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Server.pm.in: Added top-level Server package just as
+	  a documentation holder
+
+2011-01-12 16:39  squinney@INF.ED.AC.UK
+
+	* PkgForge-Server.spec: never replace pkgforge config files
+
+2011-01-12 16:39  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Builder/RPM.pm.in: Use the new BuildTopic methods
+	  for storing logs and generated packages
+
+2011-01-12 16:38  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Builder.pm.in: Pass through the debug attribute
+	  value to the build topic
+
+2011-01-12 16:38  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildTopic.pm.in: Added full API docs. Added methods
+	  for storing log files and generated packages
+
+2011-01-12 16:15  squinney@INF.ED.AC.UK
+
+	* lcfg.yml, lib/PkgForge/Builder/RPM.pm.in: Switched to using the
+	  new BuildTopic
+
+2011-01-12 16:15  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Builder.pm.in: Now using the new BuildTopic object.
+	  Created a generic build() method which calls a run() method in
+	  the specific class
+
+2011-01-12 16:13  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/BuildTopic.pm.in: Added a simple class to hold all
+	  the info on the current build task
+
+2011-01-11 15:18  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Buildd.pm.in: Removed the configfile
+	  attribute overrides, this all now works fine from the
+	  parent-class. Slightly modified the call to the build method for
+	  the builder class. Also now pass in the setting of the debug
+	  parameter.
+
+2011-01-11 15:17  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler/Incoming.pm.in: removed the configfile
+	  attribute overrides, this all now works fine from the
+	  parent-class
+
+2011-01-11 15:17  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Daemon.pm.in: Moved the setting of the umask and
+	  working directory outside of the daemonize routine so that they
+	  are done earlier. Removed the unused 'user' attribute.
+
+2011-01-11 15:15  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/Handler.pm.in, t/02_incoming.t: Modified the list of
+	  standard configuration files for handlers
+
+2011-01-11 15:15  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, PkgForge-Server.spec: Updated list of requirements
+
+2010-12-17 09:44  squinney@INF.ED.AC.UK
+
+	* t/01_builder.t, t/01_daemon.t, t/01_pidfile.t, t/01_queue.t,
+	  t/02_incoming.t: Added the tests which were previously in the
+	  PkgForge project directory
+
+2010-12-17 09:40  squinney@INF.ED.AC.UK
+
+	* t/00_load.t: Added basic module tests
+
+2010-12-17 09:31  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.8.10
+
+2010-12-17 09:30  squinney@INF.ED.AC.UK
+
+	* MANIFEST, MANIFEST.SKIP, META.yml.in: Added standard
+	  Module::Build metadata files
+
+2010-12-17 09:24  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.8.9
+
+2010-12-17 09:23  squinney@INF.ED.AC.UK
+
+	* PkgForge-Server.spec, lcfg.yml: Added mock_config_query script
+	  and some pkgforge directories
+
+2010-12-17 09:22  squinney@INF.ED.AC.UK
+
+	* bin, bin/mock_config_query: Added the mock_config_query script
+	  for the RPM builder
+
+2010-12-17 09:19  squinney@INF.ED.AC.UK
+
+	* doc/index.html: Added the first documentation html page
+
+2010-12-17 09:18  squinney@INF.ED.AC.UK
+
+	* README: added the missing README file
+
+2010-12-17 09:18  squinney@INF.ED.AC.UK
+
+	* ChangeLog, lcfg.yml: PkgForge-Server release: 0.8.8
+
+2010-12-17 09:17  squinney@INF.ED.AC.UK
+
+	* doc, lcfg.yml, t: First import of all server related modules
+
+2010-12-17 09:17  squinney@INF.ED.AC.UK
+
+	* Build.PL.in, PkgForge-Server.spec: Added deps
+
+2010-12-17 09:11  squinney@INF.ED.AC.UK
+
+	* ChangeLog: added empty changelog to make reltool happy
+
+2010-12-17 09:10  squinney@INF.ED.AC.UK
+
+	* lib/PkgForge/App, lib/PkgForge/App/Buildd.pm.in,
+	  lib/PkgForge/App/Incoming.pm.in,
+	  lib/PkgForge/App/InitServer.pm.in: Moved server related apps
+
+2010-12-17 09:08  squinney@INF.ED.AC.UK
+
+	* sbin, sbin/pkgforge-buildd.in, sbin/pkgforge-incoming.in: Moved
+	  pkgforge daemons
+
+2010-12-17 09:08  squinney@INF.ED.AC.UK
+
+	* conf, conf/log-default.cfg, conf/log-incoming.cfg: Moved logging
+	  config files
+
+2010-12-17 09:00  squinney@INF.ED.AC.UK
+
+	* ., lib, lib/PkgForge, lib/PkgForge/Builder,
+	  lib/PkgForge/Builder.pm.in, lib/PkgForge/Daemon,
+	  lib/PkgForge/Daemon.pm.in, lib/PkgForge/Handler,
+	  lib/PkgForge/Handler.pm.in, lib/PkgForge/PidFile.pm.in,
+	  lib/PkgForge/Queue, lib/PkgForge/Queue.pm.in: Moved all the
+	  server related modules into a separate project directory
+

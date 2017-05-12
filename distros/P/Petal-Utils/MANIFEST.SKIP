@@ -1,0 +1,12 @@
+^_build
+^Build$
+^blib
+~$
+\.cvsignore
+\.bak$
+CVS
+^\.DS_Store$
+^Petal-Utils.+\.tar\.gz$
+RELEASE.TASKS
+^Makefile$
+.*\.swp

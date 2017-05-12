@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity name="emp" alias="e">
+    <primary_key>empno</primary_key>
+    <columns>
+        <column name="empno" />
+        <column name="ename" unique="1" />
+        <column name="sal" />
+        <column name="job" />
+        <column name="deptno" />
+    </columns>
+    <subquery_columns>
+        <subquery_column name="dname" entity="dept" />
+    </subquery_columns>
+</entity>

@@ -1,0 +1,13 @@
+[% INCLUDE common/header.tt
+           title = "Index of all pages"
+%]
+
+<h2>[% pages.size %] pages found:</h2>
+
+<p>
+[% FOREACH page = pages %]
+<a href="[% baseUrl %]?[% page.id %]">[% page.pageName %]</a><br />
+[% END %]
+</p>
+
+[% INCLUDE common/footer.tt %]

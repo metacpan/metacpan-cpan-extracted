@@ -1,0 +1,221 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Panotools::Makefile;
+use Panotools::Script;
+
+my $path_output;
+my $path_mk;
+my $ignoregroups;
+my $factor = 1.25;
+my $help = 0;
+
+GetOptions ('o|output=s' => \$path_output,
+            'm|makefile=s' => \$path_mk,
+            'ignoregroups' => \$ignoregroups,
+            'f|factor=s' => \$factor,
+            'h|help' => \$help);
+
+pod2usage (-verbose => 2) if $help;
+pod2usage (2) unless (defined $path_output and scalar @ARGV);
+
+my $path_prefix = $path_output;
+$path_prefix =~ s/\.[[:alnum:]]+$//;
+
+my $path_input = shift @ARGV;
+
+my $mk = new Panotools::Makefile;
+$mk->Comment ('Command-line tools');
+$mk->Variable ('PTOMERGE', 'ptomerge');
+$mk->Variable ('PTOSPLIT', 'ptosplit');
+$mk->Variable ('AUTOPANO', 'autopano');
+$mk->Variable ('GENKEYS', 'generatekeys');
+$mk->Variable ('CELESTE', '-', 'celeste_standalone');
+$mk->Variable ('CPCLEAN', 'cpclean');
+$mk->Variable ('RM', '-', 'rm');
+
+$mk->Comment ('Input project file and prefix for output');
+$mk->Variable ('PROJECT_FILE', $path_input);
+$mk->Variable ('PREFIX', $path_prefix);
+$mk->Variable ('PTO_OUT', $path_output);
+
+my $rule = $mk->Rule ('all');
+$rule->Prerequisites ('$(PTO_OUT)');
+
+$mk->Comment ("Files we don't need afterwards");
+my $var_tempfiles = $mk->Variable ('TEMP_FILES');
+
+$rule = $mk->Rule ('clean');
+$rule->Command ('$(RM_SHELL)', '$(TEMP_FILES_SHELL)');
+
+$rule = $mk->Rule ('.PHONY');
+$rule->Prerequisites ('all', 'clean');
+
+my $pto = new Panotools::Script;
+$pto->Read ($path_input);
+
+my $pix_max = $pto->Option->{cpgenSize} || 1600;
+my $points = $pto->Option->{cpgenNumber} || 25;
+my $ransac = 1;
+$ransac = 0 if (defined $pto->Option->{cpgenRansac} and $pto->Option->{cpgenRansac} eq 'false');
+my @refine = ();
+@refine = ('--refine', '--keep-unrefinable', 0)
+    if (defined $pto->Option->{cpgenRefine} and $pto->Option->{cpgenRefine} eq 'true');
+
+$ransac = 0 if $pto->Image->[0]->v ($pto) > 60;
+
+$mk->Comment ('Rule to create feature-point files when required');
+$rule = $mk->Rule ('%.key');
+$rule->Prerequisites ('%');
+$rule->Command ('$(GENKEYS_SHELL)', '$<', '$@', $pix_max);
+
+my $var_links = $mk->Variable ('LINK_PTOS');
+
+my $keys = {};
+
+# a group of all photos
+my $groups = [[0 .. scalar (@{$pto->Image}) -1]];
+$groups = $pto->ConnectedGroups unless $ignoregroups;
+
+$mk->Comment ('Rules to match points between nearby photos');
+for my $id_image_a (1 .. scalar @{$pto->Image} -1)
+{
+    for my $id_image_b (0 .. $id_image_a -1)
+    {
+        next if $pto->Connections ($id_image_a, $id_image_b);
+
+        my $samegroup = 0;
+        for my $group (@{$groups})
+        {
+            $samegroup = 1 if (grep (/^$id_image_a$/, @{$group})
+                                 and grep (/^$id_image_b$/, @{$group}));
+        }
+        next unless $samegroup;
+
+        # 'average' field of view of this pair of photos
+        my $image_a = $pto->Image->[$id_image_a];
+        my $fov_a = $image_a->v ($pto) * ($image_a->h / $image_a->w + 1) / 2;
+        my $image_b = $pto->Image->[$id_image_b];
+        my $fov_b = $image_b->v ($pto) * ($image_b->h / $image_b->w + 1) / 2;
+        my $fov = ($fov_a + $fov_b) / 2;
+
+        next if $pto->AngularDistance ($id_image_a, $id_image_b) > $factor * $fov;
+
+        my $path_a = $pto->Image->[$id_image_a]->Path ($path_input);
+        my $path_b = $pto->Image->[$id_image_b]->Path ($path_input);
+        # strip any suffixes
+        $path_a =~ s/\.[[:alnum:]]+$//;
+        $path_b =~ s/\.[[:alnum:]]+$//;
+        # strip all but filename
+        $path_b =~ s/.*[\/\\]//;
+        my $stub = $path_a .'-'. $path_b;
+
+        $rule = $mk->Rule ($stub .'.a.pto');
+        $rule->Prerequisites ($pto->Image->[$id_image_a]->Path ($path_input) .'.key',
+                                $pto->Image->[$id_image_b]->Path ($path_input) .'.key');
+        $rule->Command ('$(AUTOPANO_SHELL)', @refine, '--ransac', $ransac,
+                          '--maxmatches', $points, $stub .'.a.pto',
+                          $pto->Image->[$id_image_a]->Path ($path_input) .'.key',
+                          $pto->Image->[$id_image_b]->Path ($path_input) .'.key');
+
+        $keys->{$pto->Image->[$id_image_a]->Path ($path_input) .'.key'} = 1;
+        $keys->{$pto->Image->[$id_image_b]->Path ($path_input) .'.key'} = 1;
+
+        $var_tempfiles->Values ($stub .'.a.pto');
+
+        $rule = $mk->Rule ($stub .'.b.pto');
+        $rule->Prerequisites ('$(PROJECT_FILE)');
+        $rule->Command ('$(PTOSPLIT_SHELL)', $id_image_a, $id_image_b, '$(PROJECT_FILE_SHELL)', $stub .'.b.pto');
+        $var_tempfiles->Values ($stub .'.b.pto');
+
+        $rule = $mk->Rule ($stub .'.c.pto');
+        $rule->Prerequisites ($stub .'.b.pto', $stub .'.a.pto');
+        $rule->Command ('$(PTOMERGE_SHELL)', $stub .'.b.pto', $stub .'.a.pto', $stub .'.c.pto');
+        $var_tempfiles->Values ($stub .'.c.pto');
+
+        $rule = $mk->Rule ($stub .'.pto');
+        $rule->Prerequisites ($stub .'.c.pto');
+        $rule->Command ('$(CPCLEAN_SHELL)', '-o', $stub .'.pto', $stub .'.c.pto');
+
+        $var_links->Values ($stub .'.pto');
+        $var_tempfiles->Values ($stub .'.pto');
+    }
+}
+
+$var_tempfiles->Values (sort keys %{$keys});
+
+$rule = $mk->Rule ('$(PTO_OUT)');
+$rule->Prerequisites ('$(PROJECT_FILE)', '$(LINK_PTOS)');
+$rule->Command ('$(PTOMERGE_SHELL)', '$(PROJECT_FILE_SHELL)', '$(LINK_PTOS_SHELL)',
+                  '$(PTO_OUT_SHELL)');
+
+my $rule_secondary = $mk->Rule ('.SECONDARY');
+$rule_secondary->Prerequisites ('$(TEMP_FILES)');
+
+$mk->Write ($path_mk) if defined $path_mk;
+$mk->DoIt ('--always-make', 'all', 'clean') unless defined $path_mk;
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+ptofill - add control points to a Hugin project between likely overlapping photos
+
+=head1 SYNOPSIS
+
+ptofill [options] --output output.pto input.pto
+
+ Options:
+  -m | --makefile file  Output Makefile
+  -o | --output file    Output project
+       --ignoregroups   Match photos even between unconnected groups
+  -f | --factor         Distance factor to search for overlaps (default=1.25)
+  -h | --help           Outputs help documentation.
+
+=head1 DESCRIPTION
+
+B<ptofill> is a wrapper around various tools that generates control points.
+Output is in the form of a .pto project.
+
+All pairs of photos in a project are examined and angular distances compared to
+determine if photos likely overlap, if points already exist between photos then
+matching will be skipped.
+
+Matching will also be skipped between photos that are not in the same
+'connected group' unless the --ignoregroups option is specified.
+
+If the --makefile option is given, rules for generating the project are written
+to a Makefile, if --makefile isn't set then these rules will be executed
+immediately.
+
+Control point generator parameters are set via Option lines in the input
+project:
+
+  #hugin_cpgenSize 1500
+  #hugin_cpgenNumber 25
+  #hugin_cpgenRansac true
+  #hugin_cpgenRefine false
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+=head1 AUTHOR
+
+Bruno Postle - December 2009.
+
+=cut
+
+=begin perl

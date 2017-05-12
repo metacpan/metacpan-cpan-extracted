@@ -1,0 +1,11 @@
+SYNOPSIS
+
+     use Parse::Netstat qw(parse_netstat);
+     my $res = parse_netstat(output => join("", `netstat -anp`), flavor=>'linux');
+
+SEE ALSO
+
+    Parse::Netstat::* for per-flavor notes and sample outputs.
+
+    parse-netstat from App::ParseNetstat is a CLI for this module.
+

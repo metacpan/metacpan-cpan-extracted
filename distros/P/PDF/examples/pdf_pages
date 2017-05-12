@@ -1,0 +1,75 @@
+#!/usr/local/bin/perl 
+#
+# pdf_pages       Return the number of pages of a PDF files
+#
+# A simple example that use the PDF library
+#
+# by Antonio Rosella <anface@geocities.com> January 1998
+#            http://www.geocities.com/CapeCanaveral/Hangar/4794
+#
+# Free use under GNU License.
+#
+# This is the version 1.1
+#
+
+
+use Carp;
+use Getopt::Long;
+use PDF;
+
+my $version="1.0";
+my $help="";
+my $verbose="";
+
+GetOptions( "help" => \$help , "verbose" => \$verbose );  
+
+$help and printusage(); 
+
+foreach (@ARGV) {
+  do_the_dirty_job_on($_);
+}
+
+exit(1);
+
+sub do_the_dirty_job_on {
+
+  my $file = shift;
+
+  my $PDFfile = PDF->new($file);
+
+  if ($PDFfile->IsaPDF) {
+  $verbose ? print "File $file has ",$PDFfile->Pages," page",$PDFfile->Pages > 1 ? "s" :"","\n" 
+	   : print $file,":",$PDFfile->Pages,"\n" ;
+  } else {
+    $verbose && print "File $file isn't a PDF file\n";
+  }
+}
+
+sub printusage {
+
+print <<ANTRO;
+
+Return the number of pages of a PDF file format.
+
+usage:
+        pdf_pages [-options ...] files
+
+where options include:
+    -help                        print out this message
+    -verbose                     verbose
+
+or the abbreviate version -h, -v 
+
+files:
+    with files you can use metacharacters and relative and absolute path name
+    
+example:
+    pdf_pages *.pdf
+    pdf_pages -h
+    pdf_pages -v . "*.pdf" "/tmp/path/to/work/*.pdf"
+
+ANTRO
+
+exit(1);
+
+}; 

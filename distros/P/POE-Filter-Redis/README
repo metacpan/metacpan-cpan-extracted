@@ -1,0 +1,66 @@
+NAME
+    POE::Filter::Redis - A POE Filter for the Redis protocol
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+      use POE::Filter::Redis;
+
+      my $filter = POE::Filter::Redis->new();
+
+      my $stream = $filter->put( [ [ 'SET', 'mykey', 'myvalue' ] ] );
+
+      my $responses = $filter->get( [ "-NOT OK THIS TIME\x0D\x0A", "$6\x0D\x0Afoobar\x0D\x0A" ] );
+
+DESCRIPTION
+    POE::Filter::Redis is a POE::Filter for the Redis protocol,
+    <http://redis.io/topics/protocol>.
+
+    It is a "client" side implementation.
+
+    It should be POE::Filter::Stackable friendly if you like that sort of
+    thing.
+
+CONSTRUCTOR
+    "new"
+        Creates a new POE::Filter::Redis object.
+
+METHODS
+    "get"
+    "get_one_start"
+    "get_one"
+        Takes an arrayref which contains lines of Redis protocol streams
+        from a Redis server. Returns arrayref of arrayrefs, each being a
+        complete response from the server.
+
+    "put"
+        Takes an arrayref of arrayrefs. Each arrayref should contain an
+        individual Redis command and any additional parameters. Returns an
+        arrayref of protocol encoded strings suitable for sending over the
+        wire to a Redis server.
+
+    "get_pending"
+        Returns any data remaining in a filter's input buffer
+
+    "clone"
+        Makes a copy of the filter, and clears the copy's buffer.
+
+SEE ALSO
+    Please see POE::Filter for documentation regarding the base interface.
+
+    <http://redis.io/topics/protocol>
+
+    <http://redis.io/>
+
+AUTHORS
+    *   Chris Williams <chris@bingosnet.co.uk>
+
+    *   Rocco Caputo <rcaputo@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams and Rocco Caputo.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

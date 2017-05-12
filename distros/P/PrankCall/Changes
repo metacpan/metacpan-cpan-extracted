@@ -1,0 +1,24 @@
+Revision history for PrankCall
+
+0.004 2013-05-03
+
+  - Updated logic around how a HTTP request is generated. Instead of absolute URLs
+    after the HTTP METHOD they are now relative. 
+  - Added a user agent string and the ability to override it via import
+
+0.003 2013-04-29
+
+  - Release "Hello, I'd like to speak with a Mr. Snotball, first name Ura"
+  - Made unit tests a bit more robust.
+
+0.002 2013-04-26
+  
+  - Release "Is your refrigerator running?"
+  - Added redial
+  - Added ability to cache sockets
+  - New override options for Timeout and Blocking
+  - Pass back self in callback (Thanks Belden Lyman)
+
+0.001  2013-04-24
+
+  -Initial release

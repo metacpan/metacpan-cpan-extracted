@@ -1,0 +1,5 @@
+=pod
+
+=sql SELECT id FROM database_name.table_name WHERE some_column = 'YES'
+
+=cut

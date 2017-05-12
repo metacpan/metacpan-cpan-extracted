@@ -1,0 +1,49 @@
+NAME
+    POE::Filter::DHCPd::Lease - parses leases from isc dhcpd leases file
+
+VERSION
+    0.0702
+
+METHODS
+  new
+     my $filter = POE::Filter::DHCPd::Lease->new;
+
+  get_one_start
+     $self->get_one_start($stream);
+
+    $stream is an array-ref of data, that will eventually be parsed into a
+    qualified lease, returned by get() or get_one.
+
+  get_one
+     $leases = $self->get_one;
+
+    $leases is an array-ref, containing zero or one leases.
+
+     starts      => epoch value
+     ends        => epoch value
+     binding     => "active" or "free"
+     hw_ethernet => 12 chars, without ":"
+     hostname    => the client hostname
+     circuit_id  => circuit id from relay agent (option 82)
+     remote_id   => remote id from relay agent (option 82)
+
+  get
+    See POE::Filter.
+
+  put
+    Returns an empty string. Should not be used.
+
+  get_pending
+     my $buffer = $self->get_pending;
+
+    Returns any data left in the buffer.
+
+AUTHOR
+    Jan Henning Thorsen, "<jhthorsen-at-cpan-org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2007 Jan Henning Thorsen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name:               Plack-Middleware-SocketIO
+version:            0.00904
+abstract:           Socket.IO Plack middleware
+author:
+    - Viacheslav Tykhanovskyi <vti@cpan.org>
+license:            artistic_2
+distribution_type:  module
+configure_requires:  {}
+build_requires:  {}
+requires:
+    AnyEvent:             0
+    JSON:                 0
+    perl:                 5.008007
+    Plack:                0
+    Protocol::WebSocket:  0.009001
+    Scalar::Util:         0
+    Try::Tiny:            0
+resources:
+    bugtracker:  http://github.com/vti/plack-middleware-socketio/issues
+    license:     http://dev.perl.org/licenses/
+    repository:  http://github.com/vti/plack-middleware-socketio
+no_index:
+    directory:
+        - t
+        - inc
+        - t
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

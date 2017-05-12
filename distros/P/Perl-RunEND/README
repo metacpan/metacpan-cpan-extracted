@@ -1,0 +1,184 @@
+Perl-RunEND - Execute perl code after __END__ literal
+
+USAGE:
+
+   perl-run-end /opt/Module/Whatever/YourModule.pm
+
+
+A common best-practice under Python is to include a self-test at the end every
+module - especially if the module is largely standalone.  In Python this is 
+done via: if __name__ == '__main__':
+
+In Perl, we have __END__ available, often we will put test code or notes 
+or comments, etc. We make use of this data by using the DATA filehandle. 
+It would be handy if we could put fully working Perl code in this section
+as a self documenting example. (say of the SYNOPSIS)
+
+When we execute the module as 'self' (e.g. perl-run-end /opt/module.pm) 
+it would execute all the code contained below __END__.
+This could be handy to use __END__ to create self-testing code.
+
+This is not meant to replace Test::More, or any of the other great
+testing modules avaiable in Perl, it's more of a 'test helper', or
+convienent notepad to test your synopsis code, or to show actual
+working examples of your module. In fact this could be used in conjunction
+or even as a jump start (this working code could then become your 
+test suite. this would even work with TDD, to flesh out your module.
+write code to use the interface, then create the actual interface.)
+
+Additionally, this can be also be used for any perl script, or file
+with executable perl code with an __END__. 
+
+NOTE: I wrote this before I saw Test::Inline (which is probably a 
+better approach) however, I still find this useful.
+
+I believe this would be useful as a command line switch to the perl
+interpreter itself: something like:
+perl -r     Execute code embedded in __END__ block
+
+probably introducing a new literal would be best like __RUN__ which would act
+just like __END__ . The code contained within would only be exectuted if perl
+was called with the command line switch.
+
+=head1 SYNOPSIS
+
+If module is called as 'self' run the code beneath __END__.
+
+
+    perl-run-end /opt/Module/Whatever/YourModule.pm
+    # displays
+    FOOfunction1 called
+
+    Where the contents of ModuleWhatever/YourModule.pm
+
+    package YourModule;
+    use strict;
+    sub new {
+        my $class = shift;
+        my $self = bless {}, $class;
+        $self->{foo} = 'FOO';
+        return $self;
+    }
+    sub function1 {
+      return 'function1 called';
+    }
+    1; # End of Perl::RunEND
+    
+    __END__
+    use strict;
+    use warnings;
+    use YourModule;
+    my $ym = YourModule->new();
+    warn $ym->{foo};
+    warn $ym->function1;
+
+    # you may have to add the module path to your @INC
+    perl-run-end -i /opt/Module/Whatever/Mod  /opt/Module/Whatever/Mod/YourModule.pm
+
+=head1 DESCRIPTION
+
+Some people like to create their POD below the __END__ literal in the modules
+
+This module could be useful for proving your synopsis and POD examples are working code.
+
+Consider the following POD:
+
+  =head1 SYNOPSIS
+  
+    use My::MyModulePod;
+    my $mm = My::MyModulePod->new();
+    print $mm->function1,"\n";
+  
+  =cut
+  
+  # perdoc does not parse this code but perl-run-end does execute it
+  use My::MyModulePod;
+  my $mm = My::MyModulePod->new();
+  print "test synopsis\n";
+  print $mm->function1,"\n";
+
+  =head2 function1
+  
+   provides useful funtion type access
+  
+   $mm->function1;
+  
+  =cut
+  
+  print "test method definition\n";
+  print $mm->function1,"\n";
+
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Perl::RunEND
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-RunEND
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Perl-RunEND
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Perl-RunEND
+
+    Search CPAN
+        http://search.cpan.org/dist/Perl-RunEND/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 David Wright
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

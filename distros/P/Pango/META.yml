@@ -1,0 +1,51 @@
+---
+abstract: 'Layout and render international text'
+author:
+  - 'gtk2-perl Team <gtk-perl-list at gnome dot org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  Cairo: '1.000'
+  ExtUtils::Depends: '0.300'
+  ExtUtils::MakeMaker: '0'
+  ExtUtils::PkgConfig: '1.030'
+  Glib: '1.220'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pango
+no_index:
+  directory:
+    - t
+    - inc
+  file:
+    - xs/Pango.xs
+    - xs/PangoAttributes.xs
+    - xs/PangoContext.xs
+    - xs/PangoFont.xs
+    - xs/PangoFontset.xs
+    - xs/PangoFontMap.xs
+    - xs/PangoLayout.xs
+    - xs/PangoRenderer.xs
+    - xs/PangoScript.xs
+    - xs/PangoTabs.xs
+    - xs/PangoTypes.xs
+    - xs/PangoCairo.xs
+    - xs/PangoGravity.xs
+    - xs/PangoMatrix.xs
+requires:
+  Cairo: '1.000'
+  ExtUtils::Depends: '0.300'
+  ExtUtils::PkgConfig: '1.030'
+  Glib: '1.220'
+resources:
+  MailingList: https://mail.gnome.org/mailman/listinfo/gtk-perl-list
+  Twitter: https://twitter.com/GTKPerl
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Pango
+  homepage: http://gtk2-perl.sourceforge.net
+  license: http://www.gnu.org/licenses/lgpl-2.1.html
+  repository: git://git.gnome.org/perl-Pango
+version: '1.227'

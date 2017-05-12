@@ -1,0 +1,72 @@
+=head1 NAME
+
+Links
+
+=head2 Original
+
+A  L<name> manual page.
+
+An L<name/ident> item in manual page. 
+
+A  L<name/"sec"> section in other manual page.
+
+A  L<"sec">      section in this manual page (the quotes are B<not> optional).
+
+A  L< sec >      section in this manual page
+
+A  L<sec tion >   section in this manual page
+
+A  L<mod::ule.foo>  link to a module POD
+
+A  L</"sec">     section in this manual page (the quotes are optional).
+
+
+=head2 Total Control
+
+A  L<text|name> manual page.
+
+An L<text|name/ident> item in manual page. 
+
+A  L<text|name/"sec"> section in other manual page.
+
+A  L<text|"sec">      section in this manual page (quotes are B<not> optional).
+
+A  L<text| sec >      section in this manual page 
+
+A  L<text|sec tion>   section in this manual page 
+
+A  L<text|bar-mod::ule>   link to a module POD
+
+A  L<text|/"sec">     section in this manual page (quotes are optional).
+
+
+=head2 Targets
+
+X<target>
+
+X<target with spaces>
+
+X<target w/spaces>
+
+X<I<italic> target>
+
+
+=head2 Links
+
+L</target>
+
+L<"target with spaces">
+
+L<" target w/spaces ">
+
+L<"target with
+line 
+breaks">
+
+L</I<italic> B<target>>
+
+L<I<page>/I<section>>
+
+L<http://world.std.com/~swmcd/steven/index.html>
+
+L<Steven McDougall|http://world.std.com/~swmcd/steven/index.html>

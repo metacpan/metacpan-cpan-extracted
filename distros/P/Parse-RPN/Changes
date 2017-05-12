@@ -1,0 +1,478 @@
+Revision history for Perl module Parse::RPN
+
+Note: version <2 is only a RPN parser
+
+2.83 2013-09-25T20:24:19+02:00
+
+    - fix Date format in CHANGELOG to agree CPAN new requirement
+    
+2.82 2013-09-23T17:49:50+02:00
+
+    - add CATN JOIN JOINN and JOINALL
+    - add/update test related
+
+2.81 2013-09-14T12:20:19+02:00
+
+    - Don't use ${^PREMATCH} to cope with perl 5.18
+
+2.80 2013-09-06T11:53:29+02:00
+
+    - RPN.pm: Prevent crash when variable not defined in PERLVAR 
+    - t/11Perl.t  and test for var not defined   
+      test returning a hash multikey are most of the time in different order,
+      removing multikey test 
+    - RPN.pl: Use persistent history ( and add flag and command to set another histoty file )
+
+2.79 2013-09-04T14:09:21+02:00
+
+    - fix PERLVAR for simple scalar 
+    - add $scal test variable in RPN.pl
+
+2.78 2013-09-02T12:24:01+02:00
+
+    - update test with TZ set tp EST to allow make test succeed anywhere
+
+2.77 2013-09-01T18:23:05+02:00
+
+    [ Parse::RPN }
+    - MOD >> << : Swap arguments
+    - REMAIN and REV: remove processed argument
+    - PI : better value for COS
+    - MINX MAXX SLSLICE N!= UNSET FORGOT UNLINK CHOMP : new words
+    - MIN MAX SUM STATS : in section arithmetic
+    - >< >=< UNPACK !!!CA ; : typo on pod
+    - TRUE and FALSE : check if argument numeric and prevent warning
+    - All SLxxx and OIDSEARCHxxx words:
+      correct code to allow structurated string without leading #
+    - EQ : correct return value for DICT
+    - Better test ( by type of operator )
+    - FIND FINDK fix initial index ( no more warning )
+    - VARIABLE only set variable if variable name defined
+    - ; ( word creation ) create private dict and prevent overwriting of native dict
+    - fix warning if IF (variable not numeric if uninitialized)
+    - LOOP add _T_ variable
+    - +LOOP fix error in code + simplification for _T_
+    - PERL push STDOUT on stack
+    - TELL fix for unbuffered IO
+    - WRITELINE in correct order
+    - remove spurious warning in HGTIME
+    - fix SLGREP and SLGREPI ending space in SL result
+
+    [ RPN.pl ]
+    - add argument -I to put a full path to RPM.pm. 
+    - In shell mode auto reload of RPN.pm.
+    - Add command \c r to force a reload of RPN.pm ( reset all provate dict and vars )
+
+2.76 2013-07-18T11:27:05+02:00
+
+    - Add SLITEM
+
+2.75 2013-05-22T18:53:55+02:00
+
+    - funct rpn_separator_out and rpn_separator_in return current value
+
+2.74 2013-05-14T11:22:08+02:00
+
+    - use recursion to create SL list from PERLVAR
+    - Allow PERLVAR to be inside LOOP or IF
+
+2.73 2013-05-10T17:49:54+02:00
+
+    - Replace PERLUNARY by PERLFUNC1
+    - Add PERLFUNCX
+    - Add PERLVAR
+
+2.72 2013-05-07T09:09:08+02:00
+
+    - Add PERLUNARY
+    - Clean PERLFUNC
+
+2.71 2013-05-06T11:18:06+02:00
+
+    - Replace rpn_separator by rpn_sseparator_out
+    - Add rpn_separator_in
+
+2.70 2013-05-03T12:09:43+02:00
+
+    - Add SLGREP, SLGREPI , SLSEARCHALL and SLSEARCHALLI
+
+2.69 2013-04-15T14:00:00+02:00
+
+    - Add SLSEARCHALLKEYS and SLSEARCHALLKEYSI
+    - Some typo in doc
+
+2.68 2013-04-09T12:47:45+02:00
+
+    - add NXOR
+
+2.67 2013-03-17T17:37:09+01:00
+
+    - add >< and >=< operator
+
+2.66 2012-02-06T13:37:00+01:00
+
+    - add case insensitive OIDSEARCHALLVALI and OIDSEARCHLEAFI
+      ( the latest one is not very useful )
+
+2.65 2012-01-19T13:46:21+01:00
+
+    - add relational operator staring with N to test th efirst element as numeric
+
+2.64 2011-11-28T14:39:56+02:00
+
+    - add OIDSEARCHALLVAL and OIDSEARCHALLVAL
+
+2.63 2011-04-14T12:08:06+02:00
+
+    - add KEEPV and KEEPVV
+
+2.62 2011-01-27T19:04:22+01:00
+
+    - typo error
+
+2.61 2011-01-27T18:25:09+01:00
+
+    - fix IF THEN ELSE ( specifically ELSE )
+
+2.60 2011-01-26T16:14:04+01:00
+
+    - fix OPEN ( mode )
+    - WRITELINE and WRITE (remove value from the stack)
+
+2.59 2010-12-01T13:26:49+01:00
+
+    - add POPV, SHIFTV and IND
+
+2.58 2010-12-01T11:34:50+01:00
+
+    - add SEARCHA and SEARCHI
+
+2.57 2010-10-21T15:32:18+02:00
+
+    - add SPLIT2
+    - correct LOOKUP and LOOKUPOP ( switch parameter order )
+
+2.56 2010-10-19T15:01:54+02:00
+
+    - add SIZE
+    - correct variable append code
+
+2.55 2010-10-11T14:10:46+02:00
+
+    - add HTTP::Date in Makefile.pl
+
+2.54 2010-10-01T15:33:53+02:00
+
+    - add FILE IO
+    - correct ROLL with negative value ( remove undef extra value )
+    - typo in doc
+
+2.53 2010-09-30T13:47:01+02:00
+
+    - add all append to variable primitives ( !A, !!A, !!!A, !!CA, !!!CA )
+
+2.52 2010-04-29T18:15:46+02:00
+
+    - add KEEPR and KEEPRN
+    - fix the offset of PUT
+    - change ROLL to allow reverse ROLL when value is negative
+    - fix ROLL when value are = 0
+
+2.51 2010-04-27T08:37:09+02:00
+
+    - UNORM and UNORM2 allow entry in the form 249.12 G
+    - some digit, zero or one dot followed by some digit, some space , and a letter as suffix) 
+
+2.50 2010-04-26T14:57:46+02:00
+
+    - add UNORM and UNORM2
+
+2.49 2010-04-23T14:08:13+02:00
+
+    - if the only data on the stack is 0, return 0 and not an empty value
+
+2.48 2010-04-09T14:24:19+02:00
+
+    - add HTTPTIME
+    - correct TICK function ( don't remove first elem of the stack )
+
+2.47 2009-04-30T18:24:12+02:00
+
+    - add SUM and STATS 
+
+2.46 2009-04-08T11:32:54+02:00 
+
+    - bug fix : reverse order for >, >= and < <=
+
+2.45 2009-03-16T10:37:23+01:00
+
+    - typo error in STR2DDEC
+
+2.44 2009-03-13T18:14:17+01:00
+
+    - add OCTSTR2HEX, OCTSTR2HEX, DDEC2STR and STR2DDEC
+
+2.43 2008-11-07T08:53:12+02:00
+
+    - add LOOKUPP and LOOKUPOPP 
+    - IF THEN and OF THEN ELSE become reentrant
+
+2.42 2008-08-18T13:22:38+02:00
+
+    - add LOOKUP and LOOKUPOP 
+    - fix !! and !!C parameter
+
+2.41 2008-04-15T15:41:38+02:00
+
+    - add SEARCHK and SEARCHKI
+
+2.39 2008-04-04T11:44:23+02:00
+
+    - correct !!! operators
+
+2.38 2007-09-25T16:12:30+02:00
+
+    - add ISNUM ISNUMD ISINT ISINTD ISHEX ISHEXD
+
+2.37 2007-08-08T16:01:37+02:00
+
+    - correct IF ELSE THEN to follow the IF THEN code
+
+2.36 2007-08-08T11:01:53+02:00
+
+    - remove extra value on the return stack in IF THEN
+
+2.35 2007-08-08T10:48:11+02:00
+
+    - correct the IF THEN
+
+2.34 2007-06-07T09:29:40+02:00
+
+    - correct the return from dict (retrun always 3 values)
+
+2.33 2006-08-23T11:29:40+02:00
+
+    - add CATALL
+
+2.32 2006-03-16T16:2:41+01:00
+
+    - add KEEPN, COPY, !!, !!C, !!!, !!!C
+    - change in PRESERVE INC, DEC, @
+
+2.31 2006-03-16T12:11:22+01:00
+
+    - correct +LOOP code
+
+2.30 2006-03-16T09:41:00+01:00
+
+    - don't execute code in definition when creating new WORD
+    - correct code for WHILE
+
+2.29 2006-03-13T15:27:25+01:00
+
+    - add PRESERVE
+    - correct DEL and PRESERVE when length to delete is greater then stack
+
+2.28 2006-03-13T14:33:55+01:00
+
+    - now xxx,0,KEEP clear the stack
+
+2.27 2006-03-13T14:24:09+01:00
+
+    - add SEARCH and SEARCHI
+
+2.26 2006-01-16T15:16:56+01:00
+
+    - the previous PERL for call of a perl function become PERLFUNC
+    - PERL become the inline perl code use
+
+2.25 2006-01-12T13:10:30+01:00
+
+    - add OCT operator
+    - correct SPATx operators to allow replacement by capturing parentheses
+
+2.24 2006-01-06T10:33:12+01:00
+
+    - add a function to modify the separator of the result
+
+2.23 2006-01-06T09:06:31+02:00
+
+    - add the KEEP function
+
+2.19 2005-10-05T13:53:57+02:00
+
+    - create name space for PERL function
+
+2.18 2005-10-03T06:58:08+02:00
+
+    - possibility to call PERL function
+
+2.17 2005-07-20T06:56:17+02:00
+
+    - correct the SUB creation (don't execute stack when store function)
+
+2.16 2005-06-29T09:15:33+02:00
+
+    - return '' in case of LN(0)
+
+2.15 2005-06-29T09:06:40+02:00
+
+    - retrun '' in case of division by null
+
+2.14 2005-04-21T10:51:45+02:00
+
+    - in IF remove the value on top of the stack before executing the IF code
+
+2.13 2005-04-21T08:14:49+02:00
+
+    - add logical operators
+
+2.12 2005-04-20T13:36:41+02:00
+
+    - correct all the loop algo
+
+2.11 2005-04-19T14:31:39+02:00
+
+    - error in TIF (no stack )
+
+2.10 2005-04-17T14:27:03+02:00
+
+    - remove the leading empty string when SPLIT and SPLITI matche the beginning of the string
+
+2.9 2005-04-17T13:44:59+02:00
+
+    - correct code for IF (use top of stack and not end)
+
+2.8 2004-11-28T17:44:03+01:00
+
+    - replace \1 by $1 to prevent warning in substitution
+
+2.7 2004-10-12T10:11:27+02:00
+
+    - clean up code
+
+2.6 2004-10-12T10:09:00+02:00
+
+    - clean up code
+
+2.5 2004-10-01T06:58:49+02:00
+
+    - add SPLIT, SPLITI, PATI, TPATI
+
+2.4 2004-09-30T15:38:51+02:00
+
+    - correct PAT return and LCFIRST return
+
+2.3 2004-08-29T17:43:08+02:00
+
+    - test if string in VAR or DICT
+
+2.02 2004-08-29T16:48:17+02:00
+
+    - better use of STRING (when space before and after)
+
+2.01 2004-08-29T11:56:06+02:00
+
+    - transfert NRPM to RPM
+
+2.00 2004-08-29T10:02:59+02:00
+
+    - transfert NRPM to RPM
+
+1.24 2004-08-06T10:40:56+02:00
+
+    - add DEL
+
+1.23 2004-08-06T10:19:19+02:00
+
+    - correct license text
+
+1.22 2004-08-06T08:41:47+02:00
+
+    - POPN, PI added
+
+1.21 2004-08-06T07:30:56+02:00
+
+    - use the same loop in PRINTF to allow any number of field in format
+
+1.20 2004-08-06T07:12:31+02:00
+
+    - correct REGEX in PACK to allow only 1 letter as format
+
+1.19 2004-08-05T19:03:37+02:00
+
+    - correct PACK command to allow any number of param
+
+1.18 2004-08-05T15:59:12+02:00
+
+    - use PACK and check number of variable in format
+
+1.17 2004-08-05T14:25:59+02:00
+
+    - add PRINTF to convert value to
+
+1.16 2004-08-05T13:18:23+02:00
+
+    - add synomin of +- to NEG
+
+1.15 2004-08-05T13:11:23+02:00
+
+    - add +- function to negate a numerical value
+
+1.14 2004-04-27T15:02:11+02:00
+
+    - swap RROT and ROT
+
+1.13 2004-04-27T14:52:55+02:00
+
+    - add function RROT, SWAP2, REVERSE, ROT3
+
+1.12 2003-10-20T10:05:14+02:00
+
+    - correct typo error in POD for TPAT
+
+1.11 2003-10-20T09:56:25+02:00
+
+    - add TPAT
+
+1.10 2003-10-20T09:49:55+02:00
+
+    - TPAT return 0 if not pattern found
+
+1.9 2003-10-20T09:42:27+02:00
+
+    - add TPAT (test pattern)
+
+1.8 2003-10-20T09:16:12+02:00
+
+    - add SWAT alias EXCH to keep compatibility with Math::RPN
+
+1.7 2003-10-20T08:20:10+02:00
+
+    - correct VERSION number for MakeMaker again
+
+1.6 2003-10-20T08:15:32+02:00
+
+    - correct VERSION number for MakeMaker
+
+1.5 2003-10-19T20:03:20+02:00
+
+    - correct typo in POD
+
+1.4 2003-10-19T19:59:53+02:00
+
+    - correct typo in POD
+
+1.3 2003-10-19T19:59:23+02:00
+
+    - correct typo in POD
+
+1.2 2003-10-19T19:57:41+02:00
+
+    - Clean code and add POD doc
+
+1.1 2003-10-19T19:50:20+02:00
+
+    - Initial revision
+    - RPN parser with STRING functions
+

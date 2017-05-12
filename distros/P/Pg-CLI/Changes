@@ -1,0 +1,72 @@
+0.11    2013-04-01
+
+- Added Pg::CLI::createdb and Pg::CLI::dropdb classes.
+
+- Made the database argument optional for Pg::CLI::psql->run(). There are some
+  options (like "psql -l") that don't require a database.
+
+
+0.10    2013-02-13
+
+- Make the pg_restore class actually work. Unlike other Pg CLI commands, with
+  pg_restore the database is passed as "-d Foo", not as the final argument.
+
+
+0.09    2013-02-05
+
+- Added a Pg::CLI::pg_restore class.
+
+
+0.08    2013-01-23
+
+- The command running code now uses IPC::Run3::run3, so you can pass stdin,
+  stdout, and stderr parameters to the psql and pg_dump ->run() methods. This
+  is useful for passing in SQL to psql or capturing output from pg_dump, as
+  well as capturing error output.
+
+
+0.07    2010-11-27
+
+- The version check caused the output of "$cmd --version" to be visible,
+  instead of being captured.
+
+
+0.06    2010-11-27
+
+- Added a new parameter, require_ssl, for pg_dump and psql. If this is true,
+  then the PGSSLMODE env var is set to "require" when connecting to the dbms.
+
+
+0.05    2010-11-27
+
+- The command line arguments for pg_dump and psql included -w, which only
+  works on 8.4+. Now we check to see what version of the command line
+  utilities we have, and only add -w when it's allowed. Reported by Getty.
+
+
+0.04    2010-11-25
+
+- Added a new class, Pg::CLI::pg_config.
+
+- All classes now take an executable parameter so you can explicitly set the
+  path to the executable. By default, classes look in the current path, and
+  die if they cannot find the relevant executable.
+
+
+0.03    2010-11-25
+
+- The psql execute_file method now accepts a Path::Class::File object for the
+  file name.
+
+- The psql execute_file method reused the same default ref for options
+  repeatedly, causing weird bugs.
+
+
+0.02    2010-11-25
+
+- Forget to list prereqs.
+
+
+0.01    2010-11-24
+
+- Initial release.

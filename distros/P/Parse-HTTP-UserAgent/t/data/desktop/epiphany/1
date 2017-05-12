@@ -1,0 +1,53 @@
+[AGENT]
+
+Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.0.14eol) Gecko/20070505 (Debian-1.8.0.15~pre080323b-0etch2) Epiphany/2.14
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Linux i686',
+'extras'           => [ 'X11', 'Debian-1.8.0.15~pre080323b-0etch2', 'Epiphany/2.14' ],
+'toolkit'          => [ 'Gecko', '20070505', '20070505.000' ],
+'version_raw'      => '2.14',
+'lang'             => 'en-US',
+'version'          => '2.140',
+'mozilla'          => ['1.8.0.14','1.008000014'],
+'name'             => 'Epiphany',
+
+[AGENT]
+
+Mozilla/5.0 (X11; U; Linux i686; en; rv:1.9.0.11) Gecko/20080528 Epiphany/2.22 Firefox/3.0
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Linux i686',
+'extras'           => ['X11','Firefox/3.0'],
+'toolkit'          => ['Gecko','20080528','20080528.000'],
+'version_raw'      => '2.22',
+'lang'             => 'en',
+'version'          => '2.220',
+'mozilla' => ['1.9.0.11','1.009000011'],
+'name'             => 'Epiphany',
+
+[AGENT]
+
+Mozilla/5.0 (X11; U; Linux x86_64; c) AppleWebKit/525.1+ (KHTML, like Gecko, Safari/525.1+) epiphany
+
+'parser'           => 'safari',
+'strength'         => 'U',
+'os'               => 'Linux x86_64',
+'extras'           => ['X11','KHTML, like Gecko, Safari/525.1+'],
+'toolkit'          => ['AppleWebKit','525.1+','525.100'],
+'lang'             => 'c',
+'name'             => 'Epiphany',
+
+[AGENT]
+
+Mozilla/5.0 (X11; U; Linux i686; en-us) AppleWebKit/528.5+ (KHTML, like Gecko, Safari/528.5+) epiphany-browser
+
+'parser'           => 'safari',
+'strength'         => 'U',
+'os'               => 'Linux i686',
+'extras'           => ['X11','KHTML, like Gecko, Safari/528.5+'],
+'toolkit'          => ['AppleWebKit','528.5+','528.500'],
+'lang'             => 'en-us',
+'name'             => 'Epiphany',

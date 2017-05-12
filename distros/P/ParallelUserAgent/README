@@ -1,0 +1,162 @@
+
+             Parallel User Agent
+                        ---------------------
+
+(c) 1997-2004 Marc Langheinrich <marclang@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+   Disclaimer
+   ----------
+   Unfortunately, I have very little time to maintain this
+   module. Though I eventually get around to update it every
+   so often, please be aware that the level of support and
+   quality for this Perl module is somewhat less than what you
+   might expect from official CPAN releases :-(
+
+   Disclaimer 2.0
+   --------------
+   Hi, this is Mike South (msouth@cpan.org). I got myself added
+   as a co-maintainer to this project so that I could fix a few
+   small bugs and let it pass tests using more recent versions of
+   libwww.  I have no deep knowledge of the module but I am
+   trying to address trivial blockers that are preventing legacy
+   users from being able to install on an updated system.  I will
+   do my best to handle any issues that come up, and I thank you
+   in advance for your patience and suggestions/patches.
+
+
+1. What is it?
+--------------
+ParallelUserAgent (or PUA for short) is an extension of the existing
+libwww-5.x distribution. It allows you to connect to download several
+Web pages in _parallel_, without having to request each page one after
+the other. 
+
+Instead of retrieving each single page using LWP::UserAgent::request
+or ::simple_request methods, you first "register" all pages that you
+wish to download in parallel and then call PUA's "wait" method, which
+will then make all the necessary connections and download the
+pages. 
+
+You can define callback routines which will be called whenever a
+connection is established, is cut off, new data comes in or a request
+finishes. The subroutines can be global for all requests you
+registered, or different for every single request. 
+
+Callbacks for example allow you to print status updates as the
+responses come in, or even immediately post follow-up requests based
+on the responses, all within the same single "wait" cycle.
+
+2. How to install it?
+---------------------
+
+PUA comes with an out-of-the-box installation setup. All you have to do 
+is the usual
+
+perl Makefile.PL
+make
+make test
+make install
+
+Previous versions of PUA asked you to replace a few standard modules
+that came with libwww5.x. As of version 2.30, PUA will install all of
+its modules into the LWP::Parallel subtree, so that your previous
+libwww installation remains unchanged!
+
+However, it also requires the latest version of the libwww that it has
+been tested against. Earlier (or later) version might work, too, but
+you are on your own there. If you are using a different version then
+the ones listed below, either upgrade to the latest tested libwww
+distribution, or try running the testscript ("make test") and see if
+it tests ok anyways :-)
+
+Checked versions so far:
+
+    libwww-5.76 - 6.04*          use ParallelUA-2.62
+
+    libwww-5.66 - 5.69          untested
+    libwww-5.64 - 5.65          use ParallelUA-2.55
+    libwww-5.60 - 5.63          use ParallelUA-2.54
+    libwww-5.52 - 5.53          use ParallelUA-2.51
+    libwww-5.48 - 5.51          use ParallelUA-2.50
+    libwww-5.44 - 5.47          untested (use 2.43)
+    libwww-5.41 - 5.43          use ParallelUA-2.43
+    libwww-5.20 - 5.36          use up to ParallelUA-2.39
+    libwww-5.19                 untested
+    libwww-5.18 and below       not ok!
+
+Note: For optimal results use the _latest_ version of BOTH
+      libwww-perl (i.e. 6.04) and ParallelUserAgent (i.e. 2.62).
+
+* note--not every single version in this range has been tested. 5.76,
+5.808, 6.04 I am sure of.  There could be versions in between that
+need to go back to 2.57.  If you find that to be the case please
+file a bug at rt.cpan.org for this distribution.
+
+3. How to use it?
+-----------------
+The current distribution unfortunately has very little documentation
+:-( So far I'm happy that I can keep up with Gisle's constant output
+of new versions of libwww and haven't had much time to think about
+proper documentation.
+
+For starters, you should look into the t/ subdirectory in this
+distribution for some examples on how to use this library! Some brief
+explanations and examples can also be found in the LWP/Parallel.pm
+file -- you can use "perldoc LWP::Parallel" after you installed this
+module to view the embedded documentation.
+
+Most of the other modules also come with some brief description of
+their interfaces which can be viewed using "perldoc <Modulename>".
+
+
+4. Remarks for users upgrading from ParallelUA 2.20:
+---------------------------------------------------- 
+
+You should start out by installing a clean copy of the latest
+libwww-5.x package, which should overwrite any existing PUA modules
+which used to replace some of the LWP modules. 
+
+The new PUA distribution will still offer the LWP::ParallelUA and
+LWP::RobotPUA modules for backward compatibility, but you are
+encouraged to start any new projects using the "local" modules now
+residing under the LWP::Parallel subtree, namely
+LWP::Parallel::UserAgent and LWP::Parallel::RobotUA.
+
+The old "TestScript.pl" that used to come with versions 2.20 and below
+can be found in t/TestScript.pl and can be used to check backward
+compatibility (or can also be used to get a somewhat bigger example on
+how to use this module).
+ 
+
+5. Questions, comments, etc.
+----------------------------
+
+You can join the libwww-perl mailing list by following the
+instructions at http://lists.perl.org/list/libwww-perl.html
+(send email to libwww-subscribe@perl.org).
+
+Bug reports and suggestions for improvements can be submitted via
+the cpan RT installation: 
+
+https://rt.cpan.org/Dist/Display.html?Queue=ParallelUserAgent
+
+COPYRIGHT
+
+  © 1997-2004 Marc Langheinrich. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+
+Have fun!
+
+--
+$Revision: 1.20 $
+
+
+
+
+

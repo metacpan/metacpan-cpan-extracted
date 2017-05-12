@@ -1,0 +1,67 @@
+  #%semantic token '*' '='
+  %right  '='     
+  %left   '-' '+' 
+  %left   '*' '/' 
+  %left   NEG    
+  #%tree 
+  %tree  bypass
+
+  %%
+  line: 
+    sts <%name EXPS + ';'>  
+  ;
+  sts: 
+      %name PRINT 
+      PRINT leftvalue
+    | exp 
+  ;
+  exp:
+      %name NUM  NUM            
+    | %name VAR   VAR         
+    | %name ASSIGN leftvalue '=' exp 
+    | %name PLUS exp '+' exp    
+    | %name MINUS exp '-' exp 
+    | %name TIMES  exp '*' exp 
+    | %name DIV     exp '/' exp 
+    | %no bypass NEG 
+    #| %name NEG 
+      '-' exp %prec NEG 
+    |   '(' exp ')'  
+  ;
+  leftvalue : %name VAR VAR
+  ;
+  %%
+  my $lineno = 1;
+
+  sub Err {
+    my $parser = shift;
+
+    my($token)=$parser->YYCurval;
+    my($what)= $token ? "input: '$token'" 
+                      : "end of input";
+    my @expected = $parser->YYExpect();
+    local $" = ', ';
+    die << "ERRMSG";
+Syntax error near $what (line number $lineno). 
+Expected one of these terminals: @expected
+ERRMSG
+  }
+
+  sub Lex {
+    my($parser)=shift; # The parser object
+
+    for ($parser->YYData->{INPUT}) { # Topicalize
+      m{\G[ \t]*}gc;
+      m{\G\n}gc                      
+        and $lineno++;
+      m{\G([0-9]+(?:\.[0-9]+)?)}gc   
+        and return('NUM',$1);
+      m{\Gprint}gc                   
+        and return('PRINT', 'PRINT');
+      m{\G([A-Za-z_][A-Za-z0-9_]*)}gc 
+        and return('VAR',$1);
+      m{\G(.)}gc                     
+        and return($1,$1);
+      return('',undef);
+    }
+  }

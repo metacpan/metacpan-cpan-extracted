@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/libjingle-0.3
+
+Name: JingleP2P
+Description: Jingle P2P Library
+Version: 0.3.11
+Requires: jinglebase-0.3 jinglexmllite-0.3 jinglexmpp-0.3
+Libs: -L${libdir} -ljinglep2pbase-0.3 -ljinglep2pclient-0.3
+Cflags: -I${includedir}

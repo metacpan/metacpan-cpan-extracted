@@ -1,0 +1,223 @@
+=head1 NAME
+
+Persistent::Hash - Hash persistence API  (0.1)
+
+=head1 SYNOPSIS
+
+	use Persistent::Hash;
+
+	my $phash = Persistent::Hash->new();
+
+	$phash->{key} = 'value';
+	$phash->{indexkey} = 'value';
+	
+	my $hash_id = $phash->Save();
+
+	my $reloaded_phash = Persistent::Hash->load($hash_id);
+
+	$phash->Id();
+	$phash->TimeCreated();
+	$phash->TimeModified();
+	$phash->Delete();
+	$phash->Type();
+
+=head1 DESCRIPTION
+
+** WARNING **
+
+This file only gives an overview of Persistent::Hash, to fully grasp it's potential, please consult
+the L<Persistent::Hash::API> (API Reference) and the L<Persistent::Hash::Manual> (Programmer Manual)
+
+****
+
+Persistent::Hash is a base class that implements a hash persistence framework for Perl.
+The Persistent::Hash class implements a TIE mechanism to transform a standard hash into
+a storable object. It also includes standard method to load and save the object. A Persistent::Hash 
+basically has the same behaviour a normal hash would, but has additionnal methods pertaining to 
+persistence.
+
+The base class uses "storage modules" to know how to save a specific object to storage container 
+and how to reload it, so the whole "storage" part of the implementation is completely modular. 
+A Persistent::Hash can be saved in two chunk, data and index. The "data" chunk is saved as a 
+blob while the "index" chunk is saved in a properly indexed table to take advantage of native
+database implementations. 
+
+More importantly, Persistent::Hash works uniquely by overloading and the interface is made
+to work so that programmers can easely create their subclasses (called data types) simply by creating 
+a module that ISA Persistent::Hash.
+
+=head1 IMPLEMENTATION
+
+The basic implementation of Persistent::Hash uses the perltie mechanism to hook into the standard
+hash structure and provide additionnal functionnality. When creating a subclass (data type), you basically
+create a class that inherits from Persistent::Hash. You control the options of your data type by overloading
+constants/subroutines to the desired behaviour. 
+
+=head1 DATA TYPES
+
+=head2 A SIMPLE DATA TYPE 
+
+Here is a very simple data type:
+
+	package MyProject::Customer;
+
+	use strict;
+
+	use base qw(Persistent::Hash);
+
+	use constant PROJECT => 'MyProject';
+	use constant STORABLE => 1;
+	use constant STRICT_FIELDS => 0;
+
+	1;
+
+This is your basic class definition for a data type. This one is very minimal and doesn't specify anything.
+You can see that we defined 3 overloaded constants to create this type, PROJECT, STORAGE and STRICT_FIELDS.
+
+PROJECT specify wich project this data type is part of, this is used to create a MIME type style "type name"
+for this object that will be used to recognize what type of hash this is when it is retrieved from storage.
+The hash type for this class for example would be "MyProject/MyProject_Customer". The hash type can be retrieved
+for an object by using the Type() method.
+
+The STORABLE constants is used to specify if this hash should be allowed to be stored. Naturally we turn this
+on ;) The STRICT_FIELDS constant is used to control wether Persistent::Hash should control wich keys are set
+in the hash from a list of allowed keys. (This will be discussed later). In this example, we don't want
+any strict field attribues.
+
+This object can then be instantiated with the new() constructor:
+
+	#!/usr/bin/perl
+	# CreateCustomer.pl
+
+	use strict;
+	use MyProject::Customer;
+
+	my $customer = MyProject::Customer->new();
+
+	$customer->{name} = 'OReilly and Associates';
+	$customer->{website} = 'http://www.oreilly.com';
+	$cusomter->{email} = 'info@oreilly.com';
+
+Once you have an instance of your hash, you can use it as you would a standard hash. Set keys in, delete keys, 
+sort the keys...anything. Then, you can save your object using the Save() method.
+
+	my $customer_id = $customer->Save();
+
+The Save() method returns the generated "id" that the storage module returned (typically, if saving to an SQL 
+database, the 'id' will be the next available id in the sequence). Your application can take this id and save
+it in session, or reference it in another object for later retrieval. You can reload the hash from your storage
+by using the Load() constructor with the id:
+
+	my $reloaded_customer = MyProject::Customer->Load($customer_id);
+
+The reloaded object is exactly the same as the one you saved (it is a different "perl object", but it contains
+the same data). You can modify this new hash, and call Save() again, it will update the same record. Now, this
+customer can be deleted from storage using the Delete() method:
+
+	$customer->Delete();
+
+At this point, the has is unusable, it's been untied and the records in storage have been deleted.
+
+This hash was just a very simple example to show you how the actual API looks like, the hash in the storage
+container (aka database) actually is only a serialized version of the perl reference, not very useful, especially
+if you want to have performance when retrieving this object from storage.
+
+=head2 ADVANCED TYPES
+
+Let's take our example in the previous chapter and try to make it a little more useful by adding index and strict
+fields properties:
+
+	package MyProject::Customer;
+
+	use strict;
+	
+	use base qw(Persistent::Hash);
+
+	use constant STORABLE => 1;
+	use constant PROJECT => 'MyProject';
+	use constant STRICT_FIELDS => 1;
+
+	use constant DATA_FIELDS => ['address','phone','comments'];
+
+	use constant INDEX_TABLE => 'myproject_customer_index';
+	use constant INDEX_FIELDS => ['name','website','email'];
+
+	1;
+
+This object is a little more complex than the previous one because we want to be able run queries on some fields
+to allow us some very fast searches. In this example, we used STRICT_FIELDS 'on' to make sure that our hash will
+not get polluted by bad key settings, so only keys listed in the DATA_FIELDS and INDEX_FIELDS will be allowed in the
+hash.
+
+DATA_FIELDS here is used to define wich fields will be saved in the serialized view of the hash in the datbase. Usually, 
+DATA_FIELDS are fields that you don't want to run search on, because, for example if you are saving to MySQL, searching
+blobs is not very efficient ;)
+
+INDEX_TABLE specifies the table in wich the index fields will be saved. You want this table to have all the fields listed
+in INDEX_FIELDS as columns and that table must have an 'id' field to link with the actual hash object.
+
+Now that we have our data type defined, what will happen when saving it ?
+
+Well, the keys listed in DATA_FIELDS will be serialized and saved, the INDEX_FIELDS will be inserted in their respective
+columns in INDEX_TABLE. When retrieving the object using Load(), those two chunks of data will be reconstructed as one
+single hash automagically.
+
+=head1 API REFERENCE AND PROGRAMMER MANUAL
+
+This file only contains an overview of Persistent::Hash. The complete API Reference and programmer manual are included
+in this package in L<Persistent::Hash::API> and L<Persistent::Hash::Manual>. These documents contain more examples
+and definitions of all the possible configuration options and their explanations.
+
+You can also consult the Storage module programmer's guide: L<Persistent::Hash::Storage>
+
+Please refer to these when developping application and systems using Persistent::Hash.
+
+Online versions of these manuals are available at:
+
+http://www.flatlineconstruct.com/documentation/Persistent-Hash/API.html
+
+http://www.flatlineconstruct.com/documentation/Persistent-Hash/Manual.html
+
+http://www.flatlineconstruct.com/documentation/Persistent-Hash/Storage.html
+
+
+=head1 BUGS (known)
+
+None, for now.
+
+=head1 CVS AND BLEEDING VERSIONS
+
+The latest developments and changes history for this module are available through cvsweb at:
+
+http://cvs.flatlineconstruct.com/
+
+The bleeding edge code is also available through anonymous CVS access via:
+
+cvs -d:pserver:anoncvs@cvs.flatlineconstruct.com:/home/cvs/anon checkout Persistent-Hash 
+
+Please, if you use this module in a project, let me know! 
+
+=head1 TODO
+
+=head1 COPYRIGHT
+
+Copyright(c) 2001 Benoit Beausejour <bbeausej@pobox.com>
+
+All rights reserved. This program is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself. 
+
+=head1 AUTHOR
+
+Benoit Beausejour <bbeausej@pobox.com>
+
+=head1 CONTRIBUTORS
+
+Your name here!
+
+=head1 SEE ALSO
+
+perltie(1).
+perl(1).
+
+=cut
+

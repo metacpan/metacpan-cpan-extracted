@@ -1,0 +1,36 @@
+---
+abstract: 'Prevent SQL injection in interpolated strings.'
+author:
+  - 'Guillaume Aubert <aubertg@cpan.org>'
+build_requires:
+  Test::Deep: '0'
+  Test::FailWarnings: '0'
+  Test::More: '0'
+  Test::Perl::Critic::Policy: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-ValuesAndExpressions-PreventSQLInjection
+provides:
+  Perl::Critic::Policy::ValuesAndExpressions::PreventSQLInjection:
+    file: lib/Perl/Critic/Policy/ValuesAndExpressions/PreventSQLInjection.pm
+    version: v1.4.0
+requires:
+  Carp: '0'
+  Perl::Critic::Policy: '0'
+  Perl::Critic::Utils: '0'
+  Readonly: '0'
+  String::InterpolatedVariables: '0'
+  Try::Tiny: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/guillaumeaubert/Perl-Critic-Policy-ValuesAndExpressions-PreventSQLInjection/issues
+  homepage: https://metacpan.org/release/Perl-Critic-Policy-ValuesAndExpressions-PreventSQLInjection
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/guillaumeaubert/Perl-Critic-Policy-ValuesAndExpressions-PreventSQLInjection
+version: v1.4.0

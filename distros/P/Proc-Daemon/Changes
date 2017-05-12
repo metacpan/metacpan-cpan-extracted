@@ -1,0 +1,120 @@
+Revision history for Perl module Proc::Daemon.
+
+0.23  Fri Jan  1 2016
+	- RT#110330: fix taint safe test (Owen Boyle).
+
+0.22  Wed Oct 28 2015
+	- RT#108012: force all tests to be executed sequentially (Alceu Rodrigues de Freitas Junior).
+
+0.21  Thu Aug  6 2015
+	- GH#5: make tests less time-sensitive (Stefan Parvu).
+	- RT#103130: fix taint safe test (Håkon Hægland).
+
+0.20  Wed Jun 24 2015
+	- GH#4: fix taint safe test (rouzier).
+	- RT#103130: make tests less time-sensitive (Remi Collet, ppisar).
+
+0.19  Sat Mar 21 2015
+	- RT#102360: add file_umask option (Cyrille Mastchenko).
+
+0.18  Mon Jan 26 2015
+	- GH#2: make Proc::Daemon internally taint safe (Rob Van Dam).
+	- GH#3: add option to setgid, same as setuid (Rob Van Dam).
+
+0.17  Fri Jan 23 2015
+	- Move umask test to the end, should fix some failures from CPAN Testers.
+	- RT#73352: replace exit with POSIX::_exit(0) in the "first child".
+
+0.16  Thu Jan 22 2015
+	- GH#1: fix Proc::ProcessTable test requirement.
+	- RT#72107: die when exec_command fails.
+
+0.15  Wed Jan 21 2015
+	- RT#91450: fix pid file permissions.
+	- RT#88512: fix typos in the documentation.
+
+0.14  Fri Jun 03 2011
+	- The filename memory is now a part of the object (not a package variable
+	  any more). This was a bug.
+	- Since <fork> is not performed on Windows OS as on Linux, I removed the
+	  <eval> and <warn> from 0.13 and add an INFO to the documentation.
+	- Updated the documentation.
+
+0.13  Wed Jun 01 2011
+	- Add ability to define the user identifier for the daemon if you want to
+	  run it under other user then the parent (request from Holger Gläss).
+	- Add <eval> and <warn> for OS not supporting POSIX::setsid (e.g. Windows).
+	- Updated the documentation.
+
+0.12  Tue Mai 24 2011
+	- Init() did not close all filehandles reliably in some cases. Thanks again
+	  to Rob Brown for reporting.
+	- Text improvement in the documentation.
+
+0.11  Mon Mai 23 2011
+	- Init() didn't close all filehandles reliably (see also bug report at
+	  http://rt.perl.org/rt3/Ticket/Display.html?id=72526). Thanks to Rob Brown
+	  for reporting and offering a patch.
+	- Attributes 'dont_close_fh' AND 'dont_close_fd' added so we can define
+	  file handles and descriptors that must be preserved from the parent into
+	  the child (daemon).
+	- Updated the documentation.
+	- In some environment it is not allowed to open anonymous files. In this
+	  case now a 'pid_file' must be defined. Thanks to Holger Gläss for
+	  reporting.
+
+0.10  Fri Apr 01 2011
+	- Improvement how Init() determines whether it was passed a blessed object
+
+0.09  Tue Mar 15 2011
+	- Fix for a possibly not reseted numbered match variable ($1).
+	- Typo fix and text improvement in the documentation.
+
+0.08  Sun Mar 13 2011
+	- The <open> Mode of the daemon file handles STDIN, STDOUT, STDERR can be
+	  specified now. The default Mode values are the same as before.
+	- Updated the documentation.
+
+0.07  Thu Feb 17 2011
+	- Add signal processing to Kill_Daemon().
+	- Updated the documentation.
+
+0.06  Mon Jan 17 2011
+	- A lot of documentation was add to the source code.
+	- Daemon STDIN was fixed to "read" now instead of "write".
+	- Replaced global filehandles with scalars.
+	- Add a <die> if <chdir> fails.
+	- Updated the documentation and add a note to the documentation about the
+	  behavior of process-group Signals.
+
+0.05  Thu Okt 28 2010
+	- Fixed a problem when using the old method of calling Proc::Daemon::Init
+	  without object (reported by Alex Samorukov). The parent process didn't
+	  exit.
+	- Fixed a problem with Proc::ProcessTable 0.44: Under some conditions
+	  'cmndline' retruns with space and/or other characters at the end.
+	- Update and small fixes in the documentation.
+
+0.04  Sun Okt 24 2010
+	- Added functions: new(), adjust_settings(), fix_filename(), Status(),
+	  Kill_Daemon(), get_pid() and get_pid_by_proc_table_attr().
+	- Init() now returns the PID of the daemon.
+	- Fork() now allways returns values like Perls built-in 'fork' does.
+	- Description was rewritten, extended and moved to the new Daemon.pod file.
+	- Additional test are done at installation.
+	- $SIG{'HUP'} was set to be valid only 'local' (bug report).
+	- POSIX::EAGAIN() was added to Fork() (bug report).
+
+0.03  Thu Jun 19 2003
+	- Licensing is more explicit: Either GPL or Artistic.
+	- Updated author contact information.
+
+0.02  Sat Apr 17 1999
+	- init() function superceded by Init() function.
+	- All open files are closed during daemonization.
+	- A double fork is now down to avoid the potential of acquiring
+	  a controlling terminal.
+	- Added Fork() and OpenMax() functions.
+
+0.01  Thu Jan 27 1998
+	- Initial bundled release.

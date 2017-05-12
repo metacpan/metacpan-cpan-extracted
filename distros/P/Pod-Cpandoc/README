@@ -1,0 +1,83 @@
+NAME
+    Pod::Cpandoc - perldoc that works for modules you don't have installed
+
+SYNOPSIS
+        cpandoc File::Find
+            -- shows the documentation of your installed File::Find
+
+        cpandoc Acme::BadExample
+            -- works even if you don't have Acme::BadExample installed!
+
+        cpandoc -c Text::Xslate
+            -- shows the changelog file for Text::Xslate
+
+        cpandoc -v '$?'
+            -- passes everything through to regular perldoc
+
+        cpandoc -m Acme::BadExample | grep system
+            -- options are respected even if the module was scraped
+
+        vim `cpandoc -l Web::Scraper`
+            -- getting the idea yet?
+
+        cpandoc http://darkpan.org/Eval::WithLexicals::AndGlobals
+            -- URLs work too!
+
+DESCRIPTION
+    "cpandoc" is a perl script that acts like "perldoc" except that if it
+    would have bailed out with "No documentation found for
+    "Uninstalled::Module"", it will instead scrape a CPAN index for the
+    module's documentation.
+
+    One important feature of "cpandoc" is that it *only* scrapes the live
+    index if you do not have the module installed. So if you use "cpandoc"
+    on a module you already have installed, then it will just read the
+    already-installed documentation. This means that the version of the
+    documentation matches up with the version of the code you have. As a
+    fringe benefit, "cpandoc" will be fast for modules you've installed. :)
+
+    All this means that you should be able to drop in "cpandoc" in place of
+    "perldoc" and have everything keep working. See "SNEAKY INSTALL" for how
+    to do this.
+
+    If you set the environment variable "CPANDOC_FETCH" to a true value,
+    then we will print a message to STDERR telling you that "cpandoc" is
+    going to make a request against the live CPAN index.
+
+TRANSLATIONS
+    Japanese
+            Japanese documentation can be found at
+            L<http://perldoc.jp/docs/modules/Pod-Cpandoc-0.09/Cpandoc.pod>,
+            contributed by @bayashi.
+
+SNEAKY INSTALL
+        cpanm Pod::Cpandoc
+
+        then: alias perldoc=cpandoc
+        or:   function perldoc () { cpandoc "$@" }
+
+        Now `perldoc Acme::BadExample` works!
+
+    "perldoc" should continue to work for everything that you're used to,
+    since "cpandoc" passes all options through to it. "cpandoc" is merely a
+    subclass that falls back to scraping a CPAN index when it fails to find
+    your queried file in @INC.
+
+SEE ALSO
+    The sneaky install was inspired by <https://github.com/defunkt/hub>.
+
+    <http://tech.bayashi.jp/archives/entry/perl-module/2011/003305.html>
+
+    <http://perladvent.org/2011/2011-12-15.html>
+
+    <http://sartak.org/talks/yapc-na-2011/cpandoc/>
+
+AUTHOR
+    Shawn M Moore "code@sartak.org"
+
+COPYRIGHT
+    Copyright 2011-2013 Shawn M Moore.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

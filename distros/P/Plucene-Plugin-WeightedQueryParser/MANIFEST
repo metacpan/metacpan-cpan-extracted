@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+WeightedQueryParser.pm
+META.yml                                 Module meta-data (added by MakeMaker)

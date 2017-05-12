@@ -1,0 +1,161 @@
+NAME
+    POE::Filter::Finger - A POE Filter for creating FINGER servers.
+
+SYNOPSIS
+       # A simple Fingerd using Test::POE::Server::TCP
+
+       use strict;
+       use warnings;
+       use POE;
+       use POE qw(Filter::Stackable Filter::Line Filter::Finger);
+       use Test::POE::Server::TCP;
+
+       POE::Session->create(
+         package_states => [
+            'main' => [qw(
+                            _start
+                            testd_client_input
+            )],
+         ],
+       );
+   
+       $poe_kernel->run();
+       exit 0;
+   
+       sub _start {
+         my $heap = $_[HEAP];
+         # Spawn the Test::POE::Server::TCP server.
+         $heap->{testd} = Test::POE::Server::TCP->spawn(
+            address => '127.0.0.1',
+            port => 0,
+            filter => POE::Filter::Stackable->new(
+                    Filters => [
+                            POE::Filter::Line->new(),
+                            POE::Filter::Finger->new(),
+                    ],
+            ),
+         );
+         warn "Listening on port: ", $heap->{testd}->port(), "\n";
+         return;
+       }
+   
+       sub testd_client_input {
+         my ($kernel,$heap,$sender,$id,$input) = @_[KERNEL,HEAP,SENDER,ARG0,ARG1];
+
+         my $output;
+
+         SWITCH: {
+            if ( $input->{listing} ) {
+                $output = 'listing of users rejected';
+                last SWITCH;
+            }
+            if ( $input->{user} ) {
+                my $username = $input->{user}->{username};
+                $output = "query for information on alleged user <$username> rejected";
+                last SWITCH;
+            }
+            if ( $input->{forward} ) {
+                $output = 'finger forwarding service denied';
+                last SWITCH;
+            }
+            $output = 'could not understand query';
+         }
+
+         $kernel->post( $sender, 'send_to_client', $id, $output );
+
+         return;
+       }
+
+DESCRIPTION
+    POE::Filter::Finger is a POE::Filter for the FINGER protocol, RFC 1288.
+
+    It is for use on the server side and parses incoming finger requests
+    from clients and produces hashrefs of information relating to those
+    requests.
+
+    The "put" method works in much the same way as POE::Filter::Stream and
+    does not alter any data passed back to the client.
+
+    The filter does not deal with chunking data received into lines. It is
+    intended to be used in a stackable filter, POE::Filter::Stackable, with
+    POE::Filter::Line.
+
+    It is based on code borrowed from Net::Finger::Server.
+
+CONSTRUCTOR
+    "new"
+        Creates a new POE::Filter::Finger object.
+
+        Takes two optional parameters:
+
+          'username_regex', override the regex used to match usernames in query string;
+          'hostname_regex', override the regex used to match hostnames in query string;
+
+METHODS
+    "get"
+    "get_one_start"
+    "get_one"
+        Takes an arrayref which contains lines of Finger protocol data,
+        returns an arrayref of hashref records dependent on what was
+        requested:
+
+           listing request:
+
+           {
+                'listing' => { verbose => '' }, # verbose boolean; did client request a verbose reply?
+           }
+
+           user request:
+
+           {
+                'user' => {
+                                'verbose' => '', # verbose boolean; did client request a verbose reply?
+                                'username' => 'bingos' # the username requested.
+                          }
+           }
+
+           forward request:
+
+           {
+                'forward' => {
+                                'verbose' => '', # verbose boolean; did client request a verbose reply?
+                                 'hosts' => [    # an arrayref of the hosts in the query, left to right
+                                                'example.org',
+                                                'example.com'
+                                            ],
+                                 'username' => 'bingos' # the user named in the query (if any)
+                             }
+            }
+
+            unknown request:
+
+            {
+                    'unknown' => 'this is garbage' # passed the query string
+            }
+
+    "get_pending"
+        Returns the filter's partial input buffer.
+
+    "put"
+        Passes any given data through without altering it.
+
+    "clone"
+        Makes a copy of the filter, and clears the copy's buffer.
+
+AUTHOR
+    Chris "BinGOs" Williams <chris@bingosnet.co.uk>
+
+    Ricardo SIGNES <rjbs@cpan.org>
+
+LICENSE
+    Copyright © Chris Williams and Ricardo SIGNES
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.
+
+SEE ALSO
+    POE::Filter
+
+    Net::Finger::Server
+

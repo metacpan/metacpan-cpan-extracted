@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+Methods
+PGP/Pipe.pm
+README
+TODO
+t/PGP.t

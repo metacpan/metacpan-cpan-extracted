@@ -1,0 +1,114 @@
+
+=encoding utf8
+
+=head1 NAME/НАИМЕНОВАНИЕ
+
+perlcheat - Perl 5 Шпаргалка
+
+=head1 ОПИСАНИЕ
+
+Этот «шпаргалка» является удобным справочником, предназначенный для начинающих программистов на этом языке. Здесь упомянуты не все функции, но уже 195 может быть достаточно.
+
+=head2 Таблица
+
+  КОНТЕКСТЫ  СИГИЛЫ  ref        ARRAYS        HASHES
+  void      $scalar SCALAR     @array        %hash
+  scalar    @array  ARRAY      @array[0, 2]  @hash{'a', 'b'}
+  list      %hash   HASH       $array[0]     $hash{'a'}
+            &sub    CODE
+            *glob   GLOB       SCALAR VALUES
+                    FORMAT     number, string, ref, glob, undef
+  Ссылки
+  \      ссылка       $$foo[1]       тоже, что и $foo->[1]
+  $@%&*  dereference     $$foo{bar}     тоже, что и $foo->{bar}
+  []     anon. arrayref  ${$$foo[1]}[2] aka $foo->[1]->[2]
+  {}     anon. hashref   ${$$foo[1]}[2] aka $foo->[1][2]
+  \()    ссылка на список
+                         СИНТАКСИС
+  ПРИОРИТЕТ ОПЕРАТОРОВ    foreach (LIST) { }     for (a;b;c) { }
+  ->                     while   (e) { }        until (e)   { }
+  ++ --                  if      (e) { } elsif (e) { } else { }
+  **                     unless  (e) { } elsif (e) { } else { }
+  ! ~ \ u+ u-            given   (e) { when (e) {} default {} }
+  =~ !~
+  * / % x                 NUMBERS vs STRINGS  FALSE vs TRUE
+  + - .                   =          =        undef, "", 0, "0"
+  << >>                   +          .        что-нибудь еще
+  имени микрооперации (uops)              == !=      eq ne
+  < > <= >= lt gt le ge   < > <= >=  lt gt le ge
+  == != <=> eq ne cmp ~~  <=>        cmp
+  &
+  | ^             МОДИФИКАТОРЫ REGEX       МЕТАСИМВОЛЫ REGEX 
+  &&              /i не чувствительно к регистру   ^      начало строки
+  || //           /m основная линия ^$      $      str end (bfr \n)
+  .. ...          /s . включает \n      +      один или более
+  ?:              /x игнорировать пробелы    *      ноль или более
+  = += last goto  /p сохранить           ?      ноль или один
+  , =>            /a ASCII    /aa безопасно  {3,7}  повторить в диапазоне
+  list ops        /l локаль   /d  dual  |      альтернатива
+  not             /u Юникод            []     класс символов
+  and             /e выполнить /ee rpts  \b     граница слова
+  or xor          /g глобально             \z     конец строки
+                  /o компиляции единожды   ()     захват
+  ОТЛАДКА                                 (?:p)  не захватывать
+  -MO=Deparse     КЛАСССИМВОЛОВ REGEX     (?#t)  комментарий
+  -MO=Terse       .   [^\n]             (?=p)  ZW позиция впереди
+  -D##            \s  пробел        (?!p)  ZW  отр впереди
+  -d:Trace        \w  символы слова        (?<=p) ZW поз позади \K
+                  \d  цифры            (?<!p) ZW отр позади
+  КОНФИГУРАЦИЯ   \pP именованное свойство    (?>p)  не возвращаться назад
+  perl -V:ivsize  \h  горизонт пробелы    (?|p|p)сброс ветки
+                  \R  перенос строки         (?<n>p)именованный захват
+                  \S \W \D \H отрицать    \g{n}  ссылка на имени крышкой (cap)
+                                        \K     держать левую часть
+  СПИСКИ ВОЗВРАТОВ ФУНКЦИЙ
+  stat      localtime    caller         СПЕЦИАЛЬНЫЕ ПЕРЕМЕННЫЕ
+   0 dev    0 second      0 package     $_    переменная по умолчанию
+   1 ino    1 minute      1 filename    $0    имя файла программы
+   2 mode   2 hour        2 line        $/    входной разделитель
+   3 nlink  3 day         3 subroutine  $\    выходной разделитель
+   4 uid    4 month-1     4 hasargs     $|    autoflush (сбрасывание буфера)
+   5 gid    5 year-1900   5 wantarray   $!    ошибки системы/или вызова lib 
+   6 rdev   6 weekday     6 evaltext    $@    eval error
+   7 size   7 yearday     7 is_require  $$    ID процесса
+   8 atime  8 is_dst      8 hints       $.    номер строки
+   9 mtime                9 bitmask     @ARGV аргументы командной строки
+  10 ctime               10 hinthash    @INC  включенные пути
+  11 blksz               3..10 only     @_    аргументы подпрограммы
+  12 blcks               with EXPR      %ENV  переменные среды
+
+=head1 БЛАГОДАРНОСТЬ
+
+Первая версия этого документа появилась на Perl Monks, где несколько человек делали полезные предложения. Спасибо, Perl Monks.
+
+Особая благодарность Дамиану Конвею, который не только предложил важные изменения, но и нашел время, чтобы подсчитать количество перечисленных особенностей и сделать версию Perl 6, чтобы показать, что Perl остаётся Перлом.
+
+=head1 АВТОР
+
+Juerd Waalboer <#####@juerd.nl>, с помощью многих Perl Monks.
+
+=head1 СМОТРИТЕ ТАКЖЕ
+
+=over 4
+
+=item *
+
+L<http://perlmonks.org/?node_id=216602> - Оригинальное сообщение на PM
+
+=item *
+
+L<http://perlmonks.org/?node_id=238031> - Damian Conway Perl 6 версия
+
+=item *
+
+L<http://juerd.nl/site.plp/perlcheat> - дом Perl Шпаргалки (Cheat Sheet)
+
+=back
+
+=head1 ПЕРЕВОДЧИКИ
+
+=over
+
+=item * Николай Мишин  C<< <mishin@cpan.org> >>
+
+=back    

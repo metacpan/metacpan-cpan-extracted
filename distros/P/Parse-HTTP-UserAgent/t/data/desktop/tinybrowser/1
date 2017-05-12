@@ -1,0 +1,10 @@
+[AGENT]
+
+TinyBrowser/2.0 (TinyBrowser Comment) Gecko/20201231
+
+'parser'           => 'mozilla_family:generic',
+'extras'           => ['TinyBrowser Comment'],
+'version_raw'      => '2.0',
+'version'          => '2.000',
+'name'             => 'TinyBrowser',
+'toolkit'          => ['Gecko','20201231','20201231.000']

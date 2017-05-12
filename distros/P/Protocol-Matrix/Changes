@@ -1,0 +1,11 @@
+Revision history for Protocol-Matrix
+
+0.02    2015/10/19 19:12:34
+        [CHANGES]
+         * Added 'signed_json' for returning a fresh copy of signed data
+         * Added redaction and event-signing functions
+         * Initial attempt at abstracting out some HTTP request factory methods
+
+0.01    2015/07/08 18:14:29
+        First version, released on an unsuspecting world.
+

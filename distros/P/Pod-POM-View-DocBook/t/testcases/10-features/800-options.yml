@@ -1,0 +1,4 @@
+desc: option root='book'
+viewoptions:
+  root: book
+  titlecasing: 1

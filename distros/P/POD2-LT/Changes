@@ -1,0 +1,13 @@
+Revision history for Perl extension POD2::LT.
+
+0.02  Wed Jan  7 19:50:13 2004
+	- perlreref
+	- perl582delta
+	- perl583delta
+	- lwpcook
+	- added encoding information
+
+0.01  Wed Jul 23 15:07:08 2003
+	- original version; created by h2xs 1.22 with options
+		-A -X -n POD2::LT by Petras Kudaras
+

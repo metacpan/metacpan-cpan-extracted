@@ -1,0 +1,35 @@
+---
+abstract: 'A POE Filter for creating FINGER servers.'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Deep: 0.103
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Filter-Finger
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+provides:
+  POE::Filter::Finger:
+    file: lib/POE/Filter/Finger.pm
+    version: 0.08
+requires:
+  POE: 0.38
+  POE::Filter: 0
+  perl: 5.6.0
+resources:
+  homepage: http://github.com/bingos/poe-filter-finger/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bingos/poe-filter-finger.git
+version: 0.08

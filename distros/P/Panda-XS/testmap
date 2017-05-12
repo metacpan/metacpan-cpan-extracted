@@ -1,0 +1,114 @@
+TYPEMAP
+
+PTRMyBase*             PXS_PTR_MYBASE
+PTRMyChild*            PXS_PTR_MYBASE
+PTRMyRefCounted*       PXS_PTR_REFCOUNTED
+PTRMyRefCountedChild*  PXS_PTR_REFCOUNTED
+PTRMyRefCountedSP      PXS_PTR_REFCOUNTED_SP
+PTRMyRefCountedChildSP PXS_PTR_REFCOUNTED_SP
+PTRMyBaseSSP           PXS_PTR_MYBASE_SSP
+PTRMyChildSSP          PXS_PTR_MYBASE_SSP
+PTRMyBaseSP            PXS_PTR_MYBASE_SP
+PTRMyChildSP           PXS_PTR_MYBASE_SP
+PTRMyStatic*           PXS_PTR_MYSTATIC
+PTRMyStaticChild*      PXS_PTR_MYSTATIC
+PTRWBase*              PXS_PTR_WRAPPED
+PTRWChild*             PXS_PTR_WRAPPED_CHILD
+PTRBRStorage*          T_OPTR
+PTRBRUnit*             PXS_PTR_BRUNIT
+
+MyBase*                PXS_MYBASE
+MyChild*               PXS_MYBASE
+MyRefCounted*          PXS_REFCOUNTED
+MyRefCountedChild*     PXS_REFCOUNTED
+MyRefCountedSP         PXS_REFCOUNTED_SP
+MyRefCountedChildSP    PXS_REFCOUNTED_SP
+MyBaseSP               PXS_MYBASE_SP
+MyChildSP              PXS_MYBASE_SP
+MyBaseSSP              PXS_MYBASE_SSP
+MyChildSSP             PXS_MYBASE_SSP
+MyStatic*              PXS_MYSTATIC
+MyStaticChild*         PXS_MYSTATIC
+MyOther*               T_OEXT
+MixBase*               T_OEXT
+MixPluginA*            T_OEXT
+MixPluginB*            T_OEXT
+MyBaseAV*              T_OEXT_AV
+MyBaseHV*              T_OEXT_HV
+MyThreadSafe*          PXS_MYTHREAD_SAFE
+WBase*                 PXS_WRAPPED
+WChild*                PXS_WRAPPED_CHILD
+BRStorage*             PXS_BRSTORAGE
+BRSPStorage*           PXS_BRSPSTORAGE
+BRUnit*                PXS_BRUNIT
+BRUnitSP               PXS_BRUNIT_SP
+
+Wrapper*               PXS_WRAPPER
+WrapperChild*          PXS_WRAPPER
+BRUnitSPWrapper*       PXS_BRUNIT_SP_WRAPPER
+
+
+INPUT
+
+PXS_PTR_MYBASE        : T_OPTR(basetype=PTRMyBase*)
+PXS_PTR_REFCOUNTED    : T_OPTR(basetype=PTRMyRefCounted*, refcnt)
+PXS_PTR_REFCOUNTED_SP : T_OPTR(basetype=PTRMyRefCountedSP)
+PXS_PTR_MYBASE_SP     : T_OPTR(basetype=PTRMyBaseSP)
+PXS_PTR_MYBASE_SSP    : T_OPTR(basetype=PTRMyBaseSSP)
+PXS_PTR_MYSTATIC      : T_OPTR(basetype=PTRMyStatic*, static_cast=1)
+PXS_PTR_WRAPPED       : T_OPTR(basetype=PTRWBase*, wrapper=Wrapper*)
+PXS_PTR_WRAPPED_CHILD : T_OPTR(basetype=PTRWBase*, wrapper=WrapperChild*)
+PXS_PTR_BRUNIT        : T_OPTR(basetype=BRUnit*, refcnt, backref)
+
+PXS_MYBASE        : T_OEXT(basetype=MyBase*)
+PXS_REFCOUNTED    : T_OEXT(basetype=MyRefCounted*, refcnt)
+PXS_REFCOUNTED_SP : T_OEXT(basetype=MyRefCountedSP)
+PXS_MYBASE_SP     : T_OEXT(basetype=MyBaseSP)
+PXS_MYBASE_SSP    : T_OEXT(basetype=MyBaseSSP)
+PXS_MYSTATIC      : T_OEXT(basetype=MyStatic*, static_cast=1)
+PXS_MYTHREAD_SAFE : T_OEXT(basetype=MyThreadSafe*, refcnt)
+PXS_WRAPPED       : T_OEXT(basetype=WBase*, wrapper=Wrapper*)
+PXS_WRAPPED_CHILD : T_OEXT(basetype=WBase*, wrapper=WrapperChild*)
+PXS_BRSTORAGE     : T_OEXT(basetype=BRStorage*)
+PXS_BRSPSTORAGE   : T_OEXT(basetype=BRSPStorage*)
+PXS_BRUNIT        : T_OEXT(basetype=BRUnit*, backref, refcnt)
+PXS_BRUNIT_SP     : T_OEXT(basetype=BRUnitSP, backref, wrapper=BRUnitSPWrapper*)
+
+PXS_WRAPPER : T_OWRAPPER(basetype=Wrapper*)
+    $var = $arg->obj;
+    
+PXS_BRUNIT_SP_WRAPPER : T_OWRAPPER(basetype=BRUnitSPWrapper*)
+    $var = $arg->unit();
+
+OUTPUT
+
+PXS_PTR_MYBASE        : T_OPTR(basetype=PTRMyBase*)
+PXS_PTR_REFCOUNTED    : T_OPTR(basetype=PTRMyRefCounted*, refcnt)
+PXS_PTR_REFCOUNTED_SP : T_OPTR(basetype=PTRMyRefCountedSP)
+PXS_PTR_MYBASE_SP     : T_OPTR(basetype=PTRMyBaseSP)
+PXS_PTR_MYBASE_SSP    : T_OPTR(basetype=PTRMyBaseSSP)
+PXS_PTR_MYSTATIC      : T_OPTR(basetype=PTRMyStatic*)
+PXS_PTR_WRAPPED       : T_OPTR(basetype=PTRWBase*, wrapper=Wrapper*)
+PXS_PTR_WRAPPED_CHILD : T_OPTR(basetype=PTRWBase*, wrapper=WrapperChild*)
+PXS_PTR_BRUNIT        : T_OPTR(basetype=BRUnit*, refcnt, backref, on_svdup=clone)
+
+PXS_MYBASE        : T_OEXT(basetype=MyBase*, on_svdup=clone)
+PXS_REFCOUNTED    : T_OEXT(basetype=MyRefCounted*, refcnt)
+PXS_REFCOUNTED_SP : T_OEXT(basetype=MyRefCountedSP)
+PXS_MYBASE_SP     : T_OEXT(basetype=MyBaseSP)
+PXS_MYBASE_SSP    : T_OEXT(basetype=MyBaseSSP)
+PXS_MYSTATIC      : T_OEXT(basetype=MyStatic*)
+PXS_MYTHREAD_SAFE : T_OEXT(basetype=MyThreadSafe*, refcnt, on_svdup=retain)
+PXS_WRAPPED       : T_OEXT(basetype=WBase*, wrapper=Wrapper*)
+PXS_WRAPPED_CHILD : T_OEXT(basetype=WBase*, wrapper=WrapperChild*)
+PXS_BRSTORAGE     : T_OEXT(basetype=BRStorage*, on_svdup=clone)
+PXS_BRSPSTORAGE   : T_OEXT(basetype=BRSPStorage*, on_svdup=clone)
+PXS_BRUNIT        : T_OEXT(basetype=BRUnit*, refcnt, backref, on_svdup=clone)
+PXS_BRUNIT_SP     : T_OEXT(basetype=BRUnitSP, backref, on_svdup=clone, wrapper=BRUnitSPWrapper*)
+
+PXS_WRAPPER : T_OWRAPPER(basetype=Wrapper*)
+    $arg = new $subtype($var);
+
+PXS_BRUNIT_SP_WRAPPER : T_OWRAPPER(basetype=BRUnitSPWrapper*)
+    $arg = new $subtype($var);
+    

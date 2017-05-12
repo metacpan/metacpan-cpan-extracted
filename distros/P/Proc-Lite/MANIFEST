@@ -1,0 +1,27 @@
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Proc/Hevy.pm
+lib/Proc/Hevy/Reader.pm
+lib/Proc/Hevy/Writer.pm
+lib/Proc/Lite.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/hevy-exec.t
+t/hevy-stdin.t
+t/hevy-stdxxx.t
+t/lite.t
+t/reopen.t

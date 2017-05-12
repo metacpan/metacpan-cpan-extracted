@@ -1,0 +1,28 @@
+Revision history for Perl extension Plack::App::Directory::Xslate
+
+0.07 2013-10-12T00:34:31Z
+        - minil migrate
+        - cleanup code
+        - (no feature changes)
+
+0.06    2011-11-04 08:30:00
+        - match the specification change of Plack::App::File.(SCRIPT_NAME to plack.file.SCRIPT_NAME)
+        - fixed bugging logic.
+
+0.05    2011-09-11 16:22:00
+        - fix dependency
+
+0.04    2011-09-11 16:20:00
+        - add param "xslate_param"
+        - put Content-Length header
+        - add basic test
+
+0.03    2011-06-30 23:23:00
+        - fix: add META.yml
+        - fix: add requires in Makefile.PL
+
+0.02    2011-06-30 22:17:00
+        - fix: no suffix override
+
+0.01    Tue Jun 28 15:14:04 2011
+        - original version

@@ -1,0 +1,64 @@
+= Params-Validate-Checks-Net =
+
+This is the Cpan distribution of the Params::Validate::Checks::Net Perl module.
+
+Params::Validate::Checks::Net provides some named checks for use with
+Params::Validate, to specify that certain function or method parameters should
+be networky things:
+
+  use Params::Validate::Checks qw<validate as>;
+  use Params::Validate::Checks::Net;
+
+  sub configure_website
+  {
+    my %arg = validate @_,
+    {
+      website => {as 'domain'},
+      nameserver => {as 'domain'},
+      ip_address => {as 'public_ip_address'},
+    };
+
+    # Do something with $arg{website}, $arg{nameserver}, $arg{ip_address} ...
+  }
+
+  sub check_network
+  {
+    my %arg = validate @_.
+    {
+      device => {as 'hostname'},
+      mac_address => {as 'mac_address'},
+      timeout => {as 'pos_int', default => 10},
+    };
+
+    # Do something with $arg{device}, $arg{mac_address}, $arg{timeout} ...
+  }
+
+== Installation ==
+
+Params::Validate::Checks::Net can be installed using the Cpan client:
+
+  cpan -i Params::Validate::Checks::Net
+
+or by unzipping this distribution and running Build.PL and then Build:
+
+  perl Build.PL
+  ./Build test
+  ./Build install
+
+or, if you have a make program, by running Makefile.PL then make:
+
+  perl Makefile.PL
+  make test
+  make install
+
+== Copyright & Licence ==
+
+© copyright 2006-2008 by Smylers <smylers@cpan.org>
+
+This library is software libre; you may redistribute it and modify it under the
+terms of any of these licences:
+
+* The GNU General Public License, version 2
+* The GNU General Public License, version 3
+* The Artistic License
+* The Artistic License 2.0

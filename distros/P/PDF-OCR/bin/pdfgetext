@@ -1,0 +1,103 @@
+#!/usr/bin/perl -w
+use lib './lib';
+use strict;
+use warnings;
+use Cwd;
+use base 'LEOCHARRE::CLI';
+use PDF::OCR::Thorough;
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /(\d+)/g;
+
+my $o = gopts('fdo:');
+
+
+if (DEBUG()){
+	$PDF::OCR::Thorough::DEBUG = 1;
+}
+
+
+
+
+
+
+
+
+if ($o->{o}){
+	if (-f $o->{o}){
+		die ("output destination $$o{o} already exists.");	
+	}	
+}
+
+
+my $arg = $ARGV[0];
+my $p = new PDF::OCR::Thorough($arg) or die("cant use [$arg]");
+
+if ($o->{f}){
+	$p->force_ocr(1);
+}
+
+my $ALLTEXT = $p->get_text;
+
+
+
+if ($o->{o}){
+	open(FILE,">$$o{o}");
+	print FILE $ALLTEXT;
+	close FILE;
+	print STDERR " Saved output as $$o{o}\n" if DEBUG;
+	exit;	
+}
+
+print $ALLTEXT;
+
+exit;
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+pdfgetext - get text from pdf and resort to ocr as needed
+
+=head1 DESCRIPTION
+
+Get all text out of a pdf, even from images.
+
+This is basically a CLI interface to L<OCR::PDF::Thorough>.
+
+=head1 OPTION FLAGS
+
+	-f force extracting images and running ocr even if pdftotext finds content
+	-d debug on
+	-o output file, abs path (text file) instead of STDOUT
+
+=head1 EXAMPLE USAGE
+
+Standard usage:
+
+	pdfgetext /home/myself/brochure.pdf
+
+If you want to save to a text file
+
+	pdfgetext -o /home/myself/brochure.txt /home/myself/brochure.pdf
+
+If you want to see extra debug info:
+
+	pdfgetext -d /home/myself/brochure.pdf
+
+Another way to save to a text file
+
+	pdfgetext /home/myself/brochure.pdf > /home/myself/output
+
+=head1 SEE ALSO
+
+L<PDF::OCR>
+L<PDF::OCR::Thorough>
+L<PDF::API2>
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=cut

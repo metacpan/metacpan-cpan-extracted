@@ -1,0 +1,333 @@
+{
+          'is_analyzed' => 1,
+          'actual_time_first' => '984.815',
+          'estimated_rows' => '1',
+          'estimated_total_cost' => '19735.08',
+          'estimated_row_width' => '108',
+          'actual_time_last' => '984.898',
+          'estimated_startup_cost' => '19735.07',
+          'actual_rows' => '705',
+          'extra_info' => [
+                            'Sort Key: gp.idx_gabinetu, (COALESCE(z.godz_otwarcia, gp.godz_otwarcia))',
+                            'Sort Method:  quicksort  Memory: 124kB'
+                          ],
+          'sub_nodes' => [
+                           {
+                             'is_analyzed' => 1,
+                             'actual_time_first' => '625.283',
+                             'estimated_rows' => '1',
+                             'estimated_total_cost' => '19735.06',
+                             'estimated_row_width' => '108',
+                             'actual_time_last' => '983.437',
+                             'estimated_startup_cost' => '14296.97',
+                             'actual_rows' => '705',
+                             'extra_info' => [
+                                               'Join Filter: (($1 + s.s) <= COALESCE(gu.data_do, \'3000-01-01\'::date))',
+                                               'Filter: (((CASE WHEN (z.idx_gdz_pracy IS NULL) THEN gp.czy_ukryty ELSE z.czy_ukryty END)::"char" = \'N\'::"char") OR ps_chkupr(246) OR (NOT (gu.idx_pracownika IS NULL)))'
+                                             ],
+                             'sub_nodes' => [
+                                              {
+                                                'is_analyzed' => 1,
+                                                'actual_time_first' => '624.938',
+                                                'estimated_rows' => '1',
+                                                'estimated_total_cost' => '19733.98',
+                                                'estimated_row_width' => '114',
+                                                'actual_time_last' => '960.508',
+                                                'estimated_startup_cost' => '14296.72',
+                                                'actual_rows' => '705',
+                                                'extra_info' => [
+                                                                  'Hash Cond: ((gp.idx_gdz_pracy = z.idx_gdz_pracy_wyjsciowy) AND (($1 + s.s) = z.wazny_od))',
+                                                                  'Filter: ((((CASE WHEN (z.idx_gdz_pracy IS NULL) THEN gp.czy_lokalny ELSE z.czy_lokalny END)::"char" = \'N\'::"char") OR (g.idx_placowki = ps_akt_placowka())) AND ((SubPlan 1) = $5))',
+                                                                ],
+                                                'sub_nodes' => [
+                                                                 {
+                                                                   'is_analyzed' => 1,
+                                                                   'actual_time_first' => '490.88',
+                                                                   'estimated_rows' => '1192',
+                                                                   'estimated_total_cost' => '3900.07',
+                                                                   'estimated_row_width' => '74',
+                                                                   'actual_time_last' => '654.251',
+                                                                   'estimated_startup_cost' => '3509.52',
+                                                                   'actual_rows' => '14703',
+                                                                   'extra_info' => [
+                                                                                     'Merge Cond: ((date_part(\'dow\'::text, (($1 + s.s))::timestamp without time zone)) = ((gp.dzien_tygodnia)::double precision))',
+                                                                                     'Join Filter: ((($1 + s.s) >= gp.wazny_od) AND (($1 + s.s) <= gp.wazny_do))'
+                                                                                   ],
+                                                                   'sub_nodes' => [
+                                                                                    {
+                                                                                      'is_analyzed' => 1,
+                                                                                      'actual_time_first' => '0.056',
+                                                                                      'estimated_rows' => '1000',
+                                                                                      'estimated_total_cost' => '67.33',
+                                                                                      'estimated_row_width' => '4',
+                                                                                      'actual_time_last' => '0.059',
+                                                                                      'estimated_startup_cost' => '64.83',
+                                                                                      'actual_rows' => '11',
+                                                                                      'extra_info' => [
+                                                                                                        'Sort Key: (date_part(\'dow\'::text, (($1 + s.s))::timestamp without time zone))',
+                                                                                                        'Sort Method:  quicksort  Memory: 25kB'
+                                                                                                      ],
+                                                                                      'sub_nodes' => [
+                                                                                                       {
+                                                                                                         'is_analyzed' => 1,
+                                                                                                         'actual_time_first' => '0.032',
+                                                                                                         'estimated_rows' => '1000',
+                                                                                                         'estimated_total_cost' => 15,
+                                                                                                         'estimated_row_width' => '4',
+                                                                                                         'actual_time_last' => '0.041',
+                                                                                                         'estimated_startup_cost' => 0,
+                                                                                                         'actual_rows' => '11',
+                                                                                                         'type' => 'Function Scan',
+                                                                                                         'scan_on' => {
+                                                                                                             'function_alias' => 's',
+                                                                                                             'function_name' => 'generate_series'
+                                                                                                         },
+                                                                                                         'actual_loops' => '1'
+                                                                                                       }
+                                                                                                     ],
+                                                                                      'type' => 'Sort',
+                                                                                      'actual_loops' => '1'
+                                                                                    },
+                                                                                    {
+                                                                                      'is_analyzed' => 1,
+                                                                                      'actual_time_first' => '490.804',
+                                                                                      'estimated_rows' => '2146',
+                                                                                      'estimated_total_cost' => '3450.06',
+                                                                                      'estimated_row_width' => '70',
+                                                                                      'actual_time_last' => '561.202',
+                                                                                      'estimated_startup_cost' => '3444.69',
+                                                                                      'actual_rows' => '173693',
+                                                                                      'extra_info' => [
+                                                                                                        'Sort Key: ((gp.dzien_tygodnia)::double precision)',
+                                                                                                        'Sort Method:  external sort  Disk: 11312kB'
+                                                                                                      ],
+                                                                                      'sub_nodes' => [
+                                                                                                       {
+                                                                                                         'is_analyzed' => 1,
+                                                                                                         'actual_time_first' => '0.461',
+                                                                                                         'estimated_rows' => '2146',
+                                                                                                         'estimated_total_cost' => '3325.94',
+                                                                                                         'estimated_row_width' => '70',
+                                                                                                         'actual_time_last' => '198.491',
+                                                                                                         'estimated_startup_cost' => '46.42',
+                                                                                                         'actual_rows' => '113394',
+                                                                                                         'sub_nodes' => [
+                                                                                                                          {
+                                                                                                                            'is_analyzed' => 1,
+                                                                                                                            'actual_time_first' => '0.437',
+                                                                                                                            'estimated_rows' => '19',
+                                                                                                                            'estimated_total_cost' => '129.38',
+                                                                                                                            'estimated_row_width' => '12',
+                                                                                                                            'actual_time_last' => '3.798',
+                                                                                                                            'estimated_startup_cost' => '46.42',
+                                                                                                                            'actual_rows' => '1252',
+                                                                                                                            'extra_info' => [
+                                                                                                                                              'Hash Cond: (g.idx_placowki = p.idx_placowki)'
+                                                                                                                                            ],
+                                                                                                                            'sub_nodes' => [
+                                                                                                                                             {
+                                                                                                                                               'scan_on' => {
+                                                                                                                                                              'table_alias' => 'g',
+                                                                                                                                                              'table_name' => 's_gabinety'
+                                                                                                                                                            },
+                                                                                                                                               'is_analyzed' => 1,
+                                                                                                                                               'actual_time_first' => '0.009',
+                                                                                                                                               'estimated_rows' => '38',
+                                                                                                                                               'estimated_total_cost' => '82.63',
+                                                                                                                                               'estimated_row_width' => '8',
+                                                                                                                                               'actual_time_last' => '1.747',
+                                                                                                                                               'estimated_startup_cost' => 0,
+                                                                                                                                               'actual_rows' => '2443',
+                                                                                                                                               'extra_info' => [
+                                                                                                                                                                 'Filter: ((idx_placowki = $3) OR ($3 = 0))'
+                                                                                                                                                               ],
+                                                                                                                                               'type' => 'Seq Scan',
+                                                                                                                                               'actual_loops' => '1'
+                                                                                                                                             },
+                                                                                                                                             {
+                                                                                                                                               'is_analyzed' => 1,
+                                                                                                                                               'actual_time_first' => '0.416',
+                                                                                                                                               'estimated_rows' => '19',
+                                                                                                                                               'estimated_total_cost' => '46.19',
+                                                                                                                                               'estimated_row_width' => '4',
+                                                                                                                                               'actual_time_last' => '0.416',
+                                                                                                                                               'estimated_startup_cost' => '46.19',
+                                                                                                                                               'actual_rows' => '134',
+                                                                                                                                               'sub_nodes' => [
+                                                                                                                                                                {
+                                                                                                                                                                  'scan_on' => {
+                                                                                                                                                                                 'table_alias' => 'p',
+                                                                                                                                                                                 'table_name' => 's_lokalizacje_placowki'
+                                                                                                                                                                               },
+                                                                                                                                                                  'is_analyzed' => 1,
+                                                                                                                                                                  'actual_time_first' => '0.008',
+                                                                                                                                                                  'estimated_rows' => '19',
+                                                                                                                                                                  'estimated_total_cost' => '46.19',
+                                                                                                                                                                  'estimated_row_width' => '4',
+                                                                                                                                                                  'actual_time_last' => '0.342',
+                                                                                                                                                                  'estimated_startup_cost' => 0,
+                                                                                                                                                                  'actual_rows' => '134',
+                                                                                                                                                                  'extra_info' => [
+                                                                                                                                                                                    'Filter: ((idx_lokalizacji = $5) OR ($5 = 0))'
+                                                                                                                                                                                  ],
+                                                                                                                                                                  'type' => 'Seq Scan',
+                                                                                                                                                                  'actual_loops' => '1'
+                                                                                                                                                                }
+                                                                                                                                                              ],
+                                                                                                                                               'type' => 'Hash',
+                                                                                                                                               'actual_loops' => '1'
+                                                                                                                                             }
+                                                                                                                                           ],
+                                                                                                                            'type' => 'Hash Join',
+                                                                                                                            'actual_loops' => '1'
+                                                                                                                          },
+                                                                                                                          {
+                                                                                                                            'scan_on' => {
+                                                                                                                                           'index_name' => 's_gabinety_godziny_pracy_idx',
+                                                                                                                                           'table_alias' => 'gp',
+                                                                                                                                           'table_name' => 's_gabinety_godziny_pracy'
+                                                                                                                                         },
+                                                                                                                            'is_analyzed' => 1,
+                                                                                                                            'actual_time_first' => '0.007',
+                                                                                                                            'estimated_rows' => '113',
+                                                                                                                            'estimated_total_cost' => '166.83',
+                                                                                                                            'estimated_row_width' => '62',
+                                                                                                                            'actual_time_last' => '0.107',
+                                                                                                                            'estimated_startup_cost' => 0,
+                                                                                                                            'actual_rows' => '91',
+                                                                                                                            'extra_info' => [
+                                                                                                                                              'Index Cond: (gp.idx_gabinetu = g.idx_gabinetu)',
+                                                                                                                                              'Filter: (gp.idx_gdz_pracy_wyjsciowy IS NULL)'
+                                                                                                                                            ],
+                                                                                                                            'type' => 'Index Scan',
+                                                                                                                            'actual_loops' => '1252'
+                                                                                                                          }
+                                                                                                                        ],
+                                                                                                         'type' => 'Nested Loop',
+                                                                                                         'actual_loops' => '1'
+                                                                                                       }
+                                                                                                     ],
+                                                                                      'type' => 'Sort',
+                                                                                      'actual_loops' => '1'
+                                                                                    }
+                                                                                  ],
+                                                                   'type' => 'Merge Join',
+                                                                   'actual_loops' => '1'
+                                                                 },
+                                                                 {
+                                                                   'is_analyzed' => 1,
+                                                                   'actual_time_first' => '122.25',
+                                                                   'estimated_rows' => '207928',
+                                                                   'estimated_total_cost' => '5637.28',
+                                                                   'estimated_row_width' => '50',
+                                                                   'actual_time_last' => '122.25',
+                                                                   'estimated_startup_cost' => '5637.28',
+                                                                   'actual_rows' => '2778',
+                                                                   'sub_nodes' => [
+                                                                                    {
+                                                                                      'scan_on' => {
+                                                                                                     'table_alias' => 'z',
+                                                                                                     'table_name' => 's_gabinety_godziny_pracy'
+                                                                                                   },
+                                                                                      'is_analyzed' => 1,
+                                                                                      'actual_time_first' => '0.014',
+                                                                                      'estimated_rows' => '207928',
+                                                                                      'estimated_total_cost' => '5637.28',
+                                                                                      'estimated_row_width' => '50',
+                                                                                      'actual_time_last' => '94.524',
+                                                                                      'estimated_startup_cost' => 0,
+                                                                                      'actual_rows' => '207931',
+                                                                                      'type' => 'Seq Scan',
+                                                                                      'actual_loops' => '1'
+                                                                                    },
+                                                                                  ],
+                                                                   'type' => 'Hash',
+                                                                   'actual_loops' => '1'
+                                                                 }
+                                                               ],
+                                                'type' => 'Hash Left Join',
+                                                'actual_loops' => '1',
+                                                'subplans' => [
+                                                                                    {
+                                                                                      'is_analyzed' => 1,
+                                                                                      'actual_time_first' => '0.005',
+                                                                                      'estimated_rows' => '1',
+                                                                                      'estimated_total_cost' => '36.22',
+                                                                                      'estimated_row_width' => '0',
+                                                                                      'actual_time_last' => '0.005',
+                                                                                      'estimated_startup_cost' => '36.21',
+                                                                                      'actual_rows' => '1',
+                                                                                      'sub_nodes' => [
+                                                                                                       {
+                                                                                                         'scan_on' => {
+                                                                                                                        'table_alias' => 'gpu',
+                                                                                                                        'table_name' => 's_gabinety_godziny_pracy_uslugi'
+                                                                                                                      },
+                                                                                                         'is_analyzed' => 1,
+                                                                                                         'actual_time_first' => '0.004',
+                                                                                                         'estimated_rows' => '1',
+                                                                                                         'estimated_total_cost' => '36.21',
+                                                                                                         'estimated_row_width' => '0',
+                                                                                                         'actual_time_last' => '0.004',
+                                                                                                         'estimated_startup_cost' => '33.18',
+                                                                                                         'actual_rows' => '0',
+                                                                                                         'extra_info' => [
+                                                                                                                           'Recheck Cond: ((idx_gdz_pracy = COALESCE($0, $1)) AND (idx_wariantu_suslugi = ANY ($4)))'
+                                                                                                                         ],
+                                                                                                         'sub_nodes' => [
+                                                                                                                          {
+                                                                                                                            'scan_on' => {
+                                                                                                                                           'index_name' => 's_gabinety_godziny_pracy_uslugi_pkey'
+                                                                                                                                         },
+                                                                                                                            'is_analyzed' => 1,
+                                                                                                                            'actual_time_first' => '0.003',
+                                                                                                                            'estimated_rows' => '1',
+                                                                                                                            'estimated_total_cost' => '33.18',
+                                                                                                                            'estimated_row_width' => '0',
+                                                                                                                            'actual_time_last' => '0.003',
+                                                                                                                            'estimated_startup_cost' => 0,
+                                                                                                                            'actual_rows' => '0',
+                                                                                                                            'extra_info' => [
+                                                                                                                                              'Index Cond: ((idx_gdz_pracy = COALESCE($0, $1)) AND (idx_wariantu_suslugi = ANY ($4)))'
+                                                                                                                                            ],
+                                                                                                                            'type' => 'Bitmap Index Scan',
+                                                                                                                            'actual_loops' => '11341'
+                                                                                                                          }
+                                                                                                                        ],
+                                                                                                         'type' => 'Bitmap Heap Scan',
+                                                                                                         'actual_loops' => '11341'
+                                                                                                       }
+                                                                                                     ],
+                                                                                      'type' => 'Aggregate',
+                                                                                      'actual_loops' => '11341'
+                                                                                    }
+                                                ],
+                                              },
+                                              {
+                                                'scan_on' => {
+                                                               'index_name' => 's_lokalizacje_placowki_upr_graf_ukr_pkey',
+                                                               'table_alias' => 'gu',
+                                                               'table_name' => 's_lokalizacje_placowki_upr_graf_ukr'
+                                                             },
+                                                'is_analyzed' => 1,
+                                                'actual_time_first' => 0,
+                                                'estimated_rows' => '1',
+                                                'estimated_total_cost' => '0.81',
+                                                'estimated_row_width' => '16',
+                                                'actual_time_last' => 0,
+                                                'estimated_startup_cost' => '0.25',
+                                                'actual_rows' => '0',
+                                                'extra_info' => [
+                                                                  'Index Cond: ((gu.idx_placowki = p.idx_placowki) AND (gu.idx_pracownika = ps_akt_user()) AND (($1 + s.s) >= gu.data_od))'
+                                                                ],
+                                                'type' => 'Index Scan',
+                                                'actual_loops' => '705'
+                                              }
+                                            ],
+                             'type' => 'Nested Loop Left Join',
+                             'actual_loops' => '1'
+                           }
+                         ],
+          'type' => 'Sort',
+          'actual_loops' => '1'
+        }

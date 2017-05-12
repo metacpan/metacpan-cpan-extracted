@@ -1,0 +1,165 @@
+package Perl6::Cookbook::Numbers;
+
+
+=head1 04 Operation on a Series of Integers
+
+   #!/usr/bin/perl6
+   use v6;
+   
+
+=head2 Description
+
+Iterating over a series of integers in a range is similar in Perl 6
+to the same code in Perl 5 except of slightly different format of the
+foreach loop that is spelled C<for> now.
+
+   
+   my $x = 23;
+   my $z = 25;
+   
+   for $x .. $z -> $i {
+   	say $i;
+   }
+   say '-----';
+   
+
+=head2 Description
+
+C-style, 3-part for loops are now called loop but they are not really recommended.
+Better to use the for loop as described above.
+
+   
+   # The following produced 2 in Rakudo which is probably a bug
+   # as for should not work that way
+   # for (my $i = 1; $i <= 3; $i++) { say $i; }
+   
+   loop (my $i = $x; $i <= $z; $i++) { 
+   	say $i;
+   }
+   say '-----';
+   
+
+=head2 Description
+
+Iterating over every 2nd number is also possible with the for loop
+of Perl 6.
+
+   
+   # the following code does not YET work in Rakudo
+   
+   #for 1..8:by(2) -> $i {
+   #	say $i;
+   #}
+   #say '-----';
+   
+   
+
+
+=cut
+
+
+=head1 06 Generating Random Numbers
+
+   #!/usr/bin/perl6
+   use v6;
+   
+
+=head2 Description
+
+The rand() function in Perl 6 provides a random number between
+0 and 1 where 0 is possible while 1 is not.
+
+so $x = rand(); 
+0 <= $x < 1;
+
+In order to make the numbers random Perl automatically calls
+srand() for us the first time rand() is called in a program.
+So normally there is no need to call srand().
+
+
+   
+   say rand();
+   say rand();
+   say rand();
+   
+
+
+=cut
+
+
+=head1 06 Generating Random Whole Numbers
+
+   #!/usr/bin/perl6
+   use v6;
+   
+
+=head2 Description
+
+The rand() function in Perl 6 provides a random number between
+0 and 1 where 0 is possible while 1 is not.
+
+so $x = rand(); 
+0 <= $x < 1;
+
+As opposed to Perl 5 in Perl 6 rand() does not get an argument.
+If you'd like to generate a random integer between $N and $K 
+(both inclusive) then you have to write
+TODO: really Num.rand is not exported to main?
+
+$N + int rand * $K
+
+So for example throwing a cube is 
+
+1 + int rand * 6;
+
+As rand is also a method of the Num class one could also write
+the above like this:
+
+6.rand.int+1
+
+In order to avoid the need to think over $N and $K 
+again and again Perl 6 also provides a nice way to generate
+random whole numbers
+
+(1..6).pick;
+
+but don't try it on (1..100000).pick on Rakudo as it does 
+not seem to like it. It seems he range is not lazy there.
+
+
+   
+   say 1 + int rand * 6 for 1..10;
+   say 6.rand.int+1     for 1..10;
+   say (1..6).pick      for 1..10;
+   
+
+
+=cut
+
+
+=head1 07 Generating Repeatable Random Sequences
+
+   #!/usr/bin/perl6
+   use v6;
+   
+
+=head2 Description
+
+In order to make sure the random number generator starts
+at the same place every time we start our script we should call
+srand() ourself with some fixed numerical value.
+
+   
+   srand(42);
+   
+   say rand();
+   say rand();
+   say rand();
+   
+
+
+=cut
+
+
+1;
+

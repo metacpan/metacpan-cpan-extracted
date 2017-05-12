@@ -1,0 +1,12 @@
+
+POSIX::SchedYield supports sched_yield
+
+getpriority/setpriority in ::Proc ?
+getrusage in ::Proc ?
+
+gethostid
+gettimeofday ?
+
+test _poll
+
+why are all SIG_ undef?

@@ -1,0 +1,104 @@
+NAME
+    PPI::HTML - Generate syntax-hightlighted HTML for Perl using PPI
+
+SYNOPSIS
+      use PPI;
+      use PPI::HTML;
+      
+  # Load your Perl file
+      my $Document = PPI::Document->load( 'script.pl' );
+      
+  # Create a reusable syntax highlighter
+      my $Highlight = PPI::HTML->new( line_numbers => 1 );
+      
+  # Spit out the HTML
+      print $Highlight->html( $Document );
+
+DESCRIPTION
+    PPI::HTML converts Perl documents into syntax highlighted HTML pages.
+
+HISTORY
+    PPI::HTML is the successor to the now-redundant PPI::Format::HTML.
+
+    While early on it was thought that the same formatting code might be
+    able to be used for a variety of different types of things (ANSI and
+    HTML for example) later developments with the here-doc code and the need
+    for independantly written serializers meant that this idea had to be
+    discarded.
+
+    In addition, the old module only made use of the Tokenizer, and had a
+    pretty shit API to boot.
+
+  API Overview
+    The new module is much cleaner. Simply create an object with the options
+    you want, pass PPI::Document objects to the "html" method, and you get
+    strings of HTML that you can do whatever you want with.
+
+METHODS
+  new %args
+    The "new" constructor takes a simple set of key/value pairs to define
+    the formatting options for the HTML.
+
+    page
+        Is the "page" option is enabled, the generator will wrap the
+        generated HTML fragment in a basic but complete page.
+
+    line_numbers
+        At the present time, the only option available. If set to true, line
+        numbers are added to the output.
+
+    colors | colours
+        For cases where you don't want to use an external stylesheet, you
+        can provide "colors" as a hash reference where the keys are CSS
+        classes (generally matching the token name) and the values are
+        colours.
+
+        This allows basic colouring without the need for a whole stylesheet.
+
+    css The "css" option lets you provide a custom CSS::Tiny object
+        containing any CSS you want to apply to the page (if you are using
+        page mode).
+
+        If both the "colors" and "css" options are used, the colour CSS
+        entries will overwrite anything contained in the CSS::Tiny object.
+        The object will also be cloned if it to be modified, to prevent
+        destroying any CSS objects passed in.
+
+    Returns a new PPI::HTML object
+
+  css
+    The "css" accessor returns the CSS::Tiny object originally provided to
+    the constructor.
+
+  html $Document | $file | \$source
+    The main method for the class, the "html" method takes a single
+    PPI::Document object, or anything that can be turned into a
+    PPI::Document via its "new" method, and returns a string of HTML
+    formatted based on the arguments given to the "PPI::HTML" constructor.
+
+    Returns a string, or "undef" on error.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PPI-HTML>
+
+    For other issues, contact the maintainer
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+    Funding provided by The Perl Foundation
+
+SEE ALSO
+    <http://ali.as/>, PPI
+
+COPYRIGHT
+    Copyright 2005 - 2009 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

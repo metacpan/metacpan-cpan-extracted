@@ -1,0 +1,27 @@
+Revision history for Plack-App-WebSocket
+
+0.05    2015-11-01
+        [ENHANCEMENT]
+        - Add websocket_server option. (gh#3)
+        - Now the exception from the handshake process is available
+          as $psgi_env->{"plack.app.websocket.error.handshake"}.
+
+0.04    2014-08-17
+        [PACKAGING]
+        - Migrate to Module::Build::Prereqs::FromCPANfile.
+
+0.03    2014-02-05
+        [ENHANCEMENT]
+        - (gh#1) Now on_established callback gets $psgi_env as the second
+          argument. That way, you can change behavior of the connection
+          according to query params etc. Thanks leedo.
+
+0.02    2013-11-21
+        [BUGFIX]
+        - Sometimes installation failed because $VERSION was inspected
+          before prerequisites were installed. This bug is fixed now
+          that $VERSIONs are set by literals.
+
+0.01    2013-11-10
+        First version, released on an unsuspecting world.
+

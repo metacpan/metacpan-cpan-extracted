@@ -1,0 +1,321 @@
+=head1 NAME
+
+pacmd - Compatability notes
+
+=head1 Functionality
+
+Here is a breakdown of the functionality of B<pacmd(1)>.
+
+=head1 Description
+
+PulseAudio provides a CLI interface called B<pacmd>. This lists the pacmd commands indexed by functionality. Because L<PulseAudio> provides an object oriented interface to Pulse Audio, you needn't specify the B<index> argument in any of these: these methods are called on the respective objects which hold the index (or in the case of L<PulseAudio::Module> 'name') information.
+
+=head2 L<PulseAudio::Backend::Utilties> functionality
+
+All of the functional is performed by the L<PulseAudio::Backend::Utilities> role.
+
+=head3 Loading
+
+=over 4
+
+=item load-module
+
+Load a module (args: name, arguments)
+
+=item load-sample
+
+Load a sound file into the sample cache (args: name, filename)
+
+=item load-sample-lazy
+
+Lazily load a sound file into the sample cache (args: name, filename)
+
+=item load-sample-dir-lazy
+
+Lazily load all files in a directory into the sample cache (args: pathname)
+
+=back
+
+=head3 Listing
+
+Interally we only parse B<info> which is thought to have everything.
+
+=over 4
+
+=item list-samples
+
+List all entries in the sample cache
+
+=item list-modules
+
+List loaded modules
+
+=item list-cards
+
+List cards
+
+=item list-sinks
+
+List loaded sinks
+
+=item list-sources
+
+List loaded sources
+
+=item list-clients
+
+List loaded clients
+
+=item list-sink-inputs
+
+List sink inputs
+
+=item list-source-outputs
+
+List source outputs
+
+=item stat
+
+Show memory block statistics
+
+=item info
+
+Show comprehensive status
+
+=back
+
+=head3 Misc
+
+=over 4
+
+=item exit
+
+Terminate the daemon
+
+=item suspend
+
+Suspend all sinks and all sources (args: bool)
+
+=back
+
+=head2 Sink
+
+All of these are supported by L<PulseAudio::Sink>.
+
+=over 4
+
+=item set-sink-volume
+
+Set the volume of a sink (args: index|name, volume)
+
+=item set-sink-mute
+
+Set the mute switch of a sink (args: index|name, bool)
+
+=item set-default-sink
+
+Set the default sink (args: index|name)
+
+=item set-sink-port
+
+Change the port of a sink (args: index|name, port-name)
+
+=item suspend-sink
+
+Suspend sink (args: index|name, bool)
+
+=item update-sink-proplist
+
+Update the properties of a sink (args: index|name, properties)
+
+=item play-sample
+
+Play a sample from the sample cache (args: name, sink|index)
+
+=item play-file
+
+Play a sound file (args: filename, sink|index)
+
+=back
+
+=head2 Sink Input
+
+All of these are supported by L<PulseAudio::SinkInput>.
+
+=over 4
+
+=item set-sink-input-volume
+
+Set the volume of a sink input (args: index, volume)
+
+=item set-sink-input-mute
+
+Set the mute switch of a sink input (args: index, bool)
+
+=item move-sink-input
+
+Move sink input to another sink (args: index, sink)
+
+=item update-sink-input-proplist
+
+Update the properties of a sink input (args: index, properties)
+
+=item kill-sink-input
+
+Kill a sink input (args: index)
+
+=back
+
+=head2 Source
+
+All of these are supported by L<PulseAudio::Source>.
+
+=over 4
+
+=item set-source-volume
+
+Set the volume of a source (args: index|name, volume)
+
+=item set-source-mute
+
+Set the mute switch of a source (args: index|name, bool)
+
+=item set-default-source
+
+Set the default source (args: index|name)
+
+=item set-source-port
+
+Change the port of a source (args: index|name, port-name)
+
+=item suspend-source
+
+Suspend source (args: index|name, bool)
+
+=item update-source-proplist
+
+Update the properties of a source (args: index|name, properties)
+
+=back
+
+=head2 Source Output
+
+All of these are supported by L<PulseAudio::SourceOutput>.
+
+=over 4
+
+=item set-source-output-volume
+
+Set the volume of a source output (args: index, volume)
+
+=item set-source-output-mute
+
+Set the mute switch of a source output (args: index, bool)
+
+=item move-source-output
+
+Move source output to another source (args: index, source)
+
+=item update-source-output-proplist
+
+Update the properties of a source output (args: index, properties)
+
+=item kill-source-output
+
+Kill a source output (args: index)
+
+=back
+
+=head2 Card
+
+All of these are supported by L<PulseAudio::Card>.
+
+=over 4
+
+=item set-card-profile
+
+Change the profile of a card (args: index|name, profile-name)
+
+=back
+
+=head2 Clients
+
+All of these are supported by L<PulseAudio::Client>.
+
+=over 4
+
+=item kill-client
+
+Kill a client (args: index)
+
+=back
+
+=head2 Modules
+
+All of these are supported by L<PulseAudio::Module>.
+
+=over 4
+
+=item unload-module
+
+Unload a module (args: index)
+
+=back
+
+=head2 Samples
+
+All of these are supported by L<PulseAudio::Samples>.
+
+=over 4
+
+=item remove-sample
+
+Remove a sample from the sample cache (args: name)
+
+=back
+
+=head2 Totally unsupported commands
+
+None of these commands are supported
+
+=over 4
+
+=item describe-module
+
+Describe a module (arg: name)
+
+=item set-log-level
+
+Change the log level (args: numeric level)
+
+=item set-log-meta
+
+Show source code location in log messages (args: bool)
+
+=item set-log-time
+
+Show timestamps in log messages (args: bool)
+
+=item set-log-backtrace
+
+Show backtrace in log messages (args: frames)
+
+=item dump
+
+Dump daemon configuration
+
+=item dump-volumes
+
+Debug: Show the state of all volumes
+
+=item shared
+
+Debug: Show shared properties
+
+=item help
+
+Show this help
+
+=back
+
+=cut

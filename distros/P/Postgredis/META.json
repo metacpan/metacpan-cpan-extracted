@@ -1,0 +1,44 @@
+{
+   "abstract" : "PostgreSQL and Redis mashup",
+   "author" : [
+      "Brian Duggan <bduggan@matatu.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Postgredis",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Mojo::Pg" : "0",
+            "Test::More" : "0",
+            "Test::PostgreSQL" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.002"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : 0.03,
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

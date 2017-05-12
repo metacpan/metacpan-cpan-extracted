@@ -1,0 +1,66 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 427e6e41b255d709de381b943da559e76480ef19 AUTHOR_PLEDGE
+SHA1 45bfb1662ceb2f539b7a84e8a83c63ac74e4b112 Build.PL
+SHA1 b7bce2ca389897293c272733fdddd18e620b7c7d Changes
+SHA1 a86ef10da1561a868fb7eec3aeb2931f69835fea CommitLog
+SHA1 b75af39c9fe42eaafb41179a5848d50323b92b6c INSTALL
+SHA1 e6514e4bc5abd3d1a8c7bd2a782c2f8737b413e7 LICENSE
+SHA1 751a1dbea35cb81ab2d14f6afa7c5e1013d85379 MANIFEST
+SHA1 69b8a0accb85effa4bd5f4ea93e4f2386d10ac8b MANIFEST.SKIP
+SHA1 18ccc7e7ef8eeeb5aae26e3fb6bac1dca6b80533 META.json
+SHA1 105d53c413f245dff657ba0f36bcbc442ae6b912 META.yml
+SHA1 f0cd277fa23c2796786f34caab90778c74adec80 Makefile.PL
+SHA1 02145222e7316163bab8ce9b886b1348f4f380fc README
+SHA1 d20aeaa271c3d6abe4a55112b6197a0d78b44257 cpanfile
+SHA1 41a5da1356107d097f6bbf72c62ee4da83e4119f dist.ini
+SHA1 9ca4ef12f3325b2fbcd3847a30066bd22fea1acb doap.xml
+SHA1 7f8e80e0f34831ee62d37236e72d14ff994517f6 examples/client.pl
+SHA1 e9802b791af652351422884f5899a07bb84ef2ec examples/server.pl
+SHA1 a7fd612bed4ef287fe7820ce86f56d6a4a8ea43b examples/serverclient.pl
+SHA1 2f80c76a50a07e5fffaff3c9ace7b9b60f8ac5fd lib/POE/Component/SSLify.pm
+SHA1 e2bd7e88034f6ec148855d0f65f6a82f88ba9c73 lib/POE/Component/SSLify/ClientHandle.pm
+SHA1 1c6f932e367fe9b910af853e85a79e850fb27eaa lib/POE/Component/SSLify/ServerHandle.pm
+SHA1 59afa28f138a14b956443f915d60a891d5b306b8 mylib/example.crt
+SHA1 f2ba02d28cfb207e0a86be7cb4f3c570f257bf93 mylib/example.key
+SHA1 36b0e0fc225ff13e639e9a11671ea67e3179fcd8 t/00-compile.t
+SHA1 8b29673d89e159edc8a2e01ec6927b6119837b08 t/00-report-prereqs.dd
+SHA1 0f795aaaadd9edd61eb9ad9933f443802b6f77c3 t/00-report-prereqs.t
+SHA1 1cf17c9c22e93bf1577f02450a568c61212f03f2 t/00-ssleay-info.t
+SHA1 17a2d0baef2231e391c26517ee3f919827b9fdfb t/99_mire_test.t
+SHA1 a42f89f63552797bf82457d864affdb5c74ff000 t/apocalypse.t
+SHA1 f0488f2a7600b6a56261387f1b2554a859f4bd8f t/connect_hook.t
+SHA1 b1018a80aec2289255d9620e740335c8cf6355af t/connect_hook_nodata.t
+SHA1 61c6dc760d6ba8f3c0672cd37c5326796592f340 t/connfail_client.t
+SHA1 a93284eec5af5e074cabc2499e2151e9f05b2d85 t/connfail_server.t
+SHA1 6c177f33cdf46a2b9b2e3e348c78566cea7b7fd6 t/renegotiate_client.t
+SHA1 4382dd4d3340057e840fdf2a2ab65c2d6d1a61b4 t/renegotiate_client_pings.t
+SHA1 0c29c30bee832d33b4af6b71e5caa812b9e8004c t/renegotiate_server.t
+SHA1 cdb3bcc592ea5775b06474c82bc3ff58c812c47d t/simple.t
+SHA1 c88eae9b29402c0f3cc59a4e9e6e9a192f114585 t/simple_large.t
+SHA1 5db5fb734853185c1b66d98aad41181e071803df t/simple_parallel.t
+SHA1 2ccf516fbfa01550546426b560bd9009ef947221 t/simple_parallel_large.t
+SHA1 23dca4da565c773cd934714add8781822771f6fb t/simple_parallel_superbig.t
+SHA1 45a15084faaa845989f038b8f2e6b4242b570b45 t/simple_superbig.t
+SHA1 a2983a2e0b87fc1c4d220f5bf52e7bede374f130 t/upgrade.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRmY/EACgkQGfr7vsGKgxwVbwCg1jqDFkbib8f3MCrMsCVrqB1E
+fFcAoL/1YQl9RjHzzm9Jizzs2Sc5zgbd
+=KGeN
+-----END PGP SIGNATURE-----

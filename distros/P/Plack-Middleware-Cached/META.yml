@@ -1,0 +1,23 @@
+---
+abstract: 'Glues a cache to your PSGI application'
+author:
+  - 'Jakob Voß'
+build_requires:
+  Clone: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Cached
+requires:
+  Plack: 1.0
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/nichtich/Plack-Middleware-Cached/issues
+  homepage: https://github.com/nichtich/Plack-Middleware-Cached
+  repository: https://github.com/nichtich/Plack-Middleware-Cached.git
+version: 0.15

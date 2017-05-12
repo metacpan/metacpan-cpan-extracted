@@ -1,0 +1,90 @@
+==================================================
+Changes from 2012-11-08 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2013-11-08 19:54:49 +0000
+------------------------------------------
+
+  Change: d595f05c4b307573f00b2eb3dd1432798d2f1451
+  Author: Andy Gorman <andy@apacesystems.com>
+  Date : 2013-11-08 11:54:09 +0000
+
+    Updating requirements and POD. Adding optional params to TO_JSON
+    method 
+
+  Change: ef7139088946d07038878c38b28a9b3e13c2cecf
+  Author: Andy Gorman <andy@apacesystems.com>
+  Date : 2013-11-05 11:39:21 +0000
+
+    Allowing for a custom set of opts to be passed to TO_JSON 
+
+  Change: c07c79487bf765d4d4eb5156d6904a292569fb9b
+  Author: Andy Gorman <andy@apacesystems.com>
+  Date : 2013-10-08 22:50:02 +0000
+
+    Cleaning up how TO_JSON method is added to caller 
+
+  Change: aebc238c4a37dcbdadd26d60b43d8ee47a0728a9
+  Author: Andy Gorman <andy@apacesystems.com>
+  Date : 2013-10-07 23:29:52 +0000
+
+    Removing repeated method calls inside TO_JSON method 
+
+  Change: d946c8b08c064e5b4936c638f6e90073b4bb9828
+  Author: Andy Gorman <andy@apacesystems.com>
+  Date : 2013-10-07 23:25:43 +0000
+
+    Fixing bug references other than CODE were allowed as a type 
+
+  Change: f13218577d115db3f19ed9f216fb9817edf4bfd6
+  Author: Andy Gorman <andy@apacesystems.com>
+  Date : 2013-10-07 22:48:19 +0000
+
+    Adding number of tests 
+
+  Change: 5e9533b3467ca13d88f959814e79beaa4aea1cb4
+  Author: Andy Gorman <andy@apacesystems.com>
+  Date : 2013-10-07 22:47:19 +0000
+
+    Updating dist.ini to include Test::Exception 
+
+  Change: f901692f343eeb3726d8a6657f8bb8752eb87f56
+  Author: Andy Gorman <andy@apacesystems.com>
+  Date : 2013-10-07 22:44:53 +0000
+
+    Updating README 
+
+  Change: 5daaa8549e2fa91792e215dfd6e9b064c7fcac3f
+  Author: Andy Gorman <andy@apacesystems.com>
+  Date : 2013-10-07 22:44:09 +0000
+
+    Cleaning up code, adding exception unit tests 
+
+  Change: 96c0cb0f39bc0d6a5a7aa71b87856583352c645e
+  Author: Andy Gorman <andy@apacesystems.com>
+  Date : 2013-10-07 21:35:44 +0000
+
+    Removing unused getglob method 
+
+  Change: c3c8dea64b931fd2b1f5fa0e2b55204c5c5fa4f0
+  Author: Andy Gorman <andy@apacesystems.com>
+  Date : 2013-10-07 18:07:29 +0000
+
+    Only disabling strict refs for a single call 
+
+  Change: 2072a37b24fb079368a187b5e190c73cb37a8c1d
+  Author: Andy Gorman <andy@apacesystems.com>
+  Date : 2013-10-07 16:59:54 +0000
+
+    Adding early experimental code 
+
+  Change: 79d966a68c266b2e8f943876403b908f61c8a95f
+  Author: Andy Gorman <andy@apacesystems.com>
+  Date : 2013-10-07 15:17:25 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

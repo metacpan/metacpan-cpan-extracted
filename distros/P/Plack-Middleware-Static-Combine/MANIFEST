@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Plack/Middleware/Static/Combine.pm
+t/00_compile.t
+t/10_combine.t
+t/files/bar.js
+t/files/doz.txt
+t/files/foo.js

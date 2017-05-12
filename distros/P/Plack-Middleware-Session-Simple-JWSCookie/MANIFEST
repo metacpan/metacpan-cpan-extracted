@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Plack/Middleware/Session/Simple/JWSCookie.pm
+minil.toml
+t/00_compile.t
+t/01_simple_jwscookie.t
+t/compat_session_simple/01_simple.t
+t/compat_session_simple/02_empty.t
+t/compat_session_simple/03_session.t
+t/compat_session_simple/04_serializer.t
+META.yml
+MANIFEST

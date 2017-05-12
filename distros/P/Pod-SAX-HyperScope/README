@@ -1,0 +1,7 @@
+Pod::SAX::HyperScope is a SAX driver to convert POD into OPML suitable for the
+HyperScope project.  The program pod2hs is included which reads in a POD file
+and outputs OPML to STDOUT.
+
+Example:
+
+    perldoc -u Pod::SAX::HyperScope | pod2hs - > PodSaxHyperScope.opml

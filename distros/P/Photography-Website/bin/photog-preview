@@ -1,0 +1,55 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+print <<EOF
+photog-preview: Composes images to together to create an album preview
+
+Usage: photog-preview img1.jpg img2.jpg img3.jpg [...] preview.jpg
+
+Note: Album previews MUST consist of 3, 6 or 9 images
+EOF
+and exit if @ARGV < 4;
+
+# The following code builds an array of command arguments to be used
+# in a system() call to ImageMagick's `convert`. It would probably
+# make more sense to use Image::Magick instead, but I have no idea how.
+
+my @command;
+my @images = @ARGV[0 .. @ARGV-2];
+my $destination = $ARGV[-1];
+
+if (@images == 3) {
+
+    # The "xc:red" is a workaround for the following ImageMagick bug:
+    # http://www.imagemagick.org/discourse-server/viewtopic.php?t=26796
+    @command = qw[convert -bordercolor black xc:red];
+
+    for (@images) {
+        push @command, ('(', $_, qw[-border 8 -resize 200x1000 )]);
+    }
+    push @command, qw[-append -crop +0+1 -shave 2 +repage];
+    push @command, $destination;
+}
+
+elsif (@images == 6 or @images == 9) {
+    my $rows = 3;
+    my $cols = @images / 3;
+    my $width = $cols * 200;
+    push @command, qw[convert -bordercolor black];
+    for (1..$rows) {
+        push @command, qw[( ( xc:red )];
+        for (1..$cols) {
+            push @command, ('(', shift @images, qw[-border 8 )]);
+        }
+        push @command, qw[+append -crop +1+0 +repage -resize];
+        push @command, ($width.'x1000', ')');
+    }
+    push @command, qw[-append -shave 2];
+    push @command, $destination;
+}
+
+else {
+    die "Incorrect number of arguments\n";
+}
+
+exit !!system(@command);

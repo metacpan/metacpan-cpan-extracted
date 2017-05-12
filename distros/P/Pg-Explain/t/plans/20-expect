@@ -1,0 +1,27 @@
+{
+    'type'                   => 'Limit',
+    'estimated_startup_cost' => 0,
+    'estimated_total_cost'   => 0.08,
+    'estimated_rows'         => 2,
+    'estimated_row_width'    => 190,
+    'is_analyzed'            => 1,
+    'actual_time_first'      => 0.033,
+    'actual_time_last'       => 0.043,
+    'actual_rows'            => 2,
+    'actual_loops'           => 1,
+    'sub_nodes'              => [
+        {
+            'scan_on'                => { 'table_name' => 'pg_class', },
+            'estimated_startup_cost' => '0',
+            'estimated_rows'         => '361',
+            'type'                   => 'Seq Scan',
+            'estimated_total_cost'   => '13.61',
+            'estimated_row_width'    => '190',
+            'is_analyzed'            => 1,
+            'actual_time_first'      => 0.028,
+            'actual_time_last'       => 0.030,
+            'actual_rows'            => 2,
+            'actual_loops'           => 1,
+        }
+    ]
+}

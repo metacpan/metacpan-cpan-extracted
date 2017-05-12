@@ -1,0 +1,16 @@
+
+PerlQt-3 is (c) Ashley Winters 2002, and (c) Germain Garand 2003
+
+The project's homepage is at http://perlqt.sourceforge.net
+
+Puic was derived from Pyuic(Phil Thompson et alii) and Uic(Trolltech As) by
+Germain Garand.
+
+The Smoke binding library was conceived by Ashley Winters.
+It uses the Kalyptus Parser by Richard Dale, with a module implemented
+by David Faure.
+
+
+All code in this tree is released under the terms of the GNU Public License
+v2.
+

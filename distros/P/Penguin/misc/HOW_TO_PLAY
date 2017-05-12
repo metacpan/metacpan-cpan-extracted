@@ -1,0 +1,64 @@
+In the ../bin directory are four example programs:
+
+1.  penguind 
+
+This is a 'daemon' which waits around for Penguin programs to contact
+it and send it a code frame.  It unwraps the code frame and executes it.
+It then creates a data frame out of the return value of the code and
+sends that back.  It prints a lot of stuff on the screen to show you
+what's going on.
+
+Occasionally, a port will get wedged (because we can't set SO_NOLINGER
+on the socket just yet) during heavy testing.  Either wait about 30
+seconds and try to start penguind again, or give it a port number as
+its first argument and it'll start there.
+
+2.  pclient 
+
+'pclient' wraps up some code and sends it to a penguind running
+on localhost.  If you want to change that, change the source
+code. It then listens for a return value data packet and prints 
+out what it got.
+
+3.  makeapplet PERLCODEFILE
+
+'makeapplet' wraps the code in PERLCODEFILE *insecurely* and writes
+a Penguin frame to the file PERLCODEFILE.pen.
+
+4.  runapplet PENGUINFILE
+
+'runapplet.pl' unwraps the code in PENGUINFILE and runs it in a secure
+compartment (you could use this as a web browser helper app).
+
+In this 'misc' directory, you'll also find six other files:
+
+evilapplet    The perl source code for an 'evil' applet (it
+              runs /bin/date using backticks, which is deemed
+              a bad idea).
+
+evilapp.pen   The Penguin applet file that wraps 'evilapp.pl'.
+              Run this using 'runapplet.pl' from the bin directory
+              (it should fail with a suitably ominous error message).
+
+codefile      A file suitable for sending with client -f.
+              Read it first (and of course have a penguind running).
+
+rightsfile    An example rightsfile.  GO AND READ Safe.pm BEFORE
+              YOU ATTEMPT TO EDIT A RIGHTSFILE.  However, this
+              one should be relatively safe to copy into your
+              home directory as '.rightsfile'.
+
+mycat.asc     the PGP public key of my EXTREMELY NONTRUSTABLE cat,
+              Map.  DO NOT GIVE THIS CAT RIGHTS TO DO ANYTHING TO
+              YOUR SERVICE!  HE LOOKS CUTE BUT HE'S MEAN AS A SNAKE!
+
+felix.asc     the PGP public key of Felix S. Gallo <fsg@ultranet.com>.
+              That's me!  I believe strongly that nobody has ever compromised
+              my private key, and that I will never knowingly sign code
+              which will damage your machine.  If you're really worried
+              about whether this key is mine, send me mail and I'll
+              send you the md5sum.
+
+Please add these to your PGP key ring, and, if you like, make appropriate
+entries in your $HOME/.rightsfile.  Further, please feel free to send
+me your PGP keys and penguind locations.

@@ -1,0 +1,810 @@
+=head1 NOME
+X<riferimento> X<puntatore> X<struttura dati> X<struttura> X<struct>
+
+perlref - I Riferimenti in Perl e le strutture dati annidate
+
+=head1 NOTA
+
+Questa E<egrave> una documentazione completa riguardante tutti gli
+aspetti dei riferimenti. Se si desidera un tutorial piE<ugrave> breve,
+con un'introduzione alle caratteristiche essenziali, date un'occhiata a L<perlreftut>.
+
+=head1 DESCRIZIONE
+
+Prima della versione 5 di Perl era difficile rappresentare strutture
+dati complesse, perchE<eacute> tutti i riferimenti dovevano esser
+simbolici--ed era persino difficile referenziare una variabile invece
+di una voce nella tabella dei simboli. Perl ora non solo rende piE<ugrave>
+semplice utilizzare dei riferimenti simbolici alle variabili, ma
+vi permette anche di avere riferimenti concreti [hard reference, NdT]
+a qualsiasi dato o pezzo di codice. Qualunque scalare puE<ograve> contenere
+un riferimento concreto. Dato che gli array e gli hash contengono scalari, ora potete creare
+facilmente array di array, array di hash, hash di array, array di hash
+di funzioni, e cosE<igrave> via.
+
+I riferimenti concreti sono scaltri, tengono traccia dei contatori
+dei riferimenti per voi, liberando automaticamente la cosa riferita quando
+il suo contatore dei riferimenti va a zero. (I valori dei contatori dei 
+riferimenti di strutture dati auto-referenziate o cicliche potrebbero 
+non andare a zero senza un piccolo aiuto; consultate L<perlobj/"Two-Phased Garbage Collection">
+[Garbage Collection in due fasi, NdT] in L<perlobj> per una spiegazione dettagliata).
+Se la cosa di cui si parla E<egrave> un oggetto, l'oggetto viene distrutto. Consultate
+L<perlobj> per maggiori informazioni sugli oggetti. (In un certo senso, in Perl tutto
+E<egrave> un oggetto, ma noi solitamente riserviamo questo termine per
+riferimenti a oggetti che sono stati ufficialmente sottoposti a bless
+nel package della classe).
+
+I riferimenti simbolici sono nomi di variabili o di altri oggetti,
+proprio come un link simbolico in un filesystem Unix contiene
+solamente il nome di un file. La notazione *glob E<egrave> qualcosa di simile
+ad un riferimento simbolico. (I riferimenti simbolici sono alle volte
+chiamati "riferimenti soft", ma per favore non chiamateli cosE<igrave>;
+ci si confonde a sufficienza anche senza inutili sinonimi).
+X<riferimento, simbolico> X<reference, soft>
+X<riferimento simbolico> X<soft reference>
+
+Al contrario, i riferimenti concreti sono piE<ugrave> simili agli hard 
+[letteralmente "duro", NdT] link in un filesystem Unix: essi sono utilizzati
+per accedere all'oggetto che vi sta sotto senza preoccuparsi di quale sia
+il suo (altro) nome. Quando la parola "riferimento" E<egrave> utilizzata
+senza un aggettivo, come nel seguente paragrafo, si sta parlando solitamente 
+di un riferimento concreto.
+X<riferimento concreto> X<hard reference>
+X<reference, hard>
+
+I riferimenti sono facili da usare in Perl. C'E<egrave> solo un principio di 
+sovrapposizione: Perl non referenzia o dereferenzia implicitamente. Quando
+uno scalare contiene un riferimento, si comporta sempre come uno
+scalare semplice. Non diventa magicamente un array o un hash o
+una subroutine; dovete dirgli voi esplicitamente cosa fare, deferenziandolo.
+
+=head2 Creare Riferimenti
+X<riferimento, creazione> X<referenziare>
+
+I riferimenti possono esser creati in molti modi.
+
+=over 4
+
+=item 1.
+X<\> X<backslash> X<barra inversa>
+
+Utilizzando l'operatore backslash [barra inversa, NdT] su una variabile, una funzione o
+un valore. (Questo funziona come l'operatore & (indirizzo-di) in C).
+Questo crea tipicamente I<un altro> riferimento ad una variabile,
+perchE<eacute> c'E<egrave> giE<agrave> un riferimento alla variabile
+nella tabella dei simboli. Ma la tabella dei simboli dei riferimenti potrebbe
+sparire e voi avreste ancora il riferimento che l'operatore backslash
+ha restituito. Ecco alcuni esempi:
+
+    $rifscalare = \$pippo;
+    $rifarray   = \@ARGV;
+    $rifhash    = \%ENV;
+    $rifcodice  = \&handler;
+    $rifglob    = \*pippo;
+
+Non E<egrave> possibile creare un riferimento valido ad un handle di IO
+(filehandle o dirhandle) utilizzando l'operatore backslash. Il massimo che
+potete ottenere E<egrave> un riferimento ad un typeglob, che E<egrave>
+in realtE<agrave> una voce completa nella tabella dei simboli. Ma vedetevi la
+spiegazione della sintassi *pippo{COSA} qua sotto. Comunque, potete ancora
+utilizzare typeglob e riferimenti a glob come se fossero handle di IO.
+
+=item 2.
+X<array, anonimo> X<[> X<[]> X<parentesi quadre>
+X<quadre, parentesi> X<arrayref> X<riferimento array> X<array, riferimento>
+
+Un riferimento ad un array anonimo puE<ograve> esser creato utilizzando
+le parentesi quadre:
+
+    $rifarray = [1, 2, ['a', 'b', 'c']];
+
+Qui abbiamo creato un riferimento ad un array anonimo di tre elementi il
+cui elemento finale E<egrave> esso stesso un riferimento a un altro array
+anonimo di tre elementi. (La sintassi multidimensionale descritta in seguito
+puE<ograve> essere utilizzata per accedere a quest'ultimo. Per esempio, dopo il
+suddetto esempio, C<< $rifarray->[2][1] >> dovrebbe avere il valore "b").
+
+Ottenere un riferimento a una lista enumerata non E<egrave> lo stesso che
+utilizzare le parentesi quadre--che invece equivale a creare una lista
+di riferimenti!
+
+    @lista = (\$a, \@b, \%c);
+    @lista = \($a, @b, %c);      # stessa cosa!
+
+Come caso speciale, C<\(@pippo)> restituisce una lista di riferimenti al
+contenuto di C<@pippo>, non un riferimento a C<@pippo> stesso. Nello stesso modo
+per C<%pippo>, eccetto che i riferimenti alle chiavi sono da copiare (dato che
+le chiavi sono semplicemente delle stringe invece che scalari completi).
+
+=item 3.
+X<hash, anonimo> X<{> X<{}> X<parentesi graffe>
+X<graffe, parentesi> X<brace> X<hashref> X<riferimento hash> X<hash, riferimento>
+
+Un riferiemnto ad un hash anonimo puE<ograve> esser creato utilizzando le
+parentesi graffe:
+
+    $rifhash = {
+        'Adamo'  => 'Eva',
+        'Clyde' => 'Bonnie',
+    };
+
+Hash anonimi e compositori di array come questi possono esser mescolati
+liberamente per produrre strutture complicate quanto volete. La
+sintassi multidimensionale descritta sotto va bene anche per questo. I
+valori sopra sono letterali, ma le variabili e le espressioni
+dovrebbero funzionare lo stesso, perchE<eacute> gli operatori di assegnamento
+in Perl (perfino all'interno di local() o my() sono comandi eseguibili, non
+dichiarazioni a tempo di compilazione.
+
+Dato che le parentesi graffe (da ora in poi solo "graffe") 
+sono utilizzate per molte altre cose inclusi i BLOCCHI,
+potreste occasionalmente dover esplicitare le graffe
+all'inizio di un comando mettendovi un C<+> o un C<return> davanti,
+di modo che Perl capisca che la graffa aperta non E<egrave>
+l'inizio di un BLOCCO. Vale la pena, in termini economici e mnemonici, di
+utilizzare le graffe.
+
+Per esempio, se volete che una funzione crei un nuovo hash e ne restituisca
+un riferimento, avete queste opzioni:
+
+    sub hashem {        { @_ } }   # silenziosamente errata
+    sub hashem {       +{ @_ } }   # ok
+    sub hashem { return { @_ } }   # ok
+
+D'altro canto, se volete l'altro significato, potete far questo:
+
+    sub showem {        { @_ } }   # ambiguo (adesso funziona, ma potrebbe cambiare)
+    sub showem {       {; @_ } }   # ok
+    sub showem { { return @_ } }   # ok
+
+I C<+{> and C<{;> all'inizio, servono a disambiguare l'espressione
+per intendere o il riferimento ad un HASH o il BLOCCO.
+
+=item 4.
+X<subroutine, anonima> X<subroutine, riferimento> X<riferimento, subroutine>
+X<scope lessicale> X<chiusura> X<lessicale>
+
+Un riferimento ad una subroutine anonima puE<ograve> esser creato
+utilizzando la parola chiave C<sub> senza il nome della subroutine:
+
+    $rifcodice = sub { print "Boink!\n" };
+
+Va notato il punto e virgola. Eccetto che per il codice all'interno che non
+viene eseguito immediatamente, una C<sub {}> non E<egrave> proprio
+una dichiarazione, essa E<egrave> un operatore, C<do{}> o C<eval{}>.
+(Ad ogni modo, non importa quante volte eseguiate quella particolare
+linea (a meno che non siate in un C<eval("...")>), $rifcodice avrE<agrave>
+ancora un riferimento alla I<stessa> subroutine anonima).
+
+Le subroutine anonime agiscono come le closures [letteralmente
+"chiusure", NdT] con rispetto alle variabili my(),
+che sono variabili lessicalmente visibili dentro lo scope corrente. La
+chiusura E<egrave> un concetto del mondo Lisp che dice che se voi definite
+una funzione anonima in un particolare contesto lessicale, essa
+pretende di essere eseguita in quel contesto anche quando viene chiamata
+fuori da quel contesto.
+
+In termini comprensibili, esso E<egrave> una modo divertente di passare
+argomenti ad una subroutine non solo quando la definite ma anche quando
+la chiamate. E<Egrave> utile per impostare piccoli bit di codice da far
+girare dopo, come callbacks. Potete anche farci anche cose orientate agli
+oggetti, sebbene Perl fornisca giE<agrave> un meccanismo diverso per
+farlo--consultate L<perlobj>.
+
+Potreste anche pensare alla chiusura come ad un modo per scrivere
+un modello di subroutine ["template" NdT] senza usare eval().
+Ecco un breve esempio di come funzionano le chiusure:
+
+    sub nuovastampa {
+        my $x = shift;
+        return sub { my $y = shift; print "$x, $y!\n"; };
+    }
+    $h = nuovastampa("Salve");
+    $g = nuovastampa("Benvenuti");
+
+    # Il tempo passa...
+
+    &$h("mondo");
+    &$g("terrestri");
+
+Questo stampa
+
+    Salve, mondo!
+    Benvenuti, terrestri!
+
+Va notato in particolare che $x continua a riferire al valore passato
+a nuovastampa() I<malgrado> "my $x" sia uscita dallo scope
+nel momento in cui la subroutine anonima E<egrave> in esecuzione. Questo E<egrave> tutto
+ciE<ograve> che una chiusura E<egrave>.
+
+A proposito, questo si applica solo a variabili lessicali. Le variabili
+dinamiche continuano a funzionare come hanno sempre fatto. Le chiusure
+non sono qualcosa di cui la maggior parte dei programmatori Perl
+devono preoccuparsi all'inizio.
+
+=item 5.
+X<costruttore> X<new>
+
+I riferimenti sono spesso restituiti da speciali subroutine
+chiamate costruttori. Gli oggetti in Perl sono semplicemente dei riferimenti a
+speciali tipi di oggetti che sembrano sapere a quale pacchetto essi
+sono associati. I costruttori sono solo delle subroutine speciali
+che sanno come creare quell'associazione. Fanno questo cominciando
+con un normale riferimento, ed esso rimane un normale riferimento anche
+quando E<egrave> anche un oggetto. Il nome dei costruttori E<egrave> spesso new()
+e vengono chiamati indirettamente:
+
+    $rifogg = new Cagnolino (Coda => 'corta', Orecchie => 'lunghe');
+	       
+Ma non E<egrave> necessario:
+
+    $rifogg   = Cagnolino->new(Coda => 'corta', Orecchie => 'lunghe');
+
+    use Term::Cap;
+    $terminal = Term::Cap->Tgetent( { OSPEED => 9600 });
+
+    use Tk;
+    $main    = MainWindow->new();
+    $menubar = $main->Frame(-relief              => "raised",
+                            -borderwidth         => 2)
+
+=item 6.
+X<autovivificazione>
+
+Quando dereferenziate uno scalare in un contesto che assume si tratti di
+un riferimento di un certo tipo, un tale riferimento viene creato
+automaticamente. Visto che non abbiamo ancora parlato del dereferenziamento,
+non E<egrave> ancora possibile mostrare alcun esempio.
+
+=item 7.
+X<*pippo{COSA}> X<*>
+
+Un riferimento puE<ograve> esser creato utilizzando una speciale sintassi,
+affettuosamente conosciuta come sintassi *pippo{COSA}. *pippo{COSA}
+restituisce un riferimento alla casella COSA in *pippo (che E<egrave> la voce nella
+tabella dei simboli che contiene qualunque cosa conosciuta come pippo).
+
+    $rifscalare = *pippo{SCALAR};
+    $rifarray   = *ARGV{ARRAY};
+    $rifhash    = *ENV{HASH};
+    $rifcodice     = *handler{CODE};
+    $rifio      = *STDIN{IO};
+    $rifglob    = *pippo{GLOB};
+
+Tutti questi sono auto-esplicativi tranne *pippo{IO}. Esso restituisce l'IO
+handle, utilizzato per file handle (L<perlfunc/open>), socket
+(L<perlfunc/socket> e L<perlfunc/socketpair>), e directory handle
+(L<perlfunc/opendir>). Per compatibilitE<agrave> con le precedenti versioni
+di Perl, *pippo{FILEHANDLE} E<egrave> un sinonimo di *pippo{IO}, sebbene esso
+sia deprecato dalla versione 5.8.0. Se sono in vigore dei warning di deprecazione, 
+ci saranno degli avvertimenti sul suo utilizzo.
+
+*pippo{THING} restituisce undef se quella particolare COSA non E<egrave>
+giE<agrave> stata utilizzata, eccetto che nel caso di scalari.
+*pippo{SCALAR} restituisce un riferimento ad uno scalare anonimo se $pippo non
+E<egrave> giE<agrave> stato utilizzato. Questo potrebbe cambiare in
+versioni future.
+
+*pippo{IO} E<egrave> un'alternativa al meccanismo di *HANDLE dato in
+L<perldata/"Typeglobs and Filehandles"> in perldata per passare filehandle
+dentro o fuori una subroutine, o salvare dentro vaste strutture dati.
+Il suo svantaggio E<egrave> che non vi creerE<agrave> un nuovo filehandle.
+Il suo vantaggio E<egrave> che correte meno rischi di sbagliare rispetto
+a quanto si puE<ograve> fare con un assegnamento con typeglob.
+(Sebbene esso combini ancora insieme file e directory handle). Ad ogni modo,
+se assegnate il nuovo valore ad uno scalare invece che ad un typeglob come
+abbiamo fatto nell'esempio sotto, non c'E<egrave> il rischio che questo accada.
+
+    borbottio(*STDOUT);          # passa l'intero glob
+    borbottio(*STDOUT{IO});      # passa sia file che dir handle
+
+    sub borbottio {
+        my $fh = shift;
+        print $fh "eh um bhe ah mmm\n";
+    }
+
+    $rec = get_rec(*STDIN);     # passa l'intero glob
+    $rec = get_rec(*STDIN{IO}); # passa sia file che dir handle
+
+    sub get_rec {
+        my $fh = shift;
+        return scalar <$fh>;
+    }
+
+=back
+
+=head2 Utilizzare i Riferimenti
+X<riferimento, uso> X<deferenziamento> X<deferenziazione> X<deferenziare>
+
+Questo E<egrave> quanto per creare riferimenti. Ormai vi starete probabilmente 
+chiedendo come utilizzare riferimenti per recuperare dati a "lungo persi".
+Ci sono molti metodi di base.
+
+=over 4
+
+=item 1.
+
+Ovunque dovreste mettere un identificatore (o una serie di identificatori)
+come parte di una variabile o nome di subroutine, potete rimpiazzare
+l'indentificatore con un semplice scalare che contiene un riferimento
+del tipo corretto:
+
+    $pluto = $$rifscalare;
+    push(@$rifarray, $nomefile);
+    $$rifarray[0] = "Gennaio";
+    $$rifhash{"CHIAVE"} = "VALORE";
+    &$rifcodice(1,2,3);
+    print $rifglob "output\n";
+
+E<Egrave> importante capire che non stiamo dereferenziando
+specificatamente $rifarray[0] o $rifhash{"CHIAVE"} qui. Il
+dereferenziamento della variabile scalare accade I<prima> che esso
+faccia qualsiasi key lookup ["ricerca della chiave" NdT].
+Qualcosa di piE<ugrave> complicato che una semplice
+variabile scalare deve utilizzare i metodi 2 e 3 sotto. Comunque un
+"semplice scalare" include un identificatore che essostesso utilizza
+il metodo 1 ricorsivamente. Di conseguenza, ciE<ograve> stampa "salve"
+
+    $rifrifrif = \\\"salve";
+    print $$$$rifrifrif;
+
+=item 2.
+X<${}> X<@{}> X<%{}>
+
+Ovunque poniate un identificatore (o un insieme di identificatori)
+come parte di una variabile o del nome di una subroutine, potete rimpiazzare
+l'indentificatore con un BLOCCO che restituisce un riferimento di tipo corretto.
+In altre parole, i precedenti esempi potrebbero esser scritti cosE<igrave>:
+
+    $pluto = ${$rifscalare};
+    push(@{$rifarray}, $nomefile);
+    ${$rifarray}[0] = "Gennaio";
+    ${$rifhash}{"CHIAVE"} = "VALORE";
+    &{$rifcodice}(1,2,3);
+    $rifglob->print("output\n"); # sse IO::Handle e` caricato
+
+Certo, E<egrave> un po' sciocco utilizzare le graffe in questo 
+caso, ma il BLOCCO puE<ograve> contenere un'espressione arbitraria, in 
+particolare, l'espressione qui sotto:
+
+    &{ $dispatch{$indice} }(1,2,3); # chiama la routine corretta
+
+Dato che E<egrave> possibile omettere le graffe per il semplice caso di C<$$x>,
+le persone spesso fanno un errore nel vedere i simboli del
+dereferenziamento come degli operatori, e si meravigliano delle loro
+precedenze. Se cosE<igrave> fosse, potreste utilizzare le parentesi tonde
+invece delle graffe. Non E<egrave> questo il caso. Si consideri la differenza
+sotto; il caso 0 E<egrave> una versione stenografata del caso 1, I<non> il caso 2:
+
+    $$rifhash{"CHIAVE"}   = "VALORE";       # CASO 0
+    ${$rifhash}{"CHIAVE"} = "VALORE";       # CASO 1
+    ${$rifhash{"CHIAVE"}} = "VALORE";       # CASO 2
+    ${$rifhash->{"CHIAVE"}} = "VALORE";     # CASO 3
+
+Il caso due E<egrave> anche ingannevole in quanto state accedendo ad una
+variabile chiamata %rif_hash, non dereferenziandola attraverso $rifhash
+all'hash che esso sta presumibilmente referenziando. Che dovrebbe essere il
+caso 3.
+
+=item 3.
+X<autovivificazione> X<< -> >> X<freccia>
+
+Chiamate a subroutine e lookup di singoli elementi di array si
+presentano spesso scomode nell'utilizzare il metodo 2.
+Come una forma di zucchero sintattico, gli esempi per il metodo 2
+potrebbero esser scritti:
+
+    $rifarray->[0] = "Gennaio";       # Elemento di un array
+    $rifhash->{"CHIAVE"} = "VALORE";  # Elemento di un hash
+    $rifcodice->(1,2,3);             # Chiamata a subroutine
+
+La parte sinistra della freccia puE<ograve> essere qualsiasi espressione che
+restituisce un riferimento, inclusa una precedente dereferenziazione. Va notato
+che $array[$x] I<non> E<egrave> la stessa cosa che C<< $array->[$x] >> qui:
+
+    $array[$x]->{"pippo"}->[0] = "Gennaio";
+					
+Questo E<egrave> uno dei casi che avevamo menzionato prima nel quale i
+riferimenti potevano essere creati automaticamente [ossia quando sono
+utilizzati in un contesto I<lvalue>, ossia in cui possono essere
+considerati alla stregua di un possibile valore a sinistra di un operatore
+di assegnazione, NdT].
+Prima questa istruzione, $array[$x] potrebbe non esser stato definito.
+Se cosE<igrave> fosse, esso E<egrave> automaticamente definito con un riferimento
+ad hash cosE<igrave> che possiamo  fare un lookup di "{"pippo"}" in esso.
+CosE<igrave> come "$array[$x]->{"pippo"} sarE<agrave> automaticamente definito
+con un riferimento ad array in maniera che possiamo fare lookup di "[0]" in esso.
+Questo processo E<egrave> chiamato I<autovivificazione>.
+
+Un'altra cosa. La freccia E<egrave> opzionale I<tra> le graffe
+qui sotto, di modo che potete scrivere quanto sopra come:
+
+    $array[$x]{"pippo"}[0] = "Gennaio";
+					
+Che, in un caso degenerativo di utilizzo di soli array ordinari, vi da
+un array multidimensionale come in C:
+
+    $punteggio[$x][$y][$z] += 42;
+					
+Bene, okay, in realtE<agrave> non del tutto come un array in C. Il C non sa
+come crescono i suoi array on demand [letteralmente "a richiesta" NdT].
+Perl invece sE<igrave>.
+
+=item 4.
+X<incapsulamento>
+
+Se un riferimento sembra essere un riferimento ad un oggetto, allora
+ci sono probabilmente dei metodi per accedere alle cose riferite, e
+dotreste probabilmente stick to (limitarvi a)(?) quei metodi se non siete
+nel package della classe che li definisce. In altre parole,
+siate buoni, e non violate l'incapsulamento di un oggetto senza
+una ragione molto buona. Perl non forza l'incapsulamento. Qui non
+siamo totalitaristi. Sebbene ci aspettiamo un po' di
+civiltE<agrave> di base.
+
+=back
+
+Utilizzare una stringa o un numero come un riferimento produce un
+riferimento simbolico, come spiegato sopra. Utilizzare un riferimento
+come un numero produce un intero che rappresenta la sua locazione di
+salvataggio in memoria. L'unica cosa utile che ci si puE<ograve> fare E<egrave>
+confrontare numericamente due riferimenti per vedere se si riferiscono
+alla stessa locazione.
+X<riferimento, contesto numerico>
+
+    if ($rif1 == $rif2) {  # confronto numerico, non costoso, di riferimenti
+        print "I rif 1 e 2 si riferiscono alla stessa cosa\n";
+    }
+
+Utilizzando un riferimento all'interno di una stringa si produce sia il
+suo tipo referente, che include qualsiasi package sottoposto a bless
+come descritto in L<perlobj>, sia l'indirizzo numerico della variabile espresso in
+esadecimale. L'operatore ref() restituisce il tipo di cosa al quale il riferimento
+sta puntando, senza l'indirizzo. Consultate L<perlfunc/ref> per dettagli ed
+esempi del suo utilizzo.
+X<riferimento, contesto di stringa>
+
+L'operatore bless() potrebbe essere usato per associare un
+riferimento che punta ad un oggetto con un package che funzioni come un
+oggetto di una classe. Si veda L<perlobj>.
+
+Un typeglob potrebbe essere dereferenziato nello stesso modo di un
+riferimento, perchE<eacute> la sintassi di dereferenziazione indica sempre il
+tipo di riferimento desiderato. CosE<igrave> "${*pippo}" e "${\$pippo}" indicano
+entrambi la stessa variabile scalare.
+
+Ecco un trucco per interpolare una chiamata a subroutine in una stringa:
+
+    print "Quella volta, la mia sub ha restituito @{[mysub(1,2,3)]}.\n";
+
+Il modo in cui esso funziona E<egrave> che quando "@{...}" E<egrave> visto nella stringa
+quotata tra doppi apici, esso viene valutato come un blocco. Il blocco crea
+un riferimento ad un array anonimo contenente i risultati della chiamata
+a C<mysub(1,2,3)>. CosE<igrave> l'intero blocco restituisce un riferimento ad un
+array, il quale E<egrave> poi dereferenziato da C<@{...}> ed incluso nella
+stringa quotata tra doppi apici. Questo sotterfugio E<egrave> utile anche per
+espressioni arbitrarie:
+
+    print "Questo produce @{[$n + 5]} widget\n";
+
+=head2 Riferimenti Simbolici
+X<riferimento simbolico> X<riferimento, soft>
+X<symbolic reference> X<soft reference>
+
+Abbiamo detto che i riferimenti vengono creati automaticamente se non sono
+definiti, ma non abbiamo detto cosa accade se un valore usato come un
+riferimento E<egrave> giE<agrave> stato definito, ma I<non E<egrave>> un
+riferimento concreto. CioE<egrave> il valore dello scalare E<egrave> preso
+come il I<nome> di una variabile, anzichE<eacute> come link diretto ad un (possibile)
+valore anonimo.
+
+Spesso le persone si aspettano che funzioni in questo modo.
+Quindi E<egrave> ciE<ograve> che fa.
+
+    $name = "pippo";
+    $$name = 1;                 # Imposta $pippo
+    ${$name} = 2;               # Imposta $pippo
+    ${$name x 2} = 3;           # Imposta $pippopippo
+    $name->[0] = 4;             # Imposta $pippo[0]
+    @$name = ();                # Pulisce @pippo
+    &$name();                   # Chiama &pippo() (come in Perl 4)
+    $pack = "QUEL";
+    ${"${pack}::$name"} = 5;    # Imposta $QUEL::pippo senza eval
+
+Questo E<egrave> potente, e lievemente pericoloso, nel senso che E<egrave> possibile
+intendere (con la massima sinceritE<agrave>) di utilizzare un riferimento 
+reale, e invece utilizzare accidentalmente un riferimento simbolico.
+Per proteggervi contro queste situazioni, potete dichiarare:
+
+    use strict 'refs';
+
+e quindi saranno permessi solamente i riferimenti concreti per il resto del
+blocco considerato. Un blocco interno potrebbe annullare ciE<ograve> con
+
+    no strict 'refs';
+
+Solamente le variabili package (globali, anche se localizzate) sono
+visibili a riferimenti simbolici. Variabili lessicali (dichiarate con
+my()) non sono nella tabella dei simboli, e quindi sono invisibili a
+questo meccanismo. Per esempio:
+
+    local $valore = 10;
+    $rif = "valore";
+    {
+        my $valore = 20;
+        print $$rif;
+    }
+
+Questo stamperE<agrave> ancora 10, non 20. Ricordate che local() agisce su
+variabili package, le quali sono tutte "globali" al package.
+
+=head2 Riferimenti non cosE<igrave> simbolici
+
+Una nuova caratteristica che contribuisce alla leggibilitiE<agrave> nel perl
+versione 5.001 E<egrave> che le graffe intorno ad un riferimento simbolico si
+comportano piE<ugrave> come degli apici, come se contenessero sempre una
+stringa. CioE<egrave>,
+
+    $push = "pop on ";
+    print "${push}over";
+
+ha sempre il senso di stampare "pop on over", anche se push E<egrave> una parola
+riservata del linguaggio. Questo E<egrave> stato generalizzato per funzionare
+anche fuori dagli apici, cosE<igrave> che
+
+    print ${push} . "over";
+
+ed anche
+
+    print ${ push } . "over";
+
+avranno lo stesso effetto. (Questo dovrebbe esser stato un errore di
+sintassi in Perl 5.000, anche se Perl 4 lo permetteva nella forma senza spazi).
+Questo costrutto I<non> E<egrave> considerato essere un
+riferimento simbolico quando state utilizzando strict refs:
+
+    use strict 'refs';
+    ${ bareword };      # Va bene, significa $bareword.
+    ${ "bareword" };    # Errore, riferimento simbolico.
+
+Analogamente, a causa di tutto il subscripting che E<egrave> stato fatto usando
+parole singole, abbiamo applicato la stessa regola a qualsiasi
+I<bareword> [letteralmente "parola nuda", NdT] che E<egrave> usata per
+effettuare l'indicizzazione di un hash. Quindi ora,
+invece di scrivere
+
+    $array{ "aaa" }{ "bbb" }{ "ccc" }
+
+potete scrivere solamente
+
+    $array{ aaa }{ bbb }{ ccc }
+
+e non preoccupatevi se le parole nelle graffe sono parole riservate del linguaggio.
+Nel raro caso in cui desideriate fare qualcosa come
+
+    $array{ shift }
+
+potete forzare l'interpretazione a parola riservata aggiungendo qualcosa
+che la renda piE<ugrave> di una semplice I<bareword>:
+
+    $array{ shift() }
+    $array{ +shift }
+    $array{ shift @_ }
+											
+La direttiva C<use warnings> o lo switch B<-w> vi avviseranno qualora
+interpretassero una parola riservata come una stringa. Ma non vi
+avvertiranno ulteriormente circa l'uso di parole scritte in lettere
+minuscole, perchE<eacute> la stringa E<egrave> effettivamente
+posta fra virgolette.
+
+=head2 Pseudo-hash: Utilizzare un array come un hash
+X<pseudo-hash> X<pseudo hash> X<pseudohash>
+
+AVVERTIMENTO: Questa sezione descrive una caratteristica sperimentale. I
+dettagli potrebbero cambiare senza preavviso nelle versioni future.
+
+NOTA: L'implementazione corrente degli pseudo-hash visibile all'utente
+(il bizzarro utilizzo del primo elemento dell'array) E<egrave>
+sconsigliato a partire da Perl 5.8.0 e sarE<agrave> rimosso in Perl 5.10.0, e
+tale caratteristica sarE<agrave> implementata differentemente. Non solo l'attuale
+interfaccia E<egrave> piuttosto bruttina, ma l'implementazione corrente
+rallenta abbastanza visibilmente l'utilizzo normale di array ed hash. La
+direttiva 'fields' rimarrE<agrave> disponibile.
+
+A partire dalla versione 5.005 di Perl, potete utilizzare un
+riferimento ad array in alcuni contesti che di solito richiederebbero
+un riferimento ad hash. Questo vi permette di accedere agli
+elementi di un array utilizzando nomi simbolici, come se essi fossero i
+campi di una struttura.
+
+Per far in modo che questo funzioni, l'array deve contenere delle
+informazioni in piE<ugrave>. Il primo elemento dell'array deve essere un
+riferimento ad un hash che consenta di mappare i nomi dei campi
+agli indici dell'array. Ecco un esempio:
+
+    $struct = [{pippo => 1, pluto => 2}, "PIPPO", "PLUTO"];
+
+    $struct->{pippo};  # lo stesso che $struct->[1], cioe` "PIPPO"
+    $struct->{pluto};  # lo stesso che $struct->[2], cioe` "PLUTO"
+
+    keys %$struct;     # restituira` ("pippo", "pluto") in qualche ordine
+    valores %$struct;  # restituira` ("PIPPO", "PLUTO") nello stesso "qualche" ordine
+
+    while (my($k,$v) = each %$struct) {
+       print "$k => $v\n";
+    }
+
+Perl solleverE<agrave> un'eccezione qualora cercaste di accedere a dei campi che
+non esistono. Per aggirare queste inconsistenze, usate sempre la
+funzione fields::phash() fornita dalla direttiva C<fields>.
+
+    use fields;
+    $pseudohash = fields::phash(pippo => "PIPPO", pluto => "PLUTO");
+
+Per migliori prestazioni, Perl puE<ograve> fare anche la traduzione
+dal nome del campo all'indice nell'array in fase di compilazione,
+per riferimenti ad oggetti cui è stato assegnato un tipo. Si veda L<fields>.
+
+Ci sono due strade per controllare l'esistenza di una chiave in uno
+pseudo-hash. La prima E<egrave> utilizzare exists(). Questo metodo controlla
+se un dato campo sia mai stato impostato. Essa agisce in questo modo
+per controllare il comportamento di un hash ordinario. Per esempio:
+
+    use fields;
+    $phash = fields::phash([qw(pippo pluto pantaloni)], ['PIPPO']);
+    $phash->{pantaloni} = undef;
+
+    print exists $phash->{pippo};    # vero, 'pippo' era impostato nella dichiarazione
+    print exists $phash->{pluto};    # falso, 'pluto' non e` stato usato
+    print exists $phash->{pantaloni};# vero, i vostri 'pantaloni' sono stati toccati
+
+La seconda E<egrave> utilizzare exists() sul riferimento ad hash che si trova
+nel primo elemento dell'array. In questo modo si controlla se la chiave
+data E<egrave> un campo valido nello pseudo-hash.
+
+    print exists $phash->[0]{pluto};   # vero, 'pluto' e` un campo valido
+    print exists $phash->[0]{scarpe};  # falso, 'scarpe' non puo` esser usato
+
+delete() su un elemento di uno pseudo-hash cancella solamente il
+valore corrispondente alla chiave, non la chiave stessa. Per cancellare
+la chiave, dovrete cancellarla esplicitamente dal primo elemento
+dell'hash. 
+
+    print delete $phash->{pippo};     # stampa $phash->[1], "PIPPO"
+    print exists $phash->{pippo};     # falso
+    print exists $phash->[0]{pippo};  # vero, la chiave esiste ancora
+    print delete $phash->[0]{pippo};  # ora la chiave non c'e` piu`
+    print $phash->{pippo};            # eccezione a tempo di esecuzione
+
+=head2 Modelli di funzione
+X<scope lessicale> X<chiusura> X<lessicale> X<closure>
+X<subroutine, innestata> X<sub, innestata> X<subroutine, locale> X<sub, locale>
+
+Come spiegato sopra, una funzione anonima con accesso alle variabili lessicali visibili quando
+quella funzione E<egrave> stata compilata, crea una chiusura. Essa mantiene l'accesso a quelle
+variabili anche se non E<egrave> in esecuzione successivamente, come in un signal handler o in una callback Tk.
+
+Utilizzare una chiusura come un modello di funzione ci permette di
+generare molte funzioni che si comportano in modo simile.
+Supponiamo che vogliate delle funzioni con il nome dei colori, che
+possano generare i cambiamenti di font necessari in HTML per ottenere
+i colori stessi:
+
+    print "State ", rosso("attenti"), "con quella ", verde("luce");
+
+Le funzioni C<rosso()> e C<verde()> dovrebbero esser simili. Per crearle,
+assegneremo una chiusura ad un typeglob del nome della funzione che stiamo
+cercando di andare a costruire.
+
+    @colori = qw(rosso blu verde giallo arancione porpora viola);
+    for my $nome (@colori) {
+        no strict 'refs';       # permette la manipolazione della tabella dei simboli
+        *$nome = *{uc $nome} = sub { "<FONT COLOR='$name'>@_</FONT>" };
+    }
+
+Ora tutte queste differenti funzioni sembrano esistere indipendentemente.
+Potete chiamare rosso(), ROSSO(), blu(), BLU(), verde(), ecc.
+Questa tecnica fa risparmiare sia tempo di compilazione che utilizzo di memoria,
+ed E<egrave> meno incline ad errori, dato che i controlli sintattici vengono
+fatti a tempo di compilazione. E<Egrave> di estrema importanza che qualsiasi
+variabile nella subroutine anonima sia lessicale, in modo da creare la
+chiusura in maniera appropriata. Questa E<egrave> la ragione per il "my" nelle
+variabili utilizzate nelle iterazioni.
+
+Questo E<egrave> uno dei pochi casi nei quali prototipizzare una chiusura ha un
+qualche senso. Se aveste voluto imporre la valutazione dell'argomento
+in contesto scalare (un'idea probabilmente non saggia per
+questo particolare esempio), avreste potuto scriverlo così:
+
+    *$name = sub ($) { "<FONT COLOR='$nome'>$_[0]</FONT>" };
+
+Comunque, dato che i controlli sui prototipi avvengono a tempo di
+compilazione, l'assegnamento sopra avviene troppo tardi per poter essere
+utilizzato. Potreste risolvere questo fatto mettendo l'intero ciclo di
+assegnamenti tra un blocco BEGIN, forzandolo ad accadere durante la
+compilazione.
+
+Accedere a variabili lessicali che cambiano tipo--come quelle nel ciclo
+C<for> sopra--funziona solo con le chiusure, non nelle comuni
+subroutine. Nel caso generale, quindi, le subroutine con nome non si
+innestano correttamente, sebbene quelle con nome sE<igrave>. Se siete
+abituati ad utilizzare le subroutine innestate in altri linguaggi di 
+programmazione con le loro variabili private, in Perl dovrete lavorarci un po'
+di piE<ugrave>. Programmando intuitivamente questo tipo di cose
+si incorre in misteriosi avvertimenti circa "will not stay shared"
+[letteralmente "non saranno condivise", NdT].
+Per esempio, questo non funzionerE<agrave>:
+
+    sub piu_esterno {
+        my $x = $_[0] + 35;
+        sub piu_interno { return $x * 19 }   # SBAGLIATO
+        return $x + piu_interno();
+    }
+
+una soluzione di ripiego E<egrave> la seguente:
+
+    sub piu_esterno {
+        my $x = $_[0] + 35;
+        local *piu_interno = sub { return $x * 19 };
+        return $x + piu_interno();
+    }
+
+Ora, piu_interno() puE<ograve> essere chiamata solamente dentro piu_esterno(), a causa
+dell'assegnamento temporaneo della chiusura (subroutine anonima). Ma
+quando questo viene fatto, la sub anonima ha normale accesso alla 
+variabile lessicale $x dallo scope di piu_esterno().
+
+Questo ha l'interessante effetto di creare una funzione locale ad
+un'altra funzione, qualcosa di solito non supportato in Perl.
+
+=head1 AVVERTIMENTI
+X<riferimento, contesto di stringa> X<riferimento, usare come chiave di hash>
+
+Non E<egrave> consigliabile utilizzare un riferimento come chiave in un hash.
+Questo verrE<agrave> infatti convertito in una stringa:
+
+           $x{ \$a } = $a;
+
+Se provate a dereferenziare la chiave, essa non creerE<agrave> un riferimento concreto,
+e non si otterrE<agrave> ciE<ograve> che ci si aspetta. Potreste voler fare
+qualcosa come
+
+           $r = \@a;
+	   $x{ $r } = $r;
+
+E poi, almeno potete utilizzare values(), che sarE<agrave> un riferimento concreto,
+invece di keys(), che non lo sarE<agrave>.
+
+Il modulo standard Tie::RefHash fornisce una soluzione conveniente a questo aspetto.
+
+=head1 SI VEDA ANCHE
+
+Accanto agli ovvi documenti, il codice sorgente puE<ograve> essere
+istruttivo. Alcuni patologici esempi di utilizzo dei riferimenti
+si possono trovare nel test di regressione F<t/op/ref.t> nella
+directory del codice sorgente Perl.
+
+Consultate anche L<perldsc> e L<perllol> sul come utilizzare i riferimenti per
+creare strutture dati complesse, e L<perltoot>, L<perlobj>, e L<perlbot> sul
+come utilizzarli per creare oggetti.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlref
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Daniele Ludovici.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

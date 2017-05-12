@@ -1,0 +1,20 @@
+Revision history for POE-Wheel-Spawner
+
+0.03.1 2017-04-26
+        * rename the module to POE::Wheel::Spawner (previous Poe)
+
+0.021.2 2017-04-25
+        * clean up POD description
+        * version test
+
+0.021.1 2016-10-24
+        * add abstract into POD
+        * version declaration with qv
+
+0.02    2014-12-23
+        * POD tests
+        * perltidy
+
+0.01    2014-12-19
+        First version, released on an unsuspecting world.
+

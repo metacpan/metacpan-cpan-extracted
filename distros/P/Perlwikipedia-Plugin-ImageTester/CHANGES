@@ -1,0 +1,13 @@
+Revision history for ImageTester
+
+Unreleased version
+	Changes made since 0.1.2:
+		* 
+0.1.2 DCOLLINS December 27 2008
+	Changes made since 0.1.1:
+		* None. I just forgot to add the module itself to the MANIFEST, so it wasn't included in the PAUSE uploads.
+0.1.1 DCOLLINS December 27 2008
+	Changes made since 0.1.0:
+		* Added some more automatic issue resolution
+0.1.0 DCOLLINS December 27 2008
+	* Initial version

@@ -1,0 +1,62 @@
+## name Basic passing
+## failures 0
+## cut
+
+sub die {}
+sub croak {}
+sub confess {}
+
+$x->die();
+$x->croak();
+$x->confess();
+
+$x->{die};
+$x->{croak};
+$x->{confess};
+
+## name Basic failure
+## failures 9
+## cut
+
+die 'A horrible death' if $condtion;
+croak 'A horrible death' if $condtion;
+confess 'A horrible death' if $condtion;
+
+if ($condition) {
+   die 'A horrible death';
+}
+
+if ($condition) {
+   croak 'A horrible death';
+}
+
+if ($condition) {
+   confess 'A horrible death';
+}
+
+open my $fh, '<', $path or
+  die "Can't open file $path";
+
+open my $fh, '<', $path or
+  croak "Can't open file $path";
+
+open my $fh, '<', $path or
+  confess "Can't open file $path";
+
+#-----------------------------------------------------------------------------
+
+##############################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/distributions/Perl-Critic-More/t/ErrorHandling/RequireUseOfExceptions.run $
+#     $Date: 2007-07-20 22:45:58 -0700 (Fri, 20 Jul 2007) $
+#   $Author: clonezone $
+# $Revision: 1774 $
+##############################################################################
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab :

@@ -1,0 +1,6 @@
+name = "Port-Selector"
+badges = ["travis"]
+authority="cpan:JASEI"
+
+module_maker="ModuleBuildTiny"
+

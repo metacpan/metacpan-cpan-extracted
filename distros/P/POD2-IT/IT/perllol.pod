@@ -1,0 +1,344 @@
+=head1 NOME
+
+perllol - Manipolare Array di Array in Perl
+
+=head1 DESCRIZIONE
+
+=head2 Dichiarazione ed Accesso ad Array di Array
+
+La cosa piE<ugrave> semplice da costruire E<egrave> un array di array (a volte detto
+imprecisamente lista di liste). E<Egrave> piuttosto semplice da
+comprendere, e praticamente tutto quello che si applica qui sarE<agrave>
+anche applicabile nel seguito a strutture dati piE<ugrave> elaborate.
+
+Un array di array E<egrave> solo un buon vecchio array C<@AoA> accessibile
+utilizzando due indici, come C<$AoA[3][2]>. Ecco una possibile
+dichiarazione dell'array:
+
+    # assegnazione al nostro array, un array di riferimenti ad array
+    @AoA = (
+        [ "fred", "barney" ],
+        [ "george", "jane", "elroy" ],
+        [ "homer", "marge", "bart" ],
+    );
+
+    print $AoA[2][2];
+  bart
+
+Dovete prestare molta attenzione al fatto che la parentesi esterna E<egrave>
+tonda; questo dipende dal fatto che state effettuando un'assegnazione
+ad un un C<@array>,
+per cui avete bisogno di questo tipo di parentesi. Se I<non> voleste 
+un C<@AoA>, ma solo un riferimento ad esso, potreste fare qualcosa tipo:
+
+    # assegna un riferimento ad un array di riferimenti ad array
+    $rif_a_AdA = [
+        [ "fred", "barney", "pebbles", "bambam", "dino", ],
+        [ "homer", "bart", "marge", "maggie", ],
+        [ "george", "jane", "elroy", "judy", ],
+    ];
+
+    print $rif_a_AdA->[2][2];
+
+Osservate che il tipo delle parentesi esterne E<egrave> cambiato da tondo
+a quadrato, per cui la nostra sintassi di accesso E<egrave> variata. Questo
+E<egrave> necessario per il fatto che, diversamente da C, in Perl non potete
+scambiare liberamente array e riferimenti ad essi. C<$rif_a_AdA> E<egrave> un
+riferimento ad un array, laddove C<@AoA> E<egrave> un array vero e proprio.
+Similmente, C<$AoA[2]> non E<egrave> un array, ma un riferimento ad array.
+Ci si puE<ograve> allora chiedere come sia possibile scrivere:
+
+    $AoA[2][2]
+    $rif_a_AdA->[2][2]
+
+invece di essere costretti ad utilizzare:
+
+    $AoA[2]->[2]
+    $rif_a_AdA->[2]->[2]
+
+Bene, questo dipende dalla regola che dice che, limitatamente a parentesi
+adiacenti (siano esse quadrate o graffe), siete liberi di omettere la freccia
+di dereferenziazione. Ma non potete farlo per la prima parentesi se il
+riferimento E<egrave> contenuto in uno scalare, il che significa che
+C<$rif_a_AdA> lo deve sempre avere.
+
+=head2 Primi passi in autonomia
+
+Fin qui tutto a posto per la dichiarazione di una struttura dati fissa,
+ma cosa fare se avete bisogno di aggiungere nuovi elementi al volo, o
+costruire la struttura da zero?
+
+Prima di tutto vediamo come leggerla da file. E<Egrave> qualcosa di molto
+simile ad aggiungere una riga per volta. Assumeremo che sia presente un
+semplice file nel quale ciascuna linea E<egrave> una riga della nostra struttura,
+e ciascuna parola un elemento. Se state provando a costruire un array
+C<@AoA> che contenga tutto questo, ecco il modo corretto per farlo:
+
+    while (<>) {
+        @tmp = split;
+        push @AoA, [ @tmp ];
+    }
+
+Potete anche caricare i dati da una funzione:
+
+    for $i ( 1 .. 10 ) {
+        $AoA[$i] = [ una_funzione($i) ];
+    }
+
+In alternativa, potreste utilizzare una variabile temporanea con il
+contenuto dell'array:
+
+    for $i ( 1 .. 10 ) {
+        @tmp = una_funzione($i);
+        $AoA[$i] = [ @tmp ];
+    }
+
+E<Egrave> molto importante che vi assicuriate di utilizzare il costruttore
+di riferimento ad array C<[]>; quanto segue sarebbe totalmente sbagliato:
+
+    $AoA[$i] = @tmp;
+
+Come potete vedere, assegnare un array ad uno scalare (perchE<eacute> C<$AoA[$i]>
+E<egrave> uno scalare, giusto?) avrebbe l'unico effetto di contare
+gli elementi in C<@tmp>,
+il che non E<egrave> probabilmente quel che volete.
+
+Se state utilizzando C<use strict>, potreste aver bisogno di qualche
+dichiarazione addizionale per farlo contento:
+
+    use strict;
+    my(@AoA, @tmp);
+    while (<>) {
+        @tmp = split;
+        push @AoA, [ @tmp ];
+    }
+
+E<Egrave> chiaro che non avete bisogno di avere un array temporaneo
+esplicito:
+
+    while (<>) {
+        push @AoA, [ split ];
+    }
+
+Non avete neanche bisogno di utilizzare C<push()>. Fate semplicemente
+un'assegnazione se sapete giE<agrave> dove volete mettere i dati:
+
+    my (@AoA, $i, $line);
+    for $i ( 0 .. 10 ) {
+        $line = <>;
+        $AoA[$i] = [ split ' ', $line ];
+    }
+
+In questo caso basta anche:
+
+    my (@AoA, $i);
+    for $i ( 0 .. 10 ) {
+        $AoA[$i] = [ split ' ', <> ];
+    }
+
+In generale, perE<ograve>, conviene essere cauti nell'utilizzare funzioni che
+potrebbero potenzialmente restituire liste in un contesto scalare,
+senza che questo risulti in quale modo esplicito.
+Per il lettore occasionale quanto
+segue sarebbe piE<ugrave> comprensibile:
+
+    my (@AoA, $i);
+    for $i ( 0 .. 10 ) {
+        $AoA[$i] = [ split ' ', scalar(<>) ];
+    }
+
+Se voleste avere una variabile C<$rif_a_AdA> come riferimento ad un
+array, dovreste fare qualcosa tipo:
+
+    while (<>) {
+        push @$rif_a_AdA, [ split ];
+    }
+
+Ora sapete come aggiungere nuove righe. Che ne pensate di aggiungere nuove
+colonne? Se stiamo parlando di semplici matrici, E<egrave> spesso piE<ugrave> facile
+utilizzare una semplice assegnazione:
+
+    for $x (1 .. 10) {
+        for $y (1 .. 10) {
+            $AoA[$x][$y] = func($x, $y);
+        }
+    }
+
+    for $x ( 3, 7, 9 ) {
+        $AoA[$x][20] += func2($x);
+    }
+
+Non importa se gli elementi sono giE<agrave> lE<igrave> o no: perl sarE<agrave> felice di crearli
+per voi, impostando tutti gli elementi in mezzo necessari a C<undef>,
+come E<egrave> giusto che sia.
+
+Se voleste solamente aggiungere elementi ad una riga, dovreste fare qualcosa
+di un po' piE<ugrave> articolato:
+
+    # aggiungere nuove colonne ad una riga
+    push @{ $AoA[0] }, "wilma", "betty";
+
+Da notare che I<non abbiamo> potuto dire semplicemente:
+
+    push $AoA[0], "wilma", "betty";  # SBAGLIATO!
+
+Questa espressione, infatti, non compilerebbe nemmeno. Com'E<egrave> possibile?
+PerchE<eacute> il primo argomento di C<push()> deve essere un array in carne
+ed ossa, non solo un riferimento.
+
+=head2 Accesso ai dati e Stampa
+
+E<Egrave> ora di stampare la vostra struttura dati. Come farlo? Se
+volete solo un elemento E<egrave> banale:
+
+    print $AoA[0][0];
+
+Se volete stampare tutto, perE<ograve>, non potete scrivere semplicemente
+
+    print @AoA;		# SBAGLIATO
+
+perchE<eacute> ricevereste solo la lista dei riferimenti, e perl non
+effettuerE<agrave> mai una dereferenziazione implicita per conto vostro. Dovete
+mettere su uno o due cicli per conto vostro, dunque; il
+codice che segue stampa l'intera struttura, utilizzando C<for()>
+in stile shell per iterare sull'array piE<ugrave> esterno.
+
+    for $aref ( @AoA ) {
+        print "\t [ @$aref ],\n";
+    }
+
+Se voleste tener traccia degli indici esplicitamente, potreste fare
+come segue:
+
+    for $i ( 0 .. $#AoA ) {
+        print "\t la riga $i contiene [ @{$AoA[$i]} ],\n";
+    }
+
+o anche cosE<igrave> (notate il ciclo interno):
+
+    for $i ( 0 .. $#AoA ) {
+        for $j ( 0 .. $#{$AoA[$i]} ) {
+            print "l'elemento in posizione $i $j vale $AoA[$i][$j]\n";
+        }
+    }
+
+Ebbene sE<igrave>, comincia a diventare un po' complicato. Questo E<egrave> il motivo
+per cui a volte E<egrave> piE<ugrave> semplice (e leggibile) utilizzare qualche variabile
+temporanea lungo il percorso:
+
+    for $i ( 0 .. $#AoA ) {
+        $aref = $AoA[$i];
+        for $j ( 0 .. $#{$aref} ) {
+            print "l'elemento in posizione $i $j vale $AoA[$i][$j]\n";
+        }
+    }
+
+Rimane ancora un po' bruttino. Che ne pensate di questo?
+
+    for $i ( 0 .. $#AoA ) {
+        $aref = $AoA[$i];
+        $n = @$aref - 1;
+        for $j ( 0 .. $n ) {
+            print "l'elemento in posizione $i $j vale $AoA[$i][$j]\n";
+        }
+    }
+
+=head2 Slice
+
+Se volete accedere ad una I<slice> (una porzione di una riga costituita
+da elementi in posizioni adiacenti) in un array multidimensionale 
+avrete bisogno
+di utilizzare un po' di indicizzazione ed un po' di fantasia. 
+Se infatti abbiamo
+a disposizione un sinonimo comodo per accedere ad un singolo elemento,
+utilizzando la freccia di puntamento per la dereferenziazione, non esiste
+nessuno strumento simile per le slice. (Ricordate, ovviamente, che
+potete sempre scrivere un ciclo per effettaure l'estrazione di una slice).
+
+Ecco come effettuare un'operazione (estrazione dei dati, nel caso particolare)
+utilizzando un ciclo. Assumeremo
+che C<@AoA> sia lo stesso definito in precedenza.
+
+    @part = ();
+    $x = 4;
+    for ($y = 7; $y < 13; $y++) {
+        push @part, $AoA[$x][$y];
+    }
+
+Tale ciclo puE<ograve> essere rimpiazzato da un'operazione effettuata su
+una slice opportuna:
+
+    @part = @{ $AoA[4] } [ 7..12 ];
+
+ma, come avete giE<agrave> indovinato, E<egrave> piuttosto criptico per chi legge.
+
+Che dovreste fare se voleste una I<slice bidimensionale>, come
+prendere i dati con C<$x> in 4..8 e C<$y> in 7..12? Beh, la strada
+piE<ugrave> semplice E<egrave> la seguente:
+
+    @newAoA = ();
+    for ($startx = $x = 4; $x <= 8; $x++) {
+       for ($starty = $y = 7; $y <= 12; $y++) {
+           $newAoA[$x - $startx][$y - $starty] = $AoA[$x][$y];
+       }
+    }
+
+Possiamo ridurre i cicli espliciti utilizzando le slice:
+
+    for ($x = 4; $x <= 8; $x++) {
+        push @newAoA, [ @{ $AoA[$x] } [ 7..12 ] ];
+    }
+
+Se avete dimestichezza con la Schwartzian Transform (Trasformazione
+di Schwartz, da Randal L. Schwartz, N.d.T.), avreste
+probabilmente scelto C<map>:
+
+    @newAoA = map { [ @{ $AoA[$_] } [ 7..12 ] ] } 4 .. 8;
+
+Per quanto sarebbe difficile, in questo caso, controbattere il vostro capo,
+se vi accusasse di cercare la certezza di conservare il vostro posto di
+lavoro (o perderlo molto rapidamente) utilizzando codice illeggibile.
+Fossi in voi, lo incapsulerei all'interno di una funzione:
+
+    @newAoA = splice_2D( \@AoA, 4 => 8, 7 => 12 );
+    sub splice_2D {
+        my $lrr = shift; 	# rif. ad un array di rif. ad array!
+        my ($x_lo, $x_hi,
+            $y_lo, $y_hi) = @_;
+
+        return map {
+            [ @{ $lrr->[$_] } [ $y_lo .. $y_hi ] ]
+        } $x_lo .. $x_hi;
+    }
+
+
+=head1 VEDERE ANCHE
+
+perldata(1), perlref(1), perldsc(1)
+
+=head1 AUTORE
+
+Tom Christiansen <F<tchrist@perl.com>>
+
+Last update: Thu Jun  4 16:16:23 MDT 1998
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perllol
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Flavio Poletti.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

@@ -1,0 +1,125 @@
+
+use strict;
+
+print << "EOD";
+\a\a
+This script will complete the upgrade of your PPM installation.
+
+It is *very* important that you exit VPM or PPM before proceeding.
+
+To exit VPM, click on the 'Quit' icon at the top of the current 
+VPM screen, then press the 'Quit' button that appears.
+
+If you are using PPM, return to the window in which PPM is running,
+and type 'quit'.
+
+Press 'Enter' in this window after you have shut down VPM or PPM 
+to continue the upgrade process.
+
+EOD
+
+<>;
+
+my $thisperl;
+
+my @paths = split(';', $ENV{PATH});
+foreach (@paths) {
+    chop if /\\$/;
+    if (-x "$_/perl.exe" || -x "$_/perl") {
+        # PRK install
+        if (/\\bin\\MSWin32-x86-object$/) {
+            $_ =~ s/\\bin\\MSWin32-x86-object$//i;
+        }
+        # ActivePerl
+        elsif (/[\\\/]bin$/) {
+            $_ =~ s/[\\\/]bin$//i;
+        }
+        $thisperl = $_;
+        last;
+    }
+}
+
+print << "EOD";
+
+Found a Perl installation under '$thisperl'.
+
+If this is the version of Perl for which you want to upgrade PPM,
+press 'Enter'.  Otherwise, enter the root directory of your Perl 
+installation (e.g. if perl.exe is in C:/Perl/bin, enter C:/Perl below).
+
+EOD
+
+my $dir;
+while (!defined $dir) {
+    print "directory [$thisperl]: ";
+    $dir = <>;
+
+    if ($dir ne "\n") {
+        chomp $dir;
+        if (! -d $dir) {
+            print << "EOD";
+Error: $dir does not exist.
+Please enter the path to your Perl installation, or press
+'Enter' to use '$thisperl'
+
+EOD
+        undef $dir;
+        }
+        else {$thisperl = $dir; }
+    }
+}
+
+print "\nCompleting PPM upgrade...\n";
+
+#
+# Create new ppm.bat
+#
+
+my $thisperlbin = $thisperl . '/bin';
+if (!chdir($thisperlbin)) {
+    print "Can't cd to '$thisperlbin': $!\n";
+    print "Press 'Enter' to exit.\n";
+    <>;
+    exit 1;
+}
+
+if($^O eq 'MSWin32' && system("pl2bat ppm.pl")) {
+    print "Error calling 'pl2bat' to create ppm.bat from ppm.pl: $?\n";
+    print "Press 'Enter' to exit.\n";
+    <>;
+    exit 1;
+}
+
+#
+# Fix ppm.xml (613 had <LOCATION>http://... rather than <LOCATION>soap://...
+#
+{
+    my $thisperlsitelib = $thisperl . '/site/lib';
+    local $/;
+    open(PPMXML, "<$thisperlsitelib/ppm.xml") 
+        or die "Can't open $thisperlsitelib/ppm.xml for reading: $!";
+    my $dat = <PPMXML>;
+    close(PPMXML);
+    $dat =~ s@<LOCATION>http://www.ActiveState.com/packages</LOCATION>
+             @<LOCATION>soap://www.ActiveState.com/cgibin/SOAP/ppmserver.plex?class=PPM::SOAPServer</LOCATION>@goix;
+    open(PPMXML, ">$thisperlsitelib/ppm.xml") 
+        or die "Can't open $thisperlsitelib/ppm.xml for writing: $!";
+    print PPMXML $dat;
+    close(PPMXML);
+}
+
+# May need to move some PPM components from $Config{installprivlib}.
+# Older versions of PPM upgraded itself into that directory because 
+# the ActivePerl installer used to install it there.
+my @PPMfiles = ('PPM.pm', 'XML/PPD.pm', 'XML/PPMConfig.pm', 
+                'XML/RepositorySummary.pm', 'PPM/RelocPerl.pm');
+mkdir ("$thisperl/site/lib/PPM", 0777) if not -d "$thisperl/site/lib/PPM";
+foreach (@PPMfiles) {
+    next if (not -f "$thisperl/lib/$_");
+    chmod (0644, "$thisperl/site/lib/$_") if -f "$thisperl/site/lib/$_";
+    rename "$thisperl/lib/$_", "$thisperl/site/lib/$_";
+}
+
+print "PPM has been successfully updated.\n";
+print "Press 'Enter' to exit.\n";
+<>;

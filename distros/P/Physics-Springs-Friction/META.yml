@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name: Physics-Springs-Friction
+version: 1.01
+author:
+  - |-
+    Steffen Mueller <friction-module at steffen-mueller dot net>
+abstract: Simulate Dynamics with Springs and Friction
+license: perl
+requires:
+  Data::Dumper: 0
+  Physics::Particles: 1.00
+  Physics::Springs: 1.00
+  Sub::Assert: 0
+recommends:
+  Test::Pod: 1.0
+  Test::Pod::Coverage: 1.0
+build_requires:
+  Test::More: 0
+conflicts:
+  Physics::Particles: '<1.00'
+  Physics::Springs: '<1.00'
+provides:
+  Physics::Springs::Friction:
+    file: lib/Physics/Springs/Friction.pm
+    version: 1.01
+generated_by: Module::Build version 0.2608

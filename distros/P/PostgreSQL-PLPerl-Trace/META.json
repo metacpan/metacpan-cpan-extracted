@@ -1,0 +1,23 @@
+{
+   "resources" : {
+      "repository" : "git@github.com:timbunce/posgtresql-plperl-trace.git"
+   },
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "Dist::Zilla version 1.100660",
+   "version" : "1.001",
+   "name" : "PostgreSQL-PLPerl-Trace",
+   "author" : [
+      "Tim Bunce <Tim.Bunce@pobox.com>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "requires" : {},
+   "abstract" : "Trace execution of PostgreSQL PL/Perl code statements",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

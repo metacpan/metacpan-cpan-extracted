@@ -1,0 +1,43 @@
+%{
+=head1 SYNOPSIS
+
+Compile it with:
+
+  $ eyapp -C default_naming_scheme
+
+to run it, write:
+
+  $ ./default_naming_scheme.pm -t -i -c '*a=b'
+
+
+It will produce the output:
+
+  s_1(l_3(TERMINAL,r_5(l_4(TERMINAL[a]))),TERMINAL,r_5(l_4(TERMINAL[b])))
+
+=cut
+%}
+%strict
+%token ASSIGN  = /=/
+%token POINTER = /\*/
+%token NUM = /([0-9]+(?:\.[0-9]+)?)/
+%token VAR = /([A-Za-z][A-Za-z0-9_]*)/
+
+%tree
+
+%%
+s:
+    l ASSIGN r
+  | r
+;
+
+l:
+    POINTER r
+  | VAR
+;
+
+r:
+    l
+;
+
+%%
+

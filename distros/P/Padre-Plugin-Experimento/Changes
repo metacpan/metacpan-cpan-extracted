@@ -1,0 +1,9 @@
+Changes for Padre-Plugin-Experimento
+
+0.02  2012.3.28  (AZAWAWI)
+    - Added "Check POD" to print the current document's POD errors and warnings
+      in the output panel.
+
+0.01  2012.3.26  (AZAWAWI)
+    - Initial release to CPAN.
+    - Adds Control-Shift up/down to move selected text up and down.

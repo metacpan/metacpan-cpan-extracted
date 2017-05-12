@@ -1,0 +1,3 @@
+This is a test for RT ticket 75228.
+
+Allow apostrophes (wasn't done before), and G.M.T, even though G.M.T. ought to be G. M. T or, in open-punctuation, GMT.

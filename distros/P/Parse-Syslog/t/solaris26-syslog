@@ -1,0 +1,11 @@
+Aug  7 22:10:39 otaniemi.ee.ethz.ch sshd[1517]: error: Hm, dispatch protocol error: type 32 plen 4
+Aug  7 22:11:19 otaniemi.ee.ethz.ch last message repeated 8 times
+Aug  7 22:11:21 tardis-a1.ee.ethz.ch ftpd[14025]: FTPD: command: NOOP^M
+Aug  7 22:11:21 tardis-a1.ee.ethz.ch ftpd[14025]: <--- 200 
+Aug  7 22:11:21 tardis-a1.ee.ethz.ch ftpd[14025]: NOOP command successful.
+Aug  7 22:11:24 otaniemi.ee.ethz.ch sshd[1517]: error: Hm, dispatch protocol error: type 32 plen 4
+Aug  7 22:12:09 otaniemi.ee.ethz.ch last message repeated 9 times
+Aug  7 22:12:11 tardis-a3.ee.ethz.ch sshd[16925]: Could not reverse map address 129.132.166.193.
+Aug  7 22:12:11 testhost -- MARK --
+Aug  7 22:12:11 tardis-a3.ee.ethz.ch sshd[16925]: Accepted password for haemmluk from 129.132.166.193 port 50395
+Aug  7 22:12:14 otaniemi.ee.ethz.ch sshd[1517]: error: Hm, dispatch protocol error: type 32 plen 4

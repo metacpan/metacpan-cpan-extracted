@@ -1,0 +1,6 @@
+Revision history for Perl extension PeekPoke.
+
+0.01  Sun Nov 19 17:11:56 2000
+	- original version; created by h2xs 1.20 with options
+		-n PeekPoke -A
+

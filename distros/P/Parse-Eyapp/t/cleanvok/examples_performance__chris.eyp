@@ -1,0 +1,60 @@
+
+%%
+
+log:
+      fw
+    | tcplog 
+;
+fw:
+      syslogdate 'S' hostname 'S' process ':' fwdatas 
+;
+tcplog:
+      syslogdate 'S' hostname 'S' tcplogid tcplogopen
+    | syslogdate 'S' hostname 'S' tcplogid tcplogclose 
+;
+fwdatas:
+      fwdata + 
+;
+fwdata:
+      'S' 'KEYPAIR'
+    | 'S' 'ALPHA'
+    | 'S' 
+;
+tcplogid:
+      'TCPLOG' 'OPENPAREN' 'HEXID8' 'CLOSEPAREN' ':' 'S' 
+;
+tcplogopen:
+      'ALPHA' 'S' 'ALPHA' ',' 'S' ip ':' port 'S' '-' '>' 'S' ip ':' port 
+;
+tcplogclose:
+      'ALPHA' 'S' 'ALPHA' ',' 'S' 'ALPHA' 'S' 'INT' ',' 'S' 'ALPHA' 'S' 'INT' 
+;
+syslogdate:
+      year 'S' month 'S' day 'S' time 
+;
+year:
+      'INT' 
+;
+month:
+      'ALPHA' 
+;
+day:
+      'INT' 
+;
+time:
+      'INT' ':' 'INT' ':' 'INT' 
+;
+hostname:
+      'ALPHA' '-' 'ALPHA' '-' 'INT' 
+;
+process:
+      'ALPHA' 'S' 'ALPHA' 'S' 'ALPHA' 
+;
+port:
+      'INT'  
+;
+ip:
+      'INT' '.' 'INT' '.' 'INT' '.' 'INT' 
+;
+
+%%

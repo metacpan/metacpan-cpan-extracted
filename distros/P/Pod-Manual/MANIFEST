@@ -1,0 +1,20 @@
+Build.PL
+Makefile.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Pod/Manual.pm
+lib/Pod/Manual/PodXML2Docbook.pm
+lib/Pod/Manual/Docbook2LaTeX.pm
+t/01general.t
+t/90pod-coverage.t
+t/91perlcritic.t
+t/92pod.t
+t/99signature.t
+examples/catalyst_manual.pl
+examples/rose-db-object.pl
+script/podmanual
+t/02title.t
+t/10podmanual.t
+SIGNATURE    Added here by Module::Build

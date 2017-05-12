@@ -1,0 +1,9 @@
+Changes
+lib/Plack/Middleware/CSS/Compressor.pm
+Makefile.PL
+MANIFEST
+README
+t/_use.t
+t/foo.css
+t/simple.t
+META.yml                                 Module meta-data (added by MakeMaker)

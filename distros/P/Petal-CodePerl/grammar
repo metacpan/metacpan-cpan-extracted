@@ -1,0 +1,169 @@
+q{
+
+	only_expr: expr /^\z/ {$item{expr}}
+
+	expr: single_expr(s? /\\|/) {
+		Petal::CodePerl::Expr::alternate(@{$item[1]})
+	}
+
+	single_expr: qual_expr | single_path
+
+	# a qualified expression, that is it begins with a type:
+	qual_expr: path_expr | not_expr | string_expr | exists_expr |
+		perl_expr | mod_expr
+
+		path_expr: "path:" <commit> single_path { $item{path} }
+
+		not_expr: "not:" <commit> expr {
+			Code::Perl::Expr::not($item{expr})
+		}
+
+		# see far below for string
+		string_expr : "string:" <commit> string { $item{string} }
+
+		exists_expr: "exists:" <commit> path_expr { Petal::CodePerl::Expr::pathexists($item{expr}) }
+
+		perl_expr: "perl:" <commit> <perl_codeblock>  { Code::Perl::Expr::perl($item[2]) }
+
+		mod_expr: mod_expr_compile | mod_expr_revert
+
+		# a modifier that know's about compilation
+		mod_expr_compile: mod_name /\s*/ ':' expr {
+
+			my $name = $item{mod_name};
+			my $expr = $item{expr};
+			my $mod = $Petal::Hash::MODIFIERS{"$name:"} || die "Modifier '$name' does not exists";
+
+			my $compiled;
+			if (UNIVERSAL::can($mod, "inline") and $Petal::CodePerl::InlineMod)
+			{
+				$compiled =	$mod->inline($Petal::CodePerl::Compiler::root, $expr);
+			}
+			elsif (UNIVERSAL::can($mod, "process_value"))
+			{
+				$compiled =	Code::Perl::Expr::callm(
+					Code::Perl::Expr::scal("Petal::Hash::MODIFIERS{\"$name:\"}"), # this is a bit naughty
+					"process_value",
+					$Petal::CodePerl::Compiler::root,
+					$item{expr}
+				);
+			}
+			$compiled;
+		}
+
+		# an old style modifier that doesn't know about compilation
+		mod_expr_revert: mod_name /\s*/ ':' /.*/ {
+
+			# make sure Petal doesn't escape it because we will
+			my $key = "structure ".join("", @item[1, 2, 3, 4]);
+
+			Code::Perl::Expr::callm(
+				$Petal::CodePerl::Compiler::root,
+				"get",
+				$key
+			);
+		}
+
+#		# this is how it might be done in the future...
+#		mod_expr: mod_name /\s*/ ':' expr {
+#			Code::Perl::Expr::callsub(
+#				"Petal::CodeGeneratorTeng::call_modifier",
+#				Code::Perl::Expr::self(),
+#				Code::Perl::Expr::const("$item{mod_name}:"),
+#				$item{expr}
+#			);
+#		}
+
+	mod_name: /\w+/
+
+############ path 
+
+	single_path: url_segment deref(s?) {
+
+		my $current = Code::Perl::Expr::derefh($Petal::CodePerl::Compiler::root, $item{url_segment});
+
+		foreach my $deref (@{$item[2]})
+		{
+			my ($type, $key, @others) = @$deref;
+
+			if ($type eq 'tal')
+			{
+				$current = Petal::CodePerl::Expr::dereft($current, $key);
+			}
+			elsif ($type eq 'hash')
+			{
+				$current = Code::Perl::Expr::derefh($current, $key);
+			}
+			elsif($type eq 'array')
+			{
+				$current = Code::Perl::Expr::derefa($current, $key);
+			}
+			elsif($type eq 'method')
+			{
+				$current = Code::Perl::Expr::callm($current, $key, @others);
+			}
+			else
+			{
+				die "Unknown type '$type'";
+			}
+		}
+
+		$current;
+	}
+
+		url_segment : /[a-z0-9_\\-\\~]+/i
+		
+		separator: '/' | '.'
+
+		deref: method_call | tal_deref | hash_deref | array_deref
+
+			tal_deref: separator url_segment { ['tal', $item{url_segment}] }
+			
+			hash_deref: '{' url_segment '}' { ['hash', $item{url_segment}] }
+
+			array_deref: '[' integer ']' { ['array', $item{integer}] }
+
+				integer: /[0-9]+/
+
+			method_call: empty_method | arg_method
+			
+				empty_method: separator url_segment '()' { ['method', $item{url_segment}] }
+
+				arg_method: separator url_segment /\s+/ argument(s /\s+/) {
+					['method',  $item{url_segment}, @{$item[4]}]
+				}
+
+					argument: string_argument | expr
+
+						string_argument: (mm_string | qq_string | q_string) {
+							Code::Perl::Expr::string($item[1])
+						}
+
+							mm_string: '--' /\S+/
+							qq_string: '"' /[^"]*/ '"' { $item[2] }
+							q_string: "'" /[^']*/ "'" { $item[2] }
+
+######### string
+
+		# the string is made from various pieces joined together
+		string: string_piece(s?) {
+			Code::Perl::Expr::append(@{$item[1]})
+		}
+
+			# each piece is either just a plain bit of text or a variable
+			string_piece: plain_string | varsub
+			        
+				varsub: '$' single_path | '${' single_path '}' { $item{single_path} }
+
+				# plain strings are made up of escaped dollars or other things
+				plain_string: (dollar | non_dollar)(s) {
+					Code::Perl::Expr::string( join("", @{$item[1]}) )
+				}
+
+					dollar: '$$' { '$' }
+						
+					non_dollar: /[^\$]+/
+
+
+
+};

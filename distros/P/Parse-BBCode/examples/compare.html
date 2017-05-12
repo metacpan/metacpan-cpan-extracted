@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+        <title>Comparing BBCode-Modules</title>
+    </head>
+    <body>
+<table border="1">
+<tr>
+<th>Module/Version</th>
+<th><a href="http://search.cpan.org/dist/HTML-BBCode">HTML::BBCode 2.06</a></th>
+<th><a href="http://search.cpan.org/dist/BBCode-Parser">BBCode::Parser 0.34</a></th>
+<th><a href="http://search.cpan.org/dist/Parse-BBCode">Parse::BBCode 0.12</a></th>
+<th><a href="http://search.cpan.org/dist/HTML-BBReverse">HTML::BBReverse 0.07</a></th>
+<th><a href="http://search.cpan.org/dist/AUBBC">AUBBC 4.06</a></th>
+<th></th>
+</tr>
+<tr>
+    <th>Unbalanced / incorrectly nested tags</th>
+
+    <td>Leaves tags unparsed</td>
+    <td>Closes open tags or dies<br>depending on tags</th>
+    <td>Leaves tags unparsed<br>or closes tags if wanted</th>
+    <td>Creates invalid HTML</th>
+    <td>Leaves tags unparsed /<br> Creates invalid HTML</th>
+
+</tr>
+
+<tr>
+    <th>Add own tags</th>
+
+    <td>No</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>No</td>
+    <td>Some (2)</td>
+</tr>
+<tr>
+    <th>Unknown Tags</th>
+
+    <td>leaves unparsed</td>
+    <td>leaves unparsed</td>
+    <td>leaves unparsed</td>
+    <td>leaves unparsed</td>
+    <td>leaves unparsed</td>
+
+</tr>
+<tr>
+    <th>Forbidden Tags</th>
+
+    <td>leaves unparsed</td>
+    <td>Dies</td>
+    <td>leaves unparsed</td>
+    <td>leaves unparsed</td>
+    <td>leaves unparsed</td>
+</tr>
+<tr>
+    <th>Provides parsed tree</th>
+
+    <td>No</td>
+    <td>Yes</td>
+    <td>Yes</td>
+    <td>No</td>
+    <td>No</td>
+</tr>
+<tr>
+    <th>Block in Inline</th>
+
+    <td>Creates broken output (1)</td>
+    <td>Dies</td>
+    <td>leaves unparsed</td>
+    <td>Creates invalid HTML<br>depending on block tags</td>
+    <td>Creates invalid HTML</td>
+    </tr>
+</table>
+
+<ul>
+    <li>(1) The output from <tt>'[i] italic [code]code block[/code] [/i]'</tt>:<br>
+    <pre>&lt;span style=&quot;font-style:italic&quot;&gt; italic  &lt;/span&gt;&lt;div class=&quot;bbcode_code_header&quot;&gt;Code:&lt;/div&gt;&lt;div class=&quot;bbcode_code_body&quot;&gt;code&amp;nbsp;block&lt;/div&gt;  &amp;lt;/span&amp;gt;</pre>
+    </li>
+    <li>(2) Not possible to build tags with unparsed content; must use the builtin [code] tag</li>
+</ul>
+    </body>
+</html>

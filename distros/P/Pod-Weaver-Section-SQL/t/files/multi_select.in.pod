@@ -1,0 +1,3 @@
+=sql SELECT toto FROM tata
+
+=sql SELECT titi FROM grosminet

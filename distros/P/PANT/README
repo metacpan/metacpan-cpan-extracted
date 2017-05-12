@@ -1,0 +1,59 @@
+PANT version 0.17
+=================
+
+This is a set of useful functions to facilitate building packages in
+an automate build environment. It has facilities to ease common tasks
+and provide a HTML build log of what happened. It has come about
+because I found neither ANT or NANT did quite what I needed, and there 
+is "more than one way to do it".
+
+THE PHILOSOPHY
+
+The basic philosophy is that you can probably use make or visual studio
+or similar to do the heavy building. There is no real need to replicate 
+that. However stuff like checking out of CVS/SVN repositories, updating
+version numbers, checking it back in, running test harnesses, and similar
+are things that make is not good at. 
+
+XML is not a programming language, but you can describe a lot of what you
+want using it, which is what ANT/NANT basically do. However there is always
+something you want to do, which can't be described in the current description
+language. In these cases you can call out to an external routine to do things.
+However it seems much easier to provide a number of useful subroutines in
+a scripting language, which help you build things. Then if you need to do
+something slightly of piste, you have all the power right there.
+
+The other thing I want to know about is "did it work" and if it
+didn't, what went wrong? To this end plenty of logging is required so
+the build can be tracked. As the build is probably going to be remote,
+HTML seems the obvious choice to report in, so you can just look at it
+from a web server.
+
+This is the first version, it is currently evolving to meet my needs,
+but could well take into account other peoples needs. 
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other non-standard modules and libraries:
+
+XML::Writer, Archive::Zip, File::Copy::Recursive
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 Julian Onions
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

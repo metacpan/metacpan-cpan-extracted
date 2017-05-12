@@ -1,0 +1,13 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: devkit-power-gobject
+Description: DeviceKit-power is a system daemon for installing stuff.
+Version: 015
+Requires.private: dbus-1, gthread-2.0
+Requires: glib-2.0, gobject-2.0
+Libs: -L${libdir} -ldevkit-power-gobject
+Cflags: -I${includedir}/DeviceKit-power
+

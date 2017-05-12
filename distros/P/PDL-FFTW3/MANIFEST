@@ -1,0 +1,14 @@
+compute_plan_template.xs
+FFTW3.pd
+FFTW3_header_include.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/01-checkmanifest.t
+t/fftw.t
+template_complex.c
+template_real.c
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

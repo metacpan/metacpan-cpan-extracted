@@ -1,0 +1,41 @@
+---
+abstract: 'POD Object Model'
+author:
+  - 'Andy Wardley <abw@kfs.org>'
+build_requires:
+  Cwd: '0'
+  File::Slurper: '0.004'
+  Scalar::Util: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  Text::Diff: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-POM
+requires:
+  Encode: '0'
+  Exporter: '0'
+  File::Basename: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  Getopt::Std: '0'
+  Text::Wrap: '0'
+  constant: '0'
+  lib: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilb/Pod-POM
+  repository: https://github.com/neilb/Pod-POM.git
+version: '2.01'

@@ -1,0 +1,56 @@
+{
+   "abstract" : "parse SMS database files",
+   "author" : [
+      "Lorenzo Cappelletti <lorenzo.cappelletti@email.it>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Palm-SMS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Format" : "0",
+            "File::Basename" : "0",
+            "Getopt::Long" : "0",
+            "Palm::PDB" : "0",
+            "Palm::Raw" : "0",
+            "Pod::Usage" : "0",
+            "Test::More" : "0",
+            "Text::Wrap" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/DrHyde/perl-modules-Palm-SMS/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/DrHyde/perl-modules-Palm-SMS"
+      }
+   },
+   "version" : "0.04"
+}

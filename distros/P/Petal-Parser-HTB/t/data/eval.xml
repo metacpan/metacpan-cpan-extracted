@@ -1,0 +1,17 @@
+<test>
+  <li
+    petal:on-error="structure string:&lt;blink&gt;oops&lt;/blink&gt;"
+    petal:condition="list"
+    petal:repeat="element list">Hello</li>
+  This is an eval test:
+  <?eval?>
+    <?eval?>
+      But this is going to work, however it still
+      should not appear in the final result because
+      it's within an eval that fails
+    <?endeval errormsg="huh oh, problem, this should not appear"?>
+    <?var name="this/aint/gonna/work"?>
+  <?endeval errormsg="should appear"?>
+
+  <span petal:on-error="string:booo">$this/aint/gonna/work</span>
+</test>

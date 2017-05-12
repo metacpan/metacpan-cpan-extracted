@@ -1,0 +1,35 @@
+
+I wanted to know, after matching a rule, what text the rule matched.
+So I used two variables to remember what the remaining text and
+offset were before and after the rule and just determined the
+difference.
+
+   report : <rulevar: local $rule_text>
+   report : <rulevar: local $rule_offset>
+
+   report :
+             {
+                 $rule_text   = $text;
+                 $rule_offset = $thisoffset;
+             }
+
+         ...some subrules...
+
+             {
+                 my $str = substr($rule_text, 0, $thisoffset - 
+$rule_offset);
+
+                 # remove all sorts of whitespace
+
+                 $str =~ s/^\s*//s;
+                 $str =~ s/\s*$//s;
+                 $str =~ s/\s+/ /gs;
+
+                 # Now $str contains the text matched by this rule
+             }
+
+This is the kind of thing I thought would have been possible a lot
+easier. Did I miss something?
+
+If not, is there a way to make this available in every parser,
+e.g. by providing a new directive or something like that?

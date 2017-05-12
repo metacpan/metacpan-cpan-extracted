@@ -1,0 +1,121 @@
+Revision history for PONAPI-Server
+
+0.003001     2017-Feb-7
+             * JSON::XS --> JSON::MaybeXS.
+
+0.003000     2016-Jun-17
+             * Document building split, now using PONAPI::Tools
+
+0.002016     2016-Mar-01
+             * dist.ini: added MetaProvides::Package
+
+0.002015     2016-Feb-16
+             * dist.ini: fixed skip of Plack::Middleware*
+             * Demo query: fixed headers
+
+0.002014     2016-Feb-11
+             * Corrected content-negotiation logic
+             * Corrected header setting logic
+             * Reduced # of calls to `does` (performance++)
+             * Removed dependency (Return::MultiLevel)
+             * Demo server: added signal catcher to allow
+               graceful shutdown and cleanup of temp-files
+             * Demo query: added JSON-only mode for output
+             * Code improvements + warnings fixed
+
+0.002013     2016-Feb-03
+             * Added support for HEAD and OPTIONS
+             * Added 'sort' params to demo queries
+             * Modulized `ponapi demo` code (for testing)
+
+0.002012     2016-Feb-02
+             * Fixed a bug in Server.pm's data validation
+             * Fixed pagination urls
+
+0.002011     2016-Feb-02
+             * Removed dependency (SQL::Composer)
+             * Fixed document relative self links (missing params)
+             * `ponapi demo -q` takes query or generates a random one
+
+0.002010     2016-Feb-01
+             * Lowered the minimum Test::Simple version to 0.98
+             * Kwalitee tweaks
+
+0.002009     2016-Jan-29
+             * Added `ponapi` CLI utility
+             * dist.ini updates
+             * Document updates
+
+0.002008     2016-Jan-28
+             * Bug fix: allow zero-values in attributes
+             * Server can now take config dir constructor parameter
+
+0.002007     2016-Jan-24
+             * Corrected content-negotiation rules.
+             * Fixed POD
+
+0.002006     2016-Jan-20
+             * Fixed Kwalitee errors
+             * Support extra url-decoding for values
+               with header 'X-PONAPI-Escaped-Values: 1'
+             * dist.ini updates
+             * Document updates
+
+0.002005     2016-Jan-19
+             * Member-name checking for incoming requests
+             * Links to repository in dist.ini (Alexandr Ciornii)
+             * Increased testing coverage
+             * Document updates
+
+0.002004     2016-Jan-14
+             * Fix dist.ini (DBD::SQLite)
+
+0.002003     2016-Jan-14
+             * Plack version >= 1.0029
+             * Updated dist.ini (AutoPrereqs)
+
+0.002002     2016-Jan-14
+             * Removed dependency (Path::Class::File)
+             * Updated dist.ini (AutoPrereqs)
+
+0.002001     2016-Jan-14
+             * Removed dependency (Hash::MultiValue)
+
+0.002000     2016-Jan-13
+             * First CPAN release
+
+0.001006     2016-Jan-13
+             * Removed DAO object dependency from exceptions
+             * Moved Constants, Exception & Repository outside of DAO namespace
+             * Improved testing
+             * Document updates
+
+0.001005     2016-Jan-08
+             * Improved testing (debugging code)
+             * Increased test coverage (sort/page parameters)
+             * Document updates
+
+0.001004     2016-Jan-07
+             * Set minimum version for File::Path (2.04)
+             * Set minimum version for Test::Simple (1.001014)
+
+0.001003     2016-Jan-06
+             * Set minimum version for Plack::Middleware::MethodOverride (0.15)
+             * Send Conten-Length header in response
+             * No body with a 204 response
+             * Fixed abstracts
+             * Reduced dependencies (Storable, Scalar::Util)
+             * Improved testing (multiple clients)
+             * Document updates
+
+0.001002     2015-Dec-17
+             * Support Perl 5.10+ (was 5.14)
+             * Reduced dependencies
+             * Improved testing
+             * Document updates
+
+0.001001     2015-Dec-15
+             * Docuemnt updates
+
+0.001000     2015-Dec-15
+             * The Big Bang!

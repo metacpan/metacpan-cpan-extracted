@@ -1,0 +1,14 @@
+  use Package::Tent sub {
+    package Who::sYourDaddy;
+    use constant thing => 7;
+    1;
+  };
+  use Package::Tent sub {
+    package What::sInAName;
+    use base 'Who::sYourDaddy';
+    sub method {
+      $_[0]->thing;
+    }
+    __PACKAGE__;
+  };
+

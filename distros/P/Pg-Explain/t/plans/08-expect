@@ -1,0 +1,19 @@
+{
+    'type'                   => 'Limit',
+    'estimated_startup_cost' => 0,
+    'estimated_total_cost'   => 0.01,
+    'estimated_rows'         => 1,
+    'estimated_row_width'    => 4,
+    'is_analyzed'            => 0,
+    'sub_nodes'              => [
+        {
+            'scan_on'                => { 'table_name' => 'test', },
+            'estimated_startup_cost' => '0',
+            'estimated_rows'         => '1000',
+            'type'                   => 'Seq Scan',
+            'estimated_total_cost'   => '14',
+            'estimated_row_width'    => '4',
+            'is_analyzed'            => 0,
+        }
+    ]
+}

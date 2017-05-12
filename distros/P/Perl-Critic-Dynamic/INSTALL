@@ -1,0 +1,28 @@
+#######################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/tags/Perl-Critic-Dynamic-0.05/INSTALL $
+#     $Date: 2010-09-30 10:38:54 -0700 (Thu, 30 Sep 2010) $
+#   $Author: thaljef $
+# $Revision: 3944 $
+########################################################################
+
+
+INSTALLATION
+
+     To install Perl::Critic::Dynamic with C<make> give the following 
+     commands to your favorite shell:
+
+         tar -zxf Perl-Critic-Dynamic-0.05.tar.gz
+         cd Perl-Critic-Dynamic-0.05
+         perl Makefile.PL
+         make
+         make test
+         make install 
+
+     Or if you prefer C<Module::Build>, try this:
+
+         tar -zxf Perl-Critic-Dynamic-0.05.tar.gz
+         cd Perl-Critic-Dynamic-0.05
+         perl Build.pl
+         ./Build
+         ./Build test
+         ./Build install 

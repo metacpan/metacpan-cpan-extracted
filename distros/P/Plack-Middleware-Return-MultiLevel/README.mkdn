@@ -1,0 +1,110 @@
+# TITLE
+
+Plack::Middleware::Return::MultiLevel - Escape a PSGI app from anywhere in the stack
+
+# SYNOPSIS
+
+    use Plack::Builder;
+    use Plack::Middleware::Return::MultiLevel::Utils
+      qw/return_to_level return_to_default_level/;
+
+    my $app = builder {
+      enable "Return::MultiLevel";
+
+      mount "/default" => sub {
+        my $env = shift;
+        return_to_default_level($env, [200, ['Content-Type', 'text/plain'], ['default']]);
+      };
+
+      mount '/layers' => builder {
+        enable "Return::MultiLevel", level_name=>'one';
+        enable "Return::MultiLevel", level_name=>'two';
+
+        mount '/one' => sub {
+          my $env = shift;
+          return_to_level($env, 'one', [200, ['Content-Type', 'text/plain'], ['one']]);
+        };
+
+        mount '/two' => sub {
+          my $env = shift;
+          return_to_level($env, 'two', [200, ['Content-Type', 'text/plain'], ['two']]);
+        };
+
+      };
+
+    };
+
+# DESCRIPTION
+
+Sometimes when in a PSGI application you want an easy way to escape out of the
+current callstack.  For example you might wish to immediately end processing and
+return a 'NotFound' or 'ServerError' type response.  In those cases you might
+use the core middleware [Plack::Middleware::HTTPExceptions](https://metacpan.org/pod/Plack::Middleware::HTTPExceptions), which allows you
+to throw an exception object that matches a duck type (has methods `code` and
+`as_string` or `as_psgi`).  That middleware wraps everything in an eval and
+looks for exception objects of that type, and converts them to a response.
+
+[Plack::Middleware::Return::MultiLevel](https://metacpan.org/pod/Plack::Middleware::Return::MultiLevel) is an alternative approach to solving
+this problem.  Instead of throwing an exception, it uses [Return::MultiLevel](https://metacpan.org/pod/Return::MultiLevel)
+to set a 'callback' point that you can jump to at any time.  If you don't like
+using exceptions for control flow, or you have code that does a lot of exception
+catching, you might prefer this approach.
+
+Unlike [Plack::Middleware::HTTPExceptions](https://metacpan.org/pod/Plack::Middleware::HTTPExceptions) you don't need to return an object
+matching a ducktype, you can just return any standard, acceptable PSGI response.
+
+# CONSTANTS
+
+This class defines the following constants
+
+## PSGI\_KEY
+
+PSGI environment key under which your return callback are stored.
+
+## DEFAULT\_LEVEL\_NAME
+
+The default level name used if you choose not to explicitly name your return
+level target.
+
+# METHODS
+
+This class defines the following methods.
+
+## prepare\_app
+
+Sets instance defaults
+
+## call
+
+Used by plack to call the middleware
+
+## return
+
+    my $mw = Plack::Middleware::Return::MultiLevel->new;
+
+    #...
+
+    $mw->return([200, ['Content-Type', 'text/plain'], ['returned']]);
+
+Returns to the callpoint set by [Return::MultiLevel](https://metacpan.org/pod/Return::MultiLevel).  You should pass this
+args suitable for a PSGI response.
+
+Since the return callback is also stored in the `$psgi_env`, you are more
+likely to use methods from [Plack::Middleware::Return::MultiLevel::Utils](https://metacpan.org/pod/Plack::Middleware::Return::MultiLevel::Utils)
+rather than storing the middleware object.
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+# SEE ALSO
+
+[Return::MultiLevel](https://metacpan.org/pod/Return::MultiLevel), [Plack](https://metacpan.org/pod/Plack), [Plack::Middleware](https://metacpan.org/pod/Plack::Middleware), 
+[Plack::Middleware::Return::MultiLevel::Utils](https://metacpan.org/pod/Plack::Middleware::Return::MultiLevel::Utils)
+
+# COPYRIGHT & LICENSE
+
+Copyright 2014, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

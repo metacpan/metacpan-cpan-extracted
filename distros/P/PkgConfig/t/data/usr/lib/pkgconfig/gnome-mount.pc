@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: gnome-mount
+Description: GNOME mount wrapper
+Version: 0.8
+Requires: hal-storage
+

@@ -1,0 +1,29 @@
+---
+abstract: 'Control and query network attached power switches'
+author:
+  - 'Michael R. Davis (mdavis@stopllc.com)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120351'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Power-Outlet
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Tiny: 0
+  JSON: 0
+  Net::SNMP: 0
+  Net::UPnP: 0
+  Package::New: 0
+  Test::Simple: 0.44
+  URI: 0
+  XML::LibXML::LazyBuilder: 0
+version: 0.16

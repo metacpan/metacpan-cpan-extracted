@@ -1,0 +1,10 @@
+Revision history for Perl extension Pod-Weaver-Section-BugsAndLimitations
+
+1.20      2012-01-17
+    - Don't claim no bugs have been reported (Mike Doherty)
+
+1.102670  2010-09-24 17:22:26 Europe/Vienna
+    - use the correct hash key to access bug tracker URL (Mike Doherty)
+
+1.102460  2010-09-03 12:26:40 Europe/Vienna
+   - separated from Pod-Weaver-PluginBundle-MARCEL 

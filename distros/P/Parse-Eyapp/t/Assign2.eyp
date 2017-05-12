@@ -1,0 +1,20 @@
+%token then = %/(then)\b/
+%token ID = /([a-zA-Z_])\w*/
+
+%%
+expr_then: 
+     expr then 
+;
+
+expr:
+    id '=' id
+  | id
+;
+
+id: 
+    ID
+;
+
+%%
+
+

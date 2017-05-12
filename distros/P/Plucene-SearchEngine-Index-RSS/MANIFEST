@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Plucene-SearchEngine-Index-RSS.t
+lib/Plucene/SearchEngine/Index/RSS.pm
+META.yml                                 Module meta-data (added by MakeMaker)

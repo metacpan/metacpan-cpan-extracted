@@ -1,0 +1,61 @@
+{
+   "abstract" : "Perl::Critic::Bangs - A collection of policies for Perl::Critic",
+   "author" : [
+      "Andy Lester <andy@petdance.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Critic-Bangs",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PPI::Cache" : 0,
+            "PPI::Document" : 0,
+            "Perl::Critic" : "1.098",
+            "Perl::Critic::Policy" : 0,
+            "Perl::Critic::PolicyFactory" : 0,
+            "Perl::Critic::PolicyParameter" : 0,
+            "Perl::Critic::TestUtils" : 0,
+            "Perl::Critic::UserProfile" : 0,
+            "Perl::Critic::Utils" : 0,
+            "Perl::Critic::Violation" : 0,
+            "Readonly" : 0,
+            "Test::More" : "0.96",
+            "Test::Perl::Critic" : "1.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/petdance/perl-critic-bangs.git"
+      }
+   },
+   "version" : "1.10"
+}

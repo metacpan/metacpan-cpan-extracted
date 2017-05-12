@@ -1,0 +1,34 @@
+---
+abstract: 'Dealing with that pesky trailing slash/'
+author:
+  - 'Menno Blom <blom@cpan.org>'
+build_requires:
+  Plack: '0'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.038'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-TrailingSlashKiller
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Plack: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/b10m/p5-Plack-Middleware-TrailingSlashKiller/issues
+  homepage: https://github.com/b10m/p5-Plack-Middleware-TrailingSlashKiller
+  repository: https://github.com/b10m/p5-Plack-Middleware-TrailingSlashKiller.git
+version: '0.01'
+x_contributors:
+  - 'B10m <menno@b10m.net>'

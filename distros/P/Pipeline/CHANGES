@@ -1,0 +1,60 @@
+3.12
+	+ Pipeline::Analyser was producing output incompatible
+	  with internal Fotango version.  Fotango version wins.
+	  (Tom Insam)
+	
+3.11
+	+ Pipeline::Analyser was missing. (generally release
+	  opensource.fotango.com/svn/trunk/Pipeline to the
+          wider world --richardc)
+
+3.10
+	+ Applied patches from spurkis@cpan.org re:
+		http://rt.cpan.org/NoAuth/Bug.html?id=6305
+
+3.09
+	+ Added weak references to stop a memory leak when we miss
+	  cleaning up the parent of a segment after dispatch -- this
+	  is largely thanks to Pierre's work on Data::Structure::Util
+	+ started refactoring an awful lot of code in Pipeline to
+	  get rid of the mass of the logic that handles the processing
+	  of results
+	+ Added a Pipeline::Dumper dispatch class
+
+3.08
+	+ throws an error if reattach doesn't really work properly (ie,
+	  if it gives unexpected results).
+	+ fixed a bug that meant end_dispatch was only being called if
+	  there was no parent pipeline.  This was a Bad Thing[tm].
+
+3.07
+	+ added dispatcher class to the pipeline
+	+ added Pipeline::Segment::Async class for asyncronous pipeline
+	  segments.
+	+ fixed a bug introduced in 3.06 that broke tests relying on
+	  Pipeline::Segment::Tester.
+	+ Transaction store is flagged at the beginning of a segment
+	  dispatch, and the flag is removed at the end of a dispatch.
+	+ Fixed a bug that meant the pipeline could not be dispatched twice.
+
+3.06
+	+ fixed production returning bug
+	+ fixes bug reported by James Fitzgibbon regarding subclassing
+	  pipeline stores
+
+3.05
+	+ thought of another test, exposed a bug, fixed it
+
+3.04
+	+ fixed a bug that was passing on indv. tests but
+	  causing tests to fail under a make test.
+
+3.03
+	+ Added Error.pm to Makefile.PL
+
+3.02
+	+ Added DESTROY to cleanup Transaction store
+	+ Applied patches from spurkis@cpan.org in 
+		http://rt.cpan.org/Ticket/Display.html?id=2452
+	+ Applied patches from spurkis@cpan.org in
+		http://rt.cpan.org/Ticket/Display.html?id=2468

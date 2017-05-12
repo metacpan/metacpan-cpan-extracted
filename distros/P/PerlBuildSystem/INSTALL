@@ -1,0 +1,146 @@
+paths INSTALL
+===========
+
+Installing paths takes time!
+
+This is the first module of this size we prepare and the first where we try to 
+support windows as well as Linux. Please be patient and give us feedback so we
+can make the installation easier.
+
+The system is tested on Linux and windows. I believe it should work on cygwin but
+I did not check that. I have heard of a user who is trying it on BSD.
+
+We are 4 engineers using paths everyday for our work on windows and Linux so this
+is possible to install!
+
+Let' us know how easy it went for you so we can help the other users.
+
+Installing on Linux:
+====================
+
+This is my development OS and paths mostly tested on Linux too.
+
+paths use Module::Build which is supported by 'cpanp'. Unfortunately not all
+modules install smoothly in 'cpanp'. I have just installed on a fresh gentoo box
+It took me 1 hours to install.
+
+I recommend installing 'cpanp' and trying to install from there. If some modules
+don't install, try installing them in 'cpan' or emerge.
+
+paths now comes with a Makefile.PL that should make the installation via 'cpan' possible.
+
+If everything fails (or just some) drop me a line and I'll try to get you up and
+running.
+
+
+Manual install:
+===============
+
+download the module
+tar xzf PerlBuildSystem-version.tgz
+perl Build.PL
+./Build test
+sudo ./Build install
+
+Install the missing modules with cpan. This works OK but takes time.
+
+Installing on windows:
+======================
+
+You are a bit out of luck as the install is more difficult and the run time is
+higher as windows file caching is rather bad (as is the network layer).
+
+90% of the problems you'll encounter will come from dependencies paths has. I report
+these problems to the module authors but there's not much I can do. Jungling with
+cpan and ppm fix the problem.
+
+SETUP
+=====
+once you have installed paths, you need too set the following:
+
+$paths_FLAGS holds flags that you would normaly give on the command line.
+**********
+
+My variable only contains '-c' so I get colored output.
+
+$paths_LIB_PATH this contains the paths to the paths module you access through 'pathsUse'.
+*************
+
+Mine, for example, contains:
+/devel/perl_modules/PerlBuildSystem-0.34
+
+
+The default paths Lib is now installed under paths installation in the perl module directory
+
+$paths_PLUGIN_PATH contains the path to paths plugins
+****************
+
+ex: /devel/perl_modules/PerlBuildSystem-0.34/Plugins
+
+The default paths plugins is now installed under paths installation in the perl module directory
+
+$USER
+*****
+
+Your name. This is used to put paths output in a the right directory if you are multiple users on
+your box (this is also needed on single user machines)
+
+test HELLO WORLD
+================
+
+on linux:
+
+change to the paths installation directory.
+change to pathsfiles/hello
+
+run this command 'paths -dpu -dpt'. It will build an hello world example. This should
+work on any "standard" linux installation. the -dpu switch tells paths to show you
+where the paths modules come from. -dpt shows you some timing information.
+
+[nadim@khemir hello]$ paths -dpu -dpt
+No source directory! Using '/devel/perl_modules/PerlBuildSystem-0.34/test/hello'.
+No Build directory! Using '/devel/perl_modules/PerlBuildSystem-0.34/test/hello/out_nadim'.
+Warp 1.5 file '/devel/perl_module ... 6cd0e0c8b47ae970.warp1_5.pl' doesn't exist.
+pathsUse: '/devel/TheBigO/pathsLib/Configs/gcc.pm'
+pathsUse: '/devel/TheBigO/pathsLib/Rules/C.pm'
+   pathsUse: '/devel/perl_modules/PerlBuildSystem-0.34/pathsLib/Rules/C_depender.pm'
+   pathsUse: '/devel/perl_modules/PerlBuildSystem-0.34/pathsLib/MetaRules/FirstAndOnlyOneOnDisk.pm'
+No user defined [paths] Build(), using DefaultBuild() with [BuiltIn, User] rules and [BuiltIn, User] configs.
+** Depending [paths/0] **
+Processed 1 pathsfile.
+
+Total dependency time: 0.10 s.
+   C depender time: 0.09 s.
+   C depender: 2 files of which 0 was cached.
+
+** Checking **
+Total Check time: 0.01 s.
+Generating warp 1.5 file.
+Warp 1.5 generated in: 0.02 s.
+
+** Building **
+Number of nodes in the dependency tree: 36 nodes.
+6 [1V, 5 P, 1 S] nodes scheduled for build.
+100% [===========================================================]D 0h00m01s
+Total build time: 0.16 s. Perl subs time: 0.11 s.
+Build Done.
+Generating warp 1.5 file.
+Warp 1.5 generated in: 0.02 s.
+Total time in paths: 0.41 s.
+
+run again:
+
+[nadim@khemir hello]$ paths -dpu -dpt
+No source directory! Using '/devel/perl_modules/PerlBuildSystem-0.34/test/hello'.
+No Build directory! Using '/devel/perl_modules/PerlBuildSystem-0.34/test/hello/out_nadim'.
+Verifying warp 1.5: 36 nodes ...
+Warp 1.5 verification time: 0.01 s.
+Warp 1.5: Up to date.
+Total time in paths: 0.08 s.
+
+
+Reporting bugs:
+===============
+
+http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PerlBuildSystem
+

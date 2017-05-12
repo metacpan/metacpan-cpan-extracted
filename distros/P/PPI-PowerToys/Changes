@@ -1,0 +1,52 @@
+Revision history for Perl extension Perl-PowerToys
+
+0.14 Mon 11 May 2009
+	- Adding --author support to ppi_copyright
+
+0.13 Sun 10 May 2009
+	- Upgrading to Module::Install::DSL 0.87
+	- Adding new ppi_copyright tool
+
+0.12 Thu 30 Apr 2009
+	- Upgrading to Module::Install::DSL 0.83
+	- Adding support for "our $VERSION";
+	- Adding support for all four quote variants
+
+0.11 Thu  6 Mar 2008
+	- Upgrading to Module::Install 0.76
+	- Adding increment support
+	- Bug fixes
+
+0.10 Sun 16 Nov 2007
+	- VERSION detection supports fully referenced variables
+	  (now in the change command as well)
+	- Refactored ppi_version into PPI::App::Version
+
+0.09 Fri  2 Nov 2007
+	- VERSION detection supports fully referenced variables
+
+0.08 Thu 12 Jul 2007
+        - If PPI::Document fails for a document, skip it
+        - Add a Usage message if no command
+        - Add a show command
+
+0.07 Wed  9 May 2007
+        - Upgrading to use File::Find::Rule::Perl
+        - Upgrading to Module::Install 0.67
+
+0.06 Sun 19 Mar 2006
+	- Renaming to PPI-PowerToys for better clarity
+	- Changing ppichangeversion to ppi_version to allow the addition
+	  or more features in future versions.
+
+0.05 Sun 22 Jan 2006
+	- Skip files we can't write to
+
+0.04 Sun 15 Jan 2006
+	- Allow _ in ppichangeversion versions
+
+0.03 Wed 11 Jan 2006
+	- Added .t files to the list checked
+
+0.01 Wed 11 Jan 2006
+	- Created initial version

@@ -1,0 +1,56 @@
+Revision history for Perl extension POE::XS::Queue::Array.
+
+0.006 Sat Mar 28 2009
+ - non-developer release with CLONE_SKIP().
+
+0.005_02 Sun Mar 15 2009
+ - remove CLONE support and add a CLONE_SKIP() method, this handles
+   the cases from RT #43902
+
+0.005_01 Fri Mar 13 2009
+ - added perl ithread support, this properly clones the queue and any
+   objects it references on thread creation.
+   http://rt.cpan.org/Public/Bug/Display.html?id=43902
+
+0.005 Tue Apr 15 2008
+ - extra tests to distinguish errno problems from P::X::Q:A bugs,
+   possibly leading to a workaround
+   https://rt.cpan.org/Ticket/Display.html?id=35044
+ - bump to 0.005 for release
+
+0.004 Wed Apr  9 2008
+ - include license information in appropriate places
+ - fix @ISA, it was badly broken, thanks to Yuval Kogman (nothingmuch)
+ - add pod, pod coverage tests, such as they are
+ - bump to 0.004 for release
+
+0.003 Thu Sep 14 2006
+ - added #include <string.h> for strcmp/strerror declarations
+ - added a missing format specifier in the debug code in queue.c
+ - disable the debug check code by default
+ - bump to 0.003 for release
+
+0.002 Sun Jul  9 22:50:17 EST 2006
+ - moved the structural queue code to queue.c, Array.xs is purely an
+   interface to that now.
+ - replaced all the opaque memmove() calls with a call to pq_move_items() 
+   which does sanity checks in DEBUG code.
+ - added t/02_release.t which attempts to check we're handling references 
+   correctly.
+ - added Imager's memory debugging code in an attempt to find the
+   crash problem on Win32.  This seems to have eliminated the crash
+   even when it's disabled (and just calls malloc/free/realloc)
+   https://rt.cpan.org/Ticket/Display.html?id=18543
+ - found the memory leak - we were creating an SV for the id to
+   priority hash and nothing was releasing it
+   https://rt.cpan.org/Ticket/Display.html?id=20018
+ - the memory leak fix has become obsolete, we now avoid creating the
+   SV at all by using the id in memory as a key to the hash.
+ - added a verify method during debugging, it's not necessary anymore
+   but someone else fiddling with the code might find it useful
+ - pq_find_item() and pq_insertion_point() now use a binary search for
+   larger queues.  These were the hotspots going by sprof profiling.
+ - bump to 0.002
+
+0.001
+ - initial release

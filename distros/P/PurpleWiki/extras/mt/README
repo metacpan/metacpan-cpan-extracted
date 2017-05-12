@@ -1,0 +1,149 @@
+The PurplePlugin for MovableType is a collection of Perl code that
+adds several features to a weblog that uses MovableType as its content
+management system:
+
+1. An optional wiki backend that links WikiWords in blog entries to a
+   personal Wiki. See WikiBlog.
+
+2. WikiFormatting of either blog entries or comments, or both.
+
+3. PurpleNumbers that allow granular addressability and TransClusion
+   of blog and wiki content at the paragraph, header and list levels.
+
+The PurplePlugin is built on top of the PurpleWiki system by using the
+PurpleWiki API in combination with the MovableType API. It is partly a
+MovableType text formatting plugin and partly an override of existing
+MovableType data management functions. The plugin can be turned on and
+off in the configuration for individual blogs.
+
+If you have problems installing this plugin please contact the author:
+ChrisDent <cdent@blueoxen.org> or leave comments here. Your questions
+will help me improve the documentation.
+
+INSTALLATION
+
+1. Make sure you are running MovableType version 2.62 or greater.
+
+2. If you want to be extra safe, export a copy of all your blog
+   entries to a text file using the IMPORT/EXPORT feature in your blog
+   configuration.
+
+3. Retrieve, install and configure PurpleWiki according to
+   PurpleWikiInstructions. Even if you will not be using the wiki word
+   linking, you must install the PurpleWiki modules and create a
+   configuration directory (this is where the PurpleNumbers
+   information is stored). If you intend to do wiki word linking you
+   must install the wiki.pl CGI script. '''The wiki CGI scripts and
+   the MovableType CGI scripts must be running as the same user as
+   there are files they both need to be able to write.'''
+
+4. Note the pathname of the configuration directory that you create.
+
+5. From the extras/mt directory in the PurpleWiki distribution, copy
+   the file purple.pl to the plugins directory in your MovableType
+   installation. This is usually in the same place as your mt.cgi
+   file.
+
+6. Edit mt_purple.pl
+
+  a. Set $CONFIG_DIR to the pathname of the configuration directory
+     you noted in step 3.
+
+  b. If you do not want to parse your entries for wiki word links to
+     the wiki, set $WIKIWORDS to 0.
+
+7. Run your blog configuration. In the "General Settings" section of
+   "Preferences" you should see PurpleWiki as an option for "Default
+   Text Formatting". If you do not, something has gone wrong. Check
+   your web server error log for more information and check over the
+   steps so far to make sure everything is correct.
+
+8. Create a test posting to the blog that uses PurpleWiki as its text
+   formatting.
+
+  a. See WikiFormatting to see the sort of formatting you can do in
+     the entry.
+
+  b. If things are working, your post should be presented with "#"
+     marks at the end of sections. These marks are links to that item
+     of content at the PermaLink address.
+
+If you've made it this far and things have worked, good for you. If
+things aren't working, contact the author (adddress above). The rest
+of these instructions describe how to tune up the use and presentation
+of the PurpleNumbers and other features.
+
+1. Decide if you want all entries to use PurpleWiki formatting. If you
+   do, you can turn it on in the "Default Text Formatting" section of
+   the weblog configuration. If you don't, you can choose to use it
+   per entry. If PurpleWiki formatting is on by default, some
+   features, such as image uploading, and automatic insertion of
+   highlighted text when creating a new post will not work as
+   expected. Those features generate HTML and PurpleWiki formatting
+   does not work with HTML.
+
+2. You may use PurpleWiki formatting in comments to entries if you
+   like, but it is an all or nothing choice. If you want to use them,
+   it is on for all comments and you must make some adjustments to
+   stylesheets. To make it go:
+
+  a. In the "Comment Configuration" section of your weblog
+     "Preferences":
+
+     i. Set "Text Formatting for Comments" to PurpleWiki
+
+     ii. Turn off "Allow HTML in Comments"
+
+     iii. Turn off "Auto-link URLs"
+
+  b. Adjust two comment related templates to turn off the Sanitize
+     feature. Sanitize and PurpleWiki confuse one another.
+
+     i. Change the $MTCommentBody and MTCommentPreviewBody tags in the
+        individual archive, comment listing and comment preview
+        templates so they include a sanitize="0" attribute. For the
+        preview template, change only the first instance of
+        MTCommentPreviewBody
+
+3. Adjust your style sheets so that the purple number tags appear
+   pleasant to you. The tags have a class of "nid" (for node
+   identifier). Transcluded content is in a span with a class of
+   "transclusion". This is what I use for nid:
+
+     a.nid {
+         font-family: "Helvetica", "Arial", sans-serif;
+         font-style: normal;
+         font-weight: bold;
+         font-size: x-small;
+         text-decoration: none;
+         color: #C8A8FF;  /* light purple */
+     }
+
+BUT WHAT CAN I DO WITH IT?
+
+If you've made it this far you probably already know what you can do
+with it, but in case you don't, here's what I do with it:
+
+* I do easy formatting, especially lists, using WikiFormatting rather
+  than noisy HTML.
+
+* I make reference to header, paragraph and list items in my sometimes
+  very long blog entries without having to be all crufty and say
+  things like, "it's the 5th paragraph". See also:
+
+  http://www.burningchrome.com:8000/~cdent/mt/archives/000172.html
+
+* I automatically make links into my wiki, which provides context for
+  some of the concepts I'm discussing in my blog.
+
+* I can transclude content amongst blog entries, comments and wiki
+  pages. How this has proven most handy is with comments. If someone
+  makes a particularly interesting statement in their comments I can
+  transclude it into a new entry very easily, raising it up into the
+  main thread of discussion.
+
+See also a blog entry entitled, "Purple Number Coolness":
+
+  http://www.burningchrome.com:8000/~cdent/mt/archives/000154.html
+
+for more general comments on why PurpleNumbers are cool.

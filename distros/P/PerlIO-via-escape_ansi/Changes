@@ -1,0 +1,14 @@
+Revision history for PerlIO-via-escape_ansi
+
+0.01    2009.01.29
+        Fixed the Perl/XS part, wrote the doc and the tests.
+
+        2009.01.xx
+        Fillu forgot about this module.
+
+        2009.01.0x
+        Wrote the C code.
+
+        2008.12.xx
+        Assembling bits to test the code.
+

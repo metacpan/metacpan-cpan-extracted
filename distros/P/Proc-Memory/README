@@ -1,0 +1,80 @@
+NAME
+
+    Proc::Memory - Peek/Poke into processes' address spaces
+
+SYNOPSIS
+
+        use Proc::Memory;
+    
+        my $mem = Proc::Memory->new(pid => $$);
+    
+        my $byte = $mem->peek(0x1000);
+        my $u32  = $mem->read(0x1000, 4);
+        $mem->poke(0x1000, 'L') = 12;
+
+DESCRIPTION
+
+    PEEK/POKE are a BASIC programming language extension for
+    reading/writing memory at a specified address. This module brings
+    similiar capability to Perl.
+
+    Eventually, Memory searching capability will also be added.
+
+IMPLEMENTATION
+
+    The module is a Perlish wrapper for Alien::libvas and doesn't expose
+    any extra functionality. libvas <http://github.com/a3f/libvas>
+    currently supports Win32, macOS and Linux.
+
+METHODS AND ARGUMENTS
+
+    new(pid)
+
+      Constructs a new Proc::Memory instance.
+
+    peek(addr [, 'pack-string'])
+
+      Peeks at the given memory address. pack-string defaults to 'C' (A
+      single byte)
+
+    poke(addr [, 'pack-string']) = $value # or = ($a, $b)
+
+      Pokes a given memory address. If no pack-string is given, the rvalue
+      is written as is
+
+    read(addr, size)
+
+      Reads size bytes from given memory address.
+
+    write(addr, buf [, count])
+
+      Writes buf to addr
+
+    tie(addr, 'pack-string')
+
+      Returns a tied variable which can be used like any other variable. To
+      be implemented
+
+    search('pack-string')
+
+      To be implemented when libvas provides it
+
+GIT REPOSITORY
+
+    http://github.com/athreef/Proc-Memory
+
+SEE ALSO
+
+    libvas <http://github.com/a3f/libvas> Alien::libvas
+
+AUTHOR
+
+    Ahmad Fatoum <athreef@cpan.org>, http://a3f.at
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2016 Ahmad Fatoum
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

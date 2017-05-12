@@ -1,0 +1,97 @@
+NAME
+    Perl::osnames - List possible $^O ($OSNAME) values, with description
+
+VERSION
+    This document describes version 0.11 of Perl::osnames (from Perl
+    distribution Perl-osnames), released on 2014-12-19.
+
+DESCRIPTION
+    This package contains $data which lists possible values of $^O along
+    with description for each. It also provides some helper functions.
+
+  Tags
+    *   unix
+
+        Unix-like operating systems. This currently excludes beos/haiku.
+
+    *   bsd
+
+        BSD-derived Unix operating systems.
+
+    *   sysv
+
+        SysV-derived Unix operating systems.
+
+    *   posix
+
+        For POSIX-compliant OSes, including fully-, mostly-, and
+        largely-compliant ones (source:
+        <http://en.wikipedia.org/wiki/POSIX>).
+
+        From what I can gather, dec_osf is not POSIX compliant, although
+        there is a posix package for it.
+
+VARIABLES
+    None are exported by default, but they are exportable.
+
+  $data
+    An arrayref of records (arrayrefs), each structured as:
+
+     [$name, \@tags, $description]
+
+FUNCTIONS
+    None are exported by default, but they are exportable.
+
+  is_posix([ $os ]) => bool
+    Check whether $os (defaults to $^O if not specified) is POSIX (checked
+    by the existence of "posix" tag on the OS's record in $data). Will
+    return 0, 1, or undef if $os is unknown.
+
+  is_unix([ $os ]) => bool
+    Check whether $os (defaults to $^O if not specified) is Unix (checked by
+    the existence of "unix" tag on the OS's record in $data). Will return 0,
+    1, or undef if $os is unknown.
+
+SEE ALSO
+    perlvar
+
+    Config
+
+    Perl::OSType, a core module. You should probably use this module
+    instead. Currently the difference between this module and Perl::osnames:
+    1) Perl::osnames currently doesn't list beos/haiku as Unix, but POSIX;
+    2) Perl::osnames provides more tags (like sysv, bsd, posix) and
+    description.
+
+    Devel::Platform::Info
+
+    The output of "perl -V"
+
+    App::osnames, the original reason for Perl::osnames. With this CLI tool
+    you can grep OS names by name, tag, or description, e.g. "osnames
+    solaris" or "osnames posix".
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Perl-osnames>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Perl-osnames>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-osnames>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

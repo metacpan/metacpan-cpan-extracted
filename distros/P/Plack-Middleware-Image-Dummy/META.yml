@@ -1,0 +1,38 @@
+---
+abstract: 'Dummy image responser for Plack'
+author:
+  - 'Tasuku SUENAGA a.k.a. gunyarakun <tasuku-s-cpanATATtitech.ac>'
+build_requires:
+  Plack::Test: 0
+  Test::Exception: 0
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Image-Dummy
+no_index:
+  directory:
+    - inc
+    - author
+provides:
+  Plack::Middleware::Image::Dummy:
+    file: lib/Plack/Middleware/Image/Dummy.pm
+    version: 0.05
+requires:
+  Imager: 0.94
+  Imager::File::GIF: 0.86
+  Imager::File::JPEG: 0.85
+  Imager::File::PNG: 0.86
+  Plack::Builder: 0
+  Plack::Middleware::Static: 0
+  parent: 0
+  perl: 5.008005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

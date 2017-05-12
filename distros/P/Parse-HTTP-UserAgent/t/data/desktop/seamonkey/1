@@ -1,0 +1,16 @@
+# just the mozilla suite
+
+[AGENT]
+
+Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.9.1b1pre) Gecko/20080915000512 SeaMonkey/2.0a1pre
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Linux i686',
+'extras'           => ['X11'],
+'version_raw'      => '2.0a1pre',
+'lang'             => 'en-US',
+'mozilla'          => [ '1.9.11', '1.009011'],
+'version'          => '2.000',
+'name'             => 'SeaMonkey',
+'toolkit'          => ['Gecko','20080915000512','2147483647.000']

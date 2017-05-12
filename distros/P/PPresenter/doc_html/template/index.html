@@ -1,0 +1,70 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Templates</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Templates</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<B>Templates</B><BR>
+<UL>
+<LI><A HREF=default.html>default</A>
+</UL>
+<P>
+<A HREF=#options>options</A><BR>
+<P>
+
+    </TD><TD VALIGN=top>
+
+The <I>Template</I> style-elements describe where the text is place in
+the screen.
+<A HREF=../index.html>Portable Presenter</A> currently has only
+one set of templates: the default set.
+
+<H2>General Template <A NAME=options>Options</A></H2>
+
+A <I>percentage</I> is a value between <CODE>0</CODE> and
+<CODE>1</CODE> or a string between <CODE>'0%'</CODE> and <CODE>'100%'</CODE>.
+<DL>
+<DT><B>-place =&gt; [ [</B> <I>left, top, width, height, string</I> <B>], ... ]</B> or<BR>
+    <B>-place =&gt; [</B> <I>left, top, width, height, string</I> <B>]</B><BR>
+<DD><CODE>-place</CODE> is a list of regions where to put text in.
+    The values for <I>left, top, width, height</I> are <I>percentages</I>
+    relative to the actual screen-width or -height.
+    <P>
+    The percentages are relative to the area which is determined by the
+    <CODE>-defaultBounds</CODE> defined by the selected
+    <A HREF=../decoration/index.html>decoration</A>.
+    <P>
+<DT><B>-footer =&gt;</B> <I>text</I>
+<DD>The text to be displayed as footer.  If there is no footer-text defined,
+    some decorations may still reserve screen-space for it.  The text will
+    be shown using the specifial directive that the 
+    <A HREF=../template/index.html>formatter</A> has defined for it.
+    The <A HREF=../formatter/markup.html>Markup Formatter</A>
+    uses tag <CODE>&lt;FOOTER&gt;</CODE> (which can easily be redefined).
+    You should not specify that tag yourself: it is automatically added
+    for you.
+    <P>
+<DT><B>-showTemplateOutlines =&gt;</B> <I>pixels</I>
+<DD>Mostly used for debugging template layouts.  The size given is used
+    as line-width.
+    <P>
+</DL>
+<P>
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

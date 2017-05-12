@@ -1,0 +1,28 @@
+---
+abstract: 'Deals with Filesystem Encoding'
+author:
+  - 'Goro Fuji (藤 吾郎) <gfuji (at) cpan.org>.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  ExtUtils::ParseXS: 0
+  Test::More: 0.62
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.88'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PerlIO-fse
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Encode: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

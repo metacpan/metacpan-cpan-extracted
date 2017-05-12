@@ -1,0 +1,4 @@
+name: Filter::HatenaKeywordTag
+author: Yuichi Tateno (id:secondlife)
+depends:
+  Hatena::Keyword: 0

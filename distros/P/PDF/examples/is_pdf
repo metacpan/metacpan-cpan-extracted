@@ -1,0 +1,71 @@
+#!/usr/local/bin/perl 
+#
+# is_pdf       SImple checker for PDF files
+#
+# A simple example that use the PDF library
+#
+# by Antonio Rosella <anface@geocities.com> January 1998
+#            http://www.geocities.com/CapeCanaveral/Hangar/4794
+#
+# Free use under GNU License.
+#
+# This is the version 1.1
+#
+
+
+use Carp;
+use Getopt::Long;
+use PDF;
+
+my $version="1.1";
+my $help="";
+my $verbose="";
+
+GetOptions( "help" => \$help , "verbose" => \$verbose );  
+
+$help and printusage(); 
+
+foreach (@ARGV) {
+  do_the_dirty_job_on($_);
+}
+
+exit(1);
+
+sub do_the_dirty_job_on {
+
+  my $file = shift;
+
+  my $PDFfile= PDF->new( $file ); 
+
+  $verbose ? print "file \"$file\" is",!$PDFfile->IsaPDF && "n\'t"," a PDF\n" 
+           : print "$file:",$PDFfile->IsaPDF ? "yes":"no","\n" ;
+}
+
+sub printusage {
+
+print <<ANTRO;
+
+Test if a list of files are writte in PDF format.
+
+usage:
+        pdf_version [-options ...] files
+
+where options include:
+    -help                        print out this message
+    -verbose                     verbose
+
+or the abbreviate version -h, -v 
+
+files:
+    with files you can use metacharacters and relative and absolute path name
+    
+example:
+    pdf_version *.pdf
+    pdf_version -h
+    pdf_version -v . "*.pdf" "/tmp/path/to/work/*.pdf"
+
+ANTRO
+
+exit(1);
+
+}; 

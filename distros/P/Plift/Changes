@@ -1,0 +1,136 @@
+Revision history for Perl extension Plift
+
+0.15 2016-10-27T14:24:18Z
+
+    * replaced Scalar::Util by Ref::Util
+    * context get() method now tries to find a hash key when
+      it doesn't find a method on blessed targets.
+    * fixed the current path shown on error messages
+
+0.14 2016-10-26T23:17:39Z
+
+    * new context methods 'abort' and 'is_aborted'
+      - call abort to stop any further processing
+
+0.13 2016-10-17T18:30:10Z
+
+    * enabled the JSON's 'convert_blessed' option
+      - objects are now automatically converted to json if the support it
+
+0.12 2016-10-04T16:56:34Z
+
+    * made 'data-' prefix optional for data-remove-if/unless
+
+0.11 2016-10-04T01:46:39Z
+
+    * implemented special selector '.' to select the current DOM root
+    * implemented methods 'hook($step, $callback) and run_hooks($step)'
+      - implemented hook 'after_load_template'
+      - implemented hook 'before_process_template'
+      - implemented hook 'after_process_template'
+      - implemented hook 'before_render_directives'
+      - implemented hook 'after_render_directives'
+    * implemented 'data-remove-if' and 'data-remove-unless'
+      - conditionally remove HTML elements based on context data
+      - runs via 'after_load_template' hook
+
+
+0.10 2016-09-02T12:34:10Z
+
+    [ NEW ]
+    * new context method selector_for($element)
+      - generate deterministic css selector for any html element,
+        based on libxml node's unique_key
+
+0.09 2016-09-01T21:52:45Z
+
+    [ INCOMPATIBLE CHANGE ]
+    * snippet action methods now receive the context and parameters as arguments
+      - The signature is: sub ($self, $element, $c, $params);
+    * the parameters hashref is also used as snippet constructor params
+
+0.08 2016-08-15T16:11:18Z
+
+    [ NEW ]
+    * Plift::template() now supports the 'data' option
+      - so you can set the data before calling render()
+      - useful if you need a reference to the metadata hash before calling render()
+
+0.07 2016-08-12T19:32:32Z
+
+    [ NEW ]
+    * implemented active_handlers/inactive_handlers options
+    * implemented <x-meta/> handler
+      - templates can now set simple key/value metadata
+
+    [ BUG FIX ]
+    * fixed bug in process_element() where xfind() wouldn't find elements after xfilter()
+      - now collecting all xfilter() + xfind() nodes before processing
+    * fixed a bug where render directives wouldn't match document-root elements
+
+0.06 2016-07-23T18:13:21Z
+
+    [ PERFORMANCE ]
+    * avoid calling Path::Tiny realpath + subsumes
+      - only if template name has '../'
+    * builtin handlers now calling attribute-related methods directly on libxml node
+      - I know.. micro optimization.. just a NYTProf itch.
+    * resolving relative path prefix only when template name is relative :)
+
+    [ BUG FIX ]
+    * fixed relative path resolution
+      - now properly localizing current file/path
+
+
+
+0.05 2016-07-23T02:34:37Z
+
+    * added support for inline template
+      - pass a scalarref with html source instead of template name
+      - needed since not all applications stores the templates as files
+    * added URI dep
+    * implemented "data-plift-template" feature
+      - a body attribute pointing to the actual template element,
+      - used by load_template() method
+
+
+0.04 2016-07-21T04:14:15Z
+
+    * implemented 'wrapper' option
+      - a template used for final wrapper, usually the website layout
+      - avoids '<x-wrap>' on every template file
+    * implemented context 'helper'
+      - optional object of which methods get AUTOLOADed from
+      - meant as a gateway from Plift to the rest of the system
+        - (e.g. the current web request controller instance)
+
+    * implemented snippets: dynamically loaded code blocks
+    * renamed option 'path' to 'paths'
+
+0.03 2016-07-20T19:09:47Z
+
+    - implemented Plift::render(), Plift::load_components()
+    - added a little more documentation
+
+0.02 2016-07-18T22:12:26Z
+
+    - implemented <x-render> processing instructions
+      - creates render directives dynamically
+    - implemented match modifiers to append+, +prepend and ^replace the element
+      - like Template::Pure
+
+    - added manual pages
+      - Plift::Manual::Tutorial
+      - Plift::Manual::DesignerFriendly
+      - Plift::Manual::Inception
+      - Plift::Manual::CustomHandler
+
+
+0.01 2016-07-12T00:47:33Z
+
+    - first released version, includes all basic features:
+      - include and wrap templates
+      - render data via pre-defined directives
+      - render data via references found in templates
+      - load plugins
+      - add custom handlers

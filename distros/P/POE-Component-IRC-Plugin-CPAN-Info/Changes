@@ -1,0 +1,22 @@
+Revision history for POE-Component-IRC-Plugin-CPAN-Info
+
+1.001001    2014-03-09
+        - Restored after accidental deletion
+        - Converted to dzil
+
+0.04    2013-11-11
+        - Fixed the bot saying "No idea" to everything
+          (though that seems to have been a bug with
+          POE::Component::CPAN::SQLite::Info
+        - Fixed "Use of qw(...) as parentheses" warnings
+        - Minor fixes to comply with specs and Kwalitee game
+
+0.03    2008-02-07
+        - Fixed left over Data::Dumper's
+
+0.02    2008-02-07
+        - <Lost changes>
+
+0.01    2008-02-07
+        - First version, released on an unsuspecting world.
+

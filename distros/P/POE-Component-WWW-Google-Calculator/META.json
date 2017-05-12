@@ -1,0 +1,52 @@
+{
+   "abstract" : "A non-blocking POE wrapper",
+   "author" : [
+      "Zoffix Znet <zoffix@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-WWW-Google-Calculator",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.04",
+            "POE" : "0.9999",
+            "POE::Filter::Line" : "1.192",
+            "POE::Filter::Reference" : "1.2187",
+            "POE::Wheel::Run" : "1.2179",
+            "WWW::Google::Calculator" : "0.04",
+            "perl" : "5.008008"
+         }
+      }
+   },
+   "provides" : {
+      "POE::Component::WWW::Google::Calculator" : {
+         "file" : "lib/POE/Component/WWW/Google/Calculator.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03"
+}

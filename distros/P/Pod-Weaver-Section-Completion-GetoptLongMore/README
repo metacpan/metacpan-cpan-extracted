@@ -1,0 +1,16 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [Completion::GetoptLongMore]
+
+DESCRIPTION
+
+    This section plugin adds a COMPLETION section for
+    Getopt::Long::More-based scripts. The section contains information on
+    how to activate shell tab completion for the scripts.
+
+SEE ALSO
+
+    Getopt::Long::More
+

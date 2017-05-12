@@ -1,0 +1,1984 @@
+2016-07-25  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2128] Creation of
+	  svn+ssh://svn.project-builder.org/prj/svn/pb/0.14.1 from
+	  svn+ssh://svn.project-builder.org/prj/svn/pb//devel
+	* [r2125] - Fix list of containers used to build pb
+	  - Try to fix opensuse 13.1 build issue (/etc/SuSE-release
+	  missing)
+	* [r2123] - Fix debian 7 deps on diff replaced by diffutils
+
+2016-07-23  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2122] - Fix issue with rpmsign aborting the build script when
+	  incorrect
+	  - Fix fedora perl deps by using perl-core (exists since f10 !!).
+	  This should solve the perl headackes on Fedora
+	* [r2121] Fedira 24 depends on perl-File-Temp !
+	* [r2119] -Fix #144 by declaring PBTMP when File::Temp doesn't
+	  exist
+
+2016-07-22  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2118] CentOS is also installed from pkgs now
+	* [r2117] - Fix CentOS perl deps (Data::Dumper is a separate pkg)
+	* [r2114] - Improve exmaple conf file generation for 0.14.x
+	  versions
+
+2016-07-21  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2111] Fix Date-Manip dep for gentoo
+
+2016-07-20  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2105] Fix the version returned by pb for test mode
+	* [r2104] Fix name of docker reg/repo function and fix it by
+	  invoking the older one content
+	* [r2103] The default is now to setup a pb dockerrepository and
+	  leave the registry up to the admin
+	* [r2102] Fix generation of example files to correspond to current
+	  test version naming implementation
+	* [r2098] The expanded PBVER macro should just use the macro, not
+	  the extdir which
+	  is now in the tag
+
+2016-06-24  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2096] opensuse needs the rpm-build package
+	  
+	  As it's not brought by current dependencies
+	* [r2095] Adds fedora 24 support for pb
+
+2016-06-01  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2092] Adds function pv_ve_docker_repo
+	  
+	  Reuse code from VE.pm in pb to check whether we use a Registry or
+	  just a
+	  repository
+	  Adds a new conf param dockerrepository and document it (mandatory
+	  if no
+	  registry used)
+	* [r2091] Fix a bug for git+svn
+	  
+	  directories need to be used as with normal svn
+
+2016-04-29  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2086] - Updates COPYINg files for new FSF address
+	  - Improve pbr support
+	* [r2084] - build and delivery directories renamed pbbuild and
+	  pbdelivery for consistency and to ease filtering (with git e.g.)
+
+2016-04-28  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2080] - Update of the codenames for latest Ubuntu versions
+	* [r2079] Add support for pbr for python project such as
+	  python-redfish
+	  Update demo
+	  More API tests added
+	* [r2077] First attempt to add a Mojolicious web app with swagger
+	  providing a RESTful API for pb
+
+2016-04-05  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2063] - Fix a perl warning with recent versions where we now
+	  need to escape {
+
+2016-02-22  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2054] - perl-Data-Manipcannot be downloaded from opensuse 10.2
+	  repo as it doesn't exist anymore. Removing from deps to avoid
+	  waiting for ever trying to install it. Installed as a file
+	  anyway.
+
+2016-02-17  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2034] - Adds support for Fedora 23 in conf
+	* [r2032] - Copyright update for 2016
+
+2015-12-23  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2027] - Improve yum and dnf invocation by just cleaning cache
+	  of metadata, avoiding to do a clean + upgrade
+
+2015-12-17  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2026] Fix dependencies for Fedora 22 docker ctn
+
+2015-12-11  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2025] improve git support by archiving HEAD if no modif in
+	  progress and removing git+ on uri when needed
+
+2015-12-08  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2024] - Fix previous commit not tested (should use even more pb
+	  !!)
+	* [r2023] - export now export the current state of the git tree
+	  with git stash
+	  create instead of just HEAD to match what is done with svn
+
+2015-12-06  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2022] - Improve git support where pbconf is upstream in the
+	  main directory of a simple project
+
+2015-10-12  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2012] Adds dnf support
+	  
+	  Starting with Fedora 22 the package manager is dnf and not yum
+	  anymore
+	  pb needed some adaptations to support it, which have been mostly
+	  been
+	  coded in this patch. Tests to be done.
+
+2015-09-30  Bruno Cornec <bruno@project-builder.org>
+
+	* [r2003] Presence of a local docker registry is now optional
+	  
+	  Do not for ce user to have a local docker registry but just store
+	  locally docker images if none is given as parameter.
+
+2015-08-10  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1984] - Fix perl deps for rhel7/centos7 for new/prep phase
+
+2015-07-22  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1981] Add support for mageia 5
+
+2015-06-16  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1972] Adds debug info to Distribution.pm to catch a dependency
+	  analysis issue on Ubuntu
+
+2015-06-12  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1969] When searching for amiguous distro files, do not issue
+	  error messages if
+	  there are still other amibiguity possible but do that at the end
+	  of the
+	  loop just once.
+	* [r1967] - newve now installs deps in container if using an
+	  upstream one
+
+2015-06-11  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1966] Add the possibility to use an existing docker image for
+	  newve with -i
+	  option
+
+2015-05-12  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1963] - Fix pb install support on Debian 8
+	  - Do not setup ssh when creating VM
+	  - Adds a pb_move_extracted_files function to handle debian subdir
+	  case
+
+2015-04-30  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1961] - Review debian versions and adds info for 8 and 9 name
+
+2015-03-30  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1958] - Update copyrights dates notices
+	  - Change pb_parallel_launchv interface to have pbimage earlier in
+	  the params to fix newvm not working anymore
+
+2015-03-05  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1953] - Fix typos in conf file doc
+	  - Fix VM package build by using again the correct script to setup
+	  repo and initializing it correctly later in pb
+	  - Fix an error where vetype was used without check that a VE was
+	  in operation
+	* [r1952] - Adds a pb_ssh_setup function used for both VM and RM to
+	  setup the ssh environment with the right keyfile
+	  - Move that ssh setup at the right place in launchv instead of
+	  setupv (was done too early now that VM launch has been
+	  re-adapted)
+
+2015-01-26  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1938] - sles/opensuse now uses zypper by default
+
+2014-12-26  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1926] -Improves deb checkssh support again
+
+2014-12-07  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1917] - Ubuntu 15.04 is vivid
+
+2014-12-02  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1916] - Ubuntu 14.10 is utopic
+
+2014-10-10  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1907] - Fix some default initializations (|| undef e.g.)
+	  - VE.pm doesn't need to have pbstep (use pbforce simply)
+	  - Fix sbx2setupve in a docker context
+	  - Add entries for prepve|vm|rm
+	  - Move sandbox management into send2target so that all files to
+	  process
+	  are managed here
+
+2014-10-09  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1905] - pb_conf_write is indeed working and tested now (git
+	  error)
+	* [r1904] - Add a pb_conf_write function and its test
+
+2014-10-08  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1903] - Add entries for osrepo for mageia/mandriva distros to
+	  allow setupve to
+	  work for these distributions without resorting to sbx2setupve
+	  - pbkeep now managed in pb_temp_init to avoid removing the temps
+	  dir
+	  when debugging
+	  - Add functions pb_ve_docker_get_image and pb_ve_get_type
+	  - lots of interfaces changes to allow support of docker,
+	  including
+	  script names. May break other non docker features
+	  - both newve and setupve work with docker now.
+	  - manages public keys for urpmi distriutions
+	  - Adds function pb_parallel_launchv. Now pb_launchv is single V
+	* [r1902] - Usage of sudo for docker import to avoid issues in
+	  rights
+
+2014-09-30  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1900] - Add support for docker phase 1: newve working
+	  - Add separate pb_ve_snap function
+	  - Add separate pb_ve_docker functions to interact with the
+	  registry and
+	  the repository
+	  - Add a dockerregistry conf parameter
+	* [r1899] - Adapt Makefile.PL to build pbgetparam now
+	* [r1898] pbdistrogetparam -> pbgetparam and fix printing of values
+	  now for both
+	  project and distros
+	* [r1897] - Fix a previous patch on git support for compliance
+	  checks which were
+	  incorrect. Now works at least with git+svn, and should work the
+	  same
+	  way as the original patch was intentded to work for native git.
+	* [r1896] - Fix PBDIR computation when using git+svn (which is like
+	  svn with
+	  versions not git flat)
+	* [r1895] - Fix pbdistrogetparam in order to also display project
+	  related info,
+	  and not only distro related
+
+2014-08-29  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1893] - Adapt a patch from Hartmut Goebel
+	  h.goebel_at_crazy-compilers.com in order to add support for local
+	  git repos.
+
+2014-07-13  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1891] - Improve mageia 4 VE support
+	* [r1890] - Adjust dependency list for Mageia4 VE
+
+2014-06-26  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1885] - Create entries fr mga4 rmbootstrap (not tested yet)
+
+2014-06-22  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1879] - Do not abort if pb_stop_on_error isn't set in
+	  pb_distro_installdeps to allow to continue if deps are not
+	  satisfied for one package but are for the others, which is the
+	  case with ondo-doc failing on some VMs
+
+2014-04-27  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1875] - Improve git support for repo creation hopefully
+	  - Git build works correctly for pdfposter now
+	* [r1872] - Fix an error msg which shouldn't be printed with a
+	  wrong testing on the version value
+
+2014-04-03  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1866] - If using git, then do not use the version name in the
+	  URI cloned as it's in the repo in fact.
+
+2014-02-06  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1852] - Fix duplicate display error and intermediate RE error
+	  as well
+
+2014-01-28  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1851] - Fix #128 by removing the initialization to STDOUT of
+	  the FD in pb_display_file and also improving pb_get_content to
+	  avoid to handle the last line
+	* [r1850] - Move pb_cms_compliant fundtion into VCS.pm and rename
+	  it pb_vcs_compliant, as it was used incorrectly in Env.pm which
+	  was lower in the tree. Detected by MondoRescue 3.2 update by
+	  Corey Wirun and reported on the ML.
+
+2014-01-06  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1837] - With Debian 7 the release number is now part of the
+	  version as for RHEL. So dropping it in the RE in order to just
+	  make VM|VE with -6- or -7- . Things can be reversed of course, if
+	  that's what is wanted.
+	* [r1834] - Fix bugs in Distribution.pm preventing debian VM to be
+	  setup anymore
+
+2014-01-05  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1820] - Adds future Debian 8 and Ubuntu 14.04 codenames
+	* [r1817] - Fedora 19 now working and 20 is on track
+	  - metalink in yum.conf should be commented as we use baseurl (and
+	  it doesn't work in the chroot)
+
+2014-01-04  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1816] - Fedora 18 now has a working setupve
+	* [r1814] - Fix fedora 18 VE build rpm deps
+
+2014-01-02  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1812] - Improve fedora rpmbootstrap VE (still need now correct
+	  deps list)
+
+2013-12-23  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1802] - Adds mageia 3 VE support
+	  - Adds rbsmirrorupd feature
+	  - No -s option for oppatchcmd by default now
+	  - Start to improve rpmbootstrap for new Fedora mirror
+
+2013-11-29  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1801] - Fix PBREVISION computation for git-svn
+	  - Export correctly in case of git-svn as well
+	* [r1800] - Start to support git-svn
+
+2013-11-03  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1795] - rename function pb_conf_print into pb_distro_conf_print
+	  and place it in the right module to handle distribution input for
+	  filtering base on it. pb now uses it
+
+2013-07-30  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1781] - Fix Mageia halt command
+
+2013-06-25  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1776] - halt is under /usr/bin on Mageia
+	  - Updat the PDF Lab doc with latest source
+
+2013-06-01  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1767] - generate debian 6 template, latest being debian 7
+
+2013-05-16  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1756] - For opensuse 12.3 patch doesn't support the -s option.
+	  Fixed in the conf file
+
+2013-04-29  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1747] - Exports also pb_distro_init
+
+2013-04-27  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1746] - Adding ubuntu 13.10 code name
+
+2013-03-20  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1741] - Latest opensuse 12.3 has perl module named Date-Manip
+	  as most others, but contrary to at least 11.0
+
+2013-03-18  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1732] - sudoers on sles10 is 440
+	* [r1731] - Adds template for Debian 3.1 and improve vmlist example
+
+2013-03-16  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1727] - Fix opensuse-10.2 yast usage
+	  - RHEL 2 is now without the ot version as well, to match the
+	  latest versins and avoid build problems with file with 2.1 not
+	  found
+
+2013-03-12  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1716] - Fix an error in VMbuild where ' were misplaced leading
+	  to the script being printed and not executed
+	  - Document ossudoersmode for pb.conf
+
+2013-03-10  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1715] - Adds a parameter for the mode of the sudoers file
+	  instead of hard-coding
+	* [r1714] - remove param vmntpcmd and use oscmdntp instead placed
+	  in pb.conf
+	  - Improve ntp handling for setupvm by adding a call to date when
+	  ntpdate is failing
+	  - Update appropriate docs
+	  - Fix pb_get_sudocmds which was using @_ directly which was
+	  impacting parameters in the calling function, and removed e.g.
+	  the ntp server name from the cmd line !
+	  - TODO: if a ntpd server is running, avoid doing all ntp/date
+	  stuff
+
+2013-03-09  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1713] - Fix a perl warning due to a strange syntax for a
+	  function
+	* [r1711] - Adds the possibility to prefix the output of commands
+	  executed by pb_system, if the verbose keyword is of the form
+	  verbose_prefix
+
+2013-02-28  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1702] - Fix #116 by documenting the cachedir parameter
+	  - remove mkbmpath variable to use cachedir instead (more
+	  coherent)
+
+2013-02-27  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1701] - Remove make test from pb rpm build process for now as
+	  there is no test yet
+	  - Place pbtest in its own dir
+	  - use ast2 for opensuse-11.0 install
+
+2013-02-26  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1694] - pbdistrogetparam now works, is built & delivered, and
+	  has a new -a (all) option
+	  - New function pb_conf_get_all to return the list of all
+	  parameters, also now used by pb_conf_print
+
+2013-02-10  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1690] r5138@localhost: bruno | 2013-02-10 15:53:09 +0100
+	  - Update pb pres for LCA 2013
+	  - add a pbdistrogetparam command to easy shell interface
+
+2013-01-16  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1685] - Latest Ubuntu codename
+	  - rpmbootstrap for opensuse 12.2
+
+2012-11-16  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1678] - Exports function pb_vcs_add_if_not_in
+	  - replace most die by confess
+
+2012-11-10  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1672] r5007@localhost: bruno | 2012-10-09 23:15:57 +0200
+	  - Continue pbmkbm dev
+	* [r1671] r4928@localhost: bruno | 2012-06-07 19:07:57 +0200
+	  - pbmkbm now support terminfo and stop on error (off by default)
+
+2012-10-22  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1663] - Small improvement to pb_exit
+
+2012-10-21  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1661] - Introduce a pb_exit function and use it in all apps
+	* [r1660] - In debug mode, do not erase the temporary dir created
+	  to ease analysis
+
+2012-10-07  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1653] - Red Hat 6.2 doesn't really support rpm --whaprovides so
+	  removing it for this one
+	* [r1652] - As Red Hat 6.2 in chroot doesn't support setarch i386
+	  for a x86_64 environment, we have to fake x86_64 rpm build in
+	  /etc/rpmrc
+	  - Red Hat 6.2 builds with the rpm command, not rpmbuild
+	  - Red Hat 6.2 sudo doesn't support the env_keep var, remove it
+	* [r1651] - Avoid to emit msgs when sed -i doesn't work (as on
+	  RedHat 6.2)
+	  - Factorize the proxy usages in pb_apply_conf_proxy and make it
+	  public (was partly done only)
+	  - debug level is now passed to the vescrip improving debug
+	  capabilities in that script
+	  - /dev/null shouldn't be touched on RedHat 6.2 as recreating it
+	  doesn't seem to work
+	  - Allow usage of mayfailverbose in pb_system when both features
+	  are needed to help debuging
+	  - Imrpove again RedHat 6.2 support up to setupve now (however
+	  needs a manual install of perl 5.6.2 to work as the minimum
+	  version for pb)
+
+2012-09-27  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1648] - setupve needs the sourcing of the project conf file.
+	* [r1647] - Render File::Temp and Pod::Usage optional, in order to
+	  support partly old perl versions (5.00.5 at least) such as on
+	  RH6.2, so that the Base.pm module can be used in such a VE/VM
+	* [r1646] - Really use snapshot for launchve when needed. fix some
+	  parts of the condition which were wrong.
+
+2012-09-26  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1645] - Adds support for a RedHat 6.2 VE by first making newve
+	  work, and rpmbootstrap support non-yum type of install with a
+	  full list of deps.
+	* [r1644] - Fix a nasty bug when using an empty value on the right
+	  side of th = sign in a conf file, he parameter wasn't created in
+	  the cache conf. The rehexp has been adapted to support it, as it
+	  was designed. Allows to create empty values for some use case
+	  (osmindep in our case for rh6.2)
+
+2012-06-05  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1629] r4911@localhost: bruno | 2012-06-05 02:56:19 +0200
+	  - Skip env var passed with sudo in analysis of cmds to allow in
+	  sudoers to avoid env to be there
+
+2012-06-02  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1620] - Changing old checksum for yum from sha1 to sha as it
+	  wasn't working at leat for RHEL5. Now fixed
+
+2012-05-28  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1606] - Adds pbstoponerr option in conf file to allow to
+	  overwrite the default which is back to not stopping on errors as
+	  it perturbates VE and VM build for themoment, as not all commands
+	  are expected to succeed systematically.
+
+2012-05-27  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1605] - Change urpmi.update call from /usr/bin (consolehelper)
+	  to /usr/sbin (urpmi) as that's what we have in VE.
+	* [r1604] - Fix an error in the Package file generation for deb
+	  repo
+	  - more pbtest fine tune
+	  - Review again pb_system msgs
+
+2012-05-26  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1603] - pbtest now uses debian-6.0 has the correct distro name
+	  and points to mandriva 2011.0
+	  - pbtest now first umounts potential remaining /proc FS left from
+	  previous run and has a build dep fo deb on gcc
+	  - pb: removes a useless chown in it which was always failing
+	  - Fix errors in mageia deps
+	  - Fix typo in Base.pm
+	  - rpmbootstrap needs aaa_base for VE seyup with zypper, in order
+	  to add passwd file e.g.
+	* [r1602] - pb_system will echo systematically the word ERROR when
+	  one occurs, even if non blocking to ease search in logs.
+	* [r1601] - pb correctly now differentiate PBDEP and BPBDEP (in
+	  Env.pm for template generation
+	  - pbtest uses now this feature
+	  - Fix mageia 1 and 2 deps for VE
+	  - remove a detail given in a generated pb_system as it creates
+	  errors in the built script
+	* [r1597] - Adds option pbshowsudo (false by default) to check
+	  whether we display the detail of sudo commands (to match security
+	  requiremetns) or not (to have a nicer output)
+	  - Fix a template generation error in Env.pm for deb rules file
+	  (line was split)
+	  - In VE.pm fix modes of the chroot after the snapshot phase
+	  detection to avoid error which make the code die
+	  - In pb create the RPM build dirs before entering in the parallel
+	  loop as sometimes 2 identical were created simultaneously,
+	  leading to an error leading to a die
+	  - In pb revert the code added by Eric to check deb content
+	  creation as it was failing in my environement (naming issues).
+	  Could be added after 0.12.1 is out as an additional check, but
+	  anyway as the files are copied after, it's not that important.
+	  - Use full path of chown in sudo for pb
+	  - Make the test account a variable in pbtest
+	  - Start to add test case for a VM in pbtest
+	  - This patch makes pb build back in a debian 6 VE.
+
+2012-05-24  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1596] - Improve system cmd display in Distribution.pm for deps
+	  analysis
+	  - umount /proc in the VE when using rpmbootstrap, if it wasn't
+	  unmounted due to error, to allow snapshots to work correctly
+	  - pbtest should now be able to build afio in an rpm VE (The VE is
+	  setup correctly again, including fedora 16 having the requiretty
+	  constraint))
+	* [r1595] - pb_system is back to 3 params, as the previously
+	  undocumented "mayfail" 3rd parameter povides what the 4th was
+	  dded for. callers adapted in relationship
+	* [r1594] - Fix a bug in VE context around the chown part (no
+	  quotes without the sudo)
+	  - Improve mageia 2 deps
+	  - pbtest is nearly at the end
+
+2012-05-23  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1593] - Fix mageia 1 VE creation support
+	* [r1592] - Fix another bug in pb_check_req on the default value
+	  used with a || where an undef wasn't different from a bad
+	  integer.
+	* [r1591] - Adds entry for mageia 2
+	* [r1588] - Use pb_cjeck_req for all commands called in the VE for
+	  its setup, so it can be used correctly in a secured environement
+	  with a sudoers conf file (Cf pbtest)
+	* [r1586] - Adds support for the PBVCSOPT env var to pass cli
+	  options to the VCS command. Example is authentication method for
+	  SVN as in pbtest.
+	* [r1585] - Fix pb_syntax, where a call with an exit of 0 was seen
+	  as false and thus lead to a value of -1. Now pb -h returns true
+	* [r1584] - Move PBPROJ env var setuo from Env.pm to Conf.pm to
+	  have it earlier available for some calls with less context.
+	  - Fix a bug when (ve|vm|rm)path->ENV(PBPROJ) was undefined, and
+	  expand its path when defined to support that type of definition
+	  in conf files (pbtest does it)
+	  - getconf now loads more conf files, and calls cms_compliant
+	* [r1576] Add support of the PBVCSOPT environment variable to pass
+	  options to the VCS command such as a login/passwd authentication
+	  (useful for pbtest)
+
+2012-05-22  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1564] - Fix typo n rpmbootstrap preventing it to run
+	  - Fix the detection of setarch call with a more correct regexp
+	  - New mageia mirror used (similar as mandriva)
+	  - Add a test script to have a full regression suite before
+	  publishing a new version
+
+2012-05-21  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1560] -pb project: Add Copyrights specified by HP Open Source
+	  Review Board (Eric Anderson)
+	* [r1558] - pb: [BUGFIX] added code assumed it had
+	  Parallel::ForkManager package. (Eric Anderson)
+	  - Fix more typos on comma (Bruno Cornec)
+	* [r1556] pb: Use new pbgpgcheck option to control whether we
+	  enable gpgcheck in the repo script. Problem is that signing
+	  failure is tolerated, so the rpms can be unsigned, but gpgcheck
+	  is on by default. Preserve those semantics by default, but allow
+	  for control. (Eric Anderson)
+	  - pbgpgcheck is optional and default to 1 (Bruno Cornec)
+	* [r1555] - pb: improve documentation on the project.pb entries.
+	  Use new projcomponent value to specify which component we are
+	  building for -- most things probably aren't contrib (for deb
+	  based distros) (Eric Anderson)
+	* [r1554] - pb: Update documentation, the newproj docs were missing
+	  an important argument. Expanded out the newproj documentation.
+	  Fixed the cms2build documentation to match the same style as the
+	  other documentation. (Eric Anderson)
+	  - CMS.pm/VCS.pm: Tolerate the file: scheme -- it was tolerated in
+	  some places but not others. (Eric Anderson)
+	* [r1553] - pb: log when we start and finish the build, that's an
+	  important state. Add missing setting of all_ok to false that kept
+	  us from properly stopping on errors. Fix typos in comments (coma
+	  => comma). Greatly simplify pb_get_distros function by using
+	  split and join. Also remove whitespace since multi-line conf file
+	  support will cause that to be added. (Eric Anderson)
+	  - Filter.pm: use new pb_pbos_to_keylist function to generate the
+	  list of basenames we want, and use a loop rather than lots of
+	  separate statements. Simplifies and makes more powerful this
+	  function. Also now guaranteed to maintain consistency with key
+	  lookups in the hash maps. (Eric Anderson)
+	  - rename pb_pbos_to_keylist to pb_distro_to_keylist and make it
+	  public (Bruno Cornec)
+	* [r1551] - pbdistrocheck: remove hack to have common library path
+	  and static ref to /usr/share/perl5. That should really be done in
+	  the build process if needed not in code (Bruno Cornec)
+	  - pb: Just create the /etc/sysconfig/network file on rpm based
+	  distro not being opensuse (where it is a directory) (Eric
+	  Andersson/Bruno Cornec)
+	  - CMS.pm: drop log level down to 2 this is a pretty irrelevant
+	  log message. (Eric Andersson)
+
+2012-05-14  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1545] - pb: Add in better documentation for setupve, and add
+	  documentation for build2ve. Make sure that if we are doing a
+	  parallel build we will stop on errors if that option is set. Fix
+	  the code for determining which output files were made. The .dsc,
+	  .tar.gz, and .changes files are named based on the Source: option
+	  in the debian control file. The .deb files can be extracted from
+	  there or (as implemented) from the output of dpkg-deb. Verify
+	  that all expected files are present. Refactor code to avoid
+	  duplicating long filename construction. Fix bug in running in
+	  32bit VE with 64bit host; the setarch command needs to be used to
+	  make the child think it is running in a 32 bit environment. Make
+	  the use of a key option to ssh optional so that if ssh-agent is
+	  in use no key-file is generated. Do *not* set the time in a
+	  virtual environment. It is getting it's time from the parent OS
+	  and I believe this piece of code was mis-setting the time since
+	  the VE thought it was in UTC rather than PST for the parent and
+	  so was shifting the clock by many hours. In the script generated
+	  in the sub-child, enable set -e if pb_stop_on_error is set so
+	  that if the package build fails we don't try to keep going.
+	  Having done that, /proc can remain around on failure, so tolerate
+	  that state. Fix the documentation on how the date is being set.
+	  Invert the loop that makes the bootstrapping project-builder so
+	  that we only include each of the .pm files once; if you have
+	  installed the pb-modules and have a locally built copy in @INC
+	  you could get both copies in the bootstrap version which lead to
+	  updating the source not changing the behavior. When getting the
+	  ssh-keyfile, if ssh-agent is running, and asked to use it then
+	  use it. Tolerate failures on the debsign step -- the key-file can
+	  validly not exist. (Eric Anderson)
+	  - Add a new option pbusesshagent in pb.conf to allow the user to
+	  specify whether he wants to use his existing SSH environement and
+	  agent, or if he prefers to create a new key pair for building.
+	  (Bruno Cornec)
+	* [r1544] Document ossueminorrel
+	* [r1543] - setupve|m does not require a cms2 command earlier now.
+
+2012-05-13  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1540] - vmmonport is now optional
+	  - vmmem is also now really optional (wasn't working before as
+	  wasn't correctly tested)
+	  - We are allowed to kill the sleep during VMs wait without it
+	  aborting the process
+	  - newv(e|m) doesn't require execution of cms2build before being
+	  available
+	  - Fix another git support error introduced earlier
+	* [r1539] - checking packages is allowed to fail
+	  - Fix syntax error introduced by a previous patch
+	  - When using git and pb_vcs_up, for git we need to loop on all
+	  the dirs passed (change of interface after Eric's patch)
+	* [r1538] - Use more confess instead of die in Conf.pm to debug a
+	  calling issue
+	* [r1536] - Improve git support for pb_vcs_get_uri (Eric Anderson)
+	  as for the previous patches
+	* [r1535] - Add git support in pb_vcs_up, pb_vcs_checkin and
+	  pb_vcs_add
+
+2012-05-12  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1530] - ossueminorrel option now initialized first, and
+	  correectly. Removes warnings.
+	  - other smaller fixes for CMD usage
+	* [r1529] - Fix a typo introduced when adding the pbuseminorrel
+	  option
+	* [r1528] - Add Copyrights specified by HP Open Source Review Board
+	  (Eric Anderson)
+	  - Clarification of copyrights, dates and licences (Bruno Cornec)
+	* [r1527] - VE.pm: Verify that the proxy variables are passed
+	  through if we are using sudo. (Eric Anderson)
+	* [r1526] - Document pbgpgcheck option. (Eric Anderson)
+	  - Generate example of the 2 last new project options in th .pb
+	  template (Bruno Cornec)
+	* [r1525] - pb.conf: ospkgdep has changed for debian, er-sort
+	  general to specific. (Eric Anderson)
+	  - pb.conf.pod: document new projcomponent entry. (Eric
+	  Anderson/Bruno Cornec)
+	* [r1524] - Distribution.pm: check that package was installed
+	  failed because package name could be truncated if COLUMNS env var
+	  is set. Also log out missing dependencies at log level 1. Add
+	  missing newlines on some log messages. (Eric Anderson)
+	* [r1523] - pb.conf: Add scilinux to list of OS's. Add case where
+	  centos versioning include minor since centos makes major changes
+	  in minor releases. Fix typo in oracle linux regex. Proposes min
+	  dependencies separately for centos-5.2, 5.6 others just match
+	  that set. Add next ubuntu codename. (Eric Anderson)
+	  - Distribution.pm: Add new pb_pbos_to_keylist function that
+	  generates the keys that should be used for looking up filter
+	  filenames or keys into the hash-maps. New function will generate
+	  5.m, for all m in [0,n] for version 5.n of some OS. Useful
+	  because minor versions are usually similar. Use it in
+	  distro_get_param, simplifying the function and making it more
+	  powerful. Fix comment to be correct, you can check for
+	  scalar/list context if you want, but that's not what this code
+	  does.
+
+2012-05-11  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1522] pb.conf: dependency on perl-Date-Manip in project-builder
+	  means that the mirror must come from the Everything repo rather
+	  than the Fedora one. (Eric Anderson)
+	* [r1521] - pb.conf: add auto-agree-with-licenses for opensuse,
+	  other failures on install can occur. partially fix dependencies
+	  for opensuse-11.2, stopped because the version isn't supported.
+	  remove cracklib-dict-small, not actually a dependency. (Eric
+	  Anderson)
+	  - Distribution.pm: Fix bug, if we install with yum, put the repo
+	  in the yum location. If we install with zypper, put it in the
+	  zypper location. Otherwise complain that we don't know what to do
+	  with the file. (Eric Anderson/Bruno Cornec)
+	* [r1520] - Fix an error introduced when isolating the new
+	  pb_distro_compare_repo function (Bruno Cornec)
+	  - pbdistrocheck: hack so that we can have one pb package that
+	  just works everywhere (Need a special use lib for opensuse) (Eric
+	  Anderson)
+	* [r1519] - pb.conf: Add support for centos-6: new osrelfile, add
+	  initial dependencies, add perl and package dependencies (Eric
+	  Anderson)
+	  - Distribution.pm: Require that we have a functional install
+	  command. The old protection code was wrong since without a valid
+	  value it defaults to '', and if it had been correct would cause
+	  installs to silently fail. (Eric Anderson)
+	  - VE.pm: Run bootstrapping under linux32 (Bruno changed that to
+	  setarch) if arch is i386 and host is x86_64/amd64 so that it gets
+	  the architecture right. (Eric Anderson)
+	* [r1518] - Base.pm: Don't display the error message if failure is
+	  ok. Simplify cluck + exit to confess. (Eric Anderson)
+	  - Env.pm: We are in a "", so escape the \'s. (Eric Anderson)
+
+2012-05-10  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1517] r4765@localhost: bruno | 2012-05-10 17:08:00 +0200
+	  - pb.conf: centos-5.6 moved python-libs into a separate package.
+	  List it or otherwise we can't run yum. Fix the mirror servers for
+	  centos-4,5 to just get the latest, and add mirror servers for 6.
+	  - pb.conf.pod: document addrepo, looked here and didn't find it,
+	  accidentally found it in code before adding it myself. Fix pod
+	  glitch at the end (missing =over/=back)
+	  - Distribution.pm: move the code to apply ftp_proxy/http_proxy
+	  from the conf files to a sub function since it's now needed in
+	  two places. Log the proxy and verify that everything we tried to
+	  install succeeded since yum will silently tolerate failing to
+	  install things, but rpmbuild will complain about missing
+	  dependencies. Tolerate an error from testing install of an rpm in
+	  pb_distro_setuprepo_gen.
+	  - Env.pm: Give an example of multi-line filters and an example of
+	  a transform.
+	  - VE.pm: If the verpmtype isn't defined, error out cleanly.
+	  Otherwise we're just going to fail later with lots of noisy
+	  output.
+	* [r1516] r4764@localhost: bruno | 2012-05-10 15:13:10 +0200
+	  - Distribution.pm: Fix the code to check to see if a package is
+	  installed. dpkg -L <package> can succeed on an installed but not
+	  configured package, however, dpkg-buildpackage will later fail.
+	  Fix is to check that the package is in the ii state. (Eric
+	  Anderson)
+	* [r1515] r4760@localhost: bruno | 2012-05-10 11:48:21 +0200
+	  - pb.conf: sudo does not pass through the DEBIAN_FRONTEND
+	  variable; use env to make sure it is set. Also change from
+	  --force-yes to --allow-unauthenticated (Eric Anderson)
+	  - Base.pm: Provide a better error message for failures of
+	  pb_mkdir_p (Eric Anderson)
+	  - Distribution.pm: Make sure to apply the ftp/http proxy when
+	  installing dependencies. Also add hack to try the install twice
+	  if it fails the first time. That may be unnecessary with the
+	  DEBIAN_FRONTEND fix, but doesn't hurt. (Eric Anderson)
+	* [r1514] r4759@localhost: bruno | 2012-05-10 11:12:46 +0200
+	  Distribution.pm: Handle multi-line entries in debian control
+	  files. Tolerate errors from listing dependencies since we handle
+	  them in pb_distro_only_deps_needed. If the two files differ,
+	  generate more error output. (Eric Anderson as the previous patch)
+	* [r1513] r4758@localhost: bruno | 2012-05-10 10:49:36 +0200
+	  Base.pm: Add a parameter to pb_system that allows commands to
+	  fail even if pb_stop_on_error is set. Some callers handle the
+	  error code. Add in pid to the error output from pb_system for
+	  help in tracking down which parent ran the command.
+
+2012-05-09  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1509] - Fix a build bug with the new prefix variable in
+	  pb-module. Only use if it exists !
+	  - pb_conf_init is called at low level on the default project to
+	  avoid PBPROJ to be undefined and creatin lots of error msgs.
+	  pbdistrocheck works again with it
+	  - Fix sbx2setupvm in order to call pb_conf_init correctly at
+	  start of the pbinit script.
+	* [r1508] - pb.conf.pod: expand documentation a bit more. (Eric
+	  Anderson from 73ca8f77a96586841affff0e41c8e29d4dbcecad)
+	* [r1507] - pb.conf: installing project-builder requires
+	  --force-yes since the keys don't get installed into the virtual
+	  environment. (Eric Anderson from
+	  d3145b5c2c63cf9cf00ffa818fa03a432a2e6e45)
+	  - pb.conf.pod: Fix lots of typos (coma -> comma) Document new
+	  ftp_proxy and http_proxy options. Document the rbsmirrorsrv
+	  option (already supported, not documented) Document that sshlogin
+	  and sshport are now optional parameters; both have reasonable
+	  defaults (not in that patch, will come later) (Eric Anderson from
+	  d3145b5c2c63cf9cf00ffa818fa03a432a2e6e45)
+	  - Conf.pm: Use confess so when failing to get a parameter we get
+	  a stack trace. (Eric Anderson from
+	  d3145b5c2c63cf9cf00ffa818fa03a432a2e6e45)
+	  - Distribution.pm: Fix typo (Donwloading -> Downloading); Fix
+	  code so that you can try to setup a VE multiple times. Existing
+	  debian code would fail the second time since pb.conf would
+	  already exist. Unclear on correct semantics here; the rpm code
+	  just force overwrites the file, but the old debian code was
+	  trying not to. (Eric Anderson from
+	  d3145b5c2c63cf9cf00ffa818fa03a432a2e6e45)
+	  - Distribution.pm: Adding the internal function
+	  pb_distro_compare_repo to avoid code duplication between apt and
+	  yum repos treatment (Bruno Cornec)
+	* [r1506] - Base.pm: add pb_path_expand to do the path expansion
+	  for config values. Print out all sudo'd commands if we haven't
+	  already so people know what they're typing their passwords in
+	  for. (Eric Anderson from
+	  aaf4d2337ab1554ba0c1f894108b3edc90996f69)
+	  - Env.pm: use pb_path_expand instead of inline expansion. (Eric
+	  Anderson from aaf4d2337ab1554ba0c1f894108b3edc90996f69)
+	  - VE.pm: Error out if vetype isn't defined; improve variable
+	  name, and verify that we don't try to launch a mips ve on x86_64
+	  (previous check only prevented x86_64 on ix86). Use
+	  pb_path_expand to expand out the vepath also. Make sure to create
+	  the path to the VE before we try to bootstrap it. (Eric Anderson
+	  from aaf4d2337ab1554ba0c1f894108b3edc90996f69)
+	* [r1505] - Base.pm: use Carp and Cwd so we can give better error
+	  messages. Use new Global::pb_stop_on_error variable to decide
+	  whether we should abort on an error. (Eric Anderson from
+	  9c3c696597c49b385df409311b1385d7a394db5a)
+	  - Distribution.pm: Remove useless redundant check of deps not
+	  maching whitespace, improve message since it is likely to call
+	  sudo. Skip dependencies that are all whitespace since that leads
+	  to errors when running dpkg -L <whitespace> (Eric Anderson from
+	  9c3c696597c49b385df409311b1385d7a394db5a)
+
+2012-05-08  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1504] - Avoid error msg in log when uri is undef in pb_get_uri
+	  (Eric Anderson from 2f76f20dc7337edcc323b4efb45ba7831029dbc7)
+	* [r1503] - Add possibility to use a PREFIX variable for Makefie.PL
+	  for pb-module (Eric Anderson) from
+	  b97fdb1f441101ad30da0f0d9ca399c57d08ffa8
+
+2012-05-07  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1495] r4735@localhost: bruno | 2012-05-07 03:46:39 +0200
+	  - Conf.pm largely rewritten to cache all conf files into a local
+	  $h hash in which conf files are added in reverse order.
+	  The new pb_conf_hash stores a configuration file into a hash
+	  structure passed in parameter.
+	  pb_conf_add now triggers the computation of the hash structure
+	  with pb_conf_cache and adds it to the main $h hash.
+	  pb_conf_read_if now just uses the content in the $h hash to
+	  return its table.
+	  pb_conf_get_in_hash_if function added to do the same as
+	  pb_conf_read_if on the cached $h hash instead of a configuration
+	  file.
+	  pb_conf_get_if now uses pb_conf_get_in_hash_if and the $h hash
+	  without re-reading conf files
+	  pb_conf_add_last_in_hash adds the content of a hash behind the
+	  content of the $h main hash (was done in pb_conf_get before)
+	  pb_env_init now calls pb_conf_init to have PBPROJ defined when
+	  needed.
+	  pb seems to work with this new version (builds itself)
+	  - Add a new getconf option to pb in order to see the state of the
+	  current configuration parameters (now in memory)
+
+2012-04-30  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1493] - Fix the previous improvement by using really a list as
+	  second parameter
+	* [r1492] - pb_vcs_add and pb_vcs_up now support a list of
+	  dirs/files as second parameter
+
+2012-04-24  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1486] - pb_mkdir_p now returns the return value of mkpath
+	  - Do not point onto Cauldron anymore for Mageia chroots
+
+2012-04-16  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1469] - Split CMS functions in 2 parts, one lowlevel reusable
+	  outside of pb in VCS.pm, the remaining stay in CMS.pm, part of
+	  pb.
+
+2012-04-15  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1465] - Fix a minor POD error
+	* [r1464] - Fix a remaining issue with extdir in newproj, which
+	  wasn't using it
+
+2012-04-07  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1460] - Prepare support for os-release coming from systemd
+
+2012-04-06  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1452] - Fedora 4 and 5 also use sha1 as checksum mecaniss (some
+	  people seems to still use it !)
+
+2012-03-27  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1443] - Env.pm now generates also template files with extdir
+
+2012-03-17  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1433] r4570@cabanilles: bruno | 2012-03-15 14:21:23 +0100
+	  - Improve return value documentation of pb_check_req
+
+2012-02-26  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1429] - Fix rpmbootstrap to support sites with multiple href in
+	  their page (opensuse main site e.g)
+	  - Fix conf to support VE for opensuse 12.1
+	* [r1428] - update opensuse mirror as kernel.org is not up to date
+	* [r1427] - Add more VM to build
+	  - Rename suse-11 in opensuse as well as 10.3
+
+2012-02-25  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1425] - Adds a new -k option to kep some temporary files for
+	  debug purposes
+	  - Fix newvm as the awk call was broken
+
+2012-02-23  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1414] r4400@localhost: bruno | 2012-02-21 13:15:45 +0100
+	  - Start adding keyboard capture support
+	* [r1413] r4399@localhost: bruno | 2012-02-20 20:47:28 +0100
+	  - Start coding kernel and keyboard detection for pbmkbm
+
+2012-02-06  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1408] r4511@cabanilles: bruno | 2012-02-06 09:29:48 +0100
+	  - New sync point which brings a start of kernel analysis for
+	  pbmkbm
+
+2012-02-02  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1403] r4490@cabanilles: bruno | 2012-02-03 00:10:53 +0100
+	  - Still further on pbmkbm (sync point)
+	* [r1402] r4487@cabanilles: bruno | 2012-02-01 16:21:48 +0100
+	  - Fix the -t option without param for pb
+	  - add a function to analyze busybox countent and create
+	  appropriate structure for pbmkbm
+	* [r1400] r4485@cabanilles: bruno | 2012-01-31 17:20:04 +0100
+	  - Provides a new pb_get_osrelease function similar to uname -r
+
+2012-01-24  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1392] - Adds a cleanssh target to purge test versiosn on the
+	  remote repository
+
+2012-01-02  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1386] - Adds option checkexclude and command checkssh with the
+	  -rebuild option: this allows to check after the build which
+	  packages have not been built correctly and to potentially
+	  relaunch the build (however why it didn't built is left as an
+	  exercise to the reader !)
+
+2011-12-22  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1374] - Start to add CPAN upload support to solve #101 - Needs
+	  to be tested now with an official version
+
+2011-11-27  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1367] - Fix a bug in the recursive function pb_list_bfiles
+	  where file handle should not be global
+	  - patch command and option are now variables in p.conf under
+	  ospatchcmd and ospatchopt
+	  - Add support for patches for deb family of distributions
+
+2011-11-24  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1365] - Prepare key support for SLES
+	  - Adds OEL support for build
+
+2011-11-21  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1363] - Fix to support directories under the debian dir (such
+	  as source/format)
+	  - Fix to apply build files really from generic to specific
+	  - Add initial support for quilt patches on Debian
+	* [r1360] - Adds fedora16 support for VE
+	  - Fix a bug when calling pb_ve_launch in pb for newve, evething
+	  needs to be fixed as we know what we want to do.
+
+2011-10-30  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1352] r4384@localhost: bruno | 2011-10-30 01:28:14 +0200
+	  - Change pb_ve_launch interface (remove useless second parameter)
+	  - Force call to pb_ve_launch with pbforce to always create the
+	  chroot in pbmkbm
+
+2011-10-26  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1350] r4380@localhost: bruno | 2011-10-26 15:30:49 +0200
+	  - remove oldies for mondorescue under 2.2.9
+	  - small improvements to start having pbmkbm working
+	* [r1348] r4374@localhost: bruno | 2011-10-25 12:10:59 +0200
+	  - Add mkbmpath parameter and document it
+	  - Create a new VE.pm module to host pb_ve_launch (from pb code
+	  now reusable for pbmkbm)
+
+2011-06-25  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1318] - Adds codename for debian 7 and Ubuntu 11.10
+
+2011-05-30  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1312] - Fix #103: ProjectBuilder::Env is needed by rpmbootstrap
+	  so should be under pb-modules
+	* [r1308] - Adds support for Fedora 15 (tested) and RHEL 6 (to be
+	  tested) for VE
+
+2011-04-16  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1299] - Working VVE for opensuse-11.4
+	  - some corresponding fixes for rpmbootstrap that would also need
+	  backward checks now
+
+2011-04-04  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1290] r4335@localhost: bruno | 2011-04-04 18:17:05 +0200
+	  - Remove useless list of man pages for (3) as it's automatically
+	  computed.
+
+2011-03-30  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1287]
+
+2011-03-28  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1284] - Arch Linux doesn't have a version. It's like gentoo
+
+2011-03-25  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1279] - Adds delivery of the public key to each repository
+	  ateach delivery
+	  - Fix debian repo build
+	  - Adds suport for .deb package signing
+
+2011-03-24  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1278] r4314@localhost: bruno | 2011-03-24 22:18:22 +0100
+	  - Adds RPM signature support and doc
+	* [r1277] r4302@localhost: bruno | 2011-03-18 17:48:34 +0100
+	  - Fix type in devbootstrap instead of debootstrap
+
+2011-03-22  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1276] - Adds support for different sha algorithms for
+	  createrepo call, due to some distro with python 2.4 not
+	  supporting sha256.
+
+2011-03-11  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1254] - Adds mdkonline as a dependency for Mandriva VE builds
+	  (at least afetr 2010.1) to have urpmi.update
+
+2011-03-09  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1245] - Fix rpm repo installation for pb (missing arch)
+	  - Add support for sources.list pb repo installation for deb based
+	  distro. Fix for #81.
+	* [r1244] - No repo provided for CentOS so file install. May fix
+	  #81.
+	* [r1243] - Announce of 0.11.1
+	  - Some more fixes for full path commands with sudo (older rhel)
+
+2011-02-27  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1240] - Fix sudo calls for sles/suse with full path
+
+2011-02-24  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1217] - *tmout param is optional and now handled and documented
+	  as such
+	* [r1216] - rmntpcmd, vmhost, vmmem, vmntpcmd and vmsize have OS
+	  keys and not project keys. Fixed in doc and code.
+	  - Document [web]sshdir|port|login|host
+	  - pb_date2v needs the pbos as param to deal with *ntpcmd
+	  correctly. $v param removed as a consequence.
+
+2011-02-23  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1215] - Fix #83. rmntp is indeed optional. But rmntpcmd is
+	  mandatory as used to be placed at setup time in the sudoers file
+	  in order to allow its usage by root when needed from the build
+	  account
+
+2011-02-21  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1213] - Mageia distributions are now working wirh pb
+
+2011-02-20  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1212] - pb_mkdir_p doesn't return anything anymore. Test of
+	  return removed.
+	  - Packages installed are not using really the install command not
+	  the update one.
+
+2011-02-18  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1206]
+	* [r1204] - Add debian 6.0 build support and VMs
+	  - use --no-suggests for urpmi to allow for minimal chorrot build
+	  - Adapt pbinit for website to new b structure (needs to be
+	  tested)
+	  - add afio build for debian based distro (and build it fr latest
+	  debian 6 and ubuntu 10.10)
+
+2011-02-17  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1198] - Fix sudoers format fr env_keep (at least on gentoo)
+	  - Fix pb_get_sudocmds to deal correctly with additional params,
+	  and handle correctly spaces before sudo
+	  - Add full path names on sudo commands for gentoo
+
+2011-02-16  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1192] - Fix pb_get_filters to also support filter based on os
+	  name and os-ver-arch as well to be coherent, and also fix bugs in
+	  the tests made for filter exitence.
+	  - Fix pb_changelog with test for correct pb hash values which
+	  were changed previously
+	  - Revert back using no arch subdir for deb based repo
+	  - Introduce new parameter oscmdpath to support external commands
+	  full path name easier (could also be very useful for MondoRescue)
+	  - Another set of fixes for sudo comands support: no parameter
+	  taken in account, replace localhost by ALL to avoid nightmares
+	  with VMs naming
+	* [r1191] - Fix a bug in conf file where a sudo cll had disappered
+	  for an apt-get command
+
+2011-02-15  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1190] - Fix bugs in sudoers generation (syntax issue)
+	  - Improve pb_get_sudocmds to remov duplicates, and take an
+	  additional list of commands to filter
+	  - Change pb_date2v interface to just return the line we want.
+
+2011-02-12  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1181] - Fix rpmbootstrap and pb newve order, which wasn't
+	  working after the latest pbos introduction
+	  - rpmbootstrap wasn't using the right conf file when launched
+	  with sudo is fixed by using the SUDO_USER env. var.
+	  - pb.conf rbsmirrorsrv now uses pbos var, and is filtered
+	  correctly.
+
+2011-02-11  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1179] r4166@localhost: bruno | 2011-02-11 11:55:19 +0100
+	  - Adds support for RM (Romte Machines) in addition to VE/VM
+	  - Detail security aspects in pb, especially for RM setup with
+	  sudo (to be improved) in file SECURITY in pb-doc
+	  - Use some full path names for commands to improve security with
+	  sudo (for RM). This should be externalized later on to support OS
+	  contexts.
+	  - pb_get_port function now needs the ref to the pbos
+	  - pb_get_sudocmds function added to provide the external list of
+	  commands called by sudo in osupd or osins
+	  - Adds codenames for Debian 6.0 and Ubuntu 11.04
+	  
+
+2011-02-07  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1177] r4161@eelzbach2: bruno | 2011-02-06 21:07:30 +0100
+	  - Introduction of a new hash $pbos to manage all os related info
+	  through a single data structure. All functions reviewed
+	  accordingly. Externally transparent, hopefully, but much cleaner
+	  code as a consequence. VM/VE/RM remains to be tested.
+	* [r1176] r4160@eelzbach2: bruno | 2011-02-06 13:30:39 +0100
+	  - Adds support for Remote Machines (RM). Not tested yet.
+
+2011-01-18  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1167] removedot only applies to the extension generated not to
+	  the rest of the distro ver (so filters have the right name, ...)
+
+2011-01-15  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1159] - Fix a bug in gentoo generation
+	  - redhat extension set by default to rh
+
+2011-01-13  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1157] - Introduce placholders for HP-UX port in pb.conf
+	* [r1156] - Adds a global variable REVISION for version management
+	  - Do not return in pb_send2target if pb file not available in
+	  order to shutdown VM in all cases
+	  - Code and test sbx2setupvm
+	  - setup_v now needs a fake pb_version_init fct added at the end
+	  of the script
+	  - Fix pbdistrocheck install comand printing
+	  - Fix mandralinux old distro build in pb.conf (Note only non
+	  symlink release files are important)
+
+2011-01-12  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1155] - Fix a bug in dir delivery due to the recent change
+	  using the arch subdir to avoid conflicts
+	  - Fix bug for ol mandrake release which were not built correctly
+	  due to configuration file issues (mix of mandrake and
+	  mandrakelinux)
+	* [r1153] - Avoid File::MimeInfo hard requirement. Only abort if
+	  not found when needed.
+	  - Improve report when a perl module is missing
+	  - Kill an existing crashed VM using an SSH port needed for
+	  another VM (should avoid crashed VM to stay when building for all
+	  VMs)
+	  - Use a new parameter vmbuildtm as a timeout before killing the
+	  VM (shoudl correspond to build + transfer time)
+	  - use twice the number of VMs for ports in the range for SSH
+	  communication to allow for VMs to finish in an unordered way.
+	  - Fix a bug in test modules when using Test simple only
+	  - Mail::Sendmail is now optional for Log module as well, even if
+	  not used yet
+	  - Update pb.conf doc with info for vmbuildtm and vmmem
+	  - Ready for 0.10.1
+
+2011-01-11  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1148] - Most modules now have a VERSION declared
+	  - Moulde Version.pm move to pb-modules due to that
+	* [r1147] - A inimal version of Test::More is required to perform
+	  test (especially on older version). Now fixed
+
+2011-01-06  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1137] - build2pkg is now using Parallel::ForkManager to
+	  generate packages in parallel
+	  - pb_system fixed to support parallel calls
+
+2010-12-23  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1133] - Adds related documentation to parameter changes of
+	  previous update
+	* [r1132] - Adds params to pb_distro_setuprepo to support generic
+	  family/os templates
+	  - Fix pbinstalltype issue (setupve was broken) by useing a dsitro
+	  based hash
+	  - Use new pb.conf variable (ospkg and osrepo for pkg install)
+	  - Adds function pb_distro_setuposrepo to setup pb install repo
+	  - Adds a private pb_distro_setuprepo_gen function for code share
+	  between pb_distro_setuposrepo and pb_distro_setuprepo
+	  - Move the relative conf parameters from pb.pb to pb.conf
+
+2010-12-22  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1131] r4123@localhost: bruno | 2010-12-22 19:15:45 +0100
+	  - Adds a default pbinstalltype for projects as pkg
+
+2010-12-21  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1128] - pb_check_requirements now takes direct result from
+	  pb_conf_get_if and does more internal work, which ease caller.
+	* [r1127] - Modify pb_check_req interface to return the found value
+	  and allow direct call
+	  - Use pb_check_req to avoid some hardcoded path
+
+2010-12-13  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1126] - Use potentially Sys::CPU if present to determine number
+	  of cores (1 by default)
+	  - Adds a conf param to force number of cores (pbparallel)
+	  - Adds doc for pbparallel, oscmd, oscmdopt
+
+2010-12-12  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1123] - Improve update commands for gentoo and debian as per
+	  #70 comments and fix it.
+
+2010-12-04  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1120] - remove the test on the '>' char in pb_stsem as there
+	  are too many false positive. Use "noredir" in pbinit of website
+	  instead.
+	  - Adds support for -t option to prepare a builbot or similar
+	  interface.
+
+2010-11-26  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1117] r4058@localhost: bruno | 2010-11-26 11:42:34 +0100
+	  - New Web site management with 4 targtes instead of only 2
+	  (sbx2webssh, ...)
+	* [r1115] r4056@localhost: bruno | 2010-11-25 19:38:07 +0100
+	  - Fix a bug in pb_system when using redirctions in the command
+
+2010-11-18  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1111] - Rename previous option osupd into the more correct
+	  osins, and add a real osupd param to support distribution update
+	  commands
+	  - Adds 2 new commands to update distributions in VM|VE with
+	  updatevm|ve (Fix #70)
+
+2010-11-17  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1109] r4041@localhost: bruno | 2010-11-17 11:40:41 +0100
+	  - Adds new configuration parameters (oschkcmd, oschkopt) to
+	  externalize package checking command
+	  - Adds new configuration parameters (pbinstalltype, pbpkg) to
+	  start allowing installation of pb in VM/VE with packages or files
+	  (this last is only needed by upstream)
+	  - Remove dependency on Mail::Sendmail to where it's really needed
+	  (part of Log, not used yet, and annouce). In particular this
+	  removes one non std dep for VE/VM build.
+	* [r1108]
+	* [r1107] r4032@localhost: bruno | 2010-11-08 15:51:53 +0100
+	  - Change dependency on Mail::Sendmail from use to require, as
+	  it's only used in pb_announce, so not in VE/VM
+
+2010-11-14  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1106] - Avoids to force a dep on Test::More. Just use Test and
+	  a fake test if Test::More is not available.
+	* [r1105] - No error message if chcon fails in setupvm
+	  - Add support for RHEL6 setupvm and improve Fedora as well
+
+2010-11-10  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1102] - Fix sbx2ssh call
+	  - Improve yum-arch call
+
+2010-11-04  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1100] - Adds fedora 14 support for rpmbootstrap
+
+2010-09-20  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1093] r4077@localhost: bruno | 2010-09-20 17:01:36 +0200
+	  - Improve Fedora 13 VE support
+
+2010-09-05  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1090] r4004@localhost: bruno | 2010-09-06 00:18:33 +0200
+	  - Fix #66: Adds log management (contribution from joachim).
+	  Starting point, as some more work has to be done around it.
+
+2010-08-08  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1081] - Solve most lintian errors for Ubuntu 10.04 - Prepare
+	  for another Debian submission
+
+2010-07-25  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1078] - Fix an issue in VE setup with the new delivery variable
+	  (forgot indirection)
+	  - Fix Mandriva 2010.1 VE built with right dep pkg list
+	* [r1077] r3961@localhost: bruno | 2010-07-22 22:39:23 +0200
+	  - Increase number of tests for Base
+	* [r1076] r3960@localhost: bruno | 2010-07-22 22:11:48 +0200
+	  - Fix a bug on pb_get_uri revealed by introduction of first
+	  successful set of tests ;-) (TBC)
+	  - Add support for mandriva 2010.1
+	* [r1074] - Adds rbsdeplist for Mandriva 2010.1 VE
+
+2010-07-12  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1072] r3953@sge91-1-82-234-15-218: bruno | 2010-07-11 23:43:35
+	  +0200
+	  - Fix partly #41 by externalizing the VM command in the new vmcmd
+	  option
+	* [r1071] r3947@sge91-1-82-234-15-218: bruno | 2010-07-10 18:40:35
+	  +0200
+	  - Adds function pb_distro_getlsb and make pbdistrocheck fully
+	  lsb_release compatible
+	* [r1067] r3941@sge91-1-82-234-15-218: bruno | 2010-06-30 17:25:48
+	  +0200
+	  Adds a new optional parameter for pb_distro_get_param (upper
+	  family such as linux)
+
+2010-06-27  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1066] r3935@dhcp184-49-175-19: bruno | 2010-06-26 08:40:49
+	  +0200
+	  - Adds new "Walt Disney" feature: possibility to deliver in
+	  multiple variable dirs, and not just / and test
+	* [r1064] r3931@dhcp184-49-175-19: bruno | 2010-06-26 08:02:59
+	  +0200
+	  - Adds the notion of os at the top in order to provide an even
+	  better tuple management
+
+2010-06-25  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1063] r3929@dhcp184-49-175-84: bruno | 2010-06-24 05:12:13
+	  +0200
+	  - Modify pb_display_file interface to allow printing to a logfile
+	  in addition if reqested to
+
+2010-06-21  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1060] r3906@wsip-70-165-197-185: bruno | 2010-06-20 08:04:11
+	  +0200
+	  - Force printing on stdout in pb_log if 0 level
+
+2010-06-13  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1052] r3866@localhost: bruno | 2010-06-09 23:43:23 +0200
+	  - Add support for LSB 3.2
+	* [r1050] r3864@localhost: bruno | 2010-06-09 23:41:19 +0200
+	  - remove all dots in version when asked to
+
+2010-06-07  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1038] - Update log files for 0.9.10 generation
+
+2010-06-04  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1036] - Add support for mirror server to debootstrap command
+
+2010-05-23  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1035] - Alternative download URL for Fedora (more complete ?)
+	  - no requiretty for root as well
+	  - VE for Mandriva 2009.1 now works (package list correct - no
+	  code change)
+
+2010-05-22  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1031] - the repodata dir is now search in the parents dir of
+	  the mirror given as it depends on yum version. CentOS 4 & 5,
+	  Fedora 12 OK.
+	  - Update perl modules versions (Date-Manip is now in 6.x, still
+	  using 5.x at the moment)
+	* [r1030] - Add support for Ubuntu 10.04 with debootstrap (universe
+	  repo needed)
+	  - Add support of option rbsopt for deb based distro
+
+2010-05-21  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1029] - Fix umask propagation in VE, fixing issues in directory
+	  creation with wrong rights
+	  - Remove the useless vemindep option and fix ospkgdep accordingly
+	  - Fix the rights for the dev dir in rpmbootstrap
+	* [r1027] - Adds rbsopt parameter + doc to allow for passing
+	  options to rpmbootstrap such as -k now by default.
+	  - Mandriva VE are now working (tested with 2010.0 + package list
+	  fixed)
+
+2010-04-28  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1015] Fixes to support ia64 chroot with centos5
+
+2010-04-14  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1008] Mandrake should keep their '.' in version name
+
+2010-04-12  Bruno Cornec <bruno@project-builder.org>
+
+	* [r1005] - Project-Builder.org is licensed under the GPL v2 for
+	  the moment.
+
+2010-03-03  Bruno Cornec <bruno@project-builder.org>
+
+	* [r993] r3719@localhost: bruno | 2010-03-03 19:10:43 +0100
+	  - Improvements for mandriva chroot. GPG check still not working
+	* [r992] r3713@localhost: bruno | 2010-03-02 23:13:29 +0100
+	  - Adds support for mandriva in rpmbootstrap - Not finished yet.
+	  chroot should be able to call urpmi
+
+2010-03-01  Bruno Cornec <bruno@project-builder.org>
+
+	* [r991] r3711@localhost: bruno | 2010-03-01 07:29:29 +0100
+	  - veconf => rbsconf
+	  - Adds option -a to rpmbootstrap in order for pb to automatically
+	  install the packages it needs
+	  - Check CentOS4 VE OK
+	  - Adds pb.conf man page to spec build
+
+2010-02-24  Bruno Cornec <bruno@project-builder.org>
+
+	* [r990] r3709@localhost: bruno | 2010-02-22 22:05:32 +0100
+	  - First addition of OpenSUSE support in rpmbootstrap
+
+2010-02-23  Bruno Cornec <bruno@project-builder.org>
+
+	* [r989] r3705@localhost: bruno | 2010-02-22 01:48:44 +0100
+	  - Improved pod format for pb.conf.pod
+	  - man page generated from pod now included in Makefile.PL and
+	  packages
+	  - Move the pod file into the etc conf dir
+
+2010-02-21  Bruno Cornec <bruno@project-builder.org>
+
+	* [r986] r3700@localhost: bruno | 2010-02-20 16:35:59 +0100
+	  - Continue to improve pb.conf documentation
+	  - veconf renamed as rbsconf
+	  - ve4pi renamed rbs4pi
+	  - new pb_get_postinstall generic function for rinse and
+	  rpmbootstrap
+	  - ventp/vmntp is now optional
+	  - licom_err needed by fedora 12
+	  - make rpmbootstrap work for i386 distros
+
+2010-02-20  Bruno Cornec <bruno@project-builder.org>
+
+	* [r984] - Fix fedora 12: now installing in VE with rpmbootstrap
+	  - First fully rpmbootstrap working version. Now needs more
+	  testing with other fedora versions, and opensuse/mandriva
+	  adaptation
+	* [r983] - rpmbootstrap good up to package name identification
+	  - fedora-12 package list updated
+
+2010-02-19  Bruno Cornec <bruno@project-builder.org>
+
+	* [r982] - Fix variable substitution which was too aggressive in
+	  pb_distro_get_param
+	* [r974] - Adds function pb_check_requirements and use it in pb
+	  - Adds some conf params for rpmbootstrap in conf file
+	  - pb_distro_get_param now can expand some variables before
+	  returning a value
+
+2010-02-18  Bruno Cornec <bruno@project-builder.org>
+
+	* [r971] - First packages built and delivered with deboostrap
+	  (solve the shell expansion which should not be done for VE)
+	  - Previous snapshot removed before trying to create a new one to
+	  avoid useless extraction
+
+2010-02-16  Bruno Cornec <bruno@project-builder.org>
+
+	* [r969] - Fix a bug for suffix computation, following the change
+	  of interface for pb_distro_get_param
+	  - pbdistrocheck now has a man page. Build files adapted
+	  accordingly
+
+2010-02-15  Bruno Cornec <bruno@project-builder.org>
+
+	* [r968] - Use pbsnap in pb_script2v instead of forcing no snapshot
+	  - use x86_64 arch for debian, and only amd64 for debootstrap call
+	  - debootstrap doesn't create a /etc/hosts file, so copy the local
+	  one in the VE
+	  - debian version do not include by default subversion (5.0 vs
+	  5.0.4)
+	  - Announce of pb pres at slideshare
+
+2010-02-08  Bruno Cornec <bruno@project-builder.org>
+
+	* [r964] r3659@localhost: bruno | 2010-02-07 02:02:22 +0100
+	  - Now we have debootstrap working (on Mandriva) for VE.
+	* [r963] r3658@localhost: bruno | 2010-02-07 00:15:25 +0100
+	  - Fix a bug in newve, by calling pb_distrib_init earlier to have
+	  the loading of the pb.conf main conf file, used to install
+	  default packages.
+
+2010-02-07  Bruno Cornec <bruno@project-builder.org>
+
+	* [r962] r3656@localhost: bruno | 2010-02-06 20:14:21 +0100
+	  - Adds a reference document for all configuration files
+	  parameters (half done)
+	  - Fix typo in pod format for Distribution.pm
+	  - Adds centos support for setup of VE
+
+2009-12-17  Bruno Cornec <bruno@project-builder.org>
+
+	* [r938] Adds LSB support description in conf file
+
+2009-12-05  Bruno Cornec <bruno@project-builder.org>
+
+	* [r932] - Improve conf when starting from scratch (pbproj
+	  undifined)
+	* [r931] - Fix a bug in the analysis of Build-Requires (middle
+	  packages were missed)
+
+2009-11-27  Bruno Cornec <bruno@project-builder.org>
+
+	* [r915] - Remove the dependency on GNU install in Makefile.PL in
+	  order to make it more portable (Solaris)
+
+2009-11-25  Bruno Cornec <bruno@project-builder.org>
+
+	* [r911] - Improve fedora deps for setupvm
+	* [r910] - Improve Solaris setupvm
+	  - Improve fedora 12 deps
+	* [r909] - setupvm for rhel-3
+
+2009-11-24  Bruno Cornec <bruno@project-builder.org>
+
+	* [r908] - Force bash usage in pb to be OS compatible
+	  - Solaris setupvm improvements
+	  - Module-Build is now version 0.35 by default
+	* [r907] - Other improvements for opensuse
+	  - Warn at end of newvm about sshd+root access needed in VM
+	* [r906] - Improves opensuse deps for setupvm
+
+2009-11-20  Bruno Cornec <bruno@project-builder.org>
+
+	* [r899] r3617@localhost: bruno | 2009-11-15 13:33:01 +0100
+	  Improve case where the build file description if undef (seen in
+	  cms2vm)
+
+2009-11-10  Bruno Cornec <bruno@project-builder.org>
+
+	* [r898] - Do not add conf files if already present in the list
+	  (changing pbconffiles into a hash for that to still keep order as
+	  this is mandatory)
+	  - Small optimisations for pb_conf function usage in pb
+
+2009-10-29  Bruno Cornec <bruno@project-builder.org>
+
+	* [r892] - remove call to bash to use generic sh. This has o be
+	  checked for compatibility issues
+	  - In conf file, when having a dependency on Module-Build, it has
+	  to be first, as some other may depend on it
+
+2009-10-28  Bruno Cornec <bruno@project-builder.org>
+
+	* [r891] - setuptvm now uses as well the conf file
+	  - removal of hardcoded stuff in pb_install_deps
+	  - conf file updated with new contetn for setupvm
+	  - Variable for the home dir (not /home on Solaris)
+
+2009-10-21  Bruno Cornec <bruno@project-builder.org>
+
+	* [r873] First round of Solaris fixes
+	* [r869] - function pb_distro_get now also uses the external
+	  pb.conf conf file. Nothing is hard coded anymore in the
+	  Distribution.pm which will make porting and adaptations by users
+	  much easier.
+	* [r867] - Transition static distribution into a configuration file
+	  typically /etc/pb/pb.conf
+	  - function pb_distro_init adapted to use the new conf file
+	  - function pb_distro_get_param adapted to support osfamily and
+	  ostype
+	  - Adapt the package building of pb to the need of the new
+	  configuration file
+
+2009-10-19  Bruno Cornec <bruno@project-builder.org>
+
+	* [r866] Prepare a new conf file for pb-modules, which will contain
+	  all the specificities of pb wrt distributions/OS and will allow
+	  to make it customizable by admin instead of coded inside the
+	  project
+
+2009-08-20  Bruno Cornec <bruno@project-builder.org>
+
+	* [r839] - Adds option support for pbdistrocheck (-v and -d)
+	  - Fix a bug on pbvi/pbg for function having binary in their name
+
+2009-07-14  Bruno Cornec <bruno@project-builder.org>
+
+	* [r829] r3259@localhost: bruno | 2009-07-12 19:59:58 +0200
+	  Adds an Augeas lense to project-builder to make conf file
+	  analysis more easy.
+
+2009-05-03  Bruno Cornec <bruno@project-builder.org>
+
+	* [r768] - No snapshot needed if creating the VM
+	  - Remove the VE befor recreating it if snapshot
+	  - Force yum update
+
+2009-04-04  Bruno Cornec <bruno@project-builder.org>
+
+	* [r757] Should initialize arch systematically
+	* [r756] pb_distro_init now returns a 7th paramater which is the
+	  arch, useful for pbdistrocheck
+
+2009-03-30  Bruno Cornec <bruno@project-builder.org>
+
+	* [r751] - Adds snapshot support for VEs
+	  - Force usage of correct arch in pb_distro_init to avoid issues
+	  when cross building
+	* [r750] - pb_distro_init accepts now a third parameter (arch) in
+	  order to force the setup of the update command for VEs
+	* [r749] - pb_get_arch placed lower in the modules tree and used
+	  everywhere uname was used
+	  - Adds the possibility to replace the post-install script for
+	  rinse to allow for a perl script replacement which is common
+	  between distributions
+
+2009-03-12  Bruno Cornec <bruno@project-builder.org>
+
+	* [r735] - pb now differentiates suse (aka SuSE Professional) and
+	  opensuse. Fix original #40
+
+2009-03-06  Bruno Cornec <bruno@project-builder.org>
+
+	* [r721] - Adds support for pre and post scripts for VM/VE launched
+	  before and after the build to allow for local setup.
+	  - Adds additional repo support for debian type as well.
+	  - Fix a bug around architecture compatibility check.
+	  - Transmit verbosity level
+	  - Adds support for proxy environment variables at setup and build
+	  time
+	  - Do not reinstall a repo which was already there (except for
+	  urpmi)
+
+2009-03-05  Bruno Cornec <bruno@project-builder.org>
+
+	* [r717] Take only the major number of the version for asianux
+	* [r716] Fix for Asianux 2.0 support
+
+2009-03-04  Bruno Cornec <bruno@project-builder.org>
+
+	* [r715] Fix Asianux 3 support - still have to see for 2.2
+
+2009-03-02  Bruno Cornec <bruno@project-builder.org>
+
+	* [r714] Adds Asianux support to pb for MondoRescue official
+	  packages support
+
+2009-02-20  Bruno Cornec <bruno@project-builder.org>
+
+	* [r711] Use the directory /etc/pat/sources.list.d to put the new
+	  apt repo at build time. Much cleaner
+
+2009-02-19  Bruno Cornec <bruno@project-builder.org>
+
+	* [r702] - new function pb_distro_setuprepo (addition of repository
+	  on the fly at build time)
+	  - pb_get_dist_param => pb_distro_get_param and placed in
+	  Distribution
+	  - removal of last locale issue
+
+2009-02-18  Bruno Cornec <bruno@project-builder.org>
+
+	* [r698] - Tries to avoid an error msg on disconnect at end of
+	  announce by finishing session before
+	  - Fix debian build deps computation (checked on lenny)
+	* [r696] - Fix a bug in distro for dep install on deb type of
+	  distro
+	  - Adds a basic network config file for VE when not available
+
+2009-02-16  Bruno Cornec <bruno@project-builder.org>
+
+	* [r683] centos uses yum and not up2date (checked for 4)
+
+2009-02-15  Bruno Cornec <bruno@project-builder.org>
+
+	* [r681] - Differentiate between Scripts for VE and VM with 2 tags
+	  - Have a working newve, setupve and cms2ve sequence for rinse and
+	  centos5 at least (rest to be tested)
+	  - Planned usage of chroot (tested) and schroot (not tested)
+	  - Remove the external locale dependece to use the one provided by
+	  perl !
+	  - Fix CentOS support in Distribution module
+
+2009-01-14  Bruno Cornec <bruno@project-builder.org>
+
+	* [r652] - Improves SuSE 11.1 build
+	  - Improves ntp handling in VMs (depending on distro)
+	  - Removes > version deps type at the end of line also
+
+2009-01-10  Bruno Cornec <bruno@project-builder.org>
+
+	* [r647] Improve PATH variable on new SuSE distro so that yast2 is
+	  found
+
+2008-12-09  Bruno Cornec <bruno@project-builder.org>
+
+	* [r638] - Fix a bug in conf file handling when tag is using a '.'
+	  which wasn't supported by the regexp. Needed for ditribution
+	  names in vmopt/vmymout e.g.
+
+2008-12-01  Bruno Cornec <bruno@project-builder.org>
+
+	* [r623] - Adds preliminary support for rpm signing
+	  - Fix a bad bug in the call function of pb_distro_getdeps
+
+2008-11-30  Bruno Cornec <bruno@project-builder.org>
+
+	* [r622] - pb now uses pb_distro_installdeps in VM/VE setup
+	  - pb_get_distro => pb_distro_get for homogeneity
+	  - before installing packages, call the update of the pkg db
+	  before (may create issues, but is generally better)
+	  - Adds pb_distro_only_deps_needed to compute the packages in a
+	  list whose installation is really needed
+	* [r621] Adds function pb_distro_installdeps to automatically
+	  istall dependencies on distro before building
+
+2008-11-29  Bruno Cornec <bruno@project-builder.org>
+
+	* [r620] - change pb_distro_init interface and add a 6th parameter
+	  which is the update CLI to use for that distro.
+
+2008-10-17  Bruno Cornec <bruno@project-builder.org>
+
+	* [r591] Add support for RHAS 2.1 to pb as rhel-2.1
+
+2008-09-23  Bruno Cornec <bruno@project-builder.org>
+
+	* [r556] - Prepare a web delivery function
+	  - Creates a pbinit script for website for mondorescue
+	  - Adds a pb_set_content function
+
+2008-09-15  Bruno Cornec <bruno@project-builder.org>
+
+	* [r539] First attempt to code support for real/virtual names for
+	  packages in order to support perl naming in both Debian and RPM
+	  distributions
+
+2008-08-07  Bruno Cornec <bruno@project-builder.org>
+
+	* [r515] Te Display module is reusable so part of ProjectBuilder
+	  modules not pb
+	* [r514] Also generates man pages for the new Display module
+	* [r512] Transport pb_display functions using gettext from Base
+	  into a separate module to allow Base to have only basic perl deps
+	  only abd be used in setupvm easily.
+
+2008-08-05  Bruno Cornec <bruno@project-builder.org>
+
+	* [r505] - pb_conf_init introduced to allow projects using pb
+	  functions to setup the PBPROJ variable correctly, even when the
+	  code is expanded with macros.
+	  - doc fixes
+	* [r503] -Fix pb_system error msgs in case of verbose undef
+
+2008-08-03  Bruno Cornec <bruno@project-builder.org>
+
+	* [r500] - Working patch support added to pb (tested with buffer)
+	  - Filtering functions now handle also pointer on hashes (such as
+	  the new pb hash)
+	  - Filtering functions support new macro for patch support
+	  (PBPATCHSRC and PBPATCHCMD)
+	  - Env.pm now generates correct templates for patch support and
+	  uses the new pb hash
+	  - pb_cms_export extended to support file:// URI, and also
+	  supports an undef second param (no local export available)
+	  - In pb, hashes now include also the arch (for better patch
+	  support)
+	  - pb supports local CMS based patches, as well as external
+	  references (not tested yet)
+	  - New pb_get_arch function provided
+	  - New parameters for pb_system (mayfail and quiet)
+
+2008-07-10  Bruno Cornec <bruno@project-builder.org>
+
+	* [r495] - all global variables are prefixed with pb
+	  - First attempt at using locale and gettext
+	  - use of pb_display and pb_display_init added
+	  - Update presentation following RMLL 2008
+
+2008-06-05  Bruno Cornec <bruno@project-builder.org>
+
+	* [r482] Improves again pb_system for feedback of printed msgs
+
+2008-06-04  Bruno Cornec <bruno@project-builder.org>
+
+	* [r473] Working announce action for pb
+
+2008-06-03  Bruno Cornec <bruno@project-builder.org>
+
+	* [r471] announce function - begining of coding
+
+2008-05-02  Bruno Cornec <bruno@project-builder.org>
+
+	* [r424] - Fix a bug in Env.pm (forgot a use)
+	  - Fix a bug in pb_conf_get_fromfile_if (using last instead of
+	  next) and fix #24
+	* [r423] - Improved pbdistrocheck to support -v flags
+	  - Fix Ubuntu issue on distribution detection
+	  - some more pb_log added
+
+2008-04-26  Bruno Cornec <bruno@project-builder.org>
+
+	* [r416] move the pb_env_init function to a separate module to
+	  allow pbinit usage
+	* [r415] - Adds support for a build system conf file under
+	  $vmpath/.pbrc or $vepath/.pbrc
+	  - Fix .pm modes
+
+2008-04-25  Bruno Cornec <bruno@project-builder.org>
+
+	* [r409] - Document all reusable functions in pb
+	  - remove the useless pbproj parameter from pb_filter functions
+	  - Addition and use of pb_conf_init and pb_conf_add in pb
+	  - Addition and use of pb_conf_fromfile_if in Conf.pm
+	  - preparation for 0.9.1
+	  - Update of pbinit files for mondo to support the new interface
+	  of pb_filter functions
+
+2008-04-20  Bruno Cornec <bruno@project-builder.org>
+
+	* [r405] Split again function in modules to allow for usage with
+	  pbinit and easier reuse.
+	* [r403] Split of packages done and working.
+	* [r402] Split Base.pm and Distribution.pm to create a new
+	  perl-ProjectBuilder module (for CPAN submission as well)
+	* [r400] Add new directory pb-modules to host shared modules
+

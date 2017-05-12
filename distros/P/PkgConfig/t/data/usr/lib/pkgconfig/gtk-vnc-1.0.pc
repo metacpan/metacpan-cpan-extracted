@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: GTK-VNC
+Description: GTK widget for a VNC client
+Requires: gvnc-1.0 = 0.4.1, gtk+-2.0 >= 2.18.0
+Version: 0.4.1
+Libs: -L${libdir} -lgtk-vnc-1.0
+Cflags: -I${includedir}/gtk-vnc-1.0

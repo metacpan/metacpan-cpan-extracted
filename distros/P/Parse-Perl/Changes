@@ -1,0 +1,103 @@
+version 0.007; 2012-02-05
+
+  * bugfix: on Perls prior to 5.13.7, avoid source string being mutated
+    by parser plugin code such as Devel::Declare
+
+  * bugfix: on Perl 5.15.2 and above, avoid failure of a new assertion,
+    by using parse_stmtseq() rather than GRAMPROG
+
+  * port to Perl 5.15.5: PL_curstash is now reference-counted
+
+  * trigger custom op generation via Devel::CallChecker rather than by
+    hooking the underlying op checker
+
+  * new tests for context handling
+
+  * test $[ as part of lexical environment on Perls 5.15.5 and above,
+    where it has been reimplemented in the arybase module, with a
+    workaround for a bug in arybase
+
+  * test $[ as part of lexical environment on Perls 5.15.0 up to 5.15.2,
+    where it was previously expected to be removed but actually wasn't
+
+  * jump through another hoop to duck the compiler warning previously
+    noted to be unavoidable
+
+  * convert .cvsignore to .gitignore
+
+version 0.006; 2011-09-05
+
+  * port to Perl 5.15.1: pad_findmy_sv() is in the API, replacing the
+    provisional API pad_findmy()
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.005; 2010-11-21
+
+  * bugfix: on Perl 5.13.3 and above, maintain CvSTASH backrefences
+    correctly
+
+  * port to Perl 5.13.7: lex_start() is in the API and the meaning of
+    its third parameter changes; lex_end() disappears; cop_hints_hash
+    can be manipulated through a new API
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * jump through hoops to avoid compiler warnings, and add a comment
+    about an unavoidable compiler warning
+
+version 0.004; 2010-10-21
+
+  * port to Perl 5.13.6: append_elem() (newly in the API) renamed to
+    op_append_elem()
+
+  * in XS, provide a reserve definition of croak, so that the Perl_croak
+    circumlocution is avoided even with PERL_CORE defined
+
+version 0.003; 2010-09-20
+
+  * port to Perl 5.13.5: yyparse() takes a parameter
+
+  * don't skip tests for $[ on 5.13 and the future 5.14, now that $[
+    won't be removed until 5.15
+
+  * in XS, use gv_stashpvs() wherever appropriate
+
+  * use full stricture in test suite
+
+  * in test suite, make all numeric comparisons against $] stringify it
+    first, to avoid architecture-dependent problems with floating point
+    rounding giving it an unexpected numeric value
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+version 0.002; 2010-07-20
+
+  * make current_environment operator compile correctly when imported
+    lexically via Lexical::Import
+
+  * port to Perl 5.13.3: use CvGV_set()
+
+  * correct order of parse_perl() parameters in synopsis
+
+  * small doc rewording
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * in XS, use macros to avoid explicit passing of aTHX, in the manner
+    of the core
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.001; 2009-11-22
+
+  * port to Perl 5.11.2: different usage for pad_findmy()
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+version 0.000; 2009-10-20
+
+  * initial released version

@@ -1,0 +1,5091 @@
+        package Pugs::Grammar::Rule;
+        no strict 'refs';
+        use Pugs::Runtime::Match;
+        use Pugs::Runtime::Regex;
+        our %rule_terms;
+        our %variables;
+*pod_begin = do {
+  my $rule;
+  $rule = sub {
+
+    $_[3] = $_[2];
+    $_[2] = undef;
+    my $grammar = $_[0];
+    my $s       = $_[1];
+    no warnings 'substr', 'uninitialized', 'syntax';
+    my %pad;
+    my $m;
+    for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+      my %index;
+      my @match;
+      my %named;
+      my $bool = 1;
+      $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+      $m = Pugs::Runtime::Match->new(
+        {
+          str     => \$s,
+          from    => \( 0 + $pos ),
+          to      => \($pos),
+          bool    => \$bool,
+          match   => \@match,
+          named   => \%named,
+          capture => undef,
+        }
+      );
+      {
+        $bool = 0
+          unless (
+          ( $pad{I1669} = $pos or 1 )
+          && (
+            (
+              (
+                ( substr( $s, $pos ) =~ m/^((?:\n\r?|\r\n?))/ ) ? ( $pos += length($1) or 1 )
+                : 0
+              )
+              && (
+                ( substr( $s, $pos, 1 ) eq '=' ) ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && (
+                ( substr( $s, $pos, 1 ) eq 'e' ) ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && (
+                ( substr( $s, $pos, 1 ) eq 'n' ) ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && (
+                ( substr( $s, $pos, 1 ) eq 'd' ) ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && do {
+                while ( ( ( substr( $s, $pos ) =~ m/^((?!\n\r?|\r\n?).)/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) { }
+                $bool = 1;
+              }
+            )
+          )
+          || (
+            ( ( $bool = 1 ) && ( $pos = $pad{I1669} ) or 1 )
+            && (
+              ( substr( $s, $pos++, 1 ) ne '' )
+              && do {
+                while ( ( ( substr( $s, $pos ) =~ m/^((?!\n\r?|\r\n?).)/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) { }
+                $bool = 1;
+              }
+              && do {
+                my $prior = $::_V6_PRIOR_;
+                my $match = $grammar->pod_begin( $s, { p => $pos, args => {} }, undef );
+                $::_V6_PRIOR_ = $prior;
+                my $bool = ( !$match != 1 );
+                $pos = $match->to if $bool;
+                $match;
+              }
+            )
+          )
+          );
+      }
+      if ($bool) {
+        $::_V6_PRIOR_ = $rule;
+
+        #print "rule = $::_V6_PRIOR_ \n";
+        last;
+      }
+    }    # /for
+    $::_V6_MATCH_ = $m;
+    return $m;
+    }
+};    ## Signature for pod_begin
+#Data::Bind->sub_signature( \&pod_begin, );
+*pod_other = do {
+  my $rule;
+  $rule = sub {
+
+    $_[3] = $_[2];
+    $_[2] = undef;
+    my $grammar = $_[0];
+    my $s       = $_[1];
+    no warnings 'substr', 'uninitialized', 'syntax';
+    my %pad;
+    my $m;
+    for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+      my %index;
+      my @match;
+      my %named;
+      my $bool = 1;
+      $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+      $m = Pugs::Runtime::Match->new(
+        {
+          str     => \$s,
+          from    => \( 0 + $pos ),
+          to      => \($pos),
+          bool    => \$bool,
+          match   => \@match,
+          named   => \%named,
+          capture => undef,
+        }
+      );
+      {
+        $bool = 0
+          unless (
+          ( $pad{I1670} = $pos or 1 )
+          && (
+            (
+              (
+                ( substr( $s, $pos ) =~ m/^((?:\n\r?|\r\n?))/ ) ? ( $pos += length($1) or 1 )
+                : 0
+              )
+              && (
+                ( substr( $s, $pos, 1 ) eq '=' ) ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && (
+                ( substr( $s, $pos, 1 ) eq 'c' ) ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && (
+                ( substr( $s, $pos, 1 ) eq 'u' ) ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && (
+                ( substr( $s, $pos, 1 ) eq 't' ) ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && do {
+                while ( ( ( substr( $s, $pos ) =~ m/^((?!\n\r?|\r\n?).)/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) { }
+                $bool = 1;
+              }
+            )
+          )
+          || (
+            ( ( $bool = 1 ) && ( $pos = $pad{I1670} ) or 1 )
+            && (
+              ( substr( $s, $pos++, 1 ) ne '' )
+              && do {
+                while ( ( ( substr( $s, $pos ) =~ m/^((?!\n\r?|\r\n?).)/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) { }
+                $bool = 1;
+              }
+              && do {
+                my $prior = $::_V6_PRIOR_;
+                my $match = $grammar->pod_other( $s, { p => $pos, args => {} }, undef );
+                $::_V6_PRIOR_ = $prior;
+                my $bool = ( !$match != 1 );
+                $pos = $match->to if $bool;
+                $match;
+              }
+            )
+          )
+          );
+      }
+      if ($bool) {
+        $::_V6_PRIOR_ = $rule;
+
+        #print "rule = $::_V6_PRIOR_ \n";
+        last;
+      }
+    }    # /for
+    $::_V6_MATCH_ = $m;
+    return $m;
+    }
+};    ## Signature for pod_other
+#Data::Bind->sub_signature( \&pod_other, );
+*ws = do {
+  my $rule;
+  $rule = sub {
+
+    $_[3] = $_[2];
+    $_[2] = undef;
+    my $grammar = $_[0];
+    my $s       = $_[1];
+    no warnings 'substr', 'uninitialized', 'syntax';
+    my %pad;
+    my $m;
+    for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+      my %index;
+      my @match;
+      my %named;
+      my $bool = 1;
+      $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+      $m = Pugs::Runtime::Match->new(
+        {
+          str     => \$s,
+          from    => \( 0 + $pos ),
+          to      => \($pos),
+          bool    => \$bool,
+          match   => \@match,
+          named   => \%named,
+          capture => undef,
+        }
+      );
+      {
+        $bool = 0
+          unless (
+          (
+            ( $pad{I1671} = $pos or 1 )
+            && (
+              (
+                (
+                    ( substr( $s, $pos, 1 ) eq '#' )
+                  ? ( $pos += 1 or 1 )
+                  : 0
+                )
+                && do {
+                  while ( ( ( substr( $s, $pos ) =~ m/^((?!\n\r?|\r\n?).)/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) { }
+                  $bool = 1;
+                }
+              )
+            )
+            || (
+              ( ( $bool = 1 ) && ( $pos = $pad{I1671} ) or 1 )
+              && (
+                (
+                  ( substr( $s, $pos ) =~ m/^((?:\n\r?|\r\n?))/ ) ? ( $pos += length($1) or 1 )
+                  : 0
+                )
+                && (
+                  (
+                    (
+                      ( substr( $s, $pos, 1 ) eq '=' ) ? ( $pos += 1 or 1 )
+                      : 0
+                    )
+                    && (
+                      (
+                        ( $pad{I1672} = $pos or 1 )
+                        && (
+                          (
+                            (
+                              ( substr( $s, $pos, 1 ) eq 'b' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'e' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'g' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'i' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'n' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && do {
+                              my $prior = $::_V6_PRIOR_;
+                              my $match = $grammar->ws( $s, { p => $pos, args => {} }, undef );
+                              $::_V6_PRIOR_ = $prior;
+                              my $bool = ( !$match != 1 );
+                              $pos = $match->to if $bool;
+                              $match;
+                            }
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'E' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'N' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'D' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && do {
+                              while ( ( ( substr( $s, $pos ) =~ m/^((?!\n\r?|\r\n?).)/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) { }
+                              $bool = 1;
+                            }
+                            && do {
+                              while ( ( substr( $s, $pos++, 1 ) ne '' ) ) { }
+                              $bool = 1;
+                            }
+                          )
+                        )
+                        || (
+                          ( ( $bool = 1 ) && ( $pos = $pad{I1672} ) or 1 )
+                          && (
+                            (
+                              ( substr( $s, $pos, 1 ) eq 'b' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'e' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'g' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'i' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'n' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && do {
+                              my $prior = $::_V6_PRIOR_;
+                              my $match = $grammar->pod_begin( $s, { p => $pos, args => {} }, undef );
+                              $::_V6_PRIOR_ = $prior;
+                              my $bool = ( !$match != 1 );
+                              $pos = $match->to if $bool;
+                              $match;
+                            }
+                          )
+                        )
+                        || (
+                          ( ( $bool = 1 ) && ( $pos = $pad{I1672} ) or 1 )
+                          && (
+                            (
+                              ( substr( $s, $pos, 1 ) eq 'k' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'w' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'i' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'd' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && do {
+                              my $prior = $::_V6_PRIOR_;
+                              my $match = $grammar->pod_other( $s, { p => $pos, args => {} }, undef );
+                              $::_V6_PRIOR_ = $prior;
+                              my $bool = ( !$match != 1 );
+                              $pos = $match->to if $bool;
+                              $match;
+                            }
+                          )
+                        )
+                        || (
+                          ( ( $bool = 1 ) && ( $pos = $pad{I1672} ) or 1 )
+                          && (
+                            (
+                              ( substr( $s, $pos, 1 ) eq 'p' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'o' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'd' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && do {
+                              my $prior = $::_V6_PRIOR_;
+                              my $match = $grammar->pod_other( $s, { p => $pos, args => {} }, undef );
+                              $::_V6_PRIOR_ = $prior;
+                              my $bool = ( !$match != 1 );
+                              $pos = $match->to if $bool;
+                              $match;
+                            }
+                          )
+                        )
+                        || (
+                          ( ( $bool = 1 ) && ( $pos = $pad{I1672} ) or 1 )
+                          && (
+                            (
+                              ( substr( $s, $pos, 1 ) eq 'f' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'o' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'r' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && do {
+                              my $prior = $::_V6_PRIOR_;
+                              my $match = $grammar->pod_other( $s, { p => $pos, args => {} }, undef );
+                              $::_V6_PRIOR_ = $prior;
+                              my $bool = ( !$match != 1 );
+                              $pos = $match->to if $bool;
+                              $match;
+                            }
+                          )
+                        )
+                        || (
+                          ( ( $bool = 1 ) && ( $pos = $pad{I1672} ) or 1 )
+                          && (
+                            (
+                              ( substr( $s, $pos, 1 ) eq 'h' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'e' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'a' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq 'd' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && (
+                              ( substr( $s, $pos, 1 ) eq '1' ) ? ( $pos += 1 or 1 )
+                              : 0
+                            )
+                            && do {
+                              my $prior = $::_V6_PRIOR_;
+                              my $match = $grammar->pod_other( $s, { p => $pos, args => {} }, undef );
+                              $::_V6_PRIOR_ = $prior;
+                              my $bool = ( !$match != 1 );
+                              $pos = $match->to if $bool;
+                              $match;
+                            }
+                          )
+                        )
+                      )
+                      || ( $bool = 1 )
+                    )
+                  )
+                  || ( $bool = 1 )
+                )
+              )
+            )
+            || (
+              ( ( $bool = 1 ) && ( $pos = $pad{I1671} ) or 1 )
+              && (
+                  ( substr( $s, $pos ) =~ m/^(\s)/ )
+                ? ( $pos += length($1) or 1 )
+                : 0
+              )
+            )
+          )
+          && do {
+            while (
+              (
+                ( $pad{I1671} = $pos or 1 )
+                && (
+                  (
+                    (
+                        ( substr( $s, $pos, 1 ) eq '#' )
+                      ? ( $pos += 1 or 1 )
+                      : 0
+                    )
+                    && do {
+                      while ( ( ( substr( $s, $pos ) =~ m/^((?!\n\r?|\r\n?).)/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) { }
+                      $bool = 1;
+                    }
+                  )
+                )
+                || (
+                  ( ( $bool = 1 ) && ( $pos = $pad{I1671} ) or 1 )
+                  && (
+                    (
+                      ( substr( $s, $pos ) =~ m/^((?:\n\r?|\r\n?))/ ) ? ( $pos += length($1) or 1 )
+                      : 0
+                    )
+                    && (
+                      (
+                        (
+                          ( substr( $s, $pos, 1 ) eq '=' ) ? ( $pos += 1 or 1 )
+                          : 0
+                        )
+                        && (
+                          (
+                            ( $pad{I1672} = $pos or 1 )
+                            && (
+                              (
+                                (
+                                  ( substr( $s, $pos, 1 ) eq 'b' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'e' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'g' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'i' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'n' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && do {
+                                  my $prior = $::_V6_PRIOR_;
+                                  my $match = $grammar->ws( $s, { p => $pos, args => {} }, undef );
+                                  $::_V6_PRIOR_ = $prior;
+                                  my $bool = ( !$match != 1 );
+                                  $pos = $match->to if $bool;
+                                  $match;
+                                }
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'E' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'N' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'D' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && do {
+                                  while ( ( ( substr( $s, $pos ) =~ m/^((?!\n\r?|\r\n?).)/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) { }
+                                  $bool = 1;
+                                }
+                                && do {
+                                  while ( ( substr( $s, $pos++, 1 ) ne '' ) ) { }
+                                  $bool = 1;
+                                }
+                              )
+                            )
+                            || (
+                              ( ( $bool = 1 ) && ( $pos = $pad{I1672} ) or 1 )
+                              && (
+                                (
+                                  ( substr( $s, $pos, 1 ) eq 'b' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'e' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'g' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'i' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'n' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && do {
+                                  my $prior = $::_V6_PRIOR_;
+                                  my $match = $grammar->pod_begin( $s, { p => $pos, args => {} }, undef );
+                                  $::_V6_PRIOR_ = $prior;
+                                  my $bool = ( !$match != 1 );
+                                  $pos = $match->to if $bool;
+                                  $match;
+                                }
+                              )
+                            )
+                            || (
+                              ( ( $bool = 1 ) && ( $pos = $pad{I1672} ) or 1 )
+                              && (
+                                (
+                                  ( substr( $s, $pos, 1 ) eq 'k' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'w' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'i' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'd' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && do {
+                                  my $prior = $::_V6_PRIOR_;
+                                  my $match = $grammar->pod_other( $s, { p => $pos, args => {} }, undef );
+                                  $::_V6_PRIOR_ = $prior;
+                                  my $bool = ( !$match != 1 );
+                                  $pos = $match->to if $bool;
+                                  $match;
+                                }
+                              )
+                            )
+                            || (
+                              ( ( $bool = 1 ) && ( $pos = $pad{I1672} ) or 1 )
+                              && (
+                                (
+                                  ( substr( $s, $pos, 1 ) eq 'p' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'o' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'd' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && do {
+                                  my $prior = $::_V6_PRIOR_;
+                                  my $match = $grammar->pod_other( $s, { p => $pos, args => {} }, undef );
+                                  $::_V6_PRIOR_ = $prior;
+                                  my $bool = ( !$match != 1 );
+                                  $pos = $match->to if $bool;
+                                  $match;
+                                }
+                              )
+                            )
+                            || (
+                              ( ( $bool = 1 ) && ( $pos = $pad{I1672} ) or 1 )
+                              && (
+                                (
+                                  ( substr( $s, $pos, 1 ) eq 'f' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'o' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'r' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && do {
+                                  my $prior = $::_V6_PRIOR_;
+                                  my $match = $grammar->pod_other( $s, { p => $pos, args => {} }, undef );
+                                  $::_V6_PRIOR_ = $prior;
+                                  my $bool = ( !$match != 1 );
+                                  $pos = $match->to if $bool;
+                                  $match;
+                                }
+                              )
+                            )
+                            || (
+                              ( ( $bool = 1 ) && ( $pos = $pad{I1672} ) or 1 )
+                              && (
+                                (
+                                  ( substr( $s, $pos, 1 ) eq 'h' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'e' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'a' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq 'd' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && (
+                                  ( substr( $s, $pos, 1 ) eq '1' ) ? ( $pos += 1 or 1 )
+                                  : 0
+                                )
+                                && do {
+                                  my $prior = $::_V6_PRIOR_;
+                                  my $match = $grammar->pod_other( $s, { p => $pos, args => {} }, undef );
+                                  $::_V6_PRIOR_ = $prior;
+                                  my $bool = ( !$match != 1 );
+                                  $pos = $match->to if $bool;
+                                  $match;
+                                }
+                              )
+                            )
+                          )
+                          || ( $bool = 1 )
+                        )
+                      )
+                      || ( $bool = 1 )
+                    )
+                  )
+                )
+                || (
+                  ( ( $bool = 1 ) && ( $pos = $pad{I1671} ) or 1 )
+                  && (
+                      ( substr( $s, $pos ) =~ m/^(\s)/ )
+                    ? ( $pos += length($1) or 1 )
+                    : 0
+                  )
+                )
+              )
+              )
+            {
+            }
+            $bool = 1;
+          }
+          );
+      }
+      if ($bool) {
+        $::_V6_PRIOR_ = $rule;
+
+        #print "rule = $::_V6_PRIOR_ \n";
+        last;
+      }
+    }    # /for
+    $::_V6_MATCH_ = $m;
+    return $m;
+    }
+};    ## Signature for ws
+#Data::Bind->sub_signature( \&ws, );
+*ident = do {
+  my $rule;
+  $rule = sub {
+
+    $_[3] = $_[2];
+    $_[2] = undef;
+    my $grammar = $_[0];
+    my $s       = $_[1];
+    no warnings 'substr', 'uninitialized', 'syntax';
+    my %pad;
+    my $m;
+    for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+      my %index;
+      my @match;
+      my %named;
+      my $bool = 1;
+      $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+      $m = Pugs::Runtime::Match->new(
+        {
+          str     => \$s,
+          from    => \( 0 + $pos ),
+          to      => \($pos),
+          bool    => \$bool,
+          match   => \@match,
+          named   => \%named,
+          capture => undef,
+        }
+      );
+      {
+        $bool = 0
+          unless (
+          (
+            ( $pad{I1673} = $pos or 1 )
+            && (
+              (
+                ( substr( $s, $pos ) =~ m/^([[:alnum:]])/ ) ? ( $pos += length($1) or 1 )
+                : 0
+              )
+            )
+            || (
+              ( ( $bool = 1 ) && ( $pos = $pad{I1673} ) or 1 )
+              && (
+                ( substr( $s, $pos, 1 ) eq '_' ) ? ( $pos += 1 or 1 )
+                : 0
+              )
+            )
+            || (
+              ( ( $bool = 1 ) && ( $pos = $pad{I1673} ) or 1 )
+              && (
+                ( substr( $s, $pos, 2 ) eq '::' ) ? ( $pos += 2 or 1 )
+                : 0
+              )
+            )
+          )
+          && do {
+            while ( ( ( $pad{I1673} = $pos or 1 ) && ( ( ( substr( $s, $pos ) =~ m/^([[:alnum:]])/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) || ( ( ( $bool = 1 ) && ( $pos = $pad{I1673} ) or 1 ) && ( ( substr( $s, $pos, 1 ) eq '_' ) ? ( $pos += 1 or 1 ) : 0 ) ) || ( ( ( $bool = 1 ) && ( $pos = $pad{I1673} ) or 1 ) && ( ( substr( $s, $pos, 2 ) eq '::' ) ? ( $pos += 2 or 1 ) : 0 ) ) ) ) { }
+            $bool = 1;
+          }
+          );
+      }
+      if ($bool) {
+        $::_V6_PRIOR_ = $rule;
+
+        #print "rule = $::_V6_PRIOR_ \n";
+        last;
+      }
+    }    # /for
+    $::_V6_MATCH_ = $m;
+    return $m;
+    }
+};    ## Signature for ident
+#Data::Bind->sub_signature( \&ident, );
+*literal = do {
+  my $rule;
+  $rule = sub {
+
+    $_[3] = $_[2];
+    $_[2] = undef;
+    my $grammar = $_[0];
+    my $s       = $_[1];
+    no warnings 'substr', 'uninitialized', 'syntax';
+    my %pad;
+    my $m;
+    for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+      my %index;
+      my @match;
+      my %named;
+      my $bool = 1;
+      $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+      $m = Pugs::Runtime::Match->new(
+        {
+          str     => \$s,
+          from    => \( 0 + $pos ),
+          to      => \($pos),
+          bool    => \$bool,
+          match   => \@match,
+          named   => \%named,
+          capture => undef,
+        }
+      );
+      {
+        $bool = 0
+          unless do {
+          while ( ( ( $pad{I1674} = $pos or 1 ) && ( ( ( ( substr( $s, $pos, 1 ) eq '\\' ) ? ( $pos += 1 or 1 ) : 0 ) && ( substr( $s, $pos++, 1 ) ne '' ) ) ) || ( ( ( $bool = 1 ) && ( $pos = $pad{I1674} ) or 1 ) && ( ( substr( $s, $pos ) =~ m/^([^\'])/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) ) ) { }
+          $bool = 1;
+          };
+      }
+      if ($bool) {
+        $::_V6_PRIOR_ = $rule;
+
+        #print "rule = $::_V6_PRIOR_ \n";
+        last;
+      }
+    }    # /for
+    $::_V6_MATCH_ = $m;
+    return $m;
+    }
+};    ## Signature for literal
+#Data::Bind->sub_signature( \&literal, );
+*metasyntax = do {
+  my $rule;
+  $rule = sub {
+
+    $_[3] = $_[2];
+    $_[2] = undef;
+    my $grammar = $_[0];
+    my $s       = $_[1];
+    no warnings 'substr', 'uninitialized', 'syntax';
+    my %pad;
+    my $m;
+    for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+      my %index;
+      my @match;
+      my %named;
+      my $bool = 1;
+      $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+      $m = Pugs::Runtime::Match->new(
+        {
+          str     => \$s,
+          from    => \( 0 + $pos ),
+          to      => \($pos),
+          bool    => \$bool,
+          match   => \@match,
+          named   => \%named,
+          capture => undef,
+        }
+      );
+      {
+        $bool = 0
+          unless (
+          (
+            (
+              ( $pad{I1675} = $pos or 1 )
+              && (
+                (
+                  (
+                    ( substr( $s, $pos, 1 ) eq '\\' ) ? ( $pos += 1 or 1 )
+                    : 0
+                  )
+                  && ( substr( $s, $pos++, 1 ) ne '' )
+                )
+              )
+              || (
+                ( ( $bool = 1 ) && ( $pos = $pad{I1675} ) or 1 )
+                && (
+                  (
+                    ( substr( $s, $pos, 1 ) eq chr(39) ) ? ( $pos += 1 or 1 )
+                    : 0
+                  )
+                  && do {
+                    my $prior = $::_V6_PRIOR_;
+                    my $match = $grammar->literal( $s, { p => $pos, args => {} }, undef );
+                    $::_V6_PRIOR_ = $prior;
+                    my $bool = ( !$match != 1 );
+                    $pos = $match->to if $bool;
+                    $match;
+                  }
+                  && (
+                    ( substr( $s, $pos, 1 ) eq chr(39) ) ? ( $pos += 1 or 1 )
+                    : 0
+                  )
+                )
+              )
+              || (
+                ( ( $bool = 1 ) && ( $pos = $pad{I1675} ) or 1 )
+                && (
+                  (
+                    ( substr( $s, $pos, 1 ) eq '{' ) ? ( $pos += 1 or 1 )
+                    : 0
+                  )
+                  && do {
+                    my $prior = $::_V6_PRIOR_;
+                    my $match = $grammar->string_code( $s, { p => $pos, args => {} }, undef );
+                    $::_V6_PRIOR_ = $prior;
+                    my $bool = ( !$match != 1 );
+                    $pos = $match->to if $bool;
+                    $match;
+                  }
+                  && (
+                    ( substr( $s, $pos, 1 ) eq '}' ) ? ( $pos += 1 or 1 )
+                    : 0
+                  )
+                )
+              )
+              || (
+                ( ( $bool = 1 ) && ( $pos = $pad{I1675} ) or 1 )
+                && (
+                  (
+                    ( substr( $s, $pos, 1 ) eq '<' ) ? ( $pos += 1 or 1 )
+                    : 0
+                  )
+                  && do {
+                    my $prior = $::_V6_PRIOR_;
+                    my $match = $grammar->metasyntax( $s, { p => $pos, args => {} }, undef );
+                    $::_V6_PRIOR_ = $prior;
+                    my $bool = ( !$match != 1 );
+                    $pos = $match->to if $bool;
+                    $match;
+                  }
+                  && (
+                    ( substr( $s, $pos, 1 ) eq '>' ) ? ( $pos += 1 or 1 )
+                    : 0
+                  )
+                )
+              )
+              || (
+                ( ( $bool = 1 ) && ( $pos = $pad{I1675} ) or 1 )
+                && (
+                  ( substr( $s, $pos ) =~ m/^([^\>])/ ) ? ( $pos += length($1) or 1 )
+                  : 0
+                )
+              )
+            )
+            && do {
+              while (
+                (
+                  ( $pad{I1675} = $pos or 1 )
+                  && (
+                    (
+                      (
+                        ( substr( $s, $pos, 1 ) eq '\\' ) ? ( $pos += 1 or 1 )
+                        : 0
+                      )
+                      && ( substr( $s, $pos++, 1 ) ne '' )
+                    )
+                  )
+                  || (
+                    ( ( $bool = 1 ) && ( $pos = $pad{I1675} ) or 1 )
+                    && (
+                      (
+                        ( substr( $s, $pos, 1 ) eq chr(39) ) ? ( $pos += 1 or 1 )
+                        : 0
+                      )
+                      && do {
+                        my $prior = $::_V6_PRIOR_;
+                        my $match = $grammar->literal( $s, { p => $pos, args => {} }, undef );
+                        $::_V6_PRIOR_ = $prior;
+                        my $bool = ( !$match != 1 );
+                        $pos = $match->to if $bool;
+                        $match;
+                      }
+                      && (
+                        ( substr( $s, $pos, 1 ) eq chr(39) ) ? ( $pos += 1 or 1 )
+                        : 0
+                      )
+                    )
+                  )
+                  || (
+                    ( ( $bool = 1 ) && ( $pos = $pad{I1675} ) or 1 )
+                    && (
+                      (
+                        ( substr( $s, $pos, 1 ) eq '{' ) ? ( $pos += 1 or 1 )
+                        : 0
+                      )
+                      && do {
+                        my $prior = $::_V6_PRIOR_;
+                        my $match = $grammar->string_code( $s, { p => $pos, args => {} }, undef );
+                        $::_V6_PRIOR_ = $prior;
+                        my $bool = ( !$match != 1 );
+                        $pos = $match->to if $bool;
+                        $match;
+                      }
+                      && (
+                        ( substr( $s, $pos, 1 ) eq '}' ) ? ( $pos += 1 or 1 )
+                        : 0
+                      )
+                    )
+                  )
+                  || (
+                    ( ( $bool = 1 ) && ( $pos = $pad{I1675} ) or 1 )
+                    && (
+                      (
+                        ( substr( $s, $pos, 1 ) eq '<' ) ? ( $pos += 1 or 1 )
+                        : 0
+                      )
+                      && do {
+                        my $prior = $::_V6_PRIOR_;
+                        my $match = $grammar->metasyntax( $s, { p => $pos, args => {} }, undef );
+                        $::_V6_PRIOR_ = $prior;
+                        my $bool = ( !$match != 1 );
+                        $pos = $match->to if $bool;
+                        $match;
+                      }
+                      && (
+                        ( substr( $s, $pos, 1 ) eq '>' ) ? ( $pos += 1 or 1 )
+                        : 0
+                      )
+                    )
+                  )
+                  || (
+                    ( ( $bool = 1 ) && ( $pos = $pad{I1675} ) or 1 )
+                    && (
+                      ( substr( $s, $pos ) =~ m/^([^\>])/ ) ? ( $pos += length($1) or 1 )
+                      : 0
+                    )
+                  )
+                )
+                )
+              {
+              }
+              $bool = 1;
+            }
+          )
+          && do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'metasyntax' => ${$::_V6_MATCH_}    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+          }
+          );
+      }
+      if ($bool) {
+        $::_V6_PRIOR_ = $rule;
+
+        #print "rule = $::_V6_PRIOR_ \n";
+        last;
+      }
+    }    # /for
+    $::_V6_MATCH_ = $m;
+    return $m;
+    }
+};    ## Signature for metasyntax
+#Data::Bind->sub_signature( \&metasyntax, );
+*string_code = do {
+  my $rule;
+  $rule = sub {
+
+    $_[3] = $_[2];
+    $_[2] = undef;
+    my $grammar = $_[0];
+    my $s       = $_[1];
+    no warnings 'substr', 'uninitialized', 'syntax';
+    my %pad;
+    my $m;
+    for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+      my %index;
+      my @match;
+      my %named;
+      my $bool = 1;
+      $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+      $m = Pugs::Runtime::Match->new(
+        {
+          str     => \$s,
+          from    => \( 0 + $pos ),
+          to      => \($pos),
+          bool    => \$bool,
+          match   => \@match,
+          named   => \%named,
+          capture => undef,
+        }
+      );
+      {
+        $bool = 0
+          unless (
+          (
+            ( $pad{I1676} = $pos or 1 )
+            && (
+              (
+                (
+                  ( substr( $s, $pos, 1 ) eq '\\' ) ? ( $pos += 1 or 1 )
+                  : 0
+                )
+                && ( substr( $s, $pos++, 1 ) ne '' )
+              )
+            )
+            || (
+              ( ( $bool = 1 ) && ( $pos = $pad{I1676} ) or 1 )
+              && (
+                (
+                  ( substr( $s, $pos, 1 ) eq chr(39) ) ? ( $pos += 1 or 1 )
+                  : 0
+                )
+                && do {
+                  my $prior = $::_V6_PRIOR_;
+                  my $match = $grammar->literal( $s, { p => $pos, args => {} }, undef );
+                  $::_V6_PRIOR_ = $prior;
+                  my $bool = ( !$match != 1 );
+                  $pos = $match->to if $bool;
+                  $match;
+                }
+                && (
+                  ( substr( $s, $pos, 1 ) eq chr(39) ) ? ( $pos += 1 or 1 )
+                  : 0
+                )
+              )
+            )
+            || (
+              ( ( $bool = 1 ) && ( $pos = $pad{I1676} ) or 1 )
+              && (
+                (
+                  ( substr( $s, $pos, 1 ) eq '{' ) ? ( $pos += 1 or 1 )
+                  : 0
+                )
+                && do {
+                  my $prior = $::_V6_PRIOR_;
+                  my $match = $grammar->string_code( $s, { p => $pos, args => {} }, undef );
+                  $::_V6_PRIOR_ = $prior;
+                  my $bool = ( !$match != 1 );
+                  $pos = $match->to if $bool;
+                  $match;
+                }
+                && (
+                  ( substr( $s, $pos, 1 ) eq '}' ) ? ( $pos += 1 or 1 )
+                  : 0
+                )
+              )
+            )
+            || (
+              ( ( $bool = 1 ) && ( $pos = $pad{I1676} ) or 1 )
+              && (
+                ( substr( $s, $pos ) =~ m/^([^\}])/ ) ? ( $pos += length($1) or 1 )
+                : 0
+              )
+            )
+          )
+          && do {
+            while (
+              (
+                ( $pad{I1676} = $pos or 1 )
+                && (
+                  (
+                    (
+                      ( substr( $s, $pos, 1 ) eq '\\' ) ? ( $pos += 1 or 1 )
+                      : 0
+                    )
+                    && ( substr( $s, $pos++, 1 ) ne '' )
+                  )
+                )
+                || (
+                  ( ( $bool = 1 ) && ( $pos = $pad{I1676} ) or 1 )
+                  && (
+                    (
+                      ( substr( $s, $pos, 1 ) eq chr(39) ) ? ( $pos += 1 or 1 )
+                      : 0
+                    )
+                    && do {
+                      my $prior = $::_V6_PRIOR_;
+                      my $match = $grammar->literal( $s, { p => $pos, args => {} }, undef );
+                      $::_V6_PRIOR_ = $prior;
+                      my $bool = ( !$match != 1 );
+                      $pos = $match->to if $bool;
+                      $match;
+                    }
+                    && (
+                      ( substr( $s, $pos, 1 ) eq chr(39) ) ? ( $pos += 1 or 1 )
+                      : 0
+                    )
+                  )
+                )
+                || (
+                  ( ( $bool = 1 ) && ( $pos = $pad{I1676} ) or 1 )
+                  && (
+                    (
+                      ( substr( $s, $pos, 1 ) eq '{' ) ? ( $pos += 1 or 1 )
+                      : 0
+                    )
+                    && do {
+                      my $prior = $::_V6_PRIOR_;
+                      my $match = $grammar->string_code( $s, { p => $pos, args => {} }, undef );
+                      $::_V6_PRIOR_ = $prior;
+                      my $bool = ( !$match != 1 );
+                      $pos = $match->to if $bool;
+                      $match;
+                    }
+                    && (
+                      ( substr( $s, $pos, 1 ) eq '}' ) ? ( $pos += 1 or 1 )
+                      : 0
+                    )
+                  )
+                )
+                || (
+                  ( ( $bool = 1 ) && ( $pos = $pad{I1676} ) or 1 )
+                  && (
+                    ( substr( $s, $pos ) =~ m/^([^\}])/ ) ? ( $pos += length($1) or 1 )
+                    : 0
+                  )
+                )
+              )
+              )
+            {
+            }
+            $bool = 1;
+          }
+          );
+      }
+      if ($bool) {
+        $::_V6_PRIOR_ = $rule;
+
+        #print "rule = $::_V6_PRIOR_ \n";
+        last;
+      }
+    }    # /for
+    $::_V6_MATCH_ = $m;
+    return $m;
+    }
+};    ## Signature for string_code
+#Data::Bind->sub_signature( \&string_code, );
+*parsed_code = do {
+  my $rule;
+  $rule = sub {
+
+    $_[3] = $_[2];
+    $_[2] = undef;
+    my $grammar = $_[0];
+    my $s       = $_[1];
+    no warnings 'substr', 'uninitialized', 'syntax';
+    my %pad;
+    my $m;
+    for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+      my %index;
+      my @match;
+      my %named;
+      my $bool = 1;
+      $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+      $m = Pugs::Runtime::Match->new(
+        {
+          str     => \$s,
+          from    => \( 0 + $pos ),
+          to      => \($pos),
+          bool    => \$bool,
+          match   => \@match,
+          named   => \%named,
+          capture => undef,
+        }
+      );
+      {
+        $bool = 0
+          unless (
+          do {
+            my $prior = $::_V6_PRIOR_;
+            my $match = $grammar->string_code( $s, { p => $pos, args => {} }, undef );
+            $::_V6_PRIOR_ = $prior;
+            my $bool = ( !$match != 1 );
+            $pos = $match->to if $bool;
+            $match;
+          }
+          && do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return ( '{' . $::_V6_MATCH_ . '}' );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+          }
+          );
+      }
+      if ($bool) {
+        $::_V6_PRIOR_ = $rule;
+
+        #print "rule = $::_V6_PRIOR_ \n";
+        last;
+      }
+    }    # /for
+    $::_V6_MATCH_ = $m;
+    return $m;
+    }
+};    ## Signature for parsed_code
+#Data::Bind->sub_signature( \&parsed_code, );
+*named_capture_body = do {
+  my $rule;
+  $rule = sub {
+
+    $_[3] = $_[2];
+    $_[2] = undef;
+    my $grammar = $_[0];
+    my $s       = $_[1];
+    no warnings 'substr', 'uninitialized', 'syntax';
+    my %pad;
+    my $m;
+    for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+      my %index;
+      my @match;
+      my %named;
+      my $bool = 1;
+      $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+      $m = Pugs::Runtime::Match->new(
+        {
+          str     => \$s,
+          from    => \( 0 + $pos ),
+          to      => \($pos),
+          bool    => \$bool,
+          match   => \@match,
+          named   => \%named,
+          capture => undef,
+        }
+      );
+      {
+        $bool = 0
+          unless (
+          ( $pad{I1677} = $pos or 1 )
+          && (
+            (
+              (
+                  ( substr( $s, $pos, 1 ) eq '(' )
+                ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && do {
+                my $prior = $::_V6_PRIOR_;
+                my $match = $grammar->rule( $s, { p => $pos, args => {} }, undef );
+                $::_V6_PRIOR_ = $prior;
+                if ($match) {
+                  $named{'rule'} = $match;
+                  $pos = $match->to;
+                  1;
+                }
+                else { 0 }
+              }
+              && (
+                  ( substr( $s, $pos, 1 ) eq ')' )
+                ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && do {
+                $::_V6_MATCH_ = $m;
+                local $::_V6_SUCCEED = 1;
+                $m->data->{capture} = \(
+                  sub {
+                    return (
+                      {
+                        'capturing_group' => ${ $::_V6_MATCH_->{qw(rule)} }    # hash
+                      }
+                    );
+                    }
+                    ->()
+                );
+                $bool = $::_V6_SUCCEED;
+                $::_V6_MATCH_ = $m if $bool;
+                return $m if $bool;
+              }
+            )
+          )
+          || (
+            ( ( $bool = 1 ) && ( $pos = $pad{I1677} ) or 1 )
+            && (
+              (
+                  ( substr( $s, $pos, 1 ) eq '[' )
+                ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && do {
+                my $prior = $::_V6_PRIOR_;
+                my $match = $grammar->rule( $s, { p => $pos, args => {} }, undef );
+                $::_V6_PRIOR_ = $prior;
+                if ($match) {
+                  $named{'rule'} = $match;
+                  $pos = $match->to;
+                  1;
+                }
+                else { 0 }
+              }
+              && (
+                  ( substr( $s, $pos, 1 ) eq ']' )
+                ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && do {
+                $::_V6_MATCH_ = $m;
+                local $::_V6_SUCCEED = 1;
+                $m->data->{capture} = \(
+                  sub {
+                    return ( ${ $::_V6_MATCH_->{qw(rule)} } );
+                    }
+                    ->()
+                );
+                $bool = $::_V6_SUCCEED;
+                $::_V6_MATCH_ = $m if $bool;
+                return $m if $bool;
+              }
+            )
+          )
+          || (
+            ( ( $bool = 1 ) && ( $pos = $pad{I1677} ) or 1 )
+            && (
+              (
+                  ( substr( $s, $pos, 1 ) eq '<' )
+                ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && do {
+                my $prior = $::_V6_PRIOR_;
+                my $match = $grammar->metasyntax( $s, { p => $pos, args => {} }, undef );
+                $::_V6_PRIOR_ = $prior;
+                if ($match) {
+                  $named{'metasyntax'} = $match;
+                  $pos = $match->to;
+                  1;
+                }
+                else { 0 }
+              }
+              && (
+                  ( substr( $s, $pos, 1 ) eq '>' )
+                ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && do {
+                $::_V6_MATCH_ = $m;
+                local $::_V6_SUCCEED = 1;
+                $m->data->{capture} = \(
+                  sub {
+                    return ( ${ $::_V6_MATCH_->{qw(metasyntax)} } );
+                    }
+                    ->()
+                );
+                $bool = $::_V6_SUCCEED;
+                $::_V6_MATCH_ = $m if $bool;
+                return $m if $bool;
+              }
+            )
+          )
+          || (
+            ( ( $bool = 1 ) && ( $pos = $pad{I1677} ) or 1 )
+            && do {
+              $::_V6_MATCH_ = $m;
+              local $::_V6_SUCCEED = 1;
+              sub {
+                die("invalid alias syntax");
+                }
+                ->();
+              $::_V6_SUCCEED;
+            }
+          )
+          );
+      }
+      if ($bool) {
+        $::_V6_PRIOR_ = $rule;
+
+        #print "rule = $::_V6_PRIOR_ \n";
+        last;
+      }
+    }    # /for
+    $::_V6_MATCH_ = $m;
+    return $m;
+    }
+};    ## Signature for named_capture_body
+#Data::Bind->sub_signature( \&named_capture_body, );
+%variables = (
+  '$<' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless (
+            do {
+              my $prior = $::_V6_PRIOR_;
+              my $match = $grammar->ident( $s, { p => $pos, args => {} }, undef );
+              $::_V6_PRIOR_ = $prior;
+              if ($match) {
+                $named{'ident'} = $match;
+                $pos = $match->to;
+                1;
+              }
+              else { 0 }
+            }
+            && (
+                ( substr( $s, $pos, 1 ) eq '>' )
+              ? ( $pos += 1 or 1 )
+              : 0
+            )
+            && do {
+              $::_V6_MATCH_ = $m;
+              local $::_V6_SUCCEED = 1;
+              $m->data->{capture} = \(
+                sub {
+                  return (
+                    {
+                      'match_variable' => '$' . $::_V6_MATCH_->{qw(ident)}    # hash
+                    }
+                  );
+                  }
+                  ->()
+              );
+              $bool = $::_V6_SUCCEED;
+              $::_V6_MATCH_ = $m if $bool;
+              return $m if $bool;
+            }
+            );
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '$' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless (
+            ( $pad{I1678} = $pos or 1 )
+            && (
+              (
+                (
+                  (
+                      ( substr( $s, $pos ) =~ m/^([[:digit:]])/ )
+                    ? ( $pos += length($1) or 1 )
+                    : 0
+                  )
+                  && do {
+                    while ( ( ( substr( $s, $pos ) =~ m/^([[:digit:]])/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) { }
+                    $bool = 1;
+                  }
+                )
+                && do {
+                  $::_V6_MATCH_ = $m;
+                  local $::_V6_SUCCEED = 1;
+                  $m->data->{capture} = \(
+                    sub {
+                      return (
+                        {
+                          'match_variable' => '$' . $::_V6_MATCH_    # hash
+                        }
+                      );
+                      }
+                      ->()
+                  );
+                  $bool = $::_V6_SUCCEED;
+                  $::_V6_MATCH_ = $m if $bool;
+                  return $m if $bool;
+                }
+              )
+            )
+            || (
+              ( ( $bool = 1 ) && ( $pos = $pad{I1678} ) or 1 )
+              && (
+                (
+                  (
+                    ( substr( $s, $pos, 1 ) eq '^' ) ? ( $pos += 1 or 1 )
+                    : 0
+                  )
+                  || ( $bool = 1 )
+                )
+                && (
+                  (
+                    ( $pad{I1679} = $pos or 1 )
+                    && (
+                      (
+                        ( substr( $s, $pos ) =~ m/^([[:alnum:]])/ ) ? ( $pos += length($1) or 1 )
+                        : 0
+                      )
+                    )
+                    || (
+                      ( ( $bool = 1 ) && ( $pos = $pad{I1679} ) or 1 )
+                      && (
+                        ( substr( $s, $pos, 1 ) eq '_' ) ? ( $pos += 1 or 1 )
+                        : 0
+                      )
+                    )
+                    || (
+                      ( ( $bool = 1 ) && ( $pos = $pad{I1679} ) or 1 )
+                      && (
+                        (
+                          ( substr( $s, $pos, 1 ) eq ':' ) ? ( $pos += 1 or 1 )
+                          : 0
+                        )
+                        && (
+                          ( substr( $s, $pos, 1 ) eq ':' ) ? ( $pos += 1 or 1 )
+                          : 0
+                        )
+                      )
+                    )
+                  )
+                  && do {
+                    while ( ( ( $pad{I1679} = $pos or 1 ) && ( ( ( substr( $s, $pos ) =~ m/^([[:alnum:]])/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) || ( ( ( $bool = 1 ) && ( $pos = $pad{I1679} ) or 1 ) && ( ( substr( $s, $pos, 1 ) eq '_' ) ? ( $pos += 1 or 1 ) : 0 ) ) || ( ( ( $bool = 1 ) && ( $pos = $pad{I1679} ) or 1 ) && ( ( ( substr( $s, $pos, 1 ) eq ':' ) ? ( $pos += 1 or 1 ) : 0 ) && ( ( substr( $s, $pos, 1 ) eq ':' ) ? ( $pos += 1 or 1 ) : 0 ) ) ) ) ) { }
+                    $bool = 1;
+                  }
+                )
+                && do {
+                  $::_V6_MATCH_ = $m;
+                  local $::_V6_SUCCEED = 1;
+                  $m->data->{capture} = \(
+                    sub {
+                      return (
+                        {
+                          'variable' => '$' . $::_V6_MATCH_    # hash
+                        }
+                      );
+                      }
+                      ->()
+                  );
+                  $bool = $::_V6_SUCCEED;
+                  $::_V6_MATCH_ = $m if $bool;
+                  return $m if $bool;
+                }
+              )
+            )
+            );
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '@' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless (
+            ( $pad{I1680} = $pos or 1 )
+            && (
+              (
+                (
+                  (
+                      ( substr( $s, $pos ) =~ m/^([[:digit:]])/ )
+                    ? ( $pos += length($1) or 1 )
+                    : 0
+                  )
+                  && do {
+                    while ( ( ( substr( $s, $pos ) =~ m/^([[:digit:]])/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) { }
+                    $bool = 1;
+                  }
+                )
+                && do {
+                  $::_V6_MATCH_ = $m;
+                  local $::_V6_SUCCEED = 1;
+                  $m->data->{capture} = \(
+                    sub {
+                      return (
+                        {
+                          'match_variable' => '@' . $::_V6_MATCH_    # hash
+                        }
+                      );
+                      }
+                      ->()
+                  );
+                  $bool = $::_V6_SUCCEED;
+                  $::_V6_MATCH_ = $m if $bool;
+                  return $m if $bool;
+                }
+              )
+            )
+            || (
+              ( ( $bool = 1 ) && ( $pos = $pad{I1680} ) or 1 )
+              && (
+                (
+                  (
+                    ( substr( $s, $pos, 1 ) eq '^' ) ? ( $pos += 1 or 1 )
+                    : 0
+                  )
+                  || ( $bool = 1 )
+                )
+                && (
+                  (
+                    ( $pad{I1681} = $pos or 1 )
+                    && (
+                      (
+                        ( substr( $s, $pos ) =~ m/^([[:alnum:]])/ ) ? ( $pos += length($1) or 1 )
+                        : 0
+                      )
+                    )
+                    || (
+                      ( ( $bool = 1 ) && ( $pos = $pad{I1681} ) or 1 )
+                      && (
+                        ( substr( $s, $pos, 1 ) eq '_' ) ? ( $pos += 1 or 1 )
+                        : 0
+                      )
+                    )
+                    || (
+                      ( ( $bool = 1 ) && ( $pos = $pad{I1681} ) or 1 )
+                      && (
+                        (
+                          ( substr( $s, $pos, 1 ) eq ':' ) ? ( $pos += 1 or 1 )
+                          : 0
+                        )
+                        && (
+                          ( substr( $s, $pos, 1 ) eq ':' ) ? ( $pos += 1 or 1 )
+                          : 0
+                        )
+                      )
+                    )
+                  )
+                  && do {
+                    while ( ( ( $pad{I1681} = $pos or 1 ) && ( ( ( substr( $s, $pos ) =~ m/^([[:alnum:]])/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) || ( ( ( $bool = 1 ) && ( $pos = $pad{I1681} ) or 1 ) && ( ( substr( $s, $pos, 1 ) eq '_' ) ? ( $pos += 1 or 1 ) : 0 ) ) || ( ( ( $bool = 1 ) && ( $pos = $pad{I1681} ) or 1 ) && ( ( ( substr( $s, $pos, 1 ) eq ':' ) ? ( $pos += 1 or 1 ) : 0 ) && ( ( substr( $s, $pos, 1 ) eq ':' ) ? ( $pos += 1 or 1 ) : 0 ) ) ) ) ) { }
+                    $bool = 1;
+                  }
+                )
+                && do {
+                  $::_V6_MATCH_ = $m;
+                  local $::_V6_SUCCEED = 1;
+                  $m->data->{capture} = \(
+                    sub {
+                      return (
+                        {
+                          'variable' => '@' . $::_V6_MATCH_    # hash
+                        }
+                      );
+                      }
+                      ->()
+                  );
+                  $bool = $::_V6_SUCCEED;
+                  $::_V6_MATCH_ = $m if $bool;
+                  return $m if $bool;
+                }
+              )
+            )
+            );
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '%' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless (
+            ( $pad{I1682} = $pos or 1 )
+            && (
+              (
+                (
+                  (
+                      ( substr( $s, $pos ) =~ m/^([[:digit:]])/ )
+                    ? ( $pos += length($1) or 1 )
+                    : 0
+                  )
+                  && do {
+                    while ( ( ( substr( $s, $pos ) =~ m/^([[:digit:]])/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) { }
+                    $bool = 1;
+                  }
+                )
+                && do {
+                  $::_V6_MATCH_ = $m;
+                  local $::_V6_SUCCEED = 1;
+                  $m->data->{capture} = \(
+                    sub {
+                      return (
+                        {
+                          'match_variable' => '%' . $::_V6_MATCH_    # hash
+                        }
+                      );
+                      }
+                      ->()
+                  );
+                  $bool = $::_V6_SUCCEED;
+                  $::_V6_MATCH_ = $m if $bool;
+                  return $m if $bool;
+                }
+              )
+            )
+            || (
+              ( ( $bool = 1 ) && ( $pos = $pad{I1682} ) or 1 )
+              && (
+                (
+                  (
+                    ( substr( $s, $pos, 1 ) eq '^' ) ? ( $pos += 1 or 1 )
+                    : 0
+                  )
+                  || ( $bool = 1 )
+                )
+                && (
+                  (
+                    ( $pad{I1683} = $pos or 1 )
+                    && (
+                      (
+                        ( substr( $s, $pos ) =~ m/^([[:alnum:]])/ ) ? ( $pos += length($1) or 1 )
+                        : 0
+                      )
+                    )
+                    || (
+                      ( ( $bool = 1 ) && ( $pos = $pad{I1683} ) or 1 )
+                      && (
+                        ( substr( $s, $pos, 1 ) eq '_' ) ? ( $pos += 1 or 1 )
+                        : 0
+                      )
+                    )
+                    || (
+                      ( ( $bool = 1 ) && ( $pos = $pad{I1683} ) or 1 )
+                      && (
+                        (
+                          ( substr( $s, $pos, 1 ) eq ':' ) ? ( $pos += 1 or 1 )
+                          : 0
+                        )
+                        && (
+                          ( substr( $s, $pos, 1 ) eq ':' ) ? ( $pos += 1 or 1 )
+                          : 0
+                        )
+                      )
+                    )
+                  )
+                  && do {
+                    while ( ( ( $pad{I1683} = $pos or 1 ) && ( ( ( substr( $s, $pos ) =~ m/^([[:alnum:]])/ ) ? ( $pos += length($1) or 1 ) : 0 ) ) || ( ( ( $bool = 1 ) && ( $pos = $pad{I1683} ) or 1 ) && ( ( substr( $s, $pos, 1 ) eq '_' ) ? ( $pos += 1 or 1 ) : 0 ) ) || ( ( ( $bool = 1 ) && ( $pos = $pad{I1683} ) or 1 ) && ( ( ( substr( $s, $pos, 1 ) eq ':' ) ? ( $pos += 1 or 1 ) : 0 ) && ( ( substr( $s, $pos, 1 ) eq ':' ) ? ( $pos += 1 or 1 ) : 0 ) ) ) ) ) { }
+                    $bool = 1;
+                  }
+                )
+                && do {
+                  $::_V6_MATCH_ = $m;
+                  local $::_V6_SUCCEED = 1;
+                  $m->data->{capture} = \(
+                    sub {
+                      return (
+                        {
+                          'variable' => '%' . $::_V6_MATCH_    # hash
+                        }
+                      );
+                      }
+                      ->()
+                  );
+                  $bool = $::_V6_SUCCEED;
+                  $::_V6_MATCH_ = $m if $bool;
+                  return $m if $bool;
+                }
+              )
+            )
+            );
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+    }
+);
+%rule_terms = (
+  '(' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless (
+            do {
+              my $prior = $::_V6_PRIOR_;
+              my $match = $grammar->rule( $s, { p => $pos, args => {} }, undef );
+              $::_V6_PRIOR_ = $prior;
+              if ($match) {
+                $named{'rule'} = $match;
+                $pos = $match->to;
+                1;
+              }
+              else { 0 }
+            }
+            && (
+                ( substr( $s, $pos, 1 ) eq ')' )
+              ? ( $pos += 1 or 1 )
+              : 0
+            )
+            && do {
+              $::_V6_MATCH_ = $m;
+              local $::_V6_SUCCEED = 1;
+              $m->data->{capture} = \(
+                sub {
+                  return (
+                    {
+                      'capturing_group' => ${ $::_V6_MATCH_->{qw(rule)} }    # hash
+                    }
+                  );
+                  }
+                  ->()
+              );
+              $bool = $::_V6_SUCCEED;
+              $::_V6_MATCH_ = $m if $bool;
+              return $m if $bool;
+            }
+            );
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '<(' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless (
+            do {
+              my $prior = $::_V6_PRIOR_;
+              my $match = $grammar->rule( $s, { p => $pos, args => {} }, undef );
+              $::_V6_PRIOR_ = $prior;
+              if ($match) {
+                $named{'rule'} = $match;
+                $pos = $match->to;
+                1;
+              }
+              else { 0 }
+            }
+            && (
+                ( substr( $s, $pos, 2 ) eq ')>' )
+              ? ( $pos += 2 or 1 )
+              : 0
+            )
+            && do {
+              $::_V6_MATCH_ = $m;
+              local $::_V6_SUCCEED = 1;
+              $m->data->{capture} = \(
+                sub {
+                  return (
+                    {
+                      'capture_as_result' => ${ $::_V6_MATCH_->{qw(rule)} }    # hash
+                    }
+                  );
+                  }
+                  ->()
+              );
+              $bool = $::_V6_SUCCEED;
+              $::_V6_MATCH_ = $m if $bool;
+              return $m if $bool;
+            }
+            );
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '<after' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless (
+            do {
+              my $prior = $::_V6_PRIOR_;
+              my $match = $grammar->ws( $s, { p => $pos, args => {} }, undef );
+              $::_V6_PRIOR_ = $prior;
+              my $bool = ( !$match != 1 );
+              $pos = $match->to if $bool;
+              $match;
+            }
+            && do {
+              my $prior = $::_V6_PRIOR_;
+              my $match = $grammar->rule( $s, { p => $pos, args => {} }, undef );
+              $::_V6_PRIOR_ = $prior;
+              if ($match) {
+                $named{'rule'} = $match;
+                $pos = $match->to;
+                1;
+              }
+              else { 0 }
+            }
+            && (
+                ( substr( $s, $pos, 1 ) eq '>' )
+              ? ( $pos += 1 or 1 )
+              : 0
+            )
+            && do {
+              $::_V6_MATCH_ = $m;
+              local $::_V6_SUCCEED = 1;
+              $m->data->{capture} = \(
+                sub {
+                  return (
+                    {
+                      'after' => { 'rule' => ${ $::_V6_MATCH_->{qw(rule)} } }    # hash
+                    }
+                  );
+                  }
+                  ->()
+              );
+              $bool = $::_V6_SUCCEED;
+              $::_V6_MATCH_ = $m if $bool;
+              return $m if $bool;
+            }
+            );
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '<before' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless (
+            do {
+              my $prior = $::_V6_PRIOR_;
+              my $match = $grammar->ws( $s, { p => $pos, args => {} }, undef );
+              $::_V6_PRIOR_ = $prior;
+              my $bool = ( !$match != 1 );
+              $pos = $match->to if $bool;
+              $match;
+            }
+            && do {
+              my $prior = $::_V6_PRIOR_;
+              my $match = $grammar->rule( $s, { p => $pos, args => {} }, undef );
+              $::_V6_PRIOR_ = $prior;
+              if ($match) {
+                $named{'rule'} = $match;
+                $pos = $match->to;
+                1;
+              }
+              else { 0 }
+            }
+            && (
+                ( substr( $s, $pos, 1 ) eq '>' )
+              ? ( $pos += 1 or 1 )
+              : 0
+            )
+            && do {
+              $::_V6_MATCH_ = $m;
+              local $::_V6_SUCCEED = 1;
+              $m->data->{capture} = \(
+                sub {
+                  return (
+                    {
+                      'before' => { 'rule' => ${ $::_V6_MATCH_->{qw(rule)} } }    # hash
+                    }
+                  );
+                  }
+                  ->()
+              );
+              $bool = $::_V6_SUCCEED;
+              $::_V6_MATCH_ = $m if $bool;
+              return $m if $bool;
+            }
+            );
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '<!before' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless (
+            do {
+              my $prior = $::_V6_PRIOR_;
+              my $match = $grammar->ws( $s, { p => $pos, args => {} }, undef );
+              $::_V6_PRIOR_ = $prior;
+              my $bool = ( !$match != 1 );
+              $pos = $match->to if $bool;
+              $match;
+            }
+            && do {
+              my $prior = $::_V6_PRIOR_;
+              my $match = $grammar->rule( $s, { p => $pos, args => {} }, undef );
+              $::_V6_PRIOR_ = $prior;
+              if ($match) {
+                $named{'rule'} = $match;
+                $pos = $match->to;
+                1;
+              }
+              else { 0 }
+            }
+            && (
+                ( substr( $s, $pos, 1 ) eq '>' )
+              ? ( $pos += 1 or 1 )
+              : 0
+            )
+            && do {
+              $::_V6_MATCH_ = $m;
+              local $::_V6_SUCCEED = 1;
+              $m->data->{capture} = \(
+                sub {
+                  return (
+                    {
+                      'not_before' => { 'rule' => ${ $::_V6_MATCH_->{qw(rule)} } }    # hash
+                    }
+                  );
+                  }
+                  ->()
+              );
+              $bool = $::_V6_SUCCEED;
+              $::_V6_MATCH_ = $m if $bool;
+              return $m if $bool;
+            }
+            );
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '<!' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless (
+            do {
+              my $prior = $::_V6_PRIOR_;
+              my $match = $grammar->metasyntax( $s, { p => $pos, args => {} }, undef );
+              $::_V6_PRIOR_ = $prior;
+              if ($match) {
+                $named{'metasyntax'} = $match;
+                $pos = $match->to;
+                1;
+              }
+              else { 0 }
+            }
+            && (
+                ( substr( $s, $pos, 1 ) eq '>' )
+              ? ( $pos += 1 or 1 )
+              : 0
+            )
+            && do {
+              $::_V6_MATCH_ = $m;
+              local $::_V6_SUCCEED = 1;
+              $m->data->{capture} = \(
+                sub {
+                  return (
+                    {
+                      'negate' => { 'metasyntax' => ${ $::_V6_MATCH_->{qw(metasyntax)} } }    # hash
+                    }
+                  );
+                  }
+                  ->()
+              );
+              $bool = $::_V6_SUCCEED;
+              $::_V6_MATCH_ = $m if $bool;
+              return $m if $bool;
+            }
+            );
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '<' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless (
+            do {
+              my $prior = $::_V6_PRIOR_;
+              my $match = $grammar->metasyntax( $s, { p => $pos, args => {} }, undef );
+              $::_V6_PRIOR_ = $prior;
+              if ($match) {
+                $named{'metasyntax'} = $match;
+                $pos = $match->to;
+                1;
+              }
+              else { 0 }
+            }
+            && (
+                ( substr( $s, $pos, 1 ) eq '>' )
+              ? ( $pos += 1 or 1 )
+              : 0
+            )
+            && do {
+              $::_V6_MATCH_ = $m;
+              local $::_V6_SUCCEED = 1;
+              $m->data->{capture} = \(
+                sub {
+                  return ( ${ $::_V6_MATCH_->{qw(metasyntax)} } );
+                  }
+                  ->()
+              );
+              $bool = $::_V6_SUCCEED;
+              $::_V6_MATCH_ = $m if $bool;
+              return $m if $bool;
+            }
+            );
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '{' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless (
+            do {
+              my $prior = $::_V6_PRIOR_;
+              my $match = $grammar->parsed_code( $s, { p => $pos, args => {} }, undef );
+              $::_V6_PRIOR_ = $prior;
+              if ($match) {
+                $named{'parsed_code'} = $match;
+                $pos = $match->to;
+                1;
+              }
+              else { 0 }
+            }
+            && (
+                ( substr( $s, $pos, 1 ) eq '}' )
+              ? ( $pos += 1 or 1 )
+              : 0
+            )
+            && do {
+              $::_V6_MATCH_ = $m;
+              local $::_V6_SUCCEED = 1;
+              $m->data->{capture} = \(
+                sub {
+                  return (
+                    {
+                      'closure' => ${ $::_V6_MATCH_->{qw(parsed_code)} }    # hash
+                    }
+                  );
+                  }
+                  ->()
+              );
+              $bool = $::_V6_SUCCEED;
+              $::_V6_MATCH_ = $m if $bool;
+              return $m if $bool;
+            }
+            );
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '\\' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless (
+            ( substr( $s, $pos++, 1 ) ne '' )
+            && do {
+              $::_V6_MATCH_ = $m;
+              local $::_V6_SUCCEED = 1;
+              $m->data->{capture} = \(
+                sub {
+                  return (
+                    {
+                      'special_char' => '\\' . $::_V6_MATCH_    # hash
+                    }
+                  );
+                  }
+                  ->()
+              );
+              $bool = $::_V6_SUCCEED;
+              $::_V6_MATCH_ = $m if $bool;
+              return $m if $bool;
+            }
+            );
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '.' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'dot' => 1    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '[' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless (
+            do {
+              my $prior = $::_V6_PRIOR_;
+              my $match = $grammar->rule( $s, { p => $pos, args => {} }, undef );
+              $::_V6_PRIOR_ = $prior;
+              if ($match) {
+                $named{'rule'} = $match;
+                $pos = $match->to;
+                1;
+              }
+              else { 0 }
+            }
+            && (
+                ( substr( $s, $pos, 1 ) eq ']' )
+              ? ( $pos += 1 or 1 )
+              : 0
+            )
+            && do {
+              $::_V6_MATCH_ = $m;
+              local $::_V6_SUCCEED = 1;
+              $m->data->{capture} = \(
+                sub {
+                  return ( ${ $::_V6_MATCH_->{qw(rule)} } );
+                  }
+                  ->()
+              );
+              $bool = $::_V6_SUCCEED;
+              $::_V6_MATCH_ = $m if $bool;
+              return $m if $bool;
+            }
+            );
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  ':::' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'colon' => ':::'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  ':?' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'colon' => ':?'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  ':+' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'colon' => ':+'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '::' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'colon' => '::'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  ':' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'colon' => ':'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '$$' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'colon' => '$$'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '$' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'colon' => '$'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '^^' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'colon' => '^^'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '^' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'colon' => '^'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '>>' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'colon' => '>>'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '»' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'colon' => '>'.'>'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '<' . '<' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'colon' => '<' . '<'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  '«' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'colon' => '<' . '<'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  ':i' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'modifier' => 'ignorecase'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  ':ignorecase' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'modifier' => 'ignorecase'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  ':s' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'modifier' => 'sigspace'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  ':sigspace' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'modifier' => 'sigspace'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  ':P5' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'modifier' => 'Perl5'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  ':Perl5' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'modifier' => 'Perl5'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  ':bytes' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'modifier' => 'bytes'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  ':codes' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'modifier' => 'codes'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  ':graphs' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'modifier' => 'graphs'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+  },
+  ':langs' => do {
+    my $rule;
+    $rule = sub {
+
+      my $s       = $_[0] || '';
+      my $grammar = $_[1] || __PACKAGE__;
+      $_[3] = $_[2];
+      $_[2] = undef;
+
+      no warnings 'substr', 'uninitialized', 'syntax';
+      my %pad;
+      my $m;
+      for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+        my %index;
+        my @match;
+        my %named;
+        my $bool = 1;
+        $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+        $m = Pugs::Runtime::Match->new(
+          {
+            str     => \$s,
+            from    => \( 0 + $pos ),
+            to      => \($pos),
+            bool    => \$bool,
+            match   => \@match,
+            named   => \%named,
+            capture => undef,
+          }
+        );
+        {
+          $bool = 0
+            unless do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'modifier' => 'langs'    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+            };
+        }
+        if ($bool) {
+          $::_V6_PRIOR_ = $rule;
+
+          #print "rule = $::_V6_PRIOR_ \n";
+          last;
+        }
+      }    # /for
+      $::_V6_MATCH_ = $m;
+      return $m;
+      }
+    }
+);
+*term = do {
+  my $rule;
+  $rule = sub {
+
+    $_[3] = $_[2];
+    $_[2] = undef;
+    my $grammar = $_[0];
+    my $s       = $_[1];
+    no warnings 'substr', 'uninitialized', 'syntax';
+    my %pad;
+    my $m;
+    for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+      my %index;
+      my @match;
+      my %named;
+      my $bool = 1;
+      $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+      $m = Pugs::Runtime::Match->new(
+        {
+          str     => \$s,
+          from    => \( 0 + $pos ),
+          to      => \($pos),
+          bool    => \$bool,
+          match   => \@match,
+          named   => \%named,
+          capture => undef,
+        }
+      );
+      {
+        $bool = 0
+          unless (
+          ( $pad{I1684} = $pos or 1 )
+          && (
+            (
+              do {
+                my $match = do {
+                  our $I1685;
+                  our $I1685_sizes;
+                  unless ($I1685) {
+                    my $hash = \%Pugs::Grammar::Rule::variables;
+                    my %sizes = map { length($_) => 1 } keys %$hash;
+                    $I1685_sizes = [ sort { $b <=> $a } keys %sizes ];
+                    $I1685 = $hash;
+                  }
+                  my $match = 0;
+                  my $key;
+                  for (@$I1685_sizes) {
+                    $key = (
+                      $pos <= length($s)
+                      ? substr( $s, $pos, $_ )
+                      : ''
+                    );
+                    if ( exists $I1685->{$key} ) {
+
+                      #$named{KEY} = $key;
+                      #$::_V6_MATCH_ = $m;
+                      #print "m: ", Dumper( $::_V6_MATCH_->data )
+                      #    if ( $key eq 'until' );
+                      $match = Pugs::Runtime::Regex::preprocess_hash( $I1685, $key )->( $s, $grammar, { p => ( $pos + $_ ), args => { KEY => $key } }, undef );
+                      last if $match;
+                    }
+                  }
+                  if ($match) {
+                    $pos = $match->to;
+
+                    #print "match: $key at $pos = ", Dumper( $match->data );
+                    $bool = 1;
+                  }
+                  ;    # else { $bool = 0 }
+                  $match;
+                };
+                if ($match) {
+                  $named{'Pugs::Grammar::Rule::variables'} = $match;
+                  $pos = $match->to;
+                  1;
+                }
+                else { 0 }
+              }
+              && (
+                ( $pad{I1686} = $pos or 1 )
+                && (
+                  (
+                    (
+                      do {
+                        my $prior = $::_V6_PRIOR_;
+                        my $match = $grammar->ws( $s, { p => $pos, args => {} }, undef );
+                        $::_V6_PRIOR_ = $prior;
+                        my $bool = ( !$match != 1 );
+                        $pos = $match->to if $bool;
+                        $match;
+                      }
+                      || ( $bool = 1 )
+                    )
+                    && (
+                        ( substr( $s, $pos, 2 ) eq ':=' )
+                      ? ( $pos += 2 or 1 )
+                      : 0
+                    )
+                    && (
+                      do {
+                        my $prior = $::_V6_PRIOR_;
+                        my $match = $grammar->ws( $s, { p => $pos, args => {} }, undef );
+                        $::_V6_PRIOR_ = $prior;
+                        my $bool = ( !$match != 1 );
+                        $pos = $match->to if $bool;
+                        $match;
+                      }
+                      || ( $bool = 1 )
+                    )
+                    && do {
+                      my $prior = $::_V6_PRIOR_;
+                      my $match = $grammar->named_capture_body( $s, { p => $pos, args => {} }, undef );
+                      $::_V6_PRIOR_ = $prior;
+                      if ($match) {
+                        $named{'named_capture_body'} = $match;
+                        $pos = $match->to;
+                        1;
+                      }
+                      else { 0 }
+                    }
+                    && do {
+                      $::_V6_MATCH_ = $m;
+                      local $::_V6_SUCCEED = 1;
+                      $m->data->{capture} = \(
+                        sub {
+                          return (
+                            {
+                              'named_capture' => {
+                                'rule'  => ${ $::_V6_MATCH_->{qw(named_capture_body)} },
+                                'ident' => ${ $::_V6_MATCH_->{qw(Pugs::Grammar::Rule::variables)} }    # hash
+                                }    # hash
+                            }
+                          );
+                          }
+                          ->()
+                      );
+                      $bool = $::_V6_SUCCEED;
+                      $::_V6_MATCH_ = $m if $bool;
+                      return $m if $bool;
+                    }
+                  )
+                )
+                || (
+                  ( ( $bool = 1 ) && ( $pos = $pad{I1686} ) or 1 )
+                  && do {
+                    $::_V6_MATCH_ = $m;
+                    local $::_V6_SUCCEED = 1;
+                    $m->data->{capture} = \(
+                      sub {
+                        return ( ${ $::_V6_MATCH_->{qw(Pugs::Grammar::Rule::variables)} } );
+                        }
+                        ->()
+                    );
+                    $bool = $::_V6_SUCCEED;
+                    $::_V6_MATCH_ = $m if $bool;
+                    return $m if $bool;
+                  }
+                )
+              )
+            )
+          )
+          || (
+            ( ( $bool = 1 ) && ( $pos = $pad{I1684} ) or 1 )
+            && (
+              do {
+                my $match = do {
+                  our $I1687;
+                  our $I1687_sizes;
+                  unless ($I1687) {
+                    my $hash = \%Pugs::Grammar::Rule::rule_terms;
+                    my %sizes = map { length($_) => 1 } keys %$hash;
+                    $I1687_sizes = [ sort { $b <=> $a } keys %sizes ];
+                    $I1687 = $hash;
+                  }
+                  my $match = 0;
+                  my $key;
+                  for (@$I1687_sizes) {
+                    $key = (
+                      $pos <= length($s)
+                      ? substr( $s, $pos, $_ )
+                      : ''
+                    );
+                    if ( exists $I1687->{$key} ) {
+
+                      #$named{KEY} = $key;
+                      #$::_V6_MATCH_ = $m;
+                      #print "m: ", Dumper( $::_V6_MATCH_->data )
+                      #    if ( $key eq 'until' );
+                      $match = Pugs::Runtime::Regex::preprocess_hash( $I1687, $key )->( $s, $grammar, { p => ( $pos + $_ ), args => { KEY => $key } }, undef );
+                      last if $match;
+                    }
+                  }
+                  if ($match) {
+                    $pos = $match->to;
+
+                    #print "match: $key at $pos = ", Dumper( $match->data );
+                    $bool = 1;
+                  }
+                  ;    # else { $bool = 0 }
+                  $match;
+                };
+                if ($match) {
+                  $named{'Pugs::Grammar::Rule::rule_terms'} = $match;
+                  $pos = $match->to;
+                  1;
+                }
+                else { 0 }
+              }
+              && do {
+                $::_V6_MATCH_ = $m;
+                local $::_V6_SUCCEED = 1;
+                $m->data->{capture} = \(
+                  sub {
+                    return ( ${ $::_V6_MATCH_->{qw(Pugs::Grammar::Rule::rule_terms)} } );
+                    }
+                    ->()
+                );
+                $bool = $::_V6_SUCCEED;
+                $::_V6_MATCH_ = $m if $bool;
+                return $m if $bool;
+              }
+            )
+          )
+          || (
+            ( ( $bool = 1 ) && ( $pos = $pad{I1684} ) or 1 )
+            && (
+              (
+                  ( substr( $s, $pos ) =~ m/^([^\]\}\)\>\:\?\+\*\|\&])/ )
+                ? ( $pos += length($1) or 1 )
+                : 0
+              )
+              && do {
+                $::_V6_MATCH_ = $m;
+                local $::_V6_SUCCEED = 1;
+                $m->data->{capture} = \(
+                  sub {
+                    return (
+                      {
+                        'constant' => ${$::_V6_MATCH_}    # hash
+                      }
+                    );
+                    }
+                    ->()
+                );
+                $bool = $::_V6_SUCCEED;
+                $::_V6_MATCH_ = $m if $bool;
+                return $m if $bool;
+              }
+            )
+          )
+          );
+      }
+      if ($bool) {
+        $::_V6_PRIOR_ = $rule;
+
+        #print "rule = $::_V6_PRIOR_ \n";
+        last;
+      }
+    }    # /for
+    $::_V6_MATCH_ = $m;
+    return $m;
+    }
+};    ## Signature for term
+#Data::Bind->sub_signature( \&term, );
+*quant = do {
+  my $rule;
+  $rule = sub {
+
+    $_[3] = $_[2];
+    $_[2] = undef;
+    my $grammar = $_[0];
+    my $s       = $_[1];
+    no warnings 'substr', 'uninitialized', 'syntax';
+    my %pad;
+    my $m;
+    for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+      my %index;
+      my @match;
+      my %named;
+      my $bool = 1;
+      $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+      $m = Pugs::Runtime::Match->new(
+        {
+          str     => \$s,
+          from    => \( 0 + $pos ),
+          to      => \($pos),
+          bool    => \$bool,
+          match   => \@match,
+          named   => \%named,
+          capture => undef,
+        }
+      );
+      {
+        $bool = 0
+          unless (
+          ( $pad{I1688} = $pos or 1 )
+          && (
+            (
+              (
+                  ( substr( $s, $pos, 2 ) eq '**' )
+                ? ( $pos += 2 or 1 )
+                : 0
+              )
+              && (
+                do {
+                  my $prior = $::_V6_PRIOR_;
+                  my $match = $grammar->ws( $s, { p => $pos, args => {} }, undef );
+                  $::_V6_PRIOR_ = $prior;
+                  my $bool = ( !$match != 1 );
+                  $pos = $match->to if $bool;
+                  $match;
+                }
+                || ( $bool = 1 )
+              )
+              && (
+                  ( substr( $s, $pos, 1 ) eq '{' )
+                ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && do {
+                my $prior = $::_V6_PRIOR_;
+                my $match = $grammar->parsed_code( $s, { p => $pos, args => {} }, undef );
+                $::_V6_PRIOR_ = $prior;
+                if ($match) {
+                  $named{'parsed_code'} = $match;
+                  $pos = $match->to;
+                  1;
+                }
+                else { 0 }
+              }
+              && (
+                  ( substr( $s, $pos, 1 ) eq '}' )
+                ? ( $pos += 1 or 1 )
+                : 0
+              )
+              && do {
+                $::_V6_MATCH_ = $m;
+                local $::_V6_SUCCEED = 1;
+                $m->data->{capture} = \(
+                  sub {
+                    return (
+                      {
+                        'closure' => ${ $::_V6_MATCH_->{qw(parsed_code)} }    # hash
+                      }
+                    );
+                    }
+                    ->()
+                );
+                $bool = $::_V6_SUCCEED;
+                $::_V6_MATCH_ = $m if $bool;
+                return $m if $bool;
+              }
+            )
+          )
+          || (
+            ( ( $bool = 1 ) && ( $pos = $pad{I1688} ) or 1 )
+            && (
+              (
+                  ( substr( $s, $pos ) =~ m/^([\?\*\+])/ )
+                ? ( $pos += length($1) or 1 )
+                : 0
+              )
+              || ( $bool = 1 )
+            )
+          )
+          );
+      }
+      if ($bool) {
+        $::_V6_PRIOR_ = $rule;
+
+        #print "rule = $::_V6_PRIOR_ \n";
+        last;
+      }
+    }    # /for
+    $::_V6_MATCH_ = $m;
+    return $m;
+    }
+};    ## Signature for quant
+#Data::Bind->sub_signature( \&quant, );
+*quantifier = do {
+  my $rule;
+  $rule = sub {
+
+    $_[3] = $_[2];
+    $_[2] = undef;
+    my $grammar = $_[0];
+    my $s       = $_[1];
+    no warnings 'substr', 'uninitialized', 'syntax';
+    my %pad;
+    my $m;
+    for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+      my %index;
+      my @match;
+      my %named;
+      my $bool = 1;
+      $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+      $m = Pugs::Runtime::Match->new(
+        {
+          str     => \$s,
+          from    => \( 0 + $pos ),
+          to      => \($pos),
+          bool    => \$bool,
+          match   => \@match,
+          named   => \%named,
+          capture => undef,
+        }
+      );
+      {
+        $bool = 0
+          unless (
+          do {
+            my $match = Pugs::Runtime::Match->new(
+              do {
+                my $bool = 1;
+                my $from = $pos;
+                my @match;
+                my %named;
+                $bool = 0 unless do {
+                  my $hash = do {
+                    my $bool = 1;
+                    my $from = $pos;
+                    my @match;
+                    my %named;
+                    $bool = 0
+                      unless (
+                      do {
+                        my $prior = $::_V6_PRIOR_;
+                        my $match = $grammar->ws( $s, { p => $pos, args => {} }, undef );
+                        $::_V6_PRIOR_ = $prior;
+                        my $bool = ( !$match != 1 );
+                        $pos = $match->to if $bool;
+                        $match;
+                      }
+                      || ( $bool = 1 )
+                      );
+                    { str => \$s, from => \$from, match => \@match, named => \%named, bool => \$bool, to => \( 0 + $pos ), capture => undef };
+                  };
+                  my $bool = ${ $hash->{'bool'} };
+                  $match[0] = Pugs::Runtime::Match->new($hash);
+                  $bool;
+                };
+                { str => \$s, from => \$from, match => \@match, named => \%named, bool => \$bool, to => \( 0 + $pos ), capture => undef };
+                }
+            );
+            if ($match) {
+              $named{'ws1'} = $match;
+              $pos = $match->to;
+              1;
+            }
+            else { 0 }
+          }
+          && do {
+            my $pos1 = $pos;
+            do {
+              my $pos  = $pos1;
+              my $from = $pos;
+              my @match;
+              my %named;
+              my $bool = 1;
+              $bool = 0
+                unless (
+                  ( substr( $s, $pos ) =~ m/^([\}\]\)\>])/ )
+                ? ( $pos += length($1) or 1 )
+                : 0
+                );
+              !$bool;
+            };
+          }
+          && do {
+            my $prior = $::_V6_PRIOR_;
+            my $match = $grammar->term( $s, { p => $pos, args => {} }, undef );
+            $::_V6_PRIOR_ = $prior;
+            if ($match) {
+              $named{'term'} = $match;
+              $pos = $match->to;
+              1;
+            }
+            else { 0 }
+          }
+          && do {
+            my $match = Pugs::Runtime::Match->new(
+              do {
+                my $bool = 1;
+                my $from = $pos;
+                my @match;
+                my %named;
+                $bool = 0 unless do {
+                  my $hash = do {
+                    my $bool = 1;
+                    my $from = $pos;
+                    my @match;
+                    my %named;
+                    $bool = 0
+                      unless (
+                      do {
+                        my $prior = $::_V6_PRIOR_;
+                        my $match = $grammar->ws( $s, { p => $pos, args => {} }, undef );
+                        $::_V6_PRIOR_ = $prior;
+                        my $bool = ( !$match != 1 );
+                        $pos = $match->to if $bool;
+                        $match;
+                      }
+                      || ( $bool = 1 )
+                      );
+                    { str => \$s, from => \$from, match => \@match, named => \%named, bool => \$bool, to => \( 0 + $pos ), capture => undef };
+                  };
+                  my $bool = ${ $hash->{'bool'} };
+                  $match[0] = Pugs::Runtime::Match->new($hash);
+                  $bool;
+                };
+                { str => \$s, from => \$from, match => \@match, named => \%named, bool => \$bool, to => \( 0 + $pos ), capture => undef };
+                }
+            );
+            if ($match) {
+              $named{'ws2'} = $match;
+              $pos = $match->to;
+              1;
+            }
+            else { 0 }
+          }
+          && do {
+            my $prior = $::_V6_PRIOR_;
+            my $match = $grammar->quant( $s, { p => $pos, args => {} }, undef );
+            $::_V6_PRIOR_ = $prior;
+            if ($match) {
+              $named{'quant'} = $match;
+              $pos = $match->to;
+              1;
+            }
+            else { 0 }
+          }
+          && do {
+            my $match = Pugs::Runtime::Match->new(
+              do {
+                my $bool = 1;
+                my $from = $pos;
+                my @match;
+                my %named;
+                $bool = 0 unless do {
+                  my $hash = do {
+                    my $bool = 1;
+                    my $from = $pos;
+                    my @match;
+                    my %named;
+                    $bool = 0
+                      unless (
+                      (
+                          ( substr( $s, $pos ) =~ m/^([\?\+])/ )
+                        ? ( $pos += length($1) or 1 )
+                        : 0
+                      )
+                      || ( $bool = 1 )
+                      );
+                    { str => \$s, from => \$from, match => \@match, named => \%named, bool => \$bool, to => \( 0 + $pos ), capture => undef };
+                  };
+                  my $bool = ${ $hash->{'bool'} };
+                  $match[0] = Pugs::Runtime::Match->new($hash);
+                  $bool;
+                };
+                { str => \$s, from => \$from, match => \@match, named => \%named, bool => \$bool, to => \( 0 + $pos ), capture => undef };
+                }
+            );
+            if ($match) {
+              $named{'greedy'} = $match;
+              $pos = $match->to;
+              1;
+            }
+            else { 0 }
+          }
+          && do {
+            my $match = Pugs::Runtime::Match->new(
+              do {
+                my $bool = 1;
+                my $from = $pos;
+                my @match;
+                my %named;
+                $bool = 0 unless do {
+                  my $hash = do {
+                    my $bool = 1;
+                    my $from = $pos;
+                    my @match;
+                    my %named;
+                    $bool = 0
+                      unless (
+                      do {
+                        my $prior = $::_V6_PRIOR_;
+                        my $match = $grammar->ws( $s, { p => $pos, args => {} }, undef );
+                        $::_V6_PRIOR_ = $prior;
+                        my $bool = ( !$match != 1 );
+                        $pos = $match->to if $bool;
+                        $match;
+                      }
+                      || ( $bool = 1 )
+                      );
+                    { str => \$s, from => \$from, match => \@match, named => \%named, bool => \$bool, to => \( 0 + $pos ), capture => undef };
+                  };
+                  my $bool = ${ $hash->{'bool'} };
+                  $match[0] = Pugs::Runtime::Match->new($hash);
+                  $bool;
+                };
+                { str => \$s, from => \$from, match => \@match, named => \%named, bool => \$bool, to => \( 0 + $pos ), capture => undef };
+                }
+            );
+            if ($match) {
+              $named{'ws3'} = $match;
+              $pos = $match->to;
+              1;
+            }
+            else { 0 }
+          }
+          && do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                return (
+                  {
+                    'quant' => {
+                      'term'   => ${ $::_V6_MATCH_->{'term'} },
+                      'quant'  => ${ $::_V6_MATCH_->{'quant'} },
+                      'greedy' => ${ $::_V6_MATCH_->{'greedy'} },
+                      'ws1'    => ${ $::_V6_MATCH_->{'ws1'} },
+                      'ws2'    => ${ $::_V6_MATCH_->{'ws2'} },
+                      'ws3'    => ${ $::_V6_MATCH_->{'ws3'} }       # hash
+                      }    # hash
+                  }
+                );
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+          }
+          );
+      }
+      if ($bool) {
+        $::_V6_PRIOR_ = $rule;
+
+        #print "rule = $::_V6_PRIOR_ \n";
+        last;
+      }
+    }    # /for
+    $::_V6_MATCH_ = $m;
+    return $m;
+    }
+};    ## Signature for quantifier
+#Data::Bind->sub_signature( \&quantifier, );
+*concat = do {
+  my $rule;
+  $rule = sub {
+
+    $_[3] = $_[2];
+    $_[2] = undef;
+    my $grammar = $_[0];
+    my $s       = $_[1];
+    no warnings 'substr', 'uninitialized', 'syntax';
+    my %pad;
+    my $m;
+    for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+      my %index;
+      my @match;
+      my %named;
+      my $bool = 1;
+      $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+      $m = Pugs::Runtime::Match->new(
+        {
+          str     => \$s,
+          from    => \( 0 + $pos ),
+          to      => \($pos),
+          bool    => \$bool,
+          match   => \@match,
+          named   => \%named,
+          capture => undef,
+        }
+      );
+      {
+        $bool = 0
+          unless (
+          (
+            do {
+              my $prior = $::_V6_PRIOR_;
+              my $match = $grammar->quantifier( $s, { p => $pos, args => {} }, undef );
+              $::_V6_PRIOR_ = $prior;
+              if ($match) {
+                push @{ $named{'quantifier'} }, $match;
+                $pos = $match->to;
+                1;
+              }
+              else { 0 }
+            }
+            && do {
+              while (
+                do {
+                  my $prior = $::_V6_PRIOR_;
+                  my $match = $grammar->quantifier( $s, { p => $pos, args => {} }, undef );
+                  $::_V6_PRIOR_ = $prior;
+                  if ($match) {
+                    push @{ $named{'quantifier'} }, $match;
+                    $pos = $match->to;
+                    1;
+                  }
+                  else { 0 }
+                }
+                )
+              {
+              }
+              $bool = 1;
+            }
+          )
+          && do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                my @a = map { $_->() } @{ $::_V6_MATCH_->{'quantifier'} };
+                return { concat => \@a, } if scalar @a > 1;
+                return $a[0];
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+          }
+          );
+      }
+      if ($bool) {
+        $::_V6_PRIOR_ = $rule;
+
+        #print "rule = $::_V6_PRIOR_ \n";
+        last;
+      }
+    }    # /for
+    $::_V6_MATCH_ = $m;
+    return $m;
+    }
+};    ## Signature for concat
+#Data::Bind->sub_signature( \&concat, );
+*rule = do {
+  my $rule;
+  $rule = sub {
+
+    $_[3] = $_[2];
+    $_[2] = undef;
+    my $grammar = $_[0];
+    my $s       = $_[1];
+    no warnings 'substr', 'uninitialized', 'syntax';
+    my %pad;
+    my $m;
+    for my $pos ( defined $_[3]{p} ? $_[3]{p} : ( 0 .. length($s) ) ) {
+      my %index;
+      my @match;
+      my %named;
+      my $bool = 1;
+      $named{KEY} = $_[3]{KEY} if exists $_[3]{KEY};
+      $m = Pugs::Runtime::Match->new(
+        {
+          str     => \$s,
+          from    => \( 0 + $pos ),
+          to      => \($pos),
+          bool    => \$bool,
+          match   => \@match,
+          named   => \%named,
+          capture => undef,
+        }
+      );
+      {
+        $bool = 0
+          unless (
+          (
+            (
+              (
+                do {
+                  my $prior = $::_V6_PRIOR_;
+                  my $match = $grammar->ws( $s, { p => $pos, args => {} }, undef );
+                  $::_V6_PRIOR_ = $prior;
+                  my $bool = ( !$match != 1 );
+                  $pos = $match->to if $bool;
+                  $match;
+                }
+                || ( $bool = 1 )
+              )
+              && (
+                  ( substr( $s, $pos, 1 ) eq '|' )
+                ? ( $pos += 1 or 1 )
+                : 0
+              )
+            )
+            || ( $bool = 1 )
+          )
+          && do {
+            my $prior = $::_V6_PRIOR_;
+            my $match = $grammar->concat( $s, { p => $pos, args => {} }, undef );
+            $::_V6_PRIOR_ = $prior;
+            if ($match) {
+              push @{ $named{'concat'} }, $match;
+              $pos = $match->to;
+              1;
+            }
+            else { 0 }
+          }
+          && do {
+            while (
+              (
+                (
+                    ( substr( $s, $pos, 1 ) eq '|' )
+                  ? ( $pos += 1 or 1 )
+                  : 0
+                )
+                && do {
+                  my $prior = $::_V6_PRIOR_;
+                  my $match = $grammar->concat( $s, { p => $pos, args => {} }, undef );
+                  $::_V6_PRIOR_ = $prior;
+                  if ($match) {
+                    push @{ $named{'concat'} }, $match;
+                    $pos = $match->to;
+                    1;
+                  }
+                  else { 0 }
+                }
+              )
+              )
+            {
+            }
+            $bool = 1;
+          }
+          && do {
+            $::_V6_MATCH_ = $m;
+            local $::_V6_SUCCEED = 1;
+            $m->data->{capture} = \(
+              sub {
+                my @a = map { $$_ } @{ $::_V6_MATCH_->{'concat'} };
+                return { alt => \@a, } if scalar @a > 1;
+                return $a[0];
+                }
+                ->()
+            );
+            $bool = $::_V6_SUCCEED;
+            $::_V6_MATCH_ = $m if $bool;
+            return $m if $bool;
+          }
+          );
+      }
+      if ($bool) {
+        $::_V6_PRIOR_ = $rule;
+
+        #print "rule = $::_V6_PRIOR_ \n";
+        last;
+      }
+    }    # /for
+    $::_V6_MATCH_ = $m;
+    return $m;
+    }
+};    ## Signature for rule
+#Data::Bind->sub_signature( \&rule, );
+
+1;

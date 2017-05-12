@@ -1,0 +1,30 @@
+Revision history for Plack-Middleware-ParseContent
+
+0.09  2016-04-14 16:41:07 CEST
+	Return HASH
+
+0.08  2016-04-11 15:30:06 CEST
+	Fixed params in request
+
+0.07  2016-04-09 18:48:39 CEST
+	Added enctype for all mime-types
+
+0.06  2016-04-08 00:10:07 CEST
+	Mixed post textarea and parameters to QUERY_STRING
+	Fixed utf8 encoding
+
+0.05  2015-05-19 12:57:43 CEST
+	Added application/x-www-form-urlencoded as default mime type.
+
+0.04  2015-04-08 08:37:25 CEST
+	Fixed POST for application/x-www-form-urlencoded
+
+0.03  2015-03-24 02:06:27 CET
+		Switched to milla
+		Change env key to parsecontent.data	
+
+0.02    5. Mar 2015
+        Fixed form parameters.
+
+0.01    22. Jan 2015
+        First version.

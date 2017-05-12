@@ -1,0 +1,10 @@
+Yet Another LALR(1) parser generator. Really intended for use as a backend
+for Parse::Vipar, a visual parser debugger. Yes, I know the name sucks.
+
+perl Makefile.PL
+make
+make test
+make install
+
+man Parse::YALALR::Run for more info. Or before you install it, you can do
+perldoc -F lib/Parse/YALALR/Run.pm

@@ -1,0 +1,32 @@
+SYNOPSIS
+
+DESCRIPTION
+
+FUNCTIONS
+
+ format($res, $format[ , $is_naked=0, $cleanse=1 ]) => str
+
+ENVIRONMENT
+
+ FORMAT_PRETTY_TABLE_BACKEND => str
+
+    If this is set, will render text table using Text::Table::Any (with
+    backend set to the value of this environment variable) instead of the
+    default Text::Table::Tiny. This is useful if you want to output text
+    table in a different format, for example to generate Org tables (make
+    sure Text::Table::Org backend is already installed):
+
+     % FORMAT_PRETTY_TABLE_BACKEND=Text::Table::Org lcpan rdeps Getopt::Lucid
+
+ FORMAT_PRETTY_TABLE_COLUMN_ORDERS => array (json)
+
+    Set the default of table_column_orders in format_options in result
+    metadata, similar to what's implemented in Perinci::Result::Format and
+    Data::Format::Pretty::Console.
+
+SEE ALSO
+
+    Perinci::Result::Format, a more heavyweight version of this module.
+
+    Perinci::CmdLine::Lite uses this module to format enveloped result.
+

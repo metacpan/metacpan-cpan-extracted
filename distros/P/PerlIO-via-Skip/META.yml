@@ -1,0 +1,24 @@
+---
+name: PerlIO-via-Skip
+version: 0.04
+author:
+  - 'Ioannis Tambouras <ioannis@cpan.org>'
+abstract: PerlIO layer for skipping lines
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 5.006
+recommends:
+  Test::Distribution: 1.22
+  Test::Exception: 0
+  Test::Pod: 1.20
+  Test::Pod::Coverage: 1.06
+provides:
+  PerlIO::via::Skip:
+    file: lib/PerlIO/via/Skip.pm
+    version: 0.04
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

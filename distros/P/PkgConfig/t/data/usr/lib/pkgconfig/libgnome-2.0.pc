@@ -1,0 +1,14 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+libgnome_serverdir=${prefix}/lib/libgnome
+localstatedir=/var
+
+Name: libgnome
+Description: libgnome
+Requires: glib-2.0 libbonobo-2.0
+Requires.private: ORBit-2.0 gconf-2.0 gnome-vfs-2.0 esound
+Version: 2.30.0
+Libs: -L${libdir} -lgnome-2 -lpopt
+Cflags: -I${includedir}/libgnome-2.0

@@ -1,0 +1,29 @@
+---
+abstract: 'Add standard (or custom) P3P header to response'
+author:
+  - 'Hans Staugaard <staugaard@cpan.org>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Plack::Builder: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-P3P
+requires:
+  Plack::Middleware: '0'
+  Plack::Util::Accessor: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://bitbucket.org/hstaugaard/plack-middleware-p3p/issues
+  homepage: https://bitbucket.org/hstaugaard/plack-middleware-p3p
+  repository: https://bitbucket.org/hstaugaard/plack-middleware-p3p
+version: '0.001'

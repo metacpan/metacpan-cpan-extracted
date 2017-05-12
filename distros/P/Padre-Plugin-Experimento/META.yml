@@ -1,0 +1,34 @@
+---
+abstract: 'Provides experimental features to Padre'
+author:
+  - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Locale::Msgfmt: 0.15
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Padre-Plugin-Experimento
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  IO::String: 1.08
+  Modern::Perl: 1.20120130
+  Padre: 0.94
+  Wx::Scintilla: 0.3801
+resources:
+  bugtracker: http://padre.perlide.org/
+  homepage: http://padre.perlide.org/trac/wiki/PadrePluginExperimento
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-Experimento
+version: 0.02

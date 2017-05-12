@@ -1,0 +1,65 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Decoration Lines1</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Decoration Lines1</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<A HREF=index.html>Decoration</A><BR>
+<B>Lines1</B>
+<P>
+<A HREF=#options>Options</A><BR>
+<P>
+
+    </TD><TD VALIGN=top>
+
+<A HREF=../../index.html>Portable Presenter</A> has a few modules
+which descibe how to decorate a slide.  The <EM>Lines1</EM> decoration-type
+shows a logo and a line.  If the <CODE>-decorationLineWidth</CODE> is set
+to <CODE>0</CODE>, the page will be without line.
+
+<H2><A NAME=options>Options</A></H2>
+
+None: the background colour of the specific device of the viewport is used.
+This is set with the <A HREF=index.html>general decoration</A> function
+<CODE>addDevice</CODE>.
+<P>
+<DL>
+<DT><B>-pageLogo            =&gt;</B> <I>image</I>
+<DD>The image to be displayed top-left on the page. The <I>image</I> can
+    be a <CODE>PPresenter::Image</CODE> object
+   (created with <CODE>$show->image</CODE>, see all about
+    see <A HREF=../image/index.html>images</A>)
+    <P>
+<DT><B>-pageLogoSpacing     =&gt;</B> <I>percentage</I>
+<DD>The space which is kept blank around the logo in all four directions.
+    Defaults to <CODE>1%</CODE>.
+    <P>
+<DT><B>-decorationLineWidth =&gt;</B> <I>pixels</I>
+<DD>Defaults to <CODE>2</CODE>.  A line-width of 0 will not show the line,
+    be still limit the space for text as if the line was present.
+    <P>
+<DT><B>-decorationLineColor =&gt;</B> <I>color</I>
+<DD>Defaults to the pen-color of the slide: the <CODE>-fgcolor</CODE>, which
+    is a generic decoration option, dependent on the type of device where
+    the slide is displayed on.
+</DL>
+
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

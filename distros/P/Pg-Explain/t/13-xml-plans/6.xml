@@ -1,0 +1,56 @@
+ <explain xmlns="http://www.postgresql.org/2009/explain">       +
+   <Query>                                                      +
+     <Plan>                                                     +
+       <Node-Type>Index Scan</Node-Type>                        +
+       <Scan-Direction>Forward</Scan-Direction>                 +
+       <Index-Name>pg_class_oid_index</Index-Name>              +
+       <Relation-Name>pg_class</Relation-Name>                  +
+       <Alias>pg_class</Alias>                                  +
+       <Startup-Cost>8.27</Startup-Cost>                        +
+       <Total-Cost>16.55</Total-Cost>                           +
+       <Plan-Rows>1</Plan-Rows>                                 +
+       <Plan-Width>198</Plan-Width>                             +
+       <Actual-Startup-Time>0.077</Actual-Startup-Time>         +
+       <Actual-Total-Time>0.078</Actual-Total-Time>             +
+       <Actual-Rows>1</Actual-Rows>                             +
+       <Actual-Loops>1</Actual-Loops>                           +
+       <Index-Cond>(oid = $1)</Index-Cond>                      +
+       <Plans>                                                  +
+         <Plan>                                                 +
+           <Node-Type>Index Scan</Node-Type>                    +
+           <Parent-Relationship>InitPlan</Parent-Relationship>  +
+           <Subplan-Name>InitPlan 2 (returns $1)</Subplan-Name> +
+           <Scan-Direction>Forward</Scan-Direction>             +
+           <Index-Name>pg_class_relname_nsp_index</Index-Name>  +
+           <Relation-Name>pg_class</Relation-Name>              +
+           <Alias>pg_class</Alias>                              +
+           <Startup-Cost>0.00</Startup-Cost>                    +
+           <Total-Cost>8.27</Total-Cost>                        +
+           <Plan-Rows>1</Plan-Rows>                             +
+           <Plan-Width>4</Plan-Width>                           +
+           <Actual-Startup-Time>0.015</Actual-Startup-Time>     +
+           <Actual-Total-Time>0.016</Actual-Total-Time>         +
+           <Actual-Rows>1</Actual-Rows>                         +
+           <Actual-Loops>1</Actual-Loops>                       +
+           <Index-Cond>(relname = 'pg_class'::name)</Index-Cond>+
+         </Plan>                                                +
+         <Plan>                                                 +
+           <Node-Type>Result</Node-Type>                        +
+           <Parent-Relationship>SubPlan</Parent-Relationship>   +
+           <Subplan-Name>SubPlan 1</Subplan-Name>               +
+           <Startup-Cost>0.00</Startup-Cost>                    +
+           <Total-Cost>0.01</Total-Cost>                        +
+           <Plan-Rows>1</Plan-Rows>                             +
+           <Plan-Width>0</Plan-Width>                           +
+           <Actual-Startup-Time>0.049</Actual-Startup-Time>     +
+           <Actual-Total-Time>0.049</Actual-Total-Time>         +
+           <Actual-Rows>1</Actual-Rows>                         +
+           <Actual-Loops>1</Actual-Loops>                       +
+         </Plan>                                                +
+       </Plans>                                                 +
+     </Plan>                                                    +
+     <Triggers>                                                 +
+     </Triggers>                                                +
+     <Total-Runtime>0.126</Total-Runtime>                       +
+   </Query>                                                     +
+ </explain>

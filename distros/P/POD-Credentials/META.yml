@@ -1,0 +1,25 @@
+--- 
+abstract: ~
+author: 
+  - ()
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: Fermitools
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: POD-Credentials
+no_index: 
+  directory: 
+    - t
+    - inc
+    - t
+requires: 
+  Class::Accessor::Fast: 0
+  Class::Fields: 0
+  POSIX: 0
+  Test::More: 0
+  fields: 0
+  perl: 5.6.1
+  version: 0
+version: 0.04

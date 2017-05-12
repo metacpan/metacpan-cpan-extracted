@@ -1,0 +1,9 @@
+=pod
+
+This is a simple paragraph.
+
+This is a second paragraph.
+
+And this is a third paragraph.
+
+=cut

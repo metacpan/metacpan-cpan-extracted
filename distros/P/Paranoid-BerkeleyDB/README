@@ -1,0 +1,12 @@
+Paranoid::BerkeleyDB
+====================
+
+  This module provides BerkeleyDB CDS support from within the Paranoid
+framework. 
+
+NOTE:  This is a complete rewrite with an incompatible API compared to
+previous versions.  It was written to be easier to use but can no longer 
+be considered fork-safe.  Please see documentation for more details.
+
+  Please send bugs, requests, and flames to Arthur Corliss
+<corliss@digitalmages.com>.

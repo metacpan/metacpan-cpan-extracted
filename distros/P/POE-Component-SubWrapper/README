@@ -1,0 +1,29 @@
+POE::Component::SubWrapper
+--------------------------
+
+This module provides an event based interface to subroutines in existing
+perl modules.
+
+To install, run:
+
+perl Makefile.PL
+make
+make test
+make install
+
+The last step should be run as root if applicable.
+
+This module is beta quality - it may be unreliable, but the API should
+be retained in future releases.
+
+Required:
+
+This module currently requires the following CPAN modules:
+
+  POE - Version 0.24
+  Devel::Symdump - Version 2.01
+
+Author:
+
+sungo - eek+cpan@eekeek.org
+Michael Stevens - michael@etla.org

@@ -1,0 +1,50 @@
+PostScript::Calendar version 1.02, released June 13, 2015
+
+
+PostScript::Calendar generates printable calendars using PostScript.
+
+PostScript::Calendar uses Date::Calc's *_to_Text functions, so you
+can change the language used by calling Date::Calc's Language
+function before creating your calendar.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+  Package           Minimum Version
+  ----------------- ---------------
+  perl               5.8.0
+  Carp               
+  Date::Calc         5.0
+  PostScript::File   2.20
+
+To display phases of the moon:
+
+
+
+CHANGES
+    Here's what's new in version 1.02 of PostScript::Calendar:
+    (See the file "Changes" for the full revision history.)
+
+	- No functional changes
+	- Release tests moved to xt/
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

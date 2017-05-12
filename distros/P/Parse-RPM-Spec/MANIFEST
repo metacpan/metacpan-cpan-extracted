@@ -1,0 +1,11 @@
+Changes
+Build.PL
+MANIFEST
+README
+t/parse-rpm-spec.t
+t/pod.t
+t/pod_coverage.t
+t/file.spec
+lib/Parse/RPM/Spec.pm
+Makefile.PL
+META.yml

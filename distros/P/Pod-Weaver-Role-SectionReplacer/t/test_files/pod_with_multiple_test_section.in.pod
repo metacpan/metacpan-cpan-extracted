@@ -1,0 +1,27 @@
+=pod
+
+=head1 PRE-FIRST-TEST SECTION
+
+This is the pre-first-test section.
+
+=head1 TEST SECTION
+
+This is the first test section.
+
+=head1 POST-FIRST-TEST SECTION
+
+This is the post-first-test section.
+
+=head1 PRE-SECOND-TEST SECTION
+
+This is the pre-second-test section.
+
+=head1 TEST SECTION
+
+This is the second test section.
+
+=head1 POST-SECOND-TEST SECTION
+
+This is the post-second-test section.
+
+=cut

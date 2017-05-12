@@ -1,0 +1,2 @@
+# Simply dump all a-nodes
+a-node $n := [  ];

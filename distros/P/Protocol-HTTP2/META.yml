@@ -1,0 +1,91 @@
+---
+abstract: 'HTTP/2 protocol implementation (RFC 7540)'
+author:
+  - 'Vladimir Lettiev <thecrux@gmail.com>'
+build_requires:
+  AnyEvent: '0'
+  Net::SSLeay: '> 1.45'
+  Test::LeakTrace: '0'
+  Test::More: '0.98'
+  Test::TCP: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Protocol-HTTP2
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Protocol::HTTP2:
+    file: lib/Protocol/HTTP2.pm
+    version: '1.08'
+  Protocol::HTTP2::Client:
+    file: lib/Protocol/HTTP2/Client.pm
+  Protocol::HTTP2::Connection:
+    file: lib/Protocol/HTTP2/Connection.pm
+  Protocol::HTTP2::Constants:
+    file: lib/Protocol/HTTP2/Constants.pm
+  Protocol::HTTP2::Frame:
+    file: lib/Protocol/HTTP2/Frame.pm
+  Protocol::HTTP2::Frame::Continuation:
+    file: lib/Protocol/HTTP2/Frame/Continuation.pm
+  Protocol::HTTP2::Frame::Data:
+    file: lib/Protocol/HTTP2/Frame/Data.pm
+  Protocol::HTTP2::Frame::Goaway:
+    file: lib/Protocol/HTTP2/Frame/Goaway.pm
+  Protocol::HTTP2::Frame::Headers:
+    file: lib/Protocol/HTTP2/Frame/Headers.pm
+  Protocol::HTTP2::Frame::Ping:
+    file: lib/Protocol/HTTP2/Frame/Ping.pm
+  Protocol::HTTP2::Frame::Priority:
+    file: lib/Protocol/HTTP2/Frame/Priority.pm
+  Protocol::HTTP2::Frame::Push_promise:
+    file: lib/Protocol/HTTP2/Frame/Push_promise.pm
+  Protocol::HTTP2::Frame::Rst_stream:
+    file: lib/Protocol/HTTP2/Frame/Rst_stream.pm
+  Protocol::HTTP2::Frame::Settings:
+    file: lib/Protocol/HTTP2/Frame/Settings.pm
+  Protocol::HTTP2::Frame::Window_update:
+    file: lib/Protocol/HTTP2/Frame/Window_update.pm
+  Protocol::HTTP2::HeaderCompression:
+    file: lib/Protocol/HTTP2/HeaderCompression.pm
+  Protocol::HTTP2::Huffman:
+    file: lib/Protocol/HTTP2/Huffman.pm
+  Protocol::HTTP2::HuffmanCodes:
+    file: lib/Protocol/HTTP2/HuffmanCodes.pm
+  Protocol::HTTP2::Server:
+    file: lib/Protocol/HTTP2/Server.pm
+  Protocol::HTTP2::Server::Stream:
+    file: lib/Protocol/HTTP2/Server.pm
+  Protocol::HTTP2::StaticTable:
+    file: lib/Protocol/HTTP2/StaticTable.pm
+  Protocol::HTTP2::Stream:
+    file: lib/Protocol/HTTP2/Stream.pm
+  Protocol::HTTP2::Trace:
+    file: lib/Protocol/HTTP2/Trace.pm
+  Protocol::HTTP2::Upgrade:
+    file: lib/Protocol/HTTP2/Upgrade.pm
+requires:
+  MIME::Base64: '3.11'
+  Scalar::Util: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/vlet/p5-Protocol-HTTP2/issues
+  homepage: https://github.com/vlet/p5-Protocol-HTTP2
+  repository: git://github.com/vlet/p5-Protocol-HTTP2.git
+version: '1.08'
+x_contributors:
+  - 'Daniil Bondarev <bondarev@amazon.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

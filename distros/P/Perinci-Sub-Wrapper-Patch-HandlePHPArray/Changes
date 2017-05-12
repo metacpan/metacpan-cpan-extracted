@@ -1,0 +1,19 @@
+Revision history for Perinci-Sub-Wrapper-Patch-HandlePHPArray
+
+0.03    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.02     2014-03-07 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Perinci::Sub::Wrapper 0.51.
+
+
+0.01     2013-09-06 (SHARYANTO)
+
+         - First release.

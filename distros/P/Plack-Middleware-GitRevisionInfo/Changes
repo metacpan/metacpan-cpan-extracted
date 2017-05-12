@@ -1,0 +1,8 @@
+Revision history for Plack::Middleware::GoogleAnalytics 
+
+0.001   17 February 2012
+        - initial release
+
+0.002   18 February 2012
+        - fixed failed attempts at unit tests. Now using Test::Git to appease
+          cpan testers.

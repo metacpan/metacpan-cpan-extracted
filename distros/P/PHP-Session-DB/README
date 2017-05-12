@@ -1,0 +1,15 @@
+This is the README file for PHP::Session::DB module.
+
+This module provides perl scripts with access to PHP sessiones stored on data bases
+
+I tested this module on perl 5.8.5 and with a MySQL database.
+
+To install do
+
+perl Makefile.PL
+make
+make test
+make install
+
+Copyright (c) 2005 Roberto Alamos Moreno <ralamosm@cpan.org>.
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

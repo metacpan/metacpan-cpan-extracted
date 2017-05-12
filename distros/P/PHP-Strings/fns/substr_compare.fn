@@ -1,0 +1,3 @@
+docs: |
+    Use L<substr|perlfunc/"substr"> and
+    L<the C<cmp> operator|perlop/"Relational Operators">.

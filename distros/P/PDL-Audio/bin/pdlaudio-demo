@@ -1,0 +1,282 @@
+#!/usr/bin/perl
+
+#use blib;
+use PDL;
+use PDL::Audio;
+#use PDL::Graphics::PGPLOT;
+use PDL::Audio::Pitches;
+use PDL::Dbg;
+use PDL::Complex;
+
+$|=1;
+   
+*_dur2time = *PDL::Audio::_dur2time;
+sub HZ (){ 22050 };
+
+sub freqz {
+   my ($a, $b, $w) = @_;
+   $w = 512 unless defined $w;
+   $w = zeroes($w)->xlinvals(0,M_PI*($w-1)/$w) unless ref $w;
+   $w = exp i * r2C $w;
+   
+   Cabs(Cdiv($a->rCpolynomial($w),$b->rCpolynomial($w)));
+}
+
+sub play {
+   my $pdl = shift;
+   #line $pdl;
+   $pdl->scale2short->playaudio (rate => HZ, @_);
+}
+
+if (@ARGV) {
+   $pdl = raudio $ARGV[0];
+} else {
+   binmode DATA;
+   local $/;
+   $pdl = pdl unpack "C*", <DATA>;
+   $pdl->rate (11025);
+}
+
+print describe_audio($pdl), "\n";
+
+$pdl = $pdl->float->filter_src($pdl->rate / HZ);
+$pdl = $pdl->filter_center;
+
+my @stdenv = (pdl(0,0.1,0.2,0.9,1), pdl(0,1,0.6,0.6,0));
+$env = gen_env $pdl, @stdenv;
+
+sub tst($$) {
+   push @tests, [$_[0], $_[1]];
+}
+
+tst src, sub {
+   for (qw(22050 11025 8000)) {
+      print " $_"; play $pdl->filter_src(44100 / $_), rate => $_;
+   }
+};
+
+tst contrast_enhance, sub {
+   for (qw(0.1 0.2 0.3 0.6 1)) {
+      print " $_"; play $pdl->filter_contrast_enhance($_);
+   }
+};
+
+tst granulate => sub {
+   for (qw(1.5 1.3 1.1 1.0 0.8 0.6 0.5)) {
+      print " $_"; play $pdl->filter_granulate($_);
+   }
+   print " +SRC:";
+   for (qw(1.5 1.3 1.1 1.0 0.8 0.6 0.5)) {
+      print " $_"; play $pdl->filter_granulate($_)->filter_src($_), rate => 44100;
+   }
+};
+
+tst modulated_src => sub {
+   print " 2 hz 0.7 sine...";
+   play $pdl->filter_src(1, 5, 0.7 * gen_oscil $pdl,   2/HZ);
+   print " 5 hz 0.3 sine...";
+   play $pdl->filter_src(1, 5, 0.3 * gen_oscil $pdl,  20/HZ);
+   print " 90 hz 0.5 sine...";
+   play $pdl->filter_src(1, 5, 0.5 * gen_oscil $pdl,  90/HZ);
+   print " 300 hz 0.8 sine...";
+   play $pdl->filter_src(1, 5, 0.8 * gen_oscil $pdl, 300/HZ);
+};
+
+tst ring_modulate => sub {
+   print " ring modulated with 20 hz sine";
+   play $pdl->ring_modulate(gen_oscil $pdl, 20 / HZ);
+   print " ring modulated with 1000 hz sine";
+   play $pdl->ring_modulate(gen_oscil $pdl, 1000 / HZ);
+};
+
+tst touchtones => sub {
+   my @h = ( 697, 697, 697, 770, 770, 770, 852, 852, 852, 941, 941, 941);
+   my @v = (1209,1336,1477,1209,1336,1477,1209,1336,1477,1209,1336,1477);
+   my $dur = HZ*0.22;
+   my $env = gen_env $dur, pdl(0,1,2,9,10), pdl(0,1,0.9,0.9,0);
+   my @mix;
+   for (0..$#h) {
+      my ($h, $v) = ($h[$_], $v[$_]);
+      $h = $env * gen_oscil $dur, $h/HZ;
+      $v = $env * gen_oscil $dur, $v/HZ;
+      push @mix, ($_*$dur, $h, $_*$dur, $v);
+   };
+   play audiomix @mix;
+};
+
+tst noise_fm => sub {
+   my $pdl;
+   print " 100 hz";
+   $pdl = gen_rand 2*HZ, 100/HZ;
+   $pdl = gen_oscil $pdl, 880/HZ, 0, $pdl * $pdl->xlinvals(0.001,0.1);
+   play $pdl * gen_env $pdl, @stdenv;
+   print " 6000 hz";
+   $pdl = gen_rand 2*HZ, 6000/HZ;
+   $pdl = gen_oscil $pdl, 880/HZ, 0, $pdl * $pdl->xlinvals(0.001,0.1);
+   play $pdl * gen_env $pdl, @stdenv;
+};
+
+tst simple_fm => sub {
+   my $fm = gen_triangle $pdl, 16/HZ;
+   $fm *= $fm->xlinvals(0,0.1);
+   print " 900 hz sine + vibrato"; play $env * gen_oscil $pdl, 900/HZ, 0, $fm;
+   print " 900 hz sine + sound"; play $env * gen_oscil $pdl, 1/HZ, 0, $pdl * 0.08;
+};
+
+tst filters => sub {
+   print " filter_lir(<0.05s echo>)"; play $pdl->filter_lir(pdl(0),pdl(0.5), pdl(HZ*0.05), pdl(0.5));
+   print " ppolar(0.8,220)"; play $pdl->filter_ppolar(0.8,220);
+   print " zpolar(0.8,220)"; play $pdl->filter_zpolar(0.8,220);
+};
+
+tst waveshaping => sub {
+   # this is the spectrum of a cello playing as3
+   my @i = (1.01, 1.99, 2.99, 4.00, 5.00, 6.00, 6.99, 8.00, 9.00, 9.98,
+            10.99, 11.99, 13.00, 14.01, 14.99, 16.02, 17.00, 17.98, 19.00, 20.01,
+            21.02, 22.02, 22.22, 22.93, 24.05, 25.04, 25.99, 27.00, 29.03);
+
+   my @a = (.0839, .0414, .1265, .0196, .0377, .0117, .0111, .0151, .0207,
+            .0033, .0090, .0039, .0039, .0031, .0038, .0023, .0026, .0069, .0020,
+            .0017, .0007, .0006, .0002, .0001, .0003, .0002, .0003, .0003, .0003);
+
+   # add a slight vibrato
+   my $tri = gen_triangle 4*HZ, 1.5/HZ;
+   my $pdl = gen_from_partials (4*HZ, as3/HZ, \@i, \@a, 0, 16/HZ*$tri);
+
+   play $pdl * gen_env $pdl, @stdenv;
+};
+
+tst simple_generators => sub {
+   print " 1/f noise"; play $env * gen_rand_1f $pdl;
+   print " 900 hz sine"; play $env * gen_oscil $pdl, 900/HZ;
+   print " 900 hz triangle"; play $env * gen_triangle $pdl, 900/HZ;
+   print " 900 hz asyfm"; play $env * gen_asymmetric_fm $pdl, 900/HZ;
+   print " 900 hz sine summation"; play $env * gen_sine_summation $pdl, 900/HZ, 0, 5;
+   print " 900 hz sum of cosines"; play $env * gen_sum_of_cosines $pdl, 900/HZ, 0, 5;
+};
+
+tst noise_filtering => sub {
+   my $pdl = gen_rand 2*HZ, 1;
+   $pdl = $pdl->filter_ppolar(0.97, 440/HZ);
+   $pdl = $pdl->filter_lir(pdl(0),pdl(0.1), pdl(HZ/440),pdl(0.99));
+   play $pdl * gen_env $pdl, @stdenv;
+};
+
+tst spectrum => sub {
+   $pdl = gen_fft_window(100, KAISER, -1.0);
+   #line spectrum $pdl, 'db';
+   #line spectrum $pdl, db', KAISER;
+   #line spectrum $pdl, 'db';
+   exit;
+} if 0;
+
+tst karplus => sub {
+   my $pdl = concat gen_rand(0.4*HZ, 1), zeroes(5.0*HZ);
+
+   my $dur = 2*HZ;
+   my $freq = 440/HZ;
+   my $damping = -0.5/HZ;
+
+   $freq *= M_2PI;
+
+   my $e = exp $damping;
+   my $c1 = 2 * $e * cos $freq;
+   my $c2 = $e * $e;
+   my $tm = atan2 ($freq, $damping) / $freq;
+   my $scale = sqrt ($damping*$damping + $freq*$freq) * exp (-$damping*$tm) * HZ / 750000;
+   print "$scale, $c1, $c2\n";
+   $pdl = $pdl->filter_lir(pdl(1), pdl($scale),
+                           pdl(1, 2, int(1/$freq+6)), pdl(-$c1, $c2, -$scale*0.1));
+#   line $pdl;
+   play $pdl * gen_env $pdl, @stdenv;
+} if 0;
+
+tst karplus2 => sub {
+   my $pdl = concat gen_rand(1.*HZ, 1), zeroes(5.0*HZ);
+
+   my $dur = 2*HZ;
+   my $freq = 440/HZ;
+   my $freq2 = 88/HZ;
+   my $reson = 0.05;
+
+   $pdl = $pdl->filter_lir(
+                           pdl(1, 2, 1,2),
+                           pdl(-$reson*$reson, 2*$reson*cos(M_2PI*$freq),
+                               -$reson*$reson, 2*$reson*cos(M_2PI*$freq2)),
+                           pdl(int(1/$freq),int(1/$freq2)), pdl(0.49, 0.499));
+#   line $pdl;
+   play $pdl; # * gen_env $pdl, @stdenv;
+};
+
+tst vibro => sub {
+   my $pdl;
+   $pdl = gen_oscil 2*HZ, 40/HZ;
+   #$pdl = gen_oscil 2*HZ, 40/HZ, 0, $pdl->xlinvals(0,80/HZ);
+   #$pdl = $pdl->filter_zpolar(0.9, 80/HZ);
+   #line $pdl->slice("0:30000");
+   $pdl = pdl(1,1)->partials2polynomial(1)->polynomial($pdl);
+#   line $pdl;
+   play $pdl;
+   exit;
+};
+
+tst chorus => sub {
+   play $pdl;
+   my $lfo = $osc = 0.02 * gen_rand $pdl, 30/HZ;
+   my $dly = $pdl->filter_src(1, undef,  $lfo);
+   play $dly->rshift(0.030*HZ) + $pdl;
+};
+
+tst phazor => sub {
+   play $pdl;
+   print "rfft...";
+   my $fft = rfft($pdl)->Cr2p;
+   my $im = im $fft; $im .= $im->rshift(-10000);
+   print "irfft...";
+   my $fft = irfft($fft->Cp2r);
+   play $fft;
+} if 0;
+
+tst strong => sub {
+   # as done originally by Alex Strong
+   my $pdl = zeroes HZ*5;
+   my $freq = int (HZ/220);
+   my $x = $pdl->slice("0:".($freq-1)); $x .= gen_rand $x, 1;
+
+   $pdl = $pdl->filter_lir(pdl(0),pdl(1),pdl($freq,$freq+1),pdl(0.5,0.5));
+   play $pdl;
+};
+
+#print "original version..."; play $pdl; print "\n";
+
+for (@tests) {
+   my ($name, $sub) = @$_;
+   print "$name...";
+   &$sub;
+   print "\n";
+}
+
+exit;
+
+#$pdl2 = filter_granulate $pdl, 0.8, rate => 44100;
+$pdl2 = filter_contrast_enhance $pdl, 0.1;
+#$pdl->scale2short->playaudio(rate => 44100);
+$pdl2->scale2short->playaudio(rate => 44100);
+exit;
+
+$pdl = zeroes(4096);
+$pdl = sin $pdl->xlinvals(0,20) + sin $pdl->xlinvals(0,50);
+$pz  = zeroes(40960);
+$pdl2 = filter_src ($pdl, 0.5, 80, $pz);
+#line $pdl2;
+$pdl2->scale2short->playaudio;
+
+__DATA__
+PONNOQSUY[_cinsw{‡‹‘—›ž¡¥§ª¬­¯±±²²°¯­ª§¤ š”Š„€}xurojheb`]]\[[ZZZZ[]_acfhmqv}‚‡’–šž¡¥§©ªª©¨¦¥£¢ œš˜–“‘Œˆ„€|wsplifdba`]]^]^``adegimoruy}‚…ˆŒ‘”—šŸ ¢£¥¦¦§§¦¤¢ š–‘ŽŠ…€|yvrpmkjhfdddeegijlnortvwz}‚„…‡Š‹“•—šŸŸ ¡¡¢¡¡¡  žš—’Œˆ„€{vsplhgfdba`____behkosw|…ˆŒ’”–™›žžžžž›š™˜–”’ŽŒŠˆ††„‚€~}}|zxvtspmkigdccdefgiknqsvy}„ˆ‘”—›Ÿ¢££¤¤£¢¢ ›˜”‘Š†‚€|yvrpmjijjijllmnoqqrrruvwy{}€‚‚ƒ„‡‰ŠŒ’”–™š›œžœšš˜–“ŒŠ†ƒ~zwtqomjggfeeefgiikmoqtvy{}‚…‡ŠŒ‘’“”””””“’‘ŽŽŒŒŒŠˆ†…‚€}zywutrpnmkjjijkmmoprtwy|ƒ†ˆ‹Ž‘”—™š›œš˜–“‘Œ‰‡…„€~}{zxwvutrppqqqrrstvvwyz{{}~‚ƒ…‡ˆŠŒŽ‘’”–—˜™™š™˜˜—–“ŽŒŠ†ƒ€}{xvutrqqrrqrrrqqppqrsvxz}ƒ……‡‰ŠŠ‹‘‘‘ŽŒ‹‹‹Š‰ˆ†„‚€}{zxvsrrpponoqpoprsuvwz{|~‚…‡‹‹Ž‘’’Ž“’’“ŽŒ‹Š‹ŠŠŠˆˆ‡ˆˆ†„‚€~|ywutrpnllkjjkmnoqruwxz|‚„†ˆ‰‹“••—˜™™š™˜˜•“ŽŠˆ†„‚€~|{ywvutttsrqrsrrrsttttvwy{~‚…‡Š‹’“”““–’’‘“‘Ž‹‡Š‡‡‡…ƒ€~||{{zyyy{}~~~~~}|{{ywvvwvwxy{}~€‚…‡ˆ‰‹Ž“’“““’‘ŽŒŠˆ‡†„‚€~{xvtsrpoopppqsuwyz|ƒ„…†‡ˆˆ‰ˆ‰ŠŠŠŠ‹ŒŽŽŽ‹‰‡„‚€~|zxxxvvvvuvvvwxxxxxxyyz{}~ƒ„†‰ŠŠŠ‹ŒŒŒ‹Œ‹‹‹Š‰‰ˆˆ‰‰ˆ‡‡‡†……„ƒ€~|{yxxwwvvvwwxxzz{|{||~~€‚ƒ„†ˆŠ‹ŒŒŽŒŒ‹‹ŠŠˆˆˆ†………„ƒ‚ƒ‚€€€~}|zzyxwvwwwwxz{{}‚ƒ„………†…†††…†…††‡ˆ‰ŠŠ‹‹ŠŠ‰ˆ‡††…„‚‚€€€~~}~~~~}}||{{{{{{{{|}~€‚ƒ„„…†††ˆˆ‰‰ˆˆ‰‰‰‰‰‰ˆ‡†……ƒ‚€~}}|zyzyy{zzzz{{|}~~~€€€‚‚ƒ‚ƒ„ƒ„…„………………………„„„ƒƒƒƒ„…„„………„„ƒ‚‚€~}}|{||{}||}}~‚ƒƒ„…††††††……††…„„„„………„…„„ƒƒƒ‚‚‚‚‚‚€€€€€€€€‚‚‚‚‚‚ƒ‚ƒƒƒƒ‚‚ƒ„„„„…„„„„„ƒƒƒƒ„„„ƒ„„„„„„ƒƒƒ‚ƒƒƒ‚‚‚€€€€~~}{{}|||}||}~~€‚ƒƒ„„………††…††††‡‡†††………„„„‚‚‚€€€€~~~~~}}~}}}}||||||||||}~‚ƒƒ„††‡ˆ‡‡ˆ‡‡ˆ‰ˆˆˆˆ‡‡†………„‚‚‚€€€€~~}}}}~}}}}}}}}~~~~~~~~€‚ƒ…†‡‰ŠŠ‹‹‹‹‹‰ˆ‰‰‰ˆˆˆ‡‡†……„ƒ€~}|{{zyyyyyxyyzz{}‚ƒ……„„………††††††‡‡‰‰ˆˆˆ‡†††„ƒƒƒƒ‚‚ƒƒ‚‚‚€€~~}|||{zzyz{{{{|}}€‚ƒ„……„„…†……†††††‡‡ˆ‡†††……„ƒƒƒƒ‚€~~~~~~}~}}|z{zzyz{|}~€ƒ…‰‡ˆˆ‰‹‹ŠŠ‹‹‰†‡ŠŠ‡„ƒ…„ƒ‚~ƒ`ˆb{‹z„tro‹˜PPWWŸ°  @_¿¿ ¿Ð`?Po›ïÿÿÿÿÿÿø€€7ž@¼u›®„Ÿ /DD   */o“¿è T ?g]k™‘Ÿ·¼¤€XSw§ËÿüûÿÿìëèÐ ©€('W›¿åÈ°”€ljbVJOo‡—”†x`DOo‹Ÿ¯¿ÇÀ´± „lXVH;8$'?_«ÏØÊÇÄ´š†ƒ€qry~€|l\R]ao¥­³°¦œŒ€trlhc]PDOcoŸ¯»ÍßâÔÀ¤„pidistppnd`ceo™ž§¦˜ˆ„€pil`RPNMOV[k‘Ÿ·¿¸¨œ”Šxqrtww‚‡…€{ˆŠž§ª ™’ŽŠ‡ˆ€unm`VW_mw‹§¹³¬¦žš€p`b[coplrmhb^_gw‹•§¦¡ œ˜ˆ€ytklo{Ÿ®»À½´¢”„|ja_`_aghcg`_aago{ƒ‹›§®¦ ”Œ„tnl`\bgs“¥±¹´¨šˆ€tqospowzts{|u}‡Š—Ÿ¦¯³®¤–Šxlb`TSW_gm{¡ ¢¤˜„z}xru}|wy~zzz‡•™£ª®ª£ ’Œ€pi\WZ]elpv…‹•š™”‰€|tpniknnnjfono}‰™¢¨§¨¨ ˜Žˆ|rjdgmqu}‡‹“›¢¢•Žˆ€umkiknqtux††‹‘•›˜’‘„€|tmgfcgkntv‡’£¡¥¢ •Œ„~|}‚„…‡Š‹–”’ˆ€tlnhfefoorpsxxz‡•——››š”‰„}xywy|}‡‹’Ž‹‹ˆ‚zurqoowvw~|yy|{zw}~ƒƒ„…ˆ‚{wploou{†‡ŒŠ†‡†…„†…€z}~‚ƒ€~zxu{‡ŒŽŒˆˆ‚zyxqsyzz…„|€xx}|ƒ„†‡‹‹‰‰„ƒ‚„€ƒ‹“–™˜–Šƒ€~zzz}‚ƒƒ€~~…„‡‘Œ†…„ƒ€~|z{…Š‹’Š…ƒ~xyxxzz}‡‰†‰Šˆ‡‰ŠŒŽŒŠ…„‚€|{}wy|€ƒ…†‰Œ†‚…„‚|{|y|{{}…„…‹Œ‰ŠŠ„{zvwwtw{{z}~|}|~z{{xywvrstvw{{|ƒ†‰Š‰ˆˆˆ‡…ƒ€~}{‚‚€}}ƒ}~~~z{zxy}}‚‡„‡ˆ‡ˆ‡†€ƒ…‚ˆ„„€~€~~‚ƒ…„„„ƒ††‚„‡†„‚‡Š‹Šˆ‹Š…ƒ€~}yvy|„……‰‰………€|€~‚‚‚ƒ…„„†…„†ˆ……‡‹ŠŠˆ„€}{|{{}‚‡‹‹Œ‰„ƒ‚€|||~ƒƒ†‡‡†Šˆ„…†‡„…†„„ƒƒ€~~~€‡‹‹Œ‰†€zzzx}ƒ†ˆ‡ŒŒ‰ŠŠŠ„ƒ~~|||{{zƒ€……ŠŒˆŠŠ†ƒ…„||€|‚‚‚‚ƒ‚ƒ€€~}|}zwstwvvyz}ƒ…‰‹Ž‹‡ˆ†€|zxuyz{}ƒƒ„‡‰…€‚~{~}z{{{}|x}€|}„‚…ˆˆ‰‹ˆƒ……€yyzyvz}~‡ˆ…††…„„€‚ƒ‚‚…‚€€~‚ƒ‚€„…„‚„‚‚‚€~~}~€‚†‡…ˆˆ…„ƒ†ˆ„†„‚€~„ƒ~€…‡‰ˆ‡‰ˆ‡ˆˆ‡‹Œ…‚x{€uzy{y‚z{ƒ€{~xx|‡“–—Ÿ«œž•œ”„p`ZTVYXZ\Y]i{Š—¡¢¤¢£  ™†}xpopkkmosyyy}…Œ†…‚ƒ‡ŽŽ„‚€†•—œ™—–”Œˆ€tmheabacisy†ŠŽ’•˜›ž›˜†€~|wrjfkoou{ƒ„‡‹Ž‘Œ‰‰‰„€}}}z{€ƒ‰‹ŠŽ‹Œ…€|xpijigjjou{…‹—Ÿ¢¡Ÿ¢ ˜Š‚|upmmlnnouyz|„†„ƒƒ‚„ƒƒƒ……†ˆŠŽŽŽŽ‰ˆ„€~~xsrmjjknuz}‚‰ŽŽ••—–ŽŠ‡ƒ‚€ƒƒ„…ˆŠˆ‡†€|zxtqppoquy}‚‡‘’‘“ŒŽŠ€~xuwwy{€ƒ…‡‰ŠŒ‹ˆ„…€|zywvrvz|ƒ„‡‹ŒŒŒ‹Š‰…ƒ‚|zyxxy{|}††Š‹‰‰‰‡„€}{zzzuwyz~€ƒ…†‡†‰‹‹ŠŠ‰†………€~|yy}€ƒ…‡Š‹ˆ„ƒƒ€|y{{{{z}‚„…‡‡ˆŒŠŠ‹ŒŒŠ†……‚||{yz{~~…„…‚~~~~~~€€ƒ„„†‡ˆ‡‰‡‹Š‡‚|xxz{{}€ƒ„ƒ‡ˆ‡‡††ƒƒ…„€~‚€~}~€~ƒ‡†„†ƒ€~}~}„ƒ…†„‚…†††‰‹‰ˆˆ†…„~~}€€€ƒ†‹Šˆˆ‰‡„€€|{}~€€€„„ƒƒ„„‡ˆ…ƒƒƒ~~|}~‚‚€‚‚€€€€~}|}zxy||}~ƒ…‰ˆ‡‡‚€‚‚€{z|{{~€€„ƒ‚€€ƒƒ‚‚‚€€~}||}ƒ„ƒ†‡††…„ƒ‚€}||||~ƒƒ‚ƒ……„††ƒ€~ƒ„„„ƒ€‚ƒƒ„…ˆ††††„…‡†„ƒ~}~}~‚…‡‰‹ŠŒˆ†…ƒ€~}~ƒ……ƒ„‚…‡……ƒ‚€ƒ‚€…„‚ƒƒ€‚‚‚€ƒ‡‰‰ˆ‰‹‰ˆ…‚€~z{}‚‚‚€~~~ƒ‚„„…‚€€~~~}€€†„„†‚‚€|}|‚„‡ˆ…ƒ„€~}{€€€}‚€~€~|{}†††…††„ƒ‚~ƒ„„ƒ„‚‚€€€ƒ„…„ƒ‡†ƒ…†‡‡†„…„‚€€~‚‚€€€|yz}‚ƒƒ‚„‚ƒ††……‡††‡ˆ‡†…€~|{~†‚€‚ƒ‚€ƒ‚‚ƒ‚€|~}}}~ƒ‡„€ƒ„‚€~}€€‚€…ˆ†‡ˆ…„‚‚‚‚€€€~{}€ƒ…‚‚„ƒƒ‚€ƒƒƒƒƒ‚‚€‚…‡†„„„ƒ„„€‚ƒ‡†……„‚…†††…ƒ„ƒ‚€€~‚‚€}~}~}€ƒ…„ƒƒ„‚€‚ƒ‡Šˆˆ‰†ƒƒ‚‚‚‚ƒ‚ƒ€~€~||{{}€‚ƒ…†„‚€|z{|~€ƒ…ƒ„€€}~~€‚„…†…‚€‚‚‚‚„„„€~‚„†€}}{zz}}„„‚€}~||}‚‚††……„ƒ„ƒ‚………„‚€‚‚‚…†„„…„‚ƒ‚„†„‚ƒ„‚€~~€‚€€‚‚ƒ„„ƒ‚„ƒ‚€„…†ˆ‹Ž‰‡„„…„„‚‚ƒ„ƒƒƒ‚ƒ„‚ƒ‚‚„……‰€‚|{|ƒ„…€€ƒƒ‡ƒ||yzy|{†…‡‹Š‰†Šˆ‰‹Š‡Šˆˆˆ…†…„€}}tuxwxvuwyxx{ywz€}}~‚…………‡††ƒ‡‰Šˆ†‡‡†…‚ƒƒ€‚…€‚ƒ€||~ƒ…ƒ‚‚ƒ€~||}€€‚‚……„„‚…‡…ƒ„€ƒ„‚‚‚„~~}~}€€~‚†ˆ†…†ˆ‡„ƒ‚ƒ„„…ƒ‚€€€ƒƒƒ‚ƒ‚‚ƒƒ„‚‚„…„…„‚ƒ„‚…†„………ƒ€}|{~}||}z{€€…‡†‡‡…„……€‚‚‚ƒƒ‚‚ƒƒ€‚‚€€€€~}ƒ€~€‚……„„…€€~€~€‚ƒ„„„…‚ƒ„‚ƒ„„………„‚‚ƒ€ƒ‡‡‡„ƒƒ‚‚‚€‚‚ƒ‚€~€ƒ…„„†‡„ƒ„…ˆ‰ˆ‡‹Š„…„ƒ€}|}~}~€€‚€‚€‚ƒ‚ƒƒ‚…†„„„„„ƒ‚€‚ƒ‚€}€ƒ€€ƒ„ƒ‚~~}}z}~€‚‚€ƒ‚‚„‚€}ƒ‚ƒƒƒ…†ƒ‚…„‚‚„……„…„‚€‚‚€€‚‚€ƒ„„ƒ…ƒ€}~}}}{{}~‚‚…†……‡‡…ƒƒ†‚~|€~ƒ†ƒ‚‚…†ƒ…„€‚€€~‚…‚‚‚‚‚‚€‚‚€}~|}„„‚‚ƒ„‡‡„„‡„„„„‚‚‚€„ƒ‚ƒ†…‚ƒƒ€€€€€||~~€‚~~‚‚€‚‚‚€‚„ƒ‚‚ƒƒ„†‡‡‚‚ƒƒƒ„‚€€€€€€€€€€~€€€‚‚ƒ€€~~~ƒ†‡‡ˆ…‚ƒ†„‚ƒƒƒƒ‚‚ƒƒ‚ƒ‡ˆ††„……„„‚‚€~‚ƒ…„‚‚ƒ€€„‚ƒ‚€€€~ƒ„€‚‚„‚ƒ…ƒ…‡‡„‚‚ƒ…„‚„†‚‚‚€€‚ƒ‚ƒ‚‚‚‚‚€€€~‚„…„€}}}~‚„„‚ƒ‚ƒƒ‚€‚ƒ‚„ƒ‚‚ƒ‚€~}~}€ƒ„€€€~}}€€‚‚ƒƒƒƒƒ‚„ƒƒ‚‚ƒ„‚‚„‡†ƒ€ƒƒƒ†‚‚ƒ„‚€~~‚€€‚€€€ƒƒ„„ƒ…„„…‡‡†ƒ‚ƒ‚‚‚„…ƒƒ„…‚„„„ƒƒ‚‚„‚‚ƒ‚‚€€€~€€€€€‚€‚ƒ‚ƒ‚‚„„…„„†††„…„‚‚ƒ‚ƒ‚‚€€ƒƒƒ‚€~‚€ƒ„ƒ„†‚€€~‚„„„…„ƒƒ„„‚„…ƒƒƒ‚„…„…„‚‚€€~‚‚‚‚€~€ƒ„ƒ‚€€€€ƒ……‚ƒƒƒƒ‚‚‚‚‚€€ƒ„„„ƒ‚„‚‚€€€€ƒ„‚‚€€~}~}}}}~€€‚‚€ƒ„‚€ƒ„ƒ„„‡†„ƒƒƒ€€‚€€€€€€}~~}~}}}~~~‚€‚‚‚‚‚‚‚‚ƒ„„ƒ„ƒ€‚€ƒƒ„ƒ„……†„ƒƒƒƒ‚‚‚‚‚€€~ƒ€~~€~ˆyƒ††~……ƒ€€„€~…“ˆ—€o˜ wh€oyˆŒ‹€€H&7[˜€«¿Ô³°`K\o¶¸@?Ÿ¿÷ÿÿÿÿÿþÐ¸˜d@         +?[c¿ÔÛïÿÿÿÿÿÿöà°€rvz…Ÿ»°„{‡€eakl`ZRD(/K_oŸÇÓ×ßãááàÌ¨x`D0" &/;G_Ÿ®¹ÁÃ¼´³¹ÁÀ²˜€X@03G[gs}„•—Ÿ¦¤œŒxhckw‡­»ÏßïøðØ¸˜€dL@2&   ?_{—¯¿ÏÝíûÿÿúäÈ¬”x`TMNOW]gihf^P:(%3?O_s…—­ÇçûÿÿÿÿÿøèØÀ¨Œx`@  3K_w‹›§­«¦¤¢¢ Ÿ£ ˜”•š¢­»ÃÃÀ´¢€hTD80($#-3:GWo—«¿Ï×ßàÔÂ° €vnh`XTUYbo•£§ªª¤šŒvlf`XTW^`co{‡™£¨¢šŒ€p`XTUZcoy‡—ž«·ÃÏÑÊÀ¬˜ˆzhXE8(+?Uk“£³¿ÄÂ¼²¦œ–—šŸ§³·¶´ª š“Œƒ|p`P@4.'(+/4;EUgw«¿×ëúÿýøèØÀ¨t`PHFGJKJIIMSYbjlmlihgoy…’Ÿ©±¹¿ÅËÓÙÚÔÈ¸¤€lXD4( +7GWjw“Ÿ«µ½ÁÀ¸©œ‚zwy|}~†‡‰““ˆ€vkdbeefjqy‡©®¯®ª¤ ™ˆ€tdYPPQU_m{‰“§³º¿ÅÃ¼° Š€lb\VSTTUY_jr{ƒ…‡‰†‚‚„†‡ˆ‰‹“–›£ª®®ª¦¢ž–Ž„xhTD4( %-7ESez‹¯¿ËÑÐËÄ¸°©¢œ”‰‚|upnnlheb_^\[[YYWTUX\ckw‡—¥¯»ÇÏÒÓÎÄ¸¨”€p`ULDAACGOYcoz…‹’—™˜——–”’Ž‹‰‡‰‘”—  œš˜’ˆ€zth`YWY]bjr{…Ž—£¬³¶´°¨ ’ˆ€tpkhikns}…™Ÿ£¦¤ ›˜“Ž…€|vrpppqswz~ƒ…†††‡„€yvrrstu}†‹“Ÿ©¯µ¶¶±¨ ’„zpdXPNKJMRYcmw…‹‘–™› ¢Ÿš˜”ŽŒŒŠˆˆˆ‡†€{uld\RJDDEINV_m™£¯·¾¾»¸´®¦œ”Œ‚|slfd`_acgkmoppprqqsuwz}ƒŠ‘—£ª««ª¤ š†€rjc\YWW[_ems{…Ž•—›Ÿœ•‘Œˆƒ€{zzywx|~‚‡ŠŽŒŒŠŠŠ„€}zxwvxy~ƒ‡Š‹Œ’’ŽŒ†€zvpllmosv{‡Ž–›¡¤¥¥¤ š“Œ‡ztpljhhkmnswy}„†ˆˆˆ†‡Š‰‹ŒŽ’—™›Ÿ¡  Ÿ›–Ž„|th`\XWVX[^cmt{„‹“›¡¥©¬¬ª¦¢œ˜’Š„€}xwxyzyxvurpomjhknqv{ƒ‰Ž“™Ÿ£¨©©¨¤ ˜“‹…€xpkhdacgkmqw{~ƒƒƒ„ƒ€~€ƒ„…„…†…‡‰‹ˆ‡…ƒ~zvsrpooosw{„‰Œ‘’Ž‰ŠŠ„€|zywtruwz€…„•’’‘Œ†„‚€{||€w‡ˆ`€eŒxƒ‹€w€07o¯º»ËÕ¨¯ 8(NW›¿ÿÀœ` @ ?w§¬¿È‹¿ÿÿè÷ÿÿÿÿðÀ»´P6       ;[§¦ˆ§ÃÏãûÿÿÿÿÿðÐËÀ¤›§¿¸pTHJB0?w€pidXP@:?UoŸÛåÞßÞÈ¬¡œxppX@?MOS]o›«¯¦˜Œ€u›•—šŒzlT2/Mk„xj`eo{›§¬¤’™¤¦¯½ËßèàÐ°”€`H0($#'$#/Gk‹§¿×àÝÛ×ÞæïôîàÈ¨€l\STPH@61* %3CWkwƒ“Ÿ·Ëß÷ÿÿÿÿÿèÈ¨‚xldT@$#5COU^fu‹›«·¿ÏÚÙÐÀ²¨ž¥«±µ° ˆpP4 #/9EIS_o—§³¹¹µ¬©¥  žœ›žœ”Œ€xlccirw——„~xnijrrsuvtou‹’‘’Ž€p`\]afmy…™Ÿ¥«©ª©«µº¾¸°¡€hTID@=?A@?ACGS_oŸ§­¯·¾¿ÃÇÊÇÇÈÂ¸°ª¢”…€th\L<(/?SgvŸ¯¿Í×ãìëæÜÌÀ´¨™€tdVD=2&$)/7?JS]cegowƒŸ³¿ÏÕ×ÕÓÒÎÈÀ²¤”„r`PD:677=FKQWcfku™£­µ¹¹µ®¥œ˜“Ž‹‰†‚‚„ƒ‚€}vnhcegio{…“—›žœ›˜”Œ…}urplhioty‹”—šŸ¥ª­®®«¢œ€xjecbbbb`__`agjow„ŠŽ”—˜›Ÿ£§­²·¹»¶°¨œ‚rh`UI@2,+-3?JWco{‡•Ÿ«µ½ÃÇÉÆÄÀ¸°¢™‘ˆ€xtpjdZPHB<:<?BIOS]fo¥³»ÃÉËÈÄ½·²¨œˆ|pd\TNKHLQZagnsuv}„‡Š“•–––™ £§ª«©¥œ”Œxpkf`]_aagopw}ƒŠ•—›œš˜’ˆ…ƒ€{xwwz…‹’—™™–”‹‡††ƒƒ„€~|}~~|~~{vutrpoux}…‡‹—Ÿ¥«¯±±®©£›”Š€xpkd^XUSQPU[_ksy…‹Ž’–˜›Ÿ  ¦©¨¦¤¤ ™’ŠxlbXPJEB@CJRW[eo{…Ž™¥®µ·º¹¸´¬¦ ˜’Œ„€xplhdb`_a``^\\]_aiou}‡’›£ª­®«¬«¨£–Ž„~yrmfcbbefgkouz}‚†‰ŒŠ‰‡„€~~…‡‰ŠŠ‹ˆ…„„‚~~{}~‚„†…‰‰‰ˆŠ‰„€~yvspqrsuw{‡‹‘–š›Ÿ¡£¢Ÿœ–‰‚}vrmhijjkmqsuuyyz||}…‰•š¡§«««¨£ ˜”Œˆ‚{upi`XTRQSY_emw‰‘™ £¤£¢¢ œœ™•‘Žˆƒ‚~{yxrlieeebadghms{‡Ž“šŸ£¦¨¨§¥ž˜’Œˆ€zvspljllmnprv{zx{{yzz{}„ƒ„‡Š‹ŒŽ‹‹Œˆ†„€~~|zyxutuwz|}…†‡‰ˆ„€}ywwvuwyxz|~‚ƒ‡‘”””“ŒŠˆ…‚€~}}{{}zz{ywuvvvww{||ƒ‡‹””•—™›ššš–“Žˆƒ}vpmifegjnqswz}‚„†‰ŒŽ‘—––•–™•Žˆ„€€|vvtrsqptty{}}‚…‡†‡ŠŠ‹‹‹Œ†„‚ƒ€€}yx{~ƒ„ƒ…„‡ˆ‡‡„‚ƒƒ‚‚ƒ…„„ƒ€~}~|{|~~€‚‚„…††‡‰‰††„ƒ€~‚‚ƒ„„„†‡†‡ˆ‡ˆ‰‹‹Šˆ‡„‚€}}~}}}}~{zz{{zxxyyz€…‡ˆ‰‹ŠŠŠŠ‹‹‰ˆ†‡„‚ƒ€|zyxursswxwzyz}|ƒƒ„…†…†‰‹ŒŒˆˆ‡†‚€}{yzxtuuutrux|~„††‰‹‹ŽŽŒˆˆ‡…††…„€||~~}}|z{}~€ƒ„„…„„…‡ˆ‰Š‰‰‰Š‰ˆ…‚€{{|~€€€‚‚‚‚€€‚‚‚ƒƒ„…ƒ€€‚ƒƒƒ…††…††„€€~€ƒ„‚‚€~}~€~~}}}~~‚ƒƒ……‡ˆ‡‡‰ˆ‡ˆ‰ˆˆ†„€€€}|}~{y{{zxxyz~€€ƒ‚‚ƒ„‰ŒŠŒŽŒŒŠ‡†…ƒ€~~~}yxyxwxy{}ƒ„‡‰ˆ‡‡Šˆ‡‡†„„ƒ‚„‚~€~~}~€|}€€‚„†…†Š‹Š‹Š‰ˆ‡„€€~~|}}}€‚ƒƒƒƒ„†ˆ‰Šˆ†…‚‚€~~~ƒ„ƒƒ…„ƒ‚‚‚ƒ‚‚„……ƒƒ‚‚ƒ„†††‡…ƒ‚€~{xy|~‚‚‚ƒƒ†Š‰‰ŠŠŠŠˆ†…ƒ‚‚€€€}{zzz{}~~~€‚‚ƒƒ„…†‡ˆ‰‹Š‰‰ˆ††„‚‚€|zywvtrrttvy|€ƒƒ‚„…„…ˆ‰‡…‰‹‰‡†…„ƒƒ€~}}~|yy{|z{~€ƒƒ……†‹ŠŠˆ‡†…„ƒ‚‚€~~|||~€€‚‚‚ƒƒƒƒƒƒ‚ƒ„…„ƒ‡†……„‚€€€€‚‚……ƒ‚€€~‚‚~~}~‚ƒ…„‚‚‚‚‚‚ƒ…‡‰‹Š‰ˆ‡†„ƒ‚ƒ‚‚ƒ~~}}~}|}‚ƒ…‡‡†‡‡†„„†…ƒ…‡‰Š‰…€}|}~||}}~„…††‡‡…‡ˆ…†ˆ‡‡†…ƒ‚€}|{{|}}~~{z{{{~‚‚‚ƒ„‚‚ƒ„†ŠŒŒŠ†ƒ€‚‚‚€€~~~}}~€€‚~}~ƒƒ……„ƒ€€‚„†‡ˆ†„„ƒƒ…†‡†‡††…ƒ€}}~|}}}zx{~~ƒ……„‚ƒ…†‡‡‡†…ƒƒ‚€ƒƒ‚‚‚€}|{{{{|{{}~}‚ƒ‡Š‰‡ˆˆ†ƒƒ„ƒƒƒƒ€€}z{}}}‚‚€‚ƒƒ‚ƒ„…‡‡ˆ‡†††„ƒ„…„ƒ‚€€€‚…„ƒƒ†„€}~‚‚ƒ…„€‚‚‚‚„†„„ƒ„ƒ‚‚ƒ‚€€~~„…„†…„ƒ‚€~~‚‚‚‚€~}}‚„†‡‡†††ƒ‚‚‚„„‚‚‚€|||~~~~}{|~ƒ………‚€‚‚†‡‰‰ˆ…€~}}‚‚„€}|~€€‚€€€‚ƒ„…‡†ƒ‚‚€‚ƒ„„„„€~‚‚‚„„ƒ€€‚‚„…„„‚‚€€ƒ…ˆ‡†ˆˆ…‚‚ƒƒƒ‚€€}~€€€‚€{‚‡‰”€oŠ…€ˆ‡¨po—ˆuko‡›p_”w‡€]fbbPO_aplu‹—ˆ‡š«»ÅÓãïÿÿÿüþþìäàÀ˜„p`P@9:6(      7Vcs‹Ÿ³Ç×åïýÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿÿþòàÌ´ €dH0            #/?JWgs‹—£¯»ÇÒÙßæìóûÿÿÿÿÿÿøêÜÌ¼¬œteZQH@80& '5CO_o•¥³¿Í×ßçíõúýÿÿüöðäÚÐÈÂ¼´ª ˜Œ‚xmbVJ@2("#/9CNYcnw›£¯ºÃÊÒÚßãæéíò÷ûþÿýøðàÒÂ° xhVH<2*$ !'/:EU_n{Š—¥¯¹ÂÇÍÏÑÕÙÝßàáàÞÜÙÖÒÎÊÈÅÂ¼´ª ”„tfXH<0$%/;FOZgr}‡‘›§³¿ÇÏ×ÞãçìïñòðêäÜÒÈÀ²¦œ’ˆ|ph`XRLHFB@<742.+)*+-/27;?FOYeo{‡“Ÿ©±¹¿ÉÏÕÙÝáåççæåäâÜ×ÑÈÀ´¨˜Š€pbTH@4,$'.6?MWcmw‹•ž¥­³»¿ÆËÑÕ×ÚÜÞßÞÝÜØÓÎÈÀ¸® ”Š€rjaYRJD@:52,)&$"!!#'+29CMWco{‡“§³½ÆÎÔÛÞáãäãáàÝÛØÔÎÈÀ¸°¨ –Œ‚xlbXPE@4.)&" "$&+15;BIOW_fow‡—Ÿª±·¿ÅÊÏÓÖÚÜÛÛÜÙÔÐÊÄ¼´ª –Š€xph]TLFA<720,*((')+/3:CKU^go{…—Ÿ«³¹¿ÇÌÏÓÕÖ××ÖÖÔÐËÅÀ¸°¨ ˜†€vme\UNH@;7410.-.149=CJRZ_gqw†—Ÿ§­µº½ÁÆËÏÑÓÔÖÖÔÑÎÉÄ¼´¬¢šˆ€ulbZRLIDB@>><;:::;<?EIOU]gq{†™Ÿ§¯¶¼¿ÅÉËÍÎÍËËÊÆÃ¾¸µ±¬¦¡œ”Œ…€vph`XRNHD@<:989;>CGKOV[agmsy†Œ“›¡§¯µº¾ÂÅÇÉËËÊÊÇÃÀ¼¶°¨ ˜ˆ€xrlf`\XRNJFCA@???ACGJOTY^eksz‰‘™Ÿ¥ª¯³·»¾ÁÁÃÅÄÃÃÁÀ¼¸´°¨ š”Ž…€xpjb[UPLGCA?==>AEILQV[bgou{ƒ‡Ž“—¡¦«¯±´¶·¸¹º¹¸¸µ²°­¨¤ š”Žˆƒ~vqlid`\XTRPOMMMMKKLMOSW[agnv}…“™ž¤§«¯°³¶·¸¹ºº¸µ´°«¨¢ž˜’Œ†‚}xqkfb^[YWUTTSSUWY\]_dgmqtw{…‡ŠŽ’–šž£¨«­¯²³³´³²±¯­«©¥¢žš”Ž‰„€xrlfc`[ZYWTRQPQQRUW[aejqw}‚‡Œ“—›Ÿ£§©«­­­®­­¬ªª©¦£ š•‘Š†|xtqnkhda_\YWVWXXYZ]_bdgkorv|…Š•šž¢¦©¬¯±³³´´²°®ª¦¢žš”ŽŠ„€|vrnkheb`_][ZZZ[[\^_bcdinquy~‚†ŠŽ“–˜šœŸ ¢¤¥§¨¨¨§¦¤¢ œ˜–’Ž‹ˆ‚~zuplheb_\[ZZZYZ[\^adgjnqtw{ƒ‡‘”—šœŸ ¡£¤¥¤¤¤£¡ ž›™–“ŽŒˆ…|xurpnmkihfdcaabcbbcegilorvz}‚†ŠŽ’”—›Ÿ£¥¦¨©©¨¦¥¤¢ š˜•’ŽŠ…‚~yutqmifdca`^_`acfiknqsuwz|‚…‡Š’•—š›žŸ¡¢¡ ¡¡ žœš˜•“ŒŠ‡„€~{xvtpnljigeeeedeefghknpsw{ƒ‡‰‹Ž’•—™šœœŸŸ  Ÿž›™˜–”’Œˆ†ƒ€~|ywtroljhhgghggijjjknpsuwy}‚†‰‹’•–—™›œœœ›šš™˜———–”’‹ˆ…‚€|zvrqnlkihgffeegghjlnoqtw{~…†ˆˆŠ“”•–—˜—™šœœš˜™˜˜—–•’Š†ƒ€{xvrnkigea``aabdegjlpsvy|‚†Š“–—™šš›œ››šš™˜˜—•“‘ŽŒ‰†„‚€|zxtttpmoljkjijijjmprsuwy}ƒ‡‰Œ‘“–˜šš›œ›œœš˜—•“‘Ž‹‹Šˆ‡„‚€}|zxvtsponljjklmnooqrsuwz|„‡‰Œ‘‘“–—˜™šš™˜˜–•”“‘Œ‰†‚€|zxvttsrppppoopqqqrssstvwy{~‚„…†‡ˆ‰‰‹Ž‘’“””””“““’‘Ž‹‰‡…ƒ‚€}zxusrpoooppprstuvvxz{}‚„„…‡ˆˆ‰‹ŒŽŽŽŽŽŒŒŒ‹‹‹‰ˆ†„„‚€~}|zxwvttttrrsrrstuwy{|}ƒ…‡ˆ‰ŠŒŽŽŽŒŠ‰‡…„ƒ‚€€~~}||||{{zyzzzyyzyzzz{{{{|}€‚ƒ…†‡ˆ‰‹ŒŽŒŒ‹Šˆ†…ƒ€~}|{yxvwvuuuuvvvwxyz{|}~‚ƒ„…………†‡‡‡‡‡ˆˆˆˆˆˆ††††‡‡†††††…„„„„ƒƒƒƒ€€~|{zyxxxwxyyyzzz{|~‚ƒ„„†‡‡‰Š‹‹Œ‹ŠŠŠ‰‰‰‰Š‰‰ˆ‡†……ƒ€~~~~~~~~~~~~~~~}}~~€€‚‚‚ƒƒ„…‡‡ˆˆˆˆ‡†‡††‡‡†††††…„„…„ƒ„……„„‚€~~~~~~~~~~}}}~€€€ƒ‚‚ƒƒƒ„…††‡ˆˆˆˆˆ‡††…„…„ƒƒ‚‚‚€€~~}||{{||||}~}}}}}~~~~€ƒƒ„…„„………„„…………………‡‡‡††………„ƒƒ‚€€€€~}}}|{{|||||||}}}~~~€‚ƒ„…††‡ˆˆˆ‰ŠŠ‰‰‰ˆˆˆ‡‡†……„„ƒƒƒ‚€~~}|{|||||||}}}}}}}~€‚‚ƒ„ƒ„„…†‡‡‡ˆ‰‰‰ˆˆ‰ˆˆ‡††††…„ƒ„ƒ‚‚‚ƒ‚‚‚€€~~~}||{{zz{{|}~~~‚„„ƒ„†††‡‡ˆˆˆˆ‰ŠŠŠ‰ˆˆ‡†„„„‚€}|{{{{{{||{{{{|}}}}~~~~~‚‚ƒ……†Š…ˆ‰††‡ˆ…‡‰ˆˆ‰‰††„‚‚‚€€…`ˆuovx}‡”h~h‹pK_…Ÿª ˆt}P<?°—ßÿ  ƒ€@ T?Ÿ·ïÔïÿðçÿ°ßä   /  ?`W€_¯à€w¶€ˆHC4/KXIUJC˜To¯ÔÀ€sŒpH[ª”xhP_w†›·ÇßýüðùôÐ¶± p8("$!/Ofq{¥©³°®ª˜€hempr€h^fbTQ]w•¯¿À¼ªœ€ph\L:27?Ucs“§»ÇÓßÐÀ°šˆrdXIBAIJIMWen{œ¦³»À¸¨˜ˆ€xhihhkns‰™­¿Â¼µ¬˜ŒˆzlhdYSVYYgv{‡›¯°¬ª¨¦ „xhVPNJGMU^eo‹™Ÿ§­¨¢”Œ„|ty~x}‚†…†Ž—Ÿ£«®¤ž™Œ†zpbXROR[gu~‡““”–™‘Š‚zrd_`]fjjkrvx{‹—›Ÿ§²¬£¢œ’†‚|pjcfku~‡‘›ž£ œ–ŽŠ„xrh`]\Z[abeor{|—¢ žŸ”ˆ€usldcdjjs‹›œ£¬ª¤œ›š““Œ…€pijkmmzƒ†Š‹•™”—œ„|lea\X^abdo{Ž¤©¨§¥ ™’Œˆ‚|rmpmo{…‹—–™œœ™—›”Œ‚xkd`][_fkpv}‹–™˜”ˆ€rmfc``begmy‡£¤¥¤¢˜“ˆ€{urnorw‡™›ššš•ˆ€pjd][^cjosw}„‰——•Œ„~}yxvpqtw{…—¢¦§£¡¢š”„~xpnosru{}~‚‚ƒ†ˆŠ„‚€xtpnmmoosvu}†Š‘™›™˜˜’Š…€|yywyz|…‰Œ‹‘•’Ž‘‰„|yvusrsspruuvy}}‚€~zxzxuty{}ƒŒŽ‘‘•”’Š†~|}}~|{}|}€‚††…‚‚|{xuwvrryxrw~~†‡ˆˆ‰ˆ†…„‚„‡‰ˆ‰‹‰Œˆ‹‹‹ŒŒ’“’Œ†ƒ‚€|}zz}~€‚„…‡‡ƒ}{{||€€|{}}…‰ŠŽ‘Ž‹‡†ˆƒ€ƒ‡‚ƒ‡‡Šˆ†‰Š‰…ƒ†‚‚€}~~{{yzxsvwz}‚‚‡Š‡††‚€~~€ƒ‚„ƒ…‡†ŠŒŒŠŠˆ†„€~}{xuvyzxy}‚ƒ‚ƒ€~~{xvvtvvv{z{~„††ˆ‡†ƒƒ€|zzx{~ƒ…‡‰ŠŠŠ†…††…ƒƒ€zzxxzxxz}}~„ƒ††ƒ|y{x{~|~ƒ†‰‰‹Šˆ‹Š…††…‚ƒ‚‚€‚ƒ„‡†ˆŠŠŠ†…„€€~|zwz|{~‚…„„„ƒ…‚ƒ„‡…€~||~€……†ŠŽŽŽˆ…ˆ„~€€~ƒƒ„‡‰‰‰‡‡‰†„„‚€~}{{}|{€€„‰‡‡Š‰ˆ‡„€€}ƒ††‡‰‰‰ŠŠ‰Š‰‰ˆ„‚€~€„„†…„„‚ƒ€€~~~‚€€‚„€‚‡ƒ…†‡†ƒ…€|~|‚€~‚ƒ‚‚„„€ƒƒ‚€~}z|~~~~„‚€‚‚‚€€~z|zxz‚„„‚‚€~€~‚„ƒ‚ƒ†‚ƒ‚~€ƒ‚ƒ„€~€€|z~}}‚‚‚‚‚„ƒ€ƒƒ…†„†…‚„‚€€~~€‚€…ƒƒ††ƒ€…ˆ…‚ƒ„…‚~‚ƒƒ‡ˆˆ…‚‚ƒ‚€}€€‚…†ƒƒ†‡ƒ…ˆ†ƒ‚„ƒƒƒ‚ƒ‚ƒ‡…„„†ƒ……ƒ‚‚€‚€}~|{~€~‚‚ƒ‡ˆ‡Š‡ˆ€|y}}|{}ƒ…‡ˆ……†„„†ƒƒ‡€}|}~~|~……‡…ˆ‰ˆ’ˆ„€~zx|€…ŒŒ‹‰‰„ƒ…€}zwxxvy~‚€|€}‚ƒ~~€€€€ƒ…‰‰‹Ž‹‰‹ˆ„†„€{wxwv{z{{z|}ƒ‹ŒŠˆ……€{|zyz{}|‚ƒ„‡‰ŠŠ‡‰ˆˆ†€‚€yywy{{~€…†„„‡Š†„†„‚€}yyyyz{}„ƒƒ‰‹ˆ…ŠŠŠ‰††„€~{{}~ƒ‚ƒ„„„‡„…ˆ„€€}|||~€|}€€ƒ…†„„……„ƒ€~xtsstuy{„‡‰‰‹Š‹Š‡†…ƒƒƒ‚„ƒ‚ƒƒ‚ƒ…„†‰…ƒ†„€€~~~{xy{{~„…„ƒ……„ƒ…‡„……€~|{yx{}‚ƒ‡ˆ‡‹‹Š‰ˆ†‚‚€~‚ƒƒ‚‚‚ƒ‚†…ƒ…„„„„‚€€~|zy~~}ƒ‰ˆ‡ˆˆ„ƒ€~{~|{{|€€‚……††ŠŠ‡ˆ†…†ƒƒ‚€€~}~„ƒƒ…‚€‚‚‚‚€€}|~|~„†ˆ‰Š‹‰ˆ†„‚€€€‚ƒ‚†„ƒ…†„‚‚…†ƒ‚€€}zz}€„…„ƒ……ƒƒ‚€‚‚‚€‚‚††‡†‡†‡†……ƒ‚‚~z{{}~…†…„………„‚‚‚€~}{{|}}‚€…„‚ƒ„„ƒ‚ƒ€~~|}€ƒƒƒ†…‚€€‚„‚€}~||~„‚„‚ƒ„ƒ€~}}~‚……‚ƒ†„…‚ƒ„€€‚ƒ„„‚ƒƒ‚€€‚ƒ‚†…‚‚€€}€ƒ‚ƒƒ‚ƒ‚‚€€€€€„€‚„ƒƒ…†„ƒ‚€€€‚†‰ˆˆˆ†……‚‚‚€€‚ƒƒ…‡†ƒ…ƒ‚€~~~~‚ƒ„„ƒƒ„ƒƒ€}„…„†‡†‚ƒ…ƒ‚„ƒ‚„…„†‡……„‚€‚‚ƒ…‚‚€‚€ƒƒƒ‚ƒƒ‚€€~|€‚‚„‚ƒƒ‚€€ƒ‚€ƒ„‚‚ƒƒ€€}{~}}‚‚ƒ‚‚€€~~}~€…„ƒƒƒ‚ƒ€‚ƒ‚ƒ„…„†††…„ƒ‚ƒ‚ƒƒƒƒ……„‚ƒ‚€€~~€}€€}}~~‚ƒ‚„ƒ†‡„‚~}ƒ„†‡ƒ……†ƒ€~ƒƒ‚ƒ…ƒ„†‚„€€~{~}}~ƒƒƒ…ƒ„††„‚ƒ„‚‚ƒ„‚ƒ„‚ƒƒ………ƒ‚„ƒ„„„‚€€€~~‚………†„ƒ†„ƒƒ‚‚ƒ„ƒƒ‚…‡…„†„‚ƒƒ€‚ƒ€€€€€ƒ„‚‚€„ƒ‚‚‚‚~}}}€ƒƒ‚‚ƒ„ƒƒ…‡‡ƒƒ‡…„…‡†ƒƒƒ€~ƒƒ„…ƒ€~}|}}‚€ƒ‚€€‚€~~~~€ƒ‚‚ƒƒ€ƒ‚„ƒ‚„ƒ‚‚ƒ€‚€€€~~~}}~~‚€‚‚€€€‚‚‚ƒ…‚‚„……„…„„…„ƒƒ……|{ƒ…‚€|}€…ˆˆ‹€†€…‚€~{~…†x|z€y~po}€‰’‘œŒ€uƒ€t‚’‹––œ˜™œ’‘•’ŽŽ„€xtrlhca_bfbcinps{|ƒ‡‰Šˆ„€…‹‘‘“——›˜“–•”’†|vvrjhiqy|~ƒˆŠŠ†……††‚~zy{{|~~}z{}|ƒ„‡‹ŒŒˆ„€zxtrruvvz€€‚‚…„‚ƒƒ€}zxyzz|…‡‰Ž‘’‘‘‹Š‰†‚€}zvsrpqrtx{}…‰ŒŽ’‘‘‹‹Š†„†‡‡ˆŠ‰ˆ…€€~{vqqpnmlnoouy|ƒ‡Š‘”———™•”Š‡„|yzyyz{|zx{zyy}|{|~}}~~}‚„‡ŠŒ‹‹ŽŽŒŠˆˆ†…~{xwtppquwy~ƒ…‡†‰ˆ…††……„ƒ‚ƒ€‚ƒ†ˆ‡‡‹ŠŠŠˆ†‚€€~|zxwxz}}‚„††…„ƒ‚€~€‚€‚‚‚ƒ…‡ˆ‹‹ŒŽŒ‹‰†…„€ywvtrrsvxz|‚ƒƒƒ‚€ƒ…†‰‹Š‰ŠˆˆŠ‹ŒŒˆ‰†ƒ€}yuvrqrtxxz„††Š‰‹‹‰‹ˆ‡‡††ƒ€}||}‚€€~zyyxxxx||}ƒ‡ˆ‰‹ŒŒ‹‹ŒŒˆ††ƒ€|yyxvwyw{~ƒ‚~~~}||}€ƒ‡‡ˆ‹‹Š‹‹‰‰ˆ„ƒ€}~~|}€…„„‡…ƒ…„ƒƒ‚€~~}|ƒ„ƒƒ‡‡‡‰‡ˆ†„‚‚€€~~€}‚ƒ„„ƒ„€‚‚ƒ‚‚‚ƒƒƒ…‡ˆ‡‡‰ˆ††ƒ€€~zyywvwwy{}~€€ƒ„ƒ…‡†……‡†…‡‡‰ˆˆˆ‡‡‡…„„‚€€~||zyyxwwz|}|ƒƒƒ‡‡……†‡……ƒƒƒ€€€‚‚‚ƒƒƒ‚‚‚€€€ƒ‚‚„„ƒ„…†‡‡‰‰ˆ†„„‚€€~~~~~€~ƒ‚ƒ‚€€‚„„ƒƒƒƒƒ„…†ˆˆ‡‡‡‡‡‡ˆ‡‰Š‡…„„ƒ‚‚‚€€}||}~‚‚€~~€}}~~‚„†‡…†‡††‡‰ˆ„„~}~~}~~~‚ƒƒ€‚€|}~‚ƒ……‡ˆˆ†„‚€~}~~}~~||}|}}~€€ƒ„…ˆˆˆ‰‡†„ƒƒƒƒ„„……‚‚‚‚€€|zxyzyz|}~ƒ‚ƒ…„„†††…††„„„„ƒƒƒƒƒ‚€ƒ„…„„…„„€~~}}}~€€ƒ„‚‚„ƒƒƒ€€€€€€‚ƒ‚ƒ„‚ƒƒ…†…„‚‚€€‚ƒƒ……‡ˆˆ†‡††„‚€}~€}}€€€€€€€‚„……†‡‰Šˆ‡ˆŠˆ††„ƒ…„‚‚€€}}}~ƒƒƒƒ‚€}||~€ƒ‡ˆ†‡Šˆ„‚ƒ‚€‚€~€‚ƒ…„„‡‡†††…†…ƒƒ€€€€~}|}|{|z{||}‚‚ƒ†‰ˆ†‡‡†‡…ƒ‚‚€‚‚‚‚‚€‚ƒ‚‚ƒ„ƒ‚€~|||}€€‚€€€€€}€ƒ„ƒƒƒƒ„…‡‰†‡†„„‚€~~~~~€€‚‚ƒ€‚‚‚‚€~€€€€€ƒ……†……†ƒ‚ƒƒ„†…‡ˆ‰ˆˆ‡…„‡†ƒ}}|{yy}z{€}‹xw‹Œ€›€{t€›„‹€—}‡€op_p@?ouˆm€o› ‡¯¼ËûÿÿÿÿÿøÐ°„P        ?fwzŸ·¿ÏßïûøêâÈ¬­´²­¨¦˜…‡‹€t`D0"'?Seosw‡—§¬ª¬µ·²¤”ŒŠˆ‚zp`PHMW_o†ˆ‰’¡¦ª©¤šˆ†ˆ„|tle^[[]_istpkggiiow‡Œ’›¥¯»¿ÉÍÍÊÂ¸° x`L@2,(%-5:==FUew‡›«·¿ÅÈÏÕÒÈÀ¸¬£š‹…€tj`ZRH<0("+7K_s‹Ÿ¯½Ë×æïôôðâÔÄ¸¨œŒ€l`TF<1**.7FS_kw‚‡’—Ÿ®·¿ÆÄÂº°©¢˜Œ€xhVH>:9;COUYbiow›¥¯¶·µ´²¨œ€xrnpsw…†‡†‚‚}|zutssx{ƒ‚€~~~„†€}xrlheegjnu}‡“£®´·º¸´®¨¤¢œ’„xi\PFCGHHJNRW_o{†Ž“™šœ¡£¥©­±¶¹¹º½»´¬ €p`TJE@<:98:?JS_o{‹š§µ¿Í×ÛÙÐÆº¬ ˆ€xmfb^\ZTSRLIFFJOYakw‹”Ÿ«³»ÃÇÉÉÅÀ¸°¨ –ˆzj`RH@=?BIS^gu‰“•–––—™›››š˜•“ŒŒŠ‰…‚|xrqpoopnquuz…Š–›œœ™•ˆ€yplheccgkov‡•¢¥¥£ ˜”Žˆ„€yrnljihjlkkkilmopsw|‡Œ“™ž¢¥©¬­¬ª¨¤œ’†|peZPLHA>?CKS[eo{…–Ÿ¤¦¬¯°®¬«¨¤¡™’Œ…€xmfb\VRONMORV]ejr{…‹“ž§¯¶»½¼¸²¬¤˜Œ‚zphc`__`ceikorsw{}ƒ‡ŠŽ’”•˜šš˜˜™˜˜—•–•Œ‰‚|wqlihhkou{‡Œ‘•–—––”‘ŽŠ‡†ƒ€|xwxy}ƒ‡ŠŽ‘Ž‹‰†ƒ€€‚ƒ‚‚€}}|yywwtqqqrsuw{„‡‘—›Ÿ¥¥£¡ž˜’Œ…€xqkgb`_^_cegjnrw|‡“˜˜šžžŸžœ›š—”Œ‰‚{upjb[XVTTVZ_cirzƒ‹“›¡£¦¨©¥¢Ÿœ™“Œ…€|xvqmkjhdeeghgkosux}‚‡Œ‘–˜›žŸŸŸœ˜”ˆ‚|uplkkklnqtvz‚…‡ˆˆˆ‰‰Š‹Šˆ‡†„‚€‚‚‚ƒ‚€~€ƒ‡‰Š‹Œ‹Œ‹‰‡„€|wuuuutvyy}…ŠŽ‘•˜™˜˜˜•’ŽŠ†ƒ~}{xwvusrpprtwyz€‚†ˆ”—™žŸ   š•’Œ†‚|uplhedbdhknrw|ƒ‰“—™››œž™–•ŽŠ‡ƒ€zvtromljhijknrvz†ŠŽ’•——–––”’ŽŒ‰„€~zwusrqporrsvwy||}ƒ„„ƒ…††ˆŠ‹Š‰ˆ†ƒ~|{|{xxxxxxyz{}}„„„…‡†……„‚~{zxwvwxy{|}ƒ„†††‡Š‰ˆ‰Š‹‹Š‹ˆ††„‚‚€€~|{zzxy{xwz}|~ƒ‡Œ’““ŽŒ‰†‡ˆ|y~hkypmsqˆh€o‚„‡—Žš€ŸËÀp¿ÿ W@Ð@ŸÀ0 7H'W¨e—·É×ÿÿÿÿÿÿÿÿÿøàÄ±° `8          ?k«ïÿÿÿÿúùõÿÿüäÔÌÄÀ tggl`Ug€jb`TORJ86Ko‹›£¥žŸ­»ÏååÐ°”€X803./?OUWg—¯ÏååääÚÈ¨”€X8"7Wu…‘Ÿ§¢™šŸ§µÅÏÓÕÝÝÛ×ÐÌÀ°œˆ€pX@       7KgŸ·ÏëÿÿÿÿÿÿüàÊ´ €j\J8,!#/9=CKWg{—©·ÏåóÿÿÿÿÿÿÿìÐ¸˜€T8$&/GWg{Ÿ­»ÉÍÎÌÆÂ¾·´«©©¨¢–‚xqph`VKA95./7?O_o›§³¶¹»ÂÂ¾¸¬ †€laYYZ_jqz“•›¡¡ •€tlb\ZY_abd``_eloy}‚…†‡ˆ’™Ÿ¥­³·½ÁÂÁ¼´¨˜Œ€p`J<("/?Wgu•§µÆ×åíõôðâÕÈÀ° ‚xl`TPH<60.*++/;CO[j{£µÇ×åñôôòêàÔÈº¨’€hT@0 )3?O_oŽ—Ÿ«³·º¿ÁÃÃÇÄÀ¼¶°¤˜ˆ€rh`UPH@8766:CS_o›§¯¹¿½¼»¸¬¢˜Ž„|rmlhgkorwz„„‰ŽŠ†„‚€‚‚…†††€~{ttqqqquuw…Ž–ž§¬±³¶¶±®¨ ’Š€pdZQHB@>?EOWcnwƒ™Ÿ§¯´¹¿¿À½º¶±ª¦ •Œ„xh`TJ@41,+,/;ER[g{‰–Ÿ¯½ÇÏ×ÚÛØÐÈÀ²¤”Š€p`TLD=;:9;?CGOW_is~‡“£«·»½¿½½¸±¬ ˜„ypd\XTNLMNOTZckq{…—šž¢¥¥¥§§¦£ š—’Œ†‚~ztrsppprssuw{}ƒ…‰ŽŽŽŒŠ‰‰ˆ†…‚€~}}ƒ‡ˆˆ‰‰Š’”•—™™™–“Œ‰‚~xtplfdb_a`cimrw…‹•Ÿ¦­²´µ´±®©¤œ”ˆ€xple^[YTSVTY]cimv}…‹—¢§¯µ¸»»¼¹´®¨ ˜vl`XPJFBACFIOW_iu{…—Ÿ¥©­¯°²³°¯ª¤ž˜‰€xrlhbZUSRNOSW_cirz‡•›ž£¦¥¥ Ÿž˜’Œˆƒ|xxvsqpppssuz{}‚ƒ„ƒ„„†ˆ†………‚„„„‚€‚€‚ƒ…ƒƒ‡‰Š‹Œ‹ŒŽŽŒ‹‰…‚€|wtpnnmmoorwz}ƒ‹“–—Ÿ¢¤¤¡Ÿ›—’ŽŠƒ~zupkhefedefijmrvz}ƒ‹–›Ÿ¤§­¯°¯®«¤ ˜ˆ€xnhb\XUVVWY_eksy‹–›¡¦¦§©©¥¢ žš•’ŽŠ†€zxsljfd`]__cekrv~ƒ‰‘•›¡¡£¥¥£ š–Ž‰„€zvtpoqqrqsvvvwwxsy|{}“€…Ÿ˜€Ž—Í×€?€Wgggghhiijjjkkkllmmnnnoopppqqqrrrssstttuuuvvvwwwwxxxyyyyzzzz{{{{||||}}}}~~~~~€€€€€‚‚‚‚‚‚ƒƒƒƒƒƒƒƒ„„„„„„……………………††††††††††‡‡‡‡‡‡‡‡‡‡ˆˆˆˆˆˆˆˆˆˆˆˆˆˆ‰‰‰‰‰‰‰‰‰‰‰‰‰‰ŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠ‹Š‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹‹ŒŒŒŒŒŒŒŒŒ‹‹ŠŠ€‹‹Š`K¿ ‡ P€ï ‹“ŸàŠŒ’ß †—ð„†×¨€‡ð€‡¿À{‡ð€{ ¼¿¯À?kihijjjkkkllmmmnnnoopppqqqrrrrsssstttuuuvvvvwwwwxxxyyyyzzzz{{{{{|||||}}}}~~~~~€€€€€€‚‚‚‚‚‚‚‚ƒƒƒƒƒƒƒƒ„„„„„„„„„……………………††††††††††††‡‡‡‡‡‡‡‡‡‡‡‡‡‡‡ˆˆˆˆˆˆˆˆˆˆˆˆˆˆ‰ˆ‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰ŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠŠ‰‰ˆ€‰‰‰`M ¿ ‡ P›€ß Š‘Ÿàˆ‹ß …‹ð„„‹¿°…‡ð€~…¿Àzƒð€y€¾¿«À?kiiijjkkkkllmmnnnnooppppqqrrrrsssttttuuuvvvvwwwwxxxxyyyyzzzz{{{{{|||||}}}}}~~~~~~€€€€€€€‚‚‚‚‚‚‚‚ƒƒƒƒƒƒƒƒƒƒ„„„„„„„„„…………………………†††††††††††††††‡‡‡‡‡‡‡‡‡‡‡‡‡‡‡‡‡ˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆ‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰Š‰‰‰‰‰‰‰‰Š‰‰‰‰ŠŠ‰‰ˆˆ€‰ˆˆ€#O ¿ ƒ Pš€ß¨‰ŸàˆŠß¨„‹ð„ƒ‹¿°…‡ð€~ƒ¿Àzƒð€y€ ¿¿«Ð?kjjjjkkkllmmmnnnooopppqqqrrrrsssttttuuuvvvvwwwwxxxxyyyyzzzzz{{{{{|||||}}}}}~~~~~€€€€€€€‚‚‚‚‚‚‚‚‚ƒƒƒƒƒƒƒ„„„„„„„„„„„„„………………………………††††††††††††††††‡‡‡‡‡‡‡‡‡‡‡‡‡‡‡‡‡‡‡‡‡ˆˆ‡ˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆˆ‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰‰†ƒƒ‰‰ˆˆˆˆˆˆˆˆˆˆˆˆˆˆ‡‡‡‡‡‡‡‡‡‡‡†‡‡††††††††††††††††††††……………………………………………„„„„„„„„„„„„„„„„„„„„„„„ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ‚‚‚‚‚‚‚‚‚ƒ‚‚ƒƒ‚‚ƒ‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚€€€€€€€‚‚‚‚‚€€€€€€‚‚‚ƒƒ‚‚‚€€~€‚ƒ‚ƒƒƒƒ‚‚€€‚ƒƒƒƒƒ‚€€€€€€€‚ƒ†‡ˆˆ†„|zyyxyz{ƒ‡’ŽŠ„€|xsrrpqux~†”™š˜•†€xrmjhgimr{‡“ž¥¥¢œ‘ˆ|tlfd`]afo~«¯®¨œŒ€tlda^Z[_gw‹Ÿ¯·¶° Œ€le`\ZTV^g—«½ÅÀ°˜‚p`ZUSTQS_u¯ÇÕÒÀ „hXLHHJFO_w—·ÏßàÈ¨ˆhL@;;?=K_}ŸÇßíìÈ¤€`D80/77Kk»ßñöèÀpH1( '3?_¯ßõöòÐ xP0 +;_—¿ßýüôà pP"'?kŸÏïÿüðØh@/O¿ãûÿøèÀ€P(   ?o¯çûÿýðÐ `4  7gŸßùÿÿôà¨`4  ?k—×õ÷úõè¨`0  ?wŸ×ñîñòà `(  _‡«×èãééÐˆ@  ?—·ÛÜÛÞØ°`( /o›§¿×ÐÑØÀ€@'kŸ©»ÏÌÉÏÀ€H'_Ÿ²·ËÈ¿ËÀ€P /_§¼¹ÉÈ¸¿¸€H7o¯Ä»ÊÄ±½´€@ ?¿ÐÅÊÀ®¶ `( O›ÏàÒÒÀ°²@  _¯ßäÜØÀµ°p(  /¿çâàÐº¼ P   ?ŸÛàßàÀ½¸€@  +o¿ÛÕÚÈµ¶T(  _Ÿ×ÚÓÌ°«˜`4W—ÏáÚÐ¸¤`0 ?ÏêäàÈ¬˜`(
+ ?¿åæäÔÀ¤€4 /o·ÛääØÀ¬€@ /o«ÏÙÙÔÀ¨€@ ;w¯ÏÓÍÈ´ €@ ?·ÕÔÌÀ°”`0
+_›¿ÝÚÑÀªˆX _ŸÍßáÒÀ°€H /o¯ÏÛÚÌ¸ €P ?¯ÓÕÒÄ°˜`@[Ÿ¿ÖÔÆ¸œ€P(?·×ÞÐÀ¤ˆX8[Ÿ×îäØÀ˜p@
+/¿ëôìÔ´ˆP$ O—ÏõöìÐ¨€@ /o·ßðìàÀT$ O—ËëðäÐ¨h@ 7w·ßêèØ°€H /_§ÓæéÚÀP('_—ÇßåàÈ `0W¿ßæàÈ `0OÇêëàÈ `0
+?¿ïôðØ `0?{·ëúôà°p0 7o¯ß÷öèÀ€@ /o¯ßøôèÀ€@ +_ŸßöúìÀ€@ '_ŸÏïõðÐˆH +_ŸÏçïèÄˆP 7oŸÏååÜÀ€@ 	;o¯ßëæØ°p8?»çðêØ°`0?¿ëõêØ¨`(?¿õ÷ìÔ T OËõúðÔ H W—×ûúðÐ@ WŸ×ûüðÐˆ@ '_ŸÛ÷øêÈ€@ /g¯ßóðäÀp0?·åïìØ `0O¿îðèÐP /_ŸÏïðäÀ€@7o¯ßòìà°`0
+K¿ëñéÐP 
+/_ŸÏïðäÀ€@;o¯ßôðà°`0
+?¿ëóìØ P '[—ÏïðèÄ€@7o«ßñîà°h8	?·çðìÔ T +_›ÏëíäÀ€@ ?w§ÛëèØ¨`0'O¿ãìäÈˆP$7oŸÏêéà°p@'O¯ÝêäÐX(7_Ÿ¿ãæàÀ€@ %O¯ÛææÔ `0/_—¿ßæâÀ€H(G{§ÏßâÔ h@ 3_»×ÞÜÀ€P0%?w§ÏßÝÐ h@$7_·×ßÞÀ€P0 'G{ŸËÙÝÐ p@(!7_¯ÓÜØÀ€X4&+OŸ¿××Ð h@,%;_—·ÏÚÔÀ€T8$/OŸÇÙØÈ dD0*?k—·Ï×Ô¸€P8(7W§¿ÐÔÈ˜`@0*?o›·ÍÓÐ°€P8,7[§ÇÑÒÀ`@1/OwŸ·ÊÎÌ¨pP8.?g“«ÅÍË¸„`@03W£»ËËÈ hP60?o›¯ÇËÊ°€X@07W«¿ÊÉÀ˜hH82GoŸ·ÊÌÈ°€P@37[«¿ÌÊÀ`H82OwŸ·ËÊÆ¨€P83;_³ÇÌÆ¸ˆ`D43O«¿ÐÌÄ hJ83?g—·ËÎÈ¸€T@46W­¿ÎÊÀ `H82?oŸ¶ËÌÆ°€R@27]¯¿ËÅÀ `D73GoŸ»ÊÈÁ°€P@47_µÇÌÄ¸`D83Kw§½ÍÈÀ¨€P<47_—·ÇÎÄ¸`@94Kw§½ÎÊÀ¨€L807_—·ËÐÂ¸`D4/Kw§¿ÏÈÀ¨€L:17_·ËÎÆ¸`B4/?w§¿ÓÊÂ¬€L8.3[·ÍÑÈÀ `B2,?oŸ¿ÏÍÆ°€T@,/W¯ÇÑÊÀ hH4+;_»ÏÐÈ¸ˆX@,-O«¿ÔÍÄ¨pP4(7_—·ÎÐÊÀ`D,)?o§¿ÒÐÈ°€P8(-O³ÏÕÍÂ hH0'7g—»ÑÒÌÀˆ`@('Gw§¿ÓÐÈ°€P2"/W³ÏÒÌÀ pH,$7_›¿ÔÓÌ¸ˆX@()G{§¿ÒÒÈ°€P4$/W¯ÏÔÐÄ hH*%;g—»ÒÓÐÀ`@"'?w§ÇÒÒÊ°€P0 'O³ÏÔÐÈ tL0 /_»ÕÕÑÀ˜hD$7gŸ¿ÚØÒÀˆ`4 ?o«ÏÙØÒ°€P0O·ÕÜÚÐ¤€H"'O¿ÛàÜÈ h@ -_—¿ßâÚÄ`4/gŸÏßâÚÀˆP(7o¯ÓæâÔ´€P$?w·ßèäÔ¨€@ ?¿ßìäÐ¤p@O¿çîàÈ h4WËëîàÀ”`0'_ŸÏíìØÀ`('_Ÿ×ïìØÀ`(+_ŸÛïèÔ¸ˆX(+_ŸÝïêÒ°€X$/_ŸßñèÐ°€T(/_§ßïèÐ°€T(/gŸÝíèÐ°€X0/_ŸÛëèÐ¨€`0/_Ÿ×çèÐ°ˆ`@!3_—ÏãäÐ°ˆ`@$!3W¿ßâÐ°hL*&/O·ÛàÐ°pT2,/O{«×ÛÐ´˜€`@21?oŸÏÕÔÀ €bP85?_·ÐÔÀ¤ˆj`@<?WŸÇÍÄ°”€fP@=Ko»ÅÆ´ ˆp`D@G_§¿ÅÀ¨€lRFAOm·ÃÄ° ˆtdLFG[wŸ¹ÃÀ¨˜€pXH@Kg‹¯¿Ä¸ xhP@?So›½ÆÂ°œ„t`H<?[¯¿ÉÀ¨”€pP@:Kg—»ËÊ¸ ˆt`H:=WwŸÃÍÄ°˜€pTB9G_·ÇÎÀ¨ŒxhP@=Ok—¿ËÊ´ „l`JAC[{ŸÅËÄ¨’€l`JDG_«ÃÆÀ Œxm`MEOg¯¿Â´ ŒxpZNCOg‹³¾À°šˆzp`LDSkµ¾»°šŠzt`LCSo³½¼¬šŠzt`LDOk³½½°šˆxp`LCSkµ¿¼¬šŒxp`LCSk¯½º°˜ŒxrdNESk¯»º¬˜Œ€thQHSg‡§¶¸¬œŒ€vlTPSgŸ²µ¨œ‚wt`RScw­²ªœˆzwpXP[o‡Ÿ¯­ Œ€yz`TWg}—­¯¤”ˆ|{pZS_o‹Ÿª¨œ’€xx`X^k}£¨¡–”Šz{t`Yeo—£¨ ˜‚y{p^]fs‡ž¥£š”€~}d\_gw‹Ÿ¦ š–Œ€~z`X_gw¢¨ š•Š€xZS[g—¦¨ —”ˆ‚€tTR[kŸ«© •„~zpXTbo‡Ÿ«¨š‹€{yx`[es—ª¤˜Š†€z{{p`fs“Ÿ¡˜„~‚€€hem{‡—¡–Š€‚ƒƒ„ƒxfiw‹›”‚‚…†‡ƒ„pko{‹–‹Š‚‡ˆŠŠ†„pmov}‹‘‹Š„‰‹Žˆ€lhis~‹‘Š‰Œ€zhdmw”ŽˆŠ‹Šˆ€|pjozŽ”Œˆ€„‡‰ˆ‚xnqz}…‹„„€ƒ‹•ˆ€rjosw…†ˆ‡‘—˜–Œ€p`ckr‹‹“˜”‘ˆxpdbku‹’‘–’ˆ…zsrimw~‡‘‘Žˆ‡…„ƒ€|zpt{}…‹Œˆ…ƒ……ŠŒ†„|qquz…ƒƒ‚‰’—ˆ€tllnqy†ŽŽ“•”•†yp``io‹’•—”•’Œ„xlldgw‡‘——–Œ‰…|{zvyzu}‚…Œˆ‰‚}‚†‰†ƒ†€w{x{~‚…‰‡‹ŒŒ…€xllps‡Œ’Ž’Œ‰ˆ€zzpksu‡‘’Š‰Šƒ‡„€{zpqwz…‰ŒŽˆˆˆ„ˆƒ€{zpsz|…‡Ž‹…‡ƒ…‚~~xwy„…‹ˆˆƒ‚‚‡†‡‚~yx{~~ƒ‚…„ƒ†‡‰ˆŠ„ƒ€vtuwy„‰‰†‰ˆ‰‹‹†€~ursw{†‡Š‰‰ŠŠ‹Šˆ~xoqsw~†‰‹Œ‹ŠŠ‰…€zxpqv{…ŒŒŽŠ‰‡„„ƒ‚}~|uv{~‚‡ŠŒ‰†„‚‚ƒ„‚€~}xz€„†††„‚ƒ‚ƒ„……„„}{|z{ƒ„‚„††Š‹Š‡„€xuvvy‚…‡†ˆˆˆ‹ŒŠ†„€tqstxƒ‡ˆ‰‹ŒŒŒˆ‚vport{ƒ‡‹ŒŒ‹‹Šˆ‚€|xprvw}…‰ŽŽŒˆ†„ƒ€€||usyz‡‹Š‡†‚€ƒ„ƒ„€€€xz|{„„††„…„…‡ˆ†…ƒ€zuwxy…†ˆ‡†ˆ†ˆŠˆ†ƒ|utww|ƒ…‰‰‡ˆ†ˆŠ‰ˆ…‚€urttw„ˆŠŠ‹ŠŠ‹‹ˆ„€|spruy‡ŠŒŒŒˆ†‡†…„zssvw}„‡‹Šˆˆ††ˆ‡…ƒ~|xswy{‚‡ˆŠˆ††ƒ„…„„‚€€y{|{ƒ………†„…ˆ‡‡‡‚€xwxwz‚…‡‡ˆ‡‡ˆˆ‰‡ƒ€|tsuty„‡‰Š‹‰ˆŠ‡‡„€yssuv|…‰ŠŠ‰ˆˆˆ‡ˆ…€xrstv}‚‡‹‹‹Š‡‡ˆ‡ˆ…€vrstwƒ‡Šˆ‰ˆ†ˆŠŠŠ†€~tprswƒ‰ŒŠ‹Šˆ‰‰‡…‚}|vswx{‚†ŠŒ‰‰†ƒ………†„}yyz{~‚…‡‡‡‡…„…††……ƒ€{z{{}‚„……‡†…‡‡††…‚€{yzz}‚„††††…†‡‡‡†„€ywwwz~‚…‡‡ˆ†…‡††‡…ƒ}xxxw{~ƒ„……†‡‰ŠŠŠ‡ƒ€zuttuz‚‡ˆ‰‰ˆˆ‰‰‰ˆ„€|vttty~‚…‡ˆ‰ˆ†‰‰‰Š†‚~ztstv{ƒ‡‰‰‰ˆ‡ˆˆ‡‡„€}zvvxz~‚…‡ˆ‡‡†ƒ…………„‚€}}{{}~‚ƒƒ„………†‡††„‚€}{{{|~‚……†‡……………†…ƒ€}zz{{}‚ƒ„…†…†‡ˆˆˆ†‚€~zxyz{~€‚ƒ„†††‡‰‰Š‰†‚€|wvwwy}ƒ…‡Šˆˆ‰‰ˆˆ†‚€|xvvwy|ƒ…†ˆ‰ˆˆ‰ˆˆ‡„€}zxvwy{~‚„†‡ˆ‰ˆ‡‡‡…„‚€}zyxy|}ƒ„…†‡‡†…†…„„‚€~}}{{}~ƒ„………†………ƒƒƒ€}|}}}€ƒ„…††††††…ƒ€|{{{{~ƒ…††††‡‡‡‡…„‚€|zzyz|ƒ…‡‡‡ˆˆˆˆˆ†„€~{xxyy|„…‡ˆ‡‡‡‡‡‡†„~|yxxy{~ƒ†‡ˆ‰‡‡ˆ‡†…ƒ€~|{zy{|~€‚„…†‡‡†‡‡†…„‚€~|{z{{|~„††ˆˆ‡‡‡†„‚€~|{zyz{}ƒ…†‡‡‡‡‡†…„€}{yxyz|ƒ†‡‡ˆˆ‡‡†…„‚€~|yyyy{~ƒ…†‡‡ˆ‰‰‰ˆ†„~|xwxxz}ƒ…‡ˆˆˆˆˆ‡‡†…ƒ€~|zxz{|ƒ…‡ˆ‰ˆˆ‡††…ƒ€}||{|}~‚ƒ†‡‡ˆˆ‡‡……„‚€~}|}}~€ƒ„†‡ˆˆ‡†„„ƒ‚€~~~}|}ƒ„…………„„„„„„ƒ€~|{{|}‚„…†††………„„ƒ‚€}|||}~‚ƒ„…………………†…„‚€~|zzz{}‚ƒ…††‡ˆˆˆ‡…ƒ€~|zyzz{~ƒƒ…††‡ˆˆ‰ˆ†„{yxwxz}‚ƒ…††‡‡‡‰‰ˆ‡…‚€|xwwxz|ƒ…†‡‡ˆˆˆ‰ˆ‡„‚€|zyxyz|~ƒ„†‡ˆˆˆˆˆ‡†…ƒ€}|zzz{}~‚„†‡ˆˆ‰ˆˆˆ†„‚€}|yyyz{}‚ƒ…‡‡‡ˆˆ‡‡†…„€}{yyzz|~‚„…‡‡‡‡‡‡‡†…„}zyyyz|~€ƒ„†‡‡‡ˆˆˆˆ‡…ƒ€~|yxyyz|~‚ƒ…‡‡ˆˆˆˆˆ‡…ƒ€~|yxxxz|~ƒ„†‡‡ˆˆˆˆ‡†…ƒ€~|zyxyz|~ƒ…†‡‡ˆˆˆˆ‡†„‚€~|zyyyz|~ƒ„†‡‡ˆˆ‡‡‡†…ƒ€}|zzz{|~‚„…‡‡ˆ‡‡‡††„ƒ‚€~}{z{{|~ƒ…†‡‡‡‡‡†…„ƒ‚€~||{{|}€‚„…†‡‡‡‡†…„ƒ‚€~}}||}}ƒ„†‡‡‡‡†…„‚€~}}|}~~‚ƒ„………†††††„„‚€~|{zz{}~‚ƒ„………†††††…„ƒ€}|{{{|~ƒ„……††‡‡‡†…„‚€~}|||}~€‚ƒƒ„…††‡‡ˆ‡†…ƒ€~|{zzz{}ƒ„…††‡‡‡‡††…ƒ€~|{{{|~ƒ„…††‡‡‡††…„ƒ‚€~}|}}~‚ƒ„……†††‡‡‡†…ƒ}{zz{|~ƒ„…†††††………„ƒ‚€~}|||}~€‚ƒ„„………†……„„ƒ‚€€~~~~~€‚ƒƒ„„……†††…„ƒ‚€~}|||}~€‚‚ƒ„„„…………„„ƒ‚€~~}~~€‚ƒ„„………„„ƒƒ‚‚€€‚‚ƒ„„„„ƒƒ‚‚€€€€‚‚‚‚ƒƒƒƒ„„„„„ƒ‚€~}}}~€‚‚ƒƒƒ„„„„„„ƒƒ‚‚€€€€€‚‚ƒƒƒ„„„„„„„„ƒƒ‚‚€€‚‚ƒƒƒƒƒ„„„„„„ƒ‚€€€€‚‚ƒ„„…………„ƒ‚€€€€€‚ƒƒ„…††††„ƒ‚€~}||}}~€‚ƒƒ„„„……„„ƒ‚€€~~~~€€‚‚ƒ„……†††……ƒ‚€}}||}}~€‚ƒƒ„………†……„ƒ‚€€~~~~€€‚ƒ„††‡‡‡†…ƒ€~}||}}~€‚‚ƒ„„……†††…„ƒ‚€€~~€‚ƒ„…††‡††…„‚€~}}}}}~€‚ƒƒ„„…………„ƒ‚€€€€‚‚ƒ„…††††…„‚€~}}~}~€€‚ƒƒ„……………„ƒ‚€€€€‚‚ƒ„…†††††…ƒ‚€~~}}}~~€€‚ƒ„„…†††……„ƒ‚€€~~~~€‚ƒ„…††‡‡††…„‚€~}}}}}~~€‚ƒƒ„…††††……„ƒ‚€€‚ƒ„…†‡‡‡‡††„ƒ€~}}}~~€‚ƒƒ„……†††……„ƒ‚€€€€‚ƒ„……††††…„„‚€~~}}~~€‚‚ƒ„„……………„ƒ‚€€~~~€‚ƒ„„…††……„ƒ‚€~~}}}~~€‚‚ƒ„……††……„ƒ‚€€~~~€‚ƒ„……†††……„ƒ‚€~~}}}~€‚ƒ„……†††……„ƒ‚€~~€€‚‚ƒ„……†††……„ƒ‚€~}}~~€€‚ƒƒ„„……………„ƒ‚‚€€‚‚ƒ„„…………„„ƒ‚€€~~~~~€€‚ƒƒ„„„„„„„ƒ‚€€€€€€‚‚ƒ„„„……„„ƒƒ‚€€~~~~€€‚‚ƒƒ„„„„„ƒƒ‚‚€€€€€€€‚‚‚ƒƒƒ„„„„„„ƒƒ‚€€€€‚‚ƒƒƒ„„„„„ƒƒ‚‚€€€€€‚‚‚‚‚ƒƒƒƒƒ„„„ƒƒƒ‚‚€€€€€‚‚‚ƒƒƒƒ„ƒƒƒ‚‚‚‚‚‚‚‚‚‚ƒƒƒƒƒƒƒ‚‚€€€€€€‚‚‚‚ƒƒƒƒƒƒ‚‚‚€€€€€€‚‚‚‚‚ƒƒƒƒƒ‚‚‚‚€€€€€€€‚‚‚‚‚‚ƒ‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚ƒƒƒƒƒƒƒƒƒ‚‚€€€€€€‚‚‚‚ƒƒƒƒƒƒƒƒƒ‚‚‚‚‚‚‚‚‚‚‚‚ƒ‚‚‚ƒ‚‚‚‚‚‚‚‚‚‚€€€€‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚€‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚€€€€€€€€‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚€€€€€€€‚‚‚‚‚ƒƒƒ‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚ƒƒƒƒƒƒ‚‚€€€€‚‚‚‚‚‚‚‚‚ƒƒƒƒ‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚ƒƒƒƒ‚‚‚‚‚€€€€€€‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚ƒ‚‚‚‚€€€€€‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚ƒƒ‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚€€€€€€‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚‚

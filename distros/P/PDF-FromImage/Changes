@@ -1,0 +1,13 @@
+Revision history for Perl extension PDF::FromImage
+
+0.000003 2008-05-30T11:35:57+09:00
+         - image object need to create by same $pdf object what paste to.
+           (otherwise can't open pdf by adobe reader)
+         - added missing $pdf->end call
+         - fit page size to image size
+
+0.000002 2008-05-29T17:18:09+09:00
+         - added image2pdf.pl for example
+
+0.000001 2008-05-29T16:51:40+09:00
+         - initial release

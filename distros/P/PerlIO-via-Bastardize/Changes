@@ -1,0 +1,6 @@
+Revision history for Perl extension PerlIO::via::Bastardize.
+
+0.01  Tue Feb 25 02:23:44 2003
+	- original version; created by h2xs 1.21 with options
+		-XA PerlIO::via::Bastardize
+

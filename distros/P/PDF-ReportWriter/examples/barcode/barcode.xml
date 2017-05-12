@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Simple Report that shows use of barcodes
+    Author: Cosimo Streppone <cosimo@cpan.org>
+    Date: 2006-03-15
+    $Id: barcode.xml,v 1.1 2006/03/16 11:11:06 cosimo Exp $
+-->
+<report>
+
+    <definition>
+        <name>A Barcode Report</name>
+        <destination>barcode.pdf</destination>
+        <paper>A4</paper>
+        <orientation>portrait</orientation>
+        <font>Helvetica</font>
+        <default_font>Helvetica</default_font>
+        <default_font_size>10</default_font_size>
+        <x_margin>30</x_margin>
+        <y_margin>30</y_margin>
+
+        <info>
+            <ModDate>2006-06-15</ModDate>
+            <CreationDate>2006-06-15</CreationDate>
+            <Author>Cosimo Streppone</Author>
+        </info>
+
+    </definition>
+
+    <data>
+
+        <cell_borders>1</cell_borders>
+        <page>
+
+            <header>
+
+                <cell>
+                    <text>Sample Barcode Report</text>
+                    <percent>60</percent>
+                    <font_size>20</font_size>
+                    <colour>blue</colour>
+                    <align>left</align>
+                    <height>100</height>
+                </cell>
+
+                <cell>
+                    <!-- Pay attention at how multiline text is handled
+                         There is no space at start of lines, though it should be.
+                         This is a convenience to have text nicely aligned.
+                    -->
+                    <text>This report does not have data.
+                          Currently it's not possible to display data
+                          in form of barcode cells.
+                          (BTW, this is multiline text.)</text>
+                    <percent>60</percent>
+                    <font_size>11</font_size>
+                    <colour>black</colour>
+                    <align>left</align>
+                    <height>100</height>
+                </cell>
+
+                <!-- From now on, absolute positioned barcode cells -->
+
+                <cell x="30" y="580">
+                    <text>Code 128 sample 1</text>
+                    <font>Helvetica</font>
+                    <font_size>10</font_size>
+                    <percent>50</percent>
+                </cell>
+                
+                <cell x="30" y="600">
+                    <barcode>BANANA123</barcode>
+                    <type>code128</type>
+                    <percent>50</percent>
+                    <!-- "zone" is the barcode height -->
+                    <zone>40</zone>
+                </cell>
+                
+                <cell x="300" y="580">
+                    <text>Code 128 Sample 2</text>
+                    <font>Helvetica</font>
+                    <font_size>10</font_size>
+                    <percent>50</percent>
+                </cell>
+
+                <cell x="300" y="600">
+                    <barcode>Apple987</barcode>
+                    <type>code128</type>
+                    <percent>40</percent>
+                    <zone>40</zone>
+                </cell>
+
+                <!-- Example of EAN13 barcode -->
+                <cell>
+                    <x>30</x>
+                    <y>480</y>
+                    <text>EAN 13 Check digit automatically added</text>
+                    <font>Helvetica</font>
+                    <font_size>10</font_size>
+                    <percent>50</percent>
+                </cell>
+
+                <cell x="30" y="500">
+                    <!-- 13rd checksum char is always automatically added -->
+                    <barcode>123456789012</barcode>
+                    <type>ean13</type>
+                    <percent>40</percent>
+                </cell>
+                
+                <cell x="300" y="480">
+                    <text>EAN 13 truncated to 12 chars</text>
+                    <font>Helvetica</font>
+                    <font_size>10</font_size>
+                    <percent>50</percent>
+                </cell>
+                
+                <cell x="300" y="500">
+                    <!-- EAN 13 barcode is truncated automatically at 12 chars -->
+                    <barcode>9999999999999999999999999999</barcode>
+                    <type>ean13</type>
+                    <percent>40</percent>
+                </cell>
+
+                <cell x="30" y="380">
+                    <text>Code 128 with some symbols</text>
+                    <font>Helvetica</font>
+                    <font_size>10</font_size>
+                    <percent>50</percent>
+                </cell>
+
+                <cell x="30" y="400">
+                    <barcode>PINEAPPLE#$999</barcode>
+                    <type>code128</type>
+                    <percent>50</percent>
+                    <zone>40</zone>
+                </cell>
+                
+                <cell x="300" y="380">
+                    <text>Assorted symbols</text>
+                    <font>Helvetica</font>
+                    <font_size>10</font_size>
+                    <percent>50</percent>
+                </cell>
+                
+                <cell x="300" y="400">
+                    <barcode>_!@#$%^&amp;*()ZZZZZZ</barcode>
+                    <type>code128</type>
+                    <percent>40</percent>
+                    <zone>40</zone>
+                </cell>
+            </header>
+
+        </page>
+
+    </data>
+
+</report>

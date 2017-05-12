@@ -1,0 +1,59 @@
+==================================================
+Changes from 2013-11-10 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.003 at 2014-11-10 20:21:12 +0000
+------------------------------------------
+
+  Change: d0ea32d6cf36a1d839ec76e9de443b1dc9ba84c8
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-10 12:21:06 +0000
+
+    fix the spread version for RT#66904 
+
+  Change: 0d14e3e72479b048dd8e6ba933ee34a9b710191f
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-10 12:15:51 +0000
+
+    fix comment about installation 
+
+  Change: 4e690643e4490ddcf4c9e6ccd664efa983f003ed
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-10 12:15:18 +0000
+
+    bump Spread prereq 
+
+  Change: 571ae0e397392e86d87abe82abffea477b02f160
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-10 12:10:46 +0000
+
+    fix the example client 
+
+  Change: 5c33b3f0cd081492c6c5d869d257a32e68a96c00
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-10 12:01:47 +0000
+
+    tweaks to pass tests 
+
+  Change: e9e4b74b7c4772d53d0a285acd6a7963432de61b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-10 11:16:34 +0000
+
+    fix changes 
+
+  Change: 76b133abb6c97fec52627b96dfbb077200fe46a5
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-10 10:55:32 +0000
+
+    add installation notes 
+
+  Change: 8dcc4021b759b564f139b9a1b71dfbf99d27677c
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-09 01:19:19 +0000
+
+    mailmap 
+
+================================================
+Plus 3 releases after 2013-11-10 00:00:00 +0000.
+================================================

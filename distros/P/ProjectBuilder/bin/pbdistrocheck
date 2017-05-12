@@ -1,0 +1,155 @@
+#!/usr/bin/perl -w
+#
+# Project Builder Distribution Checker
+#
+# $Id$
+#
+# Copyright B. Cornec 2007-2016
+# Eric Anderson's changes are (c) Copyright 2012 Hewlett Packard
+# Provided under the GPL v2
+
+use strict 'vars';
+use Getopt::Long qw(:config auto_abbrev no_ignore_case);
+use Data::Dumper;
+use lib qw (lib);
+#use lib '/usr/share/perl5'; # mandatory for opensuse
+use ProjectBuilder::Distribution;
+use ProjectBuilder::Base;
+
+=pod
+
+=head1 NAME
+
+pb, aka project-builder.org - builds packages for your projects
+
+=head1 DESCRIPTION
+
+pb helps you build various packages directly from your project sources.
+pbdistrocheck is a command from the pb project providing the same type of services as lsb_release, but extended.
+
+=head1 SYNOPSIS
+
+pbdistrocheck [-h][-d][-v][-l [-c][-i][-r][-a]][-s] [distro-ver-arch]
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-h|--help>
+
+Prints this help
+
+=item B<-v|--verbose>
+
+Print a brief help message and exits.
+
+=item B<-a|--all>
+
+Print all parameters
+
+=item B<-s|--short>
+
+Generate a short format user friendly, comma separated allowing parsing
+
+=item B<-l|--lsb>
+
+Generate an LSB compliant output
+
+=item B<-d|--description>
+
+Print only description (LSB only)
+
+=item B<-r|--release>
+
+Print only release (LSB only)
+
+=item B<-c|--codename>
+
+Print only codename (LSB only)
+
+=item B<-i|--id>
+
+Print only distribution identificator (LSB only)
+
+=item B<-a|--all>
+
+Print all LSB fields
+
+=back 
+
+=head1 ARGUMENTS
+
+Arguments are optional. If none given, analyzes the underlying operating system
+If one is given, it should have the format osname-version-architecture, and in that case pbdistrocheck will provide all the information related to that OS needed by pb.
+
+=head1 WEB SITES
+
+The main Web site of the project is available at L<http://www.project-builder.org/>. Bug reports should be filled using the trac instance of the project at L<http://trac.project-builder.org/>.
+
+=head1 USER MAILING LIST
+
+Cf: L<http://www.mondorescue.org/sympa/info/pb-announce> for announces and L<http://www.mondorescue.org/sympa/info/pb-devel> for the development of the pb project.
+
+=head1 CONFIGURATION FILES
+
+Uses the main /etc/pb/pb.conf (or /usr/local/etc/pb/pb.conf if installed from files) configuration file to give its answers.
+
+=head1 AUTHORS
+
+The Project-Builder.org team L<http://trac.project-builder.org/> lead by Bruno Cornec L<mailto:bruno@project-builder.org>.
+
+=head1 COPYRIGHT
+
+Project-Builder.org is distributed under the GPL v2.0 license
+described in the file C<COPYING> included with the distribution.
+
+=cut
+
+my %opts;					# CLI Options
+
+GetOptions(
+		"verbose|v+" => \$opts{'v'},
+		"short|s" => \$opts{'s'},
+		"help|h" => \$opts{'h'},
+		"description|d" => \$opts{'d'},
+		"id|i" => \$opts{'i'},
+		"release|r" => \$opts{'r'},
+		"codename|c" => \$opts{'c'},
+		"all|a" => \$opts{'a'},
+		"lsb|l" => \$opts{'l'},
+);
+if (defined $opts{'v'}) {
+	$pbdebug = $opts{'v'};
+}
+pb_log_init($pbdebug, \*STDOUT);
+
+my $dist = shift @ARGV || undef ;
+my $pbos = pb_distro_get_context($dist);
+my $sep = "\n";
+if (defined $opts{'l'}) {
+	# Simulate lsb_release output
+	my ($l,$i,$d,$r,$c) = pb_distro_getlsb($opts{'s'});
+	$sep = " " if (defined $opts{'s'});
+	print $l.$sep;
+	print $i.$sep if (defined $opts{'i'} or defined $opts{'a'});
+	print $d.$sep if (defined $opts{'d'} or defined $opts{'a'});
+	print $r.$sep if (defined $opts{'r'} or defined $opts{'a'});
+	$sep = "" if (defined $opts{'s'});
+	print $c.$sep if (defined $opts{'c'} or defined $opts{'a'});
+	print "\n" if (defined $opts{'s'});
+} else {
+	$sep = "," if (defined $opts{'s'});
+	if (not defined $opts{'s'}) {
+		$pbos->{'os'} = "OS:\t$pbos->{'os'}";
+		$pbos->{'name'} = "Name:\t$pbos->{'name'}";
+		$pbos->{'version'} = "Ver:\t$pbos->{'version'}";
+		$pbos->{'family'} = "Family:\t$pbos->{'family'}";
+		$pbos->{'type'} = "Type:\t$pbos->{'type'}";
+		$pbos->{'suffix'} = "Suffix:\t$pbos->{'suffix'}";
+		$pbos->{'update'} = "Update:\t$pbos->{'update'}";
+		$pbos->{'install'} = "Install:\t$pbos->{'install'}";
+		$pbos->{'arch'} = "Arch:\t$pbos->{'arch'}";
+		print "Project-Builder tuple:\n";
+	}
+	print join($sep,($pbos->{'os'}, $pbos->{'name'}, $pbos->{'version'}, $pbos->{'arch'}, $pbos->{'type'}, $pbos->{'family'}, $pbos->{'suffix'}, $pbos->{'update'}, $pbos->{'install'}))."\n";
+}

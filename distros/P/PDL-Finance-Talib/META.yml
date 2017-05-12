@@ -1,0 +1,27 @@
+---
+abstract: 'PDL interface to ta-lib library'
+author:
+  - 'KMX <kmx@cpan.org>'
+build_requires:
+  PDL: 2.006
+  PDL::Finance::TA: 0.008
+configure_requires:
+  PDL: 2.006
+  PDL::Finance::TA: 0.008
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PDL-Finance-Talib
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  PDL: 2.006
+  PDL::Finance::TA: 0.008
+resources:
+  repository: https://github.com/kmx/pdl-finance-talib
+version: 0.009

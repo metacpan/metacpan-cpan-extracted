@@ -1,0 +1,11 @@
+CHANGES
+COPYRIGHT
+lib/Python/Bytecode/SAX.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/saxwriter.t
+t/yawriter.t
+t/primes2.py
+t/primes2.pyc

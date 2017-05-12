@@ -1,0 +1,75 @@
+{
+   "abstract" : "WebMySQL web application",
+   "author" : [
+      "MacGyveR <dumb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-App-WebMySQL",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Pluggable::CPANfile" : "0.05"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "CGI::Compile" : "0",
+            "CGI::Emulate::PSGI" : "0",
+            "DBD::mysql" : "0",
+            "DBI" : "0",
+            "File::Share" : "0",
+            "File::ShareDir" : "1.00",
+            "File::Spec" : "0",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CPANfile" : "0",
+            "Plack::App::MCCS" : "0",
+            "Plack::Builder" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::App::WebMySQL" : {
+         "file" : "lib/Plack/App/WebMySQL.pm",
+         "version" : "3.02"
+      },
+      "Plack::App::WebMySQL::General" : {
+         "file" : "lib/Plack/App/WebMySQL/General.pm"
+      },
+      "Plack::App::WebMySQL::Key" : {
+         "file" : "lib/Plack/App/WebMySQL/Key.pm"
+      },
+      "Plack::App::WebMySQL::Sql" : {
+         "file" : "lib/Plack/App/WebMySQL/Sql.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/thedumbterminal/Plack-App-WebMySQL"
+      }
+   },
+   "version" : "3.02"
+}

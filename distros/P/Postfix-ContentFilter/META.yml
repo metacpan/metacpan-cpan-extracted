@@ -1,0 +1,34 @@
+---
+abstract: 'a perl content_filter for postfix'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  MIME::Parser: '0'
+  Mail::Message: '0'
+  Test::More: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Postfix-ContentFilter
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  IPC::Run: '0.92'
+  Scalar::Util: '0'
+  Try::Tiny: '0.11'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/zurborg/libpostfix-contentfilter-perl/issues
+  homepage: https://github.com/zurborg/libpostfix-contentfilter-perl
+  repository: https://github.com/zurborg/libpostfix-contentfilter-perl.git
+version: '1.12'
+x_contributors:
+  - 'Andy Beverley <a.beverley@ctrlo.com>'
+  - 'David Zurborg <d.zurborg@propartner-it.de>'

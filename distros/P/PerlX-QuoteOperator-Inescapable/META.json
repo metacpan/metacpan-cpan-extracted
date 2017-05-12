@@ -1,0 +1,65 @@
+{
+   "abstract" : "a quote-like operator with no string escapes",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Moose::Meta::Class::__ANON__::SERIAL::6 version , CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PerlX-QuoteOperator-Inescapable",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::OptList" : "0",
+            "Devel::Declare" : "0",
+            "Devel::Declare::Context::Simple" : "0",
+            "Sub::Install" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PerlX::QuoteOperator::Inescapable" : {
+         "file" : "lib/PerlX/QuoteOperator/Inescapable.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/PerlX-QuoteOperator-Inescapable/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=PerlX-QuoteOperator-Inescapable"
+      },
+      "homepage" : "https://metacpan.org/release/PerlX-QuoteOperator-Inescapable",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-perlx-quoteoperator-inescapable.git",
+         "web" : "https://github.com/tobyink/p5-perlx-quoteoperator-inescapable"
+      }
+   },
+   "version" : "0.002"
+}

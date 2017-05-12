@@ -1,0 +1,46 @@
+POSIX-bsearch version 0.02
+==========================
+
+POSIX bsearch semantics are provided in scalar context.
+
+In array context, you get the array of contiguous matching list elements
+that compare to zero against the provided key.
+
+Comparison function semantics are identical to Perl's sort function, using
+$a and $b package variables.
+
+Sets $POSIX::bsearch::index to the index of the first
+( wantarray ? indexwise : temporally) found element, or -1 if the key
+sorts under the first element, or the array length if it sorts over
+the last.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   core perl only
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by David Nicol / Tipjar LLC
+
+This work is licensed under the Creative Commons Attribution
+3.0 Unported License. To view a copy of this license, visit
+http://creativecommons.org/licenses/by/3.0/ or send a letter to Creative
+Commons, 171 Second Street, Suite 300, San Francisco, California,
+94105, USA.
+
+Having this file as distributed, or the pod documentation in the
+module file, intact, is sufficient attribution. A source code comment
+mentioning the POSIX::bsearch module from CPAN is sufficient attribution
+in derivative works.
+
+
+

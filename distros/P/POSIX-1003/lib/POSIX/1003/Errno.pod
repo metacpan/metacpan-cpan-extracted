@@ -1,0 +1,266 @@
+=encoding utf8
+
+=head1 NAME
+
+POSIX::1003::Errno - all error codes defined by the OS
+
+=head1 INHERITANCE
+
+ POSIX::1003::Errno
+   is a POSIX::1003::Module
+
+=head1 SYNOPSIS
+
+  use POSIX::1003::Errno; # load all names
+
+  use POSIX::1003::Errno qw(errno);
+  # keys are strings!
+  $ticks = errno('EPERM');
+
+  use POSIX::1003::Errno qw(errno EPERM);
+  if($!==EPERM) ...
+
+  use POSIX::1003::Errno '%errno';
+  my $key = $errno{EPERM};
+  $errno{EUNKNOWN} = 1024;
+  $ticks  = errno('EUNKNOWN');
+
+  print "$_\n" for keys %errno;
+
+=head1 DESCRIPTION
+
+The error codes provided by your operating system.
+
+The code modules Errno and POSIX do also contain an extensive
+list of error numbers.  However: Errno have their values hard-coded,
+which is incorrect (higher numbered codes may [do!] differ per platform).
+POSIX only provides a limited subset.
+
+See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
+ 
+=over 4
+
+=item POSIX::1003::Errno-E<gt>B<exampleValue>(NAME)
+
+See L<POSIX::1003::Module/"METHODS">
+
+=item $obj-E<gt>B<import>()
+
+See L<POSIX::1003::Module/"METHODS">
+
+=back
+
+=head1 FUNCTIONS
+
+=head2 Standard POSIX
+
+=over 4
+
+=item B<strerror>(ERRNO)
+
+Returns the string representations of the ERRNO, as provided by
+the operating system.
+
+=back
+
+=head2 Additional
+
+=over 4
+
+=item B<errno>(NAME)
+
+Returns the errno value related to the NAMEd constant.  The NAME
+must be a string. C<undef> will be returned when the NAME is not
+known by the system.
+
+example: 
+
+  my $ticks = errno('EPERM') || 1000;
+
+=item B<errno_names>()
+
+Returns a list with all known names, unsorted.
+
+=back
+
+=head1 CONSTANTS
+
+=over 4
+
+=item B<%errno>
+
+This exported variable is a tied HASH which maps C<E*> names
+on numbers, to be used with the system's C<errno()> function.
+
+=back
+
+The following error names where detected on your system when the
+module got installed.  The second column shows the related value.
+Followed by the text that L<strerror()|POSIX::1003::Errno/"Standard POSIX"> produces for that error.
+
+=for comment
+#TABLE_ERRNO_START
+
+  E2BIG            7    Argument list too long
+  EACCES           13   Permission denied
+  EADDRINUSE       98   Address already in use
+  EADDRNOTAVAIL    99   Cannot assign requested address
+  EADV             68   Advertise error
+  EAFNOSUPPORT     97   Address family not supported by protocol
+  EAGAIN           11   Resource temporarily unavailable
+  EALREADY         114  Operation already in progress
+  EBADE            52   Invalid exchange
+  EBADF            9    Bad file descriptor
+  EBADFD           77   File descriptor in bad state
+  EBADMSG          74   Bad message
+  EBADR            53   Invalid request descriptor
+  EBADRQC          56   Invalid request code
+  EBADSLT          57   Invalid slot
+  EBFONT           59   Bad font file format
+  EBUSY            16   Device or resource busy
+  ECANCELED        125  Operation canceled
+  ECHILD           10   No child processes
+  ECHRNG           44   Channel number out of range
+  ECOMM            70   Communication error on send
+  ECONNABORTED     103  Software caused connection abort
+  ECONNREFUSED     111  Connection refused
+  ECONNRESET       104  Connection reset by peer
+  EDEADLK          35   Resource deadlock avoided
+  EDEADLOCK        35   Resource deadlock avoided
+  EDESTADDRREQ     89   Destination address required
+  EDOM             33   Numerical argument out of domain
+  EDOTDOT          73   RFS specific error
+  EDQUOT           122  Disk quota exceeded
+  EEXIST           17   File exists
+  EFAULT           14   Bad address
+  EFBIG            27   File too large
+  EHOSTDOWN        112  Host is down
+  EHOSTUNREACH     113  No route to host
+  EHWPOISON        133  Unknown error 133
+  EIDRM            43   Identifier removed
+  EILSEQ           84   Invalid or incomplete multibyte or wide character
+  EINPROGRESS      115  Operation now in progress
+  EINTR            4    Interrupted system call
+  EINVAL           22   Invalid argument
+  EIO              5    Input/output error
+  EISCONN          106  Transport endpoint is already connected
+  EISDIR           21   Is a directory
+  EISNAM           120  Is a named type file
+  EKEYEXPIRED      127  Key has expired
+  EKEYREJECTED     129  Key was rejected by service
+  EKEYREVOKED      128  Key has been revoked
+  EL2HLT           51   Level 2 halted
+  EL2NSYNC         45   Level 2 not synchronized
+  EL3HLT           46   Level 3 halted
+  EL3RST           47   Level 3 reset
+  ELIBACC          79   Can not access a needed shared library
+  ELIBBAD          80   Accessing a corrupted shared library
+  ELIBEXEC         83   Cannot exec a shared library directly
+  ELIBMAX          82   Attempting to link in too many shared libraries
+  ELIBSCN          81   .lib section in a.out corrupted
+  ELNRNG           48   Link number out of range
+  ELOOP            40   Too many levels of symbolic links
+  EMEDIUMTYPE      124  Wrong medium type
+  EMFILE           24   Too many open files
+  EMLINK           31   Too many links
+  EMSGSIZE         90   Message too long
+  EMULTIHOP        72   Multihop attempted
+  ENAMETOOLONG     36   File name too long
+  ENAVAIL          119  No XENIX semaphores available
+  ENETDOWN         100  Network is down
+  ENETRESET        102  Network dropped connection on reset
+  ENETUNREACH      101  Network is unreachable
+  ENFILE           23   Too many open files in system
+  ENOANO           55   No anode
+  ENOBUFS          105  No buffer space available
+  ENOCSI           50   No CSI structure available
+  ENODATA          61   No data available
+  ENODEV           19   No such device
+  ENOENT           2    No such file or directory
+  ENOEXEC          8    Exec format error
+  ENOKEY           126  Required key not available
+  ENOLCK           37   No locks available
+  ENOLINK          67   Link has been severed
+  ENOMEDIUM        123  No medium found
+  ENOMEM           12   Cannot allocate memory
+  ENOMSG           42   No message of desired type
+  ENONET           64   Machine is not on the network
+  ENOPKG           65   Package not installed
+  ENOPROTOOPT      92   Protocol not available
+  ENOSPC           28   No space left on device
+  ENOSR            63   Out of streams resources
+  ENOSTR           60   Device not a stream
+  ENOSYS           38   Function not implemented
+  ENOTBLK          15   Block device required
+  ENOTCONN         107  Transport endpoint is not connected
+  ENOTDIR          20   Not a directory
+  ENOTEMPTY        39   Directory not empty
+  ENOTNAM          118  Not a XENIX named type file
+  ENOTRECOVERABLE  131  State not recoverable
+  ENOTSOCK         88   Socket operation on non-socket
+  ENOTSUP          95   Operation not supported
+  ENOTTY           25   Inappropriate ioctl for device
+  ENOTUNIQ         76   Name not unique on network
+  ENXIO            6    No such device or address
+  EOPNOTSUPP       95   Operation not supported
+  EOVERFLOW        75   Value too large for defined data type
+  EOWNERDEAD       130  Owner died
+  EPERM            1    Operation not permitted
+  EPFNOSUPPORT     96   Protocol family not supported
+  EPIPE            32   Broken pipe
+  EPROTO           71   Protocol error
+  EPROTONOSUPPORT  93   Protocol not supported
+  EPROTOTYPE       91   Protocol wrong type for socket
+  ERANGE           34   Numerical result out of range
+  EREMCHG          78   Remote address changed
+  EREMOTE          66   Object is remote
+  EREMOTEIO        121  Remote I/O error
+  ERESTART         85   Interrupted system call should be restarted
+  ERFKILL          132  Operation not possible due to RF-kill
+  EROFS            30   Read-only file system
+  ESHUTDOWN        108  Cannot send after transport endpoint shutdown
+  ESOCKTNOSUPPORT  94   Socket type not supported
+  ESPIPE           29   Illegal seek
+  ESRCH            3    No such process
+  ESRMNT           69   Srmount error
+  ESTALE           116  Stale NFS file handle
+  ESTRPIPE         86   Streams pipe error
+  ETIME            62   Timer expired
+  ETIMEDOUT        110  Connection timed out
+  ETOOMANYREFS     109  Too many references: cannot splice
+  ETXTBSY          26   Text file busy
+  EUCLEAN          117  Structure needs cleaning
+  EUNATCH          49   Protocol driver not attached
+  EUSERS           87   Too many users
+  EWOULDBLOCK      11   Resource temporarily unavailable
+  EXDEV            18   Invalid cross-device link
+  EXFULL           54   Exchange full
+
+
+=for comment
+#TABLE_ERRNO_END
+
+
+
+
+
+=head1 SEE ALSO
+
+This module is part of POSIX-1003 distribution version 0.98,
+built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights 2011-2013 on the perl code and the related documentation
+ by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

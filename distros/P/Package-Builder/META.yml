@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Package-Builder
+version:             5.03
+abstract:            The great new Package::Builder!
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Archive::Tar:                  
+    Test::More:                    0
+    Text::Template:                1.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Jean-Marie RENOUARD <jmrenouard@gmail.com>

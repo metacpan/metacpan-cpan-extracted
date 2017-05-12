@@ -1,0 +1,62 @@
+# Japanese translations for PACKAGE package.
+# Copyright (C) 2009 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Kenichi Ishigaki <ishigaki@cpan.org>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-PerlTidy\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-25 14:42+0300\n"
+"PO-Revision-Date: 2011-11-15 01:41+0900\n"
+"Last-Translator: Kenichi Ishigaki <ishigaki@cpan.org>\n"
+"Language-Team: Japanese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: lib/Padre/Plugin/PerlTidy.pm:39
+msgid "Perl Tidy"
+msgstr "Perl Tidy"
+
+#: lib/Padre/Plugin/PerlTidy.pm:45
+msgid "Tidy the active document\tAlt+Shift+F"
+msgstr "現在のドキュメントを整形する\tAlt+Shift+F"
+
+#: lib/Padre/Plugin/PerlTidy.pm:46
+msgid "Tidy the selected text\tAlt+Shift+G"
+msgstr "選択したテキストを整形する\tAlt+Shift+G"
+
+#: lib/Padre/Plugin/PerlTidy.pm:49
+msgid "Export active document to HTML file"
+msgstr "現在のドキュメントをHTMLファイルにエクスポートする"
+
+#: lib/Padre/Plugin/PerlTidy.pm:51
+msgid "Export selected text to HTML file"
+msgstr "選択したテキストをHTMLファイルにエクスポートする"
+
+#: lib/Padre/Plugin/PerlTidy.pm:67
+#: lib/Padre/Plugin/PerlTidy.pm:194
+msgid "Document is not a Perl document"
+msgstr "Perlのドキュメントではありません"
+
+#: lib/Padre/Plugin/PerlTidy.pm:97
+#: lib/Padre/Plugin/PerlTidy.pm:226
+msgid "PerlTidy Error"
+msgstr "PerlTidyエラー"
+
+#: lib/Padre/Plugin/PerlTidy.pm:166
+msgid "Save file as..."
+msgstr "名前をつけて保存..."
+
+#: lib/Padre/Plugin/PerlTidy.pm:177
+msgid "File already exists. Overwrite it?"
+msgstr "ファイルはすでに存在します。上書きしますか?"
+
+#: lib/Padre/Plugin/PerlTidy.pm:177
+msgid "Exist"
+msgstr "ファイルが存在します"
+
+#~ msgid "Error"
+#~ msgstr "エラー"

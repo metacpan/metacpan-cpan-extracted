@@ -1,0 +1,35 @@
+Changes for PDL::Opt::QP
+
+0.27 - Fri Mar 21 09:10:15 EDT 2014
+    Removes MB::Pluggable::Warn64Bit from requires RE#94031
+
+0.26 - Sun Dec  8 12:18:19 EST 2013
+    Adds warning if we are building under 64bit capable PDL.
+
+0.25 - Tue Jun 18 14:33:10 EDT 2013
+    Adds the .pod file with preprocessed documentation.
+
+0.24 - Thu May 30 19:13:04 EDT 2013
+    Pushes more of the allocation/deallocation work to PDL::PP. Should
+    avoid some memory errors.
+
+    Allows "stacked" optimization problems. Each input matrix/vector can
+    have one additional dimension. The optimization will be done
+    (independently) for each of the dimensions.
+
+    Convert qp() to use key/value arguments for the equality and
+    inequality constraints. Much cleaner.
+
+    Thanks for run4flat++ for guiding me and rewriting much of my code to
+    take advantage of PDL::PP.
+
+0.21 - Thu May 16 15:37:23 EDT 2013
+    Implements the new interface (split Aeq and Aneq) in qp
+
+0.20 - Thu May 16 12:21:50 EDT 2013
+    Converts to MB::Pluggable
+    Rearranges and adds a second interface with separate Aeq and Aneq
+    Still a work in progress (alpha)
+
+0.01 - Mon May 13 14:18:34 EDT 2013
+    Initial (test) release of PDL::Opt::QP

@@ -1,0 +1,87 @@
+#========================================================================
+#
+# Changes 
+#
+# DESCRIPTION
+#   Revision history for Pod::POM::View::DocBook module.
+#
+# AUTHOR
+#   Andrew Ford   <A.Ford@ford-mason.co.uk>
+#
+#------------------------------------------------------------------------
+# $Id: Changes 4117 2009-03-08 09:21:04Z andrew $
+#========================================================================
+
+#------------------------------------------------------------------------
+# Version 0.08  08-Mar-2009
+#------------------------------------------------------------------------
+
+* update documentation
+
+* handle casing of words surrounded with non-word characters
+  (e.g. punctuation)
+
+* implement "forcecase" option and rename "casepreserve" option to
+  "preservecase"
+
+* fix handling of verbatim blocks (use <programlisting>, not spurious
+  <verbatim> element)
+
+* added Class::Accessor to prerequisites (used in unit tests)
+
+#------------------------------------------------------------------------
+# Version 0.07  05-Mar-2009
+#------------------------------------------------------------------------
+
+* added L<> to <ulink> mapping
+
+#------------------------------------------------------------------------
+# Version 0.06  05-Mar-2009
+#------------------------------------------------------------------------
+
+* update Makefile.PL prerequisites (again)
+
+#------------------------------------------------------------------------
+# Version 0.05  04-Mar-2009
+#------------------------------------------------------------------------
+
+* update Makefile.PL prerequisites
+
+#------------------------------------------------------------------------
+# Version 0.04  03-Mar-2009
+#------------------------------------------------------------------------
+
+* fix formatting of blockquotes (=over blocks without an =item)
+
+* add test for blockquote formatting
+
+* fix Pod errors
+
+* fix spurious test errors
+
+
+#------------------------------------------------------------------------
+# Version 0.03  25-Feb-2009
+#------------------------------------------------------------------------
+
+* reworked the title-casing of section titles (triggered by the the
+  "titlecasing" option)
+
+* reorganized testcases such that each test case consists of a pod file
+  (input), xml file (expected output) and a yml file (options -
+  optional).  t/TestUtils.pm was rewritten to read the trios of files
+  that define tests.
+
+
+#------------------------------------------------------------------------
+# Version 0.02  25-Feb-2009
+#------------------------------------------------------------------------
+
+* fix syntax error in generated DocBook CDATA section
+  (was "<[CDATA[...", should be "<![CDATA[...")
+
+#------------------------------------------------------------------------
+# Version 0.01  24-Feb-2009
+#------------------------------------------------------------------------
+
+* first public release.

@@ -1,0 +1,36 @@
+SYNOPSIS
+
+     use Perinci::Sub::Util::DepModule qw(get_required_dep_modules);
+    
+     my $meta = {
+         v => 1.1,
+         deps => {
+             prog => 'git',
+             any => [
+                 {pm => 'Foo::Bar'},
+                 {pm => 'Foo::Baz'},
+             ],
+         },
+         ...
+     };
+     my $mods = get_required_dep_modules($meta);
+
+    Result:
+
+     {
+         'Perinci::Sub::DepChecker' => 0,
+         'Perinci::Sub::Dep::pm' => 0,
+     }
+
+FUNCTIONS
+
+ get_required_dep_modules($meta) => array
+
+    Dpendencies are checked by Perinci::Sub::DepChecker as well as other
+    Perinci::Sub::Dep::* modules for custom types of dependencies.
+
+    This function can detect which modules are used.
+
+    This function can be used during distribution building to automatically
+    add those modules as prerequisites.
+

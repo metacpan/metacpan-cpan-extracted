@@ -1,0 +1,34 @@
+Revision history for PDF-API2-Tweaks
+
+0.09	Sun Dec 28 10:09:30 2014 +0100
+
+	Fix depency list in Makefile.PL.
+
+0.08	Wed Sep 3 21:01:56 2014 +0200
+
+	Rewrite documenting comments as POD.
+	Rename to PDF::API2::Tweaks
+
+0.07	Wed Sep 3 17:21:11 2014 +0200
+
+	Add textcline.
+	Add grid.
+	Fix wantarray return values.
+	Add textpara and textparas.
+
+0.06	---
+
+	Add textcline.
+	Add grid.
+
+0.05	Fri Jan 18 14:20:33 2013 +0100
+
+	Use PDF::API2.
+	Add facility to rotate texts.
+	Add textrline (right aligned).
+
+0.04    Wed Jan 9 17:57:47 2013 +0100
+
+        First alpha version, PDF::Overlay, released on an unsuspecting
+        world.
+

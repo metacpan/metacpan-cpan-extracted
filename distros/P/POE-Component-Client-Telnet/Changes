@@ -1,0 +1,13 @@
+Revision history for POE::Component::Client::Telnet.
+
+0.06 Sun Jul 30 2006
+    - Fixed readme.  It had the wrong module named in it.
+
+0.05 Mon Aug 08 2005
+	- Changed package from POE::Component::Net::Telnet to POE::Component::Client::Telnet
+
+0.04 Thu Aug 04 2005
+	- improved interface, now works with subclassed packages 
+
+0.01 Wed Aug 03 2005
+	- first version

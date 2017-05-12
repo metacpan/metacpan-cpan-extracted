@@ -1,0 +1,33 @@
+---
+abstract: 'Parse pod into an array of hashes.'
+author:
+  - 'Robert Acock <thisusedtobeanemail@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Metadata: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Simpler-Aoh
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Pod::Simpler::Aoh:
+    file: lib/Pod/Simpler/Aoh.pm
+    version: '0.06'
+requires:
+  Moo: '1.0010001'
+  MooX::LazierAttributes: '0.11'
+  Pod::Simple: '3.29'
+  Type::Tiny: '1.000006'
+  perl: '5.006'
+resources:
+  repository: https://github.com/ThisUsedToBeAnEmail/Pod-Simpler-Aoh.git
+version: '0.06'

@@ -1,0 +1,46 @@
+Perlbal-Plugin-Addheader
+
+This module allows you to add/change headers to/from perlbal responses
+
+You can configure headers to be added/changed based on each service declared, although the service role has to be set to web_server
+
+For each header you want to add/change,  you have to specify the header content, this header content can be a set of characters or Perl code that will be evaluated for each response.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Perlbal::Plugin::Addheader
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perlbal-Plugin-Addheader
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Perlbal-Plugin-Addheader
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Perlbal-Plugin-Addheader
+
+    Search CPAN
+        http://search.cpan.org/dist/Perlbal-Plugin-Addheader/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Bruno Martins, SAPO
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

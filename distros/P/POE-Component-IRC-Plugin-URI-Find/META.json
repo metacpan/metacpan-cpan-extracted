@@ -1,0 +1,43 @@
+{
+   "abstract" : "A POE::Component::IRC plugin that finds URIs in channel traffic",
+   "author" : [
+      "Chris Williams"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-IRC-Plugin-URI-Find",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "POE" : "1.004",
+            "POE::Component::IRC" : "5.07",
+            "POE::Component::IRC::Plugin" : 0,
+            "URI::Find" : "0.16",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/bingos/poe-component-irc-plugin-uri-find",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/bingos/poe-component-irc-plugin-uri-find",
+         "web" : "http://github.com/bingos/poe-component-irc-plugin-uri-find"
+      }
+   },
+   "version" : "1.10"
+}
+

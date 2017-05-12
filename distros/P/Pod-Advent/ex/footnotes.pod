@@ -1,0 +1,40 @@
+=for advent_year 2008
+
+=for advent_day 00
+
+=for advent_title Footnotes
+
+=for advent_author David Westbrook
+
+This is to demo footnotes.
+
+Chunk of textN<chunk> and some moreN<more>.
+
+Blah blah blah
+
+And yetN<yet> more goes here.
+
+#=sourcedcode footnotes.pod
+
+#######################################
+
+=begin footnote yet
+
+Some about B<stuff>
+
+blah I<about> "yet";
+
+=end footnote
+
+=begin footnote chunk
+
+Something about "chunk";
+
+=end footnote
+
+=begin footnote more
+
+Something about "more";
+
+=end footnote
+

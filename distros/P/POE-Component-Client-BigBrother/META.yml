@@ -1,0 +1,23 @@
+---
+abstract: 'a POE Component for sending Big Brother commands'
+author:
+  - 'Sebastien Aperghis-Tramoni <sebastien@aperghis.net>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-Client-BigBrother
+provides:
+  POE::Component::Client::BigBrother:
+    file: lib/POE/Component/Client/BigBrother.pm
+    version: 1.00
+requires:
+  POE: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

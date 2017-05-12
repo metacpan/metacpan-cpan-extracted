@@ -1,0 +1,11 @@
+use inc::Module::Install;
+all_from 'lib/Plack/Handler/FCGI/EV.pm';
+readme_from('lib/Plack/Handler/FCGI/EV.pm');
+requires 'FCGI::EV', '1.0.7';
+requires 'Plack', 0.9977;
+requires 'AnyEvent', 5.3;
+requires 'EV', 4;
+build_requires 'Test::More', 0.88;
+test_requires 'Test::Requires';
+auto_set_repository();
+WriteAll;

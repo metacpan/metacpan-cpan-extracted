@@ -1,0 +1,64 @@
+NAME
+    POE::Declare::HTTP::Online - Does your POE process have access to the
+    web
+
+SYNOPSIS
+        my $online = POE::Declare::HTTP::Online->new(
+            Timeout      => 10,
+            OnlineEvent  => \&handle_online,
+            OfflineEvent => \&handle_offline,
+            ErrorEvent   => \&handle_unknown,
+        );
+        
+    $online->run;
+
+DESCRIPTION
+    This is a port of LWP::Online to POE::Declare. It behaves similarly to
+    the original, except that it does not depend on LWP and can execute the
+    HTTP probes in parallel.
+
+  new
+        my $online = POE::Declare::HTTP::Online->new(
+            Timeout      => 10,
+            OnlineEvent  => \&handle_online,
+            OfflineEvent => \&handle_offline,
+            ErrorEvent   => \&handle_unknown,
+        );
+
+    The "new" constructor sets up a reusable HTTP online status checker that
+    can be run as often as needed.
+
+    Unless actively in use, the online detection object will not consume a
+    POE session.
+
+  run
+    The "run" method starts the online detection process, spawning the POE
+    session and initiating HTTP Test to each of the test URLs in parallel.
+
+    Once a determination has been made as to our online state (positive,
+    negative or unknown) and the reporting event has been fired, the session
+    will be terminated immediately.
+
+SUPPORT
+    Bugs should be always be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Declare-HTTP-Online>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    LWP::Simple
+
+COPYRIGHT
+    Copyright 2011 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

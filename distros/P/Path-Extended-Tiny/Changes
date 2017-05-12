@@ -1,0 +1,31 @@
+Revision history for Path-Extended-Tiny
+
+0.08 2015/03/13
+  - explicitly use IO::Handle
+
+0.07 2015/03/11
+  - requires Exporter 5.57
+  - let recurse() accept a single code reference as its argument
+
+0.06 2014/12/23
+  - fixed README
+
+0.05 2014/10/10
+  - replaced recurse with the code in Path::Extended, which silenced
+    "Attempt to free unreferenced scalar" warnings with fork()
+    (this was actually an issue of File::Find it used)
+
+0.04 2014/10/07
+  - requires IO::Handle 1.25
+
+0.03 2014/09/30
+  - fixed a case when an absolute path is passed to file/subdir
+    (Unlike Path::Class/Path::Tiny, Path::Extended doesn't simply
+    append the path to the original and replaces the original with
+    the new absolute path.)
+
+0.02 2014/09/05
+  - subsumes requires Path::Tiny 0.048
+
+0.01 2014/09/03
+  - initial release

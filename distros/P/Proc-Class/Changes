@@ -1,0 +1,21 @@
+Revision history for Perl extension Proc::Class
+
+0.05
+
+        - re-packaging
+
+0.04
+
+        - fixed docs
+
+0.03
+
+        - added $proc->kill('KILL')
+
+0.02
+
+        - pass orignal environment variables to child process
+        - fixed docs
+
+0.01    Wed Jul  8 12:42:21 2009
+        - original version

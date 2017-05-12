@@ -1,0 +1,18 @@
+$Id: TODO,v 1.2 2009-11-13 20:10:02 ubuntu Exp $
+ * update references to RDFS.pm ... 
+  
+ * ONGOING
+	- Create better test cases for everything
+	- Continue to refine documentation
+	- Create simple example applications
+	
+ * INDIVIDUAL ITEMS
+ 	- Complete OWL code generator
+ 	- Complete OWL-Lite code generator
+ 	- Complete SPARQL parser and default query handler
+ 	- Update Jena compatbility modules to newest ODO API and Jena version
+ 	- Asynchronus event handling
+ 	- Build out database persistence layer
+ 	- Add more triple format parsers and serializers (Turtle, N3, etc.)
+ 	- Create AOP code for debug/development support
+ 

@@ -1,0 +1,194 @@
+=encoding utf8
+
+=head1 NAME
+
+POSIX::1003::Limit - POSIX access to ulimit and rlimit
+
+=head1 INHERITANCE
+
+ POSIX::1003::Limit
+   is a POSIX::1003::Module
+
+=head1 SYNOPSIS
+
+  # ULIMIT support
+
+  use POSIX::1003::Limit; # load all names
+
+  use POSIX::1003::Limit qw(ulimit);
+  # keys are strings!
+  $size = ulimit('UL_GETFSIZE');
+
+  use POSIX::1003::Limit qw(ulimit UL_GETFSIZE);
+  $size = UL_GETFSIZE;   # constants are subs
+
+  use POSIX::1003::Limit '%ulimit';
+  my $key = $ulimit{UL_GETFSIZE};
+  $ulimit{_SC_NEW_KEY} = $key_code;
+  $size = ulimit($key);
+
+  print "$_\n" for keys %ulimit;
+
+  # RLIMIT support
+
+  use POSIX::1003::Limit ':rlimit';
+
+  my ($cur, $max, $success) = getrlimit('RLIMIT_CORE');
+  my ($cur, $max) = getrlimit('RLIMIT_CORE');
+  my $cur = RLIMIT_CORE;
+
+  my $success = setrlimit('RLIMIT_CORE', 1e6, 1e8);
+  setrlimit('RLIMIT_CORE', 1e6) or die;
+  setrlimit('RLIMIT_CORE', RLIM_SAVED_MAX, RLIM_INFINITY);
+  RLIMIT_CORE(1e6, 1e8);
+
+=head1 DESCRIPTION
+
+This module provides access to the "ulimit" (user limit) and "rlimit"
+(resource limit) handling.  On most systems, C<ulimit()> is succeeded
+by C<rlimit()> hence provides a very limited set of features.
+
+See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
+ 
+=over 4
+
+=item POSIX::1003::Limit-E<gt>B<exampleValue>(NAME)
+
+See L<POSIX::1003::Module/"METHODS">
+
+=item $obj-E<gt>B<import>()
+
+See L<POSIX::1003::Module/"METHODS">
+
+=back
+
+=head1 FUNCTIONS
+
+=head2 Standard POSIX
+
+=over 4
+
+=item B<getrlimit>(RESOURCE)
+
+  my ($cur, $max, $success) = getrlimit('RLIMIT_CORE');
+  my ($cur, $max) = getrlimit('RLIMIT_CORE');
+
+=item B<setrlimit>(RESOURCE, CUR, [MAX])
+
+  my $success = setrlimit('RLIMIT_CORE', 1e6, 1e8);
+
+=item B<ulimit>(NAME)
+
+Returns the ulimit value related to the NAMEd constant.  The NAME
+must be a string. C<undef> will be returned when the NAME is not
+known by the system.
+
+  my $filesize = ulimit('UL_GETFSIZE') || SSIZE_MAX;
+
+=back
+
+=head2 Additional
+
+=over 4
+
+=item B<rlimit_names>()
+
+Returns a list with all known resource names, unsorted.
+
+=item B<ulimit_names>()
+
+Returns a list with all known names, unsorted.
+
+=back
+
+=head1 CONSTANTS
+
+=over 4
+
+=item B<%ulimit>
+
+This exported variable is a tied HASH which maps C<UL_*> names
+on unique numbers, to be used with L<ulimit()|POSIX::1003::Limit/"Standard POSIX">.
+
+=item B<%rlimit>
+
+This exported variable is a tied HASH which maps C<RLIMIT_*> names
+on unique numbers, to be used with L<getrlimit()|POSIX::1003::Limit/"Standard POSIX"> and L<setrlimit()|POSIX::1003::Limit/"Standard POSIX">.
+
+=back
+
+The following constants where detected on your system when the
+module got installed.  The second column shows the value which
+where returned at that time.
+
+For ulimit, with a value when it is a getter:
+
+=for comment
+#TABLE_ULIMIT_START
+
+  UL_GETFSIZE    9223372036854775807
+  UL_GETMAXBRK   undef
+  UL_GETOPENMAX  1024
+  UL_SETFSIZE    (setter)
+
+
+=for comment
+#TABLE_ULIMIT_END
+
+
+
+
+
+The constant names for rlimit, with the soft and hard limits that
+L<getrlimit()|POSIX::1003::Limit/"Standard POSIX"> returned during installation of the module.
+
+=for comment
+#TABLE_RLIMIT_START
+
+  RLIMIT_AS          18446744073709551615, 18446744073709551615
+  RLIMIT_CORE        0, 18446744073709551615
+  RLIMIT_CPU         18446744073709551615, 18446744073709551615
+  RLIMIT_DATA        18446744073709551615, 18446744073709551615
+  RLIMIT_FSIZE       18446744073709551615, 18446744073709551615
+  RLIMIT_LOCKS       18446744073709551615, 18446744073709551615
+  RLIMIT_MEMLOCK     65536, 65536
+  RLIMIT_MSGQUEUE    819200, 819200
+  RLIMIT_NICE        0, 0
+  RLIMIT_NLIMITS     0, 15
+  RLIMIT_NOFILE      1024, 4096
+  RLIMIT_NPROC       61461, 61461
+  RLIMIT_OFILE       1024, 4096
+  RLIMIT_RSS         18446744073709551615, 18446744073709551615
+  RLIMIT_RTPRIO      0, 0
+  RLIMIT_RTTIME      18446744073709551615, 18446744073709551615
+  RLIMIT_SIGPENDING  61461, 61461
+  RLIMIT_STACK       8388608, 18446744073709551615
+
+
+=for comment
+#TABLE_RLIMIT_END
+
+
+
+
+
+=head1 SEE ALSO
+
+This module is part of POSIX-1003 distribution version 0.98,
+built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights 2011-2013 on the perl code and the related documentation
+ by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

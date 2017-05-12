@@ -1,0 +1,72 @@
+PerlBean $Revision: 1.0 $
+=============================
+
+QUICK INSTALL/USAGE
+
+1) Install the module as usual
+2) Read the tutorial (it's fully reviewd in version 0.6)
+3) Run the samples in the tutorial directory
+
+SHORT DESCRIPTION
+
+PerlBean generates well documented bean like Perl module code.
+
+INCENTIVE
+
+I used to spend too much time programming bean like objects in Perl. The coding
+of object attributes (properties) sometimes takes more time than the coding of
+the object logic, is highly distracts and repetitive work.
+
+JUSTIFICATION
+
+You might argue that code generation (like this package does) is undesired
+in OO development and that required additional functionality is to be provided
+by classes.
+
+Indeed, I agree. However, although writing a class to abstract this problem is
+feasible I highly question its practical usage. Specifically: 1) the class
+may actually turn out to be more complex than desired/though 2) the problem
+covered may be redefined endlessly 3) additional functional requirements may 
+be prohibitive for the user of the class.
+
+Hence, this module generates code which I think is decent/usable and which may
+be edited at will.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Error
+
+AUTHOR
+       Vincenzo Zocca
+
+COPYRIGHT
+       Copyright 2002, 2003 by Vincenzo Zocca
+
+LICENSE
+
+The PerlBean module hierarchy is free software; you can redistribute it
+and/or modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2 of
+the License, or (at your option) any later version.
+
+The PerlBean module hierarchy is distributed in the hope that it will
+be useful, but WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with the PerlBean module hierarchy; if not, write to
+the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+Boston, MA 02111-1307 USA
+

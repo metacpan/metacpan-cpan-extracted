@@ -1,0 +1,48 @@
+---
+abstract: 'Perl extension for loading and updating Postgres tables'
+author:
+  - 'Ioannis Tambouras, <ioannis@cpan.org>'
+build_requires:
+  Expect: 1.21
+  ExtUtils::MakeMaker: 6.62
+  Test::CPAN::Meta: 0.12
+  Test::Dependencies: 0.11
+  Test::Exception: 0.27
+  Test::HasVersion: 0.012
+  Test::Legal: 0.10
+  Test::MinimumVersion: 0.101080
+  Test::MockDBI: 0.61
+  Test::Pod: 1.0
+  Test::Pod::Coverage: 1.0
+  Test::Spelling: 0.15
+configure_requires:
+  ExtUtils::MakeMaker: 6.62
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pg-Loader
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Config::Format::Ini: 0.05
+  DBD::Pg: 2.10.7
+  File::Tools: 0.09
+  Getopt::Compact: 0.04
+  List::MoreUtils: 0.22
+  Log::Log4perl: 1.16
+  Quantum::Superpositions: 2.02
+  Storable: 2.18
+  Text::CSV: 1.06
+  Text::Table: 1.107
+  Time::HiRes: 1.9711
+  perl: 5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.21

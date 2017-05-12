@@ -1,0 +1,34 @@
+Changes
+cpanfile
+lib/Pod/POM/View/TextBasic.pm
+lib/Pod/Spelling.pm
+lib/Pod/Spelling/Aspell.pm
+lib/Pod/Spelling/Ispell.pm
+lib/Test/Pod/Spelling.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.skip
+Makefile.PL
+t/bad.pod
+t/for.pod
+t/good.pod
+t/manifest.t
+t/numbers.pod
+t/one.pod
+t/pod_coverage.t
+t/pod_for.t
+t/pod_format.t
+t/pod_spelling_aispell.t
+t/pod_spelling_base.t
+t/pod_spelling_base_cb.t
+t/pod_spelling_import_speller.t
+t/pod_wordlist.pod
+t/test_pod_spelling.t
+t/test_pod_spelling_add_stopwords.t
+t/textbasic.t
+t/rt_75228.txt
+README
+README.md
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

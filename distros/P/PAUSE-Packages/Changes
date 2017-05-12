@@ -1,0 +1,88 @@
+Revision history for Perl module PAUSE::Packages
+
+0.17 2015-10-31 NEILB
+    - After looking at CPAN Testers results, realised I was requiring
+      Perl 5.10 needlessly. Have tested on 5.8.9, but set required to
+      5.8.1, which I suspect is true. Will see if CPAN Testers agrees.
+
+0.16 2015-10-28 NEILB
+    - Require at least version 0.93 of File::HomeDir, which is needed
+      for my_dist_data(). Thanks to MANWAR for the Pull Request.
+    - Added [MetaJSON] to dist.ini so releases will contain a META.json file.
+    - Updated github repo URL after changing my github username.
+
+0.15 2015-03-07 NEILB
+    - Set min version of Moo to 1.006 after reading the Changes file for Moo,
+      which I should have done before, rather than trust OALDERS :-)
+
+0.14 2015-03-05 NEILB
+    - Set minimum version of Moo to 1.004005, to address CPAN Testers fails.
+      Eg http://www.cpantesters.org/cpan/report/e3da2a54-c260-11e4-8a69-fbd67d3e1735
+      OALDERS++
+
+0.13 2015-03-03 NEILB
+    - Switch to use JSON::MaybeXS instead of JSON, as the front-end for
+      JSON processing. Thanks to ETHER.
+
+0.12 2015-03-02 NEILB
+    - Use a cache name which is unique to each URI. (Olaf Alders)
+
+0.11 2015-01-23
+    - Adds ua method for providing your own UserAgent.
+    - Documents previously secret "url" attribute.
+
+0.10 2014-04-27
+    - Updated documentation to describe that you can pass the path
+      attribute to the constructor. RT#93965.
+    - Noted that the 'path' attribute will split into two in a future release,
+      so the cache path and the path to a local copy are separate things,
+      as they should be.
+    - Dropped use of [MungeFile::WithData] to set package name in
+      PAUSE/Packages.pm -- the 'PAUSE-Packages' resulted in broken
+      cache filename when testing from the dev directory. I'm sure there's
+      a better way to fix this, but this is easiest for now.
+    - Added [Git::Tag] and [Git::Push] to dist.ini
+
+0.09 2014-02-26
+    - Added CPAN::Common::Index to SEE ALSO (Thanks ETHER)
+    - Added CPAN::PackageDetails to SEE ALSO
+
+0.08 2014-02-22
+    - Added 'well_formed' option to release iterator
+    - Dropped support for old method name 'next' on ReleaseIterator
+
+0.07 2014-01-05
+    - ReleaseIterator method next() renamed to next_release().
+      The old name will be retained for a while, for back compat.
+    - Added THALJEF's new module Parse::CPAN::Perms to SEE ALSO.
+
+0.06 2013-11-26
+    - Still had entry_iterator() function, which was referring to
+      PAUSE::Packages::EntryIterator. Caused failures due to missing
+      pre-req.
+
+0.05 2013-10-16
+    - Specified min version of perl in each module
+
+0.04 2013-10-12
+    - Added a release() method, which takes a dist name and returns
+      a PAUSE::Packages::Release for the latest release of that dist.
+
+0.03 2013-09-20
+    - Changed SYNOPSIS and doc to make it clear that you should require at
+      least version 0.02 of PAUSE::Packages,
+      given the changes from 0.01 to 0.02
+    - Added SEE ALSO section with links to
+            Parse::CPAN::Packages
+            Parse::CPAN::Packages::Fast
+
+0.02 2013-09-13
+    - Now process 02packages and transform into a format where all modules
+      in a release are encoded in JSON and recorded on one line.
+      Thanks to DAGOLDEN for the suggestion to use JSON.
+    - We only hold onto the latest release for each dist
+    - Dropped EntryIterator as it no longer makes sense
+
+0.01 2013-08-26
+    - first release to CPAN
+

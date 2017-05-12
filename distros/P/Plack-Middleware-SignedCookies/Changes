@@ -1,0 +1,18 @@
+Revision history for Plack-Middleware-SignedCookies
+
+1.103 Sat 10 Jan 2015
+	- No functional changes
+	- No longer contains INSTALL file with install-as-root instructions
+
+1.102 Sun 04 Jan 2015
+	- Turned on warnings.
+
+1.101 Fri 19 Dec 2014
+	- Fixed accidental reliance of a test on autoderef misfeature in newer
+	  perls. No module code changes.
+
+1.100 Thu 18 Dec 2014
+	- Added support for forcing the secure and HttpOnly flags on all cookies.
+
+1.000 Wed 17 Dec 2014
+	- Initial release.

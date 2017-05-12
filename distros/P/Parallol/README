@@ -1,0 +1,110 @@
+NAME
+    Mojolicious::Plugin::Parallol - Because parallel requests should be as
+    fun as parallololololol!
+
+SYNOPSIS
+      # Mojolicious
+      $self->plugin('Parallol');
+
+      # Mojolicious::Lite
+      plugin 'Parallol';
+
+DESCRIPTION
+    Mojolicious::Plugin::Parallol provides a simple helper for managing
+    several parallel requests in the controller.
+
+HELPERS
+    Mojolicious::Plugin::Parallol implements the following helpers.
+
+  `parallol'
+    Parallol optimizes for the common case: You want to call several
+    parallel requests and render the view when they're done.
+
+      get '/' => sub {
+        my $self = shift;
+
+        $self->ua->get('http://bbc.co.uk/', $self->parallol(sub {
+          $self->stash(bbc => pop->res->dom->at('title')->text);
+        }));
+
+        $self->ua->get('http://mojolicio.us/', $self->parallol(sub {
+          $self->stash(mojo => pop->res->dom->at('title')->text);
+        }));
+      };
+
+    By wrapping a callback in `$self->parallol' you mark the current
+    response as asynchronous (see Mojolicious::Controller) and Parallol will
+    render the view when all callbacks are called.
+
+    Automatic stashing
+    By passing a string to `$self->parallol' it will stash the last argument
+    of the result instead. If we rewrite the previous example to use a
+    helper, we can simplify our controller quite a lot.
+
+      get '/' => sub {
+        my $self = shift;
+
+        $self->title('http://bbc.co.uk/',    $self->parallol('bbc'));
+        $self->title('http://mojolicio.us/', $self->parallol('mojo'));
+      };
+
+      helpers title => sub {
+        my ($self, $url, $cb) = @_;
+        $self->ua->get($url, sub {
+          $cb->(pop->res->dom->at('title')->text);
+        });
+      };
+
+    It's recommended that you move as much logic to helpers and other
+    classes/methods so you can take advantage of automatic stashing.
+
+    Overriding "done" behavior
+    When you need to do more than just rendering the view you can override
+    the "done" callback:
+
+      get '/' => sub {
+        my $self = shift;
+        $self->on_parallol(sub {
+          shift->render(template => 'something_else');
+        });
+      };
+
+    $self weakening
+    In order to prevent memory leaks, Parallol will automatically `weaken
+    $self'. This means that if you *don't* refer to `$self' in your callback
+    objects will magically disappear.
+
+      # This controller will behave very strangely:
+      get '/' => sub {
+        my $self = shift;
+        my $res = {};
+        $self->ua->get('http://bbc.co.uk/', $self->parallol(sub {
+          # There's no reference to $self in this block
+          $res->{bbc} = pop->res->dom->at('title')->text;
+        }));
+      };
+
+    In these cases you can disabled weakening by passing in `weaken => 0'.
+
+      # This controller is fine:
+      get '/' => sub {
+        my $self = shift;
+        my $res = {};
+        $self->ua->get('http://bbc.co.uk/', $self->parallol(weaken => 0, sub {
+          # There's no reference to $self in this block
+          $res->{bbc} = pop->res->dom->at('title')->text;
+        }));
+      };
+
+METHODS
+    Mojolicious::Plugin::Parrallol inherits all methods from
+    Mojolicious::Plugin and implements the following new ones.
+
+  `register'
+      $plugin->register;
+
+    Register helpers in Mojolicious application.
+
+SEE ALSO
+    Mojolicious, Parallol
+

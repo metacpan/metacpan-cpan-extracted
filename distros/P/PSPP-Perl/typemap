@@ -1,0 +1,53 @@
+TYPEMAP
+ struct dictionary *   T_PTRREF
+ struct variable *     T_PTRREF
+ struct sysfile_info * T_PTRREF
+ struct sysreader_info * T_PTRREF
+ input_format  INPUT_FMT_SPEC
+ output_format OUTPUT_FMT_SPEC
+
+
+INPUT
+OUTPUT_FMT_SPEC
+ {
+   HV *hv = (HV *) SvRV ($arg);
+   SV** the_format = hv_fetch (hv, \"fmt\", 3, 0);
+   SV** decimals = hv_fetch (hv, \"decimals\", 8, 0);
+   SV** width = hv_fetch (hv, \"width\", 5, 0);
+
+   $var.type = the_format ? SvIV (*the_format) : FMT_F;
+   $var.w    = width ? SvIV (*width) : 8;
+   $var.d    = decimals ? SvIV (*decimals) :
+     fmt_takes_decimals ($var.type) ?
+     MIN (2, fmt_max_output_decimals ($var.type, $var.w)) : 0;
+   if ( ! fmt_check_output (&$var))
+   {
+	char buf[FMT_STRING_LEN_MAX + 1];
+        fmt_to_string (&$var, buf);
+  	croak (\"%s is an invalid output format\", buf);
+   }
+
+ }
+
+
+INPUT_FMT_SPEC
+ {
+   HV *hv = (HV *) SvRV ($arg);
+   SV** the_format = hv_fetch (hv, \"fmt\", 3, 0);
+   SV** decimals = hv_fetch (hv, \"decimals\", 8, 0);
+   SV** width = hv_fetch (hv, \"width\", 5, 0);
+
+
+   $var.type = the_format ? SvIV (*the_format) : FMT_F;
+   $var.w    = width ? SvIV (*width) : 8;
+   $var.d    = decimals ? SvIV (*decimals) :
+     fmt_takes_decimals ($var.type) ?
+     MIN (2, fmt_max_input_decimals ($var.type, $var.w)) : 0;
+   if ( ! fmt_check_input (&$var))
+   {
+	char buf[FMT_STRING_LEN_MAX + 1];
+        fmt_to_string (&$var, buf);
+  	croak (\"%s is an invalid input format\", buf);
+   }
+
+ }

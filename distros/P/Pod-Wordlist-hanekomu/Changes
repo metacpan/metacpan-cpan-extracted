@@ -1,0 +1,60 @@
+Revision history for Perl extension Pod-Wordlist-hanekomu
+
+1.132680  2013-09-25 14:47:26 America/New_York
+
+    - marked as deprecated now that words are merged
+      into Pod::Wordlist
+
+1.130240  2013-01-23 20:27:57 America/New_York
+
+1.122840  2012-10-10 10:25:10 America/New_York
+
+    - added: iteratively
+
+1.121370  2012-05-16 17:02:39 America/New_York
+
+    - added: GUIDs, UUID, UUIDs, searchable
+
+1.121231  2012-05-02 16:12:36 America/New_York
+
+    - added deserialized, parameterizable, pre, precompute,
+      precomputes, symlinked
+
+1.120920  2012-04-01 11:53:06 Europe/Paris
+    - added: prereq(s), pre, precompute, symlinked
+
+1.120740  2012-03-14 16:36:02 EST5EDT
+    - added: EINTR, chunked, redirections, timestamp, CamelCase, CPANPLUS,
+      GUID, HTTPS, IETF, IRC, ISP, ISP's, JSON, modulino, SMTP, SSL, URI's,
+      UTC, wiki, analyses, locator
+
+1.113620  2011-12-28 22:25:25 Europe/Vienna
+    - added "Lapworth", "UTF", "aggregator", "aggregators", "probe's",
+      "runtime", "seekable" and "sigils"
+
+1.110090  2011-01-09 12:39:53 Europe/Vienna
+    - added "breakpoint", "breakpoints", "debugger's"
+    - also added author names "Cushing", "Doherty", "Doran".
+
+1.102640  2010-09-21 14:49:22 Europe/Vienna
+    - added "multi", "multi-value", "multi-valued"
+
+1.102630  2010-09-20 15:21:26 Europe/Vienna
+    - added "benchmarked"
+
+1.102340  2010-08-22 20:04:59 Europe/Vienna
+    - added "Metheringham" (nigelm) to make Pod-Weaver-PluginBundle-MARCEL pass
+
+1.102250  2010-08-13 14:33:51 Europe/Vienna
+    - added: afterwards, nestable, lookup. Are these such strange words or is
+      my spell checker simply a bit... retarded?
+    - also added: SQL, lookups, variable's, munger, munging, storages, filenames
+
+1.100860  2010-03-27 23:53:59 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.02 Thu 2009.10.29 16:54:01 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - more words
+
+0.01 2009-06-07T16:05:29Z (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

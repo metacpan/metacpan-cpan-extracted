@@ -1,0 +1,45 @@
+pod
+  head1
+    @title
+      "NAME"
+    text
+      @text
+        "130-blockquote-paragraphs"
+  head1
+    @title
+      "EXAMPLES"
+    text
+      @text
+        "Text before blockquote paragraph."
+    over
+      @indent
+        "4"
+      text
+        @text
+          "Blockquote paragraph."
+    text
+      @text
+        "Text between blockquote paragraphs."
+    over
+      @indent
+        "4"
+      text
+        @text
+          "Multi-paragraph blockquote."
+      text
+        @text
+          "Here is the second paragraph in"
+          "the blockquote."
+      text
+        @text
+          "Here is the third paragraph in"
+          "the blockquote."
+      over
+        @indent
+          "4"
+        text
+          @text
+            "Nested blockquote paragraph."
+    text
+      @text
+        "[EOF]"

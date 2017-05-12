@@ -1,0 +1,157 @@
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; Maxthon; Win64; x64; Trident/4.0)
+
+'original_name'    => 'Maxthon',
+'parser'           => 'maxthon',
+'os'               => 'Windows 7',
+'extras'           => ['Win64','x64'],
+'version_raw'      => '8.0',
+'version'          => '8.000',
+'name'             => 'MSIE',
+'original_version' => '1.0',
+'toolkit'          => ['Trident','4.0','4.000']
+
+[AGENT]
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Trident/4.0; Maxthon; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 1.1.4322; .NET CLR 3.5.21022; .NET CLR 3.0.30618; .NET CLR 3.5.30729; OfficeLiveConnector.1.3; OfficeLivePatch.0.0)
+
+'original_name'    => 'Maxthon',
+'parser'           => 'maxthon',
+'os'               => 'Windows Vista / Server 2008',
+'extras'           => ['SLCC1','Media Center PC 5.0','OfficeLiveConnector.1.3','OfficeLivePatch.0.0'],
+'version_raw'      => '7.0',
+'version'          => '7.000',
+'name'             => 'MSIE',
+'dotnet'           => ['2.0.50727','1.1.4322','3.5.21022','3.0.30618','3.5.30729'],
+'original_version' => '1.0',
+'toolkit'          => ['Trident','4.0','4.000']
+
+[AGENT]
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 6.0; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; Maxthon; SLCC1; .NET CLR 2.0.50727; Media Center PC 5.0; .NET CLR 3.0.04506; .NET CLR 1.1.4322; InfoPath.2)
+
+'original_name'    => 'Maxthon',
+'parser'           => 'maxthon',
+'os'               => 'Windows Vista / Server 2008',
+'extras'           => ['SV1','SLCC1','Media Center PC 5.0','InfoPath.2'],
+'version_raw'      => '7.0',
+'version'          => '7.000',
+'name'             => 'MSIE',
+'dotnet'           => ['2.0.50727','3.0.04506','1.1.4322'],
+'original_version' => '1.0'
+
+[AGENT]
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Trident/4.0; .NET CLR 2.0.50727; .NET CLR 3.0.04506.30; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729; Maxthon 2)
+
+'original_name'    => 'Maxthon',
+'parser'           => 'maxthon',
+'os'               => 'Windows XP',
+'version_raw'      => '7.0',
+'version'          => '7.000',
+'name'             => 'MSIE',
+'dotnet'           => ['2.0.50727','3.0.04506.30','3.0.4506.2152','3.5.30729'],
+'original_version' => '2',
+'toolkit'          => ['Trident','4.0','4.000']
+
+[AGENT]
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; SV1; Maxthon; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
+
+'original_name'    => 'Maxthon',
+'parser'           => 'maxthon',
+'os'               => 'Windows XP',
+'extras'           => ['SV1'],
+'version_raw'      => '7.0',
+'version'          => '7.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.1.4322','2.0.50727'],
+'original_version' => '1.0'
+
+[AGENT]
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; SV1; FunWebProducts; Maxthon; FDM)
+
+'original_name'    => 'Maxthon',
+'parser'           => 'maxthon',
+'os'               => 'Windows XP',
+'extras'           => ['SV1','FunWebProducts','FDM'],
+'version_raw'      => '7.0',
+'version'          => '7.000',
+'name'             => 'MSIE',
+'original_version' => '1.0'
+
+[AGENT]
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; Maxthon; .NET CLR 1.1.4322; .NET CLR 2.0.50727; .NET CLR 3.0.4506.2152; .NET CLR 3.5.30729)
+
+'original_name'    => 'Maxthon',
+'parser'           => 'maxthon',
+'os'               => 'Windows XP',
+'extras'           => ['SV1'],
+'version_raw'      => '7.0',
+'version'          => '7.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.1.4322','2.0.50727','3.0.4506.2152','3.5.30729'],
+'original_version' => '1.0'
+
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 7.0; Windows NT 5.1; Maxthon; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; InfoPath.1)
+
+'original_name'    => 'Maxthon',
+'parser'           => 'maxthon',
+'os'               => 'Windows XP',
+'extras'           => ['SV1','InfoPath.1'],
+'version_raw'      => '7.0',
+'version'          => '7.000',
+'name'             => 'MSIE',
+'original_version' => '1.0'
+
+[AGENT]
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; Maxthon; .NET CLR 1.0.3705; .NET CLR 1.1.4322; Media Center PC 4.0; .NET CLR 2.0.50727; InfoPath.1)
+
+'original_name'    => 'Maxthon',
+'parser'           => 'maxthon',
+'os'               => 'Windows XP',
+'extras'           => ['SV1','Media Center PC 4.0','InfoPath.1'],
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.0.3705','1.1.4322','2.0.50727'],
+'original_version' => '1.0'
+
+[AGENT]
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; iOpus-I-M; SV1; Maxthon; .NET CLR 1.0.3705; .NET CLR 1.1.4322)
+
+'original_name'    => 'Maxthon',
+'parser'           => 'maxthon',
+'os'               => 'Windows XP',
+'extras'           => ['iOpus-I-M','SV1'],
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.0.3705','1.1.4322'],
+'original_version' => '1.0'
+
+[AGENT]
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.0; Maxthon; Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1) ; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
+
+'original_name'    => 'Maxthon',
+'parser'           => 'maxthon',
+'os'               => 'Windows 2000',
+'extras'           => ['SV1'],
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.1.4322','2.0.50727'],
+'original_version' => '1.0'
+
+[AGENT]
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; Maxthon; MRA 4.6 (build 01425); Maxthon; .NET CLR 1.1.4322; .NET CLR 2.0.50727)
+
+'original_name'    => 'Maxthon',
+'parser'           => 'maxthon',
+'os'               => 'Windows XP',
+'extras'           => ['SV1','MRA 4.6 build 01425'],
+'version_raw'      => '6.0',
+'version'          => '6.000',
+'name'             => 'MSIE',
+'dotnet'           => ['1.1.4322','2.0.50727'],
+'original_version' => '1.0'

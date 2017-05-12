@@ -1,0 +1,2 @@
+requires 'Plack';
+requires 'Plack::Middleware::Assets::RailsLike';

@@ -1,0 +1,23 @@
+=head1 NAME
+
+Blah - Blah Blah
+
+=head1 SYNOPSIS
+ 
+    # Blah Blah
+    my $blah = Blah->new();
+       
+=head1 ABSTRACT
+
+    Blah provides a powerful API for your application
+
+=head1 DESCRIPTION
+
+Blah is superb in every aspect.
+
+=head1 LICENSE
+
+Copyright 2002-2011 by Bodo Bravo <bodo@bravo.com> and
+Zach Zulu <zach@zulu.com>. All rights reserved.
+
+=cut

@@ -1,0 +1,35 @@
+---
+doctype: dist
+
+header:
+  name: Pod-Weaver-PluginBundle-Author-CSSON
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Pod::Weaver::Config::Assembler
+      - Path::Tiny
+
+plugins:
+ - +config: Author::CSSON
+
+ - +plugin: Deprecated
+
+---
+doctype: weaver
+
+plugins:
+ - +config: Author::CSSON
+   badges: 0
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+
+config: Author::CSSON
+
+always:
+ - /Pod-Weaver-PluginBundle-Author-CSSON-*

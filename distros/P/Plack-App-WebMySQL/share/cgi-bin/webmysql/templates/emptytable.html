@@ -1,0 +1,18 @@
+		<!--menu-->
+		<p>
+			Are you sure you wish to empty the following table?
+			<dir><b><!--tables--></b></dir>
+			It contains <b><!--rows--></b> rows of data.
+		</p>
+		<form action="<!--self-->" method="POST">
+			<input type="hidden" name="key" value="<!--key-->">
+			<input type="hidden" name="action" value="emptytableconfirm">
+			<table class="inputtable">
+				<tr><th><input checked type="radio" name="answer" value="no"></th><td>No</td></tr>
+				<tr><th><input type="radio" name="answer" value="yes"></th><td>Yes</td></tr>
+			</table>
+			<br>
+			<table class="inputtable">
+				<tr><td><input type="submit" value="Continue"></td></tr>
+			</table>
+		</form>

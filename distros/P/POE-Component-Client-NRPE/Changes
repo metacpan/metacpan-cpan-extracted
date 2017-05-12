@@ -1,0 +1,39 @@
+==============================
+2012-10-04 10:37:23 +0100 0.20
+==============================
+
+  commit b76d4cbc4862a424104c8dcba5ba47ff27dfa680
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Oct 4 10:37:23 2012 +0100
+  
+    Convert to Dist::Zilla distribution
+
+  commit fbaa60e167d8ebcdc8a47431bdf02ad21bd602c3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Oct 4 10:29:14 2012 +0100
+  
+    Make the sockerr2 test a bit more forgiving 
+
+==============================
+2010-12-13 16:08:58 +0000 0.18
+==============================
+
+  commit 8a6bd843cede96b6294dbe0eb8ee237fc8ae3635
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Dec 13 16:08:58 2010 +0000
+  
+    Added 'args' option 
+
+==============================
+2009-04-08 12:28:03 +0100 0.16
+==============================
+
+  commit 1b21b2fbe525de0c2ee5526434b64b2737169adc
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Wed Apr 8 12:28:03 2009 +0100
+  
+    Make auto_set_repository() only run at author-time 
+
+====================================
+End of changes in the last 1825 days
+====================================

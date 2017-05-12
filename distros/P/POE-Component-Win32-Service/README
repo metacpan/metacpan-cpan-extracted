@@ -1,0 +1,188 @@
+NAME
+
+    POE::Component::Win32::Service - A POE component that provides
+    non-blocking access to Win32::Service.
+
+VERSION
+
+    version 1.26
+
+SYNOPSIS
+
+      use strict;
+      use POE qw(Component::Win32::Service);
+    
+      my ($poco) = POE::Component::Win32::Service->spawn( alias => 'win32-service', debug => 1, options => { trace => 1 } );
+    
+      # Start your POE sessions
+    
+      POE::Session->create(
+            package_states => [
+                    'main' => [ qw(_start result) ],
+            ],
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+    
+      sub _start {
+        $_[KERNEL]->post( 'win32-service' => restart => { host => 'win32server', 
+                                                   service => 'someservice',
+                                                   event => 'result' } );
+        undef;
+      }
+    
+      sub result {
+        my ($kernel,$ref) = @_[KERNEL,ARG0];
+    
+        if ( $ref->{result} ) {
+            print STDOUT "Service " . $ref->{service} . " was restarted\n";
+        } else {
+            print STDERR join(' ', @{ $ref->{error} } ) . "\n";
+        }
+        $kernel->post( 'win32-service' => 'shutdown' );
+        undef;
+      }
+
+DESCRIPTION
+
+    POE::Component::Win32::Service is a POE component that provides a
+    non-blocking wrapper around Win32::Service, so one can start, stop,
+    restart, pause and resume services, query the status of services or
+    just get a list of services, from the comfort of your POE sessions and
+    applications.
+
+    Consult the Win32::Service documentation for more details.
+
+CONSTRUCTOR
+
+    spawn
+
+      Takes a number of arguments, all of which are optional:
+
+        'alias', the kernel alias to bless the component with;
+        'debug', set this to 1 to see component debug information; 
+        'options', a hashref of POE::Session options that are passed to the component's session creator.
+
+      Returns a POE::Component::Win32::Service object on success.
+
+METHODS
+
+    These are methods that are applicable to the
+    POE::Component::Win32::Service object.
+
+    session_id
+
+      Takes no arguments, returns the POE::Session ID of the component.
+      Useful if you don't want to use aliases.
+
+    yield
+
+      This method provides an alternative object based means of posting
+      events to the component. First argument is the event to post,
+      following arguments are sent as arguments to the resultant post.
+
+        $poco->yield( 'restart' => { host => 'win32server', service => 'someservice', event => 'result' } );
+
+    call
+
+      This method provides an alternative object based means of calling
+      events to the component. First argument is the event to call,
+      following arguments are sent as arguments to the resultant call.
+
+        $poco->call( 'restart' => { host => 'win32server', service => 'someservice', event => 'result' } );
+
+INPUT
+
+    These are the events that the component will accept. Each event
+    requires a hashref as an argument with the following keys:
+
+      'service', the short form of the service to manipulate; 
+      'host', which host to query ( default is localhost ); 
+      'event', the name of the event handler in *your* session that you want the result go to;
+
+    'event' is mandatory for all requests. 'service' is mandatory for all
+    requests, except for 'services'.
+
+    It is possible to pass arbitary data in the request hashref that could
+    be used in the resultant event handler. Simply define additional
+    key/value pairs of your own. It is recommended that one prefixes keys
+    with '_' to avoid future clashes.
+
+    start
+
+      Starts the requested service on the requested host.
+
+    stop
+
+      Stops the requested service on the requested host.
+
+    restart
+
+      Stops and starts the requested service on the requested host.
+
+    pause
+
+      Pauses the requested service on the requested host.
+
+    resume
+
+      Resumes the requested service on the requested host.
+
+    status
+
+      Retrieves the status of the requested service on the requested host.
+
+    services
+
+      Retrieves a list of services on the requested host.
+
+    shutdown
+
+      Takes no arguments. Terminates the component.
+
+OUTPUT
+
+    For each requested operation an event handler is required. ARG0 of this
+    event handler contains a hashref.
+
+    The hashref will contain keys for 'service', 'host' and 'state'. The
+    first two are those passed in the original query. 'state' is the
+    operation that was requested.
+
+    result
+
+      For most cases this will be just a true value. For 'status', it will
+      be a hashref that will be populated with entries corresponding to the
+      SERVICE_STATUS structure of the Win32 API. See the Win32 Platform SDK
+      documentation for details of this structure. For 'services' it will
+      be a hashref populated with the descriptive service names as keys and
+      the short names as the values.
+
+    error
+
+      In the event of an error occurring this will be defined. It is an
+      arrayref which contains the error code and the formatted error
+      relating to that code.
+
+CAVEATS
+
+    This module will only work on Win32. But you guessed that already :)
+
+SEE ALSO
+
+    Win32::Service
+
+    POE
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

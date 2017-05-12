@@ -1,0 +1,376 @@
+NAME
+    Parse::CSV::Colnames - Highly flexible CSV parser including column names
+    (field names) manipulation
+
+NOTE
+    This Module derives from Parse::CSV by Adam Kennedy inheriting its
+    methods. The main extensions are methods for column names manipulation
+    and some simple method-fixes.
+
+SYNOPSIS
+    Column names manipulation makes only sense if the fields-parameter is
+    auto, i.e. column names are in the first line.
+
+      # Parse a colon-separated variables file  from a handle as a hash
+      # based on headers from the first line.
+      my $objects = Parse::CSV::Colnames->new(
+          handle => $io_handle,
+          sep_char   => ';',
+          fields     => 'auto',
+       # select only rows where column name fieldname is "value"
+          filter     => sub { if($_->{fieldname} eq "value") 
+                           {$_} else 
+                           {undef}
+                            }
+          );
+
+      # get column names
+      my @fn=$objects->colnames
+      # you want lower case field names
+      @fn=map {lc} @fn;
+      # you want field names without blanks 
+      @fn=map { s/\s+//g} @fn;
+      # set column names
+      $objects->colnames(@fn);
+
+      while ( my $object = $objects->fetch ) {
+          $object->do_something;
+      }
+
+DESCRIPTION
+    This module is only an extension of Parse::CSV
+
+    For a detailed description of all methods see Parse::CSV
+
+    For a detailed description of the underlying csv-parser see Text::CSV_XS
+
+Fixed METHODS
+    These methods have not work in the parent module Parse::CSV yet, because
+    Adam Kennedy is very busy.
+
+  combine
+      $status = $csv->combine(@columns);
+
+    The "combine" method is passed through to the underlying Text::CSV_XS
+    object. See example 3.
+
+    It sets the fields and constructs the corresponding csv string from the
+    arguments. You can read this array with the "fields" method.
+
+  string
+      $line = $csv->string;
+
+    The "string" method is passed through to the underlying Text::CSV_XS
+    object. See example 3 and example 4.
+
+    It returns the parsed string or the corresponding combine-setting.
+
+  print
+      $status = $csv->print($io, $colref);
+
+    The "print" method is passed through to the underlying Text::CSV_XS
+    object. See example 1.
+
+    It prints the string of the corresponding @$colref directly to an IO
+    handle.
+
+Added METHODS
+  fields
+      @fields = $csv->fields;
+
+    The "fields" method is passed through to the underlying Text::CSV_XS
+    object.
+
+    It returns the input to "combine"-method or the actual row as an array.
+
+  colnames
+      @colnames = $csv->colnames("fn1","fn2") # sets colnames
+                      or
+      @colnames = $csv->colnames; # gets colnames
+
+    The "colnames" method sets or gets colnames (="fields"-param). So you
+    can rename the colnames (hash-keys in Parse::CSV::Colnames object).
+
+  pushcolnames
+      @colnames = $csv->pushcolnames("fn1","fn2")
+
+    The "pushcolnames" method adds colnames at the end of $csv->colnames
+    (="fields"-param). You can do that if the "filter"-method adds some new
+    fields at the end of fields-array in Parse::CSV::Colnames object .
+    Please consider that these colnames or fields are not in the underlying
+    Text::CSV_XS object. See example 1 and example 4.
+
+  pushcombine
+      @colnames = $csv->pushcombine("fn1","fn2")
+
+    The "pushcombine" method adds fields at the end of the actual row
+    (="fields"-method) and constructs the corresponding csv string. You can
+    read the result with the "fields"-method. The pushcombine and
+    pushcolnames belong together. See example 4.
+
+EXAMPLES
+    You can test these examples with copy and paste
+
+  Example 1
+    Using "csv->print", "csv->pushcolnames"
+
+      #!/usr/bin/perl 
+
+      use strict;
+      use warnings;
+      use Parse::CSV::Colnames;
+      my $fh=\*DATA;
+      my $fhout=\*STDOUT; # only for demo
+      my $csv = Parse::CSV::Colnames->new(
+                             #file => "testnamen.csv",
+                             handle     => $fh,
+                             sep_char   => ';',
+                             fields     => 'auto',
+                             binary     => 1, # for german umlauts and utf
+                             filter     => sub { $_->{country}="Germany"; 
+                                     $_->{product}=$_->{factor1}*$_->{factor2};
+                                     # select only rows where column name product>0 
+                                     if($_->{product}>0) {
+                                             $_;
+                                     } else {
+                                             undef
+                                     }
+                            }
+                             );
+
+      # add colnames at the end
+      $csv->pushcolnames(qw(product country));
+      # get column names
+      my @fn=$csv->colnames;
+      # you want lower case field names
+      @fn=map {lc} @fn;
+      # you want field names without blanks
+      map { s/\s+//g} @fn;
+      # set column names
+      $csv->colnames(@fn);
+
+      # headerline for direct output
+      $csv->print($fhout,[$csv->colnames]); # print header-line
+      print "\n";
+
+
+      while(my $line=$csv->fetch) {
+            # csv direct output
+            $csv->print($fhout,[$csv->fields,$line->{product},$line->{country}]); # only input-fields are printed with method fields
+            print "\n";
+      }
+
+      __DATA__
+      Name;Given Name;factor1;factor2
+      Hurtig;Hugo;5.4;4.6
+      Schnallnichts;Carlo;6.4;4.6
+      Weissnich;Carola;7.4;4.6
+      Leer;Hinnerk;0;4.6
+      Keine Ahnung;Maximilian;8.4;4.6
+
+  Example 2
+    Building new fields by hand with map
+
+      #!/usr/bin/perl 
+
+      use strict;
+      use warnings;
+      use Parse::CSV::Colnames;
+      my $fh=\*DATA;
+      my $csv = Parse::CSV::Colnames->new(
+                             #file => "testnamen.csv",
+                             handle     => $fh,
+                             sep_char   => ';',
+                             fields     => 'auto',
+                             binary     => 1, # for german umlauts
+                             filter     => sub { $_->{country}="Germany"; 
+                                     $_->{product}=$_->{factor1}*$_->{factor2};
+                                     # select only rows where column name product>0 
+                                     if($_->{product}>0) {
+                                             $_;
+                                     } else {
+                                             undef
+                                     }
+                            }
+                             );
+      #add new fieldname at the end
+      $csv->pushcolnames(qw(product));
+      # get column names
+      my @fn=$csv->colnames;
+      # you want lower case field names
+      @fn=map {lc} @fn;
+      # you want field names without blanks
+      map { s/\s+//g} @fn;
+      # set column names
+      $csv->colnames(@fn);
+
+      # headerline with only 2 fields
+      my @outcolnames1=(qw(givenname product));
+      print join(";",@outcolnames1) . "\n"; 
+
+
+      while(my $line=$csv->fetch) {
+            print join(";",map {$line->{$_}} @outcolnames1) . "\n"; 
+
+      }
+
+      __DATA__
+      Name;Given Name;factor1;factor2
+      Hurtig;Hugo;5.4;4.6
+      Schnallnichts;Carlo;6.4;4.6
+      Weissnich;Carola;7.4;4.6
+      Leer;Hinnerk;0;4.6
+      Keine Ahnung;Maximilian;8.4;4.6
+
+  Example 3
+    Using "csv->combine" and "csv->string"
+
+      #!/usr/bin/perl 
+
+      use strict;
+      use warnings;
+      use Parse::CSV::Colnames;
+      my $fh=\*DATA;
+      my $csv = Parse::CSV::Colnames->new(
+                             #file => "testnamen.csv",
+                             handle     => $fh,
+                             sep_char   => ';',
+                             fields     => 'auto',
+                             binary     => 1, # for german umlauts
+                             filter     => sub { $_->{country}="Germany"; 
+                                     $_->{product}=$_->{factor1}*$_->{factor2};
+                                     # select only rows where column name product>0 
+                                     if($_->{product}>0) {
+                                             $_;
+                                     } else {
+                                             undef
+                                     }
+                            }
+                             );
+      $csv->pushcolnames(qw(product country));
+      # get column names
+      my @fn=$csv->colnames;
+      # you want lower case field names
+      @fn=map {lc} @fn;
+      # you want field names without blanks
+      map { s/\s+//g} @fn;
+      # set column names
+      $csv->colnames(@fn);
+
+      # headerline
+      my @outcolnames2=(qw(givenname product country));
+      $csv->combine(@outcolnames2);
+      print $csv->string . "\n";
+
+
+      while(my $line=$csv->fetch) {
+            # csv output
+            $csv->combine(map {$line->{$_}} @outcolnames2);
+            print $csv->string . "\n";
+
+
+      }
+
+
+      __DATA__
+      Name;Given Name;factor1;factor2
+      Hurtig;Hugo;5.4;4.6
+      Schnallnichts;Carlo;6.4;4.6
+      Weissnich;Carola;7.4;4.6
+      Leer;Hinnerk;0;4.6
+      Keine Ahnung;Maximilian;8.4;4.6
+
+  Example 4
+    Using "csv->pushcombine" , "csv->pushcolnames" and "csv->string"
+
+      #!/usr/bin/perl 
+
+      use strict;
+      use warnings;
+      use Parse::CSV::Colnames;
+      my $fh=\*DATA;
+      my $csv = Parse::CSV::Colnames->new(
+                             #file => "testnamen.csv",
+                             handle     => $fh,
+                             sep_char   => ';',
+                             fields     => 'auto',
+                             binary     => 1, # for german umlauts
+                             filter     => sub { $_->{country}="Germany"; 
+                                     $_->{product}=$_->{factor1}*$_->{factor2};
+                                     # select only rows where column name product>0 
+                                     if($_->{product}>0) {
+                                             $_;
+                                     } else {
+                                             undef
+                                     }
+                            }
+                             );
+      $csv->pushcolnames(qw(product country));
+      # get column names
+      my @fn=$csv->colnames;
+      # you want lower case field names
+      @fn=map {lc} @fn;
+      # you want field names without blanks
+      map { s/\s+//g} @fn;
+      # set column names
+      $csv->colnames(@fn);
+
+      # headerline
+      $csv->combine($csv->colnames);
+      print $csv->string . "\n";
+
+
+      while(my $line=$csv->fetch) {
+            # csv output
+            $csv->pushcombine(map {$line->{$_}} qw(product country));
+            # is like
+            $csv->pushcombine($line->{product},$line->{country});
+             
+        print $csv->string . "\n";
+
+
+      }
+
+
+      __DATA__
+      Name;Given Name;factor1;factor2
+      Hurtig;Hugo;5.4;4.6
+      Schnallnichts;Carlo;6.4;4.6
+      Weissnich;Carola;7.4;4.6
+      Leer;Hinnerk;0;4.6
+      Keine Ahnung;Maximilian;8.4;4.6
+
+TODO
+    Creating Methods "popcolnames" and "popcombine". These methods delete
+    the last fieldnames (column names) or fields. (I will add these methods
+    if anybody wants this)
+
+    Creating Methods "(un)shiftcolnames" and "(un)shiftcombine". These
+    methods add/delete the first fieldnames (column names) or fields. (I
+    will add these methods if anybody wants this)
+
+    Integrating methods "getline_hr" and "column_names" of the underlying
+    object Text::CSV_XS.
+
+SUPPORT
+    Bugs should always be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Parse-CSV-Colnames>
+
+AUTHORS
+    Uwe Sarnowski <uwes at cpan.org>
+
+    Author of the parent modul Parse::CSV : Adam Kennedy
+
+SEE ALSO
+    Parse::CSV, Text::CSV_XS
+
+COPYRIGHT
+    Copyright 2011 Uwe Sarnowski
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,81 @@
+@startuml
+
+/'
+class Main {
+  run()
+}
+'/
+
+/' クラスと関係の文字列を抽出。PlantUML::ClassDiagram::Classに渡してオブジェクトをもらう '/
+/' relationはこの中でビルドしてPlantUML::ClassDiagram::Classに渡す'/
+class PlantUML::ClassDiagram::Parse {
+  classes
+  relations
+  ____
+  {static} parse()
+
+  .. private method ..
+  _extract_class_strings()
+  _extract_relation_strings()
+}
+
+/'クラス全体の文字列と、Relationオブジェクト全てをもらってクラスを組み立てる'/
+class PlantUML::ClassDiagram::Class {
+  name
+  attribute
+  variables
+  methods
+  relations
+  {static} build()
+}
+
+class PlantUML::ClassDiagram::Class::Factory {
+  {static} create()
+  _check_is_method()
+  _check_is_variable()
+}
+
+abstract class PlantUML::ClassDiagram::Class::Base {
+  name
+  attribute
+  {static} build()
+  is_method()
+  is_variable()
+}
+
+class PlantUML::ClassDiagram::Class::Variable {
+  name
+  attribute
+  {static} build()
+  is_method()
+  is_variable()
+}
+
+class PlantUML::ClassDiagram::Class::Method {
+  name
+  attribute
+  {static} build()
+  'check method'
+  is_static()
+  is_abstract()
+  is_method()
+  is_variable()
+}
+
+class PlantUML::ClassDiagram::Relation << (R,orchid) >> {
+  from
+  to
+  name
+  {static} build()
+}
+
+PlantUML::ClassDiagram::Class *-- PlantUML::ClassDiagram::Class::Variable
+PlantUML::ClassDiagram::Class *-- PlantUML::ClassDiagram::Class::Method
+PlantUML::ClassDiagram::Class <-- PlantUML::ClassDiagram::Relation
+PlantUML::ClassDiagram::Class::Factory <-- PlantUML::ClassDiagram::Class
+PlantUML::ClassDiagram::Class::Factory ..|> PlantUML::ClassDiagram::Class::Variable
+PlantUML::ClassDiagram::Class::Factory ..|> PlantUML::ClassDiagram::Class::Method
+PlantUML::ClassDiagram::Class::Variable -down-|> PlantUML::ClassDiagram::Class::Base
+PlantUML::ClassDiagram::Class::Method -down-|> PlantUML::ClassDiagram::Class::Base
+
+@enduml

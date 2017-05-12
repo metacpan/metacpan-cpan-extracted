@@ -1,0 +1,44 @@
+Revision history for Plack-App-MCCS
+
+1.000000  2016-10-24 17:11:41+03:00 Asia/Jerusalem
+	- Bugfix: assign the correct path to the filehandle when reading the
+	  minified file. This also allows windows tests to pass.
+      - Bugfix: tests would fail if JavaScript::Minifier::XS and
+        CSS::Minifier::XS were not installed
+	- add autodie to protect against ignored errors in file operations
+	- add min_cache_dir to reduce pollution with files that are hard to
+	  filter
+
+0.007002  2015-09-15 16:39:09+03:00 Asia/Jerusalem
+	- Bugfix: bin/mccs did not parse the root directory from the command
+	  line arguments correctly. Also print it out so its obvious.
+
+0.007001  2015-02-07 22:43:20+02:00 Asia/Jerusalem
+	- Small typo fix
+
+0.007000  2015-02-07 19:33:20+02:00 Asia/Jerusalem
+	- Added the mccs script to quickly start an MCCS application serving
+	  files from a directory.
+
+0.006000  2014-02-26 20:01:38+02:00 Asia/Jerusalem
+	- Created a middleware that uses MCCS to serve static files.
+	- Fixed bug causing endless re-additions of the max-age value to the
+	  cache control header.
+
+0.005     2012-11-23 16:54:16 Asia/Jerusalem
+	- Added the ability to disable creation and examination of ETags.
+
+0.004     2012-09-06 22:09:09 Asia/Jerusalem
+	- Removed bad test that caused tested installations to fail.
+
+0.003     2011-09-16 19:24:24 Asia/Jerusalem
+	- MCCS now doesn't read/write ETag files for resources with the
+	  no-store cache control option.
+
+0.002     2011-09-16 02:36:35 Asia/Jerusalem
+	- MCCS now knows to recognize stale minfied/compressed versions of
+	  files and their etag files, so you don't need to manually remove these
+	  versions when you modify a source file
+
+0.001     2011-08-31 20:55:10 Asia/Jerusalem
+	- Initial release

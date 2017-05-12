@@ -1,0 +1,4 @@
+#! /usr/bin/env perl
+
+open my $fh, '<:http', 'https://metacpan.org/recent' or die "Couldn't open metacpan/recent: $!";
+print while <$fh>;

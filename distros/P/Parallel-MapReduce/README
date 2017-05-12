@@ -1,0 +1,90 @@
+Parallel-MapReduce
+==================
+
+  ## THIS IS ALL STILL EXPERIMENTAL!!
+  ## DO NOT USE FOR PRODUCTION!!
+
+What is it?
+-----------
+
+This is a pure-Perl implementation of MapReduce, the distributed
+algorithm introduced by Google.
+
+See the RESOURCES file in this distribution and also
+
+   http://kill.devc.at/node/197
+
+   http://kill.devc.at/node/195
+
+What are the _external_ dependencies?
+-------------------------------------
+
+Apart from the normal CPAN dependencies, following software
+must be available for full operation:
+
+   apt-get install openssh-client
+   apt-get install memcached
+
+How to get started?
+-------------------
+
+  1) Write your algorithm in MR form and test it with
+
+        Parallel::MapReduce::Testing
+
+     That is a sequential, local implementation.
+
+  2) If you want to test it in a distributed setting, switch
+     to
+
+        Parallel::MapReduce::Sequential
+
+     and use the worker class
+
+        Parallel::MapReduce::Worker::SSH
+
+     You (your process) need/s to have a working ssh account on
+     every worker box you want to use. The public key of the SSH
+     servers should be known and accepted locally and you should
+     be able to log into the remote workers without giving a
+     password. Otherwise the worker implementation will just block
+     there waiting for your input.
+
+  3) Make sure your memcached daemons are running on each of
+     the servers:
+
+        /etc/init.d/memcached start
+
+  4) Cross your fingers and run your app.
+
+How to install?
+---------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+>>> NOTE!! <<<
+
+At this stage the tests are only testing local functionality, not any
+which involves the network setup. That cannot be detected or guessed.
+If you have a memcached on your local machine running, then
+
+   export MR_ONLINE=1
+   make test
+
+will run a test against that. Do not be scared by the large amount of
+test output. That will eventually go away.
+
+
+Copyright (C) 2008 by Robert Barta
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

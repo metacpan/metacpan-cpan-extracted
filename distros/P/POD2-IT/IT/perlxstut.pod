@@ -1,0 +1,1530 @@
+=head1 NOME
+
+perlXStut - Tutorial per scrivere estensioni XSUB
+
+=head1 DESCRIZIONE
+
+Questo tutorial spiegherE<agrave> i passi necessari alla creazione di un'estensione
+Perl. Si assume che abbiate a disposizione anche L<perlguts>, L<perlapi>
+e L<perlxs>.
+
+Si comincia con esempi molto semplici per procedere poi con quelli
+piE<ugrave> complessi, in modo che ogni nuovo esempio aggiunge nuove
+caratteristiche. Alcuni concetti potrebbero non essere spiegati
+completamente se non piE<ugrave> avanti nel tutorial, in modo da rendere
+via via piE<ugrave> facile al lettore la creazione delle estensioni.
+
+Il tutorial E<egrave> stato scritto da un punto di vista orientato a Unix.
+Laddove sia a conoscenza di comportamenti differenti in altre
+piattaforme (ad esempio Win32) ne farE<ograve> menzione; se trovate che manchi
+qualcosa fatemelo sapere, per favore.
+
+=head1 NOTE SPECIALI
+
+=head2 make
+
+In questo tutorial si assume che il programma I<make> utilizzato da Perl
+sia chiamato C<make>. Negli esempi che seguono, potete sostituire le
+chiamate a C<make> con qualunque programma abbiate configurato nella
+vostra installazione di Perl. Per sapere qual E<egrave>, lanciate
+B<perl -V:make>.
+
+=head2 attenzione alle versioni
+
+Quando scrivete un'estensione Perl di largo consumo, dovreste ricordare
+che verrE<agrave> utilizzata con versioni di Perl differenti da quella
+disponibile sulla vostra macchina. PoichE<eacute> state leggendo questo
+documento, la vostra versione di Perl E<egrave> probabilmente la 5.005 o
+successiva, ma gli utenti della vostra estensione potrebbero avere
+versioni piE<ugrave> datate.
+
+Per comprendere quali tipi di incompatibilitE<agrave> potete aspettarvi, e nel
+raro caso che la versione di Perl sulla vostra macchina sia piE<ugrave> vecchia
+di questo documento, guardate nella sezione
+L<Se gli Esempi danno errore> per maggiori dettagli.
+
+Se la vostra estensione utilizza caratteristiche di Perl che non sono
+disponibili nelle versioni piE<ugrave> vecchie, gli utenti finali apprezzeranno
+la presenza di avvisi espliciti nelle prime fasi dell'installazione.
+Potreste inserire queste informazioni nel file F<README>, ma al giorno
+d'oggi l'installazione delle estensioni viene normalmente effettuata
+in maniera automatica, sotto il controllo del modulo F<CPAN.pm> o
+di altri strumenti analoghi.
+
+Nelle installazioni basate su MakeMaker, il file F<Makefile.PL>
+fornisce l'opportunitE<agrave> I<tempestiva> di effettuare controlli sulle
+versioni. E<Egrave> dunque possibile inserire allo scopo dei controlli
+tipo:
+
+    eval { require 5.007 }
+        or die <<EOD;
+    ############
+    ### Questo modulo utilizza l'ambiente pincopallino, che non e` disponibile
+    ### prima della versione 5.007 di Perl. Effettuate un aggiornamento prima
+    ### di installare Kara::Mba.
+    ############
+    EOD
+
+=head2 Caricamento Dinamico e Caricamento Statico
+
+E<Egrave> opinione diffusa che se un sistema non ha la capacitE<agrave> di
+caricare dinamicamente una libreria non sia possibile utilizzare XSUB.
+Questo non E<egrave> corretto. I<Potete> utilizzarli, ma dovete collegare
+le funzioni XSUB al resto dell'eseguibile C<perl>, creandone uno nuovo.
+Questa situazione E<egrave> simile al Perl 4.
+
+Questo tutorial puE<ograve> essere utilizzato anche su quei sistemi. Il
+meccanismo di compilazione di XSUB controllerE<agrave> il sistema e genererE<agrave>
+una libreria caricabile dinamicamente se possibile, altrimenti una
+libreria statica e, opzionalmente, un nuovo eseguibile C<perl> statico
+comprendente la libreria generata.
+
+Se doveste aver bisogno di generare un eseguibile statico in un sistema
+che E<egrave> in grado di gestire librerie dinamiche, potete, in tutti gli
+esempi che seguono, utilizzare il comando C<make perl> invece del
+semplice C<make>.
+
+Se avete generato un eseguibile statico per vostra scelta, per effettuare
+le verifiche dovete utilizzare C<make test static> invece del semplice
+C<make test>. Su sistemi che non sono in grado di generare librerie
+caricabili dinamicamente, sarE<agrave> sufficiente utilizzare C<make test>.
+
+=head1 TUTORIAL
+
+Che si dia inizio allo spettacolo!
+
+=head2 ESEMPIO 1
+
+La nostra prima estensione sarE<agrave> molto semplice. Quando chiamiamo la
+funzione nell'estensione, questa stamperE<agrave> un messaggio ed uscirE<agrave>.
+
+Lanciate C<h2xs -An MiaProva>. Questo comando crea una directory
+chiamata I<MiaProva>, possibilmente sotto C<ext/> se tale directory esiste
+nella directory corrente [Si noti che il comportamento del programma
+C<h2xs> varia da versione a versione di Perl, N.d.T.]. Vengono creati
+molti file nella nuova directory, inclusi MANIFEST, Makefile.PL,
+MiaProva.pm, MiaProva.xs, test.pl e Changes.
+
+Il file MANIFEST contiene i nomi di tutti i file creati nella directory
+MiaProva.
+
+Il file Makefile.pl dovrebbe assomigliare a questo [si ricordi che
+i commenti qui di seguito sono stati tradotti in italiano, ma saranno
+in inglese in quanto generato da C<h2xs>, N.d.T.]:
+
+	use ExtUtils::MakeMaker;
+	# Vedere lib/ExtUtils/MakeMaker.pm per maggiori dettagli su come
+	# intervenire sul Makefile che verra` scritto.
+	WriteMakefile(
+	    NAME         => 'MiaProva',
+	    VERSION_FROM => 'MiaProva.pm', # trova $VERSION
+	    LIBS         => [''],   # es. '-lm'
+	    DEFINE       => '',     # es. '-DHAVE_SOMETHING'
+	    INC          => '',     # es. '-I/usr/include/other'
+	);
+
+Il file MiaProva.pm dovrebbe cominciare con qualcosa del genere:
+
+	package MiaProva;
+
+	use strict;
+	use warnings;
+
+	require Exporter;
+	require DynaLoader;
+
+	our @ISA = qw(Exporter DynaLoader);
+	# Gli elementi da esportare per default nel namespace del chiamante.
+	# Nota: non esportate niente senza un'ottima ragione. Utilizzate
+	# EXPORT_OK se possibile. Evitate di esportare tutte i vostri
+	# metodi/funzioni/costanti pubblici.
+	our @EXPORT = qw(
+
+	);
+	our $VERSION = '0.01';
+
+	bootstrap MiaProva $VERSION;
+
+	# I metodi precaricati vanno inseriti qui.
+
+	# I metodi Autoload vanno dopo __END__, e sono elaborati dal programma
+	# autosplit
+
+	1;
+	__END__
+	# Qui di seguito trovate la documentazione pilota del vostro modulo.
+	# Fareste bene a scriverla!
+
+Il resto del file C<.pm> contiene il codice di esempio per fornire la
+documentazione dell'estensione.
+
+Infine, il file MiaProva.xs dovrebbe essere qualcosa del genere:
+
+	#include "EXTERN.h"
+	#include "perl.h"
+	#include "XSUB.h"
+
+	MODULE = MiaProva		PACKAGE = MiaProva
+
+Modifichiamo il file C<.xs> aggiungendo questo in fondo:
+
+	void
+	ciao()
+	    CODE:
+		printf("Ciao, Mondo!\n");
+
+Se le righe che iniziano dalla linea "CODE:" non sono indentate va tutto
+bene. D'altra parte, per motivi di leggibilitE<agrave>, vi suggeriamo di indentare
+C<CODE:> di un livello, e le righe che seguono di un ulteriore livello.
+
+A questo punto possiamo lanciare C<perl Makefile.PL>. Questo genererE<agrave>
+il Makefile vero e proprio, necessario a C<make>. L'uscita stampata
+dovrebbe essere qualcosa del tipo:
+
+	% perl Makefile.PL
+	Checking if your kit is complete...
+	Looks good
+	Writing Makefile for MiaProva
+	%
+
+che sarebbe [N.d.T.]:
+
+	% perl Makefile.PL
+	Controllo che il sistema sia completo...
+	Sembra a posto
+	Scrivo il Makefile per MiaProva
+	%
+
+Ora, lanciando C<make> verranno stampati dei messaggi simili a quelli
+che seguono (alcune righe particolarmente lunghe sono state accorciate per
+chiarezza, ed alcune linee estranee sono state cancellate):
+
+	% make
+	umask 0 && cp MiaProva.pm ./blib/MiaProva.pm
+	perl xsubpp -typemap typemap MiaProva.xs >MiaProva.tc && mv MiaProva.tc MiaProva.c
+	Please specify prototyping behavior for MiaProva.xs (see perlxs manual)
+	cc -c MiaProva.c
+	Running Mkbootstrap for MiaProva ()
+	chmod 644 MiaProva.bs
+	LD_RUN_PATH="" ld -o ./blib/PA-RISC1.1/auto/MiaProva/MiaProva.sl -b MiaProva.o
+	chmod 755 ./blib/PA-RISC1.1/auto/MiaProva/MiaProva.sl
+	cp MiaProva.bs ./blib/PA-RISC1.1/auto/MiaProva/MiaProva.bs
+	chmod 644 ./blib/PA-RISC1.1/auto/MiaProva/MiaProva.bs
+	Manifying ./blib/man3/MiaProva.3
+	%
+
+ossia [N.d.T.]:
+
+	% make
+	umask 0 && cp MiaProva.pm ./blib/MiaProva.pm
+	perl xsubpp -typemap typemap MiaProva.xs >MiaProva.tc && mv MiaProva.tc MiaProva.c
+	Per favore, specificate il tipo di prototipi per MiaProva.xs (vedere
+	la pagina di manuale perlxs).
+	cc -c MiaProva.c
+	Lancio Mkbootstrap per MiaProva ()
+	chmod 644 MiaProva.bs
+	LD_RUN_PATH="" ld -o ./blib/PA-RISC1.1/auto/MiaProva/MiaProva.sl -b MiaProva.o
+	chmod 755 ./blib/PA-RISC1.1/auto/MiaProva/MiaProva.sl
+	cp MiaProva.bs ./blib/PA-RISC1.1/auto/MiaProva/MiaProva.bs
+	chmod 644 ./blib/PA-RISC1.1/auto/MiaProva/MiaProva.bs
+	Genero il manuale da ./blib/man3/MiaProva.3
+	%
+
+Potete tranquillamente ignorare le linee sul "tipo di prototipi" - viene
+spiegato nella sezione "La parola chiave PROTOTIPI:" in L<perlxs>.
+
+Se vi trovate in un sistema Win32, ed il processo di compilazione
+fallisce con errori di collegamento per funzioni nella libreria C,
+controllate che il vostro Perl sia configurato per utilizzare PerlCRT
+(potete farlo lanciando C<perl -V:libc>). Se perl E<egrave> configurato per
+utilizzare PerlCRT, dovete assicurarvi che PerlCRT.lib sia copiata
+nella stessa directory dove si trova msvcrt.lib, di modo che il
+compilatore puE<ograve> trovarla da solo. msvcrt.lib E<egrave> posta di solito nella
+directory lib del compilatore Visual C (ad esempio, C:/DevStudio/VC/lib).
+
+Perl mette a disposizione alcuni sistemi speciali per scrivere degli
+script di test in maniera semplice, ma solo per questo script creeremo
+il nostro script di test da soli. Create un file chiamato C<ciao>
+come segue [il percorso all'eseguibile C<perl> E<egrave> stato cambiato per
+adeguarlo alla locazione piE<ugrave> in voga, N.d.T.]:
+
+	#! /usr/bin/perl
+
+	use ExtUtils::testlib;
+
+	use MiaProva;
+
+	MiaProva::ciao();
+
+Ora possiamo rendere lo script eseguibile (C<chmod +x ciao>) e
+lanciarlo per vedere:
+
+	% ./ciao
+	Ciao, Mondo!
+	%
+
+=head2 ESEMPIO 2
+
+Alla nostra estensione aggiungiamo ora una funzione che prende in ingresso
+un unico valore numerico, e restituisce 0 se il numero E<egrave> pari, 1 se dispari.
+
+Aggiungete quanto segue alla fine del file MiaProva.xs:
+
+	int
+	risulta_pari(input)
+		int	input
+	    CODE:
+		RETVAL = (input % 2 == 0);
+	    OUTPUT:
+		RETVAL
+
+Gli spazi bianchi all'inizio di C<int input> non sono strettamente
+necessari, ma sono comunque utili per migliorare la leggibilitE<agrave>. Anche
+l'uso di un punto-e-virgola a fine riga E<egrave> opzionale. Per finire, fra
+C<int> e C<input> possono essere inseriti spazi a piacere di qualsiasi tipo.
+
+Ora potete rilanciare C<make> per ricostruire la libreria condivisa.
+
+Ripetete gli stessi passi di prima, generando prima C<Makefile> da
+C<Makefile.PL>, e poi lanciando make.
+
+Per provare la nostra estensione, abbiamo bisogno di guardare nel file
+C<test.pl>. Questo file viene impostato per imitare lo stesso tipo di
+struttura di test che ha lo stesso Perl. All'interno dello script di test,
+impostate una serie di prove per assicurarvi che il comportamento
+dell'estensione sia corretto, stampando "ok" quando un test va a buon fine,
+e "not ok" altrimenti. Impostate l'istruzione di stampa nel blocco BEGIN
+per stampare "1..4" ed aggiungete quanto segue alla fine del file: 
+
+	print &MiaProva::risulta_pari(0) == 1 ? "ok 2" : "not ok 2", "\n";
+	print &MiaProva::risulta_pari(1) == 0 ? "ok 3" : "not ok 3", "\n";
+	print &MiaProva::risulta_pari(2) == 1 ? "ok 4" : "not ok 4", "\n";
+
+Chiameremo lo script di test attraverso il comando C<make test>.
+Dovreste vedere un'uscita simile a questa:
+
+	% make test
+	PERL_DL_NONLAZY=1 /opt/perl5.004/bin/perl (qualcha argomento -I) test.pl
+	1..4
+	ok 1
+	ok 2
+	ok 3
+	ok 4
+	%
+
+=head2 Che E<egrave> successo?
+
+Il programma C<h2xs> E<egrave> il punto di partenza per la creazione delle estensioni.
+Negli esempi successivi mostrerE<agrave> come possiamo utilizzare C<h2xs> per
+leggere i file I<header> e generare dei modelli per connetterci alle
+funzioni C.
+
+C<h2xs> crea un certo numero di file nella directory dell'estensione. Il file
+C<Makefile.PL> E<egrave> uno script Perl che genererE<agrave> un C<Makefile> vero e proprio
+per costruire, infine, l'estensione. Daremo un'occhiata da vicino piE<ugrave>
+avanti.
+
+I file C<.pm> e C<.xs> contentono la "ciccia" dell'estensione. Il file
+C<.xs> contiene le routine C che compongono l'estensione; il file C<.pm>
+contiene, invece, quelle funzioni che dicono a perl come caricare la
+vostra estensione.
+
+Generando il C<Makefile> e lanciando C<make> si crea una directory
+chiamata C<blib> [che sta per "build library", ossia una directory di
+appoggio per la compilazione e la costruzione della libreria, N.d.T.] sotto
+la directory corrente. Questa directory conterrE<agrave> le librerie condivise
+che andremo a costruire. Una volta che le abbiamo provate, possiamo
+installarle nella loro posizione finale.
+
+Chiamando lo script di test attraverso C<make test> si ottiene un
+risultato importante. In questo modo, perl viene chiamato con tutti
+quegli argomenti C<-I>, che fanno in modo che tutti i file dell'estensione
+possano essere trovati. E<Egrave> I<molto> importante che, mentre state
+ancora provando la vostra estensione, utilizziate C<make test>. Se provate
+a lanciare lo script di test direttamente, infatti, avreste solo un
+I<fatal error>. Un'altra ragione per cui E<egrave> importante usare C<make test>
+per lanciare il vostro script di test E<egrave> che se state provando una
+versione successiva di qualcosa che giE<agrave> avete installato, il suo
+utilizzo vi assicura che state provando la nuova versione, non quella
+che avete giE<agrave>.
+
+Quando Perl vede un'istruzione C<use estensione;>, va alla ricerca di un
+file che ha lo stesso nome dell'estensione da usare, con aggiunto il
+suffisso C<.pm>. Se non riesce a trovare il file, esce con un errore
+fatale. Il percorso di ricerca di default E<egrave> contenuto nell'array C<@INC>.
+
+Nel nostro caso, C<MiaProva.pm> indica a Perl che avrE<agrave> bisogno delle
+estensioni C<Exporter> [C<Esportatore>, N.d.T.] e C<Dynamic Loader>
+[C<Caricatore Dinamico>, N.d.T.]. Successivamente, imposta i due array
+C<@ISA> e C<@EXPORT> e lo scalare C<$VERSION>; invine, dice a perl di
+effettuare il caricamento e l'inizializzazione del modulo. Perl
+chiamerE<agrave> la propria routine di caricamento dinamico (se ne ha una) e
+caricherE<agrave> la libreria condivisa.
+
+I due array C<@ISA> e C<@EXPORT> sono di estrema importanza. Il primo
+contiene una lista degli altri I<package> nei quali andare a cercare
+i metodi (o le subroutine) che non esistono nel package corrente. Questo
+risulta di solito importante per estensioni orientate agli oggetti (di
+cui discuteremo ampiamente molto piE<ugrave> avanti), per cui di norma non ha
+bisogno di essere modificato.
+
+L'array C<@EXPORT> indica a Perl quali variabili e funzioni dell'estensione
+dovrebbero essere impostate nel I<namespace> del package chiamante. PoichE<eacute>
+non potete sapere a priori se l'utente sta giE<agrave> utilizzando per conto suo
+i nomi delle vostre variabili o delle vostre funzioni, E<egrave> di vitale
+importanza che selezioniate con estrema cautela cosa volete esportare.
+I<Non> esportate nomi di variabili o funzioni I<per default> senza avere
+un'ottima ragione.
+
+Come regola generale, se il modulo E<egrave> orientato agli oggetti allora non
+esportate nulla. Se al contrario E<egrave> solo un insieme di funzioni e variabili,
+allora potete esportare attraverso un altro array chiamato C<@EXPORT_OK>.
+Quest'ultimo non imposta i nomi delle variabili o delle funzioni nel
+I<namespace> automaticamente, ma solo dietro esplicita richiesta dell'utente.
+
+Consultate L<perlmod> per maggiori informazioni.
+
+La variabile C<$VERSION> viene utilizzata per assicurare che il file
+C<.pm> e la libreria condivisa sono "sincronizzate" l'uno con l'altra. Ogni
+volta che effettuate cambiamenti ai file C<.pm> o C<.xs> dovreste
+incrementare il valore di questa variabile.
+
+=head2 Scrivere buoni script di test
+
+L'importanza di scrivere buoni script di test non verrE<agrave> mai ribadita
+a sufficienza. Dovreste seguire molto da vicino lo stile "ok/not ok"
+["ok/non ok", N.d.T.] che Perl stesso utilizza, cosicchE<eacute> diviene molto semplice
+e non ambiguo determinare il risultato atteso da ogni singolo test.
+Quando trovate e correggete un errore, assicuratevi di aggiungere un
+test relativo.
+
+Lanciando C<make test> vi assicurate che il vostro script C<test.pl> sia
+avviato ed utilizzi la versione corretta della vostra estensione. Se
+avete molti test, potreste copiare lo stile dei test di Perl. Create una
+directory chiamata C<t> nella directory dell'estensione, e aggiungete
+il suffisso C<.t> ai nomi dei file contenenti i test. Quando lanciate
+C<make test>, tutti questi file saranno eseguiti. [Questa organizzazione
+dei test E<egrave> giE<agrave> presente nelle ultime versioni 
+di C<h2xs>, N.d.T.].
+
+=head2 ESEMPIO 3
+
+La nostra terza estensione prenderE<agrave> un valore come argomento in ingresso,
+lo arrotonderE<agrave> e imposterE<agrave> l'I<argomento> stesso al valore arrotondato.
+
+Aggiungete quanto seque alla fine di C<MiaProva.xs>:
+
+	void
+	round(arg)
+		double  arg
+	    CODE:
+		if (arg > 0.0) {
+			arg = floor(arg + 0.5);
+		} else if (arg < 0.0) {
+			arg = ceil(arg - 0.5);
+		} else {
+			arg = 0.0;
+		}
+	    OUTPUT:
+		arg
+
+Modificate C<Makefile.PL> in modo che la linea corrispondente
+sia come segue:
+
+	'LIBS'      => ['-lm'],   # e.g., '-lm'
+
+Generate il C<Makefile> e lanciate C<make>. Cambiate il blocco C<BEGIN>
+in modo da stampare "1..9" e aggiungete quanto segue allo script C<test.pl>:
+
+	$i = -1.5; &MiaProva::round($i); print $i == -2.0 ? "ok 5" : "not ok 5", "\n";
+	$i = -1.1; &MiaProva::round($i); print $i == -1.0 ? "ok 6" : "not ok 6", "\n";
+	$i = 0.0; &MiaProva::round($i); print $i == 0.0 ? "ok 7" : "not ok 7", "\n";
+	$i = 0.5; &MiaProva::round($i); print $i == 1.0 ? "ok 8" : "not ok 8", "\n";
+	$i = 1.2; &MiaProva::round($i); print $i == 1.0 ? "ok 9" : "not ok 9", "\n";
+
+C<make test> dovrebbe ora stampare che tutti i nove test sono corretti.
+
+Osservate che in questi nuovi test l'argomento passato da arrotondare E<egrave>
+una variabile scalare. Potreste chiedervi se potete arrotondare una costante
+o un letterale: per vedere cosa succede, aggiungete la seguente riga
+al file C<test.pl>:
+
+	&MiaProva::round(3);
+
+Lanciate di nuovo C<make test>: Perl termina con un errore fatale. Perl
+non vi consente di cambiare il valore delle costanti!
+
+=head2 Che c'E<egrave> di nuovo?
+
+=over 4
+
+=item *
+
+Abbiamo fatto alcune modifiche a C<Makefile.PL>. In questo caso, abbiamo
+specificato che un'altra libreria deve essere collegata nella nostra
+libreria condivisa, ossia la libreria matematica I<libm>. Mostreremo in
+seguito come scrivere XSUB che possono chiamare qualsiasi funzione in una
+libreria.
+
+=item *
+
+Il valore della funzione di arrotondamento non viene passato indietro come
+valore restituito, ma cambiando il contenuto della variabile che E<egrave> stata
+passata in ingresso. Sicuramente l'avevate giE<agrave> indovinato quando avete visto
+che la funzione C<round> E<egrave> di tipo C<void>.
+
+=back
+
+=head2 Parametri di Ingresso e di Uscita
+
+Potete specificare i parametri che saranno passati alla XSUB sulla
+riga (o sulle righe) immediatamente successive alla dichiarazione del
+valore restituito e del nome della funzione. Ciascuna riga contenente
+la descrizione di un parametro di ingresso inizia con spazi vuoti opzionali
+e puE<ograve> avere un punto e virgola finale, sempre opzionale.
+
+La lista dei parametri di uscita va inserita alla fine della funzione,
+immediatamente dopo la direttiva C<OUTPUT:>. L'uso di C<RETVAL> indica a Perl
+che volete mandare il valore indietro al chiamante come valore restituito
+dalla funzione XSUB. Nell'esempio 4, volevamo che il "valore restituito"
+fosse messo nella variabile di ingresso originale, per cui l'abbiamo
+inserita nella sezione C<OUTPUT:> e non in C<RETVAL>.
+
+
+=head2 Il programma XSUBPP
+
+Il programma B<xsubpp> prende il codice XS nel file C<.xs> e lo traduce
+in codice C, inserendolo in un file dal suffisso C<.c>. Il codice cosE<igrave>
+creato fa un uso massiccio delle funzioni C all'interno di Perl.
+
+=head2 Il file TYPEMAP
+
+Il programma B<xsubpp> utilizza delle regole per effettuare la conversione
+fra i tipi di dato di Perl (scalari, array, ecc.) nei tipi di dati C
+(int, char, ecc.). Queste regole sono raccolte in un file di mappatura
+dei tipi (C<$PERLLIB/ExtUtils/typemap>), che E<egrave> diviso in tre parti.
+
+La prima sezione mappa vari tipi di dato C in un nome che corrisponde,
+in una certa maniera, ai differenti tipi di Perl. La seconda parte contiene
+codice C che B<xsubpp> utilizza per trattare i parametri di ingresso. La
+terza sezione, infine, contiene il codice C che B<xsubpp> utilizza per
+trattare i parametri di uscita.
+
+Diamo un'occhiata ad una parte del file C<.c> creato per la nostra
+estensione. Il nome del file E<egrave> C<MiaProva.c>:
+
+	XS(XS_MiaProva_round)
+	{
+	    dXSARGS;
+	    if (items != 1)
+		croak("Utilizzo: MiaProva::round(arg)");
+	    {
+		double  arg = (double)SvNV(ST(0));	/* XXXXX */
+		if (arg > 0.0) {
+			arg = floor(arg + 0.5);
+		} else if (arg < 0.0) {
+			arg = ceil(arg - 0.5);
+		} else {
+			arg = 0.0;
+		}
+		sv_setnv(ST(0), (double)arg);	/* XXXXX */
+	    }
+	    XSRETURN(1);
+	}
+
+Osservate le due linee commentate con "XXXXX". Se controllate la prima
+sezione del file C<typemap>, noterete che i I<double> sono del tipo
+T_DOUBLE. Nella sezione C<INPUT>, un argomento che E<egrave> T_DOUBLE viene
+assegnato alla variabile C<arg> in questo modo: si chiama la routine
+C<SvNV> su "qualcosa", poi si modifica [I<typecasting>, N.d.T.] in un
+I<double>, infine si assegna alla variabile C<arg>. Allo stesso modo, nella
+sezione C<OUTPUT>, una volta che arg ha il suo valore finale, viene
+passata alla funzione C<sv_setnv> perchE<eacute> venga restituita indietro ala
+subroutine chiamante. Queste due funzioni sono spiegate in L<perlguts>;
+parleremo piE<ugrave> avanti, nella sezione sullo stack degli argomenti,
+di cosa significhi C<ST(0)>.
+
+=head2 Attenzione agli Argomenti di Uscita
+
+In generale, non E<egrave> una buona idea scrivere estensioni che modificano
+i loro parametri di ingresso come nell'esempio 3. Dovreste invece
+probabilmente restituire piE<ugrave> valori all'interno di un array, e lasciare
+che sia il chiamante a gestirli (E<egrave> quanto faremo in un esempio successivo).
+In ogni caso, per meglio adattarci alla modalitE<agrave> di chiamata di funzioni
+C preesistenti, che spesso modificano i loro parametri di ingresso, questo
+comportamento E<egrave> tollerato.
+
+=head2 ESEMPIO 4
+
+In questo esempio cominceremo a scrivere XSUB che interagiranno con le
+librerie C predefinite. Per cominciare, costruiremo una piccola libreria
+per conto nostro, per poi consentire a C<h2xs> di scrivere i file C<.pm>
+e C<.xs> al posto nostro.
+
+Create una nuova directory chiamata MiaProva2 allo stesso livello della
+directory MiaProva. In questa nuova directory, create un'altra directory
+chiamata mylib, e spostatevici dentro.
+
+Qui creeremo alcuni file che genereranno una libreria di testo. Questi
+includeranno un file sorgente C ed un file di intestazione. Creeremo
+anche un C<Makefile.PL> in questa stessa directory. Successivamente, ci
+assicureremo che lanciando C<make> al livello di MiaProva2 chiamerE<agrave>
+automaticamente questo C<Makefile.PL> e il C<Makefile> risultante.
+
+Nella directory mylib, create un file C<mylib.h> come segue:
+
+	#define TESTVAL	4
+
+	extern double	foo(int, long, const char*);
+
+Create anche un file C<mylib.c>:
+
+	#include <stdlib.h>
+	#include "./mylib.h"
+
+	double
+	foo(int a, long b, const char *c)
+	{
+		return (a + b + atof(c) + TESTVAL);
+	}
+
+Infine, create un file C<Makefile.PL> come segue:
+
+	use ExtUtils::MakeMaker;
+	$Verbose = 1;
+	WriteMakefile(
+	    NAME   => 'MiaProva2::mylib',
+	    SKIP   => [qw(all static static_lib dynamic dynamic_lib)],
+	    clean  => {'FILES' => 'libmylib$(LIB_EXT)'},
+	);
+
+
+	sub MY::top_targets {
+		'
+	all :: static
+
+	pure_all :: static
+
+	static ::       libmylib$(LIB_EXT)
+
+	libmylib$(LIB_EXT): $(O_FILES)
+		$(AR) cr libmylib$(LIB_EXT) $(O_FILES)
+		$(RANLIB) libmylib$(LIB_EXT)
+
+	';
+	}
+
+Assicuratevi di utilizzare un carattere di tabulazione e non gli spazi
+nelle righe che cominciano con C<$(AR)> e C<$(RANLIB)>: C<make> non
+funzionerE<agrave> correttamente se utilizzate gli spazi in questi posti.
+E<Egrave> stato anche riportato che l'argomento C<cr> a C<$(AR)> non E<egrave>
+necessario nei sistemi Win32.
+
+Creeremo ora i file al livello MiaProva2. Spostatevi in questa directory e
+lanciate il seguente comando:
+
+	% h2xs -O -n MiaProva2 ./MiaProva2/mylib/mylib.h
+
+VerrE<agrave> stampato un messaggio di avvertimento sulla riscrittura di MiaProva2,
+ma va bene cosE<igrave>. I nostri file si trovano in MiaProva2/mylib, e non verranno
+toccati.
+
+Il normale file C<Makefile.PL> generato da C<h2xs> non sa niente sulla
+directory mylib. Abbiamo bisogno di dirgli che c'E<egrave> una sottodirectory,
+e che genereremo una liberira lE<igrave> dentro. Aggiungiamo gli argomenti
+C<MYEXTLIB> alla chiamata C<WriteMakefile> in modo che risulti come
+segue:
+
+	WriteMakefile(
+	    'NAME'      => 'MiaProva2',
+	    'VERSION_FROM' => 'MiaProva2.pm', # finds $VERSION
+	    'LIBS'      => [''],   # e.g., '-lm'
+	    'DEFINE'    => '',     # e.g., '-DHAVE_SOMETHING'
+	    'INC'       => '',     # e.g., '-I/usr/include/other'
+	    'MYEXTLIB' => 'mylib/libmylib$(LIB_EXT)',
+	);
+
+e quindi alla fine aggiungiamo una subroutine (che rimpiazzerE<agrave> quella
+pre-esistente). Ricordatevi di utilizzare il carattere di tabulazione
+per indentare la riga che comincia con C<cd>!
+
+	sub MY::postamble {
+	'
+	$(MYEXTLIB): mylib/Makefile
+		cd mylib && $(MAKE) $(PASSTHRU)
+	';
+	}
+
+Modifichiamo anche il file C<MANIFEST> in modo che rifletta accuratamente
+i contenuti della nostra estensione. La singola riga che dice "mylib"
+va rimpiazzata con le seguenti tre righe:
+
+	mylib/Makefile.PL
+	mylib/mylib.c
+	mylib/mylib.h
+
+Per mantenere il nostro I<namespace> in ordine, modificate il file C<.pm>
+e cambiate la variabile C<@EXPORT> in C<@EXPORT_OK>. Infine, nel file
+C<.xs> scrivete una riga C<#include> come segue:
+
+	#include "mylib/mylib.h"
+
+Aggiungete anche la seguente definizione di funzione alla fine del
+file C<.xs>:
+
+	double
+	foo(a,b,c)
+		int             a
+		long            b
+		const char *    c
+	    OUTPUT:
+		RETVAL
+
+Ora abbiamo anche bisogno di creare un file C<typemap> perchE<eacute> Perl non ha
+al momento un supporto di default per il tipo C<const char *>. Create un
+file chiamato C<typemap> nella directory MiaProva2 e scriveteci quanto segue:
+
+	const char *	T_PV
+
+Ora lanciate C<perl Makefile.PL> in MiaProva2. Notate che viene creato un
+C<Makefile> anche nella directory mylib. Lanciate C<make> ed osservate che
+entra nella directory mylib e lancia C<make> da lE<igrave> dentro.
+
+Ora modificate lo script C<test.pl> e cambiate il blocco C<BEGIN> per
+stampare "1..4"; aggiungete anche le righe seguenti alla fine dello
+script:
+
+	print &MiaProva2::foo(1, 2, "Ciao, mondo!") == 7 ? "ok 2\n" : "not ok 2\n";
+	print &MiaProva2::foo(1, 2, "0.0") == 7 ? "ok 3\n" : "not ok 3\n";
+	print abs(&MiaProva2::foo(0, 0, "-3.4") - 0.6) <= 0.01 ? "ok 4\n" : "not ok 4\n";
+
+(Quando sia necessario fare confronti con valori a virgola mobile,
+E<egrave> meglio non farlo sull'uguaglianza, ma piuttosto sul fatto che la
+differenza fra quanto ci aspettavamo ed il valore effettivo risulti
+al di sotto di un certo valore prefissato (chiamato epsilon), che
+nel nostro caso E<egrave> pari a 0.01).
+
+Lanciate C<make test> e tutto dovrebbe andare bene.
+
+=head2 Che E<egrave> successo?
+
+Diversamente dagli esempi precedenti, abbiamo lanciato C<h2xs> su un
+vero file di intestazione. Questo ha fatto sE<igrave> che apparissero alcune
+parti in piE<ugrave> sia nel file C<.pm> che nel file C<.xs>.
+
+=over 4
+
+=item *
+
+Nel file C<.xs> c'E<egrave> ora una direttiva di inclusione contenete il percorso
+assoluto al file di intestazione C<mylib.h>. L'abbiamo modificato in un
+percorso relativo in modo da poter spostare la directory dell'estensione
+se lo vogliamo.
+
+=item *
+
+C'E<egrave> ora un po' di codice C nuovo che E<egrave> stato aggiunto al file C<.xs>. Lo
+scopo della routine C<constant> E<egrave> di far sE<igrave> che i valori che sono
+C<#define> nel file di intestazione siano accessibili dallo script
+Perl (chiamando C<TESTVAL> o C<&MiaProva2::TESTVAL>). C'E<egrave> anche un po'
+di codice XS per consentire le chiamate alla routine C<constant>.
+
+=item *
+
+In origine, il file C<.pm> esportava il nome C<TESTVAL> nell'array
+C<@EXPORT>. Questo potrebbe portare a collisioni di nomi. Una buona regola
+di massima E<egrave> che se una C<#define> verrE<agrave> utilizzata solamente dalle stesse
+routine C, e non dall'utente finale, dovrebbero essere rimosse dall'array
+C<@EXPORT>. In alternativa, se non vi preoccupa utilizzare il "nome
+completo" di una variabile, potete spostare la maggior parte (al piE<ugrave> tutte)
+delle definizioni dall'array C<@EXPORT> dentro C<@EXPORT_OK>.
+
+=item *
+
+Se il nostro file di intestazione contiene direttive C<#include>, queste
+non verrebbero considerate da C<h2xs>. Al momento non c'E<egrave> nessuna buona
+soluzione per questo problema.
+
+=item *
+
+Abbiamo anche detto a Perl della libreria che abbiamo costruito nella
+directory mylib. Questo ha richiesto l'aggiunta della variabile
+C<MYEXTLIB> nella chiamata a C<WriteMakefile>, ed il rimpiazzamento
+della routine di postambolo perchE<eacute> si sposti nella sottodirectory e lanci
+C<make>. Il C<Makefile.PL> per la libreria E<egrave> un po' piE<ugrave> complicato, ma non
+E<egrave> cosE<igrave> eccessivo. Di nuovo, abbiamo rimpiazzato la routine di postambolo
+per inserire il nostro codice. Questo specifica semplicemente che la
+libreria da creare E<egrave> un archivio statico (in opposizione ad una libreria
+caricabile dinamicamente), ed inserito il comadi per costruirla.
+
+=back
+
+=head2 Anatomia del file C<.xs>
+
+Il file C<.xs> dell'L<ESEMPIO 4> contiene alcuni nuovi elementi. Per
+comprendere il loro significato, prestate attenzione alla riga
+
+	MODULE = MiaProva2		PACKAGE = MiaProva2
+
+Tutto ciE<ograve> che precede questa riga E<egrave> codice C puro, che descrive quali
+intestazioni includere, e definisce alcune funzioni di convenienza.
+In questa sezione non viene effettuata alcuna traduzione: a parte
+l'eliminazione della documentazione POD immersa (vedere L<perlpod>), il
+contenuto viene messo cosE<igrave> com'E<egrave> nel file C generato.
+
+Tutto ciE<ograve> che segue questa riga costituisce la descrizione delle funzioni
+XSUB. Queste descrizioni sono tradotte da B<xsubpp> in codice C che
+implementa le funzioni utilizzando le convenzioni di chiamata di Perl,
+e che dunque rende tale funzioni visibili all'interprete Perl.
+
+Prestate particolare attenzione alla funzione C<constant>. Questo nome
+appare due volte nel file C<.xs> generato: una nella prima parte, come
+funzione C statica, l'altra nella seconda parte, quando viene definita
+un'interfaccia XSUB alla funzione C statica suddetta.
+
+Questo E<egrave> piuttosto tipico in un file C<.xs>: di solito, il file C<.xs>
+fornisce un'interfaccia ad una funzione C esistente. Questa funzione C
+E<egrave> definita da qualche parte (una libreria esterna, o nella prima parte
+del file C<.xs>), e un'interfaccia Perl per questa funzione (ossia, la
+"colla con il Perl") E<egrave> descritta nella seconda parte del file C<.xs>.
+La situazione in L<ESEMPIO 1>, L<ESEMPIO 2> e L<ESEMPIO 3>, ove tutto
+il lavoro viene fatto dentro il "collante", E<egrave> piE<ugrave> un'eccezione che la
+regola.
+
+=head2 Tirare fuori la "ciccia" dalle XSUB
+
+Nell'L<ESEMPIO 4> la seconda parte del file C<.xs> contiene la
+seguente descrizione di una XSUB:
+
+	double
+	foo(a,b,c)
+		int             a
+		long            b
+		const char *    c
+	    OUTPUT:
+		RETVAL
+
+Osservate che, contrariamente a quanto riportato in L<ESEMPIO 1>,
+L<ESEMPIO 2> e L<ESEMPIO 3>, tale descrizione non contiene il I<codice>
+vero e proprio di cosa viene fatto quando viene chiamata la funzione
+Perl C<foo()>. Per capire cosa sta succedendo, si puE<ograve> aggiungere una
+sezione CODE a questa XSUB:
+
+	double
+	foo(a,b,c)
+		int             a
+		long            b
+		const char *    c
+	    CODE:
+		RETVAL = foo(a,b,c);
+	    OUTPUT:
+		RETVAL
+
+In ogni caso, queste due XSUB forniscono un codice C generato praticamente
+uguale: il compilatore B<xsubpp> E<egrave> abbastanza intelligente da intuire
+la sezione C<CODE:> dalle prime due righe della descrizione XSUB. Che
+dire della sezione C<OUTPUT:>? E<Egrave> assolutamente la stessa! Anche la
+sezione C<OUTPUT:> puE<ograve> essere rimossa, I<sempre che le sezioni C<CODE:>
+o C<PPCODE:> > non siano specificate: B<xsubpp> puE<ograve> quindi vedere che ha
+bisogno di generare una sezione di chiamata a funzione, e genererE<agrave> anche
+la sezione C<OUTPUT>. Per quanto detto, un'abbreviazione della XSUB
+diventa:
+
+	double
+	foo(a,b,c)
+		int             a
+		long            b
+		const char *    c
+
+Possiamo fare la stessa cosa con la XSUB
+
+	int
+	is_even(input)
+		int	input
+	    CODE:
+		RETVAL = (input % 2 == 0);
+	    OUTPUT:
+		RETVAL
+
+dell'L<ESEMPIO 2>? Per farlo, avremmo bisogno di definire una funzione
+C C<int is_even(int input)>. Come abbiamo visto il L<Anatomia di un file C<.xs> >, un possibile posto per questa definizione si trova nella prima parte
+del file C<.xs>. A tutti gli effetti, una funzione
+
+	int
+	is_even(int arg)
+	{
+		return (arg % 2 == 0);
+	}
+
+E<egrave> probabilmente troppo in questo caso. Qualcosa di piE<ugrave> semplice come una
+C<#define> servirE<agrave> egregiamente allo scopo:
+
+	#define is_even(arg)	((arg) % 2 == 0)
+
+Una volta inserito nella prima parte del file C<.xs>, la "colla Perl"
+diventa semplice:
+
+	int
+	is_even(input)
+		int	input
+
+Questa tecnica di separazione della parte "collante" da quella che
+"lavora" presenta anche degli svantaggi: se volete cambiare un'interfaccia
+Perl, dovete farlo in due punti del vostro codice. In ogni caso, vi
+consente di rimuovere parecchio rumore, e rende la parte "che lavora"
+indipendente dalle idiosincrasie della convenzione di chiamata di Perl.
+(Infatti, non c'E<egrave> niente di specifico di Perl nella descrizione data; una
+versione di B<xsubpp> differente avrebbe potuto anche tradurlo in codice
+collante TCL o Python).
+
+=head2 Ancora sugli argomenti XSUB
+
+Con il completamento dell'L<ESEMPIO 4>, abbiamo ora un modo semplice per
+simulare alcune librerie "reali" la cui interfaccia potrebbe non essere
+la piE<ugrave> pulita al mondo. Continueremo ora con una discussione degli argomenti
+passati al compilatore B<xsubpp>.
+
+Quando specificate gli argomenti per le routine nel file C<.xs>, in realtE<agrave>
+state passando tre informazioni per ciascuno degli argomenti. La prima
+E<egrave> l'ordine dell'argomento rispetto agli altri (primo, secondo, ecc.). La
+seconda E<egrave> il tipo di argomento, e consiste della dichiarazione del tipo
+C dell'argomento (per esempio int, char*, ecc.). La terza informazione
+E<egrave> la convenzione di chiamata per l'argomento rispetto alla funzione
+di libreria.
+
+Mentre Perl passa gli argomenti alle funzioni per riferimento, C passa
+gli argomenti per valore; per implementare una funzione C che modifica
+i dati di uno degli "argomenti", l'argomento vero e proprio di questa
+funzione C dovrebbe essere un puntatore al dato. Per questo, due funzioni
+C con le seguenti dichiarazioni
+
+	int string_length(char *s);
+	int upper_case_char(char *cp);
+
+potrebbero avere semantiche completamente differenti: la prima potrebbe
+leggere un array di caratteri puntati da C<s>, mentre la seconda potrebbe
+agire sul dato puntato da C<cp> e manipolare C<*cp> (utilizzando il valore
+di ritorno, diciamo, come indicatore di successo). Da Perl queste due
+funzioni verrebbero utilizzate in maniere completamente differenti.
+
+Si puE<ograve> comunicare questa informazione a B<xsubpp> rimpiazzando C<*> prima
+dell'argomento con C<&>. C<&> indica che l'argomento dovrebbe essere
+passato ad una funzione di libreria attraverso il suo indirizzo. Le due
+funzioni verrebbero dunque XSUB-ificate come segue:
+
+	int
+	string_length(s)
+		char *	s
+
+	int
+	upper_case_char(cp)
+		char	&cp
+
+Considerate ad esempio:
+
+	int
+	foo(a,b)
+		char	&a
+		char *	b
+
+Il primo argomento Perl di questa funzione verrebbe trattato come un
+carattere ed assegnato alla variabile C<a>, laddove il suo indirizzo verrebbe
+passato alla funzione C C<foo>. Il secondo argomento Perl verrebbe trattato
+come un puntatore a stringa ed assegnato alla variabile C<b>. Il I<valore>
+di C<b> verrebbe passato alla funzione C C<foo>. La reale chiamata alla
+funzione C che B<xsubpp> genera sarebbe dunque come segue:
+
+	foo(&a, b);
+
+B<xsubpp> interpreterE<agrave> le seguenti liste di argomenti di funzioni
+nella stessa identica maniera:
+
+	char	&a
+	char&a
+	char	& a
+
+Comunque, per maggior semplicitE<agrave> di comprensione, si suggerisce di
+mettere C<&> vicino al nome della variabile e lontano dal tipo, e di
+mettere C<*> vicino al tipo e lontano dal nome della variabile (come
+nella chiamata a C<foo> riportata). Facendo cosE<igrave>, E<egrave> facile capire
+esattamente cosa verrE<agrave> passato alla funzione C -- ossia, qualunque cosa
+compaia "nell'ultima colonna".
+
+Dovreste prestare la massima cura nel cercare di passare alla funzione il
+tipo di variabile che questa si aspetta, quando possibile: vi risparmierE<agrave>
+parecchi guai nel lungo termine.
+
+=head2 Lo Stack degli Argomenti
+
+Se guardate una qualunque parte del codice C generato in uno degli esempi
+(eccetto L<ESEMPIO 1>), noterete che compaiono un certo numero di
+riferimenti a C<ST(n)>, dove n E<egrave> usualmente 0. C<ST> E<egrave>, in realtE<agrave>, una
+macro che punta all'n-simo argomento dello stack degli argomenti.
+C<ST(0)>, dunque, E<egrave> il primo argomento sullo stack e perciE<ograve> il
+primo argomento passato alla XSUB, C<ST(1)> il secondo argomento, e
+cosE<igrave> via.
+
+Quando scrivete la lista degli argomenti alla XSUB nel file C<.xs>, ciE<ograve>
+dice a B<xsubpp> quali argomenti corrispondono ai differenti elementi
+dello stack (ossia, il primo della lista E<egrave> il primo argomento, e cosE<igrave> via).
+State chiedendo qualche disastro se non li elencate nello stesso ordine
+atteso dalla relativa funzione.
+
+I valori effettivi sullo stack degli argomenti sono puntatori ai valori
+passati. Quando un argomento viene elencato come valore C<OUTPUT>, il
+suo corrispondente valore sullo stack (ossia, C<ST(0)> nel caso del primo
+argomento) viene modificato. Potete verificarlo guardando il codice C
+generato per l'L<ESEMPIO 3>; il codice per la routine XSUB C<round()>
+contiene alcune righe come quelle che seguono:
+
+	double  arg = (double)SvNV(ST(0));
+	/* Arrotonda i contenuti della variabile arg */
+	sv_setnv(ST(0), (double)arg);
+
+La variabile C<arg> E<egrave> inizialmente impostata prendendo il valore da
+C<ST(0)>, per poi essere rimessa in C<ST(0)> alla fine della routine.
+
+Le XSUB possono anche restituire liste, non solo scalari. Questo
+va fatto manipolando i valori sullo stack C<ST(0)>, C<ST(1)>, ecc. in
+una maniera leggermente differente. I dettagli li trovate in L<perlxs>.
+
+Le XSUB possono anche evitare la conversione automatica degli argomenti
+delle funzioni Perl in argomenti delle funzioni C - i dettagli sono in
+L<perlxs>. Qualcuno preferisce effettuare la conversione manualmente
+ispezionando C<ST(i)>, anche nei casi in cui la conversione automatica
+risulterebbe corretta, obiettando che questo rende la logica di una XSUB
+piE<ugrave> chiara. Confrontate con L<Tirare fuori la "ciccia" dalle XSUB> per
+un simile compromesso riguardo la separazione della "colla Perl" e
+della "sezione di lavoro" di una XSUB.
+
+Mentre gli esperti potrebbero dubitare di tutti questi idiomi, un
+neofita delle I<viscere> di Perl potrebbe preferire una strada che E<egrave> quanto piE<ugrave>
+possibile scevra di elementi specifici delle I<interiora> stesse, il che
+significa avvalersi della conversione automatica e della generazione
+automatica, come in L<Tirare fuori la "ciccia" dalle XSUB>. Questo
+approcio ha anche il vantaggio aggiuntivo di proteggere chi scrive
+XSUB da futuri cambiamenti nell'API di Perl.
+
+
+=head2 Estendere la vostra Estensione
+
+Potreste a volte voler aggiungere qualche metodo o funzione aggiuntiva
+come aiuto per rendere l'interfaccia fra Perl e la vostra estensione
+piE<ugrave> semplice o piE<ugrave> comprensibile. Queste routine dovrebbero risiedere
+nel file C<.pm>. Se sono caricate automaticamente dall'estensione stessa
+o solo quando sono chiamate dipende da dove la definizione della
+subroutine viene posta nel file C<.pm>. Potete consultare anche
+L<AutoLoader> per un metodo alternativo di tenere e caricare le vostre
+subroutine aggiuntive.
+
+=head2 Documentare la vostra Estensione
+
+Non avete assolutamente alcuna scusa per evitare di documentare la vostra
+estensione. La documentazione va posta nel file C<.pm>. Questo file
+verrE<agrave> immesso in C<pod2man>, e la documentazione immersa verrE<agrave> convertita
+nel formato delle I<manpage> [pagine del manuale stile Unix, N.d.T.] e
+posta nella directory blib. VerrE<agrave> infine copiata nella directory delle
+pagine di manuale di Perl quando l'estensione verrE<agrave> installata.
+
+Potete alternare la documentazione ed il codice Perl all'interno del file
+C<.pm>. In effetti, se volete utilizzare il metodo dell'auto-caricamento,
+dovete fare proprio cosE<igrave>, come spiegano i commenti all'interno del file
+C<.pm>.
+
+Consultate L<perlpod> per maggiori informazioni sul formato pod.
+
+=head2 Installare la vostra Estensione
+
+Una volta che la vostra estensione E<egrave> completa e passa tutti i test,
+l'installazione E<egrave> piuttosto semplice: non dovete far altro che lanciare
+C<make install>. Avrete bisogno di avere i permessi in scrittura nella
+directory dove E<egrave> installato Perl, o dovrete chiedere all'amministratore
+di sistema di fare l'installazione per voi.
+
+In alternativa, potete specificare la directory esatta dove porre i file
+dell'estensione chiamando C<make install PREFIX=/directory/di/destinazione>
+(potreste aver bisogno di insirire l'aggiunta fra C<make> e C<install> se
+avete una versione di C<make> un po' bizzarra). Questo risulta
+particolarmente utile se state costruendo un'estensione che verrE<agrave>
+distribuita in molti sistemi. Potete allora semplicemente archiviare i
+file nella directory di destinazione, e distribuire questo archivio
+nei sistemi di destinazione.
+
+
+=head2 ESEMPIO 5
+
+In questo esempio avremo di nuovo a che fare con lo stack degli argomenti.
+Gli esempi precedenti hanno tutti restituito un solo, unico valore; qui
+creeremo un'estensione che restituisce un array.
+
+Questa estensione E<egrave> molto polarizzata verso Unix (utilizza
+C<struct statfs> e la chiamata di sistema C<statfs>). Se non vi trovate
+su un sistema Unix, potete sostituire a C<statfs> una qualsiasi altra
+funzione che restituisce piE<ugrave> valori, potete scrivere direttamente i valori
+che devono essere restituiti (sebbene questo risulterE<agrave> un po' piE<ugrave>
+difficile da controllare in caso di condizioni di errore) o potete
+semplicemente saltare questo esempio. Se cambiate la XSUB, assicuratevi
+di cambiare anche i test in modo da allineare i cambiamenti.
+
+Tornate nela directory MiaProva e aggiungete il seguente codice alla fine
+di C<MiaProva.xs>:
+
+	void
+	statfs(path)
+		char * path
+	    INIT:
+		int i;
+		struct statfs buf;
+
+	    PPCODE:
+		i = statfs(path, &buf);
+		if (i == 0) {
+			XPUSHs(sv_2mortal(newSVnv(buf.f_bavail)));
+			XPUSHs(sv_2mortal(newSVnv(buf.f_bfree)));
+			XPUSHs(sv_2mortal(newSVnv(buf.f_blocks)));
+			XPUSHs(sv_2mortal(newSVnv(buf.f_bsize)));
+			XPUSHs(sv_2mortal(newSVnv(buf.f_ffree)));
+			XPUSHs(sv_2mortal(newSVnv(buf.f_files)));
+			XPUSHs(sv_2mortal(newSVnv(buf.f_type)));
+			XPUSHs(sv_2mortal(newSVnv(buf.f_fsid[0])));
+			XPUSHs(sv_2mortal(newSVnv(buf.f_fsid[1])));
+		} else {
+			XPUSHs(sv_2mortal(newSVnv(errno)));
+		}
+
+Avrete anche bisogno di aggiungere quanto segue all'inizio del file
+C<.xs>, subito dopo l'inclusione di C<XSUB.h>:
+
+	#include <sys/vfs.h>
+
+Aggiungete anche il seguente frammento di codice a C<test.pl>,
+ricordandovi di incrementare la stringa "1..9" in "1..11"
+nel blocco C<BEGIN>:
+
+	@a = &MiaProva::statfs("/maddeche");
+	print ((scalar(@a) == 1 && $a[0] == 2) ? "ok 10\n" : "not ok 10\n");
+	@a = &MiaProva::statfs("/");
+	print scalar(@a) == 9 ? "ok 11\n" : "not ok 11\n";
+
+=head2 Cose Nuove in questo Esempio
+
+Questo esempio ha aggiunto un po' di concetti nuovi, li analizzeremo
+uno alla volta.
+
+=over 4
+
+=item *
+
+La direttiva C<INIT:> contiene codice che verrE<agrave> inserito immediatamente
+dopo che lo stack degli argomenti viene decodificato. Il linguaggio C
+non consente dichiarazioni di variaible in posizioni arbitrarie
+all'interno di una funzione, per cui questa E<egrave> di norma la soluzione migliore
+per dichiarare le variabili locali di cui la XSUB ha bisogno. (In
+alternativa, E<egrave> possibile mettere l'intera sezione C<PPCODE:> in
+parentesi graffe, ed aggiungere queste dichiarazioni all'inizio).
+
+=item *
+
+Questa routine restituisce anche un numero di argomenti differenti
+dipendentemente dal fatto che la chiamata a C<statfs> abbia successo
+o meno. Se ci sono errori, viene restituito il numero dell'errore
+come unico elemento di un array. Se la chiamata ha successo, viene
+restituito un array di 9 elementi. PoichE<eacute> questa funzione riceve un solo
+argomento, abbiamo bisogno di fare spazio sullo stack per tenere i
+9 valori che potrebbero essere restituiti.
+
+Otteniamo tutto ciE<ograve> utilizzando la direttiva C<PPCODE:>, piuttosto che
+la direttiva C<CODE:>. Questo indica a B<xsubpp> che utilizzeremo i
+valori di ritorno che saranno messi sullo stack degli argomenti da noi
+stessi.
+
+=item *
+
+Quando vogliamo inserire i valori da restituire al chiamante sullo stack,
+utilizziamo qualla serie di marco che cominciano con C<XPUSH>. Ce ne sono
+cinque versioni differenti a seconda dei tipi delle variabili: interi,
+interi senza segno, I<double>, stringhe e scalari Perl. Nel nostro
+esempio abbiamo inserito uno scalare Perl sullo stack. (Infatti questa
+E<egrave> l'unica macro che puE<ograve> essere utilizzata per restituire valori
+multipli).
+
+Le macro C<XPUSH*> estenderanno lo stack di ritorno automaticamente, in
+modo da prevenire possibili riempimenti. Dovete inserire i valori
+nello stack nello stesso ordine con cui li volete vedere nel programma
+chiamante.
+
+=item *
+
+I valori inseriti nello stack di ritorno della XSUB sono in realtE<agrave>
+degli SV I<mortali>. Sono resi tali in modo che una volta che i valori
+vengono copiati dal programma chiamate, le variabili SV che li
+contengono possono essere deallocate. Se non fossero I<mortali>, infatti,
+continuerebbero ad esistere dopo il ritorno dalla XSUB, senza perE<ograve>
+essere accessibili; questo risulterebbe dunque in uno spreco di memoria.
+
+=item *
+
+Se fossimo interessati alle prestazioni, ma non nella compattezza del
+codice, nel ramo relativo ad una chiamata andata a buon fine non
+utilizzeremmo le macro C<XPUSH*>, ma quelle C<PUSH>, pre-estendendo
+lo stack una volta per tutte prima di inserire i valori:
+
+	EXTEND(SP, 9);
+
+Per contro, si ha bisogno di calcolare in anticipo il numero di elementi
+da restituire (sebbene estendere lo stack oltre quanto necessario
+non abbia tipicamente altre conseguenze se non un maggior consumo di memoria).
+
+In maniera analoga, nel ramo in cui la chiamata a C<statfs> fallisce
+potremmo utilizzare C<PUSH> I<senza> estendere lo stack: il riferimento
+alla funzione Perl arriva alla XSUB sullo stack, per cui c'E<egrave> I<sempre>
+spazio sufficiente per un singolo valore da restituire.
+
+=back
+
+=head2 ESEMPIO 6
+
+In questo esempio riceveremno un riferimento ad un array come parametro
+di ingresso, e restituiremo un riferimento ad un array di hash. Potremo
+in questo modo dimostrare come sia possibile manipolare strutture dati
+Perl complesse all'interno di una XSUB.
+
+L'estensione di questo esempio E<egrave> artificiosa. E<Egrave> basata
+sul codice dell'esempio precedente; chiama la funzione C<statfs> piE<ugrave>
+volte, accettando in ingresso un riferimento ad un array di nomi di
+file, e restituendo un riferimento ad un array di hash, ciascuna
+contenente i dati per i filesystem.
+
+Ritornate nella directory MiaProva ed aggiungete il codice che segue alla
+fine di C<MiaProva.xs>:
+
+	SV *
+	multi_statfs(paths)
+		SV * paths
+	    INIT:
+        	AV * results;
+        	I32 numpaths = 0;
+        	int i, n;
+        	struct statfs buf;
+
+        	if ((!SvROK(paths))
+		    || (SvTYPE(SvRV(paths)) != SVt_PVAV)
+		    || ((numpaths = av_len((AV *)SvRV(paths))) < 0))
+		{
+		    XSRETURN_UNDEF;
+        	}
+        	results = (AV *)sv_2mortal((SV *)newAV());
+	    CODE:
+        	for (n = 0; n <= numpaths; n++) {
+		    HV * rh;
+            	    STRLEN l;
+            	    char * fn = SvPV(*av_fetch((AV *)SvRV(paths), n, 0), l);
+
+            	    i = statfs(fn, &buf);
+            	    if (i != 0) {
+		        av_push(results, newSVnv(errno));
+		        continue;
+            	    }
+
+            	    rh = (HV *)sv_2mortal((SV *)newHV());
+
+            	    hv_store(rh, "f_bavail", 8, newSVnv(buf.f_bavail), 0);
+            	    hv_store(rh, "f_bfree",  7, newSVnv(buf.f_bfree),  0);
+            	    hv_store(rh, "f_blocks", 8, newSVnv(buf.f_blocks), 0);
+            	    hv_store(rh, "f_bsize",  7, newSVnv(buf.f_bsize),  0);
+            	    hv_store(rh, "f_ffree",  7, newSVnv(buf.f_ffree),  0);
+            	    hv_store(rh, "f_files",  7, newSVnv(buf.f_files),  0);
+            	    hv_store(rh, "f_type",   6, newSVnv(buf.f_type),   0);
+
+            	    av_push(results, newRV((SV *)rh));
+        	}
+        	RETVAL = newRV((SV *)results);
+	    OUTPUT:
+        	RETVAL
+
+Aggiungete anche quanto segue allo script C<test.pl>, portando il numero
+di test a "1..13" nel blocco C<BEGIN>:
+
+	$results = MiaProva::multi_statfs([ '/', '/maddeche' ]);
+	print ((ref $results->[0]) ? "ok 12\n" : "not ok 12\n");
+	print ((! ref $results->[1]) ? "ok 13\n" : "not ok 13\n");
+
+=head2 Cose Nuove in questo Esempio
+
+Ci sono un certo numero di concetti nuovi, descritti qui a seguire.
+
+=over 4
+
+=item *
+
+Questa funzione non utilizza una C<typemap>. Al contrario, dichiariamo che
+accetta un parametro C<SV*> (scalare), e che restituisce un valore C<SV*>;
+ci prendiamo direttamente cura di questi scalari all'interno del codice.
+PoichE<eacute> stiamo restituendo un solo valore, non abbiamo bisogno di una
+direttiva C<PPCODE:> - al contrario, utilizziamo le direttive C<CODE:> e
+C<OUTPUT:>.
+
+=item *
+
+Quando si ha a che fare con i riferimenti, E<egrave> importante trattarli con
+cautela. Il blocco C<INIT:> prima di tutto si assicura che C<SvROK>
+abbia valore vero, il che indica che C<paths> E<egrave> un riferimento valido.
+Successivamente verifica che l'oggetto riferito da C<paths> sia un array,
+utilizzando C<SvRV> per dereferenziarlo, e C<SvTYPE> per scoprire qual E<egrave>
+il suo tipo. Come controllo addizionale verifica che l'array sia non
+vuoto, utilizzando la funzione C<av_len> (la quale restituisce -1 quando
+l'array E<egrave> vuoto). La macro C<XSRETURN_UNDEF> viene utilizzata per
+abortire la XSUB e restituire il valore C<undef> laddove le condizioni
+suddette non siano raggiunte.
+
+=item *
+
+Manipoliamo parecchi array in questa XSUB. Osservate che un array viene
+rappresentato internamente attraverso un puntatore C<AV*>. Le funzioni e
+le macro per manipolare gli array sono simili alle funzioni in Perl:
+C<av_len> restituisce l'indice piE<ugrave> elevato in un C<AV*>, similmente
+a C<$#array>; C<av_fetch> prende un singolo valore scalare da un array,
+dato il suo indice; C<av_push> inserisce un valore scalare in fondo
+all'array, estendendolo automaticamente se necessario.
+
+Nello specifico, leggiamo i nomi dei percorsi uno alla volta dall'array
+di ingresso, ed inseriamo i risultati in un array di uscita (risultati)
+nello stesso ordine. Se C<statfs> fallisce, l'elemento inserito
+nell'array di uscita E<egrave> il valore di C<errno> dopo tale fallimento. Se
+al contrario C<statfs> va a buon fine, il valore inserito nell'array
+di uscita E<egrave> un riferimento ad una hash contenente alcune delle
+informazioni contenute nella struttura C<struct statfs>.
+
+CosE<igrave> come per lo stack di uscita, sarebbe possibile (ottenedo un
+piccolo vantaggio di prestazioni) pre-estendere l'array di uscita prima
+di inserirvi i dati, poichE<eacute> sappiamo in anticipo quanti elementi
+dobbiamo restituire:
+
+	av_extend(results, numpaths);
+
+=item *
+
+In questa funzione stiamo solo effettuando un'operazione su hash, ossia
+immagazzinando un nuovo scalare relativo ad una data chiave utilizzando
+C<hv_store>. Una hash E<egrave> rappresentata attraverso un puntatore C<HV*>.
+Come gli array, le funzioni per manipolare le hash in una XSUB
+rispecchiano le funzionalitE<agrave> disponibili direttamente in Perl.
+Per i dettagli consultate L<perlguts> e L<perlapi>.
+
+=item *
+
+Per creare un riferimento, utilizziamo la funzione C<newRV>. Osservate
+che potete trasformare un C<AV*> o un C<HV*> in un tipo C<SV*> in questo
+come in molti altri casi. CiE<ograve> rende possibile prendere riferimenti ad
+array, hash e scalari con la stessa funzione. Di contro, la funzione
+C<SvRV> restituisce sempre un C<SV*>, che potrebbe aver bisogno di
+essere trasformata nel tipo appropriato se deve rappresentare qualcosa
+di differente da uno scalare (si puE<ograve> verificare con C<SvTYPE>).
+
+=item *
+
+A questo punto, B<xsubpp> deve fare veramente poco - le differenze fra
+C<MiaProva.xs> e C<MiaProva.c> sono minime.
+
+=back
+
+=head2 ESEMPIO 7 (ArriverE<agrave> presto...)
+
+XPUSH degli argomenti E impostazione di C<RETVAL> E assegnazione del
+valore di ritorno ad un array.
+
+=head2 ESEMPIO 8 (ArriverE<agrave> presto...)
+
+Impostare C<$!>
+
+=head2 ESEMPIO 9 Passare file aperti alle XS
+
+Potreste pensare che passare file ad una XS sia difficile, con tutti
+i I<typeglob> e roba associata. Beh, non E<egrave> cosE<igrave>.
+
+Supponete che per qualche strana ragione abbiamo bisogno di un
+I<wrapper> per la funzione di libreria standard C<fputs()>. Tutto
+ciE<ograve> di cui abbiamo bisogno E<egrave> questo:
+
+	#define PERLIO_NOT_STDIO 0
+	#include "EXTERN.h"
+	#include "perl.h"
+	#include "XSUB.h"
+
+	#include <stdio.h>
+
+	int
+	fputs(s, stream)
+		char *          s
+		FILE *	        stream
+
+Il lavoro vero e proprio viene fatto nel file C<typemap> standard.
+
+B<Ma> vi perdete tutta quella bella serie di operazioni fatte dai
+I<layer> di perlio. Qui viene chiamata la funzione stdio C<fputs()>,
+che non ne sa niente.
+
+La C<typemap> offre tre varianti di C<PerlIO *>: C<InputStream> (T_IN),
+C<InOutStream> (T_INOUT) e C<OutputStream> (T_OUT>. Un C<PerlIO *>
+nudo e crudo E<egrave> considerato un T_INOUT. Se questo ha rilevanza nel
+vostro codice (vedete sotto perchE<eacute> potrebbe averla), C<#define> o
+C<typedef> uno dei nomi specifici ed utilizzatelo come tipo
+dell'argomento o del risultato nel vostro file XS.
+
+La C<typemap> standard non contiene C<PerlIO *> prima di perl 5.7,
+ma ha questre tre varianti. Utilizzare direttamente un C<PerlIO *>
+risulta non compatibile con le versioni precedenti di perl, a meno
+che non forniate una vostra C<typemap>.
+
+Per I<stream> che vengono I<da> perl la differenza principale consiste
+nel fatto che C<OutputStream> prenderE<agrave> il C<PerlIO *> di uscita - il che
+potrebbe fare differenza per un socket. Come nel nostro esempio a
+seguire, del resto...
+
+
+Per I<stream> restituiti I<a> perl viene creato un nuovo I<handle> di
+file (ossia un riferimento ad un nuovo I<glob>) ed associato con il
+C<PerlIO *> fornito. Se lo stato di lettura/scrittura del C<PerlIO *>
+non E<egrave> corretto, potreste avere errori o avvertimenti nel momento in
+cui utilizzate l'I<handle>. Per questo motivo, se avete aperto il
+C<PerlIO *> come "w", dovrebbe in realtE<agrave> essere un C<OutputStream>,
+laddove dovrebbe essere un C<InputStream> se aperto come "r".
+
+Ora, supponiamo che vogliate utilizzare i I<layer> perlio nella vostra
+XS. Utilizzeremo la funzione perlio C<PerlIO_puts()> come esempio.
+
+Nella parte C del file XS (ossia, quella al di sopra della riga
+C<MODULE>) troviamo
+
+	#define OutputStream	PerlIO *
+     oppure
+	typedef PerlIO *	OutputStream;
+
+Questo E<egrave> invece il codice XS:
+
+	int
+	perlioputs(s, stream)
+		char *          s
+		OutputStream	stream
+	CODE:
+		RETVAL = PerlIO_puts(stream, s);
+	OUTPUT:
+		RETVAL
+
+Abbiamo utilizzato una sezione C<CODE> perchE<eacute> C<PerlIO_puts()> ha
+gli argomenti al contrario rispetto a C<fputs()>, e vogliamo che gli
+argomenti siano gli stessi.
+
+Volendo esplorare in dettaglio, vogliamo utilizzare la funzione
+stdio C<fputs()> su un C<PerlIO *>. CiE<ograve> significa che dobbiamo
+chiedere un C<FILE *> di stdio al sistema perlio:
+
+	int
+	perliofputs(s, stream)
+		char *         s
+		OutputStream	stream
+	PREINIT:
+		FILE *fp = PerlIO_findFILE(stream);
+	CODE:
+		if (fp != (FILE*) 0) {
+			RETVAL = fputs(s, fp);
+		} else {
+			RETVAL = -1;
+		}
+	OUTPUT:
+		RETVAL
+
+Nota: C<PerlIO_findFILE()> cercherE<agrave> nei I<layer> un I<layer> stdio. Se
+non riesce a trovarlo, chiamerE<agrave> C<PerlIO_exportFILE()> per generare
+un nuovo C<FILE> stdio. Chiamate C<PerlIO_exportFILE()> se volete
+un I<nuovo> C<FILE>. Ne genererE<agrave> uno per ciascuna chiamata ed
+inserirE<agrave> un nuovo I<layer> stdio. Per questo motivo, non chiamatelo
+ripetutamente sullo stesso file. C<PerlIO_findFILE()> richiamerE<agrave>
+il I<layer> stdio una volta che questo sia stato generato da
+C<PerlIO_exportFILE()>.
+
+Quanto detto si applica solamente al sistema perlio. Per le versioni
+precedenti la 5.7, C<PerlIO_exportFILE()> E<egrave> equivalente a
+C<PerlIO_findFILE()>.
+
+
+=head2 Se gli Esempi danno errore
+
+Come giE<agrave> detto all'inizio di questo documento, se avete problemi con
+le estensioni di esempio, potete vedere se quanto segue puE<ograve> esservi
+d'aiuto.
+
+=over 4
+
+=item *
+
+Nella versione 5.002, prima della revisione gamma, gli script di test
+dell'L<ESEMPIO 1> non funzioneranno a dovere. Avete bisogno di cambiare
+la riga C<use lib> come segue:
+
+	use lib './blib';
+
+=item *
+
+In versioni di 5.002 prima della 5.002b1h, il file C<test.pl> non
+veniva generato automaticamente da C<h2xs>. Questo significa che non
+potete lanciare C<make test> per far partire lo script dei test. Avrete
+bisogno di aggiungere le seguenti righe prima dell'istruzione
+C<use extension>:
+
+	use lib './blib';
+
+=item *
+
+Nelle versioni 5.000 e 5.001, invece di utilizzre la riga di cui sopra,
+avrete bisogno di utilizzare quanto segue:
+
+	BEGIN { unshift(@INC, "./blib") }
+
+=item *
+
+Questo documento presume che l'eseguibile chiamato C<perl> sia relativo
+alla versione 5 di Perl. Alcuni sistemi potrebbero avere questa versione
+installata come C<perl5>.
+
+=back
+
+=head1 Consultate anche
+
+Per maggiori informazioni, consultate L<perlguts>, L<perlapi>,
+ L<perlxs>, L<perlmod> e L<perlpod>.
+
+=head1 Autore
+
+Jeff Okamoto <F<okamoto@corp.hp.com>>
+
+Revisionato ed aiutato da De Dean Roehrich, Ilya Zakharevich,
+Andreas Koenig e Tim Bunce.
+
+Il materiale su PerlIO E<egrave> un contributo di Lupe Christoph, con
+alcuni chiarimenti da Nick Ing-Simmons.
+
+=head2 Ultima Modifica
+
+2002/05/08
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlxstut
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Flavio Poletti.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

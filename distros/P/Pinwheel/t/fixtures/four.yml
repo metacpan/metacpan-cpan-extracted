@@ -1,0 +1,14 @@
+mario:
+    four_id: 1
+    name: Mario
+    name_key: <%= make_key("Mario") %>
+
+luigi:
+    four_id: 2
+    name: Luigi
+    name_key: <%= make_key("Luigi") %>
+
+toad:
+    four_id: 3
+    name: Toad
+    name_key: <%= make_key("Toad") %>

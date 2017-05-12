@@ -1,0 +1,43 @@
+This is the README file for Pod::Template, a perl module for generating
+pod documentation from templates
+
+Please refer to 'perldoc Pod::Template' after installation for details.
+
+#####################################################################
+
+* Installation
+
+Pod::Template follows the standard Perl module install process:
+
+perl Makefile.PL
+make
+make test
+make install
+
+The module uses no C or XS parts, so no C-compiler is required.
+
+######################################################################
+
+* Samples
+
+There are a few samples included in the 'samples' directory in this
+distribution.
+
+They show you how to use efficiently use Pod::Template with an example
+program that utilizes these examples.  The program serves as an example
+of how to use the programmatic interface of Pod::Template.
+
+Invoke it as:
+    perl parse_sample.pl 00-simple-include-directive
+
+######################################################################
+
+AUTHOR
+    This module by Jos Boumans <kane@cpan.org>.
+
+COPYRIGHT
+    This module is copyright (c) 2003 Jos Boumans <kane@cpan.org>. All
+    rights reserved.  
+
+    This library is free software; you may redistribute and/or modify it
+    under the same terms as Perl itself.

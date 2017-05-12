@@ -1,0 +1,22 @@
+[AGENT]
+
+Mozilla/3.03Gold (Win95; I)
+
+'parser'           => 'netscape',
+'strength'         => 'I',
+'os'               => 'Windows 95',
+'version_raw'      => '3.03Gold',
+'version'          => '3.030',
+'name'             => 'Netscape'
+
+[AGENT]
+
+Mozilla/3.0 (Macintosh; I; PPC)
+
+'parser'           => 'netscape',
+'strength'         => 'I',
+'os'               => 'Macintosh',
+'extras'           => ['PPC'],
+'version_raw'      => '3.0',
+'version'          => '3.000',
+'name'             => 'Netscape'

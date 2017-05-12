@@ -1,0 +1,45 @@
+Revision history for Padre-Plugin-Encrypt
+
+0.12   2010.12.06
+        Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+
+0.11   2010.10.29
+        Removed Test::NeedsDisplay dependency (AZAWAWI)
+
+0.10   2010.10.27
+        t/00-load.t is magically injected by [@PadrePlugin] via [LoadTests] (AZAWAWI)
+
+0.09    2010.10.22
+        Added missing meta resources after switching to Dist::Zilla (AZAWAWI)
+
+0.08    2010.10.22
+        Switched to Dist::Zilla (AZAWAWI)
+        Fixed 00-load.t failure when $ENV{DISPLAY} is not set (AZAWAWI)
+
+0.07    2010.10.19
+        Make sure it works on latest Padre (RT #61657, RENEEB++).  (AZAWAWI)
+        Added i18n and some error handling to prevent crashes.  (AZAWAWI)
+        Fixed some build issues.  (AZAWAWI)
+        Handled various text encodings properly while decrypting.  (AZAWAWI)
+        Encrypt/Decrypt in hexadecimal to prevent data loss.  (AZAWAWI)
+        Added Arabic translation (AZAWAWI)
+        Translation files are now copied to share folder using Module::Build's share_dir
+
+0.06    2009.05.31
+        removed taint mode for tests, leading to build failures (jquelin)
+
+0.05    2009.2.1
+        for Padre 0.26
+
+0.04    2009.1.5
+        for Padre 0.23
+
+0.03    2008.11.24
+        for 'Padre::Plugin' => '0.18'
+
+0.02    2008.11.20
+        from use to require
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

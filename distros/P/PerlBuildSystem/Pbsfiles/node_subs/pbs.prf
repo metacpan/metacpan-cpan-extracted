@@ -1,0 +1,9 @@
+
+AddTargets('all') ;
+
+AddCommandLineSwitches('--build_directory ./out') ;
+
+#------------------------------------------------------------------------
+
+1;
+

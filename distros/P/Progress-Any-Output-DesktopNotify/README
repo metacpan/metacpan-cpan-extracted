@@ -1,0 +1,87 @@
+NAME
+    Progress::Any::Output::DesktopNotify - Output progress to
+    Desktop::Notify
+
+VERSION
+    This document describes version 0.02 of
+    Progress::Any::Output::DesktopNotify (from Perl distribution
+    Progress-Any-Output-DesktopNotify), released on 2014-10-14.
+
+SYNOPSIS
+     use Progress::Any::Output;
+     Progress::Any::Output->set('DesktopNotify',
+         summary_template=>'%t',
+         body_template=>'%m %p%% %R',
+     );
+
+    An example program:
+
+     use Progress::Any;
+     use Progress::Any::Output;
+
+     Progress::Any::Output->set({task=>'t1'}, 'DesktopNotify');
+     Progress::Any::Output->set({task=>'t2'}, 'DesktopNotify');
+
+     my $p1 = Progress::Any->get_indicator(task=>'t1', title=>'Copying ...', target=>10);
+     my $p2 = Progress::Any->get_indicator(task=>'t1', title=>'Verifying ...', target=>10);
+     for (1..15) {
+         $p1->update(message => "File $_") if $_ <= 10;
+         $p2->update(message => "File ".($_-5)) if $_ > 5;
+         sleep 1;
+     }
+
+DESCRIPTION
+    This output sends progress updates to Desktop::Notify. Each task will
+    get its own notification object.
+
+    Sample output (on Linux with XFCE):
+
+METHODS
+  new(%args) => OBJ
+    Instantiate. Usually called through
+    "Progress::Any::Output->set("DesktopNotify", %args)".
+
+    Known arguments:
+
+    *   summary_template => str (default: '%t')
+
+        When creating notification, use this template. Will be passed to
+        "Progress::Any"'s "fill_template()" routine.
+
+    *   body_template => str (default: '%m %p %R')
+
+        When updating notification body, use this template. Will be passed
+        to "Progress::Any"'s "fill_template()" routine.
+
+ENVIRONMENT
+TODO
+SEE ALSO
+    Progress::Any
+
+    Desktop::Notify
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Progress-Any-Output-DesktopNotify>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Progress-Any-Output-DesktopNotify>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Progress-Any-Output-D
+    esktopNotify>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

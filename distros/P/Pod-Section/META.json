@@ -1,0 +1,82 @@
+{
+   "abstract" : "select specified section from Module's POD",
+   "author" : [
+      "Ktat, C<< <ktat at cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.0",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Section",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Std" : "0",
+            "IO::String" : "0",
+            "Pod::Abstract" : "0",
+            "Pod::Perldoc" : "0",
+            "Pod::Perldoc::ToPod" : "0",
+            "Pod::Perldoc::ToText" : "0",
+            "Pod::Usage" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Pod::Section" : {
+         "file" : "lib/Pod/Section.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ktat/Pod-Section/issues"
+      },
+      "homepage" : "https://github.com/ktat/Pod-Section",
+      "repository" : {
+         "url" : "git://github.com/ktat/Pod-Section.git",
+         "web" : "https://github.com/ktat/Pod-Section"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "ktat <ktat.is@gmail.com>"
+   ]
+}

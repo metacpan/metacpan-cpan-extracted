@@ -1,0 +1,23 @@
+Revision history for Perl module Package::Constants
+
+0.06 2014-12-24 BINGOS
+    - Added min perl version 5.006 to the code, and added "use warnings",
+      and use of our.
+    - Added min perl version 5.006 to metadata
+    - Reformatted this file as per CPAN::Changes::Spec
+    - Added SEE ALSO section to doc
+
+0.04 2013-10-24 BINGOS
+    - Update Makefile.PL to add repository et al
+    - Install into site if >= v5.12.0
+    - Add use deprecate due to core scheduled removal
+
+0.02 2008-12-13 KANE
+    - Users of 0.01 need not upgrade
+    - Package::Constants is a core module, so the Makefile.PL
+      should reflect this and install into the 'core' 
+      directory, instead of 'site'
+
+0.01 2005-09-06 KANE
+    - First release to CPAN
+

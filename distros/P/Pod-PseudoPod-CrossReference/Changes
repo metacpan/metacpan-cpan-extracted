@@ -1,0 +1,8 @@
+Revision history for Perl extension Pod::PseudoPod::CrossReference.
+
+0.02 Sep 18 2005
+    - Forgot t/test.pod in the manifest.
+    - Minor documnetation fix.
+
+0.01 Sep 18 2005
+	- Initial release into CPAN.

@@ -1,0 +1,52 @@
+PBJ/JNI/Native version 0.01
+============================
+
+This is one of the modules in the PBJ::JNI suite.  This module
+implements the primitive interface to the Java JNI C library.  It
+is not recommanded that this module be used directly.  Rather, the
+other modules in the PBJ::JNI suite, namely
+
+PBJ::JNI::JavaVM
+PBJ::JNI::JNIEnv
+PBJ::JNI::Util
+
+should be used directly.
+
+As with all modules in the PBJ::JNI suite, PBJ::JNI::Native handles
+pointers returned from the C library directly.  So you are supposed 
+to know what you are doing when calling these function in this 
+module, or risk crashing your program with no or very limited
+information.
+
+
+INSTALLATION
+
+Please install PBJ::JNI as a whole.
+
+
+DEPENDENCIES
+
+JDK version 1.2 or later, or its equivalent Java virtual machine 
+implementation must be installed seperately before these modules 
+can be installed.
+
+
+INFORMATION
+
+Please send questions and comments to "Ping Liang" <ping@cpan.org>
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2001 Ping Liang
+All rights reserved.
+
+THIS PROGRAM IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+This program is licensed under the same terms as Perl itself. For more
+information see the README or Artistic files provided with the Perl
+distribution.
+
+

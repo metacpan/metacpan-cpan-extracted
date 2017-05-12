@@ -1,0 +1,67 @@
+Revision history for Perl distribution PITA-Image
+
+0.60 Thu 27 Oct 2011
+	- Upgrading to Module::Install::DSL 1.04
+	- Updating dependencies to fix IPC and resource
+	  management bugs.
+	- Adds proper Win32 support
+	- Converting from LWP to HTTP::Tiny
+	- Adding a shorter 5 second timeout
+
+0.50 Fri 11 Mar 2011
+	- Fixing the way we generate an error message
+
+0.43 Tue 1 Feb 2011
+	- Upgrading to Module::Install::DSL 1.00
+	- Fixing a bug on Win32
+
+0.42 Wed 22 Jul 2009
+	- Upgrading to Module::Install 0.91
+	- Switching over to GUIDs
+
+0.41 Tue  2 Sep 2008
+	- Incremental release to fix some Kwalitee issues
+	- Upgrading to Module::Install 0.77
+
+0.40 Sun  1 Jul 2007
+	- Tweaks to be compatible with PITA-POE-SupportServer
+	- Upgrading to Module::Install 0.65
+
+0.30 Fri  9 Mar 2007
+	- Upgrading to Module::Install 0.65
+	- Upgrading to sync with PITA-XML 0.30
+
+0.29 Wed 14 Mar 2006
+	- Upgrading to Module::Install 0.60
+	- Upgrading to sync with PITA-XML 0.29 changes
+
+0.20 Thu  2 Jan 2006
+	- Fixing a number of bugs.
+	- Adding more complete testing of the Test task
+	- Synchronising version for PITA 0.20 release
+
+0.15 Tue 31 Jan 2006
+	- Fully completed auto-discovery of the Perl5 family (I think)
+	- Heavy refactoring towards the goal of multiple tasks
+
+0.14 skipped
+
+0.13 Mon 23 Jan 2006
+	- Added support for the Ping task
+	- Added a stub for the Discover task
+	- Added a check for the Test task
+
+0.12 Mon 23 Jan 2006
+	- Added a cleanup flag to force cleaning up of the workarea
+	  on DESTROY when run in non-snapshot situations.
+
+0.11 Sun 15 Jan 2006
+	- Updated to handle the PITA::Scheme changeover to using
+	  PITA::XML::Request in XML instead of the Config::Tiny approach.
+
+0.10 Sun 15 Jan 2006
+	- Incrementing, updating dependencies and doing a version-syncronized
+	  release with PITA::XML 0.10 and PITA::Scheme 0.10
+
+0.01 Mon  8 Jan 2006
+	- First implementation

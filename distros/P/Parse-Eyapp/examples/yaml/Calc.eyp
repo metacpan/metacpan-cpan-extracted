@@ -1,0 +1,85 @@
+# examples/yaml/Calc.eyp
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+%right  '^'
+
+%tree bypass
+
+%lexer {
+    s/^\s+(?:#.*)?//;      # skip whites
+
+    return('NUM',$1) if s{^([0-9]+(?:\.[0-9]+)?)}{};
+    return('VAR',$1) if s/^([A-Za-z][A-Za-z0-9_]*)//;
+    return($1,$1)    if s/^(.)//s;
+  }
+
+%%
+
+exp:
+    %name NUM 
+    NUM                
+  | %name VAR
+    VAR                
+  | %name ASSIGN 
+    var '=' exp        
+  | %name PLUS
+    exp '+' exp        
+  | %name MINUS
+    exp '-' exp        
+  | %name TIMES
+    exp '*' exp        
+  | %name DIV
+    exp '/' exp        
+  | %name UMINUS
+    '-' exp %prec NEG  
+  | %name EXPON
+    exp '^' exp        
+  | '(' exp ')'        
+;
+
+var:
+    %name VAR
+       VAR
+;
+%%
+
+=head1 SYNOPSIS
+
+Compile this grammar with
+
+   eyapp -b '' -B '' Calc.eyp
+
+Run it with:
+
+    ./Calc.pm -t -i -c 'a = 2*3' 
+
+You'll get an output like this:
+
+    ASSIGN(VAR[a],TIMES(NUM[2],NUM[3]))
+
+If you want to produce a YAML description of the AST
+use the option C<-y>:
+
+ $ ./Calc.pm -y -c 'b = 2+a' 
+  --- !!perl/hash:ASSIGN
+  children:
+    - !!perl/hash:VAR
+      attr: b
+      children: []
+      token: VAR
+    - !!perl/hash:PLUS
+      children:
+        - !!perl/hash:NUM
+          attr: 2
+          children: []
+          token: NUM
+        - !!perl/hash:VAR
+          attr: a
+          children: []
+          token: VAR
+
+Run C<./Calc.pm -h> to get this help.
+
+=cut

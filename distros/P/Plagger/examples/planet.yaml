@@ -1,0 +1,28 @@
+global:
+  # Make plagger more verbose than default
+  log:
+    level: debug
+
+plugins:
+  # Subscribe to a couple of "My Feeds" on the web
+  # They could be either Feeds URL or Blog URL (with Auto-Discovery support)
+  - module: Subscription::Config
+    config:
+      feed:
+        - http://bulknews.typepad.com/blog/index.rdf
+        - http://blog.bulknews.net/mt/
+        - http://subtech.g.hatena.ne.jp/miyagawa/
+        - http://bulknews.vox.com/
+        - http://d.hatena.ne.jp/miyagawa/
+
+  # Load 'Bundle' planet plugins
+  - module: Bundle::Planet
+    config:
+      duration: 7 days
+      title: Planet Plagger
+      description: Everything Plagger from the Web
+      dir: /tmp/planet
+      url: http://example.org/planet/
+      theme: sixapart-std
+      stylesheet: http://bulknews.typepad.com/blog/styles.css
+

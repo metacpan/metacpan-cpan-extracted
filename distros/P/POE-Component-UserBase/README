@@ -1,0 +1,73 @@
+$Id: README,v 1.3 2000/12/04 00:33:49 jgoff Exp $
+
+--------
+Abstract
+--------
+
+POE::Component::UserBase manages user authentication tasks for multiple
+sessions, and provides a convenient repository for persistent data for each
+user. It is used when you need to authenticate users of your POE application.
+It currently assumes that users cannot be logged in multiple times, but it
+does allow for a single user to exist in multiple domains.
+
+------------
+Requirements
+------------
+
+This module requires POE.  This requirement is encoded in Makefile.PL.
+In addition, it requires Storable to maintain the persistent data.
+It can optionally use the DBI module if you wish to authenticate from a
+database of some sort.
+
+------------------
+Basic Installation
+------------------
+
+[Note: This section is written in advance of PoCo::UserBase's
+placement on the CPAN.  These steps are wrong, and you will find no
+joy following them.  Please read the Manual Installation section
+instead.]
+
+POE::Component::UserBase may be installed through the CPAN shell in
+the usual CPAN shell manner.  In a modern CPAN shell, this typically is:
+
+  $ perl -MCPAN -e 'install POE::Component::UserBase'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme POE::Component::UserBase
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install POE::Component::UserBase
+
+-------------------
+Manual Installation
+-------------------
+
+POE::Component::UserBase can also be installed manually.  The latest
+CPAN version can be found at
+<ftp://ftp.cpan.org/pub/CPAN/authors/id/J/JG/JGOFF/> or in a
+similarly named directory at your favorite CPAN mirror.
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+A sample program, samples/tutorial-chat.perl, implements a simple IRC-like
+server with authentication and persistent nicks. If you would like to see
+more details about its operation, edit it and set the DEBUG constant to
+any value Perl considers "true".
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+
+---------------------------
+EOF: Thank you for reading.
+---------------------------

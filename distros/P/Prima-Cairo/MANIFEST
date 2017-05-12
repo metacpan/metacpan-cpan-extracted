@@ -1,0 +1,20 @@
+MANIFEST
+README.md
+Changes
+Makefile.PL
+Cairo.xs
+lib/Prima/Cairo.pm
+examples/star_and_ring.pl
+examples/deathvalley_panorama.jpg
+examples/knife_hand.png
+examples/raycaster.pl
+examples/star_and_ring.pl
+examples/test.pl
+examples/a1-test.pl
+examples/wall_texture.jpg
+t/01_load.t
+t/02_paint.t
+t/03_pixels.t
+t/98_pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

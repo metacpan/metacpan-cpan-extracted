@@ -1,0 +1,345 @@
+#! /usr/bin/perl
+################################################################################
+#
+# pml (Runns a file through the PML Parser)
+#
+################################################################################
+#
+# Copyright (C) 1999-2000 Peter J Jones (pjones@cpan.org)
+# All Rights Reserved
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright
+#    notice, this list of conditions and the following disclaimer in the
+#    documentation and/or other materials provided with the distribution.
+# 3. Neither the name of the Author nor the names of its contributors
+#    may be used to endorse or promote products derived from this software
+#    without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND ANY
+# EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+# OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+# DAMAGE.
+#
+################################################################################
+#
+# Includes
+#
+################################################################################
+use PML;
+use strict;
+use Getopt::Long;
+################################################################################
+#
+# Global Variables and Default Settings
+#
+################################################################################
+use vars qw($ID);
+$ID		= '$Id: pml,v 1.13 2000/07/31 17:13:47 pjones Exp $';
+
+my %clo; # command line options
+my $pml; # the pml object
+my $output = ''; # somewhere to store the output
+################################################################################
+#
+# Code Start
+#
+################################################################################
+## configure GetOptions
+Getopt::Long::Configure('no_ignore_case');
+
+## Get command line options
+GetOptions (
+	\%clo,
+	'D=s%',		# define a variable
+	'o=s',		# file to send output to
+	'dump!',	# use DataDumper to send the tokens to STDOUT
+	'pmld=s@',	# load in PML Definition files
+	'after-end!',	# Start parsing after and Perl __END__
+	'store!',	# Use PML::Storable
+	'parse-only|c!',# only parse, don't execute
+	'help|h!',	# ask for help
+	'debug!',	# tell PML to send debugging info
+	'V!',		# print the PML Version number and revesion
+	'v!',		# print the PML Version
+) or usage();
+
+# see if the user needs some help
+if ($clo{'help'}) {
+	usage();
+}
+
+# check to see if we wants simple version info
+if ($clo{'v'}) {
+	print "PML Version $PML::VERSION\n";
+	exit;
+}
+
+# check for more detailed version info
+if ($clo{'V'}) {
+	print "PML Version\n\t$PML::VERSION\n";
+	print "PML CVS ID\n\t" . PML->ID . "\n";
+	print "pml CVS ID\n\t$ID\n";
+	exit;
+}
+
+# if there are no pml files to parse send an error
+unless (@ARGV) {usage()}
+
+# should we set PMLs debug flag?
+$PML::DEBUG=1 if $clo{'debug'};
+
+# if there are no variables on the command line, 
+#at least make D a blank hash
+$clo{'D'} ||= {};
+
+# check to see if we need to load any definitions
+if ($clo{'pmld'}) {
+	load_pml_definitions();
+}
+
+# loop through and parse all the pml files
+foreach (@ARGV) {
+
+	# do we create a new PML object or a PML::Storable object?
+	if ($clo{'store'}) {
+		require PML::Storable;
+		$pml = new PML::Storable $clo{'D'};
+	} else {
+		$pml = new PML $clo{'D'};
+	}
+	
+	# should we tell PML to parse after?
+	$pml->parse_after('^__END__$') if $clo{'after-end'};
+	
+	# now we can actually parse
+	eval{$pml->parse($_)};
+	
+	# if there was a parse error die now
+	exit 1 if $@;
+	
+	# do we need to dump this file?
+	if ($clo{'dump'}) {
+		dump_tokens($pml);
+	}
+	
+	# are we allowed to call execute?
+	unless ($clo{'parse-only'}) {
+		$output .= $pml->execute;
+	}
+}
+
+# send the results somewhere
+send_output();
+################################################################################
+#
+# ==== send_output ==== ########################################################
+#
+#   Arguments:
+#	None
+#
+#     Returns:
+#	None
+#
+# Description:
+#	Prints the output to STDOUT or a file
+#
+################################################################################
+sub send_output
+{
+	return unless $output;
+	
+	if ($clo{'o'}) {
+		unless (open OFILE, '>' . $clo{'o'}) {
+			print STDERR "can't open file '$clo{o}' for writing: $!\n";
+			exit 1;
+		}
+		
+		print OFILE $output;
+		close OFILE;
+	} else { # print to STDOUT
+		print $output;
+	}
+} # <-- End send_output -->
+################################################################################
+#
+# ==== dump_tokens ==== ########################################################
+#
+#   Arguments:
+#	1) A PML Object
+#
+#     Returns:
+#	None
+#
+# Description:
+#	Sends A Dumped PML Token list to STDOUT
+#
+################################################################################
+sub dump_tokens
+{
+	my $pml_object = shift;
+	
+	use Data::Dumper;
+	print Dumper($pml->[PML->MEMBER_TOKENS]);
+} # <-- End dump_tokens -->
+################################################################################
+#
+# ==== load_pml_definitions ==== ###############################################
+#
+#   Arguments:
+#	None
+#
+#     Returns:
+#	None
+#
+# Description:
+#	Loads external definitions for internal custom pml funtions
+#
+################################################################################
+sub load_pml_definitions
+{
+	my @files = @{$clo{pmld}};
+	my ($name, $type, $id);
+	
+	foreach my $file (@files)
+	{
+		unless (open FILE, $file)
+		{
+			print STDERR "can't open pmld file '$file:' $!\n";
+			exit 1;
+		}
+		
+		while (<FILE>)
+		{
+			next if /^\s*#/;
+			s/#.*$//;
+			s/^\s+//;
+			s/\s+$//;
+			next unless $_;
+			
+			($name, $type) = split(/\s+/, $_, 2);
+			eval "\$id = PML->$type";
+			PML->register(name=>$name, type=>$id, token=>\&pmld_callback);
+		}
+		
+		close FILE;
+	}	
+} # <-- End load_pml_definitions -->
+################################################################################
+#
+# ==== pmld_callback ==== ######################################################
+#
+#   Arguments:
+#	None
+#
+#     Returns:
+#	None
+#
+# Description:
+#	Fake callback for custom subs
+#
+################################################################################
+sub pmld_callback
+{
+	return "This string was inserted my the pml script ".
+		"in place of a custom function via a pmld file";
+} # <-- End pmld_callback -->
+################################################################################
+#
+# ==== usage ==== ##############################################################
+#
+#   Arguments:
+#	None
+#
+#     Returns:
+#	None
+#
+# Description:
+#	Prints usage information
+#
+################################################################################
+sub usage
+{
+	print <<EOT;
+Usage: $0 [options] file [fileN ..]
+
+Options:
+	
+	--help
+	-h		This message
+	
+	-o <filename>	Put output into file <filename>
+	
+	-D x=y		Set pml variable x to y. You may use more then one
+			-D. (pml -D color=yellow -D speed=fast)
+			
+	--dump		Use Data::Dumper and dump the token list after parsing
+			a file. Great for debugging the PML module.
+			
+	--parse-only
+	-c		Only parse the file, dont generate any output.
+			Useful to see if you have any syntax errors.
+			
+	--pmld <file>	Load <file> as a PML Definition file. This allows
+			pml to handle custom callbacks that you might be
+			using inside your Perl scripts. You can use more then
+			one --pmld.
+	
+	--after-end	Start parsing the PML file the line after '__END__'.
+			This is great for parsing files in the test dir.
+			
+	--debug		Tell PML to output debugging info. This is not to
+			debug a pml file, but to debug PML itself.
+			
+	-v		Print PML version number
+	
+	-V		Print PML version number and a little more info.
+EOT
+	exit 1;
+} # <-- End usage -->
+################################################################################
+#                              END-OF-SCRIPT                                   #
+################################################################################
+=head1 NAME
+
+pml
+
+=head1 SYNOPSIS
+
+pml [options] <some_pml_file>
+
+=head1 DESCRIPTION
+
+pml will parse a PML file and print the output to standard out or a file.
+
+=head1 OPTIONS
+
+see pml -h
+			
+=head1 EXAMPLES
+
+pml -o outfile.txt -Dtest=1 -Dwhat=apple somefile.pml
+
+=head1 SEE ALSO
+
+perl(1)
+PML(3)
+
+=head1 AUTHOR
+
+Peter J Jones
+pjones@cpan.org
+
+=cut

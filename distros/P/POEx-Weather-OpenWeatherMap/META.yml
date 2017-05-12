@@ -1,0 +1,26 @@
+---
+abstract: 'POE-enabled OpenWeatherMap client'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POEx-Weather-OpenWeatherMap
+requires:
+  Defaults::Modern: '0.011'
+  MooX::Role::POE::Emitter: '0'
+  POE::Component::Client::HTTP: '0'
+  Weather::OpenWeatherMap: '0.003'
+  perl: '5.016'
+resources:
+  repository: git://github.com/avenj/poex-weather-openweathermap.git
+version: '0.003002'

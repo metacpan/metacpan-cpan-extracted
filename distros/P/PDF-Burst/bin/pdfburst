@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+use strict;
+use PDF::Burst;
+use base 'LEOCHARRE::CLI';
+use Cwd;
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.2 $ =~ /(\d+)/g;
+
+my $o = gopts('i:o:g:PC');
+
+my $abs_pdf = $o->{i};
+$abs_pdf ||= $ARGV[0];
+$abs_pdf 
+   and ( $abs_pdf = Cwd::abs_path($abs_pdf)) 
+   or say("Missing path to pdf file.") 
+   and exit 1;
+
+-f $abs_pdf or say("'$abs_pdf' not file on disk.") and exit 1;
+debug($abs_pdf);
+
+$o->{P} or $o->{C} = 1;
+
+my $subname = ( $o->{C} ? 'pdf_burst_CAM_PDF' : 'pdf_burst_PDF_API2' );
+debug($subname);
+
+no strict 'refs';
+my @files_out = &{"PDF::Burst\::$subname"}( $abs_pdf, $o->{g}, $o->{o} );
+my $count = scalar @files_out;
+say("Got $count files..");
+print "$_\n" for @files_out;
+exit;
+
+
+
+
+
+
+
+
+sub usage {
+   return qq{$0 - burst pdf into individual page files
+
+OPTION FLAGS
+
+   -C use CAM::PDF (default)
+   -P use PDF::API2
+
+PARAMETERS
+
+   -i path to input pdf file
+   -o output dir
+   -g groupname
+
+See PDF::Burst documentation for more.
+
+USAGE EXAMPLES
+
+   $0 ~/myfile.pdf
+   $0 -o /tmp/outputdir ~/myfile.pdf
+   $0 -o /tmp/outputdir -g rowdy -i ~/myfile.pdf
+
+CAVEATS
+
+Only does one at a time. Will not take mutiple pdf file arguments. (On purpose).
+
+SEE ALSO
+
+PDF::Burst
+LEOCHARRE::CLI
+
+AUTHOR
+
+Leo Charre leocharre at cpan dot org
+};
+
+
+}
+
+
+

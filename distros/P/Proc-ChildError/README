@@ -1,0 +1,34 @@
+FUNCTIONS
+
+ explain_child_error([\%opts, ]$child_error, $os_error) => STR
+
+    Produce a string description of an error number. $child_error defaults
+    to $? if not specified. $os_error defaults to $! if not specified.
+
+    The algorithm is taken from perldoc -f system. Some sample output:
+
+     failed to execute: No such file or directory (-1)
+     died with signal 15, with coredump
+     exited with value 3
+
+    An options hashref can be specified as the first argument to add
+    information. Currently known keys:
+
+      * prog => str
+
+      Program name/path, to include in error messages:
+
+       /usr/bin/foo failed to execute: Permission denied (-1)
+       foo died with signal 15, with coredump
+       /usr/bin/foo exited with value 3
+
+SEE ALSO
+
+    Process::Status provides a lightweight OO interface for $?. I recommend
+    this module now over Proc::ChildError.
+
+    IPC::System::Simple provides a replacement for Perl's system(), with
+    the difference that it will print a diagnostic error message similar to
+    what Proc::ChildError provides. You only need to do use
+    IPC::System::Simple qw(system) and use system() as usual. Recommended.
+

@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+use Perl::Maker;
+
+Perl::Maker->new($0, @ARGV)->run();

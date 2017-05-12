@@ -1,0 +1,3 @@
+[-TestingAndDebugging::RequireUseStrict]
+[TestingAndDebugging::ProhibitNoStrict]
+allow=refs

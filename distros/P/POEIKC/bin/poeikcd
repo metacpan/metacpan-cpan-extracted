@@ -1,0 +1,220 @@
+#!/usr/local/bin/perl
+
+use strict;
+use 5.008_001;
+
+use warnings;
+use Data::Dumper;
+use Cwd;
+use Getopt::Long;
+use Pod::Usage;
+use UNIVERSAL::require;
+
+my $options;
+my $foreground;
+my $command = shift || '';
+my @argv = @ARGV;
+
+BEGIN {
+	$Getopt::Long::ignorecase=0;
+	$options = {};
+	GetOptions ($options, qw/
+		0PROGRAM_NAME:s
+		name=s
+		port=i
+		alias=s
+		Verbose
+		Processes=i
+		babysit=i
+		connections=i
+		INC|inc:s@
+		foreground
+		version
+		Module=s@
+		startup:s
+		debug
+		help
+	/);
+	# $options->{foreground} # Run in the foreground
+	my $cwd = Cwd::getcwd;
+	unshift(@INC, 
+		map {s/~/$ENV{HOME}/;s{^\./}{$cwd/};s{^\w+}{$cwd/$&};;$_} 
+		map {split(/:/=>$_)} 
+		map {ref $_ ? @{$_} : $_} ($options->{INC})
+	) if (exists $options->{INC});
+	push @INC, $cwd;
+
+	map { $_->use or die $@ } map {ref $_ ? @{$_} : $_} ($options->{Module}) 
+		if (exists $options->{Module});
+#	if (exists $options->{Module}) {
+#		 for (map {ref $_ ? @{$_} : $_} ($options->{Module}));
+#	}
+}
+
+@{$options->{argv}} = @argv if @argv;
+
+$options->{alias} ||= 'POEIKCd';
+$options->{port} ||= 47225;
+$foreground = exists $options->{foreground} || exists $options->{debug} ;
+
+use POEIKC::Daemon;
+use POEIKC::Daemon::Utility;
+
+if (exists $options->{debug}) {
+	no warnings;
+	$POEIKC::Daemon::DEBUG = $options->{debug};
+	for (qw/POEIKC::Daemon POEIKC::Daemon::Utility/) {
+		Class::Inspector->loaded( $_ ) or die;
+	}
+}
+
+our $VERSION = $POEIKC::Daemon::VERSION;
+
+for ($command) {
+
+	### OPTION ###
+
+	exists $options->{version} and do {
+		printf "poeikcd version: %s\n", $VERSION;
+		last;
+	};
+
+	exists $options->{help} and pod2usage(1);
+
+	### COMMAND ###
+
+	/stop|restart/i and do {
+		if( Proc::ProcessTable->use ){
+			my $proc;
+			for my $ps( @{Proc::ProcessTable->new->table} ) {
+				if ($ps->{pid} != $$ and $ps->{fname} eq 'poeikcd'){
+					$proc++;
+				}
+			}
+		 	/restart/i ? do{$command='start';redo} : last unless $proc;
+		}
+		use POE::Component::IKC::ClientLite;
+		my ($name) = $0 =~ /(\w+)\.\w+/;
+		$name .= $$;
+		my $ikc = create_ikc_client(
+			ip => '127.0.0.1',
+			port => $options->{port},
+			name => $name,
+		);
+		$ikc or do{
+			if( Proc::ProcessTable->use ){
+				for my $ps( @{Proc::ProcessTable->new->table} ) {
+					if ($ps->{pid} != $$ and $ps->{fname} eq 'poeikcd'){
+						print $ps->{cmndline}," .... already running \n";
+					}
+				}
+			}
+			printf "%s\n\n",$POE::Component::IKC::ClientLite::error; 
+			exit;
+		};
+		my $ret = $ikc->post_respond($options->{alias}.'/method_respond' => ['POEIKC::Daemon::Utility','shutdown'] );
+		$ikc->error and die($ikc->error);
+		print $ret if $ret;
+		/restart/i ? do{$command='start';redo} : last;
+	};
+
+	/start/i and do {
+		use Proc::Daemon;
+		printf "poeikcd is Started. (%s)\n",scalar(localtime) unless $foreground;
+		Proc::Daemon::Init unless $foreground;
+		POEIKC::Daemon->daemon(%{$options});
+		last;
+	};
+
+	### HELP ###
+	
+	pod2usage(1)
+
+}
+
+
+__END__
+
+=head1 NAME
+
+poeikcd - POE IKC daemon
+
+=head1 SYNOPSIS
+
+  poeikcd {start|stop|restart} [options]
+
+  eg:
+    poeikcd start -p 47225
+    poeikcd stop  -p 47225
+
+    poeikcd start -I ~/lib
+
+  Options:
+
+    -n,  --name=s      : Server name.
+
+    -0   --0PROGRAM_NAME=s
+                       : renew $0 ($PROGRAM_NAME) . 
+                         What want to make it same as a server name,
+                         do not set an argument.
+                              poeikcd start --name=MyServerName -0
+                         To do it separately from a server name, 
+                         attach an argument.
+                              poeikcd start --name=MyServerName -0=MyProgramName
+
+    -p,  --port=#      : Port number to use for connection.
+
+    -a   --alias=s     : Symbolic name, or session alias methods 
+
+    -f   --foreground  : Run in the foreground 
+                         STDOUT & STDERR It outputs.
+                         eg) poeikcd start -f >> ~/logs.txt 2>1& &
+
+    -I   --INC=s       : specify @INC/#include directory
+                         eg1) -I ~/lib:/mylib/ or -I ~/lib -I /foo/lib/
+                         eg2) poikc -I '$ENV{HOME}/lib'
+
+    -M   --Module      : execute "use/no module..." before executing program
+                         eg) -M LWP::Simple
+
+    -s   --startup     : default is "spawn". 
+                         eg) poeikcd -M MyModule --startup start
+                             `MyModule->spawn'
+                             poeikcd -M MyModule --startup=new start
+                             `MyModule->new'
+
+    -v   --version     : show version number
+
+
+    -d   --debug       : debug mode. Run in the foreground 
+                         STDOUT & STDERR It outputs.
+
+    -h   --help        : show this help screen
+
+IKC server. Parameters (See also L<POE::Component::IKC::Server>)
+
+    -V   --Verbose     
+    -P   --Processes   
+    -b   --babysit     
+    -c   --connections 
+
+
+=head1 DESCRIPTION
+
+poeikcd (L<POEIKC::Daemon>) is daemon of POE::Component::IKC
+
+=head1 AUTHOR
+
+Yuji Suzuki E<lt>yujisuzuki@mail.arbolbell.jpE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<poikc>
+L<POE::Component::IKC::Server>
+
+=cut

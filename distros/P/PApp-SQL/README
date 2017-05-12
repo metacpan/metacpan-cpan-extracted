@@ -1,0 +1,302 @@
+NAME
+    PApp::SQL - absolutely easy yet fast and powerful sql access.
+
+SYNOPSIS
+     use PApp::SQL;
+
+     my $st = sql_exec $DBH, "select ... where a = ?", $a;
+
+     local $DBH = <database handle>;
+     my $st = sql_exec \my($bind_a, $bind_b), "select a,b ...";
+     my $id = sql_insertid
+                 sql_exec "insert into ... values (?, ?)", $v1, $v2;
+     my $a = sql_fetch "select a from ...";
+     sql_fetch \my($a, $b), "select a,b ...";
+
+     sql_exists "table where name like 'a%'"
+        or die "a* required but not existent";
+
+     my $db = new PApp::SQL::Database "", "DBI:mysql:test", "user", "pass";
+     local $PApp::SQL::DBH = $db->checked_dbh; # does 'ping'
+
+     sql_exec $db->dbh, "select ...";
+
+DESCRIPTION
+    This module provides you with easy-to-use functions to execute sql
+    commands (using DBI). Despite being easy to use, they are also quite
+    efficient and allow you to write faster programs in less lines of code.
+    It should work with anything from perl-5.004_01 onwards, but I only
+    support 5.005+. UTF8 handling (the "sql_u*" family of functions) will
+    only be effective with perl version 5.006 and beyond.
+
+    If the descriptions here seem terse or if you always wanted to know what
+    PApp is then have a look at the PApp module which uses this module
+    extensively but also provides you with a lot more gimmicks to play
+    around with to help you create cool applications ;)
+
+  Global Variables
+    $sql_exec
+        Since the "sql_exec" family of functions return a statement handle
+        there must be another way to test the return value of the "execute"
+        call. This global variable contains the result of the most recent
+        call to "execute" done by this module.
+
+    $PApp::SQL::DBH
+        The default database handle used by this module if no $DBH was
+        specified as argument. See "sql_exec" for a discussion.
+
+    $PApp::SQL::Database
+        The current default "PApp::SQL::Database"-object. Future versions
+        might automatically fall back on this database and create database
+        handles from it if neccessary. At the moment this is not used by
+        this module but might be nice as a placeholder for the database
+        object that corresponds to $PApp::SQL::DBH.
+
+  Functions
+    $dbh = connect_cached $id, $dsn, $user, $pass, $flags, $connect
+        (not exported by by default)
+
+        Connect to the database given by "($dsn,$user,$pass)", while using
+        the flags from $flags. These are just the same arguments as given to
+        "DBI-"connect>.
+
+        The database handle will be cached under the unique id
+        "$id|$dsn|$user|$pass". If the same id is requested later, the
+        cached handle will be checked (using ping), and the connection will
+        be re-established if necessary (be sure to prefix your application
+        or module name to the id to make it "more" unique. Things like
+        __PACKAGE__ . __LINE__ work fine as well).
+
+        The reason $id is necessary is that you might specify special
+        connect arguments or special flags, or you might want to configure
+        your $DBH differently than maybe other applications requesting the
+        same database connection. If none of this is necessary for your
+        application you can leave $id empty (i.e. "").
+
+        If specified, $connect is a callback (e.g. a coderef) that will be
+        called each time a new connection is being established, with the new
+        $dbh as first argument.
+
+        Examples:
+
+         # try your luck opening the papp database without access info
+         $dbh = connect_cached __FILE__, "DBI:mysql:papp";
+
+        Mysql-specific behaviour: The default setting of
+        "mysql_client_found_rows" is TRUE, you can overwrite this, though.
+
+    $sth = sql_exec [dbh,] [bind-vals...,] "sql-statement", [arguments...]
+    $sth = sql_uexec <see sql_exec>
+        "sql_exec" is the most important and most-used function in this
+        module.
+
+        Runs the given sql command with the given parameters and returns the
+        statement handle. The command and the statement handle will be
+        cached (with the database handle and the sql string as key), so
+        prepare will be called only once for each distinct sql call (please
+        keep in mind that the returned statement will always be the same,
+        so, if you call "sql_exec" with the same dbh and sql-statement twice
+        (e.g. in a subroutine you called), the statement handle for the
+        first call mustn't not be in use anymore, as the subsequent call
+        will re-use the handle.
+
+        The database handle (the first argument) is optional. If it is
+        missing, it tries to use database handle in $PApp::SQL::DBH, which
+        you can set before calling these functions. NOTICE: future and
+        former versions of PApp::SQL might also look up the global variable
+        $DBH in the callers package.
+
+        The actual return value from the "$sth-"execute> call is stored in
+        the package-global (and exported) variable $sql_exec.
+
+        If any error occurs "sql_exec" will throw an exception.
+
+        "sql_uexec" is similar to "sql_exec" but upgrades all input
+        arguments to UTF-8 before calling the "execute" method.
+
+        Examples:
+
+         # easy one
+         my $st = sql_exec "select name, id from table where id = ?", $id;
+         while (my ($name, $id) = $st->fetchrow_array) { ... };
+
+         # the fastest way to use dbi, using bind_columns
+         my $st = sql_exec \my($name, $id),
+                           "select name, id from table where id = ?",
+                           $id;
+         while ($st->fetch) { ...}
+
+         # now use a different dastabase:
+         sql_exec $dbh, "update file set name = ?", "oops.txt";
+
+    sql_fetch <see sql_exec>
+    sql_ufetch <see sql_uexec>
+        Execute an sql-statement and fetch the first row of results.
+        Depending on the caller context the row will be returned as a list
+        (array context), or just the first columns. In table form:
+
+         CONTEXT        RESULT
+         void           ()
+         scalar         first column
+         list           array
+
+        "sql_fetch" is quite efficient in conjunction with bind variables:
+
+         sql_fetch \my($name, $amount),
+                   "select name, amount from table where id name  = ?",
+                   "Toytest";
+
+        But of course the normal way to call it is simply:
+
+         my($name, $amount) = sql_fetch "select ...", args...
+
+        ... and it's still quite fast unless you fetch large amounts of
+        data.
+
+        "sql_ufetch" is similar to "sql_fetch" but upgrades all input values
+        to UTF-8 and forces all result values to UTF-8 (this does *not*
+        include result parameters, only return values. Using bind variables
+        in conjunction with sql_u* functions might result in undefined
+        behaviour - we use UTF-8 on bind-variables at execution time and it
+        seems to work on DBD::mysql as it ignores the UTF-8 bit completely.
+        Which just means that that DBD-driver is broken).
+
+    sql_fetchall <see sql_exec>
+    sql_ufetchall <see sql_uexec>
+        Similarly to "sql_fetch", but all result rows will be fetched (this
+        is of course inefficient for large results!). The context is ignored
+        (only list context makes sense), but the result still depends on the
+        number of columns in the result:
+
+         COLUMNS        RESULT
+         0              ()
+         1              (row1, row2, row3...)
+         many           ([row1], [row2], [row3]...)
+
+        Examples (all of which are inefficient):
+
+         for (sql_fetchall "select id from table") { ... }
+
+         my @names = sql_fetchall "select name from user";
+
+         for (sql_fetchall "select name, age, place from user") {
+            my ($name, $age, $place) = @$_;
+         }
+
+        "sql_ufetchall" is similar to "sql_fetchall" but upgrades all input
+        values to UTF-8 and forces all result values to UTF-8 (see the
+        caveats in the description of "sql_ufetch", though).
+
+    sql_exists "<table_references> where <where_condition>...", args...
+    sql_uexists <see sql_exists>
+        Check wether the result of the sql-statement "select xxx from
+        $first_argument" would be empty or not (that is, imagine the string
+        "select * from" were prepended to your statement (it isn't)). Should
+        work with every database but can be quite slow, except on mysql,
+        where this should be quite fast.
+
+        "sql_uexists" is similar to "sql_exists" but upgrades all parameters
+        to UTF-8.
+
+        Examples:
+
+         print "user 7 exists!\n"
+            if sql_exists "user where id = ?", 7;
+ 
+         die "duplicate key"
+            if sql_exists "user where name = ? and pass = ?", "stefan", "geheim";
+
+    $lastid = sql_insertid $sth
+        Returns the last automatically created key value. It must be
+        executed directly after executing the insert statement that created
+        it. This is what is actually returned for various databases. If your
+        database is missing, please send me an e-mail on how to implement
+        this ;)
+
+         mysql:    first C<AUTO_INCREMENT> column set to NULL
+         postgres: C<oid> column (is there a way to get the last SERIAL?)
+         sybase:   C<IDENTITY> column of the last insert (slow)
+         informix: C<SERIAL> or C<SERIAL8> column of the last insert
+         sqlite:   C<last_insert_rowid()>
+
+        Except for sybase, this does not require a server access.
+
+    [old-size] = cachesize [new-size]
+        Returns (and possibly changes) the LRU cache size used by
+        "sql_exec". The default is somewhere around 50 (= the 50 last
+        recently used statements will be cached). It shouldn't be too large,
+        since a simple linear list is used for the cache at the moment
+        (which, for small (<100) cache sizes is actually quite fast).
+
+        The function always returns the cache size in effect *before* the
+        call, so, to nuke the cache (for example, when a database connection
+        has died or you want to garbage collect old database/statement
+        handles), this construct can be used:
+
+         PApp::SQL::cachesize PApp::SQL::cachesize 0;
+
+    reinitialize [not exported]
+        Clears any internal caches (statement cache, database handle cache).
+        Should be called after "fork" and other accidents that invalidate
+        database handles.
+
+  Type Deduction
+    Since every database driver seems to deduce parameter types differently,
+    usually wrongly, and at leats in the case of DBD::mysql, different in
+    every other release or so, and this can and does lead to data
+    corruption, this module does type deduction itself.
+
+    What does it mean? Simple - sql parameters for placeholders will be
+    explicitly marked as SQL_VARCHAR, SQL_INTEGER or SQL_DOUBLE the first
+    time a statement is prepared.
+
+    To force a specific type, you can either continue to use e.g. sql casts,
+    or you can make sure to consistently use strings or numbers. To make a
+    perl scalar look enough like a string or a number, use this when passing
+    it to sql_exec or a similar functions:
+
+       "$string"   # to pass a string
+       $num+0      # to pass a number
+
+  The Database Class
+    Again (sigh) the problem of persistency. What do you do when you have to
+    serialize on object that contains (or should contain) a database handle?
+    Short answer: you don't. Long answer: you can embed the necessary
+    information to recreate the dbh when needed.
+
+    The "PApp::SQL::Database" class does that, in a relatively efficient
+    fashion: the overhead is currently a single method call per access (you
+    can cache the real dbh if you want).
+
+    $db = new <same arguments as "connect_cached">
+        The "new" call takes the same arguments as "connect_cached"
+        (obviously, if you supply a connect callback it better is
+        serializable, see PApp::Callback!) and returns a serializable
+        database class. No database handle is actually being created.
+
+    $db->dbh
+        Return the database handle as fast as possible (usually just a hash
+        lookup).
+
+    $db->checked_dbh
+        Return the database handle, but first check that the database is
+        still available and re-open the connection if necessary.
+
+    $db->dsn
+        Return the DSN (DBI) fo the database object (e.g. for error
+        messages).
+
+    $db->login
+        Return the login name.
+
+    $db->password
+        Return the password (emphasizing the fact that the password is
+        stored plaintext ;)
+
+SEE ALSO
+    PApp.
+
+AUTHOR
+     Marc Lehmann <schmorp@schmorp.de>
+     http://home.schmorp.de/
+

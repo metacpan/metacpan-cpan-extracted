@@ -1,0 +1,258 @@
+==================================================
+Changes from 2013-02-20 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.200 at 2014-02-20 19:05:04 +0000
+------------------------------------------
+
+  Change: 3db41b9cec7e0181ed823219c31a6a9d58344a69
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2014-02-21 04:01:27 +0000
+
+    Merge branch 'master' of github.com:sng2c/Parse-Token-Lite 
+
+  Change: 140cfd10fc0e3bf455f482fc822d1152f722b5fe
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2014-02-21 04:00:47 +0000
+
+    version up. add VERSION to Buider 
+
+  Change: 9d20aae19f5b975ffed296b9e606d22c64afafcc
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2014-02-21 03:55:48 +0000
+
+    add DSL 
+
+  Change: b234b803a0c929fff8f242f16a9daa5065047eed
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-17 19:22:57 +0000
+
+    added semantic_html.pl parser 
+
+  Change: db426dba0eff1c8e1b5d993e73a05c053ca92972
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-07-07 00:24:18 +0000
+
+    add as_string() method to Token. 
+
+  Change: 03421d61a24f38b0a5b513cb86391c70ba19224e
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-02 12:33:07 +0000
+
+    update readme 
+
+  Change: 598191a6e520ad1bb671d72ecef5fbd2f6bdbb63
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-01 19:13:40 +0000
+
+    rename to Parse::Token::Lite 
+
+  Change: f68fa07aa37558bbed8002327d60902d8da6c299
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-01 16:47:01 +0000
+
+    Add more docs.
+
+    parse() has more on array context 
+
+  Change: 0dc87fab604f663a399f720eea271afd385d830e
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-01 14:04:36 +0000
+
+    add docs. 
+
+  Change: 49b953526ccf5ca14b7c5a1cbe2c4bf049cba54b
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-01 11:32:16 +0000
+
+    Separate classes into each files. 
+
+  Change: 96bda525ed7196193397d30acc30230db2dec079
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-01 11:27:03 +0000
+
+    update README 
+
+  Change: 4e549437a4ab9254a22c2a375effa7f8c9a864c5
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-01 11:26:05 +0000
+
+    update README 
+
+  Change: f9606cf92bef901c5f089c0a462ce63572a68033
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-01 11:25:09 +0000
+
+    added documents of Parser::Token::Simple 
+
+  Change: 30ed311148a1f364ebd865e7f791a80fbc4c6efd
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-01 11:14:07 +0000
+
+    adding docs. 
+
+  Change: 823ea4a2b01b5cd3effa2c6617c45c2a8153f7e7
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-01 11:05:03 +0000
+
+    adding document 
+
+  Change: d6dde35ba12c6bd040ed3140ae23e5c1c306843e
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-07-01 10:15:26 +0000
+
+    add sample file in Synopsis.
+
+    fix synopsis bug. 
+
+  Change: e7d2eabdc25a0ef7d03d21630fd1d20b66a68711
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-06-30 13:59:34 +0000
+
+    add required 
+
+  Change: f4db28b392e5056b6b63c60907133bf8c3684715
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-06-30 13:48:41 +0000
+
+    fix samples and some bugs 
+
+  Change: d6b97526a96d6d53785988d4dda3257a527d8d30
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-06-28 22:57:14 +0000
+
+    Issue #3,#4
+
+    * #3 switch result array to token object * #4 more specific rule
+    array by using hash referece intead of array reference. 
+
+  Change: 3b5eeb8bdf7a706ab33f0c28e36f7b38bfd4b01e
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-06-28 22:16:47 +0000
+
+    Issue #4
+
+    more specific rule array by using hash referece intead of array
+    reference. 
+
+  Change: e89b0113f718e46d7cbc6da8803aa7a70dd20bc8
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-21 11:21:14 +0000
+
+    Issue #5 implements parse() 
+
+  Change: a64c7824ba90414bfad953638bc899d95ee8c47a
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-20 18:41:12 +0000
+
+    Issue #1 - implement state stack 
+
+  Change: c7167f840aaf18148d8943e11e09a42eb97328c7
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-20 17:44:17 +0000
+
+    fix error 
+
+  Change: 87376449b127b694a9d2ebb629dc7541e1b32386
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-20 17:19:31 +0000
+
+    add samples. 
+
+  Change: eff6ac68ecea4b895612f992f7751a343a10ca1d
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-20 16:40:17 +0000
+
+    fix doc 
+
+  Change: 36096a3bdb202cc1beda8d90d82bc622ea028b17
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-20 16:39:46 +0000
+
+    fix doc 
+
+  Change: 9cb6f9f4892ed0ac060b27a01d688b4573b1f707
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-20 16:37:25 +0000
+
+    fix sample code. 
+
+  Change: d5cc51a472fe7c6dc8b9632d4c3f80d8e6b2be1a
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-20 16:32:24 +0000
+
+    add SYSNOPSIS 
+
+  Change: ec8d8abbb8266d6c2f6272514016bfd7a8136a45
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-20 16:25:46 +0000
+
+    change >>,<< to >,< 
+
+  Change: dbc0e84d22499c231e1b8457734d03c287d58d00
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-20 16:12:38 +0000
+
+    fix bug for state 
+
+  Change: f96d0b68af93ba7f40ddde5ecaef01068f9486cb
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-20 15:12:20 +0000
+
+    implement state 
+
+  Change: 667fa5edea4ab633c46d2bfd6ac43b3940ddcbf9
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-20 11:06:59 +0000
+
+    change space to tab 
+
+  Change: 146eb1041d06fe5d6bdcba8e4bfd524a71aac6bb
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-20 10:51:17 +0000
+
+    Issue #2 remove regexp g option 
+
+  Change: db7783e04a38b1aca4674df940752e04373accd7
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-20 10:47:43 +0000
+
+    implements custom callback
+
+    - A callback can return additional data. - nextToken() receives
+    additional data. 
+
+  Change: 2753b9a1cca59b226c9138d19278826108396c9b
+  Author: HyunSeung Kim <sng2nara@hanmail.net>
+  Date : 2013-06-19 23:49:56 +0000
+
+    flat parsing done. 
+
+  Change: c35b075c9af2291421e4015bb86b122894042ca8
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-19 19:34:30 +0000
+
+    temp save 
+
+  Change: d220a3d15889e110082ecebbe80610fed8c55a9d
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-19 18:30:50 +0000
+
+    add empty methods 
+
+  Change: 4daf7651ac416586d438a74e28306a9bae9e4176
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-19 18:27:09 +0000
+
+    add README.md 
+
+  Change: 0e1d88907926da1c01776caf9b89e3fd3d9128e6
+  Author: sng2c <sng2nara@gmail.com>
+  Date : 2013-06-19 18:22:50 +0000
+
+    init 
+
+================
+End of releases.
+================

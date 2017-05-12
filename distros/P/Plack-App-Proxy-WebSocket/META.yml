@@ -1,0 +1,32 @@
+---
+abstract: 'proxy HTTP and WebSocket connections'
+author:
+  - 'Charles McGarvey <ccm@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-App-Proxy-WebSocket
+requires:
+  AnyEvent::Handle: 0
+  AnyEvent::Socket: 0
+  HTTP::Headers: 0
+  HTTP::Parser::XS: 0
+  HTTP::Request: 0
+  Plack::App::Proxy: 0
+  Plack::Request: 0
+  URI: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/chazmcgarvey/p5-Plack-App-Proxy-WebSocket/issues
+  homepage: http://search.cpan.org/~ccm/Plack-App-Proxy-WebSocket
+  repository: git://github.com/chazmcgarvey/p5-Plack-App-Proxy-WebSocket.git
+version: 0.03

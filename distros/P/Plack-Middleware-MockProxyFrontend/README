@@ -1,0 +1,47 @@
+Plack::Middleware::MockProxyFrontend
+
+This middleware implements the HTTP proxy protocol… without the proxy:
+it passes every request down to the wrapped PSGI application. Your
+application becomes the browser's entire internet: no matter which
+address you navigate to, the response comes from the wrapped PSGI
+application.
+
+This is useful in the development of PSGI applications that do virtual
+hosting, i.e. dispatching on hostname. Instead of testing your
+application by going to "http://localhost:5000/", you go to
+"https://example.com/" (or whatever your site is). Your application will
+see a request for "https://example.com/", not "http://localhost:5000/",
+e.g. when your framework generates absolute links. And then when the
+page loads, the browser will think it is showing you the real
+"https://example.com/", e.g. in the address bar.
+
+The way this works is that instead of typing "http://localhost:5000/"
+into the browser's address bar to test your app (or wherever your
+development server is listening), you put "localhost:5000" as the
+HTTP/HTTPS proxy in the browser's configuration. Then *any* URL you
+navigate to will end up being served by your application, so e.g.
+absolute links to "https://example.com/" will just work.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

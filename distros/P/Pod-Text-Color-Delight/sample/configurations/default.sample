@@ -1,0 +1,38 @@
++{
+    head1  => 'bright_cyan',
+    head2  => 'reset bold',
+    head3  => '',
+    head4  => '',
+    bold   => 'reset bold',
+    file   => 'bright_green',
+    italic => 'reset italic',
+    link   => 'rgb045',
+    code   => {
+        Character         => 'cyan',
+        String            => 'rgb542',
+        Quote             => 'rgb542',
+        Label             => 'rgb542',
+
+        Builtin_Function  => 'bright_red',
+        Builtin_Operator  => 'bright_red',
+
+        Keyword           => 'bright_red',
+        Package           => 'rgb345',
+
+        Subroutine        => 'rgb454',
+        Bareword          => 'white',
+        Symbol            => 'white',
+        Operator          => 'white',
+        Number            => 'white',
+
+        Variable_Hash     => 'rgb520',
+        Variable_Array    => 'rgb520',
+        Variable_Scalar   => 'rgb520',
+        Variable_Typeglob => 'rgb520',
+
+        Comment_Normal    => 'grey10',
+        Comment_POD       => 'grey10',
+        DATA              => 'grey10',
+        Directive         => 'bright_green',
+    },
+};

@@ -1,0 +1,76 @@
+Revision history for Perl extension Perl::APIReference.
+
+0.22  Wed Dec 30 15:00:00 2015
+  - Perl 5.22.1 support.
+
+0.21  Wed Sep  2 18:00:00 2015
+  - Use compressed Sereal for encoding instead of Data::Dumper.
+    Reduces the disk footprint after installation by 4x.
+    The compressed tarball on the other hand is marginally bigger
+    because it means that we double-zlib compress the data.
+
+0.20  Wed Sep  2 14:40:00 2015
+  - Perl 5.22.0 support.
+
+0.19  Wed Feb 18 23:00:00 2015
+  - Perl 5.20.2 support.
+
+0.18  Fri Sep 19 09:00:00 2014
+  - Perl 5.20.1 support.
+
+0.17  Tue Jun 17 08:00:00 2014
+  - Perl 5.20.0 support.
+
+0.16  Sun Jan 12 15:15:00 2014
+  - Perl 5.18.2 support.
+
+0.15  Tue Aug 27 07:09:00 2013
+  - Perl 5.18.1 support.
+
+0.14  Mon Jun 10 08:00:00 2013
+  - Perl 5.18.0 support.
+
+0.13  Thu Nov 11 11:00:00 2012
+  - Fixes for some previous perl versions (Randall Sawyer)
+  - Support for perlapi of 5.16.3 and 5.14.4.
+  - Dropped support for 5.15.*.
+
+0.12  Sun Nov 11 11:00:00 2012
+  - Support for perlapi of 5.12.5.
+
+0.11  Fri Nov 02 07:00:00 2012
+  - Support for perlapi of 5.16.2.
+
+0.10  Mon Oct 29 13:00:00 2012
+  - Support for perlapi of 5.14.3, 5.16.0, 5.16.1.
+  - Dropped support for 5.15.1.
+
+0.09  Tue Nov  1 08:24:00 2011
+  - Fix previous (broken) release.
+
+0.08  Mon Oct 31 07:59:00 2011
+  - Support for perlapi of 5.14.2, 5.15.4
+
+0.07  Wed Jul 20 23:44 2011
+  - Support for perlapi of 5.14.1, 5.15.1, 5.12.4
+  - Dropped support for 5.13.10
+
+0.06  Sun Jun  5 20:12:00 2011
+  - Support for perlapi of 5.14.0
+  - Dropped support for 5.11 series
+
+0.05  Sun Feb 27 17:00:00 2011
+  - Support for perlapi of 5.12.1, 5.12.2, 5.12.3, 5.13.10.
+
+0.04  Sun Apr 18 20:00:00 2010
+  - Support for perlapi of 5.12.0.
+
+0.03  Fri Nov 20 19:00:00 2009
+  - Support for all perlapi's of stable releases back to 5.6.0.
+  - Support for all perlapi's of 5.11.0-2 development releases.
+  - Offer api to get the perlapi of the most recent stable/devel release.
+  - Do not erroneously require a recent perl.
+
+0.01  Fri Nov 13 19:00 2009
+  - original version
+

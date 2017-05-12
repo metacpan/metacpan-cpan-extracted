@@ -1,0 +1,98 @@
+#!/usr/bin/perl -w
+use strict;
+
+# Copyright (c) 2002 Byron C. Darrah.  All rights reserved. This program
+# is free software; you can redistribute it and/or modify it under the
+# same terms as Perl itself. 
+
+
+###############################################################################
+###                              MODULES                                    ###
+###############################################################################
+
+use Proc::ParallelLoop;
+
+###############################################################################
+###                          GLOBAL VARIABLES                               ###
+###############################################################################
+
+use vars qw($ArgName $Commands $Max_Workers);
+$ArgName  = "parvar";
+$Commands = "-";
+$Max_Workers=$Proc::ParallelLoop::DEFAULT_MAX_WORKERS;
+
+###############################################################################
+###                       SUBROUTINE DECLARATIONS                           ###
+###############################################################################
+
+sub parse_args(\@);
+
+# It's nice to have a top-level "main" function like in C/C++.
+sub main(\@);
+main(@ARGV);
+exit 0;
+
+###############################################################################
+###                             SUBROUTINES                                 ###
+###############################################################################
+
+sub main(\@) {
+   my $s;
+
+   parse_args(@_);
+   if ($Commands eq "-") {
+       $/ = undef;
+       $Commands = <STDIN>;
+       $/ = "\n";
+   }
+   my @status = pareach [ @ARGV ], sub {
+                   $ENV{"$ArgName"} = shift;
+                   system($Commands);
+                }, {"Max_Workers"=>$Max_Workers} ;
+
+   while (@status > 0) {
+     $s = shift @status;
+     if ( $s != 0 ) { exit $s }
+   }
+}
+
+###############################################################################
+
+sub parse_args(\@) {
+    use Getopt::Long;
+    my ($help, $maxprocs, $commands, $varname);
+
+    GetOptions("help"        => \$help,
+               "var=s"       => \$varname,
+               "command=s"   => \$commands,
+               "maxprocs=i"  => \$maxprocs);
+
+    if(defined $help) {
+       print "Usage: pardo [-v variable_name] [-c command_string] " .
+             " [-m max_processes] arg ...\n\n" .
+             "Reads sh commands (from standard input if no -c option given)\n" .
+             "and executes them once for each arg, setting an environment\n" .
+             "variable to the current arg for each run.  If -v is not given\n" .
+             "then \"parvar\" is used.  Execution of commands for each arg\n" .
+             "occurs in parallel processes. -m may be used to specify the\n" .
+             "maximum number of child processes to have spawned at a time\n" .
+             "(default is " . $Max_Workers . ").  Returns 0 status if all " .
+             "children return 0.\n" .
+             "Otherwise, returns the nonzero status of the first child to\n" .
+             "do likewise.\n\n";
+       exit;
+    }
+    if(defined $varname) {
+       $ArgName = $varname;
+    }
+    if(defined $commands) {
+       $Commands = $commands;
+    }
+    if(defined $maxprocs) {
+       $Max_Workers = $maxprocs;
+    }
+
+}
+
+###############################################################################
+# EOF: pardo

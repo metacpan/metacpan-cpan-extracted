@@ -1,0 +1,493 @@
+use strict;
+
+my $infile  = shift || die "You have to give a pdf-file as an argument, aborts\n";
+my $outfile = shift;
+my $valFile;
+
+my ($line, @lines, $yes, $xCounter, $yCounter, %xPos, %yPos, $declare,
+    $stream, $xMin, $yMin, $colors, %color, $xMax, $yMax, $long, @words,
+    $packName, %extObj, $xObject, $var, %initValues, %seen, $string, @seq);
+
+my $round = 1;
+
+##############################
+# Counters for PDF operators
+##############################
+ 
+my %graphOp = (c   => 0,
+               cm  => 0,
+               CS  => 0,
+               cs  => 0,
+               d   => 0,
+               Do  => 0,
+               G   => 0,
+               g   => 0,
+               gs  => 0,
+               i   => 0,
+               j   => 0,
+               J   => 0,
+               k   => 0,
+               K   => 0,
+               l   => 0,
+               m   => 0,
+               M   => 0,
+               re  => 0,
+               rg  => 0, 
+               RG  => 0,
+               sc  => 0,
+               SC  => 0,
+               scn => 0,
+               SCN => 0,
+               sh  => 0,
+               Tf  => 0,
+               Tm  => 0,
+               Tj  => 0,
+               y   => 0,
+               v   => 0,
+               w   => 0);
+
+#####################################
+# Descriptions of PDF operators
+#####################################
+ 
+my %descr = (c   => 'curv',
+             cm  => 'matrix',
+             CS  => 'strokeColSpace',
+             cs  => 'fillColSpace',
+             d   => 'dash',
+             Do  => 'invoke',
+             G   => 'greyStroke',
+             g   => 'greyFill',
+             gs  => 'graphState',
+             i   => 'flatness',
+             j   => 'join',
+             J   => 'cap',
+             k   => 'fillCMYK',
+             K   => 'strokeCMYK',
+             l   => 'line',
+             m   => 'moveTo',
+             M   => 'miter',
+             re  => 'rectangle',
+             rg  => 'fillRGB', 
+             RG  => 'strokeRGB',
+             sc  => 'fillCol',
+             SC  => 'strokeCol',
+             scn => 'fillICC',
+             SCN => 'strokeICC',
+             sh  => 'shade',
+             Tf  => 'font',
+             Tm  => 'tMatrix',
+             Tj  => 'text',
+             Tr  => 'textRender',
+             y   => 'curvFrom',
+             v   => 'curvTo',
+             w   => 'lineWidth');
+
+
+
+if ($outfile =~ m'(\w+)\.*.*'o)
+{  $packName = $1;
+   $valFile  = $1 . '.dat';
+}
+else
+{  if ($infile =~ m'(\w+)\.*.*'o)
+   {   $packName = $1;
+       $outfile  = $1 . '.pm';
+       $valFile  = $1 . '.dat';
+   }
+   else
+   {   $packName = 'shape';
+       $outfile  = 'shape.pm';
+       $valFile  = 'shape.dat';
+   }
+}
+open (infile, "<$infile") || die "Couldn't open $infile, aborts, $!";
+open (VALFILE, ">$valFile") || die "Couldn't open $valFile, aborts, $!";
+
+          
+while ($line = <infile>)
+{  if ($yes)
+   {   if ($line =~ m'\bendstream\b'o)
+       {  last;
+       }
+       else
+       {   
+           $long .= $line;
+       }
+   }
+   elsif ($line =~ m'\bstream\b'o)
+   {  $yes = 1;
+   }
+} 
+close infile;
+
+
+@words = split(/\s+/,$long);
+undef $line;
+
+for my $word (@words)
+{  if (($word =~ m'^[a-zA-Z\*]+$'o)
+   ||  ($word =~ m'.+\)Tj'o)
+   ||  ($word =~ m'.+\]TJ'o))
+   {  $line .= $word;
+      push @lines, $line;
+      undef $line;
+   }
+   else
+   {  $line .= "$word ";
+   }
+}
+
+######################
+#  Process the lines
+######################
+
+$stream = 'sub init' . "\n" .
+          '{   my $self = shift;' . "\n" .
+          '    my @array;' . "\n";
+
+for $line (@lines)
+{   chomp($line);
+    my ($x1, $x2, $x3, $y1, $y2, $y3, $extFound, $name, @list);
+    if ($line =~ m'^([\d\.\-]+)\s+([\d\.\-]+)\s+([ml])\s*$'o)
+    {  $x1 = examineX($1);
+       $y1 = examineY($2);
+       $graphOp{$3}++;
+       $name = $descr{$3} . $graphOp{$3};
+       print VALFILE "$name => '$x1 $y1',\n";
+       $stream .= '   $self->{\'' . $name . '\'} = ' . "'$x1 $y1';\n";
+       @list = ($name, $3);
+          
+    }
+    elsif ($line =~ m'^([\d\.\-]+)\s+([\d\.\-]+)\s+([\d\.\-]+)\s+([\d\.\-]+)\s+([vy])$'o)
+    {  $x1 = examineX($1);
+       $y1 = examineY($2);
+       $x2 = examineX($3);
+       $y2 = examineY($4);
+       $graphOp{$5}++;
+       $name = $descr{$5} . $graphOp{$5};
+       print VALFILE "$name => '$x1 $y1 $x2 $y2',\n";
+       $stream .= '   $self->{\'' . $name . '\'} = ' . "'$x1 $y1 $x2 $y2';\n";
+       @list = ($name, $5);
+    }
+    elsif ($line =~ m'^([\d\.\-]+)\s+([\d\.\-]+)\s+([\d\.\-]+)\s+([\d\.\-]+)\s+([\d\.\-]+)\s+([\d\.\-]+)\s+c\s*$'o)
+    {  $x1 = examineX($1);
+       $y1 = examineY($2);
+       $x2 = examineX($3);
+       $y2 = examineY($4);
+       $x3 = examineX($5);
+       $y3 = examineY($6);
+       $graphOp{'c'}++;
+       $name = $descr{'c'} . $graphOp{'c'};
+       print VALFILE "$name => '$x1 $y1 $x2 $y2 $x3 $y3',\n";
+       $stream .= '   $self->{\'' . $name . '\'} = ' . "'$x1 $y1 $x2 $y2 $x3 $y3';\n";
+       @list = ($name, 'c');
+    }
+    elsif ($line =~ m'^([\d\.\-]+)\s+([\d\.\-]+)\s+([\d\.\-]+)\s+([\d\.\-]+)\s+re$'o)
+    {  $x1 = examineX($1);
+       $y1 = examineY($2);
+       $graphOp{'re'}++;
+       $name = $descr{'re'} . $graphOp{'re'}; 
+       print VALFILE "$name => '$x1 $y1 $3 $4',\n";
+       $stream .= '   $self->{\'' . $name . '\'} = ' . "'$x1 $y1 $3 $4';\n";
+       @list = ($name, 're');
+    }
+    elsif ($line =~ m'^([\d\.\-]+)\s+([\d\.\-]+)\s+([\d\.\-]+)\s+([\d\.\-]+)\s+([\d\.\-]+)\s+([\d\.\-]+)\s+Tm\s*$'o)
+    {  $x1 = examineX($5);
+       $y1 = examineY($6);
+       $graphOp{'Tm'}++;
+       $name = $descr{'Tm'} . $graphOp{'Tm'};
+       print VALFILE "$name => '$1 $2 $3 $4 $x1 $y1',\n";
+       $stream .= '   $self->{\'' . $name . '\'} = ' . "'$1 $2 $3 $4 $x1 $y1';\n";
+       @list = ($name, 'Tm');
+    }
+    elsif ($line =~ m'\((.*)\)\s*Tj'o)
+    {   $name = entry($1, 'Tj');
+        $stream .=  '   $self->{\'' . $name . '\'} = ' . "'$1';\n";
+        @list = ($name, 'Tj');
+
+    }
+    elsif ($line =~ m'^/(.+)\s+(\w+)$'o)
+    {   if ($2 eq 'ri')
+        {  @list = ('x', $line);
+        }
+        else
+        {  my $op  = $2;
+           my $obj = $1;
+           my $num;
+           if ($obj =~ m'(\w+)\s+(\d+)'o)
+           {  $obj = $1;
+              $num = $2;
+           }
+           $name = entry($obj, $op);
+           $extObj{$name} = { oldName => $obj,
+                              file    => $infile,
+                              page    => 1,
+                              type    => $op};
+           @list = ($name," $num $op");
+        }
+    }
+    else 
+    {   if ($line =~ m'^(.+)\s+(\w+)$'o)
+        {  if (exists $graphOp{$2})
+           {  $name    = entry($1, $2);
+              $stream .=  '   $self->{\'' . $name . '\'} = ' . "'$1';\n";
+              @list = ($name, $2);           
+           }
+           else
+           {  @list = ('x', $line);
+           }
+        }
+        else
+        {  @list = ('x', $line);
+        }
+    }
+    push @seq, ["'$list[0]'", "'$list[1]'"];
+}
+
+my $i = 0;
+for my $rad (@seq)
+{   # $stream .=  '   $self->{\'sequence\'}->[' . $i . '] = [' . $rad->[0] .
+    #            ',' . $rad->[1] . "];\n";
+    $stream .= '   push @array, ['. $rad->[0] .  ',' . $rad->[1] . "];\n";
+
+    print VALFILE "$i => \[$rad->[0], $rad->[1]\],\n";
+    $i++;
+}
+
+$stream .= '   $self->{\'sequence\'} = \\@array;' . "\n" .
+           '   1;' . "\n" .
+           '}' . "\n\n";
+
+
+$declare = "package $packName;\n" .
+           'require PDF::Reuse;' . "\n" .
+           'use strict;' . "\n\n";
+
+$xMax -= $xMin;
+$yMax -= $yMin;
+ 
+$declare .= "sub new\n" .
+            '{  my $class = shift;' . "\n" .
+            '   my $model = shift;' . "\n" .
+            '   my $self  = {};' . "\n" .
+            '   bless $self, $class;' . "\n" .
+            '   $self->{\'x\'}      = 0;' . "\n" .
+            '   $self->{\'y\'}      = 0;' . "\n" .
+            '   $self->{\'rotate\'} = 0;' . "\n" .
+            '   $self->{\'skewX\'}  = 0;' . "\n" .
+            '   $self->{\'skewY\'}  = 0;' . "\n" .
+            '   $self->{\'minX\'}   = 0;' . "\n" .
+            '   $self->{\'minY\'}   = 0;' . "\n" .
+            '   $self->{\'maxX\'}   = ' . $xMax . ";\n" .
+            '   $self->{\'maxY\'}   = ' . $yMax . ";\n" .
+            '   $self->init();' . "\n";
+
+if (scalar %extObj)
+{   
+    for my $key (keys %extObj)
+    {   $declare .= '   $self->{\'' . "$key'}->{'oldName'} = '$extObj{$key}->{'oldName'}';\n" .    
+                    '   $self->{\'' . "$key'}->{'file'}  = '$extObj{$key}->{'file'}';\n" .
+                    '   $self->{\'' . "$key'}->{'page'}  = $extObj{$key}->{'page'};\n";
+    }
+    
+}
+$declare .= '   if (defined $model)' . "\n" .
+            '   {   for (keys %$model)' . "\n" .
+            '       {   $self->{$_} = $model->{$_};' . "\n" .
+            '       }' . "\n" .
+            '   }' . "\n" .
+            '   return $self;' . "\n" .
+            '}' . "\n\n";
+                
+
+$declare .= "sub draw\n" .
+            '{  my $self  = shift;' . "\n" .
+            '   my %param = @_;' . "\n" .
+            '   for (keys %param)' . "\n" .
+            '   {   if ($_ =~ m/^\d+$/o)' . "\n" .
+            '       {   $self->{\'sequence\'}->[$_] = $param{$_}; }' . "\n" .
+            '       else' . "\n" .
+            '       {   $self->{$_} = $param{$_}; }' . "\n" .
+            '   }' . "\n" .
+            '   my ($str, $xSize, $ySize);' . "\n" .
+            '   my $x = $self->{\'x\'} - ' . $xMin . ";\n" .
+            '   my $y = $self->{\'y\'} - ' . $yMin . ";\n";
+if (scalar %extObj)
+{   $declare .= '   $self->resources();' . "\n";
+}
+$declare .= '   $self->{\'xSize\'} = 1 unless ($self->{\'xSize\'} != 0);' . "\n"; 
+$declare .= '   $self->{\'ySize\'} = 1 unless ($self->{\'ySize\'} != 0);' . "\n";
+$declare .= '   $self->{\'size\'}  = 1 unless ($self->{\'size\'}  != 0);' . "\n";
+
+$declare .= '   $xSize = $self->{\'xSize\'} * $self->{\'size\'};' . "\n"; 
+$declare .= '   $ySize = $self->{\'ySize\'} * $self->{\'size\'};' . "\n";
+$declare .= '   $str .= "q\n";' . "\n" .
+            '   $str .= ' . '"$xSize 0 0 $ySize $x $y cm\n";' . "\n";
+$declare .= '   if ($self->{\'rotate\'} != 0)' . "\n" .
+            '   {   my $radian = sprintf("%.6f", $self->{\'rotate\'} / 57.296);' . "\n" .
+            '       my $Cos    = sprintf("%.6f", cos($radian));' . "\n" .
+            '       my $Sin    = sprintf("%.6f", sin($radian));' . "\n" .
+            '       my $negSin = $Sin * -1;'    . "\n" .
+            '       $str .= "$Cos $Sin $negSin $Cos 0 0 cm\n";' . "\n" .
+            '   }' . "\n";
+$declare .= '   if (($self->{\'skewX\'} != 0) || ($self->{\'skewY\'} != 0))' . "\n" .
+            '   {   my $tanX = tan($self->{\'skewX\'});' . "\n" .
+            '       my $tanY = tan($self->{\'skewY\'});' . "\n" .
+            '       my $negTanY = $tanY * -1;' . "\n" .
+            '       $str .= ' . '"1 $tanX $negTanY 1 0 0 cm\n";' . "\n" .
+            '   }' . "\n" .
+            '   my @array = @{$self->{\'sequence\'}};' . "\n";
+$declare .= '   for my $rad (@array)' . "\n" .
+            '   {   if ($rad->[0] eq \'x\')' . "\n" .
+            '       {   if ($rad->[1] ne \' \')' . "\n" .
+            '           {   $str .= "$rad->[1]\n";' . "\n" .
+            '           }' . "\n" .
+            '       }' . "\n" .
+            '       elsif (defined $rad->[1])' . "\n" .
+            '       {   $str .= "$self->{$rad->[0]} $rad->[1]\n"; }' . "\n" .
+            '    }' . "\n" .
+            '    $str .= "Q\n";' . "\n";
+$declare .= '    PDF::Reuse::prAdd($str);' . "\n" .
+            '}' . "\n\n";
+
+
+open (outfile, ">$outfile") || die "Couldn't open $outfile, aborts $!\n";
+
+syswrite outfile, $declare; 
+syswrite outfile, $stream;
+
+$stream = "sub resources\n" .
+          '{  my $self = shift;' . "\n" .
+          '   my $answer;' . "\n";
+for my $key (keys %extObj)
+{   if ($extObj{$key}->{'type'} eq 'Tf')     # A font
+    {   $stream .= '   if (exists $self->{\'font\'})' . "\n" .
+                   '   {   $self->{\'' . "$key\'\}->{'newName'} = PDF::Reuse::prFont("
+                                     . '$self->{\'' . "font'});\n" .
+                   '   }' . "\n" .    
+                   '   else' . "\n" .
+                   '   {   $answer = PDF::Reuse::prExtract(' .
+                                     '$self->{\'' . "$key\'\}->{'oldName'}," .
+                                     '$self->{\'' . "$key\'\}->{'file'}," .
+                                     '$self->{\'' . "$key\'\}->{'page'});\n" .
+                   '       if ($answer)' . "\n" .
+                   '       {   $self->{\'' . "$key\'\}->{'newName'} = " . '$answer;' . "\n" .
+                   "       }\n" .
+                   "       else\n" .
+                   '       {   $self->{\'font\'} = \'H\';' . "\n" .
+                   '           $self->{\'' . "$key\'\}->{'newName'} = PDF::Reuse::prFont('H');\n" . 
+                   "       }\n" .
+                   "    }\n";
+    }
+    elsif ($extObj{$key}->{'type'} eq 'gs')     # A graphical state dictionary
+    {   $stream .= '   if ((exists $self->{\'defaultGraphState\'})' . "\n" .
+                   '   ||  ($self->{\'' . "$key\'\}->{'newName'} eq 'Gs0'))\n" .
+                   '   {   $self->{\'' . "$key\'\}->{'newName'} = 'Gs0';\n" .
+                   '   }' . "\n" .    
+                   '   else' . "\n" .
+                   '   {   $answer = PDF::Reuse::prExtract(' .
+                                     '$self->{\'' . "$key\'\}->{'oldName'}," .
+                                     '$self->{\'' . "$key\'\}->{'file'}," .
+                                     '$self->{\'' . "$key\'\}->{'page'});\n" .
+                   '       if ($answer)' . "\n" .
+                   '       {   $self->{\'' . "$key\'\}->{'newName'} = " . '$answer;' . "\n" .
+                   "       }\n" .
+                   "       else\n" .
+                   '       {   $self->{\'' . "$key\'\}->{'newName'} = 'Gs0';\n" . 
+                   "       }\n" .
+                   "    }\n";
+    }
+    else
+    {   $stream .= '   $answer = PDF::Reuse::prExtract(' .
+                                     '$self->{\'' . "$key\'\}->{'oldName'}," .
+                                     '$self->{\'' . "$key\'\}->{'file'}," .
+                                     '$self->{\'' . "$key\'\}->{'page'});\n" .
+                   '   if ($answer)' . "\n" .
+                   '   {   $self->{\'' . "$key\'\}->{'newName'} = " . '$answer;' . "\n" .
+                   "   }\n" .
+                   "   else\n" .
+                   '   {   die "Couldn\'t find $self->{\'' . "$key'}->{'oldName'}," .
+                               '$self->{\'' . "$key'}->{'file'}," .
+                               '$self->{\'' . "$key'}->{'page'}, aborts " . '"' . ";\n" .
+                   "   }\n";
+    }
+
+}
+  
+$stream .= '}' . "\n\n";
+
+$stream .= "sub originalDim\n" .
+           '{   my $self = shift;' . "\n" .
+           '    return ($self->{\'minX\'}, $self->{\'minY\'}, $self->{\'maxX\'}, $self->{\'maxY\'});' . "\n" .
+           '}' . "\n\n";
+
+$stream .= "sub tan\n" .
+           '{   my $tal = shift;' . "\n" .
+           '    return (sin($tal) / cos($tal));' . "\n" .
+           '}' . "\n\n";
+
+$stream .= "sub resourcesFrom\n" .
+           '{  my $self  = shift;' . "\n";
+$stream .= '   my $donor = shift;' . "\n" .
+           '   for (keys %$donor)' . "\n" .
+           '   {   if ((exists $self->{$_})' . "\n" .
+           '       && (ref($donor->{$_}) eq \'HASH\')' . "\n" .
+           '       && (defined $donor->{$_}->{\'newName\'})' . "\n" .
+           '       && (defined $donor->{$_}->{\'file\'})' . "\n" .
+           '       && (defined $donor->{$_}->{\'page\'}))' . "\n" .
+           '       {   $self->{$_} = $donor->{$_};' . "\n" .
+           '       }' . "\n" .
+           '   }' . "\n" .
+           '}' . "\n1;\n";
+
+syswrite outfile, $stream;
+
+close outfile;
+close VALFILE;
+
+
+sub examineX
+{   my $x = shift;
+    if (($x < $xMin) || (! defined $xMin))
+    {  $xMin = $x;
+    }
+    if ($round)
+    {  $x = sprintf("%.1f", $x);
+    } 
+    if ($x > $xMax)
+    {  $xMax = $x;
+    }
+    return $x;
+ 
+}
+
+sub examineY
+{   my $y = shift;
+    if (($y < $yMin) || (! defined $yMin))
+    {  $yMin = $y;
+    }
+    if ($round)
+    {  $y = sprintf("%.1f", $y);
+    } 
+    if ($y > $yMax)
+    {  $yMax = $y;
+    }
+    return $y;
+  
+}
+
+sub entry
+{  my $value       = shift;
+   my $operator    = shift;
+   my $combination = $operator . $value;
+   my $name;
+   if (! exists $seen{$combination})
+   {   my $name = $descr{$operator} . ++$graphOp{$operator};
+       $seen{$combination} = $name;
+       print VALFILE "$name => '$value',\n";
+   }
+   return $seen{$combination};
+}
+   
+       

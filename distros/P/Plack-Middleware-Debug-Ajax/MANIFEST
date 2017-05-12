@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.md
+dist.ini
+lib/Plack/Middleware/Debug/Ajax.pm
+sample/app.psgi
+t/01_use.t
+t/02_basic.t
+t/author-critic.t
+t/release-cpan-changes.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

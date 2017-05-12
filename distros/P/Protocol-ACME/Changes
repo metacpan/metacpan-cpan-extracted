@@ -1,0 +1,80 @@
+Revision history for Protocol-ACME
+
+1.01    Fri Oct 14
+        - Congratulations. Promoting to Version 1.00
+
+1.00    Mysteriously Skipped
+
+0.16    Wed Aug 10
+        - Catches json decode errors and bubbles them up
+        - Added the implicit SSL dependencies of HTTP::Tiny
+
+0.15    Mon Jul 6
+        - Changed tests so setting NO_NETWORK environment variable
+          will skip the network tests direct to Let's Encrypt
+        - Adjusted MANIFEST so that client.pl and revoke.pl will not
+          be installed (moved to examples directory)
+
+0.14    Mon Jul 6
+        - Typos in ACME.pm POD
+
+0.13    Mon Jul 6
+        - No changes of consequence
+
+0.12    Fri Apr 29
+        - Added cleanup routines to take care of removing the challenge files
+          when complete.
+        - Fixed a bug where the 'mailto' scheme was not added to the registraion
+          calls.
+        - Fixed bug with the order of execution of setgid and setuid
+        - Refactored logging clde
+        - Lowered dependency version 
+        - Typos
+
+0.11    Fri Jan 29
+        - Version bump to deal with a missing version in a number of files
+
+0.10    Thu Jan 28
+        - Added a 'chain' call
+        - Added the ability in set the mailto argument
+
+0.09    Tue Jan 19
+        - Made the log level configurable
+        - Added more tests
+        
+0.08_01 Mon Jan 18
+        - Added flexibility calls that take a PEM/DER string/filename
+        - Fixed various minor bugs
+        - Changes to the SimpleSSH challenge to create target directory as needed
+        - Updated docs
+        - deprecated load_key_from_disk
+        - changed the meaning of the account_key parameter lassed to the constructor
+        - removed the account_key_path paramater from the constructor
+
+0.08    Wed Jan 12
+        - Moved from LWP to HTTP::Tiny
+
+0.07    Mon Jan 10
+        - Moved pem2der, der2pem to external module
+
+0.06    Sun Jan  9
+        - Fixed REPOSITIRY section of POD
+
+0.05    Sat Jan  8
+        - More flexibility between using PEM and DER
+        - Keys can be passed in via buffer
+        
+0.04    Mon Jan  4 16:45:02 PST 2016
+        - Added ability to chose between using a local openssl binary
+          for crypto and Crypt::OpenSSL::RSA
+        - Changed from the deprecated Digest::SHA2 to Digest::SHA
+
+0.03    Added Revoke support
+
+0.02    Changes lost in the mists of time
+
+0.01    Tue Dec  8 17:01:36 PST 2015
+        Inital version
+
+        
+

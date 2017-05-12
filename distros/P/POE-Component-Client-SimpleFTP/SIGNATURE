@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 03271a2d52ee5b836aecab6c78081ef7ba0d9a1a AUTHOR_PLEDGE
+SHA1 5eac29c967aa25fd808bffa6c75daef57be4d2ba Build.PL
+SHA1 bade8f9a09e2cc4c388de5a6be22da7e799a853e Changes
+SHA1 22a9cba751f91009bdad2e0d455ccf7b538e213e CommitLog
+SHA1 d24d802ff62889381e55308d8ac328a427d131ee INSTALL
+SHA1 e6514e4bc5abd3d1a8c7bd2a782c2f8737b413e7 LICENSE
+SHA1 4ebb5004f2d73761342b8844938560151de10a88 MANIFEST
+SHA1 69b8a0accb85effa4bd5f4ea93e4f2386d10ac8b MANIFEST.SKIP
+SHA1 52439ac193166a01d70124c964ab36f712970e21 META.json
+SHA1 b8e3bcd3773d65d8070c702fc45e11781be5a4b2 META.yml
+SHA1 e925bc6f52d5e5175810f77735753a9b8605d015 Makefile.PL
+SHA1 635bb450c0cd114c21b6a71b874c87e43f62f071 README
+SHA1 0cca6a7125f3dc4da4e930a18c97e9072c3f7a9e cpanfile
+SHA1 fa544583afe3fa72e37bf80a1c4358052ee7c800 dist.ini
+SHA1 8f5b37ab256fdbcc08096fb65cf1e47abd0667c7 doap.xml
+SHA1 c8b45a99cd9567b185f22318b839ef70733a38b2 examples/feat.pl
+SHA1 9eba0c7487ea65802927503810fb2d3cda61d99d examples/get.pl
+SHA1 e2d58020f87c2bb5e53915c47a128bcf65ad3f6f examples/ls.pl
+SHA1 fccb42d4d15abf4a5575c1f3819283afb6bc3594 examples/put.pl
+SHA1 c95493193d528b75debcf6475bd180cf2095488f lib/POE/Component/Client/SimpleFTP.pm
+SHA1 6f6044ef7feb6254a3735fbe5e66679265e852fd lib/POE/Component/Client/SimpleFTP/Utils.pm
+SHA1 551a2df95448a30a403911967cb72665350cfaa3 t/00-compile.t
+SHA1 5c49ecd2bc81665ecee79d4663ce30a20077ba39 t/00-report-prereqs.dd
+SHA1 6a4cedc1b8e29a899411b51bdacc81d53b81e228 t/00-report-prereqs.t
+SHA1 76dabb34eeea1e05e12273b7a2c7dda323db0271 t/apocalypse.t
+SHA1 ef48e15bc37ac459638117324232de78522a9258 t/utils.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRZwoYACgkQGfr7vsGKgxy+6wCeIQDe/mqk9v8RK1n2+QsnWXa2
+JEIAnjXSVsd5f+cmTbyw11lB6BWgkqow
+=HWWC
+-----END PGP SIGNATURE-----

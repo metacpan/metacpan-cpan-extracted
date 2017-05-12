@@ -1,0 +1,6 @@
+Hi <? $name ?>,
+
+You are <? $age ?> years old.
+
+You were born in <? $birthpalce ?>.
+

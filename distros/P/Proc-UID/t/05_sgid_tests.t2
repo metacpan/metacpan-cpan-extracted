@@ -1,0 +1,60 @@
+#!/usr/bin/perl -wT
+use strict;
+use lib 'blib/lib';
+use lib 'blib/arch';
+
+# These tests are intended to be executed with set-gid privileges.
+
+use Test;
+BEGIN {
+	if ($> == 0) {
+		print "1..0 # Skipped, this file must not run as root.\n";
+		exit 0;
+	}
+	if ($( == $)) {
+		print "1..0 # Skipped, this file must run setgid.\n";
+		exit 0;
+	}
+	plan tests => 18;
+}
+
+use Proc::UID qw(
+	getegid getrgid getsgid $EGID $RGID $SGID
+	drop_gid_temp drop_gid_perm restore_gid
+);
+
+# Basic sanity checking.
+ok(1);	# Loaded module.
+ok($(==$RGID,1,'$( is not $RGID');
+ok($)==$EGID,1,'$) is not $EGID');
+ok($(==getrgid(),1,'$( and getrgid() disagree');
+ok($)==getegid(),1,'$) and getegid() disagree');
+ok($SGID,getegid(),'$SGID and getgid are not same at startup.');
+
+# Find a gid that we can't change to.
+my $bad_gid = 0;
+while ($bad_gid == $EGID or $bad_gid == $RGID or $bad_gid == $SGID) {
+	$bad_gid++;
+}
+
+# Let's try to change to a bad gid.
+eval {drop_gid_temp($bad_gid);};
+ok($@,qr/Could not/,"Appeared to drop privs to $bad_gid");
+
+# Drop privs temporarily.
+ok(eval {drop_gid_temp($RGID); "ok";},"ok","Could not drop GID temporarily.");
+ok($RGID,$EGID,"New GID not assumed");
+ok($EGID==$),1,'$) appears not to have been updated.');
+
+# Restore privs
+ok(eval {restore_gid(); "ok";},"ok","Could not restore GID");
+ok($EGID,$SGID,"Did not restore old GID.");
+ok($EGID==$),1,'$) appears not to have been updated.');
+
+# Drops privs permanently.
+ok(eval {drop_gid_perm($RGID); "ok";},"ok","Could not drop GID permanently.");
+ok($RGID,$SGID,"Real and saved GIDs do not match.");
+ok($RGID,$EGID,"Real and effective GIDs do not match.");
+ok($(==$RGID,1,'$( and $RGID disagree');
+ok($)==$EGID,1,'$) and $EGID disagree');
+

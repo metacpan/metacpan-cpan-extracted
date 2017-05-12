@@ -1,0 +1,69 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::IMAP::Fetch
+at lib/Protocol/IMAP/Fetch.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head2 data
+
+Returns a L<Future> which will resolve when the given
+item is available. Suitable for smaller data strucures
+such as the envelope. Not recommended for the full
+body of a message, unless you really want to load the
+entire message data into memory.
+
+=head2 stream
+
+This is what you would normally use for a message, although
+at the moment you can't, so don't.
+
+=over 4
+
+=item * L<Protocol::IMAP::Envelope> - represents the message envelope
+
+=item * L<Protocol::IMAP::Address> - represents an email address as found in the message envelope
+
+=back
+
+my $msg = $imap->fetch(message => 123);
+$msg->data('envelope')->on_done(sub {
+	my $envelope = shift;
+	say "Date: " . $envelope->date;
+	say "From: " . join ',', $envelope->from;
+	say "To:   " . join ',', $envelope->to;
+	say "CC:   " . join ',', $envelope->cc;
+	say "BCC:  " . join ',', $envelope->bcc;
+});
+
+Implementation:
+
+The untagged FETCH response causes instantiation of this class. We pass
+the fetch line as the initial buffer, set up the parser and run the first
+parse attempt.
+
+If we already have enough data to parse the FETCH response, then we relinquish
+control back to the client.
+
+If there's a {123} string literal, then we need to stream that amount of data:
+we request a new sink, primed with the data we have so far, with the byte count
+({123} value) as the limit, and allow it to pass us events until completion.
+
+In streaming mode, we'll pass those to event listeners.
+Otherwise, we'll store this data internally to the appropriate key.
+
+then switch back to line mode.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+

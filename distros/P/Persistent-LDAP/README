@@ -1,0 +1,82 @@
+Persistent::LDAP - A Persistent class implemented using a LDAP directory
+    by David Winters
+
+WHAT IS THIS?
+
+Persistent is a framework of classes that makes it easier to store and
+retrieve Perl objects from various types of data stores.  Using the
+common interface that all of these classes inherit, you can
+store/retrieve objects to/from various types of data stores such as
+text and DBM files, relational databases, LDAP directories and so on,
+all with the same programming interface.  This package contains a
+class that is implemented using a LDAP directory as the data store.
+
+HOW DO I INSTALL IT?
+
+Since this class inherits from the Persistent::Base class and the
+Net::LDAP package is required, the order of installation should be
+something like this:
+
+  1. Install Net::LDAP
+  2. Install Persistent::Base
+  3. Install Persistent::LDAP
+
+You can download these classes and all other Persistent
+classes/packages from CPAN.  You can also download the Persistent
+classes from the following web site:
+
+http://www.bigsnow.org/persistent/
+
+Install this package by doing the following:
+
+    perl Makefile.PL
+    make
+    vi LOGIN*  ### Edit this file with your directory login info. ###
+               ### This is used for the tests. ###
+    make test
+    make install
+
+(*) NOTE: If you have access to a directory server with the Netscape
+objects and attributes defined, you can run some additional tests if
+you'd like.  Just set the SkipTests flag to 'N' in the LOGIN file.
+
+If you want to install a private copy in your home directory, then use
+the PREFIX option when you generate the Makefile like this:
+
+    perl Makefile.PL PREFIX=~/perl_lib
+
+This package does require Perl 5.004 or later.
+
+WHERE IS THE DOCUMENTATION?
+
+You can find the documentation by typing "man Persistent::LDAP" or
+"perldoc Persistent::LDAP" after you have installed this software.
+If you're looking for online documentation, check out:
+
+http://www.bigsnow.org/persistent/
+
+You will probably also be interested in the general Persistent
+documentation that comes in the Persistent Base package.  This can be
+found by typing "man Persistent" or "perldoc Persistent" and is also
+available online at the above URL.
+
+WHERE ARE THE EXAMPLES?
+
+Complete working examples can be found in the "examples" directory
+that is included in this package.  For more examples, check out the
+web site mentioned above.
+
+WARNING!
+
+This software is definitely a work in progress.  (Though, it has been
+used in more than 10 real world applications.)  Because of this, the
+interface is definitely subject to change and bugs may be found.  We
+would definitely love to hear from you regarding bugs or general
+comments.  So please feel free to send mail to:
+
+winters@bigsnow.org
+
+Thanks, have fun, and let me know what you think!
+
+David Winters
+winters@bigsnow.org

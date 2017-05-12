@@ -1,0 +1,68 @@
+---
+abstract: 'Perl6 like method signature parser'
+author:
+  - 'Ash Berlin <ash@cpan.org>.'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  MooseX::Types::Structured: 0
+  Test::Differences: 0
+  Test::Exception: 0
+  Test::More: 0
+  aliased: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-Method-Signatures
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Parse::Method::Signatures:
+    file: lib/Parse/Method/Signatures.pm
+    version: '1.003019'
+  Parse::Method::Signatures::Param:
+    file: lib/Parse/Method/Signatures/Param.pm
+  Parse::Method::Signatures::Param::Bindable:
+    file: lib/Parse/Method/Signatures/Param/Bindable.pm
+  Parse::Method::Signatures::Param::Named:
+    file: lib/Parse/Method/Signatures/Param/Named.pm
+  Parse::Method::Signatures::Param::Placeholder:
+    file: lib/Parse/Method/Signatures/Param/Placeholder.pm
+  Parse::Method::Signatures::Param::Positional:
+    file: lib/Parse/Method/Signatures/Param/Positional.pm
+  Parse::Method::Signatures::Param::Unpacked:
+    file: lib/Parse/Method/Signatures/Param/Unpacked.pm
+  Parse::Method::Signatures::Param::Unpacked::Array:
+    file: lib/Parse/Method/Signatures/Param/Unpacked/Array.pm
+  Parse::Method::Signatures::Param::Unpacked::Hash:
+    file: lib/Parse/Method/Signatures/Param/Unpacked/Hash.pm
+  Parse::Method::Signatures::ParamCollection:
+    file: lib/Parse/Method/Signatures/ParamCollection.pm
+  Parse::Method::Signatures::Sig:
+    file: lib/Parse/Method/Signatures/Sig.pm
+  Parse::Method::Signatures::TypeConstraint:
+    file: lib/Parse/Method/Signatures/TypeConstraint.pm
+  Parse::Method::Signatures::Types:
+    file: lib/Parse/Method/Signatures/Types.pm
+requires:
+  Class::Load: '0.19'
+  List::MoreUtils: '0.20'
+  Moose: 0
+  MooseX::Traits: '0.06'
+  MooseX::Types: '0.17'
+  MooseX::Types::Moose: 0
+  MooseX::Types::Structured: 0
+  PPI: '1.203'
+  namespace::clean: '0.10'
+resources:
+  homepage: http://github.com/ashb/Parse-Method-Signatures/tree/master
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/ashb/Parse-Method-Signatures.git
+version: '1.003019'

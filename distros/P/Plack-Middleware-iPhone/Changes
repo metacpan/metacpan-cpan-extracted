@@ -1,0 +1,18 @@
+Revision history for Plack-Middleware-iPhone
+
+1.102060  2010-07-25 16:42:06 America/New_York
+    Fixed up HTML::Tidy dependency
+
+1.101110  2010-04-21 16:41:37 EST5EDT
+    Made HTML::Tidy an optional dependency
+
+1.100830  2010-03-24 15:08:11 EST5EDT
+    Switched to Dist::Zilla
+
+0.02	2010-03-23
+	Manifest generation moved to middleware constructor
+	Now handles streaming apps (like Plack:App::Proxy)
+	
+0.01    2010-03-22
+    First version, released on an unsuspecting world.
+

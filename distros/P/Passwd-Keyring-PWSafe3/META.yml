@@ -1,0 +1,44 @@
+---
+abstract: 'Password storage based on Password Safe encrypted files'
+author:
+  - 'Marcin Kasperski <Marcin.Kasperski@mekk.waw.pl>'
+build_requires:
+  Module::Build: '0.36'
+  Pod::Readme: '0'
+  Test::More: '0'
+  Test::Pod::Coverage: '1.0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+keywords:
+  - passwords
+  - security
+  - secure-storage
+  - keyring
+  - KDE
+  - PWSafe3
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Passwd-Keyring-PWSafe3
+provides:
+  Passwd::Keyring::PWSafe3:
+    file: lib/Passwd/Keyring/PWSafe3.pm
+    version: '0.61'
+recommends:
+  Math::Random::ISAAC::XS: '0'
+requires:
+  Bytes::Random::Secure: '0.09'
+  Crypt::PWSafe3: '1.15'
+  File::HomeDir: '0'
+  File::ShareDir: '1.00'
+  Term::ReadKey: '0'
+  perl: '5.009002'
+resources:
+  bugtracker: https://bitbucket.org/Mekk/perl-keyring-pwsafe3/issues
+  homepage: http://bitbucket.org/Mekk/perl-keyring-pwsafe3
+  license: http://dev.perl.org/licenses/
+  repository: http://bitbucket.org/Mekk/perl-keyring-pwsafe3
+version: '0.61'

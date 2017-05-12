@@ -1,0 +1,99 @@
+/**
+ * CSS for daia.xsl.
+ */
+
+/* general layout */
+body { font-family: sans-serif; font-size: small; }
+/* div { padding: 5px;} */
+h1 { margin: 0; font-size: 180%; }
+h1, h2 { font-weight: bold; }
+h2 { font-size: 140%; margin-bottom: 0; }
+
+a { text-decoration: none; color: #0000ff; }
+a:hover { text-decoration: underline; }
+
+#footer { margin-top: 1em; background: #EEE; border-top: 1px solid #DDD; }
+#rawxml { margin-top: 1em; padding: 0.5em; }
+
+/* copy table */
+table { border: none; border-spacing: 0px; }
+th { background: #E4E4E4; color: #000; padding: 3px; padding-left: 5px; }
+td,th { 
+  font-size: small;
+  border: none;
+  vertical-align:top; 
+  margin: 0px;
+}
+td {
+  border-bottom: 1px solid #D5D5D5;  
+  padding: 3px;
+}
+.newdepartment td { border-top: 2px solid #d5d5d5; }
+
+/* messages and errors */
+.messsage { background: #D9EDFF; margin: 1px; }
+.error    { background: #FFDBDB; margin: 1px; }
+.errno { color: red; font-weight: bold; }
+
+/* ids */
+.id { font-family: monospace; font-size: medium; }
+.invalid-id { color: #f00; }
+
+div.id { padding: 0; }
+
+/* status icons */
+.queue, .limitation, .time, .date { 
+    padding-left: 23px; line-height: 20px;
+    padding-right: 3px;
+    /*display: inline-block; */
+    display: block;
+}
+.available, .unavailable, .cur-unavail, .storage {
+    display: block;
+    padding-left: 18px;
+}
+
+/* delay or expected time */
+.time { background:transparent url(icons/clock_16.png) center left no-repeat; }
+.date { background:transparent url(icons/calendar_16.png) center left no-repeat; }
+
+.available { background:transparent url(icons/bullet_green.png) center left no-repeat; 
+  color: #009900;
+}
+.unavailable { background:transparent url(icons/bullet_red.png) center left no-repeat; 
+  color: #cc0000;
+}
+.cur-unavail { background:transparent url(icons/bullet_yellow.png) center left no-repeat; 
+  color: #cc9900;
+}
+
+.queue      { background:transparent url(icons/daia_queue_16.png) center left no-repeat; }
+.limitation { background:transparent url(icons/daia_limitation_16.png) center left no-repeat; }
+.storage    { background:transparent url(icons/daia_storage_16.png) center left no-repeat; }
+
+/* header icons */
+.document-icon, .item-icon, .location-icon, .loan-icon, 
+.presentation-icon, .openaccess-icon, .interloan-icon { padding-left: 20px;
+/*height:32px; width: 32px; */ text-align: left; padding-top: 0px;}
+
+.presentation-icon { background:transparent url(icons/daia_presentation_16.png) left top no-repeat; }
+.location-icon { background:transparent url(icons/home_16.png) left top no-repeat; }
+.loan-icon { background:transparent url(icons/daia_loan_16.png) left top no-repeat; }
+.interloan-icon { background:transparent url(icons/daia_interloan_16.png) left top no-repeat; }
+.document-icon { background:transparent url(icons/daia_document_16.png) left top no-repeat; }
+.item-icon { background:transparent url(icons/daia_item_16.png) left top no-repeat; }
+.openaccess-icon { background:transparent url(icons/daia_openaccess_16.png) left top no-repeat; }
+
+/* xmlverbatim */
+.xmlverb-default          { color: #333; font-family: monospace; 
+ font-size: medium; padding-left: 1em; border-left: 2px solid #D5D5D5; }
+.xmlverb-element-name     { color: #900 }
+.xmlverb-element-nsprefix { color: #660 }
+.xmlverb-attr-name        { color: #600 }
+.xmlverb-attr-content     { color: #009; font-weight: bold }
+.xmlverb-ns-name          { color: #660 }
+.xmlverb-ns-uri           { color: #309 }
+.xmlverb-text             { color: #000; font-weight: bold }
+.xmlverb-comment          { color: #060; font-style: italic }
+.xmlverb-pi-name          { color: #060; font-style: italic }
+.xmlverb-pi-content       { color: #066; font-style: italic }

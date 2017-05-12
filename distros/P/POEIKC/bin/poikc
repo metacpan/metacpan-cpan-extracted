@@ -1,0 +1,338 @@
+#!/usr/local/bin/perl
+
+use strict;
+use 5.008_001;
+
+use warnings;
+use Data::Dumper;
+use Getopt::Long;
+use Pod::Usage;
+use UNIVERSAL::require;
+use Class::Inspector;
+#use Sys::Hostname ();
+
+my $options;
+my $DEBUG;
+
+BEGIN {
+	$options={};
+	$Getopt::Long::ignorecase=0;
+	GetOptions ($options, qw/
+		HOST=s 
+		port=i 
+		alias=s
+		state_name|state=s
+		INC|inc:s@
+		inc_=s
+		Utility=s
+		debug
+		Display
+		Term
+		help
+		output|out=s
+		/);
+	if (exists $options->{debug}) {
+		lib->use('lib');
+		local $Data::Dumper::Terse    = 1; 
+		local $Data::Dumper::Sortkeys = 1; 
+		local $Data::Dumper::Indent   = 1; 
+		print('@INC => '. Dumper(\@INC));
+		print('%INC => '. Dumper(\%INC));
+	}
+}
+
+
+
+
+POEIKC::Client->use or die $@ ;
+
+	if (exists $options->{debug}) {
+		local $Data::Dumper::Terse    = 1; 
+		local $Data::Dumper::Sortkeys = 1; 
+		local $Data::Dumper::Indent   = 1; 
+		POEIKC::Client::_DEBUG_log('@INC => ',\@INC);
+		POEIKC::Client::_DEBUG_log('%INC => ', Dumper \%INC);
+	}
+
+if ( exists $options->{Term} ) {
+	$options->{HOST} ||= 'localhost';
+	$options->{port} ||= 47225;
+	$options->{alias} ||= 'POEIKCd';
+	my $client = POEIKC::Client->new(
+		HOST	=>$options->{HOST}, 
+		port	=>$options->{port},
+		alias	=>$options->{alias},
+	);
+
+	use Term::ReadLine;
+	Term::ReadLine::Gnu->use;
+	use Text::ParseWords ();
+	use Best [ [ qw/YAML::XS YAML::Syck YAML/ ], qw/LoadFile DumpFile/ ];
+
+	my $max_history = 100;
+	my $file_history = $ENV{HOME}.'/.poikc_history' if $ENV{HOME};
+
+	my $term = new Term::ReadLine 'POEIKC::Client';
+	my $format_prompt = "%s:%d %s> ";
+	my $prompt = sprintf $format_prompt, $options->{HOST}, $options->{port}, $options->{alias};
+	#my $OUT = $term->OUT || \*STDOUT;
+
+	if (Class::Inspector->loaded('Term::ReadLine::Gnu')){
+		$term->using_history;
+		$term->StifleHistory($max_history);
+		$term->ReadHistory($file_history) ;
+		my $attribs = $term->Attribs;
+		$attribs->{completion_entry_function} = $attribs->{list_completion_function};
+		$attribs->{completion_word} = [qw(
+				history
+				exit
+				quit
+				help
+				use
+				no
+			)];
+	}
+
+
+	eval {
+		my $module_use;
+
+		#	### pre_func, post_func vvvvvvvvvvvvvvvvvvvvvvvvv
+		#	sub pre_func { }
+		#	sub pre_func { }
+
+		while ( defined ($_ = $term->readline($prompt)) ) {
+			my $next_flag;
+			s/^\s+//;
+			s/\s+$//;
+
+			/^no\s+(\w+)/ and do {undef $module_use; ;$next_flag=1};
+			/^exit$|^quit$|^q$|^bye$/i and return;
+			/^-?help$|^-?h$|^-?\?$/i and do{pod2usage(-exitval  => 'NOEXIT', -verbose => 1);next};
+			/^history$/i and do{print join "\n"=>$term->GetHistory ,"\n";$next_flag=1} if (Class::Inspector->loaded('Term::ReadLine::Gnu'));
+			/^use$/i and do{$module_use and print($module_use, "\n");next};
+
+			@ARGV = Text::ParseWords::quotewords('\s+', 0, $_);
+
+			$options={};
+			$Getopt::Long::ignorecase=0;
+			GetOptions ($options, qw/
+				HOST=s 
+				port=i 
+				alias=s
+				state_name|state=s
+				INC|inc:s@
+				inc_=s
+				Utility=s
+				debug
+				Display
+				Term
+				help
+				output|out=s
+				/);
+			$options = {
+				HOST	=>$client->{HOST}, 
+				port	=>$client->{port},
+				alias	=>$client->{alias},
+				%{$options},
+			};
+			
+			if (/^use\s+(\S+)/) {
+				$module_use = $1;
+				$options->{Utility} = 'use';
+				$options->{state_name} = 'method_respond';
+				@ARGV=($module_use);
+			}
+
+
+			$client->{HOST}  = $options->{HOST}; 
+			$client->{port}  = $options->{port};
+			$client->{alias} = $options->{alias};
+
+			$prompt = sprintf $format_prompt, $options->{HOST}, $options->{port}, $options->{alias};
+
+			my ($state_name, $args) = $client->ikc_client_format($options, @ARGV) or print "\n";
+
+	if ($DEBUG or exists $options->{Display}) {
+		my $param = ref $args ? Dumper($args): $args;
+		$param =~ s/\s+//g;
+		$param =~ s/\$VAR1=//g;
+		$param =~ s/;//g;
+		printf "\n# \$ikc_client->post_respond( '%s' => %s );\n\n",$state_name => $param ;
+	}
+
+
+			if ($state_name and not($next_flag)) {
+				if ($args->[0] =~ /^::\w+/ or $args->[0] =~ /^\w+$/) {
+					$module_use or do{pod2usage(-exitval  => 'NOEXIT', -verbose => 1);next};
+					$args->[0] = '::'.$args->[0] if $args->[0] !~ /^::/;
+					$args->[0] = $module_use.$args->[0];
+				};
+				no warnings;
+				print $client->post_respond($options, $state_name, $args), "\n";
+				print "\n";
+			}
+
+			warn $@ if $@;
+			if (/\S/) {
+				$term->addhistory($_) ;
+				$term->WriteHistory($file_history) if (Class::Inspector->loaded('Term::ReadLine::Gnu'));
+			}
+		}
+	};
+	warn $@ if $@;
+
+}else{
+
+	my $client = POEIKC::Client->new();
+
+	my ($state_name, $args) = $client->ikc_client_format($options, @ARGV) or pod2usage(1);
+
+	#	$DEBUG and _DEBUG_log($state_name, $args);
+
+	if ($DEBUG or exists $options->{Display}){
+		my $param = ref $args ? Dumper($args): $args;
+		$param =~ s/\s+//g;
+		$param =~ s/\$VAR1=//g;
+		$param =~ s/;//g;
+		printf "\n# \$ikc_client->post_respond( '%s' => %s );\n\n",$state_name => $param ;
+	}
+
+	no warnings;
+	print $client->post_respond($options, $state_name, $args);
+}
+
+
+__END__
+
+=head1 NAME
+
+poikc - POE IKC (poeikcd) Client
+
+=head1 SYNOPSIS
+
+  poikc -H hostname [options] args...
+
+If you want to carry out the function of the module, do it like next.
+
+  poikc ModuleName::functionName  args...
+
+If you want to carry out a class method, do it like next.
+
+  poikc "ClassName->methodName"   args...
+
+If you want to carry out an event of the POE, do it like next.
+
+  poikc  AliasName eventName      args...
+
+Options:
+
+    -H  --HOST=s         : default 127.0.0.1 
+
+    -p  --port=#         : Port number to use for connection.
+                           default 47225 
+
+    -a  --alias=s        : session alias
+                           default POEIKCd 
+                           eg)
+                             -a=my_session_ailas
+
+    -s  --state_name=s   : state_name 
+                           (method_respond | function_respond | event_respond )
+                           eg) -s=m | -s=f | -s=e 
+                               -state_name=my_event_name
+
+    --Utility=s          : POEIKC::Daemon::Utility It is shortcut.
+                          eg) poikc -U=get_VERSION
+                          -U=get_stay, -U=get_load, -U=get_H_INC, -U=get_E_ENV
+                          
+
+    -o  --output|out=s   : output method 
+                          -o y | -output=YAML
+                          -o d | -output=Dumper   (Data::Dumper)
+
+    -Display             : The parameter given to post_respond is confirm.
+
+    -h  --help
+
+
+Command:
+
+Terminal
+
+    -T  -Term            : Terminal starting.
+
+            Terminal Command
+                history
+                     With  no  options,  display  the command history list.
+                use Module::Name
+                    eg) poikc -T
+                    localhost:47225 POEIKCd> use LWP::Simple
+                    localhost:47225 POEIKCd> ::get http://search.cpan.org/~suzuki/
+
+@INC Operation
+
+    -I  --INC=s          : specify @INC/#include directory
+                           eg1) -I ~/lib:/mylib/ or -I ~/lib -I /foo/lib/
+                           eg2) poikc -I '$ENV{HOME}/lib'
+
+    --inc_=delete ~/lib  : deletes from @INC.
+    --inc_=reset         : @INC is reset.
+
+  eg:
+    poikc  -I                     ( print Dumper \@INC )
+    poikc  -I ./t                 ( unshift @INC, './t' )
+    poikc --inc_=delete ./t       ( @INC = grep {$_ ne './t'} @INC )
+    poikc --inc_=reset
+
+pokikcd server shutdown
+
+    poikc -H=hostname shutdown 
+
+eg:
+
+    poikc -U=get_VERSION
+    poikc -U=eval 'scalar `ps aux`'
+    poikc Cwd::getcwd
+    poikc LWP::Simple::get  http://search.cpan.org/~suzuki/
+
+    poikc -o=d -U=publish_IKC my_alias_name my_package_name
+    poikc -o=d -U=publish_IKC my_alias_name _list event_1 event_2 ..
+
+    loop
+        # A loop is carried out 30 times.
+        poikc -D -U loop  30  Module::method args ..
+        # Carrying out a loop is continued.
+        poikc -D -U loop  Module::method args ..
+        poikc -D -U stop  Module::method args ..
+        poikc -D -U stop  Module::method end_method args ..
+    relay
+        poikc -D -U relay MyModule::relay_start args ..
+          package MyModule;
+          sub relay_start { my @args = @_; '# Some processings'; 
+                            return 'relay_1', @args1}
+          sub relay_1 { my @args1 = @_; '# Some processings'; 
+                            return 'relay_2', @args2;}
+          sub relay_2 { my @args2 = @_; ... }
+    chain
+       poikc -D -U chain  Demo::Demo::chain_start chain_1,chain_2,chain_3 abcdefg
+
+
+=head1 DESCRIPTION
+
+poikc is POE IKC (L<poeikcd>) Client 
+
+=head1 AUTHOR
+
+Yuji Suzuki E<lt>yujisuzuki@mail.arbolbell.jpE<gt>
+
+=head1 LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<poeikcd>
+
+=cut

@@ -1,0 +1,49 @@
+POE::Component::Client::NNTP
+============================
+
+1). Background
+
+POE::Component::Client::NNTP is a POE (Perl Object Environment) component which
+provides a convenient way for POE applications to perform non-blocking Network
+News Transport Protocol ( NNTP ) requests and receive applicable responses, to
+/from an NNTP server.
+
+The component assumes a working knowledge of RFC 977 and, optionally, RFC 2980.
+<http://www.faqs.org/rfcs/rfc977.html>
+<http://www.faqs.org/rfcs/rfc2980.html>
+
+2). Implementation
+
+The component is spawned and christened with a kernel alias. You 'register'
+with the component to receive events.
+
+For server responses which generate additional text such as 'help', 'article',
+etc. the component waits until it has received all server output before
+returning the applicable event with the text appended.
+
+Eg.
+
+You send:-
+
+$kernel->post ( 'NNTP-Client' => 'article' => 51 );
+
+The component returns a 'nntp_220' event:-
+
+sub nntp_220 {
+  my ($text,$article) = @_[ARG0,ARG1];
+
+  # Print the article to screen
+
+  foreach ( @{ $article } ) {
+	print "$_";
+  }
+
+  # Done
+}
+
+3). DISCLAIMER
+
+This module is provided "as is".
+No Income Tax. No V.A.T.
+No money back. No guarantee.
+

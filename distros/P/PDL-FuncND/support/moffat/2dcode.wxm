@@ -1,0 +1,37 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 0.8.5 ] */
+
+/* [wxMaxima: comment start ]
+ND Moffat
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+fn(x,u,S,alpha,beta) := block([n:length(S)],(gamma(beta)/gamma( (2*beta - n)/2) )* (%pi^(n/2)*alpha^n)^(-1) * ( 1 + transpose(x-u) . invert(S) . (x-u))^-beta );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+S : matrix([s00,s01],[s10,s11]);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+X : matrix( [x, y] );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+u : matrix( [x0, y0] );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+fn(X,u,S,alpha,beta);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+fortran(%);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+set_display('xml)$
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+inc/Module/Build/Pluggable/Warn64Bit.pm
+lib/PDL/Opt/QP.pd
+lib/PDL/Opt/QP.pod
+MANIFEST			This list of files
+src/dpo.f
+src/dpofa.f
+src/Makefile
+src/solve.QP.f
+t/00-load.t
+t/solve-orig.t
+t/solve-qp.t
+README
+META.yml
+META.json

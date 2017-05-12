@@ -1,0 +1,122 @@
+Revision history for PDL-Dims
+0.013	2015-10-1
+
+	* fixed ncop: if 1st argument had a dim with size 1, this was propagated
+	  regardless of the 2nd argument's respective dimsize(). Also a subtest was added.
+
+	* sln produced a lot of warnings by passing undefined to PDL. added +0 to suppress that.
+
+0.012	2015-9-2
+
+	* improved handling of scalars in nop, ncop
+
+	* fixed a bug for 1-element piddles in initdim (dmax calculation was off)
+
+	2015-1-27
+
+	* pos2i now is certain to return a valid index
+
+0.011	2014-11-25
+
+	* copy_dim now works for all dims at once when no dim is supplied.
+
+	2014-11-20
+	
+	* nreduce is now lvalue sub
+
+0.010	2014-10-10
+
+	* sln and active_slice are now declared as lvalue subroutines, allowing assignment - 
+	  Thanks to David Martens!
+
+0.009	2014-10-8
+
+	* sln: dmax was often wrong, fixed
+
+0.008 	2014-10-3
+
+	* ncop: fixed logic when 1st arg was a scalar
+
+	* nop: now can be called without dimension, it then works on the first.
+
+	* ->can() was not always encaplsulated in eval{ }, causing some unexpected crashes.
+
+	2014-9-30
+
+	* ncop can handle cases with non-piddle arguments better now, e.g. mutliply by scalar
+
+
+
+0.007 	2014-9-26
+
+	* index could be out of bounds in sln, fixed?
+
+
+0.006	2014-4-9
+
+	* fixed: initdim dropped last dim when inserting dim at pos < ndims
+
+	* added diminfo, extended PDL::info
+	
+0.005002 
+	2014-3-17
+
+	* fixed pod-coverage.t test failure by removing -T switch.
+
+0.005001 2014-3-14
+	
+	* changelog updates
+
+	* documentation updates
+
+0.005	2014-3-14
+
+	* pos2i was faulty for evenly-spaced values
+
+0.004	2014-2-24
+
+	* added a dummy=> option to initdim
+
+	* fixes and improvements in nagg
+
+	* ncop now can handle scalars (converts them to 1-element piddles)
+
+	* documentation update
+
+0.003	2014-2-21
+
+	* added a function for sanity check
+
+	* native aggregate function support
+
+	* fixes to copy_dim/initdim - hash keys are now the same as expected arguments
+	
+	* added a spacing function
+
+	* cleanup of min/max/inc/vals - either you have equal spacing (spacing ==1) with inc 
+	or vals, never both
+
+	* support for non-evenly spaced and non-numeric dims 
+
+	* davg name clash - going away
+
+	* internal routine _fix_old for converting old data
+
+	* many fixes
+
+0.002 	2014-2-17
+
+
+	* many fixes in ncop,nreduce,nop,sln
+
+	* added nsqueeze - updating (removing) dims when squeezing
+
+	* added active_slice - returns selected (as in call to idx) slice, ignores list of dims
+
+0.001_001 2014-2-17
+	* fixed nop
+
+
+0.001   2014-2-13 
+        First version, released on an unsuspecting world.
+

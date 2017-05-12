@@ -1,0 +1,16 @@
+Build.PL
+lib/Pod/Coverage/MethodSignatures.pm
+MANIFEST			This list of files
+META.yml
+t/FooTestFullPod.pm
+t/FooTestHalfPod.pm
+t/FooTestNoPod.pm
+t/fullpod.t
+t/halfpod.t
+t/nopod.t
+t/pod.t
+t/traceall.t
+README
+LICENSE
+Changes
+SIGNATURE    Added here by Module::Build

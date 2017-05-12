@@ -1,0 +1,223 @@
+=encoding iso-8859-1
+
+=head1 NAME/NOM
+
+perlutil - Utilitaires livrés avec la distribution de Perl
+
+=head1 DESCRIPTION
+
+En plus de l'interpréteur Perl lui-même, la distribution perl installe
+une série d'outils sur votre système. Il y a aussi plusieurs outils
+qui sont utilisés par la distribution Perl elle-même dans le cadre de
+la procédure d'installation. Ce document a été créé afin de lister
+l'ensemble de ces outils, d'expliquer ce qu'ils sont et ce qu'ils
+font, et de fournir des pointeurs vers chaque documentation de module
+lorsque c'est approprié.
+
+=head2 DOCUMENTATION
+
+=over 3
+
+=item L<perldoc|perldoc>
+
+La principale interface de consultation de la documentation de perl
+est C<perldoc>, quoique si vous lisez ceci c'est sûrement que vous
+l'avez déjà trouvée. F<perldoc> extrait et met en forme la
+documentation d'un fichier du répertoire courant, d'un module Perl
+installé sur le système ou d'une page de la documentation standard,
+comme celle-ci. Utilisez C<perldoc E<lt>nameE<gt>> pour obtenir
+l'information à propos d'un outil décrit dans ce document.
+
+=item L<pod2man|pod2man> et L<pod2text|pod2text>
+
+S'il est lancé depuis un terminal, F<perldoc> va généralement utiliser
+F<pod2man> pour traduire du POD (Plain Old Documentation -
+cf. L<perlpod> pour plus d'information) en une page de manuel, puis
+lancer F<man> pour l'afficher ; si F<man> n'est pas disponible,
+F<pod2text> sera utilisé à la place et la sortie sera redirigée vers
+votre afficheur favori.
+
+=item L<pod2html|pod2html> et L<pod2latex|pod2latex>
+
+En plus des deux convertisseurs cités précédemment, il y a deux autres
+S<convertisseurs :> F<pod2html>, qui produit des pages HTML depuis POD, et
+F<pod2latex>, qui produit des fichiers LaTeX.
+
+=item L<pod2usage|pod2usage>
+
+Si vous voulez juste savoir comment utiliser les outils décrits ici,
+F<pod2usage> extrait juste la section "USAGE" ; certains outils
+appellent automatiquement F<pod2usage> sur eux-mêmes lorsque vous les
+appelez avec C<-help>.
+
+=item L<podselect|podselect>
+
+F<pod2usage> est une utilisation spécifique de F<podselect>, un outil
+pour extraire des sections nommées des documents écrits en POD. Par
+exemple, de la même façon que les outils ont une section "USAGE", les
+modules Perl ont généralement une section S<"SYNOPSIS" :> C<podselect
+-s "SYNOPSIS" ...>E<nbsp>: extrait cette section d'un fichier donné.
+
+=item L<podchecker|podchecker>
+
+Si vous écrivez votre propre documentation en POD, l'outil
+F<podchecker> cherchera les erreurs dans votre marquage.
+
+=item L<splain|splain>
+
+F<splain> est une interface d'accès à L<perldiag> - donnez-lui l'un de
+vos messages d'erreur et il vous l'expliquera.
+
+=item L<roffitall|roffitall>
+
+L'outil C<roffitall> n'est pas installé sur votre système mais réside
+dans le répertoire F<pod/> des sources de Perl ; il convertit toute la
+documentation de la distribution vers le format F<*roff> pour générer
+finalement un ensemble de fichiers PostScript ou de fichiers texte.
+
+=back
+
+=head2 CONVERTISSEURS
+
+Pour vous aider à convertir vos programmes existants en Perl, nous
+avons inclus trois filtres de S<conversion :>
+
+=over 3
+
+=item L<a2p|a2p>
+
+F<a2p> convertit des scripts F<awk> en programmes Perl ; par exemple,
+C<a2p -F:> exécuté sur le simple script F<awk> C<{print $2}> produira
+un programme Perl basé sur ce S<code :>
+
+    while (<>) {
+        ($Fld1,$Fld2) = split(/[:\n]/, $_, 9999);
+        print $Fld2;
+    }
+
+=item L<s2p|s2p>
+
+De la même façon, F<s2p> convertit des scripts F<sed> en programmes
+Perl.  F<s2p> exécuté sur C<s/foo/bar> produira un programme Perl basé
+sur ce S<code :>
+
+    while (<>) {
+        chomp;
+        s/foo/bar/g;
+        print if $printit;
+    }
+
+=item L<find2perl|find2perl>
+
+Enfin, F<find2perl> traduit des commandes C<find> en leur équivalent
+Perl qui utilise le module L<File::Find|File::Find>. Par exemple,
+C<find2perl . -user root -perm 4000 -print> produit le callback
+suivant pour S<C<File::Find> :>
+
+    sub wanted {
+        my ($dev,$ino,$mode,$nlink,$uid,$gid);
+        (($dev,$ino,$mode,$nlink,$uid,$gid) = lstat($_)) &&
+        $uid == $uid{'root'}) &&
+        (($mode & 0777) == 04000);
+        print("$name\n");
+    }
+
+=back
+
+Tout comme ces filtres convertissant depuis d'autres langages, l'outil
+L<pl2pm|pl2pm> vous aide à convertir des librairies écrites dans
+l'ancien style Perl 4 en modules écrits dans le style Perl5.
+
+=head2 Administration
+
+=over 3
+
+=item L<libnetcfg|libnetcfg>
+
+Pour afficher et changer la configuration de libnet, exécutez la
+commande libnetcfg.
+
+=back
+
+=head2 Développement
+
+Il y a un ensemble d'outils qui vous aide à développer des programmes
+perl, et en particulier d'étendre Perl avec du C.
+
+=over 3
+
+=item L<perlbug|perlbug>
+
+F<perlbug> est le moyen recommandé pour envoyer aux développeurs un
+rapport concernant un bug trouvé dans l'interpréteur perl lui-même ou
+dans un des modules de la bibliothèque standard ; merci de lire
+entièrement la documentation de F<perlbug> avant de l'utiliser pour
+soumettre un rapport de bug.
+
+=item L<h2ph|h2ph>
+
+Avant l'ajout du système XS qui permet de connecter Perl avec des
+bibliothèques écrites en C, les programmeurs devaient récupérer les
+constantes d'une bibliothèque C en parcourant ses fichiers
+d'entêtes. Vous pourrez encore rencontrer des choses comme C<require
+'syscall.ph'> - le fichier F<.ph> peut être créé en lançant F<h2ph>
+sur le fichier F<.h> correspondant. Lisez la documentation de F<h2ph>
+pour savoir comment convertir un ensemble de fichiers d'entêtes en une
+seule fois.
+
+=item L<c2ph|c2ph> et L<pstruct|pstruct>
+
+F<c2ph> et F<pstruct>, qui sont en fait le même programme mais se
+comportent différemment selon la façon dont ils sont appelés,
+fournissent un autre moyen de travailler avec du C en Perl - ils
+convertissent les structures C et les déclarations d'unions en du code
+Perl. Cela n'est plus conseillé, F<h2xs> étant maintenant préféré.
+
+=item L<h2xs|h2xs>
+
+F<h2xs> convertit des fichiers d'entête C en modules XS en essayant de
+mettre en correspondance un maximum de code des modules Perl avec
+celui des librairies C.  C'est aussi très utile pour créer des
+squelettes de purs modules Perl.
+
+=item L<dprofpp|dprofpp>
+
+Perl est fourni avec un profiler, le module F<Devel::DProf>. L'outil
+F<dprofpp> analyse les sorties de ce profiler et vous dit quelles sont
+les routines qui ont le temps d'exécution le plus long. Se référer à
+L<Devel::DProf> pour plus d'information.
+
+=item L<perlcc|perlcc>
+
+F<perlcc> est l'interface de la suite de compilation expérimentale de
+Perl.
+
+=back
+
+=head2 VOIR AUSSI
+
+L<perldoc|perldoc>, L<pod2man|pod2man>, L<perlpod>,
+L<pod2html|pod2html>, L<pod2usage|pod2usage>, L<podselect|podselect>,
+L<podchecker|podchecker>, L<splain|splain>, L<perldiag>,
+L<roffitall|roffitall>, L<a2p|a2p>, L<s2p|s2p>,
+L<find2perl|find2perl>, L<File::Find|File::Find>, L<pl2pm|pl2pm>,
+L<perlbug|perlbug>, L<h2ph|h2ph>, L<c2ph|c2ph>, L<h2xs|h2xs>,
+L<dprofpp|dprofpp>, L<Devel::DProf>, L<perlcc|perlcc>.
+
+=head1 TRADUCTION
+
+=head2 Version
+
+Cette traduction française correspond à la version anglaise distribuée avec
+perl 5.8.8.  Pour en savoir plus concernant ces traductions, consultez
+L<http://perl.enstimac.fr/>.
+
+=head2 Traducteur
+
+Denis Dordoigne.
+
+=head2 Relecture
+
+Aucune pour l'instant.
+
+=cut

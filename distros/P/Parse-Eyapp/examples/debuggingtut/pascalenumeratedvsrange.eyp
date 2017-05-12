@@ -1,0 +1,83 @@
+%{
+
+=head1 SYNOPSIS
+
+Quoted from Bison manual:
+
+This grammar introduces a problem that arises in the declaration of enumerated 
+and subrange types in Pascal:
+
+  type subrange = lo .. hi;
+  type enum = (a, b, c);
+
+The original language standard allows only numeric literals and constant
+identifiers for the subrange bounds (`lo' and `hi'), but Extended Pascal
+and many other Pascal implementations allow arbitrary expressions there. This
+gives rise to the following situation, containing a superfluous pair of
+parentheses:
+
+     type subrange = (a) .. b;
+
+Compare this to the following declaration of an enumerated type with only one value:
+
+      type enum = (a);
+
+These two declarations look identical until the C<..> token. With normal LALR(1)
+one-token look-ahead it is not possible to decide between the two forms when
+the identifier C<a> is parsed. It is, however, desirable for a parser to decide
+this, since in the latter case C<a> must become a new identifier to represent
+the enumeration value, while in the former case C<a> must be evaluated with its
+current meaning, which may be a constant or even a function call.
+
+You could parse C<(a)> as an 'unspecified identifier in parentheses', to be
+resolved later, but this typically requires substantial contortions in both
+semantic actions and large parts of the grammar, where the parentheses are
+nested in the recursive rules for expressions.
+
+You might think of using the lexer to distinguish between the two
+forms by returning different tokens for currently defined and
+undefined identifiers. But if these declarations occur in a local
+scope, and C<‘a’> is defined in an outer scope, then both forms are
+possible—either locally redefining C<‘a’>, or using the value of C<‘a’>
+from the outer scope. So this approach cannot work.
+
+=head1 SEE ALSO 
+
+=over 2
+
+=item * The Bison manual L<http://www.gnu.org/software/bison/manual/html_mono/bison.html>
+
+=back
+
+=cut
+
+%}
+
+%token TYPE DOTDOT ID
+
+%left '+' '-'
+%left '*' '/'
+
+%%
+
+type_decl : TYPE ID '=' type ';'
+    ;
+
+type : '(' id_list ')'
+    | expr DOTDOT expr
+    ;
+
+id_list : ID
+    | id_list ',' ID
+    ;
+
+expr : '(' expr ')'
+    | expr '+' expr
+    | expr '-' expr
+    | expr '*' expr
+    | expr '/' expr
+    | ID
+    ;
+
+%%
+

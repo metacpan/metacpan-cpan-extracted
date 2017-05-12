@@ -1,0 +1,9 @@
+# non-projective edge (a-layer)
+a-node $n2 :=
+[ !ancestor $ref0, ((order-precedes $ref0 and order-follows $ref1) or (order-follows $ref0 and order-precedes $ref1)) ];
+
+a-node $ref0 :=
+[ same-tree-as $n2,
+      a-node $ref1 := [  ] ];
+  >> give distinct $ref1
+  >> give count()

@@ -1,0 +1,40 @@
+##author:Brad Adkins
+##outfile:Changes.html
+##title:Pod-WikiText Revision History
+##toc:yes
+=begin wiki
+
+!1 Name
+
+Revision history for Perl extension Pod::WikiText.pm
+
+----
+
+!3 Version 0.06
+
+Sun Apr 13, 2008
+
+* Initial release.
+
+!3 Version 0.08
+
+Mon Apr 15, 2008
+
+* Added POD for CPAN.
+
+!3 Version 0.10
+
+Tue Apr 15, 2008
+
+* Fixed Description in POD.
+* Fixed tarball permissions problem. Use bsdtar not tar on Windows.
+* Added 13 tests.
+
+!3 Version 0.12
+
+Fri Apr 18, 2008
+
+* Fixed bad file in distribution.
+* Building CPAN distributiions on Windows is a horrible pain.
+
+----

@@ -1,0 +1,49 @@
+NAME
+
+    Parse::Stata::DtaReader - extract data from Stata 8 and Stata 10 .dta files.
+
+SUMMARY
+
+    Parse::Stata::DtaReader is a module to extract data from Stata 8 and Stata 10 .dta files.
+
+    This distribution also contains the command-line tools dta2csv and dta2sql.
+
+SYNOPSIS
+
+    open my $fileHandle, '<', 'test.dta';
+    my $dta = new Parse::Stata::DtaReader($fileHandle);
+    print "$dta->{nvar} variables; $dta->{nobs} observations\n";
+    print join( ',', @{ $dta->{varlist} } ) . "\n";
+    while ( my @a = $dta->readRow ) {
+        print join( ',', @a ) . "\n";
+    }
+    
+    See perldoc Parse::Stata::DtaReader for more details.
+    
+    Look at the source code of dta2csv and dta2sql for code examples.
+
+CHANGES
+
+    See L<https://github.com/f20/parse-stata-dtareader>.    
+
+BUGS
+
+    It works for me, but has not been fully tested.
+
+    All Stata missing values will be converted into a perl undef, losing the information about the type of missing value.
+
+    This code comes with ABSOLUTELY NO WARRANTY of any kind.
+
+AUTHOR
+
+    Copyright 2007, 2008, 2014 Reckon LLP and Franck Latrémolière.
+    L<http://www.reckon.co.uk/staff/franck/>
+
+    Stata .dta format specification from:
+        L<http://www.stata.com/help.cgi?dta_114>
+        L<http://www.stata.com/help.cgi?dta_113>
+
+LICENCE
+
+    This is free software; you can redistribute it and/or modify it under the same terms as Perl.
+

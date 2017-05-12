@@ -1,0 +1,22 @@
+CHANGELOG
+
+v2.03 (07/23/2017)
+==================
+--Rewrite to adapt to new Class::EHierarchy API
+
+v2.02 (06/21/2016)
+==================
+--EXISTS call was dependent on a BDB 4.6+ call, fixed to compensate for
+  older versions
+
+v2.01 (06/17/2016)
+==================
+--Removed gratuitous CDS locks in basic tied hash functions
+--Updated documention to be more clear in examples
+--Added helper method for retrieving CDS locks
+
+v2.00 (10/22/2015)
+==================
+--Adjusted to work with new Paranoid v2.0 API
+--Split into independent distribution
+

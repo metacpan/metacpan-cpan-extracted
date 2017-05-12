@@ -1,0 +1,235 @@
+NAME
+    POE::Component::WWW::Google::Calculator - A non-blocking POE wrapper
+    around WWW::Google::Calculator
+
+SYNOPSIS
+        use strict;
+        use warnings;
+
+        use POE qw(Component::WWW::Google::Calculator);
+
+        my $poco = POE::Component::WWW::Google::Calculator->spawn( alias => 'calc' );
+
+        POE::Session->create(
+            package_states => [
+                'main' => [ qw( _start calc_result ) ],
+            ],
+        );
+
+        $poe_kernel->run;
+
+        sub _start {
+            $poe_kernel->alias_set('foo');
+            $poe_kernel->post( 'calc' => 'calc' => {
+                    term => '2+2',
+                    event => 'calc_result',
+                    session => 'foo',
+                    _random_name => 'random_value',
+                }
+            );
+        }
+
+        sub calc_result {
+            my ( $kernel, $result ) = @_[ KERNEL, ARG0 ];
+
+            if ( $result->{error} ) {
+                print "ZOMG! Error: $result->{error}\n";
+            }
+            else {
+                print "Results: $result->{out}\n";
+            }
+
+            print "Oh, and BTW: $result->{_random_name}\n";
+
+            $kernel->post( 'calc' => 'shutdown' );
+        }
+
+DESCRIPTION
+    This module is a simple non-blocking POE wrapper around
+    WWW::Google::Calculator
+
+CONSTRUCTOR
+        my $poco = POE::Component::WWW::Google::Calculator->spawn;
+
+        POE::Component::WWW::Google::Calculator->spawn( alias => 'calc' );
+
+    Takes three *optional* arguments:
+
+  alias
+        POE::Component::WWW::Google::Calculator->spawn( alias => 'calc' );
+
+    Specifies a POE Kernel alias for the component
+
+  options
+        POE::Component::WWW::Google::Calculator->spawn(
+            options => {
+                trace => 1,
+                default => 1,
+            },
+        );
+
+    A hashref of POE Session options to pass to the component's session.
+
+  debug
+        POE::Component::WWW::Google::Calculator->spawn( debug => 1 );
+
+    When set to a true value turns on output of debug messages.
+
+METHODS
+    These are the object-oriented methods of the components.
+
+  calc
+        $poco->calc( {
+                term  => '2+2',
+                event => 'calc_result',
+            }
+        );
+
+    Takes hashref of options. See "calc" event below for description.
+
+  session_id
+        my $calc_id = $poco->session_id;
+
+    Takes no arguments. Returns component's session ID.
+
+  shutdown
+        $poco->shutdown;
+
+    Takes no arguments. Shuts down the component.
+
+ACEPTED EVENTS
+  calc
+        $poe_kernel->post( 'calc' => 'calc' => {
+                term          => '2+2',
+                event         => 'calc_result',
+                session       => $some_other_session,
+                _user_defined => $whatever,
+            }
+        );
+
+    Instructs the component to do a calculation. Options are passed in a
+    hashref with keys as follows:
+
+   term
+        { term => '2+2' }
+
+    Mandatory. The term you wish to solve. Whatever Google's calculator
+    would take. Such as '2*2+2' or '2USD in CAD'
+
+   event
+        { event => 'calc_result' }
+
+    Mandatory. An event to send the result to.
+
+   session
+        { session => $some_other_session_ref }
+
+        { session => 'some_alias' }
+
+        { session => $session->ID }
+
+    Optional. An alternative session alias, reference or ID that the
+    response should be sent to, defaults to sending session.
+
+   user defined
+    Optional. Any keys starting with "_" (underscore) will not affect the
+    component and will be passed back in the result intact.
+
+  shutdown
+        $poe_kernel->post( 'calc' => 'shutdown' );
+
+    Takes no arguments. Tells the component to shut itself down.
+
+OUTPUT
+        sub calc_result {
+            my ( $kernel, $result ) = @_[ KERNEL, ARG0 ];
+
+            if ( $result->{error} ) {
+                print "ZOMG! Error: $result->{error}\n";
+            }
+            else {
+                print "Results: $result->{out}\n";
+            }
+
+            print "Oh, and BTW: $result->{_random_name}\n";
+
+            $kernel->post( 'calc' => 'shutdown' );
+        }
+
+    The result will be posted to the event and (optional) session specified
+    in the arguments to the "calc" (event or method). The result, in the
+    form of a hashref, will be passed in ARG0. The keys of that hashref are
+    as follows
+
+   out
+        print "Results: $result->{out}\n";
+
+    The "out" key will contain the result of the "calculation" in scalar
+    form. If an error occured it will be undefined and "error" key will also
+    be present.
+
+   error
+        if ( $result->{error} ) {
+            print "Error calculating :( $result->{error}\n";
+        }
+        else {
+            print "Result: $result->{out}\n";
+        }
+
+    If an error occured during the calculation the "error" key will be
+    present with possibly meaningful description of the error.
+
+   user defined
+        print "$result->{_name}, the answer is $result->{out}\n";
+
+    Any arguments beginning with "_" (underscore) passed into the "calc"
+    event/method will be present intact in the result.
+
+PREREQUISITES
+    Needs POE and WWW::Google::Calculator
+
+SEE ALSO
+    POE WWW::Google::Calculator
+
+AUTHOR
+    Zoffix Znet, "<zoffix at cpan.org>" (<http://zoffix.com>,
+    <http://haslayout.net>)
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-poe-component-www-google-calculator at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-WWW-Google
+    -Calculator>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc POE::Component::WWW::Google::Calculator
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-WWW-Google-C
+        alculator>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/POE-Component-WWW-Google-Calculator>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/POE-Component-WWW-Google-Calculator>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/POE-Component-WWW-Google-Calculator>
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Zoffix Znet, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

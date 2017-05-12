@@ -1,0 +1,32 @@
+NAME
+
+    Plack::Middleware::Raygun - wrap around psgi application to send stuff
+    to raygun.io.
+
+SYNOPSIS
+
+        use Plack::Builder;
+    
+        my $app = sub {
+            die "Some error";
+            return [ 200, [ 'Content-Type', 'text/plain' ], ['Hello'] ];
+        };
+        builder {
+            enable 'Raygun';
+            $app;
+        }
+
+DESCRIPTION
+
+    Send error/crash data to the raygun.io api.
+
+INTERFACE
+
+ call
+
+    Implementation of the call method.
+
+ _call_raygun
+
+    Call the raygun.io using WebService::Raygun.
+

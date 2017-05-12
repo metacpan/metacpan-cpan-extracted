@@ -1,0 +1,13 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+exo_api_version=0.3
+
+Name: exo-hal
+Description: HAL support library for exo
+Requires: glib-2.0 hal-storage
+Version: 0.3.107
+Libs: -L${libdir} -lexo-hal-${exo_api_version}
+Cflags: -I${includedir}/exo-${exo_api_version}

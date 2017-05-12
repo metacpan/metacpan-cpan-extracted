@@ -1,0 +1,13 @@
+Pod::ToDemo
+-----------
+
+Pod::ToDemo allows pure-POD tutorials to write demonstration programs when
+invoked directly from the command line.  This is an easy way to provide
+working, tweakable programs for people who've just read a tutorial.
+
+For example, SDL::Tutorial, the bare-bones Perl SDL tutorial, will write a demo program given the command line:
+
+  $ perl -MSDL::Tutorial=sdl_demo.pl -e 1
+
+Copyright (c) 2003 - 2011, chromatic.  All rights reserved.  You may use,
+modify, and distribute this module under the same terms as Perl 5.12.

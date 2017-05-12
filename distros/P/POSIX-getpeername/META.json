@@ -1,0 +1,71 @@
+{
+   "abstract" : "provides getpeername(2)",
+   "author" : [
+      "Masahiro Nagano <kazeburo@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.4.6",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POSIX-getpeername",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::TCP" : "1.29"
+         }
+      }
+   },
+   "provides" : {
+      "POSIX::getpeername" : {
+         "file" : "lib/POSIX/getpeername.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kazeburo/POSIX-getpeername/issues"
+      },
+      "homepage" : "https://github.com/kazeburo/POSIX-getpeername",
+      "repository" : {
+         "url" : "git://github.com/kazeburo/POSIX-getpeername.git",
+         "web" : "https://github.com/kazeburo/POSIX-getpeername"
+      }
+   },
+   "version" : "0.01"
+}

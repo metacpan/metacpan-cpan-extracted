@@ -1,0 +1,65 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+use POE;
+use POE::Component::Server::XMLRPC;
+use XMLRPC::Lite;
+
+use constant ping_urls => qw(http://rpc.weblogs.com/RPC2
+			     http://ping.blo.gs/
+			     http://rpc.blogrolling.com/pinger/);
+my $setup = sub {
+  my $kernel = $_[KERNEL];
+  $kernel->alias_set("pinger");
+  $kernel->post( xmlrpc => publish => pinger => "weblogUpdates.ping" );
+  openlog("ping-server", qw(pid nowait), "local1");
+  $SIG{__WARN__} = sub {syslog("warning", join("", @_))};
+};
+
+my $shutdown = sub {
+  $_[KERNEL]->post( xmlrpc => rescind => pinger => "weblogUpdates.ping" );
+  closelog();
+};
+
+my $ping = sub {
+  my $transaction = $_[ARG0];
+  my $params = $transaction->params();
+  $transaction->return("Pinging commenced.");
+
+  if(!fork) {
+    use Sys::Syslog;
+    use XMLRPC::Lite
+      on_fault =>
+	sub {
+	  my $rpc = shift;
+	  my $res = shift;
+
+	  ref $res ? warn "Fault on $_: ".$res->faultstring :
+	    warn "Transport error on $_: ".$rpc->transport->status};
+
+    for(ping_urls) {
+      my $result = XMLRPC::Lite->proxy($_)->call('weblogUpdates.ping',
+						 @{$params});
+
+      syslog("info", "%s: %s", "Ping response from $_", 
+	     $result->result->{message})
+	if ref $result;
+    }
+  }
+
+};
+
+POE::Component::Server::XMLRPC->new(alias => "xmlrpc",
+				    port  => 42042 );
+
+POE::Session->create
+  ( inline_states =>
+    { _start => $setup,
+      _stop  => $shutdown,
+      'weblogUpdates.ping'   => $ping,
+    }
+  );
+
+$poe_kernel->run;
+

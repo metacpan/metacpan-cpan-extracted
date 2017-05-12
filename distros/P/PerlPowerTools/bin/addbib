@@ -1,0 +1,221 @@
+#!/usr/bin/perl
+
+=begin metadata
+
+Name: addbib
+Description: create or extend a bibliographic database
+Author: Jeffrey S. Haemer
+License:
+
+=end metadata
+
+=cut
+
+
+use strict;
+use Getopt::Std;
+use vars qw($opt_a $opt_p);
+
+$0 =~ s(.*/)();
+my $usage = "usage: $0 [ -a ] [ -p promptfile ] database\n";
+getopts "ap:" and @ARGV==1 or die $usage;
+
+my @prompts = (
+		"Author name:\t%A",
+		"Title:\t%T",
+		"Journal:\t%J",
+		"Volume:\t%V",
+		"Pages:\t%P",
+		"Publisher:\t%I",
+		"City:\t%C",
+		"Date:\t%D",
+		"Other:\t%O",
+		"Keywords:\t%K",
+);
+
+if ($opt_p) {
+	@prompts = ();
+	open PROMPTFILE, $opt_p or die "can't read $opt_p: $!";
+	foreach (<PROMPTFILE>) {
+		if (/^\s*([^%]+)\t(%\w)/) {
+			push @prompts, "$1\t$2";
+		}
+	}
+	close(PROMPTFILE);
+}
+
+my $database = shift;
+open DATABASE, ">>$database" or die "can't append to $database: $!";
+
+my $inst = <<_EOINST;
+	Addbib will prompt you for various bibliographic fields.
+	If you don't need a particular field, just hit RETURN,
+		and that field will not appear in the output file.
+	If you want to return to previous fields in the skeleton,
+		a single minus sign will go back a field at a time.
+		(This is the best way to input multiple authors.)
+	If you have to continue a field or add an unusual field,
+		a trailing backslash will allow a temporary escape.
+	Finally, (without -a) you will be prompted for an abstract.
+	Type in as many lines as you need, and end with a ctrl-d.
+	To quit, type `q' or `n' when asked if you want to continue.
+	To edit the database, type `edit', `vi', or `ex' instead.
+
+_EOINST
+
+print "Instructions? (n) ";
+$_ = <>;
+print "$inst" if /^y/i;
+
+# The use of an array instead of a hash looks hokey here
+# I did it to preserve order.
+
+while (1) {
+	print DATABASE "\n";		# start a new entry
+
+	PROMPT: for (my $i=0; $i < @prompts; $i++)  {
+		my ($prompt, $code) = split /\t/, $prompts[$i];
+		print "$prompt ";
+		$_ = <>;
+		next PROMPT if /^$/;	# blank line means "don't want it"
+		if (/^-$/) {		# go back to the last prompt
+			$i -= 2;
+			next PROMPT;
+		}
+		print DATABASE "$code\t";
+		while (/\\$/) {
+			chop; chop;
+			print DATABASE "$_\n";
+			print "> ";
+			$_ = <>;
+		}
+		print DATABASE $_;
+	}
+
+	unless ($opt_a) {
+		print "Abstract: ";
+		$_ = <>;
+		next if (/^$/);
+		print DATABASE "%X\t$_";
+		while (<>) {
+			print DATABASE $_;
+		}
+	}
+} continue {
+	print "Continue? (y) ";
+	$_ = <>;
+	while (/^\s*(edit|ex|vi|view|emacs)\s*/) {
+		close DATABASE or die "can't close $database: $!";
+		system("$1 $database") == 0
+		 or die "system '$1 $database' failed: $?";
+		open DATABASE, ">>$database" or die "can't open $database: $!";
+		print "Continue? (y) ";
+		$_ = <>;
+	}
+	last if /^(n|q)/i;
+}
+
+close DATABASE or die "can't close $database: $!";
+
+__END__
+
+=head1 NAME
+
+addbib - create or extend a bibliographic database
+
+=head1 SYNOPSIS
+
+    addbib [ -a ] [ -p promptfile ] database
+
+=head1 DESCRIPTION
+
+When the program starts, you will be prompted for instructions.  Answering
+C<n> or simply hitting enter will continue without showing the instructions.
+Answering C<y> will display directions for using the program.  C<addbib>
+then prompts for various bibliographic fields, accepting input from the
+console and eventually saving records in a C<database> file.  At each
+prompt, if one enters a null response (i.e. simply hits the return/enter
+key), then this field is skipped.  Entering a minus sign (C<->) means to
+return to the previous field.  Using a trailing backslash allows a field to
+be continued to the next line.  Once all fields have been entered, the user
+is presented with the C<Continue? (y)> prompt in order to continue adding
+items to the database.  Entering C<y> or simply hitting return will start
+entering a new item into the database.  Entering C<n> or C<q> exits the
+program and saves the C<database> file to the filesystem.
+
+The C<-a> option suppresses prompting the user for an abstract; entering an
+abstract is the default behaviour.  To finish entering an abstract, enter
+C<Ctrl-d>.
+
+The C<-p> option allows for the definition of new prompt sequences.  The
+prompt file uses the following format: C<prompt text> followed by a C<tab
+character> and finally the C<field symbol> for writing into the C<database>
+file.  For instance, to define a set of prompts specifically for the
+addition of books, use something like this:
+
+    Author name	%A
+    Title	%T
+    Publisher	%I
+    Date	%D
+    Other	%O
+    Keywords	%K
+
+Note that the author name field can occur more than once to allow for
+multiple authors.
+
+The most common field symbols are (adapted from the FreeBSD manual for
+C<addbib>):
+
+    %A	 Author's name
+    %B	 Book containing article referenced
+    %C	 City (place of publication)
+    %D	 Date of publication
+    %E	 Editor of book containing article referenced
+    %F	 Footnote number or label (supplied by refer)
+    %G	 Government order number
+    %H	 Header commentary, printed before reference
+    %I	 Issuer (publisher)
+    %J	 Journal containing article
+    %K	 Keywords to use in locating reference
+    %L	 Label field used by -k option of refer
+    %M	 Bell Labs Memorandum (undefined)
+    %N	 Number within volume
+    %O	 Other commentary, printed at end of reference
+    %P	 Page number(s)
+    %Q	 Corporate or Foreign Author (unreversed)
+    %R	 Report, paper, or thesis (unpublished)
+    %S	 Series title
+    %T	 Title of article or book
+    %V	 Volume number
+    %X	 Abstract
+
+An example C<database> file output is:
+
+    %A      M Bremner
+    %T      Quantum dynamics as a physical resource
+    %J      Physical Review A
+    %V      67
+    %P      523011-5230119
+    %I      American Physical Society
+    %D      2003
+
+=head1 FILES
+
+    promptfile - optional file to define prompting
+
+=head1 AUTHOR
+
+Jeffrey S. Haemer
+
+=head1 BUGS
+
+Also wants both testing and the other bib/refer utilities to go with it.
+Release early and often, that's my motto.
+
+=head1 COPYRIGHT and LICENSE
+
+This program is copyright (c) Jeffrey S. Haemer (2004).
+
+This program is free and open software. You may use, modify, distribute,
+and sell this program (and any modified variants) in any way you wish,
+provided you do not restrict others from doing the same.

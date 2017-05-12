@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                PPM-Profile
+version:             1.4
+abstract:            A tool to save and restore PPM profiles
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    File::Temp:                    0
+    Getopt::Long:                  0
+    Pod::Usage:                    0
+    XML::Simple:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Philippe M. Chiasson <gozer@ActiveState.com>

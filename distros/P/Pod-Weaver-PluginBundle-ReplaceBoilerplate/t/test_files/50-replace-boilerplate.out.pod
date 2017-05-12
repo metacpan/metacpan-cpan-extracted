@@ -1,0 +1,27 @@
+=pod
+
+=head1 NAME
+
+Module::Name - abstract text
+
+=head1 VERSION
+
+version 10.2
+
+=head1 PRE SECTION
+
+This is the pre section.
+
+=head1 POST SECTION
+
+This is the post section.
+
+=head1 AUTHOR
+
+Sam Graham
+
+=head1 COPYRIGHT AND LICENSE
+
+{{LICENSE}}
+
+=cut

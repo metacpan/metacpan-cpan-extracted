@@ -1,0 +1,76 @@
+			  ==================
+			  Pg::Simple v. 1.20
+			  ================== 
+
+NAME
+
+    Pg::Simple - simple OO interface to PostgreSQL
+
+DESCRIPTION
+
+    Pg::Simple is a very simple interface to PostgreSQL.  It is
+    patterned after the DBI interface.  Why not use the DBI interface
+    instead?  The main reason is that it does not yet support cursors.
+    This module does.  When the DBI Postgres interface supports
+    cursors, one should use that instead.
+
+    This module is designed primarily to ease reading data from a
+    database.  All statements are executed within a transaction.
+
+DEPENDENCIES
+
+    You will need the Pg module, as well as PostrgreSQL.
+
+INSTALLATION
+
+    To compile, test and install:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+CHANGES
+
+    See the Changes file for more details
+
+    1.20
+    ----
+    connect() ignored the User and Password attributes passed to the
+    constructor.
+
+    1.10
+    ---
+    added fetch_hashref method.
+
+
+    1.00
+    -----
+    First public version.
+
+COPYRIGHT
+
+    (C) 2000-2002 Smithsonian Astrophysical Observatory.  
+    All rights reserved.
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 2 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+    02111-1307 USA
+
+
+AUTHOR
+
+    Diab Jerius ( djerius@cfa.harvard.edu )
+

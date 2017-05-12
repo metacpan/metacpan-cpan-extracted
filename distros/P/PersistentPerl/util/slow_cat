@@ -1,0 +1,9 @@
+#!/bin/sh
+# Simulate slow drain of stdout
+while dd count=100 2>/tmp/slow_drain.$$; do
+    if grep '^0+0 ' /tmp/slow_drain.$$ >/dev/null; then
+	rm -f /tmp/slow_drain.$$
+	exit
+    fi
+    sleep 1
+done

@@ -1,0 +1,40 @@
+---
+abstract: 'Eats all your (session) cookies in case Plack::Middleware::StrackTrace ate your HTTP headers.'
+author:
+  - 'Manni Heumann'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  HTTP::Request::Common: '0'
+  Test::Most: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-CookieMonster
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::CookieMonster:
+    file: lib/Plack/Middleware/CookieMonster.pm
+    version: '0.03'
+requires:
+  Plack: '0'
+resources:
+  bugtracker: https://github.com/mannih/Plack-Middleware-CookieMonster/issues
+  homepage: https://github.com/mannih/Plack-Middleware-CookieMonster
+  repository: git://github.com/mannih/Plack-Middleware-CookieMonster.git
+version: '0.03'
+x_contributors:
+  - 'Manni Heumann <github@lxxi.org>'

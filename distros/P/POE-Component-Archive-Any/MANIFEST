@@ -1,0 +1,15 @@
+Build.PL
+Changes
+MANIFEST
+README
+LICENSE
+lib/POE/Component/Archive/Any.pm
+t/00-load.t
+t/01-method-same-session.t
+xt/pod-coverage.t
+xt/pod.t
+xt/kwalitee.t
+examples/extract.pl
+Makefile.PL
+META.yml
+META.json

@@ -1,0 +1,347 @@
+=encoding iso-8859-1
+
+=head1 NAME/NOM
+
+perlstyle - Comment (bien) écrire du Perl
+
+=head1 DESCRIPTION
+
+Chaque programmeur aura, bien entendu, ses propres préférences dans la manière
+d'écrire, mais voici quelques règles générales qui rendront vos programmes
+plus faciles à lire, à comprendre et à mettre à jour.
+
+La chose la plus importante est de toujours lancer vos programmes avec le
+paramètre B<-w>. Si vous en avez vraiment besoin, vous avez la possibilité de
+l'enlever explicitement pour des portions de vos programmes à l'aide du pragma
+C<no warnings> ou de la variable C<$^W>. Vous devriez aussi toujours utiliser
+C<use strict> ou au moins savoir pourquoi vous ne le faites pas. Les pragmas
+C<use sigtrap> et même C<use diagnostics> pourront s'avérer utiles.
+
+Pour ce qui est de l'esthétique du code, la seule chose à laquelle Larry
+tienne vraiment, c'est que les accolades fermantes d'un BLOC multiligne soient
+alignées avec le mot-clé qui marque le début du bloc.  Après ça, il a d'autres
+conseils qui ne sont pas aussi S<forts :>
+
+=over 4
+
+=item *
+
+Indentation de 4 colonnes.
+
+=item *
+
+Les accolades ouvrantes sont sur la même ligne que le mot-clé, si possible,
+sinon, qu'elles soient alignées avec lui.
+
+=item *
+
+Un espace avant l'accolade ouvrante d'un BLOC multiligne.
+
+=item *
+
+Un BLOC d'une ligne peut être mis sur la même ligne que le mot-clé, y compris
+les accolades.
+
+=item *
+
+Pas d'espace avant le point-virgule.
+
+=item *
+
+Point-virgule omis dans les BLOCS d'une seule ligne.
+
+=item *
+
+Des espaces autour des opérateurs.
+
+=item *
+
+Des espaces autour d'un indice «E<nbsp>complexeE<nbsp>» (entre crochets).
+
+=item *
+
+Des lignes vides entre les parties qui font des choses différentes.
+
+=item *
+
+Des else bien visibles.
+
+=item *
+
+Pas d'espace entre le nom de fonction et la parenthèse ouvrante.
+
+=item *
+
+Un espace après chaque virgule.
+
+=item *
+
+Couper les lignes trop longues après un opérateur (sauf C<and> et
+C<or>).
+
+=item *
+
+Un espace après la dernière parenthèse fermante sur la ligne courante.
+
+=item *
+
+Aligner les items correspondants verticalement.
+
+=item *
+
+Omettre la ponctuation redondante tant que la lisibilité n'en est pas
+affectée.
+
+=back
+
+Larry a ses propres raisons pour chacune de ces choses, mais il sait
+bien que tout le monde ne pense pas comme lui.
+
+Voici quelques autres choses plus concrètes auxquelles il faut S<penser :>
+
+=over 4
+
+=item *
+
+Ce n'est pas parce que vous I<POUVEZ> faire quelque chose d'une façon
+particulière que vous I<DEVEZ> le faire de cette manière. Perl a été conçu
+pour vous offrir plusieurs possibilités de faire une chose précise, alors,
+pensez à prendre la plus compréhensible. Par S<exemple :>
+
+    open(FOO,$foo) || die "J'arrive pas à ouvrir $foo: $!";
+
+est mieux S<que :>
+
+    die "J'arrive pas a ouvrir $foo: $!" unless open(FOO,$foo);
+
+et ce, parce que la deuxième méthode ne met pas en avant l'instruction
+intéressante. D'un autre S<côté :>
+
+    print "Début de l'analyse\n" if $verbose;
+
+est mieux S<que :>
+
+    $verbose && print "Début de l'analyse\n";
+
+car l'intérêt n'est pas de savoir si l'utilisateur a tapé B<-v> ou non.
+
+D'une manière similaire, ce n'est pas parce qu'un opérateur suppose des
+arguments par défaut qu'il faut que vous utilisiez ces arguments. Les réglages
+par défaut sont faits pour les programmeurs systèmes paresseux qui écrivent un
+programme pour une seule utilisation. Si vous voulez que votre programme soit
+lisible, mettez les arguments.
+
+Dans le même ordre d'idée, ce n'est pas parce que les parenthèses I<peuvent>
+être omises qu'il ne faut pas en S<mettre :>
+
+    return print reverse sort num values %array;
+    return print(reverse(sort num (values(%array))));
+
+Quand vous avez un doute, mettez des parenthèses. Au moins, ça
+permettra aux pauvres gars de s'en remettre à la touche % sous B<vi>.
+
+Même si vous êtes sûr de vous, pensez à la santé mentale de la personne qui
+aura à mettre à jour le code après vous et qui mettra très certainement les
+parenthèses au mauvais endroit.
+
+=item *
+
+Ne faites pas de contorsions impossibles pour réussir à sortir d'une boucle,
+Perl fournit l'opérateur C<last> qui vous permet de sortir. Faites le juste
+dépasser pour le rendre plus visible («E<nbsp>outdentE<nbsp>» en anglais).
+
+    LINE:
+        for (;;) {
+            instructions;
+          last LINE if $truc;
+            next LINE if /^#/;
+            instructions;
+        }
+
+=item *
+
+N'ayez pas peur d'utiliser des labels de boucle. Ils sont là pour rendre le
+code plus lisible autant que pour permettre de sauter plusieurs niveaux de
+boucles. Référez-vous à l'exemple précédent.
+
+=item *
+
+Évitez d'utiliser C<grep()> (ou C<map()>) ou des
+«E<nbsp>backticksE<nbsp>» (`) dans un contexte vide, c'est-à-dire,
+quand vous ne récupérez pas les valeurs qu'elles retournent. Ces
+fonctions retournent toujours des valeurs alors, utilisez-les. Sinon,
+à la place, utilisez une boucle C<foreach()> ou la fonction
+C<system()>.
+
+=item *
+
+Pour conserver la portabilité, quand vous utilisez des fonctionnalités qui ne
+seront peut-être pas implémentées sur toutes les machines, testez les
+instructions dans un eval pour voir si elles échouent. Si vous savez à partir
+de quelle version et quel niveau de patch la fonctionnalité a été implémentée,
+vous pouvez tester C<$]> (C<$PERL_VERSION> en C<Anglais>) pour voir si elle
+est présente. Le module C<Config> vous permettra aussi de savoir quelles
+options ont été retenues par le programme B<Configure> quand Perl a été
+installé.
+
+=item *
+
+Choisissez des identificateurs ayant un sens mnémonique. Si vous n'arrivez pas
+à vous rappeler à quoi ils correspondent, vous avez un problème.
+
+=item *
+
+Bien que les petits identificateurs comme C<$nbmots> sont
+compréhensibles, les identificateurs longs sont plus lisibles si les
+mots sont séparés par des underscores. Il est plus facile de lire
+$un_nom_de_variable que $UnNomDeVariable, surtout pour ceux qui ne
+parlent pas très bien la langue dans laquelle le programme a été
+écrit. C'est aussi une règle simple qui marche aussi avec
+C<UN_NOM_DE_CONSTANTE>.
+
+Les noms de paquetages font parfois exception à la règle. Perl réserve de
+façon informelle des noms de modules en minuscules pour des modules
+«E<nbsp>pragmaE<nbsp>» tels C<integer> ou C<strict>. Les autres modules
+devraient commencer avec une majuscule et utiliser une casse variée, mais ne
+mettez pas d'underscores à cause des limitations dans les noms des modules sur
+certains systèmes de fichiers primitifs qui ne permettent que quelques
+caractères.
+
+=item *
+
+Vous pouvez trouver utile de laisser la casse indiquer la visibilité
+ou la nature d'une variable. Par S<exemple :>
+
+    $TOUT_EN_MAJUSCULES   les constantes uniquement (attention
+                          aux collisions avec les variables internes
+                          de Perl !)
+    $Quelques_majuscules  variables globales/statiques
+    $pas_de_majuscule     internes à une fonction (my () ou local())
+
+Les noms de fonctions et de méthodes semblent mieux marcher quand
+elles sont en minuscule. ExE<nbsp>: C<< $obj->as_string() >>.
+
+Vous pouvez utiliser un underscore au début de la variable pour
+indiquer qu'elle ne doit pas être utilisée hors du paquetage qui la
+définit.
+
+=item *
+
+Si vous avez une expression régulière de la mort, utilisez le modificateur
+C</x> et ajoutez un peu d'espaces pour que cela ressemble un peu plus à
+quelque chose. N'utilisez pas de slash comme délimiteurs quand votre regexp
+contient des slash ou des antislash.
+
+=item *
+
+Utilisez les nouveaux opérateurs C<and> et C<or> pour éviter d'avoir à
+mettre trop de parenthèses dans les listes d'opérations et pour
+réduire l'utilisation des opérateurs tels C<&&> et C<||>. Appelez vos
+routines comme s'il s'agissait de fonctions ou d'opérateurs de listes
+pour éviter le surplus de parenthèses et de «E<nbsp>&E<nbsp>».
+
+=item *
+
+Utilisez des C<here> (opérateur C<< << >>) plutôt que des instructions
+C<print()> répétés.
+
+=item *
+
+Alignez ce qui correspond verticalement, spécialement si c'est trop
+long pour tenir sur une seule ligne.
+
+    $IDX = $ST_MTIME;
+    $IDX = $ST_ATIME       if $opt_u;
+    $IDX = $ST_CTIME       if $opt_c;
+    $IDX = $ST_SIZE        if $opt_s;
+
+    mkdir $tmpdir, 0700 or die "je peux pas faire mkdir $tmpdir: $!";
+    chdir($tmpdir)      or die "je peux pas faire chdir $tmpdir: $!";
+    mkdir 'tmp',   0777 or die "je peux pas faire mkdir $tmpdir/tmp: $!";
+
+=item *
+
+Vérifiez toujours la valeur retournée par un appel système. Les
+meilleurs messages d'erreur sont ceux qui sont dirigés sur C<STDERR>
+et qui S<fournissent :> le programme en cause, l'appel système qui a
+échoué avec ses arguments et (TRÈS IMPORTANT) le message d'erreur
+système indiquant la cause de l'échec. Voici un exemple simple, mais
+S<suffisant :>
+
+    opendir(D, $dir)     or die "je peux pas faire opendir $dir: $!";
+
+=item *
+
+Alignez vos translitérations quand cela a un S<sens :>
+
+    tr [abc]
+       [xyz];
+
+=item *
+
+Pensez à la réutilisation du code. Pourquoi perdre de l'énergie en produisant
+un code jetable alors que vous aurez certainement à refaire quelque chose de
+similaire dans quelque S<temps ?> Pensez à généraliser votre code. Pensez à
+écrire un module ou une classe. Pensez à faire tourner votre code proprement
+avec C<use strict> et C<use warnings> (ou B<-w>) activés. Pensez à distribuer
+votre code. Pensez à changer votre regard sur le monde. Pensez à... oh, non,
+oubliez.
+
+=item *
+
+Pensez à documenter votre code en utilisant le formatage Pod de
+manière cohérente. Voici quelques conventions courantesE<nbsp>:
+
+=over 4
+
+=item *
+
+Utilisez C<CE<lt>E<gt>> pour les noms de fonctions, de variables et de
+modules (et plus généralement pour tout ce qui peut être considéré
+comme du code tel que les filehandles ou des valeurs
+spécifiques). Remarquez qu'un nom de fonction est considéré comme plus
+lisible si il est suivi de parenthèses comme pour C<fonction()>.
+
+=item *
+
+Utilisez  C<BE<lt>E<gt>> pour les commandes comme B<cat> ou B<grep>.
+
+=item *
+
+Utilisez C<FE<lt>E<gt>> ou C<CE<lt>E<gt>> pour les noms de fichiers.
+C<FE<lt>E<gt>> devrait être utilisé systématiquement pour les noms de
+fichiers mais comme de nombreux traducteurs Pod le traduisent par de
+l'italique, les chemins Unix et Windows avec des C</> et des C<\>
+peuvent être moins lisibles et plus présentables par un
+C<CE<lt>E<gt>>.
+
+=back
+
+=item *
+
+Soyez cohérents.
+
+=item *
+
+Soyez gentils.
+
+=back
+
+=head1 TRADUCTION
+
+=head2 Version
+
+Cette traduction française correspond à la version anglaise distribuée avec
+perl 5.10.0.  Pour en savoir plus concernant ces traductions, consultez
+L<http://perl.enstimac.fr/>.
+
+=head2 Traducteur
+
+Traduction S<initiale :> Matthieu Arnold <arn@multimania.com>
+
+Mise à jourE<nbsp>: Paul Gaborit <Paul.Gaborit @ enstimac.fr>
+
+=head2 Relecture
+
+Gérard Delafond.
+

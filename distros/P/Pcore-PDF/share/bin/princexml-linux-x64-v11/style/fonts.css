@@ -1,0 +1,133 @@
+/*
+    Prince - Fonts stylesheet
+    http://www.princexml.com
+*/
+
+/* standard "serif" font family */
+
+@font-face {
+    font-family: serif; /* Thai */
+    src: prince-lookup("Garuda")
+}
+
+@font-face {
+    font-family: serif; /* Oriya */
+    src: prince-lookup("Lohit Oriya")
+}
+
+@font-face {
+    font-family: serif; /* Malayalam */
+    src: prince-lookup("Lohit Malayalam")
+}
+
+@font-face {
+    font-family: serif; /* Kannada */
+    src: prince-lookup("Lohit Kannada")
+}
+
+@font-face {
+    font-family: serif; /* Telugu */
+    src: prince-lookup("Lohit Telugu")
+}
+
+@font-face {
+    font-family: serif; /* Tamil */
+    src: prince-lookup("Lohit Tamil")
+}
+
+@font-face {
+    font-family: serif; /* Gujarati */
+    src: prince-lookup("Lohit Gujarati")
+}
+
+@font-face {
+    font-family: serif; /* Gurmukhi / Punjabi */
+    src: prince-lookup("Lohit Punjabi")
+}
+
+@font-face {
+    font-family: serif; /* Bengali */
+    src: prince-lookup("Lohit Bengali"), prince-lookup("Ani"), prince-lookup("Mukti Narrow")
+}
+
+@font-face {
+    font-family: serif; /* Devanagari / Hindi */
+    unicode-range: U+900-97F, U+20B9, U+255C;
+    src: prince-lookup("Lohit Devanagari")
+}
+
+@font-face {
+    font-family: serif; /* Korean */
+    src: prince-lookup("UnBatang"), prince-lookup("Baekmuk Batang")
+}
+
+@font-face {
+    font-family: serif; /* Japanese */
+    unicode-range: U+3040-309F, U+30A0-30FF, U+4E00-9FBF;
+    src: prince-lookup("Kochi Mincho"), prince-lookup("IPAMincho")
+}
+
+@font-face {
+    font-family: serif; /* Chinese */
+    src: prince-lookup("AR PL UMing CN"), prince-lookup("AR PL SungtiL GB")
+}
+
+@font-face {
+    font-family: serif; /* Symbols */
+    src: prince-lookup("OpenSymbol")
+}
+
+@font-face {
+    font-family: serif; /* Latin */
+    src: prince-lookup("Times New Roman"), prince-lookup("DejaVu Serif"), prince-lookup("DejaVu LGC Serif"), prince-lookup("Liberation Serif")
+}
+
+/* standard "sans-serif" font family */
+
+@font-face {
+    font-family: sans-serif; /* Korean */
+    src: prince-lookup("UnDotum"), prince-lookup("Baekmuk Gulim")
+}
+
+@font-face {
+    font-family: sans-serif; /* Japanese */
+    unicode-range: U+3040-309F, U+30A0-30FF, U+4E00-9FBF;
+    src: prince-lookup("Kochi Gothic"), prince-lookup("IPAGothic")
+}
+
+@font-face {
+    font-family: sans-serif; /* Chinese */
+    src: prince-lookup("AR PL UKai CN"), prince-lookup("AR PL KaitiM GB")
+}
+
+@font-face {
+    font-family: sans-serif; /* Symbols */
+    src: prince-lookup("OpenSymbol")
+}
+
+@font-face {
+    font-family: sans-serif; /* Latin */
+    src: prince-lookup("Arial"), prince-lookup("DejaVu Sans"), prince-lookup("DejaVu LGC Sans"), prince-lookup("Liberation Sans")
+}
+
+/* standard "monospace" font family */
+
+@font-face {
+    font-family: monospace;
+    src: prince-lookup("Courier New"), prince-lookup("DejaVu Sans Mono"), prince-lookup("DejaVu LGC Sans Mono"), prince-lookup("Liberation Mono")
+}
+
+/* standard "cursive" font family */
+
+@font-face {
+    font-family: cursive;
+    src: prince-lookup("Comic Sans MS"), prince-lookup("DejaVu Sans"), prince-lookup("DejaVu LGC Sans"), prince-lookup("Liberation Sans")
+}
+
+/* standard "fantasy" font family */
+
+@font-face {
+    font-family: fantasy;
+    src: prince-lookup("Comic Sans MS"), prince-lookup("DejaVu Sans"), prince-lookup("DejaVu LGC Sans"), prince-lookup("Liberation Sans")
+}
+

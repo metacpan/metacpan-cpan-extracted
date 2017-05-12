@@ -1,0 +1,56 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c0aaa2c9350a2b7bac1b83cdf3a2e908dc39995b Changes
+SHA1 1179f98d0de353aafbd6ac4d01401f030d8a1003 LICENSE
+SHA1 08f4eeaae62c8799db66ad792dace23c094e0b5e MANIFEST
+SHA1 a766360c4ee4d1b1f4a52ca060a241e9f14cb84c META.yml
+SHA1 eff04adf4022e98b3af0d6b36e3724561993da02 Makefile.PL
+SHA1 d9f99a46429beefab4d2e721e102e8851854590a README
+SHA1 3efd44da9080b52851a7c59ac7e9b54e463effe8 Sort.pm
+SHA1 11123877ca46016a3124182efbb8c028c43117d5 examples/ex1.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 42680e29f743bf8628b504cd2270da6ed86b7ed4 t/PYX-Sort/01-use.t
+SHA1 f5f38b2d007a5944acbd02d3d203d0c47b5cc3b6 t/PYX-Sort/02-version.t
+SHA1 68548a5c6935ec7fb6d84089392c33e50b2b29d1 t/PYX-Sort/03-new.t
+SHA1 eecfa48891369a4172c0e3572a6cfd4f0f4f234b t/PYX-Sort/04-parse.t
+SHA1 86a24ca765a5a97efd0a60e562277c1d4d70e44b t/PYX-Sort/05-parse_file.t
+SHA1 e19a3cfbd4df87dd1ddba6b0ef7fe6e270493285 t/PYX-Sort/06-parse_handler.t
+SHA1 ab48cac80826a90df5836c22087af5298da89d0a t/data/ex1.pyx
+SHA1 588e7948ba5822f46cca922c072f651f64b52c7b t/data/ex2.pyx
+SHA1 93fcec0dc0497606e64fcadfd4580bafc564fad8 xt/PYX-Sort/01-pod_coverage.t
+SHA1 723aaa6a745ce2f319a491e8a41a21c7c9e4bb31 xt/PYX-Sort/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWJ4z9AAoJEJe+XXKaIuTlVJAIAK6t6umH4YssFeEqF7Eqlnr6
+1SEF29Q0vTMjDdfWRbl8Wxq8OZ2lE5birEgMfliGTd468C7axrH0rsHj1P7E184o
+RDDwZ5efTx9zsBTArqBaDLCQHySHAcWOk3NN+RX7D9ZNXFkdkzNjrRXLOZemgpTU
+kQntg4b+tN/2FDGDjijacnrQml8IMkyhZfB64I9JxQ/JDHrwXeUuLrPrZ60A45EG
+nJMKhD5xmxiFaBRSeE77whVA+d0Imk62AjSGzeZm63pO4I7BFJ2aEQe+GL2f3+FE
+CmS8W3tf5Q07mJekMwrKtro/+dYvNLbsQghmIKvCwKnoIsW4Z5d2w5Z1Gb35msQ=
+=RPHt
+-----END PGP SIGNATURE-----

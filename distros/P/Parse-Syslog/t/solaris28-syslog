@@ -1,0 +1,5 @@
+Aug  6 08:00:55 jobis mountd[335]: [ID 664212 daemon.error] No default domain set
+Aug  7 13:15:12 jobis sshd[27321]: [ID 800047 daemon.crit] fatal: Timeout before authentication for 192.168.1.1
+Aug  7 16:45:51 jobis cvs_server: [ID 702911 daemon.notice] connection from test [192.168.1.1] to /usr/test
+Aug  7 16:49:03 jobis last message repeated 11 times
+Aug 18 14:56:03 bigbang.ee.ethz.ch snort: [ID 381826 local5.info] IDS278/dns_named-probe-version: 211.20.98.98:3656 -> 129.132.20.8:53

@@ -1,0 +1,27 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/POE/Component/Client/opentick.pm
+lib/POE/Component/Client/opentick/Constants.pm
+lib/POE/Component/Client/opentick/Error.pm
+lib/POE/Component/Client/opentick/FAQ.pm
+lib/POE/Component/Client/opentick/Output.pm
+lib/POE/Component/Client/opentick/Protocol.pm
+lib/POE/Component/Client/opentick/ProtocolMsg.pm
+lib/POE/Component/Client/opentick/OTClient.pm
+lib/POE/Component/Client/opentick/Record.pm
+lib/POE/Component/Client/opentick/Socket.pm
+lib/POE/Component/Client/opentick/Util.pm
+t/00-load.t
+t/10-Constants.t
+t/11-Util.t
+t/12-Error.t
+t/13-Output.t
+t/20-Record.t
+t/50-redirect.t
+t/pod-coverage.t
+t/pod.t
+examples/OTClient-example.pl
+examples/opentick-example.pl
+META.yml                                 Module meta-data (added by MakeMaker)

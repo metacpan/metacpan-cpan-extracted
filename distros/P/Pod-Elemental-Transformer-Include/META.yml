@@ -1,0 +1,16 @@
+---
+abstract: 'include output via files and commands'
+author:
+  - 'Adam Flott <adam@npjh.com>'
+generated_by: 'Dist::Zilla version 1.100160'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Elemental-Transformer-Include
+requires:
+  ExtUtils::MakeMaker: 6.11
+  File::Slurp: 0
+  Pod::Elemental::Transformer: 0
+  perl: 5.10.0
+version: 1.001

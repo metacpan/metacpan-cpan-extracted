@@ -1,0 +1,12 @@
+[% INCLUDE common/header.tt
+           title = "Error!"
+%]
+
+<h2>Invalid e-name.  Try again.</h2>
+
+<form method="GET" action="[% baseUrl %]">
+e-name:
+<input type="text" name="xri_ename" size="20" />
+</form>
+
+[% INCLUDE common/footer.tt %]

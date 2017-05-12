@@ -1,0 +1,19 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+lib/POE/Component/Server/HTTPServer.pm
+lib/POE/Component/Server/HTTPServer/BasicAuthenHandler.pm
+lib/POE/Component/Server/HTTPServer/Examples.pod
+lib/POE/Component/Server/HTTPServer/Handler.pm
+lib/POE/Component/Server/HTTPServer/NotFoundHandler.pm
+lib/POE/Component/Server/HTTPServer/ParameterParseHandler.pm
+lib/POE/Component/Server/HTTPServer/StaticHandler.pm
+lib/POE/Component/Server/HTTPServer/TemplateHandler.pm
+t/basic_auth_handler.t
+t/dispatch.t
+t/not_found_handler.t
+t/parameter_handler.t
+t/static_handler.t
+META.yml                                 Module meta-data (added by MakeMaker)

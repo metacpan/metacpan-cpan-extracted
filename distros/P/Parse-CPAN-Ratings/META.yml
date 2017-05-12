@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Parse-CPAN-Ratings
+version:            0.33
+abstract:           Parse CPAN Ratings
+author:
+    - Leon Brocard <acme@astray.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Moose:                0
+    MooseX::StrictConstructor:  0
+    MooseX::Types::Path::Class:  0
+    Parse::CSV:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

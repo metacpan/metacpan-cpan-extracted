@@ -1,0 +1,121 @@
+NAME
+    Perl::Metric::Basic - Provide basic software metrics
+
+SYNOPSIS
+      # first construct a PPI::Document object to pass in
+      my $document = PPI::Document->load("t/lib/Acme.pm");
+
+      # then retrieve metrics on the document
+      my $m = Perl::Metric::Basic->new;
+      my $metric = $m->measure($document);
+
+      # $metric will consist of something like:
+      #  'Acme' => {
+      #    'new' => {
+      #      'blank_lines'      => 1,
+      #      'comments'         => 1,
+      #      'lines'            => 7,
+      #      'lines_of_code'    => 6,
+      #      'numbers'          => 0,
+      #      'numbers_unique'   => 0,
+      #      'operators'        => 3,
+      #      'operators_unique' => 2,
+      #      'symbols'          => 5,
+      #      'symbols_unique'   => 2,
+      #      'words'            => 7,
+      #      'words_unique'     => 6
+      #    },
+      # ...
+
+DESCRIPTION
+    When constructing software one often produces code of vastly differing
+    quality. The Perl::Metric::Basic module leverages the PPI module to
+    provide some interesting software metrics for Perl code, mostly
+    measuring size and maintainability.
+
+    A metric is some sort of measurement which is intended to help you make
+    a decision about a piece of code. There aren't any hard rules about
+    metrics, but the ones provided should allow you to make decisions about
+    modules or subroutines which are outliers. Abnormal measurements in a
+    subroutine are a warning sign that you should reexamine that routine,
+    checking for unusually low quality.
+
+    This module uses the PPI module, and thus can parse Perl code without
+    evaluating it.
+
+    If you're interested in software metrics, I highly recommend "Code
+    Complete" (Second Edition) by Steve McConnel (Microsoft Press).
+
+METHODS
+  new()
+    The new() method is the constructor:
+
+      my $m = Perl::Metric::Basic->new;
+
+  measure()
+    The measure() method measures some metrics and returns a hash reference.
+    Files in Perl can contain more than one package, and it is interesting
+    to seperate metrics by package. The key for the hash reference is the
+    name of the package, and the value is another hash reference.
+
+    Perl packages are seperated into subroutines, and it is interesting to
+    seperate metrics by subroutine. The key for the second hash reference is
+    the name of the subroutine, and the value is another hash reference
+    containing metrics.
+
+    There are various metrics applied to the subroutine. The key for the
+    third hash reference is the name of the metric, and the value is the
+    value of the metric. The metrics are:
+
+    blank_lines
+        The number of blank code lines.
+
+    comments
+        The number of lines containing comments.
+
+    lines
+        The total number of lines.
+
+    lines_of_code
+        The number of lines of code.
+
+    numbers
+        The total number of numbers used (eg "$z = 42 * 3" would have 2
+        numbers).
+
+    numbers_unique
+        The number of unique numbers used (eg "$z = 2*$x + 2*$y" would have
+        1 unique number).
+
+    operators
+        The total number of operators used.
+
+    operators_unique
+        The number of unique operators used.
+
+    symbols
+        The total number of symbols used (eg "$z = $x*$x + $y*$y" would have
+        5 symbols).
+
+    symbols_unique
+        The number of unique symbols used (eg "$z = $x*$x + $y*$y" would
+        have 3 unique symbols).
+
+    words
+        The total number of words (operators) used.
+
+    words_unique
+        The number of unique words used.
+
+NOTES
+    Currently the code only works for object-oriented classes, not scripts.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2004, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

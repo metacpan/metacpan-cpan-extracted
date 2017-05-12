@@ -1,0 +1,11 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+eg/dunno
+lib/POE/Filter/Postfix.pm
+lib/POE/Filter/Postfix/Base64.pm
+lib/POE/Filter/Postfix/Null.pm
+lib/POE/Filter/Postfix/Plain.pm
+t/basic.t

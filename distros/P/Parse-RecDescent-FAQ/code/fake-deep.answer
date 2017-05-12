@@ -1,0 +1,55 @@
+
+The line from demo_calc.pl is in
+fact not doing any deep copying.
+
+
+    #!/usr/bin/perl -w
+    my @original = (
+        [0],  [1,2,3],  [4,5,6],  [7,8,9]
+    );
+    my @copy = &some_kind_of_copy( \@original );
+    sub some_kind_of _copy {
+        # here's that line from demo_calc.pl
+        my (@list) = @{[@{$_[0]}]};
+        return @list;
+    }
+
+ $original[0][0]         = 'zero';
+ @{ $original[1] }[0..2] = qw(one   two   three);
+ @{ $original[2] }[0..2] = qw(four  five  six);
+ @{ $original[3] }[0..2] = qw(seven eight nine);
+    # now use the debugger to look at the addresses,
+    # or use Data::Dumper to look at @copy, or just
+    # compare one of the items...
+ if (  $copy[1][2] eq 'three'  ) {
+    print "Shallow Copy\n";
+ } elsif (  $copy[1][2] == 3  ) {
+    print "Deep Copy\n";
+ } else {
+        print "This should never happen!!!\n"
+	}
+
+
+If you wanted that line to do deep copying of a list of anon arrays,
+then the line should read
+
+    my @list = map  { [@$_] }  @{$_[0]};
+               # turn $_[0] into a list (of arrayrefs)
+               # turn each (arrayref) element of that list
+               # into an anonymous array containing
+               # a list found by derefrencing the arrarref
+
+Try plugging that line into above script instead of the line from the
+demo_calc.pl and you'll see different output. The line from demo_calc.pl
+is in fact doing extra useless work. My guess is that the extra
+    @{[    ]}
+around there is one of two things:
+    1) a momentary lapse of attention
+       resulting in a copy/paste error, or duplicate typing
+ or
+    2) an artifact of earlier code wherein something extra was
+       going on in there and has since been deleted.
+
+Even Damian can make a mistake, but it's not a mistake that affects
+output... it just makes for a tiny bit of wasted work (or maybe Perl is
+smart enough to optimze away the wasted work, I dunno).

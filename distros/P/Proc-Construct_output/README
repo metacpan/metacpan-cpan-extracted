@@ -1,0 +1,29 @@
+Proc/Construct_output.pm version 0.01
+=====================================
+
+Perl extension to output values from while, foreach and if-elsif-else -constructs.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+POST-INSTALL
+
+Be sure to get examples.pl -file from http://www.kolumbus.fi/vilmak/examples.pl
+
+To get general information about the module type the following:
+
+   perldoc Proc::Construct_output.pm
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Ville Jungman
+<ville_jungman@hotmail.com, ville.jungman@frakkipalvelunam.fi>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

@@ -1,0 +1,32 @@
+# This file acts as the project's changelog.
+
+`P5U-Command-Deps 0.001 cpan:TOBYINK`
+	issued  2012-12-13;
+	label   "Initial release".
+
+`P5U-Command-Deps 0.002 cpan:TOBYINK`
+	issued  2012-12-14;
+	changeset [
+		item "When recursing directories, skip VCS crud."^^Change;
+	].
+
+`P5U-Command-Deps 0.003 cpan:TOBYINK`
+	issued  2013-03-11;
+	changeset [
+		item "Don't list packages provided by scanned codebase as being requirements."^^Change;
+		item "New '--keep-provides' option."^^Addition;
+		item "Changed '--skipcore' option to '--skip-core'."^^Change;
+		item "Better differentiation between build/runtime/test/xt."^^Change;
+	].
+
+`P5U-Command-Deps 0.004 cpan:TOBYINK`
+	issued  2013-05-28;
+	changeset [
+		item "Eschew my $_."^^Update;
+	].
+
+`P5U-Command-Deps 0.005 cpan:TOBYINK`
+	issued  2013-06-17;
+	changeset [
+		item "Switch from Path::Class::Rule to Path::Iterator::Rule, and drop Path::Class usage."^^Update;
+	].

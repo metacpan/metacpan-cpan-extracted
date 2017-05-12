@@ -1,0 +1,28 @@
+Parse::PlainConfig
+==================
+
+NOTICE:  We've jumped a major rev due to a break in the API.  After ten
+years of using Parse::PlainConfig it was inevitable that I would arrive to
+the conclusion that while the features was nice it was simply a major PITA
+from a developer's perspective.
+
+For that reason this module has been rewritten entirely from scratch with
+the aim to make it trivial to implement as a developer.  I find the new
+subclassing method to be rather insanely easy, actually, and includes some
+new features.
+
+The trade off for that, however, was dropping the config generator,
+something that sounded good at the time, but something I never actually
+used.  My wager is that no one else did, either.
+
+Legacy Support
+--------------
+
+For your convenience I've left the old module in this distribution, albeit
+under new namespace.  My hope is that this will require minimal adjustments
+to any existing scripts that rely on it.  I truly believe, though, you will
+find the new version so much more pleasureable to use that you'll migrate to
+that, instead.
+
+The old module is now called Parse::PlainConfig::Legacy.
+

@@ -1,0 +1,17 @@
+POE::Component::Client::Halo is an add-on to the POE framework
+to allow easy access to the Halo query protocol.
+
+This is based off an early release of the Halo dedicated server 
+and was reverse engineered with a sniffer, so the specification 
+may change.  I will attempt to keep the latest version on CPAN 
+up-to-date with the protocol changes.
+
+--HISTORY--
+This is version 0.2.  This release adds support for player_flags
+and game_flags.  The documentation in this release is still 
+really rough.  The sample is still the best way to get going.
+
+This is version 0.1.  This is the first release.
+
+Andrew A. Chen
+achen-poe-halo@divo.net

@@ -1,0 +1,42 @@
+---
+name: POE-Component-Client-Whois-Smart
+version: 0.187
+author: []
+abstract: Provides very quick WHOIS queries with smart features.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CLASS: 0
+  HTTP::Request: 0
+  Hash::MoreUtils: 0
+  Module::Pluggable::Ordered: 0
+  Net::Whois::Raw: 1.56
+  POE: 0
+  POE::Component::Client::HTTP: 0
+  POE::Component::SSLify: 0
+  POE::Filter::Line: 0
+  POE::Wheel::ReadWrite: 0
+  POE::Wheel::SocketFactory: 0
+  SOAP::DirectI: 0
+  Tie::Cache::LRU: 0
+  Time::HiRes: 0
+  URI::URL: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  POE::Component::Client::Whois::Smart:
+    file: lib/POE/Component/Client/Whois/Smart.pm
+    version: 0.187
+  POE::Component::Client::Whois::Smart::Cache:
+    file: lib/POE/Component/Client/Whois/Smart/Cache.pm
+  POE::Component::Client::Whois::Smart::DirectI:
+    file: lib/POE/Component/Client/Whois/Smart/DirectI.pm
+  POE::Component::Client::Whois::Smart::NetWhoisRaw:
+    file: lib/POE/Component/Client/Whois/Smart/NetWhoisRaw.pm
+  POE::Component::Client::Whois::Smart::NetWhoisRawHTTP:
+    file: lib/POE/Component/Client/Whois/Smart/NetWhoisRawHTTP.pm
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

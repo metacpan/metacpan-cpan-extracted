@@ -1,0 +1,17 @@
+
+my $x = 1;
+
+=head1 Foo
+
+This is mid-code!
+
+=cut
+
+my $y = 2;
+
+=head1 Bar
+
+This is post-code!
+
+=cut
+

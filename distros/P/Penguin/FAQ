@@ -1,0 +1,212 @@
+0.  'What's the interface to the penguin mailing list?'
+
+    Unfortunately, there is no list at the moment.
+
+1.  'What's the list for?'
+
+    If it existed, which it, again unfortunately, no
+    longer does, it would be for discussing how to mess
+    around with Penguin.
+
+2.  'Who does development and why?'
+
+    I do, with huge indirect and theoretical help from Tim Bunce.
+    I work alone whenever I can steal a moment from my horrifically
+    involved job as bizarre internet appliance hacker for Data General.
+    Nobody pays me for Penguin, and I'm not sure yet what my 
+    motivation is. :)
+
+3.  'Where is Penguin at in completionspace?'
+
+    Penguin needs a few more things before I'm actively happy with
+    letting it go out into the world and kill java.  However, since
+    some of these things are way beyond my control, it'll probably
+    have to go out early.  We need:
+
+    a.  A firmed-up digital signature method that doesn't require
+        as much external stuff.  Depends on: PGP-3.0, or finding a
+        different, smaller algorithm.  Note that PGP3 is several
+        years late.
+
+    b.  A set of well-known basic classes and a framework for implementing
+        further classes that permit programs executing on a remote machine
+        to use the power of normally-unsafe operations in a safe way.
+        Depends on: time, manpower.
+
+    c.  A graphical user interface class.  Depends on: huge time,
+        huge manpower, or Perl/Tk getting much much smaller.
+
+    d.  A rewrite in XS.
+
+    e.  A safety guarantee (perl experts ensuring that it really does
+        what it should).
+
+    All in all, I think we're about 91% done with the base part of
+    Penguin (although Tim's efforts rewriting Safe will substantially
+    alter that in one direction or another), and 44% done with 
+    Penguin-as-Internet-domination-engine.  Both of which statements
+    should be construed as a call for assistance and bug reports. :)
+
+4.  'How can I help?'
+
+    a.  Try to use the code.  
+
+    b.  Look at the code.  See if it makes any sense, or if you can
+        offer improvements, even if they're just verbal and not
+        context diffs.  
+
+    c.  Think about the concept and share your thoughts.  The
+        design of Penguin is open, and apart from a strange willingness
+        to do all of the busywork, I have no vested interest in
+        one way of doing it over another.
+
+    d.  Send code.  If you send me cool code, I will buy you beer.
+
+5.  'Saaaay, what _is_ the design of Penguin?'
+
+    Glad you asked.
+
+    Consider two machines, foo and bar.  A user on foo (or perhaps
+    a program on foo) wishes to execute a program on machine bar.
+    However, imagine that the people running bar don't want just
+    anyone running code on their machine for security reasons.
+    This is the normal case on the Internet, and one which the
+    World Wide Web attempts to emulate with HTTP and CGI.
+
+    Normally, there is no well-known channel for foo to transmit
+    code to bar.  Further, there is no provision for the code to
+    undergo verification after transmission.  Too, there is no
+    well-defined way for bar to ensure that foo's code does not
+    attempt to perform insecure or damaging operations.
+
+    Penguin attempts to solve these issues while making sure the
+    code language maintains some acceptable degree of sufficiency
+    and power.
+    
+    Using Penguin, the user/program on foo 'digitally signs' the
+    code that's earmarked for delivery to bar.  The signature
+    encodes the code in such a way that it is impossible to alter
+    the code or deny that the signer signed it.
+
+    The code is then wrapped up into a packet and transmitted
+    through a 'channel' to a Penguin process running on machine
+    bar.  The channel's protocol layer is abstracted away
+    enough that it becomes unimportant; Penguin code can just 
+    as easily be delivered through SMTP or AOL Mail as through
+    TCP/IP, DECNet, AppleTalk, whatever.
+
+    The Penguin process on bar unwraps the packet, which contains
+    further verification and checksum information, and then
+    'digitally unsigns' the code, a process which provides the
+    code in 'clear' form while telling the receiver who digitally
+    signed it.
+
+    The receiver then cross-references the signer's identity with
+    a list of rights that the receiver associates with the signer,
+    reverting to a set of default rights if the signer is unknown
+    or unlisted.
+
+    A safe compartment is then created, populated with the
+    functions allowed to the signer, and told to limit the
+    operations it can perform to only those permitted to the
+    signer.
+
+    The code is then compiled within that safe compartment.  If
+    it attempts to do something which the signer is not allowed
+    to do, or if it attempts to call a function not permitted
+    to the signer, the compartment immediately traps the operation
+    and throws the code away before it can execute.  If the code
+    uses no unsafe or illegal operations, then it executes and
+    produces a result.
+
+    The code executing side then becomes the master in the
+    transaction, and can send code to the original sender,
+    send the return value back in a data packet, and so forth.
+    The process repeats as necessary until both parties are
+    done; the channel then closes, and the Penguin transaction is complete.
+
+    The basic sentiment behind the idea of 'identity' being
+    correlated to 'rights' in the receiver is that in signing
+    the code, the signer commits her identity and her reputation
+    on the correct operation of the code.
+
+    'highly trustable' signers (as one might imagine Larry Wall,
+    Randal Schwartz, and Tom Christiansen to be) might be assigned
+    very high levels of trust and equivalent degrees of 'rights',
+    so that programs they sign can perform very complex and
+    interesting operations on your computer.  By the same token,
+    paranoid sites or those wishing isolation could assign zero
+    rights to everyone except for a select (perhaps internal) few.
+
+    Part of the 'rights' given to signers include possibly specialized
+    functions that encapsulate the functionality of extremely dangerous
+    operations.  For instance, a store opening up on the Internet might
+    put up a Penguin server which put functions called 'list_items'
+    and 'buy_item()' into the limited compartments all users get.
+    'list_items' might open up a file on the store's machine, read
+    the contents, and spit them out -- an operation which, if allowed
+    in the general case, would clearly breach security.  However,
+    by creating a specialized function, the security concern is
+    removed, and by letting potential customers know of the function,
+    the power and ease of use are kept high.
+
+    Niggling but important technical issues currently being wrestled
+    with include the way that foreign functions are registered into
+    the namespace, the construction of a foreign function framework
+    so that the names and function of the functions are well-known,
+    and a superior-than-current 'digital signature' method.
+
+6.  'Is it embedded in Netscape yet?'
+
+    No.  In fact, I personally believe that the real killer app
+    for internet-aware travelling programming languages is not
+    the server sending cute little animations of bouncing heads
+    to the client, but the client sending programs which do
+    advanced querying and information collection to the server,
+    so I don't personally plan on embedding it in Netscape any
+    time soon.
+
+    That's not to say that it can't be embedded in Netscape,
+    which it can, given a GUI; in fact, it can act just like
+    java does, except with a vastly improved security model 
+    and a much better level of abstraction for a scripting language.
+
+7.  'When will it be ready?'
+
+    I figure on releasing One Penguin (the first public version)
+    around early March.  That's assuming that a lot of things go
+    as planned, however. [ Update: as usual, this didn't turn
+    out to be true.  The new release date is something near May. ]
+    [ Second Update: I was off by a year and several months. ]
+
+8.  'One Penguin?'
+
+    Sure.  To be followed by Two Penguins, etc.
+
+9.  'You're just making up for the fact that you're using a really
+     high number for the alpha version of a product, aren't you?'
+
+    Hey, you're a FAQ, I don't have to answer that.
+
+10. 'For that matter, why Penguin?'
+
+    For several reasons.  First of all, every other language is
+    getting a really cool and happening name that has nothing to
+    do with what it does (java is a tasteless little chunk of C++,
+    blackbird is a monstrous proprietary behemoth which couldn't
+    flock if it had guy wires, guile's 6 megabyte footprint is
+    as unsubtle as one could imagine, and tcl -- doesn't tcl my
+    fancy).  Second, Penguins are cute, and it's important to
+    work on something cute when you design terrifically complex
+    web software all day.  Third, Lyle Lovett's song _Penguins_
+    off of the CD _I Love Everybody_ is insanely great.  Fourth,
+    I spent like sixty bucks buying stock photographs of penguins
+    for my web page.  Fifth, my girlfriend likes the name.  Sixth,
+    it conjures the image of a billion tiny little things running
+    hectically towards the ocean, and that's about how I envision
+    a successful Penguin.
+
+11. 'Isn't the entire form of chatty self-referential FAQs overused 
+     and pathetically trite by now?'
+
+    Could be. :)

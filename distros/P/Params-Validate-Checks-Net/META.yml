@@ -1,0 +1,21 @@
+---
+name: Params-Validate-Checks-Net
+version: 0.01
+author:
+  - 'Smylers <smylers@cpan.org>'
+abstract: |-
+  Params::Validate checks for functions taking
+  network-related arguments
+license: perl
+requires:
+  Data::Validate::Domain: 0.02
+  Data::Validate::IP: 0
+  Params::Validate::Checks: 0
+  Regexp::Common: 0
+build_requires:
+  Test::More: 0
+provides:
+  Params::Validate::Checks::Net:
+    file: lib/Params/Validate/Checks/Net.pm
+    version: 0.01
+generated_by: Module::Build version 0.26

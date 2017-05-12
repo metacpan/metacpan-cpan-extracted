@@ -1,0 +1,137 @@
+NAME
+    Perl6::Str - Grapheme level string implementation for Perl 5
+
+SYNOPSIS
+        use Perl6::Str;
+        use charnames qw(:full);
+        my $s = Perl6::Str->new("a\N{COMBINING ACUTE ACCENT}");
+        my $other = "\N{LATIN SMALL LETTER A WITH ACUTE}";
+
+        if ($s eq $other) {
+            print "Equality compared at grapheme level\n";
+        }
+
+        # just one grapheme:
+        printf "'%s' has %d logical characters\n", $s, $s->graphs;
+
+        # prints the whole grapheme, not just the accent:
+        print $s->substr(-1, 1); 
+        print $s->uc;
+
+        # adjust case of characters according to template:
+        # prints 'AbcDE'
+        print $s->new('abcdE')->samecase('Xy Z');
+
+DESCRIPTION
+    Perl 5 offers string manipulation at the byte level (for non-upgraded
+    strings) and at the codepoint level (for decoded strings). However it
+    fails to provide string manipulation at the grapheme level, that is it
+    has no easy way of treating a sequence of codepoints, in which all but
+    the first are combining characters (like accents, for example) as one
+    character.
+
+    "Perl6::Str" tries to solve this problem by introducing a string object
+    with an API similar to that of Perl 6 (as far as possible), and
+    emulating common operations such as "substr", "chomp" and "chop" at the
+    grapheme level. It also introduces builtin string methods found in Perl
+    6 such as "samecase".
+
+    "Perl6::Str" is written in pure Perl 5.
+
+    For a description of the Perl 6 "Str" type, please see
+    <http://doc.perl6.org/type/Str>.
+
+CAVEATS
+    "Perl6::Str" is implemented in terms of a blessed reference to the
+    underlying perl 5 string, and all operations are either overloaded
+    operators or method calls. That means that the objects lose all their
+    magic once they are interpolated into ordinary strings, and that all
+    overloaded operations come with a speed penalty.
+
+    Also note that it's another layer of abstraction, and as such suffers a
+    speed limit for all operations. If speed is important to you, benchmark
+    this module before you use it (and tell me your results please); if it's
+    too slow, consider writing a C based version of it.
+
+METHODS
+    All methods that expect numbers as input (like "substr") count them as
+    graphemes, not as codepoints or bytes.
+
+    new
+      "Perl6::Str-"new($p5_str)> takes a Perl 5 string, and returns a
+      "Perl6::Str" object. You can also use "new" as an object method,
+      "$p6s-"new($other)>. Note that the given perl 5 string should be a
+      decoded text string.
+
+    graphs
+      "$s->graphs" returns the number of graphemes in $s. If you think
+      "length", think "graphs" instead.
+
+    codes
+      "$s->codes" returns the number of codepoints in $s.
+
+    bytes
+      "$s->bytes" returns the number of bytes of the NFKC-normalized and
+      UTF-8 encoded $s. This is subject to change.
+
+    chars
+      returns the number of characters in the currently chosen Unicode
+      level. At the moment only grapheme-level is implemented, it's
+      currently an alias to "graphs".
+
+    substr
+
+      $s->substr(OFFSET)
+      $s->substr(OFFEST, LENGTH)
+      $s->substr(OFFSET, LENGHT, REPLACEMENT)
+
+      does the same thing as the builtin "substr" function
+
+    uc
+    lc
+    ucfirst
+    lcfirst
+      do the same things as the corresponding builtin functions.
+
+    capitalize
+      returns a lower case copy of the string with each first character in a
+      word as upper case.
+
+    samecase
+      "$s->samecase($pattern)" returns a copy of $s with the case
+      information as pattern, copied on a grapheme-by-grapheme base. If $s
+      is longer than $pattern, the case information from the last grapheme
+      of $pattern is copied to the remaining characters of $s.
+
+      Characters without case information (like spaces and digits) leave the
+      string unmodified.
+
+    chop
+      "$s->chop" returns a copy of $s with the last grapheme removed
+
+    chomp
+      "$s->chomp" returns a copy of $s, with the contents of $/ stripped
+      from the end of $s.
+
+    reverse
+      returns a reversed copy of the string.
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008, 2011 by Moritz A. Lenz. This module is free
+    software. You may use, redistribute and modify it under the same terms
+    as perl itself.
+
+    Example code included in this package may be used as if it were Public
+    Domain.
+
+AUTHOR
+    Moritz Lenz, moritz@faui2k3.org, <http://perlgeek.de/>,
+    <http://perl-6.de/>
+
+DEVELOPMENT
+    You can obtain the latest development version via git:
+
+        git clone git://github.com/moritz/Perl6-Str.git
+
+    See also: <https://github.com/moritz/Perl6-Str>.
+

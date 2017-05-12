@@ -1,0 +1,19 @@
+#!perl
+$VERSION = '2.21';
+
+use File::Find;
+use File::Slurp;
+
+print "Version: $VERSION\n";
+find(sub {
+	next unless /\.(pm|pl)$/i;
+	next unless -f $_;
+	
+	my $old = read_file($_);
+	(my $new = $old) =~ s/ ( [\$*] [\w\:\']* \b VERSION \b \s* = \s* [\'\"] ) [^\'\"]* ( [\'\"] ) /$1$VERSION$2/xg;
+	
+	if ($old ne $new) {
+		print "$File::Find::name : Change VERSION to $VERSION\n";
+		write_file($_, $new);
+	}
+}, 'lib', 'tools');

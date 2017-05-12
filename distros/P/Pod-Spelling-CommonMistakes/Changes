@@ -1,0 +1,8 @@
+Revision history for Pod-Spelling-CommonMistakes
+
+2.001 2014-11-04T20:43:44Z UTC
+ - initial release, split from Pod::Spell::CommonMistakes
+
+ [STATISTICS]
+ - code churn: 5 files changed, 106 insertions(+), 4 deletions(-)
+

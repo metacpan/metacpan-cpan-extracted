@@ -1,0 +1,11 @@
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Pod-PseudoPod-CrossReference
+version:      0.02
+version_from: lib/Pod/PseudoPod/CrossReference.pm
+installdirs:  site
+requires:
+    Pod::PseudoPod:                0.11
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.12

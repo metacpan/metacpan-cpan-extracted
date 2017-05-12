@@ -1,0 +1,45 @@
+---
+abstract: 'Domain parser and puny encoder/decoder.'
+author:
+  - 'Travis Holton <heytrav@cpan.org>'
+build_requires:
+  English: '0'
+  File::Spec: '0'
+  Mock::Quick: '0'
+  Moose: '0'
+  Test::Class: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Perl::Critic: '0'
+  Test::Routine: '0'
+  Test::Routine::Util: '0'
+  namespace::autoclean: '0'
+  parent: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: ParseUtil-Domain
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Getopt::Long: '0'
+  List::MoreUtils: '0'
+  Modern::Perl: '0'
+  Net::IDN::Encode: '0'
+  Net::IDN::Nameprep: '0'
+  Net::IDN::Punycode: '0'
+  autobox: '0'
+  autobox::Core: '0'
+  charnames: '0'
+resources:
+  repository: https://github.com/heytrav/ParseUtil-Domain.git
+version: '2.426'

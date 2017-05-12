@@ -1,0 +1,33 @@
+Changes
+lib/Protocol/ACME/Challenge/LocalFile.pm
+lib/Protocol/ACME/Challenge/Manual.pm
+lib/Protocol/ACME/Challenge/SimpleSSH.pm
+lib/Protocol/ACME/Challenge.pm
+lib/Protocol/ACME/Exception.pm
+lib/Protocol/ACME/Key.pm
+lib/Protocol/ACME/Logger.pm
+lib/Protocol/ACME/OpenSSL.pm
+lib/Protocol/ACME/Utils.pm
+lib/Protocol/ACME.pm
+Makefile.PL
+MANIFEST	
+README.pod
+examples/maketestcerts.sh
+examples/client.pl
+examples/revoke.pl
+t/00-load.t
+t/01-dependency_check.t
+t/02-load_key.t
+t/03-load_key_openssl.t
+t/04-load_key_crypt.t
+t/test_account_key.der
+t/test_account_key.pem
+t/test_cert_key.der
+t/test_cert_key.pem
+t/test_csr.der
+t/test_csr.pem
+t/write_key_files.pl
+t/lib/Protocol/ACME/Test.pm
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

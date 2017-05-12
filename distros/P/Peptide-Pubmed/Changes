@@ -1,0 +1,15 @@
+Revision history for Perl extension Peptide::Pubmed.
+
+1.02  Thu Jul 26 00:51:19 EDT 2007
+      - Added more documentation.
+
+1.01  Tue May  8 15:46:16 EDT 2007
+      Test fixes
+      - Removed obsolete test in t/01load.t
+
+1.00  Thu Mar 15 14:17:11 EDT 2007
+      - Released to http://pepbank.mgh.harvard.edu
+
+0.01  Thu Aug 11 12:56:18 2005
+      - Original version
+

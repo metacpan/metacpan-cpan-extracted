@@ -1,0 +1,70 @@
+Palm-PDB version 1.400, released March 7, 2015
+
+This distribution contains Palm::PDB and Palm::Raw, a pair of Perl 5
+modules for reading, manipulating, and writing the .pdb and .prc
+database files used by PalmOS devices such as the PalmPilot and its
+successors.
+
+These 2 modules were historically part of the p5-Palm distribution,
+which is now just called Palm.  They have been split off into their
+own distribution because they are also useful for manipulating the
+Mobipocket e-book format, which is also used for Amazon Kindle books.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+
+CHANGES
+    Here's what's new in version 1.400 of Palm-PDB:
+    (See the file "Changes" for the full revision history.)
+
+	- Bump version number to be greater than all previous releases.
+	  Palm::PDB 1.36 was released in p5-Palm 1.008, but p5-Palm 1.009
+	  contained Palm::PDB 1.009.  Version numbers shouldn't go backwards.
+	  (reported by David Cantrell - GitHub#1)
+
+
+
+CONTRIBUTING
+
+The source is in GitHub: https://github.com/madsen/Palm-PDB
+
+If you have a change, fork the repo, make your patch, and send me a
+pull request. Don't be scared; it's easy!
+
+
+
+AUTHORS AND CONTRIBUTORS
+
+	Andrew Arensburger <arensb@ooblick.com>: principal perpetrator
+	Robert Norris <rob@nauseum.org>: patch for empty PDBs
+	Sumant S.R. Oemrawsingh <sikander@stad.dsl.nl>: patch for
+		inconsistent record fields in Mail.pm
+	John Jannotti <jj@lcs.mit.edu>: patches to make Perl 5.6 shut up.
+	John-David Smith <jdsmith@astro.cornell.edu>: added "archive"
+		attribute.
+	Kenneth Lorber <keni@his.com>: fixed "pdbdump" to handle
+		arrays in parsed records (e.g., Datebook exceptions).
+	Alessandro Zummo <azummo@towertech.it>: DateTime.pm, ZirePhoto.pm
+	Kurt Starsinic <kstar@cpan.org>: documentation patch.
+	Seb Wills <saw27@mrao.cam.ac.uk>: documentation.
+	brian d foy <bdfoy@cpan.org>
+	Christopher J. Madsen <perl@cjmweb.net>
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2000 by Andrew Arensburger.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

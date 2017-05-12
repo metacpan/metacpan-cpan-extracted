@@ -1,0 +1,8 @@
+Paranoid::Log::Syslog
+=====================
+
+  This module provides syslog support from within the Paranoid::Log 
+framework.
+
+  Please send bugs, requests, and flames to Arthur Corliss
+<corliss@digitalmages.com>.

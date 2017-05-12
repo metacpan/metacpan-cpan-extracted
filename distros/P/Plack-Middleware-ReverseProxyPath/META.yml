@@ -1,0 +1,24 @@
+---
+abstract: 'adjust proxied env to match client-facing'
+author:
+  - 'Brad Bowman <cpan@bereft.net>'
+build_requires:
+  Test::More: 0.87_01
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-ReverseProxyPath
+no_index:
+  package:
+    - Plack::Middleware::ReverseProxyPath::Exception
+requires:
+  Plack::Middleware: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Plack-Middleware-ReverseProxyPath
+  repository: git://github.com/bowman/Plack-Middleware-ReverseProxyPath.git
+version: 0.04

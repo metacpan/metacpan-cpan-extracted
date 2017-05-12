@@ -1,0 +1,82 @@
+Revision history for Perl extension POEx::HTTP::Server.
+
+0.0902 May 2, 2013
+    - Correct to HTTP::Status::RC_INTERNAL_SERVER_ERROR 
+            Thank you Olivier Duclos
+    - Explicitly call ->close() as an attempt to avoid TIME_WAIT on Windows
+    - yield to 'close', so the above doesn't explode
+    - Don't use open "-|", use pipe_from_fork() instead
+            Thank you Alexandr Ciornii
+    - Fixed handling of input errors.  Previously it would crash if a
+        malformed request was sent as a second or subsequent request on a
+        keep-alive connection.
+            Thank you Dzs Bsd    
+
+0.0901 Jul 13, 2012
+    - Turn off DEBUG
+
+0.0900 Jul 13, 2012
+    - Added 'timeout' param
+    - Tweak the documentation
+
+0.0804 Feb 15, 2012
+    - It's 'error', not 'client_error'.  This fixes intermittent 
+        halting problems.
+    - Start a keepalive timer before we even get a request, to prevent DoS.
+
+0.0803 Sep 16, 2011
+    - Changed AUTHOR and added LICENSE
+
+0.0802 Aug 26, 2011
+    - Added do_retry to methods for server.  Now retry should work
+        Thank you Kevin Smith
+
+0.0801 Aug 26, 2011
+    - Use SIGUSR1, not 11
+
+0.0800 Wed May 18, 2011
+    - Bump copyrights
+    - Don't warn if Sys::Sendfile is missing
+    - Confirmed working in POE 1.311
+
+0.0700 Fri Feb 18, 2011
+    - Better keepalive params.  Documented, no less.
+    - Rebuild the filter for Keep-alive
+    - Only tell PoCo::Daemon we closed only when we really close a connection
+    - Don't close the connection on daemon_shutdown if we are handling a request
+    - Use ->call to inform PoCo::Daemon
+    - Fixed concurrency
+    - Make Sys::Sendfile visible to PAR
+    - Fixed content-type handling for ->sendfile
+    - Tweak doco
+    - Require latest POEx::URI
+
+0.0600 Fri Dec 17, 2010
+    - Removed debug option.  
+    - Fixed the race condition between send/flushed and done
+    - Renamed Response->sent to ->headers_sent
+
+0.0500 Wed Dec 15, 2010
+    - Added streaming support
+    - Document and test above
+    - Added sendfile and blocksize
+    - Document and test above
+    - Improve documentation for ::Error, ::Response and ::Request.
+
+0.0400 Wed Dec 15, 2010
+    - Document prefork
+    - Created POEx::HTTP::Server::Base
+    - Use POE::Session::Multiplex for _psm_begin
+    - Allow concurrency>1 and prefork
+    - Tweak the documentation
+
+0.03  Wed Dec 15, 2010
+    - Added prefork support
+
+0.02  Tue Dec 14, 2010
+    - Added on_error
+    - Fixed Response->is_error and ->is_success
+
+0.01  Mon Dec 13, 2010
+    - Initial release
+

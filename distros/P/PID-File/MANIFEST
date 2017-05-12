@@ -1,0 +1,27 @@
+Changes
+lib/PID/File.pm
+lib/PID/File/Guard.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-clean.t
+t/02-filename.t
+t/03-guard.t
+t/04-guard-scalar-context.t
+t/05-guard-list-context.t
+t/06-guard-wrapped-scalar-context.t
+t/07-guard-wrapped-list-context.t
+t/08-guard-wrapped-void-context.t
+t/09-guard-no-block-scalar-context.t
+t/10-guard-no-block-list-context.t
+t/11-guard-no-block-void-context.t
+t/12-guard-wrapped-void-context-multiple.t
+t/13-create-or-wait.t
+t/14-guard-off-on-create.t
+t/15-guard-on-create.t
+t/16-holgar-bug.t
+t/17-holgar-bug-correct.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

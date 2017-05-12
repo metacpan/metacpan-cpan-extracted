@@ -1,0 +1,152 @@
+#!/bin/sh -u
+
+#
+# Build solaris packages
+#
+# Helpful urls:
+#  http://www.sunfreeware.com/pkgadd.html
+#  http://docs.sun.com/db?p=/doc/806-7008
+#
+# Package names must be nine or fewer characters.
+
+pkgid=DMNCpprl
+modid1=DMNCpprla
+modid2=DMNCpprl2
+eval "modid=\$modid$APACHE_VERSION"
+plpkg=SUNWpl5u
+arch=`uname -p`
+spool=/var/spool/pkg
+os=Solaris`uname -r | awk -F. '{print $2}'`
+
+# Package prototype file
+make_proto() {
+    binlink=$1; shift
+    scripts=$1; shift
+
+    # Copy the files into $TMPDIR
+    copy_pkgfiles $TMPDIR "$@"
+
+    (
+	cd $PREFIX
+
+	echo i pkginfo=./pkginfo
+	echo i depend=./depend
+	echo i copyright=./copyright
+
+	if test "$scripts" -gt 0; then
+	    echo i postinstall=./postinstall
+	    echo i postremove=./postremove
+	fi
+
+	# Add a symlink in the "bin" directory
+	if test "$binlink" -gt 0 -a -d bin -a "$INSTALLBIN" != "bin"; then
+	    b=`echo $INSTALLBIN | remove_prefix`
+	    echo s none bin/perperl=../$b/perperl
+	fi
+
+	for f in `file_dest "$@"`; do echo $f; done |
+	remove_prefix |
+	awk '{printf("f none %s 0755 bin bin\n", $1, $2, $3, $4)}'
+    ) >$TMPDIR/prototype
+}
+
+# Package info file
+make_pkginfo() {
+    pkg=$1;	shift
+    nm=$1;	shift
+    desc=$1;	shift
+
+    cat >$TMPDIR/pkginfo <<-END
+	PKG="$pkg"
+	NAME="$nm"
+	ARCH="$arch"
+	VERSION="$VERSION"
+	CATEGORY="system"
+	VENDOR="$VENDOR"
+	EMAIL="$EMAIL"
+	PSTAMP="$VENDOR"
+	BASEDIR="$PREFIX"
+	CLASSES="none"
+	HOTLINE="$URL"
+	DESC="$desc"
+	END
+}
+
+pl_depend() {
+    # Pass in 0/1 to decide if output should be pretty
+    (
+	echo $1
+	pkginfo -l $plpkg
+    ) |
+    awk '
+	NR == 1 {
+	    pretty = $1;
+	}
+	$1  == "NAME:" {
+	    for (i = 2; i <= NF; ++i)
+		name = name " " $i;
+	}
+	$1 == "VERSION:" {
+	    version = $2;
+	}
+	END {
+	    if (pretty) {
+		printf("%s ('"$plpkg"')\n", name);
+	    } else {
+		printf("P '"$plpkg"'%s\n    %s\n", name, version);
+	    }
+	}
+    '
+}
+
+make_depend() {
+    cat >$TMPDIR/depend
+}
+
+make_pkg() {
+    is_apache=$1;	shift
+    pkg=$1;		shift
+    nm=$1;		shift
+
+    out=$OUTDIR/${os}-${nm}-${VERSION}-${arch}.gz
+
+    # Make the package
+    rm -rf $spool/$pkg
+    (cd $TMPDIR; pkgmk -r "${TMPDIR}${PREFIX}") &&
+
+    # Make it into a stream
+    (cd $spool; pkgtrans -s $spool $TMPDIR/$pkg $pkg) &&
+    rm -rf $spool/$pkg &&
+
+    # Compress and make final output file
+    gzip -9 <$TMPDIR/$pkg >$out
+
+    add_desc $out $is_apache $os $arch "$@"
+}
+
+# Make a copyright file
+cp COPYING $TMPDIR/copyright
+
+# Make regular package
+make_proto 1 0 $STD_FILES </dev/null &&
+make_pkginfo $pkgid "$PKGNM_PRETTY" "`grab_summary`" &&
+pl_depend 0 | make_depend &&
+make_pkg 0 $pkgid $PKGNM "`pl_depend 1`" &&
+
+if want_apache_package; then
+    # Make pre/postinstall scripts for apache
+    apache_install_script '$BASEDIR' 'FCS' >$TMPDIR/postinstall
+    apache_uninstall_script >$TMPDIR/postremove
+
+    # Make apache module package
+    make_proto 0 1 $APACHE_FILES &&
+    make_pkginfo $modid "$MODNM_PRETTY" "$APACHE_DESC" &&
+    (
+	echo "P SUNWapchu Apache Web Server (usr)"
+	echo "P SUNWapchr Apache Web Server (root)"
+	echo "P $pkgid $PKGNM_PRETTY"
+    ) |
+    make_depend &&
+    make_pkg $APACHE_VERSION $modid ${PKGNM}-${MODNM} \
+	"Apache Web Server (SUNWapchu, SUNWapchr)"
+fi

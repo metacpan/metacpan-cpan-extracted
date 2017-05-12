@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                Pod-Trac
+version:             0.0.1
+abstract:            Convert a POD to trac's wiki syntax and add it to the trac
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Class::Accessor::Fast:         0
+    File::Util:                    0
+    HTTP::Cookies:                 0
+    HTTP::Request::Common:         0
+    LWP::UserAgent:                0
+    Pod::Simple::Wiki:             0
+    Test::More:                    0
+    Test::Perl::Critic:            0
+    URI::Escape:                   0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - franck cuny <franck.cuny@gmail.com>

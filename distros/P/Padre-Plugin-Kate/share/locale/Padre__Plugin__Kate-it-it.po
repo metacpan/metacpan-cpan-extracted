@@ -1,0 +1,31 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre2It\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-30 08:24+0200\n"
+"PO-Revision-Date: 2010-11-03 14:49+0100\n"
+"Last-Translator: Simone Blandino <simone.blandino@gmail.com>\n"
+"Language-Team: Padre2It <simone.blandino@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Italian\n"
+"X-Poedit-Country: ITALY\n"
+
+#: lib/Padre/Plugin/Kate.pm:64
+msgid "About"
+msgstr "Informazioni su"
+
+#: lib/Padre/Plugin/Kate.pm:70
+msgid "Using Syntax::Highlight::Engine::Kate based on the Kate editor"
+msgstr "In uso Syntax::Highlight::Engine::Kate basato sull'editor Kate"
+
+#: lib/Padre/Plugin/Kate.pm:170
+msgid "Trying to use Syntax::Highlight::Engine::Kate for syntax highlighting"
+msgstr "Sto cercando di usare Syntax::Highlight::Engine::Kate per l'evidenziazione della sintassi"
+

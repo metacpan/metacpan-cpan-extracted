@@ -1,0 +1,8 @@
+CHANGES
+Makefile.PL
+MANIFEST			This list of files
+t/post_queue.t
+t/post_threshold.t
+t/pre_interface.t
+Thread.pm
+META.yml                                 Module meta-data (added by MakeMaker)

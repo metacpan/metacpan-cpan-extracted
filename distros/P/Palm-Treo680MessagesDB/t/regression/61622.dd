@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1197734474,
+          'number' => '+440002561370',
+          'time' => '16:01',
+          'date' => '2007-12-15',
+          'name' => 'Anna XXXXXXXXX (M)',
+          'phone' => '+440002561370',
+          'device' => 'Treo 680',
+          'direction' => 'outbound',
+          'timestamp' => 1197734474,
+          'text' => 'Jenny and I are going to the whisky society this evening, meet at waverley station taxi rank at 6:30. -- dave c',
+          'type' => '0x0000',
+          'category' => 0,
+          'id' => 7107486,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 61622
+        };

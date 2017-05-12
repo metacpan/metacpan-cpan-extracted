@@ -1,0 +1,106 @@
+NAME
+    Proc::DaemonLite - Simple server daemonisation module
+
+SYNOPSIS
+     use strict;
+     use Proc::DaemonLite qw(:all);
+     
+ my $pid = init_server();
+     log_warn("Forked in to background PID $pid");
+     
+ $SIG{__WARN__} = \&log_warn;
+     $SIG{__DIE__} = \&log_die;
+     
+ for my $cid (1..4) {
+         my $child = launch_child();
+         if ($child == 0) {
+             log_warn("I am child PID $$") while sleep 2;
+             exit;
+         } else {
+             log_warn("Spawned child number $cid, PID $child");
+         }
+     }
+     
+ sleep 20;
+     kill_children();
+
+DESCRIPTION
+    Proc::DaemonLite is a basic server daemonisation module that trys to
+    cater for most basic Perl daemon requirements.
+
+    The POD for this module is incomplete, as is some of the tidying of the
+    code. It is however fully functional. This is a pre-release in order to
+    reserve the namespace before it becomes unavailable.
+
+EXPORTS
+    By default only *init_server()* is exported. The export tag *all* will
+    export the following: *init_server()*, *kill_children()*,
+    *launch_child()*, *do_relaunch()*, *log_debug()*, *log_notice()*,
+    *log_warn()*, *log_info()*, *log_die()* and *%CHILDREN*.
+
+  init_server()
+     my $pid = init_server($pidfile, $user, $group);
+
+  launch_child()
+     my $child_pid = launch_child($callback, $home);
+
+  kill_children()
+     kill_children();
+
+    Terminate all children with a *TERM* signal.
+
+  do_relaunch()
+     do_relaunch()
+
+    Attempt to start a new incovation of the current script.
+
+  log_debug()
+     log_debug(@messages);
+
+  log_info()
+     log_info(@messages);
+
+  log_notice()
+     log_notice(@messages);
+
+  log_warn()
+     log_warn(@messages);
+
+  log_die()
+     log_die(@messages);
+
+  %CHILDREN
+    *%CHILDREN* is a hash of all child processes keyed by PID. Children with
+    registered callbacks will contain a reference to their callback in this
+    hash.
+
+SEE ALSO
+    Proc::Deamon, Proc::Fork, Proc::Application::Daemon, Proc::Forking,
+    Proc::Background, Net::Daemon, POE::Component::Daemon,
+    <http://www.modperl.com/perl_networking/>, perlfork
+
+VERSION
+    $Id: DaemonLite.pm 946 2007-02-11 15:14:13Z nicolaw $
+
+AUTHOR
+    Nicola Worthington <nicolaw@cpan.org>
+
+    <http://perlgirl.org.uk>
+
+    If you like this software, why not show your appreciation by sending the
+    author something nice from her Amazon wishlist? (
+    http://www.amazon.co.uk/gp/registry/1VZXC59ESWYK0?sort=priority )
+
+    Original code written by Lincoln D. Stein, featured in "Network
+    Programming with Perl". <http://www.modperl.com/perl_networking/>
+
+    Released with permission of Lincoln D. Stein.
+
+COPYRIGHT
+    Copyright 2006,2007 Nicola Worthington.
+
+    This software is licensed under The Apache Software License, Version
+    2.0.
+
+    <http://www.apache.org/licenses/LICENSE-2.0>
+

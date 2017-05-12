@@ -1,0 +1,124 @@
+use strict;
+use warnings;
+use ExtUtils::MakeMaker;
+use Config;
+use PDL::Core::Dev;
+
+##############################
+# Try to use Alien::FFTW3 - but if it's not present
+# fall back to pkg-config.  This is so that 
+# a Debian package won't have to include Alien::FFTW3.
+my $cflags;
+my $libs;
+my $version = parseVersion( 'FFTW3.pd');
+
+if( eval "require Alien::FFTW3" ) {
+    ## Ensure at least version 3.3; die if we can't get it.
+    Alien::FFTW3->VERSION(3.3);
+    
+    my $p = Alien::FFTW3->precision;
+    unless($p->{'d'} and $p->{'f'}) {
+	die "PDL::FFTW3 - needs both double-precision and single-precision fftw3 libraries\n\t(libfftw3 and libfftw3f). Alien::FFTW3 found only ".(join(",",keys %$p))."\n";
+    }
+    
+    $cflags = Alien::FFTW3->cflags;
+    $libs   = Alien::FFTW3->libs;
+} else {
+#    if( $version =~ /_/ ) {
+#        die <<EOF;
+#Alien::FFTW3 not found, but it is required for dev snapshots, such as this.
+#Please use Alien::FFTW3 or use a release of this module.
+#Or remove this check from the source.
+#EOF
+#    }
+
+    printf "Alien::FFTW3 not found.  Using pkg-config instead...\n";
+
+    require IPC::Run;
+    $cflags = '';
+    $libs   = '';
+    my $err = '';
+    IPC::Run::run( ['pkg-config',
+                    '--cflags',
+                    'fftw3f >= 3.3', 'fftw3 >= 3.3'],
+                   \undef,
+                   \$cflags, \$err ) or die "Couldn't get the fftw flags: '$err'";
+
+    IPC::Run::run( ['pkg-config',
+                    '--libs',
+                    'fftw3f >= 3.3', 'fftw3 >= 3.3'],
+                   \undef,
+                   \$libs, \$err ) or die "Couldn't get the fftw libs: '$err'";
+
+    chomp($cflags, $libs);
+}
+
+my @package = qw(FFTW3.pd FFTW3 PDL::FFTW3);
+my %descriptor = pdlpp_stdargs(\@package);
+
+$descriptor{VERSION}   = $version;
+$descriptor{OPTIMIZE}  = ($Config{ccname} =~ m/gcc/) ? '-O2' : $Config{optimize};
+$descriptor{CCFLAGS} .= ( ($Config{ccname} =~ m/gcc/) ? '--std=gnu99 ' : '' ) . $Config{ccflags};
+
+# I support single and double precision FFTW calls, so both fftw and fftw3f
+push @{$descriptor{LIBS}  },  $libs;
+
+$descriptor{INC} = '' unless defined $descriptor{INC};
+$descriptor{INC} .= $cflags;
+
+$descriptor{depend} = { 'FFTW3.pm' => join(' ', qw(template_complex.c template_real.c
+                                                   compute_plan_template.xs
+                                                   FFTW3_header_include.pm)) };
+
+# This Alien::FFTW3 requirement is actually optional. pkg-config is used if this
+# isn't available
+$descriptor{PREREQ_PM} = {'PDL::Core'=>2.001};
+$descriptor{CONFIGURE_REQUIRES} = {
+  'PDL::Core::Dev' =>0,
+  'IPC::Run'       =>0,
+#  'Alien::FFTW3'   =>0,
+};
+$descriptor{BUILD_REQUIRES} = {'PDL::PP'=>0};
+$descriptor{NO_MYMETA} = 0;
+
+$descriptor{NAME}   = "PDL::FFTW3";
+$descriptor{AUTHOR} = "Dima Kogan <dima\@secretsauce.net>, Craig DeForest <deforest\@boulder.swri.edu>";
+$descriptor{ABSTRACT} = "PDL interface to the Fastest Fourier Transform in the West";
+
+$descriptor{META_MERGE} = {
+  resources => {
+    homepage => 'http://github.com/PDLPorters/pdl-fftw3',
+    repository => 'git://github.com/PDLPorters/pdl-fftw3.git',
+    bugtracker => 'http://github.com/PDLPorters/pdl-fftw3/issues',
+  },
+  provides => {
+    'PDL::FFTW3' => {
+      file => 'FFTW3.pd',
+      version => $descriptor{VERSION},
+    }
+  }
+};
+
+WriteMakefile( %descriptor );
+
+sub MY::postamble {
+  return <<'FOO' . pdlpp_postamble(\@package);
+
+install ::
+	@echo "Updating PDL documentation database...";
+	@$(PERL) -e "exit if $$ENV{DESTDIR}; use PDL::Doc; eval { PDL::Doc::add_module(q{PDL::FFTW3}); }; ";
+FOO
+}
+
+sub parseVersion {
+  my $file = shift;
+
+  my $infd;
+  open $infd, '<', $file or die "Error: couldn't open file '$file' for version parsing";
+
+  while(<$infd>) {
+    return $1 if /our \$VERSION = '([0-9\.a-zA-Z_]+)'/;
+  }
+
+  die "Error: couldn't parse version from '$file'";
+}

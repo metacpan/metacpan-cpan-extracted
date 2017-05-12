@@ -1,0 +1,9 @@
+TODO list for Perl module Pod::Tidy
+
+- use Params::Validate
+- test verbose option
+- test functions for output to stdout/stderr
+- better testing for podtidy options
+- add a unified diff output option (Text::Diff)
+- add an rc file for global ignore options
+- add support for using .cvsignore/svn:keywords

@@ -1,0 +1,66 @@
+{
+    'scan_on' => {
+        'index_name' => 'pg_class_oid_index',
+        'table_name' => 'pg_class'
+    },
+    'is_analyzed'            => 1,
+    'actual_time_first'      => '0.035',
+    'estimated_rows'         => '1',
+    'estimated_total_cost'   => '8.44',
+    'estimated_row_width'    => '194',
+    'actual_time_last'       => '0.036',
+    'estimated_startup_cost' => '0.17',
+    'actual_rows'            => '1',
+    'extra_info'             => [
+        'Index Cond: (oid = $1)',
+    ],
+    'initplans' => [
+        {
+            'is_analyzed'            => 1,
+            'actual_time_first'      => '0.023',
+            'estimated_rows'         => '1',
+            'estimated_total_cost'   => '0.17',
+            'estimated_row_width'    => '0',
+            'actual_time_last'       => '0.023',
+            'estimated_startup_cost' => '0.16',
+            'actual_rows'            => '1',
+            'initplans'              => [
+                {
+                    'is_analyzed'            => 1,
+                    'actual_time_first'      => '0.02',
+                    'estimated_rows'         => '1',
+                    'estimated_total_cost'   => '0.16',
+                    'estimated_row_width'    => '4',
+                    'actual_time_last'       => '0.021',
+                    'estimated_startup_cost' => '0',
+                    'actual_rows'            => '1',
+                    'sub_nodes'              => [
+                        {
+                            'scan_on' => {
+                                'index_name' => 'pg_class_oid_index',
+                                'table_name' => 'pg_class'
+                            },
+                            'is_analyzed'            => 1,
+                            'actual_time_first'      => '0.019',
+                            'estimated_rows'         => '281',
+                            'estimated_total_cost'   => '44.47',
+                            'estimated_row_width'    => '4',
+                            'actual_time_last'       => '0.019',
+                            'estimated_startup_cost' => '0',
+                            'actual_rows'            => '1',
+                            'extra_info'             => [ 'Index Cond: (oid IS NOT NULL)' ],
+                            'type'                   => 'Index Scan',
+                            'actual_loops'           => '1'
+                        }
+                    ],
+                    'type'         => 'Limit',
+                    'actual_loops' => '1'
+                }
+            ],
+            'type'         => 'Result',
+            'actual_loops' => '1'
+        }
+    ],
+    'type'         => 'Index Scan',
+    'actual_loops' => '1'
+}

@@ -1,0 +1,11 @@
+Changes
+Interpreter.pm
+Makefile.PL
+MANIFEST
+README
+test.pl
+testimg/count.gif
+testimg/hello2big.gif
+bin/gif2txt.pl
+bin/txt2gif.pl
+bin/piet

@@ -1,0 +1,25 @@
+---
+abstract: 'non-blocking, parallel DNS client'
+author:
+  - 'Rocco Caputo <rcaputo@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-Client-DNS
+requires:
+  Net::DNS: '0.65'
+  POE: '1.294'
+  Test::More: '0.96'
+  Test::NoWarnings: '1.02'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Client-DNS
+  homepage: http://search.cpan.org/dist/POE-Component-Client-DNS
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/rcaputo/poe-component-client-dns.git
+version: '1.054'

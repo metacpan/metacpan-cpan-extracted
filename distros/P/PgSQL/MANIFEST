@@ -1,0 +1,10 @@
+README
+BLOB.txt
+MANIFEST
+ChangeLog
+Makefile.PL
+lib/PgSQL.pm
+lib/PgSQL/Cursor.pm
+test.pl
+test1.pl
+ToDo

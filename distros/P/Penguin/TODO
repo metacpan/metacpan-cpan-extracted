@@ -1,0 +1,48 @@
+Put the checksum and the real signing authority's name in
+the frames, and verify against them.
+
+Make the entire socketing procedure a little bit more
+bulletproof in the TCP Channel.
+(partially done Wed Apr 17 13:50:12 CDT 1996)
+(again, Tue May 13 14:53:32 EDT 1997)
+
+Figure out what the deal is with the 'Attempt to free an
+unreferenced scalar' problem in erase() in Safe.
+(partially done)
+
+Get something less silly than PGP in to do the job.
+Perhaps ElGamal or DSA?  Nearly everything is less silly.
+(partially done; rewrote PGP better Wed Apr 17 13:51:13 CDT 1996)
+
+Write a set of helper routines to implement really simple
+servers and clients and applet writers/readers.
+(DONE Tue May 13 14:53:46 EDT 1997)
+
+Put 'password' under more security and scrutiny in the 
+PGP implementation.
+(DONE Wed Apr 17 13:50:37 CDT 1996)
+
+Make the rightsfile access methods a little better.
+
+Write a program for simple rightsfile administration.
+
+Beef up compartments to do everything I've said they'll do,
+including using BSD::Resource where applicable.  Note that
+this means the daemon must fork, or be twinned, because
+the executing program Will Go Away.
+
+Pester Tim mercilessly until he separates Safe from Opcode.
+(DONE)
+
+Write up a brutal security critique to include with
+Penguin in much the same way that Java doesn't.  
+(IN BETA Wed Apr 17 13:50:52 CDT 1996)
+
+Find some way to make data frames and code frames return
+the same thing from disassemble.  Maybe...an associative
+array?
+
+Determine how grossly memory is leaking with every step
+one takes through Penguin.
+
+Write Two Penguins.

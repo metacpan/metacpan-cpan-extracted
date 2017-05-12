@@ -1,0 +1,22 @@
+To DO For PPI::HTML::CodeFolder:
+
+- (JS) add open/closeAll() functions to open/close all folded code; requires
+keeping complete list of fold ranges *OR* a scanner to traverse
+the button margin, extracting and executing the links 
+
+- add support for app specific margins: like foldbutton margin, but
+	app specifies an icon, maybe a coderef, and possibly some
+	Javascript/CSS to control rendering, e.g., an annotation margin
+	that uses "!" as icon to indicate an annotation. Clicking in
+	annotation margin opens popup with text of any existing annotation,
+	and a testarea to add add'l annotation. on "Save", sends annotation
+	plus add'l info (eg, userid) back to server.
+
+- (JS) add function to compute and scroll a line number into view,
+based on an input line number value (see window.scroll, window.scrollBy,
+using line number * line-height property (for Devel::Psichedb);
+apply to JS close() logic to keep folded line in view
+
+- attempt to determine breakable lines via the PPI or PPI::HTML
+output (for Devel::Psichedb)
+

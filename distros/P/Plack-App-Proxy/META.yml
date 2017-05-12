@@ -1,0 +1,35 @@
+---
+abstract: 'proxy requests'
+author:
+  - 'Lee Aylward'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  IO::Socket::INET: 0
+  Test::More: 0.88
+  Test::Requires: 0
+  Test::TCP: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-App-Proxy
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  AnyEvent::HTTP: 1.44
+  HTTP::Headers: 0
+  LWP::UserAgent: 0
+  Plack: 1.0013
+  parent: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/leedo/Plack-App-Proxy.git
+version: 0.29

@@ -1,0 +1,48 @@
+---
+abstract: 'debug request parameters (inspired by Catalyst)'
+author:
+  - 'Hiroki Honda <cside.story@gmail.com>'
+build_requires:
+  Capture::Tiny: 0.12
+  HTTP::Request::Common: 0
+  Plack::Test: 0
+  Test::Base::Less: 0
+  Test::Differences: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.4.3, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-DebugRequestParams
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Plack::Middleware::DebugRequestParams:
+    file: lib/Plack/Middleware/DebugRequestParams.pm
+    version: 0.06
+requires:
+  Plack::Request: 0
+  Text::ASCIITable: 0
+  Text::VisualWidth: 0
+  parent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/Cside/Plack-Middleware-DebugRequestParameters/issues
+  homepage: https://github.com/Cside/Plack-Middleware-DebugRequestParameters
+  repository: git://github.com/Cside/Plack-Middleware-DebugRequestParameters.git
+version: 0.06
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'

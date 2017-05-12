@@ -1,0 +1,46 @@
+__END__
+
+=head1 INTRODUCTION
+
+This page describes how to attach custom processing handlers on the L<Plift>
+template engine.
+
+=head1 WHAT IS A HANDLER?
+
+Besides the data interpolation feature, the Plift engine has just one core
+funcionality that is to search the HTML document using registered xpath
+expressions and triggering the associated subroutines.
+
+A handler is just a perl subroutine bound to a xpath expression, usualy targgeting
+a element or attribute (like C<< <x-include> >> or C<data-plift-include>).
+
+The following example attaches a handler to the HTML C<< <head> >> element:
+
+    $plift->add_handler({
+        name    => 'head_example',
+        tag     => 'head',
+        handler => sub {
+
+            my ($head_element, $context) = @_;
+
+            # do you custom processing on the <head> element:
+            # - add SEO metadata?
+            # - process asset files?
+            # - add tracking code?
+
+        }
+    });
+
+
+I encourage you to read the source of the builtin handlers. They are very simple,
+just a few lines of code.
+
+=over
+
+=item L<Plift::Handler::Include>
+
+=item L<Plift::Handler::Wrap>
+
+=item L<Plift::Handler::Render>
+
+=back

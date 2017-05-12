@@ -1,0 +1,172 @@
+NAME
+    PYX::Hist - Processing PYX data or file and print histogram.
+
+SYNOPSIS
+     use PYX::Hist;
+     my $obj = PYX::Hist->new(%parameters);
+     $obj->parse($pyx, $out);
+     $obj->parse_file($input_file, $out);
+     $obj->parse_handle($input_file_handler, $out);
+
+METHODS
+    "new(%parameters)"
+             Constructor.
+
+            *       "output_handler"
+
+                     Output handler.
+                     Default value is \*STDOUT.
+
+    "parse($pyx[, $out])"
+             Parse PYX text or array of PYX text and print histogram of PYX input.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+    "parse_file($input_file[, $out])"
+             Parse file with PYX data and print histogram of PYX input.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+    "parse_handler($input_file_handler[, $out])"
+             Parse PYX handler and print histogram of PYX input.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+     parse():
+             Bad end of element.
+                     Element: %s
+             Stack has some elements.
+
+     parse_file():
+             Bad end of element.
+                     Element: %s
+             Stack has some elements.
+
+     parse_handler():
+             Bad end of element.
+                     Element: %s
+             Stack has some elements.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use PYX::Hist;
+
+     # Example data.
+     my $pyx = <<'END';
+     (begin
+     (middle
+     (end
+     -data
+     )end
+     (end
+     -data
+     )end
+     )middle
+     )begin
+     END
+
+     # PYX::Hist object.
+     my $obj = PYX::Hist->new;
+
+     # Parse.
+     $obj->parse($pyx);
+
+     # Output:
+     # [ begin  ] 1
+     # [ end    ] 2
+     # [ middle ] 1
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure;
+     use PYX::Hist;
+
+     # Error output.
+     $Error::Pure::TYPE = 'PrintVar';
+
+     # Example data.
+     my $pyx = <<'END';
+     (begin
+     (middle
+     (end
+     -data
+     )middle
+     )begin
+     END
+
+     # PYX::Hist object.
+     my $obj = PYX::Hist->new;
+
+     # Parse.
+     $obj->parse($pyx);
+
+     # Output:
+     # PYX::Hist: Bad end of element.
+     # Element: middle
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure;
+     use PYX::Hist;
+
+     # Error output.
+     $Error::Pure::TYPE = 'PrintVar';
+
+     # Example data.
+     my $pyx = <<'END';
+     (begin
+     (middle
+     (end
+     -data
+     )end
+     )middle
+     END
+
+     # PYX::Hist object.
+     my $obj = PYX::Hist->new;
+
+     # Parse.
+     $obj->parse($pyx);
+
+     # Output:
+     # PYX::Hist: Stack has some elements.
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, List::Util, PYX::Parser.
+
+SEE ALSO
+    Task::PYX
+        Install the PYX modules.
+
+REPOSITORY
+    <https://github.com/tupinek/PYX-Hist>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2014-2016 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.04
+

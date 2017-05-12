@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Pod-Perldoc-ToTextTermcap
+version:            0.01
+abstract:           let Perldoc render Pod as plaintext with format escapes
+author:
+    - Slaven Rezic <srezic@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Pod::Perldoc::ToText:  0
+    Pod::Text::Overstrike:  0
+    Pod::Text::Termcap:   0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

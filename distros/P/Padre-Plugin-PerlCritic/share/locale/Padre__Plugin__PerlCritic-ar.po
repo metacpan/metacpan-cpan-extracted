@@ -1,0 +1,42 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-PerlCritic\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-25 09:56+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"Language-Team: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Arabic\n"
+
+#: lib/Padre/Plugin/PerlCritic.pm:18
+msgid "Perl Critic"
+msgstr "انتقاد برامج Perl"
+
+#: lib/Padre/Plugin/PerlCritic.pm:24
+msgid "Perl::Critic Current Document"
+msgstr "الوثيقة الحالية ل Perl::Critic"
+
+#: lib/Padre/Plugin/PerlCritic.pm:39
+msgid "Document is not a Perl document"
+msgstr "الوثيقة ليست وثيقة Perl"
+
+#: lib/Padre/Plugin/PerlCritic.pm:40
+msgid "Error"
+msgstr "خطأ"
+
+#: lib/Padre/Plugin/PerlCritic.pm:62
+#, perl-format
+msgid "Perl::Critic running with project-specific configuration %s"
+msgstr "تم تشغيل برنامج Perl::Critic باعدادات المشروع %s"
+
+#: lib/Padre/Plugin/PerlCritic.pm:64
+msgid "Perl::Critic running with default or user configuration"
+msgstr "تم تشغيل برنامج Perl::Critic بالافتراضي أو اعدادات المستخدم "
+
+#: lib/Padre/Plugin/PerlCritic.pm:77
+msgid "Perl::Critic found nothing to say about this code"
+msgstr "لم يعثر برنامج Perl::Critic على أي شيء في هذا المصدر"
+

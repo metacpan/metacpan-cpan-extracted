@@ -1,0 +1,17 @@
+Revision history for POE component Player::Xmms
+
+0.04 Mon Jul 31 2006
+    - test.mp3 wasn't in the manifest!
+
+0.03 Sun Jul 30 2006
+    - fixed docs
+    - added child handler
+    - moved test to t/
+
+0.02 Wed Oct 20 2004
+	- removed extra sub
+	- prettied up the docs
+
+0.01 Fri Sep 10 2004
+	- original version
+

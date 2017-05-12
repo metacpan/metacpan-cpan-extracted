@@ -1,0 +1,79 @@
+Changes file for Perl::Critic::Policy::logicLAB::RequireVersionFormat
+
+Project Change Log:
+http://logiclab.jira.com/browse/PCPMRVF#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel
+
+0.08 2014-08-27 Maintenance release, update not required
+
+- Migrated from Module::Build to Dist::Zilla
+
+
+0.07 2014-08-11 Maintenance release, update not required
+
+- Added abstract to POD as pointed out by CPANTS for release 0.06
+
+0.06 2014-01-24
+
+- Maintenance release, update not required
+
+- Re-addressed issue listed on CPANTS with error in POD [PCPMRVF-21]
+
+  https://logiclab.jira.com/browse/PCPMRVF-21
+
+
+0.05 2014-01-18 Maintenance release, update not required
+
+- Addressed several issues listed on CPANTS, all for version 0.04 and
+  earlier:
+
+    - missing manifest (triggering two metrics)
+    - error in POD
+
+  http://cpants.cpanauthors.org/dist/Perl-Critic-Policy-logicLAB-RequireVersionFormat
+
+- Added changes.t automatic assertion of the integrity of the Changes
+  file, see also PCPMRVF-19 [PCPMRVF-20]
+
+  https://logiclab.jira.com/browse/PCPMRVF-20
+
+
+0.04 2013-07-28 Maintenance release, update not required
+
+- Fixed up Changes file as part of my Questhub quest adhering to the standard
+  described in: CPAN::Changes::Spec [PCPMRVF-19]
+
+  Quest: http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
+  Spec: https://metacpan.org/module/CPAN::Changes::Spec
+
+  https://logiclab.jira.com/browse/PCPMRVF-19
+
+- Perl::Critic boiler plate updated to latest version [PCPMRVF-17]
+
+  https://logiclab.jira.com/browse/PCPMRVF-17
+
+- Changes Perl::Critic theme to logicLAB as default [PCPMRVF-18]
+
+  https://logiclab.jira.com/browse/PCPMRVF-18
+
+
+0.03 2011-02-13 Bug fix release, update not required
+
+- Addressed report on failing test, we now explicitly require Perl::Critic version 1.03 [PCPMRVF-15]
+  http://logicLAB.jira.com/browse/PCPMRVF-15
+
+
+0.02 2010-09-18 Feature release, update recommended
+
+- Exchanged formats delimeter from '|' to '||', since '|' could be used in
+  formats, since formats are regular expressions [PCPMRVF-11]
+  http://logiclab.jira.com/browse/PCPMRVF-11
+
+  WARNING! this might require changes to your current configuration
+
+- Corrected broken example in POD [PCPMRVF-12]
+  http://logiclab.jira.com/browse/PCPMRVF-12
+
+
+0.01 2010-09-07 Initial release
+
+- Initial release

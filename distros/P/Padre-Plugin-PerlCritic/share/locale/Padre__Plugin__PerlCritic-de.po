@@ -1,0 +1,26 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-PerlCritic\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-19 02:34+0800\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Sebastian Willing\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: German\n"
+"X-Poedit-Country: GERMANY\n"
+
+#: lib/Padre/Plugin/PerlCritic.pm:31
+msgid "Run PerlCritic"
+msgstr "PerlCritic ausführen"
+
+#: lib/Padre/Plugin/PerlCritic.pm:43
+msgid "Document is not a Perl document"
+msgstr "Dokument ist kein Perl-Quellcode"
+
+#: lib/Padre/Plugin/PerlCritic.pm:43
+msgid "Error"
+msgstr "Fehler"
+

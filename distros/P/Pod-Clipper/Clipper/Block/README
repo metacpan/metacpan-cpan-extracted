@@ -1,0 +1,71 @@
+To install this module, you can either use cpan (which automates the
+process for you) or manually run the following commands:
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+
+Feel free to email me at yha@cpan.org if you have problems installing this
+module or if you have any other comments or questions. Module documentation
+follows.
+
+---------------------------------------------------------------------------
+
+NAME
+    Pod::Clipper::Block - A block of POD or non-POD data
+
+SYNOPSIS
+      use Pod::Clipper::Block;
+      my $block = Pod::Clipper::Block->new({ data => $data, is_pod => 1 });
+
+DESCRIPTION
+    This module has very limited use on its own. It's mainly used as a
+    helper for "Pod::Clipper". Each "Pod::Clipper::Block" object stores a
+    block of text along with a flag about whether the stored text is POD or
+    non-POD data. Both of these parameters have to be provided when you
+    construct the object. There's nothing preventing you from providing
+    conflicting parameters, e.g. "data" can be non-POD yet you set "is_pod"
+    to true or vice versa (not sure why you would want to do that, though).
+
+METHODS
+  new
+    This is the "Pod::Clipper::Block" constructor. It expects a hash
+    reference with two mandatory options: "data" and "is_pod".
+
+  data
+    Returns the block of data stored in the object. You can also use it to
+    set new data.
+
+      print $block->data;
+      $block->data($new_data);
+
+  is_pod
+    Returns a boolean value describing the type of the data in your block. 1
+    => POD, 0 => non-POD. "Pod::Clipper::Block" does not check your data for
+    whether it's POD or non-POD. It simply returns whatever you've set the
+    "is_pod" option to (via the constructor or this method).
+
+      print "POD!" if $block->is_pod;
+      $block->is_pod(0); # assign it a new value
+
+BUGS
+    There are no known bugs. If you find one, please report it to me at the
+    email address listed below. Any other suggestions or comments are also
+    welcome.
+
+AUTHOR
+    Yousef H. Alhashemi <yha@cpan.org>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    Pod::Clipper
+

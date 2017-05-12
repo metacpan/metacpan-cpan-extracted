@@ -1,0 +1,32 @@
+Revision history for POEx-Role-PSGIServer: 1.150280
+
+1.150280  2015-01-27 22:11:39-05:00 America/Toronto
+
+        This module is now marked as deprecated. (oalders)
+
+1.110670  2011-03-08 08:02:37 America/Chicago
+        Depending on POE::Filter::HTTP::Parser 1.06 because prior versions
+        constructed their URI wrong in an edge case that Plack::Test::Suite
+        now uncovers.
+
+1.103341  2010-11-30 16:11:52 America/New_York
+
+1.103340  2010-11-30 16:03:34 America/New_York
+        Moved the code to K&R brace style to work around a stupid MXD bug
+        under 5.12 perls.  Oy ve.
+
+1.103331  2010-11-29 10:18:00 America/New_York
+        Declare dependency on latest POEx::Role::TCPServer and use around for
+		BUILDARGS rather than method.
+
+1.102531  2010-09-10 13:11:09 America/Los_Angeles
+        Throw some defaults on listen_ip and listen_port so we don't explode when plackup doesn't pass them to us (frodwith)
+
+1.102530  2010-09-10 12:14:32 America/Los_Angeles
+        Some bugs (poll_cb) in the streaming interface fixed, along with a small test fix (frodwith)
+
+1.101040  2010-04-14 08:35:12 America/Chicago
+        BUILDARGS needs to return /all/ of the args, not just the ones Plack cares about
+
+1.101020  2010-04-12 15:39:30 America/Chicago
+        Initial Release

@@ -1,0 +1,6 @@
+Revision history for Perl extension Poem.
+
+0.01  Sat Mar 25 17:51:45 2006
+	- original version; created by h2xs 1.23 with options
+		-XA Poem
+

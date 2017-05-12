@@ -1,0 +1,58 @@
+{
+   "abstract" : "Format perl files using Perl::Tidy",
+   "author" : [
+      "Brian Cassidy <bricas@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.04, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Padre-Plugin-PerlTidy",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "share",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.62",
+            "Test::More" : "0.42"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.62"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Padre::Plugin" : "0.92",
+            "Params::Util" : "1.04",
+            "Perl::Tidy" : "20101217",
+            "perl" : "5.008002"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://padre.perlide.org/"
+      },
+      "homepage" : "http://padre.perlide.org/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://svn.perlide.org/padre/trunk/Padre-Plugin-PerlTidy"
+      }
+   },
+   "version" : "0.21"
+}

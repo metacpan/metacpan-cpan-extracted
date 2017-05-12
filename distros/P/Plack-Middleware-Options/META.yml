@@ -1,0 +1,24 @@
+---
+abstract: 'Implements OPTIONS and filters out unknown methods'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  Plack::Test: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+generated_by: 'Module::Build version 0.3624'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Options
+provides:
+  Plack::Middleware::Options:
+    file: lib/Plack/Middleware/Options.pm
+    version: 0.01
+requires:
+  Plack::Middleware: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

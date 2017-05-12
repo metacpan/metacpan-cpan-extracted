@@ -1,0 +1,101 @@
+---
+abstract: 'whoever die()s with the most badges win'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  Carp: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Scalar::Util: 0
+  Test::More: 0.94
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perl-Achievements
+provides:
+  Perl::Achievements:
+    file: lib/Perl/Achievements.pm
+    version: v0.4.0
+  Perl::Achievements::Achievement:
+    file: lib/Perl/Achievements/Achievement.pm
+    version: v0.4.0
+  Perl::Achievements::Achievement::Cryptomancer:
+    file: lib/Perl/Achievements/Achievement/Cryptomancer.pm
+    version: v0.4.0
+  Perl::Achievements::Achievement::PerlAchiever:
+    file: lib/Perl/Achievements/Achievement/PerlAchiever.pm
+    version: v0.4.0
+  Perl::Achievements::Achievement::PerlHacker:
+    file: lib/Perl/Achievements/Achievement/PerlHacker.pm
+    version: v0.4.0
+  Perl::Achievements::Achievement::SchwartzianTransform:
+    file: lib/Perl/Achievements/Achievement/SchwartzianTransform.pm
+    version: v0.4.0
+  Perl::Achievements::Achievement::WeekendWarrior:
+    file: lib/Perl/Achievements/Achievement/WeekendWarrior.pm
+    version: v0.4.0
+  Perl::Achievements::Command:
+    file: lib/Perl/Achievements/Command.pm
+    version: v0.4.0
+  Perl::Achievements::Command::init:
+    file: lib/Perl/Achievements/Command/init.pm
+    version: v0.4.0
+  Perl::Achievements::Command::report:
+    file: lib/Perl/Achievements/Command/report.pm
+    version: v0.4.0
+  Perl::Achievements::Command::scan:
+    file: lib/Perl/Achievements/Command/scan.pm
+    version: v0.4.0
+  Perl::Achievements::Report::Html:
+    file: lib/Perl/Achievements/Report/Html.pm
+    version: v0.4.0
+  Perl::Achievements::Role::ConfigItem:
+    file: lib/Perl/Achievements/Role/ConfigItem.pm
+    version: v0.4.0
+  Perl::Achievements::Role::Report:
+    file: lib/Perl/Achievements/Role/Report.pm
+    version: v0.4.0
+  Perl::Achievements::User:
+    file: lib/Perl/Achievements/User.pm
+    version: v0.4.0
+requires:
+  Data::Printer: 0
+  DateTime::Functions: 0
+  Digest::SHA: 0
+  File::HomeDir: 0
+  File::Touch: 0
+  List::MoreUtils: 0
+  Method::Signatures: 0
+  Module::Pluggable: 0
+  Moose: 0
+  Moose::Role: 0
+  MooseX::App::Cmd: 0
+  MooseX::App::Cmd::Command: 0
+  MooseX::ClassAttribute: 0
+  MooseX::ConfigFromFile: 0
+  MooseX::Role::BuildInstanceOf: 0
+  MooseX::Role::Loggable: 0
+  MooseX::SemiAffordanceAccessor: 0
+  PPI: 0
+  Path::Class: 0
+  Template::Caribou: 0
+  Template::Caribou::Tags::HTML: 0
+  Template::Caribou::Utils: 0
+  YAML::Any: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Achievements
+  homepage: http://search.cpan.org/dist/Perl-Achievements/
+  repository: https://github.com/yanick/Perl-Achievements.git
+version: 0.4.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK

@@ -1,0 +1,23 @@
+Summary of important user-visible changes for Pod::Weaver::Section::Legal::Complicated:
+---------------------------------------------------------------------------------------
+
+1.23      2017-04-13 17:00:43+01:00 Europe/London
+  * Fix typo on TestRequires prerequesites.
+
+1.22      2017-02-01 20:32:45+00:00 Europe/London
+  * Made the testsuite available at install time which adds a
+    prerequesite on Software::Licences for test.
+
+1.21      2013-04-07 15:25:48 Europe/Dublin
+  * Bug fix release for perl versions pre 5.14
+
+1.20      2013-04-03 04:54:06 Europe/Dublin
+  * We are now able to capture years from the OWNER part which is used on the
+    legal text.
+  * The text in the COPYRIGHT section has changed slightly.
+  * The POD sections AUTHOR and COPYRIGHT are now independent sections, instead
+    of 2 subsections under LEGAL.
+  * Trailing whitespace from the captured text is now ignored.
+
+1.00      2013-03-22 18:26:00 Europe/Dublin
+  * Initial release.

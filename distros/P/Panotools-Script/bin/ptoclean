@@ -1,0 +1,168 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Panotools::Script;
+use Getopt::Long;
+use Pod::Usage;
+use File::Temp qw/tempdir/;
+use File::Spec;
+
+my $path_output;
+my $n = 2;
+my $fast = 0;
+my $verbose = 0;
+my $help = 0;
+
+GetOptions ('o|output=s' => \$path_output,
+            'n|amount=f' => \$n,
+            'f|fast' => \$fast,
+            'v|verbose' => \$verbose,
+            'h|help' => \$help);
+
+pod2usage (-verbose => 2) if $help;
+
+my $tempdir = tempdir (CLEANUP => 1);
+my @report;
+
+my $path_pto = shift || pod2usage;
+die "Can't find $path_pto" unless -e $path_pto;
+
+my $p = new Panotools::Script;
+$p->Read ($path_pto);
+
+my $control_new = [];
+for my $index_a (0 .. scalar @{$p->Image} -1)
+{
+    for my $index_b ($index_a +1 .. scalar @{$p->Image} -1)
+    {
+        # construct list of points relating to this image pair
+        my $control_temp = [];
+        for my $control (@{$p->Control})
+        {
+            push @{$control_temp}, $control
+                if ($control->{n} == $index_a and $control->{N} == $index_b);
+            push @{$control_temp}, $control
+                if ($control->{n} == $index_b and $control->{N} == $index_a);
+        }
+        next unless scalar @{$control_temp};
+
+        # create a temporary project using only relevant points
+        my $p_temp = $p->Clone;
+        $p_temp->{control} = $control_temp;
+
+        unless ($fast or scalar @{$p_temp->Control} == 0)
+        {
+            $p_temp->{variable} = new Panotools::Script::Line::Variable;
+            $p_temp->Variable->{$index_b} = {r => 1, p => 1, y => 1};
+            # FIXME, assumes 0 is an anchor image
+            $p_temp->Variable->{0}->{v} = 1 if (scalar @{$control_temp} > 4);
+            $p_temp->Variable->{0}->{b} = 1 if (scalar @{$control_temp} > 6);
+            $p_temp->Variable->{0}->{c} = 1 if (scalar @{$control_temp} > 8);
+            $p_temp->Image->[0]->Set (a => 0, b => 0, c => 0, d => 0, e => 0);
+            $p_temp->Image->[$index_a]->Set (a => "=0", b => "=0", c => "=0",
+                                             d => "=0", e => "=0") unless ($index_a == 0);
+            $p_temp->Image->[$index_b]->Set (a => "=0", b => "=0", c => "=0",
+                                             d => "=0", e => "=0");
+
+            my $pto_in_tmp = File::Spec->catfile ($tempdir, "$index_a-$index_b.in.pto");
+            my $pto_out_tmp = File::Spec->catfile ($tempdir, "$index_a-$index_b.out.pto");
+            $p_temp->Write ($pto_in_tmp);
+            system ('autooptimiser', '-q', '-n', '-o', $pto_out_tmp, $pto_in_tmp);
+            $p_temp->Read ($pto_out_tmp);
+        }
+
+        # prune points using local threshold
+        my ($total, $min, $max, $average, $sigma) = $p_temp->Stats;
+        my $threshold = $average + ($n * $sigma);
+        my $pruned = $p_temp->Prune ($threshold);
+        push @{$control_new}, @{$p_temp->Control};
+
+        next unless $verbose;
+        print STDERR "Pair $index_a,$index_b: ";
+        print STDERR scalar (@{$pruned}) ." points cleaned using threshold: $threshold\n";
+    }
+}
+
+my ($total, $min, $max, $average, $sigma) = map {sprintf ('%.3f', $_)} $p->Stats;
+push @report, "Before, Min: $min Max: $max Average: $average Sigma: $sigma";
+
+$p->{control} = $control_new;
+
+my $p_temp = $p->Clone;
+
+unless ($fast)
+{
+    my $pto_in_tmp = File::Spec->catfile ($tempdir, "all.in.pto");
+    my $pto_out_tmp = File::Spec->catfile ($tempdir, "all.out.pto");
+    $p_temp->Write ($pto_in_tmp);
+    system ('autooptimiser', '-q', '-n', '-o', $pto_out_tmp, $pto_in_tmp);
+    $p_temp->Read ($pto_out_tmp);
+}
+
+($total, $min, $max, $average, $sigma) = $p_temp->Stats;
+my $threshold = $average + ($n * $sigma);
+my $pruned = $p_temp->Prune ($threshold);
+
+$p->{control} = $p_temp->{control};
+$p->Write ($path_output);
+
+($total, $min, $max, $average, $sigma) = map {sprintf ('%.3f', $_)} $p->Stats;
+push @report, ("After, Min: $min Max: $max Average: $average Sigma: $sigma",'');
+
+print STDERR join "\n", @report if $verbose;
+
+__END__
+
+=head1 NAME
+
+ptoclean - prune improbable control points
+
+=head1 SYNOPSIS
+
+ptoclean [options] --output better.pto notgood.pto
+
+ Options:
+  -o | --output     Filename of pruned project (can be the the same as the input)
+  -n | --amount     Distance factor for pruning (default=2)
+  -f | --fast       Don't run the optimiser for each image pair (similar to APClean)
+  -v | --verbose    Report some statistics
+  -h | --help       Outputs help documentation
+
+=head1 DESCRIPTION
+
+B<ptoclean> takes a hugin .pto project and removes inconsistent control-points.
+'Bad' points are determined by calculating the average error distance and
+standard deviation (Sigma), then removing any points with an error distance
+greater than the average by n * sigma.  This pruning is performed on each pair
+of images in turn and then finally on the project as a whole.
+
+Additionally the autooptimiser tool is run on each pair of images separately
+before each calculation, so there is no need for the project to be 'nearly
+aligned' beforehand.
+
+NOTE: although optimisation plays a part in the pruning process, the output
+project is exactly the same as the input except with 'bad' points removed, you
+probably want to optimise the geometry of this project with hugin or
+autooptimiser afterward.
+
+This tool is heavily inspired by APClean, a similar tool for PTGui project
+files by Fulvio Senore.  If you want a similar behaviour to APClean without the
+optimisation steps, use the --fast option.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+L<http://www.fsoft.it/panorama/APClean.htm>
+
+=head1 AUTHOR
+
+Bruno Postle - August 2008.
+
+=cut

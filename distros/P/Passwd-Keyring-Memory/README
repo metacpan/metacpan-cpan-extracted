@@ -1,0 +1,84 @@
+NAME
+
+    Passwd::Keyring::Memory - fallback keyring for environments where no
+    better keyring is available.
+
+VERSION
+
+    Version 0.2405
+
+SYNOPSIS
+
+        use Passwd::Keyring::Memory;
+    
+        my $keyring = Passwd::Keyring::Memory->new();
+    
+        $keyring->set_password("John", "verysecret", "my-realm");
+    
+        my $password = $keyring->get_password("John", "my-realm");
+    
+        $keyring->clear_password("John", "my-realm");
+
+    Note: see Passwd::Keyring::Auto::KeyringAPI for detailed comments on
+    keyring method semantics (this document is installed with
+    Passwd::Keyring::Auto package).
+
+SUBROUTINES/METHODS
+
+ new
+
+    Initializes the processing.
+
+ set_password(username, password, realm)
+
+    Sets (stores) password identified by given realm for given user
+
+ get_password($user_name, $realm)
+
+    Reads previously stored password for given user in given app. If such
+    password can not be found, returns undef.
+
+ clear_password($user_name, $realm)
+
+    Removes given password (if present)
+
+ is_persistent
+
+    Returns info, whether this keyring actually saves passwords
+    persistently.
+
+    (false in this case)
+
+AUTHOR
+
+    Marcin Kasperski
+
+BUGS
+
+    Please report any bugs or feature requests to issue tracker at
+    https://bitbucket.org/Mekk/perl-keyring-memory.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Passwd::Keyring::Memory
+
+    You can also look for information at:
+
+    http://search.cpan.org/~mekk/Passwd-Keyring-Memory/
+
+    Source code is tracked at:
+
+    https://bitbucket.org/Mekk/perl-keyring-memory
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2012 Marcin Kasperski.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

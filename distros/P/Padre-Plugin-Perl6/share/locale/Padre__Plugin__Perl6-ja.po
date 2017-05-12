@@ -1,0 +1,319 @@
+# Japanese translations for Perl package.
+# Copyright (C) 2009 THE Perl'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Perl package.
+# Kenichi Ishigaki <ishigaki@cpan.org>, 2009.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Perl6\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-07-18 21:21+0300\n"
+"PO-Revision-Date: 2009-07-27 04:23+0900\n"
+"Last-Translator: Kenichi Ishigaki <ishigaki@cpan.org>\n"
+"Language-Team: Japanese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: lib/Padre/Plugin/Perl6.pm:39
+msgid "Perl 6"
+msgstr "Perl 6"
+
+#: lib/Padre/Plugin/Perl6.pm:99
+msgid "Create Perl 6..."
+msgstr "新しいPerl 6の..."
+
+#: lib/Padre/Plugin/Perl6.pm:104
+msgid "Script"
+msgstr "スクリプト"
+
+#: lib/Padre/Plugin/Perl6.pm:109
+msgid "Class"
+msgstr "クラス"
+
+#: lib/Padre/Plugin/Perl6.pm:114
+msgid "Grammar"
+msgstr "グラマー"
+
+#: lib/Padre/Plugin/Perl6.pm:119
+msgid "Package"
+msgstr "パッケージ"
+
+#: lib/Padre/Plugin/Perl6.pm:124
+msgid "Module"
+msgstr "モジュール"
+
+#: lib/Padre/Plugin/Perl6.pm:129
+msgid "Role"
+msgstr "ロール"
+
+#: lib/Padre/Plugin/Perl6.pm:134
+msgid "Inlined in Perl 5"
+msgstr "Perl 5でインライン化"
+
+#: lib/Padre/Plugin/Perl6.pm:142
+msgid "Refactor..."
+msgstr "リファクタリング..."
+
+#: lib/Padre/Plugin/Perl6.pm:149
+msgid "Find variable declaration"
+msgstr "変数宣言を検索"
+
+#: lib/Padre/Plugin/Perl6.pm:152 lib/Padre/Plugin/Perl6.pm:166
+msgid "Perl 6 refactoring support is coming soon..."
+msgstr "Perl 6のリファクタリングサポートは近日中に対応予定です..."
+
+#: lib/Padre/Plugin/Perl6.pm:153 lib/Padre/Plugin/Perl6.pm:167
+#: lib/Padre/Plugin/Perl6.pm:487 lib/Padre/Plugin/Perl6.pm:610
+#: lib/Padre/Plugin/Perl6.pm:787 lib/Padre/Plugin/Perl6/Perl6Document.pm:778
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:820
+msgid "Error"
+msgstr "エラー"
+
+#: lib/Padre/Plugin/Perl6.pm:163
+msgid "Rename variable"
+msgstr "変数のリネーム"
+
+#: lib/Padre/Plugin/Perl6.pm:178
+msgid "Rakudo"
+msgstr "Rakudo"
+
+#: lib/Padre/Plugin/Perl6.pm:184
+msgid "Perl 6 Executable"
+msgstr "Perl 6実行ファイル"
+
+#: lib/Padre/Plugin/Perl6.pm:191
+msgid "Perl 6 PIR"
+msgstr "Perl 6 PIR"
+
+#: lib/Padre/Plugin/Perl6.pm:199
+msgid "Export..."
+msgstr "エクスポート"
+
+#: lib/Padre/Plugin/Perl6.pm:205
+msgid "Full html"
+msgstr "HTML(完全)"
+
+#: lib/Padre/Plugin/Perl6.pm:210
+msgid "Simple html"
+msgstr "HTML(簡易)"
+
+#: lib/Padre/Plugin/Perl6.pm:215
+msgid "Snippet html"
+msgstr "HTML(スニペット)"
+
+#: lib/Padre/Plugin/Perl6.pm:224
+msgid "Perl 6 Help\tF2"
+msgstr "Perl 6ヘルプ\tF2"
+
+#: lib/Padre/Plugin/Perl6.pm:232
+msgid "More Help?"
+msgstr "その他のヘルプ"
+
+#: lib/Padre/Plugin/Perl6.pm:239
+msgid "#padre for Padre Help"
+msgstr "Padreのヘルプ(#padre)"
+
+#: lib/Padre/Plugin/Perl6.pm:246
+msgid "#perl6 for Perl 6 Help"
+msgstr "Perl 6のヘルプ(#perl6)"
+
+#: lib/Padre/Plugin/Perl6.pm:253
+msgid "Perl 6 Projects"
+msgstr "Perl 6プロジェクト"
+
+#: lib/Padre/Plugin/Perl6.pm:263
+msgid "Maintenance"
+msgstr "メンテナンス"
+
+#: lib/Padre/Plugin/Perl6.pm:270
+msgid "Cleanup STD.pm Lex Cache"
+msgstr "STDのレキシカルキャッシュをクリア"
+
+#: lib/Padre/Plugin/Perl6.pm:277
+msgid "Preferences"
+msgstr "設定"
+
+#: lib/Padre/Plugin/Perl6.pm:284
+msgid "About"
+msgstr "このプラグインについて"
+
+#: lib/Padre/Plugin/Perl6.pm:333
+msgid "This plugin enables useful Perl 6 features on Padre IDE."
+msgstr "このプラグインはPadre IDE上で便利なPerl 6の機能を\n"
+"利用できるようにするものです。"
+
+#: lib/Padre/Plugin/Perl6.pm:334
+msgid "It integrates coloring and easy access to Perl 6 help documents."
+msgstr "色分けやPerl 6のヘルプに簡単にアクセスできるようにします。"
+
+#: lib/Padre/Plugin/Perl6.pm:335
+msgid "The following modules are used:"
+msgstr "利用しているモジュールは次の通りです:"
+
+#: lib/Padre/Plugin/Perl6.pm:366
+msgid "Cannot find STD.pm lex cache"
+msgstr "STD.pmのレキシカルキャッシュが見つかりません"
+
+#: lib/Padre/Plugin/Perl6.pm:487 lib/Padre/Plugin/Perl6.pm:610
+#: lib/Padre/Plugin/Perl6.pm:787
+msgid "No document"
+msgstr "ドキュメントがありません"
+
+#: lib/Padre/Plugin/Perl6.pm:493
+msgid "Not a Perl 6 file"
+msgstr "Perl 6のファイルではありません"
+
+#: lib/Padre/Plugin/Perl6.pm:494
+msgid "Operation cancelled"
+msgstr "キャンセルしました"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:219
+#, perl-format
+msgid "Insert declaration for %s"
+msgstr "%sの宣言を挿入する"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:249
+#, perl-format
+msgid "Insert a space after %s"
+msgstr "%sのあとに空白を挿入する"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:272
+#, perl-format
+msgid "Insert routine %s"
+msgstr "%sルーチンを挿入する"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:295
+msgid "Use ~ instead of . for string concatenation"
+msgstr "文字列の結合には「.」ではなく「~」を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:314
+msgid "Use . for method call"
+msgstr "メソッド呼び出しには「.」を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:333
+msgid "Use Perl 6 constructor syntax"
+msgstr "Perl 6のコンストラクタ構文を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:353
+msgid "Use loop (;;) for looping"
+msgstr "ループにはloop (;;)を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:372
+msgid "Use [*-1] to access final element"
+msgstr "最後の要素にアクセスする時は[*-1]を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:391
+msgid "Use N.pick for a random number"
+msgstr "ランダムな数字を指定する場合はN.pickを使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:408
+msgid "Use (1..N).pick for a random number"
+msgstr "ランダムな数字を指定する場合は(1..N).pickを使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:427
+msgid "Use [N..*] for indefinite range"
+msgstr "不定の範囲を指定する場合は[N..*]を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:446
+msgid "Use !! for conditional operator"
+msgstr "条件演算子には!!を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:465
+msgid "Use ?? (...) !! to avoid precedence bugs"
+msgstr "優先順位のバグを避けるため?? (...) !!を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:485
+msgid "Use ?? !! for the conditional operator"
+msgstr "条件演算子には?? !!を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:504
+msgid "Use ~= for string concatenation"
+msgstr "文字列結合には~=を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:523
+msgid "Use ~~ for pattern matching"
+msgstr "パターンマッチングには~~を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:542
+msgid "Use !~~ for negated pattern matching"
+msgstr "パターンマッチングの否定には!~~を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:561
+msgid "Use +> for numeric right shift"
+msgstr "数値の右シフトには+>を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:578
+msgid "Use ~> for string right shift"
+msgstr "文字列の右シフトには~>を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:596
+msgid "Use +< for numeric left shift"
+msgstr "数値の左シフトには+<を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:613
+msgid "Use ~< for string left shift"
+msgstr "文字列の左シフトには~<を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:632
+msgid "Use $! for eval errors"
+msgstr "evalエラーには$!を使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:651
+msgid "Use $::PERL_VERSION"
+msgstr "$::PERL_VERSIONを使ってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:680
+msgid "Comment error line"
+msgstr "コメントエラー行"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:714
+msgid "Surround with try { ... }"
+msgstr "try { ... }でくくってください"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:742
+msgid "Convert POD6 to XHTML"
+msgstr "POD6をXHTMLに変換"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:777
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:819
+msgid "Operation failed!"
+msgstr "失敗しました!"
+
+#: lib/Padre/Plugin/Perl6/Perl6Document.pm:789
+msgid "Convert POD6 to Text"
+msgstr "POD6をテキストに変換"
+
+#: lib/Padre/Plugin/Perl6/Perl6HelpDialog.pm:39
+msgid "Perl 6 Help (Powered by grok)"
+msgstr "Perl 6ヘルプ(grokを利用)"
+
+#: lib/Padre/Plugin/Perl6/Perl6OutlineTask.pm:191
+msgid "Outline"
+msgstr "アウトライン"
+
+#: lib/Padre/Plugin/Perl6/Perl6OutlineTask.pm:224
+msgid "Open &Documentation"
+msgstr "ドキュメントを開く(&D)"
+
+#: lib/Padre/Plugin/Perl6/Perl6StdColorizerTask.pm:222
+msgid ""
+"'STD Lex Cache' folder is corrupt. Please click on 'Plugins/Perl6/"
+"Maintenance' and then 'Cleanup STD Lex Cache' and then re-open the file."
+msgstr ""
+"「STDレキシカルキャッシュ」フォルダが壊れています。"
+"「プラグイン」「Perl6」「メンテナンス」から「STDレキシカル"
+"キャッシュのクリア」をクリックしてファイルを開きなおしてください"
+
+#: lib/Padre/Plugin/Perl6/Preferences.pm:30
+msgid "Perl 6 preferences"
+msgstr "Perl 6の設定"
+
+#: lib/Padre/Plugin/Perl6/Preferences.pm:121
+msgid "Enable coloring"
+msgstr "色分けする"
+
+#: lib/Padre/Plugin/Perl6/Preferences.pm:129
+msgid "Colorizer:"
+msgstr "色分けに使うモジュール:"

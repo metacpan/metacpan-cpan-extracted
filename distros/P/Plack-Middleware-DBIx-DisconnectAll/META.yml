@@ -1,0 +1,41 @@
+---
+abstract: 'Disconnect all database connection at end of request'
+author:
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.6, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-DBIx-DisconnectAll
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Plack::Middleware::DBIx::DisconnectAll:
+    file: lib/Plack/Middleware/DBIx/DisconnectAll.pm
+    version: 0.02
+requires:
+  DBIx::DisconnectAll: 0.03
+  Plack: 0.9949
+  parent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/kazeburo/Plack-Middleware-DBIx-DisconnectAll/issues
+  homepage: https://github.com/kazeburo/Plack-Middleware-DBIx-DisconnectAll
+  repository: git://github.com/kazeburo/Plack-Middleware-DBIx-DisconnectAll.git
+version: 0.02

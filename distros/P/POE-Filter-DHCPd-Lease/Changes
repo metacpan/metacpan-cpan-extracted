@@ -1,0 +1,46 @@
+Revision history for Perl module POE::Filter::DHCPd::Lease
+
+0.0703   Fri Aug  1 22:19:43 UTC 2014
+       - Added support for "next binding state"
+
+0.0702   Mon Jul 28 20:01:06 UTC 2014
+       - Minimum perl version bump to 5.10 to support regex named capture
+         variables.
+
+0.0701   Tue Jul 22 10:48:37 UTC 2014
+       - Net::ISC::DHCPd didn't like circuit_id and remote_id being defined
+         but empty
+
+0.07     Tue Jul 22 09:23:03 UTC 2014
+       - fix errors parsing files with non-lease statments (github#2)
+       - profiled and optimized main parser loop
+       - switching bugtracker to github
+
+0.06     Fri May  2 16:38:56 UTC 2014
+       - fix intermittent parse error with 5.17+
+
+0.0502   Sat Jun 19 13:58:10 CEST 2010
+       - Fix 10-filter.t: failed in any other timezone than CEST
+
+0.05_01  Sat Apr 24 16:33:57 CEST 2010
+       - This release is the same as 0.0502
+
+0.05     Wed Apr 21 10:52:56 CEST 2010
+       - Fix pod tests: Not required
+       - Fix Makefile.PL: Correct dependencies
+
+0.04     Tue Juli 21 15:00:40 2009
+       - Fix failing test
+       - Fix parsing of starts/ends
+
+0.03     Mon Jun  1 17:30:00 2009
+       - Fix timelocal() expects month from 0-11
+
+0.02     Fri Apr  3 11:11:40 2009
+       - Fix greedy bug
+       - Change starts/ends are in epoch format
+       - Code seems to actually do something
+
+0.01     Thu Apr   2 00:15:30 2009
+       - Commited first version of POE::Filter::DHCPd::Lease
+

@@ -1,0 +1,20 @@
+Array.pm
+Array.xs        Interface between perl and queue.c
+Changes
+MANIFEST
+Makefile.PL
+README
+alloc.c         Imager's memory debug library, mangled
+alloc.h
+bench1.perl	based on code in POE's svn tree
+bench2.perl	my own benchmarks
+queue.c         Moved the implementation code here
+queue.h
+t/01_array.t
+t/02_release.t
+t/03_errno.t
+t/05_pfork.t
+t/90_pod.t
+t/91_pod_cover.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

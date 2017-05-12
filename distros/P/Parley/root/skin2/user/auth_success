@@ -1,0 +1,6 @@
+<h1>[%l('Registration Complete')%]</h1>
+
+<p>
+[%l('Your registration has been authenticated')%].
+[%l('Click on the login link to continue')%].
+</p>

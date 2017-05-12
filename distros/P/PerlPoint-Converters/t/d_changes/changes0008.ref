@@ -1,0 +1,62 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!-- ZOOMSTOP -->
+
+<HTML>
+
+<!-- *** Created by pp2html, build 1.21 from PerlPoint-Converters 1.0205  -->
+
+<HEAD>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+
+<!-- ZOOMRESTART -->
+
+
+
+<TITLE>Version 0.008   01/17/2001</TITLE>
+</HEAD>
+
+<!-- ************************************************************** -->
+<BODY bgcolor="#FFFFFF" text="#000000" link="#0000CC" vlink="#AAAAAA" alink="#FF0000">
+<a name="Version 0.008   01/17/2001"></a>
+
+<H1>Version 0.008   01/17/2001
+</H1>
+
+<UL>
+<LI>README updated (Introduction and About PerlPoint-Converters)</LI>
+<LI>Requires <CODE>PerlPoint::Parser 0.29</CODE>, and hence perl5.00503 (Some earlier versions of the PerlPoint-Package needed perl5.6.0)</LI>
+<LI>changes to pp2html:</LI>
+</UL>
+<UL>
+
+<UL>
+<LI>Parameters for fgcolor, linkcolor, vlinkcolor, alinkcolor</LI>
+<LI>Parameters for cache usage: --cache, --cacheCleanup</LI>
+<LI>.cfg files adapted to new options</LI>
+</UL>
+</UL>
+
+<UL>
+<LI>changes to pp2latex</LI>
+</UL>
+<UL>
+
+<UL>
+<LI>POD Docu updated</LI>
+<LI>--slide_dir parameter to be compatible with pp2html</LI>
+<LI>--no_index</LI>
+<LI>Parameters for cache usage: --cache, --cacheCleanup</LI>
+<LI>no formatting in \verbatim blocks</LI>
+<LI>bugfix: version message now goes to STDERR</LI>
+</UL>
+</UL>
+
+<UL>
+<LI>ppdoc.pp Dokumentation updated</LI>
+</UL>
+</BODY>
+</HTML>

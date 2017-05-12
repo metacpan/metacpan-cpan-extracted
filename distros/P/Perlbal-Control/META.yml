@@ -1,0 +1,22 @@
+---
+name: Perlbal-Control
+version: 0.02
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+abstract: Simple class to manage perlbal
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Moose: 0.32
+  MooseX::Control: 0.02
+  Proc::ProcessTable: 0
+  Test::More: 0
+provides:
+  Perlbal::Control:
+    file: lib/Perlbal/Control.pm
+    version: 0.02
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

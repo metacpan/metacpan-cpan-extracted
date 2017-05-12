@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+use strict;
+use NetSNMP::ASN;
+use POE::Component::NetSNMP::agent;
+
+
+use constant {
+    BASE_OID    => ".1.3.6.1.4.1.32272",
+};
+
+my $agent = POE::Component::NetSNMP::agent->new(
+    AgentX      => 1,
+    AutoHandle  => BASE_OID,
+    AutoUpdate  => [[ \&update_tree, 30 ]],
+);
+
+$agent->run;
+
+sub update_tree {
+    my ($self) = @_;
+
+    # add one OID entry
+    $self->add_oid_entry(BASE_OID.".1", ASN_OCTET_STR, "hello");
+
+    # add several OID entries at once
+    $self->add_oid_tree({
+        BASE_OID.".2" => [ ASN_INTEGER, 42 ],
+        BASE_OID.".3" => [ ASN_COUNTER, 1873541 ],
+        BASE_OID.".4" => [ ASN_GAUGE, 235 ],
+    });
+}
+

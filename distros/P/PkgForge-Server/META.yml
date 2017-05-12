@@ -1,0 +1,72 @@
+---
+name: PkgForge-Server
+version: v1.1.10
+author:
+  - 'Stephen Quinney <squinney@inf.ed.ac.uk>'
+abstract: Package Forge servers
+license: gpl
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+build_requires:
+  Test::More: 0.87
+requires:
+  File::Find::Rule: 0
+  IPC::Run: 0
+  Moose: 0
+  MooseX::Getopt: 0
+  MooseX::Types: 0
+  PkgForge: v1.4.6
+  Readonly: 0
+  perl: v5.8.8
+configure_requires:
+  Module::Build: 0.35
+provides:
+  PkgForge::App::Buildd:
+    file: lib/PkgForge/App/Buildd.pm
+    version: v1.1.10
+  PkgForge::App::Incoming:
+    file: lib/PkgForge/App/Incoming.pm
+    version: v1.1.10
+  PkgForge::App::InitServer:
+    file: lib/PkgForge/App/InitServer.pm
+    version: v1.1.10
+  PkgForge::Builder:
+    file: lib/PkgForge/Builder.pm
+    version: v1.1.10
+  PkgForge::Builder::RPM:
+    file: lib/PkgForge/Builder/RPM.pm
+    version: v1.1.10
+  PkgForge::Daemon:
+    file: lib/PkgForge/Daemon.pm
+    version: v1.1.10
+  PkgForge::Daemon::Buildd:
+    file: lib/PkgForge/Daemon/Buildd.pm
+    version: v1.1.10
+  PkgForge::Daemon::Incoming:
+    file: lib/PkgForge/Daemon/Incoming.pm
+    version: v1.1.10
+  PkgForge::Handler:
+    file: lib/PkgForge/Handler.pm
+    version: v1.1.10
+  PkgForge::Handler::Buildd:
+    file: lib/PkgForge/Handler/Buildd.pm
+    version: v1.1.10
+  PkgForge::Handler::Incoming:
+    file: lib/PkgForge/Handler/Incoming.pm
+    version: v1.1.10
+  PkgForge::Handler::Initialise:
+    file: lib/PkgForge/Handler/Initialise.pm
+    version: v1.1.10
+  PkgForge::PidFile:
+    file: lib/PkgForge/PidFile.pm
+    version: v1.1.10
+  PkgForge::Queue:
+    file: lib/PkgForge/Queue.pm
+    version: v1.1.10
+  PkgForge::Queue::Entry:
+    file: lib/PkgForge/Queue/Entry.pm
+    version: v1.1.10
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

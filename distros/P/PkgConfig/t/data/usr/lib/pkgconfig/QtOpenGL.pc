@@ -1,0 +1,14 @@
+prefix=/usr/lib/qt44
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include/QtOpenGL
+qt_config=lex yacc warn_on uic resources qt warn_on release incremental link_prl exceptions no_mocdepend release stl qt_no_framework system-sqlite release shared dll largefile stl precompile_header mmx 3dnow sse sse2 dylib create_prl link_prl depend_includepath QTDIR_build use_libmysqlclient_r qt_install_headers qt warn_on depend_includepath qmake_cache target_qt hide_symbols create_libtool create_pc explicitlib x11 opengl x11lib x11inc moc thread shared dll
+moc_location=/usr/lib/qt44/bin/moc
+uic_location=/usr/lib/qt44/bin/uic
+
+Name: Qtopengl
+Description: Qtopengl Library
+Version: 4.4.3
+Libs: -L${libdir} -lQtOpenGL -L/usr/lib/qt44/lib  -lGLU -lGL -lQtGui -L/usr/lib/qt44/lib -lQtCore -lrt  
+Cflags: -DQT_SHARED -I/usr/lib/qt44/include -I${includedir}
+

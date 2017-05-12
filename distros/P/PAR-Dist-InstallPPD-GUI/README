@@ -1,0 +1,40 @@
+NAME
+    PAR::Dist::InstallPPD::GUI - GUI frontend for PAR::Dist::InstallPPD
+
+SYNOPSIS
+      use PAR::Dist::InstallPPD::GUI;
+      my $gui = PAR::Dist::InstallPPD::GUI->new();
+      $gui->run();
+
+DESCRIPTION
+    This module implements a Tk GUI front-end to the PAR::Dist::InstallPPD
+    module's "parinstallppd" command. You will generally want to use the
+    "parinstallppdgui" command instead of using this module.
+
+    The interface to "parinstallppd" isn't done in code via an API. Instead
+    "parinstallppdgui" uses IPC::Run to run "parinstallppd".
+
+SEE ALSO
+    PAR::Dist::InstallPPD, IPC::Run, File::UserConfig, Tk
+
+    PAR has a mailing list, <par@perl.org>, that you can write to; send an
+    empty mail to <par-subscribe@perl.org> to join the list and participate
+    in the discussion.
+
+    Please send bug reports to <bug-par-dist-installppd-gui@rt.cpan.org>.
+
+    The official PAR website may be of help, too: http://par.perl.org
+
+    For details on the *Perl Package Manager*, please refer to ActiveState's
+    website at <http://activestate.com>.
+
+AUTHOR
+    Steffen Mueller, <smueller at cpan dot org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006-2007 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6 or, at your
+    option, any later version of Perl 5 you may have available.
+

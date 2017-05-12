@@ -1,0 +1,1605 @@
+=head1 NOME
+
+perlunicode - Supporto Unicode in Perl
+
+=head1 DESCRIZIONE
+
+=head2 Avvertenze Importanti
+
+Un supporto completo Unicode richiede una gran quantitE<agrave> di
+lavoro.  Sebbene Perl non implementi lo standard Unicode e i rapporti
+tecnici allegati da parte a parte, Perl fornisce comunque una gran
+quantitE<agrave> di funzionalitE<agrave> Unicode.
+
+=over 4
+
+=item Strati di Input e Output
+
+Perl sa che un filehandle usa la codifica Unicode interna (UTF-8, o
+UTF-EBCDIC su piattaforme EBCDIC) se il filehandle viene aperto con lo
+strato C<:utf8>. Altre codifiche possono essere convertite alla
+codifica interna Perl in lettura (o viceversa in scrittura) usando lo
+strato C<:encoding(...)>. Leggete L<open>.
+
+Per indicare che il sorgente stesso dello script E<egrave> in una
+particolare codifica, usate L<encoding>.
+
+=item Espressioni Regolari
+
+Il compilatore delle espressioni regolari produce istruzioni
+polimorfiche. Ovvero, l'espressione si adatta ai dati e commuta
+automaticamente allo schema di caratteri Unicode quando viene usata su
+dati Unicode -- o viceversa usa lo schema tradizionale a byte quando
+viene usata su dati a byte.
+
+=item C<use utf8> E<egrave> ancora necessario per usare UTF-8/UTF-EBCDIC negli script
+
+Per compatibilitE<agrave>, la direttiva C<use utf8> deve essere
+inclusa esplicitamente per attivare il riconoscimento di stringhe in
+UTF-8 nei sorgenti degli script (nelle costanti stringa e espressioni
+regolari, o nei nomi degli identificatori) sulle macchine ASCII,
+ovvero il riconoscimento di UTF-EBCDIC sulle macchine EBCDIC. B<<
+Questi sono i soli casi in cui E<egrave> necessario un esplicito C<use
+utf8> >>. Cfr. L<utf8>.
+
+Potete anche usare la direttiva C<encoding> per cambiare la codifica
+di default per i dati nei vostri script; cfr. L<encoding>.
+
+=item gli script marcati con BOM o codificati in UTF-16 sono riconosciuti automaticamente
+
+Se uno script Perl comincia con il BOM Unicode (codificato in
+UTF-16LE, UTF16-BE, o UTF-8), oppure sembra essere codificato in
+UTF-16 (con i byte in qualunque ordine) senza BOM, perl
+interpreterE<agrave> correttamente lo script in Unicode. (UTF-8 senza
+BOM non è efficacemente distinguibile da ISO 8859-1 o altre codifiche
+a 8 bit).
+
+=item C<use encoding> E<egrave> necessario per interpretare correttamente le stringhe di byte non Latin-1
+
+Per default, c'E<egrave> una asimmetria fondamentale nel modello
+Unicode di Perl: la conversione implicita da stringhe di byte a
+stringhe di caratteri Unicode assume che la codifica di partenza sia
+I<ISO 8859-1 (Latin-1)>, ma le stringhe di caratteri Unicode vengono
+convertite in stringhe di byte usando UTF-8. Questo succede
+perchE<eacute> i primi 256 code point di Unicode concordano (quasi per
+caso) con Latin-1.
+
+Se volete che le stringhe di byte siano interpretate come UTF-8, usate
+la direttiva C<encoding>:
+
+    use encoding 'utf8';
+
+Cfr. L</"Semantica a byte e a caratteri"> per ulteriori dettagli.
+
+=back
+
+=head2 Semantica a byte e a caratteri
+
+A partire dalla versione 5.6, la rappresentazione interna delle
+stringhe in Perl E<egrave> basata su caratteri "larghi" (nel senso che
+possono occupare piE<ugrave> di un byte).
+
+Nel futuro, si potrE<agrave> supporre che le operazioni a livello di
+Perl lavorino su caratteri anzichE<eacute> byte.
+
+Comunque, come misura di compatiblitE<agrave> temporanea, Perl cerca
+di fornire un percorso sicuro di migrazione per i vostri programmi da
+semantica a byte a semantica a caratteri. Nel caso di operazioni per
+le quali Perl puE<ograve> decidere senza ambiguitE<agrave> che i dati
+in ingresso sono caratteri, viene usata la semantica a caratteri. Nel
+caso di operazioni per le quali questa decisione non puE<ograve>
+essere effettuata senza ulteriori informazioni da parte dell'utente,
+Perl decide per la compatibilitE<agrave> e sceglie la semantica a
+byte.
+
+Questo comportamento mantiene la compatiblitE<agrave> con versioni
+precedenti del Perl, che usavano la semantica a byte solo nel caso in
+cui nessuno degli input del programma erano indicati come sorgenti di
+caratteri Unicode. Questi dati possono provenire da filehandle, da
+chiamate a programmi esterni, da informazioni fornite dal sistema (ad
+esempio C<%ENV>), o da costanti nel sorgente.
+
+La direttiva C<bytes> forzerE<agrave> sempre, indipendentemente dalla
+piattaforma, la semantica a byte in un particolare scope
+lessicale. Cfr. L<bytes>.
+
+La direttiva C<utf8> E<egrave> principalmente un sistema di
+compatibilitE<agrave> che attiva il riconoscimenti di costanti
+UTF-(8|EBCDIC) da parte del parser. Notate che questa direttiva
+E<egrave> necessaria solo finchE<eacute> Perl assume una semantica a
+byte; quando la semantica a caratteri diventerE<agrave> quella
+predefinita, questa direttiva potrE<agrave> non avere piE<ugrave>
+effetto. Cfr. L<utf8>.
+
+Tranne dove viene detto esplicitamente, gli operatori Perl usano la
+semantica a carattere per i dati Unicode e la semantica a byte per i
+dati non Unicode. La decisione di usare la semantica a carattere
+E<egrave> fatta in modo trasparente. Se i dati provengono da una
+sorgente Unicode -- ad esempio, da un filehandle cui E<egrave> stato
+applicato uno strato di codifica, o da una costante Unicode nel
+sorgente -- si applica la semantica a carattere. Altrimenti, si
+applica la semantica a byte. La direttiva C<bytes> E<egrave> usata per
+forzare la semantica a byte sui dati Unicode.
+
+Se si concatenano stringe con semantica a byte e stringhe Unicode, la
+nuova stringa verrE<agrave> creata decodificando la stringa di byte
+usando I<ISO 8859-1 (Latin-1)>, anche se le stringhe Unicode usavano
+EBCDIC.  Questa trasformazione avviene senza considerare quale sia la
+codifica nativa a 8 bit del sistema; per cambiare questo comportamento
+in sistemi la cui codifica nativa non E<egrave> nE<eacute> Latin-1
+nE<eacute> EBCDIC usate la direttiva C<encoding>. Cfr. L<encoding>.
+
+Secondo la semantica a carattere, molte operazioni che prima
+lavoravano sui byte ora lavorano sui caratteri. Un carattere in Perl
+E<egrave>, a livello logico, un numero tra 0 e circa 2**31. I
+caratteri con valore piE<ugrave> alto potrebbero essere codificati
+internamente con sequenze di byte piE<ugrave> lunghe, ma questi
+dettagli sono quasi del tutto nascosti al codice Perl. Leggete
+L<perluniintro> per ulteriori informazioni.
+
+=head2 Effetti della semantica a carattere
+
+La semantica a carattere ha gli effetti seguenti:
+
+=over 4
+
+=item *
+
+Le stringhe -- incluse le chiavi degli hash -- e le espressioni
+regolari possono contenere caratteri aventi valore ordinale maggiore
+di 255.
+
+Se usate un editor Unicode per scrivere i vostri programmi, i
+caratteri Unicode possono essere inseriti direttamente nelle costanti
+stringa in una qualunque delle vari codifiche di Unicode (UTF-8,
+UTF-EBCDIC, UTF-16, etc.), ma verranno riconosciuti come tali e
+convertiti nella codifica interna del Perl solo se la codifica
+E<egrave> stata indicata con un'apposita direttiva L<encoding>.
+
+Potete inserire caratteri Unicode all'interno di una stringa anche
+usando la notazione C<\x{...}>. Tre le graffe dovete inserire il code
+point Unicode del carattere, in esadecimale. Ad esempio, una faccina
+sorridente E<egrave> C<\x{263A}>. Questo metodo funziona soltanto per
+i caratteri con valore maggiore o uguale a C<0x100>.
+
+Inoltre, se scrivete
+
+   use charnames ':full';
+
+potete usare la notazione C<\N{...}> inserendo tre le graffe il nome
+ufficiale Unicode del carattere, come ad esempio C<\N{WHITE SMILING FACE}>.
+
+=item *
+
+Se avete specificato una codifica con un'opportuna direttiva
+L<encoding>, gli identificatori nello script Perl possono contenere
+caratteri alfanumerici Unicode, ideogrammi inclusi. Al momento Perl
+non tenta di canonicalizzare i nomi di variabile.
+
+=item *
+
+Le espressioni regolari fanno match su caratteri anzichE<eacute> byte. "C<.>"
+fa match su un carattere anzichE<eacute> su un byte. Il pattern "C<\C>" forza
+il match di un singolo byte -- si chiama C<\C> perchE<eacute> un byte nel
+linguaggio C viene chiamato C<char>.
+
+=item *
+
+Le classi di caratteri nelle espressioni regolari fanno match su
+caratteri anzichE<eacute> byte e fanno match sulle proprietE<agrave>
+dei caratteri specificate nel database delle proprietE<agrave>
+Unicode. Ad esmepio, "C<\w>" puE<ograve> essere usato per far match su
+un ideogramma giapponese.
+
+(Comunque, a causa di una limitazione dell'implementazione attuale,
+usare C<\w> o C<\W> I<all'interno> di una classe di caratteri C<[...]>
+farE<agrave> sempre match sui byte).
+
+=item *
+
+ProprietE<agrave> Unicode, I<script>, e blocchi possono essere usati
+per nome come classi di caratteri usando il pattern C<\p{}> "fa match
+su proprietE<agrave>" e la sua negazione C<\P{}>.
+
+Ad esempio, C<\p{Lu}> fa match con un qualsiasi carattere che abbia la
+proprietE<agrave> Unicode "Lu" (lettera maiuscola, da "Letter,
+uppercase"), mentre C<\p{M}> fa match su qualsiasi carattere con la
+proprietE<agrave> "M" (accenti e simili, da "Mark"). Le graffe non
+sono necessarie per proprietE<agrave> di una sola lettera, per cui
+C<\p{M}> E<egrave> uguale a C<\pM>. Sono disponibili molte
+proprietE<agrave> predefinite, come ad esempio C<\p{Mirrored}> o
+C<\p{Tibetan}>.
+
+I nomi ufficiali Unicode di script e blocchi usano spazi e trattini
+come separatori, ma per comoditE<agrave> potete usare trattini, spazi,
+o sottolineature, e non vengono distinte maiuscola da minuscole. Si
+suggerisce, comunque, che per coerenza usiate la seguente convenzione:
+usate il nome ufficiale Unicode per lo script, la proprietE<agrave>, o
+il blocco (ma leggete sotto per le regole aggiuntive che si applicano
+ai nomi di blocco), tolti spazi e trattini, con ciascuna parola avente
+la sola prima lettera maiuscola. CosE<igrave> C<Latin-1 Supplement>
+diventa C<Latin1Supplement>.
+
+Potete anche usare la negazione, sia in C<\p{}> che in C<\P{}>
+inserendo un circonflesso (C<^>) tra la graffa aperta e il nome della
+proprietE<agrave>: C<\p{^Tamil}> E<egrave> equivalente a C<\P{Tamil}>.
+
+B<< NOTA: Le proprietE<agrave>, I<script> e blocchi elencati qui di
+seguito sono quelli di Unicode 3.2.0, Marzo 2002, ovvero Perl 5.8.0,
+Luglio 2002. Unicode 4.0.0 E<egrave> uscito in Aprile 2003, e Perl
+5.8.1 in Settembre 2003. >>
+
+Quelle che seguono sono le proprietE<agrave> base della categoria "generale"
+di Unicode, assieme alla loro forma estesa (e a una traduzione, NdT).
+Potete usare l'una o l'altra; ad esempio, C<\p{Lu}> e
+C<\p{LowercaseLetter}> sono identici.
+
+    Breve       Estesa                 Traduzione
+
+    L           Letter                 lettera
+    LC          CasedLetter            lettera con versioni maiuscola, minuscola, etc.
+    Lu          UppercaseLetter        lettera maiuscola
+    Ll          LowercaseLetter        lettera minuscola
+    Lt          TitlecaseLetter        lettera da titolo
+    Lm          ModifierLetter         lettera modificatrice
+    Lo          OtherLetter            altra lettera
+
+    M           Mark                   diacritico
+    Mn          NonspacingMark         diacritico senza larghezza
+    Mc          SpacingMark            diacritico con larghezza
+    Me          EnclosingMark          diacritico circoscritto
+
+    N           Number                 cifra
+    Nd          DecimalNumber          cifra decimale
+    Nl          LetterNumber           cifra lettera
+    No          OtherNumber            altra cifra
+
+    P           Punctuation            punteggiatura
+    Pc          ConnectorPunctuation   punteggiatura legante
+    Pd          DashPunctuation        punteggiatura tratto
+    Ps          OpenPunctuation        punteggiatura di apertura
+    Pe          ClosePunctuation       punteggiatura di chiusura
+    Pi          InitialPunctuation     punteggiatura iniziale
+                (puo` comportarsi come Ps o Pe a seconda dell'uso)
+    Pf          FinalPunctuation       punteggiatura finale
+                (puo` comportarsi come Ps o Pe a seconda dell'uso)
+    Po          OtherPunctuation       altra punteggiatura
+
+    S           Symbol                 simbolo
+    Sm          MathSymbol             simbolo matematico
+    Sc          CurrencySymbol         simbolo di valuta
+    Sk          ModifierSymbol         simbolo modificatore
+    So          OtherSymbol            altro simbolo
+
+    Z           Separator              separatore
+    Zs          SpaceSeparator         separatore spazio
+    Zl          LineSeparator          separatore linea
+    Zp          ParagraphSeparator     separatore paragrafo
+
+    C           Other                  altro
+    Cc          Control                controllo
+    Cf          Format                 formato
+    Cs          Surrogate              surrogato
+                (non usabile)
+    Co          PrivateUse             uso privato
+    Cn          Unassigned             non assegnato
+
+ProprietE<agrave> di una sola lettera fanno match con caratteri che
+abbiano una qualsiasi delle proprietE<agrave> di due lettere che
+cominciano con essa.  C<LC> e C<L&> sono casi speciali: indicano
+l'unione di C<Ll>, C<Lu> e C<Lt>.
+
+PoichE<eacute> Perl evita all'utente di dover comprendere la
+rappresentazione interna dei caratteri Unicode, non c'E<egrave>
+bisogno di implementare il concetto piuttosto scomodo dei
+surrogati. PerciE<ograve> C<Cs> non E<egrave> supportata.
+
+PoichE<eacute> gli script differiscono nella loro
+direzionalitE<agrave> -- l'ebraico E<egrave> scritto da destra a
+sinistra, ad esempio -- Unicode fornisce le seguenti proprietE<agrave>
+nella classe BidiClass:
+
+    Proprieta`  Significato
+
+    L           Sinistra-Destra
+    LRE         Sinistra-Destra Immerso
+    LRO         Sinistra-Destra Forzato
+    R           Destra-Sinistra
+    AL          Destra-Sinistra Arabo
+    RLE         Destra-Sinistra Immerso
+    RLO         Destra-Sinistra Forzato
+    PDF         Estrai formato direzionale
+    EN          Numero Europeo
+    ES          Separatore di Numero Europeo
+    ET          Terminatore di Numero Europeo
+    AN          Numero Arabo
+    CS          Separatore Comune di Numero
+    NSM         Diacritico senza larghezza
+    BN          Ininfluente al bordo
+    B           Separatore di Paragrafo
+    S           Separatore di Segmento
+    WS          Spazio
+    ON          Altri ininfluenti
+
+Ad esempio, C<\p{BidiClass:R}> fa match sui caratteri che sono normalmente
+scritti da destra a sinistra.
+
+=back
+
+=head2 Script
+
+I nomi degli script che possono essere usati con C<\p{...}> e
+C<\P{...}>, come ad esempio C<\p{Latin}> o C<\p{Cyrillic}>, sono i
+seguenti:
+
+    Arabic
+    Armenian
+    Bengali
+    Bopomofo
+    Buhid
+    CanadianAboriginal
+    Cherokee
+    Cyrillic
+    Deseret
+    Devanagari
+    Ethiopic
+    Georgian
+    Gothic
+    Greek
+    Gujarati
+    Gurmukhi
+    Han
+    Hangul
+    Hanunoo
+    Hebrew
+    Hiragana
+    Inherited
+    Kannada
+    Katakana
+    Khmer
+    Lao
+    Latin
+    Malayalam
+    Mongolian
+    Myanmar
+    Ogham
+    OldItalic
+    Oriya
+    Runic
+    Sinhala
+    Syriac
+    Tagalog
+    Tagbanwa
+    Tamil
+    Telugu
+    Thaana
+    Thai
+    Tibetan
+    Yi
+
+Classi di proprietE<agrave> estese possono aggiungersi a quelle base,
+definite nel database Unicode F<PropList> (con spiegazione in
+italiano, NdT):
+
+    ASCIIHexDigit                   cifra esadecimale ASCII
+    BidiControl                     controllo bidirezionalita`
+    Dash                            trattino
+    Deprecated                      deprecato
+    Diacritic                       diacritico (accenti etc.)
+    Extender                        estensore
+    GraphemeLink                    collegamento tra grafemi
+    HexDigit                        cifra esadecimale
+    Hyphen                          trattino di sillabazione
+    Ideographic                     ideografico
+    IDSBinaryOperator               operatore binario IDS
+    IDSTrinaryOperator              operatore ternario IDS
+    JoinControl                     controllo di legatura
+    LogicalOrderException           eccezione di ordine logico
+    NoncharacterCodePoint           code point non carattere
+    OtherAlphabetic                 altri alfabetici
+    OtherDefaultIgnorableCodePoint  altro code point normalmente
+                                    ignorabile
+    OtherGraphemeExtend             altra estensione di grafema
+    OtherLowercase                  altra minuscola
+    OtherMath                       altro carattere matematico
+    OtherUppercase                  altra maiuscola
+    QuotationMark                   virgoletta
+    Radical                         radicale
+    SoftDotted                      con puntino eliminabile
+    TerminalPunctuation             punteggiatura terminale
+    UnifiedIdeograph                ideogramma unificato
+    WhiteSpace                      spazio
+
+e ci sono ancora proprietE<agrave> derivate:
+
+    Alphabetic      Lu + Ll + Lt + Lm + Lo + OtherAlphabetic
+    Lowercase       Ll + OtherLowercase
+    Uppercase       Lu + OtherUppercase
+    Math            Sm + OtherMath
+
+    ID_Start        Lu + Ll + Lt + Lm + Lo + Nl
+    ID_Continue     ID_Start + Mn + Mc + Nd + Pc
+
+    Any             Ogni carattere
+    Assigned        Ogni carattere non in Cn (sinonimo di \P{Cn})
+    Unassigned      Sinonimo di \p{Cn}
+    Common          Ogni carattere (o code point non assegnato)
+                    non esplicitamente assegnato a uno script
+
+Per compatibilitE<agrave> con Perl 5.6, tutte le proprietE<agrave>
+menzionate finora possono essere indicate anche preponendo C<Is> al
+loro nome, per cui as esempio C<\P{IsLu}> E<egrave> uguale a
+C<\P{Lu}>.
+
+=head2 Blocchi
+
+Oltre agli script, Unicode definisce anche dei I<blocchi> di
+caratteri. La differenza tra script e blocchi E<egrave> che il
+concetto di script E<egrave> piE<ugrave> vicino ai linguaggi naturali,
+mentre il concetto di blocco E<egrave> piE<ugrave> un raggruppamento
+artificioso basato su gruppi di 256 caratteri.  Ad esempio, lo script
+L<Latin> contiene lettere da svariati blocchi, ma non contiene ciascun
+carattere da tutti quei blocchi. Ad esempio, non contiene le cifre,
+essendo queste condivise tra molti script. Cifre e altri caratteri
+condivisi, come ad esempio la punteggiatura, appartengono alla
+categoria chiamata C<Common>.
+
+Per maggiori informazioni sugli script, leggete UTR #24:
+
+   http://www.unicode.org/unicode/reports/tr24/
+
+Per maggiori informazioni sui blocchi, leggete:
+
+   http://www.unicode.org/Public/UNIDATA/Blocks.txt
+
+I nomi dei blocchi si indicano con il prefisso C<In>. Ad esempio, per
+far match sui caratteri del blocco Katakana si usa
+C<\p{InKatakana}>. Il prefisso C<In> puE<ograve> essere omesso se non
+ci sono conflitti con il nome di uno script o di un'altra
+proprietE<agrave>, ma si raccomanda di usare sempre C<In> per indicare
+i blocchi, per evitare confusione.
+
+Sono supportati i seguenti nomi di blocco:
+
+    InAlphabeticPresentationForms
+    InArabic
+    InArabicPresentationFormsA
+    InArabicPresentationFormsB
+    InArmenian
+    InArrows
+    InBasicLatin
+    InBengali
+    InBlockElements
+    InBopomofo
+    InBopomofoExtended
+    InBoxDrawing
+    InBraillePatterns
+    InBuhid
+    InByzantineMusicalSymbols
+    InCJKCompatibility
+    InCJKCompatibilityForms
+    InCJKCompatibilityIdeographs
+    InCJKCompatibilityIdeographsSupplement
+    InCJKRadicalsSupplement
+    InCJKSymbolsAndPunctuation
+    InCJKUnifiedIdeographs
+    InCJKUnifiedIdeographsExtensionA
+    InCJKUnifiedIdeographsExtensionB
+    InCherokee
+    InCombiningDiacriticalMarks
+    InCombiningDiacriticalMarksforSymbols
+    InCombiningHalfMarks
+    InControlPictures
+    InCurrencySymbols
+    InCyrillic
+    InCyrillicSupplementary
+    InDeseret
+    InDevanagari
+    InDingbats
+    InEnclosedAlphanumerics
+    InEnclosedCJKLettersAndMonths
+    InEthiopic
+    InGeneralPunctuation
+    InGeometricShapes
+    InGeorgian
+    InGothic
+    InGreekExtended
+    InGreekAndCoptic
+    InGujarati
+    InGurmukhi
+    InHalfwidthAndFullwidthForms
+    InHangulCompatibilityJamo
+    InHangulJamo
+    InHangulSyllables
+    InHanunoo
+    InHebrew
+    InHighPrivateUseSurrogates
+    InHighSurrogates
+    InHiragana
+    InIPAExtensions
+    InIdeographicDescriptionCharacters
+    InKanbun
+    InKangxiRadicals
+    InKannada
+    InKatakana
+    InKatakanaPhoneticExtensions
+    InKhmer
+    InLao
+    InLatin1Supplement
+    InLatinExtendedA
+    InLatinExtendedAdditional
+    InLatinExtendedB
+    InLetterlikeSymbols
+    InLowSurrogates
+    InMalayalam
+    InMathematicalAlphanumericSymbols
+    InMathematicalOperators
+    InMiscellaneousMathematicalSymbolsA
+    InMiscellaneousMathematicalSymbolsB
+    InMiscellaneousSymbols
+    InMiscellaneousTechnical
+    InMongolian
+    InMusicalSymbols
+    InMyanmar
+    InNumberForms
+    InOgham
+    InOldItalic
+    InOpticalCharacterRecognition
+    InOriya
+    InPrivateUseArea
+    InRunic
+    InSinhala
+    InSmallFormVariants
+    InSpacingModifierLetters
+    InSpecials
+    InSuperscriptsAndSubscripts
+    InSupplementalArrowsA
+    InSupplementalArrowsB
+    InSupplementalMathematicalOperators
+    InSupplementaryPrivateUseAreaA
+    InSupplementaryPrivateUseAreaB
+    InSyriac
+    InTagalog
+    InTagbanwa
+    InTags
+    InTamil
+    InTelugu
+    InThaana
+    InThai
+    InTibetan
+    InUnifiedCanadianAboriginalSyllabics
+    InVariationSelectors
+    InYiRadicals
+    InYiSyllables
+
+=over 4
+
+=item *
+
+Il pattern speciale C<\X> fa match su una qualsiasi sequenza estesa
+Unicode -- una sequenza di caratteri combinati, "combining character
+sequence" nello standard -- in cui il primo carattere E<egrave> un
+carattere base e i seguenti sono modificatori che si applicano al
+primo. C<\X> equivale a C<(?:\PM\pM*)>.
+
+=item *
+
+L'operatore C<tr///> trasforma caratteri invece che byte. Notare che
+la funzionalitE<agrave> di C<tr///CU> E<egrave> stata rimossa. Per
+fare qualcosa di simile usate C<pack('U0', ...)> e C<pack('C0', ...)>.
+
+=item *
+
+Gli operatori di cambio tra maiuscole e minuscole usano le tabelle di
+trasformazione Unicode quando vengono applicati a caratteri. Notate
+che C<uc()>, o C<\U> nelle stringhe interpolate, trasforma in
+maiuscolo, mentre C<ucfirst()>, o C<\u> nelle stringhe interpolate,
+trasforma in "maiuscole da titolo", nelle lingue che hanno questa
+distinzione.
+
+=item *
+
+La maggior parte degli operatori che trattano posizioni o lunghezze su
+stringhe passeranno automaticamente a usare posizioni di caratteri;
+tali operatori includono C<chop()>, C<chomp>, C<substr()>, C<pos()>,
+C<index()>, C<rindex()>, C<sprintf()>, C<write()>, e C<length()>.  Tra
+gli operatori che esplicitamente non cambiano ci sono C<vec()>,
+C<pack()>, e C<unpack()>.
+
+Tra gli operatori per cui non fa differenza ci sono gli opertatori che
+trattano le stringhe come mucchi di bit come C<sort()>, e gli
+operatori che gestiscono i nomi di file.
+
+=item *
+
+Le lettere di formato C<c> e C<C> di C<pack()> e C<unpack()> I<non>
+cambiano, poichE<eacute> vengono spesso usate per formati orientati ai
+byte. Pensate al C<char> del linguaggio C.
+
+Il nuovo specificatore C<U> converte tra caratteri Unicode e code point.
+
+=item *
+
+Le funzioni C<chr()> e C<ord()> lavorano sui caratteri, in maniera
+simile a C<pack("U")> e C<unpack("U")>, e I<non> come C<pack("C")> e
+C<unpack("C")>.  C<pack("C")> e C<unpack("C")> sono metodi per emulare
+le funzioni C<chr()> e C<ord()> orientate ai byte su stringhe Unicode.
+Sebbene questi metodi mostrino la codifica interna delle stringhe
+Unicode, non si tratta di una cosa di cui dovreste normalmente
+preoccuparvi.
+
+=item *
+
+Gli operatori per stringhe di bit, C<& | ^ ~>, possono lavorare su
+dati a carattere. PerE<ograve>, per compatibilitE<agrave> all'indietro
+con i casi in cui si usano questi operatori su stringhe i cui
+caratteri hanno tutti valore inferiore a 256, non dovreste usare C<~>
+(il complemento a bit) quando i caratteri hanno valori sia sotto sia
+sopra 256. PiE<ugrave> importante, le leggi di De Morgan
+(C<~($x|$y) eq ~$x&~$y> e C<~($x&$y) eq ~$x|~$y>) non varranno. La
+ragione per questo I<sgarro> matematico E<egrave> che il complemento
+non puE<ograve> restituire B<sia> il complemento a 8 bit (byte) B<che>
+il complemento a larghezza di carattere.
+
+=item *
+
+C<lc()>, C<uc()>, C<lcfirst()>, e C<ucfirst()> funzionano nei seguenti
+casi:
+
+=over 8
+
+=item *
+
+la trasformazione va da un singolo carattere Unicode a un altro
+singolo carattere Unicode, oppure
+
+=item *
+
+la trasformazione va da un singolo carattere Unicode a piE<ugrave>
+di un carattere Unicode.
+
+=back
+
+Ogni cosa che ha a che fare coi I<locale> (Lituano, Turco, Azeri)
+B<non> funziona, poirchE<eacute> Perl non capisce il concetto dei
+I<locale> Unicode.
+
+Leggete il rapporto tecnico Unicode #21, "Case Mappings"
+("Trasformazioni tra maiuscole e minuscole", NdT), per ulteriori
+dettagli.
+
+=item *
+
+E, infine, C<scalar reverse()> rovescia per caratteri anzichE<eacute>
+per byte.
+
+=back
+
+=head2 ProprietE<agrave> dei caratteri definite dall'utente
+
+Potete definire le vostre proprietE<agrave> di carattere definendo
+delle subroutine con nomi che cominciano con C<In> o C<Is>. Queste
+subroutine possono essere definite in un qualsiasi package. Le
+proprietE<agrave> definite dall'utente possono essere usate nei
+costrutti C<\p> e C<\P> nelle espressioni regolari; se usate una
+proprietE<agrave> definite dall'utente in un package diverso da quello
+in cui E<egrave> definita, dovete specificare quest'ultimo package
+all'interno di C<\p> o C<\P>:
+
+    # la proprieta` IsStraniero e` definita in Lang::
+    package main;  # altro package: serve il nome completo
+    if ($txt =~ /\p{Lang::IsStraniero}+/) { ... }
+
+    package Lang;  # stesso package: basta il nome corto
+    if ($txt =~ /\p{IsStraniero}+/) { ... }
+
+Notare che l'effetto E<egrave> a tempo di compilazione, ed E<egrave>
+immutabile una volta definito.
+
+Le subroutine devono restituire una stringa in formato speciale,
+contenente una o piE<ugrave> linee separate da a-capo. Ciascuna linea
+deve avere uno dei formati seguenti:
+
+=over 4
+
+=item *
+
+Due numeri esadecimali separati da spazi orizzontali (caratteri di
+spazio o tabulazione), indicante un intervallo di code point Unicode
+da includere.
+
+=item *
+
+Qualcosa da includere, preceduto da C<+>: una delle proprietE<agrave>
+predefinite (preceduta da C<utf8::>) o una proprietE<agrave> definita
+dall'utente, per indicare tutti i caratteri in quella
+proprietE<agrave>; due numeri esadecimali per un intervallo di code
+point; o un singolo code point in esadecimale.
+
+=item *
+
+Qualcosa da escludere, preceduto da C<->: una delle proprietE<agrave>
+predefinite (preceduta da C<utf8::>) o una proprietE<agrave> definita
+dall'utente, per indicare tutti i caratteri in quella
+proprietE<agrave>; due numeri esadecimali per un intervallo di code
+point; o un singolo code point in esadecimale.
+
+=item *
+
+Qualcosa da negare, preceduto da C<!>: una delle proprietE<agrave>
+predefinite (preceduta da C<utf8::>) o una proprietE<agrave> definita
+dall'utente, per indicare tutti i caratteri tranne quelli in quella
+proprietE<agrave>; due numeri esadecimali per un intervallo di code
+point; o un singolo code point in esadecimale.
+
+=item *
+
+Qualcosa con cui fare l'intersenzione, preceduto da C<&>: una delle
+proprietE<agrave> predefinite (preceduta da C<utf8::>) o una
+proprietE<agrave> definita dall'utente, per indicare tutti i caratteri
+tranne quelli in quella proprietE<agrave>; due numeri esadecimali per
+un intervallo di code point; o un singolo code point in esadecimale.
+
+=back
+
+Ad esempio, per definire una proprietE<agrave> che copra entrambi i sistemi
+sillabici giapponesi (hiragana e katakana) potete definire
+
+    sub InKana {
+	return <<END;
+    3040\t309F
+    30A0\t30FF
+    END
+    }
+
+(immaginando che il terminatore del documento immediato sia all'inizio
+della riga). Ora potete usare C<\p{InKana}> e C<\P{InKana}>.
+
+Avremmo anche potuto usare i nomi di blocchi esistenti:
+
+    sub InKana {
+	return <<'END';
+    +utf8::InHiragana
+    +utf8::InKatakana
+    END
+    }
+
+Supponiamo che vogliate indicare solo i caratteri allocati, e non i
+semplici intervalli dei blocchi: in altre parole, volete rimuovere i
+non-caratteri:
+
+    sub InKana {
+	return <<'END';
+    +utf8::InHiragana
+    +utf8::InKatakana
+    -utf8::IsCn
+    END
+    }
+
+La negazione E<egrave> utile per definire (sorpresa!) negazioni di classi:
+
+    sub InNotKana {
+	return <<'END';
+    !utf8::InHiragana
+    -utf8::InKatakana
+    +utf8::IsCn
+    END
+    }
+
+L'intersezione E<egrave> utile per indicare i caratteri presenti in
+due (o piE<ugrave>) classi.
+
+    sub InFooAndBar {
+        return <<'END';
+    +main::Foo
+    &main::Bar
+    END
+    }
+
+E<Egrave> importante ricordare di non usare C<&> per il primo insieme:
+vorrebbe dire fare l'intersezione col niente, e otterreste un insieme
+vuoto.
+
+Potete anche definire le vostre mappature da far usare a C<lc()>,
+C<lcfirst()>, C<uc()> e C<ucfirst()> (o i loro equivalenti per le
+stringhe interpolate). Il principio E<egrave> lo stesso: definite
+delle subroutine nel package C<main> con nome C<ToLower> (per C<lc()>
+e C<lcfirst()>), C<ToTitle> (per il primo carattere in C<ucfirst>), e
+C<ToUpper> (per C<uc()>, e i caratteri successivi in C<ucfirst()>)).
+
+La stringa restituita dalla subroutine ora deve contenere, per
+ciascuna riga, tre numeri esadecimali separati da tabulazioni: inizio
+dell'intervallo di partenza, fine dell'intervallo di partenza, inizio
+dell'intervallo di arrivo. Per esempio:
+
+    sub ToUpper {
+        return <<END;
+    0061\t0063\t0041
+    END
+    }
+
+definisce una mappatura per C<uc()> che trasforma i soli caratteri
+C<"a">, C<"b"> e C<"c"> in C<"A">, C<"B"> e C<"C">, lasciando
+inalterati tutti gli altri caratteri.
+
+Se non ha senso parlare di intervallo di partenza, ovvero, se la
+mappatura interessa un solo carattere, lasciate vuota la fine
+dell'intervallo di partenza, ma dovete lasciare le due
+tabulazioni. Per esempio:
+
+    sub ToLower {
+        return <<END;
+    0041\t\t0061
+    END
+    }
+
+definisce una mappatura per C<lc()> che trasforma il solo carattere
+C<"A"> in C<"a">, lasciando inalterati tutti gli altri caratteri.
+
+(Per hacker piE<ugrave> che abili) Se volete esaminare le mappature di
+default, potete trovarne le definizioni nella directory
+C<$Config{privlib}>/F<unicore/To/>. I dati delle mappature vengono
+restituiti dal documento immediato, e i vari C<utf::ToSpecQualcosa>
+sono eccezioni speciali ricavate da
+C<$Config{privlib}>/F<unicore/SpecialCasing.txt>. Le mappature
+C<Digit> e C<Fold> presenti nella directory non sono direttamente
+accessibili dall'utente: potete usare il modulo C<Unicode::UCD>, o
+fare i match senza distinguere maiuscole da minuscole (E<egrave> in
+questo caso che viene usata la mappatura C<Fold>).
+
+Una nota finale sulle proprietE<agrave> e mappature definite
+dall'utente: vengono usate soltanto se lo scalare su cui si opera
+E<egrave> stato marcato come contente caratteri Unicode. Il
+funzionamento sulle stringhe di byte non viene modificato.
+
+=head2 Codifica dei caratteri per l'input e l'output
+
+Leggete L<Encode>.
+
+=head2 Livello di supporto Unicode nelle espressioni regolari
+
+La seguente lista descrive tutte le funzionalitE<agrave> Unicode per
+espressioni regolari supportate al momento. I riferimenti a "Livello
+I<N>" e i numeri di sezione si riferiscono al rapporto tecnico Unicode
+#18, "Linee guida per le espressioni regolari Unicode" ("Unicode
+Regular Expression Guidelines"), versione 6 (Unicode 3.2.0, Perl
+5.8.0).
+
+=over 4
+
+=item *
+
+Livello 1 - Supporto Unicode di base
+
+        2.1 Notazione esadecimale               - fatto         [1]
+            Notazione per nome                  - fatto         [2]
+        2.2 Categorie                           - fatto         [3][4]
+        2.3 Sottrazione                         - MANCA         [5][6]
+        2.4 Limiti semplice di parola           - fatto         [7]
+        2.5 Match laschi semplici               - fatto         [8]
+        2.6 Fine linea                          - MANCA         [9][10]
+
+        [ 1] \x{...}
+        [ 2] \N{...}
+        [ 3] . \p{...} \P{...}
+        [ 4] c'e` il supporto per gli script (cfr. UTR#24 "Script
+             Names"), i blocchi, le proprieta` binarie, le proprieta`
+             enumerate, le proprieta` numeriche (come elencate in
+             UTR#18 "Other Properties")
+        [ 5] c'e` la negazione
+        [ 6] potete usare il look-ahead [a] o definire apposite
+             proprieta` [b] per emulare la sottrazione
+        [ 7] includiamo la categoria C<Letters> tra i caratteri
+             di parola
+        [ 8] notare che Perl esegue il "Full case-folding" per i
+             match, non il "Simple": as esempio, U+1F88 e` equivalente
+             a U+1F00 U+03B9, non a U+1F80. Questo fa differenza per
+             alcune lettere greche con alcuni modificatori: il "Full
+             case-folding" decompone il carattere, mentre il "Simple"
+             lo mapperebbe su un carattere singolo.
+        [ 9] cfr. UTR#13 "Linee guida Unicode per i terminatori di
+             linea" ("Unicode Newline Guidelines")
+        [10] ^ e $ dovrebbero fare match anche su \x{85}, \x{2028}
+             e \x{2029}
+             (dovrebbe influenzare anche <>, $., e i numeri di riga)
+             (\s fa match su \x{85}, \x{2028} and \x{2029})
+
+[a] Potete simulare la sottrazione tra classi usando il look-ahead.
+Ad esmepio, quello che secondo UTR #18 potrebbe essere scritto come
+
+    [{Greek}-[{UNASSIGNED}]]
+
+in Perl puE<ograve> essere scritto come:
+
+    (?!\p{Unassigned})\p{InGreekAndCoptic}
+    (?=\p{Assigned})\p{InGreekAndCoptic}
+
+Ma in questo particolare caso, probabilmente quello che volete
+E<egrave>
+
+    \p{GreekAndCoptic}
+
+che farE<agrave> match sui caratteri assegnati facenti parti dello
+script greco.
+
+Guardate anche il modulo C<Unicode::Regex::Set>: implementa l'intera
+sintassi di raggruppamento, intersezione, unione e sottrazione di UTR
+#18.
+
+[b] Cfr. L<< /"ProprietE<agrave> dei caratteri definite dall'utente" >>
+
+=item *
+
+Livello 2 - Supporto Unicode esteso
+
+        3.1 Surrogati                           - MANCA         [11]
+        3.2 Equivalenti canonici                - MANCA         [12][13]
+        3.3 Grafemi indipendenti da locale      - MANCA         [14]
+        3.4 Parole indipendenti da locale       - MANCA         [15]
+        3.5 Match laschi indipendenti da locale - MANCA         [16]
+
+        [11] i surrogati sono un concetto limitato a UTF-16, e la
+             rappresentazione interna di Perl e` UTF-8. Il
+             modulo Encode tratta anche UTF-16.
+        [12] cfr. UTR#15 "Normalizzazione Unicode" ("Unicode Normalization")
+        [13] c'e` Unicode::Normalize ma non e` integrato con le
+             espressioni regolari
+        [14] c'e` \X ma a questo livello . dovrebbe essere equivalente
+        [15] servono tre classi, non solo \w e \W
+        [16] cfr. UTR#21 "Trasformazioni tra maiuscole e minuscole"
+             ("Case Mappings")
+
+=item *
+
+Livello 3 - Supporto dipendente da I<locale>
+
+        4.1 Categorie dipendenti da locale      - MANCA  
+        4.2 Grafemi dipendenti da locale        - MANCA         [16][17]
+        4.3 Parole dipendenti da locale         - MANCA  
+        4.4 Match laschi dipendenti da locale   - MANCA  
+        4.5 Intervalli dipendenti da locale     - MANCA  
+
+        [16] cfr. UTR#10 "Algoritmi di collazione Unicode"
+             ("Unicode Collation Algorithms")
+        [17] c'e` Unicode::Collate ma non e` integrato con le
+             espressioni regolari
+
+=back
+
+=head2 Codifiche Unicode
+
+I caratteri Unicode sono associati a I<code point>, che sono numeri
+astratti. Per usare questi numeri, sono necessarie varie codifiche.
+
+=over 4
+
+=item *
+
+UTF-8
+
+UTF-8 E<egrave> una codifica a lunghezza variabile (da 1 a 6 byte, per
+tutti i caratteri attualmente allocati ne sono sufficienti 4),
+indipendente dall'ordinamento dei byte. La codifica UTF-8 E<egrave>
+trasparente se ci si limita ad ASCII (e qui si intende davvero ASCII,
+7 bit, non una qualche altra codifica a 8 bit).
+
+La tabella seguente E<egrave> presa da Unicode 3.2:
+
+     Code Point         1o byte  2o byte  3o byte  4o byte
+
+   U+0000..U+007F       00..7F
+   U+0080..U+07FF       C2..DF   80..BF
+   U+0800..U+0FFF       E0       A0..BF   80..BF
+   U+1000..U+CFFF       E1..EC   80..BF   80..BF
+   U+D000..U+D7FF       ED       80..9F   80..BF
+   U+D800..U+DFFF       ******* mal formato *******
+   U+E000..U+FFFF       EE..EF   80..BF   80..BF
+  U+10000..U+3FFFF      F0       90..BF   80..BF   80..BF
+  U+40000..U+FFFFF      F1..F3   80..BF   80..BF   80..BF
+ U+100000..U+10FFFF     F4       80..8F   80..BF   80..BF
+
+Notate il C<A0..BF> per C<U+0800..U+0FFF>, il C<80..9F> per
+C<U+D000...U+D7FF>, il C<90..BF> per C<U+10000..U+3FFFF>, e il
+C<80...8F> per C<U+100000..U+10FFFF>.  Questi "buchi" sono causati dal
+fatto che UTF-8 corretto evita le codifiche non minime: tecnicamente
+E<egrave> possibile codificare in UTF-8 un singolo code point in
+piE<ugrave> di un modo, ma ciE<ograve> E<egrave> espressamente
+proibito, e bisogna sempre usare la codifica piE<ugrave> breve
+possibile. Per cui questo E<egrave> quello che fa Perl.
+
+Un altro modo di vedere la codifica E<egrave> a livello di bit:
+
+         Code Point              1o byte   2o byte   3o byte   4o byte
+
+                    0aaaaaaa     0aaaaaaa
+            00000bbbbbaaaaaa     110bbbbb  10aaaaaa
+            ccccbbbbbbaaaaaa     1110cccc  10bbbbbb  10aaaaaa
+  00000dddccccccbbbbbbaaaaaa     11110ddd  10cccccc  10bbbbbb  10aaaaaa
+
+Come potete vedere, i byte seguenti cominciano tutti con C<10>, e i
+bit iniziali del primo byte indicano quanti byte fanno parte della
+codifica del carattere.
+
+=item *
+
+UTF-EBCDIC
+
+Come UTF-8 ma "EBCDIC-safe", allo stesso modo che UTF-8 E<egrave>
+ASCII-safe.
+
+=item *
+
+UTF-16, UTF-16BE, UTF-16LE, surrogati, e i BOM (Byte Order Mark)
+
+Quello che segue E<egrave> soprattutto per riferimento e conoscenza generale
+di Unicode; Perl non usa questi costrutti internamente.
+
+UTF-16 E<egrave> una codifica a 2 o 4 byte. I code point
+C<U+0000..U+FFFF> sono codificati in una singola unitE<agrave> da 16
+bit, e i code point C<U+10000..U+10FFFF> sono codificati in due
+unitE<agrave> da 16 bit.  Quest'ultimo caso usa i I<surrogati>, con la
+prima unitE<agrave> chiamata I<surrogato alto> ("high surrogate" NdT)
+e la seconda chiamata I<surrogato basso> ("low surrogate" NdT).
+
+I surrogati sono code point lasciati da parte per codificare
+l'intervallo di code point C<U+10000..U+10FFFF> in coppie di
+unitE<agrave> da 16 bit. I I<surrogati alti> sono nell'intervallo
+C<U+D800..U+DBFF>, e i I<surrogati bassi> sono nell'intervallo
+C<U+DC00..U+DFFF>.  La codifica con i surrogati E<egrave>
+
+	$alto  = ($uni - 0x10000) / 0x400 + 0xD800;
+	$basso = ($uni - 0x10000) % 0x400 + 0xDC00;
+
+e la decodifica E<egrave>
+
+	$uni = 0x10000 + ($alto - 0xD800) * 0x400 + ($basso - 0xDC00);
+
+Se provate a generare surrogati (ad esempio usando C<chr()>),
+otterrete un avvertimento se gli avvertimenti sono abilitati,
+poichE<eacute> tali code point non sono validi per caratteri Unicode.
+
+Avendo unitE<agrave> lunghe 16 bit, UTF-16 dipende dall'ordinamento
+dei byte. UTF-16 di per sE<eacute> puE<ograve> essere usato in
+memoria, ma se deve essere trasmesso o salvato su file bisogna
+scegliere tra UTF-16BE (big-endian) e UTF-16LE (little-endian).
+
+Questo introduce un altro problema: cosa succede se sapete solo che i
+dati sono in UTF-16, ma non sapete in che ordine? I Byte Order Mark, o
+BOM, sono una soluzione. Un carattere speciale E<egrave> stato scelto in
+Unicode per essere usato come Byte Order Mark: il carattere con code
+point C<U+FEFF> E<egrave> il BOM.
+
+Il trucco E<egrave> che se leggete un BOM, saprete l'ordinamento dei
+byte, visto che se E<egrave> stato scritto su una piattaforma
+big-endian, leggerete i due byte C<0xFE 0xFF>, ma se E<egrave> stato
+scritto su una piattaforma little-endian leggerete i due byte C<0xFF
+0xFE>. (E se la piattaforma di partenza scriveva in UTF-8, leggerete i
+tre byte C<0xEF 0xBB 0xBF>).
+
+Questo trucco funziona perchE<eacute> il code point C<U+FFFE>
+E<egrave> garantito non essere un carattere valido, per cui la
+sequenza di byte C<0xFF 0xFE> E<egrave> senza ambiguitE<agrave> "BOM
+rappresentato in forma little-endian" e non puE<ograve> essere
+"C<U+FFFE> rappresentato in forma big-endian".
+
+=item *
+
+UTF-32, UTF-32BE, UTF-32LE
+
+La famiglia UTF-32 E<egrave> molto simile a quella UTF-16, tranne per
+il fatto che le unitE<agrave> sono di 32 bit, e di conseguenza non
+serve il metodo dei surrogati. Le segnature BOM saranno C<0x00 0x00
+0xFE 0xFF> per BE e C<0xFF 0xFE 0x00 0x00> per LE.
+
+=item *
+
+UCS-2, UCS-4
+
+Codifiche definite dallo standard ISO 10646. UCS-2 E<egrave> una
+codifica a 16 bit. A differenza di UTF-16, UCS-2 non puE<ograve>
+essere esteso oltre C<U+FFFF>, poichE<eacute> non usa i
+surrogati. UCS-4 E<egrave> una codifica a 32 bit, funzionalmente
+identica a UTF-32.
+
+=item *
+
+UTF-7
+
+Una codifica a 7 bit (l'ottavo bit E<egrave> sempre a 0), utile quando
+il sistema di trasferimento o immagazzinamento non gestisce bene dati
+a 8 bit. E<Egrave> definito dalla RFC 2152.
+
+=back
+
+=head2 Implicazioni di sicurezza di Unicode
+
+=over 4
+
+=item *
+
+UTF-8 malformato
+
+Sfortunatamente, la specifica di UTF-8 lascia un po' di spazio
+all'interpretazione su quanti byte di output codificato si debbano
+generare per un dato carattere Unicode di input. Strettamente
+parlando, dovrebbe essere generata la sequenza piE<ugrave> breve
+possibile, poichE<eacute> altrimenti c'E<egrave> la
+possibilitE<agrave> di overflow del buffer di input dal lato di
+lettura di una connessione UTF-8. Perl genera sempre la sequenza
+piE<ugrave> breve, e con gli avvertimenti attivati Perl vi
+avvertirE<agrave> nel caso di UTF-8 a lunghezza non minima assieme ad
+altre malformazioni, come l'uso di surrogati, che non sono davvero
+code point Unicode.
+
+=item *
+
+Le espressioni regolari si comportano in maniera leggermente
+differente se applicate a stringhe di byte o a stringhe di caratteri
+(Unicode). Ad esempio, la classe "caratteri di parola" C<\w>
+funzionerE<agrave> in modo diverso nei due casi.
+
+Nel primo caso, l'insieme di caratteri di C<\w> E<egrave> piuttosto
+ristretto: l'insieme di default di caratteri alfabetici, cifre, e il
+"C<_>" -- oppure, se state usando un "locale" (cfr. L<perllocale>),
+C<\w> potrebbe contenere alcune altre lettere a seconda della vostra
+lingua e nazione.
+
+Nel secondo caso, l'insieme di caratteri di C<\w> E<egrave> molto,
+molto piE<ugrave> esteso. La cosa piE<ugrave> importante E<egrave>
+che, anche limitatamente ai primi 256 caratteri, probabilmente
+includerE<agrave> caratteri diversi: a differenza della maggior parte
+dei "locale", che sono specifici di una lingua e una nazione, Unicode
+classifica come C<\w> tutti i caratteri che sono lettere I<da qualche
+parte>. Ad esempio, il vostro "locale" potrebbe non pensare che LATIN
+SMALL LETTER ETH sia una lettera (tranne nel caso in cui parliate
+Islandese), ma Unicode la tratta come tale.
+
+Come discusso altrove, Perl tiene un piede (due zoccoli?) in ciascuno
+dei due mondi: il vecchio mondo dei byte, e il nuovo mondo dei
+caratteri, convertendo i byte in caratteri quando necessario.
+Se il vostro codice esistente non usa esplicitamente Unicode, non
+dovrebbe avvenire alcuna conversione automatica a caratteri. I
+caratteri non dovrebbero neppure venire riconvertiti in byte. E<Egrave>
+comunque possibile mescolare byte e caratteri (cfr. L<perluniintro>),
+nel qual caso C<\w> nelle espressioni regolari potrebbe cominciare a
+comportarsi differentemente. Controllate il vostro codice. Usate gli
+avvertimenti ("warning") e la direttiva C<strict>.
+
+=back
+
+=head2 Unicode in Perl su piattaforme EBCDIC
+
+La gestione di Unicode su piattaforme EBCDIC E<egrave> ancora
+sperimentale. Su tali piattaforme, i rifermenti alla codifica UTF-8 in
+questo e altri documenti dovrebbero essere intesi come a indicare
+UTF-EBCDIC, specificato dal rapporto tecnico Unicode 16, tranne nel
+caso in cui si stiano proprio discutendo le differenze tra ASCII e
+EBCDIC. Non esiste nE<eacute> una direttiva C<utfebcdic> nE<eacute>
+uno strato C<:utfebcdic>; al loro posto, C<utf8> e C<:utf8> vengono
+usati per indicare la codifica a 8 bit "nativa" della piattaforma per
+Unicode. Leggete L<perlebcdic> per una discussione piE<ugrave>
+approfondita della questione.
+
+=head2 "Locale"
+
+Normalmente le impostazione di "locale" e Unicode non si influenzano a
+vicenda, ma ci sono un paio di eccezioni:
+
+=over 4
+
+=item *
+
+Potete abilitare l'interpretazione automatica in UTF-8 dei filehandle
+standard e di C<@ARGV>, e l'uso di UTF-8 come strato implicito nelle
+C<open()>, fornendo il parametro a linea di comando C<-C> o la
+variabile d'ambiente C<PERL_UNICODE>; leggete L<perlrun> per la
+documentazione del parametro C<-C>.
+
+=item *
+
+Perl cerca con tutte le sue forze di lavorare sia con Unicode sia col
+vecchio mondo a byte. Molto spesso questo E<egrave> comodo, ma certe volte
+tenere cosE<igrave> "il piede in due staffe" puE<ograve> causare problemi.
+
+=back
+
+=head2 Quando Unicode non viene usato
+
+Sebbene Perl abbia molti modi per gestire l'input e l'output in
+Unicode, e i vari altri "punti di ingresso dati" come C<@ARGV> che
+possono essere interpretati come Unicode (UTF-8), restano comunque
+molti casi in cui Unicode (in una qualche codifica) potrebbe essere
+fornito come parametro o ricevuto come risultato, ma non viene usato.
+
+L'elenco seguente contiene tali interfacce. Per ciascuna di esse Perl
+al momento (versione 5.8.3) si limita ad assumere che sia i parametri
+che i risultati siano stringhe di byte, o stringhe UTF-8 se E<egrave>
+stata usata la direttiva C<encoding>.
+
+Una delle ragioni per cui Perl non tenta di risolvere il ruolo di
+Unicode in questi casi E<egrave> che le risposte dipendono fortemente
+dal sistema operativo e dal file system. Ad esempio, il fatto che i
+nomi di file possano essere Unicode, e in quale particolare codifica,
+non E<egrave> un concetto proprio portabile. Allo stesso modo per
+C<qx> e C<system>: come viene gestito Unicode dall'"interfaccia a riga
+di comando"? (e di quale interfaccia si tratta?).
+
+=over 4
+
+=item *
+
+C<chdir>, C<chmod>, C<chown>, C<chroot>, C<exec>, C<link>, C<lstat>,
+C<mkdir>, C<rename>, C<rmdir>, C<stat>, C<symlink>, C<truncate>,
+C<unlink>, C<utime>, C<-X>
+
+=item *
+
+C<%ENV>
+
+=item *
+
+C<glob> (ovvero C<< <*> >>)
+
+=item *
+
+C<open>, C<opendir>, C<sysopen>
+
+=item *
+
+C<qx> (ovvero l'operatore C<``>), C<system>
+
+=item *
+
+C<readdir>, C<readlink>
+
+=back
+
+=head2 Forzare Unicode in Perl (o forzare non-Unicode)
+
+In alcuni casi (vedi L</"Quando Unicode non viene usato">) dovete
+proprio convincere Perl che una stringa di byte E<egrave> in UTF-8, o
+viceversa. Le chiamate di basso livello C<utf8::upgrade($bytestring)>
+e C<utf8::downgrade($utf8string)> sono la risposta.
+
+Non usatele senza pensarci, perE<ograve>: Perl puE<ograve>
+confondersi, arabbiarsi o dare errori fatali se cambiate al volo la
+"natura" degli scalari a quel modo. Dovete stare particolarmente
+attenti se usate C<utf8::upgrade()>: una stringa di byte a caso non
+E<egrave>, in generale, UTF-8 valido.
+
+=head2 Uso di Unicode con XS
+
+Se volete maneggiare dati Perl in Unicode nelle vostre estensioni XS,
+potreste trovare utili le seguenti funzioni della API C. Leggete
+L<perlguts/"Supporto Unicode"> per una spiegazione di Unicode a
+livello XS, e L<perlapi> per i dettagli della API.
+
+=over 4
+
+=item *
+
+C<DO_UTF8(sv)> restituisce true se il flag C<UTF8> E<egrave> attivo e
+la direttiva C<bytes> non E<egrave> in uso. C<SvUTF8(sv)> restituisce
+true se il flag C<UTF8> E<egrave> attivo, senza tener conto della
+direttiva C<bytes>. Il fatto che il flag C<UTF8> sia attivo B<non>
+indica che lo scalare contenga caratteri con code point maggiori di
+255 (o 127), e neppure che ci siano prorio caratteri. Il significato
+del flag C<UTF8> E<egrave> che la sequenza di ottetti nella
+rappresentazione dello scalare E<egrave> la sequenza codificata in
+UTF-8 dei code point dei caratteri di una stringa. Il fatto che il
+flag C<UTF8> sia a zero significa che ciascun ottetto in questa
+rappresentazione codifica un solo carattere con code point tra 0 e 255
+nella stringa. In modello Unicode del Perl consiste nel non usare
+UTF-8 finchE<eacute> non E<egrave> assolutamente necessario.
+
+=item *
+
+C<uvuni_to_utf8(buf, chr)> scrive il code point di un carattere
+Unicode in un buffer, codificandolo in UTF-8, e restituisce un
+puntatore che punta dopo i byte UTF-8.
+
+=item *
+
+C<utf8_to_uvuni(buf, lenp)> legge dei byte codificati in UTF-8 da un
+buffer e restituisce i code point dei caratteri Unicode e,
+opzionalmente, la lunghezza della sequenza di byte UTF-8.
+
+=item *
+
+C<utf8_length(start, end)> restituisce la lunghezza del buffer in
+numero di caratteri codificati in UTF-8. C<sv_len_utf8(sv)>
+restituisce la lunghezza di scalari codificati in UTF-8.
+
+=item *
+
+C<sv_utf8_upgrade(sv)> converte la stringa dello scalare nella sua
+forma codificata in UTF-8. C<sv_utf8_downgrade(sv)> fa l'opposto, se
+possibile.  C<sv_utf8_encode(sv)> E<egrave> simile a
+C<sv_utf8_upgrade> tranne che non imposta il flag
+C<UTF8>. C<sv_utf8_decode()> fa l'opposto di C<sv_utf8_encode()>.
+Notate che nessuna di queste funzioni deve essere usata come
+interfaccia generica di codifica/decodifica: usate C<Encode> in questi
+casi. C<sv_utf8_upgrade()> E<egrave> influenzata dalla direttiva
+C<encoding>, ma C<sv_utf8_downgrade()> no (poichE<eacute> la direttiva
+C<encoding> E<egrave> progettata per essere una strada a senso unico).
+
+=item *
+
+C<is_utf8_char(s)> restituisce true se il puntatore punta a una
+codifica valida in UTF-8 di un carattere.
+
+=item *
+
+C<is_utf8_string(buf, len)> restituisce true se C<len> byte del buffer
+sono UTF-8 valido.
+
+=item *
+
+C<UTF8SKIP(buf)> restituisce il numero di byte usati dal carattere
+codificato nel buffer. C<UNISKIP(chr)> restituisce il numero di byte
+necessari per codificare in UTF-8 il code point del carattere
+Unicode. C<UTF8SKIP()> E<egrave> utile ad esempio per iterare sui
+caratteri di un buffer codificato in UTF-8; C<UNISKIP()> E<egrave>
+utile, ad esempio, per calcolare la dimensione necessaria per un
+buffer codificato in UTF-8.
+
+=item *
+
+C<utf8_distance(a, b)> restituisce la distanza in caratteri tra i due
+puntatori che puntano allo stesso buffer codificato in UTF-8.
+
+=item *
+
+C<utf8_hop(s, off)> restituisce un puntatore a un buffer UTF-8 che
+dista C<off> (positivo o negativo) caratteri dal buffer UTF-8
+C<s>. Attenzione a non sforare: C<utf8_hop()> uscirE<agrave>
+tranquillamente dall'inizio o dalla fine del buffer se gli viene
+richiesto.
+
+=item *
+
+C<pv_uni_display(dsv, spv, len, pvlim, flags)> e
+C<sv_uni_display(dsv, ssv, pvlim, flags)> sono utili per la
+visualizzazione in fase di debugging di stringhe e scalari
+Unicode. Normalmente sono utili sono in fase di debugging -- mostrano
+B<tutti> i caratteri come code point in esadecimale -- ma usando i
+flag C<UNI_DISPLAY_ISPRINT>, C<UNI_DISPLAY_BACKSLASH>, e
+C<UNI_DISPLAY_QQ> potete renderne l'output piE<ugrave> leggibile.
+
+=item *
+
+C<ibcmp_utf8(s1, pe1, u1, l1, u1, s2, pe2, l2, u2)> puE<ograve> essere
+usata per confrontare due stringhe Unicode considerando uguali
+maiuscole e minuscole. Per i confronti esatti usate semplicemente
+C<memEQ()> e C<memNE()> come al solito.
+
+=back
+
+Per ulteriori informazioni, leggete L<perlapi>, e F<utf8.c> e
+F<utf8.h> nella distribuzione del codice sorgente di Perl.
+
+=head1 BUGS
+
+=head2 Interazione con i "locale"
+
+L'uso dei "locale" con dati Unicode puE<ograve> portare a strani
+risultati. Al momento, Perl cerca di associare le informazioni di
+"locale" a 8 bit ai caratteri tra 0 e 255, ma questa tecnica E<egrave>
+dimostrabilmente sbagliata per i "locale" che usano caratteri fuori da
+quell'intervallo quando vengono mappati su Unicode. Inoltre, il
+supporto Unicode di Perl funzionerE<agrave> un po' piE<ugrave>
+lentamente. L'uso dei "locale" con Unicode E<egrave> scoraggiato.
+
+=head2 Interazione con le estensioni
+
+Quando Perl scambia dati con un estensione, l'estensione dovrebbe
+essere in grado di capire il flag C<UTF8> e agire di conseguenza. Se
+l'estensione non sa come usare il flag, E<egrave> probabile che
+restituisca dati con il flag impostato in maniera scorretta.
+
+PerciE<ograve> se state lavorando con dati Unicode, consultate la
+documentazione di ciascun modulo che state usando se ci sono problemi
+con lo scambio di dati Unicode. Se la documentazione non parla di
+Unicode, sospettate il peggio, e magari guardate il sorgente per
+capire come E<egrave> implementato il modulo. I moduli scritti
+interamente in Perl non dovrebbero causare problemi. Moduli che
+accedono, direttamente o indirettamente, codice scritto in altri
+linguaggi, sono a rischio.
+
+Per le funzioni affette, la strategia semplice per evitare corruzione
+dei dati consiste nel rendere sempre esplicita la codifica dei dati
+scambiati. Scegliete una codifica che sapete che l'estensione sa
+gestire. Convertite gli argomenti da passare all'estensione in quella
+codifica, e riconvertite alla rovescia i risultati. Scrivete funzioni
+di interfaccia che facciano le conversioni al posto vostro,
+cosE<igrave> che possiate sostituirle quando l'estensione
+verrE<agrave> aggiornata.
+
+Per fare un esempio, diciamo che la funzione C<Foo::Bar::escape_html>
+non gestisce ancora dati Unicode. La funzione di interfaccia converte
+gli argomenti in UTF-8 semplice e converte il risultato di nuovo nella
+rappresentazione interna Perl:
+
+    sub mio_escape_html ($) {
+      my($cosa) = shift;
+      return unless defined $cosa;
+      Encode::decode_utf8(Foo::Bar::escape_html(Encode::encode_utf8($cosa)));
+    }
+
+Certe volte, quando l'estensione non converte i dati ma si limita a
+immagazzinarli e recuperarli, vi troverete nella posizione di usare
+l'altrimenti pericolosa funzione C<Encode::_utf8_on()>.  Diciamo che
+la popolare estensione C<Foo::Bar>, scritta in C, fornisce un metodo
+C<param> che permette di immagazzinare e recuperare dati secondo
+queste segnature:
+
+    $self->param($name, $value);            # salva uno scalare
+    $value = $self->param($name);           # recupera uno scalare
+
+Se l'estensione non fornisce ancora supporto per alcuna codifica,
+potreste scrivere una classe derivata con un metodo C<param> come
+questo:
+
+    sub param {
+      my($self,$nome,$valore) = @_;
+      utf8::upgrade($nome);     # ora e` sicuramente UTF-8
+      if (defined $valore)
+        utf8::upgrade($valore); # ora e` sicuramente UTF-8
+        return $self->SUPER::param($nome,$valore);
+      } else {
+        my $ret = $self->SUPER::param($nome);
+        Encode::_utf8_on($ret); # sappiamo che e` UTF-8
+        return $ret;
+      }
+    }
+
+Alcune estensioni forniscono filtri per i casi di entrata/uscita dei
+dati, come la famiglia di C<DB_File::filter_store_key>. Cercate filtri
+del genere nella documentazione delle vostre estensioni, possono
+rendere la transizione a Unicode molto piE<ugrave> facile.
+
+=head2 VelocitE<agrave>
+
+Alcune funzioni sono piE<ugrave> lente quando lavorano su stringhe
+codificate in UTF-8 piuttosto che su stringhe di byte. Tutte le
+funzioni che devono saltare caratteri, come C<length()>, C<substr()> o
+C<index()>, o le espressioni regolari, lavorano B<molto> piE<ugrave>
+velocemente quando i dati sono byte.
+
+In Perl 5.8.0 questa lentezza era spesso piuttosto spettacolare; in
+Perl 5.8.1 E<egrave> stato introdotto un sistema di cache che dovrebbe
+ridurre il problema, almeno per alcune operazioni. In generale, le
+operazioni con stringhe UTF-7 restano lente. Ad esempio, le
+proprietE<agrave> Unicode (classi di caratteri) come C<\p{Nd}> sono
+parecchio piE<ugrave> lente (5-20 volte) delle corrispondenti semplici
+come C<\d> (d'altra parte, ci sono 268 caratteri corrispondenti a
+C<Nd>, contro i soli 10 per C<d>).
+
+=head2 Aggiornare il codice da perl-5.6.X
+
+Perl 5.8 ha un modello Unicode diverso da quello di 5.6. In 5.6 il
+programmatore doveva usare la direttiva C<utf8> per indicare che in un
+particolare scope si stavano trattando dati Unicode, e doveva
+assicurarsi che ci entrassero solo dati Unicode. Se avete del codice
+che funziona sollo 5.6, avrete bisogno di alcuni tra gli aggiustamenti
+seguenti. Gli esempi sono scritti in modo da continuare a funzionare
+sotto 5.6, per cui dovreste poterli provare senza rischi.
+
+=over 4
+
+=item *
+
+Un filehandle che deve leggere e/o scrivere UTF-8
+
+  if ($] > 5.007) {
+    binmode $fh, ":utf8";
+  }
+
+=item *
+
+Uno scalare che deve essere passato a qualche estensione
+
+Per C<Compress::Zlib>, C<Apache::Request> o ogni altra estensione che
+non cita Unicode nella documentazione, dovete disattivare il flag
+C<UTF8>. Notare che tra quando scriviamo questo testo (Ottobre 2002) e
+quando lo leggete, lo stato dei moduli citati puE<ograve> essere
+cambiato: leggetene la documentazione per essere sicuri.
+
+  if ($] > 5.007) {
+    require Encode;
+    $val = Encode::encode_utf8($val); # ottiene ottetti
+  }
+
+=item *
+
+Uno scalare proveniente da un'estensione
+
+Se siete convinti che lo scalare contenga UTF-8, molto probabilmente
+volete impostare il flag C<UTF8>:
+
+  if ($] > 5.007) {
+    require Encode;
+    $val = Encode::decode_utf8($val);
+  }
+
+=item *
+
+Stessa cosa, ma solo se siete davvero sicuri
+
+  if ($] > 5.007) {
+    require Encode;
+    Encode::_utf8_on($val);
+  }
+
+=item *
+
+Una funzione di aiuto per C<fetchrow_array> e C<fetchrow_hashref>
+
+Quando il database contiene soltanto UTF-8, una funzione o un metodo
+di aiuto permette di sostituire comodamente le chiamate a
+C<fetchrow_array> e C<fetchrow_hashref>. PermetterE<agrave> anche di
+adattarsi piE<ugrave> facilmente a future migliorie nel dirver del
+vostro database.  Notare che quando scriviamo questo (Ottobre 2002),
+DBI non ha un modo standard per gestire i dati UTF-8. Controllate la
+documentazione relativa per vedere se sia ancora cosE<igrave>.
+
+  sub fetchrow {
+    my($self, $sth, $cosa) = @_; # $cosa e` uno tra fetchrow_{array,hashref}
+    if ($] < 5.007) {
+      return $sth->$cosa;
+    } else {
+      require Encode;
+      if (wantarray) {
+        my @arr = $sth->$cosa;
+        for (@arr) {
+          defined && /[^\000-\177]/ && Encode::_utf8_on($_);
+        }
+        return @arr;
+      } else {
+        my $ret = $sth->$cosa;
+        if (ref $ret) {
+          for my $k (keys %$ret) {
+            defined && /[^\000-\177]/ && Encode::_utf8_on($_) for $ret->{$k};
+          }
+          return $ret;
+        } else {
+          defined && /[^\000-\177]/ && Encode::_utf8_on($_) for $ret;
+          return $ret;
+        }
+      }
+    }
+  }
+
+=item *
+
+Un grande scalare che sapete contiene soltanto ASCII
+
+Gli scalari che contengono soltanto ASCII ma sono marcati come UTF-8
+impongono a volte dei rallentamenti ai vostri programmi. Se vi trovate
+in una situazione del genere, basta che togliate il flag C<UTF8>:
+
+  utf8::downgrade($val) if $] > 5.007;
+
+=back
+
+=head1 VEDI ANCHE
+
+L<perluniintro>, L<encoding>, L<Encode>, L<open>, L<utf8>, L<bytes>,
+L<perlretut>, L<perlvar/"${^UNICODE}">
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlunicode
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Gianni Ceccarelli.
+
+=cut

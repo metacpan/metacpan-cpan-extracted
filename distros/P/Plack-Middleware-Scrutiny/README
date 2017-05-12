@@ -1,0 +1,13 @@
+Status: proof of concept.
+
+  # This uses AnyEvent, so go with twiggy
+
+  builder {
+    enable 'Scrutiny';
+    $app;
+  };
+
+  # Now pass ?_scrutinize=1 to your app, and you'll get an inline debugger
+
+Screenshot: http://thelackthereof.org/tmp/scrutiny-demo2.png
+

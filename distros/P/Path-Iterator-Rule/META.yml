@@ -1,0 +1,68 @@
+---
+abstract: 'Iterative, recursive file finder'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Exporter: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  File::pushd: '0'
+  Path::Tiny: '0'
+  Test::Deep: '0'
+  Test::Filename: '0.03'
+  Test::More: '0.92'
+  lib: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Path-Iterator-Rule
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  PIR:
+    file: lib/PIR.pm
+    version: '1.012'
+  Path::Iterator::Rule:
+    file: lib/Path/Iterator/Rule.pm
+    version: '1.012'
+requires:
+  Carp: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  List::Util: '0'
+  Number::Compare: '0.02'
+  Scalar::Util: '0'
+  Text::Glob: '0'
+  Try::Tiny: '0'
+  if: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+  warnings::register: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Path-Iterator-Rule/issues
+  homepage: https://github.com/dagolden/Path-Iterator-Rule
+  repository: https://github.com/dagolden/Path-Iterator-Rule.git
+version: '1.012'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Gian Piero Carrubba <gpiero@butterfly.fdc.rm-rf.it>'
+  - 'Graham Knop <haarg@cpan.org>'
+  - 'Ricardo Signes <rjbs@cpan.org>'
+  - 'Slaven Rezic <slaven.rezic@idealo.de>'
+  - 'Toby Inkster <tobyink@cpan.org>'

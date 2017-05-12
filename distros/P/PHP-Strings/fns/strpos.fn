@@ -1,0 +1,3 @@
+docs: |
+    This function is Perl's L<index|perlfunc/"index">
+    function, however C<index> has a sensible return value.

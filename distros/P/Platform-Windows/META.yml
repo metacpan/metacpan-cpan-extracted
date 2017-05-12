@@ -1,0 +1,26 @@
+---
+abstract: 'an empty module that can only be installed on Windows'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  Test::More: 0.80
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Platform-Windows
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Platform-Windows
+  homepage: https://metacpan.org/release/Platform-Windows
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/tobyink/p5-platform
+version: 0.002

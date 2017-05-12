@@ -1,0 +1,4 @@
+name = "PlantUML-ClassDiagram-Parse"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,35 @@
+Revision history for Perl extension Plack::Middleware::AxsLog
+
+0.21 2014-02-20T06:14:17Z
+
+        - [BUGFIX] log_line that returns from ALFC coderef does not have "\n"
+
+0.20 2014-01-29T03:02:52Z
+
+        - use POSIX::strftime::Compiler 0.30
+
+0.13 2013-10-27T14:15:09Z
+
+        - add format_options (Thank you zentooo)
+
+0.12 2013-09-02T06:06:34Z
+
+        - re-packaging
+
+0.11 2013-04-09T15:44:33Z
+
+        - updated POD
+        - re-packaging
+
+0.10    Sun Mar 3 16:38:54 2012
+        - supports any format with Apache::LogFormat::Compiler
+          be 3% faster than previous version
+
+0.03    Fri Feb 8 13:56:20 2013
+        - supports LTSV format
+
+0.02    Tue Oct 9 11:45:11 2012
+        - updated doc
+
+0.01    Wed Aug 22 16:11:51 2012
+        - original version

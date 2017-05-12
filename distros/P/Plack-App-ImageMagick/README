@@ -1,0 +1,235 @@
+NAME
+    Plack::App::ImageMagick - Create and manipulate images with
+    Image::Magick
+
+VERSION
+    version 1.110990
+
+SYNOPSIS
+        # app.psgi
+        use Plack::App::ImageMagick;
+
+        my $thumbnailer_app = Plack::App::ImageMagick->new(
+            root => '/path/to/images',
+            apply => [
+                Scale => { geometry => "%{width:-200}x%{height:-120}" },
+                Set => { quality => 30 },
+            ],
+            with_query => 1,
+        );
+
+        my $captcha_app = Plack::App::ImageMagick-new(
+            apply => [
+                Set => { size => "100x20" },
+                ReadImage => [
+                    'xc:%{bgcolor:-white}',
+                ],
+                Set => { magick => "png" },
+            ],
+            post_process => sub {
+                my ($app, $env, $img) = @_;
+
+                $img->Annotate(
+                    text => random_text( $env->{PATH_INFO} ),
+                    fill => 'black',
+                    pointsize => 16,
+                    gravity => 'Center',
+                );
+                return $img;
+            }
+        );
+
+        # and map it later
+        use Plack::Builder;
+        builder {
+            # /thumbs/photo_1.jpg?width=640&height=480
+            mount "/thumbs/" => $thumbnailer_app;
+
+            # /captcha/623b1c9b03d4033635a545b54ffc4775.png
+            mount "/captcha/" => $captcha_app;
+        }
+
+DESCRIPTION
+    Use Image::Magick to create and manipulate images for your web
+    applications.
+
+CONFIGURATION
+    You need to supply "apply" or "handler" configuration options. All other
+    parameters are optional.
+
+  apply
+        my $app = Plack::App::ImageMagick->new(
+            root => '/path/to/images',
+            apply => [
+                Scale => { geometry => "%{width:-200}x%{height:-120}" },
+                Set => { quality => 30 },
+            ],
+            with_query => 1,
+        );
+
+    Array reference of ImageMagick's *method_name* and its *arguments*
+    pairs.
+
+    The *arguments* element could be a hash or array reference - both will
+    be flatten when passed as *method_name* parameters.
+
+    If used with "root" then attempt will be made to read image located
+    there, check "root" for details.
+
+    If "with_query" is specified the "apply" block will be pre-processed to
+    replace placeholders with values from query string, check "with_query"
+    for more details.
+
+    Results of the following methods will be pushed to @$img:
+
+    *   Clone
+
+    *   EvaluateImages
+
+    *   Fx
+
+    *   Smush
+
+    *   Transform
+
+    Results of the following method will replace current $img object:
+
+    *   FlattenImage
+
+    *Note:* if the @$img object contains more then one layer
+    "FlattenImage()" is called before rendering.
+
+    *Note:* "handler" and "apply" are mutually exclusive.
+
+  root
+        my $app = Plack::App::ImageMagick->new(
+            root => '/path/to/images',
+            apply => [ ... ],
+        );
+
+    Path to images used in conjunction with "apply" to allow modifications
+    of existing images.
+
+    Attempt will be made to read image located there, based on
+    "$env->{PATH_INFO}", failure to read image will result in *500 Internal
+    Server Error* response.
+
+    In essence it is equal to calling "Read()" before "apply" methods:
+
+            $img->Read( $self->root . $env->{PATH_INFO} );
+
+  with_query
+        my $app = Plack::App::ImageMagick->new(
+            apply => [
+                '%{method:-Scale}' => { geometry => "%{width:-200}x%{height:-120}" },
+                Set => { quality => '%{quality:-30}' },
+            ],
+            with_query => 1,
+        );
+
+    Used with "apply" allows to use placeholders which will be replaced with
+    values found in query string.
+
+    For details about syntax please see String::Bash.
+
+    User supplied value (from query string) is validated with "\A[\w ]+\z",
+    if validation fails *403 Forbidden* will be thrown.
+
+    Please note that providing default values is recommended.
+
+  cache_dir
+        my $app = Plack::App::ImageMagick->new(
+            cache_dir => '/path/to/cache',
+            apply => [ ... ],
+        );
+
+    If provided images created will be saved in this directory, with
+    filenames based on "$env->{REQUEST_URI}" MD5 checksum.
+
+    However use of reverse proxy for even better performance gain is
+    recommended.
+
+  handler
+        my $app = Plack::App::ImageMagick->new(
+            handler => sub {
+                my ($app, $env, $img) = @_;
+
+                # process $img
+                ...
+
+                return $img;
+            },
+        );
+
+    Sub reference called with following parameters:
+
+    $app
+        Reference to current Plack::App::ImageMagick object.
+
+    $env
+        Reference to current $env.
+
+    $img
+        Reference to Image::Magick object created with:
+
+            my $img = Image::Magick->new();
+
+    *Note:* if returned @$img object contains more then one layer
+    "FlattenImage()" is called before rendering.
+
+    *Note:* "handler" and "apply" are mutually exclusive.
+
+  pre_process
+        my $app = Plack::App::ImageMagick->new(
+            pre_process => sub {
+                my ($app, $env, $img) = @_;
+
+                # process $img
+                ...
+
+                return $img;
+            },
+            apply => [ ... ],
+        );
+
+    Sub reference called before "apply" methods are processed, with same
+    parameters as "handler".
+
+    Returns $img which is processed later by methods defined in "apply".
+
+  post_process
+        my $app = Plack::App::ImageMagick->new(
+            apply => [ ... ],
+            post_process => sub {
+                my ($app, $env, $img) = @_;
+
+                # process $img
+                ...
+
+                return $img;
+            },
+        );
+
+    Sub reference called after "apply" (with $img processed by its methods),
+    with same parameters as "handler".
+
+    *Note:* if the @$img object contains more then one layer
+    "FlattenImage()" is called before rendering.
+
+SEE ALSO
+    *   Image::Magick
+
+    *   Plack
+
+    *   String::Bash
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

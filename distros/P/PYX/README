@@ -1,0 +1,88 @@
+NAME
+    PYX - A perl module for PYX handling.
+
+SYNOPSIS
+     use PYX qw(attribute char comment end_element instruction start_element);
+     my @data = attribute(@attr);
+     my @data = char($char);
+     my @data = comment($comment);
+     my @data = end_element($elem);
+     my @data = instruction($target, $code);
+     my @data = start_element($elem, @attr);
+
+SUBROUTINES
+    "attribute(@attr)"
+             Encode attribute as PYX.
+             Returns array of encoded lines.
+
+    "char($char)"
+             Encode characters between elements as PYX.
+             Returns array of encoded lines.
+
+    "comment($comment)"
+             Encode comment as PYX.
+             Returns array of encoded lines.
+
+    "end_element($elem)"
+             Encode end of element as PYX.
+             Returns array of encoded lines.
+
+    "instruction($target, $code)"
+             Encode instruction as PYX.
+             Returns array of encoded lines.
+
+    "start_element($elem, @attr)"
+             Encode begin of element as PYX.
+             Returns array of encoded lines.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use PYX qw(attribute char comment end_element instruction start_element);
+
+     # Example output.
+     my @data = (
+             instruction('xml', 'foo'),
+             start_element('element'),
+             attribute('key', 'val'),
+             comment('comment'),
+             char('data'),
+             end_element('element'),
+     );
+
+     # Print out.
+     map { print $_."\n" } @data;
+
+     # Output:
+     # ?xml foo
+     # (element
+     # Akey val
+     # _comment
+     # -data
+     # )element
+
+DEPENDENCIES
+    Exporter, PYX::Utils, Readonly.
+
+SEE ALSO
+    Task::PYX
+        Install the PYX modules.
+
+REPOSITORY
+    <https://github.com/tupinek/PYX>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2005-2016 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.05
+

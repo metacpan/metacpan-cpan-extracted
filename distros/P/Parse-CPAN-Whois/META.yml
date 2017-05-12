@@ -1,0 +1,32 @@
+---
+abstract: 'Parse CPAN''s authors/00whois.xml file'
+author:
+  - 'Martijn van Beers <martijn@cpan.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Parse::CPAN::Whois
+name: Parse-CPAN-Whois
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Parse::CPAN::Whois:
+    file: lib/Parse/CPAN/Whois.pm
+    version: 0.02
+  Parse::CPAN::Whois::Author:
+    file: lib/Parse/CPAN/Whois/Author.pm
+    version: 0.01
+requires:
+  XML::SAX::Base: 1.04
+  XML::SAX::ParserFactory: 0
+  perl: 5.6.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Status=Active&Queue=Parse-CPAN::Whois
+version: 0.02

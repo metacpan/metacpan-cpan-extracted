@@ -1,0 +1,14 @@
+Changes
+lib/POE-Component-Server-MySQL.pm
+lib/POE/Component/Server/MySQL.pm
+lib/POE/Component/Server/MySQL/Client.pm
+Makefile.PL
+MANIFEST
+README
+t/lib/MyMySQL.pm
+t/lib/MyMySQL/Infobrightize.pm
+t/lib/MyMySQL/OnSteroids.pm
+t/lib/MyMySQL/Remote.pm
+t/mymysql.pl
+t/POE-Component-Server-MySQL.t
+META.yml                                 Module meta-data (added by MakeMaker)

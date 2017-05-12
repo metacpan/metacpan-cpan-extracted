@@ -1,0 +1,12 @@
+Revision history for Plack-Middleware-RealIP
+
+0.03    Sun Apr  8 00:18:13 PHT 2012
+          - Perlcritic fixes
+          - Specified MIN_PERL_VERSION in Makefile.PL
+
+0.02    Sun Mar 18 21:39:01 PHT 2012
+          - Require Net::Netmask
+
+0.01    Sun Mar 18 15:11:18 PHT 2012
+          - First version, released on an unsuspecting world.
+

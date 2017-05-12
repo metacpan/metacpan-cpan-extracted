@@ -1,0 +1,25 @@
+Revision history for Plack-Middleware-Recorder
+
+0.06 November 02 2016
+     - Include META.json (Thanks, Sean Zellmer!)
+
+0.05 April 12 2015
+     - Fix a test to run better on CPAN testers (Thanks, Slaven Rezić!)
+
+0.04 April 08 2015
+     - POD/prereqs fixes (thanks, Anthony Brummett!)
+     - Get the module working with CGI (thanks, Anthony Brummett!)
+     - Get the module working with multi-tasking servers (thanks, Anthony Brummett!)
+     - Use Sereal instead of Storable
+
+0.03 January 13 2012
+     - Bug fix (support web applications that use LWP::UserAgent)
+
+0.02 October 12 2011
+     - Add /recorder/start, /recorder/stop
+     - Add a debug panel for communicating with the recorder middleware
+     - Add the ability to replay requests against a PSGI file
+     - Add ability to specify output file with plack-record
+
+0.01 October 06 2011
+     Initial release.  Supports record and replay of requests.

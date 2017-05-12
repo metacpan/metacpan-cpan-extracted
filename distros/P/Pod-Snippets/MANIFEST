@@ -1,0 +1,20 @@
+Build.PL
+Changes
+eg/ClassWithTestsAtTheEnd.pm
+lib/Pod/Snippets.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/as_data.t
+t/eg.t
+t/line-numbers.t
+t/maintainer/kwalitee.t
+t/maintainer/pod-coverage.t
+t/maintainer/pod-source.t
+t/maintainer/pod.t
+t/strict-violations.t
+t/synopsis.t
+t/unknown_name.t
+t/whitespace.t
+t/whole_snippage.t

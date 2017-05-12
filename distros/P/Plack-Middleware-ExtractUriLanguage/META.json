@@ -1,0 +1,73 @@
+{
+   "abstract" : "Cuts off language tags out of the request's PATH_INFO to simplify internationalization route handlers.",
+   "author" : [
+      "BURNERSK <burnersk@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-ExtractUriLanguage",
+   "no_index" : {
+      "directory" : [
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Const::Fast" : "0",
+            "Exporter" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Util::Accessor" : "0",
+            "base" : "0",
+            "parent" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Warn" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::ExtractUriLanguage" : {
+         "file" : "lib/Plack/Middleware/ExtractUriLanguage.pm",
+         "version" : "0.004"
+      },
+      "Plack::Middleware::ExtractUriLanguage::Type" : {
+         "file" : "lib/Plack/Middleware/ExtractUriLanguage/Type.pm"
+      }
+   },
+   "release_status" : "testing",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "burnersk@cpan.org",
+         "web" : "https://github.com/burnersk/Plack-Middleware-ExtractUriLanguage/issues"
+      },
+      "homepage" : "http://p3rl.org/Plack::Middleware::ExtractUriLanguage",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/burnersk/Plack-Middleware-ExtractUriLanguage.git",
+         "web" : "https://github.com/burnersk/Plack-Middleware-ExtractUriLanguage"
+      }
+   },
+   "version" : "0.004"
+}
+

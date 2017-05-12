@@ -1,0 +1,99 @@
+NAME
+
+    PowerShell - Wraps PowerShell commands;
+
+VERSION
+
+    version 1.00
+
+SYNOPSIS
+
+        use PowerShell;
+    
+        # Minimally
+        PowerShell
+            ->new('Mount-DiskImage, 
+                ['Image' => 'C:\\tmp\\foo.iso'], 
+                ['StorageType' => 'ISO'])
+            ->pipe_to('Get-Volume')
+            ->execute();
+    
+        # Or explicitly
+        PowerShell
+            ->new(
+                PowerShell::Pipeline
+                    ->new(
+                        PowerShell::Cmdlet
+                            ->new('Mount-DiskImage')
+                            ->parameter('Image', 'C:\\tmp\\foo.iso')
+                            ->parameter('StorageType', 'ISO'))
+                    ->add(
+                        PowerShell::Cmdlet
+                            ->new('Get-Volume')))
+            ->execute();
+    
+        # Or just get the command
+        my $command = PowerShell
+            ->new('Mount-DiskImage', [Image => 'C:\\tmp\\foo.iso'])
+            ->command();
+    
+        # and execute it yourself
+        my $result = `$command`;
+
+DESCRIPTION
+
+    I know, I know, why would you want a scripting language to wrap a
+    scripting language... In the real world, it happens. This can be really
+    useful for automation that needs to do things that are exposed via
+    PowerShell that would otherwise require jumping through more extensive
+    hoops. It can also be quite useful when ssh'ing to a remote system to
+    execute PowerShell commands. Anyway, the intent of this module is to
+    simplify that use case.
+
+CONSTRUCTORS
+
+ new($command, [@cmdlet_parameters])
+
+    Creates a new PowerShell command wrapper. $command is either a
+    PowerShell::Pipeline, a PowerShell::Cmdlet, or a string containing a
+    cmdlet name. If a string containing a cmdlet name, then
+    @cmdlet_parameters contains the parameters to that cmdlet.
+
+METHODS
+
+ command()
+
+    Returns a string form of the command.
+
+ execute()
+
+    Executes the command.
+
+ pipe_to($cmdlet, [@cmdlet_parameter)
+
+    Pipes the output to $cmdlet.
+
+AUTHOR
+
+    Lucas Theisen <lucastheisen@pastdev.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Lucas Theisen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * PowerShell::Cmdlet
+
+      * PowerShell::Pipeline
+
+      *
+      https://msdn.microsoft.com/en-us/powershell/scripting/powershell-scri
+      pting
+

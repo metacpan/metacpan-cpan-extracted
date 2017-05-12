@@ -1,0 +1,18 @@
+use MooseX::Declare;
+
+class Test {
+    has a_var => ( is => 'rw', isa => 'Str' );
+    has b_var => ( is => 'rw', isa => 'Str' );
+
+    method some_method {
+        my $shiny = 1;
+
+        print "Do stuff with ${shiny}\n";
+        $shiny += 1;
+
+        my %hash;
+        for my $i (1..5) {
+            $hash{$i} = $shiny;
+        }
+    }
+}

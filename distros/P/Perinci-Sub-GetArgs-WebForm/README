@@ -1,0 +1,16 @@
+SYNOPSIS
+
+     use Perinci::Sub::GetArgs::WebForm qw(get_args_from_webform);
+    
+     my %params = $query->params; # from CGI, or from Plack::Request
+     my $args = get_args_from_webform(\%params);
+
+DESCRIPTION
+
+    This module provides get_args_from_webform(). This module is used by,
+    among others, Borang.
+
+SEE ALSO
+
+    Perinci
+

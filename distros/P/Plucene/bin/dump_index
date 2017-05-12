@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dump_index - dump the contents of an index
+
+=head1 SYNOPSIS
+
+	perl -w dump_index $DIR
+
+=head1 DESCRIPTION
+
+This will dump out an index in human readable form. It can be used when 
+debugging to compare indexes create with Plucene to those created with
+Lucene.
+	
+=cut
+
+use strict;
+use warnings;
+
+use Plucene::Index::Reader;
+
+my $where = shift @ARGV;
+my $r     = Plucene::Index::Reader->open($where);
+
+no strict 'refs';
+my @readers = (@{ $r->{readers} } ? @{ $r->{readers} } : $r);
+print "We have " . @readers . " readers\n";
+if (@readers == 1 and $r->isa("Plucene::Index::SegmentsReader")) {
+	die "But no segments\n";
+}
+
+print "\n\nDocuments:\n";
+for my $reader (@readers) {
+	print "Segment "
+		. $reader->{segment} . " has "
+		. $reader->max_doc
+		. " docs\n";
+	my @terms = $reader->terms;
+	print "Fields:\n";
+	for my $field ($reader->field_infos->fields) {
+		print "\t" . $field->number . ": " . $field->name;
+		print " [indexed]" if $field->is_indexed;
+		print "\n";
+	}
+	print "Terms: \n";
+	my $td = $reader->term_docs;
+	for my $t (@terms) {
+		while ($t->next) {
+			my $term = $t->term;
+			print $term->field . ": " . $term->text . "\n";
+			$td->seek($term);
+			my ($docs, $freqs) = $td->read;
+			for (0 .. $#$docs) {
+				print "\t Doc "
+					. $docs->[$_] . " ("
+					. $freqs->[$_]
+					. " occurrences)\n";
+			}
+		}
+	}
+
+}
+print "Total documents: " . $r->max_doc . " in " . @readers . " segments\n";
+

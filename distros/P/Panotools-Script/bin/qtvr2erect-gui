@@ -1,0 +1,45 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $cwd = `cat \$HOME/.qtvr2erect-gui` || $ENV{'HOME'};
+chomp $cwd;
+
+unless (`which qtvr2erect`)
+{
+    `zenity --error --text='qtvr2erect not found in your \$PATH'`;
+    exit 1;
+}
+
+my $qtvr;
+
+if (@ARGV)
+{
+    $qtvr = shift;
+}
+else
+{
+    $qtvr = `zenity --file-selection \\
+                       --filename=$cwd/ \\
+                       --title='Select cubic QTVR .mov file'` || exit 0;
+    chomp $qtvr;
+    $cwd = $qtvr;
+    $cwd =~ s/\/[^\/]*$//;
+    $cwd =~ s/\\\//\//g;
+    `echo '$cwd' > \$HOME/.qtvr2erect-gui` if ($cwd =~ /^\//);
+}
+
+`qtvr2erect '$qtvr' | \\
+     zenity --progress \\
+            --title='Converting QTVR' \\
+            --auto-close \\
+            --pulsate \\
+            --text='Processing: $qtvr'`;
+
+`zenity --info \\
+        --title='equirectangular created' \\
+        --text='$qtvr.tif'`;
+
+exit 0;
+

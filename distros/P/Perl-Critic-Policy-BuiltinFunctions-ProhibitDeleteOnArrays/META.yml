@@ -1,0 +1,24 @@
+---
+abstract: 'Do not use C<delete> on arrays.'
+author:
+  - 'liosha <liosha@yandex-team.ru>'
+build_requires:
+  Test::Perl::Critic::Policy: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-BuiltinFunctions-ProhibitDeleteOnArrays
+requires:
+  Perl::Critic::Policy: '0'
+  Perl::Critic::Utils: '0'
+  Readonly: '0'
+  base: '0'
+  perl: '5.006001'
+  strict: '0'
+  warnings: '0'
+version: '0.02'

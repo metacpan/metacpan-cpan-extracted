@@ -1,0 +1,42 @@
+## name EmptyOverload
+## failures 0
+## cut
+
+use overload;
+use overload ();
+use overload qw();
+
+## name NoBoolOverload
+## failures 2
+## cut
+
+use overload '""' => sub { $_[0]->name }, fallback => 1;
+use overload ('""', sub { $_[0]->name }), qw(fallback 1);
+
+## name NoFallback
+## failures 2
+## cut
+
+use overload '""' => sub { $_[0]->name }, bool => sub {1};
+use overload (q{""}, sub { $_[0]->name }, "bool", sub {1});
+
+## name UndefFallback
+## failures 2
+## cut
+
+use overload bool => sub {1}, fallback => undef;
+use overload bool => sub {1}, 'fallback';
+
+## name NoBoolOrFallback
+## failures 2
+## cut
+
+use overload '""' => sub { $_[0]->name };
+use overload ('""', sub { $_[0]->name });
+
+## name BoolAndFallback
+## failures 0
+## cut
+
+use overload '""' => sub { $_[0]->name }, bool => sub {1}, fallback => 1;
+use overload (qq{""}, sub { $_[0]->name }, (q{bool}, sub {1})), qw(fallback 1);

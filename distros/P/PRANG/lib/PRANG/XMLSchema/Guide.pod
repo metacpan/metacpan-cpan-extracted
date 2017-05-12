@@ -1,0 +1,819 @@
+
+=head1 NAME
+
+PRANG::XMLSchema::Guide - converting .xsd to PRANG by hand
+
+=head1 OVERVIEW
+
+With XMLSchema, you are supplied with a set of F<.xsd> files which
+define the schema.  This is specified in XML format.  This document
+goes through conversion of a real XML Schema document, the example
+given here is the RFC 5732 EPP host mapping.
+
+This man page is structured so that it can be used both as a tutorial
+and a reference; for use as a reference, scan the headings and look
+for the one that corresponds to the XML Schema structure you are
+encountering.  For use as a tutorial, read from start to finish, if
+you like with the history of XML::EPP open in C<gitk> or a similar
+tool.
+
+=head1 EXAMPLE - RFC 5732
+
+=head2 MODULE NAMESPACE
+
+The first thing to do is to choose a namespace which your classes will
+sit on.  I like to keep each XML namespace in its own package
+heirarchy in Perl.
+
+ <schema targetNamespace="urn:ietf:params:xml:ns:host-1.0"
+       xmlns:host="urn:ietf:params:xml:ns:host-1.0"
+       xmlns:epp="urn:ietf:params:xml:ns:epp-1.0"
+       xmlns:eppcom="urn:ietf:params:xml:ns:eppcom-1.0"
+       xmlns="http://www.w3.org/2001/XMLSchema"
+       elementFormDefault="qualified">
+
+Five namespaces are defined here; the last one, C<xmlns=...>, says the
+namespace that the schema itself is in.  C<xmlns:foo> defines what
+namespace nodes in this document with that prefix are in.  However,
+unlike regular use of XML namespaces, this affects the interpretation
+of I<values>, in particular values of the C<type=> attribute of
+various XML Schema declaration elements.
+
+The important one is C<targetNamespace> - I decide to map to the
+L<XML::EPP::Host> namespace, and so I create;
+
+ package XML::EPP::Host::Node;
+ use Moose::Role;
+ sub xmlns { "urn:ietf:params:xml:ns:host-1.0" }
+ use XML::EPP::Common;
+ 1;
+
+Every class I compose this role into will get that XML namespace.
+This affects the default namespace for C<has_element> definitions that
+are defined within that class.
+
+I also include the L<XML::EPP::Common> class so that all type
+definitions are always present.  In fact, this had already been built
+to correspond to the namespace URI associated with the C<eppcom>
+prefix above.
+
+=head2 CONVERT ROOT NODE(S) TO PRANG::Graph CLASSES
+
+If your XML language can have only one main element type, then make
+the "XML::Whatever" a normal class.  If the language can have multiple
+elements, use roles.  In the RFC XML Schema appendix, there are found
+the following top-level C<element> definitions:
+
+ <!--
+ Child elements found in EPP commands.
+ -->
+  <element name="check" type="host:mNameType"/>
+  <element name="create" type="host:createType"/>
+  <element name="delete" type="host:sNameType"/>
+  <element name="info" type="host:sNameType"/>
+  <element name="update" type="host:updateType"/>
+
+Then later:
+
+ <!--
+ Child response elements.
+ -->
+  <element name="chkData" type="host:chkDataType"/>
+  <element name="creData" type="host:creDataType"/>
+  <element name="infData" type="host:infDataType"/>
+  <element name="panData" type="host:panDataType"/>
+
+There are 5 request elements and 4 response elements which can be
+used.  In this case, I also want these objects to be types of the
+L<XML::EPP::Plugin> role.  This role requires the C<is_command>
+function to be defined, so I'll make a couple of convenience roles for
+that, too:
+
+So, I write:
+
+ package XML::EPP::Host;
+ use Moose::Role;
+ with qw(XML::EPP::Plugin PRANG::Graph);
+ 1;
+
+And:
+
+ package XML::EPP::Host::RQ;
+ use Moose::Role;
+ with qw(XML::EPP::Host);
+ sub is_command { 1 }
+ 1;
+
+ package XML::EPP::Host::RS;
+ use Moose::Role;
+ with qw(XML::EPP::Host);
+ sub is_command { 0 }
+ 1;
+
+To define an allowed root node, I can then use:
+
+ package XML::EPP::Host::Check;
+ use Moose;
+ use PRANG::Graph;
+ sub root_element { "check" }
+ with
+      'XML::EPP::Host::RQ',
+      'XML::EPP::Host::Node',
+      ;
+
+=head2 CONVERTING C<complexType> TYPES TO ROLES
+
+After we have the top-level definitions for each root element we can
+move on to define each sub-type.
+
+Normally C<complexType> definitions will become classes, however
+sometimes is is more appropriate to convert them to roles.  In this
+instance we are forced to, because they are used for root elements in
+this XML Schema, and at the top level of the schema, a single type
+must correspond with a single root element.
+
+In this case there is the problematic C<info> and C<delete> elements
+which share C<sNameType>.  C<sNameType> seems to indicate a single
+list of items, and C<mNameType> a list.  I decide to call these "Item"
+and "List", and to make them both roles because they seem to be
+generic; see also L</CHOOSING GOOD CLASS NAMES>
+
+ package XML::EPP::Host::Item;
+ # <!--
+ # Child elements of the <delete> and <info> commands.
+ # -->
+ #  <complexType name="sNameType">
+ #    <sequence>
+ #      <element name="name" type="eppcom:labelType"/>
+ #    </sequence>
+ #  </complexType>
+ #
+ use Moose::Role;
+ use PRANG::Graph;
+ has_element 'value' =>
+     is => "ro",
+     isa => "XML::EPP::Common::labelType",
+     ;
+
+ package XML::EPP::Host::List;
+ use Moose::Role;
+ use PRANG::Graph;
+ # <!--
+ # Child element of commands that accept multiple names.
+ # -->
+ # <complexType name="mNameType">
+ #   <sequence>
+ #     <element name="name" type="eppcom:labelType"
+ #      maxOccurs="unbounded"/>
+ #   </sequence>
+ # </complexType>
+ has_element 'members' =>
+     is => "ro",
+     isa => "ArrayRef[XML::EPP::Common::labelType]",
+     ;
+
+Now I can make the C<check>, C<delete> and C<info> messages concrete
+types, each with a single C<root_element>.
+
+ package XML::EPP::Host::Check;
+ use Moose;
+ use PRANG::Graph;
+ sub root_element { "check" }
+ with
+      'XML::EPP::Host::RQ',
+      'XML::EPP::Host::Node',
+      'XML::EPP::Host::List';
+
+ package XML::EPP::Host::Info;
+ use Moose;
+ use PRANG::Graph;
+ sub root_element { "info" }
+ with
+      'XML::EPP::Host::RQ',
+      'XML::EPP::Host::Node',
+      'XML::EPP::Host::Item';
+
+ package XML::EPP::Host::Delete;
+ use Moose;
+ use PRANG::Graph;
+ sub root_element { "delete" }
+ with
+      'XML::EPP::Host::RQ',
+      'XML::EPP::Host::Node',
+      'XML::EPP::Host::Item';
+
+That should be enough to parse these messages alone.
+
+So we go back and C<use> the message types from the C<XML::EPP::Host>
+package, and we're done:
+
+ package XML::EPP::Host;
+ use Moose::Role;
+ use XML::EPP::Host::Check;
+ use XML::EPP::Host::Delete;
+ use XML::EPP::Host::Info;
+ with qw(XML::EPP::Plugin PRANG::Graph);
+ 1;
+
+Let's try it!
+
+ denix:~/src/XML-EPP$ perl -Mlib=lib t/22-xml-rfc5732-host.t -t "0[137]"
+ 1..9
+ ok 1 - 22-xml-rfc5732-host/rfc-examples/01-check-command.xml - parsed OK
+ ok 2 - 22-xml-rfc5732-host/rfc-examples/01-check-command.xml - emitted OK (30ms)
+ ok 3 - 22-xml-rfc5732-host/rfc-examples/01-check-command.xml - XML output same
+ ok 4 - 22-xml-rfc5732-host/rfc-examples/03-info-command.xml - parsed OK
+ ok 5 - 22-xml-rfc5732-host/rfc-examples/03-info-command.xml - emitted OK (17ms)
+ ok 6 - 22-xml-rfc5732-host/rfc-examples/03-info-command.xml - XML output same
+ ok 7 - 22-xml-rfc5732-host/rfc-examples/07-delete-command.xml - parsed OK
+ ok 8 - 22-xml-rfc5732-host/rfc-examples/07-delete-command.xml - emitted OK (18ms)
+ ok 9 - 22-xml-rfc5732-host/rfc-examples/07-delete-command.xml - XML output same
+ denix:~/src/XML-EPP$ 
+
+Win!  This point corresponds to the git commit called;
+
+ rfc5732: implement <check>, <info>, <delete> commands
+
+In C<XMP-EPP.git>
+
+Now I will deal with the C<createType>;
+
+ <!--
+ Child elements of the <create> command.
+ -->
+  <complexType name="createType">
+    <sequence>
+      <element name="name" type="eppcom:labelType"/>
+      <element name="addr" type="host:addrType"
+       minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+C<eppcom:labelType> is already defined.  So, I can refer to it:
+
+ package XML::EPP::Host::Create;
+ use Moose;
+ use PRANG::Graph;
+ sub root_element { "create" }
+
+ with
+      'XML::EPP::Host::RQ',
+      'XML::EPP::Host::Node',
+      ;
+
+ has_element 'name' =>
+    is => "ro",
+    isa => "XML::EPP::Common::labelType",
+    ;
+
+C<addrType> is not yet there to be added to XML::EPP::Host::Create.
+So, convert it first; here is the definition:
+
+ <complexType name="addrType">
+   <simpleContent>
+     <extension base="host:addrStringType">
+       <attribute name="ip" type="host:ipType"
+        default="v4"/>
+     </extension>
+   </simpleContent>
+ </complexType>
+
+Ah!  C<simpleContent>!  But wait!  It has an attribute, so we can't
+use that mapping.  Blast.
+
+=head1 CONVERTING C<simpleType> TYPES
+
+Let's do C<addrStringType> first.
+
+  <simpleType name="addrStringType">
+    <restriction base="token">
+      <minLength value="3"/>
+      <maxLength value="45"/>
+    </restriction>
+  </simpleType>
+
+Ok, this one is a simpler case - takes the C<token> type defined in
+the XML Schema spec, and restricts its... length... to 45?  really?
+Oh well, whatever - if that's what it says that's what it says.
+
+The convention I use is to put all simpletypes in the namespace of the
+entire module, with the type from the XSD file after it.  So, in
+L<XML::EPP::Host> we write:
+
+ use Moose::Util::TypeConstraints;
+ use PRANG::XMLSchema::Types;
+ subtype "XML::EPP::Host::addrStringType"
+    => as "PRANG::XMLSchema::token"
+    => where { length $_ >= 3 and length $_ <= 45 };
+
+Note the use of the 'token' type from the XML Schema type library,
+available in L<PRANG::XMLSchema::Types>.  There are a number of core
+XML Schema types defined in this library, if you find any which are
+missing please send a patch.
+
+I also do the C<host:ipType>:
+
+ <simpleType name="ipType">
+   <restriction base="token">
+     <enumeration value="v4"/>
+     <enumeration value="v6"/>
+   </restriction>
+ </simpleType>
+
+Can become simply:
+
+ enum "XML::EPP::Host::ipType" => qw(v4 v6);
+
+Depending on the exact ordering of loading your classes, you might
+find that you need to lift your C<subtype> and C<enum> definitions
+into C<BEGIN> blocks.  They must always be defined before an attribute
+which uses them is defined, otherwise Moose will create an
+C<-E<gt>isa> type constraint, not a C<Str> sub-type type constraint.
+
+Now, with these definitions in place I can get back to the
+C<addrType>.
+
+=head2 CONVERTING C<simpleContent> TYPES TO CLASSES
+
+C<simpleContent> means a node with no element children, however it can
+have attributes and textual content.  These must be converted to
+classes.
+
+ <!--
+ Child elements of the <create> command.
+ -->
+  <complexType name="createType">
+    <sequence>
+      <element name="name" type="eppcom:labelType"/>
+      <element name="addr" type="host:addrType"
+       minOccurs="0" maxOccurs="unbounded"/>
+    </sequence>
+  </complexType>
+
+Becomes the following:
+
+ package XML::EPP::Host::Address;
+ use Moose;
+ use PRANG::Graph;
+ with 'XML::EPP::Host::Node';
+ has_element "name" =>
+     is => "ro",
+     isa => "XML::EPP::Host::addrStringType",
+     xml_nodeName => "",
+     coerce => 1,
+     ;
+
+ has_attr "ip" =>
+      is => "ro",
+      isa => "XML::EPP::Host::ipType",
+      default => "v4",
+      ;
+
+Specifying an C<xml_nodeName> on an element, of the empty string
+refers to a text node as the contents.  Specifying the C<coerce =E<gt>
+1> option will allow values which can be safely transformed to the
+correct type transparently be converted.  In this case, it is to pick
+up the default rule in L<PRANG::XMLSchema::Types> which trims
+whitespace from C<PRANG::XMLSchema::token> nodes.
+
+Right, now I can pop the stack and finish the C<Create> class:
+
+ <element name="addr" type="host:addrType"
+          minOccurs="0" maxOccurs="unbounded"/>
+
+Becomes:
+
+ has_element 'addr' =>
+      is => "ro",
+      isa => "ArrayRef[XML::EPP::Host::Address]",
+      xml_min => 0,
+      ;
+
+With that, we should hopefully be able to parse the RFC C<create>
+command:
+
+ denix:~/src/XML-EPP$ perl -Mlib=lib t/22-xml-rfc5732-host.t -t 05
+ 1..3
+ ok 1 - 22-xml-rfc5732-host/rfc-examples/05-create-command.xml - parsed OK
+ ok 2 - 22-xml-rfc5732-host/rfc-examples/05-create-command.xml - emitted OK (36ms)
+ ok 3 - 22-xml-rfc5732-host/rfc-examples/05-create-command.xml - XML output same
+ denix:~/src/XML-EPP$ 
+
+It worked!
+
+This point is the git commit:
+
+ rfc5732: implement <create> host message
+
+=head2 USING COERCIONS FOR SIMPLER CONSTRUCTION
+
+The L<Moose::Util::TypeConstraints> functions for coercing between
+types are invaluable for writing easy to use classes.
+
+For instance, if we write this in our C<Create> class, we can pass
+Perl hashes instead of already constructed objects; here is a recipe:
+
+ use Moose::Util::TypeConstraints;
+ coerce __PACKAGE__
+	 => from "Str",
+	 => via { __PACKAGE__->new(value => $_) },
+	 ;
+ coerce __PACKAGE__
+	 => from "HashRef",
+	 => via { __PACKAGE__->new($_) },
+	 ;
+
+In this, it is assumed that if you pass a plain string, to create an
+object with the string in the C<value> field.  Similarly, if a HASH
+reference is passed (C<HashRef> to Moose), then create an object,
+passing that to the C<-E<gt>new> constructor.
+
+Sadly, this does not imply that C<ArrayRef[XML::EPP::Host::Address]>
+with coercion enabled will happily work.  Moose should know this, but
+doesn't currently, so we have to declare a specific rule:
+
+ coerce "ArrayRef[XML::EPP::Host::Address]"
+     => from "ArrayRef[XML::EPP::Host::Address|HashRef|Str]"
+     => via {
+         my @rv = @$_;
+         for ( @rv ) {
+             if ( ref $_ eq "HASH" ) {
+                 $_ = XML::EPP::Host::Address->new($_);
+             }
+             elsif ( !blessed $_ ) {
+                 $_ = XML::EPP::Host::Address->new(
+                     value => $_,
+                        );
+             }
+         }
+         \@rv;
+     },
+     ;
+
+We are now up to
+
+ rfc5732: useful coercions for Address
+
+=head2 CHOOSING GOOD CLASS NAMES
+
+It's good to be somewhat systematic about the conversion of type names
+from your schema to class names.  But frequently the type names in the
+XML Schema will not be adequate for such use.
+
+So, the rules I tend to use for sanitising type names are;
+
+=over
+
+=item *
+
+Remove any redundant C<Type> or similar prefix/suffix
+
+=item *
+
+If the type name contains an abbreviation, consider un-abbreviating it
+if it is short enough.
+
+=item *
+
+If the resulting class ends up in CamelCase, consider if there is an
+alternative single word which summarises the notion better, or use
+deeper namespaces where it makes sense (see next rule).
+
+If the type is only ever used with a single element name, then the
+name of that element is also a candidate for a good name for the
+class.
+
+=item *
+
+Consider making types corresponding to actions on entities, live in
+C<Namespace::Entity::Action>, rather than C<Namespace::ActionEntity>.
+
+=back
+
+One of the things to remember is that XML Schema type names are not
+normally visible to people working with the XML directly.  Less care
+may be placed on making them understandable, than merely making them
+unique tokens useful enough for a standards maintainer to work with.
+
+Where it does not cause any conflicts, consider exporting aliases to
+the raw XML Schema type names into the package which you are using,
+using C<subtype> (from L<Moose::Util::TypeConstraints>).  For the
+example schema, I know this will always be safe as the types always
+end in C<Type>.
+
+This is normally as simple as using something like this at the end of
+your class definition:
+
+ use Moose::Util::TypeConstraints;
+ subtype "XML::EPP::Host::chgType" => as __PACKAGE__;
+
+The above I used in the class I called L<XML::EPP::Host::Change>.
+
+In general, you can use these subtypes for type constraints (ie, C<isa
+=E<gt>>) fields on attributes) instead of the Perl package name.
+However currently for C<xml_nodeName> maps this does not work and the
+real class name must be given.  This may be fixed in a later release.
+
+In any case, you need to make sure that the class which defines the
+subtype is loaded before you define an attribute which uses that type;
+or Moose will convert it to an C<-E<gt>isa> type constraint.
+
+Also, don't use this trick for types which got converted into roles
+(as C<mNameType> and C<sNameType> were in the example) or you might
+get yourself into trouble later; if roles are used in type defintions,
+they imply plug-in like operation where all of the classes which
+implement that role are allowed (and they all have to be
+L<PRANG::Graph> consumers).
+
+This point corresponds to git commit:
+
+ rfc5732: add subtype definitions at the end of corresponding files
+
+=head2 CHOOSING GOOD ATTRIBUTE NAMES
+
+Attribute and element names are more visible and well-known than XML
+Schema type names; so the bar for renaming them to moose attribute
+names is slightly higher as this will actually confuse people.
+
+That being said, sometimes the attribute names are just awful.  Case
+in point: C<statusType>
+
+  <attribute name="s" type="host:statusValueType"
+             use="required"/>
+
+C<s> ?  That's ... B<s>pecial?  B<s>illy?
+
+I'll call it C<status>:
+
+ has_attr "status" =>
+     is => "ro",
+     isa => "XML::EPP::Host::statusValueType",
+     required => 1,
+     xml_name => "s",
+     ;
+
+I used C<xml_name> there to refer to the name it gets in the XML.
+This works with C<has_attr>; for C<has_element>, you must use
+C<xml_nodeName>.
+
+I personally will also convert to keep in line with perl-ish
+conventions:
+
+  XML form      Perl attribute
+  Capitalized   capitalized
+  CamelCase     camel_case
+
+=head2 HANDLING C<minOccurs> AND C<maxOccurs>
+
+In the C<addRemType>, the following definition appears:
+
+   <sequence>
+     <element name="addr" type="host:addrType"
+      minOccurs="0" maxOccurs="unbounded"/>
+     <element name="status" type="host:statusType"
+      minOccurs="0" maxOccurs="7"/>
+   </sequence>
+
+The default for C<minOccurs> and C<maxOccurs> is 1 - making the
+attribute compulsary.  This is the regular case, mapped to a single
+item type.
+
+If C<maxOccurs> is more than 1, then the slot in the sequence needs to
+be represented with an ArrayRef.  Setting the type to be an ArrayRef
+type automatically makes PRANG default the C<xml_max> to be unlimited,
+so the above definition is implemented in the corresponding class
+with:
+
+ use XML::EPP::Host::Address;
+ has_element 'addr' =>
+     is => "ro",
+     isa => "ArrayRef[XML::EPP::Host::Address]",
+     xml_min => 0,
+     ;
+ use XML::EPP::Host::Status;
+ has_element 'status' =>
+     is => "ro",
+     isa => "ArrayRef[XML::EPP::Host::Status]",
+     xml_min => 0,
+     xml_max => 7,
+     ;
+
+=head2 HANDLING MULTIPLE ELEMENTS WITH THE SAME TYPE
+
+As the implementation of RFC5732 continues, we encounter the
+C<updateType>, which contains multiple element definitions with the
+same type;
+
+ <!--
+ Child elements of the <update> command.
+ -->
+  <complexType name="updateType">
+    <sequence>
+      <element name="name" type="eppcom:labelType"/>
+      <element name="add" type="host:addRemType"
+       minOccurs="0"/>
+      <element name="rem" type="host:addRemType"
+       minOccurs="0"/>
+      <element name="chg" type="host:chgType"
+       minOccurs="0"/>
+    </sequence>
+  </complexType>
+
+However, this is no problem!  In fact, this is why I<types> are mapped
+to classes and not I<elements>.
+
+I decided to name C<addRemType> the simpler C<Delta> (full name:
+L<XML::EPP::Host::Delta>).
+
+So, the definitions become:
+
+ use XML::EPP::Host::Delta;
+ has_element 'add' =>
+    is => "ro",
+    isa => "XML::EPP::Host::Delta",
+    predicate => "has_add",
+    coerce => 1,
+    ;
+ has_element 'remove' =>
+    is => "ro",
+    isa => "XML::EPP::Host::Delta",
+    predicate => "has_remove",
+    xml_nodeName => "rem",
+    coerce => 1,
+    ;
+
+Also of passing note: setting C<predicate> as in the above
+automatically implies C<xml_min =E<gt> 0>
+
+We are now up to git commit:
+
+ rfc5732: implement <update> command
+
+Here is the parser in action:
+
+ denix:~/src/XML-EPP$ perl -Mlib=lib t/22-xml-rfc5732-host.t -t 09
+ 1..3
+ ok 1 - 22-xml-rfc5732-host/rfc-examples/09-update-command.xml - parsed OK
+ ok 2 - 22-xml-rfc5732-host/rfc-examples/09-update-command.xml - emitted OK (47ms)
+ ok 3 - 22-xml-rfc5732-host/rfc-examples/09-update-command.xml - XML output same
+ denix:~/src/XML-EPP$ 
+
+The remaining types were implemented in three further commits;
+
+  rfc5732 - implement <check> response (<chkData>)
+  rfc5732 - implement <info> and <create> responses
+  rfc5732 - implement pending action notifications (<panData>) message
+
+None of the methods used for these commits have not been touched on in
+this Guide.
+
+=head1 OTHER XMLSchema CONSTRUCTS TO BE WARY OF
+
+=head2 CONVERT C<E<lt>any namespace="##other"/E<gt>> TO ROLES
+
+The L<XML::EPP::SubCommand> class is a conversion of the
+C<readWriteType> XML Schema definition;
+
+ <!--
+ All other object-centric commands.  EPP doesn't specify the syntax or
+ semantics of object-centric command elements.  The elements MUST be
+ described in detail in another schema specific to the object.
+ -->
+   <complexType name="readWriteType">
+     <sequence>
+       <any namespace="##other"/>
+     </sequence>
+   </complexType>
+
+Each point of other-schema inclusion like this is really a type; XML
+Schema does not have the semantics to specify this.  In this case,
+L<XML::EPP::Plugin> becomes the type:
+
+ package XML::EPP::SubCommand;
+ use Moose;
+ use Moose::Util::TypeConstraints;
+ use PRANG::Graph;
+
+ use XML::EPP::Plugin;
+ has_element "payload" =>
+    is => "rw",
+    isa => "XML::EPP::Plugin",
+    ;
+
+ with "XML::EPP::Node";
+
+ subtype "XML::EPP::readWriteType"
+     => as __PACKAGE__;
+
+ 1;
+
+Once that facility is there, classes can specify that they may be
+included at that point by consuming the L<XML::EPP::Plugin> role.
+
+=head2 CONVERT C<attributeGroup> TO ROLES
+
+No examples yet, but a grouping of attributes as in an
+C<attributeGroup> can be implemented with a role that includes lots of
+C<has_attr> attributes.
+
+=head2 CONVERT C<restriction> TO TYPE CONSTRAINTS
+
+Stuff like this;
+
+  <simpleType name="pwType">
+    <restriction base="token">
+      <minLength value="6"/>
+      <maxLength value="16"/>
+    </restriction>
+  </simpleType>
+
+You can implement as:
+
+  subtype "XML::EPP::pwType"
+      as => "PRANG::XMLSchema::token",
+      where => { length >= 6 and length <= 16 };
+
+Enumerations such as this;
+
+  <simpleType name="transferOpType">
+    <restriction base="token">
+      <enumeration value="approve"/>
+      <enumeration value="cancel"/>
+      <enumeration value="query"/>
+      <enumeration value="reject"/>
+      <enumeration value="request"/>
+    </restriction>
+  </simpleType>
+
+Are much more succinctly described using the C<enum> keyword from
+L<Moose::Util::TypeConstraints>;
+
+ enum "XML::EPP::transferOpType" =>
+     qw(approve cancel query reject request);
+
+The downside of this is that you don't get the default coerce
+behaviour of PRANG::XMLSchema::token, to strip leading and trailing
+whitespace.  To do so, use a real constraint;
+
+ our @tot = qw(approve cancel query reject request);
+ subtype "XML::EPP::transferOpType"
+     => as "PRANG::XMLSchema::token",
+     => where { $_ ~~ @tot };
+
+=head2 CONVERT C<complexType> TO CLASSES
+
+This really belongs earlier in this document, it has been implied from
+the first or second system.  But here are the guidelines;
+
+=over
+
+=item *
+
+Any C<E<lt>attributeE<gt>> sections get converted to C<has_attr>
+attributes.  If the attribute specifies C<use="required">, set the
+Moose C<required =E<gt> 1> attribute property.
+
+=item *
+
+The C<E<lt>sequenceE<gt>> portion is encapsulated by the order of
+definition of C<has_element> attributes in the class.  Be warned that
+when consuming roles, the order of addition of the attributes is not
+currently defined (as of Moose version 1.00 or so).  So, be careful
+when putting more than one C<has_element> in a role.
+
+This may be fixed in a later PRANG release (if possible) or a later
+Moose version.
+
+=item *
+
+Convert each C<E<lt>elementE<gt>> node to a C<has_element> attribute.
+The type of the attribute as passed to C<isa =E<gt>> on the attribute
+should correspond to the type matching the XML Schema type definition.
+
+If the element has the C<minOccurs> or C<maxOccurs>, set C<predicate>,
+C<xml_min> and/or C<xml_max> appropriately - as well as possibly
+making the attribute an ArrayRef type - see L</HANDLING C<minOccurs>
+AND C<maxOccurs>>, above.
+
+
+=back
+
+
+=head2 MORE?
+
+There are probably more XML Schema constructs than this.  If you
+encounter difficulties, please ask for help - see L<PRANG> for
+appropriate channels for this.
+
+=head1 AUTHOR AND LICENCE
+
+This documentation was written by Sam Vilain L<samv@cpan.org>.
+
+Development commissioned by NZ Registry Services, and carried out by
+Catalyst IT - L<http://www.catalyst.net.nz/>
+
+Copyright 2010, NZ Registry Services.  This module is licensed under
+the Artistic License v2.0, which permits relicensing under other Free
+Software licenses.
+
+=cut

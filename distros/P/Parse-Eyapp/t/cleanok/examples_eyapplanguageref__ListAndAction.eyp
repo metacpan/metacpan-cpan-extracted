@@ -1,0 +1,10 @@
+# ListAndAction.eyp
+
+%%
+
+S:
+      'c'
+    | ( 'a' ) S 'b' 
+;
+
+%%

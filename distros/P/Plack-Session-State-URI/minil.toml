@@ -1,0 +1,3 @@
+name = "Plack-Session-State-URI"
+authority = "cpan:ASKADNA"
+badges = ['travis']

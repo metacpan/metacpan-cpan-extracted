@@ -1,0 +1,15 @@
+[AGENT]
+
+Mozilla/5.0 (Linux; U; Android 2.1-update1; de-de; E10i Build/2.0.2.A.0.24) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17
+
+'parser'      => 'android',
+'mobile'      => 1,
+'strength'    => 'U',
+'os'          => 'Android 2.1-update1 (2.0.2.A.0.24)',
+'extras'      => [ 'KHTML, like Gecko', 'Safari/530.17' ],
+'toolkit'     => ['AppleWebKit', '530.17','530.170'],
+'version_raw' => '4.0',
+'lang'        => 'de-de',
+'version'     => '4.000',
+'name'        => 'Android',
+'device'      => 'E10i',

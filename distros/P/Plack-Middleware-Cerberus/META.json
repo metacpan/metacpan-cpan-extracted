@@ -1,0 +1,46 @@
+{
+   "abstract" : "Include geo, time zone, user-agent and throttling from App::Cerberus",
+   "author" : [
+      "Clinton Gormley <drtech@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Cerberus",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cerberus::Client" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Util::Accessor" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/clintongormley/Plack-Middleware-Cerberus/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/clintongormley/Plack-Middleware-Cerberus.git",
+         "web" : "https://github.com/clintongormley/Plack-Middleware-Cerberus"
+      }
+   },
+   "version" : "0.04"
+}
+

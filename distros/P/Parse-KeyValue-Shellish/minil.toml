@@ -1,0 +1,4 @@
+name = "Parse-KeyValue-Shellish"
+badges = ["travis", "coveralls"]
+authority="cpan:MOZNION"
+module_maker="ModuleBuildTiny"

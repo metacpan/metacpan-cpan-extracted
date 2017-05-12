@@ -1,0 +1,6 @@
+The files in this directory  corrspond to the tutorial 
+"Parsing Strings and Trees with Parse::Eyapp (An Introduction
+to Compiler Construction)" available from 
+http://nereida.deioc.ull.es/~pl/perlexamples/parsingstringsandtrees.pdf
+The directory contains a translator for infix expressions
+to Parrot code

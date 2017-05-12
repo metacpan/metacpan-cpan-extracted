@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.mkdn
+dist.ini
+lib/Plack/Middleware/GoogleAnalytics.pm
+t/00-use.t
+t/01-basic.t

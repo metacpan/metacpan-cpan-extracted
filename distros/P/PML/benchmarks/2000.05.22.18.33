@@ -1,0 +1,10 @@
+This benchmark was take after tons of changes have be made to PML
+to prepare for 0.2.0. The gut function was completly rewriten and
+does not use hacky regexs.
+
+Look like this is more then a 200% speed improvment from last time!
+
+
+-- Peter
+
+100 calls to PML took:  4 wallclock secs ( 3.67 usr  0.02 sys +  0.00 cusr  0.04 csys =  0.00 CPU)

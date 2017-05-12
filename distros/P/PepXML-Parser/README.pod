@@ -1,0 +1,377 @@
+=head1 NAME
+
+PepXML::Parser - A Perl parser for the pepXML file format.
+
+=head1 VERSION
+
+Version 0.01
+
+=head1 SYNOPSIS
+
+Quick summary of what the module does.
+
+    my $parser = PepXML::Parser->new();
+
+    my $pepxml = $parser->parse("sample.pepxml");
+    
+    my %msms = $pepxml->get_msms_pipeline_analysis();
+    
+    my @proteins = $pepxml->get_proteins();
+    
+    my @peptides = $pepxml->get_unique_peptides();
+    
+    ...
+
+=head1 DESCRIPTION
+
+pepXML is an open data format developed at the SPC/Institute for Systems biology for the storage, exchange, and processing of peptide 
+sequence assignments of MS/MS scans. pepXML is intended to provide a common data output format for many different MS/MS search engines and 
+subsequent peptide-level analyses. Several search engines already have native support for outputting pepXML and converters are available 
+to transform output files to pepXML.
+
+=head1 Data Structure & Access
+
+Once the file is parsed, a deeply nested data strcuture is organized in memory, with all the information stored inside the the top level class
+called PepXML::PepXMLFile. Use the public methods described bellow in order to acces the data.
+
+    PepXML::PepXMLFile  {
+        Parents       Moose::Object
+        public methods (17) : get_enzymes, get_hits, get_modifications, get_msms_pipeline_analysis, get_parameters, get_peptides, get_proteins, 
+        get_run_summary, get_search_summary, get_unique_peptides, get_unique_proteins, meta, msms_pipeline_analysis, msms_run_summary, 
+        sample_enzyme, search_hit, search_summary
+        private methods (0)
+        internals: {
+            msms_pipeline_analysis   PepXML::MsmsPipelineAnalysis,
+            msms_run_summary         PepXML::RunSummary,
+            sample_enzyme            [
+                [0] PepXML::Enzyme
+            ],
+            search_hit               [
+                [0]  PepXML::SearchHit,
+                [1]  PepXML::SearchHit,
+                [2]  PepXML::SearchHit,
+                [3]  PepXML::SearchHit,
+                [4]  PepXML::SearchHit,
+                [5]  PepXML::SearchHit,
+                ...
+            ],
+            search_summary           PepXML::SearchSummary
+        }
+
+
+=head2 Public Methods
+
+
+=head3 get_msms_pipeline_analysis
+
+Return type: hash.
+    
+    my %msms = $pepxml->get_msms_pipeline_analysis();
+
+Data access:
+
+    {
+    date                   "2015-04-09T18:54:11",
+    summary_xml            "/Adult_Adrenalgland_Gel_Elite_49_f01.pep.xml",
+    xmlns                  "http://regis-web.systemsbiology.net/pepXML",
+    xmlns_schemaLocation   "http://sashimi.sourceforge.net/schema_revision/pepXML/pepXML_v117.xsd",
+    xmlns_xsi              "http://www.w3.org/2001/XMLSchema-instance"
+    }
+    
+    
+=head3 get_enzymes
+
+Return tupe: array of PepXML::Enzyme objects.
+
+    my @enzymes = $pepxml->get_enzymes();
+
+Data access:
+    
+    [0] PepXML::Enzyme  {
+        Parents       Moose::Object
+        public methods (5) : cut, meta, name, no_cut, sense
+        private methods (0)
+        internals: {
+            cut      "KR",
+            name     "Trypsin",
+            no_cut   "P",
+            sense    "C"
+        }
+    }
+
+
+=head3 get_run_summary()
+
+Return type: PepXML::RunSummary Object.
+    
+    my $summary = $pepxml->get_run_summary();
+    
+Data access:
+
+    PepXML::RunSummary  {
+        Parents       Moose::Object
+        public methods (6) : base_name, meta, msManufacturer, msModel, raw_data, raw_data_type
+        private methods (0)
+        internals: {
+            base_name        "Sample",
+            msManufacturer   "Thermo Scientific",
+            msModel          "LTQ Orbitrap Elite",
+            raw_data         ".mzXML",
+            raw_data_type    "raw"
+        }
+    }
+    
+    
+=head3 get_search_summary()
+
+Return Type: PepXML::SearchSummary Object.
+
+PepXML::SearchSummary is a complex object, some internal methods are accessors to other objects, like the aminoacid_modification
+for example. 
+
+    my $search_summary = $pepxml->get_search_summary();
+
+Data access:
+     
+    PepXML::SearchSummary  {
+        Parents       Moose::Object
+        public methods (11) : aminoacid_modification, base_name, enzymatic_search_constraint, fragment_mass_type, meta, parameter, precursor_mass_type, search_database, search_engine, search_engine_version, search_id
+        private methods (0)
+        internals: {
+            aminoacid_modification        [
+                [0] PepXML::AAModification,
+                [1] PepXML::AAModification
+            ],
+            base_name                     "/Adult_Adrenalgland_Gel_Elite_49_f01",
+            enzymatic_search_constraint   PepXML::EnzSearchConstraint,
+            fragment_mass_type            "monoisotopic",
+            parameter                     [
+                [0]  PepXML::Parameter,
+                [1]  PepXML::Parameter,
+                [2]  PepXML::Parameter,
+                [3]  PepXML::Parameter,
+                [4]  PepXML::Parameter,
+                [5]  PepXML::Parameter,
+                ...
+            ],
+            precursor_mass_type           "monoisotopic",
+            search_database               PepXML::SearchDatabase,
+            search_engine                 "Comet",
+            search_engine_version         "2015.01 rev. 1",
+            search_id                     1
+        }
+    }
+       
+        
+=head3 get_modifications()
+
+Return Type: array of PepXML::AAModification objects.
+
+    my @mods = $pepxml->get_modifications();
+
+Data access:
+
+    [0] PepXML::AAModification  {
+        Parents       Moose::Object
+        public methods (6) : aminoacid, mass, massdiff, meta, symbol, variable
+        private methods (0)
+        internals: {
+            aminoacid   "M",
+            mass        147.035385,
+            massdiff    15.994900,
+            symbol      "*",
+            variable    "Y"
+        }
+    },
+    [1] PepXML::AAModification  {
+        Parents       Moose::Object
+        public methods (6) : aminoacid, mass, massdiff, meta, symbol, variable
+        private methods (0)
+        internals: {
+            aminoacid   "C",
+            mass        160.030649,
+            massdiff    57.021464,
+            symbol      "",
+            variable    "N"
+        }
+    }
+
+
+=head3 get_parameters()
+
+Return Type: array of PepXML::Parameter objects.
+
+    my @params = $pepxml->get_parameters();
+    
+Data access:
+
+    [0] PepXML::Parameter  {
+        Parents       Moose::Object
+        public methods (3) : meta, name, value
+        private methods (0)
+        internals: {
+            name    "# comet_version ",
+            value   2015.01
+        }
+    },
+    [1] PepXML::Parameter  {
+        Parents       Moose::Object
+        public methods (3) : meta, name, value
+        private methods (0)
+        internals: {
+            name    "activation_method",
+            value   "ALL"
+        }
+    },
+    ...
+    
+    
+=head3 get_db_info()
+
+Return type: PepXML::SearchDatabase object.
+
+    my $db = $pepxml->get_db_info;
+
+Data access:
+
+    PepXML::SearchDatabase  {
+        Parents       Moose::Object
+        public methods (3) : local_path, meta, type
+        private methods (0)
+        internals: {
+            local_path   "Ens78plusREV_plusPeps.fa",
+            type         "AA"
+        }
+    }
+    
+    
+=head3 get_hits()
+
+Return type: array of PepXML::SearchHit objects.
+
+    my @hits = $pepxml->get_hits();
+
+Data access:
+
+    [0] PepXML::SearchHit  {
+        Parents       Moose::Object
+        public methods (22) : assumed_charge, calc_neutral_pep_mass, end_scan, hit_rank, index, massdiff, meta, num_matched_ions, num_matched_peptides, num_missed_cleavages, num_tol_term, num_tot_proteins, peptide, peptide_next_aa, peptide_prev_aa, precursor_neutral_mass, protein, retention_time_sec, search_score, spectrum, start_scan, tot_num_ions
+        private methods (0)
+        internals: {
+            assumed_charge           3,
+            calc_neutral_pep_mass    1118.485333,
+            end_scan                 517,
+            hit_rank                 5,
+            index                    9,
+            massdiff                 0.005685,
+            num_matched_ions         12,
+            num_matched_peptides     3916,
+            num_missed_cleavages     0,
+            num_tol_term             2,
+            num_tot_proteins         2,
+            peptide                  "DSGHPGHAEGR",
+            peptide_next_aa          "E",
+            peptide_prev_aa          "R",
+            precursor_neutral_mass   1118.491019,
+            protein                  "ENSP00000374387",
+            retention_time_sec       572.8,
+            search_score             {
+                deltacn       0.009,
+                deltacnstar   0.000,
+                expect        2.14E+01,
+                sprank        46,
+                spscore       172.1,
+                xcorr         0.961
+            },
+            spectrum                 "Adult_Adrenalgland_Gel_Elite_49_f01.00517.00517.3",
+            start_scan               517,
+            tot_num_ions             40
+        }
+    }
+
+
+=head3 get_proteins()
+
+Return type: array
+
+    my @proteins = $pepxml->get_proteins();
+
+
+=head3 get_unique_proteins()
+
+Return type: array
+
+    my @proteins = $pepxml->get_unique_proteins();
+
+
+=head3 get_peptides()
+
+Return type: array
+
+    my @peptides = $pepxml->get_peptides();
+
+
+=head3 get_unique_peptides()
+
+Return type: array
+
+    my @peptides = $pepxml->get_unique_peptides();
+
+
+=head1 AUTHOR
+
+Felipe da Veiga Leprevost, C<< <leprevost at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-pepxml-parser at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PepXML-Parser>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc PepXML::Parser
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=PepXML-Parser>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/PepXML-Parser>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/PepXML-Parser>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/PepXML-Parser/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2015 Felipe da Veiga Leprevost.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+
+

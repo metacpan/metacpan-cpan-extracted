@@ -1,0 +1,187 @@
+
+=head1 NAME
+
+Perl::ToPerl6::TransformerSummary - Descriptions of the Transformer modules included with L<Perl::ToPerl6|Perl::ToPerl6> itself.
+
+
+=head1 DESCRIPTION
+
+The following Transformer modules are distributed with Perl::ToPerl6. (There are
+additional Transformers that can be found in add-on distributions.) Each
+Transformer is listed here with its default necessity.  If you don't agree with
+the default necessity, you can change it in your F<.perlmogrifyrc> file (try
+C<perlmogrify --profile-proto> for a starting version).  See the documentation
+of each module for its specific details.
+
+
+=head1 POLICIES
+
+=head2 L<BasicTypes::Rationals::AddTrailingZero|Perl::ToPerl6::Transformer::BasicTypes::Rationals::AddTrailingZero>
+
+Add trailing zero where needed [Default necessity 5]
+
+=head2 L<RewriteSpecialLiterals|Perl::ToPerl6::Transformer::RewriteSpecialLiterals>
+
+Format __END__, __LINE__ &c [Default necessity 5]
+
+=head2 L<Builtins::AddWhitespace|Perl::ToPerl6::Transformer::Builtins::AddWhitespace>
+
+Format my(), our(), print() [Default necessity 5]
+
+=head2 L<Instances::RewriteCreation|Perl::ToPerl6::Transformer::Instances::RewriteCreation>
+
+Indirect object notation no longer allowed. [Default necessity 5]
+
+=head2 L<CompoundStatements::RewriteMapGreps|Perl::ToPerl6::Transformer::CompoundStatements::RewriteMapGreps>
+
+Format map{}, grep{} [Default necessity 5]
+
+=head2 L<CompoundStatements::RewriteLoops|Perl::ToPerl6::Transformer::CompoundStatements::RewriteLoops>
+
+Format for(;;) loops [Default necessity 5]
+
+=head2 L<Arrays::AddWhitespace|Perl::ToPerl6::Transformer::Arrays::AddWhitespace>
+
+Format qw() to qw () [Default necessity 5]
+
+=head2 L<BasicTypes::Strings::RewriteHereDocs|Perl::ToPerl6::Transformer::BasicTypes::Strings::RewriteHereDocs>
+
+Format <<EOF constructs correctly [Default necessity 5]
+
+=head2 L<CompoundStatements::RenameForeach|Perl::ToPerl6::Transformer::CompoundStatements::RenameForeach>
+
+Rename 'foreach' to 'for' [Default necessity 5]
+
+=head2 L<Subroutines::RemovePrototypes|Perl::ToPerl6::Transformer::Subroutines::RemovePrototypes>
+
+Remove ($)-style prototypes on subroutines. [Default necessity 5]
+
+=head2 L<Variables::RewriteSigils|Perl::ToPerl6::Transformer::Variables::RewriteSigils>
+
+Give variables their proper sigils. [Default necessity 5]
+
+=head2 L<Packages::RewriteDeclarations|Perl::ToPerl6::Transformer::Packages::RewriteDeclarations>
+
+Format 'package Foo;' declarations [Default necessity 5]
+
+=head2 L<Builtins::Rename|Perl::ToPerl6::Transformer::Builtins::Rename>
+
+Format my(), our(), print() [Default necessity 5]
+
+=head2 L<BasicTypes::Strings::AddWhitespace|Perl::ToPerl6::Transformer::BasicTypes::Strings::AddWhitespace>
+
+Add whitespace between q/qq and () [Default necessity 5]
+
+=head2 L<Regexes::StandardizeDelimiters|Perl::ToPerl6::Transformer::Regexes::StandardizeDelimiters>
+
+Regexen can no longer have alphanumeric delimiters [Default necessity 5]
+
+=head2 L<Variables::QuoteHashKeys|Perl::ToPerl6::Transformer::Variables::QuoteHashKeys>
+
+Transform bareword hash keys into quoted hash keys [Default necessity 5]
+
+=head2 L<Pragmas::RewriteConstants|Perl::ToPerl6::Transformer::Pragmas::RewriteConstants>
+
+Transform Readonly and constant [Default necessity 5]
+
+=head2 L<BasicTypes::Strings::Interpolation|Perl::ToPerl6::Transformer::BasicTypes::Strings::Interpolation>
+
+Format C<${x}> correctly [Default necessity 5]
+
+=head2 L<Variables::ReplaceNegativeIndex|Perl::ToPerl6::Transformer::Variables::ReplaceNegativeIndex>
+
+Perl6 now uses [*-1] notation to represent negative indices. [Default necessity 5]
+
+=head2 L<Regexes::SwapModifiers|Perl::ToPerl6::Transformer::Regexes::SwapModifiers>
+
+ [Default necessity 5]
+
+=head2 L<PostfixExpressions::AddWhitespace|Perl::ToPerl6::Transformer::PostfixExpressions::AddWhitespace>
+
+Add whitespace between conditionals 'if', 'unless' &c and () [Default necessity 5]
+
+=head2 L<Pragmas::RewritePragmas|Perl::ToPerl6::Transformer::Pragmas::RewritePragmas>
+
+Remove unnecessary pragmas [Default necessity 5]
+
+=head2 L<CompoundStatements::AddWhitespace|Perl::ToPerl6::Transformer::CompoundStatements::AddWhitespace>
+
+Add whitespace between conditionals 'if', 'unless' &c and '(...)' [Default necessity 5]
+
+=head2 L<Packages::RewriteUsages|Perl::ToPerl6::Transformer::Packages::RewriteUsages>
+
+Format 'use Foo;' to 'use Foo:from<Perl5>;' [Default necessity 5]
+
+=head2 L<Variables::RewriteSpecialVariables|Perl::ToPerl6::Transformer::Variables::RewriteSpecialVariables>
+
+Format special variables such as @ARGV [Default necessity 5]
+
+=head2 L<BasicTypes::Strings::RenameShell|Perl::ToPerl6::Transformer::BasicTypes::Strings::RenameShell>
+
+Rename qx() to qqx() [Default necessity 5]
+
+=head2 L<Variables::RewriteMatchVariables|Perl::ToPerl6::Transformer::Variables::RewriteMatchVariables>
+
+Renumber match variables [Default necessity 5]
+
+=head2 L<BasicTypes::Integers::RewriteHexNumbers|Perl::ToPerl6::Transformer::BasicTypes::Integers::RewriteHexNumbers>
+
+Format 0x1234 properly [Default necessity 5]
+
+=head2 L<Operators::FormatOperators|Perl::ToPerl6::Transformer::Operators::FormatOperators>
+
+Transform '->', '!" &c to their Perl6 equivalents [Default necessity 5]
+
+=head2 L<BasicTypes::Strings::RenameRegex|Perl::ToPerl6::Transformer::BasicTypes::Strings::RenameRegex>
+
+Format regexps correctly [Default necessity 5]
+
+=head2 L<BasicTypes::Integers::RewriteBinaryNumbers|Perl::ToPerl6::Transformer::BasicTypes::Integers::RewriteBinaryNumbers>
+
+Format 0b0101 properly [Default necessity 5]
+
+=head2 L<BasicTypes::Integers::RewriteOctalNumbers|Perl::ToPerl6::Transformer::BasicTypes::Integers::RewriteOctalNumbers>
+
+Format 0o0123 properly [Default necessity 5]
+
+=head2 L<CompoundStatements::SwapForArguments|Perl::ToPerl6::Transformer::CompoundStatements::SwapForArguments>
+
+Swap C<for my $x ( @x ) { }> --> C<<for ( @x ) -> $x { }>> [Default necessity 5]
+
+=head2 L<Builtins::RewritePrint|Perl::ToPerl6::Transformer::Builtins::RewritePrint>
+
+Format 'print $fh "expr"' [Default necessity 5]
+
+=head2 L<Variables::ReplaceUndef|Perl::ToPerl6::Transformer::Variables::ReplaceUndef>
+
+Give variables their proper sigils. [Default necessity 5]
+
+=head2 L<References::RewriteDereferences|Perl::ToPerl6::Transformer::References::RewriteDereferences>
+
+Transform %{$foo} to %($foo) [Default necessity 5]
+
+
+=head1 VERSION
+
+This is part of L<Perl::ToPerl6|Perl::ToPerl6> version 0.040
+
+
+=head1 AUTHOR
+
+Jeffrey Goff <drforr@pobox.com>
+
+
+=head1 AUTHOR EMERITUS
+
+Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>
+
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015 Jeffrey Goff, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.  The full text of this license
+can be found in the LICENSE file included with this module.
+
+=cut

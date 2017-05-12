@@ -1,0 +1,84 @@
+NAME
+    Plack::Middleware::Log::Contextual - integrate Log::Contextual with
+    Plack/PSGI logger middleware
+
+SYNOPSIS
+      # in your PSGI web application
+      use Log::Contextual qw(:log);
+
+      log_info  { "Information" };
+      log_fatal { "ZOMG this shouldn't happen: " . $self->dump_stuff };
+
+      # standalone mode
+      use Plack::Builder;
+      use Log::Dispatchouli;
+
+      my $ld = Log::Dispatchouli->new(...);
+
+      builder {
+          enable "Log::Contextual", logger => $ld;
+          $app;
+      };
+
+      # PSGI logger mode
+      use Plack::Builder;
+
+      builder {
+          enable "ConsoleLogger"; # should come before Log::Contextual
+          enable "Log::Contextual";
+          $app;
+      };
+
+DESCRIPTION
+    Plack::Middleware::Log::Contextual is a PSGI middleware component that
+    integrates Log::Contextual with your application. It works as a
+    standalone and could also be used in combination with PSGI logger
+    framework.
+
+CONFIGURATION
+  Standalone mode
+    You can use Log::Contextual as a standalone, meaning you can configure
+    the logger object by yourself in the PSGI setup, and all the logging
+    calls get propagated to the logger object you configured.
+
+      use Plack::Builder;
+      use Log::Log4perl qw(:easy);
+      Log::Log4perl->easy_init(...);
+
+      my $logger = Log::Log4perl->get_logger;
+
+      builder {
+          enable "Log::Contextual", logger => $logger;
+          $psgi_app;
+      };
+
+  PSGI logger mode
+    This middleware also works with the middleware components that support
+    "psgix.logger" extention, such as Plack::Middleware::SimpleLogger,
+    Plack::Middleware::LogDispatch or Plack::Middleware::ConsoleLogger.
+
+      use Plack::Builder;
+
+      builder {
+          enable "ConsoleLogger";
+          enable "Log::Contextual", level => "debug";
+          $psgi_app;
+      };
+
+    Note that the PSGI logger should be applied before this middleware.
+
+    Unlike the standalone mode where you configure the minimum (and maximum)
+    level in the logger, you should configure the minimum "level" in the
+    middleware configuration like seen above. It defaults to "debug".
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+COPYRIGHT
+    Copyright 2011- Tatsuhiko Miyagawa
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

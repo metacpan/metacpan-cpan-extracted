@@ -1,0 +1,13 @@
+a = {
+	foo: "bar",
+	bar: [1,2,3],
+	baz: {x: 1, y: 2, z: 3}
+}
+
+b = {
+	top: "top",
+	left: "left",
+	right: "right",
+}
+
+c = ["a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q"]

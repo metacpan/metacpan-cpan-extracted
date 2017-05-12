@@ -1,0 +1,125 @@
+
+Redirect print and warn automatically and have it ready in get_redirected_test_output()
+
+Add =begin common_but_not_in_pod
+
+
+inline tests in common section
+
+	my $cc_value = $config->Get(NAME => 'CC')
+	is($cc_value, 'CC', 'Get returns right value') ; ## test
+
+or
+
+	my $cc_value = $config->Get(NAME => 'CC')
+	
+	## test
+	is($cc_value, 'CC', 'Get returns right value') ;
+	is($cc_value, 'CC', 'Get returns right value') ;
+	## end test
+
+
+=begin POD::Tested
+
+	# defaults to common
+	$config->Set(NAME => 'CC', VALUE => 'gcc') ;
+	$config->Set(NAME => 'LD', VALUE => 'ld') ;
+	
+	my $cc_value = $config->Get(NAME => 'CC')
+	## test
+	is($cc_value, 'CC', 'Get returns right value') ; 
+	## common
+	
+	more stuff
+
+=end POD::Tested
+
+
+or 
+
+=begin POD::Tested
+
+=head2 XYZ
+
+This will create a container with blah blah ...
+
+=head3	Setting and getting configuration variables
+
+	#common
+	
+	$config->Set(NAME => 'CC', VALUE => 'gcc') ;
+	$config->Set(NAME => 'LD', VALUE => 'ld') ;
+	
+	print "Value for 'CC' is '" . $config->Get(NAME => 'CC') . "'.\n\n" ;
+
+	##test
+
+	my $cc_value = $config->Get(NAME => 'CC') ;
+	is($cc_value, 'gcc', 'Get returns right value') ;
+	
+	##POD "Would display:\n\tValue for 'CC' is '$cc_value'.\n\n" ; # note the \t in the string so the pod is presented properly
+	
+=end POD::Tested
+
+
+alternate tags
+
+=head3 Set the same variable multiple time with different values
+
+
+This will create a container with default values. You can modify the container behaviour by passing options
+to the constructor. We will see advanced initalization later.
+
+=head3	Setting and getting configuration variables
+
+=begin common
+
+	$config->Set(NAME => 'CC', VALUE => 'gcc') ;
+	$config->Set(NAME => 'LD', VALUE => 'ld') ;
+	
+	print "Value for 'CC' is '" . $config->Get(NAME => 'CC') . "'.\n\n" ;
+
+=end common
+
+Would display:
+
+=begin hidden
+
+	my $cc_value = $config->Get(NAME => 'CC') ;
+	is($cc_value, 'gcc', 'Get returns right value') ;
+	generate_pod("\tValue for 'CC' is '$cc_value'.\n\n") ; # note the \t in the string so the pod is presented properly
+
+=end hidden
+
+=for POD "\tValue for 'CC' is '$cc_value'.\n\n") ; # note the \t in the string so the pod is presented properly
+
+=head3 Set the same variable multiple time with different values
+
+or
+
+=begin not_common
+
+some code that is not to be seen
+
+=end not_common
+
+=begin common
+
+stuff to be see
+
+=end common
+
+=begin not_common
+
+more stuff to not be seen but run with the common part
+
+=end not_common
+
+
+=begin test
+
+run test
+
+generate_pod
+
+=end test

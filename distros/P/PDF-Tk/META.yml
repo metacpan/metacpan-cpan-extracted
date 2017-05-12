@@ -1,0 +1,16 @@
+---
+name: PDF-Tk
+version: 0.02
+author:
+  - 'Marcus Ramberg, E<lt>marcus@mediaflex.noE<gt>'
+abstract: Perl integration for the pdf toolkit (pdftk)
+license: perl
+requires:
+  File::Temp: 0
+  IO::All: 0
+  IPC::Open2: 0
+provides:
+  PDF::Tk:
+    file: lib/PDF/Tk.pm
+    version: 0.02
+generated_by: Module::Build version 0.2607

@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Plack/Middleware/NoMultipleSlashes.pm
+t/00-compile.t
+t/multislash.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

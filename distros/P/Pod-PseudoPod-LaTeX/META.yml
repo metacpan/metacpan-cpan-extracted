@@ -1,0 +1,31 @@
+---
+abstract: 'convert Pod::PseudoPod documents into LaTeX'
+author:
+  - chromatic
+build_requires:
+  IO::String: '0'
+  Test::More: '0.60'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-PseudoPod-LaTeX
+requires:
+  File::Basename: '0'
+  File::Path: '0'
+  File::Spec::Functions: '0'
+  Getopt::Long: '0'
+  Pod::PseudoPod: '0.16'
+  Pod::Usage: '0'
+  base: '0'
+  perl: '5.008006'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: http://github.com/chromatic/Pod-PseudoPod-LaTeX
+  repository: http://github.com/chromatic/Pod-PseudoPod-LaTeX.git
+version: '1.20160626'

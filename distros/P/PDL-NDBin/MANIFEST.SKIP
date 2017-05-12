@@ -1,0 +1,11 @@
+\.bak$
+\bActions_PP\b
+\bMYMETA\b
+\bMakefile(\.old)?$
+\bUtils_PP\b
+\bnosync\b
+\bpm_to_blib\b
+\bresults\b
+^_private
+^cover_db$
+^nytprof

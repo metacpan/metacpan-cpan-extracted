@@ -1,0 +1,81 @@
+<html>
+  <head>
+    <title>Extester</title>
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script type="text/javascript">
+      function my_submit (form, action) {
+         $.ajax({
+            type: form.attr('method'),
+            url: form.attr('action'),
+            data: form.serialize()+'&action='+action,
+            success: function (data) {
+               $( "#result" ).empty().append( data );
+            }
+         });
+         return false;
+      }
+    </script>
+
+  </head>
+
+<body>
+<h1>Extester</h1>
+
+<form method="post" action="/cgi-bin/extester/monitor.pl" id="mainForm" name="mainForm">
+
+  <table border="0">
+    <tr valign="top">
+      <td colspan="2"><input type="submit" id="start"/></td>
+    </tr>
+    <tr valign="top">
+      <td>Sleep for </td><td><input type="text" name="sleep"/> seconds</td>
+    </tr>
+    <tr valign="top">
+      <td>Write to STDOUT this text </td><td><input type="text" name="stdout"/></td>
+    </tr>
+    <tr valign="top">
+      <td>Write to STDERR this text </td><td><input type="text" name="stderr"/></td>
+    </tr>
+    <tr valign="top">
+      <td>Create a file named </td>
+      <td><input type="text" name="file1"/> with this number <input type="text" name="count1"/> of lines</td>
+    </tr>
+    <tr valign="top">
+      <td>Create another file </td>
+      <td><input type="text" name="file2"/> with this number <input type="text" name="count2"/> of lines</td>
+    </tr>
+    <tr valign="top">
+      <td>Exit with this exit code </td><td><input type="text" name="exit"/> (an integer)</td>
+    </tr>
+  </table>
+
+</form>
+
+<hr/>
+
+<form method="post" action="/cgi-bin/extester/monitor.pl" id="statusForm" name="statusForm">
+  <input type="submit" id="status" value="Check status"/>
+  <input type="submit" id="kill"   value="Kill running process"/>
+  <input type="submit" id="clean"  value="Remove results"/>
+
+<div id="result"></div>
+
+</form>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+   $('#start').click (function() { return my_submit ($('#mainForm'),   'start');  });
+   $('#status').click (function(){ return my_submit ($('#statusForm'), 'status'); });
+   $('#kill').click (function()  { return my_submit ($('#statusForm'), 'kill');   });
+   $('#clean').click (function() { return my_submit ($('#statusForm'), 'clean');  });
+});
+</script>
+
+<hr>
+<div align=right><font size=-2>
+<address><A HREF="mailto:martin.senger&#64;gmail.com">Martin Senger</A><BR></address>
+<!-- hhmts start -->
+Last modified: Sun May 19 15:49:56 2013
+<!-- hhmts end -->
+</font></div>
+</body> </html>

@@ -1,0 +1,16 @@
+
+no_index: 
+  directory: 
+    - inc
+    - t
+generated_by: Module::Install version 0.54
+distribution_type: module
+version: 0.20
+name: Perldoc
+author: "Ingy d\xC3\xB6t Net <ingy@cpan.org>"
+license: perl
+requires: 
+  Test::Base: 0.47
+  perl: 5.6.1
+  Spiffy: 0.29
+abstract: Documentation Framework for Perl

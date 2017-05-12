@@ -1,0 +1,33 @@
+Revision history for Padre-Plugin-CSS
+
+0.08    2009.05.31
+    removed taint mode for tests, which lead to some fails (jquelin)
+
+0.07    2009.05.26
+    Added translations:
+		Chinese (Traditional) translation (BLUET)
+		Arabic (azawawi)
+		Spanish (brunov)
+    
+0.06    2009.05.18
+	added translations:
+	- French (jquelin)
+	- Polish (therek)
+    - Brazilian portuguese (garu)
+    - Chinese Simpified (fayland)
+
+0.05    2009.2.1
+        for Padre 0.26
+
+0.04    2009.1.5
+        for Padre 0.23
+
+0.03    2008.12.19
+        start Padre::Document::CSS
+
+0.02    2008.12.19
+        add CSS::Minifier::XS
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,272 @@
+##############################################################################
+#      $URL$
+#     $Date$
+#   $Author$
+# $Revision$
+##############################################################################
+
+## ----- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.0 ] -----
+## name Qualified function from package that *is not* explicitly included
+## failures 6
+## cut
+
+package main;
+
+Foo::foo;              #No parens
+Foo::foo();            #No args
+Foo::foo( 'quux' );    #With args
+
+&Foo::foo;             #With sigil, and no parens
+&Foo::foo();           #With sigil, and no args
+&Foo::foo( 'quux' );   #With sigil, and args
+
+## ----- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.1 ] -----
+## name Qualified function from package that *is* explicitly included (via use)
+## failures 0
+## cut
+
+package main;
+
+use Foo;
+use Bar ();   #Alternate form
+use Baz qw(); #Alternate form
+
+Bar::bar;              #No parens
+Foo::foo();            #No args
+Baz::baz( 'quux' );    #With args
+
+&Bar::bar;             #With sigil, and no parens
+&Foo::foo();           #With sigil, and no args
+&Baz::baz( 'quux' );   #With sigil, and args
+
+
+## ----- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.2 ] -----
+## name Qualified function from package that *is* explicitly included (via require)
+## failures 0
+## cut
+
+package main;
+
+require Foo;
+require Bar;
+require Baz;
+
+Bar::bar;              #No parens
+Foo::foo();            #No args
+Baz::baz( 'quux' );    #With args
+
+&Bar::bar;             #With sigil, and no parens
+&Foo::foo();           #With sigil, and no args
+&Baz::baz( 'quux' );   #With sigil, and args
+
+## ----- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.3 ] -----
+## name Stringy requires will create false-positives for functions
+## failures 6
+## cut
+
+package main;
+
+require 'lib/Foo.pm';
+require q{lib/Bar.pm};  #Alternate form
+require "lib/Baz.pm";   #Alternate form
+
+Bar::bar;               #No parens
+Foo::foo();             #No args
+Baz::baz( 'quux' );     #With args
+
+&Bar::bar;              #With sigil, and no parens
+&Foo::foo();            #With sigil, and no args
+&Baz::baz( 'quux' );    #With sigil, and args
+
+## ----- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.4 ] -----
+## name Class method call on package that *is* explicitly included (via require)
+## failures 0
+## cut
+
+require Foo;
+require Foo::Bar;
+require Foo::Bar::Baz;
+
+Foo->new;                        #No parens
+Foo::Bar->create();              #No args
+Foo::Bar::Baz->import( 'quux' ); #With args
+
+## ----- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.5 ] -----
+## name Class method call on package that *is* explicitly included (via use)
+## failures 0
+## cut
+
+use Foo;
+use Foo::Bar;
+use Foo::Bar::Baz;
+
+Foo->new;                        #No parens
+Foo::Bar->create();              #No args
+Foo::Bar::Baz->import( 'quux' ); #With args
+
+## ----- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.6 ] -----
+## name Class method call on package that *is not* explicitly included
+## failures 3
+## cut
+
+Foo->new;                        #No parens
+Foo::Bar->create();              #No args
+Foo::Bar::Baz->import( 'quux' ); #With args
+
+
+## ----- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.7 ] -----
+## name Qualified variable from package that *is not* explicitly included
+## failures 1
+## cut
+
+$Data::Dumper::Indent = 0;
+
+## ----- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.8 ] -----
+## name Qualified variable from package that *is* explicitly included (via use)
+## failures 0
+## cut
+
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+
+## ----- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.9 ] -----
+## name Qualified variable from package that *is* explicitly included (via require)
+## failures 0
+## cut
+
+require Data::Dumper;
+$Data::Dumper::Indent = 2;
+
+## ---- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.10 ] ----
+## name Stringy requires will create false-positives for variables
+## failures 1
+## cut
+
+require 'Data/Dumper.pm';
+$Data::Dumper::Indent = 3;
+
+## ---- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.11 ] ----
+## name Qualified name from package that is included in a BEGIN block.
+## failures 0
+## cut
+
+BEGIN {
+    require Foo;
+}
+
+print join (@Foo::BARS), qq{\n};
+
+## ---- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.12 ] ----
+## name Qualified name from package that is included in a CHECK block.
+## failures 0
+## cut
+
+CHECK {
+    require Foo;
+}
+
+print join (@Foo::BARS), qq{\n};
+
+## ---- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.13 ] ----
+## name Qualified name from package that is included in an INIT block.
+## failures 0
+## cut
+
+INIT {
+    require Foo;
+}
+
+print join (@Foo::BARS), qq{\n};
+
+## ---- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.14 ] ----
+## name Qualified name from package that is included in an END block.
+## failures 0
+## cut
+
+END {
+    require Foo;
+}
+
+print join (@Foo::BARS), qq{\n};
+
+## ---- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.15 ] ----
+## name Qualified name from package that is included in a lexical block.
+## failures 0
+## cut
+
+
+{
+    require Foo;
+    print join (@Foo::BARS), qq{\n};
+}
+
+## ---- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.16 ] ----
+## name Conditional inclusions.
+## failures 0
+## cut
+
+
+require Foo if $condition;
+print $Foo::VERSION;
+
+eval { require Bar };
+print $Bar::VERSION;
+
+if ( require Baz ) {
+    print $Baz::VERSION;
+}
+
+## ---- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.17 ] ----
+## name Chained method call on missing module
+## failures 4
+## cut
+
+Foo->bar;
+Foo->bar->baz();
+Foo->bar()->baz();
+Foo->bar( $arg1 )->baz( $arg2 );
+
+## ---- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.18 ] ----
+## name Chained method call on included module
+## failures 0
+## cut
+
+use Foo;
+
+Foo->bar;
+Foo->bar->baz();
+Foo->bar()->baz();
+Foo->bar( $arg1 )->baz( $arg2 );
+
+## ---- Perl::Critic::Policy::Modules::RequireExplicitInclusion [ 2.19 ] ----
+## name Method called on the return value of a builtin function;
+## failures 0
+## cut
+
+sub example {
+    my $something = shift->method();
+}
+
+## name Allow __PACKAGE__->foo(). RT #43314 and 44609
+## failures 0
+## cut
+
+__PACKAGE__->foo();
+
+## name Still prohibit __PACKAGE__ in sub and var. RT #43314 and 44609
+## failures 3
+## cut
+
+__PACKAGE__::foo();
+&__PACKAGE__::foo();
+$__PACKAGE__::bar;
+
+##############################################################################
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab :

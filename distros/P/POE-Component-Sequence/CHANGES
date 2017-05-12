@@ -1,0 +1,10 @@
+Revision history for POE::Component::Sequence
+
+v0.02  Mon, 17 Sep 2012 12:01:26 -0400
+
+  - Add synchronous action access with get_next_action()
+
+v0.01  Aug  3 17:31:27 2012
+
+  - Initial release
+

@@ -1,0 +1,34 @@
+0.27
+	Rename misnamed pacakge variable (harmless).
+
+0.26
+	Cleanup internal documentation.
+
+0.25
+	added callback support.
+	improved debug messaging.
+	fixed bug in delimiter assignment.
+	rearranged distribution files.
+	improved test script.
+
+0.24
+	added sample script and data.
+
+0.23
+	fix pseudo-bug relating to 'o' option and regular expressions and token
+matching.
+
+0.22
+	add push_delimiters method for adding to the delimiter array.
+
+0.21
+	add pre_parse and post_parse methods; add minimal debug message support.
+
+0.20
+	added multi-token support
+
+0.17
+	delimiters() now returns an array of references to the real and the escaped
+delimiters. This differs from previous behavior where an array reference
+was returned.
+

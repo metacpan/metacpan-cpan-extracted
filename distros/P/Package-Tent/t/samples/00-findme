@@ -1,0 +1,5 @@
+use Package::Tent sub {
+  package Bar;
+  use constant thing => 7;
+  1;
+};

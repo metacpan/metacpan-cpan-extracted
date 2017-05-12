@@ -1,0 +1,54 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Flavio S. Glock <fglock@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perlito5",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "lib/Perlito5X",
+         "lib/Perlito5",
+         "src"
+      ],
+      "package" : [
+         "name"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.014"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/fglock/Perlito.git",
+         "web" : "https://github.com/fglock/Perlito"
+      }
+   },
+   "version" : "9.021"
+}

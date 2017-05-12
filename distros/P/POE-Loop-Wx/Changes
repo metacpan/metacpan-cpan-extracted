@@ -1,0 +1,16 @@
+Revision history for POE::Loop::Wx
+
+0.04
+   ! fixed warning emitted by call to select
+     (Thanks to Anders Nor Berle)
+   + added some simple load and pod tests
+
+0.03
+	+ Add two more example scripts to the example dir
+
+0.02
+	! Cleaned up some POD
+   ! consolidated the eample code into single script
+
+0.01
+	+ Initial version based on work by Mattia Barbon

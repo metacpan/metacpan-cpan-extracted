@@ -1,0 +1,86 @@
+NAME
+    POE::Loop::Glib - A bridge that supports Glib's event loop from POE
+
+SYNOPSIS
+      die "Don't use this module directly. Please use POE instead.";
+
+ABSTRACT
+    A bridge that supports Glib's event loop from POE.
+
+DESCRIPTION
+    This class is an implementation of the abstract POE::Loop interface. It
+    follows POE::Loop's public interface exactly. Therefore, please see
+    POE::Loop for its documentation. Also, please look at Glib for more
+    details on using it.
+
+SEE ALSO
+    POE, POE::Loop, Glib, Glib::MainLoop
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+      perldoc POE::Loop::Glib
+
+  Websites
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/POE-Loop-Glib>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/POE-Loop-Glib>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/POE-Loop-Glib>
+
+    *   CPAN Forum
+
+        <http://cpanforum.com/dist/POE-Loop-Glib>
+
+    *   RT: CPAN's Request Tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Loop-Glib>
+
+    *   CPANTS Kwalitee
+
+        <http://cpants.perl.org/dist/overview/POE-Loop-Glib>
+
+    *   CPAN Testers Results
+
+        <http://cpantesters.org/distro/P/POE-Loop-Glib.html>
+
+    *   CPAN Testers Matrix
+
+        <http://matrix.cpantesters.org/?dist=POE-Loop-Glib>
+
+    *   Git Source Code Repository
+
+        This code is currently hosted on github.com under the account
+        "apocalypse". Please feel free to browse it and pull from it, or
+        whatever. If you want to contribute patches, please send me a diff
+        or prod me to pull from your repository :)
+
+        <http://github.com/apocalypse/perl-poe-loop-glib>
+
+  Bugs
+    Please report any bugs or feature requests to "bug-poe-loop-glib at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Loop-Glib>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+AUTHOR
+    Martijn van Beers <martijn@cpan.org>
+
+    Apocalypse <apocal@cpan.org> is co-maint and tries to fix bugs :)
+
+    This module is based on POE::Loop::Gtk which was written by Rocco Caputo
+    <rcaputo@cpan.org>, thanks!
+
+LICENSE
+    POE::Loop::Glib is released under the GPL version 2.0 or higher.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

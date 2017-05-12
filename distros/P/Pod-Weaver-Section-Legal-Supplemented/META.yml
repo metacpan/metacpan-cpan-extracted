@@ -1,0 +1,47 @@
+---
+abstract: 'Add text to the Legal section'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  PPI: '0'
+  Pod::Weaver: '4.011'
+  Software::License::Artistic_1_0: '0'
+  String::Cushion: '0'
+  Syntax::Feature::Qi: '0'
+  Test::Differences: '0'
+  Test::More: '0.96'
+  syntax: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, Dist::Iller version 0.0001, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Weaver-Section-Legal-Supplemented
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Pod::Weaver::Section::Legal::Supplemented:
+    file: lib/Pod/Weaver/Section/Legal/Supplemented.pm
+    version: '0.0100'
+requires:
+  Moose: '2.00'
+  Pod::Weaver::Role::AddTextToSection: '0'
+  Pod::Weaver::Section::Legal: '0'
+  Types::Standard: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Csson/p5-Pod-Weaver-Section-Legal-Supplemented/issues
+  homepage: https://metacpan.org/release/Pod-Weaver-Section-Legal-Supplemented
+  repository: https://github.com/Csson/p5-Pod-Weaver-Section-Legal-Supplemented.git
+version: '0.0100'

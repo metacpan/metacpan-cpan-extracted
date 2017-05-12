@@ -1,0 +1,108 @@
+#!/usr/bin/perl
+
+# Demo script using PDL::IO::HDF5 and Tk to show an HDF5 file structure
+#
+
+
+
+ use Tk;
+ use PDL::IO::HDF5::tkview;
+ use PDL::IO::HDF5;
+ use Tk::Balloon;
+
+
+ my $maxElements = 50;  # Largest Array  (in number of elements) that we 
+ 			# will try to show in a popup balloon
+
+ my $filename = shift @ARGV || 'varlen.hdf5';
+
+ my $mw = MainWindow->new;
+
+
+ my $b = $mw->Balloon;
+ 
+ my $h5 = new PDL::IO::HDF5($filename);  # open HDF5 file object
+
+ my $tkview = new PDL::IO::HDF5::tkview( $mw, $h5);
+ 
+
+my $tree = $tkview->{hl};
+my $lastItem = '';
+my $mouseItem;
+my ($pointerX,$pointerY);
+my @BBox = (0,0,0,0);
+$b->attach($tree,
+             -balloonposition => 'mouse',
+             -postcommand => sub {
+
+		 #print "Box for $item is ".join(", ",@BBox)."\n";
+		 #print "Box for $mouseItem is ".join(", ",@BBox)."\n";
+		 #print "y = $pointerY\n";
+		 if( ($pointerY >= $BBox[1] ) && ($pointerY <= $BBox[3]) &&   # Popup balloon if withing bounding box
+			$mouseItem =~ /$;_Dset(.+)$/ ){   			  # and a dataset item
+			 my $datasetName = $1;
+			 my $text = $tree->entrycget($mouseItem,'-text');
+			 my $elements = 1;
+			 if(  $text =~ /\: Dims (.+)$/ ){
+ 				 my @dims = split(',',$1);
+				 my $message;
+				 foreach (@dims){
+					 $elements *= $_;
+				 }
+			}
+			if( $elements > $maxElements){
+				$message = "$elements Elements: Too Big To Display";
+			}
+			else{
+				my $group = $tree->entrycget($mouseItem,'-data');
+				my $PDL = $group->dataset($datasetName)->get;
+				$message = "$PDL";
+			}
+			$b->{"clients"}{$tree}{-balloonmsg} = $message;
+			return 1;
+		}
+		
+		 0;
+             },
+             -motioncommand => sub {
+                # my $e = $tree->XEvent;
+        	# print "xevent is a ".ref($e)."\n";
+
+                 ($pointerX,$pointerY) = $tree->pointerxy;
+		 $pointerX -= $tree->rootx;
+		 $pointerY -= $tree->rooty;
+                 $mouseItem = $tree->nearest($pointerY);
+		 # print "MouseItem = '$mouseItem'\n";
+		 my $infoBBox = $tree->infoBbox($mouseItem);
+		 # print "infoBBox = '$infoBBox'\n";
+		 return 1 unless defined($infoBBox);
+		
+		 if( ref($infoBBox)){ # Handle the different ways that
+		 		      # tk does the bounding box for 800.015 and 800.018, etc
+		 	@BBox =  @$infoBBox;
+		 }
+		 else{
+			@BBox = split(' ', $infoBBox);
+		 }
+		 # print "Bbox = ".join(", ",@BBox)."\n";
+		 # print "lastItem = '$lastItem', mouseItem = '$mouseItem'\n";
+		 if( ( $lastItem eq $mouseItem ) && 
+			 ($pointerY >= $BBox[1] ) && ($pointerY <= $BBox[3]) ){
+			 # Same item, and withing it's bounding box don't cancel the Balloon
+			 0;
+		 }
+		 else{
+			 # New item - cancel it so a new balloon will
+			 # be posted
+			 $lastItem = $mouseItem;
+			 1;
+
+		 }
+
+             }
+
+	     );
+
+
+ MainLoop;
+

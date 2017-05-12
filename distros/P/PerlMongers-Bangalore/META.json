@@ -1,0 +1,87 @@
+{
+   "abstract" : "We are the Bangalore Perl Mongers",
+   "author" : [
+      "Shantanu Bhadoria <shantanu at cpan dott org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.132510",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PerlMongers-Bangalore",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus",
+         "inc"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "perl" : "5.010000",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "List::Util" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "PerlMongers::Bangalore" : {
+         "file" : "lib/PerlMongers/Bangalore.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shantanubhadoria/perlmongers-bangalore/issues"
+      },
+      "homepage" : "https://metacpan.org/release/PerlMongers-Bangalore",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/shantanubhadoria/perlmongers-bangalore.git",
+         "web" : "https://github.com/shantanubhadoria/perlmongers-bangalore"
+      }
+   },
+   "version" : "0.07",
+   "x_contributors" : [
+      "Shantanu <shantanu@cpan.org>",
+      "Shantanu Bhadoria <shantanu.bhadoria@gmail.com>",
+      "Shantanu Bhadoria <shantanu@cpan.org>"
+   ]
+}
+

@@ -1,0 +1,26 @@
+POE-Filter-Log-Procmail version 0.03
+====================================
+
+This module turns procmail log records into hashrefs.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  POE (for POE::Filter::Line)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Paul Visscher
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,57 @@
+=encoding utf8
+
+Puede leer este archivo en cualquier editor de texto (verá algunos caracteres
+extraños, pero puede ignorarlos). Está escrito en formato POD (vea
+pod/perlpod.pod), un formato diseñado específicamente para ser legible tal
+cual.
+
+=head1 NAME
+
+perlfreebsd - Perl versión 5 en sistemas FreeBSD
+
+=head1 DESCRIPCIÓN
+
+En este documento se describen varias características de FreeBSD que afectan a
+la compilación y ejecución de Perl versión 5 (en lo sucesivo, Perl).
+
+=head2 FreeBSD vuelca la memoria de trabajo desde readdir_r con ithreads
+
+Si Perl está configurado para usar ithreads, las llamadas a biblioteca
+reentrantes tendrán preferencia sobre las versiones no reentrantes. En las
+versiones 4.5 y anteriores de FreeBSD existe un error en la función 
+C<readdir_r> que provocará un SEGV si se leen directorios grandes. Está
+disponible un parche de FreeBSD libc (vea
+http://www.freebsd.org/cgi/query-pr.cgi?pr=misc/30631) que se ha integrado en
+FreeBSD 4.6.
+
+=head2 En FreeBSD, $^X no siempre contiene una ruta de acceso completa
+
+Siempre que es posible, perl establece como valor de C<$^X> una ruta completa;
+para ello, consulta al sistema operativo. En FreeBSD, la ruta completa del
+intérprete perl se obtiene mediante C<sysctl> con C<KERN_PROC_PATHNAME>, si se
+admite; de lo contrario, se puede leer el vínculo simbólico
+F</proc/curproc/file>. En FreeBSD 7 y versiones anteriores había un error que
+hacía que, a veces, cualquiera de las dos formas mencionadas de obtener la
+ruta devolviera un valor incorrecto (vea
+http://www.freebsd.org/cgi/query-pr.cgi?pr=35703 ). En estos casos, perl vuelve
+al comportamiento anterior (utilizar el valor argv[0] de C como valor de
+C<$^X>).
+
+=head1 AUTOR
+
+Nicholas Clark <nick@ccl4.org>, con aportaciones de Slaven Rezic y Tim Bunce.
+
+Para notificar errores, actualizaciones o sugerencias, utilice la dirección
+F<perlbug@perl.org>.
+
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

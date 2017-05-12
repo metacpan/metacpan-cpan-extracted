@@ -1,0 +1,41 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/PerlIO-via-ToFirePHP/",
+      "repository" : "http://github.com/hanekomu/PerlIO-via-ToFirePHP",
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=PerlIO-via-ToFirePHP"
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "1.100860",
+   "name" : "PerlIO-via-ToFirePHP",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "provides" : {
+      "PerlIO::via::ToFirePHP" : {
+         "version" : "1.100860",
+         "file" : "lib/PerlIO/via/ToFirePHP.pm"
+      }
+   },
+   "requires" : {
+      "Scalar::Util" : "0",
+      "English" : "0",
+      "Carp" : "0",
+      "perl" : "5.008",
+      "Test::More" : "0.88",
+      "FirePHP::Dispatcher" : "0",
+      "HTTP::Headers" : "0",
+      "File::Find" : "0",
+      "File::Temp" : "0"
+   },
+   "abstract" : "log to FirePHP via an PerlIO layer",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

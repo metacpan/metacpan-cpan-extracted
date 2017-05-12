@@ -1,0 +1,8 @@
+#! /usr/bin/env perl
+
+BEGIN {
+    use FindBin qw($Bin);
+    require "$Bin/../lib/Config/Pinwheel.pm";
+}
+
+require Pinwheel::Commands::Routes;

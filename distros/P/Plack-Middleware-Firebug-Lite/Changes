@@ -1,0 +1,15 @@
+0.2.3   April 10, 2011
+        - Fix regex bug.
+
+0.2.2   April 10, 2011
+        - Fix namespace::clean issue.
+
+0.2.1   April 10, 2011
+        - Fix namespace::autoclean issue.
+
+0.2.0   April 10, 2011
+        - Fix regexp bug.
+        - Encode url to keep validation.
+
+0.1.0   April 10, 2011
+        - First release.

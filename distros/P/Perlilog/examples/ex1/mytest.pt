@@ -1,0 +1,23 @@
+port testport vars clk:clk, rst:rst, d:d, q:q;
+
+module mytest_template(clk, rst, d, q);
+   input   q;
+   output  clk, rst, d;
+   reg 	   clk, rst;  
+ 
+
+   always #5 clk = ~clk;
+
+   assign d = ~q;
+   
+   initial
+      begin
+	 clk = 0; rst = 0;
+
+	 #1; rst = 1;
+	 #1; rst = 0;
+
+	 repeat (100) @(posedge clk);
+	 $stop;
+      end
+endmodule

@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:                Proc-Exists
+version:             1.01
+abstract:            quickly and portably check for process existence
+license:             perl
+resources:
+  license: http://dev.perl.org/licenses/
+generated_by:        manually
+distribution_type:   module
+requires:
+  perl:                5
+  Exporter:            0
+recommends:
+  XSLoader:            0
+build_requires:
+  Config:              0
+  ExtUtils::MakeMaker: 0
+  Getopt::Long:        0
+  POSIX:               0
+  Test::More:          0
+meta-spec:
+  url:     http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+author:
+  - Brian Szymanski <ski-cpan@allafrica.com>

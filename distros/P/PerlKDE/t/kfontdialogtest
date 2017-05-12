@@ -1,0 +1,14 @@
+#!/usr/bin/perl -w
+use KDE;
+import KDE::app;
+
+$aConfig = new KDE::Config;
+$aConfig->setGroup("KFontDialog-test");
+Qt::Application::setFont(new Qt::Font("Helvetica", 12));
+
+$font = $aConfig->readFontEntry("Chosen");
+$nRet = KDE::FontDialog::getFont($font);
+$aConfig->writeEntry("Chosen", $font, 1);
+
+$aConfig->sync();
+exit $nRet;

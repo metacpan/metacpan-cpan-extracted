@@ -1,0 +1,10 @@
+%incremental lexer 'Try aaabbb: ' 
+
+%%
+
+S:
+      /* empty */
+    | 'a' S 'b' 
+;
+
+%%

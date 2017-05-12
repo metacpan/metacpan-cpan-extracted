@@ -1,0 +1,1252 @@
+=head1 NOME
+
+perlembed - come integrare perl nei vostri programmi C
+
+=head1 DESCRIZIONE
+
+=head2 PREAMBOLO
+
+Volete:
+
+=over 5
+
+=item B<Usare C da Perl?>
+
+Leggete L<perlxstut>, L<perlxs>, L<h2xs>, L<perlguts> e L<perlapi>.
+
+=item B<Usare un programma Unix da Perl?>
+
+Leggete L<perlop> sugli operatori di esecuzione (backtick e qx),
+L<perlfunc/system> e L<perlfunc/exec>.
+
+=item B<Usare Perl da Perl?>
+
+Leggete L<perlfunc/do>, L<perlfunc/eval>, L<perlfunc/require> e
+L<perlfunc/use>.
+
+=item B<Usare C da C?>
+
+Ripensate bene il vostro progetto.
+
+=item B<Usare Perl da C?>
+
+Andate avanti...
+
+=back
+
+=head2 SOMMARIO
+
+=over 5
+
+=item *
+
+Compilazione del programma C
+
+=item *
+
+Aggiunta di un interprete Perl al vostro programma C
+
+=item *
+
+Chiamare una subroutine Perl dal vostro programma C
+
+=item *
+
+Valutare un'istruzione Perl dal vostro programma C
+
+=item *
+
+Effettuare pattern-match e sostituzioni Perl dal vostro programma C
+
+=item *
+
+Manipolare lo stack Perl dal vostro programma C
+
+=item *
+
+Mantenere un interprete persistente
+
+=item *
+
+Esecuzione dei blocchi END
+
+=item *
+
+Mantenere piE<ugrave> istanze dell'interprete
+
+=item *
+
+Usare moduli Perl, che usano librerie C, dal vostro programma C
+
+=item *
+
+Integrare Perl in Win32
+
+=back
+
+=head2 Compilazione del programma C
+
+Se avete problemi a compilare gli script in questo documento, non siete
+i soli. La regola d'oro E<egrave>: COMPILATE I PROGRAMMA NELLA STESSA, ESATTA
+MANIERA IN CUI E<Egrave> STATO COMPILATO IL VOSTRO PERL. (Scusate
+l'urlo).
+
+Inoltre, ogni programma C che utilizza Perl deve effettuare il link alla
+I<libreria perl>. Cos'E<eacute>, chiederete? Perl stesso E<egrave> scritto in C;
+la libreria perl E<egrave> la raccolta dei programmi C compilati che sono stati
+utilizzati per creare il vostro eseguibile perl (I</usr/bin/perl> o
+equivalenti). (Corollario: non potete utilizzare Perl dal vostro
+programma C se Perl non E<egrave> stato compilato sulla vostra macchina, o
+perlomeno installato in maniera corretta -- questo E<egrave> il motivo per
+cui non dovreste copiare alla leggera gli eseguibili Perl da una
+macchina all'altra senza copiare anche la directory I<lib>.)
+
+Quando utilizzate Perl da C, il vostro programma C deve -- normalmente --
+allocare, "lanciare" e deallocare un oggetto I<PerlInterpreter>
+(InterpretePerl, N.d.T.), che E<egrave> definito nella libreria perl.
+
+Se avete a disposizione una copia di Perl sufficientemente recente da
+contenere questa documentazione (versione 5.002 o successive), allora
+la libreria perl (e gli I<header file> I<EXTERN.h> e I<perl.h>, di
+cui avrete bisogno) risiederanno in una directory che ha la forma
+seguente:
+
+    /usr/local/lib/perl5/architettura_vostra_macchina/CORE
+
+o forse solo
+
+    /usr/local/lib/perl5/CORE
+
+o anche qualcosa tipo
+
+    /usr/opt/perl5/CORE
+
+Per avere un suggerimento su dove trovare CORE, eseguite il comando:
+
+    perl -MConfig -e 'print $Config{archlib}'
+
+Ecco come dovreste compilare gli esempi della prossima sezione,
+L<Aggiunta di un interprete Perl al vostro programma C>, su una
+macchina Linux:
+
+    % gcc -O2 -Dbool=char -DHAS_BOOL -I/usr/local/include
+    -I/usr/local/lib/perl5/i586-linux/5.003/CORE
+    -L/usr/local/lib/perl5/i586-linux/5.003/CORE
+    -o interp interp.c -lperl -lm
+
+(Ovviamente tutto su una sola riga). Su un DEC ALpha provvisto della
+vecchia 5.003_05, ci sono delle lievi differenze:
+
+    % cc -O2 -Olimit 2900 -DSTANDARD_C -I/usr/local/include
+    -I/usr/local/lib/perl5/alpha-dec_osf/5.00305/CORE
+    -L/usr/local/lib/perl5/alpha-dec_osf/5.00305/CORE -L/usr/local/lib
+    -D__LANGUAGE_C__ -D_NO_PROTO -o interp interp.c -lperl -lm
+
+Come fate a capire cosa aggiungere? Assumendo che stiate utilizzando
+una versione di Perl successiva alla 5.001, lanciate il comando
+C<perl -V> e prestate particolare attenzione alle informazioni su "cc"
+e "ccflags".
+
+Dovrete scegliere il compilatore appropriato (I<cc>, I<gcc>, et al.) per
+la vostra macchina: C<perl -MConfig -e 'print $Config{cc}'> vi dirE<agrave>
+cosa utilizzare.
+
+Dovrete anche scegliere la directory di libreria corretta (tipo
+I</usr/local/lib/...>) per la vostra macchina. Se il compilatore si
+lamenta che certe funzioni non sono definite, o che non riesce a trovare
+I<-lperl>, dovete cambiare il percorso che segue C<-L>. Se
+si lamenta che non riesce a trovare I<EXTERN.h> e I<perl.h>, dovete
+cambiare il percorso che segue C<-I>.
+
+Potreste aver bisogno di aggiungere anche altre librerie. Quali?
+Con buona probabilitE<agrave> quelle stampate da
+
+   perl -MConfig -e 'print $Config{libs}'
+
+Ammesso che il vostro binario perl sia stato configurato ed installato
+correttamente, il modulo B<ExtUtils::Embed> E<egrave> in grado di determinare
+questa informazione per voi:
+
+   % cc -o interp interp.c `perl -MExtUtils::Embed -e ccopts -e ldopts`
+
+Se B<ExtUtils::Embed> non fa parte della vostra distribuzione Perl,
+potete prenderlo da http://www.perl.com/perl/CPAN/modules/by-module/ExtUtils/ .
+(Se questo documento si trova nella vostra distribuzione Perl, allora
+state utilizzando almeno la versione 5.004 ed avete giE<agrave> il modulo).
+
+Il kit B<ExtUtils::Embed> kit su CPAN contiene anche il codice sorgente
+per gli esempi di questo documento, i test, esempi aggiuntivi ed altre
+informazioni che potreste trovare utili.
+
+=head2 Aggiunta di un interprete Perl al vostro programma C
+
+In un certo senso, perl (il programma C) E<egrave> un buon esempio di integrazione
+di Perl (il linguaggio), per cui andremo a dimostrare l'embedding con
+I<miniperlmain.c>, incluso nella distribuzione sorgente. Quella che segue
+E<egrave> una versione cannibalizzata e non portabile di I<miniperlmain.c>,
+contenente l'essenziale per l'integrazione:
+
+    #include <EXTERN.h>               /* dalla distribuzione Perl       */
+    #include <perl.h>                 /* dalla distribuzione Perl       */
+
+    static PerlInterpreter *my_perl;  /***    L'interprete Perl       ***/
+
+    int main(int argc, char **argv, char **env)
+    {
+        PERL_SYS_INIT3(&argc,&argv,&env);
+        my_perl = perl_alloc();
+        perl_construct(my_perl);
+        PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
+        perl_parse(my_perl, NULL, argc, argv, (char **)NULL);
+        perl_run(my_perl);
+        perl_destruct(my_perl);
+        perl_free(my_perl);
+        PERL_SYS_TERM();
+    }
+
+Da notare che non stiamo utilizzando il puntatore C<env>. Normalmente
+questo viene passato alla funzione C<perl_parse()> come ultimo argomento,
+ma qui viene rimpiazzato da C<NULL>, che implica l'utilizzo dell'ambiente
+corrente. Le macro PERL_SYS_INIT3() e PERL_SYS_TERM() forniscono un
+adattamento specifico per sistema dell'ambiente di runtime C necessario
+per eseguire gli interpreti Perl; poichE<eacute> PERL_SYS_INIT3() puE<ograve> modificare
+C<env>, potrebbe essere piE<ugrave> appropriato fornire C<env> come argomento
+a perl_parse().
+
+Ora compilate questo programma (lo chiameremo I<interp.c>) in un
+eseguibile:
+
+    % cc -o interp interp.c `perl -MExtUtils::Embed -e ccopts -e ldopts`
+
+Dopo una compilazione valida sarete in grado di utilizzare I<interp>
+come se fosse perl stesso:
+
+    % interp
+    print "Perl ci piace un sacco\n";
+    print "10890 - 9801 is ", 10890 - 9801;
+    <CTRL-D>
+    Perl ci piace un sacco
+    10890 - 9801 is 1089
+
+o anche:
+
+    % interp -e 'printf("%x", 3735928559)'
+    deadbeef
+
+Potete anche leggere ed eseguire istruzioni Perl da un file nel mezzo del
+vostro programma C, inserendo il nome del file dentro I<argv[1]> prima
+di chiamare I<perl_run()>.
+
+=head2 Chiamare una subroutine Perl dal vostro programma C
+
+Per chiamare le singole subroutine Perl potete utilizzare una qualunque
+delle funzioni B<call_*> documentate in L<perlcall>. In questo esempio
+utilizzeremo C<call_argv()>.
+
+Ci riferiremo al programma dimostrativo che segue con il nome
+I<mostratempo.c>.
+
+    #include <EXTERN.h>
+    #include <perl.h>
+
+    static PerlInterpreter *my_perl;
+
+    int main(int argc, char **argv, char **env)
+    {
+        char *args[] = { NULL };
+        PERL_SYS_INIT3(&argc,&argv,&env);
+        my_perl = perl_alloc();
+        perl_construct(my_perl);
+
+        perl_parse(my_perl, NULL, argc, argv, NULL);
+        PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
+
+        /*** saltiamo perl_run() ***/
+
+        call_argv("mostratempo", G_DISCARD | G_NOARGS, args);
+
+        perl_destruct(my_perl);
+        perl_free(my_perl);
+        PERL_SYS_TERM();
+    }
+
+dove I<mostratempo> E<egrave> una subroutine Perl che non prende argomenti (E<egrave>
+I<G_NOARGS>) e per la quale ignoreremo il valore restituito (per questo
+motivo utilizziamo I<G_DISCARD>). Questi ed altri indicatori sono discussi
+in dettaglio in L<perlcall>.
+
+Definiremo la subroutine I<mostratempo> in un file chiamato
+I<mostratempo.pl>:
+
+    print "Questa stringa non viene stampata.";
+
+    sub mostratempo {
+        print time;
+    }
+
+Piuttosto semplice. Ora compilate e lanciate:
+
+    % cc -o mostratempo mostratempo.c `perl -MExtUtils::Embed -e ccopts -e ldopts`
+
+    % mostratempo mostratempo.pl
+    818284590
+
+che fornisce il numero di secondi passati dal primo gennaio 1970 (l'inizio
+della I<epoch> di Unix) al momento in cui il programma E<egrave> stato avviato
+durante la stesura della versione inglese di questo documento.
+
+In questo caso particolare non abbiamo bisogno di chiamare I<perl_run()>,
+poichE<eacute> impostiamo il PL_exit_flag PERL_EXIT_DESTRUCT_END 
+per fare in modo che vengano eseguiti i blocchi END quando viene
+chiamata I<perl_destruct()>.
+
+Se avete bisogno di passare argomenti alla funzione Perl, potete aggiungere
+delle stringhe alla lista C<args> terminata da C<NULL> che viene passata
+a I<call_argv()>. Per altri tipi di dato, o per esaminare i valori
+ritornati, avrete bisogno di manipolare lo stack Perl; questo viene
+dimostrato piE<ugrave> avanti in L<Manipolare lo stack Perl dal vostro programma C>.
+
+=head2 Valutare un'istruzione Perl dal vostro programma C
+
+Perl mette a disposizione due funzioni da API per valutare porzioni di
+codice Perl: L<perlapi/eval_sv> e L<perlapi/eval_pv>.
+
+In effetti, queste sono le sole funzioni di cui avrete mai bisogno per
+eseguire porzioni di codice Perl dai vostri programmi C. Il
+codice (Perl) da valutare puE<agrave> essere lungo quanto volete;
+puE<ograve> contenere piE<ugrave> istruzioni,
+puE<ograve> utilizzare L<perlfunc/use>, L<perlfunc/require> e L<perlfunc/do>
+per includere file Perl esterni.
+
+I<eval_pv> ci permette di valuatare stringhe Perl individuali, per poi
+estrarre variabili per l'inserimento in tipi C. Il programma che segue,
+I<stringhe.c>, esegue tre stringhe di codice Perl, estraendo un
+C<int> dalla prima, un C<float> dalla seconda e un C<char *> dalla terza.
+
+   #include <EXTERN.h>
+   #include <perl.h>
+
+   static PerlInterpreter *my_perl;
+
+   main (int argc, char **argv, char **env)
+   {
+       STRLEN n_a;
+       char *embedding[] = { "", "-e", "0" };
+
+       PERL_SYS_INIT3(&argc,&argv,&env);
+       my_perl = perl_alloc();
+       perl_construct( my_perl );
+
+       perl_parse(my_perl, NULL, 3, embedding, NULL);
+       PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
+       perl_run(my_perl);
+
+       /** Considera $a come un intero **/
+       eval_pv("$a = 3; $a **= 2", TRUE);
+       printf("a = %d\n", SvIV(get_sv("a", FALSE)));
+
+       /** Considera $a come un float **/
+       eval_pv("$a = 3.14; $a **= 2", TRUE);
+       printf("a = %f\n", SvNV(get_sv("a", FALSE)));
+
+       /** Considera $a come una stringa **/
+       eval_pv("$a = 'rekcaH lreP rehtonA tsuJ'; $a = reverse($a);", TRUE);
+       printf("a = %s\n", SvPV(get_sv("a", FALSE), n_a));
+
+       perl_destruct(my_perl);
+       perl_free(my_perl);
+       PERL_SYS_TERM();
+   }
+
+Tutte quelle strane funzioni con I<sv> nel nome aiutano nella conversione
+di scalari Perl in tipi C.  Sono spiegati in L<perlguts> e L<perlapi>.
+
+Se compilate ed avviate I<stringhe.c>, potrete vedere i risultati
+dell'utilizzo di I<SvIV()> per generare un C<int>, I<SvNV()> per creare
+un C<float> e I<SvPV()> per ottenere una stringa:
+
+   a = 9
+   a = 9.859600
+   a = Just Another Perl Hacker
+
+Nell'esempio riportato, abbiamo creato una variabile globale per
+contenere temporaneamente il valore calcolato della nostra espressione
+valutata.  E<Egrave> anche possibile, e nella maggior parte dei casi
+consigliabile, raccogliere direttamente il valore di ritorno di
+I<eval_pv()> invece di passare per una variabile temporanea:
+
+   ...
+   STRLEN n_a;
+   SV *val = eval_pv("reverse 'rekcaH lreP rehtonA tsuJ'", TRUE);
+   printf("%s\n", SvPV(val,n_a));
+   ...
+
+In questo modo evitiamo di sporcare il namespace perchE<eacute> non creiamo
+variabili globali; come bonus aggiunto abbiamo anche semplificato il
+nostro codice.
+
+=head2 Effettuare pattern-match e sostituzioni Perl dal vostro programma C
+
+La funzione I<eval_sv()> ci permette di valutare stringhe di codice Perl,
+di modo che possiamo definire alcune funzioni specializzate in
+matching e sostituzioni: I<match()>, I<sostituisci()> e
+I<match_multipli()>.
+
+   I32 match(SV *string, char *pattern);
+
+Data una stringa ed un pattern (per esempio, C<m/clasp/> oppure C</\b\w*\b/>,
+che nel vostro programma potrebbero/dovrebbero apparire come
+ "/\\b\\w*\\b/"), I<match()> restituisce 1 se la stringa corrisponde
+al pattern, 0 altrimenti.
+
+   int sostituisci(SV **string, char *pattern);
+
+Dato un puntatore ad un C<SV> ed un'operazione di binding C<=~>
+(ad esempio C<s/salvatore/turi/g> oppure C<tr[A-Z][a-z]>), I<sostituisci()>
+modifica la stringa nel C<SV> in accordo con l'operazione, e restituisce
+il numero di sostituzioni effettuate.
+
+   int match_multipli(SV *string, char *pattern, AV **matches);
+
+Dato un C<SV>, un pattern ed un puntatore ad un C<AV> vuoto,
+I<match_multipli> valuta C<$string =~ $pattern> in un contesto lista
+e riempie I<matches> con gli elementi
+dell'array, restituendo il numero di corrispondenze trovate.
+
+Ecco un programma di esempio, I<match.c>, che implementa ed utilizza
+tutte e tre le funzioni (le linee lunghe sono state mandate a capo):
+
+ #include <EXTERN.h>
+ #include <perl.h>
+
+ static PerlInterpreter *my_perl;
+
+ /** my_eval_sv(code, error_check)
+  ** una specie di eval_sv(),
+  ** ma eliminiamo il valore di ritorno dallo stack
+  **/
+ SV* my_eval_sv(SV *sv, I32 croak_se_errore)
+ {
+     dSP;
+     SV* retval;
+     STRLEN n_a;
+
+     PUSHMARK(SP);
+     eval_sv(sv, G_SCALAR);
+
+     SPAGAIN;
+     retval = POPs;
+     PUTBACK;
+
+     if (croak_se_errore && SvTRUE(ERRSV))
+         croak(SvPVx(ERRSV, n_a));
+
+     return retval;
+ }
+
+ /** match(string, pattern)
+  **
+  ** Utilizzata per match in contesto scalare.
+  **
+  ** Restituisce 1 se il match ha successo; 0 altrimenti.
+  **/
+
+ I32 match(SV *string, char *pattern)
+ {
+     SV *command = NEWSV(1099, 0), *retval;
+     STRLEN n_a;
+
+     sv_setpvf(command, "my $string = '%s'; $string =~ %s",
+ 	      SvPV(string,n_a), pattern);
+
+     retval = my_eval_sv(command, TRUE);
+     SvREFCNT_dec(command);
+
+     return SvIV(retval);
+ }
+
+ /** sostituisci(string, pattern)
+  **
+  ** Utilizzata per operazioni =~ che modificano il termine a sinistra
+  ** (s/// e tr///).
+  **
+  ** Restituisce il numero di corrispondenze trovate, modificando la
+  ** stringa in ingresso
+  **/
+
+ I32 sostituisci(SV **string, char *pattern)
+ {
+     SV *command = NEWSV(1099, 0), *retval;
+     STRLEN n_a;
+
+     sv_setpvf(command, "$string = '%s'; ($string =~ %s)",
+ 	      SvPV(*string,n_a), pattern);
+
+     retval = my_eval_sv(command, TRUE);
+     SvREFCNT_dec(command);
+
+     *string = get_sv("string", FALSE);
+     return SvIV(retval);
+ }
+
+ /** match_multipli(string, pattern, matches)
+  **
+  ** Utilizzata per match in contesto lista.
+  **
+  ** Restituisce il numero di corrispondenze, e riempie
+  ** **matches con le sottostringhe trovate.
+  **/
+
+ I32 matches(SV *string, char *pattern, AV **match_list)
+ {
+     SV *command = NEWSV(1099, 0);
+     I32 num_matches;
+     STRLEN n_a;
+
+     sv_setpvf(command, "my $string = '%s'; @array = ($string =~ %s)",
+ 	      SvPV(string,n_a), pattern);
+
+     my_eval_sv(command, TRUE);
+     SvREFCNT_dec(command);
+
+     *match_list = get_av("array", FALSE);
+     num_matches = av_len(*match_list) + 1; /** assume $[ is 0 **/
+
+     return num_matches;
+ }
+
+ main (int argc, char **argv, char **env)
+ {
+     char *embedding[] = { "", "-e", "0" };
+     AV *match_list;
+     I32 num_matches, i;
+     SV *text;
+     STRLEN n_a;
+
+     PERL_SYS_INIT3(&argc,&argv,&env);
+     my_perl = perl_alloc();
+     perl_construct(my_perl);
+     perl_parse(my_perl, NULL, 3, embedding, NULL);
+     PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
+
+     text = NEWSV(1099,0);
+     sv_setpv(text, "When he is at a convenience store and the "
+         "bill comes to some amount like 76 cents, Maynard is "
+         "aware that there is something he *should* do, something "
+         "that will enable him to get back a quarter, but he has "
+         "no idea *what*.  He fumbles through his red squeezey "
+         "changepurse and gives the boy three extra pennies with "
+         "his dollar, hoping that he might luck into the correct "
+         "amount.  The boy gives him back two of his own pennies "
+         "and then the big shiny quarter that is his prize. "
+         "-RICHH");
+
+     if (match(text, "m/quarter/")) /** 'quarter' contenuto? **/
+         printf("match: Il testo contiene la parola 'quarter'.\n\n");
+     else
+         printf("match: Il testo non contiene la parola 'quarter'.\n\n");
+
+     if (match(text, "m/eighth/")) /** eighth'? **/
+         printf("match: Il testo contiene la parola 'eighth'.\n\n");
+     else
+         printf("match: Il testo non contiene la parola 'eighth'.\n\n");
+
+     /** Match tutte le occorreze di /wi../ **/
+     num_matches = match_multipli(text, "m/(wi..)/g", &match_list);
+     printf("match_multipli: m/(wi..)/g ha trovato %d match...\n",
+         num_matches);
+
+     for (i = 0; i < num_matches; i++)
+         printf("match: %s\n", SvPV(*av_fetch(match_list, i, FALSE),n_a));
+     printf("\n");
+
+     /** Rimuovi tutte le vocali dal testo **/
+     num_matches = sostituisci(&text, "s/[aeiou]//gi");
+     if (num_matches) {
+         printf("sostituisci: s/[aeiou]//gi...%d sostituzioni effettuate.\n",
+             num_matches);
+         printf("Ora il testo risulta: %s\n\n", SvPV(text,n_a));
+     }
+
+     /** Tenta una sostituzione **/
+     if (!sostituisci(&text, "s/Perl/C/")) {
+         printf("sostituisci: s/Perl/C/...Nessuna sostituzione.\n\n");
+     }
+
+     SvREFCNT_dec(text);
+     PL_perl_destruct_level = 1;
+     perl_destruct(my_perl);
+     perl_free(my_perl);
+     PERL_SYS_TERM();
+ }
+
+che produce l'uscita (di nuovo, le righe lunghe sono state tagliate)
+
+   match: Il testo contiene la parola 'quarter'.
+
+   match: Il testo non contiene la parola 'eighth'.
+
+   match_multipli: m/(wi..)/g ha trovato 2 matches...
+   match: will
+   match: with
+
+   sostituisci: s/[aeiou]//gi...139 sostituzioni effettuate.
+   Ora il testo risulta: Whn h s t  cnvnnc str nd th bll cms t sm mnt lk 76
+   cnts, Mynrd s wr tht thr s smthng h *shld* d, smthng tht wll nbl hm t gt bck
+   qrtr, bt h hs n d *wht*.  H fmbls thrgh hs rd sqzy chngprs nd gvs th by
+   thr xtr pnns wth hs dllr, hpng tht h mght lck nt th crrct mnt.  Th by gvs
+   hm bck tw f hs wn pnns nd thn th bg shny qrtr tht s hs prz. -RCHH
+
+   sostituisci: s/Perl/C/...Nessuna sostituzione.
+
+
+=head2 Manipolare lo stack Perl dal vostro programma C
+
+Quando si trovano a dover spiegare le pile (I<stack>, N.d.T.), la
+maggior parte dei libri di informatica farfugliano qualcosa riguardo
+a pile di piatti in una caffetteria: l'ultimo che mettete (I<push>)
+sulla pila E<egrave> il primo che poi andate a togliere (I<pop>) quando
+vi serve un piatto. Per i
+nostri scopi andrE<agrave> bene questa spiegazione: il vostro programma C
+immetterE<agrave> alcuni parametri sullo "I<stack> Perl", chiuderE<agrave> gli occhi
+finchE<eacute> non sarE<agrave> accaduta qualche magia, e poi estrarrE<agrave> i risultati
+-- il valore di ritorno della vostra funzione Perl -- dallo "stack".
+(Utilizziamo la parola inglese I<stack> invece di pila poichE<eacute>
+questa notazione E<egrave> quella piE<ugrave> utilizzata quando 
+si parla delle pile
+di attivazione che controllano l'evoluzione dei programmi, N.d.T.).
+
+Prima di tutto avete bisogno di sapere come effettuare la conversione
+tra i tipi
+C e quelli Perl, utilizzando C<newSViv()>, C<sv_setnv()>, C<newAV()> e
+parenti. Trovate la descrizione in L<perlguts> e L<perlapi>.
+
+Successivamente, avete bisogno di sapere come manipolare lo stack
+di Perl. Questo E<egrave> descritto in L<perlcall>.
+
+Una volta che avete capito tutto questo, integrare Perl dentro C
+E<egrave> facile.
+
+PoichE<eacute> C non ha alcuna funzione nativa per l'elevazione a
+potenza degli interi, rendiamogli disponibile l'operatore Perl **
+(il che E<egrave> meno utile di quel che puE<ograve> sembrare, 
+poichE<eacute> Perl implementa
+** con la funzione C I<pow()>). Prima di tutto creeremo una funzione
+di elevazione a potenza di comodo in I<power.pl>:
+
+    sub expo {
+        my ($a, $b) = @_;
+        return $a ** $b;
+    }
+
+Successivamente creeremo il programma, I<potenza.c>, con una funzione
+I<PotenzaPerl()> che contiene tutti i L<perlguts> necessari ad inserire
+due parametri (argomenti) dentro I<expo> e per estrarne il valore.
+Fate un bel respiro...
+
+    #include <EXTERN.h>
+    #include <perl.h>
+
+    static PerlInterpreter *my_perl;
+
+    static void
+    PotenzaPerl(int a, int b)
+    {
+      dSP;                            /* inizializza lo stack pointer  */
+      ENTER;                          /* quanto viene creato da qui... */
+      SAVETMPS;                       /* ..e` una variabile temporanea */
+      PUSHMARK(SP);                   /* segnati lo stack pointer      */
+      XPUSHs(sv_2mortal(newSViv(a))); /* inserisci la base sullo stack */
+      XPUSHs(sv_2mortal(newSViv(b))); /* poi l'esponente               */
+      PUTBACK;                    /* stack pointer da locale a globale */
+      call_pv("expo", G_SCALAR);      /* chiama la funzione            */
+      SPAGAIN;                        /* aggiorna lo stack pointer     */
+                                    /* prendi il valore dallo stack    */
+      printf ("%d alla %d fa %d.\n", a, b, POPi);
+      PUTBACK;
+      FREETMPS;                       /* rilascia il valore di ritorno */
+      LEAVE;                          /* ...e gli argomenti "mortali". */
+    }
+
+    int main (int argc, char **argv, char **env)
+    {
+      char *my_argv[] = { "", "power.pl" };
+
+      PERL_SYS_INIT3(&argc,&argv,&env);
+      my_perl = perl_alloc();
+      perl_construct( my_perl );
+
+      perl_parse(my_perl, NULL, 2, my_argv, (char **)NULL);
+      PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
+      perl_run(my_perl);
+
+      PotenzaPerl(3, 4);                      /*** Calcola 3 ** 4 ***/
+
+      perl_destruct(my_perl);
+      perl_free(my_perl);
+      PERL_SYS_TERM();
+    }
+
+
+Compilate ed eseguite:
+
+    % cc -o potenza potenza.c `perl -MExtUtils::Embed -e ccopts -e ldopts`
+
+    % potenza
+    3 alla 4 fa 81.
+
+
+
+=head2 Mantenere un interprete persistente
+
+Quando sviluppate applicazioni interattive, o che potenzialmente
+possono avere una vita molto lunga, E<egrave> una buona idea mantenere un
+interprete Perl persistente invece che allocarlo e costruirne uno
+nuovo piE<ugrave> e piE<ugrave> volte. La ragione principale E<egrave> la velocitE<agrave>: in questo
+modo Perl viene caricato in memoria solo una volta.
+
+In ogni caso, dovete prestare maggiore attenzione con I<namespace>
+e I<scoping> delle variabili quando utilizzate un interprete persistente.
+Negli esempi precedenti abbiamo usato variabili globali nel
+package di default C<main>.  Sapevamo esattamente quale codice sarebbe
+stato eseguito, ed abbiamo assunto di poter evitare collisione di
+variabili e una crescita esagerata della tabella dei simboli.
+
+Supponiamo che la vostra applicazione sia un server che, di tanto in
+tanto, eseguirE<agrave> codice Perl da un file qualunque. Il server non ha modo
+di sapere quale codice eseguirE<agrave>. Molto pericoloso.
+
+Se il file viene preso da C<perl_parse()>, compilato dentro un
+inteprete costruito apposta, e successivamente rilasciato con
+C<perl_destruct()>, siete protetti dalla maggior parte dei guai
+derivanti dal I<namespace>.
+
+Una possibile strada per evitare collisione nei I<namespace> in questo
+scenario consiste nel tradurre il nome del file in un nome di package
+che sia sicuramente univoco, e poi compilare il codice all'interno di
+questo package utilizzando L<perlfunc/eval>. Nell'esempio di seguito,
+ciascun file viene compilato solamente una volta.  In alternativa,
+l'applicazione potrebbe decidere di ripulire la tabella dei simboli
+associata al file una volta che questa non sia piE<ugrave> utile. Utilizzando
+ L<perlapi/call_argv>, chiameremo la funzione 
+C<Embed::Persistent::eval_file> che vive nel file C<persistente.pl>,
+e passeremo il nome del file ed un indicatore booleano di 
+ripulitura/memorizzazione come argomenti.
+
+Osservate che il processo continuerE<agrave> a crescere per ciascun file che
+utilizza. In aggiunta, potrebbero esserci subroutine autocaricate
+(mediante C<AUTOLOAD>) ed altre condizioni che fanno crescere la tabella dei
+simboli. Potreste voler aggiungere una qualche logica che tiene traccia
+della dimensione del processo, o che provoca una terminazione e
+rilancio dell'interprete dopo un certo numero di richieste, per
+assicurare che il consumo di memoria sia minimizzato. Potreste anche
+volere ridurre lo I<scope> delle variabili con L<perlfunc/my> laddove
+possibile.
+
+ package Embed::Persistent;
+ #persistente.pl
+
+ use strict;
+ our %Cache;
+ use Symbol qw(delete_package);
+
+ sub valid_package_name {
+     my($string) = @_;
+     $string =~ s/([^A-Za-z0-9\/])/sprintf("_%2x",unpack("C",$1))/eg;
+     # seconda passata solo per parole che iniziano con una cifra decimale
+     $string =~ s|/(\d)|sprintf("/_%2x",unpack("C",$1))|eg;
+
+     # Trasforma in un vero nome di package
+     $string =~ s|/|::|g;
+     return "Embed" . $string;
+ }
+
+ sub eval_file {
+     my($filename, $delete) = @_;
+     my $package = valid_package_name($filename);
+     my $mtime = -M $filename;
+     if(defined $Cache{$package}{mtime}
+        &&
+        $Cache{$package}{mtime} <= $mtime)
+     {
+        # abbiamo compilato questa subroutine almeno una volta,
+        # non ha avuto aggiornamenti su disco, non dobbiamo fare niente
+        print STDERR "$package->handler gia' compilato\n";
+     }
+     else {
+        local *FH;
+        open FH, $filename or die "open '$filename' $!";
+        local($/) = undef;
+        my $sub = <FH>;
+        close FH;
+
+        # Inserisci il codice dentro una subroutine all'interno del nostro
+        # package unico
+        my $eval = qq{package $package; sub handler { $sub; }};
+        {
+            # hide our variables within this block
+            my($filename,$mtime,$package,$sub);
+            eval $eval;
+        }
+        die $@ if $@;
+
+        # tieni in cache a meno che non sia ora di pulizie
+        $Cache{$package}{mtime} = $mtime unless $delete;
+     }
+
+     eval {$package->handler;};
+     die $@ if $@;
+
+     delete_package($package) if $delete;
+
+     # date un'occhiata se volete
+     #print Devel::Symdump->rnew($package)->as_string, $/;
+ }
+
+ 1;
+
+ __END__
+
+ /* persistente.c */
+ #include <EXTERN.h>
+ #include <perl.h>
+
+ /* 1 = ripulisci la tabella del filename dopo ogni richiesa, 0 = non farlo */
+ #ifndef DO_CLEAN
+ #define DO_CLEAN 0
+ #endif
+
+ #define BUFFER_SIZE 1024
+
+ static PerlInterpreter *my_perl = NULL;
+
+ int
+ main(int argc, char **argv, char **env)
+ {
+     char *embedding[] = { "", "persistente.pl" };
+     char *args[] = { "", DO_CLEAN, NULL };
+     char filename[BUFFER_SIZE];
+     int exitstatus = 0;
+     STRLEN n_a;
+
+     PERL_SYS_INIT3(&argc,&argv,&env);
+     if((my_perl = perl_alloc()) == NULL) {
+        fprintf(stderr, "ho finito la memoria!");
+        exit(1);
+     }
+     perl_construct(my_perl);
+
+     exitstatus = perl_parse(my_perl, NULL, 2, embedding, NULL);
+     PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
+     if(!exitstatus) {
+        exitstatus = perl_run(my_perl);
+
+        while(printf("Nome del file: ") &&
+              fgets(filename, BUFFER_SIZE, stdin)) {
+
+            filename[strlen(filename)-1] = '\0'; /* strip \n */
+            /* chiama la subroutine, passandole il nome del file */
+            args[0] = filename;
+            call_argv("Embed::Persistent::eval_file",
+                           G_DISCARD | G_EVAL, args);
+
+            /* check $@ */
+            if(SvTRUE(ERRSV))
+                fprintf(stderr, "errore eval: %s\n", SvPV(ERRSV,n_a));
+        }
+     }
+
+     PL_perl_destruct_level = 0;
+     perl_destruct(my_perl);
+     perl_free(my_perl);
+     PERL_SYS_TERM();
+     exit(exitstatus);
+ }
+
+Ora compilate:
+
+ % cc -o persistente persistente.c `perl -MExtUtils::Embed -e ccopts -e ldopts`
+
+Ecco uno script di esempio:
+
+ #test.pl
+ my $string = "ciao";
+ foo($string);
+
+ sub foo {
+     print "foo dice: @_\n";
+ }
+
+Ora lanciate:
+
+ % persistente
+ Nome del file: test.pl
+ foo dice: ciao
+ Nome del file: test.pl
+ Embed::test_2epl->handler gia' compilato
+ foo dice: ciao
+ Nome del file: ^C
+
+=head2 Esecuzione dei blocchi END
+
+Tradizionalmente i blocchi END sono stati pensati per essere eseguiti
+alla fine di
+C<perl_run()>. Questo causa problemi per applicazioni che non
+chiamano mai questa funzione (si veda un esempio di sopra). A partire
+da perl 5.7.2 potete specificare C<PL_exit_flags |= PERL_EXIT_DESTRUCT_END>
+per avere il nuovo comportamento; questo abilita anche l'esecuzione
+dei blocchi END se C<perl_parse()> fallisce, nel qual caso C<perl_destruct()>
+restituirE<agrave> il valore di uscita.
+
+
+=head2 Mantenere piE<ugrave> istanze dell'interprete
+
+Raramente puE<ograve> succedere che un'applicazione abbia bisogno di creare
+piE<ugrave> di un interprete nel corso di una sessione. Un'applicazione
+siffatta puE<ograve> sporadicamente decidere di rilasciare qualsiasi
+risorsa associata con l'interprete.
+
+Il programma deve assicurarsi che questo avvenga I<prima> che
+l'interprete successivo sia costruito. Per default, quando perl
+non viene compilato con opzioni speciali, la variabile globale
+C<PL_perl_destruct_level> E<egrave> impostata a C<0>,
+poichE<eacute> una pulizia
+extra non E<egrave> usualmente necessaria laddove un programma abbia bisogno
+di creare un unico interprete nel corso della sua vita utile.
+
+Impostando C<PL_perl_destruct_level> a C<1> si rende tutto lindo e pulito
+per il caso di interpreti multipli:
+
+ while(1) {
+     ...
+     /* reimposta le variabili globali con PL_perl_destruct_level = 1 */
+     PL_perl_destruct_level = 1;
+     perl_construct(my_perl);
+     ...
+     /* ripulisci e reimposta _tutto_ durante perl_destruct() */
+     PL_perl_destruct_level = 1;
+     perl_destruct(my_perl);
+     perl_free(my_perl);
+     ...
+     /* vai, di nuovo! */
+ }
+
+Quando C<perl_destruct()> viene chiamata, l'albero di parsing della
+sintassi e le tabelle dei simboli dell'interprete vengono ripulite, e
+le variabili globali sono ripristinate. La seconda assegnazione a
+C<PL_perl_destruct_level> E<egrave> necessaria perchE<eacute>
+C<perl_construct()> ripristina il suo valore a C<0>.
+
+Ora supponete di avere piE<ugrave> di un'istanza dell'interprete in corso
+allo stesso tempo. E<Egrave> possibile, ma solo se avete utilizzato
+l'opzione di configurazione (quando avete lanciato I<Configure> per compilare
+perl) C<-Dusemultiplicity> o le opzioni
+C<-Dusethreads -Duseithreads>. Per default,
+abilitando una di queste opzioni di I<Configure> la variabile
+C<PL_perl_destruct_level> E<egrave> impostata ad C<1>, dunque la pulizia
+completa E<egrave> automatica e le variabili dell'interprete sono inizializzate
+correttamente. Anche se non avete intezione di lanciare due o piE<ugrave>
+intrepreti allo stesso tempo, ma sequenzialmente, come
+nell'esempio riportato di sopra, si raccomanda di compilare perl con
+l'opzione C<-Dusemultiplicity>, altrimenti alcune variabili
+dell'interprete potrebbero non essere inizializzate correttamente nel
+passaggio fra due istanze consecutive, e la vostra applicazione
+potrebbe terminare con un I<crash>.
+
+Usare C<-Dusethreads -Duseithreads> invece di C<-Dusemultiplicity>
+E<egrave> piE<ugrave> appropriato se intendete lanciare interpreti multipli in
+thread differenti, perchE<eacute> abilita il supporto per effettuare il
+link alla libreria dei thread del vostro sistema con l'interprete stesso.
+
+Mettiamolo alla prova:
+
+
+ #include <EXTERN.h>
+ #include <perl.h>
+
+ /* integreremo due interpreti */
+
+ #define SALUTA "-e", "print qq(Ciao, io sono $^X\n)"
+
+ int main(int argc, char **argv, char **env)
+ {
+     PerlInterpreter *one_perl, *two_perl;
+     char *one_args[] = { "perl_uno", SALUTA };
+     char *two_args[] = { "perl_due", SALUTA };
+
+     PERL_SYS_INIT3(&argc,&argv,&env);
+     one_perl = perl_alloc();
+     two_perl = perl_alloc();
+
+     PERL_SET_CONTEXT(one_perl);
+     perl_construct(one_perl);
+     PERL_SET_CONTEXT(two_perl);
+     perl_construct(two_perl);
+
+     PERL_SET_CONTEXT(one_perl);
+     perl_parse(one_perl, NULL, 3, one_args, (char **)NULL);
+     PERL_SET_CONTEXT(two_perl);
+     perl_parse(two_perl, NULL, 3, two_args, (char **)NULL);
+
+     PERL_SET_CONTEXT(one_perl);
+     perl_run(one_perl);
+     PERL_SET_CONTEXT(two_perl);
+     perl_run(two_perl);
+
+     PERL_SET_CONTEXT(one_perl);
+     perl_destruct(one_perl);
+     PERL_SET_CONTEXT(two_perl);
+     perl_destruct(two_perl);
+
+     PERL_SET_CONTEXT(one_perl);
+     perl_free(one_perl);
+     PERL_SET_CONTEXT(two_perl);
+     perl_free(two_perl);
+     PERL_SYS_TERM();
+ }
+
+Notate le chiamate a PERL_SET_CONTEXT(). Queste sono necessarie per
+inizializzare lo stato globale che tiene traccia di quale interprete
+E<egrave> quello "corrente" sul particolare processo, o thread, che lo
+sta eseguendo. Dovrebbe essere sempre utilizzata se avete piE<ugrave> di un
+interprete e state effettuando chiamate all'API perl su entrambi
+in maniera interlacciata.
+
+PERL_SET_CONTEXT(interp) dovrebbe essere anche chiamata ogni volta
+che C<interp> E<egrave> utilizzato da un thread che non
+l'ha creato (utilizzando
+o C<perl_alloc()> o la piE<ugrave> esoterica C<perl_clone()>);
+
+Compilate come di consueto:
+
+ % cc -o molteplicita molteplicita.c `perl -MExtUtils::Embed -e ccopts -e ldopts`
+
+Lanciatelo, lanciatelo:
+
+ % ./molteplicita
+ Ciao, io sono perl_uno
+ Ciao, io sono perl_due
+
+
+=head2 Usare moduli Perl, che usano librerie C, dal vostro programma C
+
+Se avete giocato un po' con gli esempi riportati, ed avete provato
+ad integrare uno script che utilizza (nel senso di C<use>) un modulo
+Perl (come, ad esempio, I<Socket>), il quale a sua volta utilizza
+una libreria C o C++, E<egrave> probabilmente accaduto che avete ricevuto il
+seguente errore:
+
+ Can't load module Socket, dynamic loading not available in this perl.
+  (You may need to build a new perl executable which either supports
+  dynamic loading or has the Socket module statically linked into it.)
+
+ [Non posso caricare il modulo Socket, il caricamento dinamico non
+  e' disponibile in questo perl. (Potreste dover compilare un nuovo
+  eseguibile perl che o supporta il caricamento dinamico o ha il modulo
+  Socket linkato staticamente dentro di esso) - N.d.T.]
+
+Che cosa E<egrave> andato storto?
+
+Il vostro interprete non sa come comunicare con queste estensioni: un po'
+di "colla" sarE<agrave> d'aiuto. Fino ad ora abbiamo chiamato C<perl_parse()>,
+passando un NULL come secondo argomento:
+
+ perl_parse(my_perl, NULL, argc, my_argv, NULL);
+
+Il codice "colla" va inserito proprio qui, nell'interazione iniziale fra
+Perl e le routine C/C++ collegate. Diamo un'occhiata ad alcune parti
+di I<perlmain.c> per vedere come lo fa Perl:
+
+ static void xs_init (pTHX);
+
+ EXTERN_C void boot_DynaLoader (pTHX_ CV* cv);
+ EXTERN_C void boot_Socket (pTHX_ CV* cv);
+
+
+ EXTERN_C void
+ xs_init(pTHX)
+ {
+        char *file = __FILE__;
+        /* DynaLoader e` un caso speciale */
+        newXS("DynaLoader::boot_DynaLoader", boot_DynaLoader, file);
+        newXS("Socket::bootstrap", boot_Socket, file);
+ }
+
+Messa in termini semplici: per ciascuna estensione Perl collegata con il 
+vostro eseguibile (determinata durante la configurazione iniziale sul
+vostro computer o quando viene aggiunta una nuova estensione), viene
+creata una subroutine Perl per incorporare le routine dell'estensione.
+Normalmente, questa routine viene denominata I<Modulo::bootstrap()>, e viene
+chiamata quando scrivete C<use Modulo>. A sua volta, questa si collega
+dentro una XSUB, C<boot_Modulo()>, che crea una controparte Perl per ciascuna
+delle XSUB dell'estensione. Non vi preoccupate di questa parte: lasciatela
+a I<xsubpp> e agli autori delle estensioni. Se la vostra estensione
+E<egrave> caricata dinamicamente, DynaLoader crea C<Modulo::bootstrap()> per
+voi al volo. In effetti, se avete un DynaLoader funzionante allora c'E<egrave>
+raramente la necessita di caricare qualsiasi altra estensione staticamente.
+
+Una volta che avete questo codice, inseritelo nel secondo argomento di
+C<perl_parse()>:
+
+
+ perl_parse(my_perl, xs_init, argc, my_argv, NULL);
+
+Poi compilate:
+
+ % cc -o interp interp.c `perl -MExtUtils::Embed -e ccopts -e ldopts`
+
+ % interp
+   use Socket;
+   use UnQualcheModuloCaricatoDinamicamente;
+
+   print "Ora posso utilizzare le estensioni!\n"'
+
+B<ExtUtils::Embed> puE<ograve> anche aiutarvi ad automatizzare il processo di
+scrittura del codice "collante" C<xs_init>.
+
+ % perl -MExtUtils::Embed -e xsinit -- -o perlxsi.c
+ % cc -c perlxsi.c `perl -MExtUtils::Embed -e ccopts`
+ % cc -c interp.c  `perl -MExtUtils::Embed -e ccopts`
+ % cc -o interp perlxsi.o interp.o `perl -MExtUtils::Embed -e ldopts`
+
+Consultate L<perlxs>, L<perlguts> e L<perlapi> per maggiori dettagli.
+
+
+=head1 Integrare Perl in Win32
+
+In generale, tutto il codice mostrato qui dovrebbe funzionare senza
+modifiche sotto Windows.
+
+Comunque, ci sono alcune questioni circa gli esempi a linea di comando
+mostrati che richiedono attenzione. Per cominciare, i I<backtick> (gli
+apici invertiti, N.d.T.) non funzioneranno nella shell nativa di Win32.
+Il kit ExtUtils::Embed su CPAN viene fornito con uno script chiamato
+B<genmake>, che genera un semplice makefile per compilare un programma
+da un file sorgente C singolo. PuE<ograve> essere utilizzato come segue:
+
+ C:\ExtUtils-Embed\eg> perl genmake interp.c
+ C:\ExtUtils-Embed\eg> nmake
+ C:\ExtUtils-Embed\eg> interp -e "print qq{Sono integrato in Win32!\n}"
+
+Potreste voler usare un ambiente piE<ugrave> robusto come Microsoft Developer
+Studio. In questo caso, lanciate questo comando per generare I<perlxsi.c>:
+
+ perl -MExtUtils::Embed -e xsinit
+
+Crate allora un nuovo progetto ed effettuate
+C<< Inserisci -> File >> dentro I<Progetto>:
+I<perlxsi.c>, I<perl.lib> e il vostro file sorgente, ad esempio I<interp.c>.
+Tipicamente trovate I<perl.lib> in B<C:\perl\lib\CORE>; altrimenti,
+dovreste cercare la directory B<CORE> relativa a C<perl -v:archlib>.
+MSD avrE<agrave> anche bisogno di questo percorso per sapere dove trovare i
+file Perl da includere; esso puE<ograve> essere aggiunto dal menu
+C<< Strumenti -> Opzioni -> Directory >>. Infine, selezionate
+C<< Build -> Build interp.exe >> e siete pronti a partire.
+
+=head1 Nascondere Perl_
+
+Se volete nascondere completamente le forme brevi delle funzioni
+dell'API pubblica di Perl, aggiungete -DPERL_NO_SHORT_NAMES alle
+opzioni di compilazione. Questo significa che nel vostro codice,
+invece di scrivere:
+
+    warn("%d bottiglie di birra sul muro", nbottiglie);
+
+dovrete scrivere la forma estesa esplicita:
+
+    Perl_warn(aTHX_ "%d bottiglie di birra sul muro", nbottiglie);
+
+(Vedere L<perlguts/Background and PERL_IMPLICIT_CONTEXT> per la 
+spiegazione di C<aTHX_>. ) Nascondere le forme brevi 
+E<egrave> molto comodo per evitare
+tutta una serie di conflitti (nel preprocessore C o altrove) con altri
+pacchetti software (Perl definisce circa 2400 API con questi nomi
+brevi, piE<ugrave> o meno qualche centinaio, per cui 
+c'E<egrave> assolutamente spazio
+per questo tipo di conflitti).
+
+=head1 MORALE
+
+Potete a volte I<scrivere codice piE<ugrave> veloce> in C, ma potete sempre
+I<scrivere piE<ugrave> velocemente codice> in Perl.
+PoichE<eacute> potete utilizzare
+l'uno dall'altro, combinateli a vostro piacimento.
+
+=head1 AUTORE
+
+Jon Orwant <F<orwant@media.mit.edu>> e Doug MacEachern
+<F<dougm@covalent.net>>, con alcuni contributi da Tim Bunce, Tom
+Christiansen, Guy Decoux, Hallvard Furuseth, Dov Grobgeld e Ilya
+Zakharevich.
+
+Doug MacEachern ha un articolo sull'integrazione nel Volume 1,
+sezione 4 della e-zine The Perl Journal ( http://www.tpj.com/ ). Doug
+E<egrave> anche lo sviluppatore dell'integrazione Perl piE<ugrave> largamente utilizzata:
+il sistema mod_perl (perl.apache.org), che integra Perl nel server
+web Apache. Oracle, Binary Evolution, ActiveState, e la nsapi_perl
+di Ben Sugars hanno utilizzato questo modello per i plugin Perl di
+Oracle, Netscape e Internet Information Server.
+
+=head1 COPYRIGHT
+
+Copyright (C) 1995, 1996, 1997, 1998 Doug MacEachern e Jon Orwant. Tutti
+i diritti sono riservati.
+
+Viene dato permesso di fare e distribuire copie conformi di questa
+documentazione a patto che la nota di copyright e questa nota di permesso
+sono preservate su tutte le copie.
+
+Viene dato permesso di copiare e distribuire versioni modificate di
+questa documentazione sotto le condizioni per le copie conformi, a patto
+che queste sono indicate chiaramente come versioni modificate, che
+i nomi degli autori ed i titoli rimangono invariati (sebbene i sottotitoli
+ed i nomi di altri autori possano essere aggiunti), e che l'intero lavoro
+risultante sia distribuito sotto i termini di una nota di permesso
+identica alla presente.
+
+Viene dato permesso di copiare e distribuire traduzioni di questa
+documentazione in altre lingue, soggette alle condizioni suddette per
+le versioni modificate.
+
+Si riporta comunque la versione originale inglese della nota di
+Copyright.
+
+Copyright (C) 1995, 1996, 1997, 1998 Doug MacEachern and Jon Orwant.  All
+Rights Reserved.
+
+Permission is granted to make and distribute verbatim copies of this
+documentation provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+documentation under the conditions for verbatim copying, provided also
+that they are marked clearly as modified versions, that the authors'
+names and title are unchanged (though subtitles and additional
+authors' names may be added), and that the entire resulting derived
+work is distributed under the terms of a permission notice identical
+to this one.
+
+Permission is granted to copy and distribute translations of this
+documentation into another language, under the above conditions for
+modified versions.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlembed
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Flavio Poletti.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

@@ -1,0 +1,57 @@
+grp:3
+fd:2
+ifd:2
+dp:.
+ts:,
+cs:HK$
+ics:HKD
+csa:l
+css:0
+ns:-
+ps:+
+dtf:%Y年%m月%d日 %A %H:%M:%S
+df:%Y年%m月%d日 %A
+tf:%I時%M分%S秒 %Z
+apf:%p %I:%M:%S
+amu:上午
+pmu:下午
+aml:上午
+pml:下午
+lm1:一月
+lm2:二月
+lm3:三月
+lm4:四月
+lm5:五月
+lm6:六月
+lm7:七月
+lm8:八月
+lm9:九月
+lm10:十月
+lm11:十一月
+lm12:十二月
+sm1:1月
+sm2:2月
+sm3:3月
+sm4:4月
+sm5:5月
+sm6:6月
+sm7:7月
+sm8:8月
+sm9:9月
+sm10:10月
+sm11:11月
+sm12:12月
+ld1:星期日
+ld2:星期一
+ld3:星期二
+ld4:星期三
+ld5:星期四
+ld6:星期五
+ld7:星期六
+sd1:日
+sd2:一
+sd3:二
+sd4:三
+sd5:四
+sd6:五
+sd7:六

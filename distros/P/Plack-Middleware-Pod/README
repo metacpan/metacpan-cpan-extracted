@@ -1,0 +1,46 @@
+NAME
+
+    Plack::Middleware::Pod - render POD files as HTML
+
+SYNOPSIS
+
+      enable "Plack::Middleware::Pod",
+          path => qr{^/pod/},
+          root => './',
+          pod_view => 'Pod::POM::View::HTMl', # the default
+          ;
+
+SECURITY CONSIDERATIONS
+
+    This middleware tries to be conservative regarding access to
+    directories outside of the root directory, but you are advised to not
+    enable this middleware in a webserver accessible to a wider public.
+    This middleware might allow leaking data from outside the directory.
+
+REPOSITORY
+
+    The public repository of this module is
+    https://github.com/Corion/plack-middleware-pod.
+
+SUPPORT
+
+    The public support forum of this module is https://perlmonks.org/.
+
+BUG TRACKER
+
+    Please report bugs in this module via the RT CPAN bug queue at
+    https://rt.cpan.org/Public/Dist/Display.html?Name=Plack-Middleware-Pod
+    or via mail to plack-middleware-pod-Bugs@rt.cpan.org.
+
+AUTHOR
+
+    Max Maischein corion@cpan.org
+
+COPYRIGHT (c)
+
+    Copyright 2014-2016 by Max Maischein corion@cpan.org.
+
+LICENSE
+
+    This module is released under the same terms as Perl itself.
+

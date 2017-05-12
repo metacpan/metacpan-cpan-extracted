@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/POE/Filter/XML.pm
+lib/POE/Filter/XML/Handler.pm
+lib/POE/Filter/XML/NS.pm
+lib/POE/Filter/XML/Node.pm
+t/00-load.t
+t/01-node.t
+t/02-filter.t
+t/release-pod-syntax.t
+weaver.ini

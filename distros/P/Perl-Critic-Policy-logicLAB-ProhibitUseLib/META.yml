@@ -1,0 +1,37 @@
+---
+abstract: "simple policy prohibiting the use of 'use lib'"
+author:
+  - 'Jonas B. Nielsen <jonasbn@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.30'
+  Pod::Coverage::TrustPod: '0'
+  Test::Kwalitee: '1.21'
+  Test::More: '0.88'
+  Test::Perl::Critic: '0'
+  Test::Pod: '1.41'
+  Test::Pod::Coverage: '1.08'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-logicLAB-ProhibitUseLib
+provides:
+  Perl::Critic::Policy::logicLAB::ProhibitUseLib:
+    file: lib/Perl/Critic/Policy/logicLAB/ProhibitUseLib.pm
+    version: '0.04'
+requires:
+  Perl::Critic::Utils: '0'
+  Readonly: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/jonasbn/pcpmpul/issues
+  repository: git://github.com/jonasbn/pcpmpul.git
+version: '0.04'

@@ -1,0 +1,10 @@
+<foo xmlns:petal="http://purl.org/petal/1.0/willBeReplaced"
+     xmlns:petal-meta="http://purl.org/petal/1.0/"
+     petal-meta:attributes="xmlns:petal string:http://purl.org/petal/1.0/">
+        <bar baz="default" 
+             buzz="default"
+             quxx="default"
+             petal:attributes="baz replace; buzz replace; quxx replace"
+             petal-meta:attributes
+                 ="petal:attributes string:baz ${baz_meta}\; buzz ${buzz_meta}\; quxx ${quxx_meta}" />
+</foo>

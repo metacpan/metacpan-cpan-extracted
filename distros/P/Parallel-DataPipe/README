@@ -1,0 +1,33 @@
+Parallel-DataPipe version 0.11
+=================================
+
+CPAN module Parallel::DataPipe for parallel data processing pipe and pipeline
+
+Multiplatform implementation: tests are passed for OpenBSD, MSWin32, Freebsd, Cygwin, Linux (perl 5.8.9)
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+It depends only on Core Perl modules now.
+
+if found it uses Sereal module for serialization instead of Storable as the former is more efficient.
+
+SOURCE REPOSITORY
+
+https://github.com/okharch/Parallel-DataPipe
+
+COPYRIGHT AND LICENCE
+
+All right reserved. This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+

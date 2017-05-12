@@ -1,0 +1,9 @@
+{
+    'scan_on'                => { 'table_name' => 'tenk1' },
+    'estimated_startup_cost' => '0',
+    'estimated_rows'         => '10000',
+    'type'                   => 'Seq Scan',
+    'estimated_total_cost'   => '333',
+    'estimated_row_width'    => '148',
+    'is_analyzed'            => 0,
+}

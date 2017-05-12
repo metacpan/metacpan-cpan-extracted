@@ -1,0 +1,11 @@
+%semantic token N = /(\d+)/ W = /([a-z]\w*)/
+
+%%
+
+s:   s N
+   | s W
+   | N
+   | W
+;
+
+%%

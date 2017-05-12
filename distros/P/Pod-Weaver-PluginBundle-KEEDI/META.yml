@@ -1,0 +1,22 @@
+---
+abstract: 'document your modules like KEEDI does'
+author:
+  - 'Keedi Kim - 김도형 <keedi@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Weaver-PluginBundle-KEEDI
+requires:
+  Pod::Weaver::Config::Assembler: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: https://github.com/keedi/Pod-Weaver-PluginBundle-KEEDI/issues
+  homepage: https://github.com/keedi/Pod-Weaver-PluginBundle-KEEDI
+  repository: https://github.com/keedi/Pod-Weaver-PluginBundle-KEEDI.git
+version: 0.004

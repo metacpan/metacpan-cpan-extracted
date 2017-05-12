@@ -1,0 +1,45 @@
+=begin filter perl | html nnn=1
+
+    "hot cross buns" =~ /cross/;
+    print "Matched: <$`> $& <$'>\n";    # Matched: <hot > cross < buns>
+    print "Left:    <$`>\n";            # Left:    <hot >
+    print "Match:   <$&>\n";            # Match:   <cross>
+    print "Right:   <$'>\n";            # Right:   < buns>
+
+=end
+__RESULT__
++perl+html
+<html><body bgcolor="#ffffff">
+<pre>    <span class="h-lno">  1</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>hot cross buns<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> =~ <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span>/cross/<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>
+    <span class="h-lno">  2</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"k</span>"<span class="h-ab">&gt;</span>print<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>Matched: <span class="h-ent">&amp;lt;</span>$`<span class="h-ent">&amp;gt;</span> $<span class="h-ent">&amp;amp;</span> <span class="h-ent">&amp;lt;</span>$<span class="h-ent">&amp;#39;</span><span class="h-ent">&amp;gt;</span>\n<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>    <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"c</span>"<span class="h-ab">&gt;</span># Matched: <span class="h-ent">&amp;lt;</span>hot <span class="h-ent">&amp;gt;</span> cross <span class="h-ent">&amp;lt;</span> buns<span class="h-ent">&amp;gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>
+    <span class="h-lno">  3</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"k</span>"<span class="h-ab">&gt;</span>print<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>Left:    <span class="h-ent">&amp;lt;</span>$`<span class="h-ent">&amp;gt;</span>\n<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>            <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"c</span>"<span class="h-ab">&gt;</span># Left:    <span class="h-ent">&amp;lt;</span>hot <span class="h-ent">&amp;gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>
+    <span class="h-lno">  4</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"k</span>"<span class="h-ab">&gt;</span>print<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>Match:   <span class="h-ent">&amp;lt;</span>$<span class="h-ent">&amp;amp;</span><span class="h-ent">&amp;gt;</span>\n<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>            <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"c</span>"<span class="h-ab">&gt;</span># Match:   <span class="h-ent">&amp;lt;</span>cross<span class="h-ent">&amp;gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>
+    <span class="h-lno">  5</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"k</span>"<span class="h-ab">&gt;</span>print<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span> <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"q</span>"<span class="h-ab">&gt;</span><span class="h-ent">&amp;quot;</span>Right:   <span class="h-ent">&amp;lt;</span>$<span class="h-ent">&amp;#39;</span><span class="h-ent">&amp;gt;</span>\n<span class="h-ent">&amp;quot;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span><span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"sc</span>"<span class="h-ab">&gt;</span>;<span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span>            <span class="h-ab">&lt;</span><span class="h-tag">span</span> <span class="h-attr">class</span>=<span class="h-attv">"c</span>"<span class="h-ab">&gt;</span># Right:   <span class="h-ent">&amp;lt;</span> buns<span class="h-ent">&amp;gt;</span><span class="h-ab">&lt;/</span><span class="h-tag">span</span><span class="h-ab">&gt;</span></pre>
+</body></html>
+__RESULT__
++perl-html
+<html><body bgcolor="#ffffff">
+<pre>    "hot cross buns" =~ /cross/;
+    print "Matched: &lt;$`&gt; $&amp; &lt;$'&gt;\n";    # Matched: &lt;hot &gt; cross &lt; buns&gt;
+    print "Left:    &lt;$`&gt;\n";            # Left:    &lt;hot &gt;
+    print "Match:   &lt;$&amp;&gt;\n";            # Match:   &lt;cross&gt;
+    print "Right:   &lt;$'&gt;\n";            # Right:   &lt; buns&gt;</pre>
+</body></html>
+__RESULT__
+-perl+html
+<html><body bgcolor="#ffffff">
+<pre>    "hot cross buns" =~ /cross/;
+    print "Matched: &lt;$`&gt; $&amp; &lt;$'&gt;\n";    # Matched: &lt;hot &gt; cross &lt; buns&gt;
+    print "Left:    &lt;$`&gt;\n";            # Left:    &lt;hot &gt;
+    print "Match:   &lt;$&amp;&gt;\n";            # Match:   &lt;cross&gt;
+    print "Right:   &lt;$'&gt;\n";            # Right:   &lt; buns&gt;</pre>
+</body></html>
+__RESULT__
+-perl-html
+<html><body bgcolor="#ffffff">
+<pre>    "hot cross buns" =~ /cross/;
+    print "Matched: &lt;$`&gt; $&amp; &lt;$'&gt;\n";    # Matched: &lt;hot &gt; cross &lt; buns&gt;
+    print "Left:    &lt;$`&gt;\n";            # Left:    &lt;hot &gt;
+    print "Match:   &lt;$&amp;&gt;\n";            # Match:   &lt;cross&gt;
+    print "Right:   &lt;$'&gt;\n";            # Right:   &lt; buns&gt;</pre>
+</body></html>

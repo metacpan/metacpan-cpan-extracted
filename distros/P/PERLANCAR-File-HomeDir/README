@@ -1,0 +1,36 @@
+SYNOPSIS
+
+     use PERLANCAR::Home::Dir qw(get_my_home_dir users_home);
+    
+     my $dir = get_my_home_dir();
+    
+     $dir = users_home("ujang");
+
+DESCRIPTION
+
+    This is a (temporary?) module to get user's home directory. It is a
+    lightweight version of File::HomeDir with fewer OS support (only
+    Windows and Unix) and fewer logic/heuristic.
+
+VARIABLES
+
+ $DIE_ON_FAILURE => bool (default: 0)
+
+    If set to true, will die on failure. Else, function usually return
+    undef on failure.
+
+FUNCTIONS
+
+    None are exported by default, but they are exportable.
+
+ get_my_home_dir() => str
+
+    Try several ways to get home directory. Return undef or die (depends on
+    $DIE_ON_FAILURE) if everything fails.
+
+ get_users_home_dir($username) => str
+
+SEE ALSO
+
+    File::HomeDir
+

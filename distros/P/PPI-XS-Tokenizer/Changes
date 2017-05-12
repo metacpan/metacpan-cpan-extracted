@@ -1,0 +1,8 @@
+Revision history for Perl extension PPI::XS::Tokenizer
+
+0.02  Fri Aug 27 2010
+	- Fixed compilation problems in PPI::XS::Tokenizer.pm
+
+0.01  Mon Aug  2 16:30 2010
+	- original version
+

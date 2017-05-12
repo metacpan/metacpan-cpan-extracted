@@ -1,0 +1,128 @@
+
+<HTML>
+<HEAD>
+<TITLE>PPresenter; Beginners; Timing</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Timing you Presentation</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../../index.html>PPresenter</A><BR>
+<A HREF=../../manual.html>Manual</A><BR>
+<A HREF=../index.html>Tutorials</A><BR>
+<A HREF=index.html>Beginners</A><BR>
+<P>
+<A HREF=define.html>Subject</A><BR>
+<A HREF=design.html>Design</A><BR>
+<A HREF=create.html>Creation</A><BR>
+<A HREF=style.html>Styles</A><BR>
+<A HREF=slide.html>Adding Slides</A><BR>
+<A HREF=change.html>Changing&nbsp;defaults</A><BR>
+<B>Timing</B><BR>
+<A HREF=tagging.html>Tagging</A><BR>
+<A HREF=dday.html>DDay</A><BR>
+
+    </TD><TD VALIGN=top>
+
+If you didn't get the picture right now: in the previous chapters is all
+you have to know about creating a presentation.  Yes, you have to learn
+the options, and have to learn how the markup formatter works (I know: need
+for a tutorial on that subject).
+<P>
+So, now you have the presentation ready on the content.  The next chapters
+are to fine-tune your speach.  First we will try to get more specifics on
+time requirements.  Then we will group sets of slides (to be able to skip
+parts of your presentation).
+<P>
+In the beginning, we had a time requirement for the full show.  At that time,
+we took the average of three minutes average per slide.  Now, we have to
+try to be more specific: a time estimation per slide.  PPresenter can help you
+to keep on schedule during you talk, and it is really adviceable to use this
+help!
+
+<H3><A NAME=notes>Slide Notes</A></H3>
+How long do we need per slide?  The slides do only contain the key words and
+key sentences on were you are talking about.  Now we completed the
+initial version of the presentation, the details have to be filled in.  Very
+useful is adding notes to your slides.  PPresenter has the possibility to display
+those notes on a diffent screen or on paper, if you like.
+<P>
+Go through each slide and add the <CODE>-notes</CODE> option describing
+which things you would like to talk about, for example:
+<PRE>
+   $show-&gt;addSlide
+      ( -title    =&gt; 'Wildlife in Holland'
+      , -main     =&gt; &lt;&lt;MAIN
+In the wild you will find
+&lt;UL&gt;
+&lt;LI&gt;bears
+&lt;LI&gt;apes
+&lt;LI&gt;spiders
+&lt;/UL&gt;
+MAIN
+      , -notes    =&gt; &lt;&lt;NOTES
+Situation of 100 million years back.
+Why did spiders survive?
+How did the climate change?
+NOTES
+      );
+</PRE>
+Some people like to write-out their story in detail, other can manage on
+a global outline.  The reason for adding notes is to be able to read through
+you presentation just before you will have it, to remember everything you
+want to explain, and to estimate the required time.
+
+<H3><A NAME=specs>Time Specifications</A></H3>
+
+The default time for a slide is three minutes.  If you think you need a
+different amount, add the line:
+<PRE>
+      , -reqtime   =&gt; '5m30'
+</PRE>
+or
+<PRE>
+      , -reqtime   =&gt; '3:30'
+</PRE>
+(many formats possible).
+<P>
+Next to adding times per slide, you specify the total time for the presentation
+as option to new:
+<PRE>
+   my $show = PPresenter->new
+      ( -name      =&gt; 'Wildlife'
+      , -totaltime =&gt; '1h15m'
+      );
+</PRE>
+<IMG SRC=../../viewport/slidecontrol.gif WIDTH=284 HEIGHT=262 ALIGN=right
+ HSPACE=10>
+Now, when you run the script (start the presentation), PPresenter will show how the
+sum of the required times fits to the total time you have available.  Press
+`<CODE>s</CODE>' in your presentation-<WBR>window to get a popup including
+the table shown here right.
+<P>
+In for a big shock?: too much time required!  Response?  No, wrong response!r
+Do never shorten the required time per slide unless you strip content,
+otherwise you will have to hurry, which is deadly for your message.
+<P>
+The colours you see in the image show how the time used is related to the
+time available.  Press `<CODE>g</CODE>' to start the timer.
+<BR CLEAR=right>
+<P>
+Next: <A HREF=tagging.html>Tagging</A>.
+
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

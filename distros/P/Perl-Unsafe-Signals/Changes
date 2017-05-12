@@ -1,0 +1,10 @@
+0.03 - 2015-09-07
+    Restore flags if code within UNSAFE_SIGNALS fails (Slaven Rezic)
+
+0.02 - 2005-10-13
+    Don't use a source filter, but an UNSAFE_SIGNALS function with a (&) prototype
+    instead. Suggested by Scott McWhirter. Side-effect: a semi-colon is now needed
+    after an UNSAFE_SIGNALS block.
+
+0.01 - 2005-10-12
+    Initial version

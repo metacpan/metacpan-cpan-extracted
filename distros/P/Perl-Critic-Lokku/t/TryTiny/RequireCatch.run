@@ -1,0 +1,65 @@
+## name "try" on its own
+## failures 1
+## cut
+
+use Try::Tiny;
+
+my $hi;
+try {
+    $hi = "one";
+};
+
+## name "try" with "finally" block
+## failures 1
+## cut
+
+use Try::Tiny;
+
+my $hi;
+try {
+    $hi = "two";
+}
+finally {
+    $hi = "three";
+};
+
+## name "try" with "catch" block
+## failures 0
+## cut
+
+use Try::Tiny;
+
+my $hi;
+try {
+    $hi = "four";
+}
+catch {
+    $hi = "five";
+};
+
+## name "try" with "catch" and "finally" blocks
+## failures 0
+## cut
+
+use Try::Tiny;
+
+my $hi;
+try {
+    $hi = "six";
+}
+catch {
+    $hi = "seven";
+}
+finally {
+    $hi = "eight";
+};
+
+## name Try::Tiny not imported, perhaps we will support TryCatch and others in future
+## failures 0
+## cut
+
+
+my $hi;
+try {
+    $hi = "nine";
+};

@@ -1,0 +1,405 @@
+Sun May 29 2016 Michael South <msouth@cpan.org>
+ o CPAN Release 2.62
+
+ o Fix HTTPS support with newer LWP versions, a HUGE thanks
+ to Sebastian Willing <sewi@cpan.org> for taking care of this.
+
+Mon Feb 18 2013 Michael South <msouth@cpan.org>
+ o CPAN Release 2.61
+
+ o Correcting error in Makefile.PL :(
+
+Mon Feb 18 2013 Michael South <msouth@cpan.org>
+ o CPAN Release 2.60
+
+ o using 'localhost' when creating daemons for any local/*.t
+   tests.  Some machines don't return a reachable domain
+   for `hostname`.  This may need further refinement.
+ o exiting explicitly from daemon in local/*.t code that
+   creates them.  This was already done in timeouts.t,
+   adding it to the other two locations.
+ o attempting a fix for https://rt.cpan.org/Ticket/Display.html?id=46821
+   without having reproduced.  Should at least do no harm, though.
+ o applied (some of) the patch for https://rt.cpan.org/Ticket/Display.html?id=35775
+   by CHORNY@cpan.org (issue with use of `pwd` on Win32)
+ o adding (generated) META.yml and META.json 
+
+Fri Feb 15 2013 Michael South <msouth@cpan.org>
+ o CPAN Release 2.59
+
+ o some tests were failing due to prerequisites that were not specified
+ o a little more robustness/info in debug mode of t/local/compatibility.t
+
+Tue Dec 11 2012 Michael South <msouth@cpan.org>
+
+ o CPAN Release 2.58
+
+ o updates for newer versions of libwww (tests now pass with libwww 6.04) 
+ o "harder" deprecation of some (previously deprecated) UA shadow methods
+ o removed some deprecated constructs that were throwing warnings
+
+Tue Feb 10 2004 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.57
+
+ o redirect bug fixed (patch by Thomas Boutell)
+
+Mon May 26 2003 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.56
+
+ o forgot to package t/TEST in the latest release, so all tests failed
+
+ o some miscenallenous bugfixes (undefined values, etc)
+
+Fri May 23 2003 Marc Langheinrich <marclang@cpan.org>
+ 
+ o CPAN Release 2.55 (namefix release: didn't realize PAUSE had some
+   special handling mechanisms for x.yy_zz version names, which resulted
+   in the 2.54_21 release not being indexed)
+
+ o No code changes to 2.54_21!
+
+Tue Mar 11 2003 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.54_21 (bugfix release)
+
+ o Packaging
+
+Wed Feb 19 2003 Marc Langheinrich <marclang@cpan.org>
+
+ o Release 2.54_20 (beta testing only)
+
+ o bugfix: [Parallel::UserAgent.pm] called _new_response without fully
+   qualifiying the package (should be LWP::UserAgent::_new_response),
+   as this was screwed up in the bugfix in 2.54_19
+ 
+Wed Feb 19 2003 Marc Langheinrich <marclang@cpan.org>
+
+ o Release 2.54_19 (beta testing only)
+ 
+ o rearranged tests and copied LWP's t/TEST file for ease-of-use
+
+ o added local/file tests
+ 
+ o added live tests (mozilla, jigsaw.w3c.org), see t/TEST
+
+ o added [Parallel::Protocol::file.pm] by Jeff Behr
+
+ o added file.pm support to [Parallel::UserAgent.pm]
+
+ o bugfix: [Parallel::Protocol.pm] fixed some LWP::Debug::trace calls
+ 
+ o bugfix: [Parallel::Protocol.pm] receiving into a file would always
+   _append_
+ 
+ o bugfix: [Parallel::UserAgent.pm] called _new_reponse without $self->
+ 
+ o bugfix: [Parallel::UserAgent.pm] _single_request would drop parameters
+   when delegating to ->register
+ 
+ o bugfix: [Parallel::UserAgent.pm] send_request and request would create
+   new useragent, without copying currents ua's settings. now they operate
+   on $self instead (thus retaining all current settings)
+ 
+ o bugfix: [Parallel::RobotUA.pm] fixed syntax errors!! :-(
+ 
+ o bugfix: [Parallel::RobotUA.pm] $rules->visit would not be updated if
+   an earlier visit had failed (even though the current one worked), or
+   if we requested the robots.txt file itself.
+ 
+ o bugfix: [Parallel::RobotUA.pm] added ->use_sleep support
+ 
+ o checked [Parallel::RobotUA] against LWP::RobotUA 1.18
+
+ o updated RobotUA->delay method to use minutes instead of seconds
+   (compatible with LWP::RobotUA behavior)
+
+ o bugfix: [Parallel::Protocol::ftp.pm] fixed HTTP::Response calls (forgot to
+   add "->new", aargh!)
+ 
+ o bugfix: [Parallel::Protocol::ftp.pm] added $key and $account vars to make
+   conn_cache work
+
+ o bugfix: [Parallel::Protocol::ftp.pm] fixed various syntax errors!!! :-|
+
+ o renamed Parallel::Protocol::http::connect method to _connect (to indicate
+   that it's private)
+
+ o bugfix: [Parallel::Protocol::http.pm] handle_connect had wrong return
+
+ o bugfix: [Parallel::Protocol::http.pm] pushback buffer (also spotted by
+   Dongqiang Bai)
+ 
+ o bugfix: [Parallel::Protocol::http.pm] empty buffers passed to ->receive
+
+ o bugfix: [Parallel::Protocol::http.pm] handle_connect had wrong return
+   format
+
+Thu Mar 28 2002 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.54
+
+ o compatibility fixes only in this release (against LWP 5.64). This also 
+   means still no support for HTTP/1.1 :-( Uses LWP 'backdoor' to force use
+   of HTTP/1.0
+
+ o checked against libwww-5.64
+
+Mon May 28 2001 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.51
+
+ o NO SUPPORT FOR HTTP/1.1 YET! (new in libwww-perl-5.53) 
+
+ o connections that time out halfway through their data transfer now 
+   call the on_failure callback (nothing was called in prior versions, 
+   thanks to Jonathan Feinberg <jdf@pobox.com> for spotting this)
+
+ o prepared compatibilty for POE http://sourceforge.net/projects/poe/
+   (still needs some work, thanks to http://www.en-directo.net/mail/kirill.html)
+
+ o added (optional) non-blocking connects (use $ua->nonblock(1))
+   (experimental, thanks to http://www.en-directo.net/mail/kirill.html)
+
+ o Fixed bug in Useragent.pm assigning same response to all timed out
+   entries (thanks to John Salmon <john@thesalmons.org>)
+
+ o checked against libwww-5.53
+
+Mon Feb 21 2001 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.50
+
+ o Fixed https.pm inheritance bug
+   (thanks to Chris Osborn <cosborn@digisle.net> and countless others)
+
+ o Fixed (serious) RobotUA.pm bug, where robots.txt files get ignored
+   (thanks to Vlad Ciubotariu <ciu@infoiasi.ro>)
+
+ o checked against libwww-5.50
+
+Mon May 08 2000 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.49
+
+ o added initial https support
+   (as suggested by Marian Szabo <mszabo@coralwave.com>)
+
+Mon May 08 2000 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.48a
+
+ o Added (empty) DESTROY method to Parallel::UserAgent::Entry in 
+   order to please perl5.6
+   
+Wed Apr 19 2000 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.48
+
+ o Updated changes in libwww-5.48 (since 5.43)
+     UserAgent.pm: 1.66 -> 1.73
+     RobotUA.pm:   1.15 -> 1.17
+     Protocol.pm:  1.33 -> 1.36
+     http.pm:      1.46 -> 1.49
+     ftp.pm:       1.25 -> 1.27
+ 
+Sun Jul 18 1999 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.43 
+
+ o Fixed FTP mode and finally unblocked ftp-scheme again :-)
+
+ o Checked against libwww-5.43
+ 
+Thu Apr 15 1999 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.41
+
+ o Updated changes in libwww-5.42:
+     UserAgent.pm: 1.64 -> 1.66
+     RobotUA.pm:   1.14 -> 1.15
+     Protocol.pm:  1.31 -> 1.33
+     http.pm:      1.44 -> 1.46
+
+ o Fixed $ua->max_size bug in Parallel/Protocol.pm
+	
+Tue Jan 12 1999 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.40
+
+ o Updated changes in libwww-5.41:
+     UserAgent.pm: 1.62 -> 1.64
+     RobotUA.pm:   1.13 -> 1.14
+     http.pm:      1.43 -> 1.44
+     ftp.pm:       1.24 -> 1.25
+
+ o Fixed '$1' bug in Parallel/Protocol/http.pm	
+	
+Tue Nov 24 1998 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.39
+
+ o Added incompatibility warning for libwww > supported ones 
+   (currently up to 5.36)
+	
+ o Added cookie jar to redirects (fix by Andrey Chernov <ache@nagual.pp.ru>)
+    	  
+Tue Nov 17 1998 Marc Langheinrich  <marclang@cpan.org>
+
+ o Fixed problem with otherwise successful requests that took a
+   long time to have their handles closed. These would be set to "408
+   timeout" although all the data was already transmitted. Now the
+   existing status is preserved and the string (timeout) appended
+   instead.
+
+ o Added more timeout.t tests to make sure the above scheme works.
+
+Tue Nov 10 1998 Marc Langheinrich  <marclang@cpan.org>
+
+ o CPAN Release 2.38
+
+ o Split parallel.t into three separate testfiles: compatibility.t,
+   parallel.t and timeouts.t
+	
+ o Fixed timeout handling in Parallel::UserAgent.
+	
+ o Added Timeout tests to parallel.t testscript (this included 
+   using a forking HTTP::Daemon instead of our serial one, since
+   otherwise the timeout simulations would break the server).	
+	
+ o Fixed die's when calling ->previous methods in parallel.t
+	
+Tue Sep 29 1998 Marc Langheinrich  <marclang@cpan.org>
+
+ o Fixed testcript parallel.t for broken redirection on ppc-linux. 
+	
+Tue Sep 22 1998 Marc Langheinrich  <marclang@cpan.org>
+
+ o CPAN Release 2.37
+
+ o Fixed bug in Parallel::UserAgent where timeout would fail to create
+   HTTP::Response object.
+
+ o Added some simple examples to LWP::Parallel manpage.
+	
+Mon Sep 7 1998 Marc Langheinrich  <marclang@cpan.org>
+
+ o CPAN Release 2.36
+
+ o Fixed bogus version information in LWP::Parallel and Bundle::
+   ParallelUA.(forgot to update $VERSION variable accordingly)
+
+ o Fixed missing SYNOPSIS element in ParallelUA.pm and RobotPUA.pm
+
+ o Blocked ftp-scheme handling since it wasn't working at all. Thanks
+   to Gary Foster for actually being the first person to try using 
+   Paralle::UserAgent with ftp requests. This will hopefully be fixed 
+   in the next release.	
+
+Tue Sep 1 1998 Marc Langheinrich  <marclang@cpan.org>
+
+ o CPAN Release 2.35 
+	
+ o http.pm: updated changes in libwww-5.46 (http.pm,v 1.43). Fixed
+   problems with "die"s during operation (now caught by UserAgent.pm)
+
+ o ftp.pm: updated changes in libwww-5.46 (ftp.pm,v 1.24)
+
+ o UserAgent.pm: Fixed "eval{}" calls to Protocol.pm objects. Updated
+   changes in libwww-5.46 (UserAgent.pm,v 1.62)
+	
+ o Checked against libwww-5.36
+
+Thu Jul 9 1998 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.34
+
+ o Fixed wrong package name in LWP::Parallel::Protocol::ftp
+ 	
+ o Fixed typo in Parallel::UserAgent
+	
+ o Updated libwww-5.34 changes (one in ftp.pm,v 1.23)
+	 
+ o Checked against libwww-5.34	
+
+Wed Jun 10 1998 Marc Langheinrich <marclang@cpan.org>
+
+ o Developers Release 2.33a
+
+ o Fixed "die"s in Parallel/Protocol/http.pm to return
+   HTTP::Response instead.
+
+ o Adjusted Parallel/UserAgent.pm to handle http.pm errors.
+
+ o Checked against libwww-5.33
+	
+Mon Apr 27 1998 Marc Langheinrich <marclang@cpan.org>
+
+ o CPAN Release 2.32
+	
+ o Updated libwww-5.31 bugfixes (one in UserAgent.pm,v 1.60)
+
+ o Checked against libwww-5.31 and 5.32	
+	
+Fri Mar 27 1998 Marc Langheinrich <marclang@cpan.org>
+
+ o First official CPAN release, version 2.31
+
+ o Updated libwww5.22 bugfixes (one in UserAgent.pm,v 1.59)
+
+ o Checked against libwww-5.22.
+	 
+Fri Mar 13 1998 Marc Langheinrich <marclang@cpan.org>
+
+ o Developer Release 2.3c (pre-release of 2.31)
+
+ o Fixed installation bug in Makefile.PL (LWP uses ->Version method
+   for version checking).
+	
+ o Updated libwww5.21 bugfixes (two in http.pm,v 1.41).
+
+ o Checked against libwww-5.21.
+
+
+Wed Mar 11 1998 Marc Langheinrich <marclang@cpan.org>	
+	
+ o Developer Release 2.3b
+
+ o Added $ua->discard_entry($entry) method. This can be used in 
+   callbacks to discard the entire entry thus freeing up memory.
+
+ o Makefile.PL will check for correct version of LWP.	
+
+ o Fixed some installation glitches.
+	
+
+Fri Mar 6 1998	Marc Langheinrich <marclang@cpan.org>
+
+ o Developer Release 2.3a
+
+ o Moved all modules into the LWP::Parallel subdirectory.
+     
+ o LWP::ParallelUA and LWP::RobotPUA only stubs for 'real' modules
+   underneath LWP::Parallel tree (LWP::Parallel::UserAgent and
+   LWP::Parallel::RobotUA).
+
+ o Parallel::UserAgent, Parallel::RobotUA and Parallel::Protocol now
+   inherent most of their code from the corresponding LWP modules.
+
+ o Added some documentation in Parallel::UserAgent.
+
+ o Added Makefile.PL support (should compile & install now out of
+   the box using the standard sequence "perl Makefile.PL; make;
+   make test; make install").
+
+ o Supplied test script (in t/parallel.t)
+	
+ o Checked against libwww-5.20
+
+	
+Mon Mar 2 1998	Marc Langheinrich <marclang@cpan.org>
+
+ o Created standard perl module package format.
+ 
+ 

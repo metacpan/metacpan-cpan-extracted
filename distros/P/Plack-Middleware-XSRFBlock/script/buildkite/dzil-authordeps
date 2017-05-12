@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# https://buildkite.com/docs/guides/writing-build-scripts
+set -eo pipefail
+
+source ~/perl5/perlbrew/etc/bashrc
+
+dzil authordeps --missing |cpanm --notest

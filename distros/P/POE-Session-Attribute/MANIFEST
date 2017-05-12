@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/all.t
+t/psab-01-tryit.t
+t/psab-02-heappass.t
+t/psab-03-package.t
+lib/POE/Session/Attribute.pm
+eg/demo.pl
+META.yml                                 Module meta-data (added by MakeMaker)

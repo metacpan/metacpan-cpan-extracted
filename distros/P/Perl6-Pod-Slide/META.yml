@@ -1,0 +1,30 @@
+---
+abstract: 'make slides easy'
+author:
+  - 'Zahatski Aliaksandr zag@cpan.org'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perl6-Pod-Slide
+provides:
+  Perl6::Pod::Slide:
+    file: lib/Perl6/Pod/Slide.pm
+    version: 0.10
+  Perl6::Pod::Slide::Writer:
+    file: lib/Perl6/Pod/Slide.pm
+    version: 0
+requires:
+  Perl6::Pod: 0.59
+  Test::Class: 0
+  XML::ExtOn: 0.14
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Perl6::Pod::Slide
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/zag/p5-Perl6-Pod-Slide.git
+version: 0.10

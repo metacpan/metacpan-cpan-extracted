@@ -1,0 +1,859 @@
+#!/usr/bin/perl
+#
+# Dump a Palm PDB or PRC database.
+
+use strict;
+use Palm::PDB;
+use Palm::Raw;
+
+# Load handlers for the built-in apps by default
+use Palm::Memo;
+use Palm::Address;
+use Palm::Datebook;
+use Palm::Mail;
+use Palm::ToDo;
+
+use vars qw( %PDBHandlers %PRCHandlers $hexdump );
+
+our $VERSION = '1.400'; # VERSION
+
+*PDBHandlers = *Palm::PDB::PDBHandlers;
+*PRCHandlers = *Palm::PDB::PRCHandlers;
+
+&Palm::PDB::RegisterPRCHandlers("Palm::Raw",
+	[ "", "" ]
+	);
+
+$hexdump = 1;			# By default, print hex dumps of everything
+
+# Parse command-line arguments
+my $arg;
+while (($arg = $ARGV[0]) =~ /^-/)
+{
+	$arg = shift;
+
+	if (($arg eq "-h") || ($arg eq "-help") || ($arg eq "--help"))
+	{
+		print <<EOT;
+Usage: $0 [options] pdb-file
+Options:
+	-h, -help, --help	This message.
+	-nohex			Don't print hex dumps
+	-M<module>		Load <module> (e.g., -MPalm::Address)
+EOT
+#'
+		exit 0;
+	} elsif ($arg =~ /^-M/)
+	{
+		eval "use $';";
+	} elsif ($arg eq "-nohex")
+	{
+		$hexdump = 0;
+	} else {
+		die "Unrecognized option: $arg\n";
+	}
+}
+
+my $fname = shift;
+
+die "No such file: $fname\n" if ! -f $fname;
+
+my $EPOCH_1904 = 2082844800;		# Difference between Palm's
+					# epoch (Jan. 1, 1904) and
+					# Unix's epoch (Jan. 1, 1970),
+					# in seconds.
+my $HeaderLen = 32+2+2+(9*4);		# Size of database header
+my $RecIndexHeaderLen = 6;		# Size of record index header
+my $IndexRecLen = 8;			# Length of record index entry
+my $IndexRsrcLen = 10;			# Length of resource index entry
+
+#%PDBHandlers = ();			# Record handler map
+#%PRCHandlers = ();			# Resource handler map
+
+
+#&Palm::PDB::rawread($fname);
+&rawread($fname);
+
+#package Palm::PDB;		# XXX - Gross hack!
+sub rawread
+{
+	my $self = new Palm::Raw;
+	my $fname = shift;		# Filename to read from
+	my $buf;			# Buffer into which to read stuff
+
+	# Open database file
+	open PDB, "< $fname" or die "Can't open \"$fname\": $!\n";
+	binmode PDB;			# Parse as binary file under MS-DOS
+
+	# Get the size of the file. It'll be useful later
+	seek PDB, 0, 2;		# 2 == SEEK_END. Seek to the end.
+	$self->{_size} = tell PDB;
+	print "File size: $self->{_size}\n";
+	seek PDB, 0, 0;		# 0 == SEEK_START. Rewind to the beginning.
+
+	# Read header
+	my $name;
+	my $attributes;
+	my $version;
+	my $ctime;
+	my $mtime;
+	my $baktime;
+	my $modnum;
+	my $appinfo_offset;
+	my $sort_offset;
+	my $type;
+	my $creator;
+	my $uniqueIDseed;
+
+	read PDB, $buf, $HeaderLen;	# Read the PDB header
+	print "Database header:\n";
+	if ($hexdump)
+	{
+		&hexdump("   ", $buf);
+		print "\n";
+	}
+
+	# Split header into its component fields
+	($name, $attributes, $version, $ctime, $mtime, $baktime,
+	$modnum, $appinfo_offset, $sort_offset, $type, $creator,
+	$uniqueIDseed) =
+		unpack "a32 n n N N N N N N a4 a4 N", $buf;
+
+	($self->{name} = $name) =~ s/\0*$//;
+	$self->{attributes}{resource} = 1 if $attributes & 0x0001;
+	$self->{attributes}{"read-only"} = 1 if $attributes & 0x0002;
+	$self->{attributes}{"AppInfo dirty"} = 1 if $attributes & 0x0004;
+	$self->{attributes}{backup} = 1 if $attributes & 0x0008;
+	$self->{attributes}{"OK newer"} = 1 if $attributes & 0x0010;
+	$self->{attributes}{reset} = 1 if $attributes & 0x0020;
+	$self->{attributes}{open} = 1 if $attributes & 0x0040;
+	$self->{attributes}{launchable} = 1 if $attributes & 0x0200;
+	$self->{version} = $version;
+	$self->{ctime} = $ctime - $EPOCH_1904;
+	$self->{mtime} = $mtime - $EPOCH_1904;
+	$self->{baktime} = $baktime - $EPOCH_1904;
+	$self->{modnum} = $modnum;
+	# _appinfo_offset and _sort_offset are private fields
+	$self->{_appinfo_offset} = $appinfo_offset;
+	$self->{_sort_offset} = $sort_offset;
+	$self->{type} = $type;
+	$self->{creator} = $creator;
+	$self->{uniqueIDseed} = $uniqueIDseed;
+
+	print <<EOT;
+    Name:           $name
+    Attributes:     @{[sprintf("0x%02x", $attributes)]}
+EOT
+	print " "x19;
+	print " LAUNCHABLE"	if $self->{attributes}{launchable};
+	print " OPEN"		if $self->{attributes}{open};
+	print " RESET"		if $self->{attributes}{reset};
+	print " OKNEWER"	if $self->{attributes}{"OK newer"};
+	print " BACKUP"		if $self->{attributes}{backup};
+	print " APPINFO-DIRTY"	if $self->{attributes}{"AppInfo dirty"};
+	print " READ-ONLY"	if $self->{attributes}{"read-only"};
+	print " RESOURCE"	if $self->{attributes}{resource};
+	print "\n";
+	print <<EOT;
+    Version:        $version
+    Ctime:          $ctime	@{[scalar(localtime($ctime-$EPOCH_1904))]}
+    Mtime:          $mtime	@{[scalar(localtime($mtime-$EPOCH_1904))]}
+    Backup time:    $baktime	@{[scalar(localtime($baktime-$EPOCH_1904))]}
+    Mod number:     $modnum
+    AppInfo offset: $appinfo_offset
+    Sort offset:    $sort_offset
+    Type:           $type
+    Creator:        $creator
+    Unique ID seed: $uniqueIDseed
+
+EOT
+
+	# Rebless this PDB object, depending on its type and/or
+	# creator. This allows us to magically invoke the proper
+	# &Parse*() function on the various parts of the database.
+
+	# Look for most specific handlers first, least specific ones
+	# last. That is, first look for a handler that deals
+	# specifically with this database's creator and type, then for
+	# one that deals with this database's creator and any type,
+	# and finally for one that deals with anything.
+
+	my $handler;
+	if ($self->{attributes}{resource})
+	{
+		# Look among resource handlers
+		$handler = $PRCHandlers{$self->{creator}}{$self->{type}} ||
+			$PRCHandlers{undef}{$self->{type}} ||
+			$PRCHandlers{$self->{creator}}{""} ||
+			$PRCHandlers{""}{""};
+	} else {
+		# Look among record handlers
+		$handler = $PDBHandlers{$self->{creator}}{$self->{type}} ||
+			$PDBHandlers{""}{$self->{type}} ||
+			$PDBHandlers{$self->{creator}}{""} ||
+			$PDBHandlers{""}{""};
+	}
+
+	if (defined($handler))
+	{
+		bless $self, $handler;
+	} else {
+		# XXX - This should probably return 'undef' or something,
+		# rather than die.
+		die "No handler defined for creator \"$creator\", type \"$type\"\n";
+	}
+
+	## Read record/resource index
+	# Read index header
+	read PDB, $buf, $RecIndexHeaderLen;
+	print "Record/resource index header:\n";
+	if ($hexdump)
+	{
+		&hexdump("   ", $buf);
+		print "\n";
+	}
+
+	my $next_index;
+	my $numrecs;
+
+	($next_index, $numrecs) = unpack "N n", $buf;
+	$self->{_numrecs} = $numrecs;
+
+	print <<EOT;
+    Next index:     $next_index
+    # records:      $numrecs
+
+EOT
+
+	# Read the index itself
+	if ($self->{attributes}{resource})
+	{
+		&_load_rsrc_index($self, \*PDB);
+	} else {
+		&_load_rec_index($self, \*PDB);
+	}
+
+	# Ignore the two NUL bytes that are usually here. We'll seek()
+	# around them later.
+
+	# Read AppInfo block, if it exists
+	if ($self->{_appinfo_offset} != 0)
+	{
+		&_load_appinfo_block($self, \*PDB);
+	}
+
+	# Read sort block, if it exists
+	if ($self->{_sort_offset} != 0)
+	{
+		&_load_sort_block($self, \*PDB);
+	}
+
+	# Read record/resource list
+	if ($self->{attributes}{resource})
+	{
+		&_load_resources($self, \*PDB);
+	} else {
+		&_load_records($self, \*PDB);
+	}
+
+	# These keys were needed for parsing the file, but are not
+	# needed any longer. Delete them.
+	delete $self->{_index};
+	delete $self->{_numrecs};
+	delete $self->{_appinfo_offset};
+	delete $self->{_sort_offset};
+	delete $self->{_size};
+
+	close PDB;
+}
+
+
+# _load_rec_index
+# Private function. Read the record index, for a record database
+sub _load_rec_index
+{
+	my $pdb = shift;
+	my $fh = shift;		# Input file handle
+	my $i;
+my $lastoffset = 0;
+
+	print "Record index:\n";
+
+	# Read each record index entry in turn
+	for ($i = 0; $i < $pdb->{_numrecs}; $i++)
+	{
+		my $buf;		# Input buffer
+
+		print "  Record index entry $i\n";
+
+		# Read the next record index entry
+		my $offset;
+		my $attributes;
+		my @id;			# Raw ID
+		my $id;			# Numerical ID
+		my $entry = {};		# Parsed index entry
+
+		read $fh, $buf, $IndexRecLen;
+		if ($hexdump)
+		{
+			&hexdump("   ", $buf);
+			print "\n";
+		}
+
+		# The ID field is a bit weird: it's represented as 3
+		# bytes, but it's really a double word (long) value.
+
+		($offset, $attributes, @id) = unpack "N C C3", $buf;
+if ($offset == $lastoffset)
+{
+print STDERR "Record $i has same offset as previous one: $offset\n";
+}
+$lastoffset = $offset;
+
+		$entry->{offset} = $offset;
+		$entry->{attributes}{expunged} = 1 if $attributes & 0x80;
+		$entry->{attributes}{dirty} = 1 if $attributes & 0x40;
+		$entry->{attributes}{deleted} = 1 if $attributes & 0x20;
+		$entry->{attributes}{private} = 1 if $attributes & 0x10;
+		$entry->{id} = ($id[0] << 16) |
+				($id[1] << 8) |
+				$id[2];
+
+		# The lower 4 bits of the attributes field are
+		# overloaded: If the record has been deleted and/or
+		# expunged, then bit 0x08 indicates whether the record
+		# should be archived. Otherwise (if it's an ordinary,
+		# non-deleted record), the lower 4 bits specify the
+		# category that the record belongs in.
+		if (($attributes & 0xa0) == 0)
+		{
+			$entry->{category} = $attributes & 0x0f;
+		} else {
+			$entry->{attributes}{archive} = 1
+				if $attributes & 0x08;
+		}
+
+		print <<EOT;
+    Offset:         $offset
+    Attributes:     @{[sprintf("0x%02x", $attributes), keys %{$entry->{attributes}}]}
+    Category:       $entry->{category}
+    ID:             @{[sprintf("0x%02x%02x%02x", @id)]}
+
+EOT
+
+		# Put this information on a temporary array
+		push @{$pdb->{_index}}, $entry;
+	}
+}
+
+# XXX - Make this print out debugging information
+# _load_rsrc_index
+# Private function. Read the resource index, for a resource database
+sub _load_rsrc_index
+{
+	my $pdb = shift;
+	my $fh = shift;		# Input file handle
+	my $i;
+
+	print "Resource index:\n";
+
+	# Read each resource index entry in turn
+	for ($i = 0; $i < $pdb->{_numrecs}; $i++)
+	{
+		my $buf;		# Input buffer
+
+		print "  Resource index entry $i\n";
+
+		# Read the next resource index entry
+		my $type;
+		my $id;
+		my $offset;
+		my $entry = {};		# Parsed index entry
+
+		read $fh, $buf, $IndexRsrcLen;
+		if ($hexdump)
+		{
+			&hexdump("   ", $buf);
+			print "\n";
+		}
+
+		($type, $id, $offset) = unpack "a4 n N", $buf;
+
+		$entry->{type} = $type;
+		$entry->{id} = $id;
+		$entry->{offset} = $offset;
+
+		print <<EOT;
+    Offset:         $offset
+    ID:             $id
+    Type:           $type
+
+EOT
+
+		push @{$pdb->{_index}}, $entry;
+	}
+}
+
+# _load_appinfo_block
+# Private function. Read the AppInfo block
+sub _load_appinfo_block
+{
+	my $pdb = shift;
+	my $fh = shift;		# Input file handle
+	my $len;		# Length of AppInfo block
+	my $buf;		# Input buffer
+
+	print "AppInfo block:\n";
+
+	# Sanity check: make sure we're positioned at the beginning of
+	# the AppInfo block
+	if (tell($fh) > $pdb->{_appinfo_offset})
+	{
+		die "Bad AppInfo offset: expected ",
+			sprintf("0x%08x", $pdb->{_appinfo_offset}),
+			", but I'm at ",
+			tell($fh), "\n";
+	}
+
+	# Seek to the right place, if necessary
+	if (tell($fh) != $pdb->{_appinfo_offset})
+	{
+		seek PDB, $pdb->{_appinfo_offset}, 0;
+	}
+
+	# There's nothing that explicitly gives the size of the
+	# AppInfo block. Rather, it has to be inferred from the offset
+	# of the AppInfo block (previously recorded in
+	# $pdb->{_appinfo_offset}) and whatever's next in the file.
+	# That's either the sort block, the first data record, or the
+	# end of the file.
+
+	if ($pdb->{_sort_offset})
+	{
+		# The next thing in the file is the sort block
+		$len = $pdb->{_sort_offset} - $pdb->{_appinfo_offset};
+	} elsif ((defined $pdb->{_index}) && @{$pdb->{_index}})
+	{
+		# There's no sort block; the next thing in the file is
+		# the first data record
+		$len = $pdb->{_index}[0]{offset} -
+			$pdb->{_appinfo_offset};
+	} else {
+		# There's no sort block and there are no records. The
+		# AppInfo block goes to the end of the file.
+		$len = $pdb->{_size} - $pdb->{_appinfo_offset};
+	}
+
+	# Read the AppInfo block
+	read $fh, $buf, $len;
+	if ($hexdump)
+	{
+		&hexdump("   ", $buf);
+		print "\n";
+	}
+
+	# Tell the real class to parse the AppInfo block
+	$pdb->{appinfo} = $pdb->ParseAppInfoBlock($buf);
+
+	# Print out the parsed values
+	if (ref($pdb->{appinfo}) ne "")
+	{
+		&dumphash($pdb->{appinfo}, "\t");
+		print "\n";
+	}
+}
+
+# _load_sort_block
+# Private function. Read the sort block.
+sub _load_sort_block
+{
+	my $pdb = shift;
+	my $fh = shift;		# Input file handle
+	my $len;		# Length of sort block
+	my $buf;		# Input buffer
+
+	print "Sort block:\n";
+
+	# Sanity check: make sure we're positioned at the beginning of
+	# the sort block
+	if (tell($fh) > $pdb->{_sort_offset})
+	{
+		die "Bad sort block offset: expected ",
+			sprintf("0x%08x", $pdb->{_sort_offset}),
+			", but I'm at ",
+			tell($fh), "\n";
+	}
+
+	# Seek to the right place, if necessary
+	if (tell($fh) != $pdb->{_sort_offset})
+	{
+		seek PDB, $pdb->{_sort_offset}, 0;
+	}
+
+	# There's nothing that explicitly gives the size of the sort
+	# block. Rather, it has to be inferred from the offset of the
+	# sort block (previously recorded in $pdb->{_sort_offset})
+	# and whatever's next in the file. That's either the first
+	# data record, or the end of the file.
+
+	if (defined($pdb->{_index}))
+	{
+		# The next thing in the file is the first data record
+		$len = $pdb->{_index}[0]{offset} -
+			$pdb->{_sort_offset};
+	} else {
+		# There are no records. The sort block goes to the end
+		# of the file.
+		$len = $pdb->{_size} - $pdb->{_sort_offset};
+	}
+
+	# Read the AppInfo block
+	read $fh, $buf, $len;
+	if ($hexdump)
+	{
+		&hexdump("   ", $buf);
+		print "\n";
+	}
+
+	# XXX - Check to see if the sort block has some predefined
+	# structure. If so, it might be a good idea to parse the sort
+	# block here.
+
+	# Tell the real class to parse the sort block
+	$pdb->{sort} = $pdb->ParseSortBlock($buf);
+}
+
+# _load_records
+# Private function. Load the actual data records, for a record database
+# (PDB)
+sub _load_records
+{
+	my $pdb = shift;
+	my $fh = shift;		# Input file handle
+	my $i;
+
+	print "Records:\n";
+	# Read each record in turn
+	for ($i = 0; $i < $pdb->{_numrecs}; $i++)
+	{
+		my $len;	# Length of record
+		my $buf;	# Input buffer
+
+		print "  Record $i\n";
+
+		# Sanity check: make sure we're where we think we
+		# should be.
+		if (tell($fh) > $pdb->{_index}[$i]{offset})
+		{
+# XXX - The two NULs are really optional.
+#			die "Bad offset for record $i: expected ",
+#				sprintf("0x%08x",
+#					$pdb->{_index}[$i]{offset}),
+#				" but it's at ",
+#				sprintf("[0x%08x]", tell($fh)), "\n";
+		}
+
+		# Seek to the right place, if necessary
+		if (tell($fh) != $pdb->{_index}[$i]{offset})
+		{
+			seek PDB, $pdb->{_index}[$i]{offset}, 0;
+		}
+
+		# Compute the length of the record: the last record
+		# extends to the end of the file. The others extend to
+		# the beginning of the next record.
+		if ($i == $pdb->{_numrecs} - 1)
+		{
+			# This is the last record
+			$len = $pdb->{_size} -
+				$pdb->{_index}[$i]{offset};
+		} else {
+			# This is not the last record
+			$len = $pdb->{_index}[$i+1]{offset} -
+				$pdb->{_index}[$i]{offset};
+		}
+
+		# Read the record
+		read $fh, $buf, $len;
+		if ($hexdump)
+		{
+			&hexdump("   ", $buf);
+			print "\n";
+		}
+
+		# Tell the real class to parse the record data. Pass
+		# &ParseRecord all of the information from the index,
+		# plus a "data" field with the raw record data.
+		my $record;
+
+		$record = $pdb->ParseRecord(
+			%{$pdb->{_index}[$i]},
+			"data"	=> $buf,
+			);
+		push @{$pdb->{records}}, $record;
+
+		# Print out the parsed values
+		&dumphash($record, "\t");
+		print "\n";
+	}
+}
+
+# _load_resources
+# Private function. Load the actual data resources, for a resource database
+# (PRC)
+sub _load_resources
+{
+	my $pdb = shift;
+	my $fh = shift;		# Input file handle
+	my $i;
+
+	print "Resources:\n";
+	# Read each resource in turn
+	for ($i = 0; $i < $pdb->{_numrecs}; $i++)
+	{
+		my $len;	# Length of record
+		my $buf;	# Input buffer
+
+		print "  Resource $i\n";
+
+		# Sanity check: make sure we're where we think we
+		# should be.
+		if (tell($fh) > $pdb->{_index}[$i]{offset})
+		{
+			die "Bad offset for resource $i: expected ",
+				sprintf("0x%08x",
+					$pdb->{_index}[$i]{offset}),
+				" but it's at ",
+				sprintf("0x%08x", tell($fh)), "\n";
+		}
+
+		# Seek to the right place, if necessary
+		if (tell($fh) != $pdb->{_index}[$i]{offset})
+		{
+			seek PDB, $pdb->{_index}[$i]{offset}, 0;
+		}
+
+		# Compute the length of the resource: the last
+		# resource extends to the end of the file. The others
+		# extend to the beginning of the next resource.
+		if ($i == $pdb->{_numrecs} - 1)
+		{
+			# This is the last resource
+			$len = $pdb->{_size} -
+				$pdb->{_index}[$i]{offset};
+		} else {
+			# This is not the last resource
+			$len = $pdb->{_index}[$i+1]{offset} -
+				$pdb->{_index}[$i]{offset};
+		}
+
+		# Read the resource
+		read $fh, $buf, $len;
+		if ($hexdump)
+		{
+			&hexdump("   ", $buf);
+			print "\n";
+		}
+
+		# Tell the real class to parse the resource data. Pass
+		# &ParseResource all of the information from the
+		# index, plus a "data" field with the raw resource
+		# data.
+		my $resource;
+
+		$resource = $pdb->ParseResource(
+			%{$pdb->{_index}[$i]},
+			"data"	=> $buf,
+			);
+		push @{$pdb->{resources}}, $resource;
+
+		# Print out the parsed values
+		&dumphash($resource, "\t");
+		print "\n";
+	}
+}
+
+sub hexdump
+{
+	my $prefix = shift;	# What to print in front of each line
+	my $data = shift;	# The data to dump
+	my $maxlines = shift;	# Max # of lines to dump
+	my $offset;		# Offset of current chunk
+
+	for ($offset = 0; $offset < length($data); $offset += 16)
+	{
+		my $hex;		# Hex values of the data
+		my $ascii;		# ASCII values of the data
+		my $chunk;		# Current chunk of data
+
+		last if defined($maxlines) && ($offset >= ($maxlines * 16));
+
+		$chunk = substr($data, $offset, 16);
+
+		($hex = $chunk) =~ s/./sprintf "%02x ", ord($&)/ges;
+
+		($ascii = $chunk) =~ y/\040-\176/./c;
+
+		printf "%s %-48s|%-16s|\n", $prefix, $hex, $ascii;
+	}
+}
+
+# XXX - Ought to have a &dumparray as well. The two can call each other
+# recursively.
+
+sub dumphash
+{
+	my $hash = shift;
+	my $indent = shift;
+	my $key;
+	my $value;
+
+	while (($key, $value) = each %{$hash})
+	{
+		if (ref($value) eq "HASH")
+		{
+			print $indent, $key, ":\n";
+			&dumphash($value, $indent . "\t");
+		} elsif (ref($value) eq "ARRAY")
+		{
+			my($i,$j);
+
+			print $indent, $key, ":\n";
+			for ($i = 0; $i <= $#{$value}; $i++)
+			{
+				if (ref($value->[$i]) eq "HASH")
+				{
+					print $indent, "    $i:\n";
+					&dumphash($value->[$i],
+						$indent . "\t");
+				} elsif (ref($value->[$i]) eq "ARRAY")
+				{
+					my @v2 = @{$value->[$i]};
+					for ($j = 0; $j <= $#v2; $j++)
+					{
+						print $indent,
+							"\t$i-$j: [$v2[$j]]\n";
+					}
+				}else {
+					print $indent,
+						"\t$i: [$value->[$i]]\n";
+				}
+			}
+		} else {
+			print $indent, $key, " -> [", $value, "]\n";
+		}
+	}
+}
+
+__END__
+
+=head1 NAME
+
+pdbdump - Print the contents of a Palm PDB file
+
+=head1 VERSION
+
+This document describes version 1.400 of
+C<pdbdump>, released March 14, 2015
+as part of Palm version 1.400.
+
+=head1 SYNOPSIS
+
+C<pdbdump> I<[options]> F<filename>
+
+=head1 DESCRIPTION
+
+C<pdbdump> reads a S<Palm OS> F<.pdb> file, parses it, and prints its
+contents. This includes both a hex dump of the raw data of each piece,
+and a human-readable list of the various values, insofar as possible.
+The aim of C<pdbdump> is to allow one to verify whether a particular
+file is a well-formed S<Palm OS> database file and if not, where the error
+lies.
+
+If the database is of a known type, C<pdbdump> parses the AppInfo
+block and records. Otherwise, it simply prints out a hex dump of their
+contents. C<pdbdump> includes, by default, support for most of the
+built-in applications. Other helper modules may be loaded with the
+C<-M> option.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -h -help --help
+
+Print a usage message and exit.
+
+=item -nohex
+
+Don't print the hex dump of the various parts.
+
+=item -MI<module>
+
+C<use> the named module. This can be useful for loading additional
+helper modules.
+
+=back
+
+=head1 SEE ALSO
+
+L<Palm::PDB>
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+main requires no configuration files or environment variables.
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+C<pdbdump> only recognizes record databases (C<.pdb> files), not
+resource databases (C<.prc> files).
+
+=head1 AUTHORS
+
+Andrew Arensburger C<< <arensb AT ooblick.com> >>
+
+Currently maintained by Christopher J. Madsen C<< <perl AT cjmweb.net> >>
+
+Please report any bugs or feature requests
+to S<C<< <bug-Palm AT rt.cpan.org> >>>
+or through the web interface at
+L<< http://rt.cpan.org/Public/Bug/Report.html?Queue=Palm >>.
+
+You can follow or contribute to p5-Palm's development at
+L<< https://github.com/madsen/p5-Palm >>.
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2003 by Andrew Arensburger & Alessandro Zummo.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut

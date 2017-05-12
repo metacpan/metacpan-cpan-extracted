@@ -1,0 +1,40 @@
+---
+name: Parallel-Workers
+version: 0.0.9
+author:
+  - Olivier Evalet <evaleto@gelux.ch>
+abstract: |-
+  run worker tasks in parallel. Worker task is a plugin that you
+  can implement. The availables are Eval for CODE, SSH and XMLRPC.
+license: lgpl
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+requires:
+  Data::Serializer: 0
+  File::Find::Rule: 0
+  File::Temp: 0
+  Getopt::Long: 0
+  Math::BigInt::GMP: 0
+  perl: 5.8.1
+provides:
+  Parallel::Workers:
+    file: lib/Parallel/Workers.pm
+    version: 0.0.9
+  Parallel::Workers::Backend:
+    file: lib/Parallel/Workers/Backend.pm
+  Parallel::Workers::Backend::Eval:
+    file: lib/Parallel/Workers/Backend/Eval.pm
+  Parallel::Workers::Backend::Null:
+    file: lib/Parallel/Workers/Backend/Null.pm
+  Parallel::Workers::Backend::SSH:
+    file: lib/Parallel/Workers/Backend/SSH.pm
+  Parallel::Workers::Backend::XMLRPC:
+    file: lib/Parallel/Workers/Backend/XMLRPC.pm
+  Parallel::Workers::Shared:
+    file: lib/Parallel/Workers/Shared.pm
+  Parallel::Workers::Transaction:
+    file: lib/Parallel/Workers/Transaction.pm
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

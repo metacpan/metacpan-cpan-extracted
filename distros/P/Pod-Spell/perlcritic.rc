@@ -1,0 +1,9 @@
+severity = 3
+verbose  = 9
+exclude  = RegularExpressions::RequireExtendedFormatting
+[-Subroutines::RequireFinalReturn]
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 30
+[-Subroutines::RequireArgUnpacking]
+[-Modules::ProhibitMultiplePackages]
+[-ValuesAndExpressions::ProhibitConstantPragma]

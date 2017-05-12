@@ -1,0 +1,8 @@
+<div class="searchbar">
+<form method="get" action="[% baseUrl %]"
+      enctype="application/x-www-form-urlencoded">
+<h3>Search</h3>
+<input type="text" name="search"  size="20" style="width:95%" />
+<input type="hidden" name="dosearch" value="1" />
+</form>
+</div>

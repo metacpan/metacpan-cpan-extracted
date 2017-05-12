@@ -1,0 +1,4 @@
+<foo>
+    <aaa baz-baz="default" petal:attributes="baz-baz value1" />
+    <bbb foo_2.BAR="default" petal:attributes="foo_2.BAR value2" />
+</foo>

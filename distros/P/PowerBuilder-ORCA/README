@@ -1,0 +1,43 @@
+PowerBuilder::ORCA -- Perl interface to PowerBuilder ORCA API
+
+	Copyright (c) 1999-2002, Ilya Chelpanov <chelpanov@mail.ru>, 
+	http://i72.by.ru/eng/, http://i72.narod.ru/eng/
+
+	This program is free software; you can redistribute it and/or modify it 
+	under the same terms as Perl itself. 
+
+	You have two ways of installation of the module:
+
+	1. Installation of the precompiled package for ActivePerl through Perl 
+	Package Manager (Recommended). Zip archives with ppm packages are placed 
+	in a ppm subdirectory in my directory on CPAN.
+
+	2. Building module from source.
+
+
+BEFORE BUILDING, TESTING AND INSTALLING this module from source you will need to:
+
+	1. Install Perl 5 (I use ActivePerl 5.6 build 631)
+
+	2. Install C ++ compiler, suitable for compilation of Perl modules (I use  
+	Microsoft Visual C 6.0 with service packs)
+
+	3. Install PowerBuilder with ORCA .dll and .lib files (I use 
+	PowerBuilder 6.0 enterprise edition)
+
+BUILDING:
+
+	perl Makefile.PL
+	nmake
+
+TESTING:
+  
+	The test application located in files orca_test.pbl and orca_test2.pbl. 
+	It is necessary to open it and make work in PB environment. After that 
+	it is possible to start test suit:
+
+  	nmake test
+
+INSTALLING:
+
+  	nmake install

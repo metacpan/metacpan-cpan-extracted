@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/POSIX-bsearch.t
+lib/POSIX/bsearch.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,25 @@
+---
+abstract: 'Composite Type Mapper for PGObject'
+author:
+  - 'Chris Travers <chris@efficito.com>'
+build_requires:
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PGObject-Composite
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  PGObject: v1.402.4
+  PGObject::Type::Composite: 0
+  perl: 5.006
+resources:
+  repository: https://github.com/ledgersmb/PGObject-Composite.git
+version: 0.02

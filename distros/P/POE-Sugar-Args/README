@@ -1,0 +1,92 @@
+NAME
+    POE::Sugar::Args - Get "pretty", OO representation of args.
+
+SYNOPSIS
+     use POE::Sugar::Args;
+
+     sub _start {
+       my $poe = sweeten_args;
+       $poe->kernel->yield( '_stop' );
+     }
+
+     # or, the long, boring way
+ 
+     sub _stop {
+       my $poe = POE::Sugar::Args->new( @_ );
+       delete $poe->heap->{client};
+     }
+
+ABSTRACT
+    This module give an OO representation to arguments POE passes to event
+    states. I will not lie to you. This adds heavy, bulky code underneath.
+    On the other hand, it makes arguments for POE events much more
+    palatable. Of course, this is a Sugar module, meaning, it will rot your
+    program in odd (you'll be hooked) and unexpected ways (performace), but
+    you took the candy so you can suffer the consequences. Good luck.
+
+DESCRIPTION
+  Exports
+
+    This function will get "@_" from the calling state by doing deep, dark
+    voodoo. It will construct the "POE::Sugar::Args" object for you. Very
+    handy.
+
+  Methods
+
+   new
+
+    Constructs an object. Expects all of "@_" that's passed to an event
+    state.
+
+   object
+
+    If this state was initialized as an "object_state" in the session, the
+    object will be here.
+
+   session
+
+    POE::Session object.
+
+   kernel
+
+    POE::Kernel object.
+
+   heap
+
+    Your heap.
+
+   state
+
+    Event name that invoked the state.
+
+   sender
+
+    Reference to the session that send the event.
+
+   caller_file
+
+    The calling file.
+
+   caller_line
+
+    The calling line.
+
+   args
+
+    All arguments this event was called with.
+
+AUTHOR
+    Casey West <casey@geeknest.com>
+
+THANKS
+    Rocco Caputo -- Much help with code and overall inspiration.
+
+COPYRIGHT
+    Copyright (c) 2003 Casey West. All rights reserved. This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+SEE ALSO
+    the perl manpage, the Devel::Caller manpage, the DB manpage, the
+    perldebguts manpage.
+

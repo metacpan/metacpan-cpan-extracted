@@ -1,0 +1,86 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [-Rinci]
+     ;exclude_modules = REGEX
+     ;exclude_files = REGEX
+
+DESCRIPTION
+
+    This plugin inserts stuffs to POD documentation based on information
+    found on Rinci metadata.
+
+ For modules
+
+    For modules, the following are inserted:
+
+      * DESCRIPTION
+
+      From description property from package metadata, if any.
+
+      * FUNCTIONS
+
+      Documentation for each function for which the metadata is found under
+      the package will be added here. For each function, there will be
+      summary, description, usage, list of arguments and their
+      documentation, as well as examples, according to what's available in
+      the function metadata of corresponding function.
+
+    To get Rinci metadata from a module, Perinci::Access::Perl is used.
+
+ For Perinci::CmdLine-based CLI script
+
+    For scripts using Perinci::CmdLine (or its variant ::Any and ::Lite),
+    the following are inserted:
+
+      * SYNOPSIS
+
+      If the script's POD does not yet have this section, this section will
+      be added containing the usage line of the script.
+
+      * DESCRIPTION
+
+      If the script's POD does not already have this section, and if the
+      script does not have subcommands, description from function metadata
+      will be inserted here, if any.
+
+      * SUBCOMMANDS
+
+      If the script's POD does not already have his section, and if the
+      script has subcommands, then each subcommand will be listed here
+      along with its summary and description.
+
+      * OPTIONS
+
+      If the script's POD does not already have his section, command-line
+      options for the script will be listed here. If script has
+      subcommands, the options will be categorized per subcommand.
+
+      * CONFIGURATION
+
+      If the script's POD does not already have his section, general
+      information about configuration files and available configuration
+      parameters will be listed here. If script has subcommands, the
+      parameters will be categorized per subcommand.
+
+      * FILES
+
+      Configuration files read by script will be listed here.
+
+    To get Perinci::CmdLine object information (which contains the URL of
+    the Rinci function, or the list of subcommands, among others), the
+    script is run with a patched run() that will dump the content of the
+    object and exit immediately, so the plugin can inspect it.
+
+    Caveats: 1) Function used by the script must reside in the module, not
+    embedded inside the script itself, otherwise it will not be readable by
+    the plugin. 2) Coderef subcommands is not supported.
+
+    To exclude a script from being processed, you can also put #
+    NO_PWP_RINCI in the script.
+
+SEE ALSO
+
+    Pod::Weaver
+

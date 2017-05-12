@@ -1,0 +1,4 @@
+= this text should be ~italic~ here
+#--------------------------------------------------------------------------#
+=head1 this text should be I<italic> here
+

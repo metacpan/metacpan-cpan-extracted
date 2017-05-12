@@ -1,0 +1,57 @@
+=encoding utf-8
+
+=head1 名前
+
+mlpod2pod_ja - 多言語 pod を通常の pod に変換
+
+=head1 概要
+
+ mlpod2pod [options] mlpodfile > podfile
+
+=head1 説明
+
+多言語 pod を通常の pod に変換します.
+
+=head1 オプション
+
+引数のうち - で始まるものがオプション設定として扱われます. 
+-- 以降は - で始まっていてもファイルとして扱われます.
+
+=over
+
+=item --outfile="filename"
+
+F<filename> に出力します.
+
+=item -o "filename"
+
+--outfile="filename" のエイリアスです.
+
+=item --auto-out
+
+適当に *.pod という拡張子にしたファイルに出力します.
+
+=item --langs=""
+
+mlpod に記述されている言語のうち, 指定したものだけを
+出力するようにします.
+複数ファイルがあるときにはカンマ区切りで指定します.
+
+=back
+
+=head1 環境変数
+
+=over
+
+=item MLPOD_LANGS
+
+--langs 指定と同等です. 
+--langs が明示的に指定されていればそちらが優先されます.
+
+=back
+
+=head1 関連項目
+
+L<Pod::MultiLang>
+
+

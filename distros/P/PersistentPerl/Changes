@@ -1,0 +1,255 @@
+Revision history for Perl extension PersistentPerl.
+
+2.22	Sat Oct 11 20:34:15 PDT 2003
+
+	- Redhat9 fixes.
+
+	- Better support for setuid under Solaris.
+
+	- Fixes for HP-UX 11.22
+
+	- Fix for memory leak in perperl_backend reported by James H. Thompson
+
+	- perperl_file.c fixes for bugs reported by Dmitri Tikhonov
+
+	- Fix from Lars Thegler for buffer overrun in perperl_opt.c
+
+	- Add efence malloc debugging.
+
+2.21	Thu Sep 26 15:27:35 PDT 2002
+
+	- Fix too many backends problem reported by Theo Petersen.  The
+	  problem is due to temp-file corruption that occurs when the
+	  web-server sends a TERM signal to the frontend while it is working
+	  on the temp file.  It also results in some backends failing due
+	  to the corruption.  Added a fix so that signals are always blocked
+	  while working on the temp file.
+
+	- Shutdown handler should be called after script is touched.
+
+	- Fixes for Mac OS X 10.1.  Workaround the sigpending() bug,
+	  and add msync() which appears to fix a shared-memory flushing
+	  problem when temp-file is expanded.
+
+2.20	Wed Sep 11 19:33:36 PDT 2002
+
+	- Added a mod_persistentperl module that works under Apache 2.0.39 or
+	  later.  Works with the default prefork mpm, but not with threaded
+	  mpm's.
+
+	- Exit status is now passed from the backend to the frontend.
+	  The frontend now exits soon after the backend exits instead of
+	  when all sockets close.
+
+	- Fixed bug where alarm's were unusable from within perl code.
+
+	- Signal handling in the backend has been cleaned up.  Signal
+	  settings will no longer be altered between perl runs.
+
+	- Find scripts by dev/ino/group-name instead of by dev/ino
+
+	- In the "perperl" executable buffering has been changed so
+	  that BufsizGet and BufsizPut are now maximum values instead of
+	  absolute values.  The buffers will start small and grow
+	  to this value if needed.  The default values for these options
+	  have been increased.
+
+	- Backend allocation is now controlled better.  Another backend isn't
+	  allocated until the previous backend has had a chance to start.
+	  This should reduce the tendency to use too many backends when the
+	  load fluctuates.
+	
+	- Initially compiled perl-code is now shared among interpreters
+	  within the same group (or same script if not using groups).
+	  
+	- To implement the new shared perl code and exit status features,
+	  an extra parent process is created for each group (or for each
+	  script, if not using groups).  This process should use very little
+	  cpu or un-shared memory.
+
+	- New code provides doubly linked lists for all slots in the
+	  temp file.  This eliminates some of the more obscure linked list
+	  code in various places, and enables some minor performance
+	  improvements.
+
+2.11	Tue Mar 20 22:59:36 PST 2001
+
+	- When using the new Group option, exit was causing the whole
+	  interpreter to exit.
+	- Fixed a bug introduced in 2.10 where mod_persistentperl could run
+	  the wrong script
+	- Fixed a bug where mod_persistentperl could mix up the sh-bang options 
+	  between different scripts.
+	- Added automated mod_persistentperl testing.
+	- Added a workaround for a Solaris 2.5.1 bug that was causing the
+	  mungefds and touch tests to fail.
+	- Added a new variable $PersistentPerl::i_am_perperl for a quick way
+	  to check if the script is running under persistentperl.
+	- New methods: add_shutdown_handler, shutdown_now, shutdown_next_time
+
+2.10	Wed Jan 31 02:56:33 PST 2001
+
+	- Multiple scripts in one interpreter using the new Group option.
+	- Reduce perperl exec time by removing all extraneous shared-libs
+	- Make code smaller by adding ifdefs to separate frontend/backend code.
+	- Persistent frontend now dies on sigpipe if it gets epipe on fd 1 or 2
+	- The backend now always tracks the current directory of the frontend
+	- New "register_cleanup" method
+	- Build binaries for solaris and bsd ("make solpkg" and "make bsdpkg")
+	- Bug fixes:
+	    - Changing mtime on a script could cause temp-file corruption
+	    - After hitting maxruns, backend was not chdir'ing to the right
+	      directory before exec'ing itself.
+
+2.02	Sun Dec 17 21:43:02 PST 2000
+
+	- Bug fixes
+	    - Memory leak in mod_persistentperl
+	    - Zombie backends could appear to still be running
+	    - Options in #! line were sometimes ignored
+	    - Module is not being installed correctly on CPAN
+	    - Fix for mod_persistentperl compile failure on solaris-8
+	- Default value for MaxRuns is now 500
+	- Experimental support for setuid scripts with -DIAMSUID
+	- Don't link the frontend with libperl
+	- New -v option displays the PersistentPerl version
+	- Add ability to build binary rpms with "make rpm"
+
+2.0.1	Sun Oct 22 19:53:24 PDT 2000
+
+	- Bug fixes:
+	    - mod_persistentperl reports temp file is corrupt
+	    - Switching from mod_perl to mod_persistentperl causes error
+	    - Runaway file growth in FreeBSD 3.4
+	    - Stranded sockets in /tmp
+	    - Dead frontends are left stranded in invalid groups
+	    - Cannot reliably detect temp-file removal
+	    - MAP_FAILED not defined on HP-UX
+	    - index() declaration compiler warning on Solaris
+	  Details are at http://sf-www.sourceforge.net/projects/PersistentPerl
+
+2.0	Mon Sep 11 02:46:57 PDT 2000
+	
+	- Use unix sockets instead of tcp sockets.  Fixes the TIME_WAIT
+	  problem in 1.x releases.
+
+	- When a backend hits MaxRuns it now re-execs itself.  Setting
+	  MaxRuns to 1 allows pre-compilation of scripts that can't run
+	  persistently.
+
+	- Cleaner implementation of MaxBackends using frontend queuing.
+
+	- The backend is now a separate binary from the frontend.
+
+	- mod_spedycgi is now a shared object (DSO).
+
+	- Redesigned temp-file structure:
+
+	    - One temp-file for each user, used for all perperl processes
+	      running under that uid.
+
+	    - Track backends regardless of their state.
+
+	    - Two way queuing - backends waiting on frontends and frontends
+	      waiting on backends.
+
+	    - Support for multiple scripts running in a single interpreter.
+	      Not yet implemented in code.
+
+1.8.3  Sat Aug 01 16:52:20 GMT 2000
+        
+        - Added MAXBACKENDS feature to limit number of backend processes
+          spawned.  This required changing the format of the backend
+          queue.  Now each entry has a pid, port number, and used flag.
+          The queue now contains a list of all backend processes, with
+          the used flag present to determine whether or not the process
+          is in use.
+
+        - Added contrib directory with instructions on using PersistentPerl
+          with HTML::Mason
+
+1.8.2  Sun Jun  6 04:01:53 GMT 1999
+
+	- Make I/O more compatible with PerlIO
+
+1.8.1  Sat Jun  5 12:30:43 PDT 1999
+
+	- Fix compile failure under perl 5.004.
+
+1.8  Thu Jun  3 13:20:00 PDT 1999
+
+	- Now has support for an Apache module front-end, mod_persistentperl.
+	  This is a optional performance improvement -- it is not required
+	  in order to run PersistentPerl under Apache.  See apache/README
+	  for details.
+
+	- Fix for initial_eof test bug on SGI-Irix.
+
+	- New CGI:PersistentPerl method "i_am_perperl" allows the script
+	  to tell whether it is running under PersistentPerl
+
+	- New PersistentPerl methods "setopt" and "getopt" allow the
+	  script to set/get PersistentPerl options at runtime.
+
+	- Fix for bug in Solaris where PersistentPerl options could not be
+	  passed in on the #! line.
+
+	- Better documentation
+
+	- Fix to make t/shutdown.t work before "make install" is done.
+
+
+1.7  Thu May 13 00:28:42 PDT 1999
+
+	- Re-did a lot of the queue.c code.  Fixes the bug where queue
+	  order was not being preserved when a perl-proc exited.  Also
+	  saves a couple syscalls when using read/write instead of mmap.
+
+	- Fixed compile warnings on Dec Alpha in start_perl.c and 
+	  perperl.c
+
+	- Added "sleep 2" to fix t/basic.t test #2 under HP-UX.
+
+	- Secret word was not very random on little-endian systems.
+
+
+1.6  Sun Apr  4 18:18:25 PDT 1999
+
+	- added support for stderr.
+
+	- make sure to cd back to original directory after each perl run.
+
+	- signals are now reset between every request.
+
+	- wrote perperl_poll.c -- allows compilation for
+	  either poll or select, using defines USE_POLL or USE_SELECT.
+	  Default is poll for sysv & sun, select for all others.
+
+	- queue.c patch for compile failure on alpha/OSF1 V3.2. 
+	  From Jean-Damien Durand <jdurand@mail.cern.ch>
+
+	- Use mtime instead of ctime to check whether a file has changed.
+	  Touch doesn't reliably update ctime on some systems.
+
+	- Send over environment using the same poll loop as when sending
+	  stdin/stdout.  A little cleaner & more efficient.
+
+
+1.5  Tue Mar 30 13:33:55 PST 1999
+
+	- Re-wrote the test scripts to be more reliable.
+
+	- Added a FAQ file.
+
+
+1.4  Mon Mar 29 03:54:39 PST 1999
+
+	- Converted C++ style comments to /**/.  Should help compilation
+
+	- Added PersistentPerl::set_shutdown_handler to allow the perl
+	  program to set a callback for when perl is shut down.
+
+	- Added t/shutdown.t to test the new set_shutdown_handler feature.
+
+	- queue.c wouldn't compile as-is on Solaris Devpro-4.2.  Changed
+	  the void*'s to char*'s so the compiler could do pointer arithmetic.

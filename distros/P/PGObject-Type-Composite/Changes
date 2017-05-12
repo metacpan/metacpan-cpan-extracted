@@ -1,0 +1,15 @@
+Revision history for PGObject-Type-Composite
+
+0.04	2014-09-11
+	Minor packaging fixes
+
+0.03    2014-09-06
+        Code cleanup
+        Requires PGObject::Util::PseudoCSV 1.1 now
+
+0.02    2014-09-01
+        Packaging fixes
+
+0.01    2014-09-01
+        First version, released on an unsuspecting world.
+

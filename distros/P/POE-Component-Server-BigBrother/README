@@ -1,0 +1,166 @@
+NAME
+    POE::Component::Server::BigBrother - POE Component that implements
+    BigBrother daemon functionality
+
+SYNOPSIS
+     use strict;
+     use POE;
+     use POE::Component::Server::BigBrother;
+
+     POE::Component::Server::BigBrother->spawn(
+         alias => 'BigBrother_Server',
+         msg_max_size => 8192,
+     );
+
+     POE::Session->create(
+         package_states => [
+           'main' => { 'bb_status' => '_message' },
+           'main' => [ qw ( _start ) ] ],
+     );
+
+     $poe_kernel->run();
+
+     exit 0;
+
+     sub _start {
+       # Our session starts, register to receive all events from poco-BigBrother
+       $poe_kernel->post ( 'BigBrother_Server', 'register', qw( all ) );
+       return;
+     }
+
+     sub _message {
+       my ($sender, $message, $bb_server) = @_[SENDER, ARG0, ARG1];
+       print $message->{command}," message from ",$message->{host_name},$/;
+     }
+
+DESCRIPTION
+    POE::Component::Server::BigBrother is a POE component that implements
+    "BigBrother daemon" functionality. This is the daemon program that
+    accepts service check information from remote machines.
+
+    The component implements the network handling of accepting service check
+    information from multiple clients.
+
+    It is based in part on code shamelessly borrowed from
+    POE::Component::IRC
+
+CONSTRUCTOR
+    spawn
+        Optional parameters:
+
+          'alias', set an alias on the component;
+          'bind_addr', specify an address to listen on, default is INADDR_ANY;
+          'bind_port', specify a port to listen on, default is 1984;
+          'time_out', specify a time out in seconds for socket connections, default is 30;
+          'max_msg_size', specify the max size for a message, default is 16384;
+
+        Returns a POE::Component::Server::BigBrother object.
+
+METHODS
+    session_id
+        Takes no arguments. Returns the POE::Session ID of the component.
+        Ideal for posting events to the component.
+
+    shutdown
+        Terminates the component. Shuts down the listener and unregisters
+        registered sessions.
+
+INPUT EVENTS
+    These are events from other POE sessions that our component will handle:
+
+  "register"
+        This will register the sending session. Takes N arguments: a list of
+        event names that your session wants to listen for, minus the 'bb_'
+        prefix. So, for instance, if you just want a program that keeps
+        track of status messages, you'll need to listen for status. You'd
+        tell POE::Component::Server::BigBrother that you want those events
+        by saying this:
+
+         $poe_kernel->post ( 'BigBrother_Server', 'register', qw( status ) );
+
+        Registering for 'all' will cause it to send all BigBrother-related
+        events to you; this is the easiest way to handle it.
+
+        The component will increment the refcount of the calling session to
+        make sure it hangs around for events. Therefore, you should use
+        either "unregister" or "shutdown" to terminate registered sessions.
+
+  "unregister"
+        Takes N arguments: a list of event names which you *don't* want to
+        receive. If you've previously done a "register" for a particular
+        event which you no longer care about, this event will tell the
+        BigBrother connection to stop sending them to you. (If you haven't,
+        it just ignores you..)
+
+        If you have registered with 'all', attempting to unregister
+        individual events such as 'status', etc. will not work. This is a
+        'feature'.
+
+  "shutdown"
+        By default, POE::Component::Server::BigBrother sessions never go
+        away. If you send a shutdown event it's terminates the component,
+        shuts down the listener and unregisters registered sessions.
+
+OUTPUT EVENTS
+    The events you will receive (or can ask to receive) from your running
+    BigBrother component. Note that all incoming event names your session
+    will receive are prefixed by 'bb_', to inhibit event namespace
+    pollution.
+
+    If you wish, you can ask the server to send you every event it
+    generates. Simply register for the event name 'all'. This is a lot
+    easier than writing a huge list of things you specifically want to
+    listen for.
+
+    In your event handlers, $_[SENDER] is the particular component session
+    that sent you the event.
+
+  "standard events"
+    All the standard events are sent with the following parameters:
+
+    ARG0
+        ARG0 will contain a hashref with the following key/values:
+
+         'command', the type of the message (eg: status, page, etc...);
+         'offset', the offset for the command;
+         'host_name', the hostname for which the message is applicable;
+         'probe', the name of the probe for which the message is applicable;
+         'color', the result color of the check (applicable only for status & page messages);
+         'data', datas associated with the message;
+
+    ARG1
+        ARG1 will contain the POE::Component::Server::BigBrother's object.
+        Useful if you want on-the-fly access to the object and its methods.
+
+   "bb_status"
+    This events are generated upon receipt of status messages.
+
+   "bb_page"
+    This events are generated upon receipt of page messages.
+
+   "bb_enable"
+    This events are generated upon receipt of enable messages.
+
+   "bb_disable"
+    This events are generated upon receipt of disable messages.
+
+   "bb_event"
+    This events are generated upon receipt of event messages.
+
+AUTHOR
+    Yves Blusseau <yblusseau@cpan.org>
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-POE-Component-Server-BigBrother at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-Server-Big
+    Brother>. I will be notified, and then you'll automatically be notified
+    of progress on your bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2008-2009 Yves Blusseau. All rights reserved.
+
+    POE::Component::Server::BigBrother is free software; you may use,
+    redistribute, and/or modify it under the same terms as Perl itself.
+

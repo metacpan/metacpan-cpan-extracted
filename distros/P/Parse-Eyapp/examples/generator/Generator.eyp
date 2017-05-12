@@ -1,0 +1,66 @@
+# file: Generator.eyp
+# compile with: eyapp -C '' Generator.eyp
+# then run: ./Generator.pm
+%strict
+%token NUM VARDEF VAR
+
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+%right  '^'
+
+%defaultaction {
+  my $parser = shift;
+
+  return join '', @_;
+}
+
+%{
+use base q{Parse::Eyapp::TokenGen};
+use base q{GenSupport};
+%}
+
+%%
+
+stmts:
+    stmt
+      {
+        $_[0]->deltaweight(VAR => +1); # At least one variable is defined now
+        $_[1];
+      }
+  | stmts ';' { "\n" } stmt 
+;
+
+stmt:
+    VARDEF '=' exp  
+      {
+        my $parser = shift;
+        $parser->defined_variable($_[0]); 
+        "$_[0]=$_[2]";
+      }
+;
+exp:
+    NUM                
+  | VAR
+  | exp '+' exp        
+  | exp '-' exp        
+  | exp '*' exp        
+  | exp '/' exp        
+  | '-' { $_[0]->pushdeltaweight('-' => -1) } exp %prec NEG  
+      {
+        $_[0]->popweight(); 
+        "-$_[3]"
+      }
+  | exp '^' exp        
+  | '('   { $_[0]->pushdeltaweight('(' => -1, ')' => +1, '+' => +1, ); } 
+      exp 
+    ')'
+      {
+         $_[0]->popweight; 
+         "($_[3])"
+      }
+;
+
+%%
+

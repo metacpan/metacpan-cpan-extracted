@@ -1,0 +1,26 @@
+September 23, 2007
+
+ o Release 1.2
+ o Changed 'use' to 'require' after code failed tests
+
+June 29, 1999
+
+ o Release 1.1
+ o General documentation and code cleanup
+ o Removed split option (never implemented)
+ o Removed un-necessary library stuff
+ o Added better scaling for very small calendars
+ o Built test suites and other stuff necessary for CPAN packaging
+
+Alan Jackson alanj@ajackson.org
+
+April 11, 1999
+
+ o Release 1.0 - initial release
+ o PlotCalendar::Day
+ o PlotCalendar::Month
+ o PlotCalendar::DateDesc
+ o PlotCalendar::DateTools
+
+Alan Jackson alanj@ajackson.org
+

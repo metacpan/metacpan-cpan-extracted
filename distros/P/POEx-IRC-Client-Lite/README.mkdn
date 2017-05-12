@@ -1,0 +1,376 @@
+# NAME
+
+POEx::IRC::Client::Lite - Minimalist POE IRC interface
+
+# SYNOPSIS
+
+    package MyClient;
+    use POE;
+    use POEx::IRC::Client::Lite;
+    use IRC::Toolkit;
+
+    our @channels = ( '#otw', '#eris' );
+
+    POE::Session->create(
+      package_states => [
+        MyClient => [ qw/
+          _start
+          emitted_irc_001
+          emitted_irc_public_msg
+          emitted_irc_ctcp_version
+        / ],
+      ],
+    );
+
+    sub _start {
+      my ($kern, $heap) = @_[KERNEL, HEAP];
+
+      $heap->{irc} = POEx::IRC::Client::Lite->new(
+        server  => "irc.perl.org",
+        nick    => "MyNick",
+        username => "myuser",
+      );
+
+      $heap->{irc}->connect;
+    }
+
+    sub emitted_irc_001 {
+      my ($kern, $heap) = @_[KERNEL, HEAP];
+
+      $heap->{irc}->join(@channels)->privmsg(
+        join(',', @channels), "hello!"
+      );
+    }
+
+    sub emitted_irc_public_msg {
+      my ($kern, $heap) = @_[KERNEL, HEAP];
+      my $event = $_[ARG0];
+
+      my ($target, $string) = @{ $event->params };
+      my $from = parse_user( $event->prefix );
+
+      if (lc($string||'') eq 'hello') {
+        $heap->{irc}->privmsg($target, "hello there, $from")
+      }
+    }
+
+    sub emitted_irc_ctcp_version {
+      my ($kern, $heap) = @_[KERNEL, HEAP];
+      my $event = $_[ARG0];
+
+      my $from = parse_user( $event->prefix );
+
+      $heap->{irc}->notice( $from =>
+        ctcp_quote("VERSION a silly Client::Lite example")
+      );
+    }
+
+# DESCRIPTION
+
+A very thin (but pluggable / extensible) IRC client library using
+[POEx::IRC::Backend](https://metacpan.org/pod/POEx::IRC::Backend) and [IRC::Toolkit](https://metacpan.org/pod/IRC::Toolkit) on top of
+[MooX::Role::POE::Emitter](https://metacpan.org/pod/MooX::Role::POE::Emitter) and [MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable).
+
+No state is maintained; POEx::IRC::Client::Lite provides a
+minimalist interface to IRC and serves as a base class for stateful clients.
+
+This is early development software pulled out of a much larger in-progress
+project. 
+**See [POE::Component::IRC](https://metacpan.org/pod/POE::Component::IRC) for a more mature POE IRC client library.**
+
+## new
+
+    my $irc = POEx::IRC::Client::Lite->new(
+      # event_prefix comes from MooX::Role::POE::Emitter,
+      # defaults to 'emitted_'
+      event_prefix => $prefix,
+      server    => $server,
+      nick      => $nickname,
+      username  => $username,
+    );
+
+Create a new Client::Lite instance. Optional arguments, in addition to
+attributes provided by [MooX::Role::POE::Emitter](https://metacpan.org/pod/MooX::Role::POE::Emitter) & [MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable),
+are:
+
+- bindaddr
+
+    Local address to bind to.
+
+- ipv6
+
+    Boolean value indicating whether to prefer IPv6.
+
+- port
+
+    Remote port to use (defaults to 6667).
+
+- ssl
+
+    Boolean value indicating whether to (attempt to) connect via SSL.
+
+    Requires [POE::Component::SSLify](https://metacpan.org/pod/POE::Component::SSLify).
+
+- ssl\_opts
+
+    An `ARRAY` containing SSL options passed along to [POE::Component::SSLify](https://metacpan.org/pod/POE::Component::SSLify)
+    via [POEx::IRC::Backend](https://metacpan.org/pod/POEx::IRC::Backend); see [POE::Component::SSLify](https://metacpan.org/pod/POE::Component::SSLify) & [Net::SSLeay](https://metacpan.org/pod/Net::SSLeay).
+
+    Not required for basic SSL operation; setting ["ssl"](#ssl) to a true value should
+    work for most users.
+
+- reconnect
+
+    Reconnection attempt delay, in seconds.
+
+    **Automatic reconnection is only triggered when an outgoing connector fails!**
+
+    You can trigger a reconnection in your own code by handling
+    ["irc\_disconnected"](#irc_disconnected) events. For example:
+
+        sub irc_disconnected {
+          # Immediate reconnect; you may want to use a timer (to avoid being banned)
+          # Assuming our IRC component's object lives in our session's HEAP:
+          $_[HEAP]->{irc}->connect
+        }
+
+## stop
+
+    $irc->stop;
+
+Disconnect, stop the Emitter, and purge the plugin pipeline.
+
+## IRC Methods
+
+IRC-related methods can be called via normal method dispatch or sent as a POE
+event:
+
+    ## These are equivalent:
+    $irc->send( $ircevent );
+    $irc->yield( 'send', $ircevent );
+    $poe_kernel->post( $irc->session_id, 'send', $ircevent );
+
+Methods that dispatch to IRC return `$self`, so they can be chained:
+
+    $irc->connect->join(@channels)->privmsg(
+      join(',', @channels),
+      'hello there!'
+    );
+
+### connect
+
+    $irc->connect;
+
+Attempt an outgoing connection.
+
+### disconnect
+
+    $irc->disconnect($message);
+
+Quit IRC and shut down the wheel.
+
+### send
+
+    use IRC::Message::Object 'ircmsg';
+    $irc->send(
+      ircmsg(
+        command => 'oper',
+        params  => [ $user, $passwd ],
+      )
+    );
+
+    ## ... or a raw HASH:
+    $irc->send(
+      {
+        command => 'oper',
+        params  => [ $user, $passwd ],
+      }
+    )
+
+    ## ... or a raw line:
+    $irc->send_raw_line('PRIVMSG avenj :some things');
+
+Use `send()` to send an [IRC::Message::Object](https://metacpan.org/pod/IRC::Message::Object) or a compatible
+HASH; this method will also take a list of events in either of those formats.
+
+### send\_raw\_line
+
+Use `send_raw_line()` to send a single raw IRC line. This is rarely a good
+idea; [POEx::IRC::Backend](https://metacpan.org/pod/POEx::IRC::Backend) provides an IRCv3-capable filter.
+
+### set\_nick
+
+    $irc->set_nick( $new_nick );
+
+Attempt to change the current nickname.
+
+### privmsg
+
+    $irc->privmsg( $target, $string );
+
+Sends a PRIVMSG to the specified target.
+
+### notice
+
+    $irc->notice( $target, $string );
+
+Sends a NOTICE to the specified target.
+
+### ctcp
+
+    $irc->ctcp( $target, $type, @params );
+
+Encodes and sends a CTCP **request** to the target.
+(To send a CTCP **reply**, send a ["notice"](#notice) that has been quoted via
+["ctcp\_quote" in IRC::Toolkit::CTCP](https://metacpan.org/pod/IRC::Toolkit::CTCP#ctcp_quote).)
+
+### mode
+
+    $irc->mode( $channel, $modestring );
+
+Sends a MODE for the specified target.
+
+Takes a channel name as a string and a mode change as either a string or an
+[IRC::Mode::Set](https://metacpan.org/pod/IRC::Mode::Set).
+
+### join
+
+    $irc->join( $channel );
+
+Attempts to join the specified channel.
+
+### part
+
+    $irc->part( $channel, $message );
+
+Attempts to leave the specified channel with an optional PART message.
+
+## Attributes
+
+### conn
+
+The [POEx::IRC::Backend::Connect](https://metacpan.org/pod/POEx::IRC::Backend::Connect) instance for our connection.
+
+### nick
+
+The nickname we were spawned with.
+
+This class doesn't track nick changes; if our nick is changed later, ->nick()
+is not updated.
+
+### server
+
+The server we were instructed to connect to.
+
+# Emitted Events
+
+## IRC events
+
+All IRC events are emitted as 'irc\_$cmd' e.g. 'irc\_005' (ISUPPORT) or
+'irc\_mode' with a few notable exceptions, detailed below.
+
+`$_[ARG0]` is the [IRC::Message::Object](https://metacpan.org/pod/IRC::Message::Object).
+
+## Special events
+
+### irc\_connected
+
+Emitted when a connection has been successfully opened.
+
+This does not indicate successful server registration, only that the
+connection has been opened and registration details have been sent.
+
+`$_[ARG0]` is the [POEx::IRC::Backend::Connect](https://metacpan.org/pod/POEx::IRC::Backend::Connect) object.
+
+### irc\_connector\_failed
+
+Emitted if an outgoing connection could not be established.
+
+`@_[ARG0 .. ARG3]` are the operation, errno, and error string passed in
+by [POEx::IRC::Backend](https://metacpan.org/pod/POEx::IRC::Backend); see ["ircsock\_connector\_failure" in POEx::IRC::Backend](https://metacpan.org/pod/POEx::IRC::Backend#ircsock_connector_failure).
+
+### irc\_connector\_killed
+
+Emitted if a connection is terminated during ["preregister"](#preregister).
+
+`$_[ARG0]` is the [POEx::IRC::Backend::Connect](https://metacpan.org/pod/POEx::IRC::Backend::Connect) object.
+
+### irc\_private\_message
+
+Emitted for PRIVMSG-type messages not covered by ["irc\_public\_message"](#irc_public_message).
+
+### irc\_public\_message
+
+Emitted for PRIVMSG-type messages that appear to be destined for a channel
+target.
+
+### irc\_ctcp\_TYPE
+
+Emitted for incoming CTCP requests. TYPE is the request type, such as
+'version'
+
+`$_[ARG0]` is the [IRC::Message::Object](https://metacpan.org/pod/IRC::Message::Object) produced by
+["ctcp\_extract" in IRC::Toolkit::CTCP](https://metacpan.org/pod/IRC::Toolkit::CTCP#ctcp_extract).
+
+An example of sending a CTCP reply lives in ["SYNOPSIS"](#synopsis).
+See [IRC::Toolkit::CTCP](https://metacpan.org/pod/IRC::Toolkit::CTCP) for CTCP-related helpers.
+
+### irc\_ctcpreply\_TYPE
+
+Emitted for incoming CTCP replies.
+
+Mirrors the behavior of ["irc\_ctcp\_TYPE"](#irc_ctcp_type)
+
+### irc\_disconnected
+
+Emitted when an IRC connection has been disconnected at the backend.
+
+`$_[ARG0]` is the disconnect string from [POEx::IRC::Backend](https://metacpan.org/pod/POEx::IRC::Backend).
+
+`$_[ARG1]` is the [POEx::IRC::Backend::Connect](https://metacpan.org/pod/POEx::IRC::Backend::Connect) that was disconnected.
+
+# Pluggable Events
+
+These are events explicitly dispatched to plugins 
+via ["process" in MooX::Role::POE::Emitter](https://metacpan.org/pod/MooX::Role::POE::Emitter#process); 
+see [MooX::Role::POE::Emitter](https://metacpan.org/pod/MooX::Role::POE::Emitter) and [MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable) for more on
+making use of plugins.
+
+## preregister
+
+Dispatched to plugins when an outgoing connection has been established, 
+but prior to registration.
+
+The first argument is the [POEx::IRC::Backend::Connect](https://metacpan.org/pod/POEx::IRC::Backend::Connect) object.
+
+Returning EAT\_ALL (see [MooX::Role::Pluggable::Constants](https://metacpan.org/pod/MooX::Role::Pluggable::Constants)) to Client::Lite
+will terminate the connection without registering.
+
+## outgoing
+
+Dispatched to plugins prior to sending output.
+
+The first argument is the item being sent. Note that no sanity checks are
+performed on the item(s) at this stage (this is done after items are passed to
+the [POEx::IRC::Backend](https://metacpan.org/pod/POEx::IRC::Backend) instance) -- your plugin's handler could receive a
+HASH, an [IRC::Message::Object](https://metacpan.org/pod/IRC::Message::Object), a raw line, or something invalid.
+
+Returning EAT\_ALL will skip sending the item.
+
+# SEE ALSO
+
+[POE::Component::IRC](https://metacpan.org/pod/POE::Component::IRC), a fully-featured POE IRC client library
+
+[IRC::Toolkit](https://metacpan.org/pod/IRC::Toolkit)
+
+[POEx::IRC::Backend](https://metacpan.org/pod/POEx::IRC::Backend)
+
+[POE::Filter::IRCv3](https://metacpan.org/pod/POE::Filter::IRCv3)
+
+[MooX::Role::POE::Emitter](https://metacpan.org/pod/MooX::Role::POE::Emitter)
+
+[MooX::Role::Pluggable](https://metacpan.org/pod/MooX::Role::Pluggable)
+
+# AUTHOR
+
+Jon Portnoy &lt;avenj@cobaltirc.org>

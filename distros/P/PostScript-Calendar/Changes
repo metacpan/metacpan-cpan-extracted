@@ -1,0 +1,54 @@
+Revision history for PostScript::Calendar
+
+1.02   2015-06-13
+	- No functional changes
+	- Release tests moved to xt/
+
+1.01   2012-02-12
+	- New constructor parameters: border_width, grid, grid_width,
+	  moon_dark, moon_light, & shade_color
+	- The shade methods can now take options to customize the color.
+	  This will generate code that requires PostScript level 2.
+	- PostScript::Calendar objects can now be passed to PostScript::Convert
+	- Use the function library provided by PostScript::File 2.20
+	- All comments are stripped from the generated PostScript
+
+1.00   2010-11-11
+	- No functional changes
+	- Restart test if necessary to pick up timezone change (Windows)
+
+0.06   2010-09-27
+	- Add a Creator comment only if we create the PostScript::File object
+	- Document that passing ps_file => undef creates a new object
+	- List the fonts we use even when given a ps_file
+	- Force timezone in tests for consistent results
+	- Figured out how to avoid Latin-1 in POD (S<C<< >>> works correctly)
+
+0.05   2010-03-15
+	- PostScript::File 2.00 now provides pstr and metrics
+	  Font::AFM is no longer required!
+	  This makes it much easier to get PostScript::Calendar working.
+	- Now possible to include multiple calendars in one PostScript file
+	  See example/calendar.pl for one way to do that.
+	- The ps_file method actually works now
+	- Switch to Dist::Zilla for packaging
+
+0.04   2008-06-25
+	- No functional changes
+	- Minor clean up to documentation
+	- Exclude ProhibitAccessOfPrivateData from perlcritic.t
+	- Skip perlcritic.t under AUTOMATED_TESTING
+	- Use Module::Build::DistVersion for packaging
+
+0.03   2007-04-05
+	- Round dimensions to integers to avoid subtle errors (RT#26090)
+
+0.02   2007-04-04
+	- Setting title to the empty string now suppresses the title (RT#26089)
+	- Bug fixes:
+	  - add_event didn't respect newlines as documented
+	  - label_font was ignored
+	- Documentation fixes
+
+0.01   2007-03-25
+	- Initial release

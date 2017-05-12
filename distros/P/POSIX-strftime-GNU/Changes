@@ -1,0 +1,49 @@
+0.0305  2014-11-15      Piotr Roszatycki <dexter@cpan.org>
+
+* Preventing "Redundant argument in sprintf" warning in Perl 5.21.x.
+* Using original system's "%Z" sequence if it works correctly.
+
+0.0304  2014-01-21      Piotr Roszatycki <dexter@cpan.org>
+
+* Compatibility with systems without locales (Android).
+
+0.0303  2014-01-15      Piotr Roszatycki <dexter@cpan.org>
+
+* Do not need c99 compiler mode.
+* Compatibility with Solaris 10 on Sparc.
+* Testing original POSIX::strftime is disabled by default.
+
+0.0302  2013-12-24      Piotr Roszatycki <dexter@cpan.org>
+
+* Compatibility with Solaris 10 and Solaris Studio 12.3 C Compiler.
+* XS function xs_strftime was renamed to strftime.
+* Supports cpanm --pp
+
+0.0301  2012-11-14      Piotr Roszatycki <dexter@cpan.org>
+
+* More portable XS code and tmzone test.
+
+0.03    2012-11-03      Piotr Roszatycki <dexter@cpan.org>
+
+* Supports "%N" sequence.
+* Do not load any module if both of PERL_* environment variables are false.
+
+0.0202  2012-11-02      Piotr Roszatycki <dexter@cpan.org>
+
+* Fixed build process on Windows with Interix.
+
+0.0201  2012-10-23      Piotr Roszatycki <dexter@cpan.org>
+
+* Fixed build process on Windows when current directory contains space
+  character.
+
+0.02    2012-10-17      Piotr Roszatycki <dexter@cpan.org>
+
+* GNU modifiers (ie. "%-", "%_", etc.) in PP module are fully supported.
+* Sequences "%z" and "%Z" in XS module are also supported.
+* FreeBSD, Solaris 11 and Windows are fully supported.
+
+0.01    2012-10-09      Piotr Roszatycki <dexter@cpan.org>
+
+* First CPAN release.
+

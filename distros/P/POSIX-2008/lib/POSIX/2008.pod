@@ -1,0 +1,983 @@
+=pod
+
+=head1 NAME
+
+POSIX::2008 - Perl interface to POSIX.1-2008
+
+=head1 SYNOPSIS
+
+  use POSIX qw(:fcntl_h);
+  use POSIX::2008;
+
+  my $dd = POSIX::2008::open('/tmp/');
+  my $fd = POSIX::2008::openat($dd, 'foobar', O_RDWR|O_CREAT);
+  POSIX::2008::pwrite($fd, 'fuckyounsa', 50);
+
+=head1 DESCRIPTION
+
+POSIX::2008 contains many of the interfaces specified by POSIX.1-2008 that
+the core POSIX module withholds, implements in Perl or fucked up.
+
+This module is provided "as is" unless someone volunteers to maintain it.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item a64l
+
+n = a64l(s);
+
+=item abort
+
+abort();
+
+=item abs
+
+ui = abs(i);
+
+=item acos
+
+y = acos(x);
+
+=item acosh
+
+y = acosh(x);
+
+=item alarm
+
+remaining_sec = alarm(sec);
+
+=item asin
+
+y = asin(x);
+
+=item asinh
+
+y = asinh(x);
+
+=item atan2
+
+z = atan2(y, x);
+
+=item atan
+
+y = atan(x);
+
+=item atanh
+
+y = atanh(x);
+
+=item atof
+
+f = atof(s);
+
+=item atoi
+
+i = atoi(s);
+
+=item atol
+
+l = atol(s);
+
+=item basename
+
+s = basename(path);
+
+=item cabs
+
+r = cabs(re, im);
+
+=item cacos
+
+(re, im) = cacos(re, im);
+
+=item cacosh
+
+(re, im) = cacosh(re, im);
+
+=item carg
+
+phi = carg(re, im);
+
+=item casinh
+
+(re, im) = casinh(re, im);
+
+=item catan
+
+(re, im) = catan(re, im);
+
+=item catanh
+
+(re, im) = catanh(re, im);
+
+=item catclose
+
+ret = catclose(catd);
+
+=item catgets
+
+s = catgets(catd, set_id, msg_id, dflt_string);
+
+=item catopen
+
+catd = catopen(name, oflag);
+
+=item cbrt
+
+y = cbrt(x);
+
+=item ccos
+
+(re, im) = ccos(re, im);
+
+=item ccosh
+
+(re, im) = ccosh(re, im);
+
+=item ceil
+
+y = ceil(x);
+
+=item cexp
+
+(re, im) = cexp(re, im);
+
+=item chdir
+
+ret = chdir(path);
+
+=item chmod
+
+ret = chmod(path, mode);
+
+=item chown
+
+ret = chown(path, uid, gid);
+
+=item cimag
+
+im = cimag(re, im);
+
+=item clock_getcpuclockid
+
+clock_id = clock_getcpuclockid(pid);
+
+pid defaults to $$. Returns undef on error.
+
+=item clock_getres
+
+(sec, nsec) = clock_getres(clock_id);
+
+clock_id defaults to CLOCK_REALTIME. Returns empty list on error.
+
+=item clock_gettime
+
+(sec, nsec) = clock_gettime(clock_id);
+
+clock_id defaults to CLOCK_REALTIME. Returns empty list on error.
+
+=item clock_nanosleep
+
+(rem_sec, rem_nsec) = clock_nanosleep(clock_id, flags, sec, nsec);
+
+In scalar context returns the remaining seconds as a floating point number.
+
+=item clock_settime
+
+ret = clock_settime(clock_id, sec, nsec);
+
+=item clog
+
+(re, im) = clog(re, im);
+
+=item confstr
+
+s = confstr(name);
+
+I<name> is one of the _CS_ integer constants.
+
+=item conj
+
+(re, im) = conj(re, im);
+
+=item copysign
+
+xs = copysign(x, y);
+
+=item cos
+
+y = cos(x);
+
+=item cosh
+
+y = cosh(x);
+
+=item cpow
+
+(re, im) = cpow(re_x, im_x, re_y, im_y);
+
+=item cproj
+
+(re, im) = cproj(re, im);
+
+=item creal
+
+re = creal(re, im);
+
+=item csin
+
+(re, im) = csin(re, im);
+
+=item csinh
+
+(re, im) = csinh(re, im);
+
+=item csqrt
+
+(re, im) = csqrt(re, im);
+
+=item ctan
+
+(re, im) = ctan(re, im);
+
+=item ctanh
+
+(re, im) = ctanh(re, im);
+
+=item dirname
+
+name = dirname(path);
+
+=item div
+
+(quot, rem) = div(numer, denom);
+
+=item dlclose
+
+dlclose(dlhandle);
+
+=item dlerror
+
+dlerror();
+
+=item dlopen
+
+dlhandle = dlopen(file, mode);
+
+=item dlsym
+
+addr = dlsym(dlhandle, name);
+
+=item drand48
+
+r = drand48();
+
+=item endutxent
+
+endutxent();
+
+=item erand48
+
+(r, X0, X1, X2) = erand48(X0, X1, X2);
+
+=item erf
+
+y = erf(x);
+
+=item erfc
+
+y = erfc(x);
+
+=item exp2
+
+y = exp2(x);
+
+=item expm1
+
+y = expm1(x);
+
+=item faccessat
+
+ret = faccessat(dirfd, path, amode, flags);
+
+I<flags> is the bitwise OR of zero or more of AT_EACCESS, AT_SYMLINK_NOFOLLOW.
+
+=item fchdir
+
+ret = fchdir(dirfd);
+
+=item fchmod
+
+ret = fchmod(fd, mode);
+
+=item fchmodat
+
+ret = fchmodat(dirfd, path, mode, flags);
+
+I<flags> can be 0 or AT_SYMLINK_NOFOLLOW.
+
+=item fchown
+
+ret = fchown(fd, uid, gid);
+
+=item fchownat
+
+ret = fchownat(dirfd, path, uid, gid, flags);
+
+I<flags> can be 0 or AT_SYMLINK_NOFOLLOW.
+
+=item fdatasync
+
+ret = fdatasync(fd);
+
+=item fdim
+
+d = fdim(double x, double y);
+
+=item fegetround
+
+round = fegetround();
+
+=item fesetround
+
+ret = fesetround(round);
+
+=item ffs
+
+pos = ffs(i);
+
+=item floor
+
+y = floor(x);
+
+=item fma
+
+r = fma(x, y, z);
+
+=item fmax
+
+m = fmax(x, y);
+
+=item fmin
+
+m = fmin(x, y);
+
+=item fmod
+
+m = fmod(x, y);
+
+=item fnmatch
+
+ret = fnmatch(pattern, string, flags);
+
+Returns 0 if I<string> matches I<pattern>, FNM_NOMATCH if there is no match,
+undef if there is an error.
+
+I<flags> is the bitwise OR of zero or more of FNM_NOESCAPE, FNM_PATHNAME,
+FNM_PERIOD, FNM_FILE_NAME, FNM_LEADING_DIR, FNM_CASEFOLD.
+
+=item fpclassify
+
+fpclassify(x);
+
+Returns one of FP_NAN, FP_INFINITE, FP_ZERO, FP_SUBNORMAL, FP_NORMAL.
+
+=item fstatat
+
+(dev, ino, mode, nlink, uid, gid, rdev, size, atim_sec, mtim_sec, ctim_sec,
+blksize, blocks, atim_nsec, mtim_nsec, ctim_nsec) = fstatat(dirfd, path,
+flags);
+
+I<flags> is the bitwise OR of zero or more of AT_SYMLINK_NOFOLLOW,
+AT_NO_AUTOMOUNT.
+
+=item fsync
+
+ret = fsync(fd);
+
+=item ftruncate
+
+ret = ftruncate(fd, length);
+
+=item futimens
+
+ret = futimens(fd, atime_sec, atime_nsec, mtime_sec, mtime_nsec);
+
+atime_sec and mtime_sec default to 0, atime_nsec and mtime_nsec default to
+UTIME_NOW.
+
+=item getdate
+
+(sec, min, hour, mday, mon, year, wday, yday, isdst) = getdate(string);
+
+=item getdate_err
+
+getdate_err() returns the value of the getdate_err variable.
+
+=item getegid
+
+egid = getegid();
+
+=item geteuid
+
+euid = geteuid();
+
+=item getgid
+
+gid = getgid();
+
+=item gethostid
+
+hostid = gethostid();
+
+=item gethostname
+
+hostname = gethostname();
+
+=item getitimer
+
+(int_sec, int_usec, val_sec, val_usec) = getitimer(which);
+
+I<which> is one of ITIMER_REAL, ITIMER_VIRTUAL, ITIMER_PROF.
+
+=item getpriority
+
+prio = getpriority(which, who);
+
+I<which> can be one of PRIO_PROCESS, PRIO_PGRP, PRIO_USER, defaults to
+PRIO_PROCESS.
+
+I<who> defaults to 0.
+
+Returns undef on error.
+
+=item getsid
+
+sid = getsid(pid);
+
+I<pid> defaults to 0.
+
+=item getuid
+
+uid = getuid();
+
+=item getutxent
+
+(user, id, line, pid, type, sec, usec) = getutxent();
+
+getutxent() reads a line from the current file position in the utmp file.
+
+=item getutxid
+
+(user, id, line, pid, type, sec, usec) = getutxid(ut_type, ut_id);
+
+getutxid() searches forward from the current file position in the utmp file
+based upon I<ut_type> and I<ut_id>. If I<ut_type> is one of RUN_LVL,
+BOOT_TIME, NEW_TIME, or OLD_TIME, getutxid() will find the first entry whose
+I<ut_type> field matches I<ut_type>. If I<ut_type> is one of INIT_PROCESS,
+LOGIN_PROCESS, USER_PROCESS, or DEAD_PROCESS, getutxid() will find the first
+entry whose I<ut_id> field matches I<ut_id>.
+
+=item getutxline
+
+(user, id, line, pid, type, sec, usec) = getutxline(ut_line);
+
+getutxline() searches forward from the current file position in the utmp file.
+It scans entries whose I<ut_type> is USER_PROCESS or LOGIN_PROCESS and returns
+the first one whose I<ut_line> field matches I<ut_line>.
+
+=item hypot
+
+r = hypot(x, y);
+
+=item ilogb
+
+y = ilogb(x);
+
+=item isalpha
+
+Like POSIX::isalpha() but returns 0 for the empty string.
+
+=item iscntrl
+
+Like POSIX::iscntrl() but returns 0 for the empty string.
+
+=item isdigit
+
+Like POSIX::isdigit() but returns 0 for the empty string.
+
+=item isfinite
+
+isfinite(x);
+
+=item isgraph
+
+Like POSIX::isgraph() but returns 0 for the empty string.
+
+=item isinf
+
+isinf(x);
+
+=item islower
+
+Like POSIX::islower() but returns 0 for the empty string.
+
+=item isnan
+
+isnan(x);
+
+=item isnormal
+
+isnormal(x);
+
+=item isprint
+
+Like POSIX::isprint() but returns 0 for the empty string.
+
+=item ispunct
+
+Like POSIX::ispunct() but returns 0 for the empty string.
+
+=item isspace
+
+Like POSIX::isspace() but returns 0 for the empty string.
+
+=item isupper
+
+Like POSIX::isupper() but returns 0 for the empty string.
+
+=item isxdigit
+
+Like POSIX::isxdigit() but returns 0 for the empty string.
+
+=item j0
+
+y = j0(x);
+
+j0() is the Bessel function of the first kind of order 0.
+
+=item j1
+
+y = j1(x);
+
+j1() is the Bessel function of the first kind of order 1.
+
+=item jn
+
+y = jn(n, x);
+
+jn() is the Bessel function of the first kind of order I<n>.
+
+=item jrand48
+
+(r, X0, X1, X2) = jrand48(X0, X1, X2);
+
+=item killpg
+
+ret = killpg(pgrp, sig);
+
+=item l64a
+
+s = l64a(n);
+
+=item ldexp
+
+y = ldexp(x, exp);
+
+=item ldiv
+
+(quot, rem) = ldiv(numer, denom);
+
+=item lgamma
+
+y = lgamma(x);
+
+=item link
+
+ret = link(path1, path2);
+
+=item linkat
+
+ret = linkat(fd1, path1, fd2, path2, flags);
+
+I<flags> can be 0 or AT_SYMLINK_FOLLOW.
+
+=item log1p
+
+y = log1p(x);
+
+=item log2
+
+y = log2(x);
+
+=item logb
+
+y = logb(x);
+
+=item lrand48
+
+r = lrand48();
+
+=item lstat
+
+ret = lstat(path);
+
+=item mkdir
+
+ret = mkdir(path, mode);
+
+=item mkdirat
+
+ret = mkdirat(fd, path, mode);
+
+=item mkdtemp
+
+name = mkdtemp(template);
+
+=item mkfifo
+
+ret = mkfifo(path, mode);
+
+=item mkfifoat
+
+ret = mkfifoat(fd, path, mode);
+
+=item mknod
+
+ret = mknod(path, mode, dev);
+
+=item mknodat
+
+ret = mknodat(fd, path, mode, dev);
+
+=item mkstemp
+
+(fd, name) = mkstemp(template);
+
+=item mrand48
+
+mrand48();
+
+=item nanosleep
+
+(rem_sec, rem_nsec) = nanosleep(sec, nsec);
+
+In scalar context returns the remaining seconds as a floating point number.
+
+=item nearbyint
+
+y = nearbyint(x);
+
+=item nextafter
+
+z = nextafter(x, y);
+
+=item nrand48
+
+r = nrand48()
+
+=item openat
+
+ret = openat(fd, path, oflag, mode);
+
+I<oflag> defaults to O_RDONLY, I<mode> defaults to 0666.
+
+=item open
+
+ret = open(path, oflag, mode);
+
+I<oflag> defaults to O_RDONLY, I<mode> defaults to 0666.
+
+=item pread
+
+bytes_read = pread(fd, buf, file_offset, nbytes[, buf_offset]);
+
+pread() reads I<nbytes> of data from the file descriptor I<fd> at file offset
+I<offset> into the scalar I<buf> without changing the file offset. I<buf> will
+be enlarged automatically if necessary.
+
+I<buf_offset> may be specified to store the data at that position in
+I<buf>. Defaults to 0. If I<buf_offset> is past the end of I<buf>, I<buf> will
+be padded with zeros before appending the data. If I<buf_offset> is negative
+it is counted from the end of the string.
+
+Returns the number of bytes read, 0 at EOF, undef on error.
+
+Note that pread() deals with I<bytes> not characters.
+
+=item ptsname
+
+name = ptsname(fd);
+
+=item pwrite
+
+bytes_written = pwrite(fd, buf, offset[, nbytes, buf_offset]);
+
+pwrite() writes data from the scalar I<buf> to the file descriptor I<fd> at
+file offset I<offset> without changing the file offset. The file referenced by
+I<fd> must be capable of seeking.
+
+I<nbytes> may be specified to write only that much bytes. If not specified or
+undef, everything from I<buf_offset> up to the end of I<buf> is written.
+
+I<buf_offset> may be specified to write data from that position in
+I<buf>. Defaults to 0. If I<buf_offset> is negative it is counted from the end
+of the string.
+
+Returns the number of bytes written, undef on error.
+
+Note that pwrite() deals with I<bytes> not characters.
+
+=item random
+
+r = random();
+
+=item read
+
+ret = read(fd, buf, nbytes);
+
+Like POSIX::read() but returns 0 at EOF instead of "0 but true".
+
+=item readlink
+
+name = readlink(path);
+
+Returns undef on error.
+
+=item readlinkat
+
+name = readlinkat(dirfd, path);
+
+Returns undef on error.
+
+=item remainder
+
+r = remainder(x, y);
+
+=item remove
+
+ret = remove(path);
+
+Like POSIX::remove() but calls the C function instead of doing it in Perl.
+
+=item rename
+
+ret = rename(old, new);
+
+=item renameat
+
+ret = renameat(olddirfd, oldpath, newdirfd, newpath);
+
+=item round
+
+r = round(x);
+
+=item scalbn
+
+y = scalbn(x, n);
+
+=item seed48
+
+(old_seed1, old_seed2, old_seed3) = seed48(seed1, seed2, seed3);
+
+=item setegid
+
+ret = setegid(gid);
+
+=item seteuid
+
+ret = seteuid(uid);
+
+=item setgid
+
+ret = setgid(gid);
+
+=item setitimer
+
+(old_int_sec, old_int_usec, old_val_sec, old_val_usec) = setitimer(which, int_sec, int_usec, val_sec, val_usec);
+
+I<which> is one of ITIMER_REAL, ITIMER_VIRTUAL, ITIMER_PROF.
+
+=item setpriority
+
+ret = setpriority(value, which, who);
+
+I<which> can be one of PRIO_PROCESS, PRIO_PGRP, PRIO_USER, defaults to
+PRIO_PROCESS.
+
+Returns true on success, undef on error.
+
+I<who> defaults to 0.
+
+=item setregid
+
+ret = setregid(rgid, egid);
+
+=item setreuid
+
+ret = setreuid(ruid, euid);
+
+=item setuid
+
+ret = setuid(uid);
+
+=item setutxent
+
+setutxent();
+
+=item sighold
+
+ret = sighold(sig);
+
+=item sigignore
+
+ret = sigignore(sig);
+
+=item signbit
+
+b = signbit(x);
+
+=item sigpause
+
+sigpause(sig);
+
+=item sigrelse
+
+ret = sigrelse(sig);
+
+=item sinh
+
+y = sinh(x);
+
+=item srand48
+
+srand48(seedval);
+
+=item srandom
+
+srandom(seed);
+
+=item stat
+
+(dev, ino, mode, nlink, uid, gid, rdev, size, atim_sec, mtim_sec, ctim_sec,
+blksize, blocks, atim_nsec, mtim_nsec, ctim_nsec) = stat(path);
+
+=item strptime
+
+(sec, min, hour, mday, mon, year, wday, yday, isdst) = strptime(s, format[,
+sec, min, hour, mday, mon, year, wday, yday, isdst]);
+
+strptime() converts the string I<s> into a broken-down time according to the
+format string I<format>. The time fields may optionally be initialized in
+whole or in part and will be returned as initialized if they are not affected
+by the format string. Unprocessed uninitialized or undef fields are returned
+as undef.
+
+Returns an empty list on error.
+
+In scalar context returns the index of the first byte in I<s> that was not
+processed or the byte length of I<s> if the whole string was consumed or undef
+on error.
+
+As strptime() acts on null-terminated strings, strings containing NUL bytes
+will only be processed up to the first NUL byte.
+
+=item symlink
+
+symlink(old, new);
+
+=item symlinkat
+
+ret = symlinkat(old, dirfd, new);
+
+=item sync
+
+sync();
+
+=item tan
+
+y = tan(x);
+
+=item tanh
+
+y = tanh(x);
+
+=item tgamma
+
+y = tgamma(x);
+
+=item truncate
+
+ret = truncate(path, length);
+
+=item trunc
+
+y = trunc(x);
+
+=item unlinkat
+
+ret = unlinkat(dirfd, path, flags);
+
+I<flags> can be 0 or AT_REMOVEDIR.
+
+=item unlink
+
+ret = unlink(path);
+
+=item utimensat
+
+ret = utimensat(dirfd, path, flags, atime_sec, atime_nsec, mtime_sec,
+mtime_nsec);
+
+I<flags> can be 0 or AT_SYMLINK_NOFOLLOW, defaults to 0.
+
+I<atime_sec> and I<mtime_sec> default to 0. I<atime_nsec> and I<mtime_nsec>
+default to UTIME_NOW.
+
+=item y0
+
+y = y0(x);
+
+y0() is the Bessel function of the second kind of order 0.
+
+=item y1
+
+y = y1(x);
+
+y1() is the Bessel function of the second kind of order 1.
+
+=item yn
+
+y = yn(n, x);
+
+yn() is the Bessel function of the second kind of order n.
+
+=back
+
+=head1 CONSTANTS
+
+AT_EACCESS AT_EMPTY_PATH AT_FDCWD AT_NO_AUTOMOUNT AT_REMOVEDIR
+AT_SYMLINK_FOLLOW AT_SYMLINK_NOFOLLOW BOOT_TIME CLOCK_MONOTONIC
+CLOCK_MONOTONIC_RAW CLOCK_PROCESS_CPUTIME_ID CLOCK_REALTIME
+CLOCK_THREAD_CPUTIME_ID _CS_GNU_LIBC_VERSION _CS_GNU_LIBPTHREAD_VERSION
+_CS_PATH DEAD_PROCESS FNM_CASEFOLD FNM_FILE_NAME FNM_LEADING_DIR FNM_NOESCAPE
+FNM_NOMATCH FNM_PATHNAME FNM_PERIOD FP_INFINITE FP_NAN FP_NORMAL FP_SUBNORMAL
+FP_ZERO INIT_PROCESS ITIMER_PROF ITIMER_REAL ITIMER_VIRTUAL LOGIN_PROCESS
+NEW_TIME O_CLOEXEC O_DIRECTORY O_EXEC OLD_TIME O_NOFOLLOW O_RSYNC O_SEARCH
+O_SYNC O_TMPFILE O_TTY_INIT RTLD_GLOBAL RTLD_LAZY RTLD_LOCAL RTLD_NOW RUN_LVL
+TIMER_ABSTIME USER_PROCESS UTIME_NOW UTIME_OMIT
+
+=head1 AUTHOR
+
+Initially hacked together by Carsten Gaebler.
+
+=head1 LICENCE
+
+This library is free software. You can redistribute and/or modify it under the
+terms of the Do What The Fuck You Want To Public License, Version 2, as
+published by Sam Hocevar. See the COPYING file or http://www.wtfpl.net/ for
+more details.
+
+=cut

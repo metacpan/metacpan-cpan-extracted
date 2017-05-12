@@ -1,0 +1,80 @@
+{
+   "abstract" : "A Paws Caller with in-memory Kinesis.",
+   "author" : [
+      "Keith Broughton C<< <keithbro [AT] cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.9",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Paws-Kinesis-MemoryCaller",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::UUID" : "0",
+            "List::AllUtils" : "0",
+            "Paws" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Paws::Kinesis::MemoryCaller" : {
+         "file" : "lib/Paws/Kinesis/MemoryCaller.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/keithbro/Paws-Kinesis-MemoryCaller/issues"
+      },
+      "homepage" : "https://github.com/keithbro/Paws-Kinesis-MemoryCaller",
+      "repository" : {
+         "url" : "git://github.com/keithbro/Paws-Kinesis-MemoryCaller.git",
+         "web" : "https://github.com/keithbro/Paws-Kinesis-MemoryCaller"
+      }
+   },
+   "version" : "0.09",
+   "x_contributors" : [
+      "Keith Broughton <keith.broughton@net-a-porter.com>",
+      "Keith Broughton <keithbro256@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

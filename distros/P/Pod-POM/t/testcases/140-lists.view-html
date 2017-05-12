@@ -1,0 +1,32 @@
+<html>
+<body bgcolor="#ffffff">
+<h1>NAME</h1>
+
+<p>140-lists</p>
+<h1>EXAMPLES</h1>
+
+<p>An itemized list:</p>
+<ul>
+<li>
+<p>item 1</p>
+</li>
+<li>
+<p>item 2</p>
+</li>
+<li>
+<p>item 3</p>
+</li>
+</ul>
+<p>A definition list:</p>
+<dl>
+<dt><a name="item_Term_1"></a><b>Term 1</b></dt>
+<dd>
+<p>description 1</p>
+</dd>
+<dt><a name="item_Term_2"></a><b>Term 2</b></dt>
+<dd>
+<p>description 2</p>
+</dd>
+</dl>
+</body>
+</html>

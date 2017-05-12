@@ -1,0 +1,45 @@
+1 t/platin1
+t/platin1
+NAME
+    Punctuation and Latin 1 pod character escape test
+
+DESCRIPTION
+    & is an ampersand < is a left chevron "angle bracket", less-than
+    > is a right chevron "angle bracket", greater-than " is a double
+    quotation mark / is a solidus (forward slash) | is a vertical
+    bar Á is a capital A, acute accent á is a small a, acute accent
+    Â is a capital A, circumflex accent â is a small a, circumflex
+    accent Æ is a capital AE diphthong (ligature) æ is a small ae
+    diphthong (ligature) À is a capital A, grave accent à is a small
+    a, grave accent Å is a capital A, ring å is a small a, ring Ã is
+    a capital A, tilde ã is a small a, tilde Ä is a capital A,
+    dieresis or umlaut mark ä is a small a, dieresis or umlaut mark
+    Ç is a capital C, cedilla ç is a small c, cedilla É is a capital
+    E, acute accent é is a small e, acute accent Ê is a capital E,
+    circumflex accent ê is a small e, circumflex accent È is a
+    capital E, grave accent è is a small e, grave accent Ð is a
+    capital Eth, Icelandic ð is a small eth, Icelandic Ë is a
+    capital E, dieresis or umlaut mark ë is a small e, dieresis or
+    umlaut mark Í is a capital I, acute accent í is a small i, acute
+    accent Î is a capital I, circumflex accent î is a small i,
+    circumflex accent Í is a capital I, grave accent í is a small i,
+    grave accent Ï is a capital I, dieresis or umlaut mark ï is a
+    small i, dieresis or umlaut mark Ñ is a capital N, tilde ñ is a
+    small n, tilde Ó is a capital O, acute accent ó is a small o,
+    acute accent Ô is a capital O, circumflex accent ô is a small o,
+    circumflex accent Ò is a capital O, grave accent ò is a small o,
+    grave accent Ø is a capital O, slash ø is a small o, slash Õ is
+    a capital O, tilde õ is a small o, tilde Ö is a capital O,
+    dieresis or umlaut mark ö is a small o, dieresis or umlaut mark
+    ß is a small sharp s, German (sz ligature) Þ is a capital THORN,
+    Icelandic þ is a small thorn, Icelandic Ú is a capital U, acute
+    accent ú is a small u, acute accent Û is a capital U, circumflex
+    accent û is a small u, circumflex accent Ù is a capital U, grave
+    accent ù is a small u, grave accent Ü is a capital U, dieresis
+    or umlaut mark ü is a small u, dieresis or umlaut mark Ý is a
+    capital Y, acute accent ý is a small y, acute accent ÿ is a
+    small y, dieresis or umlaut mark
+
+AUTHOR
+    Peter Prymmer pvhp@best.com.
+

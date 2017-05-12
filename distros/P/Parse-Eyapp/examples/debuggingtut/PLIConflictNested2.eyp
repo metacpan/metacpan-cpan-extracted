@@ -1,0 +1,75 @@
+%{
+=head1 SYNOPSIS
+
+This grammar deals with the famous ambiguous PL/I phrase:
+
+                if then=if then if=then
+
+The (partial) solution uses C<YYExpect> in the lexical analyzer to predict the token
+that fulfills the parser expectatives.
+
+Compile it with:
+
+               eyapp -C PLIConflictNested2.eyp
+               eyapp -P Assign.eyp
+
+Run it with:
+
+               ./PLIConflictNested2.pm -t -c 'if if=then then then=if'
+
+for more detail:
+
+               ./PLIConflictNested2.pm -d -t -c 'if if=then then then=if'
+
+and also
+
+               ./PLIConflictNested2.pm -t -i -c 'if then=if then if=then
+
+The problem arises again
+
+Also try:
+
+                ./PLIConflictNested2.pm -t -c 'if then=if then if a=b then c=d'
+
+=cut
+
+%}
+
+%strict
+
+%token then = %/then\b/
+%token if   = %/if\b/ !Assign
+%token ID   = /([a-zA-Z_]\w*)/
+
+%tree bypass
+%%
+stmt: 
+    ifstmt 
+  | assignstmt
+;
+
+ifstmt: 
+     %name IF
+    if expr then stmt
+;
+
+assignstmt: 
+    %name ASSIGN
+    id '=' expr
+;
+
+expr:
+    %name EQ
+    id '=' id
+  | id
+;
+
+id: 
+    %name ID
+    ID
+;
+
+%%
+
+
+

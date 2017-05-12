@@ -1,0 +1,328 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::IMAP::Client
+at lib/Protocol/IMAP/Client.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Protocol::IMAP::Client - client support for the Internet Message Access Protocol.
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+ package Some::IMAP::Client;
+ use parent 'Protocol::IMAP::Client';
+ sub on_message { warn "new message!" }
+
+ package main;
+ my $client = Some::IMAP::Client->new;
+ $client->login('user', 'pass');
+ $client->idle;
+
+=head1 DESCRIPTION
+
+There are two standard modes of operation:
+
+=over 4
+
+=item * One-shot - connect to a server, process some messages, then disconnect
+
+=item * Long-term connection - connect to a server, update status, then sit in idle mode waiting for events
+
+=back
+
+For one-shot operation against a server that doesn't keep you waiting, other more mature IMAP implementations
+are suggested ("see also" section).
+
+=head1 IMPLEMENTATION DETAILS
+
+All requests from the client have a tag, which is a 'unique' alphanumeric identifier - it is the client's responsibility
+to ensure these are unique for the session, see the L<next_id> method for the implementation used here.
+
+Server responses are always one of three possible states:
+
+=over 4
+
+=item * B<OK> - Command was successful
+
+=item * B<NO> - The server's having none of it
+
+=item * B<BAD> - You sent something invalid
+
+=back
+
+with additional 'untagged' responses in between. Any significant data is typically exchanged in the untagged sections - the
+final response to a command is indicated by a tagged response, once the client receives this then it knows that the server
+has finished with the original request.
+
+The IMAP connection will be in one of the following states:
+
+=over 4
+
+=item * ConnectionEstablished - we have a valid socket but no data has been exchanged yet, waiting for ServerGreeting
+
+=item * ServerGreeting - server has sent an initial greeting, for some servers this may take a few seconds
+
+=item * NotAuthenticated - server is waiting for client response, and the client has not yet been authenticated
+
+=item * Authenticated - server is waiting on client but we have valid authentication credentials, for PREAUTH state this may happen immediately after ServerGreeting
+
+=item * Selected - mailbox has been selected and we have valid context for commands
+
+=item * Logout - logout request has been issued, waiting for server response
+
+=item * ConnectionClosed - connection has been closed on both sides
+
+=back
+
+State changes are provided by the L<state> method. Some actions run automatically on state changes, for example switching to TLS mode and exchanging login information
+when server greeting has been received.
+
+=head1 IMPLEMENTING SUBCLASSES
+
+The L<Protocol::IMAP> classes only provide the framework for handling IMAP data. Typically you would need to subclass this to get a usable IMAP implementation.
+
+The following methods are required:
+
+=over 4
+
+=item * write - called at various points to send data back across to the other side of the IMAP connection
+
+=item * on_user - called when the user name is required for the login stage
+
+=item * on_pass - called when the password is required for the login stage
+
+=item * start_idle_timer - switching into idle mode, hint to start the timer so that we can refresh the session as required
+
+=item * stop_idle_timer - switch out of idle mode due to other tasks that need to be performed
+
+=back
+
+Optionally, you may consider providing these:
+
+=over 4
+
+=item * on_starttls - the STARTTLS stanza has been received and we need to upgrade to a TLS connection. This only applies to STARTTLS connections, which start in plaintext - a regular SSL connection will be SSL encrypted from the initial connection onwards.
+
+=back
+
+To pass data back into the L<Protocol::IMAP> layer, you will need the following methods:
+
+=over 4
+
+=item * is_multi_line - send a single line of data for handling
+
+=item * on_single_line - send a single line of data for handling
+
+=item * on_multi_line - send a multi-line section for handling
+
+=back
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item * There is no provision for dealing with messages that exceed memory limits - if someone has a 2Gb email then this will attempt to read it
+all into memory, and it's quite possible that buffers are being copied around as well.
+
+=item * Limited support for some of the standard protocol pieces, since I'm mainly interested in pulling all new messages then listening for any
+new ones.
+
+=item * SASL authentication is not implemented yet.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Mail::IMAPClient> - up-to-date, supports IDLE, generally seems to be the best of the bunch.
+
+=item * L<Net::IMAP::Client> - rewritten version of Net::IMAP::Simple, seems to be well maintained and up to date although it's not been
+around as long as some of the other options.
+
+=item * L<Net::IMAP::Simple> - handy for simple one-off mailbox access although has a few API limitations.
+
+=item * L<Net::IMAP> - over a decade since the last update, and doesn't appear to be passing on many platforms, but at least the API
+is reasonably full-featured.
+
+=back
+
+=head1 METHODS
+
+=head2 new
+
+Instantiate a new object - the subclass does not need to call this if it hits L<configure> at some point before attempting to transfer data.
+
+=head2 on_single_line
+
+Called when there's more data to process for a single-line (standard mode) response.
+
+=head2 on_multi_line
+
+Called when we have multi-line data (fixed size in characters).
+
+=head2 handle_untagged
+
+Process an untagged message from the server.
+
+=head2 untagged_fetch
+
+Fetch untagged message data. Defines the multiline callback so that we build up a buffer for the data to process.
+
+Once we call this method, the pending message takes over input until it has managed
+to read the entire response.
+
+=head2 handle_numeric
+
+Deal with an untagged response with a numeric prefix.
+
+=head2 on_server_greeting
+
+Parse the server greeting, and move on to the capabilities step.
+
+=head2 on_not_authenticated
+
+Handle the change of state from 'connected' to 'not authenticated', which indicates that we've had a valid server greeting and it's
+time to get ourselves authenticated.
+
+Depending on whether we're expecting (and supporting) the STARTTLS upgrade, we'll either switch to TLS mode at this point or just log
+in directly.
+
+=head2 on_authenticated
+
+What to do when we've been authenticated and are ready to begin the session. Suggest the subclass overrides this to make it do
+something useful.
+
+=head2 check_capability
+
+Check the server capabilities, and store them locally.
+
+=head2 on_capability
+
+Virtual method called when we have capabilities back from the server.
+
+=head2 check_greeting
+
+Verify that we had a reasonable response back from the server as an initial greeting, just in case someone pointed us at an SSH listener
+or something equally unexpected.
+
+=head2 get_capabilities
+
+Request capabilities from the server.
+
+=head2 next_id
+
+Returns the next ID in the sequence. Uses a standard Perl increment, tags are suggested to be 'alphanumeric'
+but with no particular restrictions in place so this should be good for even long-running sessions.
+
+=head2 push_waitlist
+
+Add a command to the waitlist.
+
+Sometimes we need to wait for the server to catch up before sending the next entry.
+
+TODO - maybe a mergepoint would be better for this?
+
+=head2 send_command
+
+Generic helper method to send a command to the server.
+
+=head2 login
+
+Issue the LOGIN command.
+
+Takes two parameters:
+
+=over 4
+
+=item * $user - username to send
+
+=item * $pass - password to send
+
+=back
+
+See also the L<authenticate> command, which does the same thing but via L<Authen::SASL> if I ever get around to writing it.
+
+=head2 check_status
+
+Check the mailbox status response as received from the server.
+
+=head2 noop
+
+Send a null command to the server, used as a keepalive or server ping.
+
+=head2 starttls
+
+Issue the STARTTLS command in an attempt to get the connection upgraded to something more secure.
+
+=head2 status
+
+Issue the STATUS command for either the given mailbox, or INBOX if none is provided.
+
+=head2 select
+
+Issue the SELECT command to switch to a different mailbox.
+
+=head2 examine
+
+Like L</select>, but readonly.
+
+=head2 fetch
+
+Issue the FETCH command to retrieve one or more messages.
+
+=head2 delete
+
+Issue the DELETE command, which will delete one or more messages if it can.
+
+=head2 expunge
+
+Issue an EXPUNGE to clear any deleted messages from storage.
+
+=head2 done
+
+Issue a DONE command, which did something useful and important at the time although I no longer remember what this was.
+
+=head2 idle
+
+Switch to IDLE mode. This will put the server into a state where it will continue to send untagged
+responses as any changes happen to the selected mailboxes.
+
+=head2 is_multi_line
+
+Returns true if we're in a multiline (fixed size read) state.
+
+=head2 configure
+
+Set up any callbacks that were available.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Protocol::IMAP>
+
+L<Authenticated|Protocol::IMAP/Authenticated>, L<ConnectionClosed|Protocol::IMAP/ConnectionClosed>, L<ConnectionEstablished|Protocol::IMAP/ConnectionEstablished>, L<Logout|Protocol::IMAP/Logout>, L<NotAuthenticated|Protocol::IMAP/NotAuthenticated>, L<STATE_HANDLERS|Protocol::IMAP/STATE_HANDLERS>, L<Selected|Protocol::IMAP/Selected>, L<ServerGreeting|Protocol::IMAP/ServerGreeting>, L<debug|Protocol::IMAP/debug>, L<in_state|Protocol::IMAP/in_state>, L<state|Protocol::IMAP/state>, L<state_id|Protocol::IMAP/state_id>, L<write|Protocol::IMAP/write>
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Licensed under the same terms as Perl itself.

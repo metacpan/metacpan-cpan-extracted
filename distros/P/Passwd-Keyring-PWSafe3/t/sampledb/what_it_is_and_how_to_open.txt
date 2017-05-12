@@ -1,0 +1,10 @@
+test.psafe3 is just some small Password Safe database created using
+actual Password Safe GUI. Some tests start from (copy of) this base
+to verify whether module properly reads it.
+
+Password Safe GUI can be downloaded from http://passwordsafe.sourceforge.net/downloads.shtml
+
+Master password for test.psafe3 is 
+    10101010
+
+Two perl scripts in this directory are illustrating use of Crypt::PwSafe3.

@@ -1,0 +1,37 @@
+---
+abstract: 'POE enabled CPAN smoke testing with added value.'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Harness: '3.14'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-SmokeBox
+requires:
+  Digest::SHA: '0'
+  Env::Sanctify: '0.04'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Module::Pluggable: '0'
+  Object::Accessor: '0'
+  POE: '1.367'
+  Params::Check: '0'
+  SDBM_File: '0'
+  String::Perl::Warnings: '0.04'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/bingos/poe-component-smokebox
+  repository: https://github.com/bingos/poe-component-smokebox.git
+version: '0.52'
+x_serialization_backend: 'YAML::Tiny version 1.70'

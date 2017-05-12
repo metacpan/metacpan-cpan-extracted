@@ -1,0 +1,31 @@
+Changes for Plack::App::FakeApache
+
+0.06 - Support for a minimal shim over exit()
+
+0.05 - Allow Plack::App::FakeApache to use a subclass of
+       Plack::App::FakeApache::Request 
+     - Introduce parts of CGI::Emulate::PSGI to deal with ENV and
+       STDIN problems.
+
+0.04 - Fix README in release and add files missing from 0.03 CPAN Dist 
+       (forgot ./Build manifest)
+
+0.03 - Thu Jun 20 15:04:21 CEST 2013
+  * Multiple enhancements from Lasse Makholm
+    - Support for Authen and Authz handlers
+    - Stacked handlers
+    - Server object
+    - New methods: auth_type, auth_name, is_initial_req, construct_uri
+    - Improved methods: args, uri
+    - ... and multiple typos and other minor fixes
+  * Multiple enhacements from Mark Fowler
+    - Connection object
+    - Tie STDOUT so prints in response handler are passed to client
+    - New methods: filename, document_root, args
+ 
+0.02 - Mon Aug 15 11:38:33 CEST 2011
+        * Rename module to a saner name
+	* Support for err_headers_out() and set_content_length
+ 
+0.01 - Tue Nov 30 17:02:06 CET 2010
+        * Initial release

@@ -1,0 +1,71 @@
+{
+   "abstract" : "compile LESS templates into CSS stylesheets",
+   "author" : [
+      "=over 4"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.16, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-File-Less",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CSS::LESSp" : "0",
+            "Install::Module::ReadmeFromPod" : "0",
+            "Module::Install::CPANfile" : "0",
+            "Module::Install::Can" : "0",
+            "Module::Install::Repository" : "0",
+            "inc::Install::Module" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CSS::LESSp" : "0",
+            "Plack" : "0",
+            "perl" : "v5.8.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "CSS::LESSp" : "0",
+            "Devel::Cover" : "0",
+            "Test::More" : "0",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/naoya/plack-middleware-file-less.git"
+      }
+   },
+   "version" : "0.04"
+}

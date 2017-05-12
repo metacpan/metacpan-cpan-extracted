@@ -1,0 +1,48 @@
+
+Roadmap for POE::Component::Logger sent to the POE mailing list on 2010-10-27.
+
+-------------------------------------------------------------------------------
+Hi POE fans,
+
+POE::Component::Logger provides a session that uses the Log::Dispatch
+framework for centralized logging. Once it is spawn, you can simply log with:
+
+    Logger->log('message');
+or
+    Logger->log({ level => debug, message => 'message');
+
+
+This module was originally written by Matt Sergeant 8 years old. It has a few
+issues that I'm currently fixing as Matt promoted me to co-maint.
+
+The code in development is hosted on GitHub:
+  http://github.com/dolmen/POE-Component-Logger
+
+
+I've already published 2 developer releases:
+- 1.00_01 a few days ago: added a test suite
+- 1.00_02 a few hours ago: more tests, and a major optimization
+
+If you are already a PoCo::Logger user you are invited to test 1.00_02 now.
+
+The next planned release in the next days will be:
+- 1.01: same as 1.00_02, but a public release
+- 1.10: major internal refactoring to fix RT#62397, a race condition
+        problem that occurs when logging at $DefaultLevel and $DefaultLevel
+        (may be there will be a 1.09_01 before if I get some feedback)
+- 1.50: add a proper 'shutdown' state (old RT#4062): there was
+        no proper way before. As a workaround some users were posting
+        a '_stop' message to the session to tell it to terminate.
+        This is dirty and this will be deprecated in that release: a message
+        will be sent to the log at the 'notice' level to alert about the new
+        API.
+
+I would appreciate your feedback about this plan.
+
+I would also appreciate if you tell me if you are a PoCo::Logger user, and in
+particular if you have a CPAN distribution that uses it: that could help me
+to understand how P:C:L is actually used for writing the right regression
+tests.
+
+Olivier Mengué, POE::Component::Logger co-maint.
+

@@ -1,0 +1,7 @@
+=head1 foo
+
+=head2 bar
+
+=head3 baz
+
+=head4 qux

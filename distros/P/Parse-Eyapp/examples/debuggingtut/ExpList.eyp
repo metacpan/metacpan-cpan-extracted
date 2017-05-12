@@ -1,0 +1,20 @@
+%token NUM = /(\d+)/
+%token OP  = /([-+*\/])/
+
+%%
+
+T : $S { 1+int($S/2) }
+;
+
+S:
+     $S x        { $S + 1 }
+  |   x          { 1 }  
+;
+
+x:
+     NUM
+  |  x OP NUM
+;
+%%
+
+

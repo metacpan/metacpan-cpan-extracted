@@ -1,0 +1,31 @@
+name: chunk_split
+
+docs: |
+    Returns the given string, split into smaller chunks.
+
+        my $split = chunk_split( $body [, $chunklen [, $end ] ] );
+
+    Where C<$body> is the data to split, C<$chunklen> is the optional length
+    of data between each split (default 76), and C<$end> is what to insert
+    both between each split (default C<"\r\n">) and on the end.
+
+    Also trivially implemented as a regular expression:
+
+        $body =~ s/(.{$chunklen})/$1$end/sg;
+        $body .= $end;
+
+code: |
+    sub chunk_split
+    {
+        my ( $body, $chunklen, $end ) = validate_pos( @_,
+            STRING,
+            { %{+INTEGER}, optional => 1, default => 76 },
+            { %{+STRING}, optional => 1, default => "\r\n" },
+        );
+
+        $body =~ s/(.{$chunklen})/$1$end/sg;
+        $body .= $end;
+
+        return $body;
+    }
+

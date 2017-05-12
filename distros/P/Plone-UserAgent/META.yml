@@ -1,0 +1,28 @@
+---
+name: Plone-UserAgent
+version: 0.01
+author:
+  - 'Dave Rolsky, E<gt>autarch@urth.orgE<lt>'
+abstract: An LWP agent with "logging into Plone" built-in
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Config::INI: 0
+  File::HomeDir: 0
+  HTTP::Cookies: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  MooseX::NonMoose: 0
+  URI: 0
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+provides:
+  Plone::UserAgent:
+    file: lib/Plone/UserAgent.pm
+    version: 0.01
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

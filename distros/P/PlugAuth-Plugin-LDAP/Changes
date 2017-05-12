@@ -1,0 +1,30 @@
+Revision history for PlugAuth-Plugin-LDAP
+
+0.08      2016-07-20 15:27:00 -0400
+  - Mojo 7.x compatability
+
+0.07      2015-11-29 16:08:01 -0500
+  - Updated tests to use YAML instead of JSON in preeration
+    for the latter being deprecated.
+  - Use Test::Clustericious::Cluster instead of Test::Mojo
+  - Moved repository to clustericious org on github
+    (updated meta appropriately)
+
+0.06      2014-01-22 17:45:36 America/New_York
+  - Mojo 4.50 compat
+
+0.05      2013-07-06 17:58:32 America/New_York
+  - update metadata
+
+0.04      2013-05-30 15:18:19 America/New_York
+  - Fixes for MSWin32
+
+0.03      2013-05-10 13:04:22 America/New_York
+  - Documentation
+
+0.02      2013-04-23 17:13:04 America/New_York
+  - use MakeMaker instead of ModuleBuild
+  - use [ACPS::RPM]
+
+0.01      2012-11-29 15:17:49 America/New_York
+  - initial version

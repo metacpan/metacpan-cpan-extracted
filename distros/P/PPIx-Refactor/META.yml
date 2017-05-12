@@ -1,0 +1,26 @@
+---
+abstract: 'Hooks for refactoring perl via L<PPI>'
+author:
+  - 'Kieren Diment <zarquon@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PPIx-Refactor
+requires:
+  Moo: '0'
+  PPI: '0'
+  PPI::Dumper: '0'
+  PPIx::Shorthand: '0'
+  Path::Tiny: '0'
+  Test::More: '0.87'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/singingfish/PPIx-Refactor/issues
+  repository: git://github.com/singingfish/PPIx-Refactor.git
+version: '0.10'

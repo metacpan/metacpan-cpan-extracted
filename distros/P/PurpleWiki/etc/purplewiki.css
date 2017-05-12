@@ -1,0 +1,164 @@
+body {
+    background-color: #FFF;
+    font-family: "Verdana", "Arial", sans-serif;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-bottom: 50em;
+    color: #000000;
+}
+
+table {
+}
+
+#header {
+}
+
+#header .left {
+    float: left;
+    width: 75%;
+}
+
+#header .right {
+    float: right;
+}
+
+#menubar {
+    clear: both;
+    font-family: "Verdana", "Arial", sans-serif;
+    font-size: 80%;
+}
+
+#menubar .left {
+    float: left;
+    width: 50%;
+    padding-bottom: .5em;
+}
+
+#menubar .right {
+    float: right;
+    padding-bottom: .5em;
+}
+
+#main {
+    border-top: #000 thin solid;
+    clear: both;
+}
+
+#body {
+    font-family: "Verdana", "Arial", sans-serif;
+    float: left;
+    width: 80%;
+    padding-top: 1em;
+}
+
+#sidebar {
+    font-family: "Verdana", "Arial", sans-serif;
+    font-size: 80%;
+    float: right;
+    width: 19%;
+    padding-top: 1em;
+}
+
+.box {
+    font-family: "Verdana", "Arial", sans-serif;
+    font-size: 80%;
+    background: #EEE;
+    border: #000 thin solid;
+    padding-left: .5em;
+    margin-bottom: 1em;
+}
+
+.editsubmit {
+    font-family: "Verdana", "Arial", sans-serif;
+    font-size: 80%;
+}
+
+#footer {
+    clear: both;
+    font-family: "Verdana", "Arial", sans-serif;
+    font-size: 80%;
+    border-top: #000 thin solid;
+    padding-top: .5em;
+}
+
+#footer .left {
+    float: left;
+    width: 75%;
+}
+
+#footer .right {
+    float: right;
+    text-align: right;
+}
+
+tt, pre {
+    font-size: 90%;
+}
+
+div.indent {
+    margin-left: 3em;
+}
+
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Places NIDs in parentheses.  Internet Explorer currently does not
+   support these CSS elements, hence this functionality is built into
+   the wikihtml.pm View driver for now and is commented out here.
+
+a.nid:before {
+    content: "(";
+}
+
+a.nid:after {
+    content: ")";
+}
+*/
+
+a.nid {
+    font-family: Verdana, Trebuchet, Arial, Helvetica;
+    font-style: normal;
+    font-weight: bold;
+    font-size: x-small;
+    text-decoration: none;
+    color: #C8A8FF;  /* light purple */
+}
+
+a.extlink {
+    border-width: thin;
+    border-style: none none dotted none;
+}
+
+a.create {
+    border-width: thin;
+    border-style: none none dashed none;
+}
+
+.poweredby {
+    font-family: verdana, sans-serif;
+    font-size: 80%;
+    font-weight:bold;
+    text-decoration:none;
+    color: white;
+    background-color: #8700FF;
+    border-right: thin solid #063;
+    border-bottom: thin solid #063;
+    padding:0 .25em 0 .25em;
+}
+
+.syndicate {
+    font-family: verdana, sans-serif;
+    font-size: 80%;
+    font-weight:bold;
+    text-decoration:none;
+    color: white;
+    background-color: #FF6600;
+    border-right: thin solid #063;
+    border-bottom: thin solid #063;
+    padding:0 .25em 0 .25em;
+}

@@ -1,0 +1,12 @@
+Changes
+lib/POSIX/strptime.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+ppport.h
+strptime.xs
+t/00-signature.t
+t/POSIX-strptime.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

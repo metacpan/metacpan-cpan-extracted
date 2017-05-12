@@ -1,0 +1,13 @@
+Build.PL
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+dist.ini
+lib/Perlbal/Plugin/Extredirector.pm
+t/release-distmeta.t
+t/release-eol.t
+t/release-minimum-version.t
+t/release-pod-syntax.t

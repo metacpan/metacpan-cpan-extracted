@@ -1,0 +1,35 @@
+a kind of logfile of the first image install ...
+
+
+
+
+create disk image
+~~~~~~~~~~~~~~~~~
+
+qemu-img create debian-sarge.img 1G
+(1 GB image)
+
+install
+~~~~~~~
+
+qemu -cdrom /home/uwe/dl/debian-31r1a-i386-netinst.iso -boot d debian-sarge.img
+
+- all settings to standard value
+  - language: English
+  - country: United States
+  - keymap: American English
+  - hostname: debian
+  - domain name: local (###TODO###)
+  - entire disk
+  - all files in one partition
+  - hardware clock: GMT
+  - timezone: Eastern
+  - root password: root
+  - user: pita
+  - password: pita
+  - http://ftp.debian.org
+  - no proxy
+  - exim4: local delivery only
+
+01.01.2006
+

@@ -1,0 +1,53 @@
+%{
+
+=head1 SYNOPSIS
+
+A deliberately confusing example
+
+For this grammar, an example input that starts C<x y c> is enough to confuse an
+LR(1) parser, as it has to decide whether C<x y> matches B or E after only seeing
+1 symbol further (i.e. c).
+
+An LL(1) parser would also be confused, but at the C<x> - should it expand C<A> to
+C<B c d> or to C<E c f>, as both can start with C<x>. An LL(2) or LL(3) parser
+would have similar problems at the y or c respectively.
+
+An LR(2) parser would be able to also see the d or f that followed the c and so
+make the correct choice between B and E.
+
+An LL(4) parser would also be able to look far enough ahead to see the d or f
+that followed the c and so make the correct choice between expanding A to B c d
+or to E c f. 
+
+
+=head1 SEE ALSO
+
+I have seen this example at Jinks page:
+L<http://www.cs.man.ac.uk/~pjj>
+
+Different solutions can be found in files:
+
+   confusingsolvedstatic.eyp 
+   confusingsolvedstatic2.eyp 
+   confusingsolveddynamic.eyp
+
+See 
+
+   http://www.cs.man.ac.uk/~pjj/cs2121/ho/node19.html
+
+=cut
+
+%}
+
+%%
+A: 
+    B 'c' 'd' 
+  | E 'c' 'f' 
+;
+B: 
+    'x' 'y' 
+;
+E: 
+    'x' 'y' 
+;
+%%

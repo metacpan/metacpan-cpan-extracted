@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libyahoo2
+Description: Library for the Yahoo! Messenger Protocol
+Version: 1.0.1-@RELEASE@
+Requires: glib-2.0
+Libs: -L${libdir} -lyahoo2
+Cflags: -I${includedir}/libyahoo2
+

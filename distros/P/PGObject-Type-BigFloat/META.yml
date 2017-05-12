@@ -1,0 +1,23 @@
+---
+abstract: 'Math::BigFloat wrappers for PGObject classes'
+author:
+  - 'Chris Travers <chris.travers@gmail.com>'
+build_requires:
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PGObject-Type-BigFloat
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Math::BigFloat: 0
+  PGObject: 0
+resources:
+  repository: https://github.com/ledgersmb/PGObject-Type-BigFloat.git
+version: v1.0.1

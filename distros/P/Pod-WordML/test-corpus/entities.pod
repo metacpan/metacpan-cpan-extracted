@@ -1,0 +1,6 @@
+=pod
+
+This is a simple paragraph with B<Bold> and I<Italic> text, and some
+E<lt> and E<gt> signs.
+
+=cut

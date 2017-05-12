@@ -1,0 +1,28 @@
+---
+abstract: 'Apache::SizeLimit::Core, repackaged'
+author:
+  - 'Audrey Tang <cpan@audreyt.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: apache2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Process::SizeLimit::Core
+name: Process-SizeLimit-Core
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  BSD::Resource: 0
+  perl: '5.005'
+resources:
+  homepage: https://github.com/audreyt/process-sizelimit-core/
+  repository: git://github.com/audreyt/process-sizelimit-core.git
+version: '0.9507'

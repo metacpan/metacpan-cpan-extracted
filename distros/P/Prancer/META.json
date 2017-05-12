@@ -1,0 +1,50 @@
+{
+   "abstract" : "A lightweight PSGI framework",
+   "author" : [
+      "Paul Lockaby <plockaby AT cpan DOT org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Prancer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack" : "0.9968",
+            "Plack::Middleware::Session" : "0.23",
+            "Web::Simple" : "0.020",
+            "HTTP::Message" : "0",
+            "Try::Tiny" : "0",
+            "Config::Any" : "0",
+            "YAML" : "0",
+            "Hash::MultiValue" : "0",
+            "URI" : "0",
+            "warnings::illegalproto" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.05"
+}

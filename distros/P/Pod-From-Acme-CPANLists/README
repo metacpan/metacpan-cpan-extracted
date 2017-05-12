@@ -1,0 +1,6 @@
+SYNOPSIS
+
+     use Pod::From::Acme::CPANLists qw(gen_pod_from_acme_cpanlists);
+    
+     print gen_pod_from_acme_cpanlists(module => 'Acme::CPANLists::PERLANCAR');
+

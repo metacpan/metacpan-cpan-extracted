@@ -1,0 +1,85 @@
+# German translations for Padre-Plugin-SpellCheck package.
+# Copyright (C) 2010 THE Padre COPYRIGHT HOLDER
+# This file is distributed under the same license as Padre.
+# Zeno Gantner <zeno.gantner@gmail.com>, 2010.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-SpellCheck\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-07-19 14:47+0200\n"
+"PO-Revision-Date: 2010-12-07 00:47+0100\n"
+"Last-Translator: Burak Gürsoy <burak@cpan.org>\n"
+"Language-Team: German\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: lib/Padre/Plugin/SpellCheck.pm:32
+#: lib/Padre/Plugin/SpellCheck.pm:54
+msgid "Spell check"
+msgstr "Yazımı denetle"
+
+#: lib/Padre/Plugin/SpellCheck.pm:55
+msgid "Check spelling\tF7"
+msgstr "Yazımı denetle\tF7"
+
+#: lib/Padre/Plugin/SpellCheck.pm:56
+msgid "Preferences"
+msgstr "Seçenekler"
+
+#: lib/Padre/Plugin/SpellCheck.pm:78
+msgid "No document opened."
+msgstr "Herhangi bir belge açılmadı."
+
+#: lib/Padre/Plugin/SpellCheck.pm:95
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:303
+msgid "Spell check finished."
+msgstr "Yazım denetimi bitti."
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:47
+#, perl-format
+msgid "Spelling (%s)"
+msgstr "Yazım denetimi (%s)"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:208
+msgid "Add to dictionary"
+msgstr "Sözlüğe ekle"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:209
+msgid "Replace"
+msgstr "Değiştir"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:210
+msgid "Replace all"
+msgstr "Hepsini değiştir"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:211
+msgid "Ignore"
+msgstr "Yoksay"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:212
+msgid "Ignore all"
+msgstr "Hepsini yoksay"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:213
+msgid "Close"
+msgstr "Kapat"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:243
+msgid "Not in dictionary:"
+msgstr "Sözlükte yok:"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:265
+msgid "Suggestions"
+msgstr "Öneriler"
+
+#: lib/Padre/Plugin/SpellCheck/Preferences.pm:39
+msgid "Spelling preferences"
+msgstr "Yazım denetimi seçenekleri"
+
+#: lib/Padre/Plugin/SpellCheck/Preferences.pm:139
+msgid "Dictionary:"
+msgstr "Sözlük"
+

@@ -1,0 +1,74 @@
+SYNOPSIS
+
+    Use as you would use List::Util:
+
+     use PERLANCAR::List::Util::PP qw(max min maxstr minstr);
+    
+     my $max = max @list;
+     my $min = min @list;
+
+DESCRIPTION
+
+    Most of the time you will not need this module. Use List::Util instead.
+    This module is useful for testing/benchmarking, or perhaps in the rare
+    case where you cannot use any XS module (even core ones) or in the rare
+    case where you cannot use any module, in which case you can
+    copy-and-paste the routines from this module (or, if you use
+    Dist::Zilla, you can also use Dist::Zilla::Plugin::InsertBlock).
+
+    Most of the code is from the old List::Util::PP code [2], which was
+    dropped from the Scalar-List-Utils distribution and was no longer part
+    of core perl.
+
+FUNCTIONS
+
+    For more details on each function, see List::Util.
+
+ all
+
+ any
+
+ first
+
+ max
+
+ maxstr
+
+ min
+
+ minstr
+
+ none
+
+ notall
+
+ pairfirst
+
+ pairgrep
+
+ pairkeys
+
+ pairmap
+
+ pairs
+
+ pairvalues
+
+ product
+
+ reduce
+
+ shuffle
+
+ sum
+
+ sum0
+
+ unpairs
+
+SEE ALSO
+
+    [1] List::Util
+
+    [2] https://github.com/haarg/List-Util/blob/pp/lib/List/Util/PP.pm
+

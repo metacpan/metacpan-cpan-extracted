@@ -1,0 +1,14 @@
+=begin wikidoc
+
+= GREETING
+
+hello world
+
+=end wikidoc
+#--------------------------------------------------------------------------#
+=pod
+
+=head1 GREETING
+
+hello world
+

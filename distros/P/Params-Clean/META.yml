@@ -1,0 +1,24 @@
+---
+name: Params-Clean
+version: v0.9.4
+author:
+  - 'David Green <plato@cpan.org>'
+abstract: Clean and simple parsing of args by position/name/flag/list/type
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Devel::Caller::Perl: 0
+  UID: 0
+  perl: 5.6.0
+  version: 0
+build_requires:
+  Test::More: 0
+provides:
+  Params::Clean:
+    file: lib/Params/Clean.pm
+    version: v0.9.4
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

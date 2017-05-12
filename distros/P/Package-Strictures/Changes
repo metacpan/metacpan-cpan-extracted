@@ -1,0 +1,118 @@
+Revision history for Package-Strictures
+
+1.000001 2017-03-10T14:14:38Z 0c6ec84
+ - Avoid test failures with -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - configure: +1 ↓1 (recommends: ↑1)
+ - develop: +18 ↑4 -6 (recommends: +1, suggests: +2 -1)
+ - runtime: ↓1 -1
+ - test: +2 ↓1 -3 (recommends: ↑2 ↓1 -1)
+
+1.000000 2014-04-30T12:36:53Z
+ [00 Major]
+ - A few moderate implementation/dependency changes
+ - Packaging changes that might be important for downstreams repackaging by hand.
+
+ [01 New Constant generation bug fix]
+ - Instead of the previous approach of trying to create constants for the per-package stricutres ourselves, we now use
+   a combination of constant.pm and Import::Into
+ - This approcach should be more reliable long term for ensuring constant folding takes place.
+ - This change resolves closes #1 on github.
+ - This also means this package is no longer broken >perl 5.19.3 after the close of perl #79908
+ - Thanks to Slaven Rezić for reporting, and thanks to Andreas J. Koenig for the scattered smoke testing that helped me
+   find which Perl change broke this.
+
+ [02 Moose requirement eliminated]
+ - Moose was previously used in Registry.pm to do almost nothing, and so the dependency was easy to eliminate.
+ - namespace::autoclean was nuked in favour of namespace::clean to further eliminate Moose from installation
+   requirements.
+
+ [03 Tooling switched]
+ - ExtUtils::MakeMaker is now used instead of Module::Build
+ - And "Latest" versions are now only recommended dependencies instead of mandatory ones.
+
+ [04 Version Scheme switched]
+ - Version scheme reduced to floating point with a mantissa of 6, as opposed to a mantissa of 8
+ - This is the primary reason for 0.xxx -> 1.xxx
+
+ [Dependencies::Aggregate]
+ - 5.008 : 48
+ - 5.010 : 37
+ - 5.018 : 22
+ - 5.019 : 23
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01001319, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +44 -2 (recommends: -1, suggests: +1 -1)
+ - runtime: +3 ↑1 -3
+ - test: +6 ↓1 -2 (recommends: +4)
+
+0.01001319 2012-12-02T14:23:20Z
+ - Maintenance release.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01001318, see misc/*.deps* for details
+ - build: +1
+ - configure: +1
+ - develop: +6 (recommends: +1, suggests: +1)
+ - runtime: +3 -4
+ - test: +6
+
+ [Documentation]
+ - regenerated, which removes that annoying 'our $VERSION' from the examples =p
+ - DESCRIPTION moved to after SYNOPSIS
+ - Copyright years updated.
+
+ [Internals]
+ - $VERSION declaration syntax updated
+ - All packages declare $AUTHORITY
+
+ [Packaging]
+ - bundle .perltidyrc
+ - move dist.ini to bundle-based config.
+ - Changes moved to CPAN::Changes format.
+ - Updated LICENSE copyright year.
+ - Updated LICENSE indentation.
+ - Updated LICENSE address.
+ - Moved author/release tests from t/ and put in xt/
+ - update git metadata
+ - set bug tracker to github
+
+ [Tests]
+ - Removed Test::Exception based code in favour of Test::Fatal
+
+ [Tests::Moved]
+ - t/author-critic.t -> xt/author/critic.t
+ - t/author-kwalitee -> xt/release/kwalitee.t
+ - t/release-meta-yaml.t -> xt/release/distmeta.t
+ - t/release-pod-coverage.t -> xt/release/pod-coverage.t
+ - t/release-pod-syntax.t -> xt/release/pod-syntax.t
+
+ [Tests::New]
+ - @install : 0000-report-versions-tiny.t
+ - @release : cpan-changes.t
+ - @release : eol.t
+ - @release : minimum-version.t
+
+0.01001318 2009-11-10T22:49:10Z
+ - Backed NS::AC from 0.9 to 0.09 , that always gets me.
+ - Nuked Strange Unicode in POD.
+ - Dropped MakeMaker.pl and just use MB
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01000019, see misc/*.deps* for details
+ - runtime: ↓1
+
+0.01000019 2009-10-28T23:22:41Z
+ - Fixed Dependencies.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01000007, see misc/*.deps* for details
+ - runtime: +1
+
+0.01000007 2009-10-28T11:49:12Z
+ - First version.

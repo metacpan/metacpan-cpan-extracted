@@ -1,0 +1,14 @@
+use inc::Module::Install;
+all_from 'lib/Plack/App/FCGIDispatcher.pm';
+readme_from('lib/Plack/App/FCGIDispatcher.pm');
+requires 'Plack', 0.9970;
+requires 'Plack::Handler::FCGI';
+requires 'FCGI', 0.70;
+requires 'FCGI::Client', 0.06;
+requires 'parent';
+requires 'HTTP::Request::Common';
+build_requires 'Test::TCP';
+build_requires 'Test::More', 0.88;
+test_requires 'Test::Requires';
+auto_set_repository();
+WriteAll;

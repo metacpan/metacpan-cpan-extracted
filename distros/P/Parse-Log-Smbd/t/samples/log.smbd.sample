@@ -1,0 +1,2123 @@
+[2008/06/14 09:21:48,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 09:21:48,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 09:21:48,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 09:21:48,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 09:22:37,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 09:22:38,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 09:22:38,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 09:22:41,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service netlogon initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 09:22:58,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service netlogon
+[2008/06/14 09:22:58,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service profiles
+[2008/06/14 09:22:58,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 09:22:58,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service netlogon initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 09:23:00,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service user82 initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 09:23:10,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service public initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 09:23:49,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 09:23:50,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 09:23:50,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 09:23:51,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service netlogon initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 09:23:55,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service user82 initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 09:23:58,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service public initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 09:25:27,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 09:27:37,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user57] -> [user57] -> [user57] succeeded
+[2008/06/14 09:27:40,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user57] -> [user57] -> [user57] succeeded
+[2008/06/14 09:27:40,  1] smbd/service.c:make_connection_snum(1198)
+  pc04 (::ffff:192.168.100.99) connect to service profiles initially as user user57 (uid=3808, gid=100) (pid user)
+[2008/06/14 09:27:41,  1] smbd/service.c:make_connection_snum(1198)
+  pc04 (::ffff:192.168.100.99) connect to service netlogon initially as user user57 (uid=3808, gid=100) (pid user)
+[2008/06/14 09:27:55,  1] smbd/service.c:close_cnum(1409)
+  pc04 (::ffff:192.168.100.99) closed connection to service netlogon
+[2008/06/14 09:27:55,  1] smbd/service.c:close_cnum(1409)
+  pc04 (::ffff:192.168.100.99) closed connection to service profiles
+[2008/06/14 09:27:55,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user57] -> [user57] -> [user57] succeeded
+[2008/06/14 09:27:55,  1] smbd/service.c:make_connection_snum(1198)
+  pc04 (::ffff:192.168.100.99) connect to service netlogon initially as user user57 (uid=3808, gid=100) (pid user)
+[2008/06/14 09:27:59,  1] smbd/service.c:make_connection_snum(1198)
+  pc04 (::ffff:192.168.100.99) connect to service user57 initially as user user57 (uid=3808, gid=100) (pid user)
+[2008/06/14 09:28:20,  1] smbd/service.c:make_connection_snum(1198)
+  pc04 (::ffff:192.168.100.99) connect to service public initially as user user57 (uid=3808, gid=100) (pid user)
+[2008/06/14 09:29:22,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service public
+[2008/06/14 09:29:22,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service user82
+[2008/06/14 09:29:22,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service netlogon
+[2008/06/14 09:29:22,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 09:31:37,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service profiles
+[2008/06/14 09:31:37,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service public
+[2008/06/14 09:31:37,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service user82
+[2008/06/14 09:31:37,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service netlogon
+[2008/06/14 09:33:37,  1] smbd/service.c:close_cnum(1409)
+  pc04 (::ffff:192.168.100.99) closed connection to service public
+[2008/06/14 09:33:37,  1] smbd/service.c:close_cnum(1409)
+  pc04 (::ffff:192.168.100.99) closed connection to service user57
+[2008/06/14 09:33:37,  1] smbd/service.c:close_cnum(1409)
+  pc04 (::ffff:192.168.100.99) closed connection to service netlogon
+[2008/06/14 09:34:40,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 09:34:40,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid 384)
+[2008/06/14 09:37:49,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 09:37:49,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 09:37:49,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 09:37:50,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user57] -> [user57] -> [user57] succeeded
+[2008/06/14 09:37:50,  1] smbd/service.c:make_connection_snum(1198)
+  pc04 (::ffff:192.168.100.99) connect to service profiles initially as user user57 (uid=3808, gid=100) (pid 4594)
+[2008/06/14 09:37:57,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service user82 initially as user user82 (uid=1378, gid=100) (pid 384)
+[2008/06/14 09:38:14,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service user82
+[2008/06/14 09:38:15,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid 384)
+[2008/06/14 09:39:44,  1] smbd/service.c:make_connection_snum(1198)
+  pc04 (::ffff:192.168.100.99) connect to service user57 initially as user user57 (uid=3808, gid=100) (pid 4594)
+[2008/06/14 09:40:15,  1] smbd/service.c:make_connection_snum(1198)
+  pc04 (::ffff:192.168.100.99) connect to service profiles initially as user user57 (uid=3808, gid=100) (pid 4594)
+[2008/06/14 09:42:07,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 09:42:07,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 09:42:07,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 09:43:40,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 09:43:40,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 09:45:49,  1] smbd/service.c:close_cnum(1409)
+  pc04 (::ffff:192.168.100.99) closed connection to service profiles
+[2008/06/14 09:45:49,  1] smbd/service.c:close_cnum(1409)
+  pc04 (::ffff:192.168.100.99) closed connection to service user57
+[2008/06/14 09:45:49,  1] smbd/service.c:close_cnum(1409)
+  pc04 (::ffff:192.168.100.99) closed connection to service profiles
+[2008/06/14 09:48:28,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 09:48:28,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 09:48:28,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 09:48:28,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 09:48:53,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 09:48:53,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 09:48:53,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 09:48:53,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user92] -> [user92] -> [user92] succeeded
+[2008/06/14 09:48:56,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user92] -> [user92] -> [user92] succeeded
+[2008/06/14 09:48:56,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user92 (uid=9075, gid=100) (pid user)
+[2008/06/14 09:48:58,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service netlogon initially as user user92 (uid=9075, gid=100) (pid user)
+[2008/06/14 09:49:12,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service netlogon
+[2008/06/14 09:49:12,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 09:49:12,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user92] -> [user92] -> [user92] succeeded
+[2008/06/14 09:49:12,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service netlogon initially as user user92 (uid=9075, gid=100) (pid user)
+[2008/06/14 09:49:15,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service user92 initially as user user92 (uid=9075, gid=100) (pid user)
+[2008/06/14 09:49:19,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service public initially as user user92 (uid=9075, gid=100) (pid user)
+[2008/06/14 09:54:53,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service public
+[2008/06/14 09:54:53,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service user92
+[2008/06/14 09:54:53,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service netlogon
+[2008/06/14 09:58:15,  2] auth/auth.c:check_ntlm_password(318)
+  check_ntlm_password:  Authentication for user [sbm] -> [sbm] FAILED with error NT_STATUS_WRONG_PASSWORD
+[2008/06/14 09:58:35,  2] auth/auth.c:check_ntlm_password(318)
+  check_ntlm_password:  Authentication for user [sbm] -> [sbm] FAILED with error NT_STATUS_WRONG_PASSWORD
+[2008/06/14 09:58:51,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user92] -> [user92] -> [user92] succeeded
+[2008/06/14 09:58:51,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user92 (uid=9075, gid=100) (pid user)
+[2008/06/14 10:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 10:00:00,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 10:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 10:00:00,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 10:00:21,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service user92 initially as user user92 (uid=9075, gid=100) (pid user)
+[2008/06/14 10:00:52,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service user92
+[2008/06/14 10:00:53,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user92 (uid=9075, gid=100) (pid user)
+[2008/06/14 10:01:56,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user00] -> [user00] -> [user00] succeeded
+[2008/06/14 10:01:58,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user00] -> [user00] -> [user00] succeeded
+[2008/06/14 10:01:58,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user00 (uid=1584, gid=100) (pid user)
+[2008/06/14 10:02:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service netlogon initially as user user00 (uid=1584, gid=100) (pid user)
+[2008/06/14 10:02:11,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service user00 initially as user user00 (uid=1584, gid=100) (pid user)
+[2008/06/14 10:02:13,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service netlogon
+[2008/06/14 10:02:13,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service netlogon initially as user user00 (uid=1584, gid=100) (pid user)
+[2008/06/14 10:02:15,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service public initially as user user00 (uid=1584, gid=100) (pid user)
+[2008/06/14 10:02:25,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service netlogon
+[2008/06/14 10:02:26,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service netlogon initially as user user00 (uid=1584, gid=100) (pid user)
+[2008/06/14 10:02:41,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 10:02:41,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 10:02:41,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 10:02:41,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 10:03:24,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 10:03:24,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 10:03:24,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 10:03:24,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 10:03:51,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user36] -> [user36] -> [user36] succeeded
+[2008/06/14 10:03:53,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user36] -> [user36] -> [user36] succeeded
+[2008/06/14 10:03:53,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:04:26,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service netlogon initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:05:01,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service netlogon
+[2008/06/14 10:05:01,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 10:05:02,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user36] -> [user36] -> [user36] succeeded
+[2008/06/14 10:05:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service netlogon initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:05:09,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service user36 initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:05:14,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service public initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:06:34,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 10:06:35,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 10:06:35,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service netlogon initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:06:36,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service user82 initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:07:22,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:07:23,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:07:23,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:07:30,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:07:51,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service netlogon
+[2008/06/14 10:07:51,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service public
+[2008/06/14 10:07:51,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service user00
+[2008/06/14 10:07:51,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 10:07:51,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 10:07:51,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 10:08:03,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user00] -> [user00] -> [user00] succeeded
+[2008/06/14 10:08:03,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service netlogon initially as user user00 (uid=1584, gid=100) (pid user)
+[2008/06/14 10:08:05,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service user00 initially as user user00 (uid=1584, gid=100) (pid user)
+[2008/06/14 10:08:14,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service netlogon
+[2008/06/14 10:09:31,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service public initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:11:02,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service public
+[2008/06/14 10:11:02,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service user36
+[2008/06/14 10:11:02,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service netlogon
+[2008/06/14 10:12:58,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user36] -> [user36] -> [user36] succeeded
+[2008/06/14 10:12:58,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid 2511)
+[2008/06/14 10:13:42,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user00 (uid=1584, gid=100) (pid user)
+[2008/06/14 10:15:19,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service public
+[2008/06/14 10:15:19,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 10:15:19,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 10:15:19,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 10:15:19,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 10:15:19,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service user82
+[2008/06/14 10:15:19,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service netlogon
+[2008/06/14 10:18:57,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 10:19:02,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 10:19:02,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service user00
+[2008/06/14 10:20:18,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 10:20:18,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 10:20:18,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 10:20:18,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 10:20:19,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user36] -> [user36] -> [user36] succeeded
+[2008/06/14 10:20:21,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:20:22,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 10:20:29,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 10:20:29,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 10:20:29,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 10:20:29,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 10:20:29,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 10:20:29,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:20:30,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:20:30,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:20:35,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:20:35,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service user82 initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:21:29,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 10:21:29,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 10:21:29,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 10:21:29,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 10:24:07,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 10:24:07,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 10:24:07,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 10:24:07,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 10:24:53,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user81] -> [user81] -> [user81] succeeded
+[2008/06/14 10:24:55,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user81] -> [user81] -> [user81] succeeded
+[2008/06/14 10:24:55,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service profiles initially as user user81 (uid=9062, gid=100) (pid user)
+[2008/06/14 10:24:56,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service netlogon initially as user user81 (uid=9062, gid=100) (pid user)
+[2008/06/14 10:25:09,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user36] -> [user36] -> [user36] succeeded
+[2008/06/14 10:25:10,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user36] -> [user36] -> [user36] succeeded
+[2008/06/14 10:25:10,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service netlogon initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:25:11,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service user36 initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:25:13,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service netlogon
+[2008/06/14 10:25:13,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service profiles
+[2008/06/14 10:25:13,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user81] -> [user81] -> [user81] succeeded
+[2008/06/14 10:25:13,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service netlogon initially as user user81 (uid=9062, gid=100) (pid user)
+[2008/06/14 10:25:18,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service user81 initially as user user81 (uid=9062, gid=100) (pid user)
+[2008/06/14 10:25:20,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service public initially as user user81 (uid=9062, gid=100) (pid user)
+[2008/06/14 10:26:32,  1] smbd/service.c:make_connection_snum(1198)
+[2008/06/14 10:27:29,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service user82
+[2008/06/14 10:27:29,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 10:27:29,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 10:27:29,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 10:27:29,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 10:27:48,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service profiles initially as user user81 (uid=9062, gid=100) (pid user)
+[2008/06/14 10:31:19,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service user36
+[2008/06/14 10:31:19,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service netlogon
+[2008/06/14 10:32:14,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user36] -> [user36] -> [user36] succeeded
+[2008/06/14 10:32:14,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service public initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:32:14,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service user36 initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:32:20,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:32:21,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:32:21,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:32:21,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:32:22,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 10:32:39,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 10:32:39,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 10:32:39,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 10:32:39,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 10:32:39,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 10:32:39,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service user82 initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:33:13,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service profiles
+[2008/06/14 10:33:13,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service public
+[2008/06/14 10:33:13,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service user81
+[2008/06/14 10:33:13,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service netlogon
+[2008/06/14 10:34:15,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 10:34:15,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 10:34:15,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 10:34:15,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 10:36:47,  1] smbd/service.c:close_cnum(1409)
+  deq-ltq-pc04 (::ffff:192.168.100.19) closed connection to service profiles
+[2008/06/14 10:38:14,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 10:38:14,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 10:38:14,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 10:38:14,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 10:38:14,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 10:38:14,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service user36
+[2008/06/14 10:38:14,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service public
+[2008/06/14 10:39:39,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service user82
+[2008/06/14 10:44:16,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 10:44:16,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service user82 initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:44:48,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 10:44:48,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 10:44:48,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 10:48:15,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 10:48:15,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 10:48:15,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 10:48:15,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 10:50:43,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user36] -> [user36] -> [user36] succeeded
+[2008/06/14 10:50:43,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service user36 initially as user user36 (uid=3607, gid=100) (pid 5245)
+[2008/06/14 10:50:48,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service public initially as user user36 (uid=3607, gid=100) (pid 5245)
+[2008/06/14 10:52:48,  1] smbd/ipc.c:api_fd_reply(333)
+  api_fd_reply: INVALID PIPE HANDLE: 774c
+[2008/06/14 10:56:18,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 10:56:18,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 10:56:18,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 10:56:18,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 10:56:41,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service user82
+[2008/06/14 10:56:44,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 10:56:52,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user50] -> [user50] -> [user50] succeeded
+[2008/06/14 10:56:54,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user50] -> [user50] -> [user50] succeeded
+[2008/06/14 10:56:54,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service profiles initially as user user50 (uid=3817, gid=100) (pid 9657)
+[2008/06/14 10:56:58,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service netlogon initially as user user50 (uid=3817, gid=100) (pid 9657)
+[2008/06/14 10:57:08,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service netlogon
+[2008/06/14 10:57:08,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service profiles
+[2008/06/14 10:57:08,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user50] -> [user50] -> [user50] succeeded
+[2008/06/14 10:57:08,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service netlogon initially as user user50 (uid=3817, gid=100) (pid 9657)
+[2008/06/14 10:57:11,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service user50 initially as user user50 (uid=3817, gid=100) (pid 9657)
+[2008/06/14 10:57:14,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service public initially as user user50 (uid=3817, gid=100) (pid 9657)
+[2008/06/14 10:57:17,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user76] -> [user76] -> [user76] succeeded
+[2008/06/14 10:57:18,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user76] -> [user76] -> [user76] succeeded
+[2008/06/14 10:57:18,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service profiles initially as user user76 (uid=3863, gid=100) (pid 9695)
+[2008/06/14 10:57:19,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service netlogon initially as user user76 (uid=3863, gid=100) (pid 9695)
+[2008/06/14 10:57:36,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service netlogon
+[2008/06/14 10:57:36,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service profiles
+[2008/06/14 10:57:36,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user76] -> [user76] -> [user76] succeeded
+[2008/06/14 10:57:36,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service netlogon initially as user user76 (uid=3863, gid=100) (pid 9695)
+[2008/06/14 10:57:41,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service user76 initially as user user76 (uid=3863, gid=100) (pid 9695)
+[2008/06/14 10:57:44,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service public initially as user user76 (uid=3863, gid=100) (pid 9695)
+[2008/06/14 11:00:02,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 11:00:02,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 11:00:02,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 11:00:02,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 11:00:11,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user73] -> [user73] -> [user73] succeeded
+[2008/06/14 11:00:18,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user73] -> [user73] -> [user73] succeeded
+[2008/06/14 11:00:18,  1] smbd/service.c:make_connection_snum(1198)
+  pc10 (::ffff:192.168.100.105) connect to service profiles initially as user user73 (uid=3547, gid=100) (pid 9907)
+[2008/06/14 11:00:44,  1] smbd/service.c:make_connection_snum(1198)
+  pc10 (::ffff:192.168.100.105) connect to service netlogon initially as user user73 (uid=3547, gid=100) (pid 9907)
+[2008/06/14 11:01:02,  1] smbd/service.c:close_cnum(1409)
+  pc10 (::ffff:192.168.100.105) closed connection to service netlogon
+[2008/06/14 11:01:02,  1] smbd/service.c:close_cnum(1409)
+  pc10 (::ffff:192.168.100.105) closed connection to service profiles
+[2008/06/14 11:01:03,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user73] -> [user73] -> [user73] succeeded
+[2008/06/14 11:01:03,  1] smbd/service.c:make_connection_snum(1198)
+  pc10 (::ffff:192.168.100.105) connect to service netlogon initially as user user73 (uid=3547, gid=100) (pid user)
+[2008/06/14 11:01:04,  1] smbd/service.c:make_connection_snum(1198)
+  pc10 (::ffff:192.168.100.105) connect to service user73 initially as user user73 (uid=3547, gid=100) (pid user)
+[2008/06/14 11:01:06,  1] smbd/service.c:make_connection_snum(1198)
+  pc10 (::ffff:192.168.100.105) connect to service public initially as user user73 (uid=3547, gid=100) (pid user)
+[2008/06/14 11:02:15,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service profiles initially as user user76 (uid=3863, gid=100) (pid 9695)
+[2008/06/14 11:02:16,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 11:02:52,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service public
+[2008/06/14 11:02:52,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service user50
+[2008/06/14 11:02:52,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service netlogon
+[2008/06/14 11:06:22,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid 5245)
+[2008/06/14 11:06:23,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid 5245)
+[2008/06/14 11:06:24,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid 5245)
+[2008/06/14 11:06:24,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid 5245)
+[2008/06/14 11:06:45,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user66] -> [user66] -> [user66] succeeded
+[2008/06/14 11:06:47,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user74] -> [user74] -> [user74] succeeded
+[2008/06/14 11:06:48,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user74] -> [user74] -> [user74] succeeded
+[2008/06/14 11:06:48,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service profiles initially as user user74 (uid=9043, gid=100) (pid 9695)
+[2008/06/14 11:06:50,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service netlogon initially as user user74 (uid=9043, gid=100) (pid 9695)
+[2008/06/14 11:06:52,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user66] -> [user66] -> [user66] succeeded
+[2008/06/14 11:06:52,  1] smbd/service.c:make_connection_snum(1198)
+  deq-ltq-pc03 (::ffff:192.168.100.18) connect to service profiles initially as user user66 (uid=1223, gid=100) (pid user)
+[2008/06/14 11:06:54,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service netlogon
+[2008/06/14 11:06:54,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service profiles
+[2008/06/14 11:06:54,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user74] -> [user74] -> [user74] succeeded
+[2008/06/14 11:06:54,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service netlogon initially as user user74 (uid=9043, gid=100) (pid 9695)
+[2008/06/14 11:06:56,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service user74 initially as user user74 (uid=9043, gid=100) (pid 9695)
+[2008/06/14 11:06:58,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service public initially as user user74 (uid=9043, gid=100) (pid 9695)
+[2008/06/14 11:07:02,  1] smbd/service.c:close_cnum(1409)
+  pc10 (::ffff:192.168.100.105) closed connection to service public
+[2008/06/14 11:07:02,  1] smbd/service.c:close_cnum(1409)
+  pc10 (::ffff:192.168.100.105) closed connection to service user73
+[2008/06/14 11:07:02,  1] smbd/service.c:close_cnum(1409)
+  pc10 (::ffff:192.168.100.105) closed connection to service netlogon
+[2008/06/14 11:07:05,  1] smbd/service.c:make_connection_snum(1198)
+  deq-ltq-pc03 (::ffff:192.168.100.18) connect to service netlogon initially as user user66 (uid=1223, gid=100) (pid user)
+[2008/06/14 11:07:07,  1] smbd/service.c:make_connection_snum(1198)
+  deq-ltq-pc03 (::ffff:192.168.100.18) connect to service user66 initially as user user66 (uid=1223, gid=100) (pid user)
+[2008/06/14 11:07:10,  1] smbd/service.c:make_connection_snum(1198)
+  deq-ltq-pc03 (::ffff:192.168.100.18) connect to service public initially as user user66 (uid=1223, gid=100) (pid user)
+[2008/06/14 11:08:29,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service profiles initially as user user74 (uid=9043, gid=100) (pid 9695)
+[2008/06/14 11:08:33,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 11:08:33,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 11:08:33,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 11:08:33,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 11:08:33,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user50] -> [user50] -> [user50] succeeded
+[2008/06/14 11:08:33,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service user50 initially as user user50 (uid=3817, gid=100) (pid user)
+[2008/06/14 11:08:46,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service profiles initially as user user50 (uid=3817, gid=100) (pid user)
+[2008/06/14 11:09:08,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user73] -> [user73] -> [user73] succeeded
+[2008/06/14 11:09:08,  1] smbd/service.c:make_connection_snum(1198)
+  pc10 (::ffff:192.168.100.105) connect to service profiles initially as user user73 (uid=3547, gid=100) (pid user)
+[2008/06/14 11:09:11,  1] smbd/service.c:make_connection_snum(1198)
+  pc10 (::ffff:192.168.100.105) connect to service profiles initially as user user73 (uid=3547, gid=100) (pid user)
+[2008/06/14 11:09:11,  1] smbd/service.c:make_connection_snum(1198)
+  pc10 (::ffff:192.168.100.105) connect to service profiles initially as user user73 (uid=3547, gid=100) (pid user)
+[2008/06/14 11:09:11,  1] smbd/service.c:make_connection_snum(1198)
+  pc10 (::ffff:192.168.100.105) connect to service profiles initially as user user73 (uid=3547, gid=100) (pid user)
+[2008/06/14 11:09:11,  1] smbd/service.c:make_connection_snum(1198)
+  pc10 (::ffff:192.168.100.105) connect to service user73 initially as user user73 (uid=3547, gid=100) (pid user)
+[2008/06/14 11:09:21,  1] smbd/service.c:make_connection_snum(1198)
+  pc10 (::ffff:192.168.100.105) connect to service profiles initially as user user73 (uid=3547, gid=100) (pid user)
+[2008/06/14 11:10:36,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service netlogon
+[2008/06/14 11:12:19,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service profiles
+[2008/06/14 11:12:42,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user55] -> [user55] -> [user55] succeeded
+[2008/06/14 11:12:44,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user55] -> [user55] -> [user55] succeeded
+[2008/06/14 11:12:44,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 11:12:44,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service netlogon initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 11:12:45,  1] smbd/service.c:close_cnum(1409)
+  deq-ltq-pc03 (::ffff:192.168.100.18) closed connection to service public
+[2008/06/14 11:12:45,  1] smbd/service.c:close_cnum(1409)
+  deq-ltq-pc03 (::ffff:192.168.100.18) closed connection to service user66
+[2008/06/14 11:12:45,  1] smbd/service.c:close_cnum(1409)
+  deq-ltq-pc03 (::ffff:192.168.100.18) closed connection to service netlogon
+[2008/06/14 11:12:45,  1] smbd/service.c:close_cnum(1409)
+  deq-ltq-pc03 (::ffff:192.168.100.18) closed connection to service profiles
+[2008/06/14 11:12:48,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service netlogon
+[2008/06/14 11:12:48,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 11:12:48,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user55] -> [user55] -> [user55] succeeded
+[2008/06/14 11:12:48,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service netlogon initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 11:12:50,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service user55 initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 11:12:53,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service public initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 11:13:56,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user43] -> [user43] -> [user43] succeeded
+[2008/06/14 11:13:57,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user43] -> [user43] -> [user43] succeeded
+[2008/06/14 11:13:57,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service profiles initially as user user43 (uid=3695, gid=100) (pid 9695)
+[2008/06/14 11:13:58,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service netlogon initially as user user43 (uid=3695, gid=100) (pid 9695)
+[2008/06/14 11:14:00,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service user43 initially as user user43 (uid=3695, gid=100) (pid 9695)
+[2008/06/14 11:14:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service public initially as user user43 (uid=3695, gid=100) (pid 9695)
+[2008/06/14 11:14:18,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 11:14:18,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user66] -> [user66] -> [user66] succeeded
+[2008/06/14 11:14:18,  1] smbd/service.c:make_connection_snum(1198)
+  deq-ltq-pc03 (::ffff:192.168.100.18) connect to service user66 initially as user user66 (uid=1223, gid=100) (pid user)
+[2008/06/14 11:14:18,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 11:14:18,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 11:14:18,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 11:14:23,  1] smbd/service.c:close_cnum(1409)
+  deq-ltq-pc03 (::ffff:192.168.100.18) closed connection to service user66
+[2008/06/14 11:14:23,  1] smbd/service.c:make_connection_snum(1198)
+  deq-ltq-pc03 (::ffff:192.168.100.18) connect to service profiles initially as user user66 (uid=1223, gid=100) (pid user)
+[2008/06/14 11:14:23,  1] smbd/service.c:close_cnum(1409)
+  deq-ltq-pc03 (::ffff:192.168.100.18) closed connection to service profiles
+[2008/06/14 11:14:33,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service profiles
+[2008/06/14 11:14:33,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service user50
+[2008/06/14 11:15:01,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 11:15:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 11:15:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 11:15:08,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 11:15:15,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 11:15:15,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 11:15:15,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 11:15:15,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 11:15:15,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 11:15:15,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 11:15:15,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 11:15:16,  2] auth/auth.c:check_ntlm_password(318)
+  check_ntlm_password:  Authentication for user [DEQ_B213] -> [DEQ_B213] FAILED with error NT_STATUS_NO_SUCH_USER
+[2008/06/14 11:15:57,  1] smbd/service.c:make_connection_snum(1198)
+  pc10 (::ffff:192.168.100.105) connect to service public initially as user user73 (uid=3547, gid=100) (pid user)
+[2008/06/14 11:16:32,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 11:16:32,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 11:16:32,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 11:16:34,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 11:16:44,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 11:16:44,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 11:16:44,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 11:16:44,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 11:18:00,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service netlogon
+[2008/06/14 11:18:32,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service user74
+[2008/06/14 11:18:32,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service public
+[2008/06/14 11:18:32,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service profiles
+[2008/06/14 11:18:37,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid 5245)
+[2008/06/14 11:18:38,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid 5245)
+[2008/06/14 11:18:38,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid 5245)
+[2008/06/14 11:18:38,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid 5245)
+[2008/06/14 11:19:17,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service public
+[2008/06/14 11:19:17,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service user43
+[2008/06/14 11:19:17,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service netlogon
+[2008/06/14 11:19:17,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service profiles
+[2008/06/14 11:19:17,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service public
+[2008/06/14 11:19:17,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service user76
+[2008/06/14 11:19:37,  1] smbd/service.c:close_cnum(1409)
+  pc10 (::ffff:192.168.100.105) closed connection to service profiles
+[2008/06/14 11:19:37,  1] smbd/service.c:close_cnum(1409)
+  pc10 (::ffff:192.168.100.105) closed connection to service profiles
+[2008/06/14 11:19:37,  1] smbd/service.c:close_cnum(1409)
+  pc10 (::ffff:192.168.100.105) closed connection to service profiles
+[2008/06/14 11:19:37,  1] smbd/service.c:close_cnum(1409)
+  pc10 (::ffff:192.168.100.105) closed connection to service profiles
+[2008/06/14 11:19:37,  1] smbd/service.c:close_cnum(1409)
+  pc10 (::ffff:192.168.100.105) closed connection to service profiles
+[2008/06/14 11:19:42,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user79] -> [user79] -> [user79] succeeded
+[2008/06/14 11:19:45,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user79] -> [user79] -> [user79] succeeded
+[2008/06/14 11:19:45,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service profiles initially as user user79 (uid=3822, gid=100) (pid user)
+[2008/06/14 11:20:08,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service netlogon initially as user user79 (uid=3822, gid=100) (pid user)
+[2008/06/14 11:20:13,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service netlogon
+[2008/06/14 11:20:13,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service profiles
+[2008/06/14 11:20:13,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user79] -> [user79] -> [user79] succeeded
+[2008/06/14 11:20:13,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service netlogon initially as user user79 (uid=3822, gid=100) (pid user)
+[2008/06/14 11:20:15,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service user79 initially as user user79 (uid=3822, gid=100) (pid user)
+[2008/06/14 11:20:16,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service public initially as user user79 (uid=3822, gid=100) (pid user)
+[2008/06/14 11:21:36,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 11:21:36,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 11:21:36,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 11:21:36,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 11:21:36,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 11:21:36,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 11:21:36,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 11:21:36,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 11:21:36,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service public
+[2008/06/14 11:21:36,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service user55
+[2008/06/14 11:21:36,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service netlogon
+[2008/06/14 11:22:01,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 11:22:02,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 11:22:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service netlogon initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 11:22:03,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service user82 initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 11:22:03,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user55] -> [user55] -> [user55] succeeded
+[2008/06/14 11:22:18,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 11:22:20,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 11:22:20,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 11:22:23,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 11:22:47,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 11:22:47,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 11:22:47,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 11:22:47,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 11:23:10,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user43] -> [user43] -> [user43] succeeded
+[2008/06/14 11:23:10,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service user43 initially as user user43 (uid=3695, gid=100) (pid user)
+[2008/06/14 11:23:19,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service user43
+[2008/06/14 11:23:19,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service profiles initially as user user43 (uid=3695, gid=100) (pid user)
+[2008/06/14 11:23:23,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service profiles
+[2008/06/14 11:24:25,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service profiles initially as user user79 (uid=3822, gid=100) (pid user)
+[2008/06/14 11:24:31,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service netlogon
+[2008/06/14 11:24:31,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service user79
+[2008/06/14 11:24:31,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service public
+[2008/06/14 11:24:31,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service profiles
+[2008/06/14 11:24:52,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user44] -> [user44] -> [user44] succeeded
+[2008/06/14 11:25:22,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user44] -> [user44] -> [user44] succeeded
+[2008/06/14 11:25:22,  0] lib/util_sock.c:read_socket_with_timeout(939)
+[2008/06/14 11:25:22,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  read_socket_with_timeout: client 0.0.0.0 read error = Connection reset by peer.
+[2008/06/14 11:25:22,  1] smbd/service.c:make_connection_snum(1198)
+  pc05 (::ffff:192.168.100.100) connect to service profiles initially as user user44 (uid=3617, gid=100) (pid 2775)
+[2008/06/14 11:25:29,  1] smbd/service.c:make_connection_snum(1198)
+  pc05 (::ffff:192.168.100.100) connect to service netlogon initially as user user44 (uid=3617, gid=100) (pid 2775)
+[2008/06/14 11:25:47,  1] smbd/service.c:close_cnum(1409)
+  pc05 (::ffff:192.168.100.100) closed connection to service netlogon
+[2008/06/14 11:25:47,  1] smbd/service.c:close_cnum(1409)
+  pc05 (::ffff:192.168.100.100) closed connection to service profiles
+[2008/06/14 11:25:47,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user44] -> [user44] -> [user44] succeeded
+[2008/06/14 11:25:47,  1] smbd/service.c:make_connection_snum(1198)
+  pc05 (::ffff:192.168.100.100) connect to service netlogon initially as user user44 (uid=3617, gid=100) (pid 2783)
+[2008/06/14 11:25:59,  1] smbd/service.c:close_cnum(1409)
+  pc05 (::ffff:192.168.100.100) closed connection to service netlogon
+[2008/06/14 11:26:02,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user44] -> [user44] -> [user44] succeeded
+[2008/06/14 11:26:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc05 (::ffff:192.168.100.100) connect to service user44 initially as user user44 (uid=3617, gid=100) (pid 2817)
+[2008/06/14 11:26:07,  1] smbd/service.c:make_connection_snum(1198)
+  pc05 (::ffff:192.168.100.100) connect to service netlogon initially as user user44 (uid=3617, gid=100) (pid 2817)
+[2008/06/14 11:26:50,  1] smbd/service.c:make_connection_snum(1198)
+  pc05 (::ffff:192.168.100.100) connect to service public initially as user user44 (uid=3617, gid=100) (pid 2817)
+[2008/06/14 11:27:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 11:27:00,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 11:27:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 11:27:00,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 11:27:53,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 11:27:53,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 11:27:53,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 11:27:53,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 11:27:53,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service user82
+[2008/06/14 11:27:53,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service netlogon
+[2008/06/14 11:28:40,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 11:28:40,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 11:28:40,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 11:28:40,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 11:28:45,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user42] -> [user42] -> [user42] succeeded
+[2008/06/14 11:28:46,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user42] -> [user42] -> [user42] succeeded
+[2008/06/14 11:28:47,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service profiles initially as user user42 (uid=3629, gid=100) (pid 2986)
+[2008/06/14 11:28:50,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service netlogon initially as user user42 (uid=3629, gid=100) (pid 2986)
+[2008/06/14 11:29:06,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service netlogon
+[2008/06/14 11:29:06,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service profiles
+[2008/06/14 11:29:06,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user42] -> [user42] -> [user42] succeeded
+[2008/06/14 11:29:06,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service netlogon initially as user user42 (uid=3629, gid=100) (pid 3021)
+[2008/06/14 11:29:10,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service user42 initially as user user42 (uid=3629, gid=100) (pid 3021)
+[2008/06/14 11:29:13,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service public initially as user user42 (uid=3629, gid=100) (pid 3021)
+[2008/06/14 11:29:25,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user83] -> [user83] -> [user83] succeeded
+[2008/06/14 11:29:27,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user83] -> [user83] -> [user83] succeeded
+[2008/06/14 11:29:27,  1] smbd/service.c:make_connection_snum(1198)
+  pc37 (::ffff:192.168.100.74) connect to service profiles initially as user user83 (uid=9052, gid=100) (pid 3028)
+[2008/06/14 11:29:30,  1] smbd/service.c:make_connection_snum(1198)
+  pc37 (::ffff:192.168.100.74) connect to service netlogon initially as user user83 (uid=9052, gid=100) (pid 3028)
+[2008/06/14 11:29:36,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 11:29:36,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 11:29:36,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 11:29:36,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 11:29:36,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 11:29:36,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service user82 initially as user user82 (uid=1378, gid=100) (pid 3038)
+[2008/06/14 11:29:38,  1] smbd/service.c:make_connection_snum(1198)
+  pc37 (::ffff:192.168.100.74) connect to service user83 initially as user user83 (uid=9052, gid=100) (pid 3028)
+[2008/06/14 11:29:40,  1] smbd/service.c:make_connection_snum(1198)
+  pc37 (::ffff:192.168.100.74) connect to service public initially as user user83 (uid=9052, gid=100) (pid 3028)
+[2008/06/14 11:30:57,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user69] -> [user69] -> [user69] succeeded
+[2008/06/14 11:30:57,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user69] -> [user69] -> [user69] succeeded
+[2008/06/14 11:30:57,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service profiles initially as user user69 (uid=3546, gid=100) (pid 7093)
+[2008/06/14 11:30:58,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service netlogon initially as user user69 (uid=3546, gid=100) (pid 7093)
+[2008/06/14 11:31:01,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service netlogon
+[2008/06/14 11:31:01,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service profiles
+[2008/06/14 11:31:02,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user69] -> [user69] -> [user69] succeeded
+[2008/06/14 11:31:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service netlogon initially as user user69 (uid=3546, gid=100) (pid 7093)
+[2008/06/14 11:31:04,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service user69 initially as user user69 (uid=3546, gid=100) (pid 7093)
+[2008/06/14 11:31:06,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service public initially as user user69 (uid=3546, gid=100) (pid 7093)
+[2008/06/14 11:32:02,  1] smbd/service.c:close_cnum(1409)
+  pc05 (::ffff:192.168.100.100) closed connection to service public
+[2008/06/14 11:32:02,  1] smbd/service.c:close_cnum(1409)
+  pc05 (::ffff:192.168.100.100) closed connection to service netlogon
+[2008/06/14 11:32:02,  1] smbd/service.c:close_cnum(1409)
+  pc05 (::ffff:192.168.100.100) closed connection to service user44
+[2008/06/14 11:33:06,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 11:33:06,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 11:33:06,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 11:33:06,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 11:35:06,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service public
+[2008/06/14 11:35:06,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service user42
+[2008/06/14 11:35:06,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service netlogon
+[2008/06/14 11:35:24,  1] smbd/service.c:close_cnum(1409)
+  pc37 (::ffff:192.168.100.74) closed connection to service public
+[2008/06/14 11:35:24,  1] smbd/service.c:close_cnum(1409)
+  pc37 (::ffff:192.168.100.74) closed connection to service user83
+[2008/06/14 11:35:24,  1] smbd/service.c:close_cnum(1409)
+  pc37 (::ffff:192.168.100.74) closed connection to service netlogon
+[2008/06/14 11:35:24,  1] smbd/service.c:close_cnum(1409)
+  pc37 (::ffff:192.168.100.74) closed connection to service profiles
+[2008/06/14 11:36:29,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user55] -> [user55] -> [user55] succeeded
+[2008/06/14 11:36:29,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service user55 initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 11:36:36,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service user82
+[2008/06/14 11:36:49,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service public
+[2008/06/14 11:36:49,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service user69
+[2008/06/14 11:36:49,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service netlogon
+[2008/06/14 11:36:59,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user44] -> [user44] -> [user44] succeeded
+[2008/06/14 11:36:59,  1] smbd/service.c:make_connection_snum(1198)
+  pc05 (::ffff:192.168.100.100) connect to service user44 initially as user user44 (uid=3617, gid=100) (pid user)
+[2008/06/14 11:37:11,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 11:37:11,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service user82 initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 11:37:14,  1] smbd/service.c:close_cnum(1409)
+  pc05 (::ffff:192.168.100.100) closed connection to service user44
+[2008/06/14 11:37:15,  1] smbd/service.c:make_connection_snum(1198)
+  pc05 (::ffff:192.168.100.100) connect to service profiles initially as user user44 (uid=3617, gid=100) (pid user)
+[2008/06/14 11:38:47,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user83] -> [user83] -> [user83] succeeded
+[2008/06/14 11:38:47,  1] smbd/service.c:make_connection_snum(1198)
+  pc37 (::ffff:192.168.100.74) connect to service profiles initially as user user83 (uid=9052, gid=100) (pid user)
+[2008/06/14 11:38:47,  1] smbd/service.c:close_cnum(1409)
+  pc37 (::ffff:192.168.100.74) closed connection to service profiles
+[2008/06/14 11:42:28,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service user55
+[2008/06/14 11:42:59,  1] smbd/service.c:close_cnum(1409)
+  pc05 (::ffff:192.168.100.100) closed connection to service profiles
+[2008/06/14 11:43:11,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service user82
+[2008/06/14 11:45:03,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user44] -> [user44] -> [user44] succeeded
+[2008/06/14 11:45:04,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user44] -> [user44] -> [user44] succeeded
+[2008/06/14 11:45:04,  1] smbd/service.c:make_connection_snum(1198)
+  pc05 (::ffff:192.168.100.100) connect to service netlogon initially as user user44 (uid=3617, gid=100) (pid user)
+[2008/06/14 11:45:05,  1] smbd/service.c:make_connection_snum(1198)
+  pc05 (::ffff:192.168.100.100) connect to service user44 initially as user user44 (uid=3617, gid=100) (pid user)
+[2008/06/14 11:45:31,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user83] -> [user83] -> [user83] succeeded
+[2008/06/14 11:45:31,  1] smbd/service.c:make_connection_snum(1198)
+  pc37 (::ffff:192.168.100.74) connect to service user83 initially as user user83 (uid=9052, gid=100) (pid user)
+[2008/06/14 11:45:42,  1] smbd/service.c:make_connection_snum(1198)
+  pc37 (::ffff:192.168.100.74) connect to service public initially as user user83 (uid=9052, gid=100) (pid user)
+[2008/06/14 11:48:30,  0] lib/util_sock.c:read_socket_with_timeout(939)
+[2008/06/14 11:48:30,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  read_socket_with_timeout: client 0.0.0.0 read error = Connection reset by peer.
+[2008/06/14 11:50:51,  1] smbd/service.c:close_cnum(1409)
+  pc05 (::ffff:192.168.100.100) closed connection to service user44
+[2008/06/14 11:50:51,  1] smbd/service.c:close_cnum(1409)
+  pc05 (::ffff:192.168.100.100) closed connection to service netlogon
+[2008/06/14 11:51:31,  1] smbd/service.c:close_cnum(1409)
+  pc37 (::ffff:192.168.100.74) closed connection to service public
+[2008/06/14 11:51:31,  1] smbd/service.c:close_cnum(1409)
+  pc37 (::ffff:192.168.100.74) closed connection to service user83
+[2008/06/14 11:54:53,  2] auth/auth.c:check_ntlm_password(318)
+  check_ntlm_password:  Authentication for user [user70] -> [user70] FAILED with error NT_STATUS_WRONG_PASSWORD
+[2008/06/14 11:54:59,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user70] -> [user70] -> [user70] succeeded
+[2008/06/14 11:55:01,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user70] -> [user70] -> [user70] succeeded
+[2008/06/14 11:55:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service profiles initially as user user70 (uid=3819, gid=100) (pid user)
+[2008/06/14 11:55:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service netlogon initially as user user70 (uid=3819, gid=100) (pid user)
+[2008/06/14 11:55:07,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service netlogon
+[2008/06/14 11:55:07,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service profiles
+[2008/06/14 11:55:07,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user70] -> [user70] -> [user70] succeeded
+[2008/06/14 11:55:07,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service netlogon initially as user user70 (uid=3819, gid=100) (pid user)
+[2008/06/14 11:55:09,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service user70 initially as user user70 (uid=3819, gid=100) (pid user)
+[2008/06/14 11:55:12,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service public initially as user user70 (uid=3819, gid=100) (pid user)
+[2008/06/14 11:56:15,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 11:56:15,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service user82 initially as user user82 (uid=1378, gid=100) (pid user)
+[2008/06/14 11:59:50,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 11:59:50,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 11:59:50,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 11:59:50,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 11:59:50,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user21] -> [user21] -> [user21] succeeded
+[2008/06/14 11:59:51,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service profiles initially as user user21 (uid=1829, gid=100) (pid user)
+[2008/06/14 11:59:58,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 11:59:58,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 11:59:58,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 11:59:58,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:00:00,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:00:00,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:00:00,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:00:00,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:00:00,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:00:00,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:00:00,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:00:00,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:00:00,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:00:00,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:00:24,  1] smbd/service.c:close_cnum(1409)
+  pc38 (::ffff:192.168.100.72) closed connection to service profiles
+[2008/06/14 12:00:31,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user55] -> [user55] -> [user55] succeeded
+[2008/06/14 12:00:31,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service user55 initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 12:00:52,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service public
+[2008/06/14 12:00:52,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service user70
+[2008/06/14 12:00:52,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service netlogon
+[2008/06/14 12:01:48,  2] auth/auth.c:check_ntlm_password(318)
+  check_ntlm_password:  Authentication for user [user57] -> [user57] FAILED with error NT_STATUS_WRONG_PASSWORD
+[2008/06/14 12:01:52,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user57] -> [user57] -> [user57] succeeded
+[2008/06/14 12:01:54,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user57] -> [user57] -> [user57] succeeded
+[2008/06/14 12:01:55,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service profiles initially as user user57 (uid=3808, gid=100) (pid 1191)
+[2008/06/14 12:02:24,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service netlogon initially as user user57 (uid=3808, gid=100) (pid 1191)
+[2008/06/14 12:02:30,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service user57 initially as user user57 (uid=3808, gid=100) (pid 1191)
+[2008/06/14 12:02:34,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service public initially as user user57 (uid=3808, gid=100) (pid 1191)
+[2008/06/14 12:03:01,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:03:01,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:03:01,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:03:01,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:04:01,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user70] -> [user70] -> [user70] succeeded
+[2008/06/14 12:04:01,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service profiles initially as user user70 (uid=3819, gid=100) (pid 1331)
+[2008/06/14 12:05:15,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service user82
+[2008/06/14 12:05:38,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user82] -> [user82] -> [user82] succeeded
+[2008/06/14 12:05:58,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service user55
+[2008/06/14 12:06:14,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service user82 initially as user user82 (uid=1378, gid=100) (pid 3626)
+[2008/06/14 12:06:34,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service user82
+[2008/06/14 12:06:34,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user82 (uid=1378, gid=100) (pid 3626)
+[2008/06/14 12:06:45,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 12:07:48,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service public
+[2008/06/14 12:07:48,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service user57
+[2008/06/14 12:07:48,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service netlogon
+[2008/06/14 12:07:48,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service profiles
+[2008/06/14 12:08:06,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user55] -> [user55] -> [user55] succeeded
+[2008/06/14 12:08:06,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service user55 initially as user user55 (uid=3627, gid=100) (pid 5885)
+[2008/06/14 12:08:24,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user70] -> [user70] -> [user70] succeeded
+[2008/06/14 12:08:28,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user70] -> [user70] -> [user70] succeeded
+[2008/06/14 12:08:28,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service profiles initially as user user70 (uid=1803, gid=100) (pid 5894)
+[2008/06/14 12:08:29,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service netlogon initially as user user70 (uid=1803, gid=100) (pid 5894)
+[2008/06/14 12:08:34,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service user70 initially as user user70 (uid=1803, gid=100) (pid 5894)
+[2008/06/14 12:08:36,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service public initially as user user70 (uid=1803, gid=100) (pid 5894)
+[2008/06/14 12:09:13,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service user70 initially as user user70 (uid=3819, gid=100) (pid 1331)
+[2008/06/14 12:09:14,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service public initially as user user70 (uid=3819, gid=100) (pid 1331)
+[2008/06/14 12:09:20,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:09:20,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:09:20,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:09:20,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:10:02,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service user70
+[2008/06/14 12:10:02,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service public
+[2008/06/14 12:10:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service profiles initially as user user70 (uid=3819, gid=100) (pid 1331)
+[2008/06/14 12:12:37,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user57] -> [user57] -> [user57] succeeded
+[2008/06/14 12:12:37,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service user57 initially as user user57 (uid=3808, gid=100) (pid user)
+[2008/06/14 12:12:57,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service profiles initially as user user70 (uid=1803, gid=100) (pid 5894)
+[2008/06/14 12:13:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:13:00,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:13:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:13:00,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:13:01,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service profiles initially as user user57 (uid=3808, gid=100) (pid user)
+[2008/06/14 12:14:03,  2] auth/auth.c:check_ntlm_password(318)
+  check_ntlm_password:  Authentication for user [user77] -> [user77] FAILED with error NT_STATUS_WRONG_PASSWORD
+[2008/06/14 12:14:06,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service user55
+[2008/06/14 12:14:11,  2] auth/auth.c:check_ntlm_password(318)
+  check_ntlm_password:  Authentication for user [user77] -> [user77] FAILED with error NT_STATUS_WRONG_PASSWORD
+[2008/06/14 12:14:19,  2] auth/auth.c:check_ntlm_password(318)
+  check_ntlm_password:  Authentication for user [user77] -> [user77] FAILED with error NT_STATUS_WRONG_PASSWORD
+[2008/06/14 12:14:20,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service profiles
+[2008/06/14 12:14:35,  2] auth/auth.c:check_ntlm_password(318)
+  check_ntlm_password:  Authentication for user [user77] -> [user77] FAILED with error NT_STATUS_WRONG_PASSWORD
+[2008/06/14 12:16:00,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service profiles
+[2008/06/14 12:17:01,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:17:01,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:17:01,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:17:01,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:17:03,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user69] -> [user69] -> [user69] succeeded
+[2008/06/14 12:17:03,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service user69 initially as user user69 (uid=3546, gid=100) (pid user)
+[2008/06/14 12:17:30,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service user69
+[2008/06/14 12:17:30,  1] smbd/service.c:make_connection_snum(1198)
+  pc03 (::ffff:192.168.100.98) connect to service profiles initially as user user69 (uid=3546, gid=100) (pid user)
+[2008/06/14 12:17:39,  1] smbd/service.c:close_cnum(1409)
+  pc03 (::ffff:192.168.100.98) closed connection to service profiles
+[2008/06/14 12:18:24,  1] smbd/service.c:close_cnum(1409)
+  pc38 (::ffff:192.168.100.72) closed connection to service profiles
+[2008/06/14 12:18:24,  1] smbd/service.c:close_cnum(1409)
+  pc38 (::ffff:192.168.100.72) closed connection to service public
+[2008/06/14 12:18:24,  1] smbd/service.c:close_cnum(1409)
+  pc38 (::ffff:192.168.100.72) closed connection to service user70
+[2008/06/14 12:18:24,  1] smbd/service.c:close_cnum(1409)
+  pc38 (::ffff:192.168.100.72) closed connection to service netlogon
+[2008/06/14 12:18:24,  1] smbd/service.c:close_cnum(1409)
+  pc38 (::ffff:192.168.100.72) closed connection to service profiles
+[2008/06/14 12:18:37,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service profiles
+[2008/06/14 12:18:37,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service user57
+[2008/06/14 12:20:59,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:20:59,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:20:59,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:20:59,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:21:30,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user70] -> [user70] -> [user70] succeeded
+[2008/06/14 12:21:31,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user70] -> [user70] -> [user70] succeeded
+[2008/06/14 12:21:31,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service netlogon initially as user user70 (uid=3819, gid=100) (pid user)
+[2008/06/14 12:21:32,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service user70 initially as user user70 (uid=3819, gid=100) (pid user)
+[2008/06/14 12:21:33,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user29] -> [user29] -> [user29] succeeded
+[2008/06/14 12:21:35,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user29] -> [user29] -> [user29] succeeded
+[2008/06/14 12:21:35,  1] smbd/service.c:make_connection_snum(1198)
+  pc09 (::ffff:192.168.100.104) connect to service profiles initially as user user29 (uid=3689, gid=100) (pid user)
+[2008/06/14 12:21:44,  1] smbd/service.c:make_connection_snum(1198)
+  pc09 (::ffff:192.168.100.104) connect to service netlogon initially as user user29 (uid=3689, gid=100) (pid user)
+[2008/06/14 12:21:48,  1] smbd/service.c:make_connection_snum(1198)
+  pc09 (::ffff:192.168.100.104) connect to service user29 initially as user user29 (uid=3689, gid=100) (pid user)
+[2008/06/14 12:21:52,  1] smbd/service.c:make_connection_snum(1198)
+  pc09 (::ffff:192.168.100.104) connect to service public initially as user user29 (uid=3689, gid=100) (pid user)
+[2008/06/14 12:22:51,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:22:51,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:22:51,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:22:51,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:26:13,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:26:14,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:26:14,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:26:14,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:27:19,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service user70
+[2008/06/14 12:27:19,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service netlogon
+[2008/06/14 12:27:33,  1] smbd/service.c:close_cnum(1409)
+  pc09 (::ffff:192.168.100.104) closed connection to service public
+[2008/06/14 12:27:33,  1] smbd/service.c:close_cnum(1409)
+  pc09 (::ffff:192.168.100.104) closed connection to service user29
+[2008/06/14 12:27:33,  1] smbd/service.c:close_cnum(1409)
+  pc09 (::ffff:192.168.100.104) closed connection to service netlogon
+[2008/06/14 12:27:33,  1] smbd/service.c:close_cnum(1409)
+  pc09 (::ffff:192.168.100.104) closed connection to service profiles
+[2008/06/14 12:30:20,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user15] -> [user15] -> [user15] succeeded
+[2008/06/14 12:30:21,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user15] -> [user15] -> [user15] succeeded
+[2008/06/14 12:30:21,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user15 (uid=9105, gid=100) (pid user)
+[2008/06/14 12:30:22,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service netlogon initially as user user15 (uid=9105, gid=100) (pid user)
+[2008/06/14 12:30:26,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service netlogon
+[2008/06/14 12:30:26,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 12:30:26,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user15] -> [user15] -> [user15] succeeded
+[2008/06/14 12:30:26,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service netlogon initially as user user15 (uid=9105, gid=100) (pid user)
+[2008/06/14 12:30:27,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service user15 initially as user user15 (uid=9105, gid=100) (pid user)
+[2008/06/14 12:30:29,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service public initially as user user15 (uid=9105, gid=100) (pid user)
+[2008/06/14 12:30:48,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user55] -> [user55] -> [user55] succeeded
+[2008/06/14 12:30:48,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service user55 initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 12:31:07,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service user55
+[2008/06/14 12:31:07,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user55 (uid=3627, gid=100) (pid user)
+[2008/06/14 12:31:16,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 12:34:34,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:34:34,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:34:34,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:34:34,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:34:40,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user98] -> [user98] -> [user98] succeeded
+[2008/06/14 12:34:41,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user98] -> [user98] -> [user98] succeeded
+[2008/06/14 12:34:41,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service profiles initially as user user98 (uid=9014, gid=100) (pid user)
+[2008/06/14 12:34:43,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service netlogon initially as user user98 (uid=9014, gid=100) (pid user)
+[2008/06/14 12:34:46,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service netlogon
+[2008/06/14 12:34:46,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service profiles
+[2008/06/14 12:34:46,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user98] -> [user98] -> [user98] succeeded
+[2008/06/14 12:34:46,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service netlogon initially as user user98 (uid=9014, gid=100) (pid user)
+[2008/06/14 12:34:48,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service user98 initially as user user98 (uid=9014, gid=100) (pid user)
+[2008/06/14 12:34:52,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service public initially as user user98 (uid=9014, gid=100) (pid user)
+[2008/06/14 12:36:15,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service public
+[2008/06/14 12:36:15,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service user15
+[2008/06/14 12:36:15,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service netlogon
+[2008/06/14 12:36:37,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user42] -> [user42] -> [user42] succeeded
+[2008/06/14 12:36:37,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service user42 initially as user user42 (uid=3629, gid=100) (pid user)
+[2008/06/14 12:38:13,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user15] -> [user15] -> [user15] succeeded
+[2008/06/14 12:38:13,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service user15 initially as user user15 (uid=9105, gid=100) (pid user)
+[2008/06/14 12:38:18,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service user15
+[2008/06/14 12:38:18,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user15 (uid=9105, gid=100) (pid user)
+[2008/06/14 12:38:25,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user29] -> [user29] -> [user29] succeeded
+[2008/06/14 12:38:25,  1] smbd/service.c:make_connection_snum(1198)
+  pc09 (::ffff:192.168.100.104) connect to service user29 initially as user user29 (uid=3689, gid=100) (pid user)
+[2008/06/14 12:38:30,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 12:38:50,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user70] -> [user70] -> [user70] succeeded
+[2008/06/14 12:38:55,  1] smbd/service.c:close_cnum(1409)
+  pc09 (::ffff:192.168.100.104) closed connection to service user29
+[2008/06/14 12:38:57,  1] smbd/service.c:make_connection_snum(1198)
+  pc09 (::ffff:192.168.100.104) connect to service profiles initially as user user29 (uid=3689, gid=100) (pid user)
+[2008/06/14 12:40:34,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service public
+[2008/06/14 12:40:34,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service user98
+[2008/06/14 12:40:34,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service netlogon
+[2008/06/14 12:40:35,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user98] -> [user98] -> [user98] succeeded
+[2008/06/14 12:40:37,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service profiles initially as user user98 (uid=9014, gid=100) (pid 4056)
+[2008/06/14 12:41:49,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user83] -> [user83] -> [user83] succeeded
+[2008/06/14 12:41:49,  1] smbd/service.c:make_connection_snum(1198)
+  pc37 (::ffff:192.168.100.74) connect to service user83 initially as user user83 (uid=9052, gid=100) (pid 4155)
+[2008/06/14 12:42:37,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service user42
+[2008/06/14 12:44:25,  1] smbd/service.c:close_cnum(1409)
+  pc09 (::ffff:192.168.100.104) closed connection to service profiles
+[2008/06/14 12:45:50,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user14] -> [user14] -> [user14] succeeded
+[2008/06/14 12:45:50,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user14] -> [user14] -> [user14] succeeded
+[2008/06/14 12:45:50,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user14 (uid=3552, gid=100) (pid 8715)
+[2008/06/14 12:45:51,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service netlogon initially as user user14 (uid=3552, gid=100) (pid 8715)
+[2008/06/14 12:45:55,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service user14 initially as user user14 (uid=3552, gid=100) (pid 8715)
+[2008/06/14 12:45:56,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service public initially as user user14 (uid=3552, gid=100) (pid 8715)
+[2008/06/14 12:46:04,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user42] -> [user42] -> [user42] succeeded
+[2008/06/14 12:46:04,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service user42 initially as user user42 (uid=3629, gid=100) (pid 8750)
+[2008/06/14 12:46:25,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service user42
+[2008/06/14 12:46:27,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service profiles initially as user user42 (uid=3629, gid=100) (pid 8750)
+[2008/06/14 12:46:34,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service profiles
+[2008/06/14 12:47:32,  2] auth/auth.c:check_ntlm_password(318)
+  check_ntlm_password:  Authentication for user [user21] -> [user21] FAILED with error NT_STATUS_WRONG_PASSWORD
+[2008/06/14 12:47:38,  2] auth/auth.c:check_ntlm_password(318)
+  check_ntlm_password:  Authentication for user [user21] -> [user21] FAILED with error NT_STATUS_WRONG_PASSWORD
+[2008/06/14 12:47:46,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user21] -> [user21] -> [user21] succeeded
+[2008/06/14 12:47:47,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user21] -> [user21] -> [user21] succeeded
+[2008/06/14 12:47:47,  1] smbd/service.c:make_connection_snum(1198)
+  pc04 (::ffff:192.168.100.99) connect to service profiles initially as user user21 (uid=3890, gid=100) (pid 8863)
+[2008/06/14 12:47:50,  1] smbd/service.c:make_connection_snum(1198)
+  pc04 (::ffff:192.168.100.99) connect to service netlogon initially as user user21 (uid=3890, gid=100) (pid 8863)
+[2008/06/14 12:47:57,  1] smbd/service.c:make_connection_snum(1198)
+  pc04 (::ffff:192.168.100.99) connect to service user21 initially as user user21 (uid=3890, gid=100) (pid 8863)
+[2008/06/14 12:48:01,  1] smbd/service.c:make_connection_snum(1198)
+  pc04 (::ffff:192.168.100.99) connect to service public initially as user user21 (uid=3890, gid=100) (pid 8863)
+[2008/06/14 12:48:13,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:48:13,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:48:13,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:48:13,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:48:50,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user28] -> [user28] -> [user28] succeeded
+[2008/06/14 12:48:51,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user28] -> [user28] -> [user28] succeeded
+[2008/06/14 12:48:51,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user28 (uid=3826, gid=100) (pid 8920)
+[2008/06/14 12:48:53,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service netlogon initially as user user28 (uid=3826, gid=100) (pid 8920)
+[2008/06/14 12:48:57,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service netlogon
+[2008/06/14 12:48:57,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 12:48:57,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user28] -> [user28] -> [user28] succeeded
+[2008/06/14 12:48:57,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service netlogon initially as user user28 (uid=3826, gid=100) (pid 8920)
+[2008/06/14 12:48:59,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service user28 initially as user user28 (uid=3826, gid=100) (pid 8920)
+[2008/06/14 12:49:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service public initially as user user28 (uid=3826, gid=100) (pid 8920)
+[2008/06/14 12:49:49,  1] smbd/service.c:close_cnum(1409)
+  pc37 (::ffff:192.168.100.74) closed connection to service user83
+[2008/06/14 12:50:11,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:50:11,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:50:11,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:50:11,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:50:13,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid 5245)
+[2008/06/14 12:50:19,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user60] -> [user60] -> [user60] succeeded
+[2008/06/14 12:50:20,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user60] -> [user60] -> [user60] succeeded
+[2008/06/14 12:50:20,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service profiles initially as user user60 (uid=1047, gid=100) (pid user)
+[2008/06/14 12:50:22,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service netlogon initially as user user60 (uid=1047, gid=100) (pid user)
+[2008/06/14 12:50:25,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service profiles
+[2008/06/14 12:50:26,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service user60 initially as user user60 (uid=1047, gid=100) (pid user)
+[2008/06/14 12:50:27,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service public initially as user user60 (uid=1047, gid=100) (pid user)
+[2008/06/14 12:50:59,  1] smbd/service.c:make_connection_snum(1198)
+  pc30 (::ffff:192.168.100.33) connect to service profiles initially as user user14 (uid=3552, gid=100) (pid 8715)
+[2008/06/14 12:51:10,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 12:51:10,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service netlogon
+[2008/06/14 12:51:10,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service user14
+[2008/06/14 12:51:10,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service public
+[2008/06/14 12:51:10,  1] smbd/service.c:close_cnum(1409)
+  pc30 (::ffff:192.168.100.33) closed connection to service profiles
+[2008/06/14 12:52:02,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service profiles
+[2008/06/14 12:52:46,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:52:46,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user83] -> [user83] -> [user83] succeeded
+[2008/06/14 12:52:46,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:52:46,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:52:46,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:52:48,  1] smbd/service.c:make_connection_snum(1198)
+  pc37 (::ffff:192.168.100.74) connect to service profiles initially as user user83 (uid=9052, gid=100) (pid user)
+[2008/06/14 12:52:59,  1] smbd/service.c:close_cnum(1409)
+  pc37 (::ffff:192.168.100.74) closed connection to service profiles
+[2008/06/14 12:53:14,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 12:53:14,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 12:53:14,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 12:53:14,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 12:53:14,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user44] -> [user44] -> [user44] succeeded
+[2008/06/14 12:53:14,  1] smbd/service.c:make_connection_snum(1198)
+  pc05 (::ffff:192.168.100.100) connect to service user44 initially as user user44 (uid=3617, gid=100) (pid user)
+[2008/06/14 12:53:18,  1] smbd/service.c:close_cnum(1409)
+  pc04 (::ffff:192.168.100.99) closed connection to service public
+[2008/06/14 12:53:18,  1] smbd/service.c:close_cnum(1409)
+  pc04 (::ffff:192.168.100.99) closed connection to service user21
+[2008/06/14 12:53:18,  1] smbd/service.c:close_cnum(1409)
+  pc04 (::ffff:192.168.100.99) closed connection to service netlogon
+[2008/06/14 12:53:18,  1] smbd/service.c:close_cnum(1409)
+  pc04 (::ffff:192.168.100.99) closed connection to service profiles
+[2008/06/14 12:53:30,  1] smbd/service.c:close_cnum(1409)
+  pc05 (::ffff:192.168.100.100) closed connection to service user44
+[2008/06/14 12:53:32,  1] smbd/service.c:make_connection_snum(1198)
+  pc05 (::ffff:192.168.100.100) connect to service profiles initially as user user44 (uid=3617, gid=100) (pid user)
+[2008/06/14 12:54:13,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service public
+[2008/06/14 12:54:13,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service user28
+[2008/06/14 12:54:13,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service netlogon
+[2008/06/14 12:55:16,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user28] -> [user28] -> [user28] succeeded
+[2008/06/14 12:55:16,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service user28 initially as user user28 (uid=3826, gid=100) (pid user)
+[2008/06/14 12:55:16,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service public initially as user user28 (uid=3826, gid=100) (pid user)
+[2008/06/14 12:55:43,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 12:55:43,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service public
+[2008/06/14 12:55:43,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service user36
+[2008/06/14 12:55:45,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user28 (uid=3826, gid=100) (pid user)
+[2008/06/14 12:55:46,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user28 (uid=3826, gid=100) (pid user)
+[2008/06/14 12:55:53,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user28 (uid=3826, gid=100) (pid user)
+[2008/06/14 12:55:58,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user36] -> [user36] -> [user36] succeeded
+[2008/06/14 12:55:58,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user36] -> [user36] -> [user36] succeeded
+[2008/06/14 12:55:58,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 12:56:01,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service netlogon initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 12:56:06,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 12:56:07,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service user36 initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 12:56:10,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service public initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 12:56:11,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service public
+[2008/06/14 12:56:11,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service user60
+[2008/06/14 12:56:11,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service netlogon
+[2008/06/14 12:56:34,  0] lib/util_sock.c:read_socket_with_timeout(939)
+[2008/06/14 12:56:34,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  read_socket_with_timeout: client 0.0.0.0 read error = Connection reset by peer.
+[2008/06/14 12:57:19,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user70] -> [user70] -> [user70] succeeded
+[2008/06/14 12:57:19,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service user70 initially as user user70 (uid=3819, gid=100) (pid user)
+[2008/06/14 12:57:36,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service user70
+[2008/06/14 12:57:36,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service profiles initially as user user70 (uid=3819, gid=100) (pid user)
+[2008/06/14 12:59:14,  1] smbd/service.c:close_cnum(1409)
+  pc05 (::ffff:192.168.100.100) closed connection to service profiles
+[2008/06/14 13:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:00:00,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:00:00,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:00:00,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:00:00,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:00:01,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:00:01,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:00:01,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:00:01,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:00:02,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:00:02,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:00:02,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:00:02,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:01:16,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 13:01:16,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 13:01:16,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 13:01:16,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service public
+[2008/06/14 13:01:16,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service user28
+[2008/06/14 13:01:24,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user28] -> [user28] -> [user28] succeeded
+[2008/06/14 13:02:44,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service public
+[2008/06/14 13:02:44,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service user36
+[2008/06/14 13:02:46,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service netlogon
+[2008/06/14 13:03:19,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service profiles
+[2008/06/14 13:04:58,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:04:58,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:04:58,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:04:58,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:04:58,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user36] -> [user36] -> [user36] succeeded
+[2008/06/14 13:04:58,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service user36 initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 13:05:32,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service user36
+[2008/06/14 13:05:32,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user36 (uid=3607, gid=100) (pid user)
+[2008/06/14 13:06:03,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 13:06:16,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user60] -> [user60] -> [user60] succeeded
+[2008/06/14 13:06:16,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service user60 initially as user user60 (uid=1047, gid=100) (pid user)
+[2008/06/14 13:09:19,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:09:19,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:09:19,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:09:19,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:10:49,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user28] -> [user28] -> [user28] succeeded
+[2008/06/14 13:10:49,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service user28 initially as user user28 (uid=3826, gid=100) (pid user)
+[2008/06/14 13:11:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc07 (::ffff:192.168.100.102) connect to service profiles initially as user user28 (uid=3826, gid=100) (pid user)
+[2008/06/14 13:12:18,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user21] -> [user21] -> [user21] succeeded
+[2008/06/14 13:12:18,  1] smbd/service.c:make_connection_snum(1198)
+  pc04 (::ffff:192.168.100.99) connect to service user21 initially as user user21 (uid=3890, gid=100) (pid user)
+[2008/06/14 13:12:32,  1] smbd/service.c:close_cnum(1409)
+  pc04 (::ffff:192.168.100.99) closed connection to service user21
+[2008/06/14 13:12:34,  1] smbd/service.c:make_connection_snum(1198)
+  pc04 (::ffff:192.168.100.99) connect to service profiles initially as user user21 (uid=3890, gid=100) (pid user)
+[2008/06/14 13:12:48,  1] smbd/service.c:close_cnum(1409)
+  pc04 (::ffff:192.168.100.99) closed connection to service profiles
+[2008/06/14 13:13:16,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service public initially as user user60 (uid=1047, gid=100) (pid user)
+[2008/06/14 13:13:56,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service public
+[2008/06/14 13:13:57,  1] smbd/service.c:make_connection_snum(1198)
+  pc02 (::ffff:192.168.100.97) connect to service profiles initially as user user60 (uid=1047, gid=100) (pid user)
+[2008/06/14 13:13:57,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service user60
+[2008/06/14 13:14:01,  1] smbd/service.c:close_cnum(1409)
+  pc02 (::ffff:192.168.100.97) closed connection to service profiles
+[2008/06/14 13:16:49,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service profiles
+[2008/06/14 13:16:49,  1] smbd/service.c:close_cnum(1409)
+  pc07 (::ffff:192.168.100.102) closed connection to service user28
+[2008/06/14 13:20:35,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:20:35,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:20:35,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:20:35,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:21:08,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:21:08,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:21:08,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:21:08,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:26:06,  1] smbd/service.c:close_cnum(1409)
+  pc10 (::ffff:192.168.100.105) closed connection to service public
+[2008/06/14 13:26:06,  1] smbd/service.c:close_cnum(1409)
+  pc10 (::ffff:192.168.100.105) closed connection to service user73
+[2008/06/14 13:26:14,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:26:14,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:26:14,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:26:14,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:26:32,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user34] -> [user34] -> [user34] succeeded
+[2008/06/14 13:26:33,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user34] -> [user34] -> [user34] succeeded
+[2008/06/14 13:26:33,  1] smbd/service.c:make_connection_snum(1198)
+  pc09 (::ffff:192.168.100.104) connect to service profiles initially as user user34 (uid=3824, gid=100) (pid user)
+[2008/06/14 13:26:34,  1] smbd/service.c:make_connection_snum(1198)
+  pc09 (::ffff:192.168.100.104) connect to service netlogon initially as user user34 (uid=3824, gid=100) (pid user)
+[2008/06/14 13:26:38,  1] smbd/service.c:close_cnum(1409)
+  pc09 (::ffff:192.168.100.104) closed connection to service netlogon
+[2008/06/14 13:26:38,  1] smbd/service.c:close_cnum(1409)
+  pc09 (::ffff:192.168.100.104) closed connection to service profiles
+[2008/06/14 13:26:38,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user34] -> [user34] -> [user34] succeeded
+[2008/06/14 13:26:38,  1] smbd/service.c:make_connection_snum(1198)
+  pc09 (::ffff:192.168.100.104) connect to service netlogon initially as user user34 (uid=3824, gid=100) (pid user)
+[2008/06/14 13:26:40,  1] smbd/service.c:make_connection_snum(1198)
+  pc09 (::ffff:192.168.100.104) connect to service user34 initially as user user34 (uid=3824, gid=100) (pid user)
+[2008/06/14 13:26:44,  1] smbd/service.c:make_connection_snum(1198)
+  pc09 (::ffff:192.168.100.104) connect to service public initially as user user34 (uid=3824, gid=100) (pid user)
+[2008/06/14 13:26:59,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:26:59,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:26:59,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:26:59,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:27:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:27:00,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:27:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:27:00,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:27:40,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:27:40,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:27:40,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:27:40,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:27:50,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user40] -> [user40] -> [user40] succeeded
+[2008/06/14 13:27:51,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user40] -> [user40] -> [user40] succeeded
+[2008/06/14 13:27:51,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service profiles initially as user user40 (uid=3631, gid=100) (pid user)
+[2008/06/14 13:27:52,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service netlogon initially as user user40 (uid=3631, gid=100) (pid user)
+[2008/06/14 13:28:00,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service user40 initially as user user40 (uid=3631, gid=100) (pid user)
+[2008/06/14 13:28:05,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service public initially as user user40 (uid=3631, gid=100) (pid user)
+[2008/06/14 13:32:23,  1] smbd/service.c:close_cnum(1409)
+  pc09 (::ffff:192.168.100.104) closed connection to service public
+[2008/06/14 13:32:23,  1] smbd/service.c:close_cnum(1409)
+  pc09 (::ffff:192.168.100.104) closed connection to service user34
+[2008/06/14 13:32:23,  1] smbd/service.c:close_cnum(1409)
+  pc09 (::ffff:192.168.100.104) closed connection to service netlogon
+[2008/06/14 13:33:40,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service public
+[2008/06/14 13:33:40,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service user40
+[2008/06/14 13:33:40,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service netlogon
+[2008/06/14 13:33:40,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service profiles
+[2008/06/14 13:35:14,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user40] -> [user40] -> [user40] succeeded
+[2008/06/14 13:35:14,  1] smbd/service.c:make_connection_snum(1198)
+  pc08 (::ffff:192.168.100.103) connect to service user40 initially as user user40 (uid=3631, gid=100) (pid user)
+[2008/06/14 13:41:14,  1] smbd/service.c:close_cnum(1409)
+  pc08 (::ffff:192.168.100.103) closed connection to service user40
+[2008/06/14 13:48:13,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:48:13,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:48:13,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:48:13,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:50:41,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user28] -> [user28] -> [user28] succeeded
+[2008/06/14 13:50:42,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user28] -> [user28] -> [user28] succeeded
+[2008/06/14 13:50:42,  1] smbd/service.c:make_connection_snum(1198)
+  deq-ltq-pc03 (::ffff:192.168.100.18) connect to service profiles initially as user user28 (uid=1730, gid=100) (pid user)
+[2008/06/14 13:50:43,  1] smbd/service.c:make_connection_snum(1198)
+  deq-ltq-pc03 (::ffff:192.168.100.18) connect to service netlogon initially as user user28 (uid=1730, gid=100) (pid user)
+[2008/06/14 13:50:45,  1] smbd/service.c:make_connection_snum(1198)
+  deq-ltq-pc03 (::ffff:192.168.100.18) connect to service user28 initially as user user28 (uid=1730, gid=100) (pid user)
+[2008/06/14 13:50:48,  1] smbd/service.c:make_connection_snum(1198)
+  deq-ltq-pc03 (::ffff:192.168.100.18) connect to service public initially as user user28 (uid=1730, gid=100) (pid user)
+[2008/06/14 13:54:15,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:54:15,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:54:15,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:54:15,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:54:17,  1] smbd/service.c:make_connection_snum(1198)
+  deq-ltq-pc03 (::ffff:192.168.100.18) connect to service profiles initially as user user28 (uid=1730, gid=100) (pid user)
+[2008/06/14 13:54:24,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user60] -> [user60] -> [user60] succeeded
+[2008/06/14 13:54:25,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user60] -> [user60] -> [user60] succeeded
+[2008/06/14 13:54:25,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service profiles initially as user user60 (uid=1047, gid=100) (pid user)
+[2008/06/14 13:54:30,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service netlogon initially as user user60 (uid=1047, gid=100) (pid user)
+[2008/06/14 13:54:37,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service user60 initially as user user60 (uid=1047, gid=100) (pid user)
+[2008/06/14 13:54:39,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service public initially as user user60 (uid=1047, gid=100) (pid user)
+[2008/06/14 13:56:29,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 13:56:29,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:56:29,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:56:29,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:58:35,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 13:58:35,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 13:58:35,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 13:59:37,  1] smbd/service.c:close_cnum(1409)
+  deq-ltq-pc03 (::ffff:192.168.100.18) closed connection to service profiles
+[2008/06/14 13:59:37,  1] smbd/service.c:close_cnum(1409)
+  deq-ltq-pc03 (::ffff:192.168.100.18) closed connection to service public
+[2008/06/14 13:59:37,  1] smbd/service.c:close_cnum(1409)
+  deq-ltq-pc03 (::ffff:192.168.100.18) closed connection to service user28
+[2008/06/14 13:59:37,  1] smbd/service.c:close_cnum(1409)
+  deq-ltq-pc03 (::ffff:192.168.100.18) closed connection to service netlogon
+[2008/06/14 13:59:37,  1] smbd/service.c:close_cnum(1409)
+  deq-ltq-pc03 (::ffff:192.168.100.18) closed connection to service profiles
+[2008/06/14 14:00:00,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 14:00:00,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 14:00:00,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 14:00:01,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 14:00:01,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 14:00:01,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 14:00:01,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 14:02:15,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service public
+[2008/06/14 14:02:15,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service user60
+[2008/06/14 14:02:15,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service netlogon
+[2008/06/14 14:02:15,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service profiles
+[2008/06/14 14:02:16,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 14:02:16,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 14:02:16,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 14:02:16,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 14:02:16,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user60] -> [user60] -> [user60] succeeded
+[2008/06/14 14:02:16,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service user60 initially as user user60 (uid=1047, gid=100) (pid 8804)
+[2008/06/14 14:02:27,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service public initially as user user60 (uid=1047, gid=100) (pid 8804)
+[2008/06/14 14:02:33,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user56] -> [user56] -> [user56] succeeded
+[2008/06/14 14:02:35,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user56] -> [user56] -> [user56] succeeded
+[2008/06/14 14:02:35,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service profiles initially as user user56 (uid=3643, gid=100) (pid 8807)
+[2008/06/14 14:02:37,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service netlogon initially as user user56 (uid=3643, gid=100) (pid 8807)
+[2008/06/14 14:03:01,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service netlogon
+[2008/06/14 14:03:01,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service profiles
+[2008/06/14 14:03:01,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user56] -> [user56] -> [user56] succeeded
+[2008/06/14 14:03:01,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service netlogon initially as user user56 (uid=3643, gid=100) (pid 8846)
+[2008/06/14 14:03:06,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service user56 initially as user user56 (uid=3643, gid=100) (pid 8846)
+[2008/06/14 14:03:09,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 14:03:09,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 14:03:09,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 14:03:09,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 14:03:11,  1] smbd/service.c:make_connection_snum(1198)
+  pc11 (::ffff:192.168.100.106) connect to service public initially as user user56 (uid=3643, gid=100) (pid 8846)
+[2008/06/14 14:05:18,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service user60
+[2008/06/14 14:05:18,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service public
+[2008/06/14 14:05:18,  1] smbd/service.c:make_connection_snum(1198)
+  pc06 (::ffff:192.168.100.101) connect to service profiles initially as user user60 (uid=1047, gid=100) (pid 8804)
+[2008/06/14 14:05:56,  1] smbd/service.c:close_cnum(1409)
+  pc06 (::ffff:192.168.100.101) closed connection to service profiles
+[2008/06/14 14:08:53,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 14:08:53,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 14:08:53,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 14:08:53,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 14:09:01,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service public
+[2008/06/14 14:09:01,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service user56
+[2008/06/14 14:09:01,  1] smbd/service.c:close_cnum(1409)
+  pc11 (::ffff:192.168.100.106) closed connection to service netlogon
+[2008/06/14 14:09:19,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 14:09:19,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 14:09:19,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 14:09:19,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)
+[2008/06/14 14:16:42,  2] auth/auth.c:check_ntlm_password(318)
+  check_ntlm_password:  Authentication for user [user18] -> [user18] FAILED with error NT_STATUS_WRONG_PASSWORD
+[2008/06/14 14:16:46,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user18] -> [user18] -> [user18] succeeded
+[2008/06/14 14:16:46,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user18] -> [user18] -> [user18] succeeded
+[2008/06/14 14:16:46,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service profiles initially as user user18 (uid=3672, gid=100) (pid user)
+[2008/06/14 14:16:50,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service netlogon initially as user user18 (uid=3672, gid=100) (pid user)
+[2008/06/14 14:16:53,  1] smbd/service.c:close_cnum(1409)
+  pc38 (::ffff:192.168.100.72) closed connection to service profiles
+[2008/06/14 14:16:53,  1] smbd/service.c:close_cnum(1409)
+  pc38 (::ffff:192.168.100.72) closed connection to service netlogon
+[2008/06/14 14:16:54,  2] auth/auth.c:check_ntlm_password(308)
+  check_ntlm_password:  authentication for user [user18] -> [user18] -> [user18] succeeded
+[2008/06/14 14:16:54,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service user18 initially as user user18 (uid=3672, gid=100) (pid user)
+[2008/06/14 14:16:54,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service netlogon initially as user user18 (uid=3672, gid=100) (pid user)
+[2008/06/14 14:16:56,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service public initially as user user18 (uid=3672, gid=100) (pid user)
+[2008/06/14 14:18:01,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service profiles initially as user user18 (uid=3672, gid=100) (pid user)
+[2008/06/14 14:18:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service profiles initially as user user18 (uid=3672, gid=100) (pid user)
+[2008/06/14 14:18:02,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service profiles initially as user user18 (uid=3672, gid=100) (pid user)
+[2008/06/14 14:18:03,  1] smbd/service.c:make_connection_snum(1198)
+  pc38 (::ffff:192.168.100.72) connect to service profiles initially as user user18 (uid=3672, gid=100) (pid user)
+[2008/06/14 14:20:37,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+[2008/06/14 14:20:37,  0] lib/util_sock.c:write_data(1136)
+[2008/06/14 14:20:37,  0] lib/util_sock.c:get_peer_addr_internal(1676)
+  getpeername failed. Error was Transport endpoint is not connected
+  write_data: write failure in writing to client 0.0.0.0. Error Connection reset by peer
+[2008/06/14 14:20:37,  0] smbd/process.c:srv_send_smb(74)
+  Error writing 4 bytes to client. -1. (Transport endpoint is not connected)

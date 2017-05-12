@@ -1,0 +1,32 @@
+# Change file for Plack::App::GitHub::WebHook
+
+0.9  2016-11-06 16:36:21 CET
+     - add logger option and better document logging (issue #15)
+
+0.8  2015-03-23 12:48:25 CET
+    - introduced plugin mechanism for GitHub::WebHook hooks
+    - support both JSON content and JSON parameter 'payload'
+    - improve 'access' parameter
+    - add 'secret' parameter (issue #7)
+
+0.7  2015-03-20 16:52:15 CET
+    - document logging 
+
+0.6  2015-03-17 14:12:45 CET
+    - Fixed payload parsing
+    - Also pass event, delivery and logger to hooks
+    - added section on deployment
+
+0.5  2014-09-30 14:52:44 CEST
+    - New options: events and safe
+    - Migrated to Dist::Milla
+
+0.4 2014-01-09
+    - Support multiple hooks, chained
+
+0.3 2014-01-02
+    - Additional return code 202
+    - Minor documentation fixes (thanks to Tomáš Znamenáček)
+
+0.2 2013-07-30
+    - First public version at CPAN

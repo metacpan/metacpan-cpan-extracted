@@ -1,0 +1,23 @@
+Revision history for Pod-Pandoc
+
+0.4.0  2017-02-06 11:31:17 CET
+    - Guess NAME in parse_modules if missing
+    - Let .pod override .pm in module sets (#4)
+    - Rename option data-sections to parse
+    - Add option (default-)meta (#6)
+    - Make flat output directory the default (#8)
+
+0.3.2  2017-02-03 13:44:42 CET
+    - Fix converting with pod2pandoc to STDOUT
+    - Extend module index with module descriptions
+    - Include all data sections as RawBlock
+    - Automatically publish documentation via travis-ci
+
+0.3.1  2017-02-01 15:45:45 CET
+    - Add method parse_module
+    - Implement option update
+    - Include Perl scripts in parse_dir
+    - Add GitHub wiki and Read the Docs as examples
+
+0.3.0  2017-02-01 07:44:58 CET
+    - Split from Pandoc-Elements. See there for previous changes.

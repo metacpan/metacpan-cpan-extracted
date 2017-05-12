@@ -1,0 +1,31 @@
+format-version: 1.2
+data-version: releases/2016-05-07
+date: 06:05:2016 10:39
+saved-by: al
+auto-generated-by: TermGenie 1.0
+synonymtypedef: systematic_synonym "Systematic synonym" EXACT
+default-namespace: gene_ontology
+remark: cvs version: $Revision: 33095 $
+ontology: go
+
+[Term]
+id: GO:0003674
+name: molecular_function
+namespace: molecular_function
+alt_id: GO:0005554
+def: "Elemental activities, such as catalysis or binding, describing the actions of a gene product at the molecular level. A given gene product may exhibit one or more molecular functions." [GOC:go_curators]
+comment: Note that, in addition to forming the root of the molecular function ontology, this term is recommended for use for the annotation of gene products whose molecular function is unknown. Note that when this term is used for annotation, it indicates that no information was available about the molecular function of the gene product annotated as of the date the annotation was made; the evidence code ND, no data, is used to indicate this.
+synonym: "molecular function" EXACT []
+
+[Term]
+id: GO:0102583
+name: cyanidin 3-O-glucoside-(2\"-O-xyloside) 6''-O-acyltransferase activity
+namespace: molecular_function
+def: "Catalysis of the reaction: cyanidin 3-O-beta-D-sambubioside +4-coumaryl-CoA <=> cyanidin 3-O-[2" [EC:2.3.1.-]
+xref: MetaCyc:RXN-15329
+is_a: GO:0003674
+synonym: "cyanidin 3-O-glucoside-yadda-yadda" EXACT []
+synonym: "cyanidin 3-O-glucoside-yadda-yadda" EXACT []
+synonym: "cyanidin 3-O-glucoside-yadda-yadda" NARROW []
+synonym: "cyanidin 3-O-glucoside-yadda-yadda" EXACT []
+synonym: "cyanidin 3-O-glucoside-something" NARROW []

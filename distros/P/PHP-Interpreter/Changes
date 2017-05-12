@@ -1,0 +1,11 @@
+Revision history for Perl extension PHP::Interpreter
+
+1.0.2  2008-11-12 16:12:47
+       - Updated Makefile.PL ref. [bug 35712]
+
+1.0.1  2005-09-26T17:47:00
+       - Fixed memory leak with multiple interpreters [bug 14245]
+       - Fixed makefile problems [bug 14317 - patch by vrm]
+
+1.0    2005-08-25T16:29:00
+       - Initial release

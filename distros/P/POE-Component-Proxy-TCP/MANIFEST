@@ -1,0 +1,20 @@
+Changes
+design-notes.txt
+examples/proxy.pl
+examples/proxy2.pl
+examples/winproxy.pl
+inc/ClientRequest.pm
+inc/TestClient.pm
+inc/TestServer.pm
+ISSUES.txt
+lib/POE/Component/Proxy/TCP.pm
+lib/POE/Component/Proxy/TCP/PoeDebug.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/POE-Component-Proxy-TCP.t
+t/testproxy.t
+tests/testproxy.pl
+TODO.txt

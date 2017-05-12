@@ -1,0 +1,45 @@
+Revision History for POE-Component-Server-eris
+2.0     2016-11-28 Brad Lhotsky <brad@divisionbyzero.net>
+        - Fix program matching regex to support ISO8601 Dates
+        - Optimize on the program matching regex
+        - Install the eris-dispatcher-{stdin,tcp}.pl
+
+1.9     2016-11-22 Brad Lhotsky <brad@divisionbyzero.net>
+        - Remove unnecessary dependencies of AnyEvent::Graphite
+        - Pod::Weaver and Perl::Critic the distribution.
+
+1.8     2013-08-29 Brad Lhotsky <brad@divisionbyzero.net>
+        - Bugfix for message counters
+
+1.7     2013-08-29 Brad Lhotsky <brad@divisionbyzero.net>
+        - Added statistics tracking
+        - Can send statistics to graphite
+        - Debug mode now displays statistics
+
+1.6     2013-07-12 Brad Lhotsky <brad@divisionbyzero.net>
+        - Only flush client sockets if there's data waiting
+
+1.5     2013-07-11 Brad Lhotsky <brad@divisionbyzero.net>
+        - Fix typo in message dispatch name
+
+1.4     2013-07-11 Brad Lhotsky <brad@divisionbyzero.net>
+        - Dispatcher can dispatch in blocks of messages
+          - Patch by Mattia Barbon
+
+1.0.1   2012-10-15 Brad Lhotsky <brad@divisionbyzero.net>
+        - Bug fix in dump
+
+1.0     2012-10-15 Brad Lhotsky <brad@divisionbyzero.net>
+        - Added status and dump commands for debugging
+        - Fixed stream handling bugs
+
+0.9     2012-10-15 Brad Lhotsky <brad@divisionbyzero.net>
+        - Fixed memory leak in regex matcher
+
+0.8     2012-10-04 Brad Lhotsky <brad@divisionbyzero.net>
+        - Added regex subscription option
+
+0.7     2012-06-28 Brad Lhotsky <brad@divisionbyzero.net>
+        - Fixed whitespace
+        - Updated dzil prefs
+

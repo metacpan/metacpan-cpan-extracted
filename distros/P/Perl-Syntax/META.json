@@ -1,0 +1,49 @@
+{
+   "abstract" : "Module to syntax check a Perl program file or exec string.",
+   "author" : [
+      "Rocky Bernstein <rocky@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Syntax",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.32"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008008",
+            "rlib" : "0.02",
+            "version" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Syntax" : {
+         "file" : "lib/Perl/Syntax.pm",
+         "version" : "1.00"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rocky/Perl-Syntax/issues"
+      },
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ],
+      "repository" : {
+         "url" : "http://github.com/rocky/Perl-Syntax"
+      }
+   },
+   "version" : "1.00"
+}

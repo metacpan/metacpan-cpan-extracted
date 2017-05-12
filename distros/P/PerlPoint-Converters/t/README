@@ -1,0 +1,30 @@
+Creating testcases for pp2html/pp2latex:
+========================================
+
+* Copy an existing t/test_xx.t file to a new t/test_yy.t
+
+* Create a corresponding t/test_yy.pp File.
+
+* Edit the t/test_yy.t file; replace all former 'xx' 
+  with 'yy'
+
+* The t/test_yy.t script extracts the number of headlines
+  in the t/test_yy.pp file. This determines the number of
+  tests ...
+
+* insert what you want to test into the t/test_yy.pp file
+
+* setenv PP_DEBUG 1
+
+* perl t/test_yy.t
+  This creates the yy_*htm file which are not deleted due to
+  the setting of PP_DEBUG
+
+* Rename the yy_*htm files to yy_*.ref and store them in
+  a corresponding d_yy directory
+  
+* DO NOT FORGET to update the MANIFEST file !!
+
+* run `make test'
+
+* Similar procedure for ltx_test files.

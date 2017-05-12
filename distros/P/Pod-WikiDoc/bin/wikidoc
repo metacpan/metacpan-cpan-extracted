@@ -1,0 +1,144 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+# PODNAME: wikidoc
+# ABSTRACT: convert mixed Pod and wikidoc text to Pod
+
+our $VERSION = '0.21';
+
+use Getopt::Lucid 0.14 ':all';
+use Pod::WikiDoc;
+use Pod::Usage 1;
+
+my @spec = (
+    Switch("comment|c"),
+    Param("length|l")->default(3),
+    Keypair("define|d"),
+    Switch("help|h"),
+    Switch("version|V"),
+);
+        
+my $opts;
+
+eval { $opts = Getopt::Lucid->getopt( \@spec ) };
+
+if ($@) {
+    if ( ref $@ && $@->isa("Getopt::Lucid::Exception::ARGV") ) {
+        pod2usage("Syntax Error.");
+    }
+    else {
+        die "$@\n";
+    }
+}
+
+if ( $opts->get_help ) {
+    pod2usage( -verbose => 1 );
+}
+
+if ( $opts->get_version ) {
+    print "Version: wikidoc $main::VERSION\n"; 
+    exit;
+}
+    
+my ($input_file, $output_file) = @ARGV;
+
+if ( ! $input_file && -t *STDIN ) {
+    pod2usage("wikidoc: Syntax error.")
+}
+
+die "wikidoc: Can't use the same file for input and output.\n"
+    if $input_file && $output_file && $input_file eq $output_file;
+
+my $args = {
+    comment_blocks => $opts->get_comment ? 1 : 0,
+    comment_prefix_length => $opts->get_length,
+    keywords => { $opts->get_define },
+};
+
+my $parser = Pod::WikiDoc->new( $args );
+
+if ( $output_file ) {
+    print "Extracting Pod from $input_file\n";
+}
+
+if ( defined $input_file and $input_file eq q{-} ) {
+    print "wikidoc: Reading from terminal:\n";
+    my $buffer;
+    $buffer .= $_ while <STDIN>;
+    print $parser->convert( $buffer );
+}
+else {
+    $parser->filter( { input => $input_file, output => $output_file } );
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+wikidoc - convert mixed Pod and wikidoc text to Pod
+
+=head1 VERSION
+
+version 0.21
+
+=head1 SYNOPSIS
+
+ wikidoc [options] [inputfile] [outputfile]
+ 
+ options: 
+    --comments or -c
+        include wikidoc comment-blocks
+    
+    --define <KEYWORD=VALUE> or -d <KEYWORD=VALUE>
+        define keyword for expansion
+        
+    --help or -h       
+        give usage information
+    
+    --length <INTEGER> or -l <INTEGER>
+        set the length of the comment block prefix, e.g. 3 means "###"
+    
+    --version or -V
+        print the version number of this program
+ 
+ inputfile: 
+    A filename from which Pod and wikidoc will be extracted.  To read
+    from STDIN, use the special name '-'.  If no filename is given, data 
+    will be read from STDIN if wikidoc is receiving data from a pipe, 
+    otherwise a syntax error will occur.
+ 
+ outputfile: 
+    A filename for the generated Pod.  If no filename is given, Pod
+    will be written to STDOUT.
+
+=head1 DESCRIPTION
+
+C<wikidoc> processes Pod and wikidoc, converting the wikidoc to Pod, and then
+writing the combined document back to a file or standard output. 
+
+See documentation for L<Pod::WikiDoc> for details.
+
+=head1 DIAGNOSTICS
+
+C<wikidoc: Can't use the same file for input and output.>
+
+Because an output file is clobbered, using the same input and output
+file would destroy the input and produce no output.
+
+=head1 AUTHOR
+
+David A Golden <dagolden@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2017 by David A Golden.
+
+This is free software, licensed under:
+
+  The Apache License, Version 2.0, January 2004
+
+=cut

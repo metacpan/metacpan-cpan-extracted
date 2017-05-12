@@ -1,0 +1,36 @@
+0.008     2011-07-16 22:42:10 Europe/London
+	Switch to Mixin::Event::Dispatch for event handling. Now uses ->invoke_event and
+	->add_handler_for_event to deal with events, passing on_* callbacks to statement
+	handles and db handles is still supported.
+	Pass through the statement and portal when building a statement.
+	Support ->discard on a statement handle
+	Pass through ->debug value rather than setting true/false
+	Wait for a startup event before processing queued requests
+	Additional events:
+	* command_complete now passed through when calling ->prepare_async
+	* close_complete supported in statements, with pending queued handlers
+
+
+0.007     2011-06-11 17:38:59 Europe/London
+	Included some extra callbacks for statements so that we know when it's safe to send data, and provide
+	support for the terminate/close requests so we disconnect cleanly.
+
+0.006     2011-02-26 18:55:27 Europe/London
+	More support for COPY IN, interleaved prepared statements and callbacks for data_row / no_data conditions.
+	Improved performance slightly by moving some slow debug handling into coderefs.
+
+0.005     2011-02-20 18:14:42 Europe/London
+	Better handling of interleaved prepared statements (need to be named for this to work as expected).
+
+0.004     2011-02-20 04:25:53 Europe/London
+	Finish send_copy_data implementation.
+
+0.003     2011-02-20 02:28:32 Europe/London
+	Primitive support for the extra COPY callbacks.
+
+0.002     2011-02-14 00:21:32 Europe/London
+	Basic support for prepared queries and COPY.
+
+0.001     2011-02-12 12:40:54 Europe/London
+	Preliminary release to CPAN.
+

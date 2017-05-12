@@ -1,0 +1,34 @@
+---
+abstract: "Turn Pod into Microsoft Word's WordML"
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  Test::LongString: '0'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-WordML
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - Pod::Escapes
+    - Pod::Simple::BlackBox
+requires:
+  Pod::Escapes: '0'
+  Pod::PseudoPod: '0'
+  Tie::Cycle: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/briandfoy/pod-wordml/issues
+  homepage: https://github.com/briandfoy/pod-wordml
+  repository: https://github.com/briandfoy/pod-wordml.git
+version: '0.164'

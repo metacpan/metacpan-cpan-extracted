@@ -1,0 +1,4 @@
+Sep 29 11:38:24 srssweb2 SrsFrontEnd-srsdev[5461]: FE Times: ID=4,463623; type=DomainDetailsQry; 0=11:38:22.544547; tot=1.965; read=0.001; parseXML=0.006; send=0.003; recv=1.954; respond=0.000 
+Sep 29 11:38:24 srssweb2 FeRep-srsdev[3969]: Times: ID=4,463623; 0=11:38:22.553088; tot=1.952; read_config=0.002; valid_config=0.000; fork=0.001; read=0.002; init=0.000; m0:spread=0.035; m0:send=0.004; m0:srspapp3=1.910; respond=0.001 
+Sep 29 11:38:24 srspapp3 Listener-srsdev[30744]: Times: ID=4,463623; 0=11:38:22.606203; tot=1.857; childspread=0.207; init=0.199; process=1.443; respond=0.001; request=0.000 
+Sep 29 11:38:24 srspapp3 SrsBackend-srsdev[14961]: BE Times: ID=4,463623; type=DomainDetailsQry; 0=11:38:23.097447; tot=1.354; hout=0.000; new=0.003; init=0.000; keytext=0.300; pgpv1=0.043; pgpv=0.021; parse=0.029; m0:process=0.000; m0:process=0.952; sign=0.004; send=0.001 

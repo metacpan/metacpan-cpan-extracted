@@ -1,0 +1,49 @@
+
+=head1 DESCRIPTION
+
+Foo.
+
+=over 2
+
+=item * parent
+
+=over 1
+
+=item * child
+
+=back
+
+=back
+
+=begin outer
+
+=begin inner
+
+=head1 Inner!
+
+=over 4
+
+=cut
+
+We can put non-pod text in the strangest places.
+
+=item * one
+
+=back
+
+=begin inner
+
+=head1 Another!
+
+=end inner
+
+=head2 Welcome to my Second Head
+
+=end inner
+
+=head3 Finalizing
+
+=end outer
+
+Baz.
+

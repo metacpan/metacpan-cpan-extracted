@@ -1,0 +1,66 @@
+{
+   "abstract" : "Search for CPAN distributions by cpanid or distribution name",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-SmokeBox-Dists",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::DistnameInfo" : "0.06",
+            "File::Fetch" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "IO::Zlib" : "0",
+            "POE" : "1.004",
+            "Sort::Versions" : "1.5",
+            "URI" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::More" : "0.88",
+            "blib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/poe-component-smokebox-dists",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/poe-component-smokebox-dists.git",
+         "web" : "https://github.com/bingos/poe-component-smokebox-dists"
+      }
+   },
+   "version" : "1.08"
+}
+

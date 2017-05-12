@@ -1,0 +1,60 @@
+p5-Palm version 1.400, released March 14, 2015
+
+This is p5-Palm, a set of Perl 5 modules for reading,
+manipulating, and writing the .pdb and .prc database files used by
+Palm OS devices such as the PalmPilot and its successors.
+
+You'll also need the Palm::PDB and Palm::Raw modules.  They used to be
+distributed as part of p5-Palm, but were split out into their own
+distribution because they are also useful for manipulating the
+Mobipocket e-book format, which is also used for Amazon Kindle books.
+The modules remaining in p5-Palm are generally useful only if you're
+dealing with files from actual Palm OS devices.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+
+CONTRIBUTING
+
+The source is in GitHub: https://github.com/madsen/p5-Palm
+
+If you have a change, fork the repo, make your patch, and send me a
+pull request. Don't be scared; it's easy!
+
+
+
+AUTHORS AND CONTRIBUTORS
+
+	Andrew Arensburger <arensb@ooblick.com>: principal perpetrator
+	Robert Norris <rob@nauseum.org>: patch for empty PDBs
+	Sumant S.R. Oemrawsingh <sikander@stad.dsl.nl>: patch for
+		inconsistent record fields in Mail.pm
+	John Jannotti <jj@lcs.mit.edu>: patches to make Perl 5.6 shut up.
+	John-David Smith <jdsmith@astro.cornell.edu>: added "archive"
+		attribute.
+	Kenneth Lorber <keni@his.com>: fixed "pdbdump" to handle
+		arrays in parsed records (e.g., Datebook exceptions).
+	Alessandro Zummo <azummo@towertech.it>: DateTime.pm, ZirePhoto.pm
+	Kurt Starsinic <kstar@cpan.org>: documentation patch.
+	Seb Wills <saw27@mrao.cam.ac.uk>: documentation.
+	brian d foy <bdfoy@cpan.org>
+	Christopher J. Madsen <perl@cjmweb.net>
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2003 by Andrew Arensburger & Alessandro Zummo.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

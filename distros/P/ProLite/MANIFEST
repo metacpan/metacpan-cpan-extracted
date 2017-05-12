@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+ProLite.pm
+examples/demo.pl
+examples/info.sgn
+examples/fun.sgn
+examples/pulse.pl
+examples/readme.sgn
+examples/sign.pl
+examples/slashsign.pl
+examples/wrlalogo.pl

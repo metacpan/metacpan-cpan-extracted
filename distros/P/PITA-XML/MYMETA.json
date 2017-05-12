@@ -1,0 +1,71 @@
+{
+   "abstract" : "Create, load, save and manipulate PITA-XML files",
+   "author" : [
+      "Adam Kennedy <adamk@cpan.org>, L<http://ali.as/>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PITA-XML",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::UUID" : "1.149",
+            "ExtUtils::MakeMaker" : "6.59",
+            "File::Spec" : "0.80",
+            "Test::More" : "0.47",
+            "Test::XML" : "0.08"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Autouse" : "1.23",
+            "Class::Inspector" : "1.11",
+            "Config::Tiny" : "2.02",
+            "Data::Digest" : "0.02",
+            "File::ShareDir" : "1.00",
+            "File::Which" : "1.07",
+            "IO::File" : "0",
+            "IO::Handle" : "0",
+            "IO::Seekable" : "0",
+            "IO::String" : "1.06",
+            "Params::Util" : "1.00",
+            "XML::SAX::ParserFactory" : "1.01",
+            "XML::SAX::Writer" : "0.52",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://svn.ali.as/cpan/trunk/PITA-XML"
+      },
+      "x_ChangeLog" : "http://fisheye2.atlassian.com/changelog/cpan/trunk/PITA-XML"
+   },
+   "version" : "0.52",
+   "x_module_name" : "PITA::XML"
+}

@@ -1,0 +1,7 @@
+POE::Loop::Glib is based on POE::Loop::Gtk, which
+was written by Rocco Caputo.
+
+Martijn van Beers  <martijn@cpan.org> tries to maintain it.
+
+Apocalypse <apocal@cpan.org> is also co-maint and tries
+to help Martijn the best he can :)

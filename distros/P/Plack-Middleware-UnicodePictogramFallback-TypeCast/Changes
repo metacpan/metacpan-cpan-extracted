@@ -1,0 +1,7 @@
+Revision history for Perl extension Plack::Middleware::UnicodePictogramFallback::TypeCast
+
+0.02    Thu Feb 21 03:05:00 2013
+    - add fallback option (default fallback to '〓')
+
+0.01    Wed Feb 20 19:26:00 2013
+    - original version

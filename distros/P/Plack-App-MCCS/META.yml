@@ -1,0 +1,51 @@
+---
+abstract: 'Minify, Compress, Cache-control and Serve static files from Plack applications'
+author:
+  - 'Ido Perlmuter <ido@ido50.net>'
+build_requires:
+  Data::Dumper: '0'
+  HTTP::Request: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Response: '0'
+  Plack::Builder: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-App-MCCS
+recommends:
+  CSS::Minifier::XS: '0.08'
+  IO::Compress::Gzip: '0'
+  JavaScript::Minifier::XS: '0.09'
+requires:
+  Cwd: '0'
+  Fcntl: '0'
+  File::Spec::Unix: '0'
+  Getopt::Long: '0'
+  HTTP::Date: '0'
+  Module::Load::Conditional: '0'
+  Plack::Component: '0'
+  Plack::MIME: '0'
+  Plack::Middleware: '0'
+  Plack::Runner: '0'
+  Plack::Util: '0'
+  Plack::Util::Accessor: '0'
+  autodie: '0'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/ido50/Plack-App-MCCS/issues
+  homepage: http://search.cpan.org/dist/Plack-App-MCCS
+  repository: git://github.com/ido50/Plack-App-MCCS.git
+version: '1.000000'
+x_serialization_backend: 'YAML::Tiny version 1.62'

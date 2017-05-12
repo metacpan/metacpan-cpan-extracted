@@ -1,0 +1,8 @@
+---
+name: An example repository viewer
+Model::Repository:
+  data_source: Repository
+  repositories:
+    testrepo:
+      uri: testrepo
+      name: A local testing repository

@@ -1,0 +1,13 @@
+use inc::Module::Install;
+name 'Plack-Handler-SCGI';
+all_from 'lib/Plack/Handler/SCGI.pm';
+readme_from 'lib/Plack/Handler/SCGI.pm';
+build_requires 'Test::More';
+requires 'SCGI';
+requires 'Try::Tiny', 0.04;
+requires 'Plack', 0.99_01;
+test_requires 'Test::Requires';
+auto_include_deps;
+author_tests('xt');
+auto_set_repository;
+WriteAll;

@@ -1,0 +1,37 @@
+COPYING
+Changes
+MANIFEST
+Makefile.PL
+README
+TODO
+bin/pdlaudio-demo
+bin/pdlaudio-birds
+audio.pd
+config.pl.in
+sndlib/COPYING
+sndlib/Makefile.PL
+sndlib/Makefile.in
+sndlib/audinfo.c
+sndlib/audio.c
+sndlib/config.guess
+sndlib/config.h.in
+sndlib/config.sub
+sndlib/configure
+sndlib/configure.in
+sndlib/headers.c
+sndlib/install-sh
+sndlib/io.c
+sndlib/sndinfo.c
+sndlib/sndlib.h
+sndlib/sound.c
+sndlib/sndlib.txt
+t/load.t
+xlib.xs
+xlib.h
+xlib.c
+remez.h
+remez.c
+Scales.pm
+Pitches.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

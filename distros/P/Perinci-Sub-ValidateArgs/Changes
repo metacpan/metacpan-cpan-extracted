@@ -1,0 +1,70 @@
+Revision history for Perinci-Sub-ValidateArgs
+
+0.010   2016-06-02 (PERLANCAR)
+
+        - [optimize] Some minor optimizations: no need to declare/set
+          $_sahv_dpath when not needed, reduce number of checks for wrong number
+          of arguments.
+
+        - Adjust to Data::Sah 0.79 (introduced v to compilation result, modules
+          becomes array of records).
+
+
+0.009   2016-05-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add test: checking too many arguments.
+
+	- Fix missing closing parenthesis in generated error message.
+
+
+0.008   2016-05-25 (PERLANCAR)
+
+        - Support args_as=array & args_as=arrayref.
+
+
+0.007   2016-05-25 (PERLANCAR)
+
+        - Add option: die=>1.
+
+
+0.006   2016-05-25 (PERLANCAR)
+
+	- [Incompatible change] Change interface from validate_args() to
+          gen_args_validator() which should be faster.
+
+        - Move documentation about alternate ways of validating function/method
+	  arguments to Data::Sah::Manual::ParamsValidating.
+
+
+0.005   2016-05-24 (PERLANCAR)
+
+	- Increase minimum prereq version Data::Sah to 0.76 due to changed
+	  error message format [RT#114616].
+
+
+0.004   2016-05-23 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Expand documentation.
+
+
+0.003   2016-05-23 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Optimization] Minor optimization, we don't need to use validator
+	  with return_type=str+val but just str.
+
+
+0.002   2016-05-23 (PERLANCAR)
+
+	- [Bugfix] Set argument default value from arg spec property must
+	  be done even when $args{arg} does not exist.
+
+
+0.001   2016-05-23 (PERLANCAR)
+
+         - First release.

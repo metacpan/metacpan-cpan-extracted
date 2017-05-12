@@ -1,0 +1,532 @@
+##-*- Mode: CPerl -*-
+
+##======================================================================
+## Header Administrivia
+##======================================================================
+
+use PDL::VectorValued::Dev;
+my $VERSION = '1.23.3'; ##-- update with perl-reversion from Perl::Version module
+pp_setversion($VERSION);
+
+##-- for integer-type keys
+require "../Config.pm";
+my $INT_TYPES = join('',@{$PDL::CCS::Config::ccsConfig{INT_TYPE_CHRS}});
+
+##-- PDL::PP debugging
+#$::PP_VERBOSE = 1;
+
+##------------------------------------------------------
+## pm headers
+pp_addpm({At=>'Top'},<<'EOPM');
+
+#use PDL::CCS::Version;
+use strict;
+
+=pod
+
+=head1 NAME
+
+PDL::CCS::MatrixOps - Low-level matrix operations for compressed storage sparse PDLs
+
+=head1 SYNOPSIS
+
+ use PDL;
+ use PDL::CCS::MatrixOps;
+
+ ##---------------------------------------------------------------------
+ ## ... stuff happens
+
+=cut
+
+EOPM
+## /pm additions
+##------------------------------------------------------
+
+##------------------------------------------------------
+## Exports: None
+#pp_export_nothing();
+
+##------------------------------------------------------
+## Includes / defines
+pp_addhdr(<<'EOH');
+#include <math.h> /*-- for NAN --*/
+EOH
+
+##------------------------------------------------------
+## index datatype
+require "../Config.pm";
+our $INDX = $PDL::CCS::Config::ccsConfig{INDX_SIG};
+pp_addpm( $PDL::CCS::Config::ccsConfig{INDX_FUNCDEF} );
+pp_addhdr( $PDL::CCS::Config::ccsConfig{INDX_TYPEDEF} );
+
+
+##======================================================================
+## C Utilities
+##======================================================================
+# (none)
+
+##======================================================================
+## PDL::PP Wrappers
+##======================================================================
+
+
+##======================================================================
+## Operations: matmult2d
+##======================================================================
+
+##--------------------------------------------------------------
+pp_def
+  ('ccs_matmult2d_sdd',
+   Pars => ("\n    "
+	    .join("\n    ",
+		  "$INDX ixa(NdimsA,NnzA); nza(NnzA); missinga();", ## a(M,N) (M~i, N~x): formerly here as a(N,M)
+		  'b(O,M);',                                      ## b(O,M) (O~z, M~i)
+		  'zc(O);',                                       ## zc(O)
+		  '[o]c(O,N)',                                    ## c(O,N) (O~z, N~x)
+		  '')),
+   Code =>
+(q(
+ //-- initialize: set output to $zc()
+ loop (O) %{
+   $GENERIC(zc) zc_o = $zc();
+   loop (N) %{
+     $c() = zc_o;
+   %}
+ %}
+ //
+ //-- main loop
+ loop (NnzA) %{
+   CCS_Indx mi = $ixa(NdimsA=>0);
+   CCS_Indx ni = $ixa(NdimsA=>1);
+   loop (O) %{
+     //--# c(o,n) = sum for m=1 to M [a(m,n) * b(o,m)]
+     $c(N=>ni) += $b(M=>mi) * ($nza() - $missinga());
+   %}
+ %}
+)),
+  Doc =>
+(q{
+Two-dimensional matrix multiplication of a sparse index-encoded PDL
+$a() with a dense pdl $b(), with output to a dense pdl $c().
+
+The sparse input PDL $a() should be passed here with 0th
+dimension "M" and 1st dimension "N", just as for the
+built-in PDL::Primitive::matmult().
+
+"Missing" values in $a() are treated as $missinga(), which shouldn't
+be BAD or infinite, but otherwise ought to be handled correctly.
+The input pdl $zc() is used to pass the cached contribution of
+a $missinga()-row ("M") to an output column ("O"), i.e.
+
+ $zc = ((zeroes($M,1)+$missinga) x $b)->flat;
+
+$SIZE(Ndimsa) is assumed to be 2.
+}),
+ ); ##--/ccs_matmult2d_sdd
+
+
+##--------------------------------------------------------------
+pp_def
+  ('ccs_matmult2d_zdd',
+   Pars => ("\n    "
+	    .join("\n    ",
+		  "$INDX ixa(Ndimsa,NnzA); nza(NnzA);", ## a(M,N) (M~i, N~x)
+		  'b(O,M);',                          ## b(O,M) (O~z, M~i)
+		  '[o]c(O,N)',                        ## c(O,N) (O~z, N~x)
+		  '')),
+   Code =>
+(q(
+ //-- initialize output to zero
+ loop (N) %{
+   loop (O) %{
+     $c()=0;
+   %}
+ %}
+ //
+ //-- main loop over CCS-encoded a()
+ loop (NnzA) %{
+   CCS_Indx Mi = $ixa(Ndimsa=>0);
+   CCS_Indx Ni = $ixa(Ndimsa=>1);
+   loop (O) %{
+     $c(N=>Ni) += $nza() * $b(M=>Mi);
+   %}
+ %}
+)),
+  Doc =>
+(q{
+Two-dimensional matrix multiplication of a sparse index-encoded PDL
+$a() with a dense pdl $b(), with output to a dense pdl $c().
+
+The sparse input PDL $a() should be passed here with 0th
+dimension "M" and 1st dimension "N", just as for the
+built-in PDL::Primitive::matmult().
+
+"Missing" values in $a() are treated as zero.
+$SIZE(Ndimsa) is assumed to be 2.
+}),
+ ); ##--/ccs_matmult2d_zdd
+
+##--------------------------------------------------------------
+## ccs_vnorm: code
+my $vnorm_code =
+q{
+    CCS_Indx am;
+    $GENERIC(avals) av;
+
+    /*-- initialize --*/
+    loop (M) %{ $vnorm() = 0; %}
+
+    /*-- guts: compute vnorm[mi] = \sum_{ni=1}^N a[mi,ni]**2 --*/
+    loop (NnzA) %{
+#ifdef PDL_BAD_CODE
+      if ($ISGOOD(avals())) {
+#endif
+        am = $acols();
+        av = $avals();
+	$vnorm(M=>am) += av * av;
+#ifdef PDL_BAD_CODE
+      }
+#endif
+    %}
+
+    /*-- finalize: set vnorm[*] = sqrt(vnorm[*]) --*/
+    loop (M) %{ $vnorm() = sqrt($vnorm()); %}
+};
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## ccs_vnorm: pp_def
+pp_def
+  ('ccs_vnorm',
+   Pars => ("\n    "
+	    .join("\n    ",
+		  "$INDX acols(NnzA); avals(NnzA);", ##-- logical (M,N)~(T,D) with acols~Mi
+		  "float+ [o]vnorm(M);",	       ##-- (M)~(T)
+		  ''
+		 )),
+   OtherPars => "int sizeM=>M;",
+   HandleBad => 1,
+   Code => $vnorm_code,
+   BadCode => $vnorm_code,
+   CopyBadStatusCode=> q{$SETPDLSTATEGOOD(vnorm);},
+   BadDoc => q{ccs_vnorm() always clears the bad-status flag on $vnorm().},
+   Doc=>
+q{
+Computes the Euclidean lengths of each column-vector $a(i,*) of a sparse index-encoded pdl $a()
+of logical dimensions (M,N), with output to a dense piddle $vnorm().
+"Missing" values in $a() are treated as zero,
+and $acols() specifies the (unsorted) indices along the logical dimension M of the corresponding non-missing
+values in $avals().
+This is basically the same thing as:
+
+ $vnorm = ($a**2)->xchg(0,1)->sumover->sqrt;
+
+... but should be must faster to compute for sparse index-encoded piddles.
+
+},
+  ); ##-- /ccs_vnorm
+
+
+##--------------------------------------------------------------
+## ccs_vcos_zdd : ccs-matrix vs. dense-vector, output=dense, anorm=optional
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## ccs_vcos_zdd: pmcode
+pp_add_exported('', "ccs_vcos_zdd");
+pp_addpm <<'EOPM';
+
+=pod
+
+=head2 ccs_vcos_zdd
+
+=for sig
+
+  Signature: (
+    indx ixa(2,NnzA); nza(NnzA);
+    b(N);
+    float+ [o]vcos(M);
+    float+ [t]anorm(M);
+    int sizeM=>M;
+  )
+
+
+Computes the vector cosine similarity of a dense row-vector $b(N) with respect to each column $a(i,*)
+of a sparse index-encoded PDL $a() of logical dimensions (M,N), with output to a dense piddle
+$vcos(M).
+"Missing" values in $a() are treated as zero,
+and magnitudes for $a() are passed in the optional paramter $anorm(), which will be implicitly
+computed using L<ccs_vnorm|/ccs_vnorm> if the $anorm() parameter is omitted or empty.
+This is basically the same thing as:
+
+ $anorm //= ($a**2)->xchg(0,1)->sumover->sqrt;
+ $vcos    = ($a * $b->slice("*1,"))->xchg(0,1)->sumover / ($anorm * ($b**2)->sumover->sqrt);
+
+... but should be must faster to compute.
+
+Output values in $vcos() are cosine similarities in the range [-1,1],
+except for zero-magnitude vectors which will result in NaN values in $vcos().
+If you need non-negative distances, follow this up with a:
+
+ $vcos->minus(1,$vcos,1)
+ $vcos->inplace->setnantobad->inplace->setbadtoval(0); ##-- minimum distance for NaN values
+
+to get distances values in the range [0,2].  You can use PDL threading to batch-compute distances for
+multiple $b() vectors simultaneously:
+
+  $bx   = random($N, $NB);                   ##-- get $NB random vectors of size $N
+  $vcos = ccs_vcos_zdd($ixa,$nza, $bx, $M);  ##-- $vcos is now ($M,$NB)
+
+
+=for bad
+
+ccs_vcos_zdd() always clears the bad status flag on the output piddle $vcos.
+
+=cut
+
+sub ccs_vcos_zdd {
+  my ($ixa,$nza,$b) = @_;
+  barf("Usage: ccs_vcos_zdd(ixa, nza, b, vcos?, anorm?, M?)") if (grep {!defined($_)} ($ixa,$nza,$b));
+
+  my ($anorm,$vcos,$M);
+  foreach (@_[3..$#_]) {
+    if    (!defined($M) && !UNIVERSAL::isa($_,"PDL")) { $M=$_; }
+    elsif (!defined($vcos))  { $vcos = $_; }  ##-- compat: pass $vcos() in first
+    elsif (!defined($anorm)) { $anorm = $_; }
+  }
+
+  ##-- get M
+  $M = $vcos->dim(0)  if (!defined($M) && defined($vcos) && !$vcos->isempty);
+  $M = $anorm->dim(0) if (!defined($M) && defined($anorm) && !$anorm->isempty);
+  $M = $ixa->slice("(0),")->max+1 if (!defined($M));
+
+  ##-- compat: create output piddles, implicitly computing anorm() if required
+  $anorm = $ixa->slice("(0),")->ccs_vnorm($nza, $M) if (!defined($anorm) || $anorm->isempty);
+  $vcos  = PDL->zeroes($anorm->type, $M, ($b->dims)[1..$b->ndims-1]) if (!defined($vcos) || $vcos->isempty);
+
+  ##-- guts
+  $ixa->_ccs_vcos_zdd($nza,$b, $anorm, $vcos);
+  return $vcos;
+}
+
+*PDL::ccs_vcos_zdd = \&ccs_vcos_zdd;
+
+EOPM
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## ccs_vcos_zdd: code
+my $vcos_zdd_code =
+'
+    CCS_Indx an,am, bm;
+    $GENERIC(anorm) bnorm;
+    $GENERIC(nza)   av;
+
+    /*-- sanity check: dimension "Two" --*/
+    if ($SIZE(Two) != 2) {
+       croak("ccs_vcos_zdd(): bogus input dimension Two=%ld for index-piddle ixa(Two,NnzA) must be 2", $SIZE(Two));
+    }
+
+    threadloop %{
+      /*-- cache bnorm as \sum_{i=1}^N b[i]**2 --*/
+      bnorm = 0;
+      loop (N) %{
+#ifdef PDL_BAD_CODE
+	if ($ISGOOD(b()))
+#endif
+          bnorm += $b() * $b();
+      %}
+      bnorm = sqrt(bnorm);
+      if (bnorm == 0) {
+        /*-- pathological case: return all NaN --*/
+        loop(M) %{ $vcos() = NAN; %}
+      }
+      else {
+        /*-- guts: initialize --*/
+        loop (M) %{ $vcos() = 0; %}
+
+        /*-- guts: compute \sum_{i=1}^N (a[i]*b[i]) in vcos() --*/
+        loop (NnzA) %{
+	  am = $ixa(Two=>0);
+	  an = $ixa(Two=>1);
+#ifdef PDL_BAD_CODE
+          if ($ISGOOD(nza()) && $ISGOOD(b(N=>an)))
+#endif
+	    $vcos(M=>am) += $nza() * $b(N=>an);
+	%}
+
+        /*-- guts: factor out vector magnitudes (Euclidean norms ||a||*||b||), cached in anorm(), bnorm --*/
+        loop (M) %{
+          if ($anorm() != 0) {
+	    $vcos() /= ($anorm() * bnorm);
+	  } else {
+            /*-- bogus anorm(), return NaN --*/
+	    $vcos() = NAN;
+	  }
+        %}
+      }
+    %}
+';
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## ccs_vcos_zdd: pp_def
+pp_def
+  ('_ccs_vcos_zdd',
+   Pars => ("\n    "
+	    .join("\n    ",
+		  "$INDX ixa(Two,NnzA); nza(NnzA);",   ##-- logical (M,N)
+		  "b(N);",		   	       ##-- logical (1,N)
+ 		  "float+ anorm(M);",                  ##-- dense (required)
+		  "float+ [o]vcos(M);",
+		 )),
+   HandleBad => 1,
+   Code=>$vcos_zdd_code,
+   BadCode=>$vcos_zdd_code,
+   CopyBadStatusCode=> q{$SETPDLSTATEGOOD(vcos);},
+   Doc=> q{Guts for L<ccs_vcos_zdd()|/ccs_vcos_zdd>, with slightly different calling conventions.},
+   BadDoc=> q{Always clears the bad status flag on the output piddle $vcos.},
+  ); ##-- /_ccs_vcos_zdd
+
+
+##--------------------------------------------------------------
+## ccs_vcos_pzd : ptr(1)-matrix vs. dense-vector, output=dense, anorm=optional
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## ccs_vcos_pzd: code
+my $vcos_pzd_code = '
+    CCS_Indx bn,bn1, alo,ahi, am,anzi;
+    $GENERIC(anorm) bnorm;
+
+      /*-- guts: initialize --*/
+      bnorm = 0;
+      loop (M) %{ $vcos() = 0; %}
+
+      /*-- guts: compute \sum_{i=1}^N (a[i]*b[i]) in vcos(), caching bnorm as \sum_{i=1}^N b[i]**2 --*/
+      loop (NnzB) %{
+        bn  = $brows();
+        bn1 = bn + 1;
+        alo = $aptr(Nplus1=>bn);
+        ahi = $aptr(Nplus1=>bn1);
+
+#ifdef PDL_BAD_CODE
+        if ($ISGOOD(bvals())) {
+#endif
+          bnorm += $bvals() * $bvals();
+
+          for (anzi=alo; anzi < ahi; ++anzi) {
+   	    am = $acols(NnzA=>anzi);
+#ifdef PDL_BAD_CODE
+            if ($ISGOOD(avals(NnzA=>anzi)))
+#endif
+	      $vcos(M=>am)  += $avals(NnzA=>anzi) * $bvals();
+          }
+#ifdef PDL_BAD_CODE
+        }
+#endif
+      %}
+
+    /*-- guts: finalize: factor out vector magnitudes (Euclidean norms ||a||*||b||), cached in anorm(), bnorm --*/
+    bnorm = sqrt(bnorm);
+    if (bnorm == 0) {
+      /*-- bogus bnorm, return all NaN --*/
+      loop (M) %{ $vcos() = NAN; %}
+    } else {
+      loop (M) %{
+        if ($anorm() != 0
+#ifdef PDL_BAD_CODE
+            && $ISGOOD(anorm())
+#endif
+            ) {
+          $vcos() /= ($anorm() * bnorm);
+        } else {
+          /*-- bogus anorm(), return NaN --*/
+          $vcos() = NAN;
+        }
+      %}
+    }
+';
+##--/$vcos_pzd_code
+
+##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+## ccs_vcos_pzd: ppdef
+pp_def('ccs_vcos_pzd',
+       Pars => ("\n    "
+		.join("\n    ",
+		      "$INDX aptr(Nplus1); $INDX acols(NnzA); avals(NnzA);", ##-- logical (M,N)~(T,D) with ptr(1)
+		      "$INDX brows(NnzB);                     bvals(NnzB);", ##-- logical (1,N)~(1,D)
+		      "anorm(M);",          ##-- (M)~(T)
+		      "float+ [o]vcos(M);", ##-- (M)~(T)
+		     )),
+       HandleBad => 1,
+       Code => $vcos_pzd_code,
+       BadCode => $vcos_pzd_code,
+       CopyBadStatusCode => q{$SETPDLSTATEGOOD(vcos);},
+       BadDoc=> q{ccs_vcos_pzd() always clears the bad status flag on the output piddle $vcos.},
+       Doc => q{
+Computes the vector cosine similarity of a sparse index-encoded row-vector $b() of logical dimension (N)
+with respect to each column $a(i,*) a sparse Harwell-Boeing row-encoded PDL $a() of logical dimensions (M,N),
+with output to a dense piddle $vcos(M).
+"Missing" values in $a() are treated as zero,
+and magnitudes for $a() are passed in the obligatory paramter $anorm().
+Usually much faster than L<ccs_vcos_zdd()|/ccs_vcos_zdd> if a CRS pointer over logical dimension (N) is available
+for $a().
+},
+      ); ##-- /_ccs_vcos_pzd
+
+
+##======================================================================
+## Footer Administrivia
+##======================================================================
+
+##------------------------------------------------------
+## pm additions: footer
+pp_addpm(<<'EOPM');
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+Perl by Larry Wall.
+
+PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
+
+=cut
+
+##----------------------------------------------------------------------
+=pod
+
+=head1 KNOWN BUGS
+
+We should really implement matrix multiplication in terms of
+inner product, and have a good sparse-matrix only implementation
+of the former.
+
+=cut
+
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head2 Copyright Policy
+
+All other parts Copyright (C) 2009-2015, Bryan Jurish. All rights reserved.
+
+This package is free software, and entirely without warranty.
+You may redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1), PDL(3perl)
+
+=cut
+
+EOPM
+
+
+# Always make sure that you finish your PP declarations with
+# pp_done
+pp_done();
+##----------------------------------------------------------------------

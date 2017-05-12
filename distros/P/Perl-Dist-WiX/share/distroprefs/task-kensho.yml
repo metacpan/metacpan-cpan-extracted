@@ -1,0 +1,14 @@
+---
+comment: |
+
+  Task::Kensho had a few mistakes in its Makefile.PL (already
+  corrected in its repository).
+
+match:
+  distribution: |
+    ^(?x:
+    .^   # never matches, only purpose is to let things align nicely
+    |PERIGRIN/Task-Kensho-0.22.tar.gz          # Needs a patch to install.
+    )|
+patches:
+    - "Task-Kensho-0.22.patch"

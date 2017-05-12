@@ -1,0 +1,4 @@
+dbname: pkgforge
+host: pkgforge
+username: pkgforge_web
+password: ~

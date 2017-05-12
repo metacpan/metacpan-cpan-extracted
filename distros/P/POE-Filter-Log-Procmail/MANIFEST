@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/POE-Filter-Log-Procmail.t
+Procmail.pm
+META.yml                                 Module meta-data (added by MakeMaker)

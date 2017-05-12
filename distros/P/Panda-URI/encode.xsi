@@ -1,0 +1,20 @@
+MODULE = Panda::URI                PACKAGE = Panda::URI
+PROTOTYPES: DISABLE
+
+SV* encode_uri_component (string_view input, bool plus = false) : ALIAS(encodeURIComponent=1) {
+    RETVAL = newSV(input.length()*3 + 1);
+    SvPOK_on(RETVAL);
+    size_t rlen = encode_uri_component(input, SvPVX(RETVAL), plus ? unsafe_query_component_plus : unsafe_query_component);
+    SvPVX(RETVAL)[rlen] = 0;
+    SvCUR_set(RETVAL, rlen);
+    PERL_UNUSED_VAR(ix);
+}
+
+SV* decode_uri_component (string_view input) : ALIAS(decodeURIComponent=1) {
+    RETVAL = newSV(input.length()+1);
+    SvPOK_on(RETVAL);
+    size_t rlen = decode_uri_component(input, SvPVX(RETVAL));
+    SvPVX(RETVAL)[rlen] = 0;
+    SvCUR_set(RETVAL, rlen);
+    PERL_UNUSED_VAR(ix);
+}

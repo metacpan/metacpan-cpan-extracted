@@ -1,0 +1,88 @@
+{
+    'actual_loops' => '1',
+    'actual_rows' => '24935',
+    'actual_time_first' => '2906.084',
+    'actual_time_last' => '2946.819',
+    'estimated_row_width' => '49',
+    'estimated_rows' => '33927',
+    'estimated_startup_cost' => '148927.96',
+    'estimated_total_cost' => '149012.78',
+    'extra_info' => [
+        'Sort Key: ak.artikelnr_list',
+        'Sort Method:  quicksort  Memory: 3536kB'
+    ],
+    'is_analyzed' => 1,
+    'sub_nodes' => [
+        {
+            'actual_loops' => '1',
+            'actual_rows' => '24935',
+            'actual_time_first' => '0.16',
+            'actual_time_last' => '2531.059',
+            'estimated_row_width' => '49',
+            'estimated_rows' => '33927',
+            'estimated_startup_cost' => '1.55',
+            'estimated_total_cost' => '146374.93',
+            'is_analyzed' => 1,
+            'sub_nodes' => [
+                {
+                    'actual_loops' => '1',
+                    'actual_rows' => '25112',
+                    'actual_time_first' => '0.014',
+                    'actual_time_last' => '85.614',
+                    'estimated_row_width' => '237',
+                    'estimated_rows' => '25130',
+                    'estimated_startup_cost' => '0',
+                    'estimated_total_cost' => '2312.3',
+                    'is_analyzed' => 1,
+                    'scan_on' => {
+                        'table_alias' => 'ak',
+                        'table_name' => 't_artikelkey'
+                    },
+                    'type' => 'Seq Scan'
+                },
+                {
+                    'actual_loops' => '25112',
+                    'actual_rows' => '1',
+                    'actual_time_first' => '0.073',
+                    'actual_time_last' => '0.074',
+                    'estimated_row_width' => '10',
+                    'estimated_rows' => '6',
+                    'estimated_startup_cost' => '1.55',
+                    'estimated_total_cost' => '5.63',
+                    'extra_info' => [
+                        'Recheck Cond: ((aas.artikelnrforvererbung)::text = ANY ((ARRAY[ak.keysum1, ak.keysum2, ak.keysum3, ak.keysum4, ak.keysum5, ak.keysum6])::text[]))',
+                        'Filter: ((aas.aas_ask)::text = \'PRE\'::text)'
+                    ],
+                    'is_analyzed' => 1,
+                    'scan_on' => {
+                        'table_alias' => 'aas',
+                        'table_name' => 'artikel_as'
+                    },
+                    'sub_nodes' => [
+                        {
+                            'actual_loops' => '25112',
+                            'actual_rows' => '1',
+                            'actual_time_first' => '0.066',
+                            'actual_time_last' => '0.066',
+                            'estimated_row_width' => '0',
+                            'estimated_rows' => '6',
+                            'estimated_startup_cost' => '0',
+                            'estimated_total_cost' => '1.55',
+                            'extra_info' => [
+                                'Index Cond: ((aas.artikelnrforvererbung)::text = ANY ((ARRAY[ak.keysum1, ak.keysum2, ak.keysum3, ak.keysum4, ak.keysum5, ak.keysum6])::text[]))'
+                            ],
+                            'is_analyzed' => 1,
+                            'scan_on' => {
+                                'index_name' => 'idx_artikel_as_artnrver'
+                            },
+                            'type' => 'Bitmap Index Scan'
+                        }
+                    ],
+                    'type' => 'Bitmap Heap Scan'
+                }
+            ],
+            'type' => 'Nested Loop'
+        }
+    ],
+    'type' => 'Sort'
+}

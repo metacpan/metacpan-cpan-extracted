@@ -1,0 +1,26 @@
+---
+abstract: unknown
+author:
+  - 'Douglas Hunt (dhunt@ucar.edu)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PDL-NetCDF
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  PDL::NetCDF:
+    file: netcdf.pd
+    version: 4.19
+requires:
+  PDL: 0
+version: 4.20

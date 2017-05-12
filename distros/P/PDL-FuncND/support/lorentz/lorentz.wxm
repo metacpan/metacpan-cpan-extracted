@@ -1,0 +1,41 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 0.8.5 ] */
+
+/* [wxMaxima: comment start ]
+1D Lorentz
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+f1(x,x0,g) :=  ( g^2 / ( ( x - x0)^2 + g^2) );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+2D symmetric Lorentz
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+f2(x,y,x0,y0,g) := ( g^2 / ( ( x- x0)^2 + (y-y0)^2 + g^2));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+ND Lorentz
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+fn(x,u,S) := 1/( 1 + transpose(x-u) . invert(S) . (x-u));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: comment start ]
+Specialize 2D
+   [wxMaxima: comment end   ] */
+
+/* [wxMaxima: input   start ] */
+fn(matrix([x,y]),matrix([x0,y0]),matrix([s00,s01],[s10,s11]));
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+fortran(%);
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

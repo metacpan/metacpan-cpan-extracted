@@ -1,0 +1,8 @@
+Changes for Perl extension POE-Declare-HTTP-Online
+
+0.02 Sat 16 Apr 2011
+	- New algorithm to detect validity of the URLs using only the initial
+	  301 or 302 redirect response. Way faster, lighter and more redundant.
+
+0.01 Fri 15 Apr 2011
+	- Creating the initial implementation

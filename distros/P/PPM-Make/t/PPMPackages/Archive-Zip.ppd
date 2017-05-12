@@ -1,0 +1,11 @@
+<SOFTPKG NAME="Archive-Zip" VERSION="1,1,0,0">
+	<TITLE>Archive-Zip</TITLE>
+	<ABSTRACT>Provide an interface to ZIP archive files.</ABSTRACT>
+	<AUTHOR>Ned Konz (perl@bike-nomad.com)</AUTHOR>
+	<IMPLEMENTATION>
+		<DEPENDENCY NAME="Compress-Zlib" VERSION="1,14,0,0" />
+		<OS NAME="MSWin32" />
+		<ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+		<CODEBASE HREF="http://theoryx5.uwinnipeg.ca/ppms/x86/Archive-Zip.tar.gz" />
+	</IMPLEMENTATION>
+</SOFTPKG>

@@ -1,0 +1,25 @@
+[% IF error %]
+<h1>[%l('An error has occurred')%]</h1>
+
+<p>
+[%l('The following error message was returned by the application')%]:
+
+<blockquote style="white-space:pre;">[% error.message %]</blockquote>
+</p>
+[% END %]
+
+<!-- offer the user the chance to return somewhere interesting -->
+[% IF current_thread || current_forum %]
+<ul>
+    [% IF current_thread %]
+    [% IF authed_user %]
+    <li>[%l('Continue reading')%]: <a href="thread/next_post?thread=[%current_thread.id%]">[%current_thread.subject%]</a></li>
+    [% END %]
+    <li>[%l('Return to')%]: <a href="thread/view?thread=[%current_thread.id%]">[%current_thread.subject%]</a></li>
+    [% END %]
+
+    [% IF current_forum %]
+    <li>[%l('View all')%] <a href="forum/view?forum=[%current_forum.id%]">[%current_forum.name%]</a> [%l('threads')%]</li>
+    [% END %]
+</ul>
+[% END %]

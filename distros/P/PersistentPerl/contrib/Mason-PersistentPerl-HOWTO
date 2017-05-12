@@ -1,0 +1,37 @@
+Mason PersitentPerl - HOWTO
+by Joseph Wang (joe@confucius.gnacademy.org)
+2000 August 1
+
+This is a Mini HOWTO on how to run PersitentPerl with Mason at
+http://www.masonhq.com
+
+The problem is that the instructions that are included with Mason
+require that you install mod_perl.  Running mod_perl as a module with
+Mason on a Redhat system won't work, so you need to create a
+statically linked Apache-mod_perl.  This is painful.
+
+The following is a much easier way to run Mason
+
+1) Install PersitentPerl
+
+2) Install HTML::Mason
+
+3) Put the mason.cgi file in your cgi-bin directory, MAKE SURE THAT YOU
+   MODIFY THE FILE FIRST.
+
+4) Add the following line to your /etc/httpd/etc/httpd.conf
+
+  ScriptAlias /mason/ /home/httpd/cgi-bin/mason.cgi/
+
+5) (Optional) change your directory index to look like
+
+  DirectoryIndex mason/index.html index.html  (etc. etc. etc.)
+  
+A *whole* lot less painful than installing mod_perl.
+
+TODO
+
+The next project I am working on is to get PersistentPerl to work with
+Slashdot.
+
+

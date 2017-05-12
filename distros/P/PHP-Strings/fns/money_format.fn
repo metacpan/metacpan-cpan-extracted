@@ -1,0 +1,22 @@
+
+docs: sprintf for money.
+
+code: |
+    sub money_format
+    {
+        my ( $format, @amounts ) = validate_with(
+            params => \@_,
+            allow_extra => 1,
+            spec => [
+                {
+                    type => SCALAR,
+                },
+                NUMBER,
+            ]
+        );
+
+        my $rv = _strfmon( $format, @amounts );
+
+        return $rv;
+    }
+

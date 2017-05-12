@@ -1,0 +1,101 @@
+/* hello */
+
+html, body {
+     margin: 0pt;
+     overflow: hidden;
+     padding: 0pt;
+}
+
+h1 {
+     border-bottom: 1px solid black;
+}
+
+#controls a {
+     background-color: #333333;
+     border-radius: 10px 10px 10px 10px;
+     border: 1px solid black;
+     color: white;
+     margin: 5px;
+     padding: 5px 10px;
+     text-decoration: none;
+}
+
+#controls {
+     margin-bottom: 2em;
+}
+
+#code, #stack, #pad {
+     border: 1px solid #333333;
+     float: left;
+     margin: 1em;
+     padding: 5px;
+}
+
+.codeline {
+     font-family: monospace;
+     white-space: pre-wrap;
+}
+
+.curline {
+     background-color: #CCCCFF;
+     border-radius: 5px 5px 5px 5px;
+     border: 1px solid #AAAADD;
+}
+
+#layout {
+     width: 100%;
+}
+
+#layout td {
+     vertical-align: top;
+}
+
+#splitme {
+     border: 1px solid #AAAAAA;
+     height: 100%;
+     width: 800px;
+}
+
+#MySplitterx div {
+     overflow: auto;
+}
+
+.vsplitbar {
+     background: none repeat scroll 0% 0% #AAAAAA;
+     width: 5px;
+}
+
+#MySplitter div h2 {
+     background-color: #333333;
+     border-bottom: 1px solid black;
+     color: #FFFFFF;
+     margin: 0px;
+     padding: 2px;
+}
+
+.splitter-pane {
+     overflow: auto;
+}
+
+#evalform {
+     display: inline;
+}
+
+#eval {
+     border: 0px none;
+     font-family: monospace;
+}
+
+#MySplitter {
+     border: 3px solid #666699;
+     height: 100%;
+     min-height: 300px;
+     min-width: 500px;
+     border: 1px solid #AAAAAA;
+}
+
+#LeftPane {
+     max-width: 300px;
+     min-width: 100px;
+     width: 150px;
+}

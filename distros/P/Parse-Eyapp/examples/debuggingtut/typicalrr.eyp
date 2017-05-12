@@ -1,0 +1,121 @@
+%{
+
+=head1 SYNOPSIS
+
+This is an example of a bad grammar design.
+
+There are several sources of ambiguity in this grammar:
+
+=over 2
+
+=item * Statments like 
+
+              NUM NUM NUM
+
+are ambiguous. The following two left-most derivations
+exists:
+
+             s =*=> ns ns =*=> NUM NUM ns => NUM NUM NUM
+or 
+
+             s =*=> ns ns =*=> NUM ns =*=> NUM NUM NUM
+ 
+the same with phrases like C<ID ID ID>
+
+=item * The empty word can be generated in many ways
+
+        s => empty
+
+or
+
+        s => s ns => s empty => empty
+
+etc.
+
+=back
+
+Compile it with 
+
+            eyapp -b '' typicalrr
+
+The compiler will announce:
+
+   3 shift/reduce conflicts and 3 reduce/reduce conflicts
+
+Study the file C<typicalrr.output>. The 3 reduce/reduce conflicts
+occur in state 1:
+
+  State 1:
+
+	$start -> s . $end	(Rule 0)
+	s -> s . ws	(Rule 2)
+	s -> s . ns	(Rule 3)
+
+	$end	shift, and go to state 3
+
+	$end	[reduce using rule 6 (ws)]
+	$end	[reduce using rule 4 (ns)]
+	ID	[reduce using rule 6 (ws)]
+	NUM	[reduce using rule 6 (ws)]
+	$default	reduce using rule 4 (ns)
+
+	ns	go to state 2
+	ws	go to state 4
+
+        Rules:
+        ------
+        0:	$start -> s $end
+        1:	s -> /* empty */
+        2:	s -> s ws
+        3:	s -> s ns
+        4:	ns -> /* empty */
+        5:	ns -> ns NUM
+        6:	ws -> /* empty */
+        7:	ws -> ws ID
+
+Execute it with:
+
+   ./typicalrr.pm -d
+
+Try inputs C<4 5>,  C<a b> and C<4 5 a b>.
+
+
+=head1 SEE ALSO
+
+For a solution to the conflicts
+see  correcttypicalrr.eyp and typicalrr_fixed.eyp
+
+=cut
+
+use base q{RRTail}; 
+
+%}
+%token ID NUM 
+
+%tree
+
+%%
+s:
+      /* empty */
+    | s ws
+    | s ns 
+;
+
+ns:
+      /* empty */
+    | ns NUM 
+;
+
+ws:
+      /* empty */
+    | ws ID 
+;
+
+%%
+
+unless (caller()) {
+  my $prompt = 'Try inputs "4 5",  "a b" and "4 5 a b"'.
+               '(press <CR><CTRL-D> to finish): ';
+  __PACKAGE__->main($prompt) 
+}
+

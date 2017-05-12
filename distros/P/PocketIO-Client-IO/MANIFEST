@@ -1,0 +1,18 @@
+lib/AnyEvent/PocketIO/Client.pm
+lib/AnyEvent/PocketIO/Client/Transport/WebSocket.pm
+lib/PocketIO/Client/IO.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+Changes
+t/01_base.t
+t/02_error.t
+t/03_dup_con.t
+t/04_multi_conn.t
+t/05_handshake_timeout.t
+t/06_open_timeout.t
+t/07_op.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

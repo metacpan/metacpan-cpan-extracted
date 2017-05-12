@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5d2d6ad34772311b146d0cb4a913d815321e5438 Changes
+SHA1 0e04c6779b878f3ad4ef3e82a89e55507a52caa3 INSTALL
+SHA1 6b50b30fa6f8d063d96e32c9a81f3f82328925f7 LICENSE
+SHA1 4c4c11c1d87574c2cf1e324d1746c5b3f7844d60 MANIFEST
+SHA1 27b22e18b38520a81dabc21cb13d5382c5ff87c7 META.json
+SHA1 0cb05b2d27843c9e9416d65b1bfb4874a6568470 META.yml
+SHA1 52009fa16a0a545a6d25c6450d617984f557529b Makefile.PL
+SHA1 7de698d40dca158ca3414aee9aa238a46fc5f04c README
+SHA1 9a0a37e8582f5a34655b0aa55f077d7e997d6b64 cpanfile
+SHA1 71bbe284d701dd0e7893acbc123a69ee47cd37f0 dist.ini
+SHA1 43d0e3537a2dd7508516d3727aa60e8d3aaa8b98 lib/Protocol/SOCKS.pm
+SHA1 5ad84d4f1bb209a678958f0640a812dd488b686a lib/Protocol/SOCKS/Client.pm
+SHA1 66b63a3d6c7bc3c63cd2371bb9be709cba2a462a lib/Protocol/SOCKS/Client.pod
+SHA1 9db5463f3a2a2b76ed24cec4bbe5de047097b65c lib/Protocol/SOCKS/Constants.pm
+SHA1 f697a777a47d6ccc22ff6625354e5369557427fd lib/Protocol/SOCKS/Constants.pod
+SHA1 5ed24cfc66123e7e50d7d0b6e27d57533f12522d lib/Protocol/SOCKS/Server.pm
+SHA1 06e18a8b28f7e5cef1bfb4f51831e77c07787204 lib/Protocol/SOCKS/Server.pod
+SHA1 985d9ded8d8ed7e344a09e52b1402e878e91da28 t/00-check-deps.t
+SHA1 f6ce96ead15956e3e8186aad37e614b0a17d4c91 t/00-compile.t
+SHA1 61f667071d6d4172a220942939d044323385b6aa t/000-report-versions-tiny.t
+SHA1 dedc922a8d46088f21da921c7888246071ba15b5 t/client.t
+SHA1 a52810a613da6eebeae9e0f2c1310739c6de5eac t/extract_address.t
+SHA1 0a289e70fe949e5f9c97129c0b972f67566ad483 t/server.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 296928dbbcaffd1514ccc9b77a1e6e03cfe9b068 xt/release/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJT+OS9AAoJEFKElMNpjtyDWd8H/jTe6MGJiVN1Rxq/gfjG+iqv
+H8tbefwLGqx9I0Qh5ihqtUkYoqs+LrFsYPwRvqln+7IUAVETTneehW3kW1noJnc6
+lVcSmGOLB6xpUi3M6mxXUQid5hcbQo0p1YX6Sef5MBHA3iWHLC7SQL0lP9MJjMCU
+OK2S3J5eZ7Vm//hYEdBEDkU15yf1qsgtP7BA/tVmZA8OAiG+YQBDU5igqxjivkwr
+OkaQJTgNtJvp1YknDGK+jT7lxSOTF8uVaAHuS+Ve3vwHuGjxONAAxQQP7siNVMqV
+9qUG3nqtwRM9kDZYZ7QHhPpCP9gUsA4X4LWq9cwdZ2Yz3Zc9Yeliq7KG71skXGs=
+=mNru
+-----END PGP SIGNATURE-----

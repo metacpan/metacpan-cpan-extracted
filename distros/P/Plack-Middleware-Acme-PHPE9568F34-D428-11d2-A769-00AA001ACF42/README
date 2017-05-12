@@ -1,0 +1,27 @@
+NAME
+    Plack::Middleware::Acme::PHPE9568F34::D428::11d2::A769::00AA001ACF42 -
+    Implement PHP's best features with PSGI!
+
+VERSION
+    version 3.141000
+
+SYNOPSIS
+     builder {
+        enable 'Plack::Middleware::Acme::PHPE9568F34::D428::11d2::A769::00AA001ACF42';
+        $app;
+     }
+
+DESCRIPTION
+    Who in the Perl community doesn't envy PHP's awesome features
+    <http://phpsadness.com/?page=sad/11>? This module will give you the
+    features you've always hoped and dreamed for!
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

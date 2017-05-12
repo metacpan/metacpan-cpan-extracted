@@ -1,0 +1,60 @@
+=head1 NAME
+
+Example::ClassD - Example Class D
+
+
+=head1 DESCRIPTION
+
+this is brief text of description
+This is class D
+
+
+=head1 METHODS
+
+=head2 foo
+
+ my $returnvalue = foo($text);
+
+This method is doing foo.
+
+
+ print $this->foo();
+
+
+It is not doing bar, only foo.
+
+parameter: someparam1 with description 1
+
+
+parameter: someparam2 with description 2
+
+
+returns  some text of returning value
+
+
+
+=head2 foo2
+
+ my $returnvalue = foo2($someparam2, $someparam1);
+
+This method is doing foo.
+
+
+ print $this->foo();
+
+
+It is not doing bar, only foo.
+
+parameter: someparam1 with description 1
+
+
+parameter: someparam2 with description 2
+
+
+returns  some text of returning value
+
+
+
+
+=cut
+

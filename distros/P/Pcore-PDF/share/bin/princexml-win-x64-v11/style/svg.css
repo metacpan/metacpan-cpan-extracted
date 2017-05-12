@@ -1,0 +1,17 @@
+/*
+    Prince - SVG stylesheet
+    http://www.princexml.com
+*/
+
+@namespace svg url("http://www.w3.org/2000/svg");
+@namespace xml url("http://www.w3.org/XML/1998/namespace");
+
+svg { overflow: hidden }
+
+svg marker { overflow: hidden }
+svg pattern { overflow: hidden }
+svg symbol { overflow: hidden }
+svg image { overflow: hidden }
+
+*[xml|space="default"] { white-space: normal }
+*[xml|space="preserve"] { white-space: pre }

@@ -1,0 +1,34 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'File::Spec' => '0',
+                                        'POE::Test::Loops' => '1.360'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'EV' => '4.0',
+                                      'POE' => '1.366',
+                                      'perl' => '5.006'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'POE::Test::Loops' => '1.360',
+                                   'Test::More' => '0.47'
+                                 }
+                 }
+     };
+  $x;
+ }

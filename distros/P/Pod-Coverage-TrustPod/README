@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Pod-Coverage-TrustPod,
+version 0.100003:
+
+  allow a module's pod to contain Pod::Coverage hints
+
+This software is copyright (c) 2013 by Ricardo SIGNES.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

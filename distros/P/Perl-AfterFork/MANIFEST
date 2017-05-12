@@ -1,0 +1,12 @@
+AfterFork.xs
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+mk_README.sh
+t/1_use.t
+t/2_fork.t
+t/3_reinit_all.t
+lib/Perl/AfterFork.pm
+META.yml                                 Module meta-data (added by MakeMaker)

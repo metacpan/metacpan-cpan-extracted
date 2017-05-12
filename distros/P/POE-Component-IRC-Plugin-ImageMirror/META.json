@@ -1,0 +1,62 @@
+{
+   "abstract" : "A PoCo-IRC plugin which uploads select images to a mirror service",
+   "author" : [
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-IRC-Plugin-ImageMirror",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "utils"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Cookies" : 0,
+            "HTTP::Headers" : 0,
+            "Image::ImageShack" : 0,
+            "POE" : 0,
+            "POE::Component::IRC" : "6.22",
+            "POE::Component::IRC::Plugin::URI::Find" : 0,
+            "POE::Quickie" : "0.11",
+            "Try::Tiny" : 0,
+            "URI::Title" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-POE-Component-IRC-Plugin-ImageMirror@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-IRC-Plugin-ImageMirror"
+      },
+      "homepage" : "http://search.cpan.org/dist/POE-Component-IRC-Plugin-ImageMirror/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hinrik/poe-component-irc-plugin-imagemirror.git",
+         "web" : "http://github.com/hinrik/poe-component-irc-plugin-imagemirror"
+      }
+   },
+   "version" : "0.15",
+   "x_authority" : "cpan:HINRIK"
+}
+

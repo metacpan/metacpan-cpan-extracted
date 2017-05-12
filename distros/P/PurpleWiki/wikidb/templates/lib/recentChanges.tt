@@ -1,0 +1,37 @@
+[% IF daysAgo %]
+<h2>Updates in the last [% daysAgo %] days</h2>
+[% ELSE %]
+<h2>Updates since [% changesFrom %]</h2>
+[% END %]
+
+<p>
+[% FOREACH rcDay = rcDays %]
+<a href="[% rcDay.url %]">[% rcDay.num %] days</a>
+[% IF NOT loop.last %]|[% END %]
+[% END %]
+</p>
+
+[% FOREACH date = recentChanges %]
+<p><b>[% date.date %]</b></p>
+<ul>
+  [% FOREACH page = date.pages %]
+  <li><a href="[% page.diffUrl %]">(diff)</a>
+      <a href="[% baseUrl %]?[% page.id %]">[% page.pageName %]</a> [% page.time %]
+      [% IF page.numChanges > 1 %]
+      ([% page.numChanges %] <a href="[% page.changeUrl %]">changes</a>)
+      [% END %]
+      [% IF page.summary %]
+      <b>[[% page.summary %]]</b>
+      [% END %]
+      . . . . .
+      [% IF page.userName %]
+      <a href="[% baseUrl %]?[% page.userName %]" title="ID [% page.userId %] from [% page.host %]">[% page.userName %]</a>
+      [% ELSE %]
+      [% page.host %]
+      [% END %]
+  </li>
+  [% END %]
+</ul>
+[% END %]
+
+<p>Page generated [% currentDate %]</p>

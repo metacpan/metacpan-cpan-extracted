@@ -1,0 +1,42 @@
+---
+abstract: 'Display git status information about the directory from which you run your development server'
+author:
+  - 'Manni Heumann, C<< <cpan@lxxi.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  Test::MockObject: '0'
+  Test::MockObject::Extends: '0'
+  Test::Most: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Debug-GitStatus
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::Debug::GitStatus:
+    file: lib/Plack/Middleware/Debug/GitStatus.pm
+    version: '0.04'
+requires:
+  Plack: '0'
+  Plack::Middleware::Debug: '0'
+resources:
+  bugtracker: https://github.com/mannih/Plack-Middleware-Debug-GitStatus/issues
+  homepage: https://github.com/mannih/Plack-Middleware-Debug-GitStatus
+  repository: git://github.com/mannih/Plack-Middleware-Debug-GitStatus.git
+version: '0.04'
+x_contributors:
+  - 'Manni Heumann <github@lxxi.org>'

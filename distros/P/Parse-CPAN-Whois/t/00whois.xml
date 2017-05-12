@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cpan-whois xmlns='http://www.cpan.org/xmlns/whois'
+            last-generated='Fri Aug 15 04:19:01 2008 GMT'
+            generated-by='Id: cron-daily.pl 1035 2008-06-28 06:42:43Z k '>
+ <cpanid>
+  <id>ARYEH</id>
+  <type>author</type>
+  <fullname>Aryeh Goldsmith</fullname>
+  <email>perlaim@aryeh.net</email>
+  <homepage>http://www.aryeh.net/</homepage>
+  <has_cpandir>1</has_cpandir>
+ </cpanid>
+ <cpanid>
+  <id>ARISTOTLE</id>
+  <type>author</type>
+  <fullname>Αριστοτέλης Παγκαλτζής</fullname>
+  <asciiname>Aristotle Pagaltzis</asciiname>
+  <email>pagaltzis@gmx.de</email>
+  <homepage>http://plasmasturm.org/</homepage>
+  <has_cpandir>1</has_cpandir>
+ </cpanid>
+<cpanid>
+  <id>NKH</id>
+  <type>author</type>
+  <fullname>نديم ابن ﺤﻣﻮﺪﺓ الخمير - Nadim Khemir</fullname>
+  <asciiname>Nadim Ibn Hamouda El Khemir</asciiname>
+  <email>nadim@khemir.net</email>
+  <has_cpandir>1</has_cpandir>
+ </cpanid>
+<cpanid>
+  <id>ALEC</id>
+  <type>author</type>
+  <fullname>陳衍良</fullname>
+  <asciiname>Alec Chen</asciiname>
+  <email>alec@cpan.org</email>
+  <homepage>http://alecchen.com/</homepage>
+  <has_cpandir>1</has_cpandir>
+ </cpanid>
+<cpanid>
+  <id>XMLML</id>
+  <type>list</type>
+  <asciiname>Perl-XML Mailing List</asciiname>
+  <email>perl-xml@listserv.ActiveState.com</email>
+  <info>Send mail to subscribe-perl-xml@lyris.activestate.com</info>
+  <has_cpandir>0</has_cpandir>
+ </cpanid>
+</cpan-whois>

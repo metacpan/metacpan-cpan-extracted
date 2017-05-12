@@ -1,0 +1,109 @@
+Revision history for Perl extension Palm::Progect.
+
+[2.0.4] 2005/10/02
+    - Pod tests were mistakenly excluded from distribution
+
+[2.0.3] 2005/09/26
+    - Added Pod tests
+    - Updated docs for Record.pm
+    - CPANTS found that 'use strict' was missing in some modules in the
+      distribution.  Fixed this.
+    - Updated copyright dates in pod
+
+[2.0.2] 2005/01/29
+    - Changed to Module::Build based installer
+    - Added prerequisite for Test::Harness and Test::More
+    - removed Test::* modules from test directory
+    - Fixed pod errors in Palm::Progect::Converter::LiteText
+    - fixed broken csv test
+    - Padded out categories to 16 (mainly to remove warnings about
+      undefined values, but it's probably more correct this way anyways)
+
+[2.0.1] 2002/06/01
+    - Fixed a bug where dates in January did not get stored properly
+      (thanks to Frank Meineke for spotting this one)
+
+    - Fixed the docs to note that version 1.2.4 of p5-palm is required
+
+    - Attempt to automatically require version 1.2.4 of p5-palm in
+      Makefile.PL
+
+[2.0.0] 2002/04/28
+    ** This Major internal rewrite adds new features and creates
+       a few incompatibilities. See upgrade_2.0.txt for details. **
+
+    - Progect db version 0.23 now supported
+
+    - Can convert back and forth between 0.18 and 0.23 database formats
+
+    - Converters (for import/export) made modular.  Users can add own
+      converters to the system and they will integrate automatically
+      with progconv.
+
+    - priorities now working
+
+    - COMPATIBILITY CHANGE: --date-format now split into:
+         --date-format      (for Text converter only)
+         --csv-date-format  (for CSV converter only)
+
+    - countless API changes to Palm::Progect
+
+    - new guide to the internals (hacking.txt)
+
+    - now generates sensible prefs defaults
+
+[1.9.x] 2002/04/xx
+    - unreleased testing versions, leading up to 2.0.0 release
+    - Thanks to Mark Allman for testing and feedback
+
+[1.0.2] 2001/09/29
+    - progconv couldn't handle paths with dots in them (thanks to Kris Gale
+      for the bugreport and patch)
+    - don't ignore lines that start with # when they are within
+      a multi-line field (i.e. a note)
+
+[1.0.1] 2001/07/24
+    - Notes were not being imported/exported properly (thanks to
+      Alain Mellan for the bugreport and patch)
+    - Fixed string packing/unpacking for 5.005 and 5.6.1
+
+[1.0.0] 2001/07/22
+    - Released! Available on http://www.occamstoothbrush.com/perl
+
+[0.9.4] 2001/07/22
+    - Tidied up docs, added examples
+    - Added Readme
+
+[0.9.3] 2001/07/22
+    - removed vestiges of Andrew Arensburger's code from Palm::Progect
+      (I had originally used Palm::Mail as a template for Palm::Progect)
+    - added dual GPL/Artistic license
+    - renamed Rebuild_Relationships to Repair_Tree (since it's similar
+      to the function of that name in Progect itself)
+
+[0.9.2] 2001/07/21
+    - realized multi-line descriptions not supported in Progect.
+      They were buggy anyways, so removed mention of them from the docs.
+
+[0.9.1] 2001/07/21
+    - added tests
+    - fixed all the bugs that the tests revealed :)
+    - added changelog
+
+[0.9.0] 2001/07/20
+    - used h2xs to make proper Perl CPAN-style package
+    - started to make both Palm::Progect and progconv safe under perl -w
+
+[0.2.1] 2001/07/15
+    - improved docs
+    - added csv command-line switches
+    - fixed bugs
+
+[0.2.0] 2001/07/14
+    - text import done
+    - added csv import/export
+    - feature complete
+
+[0.1.0] 2001/07/12
+    - Palm::Progect done, file format mostly sussed
+    - text export done

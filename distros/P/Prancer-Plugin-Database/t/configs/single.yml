@@ -1,0 +1,12 @@
+database:
+    default:
+        driver: Prancer::Plugin::Database::Driver::Mock
+        options:
+            username: test
+            password: test
+            database: test
+            hostname: /tmp
+            autocommit: false
+            charset: utf8
+            connection_check_threshold: 10
+

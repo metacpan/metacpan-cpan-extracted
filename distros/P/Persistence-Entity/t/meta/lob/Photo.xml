@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<orm entity="photo"  class="Photo" >
+    <column name="id"  attribute="id" />
+    <column name="name"  attribute="name" />
+    <lob name="blob_content" attribute="image" fetch_method="LAZY" />
+</orm>

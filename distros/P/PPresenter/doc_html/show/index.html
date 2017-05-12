@@ -1,0 +1,84 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Overview</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Structure of a Show</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<B>Show</B><BR>
+<P>
+
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.  The presentation is written in Perl/Tk.
+<P>
+Perl/Tk is Object Oriented (OO).  Perl is deliberately providing you with
+a lot of freedom in how to use OO.   Tk extended the OO mechanism, with a
+set of funtions, but these extentions are not used in PPresenter for reason that
+they are too `heavy': would complicate the software instead of helping it.
+<P>
+
+    </TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=#full>All objects</A><BR>
+<A HREF=#simple>Simplified</A><BR>
+<P>
+
+    </TD><TD VALIGN=top>
+
+<H2><A NAME=full>Full</A> Object Structure</H2>
+<IMG SRC=object.gif WIDTH=309 HEIGHT=280 ALIGN=right HSPACE=10>
+In the image on the right, you see that a <A HREF=../show/index.html>show</A> links
+<A HREF=../slide/index.html>slides</A> to <A HREF=../viewport/index.html>viewports</A>.
+Each slide may be shown in more than one window (viewport)
+at the same time, each defined by a <A HREF=../slideview/index.html>slide-view</A>.
+So, a slide-view is the data of a slide which is shown on one
+specific viewport.
+The data shown can be text and images.  When displayed, the data can move
+over the screen, which is described by a <A HREF=../program/index.html>program</A>.
+<P>
+The actual data which is entered by the designer of the presentation
+falls apart into
+<A HREF=../decoration/index.html>decorations</A> (background images and text colours),
+<A HREF=../dynamic/index.html>dynamics</A> (for the program),
+<A HREF=../fontset/index.html>fontsets</A> (for the fonts to be used),
+<A HREF=../formatter/index.html>formatters</A> (how the text is entered), and
+<A HREF=../template/index.html>templates</A> (how the screen is divided into parts).
+<BR CLEAR=right>
+
+<H2><A NAME=simple>Simplified</A> Model</H2>
+
+<IMG SRC=simpl_obj.gif WIDTH=309 HEIGHT=175 ALIGN=right HSPACE=10>
+For most presentations, there will be only one viewport.  In those cases,
+the existence of the slide-view is only complicating our picture.
+<P>
+In the picture on the right, the slide and slide-view objects are
+linked as if one.  The only viewport displays one slide(view) after the
+other.
+<P>
+The control objects are left out in this picture too, because when writing
+your presentation, you are not concerned with them.
+<BR CLEAR=right>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

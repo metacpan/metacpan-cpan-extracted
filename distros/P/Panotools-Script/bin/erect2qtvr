@@ -1,0 +1,189 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use File::Spec;
+use Panotools::Script;
+use Image::Size;
+
+use File::Temp qw/tempdir/;
+
+my $opts = {};
+
+my @qtvr_opts = ();
+
+while (@ARGV)
+{
+    my ($key, $value) = split ('=', shift);
+    $opts->{$key} = $value;
+    push @qtvr_opts, ($key .'='. $value);
+}
+
+my $cleanup = 1; $cleanup = 0 if (defined $opts->{'--cleanup'} and $opts->{'--cleanup'} == 0);
+my $quality = $opts->{'--quality'} || 70;
+my $pitch = $opts->{'--pitch'} || 0;
+my $yaw = $opts->{'--yaw'} || 0;
+my $outfile = $opts->{'--outfile'} || undef;
+$outfile = File::Spec->rel2abs ($outfile) if defined ($outfile);
+my $erect = $opts->{'--erect'} or die
+
+"usage\n  $0 --erect=mypanorama.tif
+
+Generates a cubic QTVR named mypanorama.mov.  Input needs to be a full
+360 degree equirectangular image in PNG, JPEG or TIFF format.
+
+Options:
+
+  --erect    Filename of equirectangular input (required)
+  --pitch    pre-rotates the entire panorama.  eg. if your panorama
+             has the nadir in the centre set this to -90
+  --yaw      pre-rotates the entire panorama.
+  --quality  JPEG quality for QTVR tiles, defaults to 70
+  --cleanup  set to '0' to keep temporary files, defaults to '1'
+
+A subset of jpeg2qtvr options are also accepted:
+
+  --date     date in seconds since January 1st 1970, defaults to current time
+  --name     title of the panorama
+  --outfile  output filename, defaults to input filename with .mov extension
+  --width    preferred window width, defaults to 1024
+  --height   preferred window height, defaults to 768
+  --pan      initial pan (yaw), defaults to 0.0 degrees
+  --tilt     initial tilt (pitch), defaults to 0.0 degrees
+  --fov      initial vertical angle of view, defaults to 60 degrees
+  --min-fov  minimum vertical angle of view, defaults to 10 degrees
+  --max-fov  maximum vertical angle of view, defaults to 120 degrees";
+
+$erect = File::Spec->rel2abs ($erect);
+my $cwd = File::Spec->rel2abs (File::Spec->curdir);
+my $tempdir = tempdir (CLEANUP => $cleanup);
+
+my $stub = $erect;
+$stub =~ s/\.([[:alnum:]]+)$//;
+
+my $prefix = File::Spec->catfile ($tempdir, 'cube');
+
+my $pto_temp = "$stub.erect2qtvr.$$.pto";
+
+system ('erect2cubic', "--erect=$erect", "--ptofile=$pto_temp", "--filespec=TIFF_m", "--pitch=$pitch", "--yaw=$yaw");
+system ('nona', '-o', "$prefix-face", $pto_temp);
+
+# generate JPEG cubefaces
+for my $index (0 .. 5)
+{
+    if ($^O eq "darwin")
+    {
+        system ('sips', '-s', 'format', 'jpeg', '-s', 'formatOptions', $quality, "$prefix-face000$index.tif", '--out', "$prefix-face000$index.jpg");
+    }
+    else
+    {
+        system ('convert', '-quality', $quality, "$prefix-face000$index.tif", "$prefix-face000$index.jpg");
+    }
+}
+
+# fisheye cubefaces for preview track
+my $scratch = new Panotools::Script;
+
+$scratch->Read ($pto_temp);
+$scratch->Panorama->Set (v => 100, f => 3);
+$scratch->Write ($pto_temp);
+
+system ('nona', '-o', "$prefix-preview", $pto_temp);
+
+unlink $pto_temp;
+
+$scratch = new Panotools::Script;
+$scratch->Panorama->Set (v => 90, f => 0, w => 256, h => 256, n => '"TIFF"');
+$scratch->Image->[0] = new Panotools::Script::Line::Image;
+
+for my $index (0 .. 5)
+{
+    # generate JPEG preview cubefaces
+    if ($^O eq "darwin")
+    {
+        system ('sips', '-z', '32', '32', "$prefix-preview000$index.tif");
+    }
+    else
+    {
+        system ('mogrify', '-geometry', '32x32', "$prefix-preview000$index.tif");
+    }
+    $scratch->Image->[0]->Set (w => 32, h => 32, v => 100, f => 3, r => 0, p => 0, y => 0, n => "\"$prefix-preview000$index.tif\"");
+    $scratch->Write ($pto_temp);
+    system ('nona', '-o', "$prefix-preview-rectilinear.tif", $pto_temp);
+    unlink $pto_temp;
+    if ($^O eq "darwin")
+    {
+        system ('sips', '-s', 'format', 'jpeg', '-s', 'formatOptions', $quality, "$prefix-preview-rectilinear.tif", '--out', "$prefix-preview000$index.jpg");
+    }
+    else
+    {
+        system ('convert', '-quality', $quality, "$prefix-preview-rectilinear.tif", "$prefix-preview000$index.jpg");
+    }
+}
+
+print "Tempdir: $tempdir\n" unless $cleanup;
+
+$outfile = "$stub.mov" unless (defined $outfile);
+
+system ('jpeg2qtvr', @qtvr_opts, "--prefix=$prefix-face000", "--preview=$prefix-preview000", "--outfile=$outfile");
+
+__END__
+
+=head1 NAME
+
+erect2qtvr - Assemble a Quicktime QTVR file from an equirectangular image
+
+=head1 Synopsis
+
+  erect2qtvr --erect=mypanorama.tif
+
+=head1 DESCRIPTION
+
+This tool generates a cubic QTVR from a single equirectangular image, see
+L<http://wiki.panotools.org/Equirectangular_Projection> for more details
+of the input file format.
+
+A QTVR file is created with the same path as the input image except with a .mov
+extension.
+
+=head1 Calling syntax
+
+  erect2qtvr [options] --erect=mypanorama.tif
+
+Options:
+
+  --erect    Filename of equirectangular input (required)
+  --pitch    pre-rotates the entire panorama.  eg. if your panorama
+             has the nadir in the centre set this to -90
+  --yaw      pre-rotates the entire panorama.
+  --quality  JPEG quality for QTVR tiles, defaults to 70
+  --cleanup  set to '0' to keep temporary files, defaults to '1'
+
+A subset of jpeg2qtvr options are also accepted:
+
+  --date     date in seconds since January 1st 1970, defaults to current time
+  --name     title of the panorama
+  --outfile  output filename, defaults to input filename with mov extension
+  --width    preferred window width, defaults to 1024
+  --height   preferred window height, defaults to 768
+  --pan      initial pan (yaw), defaults to 0.0 degrees
+  --tilt     initial tilt (pitch), defaults to 0.0 degrees
+  --fov      initial vertical angle of view, defaults to 60 degrees
+  --min-fov  minimum vertical angle of view, defaults to 10 degrees
+  --max-fov  maximum vertical angle of view, defaults to 120 degrees";
+
+=head1 License
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
+
+=head1 See Also
+
+L<perl>, L<Panotools::Script>
+
+=head1 Author
+
+March 2007, Bruno Postle <bruno AT postle.net>
+

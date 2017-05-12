@@ -1,0 +1,195 @@
+=over
+
+=item *
+
+Bullet 1
+
+=item
+
+Bullet 2
+
+=over
+
+=item *
+
+Bullet 2.1
+
+=item
+
+Bullet 2.2
+
+=back
+
+=item
+
+Bullet 3
+
+=back
+
+=over
+
+=item 1
+
+Item 1
+
+=item
+
+Item 2
+
+=over
+
+=item 1
+
+Item 2.1
+
+=item
+
+Item 2.2
+
+=back
+
+=item
+
+Item 3
+
+=back
+
+=over
+
+=item a
+
+Item a
+
+=item
+
+Item b
+
+=over
+
+=item a
+
+Item a.a
+
+=item
+
+Item a.b
+
+=back
+
+=item
+
+Item c
+
+=back
+
+=over
+
+=item A
+
+Item A
+
+=item
+
+Item B
+
+=over
+
+=item A
+
+Item B.A
+
+=item
+
+Item A.B
+
+=back
+
+=item
+
+Item C
+
+=back
+
+=over
+
+=item i
+
+Item i
+
+=item
+
+Item ii
+
+=over
+
+=item i
+
+Item ii.i
+
+=item
+
+Item ii.ii
+
+=back
+
+=item
+
+Item iii
+
+=back
+
+=over
+
+=item I
+
+Item I
+
+=item
+
+Item I
+
+=over
+
+=item I
+
+Item II.I
+
+=item
+
+Item II.II
+
+=back
+
+=item
+
+Item III
+
+=back
+
+=over
+
+=item The first
+
+First item
+
+=item The second
+
+Second item
+
+=over
+
+=item The first under the second
+
+First sub-item under the second item
+
+=item The second under the second
+
+Second sub-item under the second item
+
+=back
+
+=item The third
+
+Third item
+
+=back

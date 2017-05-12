@@ -1,0 +1,113 @@
+#!/opt/bin/perl
+
+use Getopt::Long;
+use PApp::Env;
+
+$unset = 0;
+
+sub printval {
+   my $val = shift;
+   if (ref $val) {
+      print "{$val}\n";
+   } else {
+      print "$val\n";
+   }
+}
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+
+if (@ARGV) {
+   GetOptions(
+            "help|h" => sub {
+               require Pod::Usage;
+               Pod::Usage::pod2usage(1);
+            },
+            "unset|u" => sub {
+               $unset = 1;
+            },
+            "eval|e" => sub {
+               $eval = 1;
+            },
+            "<>" => sub {
+               if ($_[0] =~ /^([^=]+)=(.*)$/s) {
+                  my ($var, $val) = ($1, $2);
+                  if ($eval) {
+                     my $_val = $val;
+                     $val = eval $_val;
+                     die "$var=$_val: $@\n" if $@;
+                  }
+                  setenv $var, $val;
+               } elsif ($unset) {
+                  unsetenv $_[0];
+               } else {
+                  printval getenv $_[0];
+               }
+            },
+
+   );
+} else {
+   for (listenv) {
+      print "$_=";
+      printval getenv($_);
+   }
+}
+
+=head1 NAME
+
+papp-env - get/set/clear/display environment variables
+
+=head1 SYNOPSIS
+
+   papp-env --help
+
+List all environment variables in name=value format (I<warning>, might
+contain binary data):
+
+   papp-env
+
+List the value of a single environment variable (I<without> trailing newline):
+
+   papp-env myvar
+
+Set some env-variables:
+
+   papp-env var1=value1 var2=value2 "var3=value 3" var4="contains == equal!"
+
+Unsetting instead of setting env-variables:
+ 
+   papp-env -u var1 var2 var3
+
+Combine almost all of the above:
+
+   papp-env var=value printvar1 -u v2 v3 v4
+
+Evaluate value as perl code rather than as strings:
+
+   papp-env -e arrayvar="['val1', 'val2']" hashvar="{ a => 5, b => 7}"
+
+=head1 DESCRIPTION
+
+This program is used to query and set PApp environment variables.
+
+Settings that are associated with specific PApp applications often can be
+used in PApp environment variables.
+
+Environment variables are also useful for asynchronous communication
+between PApp applications and outside apps.
+
+=head1 SEE ALSO
+
+L<PApp>.
+
+=head1 BUGS
+
+- no handling of binary data or perl-structures
+
+=head1 AUTHOR
+
+ Marc Lehmann <schmorp@schmorp.de>
+ http://www.goof.com/pcg/marc/
+
+=cut
+
+

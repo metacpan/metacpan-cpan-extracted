@@ -1,0 +1,56 @@
+---
+abstract: 'Redux-like store'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  perl: v5.20.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pollux
+provides:
+  Pollux:
+    file: lib/Pollux.pm
+    version: v0.0.2
+  Pollux::Action:
+    file: lib/Pollux/Action.pm
+    version: v0.0.2
+requires:
+  Clone: '0'
+  Const::Fast: '0'
+  Hash::Merge: '0'
+  List::AllUtils: '0'
+  List::MoreUtils: '0'
+  Moo: '0'
+  Moose: '0'
+  Moose::Exporter: '0'
+  MooseX::MungeHas: '0'
+  Scalar::Util: '0'
+  Type::Tiny: '0'
+  Types::Standard: '0'
+  experimental: '0'
+  overload: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/pollux/issues
+  homepage: https://github.com/yanick/pollux
+  repository: https://github.com/yanick/pollux.git
+version: 0.0.2
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'

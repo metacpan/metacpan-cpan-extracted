@@ -1,0 +1,14 @@
+This is the Change Log for PAR::Filter::Squish:
+
+0.03  Thu Oct  9 16:47 2008
+  - Skip .bs files.
+  - warn on failure, but continue with un-squished code.
+
+0.02  Wed Sep 14 10:38 2006
+  - Added optional POD tests.
+  - Added some more documentation.
+  - Upgrade to Module::Install 0.64
+
+0.01  Mon Aug 14 16:07 2006
+  - initial release
+

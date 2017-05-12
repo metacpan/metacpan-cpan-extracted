@@ -1,0 +1,32 @@
+---
+abstract: 'PDL interface to the Fastest Fourier Transform in the West'
+author:
+  - 'Dima Kogan <dima@secretsauce.net>, Craig DeForest <deforest@boulder.swri.edu>'
+build_requires:
+  PDL::PP: '0'
+configure_requires:
+  IPC::Run: '0'
+  PDL::Core::Dev: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0521, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDL-FFTW3
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  PDL::FFTW3:
+    file: FFTW3.pd
+    version: '0.04'
+requires:
+  PDL::Core: '2.001'
+resources:
+  bugtracker: http://github.com/PDLPorters/pdl-fftw3/issues
+  homepage: http://github.com/PDLPorters/pdl-fftw3
+  repository: git://github.com/PDLPorters/pdl-fftw3.git
+version: '0.04'
+

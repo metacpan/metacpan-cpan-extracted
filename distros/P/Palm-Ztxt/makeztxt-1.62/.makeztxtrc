@@ -1,0 +1,13 @@
+#
+# Sample regex file for makeztxt
+#
+# Each line contains a regular expression used for generating bookmarks
+# with makeztxt.  Blank lines and lines beginning with a '#' are ignored.
+#
+
+DRAMATIS PERSONAE
+ACT [A-Z]+
+SCENE [A-Z]+
+CHAPTER [0-9]+
+Chapter [0-9]+
+[IVX]+\. -+[a-zA-Z \t]+\.?

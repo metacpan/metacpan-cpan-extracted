@@ -1,0 +1,30 @@
+---
+abstract: 'Find country and city of origin of a web request'
+author:
+  - 'Sherwin Daganato <sherwin@daganato.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-GeoIP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Geo::IP: '1.39'
+  GeoIP2: '2.002'
+  Plack: '0'
+  Test::More: '0'
+resources:
+  bugtracker: https://github.com/sherwind/Plack-Middleware-GeoIP/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/sherwind/Plack-Middleware-GeoIP.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

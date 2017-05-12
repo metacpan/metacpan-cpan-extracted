@@ -1,0 +1,21 @@
+
+AddTargets('all') ;
+
+AddCommandLineSwitches
+	(
+	  '-c'
+	, '-D you=someone'
+#	, '-plp some_nasty_lib_path'
+	, '-no_default_path_warning'
+	, '-tnonh'
+#	, '-build_directory somewhere_else'
+#	, '-j 4'
+#	, '-ppp /devel/perl_modules/PerlBuildSystem/Plugins'
+#	, '-dpli'
+	) ;
+
+
+#------------------------------------------------------------------------
+
+1;
+

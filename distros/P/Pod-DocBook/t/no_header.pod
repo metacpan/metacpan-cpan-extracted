@@ -1,0 +1,13 @@
+=pod
+
+This is an ordinary paragraph.
+
+  This is a verbatim paragraph.
+
+This is another ordinary paragraph.
+
+  This is the first of two consecutive verbatim paragraphs.
+
+  This is the second of two consecutive verbatim paragraphs.
+
+=cut

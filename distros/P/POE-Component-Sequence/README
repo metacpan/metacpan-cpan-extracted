@@ -1,0 +1,343 @@
+NAME
+    POE::Component::Sequence - Asynchronous sequences with multiple
+    callbacks
+
+SYNOPSIS
+        use POE qw(Component::Sequence);
+
+        POE::Component::Sequence
+            ->new(
+                sub {
+                    my $sequence = shift;
+                    $sequence->heap_set(
+                        a => 5,
+                        b => 9,
+                        op => '*'
+                    );
+                },
+                sub {
+                    my $sequence = shift;
+                    my $math = join ' ', map { $sequence->heap_index($_) } qw(a op b);
+                    $sequence->heap_set(result => eval $math);
+                }
+            )
+            ->add_callback(sub {
+                my ($sequence, $result) = @_;
+                print "Answer was " . $sequence->heap_index('result') . "\n";
+            })
+            ->run();
+
+        $poe_kernel->run();
+
+DESCRIPTION
+    A Sequence is a series of code blocks (actions) that are executed
+    (handled) within the same context, in series. Each action has access to
+    the sequence object, can pause it, finish the sequence, add additional
+    actions to be performed later, or store variables in the context (the
+    heap).
+
+    If we had the following action in the above example sequence:
+
+        sub {
+            my $sequence = shift;
+            $sequence->pause;
+            ...
+        }
+
+    ...the sequence would pause, waiting for something to call either
+    $sequence->failed, $sequence->finished or $sequence->resume.
+
+  Reasoning
+        Normally, in Perl when I would create a series of asynchronous steps
+        I needed to complete, I would chain them together using a bunch of
+        hardcoded callbacks. So, say I needed to login to a remote server
+        using a custom protocol, I would perhaps do this:
+
+        1.  Using POE, yield to a state named 'login' with my params
+
+        2.  'login' would send a packet along a TCP socket, assigning the
+            state 'login_callback' as the recipient of the response to this
+            packet.
+
+        3.  'login_callback' would run with the response
+
+        If I wanted to do something after I was done logging in, I have a
+        number of ways to do this:
+
+        1.  Pass an arbitrary callback to 'login' (which would somehow have
+            to carry to 'login_callback')
+
+        2.  Hard code the next step in 'login_callback'
+
+        3.  Have 'login_callback' publish to some sort of event watcher
+            (PubSub) that it had logged in
+
+        The first two mechanisms are cludgy, and don't allow for the
+        potential for more than one thing being done upon completion of the
+        task. While the third idea, the PubSub announce, is a good one, it
+        wouldn't (without cludgly coding) contain contextual information
+        that we wanted carried through the process at the outset.
+        Additionally, if the login process failed at some point in the
+        process, keeping track of who wants to be notified about this
+        failure becomes very difficult to manage.
+
+        The elegant solution, in my opinion, was to encapsulate all the
+        actions necessary for a process into a discrete sequence that can be
+        paused/resumed, can have multiple callbacks, and carry with it a
+        shared heap where I could store and retrieve data from, passing
+        around as a reference to whomever wanted to access it.
+
+USAGE
+  Class Methods
+   new( ... )
+        Creates a new Sequence object. Provide a list of actions to be
+        handled in sequence by the handlers.
+
+        If the first argument to new() is a HASHREF, it will be treated as
+        arguments that modify the behavior as follows:
+
+        *   Any method that can be chained on the sequence (add_callback,
+            add_error_callback, and add_finally_callback, for example) can
+            be specified in this arguments hash, but obviously only once, as
+            it's a hash and has unique keys.
+
+        *   Aside from this, the arguments hash is thrown into the
+            $sequence->options and modifies the way the actions are handled
+            (see OPTIONS).
+
+  Object Methods, Chained
+    All these methods return $self, so you can chain them together.
+
+   add_callback( $subref )
+        Callbacks are FIFO. Adds the subref onto the list of normal
+        callbacks. See "finished()" for how and when the normal callbacks
+        are called. Subref signature is ($sequence, @args || ()) where @args
+        is what was passed to the "finished()" call (if the sequence
+        completes without "finished()" called, this will be an empty array).
+
+        Dying inside a normal callback will be caught, and will move
+        execution to the error callbacks, passing the error message to the
+        error callbacks.
+
+   add_error_callback( $subref )
+        Error callbacks are FIFO. Adds the subref onto the list of error
+        callbacks. See "failed()" for how and when the error callbacks are
+        called. Subref signature is ($sequence, @args || ()) where @args is
+        what was passed to the "failed()" call (usually a caught 'die' error
+        message).
+
+        Return value is not used.
+
+        Dying inside an error callback won't be caught by the sequence.
+
+   add_finally_callback( $subref )
+        Adds the subref onto the list of 'finally' callbacks. See
+        "finally()" for how and when the 'finally' callbacks are called.
+        This is effectively the same as a normal callback ("add_callback()")
+        but is called even if the sequence ended in failure.
+
+        Dying inside a 'finally' callback will not be caught.
+
+   add_action( $subref || <some other scalar value> )
+        Actions are FIFO. Enqueues the given action.
+
+   add_handler( $subref )
+        Handlers are LIFO. Enqueues the given handler. See HANDLERS for more
+        information on this.
+
+   add_delay
+      $sequence->add_delay(
+          5,
+          sub {
+              my $seq = shift;
+              $seq->failed("Took longer than 5 seconds to process");
+              # or you can just die and it'll do the same thing
+              die "Took longer than 5 seconds to process\n";
+          },
+          'timeout',
+      );
+
+    Takes $delay, $action and optionally $name. If $name is given and
+    another delay was set with the same name, that delay will be removed and
+    replaced with this new delay. The $action is a subref which will take
+    receive the sequence as it's only argument. The subref will be executed
+    in an eval { }, with errors causing the failure of the sequence.
+
+    The return value of the $action subref is usually ignored, but as a
+    special case, if the subref returns [
+    $POE::Component::Sequence::RUN_AGAIN, $delay ], the same action will be
+    run again after the indicated delay with the same name. This allows you
+    to setup a regular delay without having to do a complex recursive
+    algorithm.
+
+   adjust_delay
+      $sequence->adjust_delay('timeout', 10);
+
+   remove_delay
+      $sequence->remove_delay('timeout');
+
+   run()
+        Starts the sequence. This is mandatory - if you never call "run()",
+        the sequence will never start.
+
+  Object Accessors, public
+   heap(), heap_index(), heap_set(), etc.
+        Think of "heap()" like the POE::Session heap - it is simply a
+        hashref where you may store and retrieve data from while inside an
+        action. See Class::MethodMaker::hash for all the various heap_*
+        calls that are available to you. The most important are:
+
+        *   heap_index( $key )
+
+            Returns the value at index $key
+
+        *   heap_set( $key1 => $value1, $key2 => $value2, ... )
+
+            Sets the given key/value pairs, overriding previous values
+
+        *   heap( )
+
+            Returns all the key/value pairs of the heap in no particular
+            order
+
+   options_*()
+        In usage identical to "heap()" above, this is another object
+        hashref. Its values are intended to modify how the handlers perform
+        their actions. See OPTIONS for more info.
+
+   alias()
+        Returns the POE::Session alias for this sequence.
+
+   result()
+        Stores the return value of the last action that was executed. See
+        HANDLERS.
+
+  Object Methods, public
+   pause()
+        Pauses the sequence
+
+   resume()
+        Resumes the sequence. You must call resume() as many times as
+        pause() was called, as they are cumulative.
+
+   finished( @args )
+        Marks the sequence as finished, preventing further actions to be
+        handled. The normal callbacks are called one by one, receiving
+        ($sequence, @args) as arguments. If the normal callbacks die,
+        execution is handed to "failed()", and then to "finally()".
+
+   failed( @args )
+        Marks the sequence as failed, finishing the sequence. This will
+        happen if an action dies, if "failed()" is explicitly called by the
+        user, or if a normal callback dies. The error callbacks are called
+        one by one, receiving ($sequence, @args) as arguments. Afterwards,
+        execution moves to "finally()".
+
+  Object Methods, private, POE states
+    These methods can't be called directly, but instead can be 'yield'ed or
+    'post'ed to via POE:
+
+      $poe_kernel->post( $sequence->alias, 'finally', @args );
+
+   finish( @args )
+        See "finished()".
+
+   fail( @args )
+        See "failed()".
+
+   finally( @args )
+        Walks through each 'finally' callback, passing ($sequence, @args) to
+        each.
+
+   next()
+        The main loop of the code, "next()" steps through each action on the
+        stack, handling each in turn. See HANDLERS for more info on this.
+
+OPTIONS
+    Some options affect the default handler. Other options may be intended
+    for plugin handlers.
+
+  auto_pause
+        Before each action is performed, the sequence is paused.
+
+  auto_resume
+        After each action is performed, the sequence is resumed.
+
+HANDLERS
+    To make the sequence a flexible object, it's not actually mandatory that
+    you use CODEREFs as your actions. If you wanted to provide the name of a
+    POE session and state to be posted to, you could write a handler that
+    does what you need given the action passed. For example:
+
+        POE::Component::Sequence
+            ->new(
+                [ 'my_session', 'my_state', @args ],
+            )
+            ->add_handler(sub {
+                my ($sequence, $request) = @_;
+
+                my $action = $request->{action};
+                if (! ref $action || ref $action ne 'ARRAY') {
+                    return { deferred => 1 };
+                }
+
+                my $session = shift @$action;
+                my $state   = shift @$action;
+                my @args    = @$action;
+
+                $sequence->pause;
+                $poe_kernel->post($session, $state, $sequence, \@args);
+
+                # Let's just hope $state will unpause the sequence when it's done...
+            })
+            ->run;
+
+    When an action is being handled, a shared request object is created:
+
+      my $request = {
+        action => $action,
+        options => \%sequence_options,
+      }
+
+    This request is handed to each handler in turn (LIFO), with the
+    signature ($sequence, $request). The handler is expected to return
+    either a HASHREF in response or throw an exception.
+
+    If a handler returns the key 'deferred', the next handler is tried. If
+    the handler returns the key 'skip', the action is skipped. Otherwise,
+    the handler is expected to return the key 'value', which is the optional
+    return value of the $action. This return value is stored in
+    $sequence->result. This value will be overwritten upon each action.
+
+    The default handler handles actions only of type CODEREFs, passing to
+    the action the arg $self.
+
+    If you'd like to add default handlers globally rather than calling
+    "add_handler()" for each sequence, push the handler onto
+    @POE::Component::Sequence::_plugin_handlers. See
+    <POE::Component::Sequence::Nested> for an example of this.
+
+KNOWN BUGS
+    No known bugs, but I'm sure you can find some.
+
+SEE ALSO
+    POE
+
+DEVELOPMENT
+    This module is being developed via a git repository publicly available
+    at <http://github.com/ewaters/poe-component-sequence>. I encourage
+    anyone who is interested to fork my code and contribute bug fixes or new
+    features, or just have fun and be creative.
+
+COPYRIGHT
+    Copyright (c) 2008 Eric Waters and XMission LLC
+    (http://www.xmission.com/). All rights reserved. This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+AUTHOR
+    Eric Waters <ewaters@gmail.com>
+

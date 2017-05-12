@@ -1,0 +1,9 @@
+0.003     2017-03-21 01:01:40 EDT
+  - Use warnings
+  - Various testing improvements
+
+0.002     2015-01-15 15:41:43-05:00 America/New_York
+  - Use isa() to determine Mojo reactor backend
+
+0.001     2015-01-10 17:08:42-05:00 America/New_York
+  - First release

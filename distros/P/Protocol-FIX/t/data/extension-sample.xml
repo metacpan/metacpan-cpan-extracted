@@ -1,0 +1,15 @@
+<fix type='FIX' major='4' minor='4' servicepack='0'>
+	<messages>
+		<message name='Logon' msgtype='A' msgcat='admin'>
+			<field name='EncryptMethod' required='Y' />
+			<field name='HeartBtInt' required='Y' />
+			<field name='ResetSeqNumFlag' required='N' />
+			<field name='Username' required='N' />
+			<field name='Password' required='N' />
+			<field name='AwesomeField' required='Y' />
+		</message>
+	</messages>
+	<fields>
+		<field number='33000' name='AwesomeField' type='STRING' />
+	</fields>
+</fix>

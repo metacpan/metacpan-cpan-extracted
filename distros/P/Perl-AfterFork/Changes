@@ -1,0 +1,6 @@
+Revision history for Perl extension Perl::AfterFork.
+
+0.01  Fri Apr  8 19:46:41 2005
+	- original version; created by h2xs 1.23 with options
+		-n Perl::AfterFork -A -b 5.8.0 -c -f
+

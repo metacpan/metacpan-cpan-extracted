@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c9779bdb60d41d5f1c2b82fcece4354035f0df84 Changes
+SHA1 3ae6731347b9a6810263f9541886dcec09fcd52c MANIFEST
+SHA1 190e9058eb9c6446a1a3f3ddf15b082f1ecde152 MANIFEST.SKIP
+SHA1 e6f4787b6d114de0c7e80b8cdca13cf4a2cfa19a META.yml
+SHA1 b7337542f1f923f3c60fcc91c568af0c3d27fad1 Makefile.PL
+SHA1 9fb26bc602368e9da103cf563a11516fe014edc0 lib/POE/Filter/JSON/Incr.pm
+SHA1 ebd4df59c5367815dd4faedc640eeee738f72938 lib/POE/Filter/JSON/Incr/Error.pm
+SHA1 af4917b11d2b897a8ceb879bfc6298c532f61ac8 t/01_filter.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFKTDzAVCwRwOvSdBgRAomIAJ0QGgl3qXvicfxeD67nI9h4gyO9EACfWxL0
+5q4Mv/LsusO36P9ck361S7M=
+=JG3H
+-----END PGP SIGNATURE-----

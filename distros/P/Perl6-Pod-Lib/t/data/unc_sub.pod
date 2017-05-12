@@ -1,0 +1,4 @@
+=begin pod
+=Include subdir/test.pod
+=end pod
+

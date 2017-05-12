@@ -1,0 +1,105 @@
+This is the change log for the perl extension PApp::SQL.
+
+2.0   Sat Jul 28 15:50:52 CEST 2012
+	- work around some bugs in DBD drivers (SQLite...) instead of
+          crashing.
+	- use SvOKp to decide whether we should upgrade to utf-8.
+        - since DBD::mysql keeps changing their number detection code
+          and therefore keeps corrupting our data, call bind_param
+          with "correctly" deduced types on first first execution
+          of an sql statement.
+        - cache prepare and all statement methods per stash, to avoid
+          having to look up multiple methods per execution.
+        - use a default lru cache size of 100 instead of 50.
+        - switch to FNV-1a hash and actually _do_ hash more than the
+          first character of the sql statement.
+        - check the length of the sql string when deciding whether it is
+          too long for caching, do not use the size of the allocated
+          memory area, which is less useful.
+        - use less mind-boggling but safer method to pass return values to perl.
+
+1.05  Sun Jun 21 07:13:25 CEST 2009
+	- check statement handles for active state, to avoid using
+          a cached statement handle that is currently active
+          (good for recursive invocations, and threads).
+        - allow cache sizes of 0, do not crash.
+        - reduce max cached statement length from 8k to 4k.
+
+1.04  Sun Jun 21 02:27:46 CEST 2009
+        - be more Coro/thread friendly by actually making a copy of the
+          database handle inside sql_exec.
+	- use croak for error reporting, not die.
+
+1.03  Sat Jan 19 09:56:26 CET 2008
+	- work around API changes in perl 5.10.
+
+1.02  Fri Mar  3 15:11:23 CET 2006
+	- fixed a bug with argument passing to connect_cached in checked_dbh.
+	- sqlite sql_insertid support.
+        - added Changes file.
+
+1.0   Thu Sep  1 10:53:32 CEST 2005
+	- avoid some cast warnings.
+        - it has been extremely well-tested, so bump to 1.0.
+
+0.143 Wed Jan 28 20:03:52 MET 2004
+        - force bind-variables to utf8 before binding (for sql_u*)
+          (Stefan Traby).
+
+0.142 Thu Nov  7 02:57:30 CET 2002
+	- work around what looks like a memory leak inside
+          DBI when execute is called with tied hashelements.
+
+0.141 Fri Aug  2 05:29:31 CEST 2002
+	- only "small" (<8k size) statements are cached, larger ones
+          are thrown away on the assumption that these won't likely be
+          repeated.
+
+0.14  Wed Jun 26 03:42:30 CEST 2002
+	- the sql_*fetch* functions now make mortal copies of
+          the values returned by DBI. This is slower but ensures
+          correctness in spite of perl's own optimizations ;)
+
+0.131 Wed Apr 10 21:56:56 CEST 2002
+	- removed references to using $DBH in the callers package, which
+          doesn't work.
+
+0.13  Wed Feb 27 05:29:06 CET 2002
+	- sql_u* functions were not forcing utf8 on their return values.
+
+0.1241 Mon Dec 31 04:03:37 CET 2001
+	- mysql_client_found_rows set by default on mysql-connects.
+
+0.124 Sat Aug 11 03:02:45 CEST 2001
+	- new methods sql_uexec, sql_ufetch, sql_ufetchall that force/upgrade
+          to utf8.
+        - added COPYING.
+
+0.121 Mon Feb 12 16:56:21 CET 2001
+	- set InactiveDestroy for all handles in reinitialize instead
+          of closing them.
+
+0.12  Mon Feb  5 13:42:20 CET 2001
+	- seperated from the PApp package.
+        - fixes for 5.005 compatibility.
+        - renamed $database to $Database.
+
+Changes done while this was a part of PApp include:
+        
+0.11 <Unreleased PApp version>
+	- 5.005-ified SQL/SQL.xs.
+
+0.10 <Unreleased: missing license. Write to marco@toytest.com for complaints>
+	- PApp::SQL now tries to reconnect twice.
+
+0.08  Sun Jun 18 23:53:50 CEST 2000
+	- fixed memory corruption bug in SQL.xs that happens
+	  because mod_perl BOOT:'s the same object twice :(
+	- PApp::Env and PApp::SQL should be more resistent to restarts.
+        - PApp::SQL::*fetch methods call finish on the statement handle,
+          as does sql_exec in void context.
+
+Even older, prehistoric versions of this module under other names
+obviously had no Changes file (that's why it's called _pre_historic).
+
+

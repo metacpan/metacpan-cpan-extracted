@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<REPOSITORYSUMMARY>
+  <SOFTPKG NAME="ANSIColor" VERSION="1,11,0,0">
+    <TITLE>ANSIColor</TITLE>
+    <ABSTRACT>Color output using ANSI escape sequences</ABSTRACT>
+    <AUTHOR>Russ Allbery (rra@stanford.edu)</AUTHOR>
+    <IMPLEMENTATION>
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+      <CODEBASE HREF="Term-ANSIColor-1.11-PPM56.tar.gz" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+      <CODEBASE HREF="Term-ANSIColor-1.11-PPM58.tar.gz" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="AppConfig" VERSION="1,63,0,0">
+    <TITLE>AppConfig</TITLE>
+    <ABSTRACT>AppConfig is a bundle of Perl5 modules for reading configuration files and parsing command line arguments.</ABSTRACT>
+    <AUTHOR>Andy Wardley, (abw@wardley.org)</AUTHOR>
+    <IMPLEMENTATION>
+      <DEPENDENCY NAME="File-HomeDir" VERSION="0,57,0,0" />
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+      <CODEBASE HREF="AppConfig-1.63-PPM56.tar.gz" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+      <DEPENDENCY NAME="File-HomeDir" VERSION="0,57,0,0" />
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+      <CODEBASE HREF="AppConfig-1.63-PPM58.tar.gz" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="Archive-Tar" VERSION="1,30,0,0">
+    <TITLE>Archive-Tar</TITLE>
+    <ABSTRACT>Manipulates TAR archives</ABSTRACT>
+    <AUTHOR>Jos Boumans (kane@cpan.org)</AUTHOR>
+    <IMPLEMENTATION>
+      <DEPENDENCY NAME="File-Spec" VERSION="0,82,0,0" />
+      <DEPENDENCY NAME="IO-String" VERSION="0,0,0,0" />
+      <DEPENDENCY NAME="IO-Zlib" VERSION="1,01,0,0" />
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+      <CODEBASE HREF="Archive-Tar-1.30-PPM56.tar.gz" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+      <DEPENDENCY NAME="File-Spec" VERSION="0,82,0,0" />
+      <DEPENDENCY NAME="IO-String" VERSION="0,0,0,0" />
+      <DEPENDENCY NAME="IO-Zlib" VERSION="1,01,0,0" />
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+      <CODEBASE HREF="Archive-Tar-1.30-PPM58.tar.gz" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="Bit-Vector" VERSION="6,4,0,0">
+    <TITLE>Bit-Vector</TITLE>
+    <ABSTRACT>Efficient bit vector, set of integers and ``big int'' math library</ABSTRACT>
+    <AUTHOR>Steffen Beyer (sb@engelschall.com)</AUTHOR>
+    <IMPLEMENTATION>
+      <DEPENDENCY NAME="Carp-Clan" VERSION="5,3,0,0" />
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+      <CODEBASE HREF="Bit-Vector-6.4-PPM56.tar.gz" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+      <DEPENDENCY NAME="Carp-Clan" VERSION="5,3,0,0" />
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+      <CODEBASE HREF="Bit-Vector-6.4-PPM58.tar.gz" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="File-HomeDir" VERSION="0,58,0,0">
+    <TITLE>File-HomeDir</TITLE>
+    <ABSTRACT>Get the home directory for yourself or other users</ABSTRACT>
+    <AUTHOR>Adam Kennedy (cpan@ali.as)</AUTHOR>
+    <IMPLEMENTATION>
+      <DEPENDENCY NAME="Win32-TieRegistry" VERSION="0,0,0,0" />
+      <DEPENDENCY NAME="Win32API-Registry" VERSION="0,0,0,0" />
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+      <CODEBASE HREF="File-HomeDir-0.58-PPM56.tar.gz" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+      <DEPENDENCY NAME="Win32-TieRegistry" VERSION="0,0,0,0" />
+      <DEPENDENCY NAME="Win32API-Registry" VERSION="0,0,0,0" />
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+      <CODEBASE HREF="File-HomeDir-0.58-PPM58.tar.gz" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="Win32-TieRegistry" VERSION="0,25,0,0">
+    <TITLE>Win32-TieRegistry</TITLE>
+    <ABSTRACT>Powerful and easy ways to manipulate a registry [on Win32 for now]</ABSTRACT>
+    <AUTHOR>Tye McQueen (tye@metronet.com)</AUTHOR>
+    <IMPLEMENTATION>
+      <DEPENDENCY NAME="Win32API-Registry" VERSION="0,24,0,0" />
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+      <CODEBASE HREF="Win32-TieRegistry-0.25-PPM56.tar.gz" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+      <DEPENDENCY NAME="Win32API-Registry" VERSION="0,24,0,0" />
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+      <CODEBASE HREF="Win32-TieRegistry-0.25-PPM58.tar.gz" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="Win32API-Registry" VERSION="0,27,0,0">
+    <TITLE>Win32API-Registry</TITLE>
+    <ABSTRACT>Low-level access to Win32 system API calls from WINREG.H</ABSTRACT>
+    <AUTHOR>Tye McQueen (tye@metronet.com)</AUTHOR>
+    <IMPLEMENTATION>
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+      <CODEBASE HREF="Win32API-Registry-0.27-PPM56.tar.gz" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+      <OS NAME="MSWin32" />
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+      <CODEBASE HREF="Win32API-Registry-0.27-PPM58.tar.gz" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+</REPOSITORYSUMMARY>

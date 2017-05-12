@@ -1,0 +1,38 @@
+# SYNOPSIS
+
+    use Plack::Builder;
+
+    builder {
+        enable "Plack::Middleware::GitReivisionInfo", path => '../repo';
+        $app;
+    };
+
+# DESCRIPTION
+
+[Plack::Middleware::GitRevisionInfo](http://search.cpan.org/perldoc?Plack::Middleware::GitRevisionInfo) will display the git revision
+information in the source of an html document in the following format:
+
+    <!-- REVISION #:... DATE:MM/DD/YYYY -->
+
+# ARGUMENTS
+
+This middleware accepts the following arguments.
+
+## path
+
+This is the path to the git repository. This is a required argument.
+
+# SEE ALSO
+
+[Plack](http://search.cpan.org/perldoc?Plack), [Plack::Middleware](http://search.cpan.org/perldoc?Plack::Middleware), [Moo](http://search.cpan.org/perldoc?Moo) 
+
+# AUTHOR
+
+Logan Bell, `<logie@cpan.org>`
+
+# COPYRIGHT & LICENSE
+
+Copyright 2012, Logan Bell
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

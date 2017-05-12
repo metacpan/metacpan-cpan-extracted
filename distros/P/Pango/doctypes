@@ -1,0 +1,4 @@
+# C name        description
+# ------------  ----------------
+PangoRectangle	array reference
+PangoGlyph	integer

@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 a940aa20fee876641208a396e1380c3abb66d373 .gitignore
+SHA1 eab1fd6d0dbb8a49e4ec49eb8d49e525b8e70cac Changes
+SHA1 b0e717be6ea8a6cdaad7bac838f9e83e5133befc MANIFEST
+SHA1 94ded5e862136ef293055a024f7435c3f4bc66b7 MANIFEST.SKIP
+SHA1 e2ea2c66004d9a006e28dc1e03c8ffb2b7b2daa3 META.json
+SHA1 7639669284554e0da96a6cf46a9dc3032773bdb0 META.yml
+SHA1 a3c39a25d64c62b36bf68af425d41a588da68e11 Makefile.PL
+SHA1 51169a0ab6e401a7bc6b923369a9ee0602460071 README
+SHA1 087aad54e041ba05b53256e0a4451a43896e3369 lib/Parse/M3U/Extended.pm
+SHA1 0041aa9cc5249bb8409f513223ee3b68bbe3a164 t/01-distribution.t
+SHA1 3d05851bfa08441289be998505041cfda61d1f65 t/data/m3u-1.json
+SHA1 1fc25c06d2a83be6a98c64cb0c98edf9bc71b5c6 t/data/m3u-1.m3u
+SHA1 3b0c5dc6280fbcf2578caff40b5471c80234bc99 t/data/m3u-2.json
+SHA1 1757c8ef3eb29004aa53f5178246c94ace3cf968 t/data/m3u-2.m3u
+SHA1 664e945f5d191fc447049f6d268536547bccc303 t/data/m3u-3.json
+SHA1 568389c18f8acb61d940824507cc486c3a8c6a98 t/data/m3u-3.m3u
+SHA1 0f71611cbb6812558f1d5a3ba15b7543f1cace10 t/data/m3ue-1.json
+SHA1 2823fb4811bfbef7d97cc41f8caf5bca5e4e6ac0 t/data/m3ue-1.m3ue
+SHA1 132690afbc493a1048a05a63c0caf5ab4f221daf t/data/m3ue-2.json
+SHA1 717d4f89d61572a5a26759aa968199ccffb47a53 t/data/m3ue-2.m3ue
+SHA1 40709633805902a94af44e9954b7fa67f41b80ea t/m3u.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJXa9K5AAoJEFDVLxLOThOZoAoQAJIacWKXTMIyVCLZfA/4jlj9
+q/nVosrt7Aq3P4XJRTazovwaKjloTpJtnOU8pyxQL8qq3i+u3+4tPtREyCKwxuj/
+xPB871zOXTBdWdjqn3ZIrtjbss+rr9hSDkiAH5R6oin1TZ5mci0DHq306Qm16bqU
+wwA4egusk48vh767v/vyu3E4lQZN6M2S5A45j5/2i+aD0pz53s3rNaToCGOz3sVR
+GOJZU3pATGAPnuzU3YWng7sBXUOTFXE+zfeAc/aGGhdYEM56LiQs7W+ETogYn5oG
+PvMy0fW3gr2XilL+2jYGU5jvvmdx8j4Q1PZbqHVNeejloF+W7P2OSUvyaqpxsRYo
+1qEUkPStkYBKdaP/N8dM/dEnMSnHunA0p3KS/YRieDWYMTq5YOC7uVJIHWVZ3WA9
+fSe7OFQCt05ePFslE8xDG7NOMvVQCLi87vynjjYrYhh8B6zGCViR6LIxh5a6HfUc
+zElL7vj3a+551qIfMQHeF/iPBNxxNHC4qM7Z7iQQ8W/W+H60Q/nGA+Fu2fzlsyE7
+z1OuSC9r0DPhm4CrBkgbPMoCzP6nmlsdfz9t/vUaUjtMQxYfInHRffAjsUO806eT
+c9j59Vky5N01Cf/tuLw+5xOcyLhY9mSWWbvsVDkGd/jranD31tWLjt45kBTRnIQ+
+WwCX4e5WId2dTPnK6yKP
+=HDIB
+-----END PGP SIGNATURE-----

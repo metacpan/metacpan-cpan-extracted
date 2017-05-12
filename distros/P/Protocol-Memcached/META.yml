@@ -1,0 +1,22 @@
+---
+abstract: 'Support for the memcached binary protocol'
+author:
+  - 'Tom Molesworth <tom@entitymodel.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300023, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Protocol-Memcached
+requires:
+  List::UtilsBy: 0
+  parent: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Protocol-Memcached
+  homepage: http://search.cpan.org/dist/Protocol-Memcached/
+version: 0.004

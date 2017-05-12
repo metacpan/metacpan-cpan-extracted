@@ -1,0 +1,131 @@
+#!/usr/bin/pagsh
+#
+# pkgforge-incoming  This shell script takes care of starting and stopping
+#                    the Package Forge incoming queue processor
+#
+# chkconfig: 2345 10 99
+# description: Package Forge is a software build farm, this is the incoming queue processor part of the suite.
+
+### BEGIN INIT INFO
+# Provides: $pkgforge_incoming
+# Required-Start: $local_fs $network
+# Required-Stop: $local_fs $network
+# Default-Start:
+# Default-Stop: 0 1 2 3 4 5 6
+# Short-Description: start|stop|status|restart PkgForge Incoming Processor
+# Description: control PkgForge Incoming Processor
+### END INIT INFO
+
+[ -f /etc/init.d/functions ] && . /etc/init.d/functions
+[ -f /etc/sysconfig/pkgforge-incoming ] && . /etc/sysconfig/pkgforge-incoming
+
+RETVAL=0
+
+KRB5_KEYTAB=${KRB5_KEYTAB:-/etc/pkgforge/pkgforge_incoming.keytab}
+KRB5_CCACHE=${KRB5_CCACHE:-/var/lib/pkgforge/krb5cache-incoming}
+PIDFILE=${PIDFILE:-/var/run/pkgforge/k5start-incoming.pid}
+SCRIPT=${SCRIPT:-/usr/sbin/pkgforge-incoming}
+RUNAS=${RUNAS:-pkgforge}
+
+start() {
+
+    echo -n $"Starting k5start daemon for PkgForge"
+
+    export KRB5CCNAME=$KRB5_CCACHE
+
+    /sbin/runuser $RUNAS -c "/usr/bin/k5start\
+                         -f $KRB5_KEYTAB\
+                         -U -K10 -t\
+                         -k $KRB5_CCACHE\
+                         -b -p $PIDFILE"
+
+    RETVAL=$?
+    if [ "$RETVAL" -eq 0 ]; then
+        echo_success
+    else
+        echo_failure
+    fi
+
+    echo
+
+    if [ "$RETVAL" -ne 0 ]; then
+        return
+    fi
+
+    sleep 3
+
+    echo -n $"Starting PkgForge Incoming Queue Processor: "
+
+    /sbin/runuser $RUNAS -c "$SCRIPT start"
+
+    RETVAL=$?
+    if [ "$RETVAL" -eq 0 ]; then
+        echo_success
+    else
+        killproc -p $PIDFILE
+        echo_failure
+    fi
+
+    echo
+}
+
+stop() {
+
+    echo -n $"Stopping PkgForge Incoming Queue Processor: "
+
+    $SCRIPT stop
+    RETVAL=$?
+
+    if [ "$RETVAL" -eq 0 ] ; then
+        echo_success
+    else
+        echo_failure
+    fi
+
+    echo
+
+    # Stop the k5start daemon
+
+    echo -n $"Stopping the PkgForge k5start daemon"
+
+    killproc -p $PIDFILE
+
+    echo
+
+}
+
+restart() {
+    stop
+    start
+}
+
+status() {
+
+    $SCRIPT status
+    RETVAL=$?
+
+}
+
+
+# See how we were called.
+case "$1" in
+        start)
+                start
+                ;;
+        stop)
+                stop
+                ;;
+        status)
+                status;
+                ;;
+        restart)
+                restart
+                ;;
+        *)
+                echo $"Usage: $0 {start|stop|status|restart}"
+                [ "x$1" = "x" ] && exit 0
+                exit 2
+esac
+
+exit $RETVAL
+

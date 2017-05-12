@@ -1,0 +1,131 @@
+= Changes for PerlMaple 0.07 (rev 51) - Nov 20, 2009
+
+* applied the POD patch from Frank Wiegand.
+
+= Changes for PerlMaple 0.06 (rev 48) - May 2, 2006
+
+== Core Enhancements
+
+* made warning messages issued by the Maple kernel controllable 
+  (MAPLE_TEXT_WARNING no long directly goes to stderr, but stores 
+  in a buffer controlled by PrintError)
+
+= Changes for PerlMaple 0.05 (rev 46) - Feb 18, 2006
+
+== Documents
+
+* confirmed that PerlMaple works both with Maple 9.02 and 10.00
+* added a note to both README and PerlMaple.pm's POD for this
+* used Kwid to reformat this file (Changes). Kwid++
+* added some new TODOs to POD
+
+= Changes for PerlMaple 0.04 (rev 43) - Feb 6, 2006
+
+== Core Enhancements
+
+* rewrote PerlMaple::Expression's constructor and made its instances 
+  rather "lazy". That is to say, PerlMaple::Expression now won't
+  construct a whole AST at startup time. It only evaluate a specific 
+  part of the AST on the user's *actual* demand. This is really a big
+  win on performance. Yay!
+* added internal methods `init_type' and `init_ops' to PerlMaple::Expression.
+  They're only called on demand of the users.
+* tweaked the tests a bit to remain to pass
+
+== Documents
+
+* updated the POD to reflect recent changes in core
+* added more words for the Maplesoft and its Maple product in the POD
+  (to help Google find this stuff)
+* moved the VERSION section of the POD in PerlMaple.pm to the front of
+  the bloated SYNOPSIS section
+* replaced the ugly `-E<gt>error' and things like that with more elegant
+  `C<error>' or so.
+
+= Changes for PerlMaple 0.03 (rev 38) - Feb 5, 2006
+
+== Core Enhancements
+
+* changed the PerlMaple error message from "PerlMaple error: XXX" to
+  "PerlMaple: XXX". Indeed "errors" always frighten poeple arway.
+* added undocumented and also preliminary support for the LogCmd attribute
+* when Maple returns outputs of the type MAPLE_TEXT_WARNING, PerlMaple 
+  will warn it out instead of return the string as a return value to the
+  Perl programmer. (I'm sure there must be better solutions to this kind
+  of things. :=))
+* fixed a bug concerning zero number of ops
+* added AUTOLOAD mechanism to PerlMaple::Expression so it now autoloads 
+  Maple functions just as PerrlMaple does, which is a big win in syntax!
+  Added POD docs and some tests for this new feature.
+* fixed a bug which manifest itself when a PerlMaple::Expression object
+  is contructed using a Maple assignment statement (say, a command 
+  containing ":=").
+* added more info (the Maple command given) to the carp/croak messages 
+  issued by PerlMaple. It really eases debugging process.
+* improved the operator overloading mechanism so that PerlMaple::Expression
+  objects behave like simple Perl scalar variables. Yeah, simplicity is
+  the key, no extra magic is really needed.
+
+== Documents
+
+* updated my email address in POD to agentzh@gmail.com
+* added new TODO on facilities that imports complex perl data structure
+  to Maple land
+* added one more interesting example to PerlMaple's SYNOPSIS to 
+  demonstrate the elegant AUTOLOAD feature of PerlMaple::Expression.
+* added BUGS sections to both PerlMaple and PerlMaple::Expression's POD,
+  mostly about the sharing of Maple evaluation contexts among PerlMaple
+  objects.
+* updated the outdated "Inline::C" comment to "XS".
+* fixed the indented L<> linking in POD.
+* added $VERSION to PerlMaple/Expression.pm
+* Added TODO about making PerlMaple::Expression objects more "lazy" to 
+  PerlMaple's POD.
+* Removed duplicate code coverage report from PerlMaple::Expression's 
+  POD.
+* Confirmed that this lib won't work with Maple 7. Sigh.
+
+= Changes for PerlMaple 0.02 (rev 11) - Dec 19, 2005
+
+== Core Enhancements
+
+* On the XS side, ignored MAPLE_TEXT_STATUS output so that
+  PerlMaple won't return silly things like
+  "bytes used=1963, alloc=719, time=0.44".
+* Added AUTOLOAD mechanism so that any Maple functions or procedures
+  all automagically become the methods of PerlMaple objects;
+* Renamed ->eval method to ->eval_cmd so that ->eval is exactly the
+  Maple's counterpart.
+* ->eval is not backward-compatible.
+* Added optional options PrintError and RaiseError to the constructor
+* Added attribute methods PrintError and RaiseError
+* Fixed a bug concerning multiple PerlMaple instances creation
+* Added corresponding tests.
+* Added the PerlMaple::Expression class to represents a Maple expression ASTs.
+* PerlMaple::Expression can now build full-featured Perl AST from arbitrary
+  Maple expressions. So you can manipulate Maple expressions via data
+  structures directly, without the burden of parsing Maple code yourself!
+* PerlMaple::Expression provides several useful mehods, such as type, expr,
+  and ops.
+* Added method to_ast to the PerlMaple class, which is construct a
+  PerlMaple::Expression object from the given Maple expression.
+* Added ReturnAST attribute to the PerlMaple class (default off).
+* PerlMaple's AUTOLOADed methods (shortcuts for Maple functions) and the
+  eval_cmd method will return a PerlMaple::Expression object automagically
+  if you turn on the ReturnAST attribute.
+
+== Documents
+
+* Added SVN link 'https://svn.berlios.de/svnroot/repos/win32maple'
+  to the POD doc.
+* Emphasized that Maple's maplec.h and maplec.lib
+  must be in INC and LIB, repectively. Most of the test failure
+  reports are concerning this issue.
+* Added many, many POD docs and many, many tests for the vast variety of
+  new features.
+* Added code coverage testing results to POD docs. (Thanks to Devel::Cover.)
+
+= Changes for PerlMaple 0.01 (rev 1) - Nov 15, 2005
+
+* original version; created by h2xs 1.23
+* basic functionalities implemented

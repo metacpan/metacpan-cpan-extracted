@@ -1,0 +1,27 @@
+# File Postfix.eyp
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+
+%defaultaction { return  "$left $right $op"; }
+
+%%
+line: $exp  { print "$exp\n" }
+;
+
+exp:        $NUM  { $NUM }            
+        |   $VAR  { $VAR }            
+        |   VAR.left '='.op exp.right         
+        |   exp.left '+'.op exp.right         
+        |   exp.left '-'.op exp.right        
+        |   exp.left '*'.op exp.right       
+        |   exp.left '/'.op exp.right      
+        |   '-' $exp %prec NEG { "$exp NEG" }
+        |   '(' $exp ')' { $exp }      
+;
+
+%%
+
+use base qw{CommonTail};
+

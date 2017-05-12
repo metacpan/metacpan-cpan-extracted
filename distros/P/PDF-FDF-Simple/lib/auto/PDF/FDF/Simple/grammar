@@ -1,0 +1,376 @@
+# -*- mode: cperl -*-
+	 {
+		use Compress::Zlib;
+
+		# Local variable init - RJH
+		my $strname;
+		my $strcontent;
+		my $fh = new IO::File;
+
+		# RJH Can't include standard Perl in the parser so define a function
+		# here so it's included in its namespace
+		sub write_file
+		{
+			my($file,$content) = @_;
+
+			my $x = inflateInit()
+			      or die "Cannot create a inflation stream\n";
+			$fh->open(">$file") or die "Failed to create file $file - $!";
+
+			my $buffer = $$content;
+			my $sync = $x->inflateSync($buffer);
+			print "SYNC: $sync\n";
+
+			my($output, $status) = $x->inflate($buffer);
+			print "STATUS:$status\n";
+			print $fh $output;
+			$fh->close();
+		};
+	}
+         startrule : docstart objlist xref(?) 'trailer' '<<' '/Root' objreference /[^>]*/ '>>' /.*/
+                     {
+                       $PDF::FDF::Simple::deferred_result_FDF_OPTIONS = {};
+                       $return = $item{objlist};
+                     }
+
+         xref : 'xref' /\d+/ /\d+/ xrefentry(s)
+
+         xrefentry : /\d+/ /\d+/ /[fn]/
+
+         docstart : /%FDF-[0-9]+\.[0-9]+/ garbage
+                  | # empty
+
+         garbage : /%[^0-9]*/
+                 | # empty
+
+         objlist : obj objlist
+                   {
+                     push ( @{$return}, $item{obj}, @{$item{objlist}} );
+                   }
+                 | # empty
+                   {
+                      $return = [];
+                   }
+
+         type : /\/Type/ /\/(Filespec|Catalog)/
+              | # empty
+
+         obj : /\d+/ /\d+/ 'obj' objbody 'endobj'
+               {
+                 $return = $item{objbody};
+               }
+
+         objbody : '<<' '/FDF' '<<' attributes '/Fields' '[' fieldlist ']' attributes '>>' type(?) '>>'
+                   {
+                     $return = $item{fieldlist};
+                   }
+                 | '[' fieldlist ']'
+                   {
+                     $return = $item{fieldlist};
+                   }
+                 | '<<' '/FDF' '<<' attributes '/Fields' objreference attributes '>>' '>>'
+                   {
+                     $return = [];
+                   }
+                 | '<<' '/F' filename '/EF' '<<' '/F' objreference '>>' '/Type' '/Filespec' '>>'
+                   {
+			$::strname = $item[3];
+			$::strcontent = ''; # clear ready for next file
+                     $return = [];
+                   }
+		| '<<' '/Length' m#\d+# filter(?) subtype(?) params(?) dl(?) stream
+		   {
+			#print "STRNAME = $::strname\nSTRCONTENT = $::strcontent\n";
+			# RJH don't write until FlateDecode developed
+			#&write_file($::strname,\$::strcontent);
+                     $return = [];
+		   }
+		| '<<' '/StemV' m#\d+# stemparams stemstream
+		   {
+			$return = [];
+		   }
+
+	stemparams : stemparam stemparams
+		| # empty
+
+	stemparam : '/' m#\w+#
+
+	stemstream : streamcont 'endstream'
+		{
+		  $return = $item[1];
+		}
+
+	dl : '/DL' m#\d+# '>>'
+
+	filename : '(' name ')'
+		{
+			$return = $item[2];
+		}
+
+# RJH
+	stream : 'stream' streamcont 'endstream'
+               {
+		 $return = $item[2];
+		 1;
+               }
+
+	streamcont : streamline streamcont
+		{
+			$return = $item[1];
+		}
+		| # empty
+
+	streamline : ...!'endstream' m#.*#
+		{
+			$::strcontent .= $item[2];
+			$return = $item[2];
+		}
+
+	filter : '/Filter' filtertype
+
+	filtertype : '/FlateDecode'
+
+	subtype : '/Subtype' '/application#2Fpdf'
+
+	params : '/Params' '<<' paramlist '>>'
+
+	paramlist : param paramlist
+		| # empty
+
+	param : paramname paramvalue(?)
+
+	paramname : '/' m#\w+#
+
+	paramvalue : '(' m#[^)]*# ')'
+		| '<' m#\w*# '>'
+		| m#\w+#
+
+
+
+         objreference : /\d+/ /\d+/ 'R'
+
+         fieldlist : field fieldlist
+                     {
+                       push ( @{$return}, $item{field}, @{$item{fieldlist}} );
+                     }
+	 # TODO: How do I optimize the next two alternatives,
+	 #       which in fact execute the same code?
+	 #       Can the code block be written only once?
+                   | '<<' fieldname kids '>>' fieldlist
+                     {
+                       my $fieldlist;
+                       foreach my $ref ( @{$item{kids}} ) {
+                         my %kids = %{$ref};
+                         foreach my $key (keys %kids) {
+                           push (@{$fieldlist},{$item{fieldname}.".".$key=>$kids{$key}});
+                         }
+                       }
+                       push ( @{$return}, @{$fieldlist}, @{$item{fieldlist}} );
+                     }
+                   | '<<' kids fieldname '>>' fieldlist
+                     {
+                       my $fieldlist;
+                       foreach my $ref ( @{$item{kids}} ) {
+                         my %kids = %{$ref};
+                         foreach my $key (keys %kids) {
+                           push (@{$fieldlist},{ $item{fieldname}.".".$key=>$kids{$key}});
+                         }
+                       }
+                       push ( @{$return}, @{$fieldlist}, @{$item{fieldlist}} );
+                     }
+                   | # empty
+                     {
+                      $return = [];
+                     }
+
+         kids : '/Kids' '[' fieldlist ']'
+                {
+                  $return = $item{fieldlist};
+                }
+
+         field : '<<' fieldname fieldvalue '>>'
+                 {
+                   $return = { $item{fieldname} => $item{fieldvalue} };
+                 }
+               | '<<' fieldvalue fieldname '>>'
+                 {
+                   $return = { $item{fieldname} => $item{fieldvalue} };
+                 }
+               | '<<' fieldname '>>'
+                 {
+                   $return = { $item{fieldname} => undef };
+                 }
+
+         fieldvalue : '/V' '(' <skip:""> value <skip:$item[3]> ')'
+                      {
+                        $return = $item{value};
+                        $return =~ s/\\(\d{3})/sprintf ("%c", oct($1))/eg;         # handle octal
+                        #$return =~ s/\#([0-9A-F]{2})/sprintf ("%c",  hex($1))/eg;   # handle hex
+                      }
+                    | '/V' '[' valarray ']'
+                      {
+                        $return = $item{valarray};
+                      }
+                    | '/V' feature
+                      {
+                        $return = substr ($item{feature}, 1);
+                        $return =~ s/\\(\d{3})/sprintf ("%c", oct($1))/eg;         # handle octal
+                        $return =~ s/\#([0-9A-F]{2})/sprintf ("%c",  hex($1))/eg;   # handle hex
+                      }
+# RJH
+		    | '/V' objreference
+
+         feature :  m!/[^\s/>]*!
+
+         fieldname : '/T' '(' name ')'
+                     {
+                        $return = $item{name};
+                        $return =~ s/\\(\d{3})/sprintf ("%c", oct($1))/eg;         # handle octal
+                        $return =~ s/\#([0-9A-F]{2})/sprintf ("%c",  hex($1))/eg;   # handle hex
+                     }
+
+         valarray : '(' <skip:""> value <skip:$item[2]> ')' valarray
+                      {
+                        push @{$return}, $item{value}, @{$item{valarray}};
+                      }
+                      | # empty
+                      { $return = []; }
+
+	 value : valuechar value
+             {
+               $return = $item{valuechar}.$item{value};
+             }
+           | # empty
+             {
+               $return = "";
+             }
+
+	 # This handles different whitespace artefacts that exist
+	 # in this world and handles them similar to FDFToolkit.
+	 # (Remember: backslashes must be doubled within a Parse::RecDescent grammar,
+	 # except if they occur single.)
+         valuechar : '\\\\'
+                     {
+                       $return = chr(92);
+                     }
+                   | '\\#'
+                     {
+                      $return = "#";
+                     }
+                   | '\\\\r'
+                     {
+                       $return = '\r';
+                     }
+                   | '\\\\t'
+                     {
+                       $return = '\t';
+                     }
+                   | '\\\\n'
+                     {
+                       $return = '\n';
+                     }
+                   | '\\\r'
+                     {
+                       $return = '';
+                     }
+                   | '\\\n'
+                     {
+                       $return = '';
+                     }
+                   | '\\r'
+                     {
+                       $return = chr(13);
+                     }
+                   | '\\n'
+                     {
+                       $return = chr(10);
+                     }
+                   | '\r'
+                     {
+                       $return = '';
+                     }
+                   | '\t'
+                     {
+                       $return = "\t";
+                     }
+                   | ''
+                     {
+                       $return = chr(10);
+                     }
+                   | '\\'
+                     {
+                       $return = '';
+                     }
+                   | /\n/
+                     {
+                       $return = '';
+                     }
+                   |  m/\\/ m/\n/
+                     {
+                       $return = ''
+                     }
+                   | '\\('
+                     {
+                       $return = '(';
+                     }
+                   | '\\)'
+                     {
+                       $return = ')';
+                     }
+	 # The next two rules work closely together:
+	 #
+	 # - the first matches every *single* character 
+	 #   that is in the exclude list of the second rule.
+	 #
+	 # - the second rule matches blocks of
+	 #   successive "non-problematic" characters
+	 #
+	 #   (All the "problematic" chars and chains of them
+	 #   are already handled in the rules above.)
+                   | /[\r\t\n\\ ]/
+                     {
+                       $return = $item[1];
+                     }
+                   | /([^()\r\t\n\\ ]+)/
+                     {
+                       $return = $item[1];
+                     }
+
+         attributes : '/F' '(' <skip:""> value <skip:$item[3]> ')' attributes
+                      <defer: $PDF::FDF::Simple::deferred_result_FDF_OPTIONS->{F} = $item[4];>
+                      {
+                        $return = $item{value};
+                      }
+                    | '/UF' '(' <skip:""> value <skip:$item[3]> ')' attributes
+                      <defer: $PDF::FDF::Simple::deferred_result_FDF_OPTIONS->{UF} = $item[4];>
+                      {
+                        $return = $item{value};
+                      }
+                    | '/ID' '[' idnum(s?) ']' attributes
+                    | # empty
+
+         name : /([^)][\s]*)*/   # one symbol but not )
+
+         idnum : '<' /[\w]*/ '>'
+                 <defer: push (@{$PDF::FDF::Simple::deferred_result_FDF_OPTIONS->{ID}}, $item[1].$item[2].$item[3]); >
+               | '(' idnumchars ')'
+                 <defer: push (@{$PDF::FDF::Simple::deferred_result_FDF_OPTIONS->{ID}}, $item[1].$item{idnumchars}.$item[3]); >
+
+         idnumchar : '\\)'
+                     { $return = $item[1]; }
+                   | '\\('
+                     { $return = $item[1]; }
+                   | '\\\\'
+                     { $return = $item[1]; }
+                   | /[^()]/
+                     { $return = $item[1]; }
+
+         idnumchars : idnumchar idnumchars
+                      {
+                        $return = $item{idnumchar}.$item{idnumchars};
+                      }
+                    | # empty
+                      {
+                        $return = "";
+                      }
+

@@ -1,0 +1,33 @@
+---
+abstract: "Translate datastructures to and from Hessian for\ntransmission via a POE ReadWrite wheel."
+author:
+  - 'William Travis Holton <cromulent2000_eisley@yahoo.de>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Filter-Hessian
+provides:
+  POE::Filter::Hessian:
+    file: lib/POE/Filter/Hessian.pm
+    version: 1.00
+requires:
+  Contextual::Return: 0
+  Exception::Class: 0
+  Hessian::Translator: 1
+  Moose: 0
+  MooseX::Clone: 0
+  Perl::Critic: 0
+  Smart::Comments: 0
+  Test::Class: 0
+  Test::Deep: 0
+  Test::More: 0
+  Test::Perl::Critic: 0
+  YAML: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

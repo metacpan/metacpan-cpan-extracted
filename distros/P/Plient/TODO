@@ -1,0 +1,6 @@
+* make plient act like curl amap
+* timeout support
+* filter handlers by args.( e.g. HTTP::Lite does not support multipart/form−data )
+* proxy support
+* more auth support
+* prettify xml/json/yaml output

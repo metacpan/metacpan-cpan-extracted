@@ -1,0 +1,212 @@
+=encoding utf8
+
+=head1 NAME
+
+perlcommunity - Breve descripción de la comunidad Perl
+
+=head1 DESCRIPCIÓN
+
+Este documento tiene como objetivo proporcionar una visión general de la
+extensa comunidad Perl, demasiado grande y diversa como para poder ofrecer una
+descripción detallada. Si no incluimos algún sector específico, no debe
+entenderse como menosprecio, sino como una omisión en aras de la brevedad.
+
+La comunidad Perl es tan diversa como el lenguaje Perl, y hay una gran cantidad
+de evidencia de que los usuarios de Perl aplican a todo lo que hacen la
+filosofía TMTOWTDI (I<se puede hacer de varias maneras>), no solo a la
+programación. Existen varias maneras de involucrarse en la comunidad: sitios
+web, IRC, listas de correo, etc.
+
+=head2 Cómo entrar en contacto con la comunidad
+
+Existe un directorio central para la comunidad Perl, L<http://perl.org>,
+mantenido por la Fundación Perl (The Perl Foundation,
+L<http://www.perlfoundation.org/>), que además de prestar servicios a diversos
+sitios web de la comunidad, realiza un seguimiento de los mismos.
+
+=head2 Listas de correo y grupos de noticias
+
+No cabe duda de que el desarrollo de Perl se basa en gran medida en el correo
+electrónico. El libro del Camello original se escribió en su mayor parte a
+través de correo electrónico. Actualmente, el desarrollo de Perl se coordina
+mediante listas de correo. El repositorio principal de listas de correo sobre
+Perl se encuentra en L<http://lists.perl.org>.
+
+La mayoría de los proyectos relacionados con Perl tienen configuradas listas
+de correo para los usuarios y contribuyentes. Si no ve un proyecto determinado
+en L<http://lists.perl.org>, visite el sitio web específico del proyecto. La
+mayoría de las listas de correo se archivan en L<http://nntp.perl.org/>.
+
+También encontrará muchos grupos de noticias relacionados con Perl en
+C<comp.lang.perl.*>.
+
+=head2 IRC
+
+La comunidad Perl tiene una presencia bastante importante en IRC. Para los que
+empiezan, tiene su propia red de IRC, L<irc://irc.perl.org>. Un sitio de charla
+informal (no precisamente orientado a ayudar) se encuentra en
+L<irc://irc.perl.org/#perl>. Muchos otros sitios de charla más específicos
+también se encuentran alojados en la red. Encontrará información sobre
+irc.perl.org en el sitio web de la red: L<http://www.irc.perl.org>. Si busca un
+canal #perl más orientado a la ayuda, pruebe L<irc://irc.freenode.net/#perl>.
+El desarrollo de Perl 6 también tiene presencia en
+L<irc://irc.freenode.net/#perl6>. En la mayoría de los canales vinculados con
+Perl encontrará gente amistosa que le indicará un camino a seguir, si lo pide
+amablemente.
+
+Es probable que también encuentre un canal #perl en cualquiera de las grandes
+redes de IRC (DALnet, EFnet), con distintos niveles de actividad.
+
+=head2 Sitios web
+
+Los sitios web sobre Perl son de diversos tipos, pero se engloban en dos
+grandes categorías: foros y sitios de noticias. Hay muchos sitios web
+relacionados con Perl, por lo que aquí solo se mencionan algunos de los más
+importantes de la comunidad.
+
+=head3 Sitios de noticias
+
+=over 4
+
+=item L<http://perl.com/>
+
+En este sitio, dirigido originalmente por O'Reilly Media (la editorial del
+L<libro del Camello|perlbook>), se publican principalmente artículos de
+calidad sobre detalles técnicos de Perl.
+
+=item L<http://blogs.perl.org/>
+
+Muchos miembros de la comunidad tienen un blog sobre Perl en este sitio. Puede
+apuntarse gratuitamente.
+
+=item L<http://perlsphere.net/>
+
+Perlsphere es uno de los diversos agregadores disponibles de blogs sobre Perl.
+
+=item L<http://perlweekly.com/>
+
+Perl Weekly es una lista de correo semanal que informa sobre conferencias,
+lanzamientos y artículos de blog destacados.
+
+=item L<http://use.perl.org/>
+
+use Perl; es un sitio web de noticias/blog sobre Perl al estilo Slashdot que en
+su día cubría toda la información relacionada con Perl, desde actas de las
+reuniones del equipo de diseño de Perl 6 hasta anuncios de conferencias con
+debates (ir)relevantes. Actualmente ya no se actualiza, pero todavía se pueden
+consultar las publicaciones y los comentarios.
+
+=back
+
+=head3 Foros
+
+=over 4
+
+=item L<http://www.perlmonks.org/>
+
+PerlMonks es uno de los mayores foros de Perl, y se describe como "Un lugar que
+permite a los individuos pulir, mejorar y demostrar sus conocimientos de Perl"
+o como "Una comunidad que ayuda a que todos mejoren y aprendan unos de otros".
+
+=item L<http://stackoverflow.com/>
+
+Stack Overflow es un sitio para programadores en el que todos pueden hacer
+preguntas o contestarlas. No se centra exclusivamente en Perl, pero tiene un
+grupo activo de usuarios que hacen lo posible por ayudar a personas que tienen
+dudas sobre programación en Perl.
+
+=item L<http://prepan.org/>
+
+Puede usar PrePAN para pedir que analicen un módulo nuevo suyo antes de
+subirlo a CPAN. Recibirá comentarios sobre el diseño del módulo.
+
+=back
+
+=head2 Grupos de usuarios
+
+En muchas ciudades del mundo hay grupos locales de Perl Mongers. Un grupo de
+Perl Mongers es un grupo de usuarios local que organiza regularmente reuniones
+presenciales, tanto sociales como técnicas, ayuda a organizar conferencias,
+talleres y I<hackathons> locales, y proporciona una lista de correo u otro
+medio de contacto continuo entre sus miembros.
+
+Para localizar el grupo de Perl Mongers (o PM, como se acostumbra a abreviar)
+local o más cercano, consulte el directorio internacional de Perl Mongers en
+L<http://www.pm.org/>.
+
+=head2 Talleres
+
+Los talleres ("workshops") de Perl son, como su nombre indica, eventos en los
+que se enseña Perl de varias maneras. Estos talleres cubren temas que van
+desde la iniciación de principiantes (como la clase "Zero to Perl" del
+Pittsburgh Perl Workshop) hasta temas mucho más avanzados.
+
+Tiene a su disposición varios recursos muy útiles para encontrar talleres:
+los L<Sitios web|"Sitios web"> mencionados anteriormente, el
+L<calendario|"Calendario de eventos Perl"> que se menciona más adelante y el
+sitio web de YAPC Europe, L<http://www.yapceurope.org/>, que es probablemente
+el mejor recurso para los eventos Perl en Europa.
+
+=head2 Hackathons
+
+Un I<hackathon> es un tipo de encuentro muy diferente, donde los I<hackers> de
+Perl se reúnen para hacer lo que el nombre sugiere: I<hackear> (trabajar) sin
+parar durante un período prolongado (que puede ser de varios días) en un
+determinado proyecto (o proyectos). Encontrará información sobre los
+I<hackathons> en el mismo lugar en el que se ofrece información sobre los
+L<talleres|"Talleres">, así como en L<irc://irc.perl.org/#perl>.
+
+Si nunca ha participado en un I<hackathon>, antes de asistir a uno debe saber
+algunas cosas básicas: debe llevar un portátil y saber usarlo; debe haber
+echado un vistazo a los proyectos en los que se va a trabajar; debe tener
+instalado el cliente del sistema de control de versiones necesario; también
+debería llevar material de repuesto (un cable LAN adicional, una regleta de
+alimentación adicional, etc.), ya que siempre habrá alguien a quien se le
+olvide algo.
+
+=head2 Congresos
+
+Hay dos importantes congresos anuales sobre Perl: la Conferencia Perl (que
+ahora forma parte de OSCON), organizada por O'Reilly, y la YAPC (pronunciado
+yap-si, que significa Yet Another Perl Conference), que se celebra en varias
+conferencias YAPC regionales (Norteamérica, Europa, Asia) y constituye una
+impresionante demostración de la comunidad Perl. Para obtener más
+información sobre estas conferencias, visite sus páginas web: OSCON
+L<http://conferences.oreillynet.com/>; YAPC L<http://www.yapc.org>.
+
+La I<Open Source Developers Conference> (OSDC) es una franquicia de
+conferencias relativamente nueva que incluye un porcentaje elevado de charlas
+sobre Perl. Se realizó por vez primera en Australia y recientemente se ha
+extendido también a Israel y Francia. Encontrará más información en:
+L<http://www.osdc.com.au/> (Australia), L<http://www.osdc.org.il> (Israel) y
+L<http://www.osdc.fr/> (Francia).
+
+=head2 Calendario de eventos Perl
+
+The Perl Review (L<http://www.theperlreview.com>) mantiene un sitio web y un
+calendario de Google (L<http://www.theperlreview.com/community_calendar>) que
+permiten hacer un seguimiento de talleres, hackathons y reuniones de Perl
+Mongers, entre otros eventos. Este calendario se puede ver en
+L<http://www.perl.org/events.html> y en L<http://www.yapc.org>.
+
+No todos los eventos o grupos de Perl Mongers figuran en ese calendario, así
+que no se desanime si no ve el suyo publicado. Si desea incluir un evento o
+grupo en la lista, póngase en contacto con brian d foy
+(brian@theperlreview.com).
+
+=head1 AUTOR
+
+Edgar "Trizor" Bering <trizor@gmail.com>
+
+=cut
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

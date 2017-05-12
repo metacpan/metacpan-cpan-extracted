@@ -1,0 +1,87 @@
+Revision history for Perl extension POE::Component::Client::Stomp.
+
+0.01  Thu Aug 30 13:48:39 2007
+    - original version; created by h2xs 1.23 with options
+        -Axc -n POE::Component::Client::Stomp
+
+0.02  03-Oct-2007 K.Esteb
+    - Changed the module to be object oriented. I was having problems with
+      sub classing the module to reduce complexity. I also wanted a dispatcher
+      based on message types. This version does those things.
+
+0.03  09-Oct-2007 K.Esteb
+    - Changed event/method "handle_send" to "send_data", it seemed more
+        syntactically correct with the new "gather_data" event/method.
+      Added successors for stomp, config, host and port.
+      Added a log method, this method currently knows "warn" and "error"
+        levels. This should be overridden by your class, for your preferred
+        logger.
+      Added a event/method "gather_data", it was needed to send the
+        object to the method.
+      Changed the internals to use the new assessors.
+      Added a couple of examples.
+      Made the reconnection code more robust. Probably needs more work.
+
+0.04  15-Oct-2007 K.Esteb
+      Fixed the "Broken pipe" error.
+      Figured out how to require other modules. So Net::Stomp,
+        POE::Filter::Stomp and POE::Component::Client::Stomp::Utils are
+        now required modules.
+      Added a method "handle_shutdown" this should be overridden if specific 
+        stuff needs to be done when a shutdown has been initiated. By default 
+        nothing will be done.
+      Fixed a syntax mistake in the documentation.
+      Added a granulated scheme for reconnection attempts.
+
+0.05  17-Dec-2007 K.Esteb
+      Fixed the "connection timeout" error.
+      Fixed the documentation so it would format correctly.
+      Added an event/method "connection_down" to signal when the active 
+        connection is down. This needs to be overridden. By default nothing
+        will be done.
+      Added tests to make sure everything works correctly. These tests will
+        fail if there is no MQ listening on port 61613 at localhost. Open
+        to suggestions on how to fix this.
+      Fixed Makefile.PL
+
+0.06  16-Apr-2008 K.Esteb
+      Bug fix release for RT #34743, #34742.
+      POE is now a required module. Seems rather obvious, but I had some bug
+        reports on this one.
+      Removed 02_basic.t, Received a bug report on it not working. Sigh, 
+        release 0.05 explains why it may not work. So I guess this "fixes" 
+        the above problem.
+
+0.07  23-Jun-2008 K.Esteb
+      Alejandro Imass made the suggestion that reconnection's should recycle 
+        after they have expired. This version includes his logic to do so.
+
+0.08  15-Dec-2008 K.Esteb
+      Added some new error codes for reconnection attempts.
+
+0.09  24-Jul-2009 K.Esteb
+      Added some more error codes for reconnection attempts.
+
+0.10  04-Nov-2009 K.Esteb
+      Added some more error codes for reconnection attempts.
+      Changed the logic from 0.07 for retrying reconnection's. It didn't seem
+        to work correctly.
+
+0.11  19-Aug-2010 K.Esteb
+      Added a "EnableKeepAlive" config option to set SO_KEEPALIVE at the
+        socket level. 
+      Also added code to set the socket for reasonable levels of 
+        keepalive packet generation. Unfortunately the constants; 
+        TCP_KEEPCNT, TCP_KEEPIDLE and TCP_KEEPINTVL have different values 
+        depending on the OS being used. As such, this feature only 
+        works on Linux and AIX. 
+
+0.12  22-Mar-2012 K.Esteb
+      Improved signal handling.
+      Renamed some of the private events to better conform to other
+        systems.
+      Added a handle_reload() method to repond to HUP signals.
+      The signals INT, TERM and QUIT will now execute the
+        handle_shutdown() method.
+      Added a connection_up event.
+

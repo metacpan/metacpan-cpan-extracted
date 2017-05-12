@@ -1,0 +1,11 @@
+=pod
+
+=sql SQL::Abstract->update(
+  'toto_table',
+  {
+    id => 1,
+    name => 'Edouard',
+  }
+)
+
+=cut

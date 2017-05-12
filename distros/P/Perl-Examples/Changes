@@ -1,0 +1,45 @@
+Revision history for Perl-Examples
+
+0.07    2016-06-26 (PERLANCAR)
+
+	- Add module: Perl::Examples::POD::HTML.
+
+
+0.06    2016-03-21 (PERLANCAR)
+
+        - Add module: Perl::Examples::POD::Text.
+
+        - Fixes.
+
+
+0.05    2016-02-08 (PERLANCAR)
+
+	- Add examples of links in head2 & bullet points.
+
+
+0.04    2016-02-07 (PERLANCAR)
+
+        - Add module: Perl::Examples::POD::Link.
+
+
+0.03    2015-12-31 (PERLANCAR)
+
+	- perl-example-die: Add --warn & --carp.
+
+
+0.02     2015-12-31 (PERLANCAR)
+
+         - Add scripts: perl-example-endless-loop,
+           perl-example-grow-indefinitely.
+
+         - perl-example-die: Add argument to select way of die-ing.
+
+         - perl-example-die: Add --croak to use croak instead of die.
+
+         - perl-example-die: Add coderef & regexp arguments to test
+           Devel::Confess & Carp::Always.
+
+
+0.01     2015-01-06 (PERLANCAR)
+
+         - First release.

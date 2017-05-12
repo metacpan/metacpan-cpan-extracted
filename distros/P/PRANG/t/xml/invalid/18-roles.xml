@@ -1,0 +1,7 @@
+<!-- error: /Node incomplete; expecting: <parens...> <braces>/ -->
+<Octothorpe>
+  <colon/>
+  <caret>
+  </caret>
+  <ampersand><interpunct>42</interpunct></ampersand>
+</Octothorpe>

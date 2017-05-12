@@ -1,0 +1,14 @@
+csv: row*
+
+row:
+  /(= ALL)/
+  value* % /- COMMA/
+  /- (: EOL | CR | EOS)/
+
+value: /- ( double | plain) /
+
+double: /- DOUBLE (: (: DOUBLE DOUBLE | [^ DOUBLE] )* ) DOUBLE /
+
+plain: /- (: [^ COMMA DOUBLE CR NL]* [^ SPACE TAB COMMA DOUBLE CR NL ] )? /
+
+ws: / [ SPACE TAB ] /

@@ -1,0 +1,215 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <title>PkgForge Admin - Platforms</title>
+  <meta name="author" content="Stephen Quinney">
+</head>
+
+<body>
+<h1>PkgForge Admin - Platforms</h1>
+
+<p>For all the following operations you will need to have access to
+the Registry DB as the <em>pkgforge_admin</em> user.</p>
+
+<h2>The platform admin tool</h2>
+
+<p>All platform administration is done using the <em>platform</em>
+command of the <code>pkgforge</code> tool. This will be available on
+any machine which has the PkgForge-Registry software package
+installed, that includes the pkgforge master, website and all package
+builders.</p>
+
+<p>If you need to know the list of available commands you can type:</p>
+
+<pre>
+% pkgforge
+</pre>
+
+<p>and you will get a list like this:</pre>
+
+<pre>
+Available commands:
+
+    commands: list the application's commands
+        help: display a command's help screen
+
+      buildd: Build the next job in the queue
+     buildd2: Build the next job in the queue
+     builder: Manage builder entries in the registry
+    incoming: Process the incoming package queue
+  initserver: Initialise the Package Forge server environment
+    platform: Manage platform entries in the registry
+      submit: Submit a set of source packages for building
+
+</pre>
+
+<p>Further to this you can get help for a command like this:</p>
+
+<pre>
+% pkgforge help platform
+</pre>
+
+<p>Which will give the list of supported command-line options. For
+example:</p>
+
+<pre>
+pkgforge platform [-?] [long options...]
+
+	--configfile        Configuration file
+	--name              Platform name
+	-? --usage --help   Prints this usage information.
+	--architecture      Platform architecture
+</pre>
+
+<p>If you want to know the list of available sub-commands just enter
+the command without anything else, for example:</p>
+
+<pre>
+% pkgforge platform
+</pre>
+
+<p>This gives the following output:</p>
+
+<pre>
+You must specify an action from: activate, add, deactivate, list, setauto
+</pre>
+
+<p>Not all sub-commands will require all command-line options. You
+will be prompted if anything which is required has not been
+specified.</p>
+
+<h3>Configuration</h3>
+
+<p>By default the configuration for the Registry DB access is found in
+the <code>/etc/pkgforge/registry.yml</code> file. This can be changed
+using the <code>--configfile</code> command-line option. The contents
+of that file can be managed using the LCFG pkgforge
+component. Normally the contents should look something like:</p>
+
+<pre>
+--- 
+"host": 'pkgforge'
+"name": 'pkgforge'
+"user": 'pkgforge_admin'
+</pre>
+
+<p>For admin access to the PkgForge database you will need to
+configure the PostgreSQL <code>pg_ident.conf</code>
+and <code>pg_hba.conf</code> files to allow access to
+the <em>pkgforge_admin</em> user. This can be done in the LCFG profile
+for the host which holds the PkgForge Registry DB using the LCFG
+postgresql component like this:</p>
+
+<pre>
+!postgresql.ident               mADD(pkgf1)
+postgresql.idmap_pkgf1          pkgforge
+postgresql.sysname_pkgf1        user1
+postgresql.pgname_pkgf1         pkgforge_admin
+
+!postgresql.hostssl             mADD(pkgf1)
+postgresql.ssldatabase_pkgf1    pkgforge
+postgresql.ssluser_pkgf1        pkgforge_admin
+!postgresql.ssladdress_pkgf1    mHOSTIP(host1.example.org)
+postgresql.sslnetmask_pkgf1     255.255.255.255
+postgresql.sslauthtype_pkgf1    krb5
+!postgresql.sslauthopt_pkgf1    mSET(map=<%postgresql.idmap_pkgf1%>)
+</pre>
+
+<p>Where <code>user1</code> is your system username
+and <code>host1.example.org</code> is your host name. This example
+users Kerberos authentication but a similar setup could be done using
+password authentication.</p>
+
+<h2>List Platforms</h2>
+
+<p>To list all the known platforms use the following command:</p>
+
+<pre>
+% pkgforge platform list
+</pre>
+
+<p>This will return a list which looks something like:</p>
+
+<pre>
+Name	Architecture	Active	Auto
+=====================================
+f13	i386		1	1
+f13	x86_64		1	1
+sl5	i386		1	1
+sl5	x86_64		1	1
+sl6	i386		1	0
+sl6	x86_64		1	0
+</pre>
+
+<p>If a platform is not marked as <em>active</em> then it is not
+possible to register new jobs. If it is marked as <em>active</em> but
+not <em>auto</em> then new jobs will be registered only when
+specifically requested, that platform will not be in the default
+set.</p>
+
+<h2>Adding a new Platform</h2>
+
+<p>Adding a platform is very straightforward. The name of the platform
+and the architecture for which you intend to build packages are
+required, e.g. <code>f13</code> and <code>i386</code>. Unlike with
+LCFG the name of the platform is the same on all architectures. For
+example:</p>
+
+<pre>
+% pkgforge platform add --name f13 --arch i386
+</pre>
+
+<p>Once a platform is added you will need to make it active and add
+builders.</p>
+
+<h2>Activating a Platform</h2>
+
+<p>If a platform is not marked as <em>active</em> then it will not be
+possible to register new build jobs. A new platform starts in the
+inactive state, once a platform is no longer supported it should be
+returned to the inactive state.</p>
+
+<p>To activate a platform do something like the following example:</p>
+
+<pre>
+% pkgforge platform activate --name f13 --arch i386
+</pre>
+
+<h2>Deactivating a Platform</h2>
+
+<p>If a platform is not marked as <em>active</em> then it will not be
+possible to register new build jobs. A new platform starts in the
+inactive state, once a platform is no longer supported it should be
+returned to the inactive state. Once jobs have been registered for a
+platform then to maintain referential integrity it is not possible to
+remove a platform from the DB, instead old platforms are just marked
+as inactive.</p>
+
+<p>To deactivate a platform do something like the following example:</p>
+
+<pre>
+% pkgforge platform deactivate --name f13 --arch i386
+</pre>
+
+<h2>Set a Platform to Automatic</h2>
+
+<p>Once a platform is marked as <em>active</em> it is possible to add
+new jobs by explicitly requesting the platform name or by using
+the <em>all</em> set of platforms. If a platform should be
+automatically included in the default set of platforms (i.e. when a
+user does not make a specific platform request then jobs will be
+registered for the platform) then it must be marked
+as <em>auto</em>. This is done like the following example:</p>
+
+<pre>
+% pkgforge platform setauto --name f13 --arch i386
+</pre>
+
+<h2>Deleting a Platform</h2>
+
+<p>Once jobs have been registered for a platform then to maintain
+referential integrity it is not possible to remove a platform from the
+DB, instead old platforms should just be marked as inactive.</p>
+
+</body>
+</html>

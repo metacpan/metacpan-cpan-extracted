@@ -1,0 +1,52 @@
+---
+abstract: 'PlantUML class diagram syntax parser'
+author:
+  - '@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PlantUML-ClassDiagram-Parse
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  PlantUML::ClassDiagram::Class:
+    file: lib/PlantUML/ClassDiagram/Class.pm
+  PlantUML::ClassDiagram::Class::Base:
+    file: lib/PlantUML/ClassDiagram/Class/Base.pm
+  PlantUML::ClassDiagram::Class::Factory:
+    file: lib/PlantUML/ClassDiagram/Class/Factory.pm
+  PlantUML::ClassDiagram::Class::Method:
+    file: lib/PlantUML/ClassDiagram/Class/Method.pm
+  PlantUML::ClassDiagram::Class::Variable:
+    file: lib/PlantUML/ClassDiagram/Class/Variable.pm
+  PlantUML::ClassDiagram::Parse:
+    file: lib/PlantUML/ClassDiagram/Parse.pm
+    version: '0.1'
+  PlantUML::ClassDiagram::Relation:
+    file: lib/PlantUML/ClassDiagram/Relation.pm
+requires:
+  Class::Accessor::Fast: '0.34'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Kesin11/plantuml_class_digram_parse/issues
+  homepage: https://github.com/Kesin11/plantuml_class_digram_parse
+  repository: git://github.com/Kesin11/plantuml_class_digram_parse.git
+version: '0.1'
+x_contributors:
+  - 'Kenta Kase <kesin1202000@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

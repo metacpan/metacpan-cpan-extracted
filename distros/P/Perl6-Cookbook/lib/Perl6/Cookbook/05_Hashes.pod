@@ -1,0 +1,27 @@
+package Perl6::Cookbook::Hashes;
+
+
+=head1 01 Adding an Element to a Hash
+
+   #!/usr/bin/perl6
+   use v6;
+   
+   # 
+   
+   my %person = (
+       fname => 'Foo',
+       lname => 'Bar',
+   );
+   %person{"fname"}.say;
+   %person{"lname"}.say;
+   
+   %person{"email"} = 'foo@bar.com';
+   %person{"email"}.say;
+   
+
+
+=cut
+
+
+1;
+

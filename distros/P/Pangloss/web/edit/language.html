@@ -1,0 +1,116 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	
+	<head>
+		<title>Pangloss : Editor : Language Detail</title>
+		<link rel="stylesheet" href="/pcie.css"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	</head>
+
+	<body bottommargin="0" topmargin="0" leftmargin="0" rightmargin="0" marginheight="0" marginwidth="0">
+
+		<xi:include href="../header.html"/>
+
+<!-- START OF PAGE BODY .............................................. -->
+		<table border="0" cellpadding="0" cellspacing="0" width="100%" height="90%">
+			<tr><td valign="top" height="19"><span class="vsmall"> </span></td></tr>
+			<tr>
+				<td valign="top" width="15"><span class="vsmall"> </span></td>
+				<td valign="top" petal:if="view">
+					<h1>Language Detail</h1>
+
+					<!--% Petal does not preserve vars set in includes! Must move this to the backend... %-->
+					<!-- xi:include href="../language-error.html"/ -->
+					<p petal:if="view/language/error">
+						<div style="color: red; border: solid 1px red; text-indent: 2px">
+							<?var name="set: lang view/language/error/language"?>
+							<?if name="view/language/error/isInvalid"?>
+								Validation Error:
+								<ul>
+									<li petal:if="view/language/error/isIsoCodeRequired">Language ISO code required<?var name="set: lang/iso_code_error view/language/error/isIsoCodeRequired"?></li>
+									<li petal:if="view/language/error/isNameRequired">Language name required<?var name="set: lang/view/name/error view/language/error/isNameRequired"?></li>
+									<li petal:if="view/language/error/isDirectionRequired">Language direction required<?var name="set: lang/view/direction/error view/language/error/isDirectionRequired"?></li>
+								</ul>
+							<?else?>
+						  	Error:
+								<ul>
+									<li petal:if="view/language/error/isExists">A language with the ISO code &quot;$lang/iso_code&quot; already exists!<?var name="set: iso_code_error view/language/error/isExists"?></li>
+									<li petal:if="view/language/error/isNonExistent">No language with the ISO code &quot;$lang/iso_code&quot; exists!<?var name="set: iso_code_error view/language/error/isNonExistent"?></li>
+								</ul>
+							<?end?>
+						</div>
+					</p>
+
+ 					<?var name="set: can_edit session/user/is_admin"?>
+ 					<?var name="set: lang view/language"?>
+
+					<form method="post" action="language.html" petal:if="lang">
+						<input type="hidden" name="selected_language" value="$lang/key"/>
+						<span petal:if="lang/added"    style="color: green">Language Added.</span>
+						<span petal:if="lang/modified" style="color: green">Language Modified.</span>
+						<span petal:if="lang/removed"  style="color: red"  >Language Removed.</span>
+						<table style="border: solid 1px" width="50%" cellpadding="0" cellspacing="0">
+							<tr>
+								<td align="left" colspan="2" style="background-color: lightblue; border-bottom: solid 1px">Language Details:</td>
+								<td align="right" style="background-color: lightblue; border-bottom: solid 1px"><input petal:if="true: can_edit; false: lang/removed" type="submit" name="remove_language" value="remove language"/> </td>
+							</tr>
+							<tr>
+								<td>ISO Code:</td>
+								<td align="right"><span petal:if="lang/iso_code_error;" style="color: red">X</span></td>
+								<td>
+									<input petal:if="can_edit" type="text" size="20" name="new_language_iso_code" value="$lang/iso_code"/>
+									<span petal:if="false: can_edit" petal:replace="lang/iso_code">iso code</span>
+								</td>
+							</tr>
+							<tr>
+								<td>Language Name:</td>
+								<td align="right"><span petal:if="lang/view/name/error;" style="color: red">X</span></td>
+								<td>
+									<input petal:if="can_edit" type="text" size="20" name="new_language_name" value="$lang/name"/>
+									<span petal:if="false: can_edit" petal:replace="lang/name">name</span>
+								</td>
+							</tr>
+							<tr>
+								<td>Direction:</td>
+								<td align="right"><span petal:if="lang/view/direction/error;" style="color: red">X</span></td>
+								<td>
+									<span class="small" petal:if="can_edit">
+										<div><input type="radio" name="new_language_direction" value="rtl" petal:attributes="checked true: $lang/is_rtl;"/>right-to-left</div>
+										<div><input type="radio" name="new_language_direction" value="ltr" petal:attributes="checked true: $lang/is_ltr;"/>left-to-right</div>
+									</span>
+									<span petal:if="false: can_edit" petal:replace="lang/direction">direction</span>
+								</td>
+							</tr>
+							<tr>
+								<td>Creator:</td>
+								<td>$view/language/creator</td>
+							</tr>
+							<tr>
+								<td>Created:</td>
+								<td><span class="small" petal:content="date: $view/language/date">date</span></td>
+							</tr>
+						</table>
+						<table width="50%" petal:if="true: can_edit; false: lang/removed">
+							<tr>
+								<td align="center"><input type="submit" name="modify_language" value="modify language"/></td>
+							</tr>
+						</table>
+				  </form>
+
+					<div petal:if="false: view/language" class="error">
+						Application Error: no language present in view!
+					</div>
+
+				</td>
+				<td valign="top" petal:if="false: view">
+					<div class="error">Application Error: no view present!</div>
+				</td>
+				<td valign="top" width="15"><span class="vsmall"> </span></td>
+			</tr>
+		</table>
+<!-- END OF PAGE BODY .............................................. -->
+
+	<xi:include href="../footer.html"/>
+
+  </body>
+</html>

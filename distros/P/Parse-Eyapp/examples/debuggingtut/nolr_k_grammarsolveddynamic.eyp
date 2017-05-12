@@ -1,0 +1,82 @@
+%{
+
+=head1 SYNOPSIS 
+
+This example illustrates how to solve the conflict in
+C<nolr_k_grammar.eyp> using 
+the postponed conflict resolution technique.
+
+Compile the grammar with:
+
+                 eyapp -b '' nolr_k_grammarsolveddynamic.eyp
+
+and execute it with:
+
+                ./nolr_k_grammarsolveddynamic.pm -t
+
+
+=head1 SEE ALSO
+
+=over 2
+
+=item * See file C<nolr_k_grammar.eyp>
+
+=item * This is inspired in an example I have seen this example 
+at Pete Jinks page: L<http://www.cs.man.ac.uk/~pjj>
+
+=item * See another solution in file: C<lr_1_grammar.eyp>
+
+=back
+
+=cut 
+
+use base q{DebugTail}; 
+
+%}
+
+%expect 0 1
+
+%semantic token 'c' 'd' 'f' 'x' 'y'
+%tree 
+
+%%
+A: 
+    %name BCd
+    B C 'd' 
+  | %name ECf
+    E C 'f' 
+;
+B:  %name B
+    'x' 'y' dORfconflict
+;
+E:  %name E
+    'x' 'y' dORfconflict
+;
+C: 
+    %name C
+    /* empty */
+  | %name Cs
+    C 'c' 
+;
+
+dORfconflict:
+      /* empty. Just to solve the reduce-reduce conflict */
+      {
+        my $self = shift;
+
+        if (${$self->input()} =~ m{^.*?d}) {
+          $self->YYSetReduce(['c', 'd'], 'B' );
+        }
+        else {
+          $self->YYSetReduce(['c', 'f'], 'E' ); 
+        }
+        undef;
+      }
+;
+
+%%
+
+unless (caller) {
+  my $prompt = 'Try "x y c c c f" and "x y f". Press <CR><CTRL-D> to finish: ';
+  __PACKAGE__->main($prompt)
+}

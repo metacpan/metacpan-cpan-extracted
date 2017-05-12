@@ -1,0 +1,22 @@
+---
+name: POE-Component-PreforkDispatch
+version: 0.101
+author:
+  - 'Eric Waters <ewaters@uarc.com>'
+abstract: Preforking task dispatcher
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Error: 0
+  IO::Capture::Stdout: 0
+  POE: 0.34_01
+  Params::Validate: 0
+provides:
+  POE::Component::PreforkDispatch:
+    file: lib/POE/Component/PreforkDispatch.pm
+    version: 0.101
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,16 @@
+					<div petal:if="view/user/error" class="error">
+						<?if name="view/user/error/isInvalid"?>
+							Validation Error:
+							<ul>
+								<li petal:if="view/user/error/isIdRequired">User id required!</li>
+								<li petal:if="view/user/error/isNameRequired">User name required!</li>
+								<li petal:if="view/user/error/isCreatorRequired">User creator required!</li>
+							</ul>
+						<?else?>
+						  Error:
+							<ul>
+								<li petal:if="view/user/error/isExists">A user with the ID &quot;$view/user/error/user/id&quot; already exists!</li>
+								<li petal:if="view/user/error/isNonExistent">No user with the ID &quot;$view/user/error/user/id&quot; exists!</li>
+							</ul>
+						<?end?>
+					</div>

@@ -1,0 +1,78 @@
+Palm-MaTirelire version 1.0
+===========================
+
+Set of modules to manipulate Palm Ma Tirelire databases.
+
+Palm::MaTirelire
+Palm::MaTirelire::AccountsV1
+Palm::MaTirelire::AccountsV2
+Palm::MaTirelire::Currencies
+Palm::MaTirelire::DBItem
+Palm::MaTirelire::DBItemId
+Palm::MaTirelire::Descriptions
+Palm::MaTirelire::ExternalCurrencies
+Palm::MaTirelire::Modes
+Palm::MaTirelire::SavedPreferences
+Palm::MaTirelire::Types
+
+Palm::BlockPack
+Palm::FieldPack
+
+See directory tools for examples of use.
+
+INSTALLATION
+
+1. First of all, I don't provide any support for the use of these
+   scripts/modules in the case of a personnal use: I don't have enough
+   time.
+
+   If you plan to do a public project, I will help you...
+
+2. If you want to use the M1->M2 converter or the M2 import/export
+   scripts, you must have perl 5.8.0 or later installed. You can
+   verify this by launching : perl -v.
+
+3. You have to install the perl Palm module.
+
+   http://search.cpan.org/dist/p5-Palm/
+
+   If you want to use the M1->M2 converter or the M2 import/export
+   scripts, you have to install at least the 1.006 version of this
+   module.
+
+4. To install Ma Tirelire modules type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+   Note that this module is not yet documented... If someone has
+   more time than me, I accept his help ;-)
+
+   In the tools directory, you will find M1toM2.pl script (that can be
+   used as a CGI too) and exportM2.pl CGI script.
+
+   * M1toM2.pl is the script used by the M1 to M2 converter at
+     https://ma-tirelire.net/m1tom2.html
+     This script needs the following perl module:
+     - Archive::Zip
+
+   * exportM2.pl is the script used by the M2 into CSV exporter at
+     https://ma-tirelire.net/export.html
+     This script needs the following perl module:
+     - Archive::Zip
+     - Text::CSV_XS
+     - Locale::Recode
+
+DEPENDENCIES
+
+This module requires the module p5-Palm to be installed.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Maxime Soulé
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

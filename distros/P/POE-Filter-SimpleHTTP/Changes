@@ -1,0 +1,12 @@
+Revision history for POE-Filter-SimpleHTTP : 0.091710
+
+0.091710  2009-06-20 18:43:13 UTC
+        Fix bug with regards to un-network-newline terminated messages
+
+0.091700  2009-06-19 23:02:23 UTC
+        Add clone method
+        Switch to Dist::Zilla for distribution building
+
+0.01    
+        First version, released on an unsuspecting world.
+

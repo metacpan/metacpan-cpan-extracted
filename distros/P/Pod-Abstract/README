@@ -1,0 +1,41 @@
+Pod-Abstract
+
+Pod::Abstract provides an abstract, tree-based interface to perl POD
+documents. This allows straightforward, round-trip capable
+manipulation of POD documents, hence allowing features to be added to
+POD to support your programming activities without having to write a
+whole POD processor.
+
+This also allows an easy tree-based mechanism to write a Pod::<format>
+type filter.
+
+The package includes a simple, and extensible, command line utility
+called "paf" (Pod::Abstract Filter). This program can chain together
+Pod Abstract filtering operations, allowing manipulation & extraction
+of POD documents from the command line.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Pod::Abstract
+    perldoc /usr/bin/paf
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Ben Lilburne
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

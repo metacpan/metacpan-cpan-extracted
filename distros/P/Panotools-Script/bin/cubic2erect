@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Panotools::Script;
+use File::Spec;
+use Image::Size;
+
+my @images = @ARGV;
+die "usage\n  $0 front.tif right.tif back.tif left.tif up.tif down.tif equirectangular.tif\n" unless scalar @images == 7;
+
+my $out = File::Spec->rel2abs ($ARGV[6]);
+
+my ($face, $face2) = imgsize ($ARGV[3]);
+
+my $pano = new Panotools::Script;
+
+my $height = int ($face * 3.1416 / 2);
+my $width = $height * 2;
+
+$pano->Panorama->Set (v => 360, f => 2, u => 0, w => $width, h => $height, n => "\"TIFF c:DEFLATE\"");
+
+$pano->Image->[0] = new Panotools::Script::Line::Image;
+$pano->Image->[0]->Set (v => 90, w => $face, h => $face, f => 0, r => 0, p => 0, y => 0, n => "\"" . File::Spec->rel2abs ($images[0]) . "\"");
+
+$pano->Image->[1] = new Panotools::Script::Line::Image;
+$pano->Image->[1]->Set (v => 90, w => $face, h => $face, f => 0, r => 0, p => 0, y => 90, n => "\"" . File::Spec->rel2abs ($images[1]) . "\"");
+
+$pano->Image->[2] = new Panotools::Script::Line::Image;
+$pano->Image->[2]->Set (v => 90, w => $face, h => $face, f => 0, r => 0, p => 0, y => 180, n => "\"" . File::Spec->rel2abs ($images[2]) . "\"");
+
+$pano->Image->[3] = new Panotools::Script::Line::Image;
+$pano->Image->[3]->Set (v => 90, w => $face, h => $face, f => 0, r => 0, p => 0, y => 270, n => "\"" . File::Spec->rel2abs ($images[3]) . "\"");
+
+$pano->Image->[4] = new Panotools::Script::Line::Image;
+$pano->Image->[4]->Set (v => 90, w => $face, h => $face, f => 0, r => 0, p => 90, y => 0, n => "\"" . File::Spec->rel2abs ($images[4]) . "\"");
+
+$pano->Image->[5] = new Panotools::Script::Line::Image;
+$pano->Image->[5]->Set (v => 90, w => $face, h => $face, f => 0, r => 0, p => -90, y => 0, n => "\"" . File::Spec->rel2abs ($images[5]) . "\"");
+
+my $pto_temp = "$out.cubic2erect.$$.pto";
+$pano->Write ($pto_temp);
+system ('nona', '-o', $out, $pto_temp);
+unlink $pto_temp;
+
+
+__END__
+
+=head1 NAME
+
+cubic2erect - Utility to convert six cube faces to equirectangular
+
+=head1 Synopsis
+
+  cubic2erect front.tif right.tif back.tif left.tif up.tif down.tif equirectangular.tif
+
+=head1 DESCRIPTION
+
+'cubic2erect' is a command-line utility program for converting six cube faces
+to a single TIFF format equirectangular file suitable for viewing with
+'panoglview'.
+
+Input files must be JPEG, PPM or TIFF format, output is in TIFF format.
+
+=head1 Calling syntax
+
+  cubic2erect <front> <right> <back> <left> <up> <down> <TIFF-file>
+
+=head1 License
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 See Also
+
+L<http://panotools.sourceforge.net/>
+
+=head1 Author
+
+Bruno Postle, E<lt>bruno (at) postle.netE<gt>
+
+=cut

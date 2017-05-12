@@ -1,0 +1,221 @@
+
+=head1 Acceptance Test Suite for PBS.
+
+The acceptance tests is a suite of automated tests that testes most of
+the functionality in PBS. This document first gives an overview of the
+tests, and then describes the framework for the test suite and how to
+add additional test cases.
+
+=head2 Overview of the Tests
+
+The test suite can be divided in two sections, basic funtionality and
+rebuild correctness.
+
+Basic functionality is tested with just one or a couple of
+functionality aspects at a time.
+
+Rebuild correctness is that the correct set of nodes is rebuilt in a
+build. Different types of dependency graphs is tested, with
+some nodes modified and some unchanged in different combinations.
+
+Here is a list of in which files the different types of tests resides.
+
+=head3 Basic functionality
+
+=over
+
+=item * Build rules
+
+F<t/Rules/*.pm>
+
+=item * AddConfig, AddConfigTo
+
+F<t/Misc/AddConfig.pm>
+
+=item * PbsUse
+
+F<t/Misc/PbsUse.pm>
+
+=item * SubPbs files
+
+F<t/Misc/Subpbs.pm>
+
+=item * Node types
+
+F<t/Misc/Nodetypes.pm>
+
+=item * Source directories
+
+F<t/Misc/SourceDirectory.pm>
+
+=item * Targets
+
+F<t/Misc/Targets.pm>
+
+=item * Extra dependencies (changing the digest)
+
+F<t/Misc/ExtraDependencies.pm>
+
+=item * C dependency graph
+
+F<t/Misc/CDependencyGraph/*.pm>
+
+=item * Triggers
+
+F<t/Misc/Triggers/*.pm>
+
+=item * Warp
+
+F<t/with_warp*.t>
+
+=item * Command line flags
+
+F<t/Misc/CommandLineFlags.pm>
+
+=item * Error handling
+
+F<t/ErrorHandling/*.pm>
+
+=back
+
+=head3 Rebuild correctness
+
+F<t/Correctness/*.pm>
+
+=head2 Framework
+
+The framework uses the modules C<Test::Class>, C<Test::More>,
+C<Test::Harness>, and indirectly C<Test::Builder>, for the infrastructure.
+C<Test::Class> is a xUnit-style test framework that is used for
+organizing and executing tests. C<Test::More> is used to expressing
+the testing conditions. C<Test::More> uses C<Test::Builder> as a backend.
+C<Test::Harness> collects the results of the tests, reports them and
+presents statistics.
+
+Additionally, the module C<Test::Cmd> supplies the mechanics
+of setting up a testing environment for each test case, creating test
+files and running PBS and other programs.
+
+=head3 Organization
+
+First, there is a number of classes inheriting from C<Test::Class>, each
+containing a collection of test cases that together test a specific
+aspect of PBS.
+
+Second, there is a number of F<.t>-files. Each F<.t>-file runs all
+testes in all classes. This is done by using the module C<t::AllTests>
+which enumerates all test classes. The difference between the
+F<.t>-files is that they represents different configurations of PBS.
+Before they start running the tests they set the configuration to use.
+There is one exception from this. The F<.t>-file F<t/run_many_times.t>
+runs just a few of all the test cases, but repeats them multiple times.
+
+Finally, there is the script F<pbs-test> that runs all test cases in
+all configurations by running all the F<.t>-files. This script accepts
+some switches that controls the amount of output shown during the
+tests. Run C<pbs-test --help> to read about the switches.
+
+This organization makes it possible to run the tests from
+C<Module::Build>, C<CPan> and others as part of an automated installation
+process.
+
+In the individual test classes there is a number of methods, each
+constituting one test case. The methods express the testing
+conditions by using functions in C<Test::More>. One such condition is
+the atomic unit of the test suite, one test. Tests fail and succeed in
+this unit, and the results and statistics presented by C<Test::Harness>
+have this unit. A test case method is marked as such by using the
+attribute S<C<Test(num_tests)>>, where num_tests is the number of tests in
+the test case.
+
+Each test class can also have a startup, a setup, a teardown and a
+shutdown method, marked with corresponding attributes (see
+C<Test::Class>. The startup method is executed before all the tests cases in
+the class. The shutdown method is executed after all the tests cases in
+the class. The setup method is executed before each test case and the
+teardown is executed after each test case. The most used method is the
+setup method, where the testing environment for each test case is
+setup.
+
+Tests can be marked as todo tests. A todo test is expected to fail, and
+if it would succeed, it would be reported. This can be used for
+marking things that does not work for the moment, but will be fixed
+later on. If one just comments out the failing test case, to make the
+tests pass, there is a big chance one forgets the failing test. Look at
+the documentation for C<Test::More> to read more about todo tests.
+
+=head3 Testing Utilities
+
+The class C<t::PBS> supplies some functionality that is used by most of
+the test cases. It inherits from C<Test::Cmd> and customizes that
+functionality to PBS. It also adds functionality not present in
+C<Test::Cmd>. C<t::PBS> creates a temporary directory that can be used
+to host all test files created during the execution of a test case.
+After the test case is finished, the directory is removed. The class
+can also run arbitrary commands and capturing the output.
+
+=head3 Code Coverage Metrics
+
+The test suite has support for generating code coverage metrics using
+the module C<Devel::Cover>. That can be achived for instance using
+C<Module::Build> and issuing the command C<./Build testcover>.
+
+Internally, that works as follows. If the tests are started with the
+environment variable C<HARNESS_PERL_SWITCHES> set to
+C<'-MDevel::Cover'>, that is, the tests are running under C<Devel::Cover>
+and C<Test::Harness>, then the sub Perl processes is started
+with C<Devel::Cover> too, with the coverage data base path set to
+F<./cover_db>. Then coverage data will be collected for PBS too.
+
+=head2 Files
+
+Here is a summary of the files in the test suite.
+
+=over
+
+=item * F<documentation.pod> - The source of this document.
+
+=item * F<pbs-test> - A script that runs the whole test suite.
+
+=item * F<t/AllTests.pm> - Module which enumerates all test classes.
+
+=item * F<t/PBS.pm> - Utility class used by the test classes.
+
+=item * F<t/TestClassTemplate.pm> - Template for a test class.
+
+=item * F<t/*.t> - Scripts that run test cases under different configurations.
+
+=item * F<t/*/*.pm> - Test classes.
+
+=back
+
+=head2 Adding a test case
+
+If the test case should be added to an existing test class, just add a
+method in the class.
+
+If the test case should be added to a new class, there are more steps
+involved. Here is the recommended way of doing this:
+
+=over
+
+=item 1. Copy the template class file F<t/TestClassTemplate.pm>
+to a new file.
+
+=item 2. Change the package header to reflect the new name.
+
+=item 3. Change the name in the setup method and do more customizations if
+needed.
+
+=item 4. Add the new class to the list in F<t/AllTests.pm>.
+
+=item 5. Write the test case in a test method in the class.
+
+=back
+
+Look at existing test cases, for instance
+F<t/Misc/ExtraDependencies.pm> to see common techniques for testing PBS,
+and look at the documentation for C<t::PBS> to see which utilities
+already exist.
+
+=cut

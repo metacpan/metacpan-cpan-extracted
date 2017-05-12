@@ -1,0 +1,36 @@
+Release history for Perl::Critic::OTRS
+======================================
+
+0.07  2015-01-25
+
+  [TESTS]
+  * Skip 09_prohibit_core_functions.t on Windows. On machines with multiple Perls installed, this test fails. (Ramanan Balakrishnan)
+
+0.06  2015-01-15
+
+  [MISC]
+  * Add metaresources
+  * Add TODO
+
+0.05    30 Aug 2013
+        + added more tests
+        + added new theme: 
+            - otrs_lt_3_3 as new methods were introduced in OTRS 3.3 (RequireBaseClass)
+            - old policies belong to themes otrs and otrs_lt_3_3
+        + added new policy:
+            - ProhibitPushISA (theme: otrs)
+
+0.04    28 Aug 2013
+        + fix typo in module name (Precendece -> Precedence) (Michiel Beijen)
+        + fix variable name (Michiel Beijen)
+
+0.03    01 Apr 2013
+        + Only run tests for Code in Kernel/Modules (Martin Gruner)
+        + other code improvements (Martin Gruner)
+
+0.02    05 Jan 2012
+        + fix some bugs
+        + add tests
+
+0.01    23 Dec 2010
+        + initial release

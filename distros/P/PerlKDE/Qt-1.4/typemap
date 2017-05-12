@@ -1,0 +1,112 @@
+bool => bool
+bool& => boolptr &
+uint => uint
+unsigned => uint
+int => int
+long => long
+char => char
+char* => cstring
+const char* => cstring
+int* => intptr
+bool* => boolptr
+float* => floatptr
+
+qt_QString = const char *
+qt_QString_ptr = const char *
+qt_QString_ref = const char *
+qt_const_QString_ref = const char *
+qt_const_QString_ptr = const char *
+QString => qt_QString
+QString* => qt_QString_ptr
+QString& => qt_QString_ref
+const QString => qt_const_QString_ref
+const QString* => qt_const_QString_ptr
+const QString& => qt_const_QString_ref
+
+double => double
+float => float
+int& => intref
+QStrList => qt_QStrList_ptr &
+QStrList* => qt_QStrList_ptr
+QStrList& => qt_QStrList_ptr &
+const QStrList* => qt_QStrList_ptr
+const QStrList& => qt_QStrList_ptr &
+const QObjectList* => qt_QObjectList_ptr
+const QByteArray& => qt_QByteArray_ptr &
+const QFileInfo& => qt_QFileInfo_ptr &
+
+qt_QStrList_ptr = (QStrList*)
+enum = (int)
+qt_HVorientation = (int)
+
+BGMode => enum
+GUIStyle => enum
+ArrowType => enum
+BrushStyle => enum
+HANDLE => uint
+PenStyle => enum
+QCOORD => int
+QRgb => uint
+RasterOp => enum
+WFlags => uint
+WId => uint
+
+QRgb* => qt_uintarray
+
+QBoxLayout::Direction => enum
+QCheckListItem::Type => enum
+QColor::Spec => enum
+QComboBox::Policy => enum
+QDir::FilterSpec => enum
+QDir::SortSpec => enum
+QDragObject::DragMode => enum
+QFileDialog::Mode => enum
+QFont::CharSet => enum
+QFont::StyleHint => enum
+QHeader::Orientation => qt_HVorientation
+QIconSet::Mode => enum
+QIconSet::Size => enum
+QImage::Endian => enum
+QLCDNumber::Mode => enum
+QLCDNumber::SegmentStyle => enum
+QLineEdit::EchoMode => enum
+QListView::WidthMode => enum
+QMainWindow::ToolBarDock => enum
+QMenuBar::Separator => enum
+QMessageBox::Icon => enum
+QPixmap::Optimization => enum
+QPrinter::ColorMode => enum
+QPrinter::Orientation => qt_HVorientation
+QPrinter::PageOrder => enum
+QPrinter::PageSize => enum
+QRegion::RegionType => enum
+QScrollBar::Orientation => qt_HVorientation
+QScrollView::ResizePolicy => enum
+QScrollView::ScrollBarMode => enum
+QSlider::Orientation => qt_HVorientation
+QSlider::TickSetting => enum
+QSocketNotifier::Type => enum
+QSplitter::Orientation => qt_HVorientation
+QSplitter::ResizeMode => enum
+QTabBar::Shape => enum
+QToolBar::Orientation => qt_HVorientation
+QValidator::State => enum
+QWidget::BackgroundMode => enum
+QWidget::FocusPolicy => enum
+QWidget::PropagationMode => enum
+
+QByteArray => qt_QByteArray_ptr &
+
+qt_QObjectList_ptr = QObjectList *
+qt_QWidgetList_ptr = QWidgetList *
+
+const QFileInfoList* => qt_QFileInfoList_ptr
+QObjectList* => qt_QObjectList_ptr
+QWidgetList* => qt_QWidgetList_ptr
+QArray<QRect> => qt_QArray_QRect_ptr &
+QListT<QTab>* => qt_QTabList_ptr
+
+Display* => ptr
+void* => ptr
+
+ptr => void*

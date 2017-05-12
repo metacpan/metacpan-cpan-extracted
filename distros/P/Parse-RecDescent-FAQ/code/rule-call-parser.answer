@@ -1,0 +1,31 @@
+
+#!/usr/local/bin/perl -w
+use strict;
+use Parse::RecDescent;
+
+$::RD_ERRORS = 1;
+$::RD_WARN = 1;
+$::RD_HINT = 1;
+
+our $text_to_parse = "";
+
+my $grammar1 = q{
+[...]
+}
+
+our $inner_parser = new Parse::RecDescent($grammar1);
+
+my $grammar2 = q{
+[...]
+
+rule: TEXT
+	{
+	  $text_to_parse = $item{TEXT};
+          if (defined $text_to_parse) { print "executing inner parse...\n"; }
+          my $p_text = $inner_parser->startrule($text_to_parse);
+	}
+
+[...]
+
+}
+

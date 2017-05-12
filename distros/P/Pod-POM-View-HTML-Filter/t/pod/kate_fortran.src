@@ -1,0 +1,30 @@
+=begin filter kate Fortran
+
+    ! Exemple de computed GO TO
+       10 PRINT *, 'Entrez un entier entre 1 et 8:'
+          READ  *, i
+          GO TO (100,200,300,400,500,600,700,800) i
+          PRINT *, 'Ce nombre ne correspond pas'
+          GO TO 10 ! redemande un nombre, ad lib.
+
+=end filter
+__RESULT__
++kate
+<html><body bgcolor="#ffffff">
+<pre>    ! Exemple de computed <span class="k-keyword">GO</span> <span class="k-keyword">TO</span>
+       <span class="k-decval">10</span> <span class="k-function">PRINT</span> <span class="k-keyword">*</span>, <span class="k-string">'Entrez un entier entre 1 et 8:'</span>
+          <span class="k-function">READ</span>  <span class="k-keyword">*</span>, i
+          <span class="k-keyword">GO</span> <span class="k-keyword">TO</span> (<span class="k-decval">100</span>,<span class="k-decval">200</span>,<span class="k-decval">300</span>,<span class="k-decval">400</span>,<span class="k-decval">500</span>,<span class="k-decval">600</span>,<span class="k-decval">700</span>,<span class="k-decval">800</span>) i
+          <span class="k-function">PRINT</span> <span class="k-keyword">*</span>, <span class="k-string">'Ce nombre ne correspond pas'</span>
+          <span class="k-keyword">GO</span> <span class="k-keyword">TO</span> <span class="k-decval">10</span> <span class="k-comment">! redemande un nombre, ad lib.</span></pre>
+</body></html>
+__RESULT__
+-kate
+<html><body bgcolor="#ffffff">
+<pre>    ! Exemple de computed GO TO
+       10 PRINT *, 'Entrez un entier entre 1 et 8:'
+          READ  *, i
+          GO TO (100,200,300,400,500,600,700,800) i
+          PRINT *, 'Ce nombre ne correspond pas'
+          GO TO 10 ! redemande un nombre, ad lib.</pre>
+</body></html>

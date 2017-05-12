@@ -1,0 +1,77 @@
+NAME
+    POE::Declare::Log::File - A simple HTTP client based on POE::Declare
+
+SYNOPSIS
+        # Create the web server
+        my $http = POE::Declare::Log::File->new(
+            Filename => '/var/log/my.log',
+            Lazy     => 1,
+        );
+        
+    # Control with methods
+        $http->start;
+        $http->GET('http://google.com');
+        $http->stop;
+
+DESCRIPTION
+    This module provides a simple logging module which spools output to a
+    file, queueing and batching messages in memory if the message rate
+    exceeds the responsiveness of the filesystem.
+
+    The implementation is intentionally minimalist and has no dependencies
+    beyond those of POE::Declare itself, which makes this module useful for
+    simple utility logging or debugging systems.
+
+METHODS
+  new
+        my $server = POE::Declare::Log::File->new(
+            Filename      => 
+            ShutdownEvent => \&on_shutdown,
+        );
+
+    The "new" constructor sets up a reusable HTTP client that can be enabled
+    and disabled repeatedly as needed.
+
+  start
+    The "start" method enables the web server. If the server is already
+    running, this method will shortcut and do nothing.
+
+    If called before POE has been started, the web server will start
+    immediately once POE is running.
+
+  stop
+    The "stop" method disables the web server. If the server is not running,
+    this method will shortcut and do nothing.
+
+  print
+        $log->print("This is a log message");
+
+    Writes one or more messages to the log.
+
+    Returns true if the message will be flushed to the file immediately,
+    false if the message will be queued for later dispatch, or "undef" if
+    the logger is disabled and the message will be dropped.
+
+SUPPORT
+    Bugs should be always be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Declare-Log-File>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    POE::Declare, POE, <http://ali.as/>
+
+COPYRIGHT
+    Copyright 2011 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

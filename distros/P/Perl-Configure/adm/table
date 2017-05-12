@@ -1,0 +1,46 @@
+#!/usr/bin/perl -w
+###########################################
+# xx -- 
+# Mike Schilli, 2005 (m@perlmeister.com)
+###########################################
+use strict;
+use Sysadm::Install qw(:all);
+use Text::Wrap;
+
+use lib 'lib';
+use lib '../lib';
+use Text::ASCIITable;
+#use Text::ASCIITable::Wrap qw(wrap);
+use Perl::Configure::Questions;
+
+my $t = Text::ASCIITable->new();
+$t->setCols("Token", "Question");
+$t->setColWidth("Question", 30);
+
+
+my $bk = Perl::Configure::Questions->by_key();
+for my $key (sort keys %$bk) {
+    $Text::Wrap::columns=26;
+    my $keywrapped = wrap("", "", $key);
+
+    $Text::Wrap::columns=30;
+    my $text = wrap("", "", $bk->{$key}->[0]);
+
+#$Text::Wrap::columns=10;
+#my $eg = wrap("", "", $bk->{$key}->[1]);
+$t->addRow($keywrapped, $text);
+}
+my $str = $t->draw();
+$str =~ s/^/    /mg;
+#print $str;
+
+my $file = "lib/Perl/Configure.pm";
+open FILE, "<$file" or die "cannot open $file";
+my $data = join '', <FILE>;
+close FILE;
+
+$data =~ s/=for TABLE_START.*?=for TABLE_END/=for TABLE_START\n\n$str\n\n=for TABLE_END/gs;
+
+open FILE, ">$file" or die "";
+print FILE $data;
+close FILE;

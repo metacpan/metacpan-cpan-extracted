@@ -1,0 +1,47 @@
+#!/usr/local/bin/perl -w
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+use lib '../..';
+use PPresenter;
+use strict;
+
+my $show = new PPresenter
+( -name     => 'Callbacks'
+);
+
+$show->addSlide
+( -title    => 'Callbacks'
+, -callback => [ 'phase 1', sub {system 'xclock &'} ]
+, -main     => <<'MAIN'
+Callbacks can be used to call perl-programs while presenting a
+slide.  PPresenter callbacks are Tk::callbacks, optionally
+preceded by a Dynamics time-format.
+<P>
+Example: press &lt;space&gt; for the next phase, which will start a
+<CODE>xclock</CODE>.
+MAIN
+);
+
+my $main = $show->find('main');   # the main controling object.
+
+$show->addSlide
+( -title    => 'Callbacks -2'
+, -callback => [ [ '', sub {print "Greetings!\n"} ]
+               , [ 'phase 1', sub {system 'xclock &'} ]
+               , [ 'phase 1 after 5', sub {system 'xclock -bg yellow &'} ]
+               , [ 'phase 2', 'showSlideControl', $main ]
+               , [ 'phase 2 after 4', 'setRunning', $main, 0 ]
+               ]
+, -main     => <<'MAIN'
+Press <CODE>g</CODE> to start timing, otherwise this page will not
+demonstrate a thing.
+<UL>
+<LI>Prints greetings immediately to stdout,
+<LI>In phase 1, an <CODE>xclock</CODE> is started followed in
+    5 secs by a second (yellow) <CODE>xclock</CODE>.
+<LI>After 4 seconds in phase 2, the timer is stopped.
+</UL>
+MAIN
+);
+
+$show->run;

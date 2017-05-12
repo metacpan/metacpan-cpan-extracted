@@ -1,0 +1,80 @@
+%{
+=head1 SYNOPSIS
+
+See http://search.cpan.org/perldoc?Parse::Eyapp::debuggingtut
+This file solves the conflict in Debug.eyp using dynamic 
+conflict resolution techniques
+(see section 'SOLVING CONFLICTS WITH THE POSTPONED CONFLICT STRATEGY' in
+http://search.cpan.org/perldoc?Parse::Eyapp::debuggingtut)
+
+Be sure C<DebugTail.pm> is reachable
+compile it with 
+
+      eyapp -b '' DebugDynamicResolution.eyp
+
+Execute the generated modulino with:
+
+      ./DebugDynamicResolution.pm -t
+
+Try input "D;D;D; S;S;S".
+
+
+=head1 See also
+
+    Debug.eyp Debug1.eyp Debug2.eyp DebugLookForward.eyp
+
+=cut
+
+our $VERSION = '0.01';
+use base q{DebugTail}; 
+%}
+
+%token D S
+
+%tree bypass
+
+%%
+p:
+    %name PROG
+    ds ';' ss  
+  | %name SS
+    ss
+;
+
+ds:
+    %name MORE_Ds
+    D hacktables ';' ds    
+  | %name LAST_D
+    D hacktables        
+;
+
+ss:
+    %name SS
+    S ';' ss      
+  | %name S
+    S       
+;
+
+hacktables:
+      /* empty. This action solves the conflict using dynamic precedence */
+      {
+        my $self = shift;
+
+        if (${$self->input()} =~ m{^\s*;\s*S}) {
+          $self->YYSetReduce(';', 'LAST_D' )
+        }
+        else {
+          $self->YYSetShift(';')
+        }
+
+        undef; # skip this node in the AST
+      }
+;
+
+
+%%
+
+__PACKAGE__->lexer( \&DebugTail::lex); 
+
+my $prompt = 'Provide a statement like "D;D; S;S" and press <CR><CTRL-D>: ';
+__PACKAGE__->main($prompt) unless caller;

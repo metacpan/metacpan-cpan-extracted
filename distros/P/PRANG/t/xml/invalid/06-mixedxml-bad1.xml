@@ -1,0 +1,13 @@
+<!-- error: /unexpected element at .Octothorpe.*text node/ -->
+<Octothorpe>
+  <colon/>
+    The place is Gotham City. The time, 1987 -- once removed.
+  <section_mark>
+    The city of Tomorrow: stark angles, creeping shadows, 
+    dense, crowded, airless, a random tangle of steel and 
+    concrete, self-generating, almost subterranean in its 
+    aspect... as if hell had erupted through the sidewalks and 
+    kept on growing. A dangling fat moon shines overhead, ready 
+    to burst.
+  </section_mark>
+</Octothorpe>

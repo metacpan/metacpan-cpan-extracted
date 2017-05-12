@@ -1,0 +1,21 @@
+=head1 NAME
+
+200-simple-sequences
+
+=head1 TESTCASES
+
+This is B<bold>.
+
+This is I<italic>.
+
+This is C<code>.
+
+This is a F<filename>.
+
+This is an ampersand escape: E<amp>.
+
+This is a S<non-breaking space sequence>.
+
+This is an index entry.X<index entry> (Nothing to see)
+
+This line contains a Z sequence.Z<>

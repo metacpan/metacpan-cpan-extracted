@@ -1,0 +1,6 @@
+prefix=/usr
+Name: GKrellM
+Description: Extensible GTK system monitoring application
+Version: 2.3.5
+Requires: gtk+-2.0 >= 2.4.0
+Cflags: -I/usr/include

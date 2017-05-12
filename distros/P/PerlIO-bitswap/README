@@ -1,0 +1,30 @@
+NAME
+
+PerlIO::bitswap - I/O layer to swap bits and bytes
+
+DESCRIPTION
+
+This PerlIO layer swaps the order of bits, nybbles, or bytes within
+bytes or words.  It is a convenience when working with a file that uses
+a different endianness from the program, or when some other part of the
+system applies unwanted swaps.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2010, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

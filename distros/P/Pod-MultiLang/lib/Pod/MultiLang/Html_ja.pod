@@ -1,0 +1,190 @@
+=encoding utf-8
+
+=for stopwords
+	MultiLang-pod
+	addindex
+	buildhtml
+	buildtitle
+	escapeHtml
+	escapeUrl
+	html
+	langs
+	makelink
+	makelinkanchor
+	mlpod
+	plainize
+	poddir
+	resolveLink
+	resolvePodEscape
+	unescapeHtml
+	utf-8
+	verbmsg
+	xhtml
+
+=head1 名前
+
+Pod::MultiLang::Html_ja - 多言語 Pod を html に変換
+
+=head1 概要
+
+ $parser = Pod::MultiLang::Html->new(%opts);
+ $parser->parse_from_file($infile,$outfile);
+
+=head1 説明
+
+L<Pod::MultiLang> を継承する html へのトランスレータです. 
+Pod::MultiLang は L<Pod::Parser> を基底としているので, 
+基本的な使用方法はそれにならいます.
+
+command/verbatim/textblock では配列への蓄積のみを行いっていて, 
+変換処理は end_pod で行っている. (command/verbatim/textblock の
+処理は Pod::MultiLang が行っている.)
+
+Pod::MultiLang::Html では, 生成の準備(見出しのリストアップ, 
+索引語の生成等)を $parser->rebuild() において行い, 
+$parser->output_html() が生成した情報から出力のみを行う
+という二段になっている.
+
+xhtml 1.1 を生成してたり^^;
+
+=head1 オプション
+
+new の引数は以下のものがあります.
+
+=over
+
+=item langs
+
+ langs => [qw(ja en)]
+
+Pod::MultiLang から引き継いでいるオプション. 
+Pod::MultiLang->new() に渡されます. 
+L<Pod::MultiLang/new> を参照してください.
+
+使用する言語を指定します. 
+指定されなかった言語は, mlpod 中にあっても無視されます.
+
+=item made
+
+  made => 'mailto:example@example.com'
+
+Z<><link rev="made" href="" /> に埋め込まれます.
+
+=item css
+
+  css => 'style/podstyle.css'
+
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <link rel="stylesheet" type="text/css" href="style/podstyle.css" />
+
+html には位置は出力するファイルと指定したcssファイルとの
+相対位置で埋め込まれます.
+
+=item poddir
+
+  poddir => [qw(html/pod html/pragma html/lib)]
+
+リンク先の存在確認に使うディレクトリを指定します.
+配列リファレンスを指定します.
+
+=item missing_poddir
+
+poddir にリンク先が見つからなかったときに, 
+それが perl ドキュメントらしかったときに代わりに
+リンク先に使うディレクトリを指定します.
+
+省略時には missing_dir が使われます.
+
+=item missing_pragmadir
+
+poddir にリンク先が見つからなかったときに, 
+それが pragma ドキュメントらしかったときに代わりに
+リンク先に使うディレクトリを指定します.
+
+省略時には missing_dir が使われます.
+
+
+=item missing_dir
+
+poddir にリンク先が見つからなかったときに, 
+代わりにリンク先に使うディレクトリを指定します.
+
+=item in_charset
+
+入力ファイルのエンコーディングを指定します.
+デフォルトでは utf-8 です.
+
+=item out_charset
+
+出力ファイルのエンコーディングを指定します.
+デフォルトでは utf-8 です.
+
+Z<><meta content="Content-Type" value="text/html; charset=" /> 
+にも埋め込まれます.
+
+=item default_lang
+
+JZ<><> で囲まれていない文章に対する言語を指定します.
+
+=back
+
+=head1 メソッド
+
+=head2 new
+
+create new instance.
+
+
+=head1 OVERRIDES
+
+This module implements L<Pod::Parser>.
+
+
+=over 4
+
+=item begin_pod
+
+=item end_pod
+
+=item interior_sequence
+
+=back
+
+=head1 PRIVATE FUNCTIONS
+
+=over 4
+
+=item rebuild
+
+=item buildtitle
+
+=item buildhtml
+
+=item addindex
+
+=item output_html
+
+=item escapeHtml
+
+=item escapeUrl
+
+=item makelink
+
+=item makelinkanchor
+
+=item plainize
+
+=item resolveLink
+
+=item resolvePodEscape
+
+=item unescapeHtml
+
+=item verbmsg
+
+=back
+
+=head1 関連項目
+
+L<Pod::MultiLang>
+

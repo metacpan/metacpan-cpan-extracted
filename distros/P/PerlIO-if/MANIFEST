@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+SIGNATURE
+dist.ini
+lib/PerlIO/if.pm
+lib/PerlIO/if.xs
+t/00-compile.t
+t/10-basics.t
+t/release-kwalitee.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

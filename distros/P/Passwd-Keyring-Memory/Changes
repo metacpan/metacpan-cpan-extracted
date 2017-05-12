@@ -1,0 +1,28 @@
+Revision history for Keyring-MemoryOnly
+
+0.2405	2015-01-06
+	Adding kwalitee tests
+
+0.2404	2012-11-11
+        Minor doc and param name fixes
+
+0.2403	2012-11-09
+        Test updates
+
+0.2402	2012-11-09
+        Generating README from pod, more informative than previous one.
+
+0.2401  2012-11-08
+        Small documentation fixes, more info in CPAN metadata
+
+0.24    2012-11-08
+        Implementing expected app and group semantics (group keys, app only labels)
+
+0.23    2012-11-07
+        Added is_persistent method.
+        Test and docs updates.
+
+0.21    2012-11-04
+        First version, released on an unsuspecting world.
+
+

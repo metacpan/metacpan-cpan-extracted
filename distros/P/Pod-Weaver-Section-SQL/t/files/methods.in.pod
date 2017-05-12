@@ -1,0 +1,11 @@
+=pod
+
+=method sample_meth
+
+This method is used as an example
+
+=method samble_meth
+
+Another example.
+
+=cut

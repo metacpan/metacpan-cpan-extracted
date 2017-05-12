@@ -1,0 +1,221 @@
+Revision history for Perl module Perl-Dist
+
+1.16 Wed  8 Jul 2009
+	- Fix the requires_from to pull from Inno.pm
+
+1.15 Wed  1 Jul 2009
+	- Really use requested CPAN site to find the toolchain
+	  modules to install.
+	- Updated perldist script to allow Perl::Dist::WiX and
+	  subclasses to be used to create distributions.
+	- Minor tweak to testing - allow passing tests if no
+	  internet connection available.
+
+1.14 Thu 30 Apr 2009
+	- This release was used to build Strawberry Perl April 2009
+	- Moved dependencies to requires_from and cleaned them up
+
+1.13 Thu 30 Apr 2009
+    - really check for InnoSetup in Makefile.PL and do not generate
+      Makefile in case of failure (Alexandr Ciornii)
+	- Updating Machine.pm to allow Perl::Dist::WiX and subclasses to
+	  be gears in the machine.
+	- Adding test bypass for URI
+	- Better error capturing
+
+1.12 Thu 29 Jan 2009
+	- This release co-incides with Strawberry Perl January 2009
+	- Various minor tweaks
+
+1.11 Thu  4 Dec 2008
+	- This release represents a moment of stability at 5.10.0.4 Beta 1
+	- Adding an improved caching useragent
+	- Some minor tweaks to allow Parrot builds
+
+1.10 Tue 11 Nov 2008
+	- Adding initial support for Perl 5.8.9
+
+1.09 Mon 20 Oct 2008
+	- This version was used to build Strawberry Perl October 2008
+
+1.08 Sat 18 Oct 2008
+        - Shortcut run when no zip or exe target
+
+1.07 Thu 16 Oct 2008
+	- Better linking to Perl Documentation
+
+1.06 Wed 15 Oct 2008
+	- This is expected to be the Perl::Dist used to build
+	  Strawberry Perl October
+	- Bootstrap Perl is moving to the Strawberry distribution
+	- After the toolchain is installed, run a full CPAN upgrade
+	  to catch anything out of date NOT explicitly listed in the
+	  toolchain list.
+	- All tests (finally) pass during the 5 hours test run
+
+1.05_04 Tue 14 Oct 2008
+	- Adding missing dependency on File::HomeDir
+	- Additional minor tweaks and minor bug squashing
+
+1.05_03 Mon 13 Oct 2008
+	- Additional tweaks and clean ups
+	- Force the install of CPAN.pm
+
+1.05_02 Sat 11 Oct 2008
+	- Very aggressive dependencies, everything now to maximum
+	- Discovered and fixed a number of dependency bugs
+	- Bug fix in 09_file_asset.t
+
+1.05_01 Sat 11 Oct 2008
+	- Reorganising the test script order
+	- Added separate 5.8.8 and 5.10.0 test scripts
+	- Added a full test of Vanilla ->run
+	- Removing force flags for stuff that now works
+	- Adding a new Template-Toolkit-based patch system
+	- Unified the toolchain install methods
+	- Set the environment correctly when installing CPAN modules
+
+1.04 Wed 23 Jul 2008
+	- This release co-incides with Strawberry August 2008
+	- Tweak to allow libwww-perl to build behind a proxy
+	- Add a temporary bug-fix/patch for MM_Win32.pm
+	- Add a workaround for Data::Compare failing on Win32
+	- Adding Math::Pari to the default build
+
+1.03 Tue 22 Jul 2008
+	- Minor cleanups to support the July Strawberry release
+
+1.02 Tue 15 Jul 2008
+	- Updating to a Vista-capable mingw.
+	- Adding install_pari for Math::Pari support
+
+1.01 Tue 15 Apr 2008
+	- Refactored a bit to use install_modules
+	- Promoting some internals to public methods
+
+1.00 Mon  7 Apr 2008
+	- Release to match Strawberry Perl 5.10.0.1 April 2008
+
+0.90_04 Mon 24 Mar 2008
+	- Adding Perl::Dist::Inno::System for [Run] and [UninstallRun]
+	  block support.
+	  This is needed for more sophisticated install and uninstall
+	  functionality.
+	- Completing documentation for all the major install_foo methods.
+	- Merging some idiosyncracies into the Perl::Dist::Inno core.
+	- Converting force in install_module to use notest under the covers,
+	  so that there are no errors to propogate upwards.
+	- Added support for generating both zip and exe files simultaneously.
+
+0.90_03 Fri  4 Jan 2008
+	- Perl::Dist::Download was a bad idea, I wanted the ability to
+	  to build distribution from a minicpan mirror, but maintaining
+	  that package and incrementing it every time a minor release
+	  happens of an upstream package will become a nightmare.
+	- Merged in PAR support from Perl-Dist-Glutamate (Steffen Muller)
+	- Adding more documentation
+	- Completed first implementation of Perl::Dist::Machine, for
+	  generating multiple variations of a dist at the same time.
+	- This version used to create Vanilla Perl Build 15.
+	- This version implements features needed for Strawberry Perl April.
+
+0.90_02 Thu  3 Jan 2008
+	- This release was used to build Vanilla Perl 14
+	- Reorganising the default way that app_ver_name etc are done
+	  to allow for distributions classes that can generate BOTH
+	  5.8.8 and 5.10.0 distributions.
+	- Changed the usage of perldist
+	- Make sure Perl::Dist::Util::Toolchain in the tests uses the
+	  full explicit Perl path.
+
+0.90_01 Wed  2 Jan 2008
+	- Major API refactoring
+	- Converted Perl::Dist::Util::Toolchain to be completely
+	  auto-resolving for what it should install.
+	- Started the documentation process.
+
+0.53 Sun 24 Dec 2007 (unreleased)
+	- Adding support for websites in the start menu entries
+	- Adding support for .bat launchers in the start menu
+	- Completed Strawberry Perl 5.10.0 using this version
+	- Wide-ranging refactoring and documentation to make
+	  Perl::Dist suitable for other people to start using
+	  for making Perl distributions.
+
+0.52 Thu 20 Dec 2007
+        - Adding an additional install flag to prevent
+          installation to the old directory.
+
+0.51 Wed 19 Dec 2007
+	- Hard-code in the path to Perl 5.10.0 final
+	- Move default environment vars from ::Script to ::Inno
+	- Add share to no_index to prevent 5.8.8 overwritten
+	  modules being listed on search.cpan.org
+
+0.50 Wed 19 Dec 2007
+	- Merging in Perl::Dist::Vanilla
+	- Merging in Perl::Dist::Bootstrap
+	- Added Perl::Dist::Util::Toolchain
+	- Dynamically generate the distribution list
+	- Clean up the shared files
+	- Bug fixing and repairing perldist
+	- Completed generation of exe releases
+
+0.30 Sun 18 Nov 2007
+	- Adding support for Perl 5.10.0
+	- Adding support for zlib
+	- Adding support for bzlib2
+	- Adding support for iconv
+	- Adding support for libxml2
+	- Adding support for SQLite
+	- Completing generation of zip releases
+
+0.29_03 Fri  9 Nov 2007
+	- Completing install_perl_588
+	- Completing install_distribution
+	- Completing install_module
+	- Adding install_library
+	- Adding install_libraries
+	- Completing installation of zlib
+	- Starting installation of iconv
+	- Adding pexports to the list of binaries to install
+
+0.29_02 Thu 31 Oct 2007
+        - Adding install_file support for tweaking stuff
+          post-installation of binaries/perl/dists/etc
+        - Removed post_copy and replaced with install_file
+        - Renamed pre_copy to patch since it makes more sense
+          that way now.
+
+0.29_01 Wed 31 Oct 2007
+	- Experimental release, only intended for review
+	- Huge refactoring
+	
+0.10  Fri 19 Oct 2007
+        - Converting from config-driver to code-driven
+        - Implementing data classes for Inno
+        - Implementing data classes for "Assets"
+        - Converting binary-installation and source-compilation
+          to the new class structure.
+        - Adding various tests scripts.
+
+0.0.5 Tue Aug 29 05:51:10 EDT 2006
+	- fixed up version numbering format from Module::Install
+
+0.0.4 Tue Aug 29 00:10:26 EDT 2006
+	- Changed version numbering
+	- Forced install of CPAN modules no longer dies if modules can't
+	  be confirmed up to date.
+	  (Hack to work around Bundle::CPAN with a specific file to install.)
+
+0.000003 Mon Aug  7 07:23:55 EDT 2006
+	- Added support for distributions names to modules section
+	  to allow installation of developer releases (e.g. CPAN)
+	- Removed Sub::Exporter from dependencies (not used)    
+
+0.000002 Mon Jul 10 07:47:09 EDT 2006
+	- Forgot to switch Builder.pm to YAML from YAML::Syck
+    
+0.000001 Sun Jul  9 13:30:10 EDT 2006
+	- refactored build scripts from Perl::Dist::Vanilla to a module
+	  in Perl::Dist::Builder

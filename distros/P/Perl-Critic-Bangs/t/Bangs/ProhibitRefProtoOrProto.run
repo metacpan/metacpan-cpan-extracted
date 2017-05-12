@@ -1,0 +1,16 @@
+## name basic failure
+## failures 1
+## cut
+
+my $name = ref $proto || $proto;
+
+#-----------------------------------------------------------------------------
+
+## name Suspicious but OK
+## failures 0
+## cut
+
+my $notname = ref $proto || $name;
+# my $name = ref $proto || $proto;
+
+#-----------------------------------------------------------------------------

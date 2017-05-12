@@ -1,0 +1,3 @@
+Aug  8 12:28:47 ns2 sm-mta[13165]: j78ASk4e013165: from=<kweek@glurpp.baf>, size=786, class=0, nrcpts=1, msgid=<200508081028.j78ASkKG011031@blanditiis.crunch.zap>, proto=ESMTP, daemon=MTA-v4, relay=mx1.glurpp.baf [62.210.95.136]
+Aug  8 12:28:48 ns2 sm-mta[13198]: j78ASk4e013165: to=kweek@glurpp, delay=00:00:01, xdelay=00:00:01, mailer=cyrusv2, pri=31046, relay=localhost, dsn=2.0.0
+Aug  8 12:28:48 ns2 sm-mta[13198]: j78ASk4e013165: done; delay=00:00:01, ntries=1

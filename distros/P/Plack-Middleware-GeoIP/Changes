@@ -1,0 +1,18 @@
+Revision history for Plack-Middleware-GeoIP
+
+0.05    Tue Sep  6 00:39:26 SGT 2016
+          - Merged GeoIP2 bad IP address exception handling, thanks Zak B. Elep
+
+0.04    Fri Jan 22 23:14:15 SGT 2016
+          - Merged GeoIP2 support, thanks Zak B. Elep
+
+0.03    Wed Mar 28 12:26:44 PHT 2012
+          - Require Geo::IP v1.39
+          - Added examples to MANIFEST
+
+0.02    Mon Mar 26 15:05:24 PHT 2012
+          - Added examples and another test.
+
+0.01    Mon Mar 26 13:22:15 PHT 2012
+          - First version, released on an unsuspecting world.
+

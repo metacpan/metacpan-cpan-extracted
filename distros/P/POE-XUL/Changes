@@ -1,0 +1,68 @@
+Revision history for Perl extension POE::XUL.
+
+0.0601 Sep 6 2016
+    - Fix regex in Makefile.PL
+        - Thank you SREZIC
+
+0.0600 Nov 3 2010
+    - Better cross platform unit tests
+    - Added POE::XUL::RDF
+    - Added editable menulists
+    - Better logging
+    - Added Node->scrollTo() and friends
+    - Added per-application logging
+    - Better initial page, with i18n support
+    - Support https scheme
+    - In the browser:
+        - Include 2 versions of prototype.js
+        - Works with Firefox 3
+        - Better crash messages
+        - Speed tweaks
+        - Work around some annoying behaviour cf setAttribute vs node.value
+        - Added firebug timing routines
+        - General clean up and delinting
+        - Alert if a sub-window can't be opened
+        - href=callback
+        - Get value from node.inputField.value instead of node.value if possible
+        - <tree> support
+
+0.0500 Internal release
+
+0.0406 May 29 2008
+    - Use $(ABSPERLRUN)
+    - Tweak crash message CSS
+    - Tweak MANFEST and add MANIFEST.SKIP
+
+0.0405 May 24 2008
+    - Now I seem to have a handle on the CPAN testers problem
+    - Updated all copyright years
+    - Hide POE::XUL::Session from CPAN indexer
+    - Silence a bunch of cookie crumbs with AUTOMATED_TESTING
+    - Fixed some merge errors
+    - Added t/01_pod.t
+    - Added POE::XUL::POE, which is only documentation
+
+0.0402-0.0404 May 23 2008
+    - Augh!  Stupid tweaks so the CPAN testers don't complain
+
+0.0401 May 23 2008
+    - Augh!  MANIFEST wasn't updated.
+
+0.0400 May 23 2008
+    - Added POE::XUL::Style
+    - Added names for applications, and [APP-LIST]
+    - Fkeys work on <toolbarbutton>s
+    - Added xulDraggable
+    - Added link to restart App if it is timedout
+    - Numerous other tweaks
+
+0.0300 Dec 12 2007
+    - Added POE::XUL::Application.
+    - Better documentation
+    - Many other fixes
+
+0.0200 Dec 7 2007
+
+0.0100 Dec 6 2007
+    - First release to CPAN
+

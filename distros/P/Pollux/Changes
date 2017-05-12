@@ -1,0 +1,14 @@
+Revision history for Pollux
+
+0.0.2 2017-01-16
+  [ BUG FIXES ]
+    - Fix POD errors. (GH#5)
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 19 insertions(+), 4 deletions(-)
+
+0.0.1 2017-01-16
+  - First version, unleashed on an unsuspecting world.
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 48 insertions(+)

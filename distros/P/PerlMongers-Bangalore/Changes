@@ -1,0 +1,50 @@
+Changelog for PerlMongers-Bangalore
+
+0.07 2013-09-14T03:55:20
+ - Merge branch 'master' of
+   github.com:shantanubhadoria/PerlMongers-Bangalore
+   
+   Conflicts:
+	   Changes [Shantanu]
+ - v0.05
+   
+    - Added README [Shantanu]
+    - Bump Changes [Shantanu Bhadoria] [Shantanu]
+
+0.06 2013-09-14T03:54:07
+ - v0.06
+   
+    - v0.05
+       - Fixed gitignore added .build
+       - Fixed Kwalitee Tests
+       - Added README [Shantanu]
+       - Bump Changes [Shantanu Bhadoria] [Shantanu] [Shantanu]
+ - v0.05
+    - Fixed gitignore added .build
+    - Fixed Kwalitee Tests
+    - Added README [Shantanu]
+    - Bump Changes [Shantanu Bhadoria] [Shantanu]
+
+0.05 2013-09-12T09:31:45
+ - v0.05
+   
+    - Added README [Shantanu]
+    - Bump Changes [Shantanu Bhadoria] [Shantanu]
+ - Added README [Shantanu]
+ - Bump Changes [Shantanu Bhadoria]
+
+0.04 2013-03-07T16:33:00
+ - v0.04
+   
+	   - 2013-03-08 00:32:31 Asia/Singapore [Shantanu Bhadoria]
+
+0.03 2013-03-07T16:31:16
+ - moved to SHANTANU dzil Package [Shantanu Bhadoria]
+ - v0.03 [Shantanu Bhadoria]
+ - Added the link to discussion page [Shantanu Bhadoria]
+ - v0.02 [Shantanu Bhadoria]
+ - Minor Changes spell correction [Shantanu Bhadoria]
+ - v0.01 [Shantanu Bhadoria]
+ - adding .gitignore for future convenience [Shantanu Bhadoria]
+ - First Commit of PerlMongers::Bangalore.pm [Shantanu Bhadoria]
+

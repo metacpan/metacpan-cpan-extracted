@@ -1,0 +1,21 @@
+AUTOMATIC INSTALLATION
+
+To install, just type
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+-------------
+For help with Makefile.PL, try
+perldoc ExtUtils::MakeMaker
+
+If you wish to install in a non-standard place, use 
+
+perl Makefile.PL LIB=~/lib PREFIX=~
+
+or whatever.
+
+Good luck!
+
+Alan Jackson

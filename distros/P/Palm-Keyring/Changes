@@ -1,0 +1,9 @@
+0.95	Support v5 databases - it needs more testing though.
+
+0.94    tar it up on OS X because the tar on OpenBSD-current that I was 
+        using is apparently broken.
+
+0.93    Initial public release.  I have had a lot of help getting my first
+        module release, please see the THANKS section of the documentation.
+
+$RedRiver: Changes,v 1.3 2007/02/23 03:42:21 andrew Exp $

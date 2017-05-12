@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Parallel-Supervisor.t
+lib/Parallel/Supervisor.pm

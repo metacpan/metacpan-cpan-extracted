@@ -1,0 +1,28 @@
+---
+abstract: 'Execute loops using parallel forked subprocesses'
+author:
+  - 'Peter Valdemar Mørch <peter@morch.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: '0.84'
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parallel-Loops
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Parallel::ForkManager: 0.7.9
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/pmorch/perl-Parallel-Loops
+version: '0.08'

@@ -1,0 +1,20 @@
+#!/usr/bin/perl
+###########################################
+# Mike Schilli, 2002 (m@perlmeister.com)
+###########################################
+use warnings;
+use strict;
+
+use Pod::HtmlTree qw(pod2htmltree);
+use File::Spec;
+
+die "usage: $0 http_root" unless @ARGV;
+
+pod2htmltree(@ARGV);
+
+$ARGV[0] =~ s#^/+##;
+
+print Pod::HtmlTree::banner(
+    "Please make sure http://" . 
+    File::Spec->catfile("localhost", $ARGV[0]) .
+    " points to ", `pwd`);

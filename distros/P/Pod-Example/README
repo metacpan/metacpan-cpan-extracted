@@ -1,0 +1,84 @@
+NAME
+    Pod::Example - Module for getting example from POD.
+
+SYNOPSIS
+     use Pod::Example qw(get sections);
+     my $example = get($file_or_module[, $section[, $number_of_example]]);
+     my @sections = sections($file_or_module[, $section]);
+
+SUBROUTINES
+    "get($file_or_module[, $section[, $number_of_example]])"
+             Returns code of example.
+             $file_or_module    - File with pod doc or perl module.
+             $section           - Pod section with example. Default value is 'EXAMPLE'.
+             $number_of_example - Number of example. If exists 'EXAMPLE1' and 'EXAMPLE2'
+                                  sections, then this number can be '1' or '2'.
+                                  Default value is nothing.
+
+    "sections($file_or_module[, $section])"
+             Returns array of example sections.
+             $file_or_module - File with pod doc or perl module.
+             $section - Pod section with example. Default value is 'EXAMPLE'.
+
+ERRORS
+     get():
+             Cannot open pod file or Perl module.
+
+     sections():
+             Cannot open pod file or Perl module.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Pod::Example qw(get);
+
+     # Get and print code.
+     print get('Pod::Example')."\n";
+
+     # Output:
+     # This example.
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Pod::Example qw(sections);
+
+     # Get and print code.
+     print join "\n", sections('Pod::Example');
+     print "\n";
+
+     # Output:
+     # EXAMPLE1
+     # EXAMPLE2
+
+DEPENDENCIES
+    Error::Pure, Exporter, Module::Info, Pod::Abstract, Readonly.
+
+SEE ALSO
+    pod-example
+        Script to print or run of example from documentation.
+
+    App::Pod::Example
+        Base class for pod-example script.
+
+REPOSITORY
+    <https://github.com/tupinek/Pod-Example>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2011-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.08
+

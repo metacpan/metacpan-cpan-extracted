@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libtpl
+Description: Serialization library
+Version: 1.5
+Libs: -ltpl
+Cflags:

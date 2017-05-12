@@ -1,0 +1,12 @@
+=pod
+
+Some text.
+
+=for html
+<hr>
+
+=for confluence
+h1. title 1
+
+Some other text.
+

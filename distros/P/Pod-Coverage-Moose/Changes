@@ -1,0 +1,29 @@
+Revision history for Pod-Coverage-Moose
+
+0.07      2015-09-05 04:03:44Z
+        - fix test failures on Moose >= 2.1300 when
+          MooseX::Role::WithOverloading is not installed (RT#106898)
+
+0.06      2015-08-16 06:51:50Z
+        - update some distribution tooling
+
+0.05      2013-12-14 17:55:09Z
+        - Removed use of Perl6::Junction, which causes warnings with 5.18.0.
+        - switch to using namespace::autoclean everywhere
+        - canonical repository migrated to the github moose organization
+
+0.04    2012-03-13
+        - Fix the author field in META.yml
+        - Compatibility with the MooseX::Role::WithOverloading
+
+0.03    2012-02-29
+        - cover_requires option
+
+0.02    2009-05-14
+        - Minor POD corrections
+        - Added MooseX-AttributeHelpers hack for injected methods
+        - Fixes to work with the latest versions of Moose (Dave
+          Rolsky)
+
+0.01    2007-08-14 18:17:50Z
+        - Initial Release

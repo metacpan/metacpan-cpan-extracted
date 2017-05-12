@@ -1,0 +1,60 @@
+POE::Component::Server::DNS
+===========================
+
+0.20	Tue Apr  7 20:42:05 BST 2009
+	- Make auto_set_repository() only run at author-time
+
+0.18	Tue Apr  7 10:01:09 BST 2009
+	- auto set repository in META.yml
+	- Refactored out PoCo-Generic in favour of PoCo-Client-DNS-Recursive
+
+0.16	Tue May  6 14:04:45 BST 2008
+	- Removed kwalitee test
+	- Refactored no_clients handling
+	- Added LICENSE information
+
+0.14	Mon Feb 25 14:58:44 GMT 2008
+	- Hopefully fixed timing issues with log test.
+
+0.13	Wed Oct 31 13:48:20 GMT 2007
+	- Updated Module::Install to 0.68
+
+0.12	Thu Sep  6 11:48:10 BST 2007
+	- Removed 'out of band' output in testsuite
+
+0.11	Wed Sep  5 18:29:44 BST 2007
+	- Another fix for when Net::DNS::Recursive returns undef.
+
+0.10	Tue Sep  4 12:22:40 BST 2007
+	- Another change to pod coverage test due to a bug with perl-5.9.5,
+	again reported by Andreas Koenig.
+
+0.09	Tue Sep  4 11:26:53 BST 2007
+	- Changes to pod coverage test to work around a bug on perl-5.9.*
+	reported by Andreas Koenig.
+
+0.08	Tue Sep  4 10:21:13 BST 2007
+	- Applied a large patch from Brandon Black that supplies the 'no_clients'
+	option for disabling forwarding and recursion
+
+0.07	Wed Jul 25 11:44:27 BST 2007
+	- Fixed abstract_from in Makefile.PL
+
+0.06	Fri Mar 02 10:25:43 GMT 2007
+	- Applied patch from Brandon Black that adds bind address.
+	- Added sockport() method to obtain the listening socket port.
+	- Refactored tests to use a randomly assigned port to fix RT#25244
+
+0.05	Fri Feb 16 15:34:18 GMT 2007
+	- Added Kwalitee Test.
+
+0.04	Sun Jan 07 18:29:34 GMT 2006
+	- Forgot to document LOG EVENTS. Doh.
+
+0.03	Sun Jan 07 18:21:57 GMT 2006
+	- handler events now have the IP:port of the requestor as ARG4;
+	- added log_event. This and the above were suggested by Fosforo;
+	- New test 06_log.t;
+
+0.02    Tue Sep 26 12:06:28 BST 2006
+        - Switched to Module::Install

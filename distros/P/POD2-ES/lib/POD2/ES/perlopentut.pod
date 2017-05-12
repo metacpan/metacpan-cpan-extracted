@@ -1,0 +1,295 @@
+=encoding utf8
+
+=head1 NOMBRE
+
+perlopentut - Recetas sencillas para abrir archivos y tuberías en Perl
+
+=head1 DESCRIPCIÓN
+
+En Perl, cualquier operación de E/S en un archivo debe hacerse a través de lo
+que se conoce como un B<identificador de archivo>. Un identificador de archivo
+es un nombre interno para un archivo externo. La función C<open> se encarga de
+establecer la asociación entre el nombre interno y el nombre externo, y la
+función C<close> la cancela.
+
+Para mayor comodidad, Perl incluye algunos identificadores de archivo
+especiales que ya están abiertos cuando se ejecuta un programa. Estos son
+C<STDIN>, C<STDOUT>, C<STDERR> y C<ARGV>. Como están abiertos de manera
+predefinida, no es necesario abrirlos para usarlos:
+
+    print STDERR "Un mensaje de depuración.\n";
+
+    print STDOUT "Escriba algo: ";
+    $respuesta = <STDIN> // die "¿No hay entrada de datos?";
+    print STDOUT "¡Gracias!\n";
+
+    while (<ARGV>) { ... }
+
+Como se puede ver en estos ejemplos, C<STDOUT> y C<STDERR> son identificadores
+de salida, y C<STDIN> y C<ARGV> son identificadores de entrada. Se escriben en
+letras mayúsculas porque son palabras reservadas de Perl, como lo son el array
+C<@ARGV> y el hash C<%ENV>. Sus asociaciones externas se configuraron en la
+shell.
+
+Salvo estos casos especiales, debe abrir un identificador de archivo antes de
+usarlo. Hay muchas formas de llamar a la función open() de Perl, pero la
+variante más común es utilizar tres argumentos y un valor de retorno:
+
+C<    I<OK> = open(I<IDENTIFICADOR>, I<MODO>, I<RUTA_ARCHIVO>)>
+
+donde:
+
+=over
+
+=item I<OK>
+
+será un valor definido si la función open se ejecutó correctamente, y
+C<undef> en caso contrario;
+
+=item I<IDENTIFICADOR>
+
+debe ser una variable escalar no definida que la función C<open> rellenará si
+se ejecuta correctamente;
+
+=item I<MODO>
+
+es el modo de acceso y el formato de codificación con el que se debe abrir el
+archivo;
+
+=item I<RUTA_ARCHIVO>
+
+es el nombre externo del archivo que se va a abrir.
+
+=back
+
+Gran parte de la complejidad de la función C<open> reside en los muchos
+valores posibles del parámetro I<MODO>.
+
+Una última cosa antes de ver cómo se usa open: cuando se abre un archivo en
+Perl, no se bloquea de forma automática (normalmente). Vea L<perlfaq5> para
+obtener información sobre cómo bloquear un archivo.
+
+=head1 Abrir archivos de texto
+
+=head2 Abrir archivos de texto para lectura
+
+Para leer un archivo de texto debe abrirlo en modo de solo lectura:
+
+    my $nombre_archivo = "/ruta/al/archivo/de/texto";
+    my $codificacion   = ":encoding(UTF-8)";
+    my $identificador  = undef;     # se rellenará en caso de éxito
+
+    open($identificador, "< $codificacion", $nombre_archivo)
+        || die "$0: no se puede abrir $nombre_archivo para lectura: $!";
+
+Al igual que en la shell, en Perl se usa C<< "<" >> para abrir el archivo en
+modo de solo lectura. Si se abre correctamente, Perl le asigna un nuevo
+identificador de archivo y coloca una referencia a ese identificador en el
+argumento C<$identificador> que estaba indefinido.
+
+Ahora puede aplicar funciones como C<readline>, C<read>, C<getc> y C<sysread> a
+ese identificador. Probablemente la función de entrada más común es la que
+parece un operador:
+
+    $linea = readline($identificador);
+    $linea = <$identificador>;     # lo mismo
+
+Como la función C<readline> devuelve C<undef> al final del archivo o en caso
+de error, a veces se usa de esta manera:
+
+    $linea = <$identificador>;
+    if (defined $linea) {
+        # hacer algo con $linea
+    }
+    else {
+        # se omite $linea porque no es válida
+    }
+
+Otra posibilidad es simplemente ejecutar C<die> cuando se lee un valor
+indefinido:
+
+    $linea = <$identificador> // die "no se encontró ninguna entrada";
+
+Sin embargo, en un contexto en el que sea normal (y esté previsto) encontrarse
+EOF, la ejecución del programa no debe finalizar cuando no se encuentre
+ninguna entrada de datos. En ese caso, lo normal es salir de un bucle de
+entrada. Puede entonces comprobar si fue un error real el que provocó que el
+bucle terminase, y actuar en consecuencia:
+
+    while (<$identificador>) {
+        # hacer algo con los datos de $_
+    }
+    if ($!) {
+        die "error inesperado al leer $nombre_archivo: $!";
+    }
+
+B<Nota sobre la codificación>: Puede resultar pesado tener que especificar la
+codificación del texto cada vez que se abre un archivo. Con el pragma C<open>
+se puede configurar una codificación predeterminada para la función C<open>
+de forma que no sea necesario indicarla en cada ocasión:
+
+    use open qw< :encoding(UTF-8) >;
+
+Una vez hecho esto no es necesario especificar la codificación en el modo de
+apertura:
+
+    open($identificador, "<", $nombre_archivo)
+        || die "$0: no se puede abrir $nombre_archivo para lectura: $!";
+
+Pero nunca se debe usar simplemente C<< "<" >> sin haber configurado
+previamente una codificación predeterminada. De lo contrario, Perl no podrá
+determinar de cuál de los muchos tipos posibles de archivos de texto es el
+archivo y no podrá asignar correctamente los datos del archivo a caracteres
+reales con los que trabajar. Otros formatos comunes de codificación son
+C<"ASCII">, C<"ISO-8859-1">, C<"ISO-8859-15">, C<"Windows-1252">, C<"MacRoman">
+e incluso C<"UTF-16LE">. Encontrará más información sobre codificaciones en
+L<perlunitut>.
+
+=head2 Abrir archivos de texto para escritura
+
+Antes de escribir en un archivo hay que decidir qué hacer con su contenido
+actual. Las dos opciones básicas son conservarlo o sobrescribirlo.
+
+Para preservar el contenido actual hay que abrir el archivo en modo anexar. Al
+igual que en la shell, en Perl se usa C<<< ">>" >>> para abrir un archivo en
+modo anexar. Si el archivo no existe, C<<< ">>" >>> lo crea.
+
+    my $identificador  = undef;
+    my $nombre_archivo = "/ruta/al/archivo/de/texto";
+    my $codificacion   = ":encoding(UTF-8)";
+
+    open($identificador, ">> $codificacion", $nombre_archivo)
+        || die "$0: no se puede abrir $nombre_archivo para anexar: $!";
+
+Ya puede escribir en ese identificador de archivo mediante C<print>, C<printf>,
+C<say>, C<write> o C<syswrite>.
+
+Como se ha indicado antes, si el archivo no existe, el modo anexar lo creará.
+Pero si el archivo ya existe, su contenido no se verá afectado, ya que el
+nuevo texto se anexará al final del texto actual.
+
+Sin embargo, a veces queremos sobrescribir el contenido de un archivo. Para
+vaciar un archivo antes de empezar a escribir en él, ábralo en modo de solo
+escritura:
+
+    my $identificador  = undef;
+    my $nombre_archivo = "/ruta/al/archivo/de/texto";
+    my $codificacion   = ":encoding(UTF-8)";
+
+    open($identificador, ">  $codificacion", $nombre_archivo)
+        || die "$0: no se puede abrir $nombre_archivo en modo de solo escritura: $!";
+
+En este caso Perl también funciona igual que la shell: C<< ">" >> sobrescribe
+un archivo existente.
+
+Al igual que en el modo anexar, al abrir el archivo en modo de solo escritura
+puede aplicar las funciones C<print>, C<printf>, C<say>, C<write> o C<syswrite>
+al identificador de archivo para escribir en el archivo.
+
+¿Y el modo de lectura y escritura? Quizás lo mejor sea olvidarse de que
+existe, ya que es probable que el resultado de abrir archivos de texto en modo
+de lectura y escritura no sea lo que espera. Encontrará información detallada
+en L<perlfaq5>.
+
+=head1 Abrir archivos binarios
+
+Si el archivo que se va a abrir contiene datos binarios en lugar de caracteres
+de texto, el argumento C<MODO> de C<open> cambia. En lugar de especificar la
+codificación, se indica a Perl que los datos son bytes puros.
+
+    my $nombre_archivo = "/ruta/a/un/archivo/binario/";
+    my $codificacion   = ":raw :bytes"
+    my $identificador  = undef;     # se rellenará en caso de éxito
+
+Se abre igual que antes, eligiendo entre C<<< "<" >>>, C<<< ">>" >>> o C<<< ">"
+>>>:
+
+    open($identificador, "< $codificacion", $nombre_archivo)
+        || die "$0: no se puede abrir $nombre_archivo para lectura: $!";
+
+    open($identificador, ">> $codificacion", $nombre_archivo)
+        || die "$0: no se puede abrir $nombre_archivo para anexar: $!";
+
+    open($identificador, ">  $codificacion", $nombre_archivo)
+        || die "$0: no se puede abrir $nombre_archivo en modo de solo escritura: $!";
+
+Como alternativa, se puede cambiar a modo binario en un identificador
+existente:
+
+    binmode($identificador)  || die "no se puede pasar el identificador a modo binario";
+
+Esto es especialmente útil para los identificadores que Perl abre
+automáticamente.
+
+    binmode(STDIN)         || die "no se puede pasar STDIN a modo binario";
+    binmode(STDOUT)        || die "no se puede pasar STDOUT a modo binario";
+
+También se puede especificar en C<binmode> una codificación explícita para
+cambiarla sobre la marcha. Esto no es exactamente modo "binario", pero usamos
+igualmente C<binmode> para aplicarla:
+
+  binmode(STDIN,  ":encoding(MacRoman)") || die "no se puede pasar STDIN a modo binario";
+  binmode(STDOUT, ":encoding(UTF-8)")    || die "no se puede pasar STDOUT a modo binario";
+
+Una vez abierto el archivo binario con el modo correcto, se pueden usar las
+mismas funciones de E/S de Perl que se usan con los archivos de texto. Sin
+embargo, es posible que se desee usar la función de lectura de tamaño fijo
+C<read> en lugar de la función de lectura tamaño variable C<readline> para la
+entrada de datos.
+
+Veamos un ejemplo de cómo se copia un archivo binario:
+
+    my $TAM_BUFER = 64 * (2 ** 10);
+    my $entrada   = "/archivo/de/entrada";
+    my $salida    = "/archivo/de/salida";
+
+    my($id_entrada, $id_salida, $bufer);
+
+    open($id_entrada,  "<", $entrada)
+        || die "$0: no se puede abrir $entrada para lectura: $!";
+    open($id_salida, ">", $salida)
+        || die "$0: no se puede abrir $salida para escritura: $!";
+
+    for my $id ($id_entrada, $id_salida)  {
+        binmode($id)    || die "error de binmode";
+    }
+
+    while (read($id_entrada, $bufer, $TAM_BUFER)) {
+        unless (print $id_salida $bufer) {
+            die "no se puede escribir en $salida: $!";
+        }
+    }
+
+    close($id_entrada)       || die "no se puede cerrar $entrada: $!";
+    close($id_salida)        || die "no se puede cerrar $salida: $!";
+
+=head1 Abrir tuberías
+
+Pendiente.
+
+=head1 Apertura de archivos de bajo nivel mediante sysopen
+
+Pendiente. O se eliminará.
+
+=head1 VEA TAMBIÉN
+
+Pendiente.
+
+=head1 AUTOR Y COPYRIGHT
+
+Copyright 2013 Tom Christiansen.
+
+Esta documentación es libre; puede redistribuirla y/o modificarla en los
+mismos términos que Perl.
+
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

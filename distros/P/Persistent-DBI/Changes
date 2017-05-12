@@ -1,0 +1,22 @@
+Revision history for the Persistent DBI package.
+
+Changes in Persistent 0.50	07 Feb 2000
+
+  This is the first submission of Persistent::DBI to CPAN.
+  Here are a few changes from earlier versions of this module:
+
+o Fixed Problem: upper case vs. lower case for column names in RDBMS.
+  Due to the fact that RDBMS systems vary on the issue of
+  case-senstive names, all object attributes are case-insensitive.  So
+  all attributes names are converted to lowercase for generated SQL and
+  internal use and it is recommended that all database tables and
+  columns be named in lowercase letters if the RDBMS is case-sensitive.
+
+o Added more arguments to datastore method for host and port.
+  No longer are there separate arguments fot host, port, server,
+  etc. for the datastore method.  Instead a DBI compliant data_source
+  string should be passed as the first argument to the datastore/new
+  methods along with a user/passwd combination if the RDBMS supports it.
+  This was decided since the DBI and RDBMS implementations vary greatly
+  on "connection criteria" and DBI already handles this nicely with
+  their DSN connect strings.

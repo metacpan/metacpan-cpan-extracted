@@ -1,0 +1,186 @@
+NAME
+    AnyEvent::PocketIO::Client - pocketio client
+
+SYNOPSIS
+        # This APIs will be changed.
+
+        use AnyEvent;
+        use AnyEvent::PocketIO::Client;
+    
+        my $client = AnyEvent::PocketIO::Client->new;    
+
+        $client->on('message' => sub {
+            print STDERR "get message : $_[1]\n";
+        });
+
+        # first handshake, then open.
+    
+        my $cv = AnyEvent->condvar;
+
+        $client->handshake( $server, $port, sub {
+            my ( $error, $self, $sesid, $hb_timeout, $con_timeout, $trans ) = @_;
+
+            $client->open( 'websocket' => sub {
+
+                $self->reg_event('foo' => sub {
+                    # ...
+                });
+
+                $cv->send;
+            } );
+
+        } );
+    
+        $cv->wait;
+    
+        # ... loop, timer, etc.
+    
+        $client->disconnect;
+    
+    
+        #
+        # OR socket.io client interface
+        #
+
+        use PocketIO::Client::IO;
+        my $socket = PocketIO::Client::IO->connect("http://localhost:3000/");
+
+        my $cv = AnyEvent->condvar;
+        my $w  = AnyEvent->timer( after => 5, cb => $cv );
+
+        $socket->on( 'message', sub {
+            say $_[1];
+        } );
+
+        $socket->on( 'connect', sub {
+            $socket->send('Parumon!');
+            $socket->emit('hello', "perl");
+        } );
+
+        $cv->wait;
+
+DESCRIPTION
+    Async client using AnyEvent.
+
+    This is beta version!
+
+    APIs will be changed.
+
+    Currently acceptable transport id is websocket only.
+
+METHODS
+  new
+        $client = AnyEvent::PocketIO::Client->new( %opts )
+
+    "new" takes options
+
+    handshake_timeout
+    open_timeout
+
+  handshake
+        $client->handshake( $host, $port, $cb );
+
+    The handshake routine. it executes a call back $cb that takes error,
+    client itself, session id, heartbeat timeout, connection timeout and
+    list reference of transports.
+
+        sub {
+            my ( $error, $client, $sesid, $hb_timeout, $conn_timeout, $trans ) = @_;
+            if ( $error ) {
+                say "code:", $error->{ code };
+                say "message:", $error->{ message };
+            }
+            # ...        
+        }
+
+  open
+        $client->open( $transport_id, $cb );
+
+    After "handshake" success, makes a connection to the server. Currently
+    $transport_id (case-insensitive) is "websocket" only.
+
+    When the connection is made, $cb is executed. $cb takes error object and
+    client object.
+
+        sub {
+            my ( $error, $client ) = @_;
+
+            if ( $error ) {
+                say "code:", $error->{ code };
+                say "message:", $error->{ message };
+            }
+
+            # ...        
+        }
+
+  is_opened
+        $boolean = $client->is_opend
+
+  connect
+        $client->connect( $endpoint )
+
+    This method is for message type connect. If you want to make a
+    connection to the server in real, call "open" method.
+
+  disconnect
+        $client->disconnect( $endpoint )
+
+    Sends message type disconnect to the server and close the socket handle.
+
+  reg_event
+        $client->reg_event( 'name' => $subref )
+
+    Register an event triggered by server's emit.
+
+    You should call this method after "open"ed.
+
+  emit
+        $client->emit( 'event_name', @args )
+
+  send
+        $client->send( 'message' )
+
+  conn
+        $conn = $client->conn; # PocketIO::Connection
+
+  on
+        $client->on( 'messsage_type' => $cb );
+
+    Acceptable types are 'open', 'connect', 'disconnect', 'heartbeat' and
+    'message'.
+
+  tranport
+        my $transport = $client->transport();
+
+WRAPPER CLASS
+    Simple client module PocketIO::Client::IO.
+
+        use PocketIO::Client::IO;
+        my $socket = PocketIO::Client::IO->connect("http://localhost:3000/");
+
+        my $cv = AnyEvent->condvar;
+        my $w  = AnyEvent->timer( after => 5, cb => $cv );
+
+        $socket->on( 'message', sub {
+            say $_[1];
+        } );
+
+        $socket->on( 'connect', sub {
+            $socket->send('Parumon!');
+            $socket->emit('hello', "perl");
+        } );
+
+        $cv->wait;
+
+SEE ALSO
+    AnyEvent, PocketIO, PcketIO::Client::IO
+
+AUTHOR
+    Makamaka Hannyaharamitu, <makamaka[at]cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2012 by Makamaka Hannyaharamitu
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

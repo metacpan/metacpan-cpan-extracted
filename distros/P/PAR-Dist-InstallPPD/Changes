@@ -1,0 +1,10 @@
+Revision history for Perl extension PAR::Dist::InstallPPD.
+
+0.01  Sun Dec 27 11:34 2006
+    - original version as uploaded to CPAN
+
+0.02  Sun Dec 27 16:07 2006
+    - Sensible default values for selectperl and selectarch.
+    - Not possible to set temporary distribution meta data any more because
+      that's completely unnecessary.
+    - Also, no more --nodocs.

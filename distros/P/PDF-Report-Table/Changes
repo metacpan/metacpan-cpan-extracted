@@ -1,0 +1,8 @@
+Revision history for Perl extension PDF::Report::Table.
+
+1.01  Tue Dec  6 14:10:48 2005
+	- Creates new page if it doesn't fit
+
+1.00  Mon Dec  5 18:14:25 2005
+	- Initial Release
+

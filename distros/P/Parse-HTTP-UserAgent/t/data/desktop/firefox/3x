@@ -1,0 +1,29 @@
+[AGENT]
+
+Mozilla/5.0 (Windows; U; Windows NT 5.1; tr; rv:1.9.0.3) Gecko/2008092417 Firefox/3.0.3
+
+'parser'           => 'firefox',
+'os'               => 'Windows XP',
+'strength'         => 'U',
+'extras'           => ['Windows'],
+'version_raw'      => '3.0.3',
+'lang'             => 'tr',
+'version'          => '3.000003',
+'mozilla'          => ['1.9.0.3','1.009000003'],
+'name'             => 'Firefox',
+'toolkit'          => ['Gecko','2008092417','2008092417.000']
+
+[AGENT]
+
+Mozilla/5.0 (Macintosh; U; Intel Mac OS X 10.5; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3
+
+'parser'      => 'firefox',
+'strength'    => 'U',
+'os'          => 'Intel Mac OS X 10.5',
+'extras'      => ['Macintosh'],
+'toolkit'     => ['Gecko','20100401','20100401.000'],
+'version_raw' => '3.6.3',
+'lang'        => 'en-US',
+'version'     => '3.006003',
+'mozilla'     => ['1.9.2.3','1.009002003'],
+'name'        => 'Firefox',

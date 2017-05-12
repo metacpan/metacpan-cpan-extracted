@@ -1,0 +1,10 @@
+CHANGES
+CHANGES.OLD
+MANIFEST
+Makefile.PL
+README
+UserAgent.pm
+t/01basic.t
+t/02multi.t
+t/03chunks.t
+META.yml                                 Module meta-data (added by MakeMaker)

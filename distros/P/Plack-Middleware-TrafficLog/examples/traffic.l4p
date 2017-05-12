@@ -1,0 +1,5 @@
+log4perl.logger.traffic = DEBUG, LogfileTraffic
+log4perl.appender.LogfileTraffic = Log::Log4perl::Appender::File
+log4perl.appender.LogfileTraffic.filename = traffic.log
+log4perl.appender.LogfileTraffic.layout = PatternLayout
+log4perl.appender.LogfileTraffic.layout.ConversionPattern = %m{chomp}%n

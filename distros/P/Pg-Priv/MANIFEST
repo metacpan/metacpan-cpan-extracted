@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Pg/Priv.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/base.t
+t/parser.t
+t/pod-coverage.t
+t/pod.t

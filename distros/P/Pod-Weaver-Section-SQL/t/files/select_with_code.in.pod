@@ -1,0 +1,9 @@
+=pod
+
+=sql SELECT C<$toto>
+FROM my_table
+WHERE date_insertion = C<$start>
+ AND date_insertion < C<$end>
+ AND SUBSTR(user_identifier, 2, 1) = C<$some_computed_value>
+
+=cut

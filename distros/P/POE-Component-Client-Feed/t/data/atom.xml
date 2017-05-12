@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <entry>
+    <link rel="alternate" href="http://showmetheco.de/articles/2010/11/technical-details-on-implementing-a-websocket-vnc-client.html" type="text/html"/>
+    <id>14703</id>
+    <title>vti: Technical details on implementing a WebSocket VNC client</title>
+    <author>
+      <name>vti</name>
+    </author>
+    <updated>2010-11-05T15:54:00Z</updated>
+    <content type="html">&lt;p&gt;Now I am going to explain more details about the previous &lt;a href="http://showmetheco.de/articles/2010/11/perl-websockets-and-vnc-in-your-browser.html" class="podlinkurl"&gt;http://showmetheco.de/articles/2010/11/perl-websockets-and-vnc-in-your-browser.html&lt;/a&gt; post.&lt;/p&gt;
+&lt;div class="more"&gt;&amp;rarr; &lt;a href="/articles/2010/11/technical-details-on-implementing-a-websocket-vnc-client.html#cut"&gt;Keep reading&lt;/a&gt;&lt;/div&gt;
+
+</content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://d.hatena.ne.jp/tokuhirom/20101105/1288951436" type="text/html"/>
+    <id>14701</id>
+    <title>Tokuhiro Matsuno: [perl]DBIx::Skinny’s trigger strategy</title>
+    <author>
+      <name>Tokuhiro Matsuno</name>
+    </author>
+    <updated>2010-11-05T10:03:56Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">my $row = $db-&gt;insert($args); pre_insert: ($db, $args, $table_name) post_insert: ($db, $row, $table_name) my $updated_rows_count = $db-&gt;update($args); my $updated_rows_count = $row-&gt;update(); # example $args: +{ id =&gt; $row-&gt;id } pre_update: ($db, $ar [...]
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://reneeb-perlblog.blogspot.com/2010/11/perl-ecosystem-group.html" type="text/html"/>
+    <id>14702</id>
+    <title>Renee Baecker: Perl Ecosystem Group</title>
+    <author>
+      <name>Renee Baecker</name>
+    </author>
+    <updated>2010-11-05T10:02:00Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Zusammen mit <a href="http://szabgab.com/">Gabor Szabo</a> habe ich die <a href="http://perl-ecosystem.com/">Perl Ecosystem Group</a> gestartet. Diese Organisation soll die Verbindung zwischen Unternehmen, die <a href="http://www.perl.org/">Perl</a> einsetzen, und der Perl Community verbessern.<br/>
+<br/>
+Unsere Ziele sind:<br/>
+<ul>
+<li>Unternehmen helfen mehr gute Perl-Programmierer [...]</li>
+</ul>
+
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://d.hatena.ne.jp/ZIGOROu/20101105/1288927369" type="text/html"/>
+    <id>14698</id>
+    <title>Toru Yamaguchi: [Perl][MySQL] Time::Piece::MySQL とタイムゾーン</title>
+    <author>
+      <name>Toru Yamaguchi</name>
+    </author>
+    <updated>2010-11-05T03:22:49Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">MySQL から UNIX_TIMESTAMP() と NOW() の値をこんな感じで出します。 [12:13:13 root@bopobo/test :4] SELECT UNIX_TIMESTAMP(), NOW(); +------------------+---------------------+ | UNIX_TIMESTAMP() | NOW() | +------------------+---------------------+ | 1288926767 | 2010-11 [...]
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://szabgab.com/blog/2010/11/perl-ecosystem-group.html" type="text/html"/>
+    <id>14700</id>
+    <title>Gabor Szabo (szabgab): Perl Ecosystem Group</title>
+    <author>
+      <name>Gabor Szabo (szabgab)</name>
+    </author>
+    <updated>2010-11-05T02:44:00Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Finally it is happening. Renee Baecker and myself have established the Perl Ecosystem Group. We have several items on our agenda such as Helping companies to be better connected to the Perl community. Helping companies to find more good Perl develope [...]
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://www.modernperlbooks.com/mt/2010/11/composability-scoping-and-non-interference.html" type="text/html"/>
+    <id>14697</id>
+    <title>chromatic: Composability, Scoping, and Non-Interference</title>
+    <author>
+      <name>chromatic</name>
+    </author>
+    <updated>2010-11-04T19:32:11Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Perl 5's flexibility allows the CPAN to exist and CPAN's flexibility allows Perl 5 to evolve. Where would Perl be without the DBI or TAP? Imagine using Perl 5 without LWP or Moose or Perl::Critic. Even so, the difference between...
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://d.hatena.ne.jp/Craftworks/20101104/1288889018" type="text/html"/>
+    <id>14696</id>
+    <title>Craftworks: [perl][cpan] WWW::Curl で使えるオプション一覧</title>
+    <author>
+      <name>Craftworks</name>
+    </author>
+    <updated>2010-11-04T16:43:38Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">WWW::Curl は速いですがドキュメントが少ないのが玉に瑕です。perldoc に setopt() や getinfo() で指定できるオプション一覧が載っていないです。 実は PHP のマニュアルに良い感じで載っています。 setopt() に指定できるオプション一覧 getinfo() に指定できるオプション
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://d.hatena.ne.jp/holidays-l/20101105/p1" type="text/html"/>
+    <id>14699</id>
+    <title>Hironori Yoshida: [Perl]colordiffの文字単位版ccdiffを作ったid:yappo++</title>
+    <author>
+      <name>Hironori Yoshida</name>
+    </author>
+    <updated>2010-11-04T15:00:00Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml"><div class="section">
+<p>diffに色付けしたかったけど、colordiffみたいな行単位じゃなくて、文字単位で色付けしたい。</p>
+<p><a href="http://d.hatena.ne.jp/yappo/">id:yappo</a>の<a href="http://cpansearch.perl.org/perldoc?String::Diff">String::Diff - search.cpan.org</a>使ってccdiff(charactor color diff)というのをでっちあげた。</p>
+<br/>
+<p>ってか後から単語単位の方がいいかなと思った。</p>
+<p>でwdiffとcolordiffの組み合わせとか試してみたけど、</p>
+<pre class="syntax-highlight">
+% cat foo.patch <span class="synStatement">|</span> wdiff <span class="synSpecial">-d</span> <span class="synStatement">|</span> colordiff
+</pre>
+<p>だと、日本語の扱いもおかしくて何か出力が微妙で [...]</p>
+</div>
+
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://www.martin-evans.me.uk/node/82" type="text/html"/>
+    <id>14694</id>
+    <title>Martin Evans (MJEVANS): Development release of DBD::ODBC 1.26_1 - please test</title>
+    <author>
+      <name>Martin Evans (MJEVANS)</name>
+    </author>
+    <updated>2010-11-03T19:07:21Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">I've recently uploaded a new experimental (and development) release of DBD::ODBC 1.26_1 to CPAN. This contains over 200 block code changes so it is a VERY significant change and should not be used on production servers until you have tested it. This [...]
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://feedproxy.google.com/~r/Scrollingtext/~3/-NuB0MiuaTI/project-euler-problem-8" type="text/html"/>
+    <id>14693</id>
+    <title>Bryce Verdier: Project Euler: Problem 8</title>
+    <author>
+      <name>Bryce Verdier</name>
+    </author>
+    <updated>2010-11-03T17:43:45Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml"><p>The website has problem eight stated as such,“Find the greatest product of five consecutive digits in the 1000-digit number.<br/>
+73167176531330624919225119674426574742355349194934<br/>
+96983520312774506326239578318016984801869478851843<br/>
+85861560789112949495459501 [...]</p>
+
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://d.hatena.ne.jp/gfx/20101103/1288801272" type="text/html"/>
+    <id>14692</id>
+    <title>Goro Fuji (GFUJI):  Mojolicious meets Xslate</title>
+    <author>
+      <name>Goro Fuji (GFUJI)</name>
+    </author>
+    <updated>2010-11-03T16:21:12Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Re: Mojolicious::Liteで、Text::XSlateを使えるようにする 遅レスですが、MojoX::Renderer::Xslateをデフォルトで__DATA__以下を見るようにしてもらいました。 これでMojoでも特別な工夫なくXslateが使えます。。 #!perl package HelloMojo; use strict; use warnings; use Mojolicious::Lite; # バージョン確認のためuseしているが、 # 通常はplubin()で自 [...]
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://feedproxy.google.com/~r/PatchPublishOrPaw/~3/5QveLmedtJ0/Wrapping-An-OO-module-in-a-procedural-API-using-Exporter::Simple.html" type="text/html"/>
+    <id>14691</id>
+    <title>f00li5h: Wrapping An OO module in a procedural API using Exporter::Simple</title>
+    <author>
+      <name>f00li5h</name>
+    </author>
+    <updated>2010-11-03T10:22:00Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml"><p><strong>Object Oriented Programming:</strong> An idiom in which you capture behaviour along with state with interlated types.</p>
+<p>I like procedural APIs. I'm not sorry about that. OO is a hammer, and sometimes I want to put in a screw, simple.</p>
+<h2><a name="an_example___" id="an_example___">An example...</a></h2>
+<p><code>CPAN.pm</code> is a goo [...]</p>
+
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://showmetheco.de/articles/2010/11/20101003T7:57:00-perl-websockets-and-vnc-in-your-browser.html" type="text/html"/>
+    <id>14690</id>
+    <title>vti: Perl, WebSockets and VNC in your browser</title>
+    <author>
+      <name>vti</name>
+    </author>
+    <updated>2010-11-03T09:56:42Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Here is a video a made up to show that it is possible to run a VNC client in your browser! Perl + WebSockets + VNC Source code is available on GitHub http://github.com/vti/showmethedesktop.
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://showmetheco.de/articles/2010/11/perl-websockets-and-vnc-in-your-browser.html" type="text/html"/>
+    <id>14695</id>
+    <title>vti: Perl, WebSockets and VNC in your browser</title>
+    <author>
+      <name>vti</name>
+    </author>
+    <updated>2010-11-03T07:57:00Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Here is a video a made up to show that it is possible to run a VNC client in your browser! Perl + WebSockets + VNC Source code is available on GitHub http://github.com/vti/showmethedesktop.
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://blog.lib.umn.edu/leonard/perl/2010/11/the-lone-programmer.html" type="text/html"/>
+    <id>14687</id>
+    <title>Leonard: The lone programmer</title>
+    <author>
+      <name>Leonard</name>
+    </author>
+    <updated>2010-11-02T19:50:35Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Beware the lone programmer.I say this for many reasons, but they all can be summed up by answering either: 1. Why isn't anyone else working with him/her? Or: 2. What are we missing with a programmer working alone?I will start...
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://vampiresoftware.blogspot.com/2010/11/web-design-survey.html" type="text/html"/>
+    <id>14686</id>
+    <title>Andy Brown (setitesuk): Web design Survey</title>
+    <author>
+      <name>Andy Brown (setitesuk)</name>
+    </author>
+    <updated>2010-11-02T08:54:00Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml"><a href="http://alistapart.com/articles/survey2010"><img src="http://aneventapart.com/webdesignsurvey/templates/ala/images/i-took-the-2010-survey.gif" alt=""/></a>
+<div class="blogger-post-footer"><img alt=""/></div>
+
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://blogs.perl.org/users/olaf_alders/2010/11/using-plack-to-like-a-module-on-facebook.html" type="text/html"/>
+    <id>14685</id>
+    <title>Olaf Alders: Using Plack to "Like" a Module on Facebook</title>
+    <author>
+      <name>Olaf Alders</name>
+    </author>
+    <updated>2010-11-02T03:36:02Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">We've made a couple of fun changes to cpan-mangler. First off, you can now "like" modules on Facebook: Now, up and downvoting of modules would be a lot more useful, but this can be fun (and confusing for your friends):...
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://szabgab.com/blog/2010/11/perl-devroom-at-fosdem-2011.html" type="text/html"/>
+    <id>14684</id>
+    <title>Gabor Szabo (szabgab): Perl Devroom at FOSDEM 2011 - call for talk proposals</title>
+    <author>
+      <name>Gabor Szabo (szabgab)</name>
+    </author>
+    <updated>2010-11-02T01:47:36Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">A couple of days ago our request for a Perl devroom was accepted by the FOSDEM organizers. This means we are going to have a room on Sunday, 6th February from 9:00-17:00 where we can organize Perl related talks. The room has 72 seats and the expected [...]
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://www.modernperlbooks.com/mt/2010/11/extensibility-and-composability.html" type="text/html"/>
+    <id>14681</id>
+    <title>chromatic: Extensibility and Composability</title>
+    <author>
+      <name>chromatic</name>
+    </author>
+    <updated>2010-11-01T18:50:11Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Everyone always says that CPAN is Perl 5's killer feature, and that's true to an extent. Certainly the ability for me, an experienced Perl 5 programmer and CPAN contributor, to discover a need in my code, search CPAN for it,...
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://perl-howto.de/2010/11/lesetipp-16-ausgabe-des-perlmagazins-foo-erschienen.html" type="text/html"/>
+    <id>14682</id>
+    <title>Thomas Fahle: Lesetipp: 16. Ausgabe des Perl-Magazins $foo erschienen</title>
+    <author>
+      <name>Thomas Fahle</name>
+    </author>
+    <updated>2010-11-01T18:45:00Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Heute ist die neue, 16. Ausgabe des Perl-Magazins $foo erschienen. Inhalt der 16. Ausgabe: Zeitbasierte Konfiguration Bis 20 Uhr soll diese Konfiguration gültig sein, danach jene Konfiguration. Kein Problem. Dieser Artikel zeigt einen Lösungsansatz f [...]
+</div>
+    </content>
+  </entry>
+  <entry>
+    <link rel="alternate" href="http://bioblog5000.blogspot.com/2010/11/problems-with-your-local-perl-install.html" type="text/html"/>
+    <id>14683</id>
+    <title>Dan Bolser (faceface): Problems with your local perl install?</title>
+    <author>
+      <name>Dan Bolser (faceface)</name>
+    </author>
+    <updated>2010-11-01T18:23:00Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Try the following uber 1337 commands:<br/>
+<br/>
+mv ~/perl5 ~/notperl5<br/>
+wget -O - http://cpanmin.us | perl - -L ~/perl5 --self-upgrade local::lib<br/>
+<br/>
+<br/>
+ZOMG!<br/>
+<br/>
+<br/>
+<br/>
+OK, now add your ~/perl5 dir into git...<br/>
+cd ~/perl5/ ; git init ; git add . ; git commit -m 'initial import'<br/>
+<br/>
+This wi [...]
+</div>
+    </content>
+  </entry>
+</feed>

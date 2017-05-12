@@ -1,0 +1,74 @@
+{
+   "abstract" : "Sends events for new articles posted to an NNTP newsgroup",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-Client-NNTP-Tail",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp::POE" : 0,
+            "POE" : 0,
+            "POE::Component::Client::NNTP" : 0,
+            "POE::Component::Server::NNTP" : 0,
+            "Params::Validate" : 0,
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Email::Date::Format" : 0,
+            "Email::Simple" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "provides" : {
+      "POE::Component::Client::NNTP::Tail" : {
+         "file" : "lib/POE/Component/Client/NNTP/Tail.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-poe-component-client-nntp-tail at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Client-NNTP-Tail"
+      },
+      "homepage" : "http://github.com/dagolden/poe-component-client-nntp-tail",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/dagolden/poe-component-client-nntp-tail",
+         "web" : "http://github.com/dagolden/poe-component-client-nntp-tail"
+      }
+   },
+   "version" : "0.03"
+}
+

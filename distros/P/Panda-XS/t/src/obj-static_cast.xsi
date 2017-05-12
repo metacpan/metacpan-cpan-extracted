@@ -1,0 +1,69 @@
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::PTRMyStatic
+PROTOTYPES: DISABLE
+
+PTRMyStatic* PTRMyStatic::new (int arg) {
+    if (arg) RETVAL = new PTRMyStatic(arg);
+    else RETVAL = NULL;
+}
+
+int PTRMyStatic::val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+void PTRMyStatic::DESTROY ()
+
+
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::PTRMyStaticChild
+PROTOTYPES: DISABLE
+
+BOOT {
+    av_push(get_av("Panda::XS::Test::PTRMyStaticChild::ISA", GV_ADD), newSVpvs_share("Panda::XS::Test::PTRMyStatic"));
+}
+
+PTRMyStaticChild* PTRMyStaticChild::new (int arg1, int arg2) {
+    if (arg1 || arg2) RETVAL = new PTRMyStaticChild(arg1, arg2);
+    else RETVAL = NULL;
+}
+
+int PTRMyStaticChild::val2 (SV* newval = NULL) {
+    if (newval) THIS->val2 = SvIV(newval);
+    RETVAL = THIS->val2;
+}
+
+
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::MyStatic
+PROTOTYPES: DISABLE
+
+MyStatic* MyStatic::new (int arg) {
+    if (arg) RETVAL = new MyStatic(arg);
+    else RETVAL = NULL;
+}
+
+int MyStatic::val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+void MyStatic::DESTROY ()
+
+
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::MyStaticChild
+PROTOTYPES: DISABLE
+
+BOOT {
+    av_push(get_av("Panda::XS::Test::MyStaticChild::ISA", GV_ADD), newSVpvs_share("Panda::XS::Test::MyStatic"));
+}
+
+MyStaticChild* MyStaticChild::new (int arg1, int arg2) {
+    if (arg1 || arg2) RETVAL = new MyStaticChild(arg1, arg2);
+    else RETVAL = NULL;
+}
+
+int MyStaticChild::val2 (SV* newval = NULL) {
+    if (newval) THIS->val2 = SvIV(newval);
+    RETVAL = THIS->val2;
+}

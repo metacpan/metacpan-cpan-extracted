@@ -1,0 +1,3 @@
+requires 'Pcore', v0.24.5;
+requires 'Imager';
+requires 'Imager::File::PNG';

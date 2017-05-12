@@ -1,0 +1,76 @@
+v0.1.3    2014-01-23 18:48:51 UTC
+
+  Positron::Template changes:
+  - Environment inclusion sigils ',' and ';'
+  - Function-on-DOM sigil '^'
+
+v0.1.2    2014-01-07 20:42:26 UTC
+
+  Positron::Handler::Template changes:
+  - Wrapping ':' sigil
+  Positron::Handler::ArrayRef changes:
+  - Attribute HashRef no longer required to be present (but must still
+    be in second position if it is)
+
+v0.1.1    2013-12-20 20:44:36 UTC
+
+  - Bugfix: used 'store' instead of 'nstore' to build a Storable
+    file to be distributed with tests -> boom!
+
+v0.1.0    2013-12-19 21:04:44 UTC
+
+  Positron::Template:
+  - First running version of Positron::Template
+  - Use ArrayRef handler for now; others are not implemented
+  - Supported sigils:
+    text replacement, loops, conditions, switches, comments (text and structure),
+    file includes
+  Positron::Handler::ArrayRef:
+  - Handler can optionally read JSON, not just storable
+
+v0.0.8    2013-12-14 21:05:01 UTC
+
+  DataTemplate changes:
+  - Switch construct uses '|' instead of '?'
+  - "Conditional key" as syntactic sugar for conditional hash
+    slices
+
+v0.0.7    2013-12-11 20:51:42 UTC
+
+  - Softening of expressions: graceful degrading to "undef"
+    when the environment is underdefined
+  - Syntax change: Expression 'hashref.func()' looks up the
+    function in the hash and calls it with no extra arguments.
+
+v0.0.6    2013-12-10 19:05:11 UTC
+
+  - Replaced Parse::RecDescent with Regex-based parser for
+    Positron::Expression
+  - Hardening of expressions: detect malformed input.
+
+v0.0.5    2013-09-09 18:33:53 UTC
+
+  - Added assignment construct '=' to DataTemplate.
+  - Added escaping constructs '~' and '{~}' to DataTemplate.
+
+v0.0.4    2013-07-25 18:19:55 UTC
+
+  - Positron::Environment can take arbitrary scalar data
+  - Positron::Environment with special key '_' which gets / sets
+    the entire data
+  - Added wrapping construct ':'.
+
+v0.0.3    2013-06-06 18:26:18 UTC
+
+  - Interpolation.
+  - Positron::Expression::reduce method added
+  - More documentation.
+
+v0.0.2    2013-05-21 17:59:14 UTC
+
+  Minor release, making the Perl version explicit (for cpantesters),
+  and adding some build infrastructure.
+
+v0.0.1    2013-05-17 13:49:50 UTC
+
+  First version, about half of Positron::DataTemplate usable

@@ -1,0 +1,15 @@
+0.07  - Windows: Try to get at the native OpenGL context, not the
+        default software implementation
+
+0.06  - add alpha layering support
+
+0.05  - small fixes
+
+0.04  - use CONFIGURE_REQUIRES in Makefile.PL
+
+0.03  - fixes for cpan testing
+
+0.02  - basic concept tested, works with latest OpenGL and Prima
+
+0.01  - original version created
+

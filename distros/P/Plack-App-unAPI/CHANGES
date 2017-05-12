@@ -1,0 +1,29 @@
+Changelog for Plack-App-unAPI
+
+0.61 2013-09-18T15:10:10
+ - pass $env to format methods as well
+
+0.60 2013-09-17T09:34:43
+ - fixed tests on Perl >= 5.18
+ - introduced method 'available_formats'
+ - refactoring
+ - fixed documentation
+
+0.51 2013-09-12T12:36:01
+ - sort format list
+ - slightly changed build process
+
+0.5 2013-08-06T10:33:07
+ - test coverage
+ - test XML escaping
+ - Support subclassing Plack::App::unAPI
+ - moved core to Plack::App::unAPI::Impl
+ - Fixed test failure introduced by Plack::Middleware::Negotiate
+
+0.41 2013-08-01T11:03:31
+ - release 0.41
+ - Removed smartmatch operator for perl >= 5.18
+ - show test coverage with coveralls
+ - removed logging, added travis
+ - fixed Exporter bug
+

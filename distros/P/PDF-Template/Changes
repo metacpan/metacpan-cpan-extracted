@@ -1,0 +1,52 @@
+Revision history for Perl distribution PDF::Template
+
+0.21 Tue Jan 11 10:00:00 2005
+    - Added tests to demonstrate bug submitted by Brian T. Wightman
+    - Fixed bug in conditionals submitted by Brian T. Wightman
+      - Conditionals now correctly handle string comparisons
+
+0.20 Thu Dec 02 10:30:00 2004
+    - Fixed tests so that they run correctly
+    - Fixed Makefile.PL to generate Unicode-question correctly
+
+0.18 Thu Apr 08 07:30:00 2004
+    - Fixed bug regarding empty arrays as loop variables
+
+0.17 Wed Mar 17 12:00:00 2003
+    - Fixed bug introduced in 0.16 (loop parameters weren't case-insensitive)
+
+0.16 Wed Mar 17 12:00:00 2003
+    - Parameter names are now case-insensitive
+
+0.15 Tue Mar 16 12:00:00 2003
+    - Fixed bug w/using the same image in more than one <image> tag
+
+0.13 Tue Jan 20 12:30:00 2003
+    - Fixed bug IMAGE tag (caused by ..::Font::begin_page() not calling SUPER)
+    - Added Base to allow for external entities to be referenced by filename
+      without hard-coding the directory name.
+
+0.12 Tue Dec 19 11:30:00 2003
+    - Fixed bug with HEADERs not appearing when landscape is set
+
+0.12 Tue Dec 16 09:30:00 2003
+    - Fixed bug with HEADERs not appearing where appropriate when
+      PAGE_SIZE option is chosen.
+
+0.11 Fri Dec 07 17:00:00 2003
+    - Makefile.PL has two changes:
+        - <> => <STDIN>
+        - 5.8+ will now not ask you about Unicode support.
+    - PDF::Template::Factory::register() now works correctly
+    - All nodes are now documented (still need to document helper classes)
+    - WEBLINK will now work with parameterized X1/X2/Y1/Y2
+
+    Thanks to Nathan Byrd for pointing out and providing patches for two bugs.
+
+0.10 Fri Nov 30 17:00:00 2003
+    - Wholescale changes to the underlying structure
+    - Addition of a concept of scope, allowing for relative positioning
+    - Support for CJK fonts
+    - Maintenance fixes
+    - Turnover of maintenance from David Ferrance to Rob Kinyon
+

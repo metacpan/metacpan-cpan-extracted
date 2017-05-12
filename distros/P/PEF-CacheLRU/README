@@ -1,0 +1,3 @@
+PEF::CacheLRU - a very simple and very fast implementation of LRU cache in pure perl
+
+Github: https://github.com/pef-secure/pef-cache-lru

@@ -1,0 +1,30 @@
+---
+abstract: 'A tftp-server, implemented through POE'
+author:
+  - 'Jan Henning Thorsen, C<< <jhthorsen-at-cpan-org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-TFTPd
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  POE: 1.284
+  POE::Wheel::UDP: 0.02
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-TFTPd
+  homepage: http://search.cpan.org/dist/POE-Component-TFTPd
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com//home/repositories/poe-component-tftpd.git
+version: 0.0302

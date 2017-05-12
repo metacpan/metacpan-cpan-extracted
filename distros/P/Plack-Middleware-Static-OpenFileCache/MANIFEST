@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Plack/Middleware/Static/OpenFileCache.pm
+minil.toml
+t/00_compile.t
+t/01_static.t
+t/02_cache.t
+t/share/face.jpg
+t/static.foo
+t/static.txt
+t/test.txt
+META.yml
+MANIFEST

@@ -1,0 +1,13 @@
+0.04  2014-06-06 00:47:15 JST
+        - No change in features
+        - Clear distraction files
+
+0.03  2013-01-25 00:00:00 JST
+        - Add create() factory method.
+
+0.02  2013-01-21 00:00:00 JST
+        - Fixed Windows bugs in tests.
+
+0.01  2013-01-10 00:00:00 JST
+        - First release.
+

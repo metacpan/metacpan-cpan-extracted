@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<?xml-stylesheet type="text/xsl" href="http://gso.gbv.de/sru/?xsl=searchRetrieveResponse" ?>
+<srw:searchRetrieveResponse xmlns:srw="http://www.loc.gov/zing/srw/"
+			    xmlns:dc="http://purl.org/dc/elements/1.1/"
+			    xmlns:diag="http://www.loc.gov/zing/srw/diagnostic/"
+			    xmlns:xcql="http://www.loc.gov/zing/cql/xcql/">
+    <srw:version>1.1</srw:version>
+    <srw:numberOfRecords>2</srw:numberOfRecords>
+    <srw:resultSetId>SID68ddfabd-11a4S4</srw:resultSetId>
+    <srw:records>
+    
+
+
+<srw:record>
+<srw:recordSchema>pica</srw:recordSchema>
+<srw:recordPacking>xml</srw:recordPacking>
+<srw:recordData>
+<record>
+<datafield tag="001@"><subfield code="0">70,82,227,246,302</subfield></datafield>
+<datafield tag="001A"><subfield code="0">2004:04-03-04</subfield></datafield>
+<datafield tag="001B"><subfield code="0">2004:28-02-07</subfield>
+<subfield code="t">21:44:19.000</subfield></datafield>
+<datafield tag="001D"><subfield code="0">2004:04-03-04</subfield></datafield>
+<datafield tag="001U"><subfield code="0">utf8</subfield></datafield>
+<datafield tag="001X"><subfield code="0">0</subfield></datafield>
+<datafield tag="002@"><subfield code="0">Abvz</subfield></datafield>
+<datafield tag="003@"><subfield code="0">380023024</subfield></datafield>
+<datafield tag="006Z"><subfield code="0">21369641</subfield></datafield>
+<datafield tag="010@"><subfield code="a">ger</subfield></datafield>
+<datafield tag="011@"><subfield code="a">2003</subfield>
+<subfield code="n">2003-</subfield></datafield>
+<datafield tag="019@"><subfield code="a">XA-DE</subfield></datafield>
+<datafield tag="021A"><subfield code="a">Der @große Öko-Test-Einkaufsratgeber</subfield>
+<subfield code="d">für ... ; ... Produkte aus ... Tests im Überblick</subfield></datafield>
+<datafield tag="027A"><subfield code="a">Öko-Test-Jahrbuch / Der große Öko-Test-Einkaufsratgeber</subfield></datafield>
+<datafield tag="027A" occurrence="01"><subfield code="a">Öko-Test / Jahrbuch / Der große Öko-Test-Einkaufsratgeber</subfield></datafield>
+<datafield tag="027A" occurrence="02"><subfield code="a">Öko-Test / Sonderheft</subfield></datafield>
+<datafield tag="027A" occurrence="03"><subfield code="a">Öko-Test-Jahrbuch</subfield></datafield>
+<datafield tag="027A" occurrence="04"><subfield code="a">Öko-Test-Sonderheft</subfield></datafield>
+<datafield tag="031@"><subfield code="a">2.2004(2003) -</subfield></datafield>
+<datafield tag="033A"><subfield code="p">Frankfurt, M.</subfield>
+<subfield code="n">Öko-Test-Verl.</subfield></datafield>
+<datafield tag="036E"><subfield code="a">Öko-Test</subfield>
+<subfield code="b">Jahrbuch</subfield></datafield>
+<datafield tag="039E"><subfield code="c">Vorg.</subfield>
+<subfield code="7">20925578</subfield>
+<subfield code="a">Öko-Test / Jahrbuch</subfield></datafield>
+<datafield tag="045U"><subfield code="a">630</subfield></datafield>
+<datafield tag="046C"><subfield code="a">Nebent.: Öko-Test-Jahrbuch</subfield></datafield>
+<datafield tag="046D"><subfield code="a">Nebent. teils: Öko-Test-Sonderheft</subfield></datafield>
+<datafield tag="101@"><subfield code="a">227</subfield>
+<subfield code="c">PICA</subfield>
+<subfield code="d">Braunschweig, Städtische Bibliotheken Braunschweig   &#60;917&#62;</subfield></datafield>
+<datafield tag="201B" occurrence="01"><subfield code="0">10-08-06</subfield>
+<subfield code="t">10:38:31.000</subfield></datafield>
+<datafield tag="201D" occurrence="01"><subfield code="0">10-08-06</subfield>
+<subfield code="b">566088</subfield>
+<subfield code="a">0917/0001</subfield></datafield>
+<datafield tag="201U" occurrence="01"><subfield code="0">utf8</subfield></datafield>
+<datafield tag="203@" occurrence="01"><subfield code="0">77404733X</subfield></datafield>
+<datafield tag="208@" occurrence="01"><subfield code="a">10-08-06</subfield>
+<subfield code="b">x</subfield></datafield>
+<datafield tag="101@"><subfield code="a">82</subfield>
+<subfield code="c">PICA</subfield>
+<subfield code="d">Frankfurt am Main, Universitätsbibliothek Johann Christian Senckenberg   &#60;30&#62;</subfield></datafield>
+<datafield tag="201B" occurrence="01"><subfield code="0">10-06-06</subfield>
+<subfield code="t">23:41:27.000</subfield></datafield>
+<datafield tag="201D" occurrence="01"><subfield code="0">10-06-06</subfield>
+<subfield code="b">zdb2vfl</subfield>
+<subfield code="a">1999</subfield></datafield>
+<datafield tag="201U" occurrence="01"><subfield code="0">utf8</subfield></datafield>
+<datafield tag="203@" occurrence="01"><subfield code="0">657981060</subfield></datafield>
+<datafield tag="206W" occurrence="01"><subfield code="0">080714188</subfield>
+<subfield code="z">1</subfield></datafield>
+<datafield tag="208@" occurrence="01"><subfield code="a">06-11-02</subfield>
+<subfield code="b">bAa</subfield></datafield>
+<datafield tag="209A" occurrence="01"><subfield code="b">8110</subfield>
+<subfield code="f">000</subfield>
+<subfield code="a">Zs 23813</subfield>
+<subfield code="d">u</subfield>
+<subfield code="x">00</subfield></datafield>
+<datafield tag="209K" occurrence="01"><subfield code="b">0030</subfield></datafield>
+<datafield tag="231@" occurrence="01"><subfield code="d">12</subfield>
+<subfield code="j">2004</subfield>
+<subfield code="6"></subfield></datafield>
+<datafield tag="231B" occurrence="01"><subfield code="a">12.2004(2003) -</subfield></datafield>
+<datafield tag="101@"><subfield code="a">246</subfield>
+<subfield code="c">PICA</subfield>
+<subfield code="d">Fulda, Hochschul- und Landesbibliothek Fulda Standort Heinrich-von-Bibra-Platz &#60;66&#62;</subfield></datafield>
+<datafield tag="201B" occurrence="01"><subfield code="0">04-11-06</subfield>
+<subfield code="t">04:04:31.000</subfield></datafield>
+<datafield tag="201D" occurrence="01"><subfield code="0">04-11-06</subfield>
+<subfield code="b">zdblok</subfield>
+<subfield code="a">1999</subfield></datafield>
+<datafield tag="201U" occurrence="01"><subfield code="0">utf8</subfield></datafield>
+<datafield tag="203@" occurrence="01"><subfield code="0">725909269</subfield></datafield>
+<datafield tag="206W" occurrence="01"><subfield code="0">10547956X</subfield>
+<subfield code="z">1</subfield></datafield>
+<datafield tag="208@" occurrence="01"><subfield code="a">06-06-05</subfield>
+<subfield code="b">b</subfield></datafield>
+<datafield tag="209A" occurrence="01"><subfield code="b">8110</subfield>
+<subfield code="f">LS</subfield>
+<subfield code="a">26/490/110</subfield>
+<subfield code="d">s</subfield>
+<subfield code="x">00</subfield></datafield>
+<datafield tag="209A" occurrence="01"><subfield code="a">Z 4914</subfield>
+<subfield code="x">09</subfield></datafield>
+<datafield tag="231@" occurrence="01"><subfield code="d">3</subfield>
+<subfield code="j">2005</subfield>
+<subfield code="6"></subfield></datafield>
+<datafield tag="231B" occurrence="01"><subfield code="a">3.2005(2004) -</subfield></datafield>
+<datafield tag="231D" occurrence="01"><subfield code="a">LS=letzte Ausg. - Ausleihe=vorletzte Ausg. [41 / Hdg groß]</subfield></datafield>
+<datafield tag="101@"><subfield code="a">70</subfield>
+<subfield code="c">PICA</subfield>
+<subfield code="d">Hannover, TIB/UB Hannover   &#60;89&#62;</subfield></datafield>
+<datafield tag="201B" occurrence="01"><subfield code="0">02-02-07</subfield>
+<subfield code="t">10:56:37.000</subfield></datafield>
+<datafield tag="201D" occurrence="01"><subfield code="0">02-02-07</subfield>
+<subfield code="b">2738</subfield>
+<subfield code="a">0089</subfield></datafield>
+<datafield tag="201U" occurrence="01"><subfield code="0">utf8</subfield></datafield>
+<datafield tag="203@" occurrence="01"><subfield code="0">802804519</subfield></datafield>
+<datafield tag="208@" occurrence="01"><subfield code="a">05-12-06</subfield>
+<subfield code="b">b</subfield></datafield>
+<datafield tag="209A" occurrence="01"><subfield code="f">L all Z 35</subfield>
+<subfield code="a">ZB 5746 [Haus2]</subfield>
+<subfield code="d">f</subfield>
+<subfield code="x">00</subfield></datafield>
+<datafield tag="231@" occurrence="01"><subfield code="d">5</subfield>
+<subfield code="j">2007</subfield></datafield>
+<datafield tag="245P" occurrence="01"><subfield code="a">z</subfield></datafield>
+<datafield tag="101@"><subfield code="a">302</subfield>
+<subfield code="c">PICA</subfield>
+<subfield code="d">Speyer, Pfälzische Landesbibliothek   &#60;107&#62;</subfield></datafield>
+<datafield tag="201B" occurrence="01"><subfield code="0">10-06-06</subfield>
+<subfield code="t">23:41:27.000</subfield></datafield>
+<datafield tag="201D" occurrence="01"><subfield code="0">10-06-06</subfield>
+<subfield code="b">zdb2vfl</subfield>
+<subfield code="a">1999</subfield></datafield>
+<datafield tag="201U" occurrence="01"><subfield code="0">utf8</subfield></datafield>
+<datafield tag="203@" occurrence="01"><subfield code="0">638055423</subfield></datafield>
+<datafield tag="206W" occurrence="01"><subfield code="0">094140227</subfield>
+<subfield code="z">1</subfield></datafield>
+<datafield tag="208@" occurrence="01"><subfield code="a">25-02-04</subfield>
+<subfield code="b">b</subfield></datafield>
+<datafield tag="209A" occurrence="01"><subfield code="b">8111</subfield>
+<subfield code="a">Per. 17426</subfield>
+<subfield code="d">u</subfield>
+<subfield code="x">00</subfield></datafield>
+<datafield tag="231@" occurrence="01"><subfield code="d">2</subfield>
+<subfield code="j">2004</subfield>
+<subfield code="6"></subfield></datafield>
+<datafield tag="231B" occurrence="01"><subfield code="a">2.2004(2003) -</subfield></datafield></record></srw:recordData><srw:recordPosition>1</srw:recordPosition></srw:record>
+
+<srw:record>
+<srw:recordSchema>pica</srw:recordSchema>
+<srw:recordPacking>xml</srw:recordPacking>
+<srw:recordData>
+<record>
+<datafield tag="001@"><subfield code="0">70,78,82,246</subfield></datafield>
+<datafield tag="001A"><subfield code="0">2004:14-11-02</subfield></datafield>
+<datafield tag="001B"><subfield code="0">1999:26-06-06</subfield>
+<subfield code="t">17:01:31.000</subfield></datafield>
+<datafield tag="001D"><subfield code="0">2004:15-11-02</subfield></datafield>
+<datafield tag="001U"><subfield code="0">utf8</subfield></datafield>
+<datafield tag="001X"><subfield code="0">0</subfield></datafield>
+<datafield tag="002@"><subfield code="0">Abvz</subfield></datafield>
+<datafield tag="003@"><subfield code="0">356570509</subfield></datafield>
+<datafield tag="006Z"><subfield code="0">20925578</subfield></datafield>
+<datafield tag="010@"><subfield code="a">ger</subfield></datafield>
+<datafield tag="011@"><subfield code="a">2002</subfield>
+<subfield code="b">2002</subfield></datafield>
+<datafield tag="019@"><subfield code="a">XA-DE</subfield></datafield>
+<datafield tag="021A"><subfield code="a">Öko-Test</subfield></datafield>
+<datafield tag="021C"><subfield code="a">Jahrbuch</subfield>
+<subfield code="d">für ... ; der große Öko-Test-Einkaufsratgeber</subfield></datafield>
+<datafield tag="025@"><subfield code="a">Öko-Test / Jahrbuch</subfield></datafield>
+<datafield tag="027A"><subfield code="a">Öko-Test-Ratgeber / Jahrbuch</subfield></datafield>
+<datafield tag="027A" occurrence="01"><subfield code="a">Der @große Öko-Test-Einkaufsratgeber</subfield></datafield>
+<datafield tag="027A" occurrence="02"><subfield code="a">Öko-Test-Jahrbuch</subfield></datafield>
+<datafield tag="031@"><subfield code="a">1.2003(2002)</subfield></datafield>
+<datafield tag="033A"><subfield code="p">Frankfurt, M.</subfield>
+<subfield code="n">Öko-Test-Verl.</subfield></datafield>
+<datafield tag="036E"><subfield code="a">Öko-Test-Ratgeber</subfield></datafield>
+<datafield tag="039E"><subfield code="c">Vorg.</subfield>
+<subfield code="7">20890564</subfield>
+<subfield code="a">Öko-Test / Best of</subfield></datafield>
+<datafield tag="039E"><subfield code="c">Forts.</subfield>
+<subfield code="7">21369641</subfield>
+<subfield code="a">Der große Öko-Test-Einkaufsratgeber</subfield></datafield>
+<datafield tag="044K"><subfield code="9">10613499X</subfield>
+<subfield code="8">Umweltmedizin </subfield></datafield>
+<datafield tag="045Q" occurrence="01"><subfield code="9">106422022</subfield>
+<subfield code="8">44.13 ; Medizinische Ökologie</subfield></datafield>
+<datafield tag="045U"><subfield code="a">630</subfield></datafield>
+<datafield tag="046C"><subfield code="a">Nebent.: Öko-Test-Jahrbuch</subfield></datafield>
+<datafield tag="047D"><subfield code="a">107!(16-03-04)</subfield></datafield>
+<datafield tag="101@"><subfield code="a">82</subfield>
+<subfield code="c">PICA</subfield>
+<subfield code="d">Frankfurt am Main, Universitätsbibliothek Johann Christian Senckenberg   &#60;30&#62;</subfield></datafield>
+<datafield tag="201B" occurrence="01"><subfield code="0">10-06-06</subfield>
+<subfield code="t">16:06:09.000</subfield></datafield>
+<datafield tag="201D" occurrence="01"><subfield code="0">10-06-06</subfield>
+<subfield code="b">zdb2vfl</subfield>
+<subfield code="a">1999</subfield></datafield>
+<datafield tag="201U" occurrence="01"><subfield code="0">utf8</subfield></datafield>
+<datafield tag="203@" occurrence="01"><subfield code="0">604564740</subfield></datafield>
+<datafield tag="206W" occurrence="01"><subfield code="0">080714188</subfield></datafield>
+<datafield tag="208@" occurrence="01"><subfield code="a">06-11-02</subfield>
+<subfield code="b">bAa</subfield></datafield>
+<datafield tag="209A" occurrence="01"><subfield code="b">8110</subfield>
+<subfield code="f">000</subfield>
+<subfield code="a">Zs 23813</subfield>
+<subfield code="d">u</subfield>
+<subfield code="x">00</subfield></datafield>
+<datafield tag="209K" occurrence="01"><subfield code="b">0030</subfield></datafield>
+<datafield tag="231@" occurrence="01"><subfield code="d">1</subfield>
+<subfield code="j">2003</subfield>
+<subfield code="6"></subfield></datafield>
+<datafield tag="231B" occurrence="01"><subfield code="a">1.2003(2002) -</subfield></datafield>
+<datafield tag="201B" occurrence="02"><subfield code="0">10-06-06</subfield>
+<subfield code="t">16:06:09.000</subfield></datafield>
+<datafield tag="201D" occurrence="02"><subfield code="0">10-06-06</subfield>
+<subfield code="b">zdb2vfl</subfield>
+<subfield code="a">1999</subfield></datafield>
+<datafield tag="201U" occurrence="02"><subfield code="0">utf8</subfield></datafield>
+<datafield tag="203@" occurrence="02"><subfield code="0">657980846</subfield></datafield>
+<datafield tag="206W" occurrence="02"><subfield code="0">097215996</subfield>
+<subfield code="z">1</subfield></datafield>
+<datafield tag="208@" occurrence="02"><subfield code="a">16-06-04</subfield>
+<subfield code="b">bAa</subfield></datafield>
+<datafield tag="209A" occurrence="02"><subfield code="b">8110</subfield>
+<subfield code="f">000</subfield>
+<subfield code="a">Zs 23813</subfield>
+<subfield code="d">u</subfield>
+<subfield code="x">00</subfield></datafield>
+<datafield tag="209K" occurrence="02"><subfield code="b">0030</subfield></datafield>
+<datafield tag="231@" occurrence="02"><subfield code="d">1</subfield>
+<subfield code="j">2003</subfield></datafield>
+<datafield tag="231B" occurrence="02"><subfield code="a">1.2003(2002)</subfield></datafield>
+<datafield tag="101@"><subfield code="a">246</subfield>
+<subfield code="c">PICA</subfield>
+<subfield code="d">Fulda, Hochschul- und Landesbibliothek Fulda Standort Heinrich-von-Bibra-Platz &#60;66&#62;</subfield></datafield>
+<datafield tag="201B" occurrence="01"><subfield code="0">10-06-06</subfield>
+<subfield code="t">16:06:09.000</subfield></datafield>
+<datafield tag="201D" occurrence="01"><subfield code="0">10-06-06</subfield>
+<subfield code="b">zdb2vfl</subfield>
+<subfield code="a">1999</subfield></datafield>
+<datafield tag="201U" occurrence="01"><subfield code="0">utf8</subfield></datafield>
+<datafield tag="203@" occurrence="01"><subfield code="0">604620500</subfield></datafield>
+<datafield tag="206W" occurrence="01"><subfield code="0">080788114</subfield>
+<subfield code="z">1</subfield></datafield>
+<datafield tag="208@" occurrence="01"><subfield code="a">21-01-03</subfield>
+<subfield code="b">b</subfield></datafield>
+<datafield tag="209A" occurrence="01"><subfield code="b">8110</subfield>
+<subfield code="f">Ausleihe</subfield>
+<subfield code="a">Z 4914</subfield>
+<subfield code="d">s</subfield>
+<subfield code="x">00</subfield></datafield>
+<datafield tag="231@" occurrence="01"><subfield code="d">1</subfield>
+<subfield code="j">2003</subfield></datafield>
+<datafield tag="231B" occurrence="01"><subfield code="a">1.2003(2002)</subfield></datafield>
+<datafield tag="101@"><subfield code="a">78</subfield>
+<subfield code="c">PICA</subfield>
+<subfield code="d">Hannover, Stadtbibliothek   &#60;115&#62;</subfield></datafield>
+<datafield tag="201B" occurrence="01"><subfield code="0">15-07-03</subfield>
+<subfield code="t">15:32:23.000</subfield></datafield>
+<datafield tag="201D" occurrence="01"><subfield code="0">15-07-03</subfield>
+<subfield code="b">1841</subfield>
+<subfield code="a">0115</subfield></datafield>
+<datafield tag="201U" occurrence="01"><subfield code="0">utf8</subfield></datafield>
+<datafield tag="203@" occurrence="01"><subfield code="0">608789860</subfield></datafield>
+<datafield tag="208@" occurrence="01"><subfield code="a">15-07-03</subfield>
+<subfield code="b">b</subfield></datafield>
+<datafield tag="209A" occurrence="01"><subfield code="a">Wi 1/29 Zs</subfield>
+<subfield code="d">s</subfield>
+<subfield code="x">00</subfield></datafield>
+<datafield tag="209B" occurrence="01"><subfield code="a">2003(2002),1 -</subfield>
+<subfield code="x">32</subfield></datafield>
+<datafield tag="231@" occurrence="01"><subfield code="e">1</subfield>
+<subfield code="j">2003</subfield>
+<subfield code="h">2002 </subfield>
+<subfield code="6"></subfield></datafield>
+<datafield tag="101@"><subfield code="a">70</subfield>
+<subfield code="c">PICA</subfield>
+<subfield code="d">Hannover, TIB/UB Hannover   &#60;89&#62;</subfield></datafield>
+<datafield tag="201B" occurrence="01"><subfield code="0">19-01-05</subfield>
+<subfield code="t">14:06:29.000</subfield></datafield>
+<datafield tag="201C" occurrence="01"><subfield code="0">27-11-02</subfield></datafield>
+<datafield tag="201D" occurrence="01"><subfield code="0">19-01-05</subfield>
+<subfield code="b">2745</subfield>
+<subfield code="a">0089</subfield></datafield>
+<datafield tag="201U" occurrence="01"><subfield code="0">utf8</subfield></datafield>
+<datafield tag="203@" occurrence="01"><subfield code="0">579702545</subfield></datafield>
+<datafield tag="208@" occurrence="01"><subfield code="a">27-11-02</subfield>
+<subfield code="b">b</subfield></datafield>
+<datafield tag="209A" occurrence="01"><subfield code="a">ZB 5746 [Haus2]</subfield>
+<subfield code="d">f</subfield>
+<subfield code="x">00</subfield></datafield>
+<datafield tag="231@" occurrence="01"><subfield code="d">1</subfield>
+<subfield code="j">2003</subfield></datafield>
+<datafield tag="245P" occurrence="01"><subfield code="a">z</subfield></datafield></record></srw:recordData><srw:recordPosition>2</srw:recordPosition></srw:record>
+</srw:records>
+    <srw:echoedSearchRetrieveRequest>
+	<srw:version>1.1</srw:version>
+	<srw:query>pica.tit+%3D+%22Der+gro%C3%9Fe+%C3%96ko-Test-Einkaufsratgeber%22</srw:query>
+	<srw:xQuery><xcql:searchClause><xcql:index>pica.tit</xcql:index><xcql:relation><xcql:value>=</xcql:value></xcql:relation><xcql:term>"Der große Öko-Test-Einkaufsratgeber"</xcql:term></xcql:searchClause></srw:xQuery>
+	<startRecord>1</startRecord>
+	<maximumRecords>10</maximumRecords>
+	<srw:recordPacking>xml</srw:recordPacking>
+	<srw:recordSchema>pica</srw:recordSchema>
+	
+	<srw:stylesheet>http://gso.gbv.de/sru/?xsl=searchRetrieveResponse</srw:stylesheet>
+    </srw:echoedSearchRetrieveRequest>
+    <diag:diagnostics>
+        <diag:uri>info:srw/diagnostic/1/0</diag:uri>
+	
+	
+    </diag:diagnostics>
+    <srw:extraResponseData>
+	<rob:authenticationToken xmlns:rob="info:srw/extension/2/auth-1.0">U8000,K8000,D2.1,E68ddfabd-11a4,I1,B1999++++++,SY,A%5C9008+J,,1,,U,,7,H12-23,,30-31,,73-77,,80,,88-90,NVZ+AUTOLOGKENNUNG,R127.0.0.1,FN</rob:authenticationToken>
+        <mg:resultGrouping xmlns:mg="info:srw/extension/5/metadata-grouping-v1.0">
+	    
+	    <mg:grouping key="9008" description="Sysflag"></mg:grouping>
+	    
+	    <mg:grouping key="9001" description="Materialart"></mg:grouping>
+	    
+	    <mg:grouping key="9000" description="Erscheinungsjahr"></mg:grouping>
+	    
+	    <mg:grouping key="9006" description="Zeitraum"></mg:grouping>
+	    
+	    <mg:grouping key="9005" description="Ländercode"></mg:grouping>
+	    
+	    <mg:grouping key="9002" description="Region"></mg:grouping>
+	    
+	    <mg:grouping key="9010" description="Stringmap"></mg:grouping>
+	    
+	    <mg:grouping key="9004" description="Sprachcode"></mg:grouping>
+	    
+	    
+	</mg:resultGrouping>
+    </srw:extraResponseData>
+</srw:searchRetrieveResponse>

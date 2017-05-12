@@ -1,0 +1,173 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Ecliptic\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-07-27 15:15+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Breno G. de Oliveira <garu@cpan.org>\n"
+"Language-Team: Brazilian Portuguese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/Ecliptic.pm:36
+msgid "Ecliptic"
+msgstr "Ecliptic"
+
+#: lib/Padre/Plugin/Ecliptic.pm:114
+msgid "Open Resource\tCtrl-Shift-R"
+msgstr "Abrir Recurso\tCtrl-Shift-R"
+
+#: lib/Padre/Plugin/Ecliptic.pm:121
+msgid "Quick Assist\tCtrl-Shift-L"
+msgstr "Assistência Rápida\tCtrl-Shift-L"
+
+#: lib/Padre/Plugin/Ecliptic.pm:128
+msgid "Quick Menu Access\tCtrl-3"
+msgstr "Acesso Rápido ao Menu\tCtrl-3"
+
+#: lib/Padre/Plugin/Ecliptic.pm:135
+msgid "Quick Outline Access\tCtrl-4"
+msgstr "Acesso Rápido ao Esboço\tCtrl-4"
+
+#: lib/Padre/Plugin/Ecliptic.pm:142
+msgid "Quick Module Access\tCtrl-5"
+msgstr "Acesso Rápido a Módulos\tCtrl-5"
+
+#: lib/Padre/Plugin/Ecliptic.pm:149
+msgid "Open in File Browser\tCtrl-6"
+msgstr "Abrir no Gerenciador de Arquivos\tCtrl-6"
+
+#: lib/Padre/Plugin/Ecliptic.pm:156
+msgid "Quick Fix\tCtrl-Shift-1"
+msgstr "Correção rápida\tCtrl-Shift-1"
+
+#: lib/Padre/Plugin/Ecliptic.pm:166
+msgid "About"
+msgstr "Sobre"
+
+#: lib/Padre/Plugin/Ecliptic.pm:182
+msgid "Provides Eclipse-like useful features to Padre.\n"
+msgstr "Adiciona opções úteis do Eclipse no Padre\n"
+
+#: lib/Padre/Plugin/Ecliptic/OpenInFileBrowserAction.pm:39
+msgid "Failed to execute process\n"
+msgstr "Erro ao executar processo\n"
+
+#: lib/Padre/Plugin/Ecliptic/OpenInFileBrowserAction.pm:55
+#: lib/Padre/Plugin/Ecliptic/QuickFixDialog.pm:33
+msgid "No filename"
+msgstr "Sem nome de arquivo"
+
+#: lib/Padre/Plugin/Ecliptic/OpenInFileBrowserAction.pm:55
+#: lib/Padre/Plugin/Ecliptic/OpenInFileBrowserAction.pm:87
+#: lib/Padre/Plugin/Ecliptic/QuickFixDialog.pm:33
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:91
+msgid "Error"
+msgstr "Erro"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:55
+msgid "Open Resource"
+msgstr "Abrir Recurso"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:167
+msgid "&Select an item to open (? = any character, * = any string):"
+msgstr "&Escolha um item para abrir (? = qualquer caractere, * = qualquer string):"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:179
+msgid "&Matching Items:"
+msgstr "Itens correspondentes:"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:192
+msgid "Current Directory: "
+msgstr "Diretório Atual:"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:217
+msgid "Skip VCS files"
+msgstr "Ignorar arquivos de VCS"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:219
+msgid "Skip using MANIFEST.SKIP"
+msgstr "Ignorar usando MANIFEST.SKIP"
+
+#: lib/Padre/Plugin/Ecliptic/QuickAssistDialog.pm:31
+msgid "Quick Assist"
+msgstr "Assistência Rápida"
+
+#: lib/Padre/Plugin/Ecliptic/QuickFixDialog.pm:45
+msgid "Quick Fix"
+msgstr "Correção rápida"
+
+#: lib/Padre/Plugin/Ecliptic/QuickFixDialog.pm:207
+msgid "No suggestions"
+msgstr "Nenhuma sugestão"
+
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:33
+msgid "Quick Menu Access"
+msgstr "Acesso Rápido ao Menu"
+
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:90
+msgid "Error while trying to perform Padre action"
+msgstr "Erro ao tentar ativar ação do Padre"
+
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:146
+msgid "&Type a menu item name to access:"
+msgstr "&Digite o nome de um item de menu para acessar:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:153
+msgid "&Matching Menu Items:"
+msgstr "Itens de Menu &Correspondentes:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:278
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:265
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:274
+msgid " item(s) found"
+msgstr "itens encontrados"
+
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:280
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:267
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:276
+msgid "No items found"
+msgstr "Nenhum item encontrado"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:34
+msgid "Quick Module Access"
+msgstr "Acesso Rápido a Módulos"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:131
+msgid "&Type a module name to access:"
+msgstr "&Digite o nome de um módulo para acessar:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:138
+msgid "&Matching modules:"
+msgstr "&Módulos correspondentes:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:249
+msgid "Reading modules. Please wait..."
+msgstr "Lendo módulos. Por favor aguarde..."
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:253
+msgid "Finished Searching"
+msgstr "Busca Concluída"
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:33
+msgid "Quick Outline Access"
+msgstr "Acesso Rápido ao Esboço"
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:119
+msgid "&Type a Outline item name to access:"
+msgstr "&Digite o nome de um item de esboço para acessar:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:126
+msgid "&Matching Outline Items:"
+msgstr "Itens de Esboço Correspondentes:"
+
+#~ msgid "Ignore CVS/.svn/.git/blib folders"
+#~ msgstr "Ignorar pastas CVS/.svn/.git/blib"
+#~ msgid " items selected"
+#~ msgstr "Itens selecionados"
+#~ msgid "Reading items. Please wait..."
+#~ msgstr "Lendo itens. Por favor aguarde..."
+#~ msgid "List Key Bindings"
+#~ msgstr "Listar Associação de Teclas"
+

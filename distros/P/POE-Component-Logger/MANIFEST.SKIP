@@ -1,0 +1,16 @@
+CVS/.*
+^\.git/
+\.bak$
+\.sw[a-z]$
+\.tar$
+\.tgz$
+\.tar\.gz$
+^mess/
+^tmp/
+^blib/
+^Makefile$
+^Makefile\.[a-z]+$
+^pm_to_blib$
+^cover_db/
+~$
+^POE-Component-Logger-*

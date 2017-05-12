@@ -1,0 +1,110 @@
+Revision history for Perinci-Access
+
+0.44    2015-12-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Bump prereq version Perinci::Access::Perl to 0.85.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.43    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.42    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.41    2015-04-12 (PERLANCAR)
+
+	- Split peri-access CLI script to App-PerinciUtils.
+
+
+0.40    2015-02-19 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch to Perinci::CmdLine::Any.
+
+
+0.39    2014-10-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add manual.
+
+
+0.38    2014-10-24 (PERLANCAR)
+
+	- Add attribute: riap_version.
+
+
+0.37     2014-08-06 (SHARYANTO)
+
+         - Allow passing %client_opts in parse_url(), because some handlers like
+           Perinci::Access::HTTP::Client might need it.
+
+
+0.36     2013-09-08 (SHARYANTO)
+
+         - Replace Perinci::Access::InProcess with ::Perl and ::Schemeless.
+
+
+0.35     2013-09-07 (SHARYANTO)
+
+         - Remove use of URI and replace it with URI::Split to make things
+           simpler and a bit faster.
+
+
+0.34     2013-08-13 (SHARYANTO)
+
+         - Add parse_url().
+
+
+0.33     2013-08-06 (SHARYANTO)
+
+         - peri-access: Add --detail.
+
+
+0.32     2013-07-26 (SHARYANTO)
+
+         - Add command-line Riap client: peri-access.
+
+
+0.31     2013-03-15 (SHARYANTO)
+
+         - Add attribute 'handler_args' to pass arguments to Riap client's
+           constructors. Needed if you want to use, e.g.
+           Perinci::Access::HTTP::Client 0.06+ which expects 'user' and
+           'password' arguments passed to its constructor if you want to do HTTP
+           basic authentication.
+
+
+0.30     2013-03-15 (SHARYANTO)
+
+         - No functional changes. Upgrade dep version.
+
+
+0.29     2012-08-16 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Rename logging variable/environment name (singular, convention):
+           $Log_Response{s,}, $Log_Request{s,}, LOG_RIAP_REQUEST{S,},
+           LOG_RIAP_RESPONSE{S,}.
+
+
+0.28     2012-08-10 (SHARYANTO)
+
+         - First release, split to make Perinci dist empty (that dist was a
+           growing mixed bag and caused headache in dependencies).

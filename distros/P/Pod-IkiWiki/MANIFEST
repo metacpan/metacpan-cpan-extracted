@@ -1,0 +1,17 @@
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+README
+lib/Pod/IkiWiki.pm
+scripts/pod2ikiwiki
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+examples/input.pod
+examples/links.txt
+examples/check_links.pl
+examples/test_cli_args.pl
+META.yml
+.gitignore
+COPYING

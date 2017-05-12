@@ -1,0 +1,67 @@
+NAME
+
+Finance::Bank::PNC - Check your PNC bank accounts from Perl
+
+SYNOPSIS
+
+  use Finance::Bank::PNC;
+  my @PNCAccounts = Finance::Bank::PNC->check_PNC_balance(
+      userId  => "xxxxx",
+      password => "xxxxx",
+  );
+
+  foreach (@PNCAccounts) {
+    printf "%-9s: %s | Balance: %7s | Available: %s\n",
+    $_->{type}, $_->{account}, $_->{balance}, $_->{available};
+  }
+
+DESCRIPTION
+
+This module provides a rudimentary interface to the PNC online banking system 
+at https://www.onlinebanking.pnc.com/alservlet/OnlineBankingServlet
+which is where https://www.pnc.com/webapp/unsec/Homepage.do redirects to.
+
+DEPENDENCIES
+
+This module depends on WWW::Mechanize and HTML::TokeParser.
+
+CLASS METHODS
+
+    check_PNC_balance(userId => $u, password => $p)
+
+Return an array of account hashes, one for each of your bank accounts.
+
+ACCOUNT HASH KEYS
+
+    $ac->type
+    $ac->number
+    $ac->balance
+    $ac->available
+
+Returns the account name, account number, real balance and available
+balance which includes overdraft/creditlines.
+
+WARNING
+
+This warning is from Simon Cozens' Finance::Bank::LloydsTSB, and seems
+just as apt here.
+
+This is code for online banking, and that means your money, and
+that means BE CAREFUL. You are encouraged, nay, expected, to audit
+the source of this module yourself to reassure yourself that I am not
+doing anything untoward with your banking data. This software is useful
+to me, but is provided under NO GUARANTEE, explicit or implied.
+
+THANKS
+
+Leon Cowle for Finance::Bank::ABSA as this code is based upon his which
+was based upon the following people's code.
+
+Chris Ball for Finance::Bank::HSBC, upon which a lot of this code is
+based. Also to Simon Cozens for Finance::Bank::LloydsTSB, upon which
+most of Finance::Bank::HSBC is based, Andy Lester (and Skud, by continuation)
+for WWW::Mechanize, Gisle Aas for HTML::TokeParser.
+
+AUTHOR
+
+Dylan Armstrong <dylanarmstrong116@gmail.com>

@@ -1,0 +1,9 @@
+Revision history for Perl extension Plack-Middleware-StackTrace-RethrowFriendly
+
+0.03 2015-03-17T02:32:05Z
+    - Refactoring and add an example in the documentation
+0.02 2015-03-13T02:29:19Z
+    - Trace the original error even if the last one is not the same as the previous one
+0.01 2015-03-12T11:10:39Z
+    - original version
+

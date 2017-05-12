@@ -1,0 +1,76 @@
+=encoding utf-8
+
+=for stopwords
+
+=head1 NAME
+
+Pod::MultiLang::Dict - heading dictionary manager
+
+
+=head1 SYNOPSIS
+
+ my $dictmgr = Pod::MultiLang::Dict->new();
+ $dictmgr->load_dict(@langs);
+ my @tranlates = $dictmgr->find_word([@langs],$word);
+
+=head1 DESCRIPTION
+
+heading word translate dictionary for Pod::MultiLang.
+
+
+dictionary for each language is placed at Pod::MultiLang::Dict::xx.
+loaded by use statement from load_dict;
+
+
+=head1 METHODS
+
+=over
+
+=item new
+
+  my $dictmgr = Pod::MultiLang::Dict->new();
+
+create an instance.
+but all instance has same condition.
+
+
+=item load_dict
+
+  $dictmgr->load_dict(@langs);
+  $dictmgr->load_dict(\@langs);
+
+load dictionary for specified language.
+
+
+=item find_word
+
+  @multilingual = $dictmgr->find_word(\@langs,$text);
+
+translate English to other.
+"a AND b" is acceptable.
+
+
+=back
+
+=head1 METHODS required for dictionary
+
+=over
+
+=item static_table
+
+  $text = $dictmgr->make_link
+
+returns hash reference which contains 
+'English word' => 'Foreign Word'.
+
+
+=item make_linktext
+
+  $text = $dictmgr->make_linktext($lang,$name,$section);
+
+make link text for LZ<><> interior sequence which has 
+no text part.
+
+
+=back
+

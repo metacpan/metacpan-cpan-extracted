@@ -1,0 +1,2 @@
+name: convert_cyr_string
+docs: Perl has the L<Encode> module to convert between character encodings.

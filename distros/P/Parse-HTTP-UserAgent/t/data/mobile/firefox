@@ -1,0 +1,79 @@
+[AGENT]
+
+Mozilla/5.0 (Android; Linux armv7l; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 Fennec/10.0.1
+
+extras           => [ 'Linux armv7l' ],
+mobile           => 1,
+mozilla          => [ '10.0.1', '10.000001' ],
+name             => 'Firefox',
+original_name    => 'Fennec',
+original_version => '10.0.1',
+os               => 'Android',
+parser           => 'firefox',
+toolkit          => [ 'Gecko', '20100101', '20100101.000' ],
+version          => '10.000001',
+version_raw      => '10.0.1',
+
+[AGENT]
+
+Mozilla/5.0 (Maemo; Linux armv7l; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 Fennec/10.0.1
+
+extras           => [ 'Linux armv7l' ],
+mobile           => 1,
+mozilla          => [ '10.0.1', '10.000001' ],
+name             => 'Firefox',
+original_name    => 'Fennec',
+original_version => '10.0.1',
+os               => 'Maemo',
+parser           => 'firefox',
+toolkit          => [ 'Gecko', '20100101', '20100101.000' ],
+version          => '10.000001',
+version_raw      => '10.0.1',
+
+[AGENT]
+
+Mozilla/5.0 (X11; Linux armv7l; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 Fennec/10.0.1
+
+extras           => [ 'Linux armv7l' ],
+mobile           => 1,
+mozilla          => [ '10.0.1', '10.000001' ],
+name             => 'Firefox',
+original_name    => 'Fennec',
+original_version => '10.0.1',
+os               => 'X11',
+parser           => 'firefox',
+toolkit          => [ 'Gecko', '20100101', '20100101.000' ],
+version          => '10.000001',
+version_raw      => '10.0.1',
+
+[AGENT]
+
+Mozilla/5.0 (X11; Linux i686; rv:10.0.1) Gecko/20100101 Firefox/10.0.1 Fennec/10.0.1
+
+extras           => [ 'Linux i686' ],
+mobile           => 1,
+mozilla          => [ '10.0.1', '10.000001' ],
+name             => 'Firefox',
+original_name    => 'Fennec',
+original_version => '10.0.1',
+os               => 'X11',
+parser           => 'firefox',
+toolkit          => [ 'Gecko', '20100101', '20100101.000' ],
+version          => '10.000001',
+version_raw      => '10.0.1',
+
+[AGENT]
+
+Mozilla/5.0 (Android; Tablet; rv:10.0.4) Gecko/10.0.4 Firefox/10.0.4 Fennec/10.0.4
+
+mobile           => 1,
+mozilla          => [ '10.0.4', '10.000004' ],
+name             => 'Firefox',
+original_name    => 'Fennec',
+original_version => '10.0.4',
+os               => 'Android',
+parser           => 'firefox',
+tablet           => 1,
+toolkit          => [ 'Gecko', '10.0.4', '10.000004' ],
+version          => '10.000004',
+version_raw      => '10.0.4',

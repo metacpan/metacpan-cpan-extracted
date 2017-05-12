@@ -1,0 +1,53 @@
+---
+abstract: 'is a ready to use Codio box. Start coding now!'
+author:
+  - 'G. Casati <fibo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.64'
+  Test::Compile: v1.2.1
+  Test::More: '1.001009'
+  Test::Pod: '1.48'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Box
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  App::FatPacker: '0.010004'
+  App::cloc: '0.02'
+  Catalyst::Devel: '1.39'
+  Catalyst::Runtime: '5.90093'
+  DBI: '1.633'
+  DBIx::Class: '0.082820'
+  Dancer: '1.3140'
+  DateTime: '1.18'
+  Digest::MD5: '2.54'
+  Dist::Zilla: '5.037'
+  LWP: '6.13'
+  List::MoreUtils: '0.405'
+  List::Util: '1.41'
+  Mojolicious: '6.12'
+  Moo: '2'
+  Moose: '2.1405'
+  Regexp::Common: '2013031301'
+  Task::BeLike::FIBO: '0.19'
+  Template: '2.26'
+  Test::Class: '0.48'
+  Test::Exception: '0.40'
+  Test::Most: '0.34'
+  YAML: '1.15'
+  perl: '5.020000'
+resources:
+  bugtracker: https://github.com/fibo/Perl-Box-pm/issues
+  homepage: https://metacpan.org/pod/Perl::Box
+  license: http://g14n.info/artistic-license
+  repository: https://github.com/fibo/Perl-Box-pm
+version: '0.04'

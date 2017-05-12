@@ -1,0 +1,63 @@
+/*VIM: set ts=2 */
+%{
+=head1 SYNOPSIS
+
+See 
+   
+   http://search.cpan.org/perldoc?Parse::Eyapp::debuggingtut
+   file DebugLookForward.eyp
+
+This grammar fixes the conflicts an bugs in Debug.eyp and Debug1.eyp
+
+Be sure C<DebugTail.pm> is reachable
+compile it with 
+
+      eyapp -C DebugLookForward.eyp
+
+execute the generated modulino with:
+
+      ./DebugLookForward.pm -t -i -c 'D;D;S'
+
+=head1 See also
+
+    Debug.eyp Debug1.eyp Debug2.eyp DebugLookForward2.eyp
+
+=cut
+
+our $VERSION = '0.01';
+
+%}
+%strict
+
+%token SEMICOLONS = /(;)(?=\s*S)/
+%token ';'
+
+%syntactic token SEMICOLONS 
+%semantic token 'D' 'S'
+
+%tree
+
+%%
+p:
+    %name P
+    ds SEMICOLONS ss  
+  | %name SS
+    ss
+;
+
+ds:
+    %name D2
+      'D' ';' ds   
+  | %name D1
+      'D'       
+;
+
+ss:
+    %name S2
+      'S' SEMICOLONS ss     
+  | %name S1
+      'S'       
+;
+
+%%
+

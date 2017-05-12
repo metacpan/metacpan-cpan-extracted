@@ -1,0 +1,30 @@
+0.09  2017-02-03 00:06:05 PST
+        - Require IO::Socket::SSL 1.94+ for HTTPS
+        - Switch to FreeBSD license (2-clause)
+
+0.08  2017-02-02 21:19:51 PST
+        - Use HTTPS links for post fetching
+        - Remove WWW::Shorten dependency
+        - Use reddit.com/{id} URLs
+        - Add LICENSE file
+
+0.07  2013-06-26 10:14:00 PDT
+        - Fix TIL test
+
+0.06  2013-06-18 08:54:40 PDT
+        - Add WWW::Shorten::Bitly as dependency
+
+0.05  2013-06-16 18:19:42 PDT
+        - Add reddit test
+
+0.04  2013-06-14 11:09:10 PDT
+        - Include WWW::Shorten::Simple as prereq
+
+0.03  2013-06-13 14:17:38 PDT
+        - Use Mojo::UserAgent for web extraction
+
+0.02  2013-06-13 08:33:26 PDT
+        - Convert module to Dist::Milla
+        - Update module's abstract
+0.01    2013-24-25
+        - First version

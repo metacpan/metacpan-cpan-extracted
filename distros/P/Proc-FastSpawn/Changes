@@ -1,0 +1,26 @@
+Revision history for Perl extension Proc::FastSpawn
+
+1.2  Mon Jun 10 05:02:10 CEST 2013
+        - do not use vfork with spawnp, to avoid running into lots of
+          problems (execvp might call malloc, better thread safety etc.),
+          at the cost of using fork instead of vfork.
+        - fix a (rather theoretical) memory corruption bug.
+
+1.1  Sun Apr 28 02:47:31 CEST 2013
+	- add spawnp function for convenience.
+
+1.0  Sun Apr  7 03:32:54 CEST 2013
+	- work around corrupted $^X on openbsd, when linked against
+          libpthread (only affects a testcase).
+
+0.2  Thu Apr  4 08:24:32 CEST 2013
+        - define _WIN32_WINNT to windows xp, to make sure
+          we get the GetProcessId prototype.
+	- add synopsis section with some examples.
+
+0.1   Sat Mar 30 02:16:48 CET 2013
+	- intiial CPAN release.
+
+0.01  Fri Mar 29 14:32:28 CET 2013
+	- first rough idea.
+

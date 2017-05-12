@@ -1,0 +1,19 @@
+Revision history for Perl extension POE::Component::IRC::Plugin::Infobot.
+
+0.001003 2015-11-14T18:50+00:00
+ - Respond to !forget, even when unaddressed
+ - Add perlcritic test and make code comply
+
+0.001002 2014-08-17T00:18+03:00
+ - CPAN Day cleanup release
+ - Update Changes to follow CPAN::Changes::Spec
+ - Set POD encoding to utf-8
+ - Reindent code, tests, Makefile.PL
+ - Enable SIGN, add repository
+
+0.001001 2013-08-20T08:13:41+03:00
+ - Fix build dependencies
+
+0.001 2013-08-09
+ - Initial release
+

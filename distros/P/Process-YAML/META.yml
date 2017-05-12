@@ -1,0 +1,20 @@
+abstract: The Process::Serializable role implemented by YAML
+author: Steffen Mueller <modules at steffen-mueller dot net>, L<http://steffen-mueller.net/>
+build_requires: 
+  File::Remove: 0
+  File::Spec: 0.80
+  File::Temp: 0
+  Test::More: 0.47
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Process-YAML
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Process: 0.10
+  YAML::Syck: 0.24
+  perl: 5.005
+version: 0.04

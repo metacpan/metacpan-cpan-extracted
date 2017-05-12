@@ -1,0 +1,6 @@
+Revision history for Perl extension Simple::Types.
+
+0.01  Sun Dec 10 09:03:59 2006
+	- original version; created by h2xs 1.23 with options
+		-XA -n Simple::Types
+

@@ -1,0 +1,13 @@
+Revision history for Perl extension Pg::hstore.
+
+1.06 Unquoted hstore support (thanks to TIMB for patch)
+1.05 SV leak fix (RT #103539)
+1.04 utf8 fix (thanks to Jin Kim for patch)
+1.03 segfault fix
+1.02 'bus error' fix
+1.01 Fix packing bugs
+1.00 First working version
+0.01  Tue Nov 22 11:35:31 2011
+	- original version; created by h2xs 1.23 with options
+		-A Pg::hstore
+

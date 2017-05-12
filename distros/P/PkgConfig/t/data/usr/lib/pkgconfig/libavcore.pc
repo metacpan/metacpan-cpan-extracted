@@ -1,0 +1,14 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: libavcore
+Description: FFmpeg multimedia shared core utilities library
+Version: 0.14.0
+Requires: 
+Requires.private: libavutil = 50.33.0
+Conflicts:
+Libs: -L${libdir} -lavcore 
+Libs.private: 
+Cflags: -I${includedir}

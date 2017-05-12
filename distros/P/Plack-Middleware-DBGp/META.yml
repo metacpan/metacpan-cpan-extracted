@@ -1,0 +1,30 @@
+---
+abstract: 'interactive debugging for Plack applications'
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+build_requires:
+  DBGp::Client: '0'
+  HTTP::CookieJar: '0'
+  Test::DBGp: '0.07'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4206, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-DBGp
+provides:
+  Plack::Middleware::DBGp:
+    file: lib/Plack/Middleware/DBGp.pm
+    version: '0.13'
+requires:
+  Devel::Debug::DBGp: '0.18'
+  Plack: '1.0031'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/mbarbon/plack-middleware-dbgp/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mbarbon/plack-middleware-dbgp.git
+version: '0.13'

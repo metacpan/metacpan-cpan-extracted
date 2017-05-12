@@ -1,0 +1,9 @@
+=head1 NAME
+
+Simple4 - ya test
+
+=over
+
+=item   foo ()
+
+=back

@@ -1,0 +1,9 @@
+MANIFEST
+Makefile.PL
+Pvm.pm
+Pvm.xs
+t/00_start.t
+t/01_bigmsg.t
+t/02_group.t
+ChangeLog
+README

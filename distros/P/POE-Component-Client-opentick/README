@@ -1,0 +1,46 @@
+POE-Component-Client-opentick
+
+This module provides a POE component for connectivity to the /opentick/ open
+tick data feeds provided at http://www.opentick.com/.
+
+Most of the documentation is found in the various modules in POD format.
+This is just a boilerplate README file.
+
+INSTALLATION
+
+This module follows the standard Perl module installation steps of:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc POE::Component::Client::opentick
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-Client-opentick
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/POE-Component-Client-opentick
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/POE-Component-Client-opentick
+
+    Search CPAN
+        http://search.cpan.org/dist/POE-Component-Client-opentick
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Jason McManus (INFIDEL)
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

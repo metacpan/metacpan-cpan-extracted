@@ -1,0 +1,23 @@
+Implement a basic test that uses the three example files from the synopsis.
+
+Basically, the process should be something like this:
+
+1. figure_out_apache_binary()
+2. verify_apache_version()
+3. get_random_free_port()
+4. run_apache_on_port()
+5. do_mech_tests_on_port()
+
+Part 1 could probably be solved with File::Which, searching for 'apache' and
+'httpd'.
+
+Part 2 is required to understand the calling conventions of the apache
+version found, and ensure that the binary can execute FastCGI scripts.
+
+Part 3-4 could most probably be solved by using Test::TCP in some way.
+
+Part 5 can use Test::Mechanize, or possibly some parts of the Plack test
+suite.
+
+The Plack test suite has something useful prior art (see Plack::Handler
+tests).

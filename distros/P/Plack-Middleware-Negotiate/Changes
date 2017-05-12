@@ -1,0 +1,20 @@
+# Change file for Plack::App::unAPI
+
+0.20 2014-02-17
+    Cleanup by Chris Kirke
+    Migrate build to Milla
+
+0.10 2013-10-18
+    Support explicit format selection via HTTP POST (thanks to Maurice Aubrey)
+
+0.08 2013-09-17
+    Documentation
+
+0.07 2013-09-16
+    Additional method 'known'
+
+0.06 2013-08-01
+    Sort variants by name
+
+0.01 2012-09-05
+    Initial release at CPAN

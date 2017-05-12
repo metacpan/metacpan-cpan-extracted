@@ -1,0 +1,137 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Control Popup</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Control Popup</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<A HREF=index.html>Viewport</A><BR>
+<B>control&nbsp;popup</B>
+<P>
+<A HREF=#slidecontrol>slide&nbsp;control</A><BR>
+<A HREF=#tagcontrol>tag&nbsp;control</A><BR>
+<P>
+    </TD><TD VALIGN=top>
+
+<IMG SRC=popup.gif WIDTH=339 HEIGHT=246 ALIGN=right HSPACE=10>
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.  For serious presentations, timing is important: you want
+to plan your show such that all <A HREF=../slide/index.html>slides</A>
+get the time they require.
+<P>
+The full popup is shown on the right.  The popup has three parts:
+<OL>
+<LI><A HREF=#slidecontrol>slide control</A>
+<LI><A HREF=#tagcontrol>tag control</A>
+<LI>some buttons, which I will not describe here.
+</OL>
+In the near future, the timing and slide-selection information can be
+saved and loaded, but this is not yet implemented.
+<BR CLEAR=right>
+<P>&nbsp;
+
+    </TD></TR>
+<TR><TD VALIGN=top>
+
+    </TD><TD VALIGN=top>
+
+<H2><A NAME=slidecontrol>Slide Control</A></H2>
+The slide control window shows many details about the progress in time
+of the presentation.
+Slide control can be part of the popup or shown in the
+<A HREF=control.html>control viewport</A> (depends on the control viewport's
+<CODE>-includeControls</CODE> option).
+<IMG SRC=slidecontrol.gif WIDTH=284 HEIGHT=262 HSPACE=10 ALIGN=right>
+<UL>
+<LI>The left column is a list of checkboxes, showing
+    <UL>
+    <LI>how much time the slide requires (the <CODE>-reqtime</CODE>
+        option of <A HREF=../slide/index.html>slides</A>;
+    <LI>whether the slide is selected or not.
+    </UL>
+    <P>
+<LI>The number on the bottom in the left column displays the total time
+    required for the selected slide.  The color shows how this relates
+    to the total available time (the <CODE>-totaltime</CODE> option
+    of <A HREF=../show/new.html>show new()</A>.
+    <P>
+<LI>The central column shows the names of the slides.  This is a list
+    of radiobuttons: on slide is <EM>on</EM>: currently on display.
+    You can directly select one of the slides by pushing the button, even
+    if the slide is not selected.
+    <P>
+<LI>Below the central column is written how many of the slides are
+    selected in the first column.
+    <P>
+<LI>The right column shows for each slide
+    <UL>
+    <LI>how much time is spent on each of the slides, and
+    <LI>in color, how this relates to the required time.
+    </UL>
+    <P>
+<LI>The number on the bottom in right column shows
+    <UL>
+    <LI>the total time used, with
+    <LI>in color how this relates to the total time available for the show.
+        Again, the <CODE>-totaltime</CODE> option
+        of <A HREF=../show/new.html>show new()</A>.
+    </UL>
+</UL>
+The colors are defined by the <CODE>-progressColors</CODE> option of
+the <A HREF=control.html>control viewport</A>.
+
+<BR CLEAR=right>
+
+<H2><A NAME=tagcontrol>Tag Control</A></H2>
+The tagcontrol can be part of the popup or shown in the
+<A HREF=control.html>control viewport</A> (depends on the control viewport's
+<CODE>-includeControls</CODE> option).
+<P>
+When a <A HREF=../slide/index.html>slides</A> is added, you can provide
+the <CODE>-tag</CODE> or </CODE>-tags</CODE> option.  All the used tags
+are shown in the tag-control window.
+<P>
+With this window, you can select or unselect tagged groups of slides, for
+instance if you want to use a sub-set of the slide for a shorter
+presentation, or have a few different slides for a group of managers than
+for a group of technicians.
+<P>
+With the <CODE>-tag</CODE> option of <A HREF=../show/new.html>show new()</A>
+you can start with a certain selection.  All slides have at least tag
+<CODE>'ALL'</CODE>.
+<P>
+<IMG SRC=tagcontrol.gif WIDTH=297 HEIGHT=262 HSPACE=10 ALIGN=right>
+The parts of the window:
+<UL>
+<LI>the tags found,
+<LI>how often they were found,
+<LI>how many of the slides with the tag are currently selected
+    (see slide-control window, described above),
+<LI>how many of the slides with the tag are currently disabled.
+</UL>
+The <EM>Set</EM> and <EM>Clear</EM> columns are buttons: if you push
+them the related slides will be selected, resp. disabled.  The result
+of this is immediately shown on all places.
+
+<BR CLEAR=right>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

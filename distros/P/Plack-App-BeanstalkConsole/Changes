@@ -1,0 +1,40 @@
+Revision history for Plack-App-BeanstalkConsole
+
+0.010     2016-09-22 00:17:37Z
+          - prevent install issues on some OSes by ensuring that storage.json
+            in the installed PHP application is writable.
+
+0.009     2016-09-17 04:21:38Z
+          - update the download URL for the PHP application (thanks, Thomas
+            Sibley!) (RT#117891)
+
+0.008     2015-01-28 04:20:36Z
+          - no longer failing tests due to warnings in Plack::App::PHPCGI
+          on perl 5.19.4 and greater
+
+0.007     2013-12-10 20:08:34Z
+          - now properly dying in build, rather than exiting with status 0, if
+            required php-cgi executable is not available
+
+0.006     2013-12-08 04:40:53Z
+          - declare extra module used in Makefile.PL as configure_requires
+          - now also shipping a Build.PL, with Makefile.PL serving as a
+            fallback
+
+0.005     2013-06-05 22:22:59Z
+          - installer bails out if php-cgi is not installed
+
+0.004     2013-05-27 19:07:05Z
+          - fix '/' URI redirection - direct mapping confuses CSS
+
+0.003     2013-05-27 18:23:03Z
+          - the '/' URI is now mapped to '/public/', to avoid a bit of newbie
+            confusion
+
+0.002     2013-05-27 00:32:41Z
+          - inc::DownloadShareDirContent has been rewritten to not patch
+            [MakeMaker] directly, but rather make use of [MakeMaker::Awesome].
+
+0.001     2013-05-26 17:00:07Z
+          - Initial release.
+

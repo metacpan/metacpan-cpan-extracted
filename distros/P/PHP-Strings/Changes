@@ -1,0 +1,59 @@
+---
+version: 0.28
+date:    28 Jan 2004
+changes:
+    - Maintainer change
+    
+---
+version: 0.27
+date:    12 Dec 2003
+changes:
+    - Added substr_compare substr_count substr substr_replace
+    - Added trim ucfrist ucwords vprintf vsprintf wordwrap
+    - Added strtr
+    - Add strtolower strtoupper crc32
+    - Added tests and docs and changed implementation for str_word_count
+
+    - Include synopses in function docs
+    - Include build stuff in the dist
+    - Format multiline synopses properly
+
+    - Improved makepm argument handling.
+    - List AutoInstall featureset for PHP::Strings dev.
+    - Optional modules featureset for PHP::Strings development.
+
+---
+version: 0.26
+date:    10 Dec 2003
+changes:
+    - strip_tags and stripcslashes, with tests, implemented
+    - strstr added
+    - Added strrchr strpos strnatcasecmp strlen strrpos
+    - Added strncasecmp stripslashes strripos strnatcmp
+    - Added strncmp stripos stristr strrev
+
+    - L<> the URLs
+    - Correct heading level for functions.
+    - Better synopsis formatting
+
+    - Basic prereq per fn listing
+    - Writing to just Strings.pm now
+    - Uses Module::Install (for ExtUtils::AutoInstall mostly)
+    - Better requirements handling, allowing people to choose.
+    - Read version from pm
+
+---
+version: 0.25
+date:    06 Dec 2003
+changes:
+    - Errors now more informative.
+    - No new function implementations.
+    - Cites assorted websites.
+    - Main .pm file now generated from collection of description files.
+
+---
+version: 0.24
+date:    01 Dec 2003
+changes:
+    - Initial version.
+

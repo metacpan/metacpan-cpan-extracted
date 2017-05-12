@@ -1,0 +1,16 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include/qt4/QtGui
+qt_config=lex yacc warn_on uic resources qt warn_on release incremental link_prl exceptions no_mocdepend release stl qt_no_framework system-sqlite release shared dll largefile stl precompile_header mmx 3dnow sse sse2 dylib create_prl link_prl depend_includepath QTDIR_build nostrip use_libmysqlclient_r x11 qt_install_headers qt warn_on depend_includepath qmake_cache target_qt hide_symbols create_libtool create_pc explicitlib x11sm opentype moc thread x11lib x11inc shared dll
+moc_location=/usr/bin/moc-qt4
+uic_location=/usr/bin/uic-qt4
+
+Name: Qtgui
+Description: Qtgui Library
+Version: 4.6.3
+Libs: -L${libdir} -lQtGui 
+Libs.private: -L/usr/lib -L/usr/X11R6/lib64  -lQtCore -L/usr/lib -lfontconfig -lpthread -laudio -lXt -pthread -lgthread-2.0 -lrt -lglib-2.0 -lpng -lz -lfreetype -pthread -lgobject-2.0 -lgthread-2.0 -lrt -lglib-2.0 -lSM -lICE -lXrender -lfontconfig -lfreetype -lXext -lX11 -lm  
+Cflags: -DQT_SHARED -I/usr/include/qt4 -I${includedir}
+Requires: QtCore
+

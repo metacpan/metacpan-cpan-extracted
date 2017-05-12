@@ -1,0 +1,119 @@
+
+---
+#
+# Mouse snippets bundle for Padre::Plugin::Moose
+# Written by Ahmad M. Zawawi (azawawi)
+#
+
+# after method modifier
+after: |
+  after '${1:method_name}' => sub {
+      ${2:# body...}
+  }; 
+
+# before method modifier
+before: |
+  before '${1:method_name}' => sub {
+      ${2:# body...}
+  }; 
+
+# around method modifier
+around: |
+  around '${1:method_name}' => sub {
+      ${2:# body...}
+  }; 
+
+# Augment method modifier
+augment: |
+  augment '${1:method_name}' => sub {
+      ${2:# body...}
+  }; 
+
+# Override method modifier
+override: |
+  override '${1:method_name}' => sub {
+      ${2:# body...}
+  }; 
+
+# Define class type
+classtype: class_type '${1:ClassName}';
+
+# Type coercion
+coerce: |
+  coerce '${1:type}' 
+      => from '${2:parent_type}' 
+         via { ${3} };
+
+# Desctrutor
+DEMOLISH: |
+  sub DEMOLISH {
+      my $self = shift;
+      ${1:# body...}
+  }
+
+# Constructor
+BUILD: |
+  sub BUILD {
+      my $self = shift;
+      ${1:# body...}
+  }
+
+# Property
+has: has '${1:property}' => ( isa => '${2:Str}', is  => '${3:ro}', );
+
+# Type
+type: |
+  type '${1:type}' 
+      => where { ${2} };
+
+# Subtype
+subtype: subtype '${1:type}' => as '${2:parent_type}' => ${3:where \{ \}};
+
+# Does a list of roles
+with: with qw(${1:MyRole});
+
+# Extend a list of parents
+ext: extends qw(${1:MyParent});
+
+# Exclude
+excludes: excludes '${1:OtherRole}';
+
+# has lazy property builder
+hasl: |
+  has ${1:property} => (
+      is  => '${2:rw}',
+      isa => '${3:Str}',
+      lazy_build => 1,
+  );
+  
+  sub _build_$1 {
+      my $self = shift;
+  
+      ${4:# body...}
+  }
+
+# Role definition
+role: |
+  package ${1:RoleName};
+  use Mouse::Role;
+  
+  no Mouse::Role; 
+  1;
+
+# Require a method definition
+requires: requires '${1:my_method}';
+
+# Class declaration
+class: |
+  package ${1:ClassName};
+  use Mouse;
+  
+  no Mouse;
+  1;
+
+# Method declaration
+meth: |
+  sub ${1:method_name} {
+      my $self = shift;
+      ${2:# body...}
+  }

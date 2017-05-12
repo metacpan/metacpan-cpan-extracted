@@ -1,0 +1,51 @@
+---
+abstract: 'Object property lookup across multiple layers'
+author:
+  - 'Marcel Gruenauer <marcel@cpan.org>'
+build_requires:
+  Carp: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  FindBin: 0
+  Scalar::Util: 0
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.100960'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Property-Lookup
+provides:
+  Property::Lookup:
+    file: lib/Property/Lookup.pm
+    version: 1.101400
+  Property::Lookup::Base:
+    file: lib/Property/Lookup/Base.pm
+    version: 1.101400
+  Property::Lookup::File:
+    file: lib/Property/Lookup/File.pm
+    version: 1.101400
+  Property::Lookup::Hash:
+    file: lib/Property/Lookup/Hash.pm
+    version: 1.101400
+  Property::Lookup::Local:
+    file: lib/Property/Lookup/Local.pm
+    version: 1.101400
+recommends: {}
+requires:
+  Class::Accessor::Complex: 0
+  Class::Accessor::Constructor: 0
+  Error::Hierarchy::Internal::CustomMessage: 0
+  Error::Hierarchy::Util: 0
+  File::Basename: 0
+  YAML: 0
+  parent: 0
+  perl: 5.008
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Property-Lookup
+  homepage: http://search.cpan.org/dist/Property-Lookup/
+  repository: http://github.com/hanekomu/Property-Lookup
+version: 1.101400

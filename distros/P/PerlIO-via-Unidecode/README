@@ -1,0 +1,92 @@
+(Partly consisting of text excerpted from the Pod.)
+
+NAME
+    PerlIO::via::Unidecode -- a perlio layer for Unidecode
+
+SYNOPSIS
+      % cat utf8translit
+      #!/usr/bin/perl
+      use strict;
+      use PerlIO::via::Unidecode;
+      foreach my $f (@ARGV) {
+	open IN, '<:encoding(utf8):via(Unidecode)', $f or die "$f -> $!\n";
+	print while <IN>;
+	close(IN);
+      }
+      __END__
+
+      % od -x home_city.txt
+      000000:  E5 8C 97 E4 BA B0 0D 0A
+
+    (that's the the Chinese characters for Beijing, in UTF8)
+
+      % utf8translit home_city.txt
+      Bei Jing
+
+DESCRIPTION
+    PerlIO::via::Unidecode implements a PerlIO::via layer that applies
+    Unidecode (Text::Unidecode) to data passed through it.
+
+    You can use PerlIO::via::Unidecode on already-Unicode data, as in the
+    example in the SYNOPSIS; or you can combine it with other layers, as in
+    this little program that converts KOI8R text into Unicode and then feeds
+    it to Unidecode, which then outputs an ASCII transliteration:
+
+      % cat transkoi8r
+      #!/usr/bin/perl
+      use strict;
+      use PerlIO::via::Unidecode;
+      foreach my $f (@ARGV) {
+	open IN, '<:encoding(koi8-r):via(Unidecode)', $f or die $!;
+	print while <IN>;
+	close(IN);
+      }
+      __END__
+[...]
+
+SEE ALSO
+    Text::Unidecode
+    PerlIO::via
+    Encode and Encode::Supported
+    PerlIO::via::PinyinConvert
+
+NOTES
+    Thanks for Jarkko Hietaniemi for help with this module and many other
+    things besides.
+
+COPYRIGHT AND DISCLAIMER
+    Copyright 2003, 2014, Sean M. Burke sburke@cpan.org, all rights reserved.
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The programs and documentation in this dist are distributed in the hope
+    that they will be useful, but without any warranty; without even the
+    implied warranty of merchantability or fitness for a particular purpose.
+
+AUTHOR
+    Sean M. Burke sburke@cpan.org
+
+INSTALLATION
+
+* For using the "CPAN Plus" system, read:   perldoc cpanp
+* For old-style "make" interface, read:     perldoc perlmodinstall
+
+
+DOCUMENTATION
+
+POD-format documentation is included in PerlIO/via/Unidecode.pm.
+POD is readable with the 'perldoc' utility.
+See ChangeLog for recent changes.
+
+
+SUPPORT
+
+Questions, bug reports, useful code bits, and suggestions for
+PerlIO::via::Unidecode should just be sent to me at sburke@cpan.org
+
+
+AVAILABILITY
+
+The latest version of PerlIO::via::Unidecode is available from the
+Comprehensive Perl Archive Network (CPAN).  Visit
+<http://www.perl.com/CPAN/> to find a CPAN site near you.

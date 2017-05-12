@@ -1,0 +1,96 @@
+NAME
+    PHP::Var - export variable to PHP's expression.
+
+VERSION
+    Version 0.022
+
+SYNOPSIS
+        use PHP::Var qw/ export /;
+
+        $var = {foo => 1, bar => 2};
+
+        # export
+        $exported = export($var);
+
+        # named variable
+        $named = export('name' => $var);
+
+        # enclose variables with '<?php' and  '?>'
+        $enclosed  = export($var, enclose => 1);
+
+        # purity print
+        $purity  = export($var, purity => 1);
+
+EXPORT
+  export
+FUNCTIONS
+  export
+        $var = {foo => 1, bar => 2};
+
+        export($var);
+        # array('foo'=>'1','bar'=>'2',);
+
+        export('name' => $var);
+        # $name=array('foo'=>'1','bar'=>'2',);
+
+        export($var, enclose => 1);
+        # <?php
+        # array('foo'=>'1','bar'=>'2',);
+        # ?>
+
+        export($var, purity => 1);
+        # array(
+        #    'foo' => '1',
+        #    'bar' => '2',
+        # );
+
+Configuration Variables
+  $PHP::Var::Purity
+    When this variable is set, the expression becomes a Pretty print in
+    default.
+
+        {
+            local $PHP::Var::Purity = 1;
+            export($var);
+            # array(
+            #    'foo' => '1',
+            #    'bar' => '2',
+            # );
+        }
+
+  $PHP::Var::Enclose
+    When this variable is set, the expression is enclosed with '<?php' and
+    '?>' in default.
+
+        {
+            local $PHP::Var::Enclose = 1;
+            export($var);
+            # <?php
+            # array('foo'=>'1','bar'=>'2',);
+            # ?>
+        }
+
+NOTES
+    *   PHP::Var::export cannot export the blessed object as data that can
+        be restored.
+
+AUTHOR
+    Taku Amano, "<taku at toi-planning.net>"
+
+SEE ALSO
+    PHP::Session::Serializer::PHP
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc PHP::Var
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Taku Amano.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

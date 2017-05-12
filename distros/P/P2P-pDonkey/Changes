@@ -1,0 +1,33 @@
+Revision history for Perl extension P2P::pDonkey.
+
+0.05  Mon Apr 19 17:33:15 MSD 2004
+    - added Meta_v04.pm and Met_v04.pm - old versions of proto.
+    - now using Digest::MD4 v >= 1.3.
+    - added tests.
+
+0.04  Tue Apr 29 18:53:39 MSD 2003
+    - eDonkey-clients is no more, eDonkey-soft instead.
+    - eDonkey protocol specification will not ship inside the 
+      library now.
+    - on the top of the library edonkey server was built.
+    - added tests for Met.pm, Meta.pm, Util.pm.
+    - Fixed in readFile() was not reversing value of \$.
+    - PT_UDP_SERVERINFOREQ changed to PT_UDP_GETSERVERINFO.
+    - PT_SERVERINFO changed to PT_SERVERINFODATA according to doc.
+    - changed MetaTagName unpacking routine, so handling unknown
+      names is better.
+    - MT_PARTMET is changed from 0xe0 to 0xe1. 
+
+0.03  Fri Oct 18 12:39:17 MSD 2002
+    - added functions for admin packets.
+    - small fixes here and there.
+
+0.02  Fri Oct 11 11:49:55 MSD 2002
+    - a lot fixes for packet formats.
+    - finished pack/unpack/print/read/write functions for met files.
+    - fixed bug returning undef instead ref to empty list.
+
+0.01  Fri Oct  4 15:33:54 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n P2P::pDonkey
+

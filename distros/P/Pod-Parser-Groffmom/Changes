@@ -1,0 +1,49 @@
+Revision history for Pod-Parser-Groffmom
+
+0.042   11/11/2009
+        - Don't "use parent".  Too little benefit for the dependency (darn)
+
+0.041   10/11/2009
+        - Get rid of t/tmp directory.
+
+0.040   08/11/2009
+        - No changes, but bumped up the version number because there were
+          enough changes for a major release.
+
+0.031   Unreleased
+        - Rework how '=for mom tofile' is handled.
+        - Improve list formatting by allowing extra space if we have a
+          non-item after =item (e.g., when lists have descriptions of list
+          items).
+        - Allow pod2mom to take an alternate parser.
+        - Add 'last_title' method. Useful for subclasses.
+        - Add '=for mom tofile $filename' and '=begin mom tofile'
+        - Reformat paragraphs to be on a single line (this stops problems when
+          the newline break causes something to be recognized as a command to
+          mom).
+        - Handle one level of nested sequences: C<< I<alias>=I<name> >>
+        - Fix pod2mom bug where it wouldn't correctly find TOC's greater than
+          one page.
+        - Fix the Pod::Parser::Groffmom::Entities pod in an attempt to make
+          them render clearly on the CPAN.
+
+0.030   03/11/2009
+        - Switch 'cover', 'toc' and 'newpage' to =for commands so as not to
+          break standard POD.
+        - Add pod2mom script.
+        - Numbered lists sort of work (must always start with '1', but we'll
+          fix that later).
+        - Add support for nested lists.
+        - Add previously unhandled sequences (e.g., S<>, Z<>).
+        - Handle L<> as per "perldoc perlpod".
+        - Handle E<$entity_name>.  Codes stolen from HTML::Entities.
+        - Interpolate heading correctly.
+        - Add support for "table of contents"
+
+0.020   28/10/2009
+        - Handle E<$number> correctly.
+        - Change '=for highlight' to '=begin highlight'
+
+0.001   27/10/2009
+        - Convert pod to groff -mom format for conversion to PDF.
+

@@ -1,0 +1,5 @@
+docs: |
+    PHP's crypt is the same as Perl's. Thus there's no need for
+    C<PHP::String> to provide an implementation.
+
+    The C<CRYPT_*> constants are not provided.

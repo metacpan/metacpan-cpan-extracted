@@ -1,0 +1,122 @@
+=head1 NAME 
+
+B<Pod2WinHlp> - generate Windows Help and/or HTML Help from pod.
+
+=head1 SYNOPSIS
+
+  pod2rtf perl.pod > perl.rtf
+  hcw perl_eg.hpj
+
+=head1 DESCRIPTION
+
+Pod2WinHlp includes a script pod2rtf (also installed as pod2rtf.bat 
+on Windows) that generates .rtf (topic) files from from one or more 
+files containg POD documentation.  With appropriate bits of the 
+MS Windows Help Workshop(tm) those files may be turned into
+Windows help file(s) of type .hlp.
+
+=head1 PRE REQUISITES
+
+=head2 Perl modules
+
+Pod::Rtf uses Brad Appleton's Pod::Parser and Pod::PlainText to 
+parse the input pod files.  Pod::Parser ships with perl 5.005_03, 
+5.6.0 and later versions and is also available from CPAN.
+
+For HTML conversion you'll need a separate pod2html program and 
+you can try either the one that comes with perl or Nick Ing-Simmons' 
+Pod::HTML package from CPAN. 
+
+=head2 Help Compiler(s)
+
+In order to generate the final rtf && hpj -> hlp transformation you'll
+need to have hcw.exe a.k.a. the "Help Workshop" that ships with 
+Visual Studio wares such as MS Visual C++.  On Windows NT 4 That might 
+be in something like: C:\Program Files\DevStudio\VC\bin\hcw.exe, in other 
+words a place that may not lie along your %PATH%.  On Windows 3.11 the
+compiler was called hc31.exe, though this package was not tested with 
+that compiler (and some quirks of how hcw handles rtf were 
+accommodated by this translator). 
+
+=head2 Help viewer(s)
+
+With WinHelp the operating system includes the WinHelp viewer, and 
+every Windows user already has the WinHelp viewer installed.
+
+=head2 HTML Help Workshop compilers
+
+Be sure you have added hhc.exe and hha.dll to your path variable 
+statement. 
+
+=head2 HTML Help viewer(s)
+
+With HTML Help, the HTML Help viewer and its components are not 
+included in Windows 95, Windows NT 4.0, or any earlier releases 
+of Windows. (HTML Help is included with Microsoft Internet 
+Explorer 4.0 and later releases.)  I am not sure how this plays
+out with Windows 2000 or Millenium Edition.
+
+The HTML Help (hh.exe) program runs whenever an end user opens a 
+stand-alone compiled HTML help file. The program calls hhctrl.ocx and 
+is used to open and run .chm files. 
+
+The HTML Help Run Time Components (hhrun.exe) must be redistributed 
+with HTML Help.  If you know your end user already has an installation 
+of HTML Help, the HTML Help Update (hhupd.exe) should be redistributed.
+
+=head1 COMPILING HELP
+
+There is a sample .hpj file called perl_eg.hpj included in the kit.
+To compile help convert perlpod to perl.rtf in a directory with 
+perl_eg.hpj then type:
+
+      hcw perl_eg.hpj
+
+at the command line.  If any warnings crop up they should pertain only
+to unresolved cross-references (hyperlinking is not well handled yet).
+You can use F<perl_eg.hpj> as a template for writing your own custom .hpj
+files if you would prefer.
+
+Hopefully automatice generation of .hpj files will come with a later
+version of this kit.  Note that it could be modelled on the index.html
+generator for PodtoHTML, or the perltoc document, e.g.
+
+=head1 SEE ALSO
+
+L<perlpod>, for information on the pod format. 
+
+The Help that comes with Help Workshop and the HTML Help Workshop.
+
+There do not appear to be many good references on RTF these days,
+though for RTF as used in .hlp files try Keith E. Bugg 
+B<Building Windows Help Files> R&D Books, Lawrence Kansas, (c) 1995.  
+This latter book might be ISBN 0-87930-439-1, but it might not.
+
+=head1 SEE ALSO
+
+Pod::Rtf and pod2rtf do not currently handle hyperlinking very well.
+As part of sniffing pods in a file tree and indexing, Pod2WinHlp should
+eventually generate .hpj (project) and perhaps .cnt (table of contents), 
+files automatically.
+
+Alternatively, Pod2WinHlp may generate .html (topic), 
+.hhc (table of contents), .hhk (index), and .hhp (project) files 
+from one or more files containg POD documentation.  With appropriate bits
+of the MS HTML Help Workshop(tm) those files may be turned into
+Windows HTML help file(s) of type .chm.  (Especially since the whole
+.rtf -> .hlp type of help seems to be deprecated by Microsoft these days.)
+
+=head1 AUTHOR and LICENSE
+
+Copyright (c) 1999-2000 Peter Prymmer.  All rights reserved.
+This package is free software you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 Acknowledgements
+
+Thanks to Nick Ing-Simmons for PodToHTML upon which much of this
+is based.   Thanks to Brad Appleton for Pod::Parser.  Thanks to 
+Tom Christiansen for pod2text.
+
+=cut
+

@@ -1,0 +1,24 @@
+--- !!perl/hash:LCFG::Build::PkgSpec 
+abstract: Package Forge job registry
+author: 
+  - Stephen Quinney <squinney@inf.ed.ac.uk>
+base: ''
+build: 
+  gencmake: 0
+  remove_input_after_translate: 1
+  translate_before_pack: 1
+date: 09/05/11 08:12:51
+license: GPLv2
+name: PkgForge-Registry
+platforms: 
+  - ScientificLinux5
+  - Fedora13
+release: 1
+schema: 1
+translate: 
+  - "*.in"
+vcs: 
+  checkcommitted: 1
+  genchangelog: 1
+  logname: ChangeLog
+version: 1.3.0

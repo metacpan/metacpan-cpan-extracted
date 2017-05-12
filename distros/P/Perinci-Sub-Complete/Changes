@@ -1,0 +1,708 @@
+0.91    2017-01-15 (PERLANCAR)
+
+	- Handle x.completion being coderef or scalar, in addition to
+	  arrayref (Perinci::Sub::XCompletion 0.07).
+
+
+0.90    2016-12-11 (PERLANCAR)
+
+	- No functional changes.
+
+	- Bump prereq version Perinci::Sub::Normalize 0.19 (to force update
+	  of Sah::Schema::rinci::function_meta to 1.1.82).
+
+
+0.89    2016-12-10 (PERLANCAR)
+
+	- Handle completion of hash option (--arg k1=v1 --arg k2=v2 ...). Grok
+          'index_completion' argument spec property.
+
+
+0.88    2016-10-29 (PERLANCAR)
+
+	- No functional changes.
+
+	- Depend on Sah::SchemaR::* instead of Sah::Schema::* [RT#118535].
+
+
+0.87    2016-10-28 (PERLANCAR)
+
+	- Provide 'parsed_opts' to handler in
+	  'completion'/'element_completion' properties for more
+	  information.
+
+
+0.86    2016-08-03 (PERLANCAR)
+
+	- Replace code to check for installed module from using
+	  Module::Path::More to using Module::Installed::Tiny (works with
+	  fatpacked/datapacked scripts).
+
+
+0.85    2016-07-22 (PERLANCAR)
+
+        - complete_from_schema(): look up Sah::SchemaR::* modules when schema's
+          type is not a known built-in type.
+
+        - complete_from_schema(): observe x.completion in schema, just like in
+          arg spec.
+
+
+0.84    2015-12-30 (PERLANCAR)
+
+	- No functional changes.
+
+	- Adjust to Complete::Bash 0.23.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.83    2015-12-05 (PERLANCAR)
+
+	- Adjust to Complete::Common 0.21.
+
+        - [Removed] For more consistent user experience, remove per-function
+	  options ci, users are now encouraged to set these behaviors globally
+	  via Complete::Common.
+
+
+0.82    2015-09-09 (PERLANCAR)
+
+	- [dist] Use Complete::Setting instead of Complete, the settings
+	  have been split to a separate module in 0.13.
+
+
+0.81    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.80    2015-08-11 (PERLANCAR)
+
+	- No functional changes.
+
+	- Avoid using experimental (+Carp) to shave off a few milliseconds
+	  of startup time.
+
+
+0.79    2015-04-27 (PERLANCAR)
+
+	- No functional changes.
+
+        - Adjust tests to Complete::Getopt::Long 0.32 [CT].
+
+
+0.78    2015-04-09 (PERLANCAR)
+
+	- Replace Log::Any with Log::Any::IfLOG.
+
+
+0.77    2015-04-02 (PERLANCAR)
+
+	- Observe x.completion & x.element_completion attributes in
+	  argument specification (experimental).
+
+
+0.76    2015-03-30 (PERLANCAR)
+
+	- complete_from_schema(): Handle 'any' type by combining answers
+	  from all of its alternate types.
+
+
+0.75    2015-03-09 (PERLANCAR)
+
+	- Adjust to Complete::Getopt::Long 0.30 (escmode renamed to
+	  esc_mode).
+
+
+0.74    2015-03-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Forgot to 'use Complete', d'oh.
+
+
+0.73    2015-03-03 (PERLANCAR)
+
+	- Observe $Complete::OPT_CI as default for 'ci' options.
+
+
+0.72    2015-03-01 (PERLANCAR)
+
+	- Use completion routine from Perinci::Sub::ArgEntity::* modules.
+
+
+0.71    2015-01-09 (PERLANCAR)
+
+	- Add option: func_arg_starts_at which is a workaround for
+	  Perinci::CmdLine.
+
+
+0.70    2014-12-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak logging messages to make it easier to debug (preparing
+	  peri-test-comp).
+
+
+0.69    2014-12-20 (PERLANCAR)
+
+	- [Bugfix] 'args' arg for completion routine was not set correctly.
+
+
+0.68    2014-12-20 (PERLANCAR)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Following Complete::Getopt::Long 0.19, to make writing completion
+          routine simpler, we now also merge keys from 'extras' argument into
+          the final %args passed to the completion routine. Previously 'extras'
+          is put into a single key in %args as 'extras'.
+
+
+0.67    2014-12-11 (PERLANCAR)
+
+	- [Bugfix] static should be 0 when word length is not zero.
+
+
+0.66    2014-12-09 (PERLANCAR)
+
+	- Return 'static' key in completion answer (see Complete 0.05 for
+	  more details).
+
+
+0.65    2014-11-30 (PERLANCAR)
+
+	- No functional changes.
+
+        - Forgot to adjust some tests [CT], [RT#100605].
+
+
+0.64    2014-11-28 (PERLANCAR)
+
+	- Adjust to Complete 0.04 (in hash form, words are now put in
+	  'words' instead of 'completion').
+
+
+0.63     2014-09-03 (PERLANCAR)
+
+         - Use ignore_converted_code option to keep tab completion working when
+           there is coderef cmdline_aliases property.
+
+
+0.62     2014-08-06 (SHARYANTO)
+
+         - [Bugfix] When producing 'args' by calling get_args_from_argv(),
+           forgot to set strict => 0.
+
+
+0.61     2014-08-06 (SHARYANTO)
+
+         - Provide 'words', 'cword', 'args' in 'extras' passed to completion
+           routines.
+
+
+0.60     2014-07-27 (SHARYANTO)
+
+         - Now uses Complete::Getopt::Long instead of implementing completion
+           logic ourselves. The code is now much shorter and completion is now
+           more proper, fixing some deficiencies, e.g. inability to expect
+           option value for common option (like '--format=s' used by
+           Perinci::CmdLine).
+
+         [REMOVED FEATURES]
+
+         - To simplify code, remove argument 'custom_arg_completer' and
+           'custom_arg_element_completer', because 'custom_completer' (now
+           'completion') can assume the task.
+
+         - To be more generic, rename argument 'extra_completer_args' to
+           'extras'.
+
+         [INCOMPATIBLE CHANGES]
+
+         - To be more consistent with naming of completion routine in other
+           modules, rename argument from 'custom_completer' to 'completion'. It
+           must only be a coderef instead of coderef or hash of coderefs. Some
+           of the arguments it receives also change.
+
+         - To simplify code, no longer does parse_cmdline() when 'words' and
+           'cword' is not defined. Instead, now the args are required and you
+           need to parse cmdline yourself.
+
+
+0.59     2014-07-25 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Complete::Bash 0.09.
+
+
+0.58     2014-07-24 (SHARYANTO)
+
+         - No functional changes.
+
+         - Some minor updates to tests.
+
+         - Use Data::Sah::Normalize instead of Data::Sah, to reduce deps.
+
+
+0.57     2014-07-19 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Complete::Bash 0.06.
+
+
+0.56     2014-07-18 (SHARYANTO)
+
+         - [Bugfix] Excluded the option we're trying to complete ('cmd --help^'
+           or 'cmd -h^' didn't work because we excluded that option from the
+           list!).
+
+
+0.55     2014-07-18 (SHARYANTO)
+
+         - Adjust to Perinci::Sub::GetArgs::Argv 0.44, which makes it more
+           convenient for us to do completion (get_args_from_argv() returns the
+           result from gen_getopt_long_spec_from_meta(), which contains all
+           sorts of goodies ready for use, like func.opts_by_arg,
+           func.opts_by_common, etc.
+
+         [INCOMPATIBLE CHANGES]
+
+         - To make it easy to work with the new get_args_from_argv(),
+           'common_opts' has been changed to be in the same format that that
+           function expects, which is a hash of Getopt::Long opt spec &
+           handlers.
+
+
+0.54     2014-07-18 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Complete::Bash 0.04.
+
+
+0.53     2014-07-02 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Rename function shell_complete_arg() to complete_cli_arg() for
+           consistency (all completion routine now uses /^complete_/).
+
+
+0.52     2014-07-02 (SHARYANTO)
+
+         - No functional changes.
+
+         - Adjust to Complete::Util 0.12.
+
+
+0.51     2014-07-01 (SHARYANTO)
+
+         - No functional changes.
+
+         - [Bugfix] Avoid Perl autovivification which cause an arg that has no
+           schema to have a schema of [].
+
+
+0.50     2014-06-29 (SHARYANTO)
+
+         - No functional changes.
+
+         - Re-upload.
+
+
+0.49     2014-06-29 (SHARYANTO)
+
+         - shell_complete_args() allows completion routines to return hash
+           (completion reply + metadata) instead of just array (completion
+           reply) (Rinci 1.1.52).
+
+
+0.48     2014-06-27 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - shell_complete_args() now returns hashref instead of plain arrayref,
+           to return extra metadata to give hints to formatter (like
+           Complete::Util's format_shell_completion()) on how to properly
+           display/escape special characters to the shell. For example, if we're
+           completing environment variables (type=>'env') we don't need to
+           escape the dollar sign.
+
+
+0.47     2014-06-26 (SHARYANTO)
+
+         - No functional changes.
+
+         - [Bug fix] Remove perl undef warning when arg doesn't have schema.
+
+
+0.46     2014-06-25 (SHARYANTO)
+
+         - [Bug fix] Forgot to remove complete_array() in
+           complete_arg_{val,elem}().
+
+
+0.45     2014-06-25 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - No longer filter completion routine with complete_array(), it's now
+           up to the routine to filter it, this allows case-insensitive matching
+           or spelling correction.
+
+
+0.44     2014-06-25 (SHARYANTO)
+
+         - No functional changes.
+
+         - Use Complete::Util which replaces SHARYANTO::Complete::Util.
+
+
+0.43     2014-06-19 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - [silly] complete_from_schema(): Do a digit-by-digit completion for
+           float.
+
+
+0.42     2014-06-19 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - [tweak] Don't switch to complete arg name when word starts with '-'
+           but opt before word expects value. For example, '--bool -^' will
+           switch to completing arg name, but '--str -^' will still try to
+           complete str's value because it expects value.
+
+         - [silly] complete_from_schema(): Do a digit-by-digit completion for
+           int.
+
+
+0.41     2014-06-19 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Fix completion of array argument's element ('--ary ^' not yet
+           completed as element).
+
+
+0.40     2014-06-19 (SHARYANTO)
+
+         - Third attempt, only riap_server_url is needed, riap_uri is optional
+           because the former can contain the latter.
+
+
+0.39     2014-06-18 (SHARYANTO)
+
+         - Second attempt, we also need riap_server_url.
+
+
+0.38     2014-06-18 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add riap_client & riap_uri arguments to
+           shell_complete_args,complete_arg_{val,elem} to allow requesting to
+           server when completion/element_completion coderef has been cleansed
+           into string (currently no tests yet).
+
+
+0.37     2014-06-18 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Don't die if arg spec's completion is not a coderef, decline instead.
+
+
+0.36     2013-11-14 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Implement argument element completion (Rinci 1.1.42).
+
+         - Add functions: complete_arg_elem, complete_from_schema.
+
+         [BUG FIXES]
+
+         - complete_arg_val() now returns undef when it can't find completion
+           from schema, so shell_complete_arg() can fallback to files.
+
+         - Complete greedy argument names, always (allow us to complete e.g.
+           --file F1 --file F2 etc).
+
+
+0.35     2013-11-08 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - No functional changes. Avoid CT failure reports by forcing
+           Perinci::Sub::Wrapper version.
+
+
+0.34     2013-11-05 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - shell_complete_arg(): Accept 'extra_completer_args' argument to pass
+           to custom completion routines.
+
+         - Pass 'parent_args' argument to all custom completion routines
+           (previously only 'custom_completer' gets it, now
+           'custom_arg_completer' and 'completion' arg spec also get it).
+
+         - complete_arg_val(): observe 'is' clause.
+
+         - complete_arg_val(): complete [0, 1] for bool type.
+
+         [BUG FIXES]
+
+         - A few bug fixes.
+
+
+0.33     2013-11-04 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Allow 'custom_arg_completer' to decline with undef, just like
+           'custom_completer'.
+
+         [INCOMPATIBLE CHANGES]
+
+         - 'custom_arg_completer' is now expected to return arrayref instead of
+           list, just like the other completion routines.
+
+
+0.32     2013-11-04 (SHARYANTO)
+
+         [REFACTORING]
+
+         - Rename dist from Perinci-BashComplete to Perinci-Sub-Complete because
+           I want to extract non-Perinci-related routines to another module and
+           I want to support other shells (someday).
+
+         - Split generic (non-Rinci/Riap-related) functions to
+           SHARYANTO-Complete-Util.
+
+         - Rename some functions.
+
+
+0.31     2013-09-08 (SHARYANTO)
+
+         - No functional changes. Remove references to Perinci::Access::InProcess.
+
+
+0.30     2013-08-10 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Allow other line parser to be used, e.g. one that doesn't call out to
+           bash (currently undocumented).
+
+
+0.30     2013-08-10 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Allow other line parser to be used, e.g. one that doesn't call out to
+           bash (currently undocumented).
+
+
+0.29     2012-06-22 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Support --dry-run for function which has dry_run feature
+
+
+0.28     2012-03-22 (SHARYANTO)
+
+         - Support with.dot function arguments
+
+         - Normalize --foo_bar into --foo-bar
+
+
+0.27     2012-03-16 (SHARYANTO)
+
+         [FIXES]
+
+         - file completion inserted "." on every file/dir on the current dir.
+
+         - file completion cut intermediate dirs ("dir/a" completed into ["aa",
+           "ab"] instead of ["dir/aa", "dir/ab"]
+
+         [ENHANCEMENTS]
+
+         - Add trick in dir completion so that a single "dir/" match won't cause
+           bash to insert space after the "/".
+
+
+0.26     2012-03-07 (SHARYANTO)
+
+         - No functional changes. Deal with test failure reports from CT (change
+           'replace $HOME with ~' test in t/_line_to_argv.t into a warning, as I
+           don't know the workaround yet).
+
+
+0.25     2012-03-04 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - More fixes to complete_file() so it more closely resembles bash
+           (symlink traversal is still different though).
+
+
+0.24     2012-03-04 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - complete_file() now behaves more like bash (though not nearly
+           so, due to glob()'s quirks): First it works with files/dirs outside
+           curdir. When word is '' or ends with '/', it uses readdir() to
+           include dotfiles. Otherwise it treats word as wildcard and glob() it.
+
+
+0.23     2012-03-03 (SHARYANTO)
+
+         - No functional changes. Change implementation of _line_to_argv() from
+           calling Perl binary and dumping @ARGV, to using bash's own "$@". On
+           my Atom N570 netbook, this shaves time from about 0.1s to 0.03s.
+
+
+0.22     2012-02-28 (SHARYANTO)
+
+         - No functional changes. Fix to avoid numerous CT failure reports
+           (calling perl binary using $^X instead of the hardcoded "perl"). I
+           haven't quoted $^X, hope that won't cause much trouble though.
+
+
+0.21     2012-02-28 (SHARYANTO)
+
+         - Handle argument name completion of one-letter args and cmdline_aliases.
+
+
+0.20     2012-02-27 (SHARYANTO)
+
+         - No functional changes. Make _line_to_argv() report errors (lots of
+           failure reports from CPAN Testers with apparently undef result from
+           _line_to_argv()).
+
+
+0.19     2012-02-23 (SHARYANTO)
+
+         - Rename distribution from Sub-Spec-BashComplete to Perinci-BashComplete.
+           Follow Rinci v1.1 specification.
+
+
+0.18     2011-11-23 (SHARYANTO)
+
+         - No functional changes. _parse_schema() moved from Data::Sah::Util to
+           normalize_schema() in Data::Sah.
+
+
+0.17     2011-10-31 (SHARYANTO)
+
+         - No functional changes. _parse_schema() is moved from Sub::Spec::Utils
+           to Data::Sah::Util.
+
+
+0.16     2011-08-25 (SHARYANTO)
+
+         - No functional changes. Adjust to Sub::Spec 0.15.
+
+
+0.15     2011-07-26 (SHARYANTO)
+
+         - No functional changes. Adjust to use the new Sub::Spec::GetArgs::Argv.
+
+
+0.14     2011-05-31 (SHARYANTO)
+
+         - No functional changes. Skip tests on systems which don't have bash.
+
+
+0.13     2011-02-23 (SHARYANTO)
+
+         - Add missing dependency: Log::Any [CT].
+
+
+0.12     2011-02-23 (SHARYANTO)
+
+         - Add missing dependency: Sub::Spec::CmdLine [CT].
+
+
+0.11     2011-02-22 (SHARYANTO)
+
+         - Use Sub::Spec::Utils.
+
+
+0.10     2011-02-19 (SHARYANTO)
+
+         - Incompatible change: arg_complete & custom_completer now expected to
+           return arrayref instead of list.
+
+         - More fixes for remaining_words for custom_completer.
+
+
+0.09     2011-02-18 (SHARYANTO)
+
+         - Handle backspaced whitespace.
+
+         - Don't escape output (let completer program do it) to avoid double
+           escaping.
+
+         - Fix cword & remaining_words for custom_completer.
+
+
+0.08     2011-02-18 (SHARYANTO)
+
+         - Backslash-escape output.
+
+         - Spec: cmdline_aliases renamed to arg_aliases.
+
+
+0.07     2011-02-17 (SHARYANTO)
+
+         - bash_complete_spec_arg(): Also add --nofoo completion for bool
+           cmdline_aliases.
+
+
+0.06     2011-02-17 (SHARYANTO)
+
+         - bash_complete_spec_arg(): Add 'custom_completer' option, parse
+           'cmdline_aliases' in arg spec.
+
+
+0.05     2011-02-17 (SHARYANTO)
+
+         - Fix cword counting.
+
+
+0.04     2011-02-16 (SHARYANTO)
+
+         - Small fix on detecting arg name/value.
+
+
+0.03     2011-02-16 (SHARYANTO)
+
+         - Complete arg name instead of value if user type '-' (indicates he/she
+           wants arg name).
+
+
+0.02     2011-02-16 (SHARYANTO)
+
+         - Fix dependency version (requires Sub::Spec::CmdLine 0.10+).
+
+
+0.01     2011-02-16 (SHARYANTO)
+
+         - First release.

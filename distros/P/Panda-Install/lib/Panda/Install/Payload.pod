@@ -1,0 +1,19 @@
+=head1 NAME
+
+Panda::Install::Payload - Manager for module's payload.
+
+=head1 FUNCTIONS
+
+=head4 payload_dir($module)
+
+Returns directory where the payload of module $module is located or undef if $module didn't install any payload.
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

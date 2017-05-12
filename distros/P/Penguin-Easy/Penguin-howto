@@ -1,0 +1,131 @@
+========================================
+How to get started with One_Penguin-pre2
+========================================
+
+Installing Penguin
+------------------
+  Before any code will be excuted,  you will need the following:
+
+	perl 5.002
+	safe 2.03
+	IO 1.02
+	PGP version something.
+
+  Perl 5.002 will need to built and installed on the system,  as well as the
+other two modules.
+  You should ftp Safe and IO from the following location:
+    
+   coriolan.amicus.com/pub/PATCHED_MODULES
+
+These versions have been slightly modified from the originals in order to
+help Penguin along...
+  This is not the only magic nessercary - Perl5 comes with Safe 1.0 installed,
+and you have to get rid of it before you can do anything useful.  You will 
+need to delete the following directories:
+
+   ${PERL5LIB}/${ARCH}/5.002/auto/Safe/ and
+   ${PERL5LIB}/auto/Safe/
+
+as well as the file ${PERL5LIB}/Safe.pm in order for Safe-2.03 to work. 
+This is a rather large hassle,  but it is believed that it will be fixed in
+the next release of Perl (note: it wasn't)
+
+
+Configuring Penguin
+-------------------
+  Now you have the modules you need, installed in the correct places and
+all,  you have to build Penguin.  Go to the top of the Penguin source tree,
+and type 'perl Makefile.PL'.  This will create a standard Makefile for your 
+system.  Once everything has finished,  you can type 'make' to build Penguin,  
+and then 'make install' (You probably need to be root to do this,  as it 
+installs it inside your ${PERL5LIB} directory).
+
+The next step along the way is creating a rightsfile.  This is the file
+containing the Safe opcodes for each user.  You can start your rightsfile by
+typeing 'touch ~/.rightsfile'.
+  You must now edit the rightsfile,  it looks intimidating,  but really 
+isn't that complicated.  The format is:
+
+   [User Name <email@address.foo>]
+   opcodes
+
+To decide what opcodes to give someone,  please read Safe.pod
+this will tell you which each opcode means,  and what functions they
+allow access to.  
+  If you're not sure,  give the user the opcode :default. For instance, if you 
+were adding Map Gallo (Felix Gallo's Cat) to your rightsfile,  you could do it 
+like this:
+
+   [Map Gallo <mapthecat@amicus.com>]
+   :default
+ 
+If you wish to comment your rightsfile,  you can do so with a '#' preceding
+the commented line.
+
+
+Executing a Penguin Application
+-------------------------------
+  You should be now just about ready to run an application.  To do so,
+enter the bin directory underneath the Penguin root.  To try it out,  you 
+need a server to use and some working perl code (Write some,  and save it in 
+a file called 'test.pl').  Try coriolan.amicus.com (Felix Gallo's system).  
+You can achive this by typing:
+
+   client -h coriolan.amicus.com -f test.pl -v
+
+This basically says run the test.pl [-f test.pl] script on 
+coriolan.amicus.com [-h coriolan.amicus.com],  and display the results 
+nicely [-v, for verbosity].
+  The client will disable the screen echo on your machine,  and ask you to
+enter your PGP pass phrase.  As soon as you do this,  Penguin signs the
+code,  and puts it in a frame.  If Penguin can connect to coriolan.amicus.com,  
+it will toss this frame across the network.  The Penguin server unwraps the code 
+and reads who sent the code (it uses the PGP signature to verify this).
+It then searches in the remote .rightsfile to see what rights your name has.  
+Chances are,  it won't find your name, so it will give you default rights.  
+After unwrapping the code, it creates a compartment,  where it can safely 
+execute your script.  If it finds unsafe operations (ie,  those not specified 
+in the rightsfile) then it will return an error message,  otherwise it 
+will simply return a 1 (True).  If you want some specific information
+returned,  you can always use the perl function 'return' in your scripts. 
+  If you got this far, congratulations, you just successfully ran a Penguin
+Application.
+
+
+Starting up your own Penguind
+-----------------------------
+  Penguind is the counterpart to 'client'.  It receives the information
+across the network,  and sets up the secure execution compartment for the
+remote code. 
+  To run penguind simply type 'penguind' from the command line.  This will
+start the penguind server with the default options (No verbosity,  port
+8118,  and Interactive).  I suggest you start penguind with the following:
+
+   penguind -v
+
+The -v switch turns verbosity on,  and lets you see what exactly people are
+running on your machine.
+  After you start penguind,  the program asks you to type in your PGP pass
+phrase (You won't see what you are typing,  the same as when you type your
+login password).  Penguind will then appear to do nothing, until a client
+trys to attach.
+  If and when a client attaches,  penguind will print the hostname and port
+number that the client is coming from,  and then also print the code it
+tries to execute.
+
+
+Notes
+-----
+Most of this text was put together this evening (so the it may read a
+little strange in places),  and much of it consists of long-winded
+ways of saying what has been said before. 
+Hopefully this will help people run penguin properly,  the first time
+through.  I guess I'll have to completely revamp this text when
+One_Penguin-pre3 and finally One_Penguin come along, but it's a start.
+
+Regards,
+James.
+
+--
+jduncan@hawk.igs.net
+ 

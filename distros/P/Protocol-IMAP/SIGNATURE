@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 48a61294ea89a66101760110bfc2452a331ada6f Changes
+SHA1 b4703c32de255868539740e0b97e0e77c0c2f88e INSTALL
+SHA1 fcecd203a27c044eb4138dc70de012aa384a2234 LICENSE
+SHA1 366f657cd577b5cb3896d1d2985b65f8ece212a8 MANIFEST
+SHA1 d149c1d3df7827ec3b5fbc24e599e11fae0f283e META.json
+SHA1 55c8f70cdfcf1e90769de05e667f7c313d0dbf0a META.yml
+SHA1 bf77830e75d07c13cc663a6980f660dbd39751f9 Makefile.PL
+SHA1 e8cf0f8dab2af55bba9b110161ccbb835e455e08 README
+SHA1 ad2cf2be3f1c9aa9fef52ff5a47fec13e0528fc4 cpanfile
+SHA1 671050797f91d508ff696a2e629b1e9924cc1903 dist.ini
+SHA1 256a0d98afaae9824357c28f9f0867c8b5a05c33 examples/client.pl
+SHA1 919ad352eb32a8b6c0b9c9cb51ca1c41c4366ca4 lib/Protocol/IMAP.pm
+SHA1 662af59fdb7be88f7b2ce025c332e8783b2e8afa lib/Protocol/IMAP.pod
+SHA1 1dd86b835514cb43e264126ed4b4b624b121fbd7 lib/Protocol/IMAP/Address.pm
+SHA1 3e72408f3e737d104d32fa4420c173441a747060 lib/Protocol/IMAP/Client.pm
+SHA1 dc5dcf0b2b5a7f879a99f351ac8cde30c907c6aa lib/Protocol/IMAP/Client.pod
+SHA1 a2d245644426ba8c09d0664c333c39ea827b2066 lib/Protocol/IMAP/Envelope.pm
+SHA1 d82e4948c17935461f307f48380bc69c6580407c lib/Protocol/IMAP/Fetch.pm
+SHA1 4dd1a805ac6cf50ed1f9af960ee4cf3fdb258794 lib/Protocol/IMAP/Fetch.pod
+SHA1 6a6160a53ef5617c4a95ac24a77649f10e15b46d lib/Protocol/IMAP/FetchResponseParser.pm
+SHA1 63d240c3eaa9cf7a1e76b1338957253282f4dd1a lib/Protocol/IMAP/FetchResponseParser.pod
+SHA1 b1796cdfbe1b3d4f066a037e9b410180bed1383a lib/Protocol/IMAP/Server.pm
+SHA1 9b0c8cd6f707b23a497f7c5b96de908f9f2693ff lib/Protocol/IMAP/Server.pod
+SHA1 84cd2ca0ecdff82464bf61c9d18eef77c3ab3649 t/00-check-deps.t
+SHA1 51b34e349e57903d4a54845a8aaff5cd1e1d02dd t/00-compile.t
+SHA1 47526813af76ae1dd2ab8a3ea02891b176ddecdf t/baseclass.t
+SHA1 4d2c8538f4612a19fff29650cf779c24e27a5fc7 t/client.t
+SHA1 41733667acf0cf53049d4a09f0dc85757f14ebf1 t/fetch-parser.t
+SHA1 399839a437ec15143cf0025a387d1ca5369de278 t/imap.t
+SHA1 6384cbfdd586dafc0a3d9dc67f0a344803d02d75 t/states.t
+SHA1 8a649950be26c5ee378eec15b7347387b9586aef xt/author/test-eol.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 c6c3c9f7fe12058b4771449dff874b1c450c982c xt/release/mojibake.t
+SHA1 9934d36e45e1143c1a54658bc48872e0591af41b xt/release/pod-syntax.t
+SHA1 fd1fa776fca35fc8f1bdd24ee3fbaa1eca755a44 xt/release/synopsis.t
+SHA1 bbcd59d081d9940af5d43337ae85458075933829 xt/release/test-version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJSe/UnAAoJEFKElMNpjtyD7DYIANc9bPN7ku8S2VJp5s+SQBd4
+79nDnqsu6tJg2jNkqn15M5IPNVgUEAlYi1JHTKO/o+K82baDKhP3cyro7Qjz4hr/
+cCJpk5oWurLE2EEPzc1Q0JFjRanuYUm/H2E9PoZ1J3pU9jWl8kGAR1hUNWWOkqeu
+lmyH3qUq5nJyI9w7qyA7gqgLEAipmr4hc2aeMTSMhHhLLuVOKpqaB7YjLueRvDpD
++rStMNruXxHVtvdxSH9L1Sqz5PiJjjikqx3x1HXpfoCjdpriDkKpDBGa8Kp543qC
+4ZJtmNdcH8ETYXXcX3N10kPL9mFssIHBtKXfcjk1ozp/w0jBW2WNEgxn9GsEj4Y=
+=+XMJ
+-----END PGP SIGNATURE-----

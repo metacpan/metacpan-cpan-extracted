@@ -1,0 +1,18 @@
+Build.PL
+Changes
+lib/Padre/Plugin/PAR.pm
+MANIFEST			This list of files
+README
+share/locale/messages.pot
+share/locale/Padre__Plugin__PAR-ar.po
+share/locale/Padre__Plugin__PAR-de.po
+share/locale/Padre__Plugin__PAR-es-es.po
+share/locale/Padre__Plugin__PAR-fr-fr.po
+share/locale/Padre__Plugin__PAR-ja.po
+share/locale/Padre__Plugin__PAR-nl-nl.po
+share/locale/Padre__Plugin__PAR-pl.po
+share/locale/Padre__Plugin__PAR-pt-br.po
+share/locale/Padre__Plugin__PAR-tr.po
+share/locale/Padre__Plugin__PAR-zh-tw.po
+t/01-load.t
+META.yml

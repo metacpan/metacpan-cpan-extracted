@@ -1,0 +1,22 @@
+Changes
+lib/Parse/AccessLog.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+TODO
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/01-line-apache.t
+t/02-line-nginx.t
+t/03-file-apache.t
+t/04-file-nginx.t
+t/05-list-apache.t
+t/06-list-nginx.t
+ignore.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

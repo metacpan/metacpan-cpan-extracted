@@ -1,0 +1,166 @@
+Program received signal SIGSEGV, Segmentation fault.
+0x00000000 in ?? () from
+(gdb) bt
+#0  0x00000000 in ?? () from
+#1  0x01617967 in pcre3_dll_iname () from C:\WINDOWS\system32\wxvault.dll
+#2  0x017e30f0 in ?? ()
+#3  0x00000104 in ?? ()
+#4  0x0022f6d4 in ?? ()
+#5  0x0022f69c in ?? ()
+#6  0x017e30f0 in ?? ()
+#7  0x017e30f4 in ?? ()
+#8  0x017e2e80 in ?? ()
+#9  0x6866edb3 in _PRETTY_FUNCTION__.5 ()
+#10 0x00000000 in ?? () from
+#11 0x0022f690 in ?? ()
+#12 0x0022f8e4 in ?? ()
+#13 0x01627e5d in wxvault!??0Cwxvault@@QAE@XZ ()
+   from C:\WINDOWS\system32\wxvault.dll
+#14 0x00000000 in ?? () from
+#15 0x0022f8f0 in ?? ()
+#16 0x016165ee in pcre3_dll_iname () from C:\WINDOWS\system32\wxvault.dll
+#17 0x00000001 in ?? ()
+#18 0x0022f6d4 in ?? ()
+#19 0x017e30f0 in ?? ()
+#20 0x017e30f4 in ?? ()
+#21 0x017e2e80 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#22 0x00000000 in ?? () from
+#23 0x68e20000 in ?? ()
+#24 0x00000002 in ?? ()
+#25 0x00000001 in ?? ()
+#26 0x017e2d98 in ?? ()
+#27 0x00000002 in ?? ()
+#28 0x00000028 in ?? ()
+#29 0x017e2e58 in ?? ()
+#30 0x003f0000 in ?? ()
+#31 0x00000042 in ?? ()
+#32 0x0022ffe0 in ?? ()
+#33 0x01015c94 in ?? ()
+#34 0x0022f6b8 in ?? ()
+#35 0xffffffff in ?? ()
+#36 0x0022f7f0 in ?? ()
+#37 0x7c90ee18 in strchr () from ntdll.dll
+#38 0x7c96e0f8 in ntdll!RtlpNtMakeTemporaryKey () from ntdll.dll
+#39 0xffffffff in ?? ()
+#40 0x7c96e0d4 in ntdll!RtlpNtMakeTemporaryKey () from ntdll.dll
+#41 0x7c94a5d0 in ntdll!RtlInsertElementGenericTableAvl () from ntdll.dll
+#42 0x003f0000 in ?? ()
+#43 0x50000061 in ?? ()
+#44 0x7c926abe in ntdll!iswdigit () from ntdll.dll
+---Type <return> to continue, or q <return> to quit---
+#45 0x003f0000 in ?? ()
+#46 0x017e2e60 in ?? ()
+#47 0x40000060 in ?? ()
+#48 0x7ffdfbf8 in ?? ()
+#49 0x7c90d721 in ntdll!ZwCreateNamedPipeFile () from ntdll.dll
+#50 0x7c81e1ea in KERNEL32!CreatePipe () from C:\WINDOWS\system32\kernel32.dll
+#51 0x0022f7c4 in ?? ()
+#52 0x80100100 in ?? ()
+#53 0x0022f78c in ?? ()
+#54 0x0022f7b0 in ?? ()
+#55 0x00000003 in ?? ()
+#56 0x00000002 in ?? ()
+#57 0x7c90dd09 in ntdll!ZwOpenFile () from ntdll.dll
+#58 0x7c81e216 in KERNEL32!CreatePipe () from C:\WINDOWS\system32\kernel32.dll
+#59 0x0022f7c0 in ?? ()
+#60 0x40100080 in ?? ()
+#61 0x7c911b09 in ntdll!RtlLookupElementGenericTableAvl () from ntdll.dll
+#62 0x003f2048 in ?? ()
+#63 0x00250928 in ?? ()
+#64 0x00000000 in ?? () from
+#65 0x0022fb34 in ?? ()
+#66 0xffffffff in ?? ()
+#67 0x7c81e24a in KERNEL32!CreatePipe () from C:\WINDOWS\system32\kernel32.dll
+---Type <return> to continue, or q <return> to quit---
+#68 0x0022f900 in ?? ()
+#69 0x00000018 in ?? ()
+#70 0x00000000 in ?? () from
+#71 0x7ffdfbf8 in ?? ()
+#72 0x00000042 in ?? ()
+#73 0x00000000 in ?? () from
+#74 0x00000000 in ?? () from
+#75 0x0022f904 in ?? ()
+#76 0x002f002e in ?? ()
+#77 0x0022f7c8 in ?? ()
+#78 0x00000000 in ?? () from
+#79 0x00000001 in ?? ()
+#80 0xb8797400 in ?? ()
+#81 0x00000000 in ?? () from
+#82 0x00000000 in ?? () from
+#83 0x000006d0 in ?? ()
+#84 0x003f0000 in ?? ()
+#85 0x5c656369 in ?? ()
+#86 0x6500614e in ?? ()
+#87 0x00240000 in ?? ()
+#88 0x0022f5d0 in ?? ()
+#89 0x5032336e in ?? ()
+#90 0x0000f824 in ?? ()
+---Type <return> to continue, or q <return> to quit---
+#91 0x7c90ee18 in strchr () from ntdll.dll
+#92 0x0022f72c in ?? ()
+#93 0xffffffff in ?? ()
+#94 0x0022f8c0 in ?? ()
+#95 0x7c90ee18 in strchr () from ntdll.dll
+#96 0x7c926ac8 in ntdll!iswdigit () from ntdll.dll
+#97 0xffffffff in ?? ()
+#98 0x7c926abe in ntdll!iswdigit () from ntdll.dll
+#99 0x7c9268ad in ntdll!iswdigit () from ntdll.dll
+#100 0x003f0000 in ?? ()
+#101 0x40000060 in ?? ()
+#102 0x7c91056d in ntdll!RtlFreeThreadActivationContextStack () from ntdll.dll
+#103 0x017e2e18 in ?? ()
+#104 0x017e2e60 in ?? ()
+#105 0x017e2e60 in ?? ()
+#106 0x003f0608 in ?? ()
+#107 0x0022f8a8 in ?? ()
+#108 0x7c90ee18 in strchr () from ntdll.dll
+#109 0x7c911b10 in ntdll!RtlLookupElementGenericTableAvl () from ntdll.dll
+#110 0x000003e8 in ?? ()
+#111 0x7c911ad6 in ntdll!RtlInitializeRXact () from ntdll.dll
+#112 0x00000000 in ?? () from
+#113 0x00000000 in ?? () from
+---Type <return> to continue, or q <return> to quit---
+#114 0x77c62440 in ?? ()
+#115 0x00000480 in ?? ()
+#116 0x00000000 in ?? () from
+#117 0x0000f9b0 in ?? ()
+#118 0x003f0000 in ?? ()
+#119 0x0022f64c in ?? ()
+#120 0x7c90fb6c in ntdll!RtlNumberGenericTableElementsAvl () from ntdll.dll
+#121 0x0022f89c in ?? ()
+#122 0x7c90ee18 in strchr () from ntdll.dll
+#123 0x7c9106f0 in ntdll!RtlAppendStringToString () from ntdll.dll
+#124 0xffffffff in ?? ()
+#125 0x00000000 in ?? () from
+#126 0x00000000 in ?? () from
+#127 0x003f0000 in ?? ()
+#128 0x40000060 in ?? ()
+#129 0x77c2c3ce in msvcrt!free () from C:\WINDOWS\system32\msvcrt.dll
+#130 0x00000006 in ?? ()
+#131 0x003f0000 in ?? ()
+#132 0x0022f680 in ?? ()
+#133 0x0000f8cc in ?? ()
+#134 0x0022f8d0 in ?? ()
+#135 0x7c90ee18 in strchr () from ntdll.dll
+#136 0x7c9106f0 in ntdll!RtlAppendStringToString () from ntdll.dll
+---Type <return> to continue, or q <return> to quit---
+#137 0xffffffff in ?? ()
+#138 0x7c9106eb in ntdll!RtlAppendStringToString () from ntdll.dll
+#139 0x77c2c3c9 in msvcrt!free () from C:\WINDOWS\system32\msvcrt.dll
+#140 0x003f0000 in ?? ()
+#141 0x40000060 in ?? ()
+#142 0x77c2c3ce in msvcrt!free () from C:\WINDOWS\system32\msvcrt.dll
+#143 0x017e2e80 in ?? ()
+#144 0x00000000 in ?? () from
+#145 0x017e2e80 in ?? ()
+#146 0x00000004 in ?? ()
+#147 0x00000000 in ?? () from
+#148 0x0022f8b4 in ?? ()
+#149 0x685e5429 in g_malloc ()
+   from C:\Program Files\gnucash\bin\libglib-2.0-0.dll
+Previous frame inner to this frame (corrupt stack?)
+(gdb)
+
+
+Thanks for the help!

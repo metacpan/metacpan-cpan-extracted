@@ -1,0 +1,36 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'Module::Build::Tiny' => '0.039',
+                                        'perl' => '5.006'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'Exporter' => '0',
+                                      'IO::Scalar' => '2.110',
+                                      'Pod::Spell' => '1.01',
+                                      'parent' => '0',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

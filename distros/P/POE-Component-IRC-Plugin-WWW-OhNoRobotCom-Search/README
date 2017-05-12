@@ -1,0 +1,368 @@
+NAME
+    POE::Component::IRC::Plugin::WWW::OhNoRobotCom::Search - search
+    http://ohnorobot.com/ website from IRC
+
+SYNOPSIS
+        use strict;
+        use warnings;
+
+        use POE qw(Component::IRC Component::IRC::Plugin::WWW::OhNoRobotCom::Search);
+
+        my $irc = POE::Component::IRC->spawn(
+            nick        => 'OhNoRobotComBot',
+            server      => 'irc.freenode.net',
+            port        => 6667,
+            ircname     => 'Bot for searching ohnorobot.com',
+        );
+
+        POE::Session->create(
+            package_states => [
+                main => [ qw(_start irc_001) ],
+            ],
+        );
+
+        $poe_kernel->run;
+
+        sub _start {
+            $irc->yield( register => 'all' );
+
+            $irc->plugin_add(
+                'OhNoRobot' =>
+                    POE::Component::IRC::Plugin::WWW::OhNoRobotCom::Search->new(
+                        comic_id    => 56 # XKCD comics
+                    )
+            );
+
+            $irc->yield( connect => {} );
+        }
+
+        sub irc_001 {
+            $_[KERNEL]->post( $_[SENDER] => join => '#zofbot' );
+        }
+
+        <Zoffix> OhNoRobotComBot, comic foo
+        <OhNoRobotComBot> http://xkcd.com/233/ http://xkcd.com/240/ http://xkcd.com/261/
+        <Zoffix> OhNoRobotComBot, comic bar
+        <OhNoRobotComBot> http://xkcd.com/328/ http://xkcd.com/359/ http://xkcd.com/361/
+
+DESCRIPTION
+    This module is a POE::Component::IRC plugin which uses
+    POE::Component::IRC::Plugin for its base. It provides interface to
+    search <http://ohnorobot.com/> website from IRC. It accepts input from
+    public channel events, "/notice" messages as well as "/msg" (private
+    messages); although that can be configured at will.
+
+CONSTRUCTOR
+  new
+        # plain and simple
+        $irc->plugin_add(
+            'OhNoRobotCom' => POE::Component::IRC::Plugin::WWW::OhNoRobotCom::Search->new
+        );
+
+        # juicy flavor
+        $irc->plugin_add(
+            'OhNoRobotCom' =>
+                POE::Component::IRC::Plugin::WWW::OhNoRobotCom::Search->new(
+                    auto             => 1,
+                    response_event   => 'irc_ohnorobot_results',
+                    banned           => [ qr/aol\.com$/i ],
+                    addressed        => 1,
+                    root             => [ qr/mah.net$/i ],
+                    trigger          => qr/^comics?\s+(?=\S)/i,
+                    obj_args         => { debug => 1 },
+                    max_results      => 3,
+                    include          => [ qw(all_text meta) ],
+                    comic_id         => 56, # XKCD comics
+                    lucky            => 1,
+                    listen_for_input => [ qw(public notice privmsg) ],
+                    eat              => 1,
+                    debug            => 0,
+                )
+        );
+
+    The "new()" method constructs and returns a new
+    "POE::Component::IRC::Plugin::WWW::OhNoRobotCom::Search" object suitable
+    to be fed to POE::Component::IRC's "plugin_add" method. The constructor
+    takes a few arguments, but *all of them are optional*. Note: most of
+    these arguments can be changed on the fly by changing them as keys in
+    your plugin's object, i.e. "$plug_obj->{banned} = [qr/.*/ ];". The
+    possible arguments/values are as follows:
+
+   auto
+        ->new( auto => 0 );
+
+    Optional. Takes either true or false values, specifies whether or not
+    the plugin should auto respond to requests. When the "auto" argument is
+    set to a true value plugin will respond to the requesting person with
+    the results automatically. When the "auto" argument is set to a false
+    value plugin will not respond and you will have to listen to the events
+    emited by the plugin to retrieve the results (see EMITED EVENTS section
+    and "response_event" argument for details). Defaults to: 1.
+
+   response_event
+        ->new( response_event => 'event_name_to_recieve_results' );
+
+    Optional. Takes a scalar string specifying the name of the event to emit
+    when the results of the request are ready. See EMITED EVENTS section for
+    more information. Defaults to: "irc_ohnorobot_results"
+
+   banned
+        ->new( banned => [ qr/aol\.com$/i ] );
+
+    Optional. Takes an arrayref of regexes as a value. If the usermask of
+    the person (or thing) making the request matches any of the regexes
+    listed in the "banned" arrayref, plugin will ignore the request.
+    Defaults to: "[]" (no bans are set).
+
+   root
+        ->new( root => [ qr/\Qjust.me.and.my.friend.net\E$/i ] );
+
+    Optional. As opposed to "banned" argument, the "root" argument allows
+    access only to people whose usermasks match any of the regexen you
+    specify in the arrayref the argument takes as a value. By default: it is
+    not specified. Note: as opposed to "banned" specifying an empty arrayref
+    to "root" argument will restrict access to everyone.
+
+   trigger
+        ->new( trigger => qr/^comics?\s+(?=\S)/i );
+
+    Optional. Takes a regex as an argument. Messages matching this regex
+    will be considered as requests. See also addressed option below which is
+    enabled by default. Note: the trigger will be removed from the message,
+    therefore make sure your trigger doesn't match the actual data that
+    needs to be processed. Defaults to: "qr/^comics?\s+(?=\S)/i"
+
+   obj_args
+        ->new( obj_args => { debug => 1 } );
+
+    Optional. Takes a hashref as an argument which will be dereferenced
+    directly into POE::Component::WWW::OhNoRobotCom::Search's constructor.
+    See documentation for POE::Component::WWW::OhNoRobotCom::Search for
+    possible arguments. Defaults to: "{}" ( default constructor )
+
+   comic_id
+        ->( comic_id => 56 )
+
+    Optional. The "comic_id" argument takes a scalar as a value which should
+    be a comic ID number or an empty string which indicates that search
+    should be done on all comics. To obtain the comic ID number go to
+    <http://www.ohnorobot.com/index.pl?show=advanced>, "View Source" and
+    search for the name of the comic, when you'll find an <option> the
+    "value=""" attribute of that option will be the number you are looking
+    for. Idealy, it would make sense to make the "comic_id" argument accepts
+    names instead of those numbers, but there are just too many (500+)
+    different comics sites and new are being added, blah blah. Defaults to:
+    empty string, meaning search through all the comics.
+
+   include
+        ->( include => [ qw(all_text meta) ] )
+
+    Optional. Specifies what kind of "things" to include into consideration
+    when performing the search. Takes an arrayref as an argument. Defaults
+    to: all possible elements included which are as follows:
+
+    all_text  Include *All comic text*.
+
+    scene     Include *Scene descriptions*.
+
+    sound     Include *Sound effects*.
+
+    speakers  Include *Speakers' names*
+
+    link      Include *Link text*.
+
+    meta      Include *Meta information*
+
+   max_results
+        ->new( max_results => 3 )
+
+    Optional. The number of results displayed on <http://www.ohnorobot.com>
+    is 10, the object will send out several requests if needed to obtain the
+    number of results specified in the "max_results" argument. Don't use
+    extremely large values here, as the amount of requests will NOT be
+    "max_results / 10" because results are often repeating and the object
+    will count only unique URIs on the results page. Note: values less than
+    10 for this argument will yield to "max_results" results being presented
+    on IRC (when "auto" is turned on) but the response event will likely to
+    recieve more than that. Defaults to: 3 (this does not necessarily mean
+    that the object will send only one request).
+
+   lucky
+        ->new( lucky => 1 );
+
+    ARE YOU FEELING LUCKY?!!? If so, the "lucky" argument, when set to a
+    true value, will "press" the *Let the robot decide* button on
+    <http://www.ohnorobot.com> and the "search" method/event will fetch a
+    poiting to the comic which the *ahem* "robot" thinks is what you want.
+    Note: when using the "lucky" argument search will error out (see "EMITED
+    EVENTS" section below) if nothing was found. Defaults to: a false value
+    (no feelin' lucky :( )
+
+   addressed
+        ->new( addressed => 1 );
+
+    Optional. Takes either true or false values. When set to a true value
+    all the public messages must be *addressed to the bot*. In other words,
+    if your bot's nickname is "Nick" and your trigger is "qr/^trig\s+/" you
+    would make the request by saying "Nick, trig foo". When addressed mode
+    is turned on, the bot's nickname, including any whitespace and common
+    punctuation character will be removed before matching the "trigger" (see
+    above). When "addressed" argument it set to a false value, public
+    messages will only have to match "trigger" regex in order to make a
+    request. Note: this argument has no effect on "/notice" and "/msg"
+    requests. Defaults to: 1
+
+   listen_for_input
+        ->new( listen_for_input => [ qw(public  notice  privmsg) ] );
+
+    Optional. Takes an arrayref as a value which can contain any of the
+    three elements, namely "public", "notice" and "privmsg" which indicate
+    which kind of input plugin should respond to. When the arrayref contains
+    "public" element, plugin will respond to requests sent from messages in
+    public channels (see "addressed" argument above for specifics). When the
+    arrayref contains "notice" element plugin will respond to requests sent
+    to it via "/notice" messages. When the arrayref contains "privmsg"
+    element, the plugin will respond to requests sent to it via "/msg"
+    (private messages). You can specify any of these. In other words,
+    setting "( listen_for_input =" [ qr(notice privmsg) ] )> will enable
+    functionality only via "/notice" and "/msg" messages. Defaults to: "[
+    qw(public notice privmsg) ]"
+
+   eat
+        ->new( eat => 0 );
+
+    Optional. If set to a false value plugin will return a "PCI_EAT_NONE"
+    after responding. If eat is set to a true value, plugin will return a
+    "PCI_EAT_ALL" after responding. See POE::Component::IRC::Plugin
+    documentation for more information if you are interested. Defaults to: 1
+
+   debug
+        ->new( debug => 1 );
+
+    Optional. Takes either a true or false value. When "debug" argument is
+    set to a true value some debugging information will be printed out. When
+    "debug" argument is set to a false value no debug info will be printed.
+    Defaults to: 0.
+
+EMITED EVENTS
+  response_event
+        $VAR1 = {
+            'who' => 'Zoffix!n=Zoffix@unaffiliated/zoffix',
+            'type' => 'public',
+            'channel' => '#zofbot',
+            'term' => 'bar',
+            'message' => 'OhNoRobotComBot, comic bar',
+            'results' => {
+                'http://scarygoround.com/index.php?date=20080311' => 'Scary Go Round :: Monday-Friday Comic by John Allison',
+                'http://achewood.com/index.php?date=12312004' => 'Trashspotting',
+                'http://suburbanjungle.com/d/20060315.html' => 'The Suburban Jungle, Starring Tiffany Tiger - Archives',
+                'http://shd-wk.com/index.php?strip_id=99' => '#99',
+                'http://www.goats.com/archive/991231.html' => 'Goats comic strip from December / 31 / 1999: tastes like chicken candy',
+                'http://crfh.net/d/20080306.html' => 'College Roomies from Hell!!! for Thursday, March 6, 2008',
+                'http://rocr.xepher.net/index.php?p=20051230' => 'Webcomic Rogues of Clwyd-Rhan: The Rogues find they have an unexpected ally.',
+                'http://jesusandmo.net/thanks.html' => 'Jesus and Mo',
+                'http://www.gpf-comics.com/mischief/d/20070622.html' => 'General Protection Fault--The Comic Strip',
+                'http://questionablecontent.net/view.php?comic=99' => 'Almost Psychic'
+            }
+        };
+
+    The event handler set up to handle the event, name of which you've
+    specified in the "response_event" argument to the constructor (it
+    defaults to "irc_ohnorobot_results") will recieve input every time
+    request is completed. The input will come in a form of a hashref in
+    $_[ARG0]. The possible keys/values of that hashref are as follows:
+
+  who
+        { 'who' => 'Zoffix!n=Zoffix@unaffiliated/zoffix' }
+
+    The usermask of the person who made the request.
+
+  term
+        { 'term' => 'bar' }
+
+    The search term which was used for searching. (this is "message" key
+    with trigger stripped out)
+
+  type
+        { 'type' => 'public' }
+
+    The type of the request. This will be either "public", "notice" or
+    "privmsg"
+
+  channel
+        { 'channel' => '#zofbot' }
+
+    The channel where the message came from (this will only make sense when
+    the request came from a public channel as opposed to /notice or /msg)
+
+  message
+        { 'message' => 'OhNoRobotComBot, comic bar' }
+
+    The full message that the user has sent.
+
+  error
+        { 'error' => 'Network error: 500 read timeout' }
+
+    If an error occured during the search the "error" key will be present
+    and will contain explanation for the error.
+
+  results
+        'results' => {
+            'http://scarygoround.com/index.php?date=20080311' => 'Scary Go Round :: Monday-Friday Comic by John Allison',
+            'http://achewood.com/index.php?date=12312004' => 'Trashspotting',
+            'http://suburbanjungle.com/d/20060315.html' => 'The Suburban Jungle, Starring Tiffany Tiger - Archives',
+
+            ....etc
+        }
+
+    The "results" key will contain a hashref with search results. The keys
+    will be links poiting to comics found and values will be the titles of
+    the comics. Note: if "max_results" argument to the constructor is set to
+    a value less than 10 (it's 3 by default) then "results" key will likely
+    to contain more results than "max_results".
+
+AUTHOR
+    Zoffix Znet, "<zoffix at cpan.org>" (<http://zoffix.com>,
+    <http://haslayout.net>)
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-poe-component-irc-plugin-www-ohnorobotcom-search at rt.cpan.org",
+    or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-IRC-Plugin
+    -WWW-OhNoRobotCom-Search>. I will be notified, and then you'll
+    automatically be notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc POE::Component::IRC::Plugin::WWW::OhNoRobotCom::Search
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-IRC-Plugin-W
+        WW-OhNoRobotCom-Search>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/POE-Component-IRC-Plugin-WWW-OhNoRobotCom-
+        Search>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/POE-Component-IRC-Plugin-WWW-OhNoRobo
+        tCom-Search>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/POE-Component-IRC-Plugin-WWW-OhNoRobotC
+        om-Search>
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Zoffix Znet, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

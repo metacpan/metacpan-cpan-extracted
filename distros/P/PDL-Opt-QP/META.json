@@ -1,0 +1,67 @@
+{
+   "abstract" : "Quadratic programming solver for PDL",
+   "author" : [
+      "Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132510",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDL-Opt-QP",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::CheckLib" : "0.04",
+            "ExtUtils::CBuilder" : "0.23",
+            "ExtUtils::F77" : "0",
+            "Module::Build::Pluggable::CheckLib" : "1.02",
+            "Module::Build::Pluggable::Fortran" : "0.23",
+            "Module::Build::Pluggable::PDL" : "0.23",
+            "PDL" : "2.006"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckLib" : "0.04",
+            "Module::Build" : "0.4004",
+            "Module::Build::Pluggable" : "0",
+            "Module::Build::Pluggable::CheckLib" : "1.02",
+            "Module::Build::Pluggable::Fortran" : "0.23",
+            "Module::Build::Pluggable::PDL" : "0.23"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "2.006"
+         }
+      }
+   },
+   "provides" : {
+      "PDL::Opt::QP" : {
+         "file" : "lib/PDL/Opt/QP.pd",
+         "version" : "0.27"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mvgrimes/pdl-opt-qp/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/mvgrimes/pdl-opt-qp"
+      }
+   },
+   "version" : "0.27",
+   "x_test_requires" : {
+      "Test::Exception" : "0",
+      "Test::More" : "0"
+   }
+}

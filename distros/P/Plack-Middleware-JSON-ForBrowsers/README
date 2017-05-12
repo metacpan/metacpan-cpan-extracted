@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Plack-Middleware-JSON-ForBrowsers,
+version 0.002000:
+
+  Plack middleware which turns application/json responses into HTML
+
+This software is copyright (c) 2014 by Manfred Stock.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

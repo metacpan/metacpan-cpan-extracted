@@ -1,0 +1,36 @@
+Changes
+ignore.txt
+lib/PepXML/AAModification.pm
+lib/PepXML/EnzSearchConstraint.pm
+lib/PepXML/Enzyme.pm
+lib/PepXML/MsmsPipelineAnalysis.pm
+lib/PepXML/Parameter.pm
+lib/PepXML/Parser.pm
+lib/PepXML/PepXMLFile.pm
+lib/PepXML/RunSummary.pm
+lib/PepXML/SearchDatabase.pm
+lib/PepXML/SearchHit.pm
+lib/PepXML/SearchScore.pm
+lib/PepXML/SearchSummary.pm
+lib/PepXML/SpectrumQuery.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+README.pod
+t/00-load.t
+t/01-msms_pipeline_analysis.t
+t/02-msms_run_summary.t
+t/03-enzyme.t
+t/04-search_summary.t
+t/05-search_hit.t
+t/large_sample.xml
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/sample.pep.xml
+t/sample.PepXML
+t/sample.pepxml
+t/small.sample.pep.xml
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

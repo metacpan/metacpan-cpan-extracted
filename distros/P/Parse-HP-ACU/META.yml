@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:               Parse-HP-ACU
+version:            0.03
+abstract:           Parse the output of HP's hpacucli utility.
+author:
+    - Jeremy Cole <jeremy@jcole.us>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Test::More:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

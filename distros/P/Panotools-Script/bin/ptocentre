@@ -1,0 +1,92 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Panotools::Script;
+use Getopt::Long;
+use Pod::Usage;
+
+my $path_output;
+my $roll;
+my $pitch;
+my $yaw;
+my $help;
+
+GetOptions ('o|output=s' => \$path_output,
+            'r|roll' => \$roll,
+            'p|pitch' => \$pitch,
+            'y|yaw' => \$yaw,
+            'h|help' => \$help);
+
+pod2usage (-verbose => 2) if $help;
+
+my $path_pto = shift || pod2usage;
+$path_output = $path_pto unless (defined $path_output);
+
+my $pto = new Panotools::Script;
+$pto->Read ($path_pto);
+$pto->Centre ('y') if $yaw;
+$pto->Centre ('p') if $pitch;
+$pto->Centre ('r') if $roll;
+
+# if images are aligned then d,e is probably bogus
+if ($pto->Sigma ('r') < 100 and $pto->Sigma ('p') < 100 and $pto->Sigma ('y') < 100)
+{
+    for my $image (@{$pto->Image})
+    {
+        $image->{a} = 0 unless $image->{a} =~ '=';
+        $image->{b} = 0 unless $image->{b} =~ '=';
+        $image->{c} = 0 unless $image->{c} =~ '=';
+        $image->{d} = 0 unless $image->{d} =~ '=';
+        $image->{e} = 0 unless $image->{e} =~ '=';
+    }
+    for my $key (keys %{$pto->Variable})
+    {
+        delete $pto->Variable->{$key}->{a};
+        delete $pto->Variable->{$key}->{b};
+        delete $pto->Variable->{$key}->{c};
+        delete $pto->Variable->{$key}->{d};
+        delete $pto->Variable->{$key}->{e};
+    }
+}
+
+$pto->Write ($path_output);
+
+__END__
+
+=head1 NAME
+
+ptocentre - centre images in a panorama
+
+=head1 SYNOPSIS
+
+ptocentre [options] [--output centred.pto] input.pto
+
+ Options:
+  -o | --output     Filename of centred project (can be the the same as the input)
+  -r | --roll       Centre roll
+  -p | --pitch      Centre pitch
+  -y | --yaw        Centre yaw
+  -h | --help       Outputs help documentation
+
+=head1 DESCRIPTION
+
+B<ptocentre> takes a hugin .pto project and centres the images in the panorama.
+
+If --output isn't specified then input file is overwritten with output.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+=head1 AUTHOR
+
+Bruno Postle - October 2008.
+
+=cut

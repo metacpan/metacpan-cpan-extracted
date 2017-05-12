@@ -1,0 +1,25 @@
+Revision history for Perl extension POSIX::AtFork.
+
+0.02 2010-11-04 10:27:59
+    - First regular release
+
+0.01_05
+    - Pass the current opname to callbacks
+
+0.01_04
+    - Fix up $$ before 'child' callbacks are callled (reported by kazeburo)
+    - Specify libpthread for non-threaded perls (reported by tokuhirom)
+
+0.01_03
+    - Add Test::SharedFork to test_requires (reported by lestrrat)
+
+0.01_02
+    - Use pthread_atfork() directly with #include <pthread.h>
+
+0.01_01
+    - First beta version!
+
+0.01  Thu Aug 19 15:15:03 2010
+	- original version; created by h2xs 1.23 with options
+		-An POSIX::AtFork
+

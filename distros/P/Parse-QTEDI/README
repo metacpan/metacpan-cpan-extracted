@@ -1,0 +1,29 @@
+Parse-QTEDI 
+===========================
+
+This module is the front-end of my working project Perl QT4
+binding. It will parse gcc-preprocessed cpp headers and generate
+interface information for making binding.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Parse::RecDescent
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Dongxu Ma
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

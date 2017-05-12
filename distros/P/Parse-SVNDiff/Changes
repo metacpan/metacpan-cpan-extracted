@@ -1,0 +1,23 @@
+[Changes for 0.05 - 2006-01-03]
+
+* Include Test::Base and its dependencies in inc/ so "make test"
+  can pass without requiring installing them from CPAN.
+  Reported by: Andreas Koenig.
+
+[Changes for 0.04 - 2005-12-31]
+
+* Revamped build system; declared dependencies; fix SIGNATURE;
+  assorted docs cleanups.  (No functional changes.)
+
+[Changes for 0.03 - 2005-08-16]
+
+* Sam Vilain restructured the internals to use Tangram and Data::Lazy
+  so we are now parsing streamily.
+
+[Changes for 0.02 - 2004-11-06]
+
+* Tidied up the source a bit.
+
+[Changes for 0.01 - 2004-11-06]
+
+* Initial release to CPAN.

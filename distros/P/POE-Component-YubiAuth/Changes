@@ -1,0 +1,31 @@
+Revision history for POE-Component-YubiAuth
+
+0.09	2015-12-26
+	Add dependency on feature.pm to make CPAN Testers happy.
+
+0.08	2015-11-28
+	META.yml and META.json.
+
+0.07	2011-10-30 
+	* Support version 2 of the authentication protocol
+	* API key is now required
+
+0.06	2011-02-15
+	* Make CPAN testers happy - include Digest::HMAC_SHA1 in Makefile.PL
+
+0.05	2011-01-17
+	* Make description format consistent across modules.
+
+0.04	2010-01-27
+	* URI escape Base64 data
+
+0.03    2010-01-25
+        * Base64 EOL fix
+
+0.02    2010-01-21
+        * Allow use of API key to sign verification requests
+	* Allow passing of callback data to callbacks, to track reqests
+
+0.01    2010-01-21
+        * First version, released on an unsuspecting world
+

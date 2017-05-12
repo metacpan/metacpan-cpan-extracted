@@ -1,0 +1,44 @@
+Revision history for Params-Sah
+
+0.06    2016-06-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- Bump prereq version Data::Sah from 0.79 -> 0.82 [CT].
+
+
+0.05    2016-06-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update to Data::Sah 0.79 (introduced v to compilation data,
+	  modules becomes array of records).
+
+	- [doc] Mention Perinci::Sub::ValidateArgs and Data::Sah::Params.
+
+
+0.04     2015-04-22 (PERLANCAR)
+
+         - No functional changes.
+
+         - Tweak documentation: fix typos, add FAQ entry.
+
+
+0.03     2015-03-23 (PERLANCAR)
+
+         - [Bugfix] When on_invalid=warn|carp, reset $_ps_res for next argument.
+
+         - Add a couple of FAQ items.
+
+
+0.02     2015-03-23 (PERLANCAR)
+
+         - No functional changes.
+
+         - Minor bug fix, debugging and documentation tweaks, add more tests.
+           Add benchmark against Params::Validate.
+
+
+0.01     2015-03-23 (PERLANCAR)
+
+         - First release.

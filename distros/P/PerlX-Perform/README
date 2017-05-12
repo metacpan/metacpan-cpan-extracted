@@ -1,0 +1,116 @@
+NAME
+    PerlX::Perform - syntactic sugar for if (defined ...) { ... }
+
+SYNOPSIS
+     my $foo = function_that_might_return_undef();
+     perform { say $_ } wherever $foo;
+ 
+     my $bar = function_that_might_return_undef();
+     wherever $bar, perform { say $_ };
+
+DESCRIPTION
+    Executes some code if a given scalar is defined. Within the code block,
+    the scalar is available as $_.
+
+    Note that there is no comma before `wherever` here:
+
+     my $foo = function_that_might_return_undef();
+     perform { say $_ } wherever $foo;
+
+    But there is one before `perform` here:
+
+     my $bar = function_that_might_return_undef();
+     wherever $bar, perform { say $_ };
+
+  Gory Details
+    The implementation is pure Perl. The closest it gets to trickery is that
+    the two functions defined by this package use prototypes.
+
+   perform
+    `perform` is a function can be called in two ways:
+
+    *   with a single coderef argument
+
+        In this case, `perform` returns a blessed version of that coderef; a
+        so-called Manifesto object.
+
+    *   with a coderef argument followed by a scalar
+
+        Generates the Manifesto object, and executes the Manifesto on the
+        scalar, returning the result.
+
+        Or rather, it has the effective result of doing the above. But it
+        inlines the logic from PerlX::Perform::Manifesto.
+
+   wherever
+    `wherever` is a function can be called in three ways:
+
+    *   with a single scalar argument
+
+        In this case, `wherever` passes through the argument unchanged.
+
+    *   with a scalar argument and a Manifesto
+
+        In this case, `wherever` executes the Manifesto with the scalar
+        argument.
+
+    *   with a scalar argument and a coderef
+
+        In this case, `wherever` turns the coderef into a Manifesto and
+        executes it with the scalar argument.
+
+    This means that it's possible to do this:
+
+     my $manifesto = perform { say $_ };
+     wherever $foo, $manifesto;
+     wherever $bar, $manifesto;
+
+    And indeed `wherever` does allow a little additional syntactic sugar by
+    skipping over the string "perform" if it is used as the second parameter.
+    Thus you can write:
+
+     my $manifesto = perform { say $_ };
+     wherever $foo, perform => $manifesto;
+     wherever $bar, perform => $manifesto;
+
+    But because PerlX::Perform::Manifesto passes through any already-blessed
+    coderefs, this will work too:
+
+     my $manifesto = perform { say $_ };
+     wherever $foo, &perform($manifesto);
+     wherever $bar, &perform($manifesto);
+
+  Tail Calls
+    Both `perform` and `wherever` make extensive use of `goto` in order to
+    conceal their usage on the call stack.
+
+  whenever
+    This is available as an alias for `wherever`, but is not exported by
+    default. You need to request it like:
+
+     use PerlX::Perform qw/perform whenever/;
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Perform>.
+
+SEE ALSO
+    <http://www.modernperlbooks.com/mt/2012/02/a-practical-use-for-macros-in-p
+    erl.html>.
+
+    Scalar::Andand.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

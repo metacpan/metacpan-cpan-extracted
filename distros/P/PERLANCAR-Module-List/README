@@ -1,0 +1,30 @@
+DESCRIPTION
+
+    This module is a fork of Module::List 0.003. It's exactly like
+    Module::List, except for the following differences:
+
+      * lower startup overhead (with some caveats)
+
+      It strips the usage of Exporter, IO::Dir, Carp, File::Spec, with the
+      goal of saving a few milliseconds (a casual test on my PC results in
+      11ms vs 39ms).
+
+      Path separator is hard-coded as /.
+
+      * Recognize return_path option
+
+      Normally the returned hash has undef as the values. With this option
+      set to true, the values will contain the path instead. Useful if you
+      want to collect all the paths, instead of having to use Module::Path
+      or Module::Path::More for each module again.
+
+      * Recognize all option
+
+      If set to true and return_path is also set to true, will return all
+      found paths for each module instead of just the first found one. The
+      values of result will be an arrayref containing all found paths.
+
+SEE ALSO
+
+    Module::List
+

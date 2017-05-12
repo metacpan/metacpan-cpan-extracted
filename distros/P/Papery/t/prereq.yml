@@ -1,0 +1,5 @@
+---
+Papery::Processor::Pod::POM:
+  - Pod::POM
+Papery::Renderer::Template:
+  - Template

@@ -1,0 +1,25 @@
+# $File: //member/autrijus/Pod-HtmlHelp/README $ $Author: autrijus $
+# $Revision: #2 $ $Change: 672 $ $DateTime: 2002/08/16 18:51:54 $
+
+This is the README file for Pod::HtmlHelp, an interface with
+Microsoft's HtmlHelp system.
+
+* Installation
+
+Pod::HtmlHelp uses the standard perl module install process:
+
+cpansign -v		# see SIGNATURE for details
+perl Makefile.PL
+make
+make test
+make install
+
+* Copyright
+
+Copyright 2000 by ActiveState Tools Corp <http://www.activestate.com>.
+Copyright 2001, 2002 by Autrijus Tang <autrijus@autrijus.org>.
+
+All rights reserved.  You can redistribute and/or modify
+this bundle under the same terms as Perl itself.
+
+See <http://www.perl.com/perl/misc/Artistic.html>.

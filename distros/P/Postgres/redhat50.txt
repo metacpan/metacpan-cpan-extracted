@@ -1,0 +1,34 @@
+From: Joseph Abrahamson <jabraham@blc.edu>
+To: khera@kciLink.com, jabraham@blc.edu
+Subject: Redhat 5.0 Linux Makefile.PL for PostgresPerl-1.3
+Date: Wed, 11 Feb 1998 01:29:13 -0600
+
+Vivek,
+
+Here is a modified Makefile.PL for PostgresPerl-1.3 to allow it to work
+on RedHat Linux 5.0 distribution. It works on my RH5 i386 machine. If
+you wish, please distribute it with the PostgresPerl-1.3 package.
+-----cut below here
+use ExtUtils::MakeMaker;
+# See lib/ExtUtils/MakeMaker.pm for details of how to influence
+# the contents of the Makefile that is written.
+# Modified for Redhat 5.0, this file is named RH5Makefile.PL
+WriteMakefile(
+    'NAME'	=> 'Postgres',
+    'VERSION_FROM' => 'Postgres.pm', # finds $VERSION
+    'LIBS'	=> ['-L/var/lib/pgsql -lpq'],
+    'DEFINE'	=> '',     # e.g., '-DHAVE_SOMETHING' 
+    'INC'	=> '-I/usr/include/pgsql',
+    'MYEXTLIB' 	=> ' /usr/lib/libpq.so.1',
+);
+<----end of file
+
+Thanks for your work.
+
+Joseph Abrahamson
+Associate Director of Library Media Services
+Bethany Lutheran College
+734 Marsh St.
+Mankato, MN 56001
+
+jabraham@blc.edu

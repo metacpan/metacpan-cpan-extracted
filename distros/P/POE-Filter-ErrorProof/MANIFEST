@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/POE-Filter-ErrorProof.t
+lib/POE/Filter/ErrorProof.pm

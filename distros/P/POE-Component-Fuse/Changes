@@ -1,0 +1,30 @@
+Revision history for Perl extension POE::Component::Fuse
+
+* 0.05
+
+	Fixed bad Test::Apocalypse check
+
+* 0.04
+
+	I mistakenly thought "hv_stores()" was a good API to use, but it was added in perl 5.10! ( thanks agaran! )
+		Added Devel::PPPort functionality via ppport.h, so it's more portable now ( thanks woggle! )
+	Added Module::Build::Compat passthrough functionality, so Makefile.PL *should* work now, ha! ( thanks agaran! )
+	Removed the tons of author tests and replaced with a clean 1-file solution ( Test::Apocalypse )
+
+* 0.03
+
+	Removed Makefile.PL auto-generation because it was missing the XS compilation stuff
+	made the optional prereqs a real prereq because I was getting FAILs :(
+
+* 0.02
+
+	added support for Filesys::Virtual::Async
+	added some more options
+	fixed stupid mode screwup in examples/fuse.pl
+	allowed both session/fvilesys arg but be more smarter about it, so we can inform session of shutdown
+	POD tweaks
+	added "rmdir" option
+
+* 0.01
+
+	initial release

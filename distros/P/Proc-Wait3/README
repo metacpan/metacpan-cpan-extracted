@@ -1,0 +1,15 @@
+Proc::Wait3 version 0.05
+========================
+
+Proc::Wait3 is a simple perl wrapper around the wait3(1) system call.
+It reaps dead children like wait(), but also reports on the resource
+usage of the child.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

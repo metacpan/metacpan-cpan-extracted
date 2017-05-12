@@ -1,0 +1,22 @@
+<h1>[% title %]</h1>
+
+<div class="mod_az_list">
+  [% FOREACH az IN [ 'A' .. 'Z' ] %]
+    <a href="[% c.uri_for('/index/modules',az) %]">[% az %]</a>
+    [% UNLESS loop.last %]
+      |
+    [% END %]
+  [% END %]
+</div>
+
+[% IF modules.size > 0 %]
+  <ul>
+    [% FOREACH module IN modules %]
+      <li><a href="[% c.uri_for('/view',module.replace('::','/')) %]">[% module %]</a>
+    [% END %]
+  </ul>
+[% ELSE %]
+  <p>
+    No modules found
+  </p>
+[% END %]

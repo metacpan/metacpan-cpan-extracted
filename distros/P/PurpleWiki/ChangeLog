@@ -1,0 +1,90 @@
+Revision history for PurpleWiki.
+
+0.94 -- August 11, 2004
+	- A bug fix release.  Re-added a feature that allows you to easily
+	  recover vandalized/spammed pages.  Included some documentation in
+	  docs/FightingSpam.wiki.
+
+0.93 -- August 9, 2004
+	- Customizable look-and-feel via templates.  Improved default
+	  look-and-feel.  You can also customize the create new pages
+	  look-and-feel via the new CreateLinkBefore and CreateLinkText
+	  config variables.
+	- Fixed major bug with retrieving old versions of a page.
+	- Basic access control, including a new configuration
+	  (LoginToEdit) that requires login in order to edit a page.
+	- MoinMoin triple braces preformatting syntax.
+	- Refactored session management using CGI::Session.  Also
+	  generates session log.
+	- Built-in support for RSS syndication (action=rss).  No longer
+	  need the wikirss cron script, which has been removed from the
+	  distribution.
+	- Refactored user database and classes.  Can now log in using
+	  usernames.
+	- Support for Identity Commons i-names.
+	- Mostly complete MoinMoin parser, along with a
+	  MoinMoin-to-PurpleWiki conversion script.
+	- Refactored PurpleWiki::Config using singleton pattern.
+	- Improved XHTML conformance.
+	- New version numbering system to be more CPAN-friendly.
+	- Major code cleanup.  Lots of bug fixes.
+	- Apache1NidHandler and Apache2NidHandler have been collapsed
+	  to NidHandler, which works for both versions of Apache.
+	
+0.9.2 -- May 3, 2004
+	- New and improved OO View drivers!
+	- Support for hard rules (using "----" on a line).
+	- Modified the parser to support the XHTML model of nested lists.
+	  This is the first step towards full XHTML compliance.
+	- Added multiline support for list items and indented paragraphs.
+	- Improved installation in Makefile.PL.
+	- Additional View drivers for better transclusion support.
+	- Moved parentheses support for NIDs back to the wikihtml.pm from
+	  the CSS files because Microsoft Internet Explorer doesn't
+	  support these directives.
+	- Experimental support for remote transclusions.
+	- Bug fixes galore!
+	
+0.9.1 -- February 14, 2004
+	- Updated the provided css files in etc to use before and
+	  after elements of ( and ) to demonstrate how display of
+	  nids can be customized.
+	- Umask config option has been added so that wiki pages can be
+	  created group writable, if desired. Thanks to: Matthew O'Connor
+	- A bug with KeptRevisions causing an error fixed. Thanks to:
+	  Matthew O'Conner
+	- Boolean config option, ShowNid, that controls whether NIDs should
+	  be displayed as '#' or their value.
+	- Support for WikiWhiteboard.  See
+	  http://www.xml.com/pub/a/2003/11/19/svgwiki.html
+	- SiteBase configuration variable now used correctly, if set. Thanks
+	  to: Jason Cook
+	- Pluggage search modules allowing searching of external tools from
+	  the wiki. See PurpleWiki/Search/*.pm for
+	  documentation and information.
+        - Transclusions can now be presented as plain text rather than
+	  HTML. See PurpleWiki::Transclusion. Thanks to: Jason Cook
+	- Transclusions can be retrieved from sites requiring basic
+	  authentication.See PurpleWiki::Transclusion and set httpUser 
+	  and httpPass in config. Thanks to: Jason Cook
+	- mod_perl 1 and mod_perl 2 handlers for displaying raw wikitext
+	  files as xhtml are now included. See PurpleWiki::Apache1Handler
+	  and PurpleWiki::Apache2Handler. Intended for use with tools
+	  that manipulate wikitext and PurpleNumbers external to the
+	  wiki proper.
+
+0.9 -- August 17, 2003
+	- Document-independent node IDs.
+	- Transclusions!
+	- Rearchitected View drivers so that they are extensible,
+	  reusable, and dynamically loadable.
+	- New utilities: purple, various blog integration tools, etc.  See
+	  the extras/ subdirectory.
+	- Major UseModWiki code cleanup, including heavily refactored
+	  Database classes.
+	- RSS syndication of RecentChanges.
+	- New config file format.
+	- Bug fixes galore, with updated tests and documentation.
+
+0.1 -- January 8, 2003
+	- First released version.

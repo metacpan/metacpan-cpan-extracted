@@ -1,0 +1,31 @@
+=head1 1
+
+Contents of section 1
+
+=head2 1.1
+
+Contents of section 1.1
+
+=head3 1.1.1
+
+=head4 1.1.1.1
+
+=head1 2
+
+Contents of section 2
+
+=head2 2.1
+
+Contents of section 2.1
+
+=head4 2.1.1
+
+Contents of section 2.1.1
+
+=head3 2.2
+
+Contents of section 2.2
+
+=head1 3
+
+Contents of section 3

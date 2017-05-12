@@ -1,0 +1,28 @@
+AUTHORS
+Changes
+lib/PAR.pm
+lib/PAR/Environment.pod
+lib/PAR/FAQ.pod
+lib/PAR/Heavy.pm
+lib/PAR/SetupProgname.pm
+lib/PAR/SetupTemp.pm
+lib/PAR/Tutorial.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-pod.t
+t/01-basic.t
+t/40-par-hashref.t
+t/50-autoloaderfix.t
+t/60-cleanup.t
+t/data/lib/Data.pm
+t/data/lib/Hello.pm
+t/data/script/data.pl
+t/data/script/hello.pl
+t/data/script/nostrict.pl
+t/gen-hello-par.pl
+t/Hello.pm
+META.json                                Module JSON meta-data (added by MakeMaker)

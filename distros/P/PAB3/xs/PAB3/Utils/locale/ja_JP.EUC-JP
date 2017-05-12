@@ -1,0 +1,57 @@
+grp:3
+fd:0
+ifd:0
+dp:.
+ts:,
+cs:￥
+ics:JPY
+csa:l
+css:0
+ns:-
+ps:+
+dtf:%Y年%m月%d日 %H時%M分%S秒
+df:%Y年%m月%d日
+tf:%H時%M分%S秒
+apf:%p%I時%M分%S秒
+amu:午前
+pmu:午後
+aml:午前
+pml:午後
+lm1:1月
+lm2:2月
+lm3:3月
+lm4:4月
+lm5:5月
+lm6:6月
+lm7:7月
+lm8:8月
+lm9:9月
+lm10:10月
+lm11:11月
+lm12:12月
+sm1: 1月
+sm2: 2月
+sm3: 3月
+sm4: 4月
+sm5: 5月
+sm6: 6月
+sm7: 7月
+sm8: 8月
+sm9: 9月
+sm10:10月
+sm11:11月
+sm12:12月
+ld1:日曜日
+ld2:月曜日
+ld3:火曜日
+ld4:水曜日
+ld5:木曜日
+ld6:金曜日
+ld7:土曜日
+sd1:日
+sd2:月
+sd3:火
+sd4:水
+sd5:木
+sd6:金
+sd7:土

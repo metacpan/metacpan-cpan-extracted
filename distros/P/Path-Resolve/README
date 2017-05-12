@@ -1,0 +1,71 @@
+NAME
+    Path::Resolve - node.js path module in perl
+
+SYNOPSIS
+        use Path::Resolve;
+    
+        my $path = Path::Resolve->new();
+    
+        my $file = $path->resolve('./r/p/../file.txt');
+        my $ext  = $path->extname($file);
+
+DESCRIPTION
+    This module behaves exactly like node.js path module
+    <https://nodejs.org/api/path.html>, it doesn't check for path validity,
+    it only works on strings and has utilities to resolve and normalize path
+    strings.
+
+    If you're looking for system specific path module that can create,
+    check, chmod, copy ... etc. then take a look at Path::Tiny
+
+METHODS
+    For a complete documentations about supported methods please check
+    node.js path module api documentation <https://nodejs.org/api/path.html>
+    all methods are supported
+
+    normalize(p)
+        Normalize a string path, taking care of '..' and '.' parts.
+
+    join([path1][, path2][, ...])
+        Join all arguments together and normalize the resulting path.
+
+    resolve([from ...], to)
+        Resolves "to" to an absolute path.
+
+    isAbsolute(path)
+        Determines whether path is an absolute path.
+
+    relative(from, to)
+        Solve the relative path "from" from to "to".
+
+    dirname(p)
+        Return the directory name of a path. Similar to the Unix "dirname"
+        command.
+
+    basename(p[, ext])
+        Return the last portion of a path. Similar to the Unix "basename"
+        command.
+
+    extname(p)
+        Return the extension of the path, from the last '.' to end of string
+        in the last portion of the path.
+
+    sep he platform-specific file separator. '\\' or '/'.
+
+    delimiter
+        The platform-specific path delimiter, ; or ':'.
+
+    parse(pathString)
+        Returns a parsed object from a path string.
+
+    format(pathObject)
+        Returns a path string from an object, the opposite of "parse" method
+        above.
+
+AUTHOR
+    Mamod A. Mehyar, <mamod.mehyar@gmail.com>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself
+

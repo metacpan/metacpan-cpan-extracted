@@ -1,0 +1,91 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Fontsets</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Fontsets</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<B>Fontsets:</B>
+<UL>
+<LI><A HREF=tkfonts.html>TkFonts</A>
+<LI><A HREF=xscaling.html>XScaling</A>
+</UL>
+<P>
+<A HREF=#options>options</A>
+
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> has a few fontsets,
+which are used to show text on the slides.
+<P>
+Fontsets are <B>not optimally implemented</B> (yet).  It is only tested on
+UNIX with default fonts, and not on other platforms.  The following
+fonts are intended to start with:
+<UL>
+<LI>Portable <A HREF=tkfonts.html>Tk fonts</A>,
+<LI><A HREF=xscaling.html>Scalable X11</A> fonts,
+<LI>Big-fonts, (not implemented yet)
+<LI>TrueType fonts. (not implemented yet)
+<LI>Unicode. (not implemented yet)
+</UL>
+Font-handling is too primitive.  I hope someone is able to help on this point:
+how do you layout Japanese, Chinese, and such?
+
+<H2><A NAME=options>General Fontset Options</A></H2>
+
+All fontset share these options:
+<DL>
+<DT><B>-rawFontSizes =&gt; [</B> <EM>geometry, size, ...</EM> <B>]</B><BR>
+<DD>Fontsizes are specified for a screen with the size of the first
+    value of the <CODE>rawFontSizes</CODE> list
+    (for instance `<CODE>1280x1024</CODE>').
+    <P>
+    When the show starts, and the <CODE>-fontSizes</CODE> option is not
+    specified, the actual screen size is determined, and all fontsizes from
+    the <CODE>rawFontSizes</CODE> list are scaled.
+    <P>
+<DT><B>-fontSizes =&gt; [</B> <EM>size, ...</EM> <B>]</B>
+<DD>You can use this to overrule the fontsize scaling of raw-fontsizes.
+    This option should not be used, unless...
+    <P>
+<DT><B>-fontLabels =&gt; [ </B> <EM>string, ...</EM> <B>]</B>
+<DD>Names of the defined fonts.  The names are related to the values in the
+    <CODE>fontSizes</CODE> list.
+    The default font-labels are: pico, micro, tiny, small, normal, large,
+    big, huge, massive, giant.  The default size is <CODE>normal</CODE>.
+    <P>
+    In the <A HREF=../formatter/markup.html>markup</A> formatter, you can
+    use these names when specifying a font size, e.g.:
+<PRE>
+   &lt;P SIZE=tiny&gt;this is a footnote&lt;/P&gt;
+</PRE>
+   <P>
+<DT><B>-fixedFont =&gt;</B> <EM>string</EM>
+<DD>Name of the font to be used for the <TT>teletype</TT> characters.
+    The possible values are fontset-dependent, so have a look at those
+    pages.
+    <P>
+<DT><B>-proportionalFont =&gt;</B> <EM>string</EM>
+<DD>Name of the font to be used for the normal characters.
+    The possible values are fontset-dependent, so have a look at those
+    pages.
+    <P>
+</DL>
+<P>
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

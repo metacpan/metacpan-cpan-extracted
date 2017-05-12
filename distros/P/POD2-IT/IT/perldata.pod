@@ -1,0 +1,994 @@
+=head1 NOME
+
+perldata - Tipi di dato in Perl
+
+=head1 DESCRIZIONE
+
+=head2 Nomi di variabile
+X<variabile, nome> X<nome di variabile> X<tipo di dati> X<tipo>
+
+Perl ha tre tipi di dati incorporati: scalari, array di scalari e
+array associativi di scalari, meglio noti come "hash". Uno scalare
+puE<ograve> essere costituito da una singola stringa (di qualsiasi dimensione,
+limitata solo dalla memoria a disposizione), da un numero o da un
+riferimento a qualcosa (il che viene discusso in L<perlref>). I normali
+array sono liste ordinate di scalari indicizzate con un numero intero,
+partendo da 0. Le hash sono collezioni non ordinate di valori scalari
+indicizzate attraverso una stringa associata ad essi, detta chiave.
+
+Di solito ci si riferisce ai valori o per nome, o attraverso un
+riferimento con nome. Il primo carattere del nome vi dice a che tipo
+di struttura dati si riferisce; il resto del nome indica il particolare
+valore. Di solito questo nome E<egrave> un singolo I<identificatore>, ossia
+una stringa che comincia con una lettera o un I<underscore> [il trattino
+messo in basso "_", N.d.T.], e prosegue con lettere, underscore e
+cifre numeriche. In alcuni casi potrebbe essere una concatenazione di
+identificatori, separati da C<::> (o dal piE<ugrave> arcaico C<'>); tutti questi
+identificatori, eccetto l'ultimo, sono interpretati come nomi di
+I<package> [pacchetto, ma utilizziamo la parola inglese poichE<eacute> coincide
+con la parola chiave di Perl, N.d.T.], per individuare lo spazio dei nomi
+nei quali andare a cercare l'identificatore finale (consultate anche
+L<perlmod/Packages> per maggiori dettagli). E<Egrave> possibile
+sostituire, al posto di un semplice identificatore, un'espressione che
+produca dinamicamente un riferimento al valore. Il tutto viene descritto
+con maggior dettaglio piE<ugrave> avanti ed in L<perlref>.
+X<identificatore>
+
+Perl ha anche le sue variabili incorporate i cui nomi non seguono
+queste regole. Queste variabili hanno nomi strani, per cui non c'E<egrave> il
+rischio che vadano accidentalmente a collidere con una delle vostre
+variabili. Le stringhe che corrispondono alle parti fra parentesi di
+un'espressione regolare sono salvate con nomi che contengono solo
+cifre numeriche dopo il carattere C<$> (consulate L<perlop> e L<perlre>).
+In aggiunta, parecchie variabili speciali che danno accesso nella
+sezione piE<ugrave> interna di Perl hanno nomi che contengono caratteri di
+punteggiatura o di controllo. Tutte queste variabili sono documentate
+in L<perlvar>.
+X<variabile, incorporata>
+
+I valori scalari hanno sempre nomi con C<$>, anche quando si
+riferiscono ad uno scalare che fa parte di un array o di una hash. Il
+simbolo C<$> lavora, semanticamente, come l'articolo determinativo "il",
+nel senso che denota il fatto che ci si aspetta un singolo valore.
+X<scalare>
+
+    $giorni         # Il semplice valore scalare "giorni"
+    $giorni[28]     # Il ventinovesimo elemento dell'array @giorni
+    $giorni{'Feb'}  # Il valore 'Feb' dall'hash %giorni
+    $#giorni        # L'ultimo indice dell'array @giorni
+
+Interi array (e I<slice> [porzioni, N.d.T.] di array ed hash) sono
+indicati con C<@>, che ha una funzione molto simile alle parole
+italiane "questi" o "quelli", nel senso che indica che ci si aspettano
+piE<ugrave> valori.
+X<array>
+
+    @giorni            # ($giorni[0], $giorni[1], ..., $giorni[n])
+    @giorni[3, 4, 5]   # corrisponde a ($giorni[3], $giorni[4], $giorni[5])
+    @giorni{'a', 'c'}  # corrisponde a ($giorni{'a'}, $giorni{'c'})
+
+Le hash intere sono denotate da C<%>:
+X<hash>
+
+    %giorni    # ($chiave1, $valore1, $chiave2, $valore2, ...)
+
+
+In aggiunta, le subroutine hanno nomi che iniziano con C<&>,
+sebbene ciE<ograve> sia opzionale quando non dia adito ad ambiguitE<agrave>, esattamente
+come la parola I<proprio> E<egrave> ridondante in italiano [quando usata
+come rafforzativo, ad esempio in "sono proprio felice", N.d.T.].
+Gli elementi della
+tabella dei simboli possono essere richiamati con un C<*> iniziale, ma
+questo non vi interessa ancora (o probabilmente non vi interesserE<agrave> mai :-).
+
+Ciascun tipo di variabile ha il proprio spazio dei nomi, cosE<igrave> come
+parecchi identificativi che non sono relativi a variabili. CiE<ograve> significa
+che potete, senza temere di creare collisioni, utilizzare lo stesso
+identico nome per una variabile scalare, per un array e per una hash e,
+per quanto possa contare, per un I<filehandle>, per un I<handle> di
+directory, per il nome di una I<sub>, di un formato o anche di
+un'etichetta. CiE<ograve> implica che C<$tizio> e C<@tizio> sono due variabili
+distinte, ed anche che C<$caio[1]> E<egrave> parte di C<@caio> ma non di C<$caio>.
+Potrebbe sembrarvi un po' strano ma va bene cosE<igrave>, perchE<eacute> E<egrave> strano.
+X<spazio dei nomi>
+
+A causa del fatto che i nomi delle variabili iniziano sempre
+con C<$>, C<@> o C<%>, le parole "riservate" non sono di fatto
+proibite rispetto ai nomi di variabile. Esse I<sono> riservate
+rispetto ad etichette e I<filehandle>, comunque, che non hanno
+un carattere iniziale distintivo speciale. Non potete avere un
+I<filehandle> chiamato "log", ad esempio. Suggerimento: potete
+sempre utilizzare C<open(LOG, 'logfile)> piuttosto che
+C<open(log, 'logfile')>. Utilizzare I<filehandle> tutti maiuscoli
+migliora anche la leggibilitE<agrave> e vi protegge da possibili conflitti
+con parole riservate introdotte in futuro. La differenza fra
+maiuscole e minuscole I<E<egrave>> importante -- "SEMPRONIO", "Sempronio" e
+"sempronio" sono tutti nomi differenti. I nomi che iniziano con una
+lettera o un I<underscore> possono anche contenere cifre numeriche
+e I<underscore>.
+X<identificatore, sensibilita a maiuscole e minuscole>
+X<maiuscole e minuscole>
+
+E<Egrave> possibile rimpiazzare questi nomi alfanumerici con
+un'espressione che restituisce un riferimento al tipo appropriato.
+Per una descrizione vedete L<perlref>.
+
+I nomi che iniziano con una cifra numerica possono contenere solo
+altre cifre numeriche. I nomi che non cominciano con una lettera,
+I<underscore>, cifra numerica o con un accento circonflesso (ossia,
+un carattere di controllo) sono limitati ad un singolo carattere,
+ad esempio C<$%> o C<$$>. (La maggior parte di questi nomi con
+un singolo carattere hanno significati predefiniti in Perl. Ad
+esempio, C<$$> E<egrave> l'identificativo del processo corrente).
+
+
+=head2 Contesto
+X<contesto> X<contesto scalare> X<contesto lista>
+
+L'interpretazione di operazioni e valori in Perl a volte dipende
+dai requisiti del contesto intorno all'operazione o al valore. Ci
+sono due contesti principali: lista e scalare. Alcune operazioni
+restituiscono liste in contesti che chiedono liste, e valori
+scalari altrimenti. Se questo vale per un'operazione, questo fatto
+sarE<agrave> menzionato nella relativa documentazione. In altre parole,
+Perl sovraccarica alcune operazioni basandosi sul fatto che ci si
+aspetti un valore singolare o plurale. Alcune parole in italiano
+si comportano allo stesso modo, ad esempio "pesce" [che puE<ograve> essere
+riferito ad una molteplicitE<agrave> - come in "oggi mangiamo pesce" -
+o al singolo elemento - come in "Ho preso un pesce solo oggi"].
+
+In modo del tutto reciproco, un'operazione fornisce un contesto scalare
+o lista a ciascuno dei suoi argomenti. Ad esempio, se scrivete
+
+    int( <STDIN> )
+
+l'operazione "intero" fornisce un contesto scalare all'operatore
+diamante <>, che dunque reagisce leggendo una singola riga da STDIN
+restituendola all'operazione "intero", che troverE<agrave> infine il valore
+intero di quella linea e lo restituirE<agrave> a sua volta. Se, d'altra
+parte, scrivete
+
+    sort( <STDIN> )
+
+allora l'operazione C<sort> fornisce un contesto lista a <>, che
+procederE<agrave> a leggere ogni linea disponibile fino alla fine del file,
+restituendola a C<sort>. Questa funzione, a sua volta, ordinerE<agrave> tale
+lista di righe e la restituirE<agrave> come lista, qualsiasi sia il contesto
+in cui E<egrave> stata chiamata.
+
+L'assegnazione E<egrave> un pochino speciale, nel senso che utilizza il
+suo argomento a sinistra per determinare il contesto dell'argomento
+di destra. L'assegnazione ad uno scalare valuta la parte a destra in
+contesto scalare, mentre l'assegnazione ad un array o ad una hash
+fa sE<igrave> che la parte destra sia valutata in contesto lista.
+Anche l'assegnazione ad una lista (o I<slice>, che E<egrave> comunque una
+lista) valutano la parte destra in contesto lista.
+
+Quando utilizzate la direttiva C<use warnings> o l'opzione a linea
+di comando B<-w>, potreste vedere degli avvertimenti riguardo l'uso
+inutile ["useless use" nel messaggio, N.d.T.] di costanti o funzioni
+in "contesto void" [letteralmente "vuoto", ma si preferisce lasciare
+l'originale in inglese viste anche le similitudini con il tipo I<void>
+disponibile in C. N.d.T.]. Il contesto void significa semplicemente che il
+valore E<egrave> stato gettato via, come in un'istruzione che contiene solo
+C<"fred";> o C<getpwuid(0);>. Conta comunque come contesto scalare
+per funzioni che fanno distinzione fra l'essere chiamate o meno
+in contesto lista.
+
+Le funzioni definite da utente possono scegliere di comportarsi
+differentemente se sono chiamate in contesto void, scalare o lista.
+La maggior parte delle funzioni non avranno perE<ograve> bisogno di
+preoccuparsene, poichE<eacute> sia scalari che liste sono automaticamente
+interpolati in liste. Consultate L<perlfunc/wantarray> per sapere
+come fare a stabilire dinamicamente in quale contesto E<egrave> stata chiamata
+la vostra funzione.
+
+
+=head2 Valori scalari
+X<scalare> X<numero> X<stringa> X<riferimento>
+
+Tutti i dati in Perl sono scalari, array di scalari, o hash di
+scalari. Uno scalare puE<ograve> contenere un singolo valore di tre tipi
+differenti: un numero, una stringa o un riferimento. In generale,
+la conversione da una forma all'altra E<egrave> trasparente all'utente.
+Sebbene uno scalare non possa contenere valori multipli, puE<ograve>
+contenere un riferimento ad un array o ad una hash che, a loro
+volta, possono contenere valori multipli.
+
+Gli scalari non devono essere per forza una cosa o l'altra. Non
+c'E<egrave> nessun posto dove dichiarare una variabile scalare come
+"stringa", "numero", "riferimento" o qualsiasi altra cosa.
+A causa della conversione automatica, le operazini che restituiscono
+scalari non hanno bisogno di preoccuparsi (ed infatti non lo fanno)
+se il chiamante sta aspettando una stringa, un numero o un riferimento.
+Perl E<egrave> un linguaggio contestualmente polimorfico i cui scalari
+possono essere stringhe, numeri o riferimenti (il che include
+gli oggetti). Sebbene stringhe e numeri siano considerati piE<ugrave> o
+meno la stessa cosa per quasi tutti gli scopi, i riferimenti
+sono puntatori a tipizzazione forte e non modificabili, con
+un meccanismo di conteggio dei riferimenti [I<reference-counting>,
+N.d.T.] e chiamata dei distruttori.
+
+Un valore scalare E<egrave> considerato VERO in senso booleano se non E<egrave>
+la stringa I<nulla> o il numero 0 (ovvero il suo equivalente stringa
+"0"). Il contesto booleano E<egrave> solo una variante speciale del contesto
+scalare, dove non viene mai effettuata alcuna conversione verso una
+stringa o un numero.
+X<booleano> X<bool> X<vero> X<falso> X<verita>
+
+Ci sono in realtE<agrave> due varietE<agrave> di stringhe I<nulle> (a volte
+dette stringhe "vuote"), una definita ed una indefinita. La versione
+definita E<egrave> solo una stringa che ha lunghezza nulla, come C<"">.
+La versione indefinita E<egrave> quel valore che indica che non c'E<egrave> un vero
+valore per qualcosa, come quando c'E<egrave> stato un errore, o alla fine
+di un file, o quando vi riferite a variabili non inizializzate sia
+scalari che parti di array o hash. Sebbene nelle version piE<ugrave> datate
+di Perl uno scalare non definito potesse diventare definito al suo
+primo utilizzo in un posto dove era atteso un valore definito,
+questo non si ha piE<ugrave> eccetto per rari casi di autovivificazione
+descritti in L<perlref>. Potete utilizzare l'operatore C<defined()>
+per determinare se un valore scalare E<egrave> definito (la cosa non
+ha significato su array o hash), e l'operatore C<undef()> per
+produrre un valore indefinito.
+X<definito> X<indefinito> X<undef> X<null> X<nullo> X<stringa, nullo>
+X<stringa, nulla>
+
+Per stabilire se una data stringa E<egrave> un valore numerico valido e non
+nullo, E<egrave> di solito sufficiente confrontarlo sia con lo 0 numerico che
+con lo "0" lessicale (sebbene questo causerE<agrave> un po' di rumore se
+gli avvertimenti sono attivati). CiE<ograve> segue dal fatto che le stringhe
+che non sono numeri contano come 0, tale e quale che in B<awk>:
+
+   if ($str == 0 && $str ne "0") {
+      warn "Non sembra essere un numero";
+   }
+
+Questo metodo potrebbe essere il migliore, perchE<eacute> altrimenti non
+considererete notazioni IEEE come C<NaN> o C<Infinity> in maniera
+appropriata. In altre occasioni potreste preferire determinare se
+una stringa puE<ograve> essere utilizzata numericamente chiamando la funzione
+C<POSIX::strtod()>, o controllandola con un'espressione regolare
+(come documentato in L<perlre>):
+
+    warn "ha caratteri non numerici" if     /\D/;
+    warn "non un numero naturale"    unless /^\d+$/;           # rifiuta -3
+    warn "non un numero intero"      unless /^-?\d+$/;         # rifiuta +3
+    warn "non an numero intero"      unless /^[+-]?\d+$/;
+    warn "non un numero decimale"    unless /^-?\d+\.?\d*$/;   # rifiuta .2
+    warn "non un numero decimale"    unless /^-?(?:\d+(?:\.\d*)?|\.\d+)$/;
+    warn "non un float C"
+      unless /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/;
+
+La lunghezza di un array E<egrave> un valore scalare. Potete trovare la
+lunghezza dell'array utilizzando C<$#giorni>, come in B<csh>; ad
+ogni modo, questa non E<egrave> la lunghezza dell'array, ma l'indice
+corrispondente all'ultimo elemento, che E<egrave> un valore differente
+poichE<eacute> usualmente c'E<egrave> un valore di indice 0. Assegnare a C<$#giorni>
+cambia la lunghezza dell'array; accorciare un array in questo modo
+distrugge i valori tagliati fuori, ed una successiva operazione
+di allungamento non ripristinerE<agrave> i valori che si trovavano in
+quegli elementi. (Era cosE<igrave> in Perl 4, ma questo comportamento E<egrave>
+stato cambiato per essere sicuri che i distruttori venissero
+chiamati quando ci si attendeva che lo fossero).
+X<$#> X<array, lunghezza>
+
+Potete anche guadagnare qualche minuscola frazione di efficienza
+allungando un array in anticipo quando sapete che diventerE<agrave> grande.
+Potete estendere un array anche assengando un valore ad un elemento
+che si trova fuori dal bordo estremo dell'array. Potete troncare un
+array assegandogli la lista nulla C<()>. Le seguenti istruzioni
+sono equivalenti:
+
+    @qualcosa  = ();
+    $#qualcosa = -1;
+
+Se valutate un array in contesto scalare viene restituita la
+lunghezza dell'array. (Osservate che questo non E<egrave> vero nel caso
+delle liste, che restituiscono l'ultimo valore, analogamente
+all'operatore virgola del C. Non E<egrave> vero neanche nel caso delle
+funzioni incorporate, che restituiscono quello che sembra loro
+piE<ugrave> corretto). La seguente affermazione E<egrave> sempre vera:
+
+    scalar(@qualcosa) == $#qualcosa - $[ + 1;
+
+La versione 5 di Perl ha cambiato il significato di C<$[>: i file
+che non impostano il valore di C<$[> non hanno piE<ugrave> bisogno di
+preoccuparsi se un altro file ne ha alterato il valore. (In altre
+parole, l'utilizzo di C<$[> E<egrave> scoraggiato). In generale potete
+dunque assumere che
+X<$[>
+
+    scalar(@qualcosa) == $#qualcosa + 1;
+
+Alcuni programmatori scelgono di utilizzare una conversione
+esplicita per non lasciare spazio a dubbi:
+
+    $numero_di_elementi = scalar(@qualcosa);
+
+Se valutate una hash in contesto scalare viene restituito un
+valore FALSO se l'hash E<egrave> vuota. Se esiste anche una sola coppia
+chiave/valore, viene restituito un valore VERO; piE<ugrave> precisamente,
+il valore restituito E<egrave> una stringa costituita dal numero di
+caselle utilizzate ed il numero di caselle allocate, separate
+da una sbarretta obliqua. Questo puE<ograve> essere utile solamente se
+volete stabilire se l'algoritmo di hashing interno di Perl si
+sta comportando bene o meno sul vostro insieme di dati. Ad
+esempio, voi inserite 10.000 elementi in una hash, ma
+valutando %HASH in contesto scalare restituisce C<"1/16"> che
+significa che solo una di sedici caselle E<egrave> stata utilizzata, e
+presumibilmente contiene tutti e 10.000 gli elementi. Si suppone
+che questo non accada.
+X<hash, contesto scalare> X<hash, casella> X<casella> X<bucket>
+
+Potete prenotare spazio per una hash con un'assegnazione alla
+funzione C<keys()>. Questa operazione arrotonda il numero di
+caselle allocate alla potenza di 2 immediatamente superiore:
+
+    keys(%utenti) = 1000;		# alloca 1024 caselle
+
+=head2 Costruttori di valori scalari
+X<scalare, letterale> X<scalare, costante>
+
+I letterali numerici possono essere specificati in uno qualsiasi dei
+seguenti formati interi o a virgola mobile:
+
+    12345
+    12345.67
+    .23E-10             # un numero piuttosto piccolo
+    3.14_15_92          # un numero molto importante
+    4_294_967_296       # l'underscore aumenta la leggibilita`
+    0xff                # esadecimale
+    0xdead_beef         # piu` esadecimale
+    0377                # ottale (solo cifre, inizia con 0)
+    0b011011            # binario
+
+E<Egrave> consentito utilizzare I<underscore> fra le cifre
+nei letterali numerici per leggibilitE<agrave>. Potreste, ad esempio,
+raggruppare le cifre binarie a tre a tre (come nell'impostazione
+del modo dei file in stile Unix, ad esempio 0b110_100_100), o
+a quattro a quattro (per rappresentare metE<agrave> di ottetti, come in
+0b1010_0110), o in altri gruppi.
+X<numero, letterale>
+
+Le stringhe letterali sono usualmente delimitate da un apice
+singolo o doppio. Entrambi lavorano molto similmente alle virgolette
+nelle shell standard Unix: le stringhe letterali con virgolette
+doppie sono soggette a sostituzione di I<backslash> e di
+variabile; le stringhe con virgolette semplici non lo sono, invece,
+(con le uniche eccezioni di C<\'> e C<\\>). Le usuali regole
+in stile C per il I<backslash> si applicano per generare caratteri
+speciali come a-capo, tabulazioni, ecc., cosE<igrave> come forme piE<ugrave> esotiche.
+Consultate L<perlop/"Quote and Quote-like Operators"> per averne
+una lista.
+X<stringa, letterale>
+
+Le rappresentazioni esadecimali, ottali o binarie in stringhe letterali
+non sono automaticamente convertite alla loro rappresentazione
+intera. Le funzioni C<hex()> e C<oct()> si occupano di queste
+conversioni per conto vostro; consultate L<perlfunc/hex> e
+L<perlfunc/oct> per maggiori ragguagli.
+
+Potete anche includere a-capo direttamente nelle stringhe, ossia
+queste possono terminare in una riga differente da quella in cui
+iniziano. Questa E<egrave> una caratteristica apprezzabile, ma se vi
+dimenticate le virgolette di chiusura l'errore non verrE<agrave> segnalato
+finchE<eacute> Perl non trova un'altra riga contenente la virgoletta stessa,
+che potrebbe essere molto piE<ugrave> in lE<agrave> nello script. La sostituzione di
+variabili all'interno delle stringhe E<egrave> limitato alle variabili
+scalari, agli array ed alle C<slice> di array o di hash. (In altre
+parole, i nomi che cominciano con C<$> o C<@>, seguiti da
+un'espressione fra parentesi facoltativa). Il seguente frammento
+di codice stampa "Il prezzo ammonta a $100":
+X<interpolazione>
+
+    $Prezzo = '$100';	                     # non interpolato
+    print "Il prezzo ammonta a $Prezzo.\n";	# interpolato
+
+Non esiste doppia interpolazione in Perl, dunque la parte C<$100>
+viene lasciata cosE<igrave> com'E<egrave>.
+
+In alcune shell potete racchiudere il nome della variabile in
+parentesi graffe per eliminare ambiguitE<agrave> nel caso questo sia
+seguito da altri caratteri alfanumerici (o I<underscore>). Siete
+anche obbligati a farlo quando interpolate una variabile
+all'interno di una stringa per separare il nome della variabile da
+una successiva coppia di due-punti o da un apostrofo, poichE<eacute>
+queste verrebbero altrimenti trattate come separatori di
+I<package>:
+X<interpolazione>
+
+    $chi = "Larry";
+    print PASSWD "${chi}::0:0:Superuser:/:/bin/perl\n";
+    print "Diciamo ${chi}uccio per vezzeggiare '${chi}'no?.\n";
+
+Senza le parentesi, Perl andrebbe a cercare la variabile C<$chiuccio>,
+o C<$chi::0> o ancora C<$chi'no>. Queste ultime due risulterebbero
+essere le variabili C<$0> e C<$no> nel I<package> C<chi>, che
+presumibilmente non esiste.
+
+Qualunque identificativo in tali parentesi graffe viene forzato
+ad essere una stringa, cosE<igrave> come qualsiasi identificativo semplice
+all'interno di un indice di hash. Nessuno dei due ha bisogno
+di virgolette. Nel nostro esempio di prima, C<$giorni['Feb']> puE<ograve>
+essere riscritto come C<$giorni{Feb}>, e le virgolette sarebbero
+sottintese. D'altra parte, qualsiasi cosa piE<ugrave> complicata come
+indice verrE<agrave> interpretata come espressione. Questo significa ad
+esempio che C<$versione{2.0}++> E<egrave> equivalente a
+C<$versione{2}++>, non a C<$versione{'2.0'}++>.
+
+
+=head3 Stringhe di Versione
+X<stringhe di versione>, X<vstring> X<v-string>
+
+B<Nota>: l'uso delle Stringhe di Versione (I<v-string>) E<egrave> scoraggiato.
+Non saranno disponibili dopo Perl 5.8, i vantaggi marginali dati
+dalle I<v-string> erano facilmente messi in secondo piano da un intero
+potenziale di Sorprese e Confusione.
+
+Un letterale della forma C<v1.20.300.4000> E<egrave> interpretato come una
+stringa composta da caratteri con gli ordinali specificati. Questa
+forma, nota come I<v-string>, fornisce un modo alternativo e maggiormente
+leggibile di costruire stringhe, piuttosto che utilizzare qualche
+forma di interpolazione meno leggibile C<"\x{1}\x{14}\x{12c}\x{fa0}">.
+Risulta utile per rappresentare stringhe Unicode, e per confrontare
+"numeri di versione" utilizzando gli operatori di comparazione per
+le stringhe, ossia C<cmp>, C<gt>, C<lt> ecc. Se ci sono due o piE<ugrave>
+punti nel letterale la C<v> all'inizio puE<ograve> essere omessa.
+
+  print v9786;              # stampa uno smiley codificato UTF-8 "\x{263a}"
+  print v102.111.111;       # stampa "foo"
+  print 102.111.111;        # uguale
+
+Tali letterali sono accettati sia da C<require> che da C<use> per
+effettuare il controllo delle versioni. La variabile speciale
+C<^V> contiene anche la stringa di versione dell'interprete Perl
+che sta eseguendo lo script; consultate L<perlvar/$^V>. Osservate
+anche che utilizzare I<v-string> per indirizzi IPv4 non E<egrave> portabile
+a meno che non utilizziate anche le funzioni C<inet_aton()> e
+C<inet_ntoa()> del I<package> Socket.
+
+Da notare che a partire da Perl 5.8.1 le I<v-string> a valore
+singolo (come C<v65>) non sono piE<ugrave> considerate I<v-string> prima
+di un operatore C<< => >> (che viene di solito utilizzato per
+separare le chiavi di una hash dai valori), ma sono interpretate
+come stringhe letterali ('v65'). Esse erano I<v-string> da
+Perl 5.6.0 a Perl 5.8.0, ma questo causava piE<ugrave> confusione e
+problemi che benefici. Le I<v-string> multinumeriche come
+C<v65.66> e C<65.66.67> continuano ad essere sempre I<v-string>.
+
+
+=head3 Letterali Speciali
+X<letterali speciali> X<__END__> X<__DATA__> X<END> X<DATA>
+X<end> X<data> X<^D> X<^Z>
+
+I letterali __FILE__, __LINE__ e __PACKAGE__ sono speciali e
+rappresentano nell'ordine il nome del file sorgente corrente, il
+numero di riga ed il nome del I<package> nel particolare punto
+del programma in cui vengono utilizzati. Possono essere utilizzati
+solo come I<token> separati, non vengono interpolati all'interno
+delle stringhe. Se non esiste un I<package> corrente (a causa
+della mancanza della direttiva C<package>), __PACKAGE__ ha valore
+C<undef>.
+X<__FILE__> X<__LINE__> X<__PACKAGE__> X<line> X<file> X<package>
+
+I due caratteri di controllo ^D e ^Z, insieme ai token __END__ e
+__DATA__, possono essere utilizzati per indicicare la conclusione
+logica dello script, prima della fine del file in cui E<egrave> contenuto.
+Qualunque dato successivo viene ignorato.
+
+Il testo successivo a __DATA__ puE<ograve> essere letto utilizzando il
+I<filehandle> C<PACKNAME::DATA>, ove C<PACKNAME> E<egrave> il package
+corrente al momento in cui viene incontrato il token __DATA__ stesso.
+Il filehandle viene tenuto aperto e punta ai dati che seguono __DATA__;
+E<egrave> responsabilitE<agrave> del programma chiudere questo filehandle quando ha
+terminato le operazioni di lettura. Per compatibilitE<agrave> con script piE<ugrave>
+vecchi, scritti prima dell'introduzione di __DATA__, __END__ si comporta
+come __DATA__ nello script di livello piE<ugrave> elevato (ma non nei file
+caricati con C<require> o C<do>), e mette a disposizione i contenuti
+rimanenti attraverso il filehandle C<main::DATA>.
+
+Consultate L<SelfLoader> per maggiori ragguagli su __DATA__ ed un
+esempio di utilizzo. Osservate anche che non potete leggere dal
+filehandle DATA in blocco BEGIN, poichE<eacute> questo viene eseguito non appena
+viene incontrato (durante la compilazione), in un punto in cui il
+corrispondente I<token> __DATA__ (o __END__) non E<egrave> stato ancora incontrato.
+
+=head3 Bareword
+X<bareword>
+
+Una parola che non ha altra interpretazione nella grammatica Perl viene
+considerata come se fosse una stringa con virgolette, e viene detta
+"bareword" [parola nuda, N.d.T.]. Come per I<filehandle> ed etichette,
+una I<bareword> formata unicamente da lettere minuscole rischia di
+entrare in conflitto con possibili parole riservate del linguaggio
+che verranno introdotte in futuro; se utilizzate la direttiva
+C<use warnings> o l'opzione B<-w>, inoltre, Perl stamperE<agrave> un avviso
+per ciascuna parola di questo tipo. Alcune persone vorrebbero bandire
+del tutto le I<bareword>. Se dite
+
+    use strict 'subs';
+
+allora qualsiasi I<bareword> tale da NON venire interpretata come una
+chiamata a funzione produce un errore di compilazione. Tale restrizione
+continua fino alla fine del blocco contenente l'uso della direttiva suddetta;
+in piE<ugrave>, un blocco piE<ugrave> interno puE<ograve> disabilitare tale comando utilizzando
+C<no strict 'subs'>.
+
+=head3 Delimitatore di Unione di Array
+X<array, interpolazione> X<interpolazione, array> X<$">
+
+Gli array e le slice sono interpolate, all'interno di stringhe racchiuse
+da virgolette doppie, unendo gli elementi con il delimitatore specificato
+nella variabile C<$"> (se state utilizzando C<use English> puE<ograve> essere
+specificato anche come C<$LIST_SEPARATOR>), che risulta essere costituito
+da un singolo spazio per default. I seguenti frammenti sono equivalenti:
+
+    $temp = join($", @ARGV);
+    system "echo $temp";
+
+    system "echo @ARGV";
+
+All'interno dei pattern di ricerca (che seguono le stesse regole di
+sostituzione proprie delle virgolette doppie) c'E<egrave> spazio per una
+sfortunata ambiguitE<agrave>: C</$pippo[pluto]/> va interpretata come
+C</${pippo}[pluto]/> (ove C<[pluto]> E<egrave> una classe di caratteri per l'espressione
+regolare) o come C<${pippo[pluto]}> (ove C<[pluto]> E<egrave> un indice nell'array
+C<@pippo>)? Se C<@pippo> non esiste, allora indubbiamente ci troviamo di
+fronte ad una classe di caratteri. Se C<@pippo> esiste, d'altra parte,
+Perl cerca di tirare ad indovinare su come considerare C<[pluto]>, e nella
+maggior parte delle volte E<egrave> corretto. Se perE<ograve> sbaglia, o siete giusto un
+pizzico paranoici, potete forzare l'interpretazione da voi ritenuta
+corretta utilizzando le parentesi graffe, come fatto in precedenza.
+
+Se state cercando informazioni su come utilizzare here-document, che
+si trovavano a questo punto di questa pagina del manuale, sappiate che
+sono state spostate in L<perlop/Quote and Quote-like Operators> [Virgolette
+ed Operatori Similari, N.d.T.].
+
+=head2 Costruttori di Valori di Lista
+X<lista>
+
+I valori di una lista sono denotati separando i singoli valori utilizzando
+delle virgole (e racchiudendo la lista fra parentesi, laddove le
+regole di precedenza lo richiedano):
+
+    (LISTA)
+
+In un contesto in cui non viene richiesta una lista di valori, il valore
+che risulta dalla lista E<egrave> semplicemente quello dell'elemento finale,
+proprio come con l'operatore I<virgola> nel linguaggio C. Ad esempio:
+
+    @pippo = ('cc', '-E', $pluto);
+
+assegna l'intera lista all'array c<@pippo>, ma d'altra parte:
+
+    $pippo = ('cc', '-E', $pluto);
+
+assenga alla variabile scalare C<$pippo> il valore della variabile C<$pluto>.
+Osservate che il valore di un array reale, valutato in contesto
+scalare, si traduce nella lunghezza dell'array; il seguente frammento
+assegna dunque il valore 3 alla variabile C<$pippo>:
+
+    @pippo = ('cc', '-E', $pluto);
+    $pippo = @pippo;                # $pippo viene posta a 3
+
+Potete opzionalmente inserire una virgola prima della parentesi di
+chiusura di una lista di letterali, ossia potete dire:
+
+    @pippo = (
+        1,
+        2,
+        3,
+    );
+
+Per utilizzare un here-document per assegnare valori agli elementi
+di un array, una riga per elemento, potreste utilizzare l'approccio
+che segue.
+
+    @salse = <<Fine_Righe =~ m/(\S.*\S)/g;
+        pomodoro normale
+        pomodoro condito
+        chili verde
+        pesto
+        vino bianco
+    Fine_Righe
+
+Le LISTE effettuano automaticamente l'interpolazione sulle sottoliste.
+In poche parole, quando la LISTA viene valutata, ciascun elemento
+componente viene valutato in contesto lista, e la lista totale che ne
+consegue viene intepolata all'interno di LISTA come se quegli
+elementi individuali fossero membri di LISTA. Per questo motivo, gli
+array e le hash perdono la propria identitE<agrave> all'interno di una LIST; la
+semplice lista:
+
+    (@pippo, @pluto, &UnaFunzioneQualunque, %boh)
+
+contiene tutti gli elementi di C<@pippo>, seguiti da tutti gli
+elementi di C<@pluto>, seguiti da tutti gli elementi restituiti dalla
+funzione chiamata UnaFunzioneQualunque, seguiti infine dalle coppie chiave/valore
+dell'hash C<%boh>. Per generare un riferimento ad una lista che
+I<NON> interpola consultate L<perlref>.
+
+La lista vuota viene rappresentata da (). Interpolarla in una lista
+non ha effetti. PerciE<ograve>, ((),(),()) E<egrave> equivalente a (). In modo
+simile, interpolare un array senza elementi E<egrave> identico a pensare che
+nessun array sia stato mai interpolato fino a questo punto.
+
+L'interpolazione va a braccetto con il fatto che le parentesi di
+apertura e chiusura sono opzionali (eccezion fatta per quando
+tali parentesi sono necessarie per le regole di precedenza) e che le
+liste possono essere provviste di una virgola opzionale a
+denotare che la presenza di virgole ripetute nella lista costituiscono
+una sintassi legale. La lista C<1,,3> risulta dalla concatenazione
+di due liste, C<1,> e C<3>, la prima delle quali termina con la
+virgola opzionale descritta. C<1,,3> E<egrave> in realtE<agrave> C<(1,),(3)> che a sua
+volta corrisponde a C<1,3> (e similmente si ha che C<1,,,3> E<egrave>
+equivalente a C(1,),(,),3>, che E<egrave> C<1,3>, e cosE<igrave> via. Ovviamente non
+vi stiamo suggerendo di offuscare il codice utilizzando questa
+caratteristica.
+
+Un valore di tipo lista puE<ograve> anche essere indicizzato come un array normale;
+dovete perE<ograve> inserire la lista fra parentesi per evitare ambiguitE<agrave>.
+Ad esempio:
+
+    # La funzione `stat' restituisce un valore lista
+    $tempo = (stat($file))[8];
+
+    # ERRORE DI SINTASSI NELLA RIGA CHE SEGUE
+    $tempo = stat($file)[8];  # OOPS, HO DIMENTICATO LE PARENTESI
+
+    # Trova una cifra esadecimale
+    $cifra_esadecimale = ('a','b','c','d','e','f')[$cifra-10];
+
+    # Un "operatore virgola" al contrario
+    return (pop(@pippo),pop(@pippo))[0];
+
+Si puE<ograve> effettuare un'assegnazione ad una lista solo quando ciascun
+elemento della lista E<egrave> esso stesso un possibile valore legale
+per il lato sinistro di una assegnazione:
+
+    ($a, $b, $c) = (1, 2, 3);
+
+    ($map{'rosso'}, $map{'blu'}, $map{'verde'}) = (0x00f, 0x0f0, 0xf00);
+
+Un'eccezione a questa regola consiste nel fatto che potete assegnare
+C<undef> ad una lista. Questo approccio E<egrave> utile quando si vogliono
+ignorare alcuni risultati di una funzione.
+
+    ($dev, $ino, undef, undef, $uid, $gid) = stat($file);
+
+L'assegnazione di una lista in contesto scalare restituisce il numero
+di elementi prodotti dall'espressione regolare posta alla destra
+dell'operatore di assegnazione.
+
+  $x = (($pippo,$pluto) = (3,2,1)); # imposta $x a 3, non a 2
+  $x = (($pippo,$pluto) = f());     # imposta $x al conteggio di quanto
+                                    # restituito da f()
+
+CiE<ograve> E<egrave> comodo quando volete effettuare un'assegnazione di lista in contesto
+Booleano, poichE<eacute> molte funzioni restituiscono la lista nulla
+in uscita, che una volta assegnata produce 0, il quale a sua
+volta viene interpretato come falso.
+
+Questa proprietE<agrave> E<egrave> anche alla base di un utile idioma per eseguire una
+funzione o per effettuare un'operazione in contesto lista, per poi
+contare il numero di valori restituiti, assegnando il risultato ad una
+lista vuota e poi utilizzando l'assegnazione in contesto scalare.
+Ad esempio, il codice che segue:
+
+    $conteggio = () = $testo =~ /\d+/g;
+
+inserisce dentro C<$conteggio> il numero di gruppi di cifre numeriche trovate
+in C<$testo>. Questo accade grazie al fatto che il I<pattern match>
+avviene in contesto lista (dal momento che viene assegnato ad una
+lista vuota), ragion per cui verrE<agrave> restituita una lista di tutte le parti
+del testo che verificano l'espressione regolare. La successiva assegnazione
+in contesto scalare tradurrE<agrave> tale lista nel numero degli elementi che
+la compongono (in questo caso, il numero di volte che l'espressione
+regolare E<egrave> stata verificata) ed imposterE<agrave> C<$conteggio>. Osservate che
+usando semplicemente:
+
+    $conteggio = $testo =~ /\d+/g;
+
+non funzionerebbe, perchE<eacute> un I<pattern match> in contesto scalare
+restituisce solo un valore vero o falso, invece che il numero di
+confronti positivi.
+
+L'ultimo elemento di un'assegnazione di lista puE<ograve> essere un array
+o una hash:
+
+    ($a, $b, @resto) = split;
+    my($a, $b, %resto) = @_;
+
+In realtE<agrave>, potete mettere un array o una hash ovunque nella lista, ma
+il primo che viene incontrato farE<agrave> razzia di tutti i valori, e qualunque
+altro elemento successivo assumerE<agrave> valore C<undef>. Potrebbe anche esservi
+utile in un C<my()> o un C<local()>.
+
+Una hash puE<ograve> essere inizializzata utilizzando una lista letterale
+contenente coppie di elementi che verranno interpretate come chiave
+e valore:
+
+    # stessa assegnazione di map riportata in precedenza
+    %map = ('rosso',0x00f,'blu',0x0f0,'verde',0xf00);
+
+Mentre potete normalmente scambiare liste letterali e array, ciE<ograve> non E<egrave>
+possibile nel caso delle hash. Solo perchE<eacute> potete indicizzare un valore
+in una lista come un normale array non vuol dire che possiate
+indicizzarlo come una hash. In maniera del tutto analoga, le hash
+incluse all'interno di liste (ivi incluse le liste di parametri
+e quelle restituite dalle funzioni) sono sempre I<appiattite> in
+coppie chiave/valore. Questo E<egrave> un buon motivo per utilizzare i
+riferimenti, a volte.
+
+Spesso risulta piE<ugrave> leggibile utilizzare l'operatore C<< => >> fra le
+coppie chiave/valore. Questo operatore E<egrave> sostanzialmente solo un
+sinonimo visivamente piE<ugrave> efficace per l'operatore "virgola", ma ha
+anche l'effetto di modificare l'operando alla sua sinistra per essere
+interpretato come una stringa se E<egrave> una I<bareword> che risulterebbe essere
+un semplice identificatore ammissibile (C<< => >> non mette virgolette
+sugli identificatori compositi che contengono doppi due-punti). Questo
+rende possibile inizializzare le hash in maniera simpatica:
+
+    %map = (
+                 rosso => 0x00f,
+                 blu   => 0x0f0,
+                 verde => 0xf00,
+   );
+
+o per iniziare riferimenti ad hash da utilizzare come I<record>:
+
+    $rec = {
+                strega => 'Mabella la Senza Pieta`',
+                gatto  => 'Fuffi il feroce',
+                data   => '10/31/1776',
+    };
+
+o per impostare parametri con nome per chiamare funzioni complicate:
+
+   $campo = $query->radio_group(
+               name      => 'nome_gruppo',
+               values    => ['eenie','meenie','minie'],
+               default   => 'meenie',
+               linebreak => 'true',
+               labels    => \%labels
+   );
+
+[Vari elementi sono nome, valori, valore_di_default, a_capo ed
+etichette. Si E<egrave> preferito lasciare i nomi originali visto il chiaro
+riferimento al modulo CGI di Lincoln D. Stein. N.d.T.]
+
+Osservate che il fatto che la hash sia inizializzata in questo ordine
+non significa che gli elementi verranno fuori nello stesso ordine. Consultate
+L<perlfunc/sort> per avere esempi su come ottenere un'uscita ordinata.
+
+=head2 Indicizzazione
+
+Un array viene indicizzato specificando un segno di dollaro (C<$>),
+seguito dal nome dell'array (senza la C<@> iniziale), seguito dall'indice
+posto all'interno di parentesi quadre. Ad esempio:
+
+    @mioarray = (5, 50, 500, 5000);
+    print "L'elemento numero 2 contiene ", $mioarray[2], "\n";
+
+Gli indici di un array iniziano da 0. Un indice negativo va a prendere
+il valore corrispondente iniziando dalla fine. Nel nostro esempio,
+C<$mioarray[-1]> corrisponde al valore 5000, e C<$mioarray[-2]> a 500.
+
+Le indicizzazioni di una hash sono simili, solo che invece di parentesi
+quadre occorre utilizzare parentesi graffe. Ad esempio:
+
+    %scienziati =
+    (
+        "Newton" => "Isaac",
+        "Einstein" => "Albert",
+        "Darwin" => "Charles",
+        "Feynman" => "Richard",
+    );
+
+    print "Il nome di Darwin e' ", $scienziati{"Darwin"}, "\n";
+
+=head2 Slice
+X<slice> X<array, slice> X<hash, slice>
+
+Il metodo piE<ugrave> comune di accedere ad un array o ad una hash E<egrave> un
+elemento alla volta. Potete indicizzare anche una lista per
+prendere un singolo elemento.
+
+    $chisono  = $ENV{"USER"};            # un elemento dalla hash
+    $antenato = $ISA[0];                 # un elemento dall'array
+    $dir      = (getpwnam("daemon"))[7]; # analogo, ma con la lista
+
+Una slice accede a parecchi elementi di una lista, di un array o di
+una hash contemporaneamente, utilizzando una lista di indici; risulta
+piE<ugrave> conveniente che non scrivere gli elementi singoli come
+lista di valori scalari separati.
+
+    ($lui, $lei)   = @gente[0, -1];             # slice di array
+    @loro          = @gente[0 .. 3];            # slice di array
+    ($chi, $home)  = @ENV{"USER", "HOME"};      # slice di hash
+    ($uid, $dir)   = (getpwnam("daemon"))[2, 7] # slice di lista
+
+PoichE<eacute> potete effettuare assegnazioni a liste di variabili, potete anche
+effettuarle ad una slice di array o hash:
+
+    @giorni[3 .. 5] = qw/ Mer Gio Ven /;
+    @colori{'rosso', 'blu', 'verde'}
+                    = (0xff0000, 0x0000ff, 0x00ff00);
+    @gente[0, -1]   = @gente[-1, 0];
+
+Queste assegnazioni corrispondono esattamente a
+
+    ($giorni[3], $giorni[4], $giorni[5]) = qw/ Mer Gio Ven /;
+    ($colori{'rosso'}, $colori{'blu'}, $colori{'verde'})
+                   = (0xff0000, 0x0000ff, 0x00ff00);
+    ($gente[0], $gente[-1]) = ($gente[-1], $gente[0]);
+
+PoichE<eacute> cambiare una slice cambia l'array o la hash originale dalla quale
+proviene, un costrutto C<foreach> modificherE<agrave> alcuni, o anche tutti, i
+valori dell'array o della hash.
+
+    foreach (@array[ 4 .. 10 ]) { s/pietro/paolo/ }
+
+    foreach (@hash{qw[ chiave1 chiave2 ]}) {
+        s/^\s+//;           # elimina gli spazi iniziali
+        s/\s+$//;           # elimina gli spazi finali
+        s/(\w+)/\u\L$1/g;   # maiuscole ad inizio di ogni parola
+    }
+
+Una slice di una lista vuota E<egrave> ancora una lista vuota. PerciE<ograve>:
+
+    @a = ()[1,0];           # @a non ha elementi
+    @b = (@a)[0,1];         # @b non ha elementi
+    @c = (0,1)[2,3];        # @c non ha elementi
+
+Ma:
+
+    @a = (1)[1,0];          # @a ha due elementi
+    @b = (1,undef)[1,0,2];  # @b ha tre elementi
+
+CiE<ograve> rende semplice scrivere cicli che si interrompono quando viene
+restituita una lista nulla:
+
+    while ( ($home, $utente) = (getpwent)[7,0]) {
+        printf "%-8s %s\n", $utente, $home;
+    }
+
+Come abbiamo osservato in precedenza, l'assegnazione di una lista in
+contesto scalare restituisce il numero di elementi di quanto si trova
+alla destra dell'assegnazione. La lista vuota non ha elementi, per cui
+quando il file delle password E<egrave> terminato il risultato E<egrave> 0 invece che 2.
+
+Se siete un po' confusi sul perchE<eacute> dovete utilizzare una C<@> in una
+slice di hash invece che C<%>, provate a pensarla cosE<igrave>: il tipo di
+parentesi (quadre o graffe) indica se si sta guardando in un array o
+in una hash. D'altra parte, il carattere iniziale (C<$> o C<@>) prima
+del nome dell'array o della hash indica se volete ottenere un valore
+singolare (ossia, uno scalare) o plurale (una lista).
+
+=head2 Typeglob e Filehandle
+X<typeglob> X<filehandle> X<*>
+
+Perl utilizza un tipo interno detto I<typeglob> per contenere un intero
+elemento della tabella dei simboli. Il prefisso di una typeglob E<egrave> un
+carattere C<*>, perchE<eacute> rappresenta tutti i tipi. Questo era il sistema
+preferito per passare array ed hash per riferimento in una funzione, ma
+ora abbiamo riferimenti veri e propri, per cui se ne ha bisogno di rado.
+
+L'utilizzo principale delle typeglob nel Perl moderno si ha nella
+creazione di alias nella tabella dei simboli. Questa assegnazione:
+
+    *questo = *quello;
+
+rende C<$questo> un alias per C<$quello>, C<@questo> un alias per C<@quello>,
+C<%questo> un alias per C<%quello>, C<&questo> un alias per C<&quello> e
+cosE<igrave> via. E<Egrave> molto piE<ugrave> sicuro utilizzare un riferimento. Questa assegnazione:
+
+    local *Qui::blu = \$Altrove::verde;
+
+rende C<$Qui::blu> un alias temporaneo per C<$Altrove::verde>, ma non
+rende C<@Qui::blu> un alias temporaneo per C<@Altrove::verde>, o
+C<%Qui::blu> un alias temporaneo per C<%Altrove::verde> ecc. Consultate
+L<perlmod/"Symbol Tables"> [Tabelle dei Simboli, N.d.T.]
+per altri esempi. Per quanto possa sembrare
+strano, questo meccanismo E<egrave> alla base di tutto il sistema di import/esport
+dei moduli.
+
+Un altro utilizzo per i typeglob E<egrave> per passare filehandle all'interno
+di funzioni o per creare nuovi filehandle. Se avete bisogno di un
+typeglob per salvare un filehandle, fatelo cosE<igrave>:
+
+    $fh = *STDOUT;
+
+o forse meglio con un riferimento reale, come:
+
+    $fh = \*STDOUT;
+
+Consultate L<perlsub> per altri esempi di utilizzo di questi riferimenti
+come filehandle indiretti all'interno delle funzioni.
+
+I typeglob sono anche un modo per creare un filehandle locale utilizzando
+l'operatore C<local()>. Questi durano finchE<eacute> il loro blocco non si
+chiude, ma possono essere restituiti. Ad esempio:
+
+    sub nuova_open {
+        my $percorso = shift;
+        local  *FH;  # non my ma local!
+        open   (FH, $percorso)          or  return undef;
+        return *FH;
+    }
+    $fh = nuova_open('/etc/passwd');
+
+Ora che abbiamo la notazione C<*pippo{COSA}>, i typeglob non sono piE<ugrave>
+tanto utilizzati per la manipolazione di filehandle, sebbene siano ancora
+necessari per passare handle di file o di directory nuovi di zecca dentro
+o fuori dalle funzioni. CiE<ograve> dipende dal fatto che
+C<*HANDLE{IO}> funziona solo se HANDLE E<egrave> stato giE<agrave> utilizzato
+come handle. In altre parole, C<*FH>
+deve essere utilizzato per creare un nuovo elemento nella tabella dei
+simboli; C<*pippo{COSA}> non sa farlo. Quando siete in dubbio, utilizzate
+C<*FH>.
+
+Tutte le funzioni che sono in grado di creare filehandle (C<open()>,
+C<opendir()>, C<pipe()>, C<socketpair()>, C<sysopen()>, C<socket()> e
+C<accept()>) creano automaticamente un filehandle anonimo se
+l'handle passato loro E<egrave> una variabile scalare non inizializzata. CiE<ograve>
+consente di utilizzare costrutti come C<open(my $fh, ...)> e
+C<open(local $fh, ...)> per creare filehandle che verranno comodamente
+chiusi in automatico quando lo I<scope> termina, ammesso che non rimangano
+altri riferimenti. CiE<ograve> elimina in larga parte la necessitE<agrave> di utilizzare
+typeglob in fase di apertura di filehandle che devono essere passati
+"in giro", come nell'esempio che segue:
+
+    sub mia_open {
+        open my $fh, "@_"
+             or die "fallita chiamata a open() '@_': $!";
+        return $fh;
+    }
+
+    {
+        my $f = mia_open("</etc/motd");
+        print <$f>;
+        # $f viene chiusa implicitamente a questo punto
+    }
+
+Osservate che, se viene usata una variabile scalare inizializzata, il
+risultato E<egrave> differente: C<my $fh = 'zzz'; open($fh, ...)> E<egrave>
+equivalente a C<open( *{'zzz'}, ...)>. C<use strict 'refs'> proibisce
+questa pratica.
+
+Un altro modo per creare un filehandle anonimo si ha utilizzando
+il modulo Symbol o con il modulo IO::Handle e la sua genia. Questi
+moduli hanno il vantaggio di non nascondere tipi differenti con lo stesso
+nome quando si usa C<local()>. Per un esempio, si veda in fondo a
+L<perlfunc/open()>.
+
+=head1 VEDETE ANCHE
+
+Consultate L<perlvar> per una descrizione delle variabili predefinite
+in Perl e per una discussione sui nomi ammissibili per le variabili.
+Vedete L<perlref>, L<perlsub> e L<perlmod/"Symbol Tables">
+[Tabelle dei Simboli, N.d.T.] per maggiori
+ragguagli sui typeglob e la sintassi C<*pippo{COSA}>.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perldata
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Flavio Poletti.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut
+

@@ -1,0 +1,84 @@
+[Switching to Thread 4ae9c280a (LWP 100270)]
+0x49b3b197 in __error () from /lib/libthr.so.3
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+#1  0x49b3ad78 in __error () from /lib/libthr.so.3
+#2  0x4ceffb60 in ?? ()
+#3  0x00000008 in ?? ()
+#4  0x00000001 in ?? ()
+#5  0x4ceffb40 in ?? ()
+#6  0x00000000 in ?? ()
+#7  0x00000038 in ?? ()
+#8  0xbe9eee98 in ?? ()
+#9  0x49b396df in pthread_setcancelstate () from /lib/libthr.so.3
+#10 0x49b38f7e in pthread_cond_signal () from /lib/libthr.so.3
+#11 0x4995d042 in g_async_queue_sort () from /usr/local/lib/libglib-2.0.so.0
+#12 0x4995d3e5 in g_async_queue_pop () from /usr/local/lib/libglib-2.0.so.0
+#13 0x4841190d in sync_request_thread_cb ()
+   from /usr/local/lib/libcamel-1.2.so.14
+#14 0x499aa52f in g_thread_create_full () from /usr/local/lib/libglib-2.0.so.0
+#15 0x49b3071f in pthread_getprio () from /lib/libthr.so.3
+#16 0xbe8edfec in ?? ()
+
+Thread 16 (Thread 49d01140 (LWP 100219)):
+#0  0x49b9e53b in wait4 () from /lib/libc.so.7
+No symbol table info available.
+
+Thread 15 (Thread 4a1b4640 (LWP 100229)):
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+No symbol table info available.
+
+Thread 14 (Thread 4a1b0680 (LWP 100230)):
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+No symbol table info available.
+
+Thread 13 (Thread 49d036c0 (LWP 100235)):
+#0  0x48663d12 in sqlite3DbFree () from /usr/local/lib/libsqlite3.so.8
+No symbol table info available.
+
+Thread 12 (Thread 49d03580 (LWP 100236)):
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+No symbol table info available.
+
+Thread 11 (Thread 4acac640 (LWP 100228)):
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+No symbol table info available.
+
+Thread 10 (Thread 4acac500 (LWP 100232)):
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+No symbol table info available.
+
+Thread 9 (Thread 4ae9c640 (LWP 100234)):
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+No symbol table info available.
+
+Thread 8 (Thread 4ae9c500 (LWP 100231)):
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+No symbol table info available.
+
+Thread 7 (Thread 4ab62640 (LWP 100239)):
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+No symbol table info available.
+
+Thread 6 (Thread 4ab62140 (LWP 100233)):
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+No symbol table info available.
+
+Thread 5 (Thread 49d031c0 (LWP 100238)):
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+No symbol table info available.
+
+Thread 4 (Thread 49d03440 (LWP 100246)):
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+No symbol table info available.
+
+Thread 3 (Thread 4acac280 (LWP 100252)):
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+No symbol table info available.
+
+Thread 2 (Thread 4cd2e280 (LWP 100269)):
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+No symbol table info available.
+
+Thread 1 (Thread 4ae9c280 (LWP 100270)):
+#0  0x49b3b197 in __error () from /lib/libthr.so.3
+No symbol table info available.

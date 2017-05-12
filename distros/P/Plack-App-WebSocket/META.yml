@@ -1,0 +1,45 @@
+---
+abstract: 'WebSocket server as a PSGI application'
+author:
+  - 'Toshio Ito <toshioito@cpan.org>'
+build_requires:
+  AnyEvent: '0'
+  AnyEvent::WebSocket::Client: '0.20'
+  Net::EmptyPort: '0'
+  Plack::Util: '0'
+  Protocol::WebSocket: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build: '0.42'
+  Module::Build::Prereqs::FromCPANfile: '0.02'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-App-WebSocket
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - inc
+  file:
+    - README.pod
+requires:
+  AnyEvent: '0'
+  AnyEvent::WebSocket::Server: '0.06'
+  Carp: '0'
+  Devel::GlobalDestruction: '0'
+  Plack::Component: '0'
+  Plack::Response: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/debug-ito/Plack-App-WebSocket/issues
+  repository: git://github.com/debug-ito/Plack-App-WebSocket.git
+version: '0.05'

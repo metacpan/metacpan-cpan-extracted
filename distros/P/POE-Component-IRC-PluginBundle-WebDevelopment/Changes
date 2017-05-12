@@ -1,0 +1,15 @@
+Revision history for POE-Component-IRC-PluginBundle-WebDevelopment
+
+2.001002 2014-02-02
+    - Added POE-Component-IRC-Plugin-WWW-Cache-Google to the bundle
+    - Fixed incorrect module name in the abstract
+
+2.001002 2014-02-01
+    - Added Color Namer and Google PageRank plugins
+
+2.001001 2014-01-27
+    - Upped the version to fix some plugins' failure to index due to
+      higher version number
+
+1.001001 2014-01-27
+    - Packaged a bundle of my existing plugins into a single dist

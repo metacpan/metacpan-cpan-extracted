@@ -1,0 +1,8 @@
+$Id: INSTALL,v 1.1 2009-09-22 18:05:03 ubuntu Exp $
+
+Install using the following commands:
+
+ $ perl Makefile.PL
+ $ make
+ $ make test
+ $ make install

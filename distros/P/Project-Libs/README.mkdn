@@ -1,0 +1,89 @@
+# NAME
+
+Project::Libs - Add module directories of a project into @INC
+automatically
+
+# SYNOPSIS
+
+    # the simplest way
+    use Project::Libs;
+
+    # add more other dirs into @INC
+    use Project::Libs lib_dirs => [qw(extlib vendor modules/*/lib)];
+
+    # add more other marks locate on a project root
+    use Project::Libs project_root_files => [qw(README Changes)];
+
+# DESCRIPTION
+
+Project::Libs automatically adds directories that may contain modules
+which a project depends on.
+
+Imagin there's such a project as below: CPAN-standard file arrangement
+and using git as a SCM (\`modules' directory contains git submodules
+and that's written in \`.gitmodules').
+
+    |_ PROJECT_ROOT
+       |_ .git
+       |_ .gitmodules
+       |_ Makefile.PL
+       |_ lib/
+       |_ t/
+          |_ lib/
+          |_ compile.t
+          |_ basic.t
+       |_ script/
+          |_ server.pl
+          |_ create.pl
+       |_ extlib/
+       |_ modules/
+          |_ Foo
+             |_ lib/
+          |_ Bar
+             |_ lib/
+          |_ ...
+
+You may bother writing such code as below in all the script located in
+t/\*, script/\*, or other to add module path into @INC.
+
+    use FindBin;
+    use lib "$FindBin::Bin/../lib";
+    use lib glob "$FindBin::Bin/../modules/*/lib";
+
+To \`use Project::Libs' helps you doing that.
+
+In this case, after loading this module, the directories below are
+added into @INC:
+
+- lib
+- extlib
+- t/lib
+- modules/Foo/lib
+- modules/Bar/lib
+
+# AUTHOR
+
+Kentaro Kuribayashi <kentaro@cpan.org>
+
+# COPYRIGHT AND LICENSE (The MIT License)
+
+Copyright (c) Kentaro Kuribayashi <kentaro@cpan.org>
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

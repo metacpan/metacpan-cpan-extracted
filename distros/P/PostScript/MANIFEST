@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+README
+TextBlock.pm
+Metrics.pm
+Document.pm
+Elements.pm

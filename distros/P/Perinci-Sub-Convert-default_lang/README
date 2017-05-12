@@ -1,0 +1,9 @@
+SYNOPSIS
+
+     use Perinci::Sub::Convert::default_lang qw(convert_property_default_lang);
+     convert_property_default_lang(meta => $meta, new => 'id_ID');
+
+SEE ALSO
+
+    Rinci
+

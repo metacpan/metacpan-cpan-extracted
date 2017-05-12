@@ -1,0 +1,38 @@
+	       o-o-o-o-o-o-o-o-o-o-o-o-o
+	      o                         o
+	     o   Parse::Lex - 2.14       o
+	    o    Parse::LexEvent - 1.00   o
+            o    Parse::Token - 2.15      o
+	    o    Parse::Template - 0.32   o
+	     o   Parse::YYLex - 0.91     o
+	      o                         o
+	       o-o-o-o-o-o-o-o-o-o-o-o-o
+
+The Parse::Lex.pm module for perl5 is an object-oriented generator of
+lexical analyzers.
+
+This distribution includes Parse::YYLex (writed by Vladimir Alexiev)
+a lexer generator that you can use with yacc parsers.
+
+A collection of examples demonstrating various
+Parse::Lex/Parse::LevEvent features can be found in the "examples"
+directory.
+
+Copyright (c) 1995-1999 Philippe Verdret. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+-- 
+Philippe Verdret <pverdret@sonovision-itep.fr>
+Vladimir Alexiev <vladimir@cs.ualberta.ca> and Ocrat 
+for the English translation of the pod documentation.
+
+___________________________
+HOW TO BUILD and INSTALL IT
+
+				
+% perl Makefile.PL
+% make 
+% make test # for a specific test: make test TEST_VERBOSE=1 TEST_LOG=1 TEST_FILES=t/test5.t
+% make install
+

@@ -1,0 +1,47 @@
+		<!--menu-->
+<p>Insert record into: <b><!--tables--></b></p>
+<form action="<!--self-->" method="POST">
+	<input type="hidden" name="key" value="<!--key-->">
+	<input type="hidden" name="action" value="insertcomplete">
+	<table>
+		<tr>
+			<td valign="top">SQL code used:</td>
+			<td>
+				<!--code-->
+			</td>
+		</tr>
+		<tr>
+			<td valign="top">Affected rows:</td>
+			<td>
+				<!--affected-->
+			</td>
+		</tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr>
+			<td valign="top">What to do next</td>
+			<td>
+				<table class="inputtable">
+					<tr>
+						<th><input checked type="radio" name="after" value="another"></th>
+						<td>Insert another record</td>
+					</tr>
+					<tr>
+						<th><input type="radio" name="after" value="anotherduplicate"></th>
+						<td>Insert another duplicate record</td>
+					</tr>
+					<tr>
+						<th><input type="radio" name="after" value="querymenu"></th>
+						<td>Back to query menu</td>
+					</tr>
+				</table>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2">
+				<table class="inputtable">
+					<tr><td><input type="submit" value="Insert"></td></tr>
+				</table>
+			</td>
+		</tr>
+	</table>
+</form>

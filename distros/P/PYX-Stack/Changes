@@ -1,0 +1,21 @@
+0.04 2015-10-13T15:29:21+02:00
+ - Add PYX::Sort to SEE ALSO section in doc.
+ - Fix dependencies.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+
+0.03 2015-02-01T09:51:19+01:00
+ - Add PYX::GraphViz, PYX::Hist and PYX::Parser to SEE ALSO section in doc.
+ - Add REPOSITORY section to doc.
+ - Add comments to tests.
+ - Add tests.
+ - Rename 'pyx_parser' parameter to internal '_pyx_parser' name.
+ - Rename 05-parse.t test file to right 05-parse_file.t .
+ - Update SEE ALSO section to reality.
+
+0.02 2015-01-18T19:02:42+01:00
+ - Fix abstract in Makefile.PL.
+
+0.01 2015-01-18T17:51:43+01:00
+ - First version.

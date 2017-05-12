@@ -1,0 +1,90 @@
+PBJ::JNI version 0.1
+====================
+
+PBJ stands for Peanut Butter and Jelly.  It is in general used to make 
+sandwiches.  It is also known as Package to Bridge Java, which is this package.
+
+PBJ is a suite of modules, implemented in object-oriented fashion, to
+let the Perl community take advantage of the Java open standards, while 
+in the mean time staying in Perl.
+
+PBN::JNI is the first and the basic package released in this suite. 
+All modules in PBJ are based in PBJ::JNI::* modules.  To use PBJ::JNI::*, 
+you need to know everything that is required to program with Java JNI in 
+C.  You can easily crash the program if you don't know what you are doing. 
+So this module is not for people who want to use "pure Perl".  It is in the 
+design that all other modules based on PBJ::JNI::* in this package will 
+have a pure Perl interface.
+
+This version was developed using Java JDK 1.2. 
+
+FEATURES
+
+Warning: This software is still in alpha stage.  It may not be
+reliable and its features and APIs may change in the future releases.
+
+o PBJ::JNI::Native module provides a directly interface to Java JNI C
+  functions.
+o PBJ::JNI::JavaVm and PBJ::JNI::JNIEnv modules provide wrapper for Java VM 
+  functions in PBJ::JNI::Native in an object-oriented fashion.
+o The Java interpreter is linked with Perl so there is no other processes
+  to manage.
+
+LIMITATIONS
+
+o use system malloc only
+o do not work with "hotspot".
+
+MODULES
+
+o PBJ::JNI::JavaVM
+o PBJ::JNI::JNIEnv
+o PBJ::JNI::Util
+o PBJ::JNI::Native
+
+PREREQUISITES
+
+o This library was developed by the author with Perl v5.6.1 built for 
+  i586-linux, orignally on a Mandrakes Linux version 6.1 system with 98 Megabytes
+  of memory, and then RedHat 7.2 with 256 Megabytes for memory.
+o This library is never tested on any other platform.
+o The Perl used with this library must be compiled to use the system
+  malloc suite of function.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Alternatively, if you have CPAN.pm installed and are connected to the 
+Internet, you can try to do the following
+
+   perl -MCPAN -e shell
+   > install PBJ::JNI
+
+
+INFORMATION
+
+Please send questions and comments to "Ping Liang" <ping@cpan.org>
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2001 Ping Liang
+All rights reserved.
+
+THIS PROGRAM IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+This program is licensed under the same terms as Perl itself. For more
+information see the README or Artistic files provided with the Perl
+distribution.
+
+
+
+

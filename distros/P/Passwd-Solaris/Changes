@@ -1,0 +1,23 @@
+Revision history for Perl extension Passwd::Solaris.
+
+0.01  Fri Jan 22 17:40:47 1999
+	- original version; created by h2xs 1.18
+
+0.02  Sat Jan 23 01:10:36 1999
+	- internalized file copy and put in uid 0 checks
+
+0.50  Wed Jan 27 18:45:37 1999
+	- added mgetpwnam, fixed _file_copy and PL_na issues
+
+0.60  Thu Mar 25 whenever
+	- modified mgetpwnam to return crypted password
+
+0.65  Sat May 29 08:12:43 1999
+	- bug fix, report/solution provided by Jean-Pierre Gallou
+	- added O_TRUNC to open, files were having partial lines after
+	  rmpwnam
+1.2   Mon Sep 10 17:13:34 2007
+	- module rewritten to only have the locking in c
+	- rmpwnam can remove multiple entries at the same time
+	- mgetpwnam returns the other shadow fields too
+	- setpwnam, modpwinfo can set other shadow fields

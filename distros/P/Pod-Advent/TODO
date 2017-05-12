@@ -1,0 +1,97 @@
+#########################
+#        TODO           #
+#                       #
+# (no particular order) #
+#########################
+
+bookmark http://www.openswartz.com/2010/12/19/perltidy-and-method-happy-together in case we ever need to override  pre-/post-filters in perltidy due to some wonky reserved word collision or syntax addition in a mod99.pl confusing it.
+
+==== ON DECK ====
+
+pod for new (v0.15) pod2advent cmdline options.
+
+option for repeated linking of M<>  (or a new W<> code?)
+=over/=item/=back  UL/LI support
+support title/author instead of advent_title/advent_author
+	use this instead of --noadvent flag?
+Add a T<fmt> code (or re-purpose D<>?) for timestamping.
+
+jerrad's multiple P<> usage item
+  ==> What is this??
+    possibly: make P act like M, and only link the first occurrence??
+    ---> check gmail/aim logs
+
+(2009-12-02 9:25:13 PM) Jerrad Pierce: hey. Any idea why paragraphs aren't respected by P::A in begin blocks, like footnotes?
+
+
+==== IN THE HOLE ====
+
+change __speller() method to a __text_filter() sub that calls &text_filter attribute if it exists.  defaults to sub { __speller }.  lays way for translating subclasses, or html-muckers, or whatever. possibly create a Pod::Advent::Translate (passed a object w/a ->translate() method).
+	==> See v0.14 RC's
+
+doc & test case re:  =cut/comment/=pod method of comments.
+
+document that, although Makefile.PL complains, module runs fine w/o Text::Aspell.
+
+Linga::Translate support;  --lang option.
+
+reposition the 'View Source (POD)' link?
+
+pod2advent option to generate template (basically cat ex/getting_started.pod)
+
+pod2advent option to generate css (basically cat style.css)
+
+pod2advent option for 'POD' link vs rel=alternate tag
+
+ability to force html encoding? (see 0.07 changelog entry re: you're)
+
+more tests
+
+test w/more complicated perl samples, for differences in Perl::Tidy versions.
+
+code refactoring (package var usage; also maybe make code/directive behavior based on a config data structure)
+
+support for =over/=item
+
+check html output for validity
+
+custom podchecker (and/or subclass of Pod::Checker)
+
+rewrite with Pod::Simple::Methody ?
+
+------------------
+Items from Jerrad:
+------------------
+
+process <pre> for pod like A<>?
+	(maybe have a new tag?  can a new T<> work multi-line?
+	echo -e "=begin pre\n\nA<http://example.com|Test>\n\n=end pre" | perl -Ilib bin/pod2advent +
+
+WISH: better comment support: #lines, and extracting whole <!-- --> clause,
+rather than passing it through and hoping the browser parses results correctly.
+  ==> See TODO test cases in t/snippets.t
+
+AIM log 2008-12-24:
+(8:48:25 PM) Jerrad Pierce: .do P & M interact, so P also only links the first instance of an entity (by date, or |alternateName)?
+(8:50:57 PM) David Westbrook: P/M are seperate ..   interesting question re: P -- it doesn't have that link-first-only behvaior that M does, but it easily could
+(8:53:30 PM) Jerrad Pierce: it's a rare case, but Yanick's last write-p cited the same old module multiple times
+
+##############
+COVERAGE STATS
+##############
+
+*** v0.15 ***
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+File                           stmt   bran   cond    sub    pod   time  total
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+bin/pod2advent                100.0  100.0    n/a  100.0    n/a    0.2  100.0	#  36/36
+blib/lib/Pod/Advent.pm        100.0  100.0   95.6  100.0  100.0   99.8   99.3	# 438/441
+Total                         100.0  100.0   95.6  100.0  100.0  100.0   99.4	# 474/477
+---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+export HARNESS_PERL_SWITCHES=-MDevel::Cover=+ignore,Errno.pm
+cover -delete
+make test
+cover
+chmod go+rx cover_db
+

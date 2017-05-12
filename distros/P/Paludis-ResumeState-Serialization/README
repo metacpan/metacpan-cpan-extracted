@@ -1,0 +1,60 @@
+NAME
+    Paludis::ResumeState::Serialization - Work with resume-files generated
+    by Paludis
+
+VERSION
+    version 0.01000410
+
+SYNOPSIS
+        use Paludis::ResumeState::Serialization;
+
+        open my $fh, '<' , '/resumefile' or die;
+
+        my $objects = Paludis::ResumeState::Serialization->deserialize({
+            content => ( do { local $/ = undef;  scalar <$fh> } ),
+            format => 'basic'
+        });
+
+        my $content = Paludis::ResumeState::Serialization->serialize({
+            data => $object,
+            format => 'basic'
+        });
+
+        # $content should == contents of resumefile.
+
+    This class is just really a proxy serialization interface for a few of
+    the varying back-ends.
+
+    Currently only the 'basic' back-end exists, which provides basic, but
+    consistent serialization support.
+
+  FormatNames
+   basic
+    Defers serialization to "::Basic"
+
+METHODS
+  deserialize
+        my $object = ::Serialization->deserialize({
+            content => $string
+            format  => FormatName
+        });
+
+    See "FormatNames"
+
+  serialize
+        my $string = ::Serialization->serialize({
+            data => $object,
+            format => FormatName
+        });
+
+    See "FormatNames"
+
+AUTHOR
+    Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric <kentnl@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

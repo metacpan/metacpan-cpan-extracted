@@ -1,0 +1,547 @@
+=encoding iso-8859-1
+
+=head1 NAME/NOM
+
+perlrequick - Les expressions rationnelles Perl pour les impatients
+
+=head1 DESCRIPTION
+
+Ce document décrit les bases nécessaires à la compréhension, la création et
+l'utilisation des expressions rationnelles ou régulières (abrégé en regex) en
+Perl.
+
+=head1 Le guide
+
+=head2 Reconnaissance de mot simple
+
+L'expression rationnelle la plus simple est juste un mot ou, plus
+généralement, une chaîne de caractères. Une regex constituée d'un mot est
+reconnue dans (ou correspond avec) toutes les chaînes qui contiennent ce S<mot
+:>
+
+    "Salut tout le monde" =~ /monde/;  # correspondance
+
+Dans cette instruction, C<monde> est la regex et les C<//> qui l'entourent
+demandent à perl de rechercher une correspondance dans la chaîne. L'opérateur
+C<=~> applique la recherche à la chaîne placée à gauche et produit la valeur
+vraie si la regex correspond ou la valeur fausse sinon. Dans notre cas,
+C<monde> correspond au quatrième mot de C<"Salut tout le monde">. Donc
+l'expression est vraie. Ce concept a plusieurs usages.
+
+Des expressions de ce type sont utiles dans des S<conditions :>
+
+    print "Correspondance\n" if "Salut tout le monde" =~ /monde/;
+
+Le sens de l'expression peut être inversé en utilisant l'opérateur
+C<!~>E<nbsp>:
+
+    print "Pas de correspondance\n" if "Salut tout le monde" !~ /monde/;
+
+La chaîne littérale dans la regex peut être remplacée par une S<variable :>
+
+    $mot = "monde";
+    print "Correspondance\n" if "Salut tout le monde" =~ /$mot/;
+
+Si vous voulez chercher dans C<$_>, la partie C<$_ =~> peut être S<omise :>
+
+    $_ = "Salut tout le monde";
+    print "Correspondance\n" if /monde/;
+
+Finalement, les délimiteurs par défaut C<//> pour une recherche de
+correspondance peuvent être remplacés par des délimiteurs arbitraires en les
+préfixant part un S<C<'m'> :>
+
+    "Salut le monde" =~ m!monde!; # correspondance, délimité par '!'
+    "Salut le monde" =~ m{monde}; # correspondance, remarquez la paire '{}'
+    "/usr/bin/perl"  =~ m"/perl"; # correspondance après '/usr/bin',
+                                  # '/' devient un caractère ordinaire
+
+Les regex doivent correspondre I<exactement> à une partie de la chaîne pour
+être S<reconnue :>
+
+    "Salut le monde" =~ /Monde/;  # pas de correspondance, casse différente
+    "Salut le monde" =~ /e m/;    # correspondance, ' ' est un caractère ordinaire
+    "Salut le monde" =~ /monde /; # pas de correspondance, pas de ' ' à la fin
+
+La reconnaissance a lieu le plus tôt possible dans la S<chaîne :>
+
+    "Salut le monde" =~ /l/;    # reconnaît le 'l' dans 'Salut
+    "La peste est là" =~ /est/; # reconnaît le 'est' dans 'peste'
+
+Certains caractères ne peuvent être utilisés tels quels dans une regex. Ces
+caractères, appelés B<meta-caractères>, sont réservés pour des notations
+spéciales dans les expressions rationnelles. Les S<voici :>
+
+    {}[]()^$.|*+?\
+
+Un meta-caractère peut-être utilisé en le préfixant par un backslash (une
+barre oblique inversée)E<nbsp>:
+
+    "2+2=4" =~ /2+2/;    # pas de correspondance, + est un meta-caractère
+    "2+2=4" =~ /2\+2/;   # correspondance, \+ est traité comme un + ordinaire
+    'C:\WIN32' =~ /C:\\WIN/;                # correspondance
+    "/usr/bin/perl" =~ /\/usr\/bin\/perl/;  # correspondance
+
+Dans ce dernier exemple, le symbole divisé C</> est aussi préfixé par un
+backslash car il est utilisé comme délimiteur par l'expression rationnelle.
+
+Les caractères ASCII non affichables sont représentés par des B<séquences
+d'échappement>. Les exemples courants sont C<\t> pour une tabulation, C<\n>
+pour un passage à la ligne et C<\r> pour un retour chariot. Les octets
+quelconques sont représentés par une séquence d'échappement en octal (comme
+C<\033>) ou en hexadécimal (comme C<\x1B>)E<nbsp>:
+
+    "1000\t2000" =~ m(0\t2)            # correspondance
+    "chat"       =~ /\143\150\x61\x74/ # correspondance,
+                                       # mais 'chat' est écrit bizarrement
+
+Les expressions rationnelles sont traitées quasiment comme des chaînes entre
+guillemets. Donc l'interpolation des variables S<fonctionne :>
+
+    $foo = 'son';
+    'caisson' =~ /cais$foo/; # correspondance
+    'sonnet' =~ /${foo}net/; # correspondance
+
+Dans toutes les expressions rationnelles qui précèdent, si la regex est
+reconnue quelque part dans la chaîne, on considère qu'il y a
+correspondance. Pour spécifier I<où> doit avoir lieu la reconnaissance, vous
+pouvez utiliser les meta-caractères d'B<ancrage> C<^> et C<$>. L'ancre C<^>
+est reconnue au début de la chaîne alors que l'ancre C<$> est reconnue à la
+fin de la chaîne ou juste avant une fin de ligne à la fin de la
+chaîne. Quelques S<exemples :>
+
+    "housekeeper" =~ /keeper/;         # correspondance
+    "housekeeper" =~ /^keeper/;        # pas de correspondance
+    "housekeeper" =~ /keeper$/;        # correspondance
+    "housekeeper\n" =~ /keeper$/;      # correspondance
+    "housekeeper" =~ /^housekeeper$/;  # correspondance
+
+=head2 Utilisation des classes de caractères
+
+Une B<classe de caractères> définit un ensemble de caractères acceptables en
+un point particulier de l'expression rationnelle. Une classe de caractères
+s'exprime par une paire de crochets C<[...]> contenant l'ensemble des
+caractères acceptables. Voici quelques S<exemples :>
+
+    /rame/;            # reconnaît 'rame'
+    /[clr]ame/;        # reconnaît 'came, 'lame' ou 'rame'
+    "abc" =~ /[cab]/;  # reconnaît 'a'
+
+Dans la dernière instruction, bien que C<'c'> soit le premier caractère de la
+classe, le premier endroit où cette expression rationnelle peut être reconnue
+est le C<'a'>.
+
+    /[oO][uU][iI]/; # reconnaît 'oui' indépendamment de la casse
+                    # 'oui', 'Oui', 'OUI', etc.
+    /oui/i;         # reconnaît aussi 'oui' indépendamment de la casse
+
+Le dernier exemple démontre l'usage du modificateur C<'i'> qui permet une
+mise en correspondance indépendante de la casse (majuscule/minuscule).
+
+Les classes de caractères ont elles aussi leurs caractères normaux et spéciaux
+mais ce ne sont pas les mêmes qu'à l'extérieur d'une classe. Les caractères
+spéciaux sont C<-]\^$>. Pour les rendre normaux, il faut les préfixer par
+C<\>E<nbsp>:
+
+   /[\]c]def/; # correspond à ']def' ou 'cdef'
+   $x = 'clr';
+   /[$x]ame/;  # correspond à 'came, 'lame' ou 'rame'
+   /[\$x]ame/; # correspond à '$ame' or 'xame'
+   /[\\$x]ame/; # correspond à '\ame', 'came, 'lame' ou 'rame'
+
+Le caractère spécial C<'-'> agit à l'intérieur d'une classe comme un opérateur
+d'intervalle. Donc les classes peu maniables C<[0123456789]> et
+C<[abcde...xyz]> deviennent C<[0-9]> et C<[a-z]>E<nbsp>:
+
+    /item[0-9]/;   # reconnaît 'item0' ou 'item1' ... ou 'item9'
+    /[0-9a-fA-F]/; # reconnaît un chiffre hexadécimal
+
+Si C<'-'> est le premier ou le dernier caractère d'une classe de caractères,
+il est traité comme un caractère ordinaire.
+
+Le caractère C<^> est spécial en première position de la classe. Il indique
+alors une B<classe de caractères complémentaire> qui reconnaît tous les
+caractères sauf ceux présents entre les crochets. Qu'elle soit de la forme
+C<[...]> ou C<[^...]>, une classe de caractères doit correspondre à un
+caractère sinon la reconnaissance échoue. S<Donc :>
+
+    /[^a]at/;  # ne reconnaît ni 'aat' ni 'at', mais reconnaît
+               # 'bat', 'cat, '0at', '%at', etc.
+    /[^0-9]/;  # reconnaît un caractère non numérique
+    /[a^]at/;  # reconnaît 'aat' ou '^at'; dans ce cas '^' est ordinaire
+
+Perl propose plusieurs abréviations pour des classes de caractères S<courantes
+:>
+
+=over 4
+
+=item *
+
+\d est un chiffre et est équivalent à
+
+    [0-9]
+
+=item *
+
+\s est un blanc et est équivalent à
+
+    [\ \t\r\n\f]
+
+=item *
+
+\w est caractère I<mot> (alphanumérique ou _) et est équivalent à
+
+    [0-9a-zA-Z_]
+
+=item *
+
+\D est la négation de \d; il représente tout autre caractère qu'un chiffre
+
+    [^0-9]
+
+=item *
+
+\S est la négation de \s
+
+    [^\s]
+
+=item *
+
+\W est la négation de \w
+
+    [^\w]
+
+=item *
+
+Le point '.' reconnaît n'importe quel caractère sauf "\n".
+
+=back
+
+Les abréviations C<\d\s\w\D\S\W> peuvent être utilisées à l'extérieur ou à
+l'intérieur d'une classe de caractères. Quelques S<exemples :>
+
+    /\d\d:\d\d:\d\d/; # reconnaît une heure au format hh:mm:ss
+    /[\d\s]/;         # reconnaît un chiffre ou un blanc
+    /\w\W\w/;         # reconnaît un caractère mot suivi d'un caractère
+                      # non mot, suivi d'un caractère mot
+    /..rt/;           # reconnaît deux caractères quelconques suivis de 'rt'
+    /fin\./;          # reconnaît 'fin.'
+    /fin[.]/;         # idem, reconnaît 'fin.'
+
+L'ancre C<\b> est reconnue à la limite de S<mot :> entre un caractère mot et
+un caractère non mot (entre C<\w\W> ou entre C<\W\w>).
+
+    $x = "Housecat catenates house and cat";
+    $x =~ /\bcat/;  # reconnaît cat dans 'catenates'
+    $x =~ /cat\b/;  # reconnaît cat dans 'housecat'
+    $x =~ /\bcat\b/;  # reconnaît 'cat' en fin de chaîne
+
+Dans le dernier exemple, la fin de la chaîne est considérée comme une limite
+de mot.
+
+=head2 Reconnaître ceci ou cela
+
+Nous pouvons reconnaître différentes chaînes grâce au meta-caractère
+d'alternative C<|>. Pour reconnaître C<chien> ou C<chat>, nous pouvons
+utiliser la regex C<chien|chat>. Comme précédemment, perl essayera de
+reconnaître la regex le plus tôt possible dans la chaîne. À chaque position,
+perl essayera la première S<possibilité :> C<chien>. Si C<chien> ne correspond
+pas, perl essayera la possibilité S<suivante :> C<chat>. Si C<chat> ne
+convient pas non plus alors il n'y a pas correspondance et perl se déplace à
+la position suivante dans la chaîne. Quelques S<exemples :>
+
+    "chiens et chats" =~ /chien|chat|rat/;  # reconnaît "chien"
+    "chiens et chats" =~ /chat|chien|rat/;  # reconnaît "chien"
+
+Bien que C<chat> soit la première possibilité dans la seconde regex, C<chien>
+est reconnue plus tôt dans la chaîne.
+
+    "chat"          =~ /c|ch|cha|chat/; # reconnaît "c"
+    "chat"          =~ /chat|cha|ch|c/; # reconnaît "chat"
+
+En une position donnée, la possibilité qui est retenue est la première qui
+permet la reconnaissance de l'expression. Ici, toute les possibilités
+correspondent dès le premier caractère donc c'est la première qui est retenue.
+
+=head2 Groupement et hiérarchie
+
+Les meta-caractères de regroupement C<()> permettent de traiter une partie
+d'une regex comme une seule entité. Une partie d'une regex est groupée en
+l'entourant de parenthèses. L'expression C<para(pluie|chute)> peut reconnaître
+C<para> suivi soit de C<pluie> soit de C<chute>. D'autres S<exemples :>
+
+    /(a|b)b/;    # reconnaît 'ab' ou 'bb'
+    /(^a|b)c/;   # reconnaît 'ac' au début de la chaîne ou 'bc' n'importe où
+
+    /chat(on|)/;      # reconnaît 'chaton' ou 'chat'.
+    /chat(on(s|)|)/;  # reconnaît 'chatons' ou 'chaton' ou 'chat'.
+                      # Notez que les groupes peuvent être imbriqués
+
+    "20" =~ /(19|20|)\d\d/;  # reconnaît la possibilité vide '()\d\d',
+                             # puisque '20\d\d' ne peut pas correspondre
+
+=head2 Mémorisation de la correspondance
+
+Les meta-caractères de regroupement C<()> permettent aussi la mémorisation de
+la partie reconnue de la chaîne. Pour chaque groupe, la partie reconnue de la
+chaîne va dans une variable spéciale C<$1> ou C<$2>, etc. Elles peuvent être
+utilisées comme des variables S<ordinaires :>
+
+    # extraction des heures, minutes, secondes
+    $temps =~ /(\d\d):(\d\d):(\d\d)/;  # reconnaît le format hh:mm:ss
+    $heures = $1;
+    $minutes = $2;
+    $secondes = $3;
+
+Dans un contexte de liste, une mise en correspondance C</regex/> avec
+regroupement retourne la liste des valeurs C<($1, $2, ...)>. Nous pouvons donc
+S<écrire :>
+
+    ($heures, $minutes, $secondes) = ($temps =~ /(\d\d):(\d\d):(\d\d)/);
+
+Si les regroupements sont imbriqués, C<$1> sera le groupe ayant la parenthèse
+ouvrante la plus à gauche, C<$2> celui ayant la parenthèse ouvrante suivante,
+etc. Voici une expression rationnelle complexe avec les numéros des variables
+de groupes indiqués S<au-dessous :>
+
+    /(ab(cd|ef)((gi)|j))/;
+     1  2      34
+
+Les références arrières C<\1>, C<\2>... sont associées aux variables C<$1>,
+C<$2>... Les références arrières sont utilisées I<dans> l'expression
+rationnelle S<elle-même :>
+
+    /(\w\w\w)\s\1/; # trouve les séquences telles que 'les les' dans la chaîne
+
+C<$1>, C<$2>... ne devraient être utilisé qu'à l'extérieur de l'expression
+tandis que C<\1>, C<\2> ne devraient l'être qu'à l'intérieur.
+
+=head2 Répétitions et quantificateurs
+
+Les meta-caractères ou quantificateurs C<?>, C<*> et C<{}> nous permettent de
+fixer le nombre de répétitions d'une portion de regex. Un quantificateur est
+placé juste après le caractère, la classe de caractères ou le regroupement à
+répéter. Ils ont le sens S<suivant :>
+
+=over 4
+
+=item *
+
+C<a?> : reconnaît 'a' zéro ou une fois.
+
+=item *
+
+C<a*> : reconnaît 'a' zéro fois ou plus.
+
+=item *
+
+C<a+> : reconnaît 'a' au moins une fois.
+
+=item *
+
+C<a{n,m}> : reconnaît 'a' au moins C<n> fois, mais pas plus de C<m> fois.
+
+=item *
+
+C<a{n,}> : reconnaît 'a' au moins C<n> fois.
+
+=item *
+
+C<a{n}> : reconnaît 'a' exactement C<n> fois.
+
+=back
+
+Voici quelques S<exemples :>
+
+    /[a-z]+\s+\d*/;  # reconnaît un mot en minuscules suivi d'au moins un blanc
+                     # et éventuellement d'un certain nombre de chiffres
+    /(\w+)\s+\1/;    # reconnaît la répétition d'un mot de longueur quelconque
+    $annee =~ /\d{2,4}/; # s'assure que l'année contient au moins 2 chiffres et
+                         # pas plus de 4 chiffres
+    $annee =~ /\d{4}|\d{2}/; # meilleure reconnaissance; exclut le cas de 3 chiffres
+
+Ces quantificateurs essayent d'entrer en correspondance avec la chaîne la plus
+longue possible tout en permettant à la regex d'être reconnue (ils sont
+gourmands). S<Donc :>
+
+    $x = 'Ce chien est le mien';
+    $x =~ /^(.*)(ien)(.*)$/; # correspondance,
+                             # $1 = 'Ce chien est le m'
+                             # $2 = 'ien'
+                             # $3 = ''   (aucun caractère)
+
+Le premier quantificateur C<.*> consomme la chaîne la plus longue possible
+tout en laissant une possibilité de correspondance pour la regex globale. Le
+second quantificateur C<.*> n'a plus de caractère disponible donc il est
+reconnu zéro fois.
+
+=head2 Plus de correspondances
+
+Il y a encore quelques détails que vous devez connaître à propos des
+opérateurs de correspondance. Dans le code
+
+    $motif = 'Seuss';
+    while (<>) {
+        print if /$motif/;
+    }
+
+perl doit réévaluer C<$motif> à chaque passage dans la boucle. Si C<$motif>
+ne change jamais, utilisez le modificateur C<//o> pour n'effectuer qu'une
+seule fois l'interpolation. Si vous ne voulez aucune interpolation, utilisez
+les délimiteurs spéciaux C<m''>E<nbsp>:
+
+    @motif = ('Seuss');
+    m/@motif/; # reconnaît 'Seuss'
+    m'@motif'; # reconnaît la chaîne littérale '@motif'
+
+Le modificateur C<//g> demande à l'opérateur de mise en correspondance de
+s'appliquer à une chaîne autant de fois que possible. Dans un contexte
+scalaire, une recherche de correspondance assortie du modificateur C<//g>
+sautera de reconnaissance en reconnaissance en se souvenant à chaque fois de
+l'endroit où elle s'est arrêtée la fois précédente. Vous pouvez récupérer la
+position atteinte via la fonction C<pos()>. Par S<exemple :>
+
+    $x = "chien chat maison"; # 3 mots
+    while ($x =~ /(\w+)/g) {
+        print "le mot $1 se termine en ", pos $x, "\n";
+    }
+
+affiche
+
+  le mot chien se termine en 5
+  le mot chat se termine en 10
+  le mot maison se termine en 17
+
+L'échec de la reconnaissance ou la modification de la chaîne réinitialise la
+position. Si vous ne voulez pas de réinitialisation en cas d'échec, ajoutez le
+modificateur C<//c> comme dans C</regex/gc>.
+
+Dans un contexte de liste, C<//g> retournera la liste complète des groupes
+reconnus ou, si il n'y a pas de regroupement, la liste des sous-chaînes
+reconnues par la regex complète. S<Donc :>
+
+    @mots = ($x =~ /(\w+)/g);  # correspondance,
+                               # $mots[0] = 'chien'
+                               # $mots[1] = 'chat'
+                               # $mots[2] = 'maison'
+
+=head2 Recherche et remplacement
+
+On effectue une recherche et remplacement en utilisant
+C<s/regex/remplacement/modificateurs>. C<remplacement> est comme une chaîne
+Perl entre guillemets qui remplacera dans la chaîne la partie reconnue par la
+C<regex>. Là aussi, l'opérateur C<=~> permet de choisir à quelle chaîne sera
+appliquée C<s///>. Si C<s///> doit s'appliquer à C<$_>, il est possible
+d'omettre S<C<$_ =~>>.  S'il y a une correspondance, C<s///> retourne le
+nombre de remplacements effectués sinon il retourne faux. Voici quelques
+S<exemples :>
+
+    $x = "Time to feed the cat!";
+    $x =~ s/cat/hacker/;   # $x contient "Time to feed the hacker!"
+    $y = "'quoted words'";
+    $y =~ s/^'(.*)'$/$1/;  # supprime les apostrophes,
+                           # $y contient "quoted words"
+
+Lorsqu'on utilise l'opérateur C<s///>, les variables C<$1>, C<$2>, etc. sont
+directement utilisables dans l'expression de remplacement. Avec le
+modificateur C<s///g>, la recherche et remplacement auront lieu sur toutes les
+occurrences de l'expression S<rationnelle :>
+
+    $x = "I batted 4 for 4";
+    $x =~ s/4/four/;   # $x contient "I batted four for 4"
+    $x = "I batted 4 for 4";
+    $x =~ s/4/four/g;  # $x contient "I batted four for four"
+
+Le modificateur d'évaluation C<s///e> ajoute un C<eval{...}> autour de la
+chaîne de remplacement et c'est le résultat de cette évaluation qui sera
+substitué à la sous-chaîne reconnue. S<Quelques exemples :>
+
+    # inverser tous les mots d'une chaîne
+    $x = "the cat in the hat";
+    $x =~ s/(\w+)/reverse $1/ge;   # $x contient "eht tac ni eht tah"
+    
+    # convertir un pourcentage en fraction
+    $x = "A 39% hit rate";
+    $x =~ s!(\d+)%!$1/100!e;       # $x contient "A 0.39 hit rate"
+
+Le dernier exemple montre que C<s///> peut utiliser d'autres délimiteurs tels
+que C<s!!!> ou C<s{}{}>... ou même C<s{}//>. Si les délimiteurs sont des
+apostrophes C<s'''> alors l'expression rationnelle et la chaîne de
+remplacement sont considérées comme des chaînes entre apostrophes (pas
+d'interpolation des variables).
+
+=head2 L'opérateur de S<découpage :> split
+
+C<split /regex/, chaine> découpe C<chaine> en une liste de sous-chaînes et
+retourne cette liste. La regex détermine la séquence de caractères à utiliser
+comme séparateur lors du découpage de C<string>. Par exemple, pour découper
+une chaîne en mots, S<utilisez :>
+
+    $x = "Calvin and  Hobbes";
+    @mots = split /\s+/, $x;  # $mots[0] = 'Calvin'
+                              # $mots[1] = 'and'
+                              # $mots[2] = 'Hobbes'
+
+Pour extraire une liste de nombres séparés par des S<points-virgules :>
+
+    $x = "1,618;2,718;   3,142";
+    @const = split /;\s*/, $x;  # $const[0] = '1,618'
+                                # $const[1] = '2,718'
+                                # $const[2] = '3,142'
+
+Si vous utilisez l'expression rationnelle vide C<//>, la chaîne est découpée
+en ses caractères. Si l'expression rationnelle contient des regroupements
+alors la liste produite contiendra aussi les groupes S<reconnus :>
+
+    $x = "/usr/bin";
+    @parts = split m!(/)!, $x;  # $parts[0] = ''
+                                # $parts[1] = '/'
+                                # $parts[2] = 'usr'
+                                # $parts[3] = '/'
+                                # $parts[4] = 'bin'
+
+Puisque le premier caractère de $x est reconnu comme délimiteur, C<split>
+ajoute un élément vide au début de la liste.
+
+=head1 BUGS
+
+Aucun.
+
+=head1 VOIR AUSSI
+
+C'est un simple guide d'introduction. Pour un tutoriel plus complet voir
+L<perlretut> et pour une référence complète voir L<perlre>.
+
+=head1 AUTEUR ET COPYRIGHT
+
+Copyright (c) 2000 Mark Kvale
+All rights reserved.
+
+This document may be distributed under the same terms as Perl itself.
+
+Tous droits réservés.
+
+Ce document peut être distribuer sous les mêmes termes que Perl.
+
+=head2 Remerciements
+
+L'auteur tient à remercier Mark-Jason Dominus, Tom Christiansen, Ilya
+Zakharevich, Brad Hughes et Mike Giroux pour leurs commentaires précieux.
+
+=head1 TRADUCTION
+
+=head2 Version
+
+Cette traduction française correspond à la version anglaise distribuée avec
+perl 5.10.0.  Pour en savoir plus concernant ces traductions, consultez
+L<http://perl.enstimac.fr/>.
+
+=head2 Traducteur
+
+Paul Gaborit (Paul.Gaborit at enstimac.fr).
+
+=head2 Relecture
+
+Aucune pour l'instant.
+
+=cut

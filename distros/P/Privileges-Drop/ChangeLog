@@ -1,0 +1,12 @@
+Version 1.02 (Tue Sep 20 2011)
+ * Drop perl version check in Build.PL as this is cause problems.
+
+Version 1.01 (Wed May 6 2009)
+ * Fixed a bug in how GID was set.
+ * Thanks to Andreas Wundsam <andi@net.t-labs.tu-berlin.de> for providing code
+   example showing how to fix bug.
+ * Redid the compare method to handle Perl's varying returns from GID
+ * Thanks to Erik Wasser <erik.wasser@iquer.net> for reporting this bug. 
+
+Version 1.00 (Tue Sep 4 2007)
+ * First version released

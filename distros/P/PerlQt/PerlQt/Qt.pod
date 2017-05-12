@@ -1,0 +1,38 @@
+
+=head1 Qt
+
+Given the huge size of the Qt module
+(more than 400 classes and 13000 methods)
+it doesn't have any formal documentation.
+
+Instead, it provides two introspection tools
+
+=over 4
+
+=item * pqtapi: 
+
+a command line PerlQt API introspector
+
+=item * pqtsh:  
+
+a graphical PerlQt shell
+
+=back
+
+and a detailed B<tutorial> with comprehensive
+explanations. 
+This is where anyone new to PerlQt
+should start.
+
+The tutorial has been originally installed 
+on this system in C</usr/share/PerlQt-3>, in both B<POD> and
+B<HTML> format.
+
+For a complete IDE allowing RAD and visual programming, 
+check the pqt-designer package.
+
+--- The PerlQt team
+
+http://perlqt.sf.net - PerlQt Project Homepage
+
+=cut

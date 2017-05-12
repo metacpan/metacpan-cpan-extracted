@@ -1,0 +1,11 @@
+%semantic token 'a' 'b' 'c' 
+%tree
+
+%%
+
+S:
+      ( %name AS 'a' S ) 'b'
+    | 'c'  
+;
+
+%%

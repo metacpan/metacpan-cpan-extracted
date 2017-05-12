@@ -1,0 +1,12 @@
+# Test pipeline configuration file w/ abbreviated names
+---
+search-packages:
+  - Test
+pipeline:
+  # Test::Segment
+  - Segment
+  - TestSeg
+  - a sub pipe:
+      - another sub pipe:
+          - Segment
+      - Segment: { foo: "bar" }

@@ -1,0 +1,54 @@
+Revision history for Perl-Stripper
+
+0.09    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.08    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.07    2014-05-17 (SHARYANTO)
+
+        - No functional changes.
+
+        - Replace File::Slurp with File::Slurp::Tiny.
+
+
+0.06    2013-07-06 (SHARYANTO)
+
+        - No functional change. Second attempt (always forgets, must be after
+          'use Moo').
+
+
+0.05    2013-07-05 (SHARYANTO)
+
+        - No functional change. Add "use experimental 'smartmatch'" for 5.18+.
+
+
+0.04    2012-09-27 (SHARYANTO)
+
+        - Add test.
+
+        - Do not strip shebang line.
+
+
+0.03    2012-09-14 (SHARYANTO)
+
+        - No functional changes. Fix dist name.
+
+
+0.02    2012-09-14 (SHARYANTO)
+
+        - No functional changes. Add todo item and FAQ.
+
+
+0.01    2012-09-14 (SHARYANTO)
+
+        - First release. No tests yet.

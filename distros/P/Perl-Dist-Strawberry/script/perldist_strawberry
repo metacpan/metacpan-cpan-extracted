@@ -1,0 +1,153 @@
+#!perl
+
+use 5.012;
+use warnings;
+
+use Perl::Dist::Strawberry;
+
+my $app = Perl::Dist::Strawberry->new();
+$app->parse_options(@ARGV);
+$app->do_job or exit 1;
+
+__END__
+
+=head1 NAME
+
+perldist_strawberry - Build strawberry-perl-like distribution for MS Windows
+
+=head1 DESCRIPTION
+
+This script is used by Strawberry Perl [L<http://strawberryperl.com|http://strawberryperl.com>]
+project for building release packages (MSI, MSM, ZIP, portable/ZIP).
+
+=head1 SYNOPSIS
+
+To build strawberry-perl-like distribution you will need to prepare a build environment:
+
+=over
+
+=item * Install any version of Strawberry Perl 5.12.x (or higher)
+
+We recommend using portable edition. B<BEWARE> You'll need to install Strawberry Perl to a directory B<OTHER THAN> C:\strawberry.
+
+=item * Install Perl::Dist::Strawberry module
+
+Take this module either from CPAN or the latest version from 
+SVN [L<http://svn.ali.as/cpan/trunk/Perl-Dist-Strawberry/|http://svn.ali.as/cpan/trunk/Perl-Dist-Strawberry/>]
+
+=item * Install Windows Installer XML (WiX) toolset
+
+We recommend using version 3.8. Download WiX from [L<http://wix.sourceforge.net|http://wix.sourceforge.net>].
+No need to install WiX via MSI installer, you can only download/unpack ZIPped WiX binaries and use option C<-wixbin_dir=(dirname)>.
+
+=back
+
+The build process can be launched by:
+
+  c:\> perldist_strawberry -job "<dist_sharedir>/32bit-5.14.2.1.pp"
+  or
+  c:\> perldist_strawberry -job "<dist_sharedir>/64bit-5.14.2.1.pp"
+
+The whole build process uses only 2 directories:
+
+  c:\strawberry
+  c:\strawberry_build
+
+Check options C<-image_dir> and C<-working_dir> to change the defaults.
+
+The results of the build process (*.MSI, *.MSM, *.ZIP) can be found in:
+
+  c:\strawberry_build\output
+
+If you are about to try to build your own distribution you probably want to create a new
+job desription file (e.g. by cloning any of share/*.pp files distributed with this module).
+
+Then you will run:
+
+  c:\> perldist_strawberry -job c:\buildperl\myperl-32bit.pp
+
+When debugging your own build you should investigate some of the additional options e.g. C<-restorepoints>,
+C<-verbosity> etc.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-job=(filename)> [REQUIRED]
+
+filename sould contain build job description, you can use placeholder 'E<lt>dist_sharedirE<gt>' to choose
+predefined jobs which are distributed with this module (check 'share' folder in this module tarball)
+
+=item B<-image_dir=(dirname)>
+
+default: c:\strawberry (BEWARE: dir will be destroyed during build!!)
+
+=item B<-working_dir=(dirname)>
+
+default: c:\strawberry_build
+
+=item B<-wixbin_dir=(dirname)>
+
+default: autodetect WiX toolkit install directory
+
+=item B<-cpan_url=(url)>
+
+default: http://cpan.strawberryperl.com (or use local mirror e.g. file://C|/cpanmirror/)
+
+=item B<-package_url=(url)>
+
+default: http://strawberryperl.com/package/ (or use local mirror e.g. file://C|/pkgmirror/)
+
+=item B<-test_modules>, B<-notest_modules>
+
+flag - default: 1 (0 = skip tests when installing perl modules)
+
+=item B<-test_core>, B<-notest_core>
+
+flag - default: 0 (0 = skip tests when installing perl core)
+
+=item B<-verbosity=(level)>
+
+level - default: 3 (you can use values 1/silent to 5/verbose)
+
+=item B<-interactive>, B<-nointeractive>,
+
+flag - default: 1 (0 = no interactive questions)
+
+=item B<-restorepoints>, B<-norestorepoints>
+
+flag - default: 0 (1 = create restorepoint after each finished step, in the next run you will be offered to continue from any of the saved restorepoints)
+
+=item B<-perl_debug>
+
+flag - default: 0 (0 = no debug, 1 = standard debug, 2 = separated .debug files [EXPERIMENTAL], 3 = separated but only for perl.dll|exe [EXPERIMENTAL])
+
+=item B<-perl_64bitint>, B<-noperl_64bitint>
+
+flag - default: 0 (1 = build perl core with USE_64BIT_INT / ignored on 64bit)
+
+=item B<-perl_ldouble>, B<-noperl_ldouble>
+
+flag - default: 0 (1 = build perl core with USE_LONG_DOUBLE)
+
+=item B<-app_simplename=name>, B<-app_fullname=name>, B<-beta=N>, 
+
+override job parameters: app_simplename, app_fullname, beta
+
+=item B<-h>, B<-help>
+
+Show this usage info.
+
+=back
+
+=head1 AUTHOR
+
+2011+ KMX, E<lt>kmx@cpan.orgE<gt>
+
+2009-2011 Curtis Jewell, E<lt>csjewell@cpan.orgE<gt>
+
+2007-2009 Adam Kennedy, E<lt>adamk@cpan.orgE<gt>
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.

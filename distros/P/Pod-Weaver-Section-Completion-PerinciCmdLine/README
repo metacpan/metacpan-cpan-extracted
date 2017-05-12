@@ -1,0 +1,16 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [Completion::PerinciCmdLine]
+
+DESCRIPTION
+
+    This section plugin adds a COMPLETION section for
+    Perinci::CmdLine-based scripts. The section contains information on how
+    to activate shell tab completion for the scripts.
+
+SEE ALSO
+
+    Perinci::CmdLine
+

@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: WebKit
+Description: Web content engine for GTK+
+Version: 1.2.6
+Requires: glib-2.0 gtk+-2.0 libsoup-2.4
+Libs: -L${libdir} -lwebkit-1.0
+Cflags: -I${includedir}/webkit-1.0

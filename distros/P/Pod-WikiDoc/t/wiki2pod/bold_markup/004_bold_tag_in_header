@@ -1,0 +1,4 @@
+= this text should be *bold* here
+#--------------------------------------------------------------------------#
+=head1 this text should be B<bold> here
+

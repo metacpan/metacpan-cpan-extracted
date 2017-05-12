@@ -1,0 +1,8 @@
+#!/usr/bin/env perl
+
+use Pandoc::Filter;
+
+pandoc_filter Str => sub {
+    $_->content(uc($_->content));
+    return
+};

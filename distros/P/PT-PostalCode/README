@@ -1,0 +1,103 @@
+PT/PostalCode version 0.03
+==========================
+
+PT::PostalCode - Validates Portuguese postal codes
+
+=head1 SYNOPSIS
+
+  use PT::PostalCode;
+
+  validate($postalcode);
+
+  code_is_from_area($postalcode,$city);
+  code_is_from_subarea($postalcode,$district);
+
+  code_is_from($postalcode,$district,$city);
+
+  range_from_subarea($district);
+
+  code_is_valid($code);
+  areas_of_code($code);
+  subareas_of_code($code);
+
+=head1 METHODS
+
+=head2 code_is_from_area
+
+Given a postal code and an area, returns true if that code exists in that area.
+
+=head2 code_is_from_subarea
+
+Given a postal code and a subarea, returns true if that code exists in that
+subarea.
+
+=head2 code_is_from
+
+Given a code, a subarea and an area, returns true if that code exists in that
+subarea of that area.
+
+=head2 range_from_subarea
+
+Given a subarea, returns a list with the ranges (minimum and maximum
+values) of codes that subarea comprises. The return value is something
+like [ (4900, 4935) ].
+
+=head2 code_is_valid
+
+Given a code, returns true if that code is valid.
+
+=head2 areas_of_code
+
+Given a code, returns a list of areas where that code is allowed.
+
+=head2 subareas_of_code
+
+Given a code, returns a list of subareas allowing that code.
+
+=head1 DESCRIPTION
+
+Validates Portuguese Postal Codes (that's the four digit code; in
+order to validate the seven digit codes of the form xxxx-xxx we would
+need a huge list of codes that would probably change every day).
+
+=head1 PORTUGUESE POSTAL CODES
+
+Regarding postal codes, Portugal is divided into areas and then into
+subareas. This division does not correspond to the most expected one
+(districts and then cities); instead, it was apparently made in a
+way it would be easier to redirect mail.
+
+Postal codes in Portugal do not seem to follow any particular rule
+(but there was probably one in the beginning). There is no easy way of
+saying where a given code belongs to.
+
+Each subarea has a minimum and a maximum code. This means it only
+allows for codes within that range. HOWEVER:
+
+1) The existance of a range within a subarea does not imply the
+existance of every single code in it.
+
+2) The existance of a code within a subarea does not mean the code
+does not exist in another area too.
+
+THIS MEANS:
+
+1) You can check if a code belongs to a certain area/subarea, but that
+does not mean it doesn't also belong to other(s) area(s)/subarea(s).
+
+2) Even if a code is within the range of a certain subarea, that does
+not mean it is an existing code (that would need a huge list of codes,
+which is always subject to alterations).
+
+=head1 AUTHOR
+
+Jose Castro, C<< <cog@cpan.org> >>
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2004 Jose Castro, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

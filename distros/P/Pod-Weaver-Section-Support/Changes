@@ -1,0 +1,85 @@
+Revision history for Pod::Weaver::Section::Support
+
+1.007 2014-11-04T22:34:49Z UTC
+ - Fix the Kwalitee link so it doesn't 404 anymore
+ - Tweaked how we parsed the x_IRC metadata
+
+ [STATISTICS]
+ - code churn: 3 files changed, 392 insertions(+), 17 deletions(-)
+
+1.006 2014-10-26T05:12:19Z UTC
+ - Documentation tweaks
+ - Resolve RT#78450 - retrieve IRC information from the dzil metadata if
+   possible ( thanks BBYRD! )
+
+1.005 2012-01-03T00:48:32Z UTC
+ - Add the MetaCPAN website to the website list ( thanks RWSTAUNER! )
+ - Tweak the logging system a bit ( thanks KENTNL! )
+ - Fix some internal spelling mistakes ( thanks RWSTAUNER! )
+ - Resolve RT#69033 - logging tweaks ( thanks RJBS! )
+
+1.004 2011-04-21T21:48:17Z UTC
+ - Tweaked the output of the websites so it also includes a descriptive
+   text of the link
+ - Add the deps.cpantesters.org website ( deps ) to the website list
+
+1.003 2011-02-24T17:03:11Z UTC
+ - Made sure the bugs_content and the metadata match up, otherwise it will
+   throw an error! ( thanks XENO! )
+ - Changed the *_content attributes to arrayrefs so you can sanely use them
+   in a weaver.ini ( thanks XENO! )
+ - The email attribute didn't add C<> to the address if you specified your
+   own ( thanks XENO! )
+
+1.002 2011-02-02T22:55:07Z UTC
+ - Fix a few typos in the POD
+ - Add email section to contact the author
+ - Make the perldoc section a proper header
+ - Tweaked the wording of the bugs section ( thanks DAGOLDEN! )
+ - Add attribute to specify the bugs content ( thanks DAGOLDEN! )
+ - Add attribute to specify the website content
+
+1.001 2010-12-08T07:35:41Z UTC
+ - Add attributes to control the repository section ( thanks RWSTAUNER! )
+ - Reorganized the layout of the generated POD
+ - Add attribute to control the website links ( thanks GETTY! )
+ - Add attributes for new irc section ( thanks GETTY! )
+ - Add attribute to control the bugs section ( thanks GETTY! )
+ - Add attribute to enable/disable perldoc section ( thanks GETTY! )
+ - Add attribute to enable/disable SUPPORT section for all modules ( thanks
+   GETTY! )
+
+1.000 2010-05-30T18:03:49Z UTC
+ - Work with CPAN Meta v2 by recognizing the repository
+ - Make the repository hunk of POD optional
+
+0.010 2010-05-28T17:41:54Z UTC
+ - fixed the way the stopwords were added to the POD
+
+0.009 2010-05-13T01:41:59Z UTC
+ - another fake release
+
+0.008 2010-05-12T04:50:01Z UTC
+ - fake release
+
+0.007 2010-05-11T21:12:28Z UTC
+ - fake release
+
+0.006 2010-05-11T17:05:55Z UTC
+ - Tweaked the POD a little, and make another release...
+
+0.005 2010-05-11T06:26:29Z UTC
+ - real CPAN release, ha!
+
+0.004 2010-05-11T06:25:00Z UTC
+ - add example weaver.ini
+
+0.003 2010-05-11T06:16:15Z UTC
+ - yet another test release
+
+0.002 2010-05-11T06:13:52Z UTC
+ - test release
+
+0.001 2010-05-11T03:29:40Z UTC
+ - initial release
+

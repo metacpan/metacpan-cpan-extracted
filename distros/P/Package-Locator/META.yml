@@ -1,0 +1,53 @@
+---
+abstract: 'Find a package among CPAN-like repositories'
+author:
+  - 'Jeffrey Ryan Thalhammer <jeff@imaginative-software.com>'
+build_requires:
+  File::Find: 0
+  FindBin: 0
+  Module::Build: 0.3601
+  Test::Exception: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Package-Locator
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+provides:
+  Package::Locator:
+    file: lib/Package/Locator.pm
+    version: 0.010
+  Package::Locator::Index:
+    file: lib/Package/Locator/Index.pm
+    version: 0.010
+requires:
+  CPAN::DistnameInfo: 0
+  Carp: 0
+  File::Temp: 0
+  IO::Zlib: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  MooseX::MarkAsMethods: 0
+  MooseX::Types::Path::Class: 0
+  MooseX::Types::URI: 0
+  Path::Class: 0
+  URI: 0
+  URI::Escape: 0
+  perl: 5.006
+  version: 0
+resources:
+  bugtracker: https://github.com/thaljef/Package-Locator/issues
+  repository: git://github.com/thaljef/Package-Locator.git
+version: 0.010

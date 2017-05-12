@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+PDFLib.pm
+t/00basic.t
+t/01empty.t
+t/02text.t
+t/03image.t
+t/04font.t
+t/05graphics.t
+t/06bounding.t
+img/axkit.png
+

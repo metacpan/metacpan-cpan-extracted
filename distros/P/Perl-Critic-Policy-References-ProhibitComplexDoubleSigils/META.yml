@@ -1,0 +1,24 @@
+---
+abstract: 'allow C<$$foo>'
+author:
+  - 'Tomasz Konojacki <me@xenu.tk>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-References-ProhibitComplexDoubleSigils
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Perl::Critic: '0'
+resources:
+  repository: http://code.xenu.tk/repos.cgi/prohibit-complex-double-sigils
+version: '0.2'

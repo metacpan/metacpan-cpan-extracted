@@ -1,0 +1,126 @@
+
+=head1 NAME
+
+Pod2VMSHlp - pod to VMS Help and DSR format converters
+
+=head1 INSTALLATION
+
+Follow the usual 4 line mantra after building and 
+installing perl, that is:
+
+    perl Makefile.PL
+    mms
+    mms test
+    mms install
+
+For older perl installations you should install 
+Pod::Parser before attempting to install Pod2VMSHlp 
+(or else the Pod::Dsr stuff will not work).  Note 
+that for Perl 5.6.0 and later Pod::Parser is included 
+with a Perl installation.
+
+Older versions of MM_VMS (a part of MakeMaker) may result
+in errors that look like:
+
+ Can't open output file [.blib.man1]pod2rno.com.rno as stdout
+ %RMS-F-SYN, file specification syntax error
+
+during the initial build (MMS or MMK) step.  It is safe to 
+ignore that problem which will be fixed in later perl versions.
+
+By the way, this is a simple (i.e. non XS based) module 
+that can still be installed "by hand" if you have neither 
+MMS (from DECSet) nor MMK (free from MadGoat) installed.
+Just be sure to copy the [.pod]*.pm files into your PERL_ROOT:
+
+   $ copy [.Pod]Hlp.pm perl_root:[lib.pod]Hlp.pm
+   $ copy [.Pod]Dsr.pm perl_root:[lib.pod]Dsr.pm
+
+You might also want to COPY pod2hlp. and pod2rno.com into:
+
+   $ copy pod2hlp. perl_root:[lib.pod]
+   $ perl pod2rno.PL
+   $ copy pod2rno.com perl_root:[lib.pod]
+
+And run the pod2hlp. script from there (more information is 
+in the L<SAMPLE SCRIPTS> section below).  Please note that for
+Pod::Dsr and pod2rno to work you must have Pod::Parser installed
+(a separate module available from CPAN that ships with Perl 5.6.0
+and later versions of Perl).
+
+=head1 DOCUMENTATION
+
+Is available in pod in the Pod::*.pm packages.  Type:
+
+    perldoc Pod::Hlp 
+    perldoc Pod::Dsr
+
+for more, or convert them to .HLP, stick them in a .HLB and
+type HELP POD HLP or HELP POD DSR for more information.
+
+=head1 SAMPLE SCRIPTS
+
+Included with the Pod2VMSHlp package are two scripts that 
+will help you to turn files containing pod into VMS HLP 
+files and/or HLB libraries, and one that converts pod to 
+Digital Standard Runoff:
+
+=over 4
+
+=item * pod2hlp
+
+Usage is: C<perl pod2hlp. filename.pod n> where C<n> is the level
+that you want filename.hlp to be, e.g. the default is:
+
+     filename.pod           1 filename
+     =head1 Foo             2 Foo
+     =head2 Bar             3 Bar
+
+but this could be overridden with:
+
+     perl pod2hlp. filename.pod 3
+
+to obtain:
+
+     filename.pod           3 filename
+     =head1 Foo             4 Foo
+     =head2 Bar             5 Bar
+
+Warning: The help librarian has strict requirements on the
+order of section headings.  Hence pod2hlp may map some 
+C<=head1> and C<=head2>'s differently depending on whether 
+they are (or follow) frequently seen headers like "NAME", 
+"AUTHOR", I<etc>.
+
+=item * pod2hlb
+
+Usage is: C<perl pod2hlb.> this will take all the F<perl*.pod> files
+in F<perl_root:[lib.pod]> and turn them into F<perl*.hlp> files (at help
+levels 1,2,3) and create a new help library F<PERL.HLB> all in the DEFAULT
+directory.  This script uses DCLs LIBRARY/HELP librarian.
+
+=item * pod2rno[.com]
+
+Usage is: C<perl pod2rno.com filename.pod [E<gt> filename.rno]>.  Note 
+that unlike pod2hlp pod2rno will send output to STDOUT by default
+and you may optionally redirect that to a file of your choice.  Further
+information on what to do with .rno file types in documented in L<pod2rno>.
+
+=back
+
+=head1 AUTHOR
+
+Copyright (c) 1999-2001 by Peter Prymmer pvhp@best.com.  
+This package may be distributed under the same terms as perl.
+Pod::Hlp borrows quite heavily from Tom Christiansen's 
+Pod::Text.pm module.  Pod::Dsr requires the presence of Russ Allbery's 
+Pod::Parser.pm module and it is patterned after his Pod::Man.pm module.
+The regression tests were borrowed from Nick Ing-Simmons' PodToHTML 
+module from CPAN. 
+
+2001-??-?? ??:??:??.?? - released as Pod2VMSHlp 1.02 w/ Pod::Dsr & pod2rno.
+1999-04-30 16:14:59.87 - released as Pod2VMSHlp 1.01.
+1996-08-20 15:17:29.85 - released as Pod2Hlp 1.00.
+
+=cut
+

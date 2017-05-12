@@ -1,0 +1,53 @@
+This is the change history of POE::XS::Loop::Poll.
+
+1.00 Sun Mar  7 12:51:48 EST 2010
+
+ - eliminate trailing newlines from trace messages to avoid PID spam
+   in the trace
+
+ - use the Time::HiRes NVTime entry if available instead of calling
+   gettimeofday().
+
+ - methods check the loop has been initialized, since some loading
+   mechanisms load two loops and initialize only one.
+   https://rt.cpan.org/Ticket/Display.html?id=55064
+
+0.007 Mon Feb  2 11:43:46 EST 2009
+ - add t/poe_xs_loop_poll/*.t to the list of files deleted by make clean
+ - set the new POE_LOOP_USES_POLL from POE::Test::Loops 1.003 to skip
+   tests with ptys on OS X (darwin).
+ - remove "requires" for POE::Loop::Tests, it's only needed during
+   configure and test
+ - bump to 0.007 for release
+
+0.006 Sun Jul 20 09:13:44 EST 2008
+ - expected poll failures no longer result in a warning.  RT #37507
+ - unexpected poll failures now result in a call to 
+   POE::Kernel::_trap() just as they do for the built-in loops.
+   RT #37507
+ - bump to 0.006
+
+0.005 Tue Jul  8 10:26:07 EST 2008
+ - add a typemap entry for PerlIO for older perls
+ - bump to 0.005
+
+0.004 Mon Jul  7 11:08:24 EST 2008
+ - depend on POE::Test::Loops 1.002 for new tests
+ - fix handling of error events
+ - fix tracing of poll() results
+ - remove some old non-"standard" tracing
+ - bump for release
+
+0.003 Thu Jul  3 11:07:39 EST 2008
+ - depend on POE::Test::Loops 1.001 and use the new generate() function
+   instead of running poe-gen-tests.
+ - bump for release
+
+0.002 Wed Jul  2 14:13:06 EST 2008
+ - fix {configure,build}_requires to POE::Test::Loops instead of
+   POE::Test::Loop.  Since many of the CPAN testers are still broken
+   wrt configure_requires I'll still get failures, but they'll be 
+   someone elses fault.
+
+0.001 Fri Jun 27 16:57:49 EST 2008
+ - initial release

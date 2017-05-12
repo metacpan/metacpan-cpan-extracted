@@ -1,0 +1,50 @@
+Changes for Padre-Plugin-YAML
+
+0.10 2013-10-10
+ - Add MYMETA to MANIFEST.SKIP, Take two (BOWTIE)
+
+0.09 2013-10-09
+ - Add MYMETA to MANIFEST.SKIP (BOWTIE)
+
+0.08 2013-05-12
+ - Tweak for perl-5.17.11 compatibility (BOWTIE)
+ - update changes to changes-spec (BOWTIE)
+
+0.07 2012-05-13
+ - add missing test_requires
+ - remove unwanted file (BOWTIE)
+
+0.06 2012-04-30
+ - add plugin_enable backin as we are at Padre 0.96
+ - move eol.t to xt
+ - remove eval for Try-Tiny 
+ - catch another error message (BOWTIE)
+
+0.05 2012-03-21
+ - Use old 0.03 error decode for YAML under win32 (BOWTIE)
+ - Fix 'make test' failure under RELEASE_TESTING=1 and win32 (AZAWAWI)
+ - Fix Arabic translation (AZAWAWI)
+
+0.04 2012-03-20
+ - Remove DEPENDENCIES POD (BOWTIE)
+ - Switch to YAML::XS for better feedback (BOWTIE)
+ - Enable logging in syntax for unknowns (BOWTIE)
+ - Let us make it a bit more modern (BOWTIE)
+ - Require correct YAML in Makefile (AZAWAWI)
+ - Fix t/02-eol.t (AZAWAWI)
+
+0.03 2012-03-13
+ - Update pod & version (BOWTIE)
+ - Fix Makefile (AZAWAWI)
+
+0.02 2011-03-12
+ - Switch to Module::Install (SZABGAB)
+ - Update to Plugin API 2.0 (BOWTIE)
+ - Add background YAML syntax checking (BOWTIE, AZAWAWI)
+ - Removed "Check YAML" option (AZAWAWI)
+
+0.01 2011-06-24
+ - First version, released on an unsuspecting world.
+ - Only feature: toggle comments
+
+

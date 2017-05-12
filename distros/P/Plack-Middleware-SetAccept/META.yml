@@ -1,0 +1,31 @@
+---
+abstract: 'Sets the Accept header based on the suffix or query params of a request'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  Data::Dumper: 0
+  HTTP::Request::Common: 0
+  Module::Build: 0.3601
+  Test::Exception: 0
+  Test::More: 0
+  Test::XML: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-SetAccept
+requires:
+  List::MoreUtils: 0
+  Plack: 0
+  URI: 0
+  parent: 0
+  perl: 5.8.9
+resources:
+  bugtracker: http://github.com/hoelzro/plack-middleware-setaccept/issues
+  homepage: http://github.com/hoelzro/plack-middleware-setaccept
+  repository: http://github.com/hoelzro/plack-middleware-setaccept
+version: 0.01

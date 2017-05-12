@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name: Physics-Springs
+version: 1.01
+author:
+  - |-
+    Steffen Mueller <springs-module at steffen-mueller dot net>
+abstract: Simulate Particle Dynamics with Springs
+license: perl
+requires:
+  Data::Dumper: 0
+  Physics::Particles: 1.00
+  Sub::Assert: 0
+  perl: 5.006
+recommends:
+  Test::Pod: 1.0
+  Test::Pod::Coverage: 1.0
+build_requires:
+  Test::More: 0
+conflicts:
+  Physics::Particles: '<1.0'
+  Physics::Springs::Friction: '<1.0'
+provides:
+  Physics::Springs:
+    file: lib/Physics/Springs.pm
+    version: 1.01
+generated_by: Module::Build version 0.2608

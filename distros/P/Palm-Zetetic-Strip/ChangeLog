@@ -1,0 +1,360 @@
+2006-05-16 23:48  Dave Dribin <ddribin@cpan.org>
+
+	* .cvsignore, MANIFEST, tools/users:
+
+	Documentation updates
+
+2006-05-16 23:47  Dave Dribin <ddribin@cpan.org>
+
+	* lib/Palm/Zetetic/Strip.pm, lib/Palm/Zetetic/Strip/Account.pm,
+	lib/Palm/Zetetic/Strip/CryptV05i.pm,
+	lib/Palm/Zetetic/Strip/CryptV10.pm,
+	lib/Palm/Zetetic/Strip/System.pm, lib/Palm/Zetetic/Strip/Util.pm,
+	lib/Palm/Zetetic/Strip/Version.pm,
+	lib/Palm/Zetetic/Strip/PDB/AccountsV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/AccountsV10.pm,
+	lib/Palm/Zetetic/Strip/PDB/ParserFactory.pm,
+	lib/Palm/Zetetic/Strip/PDB/PasswordV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/PasswordV10.pm,
+	lib/Palm/Zetetic/Strip/PDB/SystemsV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/SystemsV10.pm, tools/set_version.sh:
+
+	Update version to 1.02
+
+2002-09-06 15:53  Dave Dribin <ddribin@cpan.org>
+
+	* README:
+
+	Use CPAN email address
+
+2002-09-06 15:52  Dave Dribin <ddribin@cpan.org>
+
+	* Changes:
+
+	Added 1.01 changes
+
+2002-09-06 15:29  Dave Dribin <ddribin@cpan.org>
+
+	* lib/Palm/Zetetic/Strip.pm, lib/Palm/Zetetic/Strip/Account.pm,
+	lib/Palm/Zetetic/Strip/CryptV05i.pm,
+	lib/Palm/Zetetic/Strip/CryptV10.pm,
+	lib/Palm/Zetetic/Strip/System.pm, lib/Palm/Zetetic/Strip/Util.pm,
+	lib/Palm/Zetetic/Strip/Version.pm,
+	lib/Palm/Zetetic/Strip/PDB/AccountsV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/AccountsV10.pm,
+	lib/Palm/Zetetic/Strip/PDB/ParserFactory.pm,
+	lib/Palm/Zetetic/Strip/PDB/PasswordV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/PasswordV10.pm,
+	lib/Palm/Zetetic/Strip/PDB/SystemsV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/SystemsV10.pm, tools/set_version.sh:
+
+	Bump version number
+
+2002-09-06 15:29  Dave Dribin <ddribin@cpan.org>
+
+	* tools/gen-rpm.sh:
+
+	Add cpan2rpm script
+
+2002-09-06 15:29  Dave Dribin <ddribin@cpan.org>
+
+	* Makefile.PL:
+
+	Add AUTHOR and RPM make target
+
+2002-09-06 15:25  Dave Dribin <ddribin@cpan.org>
+
+	* MANIFEST.SKIP:
+
+	Skip signature files
+
+2001-07-12 22:02  Dave Dribin <ddribin@cpan.org>
+
+	* lib/Palm/Zetetic/Strip.pm:
+
+	Fixed type in SYNOPOSIS documentation.
+
+2001-07-11 12:54  Dave Dribin <ddribin@cpan.org>
+
+	* .cvsignore:
+
+	Ignore dist file
+
+2001-07-11 12:52  Dave Dribin <ddribin@cpan.org>
+
+	* lib/Palm/Zetetic/Strip.pm, scripts/strip.pl, t/StripCommon.ph:
+
+	Returned arrays rather than array refs.
+
+2001-07-11 05:20  Dave Dribin <ddribin@cpan.org>
+
+	* Changes:
+
+	Reworded
+
+2001-07-11 04:47  Dave Dribin <ddribin@cpan.org>
+
+	* MANIFEST.SKIP:
+
+	Removed duplicate pm_to_blib
+
+2001-07-11 03:53  Dave Dribin <ddribin@cpan.org>
+
+	* Makefile.PL:
+
+	Clean dist files on realclean
+
+2001-07-11 03:53  Dave Dribin <ddribin@cpan.org>
+
+	* MANIFEST, MANIFEST.SKIP:
+
+	Don't include MANIFEST.SKIP
+
+2001-07-11 03:52  Dave Dribin <ddribin@cpan.org>
+
+	* README:
+
+	Fixed types
+
+2001-07-11 01:48  Dave Dribin <ddribin@cpan.org>
+
+	* tools/run-cvs2cl.sh:
+
+	Use --separate-header
+
+2001-07-11 01:46  Dave Dribin <ddribin@cpan.org>
+
+	* tools/: run-cvs2cl.sh, set_version.sh, users:
+
+	Added tools directory
+
+2001-07-11 01:45  Dave Dribin <ddribin@cpan.org>
+
+	* Changes, MANIFEST, MANIFEST.SKIP, Makefile.PL,
+	lib/Palm/Zetetic/Strip.pm, lib/Palm/Zetetic/Strip/Account.pm,
+	lib/Palm/Zetetic/Strip/CryptV05i.pm,
+	lib/Palm/Zetetic/Strip/CryptV10.pm,
+	lib/Palm/Zetetic/Strip/System.pm, lib/Palm/Zetetic/Strip/Util.pm,
+	lib/Palm/Zetetic/Strip/Version.pm,
+	lib/Palm/Zetetic/Strip/PDB/AccountsV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/AccountsV10.pm,
+	lib/Palm/Zetetic/Strip/PDB/ParserFactory.pm,
+	lib/Palm/Zetetic/Strip/PDB/PasswordV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/PasswordV10.pm,
+	lib/Palm/Zetetic/Strip/PDB/SystemsV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/SystemsV10.pm:
+
+	Bumped to 1.00
+
+2001-07-11 01:44  Dave Dribin <ddribin@cpan.org>
+
+	* set_version.sh, users:
+
+	Moved to tools directory
+
+2001-07-11 01:25  Dave Dribin <ddribin@cpan.org>
+
+	* MANIFEST, Makefile.PL, README, lib/Palm/Zetetic/Strip.pm,
+	lib/Palm/Zetetic/Strip/Account.pm,
+	lib/Palm/Zetetic/Strip/System.pm:
+
+	Added a ton of documentation.
+
+2001-07-11 00:55  Dave Dribin <ddribin@cpan.org>
+
+	* scripts/strip.pl:
+
+	Renamed from strip_dump
+
+2001-07-11 00:55  Dave Dribin <ddribin@cpan.org>
+
+	* scripts/strip_dump:
+
+	Renamed to strip.pl
+
+2001-07-10 23:39  Dave Dribin <ddribin@cpan.org>
+
+	* .cvsignore, Makefile.PL, lib/Palm/Zetetic/Strip.pm,
+	lib/Palm/Zetetic/Strip/Util.pm,
+	lib/Palm/Zetetic/Strip/PDB/ParserFactory.pm, t/StripV05i.t,
+	t/StripV10.t:
+
+	Added dynamic loading of modules.
+
+2001-07-04 12:21  uid41175
+
+	* set_version.sh, lib/Palm/Zetetic/Strip.pm,
+	lib/Palm/Zetetic/Strip/Account.pm,
+	lib/Palm/Zetetic/Strip/CryptV05i.pm,
+	lib/Palm/Zetetic/Strip/CryptV10.pm,
+	lib/Palm/Zetetic/Strip/System.pm, lib/Palm/Zetetic/Strip/Util.pm,
+	lib/Palm/Zetetic/Strip/Version.pm,
+	lib/Palm/Zetetic/Strip/PDB/AccountsV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/AccountsV10.pm,
+	lib/Palm/Zetetic/Strip/PDB/ParserFactory.pm,
+	lib/Palm/Zetetic/Strip/PDB/PasswordV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/PasswordV10.pm,
+	lib/Palm/Zetetic/Strip/PDB/SystemsV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/SystemsV10.pm, scripts/strip_dump:
+
+	In the test script, print password to stderr.
+
+2001-06-14 21:44  Dave Dribin <ddribin@cpan.org>
+
+	* MANIFEST:
+
+	Added Changes and users
+
+2001-06-14 21:31  Dave Dribin <ddribin@cpan.org>
+
+	* users:
+
+	Added user map file for cvs2cl.pl
+
+2001-06-14 21:28  Dave Dribin <ddribin@cpan.org>
+
+	* Changes:
+
+	Added more descriptive changes.
+
+2001-06-14 21:20  Dave Dribin <ddribin@cpan.org>
+
+	* Changes:
+
+	Added version 0.80
+
+2001-06-14 21:11  Dave Dribin <ddribin@cpan.org>
+
+	* README:
+
+	Added
+
+2001-06-14 21:10  Dave Dribin <ddribin@cpan.org>
+
+	* lib/Palm/Zetetic/Strip/Crypt.pm:
+
+	Replaced with 1.0 and 0.5i versions
+
+2001-06-14 21:10  Dave Dribin <ddribin@cpan.org>
+
+	* Makefile.PL:
+
+	Rearranged prequisites
+
+2001-06-14 21:09  Dave Dribin <ddribin@cpan.org>
+
+	* MANIFEST.SKIP:
+
+	Added pm_to_blib
+
+2001-06-14 21:09  Dave Dribin <ddribin@cpan.org>
+
+	* MANIFEST:
+
+	Added README
+
+2001-06-14 21:01  Dave Dribin <ddribin@cpan.org>
+
+	* scripts/strip_dump:
+
+	Prompt for password instead of reading from ARGV.
+
+2001-06-14 16:40  Dave Dribin <ddribin@cpan.org>
+
+	* MANIFEST, Makefile.PL, set_version.sh, lib/Palm/Zetetic/Strip.pm,
+	lib/Palm/Zetetic/Strip/Account.pm,
+	lib/Palm/Zetetic/Strip/CryptV05i.pm,
+	lib/Palm/Zetetic/Strip/CryptV10.pm, lib/Palm/Zetetic/Strip/Util.pm,
+	lib/Palm/Zetetic/Strip/Version.pm,
+	lib/Palm/Zetetic/Strip/PDB/Accounts.pm,
+	lib/Palm/Zetetic/Strip/PDB/AccountsV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/AccountsV10.pm,
+	lib/Palm/Zetetic/Strip/PDB/ParserFactory.pm,
+	lib/Palm/Zetetic/Strip/PDB/Password.pm,
+	lib/Palm/Zetetic/Strip/PDB/PasswordV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/PasswordV10.pm,
+	lib/Palm/Zetetic/Strip/PDB/Systems.pm,
+	lib/Palm/Zetetic/Strip/PDB/SystemsV05i.pm,
+	lib/Palm/Zetetic/Strip/PDB/SystemsV10.pm, scripts/strip_dump,
+	t/Strip.t, t/StripCommon.ph, t/StripV05i.t, t/StripV10.t,
+	t/Version.t, t/data/StripAccounts-SJLO.pdb,
+	t/data/StripPassword-SJLO.pdb, t/data/StripSystems-SJLO.pdb,
+	t/data/v0.5i/StripAccounts-SJLO.pdb,
+	t/data/v0.5i/StripPassword-SJLO.pdb,
+	t/data/v0.5i/StripSystems-SJLO.pdb,
+	t/data/v1.0/StripAccounts-SJLO.pdb,
+	t/data/v1.0/StripPassword-SJLO.pdb,
+	t/data/v1.0/StripSystems-SJLO.pdb:
+
+	Added Strip v1.0 (AES) support.
+
+2001-06-14 12:23  Dave Dribin <ddribin@cpan.org>
+
+	* MANIFEST, lib/Palm/Zetetic/Strip.pm,
+	lib/Palm/Zetetic/Strip/Account.pm, lib/Palm/Zetetic/Strip/Crypt.pm,
+	lib/Palm/Zetetic/Strip/System.pm,
+	lib/Palm/Zetetic/Strip/PDB/Accounts.pm,
+	lib/Palm/Zetetic/Strip/PDB/ParserFactory.pm,
+	lib/Palm/Zetetic/Strip/PDB/Password.pm,
+	lib/Palm/Zetetic/Strip/PDB/Systems.pm, t/Strip.t,
+	t/data/install.sh:
+
+	Added parser factory
+
+2001-06-12 11:23  Dave Dribin <ddribin@cpan.org>
+
+	* MANIFEST, Makefile.PL:
+
+	Fixes for directory moves
+
+2001-06-12 00:34  Dave Dribin <ddribin@cpan.org>
+
+	* lib/Palm/Zetetic/Strip/PDB/Password.pm:
+
+	Removed hexdump
+
+2001-06-11 22:32  Dave Dribin <ddribin@cpan.org>
+
+	* t/Strip.t:
+
+	Removed use 'lib'
+
+2001-06-11 22:32  Dave Dribin <ddribin@cpan.org>
+
+	* Makefile.PL:
+
+	Changed name
+
+2001-06-11 22:13  Dave Dribin <ddribin@cpan.org>
+
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, lib/Palm/Zetetic/Strip.pm,
+	lib/Palm/Zetetic/Strip/Account.pm, lib/Palm/Zetetic/Strip/Crypt.pm,
+	lib/Palm/Zetetic/Strip/System.pm,
+	lib/Palm/Zetetic/Strip/PDB/Accounts.pm,
+	lib/Palm/Zetetic/Strip/PDB/Password.pm,
+	lib/Palm/Zetetic/Strip/PDB/Systems.pm, t/Strip.t:
+
+	Moved to lib/ directory for friggin' MakeMaker
+
+2001-06-11 21:16  Dave Dribin <ddribin@cpan.org>
+
+	* MANIFEST, MANIFEST.SKIP, Makefile.PL, t/Strip.t:
+
+	Added addition checking and updated MANIFEST.
+
+2001-06-11 20:56  Dave Dribin <ddribin@cpan.org>
+
+	* MANIFEST, Makefile.PL, scripts/strip_dump, t/Strip.t,
+	t/data/StripAccounts-SJLO.pdb, t/data/StripPassword-SJLO.pdb,
+	t/data/StripSystems-SJLO.pdb, t/data/retrieve.sh:
+
+	Imported
+
+2001-06-11 20:56  Dave Dribin <ddribin@cpan.org>
+
+	* MANIFEST, Makefile.PL, scripts/strip_dump, t/Strip.t,
+	t/data/StripAccounts-SJLO.pdb, t/data/StripPassword-SJLO.pdb,
+	t/data/StripSystems-SJLO.pdb, t/data/retrieve.sh:
+
+	Initial revision
+

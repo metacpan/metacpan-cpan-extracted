@@ -1,0 +1,82 @@
+This is a rough map of the direction things will be taking for Parley over the
+next few releases. A more detailed, but less organised, list of features in
+the pipeline can be found in the TODO file.
+
+This isn't set in stone - the roadmap can be swayed by valid, sensible
+reasoning from interested parties.
+
+"[D]" means that the feature has been implemented.
+
+
+0.58 (Feb 2008):
+
+    - [D] UI improvements and cleanup
+    - [D] DBIC ResultSetManager deprecation
+    - [D] DBIC prefetch (DB optimisation)
+
+0.59 (Apr 2008):
+
+    - [D] assign new moderators (on a per-forum basis)
+    - admin/moderator support (deal with bad people)
+        - [D] edit posts (and flag accordingly)
+        - abuse handling
+          - [D] suspend account(s)
+          - [D] prevent login from IP
+          - [D] prevent signup from IP
+          - [D] prevent posting/editing from IP
+          - [D] prevent total access from IP
+        - UI for IP bans
+          - [D] prevent login from IP
+          - [D] prevent signup from IP
+          - [D] prevent posting/editing from IP
+          - [D] prevent total access from IP
+        - IP reporting
+          - [D] IPs used by user
+          - [D] Users posting from IP
+
+** VERSION FORMAT ALTERATION **
+
+1.0.0 (Oct 2008):
+
+    - [D] upgrade to YUI 2.5.x
+    - [D] update to use "new catalyst authentication"
+    - [D] replace Graphics::Magick (Image::Mate?)
+    - [D] write decent Getting Started docs
+    - [D] use Test::Aggregate [v1.0.3]
+    - [D] upgrade to YUI 2.6.x [v1.0.3]
+    - [D] use database for sessions [v1.0.3]
+    - [D] skinning support [v1.0.3]
+
+1.1.0:
+
+    - [D] advanced search
+    - [D] reCaptcha during registration
+    - [D] optional Google ads (adsense)
+
+1.2.0:
+
+    - move tables into 'parley.*' namespace
+    - upgrade to YUI 2.7.x
+
+1.3.0:
+
+    - admin: add/edit/order forums
+
+1.4.0:
+
+    - user prefs:
+        - language preference
+        - password management
+        - resend auth mail(s)
+        - realtime time-format example update
+        - gravatar support
+
+1.5.0:
+
+    - quick reply
+    - quick help
+
+1.6.0:
+
+    - internal messaging
+    - Report To Moderator

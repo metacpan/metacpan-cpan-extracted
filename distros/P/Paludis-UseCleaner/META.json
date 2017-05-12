@@ -1,0 +1,407 @@
+{
+   "abstract" : "Remove cruft from your use.conf",
+   "author" : [
+      "Kent Fredric <kentnl@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102346, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Paludis-UseCleaner",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Zilla::PluginBundle::KENTNL::Lite" : "0.01009803"
+         },
+         "requires" : {
+            "Dist::Zilla::PluginBundle::KENTNL::Lite" : 0
+         },
+         "suggests" : {
+            "Dist::Zilla::PluginBundle::KENTNL" : "0.01017119"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cave::Wrapper" : 0,
+            "Class::Load" : "0.06",
+            "Getopt::Lucid" : 0,
+            "IO::Handle" : 0,
+            "Moose" : 0,
+            "Moose::Util::TypeConstraints" : 0,
+            "MooseX::Has::Sugar" : 0,
+            "MooseX::Types::Moose" : 0,
+            "MooseX::Types::Perl" : 0,
+            "Term::ANSIColor" : 0,
+            "namespace::autoclean" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Paludis::UseCleaner" : {
+         "file" : "lib/Paludis/UseCleaner.pm",
+         "version" : "0.01000307"
+      },
+      "Paludis::UseCleaner::App" : {
+         "file" : "lib/Paludis/UseCleaner/App.pm",
+         "version" : "0.01000307"
+      },
+      "Paludis::UseCleaner::ConsoleUI" : {
+         "file" : "lib/Paludis/UseCleaner/ConsoleUI.pm",
+         "version" : "0.01000307"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01000307",
+   "x_BuiltWith" : {
+      "modules" : {
+         "Cave::Wrapper" : "0.01000002",
+         "Class::Load" : "0.06",
+         "Dist::Zilla::PluginBundle::KENTNL" : "0.01017322",
+         "Dist::Zilla::PluginBundle::KENTNL::Lite" : "0.01000002",
+         "File::Temp" : "0.22",
+         "Getopt::Lucid" : "0.18",
+         "IO::Handle" : "1.28",
+         "Module::Build" : "0.3607",
+         "Moose" : "1.21",
+         "Moose::Util::TypeConstraints" : "1.21",
+         "MooseX::Has::Sugar" : "0.05055616",
+         "MooseX::Types::Moose" : "0.24",
+         "MooseX::Types::Perl" : "0.101340",
+         "Term::ANSIColor" : "3.00",
+         "Test::More" : "0.96",
+         "namespace::autoclean" : "0.11"
+      },
+      "perl" : {
+         "original" : "v5.12.2",
+         "qv" : 1,
+         "version" : [
+            5,
+            12,
+            2
+         ]
+      },
+      "platform" : "linux",
+      "uname" : "Linux 2.6.36-gentoo-r3 x86_64 GenuineIntel GNU/Linux"
+   },
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::AutoVersion::Relative",
+            "config" : {
+               "Dist::Zilla::Plugin::AutoVersion::Relative" : {
+                  "format" : "{{ sprintf('%d.%02d%04d%02d', $major, $minor, days, hours) }}",
+                  "major" : "0",
+                  "minor" : "1",
+                  "relative_to" : {
+                     "day" : "11",
+                     "hour" : "10",
+                     "minute" : 0,
+                     "month" : "12",
+                     "second" : 0,
+                     "time_zone" : "Pacific/Auckland",
+                     "year" : "2010"
+                  }
+               }
+            },
+            "name" : "@KENTNL/AutoVersion::Relative",
+            "version" : "0.01037118"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@KENTNL/GatherDir",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@KENTNL/MetaConfig",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@KENTNL/PruneCruft",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GithubMeta",
+            "name" : "@KENTNL/GithubMeta",
+            "version" : "0.10"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@KENTNL/License",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@KENTNL/PkgVersion",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "name" : "@KENTNL/PodWeaver",
+            "version" : "3.101641"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "name" : "@KENTNL/MetaProvides::Package",
+            "version" : "1.12044908"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@KENTNL/MetaJSON",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@KENTNL/MetaYAML",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ModuleBuild",
+            "name" : "@KENTNL/ModuleBuild",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeFromPod",
+            "name" : "@KENTNL/ReadmeFromPod",
+            "version" : "0.14"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@KENTNL/ManifestSkip",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@KENTNL/Manifest",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@KENTNL/AutoPrereqs",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "develop",
+                  "type" : "requires"
+               }
+            },
+            "name" : "@KENTNL/Prereqs/BundleDevelNeeds",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "develop",
+                  "type" : "recommends"
+               }
+            },
+            "name" : "@KENTNL/Prereqs/BundleDevelRecommends",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "develop",
+                  "type" : "suggests"
+               }
+            },
+            "name" : "@KENTNL/Prereqs/BundleDevelSuggests",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaData::BuiltWith",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaData::BuiltWith" : {
+                  "_stash_key" : "x_BuiltWith",
+                  "show_uname" : 1,
+                  "uname" : {
+                     "uname_args" : [
+                        "-s",
+                        "-o",
+                        "-r",
+                        "-m",
+                        "-i"
+                     ],
+                     "uname_call" : "uname"
+                  }
+               }
+            },
+            "name" : "@KENTNL/MetaData::BuiltWith",
+            "version" : "0.01018204"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CompileTests",
+            "name" : "@KENTNL/CompileTests",
+            "version" : "1.103030"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CriticTests",
+            "name" : "@KENTNL/CriticTests",
+            "version" : "1.102280"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaTests",
+            "name" : "@KENTNL/MetaTests",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
+            "name" : "@KENTNL/PodCoverageTests",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@KENTNL/PodSyntaxTests",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReportVersions::Tiny",
+            "name" : "@KENTNL/ReportVersions::Tiny",
+            "version" : "1.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::KwaliteeTests",
+            "name" : "@KENTNL/KwaliteeTests",
+            "version" : "1.101420"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PortabilityTests",
+            "name" : "@KENTNL/PortabilityTests",
+            "version" : "1.101420"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::EOLTests",
+            "name" : "@KENTNL/EOLTests",
+            "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@KENTNL/ExtraTests",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@KENTNL/TestRelease",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@KENTNL/ConfirmRelease",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "name" : "@KENTNL/Git::Check",
+            "version" : "1.102810"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@KENTNL/NextRelease",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "@KENTNL/Git::Tag/tag_master",
+            "version" : "1.102810"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "name" : "@KENTNL/Git::Commit",
+            "version" : "1.102810"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::CommitBuild",
+            "name" : "@KENTNL/Git::CommitBuild",
+            "version" : "1.102810"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "@KENTNL/Git::Tag/tag_release",
+            "version" : "1.102810"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@KENTNL/UploadToCPAN",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Twitter",
+            "name" : "@KENTNL/Twitter",
+            "version" : "0.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereqs",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "ExecDir",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.102346"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.102346"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "4.102346"
+      }
+   }
+}
+

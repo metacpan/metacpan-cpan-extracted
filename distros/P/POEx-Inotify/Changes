@@ -1,0 +1,15 @@
+Revision history for Perl extension POEx::Inotify.
+
+0.0201  Tue Dec 11 2012
+    - Fixed multiple pending in same dir
+    - Test for above
+
+0.0200  Tue Dec 11 2012
+    - Added mode=>'cooked'
+    - More doco
+
+0.0101  Mon Nov 26 2012
+    - Forgot POE::Session::PlainCall prereq
+
+0.0001  Mon Oct 22 12:56:24 EDT 2012
+	- original version

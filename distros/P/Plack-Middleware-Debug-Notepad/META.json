@@ -1,0 +1,87 @@
+{
+   "abstract" : "Abuse the plack debug panel and keep your todo list in it.",
+   "author" : [
+      "Manni Heumann, C<< <cpan@lxxi.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Debug-Notepad",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack" : "0",
+            "Plack::Middleware::Debug" : "0",
+            "Text::Markdown" : "0",
+            "Text::MicroTemplate" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Tempdir" : "0",
+            "Test::MockModule" : "0",
+            "Test::MockObject::Extends" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::Debug::Notepad" : {
+         "file" : "lib/Plack/Middleware/Debug/Notepad.pm",
+         "version" : "0.12"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com///issues"
+      },
+      "homepage" : "https://github.com//",
+      "repository" : {
+         "url" : "git://github.com//.git",
+         "web" : "https://github.com//"
+      }
+   },
+   "version" : "0.12",
+   "x_contributors" : [
+      "Manni Heumann <github@lxxi.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

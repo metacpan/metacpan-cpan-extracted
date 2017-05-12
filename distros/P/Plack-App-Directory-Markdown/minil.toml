@@ -1,0 +1,6 @@
+name = "Plack-App-Directory-Markdown"
+# badges = ["travis"]
+authority="cpan:SONGMU"
+
+module_maker="ModuleBuildTiny"
+

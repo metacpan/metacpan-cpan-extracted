@@ -1,0 +1,32 @@
+---
+abstract: 'manage worker processes'
+author:
+  - 'Pavel Shaydo <zwon@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Path::Tiny: '0'
+  Test::More: '0.94'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parallel-Boss
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: https://github.com/trinitum/perl-Parallel-Boss/issues
+  homepage: https://github.com/trinitum/perl-Parallel-Boss
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/trinitum/perl-Parallel-Boss.git
+version: '0.03'
+x_contributors:
+  - 'Pavel Shaydo <zwon@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

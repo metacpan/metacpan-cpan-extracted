@@ -1,0 +1,8 @@
+Revision history for Perl extension Parse::AccessLogEntry.
+
+0.05  Mon Aug 12 23:28:52 2002
+	- original version; created by h2xs 1.21 with options
+		-n Parse::AccessLogEntry -AX
+0.06  Wed Apr 27 20:34:00 2005
+	- added fix for empty filename:  Michel Rodriguez
+

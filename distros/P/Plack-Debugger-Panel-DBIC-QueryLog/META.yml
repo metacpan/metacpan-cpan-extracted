@@ -1,0 +1,34 @@
+---
+abstract: 'DBIC query log panel for Plack::Debugger'
+author:
+  - 'Peter Mottram (SysPete) <peter@sysnix.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Debugger-Panel-DBIC-QueryLog
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBIx::Class::QueryLog: '0'
+  DBIx::Class::QueryLog::Analyzer: '0'
+  Plack: '0'
+  Plack::Debugger: '0'
+  Plack::Debugger::Panel: '0'
+  Plack::Middleware::DBIC::QueryLog: '0.05'
+  SQL::Abstract: '1.70'
+  Text::MicroTemplate: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/SysPete/Plack-Debugger-Panel-DBIC-QueryLog/issues
+  repository: https://github.com/SysPete/Plack-Debugger-Panel-DBIC-QueryLog.git
+version: '0.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

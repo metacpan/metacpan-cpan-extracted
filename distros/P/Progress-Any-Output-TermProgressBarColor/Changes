@@ -1,0 +1,137 @@
+Revision history for Progress-Any-Output-TermProgressBarColor
+
+0.22    2016-03-11 (PERLANCAR)
+
+	- No functional changes.
+
+	- Adjust to Text::ANSI::Util 0.22 (::NonWideUtil removed).
+
+
+0.21    2015-08-29 (PERLANCAR)
+
+	- Typo.
+
+
+0.20    2015-08-29 (PERLANCAR)
+
+	- [Bugfix] fix dependencies, add option wide=>1 to explicitly
+	  enable wide character support and load the correct module
+	  [RT#106719].
+
+
+0.19    2015-06-19 (PERLANCAR)
+
+	- Patch Log::Any::Adapter::Screen instead of ::ScreenColoredLevel,
+	  because that's what the new Perinci::CmdLine is using.
+
+
+0.18    2015-01-28 (PERLANCAR)
+
+	- [Bugfix] Fixes so that show_delay is reset again after log is
+	  printed.
+
+	- [doc] Complete incomplete sentence.
+
+
+0.17    2015-01-28 (PERLANCAR)
+
+	- Put patch for working together with
+	  Log::Any::Adapter::ScreenColoredLevel here, moved from
+	  Perinci::CmdLine(::Lite).
+
+
+0.16    2015-01-23 (PERLANCAR)
+
+	- Support eliding message with String::Elide::Parts.
+
+
+0.15    2015-01-22 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Tweak POD: show all options in example, mark unimplemented
+	  options.
+
+
+0.14    2015-01-22 (PERLANCAR)
+
+	- Add option: show_delay (and method: keep_delay_showing).
+
+
+0.13    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.12    2014-10-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- Include screenshot.
+
+
+0.11    2014-10-14 (PERLANCAR)
+
+        - Add option: fh, to allow output other than to STDOUT (thanks Przemek
+          Wesołek).
+
+
+0.10    2014-07-04 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - Avoid division by zero.
+
+
+0.09    2014-02-26 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - Fix cleanup (\b doesn't erase).
+
+
+0.08    2014-02-26 (SHARYANTO)
+
+        - Add cleanup() to allow, e.g. Perinci::CmdLine, to clean the at the end
+          of application run.
+
+
+0.07    2013-09-11 (SHARYANTO)
+
+        - No functional changes. Require Win32::Console::ANSI on Windows.
+
+
+0.06    2013-09-11 (SHARYANTO)
+
+        - Provide defaults and allow install on Windows.
+
+
+0.05    2013-09-03 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - Missed some adjustment for Progress::Any 0.10.
+
+
+0.04    2013-09-03 (SHARYANTO)
+
+        - No functional changes. Update to Progress::Any 0.10.
+
+
+0.03    2013-07-18 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - Fix RGB color.
+
+
+0.02    2013-05-18 (SHARYANTO)
+
+        - Bugfix: didn't display when target is undefined.
+
+
+0.01    2013-05-18 (SHARYANTO)
+
+        - First, early release.

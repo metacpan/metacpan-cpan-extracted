@@ -1,0 +1,43 @@
+#!/bin/bash
+
+echo "This script will install all the modules required to hack on Prophet." 
+echo "It will also install a git pre-commit script validate any commits with Code::TidyAll."
+read -sn 1 -p "Press the any key to continue or Ctrl-C to abort."
+echo
+
+# TODO ask for preferred client
+CPAN=`which cpan`
+CPAN_CMD="$CPAN"
+
+EXTRA_MODS="Test::CPAN::Meta::JSON \
+            Pod::Weaver::Section::BugsAndLimitations \
+            Pod::Elemental::Transformer::List \
+            Code::TidyAll::Plugin::Perl::AlignMooseAttributes\
+"
+
+# test for dzil / Dist::Zilla
+echo "Installing Dist::Zilla"
+$CPAN_CMD Dist::Zilla || exit -1
+echo "Done"
+
+echo "Installing Dist::Zilla plugins"
+dzil authordeps | xargs $CPAN_CMD
+# XXX testingmania didn't install first time...
+echo "Done"
+
+echo "Installing Code::TidyAll"
+$CPAN_CMD Code::TidyAll
+echo "Done"
+
+echo "Installing extra modules"
+$CPAN_CMD $EXTRA_MODS
+echo "Done"
+
+echo "Installing git hook"
+GIT_CHECK="#!/usr/bin/env perl\nuse Code::TidyAll::Git::Precommit;\nCode::TidyAll::Git::Precommit->check;"
+echo -e $GIT_CHECK > ".git/hooks/pre-commit"
+chmod +x ".git/hooks/pre-commit"
+echo "Done"
+
+echo
+echo "Complete"

@@ -1,0 +1,39 @@
+SYNOPSIS
+
+     use Perinci::Sub::Util::PropertyModule qw(get_required_property_modules);
+    
+     my $meta = {
+         v => 1.1,
+         args => {
+             foo => {
+                 ...
+                 'form.widget' => '...',
+             },
+             bar => {},
+         },
+         'cmdline.skip_format' => 1,
+         result => {
+             table => { ... },
+         },
+     };
+     my $mods = get_required_property_modules($meta);
+
+    Result:
+
+     ['Perinci::Sub::Property::arg::form',
+      'Perinci::Sub::Property::cmdline',
+      'Perinci::Sub::Property::result::table']
+
+FUNCTIONS
+
+ get_required_property_modules($meta) => array
+
+    Since the Perinci framework is modular, additional properties can be
+    introduced by additional property modules (Perinci::Sub::Property::*).
+    These properties might be experimental, 3rd party, etc.
+
+    This function can detect which modules are used.
+
+    This function can be used during distribution building to automatically
+    add those modules as prerequisites.
+

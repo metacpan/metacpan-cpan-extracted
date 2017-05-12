@@ -1,0 +1,34 @@
+0.09 (11/15/2015)
+    (ms) [rt.cpan.org #108874] removed MYMETA* files from distro.
+
+0.08 (07/26/2014)
+    (ms) [rt.cpan.org #89278] Setting PERL_HASH_SEED=0 and 
+         PERL_PERTURB_KEYS=NO before the interpreter starts (via
+         re-invoking the test suite) to comply with required
+         anti-hash-tumbling settings.
+
+0.07 (09/30/2013) 
+    (ms) Fixed test suite for perl-5.17 and its non-deterministic keys.
+
+0.06 (01/19/2013) 
+    (ms) Fixed sort order in test case.
+
+0.05 (04/01/2012) 
+    (ms) Requiring perl-5.8 to avoid utf8 problems with 5.6.
+    (ms) Pavel Zhytomirsky submitted a patch checking for undefined variables
+
+0.04 (02/26/2012)
+    (ms) [rt.cpan.org #74784] Added http_build_query_utf8() to deal with 
+         utf8 encoded input data, using URI::Escape's uri_escape_utf8()
+         instead of uri_escape().
+
+0.03 (2008/10/14)
+    (ms) Added copyright notice
+
+0.02 (2008/10/03)
+    (ms) Changed API to be more PHP-like after consulting with 
+         Sara Golemon.
+    (ms) Added arrays
+
+0.01 (2008/10/03)
+    (ms) Where it all began.

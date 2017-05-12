@@ -1,0 +1,12 @@
+DESCRIPTION
+
+    This distribution contains example scripts in bin/ which use
+    Perinci::CmdLine::Classic. It was split from Perinci::Examples so the
+    latter does not need to depend on Perinci::CmdLine::*.
+
+SEE ALSO
+
+    Perinci::CmdLine::Bin::Any
+
+    Perinci::CmdLine::Bin::Lite
+

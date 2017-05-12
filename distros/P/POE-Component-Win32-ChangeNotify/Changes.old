@@ -1,0 +1,48 @@
+POE::Component::Win32::ChangeNotify
+===================================
+
+1.20	Tue Jun  2 14:17:28 BST 2009
+	- Update Makefile.PL meta and add additional 
+          diagnostics when Win32::ChangeNotify errors.
+
+1.18	Fri Apr 24 11:35:35 BST 2009
+	- Switch to git repository
+	- Tidy up POD
+
+1.16	Tue May 13 14:07:50 GMTDT 2008
+	- Added license information
+
+1.14	Fri Mar 14 11:22:18 GMTST 2008
+	- Author tests to xt/
+
+1.12	Wed Feb 20 19:16:23 GMT 2008
+	- Oops forgot to no_index 'mylib'.
+
+1.10	Wed Feb 20 17:06:39 GMT 2008
+	- Moved Devel::AssertOS to mylib/ to avoid
+	  Module::Install trampling on it.
+
+1.08	Tue Feb 19 14:11:50 GMT 2008
+	- Added Devel::AssertOS checks to Makefile.PL
+
+1.07	Mon Jan  7 10:15:51 GMT 2008
+	- Tidied up test names
+
+1.06	Wed Oct 31 13:37:49 GMT 2007
+	- Updated Module::Install to 0.68
+
+1.05	Tue Aug 21 12:10:59 BST 2007
+	- Fixes for build_requires and abstract_from in Makefile.PL
+
+1.04	Sat Dec 30 09:01:58 GMT 2006
+	- Makefile.PL is now all M::I.
+	- Changed to sig_child() semantics.
+
+1.03	Tue Sep 26 16:52:05 BST 2006
+	- Switched to Module::Install
+
+1.02	Tue Sep 12 18:45:02 BST 2006
+	- Added Changes file.
+	- Added pod and pod coverage tests.
+	- Added examples/ folder.
+	- Fixed use strict.

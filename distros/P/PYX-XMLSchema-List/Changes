@@ -1,0 +1,19 @@
+0.04 2015-10-29T21:44:46+01:00
+ - Fix warning in length(undef).
+
+0.03 2015-10-25T09:23:29+01:00
+ - Fix test requires.
+
+0.02 2015-10-22T19:44:43+02:00
+ - Add reset() method.
+ - Add stats() method.
+ - Add tests.
+ - Clean and optimalize code.
+ - Fix output (trailing whitespace on end of line).
+ - Improve tests to better coverity.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+
+0.01 2015-04-01T01:11:02+02:00
+ - First version.

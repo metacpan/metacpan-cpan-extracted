@@ -1,0 +1,41 @@
+Parse/Pyapp version 0.01
+========================
+
+*Alpha version*
+
+
+Parse::Pyapp is a module which enables you to do stochastic parsing.
+
+
+Sample usage is as follows
+
+  use Parse::Pyapp;
+
+  my $parser = Parse::Pyapp::Parser->new();
+
+  $parser->addrule($LHS, [ $RHS_1, $P_RHS_1 ], [ $RHS_2, $P_RHS_2 ]);
+
+  $parser->start($LHS);
+
+  $parser->parse(@words) or print "Parse error\n";
+
+
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 xern <xern@cpan.org>
+
+This module is free software; you can redistribute it or modify it under the same terms as Perl itself.

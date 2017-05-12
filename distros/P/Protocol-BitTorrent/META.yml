@@ -1,0 +1,29 @@
+---
+abstract: 'abstract implementation of the bittorrent p2p protocol'
+author:
+  - 'Tom Molesworth <cpan@entitymodel.com>'
+build_requires:
+  File::Slurp: 0
+  Test::Fatal: 0
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Protocol-BitTorrent
+requires:
+  Convert::Bencode_XS: 0.06
+  Digest::SHA: 5.63
+  HTTP::Message: 0
+  Try::Tiny: 0.11
+  URI: 0
+  URI::QueryParam: 0
+  parent: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Protocol-BitTorrent
+  homepage: http://search.cpan.org/dist/Protocol-BitTorrent/
+version: 0.004

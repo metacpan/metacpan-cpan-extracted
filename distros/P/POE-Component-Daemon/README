@@ -1,0 +1,32 @@
+POE/Component/Daemon version 0.1001
+=================================
+
+
+This component attempts to make building daemons in POE as easy as possible.
+It implements pre-forking, post-forking and non-forking daemons.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    POE
+    POE::API::Peek
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2004-2011 Philip Gwyn.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

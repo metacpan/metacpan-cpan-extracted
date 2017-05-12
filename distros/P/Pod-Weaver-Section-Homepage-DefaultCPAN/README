@@ -1,0 +1,29 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [Homepage::DefaultCPAN]
+
+    To specify homepage other than https://metacpan.org/release/NAME, in
+    dist.ini:
+
+     [MetaResources]
+     homepage=http://example.com/
+
+DESCRIPTION
+
+    This section plugin adds a HOMEPAGE section using homepage metadata, or
+    MetaCPAN release page if homepage is not specified.
+
+ATTRIBUTES
+
+ text
+
+    The text that is added. %s is replaced by the homepage url.
+
+    Default: Please visit the project's homepage at L<%s>.
+
+SEE ALSO
+
+    Pod::Weaver::Section::Availability
+

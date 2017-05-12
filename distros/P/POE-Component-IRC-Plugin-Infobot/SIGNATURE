@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 4a184d9d9ae6ec3343ab7820ccc4141f7f744e27 Changes
+SHA1 63a4bf4577bac5d619e08e0047af4b202a86251a MANIFEST
+SHA1 2095200b193c680b87344882d3846952e7616b08 META.json
+SHA1 f4692781f6bc4d8d60f494837bac9d1e1d2ee3c7 META.yml
+SHA1 1c619860467b86e070bf0b8c9f293a99e333b189 Makefile.PL
+SHA1 201103c9d5cbc4f742bec1e964411f27a926daec README
+SHA1 84a44de7a7a7003b4d58c3d41c8a05deda738cc2 lib/POE/Component/IRC/Plugin/Infobot.pm
+SHA1 95bf3b84de86df7179bbf6c8bf1de4f123411187 t/POE-Component-IRC-Plugin-Infobot.t
+SHA1 fa4cca04d35b71b2c9a4d04e5977efb3868f88aa t/perlcritic.t
+SHA1 e4e0fd9a5add27aea8ea4b88c780bba779e973f6 t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBCgAGBQJWR4JyAAoJEMoENb5ewbNiNoQP/3qP0Oo1PAMdnmkmp9ZfbCgl
+feK81Z2yVkzAed0FIJA/r5sP67wCxQYPsd/dkEbZEhQ5q1LbuwSoF7rD4BV2GUtq
+v3ows53MJxoBDRjIky6dILvCIqlE4CAzm7GjOnXzS0xlO6JQlRQCrnYJ8Q+5Axle
+xTzsi6/chxGdkYd7WgTuu9q173UPelS4UDTBUMCXXx7bqg3l8ppxt1Y4pqf1ONZr
+6P//6Q34ArXkbQMb81vc4nJhOTC8/0sXRbv39csvb6yQJxEGskwuzLkXpQQodfJY
+yNR+S3qDBC+uvgqqHtJqsLa3u4o0jaoUXUxqv5A0tsW+b4uP3ggXzixcV200e3vr
+LTluMpKamNsHg7T5ekfCEOavULmkR1bp+EsqFXX1LA8fxSWbw/rBPnfuh5Cy6dfw
+BIeXkAVoSTKDTvVvPORSfwKJqQP2YW+PKwuK6IWCnislWZK06aHkHMiG5yGvxshB
+HTtCDqViJt50C5B8f/U66G60Ekhs9h/AmeVtblA9QOg8DP5+Tuh5jkZFVlYUfDdB
+FcnUVovJqgVbA91Si6rAh56mzqj4lxjnZFX7Lky9cI73ufVLdqEvLAmomTmyKpl2
+iIhnY0KKKUGlUvobiAkYXF2n/u6f0sGzL0Ovmj4oZdpCB2us3iAbhf0qDWYDi395
+hef0raDqgyNXsXW+vEY4
+=yCWq
+-----END PGP SIGNATURE-----

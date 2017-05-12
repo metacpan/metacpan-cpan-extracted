@@ -1,0 +1,107 @@
+NAME
+
+    Parse::IASLog - A parser for Microsoft IAS-formatted log entries.
+
+VERSION
+
+    version 1.14
+
+SYNOPSIS
+
+    Function Interface:
+
+      use strict;
+      use Data::Dumper;
+      use Parse::IASLog;
+    
+      while (<>) {
+            chomp;
+            my $record = parse_ias( $_, enumerate => 0 );
+            next unless $record;
+            print Dumper( $record );
+      }
+
+    Object Interface:
+
+      use strict;
+      use Data::Dumper;
+      use Parse::IASLog;
+    
+      my $ias = Parse::IASLog->new( enumerate => 0 );
+    
+      while (<>) {
+            chomp;
+            my $record = $ias->parse( $_ );
+            next unless $record;
+            print Dumper( $record );
+      }
+
+DESCRIPTION
+
+    Parse::IASLog provides a convenient way of parsing lines of text that
+    are formatted in Microsoft Internet Authentication Service (IAS) log
+    format, where attributes are logged as attribute-value pairs.
+
+    The parser takes lines of IAS-formatted text and returns on successful
+    parsing a hashref record containing the applicable RADIUS attributes
+    and values.
+
+    The module provides a perl implementation of the Iasparse tool.
+
+FUNCTION INTERFACE
+
+    Using the module automagically imports 'parse_ias' into your namespace.
+
+    parse_ias
+
+      Takes a string of IAS-formatted text as the first parameter.
+      Subsequent parameter pairs are treated as options. See new() for full
+      details regarding optional parameters. Returns a hashref on success
+      or undef on failure. See below for the format of the hashref
+      returned.
+
+OBJECT INTERFACE
+
+ CONSTRUCTOR
+
+    new
+
+      Creates a new Parse::IASLog object. Takes one optional parameter:
+
+        'enumerate', set to a false value to disable the enumeration of known
+                     attribute values, default is 1;
+
+ METHODS
+
+    parse
+
+      Takes a string of IAS-formatted text. Returns a hashref on success or
+      undef on failure.
+
+      The hashref will contain RADIUS attributes as keys. The following
+      header attributes should always be present:
+
+        'NAS-IP-Address', The IP address of the NAS sending the request;
+        'User-Name', The user name that is requesting access;
+        'Record-Date', The date that the log was written;
+        'Record-Time', The time that the log was written;
+        'Service-Name', The name of the service that is running in the RADIUS server;
+        'Computer-Name', The name of the RADIUS server;
+
+SEE ALSO
+
+    http://technet.microsoft.com/en-us/network/bb643123.aspx
+
+    http://en.wikipedia.org/wiki/RADIUS
+
+AUTHOR
+
+    Chris Williams
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

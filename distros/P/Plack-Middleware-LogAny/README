@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Plack-Middleware-LogAny,
+version 0.001:
+
+  Use Log::Any to handle logging from your Plack app
+
+This software is copyright (c) 2012 by Michael Alan Dorman.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

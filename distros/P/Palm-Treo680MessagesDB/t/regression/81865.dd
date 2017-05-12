@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1201989672,
+          'number' => '+440137952218',
+          'time' => '22:01',
+          'date' => '2008-02-02',
+          'name' => 'Dagfinn XXXXXX (XXXXXX) XXXXXXX (may be truncated)',
+          'phone' => '+440137952218',
+          'device' => 'Treo 680',
+          'direction' => 'outbound',
+          'timestamp' => 1201989672,
+          'text' => 'not going to middle farm tomorrow. I am getting extreme.y drunk',
+          'type' => '0x0002',
+          'category' => 0,
+          'id' => 7107729,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 81865
+        };

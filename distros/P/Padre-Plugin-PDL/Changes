@@ -1,0 +1,17 @@
+Changes for Padre-Plugin-PDL
+
+0.05  2012.3.15
+    - Better PDL help integration (RUN4FLAT, BOWTIE)
+    - All the PDL functions are now highlighted (AZAWAWI)
+
+0.04  2012.3.14
+    - Fix a 5.14-ism (AZAWAWI, Reported by RUN4FLAT).
+    - POD typos fixed. (AZAWAWI)
+    - PDL Help now uses PDL::Doc directly instead of PDL::Doc::Perldl which
+      required standard output capturing. (AZAWAWI)
+
+0.03  2012.3.13
+    - Fixed HTML help rendering. (AZAWAWI)
+
+0.02  2012.3.13 # mistake :)
+    - Initial release to CPAN. (AZAWAWI)

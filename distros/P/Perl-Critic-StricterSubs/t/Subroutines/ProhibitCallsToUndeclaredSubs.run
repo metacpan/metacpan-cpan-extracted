@@ -1,0 +1,383 @@
+##############################################################################
+#      $URL$
+#     $Date$
+#   $Author$
+# $Revision$
+##############################################################################
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.0 ]--
+## name Function *is not* explicitly imported nor defined in current package
+## failures 6
+## cut
+
+foo;              #No parens
+foo();            #No args
+foo( 'quux' );    #With args
+
+&foo;             #With sigil, and no parens
+&foo();           #With sigil, and no args
+&foo( 'quux' );   #With sigil, and args
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.1 ] -
+## name Function *is* defined in current package
+## failures 0
+## cut
+
+foo;              #No parens
+foo();            #No args
+foo( 'quux' );    #With args
+
+&foo;             #With sigil, and no parens
+&foo();           #With sigil, and no args
+&foo( 'quux' );   #With sigil, and args
+
+sub foo {}
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.2 ] -
+## name Function *is* defined in current package, but with qualified name
+## failures 0
+## cut
+
+package Foo;
+
+foo;              #No parens
+foo();            #No args
+foo( 'quux' );    #With args
+
+&foo;             #With sigil, and no parens
+&foo();           #With sigil, and no args
+&foo( 'quux' );   #With sigil, and args
+
+sub Foo::foo {}
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.3 ] -
+## name Fully qualified function calls are exempt
+## failures 0
+## cut
+
+Foo::foo;              #No parens
+Foo::Bar::Baz();       #No args
+Foo::foo( 'quux' );    #With args
+
+&Foo::foo;             #With sigil, and no parens
+&Foo::Bar::baz();      #With sigil, and no args
+&Foo::foo( 'quux' );   #With sigil, and args
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.4 ] -
+## name Function *is* explicitly imported from another package
+## failures 0
+## cut
+
+use Foo qw(foo);
+use Bar ('bar'); #Alternate form
+use Baz  'baz';  #Alternate form
+
+foo();
+bar();
+baz();
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.5 ] -
+## name Manual import will create false-positives
+## failures 6
+## cut
+
+BEGIN {
+    require Foo;
+    Foo->import( 'foo' );
+}
+
+foo;              #No parens
+foo();            #No args
+foo( 'quux' );    #With args
+
+&foo;             #With sigil, and no parens
+&foo();           #With sigil, and no args
+&foo( 'quux' );   #With sigil, and args
+
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.6 ] -
+## name Function *is* explicitly imported from another package, with sigil
+## failures 0
+## cut
+
+use Foo qw(&foo);
+use Bar ('&bar'); #Alternate form
+use Baz  '&baz';  #Alternate form
+
+foo();
+bar();
+baz();
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.7 ] -
+## name Multiple functions imported from one same module
+## failures 0
+## cut
+
+use Foo qw(&foo FOO);
+use Bar ('&bar', 'BAR'); #Alternate form
+use Baz  "&baz", "BAZ";  #Alternate form
+
+foo();
+FOO();
+
+bar();
+BAR();
+
+baz();
+BAZ();
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.8 ] -
+## name Import list as multi-line qw() expression with sigil
+## failures 0
+## cut
+
+use Foo qw(
+    &foo
+    &bar
+    &baz
+);
+
+foo();
+bar();
+baz();
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.9 ] -
+## name Import list as multi-line qw() expression without sigil
+## failures 0
+## cut
+
+use Foo qw(
+    foo
+    bar
+    baz
+);
+
+foo();
+bar();
+baz();
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.10 ]-
+## name Subroutine declared via constant pragma
+## failures 0
+## cut
+
+use constant FOO => 42;
+use constant (BAR => 'shizzle');
+
+use constant {
+  ALPHA => 123,
+  BETA  => 456,
+  GAMMA => 789,
+};
+
+print FOO + 91;
+warn BAR;
+
+print ALPHA + BETA + GAMMA;
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.11 ]-
+## name Don't detect barewords that are known to be filehandles
+## failures 0
+## cut
+
+print STDOUT $some_message;
+printf STDERR $some_message;
+
+print {STDERR} $some_message;
+printf {STDIN} $some_message;
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.12 ]-
+## name Don't detect barewords that *appear* to be filehandles
+## failures 0
+## cut
+
+print LOGFILE $some_message;
+close LOGFILE;
+
+open DEBUG, $some_path;
+write DEBUG, $some_bits;
+tell DEBUG;
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.13 ]-
+## name Don't detect barewords that *appear* to be filehandles inside parens
+## failures 0
+## cut
+
+print {LOGFILE} $some_message; #Conway-style
+print(LOGFILE $some_message);
+close(LOGFILE);
+
+open(DEBUG, $some_path);
+write(DEBUG, $some_bits);
+tell(DEBUG);
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.14 ]-
+## name Don't detect barewords in hashkeys
+## failures 0
+## cut
+
+$hash{FOO} = $value;
+%hash = ( BAR => $value );
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.15 ]-
+## name Detect function calls in hashkeys
+## failures 2
+## cut
+
+$hash{ foo() } = $value;
+%hash = ( bar() => $value );
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.16 ]-
+## name Don't detect line labels
+## failures 0
+## cut
+
+LABEL:  foreach $foo (@list) {
+    next LABEL unless do_something($foo);
+}
+
+sub do_something{}
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.17 ]-
+## name Symbol by same name is imported, but is not a subroutine
+## failures 3
+## cut
+
+use Foo qw($foo);
+use Bar ('@bar'); #Alternate form
+use Baz  '%baz';  #Alternate form
+
+foo();
+bar();
+baz();
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.18 ]-
+## name Don't catch perl builtins
+## failures 0
+## cut
+
+grep { lc($_) } @list;
+open my $fh, '>', $path || die $!;
+print {$fh} join( ' ', split( m/$delimiter/, $string ) );
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.19 ]-
+## name Don't catch subroutines that are configured to be exempt
+## parms { exempt_subs => 'Test::Simple::ok  Test::More::cmp_ok' }
+## failures 0
+## cut
+
+use Test::Simple;
+use Test::More;
+
+ok( $result );
+cmp_ok( $this, '>', $that );
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.20 ]-
+## name Do catch subroutines that are NOT configured to be exempt
+## parms { exempt_subs => 'Foo::Bar::ok  Foo::Bar::cmp_ok' }
+## failures 2
+## cut
+
+use Test::Simple;
+use Test::More;
+
+ok( $result );
+cmp_ok( $this, '>', $that );
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.21 ]-
+## name Subroutine is onfigured to be exempt; package is loaded at run-time
+## parms { exempt_subs => 'Test::Perl::Critic::all_critic_ok' }
+## failures 0
+## cut
+
+eval{ require Test::Perl::Critic };
+all_critic_ok() if not $@;
+
+## - Perl::Critic::Policy::Subroutines::ProhibitCallsToUndeclaredSubs [ 1.22 ]-
+## name Subroutine is onfigured to be exempt; package is loaded conditionally
+## parms { exempt_subs => 'Test::Perl::Critic::all_critic_ok' }
+## failures 0
+## cut
+
+if ( require Test::Perl::Critic ){
+    all_critic_ok();
+}
+
+## name Readonly RT #41858
+## parms { exempt_subs => 'Readonly::Readonly Readonly::Scalar Readonly::Array Readonly::Hash' }
+## failures 0
+## cut
+
+use 5.010;
+use Readonly;
+Readonly my $HI => 50;
+Readonly::Scalar my $HI => 50;
+Readonly::Array my @HI => qw< foo bar >;
+Readonly::Hash my %HI => ( foo => 'bar' );
+say $HI;
+
+## name Many imported names RT #62184
+## failures 0
+## cut
+
+use Some::Thing 'foo', 'bar', 'quux', 'xyzzy';
+my $w = foo(123);
+my $x = bar(123);
+my $y = quux(123);
+my $z = xyzzy(123);
+
+## name Import with version number RT #43310
+## failures 0
+## cut
+
+use HTTP::Status '5.187' => qw{ HTTP_INTERNAL_SERVER_ERROR };
+HTTP_INTERNAL_SERVER_ERROR();
+
+use Frobozz 42 'bazzle', qw{ boozle };
+bazzle();
+boozle();
+
+## name Nested lists RT #36783
+## failures 0
+## cut
+
+use List::Util ( qw { min } );
+min( 1, 2 );
+
+use Scalar::Util ( ( 'blessed' ) );
+blessed( $foo );
+
+## name Loop labels with qualifiers RT #72022
+## failures 0
+## cut
+
+sub try_something { return 0 };
+
+FOO: while ($some_condition) {
+    next FOO if $bar;
+    # do something
+}
+
+BAR: while ($some_condition) {
+    try_something() or last BAR;
+}
+
+BAZ: while ($some_condition) {
+    redo ( BAZ ) if $bar;
+    # do something
+}
+
+BURFLE: while ($some_condition) {
+    try_something() or next ( BURFLE );
+}
+
+
+##############################################################################
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab :

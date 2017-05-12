@@ -1,0 +1,86 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-SpellCheck\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-07-19 14:47+0200\n"
+"PO-Revision-Date: 2010-08-24 12:23+0100\n"
+"Last-Translator: Simone Blandino <simone.blandino@gmail.com>\n"
+"Language-Team:  <simone.blandino@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Italian\n"
+"X-Poedit-Country: ITALY\n"
+
+#: lib/Padre/Plugin/SpellCheck.pm:32
+#: lib/Padre/Plugin/SpellCheck.pm:54
+msgid "Spell check"
+msgstr "Correzione ortografica"
+
+#: lib/Padre/Plugin/SpellCheck.pm:55
+msgid "Check spelling\tF7"
+msgstr "Controlla ortografia\tF7"
+
+#: lib/Padre/Plugin/SpellCheck.pm:56
+msgid "Preferences"
+msgstr "Preferenze"
+
+#: lib/Padre/Plugin/SpellCheck.pm:78
+msgid "No document opened."
+msgstr "Nessun documento aperto."
+
+#: lib/Padre/Plugin/SpellCheck.pm:95
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:303
+msgid "Spell check finished."
+msgstr "Correzione ortografica terminata."
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:47
+#, perl-format
+msgid "Spelling (%s)"
+msgstr "Ortografia (%s)"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:208
+msgid "Add to dictionary"
+msgstr "Aggiungi al dizionario"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:209
+msgid "Replace"
+msgstr "Sostituisci"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:210
+msgid "Replace all"
+msgstr "Sostituisci tutto"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:211
+msgid "Ignore"
+msgstr "Ignora"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:212
+msgid "Ignore all"
+msgstr "Ignora tutto"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:213
+msgid "Close"
+msgstr "Chiudi"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:243
+msgid "Not in dictionary:"
+msgstr "Non nel dizionario:"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:265
+msgid "Suggestions"
+msgstr "Suggerimenti"
+
+#: lib/Padre/Plugin/SpellCheck/Preferences.pm:39
+msgid "Spelling preferences"
+msgstr "Preferenze ortografia"
+
+#: lib/Padre/Plugin/SpellCheck/Preferences.pm:139
+msgid "Dictionary:"
+msgstr "Dizionario:"
+

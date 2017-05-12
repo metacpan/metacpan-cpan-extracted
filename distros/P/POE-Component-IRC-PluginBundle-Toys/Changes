@@ -1,0 +1,4 @@
+Revision history for POE-Component-IRC-PluginBundle-Toys
+
+1.001001 2014-01-27
+    - Packaged a bundle of my existing plugins into a single dist

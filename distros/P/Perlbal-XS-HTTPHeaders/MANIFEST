@@ -1,0 +1,14 @@
+Changes
+HTTPHeaders.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+headers.cpp
+headers.h
+typemap
+t/HTTPHeaders.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Perlbal/XS/HTTPHeaders.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,44 @@
+Revision history for Perl extension PDL::FFTW.
+
+2.023  2015-06-15 17:17:17 EDT
+
+ - PDL::FFTW now is documentation only for
+   searchability and to inform users of the
+   PDL::FFTW3 or, if needed, a link to the
+   previous versions on backpan.
+
+2.022  2013-12-14 14:19:47 EST
+
+ - Fix missing version in meta data
+
+2.021  2013-12-14 13:54:50 EST
+
+ - Fix problem with META.json generation
+ - Add deprecation and obsoletion plans to README
+
+2.020  2013-10-14
+
+ - Fix to handle new PDL-2.007 sign convention for FFT
+ - Minimum PDL version is now 2.007
+
+2.019  2013-08-10
+
+ - Add PDL to the CONFIGURE_REQUIRES for CPAN
+   dependencies
+
+2.018  2013-08-10 12:30:00 EST
+
+ - Add provides meta data so PDL::FFTW is indexed
+
+2.017  2013-08-10
+
+ - First CPAN release version
+
+2.016  2013-08-05 12:54:15 EST
+
+ - Split out PDL::FFTW into its own CPAN distribution
+
+0.500  1999-12-09 00:00:00
+
+ - Initial commit of original FFT2.x code by Christian
+   Pellegrin into the PDL core distribution.

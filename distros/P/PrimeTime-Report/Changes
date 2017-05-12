@@ -1,0 +1,6 @@
+Revision history for Perl extension PrimeTime::Report.
+
+0.01  Wed Feb 24 11:21:25 2010
+	- original version; created by h2xs 1.23 with options
+		-A -X -n PrimeTime::Report
+

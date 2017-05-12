@@ -1,0 +1,180 @@
+#!/usr/local/bin/perl -w
+
+use strict;
+
+use English;
+use Config;
+
+use FindBin qw/$RealBin/;
+use lib "$RealBin/../lib";
+
+my @importers = qw/xml ppr/;
+
+# When you add new types here, the program doesn't need to be changed.
+# However, you have to change the manual-page manually.
+
+my %programs  =
+   $OSNAME =~ /^win/i
+      ? ( ppr  => 'ppppr'
+        , xml  => 'ppxml'
+        )
+      : ( ppr  => 'present-ppr'
+        , xml  => 'present-xml'
+        );
+
+# I'm afraid the next is not portable...
+my @path = split /\:/, $ENV{PATH} || $ENV{path} || '.';
+
+sub execProgram($@)
+{   my $type = shift;
+    my $program = $programs{$type}
+        || die "$type files not supported.\n";
+
+    foreach (@path)
+    {   next unless -x "$_/$program";
+        exec "$_/$program", @_
+            or die "Cannot run $_/$program: $!\n";
+    }
+
+    die "Cannot find program $program.\n";
+}
+     
+sub usage($)
+{   my $error = shift;
+    my $types = join ', -', sort keys %programs;
+
+    print <<USAGE;
+$PROGRAM_NAME [-help|-h|-?] [type] [options] file
+   Supported types are: -$types.
+   Options depend on type.  More details on the options when
+   you supply a type, for example
+         $PROGRAM_NAME -help -xml
+USAGE
+
+    exit $error;
+}
+
+sub stripFlag($)
+{   my $flag = '-' . shift;
+
+    for(my $i=0; $i<@ARGV; $i++)
+    {   next unless $ARGV[$i] eq $flag;
+        splice @ARGV, $i, 1;
+        return 1;
+    }
+    0;
+}
+    
+# Scan command-line.  We will start different tools dependent on
+# which type of file we get, and each has its own options, so we
+# cannot use GetOptions to get all here.
+
+my $help = stripFlag 'help' || stripFlag 'h' || stripFlag '?';
+
+# Scan for flag showing type.
+my $type;
+foreach (keys %programs)
+{   next unless stripFlag $_;
+    $type = $_;
+    last;
+}
+
+# No flag for type, so maybe file extention.
+if(!$type && @ARGV)
+{   foreach (keys %programs)
+    {   next unless $ARGV[-1] =~ /\.$_/i;
+        $type = $_;
+        last;
+    }
+}
+
+#
+# Check if help was requested.
+#
+
+execProgram $type, "-help" if $help && $type;
+usage 0 if $help;
+
+#
+# Start the program.
+#
+
+$type = 'ppr' unless $type;
+execProgram $type, @ARGV;
+
+
+#--------------------------------------- doc ---------------------
+
+=head1 NAME
+
+present - run a Portable Presenter presentation.
+
+=head1 SYNOPSIS
+
+B<present> [ B<-help>|B<-h>|B<-?> ] [ B<-ppr>|B<-xml> ] [ I<file> ]
+
+=head1 DESCRIPTION
+
+Portable Presenter (PPresenter) is a package designed to give presentations.
+It is written in Perl/Tk only, which is available for UNIX and for Windows.
+
+The key features of PPresenter are: projection on multiple screens at
+the same time; scales with the size of the display; fully object-oriented,
+which means flexible and extensible.  You can write your slides in a
+perl-program (for maximum flexability), or supply the data in xml.
+
+C<present> starts a helper program, which depends on the type of input
+you supply.  Portable Presenter presentations can be written in
+Perl (with PPresenter as library) or in XML.
+
+If you start C<present> with a filename ending on C<.ppr>, it is
+considered a perl-program.  When the filename ends with C<.xml>, it
+is a XML-description of a presentation.  Flags B<-ppr> and B<-xml>
+overrule the filename extentions.  If the type cannot be determined,
+the C<ppr> extention will be presumed.
+
+When no filename is supplied, then the standard-input is
+read.
+
+=over 4
+
+=item -help [type]
+
+=item -h [type]
+
+=item -? [type]
+
+Show the command-line options.  If you do not specify any type, you will
+get the options of the C<present> command.  If you specify a type
+flag (C<-ppr> or C<-xml>) or when a type can be derived from an
+supplied filename, you get the flags supported for that type of input.
+
+=item -ppr [options] [file]
+
+=item [options] file[.ppr]
+
+The file contains a PPresenter presentation written as a perl-program.
+You can also start this presentation directly, without use of C<present>.
+See the manual-page C<present-ppr(1)> for the options.
+
+If C<present> is supplied with a filename without extention, the file is
+considered to be a perl-program.
+
+=item -xml [options] [file]
+
+=item file.xml
+
+The file contains a presentation written in XML.  See the manual-page
+C<present-xml(1)> for the options.
+
+=back
+
+=head1 SEE ALSO
+
+A full documentation in html is included in the package, and available
+on the website: C<http://ppresenter.org>.
+
+C<present-ppr(1)>, C<present-xml(1)>.
+
+=cut
+

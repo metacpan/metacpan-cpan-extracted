@@ -1,0 +1,13 @@
+This module parses the SMS messages database generated on a Treo 680.
+
+To install, do the usual dance:
+    less Makefile.PL
+    less lib/Palm/Treo680MessagesDB.pm
+    less t/*
+those being to ensure that I'm not being evil.
+
+then do this to install the module:
+    perl Makefile.PL
+    make
+    make test
+    make install (you may need to do this as root)

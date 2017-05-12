@@ -1,0 +1,108 @@
+#!/usr/bin/perl
+#
+# Build an index.html file for the binaries directory
+#
+
+use strict;
+use CGI qw(:html);
+use vars qw($VERSION $title);
+
+open(STDIN, '</dev/null');
+
+chdir("binaries");
+
+$VERSION = shift(@ARGV);
+
+$title = "Binaries for PersistentPerl version $VERSION";
+
+my $blurb = <<'END';
+If you would like contribute binary packages, you can build them
+automatically on
+Linuxes with RPM, Solaris and BSD
+by running "make package".
+Email all the files in the binaries directory to
+ <a href="mailto:sam@daemoninc.com">sam@daemoninc.com</a>
+END
+
+sub grab_vals { my $f = shift;
+    open(F, $f) || die "${f}: $!\n";
+    $f =~ s/\.desc$//;
+    my %vals = (pkgfile=>$f);
+    while (<F>) {
+	chop;
+	my($key,$val) = split(/=/, $_, 2);
+	if ($key eq 'DEPEND') {
+	    push(@{$vals{$key}}, $val);
+	} else {
+	    $vals{$key} = $val;
+	}
+    }
+    close(F);
+    return \%vals;
+}
+
+my(%info, %osarch);
+foreach my $f (<*.desc>) {
+    my $vals = &grab_vals($f);
+    my $key = join('|', $vals->{OS}, $vals->{ARCH}, $vals->{IS_APACHE});
+    $info{$key} = $vals;
+    $osarch{join('|', $vals->{OS}, $vals->{ARCH})} = 1;
+}
+
+open(F, '>index.html') || die "index.html: $!\n";
+select F;
+print
+    start_html(-title=>$title),
+    center(
+	h1($title),
+	table({-border=>1},
+	    Tr(
+		th([
+		    'Operating System',
+		    'Architecture',
+		    'Package',
+		    'Dependencies',
+		]),
+	    ),
+	    map {
+		my($os, $arch) = split(/\|/, $_);
+		my @list;
+		foreach my $x (0, 1, 2) {
+		    my $key = join('|', $os, $arch, $x);
+		    if (my $vals = $info{$key}) {
+			push(@list, $vals);
+		    }
+		}
+		my $rspan = scalar @list;
+		Tr(
+		    td({-rowspan=>$rspan}, $os),
+		    td({-rowspan=>$rspan}, $arch),
+		    &doit($list[0]),
+		),
+		map {
+		    Tr(
+			&doit($_),
+		    ),
+		} @list[1..$#list],
+	    } (sort keys %osarch),
+	),
+    ),
+    "<p>$blurb",
+;
+
+sub doit { my $v = shift;
+    return (
+	td(
+	    a({-href=>$v->{pkgfile}},
+		$v->{IS_APACHE}
+		    ? "Optional Apache-$v->{IS_APACHE} Module"
+		    : 'Basic Distribution',
+	    ),
+	),
+	td(
+	    join('<br>',
+		@{$v->{DEPEND} || []},
+	    ) || '&nbsp;',
+	),
+    );
+}

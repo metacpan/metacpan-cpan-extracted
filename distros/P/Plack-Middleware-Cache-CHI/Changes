@@ -1,0 +1,8 @@
+Changelog for Plack::Middleware::Cache::CHI
+
+0.102     2015-08-25 16:51:04+03:00 Europe/Helsinki
+  * Documentation fix
+
+0.101     2015-08-25 16:44:17+03:00 Europe/Helsinki
+  * Rename Plack::Middleware::Cache -> Plack::Middleware::Cache::CHI
+  * Initial CPAN release

@@ -1,0 +1,158 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Tree::HTML;
+
+my %Options;
+$Options{toc} = 1;
+my $ok = GetOptions( \%Options, "base:s", "css:s", "toc!", "hr:i", "bgcolor:s", "text:s", "variables:s" );
+$ok or die "Bad command line options\n";
+
+umask 0022;
+
+@ARGV < 2 and die "podtree2html PODfile HTMLfile [templateFile]\n";
+my ( $source, $dest, $template, @variables ) = @ARGV;
+my $html = Pod::Tree::HTML->new( $source, $dest );
+$html->set_options(%Options);
+
+do $Options{variables} if $Options{variables};
+
+for (@variables) {
+	chomp;
+	my ( $name, $value ) = split /=/, $_, 2;
+	$name =~ s(^\$)();
+	${ $Pod::Tree::HTML::{$name} } = $value;
+}
+
+$html->translate($template);
+
+__END__
+
+=head1 NAME
+
+podtree2html - translate a POD to HTML
+
+=head1 SYNOPSIS
+
+C<podtree2html> 
+[C<--base> I<url>]
+[C<--css> I<url>]
+[C<-->[C<no>]C<toc>] [C<--hr> I<level>] 
+[C<--bgcolor> I<#rrggbb>] [C<--text> I<#rrggbb>]
+[C<--variables> I<values.pl>]
+F<source> F<dest> [F<template>] [I<variable>=I<value> ...]]
+
+=head1 DESCRIPTION
+
+C<podtree2html> reads the POD in file F<source>,
+translates it to HTML,
+and writes it to file F<dest>.
+F<dest> is created world-readable.
+
+If a F<template> file is provided,
+then F<template> will be filled in by the C<Text::Template> module and written to F<dest>.
+Here is a minimal template, showing all the variables that are set by C<podtree2html>.
+
+  <html>
+   <head>
+    <base href="{$base}">
+    <link href="{$css}" rel="stylesheet" type="text/css">
+    <title>{$title}</title>
+   </head>
+   <body bgcolor="{$bgcolor}" text="{$text}">
+    {$toc}
+    {$body}
+   </body>
+  </html>
+
+If the C<--variables> option is provided, then the file I<values.pl> will be executed with a C<do>
+call before the template is filled in. I<values.pl> may contain arbitrary Perl code.
+The program fragments in the template are evaulted in the C<Pod::Tree::HTML> package.
+Any variables that I<values.pl> sets in this package will be available to the template.
+
+Additional scalar variables may be set on the command line with the I<variable>=I<value> syntax.
+Do not prefix I<variable> with a C<$> sigil.
+Variables set on the command line override variables set in I<values.pl>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<--base> I<url>
+
+Translate C<LE<lt>E<gt>> sequences into HTML
+links relative to I<url>.
+
+=item C<--css> I<url>
+
+Specifies a Cascanding Style Sheet for the generated HTML page.
+Here are example rules for all the different HTML elements that may appear in a POD.
+
+    a:link { background: #ff8080 }
+    body   { background: #f0f0f0 }
+    code   { background: #c0ffc0 }
+    dd     { background: #ffffe0 }
+    dl     { background: #fffff0 }
+    dt     { background: #ffffc0 }
+    h1     { background: #ffc0c0 }
+    h2     { background: #ffe0e0 }
+    hr     { background: #ff0000; height: 5px }
+    i      { background: #ffc0c0 }
+    li     { background: #e0e0e0 }
+    ol     { background: #fff0ff }
+    p      { background: #f0f0ff }
+    pre    { background: #f0fff0 }
+    ul     { background: #f0ffff }
+
+=item C<-->[C<no>]C<toc>
+
+Includes or omits the table of contents.
+Default is to include the TOC.
+
+=item C<--hr> I<level>
+
+Controls the profusion of horizontal lines in the output, as follows:
+
+    level   horizontal lines
+    0 	    none
+    1 	    between TOC and body
+    2 	    after each =head1
+    3 	    after each =head1 and =head2
+
+Default is level 1.
+
+=item C<--bgcolor> I<#rrggbb>
+
+Set the background color to I<#rrggbb>.
+Default is white.
+
+=item C<--text> I<#rrggbb>
+
+Set the text color to I<#rrggbb>.
+Default is black.
+
+=item C<--variables> I<values.pl>
+
+Execute the file I<values.pl> with a C<do> call before filling in I<template>.
+I<values.pl> may contain arbitrary Perl code.
+
+=back
+
+=head1 REQUIRES
+
+L<C<Pod::Tree::HTML>>
+
+=head1 SEE ALSO
+
+L<C<pods2html>>, L<C<Pod::Tree::HTML>>
+
+=head1 AUTHOR
+
+Steven McDougall, <swmcd@world.std.com>
+
+=head1 COPYRIGHT
+
+Copyright (c) 1999-2007 by Steven McDougall.  This program is free software;
+you can redistribute it and/or modify it under the same terms as Perl.

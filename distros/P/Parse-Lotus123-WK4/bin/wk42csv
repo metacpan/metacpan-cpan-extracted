@@ -1,0 +1,113 @@
+#!/usr/bin/env perl
+
+eval 'exec /usr/bin/perl -w -S $0 ${1+"$@"}'
+  if 0;    # to go to perl if running under some shell
+
+=head1 NAME
+
+wk42csv - command-line tool to convert Lotus 1-2-3 .wk4 files to csv
+
+=head1 SYNOPSIS
+
+wk42csv [-l] [-s] I<file.wk4> [I<otherfile.wk4> ...]
+
+The -l option triggers long format.  The default -s is a dump of all
+lines in the WK4 without reference to which sheet they came from.
+
+=head1 BUGS
+
+Plenty, almost certainly.
+
+=head1 NO WARRANTY
+
+This code comes with ABSOLUTELY NO WARRANTY of any kind.
+
+=head1 AUTHOR
+
+Copyright 2007, 2008, 2014 Reckon LLP and Franck Latrémolière.
+L<http://www.reckon.co.uk/staff/franck/>
+
+=head1 LICENCE
+
+This is free software; you can redistribute it and/or modify it under the same terms as Perl.
+
+=cut
+
+This program is free software; you can use, redistribute and/or modify it under the same terms as Perl itself
+(Artistic Licence or GNU GPL).
+
+=cut
+
+use warnings;
+use strict;
+use Parse::Lotus123::WK4;
+
+unless (@ARGV) {
+    print STDERR "wk42csv: no input files\n";
+    print STDERR "Usage: wk42csv [-v] file.dta [otherfile.dta ...]\n";
+    print STDERR " (Parse::Lotus123::WK4 version $Parse::Lotus123::WK4::VERSION)\n";
+    exit 1;
+}
+
+my $verbose    = 0;
+my $status     = 0;
+my $longFormat = 0;
+for my $file (@ARGV) {
+    if ( $file eq '-l' ) {
+        $longFormat = 1;
+        next;
+    }
+    if ( $file eq '-s' ) {
+        $longFormat = 0;
+        next;
+    }
+    unless ( -e $file ) {
+        warn "$file: file not found";
+        ++$status;
+        next;
+    }
+    open WK4, '<', $file;
+    my $data = Parse::Lotus123::WK4::parse(*WK4);
+    close WK4;
+    if (!$data) {
+        warn "$file not understood";
+        next;
+    }
+    ( my $name = $file ) =~ s/(\.wk4)?$/.csv/i;
+    my $no = '';
+    $name =~ s/-?$no\.csv$/'-' . ++$no . '.csv'/e while -e $name;
+    open CSV, '>', $name;
+
+    if ($longFormat) {
+        print CSV qq%sheet,row,column,data\n%;
+        for ( my $sheet = 0 ; $sheet < @$data ; $sheet++ ) {
+            next unless defined $data->[$sheet];
+            for ( my $row = 0 ; $row < @{ $data->[$sheet] } ; $row++ ) {
+                next unless defined $data->[$sheet][$row];
+                for ( my $col = 0 ; $col < @{ $data->[$sheet][$row] } ; $col++ )
+                {
+                    local $_ = $data->[$sheet][$row][$col];
+                    next unless defined $_;
+                    s/"/""/g;
+                    print CSV qq%$sheet,$row,$col,"$_"\n%;
+                }
+            }
+        }
+    }
+    else {
+        for ( my $sheet = 0 ; $sheet < @$data ; $sheet++ ) {
+            next unless defined $data->[$sheet];
+            for ( my $row = 0 ; $row < @{ $data->[$sheet] } ; $row++ ) {
+                next unless defined $data->[$sheet][$row];
+                for ( my $col = 0 ; $col < @{ $data->[$sheet][$row] } ; $col++ )
+                {
+                    local $_ = $data->[$sheet][$row][$col];
+                    $_ = '' unless defined $_;
+                    s/"/""/g;
+                    print CSV qq%"$_",%;
+                }
+                print CSV qq%\n%;
+            }
+        }
+    }
+}

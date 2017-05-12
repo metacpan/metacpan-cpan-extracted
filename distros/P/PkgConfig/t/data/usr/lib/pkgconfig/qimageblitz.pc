@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include/qimageblitz
+
+Name: Blitz
+Description: Blitz image effect and filter library
+Version: 4.0.0
+Requires: QtGui
+Libs: -L${libdir} -lqimageblitz
+Cflags: -I${includedir}

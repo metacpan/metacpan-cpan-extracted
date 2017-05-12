@@ -1,0 +1,33 @@
+#!perl
+use strict;
+use warnings;
+
+our $VERSION = '0.05';
+
+use PAR::Dist::InstallPPD::GUI;
+
+# This special treatment when running from inside a par'd exe
+# means that it's possible to use the "-a file" option to pp to
+# include a copy of parinstallppd.exe WITHIN the parinstallppdgui.exe
+# and share common modules.
+# In order to do this, follow these steps:
+# - package parinstallppd into parinstallppd.exe
+# - package parinstallppdgui into parinstallppdgui.exe
+# - use "pare" from the contrib/ directory of the PAR-Packer
+#   distribution to make parinstallppd.exe dependent on
+#   parinstallppdgui.exe:
+#     pare -u parinstallppdgui.exe parinstallppd.exe
+# - Repackage parinstallppdgui.exe including the reduced parinstallppd.exe
+#     pp -o parinstallppdgui.exe -a parinstallppd.exe -l expat bin\parinstallppdgui
+
+if (defined $ENV{PAR_TEMP}) {
+	require Config;
+	require File::Spec;
+	$ENV{PATH} .= (defined $ENV{PATH} ? $Config::Config{path_sep} : '')
+                    . File::Spec->catdir($ENV{PAR_TEMP}, 'inc');
+	$ENV{PAR_GLOBAL_TEMP} = $ENV{PAR_TEMP};
+}
+
+my $gui = PAR::Dist::InstallPPD::GUI->new();
+$gui->run();
+

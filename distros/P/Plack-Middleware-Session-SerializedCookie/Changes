@@ -1,0 +1,14 @@
+Revision history for Plack-Middleware-Session-SerializedCookie
+
+1.03    2013.1.10
+        (INCOMPATIBLE CHANGE)
+        Change the 'expires' option from advance time from unix epoch time
+        to advance time from each request time.
+
+        Patched by Anatoliy Lapitskiy.
+
+1.02    2011.8.7
+        Fix bug with delay response
+
+1.01    2010.6.17
+        First version, released on an unsuspecting world.

@@ -1,0 +1,183 @@
+# Changes for POEx::IRC::Backend
+
+0.030003 2015-08-29
+
+  - Use MooX::TypeTiny for inlined type checks
+
+0.030002 2015-07-17
+
+  - Documentation improvements
+
+  - Minor disconnect-related bugfixes
+
+  - Test expansion
+
+0.030001 2015-07-02
+
+  - Fix Connector SSL (broken in 0.28.1)
+
+  - Add 'disconnect_now' method to terminate sockets without waiting for a
+    buffer flush
+
+0.029001 2015-07-01
+
+  - Connect objects now provide 'get_socket' / 'ssl_cipher' / 'ssl_object'
+
+  - Role reorganization; addr/port attributes moved to Role::HasEndpoint,
+    Connect objects consume Role::Socket
+
+  - Various optimizations
+
+  - Test suite expansion
+
+0.028001 2015-06-29
+
+  - Stop using the global POE::Component::SSLify context, maintain
+    per-Backend contexts instead to avoid trampling global options
+
+  - Add 'args' attr behavior to Listeners to act like Connectors; extra
+    unrecognized ->create_listener() parameters are saved to the Listener's
+    'args' HASH and passed to produced Connect objects
+
+  - Documentation improvements
+
+  - Minor message dispatch optimizations
+
+  - ::Role::Connector moved to ::Role::Socket to reduce confusion with
+    the Connector class
+
+  - Explicitly allow an undef 'wheel' attr
+
+  - Inline single-function ::_Util class, drop Exporter::Tiny dep
+
+0.027006 2015-06-25
+
+  - Fix server-side SSLification (miniCruzer)
+
+  - Documentation improvements
+
+0.027005 2015-06-19
+
+  - Warn informatively on ->disconnect against an inactive wheel
+    and fix documentation regarding how to avoid that particular race
+
+0.027004 2015-06-19
+
+  - Fix a ->disconnect bug that could throw an exception under race
+    (reported by Sam "miniCruzer" Hoffman)
+
+0.027003 2015-06-13
+
+  - Optimize ->send when used with IRC::Message::Object messages
+
+  - Switch to Moo-2, strictures-2; drop MooX::late
+
+0.027002 2015-06-07
+
+  - Default to using a 'colonify => 0' filter_irc; this seems to line 
+    up better with expected behavior and matches POE::Filter::IRCv3's
+    default
+
+  - Fix ->send to respect the 'colonify' attribute of a given
+    IRC::Message::Object
+    (reported by Sam "miniCruzer" Hoffman)
+
+  - Depend on newer IRC::Toolkit so we can access $ircmsg->has_colonify
+
+0.027001 2015-05-18
+
+  - Allow passing a Connect object to ->disconnect
+    (miniCruzer)
+
+0.026001 2015-01-16
+
+  - Preserve a Connector object's "args" attribute in resultant Connect
+    objects
+
+0.025001 2015-01-11
+
+  - Support passing Connect objects to ->send (instead of wheel IDs)
+
+  - Better runtime SSL/zlib detection
+
+  - Documentation fixes and improvements
+
+  - Optimizations & cleanups
+
+  - Improved test coverage
+
+0.024006 2013-03-08
+  
+  - Switch to Type::Tiny
+
+  - Drop unnecessary 5.10 dependency
+
+0.024005 2013-03-31
+
+  - IPv6 fixes
+
+0.024004 2013-03-27
+
+  - Fix some busted sockaddr handling; fixes some Windows test failures.
+
+0.024003 2013-03-24
+
+  - Fix a bug that would keep old Controller's Sessions alive unnecessarily
+    if a new Session sent a register.
+
+  - Component::SSLify should've been an optional dependency.
+
+  - POD cleanups.
+
+0.024002 2013-03-17
+
+  - Typo: sockaddr --> sockport in Backend::Connect
+
+  - POD/test cleanups.
+
+0.024001 2013-02-17
+
+  - Add Role::HasWheel
+
+  - POD cleanups
+
+0.024000 2013-02-17
+
+  - Clean up Connector/Listener code, kill unneeded writers/predicates
+    (Most of these were a bad idea and unused.)
+  
+  - Move common bits to Role::Connector
+
+  - Readd POD coverage tests.
+
+0.023001 2013-02-04
+
+  - Fix handling of IRC::Message::Objects with raw line only.
+  
+  - Switch to long-form semantic version.
+
+0.023 2013-02-04
+
+  - Fix handling of IRC::Message::Objects without prefix
+
+0.022 2013-02-02
+
+  - Fix and test ->remove_listener()
+
+  - Reset empty hash attrs on shutdown
+
+  - Dispatch remaining ircsock_input even if Connect->is_disconnecting
+
+0.021 2013-02-02
+
+  - POD expansion
+
+0.02 2013-01-02
+
+  - Depend on newer MooX::Types::MooseLike
+  
+  - Tweak Connect objs to allow service name in ->port
+
+0.01 2013-01-31
+
+  - Initial release

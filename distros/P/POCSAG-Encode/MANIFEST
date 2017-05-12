@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+Encode.pm
+PISS.pm
+README
+LICENSE
+t/00load-module.t
+t/01pod.t
+t/02pod-coverage.t
+tools/pocsag-send
+META.yml                                 Module meta-data (added by MakeMaker)

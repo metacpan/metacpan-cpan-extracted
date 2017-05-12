@@ -1,0 +1,31 @@
+PPI::Xref is a Perl module for generating cross-references of Perl code.
+
+You do need PPI and Sereal installed.
+
+The Perl code being parsed is not executed, so any fancy runtime
+(or compile-time) trickery is not detected.  This includes things
+like string evals, importing of symbols, and run-time inclusion of
+files.  This is both a bug and a feature.
+
+At the moment, any sub definitions are detected (but not declarations),
+and use/no/require/do are recursively followed.
+
+Given some code to parse, you can query things like the subs defined
+and their location in the code (file, line, even column, and where
+they finish), package declarations seen, and so forth.
+
+util/ppixref is a command-line frontend utility for using PPI::Xref.
+
+Note that if you want to use the caching feature (and you should) you
+need to create the cache directory first.  For testing, just example:
+
+  mkdir /tmp/cache
+
+and then
+
+  ppixref ... --cache_directory=/tmp/cache ...
+
+Another utility, ppixref-cache-update, can be used to explicitly
+update an existing cache directory.
+
+__EOF__

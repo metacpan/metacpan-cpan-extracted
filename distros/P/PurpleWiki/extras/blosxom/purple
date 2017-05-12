@@ -1,0 +1,150 @@
+# Blosxom Plugin: purple
+# Author: Eugene Eric Kim <eekim@blueoxen.org>
+# Version: 0+2i
+# $Id: purple,v 1.2 2003/11/20 06:31:15 eekim Exp $
+
+package purple;
+
+# --- Configurable variables -----
+
+$configDir = '/var/www/wikidb';
+
+# Using the cooluri plugin for permalinks?
+$coolUri = 0;
+
+# --------------------------------
+
+use PurpleWiki::Config;
+use PurpleWiki::Parser::WikiText;
+
+sub start {
+    return 1;
+}
+
+sub story {
+    my ($pkg, $path, $filename, $story_ref, $title_ref, $body_ref) = @_;
+
+    my $config = new PurpleWiki::Config($configDir);
+    my $wikiParser = PurpleWiki::Parser::WikiText->new();
+    my $wiki = $wikiParser->parse($$body_ref,
+                                  config => $config,
+                                  add_node_ids => 0);
+    my $url = $blosxom::url;
+    if ($coolUri) {
+        $url .= '/' . $blosxom::yr . '/' . $blosxom::mo_num . '/' .
+            $blosxom::da . '/' . $blosxom::fn;
+    }
+    else {
+        $url .= $blosxom::path . '/' . $blosxom::fn . '.' . $blosxom::flavour;
+    }
+    $$body_ref = $wiki->view('wikihtml',
+                             config => $config,
+                             url => $url);
+    # make metadata available under the purple namespace
+    $$title_ref = $wiki->title if ($wiki->title);
+    $subtitle = $wiki->subtitle if ($wiki->subtitle);
+    $id = $wiki->id if ($wiki->id);
+    $date = $wiki->date if ($wiki->date);
+    $version = $wiki->version if ($wiki->version);
+    # FIXME: not sure how to handle authors, because don't know how 
+    # blosxom deals with list refs.  Just dereference it into a list
+    # for now.
+    @authors = @{$wiki->authors} if ($wiki->authors);
+    return 1;
+}
+
+1;
+__END__
+=head1 NAME
+
+Blosxom Plug-in: purple
+
+=head1 VERSION
+
+0+2i
+
+=head1 DESCRIPTION
+
+Uses the PurpleWiki text formatting rules for blosxom entries.  Will
+also integrate with an existing PurpleWiki installation.  For example,
+it will link WikiWords in your blosxom entry to your PurpleWiki.  See:
+
+  http://www.eekim.com/blog/
+
+for an example.
+
+=head2 Prerequisites
+
+PurpleWiki.  See:
+
+  http://www.blueoxen.net/tools/purplewiki/
+
+  http://purplewiki.blueoxen.net/
+
+=head2 Configuration variables
+
+C<$configDir> is the location of your Wiki's configuration directory
+(usually called wikidb).  There must be a valid PurpleWiki config file
+in the directory, even if you don't actually have a local Wiki
+installation.
+
+If you are using Rob Hague's cooluri plugin for permalinks, set
+C<$coolUri> to 1.
+
+=head2 Adding purple numbers to your entries
+
+You can use the purple utility (different from this plugin) that comes
+with PurpleWiki to add purple numbers to your entries.  However, you
+have to be a bit careful, because strictly speaking, a blosxom entry
+is not a legal PurpleWiki document.  The first line of a blosxom entry
+is the title of the entry.  To make sure that title is not
+inadvertently processed by the purple utility, make sure there are no
+blank lines between the title and the first paragraph.
+
+Suppose you have the entry entry.txt under the category personal.
+Suppose that the URL that will point to this entry is:
+
+  http://foo.bar/blog/personal/entry.html
+
+To preprocess entry.txt, do:
+
+  purple --add_ids --url=http://foo.bar/blog/personal/entry.html \
+      /path/to/wikidb entry.txt
+
+where /path/to/wikidb is the path to your wikidb directory.  The --url
+option enables transclusions.  If you don't need this feature, you can
+omit this option.
+
+=head2 Working with the seemore plugin
+
+To use with Todd Larason's seemore plugin, rename seemore so that it
+loads before purple.  Preprocess your entry as described above, then
+follow the seemore instructions.
+
+=head1 AUTHOR
+
+Eugene Eric Kim, E<lt>eekim@blueoxen.orgE<gt>
+
+=head1 LICENSE
+
+Copyright (C) 2003 Blue Oxen Associates.
+
+(This license is the same as Blosxom's)
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.

@@ -1,0 +1,34 @@
+%right '=' 
+%left '-' '+' 
+%left '*' '/' 
+%left NEG 
+%lexer 
+%metatree
+
+%%
+
+line:
+      %name PROG
+      exp <%name EXP + ';' >
+;
+exp:
+      %name NUM
+      NUM
+    | %name VAR
+      VAR
+    | %name ASSIGN
+      VAR '=' exp
+    | %name PLUS
+      exp '+' exp
+    | %name MINUS
+      exp '-' exp
+    | %name TIMES
+      exp '*' exp
+    | %name DIV
+      exp '/' exp
+    | %name NEG
+      '-' exp %prec NEG
+    | '(' exp ')' 
+;
+
+%%

@@ -1,0 +1,37 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 0.8.5 ] */
+
+/* [wxMaxima: input   start ] */
+A(n,alpha,beta) :=  gamma(beta) / gamma( (2* beta - n)/2) * ( %pi^(n/2) * alpha^n )^-1;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+alpha : 3; beta : 2.4;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+numer : true;
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+A(1,alpha,beta );
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+A(2,alpha,beta);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+A(3,alpha,beta);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+A(4,alpha,beta);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+A(5,alpha,beta);
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

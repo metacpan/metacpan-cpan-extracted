@@ -1,0 +1,19 @@
+Changes
+lib/PDF/Tiny.pm
+lib/PDF/Tiny.pod
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/4pages.pdf
+t/7.pdf
+t/output.pdf
+t/output2.pdf
+t/pagesize.pdf
+t/pdf-tiny.t
+t/spaces.pdf
+t/test.pl
+t/tests.pm
+t/uncompressed.pdf
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

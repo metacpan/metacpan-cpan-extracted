@@ -1,0 +1,200 @@
+
+Perl Package Manager (PPM)
+
+
+Preamble
+
+Perl has a strong historical connection with Unix, and the distribution
+methods that currently exist serve this community well: 'do-it-yourself'
+types who are accustomed to obtaining their software over the Internet and
+building it from source.  CPAN has greatly simplified the process of locating
+and building Perl extensions from source, and having this well-designed
+source repository has undoubtedly contributed to Perl's past and present
+popularity.
+
+But platforms such as Macintosh and Windows make up the vast majority of
+desktop workstations, as well as an ever-growing percentage of the server
+market, and the users of these platforms typically have a different set
+of expectations regarding their software than does an experienced Perl
+programmer.  These users typically install binary versions of software
+onto their systems, usually with the aid of an installation program.
+
+We now have a number of binary distributions for the Perl core for these
+platforms.  But one problem remains: how to give users on these platforms
+access to the vast library of Perl modules and extensions that have been
+written and made available on CPAN?  This document describes how we intend
+to solve this problem for Windows users.  We offer it as a proposal for a
+method of providing pre-built versions of Perl modules and extensions in
+general, and welcome comments from the Perl community on how to make it as
+useful as possible.
+
+
+Introduction
+
+PPM is a program and API intended to simplify the process of locating,
+installing, removing, upgrading and otherwise maintaining pre-built Perl
+modules and extensions (packages).
+
+To obtain information about available software packages, PPM refers to files
+that conform to the Open Software Description (OSD) specification. These
+description files are referred to as Perl Package Description (PPD) files,
+and are written in Extensible Markup Language (XML).  The glossary at the
+end of this document contains further information about these terms.
+
+Each package has an individual PPD file describing attributes such as package
+location, installation script, abstract, licensing information, etc.  The
+person providing the pre-built version of the package for a particular
+platform generates the PPD file during the build process ("make ppd").  It is
+constructed using information available in the package's Makefile.pl file or
+its POD.
+
+The PPD is then uploaded to a PPD repository, using the Perl Authors Upload
+Server (PAUSE) as an authentication scheme, where is it merged with other
+PPDs describing available pre-built packages for various platforms.  Since
+the PPD files are written in XML, the merging can be automatically performed
+by scripts, reducing the burden on repository maintainers.  The merged PPD
+is then exposed on the repository to users of PPM.
+
+
+PPM Usage
+
+In a typical scenario, PPM will look at a central PPD repository to obtain a
+list of available packages.  The PPD repository may be a remote location
+accessed using Internet protocols such as HTTP or FTP, or a locally mounted
+(or shared) directory.  Since the PPD for a package contains the information
+needed to retrieve the installation archive, the software packages themselves
+need not be at the same location as the PPDs.
+
+To perform a package installation, PPM consults the package's PPD to determine
+the location of the pre-built package for the platform on which it is running.
+The package will usually be in
+    'package-version-bin-binversion-archname-compiler.tar.gz'
+format (the binary upload naming convention suggested by Andreas Koenig in
+'CPAN/modules/05bindist.convention.html'), but may be in any format the
+install script is written to handle.  The file is retrieved and placed in a
+local 'build' directory, where it is uncompressed and unarchived if necessary.
+PPM will then use installation instructions provided in the PPD in the form
+of a Perl script.  If there is no installation script, the required files are
+copied to the appropriate locations on the local system.
+
+PPM performs basic verifying and upgrading by comparing information from the
+PPD available at the repository to information saved during a previous
+installation of the same package.  PPM provides the ability to verify that
+the most recent version of a package is installed, and to upgrade a specific
+package (or all currently installed packages) if it is outdated.
+
+
+Features
+
+PPM provides the ability to search for specific package capabilities using
+keywords in the abstract, title, or other attributes of the PPD file. This
+makes, for example, locating a package that provides a broad range of
+functionality (e.g., 'LWP') much easier than by using existing tools. PPM
+can perform simple installations of pre-built distributions for specific
+platforms.  This greatly simplifies the task of installing and upgrading
+packages on platforms for which there is no native 'make' command.
+
+PPM has the concept of software dependencies, and thus the ability to
+automatically install any additional packages on which a package depends.
+This concept of a dependency extends to commands such as 'make', so that
+a package that is in source form will not be installed on a system without
+a 'make' command.
+
+Finally, PPM has been designed to be used with any of a number of user
+interfaces: command-line, interactive text-mode, GUI, Web browser, etc. This
+allows for the development of tools to appeal to a broad range of users with
+various levels of sophistication.
+
+
+Samples
+
+The following is a sample PPD file.
+
+<SOFTPKG NAME="Math-MatrixBool" VERSION="4,2,0,0">
+    <TITLE>Math-MatrixBool</TITLE>
+    <ABSTRACT>Easy manipulation of matrices of booleans (Boolean Algebra)</ABSTRACT>
+    <AUTHOR>Steffen Beyer (sb@sdm.de)</AUTHOR>
+    <LICENSE HREF="http://www.ActiveState.com/packages/Math-MatrixBool/license.html" />
+    <IMPLEMENTATION>
+        <OS VALUE="WinNT" />
+        <OS VALUE="Win95" />
+        <PROCESSOR VALUE="x86" />
+        <CODEBASE HREF="http://www.ActiveState.com/packages/Math-MatrixBool/Math-MatrixBool-4.2-bin-1-Win32.tar.gz" />
+        <DEPENDENCY NAME="Bit-Vector" />
+        <INSTALL>
+        </INSTALL>
+        <UNINSTALL>
+        </UNINSTALL>
+    </IMPLEMENTATION>
+    
+    <IMPLEMENTATION>
+        <DEPENDENCY NAME="Bit-Vector" />
+        <CODEBASE HREF="&CPAN;/CPAN/modules/by-module/Math/Math-MatrixBool-4.2.tar.gz" />
+        <INSTALL>
+            system("make"); ;;
+            system("make test"); ;;
+            system("make install"); ;;
+        </INSTALL>
+    </IMPLEMENTATION>
+<</SOFTPKG>
+
+
+In this example, the package 'Math-MatrixBool' is installed as a pre-built
+extension on Windows NT or 95 on an Intel x86 chip, since no install script
+has been provided.  On other platforms, the source package is retrieved from
+a CPAN mirror site and built according to the installation script. The
+dependency on 'Bit-Vector' means that 'Math-MatrixBool' will only be
+installed if 'Bit-Vector' has been, or can be, installed.
+
+
+Issues
+
+1. How to reliably provide uninstall capability?  In practice, what is the
+   likelihood of filename conflicts with existing modules?
+   
+   Possible solution: The repository could maintain a list of all installed
+   files for all packages, and as part of the process of adding a new
+   IMPLEMENTATION to a PPD, we could check that it causes no conflicts
+   with existing files.  This would still be subject to potential problems 
+   if the user installs packages outside of PPM.
+   
+   Alternatively, we could use the .packlist scheme, but do the removing 
+   ourselves rather than using uninstall, only removing files that have 
+   been installed under the package's own directory, ignoring others.  
+   This would leave the possibility of orphaned files remaining.
+   
+2. How to retain configuration information (e.g. lib/site/Net/Config.pm)
+   for installed packages during an upgrade?
+
+   Possible solution: The existing configuration could be saved by commands
+   in the /INSTALL script in the PPD.
+
+
+Glossary of terms
+
+dependency
+    - a software package necessary for installation or operation of another
+      package
+
+OSD 
+    - Open Software Description (see http://www.w3.org/TR/NOTE-OSD.html)
+
+PAUSE
+    - Perl Authors Upload Server (see CPAN/modules/04pause.html)
+    
+PPD
+    - Perl Package Description file
+
+PPD repository
+    - an Internet location or local directory, to which PPM looks for PPD files
+
+PPM
+    - Perl Package Manager
+
+pre-built package
+    - a software package consisting of ready-to-install files (e.g. compiled
+      C objects) for use on a specific platform
+
+XML
+    - Extensible Markup Language (see http://www.sil.org/sgml/xml.html)
+

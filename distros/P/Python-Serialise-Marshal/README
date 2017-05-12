@@ -1,0 +1,107 @@
+NAME
+    Python::Serialise::Marshal - a module for reading and writing marshalled
+    Python files
+
+SYNOPSIS
+        use Python::Serialise::Marshal;
+
+        my $pr = Python::Serialise::Marshal->new("file/for/reading");
+        while (my $data = $pr->load()) {
+              print Dumper $data;
+        }
+
+        my $pw = Python::Serialise::Marshal->new(">file/for/writing");
+    
+        $pw->dump(['a' 'list']);
+        $pw->dump("a string");
+        $pw->dump(42);
+        $pw->dump({'a'=>'hash'});
+
+        $pw->close();  
+
+DESCRIPTION
+    Marshalling is a method of serialising files in Python (another method,
+    Pickling, is also available). It is the method that Mailman uses to
+    store its config files.
+
+    This module is an attempt to write a pure Perl implementation of the
+    algorithm.
+
+METHODS
+  new <filename>
+
+    Open a file for reading or writing. Can take any arguments that
+    `IO::File' can.
+
+  load
+
+    Returns the next data structure from the marshalled file or undef.
+
+  dump <data structure>
+
+    Takes a ref to an array or a hash or a number or string and pickles it.
+
+    Structures may be nested.
+
+  close
+
+    Closes the current file.
+
+NOTES
+  Complex numbers
+
+    Python has inbuilt support form complex numbers whilst Perl provides it
+    through the core module `Math::Complex'. Unserialising a Python complex
+    number will return a `Math::Complex' object and, as you'd expect,
+    serialising something that ISA `Math::Complex' will result in a
+    serialised Python complex number.
+
+  None
+
+    Python has `None' objects, similar to Perl's `undef'.
+
+    Because *load* indictaes "no more objects" by returning `undef' we have
+    to return `Python::Serialise::None' objects. However dump can take
+    `undef' and serialise it as a `None' object.
+
+BUGS
+    Much less than my `Pickle' module because this is a *much* saner file
+    format.
+
+    Tests for None
+        I can't think of a nice elegant way of doing tests at the moment.
+
+        I'm sure I will soon.
+
+    Longs
+        There's no support for longs. I've figured out how to write them in
+        Python but I just can't seem to extract them properly.
+
+    Unicode
+        Not an itch that needs scratching at the moment so there's no
+        support.
+
+    Code
+        Ditto
+
+ALTERNATIVES
+    You could always dump the data structure out as YAML in Python and then
+    read it back in with YAML in Perl.
+
+    I also may look into wrapping the Python source code file in XS.
+
+AUTHOR
+    Simon Wistow <simon@thegestalt.org>
+
+COPYRIGHT
+    (c) 2003 Simon Wistow
+
+    Distributed under the same terms as Perl itself.
+
+    This software is under no warranty and will probably ruin your life,
+    kill your friends, burn your house and bring about the apocalypse.
+
+SEE ALSO
+    http://www.python.org, the YAML manpage, the File::Binary manpage and
+    the RESOURCES file in this distribution.
+

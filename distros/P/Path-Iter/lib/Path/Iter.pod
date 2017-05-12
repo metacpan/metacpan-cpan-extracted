@@ -1,0 +1,186 @@
+=head1 NAME
+
+Path::Iter - Simple Efficient Path Iteration
+
+=head1 VERSION
+
+This document describes Path::Iter version 0.2
+
+=head1 SYNOPSIS
+
+    use Path::Iter;
+
+    my $fetch = Path::Iter::get_iterator('foo');
+    
+    while ( my $next_path = $fetch->() ) {
+        # do something with $next_path
+    }
+
+=head1 DESCRIPTION
+
+Iterate through the contents of a given path without having to build the entire list first.
+
+=head1 INTERFACE 
+
+=head2 Path::Iter::get_iterator()
+
+This returns an code reference that when called returns the next path. 
+
+When there are no more (or a directory can't be opened and you have told it to stop as soon as that happens) it returns false.
+
+It takes one or more paths to process and an optional argument hashref as the last argument (See L</%ARGS>)
+
+The paths returned contain the initial argument and its contents (if any).
+
+Assuming 'foo' in the SYNOPSIS:
+
+    is a symlink:   you'd iterate through foo
+    is a file:      you'd iterate through foo
+    is a directory: you'd iterate through foo, foo/bar, foo/wop, foo/bar/baz, 
+
+=head2 %ARGS
+
+These are all optional.
+
+=head3 errors
+
+This is an array of hashref's where any errors get put.
+
+    my @err;
+    my $iter = Path::Iter::get_iterator($path, {errors => \@err});
+    while(my $next = $iter->()) {
+        ...        
+    }
+    if (@err) {
+        ... handle error ...
+    }
+
+The keys for each error in the array are as follows:
+
+    'path'     => $path,
+    'function' => 'opendir',
+    'args'     => [\*DIR, $path],
+    'errno'    => int($!), 
+    'error'    => int($!) . ": $!",
+
+=head3 stop_when_opendir_fails
+
+Boolean, when, if true will short circuit the iteration if an opendir() call fails.
+
+=head3 readdir_handler
+
+A coderef to be used to process and return directory contents (IE readdir() results)
+
+    sub {
+        my($working_path, @contents) = @_;
+        
+        if ($working_path eq '.data') {
+            @contents = grep !/^\.private\-.*/, @contents; # ignore .private-... files in .data/ dir
+        }
+        
+        return sort { $a cmp $b } @contents; # return what is left in sorted order
+    }
+
+The first argument is the directory and the rest is its contents. 
+
+The @contents have already had the $working_path prepended.
+
+It should return the contents how you wish them to appear in the iteration.
+
+=head3 symlink_handler
+
+By default syminks are not followed.
+
+This is a coderef that can control how symlinks are handled.
+
+B<!! IF YOU ALTER THE DEFAULT BEHAVIOR YOU WILL NEED TO CHECK FOR LINK LOOPS AND INFINITE RECURSION !!>
+
+It receives two arguments: the path and a boolean of if it was an initial argument or not.
+
+If it returns true the path will be followed. If the true value is '2' it will be tranformed into its target.
+
+B<!! IF YOU ALTER THE DEFAULT BEHAVIOR YOU WILL NEED TO CHECK FOR LINK LOOPS AND INFINITE RECURSION !!>
+
+Assume we have a link named 'link' whose target is 'path':
+
+    sub {
+        my ($path, $is_initial_arg) = @_;
+        ...
+        return; # default behavior = link 
+    }
+    
+    sub {
+        my ($path, $is_initial_arg) = @_;
+        ...
+        return 1; # link link/dir link/file link/dir/etc
+    }
+    
+    sub {
+        my ($path, $is_initial_arg) = @_;
+        ...
+        return 2; # path path/dir path/file path/dir/etc
+    }
+
+B<!! IF YOU ALTER THE DEFAULT BEHAVIOR YOU WILL NEED TO CHECK FOR LINK LOOPS AND INFINITE RECURSION !!>
+
+=head3 initial
+
+This is a hashref used internally as a lookup of initial args as they are after any initialization. 
+
+=head1 DIAGNOSTICS
+
+Throws no warnings or errors of its own. You can catch internal opendir failures. See L</errors> and L</stop_when_opendir_fails>
+
+=head1 CONFIGURATION AND ENVIRONMENT
+  
+Path::Iter requires no configuration files or environment variables.
+
+=head1 DEPENDENCIES
+
+L<File::Spec>
+
+=head1 INCOMPATIBILITIES
+
+None reported.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+C<bug-path-iter@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.
+
+=head1 AUTHOR
+
+Daniel Muey  C<< <http://drmuey.com/cpan_contact.pl> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2008, Daniel Muey C<< <http://drmuey.com/cpan_contact.pl> >>. All rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.

@@ -1,0 +1,72 @@
+Revision history for Parse-LocalDistribution
+
+0.19 2016/11/03
+  - ignore a few directories like examples, demo and such, as PAUSE
+    now does
+
+0.18 2016/04/24
+  - fixed a regression introduced in 0.17 which ignored a path passed
+    to new()
+
+0.17 2016/04/21
+  - benchmark revealed unnecessary cwd() took more time than
+    expected/wanted
+
+0.16 2016/01/07
+  - ported version_ok() implemented in PAUSE to disallow a VERSION
+    that is too long to store correctly in the PAUSE database
+
+0.15 2015/01/17
+  - bumped up the required version of Parse::PMFile to 0.35
+    to tolerate version line errors as undef
+
+0.14 2014/09/02
+  - permission check
+  - constructor options
+
+0.13 2014/08/22
+  - convert (illegal) back slashes in no_index entries to
+    forward slashes to suppress warnings
+
+0.12 2014/06/06
+  - no code change
+  - made sure to use different directories while testing
+
+0.11 2014/04/16
+  - fixed a case when there are simile and non-simile packages
+    in the same distribution (such as Text::Xslate), reported by
+    tokuhirom++
+
+0.10 2014/04/15
+  - fixed a wrong usage of internal method (_verbose)
+
+0.09 2014/04/11
+  - reflected the changes done in PAUSE at QAH 2014
+  - not to add _error to indexing_warning (introduced in
+    Parse::PMFile 0.16)
+
+0.08 2014/04/11
+  - respect MANIFEST/MANIFEST.SKIP correctly (Tux++)
+
+0.07 2014/02/19
+  - respect meta provides correctly
+
+0.06 2013/11/17
+  - ignore 'provides' entries whose file field is empty
+  - keep error infile as infile, not as infile_error
+
+0.05 2013/10/10
+  - include invalid version info
+
+0.04 2013/10/06
+  - ignore broken provides field
+
+0.03 2013/09/26
+  - ignore fatlib (MIYAGAWA++)
+  - META.json in a subdir should not precede META.yml in the topdir.
+
+0.02 2013/08/25
+  - corrected infile path in meta provides
+
+0.01 2013/06/15
+  - initial release

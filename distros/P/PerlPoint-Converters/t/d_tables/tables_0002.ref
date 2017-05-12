@@ -1,0 +1,35 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!-- ZOOMSTOP -->
+
+<HTML>
+
+<!-- *** Created by pp2html, build 1.21 from PerlPoint-Converters 1.0202  -->
+
+<HEAD>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+
+<!-- ZOOMRESTART -->
+
+
+
+<TITLE>Table with Table Tag</TITLE>
+</HEAD>
+
+<!-- ************************************************************** -->
+<BODY bgcolor="#FFFFFF" text="#000000" link="#0000CC" vlink="#AAAAAA" alink="#FF0000">
+<a name="Table with Table Tag"></a>
+
+<H1>Table with Table Tag
+</H1>
+<TABLE BORDER="3" BGCOLOR="#CCCCCC"><TR>
+<TD BGCOLOR="#CC0000">kkk | uuu</TD><TD BGCOLOR="#CC0000">vvv</TD><TD BGCOLOR="#CC0000">ggg</TD></TR>
+<TR>
+<TD>RRRR</TD><TD>xx</TD><TD>ii</TD></TR>
+</TABLE>
+<P>
+</BODY>
+</HTML>

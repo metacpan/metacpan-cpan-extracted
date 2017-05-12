@@ -1,0 +1,38 @@
+Parallel::SubArray Changelog
+
+0.6    Tue Feb 10 23:24:16 CET 2009
+        - changed required Perl version to v5.8.6
+
+0.5000 Thu Feb  5 20:13:40 CET 2009
+	- added a test for nested parallelism
+	- determined not to use subs for timeout
+		nor as return values
+	
+0.4003 Wed Feb  4 08:42:32 CET 2009
+	- added LICENSE to MANIFEST
+	
+0.4002 Tue Feb  3 23:04:11 CET 2009
+	- successfully tested on 5.10.0 and 5.8.6
+	- downgraded requirement to 5.8.6
+	
+0.4001 Tue Feb  3 22:16:35 CET 2009
+	- updated docs
+
+0.3002 
+	- version issue
+
+0.3.1
+	- added Test::Deep for test_requires
+
+0.3 Tue Feb  3 19:33:36 CET 2009
+	- capture errors in parallel subs
+	- better test coverage
+	- bug fix
+	- toned down OO bashing
+	- hide scary text of license - feel freedom
+
+0.2 Tue Feb  3 08:10:38 CET 2009
+	- more tests
+
+0.1 Tue Feb  3 05:00:00 CET 2009
+	- initial release

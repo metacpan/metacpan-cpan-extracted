@@ -1,0 +1,59 @@
+SYNOPSIS
+
+     use Progress::Any::Output;
+    
+     # use default options
+     Progress::Any::Output->set('TermSpin');
+    
+     # set options
+     Progress::Any::Output->set('TermSpin',
+                                style=>"bubble", fh=>\*STDOUT, speed=>0.2, show_delay=>5);
+
+DESCRIPTION
+
+METHODS
+
+ new(%args) => obj
+
+    Instantiate. Usually called through
+    Progress::Any::Output->set("TermSpin", %args).
+
+    Known arguments:
+
+      * style => str (default: 'line')
+
+      Available styles:
+
+      # CODE: require Progress::Any::Output::TermSpin; my $styles =
+      \%Progress::Any::Output::TermSpin::STYLES; print "=over\n\n"; for my
+      $style (sort keys %$styles) { print "=item *
+      $style\n\n$styles->{$style}{chars}.\n\n" } print "=back\n\n";
+
+      * fh => handle (default: \*STDOUT)
+
+      Instead of the default STDOUT, you can direct the output to another
+      filehandle.
+
+      * speed => float (default: 0.2)
+
+      * show_delay => int
+
+      If set, will delay showing the spinning cursor until the specified
+      number of seconds. This can be used to create, e.g. a CLI application
+      that is relatively not chatty but will display progress after several
+      seconds of seeming inactivity.
+
+ keep_delay_showing()
+
+    Can be called to reset the timer that counts down to show spinning
+    cursor when show_delay is defined. For example, if show_delay is 5
+    seconds and two seconds have passed, it should've been 3 seconds before
+    spinning cursor is shown in the next update(). However, if you call
+    this method, it will be 5 seconds again before showing.
+
+ENVIRONMENT
+
+SEE ALSO
+
+    Progress::Any
+

@@ -1,0 +1,140 @@
+3.23 - October 21, 2009:
+- Make tests pass on various systems
+- Fix header output using say() on Perl >= 5.10.1
+- EscapeHTML() for basic attribute quoting
+- Fix vim syntax highlighting of normal Perl code
+
+3.22 - June 2, 2008:
+- Fix delete %header
+- Fix breakage with old versions of Exporter
+- Tests emulating actual PLP usage
+
+3.21 - May 31, 2008:
+- Fix everything() wrapper (broke pre-3.20 CGI scripts on 3.20)
+- %header values containing newlines will be sent as multiple fields
+- Encoding functions retain undef
+- Add charset to Content-Type header for UTF-8 output
+- All modules use warnings and contain a $VERSION
+- Fix META.yml syntax
+- Test pod coverage
+
+3.20 - May 29, 2008:
+- MIT license
+- FastCGI support
+- mod_perl2 support (but not recommended; read docs!)
+- Lighttpd and Apache2 support (either CGI or FastCGI)
+- Seperate modules for backend-specific code
+- Documentation updates
+- Fix html of default error message
+- Example plpinfo.plp, modeled after phpinfo
+
+3.19 - September 15, 2005:
+- New maintainer
+- Send headers when using C<printf> to start output
+- Do not send headers when C<print>ing multiple empty strings
+- EncodeURI()/DecodeURI() now accept read-only values
+- Cleaner and slightly faster code in Entity(), DecodeURI(), and EncodeURI()
+- Removed (undocumented) function HiddenFields
+- Tests for a few Functions
+- Documentation fixes and elaboration
+
+3.18 - October 16, 2002:
+- Fixed the class for tied headers. Content_Type is now really converted to
+  Content-Type, as explained in L<PLP::Fields>
+- Added some bits to L<PLP::HowTo>
+- Closing :> is now optional (which is handy for code-only PLP documents that
+  should not send additional whitespace)
+
+3.17 - August 21, 2002:
+- More cleanups
+- %get is now built on script start, no longer on first access
+- Apache->request->print is used now under mod_perl, not print (faster)
+- Small documentation fixes
+- Setting a header when headers are already sent now tells you where output
+  started
+- Speeded up source()
+
+3.16 - May 21, 2002:
+- Cleaned up a little
+- Changed compile-time <(...)> includes to use paths relative to the file they
+  are included by. Include() of course still uses paths relative to the current
+  working directory
+- Added and removed Safe.pm implementation. Safe's reval() crashes Apache on
+  Linux :(
+- Removed useless constant in void context in PLP::Functions
+- Added some documentation
+
+3.15 - May 21, 2002:
+- Added caching of scripts. This means using more memory but it also means
+  executing scripts 45-65% faster! (mod_perl only)
+- Added configurability of caching: PerlSetVar PLPcache On/Off (Default: On)
+- Changed PLP.pm to use File::Basename and File::Spec
+- Added recursion protection for compile-time includes (fixed max depth: 128)
+
+3.14 - May 20, 2002:
+- New plp.vim
+- Small documentation change
+
+3.13 - May 20, 2002
+- Added documentation:
+  - PLP
+  - PLP::FAQ
+  - PLP::Fields
+  - PLP::Functions
+- Added predeclared of hashes for use-strict-users ("our"/"use vars"
+  is no longer necessary for the PLP hashes)
+- Added plp.vim for vim syntax highlighting to the distribution
+- Added error reportig to Counter, ReadFile and WriteFile
+- Changed ReadFile and WriteFile to use lexical filehandles
+- Changed PLP::Functions to use Fcntl for improved portability
+- Cleaned up PLP::Fields: removed the PLPdummies
+- Fixed DELETE, EXISTS and FIRSTKEY in PLP::Tie::Delay (added PLPdummy there)
+
+3.12 - May 18, 2002
+- Fixed strict-violation in PLP.pm that happened only without mod_perl
+
+3.11 - May 18, 2002
+- Fixed all tie-stuff by reverting a change. Symbol.pm's delete_package doesn't
+  delete a package in the way I thought it did.
+
+3.10 - May 18, 2002
+- First standardized module distribution, to allow easy distribution via CPAN
+- Caution: installation procedure has changed because of that!
+- Moved all code from plp.cgi to PLP.pm, and made PLP.pm use strict (it was
+  strict compliant, but didn't actually use the pragma).
+- Added mod_perl handler() for extremely easy installation :)
+- Added some documentation (perldoc PLP) with installation instructions
+- Moved a few lines from init() to start()
+- Added comments in PLP.pm
+- Uses Symbol.pm to delete the package (Symbol is in the Perl distr.)
+
+3.06 - April 23, 2002
+- Added PLP_END functionality to simulate END { ... } for mod_perl
+- Fixed header sending in case PLP::Tie::Print->PRINT never happened
+- Added an override for exit(), to avoid needless debugging output in mod_perl
+
+3.05 - April 12, 2002
+- Fixed a potential bug in PLP::source and PLP::Functions::Counter
+
+3.04 - April 11, 2002
+- $PLP::DEBUG works again (set to 1 for $@ output, 2 for plain text+headers,
+  3 for both)
+- $PLP::ERROR is now a subref that can be overridden (April 12: see FAQ for
+  info)
+
+3.03 - April 11, 2002
+- Removed a bug that made sending alternative headers impossible. Sorry!
+- By the way, remember that if you want to send headers, the "<:" have to be
+  the very first characters in the file, with no white space in front of it!
+
+3.02 - April 11, 2002
+- Efficiency improvement by caching initialisation in PLP.pm
+
+3.01 - April 10, 2002
+- Bugfixes: include() used strict, fixed some typos, logging
+- Improved: error reporting
+
+3.00 - April 9, 2002
+- New release, a lot has been done from scratch again, this time following 
+  strict rules and mod_perl compatible. It's also a lot faster than 2.x.
+

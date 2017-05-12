@@ -1,0 +1,39 @@
+SYNOPSIS
+
+     use Perinci::Tx::Util qw(use_other_actions);
+    
+     sub foo {
+         my %args = @_;
+         use_other_actions(actions => [
+             ["My::action1", {arg=>1}],
+             ["My::action2", {arg=>2}],
+             # ...
+         ]);
+     }
+
+FUNCTIONS
+
+ use_other_actions(actions=>$actions) => RES
+
+    Generate envelope response for transactional function. Can be used to
+    say that function entirely depends on other actions.
+
+    Each action in $actions will be called with -tx_action =>
+    'check_state'. If all actions return 304, response status will be 304.
+    If some or all actions return 200 and the rest 304, response status
+    will be 200 with undo_actions result metadata taken from the actions'
+    metadata and do_actions from $actions. If any action returns 412,
+    response will be 412. If any action return other status, response will
+    be 500 (error).
+
+    It is your responsibility to load required modules.
+
+    Does not perform checking on actions like Perinci::Tx::Manager, but
+    eventually actions will be checked by Perinci::Tx::Manager anyway.
+
+SEE ALSO
+
+    Perinci::Util
+
+    Perinci
+

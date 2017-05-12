@@ -1,0 +1,117 @@
+#!/usr/bin/env perl
+
+use strict;
+
+use Getopt::Lucid qw( :all );
+use Pod::ROBODoc;
+
+my $options = Getopt::Lucid->getopt([
+    Switch( '--keep-source|-s' ),
+    Switch( '--skip-blanks|-b' ),
+    List  ( '--tag|-t'         ),
+]);
+
+my ( $input, $output) = @ARGV;
+
+my %params;
+$params{input } = $input  if $input;
+$params{output} = $output if $output;
+
+my $parser = Pod::ROBODoc->new(
+    keepsource => $options->get_keep_source,
+    skipblanks => $options->get_skip_blanks,
+    customtags => [ $options->get_tag ],
+);
+
+$parser->filter( %params );
+
+__END__
+
+=head1 NAME
+
+robodoc2pod - Convert ROBODoc to Pod.
+
+=head1 VERSION
+
+0.01
+
+=head1 USAGE
+
+    robodoc2pod [OPTIONS] [INPUT [,OUTPUT]]
+
+    $ robodoc2pod MyModule.pm MyModule.pod
+    $ robodoc2pod MyModule.pm >MyModule.pod
+    $ cat MyModule.pm | robodoc2pod MyModule.pod
+    
+    $ robodoc2pod --tag VERSION --tag TODO MyModule.pm 
+
+=head1 OPTIONS
+
+=over 4
+
+=item --keep-source
+
+Boolean indicating whether to keep data found within the ROBODoc SOURCE tags. 
+Defaults to false.
+
+=item --skip-blanks
+
+Boolean indicating whether to strip out whitespace-only lines from ROBODoc.
+Defaults to false.
+
+=item --tag [,--tag [,...]]
+
+A list of custom ROBODoc tag names. Defaults to an empty list.
+
+=item input
+
+The input stream containing ROBODoc documentation. If specified, this must be a 
+file name. Defaults to STDIN. 
+
+=item output
+
+The output stream to which the Pod will be written. If specified, this must be a 
+file name. Defaults to STDOUT.
+
+=back 
+
+=head1 DESCRIPTION
+
+Convert ROBODoc to Pod. 
+
+=head1 DIAGNOSTICS
+
+TODO
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+TODO
+
+=head1 DEPENDENCIES
+
+=over 4
+
+=item Getopt::Lucid
+
+=item Pod::ROBODoc (obviously)
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests to C<bug-Pod-ROBODoc at rt dot cpan dot org>,
+or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Pod-Robodoc>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+You may also use this module's github issues tracker at L<http://github.com/mgrimm/Pod-ROBODoc/issues>.
+
+=head1 AUTHOR
+
+Matt Grimm, C<< mgrimm at cpan dot org >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2010, Matt Grimm, All rights reserved
+
+This software is available under the same terms as perl.

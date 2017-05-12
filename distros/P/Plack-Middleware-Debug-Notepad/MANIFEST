@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+inc/Module/AutoInstall.pm
+lib/Plack/Middleware/Debug/Notepad.pm
+t/Notepad.t
+test-app.psgi
+META.yml
+MANIFEST

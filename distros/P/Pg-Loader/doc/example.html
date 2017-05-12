@@ -1,0 +1,38 @@
+<html>
+<title>Simple COPY</title>
+<body>
+A quick intro for the impatient. 
+Perhaps a simple example is all you need to get things done.
+<p>
+Suppose this was the definition
+<a href="definition.txt">definition</a> 
+of your table and want to load data to it.
+For this example, we assume data are already validated -
+-- pre-validation is a central concept in bulk loading.
+
+<p><b> Present State </b><p>
+Here is what was already in the exam table.
+<pre>
+=> select * from exam ;
+    fn     |   ln   | exam | score
+-----------+--------+------+-------
+ tambouras | vena   |    4 |    97
+ sun       | ugjn   |    6 |    82
+
+</pre>
+
+<b>The Task</b><p>
+Suppose we need to load new data and erase old data.
+
+<p>
+<b>SOLUTION</b></p>
+<OL>
+<LI> File exam.csv contains our pre-validate  new data in 
+<a href="exam_csv.txt">csv format.</a> 
+<LI>Now, Write a 
+<a href="pgloader.conf">pgloader.conf</a> configuration file. Done.
+</OL>
+
+
+</body>
+</html>

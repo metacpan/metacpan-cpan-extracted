@@ -1,0 +1,43 @@
+Revision history for Perl extension POE::Component::Player::Musicus.
+
+1.??  ?? ? ????
+	- POD fixes
+	- Test suite skips test if musicus is not installed
+
+1.31  Jan 1 2006
+	- Fixed broken queue system using the new object based PoCo-Child
+	- Significantly improved test suite
+
+1.30  May 14 2005
+	- Switched to a non-blocking POE based method of doing delays
+
+1.21  Sun August 1 2004
+	- Fixed small bug in queuing system where commands that were
+	  queued before a restart would be sent after the restart
+	- Small POD fix
+
+1.20  Sat May 29 2004
+	- Implemented queuing system to prevent multiple commands being
+	  sent to musicus without a response back
+	- Added delay parameter
+
+1.12  Tue May 18 2004
+	- Now correctly handles plugins that return no song information
+
+1.11  Wed May 5 2004
+	- Fixed quoting when passing data to Musicus
+	- Clarified docs on done/died events
+
+1.10  Sun Apr 25 2004 
+	- Added "ready" event
+	- Changes made to reflect how new version of musicus communicates
+	- Completely reworked getinfo/getinfocurr mechanism to reflect musicus
+	  changes
+
+1.00  Sat Apr 3 2004
+	- First public release
+
+0.01  Wed Jan 21 05:51:12 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n POE::Component::Player::Musicus
+

@@ -1,0 +1,26 @@
+---
+name: Pod-Extract-URI
+version: 0.3
+author:
+  - Ian Malpass (ian-cpan@indecorous.com)
+abstract: Extract URIs from POD
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Pod::Escapes: 0
+  Pod::Parser: 0
+  URI::Find: 0
+  URI::Find::Schemeless: 0
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+provides:
+  Pod::Extract::URI:
+    file: lib/Pod/Extract/URI.pm
+    version: 0.3
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

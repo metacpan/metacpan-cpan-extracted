@@ -1,0 +1,17 @@
+LICENSE FOR Parse::CPAN::Cached
+
+Copyright © 2009 sysmonblog@googlemail.com
+
+This library is free software; you can redistribute it and/or modify it under
+the terms of the Artistic License, or (at your option) under the terms of the
+GNU General Public License version 2.
+
+The full text of the Artistic License can be found in the perlartistic file
+as part of an installation of Perl 5.8.1 or later, or at the following URL:
+
+  http://www.perlfoundation.org/artistic_license_2_0
+
+The full text of the GNU General Public License version 2 can be found at
+the following URL:
+
+  http://www.gnu.org/licenses/gpl-2.0.html

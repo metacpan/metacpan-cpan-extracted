@@ -1,0 +1,18 @@
+Revision history for Perl extension Plack::Middleware::TMT
+
+0.04    Sat Oct 27 23:03:00 JST 2012
+    [NO CODE CHANGES]
+        - fixed typo in the POD
+        - improve POD(added methods)
+        - fixed for kwalitee
+        - support travis-ci.org
+
+0.03    Sat Jul  9 18:52:00 JST 2011
+        - added default macro "d" which is the dumper
+        - added POD
+
+0.02    Sat Jul  9 09:30:00 JST 2011
+        - fixed bug: template path
+
+0.01    Wed Jul  6 15:53:22 JST 2011
+        - original version

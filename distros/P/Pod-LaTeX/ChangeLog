@@ -1,0 +1,137 @@
+2011-01-04  Tim Jenness  <tjenness@cpan.org>
+
+	---- Version 0.59 CPAN ----
+
+	* t/*.t: Use Test::More for tests.
+
+	* Build.PL: Use Module::Build
+
+	* LaTeX.pm: Fix typo in pod (RT #46887 via Dave Mitchell)
+
+2004-12-29  Tim Jenness  <tjenness@cpan.org>
+
+	---- VERSION 0.58 CPAN ----
+
+	* t/pod2latex.t: Add test for square bracket in item
+
+	* LaTeX.pm (add_item): Fix items when the item contains a square
+	bracket (thanks to R. de Vries - RT#7570)
+
+2004-03-07  Tim Jenness  <tjenness@cpan.org>
+
+	* Version 0.57 CPAN
+
+	* README: Forgot to update prior to 0.56 release.
+
+2004-03-07  Tim Jenness  <tjenness@cpan.org>
+
+	* Version 0.56 CPAN
+
+	* LaTeX.pm (end_pod): Fix bug where UserPostamble and UserPreamble
+	were written even if AddPostamble and AddPreamble were false.
+
+	* pod2latex.PL: Add -pre/postfile and -pre/postamble to pod2latex.
+	(thanks to Adriano Rodrigues Ferreira)
+
+	* LaTeX.pm (end_pod): Fix doubling up of \end{document} when user
+	postamble is used (and add new test t/user.t). (thanks to Adriano
+	Rodrigues Ferreira).
+
+2003-07-27  Tim Jenness  <tjenness@cpan.org>
+
+	* MANIFEST: Forgot to add MANIFEST to the MANIFEST!!
+
+2003-04-05  Tim Jenness  <tjenness@cpan.org>
+
+	* Version 0.55 CPAN
+
+	* t/pod2latex.t: Update the test to work with Pod::ParseUtils
+	v0.30 but retain backwards compatibility. (thanks to Mark Veltzer
+	for pointing this out).
+
+	* pod2latex.PL: Change pod2latex so that the binary is generated
+	from a .PL (this allows it to work on VMS). Imported from bleadperl.
+
+	* LaTeX.pm (begin_pod): Add usepackage{textcomp} to preamble.
+
+	* t/pod2latex.t: Fix test to take into account current
+	patches. Add additional test for enumerate environments.
+
+2003-04-03  Tim Jenness  <tjenness@cpan.org>
+
+	* LaTeX.pm (add_item): Apply patch from Ariel Scolnicov to correct =item 1 blah
+	so that it becomes "1 blah" and not "1. 1 blah" (and duplicate patch from Sudhi Herle).
+
+	* pod2latex: Apply Jarkko's pod typo
+
+	* LaTeX.pm: Add Peter J. Acklam's patch to allow much improved unicode
+	entity support.
+
+2001-11-20  Tim Jenness  <tjenness@cpan.org>
+
+	* Version 0.54 on CPAN
+
+	* LaTeX.pm (command): Fix the logic in =for blocks (found because
+	perlpod.pod was not formatting correctly with "=for comment".
+
+2001-11-19  Tim Jenness  <tjenness@cpan.org>
+
+	* LaTeX.pm (verbatim): Use a cleverer approach to tabs. (Hugh S
+	Myers <hughmyers@micron.com>)
+	(_replace_special_chars_late): verbar escape was happening in the
+	wrong place and this was ruining link expansion.
+	(add_item): Tweak so that we for long items we have some content
+	in the item description itself and some bold. This makes sure that
+	everything lines up. (thanks to Hugh S Myers for the original idea
+	and for the _split_delimited method).
+
+2001-11-16  Tim Jenness  <tjenness@cpan.org>
+
+	* LaTeX.pm (_replace_special_chars_late): Finally agree to escape
+	< and > (thanks to some more prodding from Hugh S Myers)
+
+2000-10-10  Tim Jenness  <tjenness@cpan.org>
+
+	* pod2latex: Add strict and version number.  Add -h1level option.
+
+2000-09-22  Tim Jenness  <tjenness@cpan.org>
+
+	* Release 0.53 to CPAN
+
+2000-08-20  Tim Jenness  <t.jenness@jach.hawaii.edu>
+
+	* LaTeX.pm (add_item): Fix problem with '* text' items
+
+2000-08-20  Tim Jenness  <tjenness@cpan.org>
+
+	* LaTeX.pm (add_item): Handle long item strings (from  Mark
+	A. Hershberger <mah@everybody.org>)
+	(_replace_special_chars): Escape ~ (from Simon Cozens
+	<simon@cozens.net>)
+	Escape | (thanks to Marcel Grunauer <marcel@codewerk.com>)
+	Add support for E<verbar> and E<sol>
+
+
+2000-05-15  Tim Jenness  <tjenness@cpan.org>
+
+	* V0.52 for CPAN release
+
+2000-05-09  Tim Jenness  <tjenness@cpan.org>
+
+	* pod2latex: Make sure that argument order is preserved.
+
+2000-05-08  Tim Jenness  <tjenness@cpan.org>
+
+	* LaTeX.pm: Version 0.51
+
+2000-05-05  Tim Jenness  <tjenness@cpan.org>
+
+	* pod2latex: Set INFILE name when using filehandle.
+
+	* LaTeX.pm: Fix warning messages so that they correctly list file
+	name and line number. Fix escaping of ^ and {}.
+
+2000-03-30  Tim Jenness  <tjenness@cpan.org>
+
+	* LaTeX.pm: Version 0.50
+

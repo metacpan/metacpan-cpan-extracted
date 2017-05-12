@@ -1,0 +1,170 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1" >
+<title>Authentification</title>
+
+<script type="text/javascript" src="../../lib/prototype.js"></script>
+<script type="text/javascript" src="../../lib/scriptaculous.js"></script>
+<script type="text/javascript" src="../../lib/unittest.js"></script>
+<script type="text/javascript" src="../../src/util.js"></script>
+
+<link rel="stylesheet" href="../test.css" type="text/css" />
+  
+</head>
+<body>
+<p>Test util.js</p>
+<!-- Log output -->
+<div id="testlog"> </div>
+
+<div id="something" style="display: none">You can't see this</div>
+
+
+<div id="UP_roll">You can't see this</div>
+<div id="DOWN_roll" style="display: none">You can see this</div>
+<input id="WIDGET_roll" value="++" />
+
+
+<script type="text/javascript">
+
+var output = '';
+
+// -------------------------------------
+function Animal ( name ) {
+    this.name = name;
+}
+    
+Animal.prototype.word = function () {
+    return "something";
+}
+        
+Animal.prototype.talk = function () {
+    output += this.name + " says " + this.word() + ".";
+}
+
+// -------------------------------------
+function DoublePig ( name ) {
+    Animal.call( this, name );
+}
+    
+DoublePig.inherit( Animal );
+DoublePig.prototype.word = function () {
+    return "oink and " + Animal.prototype.word.apply( this );
+}
+        
+DoublePig.prototype.talk = function () {
+    output += 'A mutant pig named ';
+    Animal.prototype.talk.apply( this );
+}
+                            
+// --------------------------------------------------------
+new Test.Unit.Runner( {
+    // Loaded
+    testLoaded: function() { with(this) {
+        assertNotNull( String.prototype.substring2, "util.js loaded substring2" );
+        assertNotNull( String.prototype.substr2, "util.js loaded substr2" );
+        assertNotNull( String.prototype.reverse, "util.js loaded reverse" );
+        assertNotNull( String.prototype.html_escape, "util.js loaded html_escape" );
+    }},
+
+    // html_escape
+    test_html_escape: function() { with(this) {
+        var was = "\xC9t\xe9 comme en hivers";
+        var out = was.html_escape();
+        assertEqual( out, "&#201;t&#233; comme en hivers", "Escaped" );
+    }},
+
+    // reverse
+    test_reverse: function() {
+        var was = "hello world";
+        var out = was.reverse();
+        this.assertEqual( "dlrow olleh", out );
+    },
+    
+    // substring2
+    test_substring2: function() { with(this) {
+        var was = "hello world";
+        var out = was.substring2( 0, 5, "good-bye" );
+        assertEqual( "good-bye world", out );
+        out = was.substring2( 6, 11, "good-bye" );
+        assertEqual( "hello good-bye", out );
+        out = was.substring2( 6, 7, "W" );
+        assertEqual( "hello World", out );
+    }},
+    
+    // substr2
+    test_substr2: function() { with(this) {
+        var was = "hello world";
+        var out = was.substr2( 6, 5, "Mars" );
+        assertEqual( "hello Mars", out );
+        var out = was.substr2( 0, 0, "hello " );
+        assertEqual( "hello hello world", out );
+    }},
+    
+    // isalpha
+    test_isalpha: function() { with(this) {
+        assert( isalpha( 'a' ) );
+        assert( isalpha( 'A' ) );
+        assert( isalpha( 'é' ) );
+        assert( isalpha( 'É' ) );
+
+        assert( ! isalpha( ':' ) );
+        assert( ! isalpha( '!' ) );
+        assert( ! isalpha( '~' ) );
+    }},
+
+    // popup 
+    test_popup: function() { with(this) {
+        var something = $( 'something' );
+        assert( something );
+        assertNotVisible( something );
+        
+        popup( 'something' );
+        assertVisible( something );
+        Element.hide( something );
+        assertNotVisible( something );
+    }},
+
+    // rollup
+    test_rollup: function() { 
+        var up = $( 'UP_roll' );
+        this.assert( up );
+        var down = $( 'DOWN_roll' );
+        this.assert( down );
+        var widget = $( 'WIDGET_roll' );
+        this.assert( widget );
+
+        this.assertNotVisible( down );
+        this.assertVisible( up );
+        this.assertEqual( "++", widget.value );
+        
+        rollup( 'roll', '++', '--' );
+
+        this.assertVisible( down );
+        this.assertNotVisible( up );
+        this.assertEqual( "--", widget.value );
+
+        rollup( 'roll', '++', '--' );
+
+        this.assertNotVisible( down );
+        this.assertVisible( up );
+        this.assertEqual( "++", widget.value );
+
+        Element.hide( up );
+        Element.hide( widget );
+    },
+
+    // inherit 
+    test_inherit: function() {
+        var oinky = new DoublePig( "Oinky" );
+        this.assert( oinky );
+        oinky.talk();
+        this.assertEqual( output, "A mutant pig named Oinky says oink and something." );
+    }
+    
+  }, "testlog" );
+
+
+    
+</script>
+</body>

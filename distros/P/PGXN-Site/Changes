@@ -1,0 +1,153 @@
+Revision history for Perl extension PGXN::Site
+
+0.10.3  2013-11-06T07:22:46Z
+      - Updated Dalibo logo.
+      - Removed sponsors from the home page. Now showing the five most recent
+        releases, instead.
+      - Removed Pod tests from the distribution.
+
+0.10.2  2013-06-19T06:35:03Z
+      - Distribution links in the user page now include the version, so that
+        it links to the latest version of the distribution released by the
+        user, rather than the latest released by any user.
+      - Replaced use of the smartmatch operator with List::Util::first so as
+        to eliminate deprecation warnings from Perl 5.18.
+
+0.10.1  2012-12-12T07:31:22Z
+      - Added an Nginx configuration example to the mirroring page.
+      - Updated GitHub URLs to point to `/pgxn/` rather than `/theory/`
+        (RT #79085).
+      - Set `=encoding` for Pod in PGXN::Site::Locale (RT #79086).
+      - Updated tagline for sponsor Younicycle.
+      - Fixed test failure due to change in behavior in Email::Sender.
+
+0.10.0  2012-01-10T04:37:24Z
+      - Updated links in the About page.
+      - Reversed the display of the browse and download icons for
+        distributions listed on the user page. This is so that they are in the
+        same order as on the distribution page. Per gripe from Marti Raudsepp.
+      - Now showing an error page when the `in` parameter to `/search` is
+        missing, rather than throwing an exception and returning 500.
+      - Added Email::MIME, Email::Sender::Simple, and Software::License to the
+        list of requirements. The were inadvertently omitted.
+      - Added all core and Plack modules to the list of requirements, just to
+        be safe.
+      - Switched to 12 tag cloud sizes and enabled the CSS for the sizes, now
+        that PGXN has enough tags to make it interesting.
+      - Added Identity page a Creative Commons Attribution-ShareAlike 3.0
+        Unported License, description of fonts, and links to original art
+        work.
+      - Added `Capfile` for capistrano deployment.
+      - Added `eg/debian_init`, an example init script for Debian that runs
+        PGXN::Site on Starman.
+      - Updated the question about a command-line client in the FAQ to point
+        to the client that was actually implemented, rather than the client
+        that was never written.
+
+0.7.4   2011-05-18T17:54:32
+      - The router tests are now skipped if PGXN::API::Searcher is not
+        installed.
+
+0.7.3   2011-05-18T17:44:31
+      - Fixed alignment of definition list items on user page. Reported by
+        Daniele Varrazzo (Issue #1).
+
+0.7.2   2011-05-16T20:35:12
+      - Added Router::Resource to list of requirements. Was inadvertently
+        omitted.
+      - Multiword tags in the tag cloud no longer wrap across lines.
+
+0.7.1   2011-05-12T18:11:02
+      - Added `use blib` to `pgxn_site_server` so that the server will always
+        find the HTML files generated from the MultiMarkdown source files.
+      - Added namespace::autoclean to prerequisites. Its omission was
+        inadvertent.
+      - Backported to support Perl 5.10.
+
+0.7.0   2011-05-03T02:40:50
+      - Replaced the gradient background image wih one that uses dithering.
+        This'eliminates banding in the image, which the eagle-eyed Marti
+        Raudsepp noticed and was kind enough to fix.
+      - Added Test::File::Contents to the build prerequisites. Its omission
+        was an oversight.
+      - Replaced `pgxn_site.psgi` with `pgxn_site_server`. This program wraps
+        the functionality of `plackup` to do proper option processing.
+
+0.6.5   2011-04-30T20:04:44
+      - Added Data::Dump to list of requirements. Was inadvertently omitted.
+
+0.6.4   2011-04-29T21:54:44
+      - Documentation tweaks.
+      - First release on CPAN.
+
+0.6.3   2011-04-27T18:52:18
+      - The distribution page now shows the distribution name with the case
+        preserved as found in the distribution metadata file.
+
+0.6.2   2011-04-25T16:35:28
+      - Fixed offsetting of the "Abstract" item below "Other Releases" in the
+        distribution metadata section of the distribution file. Seen in
+        Firefox on Ubuntu.
+      - All distribution and extension names and versions, as well as tags and
+        user nicknames, are now lowercased for use in URIs.
+
+0.6.1   2011-04-22T18:51:42
+      - Improved the styling of table headers, as seen in `/spec/` and
+        documentation HTML.
+      - Added a note under the "Distributions" header for users who have yet
+        to release a distribution.
+      - Added redirect from `/meta/spec.html` to the new URL, `/spec/`.
+      - Added links to the Google group to the About and FAQ pages.
+      - Made the background tranparent in `code` elements inside tables.
+
+0.6.0   2011-04-20T05:35:52
+      - Requests should now all be returned with an appropriate
+        `Content-Length` header.
+      - A search request with no query parameter now redirects back to the
+        home page or, if it's on the same site, the referring page.
+      - Load users starting with a letter from the new "userlist" API.
+      - Updated for PGXN::API v0.12.0, notably changed method names for
+        fetching HTML documentation files in WWW::PGXN and doc path keys.
+
+0.5.1   2011-04-13T18:12:57
+      - Added the PGXN::Site version string as a query parameter to the CSS
+        URLs. This should force them to be reloaded after the release of any
+        new version by browsers that would otherwise cache them.
+      - Fixed the display of the table of contents sidebar on the
+        documentation page on Firefox. Per gripe from depesz.
+      - Moved the HTML rendering of the spec to /spec/.
+
+0.5.0   2011-04-13T02:25:37
+      - An invalid search query, such as "*", "", or "?", now returns a 400
+        response.
+      - Removed `robots.txt` route. This baby's going live tomorrow!
+      - Changed tags on home page to all be the same size and color. Just for
+        now, while there are a limited number of tags all with only one
+        associated distribution. It looks awful when they're all huge and red.
+      - Using the user's profile page for the Gravatar link URL if the user
+        has specified no URL.
+      - Added documentation for all controller action methods.
+      - Added Meta Spec pages (HTML and text).
+
+0.4.0   2011-04-11T23:41:16
+      - Updated tag cloud and recent releases code to rely on the new files
+        generated by PGXN::Manager 0.11.0.
+      - Added the version to the footer.
+      - Added summary stats to the About page.
+
+0.3.0  2011-04-07T18:19:55
+      - Renamed "backers" to "donors".
+
+0.2.0   2011-04-07T18:02:50
+      - Fixed some URIs so that they no longer reveal private URLs from behind
+        a proxy server. That is, all local URLs should be relative to the
+        document root, and not contain the scheme or host name.
+      - Added Gravatar to user page.
+      - Added `reverse_proxy` option, so that the default gravatar URL will
+        work properly for proxied servers.
+      - Added tag cloud to the home page.
+      - Added page with list of recent releases.
+
+0.1.0   2011-04-03T20:24:35
+      - Initial version.
+ 

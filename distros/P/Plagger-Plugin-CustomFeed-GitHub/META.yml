@@ -1,0 +1,39 @@
+---
+abstract: 'Custom feed for GitHub'
+author:
+  - 'zoncoen <zoncoen@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plagger-Plugin-CustomFeed-GitHub
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plagger::Plugin::CustomFeed::GitHub:
+    file: lib/Plagger/Plugin/CustomFeed/GitHub.pm
+    version: '0.01'
+requires:
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Plagger: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/zoncoen/Plagger-Plugin-CustomFeed-GitHub/issues
+  homepage: https://github.com/zoncoen/Plagger-Plugin-CustomFeed-GitHub
+  repository: git://github.com/zoncoen/Plagger-Plugin-CustomFeed-GitHub.git
+version: '0.01'

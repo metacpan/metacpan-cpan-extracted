@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Package/Tent.pm
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-basic.t
+t/samples/00-explicit
+t/samples/00-findme
+t/samples/00-findme.2
+t/samples/00-findme.sneaky
+t/samples/00-messy
+t/samples/00-subclass

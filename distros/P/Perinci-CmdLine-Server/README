@@ -1,0 +1,129 @@
+SYNOPSIS
+
+ Running the server
+
+    From your Perinci::Access::HTTP::Server-based PSGI application:
+
+     use Perinci::CmdLine::Server qw(create_cmdline_server);
+     create_cmdline_server(
+         name         => 'app1',
+         cmdline_args => {
+             url         => '/Some/Module/some_func',
+             log_any_app => 0,
+         },
+     );
+
+    Or, shortcut for simple cases:
+
+     use Perinci::CmdLine::Server -app1 => '/Some/Module/some_func';
+
+    Or, for testing using peri-htserve:
+
+     % peri-htserve --gepok-unix-sockets /tmp/app1.sock \
+         -MPerinci::CmdLine::Server=-app1,/Some/Module/some_func \
+         Perinci::CmdLine::Server::app::app1,noload
+
+ Using the server for completion
+
+     # foo-complete
+     #!perl
+     use HTTP::Tiny::UNIX;
+     use JSON;
+    
+     my $hres = HTTP::Tiny::UNIX->new->post_form(
+        'http:/tmp/app1.sock//api/Perinci/CmdLine/Server/app/app1/complete_cmdline',
+        {
+            cmdline     => $ENV{COMP_LINE},
+            point       => $ENV{COMP_POINT},
+            '-riap-fmt' => 'json',
+        },
+     );
+     my $rres = decode_json($hres->{content});
+     print $rres->[2];
+
+    Activate bash tab completion:
+
+     % chmod +x foo-complete
+     % complete -C foo-complete foo
+     % foo <Tab>
+
+    Now foo will be tab-completed using Rinci specification from
+    Some::Module's some_func.
+
+DESCRIPTION
+
+    Currently, Perinci::CmdLine::Classic-based CLI applications have a
+    perceptible startup overhead (between 0.15-0.35s or even more,
+    depending on your hardware, those numbers are for 2011-2013 PC/laptop
+    hardware). Some of the cause of the overhead is subroutine wrapping
+    (see Perinci::Sub::Wrapper) which also involves compilation of Sah
+    schemas (see Data::Sah), all of which are necessary for the convenience
+    of using Rinci metadata to specify aspects of your functions.
+
+    This level of overhead is a bit annoying when we are doing shell tab
+    completion (Perinci::CmdLine::Classic-based applications call
+    themselves for doing tab completion, e.g. through bash's complete -C
+    progname progname mechanism). Ideally, tab completion should take no
+    longer than 0.05-0.1s to feel instantaneous.
+
+    One (temporary?) solution to this annoyance is to start a daemon that
+    listens to Riap requests (either through Unix domain sockets or
+    TCP/IP). This way, the completion external command can just be a
+    lightweight HTTP client which asks the server for the completion and
+    displays the result to STDOUT for bash (this only requires, e.g.
+    HTTP::Tiny::Unix + Complete::Bash).
+
+    In the future, other functionalities aside from completion can also be
+    "off-loaded" to the server side to make the CLI program lighter and
+    quicker to start. This might require a refactoring of
+    Perinci::CmdLine::Classic codebase so it's more "stateless" and
+    reusable/safer for multiple requests (perhaps will be made non-OO in
+    the core so it's clear what states are being passed?)
+
+    In the future, Perinci::CmdLine::Classic might also be configured to
+    automatically start a daemon after the first run (and retire/kill the
+    daemon after being idle for, say, 30 minute or an hour).
+
+ How does it work?
+
+    In your Perinci::Access::HTTP::Server-based PSGI application:
+
+     use Perinci::CmdLine::Server qw(create_cmdline_server);
+     create_cmdline_server(
+         name         => 'app1',
+         cmdline_args => {
+             url         => '/Some/Module/some_func',
+             log_any_app => 0,
+         },
+     );
+
+    This will create an instance of Perinci::CmdLine::Classic object (the
+    cmdline_args argument will be fed to the constructor). It will also
+    create a Perl package dynamically (the default is
+    Perinci::CmdLine::Server::app:: + application name specified in name
+    argument). The package will contain several functions along with their
+    Rinci metadata. The functions can then be accessed over Riap protocol.
+    So far, the only function available is: complete_cmdline. You can use
+    it to request command-line completion. The Perinci::CmdLine::Classic
+    object will persist as long as the process lives. You can of course
+    start several applications.
+
+ Caveats
+
+    Leaving daemons around could give rise to some security and
+    resource-usage issues. It is ideal in situations where you already have
+    a daemon for other purposes (for example, in Spanel there is already an
+    API daemon service running; the command-line client uses this daemon to
+    request for tab completion).
+
+    Some code which normally runs on the client-side will now run on the
+    server-side. For example, the custom_completer and custom_arg_completer
+    code. You have to make sure that authentication and authorization
+    issues are handled.
+
+SEE ALSO
+
+    Perinci::CmdLine::Classic
+
+    Perinci::Access::HTTP::Server
+

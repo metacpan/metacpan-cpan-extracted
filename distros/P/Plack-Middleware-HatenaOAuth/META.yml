@@ -1,0 +1,49 @@
+---
+abstract: 'provide a login endpoint for Hatena OAuth'
+author:
+  - 'mechairoi <ttsujikawa@gmail.com>'
+build_requires:
+  HTTP::Request: '0'
+  HTTP::Response: '0'
+  Plack::Builder: '0'
+  Plack::Middleware::Session::Cookie: '0'
+  Plack::Test: '0'
+  Test::Base: '0'
+  Test::Mock::Guard: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-HatenaOAuth
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::HatenaOAuth:
+    file: lib/Plack/Middleware/HatenaOAuth.pm
+    version: '0.01'
+requires:
+  JSON::XS: '0'
+  OAuth::Lite::Consumer: '0'
+  Plack: '0'
+  Plack::Middleware::Session: '0'
+resources:
+  bugtracker: https://github.com/hatena/Plack-Middleware-HatenaOAuth/issues
+  homepage: https://github.com/hatena/Plack-Middleware-HatenaOAuth
+  repository: git://github.com/hatena/Plack-Middleware-HatenaOAuth.git
+version: '0.01'
+x_authority: cpan:TARAO
+x_contributors:
+  - 'tarao <tarao.gnn@gmail.com>'

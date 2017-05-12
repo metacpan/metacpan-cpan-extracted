@@ -1,0 +1,96 @@
+#!/usr/bin/perl
+###########################################
+use strict;
+use warnings;
+use Pod::Usage;
+use Perl::Configure;
+use Getopt::Std;
+use Log::Log4perl qw(:easy);
+
+my @yml_file_option = ();
+
+getopts("f:hv", \my %opts);
+
+if($opts{v}) {
+    Log::Log4perl->easy_init({level => $DEBUG, file => "stdout"});
+}
+
+if($opts{h}) {
+    pod2usage("");
+}
+
+if($opts{f}) {
+    @yml_file_option = (yml_file => $opts{f});
+}
+
+my $cfg = Perl::Configure->new(@yml_file_option);
+my @keyvalues = ();
+for my $arg (@ARGV) {
+    my($token, $value) = split /=/, $arg, 2;
+    push @keyvalues, $token, $value;
+    pod2usage("Invalid argument: $arg") unless defined $value;
+}
+$cfg->define(@keyvalues);
+$cfg->run();
+
+__END__
+
+=head1 NAME
+
+    perl-configure - Answer perl's Configure questions automatically
+
+=head1 SYNOPSIS
+
+    cd perl-x.y.z
+    perl-configure token=value token=value ...
+
+    # or
+    perl-configure -f configuration.yml
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-h>
+
+Prints this manual page in text format.
+
+=item B<-v>
+
+Verbose mode (Log4perl activated).
+
+=item B<-f config.yml>
+
+Use a YAML file C<config.yml> with key/value pairs instead of
+providing them on the command line. Additional key=value arguments
+I<after> this option can be provided and will override the options set in
+the YAML file.
+
+An example YAML file could look like this:
+
+    # config.yml
+    threads: y
+    libs:    '-lnsl -lgdbm -ldb'
+    ... 
+
+=back
+
+=head1 DESCRIPTION
+
+perl-configure is a utility script to run Perl::Configure from
+the command line.
+
+=head1 EXAMPLES
+
+  $ perl-configure prefix=/path optimizer="-g -O2"
+  $ perl-configure -f myconf.yml
+
+=head1 LEGALESE
+
+Copyright 2006, 2007 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+2006, Mike Schilli <cpan@perlmeister.com>

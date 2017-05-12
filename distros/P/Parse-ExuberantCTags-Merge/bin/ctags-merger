@@ -1,0 +1,65 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Parse::ExuberantCTags::Merge;
+use Getopt::Long qw/GetOptions/;
+
+our $VERSION = '1.00';
+
+sub usage {
+  my $msg = shift;
+  defined $msg and $msg .= "\n";
+  $msg = '' if not defined $msg;
+  print $msg;
+
+  print <<HERE;
+ctags-merger $VERSION copyright 2009, Steffen Mueller
+
+Usage: ctags-merger --sfile=sorted_input_ctags --sfile=another \\
+                    --ufile=unsorted_file --ufile=evenmore... \\
+                    --outputfile=myctags_file [<more unsorted files>]
+
+Merges multiple input files into one output ctags file and sorts
+the output file lexicographically while merging. Should be
+efficient for large files and won't eat all your computer's memory.
+
+  --sfile indicates a sorted input file
+  --ufile indicates an unsorted input file
+  --outputfile (or -o) indicates the output file to write to
+
+Any arguments that are not recognized as options will be considered
+additional *unsorted* input files.
+
+Obviously, pre-sorted input files will be faster to merge.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6 or,
+at your option, any later version of Perl 5 you may have available.
+HERE
+}
+
+my @sortedfiles;
+my @unsortedfiles;
+my $outfile;
+GetOptions(
+  'h|help'                        => \&usage,
+  'sortedfile|sfile|sorted=s'     => \@sortedfiles,
+  'unsortedfile|ufile|unsorted=s' => \@unsortedfiles,
+  'o|output|outputfile=s'         => \$outfile,
+);
+push @unsortedfiles, @ARGV;
+
+if (not defined $outfile) {
+  usage("Output file required");
+}
+elsif (not @sortedfiles and not @unsortedfiles) {
+  usage("At least one input file required");
+}
+
+my $merger = Parse::ExuberantCTags::Merge->new();
+$merger->add_file($_, sorted => 1) for @sortedfiles;
+$merger->add_file($_, sorted => 0) for @unsortedfiles;
+
+$merger->write($outfile);
+

@@ -1,0 +1,22 @@
+Changes
+lib/Parse/SSH2/PublicKey.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/boilerplate.t
+t/convert.t
+t/invalid-filedata.t
+t/invalid-obj.t
+t/openssh-pubkey.t
+t/parse-file.t
+t/parse.t
+t/secsh-pubkey.t
+ignore.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

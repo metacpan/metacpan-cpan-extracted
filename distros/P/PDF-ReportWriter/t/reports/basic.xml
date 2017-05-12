@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<report>
+
+    <definition>
+        <name>basic</name>
+        <file>basic.xml</file>
+        <destination>myreport.pdf</destination>
+        <paper>A4</paper>
+        <orientation>landscape</orientation>
+        <font>Helvetica</font>
+        <font>Courier</font>
+        <default_font>Helvetica</default_font>
+        <default_font_size>10</default_font_size>
+        <x_margin>20</x_margin>
+        <y_margin>20</y_margin>
+        <template>mytemplate.pdf</template>
+        <debug>0</debug>
+    </definition>
+
+    <data>
+   
+        <max_font_size>12</max_font_size>
+        <cell_borders>1</cell_borders>
+
+        <page>
+
+            <header>
+            </header>
+
+            <footer>
+
+                <cell index="0">
+                    <text>My Cell 1</text>
+                    <percent>20</percent>
+                    <x>500</x>
+                    <y>200</y>
+                    <background shape="box" colour="grey"/>
+                    <colour>red</colour>
+                </cell>
+
+                <cell index="1">
+                    <text>My Cell 2</text>
+                    <percent>20</percent>
+                    <x>200</x>
+                    <y>100</y>
+                    <background shape="box" colour="green"/>
+                    <colour>yellow</colour>
+                </cell>
+
+            </footer>
+
+        </page>
+
+        <fields>
+        
+            <field>
+                <label>item</label>
+                <index>0</index>
+                <percent>20</percent>
+                <font_size>12</font_size>
+                <align>left</align>
+                <header_colour>white</header_colour>
+            </field>
+
+            <field>
+                <label>date</label>
+                <index>1</index>
+                <percent>20</percent>
+                <font_size>12</font_size>
+                <align>left</align>
+                <header_colour>white</header_colour>
+            </field>
+
+        </fields>
+
+        <groups>
+
+            <group name="GrandTotals">
+                <data_column>1</data_column>
+                <aggregate_source>0</aggregate_source>
+
+                <header>
+                </header>
+
+                <footer>
+                </footer>
+            </group>
+
+            <group name="ItemTotals">
+                <data_column>1</data_column>
+                <aggregate_source>0</aggregate_source>
+
+                <header>
+                </header>
+
+                <footer>
+                </footer>
+            </group>
+        
+        </groups>
+
+    </data>
+
+</report>

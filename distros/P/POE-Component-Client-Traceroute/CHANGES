@@ -1,0 +1,36 @@
+  0.21 Tue Aug 22 17:17:00 MST 2006
+	- Fixed possible crash due to unexpected ICMP message
+	- Added basic Windows support, tested on Win XP SP2
+	- Fixed Makefile.PL to compile on Windows
+
+       Thu Aug 10 16:41:00 MST 2006
+        - Made private events return unless called from current session
+        - Fixed bug in packetlen too short detection
+        - Fixed wrapping bug in poe-traceroute.pl example
+
+  0.20 Thu Aug 10 12:46:00 MST 2006
+        - Added poe_traceroute.pl to examples, released beta version to CPAN
+
+       Thu Aug 10 09:32:00 MST 2006
+        - Removed requirement for Net::RawIP
+        - Fixed ICMP echo reply processing
+
+       Wed Aug 09 23:49:00 MST 2006
+        - Implemented UseICMP
+        - Updated test to verify UseICMP
+        - Update POD documentation
+     
+  0.11 Wed Aug 09 13:05:00 MST 2006
+        - Updated the POD documentation.
+        - Fixed the 'shutdown' event and documented it.
+        - Fixed port timeouts so late packets are dropped instead of processed.
+        - Upgraded to ExtUtils::MakeMaker 6.30_01 for updated META.yml
+        - Cleaned up code based on recommendations of Perl::Critic
+        - Removed Exporter since Module didn't export anything
+	    - Updated tests in t/01_trace.t
+        - Changed CHANGES layout
+        - Updated Readme
+
+  0.10 Tue Aug 08 17:16:00 MST 2006
+        - Initial public release
+

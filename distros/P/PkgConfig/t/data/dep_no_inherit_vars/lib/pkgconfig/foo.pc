@@ -1,0 +1,11 @@
+prefix=/usr/local/opt/nss
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/nss
+
+Name: NSS
+Description: Mozilla Network Security Services
+Version: 3.16.2
+Requires: bogus
+Libs: -L${libdir} -lnss3 -lnssutil3 -lsmime3 -lssl3
+Cflags: -I${includedir}

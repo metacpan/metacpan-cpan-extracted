@@ -1,0 +1,46 @@
+Piet/Interpreter version 0.03
+=============================
+
+Piet is a programming language in which programs look like abstract
+paintings. The language is named after Piet Mondrian, who pioneered
+the field of geometric abstract art.  The language is fully described
+at http://www.physics.usyd.edu.au/~mar/esoteric/piet.html.  A Piet
+program is an image file, usually a gif, which uses a set of 20 colors
+and the transitions between blocks of those colors to define a series
+of instructions and program flow.  See the above URL for more details.
+
+INSTALLATION
+
+Since Piet is a visual language, an image parsing mechanism is 
+required.  This module uses Image::Magick, so it would be to your
+advantage to download, install, and test that module and its 
+related stuff before trying to use this one.  I know, it's sort
+of a pain in the ass, but then again, so is Piet.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+See the perldoc for complete usage instructions.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Image::Magick
+    POSIX
+
+COPYRIGHT AND LICENCE
+
+This code may be modified and distributed under the same license that
+comes with Perl.  Use at your own risk.  
+
+Copyright (C) 2001 Marc Majcher
+
+"The only difference between me and a madman is that I am not mad."
+                                               -Salvador Dali
+
+

@@ -1,0 +1,289 @@
+=head1 Glossario
+
+=over 4
+
+=item backend compiler
+
+Backend compiler
+
+Non ho idee per una traduzione.
+
+=item benchmark
+
+Benchmark
+
+Lasciato cosE<igrave>.
+
+=item bottleneck
+
+Collo di bottiglia
+
+=item closure
+
+chiusura
+
+=item core module
+
+(dakkar) modulo distribuito assieme a perl
+es: The core threads module provides ... - Il modulo threads, distribuito assieme a perl, fornisce ...
+
+=item deadlock
+
+stallo
+
+=item default
+
+predefinito, oppure direttamente default
+
+=item to flush
+
+terminare le operazioni di I/O in corso
+
+Non c'E<egrave> una reale traduzione (credo), quindi va utilizzata una frase
+intera...
+
+(dakkar) "flush buffers" -> "svuotare i buffer" (OK, buffer non lo traduco...)
+
+=item globbing
+
+espansione degli argomenti
+
+=item hash
+
+LA hash.
+
+Femminile? Maschile? Voto per femminile causa imprintint in tenera
+etE<agrave>.
+
+(arthas): io voterei per il maschile LO hash, che ho sempre usato,
+come maschile E<egrave> anche l'array.
+
+=item HERE document
+
+(dakkar) nel caso della shell, 'documento immediato' ha perfettamente senso:
+lo prendi subito, nell'invocazione del comando, invece che dopo, da un file o
+da un altro processo. Nei sorgenti Perl lo prenderesti comunque subito (da una
+costante o espressione stringa). Mettiamo una nota storico-critica nel glossario
+definitivo? ;-)
+
+=item layer
+
+strato
+
+=item leap seconds
+
+Secondi di aggiustamento
+
+In pochi sanno cosa sono, credo. ;-) Maggiori informazioni qui:
+
+http://tycho.usno.navy.mil/leapsec.html
+
+Meno criptici leap day (29 Febbraio, giorno intercalare) e leap year
+(anno bisestile).
+
+=item to link
+
+linkare, linkato, ecc...
+
+Linkare E<egrave> usato nella parlata corrente. Non mi E<egrave> noto un verbo
+italiano che si possa usare al posto del neologismo.
+
+(arthas) secondo me la traduzione corretta E<egrave> "collegare"
+(dakkar) a Informatica a Pisa si dice comunemente "collegamento di un programma"...
+
+=item literal
+
+Letterale
+
+E<egrave> un sostantivo in inglese, ma viene reso in italiano come aggettivo. Esempi:
+
+"octal literal" => "ottale letterale"
+"as a literal" => "in maniera letterale"
+
+=item locale
+
+Locale
+
+Lasciato cosE<igrave>.
+
+=item to match
+
+trovare
+
+Pattern matching E<egrave> la ricerca di un pattern (vedi voce, sopra),
+match a pattern E<egrave> trovare un pattern secondo me [Arthas]
+
+(dakkar) corrispondere?
+(dree) pattern matching puE<ograve> essere "corrispondenza di modelli",
+"it matches" E<egrave> "verifica la corrispondenza" o anche "effettua un match"
+"it matches the" E<egrave> "trova corrispondenza in"
+"matched" E<egrave> "che verifica la corrispondenza" o "che verifica il match"
+
+=item memory leak
+
+Lasciato cosE<igrave>, perE<ograve> aggiungendo un NdT "perdita di memoria" tra parentesi.
+
+=item namespace
+
+Spazio dei nomi
+
+=item offset
+
+Scostamento
+
+(dakkar) quasi sempre "posizione" (es. in un file, in una stringa, in un
+vettore di bit...)
+
+=item operator overloading
+
+overloading degli operatori
+
+Sovraccarico non sembra starci cosE<igrave> bene.
+
+=item to override
+
+sovrapporsi
+
+"The yield method overrides its father's method with the same name"
+diventa "Il metodo yield si sovrappone al metodo del padre avente lo stesso
+nome".
+
+Una traduzione accettabile potrebbe anche essere "maschera"
+
+(dakkar) "maschera" lo vedo meglio per "shadow" (delle definizioni omonime in blocchi annidati)
+
+=item to pack
+
+compattare
+
+(dakkar) "impacchettare"?
+
+=item packing
+
+impacchettamento
+
+=item pattern
+
+pattern, schema, modello
+
+lasciarlo cosE<igrave>, o tradurlo in schema a seconda del contesto.
+
+=item pattern matching
+
+ricerca di pattern, corrispondenza di modelli
+
+Secondo me pattern E<egrave> meglio lasciarlo cosE<igrave> (o tradurlo con schema, a
+seconda del contesto), matching in questo caso puE<ograve> diventare ricerca, ma
+guardate I<to match> piE<ugrave> sotto per delucidazioni ulteriori.
+
+=item pragma
+
+(dakkar) direttiva:
+ the C<warning> pragma -> la direttiva C<warning>
+
+=item profile/profiling
+
+Profile/profiling
+
+Lasciato cosE<igrave>.
+
+=item prototype, signature
+
+Di una subroutine: "segnatura" (dalla letteratura tecnica)
+
+=item reference
+
+(dakkar) riferimento (giE<agrave> usato da qualcuno in perlfaq4)
+
+=item regular expression
+
+Espressione regolare
+
+=item return, returns
+
+(di funzioni) restituisce. B<NON> I<ritorna>!
+
+=item to set
+
+impostare
+
+Non usare "settare" please! ;-)
+
+=item statement
+
+istruzione.
+
+=item system call
+
+Chiamata di sistema
+
+Direi che potremmo usare la stessa traduzione anche per syscall, no?
+
+=item tainted
+
+Dato potenzialmente dannoso
+
+Non si E<egrave> trovato niente di meglio che una perifrasi per tradurre
+questo termine. Mi pare una traduzione sufficientemente accurata, ma
+non altrettanto malleabile.
+
+=item template
+
+Template
+
+=item to throw
+
+sollevare
+
+"the function throws an exception" => "la funzione solleva un'eccezione"
+
+=item tie
+
+legame
+
+Potrebbe non essere chiaro al lettore il riferimento a C<tie()>, al
+limite E<egrave> meglio specificare tra parentesi qualche dettaglio. Vedete
+anche I<to tie> sotto
+
+=item to tie
+
+Legare
+
+Si veda I<tie>, piE<ugrave> in alto.
+
+=item tied
+
+hash sottoposto a tie
+hash legato
+
+=item timestamp
+
+(dakkar) marca temporale oppure marcatura temporale
+
+=item token
+
+simbolo
+
+=item untaint
+
+Sterilizzare
+
+Ancora piE<ugrave> complesso E<egrave> il caso di untaint. Se per 'untainted'
+forse si puE<ograve> usare "dato non piE<ugrave> potenzialmente dannoso", il verbo
+"to untaint" inteso come l'esercizio di una delle operazioni che si
+possono effettuare per rendere un dato non potenzialmente dannoso -
+pausa arbitraria cosE<igrave> tirate il fiato :) - non so come tradurlo.
+Sterilizzare E<egrave> simpatico, abbastanza fedele al significato
+letterale e al probabile intento giocoso della scelta del termine
+originale.
+
+=item to unpack
+
+scompattare
+
+Anche se nel vocabolario italiano non esiste... ;)
+
+(dakkar) "spacchettare"?
+(dree) decomprimere
+
+=back

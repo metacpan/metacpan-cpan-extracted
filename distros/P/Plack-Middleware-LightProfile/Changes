@@ -1,0 +1,9 @@
+Revision history for perl module Plack::Middleware::LightProfile
+
+0.002     2014-02-20 19:24:00PST-0800 America/Los_Angeles
+
+- Document test prerequisites
+
+0.001     2014-02-19 20:50:36PST-0800 America/Los_Angeles
+
+ - Initial release

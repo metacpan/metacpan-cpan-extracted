@@ -1,0 +1,52 @@
+Revision history for Perl extension PHP.
+
+0.15  20 Jan 2013 (mob)
+        - pass $replace arg to header callback
+
+0.14  23 Jul 2012 (mob)
+        - mechanism to update internal hash and make  is_uploaded_file()
+          return true for files uploaded outside of PHP
+	- mechanism to pass post content and set up php://input stream
+        - fix PHP::assign_global for all superglobals
+
+0.13  04 Mar 2012 (mob)
+        - added PHP::__reset and PHP::assign_global functions
+        - added PHP::options(header => ...) callback
+
+0.12  10 Dec 2010
+        - support PHP v5.2 and v5.3
+
+0.11  09 Feb 2007
+	- back-compat for php4
+
+0.10  08 Dec 2006
+	- reset EG(exception) so further php calls aren't aborted
+
+0.09  24 May 2005
+        - add PUSH/POP for array
+        - fix TieArray::FETCHSIZE
+
+0.08  02 May 2005
+	- support PHPv5 constructors 
+	- fix a memory leak
+
+0.07  20 April 2005
+	- re-implement reference counting scheme to fix some memory corruptions 
+
+0.06  16 March 2005
+        - return pseudo-hash from array-returning functions
+	
+0.05  2 March 2005
+        - implement a pseudo-hash
+
+0.04  24 Feb 2005
+	- catch more exceptions
+
+0.03  16 Feb 2005
+	- compile with gcc versions below 3.3
+
+0.02  15 Feb 2005
+	- implement object properties and parameters to class constructors
+
+0.01  12 Feb 2005
+	- original version

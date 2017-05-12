@@ -1,0 +1,89 @@
+First of all the terms LL and LR apply to both grammars and parsers.
+
+LL parsers means Left to right Leftmost
+derivatation. LL grammars are special grammars where  LL(k) grammar
+means that an unambiguous production may be selected from the list
+given _only_ K tokens of lookahead. (This implies that left recursion
+is forbidden).
+
+LR parsers are Left to Right right most derivation in reverse. An
+LR(K) grammar is a grammar where we can recognize the right side of a
+production having seen all of what is derived from that right side
+with K tokens of lookahead. 
+
+LR grammars can describe more languages than LL grammars can.
+
+A brief general taxonomy of parsers
+NOTE: Be aware that there exists a parser that may parse any
+unambiguous context free grammar (CFG) in  N**3 time.  However most
+computer languages grammars can be parsed with much less. 
+
+Unversal Parsers
+  Cocke-Younger-Kasami, Earleys algorithm.
+  Can parse any algorithm
+  Are generally slow and are not usually needed for real world application
+
+Top Down Parsers
+  Recursive Descent Parsers
+    P::RD is one of these. (Caveats below)
+    According to the dragon rarely used due to speed issues.
+    P::RD thus may be the most commonly used recursive decent parser.
+    Fairly easy to write compared to non backtracking methods.
+    Parse LL grammars
+    Build a grammar tree and then walk the tree.
+  Predictive Parser
+    Special subset of recursive descent with no backtracking.
+    Non backtracking.
+    Parse subset of LL grammars. (LL(1))
+    Uses either tabular or tree based grammar representations.
+
+Bottom Up Parsers
+  LR Parsers
+    Parses a large subset of CFG's (LR grammars)
+    Most general nonbacktracking shift-reduce parsing method known
+    yet effecient as well. 
+    LR parsers can parse anything a predictive parser can parse and more
+    LR parsers detect errors as soon as it is possible in a left to right scan
+    Difficult to write by hand as state transition tables are used and
+    must be generated. 
+    3 common forms: SLR LALR LR. (least powerful and cheapest to most
+    powerful and most expensive) 
+    YACC produces an LALR compiler.
+    Are often very fast.
+  Operator Precedence Parsers
+    Can only handle a subset of CFGs (known as Operator grammars)
+    A grammar is an operator grammar IFF it has no production right
+    side with two adjacent nonterminals. 
+    Easy to write by hand.
+    Difficult to prove correct, only apply to a limited subset of
+    grammars has problem with grammars where an operator has different
+    precedence (eg unary and binary -) 
+    Often combined with recursive descent techniques where needed.
+
+
+P::RD is a topdown (i was confused on this issue yesterday) LL
+parser. It cannot handle any form of left recursion. 
+
+P::RD is actually an interesting beast that doesnt fit into the
+catagories and definitions that ive read very well.  For instance it
+does not use a tokenizer (it IS a tokenizer!) It could be used for
+predictive parsing using dynamic rules. It includes tree pruning
+abilities like <commit> it uses pragmas to make avoiding certain
+problems easy (<leftop:> <rightop:>). 
+
+In fact in general following my review I can see (some reasons) why
+Damian did the things he did and why he hasnt done the things he
+hasnt.  In all P::RD is a very perlish dynamic recursive descent
+parser. 
+
+Some thoughts:
+Since P::RD can only handle LL grammars it would seem that a tutorial
+on eliminating left recursion would be useful. 
+
+As would an automatic way to eliminate that recursion (there is a
+known algorithm for doing this) just as Damian say in the docs. 
+
+Argh: here it is How to eliminate Left Recursion:(extracted from Red
+Dragon page 47) 
+
+

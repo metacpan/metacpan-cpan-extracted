@@ -1,0 +1,179 @@
+NAME
+    Panda::NSS - Perl bindings to NSS Mozilla security library
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+      # verify certificate
+      use Panda::NSS;
+
+      Panda::NSS::init($nssdb_path);
+      Panda::NSS::add_builtins();
+
+      my $cert = Panda::NSS::Cert->new($cert_data_in_der_format);
+
+      if ($cert->simple_verify(Panda::NSS::CERTIFICATE_USAGE_OBJECT_SIGNER)) {
+          print "Certificate OK\n";
+      }
+      else {
+          print "Certificate NOT VALID\n";
+      }
+
+DESCRIPTION
+    This library is in very early stage of development. Any API can change.
+    Currently you can verify certificates with AIA extension (when not all
+    chain exists locally).
+
+FUNCTIONS
+    "Panda::NSS::init( [ $certdb_path ] )"
+        This function initialize NSS library. It calls
+        "NSS_InitReadWrite(dbpath)". However you may not specify
+        $certdb_path, in that case "NSS_NoDB_Init()" called, that mode not
+        very useful for certificate checks.
+
+    "Panda::NSS::reinit()"
+        This function should be called after fork to reinitialize NSS
+        library. Any outstanding handles will become invalid, but new will
+        work.
+
+        Actually this function compare current PID with saved in previous
+        "init" or "reinit" one and calls "SECMOD_RestartModules(false)" if
+        needed.
+
+        Example:
+
+          use Panda::NSS;
+
+          Panda::NSS::init($nssdb_path);
+
+          my $pid = fork();
+          if ($pid == 0) {
+              # child
+              Panda::NSS::reinit();
+              # ... other code in child
+          }
+
+    "Panda::NSS::add_builtins()"
+        This function load nssckbi module, that contains default root
+        certificates in NSS. May croaks if library initialized without
+        certdb.
+
+CONSTANTS
+  Certificate usage
+    "Panda::NSS::CERTIFICATE_USAGE_CHECK_ALL_USAGES"
+    "Panda::NSS::CERTIFICATE_USAGE_SSL_CLIENT"
+    "Panda::NSS::CERTIFICATE_USAGE_SSL_SERVER"
+    "Panda::NSS::CERTIFICATE_USAGE_SSL_SERVER_WITH_STEP_UP"
+    "Panda::NSS::CERTIFICATE_USAGE_SSL_CA"
+    "Panda::NSS::CERTIFICATE_USAGE_EMAIL_SIGNER"
+    "Panda::NSS::CERTIFICATE_USAGE_EMAIL_RECIPIENT"
+    "Panda::NSS::CERTIFICATE_USAGE_OBJECT_SIGNER"
+    "Panda::NSS::CERTIFICATE_USAGE_USER_CERT_IMPORT"
+    "Panda::NSS::CERTIFICATE_USAGE_VERIFY_CA"
+    "Panda::NSS::CERTIFICATE_USAGE_PROTECTED_OBJECT_SIGNER"
+    "Panda::NSS::CERTIFICATE_USAGE_STATUS_RESPONDER"
+    "Panda::NSS::CERTIFICATE_USAGE_ANY_CA"
+
+CLASSES
+  "Panda::NSS::Cert"
+   CONSTRUCTOR
+    "$cert = Panda::NSS::Cert->new( $data )"
+        Constructs certificate object.
+
+        $data can be certificate in DER binary format or in PEM format
+        (Base64 encoded DER certificate, enclosed between *"-----BEGIN
+        CERTIFICATE-----"* and *"-----END CERTIFICATE-----"*). Format is
+        auto-detected.
+
+   PROPERTIES
+    "$cert->version"
+        Returns certificate version. 1, 2 or 3.
+
+    "$cert->serial_number"
+        Returns certificate serial number as a binary string.
+
+    "$cert->serial_number_hex"
+        Returns certificate serial number as a hex encoded string.
+
+    "$cert->subject"
+        Returns certificate subject as a string.
+
+    "$cert->issuer"
+        Returns certificate issuer as a string.
+
+    "$cert->common_name"
+        Returns common name extracted from subject.
+
+    "$cert->country_name"
+        Returns country name extracted from subject.
+
+    "$cert->locality_name"
+        Returns locality name extracted from subject.
+
+    "$cert->state_name"
+        Returns state field extracted from subject.
+
+    "$cert->org_name"
+        Returns organization name extracted from subject.
+
+    "$cert->org_unit_name"
+        Returns organization unit extracted from subject.
+
+    "$cert->domain_component_name"
+        Returns domain component extracted from subject.
+
+   METHODS
+    "$rv = $cert->simple_verify( [ $usage ], [ $time ])"
+        Arguments:
+
+        $usage (Default: "CERTIFICATE_USAGE_CHECK_ALL_USAGES")
+          Certificate usage. One of "CERTIFICATE_USAGE_*" constants.
+
+        $time (Default: current time)
+          Time at which the certificate should be valid.
+
+        Method do verification process (it uses "CERT_PKIXVerifyCert" from
+        *NSS*).
+
+        Returns "true" if certificate valid.
+
+    "$rv = $cert->verify_signed_data( $data, $signature, [ $time ])"
+        Verify the signature of a signed data with the given certificate.
+
+        Returns "true" if signature match.
+
+SEE ALSO
+    Crypt::NSS::X509
+        Another try to bind NSS to Perl.
+
+    Crypt::OpenSSL::X509
+        Allow to work with certificates, but can't validate with AIA.
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/vovkasm/perl-Panda-NSS/issues>. You will be notified
+    automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/vovkasm/perl-Panda-NSS>
+
+      git clone https://github.com/vovkasm/perl-Panda-NSS.git
+
+AUTHOR
+    Vladimir Timofeev <vovkasm@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2017 by Vladimir Timofeev.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

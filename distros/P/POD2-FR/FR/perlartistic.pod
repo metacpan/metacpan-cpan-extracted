@@ -1,0 +1,438 @@
+=head1 NAME/NOM
+
+perlartistic - La licence « artistique » Perl
+
+=head1 SYNOPSIS
+
+  Vous pouvez faire référence à ce document en Pod via "L<perlartistic>"
+  Vous pouvez aussi voir ce document en tapant la commande "perldoc perlartistic"
+
+=head1 DESCRIPTION
+
+Voici la B<licence «E<nbsp>artistiqueE<nbsp>»>. Elle est ici pour que les
+modules, programmes, etc. qui veulent l'utiliser comme licence de distribution
+puissent s'y référer.
+
+C'est aussi l'une des deux licences sous lesquelles Perl peut être redistribuer
+et/ou modifier. Pour voir la seconde, la Licence Publique Générale GNU, lisez
+L<perlgpl>.
+
+=head1 Avertissement du traducteur
+
+Je suis déjà bien en peine de comprendre si l'une quelconque de la pléthore
+des licences de logiciel libre, en version originale, a la moindre valeur
+juridique, en a déjà eu, en aura jamais, a jamais été présentée avec succès au
+cours d'un procès... La présente traduction n'a d'autre vue que de faciliter
+l'appréhension par le lecteur francophone mal à l'aise en anglais des idées du
+texte original, et en aucun cas ne prétend avoir quoi que ce soit d'officiel,
+d'avalisé, ni de légal.
+
+La version originale en anglais suit la traduction.
+
+=head1 La «E<nbsp>licence artistiqueE<nbsp>»
+
+=head2 Préambule
+
+Ce document a pour but de définir les conditions sous lesquelles un paquetage
+peut être copié, de sorte que le détenteur du copyright puisse garder une
+quelconque apparence de contrôle artistique sur le développement du paquetage,
+tout en donnant aux utilisateurs du paquetage le droit de l'utiliser et de le
+distribuer selon des usages plus ou moins établis, ainsi que le droit d'opérer
+des modifications raisonnables.
+
+=head2 Définitions
+
+=over
+
+=item «E<nbsp>paquetageE<nbsp>»
+
+se réfère à la collection de fichiers distribués par le détenteur du
+copyright, et ses dérivés créés à travers des modifications sur le texte.
+
+=item «E<nbsp>version standardE<nbsp>»
+
+se réfère à un tel paquetage s'il n'a pas été modifié, ou s'il l'a été en
+accord avec les souhaits du détenteur du copyright, comme spécifié ci-dessous.
+
+=item le «E<nbsp>détenteur du copyrightE<nbsp>»
+
+est toute personne nommément citée dans le copyright ou qui possède un
+copyright sur le paquetage.
+
+=item «E<nbsp>vousE<nbsp>»
+
+c'est vous, si vous envisagez de copier ou de distribuer ce paquetage.
+
+=item un «E<nbsp>coût de copie raisonnableE<nbsp>»
+
+peut-on le justifier en fonction du prix des supports, des coûts de
+duplication, du temps consacré à cela, etc (ce n'est pas au détenteur du
+copyright qu'il vous faudra justifier ce prix, mais à la communauté des
+utilisateurs d'ordinateurs sans son ensemble, en tant que marché qui doit
+s'acquitter de cette somme).
+
+=item «E<nbsp>disponible gratuitementE<nbsp>»
+
+signifie qu'on ne demande rien pour l'objet en lui-même, mais que la
+manipulation de l'objet peut induire divers coûts. Cela signifie aussi que les
+détenteurs de l'objet ont la liberté de le redistribuer selon les mêmes
+conditions que celles qui l'accompagnaient quand ils l'ont reçu.
+
+=back
+
+=head2 Conditions de modification et de distribution
+
+=over
+
+=item 1.
+
+Vous pouvez faire et donner des copies verbatim de la version standard de ce
+paquetage sous forme de source sans restriction, pourvu que vous dupliquiez
+toutes les notices de copyright originales et les mises en garde qui les
+accompagnent.
+
+=item 2.
+
+Vous pouvez appliquer des corrections de bogues, des corrections de
+portabilité, et d'autres modifications dérivées du domaine public ou du
+détenteur du copyright. Un paquetage modifié ainsi sera encore considéré comme
+étant la version standard.
+
+=item 3.
+
+Vous pouvez modifier votre copie de ce paquetage de toute autre manière,
+pourvu que vous insériez et mettiez en évidence une notice dans chacun des
+fichiers modifiés exposant comment et quand vous avez modifié ce fichier, et
+pourvu que vous fassiez au moins une chose parmi les S<suivantes :>
+
+=over
+
+=item a)
+
+placer vos modifications dans le domaine public ou les rendre disponibles
+gratuitement, par exemple en les publiant sur l'Usenet ou sur un médium
+équivalent, ou en plaçant ces modifications sur un site d'archives majeur tel
+que uunet.uu.net, ou en autorisant le détenteur du copyright à inclure vos
+modifications dans la versions standard du paquetage.
+
+=item b)
+
+n'utiliser le paquetage ainsi modifié qu'au sein de votre société ou de votre
+organisation.
+
+=item c)
+
+changer le nom de tous les exécutables non standard de sorte qu'ils n'entrent
+pas en conflit avec les exécutables habituels, qui devront eux aussi être
+proposés, et fournir une page de manuel séparée pour chaque exécutable non
+standard documentant clairement en quoi il diffère de la version standard.
+
+=item d)
+
+négocier avec le détenteur du copyright un accord pour la distribution.
+
+=back
+
+=item 4.
+
+Vous pouvez distribuer les programmes de ce paquetage sous forme de code objet
+ou exécutable, pourvu que vous fassiez au moins une chose parmi les
+S<suivantes :>
+
+=over
+
+=item a)
+
+distribuer une version standard des exécutables et des fichiers de
+bibliothèques, ainsi que les instructions (dans la page de manuel ou son
+équivalent) sur l'endroit où trouver la version standard.
+
+=item b)
+
+accompagner la distribution du source du paquetage, sous une forme lisible par
+la machine, avec vos modifications.
+
+=item c)
+
+donner à tout exécutable non standard un nom non standard, et documenter
+clairement les différences dans les pages de manuel (ou leur équivalent),
+ainsi que les instructions sur l'endroit où obtenir la version standard.
+
+=item d)
+
+procéder à tout autre accord pour la distribution avec le détenteur du
+copyright.
+
+=back
+
+=item 5.
+
+Vous pouvez demander un coût de copie raisonnable pour toute distribution de
+ce paquetage. Vous pouvez demander le prix de votre choix pour assurer
+l'assistance technique de ce paquetage. Vous ne pouvez pas exiger d'argent
+pour ce paquetage en lui-même. Cependant, vous pouvez distribuer ce paquetage
+dans un agrégat, aux côtés d'autres programmes (éventuellement commerciaux),
+en tant qu'élément d'une distribution logicielle plus importante
+(éventuellement commerciale), pourvu que vous ne fassiez pas la publicité de
+ce paquetage comme étant de votre fait. Vous pouvez enchâsser l'interpréteur
+de ce paquetage dans un de vos exécutables (grâce à des liens)E<nbsp>; cela sera
+considéré comme une simple forme d'agrégation, pourvu que la version standard
+complète de l'interpréteur soit ainsi enchâssée.
+
+=item 6.
+
+Les scripts et les fichiers de bibliothèques fournis en entrée à ou produits
+en sortie des programmes de ce paquetage ne tombent pas automatiquement sous
+le copyright de ce paquetage, mais appartiennent à qui les a engendrés, et
+peuvent être vendus, ainsi qu'agrégés avec ce paquetage. Si de tels scripts ou
+fichiers de bibliothèques sont agrégés avec ce paquetage à travers les
+prétendues méthodes undump ou unexec de production d'une image binaire
+exécutable, alors la distribution d'une telle image ne sera pas considérée
+comme une distribution de ce paquetage, et ne tombera pas non plus sous le
+coup des restrictions des paragraphes 3 et 4, pourvu que vous ne représentiez
+une telle image exécutable comme une version standard de ce paquetage.
+
+=item 7.
+
+Les sous-programmes en C (ou, de manière comparable, les sous-programmes
+compilés dans d'autres langages) fournis par vous et liés avec ce paquetage
+dans le but d'émuler les sous-routines et les variables du langage défini par
+ce paquetage ne seront pas considérés comme faisant partie de ce paquetage,
+mais sont les équivalents de données en entrée comme il en est question dans
+le paragraphe 6, pourvu que ces sous-programmes ne modifient le langage
+d'aucune manière qui lui fasse échouer les tests de non régression pour le
+langage.
+
+=item 8.
+
+Il est toujours autorisé d'agréger ce paquetage avec une distribution
+commerciale pourvu que l'utilisation en soit enchâsséeE<nbsp>; c'est-à-dire sans
+aucune tentative manifeste de rendre les interfaces de ce paquetage visibles à
+l'utilisateur final de la distribution commerciale. Une telle utilisation ne
+sera pas considérée comme une distribution de ce paquetage.
+
+=item 9.
+
+Le nom du détenteur du copyright ne sera pas utilisé pour signer ou promouvoir
+des produits dérivés de ce logiciel sans autorisation écrite spécifique
+préalable.
+
+=item 10.
+
+CE PAQUETAGE EST FOURNI «E<nbsp>EN L'ÉTATE<nbsp>» ET SANS GARANTIE SPÉCIFIQUE OU
+IMPLICITE, Y COMPRIS, ET C'EST UNE LISTE NON EXHAUSTIVE, LES GARANTIES
+IMPLICITES DE QUALITÉ COMMERCIALE OU D'ADÉQUATION À UN OBJECTIF PARTICULIER.
+
+=back
+
+Fin.
+
+=head1 TRADUCTION
+
+=head2 Version
+
+Cette traduction française correspond à la version anglaise
+(L<http://www.perl.com/pub/language/misc/Artistic.html>). C'est aussi celle
+distribuée avec la version perl 5.10.0.
+
+=head2 Traducteur
+
+Sébastien Blondeel (sbi@linux-france.org). Conversion en Pod par Paul Gaborit
+(Paul.Gaborit @ enstimac.fr).
+
+=head2 Relecture
+
+Personne pour l'instant.
+
+=head1 The "Artistic License"
+
+=head2 Preamble
+
+The intent of this document is to state the conditions under which a
+Package may be copied, such that the Copyright Holder maintains some
+semblance of artistic control over the development of the package,
+while giving the users of the package the right to use and distribute
+the Package in a more-or-less customary fashion, plus the right to make
+reasonable modifications.
+
+=head2 Definitions
+
+=over
+
+=item "Package"
+
+refers to the collection of files distributed by the
+Copyright Holder, and derivatives of that collection of files created
+through textual modification.
+
+=item "Standard Version"
+
+refers to such a Package if it has not been
+modified, or has been modified in accordance with the wishes of the
+Copyright Holder as specified below.
+
+=item "Copyright Holder"
+
+is whoever is named in the copyright or
+copyrights for the package.
+
+=item "You"
+
+is you, if you're thinking about copying or distributing this Package.
+
+=item "Reasonable copying fee"
+
+is whatever you can justify on the basis
+of media cost, duplication charges, time of people involved, and so on.
+(You will not be required to justify it to the Copyright Holder, but
+only to the computing community at large as a market that must bear the
+fee.)
+
+=item "Freely Available"
+
+means that no fee is charged for the item
+itself, though there may be fees involved in handling the item. It also
+means that recipients of the item may redistribute it under the same
+conditions they received it.
+
+=back
+
+=head2 Conditions
+
+=over
+
+=item 1.
+
+You may make and give away verbatim copies of the source form of the
+Standard Version of this Package without restriction, provided that you
+duplicate all of the original copyright notices and associated disclaimers.
+
+=item 2.
+
+You may apply bug fixes, portability fixes and other modifications
+derived from the Public Domain or from the Copyright Holder.  A Package
+modified in such a way shall still be considered the Standard Version.
+
+=item 3.
+
+You may otherwise modify your copy of this Package in any way, provided
+that you insert a prominent notice in each changed file stating how and
+when you changed that file, and provided that you do at least ONE of the
+following:
+
+=over
+
+=item a)
+
+place your modifications in the Public Domain or otherwise make them
+Freely Available, such as by posting said modifications to Usenet or an
+equivalent medium, or placing the modifications on a major archive site
+such as uunet.uu.net, or by allowing the Copyright Holder to include
+your modifications in the Standard Version of the Package.
+
+=item b)
+
+use the modified Package only within your corporation or organization.
+
+=item c)
+
+rename any non-standard executables so the names do not conflict with
+standard executables, which must also be provided, and provide a
+separate manual page for each non-standard executable that clearly
+documents how it differs from the Standard Version.
+
+=item d)
+
+make other distribution arrangements with the Copyright Holder.
+
+=back
+
+=item 4.
+
+You may distribute the programs of this Package in object code or
+executable form, provided that you do at least ONE of the following:
+
+=over
+
+=item a)
+
+distribute a Standard Version of the executables and library files,
+together with instructions (in the manual page or equivalent) on where
+to get the Standard Version.
+
+=item b)
+
+accompany the distribution with the machine-readable source of the
+Package with your modifications.
+
+=item c)
+
+give non-standard executables non-standard names, and clearly
+document the differences in manual pages (or equivalent), together with
+instructions on where to get the Standard Version.
+
+=item d)
+
+make other distribution arrangements with the Copyright Holder.
+
+=back
+
+=item 5.
+
+You may charge a reasonable copying fee for any distribution of this
+Package.  You may charge any fee you choose for support of this
+Package.  You may not charge a fee for this Package itself.  However,
+you may distribute this Package in aggregate with other (possibly
+commercial) programs as part of a larger (possibly commercial) software
+distribution provided that you do not advertise this Package as a
+product of your own.  You may embed this Package's interpreter within
+an executable of yours (by linking); this shall be construed as a mere
+form of aggregation, provided that the complete Standard Version of the
+interpreter is so embedded.
+
+=item 6.
+
+The scripts and library files supplied as input to or produced as
+output from the programs of this Package do not automatically fall
+under the copyright of this Package, but belong to whoever generated
+them, and may be sold commercially, and may be aggregated with this
+Package.  If such scripts or library files are aggregated with this
+Package via the so-called "undump" or "unexec" methods of producing a
+binary executable image, then distribution of such an image shall
+neither be construed as a distribution of this Package nor shall it
+fall under the restrictions of Paragraphs 3 and 4, provided that you do
+not represent such an executable image as a Standard Version of this
+Package.
+
+=item 7.
+
+C subroutines (or comparably compiled subroutines in other
+languages) supplied by you and linked into this Package in order to
+emulate subroutines and variables of the language defined by this
+Package shall not be considered part of this Package, but are the
+equivalent of input as in Paragraph 6, provided these subroutines do
+not change the language in any way that would cause it to fail the
+regression tests for the language.
+
+=item 8.
+
+Aggregation of this Package with a commercial distribution is always
+permitted provided that the use of this Package is embedded; that is,
+when no overt attempt is made to make this Package's interfaces visible
+to the end user of the commercial distribution.  Such use shall not be
+construed as a distribution of this Package.
+
+=item 9.
+
+The name of the Copyright Holder may not be used to endorse or promote
+products derived from this software without specific prior written permission.
+
+=item 10.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+=back
+
+The End

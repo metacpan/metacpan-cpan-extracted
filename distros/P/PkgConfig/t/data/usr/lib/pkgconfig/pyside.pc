@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=/usr
+libdir=/usr/lib
+includedir=/usr/include/PySide
+
+Name: PySide
+Description: Support library for Python bindings of Qt-based libraries.
+Version: 0.3.2
+Libs: -L${libdir} -lpython -lpyside
+Cflags: -I${includedir}
+

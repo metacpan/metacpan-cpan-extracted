@@ -1,0 +1,23 @@
+---
+abstract: 'PostgreSQL wire protocol'
+author:
+  - 'Tom Molesworth <cpan@entitymodel.com>'
+build_requires:
+  Test::Exception: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200009, CPAN::Meta::Converter version 2.110930001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Protocol-PostgreSQL
+requires:
+  Digest::MD5: 0
+  Mixin::Event::Dispatch: 0.002
+  POSIX: 0
+  Time::HiRes: 0
+  parent: 0
+  perl: 5.008
+version: 0.008

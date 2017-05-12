@@ -1,0 +1,62 @@
+%{
+=head1 SYNOPSIS
+
+Compile it with 
+
+         eyapp -m 'Calc' Rule9.yp 
+         treereg -o T.pm -p 'R::' -m T Transform4
+
+to execute, run C<foldand0rule9_4.pl> 
+
+=cut
+
+%}
+
+%semantic token '=' '-' '+' '*' '/' 
+
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+%tree
+
+%%
+line: exp  { $_[1] } 
+;
+
+exp:      %name NUM   
+            NUM 
+	| %name VAR  
+          VAR 
+	| %name ASSIGN        
+          VAR '=' exp 
+	| %name PLUS 
+          exp '+' exp 
+	| %name MINUS       
+          exp '-' exp 
+	| %name TIMES   
+          exp '*' exp 
+	| %name DIV     
+          exp '/' exp 
+	| %name UMINUS
+          '-' exp %prec NEG 
+        |   '(' exp ')'  { $_[2] } /* Let us simplify a bit the tree */
+;
+
+%%
+
+__PACKAGE__->lexer( 
+  sub {
+    my($parser)=shift;
+
+    for (${$parser->input}) {
+        s/^\s+(?:#.*)?//;
+
+        s/^([0-9]+(?:\.[0-9]+)?)//   and return('NUM',$1);
+        s/^([A-Za-z][A-Za-z0-9_]*)// and return('VAR',$1);
+        s/^(.)//                     and return($1,$1);
+
+        return ('',undef);
+    }
+  }
+);

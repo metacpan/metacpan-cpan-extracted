@@ -1,0 +1,10 @@
+Revision history for POE-Component-WWW-OhNoRobotCom-Search
+
+0.002   2013-12-16
+        - Minor fixes to comply with the specs and Kwalitee game
+        - Added autogeneration of README from POD
+        - Moved author tests to xt/
+
+0.001   2008-03-22
+        - First version, released on an unsuspecting world.
+

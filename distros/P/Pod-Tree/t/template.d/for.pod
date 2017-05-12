@@ -1,0 +1,33 @@
+=pod
+
+=head1 HEAD
+
+=for html Line 1<br> &lt;<em>Line 2</em>&gt;
+
+=for html <a href="http://world.std.com/~swmcd/steven/index.html">Steven</a>
+
+	VERBATIM
+	VERBATIM
+	VERBATIM
+
+Fee, Fie, Foe, Fum
+Foo, Bar, Baz, Buz
+
+=for image flower.gif
+
+=begin text
+
+=head2 Not really a command
+
+	VERBATIM
+	VERBATIM
+	VERBATIM
+
+Fee, Fie, Foe, Fum
+Foo, Bar, Baz, Buz
+
+
+
+=end text
+
+=head2 Really a commmand.

@@ -1,0 +1,166 @@
+PlotCalendar modules - make nice Calendars in html or Ascii
+===========================================================
+
+TABLE OF CONTENTS
+-----------------
+
+1. Description
+2. Availability
+3. Prerequisites
+4. Installation
+5. Running Tests
+6. Demonstration scripts
+7. Bugs
+8. Copyright
+9. Author Information
+
+
+
+1. DESCRIPTION
+--------------
+
+This is a collection of modules for generating nice-looking calendars.
+There are 4 related modules in this set. 
+
+The modules are :
+
+PlotCalendar::Day
+PlotCalendar::Month
+PlotCalendar::DateTools
+PlotCalendar::DateDesc
+
+Day.pm generates a single day, with (for html) controls for colors, fonts, etc.
+
+Month.pm calls Day 28-31 times to create a proper Month-type calendar. Size,
+day to start week with, colors, etc are all controllable.
+
+DateTools.pm is a pure perl replacement for parts of Date::Calc because I
+can't compile the c-code in Date::Calc on my webhoster's system.
+
+DateDesc.pm is a simple parser for converting date descriptions like
+"First Tuesday" into an actual date.
+
+Examples :
+
+Day.pm
+------
+my $day = PlotCalendar::Day->new($digit);
+$day -> size(100,100);
+$day -> color('WHITE','RED',); # foreground and background
+$day -> font('14','10','8'); # font size for digits, day-name, and text
+$day -> style('bi','nbu','i'); # font styles for same
+$day -> cliptext('yes'); # clip long text
+$day -> dayname('Groundhog Day');
+$day -> nameref('<A href="http://ooga.booga.com/">');
+$day -> text('text string 1','text string 2','abcdefghijklmno'); # 3 lines of text
+$day -> textcolor('BLUE','RED','GREEN',);
+$day -> textsize('8','10','8',);
+$day -> textstyle('b','u','bi',);
+my $html = $day -> gethtml;
+
+Month.pm
+--------
+
+my $month = PlotCalendar::Month->new(01,1999);
+$month -> size(700,700);
+$month -> font('14','10','8');
+$month -> cliptext('yes');
+$month -> firstday('Sun'); # first column
+$month -> fgcolor('BLACK',);
+$month -> bgcolor(@bgcolor); # background per day
+$month -> styles('b','bi','ui',);
+$month -> htmlref(@url); # url for each day
+$month -> dayname(@daynames); # names for each day
+my $html = $month -> gethtml;
+
+
+2. AVAILABILITY
+---------------
+
+  The newest version (which should be considered a beta version) is available
+  through my home page:
+    http://www.ajackson.org/software/plotcalendar
+  Feel free to try it out.
+
+  The current (non-beta) version of this module is available from your nearest
+  CPAN site.
+
+  The two will frequently be the same.
+
+3. PREREQUISITES
+----------------
+
+Perl 5.004_01 is where I developed this. It may work with earlier versions,
+but I haven't tried it. I'm not too sophisticared, so I'd be a little
+surprised if I used anything not in 5.003 for example.
+
+Time::DaysInMonth
+Time::JulianDay
+
+Both these are called by DateTools.pm. I have maintained compatibility with
+Date::Calc, so if you wished, you could edit the 
+use PlotCalendar::DateTools 
+lines, make them 
+use Date::Calc
+and forget about the Time:: modules and DateTools.
+
+4. INSTALLATION
+---------------
+
+To install, just type
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+For help with Makefile.PL, try
+perldoc ExtUtils::MakeMaker
+
+If you wish to install in a non-standard place, use 
+
+perl Makefile.PL LIB=~/lib PREFIX=~
+
+5. RUNNING TESTS
+----------------
+
+I can't imagine the tests failing, unless you were missing some key part
+of perl, but hey, things happen. If it fails, email me. Try running
+make test TEST_VERBOSE=1 and send me the results.
+
+6. DEMONSTRATION SCRIPTS
+------------------------
+
+In the /demo directory are some scripts that show what it can do. Hope they
+make the documentation clearer.
+
+To run events_calendar.pl in it's fullest mode, type :
+events_calendar.pl  -mon 7 -yr 1999 -reg y -spec y > events.html
+and view the output in your favorite browser.
+
+7. BUGS
+-------
+
+None that I know of - when you find one, let me know.
+
+If you do report it, please include :
+- version of perl
+- version of PlotCalendar
+- Operating System and version
+- description of problem
+- a *short* piece of code that demonstrates the problem
+
+8. COPYRIGHT
+------------
+
+Copyright (c) 1999 Alan Jackson. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+9. AUTHOR INFORMATION
+---------------------
+
+Alan Jackson
+alanj@ajackson.org
+http://www.ajackson/org/
+
+

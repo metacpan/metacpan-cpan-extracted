@@ -1,0 +1,61 @@
+NAME
+    PITA::POE::SupportServer - Support server for PITA virtual machines
+
+SYNOPSIS
+      use PITA::POE::SupportServer;
+
+      my $server = PITA::POE::SupportServer->new(
+              execute => [
+                      '/usr/bin/qemu',
+                      '-snapshot',
+                      '-hda',
+                      '/var/pita/image/ba312bb13f.img',
+                      ],
+              http_local_addr       => '127.0.0.1',
+              http_local_port       => 80,
+              http_startup_timeout  => 30,
+              http_activity_timeout => 3600,
+              http_shutdown_timeout => 10,
+              http_result           => '/result.xml',
+              http_mirrors          => {
+                      '/cpan' => '/var/cache/minicpan',
+                      },
+              ) or die "Failed to create support server";
+  
+      $server->prepare
+              or die "Failed to prepare support server";
+  
+      $server->run
+              or die "Failed to run support server";
+  
+      my $result_file = $server->http_result('/result.xml')
+              or die "Guest Image execution failed";
+
+DESCRIPTION
+    TO BE COMPLETED
+
+SUPPORT 
+Bugs should be reported via the CPAN bug tracker at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PITA-POE-SupportServer>
+
+    For other issues, contact the author.
+
+AUTHORS
+    David Davis <xantus@cpan.org>
+
+    Adam Kennedy <adamk@cpan.org>
+
+    Chris Williams <bingos@cpan.org>
+
+SEE ALSO
+    PITA, POE, Process, <http://ali.as/>
+
+COPYRIGHT AND LICENSE
+    Copyright 2006 - 2008 David Davis.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

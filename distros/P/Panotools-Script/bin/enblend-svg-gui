@@ -1,0 +1,57 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $cwd = `cat \$HOME/.enblend-svg-gui` || $ENV{'HOME'};
+chomp $cwd;
+
+unless (`which enblend-svg`)
+{
+    `zenity --error --text='enblend-svg not found in your \$PATH'`;
+    exit 1;
+}
+
+my $svg;
+
+if (@ARGV)
+{
+    $svg = shift;
+}
+else
+{
+    $svg = `zenity --file-selection \\
+                       --filename=$cwd/ \\
+                       --title='Select SVG image to blend layers'` || exit 0;
+    chomp $svg;
+    $cwd = $svg;
+    $cwd =~ s/\/[^\/]*$//;
+    $cwd =~ s/\\\//\//g;
+    `echo '$cwd' > \$HOME/.enblend-svg-gui` if ($cwd =~ /^\//);
+}
+
+exit unless $svg =~ /\.svg$/i;
+
+my $wrap = system ("zenity --question \\
+                   --title='Wrap around?' \\
+                   --text='Click OK to blend across -180/+180 boundary. Click Cancel for normal scenes.'");
+
+my $args = '';
+$args = '-w' unless $wrap;
+
+my $tif = $svg;
+$tif =~ s/\.svg$/.tif/i;
+
+`enblend-svg $args -o '$tif' '$svg' | \\
+     zenity --progress \\
+            --title='Blending SVG...' \\
+            --auto-close \\
+            --pulsate \\
+            --text='blending: $svg'`;
+
+`zenity --info \\
+        --title='TIF created' \\
+        --text='$svg'`;
+
+exit 0;
+

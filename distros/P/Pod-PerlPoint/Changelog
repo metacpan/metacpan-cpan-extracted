@@ -1,0 +1,82 @@
+
+
+0.06
+----
+
+Added Perlpoint::Import::POD module, according to the parsers (0.43)
+new standard import filter API. Significant parts of the source come
+from the POD import filter of PerlPointCD which is used for years
+to produce German Perl Workshop CDs, so this is stable code.
+	
+	
+
+December 2004
+-------------
+
+Prepared for PerlPoint::Parser 0.40, which will no longer interpret
+unset or reset variables. For this reason, the $__pod2pp__empty__
+variable cannot be used to guard generated text paragraphs when
+producing for a modern parser.
+
+Luckily, the 0.40 parser introduces dotted text paragraphs, which
+are exactly what we need. So, a new method Pod::PerlPoint::configure()
+can switch to dotted texts. Likewise, a new option -parserversion
+tells pod2pp which parser shall process the generated texts, and
+adapts its Pod::PerlPoint handling accordingly:
+
+  pod2pp -parserversion 0.40 ...
+
+
+May 2004
+--------
+
+Pod::PerlPoint now accepts embedded PerlPoint:
+
+  =for perlpoint
+  A \I<PerlPoint> text
+
+  =begin perlpoint
+
+  @|
+  column 1 | column 2
+  cell 1   | cell 2
+  cell 3   | cell 4
+
+  =end perlpoint
+
+
+Bugfix: X<word> was translated into \X<word>, while its meaning is
+        \X{mode=index_only}<word>.
+
+
+January 2003:
+-------------
+
+Headlines are now preceded by explicit empty lines, avoiding trouble with first
+headline detection (which could be recognized as text before).
+
+Bugfix in \L tag generation: Pod::PerlPoint 0.02 produced "a" options instead
+of "url".
+
+The special variable $__pod2pp__empty__ is now set up in the generated PerlPoint
+source, a user has no longer to take care of it.
+
+
+
+
+December 2002:
+--------------
+
+Reimplementation on base of Pod::Simple.
+
+
+
+
+
+September 2002:
+---------------
+
+Version 0.01, derived from Pod::Text, on base on Pod::Parser.
+It worked fine, but unfortunately Pod::Parser did not offer direct string processing.
+
+Never releaed on CPAN.

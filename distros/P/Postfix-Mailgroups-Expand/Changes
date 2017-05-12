@@ -1,0 +1,9 @@
+1.131020  2013-04-12 14:38:05 Europe/Prague
+	Add last endline to created files.
+	Add missing dependency.
+
+1.130923  2013-04-02 13:23:31 Europe/Prague
+	Emails are now sorted and uniq.
+
+1.130921  2013-04-02 12:33:51 Europe/Prague
+	First version

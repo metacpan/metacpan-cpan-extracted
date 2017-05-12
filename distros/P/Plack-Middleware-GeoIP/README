@@ -1,0 +1,64 @@
+NAME
+    Plack::Middleware::GeoIP - Find country and city of origin of a web
+    request
+
+SYNOPSIS
+      # with Plack::Middleware::RealIP
+      enable 'Plack::Middleware::RealIP',
+          header => 'X-Forwarded-For',
+          trusted_proxy => [ qw(192.168.1.0/24 192.168.2.1) ];
+      enable 'Plack::Middleware::GeoIP',
+          GeoIPDBFile => [ '/path/to/GeoIP.dat', '/path/to/GeoIPCity.dat' ],
+          GeoIPEnableUTF8 => 1;
+
+DESCRIPTION
+    Plack::Middleware::GeoIP is a loose port of the Apache module mod_geoip.
+    It uses Geo::IP to lookup the country and city that a web request
+    originated from.
+
+    All requests are looked up and GEOIP_* variables are added to PSGI
+    environment hash. For improved performance, you may want to only enable
+    this middleware for specific URL's.
+
+    The following PSGI environment variables are set by this middleware:
+
+    GeoIP Country Edition:
+
+    GEOIP_COUNTRY_CODE, GEOIP_COUNTRY_CODE3, GEOIP_COUNTRY_NAME,
+    GEOIP_CONTINENT_CODE
+
+    GeoIP City Edition:
+
+    GEOIP_COUNTRY_CODE, GEOIP_COUNTRY_CODE3, GEOIP_COUNTRY_NAME,
+    GEOIP_CONTINENT_CODE, GEOIP_LATITUDE, GEOIP_LONGITUDE, GEOIP_TIME_ZONE,
+    GEOIP_REGION, GEOIP_REGION_NAME, GEOIP_CITY, GEOIP_POSTAL_CODE,
+    GEOIP_METRO_CODE, GEOIP_AREA_CODE
+
+CONFIGURATION
+    GeoIPDBFile
+          GeoIPDBFile => '/path/to/GeoIP.dat'
+          GeoIPDBFile => [ '/path/to/GeoIP.dat', '/path/to/GeoIPCity.dat' ]
+          GeoIPDBFile => [ '/path/to/GeoIP.dat', [ '/path/to/GeoIPCity.dat', 'MemoryCache' ] ]
+          GeoIPDBFile => [ '/path/to/GeoIP.dat', [ '/path/to/GeoIPCity.dat', [ qw(MemoryCache CheckCache) ] ] ]
+
+        Path to GeoIP data file. GeoIP flags may also be specified. Accepted
+        flags are Standard, MemoryCache, CheckCache, IndexCache, and
+        MMapCache.
+
+    GeoIPEnableUTF8
+          GeoIPEnableUTF8 => 1
+
+        Turn on utf8 characters for city names.
+
+AUTHOR
+    Sherwin Daganato <sherwin@daganato.com>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    mod_geoip <http://www.maxmind.com/app/mod_geoip>
+
+    Geo::IP
+

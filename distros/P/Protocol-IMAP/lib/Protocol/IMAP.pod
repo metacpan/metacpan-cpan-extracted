@@ -1,0 +1,74 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::IMAP
+at lib/Protocol/IMAP.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Protocol::IMAP - support for the Internet Message Access Protocol as defined in RFC3501.
+
+=head1 VERSION
+
+version 0.004
+
+=head1 SYNOPSIS
+
+ use Protocol::IMAP::Server;
+ use Protocol::IMAP::Client;
+
+=head1 DESCRIPTION
+
+Base class for L<Protocol::IMAP::Server> and L<Protocol::IMAP::Client> implementations.
+
+=head1 METHODS
+
+=head2 C<debug>
+
+Debug log message. Only displayed if the debug flag was passed to L<configure>.
+
+=head2 C<state>
+
+Sets or retrieves the current state, in text format.
+
+=head2 state_id
+
+Sets or returns the state, in numeric format.
+
+=head2 in_state
+
+Returns true if we're in the given state.
+
+=head2 C<write>
+
+Raise an error if we call ->write at top level, just in case someone's trying to use this directly.
+
+=head2 C<_capture_weakself>
+
+Helper method to avoid capturing $self in closures, using the same approach and method name
+as in L<IO::Async>.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+with thanks to Paul Evans <leonerd@leonerd.co.uk> for the L<IO::Async> framework, which provides
+the foundation for L<Net::Async::IMAP>.
+
+=head1 LICENSE
+
+Licensed under the same terms as Perl itself.

@@ -1,0 +1,20 @@
+Revision history for Perl-Tokenizer
+
+0.05    2016-11-28
+        - Added cache support for regular expressions that are dynamically generated.
+        - Added more tests.
+        - Updated the dependencies.
+
+0.04    2016-06-03
+        - Fixed the parsing of `$h{key}{s}`, `$h{key}{tr}`, etc...
+        - Fixed the parsing of `$o->s()`, `$o->tr()`, etc...
+        - Fixed the parsing of `$x++ < $y` and `$x-- < $y`
+
+0.03    2015-09-04
+        - Added support for the new bitwise operators (`^.`, `&.` and `|.`)
+
+0.02    2015-07-23
+        - Fixed the parsing of '__DATA__' when it's followed by a fat comma.
+
+0.01    2015-07-16
+        - First version, released on an unsuspecting world.

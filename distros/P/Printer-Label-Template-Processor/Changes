@@ -1,0 +1,6 @@
+Revision history for Printer-Label-Template-Processor
+
+1.01
+  - croak on error in _print_to_lpr
+1.00
+  - initial release

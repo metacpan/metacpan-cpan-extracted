@@ -1,0 +1,85 @@
+--- #YAML:1.0
+name: Petal-Utils
+version: 0.06
+license: perl
+distribution_type: module
+requires:
+  Date::Format: 0.01
+  Petal: 1.06
+  URI::Escape: 3.0
+recommends: {}
+build_requires:
+  Module::Build: 0.20
+  Test::More: 0.01
+conflicts: {}
+provides:
+  Petal::Utils:
+    file: lib/Petal/Utils.pm
+    version: 0.06
+  Petal::Utils::And:
+    file: lib/Petal/Utils/And.pm
+    version: 0.06
+  Petal::Utils::Base:
+    file: lib/Petal/Utils/Base.pm
+    version: 0.06
+  Petal::Utils::Create_Href:
+    file: lib/Petal/Utils/Create_Href.pm
+    version: 0.06
+  Petal::Utils::Date:
+    file: lib/Petal/Utils/Date.pm
+    version: 0.06
+  Petal::Utils::Decode:
+    file: lib/Petal/Utils/Decode.pm
+    version: 0.06
+  Petal::Utils::Dump:
+    file: lib/Petal/Utils/Dump.pm
+    version: 0.06
+  Petal::Utils::Each:
+    file: lib/Petal/Utils/Each.pm
+    version: 0.06
+  Petal::Utils::Equal:
+    file: lib/Petal/Utils/Equal.pm
+    version: 0.06
+  Petal::Utils::If:
+    file: lib/Petal/Utils/If.pm
+    version: 0.06
+  Petal::Utils::Keys:
+    file: lib/Petal/Utils/Keys.pm
+    version: 0.06
+  Petal::Utils::Like:
+    file: lib/Petal/Utils/Like.pm
+    version: 0.06
+  Petal::Utils::Limit:
+    file: lib/Petal/Utils/Limit.pm
+    version: 0.06
+  Petal::Utils::Limitr:
+    file: lib/Petal/Utils/Limitr.pm
+    version: 0.06
+  Petal::Utils::LowerCase:
+    file: lib/Petal/Utils/LowerCase.pm
+    version: 0.06
+  Petal::Utils::Or:
+    file: lib/Petal/Utils/Or.pm
+    version: 0.06
+  Petal::Utils::Printf:
+    file: lib/Petal/Utils/Printf.pm
+    version: 0.06
+  Petal::Utils::Sort:
+    file: lib/Petal/Utils/Sort.pm
+    version: 0.06
+  Petal::Utils::Substr:
+    file: lib/Petal/Utils/Substr.pm
+    version: 0.06
+  Petal::Utils::UC_First:
+    file: lib/Petal/Utils/UC_First.pm
+    version: 0.06
+  Petal::Utils::US_Date:
+    file: lib/Petal/Utils/US_Date.pm
+    version: 0.06
+  Petal::Utils::UpperCase:
+    file: lib/Petal/Utils/UpperCase.pm
+    version: 0.06
+  Petal::Utils::UriEscape:
+    file: lib/Petal/Utils/UriEscape.pm
+    version: 0.06
+generated_by: Module::Build version 0.21

@@ -1,0 +1,42 @@
+==============================
+2011-11-17 21:50:49 +0000 1.04
+==============================
+
+  commit 8b9800205877ea50d6e926cf032b58e235b06150
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Nov 17 21:50:49 2011 +0000
+  
+    Use Net::IP::Minimal instead of Net::IP 
+
+==============================
+2011-05-02 11:01:34 +0100 1.02
+==============================
+
+  commit 0d104e16c71ebf8fd387590efc9a86706a89a4a6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon May 2 11:01:34 2011 +0100
+  
+    Add POD::Coverage exceptions
+
+  commit c88fe929fcae1cd5246d805138076e8fa42629e0
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon May 2 10:49:20 2011 +0100
+  
+    Bump to 1.02
+
+  commit 17fcdc5e82037a1b730285b040bb11c327a40ce3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon May 2 10:43:51 2011 +0100
+  
+    Dzilification of the distribution, requires
+    Dist::Zilla::PluginBundle::BINGOS mmmkay
+
+  commit 804f9f7ce7f02c83c59c9604d9ecf312714abb6d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon May 2 10:30:25 2011 +0100
+  
+    Add Net::IP as a prereq and use it instead of PoCo::IRC::Common 
+
+====================================
+End of changes in the last 1825 days
+====================================

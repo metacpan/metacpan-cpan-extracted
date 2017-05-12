@@ -1,0 +1,39 @@
+---
+abstract: 'Find a minimum required version of perl for Perl code'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  File::Spec::Functions: '0'
+  Test::More: '0.47'
+  Test::Script: '1.03'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-MinimumVersion
+requires:
+  Carp: '0'
+  Exporter: '0'
+  File::Find::Rule: '0'
+  File::Find::Rule::Perl: '0'
+  File::Spec: '0'
+  Getopt::Long: '0'
+  List::Util: '1.20'
+  PPI: '1.215'
+  PPI::Util: '0'
+  PPIx::Regexp: '0.033'
+  Params::Util: '0.25'
+  Perl::Critic::Utils: '1.104'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+  version: '0.76'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilbowers/Perl-MinimumVersion
+  repository: https://github.com/neilbowers/Perl-MinimumVersion.git
+version: '1.38'

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Plack-Middleware-Auth-Htpasswd,
+version 0.02:
+
+  http basic authentication through apache-style .htpasswd files
+
+This software is copyright (c) 2010 by Jesse Luehrs.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

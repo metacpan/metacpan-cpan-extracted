@@ -1,0 +1,28 @@
+---
+abstract: 'A toolkit integrating intelligent PostgreSQL dbs into Perl objects'
+author:
+  - 'Chris Travers <chris.travers@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PGObject
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBD::Pg: '2'
+  Memoize: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+resources:
+  repository: https://github.com/ledgersmb/PGObject.git
+version: v1.403.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

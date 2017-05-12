@@ -1,0 +1,8 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Plack/Middleware/AppStoreReceipt.pm
+t/app_store_receipt.t

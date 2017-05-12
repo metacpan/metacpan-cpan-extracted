@@ -1,0 +1,57 @@
+%{
+=head1 SYNOPSIS
+
+See http://search.cpan.org/perldoc?Parse::Eyapp::debuggingtut
+This file solves the conflict in Debug.eyp using dynamic 
+conflict resolution techniques
+(see section 'SOLVING CONFLICTS WITH THE POSTPONED CONFLICT STRATEGY' in
+http://search.cpan.org/perldoc?Parse::Eyapp::debuggingtut)
+
+Compile it with 
+
+      $ eyapp -C DebugDynamicResolution4.eyp
+      $ eyapp -P lastD.eyp
+
+Execute the generated modulino with:
+
+       $ ./DebugDynamicResolution4.pm -t -i -m 1 -c 'D;D;D;S;S'
+
+
+=head1 See also
+
+    Debug.eyp Debug1.eyp Debug2.eyp DebugLookForward.eyp
+
+=cut
+
+%}
+
+%token D S
+
+%conflict LD lastD? D:LAST : shift
+
+%tree 
+
+%%
+p:
+    %name PROG
+    ds ';' ss  
+  | %name SS
+    ss
+;
+
+ds:
+    %name D
+    D                    %PREC LD 
+      ';' ds    
+  | %name D:LAST
+    D                    %PREC LD  
+;
+
+ss:
+    %name SS
+    S ';' ss      
+  | %name S
+    S       
+;
+
+%%

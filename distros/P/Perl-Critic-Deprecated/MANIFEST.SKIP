@@ -1,0 +1,52 @@
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+\B\.cvsignore$
+
+# Avoid Makemaker generated and utility files.
+\bMakefile$
+\bblib
+\bMakeMaker-\d
+\bpm_to_blib$
+\bblibdirs$
+^MYMETA.yml$
+^MYMETA.json
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\bBuild.bat$
+\b_build
+
+# Avoid Devel::(Cover|NYTProf) generated files
+\bcover_db
+\bnytprof
+
+# Avoid temp and backup files.
+~$
+\.tmp$
+\.old$
+\.bak$
+\.vim_backup$
+\.swp$
+\#$
+\.#
+\.rej$
+
+# Avoid OS-specific files/dirs
+#   Mac OSX metadata
+\B\.DS_Store
+#   Mac OSX custom folder icons
+\bIcon\x0d
+#   Mac OSX SMB mount metadata files
+\B\._
+# Avoid archives of this distribution
+\bPerl-Critic-Deprecated-.*
+
+# Avoid Eclipse files.
+\.project\b
+^\.includepath$
+
+# Avoid my Ant build script
+^build\.xml$

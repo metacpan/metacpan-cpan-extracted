@@ -1,0 +1,33 @@
+=head1 TODO for Parse-Taxonomy
+
+TODO list for Perl module Parse::Taxonomy
+
+=head2 Filehandle as argument
+
+What would it mean for a Parse::Taxonomy subclass to accept a
+filehandle as an argument, rather than a file?  Would that be difficult to
+implement?
+
+=head2 Data migration example
+
+Cookbook:  Include recipe for predicting the result of a data migration
+between relational database tables.
+
+=head2 Nested Sets
+
+=head3 Methods in existing packages
+
+A method in Parse::Taxonomy::MaterializedPath that would generate a Perl data
+structure holding a taxonomy-by-nested-set equivalent to that in the object.
+
+A method in Parse::Taxonomy::AdjacentList that would generate a Perl data
+structure holding a taxonomy-by-nested-set equivalent to that in the object.
+
+=head3 New package
+
+Explore creation of a Parse::Taxonomy::NestedSet package which would
+take as input a taxonomy-by-nested-set (via a CSV file or via a C<components>
+interface), created a NestedSet object against which methods such as
+C<descendant_counts()>, C<pathify()> and C<adjacentify()> would be callable.
+
+=cut

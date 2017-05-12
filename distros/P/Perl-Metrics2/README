@@ -1,0 +1,70 @@
+NAME
+    Perl::Metrics2 - Perl metrics storage and processing engine
+
+DESCRIPTION
+    THIS IS AN EXPERIMENTAL MODULE AND MAY CHANGE WITHOUT NOTICE
+
+    Perl::Metrics2 is a 2nd-generation implementation of the Perl Code
+    Metrics System.
+
+    The Perl Code Metrics System is a module which provides a Perl document
+    metrics processing engine, and a database in which to store the
+    resulting metrics data.
+
+    The intent is to be able to take a large collection of Perl documents,
+    and relatively easily parse the files and run a series of processes on
+    the documents.
+
+    The resulting data can then be stored, and later used to generate useful
+    information about the documents.
+
+  General Structure
+    Perl::Metrics2 consists of two primary elements. Firstly, an ORLite
+    database that stores the metrics informationg.
+
+    See Perl::Metrics2::FileMetrics for the data class stored in the
+    database.
+
+    The second element is a plugin structure for creating metrics packages,
+    so that the metrics capture can be done independant of the underlying
+    mechanisms used for parsing, storage and analysis.
+
+    See Perl::Metrics2::Plugin for more information.
+
+  Getting Started
+    "Perl::Metrics2" comes with on default plugin,
+    Perl::Metrics2::Plugin::Core, which provides a sampling of metrics.
+
+    To get started load the module, providing the database location as a
+    param (it will create it if needed). Then call the "process_directory"
+    method, providing it with an absolute path to a directory of Perl code
+    on the local filesystem.
+
+    "Perl::Metrics" will work on the files in the directory, and when it
+    finishes you will have a nice database full of metrics data about your
+    files.
+
+    Of course, how you actually USE that data is up to you, but you can
+    query Perl::Metrics2::FileMetric just like any other ORLite database
+    once you have collected it all.
+
+METHODS
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Perl-Metrics2>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2009 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,71 @@
+Changelog for P9Y-ProcessTable
+
+1.08 2015-10-18T17:41:51
+ - Paranoid checking of $proc->stat, in case it suddenly doesn't exist
+   (Brendan Byrd)
+ - Small RE tweak on ProcFS.pm for speed (Brendan Byrd)
+ - Fix refresh method (Brendan Byrd)
+
+1.07 2014-08-07T04:31:37
+ - No changes found
+
+1.06 2014-08-07T04:31:37
+ - Fix RSS for Linux procFS (Brendan Byrd)
+ - Use a better source for start time with Linux procFS (Brendan Byrd)
+ - Add AUTHORITY comment (Brendan Byrd)
+ - Use Meta::Dynamic::Config for dynamic_config=1 (Brendan Byrd)
+ - Add test/requires deps (Brendan Byrd)
+
+1.05 2013-06-18T13:08:33
+ - More PPT fixes... (Brendan Byrd)
+
+1.00 2013-06-14T17:11:44
+
+0.98 2013-06-07T13:23:19
+ - Fix the magic with ProcessTable.pm's methods by moving them to a   
+   ::Base class Move all per-OS modules to a OS/ directory Remove Moo from
+   per-OS modules (since they are never objects) (Brendan Byrd)
+
+0.97 2013-05-31T04:12:37
+ - Fix missing @PodWeaver->config_plugin option in dist.ini    (which
+   totally frelled the POD last release) (Brendan Byrd)
+
+0.96 2013-05-31T03:57:31
+ - Add in Path::Class 0.32 dep for Cygwin issue Fix *.ini for new Author PB
+   (Brendan Byrd)
+
+0.95 2013-03-18T22:49:41
+ - Fix methods caught by the "You cannot overwrite a locally defined
+   method" M:G:A error (Brendan Byrd)
+
+0.94 2012-11-28T14:46:28
+ - Update docs (add Dragonfly to list) (Brendan Byrd)
+ - Make the DragonflyBSD procfs stuff actually work. (Chris 'BinGOs'
+   Williams)
+ - Fix ProcFS for Dragonfly and Solaris (Brendan Byrd)
+
+0.93 2012-10-24T20:07:34
+ - Fix Solaris in ProcFS Fix BSD v5.12 %$hash issue Make ppid a
+   non-dependency (Brendan Byrd)
+
+0.92 2012-10-18T00:25:35
+ - Some final test fixes (Brendan Byrd)
+ - Fix Prereqs Reject $hash if it doesn't have a pid/ppid (Brendan Byrd)
+ - Small fixes (Brendan Byrd)
+ - Fix missing main::dir error in P9YOSDeps.pm (Brendan Byrd)
+
+0.91 2012-10-17T18:41:51
+ - Fix SYNOPSIS (Brendan Byrd)
+ - Minor POD/dist.ini changes (Brendan Byrd)
+ - README.pod / stuff (Brendan Byrd)
+ - Various fixes (Brendan Byrd)
+ - Add inc/ (ignored by mistake) (Brendan Byrd)
+
+0.90 2012-10-14T20:39:24
+ - Fix tests Remove POD from OS stuff (Brendan Byrd)
+ - Add Darwin Add new Process class with some changes to structure (Brendan
+   Byrd)
+ - Fix class loading Fix Solaris ProcFS (Brendan Byrd)
+ - Fix some ProcFS bugs (Brendan Byrd)
+ - Mostly finished coding (Brendan Byrd)
+ - Initial commit (Brendan Byrd)

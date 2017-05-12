@@ -1,0 +1,51 @@
+[% USE dumper %]
+[% USE two_dp = Format("%.2f") %]
+[%# <!-- Profile: [% dumper.dump(profile) | html % ] --> %]
+[% marks = profile.marks;
+   IF marks.size == 1;
+      marks = [ 0 ];
+   END;
+   style = styles.Chart %]
+<g style="[% class.Profile %]" transform="translate(0, [% two_dp(y_pos) %])">
+[% m = 0;
+   FOR mark = marks %]
+<!-- iterating; mark = [% mark %] -->
+	<g transform="translate([% two_dp((profile.zero - zero) * pps) %], [% m * (styles.Chart.item_height + styles.Chart.padding) %])">
+[%      mi = profile.mark_iter(mark);
+        done = 0;
+   	y = 0;
+	IF mark != "0"; %]
+	<line style="[% class.MarkBorder %]" x1="0" y1="[% y %]" x2="[% (profile.end - profile.zero) * pps %]" y2="[% y %]" />
+	<text transform="translate([% two_dp(mi('start') * pps) %], [% y %])" dy="0em" style="[% class.MarkLabel %]">[% mi('name') %]</text>
+[%	END;
+        WHILE mi("next") %]
+<!-- showing [% mi('name') %], 0=[% mi('start') %] D=[% mi('length') %] -->
+[%         name = mi('name');
+	   delta = mi('length');
+	   left = mi('start') * pps;
+	   itemlabel = name _ " (" _ (delta * 1000) _ "ms)";
+           legend_idx = legend_index.$name || 0;
+	   text_width = styles.OverTop.avg_char_width * itemlabel.length;
+	   relative_width = (width - (profile.zero - zero) * pps);
+%]<!-- text_width of [% name %] = [% text_width %], left = [% left %], relative_width = [% two_dp(relative_width) %] -->[%
+	   IF (left + text_width) > relative_width;
+		left = relative_width - text_width;
+	   END;
+%]
+
+	  <rect x="[% mi('start') * pps %]" y="[% y %]" width="[% mi('length') * pps %]" height="[% styles.Chart.item_height %]" style="[% class.Data.$legend_idx %]" />
+[% IF 0 %]<rect x="[% left %]" y="[% y %]" width="[% text_width %]" height="[% styles.Chart.item_height %]" style="stroke: #ff00ff; fill: #dd00dd; opacity: 50%" />[% END %]
+	  <text transform="translate([% two_dp(left) %], [% y %])" textWidth="[% text_width %]px" dy="1em" style="[% class.OverTop %]">[% mi('name') | html %] ([% mi('length') * 1000 %]ms)</text>
+[%        y = y + style.item_height + style.padding;
+          m = m + 1;
+        END;
+ %]
+	</g>
+[% END %]
+	<!-- Profile overall -->
+   <rect x="[% two_dp((profile.zero - zero) * pps) %]" y="0" transform="translate(0.5, 0.5)" style="[% class.LogBorder %]stroke: #000000" width="[% (profile.end - profile.zero) * pps %]" height="[% (styles.Chart.item_height + styles.Chart.padding) * m - styles.Chart.padding %]" />
+</g>
+[% y_pos = y_pos + (styles.Chart.item_height + styles.Chart.padding) * m -%]
+<text transform="translate([% two_dp((profile.zero - zero) * pps) %], [% y_pos %])" dy="0.7em" style="[% class.LogLabel %]">[% profile.tag('process') _ "@" _ profile.tag("hostname") %]</text>
+<!-- tag: [% dumper.dump(profile.tag('process')) %] -->
+[% y_pos = y_pos + styles.Chart.box_padding %]

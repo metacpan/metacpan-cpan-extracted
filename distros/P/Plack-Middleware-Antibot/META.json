@@ -1,0 +1,93 @@
+{
+   "abstract" : "Prevent bots from submitting forms",
+   "author" : [
+      "Viacheslav Tykhanovskyi, <viacheslav.t@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Antibot",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack" : "0",
+            "Plack::Session" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::Antibot" : {
+         "file" : "lib/Plack/Middleware/Antibot.pm",
+         "version" : "0.02"
+      },
+      "Plack::Middleware::Antibot::FakeField" : {
+         "file" : "lib/Plack/Middleware/Antibot/FakeField.pm"
+      },
+      "Plack::Middleware::Antibot::FilterBase" : {
+         "file" : "lib/Plack/Middleware/Antibot/FilterBase.pm"
+      },
+      "Plack::Middleware::Antibot::Static" : {
+         "file" : "lib/Plack/Middleware/Antibot/Static.pm"
+      },
+      "Plack::Middleware::Antibot::TextCaptcha" : {
+         "file" : "lib/Plack/Middleware/Antibot/TextCaptcha.pm"
+      },
+      "Plack::Middleware::Antibot::TooFast" : {
+         "file" : "lib/Plack/Middleware/Antibot/TooFast.pm"
+      },
+      "Plack::Middleware::Antibot::TooSlow" : {
+         "file" : "lib/Plack/Middleware/Antibot/TooSlow.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vti/plack-middleware-antibot/issues"
+      },
+      "homepage" : "https://github.com/vti/plack-middleware-antibot",
+      "repository" : {
+         "url" : "git://github.com/vti/plack-middleware-antibot.git",
+         "web" : "https://github.com/vti/plack-middleware-antibot"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:VTI"
+}

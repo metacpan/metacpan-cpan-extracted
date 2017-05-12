@@ -1,0 +1,157 @@
+Revision history for Pod-Weaver-Section-Badges
+
+0.0402 2016-02-20 20:29:12 UTC
+ [Enhancements]
+ - Pass on the Dist::Zilla object (if available) to the badges.
+ - Don't create any output if the badge plugin doesn't return anything.
+   Previously created a line break.
+
+ [Stats & Dependency Changes]
+ - 6 files changed, 75 insertions(+), 16 deletions(-)
+ - (run req) + List::Util 1.42
+ - (run req) + PerlX::Maybe 1.001
+ - (run req) ~ Moose 2.1400 --> 2.1405
+ - (run req) ~ MooseX::AttributeDocumented (any) --> 0.1003
+ - (run req) ~ Types::Standard 1.000000 --> 1.000005
+ - (run req) ~ namespace::autoclean 0.18 --> 0.22
+ - (run req) - List::AllUtils
+ - (test req) ~ Badge::Depot (any) --> 0.0104
+ - (test req) ~ Path::Tiny (any) --> 0.072
+ - (dev req) + Badge::Depot 0.0104
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Badge::Depot::Plugin::Travis (any)
+ - (dev req) + Dist::Zilla 5.000
+ - (dev req) + Dist::Zilla::Plugin::Git 2.036
+ - (dev req) + Pod::Weaver::Section::Badges 0.0401
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Dist::Zilla::Plugin::ChangeStats::Dependencies::Git (any)
+   --> 0.0100
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::Clean (any) --> 0.07
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.151680
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors (any) --> 0.017
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::InstallRelease (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.003001
+ - (dev req) ~ Dist::Zilla::Plugin::NextRelease::Grouped (any) --> 0.0200
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.150250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.028
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile (any) --> 2.054
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOF (any) --> 0.0501
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOL (any) --> 0.18
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Kwalitee::Extra (any) --> v0.2.1
+ - (dev req) ~ Dist::Zilla::Plugin::Test::NoTabs (any) --> 0.15
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.021
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Version (any) --> 1.05
+ - (dev req) ~ Dist::Zilla::Plugin::TravisYML (any) --> 1.15
+ - (dev req) ~ Test::NoTabs (any) --> 1.4
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) ~ Dist::Iller 0.1406 --> 0.1407
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0307 --> 0.0309
+
+0.0401 2016-02-17T22:42:47Z UTC
+ [Enhancements]
+ - New attribute 'skip_markdown_if_html' doesn't produce '=begin markdown'
+   blocks if both html and markdown are set as formats. Some (all?)
+   markdown renderers also render html blocks. This avoids duplicating the
+   badges.
+ - Badges are now rendered one-per-line. This ensures that lines aren't
+   overly long when using many badges.
+
+ [Stats & Dependency Changes]
+ - 6 files changed, 44 insertions(+), 24 deletions(-)
+ - (run req) ~ perl 5.010001 --> 5.010000
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped (any)
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) ~ Pod::Elemental::Transformer::Splint (any) --> 0.1201
+ - (dev req) ~ Test::More (any) --> 0.88
+ - (dev req) - Dist::Iller::Config::Author::CSSON
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev sug) + Dist::Iller 0.1406
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0307
+
+0.0400 2016-01-27T22:16:34Z UTC
+ [Enhancements]
+ - Can now be used without Dist::Zilla (#3, thanks MGRIMES).
+
+0.0300 2016-01-26T18:25:47Z UTC
+ [Requirements]
+ - Remove Moops dependency (should now work on 5.10+).
+ - New (explicit) prereqs: namespace::autoclean, Types::Standard.
+
+ [Testing]
+ - Fix year dependent test (#2, thanks SREZIC).
+
+ [Other Changes]
+ - Rebuilt with current Dist::Iller::Config::Author::CSSON.
+
+0.0203 2015-04-11T23:58:00Z CEST
+ [Documentation]
+ - Removed documentation for the internal 'badge_args' attribute, and
+   instead:
+ - Added a section of documentation describing a bit more how badges are
+   rendered given the synopsis (and compared to using Badge::Depot
+   directly).
+
+0.0202 2015-03-23T18:01:15Z CET
+ [Enhancements]
+ - Renamed the plugin searcher class so that it is under the
+   Pod::Weaver::Section::Badges namespace.
+
+ [Requirements]
+ - Runtime: Listed List::AllUtils
+ - Test: Listed Syntax::Feature::Qi
+
+0.0201 2015-03-21T16:56:08Z CET
+ [Documentation]
+ - Corrected abstract.
+
+0.0200 2015-03-21T16:49:20Z CET
+ [API Changes]
+ - This version has a completely new (and better) way to choose badges:
+ - There are now *no* built-in badges, all badges are separate and in the
+   Badge::Depot::Plugin namespace.
+ - There is now *no* way to make on-the-fly custom badges. The api was
+   non-intuitive, and since it is so easy to create a new badge it is now
+   of little use.
+
+ [Requirements]
+ - Added a few test prereqs.
+ - Added Module::Pluggable as a runtime prereq.
+ - Added Pod::Weaver::Role::AddTextToSection as a runtime prereq.
+
+ [Testing]
+ - Changed test to test for multiple badges.
+
+0.0101 2015-02-15T16:24:15Z CET
+ [Requirements]
+ - Dist::Zilla::Plugin::PodWeaver is now listed as a test prereq.
+ - Added DZP::ReportPrereqs to dist.ini.
+
+ [Documentation]
+ - Fixed link to Dist::Zilla::Plugin::TravisCI::StatusBadge under See Also.
+
+0.0100 2015-02-14T02:18:15Z CET
+ - Initial release

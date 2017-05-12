@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/POE-Component-OSCAR.t
+lib/POE/Component/OSCAR.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+examples/oscar_telnet.pl
+examples/oscar_tail.pl

@@ -1,0 +1,69 @@
+## name basic failure
+## failures 1
+## cut
+
+my $regex = qr(asdf);
+if ( $string =~ /$regex/m ) {
+}
+
+#-----------------------------------------------------------------------------
+
+## name no modifier
+## failures 0
+## cut
+
+my $regex = qr(asdf);
+if ( $string =~ /$regex/ ) {
+}
+
+#-----------------------------------------------------------------------------
+
+## name regex is just a string
+## failures 0
+## cut
+
+my $regex = 'asdf';
+if ( $string =~ /$regex/m ) {
+}
+
+#-----------------------------------------------------------------------------
+
+## name regex is not simply a qr() expression
+## failures 0
+## cut
+
+my $regex = qr(asdf);
+if ( $string =~ /foo$regex/m ) {
+}
+
+#-----------------------------------------------------------------------------
+
+## name Do not warn if the qr() is modified in the same way
+## failures 0
+## cut
+
+my $regex = qr(asdf)m;
+if ( $string =~ /$regex/m ) {
+}
+
+#-----------------------------------------------------------------------------
+
+## name 's' modifier should fail
+## failures 1
+## cut
+
+my $regex = qr(asdf);
+if ( $string =~ /$regex/s ) {
+}
+
+#-----------------------------------------------------------------------------
+
+## name 'x' modifier should not trigger warning
+## failures 0
+## cut
+
+my $regex = qr(asdf);
+if ( $string =~ /$regex/x ) {
+}
+
+#-----------------------------------------------------------------------------

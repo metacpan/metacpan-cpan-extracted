@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1214408417,
+          'number' => '+440200814254',
+          'time' => '16:40',
+          'date' => '2008-06-25',
+          'name' => 'John XXXX (M)',
+          'phone' => '+440200814254',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1214408417,
+          'text' => 'Uncle Evil, Beth-Louise Ramone XXXX ie Betty-Lou is here.Born sunday,texted u then but its just come back message failed! Has your phone got the gay again? :-)',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7108308,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 131357
+        };

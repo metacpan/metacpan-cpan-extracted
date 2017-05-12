@@ -1,0 +1,44 @@
+0.16 Mon, 06 Mar 2017 11:30:00 GMT
+         - fix chained model call
+          
+0.15 Fri, 17 Feb 2017 09:00:00 GMT
+         - fix request reading in coro+ae case
+         - new config parameter cfg_url_only_camel_case
+          
+0.14 Wed, 25 Jan 2017 18:00:00 GMT
+         - fixed content-type of static files for .js and .css
+          
+0.13 Wed, 05 Oct 2016 22:29:25 GMT
+         - implement PEF::Front::Model::chain_links()
+         
+0.12 Sat, 01 Oct 2016 16:29:25 GMT
+         - model method call optimization
+         
+0.11 Thu, 29 Sep 2016 18:48:25 GMT
+         - don't reload model description files by default
+         
+0.10 Thu, 01 Sep 2016 18:48:25 GMT
+         - fix rewrite routes
+         
+0.09 Wed, 22 Aug 2016 21:48:25 GMT
+         - fix regexp routes
+         - fix Coro+AE in Request and Oauth
+         
+0.08 Wed, 22 Aug 2016 21:48:25 GMT
+         - fix connector
+         
+0.07 Wed, 20 Aug 2016 11:18:25 GMT
+         - fix prefix handling
+         
+0.06 Wed, 17 Aug 2016 16:48:25 GMT
+         - add custom routing prefixes
+         
+0.05 Fr, 05 Aug 2016 10:01:25 GMT
+         - Oauth2 is Coro/AE aware
+         
+0.04 Tue, 02 Aug 2016 17:01:25 GMT
+         - GDBM_File dependency workaround
+         
+0.03 Mon, 01 Aug 2016 08:32:15 GMT
+         - first working CPAN release
+

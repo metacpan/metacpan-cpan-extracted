@@ -1,0 +1,46 @@
+SYNOPSIS
+
+    In your command-line script (this will pick ::Lite first):
+
+     #!perl
+     use Perinci::CmdLine::Any;
+     Perinci::CmdLine::Any->new(url => '/Package/func')->run;
+
+    In your command-line script (this will pick ::Classic first, and falls
+    back to ::Lite):
+
+     #!perl
+     use Perinci::CmdLine::Any -prefer_lite=>0;
+     Perinci::CmdLine::Any->new(url => '/Package/func')->run;
+
+DESCRIPTION
+
+    This module lets you use Perinci::CmdLine::Lite or
+    Perinci::CmdLine::Classic.
+
+    If you want to force using a specific class, you can set the
+    PERINCI_CMDLINE_ANY environment variable, e.g. the command below will
+    only try to use Perinci::CmdLine::Classic:
+
+     % PERINCI_CMDLINE_ANY=Perinci::CmdLine::Classic yourapp.pl
+     % PERINCI_CMDLINE_ANY=classic yourapp.pl
+
+    If you want to prefer to Perinci::CmdLine::Classic (but user will still
+    be able to override using PERINCI_CMDLINE_ANY):
+
+     use Perinci::CmdLine::Any -prefer_lite => 0;
+
+ENVIRONMENT
+
+ PERINCI_CMDLINE_ANY => str
+
+    Either specify module name, or lite or classic.
+
+SEE ALSO
+
+    Perinci::CmdLine::Lite, Perinci::CmdLine::Classic
+
+    Another alternative backend, but not available through
+    Perinci::CmdLine::Any since it works by generating script instead:
+    Perinci::CmdLine::Inline
+

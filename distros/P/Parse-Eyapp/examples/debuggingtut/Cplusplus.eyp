@@ -1,0 +1,165 @@
+%{
+our $VERSION = '0.01';
+
+my $WHITES = qr{\G\s*};
+my $INT    = qr{\Gint\b};
+my $ID     = qr{\G([a-zA-Z_][a-zA-Z_0-9]*)};
+my $NUM    = qr{\G(\d+)};
+my $PUN    = qr{\G([-+*/=();,])};
+
+# If the incoming input looks like this then it is a declaration
+my $ISDEC  = qr{\G(?=
+                      [)\s]*  # closing parenthesis, s.t. like: ') ) )'
+                      [;=]\   # followed by semicolon or '='
+                  )
+               }x;
+%}
+
+%token ID NUM INT
+%lexer {
+    m{$WHITES}gc;
+
+    return ('INT', $1) if m{$INT}gc;
+    return ('ID',  $1) if m{$ID}gc;
+    return ('NUM', $1) if m{$NUM}gc;
+    return ($1,    $1) if m{$PUN}gc;
+  }
+
+%right '='
+%left '+'
+
+%conflict decORexp 
+      {
+        if (m{$ISDEC}) {
+          $self->YYSetReduce(')', 'ID:DEC' );
+        }
+        else {
+          $self->YYSetReduce(')', 'ID:EXP' ); 
+        }
+      }
+
+%expect-rr 1  # expect 1 reduce-reduce conflict
+
+%tree bypass
+
+%%
+prog:
+    %name EMPTY
+    /* empty */
+  | %name PROG
+    prog stmt
+;
+
+stmt: 
+    %name EXP
+    expr ';' 
+  | %name DECL
+    decl    
+;
+
+expr:
+    %name ID:EXP
+    ID                            %PREC decORexp 
+  | %name NUM 
+    NUM
+  | %name TYPECAST
+    INT '(' expr ')' /* typecast */ 
+  | %name PLUS
+    expr '+' expr
+  | %name ASSIGN
+    expr '=' expr
+;
+
+decl:
+    %name DECLARATOR
+    INT declarator ';'
+  | %name DECLARATORINIT
+    INT declarator '=' expr ';'
+;
+
+declarator:
+    %name ID:DEC
+    ID                            %PREC decORexp 
+  | '(' declarator ')'
+;
+
+%%
+
+unless (caller()) {
+  my $prompt = 'Try first "int (x) = 2;" then "int (x) + 2;" '.
+               '(press <CR><CTRL-D> to finish): ';
+  __PACKAGE__->main($prompt) 
+}
+
+####################################################
+
+=head1 SYNOPSIS
+
+Compile it with
+ 
+   eyapp -b '' Cplusplus
+
+Run it with:
+
+   ./Cplusplus.pm -t -nos -i
+
+or 
+
+   ./Cplusplus.pm -t -i -c 'int (x) + 2;'
+
+try with inputs:
+
+     int (x) = 2;
+     int (x) + 2;
+
+the output will be a description of the generated abstract syntax tree
+
+=head1  C++ Ambiguities
+
+This grammar models a problematic part of the C++ grammar
+the ambiguity between certain
+declarations and statements. For example,
+
+     int (x) = y+z;
+
+parses as either an expr or a stmt.
+
+
+Eyapp detects this as a reduce/reduce conflict:
+
+  State 17 contains 1 reduce/reduce conflict
+
+  State 17:
+
+	expr -> ID .	(Rule 5)
+	declarator -> ID .	(Rule 11)
+
+	')'	[reduce using rule 11 (declarator)]
+	$default	reduce using rule 5 (expr)
+
+The C++ disambiguation rule is: 
+take it as a declaration if it looks as a declaration,
+otherwise is an expression.
+
+This Eyapp parser solves the problem by dynamically changing the parser.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item * The file C<Cplusplus2.eyp> in C<examples/debuggintut>
+
+=item * L<http://www.gnu.org/software/bison/manual/html_mono/bison.html#GLR-Parsers>
+
+=item * L<http://en.wikipedia.org/wiki/Significantly_Prettier_and_Easier_C%2B%2B_Syntax>
+
+=item * L<http://www.csse.monash.edu.au/~damian/papers/PS/ModestProposal.ps> 
+
+=item * L<http://www.nobugs.org/developer/parsingcpp/>
+
+=item * Edward Willink's "Meta-Compilation for C++" PhD thesis at L<http://www.computing.surrey.ac.uk/Research/CSRG/fog/FogThesis.pdf>
+
+=back
+
+=cut
+

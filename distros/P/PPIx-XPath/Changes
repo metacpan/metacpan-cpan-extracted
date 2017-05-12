@@ -1,0 +1,4 @@
+2.02      2016-08-29 16:51:53+01:00 Europe/London
+ - fixed example code as per RT#116737, thanks Alastair Cooke
+ - more documentation
+ - switched to Dist::Zilla

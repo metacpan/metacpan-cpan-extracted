@@ -1,0 +1,11 @@
+blib*
+Makefile
+Makefile.old
+Build
+_build*
+pm_to_blib*
+*.tar.gz
+.lwpcookies
+Pod-Elemental-Transformer-Include-*
+cover_db
+tmp*

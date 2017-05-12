@@ -1,0 +1,86 @@
+0.14    2017-01-27 (PERLANCAR)
+
+	- [ux] Wrap long option summary.
+
+	- Tweak phrasing to be clearer: (JSON-encoded) et al to (as
+	  JSON-encoded str).
+
+
+0.13    2016-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Fix expressing follow-spec prereq relationship with
+	  x_spec.
+
+
+0.12    2016-12-27 (PERLANCAR)
+
+	- No functional changes.
+
+        - [build] Rebuild to remove extraneous dependencies.
+
+
+0.11    2016-09-28 (PERLANCAR)
+
+	- Fix newlines formatting in example (again!).
+
+
+0.10    2016-09-26 (PERLANCAR)
+
+	- Tweak format of examples.
+
+
+0.09    2016-08-04 (PERLANCAR)
+
+	- [Bugfix] Hide options for arguments that have 'hidden' tag.
+
+
+0.08    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.07    2015-07-04 (PERLANCAR)
+
+	- Support showing the same option in multiple categories if that
+	  option has multiple category:X tags.
+
+
+0.06    2015-04-11 (PERLANCAR)
+
+	- [ux] Don't show default value if it's undef.
+
+
+0.05    2015-04-07 (PERLANCAR)
+
+	- Properly order categories, from information provided by
+	  Perinci::Sub::To::CLIDocData 0.18.
+
+
+0.04    2015-04-04 (PERLANCAR)
+
+        - Fix/tweak blank lines.
+
+
+0.03    2015-02-27 (PERLANCAR)
+
+	- Show list of subcommands as comma-separated list if number of
+	  subcommands >= 12, like Perinci::CmdLine::Classic.
+
+	- Respect show_in_help=>0 in subcommand spec, like
+	  Perinci::CmdLine::Classic.
+
+
+0.02    2015-01-15 (PERLANCAR)
+
+	- Show subcommands, minor tweak.
+
+
+0.01     2014-12-23 (PERLANCAR)
+
+         - First release, extracted from Perinci-CmdLine-Lite.

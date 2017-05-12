@@ -1,0 +1,18 @@
+note that there are two URL's in play here, the first is the http:// (or
+https://) URLs which do not necessarily map code entity tree using the standard
+syntax, e.g.:
+
+ http://gudangapi.com/ga/tax.id.npwp/validate_npwp
+
+while the code entity URI is: /tax/id/npwp/validate_npwp
+
+the client should find out the code entity URI then convert it to riap+http://
+scheme. E.g.
+
+ riap+http:/tax/id/npwp/validate_npwp?url=http://gudangapi.com/ga/tax.id.npwp/validate_npwp
+
+or perhaps encode the whole HTTP url inside 'host':
+
+ riap+http://(base64-encode(http://gudangapi.com/ga/tax.id.npwp/validate_npwp))/tax/id/npwp/validate_npwp
+
+This way, we can play with the path in the riap+http:// safely.

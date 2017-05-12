@@ -1,0 +1,107 @@
+#!/usr/bin/perl -w
+#
+# $Id: htmltopalmdoc,v 1.3 2004/10/05 21:10:27 cpb Exp $
+
+use strict;
+use Getopt::Std;
+use Palm::PDB;
+use Palm::Doc;
+use HTML::FormatText;
+use HTML::TreeBuilder;
+use Encode 'from_to';
+use HTML::Entities;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+my $output;
+
+if( @ARGV == 2 ) {
+	unless( $ARGV[0] eq '-' ) {
+		open STDIN, "< $ARGV[0]" or die "$@";
+	}
+	$output = $ARGV[1];
+} elsif( @ARGV == 1 ) {
+	$output = $ARGV[0];
+} else {
+	print STDERR <<END;
+usage: $0 <htmlfile> <pdbfile>
+   or  $0 <pdbfile>
+END
+	exit 1;
+}
+
+binmode STDIN;
+my $tree = HTML::TreeBuilder->new_from_file( *STDIN );
+die "Failed to parse HTML" unless defined $tree;
+
+my $charset = 'iso-8859-1';
+
+# try to determine the HTML charset
+my $meta = $tree->find_by_tag_name('meta');
+if( defined $meta and $meta->attr('content') =~ /charset=([^\s]+)/ ) {
+	$charset = $1;
+}
+
+my $name = $tree->find_by_tag_name('title')->as_text();
+$name = $output unless defined $name;
+
+my $formatter = HTML::FormatText->new( 'lm' => 0, 'rm' => 80 );
+my $text = $formatter->format( $tree );
+
+# strip out newlines within paragraphs
+$text =~ s!(\w)[ \t]*\n([^\n])!$1 $2!sgi;
+
+# make sure we're dealing with latin1
+from_to( $text, $charset, 'iso-8859-1' ) unless $charset =~ /8859-1$/;
+
+decode_entities($text); # convert HTML entities to 8859-1
+
+# decode_entities is great, except for entities that can't be
+# represented in 8859-1. Strip those out or, if it's something we're
+# aware of, do a quick and dirty conversion
+$text =~ s/&\#821[12];?/-/g;
+$text =~ s/&\#821[678];?/'/g;
+$text =~ s/&\#822[012];?/"/g;
+
+# strip out the rest
+$text =~ s/&\#\d+;?/?/g;
+$text =~ s/&\#[xX][\da-fA-F]+;?/?/g;
+$text =~ s/&\w+;?/?/g;
+
+my $doc = new Palm::Doc();
+
+$doc->text( $text );
+$name =~ s/[^a-z0-9 ]+//gio;
+$name =~ s/^(.{3,25}).*$/$1/;
+$doc->{'name'} = $name;
+
+$name =~ s/\s+/_/g;
+$doc->Write( $output );
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+htmltopalmdoc - simple HTML to Palm Doc converter
+
+=head1 SYNOPSIS
+
+	htmltopalmdoc <htmlfile> <pdb-file>
+	cat file.html | htmltopalmdoc <pdb-file>
+
+=head1 DESCRIPTION
+
+C<htmltopalmdoc> is a very simple HTML to Palm Doc conversion script. It's
+basically just a wrapper around L<HTML::FormatText>. I wouldn't recommend it
+for serious use. L<sitescooper> does a better job.
+
+=head1 AUTHOR
+
+Christophe Beauregard E<lt>cpb@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+Palm::Doc(3)
+

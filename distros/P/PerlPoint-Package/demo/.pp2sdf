@@ -1,0 +1,5 @@
+
+# allow several opcodes
+-safeOpcode ':filesys_open'
+-safeOpcode ':still_to_be_decided'
+-safeOpcode ':browse'

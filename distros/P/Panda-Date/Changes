@@ -1,0 +1,80 @@
+3.0.5    13.03.2017
+           - compile with all warnings enabled, fix warnings
+           - fix threaded perl build
+3.0.4    09.03.2017
+           - changes related to new Panda::Time, no visible changes
+3.0.3    08.12.2015
+           - support for JSON::XS serializing with convert_blessed (TO_JSON hook)
+           - changes in docs
+3.0.2    05.02.2015
+           - docfix
+3.0.1    05.02.2015
+           - changed panda-lib's clone hook CLONE -> HOOK_CLONE, this fixes thread->create under threaded perls
+3.0.0    03.02.2015
+           - Split Panda::Time from Panda::Date to standalone module
+2.10     03.02.2015
+           - bump version to require win32-friendly Panda::Lib/XS/Install
+2.9      01.02.2015
+           - respect threaded builds with NO_GET_CONTEXT
+           - fix builds when -std=c++11
+2.8      04.12.2014
+           - Bugfix: croak if new/date/set receives bad object (wrong class, etc) instead of core dumping
+2.7      20.11.2014
+           - Bugfix: relative sec/min/hour addition/subtraction
+           - Embedded zones are updated
+           - Added clone() method to rel dates and intervals
+           - Added CLONE hook, for cloning dates, rel dates and intervals via Panda::Lib::clone()
+           - C++ interface refactor
+           - docs changes
+2.6      21.08.2014
+           - Bugfix: Creating a date object from another in some cases created corrupted objects
+           - Set const modifiers for const methods in C++ interface
+2.5      29.03.2014
+           - move to Panda::Install/XS build system, make C/C++ code shared and install headers and payload.
+2.4      07.02.2014
+           - fix building on some platforms
+2.3      06.02.2014
+           - Fix bug with ($date - $number). Returned interval, now returns date
+           - Better support for perl-32bit-int (now supported dates range is [-2**53, 2**53] instead of [-2**31, 2**31-1])
+           - removed 'posix/*' timezones as useless (they are copies of /*)
+2.2.0    06.02.2014
+           - Support for MS Windows.
+           - Support for 32bit systems.
+           - Support for 32bit perls.
+2.1      02.02.2014
+           - change compiler g++ -> c++
+2.0      31.01.2014
+           - Panda::Date is now built on top of libpanda-time - complete set of POSIX time functions written from scratch.
+             It now works correctly with all ranges of dates in all timezones and perfomance has been greatly increased.
+           - Panda::Date objects are now capable of working in different timezones with no perfomance penalty.
+           - Panda::Date is no longer following POSIX::tzset() timezone. It has it's own tzset() function in Panda::Time.
+           - Panda::Date comes with its own timezone DB (not used by default).
+           - set_from in all classes has been renamed to 'set'
+           - now(), today(), today_epoch(), string_format(), range_check() are now functions only (not a class/object methods).
+           - methods 'add', 'subtract', etc renamed to 'add_new', 'subtract_new', etc
+           - methods 'add_me', 'subtract_me', etc renamed to 'add', 'subtract', etc
+           - month_border_adjust is no longer supported
+           - added includes() method to P::D::Int class.
+           - Better Storable hooks implementation (less space, saving timezone info).
+           - '_year' and '_month' keys in hashes to constructor or clone functions are no longer supported.
+1.6      11.03.2013
+           - fix docs
+
+1.5      15.02.2013
+           - add mysql() output format
+           - fix building on threaded perls
+
+1.4      14.02.2013
+           - SEC, MIN, .., YEAR are now constant objects (read only) to avoid wrong usage
+
+1.3      14.02.2013
+           - add Storable hooks
+
+1.2      12.02.2013
+           - fix test for some more platforms
+
+1.1      12.02.2013
+           - fix test for some platforms
+
+1.0      10.02.2013
+           - first release

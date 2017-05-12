@@ -1,0 +1,9 @@
+<!-- error: /invalid attribute 'quotation_dash' at .Octothorpe.section_mark.section_mark/ -->
+<Octothorpe xmlns:A="uri:type:A" xmlns:C="uri:type:C">
+  <colon/>
+  <section_mark xmlns="uri:type:A" A:quotation_dash="blah">
+    <section_mark quotation_dash="foo">
+      baz
+    </section_mark>
+  </section_mark>
+</Octothorpe>

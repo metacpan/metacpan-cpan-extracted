@@ -1,0 +1,154 @@
+NAME
+    Pingdom::Client - a perl implementation of a client for the Pingdom REST
+    API.
+
+SYNOPSIS
+        use Pingdom::Client;
+        my $API = Pingdom::Client::->new({
+            'username' => 'user',
+            'password' => 'pass',
+            'apikey'   => 'key',
+        });
+        print $API->contacts();
+
+METHODS
+  actions
+    Returns a list of actions (alerts) that have been generated for your
+    account.
+
+  analysis
+    Returns a list of the latest error analysis results for a specified
+    check.
+
+  analysis_raw
+    Returns the raw result for a specified error analysis. This data is
+    primarily intended for internal use, but you might be interested in it
+    as well. However, there is no real documentation for this data at the
+    moment. In the future, we may add a new API method that provides a more
+    user-friendly format.
+
+  check_create
+    Creates a new check with settings specified by provided parameters.
+
+  check_delete
+    Deletes a check. THIS METHOD IS IRREVERSIBLE! You will lose all
+    collected data. Be careful!
+
+  check_details
+    Returns a detailed description of a specified check.
+
+  check_modify
+    Modify settings for a check. The provided settings will overwrite
+    previous values. Settings not provided will stay the same as before the
+    update. To clear an existing value, provide an empty value. Please note
+    that you cannot change the type of a check once it has been created.
+
+  check_modify_bulk
+    Pause or change resolution for multiple checks in one bulk call.
+
+  checks
+    Returns a list overview of all checks.
+
+  contact_create
+    Create a new contact.
+
+  contact_delete
+    Deletes a contact.
+
+  contact_modify
+    Modify a contact.
+
+  contacts
+    Returns a list of all contacts.
+
+  credits
+    Returns information about remaining checks, SMS credits and SMS
+    auto-refill status.
+
+  probes
+    Returns a list of all Pingdom probe servers.
+
+  reference
+    Get a reference of regions, timezones and date/time/number formats and
+    their identifiers.
+
+  reports_email
+    Returns a list of email report subscriptions.
+
+  reports_email_create
+    Creates a new email report.
+
+  reports_email_delete
+    Delete an email report.
+
+  reports_email_modify
+    Modify an email report.
+
+  reports_public
+    Returns a list of public (web-based) reports.
+
+  reports_public_create
+    Activate public report for a specified check.
+
+  reports_public_delete
+    Deactivate public report for a specified check.
+
+  reports_shared
+    Returns a list of shared reports (banners).
+
+  reports_shared_create
+    Create a shared report (banner).
+
+  reports_shared_delete
+    Delete a shared report (banner).
+
+  results
+    Return a list of raw test results for a specified check.
+
+  servertime
+    Get the current time of the API server.
+
+  settings
+    Returns all account-specific settings.
+
+  settings_modify
+    Modify account-specific settings.
+
+  single
+    Performs a single test using a specified Pingdom probe against a
+    specified target. Please note that this method is meant to be used
+    sparingly, not to set up your own monitoring solution.
+
+  summary_average
+    Get a summarized response time / uptime value for a specified check and
+    time period.
+
+  summary_hoursofday
+    Returns the average response time for each hour of the day (0-23) for a
+    specific check over a selected time period. I.e. it shows you what an
+    average day looks like during that time period.
+
+  summary_outage
+    Get a list of status changes for a specified check and time period.
+
+  summary_performance
+    Get the average response time and uptime for a list of intervals. Useful
+    for generating graphs.
+
+  summary_probes
+    Get a list of probes that performed tests for a specified check during a
+    specified period.
+
+  traceroute
+    Perform a traceroute to a specified target from a specified Pingdom
+    probe.
+
+AUTHOR
+    Dominik Schulz <dominik.schulz@gauner.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

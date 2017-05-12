@@ -1,0 +1,118 @@
+#!/usr/bin/perl -w
+use KDE;
+import KDE::app;
+
+package Test;
+import KDE::app;
+use Qt::slots 'convert()', 'changeDisplayCharset()';
+
+@ISA = qw(Qt::Widget);
+
+sub new {
+    my $self = shift->SUPER::new(@_);
+
+    $self->setCaption("Testing KCharsets");
+
+    my $d = $app->desktop;
+    $self->setGeometry(($d->width-320) >> 1, ($d->height-160) >> 1, 320, 160);
+
+    $self->createFields;
+    $self->show;
+
+    return $self
+}
+
+sub createFields {
+    my $self = shift;
+    my $charsets = $app->getCharsets;
+    my $displayable = $charsets->displayable;
+    my $available = $charsets->available;
+
+    my($y, $dy, $h) = (10, 30, 25);
+    my($label_x, $rest_x, $label_w, $rest_w) = (10, 105, 100, 200);
+
+    my $inputCharsetLabel = $self->{inputCharsetLabel} =
+	new Qt::Label("inputCharset", $self);
+    $inputCharsetLabel->setGeometry($label_x, $y, $label_w, $h);
+    my $inputCharsetCombo = $self->{inputCharsetCombo} =
+	new Qt::ComboBox($self);
+    for my $ch (@$available) {
+        $inputCharsetCombo->insertItem($ch);
+    }
+    $inputCharsetCombo->setGeometry($rest_x, $y, $rest_w, $h);
+    $self->connect($inputCharsetCombo, 'activated(int)', 'convert()');
+    $y += $dy;
+    my $inputLabel = $self->{inputLabel} =
+	new Qt::Label("input", $self);
+    $inputLabel->setGeometry($label_x, $y, $label_w, $h);
+    my $inputEdit = $self->{inputEdit} =
+	new Qt::LineEdit($self);
+    $inputEdit->setGeometry($rest_x, $y, $rest_w, $h);
+    $self->connect($inputEdit, 'returnPressed()', 'convert()');
+    $y += $dy;
+    my $outputCharsetLabel = $self->{outputCharsetLabel} =
+	new Qt::Label("outputCharset", $self);
+    $outputCharsetLabel->setGeometry($label_x, $y, $label_w, $h);
+    my $outputCharsetCombo = $self->{outputCharsetCombo} =
+	new Qt::ComboBox($self);
+    $self->connect($outputCharsetCombo, 'activated(int)', 'convert()');
+    for my $ch (@$available) {
+	$outputCharsetCombo->insertItem($ch);
+    }
+    $outputCharsetCombo->setGeometry($rest_x, $y, $rest_w, $h);
+    $y += $dy;
+    my $displayCharsetLabel = $self->{displayCharsetLabel} =
+	new Qt::Label("displayCharset", $self);
+    $displayCharsetLabel->setGeometry($label_x, $y, $label_w, $h);
+    my $displayCharsetCombo = $self->{displayCharsetCombo} =
+	new Qt::ComboBox($self);
+    $self->connect($displayCharsetCombo,
+		   'activated(int)', 'changeDisplayCharset()');
+    for my $ch (@$displayable) {
+	$displayCharsetCombo->insertItem($ch);
+    }
+    $displayCharsetCombo->setGeometry($rest_x, $y, $rest_w, $h);
+    $y += $dy;
+    my $outputLabel = $self->{outputLabel} =
+	new Qt::Label("output", $self);
+    $outputLabel->setGeometry($label_x, $y, $label_w, $h);
+    my $outputEdit = $self->{outputEdit} =
+	new Qt::LineEdit($self);
+    $outputEdit->setGeometry($rest_x, $y, $rest_w, $h);
+}
+
+sub convert {
+    my $self = shift;
+    my $inputEdit = $self->{inputEdit};
+    my $fnt = $inputEdit->font;
+    my $charsets = $app->getCharsets;
+
+    $charsets->setQFont($fnt,
+	new KDE::Charset($self->{inputCharsetCombo}->currentText));
+    $inputEdit->setFont($fnt);
+
+    my $text = $inputEdit->text;
+    my $converter = new KDE::CharsetConverter(
+	new KDE::Charset($self->{inputCharsetCombo}->currentText),
+	new KDE::Charset($self->{outputCharsetCombo}->currentText),
+	KDE::CharsetConverter::INPUT_AMP_SEQUENCES |
+	KDE::CharsetConverter::OUTPUT_AMP_SEQUENCES
+    );
+    $self->{outputEdit}->setText($converter->ok ?
+	$converter->convert($text)->text : "Error!");
+}
+
+sub changeDisplayCharset {
+    my $self = shift;
+    my $fnt = $self->{outputEdit}->font;
+    my $charsets = $app->getCharsets;
+    $charsets->setQFont($fnt, $self->{displayCharsetCombo}->currentText);
+    $self->{outputEdit}->setFont($fnt);
+}
+
+package main;
+
+$m = new Test;
+$app->setMainWidget($m);
+$m->show;
+exit $app->exec;

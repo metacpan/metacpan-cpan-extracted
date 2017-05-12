@@ -1,0 +1,10 @@
+Changes
+lib/PangoConst.pm
+lib/PangoConst.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/pangoconst.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

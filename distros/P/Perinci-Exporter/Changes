@@ -1,0 +1,58 @@
+Revision history for Perinci-Exporter
+
+0.07    2015-09-29 (PERLANCAR)
+
+	- Add Perinci::Examples::Export.
+
+	- [Incompatible change] Change 'default' tag to 'export:default' tag to
+          be more specific.
+
+        - Introduce 'export:never' tag as a way to never export a function.
+
+        - When user imports with tag 'foo', will match function tag 'foo' as
+          well as 'export:foo'.
+
+
+0.06    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+	- [dzil] Update syntax of lint-prereqs directive (-> lint_prereqs)
+	  to be more IOD-compliant.
+
+	- Use good ol' ref() again instead of Scalar::Util::reftype(),
+	  because I'm no longer blessing Perinci::Sub::Wrapper-wrapped
+	  subroutines.
+
+
+0.05    2014-12-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use the new renamed module SHARYANTO::Package::Util ->
+	  Package::MoreUtil.
+
+
+0.04     2014-03-07 (SHARYANTO)
+
+         - No functional changes. Update to Perinci::Sub::Wrapper 0.51.
+
+
+0.03     2013-08-12 (SHARYANTO)
+
+         - No functional changes. Update to no longer using
+           Perinci::Util::get_package_meta_accessor (removed).
+
+
+0.02     2012-08-10 (SHARYANTO)
+
+         - No functional changes. Update dependencies.
+
+
+0.01     2012-08-02 (SHARYANTO)
+
+         - First release.

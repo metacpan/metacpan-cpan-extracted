@@ -1,0 +1,13 @@
+===============================
+2011-09-12 12:30:58 +0100 0.004
+===============================
+
+  commit 48161043429d0e37f083e293edf3954a3e95feb6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Sep 12 12:30:58 2011 +0100
+  
+    Trim the Makefile.PL and fix some things in it. 
+
+====================================
+End of changes in the last 1825 days
+====================================

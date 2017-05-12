@@ -1,0 +1,48 @@
+=encoding utf8
+
+=head1 NAME
+
+POE::Component::IRC::Cookbook::Hailo - A blabbering IRC bot
+
+=head1 SYNOPSIS
+
+This bot uses L<POE::Component::IRC::Plugin::Hailo|POE::Component::IRC::Plugin::Hailo>
+for most of its magic. As of yet, this recipe just contains a SYNOPSIS that is
+copied from its documentation.
+
+=head1 DESCRIPTION
+
+ #!/usr/bin/env perl
+
+ use strict;
+ use warnings;
+ use POE;
+ use POE::Component::IRC::Plugin::AutoJoin;
+ use POE::Component::IRC::Plugin::Connector;
+ use POE::Component::IRC::Plugin::Hailo;
+ use POE::Component::IRC::State;
+
+ my $irc = POE::Component::IRC::State->spawn(
+     nick   => 'Brainy',
+     server => 'irc.freenode.net',
+ );
+
+ my @channels = ('#public_chan', '#bot_chan');
+
+ $irc->plugin_add('AutoJoin', POE::Component::IRC::Plugin::AutoJoin->new(Channels => \@channels));
+ $irc->plugin_add('Connector', POE::Component::IRC::Plugin::Connector->new());
+ $irc->plugin_add('Hailo', POE::Component::IRC::Plugin::Hailo->new(
+     Own_channel    => '#bot_chan',
+     Ignore_regexes => [ qr{\w+://\w} ], # ignore lines containing URLs
+     Hailo_args     => {
+         brain_resource => 'brain.sqlite',
+     },
+ ));
+
+ $irc->yield('connect');
+ $poe_kernel->run();
+
+=head1 AUTHOR
+
+Hinrik E<Ouml>rn SigurE<eth>sson, hinrik.sig@gmail.com
+

@@ -1,0 +1,131 @@
+Changelog for Printer-Thermal
+
+0.29 2015-03-27T04:57:51
+ - Link to the successor module in description (Shantanu Bhadoria)
+
+0.28 2015-03-16T04:11:30
+ - v0.28 (Shantanu Bhadoria)
+ - Deprecating in favour of Printer::ESCPOS (Shantanu Bhadoria)
+
+0.27 2013-11-25T03:47:19
+ - v0.27 (Shantanu Bhadoria)
+ - Reduced Printer buffer size to accomadate printers with smaller buffers.
+   (Shantanu Bhadoria)
+
+0.26 2013-10-16T05:43:30
+ - v0.26 (Shantanu Bhadoria)
+ - minor edits (Shantanu Bhadoria)
+
+0.25 2013-10-16T04:51:44
+ - v0.25 (Shantanu Bhadoria)
+
+0.24 2013-10-16T04:27:09
+ - v0.24 (Shantanu Bhadoria)
+
+0.23 2013-10-16T04:23:10
+ - v0.23 (Shantanu Bhadoria)
+ - Fixed pod nested encoding error (Shantanu Bhadoria)
+
+0.22 2013-10-14T06:59:45
+ - v0.22 (Shantanu Bhadoria)
+ - Testing wierdness in POD checker behaviour wrt podlint when testing >
+   and < signs podlint expects them to be escaped but perldoc doesnt like
+   it (Shantanu Bhadoria)
+
+0.21 2013-10-14T06:16:42
+ - v0.21 (Shantanu Bhadoria)
+ - Fixed More POD Errors (Shantanu Bhadoria)
+
+0.20 2013-09-30T07:58:17
+ - v0.20 (Shantanu Bhadoria)
+ - Attempting to fix Pod (Shantanu Bhadoria)
+ - Adding mailmap to avoid explosions in contributors (Shantanu Bhadoria)
+
+0.19 2013-09-15T05:34:37
+ - v0.19 (Shantanu Bhadoria)
+ - Fixed POD Errors (Shantanu Bhadoria)
+
+0.18 2013-09-14T04:29:29
+ - v0.18 (Shantanu Bhadoria)
+
+0.17 2013-09-14T03:44:55
+ - v0.17 (Shantanu Bhadoria)
+ - Renamed example to examples to match spec (Shantanu Bhadoria)
+
+0.16 2013-09-14T01:50:04
+ - v0.16 (Shantanu Bhadoria)
+ - Fixed Pos Errors (Shantanu Bhadoria)
+
+0.15 2013-09-12T06:52:21
+ - v0.15 (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.14 2013-07-11T03:40:42
+ - v0.14 (Shantanu Bhadoria)
+ - Code Cleanup added YML to ignore list (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.13 2013-07-03T08:35:18
+ - v0.13 (Shantanu Bhadoria)
+ - Fixed Time Hires include bug (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.12 2013-07-03T06:00:25
+ - v0.12 (Shantanu Bhadoria)
+ - Added stopwords to avoid failing pod spell test (Shantanu Bhadoria)
+ - Fixed POD spellings (Shantanu Bhadoria)
+ - Added Buffering for Print output to avoid buffer overflow issues for
+   long bills (Shantanu Bhadoria)
+ - Fixed Documentation a little. Added a few more descriptions, fixed some
+   stupid grammer (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.11 2013-06-14T05:08:10
+ - v0.11 (Shantanu Bhadoria)
+ - Fixed Issues with overlapping bold and underline patterns (Shantanu
+   Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.10 2013-06-11T02:02:20
+ - v0.10 (Shantanu Bhadoria)
+ - Fixed POD Error encoding utf-8 (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.09 2013-06-11T01:28:12
+ - v0.09 (Shantanu Bhadoria)
+ - Updated documentation and added notes and warnings (from: Peet de Vos)
+   (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.08 2013-05-31T04:42:48
+ - v0.08 (Shantanu Bhadoria)
+ - Added Drawer kick function (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.07 2013-05-23T06:25:11
+ - v0.07 (Shantanu Bhadoria)
+
+0.06 2013-05-23T05:08:22
+ - Bump Changes (Shantanu Bhadoria)
+ - vv0.5 (Shantanu Bhadoria)
+ - Dependency Hell (Shantanu Bhadoria)
+ - vv0.4 (Shantanu Bhadoria)
+ - MOdified documentation for Pod::Weaver (Shantanu Bhadoria)
+ - vv0.3 (Shantanu Bhadoria)
+ - Adde README.pod (Shantanu Bhadoria)
+ - New files (Shantanu Bhadoria)
+ - Deleted Unnecessary Files (Shantanu Bhadoria)
+ - Adde Repo (Shantanu Bhadoria)
+ - Updated README (Shantanu Bhadoria)
+ - Removed BBCode prereq and refactored Documentation (Shantanu Bhadoria)
+ - Modifications to library behaviour for multiple edits (Shantanu
+   Bhadoria)
+ - Fixed Example (Shantanu Bhadoria)
+ - Updated Makefile with new dependencies (Shantanu Bhadoria)
+ - Adding example script and segregating Serial and USB printers into
+   seperate categories (Shantanu Bhadoria)
+ - Add README files (Shantanu Bhadoria)
+ - v0.01 (Shantanu Bhadoria)
+ - First Iteration (Shantanu Bhadoria)
+ - Initial commit (Shantanu Bhadoria)
+

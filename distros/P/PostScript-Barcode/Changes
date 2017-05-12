@@ -1,0 +1,58 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Changes - Revision history for PostScript-Barcode
+
+=head2 0.006  2010-07-05
+
+work around a bug that occurs when capturing STDERR which exhibits under
+mod_perl and for which it is difficult to find a minimal test case
+
+=head2 0.005  2010-07-01
+
+=over
+
+=item require latest version of L<Alien::BWIPP>
+
+=item relax attributes C<scale> and C<translate>, backwards compatible
+
+=item some documentation improvements
+
+=back
+
+=head2 0.004  2010-06-23
+
+=over
+
+=item options passing to L<PostScript::Barcode/"render"> explained in detail
+
+=item move type constraints to a class containing the name C<Meta>, and some
+type constraints that were previously unlimited arrays are now named tuples
+
+=item fix a memory leak
+
+=item remove barcode metrics, rely on Ghostscript's C<bbox> device instead
+
+=item correct image sizes for PDF and SVG
+
+=back
+
+=head2 0.003  2010-01-14
+
+bugfixes for calling constructors of classes multiple times in the same scope
+and for empty data in the constructor (thanks, Jozef Kutej)
+
+=head2 0.002  2009-12-10
+
+=over
+
+=item add Aztec Code, Data Matrix
+
+=item renders to correct image sizes
+
+=back
+
+=head2 0.001  2009-12-07
+
+Initial release.

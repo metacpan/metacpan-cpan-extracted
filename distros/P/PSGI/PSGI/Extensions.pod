@@ -1,0 +1,90 @@
+=head1 NAME
+
+PSGI::Extensions - PSGI extensions
+
+=head1 SPECIFICATION
+
+The PSGI environment MAY include the following additional
+extensions. They are OPTIONAL and applications and middleware
+components SHOULD check if they exist in the environment before
+using the functionality provided.
+
+=over 4
+
+=item *
+
+C<psgix.io>: The raw IO socket to access the client connection to do
+low-level socket operations. This is only available in PSGI servers
+that run as an HTTP server, and should be used when (and only when)
+you want to I<jailbreak> out of PSGI abstraction, to implement
+protocols over HTTP such as BOSH or WebSocket.
+
+=item *
+
+C<psgix.input.buffered>: A boolean which is true if the HTTP request
+body (for POST or PUT requests) is buffered using a temporary
+filehandle or PerlIO in C<psgi.input>. When this is set, applications
+or middleware components can safely C<read> from C<psgi.input> without
+worrying about non-blocking I/O and then can call C<seek> to rewind
+the input for the transparent access.
+
+=item *
+
+C<psgix.logger>: A code reference to log messages. The code reference
+is passed one argument as a hash reference that represents a message
+to be logged. The hash reference MUST include at least two keys:
+C<level> and C<message> where C<level> MUST be one of the following
+strings: C<debug>, C<info>, C<warn>, C<error> and C<fatal>. C<message>
+SHOULD be a plain string or a scalar variable that stringifies.
+
+=item *
+
+C<psgix.session>: A hash reference for storing and retrieving session
+data. Updates made on this hash reference SHOULD be persisted by
+middleware components and SHOULD be restored in the succeeding
+requests. How to persist and restore session data, as well as how to
+identify the requesting clients are implementation specific.
+
+C<psgix.session.options>: A hash reference to tell Middleware
+components how to manipulate session data after the request.
+Acceptable keys and values are implementation specific.
+
+=item *
+
+C<psgix.harakiri>: A boolean which is true if the PSGI server supports
+harakiri mode, that kills a worker (typically a forked child process)
+after the current request is complete.
+
+C<psgix.harakiri.commit>: A boolean which is set to true by the PSGI
+application or middleware when it wants the server to kill the worker
+after the current request.
+
+=item *
+
+C<psgix.cleanup> - A boolean flag indicating whether a PSGI server
+supports cleanup handlers. Absence of the key assumes false
+(i.e. unsupported). Middleware and applications MUST check this key
+before utilizing the cleanup handlers.
+
+C<psgix.cleanup.handlers> - Array reference to stack callback
+handlers. This reference MUST be initialized as an empty array
+reference by the servers. Applications can register the callbacks by
+simply push()ing a code reference to this array reference. Callbacks
+will be called once a request is complete, and will receive C<$env>
+as its first argument, and return value of the callbacks will be
+simply ignored. An exception thrown inside callbacks MAY also be
+ignored.
+
+If the server also supports C<psgix.harakiri>, it SHOULD implement in
+a way that cleanup handlers run before harakiri checker, so that the
+cleanup handlers can commit the harakiri flag.
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright Tatsuhiko Miyagawa, 2009-2011.
+
+This document is licensed under the Creative Commons license by-sa.
+
+=cut

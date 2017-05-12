@@ -1,0 +1,22 @@
+% my $app = "PlugAuth";
+% my $fcgi_socket = "/tmp/$app.sock";
+% my $port = 3339;
+{
+   "auth_file" : "<%= $ENV{HOME} %>/git/PlugAuth/t/data/auth.txt",
+   "start_mode" : [ "plackup", "lighttpd" ],
+   "plackup" : {
+      "server"    : "FCGI",
+      "listen"    : "<%= $fcgi_socket %>",
+      "app"       : "<%= $ENV{HOME} =%>/git/<%= $app =%>/bin/<%= lc $app =%>.psgi",
+      "pidfile"   : "/tmp/<%= $app =%>_plack_fcgi.pid",
+      "daemonize" : "null"
+   },
+   "lighttpd" : {
+      "env" : {
+          "lighttpd_socket" : "<%= $fcgi_socket %>",
+          "lighttpd_port"   : "<%= $port %>",
+          "lighttpd_pid"    : "/tmp/<%= $app %>_lighttpd.pid"
+      },
+      "-f" : "<%= $ENV{HOME} =%>/etc/lighttpd.conf"
+   }
+}

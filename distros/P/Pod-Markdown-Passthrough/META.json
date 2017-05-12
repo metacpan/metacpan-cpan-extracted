@@ -1,0 +1,79 @@
+{
+   "abstract" : "A passthrough mode for Pod::Markdown.",
+   "author" : [
+      "Dave Webb <github@d5ve.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Markdown-Passthrough",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Pod::Markdown" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Pod::Markdown::Passthrough" : {
+         "file" : "lib/Pod/Markdown/Passthrough.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/d5ve/p5-Pod-Markdown-Passthrough/issues"
+      },
+      "homepage" : "https://github.com/d5ve/p5-Pod-Markdown-Passthrough",
+      "repository" : {
+         "url" : "git://github.com/d5ve/p5-Pod-Markdown-Passthrough.git",
+         "web" : "https://github.com/d5ve/p5-Pod-Markdown-Passthrough"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:DAVEWEBB",
+   "x_contributors" : [
+      "Dave Webb <wfh@dcw.co.nz>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

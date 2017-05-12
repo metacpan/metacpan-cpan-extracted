@@ -1,0 +1,56 @@
+#!/usr/bin/perl -w
+use KDE;
+import KDE::app;
+
+package MyMain;
+use KDE;
+import KDE::app;
+
+use Qt::slots 'changePix()', 'insertPath()';
+
+@ISA = qw(Qt::Widget);
+
+sub new {
+    my $self = shift->SUPER::new(@_);
+    $self->{icon_sel} = new KDE::IconLoaderDialog;
+    my $test = $self->{test} = new Qt::PushButton("test", $self);
+    $test->setPixmap($app->getIconLoader->loadIcon("exec.xpm"));
+    $test->setGeometry(0, 0, 50, 50);
+    $self->connect($test, 'clicked()', 'changePix()');
+    my $le_dir = new Qt::LineEdit($self);
+    $le_dir->setGeometry(10, 70, 300, 24);
+    $self->connect($le_dir, 'returnPressed()', 'insertPath()');
+    $le_dir->show;
+    $test->show;
+
+    return $self;
+}
+
+sub changePix {
+    my $self = shift;
+    my $name;
+
+    my $pix = $self->{icon_sel}->selectIcon($name, "*");
+    $self->{test}->setPixmap($pix) if $pix;
+}
+
+sub insertPath {
+    my $self = shift;
+    $app->getIconLoader->insertDirectory(3, $self->{le_dir}->text);
+    $self->{icon_sel}->delete;
+    $self->{icon_sel} = new KDE::IconLoaderDialog;
+}
+
+package main;
+
+$config = $app->getConfig;
+$config->setGroup("KDE Setup");
+if(!$config->hasKey("IconPath")) {
+    $config->writeEntry("IconPath",
+	"$ENV{KDEDIR}/lib/pics:$ENV{KDEDIR}/lib/pics/toolbar");
+}
+$demo = new MyMain;
+$app->setMainWidget($demo);
+$app->setRootDropZone(new KDE::DNDDropZone($demo, KDE::DndNotDnd));
+$demo->show;
+exit $app->exec;

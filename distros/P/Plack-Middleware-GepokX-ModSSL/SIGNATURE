@@ -1,0 +1,52 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 4993d0939cc1dcc9068d3127d1ae3a2455ffcfe3 COPYRIGHT
+SHA1 540e627824058dc4b3f75009923f7af8f8e388c8 CREDITS
+SHA1 8fb690d554f0c5452fc3cf499235e742ae7615b8 Changes
+SHA1 1ed19be0a3fcde8b4fa9e8f36762b31bf3d497ee INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 d6e2fea59c4f83a221258abdadce656d250bdca2 MANIFEST
+SHA1 c5a3de8e88b33effa0916619c0929fba4927a833 META.json
+SHA1 616fb5f19be2522477157c4e53392ebd23321de8 META.yml
+SHA1 124ec8fa5e8efd160f4e75e5a36b482af2fc1f09 Makefile.PL
+SHA1 d341da85997a668173e5a2feacf4cfb83b0fce27 README
+SHA1 1d7faa7733a2844d2a5e1a528f57dc8105aced31 dist.ini
+SHA1 ce265cbad9b2cd025112f9ef8840fb144ca5ad33 doap.ttl
+SHA1 d11937674f09b69ee6b14733076944cfe0e5e080 examples/certs/server-crt.pem
+SHA1 2d5e742bf83799a29b1057658eb8588e452c015f examples/certs/server-key-nopass.pem
+SHA1 9161d5d165d71e69ef2743274c1b5ec08d8d1412 examples/certs/server-key.pem
+SHA1 9d97eacb090f5ba7e0e0f9a5a09b29e49b11a5b8 examples/gepok.psgi
+SHA1 9be980470cfd4a979c6adc35d98be440ff9337f3 examples/plackup.sh
+SHA1 0dcc129dbc1ac24f383e9422ccda238b72c61e86 lib/Plack/Middleware/GepokX/ModSSL.pm
+SHA1 c541c2e578e494400fb2f3350094507d699ebe91 t/01basic.t
+SHA1 2a683f214b08c151df201bd132647fcb0cbd7f9e t/02certs.t
+SHA1 8114c72d5c8654c8e46a847049bc0c646dd27029 t/certs/ca/exists.txt
+SHA1 c73035759970d7fcc35541ebc361d0a724957805 t/certs/client-crt.p12
+SHA1 17942c3027534e11e0201682d5ed6b14d5d54b38 t/certs/client-crt.pem
+SHA1 849ba72790a1a63e99dd1b36a5e8d3d50044b729 t/certs/client-key-nopass.pem
+SHA1 f3a86d1641299d86e1e3448a46f25d5c61fe01d6 t/certs/client-key.pem
+SHA1 d11937674f09b69ee6b14733076944cfe0e5e080 t/certs/server-crt.pem
+SHA1 2d5e742bf83799a29b1057658eb8588e452c015f t/certs/server-key-nopass.pem
+SHA1 9161d5d165d71e69ef2743274c1b5ec08d8d1412 t/certs/server-key.pem
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQQ3moACgkQzr+BKGoqfTlWBgCfZwUks2B166/MoW6nNcj3AOjM
+mCIAniQbJBNVrdaVZwQnjB81hr9iex6/
+=fL/2
+-----END PGP SIGNATURE-----

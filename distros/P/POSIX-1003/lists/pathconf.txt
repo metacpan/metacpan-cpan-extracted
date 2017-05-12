@@ -1,0 +1,49 @@
+# Standard:  http://pubs.opengroup.org/onlinepubs/000095399/functions/pathconf.html
+# Linux:     OpenSuSE 11.4 kernel 2.6.37
+# HP:        http://docstore.mik.ua/manuals/hp-ux/en/B2355-60130/pathconf.2.html
+# OpenSolaris: http://www.unix.com/man-page/OpenSolaris/3head/unistd.h/
+# FreeBSD:   http://nixdoc.net/man-pages/FreeBSD/fpathconf.2.html
+
+_PC_24
+_PC_2_SYMLINKS
+_PC_53
+_PC_64
+_PC_ACL_EXTENDED
+_PC_ACL_PATH_MAX
+_PC_ALLOC_SIZE_MIN
+_PC_ASYNC_IO
+_PC_CAP_PRESENT
+_PC_CHOWN_RESTRICTED
+_PC_FILESIZEBITS
+_PC_HARD_HIT
+_PC_HH22
+_PC_HM10
+_PC_INF_PRESENT
+_PC_LINK_MAX
+_PC_LM22
+_PC_MAC_PRESENT
+_PC_MAX_CANON
+_PC_MAX_INPUT
+_PC_MISS
+_PC_MS_MISSES
+_PC_NAME_MAX
+_PC_NO_TRUNC
+_PC_PATH_MAX
+_PC_PIPE_BUF
+_PC_PORT0_RD
+_PC_PORT1_RD
+_PC_PRE1
+_PC_PRIO_IO
+_PC_REC_INCR_XFER_SIZE
+_PC_REC_MAX_XFER_SIZE
+_PC_REC_MIN_XFER_SIZE
+_PC_REC_XFER_ALIGN
+_PC_SNOOP_INV
+_PC_SOCK_MAXBUF
+_PC_SOFT_HIT
+_PC_SYMLINK_MAX
+_PC_SYNC_IO
+_PC_VDISABLE
+_PC_V_DISABLE
+_PC_XATTR_ENABLED
+_PC_XATTR_EXISTS

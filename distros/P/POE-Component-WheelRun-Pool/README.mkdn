@@ -1,0 +1,140 @@
+# NAME
+
+POE::Component::WheelRun::Pool - POE::Wheel::Run worker pool
+
+# VERSION
+
+version 0.001
+
+# SYNOPSIS
+
+Provides a pool wrapper around POE::Wheel::Run to allow for large worker pools that are automatically replenished.
+POE::Component::WheelRun::Pool uses STDIN, STDOUT, and STDERR for communication between the parent session and the worker children.
+
+    my $worker_pool_id = POE::Component::WheelRun::Pool->spawn(
+        Alias            => 'pool',             # Default
+        Program          => \&run_analysis,     # Required
+        PoolSize         => 4,                  # Default
+        MaxTasksPerChild => 1000,               # Default '0' = unlimited
+        MaxTimePerChild  => 3600,               # Default '0' = unlimited
+        Splay            => 0.1,                # Default
+        # Any Options from POE::Wheel::Run
+        User     => 'bob',
+        Group    => 'nobody',
+        Priority => 5,
+    );
+
+    my $main = POE::Session->create(inline_states => {
+        new_event => sub { $poe_kernel->post( pool => dispatch => @_[ARG0] ) },
+    });
+
+This will create a pool of 4 workers with the run\_analyze function as the entry point to the pool::dispatch event.  Child processes
+should monitor STDIN for availability as the first thing attempted by the parent is an EOF on the STDIN of the child to let it know it should
+go away.  Failing this, a kill() is called which is SIGINT by default.
+
+# FUNCTIONS
+
+## spawn()
+
+Creates the worker pool and sets it ready for incoming tasks.
+POE::Component::WheelRun::Pool will pass sensible options from POE::Wheel::Run
+to the child process.  See:
+
+    perldoc POE::Wheel::Run
+
+For more information on options not covered here.
+
+- __Alias__
+
+    Default is 'pool', use a unique name to make dispatching events to worker pools easier to understand.
+
+- __Program__
+
+    Required! Can be either a CODE reference or a path to an executable to launch.  The script needs to be able to accept data on STDIN and communicate
+    back to the parent session using STDOUT or STDERR.  This means the program can be in any language.
+
+- __PoolSize__
+
+    Default is 4.  This is the number of children to spawn and maintain.
+
+- __MaxTasksPerChild__
+
+    Default 0, anything <= 0 means unlimited.  This is the maximum number of tasks that can be handed to any one worker before it needs to respawn.
+
+- __MaxTimePerChild__
+
+    Default 0, anything <= 0 means unlimited.  This is the maximum number of seconds any worker can live before being killed and respawned.  This check occurs only inside of the
+    dispatch event trigger and only for that "next" worker.   This means it is possible for processes to live longer that __MaxTimePerChild__, but their next invocation will
+    be their last.
+
+- __Splay__
+
+    Default is 0.1 and is unimportant without __MaxTimePerChild__ or __MaxTasksPerChild__.  This applies a random splay to the time or tasks checker.  Best thought of as a percentage
+    range for max tasks or time.  e. g.
+
+        ChildMaxUpperBound = MaxTasksPerChild + (Splay * MaxTasksPerChild)
+        ChildMaxLowerBound = MaxTasksPerChild - (Splay * MaxTasksPerChild)
+
+    When a child is spawned the max tasks/time is calculated inside that range using two calls to rand(), one for the __Splay__ and the second for positive/negative.
+
+    The idea behind this is to offset process creation in the parent process as that can be expensive.  If you would like to disable this feature, set the __Splay__ to __0__.
+
+- __StatsInterval__
+
+    Default is 60.  Seconds to run the stats handler.
+
+- __StatsHandler__
+
+    Default 'undef'.  If passed a CODE reference, that refernce is run every __StatInterval__ seconds. The handler is passed a hash reference with the events tracked and the values
+    representing the number of times each event ocurred.
+
+- __StdoutHandler__
+
+    Default 'undef'.  CODE reference with what to do when there's content on STDOUT of the worker process.  Based on __StdioFilter__ or __StdoutFilter__ this reference may be passed
+    the content as a stream, line of text, or even a Perl object.
+
+- __StderrHandler__
+
+    Default 'undef'.  CODE reference with what to do when there's content on STDERR of the worker process.  Based on __StderrFilter__ this reference may be passed
+    the content as a stream, line of text, or even a Perl object.
+
+# AUTHOR
+
+Brad Lhotsky <brad@divisionbyzero.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Brad Lhotsky.
+
+This is free software, licensed under:
+
+    The (three-clause) BSD License
+
+# CONTRIBUTORS
+
+- Brad Lhotsky <blhotsky@craigslist.org>
+- Brad Lhotsky <brad.lhotsky@booking.com>
+
+# SUPPORT
+
+## Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+- MetaCPAN
+
+    A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+    [http://metacpan.org/release/POE-Component-WheelRun-Pool](http://metacpan.org/release/POE-Component-WheelRun-Pool)
+
+- RT: CPAN's Bug Tracker
+
+    The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+    [https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-WheelRun-Pool](https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-WheelRun-Pool)
+
+## Source Code
+
+This module's source code is available by visiting:
+[https://github.com/reyjrar/POE-Component-WheelRun-Pool](https://github.com/reyjrar/POE-Component-WheelRun-Pool)

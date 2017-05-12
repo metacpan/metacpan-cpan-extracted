@@ -1,0 +1,148 @@
+2011-03-26  Andreas J. Koenig  <andk@cpan.org>
+
+	* Release 2.002001:
+
+	* MANIFEST.SKIP now contains the incantation to use the defaults for all
+	perl distributions. That should silence MYMETA.yaml complaints.
+
+	* add notes in prominent places about the outdatedness of the package
+
+2008-11-28  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Release 2.002:
+
+	Workaround for broken patch 34882: supply the whole file
+	t/op/regexp_unicode_prop_thr.t from within the script.
+
+2008-03-08  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Release 2.001:
+
+	Unchanged stable release. For the changes between the 1.276 release and
+	this release, read below.
+
+2008-02-22  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Release around 2.000_294:
+
+	* Adding support for 5.10.1. Tiny improvements to code readability by
+	adding labels and changing bad variable names.
+
+2008-01-25  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Release around 2.000_284:
+
+	* The APC has got a new directory with additional tarballs (thanks to
+	Phillippe Chiasson) so we can drop the README.additional_tarballs and
+	simplify the documentation.
+
+	Leaving the underscore in the version number to test the package for a
+	while.
+
+2008-01-20  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Release around 2.000_280:
+
+	* Support for additional tarballs that are currently not in the APC. See
+	README.additional_tarballs for instructions how to enable the new
+	feature by copying your favorite tarballs to a new selfmade directory.
+
+	With this release we support 15 more tarballs than those in the APC,
+	which results in a muchly reduced time for patching.
+
+	The internal datastructures have changed, so we make this a dev release
+	and inc the major version number. In principle all changes should be
+	backwards compatible: P:R:BAP->translate returns a fifth element.
+	P:R:APC->tarball looks into more directories than it did before and may
+	return an absolute path, no other changes in the modules are visible to
+	the scripts.
+
+2008-01-03  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Release around 1.275:
+
+	* bugfix: address https://rt.cpan.org/Ticket/Display.html?id=32052 --
+	set LD_LIBRARY_PATH when calling ./perl.
+
+2007-11-11  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Release around 1.272:
+
+	* bugfix: check the exit status of prep scripts and if they fail rerun
+	them up to two times. That prevents bad results in scenarios with
+	complex upgrade scripts.
+
+2007-09-09  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* trimtrees now ignores empty files
+
+2007-08-12  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Release around 1.258:
+
+	* new switch --writedotpatch to create a .patch file that governs
+	PERL_PATCHLEVEL in the standard perl build procedure
+
+2007-07-10  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Release around 1.249:
+
+	* applied a patch from Father Chrysostomos to integrate better into OS X
+	environment
+
+	* a few tiny cosmetic nits not worth mentioning
+
+	* I wanted to look into CPANTS if there were any issues open but they
+	were closed for maintainance
+
+2007-04-24  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Release around 1.243:
+
+	* remove empty directories immediately because the APC patch files do
+	not contain directory removal information, as patch 31047 painfully
+	demonstrated.
+
+	* document under BUGS that patchaperlup does not work on case tolerant
+	filesystems.
+
+2007-02-14  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Release around 1.239:
+
+	* perl 5.6.2 failed one test due to different walk through find(). Only
+	the badly constructed test needed fixing
+
+2007-02-12  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Release around 1.236:
+
+	* add prereq Digest::MD5
+
+2007-02-10  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* Release around 1.233 features
+
+	* the tempdirs that end up in the chache are now mode 0755
+
+	* do not ask back if a *.t file is going to be deleted (this was just a
+	misfeature)
+
+	* improve the concurrency protection so that many binsearches can run in
+	parallel
+
+2005-11-30  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* Today's release (1.169 or so) features
+ 
+	* several bugfixes and enhancements in eg/trimtrees.pl (thanks to Eric
+	Schnetter for reprting bugs and testing the fixes).
+
+	
+
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "Changes"
+	tab-width: 2
+	left-margin: 2
+	End:

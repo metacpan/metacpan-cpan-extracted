@@ -1,0 +1,22 @@
+Revision history for Palm-Zetetic-Strip
+
+1.01 - 6 Sep 2002
+
+- Updates for cpan2rpm.
+
+1.00 - 11 Jul 2001
+
+- Released to CPAN.
+
+- Renamed from Palm-Strip to Palm-Zetetic-Strip.
+
+- Only load crypt and digest modules if needed.
+
+- More documentation.
+
+0.80 - 14 Jun 2001
+
+- Initial public release.
+
+- Read-only support for Strip v0.5i and v1.0 databases.  The PDB
+  version is autodetected.

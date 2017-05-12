@@ -1,0 +1,45 @@
+commit e3939178222a5d95edcd6c7ddf41582eb52f47b7 (refs/heads/master)
+Author: nadim khemir <nkh@cpan.org>
+Date:   Thu Jan 15 11:11:35 2009 +0100
+
+    FIXED: dependencies
+
+commit 11d688b6e0c6b4188f6907bc7cded2279e07f4d0
+Author: nadim khemir <nkh@cpan.org>
+Date:   Thu Jan 15 10:33:20 2009 +0100
+
+    FIXED: test without dependency on the locale
+
+commit c2f584204671afbfb8d2511e766d6ac585e2076c
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Jan 14 18:28:39 2009 +0100
+
+    FIXED: dependencies
+
+commit 90b9750fb8f3ea6758a898696c4b6b42fa50cbad
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Mon Dec 29 19:19:37 2008 +0100
+
+    ADDED: Initial commit
+    FIXED: some PBP errors
+    
+    0.05
+    	CHANGED: replaced POD::Spelling with Perl::Critic policy
+    
+    0.04
+    	FIXED: missing "use Test::More" in t/000_fixme.t
+    
+    0.03
+    	FIXED: VERBOSE displays the test code even if it contains errors
+    	CHANGED: (MAJOR CHANGE) remove =begin common and use verbatim blocks as test and pod
+    	CHANGED: =begin test is now =begin hidden
+    	ADDED: =begin not_tested for verbatim code that is not part of a test
+    
+    0.02
+    	FIXED: missing module dependency
+    	FIXED: division by zero example
+    	FIXED: typos in the documentation
+    	ADDED: no POD generation if a test fails
+    	ADDED: show list of failures
+    	ADDED: --verbose_pod_generation to pod_tested
+    	ADDED: output is moved if it existed and a test failed

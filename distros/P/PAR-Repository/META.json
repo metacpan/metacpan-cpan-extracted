@@ -1,0 +1,54 @@
+{
+   "abstract" : "Create and modify PAR repositories",
+   "author" : [
+      "Steffen Müller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PAR-Repository",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "DBM::Deep" : "1.0012",
+            "Digest::MD5" : "0",
+            "ExtUtils::Manifest" : "0",
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0.19",
+            "PAR::Dist" : "0.44",
+            "PAR::Indexer" : "0.91",
+            "PAR::Repository::Query" : "0.12",
+            "Pod::Text" : "0",
+            "YAML::Syck" : "0.62",
+            "version" : "0.50"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.21"
+}

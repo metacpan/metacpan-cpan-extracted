@@ -1,0 +1,5 @@
+severity = 4
+verbose = %m at %f line %l [%p]\n
+
+[TestingAndDebugging::RequireUseStrict]
+[Variables::ProhibitConditionalDeclarations]

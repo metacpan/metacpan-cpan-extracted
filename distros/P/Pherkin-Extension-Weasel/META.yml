@@ -1,0 +1,24 @@
+---
+abstract: 'Pherkin extension for web-testing'
+author:
+  - 'Erik Huelsmann <ehuels@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pherkin-Extension-Weasel
+requires:
+  Module::Runtime: '0'
+  Moose: '0'
+  Test::BDD::Cucumber: '0.50'
+  Weasel: '0'
+resources:
+  bugtracker: https://github.com/ehuelsmann/pherkin-extension-weasel/issues
+  repository: https://github.com/ehuelsmann/pherkin-extension-weasel.git
+version: '0.02'

@@ -1,0 +1,16 @@
+TO-DO
+
+better error reporting (postscript comments still?)
+check landscape: possible problems with rotation
+PostScript "compression", i.e. /n {newpath} bind def
+code compression using single letter dictionary defs (optional?)
+any postscript optimisation that can be done?
+postscript font support?
+define shape functions
+translate / scale / rotate functions?
+generate PostScript using a stack, rather than writing
+  to the end of a text variable? could lead to some rather
+  neat stuff (loops etc) (moved to ps:s "next gen")
+different line styles (dashes) (easy)
+ttf font support? (get lost!)
+

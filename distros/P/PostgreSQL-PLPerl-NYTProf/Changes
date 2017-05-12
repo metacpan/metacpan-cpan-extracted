@@ -1,0 +1,16 @@
+=head1 NAME
+
+Changes - List of significant changes to PostgreSQL::PLPerl::NYTProf
+
+=head2 Changes in 1.002
+
+  PostgreSQL 9.0 or later is now required.
+  Assorted updates to the docs.
+  No longer requires PostgreSQL::PLPerl::Injector.
+
+=head2 Changes in 1.001
+
+  Initial version.
+
+=cut
+

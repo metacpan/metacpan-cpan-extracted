@@ -1,0 +1,19 @@
+0.04 2016-02-23T14:13:20+01:00
+ - Add EXAMPLE3 section to doc.
+ - Fix EXAMPLE2 section in doc.
+ - Fix minimal version of List::Util to 1.41.
+ - Update copyright years.
+
+0.03 2015-10-13T15:14:26+02:00
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Update Module::Install to 1.16 version.
+ - Rewrite SEE ALSO section in doc to proper Task.
+
+0.02 2015-01-31T19:45:32+01:00
+ - Add PYX::Stack to SEE ALSO section in doc.
+ - Add examples/ directory.
+ - Fix abstract.
+
+0.01 2015-01-26T00:19:40+01:00
+ - First version.

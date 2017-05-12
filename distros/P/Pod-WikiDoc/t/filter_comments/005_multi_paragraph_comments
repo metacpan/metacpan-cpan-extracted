@@ -1,0 +1,14 @@
+### = GREETING
+###
+### hello world
+###
+### the line above doesn't have a space after the comments
+#--------------------------------------------------------------------------#
+=pod
+
+=head1 GREETING
+
+hello world
+
+the line above doesn't have a space after the comments
+

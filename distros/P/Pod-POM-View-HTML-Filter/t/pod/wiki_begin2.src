@@ -1,0 +1,75 @@
+=begin filter wiki extended=1
+
+= my interesting text =
+
+A NormalLink
+[let the Sun shine|AnExtendedLink]
+
+== my interesting lists ==
+
+    * unordered one
+    * unordered two
+
+    1. ordered one
+    2. ordered two
+                a. nested one
+                b. nested two
+
+    code one
+    code two
+
+The first line of a normal paragraph.
+The second line of a normal paragraph.  Whee.
+
+__RESULT__
++wiki
+<html><body bgcolor="#ffffff">
+<h1>my interesting text</h1>
+
+<p>A <a href="NormalLink">NormalLink</a><br />
+<a href="let%20the%20Sun%20shine">AnExtendedLink</a></p>
+<h2>my interesting lists</h2>
+
+<ul>
+<li>unordered one</li>
+<li>unordered two</li>
+</ul>
+<ol>
+<li value="1">ordered one</li>
+<li value="2">ordered two<ol>
+<li value="a">nested one</li>
+<li value="b">nested two</li>
+</ol>
+</li>
+</ol>
+<pre><code>  code one
+  code two
+</code></pre>
+<p>The first line of a normal paragraph.<br />
+The second line of a normal paragraph.  Whee.</p>
+
+</body></html>
+__RESULT__
+-wiki
+<html><body bgcolor="#ffffff">
+<pre>= my interesting text =
+
+A NormalLink
+[let the Sun shine|AnExtendedLink]
+
+== my interesting lists ==
+
+    * unordered one
+    * unordered two
+
+    1. ordered one
+    2. ordered two
+                a. nested one
+                b. nested two
+
+    code one
+    code two
+
+The first line of a normal paragraph.
+The second line of a normal paragraph.  Whee.</pre>
+</body></html>

@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/PXP.pm
+lib/PXP/Config.pm
+lib/PXP/Extension.pm
+lib/PXP/ExtensionPoint.pm
+lib/PXP/ExtensionPointClass.pm
+lib/PXP/I18N.pm
+lib/PXP/Plugin.pm
+lib/PXP/PluginRegistry.pm
+t/00use.t
+t/01init.t
+t/02loadplugins.t
+META.yml                                 Module meta-data (added by MakeMaker)

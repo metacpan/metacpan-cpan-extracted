@@ -1,0 +1,136 @@
+-- Patch:
+--   From: 0.58
+--   To:   0.59
+--
+-- Description:
+--  add flagging of posts edited by admin
+--  lock posts (so they can't be changed after being edited by admin)
+--  allow user accounts to be suspended
+--  logging of admin actions on users (e.g. why suspended)
+--  table support for various per-ip bans
+--  add PK to forum_moderator table
+
+BEGIN;
+
+-- patch starts here --
+
+ALTER TABLE post
+    ADD COLUMN admin_editor_id integer references person(id),
+    ADD COLUMN locked boolean not null default False
+;
+
+ALTER TABLE person
+    ADD COLUMN suspended boolean not null default False
+;
+
+CREATE TABLE role (
+    id          serial      primary key,
+    idx         integer     not null default 9999,
+    name        varchar(30) not null unique,
+    description text
+);
+CREATE INDEX idx_role_name ON role(name);
+
+-- a couple of roles
+INSERT INTO role (idx, name, description) VALUES (
+    0,
+    'site_moderator',
+    'Site Moderator'
+);
+INSERT INTO role (idx, name, description) VALUES (
+    50,
+    'suspend_account',
+    'Suspend Account'
+);
+INSERT INTO role (idx, name, description) VALUES (
+    100,
+    'ip_ban_posting',
+    'Restrict Posting by IP'
+);
+INSERT INTO role (idx, name, description) VALUES (
+    100,
+    'ip_ban_signup',
+    'Restrict Sign-Up by IP'
+);
+INSERT INTO role (idx, name, description) VALUES (
+    100,
+    'ip_ban_login',
+    'Restrict Login by IP'
+);
+
+CREATE TABLE user_roles (
+    id          serial      primary key,
+    person_id   integer     not null
+                            references person(id),
+    role_id     integer     not null
+                            references role(id),
+    UNIQUE (person_id, role_id)
+);
+CREATE INDEX idx_userroles_personid ON user_roles(person_id);
+CREATE INDEX idx_userroles_roleid   ON user_roles(role_id);
+
+-- make topdog a site_moderator
+INSERT INTO user_roles
+    (person_id, role_id)
+VALUES (
+    0,
+    (SELECT id FROM role WHERE name='site_moderator')
+);
+
+CREATE TABLE admin_action (
+    id          serial      primary key,
+    name        text        not null,
+
+    UNIQUE(name)
+);
+INSERT INTO admin_action (id, name) VALUES (0, 'undefined');
+INSERT INTO admin_action (name) VALUES ('suspend_user');
+
+-- admin action log actions/messages
+CREATE TABLE log_admin_action (
+    id          serial      primary key,
+    person_id   integer     not null
+                            references person(id),
+    admin_id    integer     not null
+                            references person(id),
+    created     timestamp   with time zone
+                            not null
+                            default CURRENT_TIMESTAMP,
+
+    action_id   integer     not null
+                            default 0
+                            references admin_action(id),
+
+    message     text        not null
+                            default 'No Message Supplied'
+);
+CREATE INDEX idx_adminaction_personid ON log_admin_action(person_id);
+CREATE INDEX idx_adminaction_adminid  ON log_admin_action(admin_id);
+
+CREATE TABLE ip_ban_type (
+    id          serial      primary key,
+    name        text        not null,
+    description text,
+
+    UNIQUE(name)
+);
+INSERT INTO ip_ban_type (name,description) VALUES ('access','Restrict all access by IP');
+INSERT INTO ip_ban_type (name,description) VALUES ('login','Restrict login by IP');
+INSERT INTO ip_ban_type (name,description) VALUES ('posting','Restrict posting by IP');
+INSERT INTO ip_ban_type (name,description) VALUES ('signup','Restrict sign-up by IP');
+
+CREATE TABLE ip_ban (
+    id          serial      primary key,
+    ban_type_id integer     not null
+                            references ip_ban_type(id),
+    ip_range    text,
+
+    UNIQUE(ban_type_id)
+);
+
+ALTER TABLE forum_moderator
+    ADD COLUMN id SERIAL primary key;
+
+-- patch ends here --
+
+COMMIT;

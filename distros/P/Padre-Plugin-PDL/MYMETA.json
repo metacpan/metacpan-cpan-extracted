@@ -1,0 +1,60 @@
+{
+   "abstract" : "PDL support for Padre",
+   "author" : [
+      "Ahmad M. Zawawi <ahmad.zawawi@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Padre-Plugin-PDL",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "inc",
+         "share",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Locale::Msgfmt" : "0.15",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "2.0402",
+            "PDL" : "v2.4.10",
+            "Padre" : "0.94",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://padre.perlide.org/"
+      },
+      "homepage" : "http://padre.perlide.org/trac/wiki/PadrePluginPDL",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://svn.perlide.org/padre/trunk/Padre-Plugin-PDL"
+      }
+   },
+   "version" : "0.05"
+}

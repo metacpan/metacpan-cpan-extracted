@@ -1,0 +1,84 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Structure of a Presentation File</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Structure of Presentation File</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<A HREF=index.html>tutorial</A><BR>
+<B>file</B>
+
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.  The presentation is written in Perl/Tk.  There is no
+graphical interface to design your slides, and I'm very pleased with
+that.  If anyone want likes create one, he/she has my blessing.
+<P>&nbsp;
+
+    </TD></TR>
+<TR><TD VALIGN=top>
+
+    </TD><TD VALIGN=top>
+
+<H2>The Basic Structure</H2>
+In its most reduced form, a presentation should be a Perl-script
+which contains the following lines:
+<PRE>
+     #!/usr/local/bin/perl -w
+     use PPresenter;
+
+     my $show = PPresenter->new(<I>..options..</I>);
+
+     $show->addViewport(<I>..options..</I>);
+     <I>...</I>;
+
+     $show->addSlide(<I>..options..</I>);
+     $show->addSlide(<I>..options..</I>);
+     <I>...</I>;
+
+     $show->run;
+</PRE>
+As you can see, a presentation is easy to build.  The first line is to
+satisfy a UNIX-system (do not forget to make the script executable).  On
+Windows32, the script shall have extention <CODE>.pl</CODE>.
+<P>
+The difficult thing about writing slides with <EM>Portable Presenter</EM>
+is to know which options are available and where to use them.
+There are three groups of options:
+<OL>
+<LI>Options to <A HREF=new.html>new</A>, which are related to the creation of
+    the whole presentation; basically about the screen(s) and controls.
+<LI>Options to <A HREF=../viewport/index.html>viewports</A>.  Viewports
+    is the name for a main window, or screen.  The term `screen' could not
+    be used as own name because it is already defined in Perl/Tk.<BR>
+    As user, you can say <CODE>Screen</CODE> instead of <CODE>Viewport</CODE>,
+    whenever you like, except when you start writing styles.
+<LI>Options to <A HREF=../slide/index.html>slides</A>, describing the way one
+    slide should be handled.  These are <A HREF=../style/>style</A>-dependent,
+    do you need to know which style you are using.
+<LI>The <CODE>run</CODE> method has no options, because most facts which are
+    about running the show have to be known when the slides are being
+    processed.
+</OL>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

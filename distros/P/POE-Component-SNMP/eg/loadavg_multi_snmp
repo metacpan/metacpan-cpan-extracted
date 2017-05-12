@@ -1,0 +1,243 @@
+#!/usr/bin/perl
+
+use Tk;
+use Tk::Graph;
+
+use POE qw/Component::SNMP Component::Client::TCP/;
+use Time::HiRes qw/time/;
+
+use Data::Dumper;
+
+use warnings;
+use strict;
+
+use constant SNMP_HOSTS => 1;
+use constant STATUS_LINE => 1;
+use constant SHOW_ALL_LOADS => 0;
+
+# do 'trace_calls.pl';
+
+my $VERBOSE = 0;
+my $POLL_DELAY = 5;
+my $REDRAW_DELAY = 1;
+
+$|++;
+
+$POLL_DELAY = $ENV{DELAY} if $ENV{DELAY};
+
+# {{{ SNMP variables
+
+# snmpget -v1 -c public localhost 1.3.6.1.4.1.2021.10.1.3.1
+# snmpget -v1 -c public localhost enterprises.ucdavis.laTable.laEntry.laLoad.1
+
+#my $load1_oid = 'enterprises.ucdavis.laTable.laEntry.laLoad.1';
+my $load1_oid  = '.1.3.6.1.4.1.2021.10.1.3.1';
+my $load5_oid  = '.1.3.6.1.4.1.2021.10.1.3.2';
+my $load15_oid = '.1.3.6.1.4.1.2021.10.1.3.3';
+# hostname oid: system.sysName => 1.3.6.1.2.1.1.5.0
+my $host_oid = '.1.3.6.1.2.1.1.5.0';
+
+# }}} SNMP variables
+
+# {{{ HOSTS
+
+# it wants to complain about the '#' chars in the qw// for the color
+# values, so hush!
+no warnings;
+
+# name => [ hostname_or_ip color ]
+my %snmp_host =
+  (
+   localhost => [qw( 127.0.0.1 #FF0000 )], # red
+  );
+
+my %snmp_community = ( localhost => 'not_public_of_course' );
+
+use warnings;
+
+# }}} HOSTS
+
+## STATES ##
+# {{{ _start
+
+sub _start {
+    my($kernel, $heap, $session) = @_[KERNEL, HEAP, SESSION];
+    my %config;
+
+    $kernel->alias_set('graph_window');
+
+    # {{{ snmp hosts
+
+    if (SNMP_HOSTS) {
+	while (my ($name, $etc) = each %snmp_host) {
+	    my ($host, $one, $five, $fifteen) = @$etc;
+	    my $name_01 = "${name}_01";
+
+	    $config{$name_01} = {
+				 -title => $name,
+				 -color => $one,
+				};
+
+	    ## setup the snmp processes
+	    POE::Component::SNMP->create(
+					 hostname  => $host,
+					 community => $snmp_community{$host} || 'public',
+					 alias => "snmp_$name",
+					 timeout => 2,
+					 retries => 0,
+					 # debug => 0x3E,
+					 # debug => 0x04, # transport
+					);
+
+	    $heap->{snmp_hostnames}->{$host} = $name;
+	    $heap->{fields}->{$name} = [ $name_01 ];
+	    $heap->{time}{$name} = time;
+
+	    # $kernel->yield( snmp_poll => $name, $host );
+	    $kernel->call( $session => snmp_poll => $name, $host );
+	}
+    }
+
+    # }}} snmp hosts
+    # {{{ set up the graph widget
+
+    $heap->{ca} = $poe_main_window->Graph(
+					  -type => 'LINE',
+					  -linewidth => 2,
+					  -look => 100,
+					  -sortnames => 'alpha',
+					  -legend => 1,
+					  # -lineheight => 30,
+					  # -threed => 3,
+					  -headroom => 10,
+					  -config => \%config,
+
+                                          -shadowdepth => 2,
+					 );
+
+    $poe_main_window->configure(-title => "load averages");
+    $poe_main_window->iconbitmap('@/usr/share/xemacs/xemacs-packages/etc/frame-icon/radioactive.xbm');
+
+    $heap->{ca}->pack(
+		      -expand => 1,
+		      -fill => 'both',
+		     );
+
+    $heap->{vars} = []; # empty update list;
+    $kernel->call( $session => 'redraw_graph' );
+
+    # }}} set up the graph widget
+
+}
+
+# }}} _start
+
+# {{{ snmp_got_data
+
+sub snmp_got_data {
+    my($kernel, $heap, $request, $response) = @_[KERNEL, HEAP, ARG0, ARG1];
+
+    my ($alias,   $host, $cmd, @args)  = @$request;
+    my ($results, $error) = @$response;
+
+    my $one;
+    my ($name) = $alias =~ /snmp_(.*)/;
+
+    $VERBOSE and
+      print Dumper [ $request, $response ];
+
+    if (ref $results) {
+	# GOOD ANSWER!
+	unless ($name) {
+	    $host = $results->{$host_oid};
+	    $name = $heap->{snmp_hostnames}{$host};
+	}
+
+	($one) = @{$results}{ $load1_oid };
+
+    } elsif (($host) = $results =~ /No response from remote host '(.*)'/) {
+
+	# NO RESPONSE
+	$VERBOSE and warn "SNMP $alias ($host): $results\n";
+	# $name ||= $heap->{snmp_hostnames}{$host};
+
+    } else {
+
+	$VERBOSE and warn "SNMP $_[ARG0][0] ($_[ARG0][1]): $results\n";
+
+    }
+
+    unless (defined $name) {
+	warn "\$name is NOT defined!!!!!!!!\n";
+	warn Dumper( $_[ARG0] );
+        return;
+    }
+
+    my $time = time;
+
+    my $delay = $POLL_DELAY - ($time - $heap->{time}{$name});
+    $delay = 0 if $delay < 0;
+
+    $kernel->delay_add( snmp_poll => $POLL_DELAY, $name, $host );
+
+    $heap->{time}{$name} = $time;
+
+
+    my $fields = $heap->{fields}->{$name};
+    unless (defined $fields) {
+        warn "No such name $name";
+    }
+
+    # stash the incoming values on the heap, to be updated in
+    # redraw_graph()
+    push @{$heap->{vars}}, ($fields->[0] => $one);
+
+}
+
+# }}} snmp_got_data
+# {{{ snmp_poll
+
+sub snmp_poll {
+    my($kernel, $heap, $name, $host) = @_[KERNEL, HEAP, ARG0, ARG1];
+
+    $host ||= '';
+
+    # poll an SNMP host
+    $kernel->post( "snmp_$name" => 'get',
+		   "snmp_got_data",
+		   -varbindlist => [ $load1_oid ]
+		 );
+}
+
+# }}} snmp_poll
+# {{{ redraw_graph
+
+sub redraw_graph {
+    my ($kernel, $heap) = @_[KERNEL, HEAP];
+
+    # defer the call to $heap->{ca}->set() to be the *LAST* call in
+    # this function.  this works around weird POE/Tk bugs in weird
+    # versions of perl, like 5.8.0.
+
+    my %v = @{$heap->{vars}};
+    $heap->{vars} = []; # empty update list;
+
+    $kernel->delay_add( redraw_graph => $REDRAW_DELAY );
+    return unless scalar keys %v;
+
+    $heap->{ca}->set(\%v);
+
+}
+
+# }}} redraw_graph
+
+POE::Session->create
+  ( inline_states => {
+                      _start => \&_start,
+                      snmp_poll => \&snmp_poll,
+                      snmp_got_data => \&snmp_got_data,
+                      redraw_graph => \&redraw_graph,
+                     }
+  );
+
+POE::Kernel->run;

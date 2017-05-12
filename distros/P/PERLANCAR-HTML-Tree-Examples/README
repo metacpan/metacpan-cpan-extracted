@@ -1,0 +1,21 @@
+SYNOPSIS
+
+     use PERLANCAR::HTML::Tree::Examples qw(gen_sample_data);
+    
+     my $html = gen_sample_data(size => 'medium1');
+
+DESCRIPTION
+
+ Overview of available sample data
+
+      # CODE: require PERLANCAR::HTML::Tree::Examples; require Text::Head;
+      for my $size ('tiny1', 'small1', 'medium1') { print "=item *
+      size=$size\n\n"; my $s = Text::Head::head_text(text =>
+      PERLANCAR::HTML::Tree::Examples::gen_sample_data(size=>$size),
+      hint=>1, lines=>20); $s =~ s/^/ /gm; print $s, "\n" }
+
+SEE ALSO
+
+    show-perlancar-sample-html-tree (App::ShowPERLANCARSampleHTMLTree), a
+    simple CLI to conveniently view the sample data.
+

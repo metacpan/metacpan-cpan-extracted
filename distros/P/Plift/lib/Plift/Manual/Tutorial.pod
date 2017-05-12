@@ -1,0 +1,277 @@
+__END__
+
+=encoding utf-8
+
+=head1 INTRODUCTION
+
+This is a step-by-step tutorial on how to use Plift. You'll start using 100%
+pure HTML templates to learn how to render data using directives.
+Then you'll learn how to use the builtin processing instructions in your
+template files.
+
+Finally, I'll show how to create your own custom processing instructions
+(triggered by custom tags/attributes) and how to bundle them in the form of
+reusable components/plugins.
+
+=head1 HELLO WORLD
+
+Lets start with the classic "Hello World" example.
+
+First our template file, C< index.html >:
+
+    <section>
+        <h1>Message placeholder</h1>
+    </section>
+
+Now our script, C< hello_world.pl >:
+
+    ### hello_world.pl ###
+
+    use Plift;
+
+    my $plift = Plift->new;
+
+    my %data = (
+        hello_message => 'Hello World!'
+    );
+
+    my @directives = (
+        'h1' => 'hello_message'
+    );
+
+    my $html = $plift->render('index', \%data, \@directives );
+
+That will render (not surprisingly) the following text into C< $html >:
+
+    <section>
+        <h1>Hello World!</h1>
+    </section>
+
+Ok, now lets explain what C<< $plift->render >> did. As you can see, the first
+argument is the name of the template file, without the C<.html> extension. The second
+argument C<\%data> is a reference to a hash of data to make available for
+templates. Finally, the third argument C<\@directives> is a reference to a list of
+render directives, which are simple rules mapping a CCS selector to a data key.
+
+Our example uses only one render directive, C<< 'h1' => 'hello_message' >>, that
+tells Plift to render the value of the 'hello_message' data key into the C<< <h1> >>
+element. If there were multiple C<< <h1> >> elements in the template, all of them
+would get rendered.
+
+Under the hood, Plift uses L<XML::LibXML::jQuery> to manipulate HTML. The render
+directive in the example is equivalent to the following code:
+
+    my $data_value = $context->get('hello_message');
+    $root_element->find('h1')->text($data_value);
+
+=head1 THE PATH
+
+In the above example Plift used the default config for the 'paths' option, which
+is the current working dir. In a real world application you usualy pass some pre
+defined template path.
+
+If you pass an arrayref with multiple paths, Plift will search all of them in
+order. You can use that funcionality to create a simple way to "extend" the
+website "theme" or "skin":
+
+    my $plift = Plift->new(
+        paths => [
+            '/myapp/website-foo/skin/templates/',
+            '/myapp/share/skin/base/templates/'
+        ]
+    );
+
+If you ask for the template C<'error_pages/404'> (remember, no .html extension),
+Plift first looks for C</myapp/website-foo/skin/templates/error_pages/404.html> then
+C</myapp/share/skin/base/templates/error_pages/404.html>. The first existing file
+will be used, totally overriding the equivalent file on subsequent paths. There
+is no "template inheritante" or anything like that.
+
+=head1 THE CONTEXT
+
+Before proceding, we must learn about the L<Plift::Context> object. At a high level,
+you can think of it as a representation of the template that we are procesing.
+Thats why we create a new context via L<Plift/template>, and render it via
+L<Plift::Context/render>. Which gives us a nice syntax:
+
+    $document = $plift->template('foo')
+                      ->at(\@directives)
+                      ->render(\%data);
+
+Semantics aside, a L<Plift::Context> instance is the storage for all things
+related to the current processing context. It's meant to live only for the
+duration of that template rendering operation (usualy a web request). In contrast
+to the actual L<Plift> instance that is meant to live for the whole application life.
+
+The methods L<Plift/render> and L<Plift/process> are just shortcuts for
+L<Plift/template>, L<Plift::Context/at> and L<Plift::Context/render>.
+The code snipped above is equivalent to:
+
+    $document = $plift->process('index', \%data, \@directives );
+
+See L<Plift::Context> for the complete reference.
+
+=head1 RENDER DIRECTIVES
+
+Render directives are pairs of C<< MATCH => ACTION >> values. The match part is a CSS
+selector that targets the element the action applies to. You can use any selector
+supported by L<HTML::Selector::XPath>. The action part takes a few variations,
+as described next.
+
+All render directives and template data are stored in the L<Plift::Context>
+object. Directives are added using the method L<Plift::Context/at>.
+
+=head2 Scalar - Interpolate data value
+
+    # directive
+    '.first-name' => 'user.first_name'
+
+    # data
+    user => {
+        first_name => 'Carlos',
+        ...
+    }
+
+This is the most common directive, where the selector points to a data point,
+like C< '.first-name' => 'user.first_name' >. By default the data value is
+rendered as the element text content. You can add a some C<MATCH> modifiers to
+control where and how the value is interpolated.
+
+=over
+
+=item '+': Append or prepend a value
+
+    '+body' => 'layout.header',
+    'body+' => 'layout.footer'
+
+The default behavior is for a match to replace the matched node's content.
+In some cases you may wish to preserve the template content and instead either
+add more content to the front or back of it.
+
+=item '@HTML': Render as HTML
+
+    '.blog-post-content@HTML' => 'post.content'
+
+The default is to explicitly create L<XML::LibXML::Text> nodes, instructing libxml
+to automatically escape any special HTML character.
+
+=item '@<attr>': Select an attribute within the current node
+
+    'a.blog-post-link@href' => 'post.url'
+
+Render the value in a node's attribute instead of inner content.
+
+=item '^': Replace current node completely
+
+    '^.user-name' => 'user.fullname'
+
+Normally we replace, append or prepend to the B<content> of the selected node. Using
+the '^' at the front of your match indicates operation should happen on the
+entire node, not just the content. Can be combined with '+' for append/prepend.
+
+=back
+
+=head2 Arrayref - Run directives under a new DOM root
+
+    # directive
+    '#contact' => [
+        '.phone' => 'contact.phone',
+        '.email' => 'contact.email',
+    ]
+
+    # data
+    contact => {
+        phone => '1234-5678',
+        email => 'foo@example.com'
+    }
+
+In the example above, the directives in the arrayref are processed using the
+'#contact' node as the DOM root instead of document node. These new directives
+can be any type of directive as already shown or later documented.
+
+=head2 Hashref - Move the root of the Data Context
+
+    # directive
+    '#contact' => {
+        'contact' => [
+            '.phone' => 'phone',
+            '.email' => 'email',
+        ]
+    }
+
+    # data
+    contact => {
+        phone => '1234-5678',
+        email => 'foo@example.com'
+    }
+
+Just like it may be valuable to move the root DOM context to an inner node,
+sometimes you'd like to also move the root of the current Data context to an inner
+path point. This can result in cleaner templates with less repeated syntax, as
+well as promote reusability. In order to do this you use a Hashref whose key is
+the path under the data context you wish to move to and who's value is an
+Arrayref of new directives. These new directives can be any type of directive as
+already shown or later documented.
+
+=head2 HashRef - Create a loop
+
+    # directive
+    'li.user' => {
+        '[users]' => [
+            '.first-name' => 'first_name',
+            '.last-name' => 'last_name',
+        ],
+    }
+
+    # data
+    users => [
+        { first_name => 'First 01', last_name => 'Last 01' },
+        { first_name => 'First 02', last_name => 'Last 02' },
+        { first_name => 'First 03', last_name => 'Last 03' }
+    ]
+
+Besides moving the current data context, setting the value of a match spec key
+to a hashref can be used to perform loops over a node, such as when you wish to
+create a list. The only difference to the previous Hashref syntax is the angle
+brakets C< [] > around the data-point name, to tell Plift this is a loop.
+
+In this case, C< users > must be an arrayref of hashref. Plift will create
+a clone of the 'li.user' element, and use that as DOM root for rendering each
+item of the array.
+
+
+=head2 CodeRef - Programmatically render the element
+
+    # directive
+    '#contact' => sub {
+        my ($element, $ctx) = @_;
+        my $text = sprintf "%s (☎ %s)", $ctx->get('contact.email'), $ctx->get('contact.phone');
+        $element->text($text)->attr( title => $text );
+    }
+
+    # data
+    contact => {
+        phone => '1234-5678',
+        email => 'foo@example.com'
+    }
+
+
+Perform any custom processing on the target element. The coderef receives the
+element and the context object as arguments. The return value of the custom code
+is ignored.
+
+=head2 THE DOT NOTATION
+
+=head1 PROCESSING INSTRUCTIONS
+
+=head2 ELEMENT REMOVAL
+
+=head1 CUSTOM HANDLERS
+
+=head1 CREATING REUSABLE COMPONENTS
+
+=head1 AUTHOR
+
+Carlos Fernando Avila Gratz E<lt>cafe@kreato.com.brE<gt>
+
+=cut

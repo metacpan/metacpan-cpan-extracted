@@ -1,0 +1,15 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use FindBin '$Bin';
+use lib "$Bin/../lib";
+
+use Benchmark::Dumb qw(timethese);
+use Perinci::Sub::Wrapper qw(wrap_sub);
+
+timethese(0, {
+    'wrap_minimal'   => sub { wrap_sub(sub=>sub{}, meta=>{v=>1.1}) },
+    'wrap_typical'   => sub { wrap_sub(sub=>sub{}, meta=>{v=>1.1, summary=>"Some summary", args=>{a1=>{schema=>"int*", req=>1, pos=>0}, a2=>{schema=>"str"}, a3=>{schema=>"str*",}, a4=>{schema=>"str"}, a5=>{schema=>"str*"}}}) },
+});

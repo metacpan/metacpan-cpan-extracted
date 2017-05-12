@@ -1,0 +1,38 @@
+                         QUERY PLAN                         
+------------------------------------------------------------
+ <explain xmlns="http://www.postgresql.org/2009/explain">  +
+   <Query>                                                 +
+     <Plan>                                                +
+       <Node-Type>Limit</Node-Type>                        +
+       <Startup-Cost>0.00</Startup-Cost>                   +
+       <Total-Cost>0.04</Total-Cost>                       +
+       <Plan-Rows>1</Plan-Rows>                            +
+       <Plan-Width>194</Plan-Width>                        +
+       <Actual-Startup-Time>0.007</Actual-Startup-Time>    +
+       <Actual-Total-Time>0.008</Actual-Total-Time>        +
+       <Actual-Rows>1</Actual-Rows>                        +
+       <Actual-Loops>1</Actual-Loops>                      +
+       <Plans>                                             +
+         <Plan>                                            +
+           <Node-Type>Seq Scan</Node-Type>                 +
+           <Parent-Relationship>Outer</Parent-Relationship>+
+           <Relation-Name>pg_class</Relation-Name>         +
+           <Alias>pg_class</Alias>                         +
+           <Startup-Cost>0.00</Startup-Cost>               +
+           <Total-Cost>10.81</Total-Cost>                  +
+           <Plan-Rows>281</Plan-Rows>                      +
+           <Plan-Width>194</Plan-Width>                    +
+           <Actual-Startup-Time>0.006</Actual-Startup-Time>+
+           <Actual-Total-Time>0.006</Actual-Total-Time>    +
+           <Actual-Rows>1</Actual-Rows>                    +
+           <Actual-Loops>1</Actual-Loops>                  +
+         </Plan>                                           +
+       </Plans>                                            +
+     </Plan>                                               +
+     <Triggers>                                            +
+     </Triggers>                                           +
+     <Total-Runtime>0.044</Total-Runtime>                  +
+   </Query>                                                +
+ </explain>
+(1 row)
+

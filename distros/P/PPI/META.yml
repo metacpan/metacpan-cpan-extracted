@@ -1,0 +1,45 @@
+---
+abstract: 'Parse, Analyze and Manipulate Perl (without perl)'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  Class::Inspector: '1.22'
+  ExtUtils::MakeMaker: 6.59
+  File::Remove: '1.42'
+  Test::More: '0.86'
+  Test::NoWarnings: '0.084'
+  Test::Object: '0.07'
+  Test::SubCalls: '1.07'
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: PPI
+name: PPI
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Clone: '0.30'
+  Digest::MD5: '2.35'
+  File::Spec: '3.2701'
+  IO::String: '1.07'
+  List::MoreUtils: '0.16'
+  List::Util: '1.20'
+  Params::Util: '1.00'
+  Storable: '2.17'
+  Task::Weaken: 0
+  perl: 5.6.0
+resources:
+  bugtracker: https://github.com/adamkennedy/PPI/issues
+  homepage: https://github.com/adamkennedy/PPI
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/adamkennedy/PPI
+version: '1.220'

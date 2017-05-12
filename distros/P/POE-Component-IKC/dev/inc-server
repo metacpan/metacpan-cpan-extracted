@@ -1,0 +1,39 @@
+#!/usr/bin/perl -w
+use strict;
+
+sub POE::Kernel::ASSERT_DEFAULT () { 1 }
+sub POE::Kernel::CATCH_EXCEPTIONS () { 1 }
+sub POE::Session::ASSERT_STATES () { 1 }
+
+use POE;
+use POE::Component::IKC::Server;
+
+POE::Component::IKC::Server->spawn(
+    port => 12345,
+    name => 'Server',
+);
+
+POE::Session->create(
+    inline_states => {
+
+        _start => sub {
+            my ( $kernel, $heap ) = @_[ KERNEL, HEAP ];
+            my $service_name = 'Incrementor';
+            $kernel->alias_set($service_name);
+            $heap->{num} = 0;
+            $kernel->post( IKC => publish => $service_name, ['inc'] );
+        },
+
+        inc => sub {
+            my ($heap) = $_[HEAP];
+            $heap->{num}++;
+            print "Someone called! New value: $heap->{num}\n";
+            return $heap->{num};
+        },
+
+        _stop => sub { print "Stopping $0\n"; },
+
+      }
+);
+
+POE::Kernel->run();

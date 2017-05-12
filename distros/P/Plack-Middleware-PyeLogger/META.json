@@ -1,0 +1,56 @@
+{
+   "abstract" : "Use Pye as a Plack logger",
+   "author" : [
+      "Ido Perlmuter <ido@ido50.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-PyeLogger",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Util::Accessor" : "0",
+            "Pye" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ido50/Plack-Middleware-PyeLogger/issues"
+      },
+      "homepage" : "https://metacpan.org/pod/Plack::Middleware::PyeLogger",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ido50/Plack-Middleware-PyeLogger.git",
+         "web" : "https://github.com/ido50/Plack-Middleware-PyeLogger"
+      }
+   },
+   "version" : "2.000001"
+}
+

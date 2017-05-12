@@ -1,0 +1,54 @@
+Padre-Plugin-Filter
+===================
+
+This plug-in enables the use of Unix-like external filtering 
+commands/scripts to transform part or all of the current document.
+
+The output of the filter can either replace the input, be appended to 
+the input, or be inserted into a new document.
+
+Unlike Unix filters, the filter mechanism in this plug-in 
+is designed to use input and output files rather than STDIN and STDOUT. 
+
+
+INSTALLATION
+============
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+=========================
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Padre::Plugin::Filter
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Padre-Plugin-Filter
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Padre-Plugin-Filter
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Padre-Plugin-Filter
+
+    Search CPAN
+        http://search.cpan.org/dist/Padre-Plugin-Filter/
+
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2009 Gregory Siems
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

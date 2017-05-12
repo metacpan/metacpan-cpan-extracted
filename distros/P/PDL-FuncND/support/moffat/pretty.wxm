@@ -1,0 +1,17 @@
+/* [wxMaxima batch file version 1] [ DO NOT EDIT BY HAND! ]*/
+/* [ Created with wxMaxima version 0.8.5 ] */
+
+/* [wxMaxima: input   start ] */
+set_display('ascii)$
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+f(x,y,alpha,beta) := (beta -1) * ( %pi * alpha^2)^(-1) * ( a + ( x^2 + y^2)/alpha^2)^(-beta);
+/* [wxMaxima: input   end   ] */
+
+/* [wxMaxima: input   start ] */
+fn(x,u,S,alpha,beta) := block([n:length(S)],(gamma(beta)/gamma( (2*beta - n)/2) )* (%pi^(n/2)*alpha^n)^(-1) * ( 1 + transpose(x-u) . invert(S) . (x-u))^-beta );
+/* [wxMaxima: input   end   ] */
+
+/* Maxima can't load/batch files which end with a comment! */
+"Created with wxMaxima"$

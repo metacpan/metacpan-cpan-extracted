@@ -1,0 +1,139 @@
+NAME
+
+    POE::Component::Win32::ChangeNotify - A POE wrapper around
+    Win32::ChangeNotify.
+
+VERSION
+
+    version 1.24
+
+SYNOPSIS
+
+       use strict;
+       use POE;
+       use POE::Component::Win32::ChangeNotify;
+    
+       my $poco = POE::Component::Win32::ChangeNotify->spawn( alias => 'blah' );
+    
+       POE::Session->create(
+            package_states => [ 
+                    'main' => [ qw(_start notification) ],
+            ],
+       );
+    
+       $poe_kernel->run();
+       exit 0;
+    
+       sub _start {
+         my ($kernel,$heap) = @_[KERNEL,HEAP];
+    
+         $kernel->post( 'blah' => monitor => 
+         {
+            'path' => '.',
+            'event' => 'notification',
+            'filter' => 'ATTRIBUTES DIR_NAME FILE_NAME LAST_WRITE SECURITY SIZE',
+            'subtree' => 1,
+         } );
+    
+         undef;
+       }
+    
+       sub notification {
+         my ($kernel,$hashref) = @_[KERNEL,ARG0];
+    
+         if ( $hashref->{error} ) {
+            print STDERR $hashref->{error} . "\n";
+         } else {
+            print STDOUT "Something changed in " . $hashref->{path} . "\n";
+         }
+         $kernel->post( 'blah' => 'shutdown' );
+         undef;
+       }
+
+DESCRIPTION
+
+    POE::Component::Win32::ChangeNotify is a POE wrapper around
+    Win32::ChangeNotify that provides non-blocking change notify events to
+    your POE sessions.
+
+METHODS
+
+    spawn
+
+      Takes a number of arguments, all of which are optional.
+
+        'alias', the kernel alias to bless the component with; 
+        'options', a hashref of POE::Session options that are passed to the component's 
+                   session creator.
+
+    session_id
+
+      Takes no arguments, returns the POE::Session ID of the component.
+      Useful if you don't want to use aliases.
+
+INPUT
+
+    These are the events that the component will accept.
+
+    monitor
+
+      Starts monitoring the specified path for the specified types of
+      changes.
+
+      Accepts one argument, a hashref containing the following keys:
+
+        'path', the filesystem path to monitor, mandatory; 
+        'event', the event handler to post results back to, mandatory.
+        'filter', a string containing whitespace or '|' separated notification flags, 
+                  see Win32::ChangeNotify for details, defaults to all notification flags; 
+        'subtree', set this to true value to monitor all subdirectories under 'path'; 
+      
+           $kernel->post( 'blah' => monitor => 
+           {
+              'path' => '.',
+              'event' => 'notification',
+              'filter' => 'ATTRIBUTES DIR_NAME FILE_NAME LAST_WRITE SECURITY SIZE',
+              'subtree' => 1,
+           } );
+
+    unmonitor
+
+      Stops monitoring the specified path.
+
+      Accepts one mandatory argument, 'path', the filesystem path to stop
+      monitoring.
+
+         $kernel->post( 'blah' => unmonitor => path => '.' );
+
+    shutdown
+
+      Has no arguments. Shuts down the component gracefully. All monitored
+      paths will be closed.
+
+OUTPUT
+
+    Each event sent by the component has a hashref as ARG0. This is the
+    hashref that was passed to the component with monitor(). The key
+    'result' will be true if a change has occurred. The key 'error' will be
+    set if an error occurred during the setup of the Win32::ChangeNotify
+    object or when trying to call 'wait' on the object.
+
+CAVEATS
+
+    This module will only work on Win32. But you guessed that already :)
+
+SEE ALSO
+
+    Win32::ChangeNotify
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

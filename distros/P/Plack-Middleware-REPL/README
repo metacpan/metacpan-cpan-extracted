@@ -1,0 +1,71 @@
+NAME
+    Plack::Middleware::REPL - REPL when your application throws errors or
+    warnings
+
+SYNOPSIS
+      enable "REPL";
+
+DESCRIPTION
+    Plack::Middleware::REPL is a PSGI middleware component that enables REPL
+    (read-eval-print-loop) when your application raises errors.
+
+      # your Dancer app
+      use Dancer;
+      get '/' => sub {
+          my $self = shift;
+          my $n = parms()->{name}; # typo
+          return "Hi there $n";
+      };
+      dance;
+
+    Run it with the REPL middleware:
+
+      plackup -e 'enable "REPL"' app.pl
+
+    Hit your application, and you'll get a REPL shell on the console:
+
+      Trace begun at ...
+      ...
+      $ :l
+      File /Users/miyagawa/development/dancer/app.pl
+        5: use Dancer;
+        6:
+        7: get '/' => sub {
+        8:     my $self = shift;
+      * 9:     my $n = parms()->{name};
+       10:     return "Hi there $n";
+       11: };
+       12: dance;
+      $ request->path
+      /
+      $ :u
+      Now at /Users/miyagawa/perl5/perlbrew/perls/perl-5.12.3/lib/site_perl/5.12.3/Dancer/Route.pm:246 (frame 1).
+      $ $self
+      $Dancer_Route1 = Dancer::Route=HASH(0x10089d278);
+
+    See Carp::REPL for more commands in the REPL shell.
+
+OPTIONS
+    warn
+          enable "REPL", warn => 1;
+
+        Also enables REPL when your app throws warnings.
+
+LIMITATIONS
+    Because of the way $SIG{__DIE__} works in Perl, this middleware doesn't
+    work well with web application frameworks that sets its own exception
+    handler, such as Mojolicious.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+COPYRIGHT
+    Copyright 2011- Tatsuhiko Miyagawa
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Carp::REPL Devel::REPL CatalystX::REPL
+

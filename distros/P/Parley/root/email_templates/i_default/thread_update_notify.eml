@@ -1,0 +1,19 @@
+[% person.first_name %],
+
+The thread "[% post.thread.subject %]"
+has received a new reply by [% post.creator.forum_name %].
+
+Click here to continue reading the thread:
+
+ [% c.req.base %]thread/next_post?thread=[% post.thread.id %]
+
+Click here to view the latest post in the thread:
+
+ [% c.req.base %]post/view?post=[% post.id %]
+
+Please note: You will not receive any further notifications for this
+thread until you view the post above or any posts created after it.
+
+Regards,
+
+The [% c.config.name %] team.

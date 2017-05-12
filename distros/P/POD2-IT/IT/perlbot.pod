@@ -1,0 +1,565 @@
+=head1 NAME
+
+perlbot - La scatola degli attrezzi degli Oggetti
+
+=head1 DESCRIZIONE
+
+La seguente raccolta di trucchi e suggerimenti E<egrave> destinata a stimolare
+la curiositE<agrave> a proposito di cose come l'utilizzo di variabili di istanza
+e i meccanismi delle relazioni tra oggetto e classe. Il lettore E<egrave> incoraggiato
+a consultare dei testi pertinenti a proposito di definizioni e metodologie per la
+programmazione OO (orientata agli oggetti). Questo documento non E<egrave> inteso
+come una guida per principianti per la programmazione orientata agli oggetti
+nE<eacute> come una guida completa alle caratteristiche del Perl orientato agli
+oggetti, e nemmeno come guida di stile. Se state cercando delle guide per principianti,
+assicuratevi di leggere L<perlboot>, L<perltoot> e L<perltooc>.
+
+Il motto del Perl E<egrave> ancora valido: ci sono molti modi per fare le cose.
+
+=head1 SUGGERIMENTI DI SCALABILITE<Agrave> OO
+
+=over 5
+
+=item 1
+
+Non tentate di verificare il tipo di $self. Non funzionerE<agrave> se la classe E<egrave>
+ereditata, quando il tipo di $self E<egrave> valido ma il suo package non E<egrave> quello
+che vi aspettereste. Si veda la regola numero 5.
+
+=item 2
+
+Se viene utilizzata una sintassi orientata agli oggetti (OO) o indiretta per
+gli oggetti (IO), allora l'oggetto E<egrave> probabilmente del tipo corretto e non
+ci sono motivi per essere paranoici al riguardo. In ogni caso, Perl non E<egrave> un
+linguaggio paranoico. Se qualcuno rovescia la sintassi OO o IO, allora costui
+probabilmente sa cosa sta facendo e dovreste lasciarlo fare. Si veda la regola
+numero 1.
+
+=item 3
+
+Utilizzate la forma a due argomenti per il bless(). Permettete ad una sottoclasse
+di utilizzare il vostro costruttore. Si veda L<EREDITARE UN COSTRUTTORE>.
+
+=item 4
+
+La sottoclasse E<egrave> autorizzata a sapere cose che riguardano la sua immediata
+superclasse, la superclasse non E<egrave> autorizzata a sapere alcunchE<eacute> di una
+sottoclasse.
+
+=item 5
+
+Non abbiate il grilletto facile con l'ereditarietE<agrave>. Relazioni di "utilizzo",
+"contenimento" o "delegazione" (qualche sorta di aggregazione, almeno) sono
+spesso piE<ugrave> appropriate. Si veda L<RELAZIONI TRA OGGETTI>, L<USARE RELAZIONI
+CON SDBM>, e L<"DELEGAZIONE">.
+
+=item 6
+
+L'oggetto E<egrave> il namespace. Rendete le variabili globali del package accessibili
+mediante l'oggetto. Ci<ograve> toglier<agrave> il bisogno di tirare a indovinare il
+package da cui proviene il simbolo. Si veda L<IL CONTESTO DI CLASSE E L'OGGETTO>.
+
+=item 7
+
+La sintassi IO E<egrave> sicuramente meno vistosa, ma anche incline ad ambiguitE<agrave>
+che possono causare errori difficili da trovare. Lasciate che le persone utilizzino la
+sintassi con la freccia, anche se non vi piace.
+
+=item 8
+
+Non utilizzate la sintassi per la chiamata di funzione su un metodo. Un giorno o l'altro
+sarete nei guai. Qualcuno potrebbe spostare quel metodo in una superclasse ed il vostro
+codice non funzionerebbe piE<ugrave>. Come se non bastasse, state alimentando la paranoia
+di cui alla regola 2.
+
+=item 9
+
+Non assumete di conoscere il package di base di un metodo. Stareste rendendo
+difficile, per alcuni, fare la sovrapposizione [override, NdT] di quel metodo. Si veda
+L<PENSARE AL RIUTILIZZO DEL CODICE>.
+
+=back
+
+=head1 VARIABILI DI ISTANZA
+
+Per mantenere le variabili di istanza E<egrave> possibile utilizzare un array anonimo
+o un hash anonimo. Vengono mostrati anche dei parametri con nome.
+
+	package Pippo;
+
+	sub new {
+		my $tipo = shift;
+		my %parametri = @_;
+		my $self = {};
+		$self->{'Alto'} = $parametri{'Alto'};
+		$self->{'Basso'}  = $parametri{'Basso'};
+		bless $self, $tipo;
+	}
+
+
+	package Pluto;
+
+	sub new {
+		my $tipo = shift;
+		my %parametri = @_;
+		my $self = [];
+		$self->[0] = $parametri{'Sinistra'};
+		$self->[1] = $parametri{'Destra'};
+		bless $self, $tipo;
+	}
+
+	package main;
+
+	$a = Pippo->new( 'Alto' => 42, 'Basso' => 11 );
+	print "Alto=$a->{'Alto'}\n";
+	print "Basso=$a->{'Basso'}\n";
+
+	$b = Pluto->new( 'Sinistra' => 78, 'Destra' => 40 );
+	print "Sinistra=$b->[0]\n";
+	print "Destra=$b->[1]\n";
+
+
+=head1 VARIABILI SCALARI DI ISTANZA
+
+Quando serve solamente una variabile di istanza, puE<ograve> essere utilizzato uno
+scalare anonimo.
+
+	package Pippo;
+
+	sub new {
+		my $tipo = shift;
+		my $self;
+		$self = shift;
+		bless \$self, $tipo;
+	}
+
+	package main;
+
+	$a = Pippo->new( 42 );
+	print "a=$$a\n";
+
+
+=head1 EREDITARIETE<Agrave> DI VARIABILI DI ISTANZA
+
+Questo esempio mostra come si possano ereditare variabili di istanza da una
+superclasse, per inclusione nella nuova classe. CiE<ograve> richiede di chiamare il
+costruttore della superclasse e di aggiungere le proprie variabili di istanza
+al nuovo oggetto.
+
+	package Pluto;
+
+	sub new {
+		my $tipo = shift;
+		my $self = {};
+		$self->{'tizio'} = 42;
+		bless $self, $tipo;
+	}
+
+	package Pippo;
+	@ISA = qw( Pluto );
+
+	sub new {
+		my $tipo = shift;
+		my $self = Pluto->new;
+		$self->{'caio'} = 11;
+		bless $self, $tipo;
+	}
+
+	package main;
+
+	$a = Pippo->new;
+	print "tizio = ", $a->{'tizio'}, "\n";
+	print "caio = ", $a->{'caio'}, "\n";
+
+
+=head1 RELAZIONI TRA OGGETTI
+
+Il seguente codice mostra come si possano implementare relazioni di "contenimento"
+e "utilizzo" tra oggetti.
+
+	package Pluto;
+
+	sub new {
+		my $tipo = shift;
+		my $self = {};
+		$self->{'tizio'} = 42;
+		bless $self, $tipo;
+	}
+
+	package Pippo;
+
+	sub new {
+		my $tipo = shift;
+		my $self = {};
+		$self->{'Pluto'} = Pluto->new;
+		$self->{'caio'} = 11;
+		bless $self, $tipo;
+	}
+
+	package main;
+
+	$a = Pippo->new;
+	print "tizio = ", $a->{'Pluto'}->{'tizio'}, "\n";
+	print "caio = ", $a->{'caio'}, "\n";
+
+
+=head1 SOVRAPPORRE I METODI DELLA SUPERCLASSE
+
+L'esempio seguente mostra come sovrapporre un metodo della superclasse e quindi
+chiamare il metodo sovrapposto. La pseudo-classe B<SUPER> permette al programmatore
+di chiamare un metodo sovrapposto di una superclasse senza in realtE<agrave> sapere dove
+quel metodo E<egrave> definito.
+
+	package Paperino;
+	sub goo { print "ecco il goo\n" } #[sostanza appicicosa, NdT]
+
+	package Pluto; @ISA = qw( Paperino );
+	sub google { print "c'e` google\n" }
+
+	package Topolino;
+	sub rimugina { print "sto rimuginando\n" }
+
+	package Pippo;
+	@ISA = qw( Pluto Topolino );
+
+	sub new {
+		my $tipo = shift;
+		bless [], $tipo;
+	}
+	sub grr { print "sto borbottando\n" }
+	sub goo {
+		my $self = shift;
+		$self->SUPER::goo();
+	}
+	sub rimugina {
+		my $self = shift;
+		$self->SUPER::rimugina();
+	}
+	sub google {
+		my $self = shift;
+		$self->SUPER::google();
+	}
+
+	package main;
+
+	$pippo = Pippo->new;
+	$pippo->rimugina;
+	$pippo->grr;
+	$pippo->goo;
+	$pippo->google;
+
+Osservate che C<SUPER> si riferisce alla superclasse del package corrente
+(C<Pippo>), non alla superclasse di C<$self>.
+
+
+=head1 USARE LE RELAZIONI CON SDBM
+
+Questo esempio mostra l'interfaccia alla classe SDBM. Essa crea una relazione
+di "utilizzo" tra la classe SDBM e la nuova classe Miodbm.
+
+	package Miodbm;
+
+	require SDBM_File;
+	require Tie::Hash;
+	@ISA = qw( Tie::Hash );
+
+	sub TIEHASH {
+	    my $tipo = shift;
+	    my $ref  = SDBM_File->new(@_);
+	    bless {'dbm' => $ref}, $tipo;
+	}
+	sub FETCH {
+	    my $self = shift;
+	    my $ref  = $self->{'dbm'};
+	    $ref->FETCH(@_);
+	}
+	sub STORE {
+	    my $self = shift;
+	    if (defined $_[0]){
+		my $ref = $self->{'dbm'};
+		$ref->STORE(@_);
+	    } else {
+		die "Impossibile effettuare STORE su una chiave indefinita in Miodbm\n";
+	    }
+	}
+
+	package main;
+	use Fcntl qw( O_RDWR O_CREAT );
+
+	tie %pippo, "Midbm", "Sdbm", O_RDWR|O_CREAT, 0640;
+	$pippo{'pluto'} = 123;
+	print "pippo-pluto = $pippo{'pluto'}\n";
+
+	tie %pluto, "Midbm", "Sdbm2", O_RDWR|O_CREAT, 0640;
+	$pluto{'Cathy'} = 456;
+	print "pluto-Cathy = $pluto{'Cathy'}\n";
+
+=head1 PENSARE AL RIUTILIZZO DEL CODICE
+
+Una forza dei linguaggi Orientati agli Oggetti E<egrave> la facilitE<agrave> con la quale il
+vecchio codice puE<ograve> utilizzare il nuovo codice. Il seguente esempio mostrerE<agrave>
+prima di tutto come si possa ostacolare il riutilizzo del codice e di seguito
+come si possa favorire il riutilizzo del codice.
+
+Questo primo esempio mostra una classe che utilizza una chiamata al nome del
+metodo per intero per accedere al metodo privato TOPOLINO(). Il secondo esempio
+mostrerE<agrave> che E<egrave> possibile effettuare una sovrapposizione del metodo TOPOLINO().
+
+	package PIPPO;
+
+	sub new {
+		my $tipo = shift;
+		bless {}, $tipo;
+	}
+	sub pluto {
+		my $self = shift;
+		$self->PIPPO::privato::TOPOLINO;
+	}
+
+	package PIPPO::privato;
+
+	sub TOPOLINO {
+		print "in TOPOLINO\n";
+	}
+
+	package main;
+
+	$a = PIPPO->new;
+	$a->pluto;
+
+Adesso proviamo ad effettuare una sovrapposizione del metodo TOPOLINO(). Vorremmo che
+PIPPO::pluto() chiamasse VAIOP::TOPOLINO(), ma ciE<ograve> non puE<ograve> accadere
+perchE<eacute> PIPPO::pluto() chiama esplicitamente PIPPO::private::TOPOLINO().
+
+	package PIPPO;
+
+	sub new {
+		my $tipo = shift;
+		bless {}, $tipo;
+	}
+	sub pluto {
+		my $self = shift;
+		$self->PIPPO::privato::TOPOLINO;
+	}
+
+	package PIPPO::privato;
+
+	sub TOPOLINO {
+		print "in TOPOLINO\n";
+	}
+
+	package VAIOP;
+	@ISA = qw( PIPPO );
+	sub new {
+		my $tipo = shift;
+		bless {}, $tipo;
+	}
+
+	sub TOPOLINO {
+		print "in VAIOP::TOPOLINO\n";
+	}
+
+	package main;
+
+	$a = VAIOP->new;
+	$a->pluto;
+
+Per creare codice riutilizzabile dobbiamo modificare la classe PIPPO,
+abbattendo la classe PIPPO::private. Il prossimo esempio mostra una classe
+PIPPO riutilizzabile che permette al metodo VAIOP::TOPOLINO() di essere utilizzato
+al posto di PIPPO::TOPOLINO().
+
+	package PIPPO;
+
+	sub new {
+		my $tipo = shift;
+		bless {}, $tipo;
+	}
+	sub pluto {
+		my $self = shift;
+		$self->TOPOLINO;
+	}
+
+	sub TOPOLINO {
+		print "in TOPOLINO\n";
+	}
+
+	package VAIOP;
+	@ISA = qw( PIPPO );
+
+	sub new {
+		my $tipo = shift;
+		bless {}, $tipo;
+	}
+	sub TOPOLINO {
+		print "in VAIOP::TOPOLINO\n";
+	}
+
+	package main;
+
+	$a = VAIOP->new;
+	$a->pluto;
+
+=head1 IL CONTESTO DI CLASSE E L'OGGETTO
+
+Utilizzate l'oggetto per risolvere problemi riguardanti il contesto di
+package e classe. Tutto ciE<ograve> di cui ha bisogno un metodo dovrebbe essere
+disponibile attraverso l'oggetto o dovrebbe essere passato come un parametro
+a quel metodo.
+
+Una classe avrE<agrave> talvolta dati statici o globali per essere utilizzati dai
+metodi. Una sottoclasse potrebbe voler scavalcare con un override questi
+dati e rimpiazzarli con nuovi dati. Quando ciE<ograve> accade, la superclasse puE<ograve>
+non sapere come trovare la nuova copia dei dati.
+
+Questo problema puE<ograve> essere risolto utilizzando l'oggetto per definire il
+contesto del metodo. Permettete al metodo di cercare nell'oggetto un riferimento
+ai dati. L'alternativa E<egrave> forzare il metodo per farlo andare a caccia dei
+dati ("E<Egrave> nella mia classe o in una sottoclasse? Quale sottoclasse?"), e ciE<ograve>
+puE<ograve> non essere conveniente e porterE<agrave> a scrivere codice strambo. E<Egrave> meglio
+permettere semplicemente all'oggetto di dire al metodo dove sono localizzati i dati.
+
+	package Pluto;
+
+	%fiasco = ( 'Password' => 'XYZZY' );
+
+	sub new {
+		my $tipo = shift;
+		my $self = {};
+		$self->{'fiasco'} = \%fiasco;
+		bless $self, $tipo;
+	}
+
+	sub enter {
+		my $self = shift;
+
+		# Non prova a indovinare se debba essere usato %Pluto::fiasco
+		# o %Pippo::fiasco. L'oggetto sa gia` quale si debba usare,
+		# quindi basta chiederlo.
+		#
+
+		my $fiasco = $self->{'fiasco'};
+
+		print "La parola e` ", $fiasco->{'Password'}, "\n";
+	}
+
+	package Pippo;
+	@ISA = qw( Pluto );
+
+	%fiasco = ( 'Password' => 'Rumple' );
+
+	sub new {
+		my $tipo = shift;
+		my $self = Pluto->new;
+		$self->{'fiasco'} = \%fiasco;
+		bless $self, $tipo;
+	}
+
+	package main;
+
+	$a = Pluto->new;
+	$b = Pippo->new;
+	$a->enter;
+	$b->enter;
+
+=head1 EREDITARE UN COSTRUTTORE
+
+Un costruttore ereditabile dovrebbe utilizzare la seconda forma di bless() che
+premette di "consacrare" direttamente in una classe specifica. Osservate in
+quest'esempio che l'oggetto sarE<agrave> un PLUTO e non un PIPPO, anche se il costruttore
+E<egrave> nella classe PIPPO.
+
+	package PIPPO;
+
+	sub new {
+		my $tipo = shift;
+		my $self = {};
+		bless $self, $tipo;
+	}
+
+	sub topolino {
+		print "in PIPPO::topolino()\n";
+	}
+
+	package PLUTO;
+	@ISA = qw(PIPPO);
+
+	sub topolino {
+		print "in PLUTO::topolino()\n";
+	}
+
+	package main;
+
+	$a = PLUTO->new;
+	$a->topolino;
+
+=head1 DELEGAZIONE
+
+Per alcune classi, tipo la SDBM_File, non si possono creare efficacemente
+sottoclassi perchE<eacute> queste creano oggetti esterni. Classi di questo tipo
+possono essere estese con una specie di tecnica di aggregazione tipo la
+relazione di "utilizzo" menzionata in precedenza o per delega.
+
+Il seguente esempio mostra la delegazione utilizzando una funzione AUTOLOAD()
+per effettuare l'inoltro dei messaggi. Questo permetterE<agrave> all'oggetto Miodbm
+di comportarsi esattamente come un oggetto SDBM_File. Possiamo estendere il
+comportamento della classe Miodbm aggiungendo metodi custom FETCH() e STORE(),
+se si desidera.
+
+	package Miodbm;
+
+	require SDBM_File;
+	require Tie::Hash;
+	@ISA = qw(Tie::Hash);
+
+	sub TIEHASH {
+		my $tipo = shift;
+		my $ref = SDBM_File->new(@_);
+		bless {'delega' => $ref};
+	}
+
+	sub AUTOLOAD {
+		my $self = shift;
+
+		# L'interprete Perl posiziona il nome del
+		# messaggio in una variabile chiamata $AUTOLOAD.
+
+		# I messaggi DESTROY non dovrebbero essere mai propagati.
+		return if $AUTOLOAD =~ /::DESTROY$/;
+
+		# Rimuovi il nome del package.
+		$AUTOLOAD =~ s/^Miodbm:://;
+
+		# Passa il messaggio alla delega.
+		$self->{'delega'}->$AUTOLOAD(@_);
+	}
+
+	package main;
+	use Fcntl qw( O_RDWR O_CREAT );
+
+	tie %pippo, "Miodbm", "undbm", O_RDWR|O_CREAT, 0640;
+	$pippo{'pluto'} = 123;
+	print "pippo-pluto = $pippo{'pluto'}\n";
+
+=head1 SI VEDA ANCHE
+
+L<perlboot>, L<perltoot>, L<perltooc>.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlbot
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+http://pod2it.sourceforge.net/ .
+
+=head2 Traduttore
+
+Traduzione a cura di Raffaello Galli <galliraf at googlemail punto com>.
+
+=head2 Revisore
+
+Revisione a cura di dree.

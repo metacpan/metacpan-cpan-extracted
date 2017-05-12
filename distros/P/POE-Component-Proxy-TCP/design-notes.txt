@@ -1,0 +1,67 @@
+Ok can't find old src so will do from scratch and see what happens
+* how will this one be different?
+  - Will use session params to avoid excess lexical nesting
+  - will have instance global structure to share information via session
+    params
+  - should use struct package here? 
+  - will develop incrementally with following steps
+    (1) create Poe:Component::Proxy::TCP.pm with master session
+        (might be the session of the p::c::server:TCP), http://www.PlatypiVentures.com/perl/modules/ModuleMaker.shtmlsessions
+        getting the session args with instance data.
+    (1.5) Add argument processing 
+    (2) add server part 
+    (3) add client parts
+    (4) test with winproxy. Might this be possible from start?
+
+Three approaches to passing self into inner sessions created
+by TCP component 
+(1) Use sessionargs to set initial heap
+(2) use args to pass self to start handler, then define
+    start method to pick up self from args and set it in heap
+    I think this won't work since args are passed here to client connect
+    not start
+(3) use lexical scope to pass self to start handler
+   in either 2 or 3 must use inline states to create start handler
+   for per connection session
+(4) use $session->get_heap()->{self} to set self in named or aliased session
+
+
+-----------------
+design of test stuff
+
+* Server - 
+  - takes zero or more line oriented requested per connection.
+  - each request has form <number>:text:<delay time number>
+    - should we use asterisk? no, don't really understand it
+  - sends <number copies of text delay time intervals apart, 
+    then closes connection
+  - Built around PoCo::Server::TCP
+
+
+* Client
+  - takes description of requests to be sent in some form
+    - As text? method calls? array of hashes reference? 
+      Array of hash references (or objects) has advantage that
+      we have request stored for comparison with response
+    - makes requests to server: each request will be one connection
+      so that response can be collected easily since we do not
+      do request token stuff
+    - collects responses
+    - at time after last requests sent compares responses
+      with requests 
+    - what is a response? array of strings back from server?
+   - so list "objects" and operations
+     - request: count, text, delay
+       change to text line
+       send
+       compare with response
+     - response: list of lines.
+       create new empty
+       add line
+       compare with request
+       print
+      - what is compare rules
+        response is list of lines of form <ordinal number>:text:<time sent>
+        should have mi,ber equal to number on request,
+        same text, and maybe we'll have a rule to the time sent someday
+        also lines 

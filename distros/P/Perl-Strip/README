@@ -1,0 +1,56 @@
+NAME
+    Perl::Strip - reduce file size by stripping whitespace, comments, pod
+    etc.
+
+SYNOPSIS
+       use Perl::Strip;
+
+DESCRIPTION
+    This module transforms perl sources into a more compact format. It does
+    this by removing most whitespace, comments, pod, and by some other
+    means.
+
+    The resulting code looks obfuscated, but perl (and the deparser) don't
+    have any problems with that. Depending on the source file you can expect
+    about 30-60% "compression".
+
+    The main target for this module is low-diskspace environments, such as
+    App::Staticperl, boot floppy/CDs/flash environments and so on.
+
+    See also the commandline utility perlstrip.
+
+METHODS
+    The "Perl::Strip" class is a subclsass of PPI::Transform, and as such
+    inherits all of it's methods, even the ones not documented here.
+
+    my $transform = new Perl::Strip key => value...
+        Creates a new Perl::Strip transform object. It supports the
+        following parameters:
+
+        optimise_size => $bool
+            By default, this module optimises *compressability*, not raw
+            size. This switch changes that (and makes it slower).
+
+        keep_nl => $bool
+            By default, whitespace will either be stripped or replaced by a
+            space. If this option is enabled, then newlines will not be
+            removed. This has the advantage of keeping line number
+            information intact (e.g. for backtraces), but of course doesn't
+            compress as well.
+
+        cache => $path
+            Since this module can take a very long time (minutes for the
+            larger files in the perl distribution), it can utilise a cache
+            directory. The directory will be created if it doesn't exist,
+            and can be deleted at any time.
+
+    $perl = $transform->strip ($perl)
+        Strips the perl source in $perl and returns the stripped source.
+
+SEE ALSO
+    App::Staticperl, Perl::Squish.
+
+AUTHOR
+       Marc Lehmann <schmorp@schmorp.de>
+       http://home.schmorp.de/
+

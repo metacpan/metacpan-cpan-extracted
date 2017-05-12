@@ -1,0 +1,21 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use File::Slurp qw( read_file );
+use File::Basename;
+use File::Spec::Functions qw( catdir updir );
+
+# use the libdir from the project root.
+use lib catdir( dirname($0), updir(), 'lib' );
+
+use Pod::Stupid;
+
+use Data::Dumper;
+
+my $text = read_file( shift );
+my ( $pieces, $stripped_text ) = Pod::Stupid->parse_string( $text );
+
+print Dumper $pieces;
+
+

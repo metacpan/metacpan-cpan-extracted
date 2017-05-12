@@ -1,0 +1,23 @@
+=encoding utf8
+
+=head1 NOME
+
+perlbook - Informações sobre livros de Perl
+
+=head1 DESCRIÇÃO
+
+O livro do Camelo, oficialmente conhecido como I<Programação Perl, Terceira Edição>,
+escrito por Larry Wall, é a referência definitiva cobrindo quase tudo de Perl.
+Você pode encomendar ele e outros livros de Perl da O'Reilly & Associates,
+1-800-998-9938. Moradores locais e de outros países ligam +1 707 829 0515. Se você
+tiver um formulário de pedido da O'Reilly, você pode enviar por fax pelo número +1 707 529 0104.
+Se você está conectado à internet, você pode dar uma olhada em L<http://www.oreilly.com/> para compras via internet.
+
+Outros livros de Perl de várias editoras e autores
+podem ser achados listados no L<perlfaq2> ou na WEB em L<http://books.perl.org/>.
+
+=head1 TRADUÇÃO
+
+Nicholas Amorim <nicholasamorim@gmail.com>
+
+=cut

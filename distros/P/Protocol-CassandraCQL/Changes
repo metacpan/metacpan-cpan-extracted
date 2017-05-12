@@ -1,0 +1,61 @@
+Revision history for Protocol-CassandraCQL
+
+0.12    2014/12/18 15:33:09
+        [CHANGES]
+         * Support 64bit-challenged machines by using Math::Int64 to
+           implement the 64bit-integer types
+
+0.11    2014/02/07 21:07:37
+        [CHANGES]
+         * Renamed ColumnMeta->metadata_defined to ->has_metadata
+        
+        [BUGFIXES]
+         * Pass CQL version from parse_result_frame to Result->from_frame so
+           that v2 metadata skipping or paging actually works
+
+0.10    2014/02/06 22:32:26
+        [BUGFIXES]
+         * unpack a prepared statement ID as short_bytes, not string
+
+0.09    2014/02/06 18:06:47
+        [CHANGES]
+         * Added many more constants to Protocol::CassandraCQL
+         * Added Protocol::CassandraCQL::Frames for building/parsing message
+           frame bodies
+         * Support CQLv2
+
+0.08    2013/09/11 14:41:17
+        [CHANGES]
+         * Added lookup_consistency()
+         * Remember to document and provide export tags for flag constants
+
+        [BUGFIXES]
+         * Older versions of Math::BigInt->from_hex needs leading "0x"
+
+0.07    2013/09/10 17:21:55
+        [CHANGES]
+         * Support frame compression in Protocol::CassandraCQL::Client
+         * Added constants for frame header flags
+         * Unit-test Protocol::CassandraCQL::Client
+
+0.06    2013/09/07 20:48:19
+        [CHANGES]
+         * Allow creating Protocol::CassandraCQL::ColumnMeta and
+           ::Result objects directly from immediate arguments, for use in
+           mocking and unit testing
+
+0.05    2013/09/03 17:00:39
+        [CHANGES]
+         * Declare CQL_VERSION 3.0.5
+         * Support password-based authentication
+         * Support 'inet' type in Protocol::CassandraCQL::Frame
+
+        [BUGFIXES]
+         * Handle OPCODE_ERROR correctly in P:C:Client
+         * Perl 5.12 and below needs 'use IO::Handle'
+
+0.04    CHANGES:
+         * Split out from Net-Async-CassandraCQL
+         * Added Protocol::CassandraCQL::Frame->recv
+         * Added a minimal Protocol::CassandraCQL::Client for testing and
+           driving examples/cqlsh

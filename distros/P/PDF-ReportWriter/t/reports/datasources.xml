@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<report>
+
+    <definition>
+        <name>datasources</name>
+        <file>datasources.xml</file>
+        <destination>myreport.pdf</destination>
+        <paper>A4</paper>
+    </definition>
+
+    <data>
+
+        <page>
+            <header>
+            </header>
+            <footer>
+            </footer>
+        </page>
+
+        <fields>
+            <field>
+                <label>item</label>
+                <index>0</index>
+                <percent>20</percent>
+                <font_size>12</font_size>
+                <align>left</align>
+                <header_colour>white</header_colour>
+            </field>
+        </fields>
+
+        <groups>
+        </groups>
+
+        <datasource>
+            <name>master</name>
+            <type>DBI</type>
+            <sql>SELECT docnum,docdate,docstate FROM documents WHERE docnum = ? LIMIT 1</sql>
+        </datasource>
+
+        <datasource>
+            <name>detail</name>
+            <type>DBI</type>
+            <sql>SELECT * FROM documents WHERE docnum = ?</sql>
+        </datasource>
+
+    </data>
+
+</report>

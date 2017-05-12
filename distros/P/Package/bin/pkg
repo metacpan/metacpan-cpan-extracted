@@ -1,0 +1,41 @@
+#!/usr/bin/env perl
+
+use Package;
+Package->run;
+
+=encoding utf8
+
+=head1 NAME
+
+pkg - The Acmeist Module Package Management Tool
+
+=head1 SYNOPSIS
+
+    > pkg help
+
+    > pkg new --from=pkg/perl/module-build --module=Foo::Bar foo-bar-pm
+    > pkg new --from=pkg/python/standard --module=foobar foobar-py
+    > pkg new --from=pkg/javascript --module=Foo.Bar foo-bar-js
+    > pkg new --from=pkg/bash --module=foo-bar.sh foo-bar-js
+
+=head1 DESCRIPTION
+
+C<pkg> is your tool for creating distributable, modular packages, in a variety
+of programming languages.
+
+See C<perldoc Package> for more info.
+
+=head1 AUTHOR
+
+Ingy döt Net <ingy@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2011-2014. Ingy döt Net.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+See http://www.perl.com/perl/misc/Artistic.html
+
+=cut

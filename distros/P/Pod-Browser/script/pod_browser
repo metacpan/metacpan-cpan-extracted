@@ -1,0 +1,144 @@
+#!/usr/bin/env perl
+#
+# This file is part of Pod-Browser
+#
+# This software is Copyright (c) 2012 by Moritz Onken.
+#
+# This is free software, licensed under:
+#
+#   The (three-clause) BSD License
+#
+# PODNAME: pod_browser
+use strict;
+use Pod::Browser;
+use Plack::Runner;
+use Plack::Middleware::Conditional;
+use Plack::Middleware::ReverseProxy;
+
+my $app;
+if($Catalyst::VERSION < 5.89) {
+    $app = sub { Pod::Browser->run(@_) };
+    Pod::Browser->setup_engine('PSGI');
+} else {
+    $app = Pod::Browser->psgi_app;
+}
+
+$app = Plack::Middleware::Conditional->wrap(
+    $app,
+    builder   => sub { Plack::Middleware::ReverseProxy->wrap($_[0]) },
+    condition => sub {
+        my ($env) = @_;
+        return if Pod::Browser->config->{ignore_frontend_proxy};
+        return $env->{REMOTE_ADDR} eq '127.0.0.1'
+            || Pod::Browser->config->{using_frontend_proxy};
+    },
+);
+
+my $runner = Plack::Runner->new;
+$runner->parse_options( qw(--env nodevel --port 3030), @ARGV );
+$runner->set_options(
+    server_ready => sub {
+        my ($args) = @_;
+        my $host  = $args->{host}  || 0;
+        my $proto = $args->{proto} || 'http';
+        print STDERR
+"POD::Browser: Accepting connections at $proto://$host:$args->{port}/\n";
+    } );
+$runner->run($app);
+
+
+
+
+=pod
+
+=head1 NAME
+
+pod_browser
+
+=head1 VERSION
+
+version 1.0.1
+
+=head1 SYNOPSIS
+
+  # start POD::Browser on port 3030
+  pod_browser
+
+  # Switch server implementation with --server (or -s)
+  pod_browser --server HTTP::Server::Simple --port 9090 --host 127.0.0.1
+
+  # Use UNIX socket to run FCGI daemon
+  pod_browser -s FCGI --listen /tmp/fcgi.sock
+
+  # FCGI external server on port 9090
+  pod_browser -s FCGI --port 9090
+
+=head1 OPTIONS
+
+=over 4
+
+=item -o, --host
+
+The interface a TCP based server daemon binds to. Defauts to undef,
+which lets most server backends bind the any (*) interface. This
+opeion doesn't mean anything if the server does not support TCP
+socket.
+
+=item -p, --port
+
+The port number a TCP based server daemon listens on. Defaults to
+3030. This option doesn't mean anything if the server does not support
+TCP socket.
+
+=item -s, --server
+
+Select a specific implementation to run on using the C<PLACK_SERVER>
+environment variable or use the C<-s> or C<--server> flag which will
+be preferred over the environment variable if present.
+
+=item -S, --socket
+
+UNIX domain socket path to listen on. Defaults to undef. This option
+doesn't mean anything if the server doesn't support UNIX sockets.
+
+=item -l, --listen
+
+Addresses to listen on. It could be "HOST:PORT", ":PORT" or "PATH"
+(without colons). It could be multiple but it depends on the server
+implementations whether multiple interfaces are supported.
+
+=item -D, --daemonize
+
+Makes the process go background. It's up to the backend server/handler
+implementation whether this option is respected or not.
+
+=item -I
+
+Specify perl library include path, like C<perl>'s -I option.
+
+=item --access-log
+
+Specify the pathname of a file where the access log should be written.
+In the development (i.e. C<< --env devel >>) environment access logs will go to STDERR.
+
+=back
+
+=cut
+
+=head1 AUTHOR
+
+Moritz Onken <onken@netcubed.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by Moritz Onken.
+
+This is free software, licensed under:
+
+  The (three-clause) BSD License
+
+=cut
+
+
+__END__
+

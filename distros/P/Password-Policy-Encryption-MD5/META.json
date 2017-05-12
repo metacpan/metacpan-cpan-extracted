@@ -1,0 +1,52 @@
+{
+   "abstract" : "The MD5 algorithm for Password::Policy",
+   "author" : [
+      "Andrew Nelson <anelson@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Password-Policy-Encryption-MD5",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "0",
+            "Password::Policy::Encryption" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/holophrastic/password-policy-encryption-md5/issues"
+      },
+      "homepage" : "https://github.com/holophrastic/password-policy-encryption-md5",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/holophrastic/password-policy-encryption-md5.git",
+         "web" : "https://github.com/holophrastic/password-policy-encryption-md5"
+      }
+   },
+   "version" : "0.02"
+}
+

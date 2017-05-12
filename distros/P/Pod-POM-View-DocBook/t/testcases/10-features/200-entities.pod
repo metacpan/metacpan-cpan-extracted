@@ -1,0 +1,16 @@
+=head1 NAME
+
+Entity Test
+
+=head1 DESCRIPTION
+
+This is a test of entity handling.
+
+Ampersand: &
+
+Less than: <
+
+Greater than: >
+
+
+=cut

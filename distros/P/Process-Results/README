@@ -1,0 +1,299 @@
+NAME
+
+    Process::Results - standardized structure for returning results of a
+    process
+
+SYNOPSIS
+
+     use Process::Results;
+     
+     my $results = Process::Results->new();
+     
+     some_subroutine(results=>$results) {
+        ...
+     }
+     
+     if ($results->success) {}
+     else {}
+     
+     more...
+
+OVERVIEW
+
+    Getting the details about the results of a subroutine call can be
+    challenging. It's easy enough for a subroutine to indicate if it
+    succeeded or not, or to simply die or croak. Communicating more detail,
+    however, can get complicated. What was the cause of the failure? What
+    was the input value that caused it? Maybe there were multiple problems,
+    any of which could have independently caused a failure.
+
+    Furthermore, it's not just failures that need communicating. Maybe
+    there were results of the process that need to be communicated back to
+    the caller, in addition to the success or failure of the operation.
+
+    Process::Results provides a standardized way for caller and subroutine
+    to communicate complex details of an operation. A Process::Results
+    object is passed into the subroutine call, which can then store results
+    information in the object. The sub doesn't even have to return the
+    object because the caller still has a reference to it.
+
+    Keep in mind that a process doesn't have to return the results object,
+    so your sub can still return success, failure, or some other value
+    without the caller having to check the Results object. In many cases, a
+    successful process doesn't need to provide any details - it's only on
+    failure that details are needed.
+
+    At its simplest, a Results object is just an empty hash. By default, an
+    empty hash indicates success, which can be checked with the success
+    method:
+
+     $results->success()
+
+    If you prefer, you can check for failure, which just returns the
+    opposite of success():
+
+     $results->failure()
+
+    If you prefer that the results object defaults to false, just add a
+    'success' option when creating the new object:
+
+     $results = Process::Results->new(success=>0);
+     $results->success(); # returns false
+
+    In a more complex situation, the results object might contain one or
+    more messages in the errors array. Such an object would look like this:
+
+     {
+       errors => [
+          { id=>'file-open-error', path=>'/tmp/output.txt' },
+          { id=>'missing-param', param_name=>'email' },
+       ]
+     }
+
+    The presence of any elements in errors means that the process failed,
+    so $results->success() returns false. A complete explanation of the
+    structure of a results object is in the next section.
+
+ Structure
+
+    A complete structure of a results object looks like this:
+
+     {
+       success => 0,
+       errors => [
+          { id=>'file-open-error', path=>'/tmp/output.txt' },
+          { id=>'missing-param', param_name=>'email' },
+       ],
+       warnings => [
+          # more messages here
+       ],
+       notes => [
+          # more messages here
+       ],
+       details => {
+          # a hash that can contain anything you want
+       }
+     }
+
+    The success and errors properties are redundant: the presence of any
+    errors indicates failure. If both properties are present, success
+    overrides errors.
+
+    Errors indicate that the process failed. Warnings do not indicate a
+    failure, but do indicate that something went wrong. Notes are simply
+    information about the process and don't mean anything was wrong at all.
+
+ Message objects
+
+    Each message is a hash reference. Each message object must have the id
+    property. Other properties can provide details about the message, for
+    example a problematic input param. You can create message objects with
+    the error(), warning(), and note() methods:
+
+     $results->error('file-not-found');
+     $results->warning('very-long-loop');
+     $results->warning('new-id');
+
+    More on those details below.
+
+METHODS
+
+ new()
+
+    Process::Results-new()> creates a new Process::Results object. By
+    default, the object is an empty hash.
+
+     my $results = Process::Results->new(); # returns empty, blessed hashref
+
+    Options
+
+      * success
+
+      The success option sets an explicit success or failure for the new
+      object. By default, you might want your results object to fail by
+      default. In that case you could do the following:
+
+       $results = Process::Results->new(success=>0);
+       
+       # stuff happens, but nothing affects the results object
+      
+       $results->success(); # returns false
+
+      * json
+
+      You can pass in a json string which will be parsed and used to
+      populate the new object. For example:
+
+       $results = Process::Results->new(json=>'{"errors":[{"id":"no-file"}]}');
+
+      produces this structure:
+
+       {
+         errors => [
+            {
+               id => "no-file"
+            }
+         ]
+       }
+
+      * results
+
+      new() can return an existing results object if the results option is
+      sent. This option is handy when you want to ensure that your
+      subroutine has a results object regardless of whether or not one was
+      passed in. For example, consider the following sub:
+
+       sub mysub {
+         my ($param, %opts) = @_;
+         my $results = Process::Results->new(results=>$opts{'results'});
+         
+         # [do stuff]
+       }
+
+      In that example, the caller can send in a results object with the
+      options hash. If it does so, that result object is used. If no such
+      option is sent, the sub has a new results object to use.
+
+      If the results object is sent, all other options are ignored.
+
+ error(), warning(), note()
+
+    Each of these methods creates a message object (which is just a
+    hashref) for their respective category. The single required param is an
+    id for the message. The id can be any defined string that you want. For
+    example, the following code creates an error object with the id
+    "do-not-find-file".
+
+     $results->error('do-not-find-file');
+
+    That code creates a message object, stored in the errors array, with
+    the following structure:
+
+     {
+       'id' => 'do-not-find-file'
+     }
+
+    A message object can hold any other properties you want. Those
+    properties should give the details of the message. Those properties can
+    be set with additional params to the method call. So, for example, the
+    following code sets an error with the id "do-not-find-file", along with
+    indicating the path that does not have the file:
+
+     $results->error('do-not-find-file', path=>$file_path);
+
+    which would result in an object like this:
+
+     {
+       'id' => 'do-not-find-file',
+       'path' => '/tmp/data.txt'
+     }
+
+    The message method returns the message object, so if you prefer you can
+    set those properties directly in the message object, like this:
+
+     $msg = $results->error('do-not-find-file');
+     $msg->{'path'} = $file_path;
+
+ success()
+
+    $results->success() returns true or false to indicate the success state
+    of the process. Success is determined in one of two ways: if the
+    success property is defined, then the boolean value of that property is
+    returned. Else, if there are any messages in the errors array, then
+    false is returned, else true is returned. success() always returns
+    either 1 or 0.
+
+    Here are some examples of some results objects and what success()
+    returns:
+
+     # empty hash returns true
+     {}
+     
+     # defined, false value of the success property returns false
+     { 'success'=>0 }
+     
+     # errors array with at least one message returns false
+     {
+       'errors'=>[
+          {'id'=>'do-not-find-file'}
+       ],
+     }
+     
+     # If there is a conflict between explicit success and the errors array, then
+     # the explicit success is returned. That's confusing, so try to avoid that.
+     {
+       'success'=>1,
+       'errors'=>[
+          {'id'=>'do-not-find-file'}
+       ],
+     }
+
+ failure()
+
+    $results->failure() simply returns the boolean opposite of
+    $results->success(). $results->failure() always returns 1 or 0.
+
+ succeed(), fail()
+
+    $results->succeed() and $results->fail() explicitly set the success
+    state of the results object. All they do is set the success property to
+    1 (succeed) or 0 (fail).
+
+ unsucceed(), unfail()
+
+    $results->unsucceed() and $results->unfail() do the same thing: delete
+    the success proeperty.
+
+ json()
+
+    $results->json() returns a JSON representation of the results object.
+    That's all, it takes no params, it just returns a JSON string.
+
+    OK, one minor thing to note is that the success property is set to the
+    JSON value of true or false. Other then that, nothing complicated.
+
+TERMS AND CONDITIONS
+
+    Copyright (c) 2016 by Miko O'Sullivan. All rights reserved. This
+    program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. This software comes with NO
+    WARRANTY of any kind.
+
+AUTHOR
+
+    Miko O'Sullivan miko@idocs.com
+
+VERSION
+
+    Version: 0.01
+
+HISTORY
+
+      * Version 0.01 Aug 9, 2016
+
+      Initial release.
+
+      * Version 0.02 Aug 15, 2016
+
+      Adding Process::Results::Holder to Process::Results.
+

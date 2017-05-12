@@ -1,0 +1,12 @@
+[% person.first_name %],
+
+Dank voor het registreren met [% c.config.name %]
+Om uw registratie te voltooien gelieve te klikken op de hieronder verbinding.
+
+  [% c.request.base %]user/authenticate/[% regauth.id %]
+
+en volg de instructies op scherm.
+
+Achting,
+
+Het [% c.config.name %] team.

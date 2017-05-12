@@ -1,0 +1,26 @@
+Revision history for Perinci-Sub-DepUtil
+
+0.04    2016-05-10 (PERLANCAR)
+
+	- Update to Sah::Schema::rinci::function_meta which replaces
+	  Sah::Schema::Rinci.
+
+
+0.03    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.02     2014-04-27 (SHARYANTO)
+
+         - Adjust to Sah::Schema::Rinci (which replaces Rinci::Schema).
+
+
+0.01     2012-12-21 (SHARYANTO)
+
+         - First release (on apocalypse day). Split from Perinci-Util, like
+           Perinci-Sub-PropertyUtil.

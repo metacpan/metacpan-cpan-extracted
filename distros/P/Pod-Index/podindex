@@ -1,0 +1,119 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Pod::Index;
+use Pod::Index::Builder;
+use Getopt::Long;
+
+my ($package, $help, $version);
+my $ret = GetOptions(
+   'package=s' => \$package,
+   'version'   => \$version,
+   'help'      => \$help,
+);
+
+if ($version) {
+    print "Pod::Index version ", Pod::Index->VERSION, "\n";
+    exit;
+} elsif (!$ret or $help or !@ARGV) {
+    print usage();
+    exit;
+}
+
+my $p = Pod::Index::Builder->new;
+
+my @files = @ARGV;
+if ($^O eq 'MSWin32') { # do our own globbing under Windows
+    @files = map glob, @files;
+}
+
+for my $file (@files) {
+    $p->parse_from_file($file);
+}
+
+if ($package) {
+    print "package $package;\n1;\n__DATA__\n";
+}
+$p->print_index;
+
+sub usage {
+    <<USAGE;
+$0 [options] <pod(s)>...
+
+Reads pod(s) and prints an index to stdout. Options:
+
+    --package=PACKAGE   precede the index by a perl package declaration
+    --help              this help
+    --version           print version number
+
+USAGE
+}
+
+__END__
+
+
+=head1 NAME
+
+podindex - build index from pods
+
+=head1 SYNOPSYS
+
+podindex [options] <pod(s)>...
+
+Reads pod(s) and prints an index to stdout. Options:
+
+    --package=PACKAGE   precede the index by a perl package declaration
+    --help              this help
+    --version           print version number
+
+=head1 DESCRIPTION
+
+This is a simple wrapper script around L<Pod::Index::Builder>. It parses
+the POD files given as arguments, finds all XE<lt>> entries, generates
+an index and prints it to standard output.
+
+=head1 OPTIONS
+
+=over
+
+=item package
+
+If given, it will place the index in the __DATA__ section of a perl package.
+For example, 
+
+    podindex --package=perlindex perlop.pod
+
+outputs something like this:
+
+        package perlindex;
+        1;
+        __DATA__
+        !	perlsyn	116	DESCRIPTION
+        !	perlop	207	Symbolic Unary Operators
+        !=	perlop	436	Equality Operators
+        !~	perlop	242	DESCRIPTION
+
+This is used so that an index can be placed in @INC and found easily (See
+L<Pod::Index::Search>).
+
+=back
+
+=head1 SEE ALSO
+
+L<Pod::Index>,
+L<Pod::Index::Builder>,
+L<perlpod>
+
+=head1 AUTHOR
+
+Ivan Tubert-Brohman E<lt>itub@cpan.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005 Ivan Tubert-Brohman. All rights reserved. This program is
+free software; you can redistribute it and/or modify it under the same terms as
+Perl itself.
+
+=cut
+

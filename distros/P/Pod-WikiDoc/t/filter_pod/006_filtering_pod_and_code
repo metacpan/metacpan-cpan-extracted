@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+=pod
+
+This is a pod paragraph
+
+=cut
+
+sub foo { 1; }
+#--------------------------------------------------------------------------#
+=pod
+
+
+This is a pod paragraph
+

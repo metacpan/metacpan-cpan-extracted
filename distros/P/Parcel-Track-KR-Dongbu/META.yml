@@ -1,0 +1,54 @@
+---
+abstract: 'Parcel::Track driver for the KG Dongbu Express (KG 동부택배)'
+author:
+  - '김도형 - Keedi Kim <keedi@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parcel-Track-KR-Dongbu
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Parcel::Track::KR::Dongbu:
+    file: lib/Parcel/Track/KR/Dongbu.pm
+    version: '0.001'
+requires:
+  Encode: '0'
+  File::Which: '0'
+  HTML::Selector::XPath: '0'
+  HTML::TreeBuilder::XPath: '0'
+  HTTP::Tiny: '0'
+  IO::Socket::SSL: '0'
+  IPC::Open3: '0'
+  Moo: '0'
+  Mozilla::CA: '0'
+  Net::SSLeay: '0'
+  Parcel::Track: '0.001'
+  Parcel::Track::Role::Base: '0'
+  perl: '5.008'
+  utf8: '0'
+resources:
+  bugtracker: https://github.com/keedi/Parcel-Track-KR-Dongbu/issues
+  homepage: https://github.com/keedi/Parcel-Track-KR-Dongbu
+  repository: https://github.com/keedi/Parcel-Track-KR-Dongbu.git
+version: '0.001'
+x_authority: cpan:KEEDI

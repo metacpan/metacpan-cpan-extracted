@@ -1,0 +1,28 @@
+---
+name: P4-Server
+version: 0.11
+author:
+  - 'Stephen Vance <steve@vance.com>'
+abstract: Perl wrapper for control of a Perforce server
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Error::Exception: 0
+  IO::Select: 0
+  IO::Socket: 0
+  IPC::Cmd: 0
+  IPC::Open3: 0
+  P4: 0
+  Symbol: 0
+build_requires:
+  Module::Locate: 0
+  Test::More: 0
+provides:
+  P4::Server:
+    file: lib/P4/Server.pm
+    version: 0.11
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

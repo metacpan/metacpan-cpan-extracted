@@ -1,0 +1,8 @@
+Changes
+lib/POE/Sugar/Args.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

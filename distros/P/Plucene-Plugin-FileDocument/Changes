@@ -1,0 +1,9 @@
+Revision history for Plucene::Plugin::FileDocument
+
+1.01 Tue Sep  6 18:49:32 UTC 2005
+	- Document how to use subclasses of Plucene::Document or Field
+
+1.0 Wed Feb  4 2004
+	- first CPAN version
+
+

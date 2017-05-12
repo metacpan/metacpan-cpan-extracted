@@ -1,0 +1,14 @@
+Release history for Plack-App-Directory-Apaxy
+
+0.004   2013-12-13 18:35:14 Asia/Seoul
+    - fix mis-called parent serve_path() method
+
+0.003   2013-12-13 18:14:34 Asia/Seoul
+    - set lower priority for `_apaxy/*` and `favicon.ico` than root path
+    - add favicon.ico
+
+0.002   2013-12-13 07:09:24 Asia/Seoul
+    - update module dependency
+
+0.001   2013-12-13 06:23:57 Asia/Seoul
+    First version, released on unsuspecting world.

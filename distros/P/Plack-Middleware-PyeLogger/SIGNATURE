@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.78.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 504c029822fc408bd7b415e8b3feffacaca9e195 Changes
+SHA1 666380d10cd36b5c88b11da19591030f21fd3dc2 INSTALL
+SHA1 43b9ff0e21a8504c73194bee2acdd52769627608 LICENSE
+SHA1 1dd47f03982e2145f3e8962c91f61d9d6eccedda MANIFEST
+SHA1 395de1401bb6fce0fa8ece101cd04f31200f4bbb MANIFEST.SKIP
+SHA1 8cf3d7213a471790a6765d3563005b845b3fe8a9 META.json
+SHA1 9dcde8f4e31c53bb1422cf11cce979a9bbaedff6 Makefile.PL
+SHA1 0d8dedbd559b4b49871ba3c173fa0154773dc45e README
+SHA1 1d5e43b49df4f4cae851e29985e7f7b8e1cf7ae2 dist.ini
+SHA1 6ad56971eccec48998b368f5c9e588b8a03ebc4b lib/Plack/Middleware/PyeLogger.pm
+SHA1 87b4aea289bae15bf12266a321e5318b39401777 t/00-load.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iF4EAREIAAYFAlXUMg4ACgkQa4OHQAFM10exsgD/Tho/XPsejkA7w9+OidpKoT4X
+FN8kzze38pKx4rcAYcMBAJ5FGN98+A2VmMwHKTWZYMo2Y68ODhy/f13DGY+59fXc
+=md6Q
+-----END PGP SIGNATURE-----

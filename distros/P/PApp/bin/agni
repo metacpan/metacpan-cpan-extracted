@@ -1,0 +1,634 @@
+#!/opt/bin/perl
+
+=head1 NAME
+
+agni - commandline access to the I<PApp!Agni System>.
+
+=head1 SYNOPSIS
+
+   Usage: /opt/bin/agni ...
+
+      --file <file>                 write output to file or read input from file
+      --daemon                      go into daemon mode
+      -i | --interval <seconds>     sleep interval for daemon mode
+      --export-path path            write path to file (or stdout)
+      --import-path path            import path from file
+      --import-ignore-type gid      on import, ignore these attributes
+
+      --load-image <file>           load a saved backup file <file>
+      --save-image <file>           save a backup file <file>
+      --clear-database              delete all objects and paths
+
+      --force                       force import even on gidseq mismatches
+
+      --gar                         starts garbagecollector
+
+      --paths                       show paths
+      --newpath <path>              creates a new path
+      
+      -e | --exec-cmd path command  executes a command as defined in util::cmdline
+                                    path specifies the path to the object.
+
+=head1 DESCRIPTION
+
+F<agni> works as a shell interface to the I<PApp!Agni System>.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --file B<file>
+
+write output to file or read input from B<file>
+
+=back
+
+=head2 Daemon Mode
+
+=over 6
+
+=item --daemon
+
+go into daemon mode
+
+=item -i | --interval B<seconds>
+
+sleep interval for daemon mode
+
+=back
+
+=head2 Handling ex/import of data from a specific path
+
+=over 6
+
+=item --export-path B<path>
+
+write B<path> to file (or stdout)
+
+=item --import-path B<path>
+
+import B<path> from file
+
+=item --import-ignore-type gid
+
+on import, ignore all attributes of the given type (they will not be
+imported). this only ignores the attributes - the corresponding type
+object will be imported if present.
+
+=back
+
+=head2 Handling whole images for backup purposes
+
+=over 6
+
+=item --load-image B<file>
+
+load a saved backup file B<file>
+
+=item --save-image B<file>
+
+save a backup file B<file>
+
+=item --force
+
+import objects even if there is a gidseq mismatch
+
+=back
+
+=over 4
+
+=item --gar
+
+starts garbagecollector
+
+=item --paths
+
+show paths
+
+=item --newpath B<path>
+
+creates a new Bpath
+
+=item -e, --exec-cmd B<path> B<command>
+
+executes a B<command> as defined in util::cmdline
+B<path> specifies the path to the object.
+
+ agni -e root/agni/ help (-v)
+
+gives you a list of available B<commands>.
+
+=back
+
+=head1 EXAMPLES
+
+=head2 Exporting Data from your applications data path
+
+	agni --file /tmp/config.xml --export-path root/agni/staging/data/
+
+After executing this command you can find a dump of all the objects from
+the B<agni-path> F<root/agni/staging/data/> (don't forget the trailing
+slash!) in the file F</tmp/config.xml>. Beware though: agni applications
+usually reside in separate paths from their data!
+
+=head2 Importing Data to an application path
+
+	agni --file /tmp/config.xml --import-path root/agni/staging/data/
+
+This command imports the data that we previously exported back into agni
+with the same path information.
+
+=head2 Exporting whole images for backup purposes
+
+	agni --save-image /backuppath/backup.xml
+
+This exports a complete backup of the running system to an image file
+F</backuppath/backup.xml>.
+
+Please take into account that some distributions clear their F<tmp>
+directories after a reboot and thereby render F</tmp> an unwise choice
+for the backup directory!
+
+=head2 Importing the previously created backup
+
+	agni --load-image /backuppath/backup.xml
+
+This command imports the previously saved image into agni, overwriting
+all existing data.
+
+=head2 Executing a command inside agni
+
+	agni -e root/agni/staging/data/ call ra/settings::class ra_upgrade
+
+This command calls a method in object F<ra/settings::class>, agni-path
+B<root/agni/staging/data/> called B<ra_upgrade>. Use this feature with
+caution!
+
+To give the method call arguments simply write them on the command line:
+
+	agni -e root/agni/staging/nethype_data/ call mercury_nethype/report::own_summary summary 0 2141167600
+
+This calls the summary method on the report::own_summary object with the two arguments
+0 and 2141167600 (unix timestamps btw.).
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003,2004 nethype GmbH, Franz-Werfel-Str. 11, S<74078
+Heilbronn>.
+
+This Program is part of the PApp!Agni Distribution. Usage
+requires a valid license.
+
+=head1 AUTHOR
+
+Marc Lehmann <marc@nethype.de>,
+Marco Maisenhelder <marco@nethype.de>,
+L<http://www.nethype.de/agni>
+
+=cut
+
+use Getopt::Long;
+
+use PApp;
+use PApp::Config ();
+use PApp::SQL;
+use PApp::XML qw(xml_quote xml_attr xml_tag xml_cdata);
+use PApp::Util qw(dumpval); # debug#d#
+use PApp::Event ();
+use MIME::Base64;
+use Convert::Scalar qw(utf8_valid);
+
+use Agni;
+
+my $opt_force;
+
+sub do_some_tests {
+   warn "heiheihei\n";#d#
+   #my $vo = path_obj_by_gid 1, 783;
+   #warn PApp::Util::dumpval($vo->{_content});
+   #warn "hoiheihei\n";#d#
+   #$vo->{_type}{content}->fetch($vo);
+   #$vo->show_content;
+   #(path_obj_by_gid 1, 5100000652)->show_content;
+   local $Agni::debug=1;
+   #my $o1 = path_obj_by_gid 1,5100000482;
+   my $o1 = path_obj_by_gid 1,5100000016;
+   warn PApp::Util::dumpval($o1->{_cache});
+   exit;
+   my $path = 3;
+   my $t1 = Time::HiRes::time;
+   my $customer = path_obj_by_gid $path, 5100000422;
+   my $lg = path_obj_by_gid $path, 5100000420;
+   my $us = path_obj_by_gid $path, 17180000071;
+   my $t2 = Time::HiRes::time;
+   warn $t2-$t1;
+}
+
+sub quote_attr($) {
+   local $_ = $_[0];
+   s/^/\t/gm;
+   $_ = "\n$_\n    ";
+   xml_cdata $_;
+}
+
+sub print_attr {
+   my ($fh, $type, $data) = @_;
+
+   my $encode = !utf8_valid $data || $data =~ /[\x{0}-\x{8}\x{b}\x{c}\x{e}-\x{1f}]/;
+
+   print $fh "\n    ",
+             (xml_tag "a",
+                 type => $type,
+                 $encode ? (base64 => "yes") : (),
+                 defined $data
+                    ? (length $data) < 30 && $data !~ y/a-zA-Z0-9_:\-$, //c
+                       ? (value => $data, undef)
+                       : ($encode
+                          ? "\n" . (encode_base64 $data) . "    "
+                          : quote_attr $data)
+                    : (null => yes, undef));
+}
+
+my %import_ignore_type;
+
+sub parse_objects {
+   my ($file) = @_;
+   my @end;
+   my @data;
+   my @objs;
+   my @paths;
+   my ($o, $all);
+   my @map_path;
+   my %map_path;
+   my $in_o;
+
+   require XML::Parser::Expat;
+
+   my $parser = new XML::Parser::Expat;
+   $parser->setHandlers(
+      Start => sub {
+         shift;
+         push @end, do {
+            if ($_[0] eq "database" or $_[0] eq "image") {
+               shift;
+               my %a = @_;
+               die "unsupported version '$a{version}'" if $a{version} != 1;
+               sub { }
+            } elsif ($_[0] eq "path") {
+               shift;
+               @data = ();
+               my %a = @_;
+               my $id = $a{id};
+               sub {
+                  push @paths, join "", @data;
+                  $map_path[$id] = $#paths;
+               }
+            } elsif ($_[0] eq "o") {
+               shift;
+               my %o = @_;
+               $in_o and $parser->xpcroak ("nested <o> detected");
+               $in_o = 1;
+               $o = { gid => $o{gid}, attr => {} };
+
+               if (exists $o{paths}) {
+                  $o->{paths} = $map_path{$o{paths}} ||= do {
+                     my $paths = "0";
+                     for (split /,/, $o{paths}) {
+                        defined $map_path[$_] or die "object (gid $gid, paths $o{paths}) references undeclared path $_";
+                        $paths = Agni::or64 $paths, Agni::bit64 $map_path[$_];
+                     }
+                     $paths;
+                  };
+               }
+
+               push @objs, $o;
+               sub {
+                  $in_o = 0;
+               }
+            } elsif ($_[0] eq "a" or $_[0] eq "m") {
+               shift;
+               @data = ();
+               %m = @_;
+               sub {
+                  my $data = join "", @data;
+                  $data =~ s/^\n//; $data =~ s/\n?    $//; $data =~ s/^\t//gm;
+                  undef $data if exists $m{null};
+                  $data = decode_base64($data) if exists $m{base64};
+                  $data = $m{value} if exists $m{value};
+                  $o->{attr}{$m{type}} = $data
+                     unless exists $import_ignore_type{$m{type}};
+               }
+            } else {
+               $parser->xpcroak("$file illegal element <$_[0]> found");
+            }
+         }
+      },
+      End => sub {
+         &{pop @end};
+      },
+      Char => sub {
+         push @data, $_[1];
+      },
+   );
+   eval {
+      $parser->parsefile($file);
+   };
+   $parser->release;
+   $@ and die;
+
+   (\@paths, \@objs);
+}
+
+sub save_image {
+   my ($file) = @_;
+   my $fh;
+   defined $file and do { open $fh, ">", $file or die "can't create '$file': $!" };
+   $fh ||= \*STDOUT; 
+
+   print $fh xml_tag("image", version => '1'),
+             "\n\n";
+
+   sql_exec Agni::lock_all_tables "obj_path";
+
+   my %map_path; # mask => list
+   my @map_path;
+   my @pathids;
+
+   my $st = sql_exec \my($id, $path),
+                     "select id, path from obj_path order by path";
+
+   while ($st->fetch) {
+      push @pathids, $id;
+      $map_path[$id] = $#pathids;
+      print $fh xml_tag "path", id => $#pathids, xml_quote $path;
+      print $fh "\n";
+   }
+   print $fh "\n";
+
+   my $st = sql_exec \my($id, $gid, $paths),
+		     "select id, gid, paths
+                      from obj
+                      order by gid, paths";
+
+   while($st->fetch) {
+      $paths
+         = $map_path{$paths}
+            ||= join ",",
+               sort { $a <=> $b }
+                  map $map_path[$_],
+                     grep { Agni::and64 $paths, Agni::bit64 $_ } sort @pathids;
+
+      print $fh "<o gid=\"$gid\" paths=\"$paths\">";
+      for my $table (@Agni::sqlcol) {
+         my $st = sql_exec \my($type, $data),
+                           "select type, data
+                            from $table where id = ?
+                            order by type",
+                           $id;
+
+         while ($st->fetch) {
+            print_attr $fh, $type, $data;
+         }
+      }
+      print $fh "\n</o><!--$paths/$gid-->\n\n\n";
+   }
+   print $fh "</image>\n\n";
+   sql_exec "unlock tables"; 
+}
+
+sub clear_database {
+   for my $table ("obj", "obj_path", @Agni::sqlcol) {
+      sql_exec "delete from $table";
+      sql_exec "alter table $table disable keys"; # mysql
+   }
+   sql_exec "alter table obj auto_increment=1"; # mysql
+}
+
+sub load_image {
+   my ($file) = @_;
+
+   my ($paths, $objs) = parse_objects $file;
+
+   my %sqlcol;
+
+   # gather info
+   for (@$objs) {
+      if (exists $_->{attr}{$Agni::OID_ATTR_SQLCOL}) {
+         $sqlcol{$_->{gid}} = $_->{attr}{$Agni::OID_ATTR_SQLCOL};
+      }
+   }
+
+   # check attr consistency
+   for (@$objs) {
+      if (my @extra = grep !exists $sqlcol{$_}, keys %{$_->{attr}}) {
+         die "object $_->{paths}/$_->{gid} references types (@extra) without sqlcol";
+      }
+   }
+
+   sql_exec Agni::lock_all_tables "obj_path";
+
+   clear_database;
+
+   # create paths
+   for my $id (0 .. $#$paths) {
+      sql_exec "insert into obj_path (id, path) values (?, ?)", $id, $paths->[$id];
+   }
+
+   # create objects and attrs
+   for (@$objs) {
+      $_->{id} = Agni::insert_obj undef, $_->{gid}, $_->{paths};
+      while (my ($type, $value) = each %{$_->{attr}}) {
+         sql_exec "insert into $sqlcol{$type} (id, type, data) values (?, ?, ?)",
+                  $_->{id}, $type, $value;
+      }
+   }
+
+   PApp::Event::broadcast agni_update => [&Agni::UPDATE_PATHS];
+   PApp::Event::broadcast agni_update => [&Agni::UPDATE_ALL];
+
+   for my $table ("obj", "obj_path", @Agni::sqlcol) {
+      sql_exec "alter table $table enable keys";
+      sql_exec "optimize table $table";
+   }
+
+   Agni::check_gidseq $opt_force;
+
+   sql_exec "unlock tables";
+}
+
+sub export_path {
+   my ($path,$file) = @_;
+   my $fh;
+   defined $file and do { open($fh, ">", $file) or die "can't create '$file': $!" };
+   $fh ||= \*STDOUT; 
+
+   die "no such path '$path'" unless sql_exists "obj_path where path = ?", $path;
+   
+   print $fh xml_tag("database", version => '1', path => $path),
+             "\n\n";
+
+   sql_exec Agni::lock_all_tables;
+
+   my $st = sql_exec \my($id, $gid, $paths),
+		     "select obj.id, gid, paths
+                      from obj
+                      where paths & (1 << ?) <> 0 and paths & ? = 0
+                      order by gid, paths",
+                     $pathid{$path}, $parpathmask[$pathid{$path}];
+
+   while($st->fetch) {
+      print $fh "<o gid=\"$gid\">";
+      for my $table (@Agni::sqlcol) {
+         my $st = sql_exec \my($type,$data),
+                           "select type, data
+                            from $table where id = ?
+                            order by type",
+                           $id;
+
+         while ($st->fetch) {
+            print_attr $fh, $type, $data;
+         }
+      }
+      print $fh "\n</o>\n\n\n";
+   }
+   print $fh "</database>\n\n";
+   sql_exec "unlock tables"; 
+}
+
+sub import_path {
+   my ($path, $file) = @_;
+
+   Agni::newpath $path;
+#      print STDERR "WARNING: paths should not be created automatically\n";#d#
+
+   my $pathid = $pathid{$path};
+   die "no such path '$path'" unless defined $pathid;
+
+   my ($paths, $objs) = parse_objects $file;
+
+   @$paths and die "file contains paths attributes, might be an image file. not imported.";
+
+   Agni::import_objs ($objs, $pathid, 0, $opt_force);
+}
+
+sub garbage_collect {
+   my $ids = Agni::find_dead_objects;
+
+   if (@$ids) {
+      #print "DEAD OBJECTS: ".(join " ", sort @$ids)."\n";
+      print "DELETING OBJECTS: ".(join " ", sort @$ids)."\n";
+      #$|=1;
+      #print "delete (y/n)?";
+      #if (<STDIN> =~ /^y/i) {
+         Agni::mass_delete_objects $ids;
+      #}
+   }
+}
+
+sub paths {
+   for (@Agni::pathname) {
+      printf "%2d %s\n", $Agni::pathid{$_}, $_;
+   }
+}
+
+sub exec_cmd {
+   my ($path, @cmd) = @_;
+
+   local $PApp::NOW = time;
+
+   die "no such path '$path'" unless defined $Agni::pathid{$path};
+   
+   my $cmdline = path_obj_by_gid ($Agni::pathid{$path}, $Agni::OID_CMDLINE_HANDLER);
+
+   print $cmdline->command (@cmd);
+}
+
+sub usage {
+   print STDERR <<EOF;
+Usage: $0 ...
+
+   --file <file>                 write output to file or read input from file
+   --daemon            	         go into daemon mode
+   -i | --interval <seconds>     sleep interval for daemon mode
+   --export-path path            write path to file (or stdout)
+   --import-path path            import path from file
+
+   --load-image <file>           load a saved backup file <file>
+   --save-image <file>           save a backup file <file>
+   --clear-database              delete all objects
+
+   --force                       force import even on gidseq mismatches
+
+   --gar                         run the garbage collector
+
+   --paths                       show paths
+   --newpath <path>              creates a new path
+   
+   -e | --exec-cmd path command  executes a command as defined in util::cmdline
+                                 path specifies the path to the object.
+
+EOF
+   exit 1;
+}
+
+Getopt::Long::Configure ("bundling", "no_ignore_case", "require_order");
+
+my @exec;
+my $fn;
+
+GetOptions(
+   "file=s" => sub { $fn = $_[1] },
+   "force"  => \$opt_force,
+   "interval|i=i" => sub {
+      $interval = shift;
+   },
+   "daemon" => sub {
+      push @exec, sub {
+         do {
+            runq;
+            sleep $interval;
+         } while $interval;
+      };
+   },
+   "save-image=s" => sub {
+      my $path = $_[1]; push @exec, sub { save_image $path };
+   },
+   "load-image=s" => sub {
+      my $path = $_[1]; push @exec, sub { load_image $path };
+   },
+   "clear-database" => sub {
+      my $path = $_[1]; push @exec, sub { clear_database $path };
+   },
+   "export-path=s" => sub {
+      my $layer = $_[1]; push @exec, sub { export_path $layer, $fn };
+   },
+   "import-path=s" => sub {
+      my $path = $_[1]; push @exec, sub { import_path $path, $fn };
+   },
+   "import-ignore-type=i" => sub {
+      undef $import_ignore_type{$_[1]};
+   },
+   "garbage-collect" => sub {
+      push @exec, \&garbage_collect;
+   },
+   "newpath=s" => sub {
+      my $path = $_[1]; push @exec, sub { Agni::newpath $path };
+   },
+   "paths" => sub {
+      push @exec, \&paths;
+   },
+   "test:s" => sub {
+      my $arg = $_[1]; push @exec, sub { do_some_tests($arg) };
+   },
+   "exec-cmd|e=s" => sub {
+      my $path = $_[1]; push @exec, sub { exec_cmd $path, @ARGV } ;
+   }
+) or usage;
+
+@exec or usage;
+
+local $PApp::SQL::Database = $PApp::Config::Database;
+local $PApp::SQL::DBH      = PApp::Config::DBH;
+
+&{shift @exec} while @exec;
+

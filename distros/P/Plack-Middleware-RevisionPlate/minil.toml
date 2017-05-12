@@ -1,0 +1,7 @@
+name = "Plack-Middleware-RevisionPlate"
+badges = ["travis"]
+authority="cpan:ASTJ"
+license = "mit"
+
+module_maker="ModuleBuildTiny"
+

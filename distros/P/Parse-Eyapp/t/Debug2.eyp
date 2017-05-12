@@ -1,0 +1,59 @@
+%token D S
+
+%{
+our $VERSION = '0.01';
+%}
+
+%%
+p:
+		ds ';' ss  
+	|	ss
+;
+
+ds:
+	  ds ';' D
+	| D				
+    {
+      print "Reducing by rule:\n";
+      print "\tds -> D\n";
+      $_[1];
+    }
+;
+
+ss:
+	  S ';' ss			
+	| S				
+;
+
+%%
+
+my $tokenline = 0;
+
+sub _Error {
+	my $parser = shift;
+	my ($token) = $parser->YYCurval;
+	my ($what) = $token ? "input: '$token'" : "end of input";
+	die "Syntax error near $what line num $tokenline\n";
+}
+
+my $input;
+
+sub _Lexer {
+	
+	for ($input) {
+      s{^(\s+)}{} and $tokenline += $1 =~ tr{\n}{};
+	    return ('',undef) unless $_;
+      return ($1,$1) if s/^(.)//;
+	}
+	return ('',undef);
+}
+
+sub Run {
+	my ($self) = shift;
+	
+	$input = shift;
+	
+	return $self->YYParse( yylex => \&_Lexer, yyerror => \&_Error,
+                         yydebug => 0x1F,
+  );
+}

@@ -1,0 +1,125 @@
+NAME
+    Padre::Plugin::SpellCheck - Check spelling in Padre, The Perl IDE.
+
+VERSION
+    version 1.31_01
+
+DESCRIPTION
+    For Padre 0.97+
+
+    This plug-in allows one to check there spelling within Padre using "F7"
+    (standard spelling short-cut across text processors).
+
+    One can change the dictionary language used (based upon install
+    languages) in the preferences window via Plug-in Manager. Note that
+    preferences can only be setup while the plugin is disabled. Preferences
+    are persistent. You need to Save your preferred language.
+
+    This plug-in is using "Text::Aspell" default (legacy). You can also use
+    "Text::Hunspell", so check these module's pod for more information and
+    install the one for you.
+
+    Of course, you need to have the relevant Dictionary binary, dev and
+    dictionary installed.
+
+SYNOPSIS
+        Check your file or selected text for spelling errors in your preferred language.
+        F7
+
+PUBLIC METHODS
+  Standard Padre::Plugin API
+    "Padre::Plugin::SpellCheck" defines a plug-in which follows
+    "Padre::Plugin" API. Refer to this module's documentation for more
+    information.
+
+    The following methods are implemented:
+
+    clean_dialog()
+    menu_plugins()
+    padre_interfaces()
+    plugin_disable()
+    plugin_enable()
+           Return the plug-in's configuration, or a suitable default one if
+           none exist previously.
+
+    plugin_name()
+    plugin_preferences()
+           Spelling preferences window normaly access via Plug-in Manager
+
+    plugin_icon()
+           Used by Plug-in Manager
+
+    event_on_context_menu
+           Add access to spelling preferences window.
+
+  Spell checking methods
+    *
+     spell_check()
+
+     Spell checks the current selection (or the whole document).
+
+BUGS and LIMITATIONS
+    If you upgrade your os, and run Perl from a local/lib, you may find
+    Hunspell stops showing local dictionary s in preferences, you will need
+    to un-install Text::Hunspell and re-install in cpan.
+
+    Spell-checking non-ascii files has bugs: the selection does not match
+    the word boundaries, and as the spell checks moves further in the
+    document, offsets are totally irrelevant. This is a bug in
+    "Wx::StyledTextCtrl" that has some Unicode problems... So unfortunately,
+    there's nothing that I can do in this plug-in to tackle this bug.
+
+    Please report any bugs or feature requests to "padre-plugin-spellcheck
+    at rt.cpan.org", or through the web interface at
+    "/rt.cpan.org/NoAuth/ReportBug.html?Queue=Padre-Plugin- SpellCheck" in
+    http:. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SEE ALSO
+    Plug-in icon courtesy of Mark James, at
+    <http://www.famfamfam.com/lab/icons/silk/>.
+
+    * Padre-Plugin-SpellCheck web page
+
+      <http://padre.perlide.org/trac/wiki/PadrePluginSpellCheck>
+
+    * Our svn repository
+
+      <http://svn.perlide.org/padre/trunk/Padre-Plugin-SpellCheck>, and can
+      be browsed at
+      <http://padre.perlide.org/browser/trunk/Padre-Plugin-SpellCheck>.
+
+    You can also look for information on this module at:
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Padre-Plugin-SpellCheck>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Padre-Plugin-SpellCheck>
+
+    *   Open bugs
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Padre-Plugin-SpellCheck>
+
+    Everything Aspell related: <http://aspell.net>.
+
+    Everything Hunspell related: <http://hunspell.sourceforge.net/>.
+
+AUTHORS
+    Kevin Dawson <bowtie@cpan.org>
+
+    Ahmad M. Zawawi <ahmad.zawawi@gmail.com>
+
+    Fayland Lam <fayland at gmail.com>
+
+    Jerome Quelin <jquelin@gmail.com>
+
+COPYRIGHT
+    This software is copyright (c) 2010 by Fayland Lam, Jerome Quelin.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl 5 itself.
+

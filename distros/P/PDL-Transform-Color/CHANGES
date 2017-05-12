@@ -1,0 +1,10 @@
+v1.003
+	- fix typo in Makefile.PL
+
+v1.002
+	- addition of pseudocolor mappings and the t_pc and t_pcp transforms
+	- Improved documentation
+	- addition of RGB combinatoric modifiers to named color tables
+	
+
+v1.001 - initial module release to git, 23 Feb 2017

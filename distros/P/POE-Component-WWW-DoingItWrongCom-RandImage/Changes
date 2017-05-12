@@ -1,0 +1,13 @@
+Revision history for POE-Component-WWW-DoingItWrongCom-RandImage
+
+0.03    2013-12-16
+        - Minor fixes to comply with the specs and Kwalitee game
+        - Added autogeneration of README from POD
+        - Moved author tests to xt/
+
+0.02    2008-02-18
+        - minor documentation discrepancy update
+
+0.01    2008-02-06
+        - First version, released on an unsuspecting world.
+

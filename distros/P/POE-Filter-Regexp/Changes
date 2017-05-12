@@ -1,0 +1,5 @@
+Revision history for Perl extension POE::Filter::Regexp.
+
+1.0 5 Apr 2008
+	- released
+	- get() implemented

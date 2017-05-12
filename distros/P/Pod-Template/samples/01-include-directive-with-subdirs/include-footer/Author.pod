@@ -1,0 +1,11 @@
+=Template author
+=head1 AUTHOR
+
+This sample by Jos Boumans
+
+=Template copyright
+=head1 COPYRIGHT
+
+This library is free software;
+you may redistribute and/or modify it under the same
+terms as Perl itself.

@@ -1,0 +1,64 @@
+{
+   "abstract" : "Turn Pod into Microsoft Word's WordML",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-WordML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "Pod::Escapes",
+         "Pod::Simple::BlackBox"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64",
+            "File::Spec::Functions" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Pod::Escapes" : "0",
+            "Pod::PseudoPod" : "0",
+            "Tie::Cycle" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::LongString" : "0",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/briandfoy/pod-wordml/issues"
+      },
+      "homepage" : "https://github.com/briandfoy/pod-wordml",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/briandfoy/pod-wordml.git",
+         "web" : "https://github.com/briandfoy/pod-wordml"
+      }
+   },
+   "version" : "0.164"
+}

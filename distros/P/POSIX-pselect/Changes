@@ -1,0 +1,12 @@
+Revision history for Perl extension POSIX::pselect
+
+0.03 2012-08-15 08:42:25
+    - Build on 5.15.3 (Leont)
+
+0.02 2011-06-24 11:36:09
+    - Fix dependencies
+    - Enable tests all the time
+
+0.01 2011-06-22 11:35:46
+    - original version; created by dim
+      at Sun Jun  5 20:17:55 2011.

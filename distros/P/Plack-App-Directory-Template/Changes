@@ -1,0 +1,29 @@
+0.27 2014-01-16
+    support option dir_index 
+
+0.26 2013-09-04
+    support PROCESS option
+
+0.25 2013-08-23
+    support Template Toolkit configuration options
+    respect existing $env->{'tt.vars'}
+    support method syntax on file objects
+
+0.24 2013-08-22
+    clarified method 'template_vars' and filter option
+
+0.23 2013-08-22
+    more template variables
+
+0.22 2013-08-21
+    modified parameter syntax of method 'template_vars'
+
+0.21 2013-08-21
+    exclude ../ at the root directory
+
+0.2  2013-08-20
+    additional method 'template_vars'
+    modified filter option
+
+0.1 2013-08-16
+    initial version

@@ -1,0 +1,47 @@
+=head1 NAME
+
+This is a pod paragraph
+
+=begin wikidoc
+
+= DESCRIPTION
+
+Wikidoc paragraph
+
+=begin comment
+
+The number 42 > 23 but we
+want x such that 12 < x < 42
+
+=end comment
+
+== Subheading
+
+Level 2 paragraph
+
+=end wikidoc
+
+=cut
+#--------------------------------------------------------------------------#
+=pod
+
+=head1 NAME
+
+This is a pod paragraph
+
+=head1 DESCRIPTION
+
+Wikidoc paragraph
+
+=begin comment
+
+The number 42 > 23 but we
+want x such that 12 < x < 42
+
+=end comment
+
+=head2 Subheading
+
+Level 2 paragraph
+
+

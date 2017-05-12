@@ -1,0 +1,65 @@
+## NOTE:
+##
+## Reliable benchmarking is a difficult task.  This particular benchmark 
+## was contructed the quickest way possible, without regard to issues like
+## caching, scooping, compiler optimization, or representative data. Only a fool
+## will consider that results might point to a 'rough' approximation.
+
+
+
+use Benchmark qw( :DEFAULT  cmpthese );
+END { unlink 'data'  }
+$SIG{INT} = sub {  unlink 'data' ; exit} ;
+
+my ($debug , $flex, $l, $n, $data, $fh, @tokens, $ret, @ret) = 0 ;
+
+{
+	local $/  = undef;
+	use Fatal qw( open  close);
+	open $fh, 'snip.txt';
+	$data = <$fh> ;
+	close $fh;
+	open $fh, '>data';
+	print $fh $data   x 850  ;
+	close $fh;
+
+	no warnings;
+	@tokens = ( 
+		qw[ EMAIL \b(?:\w+[.]?)+\w+\@(?:\w+[.])+[a-z]{2,3}\b ],
+		qw( WORD  [a-z]+                                     ),
+		qw( NUM   [0-9]+                                     ),
+		qw( EOL   \n                                         ),
+		qw( ERROR  .                                         ),
+	);
+}
+
+sub lex { 
+        $l->nextis( \$n ) ; 
+	return ('',undef) if $l->eoi;
+	($n->name, $n->text);
+};
+
+
+sub Parse_Lex {
+	use IO::File ;  use Parse::Lex ;
+
+	Parse::Lex->skip('[ \t]*') ;
+	$l = new Parse::Lex @tokens  or die;
+	$l->from( new IO::File 'data' ) ;
+  	1 while lex;
+}
+
+sub Parse_Flex {
+        use Parse::Flex;
+        yyin   'data' ;
+	1 while yylex;
+	#print "@ret"  while   @ret = yylex ;
+}
+
+
+cmpthese ( 1  , { old => \&Parse_Lex, 
+                  new => \&Parse_Flex} 
+	 ) ;
+
+
+__DATA__

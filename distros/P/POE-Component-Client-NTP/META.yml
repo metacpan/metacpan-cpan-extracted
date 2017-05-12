@@ -1,0 +1,30 @@
+---
+abstract: 'A POE Component to query NTP servers'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+  - 'James G. Willmore'
+  - 'Ask Bjørn Hansen'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-Client-NTP
+requires:
+  IO::Socket::IP: '0.29'
+  POE: '1.004'
+  Socket: '2.013'
+  Time::HiRes: '0'
+  perl: v5.6.0
+resources:
+  homepage: https://github.com/bingos/poe-component-client-ntp
+  repository: https://github.com/bingos/poe-component-client-ntp.git
+version: '0.14'

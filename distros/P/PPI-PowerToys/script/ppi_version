@@ -1,0 +1,15 @@
+#!/usr/bin/perl
+
+use 5.006;
+use strict;
+use warnings;
+use PPI::App::ppi_version ();
+
+use vars qw{$VERSION};
+BEGIN {
+        $VERSION = '0.14';
+}
+
+$| = 1;
+PPI::App::ppi_version::main(@ARGV);
+exit(0);

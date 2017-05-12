@@ -1,0 +1,27 @@
+Revision history for PerlIO-utf8_strict
+
+0.007     2017-04-06 14:58:37+02:00 Europe/Amsterdam
+          - Adapt to dot no longer being in @INC
+          - Adapt to unicode syswrite being deprecated
+
+0.006     2015-05-01 11:36:21+02:00 Europe/Amsterdam
+          Move to MakeMaker
+
+0.005     2014-11-06 00:56:54+01:00 Europe/Amsterdam
+          Add PPPort to compile on perl <5.8.9
+
+0.004     2013-02-24 10:59:59 Europe/Amsterdam
+          Fix compilation on 5.8
+
+0.003     2013-02-21 01:30:44 Europe/Amsterdam
+          Fixed conversion to code points in noncharacter error reporting
+          PerlIOBase_flush_linebuf is unresolved on some platforms, pull in a copy
+
+0.002     2012-05-30 20:43:21 Europe/Amsterdam
+          Fix bug with non-buffered lower layers
+          FIX C89 conformance
+          Documentation update
+
+
+0.001     2012-04-08 22:08:08 Europe/Amsterdam
+          Initial release

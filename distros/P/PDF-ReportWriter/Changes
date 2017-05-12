@@ -1,0 +1,232 @@
+CHANGELOG
+
+Version 1.5, released 10-Feb-2008
+
+    Patches from Dietrich Streifert <dietrich.streifert@googlemail.com>
+        A background coloring function similar to the colour_func
+            implementation. Additionally the current cell rendering options should
+            be passed to both rendering functions
+        The possibility to set the aligment of the row header
+        Documented above
+    
+    Fixed scaling image down if they're too big to fit on page
+    Fixed more optimisations that were breaking rendering of blank lines ( \n )
+    page_template() now supports being passed a path to a template file
+        ( ie you can override the default template )
+    Fixed off-by-one error in wrap_text
+    Completed multi-line row support
+        ( ie 'row' definitions can spill over 100% of x-space, in effect
+          covering >1 rows )
+    Added text justification support ( and documented )
+        ( set 'align' property to 'justified' )
+    Fixed clobbering of a cell's text_whitespace property
+
+Version 1.4, released 01-Jul-2007
+
+    Patches from Cosimo Streppone <cosimo@cpan.org>:
+        Improved management of image files according to underlying PDF::API2
+            installed version. If you specify an image type that PDF::API2
+            can't handle, the image is skipped and a warning is produced.
+        Fixed and documented custom cell type mechanism, and added automatic
+            require of formatter classes.
+    
+    Patches Patrik Eschle <patrik.eschle@spectraseis.com>:
+        Added support for code39 barcodes
+    
+    Fixed rendering of the character 0 by itself
+    Fixed setup of group footer definition if aggregate source is cell 0
+    Fixed bad calling of calculate_y_needed
+        ( was passing 'fields' in the options hash instead of 'cells' )
+    Added support for multi-line text in data ( ie cells can expand vertically )
+    Fixed printing of data headers if there are no groups defined
+    Fixed x_pos of text in render_cell_text() for multiline text
+    Moved execution of custom render functions to happen before rendering all other cell types
+    Added return hash for custom render functions, with support for passing stuff back for traditional rendering
+    Added fetch_group_results() function ( use this with custom_render_func )
+    Fixed splitting of columns inside a delimited group value for group headers ( sorry Bill )
+    Fixed printing of group headers if we have to reset them while we're calculating whether we need a new page
+    INCOMPATIBLE CHANGE:
+        colour_func() functions now get passed ( $value, $row ) instead of just $row
+    Removed dependancy on Number::Format
+    Fixed rendering of footers if reprinting_header is on
+    Fixed corruption of group aggregate values in some cases
+    Added text wrapping option to cells for text that is wider than the current width
+    Added option to cells to strip line breaks from text
+    Fixed bug in calculate_y_space for non-data cells ( eg where $cell->{text} is rendered )
+    Create a new page before the 1st invocation of calculate_y_space so we have a text object
+    Improved numeric and currency formatting - see the cell's new 'format' key
+    Fixed rendering of cell where text begins with a space ( bad optimisation )
+    
+Version 1.3, released 31-Mar-2006
+    Patches from Cosimo Streppone <cosimo@cpan.org>:
+        Fixed out-of-memory errors when defining cells that exceed page height.
+        Many fixes about text and barcode cells alignment of content even when
+            using absolute x, y coordinates.
+        Refactored cell font object retrieving code, to be used both in barcode
+            and text cells.
+        Added and documented more barcode properties (upper/lower mending zones,
+            custom font/font_size)
+        Added current_page() method to retrieve PDF::API2::Page underlying object
+            where we are rendering content. One can choose to draw directly on that.
+        Added another example of barcode document (PDF as a barcode label)
+        Added page duplication example (cool!)
+  
+Version 1.2, released 26-Mar-2006
+    Patches from Cosimo Streppone <cosimo@cpan.org>:
+        Added "one-step" loading and rendering of reports from external XML files.
+            XML::Simple now is a pre-requisite for PDF::ReportWriter.
+        Added data sources definition in the xml report, with a basic DBI data-source
+            plugin already available. Invented a new syntax for text cells to refer to
+            external data sources (`%datasource_name[record_no,column_no]%').
+        Added an examples folder with some basic cool xml reports.
+        Added print() method to directly print pdf reports to CUPS print queues.
+        Added saveas() method just like PDF::API2 class.
+        Added `max', `min' aggregate functions.
+        Added basic handling of multi-line text on text cells, with proper
+            calculation of cell height.
+        Added ReportWriter->stringify() method that returns all the pdf document
+            in a scalar, useful when you want to stream your document to a browser.
+        Refactored the cell text processing code in new `get_cell_text()' method.
+            Now every part of report should have macro expansion (%PAGE%, ...).
+        Now the `field_headers_upper_buffer' works as advertised.
+        Now document info->Creator field can be overridden.
+        [EXPERIMENTAL] New cell type "custom:xxxx" to allow arbitrary formatting.
+        Various fixes with barcode cells rendering (code 39 and 128).
+        Minor optimizations around the group aggregate calculation.
+        Documentation updates.
+    Many thanks Cosimo :)
+    
+    Added support for image types: tiff, gif, pnm
+
+Version 1.0, released 11-Mar-2006
+    Patches from Cosimo Streppone:
+        Added rendering of absolute-positioned cells with x,y properties.
+        Added rendering of barcodes of type 39 and 128.
+        Added support for PDF template pages.
+        Some refactoring of code at the cell/row rendering level.
+        Added basic testing of module.
+        Various optimisations.
+        Documentation updates.
+    Many thanks Cosimo for the above work :)
+    
+    Added 'thousands_separated' type - similar to currency type, but no dollar sign in front
+    Added 'buffer' key to image definition - minimum whitespace around an image ( defaults to 1 )
+    Changed $cell->{border_width} to $cell->{full_width}. 'border_width' is a very bad description ...
+    Added field_headers object and cleaned up mess of code that previously existed to deal with headers
+    Code cleanup: renamed remaining $field variables to $cell
+    Added warnings on image issues:
+        - Can't detect image dimensions ( including image not found )
+        - Unknown image type
+    Added 'bold' key to cell definition ( and support legacy behaviour )
+    Store temporary image metadata inside cell's image hash instead of passing it round
+        This adds support for rendering > 1 image per row :)
+    Automatically set the data_column for the GrandTotals group so you don't need to specify it
+    Optimisation: Cache image data ( dimensions, type ) in the image hash
+    Added support for custom rendering functions ( ie direct use of PDF::API2 ) for each cell
+        *Please* consider submitting useful functions for inclusion into PDF::ReportWriter :)
+    Fixed initial rendering of field headers if there are no groups defined
+    Fixed bad calling of calculate_y_needed ( changed 'fields' key to 'cells' in options hash )
+    Fixed error on multiple render() invocations with images ( cache being destroyed )
+    
+Version 0.9, released 16-Jan-2006
+    Patches from Bill Hess:
+        Added support for defining Top, Bottom, Left, Right cell borders to render
+        Added support for splitting multiple columns of data into a group header
+    Many thanks to Bill for the above work :)
+    
+    Fixed calculation of $field->{text_width} ( take into account user-defined text_whitespace )
+    Replaced max_font_size with max_cell_height - better way of handling Y-space
+    Incorporated groups into setup_cell_definitions()
+    Changed $field in setup_cell_definitions() to $cell
+    Added support for reprinting group headers on a new page
+    Fixed error in rendering final group footers if there is no footer defined. How did this happen?
+    Added upper_buffer and lower_buffer keys to group & data definitions for defining whitespace buffers
+    Added support for page breaking before a group header
+    Reprint higher-level 'reprinting_header' group headers when a lower-level group triggers a page break
+    Broke out queuing group headers into separate assemble_group_header_queue() method
+    Removed $no_group_footer variable
+    Calculate size of group header queue, and if too big, re-assemble entire queue based on assumption that
+        we're printing on a new page ( which could pull in more group headers that are reprinting_headers )
+        - thanks for Bill Hess for tirelessly reporting this bug until I fixed it :)
+    Added support for dynamic images - image path comes from the data array
+    Updated TODO with final feature additions for a 1.0 release, and plans for 2.0
+    
+Version 0.81, released 22-Oct-2005
+    
+    Fixed stoopid mistake ( missing bracket close ) in previous release
+    
+Version 0.8, released 22-Oct-2005
+    
+    Added page headers and footers, dealt with in same style as data ( ie an array of cells )
+    Added special tags %PAGE%, %PAGES%, and %TIME% for page headers and footers
+    Added cell-level control of cell borders, including colour support
+    Added legacy page footers ( default if no page footer specified )
+    Added support for setting PDF info
+    Don't create a new page in the constuctor - wait until we get passed some data
+    Added setup_cell_definitions() to generically fill out details of all different types of cells
+    Broke out calculation of Y needed into calculate_y_needed()
+    Fixed typo in paper setup ( 'portait' should be 'portrait' ) - thanks to Bill Hess for spotting this one
+    Added 'bsize' and 'legal' paper sizes - thanks to Bill Hess for these additions
+    Removed all global variables
+    Updated documentation & cleaned up POD somewhat
+    
+Version 0.7, released 22-Aug-2005
+    
+    Move down before rendering instead of after in group_header ( and not in GrandTotals header )
+    Fixed small bug in calculation of Y-space needed for current data block
+        ( take into account whitespace between previous row and group header )
+    
+Version 0.6, released 02-Aug-2005
+    
+    Major, major rewrite. Many new features. Squashed all bugs I know of.
+    Fixed bug in resetting aggregate fields when entering a new group
+    Fixed bug in colour_func when called on non-data stuff ( eg headers, footers, etc )
+    Better comments in source, use constants for TRUE / FALSE
+    Replaced $field->{picture} with $field->{image} hash
+    Set $self->{default_font_size} to 12 if one isn't supplied
+    Renamed internal variables for more consistancy
+    Replaced $cell_spacing with dynamic calculation of $field->{text_whitespace} ( user can define own values )
+    Replaced user-defined $self->{data}->{max_font_size} with calculated value - any max_font_size value you set will be overriden
+    Added far more robust calculation of Y-space needed for current block of data
+    Keep group headings with data ( ie don't print a group header at the bottom of a page ) ... FIGJAM
+    Move down the page immediately *before* rendering each line, instead of after
+    Added image scaling ... that actually works ( added dependancy on Image::Size )
+    Added image alignment
+    Recognise "center" as well as "centre" in alignment definition
+    Get rid of warnings about unintialised variables ( 'no warnings' directive )
+    Added support for colour background setting for cells - current options are 'box' or 'ellipse'
+    Separated demo app from main package
+    
+Version 0.5, released 15-Jun-2005
+    
+    Added support for images - scaled to fit to the current cell ( not finalised - comments welcome )
+    Support multiple 'render_data' operations - you can keep passing new data ( or new groups / fields / data )
+    Added support for colour
+    Added support colour_func - a user-defined function to set the colour based on the current data
+    
+Version 0.4, released 09-May-2005
+    
+    Check for group footer definitions in final run before actually calling group_footer() on them
+    Added currency:no_fill field type ... if you don't want your amounts filled out to 2 decimal places
+    Remove requirement of setting the 'text' key to the group name for aggregate results in group footers
+    
+Version 0.3, released 08-May-2005
+    
+    Bold & Centre field headers
+    Fixed bug in page counting that would 'remember' ( somehow ) the page count from previous reports
+    Do page footers in a separate pass when saving so we can write 'Page N of M' instead of just 'Page N'
+
+Version 0.2, released 27-Apr-2005
+    
+    Fixed bug in group handling that was preventing the special 'GrandTotal' group header from being rendered
+    Added a much-requested demo application
+    
+Version 0.1, released 26-Apr-2005
+
+    First Version :)
+    Table-based text layout engine with cell borders
+    Text alignment inside cells
+    Basic aggregate commands ( sum, count )
+    Page headers / footers
+    Group headers / footers ( unlimited )
+    POD documentation

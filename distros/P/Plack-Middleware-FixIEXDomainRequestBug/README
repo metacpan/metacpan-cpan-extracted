@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Plack-Middleware-FixIEXDomainRequestBug,
+version 0.001:
+
+  Solve the IE8 / IE9 XDomainRequest Missing or Invalid Content-Type Bug
+
+This software is copyright (c) 2013 by John Napiorkowski.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

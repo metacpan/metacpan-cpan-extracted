@@ -1,0 +1,26 @@
+---
+name: Parse-GEDA-Gschem
+version: v1.00
+author:
+  - 'JP Fricker <JPFRICKER@CPAN.org>'
+abstract: gEDA/gaf gschem file parser
+license: perl
+requires:
+  Data::Dumper: 0
+  Exporter: 0
+  File::Basename: 0
+  File::Copy: 0
+  Parse::RecDescent: 1.96.0
+  Test::More: 0
+  perl: 5.10.0
+  version: 0
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Parse::GEDA::Gschem:
+    file: lib/Parse/GEDA/Gschem.pm
+    version: v1.00
+resources:
+  license: http://dev.perl.org/licenses/

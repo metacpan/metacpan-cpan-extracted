@@ -1,0 +1,876 @@
+#   ---------------------------------------------------------------------- copyright and license ---
+#
+#   file: lib/Perl/PrereqScanner/Scanner/Hint/Manual.pod
+#
+#   Copyright © 2015, 2016 Van de Bugger.
+#
+#   This file is part of perl-Perl-PrereqScanner-Scanner-Hint.
+#
+#   perl-Perl-PrereqScanner-Scanner-Hint is free software: you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the Free Software Foundation,
+#   either version 3 of the License, or (at your option) any later version.
+#
+#   perl-Perl-PrereqScanner-Scanner-Hint is distributed in the hope that it will be useful, but
+#   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+#   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along with
+#   perl-Perl-PrereqScanner-Scanner-Hint. If not, see <http://www.gnu.org/licenses/>.
+#
+#   ---------------------------------------------------------------------- copyright and license ---
+
+# PODNAME: Perl::PrereqScanner::Scanner::Hint::Manual
+# ABSTRACT: C<Scanner::Hint> user manual
+
+#pod =for :this This is C<Scanner::Hint> user manual. Read this if you want to specify implicit prerequisites directly in Perl code.
+#pod
+#pod =for :those If you are going to hack or extend C<Perl-PrereqScanner-Scanner-Hint>, read the L<module
+#pod documentation|Perl::PrereqScanner::Scanner::Hint>. General topics like getting source, building, installing, bug
+#pod reporting and some others are covered in the F<README>.
+#pod
+#pod =for test_synopsis BEGIN { die "SKIP: Not Perl code.\n" };
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod In F<dist.ini>:
+#pod
+#pod     ...
+#pod     [AutoPrereqs]
+#pod         extra_scanners = Hint
+#pod     ...
+#pod
+#pod In Perl code:
+#pod
+#pod     ...
+#pod     use autodie ':all'; ## REQUIRE: IPC::System::Simple
+#pod     ...
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod =head2 Intro
+#pod
+#pod C<Dist::Zilla> is a tool for building distributions. C<Dist::Zilla>'s plugin C<AutoPrereqs>
+#pod automatically extracts prerequisites from distribution's sources, tests, etc. In great majority
+#pod of cases all you need just two lines
+#pod
+#pod     [AutoPrereqs]
+#pod     [MetaJSON]
+#pod
+#pod in your F<dist.ini> file to get C<prereq> key of distribution F<META.json> populated with your
+#pod distribution requirements. For example, if your module uses C<Module::Name>:
+#pod
+#pod     use Module::Name 0.008;
+#pod
+#pod C<AutoPrereqs> finds this statement and adds requirement C<< "Module::Name" => "0.008" >> to
+#pod distribution F<META.json>.
+#pod
+#pod When user installs your module from CPAN, CPAN client (either C<cpan>, or C<cpanp>, or C<cpanm>)
+#pod makes sure all the requirements are satisfied, so your module can be installed and run smoothly.
+#pod
+#pod C<AutoPrereqs> uses C<Perl::PrereqScanner> for extracting prerequisites from the distribution
+#pod files. C<Perl::PrereqScanner>, in turn, uses scanners for scan the files. Few most frequently used
+#pod scanners are bundled with the C<Perl::PrereqScanner> and utilized by default. For example,
+#pod C<Perl::PrereqScanner::Scanner::Perl5> looks for Perl C<use> and C<require> statements,
+#pod C<Perl::PrereqScanner::Scanner::Moose> looks for Moose's C<extends> and C<with> keywords, etc.
+#pod
+#pod C<Perl::PrereqScanner::Scanner::Hint> is an additional scanner for C<Perl::PrereqScanner>. In
+#pod contrast to other scanners, it does not look into Perl I<code> but looks into Perl I<comments>. It
+#pod searches for I<hints> leaved by the programmer.
+#pod
+#pod =head2 Hints
+#pod
+#pod A hint is a comment starting with I<two hashes>, followed by C<REQUIRE> keyword, I<colon>, I<module
+#pod name>, and optional I<version range> and I<comment>, e. g.:
+#pod
+#pod     ## REQUIRE: Assa >= 1.2, != 1.5 # 1.5 has a nasty bug
+#pod
+#pod C<REQUIRES> is an alternative keyword:
+#pod
+#pod     ## REQUIRES: Assa >= 1.2, != 1.5 # ditto
+#pod
+#pod Keyword must be in upper case. Number of whitespaces between elements (hash, keyword, colon, etc)
+#pod does not matter:
+#pod
+#pod     ##REQUIRE:...
+#pod     ## REQUIRE: ...
+#pod     ##  REQUIRE  :  ...
+#pod
+#pod A hint can be a standalone comment:
+#pod
+#pod     ## REQUIRE: ...
+#pod
+#pod or trailing one:
+#pod
+#pod     use Assa; ## REQUIRE: Assa != 1.5
+#pod
+#pod Hashes, keyword and colon are critical for recognizing a hint. Following examples are I<not> hints:
+#pod
+#pod     ### REQUIRE: ... # More than two hashes
+#pod     ##~ REQUIRE: ... # Extra character between hashes and keyword
+#pod     ##  Require: ... # Keyword is not in upper case
+#pod     ##  REQUIRE  ... # No colon
+#pod
+#pod …and so, all such lines are silently ignored. However, if a comment is recognized as a hint, it is
+#pod thoroughly validated. If a hint is not valid, C<Scanner::Hint> issues an error message and stops
+#pod scanning.
+#pod
+#pod The first word (up to the first whitespace or hash or end-of-line) must be a valid module name:
+#pod
+#pod     ## REQUIRE: Module:Name  # Error: 'Module:Name' is not a valid module name
+#pod     ## REQUIRE: Module-Name  # Error: 'Module-Name' is not a valid module name
+#pod     ## REQUIRE: "ModuleName" # Error: '"ModuleName"' is not a valid module name
+#pod
+#pod Version range (everything after the module name and up to comment or end-of-line) must be valid
+#pod too:
+#pod
+#pod     ## REQUIRE: Module::Name > 1.5 < 2.0 # Error!
+#pod     ## REQUIRE: Module::Name = 1.5       # Error!
+#pod
+#pod See L<CPAN::Meta::Spec/"Version Ranges"> for syntax and semantics of version ranges.
+#pod
+#pod Empty version range is allowed, it stands for default value C<0> which means "any version":
+#pod
+#pod     ## REQUIRE: Assa   # any version is ok
+#pod     ## REQUIRE: Assa 0 # ditto
+#pod
+#pod And, as you already noticed, a hash starts a comment:
+#pod
+#pod     ## REQUIRE: IPC::System::Simple # used by autodie
+#pod
+#pod =head2 Using C<Scanner::Hint> with C<Dist::Zilla> and C<AutoPrereqs>
+#pod
+#pod C<AutoPrereqs> has C<extra_scanners> option which can be used for adding extra scanners. This
+#pod option can be used for enabling C<Scanner::Hint> in your F<dist.ini>:
+#pod
+#pod     [AutoPrereqs]
+#pod         extra_scanners = Hint
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =head1 EXAMPLES
+#pod
+#pod All the examples below assume using C<Dist::Zilla> with C<AutoPrereqs> plugin, and enabled
+#pod C<Scanner::Hint>, as shown in L<< /"Using C<Scanner::Hint> with C<Dist::Zilla> and C<AutoPrereqs>"
+#pod >> section.
+#pod
+#pod =example C<autodie>
+#pod
+#pod If pragma C<autodie> is used with C<':system'> or C<':all'> argument, e. g.:
+#pod
+#pod     use autodie ':all';
+#pod
+#pod C<autodie> loads C<IPC::System::Simple> module. However, C<autodie>'s F<META.json> says C<autodie>
+#pod I<recommends> C<IPC::System::Simple>, but not I<requires> it. Since C<IPC::System::Simple> is not
+#pod required, a CPAN client (either C<cpan>, or C<cpanp>, or C<cpanm>) does not insist on installing
+#pod C<IPC::System::Simple>. Thus, code may fail due to missed C<IPC::System::Simple>.
+#pod
+#pod Using a hint avoids this trouble:
+#pod
+#pod     use autodie ':all'; ## REQUIRE: IPC::System::Simple
+#pod
+#pod =example C<Pod::Weaver> plugin bundle
+#pod
+#pod A plugin bundle for C<Pod::Weaver> uses many modules indirectly. For example:
+#pod
+#pod     package Pod::Weaver::PluginBundle::Author::VDB;
+#pod     use Pod::Weaver::Config::Assembler;
+#pod     sub _p($) { Pod::Weaver::Config::Assembler->expand_package( @_ ) };
+#pod     sub mvp_bundle_config {
+#pod         my $me = '@Author::VDB';
+#pod         return (
+#pod             [ "$me/CorePrep",       _p( '@CorePrep'       ), {} ],
+#pod             [ "$me/SingleEncoding", _p( '-SingleEncoding' ), {} ],
+#pod             [ "$me/Transformer",    _p( '-Transformer'    ), {
+#pod                 'transformer' => 'List',
+#pod             } ],
+#pod             [ "$me/Name",           _p( 'Name'            ), {} ],
+#pod             [ "$me/Version",        _p( 'Version'         ), {
+#pod                 'format' => [ ... ],
+#pod             } ],
+#pod             ...
+#pod         );
+#pod     };
+#pod     1;
+#pod
+#pod In code above C<AutoPrereqs> detects explicit dependency on C<Pod::Weaver::Config::Assembler>
+#pod module. However, the bundle also implicitly uses:
+#pod
+#pod =for :list
+#pod * C<Pod::Weaver::PluginBundle::CorePrep>,
+#pod * C<Pod::Weaver::Plugin::SingleEncoding>,
+#pod * C<Pod::Weaver::Plugin::Transformer>,
+#pod * C<Pod::Weaver::Section::Name>,
+#pod * C<Pod::Weaver::Section::Version>, and
+#pod * C<Pod::Elemental::Transformer::List>.
+#pod
+#pod All these implicit dependencies are not detected by C<AutoPrereqs>. When you install your bundle,
+#pod CPAN client does not pull in all the dependencies, and you have to install them manually.
+#pod
+#pod This can be avoided by using hints:
+#pod
+#pod     sub mvp_bundle_config {
+#pod         my $me = '@Author::VDB';
+#pod         return (
+#pod             [ "$me/CorePrep",       _p( '@CorePrep'       ), {} ], ## REQUIRE: Pod::Weaver::PluginBundle::CorePrep
+#pod             [ "$me/SingleEncoding", _p( '-SingleEncoding' ), {} ], ## REQUIRE: Pod::Weaver::Plugin::SingleEncoding
+#pod             [ "$me/Transformer",    _p( '-Transformer'    ), {     ## REQUIRE: Pod::Weaver::Plugin::Transformer
+#pod                 'transformer' => 'List',                           ## REQUIRE: Pod::Elemental::Transformer::List
+#pod             } ],
+#pod             [ "$me/Name",           _p( 'Name'            ), {} ], ## REQUIRE: Pod::Weaver::Section::Name
+#pod             [ "$me/Version",        _p( 'Version'         ), {     ## REQUIRE: Pod::Weaver::Section::Version
+#pod                 'format' => [ ... ],
+#pod             } ],
+#pod             ...
+#pod         );
+#pod     };
+#pod
+#pod In such a case all the required dependencies are installed automatically with the bundle.
+#pod
+#pod Someone may notice that most of the implicitly used modules are from C<Pod::Weaver> distribution,
+#pod and so they should be are already installed. That's not completely true. For example,
+#pod C<Transformer> plugin was introduced in C<Pod::Weaver> 3.093530, older C<Pod::Weaver> versions do
+#pod not have it. If the bundle requires C<Pod::Weaver::Plugin::Transformer>, CPAN client detects missed
+#pod plugin and updates C<Pod::Weaver>.
+#pod
+#pod Also, the bundle may use third-party plugins and sections which are not part of C<Pod::Weaver>. So
+#pod requiring all the modules is a right thing to do.
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =caveat Keyword Spelling
+#pod
+#pod Be careful when writing "REQUIRE" keyword. Mistyped keywords are not recognized and silently
+#pod ignored.
+#pod
+#pod =caveat File Name in Error Messages
+#pod
+#pod C<Scanner::Hint> does its best to report error location properly. However, when using with
+#pod C<Dist::Zilla> and C<AutoPrereqs>, error in any file is reported as error in C<(*UNKNOWN*)> file,
+#pod for example:
+#pod
+#pod     'Module:Name' is not a valid module name at (*UNKNOWN*) line 3
+#pod
+#pod It caused by lack of cooperation between C<Dist::Zilla> and C<PPI>. C<PPI> does not allow to
+#pod specify file name for a C<PPI::Document> object constructed from a string, while C<Dist::Zilla>
+#pod does not pass file name to a C<PPI::Document> object via C<#line> directive. See:
+#pod
+#pod =for :list
+#pod *   L<< [Feature request] filename attribute to
+#pod     PPI::Document->new|https://github.com/adamkennedy/PPI/issues/180 >>
+#pod *   L<Dist::Zilla::Role::PPI: lack of filename|https://github.com/rjbs/Dist-Zilla/issues/499>
+#pod
+#pod =caveat Extended Regular Expressions
+#pod
+#pod Comments in extended regular expressions (i. e. expressions with C</x> modifier) are not
+#pod recognized. For example:
+#pod
+#pod     my $re = qr{
+#pod         ...     ## REQUIRE: ... # This is *not* a hint :-(
+#pod     }x;
+#pod
+#pod This is C<PPI> limitation, see L<PPI::Token::Comment>.
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod =for :list
+#pod = L<Dist::Zilla>
+#pod = L<Dist::Zilla::Plugin::AutoPrereqs>
+#pod = L<Perl::PrereqScanner>
+#pod = L<Perl::PrereqScanner::Scanner::Perl5>
+#pod = L<Perl::PrereqScanner::Scanner::Moose>
+#pod
+#pod =head1 COPYRIGHT AND LICENSE
+#pod
+#pod Copyright (C) 2015, 2016 Van de Bugger
+#pod
+#pod License GPLv3+: The GNU General Public License version 3 or later
+#pod <http://www.gnu.org/licenses/gpl-3.0.txt>.
+#pod
+#pod This is free software: you are free to change and redistribute it. There is
+#pod NO WARRANTY, to the extent permitted by law.
+#pod
+#pod
+#pod =cut
+
+#   ------------------------------------------------------------------------------------------------
+#
+#   file: doc/what.pod
+#
+#   This file is part of perl-Perl-PrereqScanner-Scanner-Hint.
+#
+#   ------------------------------------------------------------------------------------------------
+
+#pod =pod
+#pod
+#pod =encoding UTF-8
+#pod
+#pod =head1 WHAT?
+#pod
+#pod C<Perl::PrereqScanner::Scanner::Hint> (or just C<Scanner::Hint> for brevity) is a plugin for C<Perl::PrereqScanner>
+#pod tool. C<Scanner::Hint> looks for C<# REQUIRE: I<ModuleName> I<VersionRange>> comments in the code.
+#pod
+#pod =cut
+
+# end of file #
+#   ------------------------------------------------------------------------------------------------
+#
+#   file: doc/why.pod
+#
+#   This file is part of perl-Perl-PrereqScanner-Scanner-Hint.
+#
+#   ------------------------------------------------------------------------------------------------
+
+#pod =pod
+#pod
+#pod =encoding UTF-8
+#pod
+#pod =head1 WHY?
+#pod
+#pod I use C<Dist::Zilla> to build my distributions. I also use C<AutoPrereqs> plugin to populate
+#pod distribution's prerequisites. Usually all this stuff works great. But sometimes it does not because
+#pod dependencies are implicit or hidden (see L<Perl::PrereqScanner::Scanner::Hint::Manual/"EXAMPLES">). In such cases I
+#pod need to make implicit dependencies explicit. There are few ways to declare prerequisites manually:
+#pod
+#pod =over
+#pod
+#pod =item Using C<Prereqs> plugin
+#pod
+#pod Prerequisites can be listed manually in F<dist.ini> file by using C<Prereqs> plugin, e. g.:
+#pod
+#pod     [Prereqs]
+#pod         IPC::System::Simple
+#pod
+#pod However, I do not like such approach. If C<autodie> is used in source code and in tests, it
+#pod complicates C<Prereqs> usage:
+#pod
+#pod     [Prereqs/Runtime]
+#pod         -phase = runtime
+#pod         IPC::System::Simple
+#pod     [Prereqs/Test]
+#pod         -phase = test
+#pod         IPC::System::Simple
+#pod
+#pod Also, this approach breaks modularity and spreads implementation details. A module is required by a
+#pod source file, but requirement is specified in different file, F<dist.ini>. It complicates
+#pod maintenance because I have to keep multiple files in sync: it is so easy to drop using C<autodie>
+#pod (and so, implicit dependency on C<IPC::System::Simple>) in source code but forget to update
+#pod F<dist.ini>.
+#pod
+#pod =item Explicit C<use> as a hint for C<AutoPrereqs>
+#pod
+#pod Prerequisites can be listed manually by explicit C<use> statements:
+#pod
+#pod     use autodie ':all';
+#pod     use IPC::System::Simple qw{};   # AutoPrereqs hint: autodie uses it.
+#pod
+#pod In such a case dependency on C<IPC::System::Simple> is explicit and so detected by C<AutoPrereqs>.
+#pod
+#pod This approach looks better than using C<Prereqs> plugin:
+#pod
+#pod =for :list
+#pod 1.  C<AutoPrereqs> properly detects phase: if such code appears in test, it is a test prerequisite;
+#pod     if such code appears in a module — it is a runtime prerequisite.
+#pod 2.  It is compact — a "hint" occupies just a line.
+#pod 3.  Such a hint is located in source code, not in separate F<dist.ini>.
+#pod
+#pod However, this is approach is not ideal:
+#pod
+#pod =for :list
+#pod 1.  I have to use C<qw{}> with all the hints to avoid importing symbols.
+#pod 2.  Such a hint is an executable code, it can interfere with normal module loading, which may be
+#pod     lazy or argument-depending.
+#pod 3.  Hints cannot be located freely.
+#pod
+#pod For example, this layout (see L<Perl::PrereqScanner::Scanner::Hint::Manual/"C<Pod::Weaver> plugin bundle">) does not
+#pod work:
+#pod
+#pod     sub mvp_bundle_config {
+#pod         my $me = '@Author::VDB';
+#pod         return (
+#pod             [ "$me/CorePrep",       _p( '@CorePrep'       ), {} ], use Pod::Weaver::PluginBundle::CorePrep qw{},
+#pod             [ "$me/SingleEncoding", _p( '-SingleEncoding' ), {} ], use Pod::Weaver::Plugin::SingleEncoding qw{},
+#pod             ...
+#pod         );
+#pod     };
+#pod
+#pod …it causes C<"use" not allowed in expression> error, so I have to separate hints and code:
+#pod
+#pod     sub mvp_bundle_config {
+#pod         my $me = '@Author::VDB';
+#pod         use Pod::Weaver::PluginBundle::CorePrep qw{};
+#pod         use Pod::Weaver::Plugin::SingleEncoding qw{};
+#pod         ...
+#pod         return (
+#pod             [ "$me/CorePrep",       _p( '@CorePrep'       ), {} ],
+#pod             [ "$me/SingleEncoding", _p( '-SingleEncoding' ), {} ],
+#pod             ...
+#pod         );
+#pod     };
+#pod
+#pod which is not desirable in case of long list of plugins/sections: it is easy to add/drop a
+#pod plugin/section and forget to add/drop corresponding hint for C<AutoPrereqs>.
+#pod
+#pod =back
+#pod
+#pod Thus, I am not satisfied with existing solutions. I want to specify dependencies directly in source
+#pod code, I want to locate it freely, and it should not interfere with existing code. To meet these
+#pod requirements, dependency specification should be comment, not code. Like this one:
+#pod
+#pod    use autodie ':all'; ## REQUIRE: IPC::System::Simple
+#pod
+#pod =cut
+
+# end of file #
+
+
+# end of file #
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perl::PrereqScanner::Scanner::Hint::Manual - C<Scanner::Hint> user manual
+
+=head1 VERSION
+
+Version v0.1.1, released on 2016-12-28 20:18 UTC.
+
+=head1 WHAT?
+
+C<Perl::PrereqScanner::Scanner::Hint> (or just C<Scanner::Hint> for brevity) is a plugin for C<Perl::PrereqScanner>
+tool. C<Scanner::Hint> looks for C<# REQUIRE: I<ModuleName> I<VersionRange>> comments in the code.
+
+This is C<Scanner::Hint> user manual. Read this if you want to specify implicit prerequisites directly in Perl code.
+
+If you are going to hack or extend C<Perl-PrereqScanner-Scanner-Hint>, read the L<module
+documentation|Perl::PrereqScanner::Scanner::Hint>. General topics like getting source, building, installing, bug
+reporting and some others are covered in the F<README>.
+
+=for test_synopsis BEGIN { die "SKIP: Not Perl code.\n" };
+
+=head1 SYNOPSIS
+
+In F<dist.ini>:
+
+    ...
+    [AutoPrereqs]
+        extra_scanners = Hint
+    ...
+
+In Perl code:
+
+    ...
+    use autodie ':all'; ## REQUIRE: IPC::System::Simple
+    ...
+
+=head1 DESCRIPTION
+
+=head2 Intro
+
+C<Dist::Zilla> is a tool for building distributions. C<Dist::Zilla>'s plugin C<AutoPrereqs>
+automatically extracts prerequisites from distribution's sources, tests, etc. In great majority
+of cases all you need just two lines
+
+    [AutoPrereqs]
+    [MetaJSON]
+
+in your F<dist.ini> file to get C<prereq> key of distribution F<META.json> populated with your
+distribution requirements. For example, if your module uses C<Module::Name>:
+
+    use Module::Name 0.008;
+
+C<AutoPrereqs> finds this statement and adds requirement C<< "Module::Name" => "0.008" >> to
+distribution F<META.json>.
+
+When user installs your module from CPAN, CPAN client (either C<cpan>, or C<cpanp>, or C<cpanm>)
+makes sure all the requirements are satisfied, so your module can be installed and run smoothly.
+
+C<AutoPrereqs> uses C<Perl::PrereqScanner> for extracting prerequisites from the distribution
+files. C<Perl::PrereqScanner>, in turn, uses scanners for scan the files. Few most frequently used
+scanners are bundled with the C<Perl::PrereqScanner> and utilized by default. For example,
+C<Perl::PrereqScanner::Scanner::Perl5> looks for Perl C<use> and C<require> statements,
+C<Perl::PrereqScanner::Scanner::Moose> looks for Moose's C<extends> and C<with> keywords, etc.
+
+C<Perl::PrereqScanner::Scanner::Hint> is an additional scanner for C<Perl::PrereqScanner>. In
+contrast to other scanners, it does not look into Perl I<code> but looks into Perl I<comments>. It
+searches for I<hints> leaved by the programmer.
+
+=head2 Hints
+
+A hint is a comment starting with I<two hashes>, followed by C<REQUIRE> keyword, I<colon>, I<module
+name>, and optional I<version range> and I<comment>, e. g.:
+
+    ## REQUIRE: Assa >= 1.2, != 1.5 # 1.5 has a nasty bug
+
+C<REQUIRES> is an alternative keyword:
+
+    ## REQUIRES: Assa >= 1.2, != 1.5 # ditto
+
+Keyword must be in upper case. Number of whitespaces between elements (hash, keyword, colon, etc)
+does not matter:
+
+    ##REQUIRE:...
+    ## REQUIRE: ...
+    ##  REQUIRE  :  ...
+
+A hint can be a standalone comment:
+
+    ## REQUIRE: ...
+
+or trailing one:
+
+    use Assa; ## REQUIRE: Assa != 1.5
+
+Hashes, keyword and colon are critical for recognizing a hint. Following examples are I<not> hints:
+
+    ### REQUIRE: ... # More than two hashes
+    ##~ REQUIRE: ... # Extra character between hashes and keyword
+    ##  Require: ... # Keyword is not in upper case
+    ##  REQUIRE  ... # No colon
+
+…and so, all such lines are silently ignored. However, if a comment is recognized as a hint, it is
+thoroughly validated. If a hint is not valid, C<Scanner::Hint> issues an error message and stops
+scanning.
+
+The first word (up to the first whitespace or hash or end-of-line) must be a valid module name:
+
+    ## REQUIRE: Module:Name  # Error: 'Module:Name' is not a valid module name
+    ## REQUIRE: Module-Name  # Error: 'Module-Name' is not a valid module name
+    ## REQUIRE: "ModuleName" # Error: '"ModuleName"' is not a valid module name
+
+Version range (everything after the module name and up to comment or end-of-line) must be valid
+too:
+
+    ## REQUIRE: Module::Name > 1.5 < 2.0 # Error!
+    ## REQUIRE: Module::Name = 1.5       # Error!
+
+See L<CPAN::Meta::Spec/"Version Ranges"> for syntax and semantics of version ranges.
+
+Empty version range is allowed, it stands for default value C<0> which means "any version":
+
+    ## REQUIRE: Assa   # any version is ok
+    ## REQUIRE: Assa 0 # ditto
+
+And, as you already noticed, a hash starts a comment:
+
+    ## REQUIRE: IPC::System::Simple # used by autodie
+
+=head2 Using C<Scanner::Hint> with C<Dist::Zilla> and C<AutoPrereqs>
+
+C<AutoPrereqs> has C<extra_scanners> option which can be used for adding extra scanners. This
+option can be used for enabling C<Scanner::Hint> in your F<dist.ini>:
+
+    [AutoPrereqs]
+        extra_scanners = Hint
+
+=head1 EXAMPLES
+
+All the examples below assume using C<Dist::Zilla> with C<AutoPrereqs> plugin, and enabled
+C<Scanner::Hint>, as shown in L<< /"Using C<Scanner::Hint> with C<Dist::Zilla> and C<AutoPrereqs>"
+>> section.
+
+=head2 C<autodie>
+
+If pragma C<autodie> is used with C<':system'> or C<':all'> argument, e. g.:
+
+    use autodie ':all';
+
+C<autodie> loads C<IPC::System::Simple> module. However, C<autodie>'s F<META.json> says C<autodie>
+I<recommends> C<IPC::System::Simple>, but not I<requires> it. Since C<IPC::System::Simple> is not
+required, a CPAN client (either C<cpan>, or C<cpanp>, or C<cpanm>) does not insist on installing
+C<IPC::System::Simple>. Thus, code may fail due to missed C<IPC::System::Simple>.
+
+Using a hint avoids this trouble:
+
+    use autodie ':all'; ## REQUIRE: IPC::System::Simple
+
+=head2 C<Pod::Weaver> plugin bundle
+
+A plugin bundle for C<Pod::Weaver> uses many modules indirectly. For example:
+
+    package Pod::Weaver::PluginBundle::Author::VDB;
+    use Pod::Weaver::Config::Assembler;
+    sub _p($) { Pod::Weaver::Config::Assembler->expand_package( @_ ) };
+    sub mvp_bundle_config {
+        my $me = '@Author::VDB';
+        return (
+            [ "$me/CorePrep",       _p( '@CorePrep'       ), {} ],
+            [ "$me/SingleEncoding", _p( '-SingleEncoding' ), {} ],
+            [ "$me/Transformer",    _p( '-Transformer'    ), {
+                'transformer' => 'List',
+            } ],
+            [ "$me/Name",           _p( 'Name'            ), {} ],
+            [ "$me/Version",        _p( 'Version'         ), {
+                'format' => [ ... ],
+            } ],
+            ...
+        );
+    };
+    1;
+
+In code above C<AutoPrereqs> detects explicit dependency on C<Pod::Weaver::Config::Assembler>
+module. However, the bundle also implicitly uses:
+
+=over 4
+
+=item *
+
+C<Pod::Weaver::PluginBundle::CorePrep>,
+
+=item *
+
+C<Pod::Weaver::Plugin::SingleEncoding>,
+
+=item *
+
+C<Pod::Weaver::Plugin::Transformer>,
+
+=item *
+
+C<Pod::Weaver::Section::Name>,
+
+=item *
+
+C<Pod::Weaver::Section::Version>, and
+
+=item *
+
+C<Pod::Elemental::Transformer::List>.
+
+=back
+
+All these implicit dependencies are not detected by C<AutoPrereqs>. When you install your bundle,
+CPAN client does not pull in all the dependencies, and you have to install them manually.
+
+This can be avoided by using hints:
+
+    sub mvp_bundle_config {
+        my $me = '@Author::VDB';
+        return (
+            [ "$me/CorePrep",       _p( '@CorePrep'       ), {} ], ## REQUIRE: Pod::Weaver::PluginBundle::CorePrep
+            [ "$me/SingleEncoding", _p( '-SingleEncoding' ), {} ], ## REQUIRE: Pod::Weaver::Plugin::SingleEncoding
+            [ "$me/Transformer",    _p( '-Transformer'    ), {     ## REQUIRE: Pod::Weaver::Plugin::Transformer
+                'transformer' => 'List',                           ## REQUIRE: Pod::Elemental::Transformer::List
+            } ],
+            [ "$me/Name",           _p( 'Name'            ), {} ], ## REQUIRE: Pod::Weaver::Section::Name
+            [ "$me/Version",        _p( 'Version'         ), {     ## REQUIRE: Pod::Weaver::Section::Version
+                'format' => [ ... ],
+            } ],
+            ...
+        );
+    };
+
+In such a case all the required dependencies are installed automatically with the bundle.
+
+Someone may notice that most of the implicitly used modules are from C<Pod::Weaver> distribution,
+and so they should be are already installed. That's not completely true. For example,
+C<Transformer> plugin was introduced in C<Pod::Weaver> 3.093530, older C<Pod::Weaver> versions do
+not have it. If the bundle requires C<Pod::Weaver::Plugin::Transformer>, CPAN client detects missed
+plugin and updates C<Pod::Weaver>.
+
+Also, the bundle may use third-party plugins and sections which are not part of C<Pod::Weaver>. So
+requiring all the modules is a right thing to do.
+
+=head1 CAVEATS
+
+=head2 Keyword Spelling
+
+Be careful when writing "REQUIRE" keyword. Mistyped keywords are not recognized and silently
+ignored.
+
+=head2 File Name in Error Messages
+
+C<Scanner::Hint> does its best to report error location properly. However, when using with
+C<Dist::Zilla> and C<AutoPrereqs>, error in any file is reported as error in C<(*UNKNOWN*)> file,
+for example:
+
+    'Module:Name' is not a valid module name at (*UNKNOWN*) line 3
+
+It caused by lack of cooperation between C<Dist::Zilla> and C<PPI>. C<PPI> does not allow to
+specify file name for a C<PPI::Document> object constructed from a string, while C<Dist::Zilla>
+does not pass file name to a C<PPI::Document> object via C<#line> directive. See:
+
+=over 4
+
+=item *
+
+L<< [Feature request] filename attribute to PPI::Document->new|https://github.com/adamkennedy/PPI/issues/180 >>
+
+=item *
+
+L<Dist::Zilla::Role::PPI: lack of filename|https://github.com/rjbs/Dist-Zilla/issues/499>
+
+=back
+
+=head2 Extended Regular Expressions
+
+Comments in extended regular expressions (i. e. expressions with C</x> modifier) are not
+recognized. For example:
+
+    my $re = qr{
+        ...     ## REQUIRE: ... # This is *not* a hint :-(
+    }x;
+
+This is C<PPI> limitation, see L<PPI::Token::Comment>.
+
+=head1 WHY?
+
+I use C<Dist::Zilla> to build my distributions. I also use C<AutoPrereqs> plugin to populate
+distribution's prerequisites. Usually all this stuff works great. But sometimes it does not because
+dependencies are implicit or hidden (see L<Perl::PrereqScanner::Scanner::Hint::Manual/"EXAMPLES">). In such cases I
+need to make implicit dependencies explicit. There are few ways to declare prerequisites manually:
+
+=over
+
+=item Using C<Prereqs> plugin
+
+Prerequisites can be listed manually in F<dist.ini> file by using C<Prereqs> plugin, e. g.:
+
+    [Prereqs]
+        IPC::System::Simple
+
+However, I do not like such approach. If C<autodie> is used in source code and in tests, it
+complicates C<Prereqs> usage:
+
+    [Prereqs/Runtime]
+        -phase = runtime
+        IPC::System::Simple
+    [Prereqs/Test]
+        -phase = test
+        IPC::System::Simple
+
+Also, this approach breaks modularity and spreads implementation details. A module is required by a
+source file, but requirement is specified in different file, F<dist.ini>. It complicates
+maintenance because I have to keep multiple files in sync: it is so easy to drop using C<autodie>
+(and so, implicit dependency on C<IPC::System::Simple>) in source code but forget to update
+F<dist.ini>.
+
+=item Explicit C<use> as a hint for C<AutoPrereqs>
+
+Prerequisites can be listed manually by explicit C<use> statements:
+
+    use autodie ':all';
+    use IPC::System::Simple qw{};   # AutoPrereqs hint: autodie uses it.
+
+In such a case dependency on C<IPC::System::Simple> is explicit and so detected by C<AutoPrereqs>.
+
+This approach looks better than using C<Prereqs> plugin:
+
+=over 4
+
+=item 1
+
+C<AutoPrereqs> properly detects phase: if such code appears in test, it is a test prerequisite; if such code appears in a module — it is a runtime prerequisite.
+
+=item 2
+
+It is compact — a "hint" occupies just a line.
+
+=item 3
+
+Such a hint is located in source code, not in separate F<dist.ini>.
+
+=back
+
+However, this is approach is not ideal:
+
+=over 4
+
+=item 1
+
+I have to use C<qw{}> with all the hints to avoid importing symbols.
+
+=item 2
+
+Such a hint is an executable code, it can interfere with normal module loading, which may be lazy or argument-depending.
+
+=item 3
+
+Hints cannot be located freely.
+
+=back
+
+For example, this layout (see L<Perl::PrereqScanner::Scanner::Hint::Manual/"C<Pod::Weaver> plugin bundle">) does not
+work:
+
+    sub mvp_bundle_config {
+        my $me = '@Author::VDB';
+        return (
+            [ "$me/CorePrep",       _p( '@CorePrep'       ), {} ], use Pod::Weaver::PluginBundle::CorePrep qw{},
+            [ "$me/SingleEncoding", _p( '-SingleEncoding' ), {} ], use Pod::Weaver::Plugin::SingleEncoding qw{},
+            ...
+        );
+    };
+
+…it causes C<"use" not allowed in expression> error, so I have to separate hints and code:
+
+    sub mvp_bundle_config {
+        my $me = '@Author::VDB';
+        use Pod::Weaver::PluginBundle::CorePrep qw{};
+        use Pod::Weaver::Plugin::SingleEncoding qw{};
+        ...
+        return (
+            [ "$me/CorePrep",       _p( '@CorePrep'       ), {} ],
+            [ "$me/SingleEncoding", _p( '-SingleEncoding' ), {} ],
+            ...
+        );
+    };
+
+which is not desirable in case of long list of plugins/sections: it is easy to add/drop a
+plugin/section and forget to add/drop corresponding hint for C<AutoPrereqs>.
+
+=back
+
+Thus, I am not satisfied with existing solutions. I want to specify dependencies directly in source
+code, I want to locate it freely, and it should not interfere with existing code. To meet these
+requirements, dependency specification should be comment, not code. Like this one:
+
+   use autodie ':all'; ## REQUIRE: IPC::System::Simple
+
+=for comment ---------------------------------------------------------------------------------------
+
+=for comment ---------------------------------------------------------------------------------------
+
+=for comment ---------------------------------------------------------------------------------------
+
+=for comment ---------------------------------------------------------------------------------------
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Dist::Zilla>
+
+=item L<Dist::Zilla::Plugin::AutoPrereqs>
+
+=item L<Perl::PrereqScanner>
+
+=item L<Perl::PrereqScanner::Scanner::Perl5>
+
+=item L<Perl::PrereqScanner::Scanner::Moose>
+
+=back
+
+=head1 AUTHOR
+
+Van de Bugger <van.de.bugger@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015, 2016 Van de Bugger
+
+License GPLv3+: The GNU General Public License version 3 or later
+<http://www.gnu.org/licenses/gpl-3.0.txt>.
+
+This is free software: you are free to change and redistribute it. There is
+NO WARRANTY, to the extent permitted by law.
+
+=cut

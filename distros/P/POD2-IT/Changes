@@ -1,0 +1,87 @@
+Revision history for Perl extension POD2::IT.
+
+Legenda:
+   + = new feature
+   ! = updated feature/bug fix
+   * = incompatible changes
+   - = removed feature
+
+0.13 2009/08/25 20:00:00 
+	+ Added perlreftut.pod [larsen, polettix, bepi]
+	! Fixes to perlfunc.pod, perlfaq2, perlfaq6 and perlfaq9 [dree]
+
+0.12 Mon Aug 18 00:00:00 2008
+	+ Added perlpacktut.pod [polettix, dree]
+	+ Added perlsub.pod [polettix, dree]
+	+ Added perltoot.pod [raffaellog, dree]
+	+ Added perlbot.pod [raffaellog, dree] 
+	+ Added perlopentut.podi [polettix, dree]
+	+ Added perlbook.pod [ludan, dree] 
+	+ Added perlfaq.pod [polettix, dree]
+	+ Added perlvar.pod [polettix, shishii]
+	! Minor fixes to all pods
+
+0.11 Sat Mar 25 12:00:00 2006
+	+ Added perl.pod [raffaellog, dree]
+	+ Added perlboot.pod [dree, dakkar, osfameron]
+	+ Added perlcheat.pod [frodo72, dree]
+	+ Added perlipc.pod translation [frodo72]
+	+ Added perlmodinstall.pod [raffaellog]
+	+ Added perlmodstyle.pod [raffaellog, dree]
+	+ Added perlref.pod [ludan, dree, frodo72]
+	+ Added perlrequick.pod [dree, shishii]
+	+ Added perlsyn.pod [kral, frodo72, dree]
+	+ Added resources/update-and-notify.pl script [frod72] 
+	! Updated all translated pods to 5.8.8 [dree, frodo72]
+	! Minor fixes to all pods
+	! Added 'COPYRIGHT AND LICENCE' section to IT.pm [bepi]
+
+0.10 Sat Nov 19 12:00:00 2005
+	+ Added perlmod.pod translation [frodo72]
+	+ Added perldata.pod translation [frodo72]
+	+ Added perlnewmod.pod translation [dree]
+	+ Added perlxstut.pod translation [frodo72]
+	! resources/podenc.pl fixes [frodo72]
+	! Minor fixes to perlfaq4, perlfaq7, perlfunc, perlreref
+	! Added 'TRANSLATION' section to all pods, containing
+	  some infos about pod translator(s) and reviewer(s) [bepi]
+
+0.09  Wed Sep 09 18:00:00 2005
+	+ Added perlunicode.pod translation [dakkar]
+	+ Added resources/podenc.pl script in order to encode 
+	  italian characters with E<> sequence [dakkar, bepi]
+	! Updated E<> pod entities [bepi]
+	! Updated IT.pm pod documentation [bepi]
+	! Fixed Changes and README typos [bepi]
+
+0.08  Fri Aug 19 10:00:00 2005
+	+ Added perlreref.pod (5.8.7) translation [gmax]
+	+ Added perlintro.pod (5.8.7) tranlsation [dree, larsen]
+	+ Minor fixes to perlfaq1, perlfaq7 perlfaq8 and perlfaq9 [dree]
+	! Improved IT.pm pod documentation [bepi]
+
+0.07  Mon Aug 01 12:00:00 2005  
+	! Updated perlboot.pod to 5.8.7 [osfameron]
+	! Updated perlfunc.pod to 5.8.7 [dree]
+	! Updated perlfaq[1..9] to 5.8.7 [dree]
+	! Updated perlrequick to 5.8.7 [dree]
+	! Added all nicknames contributors to Changes/README and so on [bepi]
+
+0.06  Mon Jul 25 19:00:00 2005
+	+ Added 'search_perlfunc_re' function to POD2::IT.pm in order
+	  to use it with patched version of Pod::Perldoc. This allow
+	  to use -f and -q perldoc switches [bepi]
+	+ Added patches/ directory containing patches over Pod::Perldoc [bepi]
+
+0.05  Sat Jul 23 16:00:00 2005
+	+ First CPAN release  [bepi]
+
+0.04  Wed Apr 17 16:00:00 2004
+	+ perlfunc finished [dree]
+
+0.02  Wed Jul 16 11:00:00 2003
+	+ pod2it new Dump [bepi]
+
+0.01  Thu Jun 19 01:29:11 2003
+	+ original version; created by h2xs 1.21 with options
+		-A -X -n POD2::IT by Enrico Sorcinelli <bepi@perl.it>

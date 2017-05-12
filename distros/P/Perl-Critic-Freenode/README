@@ -1,0 +1,146 @@
+NAME
+
+    Perl::Critic::Freenode - Perl::Critic policies inspired by #perl on
+    freenode IRC
+
+SYNOPSIS
+
+      $ perlcritic --theme freenode script.pl
+      $ perlcritic --theme freenode lib/
+      
+      # .perlcriticrc
+      theme = freenode
+      severity = 1
+
+DESCRIPTION
+
+    A set of Perl::Critic policies to enforce the practices generally
+    recommended by the denizens of #perl on Freenode IRC
+    <https://freenode.net/>. Because this policy "theme" is designed to be
+    used with zero configuration on the command line, some duplication will
+    occur if it is used in combination with core Perl::Critic policies.
+
+AFFILIATION
+
+    This module has no functionality, but instead contains documentation
+    for this distribution and acts as a means of pulling other modules into
+    a bundle. All of the Policy modules contained herein will have an
+    "AFFILIATION" section announcing their participation in this grouping.
+
+POLICIES
+
+    Perl::Critic::Policy::Freenode::AmpersandSubCalls
+
+      Don't use & to call subroutines
+
+    Perl::Critic::Policy::Freenode::ArrayAssignAref
+
+      Don't assign an anonymous arrayref to an array
+
+    Perl::Critic::Policy::Freenode::BarewordFilehandles
+
+      Don't use bareword filehandles other than built-ins
+
+    Perl::Critic::Policy::Freenode::ConditionalDeclarations
+
+      Don't declare variables conditionally
+
+    Perl::Critic::Policy::Freenode::ConditionalImplicitReturn
+
+      Don't end a subroutine with a conditional block
+
+    Perl::Critic::Policy::Freenode::DeprecatedFeatures
+
+      Avoid features that have been deprecated or removed from Perl
+
+    Perl::Critic::Policy::Freenode::DiscouragedModules
+
+      Various modules discouraged from use
+
+    Perl::Critic::Policy::Freenode::DollarAB
+
+      Don't use $a or $b as variable names outside sort()
+
+    Perl::Critic::Policy::Freenode::Each
+
+      Don't use each() to iterate through a hash
+
+    Perl::Critic::Policy::Freenode::EmptyReturn
+
+      Don't use return with no arguments
+
+    Perl::Critic::Policy::Freenode::IndirectObjectNotation
+
+      Don't call methods indirectly
+
+    Perl::Critic::Policy::Freenode::ModPerl
+
+      Don't use mod_perl to write web applications
+
+    Perl::Critic::Policy::Freenode::OpenArgs
+
+      Always use the three-argument form of open()
+
+    Perl::Critic::Policy::Freenode::OverloadOptions
+
+      Don't use overload without specifying a bool overload and enabling
+      fallback
+
+    Perl::Critic::Policy::Freenode::POSIXImports
+
+      Don't use POSIX without specifying an import list
+
+    Perl::Critic::Policy::Freenode::Prototypes
+
+      Don't use function prototypes
+
+    Perl::Critic::Policy::Freenode::StrictWarnings
+
+      Always use strict and warnings, or a module that imports these
+
+    Perl::Critic::Policy::Freenode::Threads
+
+      Interpreter-based threads are officially discouraged
+
+    Perl::Critic::Policy::Freenode::Wantarray
+
+      Don't write context-sensitive functions using wantarray()
+
+    Perl::Critic::Policy::Freenode::WarningsSwitch
+
+      Scripts should not use the -w switch on the shebang line
+
+    Perl::Critic::Policy::Freenode::WhileDiamondDefaultAssignment
+
+      Don't use while with implicit assignment to $_
+
+CONFIGURATION AND ENVIRONMENT
+
+    All policies included are in the "freenode" theme. See the Perl::Critic
+    documentation for how to make use of this.
+
+AUTHOR
+
+    Dan Book, dbook@cpan.org
+
+CONTRIBUTORS
+
+    Graham Knop (haarg)
+
+    H.Merijn Brand (Tux)
+
+    John SJ Anderson (genehack)
+
+    Matt S Trout (mst)
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2015, Dan Book.
+
+    This library is free software; you may redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+SEE ALSO
+
+    Perl::Critic
+

@@ -1,0 +1,145 @@
+[AGENT]
+
+Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en-US; rv:1.0.1) Gecko/20020909
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'PPC Mac OS X',
+'extras'           => ['Macintosh'],
+'version_raw'      => '5.0',
+'lang'             => 'en-US',
+'mozilla'          => [ '1.0.1','1.000001'],
+'version'          => '5.000',
+'name'             => 'Mozilla',
+'toolkit'          => ['Gecko','20020909','20020909.000']
+
+[AGENT]
+
+Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.2a) Gecko/20020910
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Windows XP',
+'extras'           => ['Windows'],
+'version_raw'      => '5.0',
+'lang'             => 'en-US',
+'mozilla'          => [ '1.2','1.200'],
+'version'          => '5.000',
+'name'             => 'Mozilla',
+'toolkit'          => ['Gecko','20020910','20020910.000']
+
+[AGENT]
+
+Mozilla/5.0 (Windows; U; Windows NT 5.1; en-US; rv:1.1) Gecko/20020826
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Windows XP',
+'extras'           => ['Windows'],
+'version_raw'      => '5.0',
+'lang'             => 'en-US',
+'mozilla'          => [ '1.1','1.100'],
+'version'          => '5.000',
+'name'             => 'Mozilla',
+'toolkit'          => ['Gecko','20020826','20020826.000']
+
+[AGENT]
+
+Mozilla/5.0 (X11; U; Linux i686; en-US; SkipStone 0.8.3) Gecko/20020913
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Linux i686',
+'extras'           => ['X11','en-US','SkipStone 0.8.3'],
+'version_raw'      => '5.0',
+'version'          => '5.000',
+'name'             => 'Mozilla',
+'toolkit'          => ['Gecko','20020913','20020913.000']
+
+[AGENT]
+
+Mozilla/5.0 (X11; U; Linux 2.4.3-20mdk i586; en-US; rv:0.9.1) Gecko/20010611
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Linux 2.4.3-20mdk i586',
+'extras'           => ['X11'],
+'version_raw'      => '5.0',
+'lang'             => 'en-US',
+'mozilla'          => [ '0.9.1','0.009001'],
+'version'          => '5.000',
+'name'             => 'Mozilla',
+'toolkit'          => ['Gecko','20010611','20010611.000']
+
+[AGENT]
+
+Mozilla/5.0 (Windows; U; WinNT4.0; en-US; rv:1.2a) Gecko/20020910
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Windows NT 4.0',
+'extras'           => ['Windows'],
+'version_raw'      => '5.0',
+'lang'             => 'en-US',
+'mozilla'          => [ '1.2','1.200'],
+'version'          => '5.000',
+'name'             => 'Mozilla',
+'toolkit'          => ['Gecko','20020910','20020910.000']
+
+[AGENT]
+
+Mozilla/5.0 (Windows; U; WinNT4.0; en-US; rv:1.0.1) Gecko/20020826
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Windows NT 4.0',
+'extras'           => ['Windows'],
+'version_raw'      => '5.0',
+'lang'             => 'en-US',
+'mozilla'          => [ '1.0.1','1.000001'],
+'version'          => '5.000',
+'name'             => 'Mozilla',
+'toolkit'          => ['Gecko','20020826','20020826.000']
+
+[AGENT]
+
+Mozilla/5.0 (Windows; U; Win95; en-US; rv:1.1b) Gecko/20020721
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'os'               => 'Windows 95',
+'extras'           => ['Windows'],
+'version_raw'      => '5.0',
+'lang'             => 'en-US',
+'mozilla'          => [ '1.1','1.100'],
+'version'          => '5.000',
+'name'             => 'Mozilla',
+'toolkit'          => ['Gecko','20020721','20020721.000'],
+
+[AGENT]
+
+Mozilla/5.0 (Windows; U; WinNT; en; Stable) Gecko/20020911 Beonex/0.8.1-stable
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'lang'             => 'en',
+'extras'           => ['WinNT','Stable'],
+'version_raw'      => '0.8.1-stable',
+'version'          => '0.008001',
+'name'             => 'Mozilla',
+'toolkit'          => ['Gecko','20020911','20020911.000'],
+'original_name'    => 'Beonex',
+'os'               => 'Windows',
+
+[AGENT]
+
+Mozilla/5.001 (windows; U; NT4.0; en-us) Gecko/25250101
+
+'parser'           => 'mozilla_family:generic',
+'strength'         => 'U',
+'extras'           => ['windows','en-us'],
+'version_raw'      => '5.001',
+'version'          => '5.001',
+'name'             => 'Mozilla',
+'os'               => 'Windows NT 4.0',
+'toolkit'          => ['Gecko','25250101','25250101.000']

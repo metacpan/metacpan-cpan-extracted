@@ -1,0 +1,76 @@
+NAME
+
+    POE::Component::NetSNMP::agent - AgentX clients with NetSNMP::agent and POE
+
+
+DESCRIPTION
+
+    This module is a thin wrapper around C<NetSNMP::agent> to use it within
+    a POE-based program, its basic use being the same as you would do
+    without POE: C<register> one or more OIDs with their associated callbacks.
+
+    C<POE::Component::NetSNMP::agent> also provides a simpler mechanism,
+    similar to C<SNMP::Extension::PassPersist>, if you just want to handle
+    C<get> and C<getnext> requests over an OID tree: set the C<Autohandle>
+    option to the a OID, then add OID entries with C<add_oid_entry> or
+    C<add_oid_tree>.
+
+    Note that most of the API is available both as POE events and as object
+    methods.
+
+    This module can use C<Sort::Key::OID> when it is available, for sorting
+    OIDs faster than with the internal pure Perl function.
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    Alternatively, to install with Module::Build, you can use the
+    following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc POE::Component::NetSNMP::agent
+
+    You can also look for information at:
+
+    * Search CPAN
+        http://search.cpan.org/dist/POE-Component-NetSNMP-agent/
+
+    * Meta CPAN
+        https://metacpan.org/release/POE-Component-NetSNMP-agent
+
+    * RT: CPAN's request tracker (report bugs here)
+        https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-NetSNMP-agent
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/POE-Component-NetSNMP-agent
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/POE-Component-NetSNMP-agent
+
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2011 Sebastien Aperghis-Tramoni.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

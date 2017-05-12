@@ -1,0 +1,36 @@
+PeopleSoft version 1.01
+=======================
+
+This set of modules provides functions which facilitate work with
+PeopleSoft's ERP applications.
+
+The modules are:
+
+	o PeopleSoft		Overall documentation and generic 
+				functions.
+
+	o PeopleSoft::Tools	SQR profiler
+
+	o PeopleSoft::EPM	Functions to administer EPM
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+These modules were developed using PeopleTools version 8.1x and 8.4x.
+The environment uses Oracle and a few of the functions use Oracle's
+system tables and will have to be modified to work with a different
+DBMS.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003 William Goedicke. All rights reserved. This program
+is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.

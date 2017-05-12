@@ -1,0 +1,62 @@
+%{
+=head1 SYNOPIS
+
+=head1 SYNOPSIS
+
+Compile it with 
+
+            eyapp -b '' typicalrr_fixed
+
+Execute it with:
+
+   ./typicalrr_fixed.pm -d -t
+
+Try inputs C<4 5>,  C<a b> and C<4 5 a b>.
+
+
+=head1 SEE ALSO
+
+see  typicalrr.eyp, typicalrr2.eyp and correcttypicalrr.eyp 
+
+=cut
+
+use base q{RRTail}; 
+
+%}
+%right ID NUM
+
+%tree
+
+%%
+s: 
+     %name EMPTY
+     /* empty */
+   | %name LIST
+      ws s 
+   | %name LIST
+      ns s 
+ ;
+
+ws:
+     %name ID
+     ID
+   | %name IDS
+     ws ID
+;
+
+ns:
+    %name NUM
+    NUM
+  | %name NUMS
+    NUM ns
+;
+
+%%
+
+unless (caller()) {
+  $Parse::Eyapp::Node::INDENT = 1;
+  my $prompt = 'Try "4 5 a b 2 3" '.
+               '(press <CR><CTRL-D> to finish): ';
+  __PACKAGE__->main($prompt) 
+}
+

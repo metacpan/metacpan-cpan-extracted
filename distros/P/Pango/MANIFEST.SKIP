@@ -1,0 +1,9 @@
+\.bak$
+\.git
+blib
+build
+^Makefile$
+^Pango\.bs$
+^pm_to_blib$
+^xs/.*\.c$
+^xs/.*\.o$

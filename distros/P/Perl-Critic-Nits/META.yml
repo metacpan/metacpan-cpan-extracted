@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Perl-Critic-Nits
+version:             v1.0.0
+abstract:            policies of nits I like to pick.
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Perl::Critic:                  1.07
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Kent Cowgill <kent@c2group.net>

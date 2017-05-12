@@ -1,0 +1,29 @@
+Physics-Udunits2
+================
+
+This modules is a OO-interface to Unidata's udunits-2 C-unit library.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ udunits-2 package from http://www.unidata.ucar.edu/software/udunits/ 
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Heiko Klein
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

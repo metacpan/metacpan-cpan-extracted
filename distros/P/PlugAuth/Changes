@@ -1,0 +1,157 @@
+Revision history for PlugAuth
+
+0.35      2016-11-28 14:31:26 -0500
+  - Remove dependency on Log::Log4perl::CommandLine
+
+0.34      2016-07-20 14:51:49 -0400
+  - Mojo 7.x compatability
+
+0.33      2015-12-07 19:54:31 -0500
+  - Removed deprecated items in preperation for
+    release of Clustericious 1.11.
+  - Fixed test broken with current Clustericious dev
+    (expected to be included with Clustericious 1.11)
+
+0.32      2015-11-30 15:32:53 -0500
+  - Remove deprecated use of JSON configuration files
+    from test suite.
+  - Remove dependency on Test::Differences
+  - Migrate from Mojo::JSON to JSON::MaybeXS
+  - Moved repository to clustericious org on github
+    (updated meta appropriately)
+
+0.31      2015-11-11 13:21:03 -0500
+  - Silence warnings coming from FlatAuth
+  - Fix bug where DisableGroup plugin would return 500
+    error if the user was invalid
+
+0.30      2015-03-13 03:53:43 -0400
+  - Mojolicious 6.x compatability
+
+0.29      2015-01-29 13:04:44 -0500
+  - Recent Mojo compat test fix
+
+0.28      2014-12-19 11:38:00 -0500
+  - Merge PlugAuth::Plugin::Audit into this distro.
+  - Merge PlugAuth::Client distro into this distro.
+
+0.27      2014-12-09 10:24:00 America/New_York
+  - use functional Mojo::JSON API
+    the OO version was deprecated
+
+0.26      2014-04-09 12:28:19 America/New_York
+  - remove harness detection from test code
+
+0.25      2014-02-24 10:29:37 America/New_York
+  - alter logging, make authentication INFO
+    instead of DEBUG
+
+0.24      2014-01-22 17:57:53 America/New_York
+  - Mojo 4.50 compat
+
+0.23      2013-08-06 08:42:11 America/New_York
+  - promote to production
+
+0.22_01   2013-07-21 18:25:29 America/New_York
+  - better diagnostics in new tests
+
+0.22      2013-07-19 22:55:33 America/New_York
+  - require Test::Clustericious::Cluster 0.08 for MSWin32 fixes
+
+0.21      2013-07-19 16:19:45 America/New_York
+  - promote to production
+
+0.20_04   2013-07-19 11:14:19 America/New_York
+  - allow create_user_cb to work even when implemented by a auth plugin NOT on the head
+
+0.20_03   2013-07-19 09:20:15 America/New_York
+  - added ability to assign groups to a user when user is created
+
+0.20_02   2013-07-17 18:57:08 America/New_York
+  - add disable_on_create option for DisableGroup Plugin
+
+0.20_01   2013-07-17 15:49:31 America/New_York
+  - add DisableGroup Plugin
+
+0.20      2013-06-30 19:13:35 America/New_York
+  - fix examples
+  - use YAML::XS instead of YAML, since Clustericious requires YAML::XS (but not YAML)
+
+0.19      2013-06-27 15:37:55 America/New_York
+  - documentation
+  - remove ladder and use before_dispatch hook instead for refresh
+
+0.18      2013-06-14 10:50:23 America/New_York
+  - take advantage of the new Test::Clustericious::Config
+
+0.17      2013-05-30 15:05:49 America/New_York
+  - Fixes for MSWin32
+
+0.16      2013-05-17 22:39:37 America/New_York
+  - Require Clustericious 0.9920
+
+0.15      2013-05-17 20:14:41 America/New_York
+  - Mojolicious 4.0 compatability
+
+0.14      2013-05-10 11:57:36 EST5EDT
+  - declare Class::Method::Modifiers as a prereq
+
+0.12      2013-05-09 21:05:22 America/New_York
+  - simplify the self auth plugin
+  - don't use lib in main script
+  - documentation updates
+
+0.11      2013-04-23 16:53:33 America/New_York
+  - use MakeMaker instead of ModuleBuild
+
+0.10      2013-04-16 11:14:23 America/New_York
+  - don't clobber user with route variables
+
+0.09      2013-04-12 09:49:34 America/New_York
+  - audit log for create,change,remove users,groups and resources
+  - fix t/selfauth.t to not use config in ~/etc
+
+0.08      2013-02-13 12:50:03 America/New_York
+  - ensure the last line of the file has a new line in modificatons
+  - ensure if the last line of the file doesn't have a new line adds still work
+
+0.07      2012-12-27 18:05:54 America/New_York
+  - return json if format is JSON.
+  - return yml if format is YAML.
+  - bug fix: /authz/user/username/action/ now returns 403 or 200 instead of always returning 404
+  - feature: also allow /grant/user/username/action/
+  - self auth against $c->authz instead of using Clustericious::Plugin::PlugAuth
+  - Better tests for case insensitive usernames
+
+0.06      2012-12-14 11:41:26 America/New_York
+  - Avoid creating extra resources when using /authz/user/... routes
+  - Created PlugAuth::Plugin::Test
+
+0.05      2012-12-11 13:56:53 America/New_York
+  - handle comments correctly for 'GET /grant'
+
+0.04      2012-12-07 15:41:56 America/New_York
+  - fixed /group/:group/#user route for users with @
+  - added welcome role (PlugAuth::Role::Welcome)
+  - wrote PlugAuth::Guide::Plugin (was a stub)
+
+0.03      2012-12-03 10:43:56 America/New_York
+  - wrote PlugAuth::Guide::Client (was a stub)
+  - added grant route (GET /grant)
+
+0.02      2012-11-29 15:13:48 America/New_York
+  - Added specification tests for Plugins (Test::PlugAuth::Plugin::*)
+  - use autodata to support JSON, YAML, whatever, instead of just JSON
+  - use temp storage by default if no files are specified in the config
+    warn on this sort of usage, as modifications will be lost.
+  - Added revoke route (DELETE /grant/...)
+
+0.01      2012-11-13 16:30:06 America/New_York
+  - Added documentation in PlugAuth::Guide::*
+  - Added roles for plugins (see PlugAuth::Role::*)
+  - use Apache MD5 password when creating/changing passwords
+  - accept Apache or Unix MD5 encrypted passwords
+  - renamed PlugAuth from SimpleAuth
+  - /users/:group returns 404 for groups that don't exist
+  - POST /group/:group/:user to add a user to a group
+  - DELETE /group/:group/:user to remove a user from a group

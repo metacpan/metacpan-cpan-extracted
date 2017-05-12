@@ -1,0 +1,10 @@
+
+Some usefull links:
+
+http://search.cpan.org/~holt/makepp-1.19/pod/makepp_tutorial.pod
+http://search.cpan.org/~holt/makepp-1.19/pod/makepp_cookbook.pod
+
+http://pmk.sourceforge.net/
+
+http://rake.rubyforge.org/
+

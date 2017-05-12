@@ -1,0 +1,52 @@
+{
+   "abstract" : "Inflate gzipped PSGI requests",
+   "author" : [
+      "Fabrice Gabolde <fgabolde@weborama.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Inflater",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Scalar" : "0",
+            "IO::Uncompress::Gunzip" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Util" : "0",
+            "Plack::Util::Accessor" : "0",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Plack::Test" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/weborama/Plack-Middleware-Inflater/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/weborama/Plack-Middleware-Inflater.git",
+         "web" : "https://github.com/weborama/Plack-Middleware-Inflater"
+      }
+   },
+   "version" : "0.001"
+}
+

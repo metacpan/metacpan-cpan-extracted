@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset load_strategy="INSERT_LOAD_STRATEGY">
+    <emp empno="1" ename="emp1" />
+    <emp empno="2" ename="emp2" />
+    <emp empno="3" ename="emp3" />
+    <emp empno="4" ename="emp4" />
+    <emp empno="5" ename="emp5" />
+    <emp empno="6" ename="emp6" />
+    <emp empno="7" ename="emp7" />
+    <emp empno="8" ename="emp8" />
+    <emp empno="9" ename="emp9" />
+    <emp empno="10" ename="emp10" />
+    <emp empno="11" ename="emp11" />
+    <emp empno="12" ename="emp12" />
+</dataset>

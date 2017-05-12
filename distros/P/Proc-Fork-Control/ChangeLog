@@ -1,0 +1,16 @@
+12/14/2015 v 1.6	cfork_wait_pid() has a bug, as a result of a deprecated
+			usage of `delete' function. This has now been corrected.
+
+12/11/2015 v 1.5	Added cfork_wait_pid() routine to allow a list of PID's to
+			be waited on.
+
+11/09/2015 v 1.4	Proc::Fork::Control should use cfork_exit() internally to
+			to avoid losing exit signals.
+
+			Avoid excessive delays in blocking mode while at the same
+			time keeping CPU usage down.
+
+			Improved documentation on cfork_nonblocking() mode
+
+11/08/2015 v 1.3	Time::HiRes is now required
+10/03/2014 v.1.2	Initial public release

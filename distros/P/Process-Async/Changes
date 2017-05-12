@@ -1,0 +1,16 @@
+Revision history for Process-Async
+
+0.003     2015-02-13 19:03:46+00:00 Europe/London
+	No new features.
+
+	Dependencies:
+	* Add Test::Fatal to cpanfile
+
+0.002     2015-02-13 19:00:14+00:00 Europe/London
+	Bugs fixed:
+	* Reset the $IO::Async::Loop::ONE_TRUE_LOOP internal variable to ensure that the
+	worker process does not accidentally try to use the parent's leftover loop at any
+	point.
+
+0.001     2014-08-12 18:27:36+01:00 Europe/London
+	Initial CPAN release

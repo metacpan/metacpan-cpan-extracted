@@ -1,0 +1,64 @@
+NAME
+    Perlbal::Plugin::Expires - Apache mod_expires for Perlbal web server
+
+SYNOPSIS
+      LOAD Expires
+      CREATE SERVICE web
+          SET role    = web_server
+          SET listen  = 127.0.0.1:8000
+          SET docroot = /path/to/docs
+          SET plugins = Expires
+          Expires default   = access plus 1 day 12 hours
+          Expires image/gif = access plus 10 years
+      ENABLE web
+
+DESCRIPTION
+    Perlbal::Plugin::Expires is the module to set Expires header to the
+    response of perlbal webserver the same way as Apache mode_expires.
+
+CONFIGURATIONS
+      Expires [service] <type> = <base> plus (<num> <unit>)+
+
+    *   service
+
+        You can specify service name explicitly to apply expires. Default is
+        last created service.
+
+    *   type
+
+        Content-Type. Supported MIME Types on Perlbal web server are listed
+        in $Perlbal::ClientHTTPBase::MimeType.
+
+    *   base
+
+        access, now (same as access) or modification.
+
+    *   (num unit)+
+
+        Datetime string. num should be integer value and unit is one of
+
+          * years
+          * months
+          * weeks
+          * days
+          * hours
+          * minutes
+          * seconds
+
+        Last 's' can be omiited.
+
+        e.g)
+
+          * 10 years
+          * 7 days 1 hour 30 minutes 45 seconds
+
+SEE ALSO
+    mod_expires <http://httpd.apache.org/docs/2.2/en/mod/mod_expires.html>
+
+AUTHOR
+    Hiroshi Sakai <ziguzagu@cpan.org>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

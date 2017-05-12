@@ -1,0 +1,17 @@
+# for Plack-Middleware-HTMLLint
+# Build.PL
+Software::License
+Module::Build::Pluggable
+Module::Build::Pluggable::ReadmeMarkdownFromPod
+
+# author's tests
+Test::Pod
+Test::Pod::Coverage
+Test::Spelling
+Test::Perl::Critic
+Test::Synopsis
+
+# Release tools
+ShipIt
+ShipIt::Step::ChangeAllVersions
+CPAN::Uploader

@@ -1,0 +1,64 @@
+Revision history for Perl extension Plack::Middleware::Profiler::NYTProf
+
+0.17 Tue May 19 00:40 2014
+    * Preload Devel::NYTProf in example psgi files.
+
+0.16 Tue May 17 16:54 2014
+    * Add preload method to load Devel::NYTProf in compile phase.
+      Thanks to bayashi
+
+0.15 Tue May 6 21:00 2014
+    * Load Devel::NYTProf in prepare_app phase to support fork
+    * Support only Devel::NYTProf 5.06 or higher 
+    Thanks to bayashi
+
+0.14 Sun Feb 10 20:46:00 2013
+    * Set nytprofhtml script path in prepare_app
+
+0.13 Sun Feb 10 20:24:00 2013
+    * Don't load Devel::NYTProf if profiler isn't enabled. 
+      (Thanks to bayashi)
+
+0.12 Sun Feb 10 17:58:00 2013
+    * Add nytprofhtml_path option 
+
+0.11 Sun Feb 10 15:55:00 2013
+    * Skip the reporting tests
+
+0.10 Sun Feb 08 23:43:00 2013
+    * Check nytprofhtml script is in the PATH
+
+0.09 Sun Feb 04 22:26:00 2013
+    * Refactor some tests and codes. 
+
+0.08 Sun Feb 04 18:16:00 2013
+    * Support streaming 
+
+0.07 Sun Feb 03 19:22:00 2013
+    * Added some modules dependencis 
+    * Added some tests
+
+0.06 Sun Feb 03 00:44:00 2013
+    * Check profliling result file path before reporting
+    * Add psgi examples for production use
+
+0.05 Sat Feb 02 21:52:00 2013
+    * Don't call enable_profile twice
+
+0.04 Sat Feb 02 19:50:00 2013
+    * Fixed profiling preforked app 
+      Thanks to bayashi
+    * Fixed the bug profiler is destroyed when it is disabled. 
+      Thanks to bayashi
+    * Add notes for performance penalty of enabling this middleware.
+
+0.03 Sun Jan 27 11:21:00 2013
+    * Fixed documentation and example files based on 0.02
+
+0.02 Sun Jan 27  3:21:00 2013
+    * Added options to customize the location of profiling result files 
+      and enabling profiler based on some conditions. 
+    * Added profiling before/after hooks 
+
+0.01 Sun Nov 29 23:12:50 2009
+    * original version

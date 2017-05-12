@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1208791283,
+          'number' => '+440080972064',
+          'time' => '16:21',
+          'date' => '2008-04-21',
+          'name' => 'Nicholas XXXXX (M)',
+          'phone' => '+440080972064',
+          'device' => 'Treo 680',
+          'direction' => 'outbound',
+          'timestamp' => 1208791283,
+          'text' => 'if you\'re currying tonight, the restaurant is booked for 1930',
+          'type' => '0x0000',
+          'category' => 0,
+          'id' => 7108162,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 116921
+        };

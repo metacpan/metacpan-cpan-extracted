@@ -1,0 +1,14 @@
+* we should make a test to verify that we're describing all of our
+policies somewhere the Perl::Critic distribution uses PolicySummary.pm
+and t/80_policysummary.t to ensure this. If we continue to document
+ours in Bangs.pm, we should copy and modify their test script.
+
+* Not all of our policies pass perlcritic yet.
+
+* several of our test methods are stolen directly from the
+Perl::Critic distribution. We should come up with a common way to
+indicate this to help us keep them updated when they change the
+originals.
+
+* Is it really necessary to make top-level symlinks to all of our
+policies now?

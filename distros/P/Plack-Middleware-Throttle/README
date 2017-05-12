@@ -1,0 +1,76 @@
+NAME
+    Plack::Middleware::Throttle - A Plack Middleware for rate-limiting
+    incoming HTTP requests.
+
+SYNOPSIS
+      my $handler = builder {
+        enable "Throttle::Hourly",
+            max     => 2,
+            backend => Plack::Middleware::Throttle::Backend::Hash->new(),
+            path    => qr{^/api};
+        sub { [ '200', [ 'Content-Type' => 'text/html' ], ['hello world'] ] };
+      };
+
+DESCRIPTION
+    This is a "Plack" middleware that provides logic for rate-limiting
+    incoming HTTP requests to Rack applications.
+
+    This middleware provides three ways to handle throttling on incoming
+    requests :
+
+    Hourly
+        How many requests an host can do in one hour. The counter is reseted
+        each hour.
+
+    Daily
+        How many requets an host can do in one hour. The counter is reseted
+        each day.
+
+    Interval
+        Which interval of time an host must respect between two request.
+
+OPTIONS
+    code
+        HTTP code returned in the response when the limit have been
+        exceeded. By default 503.
+
+    message
+        HTTP message returned in the response when the limit have been
+        exceeded. By defaylt "Over rate limit".
+
+    backend
+        A cache object to store sessions informations.
+
+          backend => Redis->new(server => '127.0.0.1:6379');
+
+        or
+
+          backend => Cache::Memcached->new(servers => ["10.0.0.15:11211", "10.0.0.15:11212"]);
+
+        The cache object must implement get, set and incr methods. By
+        default, you can use "Plack::Middleware::Throttle::Backend::Hash".
+
+        By default, if no backend is specified,
+        Plack::Middleware::Throttle::Backend::Hash is used.
+
+    key_prefix
+        Key to prefix sessions entry in the cache.
+
+    path
+        URL pattern or a callback to match request to throttle. If no path
+        is specified, the whole application will be throttled.
+
+    white_list
+        An arrayref of hosts to put in a white list.
+
+    black_list
+        An arrayref of hosts to put in a black list.
+
+AUTHOR
+    franck cuny <franck@lumberjaph.net>
+
+SEE ALSO
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

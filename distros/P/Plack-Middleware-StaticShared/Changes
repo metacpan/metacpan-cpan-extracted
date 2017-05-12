@@ -1,0 +1,36 @@
+0.06 2016-06-09T03:53:08Z
+
+	Fix Makefile.PL (by @motemen)
+	Change release packger to minila.
+
+2013-01-24  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.05:
+	Fix bug on invalid file names (by shibayu36)
+
+2012-04-26  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.04:
+	Fix vulnerability of directory traversal (by onishi)
+
+2011-08-10  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.03:
+	Fix fail to cache caused by invalid key
+
+2011-02-10  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.02:
+	Does not insert too much \n.
+
+2010-12-03  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.01:
+	First release.
+
+2010-09-15  SATOH Hiroh <cho45@lowreal.net>
+
+	* init
+
+# vim:set ft=changelog:
+

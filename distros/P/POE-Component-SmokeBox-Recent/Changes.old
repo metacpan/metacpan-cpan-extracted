@@ -1,0 +1,81 @@
+Changelog for POE::Component::SmokeBox::Recent
+==============================================
+
+1.30  Tue Mar  8 01:00:56 GMT 2011
+1.28  Fri Nov 26 11:32:15 GMT 2010
+  - Update required version of POE::Filter::HTTP::Parser
+
+  - Fallback on normal RECENT retrieval behaviour when epoch fails
+    Like in the case that someone is using a CPAN::Mini mirror
+    rather than a 'real' CPAN Mirror. Reported by Nigel Horne
+
+1.26  Mon Nov 15 23:08:14 GMT 2010
+  - Added 'epoch' option for determining dists from a given
+    epoch timestamp
+
+1.24  Thu Sep  2 14:42:40 BST 2010
+  - Added support for RSS retrieval
+
+1.22  Mon Jun 21 21:08:22 BST 2010
+  - Forgot to append 'RECENT' to file urls.
+
+1.20  Mon Jun 21 10:39:54 BST 2010
+  - Added support for file urls, RT #58421 by Nigel Horne
+
+1.18  Mon Mar  1 10:48:37 GMT 2010
+  - Tidied up distribution and Makefile.PL
+
+1.16	Tue Apr  7 20:51:46 BST 2009
+	- Make auto_set_repository() only run at author-time
+
+1.14	Tue Apr  7 12:21:00 BST 2009
+	- Refactored the FTP.pm to remove SIZE query because of weirdness
+	  with cpan.cpantesters.org FTP server.
+
+1.12	Fri Feb  6 11:38:17 GMT 2009
+	- Added detach_myself() which fixes a refcount leak.
+
+1.10	Mon Feb  2 14:56:10 GMT 2009
+	- Fixed 01_http_sockerr.t to skip on broken DNS
+	  configurations.
+
+1.08	Jan 29 2009
+	- Added timeout to HTTP.pm, additional tests.
+	- Fixed POD in HTTP.pm
+
+1.06	Tue Jan 27 16:38:48 GMT 2009
+	- Added miniHTTP client
+	- Refactored to use HTTP.pm
+	- Refactored tests and added tests
+	- Removed dependency on PoCo-Client-HTTP
+	- Added new dependencies
+
+1.04	Mon Jan 26 21:09:25 GMT 2009
+	- Use PoCo-Client-DNS for name resolution in
+	  FTP.pm
+
+1.02	Sun Jan 18 08:49:27 GMT 2009
+	- Bump to stable release.
+
+1.01_01	Sat Jan 17 21:15:35 GMT 2009
+	- Added our own bundled miniFTP client
+	- Pod tidying.
+	- Removed dependency of PoCo-Client-FTP
+
+1.00	Wed May  7 06:08:22 BST 2008
+	- Added license information, removed kwalitee test
+
+0.04	Fri Mar 14 17:05:49 GMT 2008
+	- Author tests to xt/ Updated prereqs
+
+0.03	Tue Jan  8 16:50:55 GMT 2008
+	- Bumped the required version of PoCo-Client-FTP to known
+	  working version;
+
+0.02	Tue Dec  4 07:08:35 GMT 2007
+	- Bumped the required version of PoCo-Client-FTP to known
+	  working version;
+
+0.01	Sat Nov 24 11:44:31 GMT 2007
+	- Initial CPAN Release
+Sun Jul  3 23:20:58 BST 2011

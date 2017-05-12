@@ -1,0 +1,22 @@
+---
+name: Package-Rename
+version: 0.02
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+abstract: Rename or copy package
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  MRO::Compat: 0
+  perl: 5.006
+build_requires:
+  Test::More: 0
+provides:
+  Package::Rename:
+    file: lib/Package/Rename.pm
+    version: 0.02
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

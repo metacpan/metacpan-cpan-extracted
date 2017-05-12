@@ -1,0 +1,29 @@
+0.06    2017-01-22
+
+- Escaped braces in regexes.
+
+
+0.05    2011-01-19
+
+- Some internal code attempted to call a non-existent method when the database
+  connection failed.
+
+
+0.04    2010-11-30
+
+- Is fourth time the charm. Added a missing prereq.
+
+
+0.03    2010-11-30
+
+- Third time may be the charm. The last release had _too many_ prereqs.
+
+
+0.02    2010-11-30
+
+- Forgot to include prereqs in 0.01.
+
+
+0.01    2010-11-30
+
+- Initial release.

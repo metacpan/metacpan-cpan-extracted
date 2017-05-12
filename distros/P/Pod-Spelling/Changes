@@ -1,0 +1,49 @@
+CHANGES
+
+0.23 2015-06-17
+	RT 83639: Added stop-word support via `=for` and `=begin`.
+
+0.22 2015-06-*
+	Various bug fixes and a bit of a tidy-up
+
+0.17 2013-04-04
+	Added skip_paths_matching()
+	Fixed index error
+	Spellers split at dashes, underscores, and numbers, but try
+	to allow that to pass.
+	Crudely test for subs using UNIVERSAL::can
+		
+0.16 2013-02-26
+	Updated Makefile.PL to accomodate Lingua::Ispell 0.07 API change
+	(no rv for correctly-spelt words)
+	RT 
+
+0.15 2012-04-12
+	Updated non-word characters removed from words prior to spellcheck
+	
+0.14 2012-04-11
+	Allow *.yml files from more recent Perls than originally used in dev
+
+0.13 ...
+
+0.12 2011-03-11
+	Try to catch bad installs of binary spellers
+	
+0.11 2011-03-10
+	Ispell.pm exists but Ispell not found
+
+0.5-0.10 2011-02
+	Tests
+
+0.4 2011-01-11 
+	Removed Test::Most
+
+0.3 2011-01-10
+	Forgot the Makefile.PL and manifest tests didn't pick it up.
+	
+0.2 2011-01-10
+	Just found Test::Spelling, so made this module API-compatible
+	
+0.1	2011-01-10
+	Initial version
+	

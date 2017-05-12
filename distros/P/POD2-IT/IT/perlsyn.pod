@@ -1,0 +1,808 @@
+=head1 NOME
+X<sintassi>
+
+perlsyn - La sintassi del Perl
+
+=head1 DESCRIZIONE
+
+Un programma Perl consiste in una sequenza di dichiarazioni e istruzioni
+che vengono eseguite dall'inizio alla fine. Cicli, subroutine e altre
+strutture di controllo vi permettono di saltare all'interno del codice.
+
+Perl E<egrave> un linguaggio B<free-form> [A forma libera, NdT], 
+potete formattarlo e indentarlo come preferite. Lo spazio bianco serve 
+generalmente a separare i simboli, diversamente da altri linguaggi come
+Python dove E<egrave> un'importante parte della sintassi.
+
+Molti degli elementi sintattici del Perl sono B<opzionali>. Piuttosto che richiedere di
+mettere le parentesi ad ogni chiamata a funzione e di dichiarare ogni variabile,
+spesso potete omettere questi elementi espliciti e Perl cercherE<agrave> di capire cosa
+intendete. Questo E<egrave> conosciuto come B<Do What I Mean> [Fa quello che intendo, NdT],
+abbreviato B<DWIM>. CiE<ograve> permette ai programmatori di essere B<pigri> e di scrivere
+il codice in uno stile a loro confortevole.
+
+Il Perl B<adotta sintassi> e concetti da molti linguaggi: awk, sed, C, Bourne Shell,
+Smalltalk, Lisp e perfino dall'inglese. Altri linguaggi hanno preso in prestito la
+sintassi da Perl, in particolare le estensioni delle sue espressioni regolari. CosE<iacute>
+se avete giE<agrave> programmato con un altro linguaggio troverete frammenti 
+familiari in Perl. Spesso funzionano allo stesso modo, ma consultate L<perltrap> per 
+informazioni su cosa differiscono.
+
+=head2 Dichiarazioni
+X<dichiarazione> X<undef> X<indefinito> X<non inizializzato>
+
+Le uniche cose che avete bisogno di dichiarare in Perl sono i formati dei report e
+le subroutine (e a volte nemmeno le subroutine). Una variabile contiene il valore 
+indefinito (C<undef>) finchE<eacute> non le viene assegnato un valore definito, cioE<eacute>
+qualsiasi valore divero da C<undef>. Quando E<egrave> usato come numero, C<undef> viene
+considerato come C<0>; quando E<egrave> usato come stringa viene considerato la stringa
+vuota, C<"">; e quando viene utilizzato come riferimento che non E<egrave> stato ancora
+assegnato, viene considerato come errore. Se abilitate i I<warnings> [letterlmente
+avvertimenti, con C<use warnings>, NdT], vi verrE<agrave> notificato l'uso di un valore non
+inizializzato, ogni volta che tratterete C<undef> come stringa o come numero.
+Beh, di solito. Contesti booleani come:
+
+    my $a;
+    if ($a) {}
+
+sono esenti da avvertimenti (perchE<eacute> sono casi in cui importa la veridicitE<agrave> 
+piuttosto che la definizione). Operatori come C<++>, C<-->, C<+=>, C<-=> e C<.=>, 
+quando operano su variabili indefinite come:
+
+    my $a;
+    $a++;
+
+sono anch'essi esenti da questi avvertimenti.
+
+Una dichiarazione puE<ograve> essere posta ovunque si possa mettere 
+un'istruzione, ma non ha effetti sulla sequenza primaria delle istruzioni--le dichiarazioni
+hanno tutte effetto al momento della compilazione. Tipicamente tutte le dichiarazioni
+vengono poste all'inizio o alla fine di uno script. Tuttavia, se state usando una variabile
+lessicale privata creata con C<my()> dovete assicurarvi che la definizione del vostro
+formato o della subroutine sia nello stesso blocco del C<my> per essere in grado di accedere
+a queste variabili private.
+
+Dichiarare una subroutine permette di usare il nome di quella subroutine come operatore
+di lista da quel punto in poi del programma. Potete dichiarare una subroutine senza 
+definirla usando C<sub nome>, cosE<igrave>:
+X<subroutine, dichiarazione>
+
+    sub mionome;
+    $io = mionome $0   or die "impossibile utilizzare mionome";
+
+Va notato che mionome() funziona come operatore di lista, non come operatore unario;
+quindi, in questo caso, state attenti ad usare C<or> invece di C<||>. Comunque, se
+dichiaraste la subroutine come C<sub mionome ($)>, allora C<mionome> funzionerebbe
+come operatore unario, cosE<igrave> sia C<or> che C<||> andrebbero bene.
+
+Le dichiarazioni delle subroutine possono anche essere caricate con l'istruzione
+C<require>, oppure sia caricate che importate nel vostro spazio dei nomi con
+l'istruzione C<use>. Consultate L<perlmod> per ulteriori dettagli.
+
+Una sequenza di istruzioni puE<ograve> contenere delle dichiarazioni di variabili 
+private, ma a parte questa funzione le dichiarazioni esse agiscono come 
+istruzioni ordinarie, e vengono elaborate con il resto
+come se fossero istruzioni ordinarie. Questo significa che in
+realtE<agrave> hanno degli effetti sia durante la compilazione che durante l'esecuzione.
+
+=head2 Commenti
+X<commento> X<#>
+
+Il testo, dal carattere C<"#"> sino alla fine della riga, E<egrave> un commento e viene
+ignorato. Le eccezioni includono C<"#"> all'interno di una stringa o di un'espressione
+regolare.
+
+=head2 Istruzioni Semplici
+X<istruzione> X<punto e virgola> X<espressione> X<;>
+
+L'unico tipo di istruzione semplice E<egrave> un'espressione valutata per i suoi 
+effetti secondari. Ogni istruzione semplice deve terminare con un punto e virgola, salvo che
+sia l'istruzione finale in un blocco nel quel caso E<egrave> opzionale. (Un punto
+e virgola E<egrave> tuttavia incoraggiato se il blocco E<egrave> lungo piE<ugrave> di
+una riga, cosE<igrave> potete eventualmente aggiungere un'altra riga). Da notare che
+ci sono operatori come C<eval {}> e C<do {}> che sembrano istruzioni composte, ma non
+lo sono (sono solo TERMINI in un espressione), e perciE<ograve> necessitano di un
+indicatore di terminazione explicito se sono usati come ultimo elemento in una espressione.
+
+=head2 VeritE<agrave> e FalsitE<agrave>
+X<verita`> X<falsita`> X<vero> X<falso> X<!> X<not> X<negazione> X<0>
+
+Il numero 0, le stringhe C<'0'> e C<''>, la lista vuota C<()> e C<undef> risultano
+tutti falsi in un contesto booleano. Tutti gli altri valori sono veri.
+La negazione di un valore vero attraverso C<!> o C<not> restituisce un
+valore falso speciale. Quando valutato come stringa viene trattato come C<''>,
+ma come numero E<egrave> considerato pari a 0.
+
+=head2 Modificatori di Istruzione
+X<modificatore di istruzione> X<modificatore> X<if> X<unless> X<while>
+X<until> X<foreach> X<for>
+
+Qualunque instruzione semplice puE<ograve> eventualmente essere seguita da un
+I<SINGOLO> modificatore, subito prima del punto e virgola finale (o della fine 
+del blocco). I possibili modificatori solo:
+
+    if ESPRESSIONE
+    unless ESPRESSIONE
+    while ESPRESSIONE
+    until ESPRESSIONE
+    foreach LISTA
+
+L'C<ESPRESSIONE> che segue il modificatore E<egrave> detta "condizione".
+La sua veridicitE<agrave> o falsitE<agrave> determina il modo in cui
+il modificatore dovrE<agrave> comportarsi.
+
+C<if> esegue l'istruzione una volta I<se> e solo se la condizione E<egrave> vera. 
+C<unless> E<egrave> l'opposto, ed esegue l'istruzione I<salvo che> l'istruzione
+risulti vera (ossia, se la condizione E<egrave> falsa).
+
+    print "I basset hound hanno lunghe orecchie" if length $orecchie >= 10;
+    vai_fuori() and gioca() unless $sta_piovendo;
+
+Il modificatore C<foreach> E<egrave> un iteratore: esegue l'istruzione una volta
+per ogni elemento nella LISTA (con C<$_> che diventa un alias di ciascun elemento, 
+volta per volta).
+
+    print "Ciao $_!\n" foreach qw(mondo Dolly infermiera);
+
+C<while> ripete l'istruzione I<finchE<eacute>> la condizione E<egrave> vera.
+C<until> fa l'opposto, cioE<eacute> ripete l'istruzione fermandosi quando 
+la condizione risulta vera.
+
+    # Ciascuna istruzione conta da 0 a 10.
+    print $i++ while $i <= 10;
+    print $j++ until $j >  10;
+
+I modificatori C<while> e C<until> hanno la tipica semantica del "ciclo C<while>"
+(la condizione E<egrave> valutata per prima), eccetto quando E<egrave> applicata ad un BLOCCO C<do>
+(oppure all'uso deprecato dell'istruzione C<do>-SUBROUTINE), nel qual caso il blocco
+viene eseguito una volta prima che sia valutata la condizione.
+CosE<igrave> potete scrivere cicli come:
+
+    do {
+      $riga = <STDIN>;
+	   # ...
+    } until $riga  eq ".\n";
+
+Vedete L<perlfunc/do>. Osservate inoltre che le istruzioni di
+controllo di ciclo descritte in seguito I<NON> funzioneranno con questo
+costrutto, perchE<eacute> i modificatori non accettano etichette di ciclo.
+Spiacenti. Potete sempre mettere un altro blocco all'interno (per C<next>)
+o all'esterno (per C<last>) per fare questo genere di cose. Per C<next>
+basta raddoppiare le parentesi graffe:
+X<next> X<last> X<redo>
+
+    do {{
+       next if $x == $y;
+       # qui si fa qualcosa
+    }} until $x++ > $z;
+
+Per C<last> dovete essere piE<ugrave> elaborati:
+X<last>
+
+    CICLO: { 
+	    do {
+          last if $x = $y**2;
+          # qui si fa qualcosa
+       } while $x++ <= $z;
+    }
+
+B<NOTA:> Il comportamento di un'istruzione C<my> modificata da un
+modificatore di istruzione o da un costrutto di ciclo (ad esempio,
+C<my $x if ...>) E<egrave> B<indefinito>. Il valore della variabile C<my>
+puE<ograve> essere C<undef>, un qualunque valore assegnato in precedenza, o
+forse qualsiasi altra cosa. Non ci contate. Versioni future di
+perl potrebbero fare cose differenti rispetto alla versione che state
+utilizzando ora. Occhio ai dragoni.
+X<my>
+
+=head2 Istruzioni Composite
+X<istruzione, composita> X<blocco> X<parentesi, graffa> X<parentesi graffa> X<graffa>
+X<{> X<}> X<if> X<unless> X<while> X<until> X<foreach> X<for> X<continue>
+
+In Perl, una sequenza di istruzioni che definisce uno I<scope> viene chiamata
+blocco. A volte un blocco E<egrave> delimitato dal file che lo contiene (nel caso di
+un file richiesto [con C<require>, NdT], o il programma nella sua interezza),
+ed a volte un blocco E<egrave> delimitato dalla lunghezza di una stringa (nel caso di
+una C<eval>).
+
+In generale, perE<ograve>, un blocco E<egrave> delimitato da parentesi graffe. Chiameremo questo
+costrutto sintattico un BLOCCO.
+
+Le istruzioni composite che seguono possono essere utilizzate per controllare
+il flusso del programma:
+
+    if (ESPRESSIONE) BLOCCO
+    if (ESPRESSIONE) BLOCCO else BLOCCO
+    if (ESPRESSIONE) BLOCCO elsif (ESPRESSIONE) BLOCCO ... else BLOCCO
+    ETICHETTA while (ESPRESSIONE) BLOCCO
+    ETICHETTA while (ESPRESSIONE) BLOCCO continue BLOCCO
+    ETICHETTA until (ESPRESSIONE) BLOCCO
+    ETICHETTA until (ESPRESSIONE) BLOCCO continue BLOCCO
+    ETICHETTA for (ESPRESSIONE; ESPRESSIONE; ESPRESSIONE) BLOCCO
+    ETICHETTA foreach VAR (LIST) BLOCCO
+    ETICHETTA foreach VAR (LIST) BLOCCO continue BLOCCO
+    ETICHETTA BLOCCO continue BLOCCO
+
+Osservate che, contrariamente a C e Pascal, queste sono definite in termini
+di BLOCCHI, non di istruzioni. CiE<ograve> significa che le parentesi graffe
+sono I<obbligatorie> -- non sono ammesse istruzioni pendenti. Se volete
+scrivere condizioni senza parentesi graffe ci sono parecchi altri modi
+di farlo. Le seguenti istruzioni fanno tutte la stessa cosa:
+
+    if (!open(PIPPO)) { die "Errore in open $PIPPO: $!"; }
+    die "Errore in open $PIPPO: $!" unless open(PIPPO);
+    open(PIPPO) or die "Errore in open $PIPPO: $!";  # PIPPO o morte!
+    open(PIPPO) ? 'hi mom' : die "Errore in open $PIPPO: $!";
+			# un po' esotica, quest'ultima
+
+L'istruzione C<if> E<egrave> banale. PoichE<eacute> i BLOCCHI sono sempre circondati da
+parentesi graffe, non c'E<egrave> mai ambiguitE<agrave> su quale C<if> sia associato ad
+un particolare C<else>. Se utilizzate C<unless> al posto di C<if>, il senso
+del test E<egrave> invertito.
+
+L'istruzione C<while> esegue il blocco finchE<eacute> l'espressione E<egrave> vera (ossia,
+non viene valutata come la stringa nulla C<""> o C<0> o C<"0">
+[o anche C<undef>, NdT]). L'istruzione C<until> esegue il blocco
+finchE<eacute> l'espressione E<egrave> falsa.
+L'ETICHETTA E<egrave> opzionale e, se presente, consiste in un identificatore seguito
+da un carattere due-punti. L'ETICHETTA identifica il ciclo per le
+istruzioni di controllo dei cicli C<next>, C<last> e C<redo>.
+Se l'ETICHETTA viene omessa, l'istruzione di controllo del ciclo si riferisce
+al ciclo piE<ugrave> interno che la racchiude. Tutto ciE<ograve> puE<ograve> implicare uno
+sguardo dinamico allo I<stack> di chiamata in esecuzione per trovare
+l'ETICHETTA giusta. Un comportamento cosE<igrave> disperato produce un
+avvertimento ["warning", NdT] se utilizzate la direttiva
+C<use warnings> o l'opzione C<-w>.
+
+Se c'E<egrave> un BLOCCO C<continue>, viene sempre eseguito immediatamente prima
+che la condizione venga valutata di nuovo. Per questo motivo, puE<ograve> essere
+utilizzato per incrementare la variabile di un ciclo, anche quando il ciclo
+viene fatto continuare con un'istruzione C<next>.
+
+=head2 Controllo di Ciclo
+X<controllo di ciclo> X<ciclo, controllo> X<next> X<last> X<redo> X<continue>
+
+Il comando C<next> fa partire l'iterazione successiva del ciclo:
+
+    RIGA: while (<STDIN>) {
+       next RIGA if /^#/;	# Scarta i commenti
+       #...
+    }
+
+Il comando C<last> esce immediatamente dal ciclo in questione. Il blocco
+C<continue>, se presente, non viene eseguito:
+
+    RIGA: while (<STDIN>) {
+       last RIGA if /^$/;	# esci quando hai finito con l'intestazione
+       # ...
+    }
+
+Il comando C<redo> fa ripartire il ciclo senza valuatare la condizione
+di nuovo. Il blocco C<continue>, se presente, I<non> viene eseguito.
+Questo comando viene normalmente utilizzato da programmi che vogliono
+mentire a se stessi su quanto E<egrave> stato appena inserito.
+
+Ad esempio, quando elaborate un file come F</etc/termcap>.
+Se le vostre righe di ingresso potessero terminare con I<backslash> per
+indicare continuazione, vorreste saltare avanti e prendere il record
+successivo.
+
+    while (<>) {
+       chomp;
+       if (s/\\$//) {
+          $_ .= <>;
+          redo unless eof();
+       }
+       # ora si elabora  $_
+    }
+
+che E<egrave> una scorciatoia Perl per la versione piE<ugrave> esplicita:
+
+    RIGA: while (defined($riga = <ARGV>)) {
+       chomp($riga);
+       if ($riga =~ s/\\$//) {
+          $riga .= <ARGV>;
+          redo RIGA unless eof(); # non eof(ARGV)!
+       }
+       # ora si elabora $riga
+    }
+
+Osservate che se ci fosse un blocco C<continue> in questo codice,
+verrebbe eseguito solo in corrispondenza delle righe scartate
+dall'espressione regolare (poichE<eacute> C<redo> salta il blocco C<continue>).
+Un blocco C<continue> viene spesso utilizzato per riazzerare i
+contatori di riga o dei match di singoli C<?pattern?>:
+
+    # ispirato da :1,$g/fred/s//WILMA/
+    while (<>) {
+       ?(fred)?    && s//WILMA $1 WILMA/;
+       ?(barney)?  && s//BETTY $1 BETTY/;
+       ?(homer)?   && s//MARGE $1 MARGE/;
+    } continue {
+       print "$ARGV $.: $_";
+       close ARGV  if eof();		# riazzera $.
+       reset	    if eof();		# riazzera ?pattern?
+    }
+
+Se si sostituisce la parola C<until> a C<while> il senso del test
+E<egrave> invertito, ma la condizione viene sempre verificata prima della
+prima iterazione.
+
+Le istruzioni di controllo di ciclo non funzionano all'interno di
+C<if> o C<unless>, poichE<eacute> questi non sono cicli. Potete perE<ograve> raddoppiare
+le parentesi graffe per renderli tali.
+
+    if (/pattern/) {{
+       last if /fred/;
+       next if /barney/; # stesso effetto di "last", ma non documenta altrettanto bene
+       # qui si fa qualcosa
+    }}
+
+Questo comportamento si ha perchE<eacute> quel blocco, di per sE<eacute>, agisce come un
+ciclo che viene eseguito una volta sola, consultate
+L<"BLOCCHI base ed Istruzioni Switch">.
+
+La forma C<while/if BLOCCO BLOCCO>, disponibile in Perl 4, non esiste
+piE<ugrave>. Rimpiazzate ogni occorrenza di C<if BLOCCO> con
+C<if (do BLOCCO)>.
+
+=head2 Cicli For
+X<for> X<foreach>
+
+I cicli C<for> stile C in Perl funzionano come il corrispondente
+ciclo C<while>; ciE<ograve> significa che questo:
+
+    for ($i = 1; $i < 10; $i++) {
+       # ...
+    }
+
+E<egrave> la stessa cosa di:
+
+    $i = 1;
+    while ($i < 10) {
+       # ...
+    } continue {
+       $i++;
+    }
+
+C'E<egrave> una differenza minore: se le variabili sono dichiarate con C<my>
+nella sezione di inizializzazione del C<for>, lo I<scope> lessicale
+di queste variabili coincide con il ciclo C<for> (il corpo del ciclo
+e le sezioni di controllo).
+X<my>
+
+Oltre al normale ciclo con l'indice di un array, C<for> puE<ograve> prestarsi
+a molte altre applicazioni interessanti. Eccone una che evita
+il problema in cui vi trovate se effettuate esplicitamente il test
+di fine file su un descrittore di file interattivo, il che
+farebbe sembrare bloccato il programma.
+X<eof> X<fine-file> X<fine file>
+
+    $su_una_tty = -t STDIN && -t STDOUT;
+    sub richiedi { print "si'? " if $su_una_tty }
+    for ( richiedi(); <STDIN>; richiedi() ) {
+       # fai qualcosa
+    }
+
+Utilizzando C<readline> (o la forma ad operatore, C<< <ESPRESSIONE> >>)
+come condizionali per un ciclo C<for> E<egrave> una scorciatoia per quanto
+segue. Questo comportamento coincide con quello di una condizione
+in un ciclo C<while>.
+X<readline> X<< <> >>
+
+    for ( richiedi(); defined( $_ = <STDIN> ); richiedi() ) {
+        # fai qualcosa
+    }
+
+=head2 Cicli Foreach
+X<for> X<foreach>
+
+Il ciclo C<foreach> itera su una normale lista ed imposta la
+variabile VAR come incarnazione di ciascun elemento della lista, in
+sequenza. Se la variabile E<egrave> preceduta dalla parola chiave C<my>, allora
+essa ha lo I<scope> di un lessicale, ed E<egrave> pertanto visibile solo
+all'interno del ciclo. Altrimenti, la vaiabile E<egrave> implicitamente locale
+al ciclo e viene ripristinata al suo valore originale una volta usciti
+dal ciclo. Se la variabile era stata precedentemente dichiarata con
+C<my>, viene utilizzata quella variabile invece che quella globale, ma
+E<egrave> sempre localizzata al ciclo. Questa localizzazione implicita avviene
+I<solo> in un ciclo C<foreach>.
+X<my> X<local>
+
+La parola chiave C<foreach> E<egrave> in realtE<agrave> un sinonimo per la parola chiave
+C<for>, di modo che potete utilizzare C<foreach> per privilegiare la
+leggibilitE<agrave> o C<for> per maggiore brevitE<agrave>. (O perchE<eacute> la shell Bourne
+potrebbe esservi piE<ugrave> familiare di I<csh>, quindi scrivere C<for>
+verrebbe piE<ugrave> naturale). Se VAR E<egrave> omessa, C<$_> viene impostata a
+ciascun valore.
+X<$_>
+
+Se un qualunque elemento di LISTA E<egrave> un I<lvalue> [valore utilizzabile
+alla sinistra di un'assegnazione, NdT], potete modificarlo attraverso
+VAR all'interno del ciclo. Di contro, se un qualsiasi elemento in LISTA
+NON E<egrave> un I<lvalue>, qualsiasi tentativo di modificare quell'elemento
+fallirE<agrave>. In altre parole, la variabile indice in un ciclo C<foreach> E<egrave>
+un alias implicito per ciascun elemento nella lista su cui state
+iterando.
+X<alias>
+
+Se una qualunque parte di LISTA E<egrave> un array, C<foreach> rimarrE<agrave> decisamente
+confuso se aggiungete o rimuovete elementi all'interno del corpo del ciclo,
+ad esempio utilizzando C<splice>. Per questo motivo, non fatelo.
+X<splice>
+
+C<foreach>, probabilmente, non farE<agrave> quel che vi aspettate se VAR E<egrave>
+una variabile su cui E<egrave> stata chiamata C<tie> o se E<egrave> un'altra variabile
+speciale. Non fate nemmeno questo.
+
+Esempi:
+
+    for (@ary) { s/foo/bar/ }
+
+    for my $elem (@elementi) {
+       $elem *= 2;
+    }
+
+    for $contatore (10,9,8,7,6,5,4,3,2,1,'BOOM') {
+       print $contatore, "\n"; sleep(1);
+    }
+
+    for (1..15) { print "Buon Natale\n"; }
+
+    foreach $elemento (split(/:[\\\n:]*/, $ENV{TERMCAP})) {
+       print "Elemento: $elemento\n";
+    }
+
+Ecco come un programmatore C potrebbe scrivere un particolare algoritmo
+in Perl:
+
+    for (my $i = 0; $i < @ary1; $i++) {
+       for (my $j = 0; $j < @ary2; $j++) {
+          if ($ary1[$i] > $ary2[$j]) {
+   	       last; # non si puo` andare su quello esterno :-(
+          }
+          $ary1[$i] += $ary2[$j];
+       }
+       # ecco dove mi porta quel last
+    }
+
+Ecco invece come potrebbe farlo un programmatore Perl piE<ugrave> a suo agio
+con l'idioma:
+
+    ESTERNO: for my $wid (@ary1) {
+    INTERNO:   for my $jet (@ary2) {
+          next ESTERNO if $wid > $jet;
+          $wid += $jet;
+       }
+    }
+
+Vedete quant'E<egrave> piE<ugrave> facile? E<Egrave> piE<ugrave> pulito, sicuro e veloce.
+E<Egrave> piE<ugrave> pulito perchE<eacute> ha meno rumore. E<Egrave> piE<ugrave> sicuro
+perchE<eacute> se piE<ugrave> tardi si aggiunge codice fra il ciclo interno e quello esterno,
+il nuovo codice non verrE<agrave> eseguito accidentalmente. Il C<next> itera esplicitamente
+il ciclo esterno invece che ridursi a terminare quello interno. Ed E<egrave> piE<ugrave>
+veloce perchE<eacute> Perl esegue un'istruzione C<foreach> piE<ugrave> rapidamente di quanto
+farebbe un ciclo C<for> equivalente.
+
+=head2 BLOCCHI base ed Istruzioni Switch
+X<switch> X<blocco> X<case>
+
+Un BLOCCO di per sE<eacute> (etichettato o meno) E<egrave> semanticamente equivalente ad
+un ciclo che viene eseguito una volta. Per questo motivo potete 
+utilizzare una qualunque delle istruzioni di controllo di ciclo al suo
+interno, per lasciare o far ripartire il blocco. (Osservate che
+ciE<ograve> I<NON> vale per C<eval{}> e C<sub{}>, o contrariamente al credo
+popolare per i blocchi C<do{}>, che I<NON> contano come cicli). Il
+blocco C<continue> E<egrave> opzionale.
+
+Il costrutto BLOCCO E<egrave> particolarmente utile per realizzare strutture
+C<case> [istruzione C che marca una fra piE<ugrave> parti di codice differenti
+a seconda del valore di un'espressione, NdT].
+
+    SWITCH: {
+       if (/^abc/) { $abc = 1; last SWITCH; }
+       if (/^def/) { $def = 1; last SWITCH; }
+       if (/^xyz/) { $xyz = 1; last SWITCH; }
+       $niente = 1;
+    }
+
+Non esite alcuna istruzione C<switch> ufficiale in Perl, perchE<eacute> ci
+sono giE<agrave> molti modi per scrivere qualcosa di equivalente.
+
+Ad ogni modo, a partire da Perl 5.8, per avere I<switch> e C<case> si
+puE<ograve> utilizzare l'estensione Switch e dichiarare:
+
+	use Switch;
+
+dopo di che si hanno switch e case. Non E<egrave> veloce come potrebbe
+perchE<eacute> non E<egrave> veramente parte del linguaggio (E<egrave> realizzato utilizzando
+dei filtri sul codice sorgente), ma E<egrave> disponibile e molto flessibile.
+
+In aggiunta al costrutto BLOCCO citato, potreste anche scrivere
+
+    SWITCH: {
+       $abc = 1, last SWITCH  if /^abc/;
+       $def = 1, last SWITCH  if /^def/;
+       $xyz = 1, last SWITCH  if /^xyz/;
+       $niente = 1;
+    }
+
+(Non E<egrave>, in realtE<agrave>, strano come sembra una volta compreso che potete
+utilizzare "operatori" di controllo del ciclo all'interno di un'espressione.
+Si sta solo utilizzando l'operatore binario "virgola" in contesto
+scalare. Consultate L<perlop/"Comma Operator"> ["L'operatore virgola", NdT]).
+
+o
+
+    SWITCH: {
+       /^abc/ && do { $abc = 1; last SWITCH; };
+       /^def/ && do { $def = 1; last SWITCH; };
+       /^xyz/ && do { $xyz = 1; last SWITCH; };
+       $niente = 1;
+    }
+
+o formattato in modo che risalti di piE<ugrave> come un'istruzione C<switch> "propria":
+
+    SWITCH: {
+       /^abc/ 	    && do {
+       		    $abc = 1;
+       		    last SWITCH;
+       	       };
+
+       /^def/ 	    && do {
+       		    $def = 1;
+       		    last SWITCH;
+       	       };
+
+       /^xyz/ 	    && do {
+       		    $xyz = 1;
+       		    last SWITCH;
+       	        };
+       $niente = 1;
+    }
+
+o
+
+    SWITCH: {
+       /^abc/ and $abc = 1, last SWITCH;
+       /^def/ and $def = 1, last SWITCH;
+       /^xyz/ and $xyz = 1, last SWITCH;
+       $niente = 1;
+    }
+
+o anche, orrore,
+
+    if (/^abc/)
+       { $abc = 1 }
+    elsif (/^def/)
+       { $def = 1 }
+    elsif (/^xyz/)
+       { $xyz = 1 }
+    else
+       { $niente = 1 }
+
+Un idioma comune per un'istruzione C<switch> consiste nell'utilizzare
+l'aliasing di C<foreach> per effetture assegnazioni temporanee a C<$_>
+ed ottenere un matching conveniente:
+
+    SWITCH: for ($dove) {
+       	/Nei Nomi delle Carte/  && do { push @flags, '-e'; last; };
+       	/Ovunque/               && do { push @flags, '-h'; last; };
+       	/Nelle Regole/          && do {                    last; };
+       	die "valore sconosciuto per la variabile dove: `$dove'";
+      }
+
+Un altro approccio interessante per un'istruzione switch consiste
+nel fare in modo che un blocco C<do> restituisca il valore corretto:
+
+    $amode = do {
+       if     ($flag & O_RDONLY) { "r" }	# XXX: non e` 0?
+       elsif  ($flag & O_WRONLY) { ($flag & O_APPEND) ? "a" : "w" }
+       elsif  ($flag & O_RDWR)   {
+           if ($flag & O_CREAT)  { "w+" }
+           else                  { ($flag & O_APPEND) ? "a+" : "r+" }
+       }
+    };
+
+O 
+
+        print do {
+            ($flags & O_WRONLY) ? "write-only"          :
+            ($flags & O_RDWR)   ? "read-write"          :
+                                  "read-only";
+        };
+
+O se siete certi che tutte le clausole in C<&&> sono vere, potete utilizzare
+qualcosa come quello che segue, che "cambia" in base al valore della variabile
+di ambiente C<HTTP_USER_AGENT>.
+
+    #!/usr/bin/perl 
+    # prendi la pagina del file jargon in base al browser
+    $dir = 'http://www.wins.uva.nl/~mes/jargon';
+    for ($ENV{HTTP_USER_AGENT}) { 
+       $page  =     /Mac/            && 'm/Macintrash.html'
+		 || /Win(dows )?NT/  && 'e/evilandrude.html'
+		 || /Win|MSIE|WebTV/ && 'm/MicroslothWindows.html'
+		 || /Linux/          && 'l/Linux.html'
+		 || /HP-UX/          && 'h/HP-SUX.html'
+		 || /SunOS/          && 's/ScumOS.html'
+		 ||                     'a/AppendixB.html';
+    }
+    print "Location: $dir/$page\015\012\015\012";
+
+Questo tipo di istruzione switch funziona solamente quando sapete che
+le clausole C<&&> saranno vere. Se non siete sicuri, dovreste affidarvi
+all'esempio precedente con C<?:>.
+
+Potreste anche prendere in considerazione lo scrivere una hash contenente
+riferimenti a subroutine invece di realizzare un'instruzione C<switch>.
+
+=head2 Goto
+X<goto>
+
+Sebbene non sia adatta ai deboli di cuore, Perl supporta un'istruzione
+C<goto>. Esiste in tre forme: C<goto>-ETICHETTA, C<goto>-ESPRESSIONE e
+C<goto>-&NOME. Un'etichetta di ciclo non costituisce, in realtE<agrave>, un
+valido obiettivo per una C<goto>; E<egrave> solo il nome del ciclo.
+
+La forma C<goto>-ETICHETTA trova l'istruzione etichettata con ETICHETTA
+e riprende l'esecuzione da lE<igrave>. Non puE<ograve> essere utilizzata per andare
+in un qualunque costrutto che richieda inizializzazione, come una
+subroutine o un ciclo C<foreach>. Non puE<ograve> nemmeno essere utilizzata per
+andare in un costrutto che viene ottimizzato. PuE<ograve> invece essere usata per
+andare praticamente in qualsiasi posto che si trovi nello scope
+dinamico, inclusa l'uscita dalle subroutine. Ma di solito E<egrave> meglio
+utilizzare altri costrutti come C<last> o C<die>. L'autore di Perl
+non ha mai sentito il bisogno di utilizzare questa forma di
+C<goto> (in Perl perlomeno -- in C E<egrave> un'altra storia).
+
+La forma C<goto>-ESPRESSIONE si aspetta il nome di un'etichetta, il cui
+scope verrE<agrave> risolto dinamicamente. Questo consente di avere dei
+C<goto> calcolati come in FORTRAN, ma non E<egrave> nesessariamente raccomandato
+se cercate di ottimizzare il codice rispetto alla manutenibilitE<agrave>:
+
+    goto(("PIPPO", "PLUTO", "TOPOLINO")[$i]);
+
+La forma C<goto>-&NOME E<egrave> estremamente magica, e sostituisce una chiamata
+alla subroutine nominata al posto della subroutine attualmente in esecuzione.
+Questo meccanismo viene utilizzato dalle subroutine C<AUTOLOAD()> che vogliono
+caricare un'altra subroutine e far finta che tale altra subroutine sia stata
+chiamata sin dall'inizio (eccetto che eventuali modifiche a C<@_> nella
+subroutine corrente siano propagate anche nell'altra). Dopo una C<goto>,
+nemmeno C<caller()> sarE<agrave> in grado di dire che questa routine E<egrave> stata
+chiamata prima.
+
+In quasi tutti i casi come questo, E<egrave> di solito un'idea di gran lunga migliore
+utilizzare i meccanismi di controllo di flusso dati da C<next>, C<last> o
+C<redo> piuttosto che abbassarsi al livello di C<goto>. Per certe applicazioni,
+la coppia di I<catch> e C<throw> [terminologia utilizzata per parlare della
+gestione delle eccezioni in molti linguaggi, fra cui C++ e Java, NdT]
+fornita da C<eval{}> e C<die()> per l'elaborazione delle eccezioni puE<ograve>
+risultare un approccio prudente.
+
+=head2 POD: Documentazione Immersa
+X<POD> X<documentazione>
+
+Perl ha un meccanismo per inframmezzare la documentazione con il codice
+sorgente. Nei punti in cui si aspetta l'inizio di una nuova istruzione,
+se il compilatore incontra una riga che comincia con un segno uguale
+ed una parola, come questa:
+
+    =head1 Ecco che arrivano i Pod!
+
+allora il testo nella riga e tutto quello che segue fino ad una riga
+che comincia con C<=cut> (riga compresa) sarE<agrave> ignorato. Il formato
+del testo incluso E<egrave> descritto in L<perlpod>.
+
+CiE<ograve> vi consente di inframmezzare liberamente codice e documentazione,
+come in
+
+    =item spippola($)
+
+    La funzione spippola() si comportera` nella piu` spettacolare
+    delle forme che possiate mai immaginare, senza nemmeno escludere
+    forme pirotecniche cibernetiche.
+
+    =cut torniamo al compilatore, niente di questa roba pod!
+
+    sub spippola($) {
+       my $cosetta = shift;
+       # .........
+    }
+
+Osservate che i traduttori pod dovrebbero guardare solo ai paragrafi
+che iniziano con una direttiva pod (rende piE<ugrave> semplice il parsing),
+laddove il compilatore di fatto sa rilevare delle eccezioni pod anche
+nel bel mezzo di un paragrafo. Questo signifca che la roba segreta
+che segue verrE<agrave> ignorata sia dal compilatore che dai traduttori.
+
+    $a=3;
+    =roba segreta
+     warn "Ne' CODICE ne' POD!?"
+    =cut indietro
+    print "preso $a\n";
+
+Probabilmente, perE<ograve>, non dovreste contare troppo sul fatto che l'istruzione
+C<warn()> qui sopra verrE<agrave> eliminata come pod per sempre. Non tutti i
+traduttori di pod si comportano bene a questo proposito, e forse
+il compilatore diverrE<agrave> piE<ugrave> bizzoso.
+
+Si possono anche utilizzare le direttive pod per commentare rapidamente una
+sezione di codice.
+
+=head2 Buoni Vecchi Commenti (No!)
+X<commento> X<line> X<riga> X<#> X<preprocessore> X<eval>
+
+Perl puE<ograve> elaborare direttive di riga, molto similmente al preprocessore C.
+Utilizzando questo meccanismo, E<egrave> possibile controllare l'idea che Perl ha
+dei nomi dei file e dei numeri di riga nei messaggi di errore o di avviso
+(specialmente per quelle stringhe che sono elaborate con C<eval()>). La
+sintassi per questo meccanismo E<egrave> la stessa che per la maggior parte
+dei preprocessori C: aderisce all'espressione regolare
+
+    # esempio: '# riga 42 "nuovo_nomefile.plx"'
+    /^\#   \s*
+      line \s+ (\d+)   \s*
+      (?:\s("?)([^"]+)\2)? \s*
+     $/x
+
+laddove C<$1> rappresenta il numero di riga per la prossima riga, e
+C<$3> rappresenta il nome del file opzionale (specificato con o
+senza virgolette).
+
+C'E<egrave> una cosa piuttosto ovvia da cui guardarsi quando si utilizza la direttiva
+C<line>: i debugger ed i profiler [programmi che analizzano le prestazioni
+delle varie sezioni del programma, NdT] mostreranno solo l'ultima riga
+riga sorgente come presente ad un particolare numero di riga in un dato
+file. Dovete prestare attenzione a non generare delle collisioni nei
+numeri di riga nel codice su cui avrete poi voglia di effettuare il debug.
+
+Ecco alcuni esempi che dovreste essere in grado di digitare nella
+vostra shell di comando:
+
+    % perl
+    # line 200 "bzzzt"
+    # il `#' nella riga precedente deve essere il primo carattere nella riga
+    die 'pippo';
+    __END__
+    pippo at bzzzt line 201.
+
+    % perl
+    # line 200 "bzzzt"
+    eval qq[\n#line 2001 ""\ndie 'pippo']; print $@;
+    __END__
+    pippo at - line 2001.
+
+    % perl
+    eval qq[\n#line 200 "pippo pluto"\ndie 'pippo']; print $@;
+    __END__
+    pippo at pippo pluto line 200.
+
+    % perl
+    # line 345 "miao"
+    eval "\n#riga " . __LINE__ . ' "' . __FILE__ ."\"\ndie 'pippo'";
+    print $@;
+    __END__
+    pippo at miao line 345.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlsyn
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di kral e Flavio Poletti.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut
+

@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Perl-Critic-Itch
+version:             0.07
+abstract:            Perl::Critic::Itch - A collection of Policies to solve some Itches
+license:             ~
+author:              
+    - Marcelo Rodrigues <marcelo@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Perl::Critic:                  1.052
+    Perl::Critic::TestUtils:       1.052
+    Perl::Critic::Utils:           1.052
+    Perl::Critic::Violation:       1.052
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,22 @@
+SYNOPSIS
+
+     use PERLANCAR::JSON::Match qw(match_json);
+     print "Data is JSON" if match_json($data);
+
+DESCRIPTION
+
+    This module is basically just JSON::Decode::Regexp with all the
+    embedded Perl code removed. So the regexp cannot build decoded JSON and
+    can only match instead. Used for testing/benchmarking only.
+
+FUNCTIONS
+
+ match_json($str) => bool
+
+    Match JSON in $str. Return true if input is a valid JSON, false
+    otherwise.
+
+SEE ALSO
+
+    JSON::Decode::Regexp
+

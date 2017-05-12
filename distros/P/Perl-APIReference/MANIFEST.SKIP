@@ -1,0 +1,13 @@
+^\..*\.sw.$
+/\..*\.sw.$
+^MANIFEST.bak$
+^Makefile$
+^Makefile.old$
+^blib/
+^pm_to_blib
+^blibdirs
+\B\.svn\b
+^nohup.out
+^Perl-APIReference-.*\.gz$
+\.git/
+\bMYMETA\..*$

@@ -1,0 +1,66 @@
+===============================
+2010-03-09 02:20:51 -0500 v0_08
+===============================
+
+  commit d29ff4ebb086a00e77229ec4cab4d25842bdd677
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Mar 9 02:20:51 2010 -0500
+  
+    Prepare for git-based distribution.
+
+  commit 25eba534463b982861b23e3bca9468e468e28b59
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Mar 9 02:20:30 2010 -0500
+  
+    Rearrange for git repository. 
+
+===============================
+2010-01-01 21:59:03 -0500 v0_07
+===============================
+
+  commit 36d44998e24ab71bf19eabb895fd850583c193a9
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Jan 1 21:59:03 2010 -0500
+  
+    Prepare for a new release.
+
+  commit 6a56f971953ac258990c1a7e212157847f7b4664
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Jan 1 21:40:14 2010 -0500
+  
+    [rt.cpan.org 24478] Applied Phonohawk's patch to handle more redirect
+    types.
+
+  commit 914dd5ab25e427ff4427fcac325c5da410db25de
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Fri Jan 1 21:36:00 2010 -0500
+  
+    [rt.cpan.org 31287] Fix http_proxy environment variable support,
+    contributed by Georg Moritz. Untested! LWP::Parallel will not
+    install. My LWP is too new for it.
+
+  commit 5e7052af5ec67b6e2dbdfcb108716a13d92dcbb9
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Mon Jul 27 04:58:17 2009 -0400
+  
+    Added a machine-readable repository directory to the distribution.
+    Documented the bug tracker, repository, and other resource URLs.
+
+  commit e9543ce81464f468d7bbeeffbebfc0a6b88ab5bb
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Tue Jun 21 18:36:42 2005 -0400
+  
+    Moved the hand-written Changes to CHANGES.OLD, making room for the
+    automated CHANGES at "make dist" time. Speaking of distributions, I
+    removed META.yml from the MANIFEST since MakeMaker makes one. I also
+    added svn-log.perl to Makefile.PL to auto-generate CHANGES.
+
+  commit b5dbd36072d238f33259f07cfa45f60c27651518
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date:   Thu May 5 05:36:16 2005 -0400
+  
+    Add META.yml to the MANIFEST. 
+
+==============
+End of Excerpt
+==============

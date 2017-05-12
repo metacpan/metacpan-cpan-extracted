@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         PXP
+version:      0.1.2
+version_from: 
+installdirs:  site
+requires:
+    I18N::LangTags:                0.33
+    Log::Log4perl:                 0.4
+    XML::Simple:                   2.09
+    XML::XPath:                    1.13
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

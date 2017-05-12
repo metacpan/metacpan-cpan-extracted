@@ -1,0 +1,37 @@
+# disable these
+
+[-Miscellanea::RequireRcsKeywords]
+[-ValuesAndExpressions::ProhibitConstantPragma]
+[-ValuesAndExpressions::ProhibitLeadingZeros]
+[-Variables::RequireInitializationForLocalVars]
+[-Modules::ProhibitMultiplePackages]
+[-ControlStructures::ProhibitPostfixControls]
+[-Modules::ProhibitAutomaticExportation]
+[-CodeLayout::RequireTidyCode]
+[-Documentation::RequirePodSections]
+[-Variables::ProhibitPunctuationVars]
+[-Modules::RequireExplicitPackage]
+[-BuiltinFunctions::ProhibitStringyEval]
+[-Modules::RequireVersionVar]
+[-ValuesAndExpressions::RequireInterpolationOfMetachars]
+[-Documentation::RequirePodLinksIncludeText]
+
+# configurable parts
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs
+
+[Subroutines::ProhibitManyArgs]
+max_arguments = 8
+
+[Variables::RequireLocalizedPunctuationVars]
+allow = %ENV %INC $|
+
+[RegularExpressions::RequireBracesForMultiline]
+allow_all_brackets = 1
+
+[RegularExpressions::ProhibitUnusualDelimiters]
+allow_all_brackets = 1
+
+[Variables::ProhibitPackageVars]
+packages = Data::Dumper File::Find FindBin Log::Log4perl Config

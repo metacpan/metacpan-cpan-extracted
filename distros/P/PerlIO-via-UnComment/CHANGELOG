@@ -1,0 +1,16 @@
+0.04	5 April 2012
+	Brought up to date with current code esthetics.  Verified it runs on
+	5.14.2, threaded and unthreaded.
+
+	28 January 2004
+	Made sure the test-suite cleans up on multi-versioned systems.
+
+0.03    28 December 2003
+        Added automatic required modules update using Devel::Required.
+
+0.02	13 August 2003
+	Cleaned up Makefile.PL and updated copyright info.  Made sure the
+	test-suite runs with strict and warnings enabled.
+
+0.01	22 July 2002
+	First version.

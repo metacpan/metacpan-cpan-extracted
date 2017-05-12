@@ -1,0 +1,22 @@
+---
+abstract: 'Invoke perl code at PAM phases'
+author:
+  - 'Jonathan Steinert <hachi@cpan.org>'
+build_requires:
+  ExtUtils::Constant: 0
+  ExtUtils::Embed: 0
+  XS::Object::Magic: 0
+configure_requires:
+  ExtUtils::Depends: 0
+  ExtUtils::MakeMaker: 6.30
+  XS::Object::Magic: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PAM
+requires:
+  XS::Object::Magic: 0
+version: 0.31

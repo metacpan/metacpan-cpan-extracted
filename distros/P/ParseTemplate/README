@@ -1,0 +1,22 @@
+		   Parse::Template 
+
+
+Parse::Template was initially created to serve as a code generator
+for the Parse::Lex class. The class is now available as a separate
+module.
+
+Copyright (c) 1995-2001 Philippe Verdret. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+-- 
+Philippe Verdret <pverdret@dalet.com>
+
+_________________________________
+How to BUILD, TEST and INSTALL it
+
+% perl Makefile.PL
+% make 
+% make test # or make test TEST_VERBOSE=1 or 2
+% make install
+

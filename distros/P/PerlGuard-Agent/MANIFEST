@@ -1,0 +1,23 @@
+Changes
+lib/PerlGuard/Agent.pm
+lib/PerlGuard/Agent/LexWrap.pm
+lib/PerlGuard/Agent/Frameworks.pm
+lib/PerlGuard/Agent/Frameworks/Catalyst.pm
+lib/PerlGuard/Agent/Frameworks/CGI.pm
+lib/PerlGuard/Agent/Frameworks/CGIApplication.pm
+lib/PerlGuard/Agent/Frameworks/Mojolicious.pm
+lib/PerlGuard/Agent/Frameworks/Script.pm
+lib/PerlGuard/Agent/Monitors.pm
+lib/PerlGuard/Agent/Monitors/DBI.pm
+lib/PerlGuard/Agent/Monitors/DBI/Tracer.pm
+lib/PerlGuard/Agent/Monitors/NetHTTP.pm
+lib/PerlGuard/Agent/Output.pm
+lib/PerlGuard/Agent/Output/PerlGuardServer.pm
+lib/PerlGuard/Agent/Output/StandardError.pm
+lib/PerlGuard/Agent/Profile.pm
+Makefile.PL
+MANIFEST
+README
+t/PerlGuard-Agent.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

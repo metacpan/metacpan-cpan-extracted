@@ -1,0 +1,60 @@
+2011/03/01 15:55:18 [49405] receiving file list
+2011/03/01 15:55:18 [49406] cd+++++++ ./
+2011/03/01 15:55:18 [49406] >f+++++++ README
+2011/03/01 15:55:18 [49406] >f+++++++ index.html
+2011/03/01 15:55:18 [49406] >f+++++++ index.json
+2011/03/01 15:55:18 [49406] cd+++++++ 
+2011/03/01 15:55:18 [49406] cd+++++++ dist/
+2011/03/01 15:55:18 [49406] >f+++++++ dist/pair.json
+2011/03/01 15:55:18 [49406] >f+++++++ dist/pg_french_datatypes.json
+2011/03/01 15:55:18 [49406] >f+++++++ dist/tinyint.json
+2011/03/01 15:55:18 [49406] cd+++++++ extension/
+2011/03/01 15:55:18 [49406] >f+++++++ extension/pair.json
+2011/03/01 15:55:18 [49406] >f+++++++ extension/pg_french_datatypes.json
+2011/03/01 15:55:18 [49406] >f+++++++ extension/tinyint.json
+2011/03/01 15:55:18 [49406] cd+++++++ user/
+2011/03/01 15:55:18 [49406] >f+++++++ user/daamien.json
+2011/03/01 15:55:18 [49406] >f+++++++ user/theory.json
+2011/03/01 15:55:18 [49406] >f+++++++ user/umitanuki.json
+2011/03/01 15:55:18 [49406] cd+++++++ tag/
+2011/03/01 15:55:18 [49406] >f+++++++ tag/data types.json
+2011/03/01 15:55:18 [49406] >fcst.... tag/france.json
+2011/03/01 15:55:18 [49406] >f.st.... tag/key value pair.json
+2011/03/01 15:55:18 [49406] >f..t.... tag/key value.json
+2011/03/01 15:55:18 [49406] >f.s..... tag/ordered pair.json
+2011/03/01 15:55:18 [49406] >fc...... tag/pair.json
+2011/03/01 15:55:18 [49406] >fcs..... tag/variadic function.json
+2011/03/01 15:55:18 [49406] cd+++++++ dist/
+2011/03/01 15:55:19 [49406] cd+++++++ dist/pair/
+2011/03/01 15:55:19 [49406] cd+++++++ dist/pair/0.1.0/
+2011/03/01 15:55:19 [49406] >f+++++++ dist/pair/0.1.0/META.json
+2011/03/01 15:55:19 [49406] >f+++++++ dist/pair/0.1.0/pair-0.1.0.zip
+2011/03/01 15:55:19 [49406] >f+++++++ dist/pair/0.1.0/README.txt
+2011/03/01 15:55:19 [49406] cd+++++++ dist/pair/0.1.1/
+2011/03/01 15:55:19 [49406] >f+++++++ dist/pair/0.1.1/META.json
+2011/03/01 15:55:19 [49406] >f+++++++ dist/pair/0.1.1/pair-0.1.1.zip
+2011/03/01 15:55:19 [49406] >f+++++++ dist/pair/0.1.1/README.txt
+2011/03/01 15:55:19 [49406] cd+++++++ dist/pg_french_datatypes/
+2011/03/01 15:55:19 [49406] cd+++++++ dist/pg_french_datatypes/0.1.0/
+2011/03/01 15:55:19 [49406] >f+++++++ dist/pg_french_datatypes/0.1.0/META.json
+2011/03/01 15:55:19 [49406] >f+++++++ dist/pg_french_datatypes/0.1.0/pg_french_datatypes-0.1.0.zip
+2011/03/01 15:55:19 [49406] >f+++++++ dist/pg_french_datatypes/0.1.0/README.txt.
+2011/03/01 15:55:19 [49406] cd+++++++ dist/pg_french_datatypes/0.1.1/
+2011/03/01 15:55:19 [49406] >f+++++++ dist/pg_french_datatypes/0.1.1/META.json
+2011/03/01 15:55:19 [49406] >f+++++++ dist/pg_french_datatypes/0.1.1/pg_french_datatypes-0.1.1.zip
+2011/03/01 15:55:19 [49406] >f+++++++ dist/pg_french_datatypes/0.1.1/README.txt
+2011/03/01 15:55:19 [49406] cd+++++++ dist/tinyint/
+2011/03/01 15:55:19 [49406] cd+++++++ dist/tinyint/0.1.0/
+2011/03/01 15:55:19 [49406] >f+++++++ dist/tinyint/0.1.0/META.json
+2011/03/01 15:55:19 [49406] >f+++++++ dist/tinyint/0.1.0/tinyint-0.1.0.zip
+2011/03/01 15:55:19 [49406] cd+++++++ meta/
+2011/03/01 15:55:19 [49406] >f+++++++ meta/mirrors.json
+2011/03/01 15:55:19 [49406] >f+++++++ meta/spec.txt
+2011/03/01 15:55:19 [49406] >f+++++++ meta/timestamp
+2011/03/01 15:55:19 [49406] cd+++++++ stats/
+2011/03/01 15:55:19 [49406] >f+++++++ stats/dist.json
+2011/03/01 15:55:19 [49406] >f+++++++ stats/extension.json
+2011/03/01 15:55:19 [49406] >f+++++++ stats/user.json
+2011/03/01 15:55:19 [49406] >f+++++++ stats/tag.json
+2011/03/01 15:55:19 [49406] >f+++++++ stats/summary.json
+2011/03/01 15:55:19 [49405] sent 1556 bytes  received 1868 bytes  total size 302398

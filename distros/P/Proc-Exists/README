@@ -1,0 +1,28 @@
+Proc-Exists version 1.01
+
+This is a small module which quickly and portably check for process
+existence via kill() or equivalent (on win32,
+OpenProcess(PROCESS_QUERY_INFORMATION...) without relying on or
+incurring the performance overhead of using the /proc filesystem.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, Brian Szymanski
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

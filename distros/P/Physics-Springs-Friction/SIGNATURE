@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 470b6fde725fdaf66125021cdcfbca511b7862f0 Build.PL
+SHA1 6d99f00b213d97faf833a4541446916df7b7f7b1 Changes
+SHA1 4b4bde88816fa82562803412d7b30d0e632d12c6 MANIFEST
+SHA1 137cad5522857bec545e64b86aa64d8983fd8ccf META.yml
+SHA1 6bb691692d30a5149124d415723ffcd8c3279a73 Makefile.PL
+SHA1 c0054773db9f5f5d0613a8723f82cb891d0f3f8e README
+SHA1 f26ed7aa07ad9a5bad386b6b48aa594aeaee657c examples/example1.pl
+SHA1 5e081c16f7e4aa98d82bf6c29a5cf9ed8780bacf examples/example1.png
+SHA1 4d487362035694eb07f91c0f421737d1b93dfaea lib/Physics/Springs/Friction.pm
+SHA1 bb0da54f2b3f2d7955baa41ee458cb3d1887f475 t/00pod.t
+SHA1 2db32c1aac44c2e41530ea63431166d91bd458bf t/00podcover.t
+SHA1 08493e953ece4d4a6f0dad439863317fb1084069 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.0 (GNU/Linux)
+
+iD8DBQFDSslWZCuimE51gxcRAkm6AJoDkiUFe8U/xsCWz1HriBrB0XsF1QCaA2p0
+uOh3TqP/KCalv20DmxiSMpo=
+=1UPa
+-----END PGP SIGNATURE-----

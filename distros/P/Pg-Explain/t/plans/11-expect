@@ -1,0 +1,26 @@
+{
+    'type'                   => 'Result',
+    'estimated_startup_cost' => 0.01,
+    'estimated_total_cost'   => 0.02,
+    'estimated_rows'         => 1,
+    'estimated_row_width'    => 0,
+    'actual_loops'           => '1',
+    'actual_rows'            => '1',
+    'actual_time_last'       => 0.035,
+    'actual_time_first'      => 0.033,
+    'is_analyzed'            => 1,
+    'initplans'              => [
+        {
+            'type'                   => 'Result',
+            'estimated_startup_cost' => 0.00,
+            'estimated_total_cost'   => 0.01,
+            'estimated_rows'         => 1,
+            'estimated_row_width'    => 0,
+            'actual_loops'           => '1',
+            'actual_rows'            => '1',
+            'actual_time_last'       => 0.005,
+            'actual_time_first'      => 0.003,
+            'is_analyzed'            => 1,
+        },
+    ]
+}

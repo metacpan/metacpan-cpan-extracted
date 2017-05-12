@@ -1,0 +1,187 @@
+NAME
+    PYX::Stack - Processing PYX data or file and process element stack.
+
+SYNOPSIS
+     use PYX::Stack;
+     my $obj = PYX::Stack->new(%parameters);
+     $obj->parse($pyx, $out);
+     $obj->parse_file($input_file, $out);
+     $obj->parse_handle($input_file_handler, $out);
+
+METHODS
+    "new(%parameters)"
+             Constructor.
+
+            *       "bad_end"
+
+                     Check bad end of element.
+                     If set, print error on unopened end of element.
+                     Default value is 0.
+
+            *       "output_handler"
+
+                     Output handler.
+                     Default value is \*STDOUT.
+
+            *       "verbose"
+
+                     Verbose flag.
+                     If set, each start element prints information to 'output_handler'.
+                     Default value is 0.
+
+    "parse($pyx[, $out])"
+             Parse PYX text or array of PYX text.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+    "parse_file($input_file[, $out])"
+             Parse file with PYX data.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+    "parse_handler($input_file_handler[, $out])"
+             Parse PYX handler.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+     parse():
+             Bad end of element.
+                     Element: %s
+             Stack has some elements.
+
+     parse_file():
+             Bad end of element.
+                     Element: %s
+             Stack has some elements.
+
+     parse_handler():
+             Bad end of element.
+                     Element: %s
+             Stack has some elements.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use PYX::Stack;
+
+     # Example data.
+     my $pyx = <<'END';
+     (begin
+     (middle
+     (end
+     -data
+     )end
+     )middle
+     )begin
+     END
+
+     # PYX::Stack object.
+     my $obj = PYX::Stack->new(
+             'verbose' => 1,
+     );
+
+     # Parse.
+     $obj->parse($pyx);
+
+     # Output:
+     # begin
+     # begin/middle
+     # begin/middle/end
+     # begin/middle
+     # begin
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure;
+     use PYX::Stack;
+
+     # Error output.
+     $Error::Pure::TYPE = 'PrintVar';
+
+     # Example data.
+     my $pyx = <<'END';
+     (begin
+     (middle
+     (end
+     -data
+     )middle
+     )begin
+     END
+
+     # PYX::Stack object.
+     my $obj = PYX::Stack->new;
+
+     # Parse.
+     $obj->parse($pyx);
+
+     # Output:
+     # PYX::Stack: Stack has some elements.
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Error::Pure;
+     use PYX::Stack;
+
+     # Error output.
+     $Error::Pure::TYPE = 'PrintVar';
+
+     # Example data.
+     my $pyx = <<'END';
+     (begin
+     (middle
+     -data
+     )end
+     )middle
+     )begin
+     END
+
+     # PYX::Stack object.
+     my $obj = PYX::Stack->new(
+             'bad_end' => 1,
+     );
+
+     # Parse.
+     $obj->parse($pyx);
+
+     # Output:
+     # PYX::Stack: Bad end of element.
+     # Element: end
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, PYX::Parser.
+
+SEE ALSO
+    Task::PYX
+        Install the PYX modules.
+
+REPOSITORY
+    <https://github.com/tupinek/PYX-Stack>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2011-2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.04
+

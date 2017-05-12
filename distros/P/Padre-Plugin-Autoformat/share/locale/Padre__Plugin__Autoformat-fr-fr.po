@@ -1,0 +1,18 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Autoformat\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-11 23:50+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Jérôme Quelin <jquelin@gmail.com>\n"
+"Language-Team: jérôme quelin <jquelin@cpan.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: French\n"
+"X-Poedit-Country: FRANCE\n"
+
+#: lib/Padre/Plugin/Autoformat.pm:53
+msgid "Autoformat\tCtrl+Shift+J"
+msgstr "Autoformat\tCtrl+Shift+J"
+

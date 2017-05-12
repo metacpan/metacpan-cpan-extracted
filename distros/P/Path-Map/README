@@ -1,0 +1,146 @@
+NAME
+    Path::Map - map paths to handlers
+
+VERSION
+    0.04
+
+SYNOPSIS
+        my $mapper = Path::Map->new(
+            '/x/y/z' => 'XYZ',
+            '/a/b/c' => 'ABC',
+            '/a/b'   => 'AB',
+
+            '/date/:year/:month/:day' => 'Date',
+
+            # Every path beginning 'SEO' is mapped the same.
+            '/seo/*' => 'slurpy',
+        );
+
+        if (my $match = $mapper->lookup('/date/2013/12/25')) {
+            # $match->handler is 'Date'
+            # $match->variables is { year => 2012, month => 12, day => 25 }
+        }
+
+        # Add more mappings later
+        $mapper->add_handler($path => $target)
+
+DESCRIPTION
+    This class maps paths to handlers. The paths can contain variable path
+    segments, which match against any incoming path segment, where the
+    matching segments are saved as named variables for later retrieval.
+
+    Note that the handlers being mapped to can be any arbitrary data, not
+    just strings as illustrated in the synopsis.
+
+  Comparison with Path::Router
+    This class fulfills some of the same jobs as Path::Router, with slightly
+    different design goals. Broadly speaking, Path::Map is a lighter,
+    faster, but less featureful version of Path::Router.
+
+    I've listed a few points of difference here to help highlight the pros
+    and cons of each class.
+
+    Speed
+        The main goal for Path::Map is lookup speed. Path::Router uses
+        regexes to do lookups, but Path::Map uses hash lookups. Path::Map
+        seems to be at least an order of magnitude faster based on my
+        benchmarks, and performance doesn't degrade with the number of
+        routes that are added. The main source of performance degradation
+        for Path::Map is path *depth*, Path::Router degrades less with depth
+        but more with width.
+
+        This approach also means that the order in which routes are added
+        makes no difference to Path::Map.
+
+    Reversibility
+        Path::Router has a specific aim of being reversible. That is to say
+        you can construct a path from a set of parameters. Path::Map does
+        not currently have this ability, patches welcome!
+
+    Validation
+        Path::Map has no built-in ability to validate path variables in any
+        way. Obviously validation can be done externally after the fact, but
+        that doesn't allow for the more complex routing rules possible in
+        Path::Router.
+
+        In other words, it's not possible for Path::Map to differentiate two
+        path templates which differ only in the variable segments (e.g.
+        "/blog/:name" vs "/blog/:id" where "id" matches "\d+" and "name"
+        matches "\D+").
+
+    Dependencies
+        Path::Map has a very small dependency chain, whereas Path::Router is
+        based on Moose, so has a relatively high dependency footprint. If
+        you're already using Moose, there's obviously no additional cost in
+        using Path::Router.
+
+METHODS
+  new
+        $mapper = $class->new(@pairs)
+
+    The constructor.
+
+    Takes an even-sized list and passes each pair to "add_handler".
+
+  add_handler
+        $mapper->add_handler($path_template, $handler)
+
+    Adds a single item to the mapping.
+
+    The path template should be a string comprising slash-delimited path
+    segments, where a path segment may contain any character other than the
+    slash. Any segment beginning with a colon (":") denotes a mandatory
+    named variable. Empty segments, including those implied by leading or
+    trailing slashes are ignored.
+
+    For example, these are all identical path templates:
+
+        /a/:var/b
+        a/:var/b/
+        //a//:var//b//
+
+    The order in which these templates are added has no bearing on the
+    lookup, except that later additions with identical templates overwrite
+    earlier ones.
+
+    Templates containing a segment consisting entirely of '*' match
+    instantly at that point, with all remaining segments assigned to the
+    "values" of the match as normal, but without any variable names. Any
+    remaining segments in the template are ignored, so it only makes sense
+    for the wildcard to be the last segment.
+
+        my $map = Path::Map->new('foo/:foo/*' => 'Something');
+        my match = $map->lookup('foo/bar/baz/qux');
+        $match->variables; # { foo => 'bar' }
+        $match->values; # [ qw( bar baz qux ) ]
+
+  lookup
+        $match = $mapper->lookup($path)
+
+    Returns a Path::Map::Match object if the path matches a known path
+    template, "undef" otherwise.
+
+    The two main methods on the match object are:
+
+    handler
+        The handler that was matched, identical to whatever was originally
+        passed to "add_handler".
+
+    variables
+        The named path variables as a hashref.
+
+  handlers
+        @handlers = $mapper->handlers()
+
+    Returns all of the handlers in no particular order.
+
+SEE ALSO
+    Path::Router
+
+AUTHOR
+    Matt Lawrence <mattlaw@cpan.org>
+
+COPYRIGHT
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

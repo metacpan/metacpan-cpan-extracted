@@ -1,0 +1,14 @@
+
+
+This archive contains the distribution PrankCall,
+version 0.004:
+
+  call remote services and hang up without waiting for a response. A word of warning,
+this module should only be used for those who are comfortable with one way communication
+
+This software is copyright (c) 2013 by Shutterstock Inc..
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

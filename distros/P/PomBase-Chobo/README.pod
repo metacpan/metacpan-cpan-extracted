@@ -1,0 +1,90 @@
+=encoding utf8
+
+=head1 PomBase-Chobo
+
+Prototype code from PomBase for reading OBO files into a Chado
+database using PostgreSQL COPY.
+
+L<https://github.com/pombase/chobo>
+
+=head2 Build status
+
+=for html <a href="https://travis-ci.org/pombase/chobo"><img src="https://travis-ci.org/pombase/chobo.svg?branch=master"></a>
+
+=head1 Features
+
+=over
+
+=item * Fast
+
+=item * Few dependencies
+
+=item * Single command for loading (chobo_load)
+
+=back
+
+=head1 Current problems
+
+=over
+
+=item * Some OBO files aren't supported because not all edge cases are handled
+
+=item * Uses a lot of memory (500MB to read and store GO)
+
+=item * Currently ignores stanza tags that PomBase doesn't use (eg. "xref:")
+
+=item * The destination Chado database must contain:
+
+=over
+
+=item * an is_a relation
+
+=item * a CV named "synonym_type" containing all synonym types from the input OBO files
+
+=back
+
+An example Chado DB containing these is here:
+L<https://github.com/pombase/pombase-legacy/blob/master/pombase-chado-base.dump?raw=true>
+
+=item * Ontologies can't be re-loaded
+
+=back
+
+
+=head2 Installation
+
+From CPAN:
+
+ cpan PomBase::Chobo
+
+or
+
+ cpanm PomBase::Chobo
+
+To install from Git:
+
+ cpanm Dist::Zilla
+ git clone https://github.com/pombase/chobo.git
+ cd chobo
+ dzil install
+
+
+=head2 Example usage
+
+C<chobo_load test-db my_username my_password *.obo>
+
+
+=head2 Support
+
+Please report problems at: L<https://github.com/pombase/chobo/issues>
+
+
+=head2 License and Copyright
+
+Copyright (C) 2016 Kim Rutherford
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

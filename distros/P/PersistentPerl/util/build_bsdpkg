@@ -1,0 +1,76 @@
+#!/bin/sh -u
+
+#
+# Build bsd package.  See "man pkg_create" for help
+#
+
+umask 022
+
+name=${PKGNM}-$VERSION
+apache_name=${PKGNM}_${MODNM}-$VERSION
+os=`uname -s`-`uname -r | sed 's/-[A-Z]*RELEASE$//'`
+arch=`uname -m`
+
+run_pkg_create() {
+    is_apache=$1;	shift
+    nm=$1;		shift
+    create_args=$1;	shift
+    o=binaries/${os}-${nm}
+    pkg_create \
+	-f $TMPDIR/pkg-plist \
+	-c $TMPDIR/pkg-comment \
+	-d $TMPDIR/pkg-descr \
+	-D COPYING \
+	$create_args \
+	$o &&
+    add_desc ${o}.tgz $is_apache $os $arch "${1:-}"
+}
+
+make_plist() {
+    name=$1;	shift
+    pkgdep=$1;	shift
+    copy_pkgfiles $TMPDIR "$@"
+    (
+	echo "@name $name"
+	echo "@cwd $PREFIX"
+	echo "@srcdir ${TMPDIR}${PREFIX}"
+	for d in $pkgdep; do
+	    echo "@pkgdep $pkgdep"
+	done
+	echo "@owner root"
+	echo "@group wheel"
+	echo "@mode 755"
+	for f in `file_dest "$@"`; do echo $f; done | remove_prefix
+    ) >$TMPDIR/pkg-plist
+}
+
+#
+# Standard package
+#
+
+# Write description file
+grab_description >$TMPDIR/pkg-descr
+
+# Write comment file
+grab_summary >$TMPDIR/pkg-comment
+
+# Write the packing list file
+make_plist $name "" $STD_FILES
+
+run_pkg_create 0 $name ""
+if test $? -ne 0; then
+    adios 1;
+fi
+
+#
+# Apache module
+#
+
+echo $APACHE_DESC >$TMPDIR/pkg-descr
+echo $APACHE_DESC >$TMPDIR/pkg-comment
+make_plist $apache_name $name $APACHE_FILES
+apache_install_script '$PKG_PREFIX' 'bak' >$TMPDIR/install
+apache_uninstall_script >$TMPDIR/uninstall
+
+run_pkg_create $APACHE_VERSION $apache_name \
+    "-I $TMPDIR/install -K $TMPDIR/uninstall" "Apache Web Server"

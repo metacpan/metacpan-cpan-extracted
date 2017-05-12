@@ -1,0 +1,29 @@
+---
+abstract: 'A Perlish Interface to the GSL 1D Root Finding Library'
+author:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+build_requires:
+  ExtUtils::CBuilder: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PerlGSL-RootFinding-SingleDim
+no_index:
+  file:
+    - README.pod
+provides:
+  PerlGSL::RootFinding::SingleDim:
+    file: lib/PerlGSL/RootFinding/SingleDim.pm
+    version: 0.001
+requires:
+  perl: 5.008
+resources:
+  bugtracker: http://github.com/jberger/PerlGSL-RootFinding-SingleDim/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/jberger/PerlGSL-RootFinding-SingleDim
+version: 0.001

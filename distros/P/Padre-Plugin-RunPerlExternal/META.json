@@ -1,0 +1,47 @@
+{
+   "abstract" : "Runs perl-document in external window. No need for config-switching",
+   "author" : [
+      "Matthias Ries <riesm@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.56, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Padre-Plugin-RunPerlExternal",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Padre" : "0.57",
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {},
+   "version" : "0.54",
+   "x_screenshots" : [
+      "http://www.imagebanana.com/view/3tndocxg/Padre_018.png",
+      "http://www.imagebanana.com/view/xiglvtu7/Auswahl_021.png"
+   ]
+}

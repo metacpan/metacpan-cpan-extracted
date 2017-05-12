@@ -1,0 +1,28 @@
+---
+abstract: 'finding and loading modules in a given namespace'
+author:
+  - 'Neil Bowers <neilb@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plugin-Loader
+requires:
+  Carp: '0'
+  File::Spec::Functions: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Path::Iterator::Rule: '0'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/neilbowers/Plugin-Loader
+  repository: https://github.com/neilbowers/Plugin-Loader.git
+version: '0.05'

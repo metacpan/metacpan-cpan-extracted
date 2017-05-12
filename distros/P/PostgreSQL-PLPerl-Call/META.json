@@ -1,0 +1,25 @@
+{
+   "resources" : {
+      "repository" : "git@github.com:timbunce/posgtresql-plperl-call.git"
+   },
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "Dist::Zilla version 1.100660",
+   "version" : "1.006",
+   "name" : "PostgreSQL-PLPerl-Call",
+   "author" : [
+      "Tim Bunce <Tim.Bunce@pobox.com>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "requires" : {
+      "DBI" : "1.605"
+   },
+   "abstract" : "Simple interface for calling SQL functions from PostgreSQL PL/Perl",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

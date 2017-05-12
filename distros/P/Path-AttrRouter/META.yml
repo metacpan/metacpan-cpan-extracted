@@ -1,0 +1,73 @@
+---
+abstract: 'Path router for URLs using the attributes'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0.98
+  URI::Escape: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.6, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Path-AttrRouter
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Path::AttrRouter:
+    file: lib/Path/AttrRouter.pm
+    version: 0.04
+  Path::AttrRouter::Action:
+    file: lib/Path/AttrRouter/Action.pm
+    version: 0
+  Path::AttrRouter::AsciiTable:
+    file: lib/Path/AttrRouter/AsciiTable.pm
+    version: 0
+  Path::AttrRouter::Controller:
+    file: lib/Path/AttrRouter/Controller.pm
+    version: 0
+  Path::AttrRouter::DispatchType::Chained:
+    file: lib/Path/AttrRouter/DispatchType/Chained.pm
+    version: 0
+  Path::AttrRouter::DispatchType::Path:
+    file: lib/Path/AttrRouter/DispatchType/Path.pm
+    version: 0
+  Path::AttrRouter::DispatchType::Regex:
+    file: lib/Path/AttrRouter/DispatchType/Regex.pm
+    version: 0
+  Path::AttrRouter::Match:
+    file: lib/Path/AttrRouter/Match.pm
+    version: 0
+requires:
+  Class::Data::Inheritable: 0
+  Data::Util: 0
+  Module::Pluggable::Object: 0
+  Mouse: 1.05
+  Text::SimpleTable: 1.1
+  Try::Tiny: 0
+  perl: 5.008_001
+resources:
+  bugtracker: https://github.com/ark-framework/Path-AttrRouter/issues
+  homepage: https://github.com/ark-framework/Path-AttrRouter
+  repository: git://github.com/ark-framework/Path-AttrRouter.git
+version: 0.04
+x_contributors:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+  - 'Ryo Miyake <ryo.studiom@gmail.com>'
+  - 'Masahiro Chiba <chiba@everqueue.com>'
+  - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
+  - 'Daisuke Murase <typester@gmail.com>'
+  - 'Songmu <y.songmu@gmail.com>'

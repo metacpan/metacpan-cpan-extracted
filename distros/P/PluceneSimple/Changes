@@ -1,0 +1,17 @@
+1.04 - Wed Mar 17 2004
+	* Now allows documents of id 0 to be deleted correctly! (Thanks to Steve Rushe for pointing this out)
+	(just a test. The fix was in Plucene itself.)
+
+1.03 - Wed Mar 17 2004
+	* added 'indexed' call
+
+1.02 - Tue Feb 16 2004
+	* results are now sorted by score
+
+1.01 - Fri Feb 06 2004
+
+	* search_during takes dates in any order. (Thanks to Simon Wistow for the idea!)
+
+1.0 - Mon Feb 02 2004
+
+	* Initial release to CPAN

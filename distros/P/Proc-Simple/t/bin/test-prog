@@ -1,0 +1,13 @@
+
+# test perl program
+
+use FindBin qw($Bin);
+
+my $testfile = "$Bin/../test-prog-running";
+
+open FILE, ">$testfile" or die "Can't open $testfile: $!";
+close FILE;
+
+$SIG{ TERM } = sub { unlink $testfile; };
+
+sleep 30;

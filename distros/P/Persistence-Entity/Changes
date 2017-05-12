@@ -1,0 +1,30 @@
+Revision history for Perl extension Persistence::Entity.
+
+0.07  Sun Sep 07 2008 
+    - fix commit (detach_all wasn't called for transaction_management eq 'transation')
+    - fix tests for MYSQL/PostgreSQL (updated sql scripts)
+
+0.06  Mon Jun 09 2008
+    - Extended xml schema for value_generators
+    - Added ValueGenerator manual
+
+0.05  Mon Jun 02 2008
+    - Add caching to xml injection
+    - Fix orm bless/new object instancation
+
+0.04  Mon Jun 02 2008
+    - Fix pod
+
+0.03 Sun Jun 01 2008
+    - Added adapters foe MOP classes
+    - Added LOBs support
+    - Improved pod documentation
+    - Extend mandual
+
+0.02  Sun May 24 2008
+    - Plain classes ORM support
+    - Improved pod documentation
+    - Introduce mandual
+    
+0.01  Sun May 18 2008
+    -  Initial import to CPAN.

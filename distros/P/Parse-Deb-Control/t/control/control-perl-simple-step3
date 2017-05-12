@@ -1,0 +1,51 @@
+Source: mms-perl
+Section: perl
+Priority: standard
+Maintainer: automat@parse-deb-control
+Uploaders: automat@parse-deb-control
+Standards-Version: 3.6.2
+Build-Depends: file, cpio (>= 2.6-5), libdb4.6-dev, libgdbm-dev, netbase [!hurd-i386], gcc (>= 4:4.2), procps | hurd
+Build-Conflicts: mms-libterm-readline-gnu-perl
+Vcs-Git: git://git.debian.org/git/perl/perl.git
+Vcs-Browser: http://git.debian.org/?p=perl/perl.git
+
+ 
+	
+Package: mms-perl-base
+Essential: yes
+Priority: required
+Architecture: any
+Pre-Depends: ${shlibs:Depends}, dpkg (>= 1.14.20)
+Conflicts: autoconf2.13 (<< 2.13-45), mms-libscalar-list-utils-perl (<< 1:1.18-1), mms-libxsloader-perl (<< 0.08-1),
+ mms-libcflow-perl (<< 1:0.68-11.1),
+ mms-libqt-perl (<< 3.008-3),
+ mms-libclass-methodmaker-perl (<< 2.10-1),
+ mms-libclearsilver-perl (<< 0.10.4-1.1),
+ mms-libhamlib2-perl (<< 1.2.6.2-6),
+ mms-libsys-cpu-perl (<< 0.40-2.1),
+ mms-libterm-size-perl (<< 0.2-4),
+ mms-libsufary-perl (<< 2.1.1-8),
+ mms-libcrypt-openssl-rsa-perl (<< 0.25-1),
+ mms-libcrypt-openssl-dsa-perl (<< 0.13-3),
+ mms-libcrypt-openssl-random-perl (<< 0.04-1),
+ mms-libcrypt-openssl-bignum-perl (<< 0.04-1),
+ mms-libvideo-ivtv-perl (<< 0.13-6),
+ icheck (<< 0.9.7-6.1),
+ findimagedupes (<< 2.11-2),
+ megahal (<< 9.1.1a-5),
+ razor (<< 1:2.84-6)
+Replaces: mms-perl (<= 5.10.0-9), mms-perl-modules (<< 5.10.0-12), mms-libperl5.8 (<< 5.8.0-20), mms-libscalar-list-utils-perl, mms-libclass-multimethods-perl (<< 1.70-4), mms-libxsloader-perl 
+Provides: mms-perl5-base, ${perlapi:Provides}, mms-libscalar-list-utils-perl, mms-libxsloader-perl
+Suggests: mms-perl
+Description: minimal Perl system
+ Perl is a scripting language used in many system scripts and utilities.
+ .
+ This package provides a Perl interpreter and the small subset of the
+ standard run-time library required to perform basic tasks. For a full
+ Perl installation, install "perl" (and its dependencies, "perl-modules"
+ and "perl-doc").
+ .
+ repackaged with "mms-" prefix
+
+
+

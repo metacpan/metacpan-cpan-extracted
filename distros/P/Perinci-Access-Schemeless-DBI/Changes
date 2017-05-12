@@ -1,0 +1,66 @@
+Revision history for Perinci-Access-Schemeless-DBI
+
+0.08    2016-03-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace JSON with JSON::MaybeXS.
+
+
+0.07    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.06    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.05     2014-07-04 (SHARYANTO)
+
+         [INCOMPATIBLE CHANGES]
+
+         - Expected database schema changed ('module' column/table now
+           'package').
+
+         [ENHANCEMENTS]
+
+         - Check database schema version for databases created by
+           App::UpdateRinciMetadataDb.
+
+
+0.04     2014-06-20 (SHARYANTO)
+
+         [ENHANCEMENTS]
+
+         - Add 'fallback_on_completion' attribute.
+
+         [BUG FIXES]
+
+         - A couple of bug fixes.
+
+
+0.03     2014-03-26 (SHARYANTO)
+
+         - No functional changes.
+
+         - Add some tests.
+
+
+0.02     2014-03-21 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - Fix list action.
+
+
+0.01     2014-03-20 (SHARYANTO)
+
+         - First release. No tests yet.

@@ -1,0 +1,15 @@
+=pod
+
+{{NEW SECTION}}
+
+=head1 PRE SECTION
+
+This is the pre section.
+
+{{DUPE SECTION}}
+
+=head1 POST SECTION
+
+This is the post section.
+
+=cut

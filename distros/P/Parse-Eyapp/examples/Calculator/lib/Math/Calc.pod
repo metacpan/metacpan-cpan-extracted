@@ -1,0 +1,176 @@
+=head1 NAME
+ 
+Math::Calc - Simple example illustrating how to use Parse::Eyapp
+ 
+=head1 Download
+
+=over 2
+
+=item * svn checkout http://misc-perl-utilities.googlecode.com/svn/trunk/calculator
+
+=back
+
+
+=head1 Building the Application
+ 
+  $ perl Makefile.PL
+  Checking if your kit is complete...
+  Looks good
+  Writing Makefile for Math::Calc
+
+  $ make rmcalc
+  rm -f lib/Math/Calc.pm
+
+  $ make calc
+  eyapp  -m Math::Calc  -o lib/Math/Calc.pm lib/Math/Calc
+  perl -Ilib -c lib/Math/Calc.pm
+  lib/Math/Calc.pm syntax OK
+
+  $ cd scripts/
+  scripts$ ./calc.pl
+  a=2*3
+  6
+
+=head1 Executing with an Input File
+
+  scripts$ cat expressions1
+  a=2*3
+  b=4
+  c=9+1
+  b= (b+1)*b
+
+  scripts$ ./calc.pl expressions1
+  6
+  4
+  10
+  20
+
+=head1 Executing an Input with Errors
+
+  scripts$ cat witherrors
+  a=2
+  b=3/(a-2)
+  c=9
+  2
+
+  scripts$ ./calc.pl witherrors
+  2
+  Illegal division by zero at line 2.
+  9
+  2
+
+=head1 Executing with the C<yydebug> option set
+
+  scripts$ ./calc.pl -debug
+  a=2
+  ----------------------------------------
+  In state 0:
+  Stack:[0]
+  Don't need token.
+  Reduce using rule 3 (STAR-1 --> /* empty */): Back to state 0, then go to state 1.
+  ----------------------------------------
+  In state 1:
+  Stack:[0,1]
+  Need token. Got >VAR<
+  Shift and go to state 8.
+  ----------------------------------------
+  In state 8:
+  Stack:[0,1,8]
+  Need token. Got >=<
+  Shift and go to state 21.
+  ----------------------------------------
+  In state 21:
+  Stack:[0,1,8,21]
+  Need token. Got >NUM<
+  Shift and go to state 5.
+  ----------------------------------------
+  In state 5:
+  Stack:[0,1,8,21,5]
+  Don't need token.
+  Reduce using rule 8 (exp --> NUM): Back to state 21, then go to state 29.
+  ----------------------------------------
+  In state 29:
+  Stack:[0,1,8,21,29]
+  Need token. Got ><0A><
+  Reduce using rule 10 (exp --> VAR = exp): Back to state 1, then go to state 6.
+  ----------------------------------------
+  In state 6:
+  Stack:[0,1,6]
+  Shift and go to state 18.
+  ----------------------------------------
+  In state 18:
+  Stack:[0,1,6,18]
+  Don't need token.
+  Reduce using rule 6 (line --> exp \n): 2
+  Back to state 1, then go to state 11.
+  ----------------------------------------
+  In state 11:
+  Stack:[0,1,11]
+  Don't need token.
+  Reduce using rule 2 (STAR-1 --> STAR-1 line): Back to state 0, then go to state 1.
+  ----------------------------------------
+  In state 1:
+  Stack:[0,1]
+  Need token. Got ><
+  Reduce using rule 4 (input --> STAR-1): Back to state 0, then go to state 2.
+  ----------------------------------------
+  In state 2:
+  Stack:[0,2]
+  Don't need token.
+  Reduce using rule 1 (start --> input): Back to state 0, then go to state 3.
+  ----------------------------------------
+  In state 3:
+  Stack:[0,3]
+  Shift and go to state 12.
+  ----------------------------------------
+  In state 12:
+  Stack:[0,3,12]
+  Don't need token.
+  Accept.
+
+=head1 Building a Standalone Distribution
+
+  $ export EYAPPENV='-s'
+  $ make rmcalc
+  rm -f lib/Math/Calc.pm
+  $ make calc
+  eyapp  -m Math::Calc -s -o lib/Math/Calc.pm lib/Math/Calc
+  perl -Ilib -c lib/Math/Calc.pm
+  lib/Math/Calc.pm syntax OK
+  $ make dist
+
+Now the distribution can be used in a machine where Parse::Eyapp isn't installed:
+
+  casiano@europa:/tmp/Math-Calc-1.0$ perl -MParse::Eyapp -e 0
+  Can't locate Parse/Eyapp.pm in @INC (@INC contains: 
+  BEGIN failed--compilation aborted.
+
+  casiano@europa:/tmp$ tar xvzf Math-Calc-1.0.tar.gz
+  casiano@europa:/tmp/Math-Calc-1.0$ perl Makefile.PL
+  Checking if your kit is complete...
+  Looks good
+  Writing Makefile for Math::Calc
+  casiano@europa:/tmp/Math-Calc-1.0$ make
+  casiano@europa:/tmp/Math-Calc-1.0$ make test
+  PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+  t/01smoke..............ok
+  t/02semanticerrors.....ok
+  t/03syntacticerrors....ok
+  All tests successful.
+  Files=3, Tests=10,  0 wallclock secs ( 0.12 cusr +  0.01 csys =  0.13 CPU)
+
+
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2006-2008 Casiano Rodriguez-Leon (casiano@ull.es). All rights reserved.
+
+These modules are free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+
+

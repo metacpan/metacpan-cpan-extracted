@@ -1,0 +1,133 @@
+@prefix cpan: <http://purl.org/NET/cpan-uri/person/> .
+@prefix cpant: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dbug: <http://ontologi.es/doap-bugs#> .
+@prefix dcs: <http://ontologi.es/doap-changeset#> .
+@prefix dist: <http://purl.org/NET/cpan-uri/dist/P5U/> .
+@prefix doap: <http://usefulinc.com/ns/doap#> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+_:main <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "lib/P5U.pm" .
+_:mst foaf:nick "MSTROUT" .
+_:mxh a foaf:Person ;
+	foaf:mbox <mailto:hunter@missoula.org> ;
+	foaf:name "Mateu X Hunter" .
+_:r1369402464r0 dcs:item [
+		a dcs:Documentation ;
+		rdfs:label "Lots and lots of documentation."@en
+	], [
+		a dcs:Addition ;
+		rdfs:label "'whois' command."@en
+	] ;
+	dcs:versus dist:v_0-001 .
+_:r1369402464r10 dcs:item [
+		rdfs:label "use MooX::Types::MooseLike::Base"@en
+	] ;
+	dcs:versus dist:v_0-005 .
+_:r1369402464r12 dcs:item [
+		dcs:blame _:mxh ;
+		a dcs:Bugix ;
+		rdfs:label "Fix for P5U::Command::Testers."@en ;
+		rdfs:seeAlso <https://bitbucket.org/tobyink/p5-p5u/pull-request/1/keep-cache_dir-as-an-instanceof-path-class/diff>
+	] ;
+	dcs:versus dist:v_0-006 .
+_:r1369402464r14 dcs:item [
+		a dcs:Update ;
+		rdfs:label "Switch from Path::Class and Path::Class::Rule to Path::Tiny and Path::Iterator::Rule"
+	], [
+		a dcs:Update ;
+		rdfs:label "Switch from MooX::Types::MooseLike to Types::Standard"
+	], [
+		a dcs:Update ;
+		rdfs:label "Switch from smartmatch to match::simple and match::smart"
+	], [
+		a dcs:Addition ;
+		rdfs:label "whois command in verbose mode now shows a list of a user's most popular distributions"
+	] ;
+	dcs:versus dist:v_0-007 .
+_:r1369402464r19 doap:browse <https://github.com/tobyink/p5-p5u> ;
+	a doap:GitRepository .
+_:r1369402464r20 a foaf:Person ;
+	foaf:mbox <mailto:tobyink@cpan.org> ;
+	foaf:name "Toby Inkster" .
+_:r1369402464r3 dcs:item [
+		a dcs:Bugfix, dcs:Documentation ;
+		rdfs:label "Fix a few abstracts."@en
+	], [
+		a dcs:Bugfix ;
+		rdfs:label "Fix 'bin/p5u' for Perl < 5.14."@en
+	] ;
+	dcs:versus dist:v_0-002 .
+_:r1369402464r6 dcs:item [
+		a dcs:Bugfix ;
+		rdfs:label "Debian package list regexp bugfix."@en
+	] ;
+	dcs:versus dist:v_0-003 .
+_:r1369402464r8 dcs:item [
+		dcs:thanks _:mst ;
+		a dcs:Update ;
+		rdfs:label "Switch from Any::Moose to Moo."@en
+	] ;
+	dcs:versus dist:v_0-004 .
+_:script <http://www.semanticdesktop.org/ontologies/2007/03/22/nfo#fileName> "bin/p5u" .
+<http://dev.perl.org/licenses/> <http://purl.org/dc/terms/title> "the same terms as the perl 5 programming language system itself" .
+dist:project cpant:install_script _:script ;
+	cpant:perl_version_from _:main ;
+	cpant:readme_from _:main ;
+	cpant:requires "App::Cmd", "Class::Load", "File::HomeDir", "File::pushd", "JSON 2.00", "LWP::Simple", "Module::Info", "Module::Manifest", "Moo 1.002000", "Object::AUTHORITY", "Path::Iterator::Rule", "Path::Tiny", "PerlX::Maybe", "Test::Pod", "Type::Utils", "Types::Standard", "autodie", "match::simple", "namespace::clean 0.19" ;
+	cpant:test_requires "Test::More 0.61" ;
+	cpant:version_from _:main ;
+	doap:bug-database <http://rt.cpan.org/Dist/Display.html?Queue=P5U> ;
+	doap:created "2012-06-28"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:developer _:r1369402464r20 ;
+	doap:download-page <https://metacpan.org/release/P5U> ;
+	doap:homepage <https://metacpan.org/release/P5U> ;
+	doap:license <http://dev.perl.org/licenses/> ;
+	doap:name "P5U" ;
+	doap:programming-language "Perl" ;
+	doap:release dist:v_0-001, dist:v_0-002, dist:v_0-003, dist:v_0-004, dist:v_0-005, dist:v_0-006, dist:v_0-007, dist:v_0-100 ;
+	doap:repository _:r1369402464r19 ;
+	doap:shortdesc "utilities for Perl 5 development and administration" ;
+	a doap:Project .
+dist:v_0-001 <http://purl.org/dc/terms/issued> "2012-06-29"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.001.tar.gz> ;
+	doap:revision "0.001"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a doap:Version ;
+	rdfs:label "Initial release" .
+dist:v_0-002 dcs:changeset _:r1369402464r0 ;
+	<http://purl.org/dc/terms/issued> "2012-07-01"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.002.tar.gz> ;
+	doap:revision "0.002"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a doap:Version .
+dist:v_0-003 dcs:changeset _:r1369402464r3 ;
+	<http://purl.org/dc/terms/issued> "2012-07-03"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.003.tar.gz> ;
+	doap:revision "0.003"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a doap:Version .
+dist:v_0-004 dcs:changeset _:r1369402464r6 ;
+	<http://purl.org/dc/terms/issued> "2012-07-03"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.004.tar.gz> ;
+	doap:revision "0.004"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a doap:Version .
+dist:v_0-005 dcs:changeset _:r1369402464r8 ;
+	<http://purl.org/dc/terms/issued> "2012-10-03"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.005.tar.gz> ;
+	doap:revision "0.005"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a doap:Version .
+dist:v_0-006 dcs:changeset _:r1369402464r10 ;
+	<http://purl.org/dc/terms/issued> "2012-10-06"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.006.tar.gz> ;
+	doap:revision "0.006"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a doap:Version .
+dist:v_0-007 dcs:changeset _:r1369402464r12 ;
+	<http://purl.org/dc/terms/issued> "2012-10-23"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.007.tar.gz> ;
+	doap:revision "0.007"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a doap:Version ;
+	rdfs:label "Skyfall"@en .
+dist:v_0-100 dcs:changeset _:r1369402464r14 ;
+	<http://purl.org/dc/terms/issued> "2013-05-24"^^<http://www.w3.org/2001/XMLSchema#date> ;
+	doap:file-release <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.100.tar.gz> ;
+	doap:revision "0.100"^^<http://www.w3.org/2001/XMLSchema#string> ;
+	a doap:Version .

@@ -1,0 +1,15 @@
+---
+name: POE-Filter-LZW-Progressive
+version: 0.1
+author:
+  - 'Eric Waters <ewaters@uarc.com>'
+abstract: ~
+license: perl
+requires:
+  Compress::LZW::Progressive: 0
+  POE: 0.34_01
+provides:
+  POE::Filter::LZW::Progressive:
+    file: lib/POE/Filter/LZW/Progressive.pm
+    version: 0.1
+generated_by: Module::Build version 0.24

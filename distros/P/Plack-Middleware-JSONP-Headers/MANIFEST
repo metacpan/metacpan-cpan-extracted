@@ -1,0 +1,8 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Plack/Middleware/JSONP/Headers.pm
+t/00_compile.t
+t/10_headers.t

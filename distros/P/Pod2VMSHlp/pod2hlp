@@ -1,0 +1,54 @@
+    eval 'exec perl -S $0 "$@"'
+        if 0;
+#
+# pod2hlp 1-MAY-1999, pvhp@best.com
+#
+
+=head1 NAME
+
+pod2hlp - pod to VMS help file reformatter.
+
+=head1 SYNOPSIS
+
+perl pod2hlp podfile
+
+=head1 DESCRIPTION
+
+This program uses the Pod::Hlp module from the Pod2VMSHlp
+package.  This program takes a podfile.TYPE and produces
+a reformatted podfile.hlp file in the same directory.
+
+=head1 AUTHOR
+
+Copyright (c) 1999 Peter Prymmer.  This program
+may be used under the same terms as Perl.
+Peter Prymmer pvhp@best.com 1-MAY-1999.
+First released with Pod::Hlp Aug 14 1996.
+
+=cut
+
+if(@ARGV<1) {
+        die <<EOF;
+Usage: 
+  $0 page_name|ModuleName|ProgramName|pod_file_name
+
+EOF
+}
+
+use Pod::Hlp;
+
+my($pod,$infile,$tmp,$hlp_level);
+
+$pod = $infile = $ARGV[0];
+$pod =~ s/\.[^\.]*$//;
+$tmp = $pod . ".hlp";
+
+if ($ARGV[1]) { $hlp_level = $ARGV[1]; } else { $hlp_level = '1'; }
+
+open(TMP,">$tmp");
+print TMP "$hlp_level $pod\n$pod\n";
+Pod::Hlp::pod2hlp($infile,$hlp_level,*TMP);
+close(TMP);
+
+# print "output is in file $tmp\n";
+

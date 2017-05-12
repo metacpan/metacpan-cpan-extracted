@@ -1,0 +1,82 @@
+#!perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use POE::Component::Server::IRC::Common qw(mkpasswd);
+
+my $version;
+my $md5;
+my $apache;
+my $password;
+
+GetOptions( 'version', \$version, 'md5', \$md5, 'apache', \$apache, 'password', \$password );
+
+if ( $version ) {
+  no strict 'vars';
+  my $v = defined $VERSION ? $VERSION : 'dev-git';
+  print "$0 - version ", $v, "\n";
+  exit 0;
+}
+
+die "No --password option specified\n" unless $password;
+
+$md5 = 0 if $md5 and $apache;
+
+my $crypt = mkpasswd( $password, md5 => $md5, apache => $apache );
+print $crypt, "\n" if $crypt;
+exit 0;
+
+__END__
+
+=head1 NAME
+
+pmkpasswd - Generate crypted passwords 
+
+=head1 SYNOPSIS
+
+  pmkpasswd --password moocow
+
+=head1 DESCRIPTION
+
+pmkpasswd is a little utility to generate crypted passwords for use with 
+L<POE::Component::Server::IRC> C<oper> blocks. It is basically a wrapper
+for the C<mkpasswd> function provided by L<POE::Component::Server::IRC::Common>.
+
+By default it produces passwords using perl's C<crypt> function.
+
+The password is outputted on STDOUT.
+
+=head1 SWITCHES
+
+=over
+
+=item --version
+
+Prints the version number on STDOUT and exits.
+
+=item --password 
+
+Mandatory switch, the plain-text password you wish to be crypted.
+
+=item --md5
+
+Instead of using C<crypt>, produce a MD5 crypted password.
+
+=item --apache 
+
+Instead of using C<crypt>, produce an Apache MD5 crypted password.
+
+=back
+
+=head1 AUTHOR
+
+Chris C<BinGOs> Williams <chris@bingosnet.co.uk>
+
+=head1 SEE ALSO
+
+L<POE::Component::Server::IRC>
+
+L<POE::Component::Server::IRC::Common>
+
+L<Crypt::PasswdMD5>

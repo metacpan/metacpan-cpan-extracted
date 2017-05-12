@@ -1,0 +1,181 @@
+==================================================
+Changes from 2011-08-16 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.921 at 2012-08-15 05:19:06 +0000
+------------------------------------------
+
+  Change: c20a7f76c2bed51677a36f8c0f17fedcc4ef5051
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-08-15 01:17:14 +0000
+
+    Fix a test failure if an internet isn't available.
+
+    Tests still don't pass but 'you actually get a "not ok" instead of
+    "Looks like you planned 4 tests but ran 3"'. Thanks, Tod McQuillin! 
+
+------------------------------------------
+version 0.920 at 2012-06-03 02:32:41 +0000
+------------------------------------------
+
+  Change: 2a038120059176b412e51388ab1a6494c03a15d5
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-06-02 22:32:41 +0000
+
+    Remove use of Socket::GetAddrInfo.
+
+    Socket 2.001 (and possibly earlier) expose getaddrinfo() so we don't
+    need Socket::GetAddrInfo anymore. Also, the author of that module
+    suggests that it's obsolete since Socket provides it now. 
+
+------------------------------------------
+version 0.919 at 2012-06-02 06:40:46 +0000
+------------------------------------------
+
+  Change: 4a415e5228e7c41da67027e7821ad606a418363f
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-06-02 02:40:46 +0000
+
+    Fix usage of Socket::GetAddrInfo for new version 0.22.
+
+    avenj on irc.perl.org #poe pointed out that Socket::GetAddrInfo 0.22
+    changed public behavior and began throwing the following error. This
+    change compensates for that and requires version 0.22 or later.
+
+    :newapi tag is no longer supported by Socket::GetAddrInfo; just 'use'
+    it directly 
+
+------------------------------------------
+version 0.918 at 2012-05-15 15:12:36 +0000
+------------------------------------------
+
+  Change: 202dea1c77b0b80aae8a06eef5318f63cc189c9e
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-05-15 11:12:36 +0000
+
+    Fix address untainting error.
+
+    Reported by Alberto Simões on irc.perl.org and diagnosted with
+    copious help from Chris Williams. Thanks, guys! 
+
+------------------------------------------
+version 0.917 at 2012-05-13 08:45:53 +0000
+------------------------------------------
+
+  Change: 963f8fe5bf94ddabf53b9b40e9458aad2c895e46
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-05-13 04:45:53 +0000
+
+    [rt.cpan.org 76987] Add a cancel() method to stop pending requests.
+
+    Modified resolve() to return a request ID. Added cancel(), which
+    accepts a request ID and cancels it.
+    POE::Component::Client::Keepalive requires it. 
+
+  Change: 34d54dbcb61ada8b0f97b4e145723be9dc35c542
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-05-05 19:01:15 +0000
+
+    [rt.cpan.org 76550] Avoid hang when no requests made.
+
+    Fixed thanks to Sergei Kozunov's bug report and test case. A sidecar
+    process was created at startup, but no idle timeout was set. These
+    timeouts are only set when requests happen, and in an application
+    where all addresses are already resolved, no timeout is set. So the
+    component lingers forever. 
+
+  Change: accbcc5a17b77642325a00267e78d1506d936640
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-04-29 19:22:55 +0000
+
+    [rt.cpan.org 76549] Fix a little typo in sidecar cleanup.
+
+    _poe_sidecar_closed() was destroying the wrong sidecar process. Thank
+    you, Kozunov, for the code review and bug report. Two little octets
+    can make a huge difference. 
+
+  Change: 401d307f6ea076b0152e51caf53717ebf7616c90
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-04-29 18:46:27 +0000
+
+    [rt.cpan.org 76314] Untaint addresses before Socket::GetAddrInfo.
+
+    Dylan Doxey pointed out that Socket::GetAddrInfo rejects tainted
+    addresses. Untaint them first, per his recommendation and test case. 
+
+------------------------------------------
+version 0.916 at 2012-03-05 02:55:32 +0000
+------------------------------------------
+
+  Change: 9610861f210360b2d2a6d263a8b0f48a4d134bf4
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-03-04 21:55:32 +0000
+
+    Avoid a final timeout if the user explicitly shuts down everything. 
+
+------------------------------------------
+version 0.915 at 2012-03-05 00:17:58 +0000
+------------------------------------------
+
+  Change: 466a7e1fa548913d59dcc454951c5bd0e293d551
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-03-04 19:17:58 +0000
+
+    Fix dist.ini and .gitignore to allow Git::Check to pass. 
+
+  Change: 3557a330346457155b951c505decc4152abaf0d3
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-03-04 18:48:42 +0000
+
+    [rt.cpan.org 67601] Test IPv6 availability against non-localhost.
+
+    Larwan Burke pointed out that localhost is a bad name to resolve when
+    testing for IPv6 availability. It tends to be in /etc/hosts, which
+    resolves whether or not the named can. 
+
+  Change: 32d22afac0c59a6ad5f68dd690a5c17849a0536f
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-03-04 17:06:56 +0000
+
+    [rt.cpan.org 74486] Fix a typo in a hash key.
+
+    I hate hash-based data structures for just this reason: typos are
+    silently ignored. Many thanks to Jon Portnoy for reporting this one. 
+
+  Change: 9c3be3c8497c043f7883136383c00ce42baa95d9
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-03-04 17:03:52 +0000
+
+    Add an environment variable to override the default IP version
+    preference.
+
+    As IPv6 is adopted, more and more places will behave differently than
+    expected. The POCO_RESOLVER_IPV environment variable gives users a
+    way to override the legacy behavior during this potentially painful
+    transition. 
+
+  Change: 4ba15258e501c522856aa2f0e89ac3e429ae0ed3
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2012-03-04 17:03:01 +0000
+
+    Update dist.ini to automatically bump versions and tag releases. 
+
+------------------------------------------
+version 0_914 at 2011-09-15 05:27:46 +0000
+------------------------------------------
+
+  Change: e4f3fb11df5d5bf43a1445edc498cb4ee75839ae
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2011-09-15 01:27:46 +0000
+
+    Resolve a runaway fork when running in EmbedPerl.
+
+    Sjors Gielen reported a runaway fork in irc.perl.org #poe. $^X is not
+    always a path to the perl binary. Resolved by using Configure's
+    notion of perlpath and _exe, per Sjors' recommendation and discussion
+    of $^X in perlvar. 
+
+================================================
+Plus 5 releases after 2011-08-16 00:00:00 +0000.
+================================================

@@ -1,0 +1,13 @@
+pod
+  head1
+    @title
+      "NAME"
+    text
+      @text
+        "100-simple"
+  head1
+    @title
+      "DESCRIPTION"
+    text
+      @text
+        "A very simple Pod file."

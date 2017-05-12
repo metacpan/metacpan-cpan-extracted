@@ -1,0 +1,26 @@
+PPerl
+=====
+
+PPerl provides a persistent environment for perl scripts. It makes converting
+a useful old script into a persistent daemon process a breeze.
+
+Simply change your shebang line to #!/usr/bin/pperl, rather than "perl", and
+you'll find your old slow scripts that take ages to start up, running like
+they were brand spanking new again. Well, that's the plan at least!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001 MessageLabs Ltd. Written by Matt Sergeant.
+
+This is free software. You may use it and redistribute it under the same terms
+as Perl itself.
+

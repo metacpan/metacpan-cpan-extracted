@@ -1,0 +1,27 @@
+Revision history for Perl extension Perl6::Pod::Lib.
+TODO:
+
+0.13 14 Dec 2015
+    + update deps
+0.12 13 Feb 2013
+    + fix tests
+    + add latex format
+0.11 11 Jul 2012
+    + fix open ( use utf8 )
+0.10 15 May 2011
+    + update to Perl6::Pod 0.51 api
+0.07 4 Nov 2011
+    +Typo and grammar fixes in the docs.( Michael G. Schwern ) 
+0.06 14.06.2011
+    + filter for exclude
+0.05 14.06.2011
+    + exclude for =Include test.pod (!BLOCKNAME)
+0.04 25.04.2011
+    + translate path in Include and Images blocks
+0.03 18.06.2010
+    + bulk attach all modules
+      =use Perl6::Pod::Lib
+0.02  25.05.2010
+    + Image block
+0.01  11.04.2010
+    + Include

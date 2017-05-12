@@ -1,0 +1,49 @@
+__END__
+
+=pod
+
+=head1 INTRODUCTION
+
+When your application templates are just pure HTML5 files, it becomes easy for
+the front-end developers to work with almost no coordination with the backend team.
+Even if you buy a "website theme" from one of those online markets, which of
+course wasn't developed to your application, it is very easy to slice it into
+'layout', 'header', 'footer' and 'content' template files.
+
+=head1 HTML vs TEXT
+
+The distinction between text and HTML is very important, its the cause of the
+L<XSS vulnerability|https://www.owasp.org/index.php/Cross-site_Scripting_(XSS)>.
+This vulnerability became so common on the web because almost all template engines
+are designed to process text. These engines can be used to render a config file,
+a christmas letter, and also HTML.
+
+Sure, all of those templating engines also provides a way to properly
+HTML-escape a value, usualy in the form of filters. But being a text templating
+engine they can't HTML-escape values by default. The reality when using
+that kind of engine is that developers can (and will) forget to add the proper
+filters, or just don't know about this security vulnerability at all.
+
+Plift is a template engine just for HTML, implemented on top of
+libxml. Which means that for rendering text, we call L<XML::LibXML::Document/createTextNode>,
+for attributes, L<XML::LibXML::Document/setAttribute> and for rendering the
+final document we call L<XML::LibXML::Document/toStringHTML>. Libxml takes care
+of the proper escaping.
+
+Does it mean its immune to XSS vulnerability? No, you can still tell Plift to
+render unescaped HTML, but its not the default.
+
+=head1 jQuery-like API
+
+Plift uses L<XML::LibXML::jQuery>, which provides a API to manipulate HTML that
+most web developers are already familiar with.
+
+I plan for a future Plift version to expose all features to an embedded
+javascript runtime.
+
+
+=head1 AUTHOR
+
+Carlos Fernando Avila Gratz E<lt>cafe@kreato.com.brE<gt>
+
+=cut

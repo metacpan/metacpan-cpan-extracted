@@ -1,0 +1,12 @@
+Revision history for Plack-Middleware-CustomErrorDocument
+
+0.004     2012-06-29 17:48:54 Europe/London
+
+ - tests actually test CustomErrorDocument instead of ErrorDocument!
+
+0.003     2012-06-29 17:31:31 Europe/London
+
+ - Matches behaviour of Plack::Middleware::ErrorDocument for non-dynamic error page selection
+ - Fixes recursive dependency bug
+
+0.002     2012-06-15 17:44:04 Europe/London

@@ -1,0 +1,9 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+pkglibdir=${libdir}/cli
+
+Name: NUnit
+Description: Testing framework for CLI
+Version: 2.4.7
+Libs: -r:${pkglibdir}/nunit.core-2.4/nunit.core.dll -r:${pkglibdir}/nunit.util-2.4/nunit.util.dll -r:${pkglibdir}/nunit.framework-2.4/nunit.framework.dll -r:${pkglibdir}/nunit.core.interfaces-2.4/nunit.core.interfaces.dll

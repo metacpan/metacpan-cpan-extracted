@@ -1,0 +1,6 @@
+% plugauthpasswd
+Username:  [default joe] optimus
+Old Password:
+New Password:
+Verify New Password:
+--- ok

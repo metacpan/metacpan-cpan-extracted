@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1203515599,
+          'number' => '+440200814254',
+          'time' => '13:53',
+          'date' => '2008-02-20',
+          'name' => 'John XXXX (M)',
+          'phone' => '+440200814254',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1203515599,
+          'text' => 'As ur Mr freebie,is it cheeky to ask u to get thegindevils.co.uk & .com?That\'s the name of my solo original project,now I\'ve used jackbarrel for the cover band',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7107813,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 87533
+        };

@@ -1,0 +1,182 @@
+#!/usr/bin/perl
+my $RCS_Id = '$Id: font2pfa.pl,v 1.7 2000-02-04 10:32:30+01 jv Exp $ ';
+
+# Author          : Johan Vromans
+# Created On      : January 1999
+# Last Modified By: Johan Vromans
+# Last Modified On: Fri Feb  4 10:22:55 2000
+# Update Count    : 37
+# Status          : Released
+
+################ Common stuff ################
+
+# $LIBDIR = $ENV{'LIBDIR'} || '/usr/local/lib/sample';
+# unshift (@INC, $LIBDIR);
+# require 'common.pl';
+use strict;
+my $my_package = 'Sciurix';
+my ($my_name, $my_version) = $RCS_Id =~ /: (.+).pl,v ([\d.]+)/;
+$my_version .= '*' if length('$Locker:  $ ') > 12;
+
+################ Program parameters ################
+
+use Getopt::Long 2.00;
+my $output;
+my $verbose = 0;
+my $type = $0 =~ /pfb$/ ? "pfb" : "pfa";
+my ($debug, $trace) = (0, 0);
+options ();
+
+################ Presets ################
+
+use PostScript::Font 1.01;
+
+my $TMPDIR = $ENV{'TMPDIR'} || '/usr/tmp';
+
+################ The Process ################
+
+my $font = new PostScript::Font ($ARGV[0],
+				 error => 'die',
+				 verbose => $verbose,
+				 trace => $trace,
+				 format => $type,
+				);
+
+if ( defined $output ) {
+    open (STDOUT, ">$output") || die ("$output: $!\n");
+}
+print STDOUT ($font->FontData);
+
+################ Subroutines ################
+
+sub options {
+    my $help = 0;		# handled locally
+    my $ident = 0;		# handled locally
+
+    # Process options.
+    if ( @ARGV > 0 && $ARGV[0] =~ /^[-+]/ ) {
+	usage ()
+	    unless GetOptions ("ident"		=> \$ident,
+			       "verbose"	=> \$verbose,
+			       "output=s"	=> \$output,
+			       "ascii|pfa"	=> sub { $type = "pfa" },
+			       "binary|pfb"	=> sub { $type = "pfb" },
+			       "asm"		=> sub { $type = "asm" },
+			       "trace"		=> \$trace,
+			       "help"		=> \$help,
+			       "debug"		=> \$debug)
+		&& !$help;
+    }
+    print STDERR ("This is $my_package [$my_name $my_version]\n")
+	if $ident;
+    usage () unless @ARGV <= 1;
+    @ARGV = ("-") unless @ARGV;
+}
+
+sub usage {
+    print STDERR <<EndOfUsage;
+This is $my_package [$my_name $my_version]
+Usage: $0 [options] [input-file]
+    -output XXX		sends output to file XXX instead of standard output
+    -ascii|pfa		decodes to .pfa format (default for font2pfa)
+    -binary|pfb		encodes to .pfb format (default for font2pfb)
+    -help		this message
+    -ident		show identification
+    -verbose		verbose information
+EndOfUsage
+    exit 1;
+}
+
+=pod
+
+=head1 NAME
+
+font2pfa/font2pfb - decodes/encodes binary or ASCII encoded PostScript fonts
+
+=head1 SYNOPSIS
+
+  font2pfa [options] [input]
+  font2pfb [options] [input]
+
+    -output XXX		writes output to file XXX instead of standard output
+    -ascii|pfa		decodes to .pfa (ASCII) format
+    -binary|pfb		encodes to .pfb (binary) format
+    -help		this message
+    -ident		show identification
+    -verbose		verbose information
+
+=head1 DESCRIPTION
+
+B<font2pfa> converts a PostScript font.
+
+The program takes, as command line arguments, the name of a PostScript
+font file, encoded either in binary (.pfb) or ascii (.pfa) format,
+optionally followed by the name of the output file. If no filenames
+are supplied, the program reads from standard input and writes to
+standard output.
+
+The output will be ASCII encoded (.pfa format), unless the B<-binary>
+or B<-pfb> option is used, or the program is installed under a name
+that ends in C<pfb>.
+
+B<font2pfa> depends on the capabilities of the C<PostScript::Font>
+module. If your version supports True Type fonts, B<font2pfa> will
+happily produce ASCII or binary encoded Type42 versions of True Type
+fonts.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-output> filename
+
+Writes the output to the named file. If this option is omitted, output
+is sent to standard output.
+
+=item B<-ascii> or B<-pfa>
+
+Output the font in ASCII (.pfa) format.
+This is the default behavior when the program is installed under the
+name C<font2pfa>.
+
+=item B<-binary> or B<-pfb>
+
+Output the font in binary (.pfb) format.
+This is the default behavior when the program is installed under the
+name C<font2pfb>.
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-ident>
+
+Prints program identification.
+
+=item B<-verbose>
+
+More verbose information.
+
+=back
+
+=head1 AUTHOR
+
+Johan Vromans, Squirrel Consultancy <jvromans@squirrel.nl>
+
+=head1 COPYRIGHT and DISCLAIMER
+
+This program is Copyright 2000,1999 by Squirrel Consultancy. All
+rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of either: a) the GNU General Public License as
+published by the Free Software Foundation; either version 1, or (at
+your option) any later version, or b) the "Artistic License" which
+comes with Perl.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See either the
+GNU General Public License or the Artistic License for more details.
+
+=cut

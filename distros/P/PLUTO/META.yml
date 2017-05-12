@@ -1,0 +1,44 @@
+---
+abstract: ~
+author:
+  - IBM
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: eclipse
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PLUTO
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Aspect: 0.10
+  Class::Accessor: 0.25
+  Class::Base: 0.02
+  Class::ISA: 0.32
+  Class::Interfaces: 0.04
+  Class::ParamParser: 1.041
+  Digest::MD5: 2.34
+  Error: 0.17
+  Exception::Class: 1.22
+  Exception::Class::DBI: 0.94
+  Module::Load: 0.10
+  Module::Load::Conditional: 0.38
+  Params::Check: 0.23
+  Parse::RecDescent: 1.93
+  SQL::Library: 0.0.3
+  Template: 2.15
+  Time::HiRes: 1.20
+  URI: 1.35
+  XML::LibXML: 1.70
+  XML::Namespace: 0.02
+  XML::RegExp: 0.02
+  XML::SAX: 0.96
+version: 0.30

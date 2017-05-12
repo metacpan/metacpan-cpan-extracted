@@ -1,0 +1,16 @@
+My TODO list in no particular order:
+
+- Fix destructors and reference counting.
+- Add mortalize/immortalize methods.
+- Add missing types.
+- Add support for by-reference arguments.
+- Reuse slot objects.
+- KDE support.
+- Port Qt examples.
+- Fix QPaintDevice::bitBlt.
+- Prune Pig.pm and repackage as ExtUtils::Pig
+- Test suite
+- Upcast from QWidget to QSubWidget
+- Overloaded operators
+- When passing default reference arguments, first assign it to a temp
+- Autoload classes

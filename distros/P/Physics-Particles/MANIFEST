@@ -1,0 +1,17 @@
+Build.PL
+Changes
+examples/ex1.gif
+examples/ex2.gif
+examples/ex3.png
+examples/ex4.png
+examples/example1.pl
+examples/example2.pl
+lib/Physics/Particles.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00pod.t
+t/00podcover.t
+t/11base.t
+META.yml
+SIGNATURE    Added here by Module::Build

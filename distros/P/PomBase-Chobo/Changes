@@ -1,0 +1,46 @@
+Revision history for PomBase-Chobo
+
+0.012     2017-02-22 11:36:03
+
+0.011     2016-08-18 13:09:42
+          Ignore trailing modifiers - See section "Trailing Modifiers" in:
+          ftp://ftp.geneontology.org/pub/go/www/GO.format.obo-1_4.shtml#S.1.4
+
+0.010     2016-08-11 11:18:33
+          Append "(obsolete)" to names of obsolete terms hen storing
+
+0.009     2016-07-21 20:34:13
+          Fix parsing for stanzas that have no subset: lines
+
+0.008     2016-07-21 20:24:28
+          Doc fixes
+          Fix term synonyms parsing and add a test for it
+          Add subsets() and is_obsolete() methods to OntologyTerm
+
+0.007     2016-07-20 21:20:12
+          Fix OBO parser to read def: and comment: lines
+          Store definition in cvterm rows
+
+0.006     2016-06-13 12:34:29
+          Use "relations" as the CV name for RO, see:
+            https://github.com/GMOD/Chado/issues/17
+          Documentation improvements
+
+0.005     2016-06-08 15:47:33
+          Improve README.pod
+          Improve chobo_load docs
+          The dbi:Pg: prefix on the database name is now optional
+
+0.004     2016-06-05 16:10:46
+          Handle reloading cv, db and dbxref rows
+          Check constraints after inserting each row in the test DB
+
+0.003     2016-06-02 14:46:28
+          Now explicity require Perl v5.20
+          (Internal) Builds correctly on Travis-CI
+
+0.002     2016-06-01 21:58:33
+          Fixed installation of chobo_load by removing Build.PL
+
+0.001     2016-06-01 21:02:38
+          Initial release

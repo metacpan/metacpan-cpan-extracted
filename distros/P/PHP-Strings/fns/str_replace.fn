@@ -1,0 +1,2 @@
+docs: |
+    See the C<s///> operator. L<perlop> and L<perlre> have details.

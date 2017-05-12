@@ -1,0 +1,27 @@
+Revision history for Params-Validate-Micro
+
+0.032   2007-10-11 hdp
+
+        '$' parameters should allow OBJECT also
+
+0.031   2007-10-08 hdp
+
+        Bugfix: don't use "1" as a hashref spec
+
+0.030   2007-04-10 hdp
+
+        Remove dependency on Hash::Merge.
+        Extend version number.
+
+0.02    20051111 15:26:52
+
+        Add positional validation; change argument passing
+        style.
+
+        Fix BARE_VAR so that single-character variable names
+        are allowed.
+
+0.01    20051110 17:35:04
+
+        First version, released on an unsuspecting world.
+

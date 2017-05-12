@@ -1,0 +1,51 @@
+==============================
+2012-10-21 00:17:54 +0100 1.08
+==============================
+
+  commit 41e569d63d03da4baa3b88ba1c95018062fb75a4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sun Oct 21 00:17:54 2012 +0100
+  
+    Switch to Dist::Zilla instead of Module::Install
+
+    No functional changes 
+
+==============================
+2011-11-17 22:12:19 +0000 1.06
+==============================
+
+  commit aece4fcbd88afe99a8be4ac095120b36dd6fea70
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Thu Nov 17 22:12:19 2011 +0000
+  
+    Use Net::IP::Minimal instead of Net::IP 
+
+==============================
+2011-03-14 22:59:03 +0000 1.04
+==============================
+
+  commit 13eb57379468e6bb87a5d3af6d3b8562a83bccfe
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Mon Mar 14 22:59:03 2011 +0000
+  
+    Remove indirect object notation and fix trailing whitespace errors 
+
+==============================
+2009-11-11 00:34:26 +0000 1.02
+==============================
+
+  commit 3d611fdb71af675bc03a66c433c3c7e066576756
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Wed Nov 11 00:34:26 2009 +0000
+  
+    Implement suggestions made by Justin Hunter
+
+  commit 9464a4bb666dac7e6447f1d6dc8bd4096896b3e0
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date:   Tue Nov 10 21:42:20 2009 +0000
+  
+    Fix documentation errors. 
+
+====================================
+End of changes in the last 1825 days
+====================================

@@ -1,0 +1,23 @@
+POE::Component::Client::Rcon is an add-on to the POE framework
+to allow easy administrative access to several types of game
+servers.
+
+Games known to use the Rcon protocol include Half-Life, all the
+versions of Quake, and Return to Castle Wolfenstein.  At this 
+point; however, PoCo::Client::Rcon only supports Half-Life
+and Quake.  RTCW is supposed to be compatible with Quake, but
+I have not been able to test this.
+
+--HISTORY--
+This is version 0.23.  Fixed a tiny bit of documentation and
+included a sample program.
+
+This is version 0.22.  I forgot to include a got_error() function
+to deal with errors.  Oops.
+
+This is version 0.21.  Fixed some documentation and the method
+of internally handing out jobids to player queries.  Various
+little bugs were also fixed.
+
+Andrew A. Chen
+achen-poe-rcon@divo.net

@@ -1,0 +1,3 @@
+$hash{CFLAGS} .= " @CFLAGS@";
+$hash{LDFLAGS = " @LDFLAGS@";
+$hash{LIBS}[0] .= " @LIBS@";

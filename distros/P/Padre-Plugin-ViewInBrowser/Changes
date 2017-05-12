@@ -1,0 +1,23 @@
+Revision history for Padre-Plugin-ViewInBrowser
+
+0.07    2009.05.31
+        removed taint mode for tests, leading to build failures (jquelin)
+
+0.06    2009.2.1
+        for Padre 0.26
+
+0.05    2009.1.5
+        for Padre 0.23
+
+0.04	2008.11.24
+		for 'Padre::Plugin' => '0.18'
+
+0.03	2008.11.22
+		Wx::LaunchDefaultBrowser
+
+0.02	2008.11.20
+		from use to require
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

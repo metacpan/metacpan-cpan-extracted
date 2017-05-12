@@ -1,0 +1,135 @@
+time    : Mon Aug  6 08:00:55 2001
+host    : jobis
+program : mountd
+pid     : 335
+msgid   : 664212
+facility: daemon
+level   : error
+text    : No default domain set
+
+time    : Tue Aug  7 13:15:12 2001
+host    : jobis
+program : sshd
+pid     : 27321
+msgid   : 800047
+facility: daemon
+level   : crit
+text    : fatal: Timeout before authentication for 192.168.1.1
+
+time    : Tue Aug  7 16:45:51 2001
+host    : jobis
+program : cvs_server
+pid     : undef
+msgid   : 702911
+facility: daemon
+level   : notice
+text    : connection from test [192.168.1.1] to /usr/test
+
+time    : Tue Aug  7 16:45:51 2001
+host    : jobis
+program : cvs_server
+pid     : undef
+msgid   : 702911
+facility: daemon
+level   : notice
+text    : connection from test [192.168.1.1] to /usr/test
+
+time    : Tue Aug  7 16:45:51 2001
+host    : jobis
+program : cvs_server
+pid     : undef
+msgid   : 702911
+facility: daemon
+level   : notice
+text    : connection from test [192.168.1.1] to /usr/test
+
+time    : Tue Aug  7 16:45:51 2001
+host    : jobis
+program : cvs_server
+pid     : undef
+msgid   : 702911
+facility: daemon
+level   : notice
+text    : connection from test [192.168.1.1] to /usr/test
+
+time    : Tue Aug  7 16:45:51 2001
+host    : jobis
+program : cvs_server
+pid     : undef
+msgid   : 702911
+facility: daemon
+level   : notice
+text    : connection from test [192.168.1.1] to /usr/test
+
+time    : Tue Aug  7 16:45:51 2001
+host    : jobis
+program : cvs_server
+pid     : undef
+msgid   : 702911
+facility: daemon
+level   : notice
+text    : connection from test [192.168.1.1] to /usr/test
+
+time    : Tue Aug  7 16:45:51 2001
+host    : jobis
+program : cvs_server
+pid     : undef
+msgid   : 702911
+facility: daemon
+level   : notice
+text    : connection from test [192.168.1.1] to /usr/test
+
+time    : Tue Aug  7 16:45:51 2001
+host    : jobis
+program : cvs_server
+pid     : undef
+msgid   : 702911
+facility: daemon
+level   : notice
+text    : connection from test [192.168.1.1] to /usr/test
+
+time    : Tue Aug  7 16:45:51 2001
+host    : jobis
+program : cvs_server
+pid     : undef
+msgid   : 702911
+facility: daemon
+level   : notice
+text    : connection from test [192.168.1.1] to /usr/test
+
+time    : Tue Aug  7 16:45:51 2001
+host    : jobis
+program : cvs_server
+pid     : undef
+msgid   : 702911
+facility: daemon
+level   : notice
+text    : connection from test [192.168.1.1] to /usr/test
+
+time    : Tue Aug  7 16:45:51 2001
+host    : jobis
+program : cvs_server
+pid     : undef
+msgid   : 702911
+facility: daemon
+level   : notice
+text    : connection from test [192.168.1.1] to /usr/test
+
+time    : Tue Aug  7 16:45:51 2001
+host    : jobis
+program : cvs_server
+pid     : undef
+msgid   : 702911
+facility: daemon
+level   : notice
+text    : connection from test [192.168.1.1] to /usr/test
+
+time    : Sat Aug 18 14:56:03 2001
+host    : bigbang.ee.ethz.ch
+program : snort
+pid     : undef
+msgid   : 381826
+facility: local5
+level   : info
+text    : IDS278/dns_named-probe-version: 211.20.98.98:3656 -> 129.132.20.8:53
+

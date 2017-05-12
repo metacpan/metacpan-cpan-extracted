@@ -1,0 +1,23 @@
+---
+name: Padre-Plugin-ViewInBrowser
+version: 0.07
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+abstract: 'view selected doc in browser for L<Padre>'
+license: perl
+resources:
+  homepage: http://padre.perlide.org/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-ViewInBrowser/
+build_requires:
+  Padre: 0.26
+  Path::Class::File: 0
+  Test::More: 0
+provides:
+  Padre::Plugin::ViewInBrowser:
+    file: lib/Padre/Plugin/ViewInBrowser.pm
+    version: 0.07
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

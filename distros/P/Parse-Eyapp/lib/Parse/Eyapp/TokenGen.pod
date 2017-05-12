@@ -1,0 +1,190 @@
+=head1 NAME
+ 
+Parse::Eyapp::TokenGen - Support for Using Parse::Eyapp as a Data Generator 
+ 
+=head1 INTRODUCTION
+
+For a introduction to data generation using L<Parse::Eyapp> see
+L<Parse::Eyapp::datagenerationtut>.
+
+=head1 METHODS
+
+=head2 set_tokengens
+
+Receives the parser object and the pairs 
+
+    token => generator
+
+Sets the generator attribute of the tokens.
+Though not strictly necessary, the generator is
+a L<Test::LectroTest::Generator> object.
+
+=head2 set_weights
+
+Receives the parser object and the pairs 
+
+    token => weight
+
+Sets the weight attribute of the tokens.
+The weight is a floating number.
+
+=head2 set_tokenweightsandgenerators
+
+Receives the parser object and the pairs 
+
+    token => [weight, generator]
+
+or
+
+    token => weight
+
+and sets the weight and generator attributes of the tokens.
+An example can be found in C<examples/generator/GenSupport.pm>:
+
+  $parser->set_tokenweightsandgenerators(
+    NUM => [ 2, Int(range=>[0, 9], sized=>0)],
+    VAR => [
+              0,  # At the beginning, no variables are defined
+              Gen {
+                return  Elements(keys %st)->generate if keys %st;
+                return Int(range=>[0, 9], sized=>0)->generate;
+              },
+            ],
+    VARDEF => [ 
+                2,  
+                String( length=>[1,2], charset=>"A-NP-Z", size => 100 )
+              ],
+    '=' => 2, '-' => 1, '+' => 2, 
+    '*' => 4, '/' => 2, '^' => 0.5, 
+    ';' => 1, '(' => 1, ')' => 2, 
+    ''  => 2, 'error' => 0,
+  );
+
+
+=head2 token_weight
+
+Receives the parser object and the token and returns the weight.
+If an additional weight is provided the weight for the token is set.
+
+=head2 token_generator
+
+Receives the parser object and the token and returns the generator.
+If an additional generator is provided the generator for the token is set.
+
+=head2 deltaweight
+
+Has the syntax:
+
+  $parser->deltaweight(TOKEN1 => deltaweight1, TOKEN2 => deltaweight2, ...)
+
+increases the weight of the respective token by the associated amount.
+
+=head2 pushdeltaweight
+
+As C<deltaweight> but the current weights of the involved tokens
+are saved in a stack
+
+=head2 popweight
+
+Restores the weights of the tokens that were previously saved
+with C<pushdeltaweight>
+
+=head1 SEE ALSO
+
+=over
+
+=item * L<Parse::Eyapp::datagenerationtut>
+
+
+=item * L<Test::LectroTest::Generator> by Tom Moertel 
+
+=item *  The Design and Implementation of a Grammar-based Data Generator (1992) 
+by Peter M. Maurer, Software Practice and Experience 
+L<http://www.cs.ubc.ca/local/reading/proceedings/spe91-95/spe/./vol22/issue3/spe756pm.pdf>
+
+=item * yagg: an easy-to-use generator for structured test inputs
+by David Coppit and Jiexin Lian.
+ASE '05: Proceedings of the 20th IEEE/ACM international Conference on Automated software engineering.
+2005, pages 356-359. 
+
+=over 2
+
+=item * L<http://search.cpan.org/perldoc?yagg::Tutorial>, 
+
+=item * L<http://www.cs.wm.edu/~coppit/wiki/images/4/4e/yagg_short.pdf>,
+
+=item * L<http://www.cs.wm.edu/~coppit/wiki/images/6/69/wm-cs-2005-13.pdf>
+
+=back
+
+=item * 
+Writing Randomly by Randall Schwartz. 
+Linux Magazine Column 04 (Sep 1999). 
+L<http://www.stonehenge.com/merlyn/LinuxMag/col04.html>
+
+=item * Generating Test Data with Enhanced Context Free Grammars by Peter M. Maurer
+L<http://cs.baylor.edu/~maurer/aida/dgl-source/documentation/gen_tst.pdf>
+
+=item * Modules as Programs by Brian d Foy 
+L<http://www252.pair.com/comdog/mastering_perl/Chapters/18.modulinos.html>
+
+=item * How a Script Becomes a Module by Brian d Foy. On Perlmonks: 
+L<http://www.perlmonks.org/index.pl?node_id=396759>.
+
+
+
+=back
+
+=head1 CONTRIBUTORS
+
+=over 2
+
+=item * Hal Finkel L<http://www.halssoftware.com/> 
+
+=item * G. Williams L<http://kasei.us/>
+
+=item * Thomas L. Shinnick L<http://search.cpan.org/~tshinnic/>
+
+=item * Frank Leray
+
+=back
+
+=head1 AUTHOR
+ 
+Casiano Rodriguez-Leon (casiano@ull.es)
+
+=head1 ACKNOWLEDGMENTS
+
+This work has been supported by CEE (FEDER) and the Spanish Ministry of
+I<Educacion y Ciencia> through I<Plan Nacional I+D+I> number TIN2005-08818-C04-04
+(ULL::OPLINK project L<http://www.oplink.ull.es/>). 
+Support from Gobierno de Canarias was through GC02210601
+(I<Grupos Consolidados>).
+The University of La Laguna has also supported my work in many ways
+and for many years.
+
+A large percentage of  code is verbatim taken from L<Parse::Yapp> 1.05.
+The author of L<Parse::Yapp> is Francois Desarmenien.
+ 
+I wish to thank Francois Desarmenien for his L<Parse::Yapp> module, 
+to my students at La Laguna and to the Perl Community. Thanks to 
+the people who have contributed to improve the module (see L<Parse::Eyapp/CONTRIBUTORS>).
+Thanks to Larry Wall for giving us Perl.
+Special thanks to Juana.
+
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2006-2008 Casiano Rodriguez-Leon (casiano@ull.es). All rights reserved.
+
+Parse::Yapp copyright is of Francois Desarmenien, all rights reserved. 1998-2001
+ 
+These modules are free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+
+

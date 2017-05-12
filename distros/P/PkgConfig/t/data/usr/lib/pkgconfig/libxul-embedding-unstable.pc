@@ -1,0 +1,11 @@
+prefix=/usr
+sdkdir=/usr/lib/xulrunner-devel-1.9.1
+includedir=/usr/include/xulrunner-1.9.1
+idldir=/usr/share/idl/xulrunner-1.9.1
+includetype=unstable
+
+Name: libxul-embedding-unstable
+Description: Static library for version-independent embedding of the Mozilla runtime (unstable API)
+Version: 1.9.1.16
+Libs: -L${sdkdir}/lib -lxpcomglue -ldl
+Cflags: -DXPCOM_GLUE -I${includedir}/${includetype} 

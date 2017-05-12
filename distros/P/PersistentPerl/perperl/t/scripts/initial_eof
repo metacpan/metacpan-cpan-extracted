@@ -1,0 +1,2 @@
+print <STDIN>;
+print "ok\n";

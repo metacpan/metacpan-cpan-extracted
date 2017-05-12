@@ -1,0 +1,44 @@
+NAME
+    Plack::Handler::AnyEvent::HTTPD - Plack handler to run PSGI apps on
+    AnyEvent::HTTPD
+
+SYNOPSIS
+      plackup -s AnyEvent::HTTPD --port 9090
+
+DESCRIPTION
+    Plack::Handler::AnyEvent::HTTPD is a Plack handler to run PSGI apps on
+    AnyEvent::HTTPD module.
+
+FEATURES
+    It's a handler running on AnyEvent::HTTPD so it inherits all the
+    features from that, but the implementation is a bit tweaked to bypass
+    some restrictions that AnyEvent::HTTPD has, i.e.:
+
+    *   AnyEvent::HTTPD only supports GET and POST but this handler supports
+        other methods too.
+
+    *   AnyEvent::HTTPD processes "x-www-form-urlencoded" and
+        "multipart/form-data" but this handler turns off that processing and
+        just pushes the buffered content to "psgi.input"
+
+LIMITATIONS
+    *   "$env->{SERVER_PROTOCOL}" is always *HTTP/1.0* regardless of the
+        request version.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    AnyEvent::HTTPD
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 217:
+        You forgot a '=back' before '=head1'
+

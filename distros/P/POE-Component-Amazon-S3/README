@@ -1,0 +1,633 @@
+NAME
+    POE::Component::Amazon::S3 - Work with Amazon S3 using POE
+
+SYNOPSIS
+        use POE qw(Component::Amazon::S3);
+    
+        POE::Component::Amazon::S3->spawn(
+            alias                 => 's3',
+            aws_access_key_id     => 'your S3 id',
+            aws_secret_access_key => 'your S3 key',
+        );
+    
+        ### Methods for working with buckets
+    
+        # List buckets, posts back to buckets_done with the result
+        $kernel->post(
+            s3 => 'buckets', 'buckets_done',
+        );
+    
+        # Add a bucket
+        $kernel->post(
+            s3 => 'add_bucket', 'add_bucket_done',
+            { 
+                bucket => 'my-bucket',
+            }
+        );
+    
+        # Delete a bucket, must be empty of all keys
+        $kernel->post(
+            s3 => 'delete_bucket', 'delete_bucket_done',
+            {
+                bucket => 'my-bucket',
+            }
+        );
+    
+        # Set access control on a bucket, see below for more info about ACL
+        $kernel->post(
+            s3 => 'set_acl', 'set_acl_done',
+            {
+                bucket    => 'my-bucket',
+                acl_short => 'public-read',
+            }
+        );
+    
+        # Get the access control list for a bucket
+        $kernel->post(
+            s3 => 'get_acl', 'get_acl_done',
+            {
+                bucket => 'my-bucket',
+            }
+        );
+    
+        ### Methods for working with keys
+    
+        # Add a key with inline data
+        $kernel->post(
+            s3 => 'add_key', 'add_key_done',
+            {
+                bucket => 'my-bucket,
+                key    => 'my-inline-key',
+                data   => 'testing 123',
+            }
+        );
+    
+        # Add a key with data from a file
+        $kernel->post(
+            s3 => 'add_key', 'add_key_done',
+            {
+                bucket => 'my-bucket,
+                key    => 'my-file-key',
+                file   => '/path/to/large_file',
+            }
+        );
+    
+        # List some keys, used for pagination
+        $kernel->post(
+            s3 => 'list_bucket', 'list_bucket_done',
+            {
+                bucket     => 'my-bucket',
+                'max-keys' => 10,
+            },
+        );
+    
+        # List all keys, may make multiple calls internally to list_bucket
+        $kernel->post(
+            s3 => 'list_bucket_all', 'list_bucket_all_done',
+            {
+                bucket => 'my-bucket',
+            },
+        );
+    
+        # Get a key, saving the contents in memory
+        $kernel->post(
+            s3 => 'get_key', 'get_key_done',
+            {
+                bucket => 'my-bucket'
+                key    => 'my-inline-key',
+            },
+        );
+    
+        # Get a key, saving directly to a file
+        $kernel->post(
+            s3 => 'get_key', 'get_key_done',
+            {
+                bucket => 'my-bucket'
+                key    => 'my-file-key',
+                file   => '/tmp/my-file-key',
+            },
+        );
+    
+        # Get only the headers for a key
+        $kernel->post(
+            s3 => 'head_key', 'head_key_done',
+            {
+                bucket => 'my-bucket',
+                key    => 'my-inline-key',
+            },
+        );
+    
+        # Delete a key
+        $kernel->post(
+            s3 => 'delete_key', 'delete_key_done',
+            {
+                bucket => 'my-bucket',
+                key    => 'my-inline-key',
+            },
+        );
+    
+        # Set access control on a key, see below for more info about ACL
+        $kernel->post(
+            s3 => 'set_acl', 'set_acl_done',
+            {
+                bucket    => 'my-bucket',
+                key       => 'my-inline-key',
+                acl_short => 'public-read',
+            }
+        );
+    
+        # Get the access control list for a key
+        $kernel->post(
+            s3 => 'get_acl', 'get_acl_done',
+            {
+                bucket => 'my-bucket',
+                key    => 'my-inline-key',
+            }
+        );
+    
+        ### Return values
+    
+        # All methods post back to the given state with the same parameters,
+        # return and response.  Example:
+    
+        sub add_bucket_done {
+            my ( $kernel, $return, $response ) = @_[ KERNEL, ARG0, ARG1 ];
+        
+            # $return contains only the results of the call
+            # $response contains the full HTTP::Response object from the call
+
+            # See individual method documentation below for details on $return
+        }
+
+DESCRIPTION
+    POE::Component::Amazon::S3 is an asynchronous Amazon S3 client based
+    loosely on Net::Amazon::S3.
+
+    Amazon provides an "infinite" Simple Storage Service (S3) where you may
+    store as much data as you like, paying only for the bandwidth and disk
+    space used. An S3 account may contain up to 100 "buckets", each of which
+    may contain any number of keys. Each key can contain any data up to 5GB
+    in size.
+
+    To find out more about S3, please visit: <http://s3.amazonaws.com/>
+
+CONSTRUCTOR / DESTRUCTOR
+  spawn
+    "spawn" takes the following named parameters:
+
+    alias => $alias
+        Optional. Sets the alias to which you can post events. This defaults
+        to 's3' if not specified.
+
+    aws_access_key_id => $amazon_s3_id
+        Required. Enter your Amazon ID which you receive after signing up
+        for an S3 account.
+
+    aws_secret_access_key => $amazon_access_key
+        Required. Enter your Amazon access key.
+
+    secure => 1
+        Optional. If you'd like to communicate with S3 using SSL, set
+        "secure" to 1. By default all communication is done over HTTP.
+        Enabling this option requires the module POE::Component::SSLify.
+
+  shutdown
+    Shuts down the component and all subcomponents.
+
+ACCEPTED EVENTS
+    All requests posted to Amazon::S3 take 2 parameters:
+
+    EVENT
+        The name of an event in the calling session where responses will be
+        sent.
+
+    OPTS
+        Required by most events, this is a hashref of various options. All
+        events support an optional key "pass" which takes an arrayref
+        containing anything to be passed-through to the response event.
+
+    All responses sent back contain at least 2 parameters:
+
+    RETURN VALUE (ARG0)
+        The return value from the event. This may be a simple boolean value
+        indicating success or failure, a hashref of keys, etc.
+
+    RESPONSE OBJECT (ARG1)
+        The complete HTTP::Response object returned by the request. If the
+        return value returned false, the Amazon S3 error information will be
+        stored in $response->{s3_error}
+
+    PASS-THROUGH PARAMETERS
+        Anything sent in the "pass" arrayref will be returned in ARG2, ARG3,
+        etc.
+
+  buckets
+    Retrieve a list of all buckets.
+
+        $kernel->post(
+            s3 => 'buckets',
+            'buckets_done',
+            {
+                pass => [ @args ],
+            }
+        );
+
+    Returns 0 on failure and a hashref on success:
+
+        {
+            owner_id          => $owner_id,
+            owner_displayname => $display_name,
+            buckets           => [
+                {
+                    bucket        => $bucket_name,
+                    creation_date => $date,
+                },
+                ...
+            ]
+        }
+
+  add_bucket
+    Add a new bucket. Note that there is a limit of 100 buckets per account.
+
+        $kernel->post( 
+            s3 => 'add_bucket',
+            'add_bucket_done',              # event where response is sent
+            {
+                bucket    => $bucket_name,  # new bucket to create
+                acl_short => $canned_acl,   # optional ACL for bucket, see below
+                pass      => [ @args ],     # optional items passed through to response event
+            }
+        );
+
+    Returns 1 on success and 0 on error.
+
+  delete_bucket
+    Delete a bucket. The bucket must not contain any keys or the call will
+    fail.
+
+        $kernel->post(
+            s3 => 'delete_bucket',
+            'delete_bucket_done',
+            {
+                bucket => $bucket_name,     # bucket to delete
+                pass   => [ @args ],        # optional pass-through items
+            }
+        );
+
+    Returns 1 on success and 0 on error.
+
+  add_key
+    Add a key to a bucket. An unlimited number of keys can be added to any
+    one bucket. Each keky may contain any data up to 5GB in size.
+
+        $kernel->post(
+            s3 => 'add_key',
+            'add_key_done',
+            {
+                bucket    => $bucket_name,  # bucket which will contain the new key
+                key       => $key_name,     # new key
+                acl_short => $canned_acl,   # optional ACL for bucket, see below
+                pass      => [ @args ],     # optional pass-through items
+            
+                # The key's data can be set from either an in-memory variable or 
+                # from a file on disk.  Using a disk file is highly recommended for
+                # large items to save on memory usage.
+            
+                data      => $inline_data,
+                file      => $file_path,
+            }
+        );
+
+    Returns 1 on success and 0 on error.
+
+  head_key
+    Retrieve only the HTTP headers associated with a key.
+
+        $kernel->post(
+            s3 => 'head_key',
+            'head_key_done',
+            {
+                bucket => $bucket_name,
+                key    => $key,
+                pass   => [ @args ],
+            }
+        );
+
+    Returns 1 on success and 0 on error.
+
+  list_bucket
+    Retrieve a list of keys in a bucket. This method is best used for paging
+    through many results. If you simply want a list of all keys regardless
+    of how many there are, call list_bucket_all instead.
+
+        $kernel->post(
+            s3 => 'list_bucket',
+            'list_bucket_done',
+            {
+                bucket     => $bucket_name,
+                pass       => [ @args ],
+            
+                # These optional params are explained below.
+                prefix     => $prefix,
+                delimiter  => $delimiter,
+                'max-keys' => $max_keys,
+                marker     => $marker,
+            }
+        );
+
+    prefix
+        If specified, restricts the response to only contain results that
+        begin with the specified prefix.
+
+    delimiter
+        If this optional, Unicode string parameter is included with your
+        request, then keys that contain the same string between the prefix
+        and the first occurrence of the "delimiter" will be rolled up into a
+        single result element and returned in the "common_prefixes" list.
+        These rolled-up keys are not returned elsewhere in the response. For
+        example, with prefix="USA/" and delimiter="/", the matching keys
+        "USA/Oregon/Salem" and "USA/Oregon/Portland" would be summarized in
+        the response as a single "USA/Oregon" element in the
+        "common_prefixes" list. If an otherwise matching key does not
+        contain the delimiter after the prefix, it appears in the normal
+        list of keys.
+
+        Each element in the "common_prefixes" list counts as one against the
+        "max-keys" limit. The rolled-up keys represented by each
+        "common_prefixes" element do not. If the "delimiter" parameter is
+        not present in your request, keys in the result set will not be
+        rolled-up and neither the "common_prefixes" list nor the
+        "next_marker" element will be present in the response.
+
+    max-keys
+        This optional argument limits the number of results returned in
+        response to your query. Amazon S3 will return no more than this
+        number of results, but possibly less. Even if "max-keys" is not
+        specified, Amazon S3 will limit the number of results in the
+        response (usually this limit is 1000 keys). Check the "is_truncated"
+        flag to see if your results are incomplete. If so, use the "marker"
+        parameter to request the next page of results. For the purpose of
+        counting max-keys, a 'result' is either a single key, or a delimited
+        prefix in the "common_prefixes" list. So for delimiter requests,
+        "max-keys" limits the total number of list results, not just the
+        number of keys.
+
+    marker
+        This optional parameter enables pagination of large result sets.
+        "marker" specifies where in the result set to resume listing. It
+        restricts the response to only contain results that occur
+        alphabetically after the value of "marker". To retrieve the next
+        page of results, use the last key from the current page of results
+        as the "marker" in your next request.
+
+        See also "next_marker", below.
+
+        If "marker" is omitted, the first page of results is returned.
+
+    Returns 0 on error and a hashref of results on success:
+
+        {
+            bucket          => $bucket_name,
+            prefix          => $bucket_prefix, 
+            common_prefixes => [ $prefix1, $prefix2, ... ]
+            marker          => $bucket_marker, 
+            next_marker     => $bucket_next_available_marker,
+            max_keys        => $bucket_max_keys,
+            is_truncated    => $bucket_is_truncated_boolean
+            keys            => [ $key1, $key2, ... ]
+        }
+
+    common_prefixes
+        If list_bucket was requested with a "delimiter", "common_prefixes"
+        will contain a list of prefixes matching that delimiter. Drill down
+        into these prefixes by making another request with the "prefix"
+        parameter.
+
+    next_marker
+        A convenience element, useful when paginating with delimiters. The
+        value of "next_marker", if present, is the largest (alphabetically)
+        of all key names and all "common_prefixes" in the response. If the
+        "is_truncated" flag is set, request the next page of results by
+        setting "marker" to the value of "next_marker". This element is only
+        present in the response if the "delimiter" parameter was sent with
+        the request.
+
+    is_truncated
+        This flag indicates whether or not all results of your query were
+        returned in this response. If your results were truncated, you can
+        make a follow-up paginated request using the "marker" parameter to
+        retrieve the rest of the results.
+
+  list_bucket_all
+    Retrieve a list of all keys in a bucket. This may make multiple requests
+    to list_bucket behind the scenes.
+
+        $kernel->post(
+            s3 => 'list_bucket_all',
+            'list_bucket_all_done',
+            {
+                bucket => $bucket_name,
+                pass   => [ @args ],
+            }
+        );
+
+    Returns 0 on error and a hashref of results on success. This hashref is
+    the same as the one returned by list_bucket.
+
+  get_key
+    Retrieve a single key, optionally saving the key's data directly to a
+    file.
+
+        $kernel->post(
+            s3 => 'get_key',
+            'get_key_done',
+            {
+                bucket => $bucket_name,
+                key    => $key_name,
+                file   => $save_path,   # if specified, the key's content is saved
+                                        # directly to this file.
+                pass   => [ @args ],
+            }
+        );
+
+    Returns 1 on success and 0 on error. If a file param was not specified,
+    the key's content will be in $response->content().
+
+  delete_key
+    Delete a single key. WARNING: There is no way to recover a deleted key.
+
+        $kernel->post(
+            s3 => 'delete_key',
+            'delete_key_done',
+            {
+                bucket => $bucket_name,
+                key    => $key_name,
+                pass   => [ @args ],
+            }
+        );
+
+    Returns 1 on success and 0 on error.
+
+ACCESS CONTROL LISTS
+    Every bucket and key in S3 has an access control list. This module
+    provides full support for setting and getting ACLs. For a full
+    explanation of S3's ACLs, please read the technical documentation at
+    <http://s3.amazonaws.com/>
+
+    As mentioned above, the "add_bucket" and "add_key" events accept an
+    optional "acl_short" parameter to set their ACL at the time of creation
+    so "set_acl" does not need to be called.
+
+  set_acl
+    Set a new ACL on a bucket or key. An ACL may be specified as either one
+    of four standard ACLs, or as a detailed list of users/groups and
+    permissions.
+
+    The four canned ACLs you may use with the "acl_short" param are:
+
+    private
+        Only the creator of the bucket/key has access.
+
+    public-read
+        Anyone may read the bucket/key. If set on a key, it may be
+        downloaded using a standard HTTP GET. This ACL is often used for
+        storing static website content in S3.
+
+    public-read-write
+        Anyone may read and overwrite the bucket/key.
+
+    authenticated-read
+        Any other authenticated S3 user may read the bucket/key.
+
+    Example using a canned ACL:
+
+        $kernel->post(
+            s3 => 'set_acl',
+            'set_acl_done',
+            {
+                bucket    => $bucket_name,
+                key       => $key_name,        # optional
+                acl_short => 'public-read',
+                pass      => [ @args ],
+            }
+        );
+
+    ACLs may also be specified as a full list of users and/or groups, and
+    their permissions. You should read the S3 documentation before using
+    this method for setting ACLs.
+
+        my $acl = [
+            # grant WRITE to another S3 user
+            {
+                display_name => $other_name,
+                id           => $other_id,
+                permission   => 'WRITE',
+            },
+        
+            # grant READ to all users (same as public-read)
+            {
+                URI        => 'http://acs.amazonaws.com/groups/global/AllUsers',
+                permission => 'READ',
+            },
+        
+            # grant READ to a user with a valid Amazon email account
+            {
+                email      => $email_address,
+                permission => 'READ',
+            },
+        ];
+    
+        $kernel->post(
+            s3 => 'set_acl',
+            'set_acl_done',
+            {
+                bucket => $bucket_name,
+                key    => $key_name,        # optional
+                acl    => $acl,
+                pass   => [ @args ],
+            }
+        );
+
+    Returns 1 on success and 0 on error.
+
+  get_acl
+    Retrieve the full ACL list for a bucket or key.
+
+        $kernel->post(
+            s3 => 'get_acl',
+            'get_acl_done',
+            {
+                bucket => $bucket_name,
+                key    => $key_name,        # optional
+                pass   => [ @args ],
+            }
+        );
+
+    Returns an arrayref containing a list of grants on the bucket or key, or
+    0 on error.
+
+ERROR HANDLING
+    The $return value will be false (0) if an error occurred. If an error
+    occurred, the $response object will contain an additional key,
+    "s3_error", which is a hashref of the error response. Example:
+
+        # $response->{s3_error} contains:
+        {
+            code    => 'NoSuchKey',
+            message => 'The resource you requested does not exist',
+        }
+
+    For a full list of possible error codes, please see
+    <http://docs.amazonwebservices.com/AmazonS3/2006-03-01/ErrorCodeList.htm
+    l>
+
+TESTING
+    This module will skip all tests unless a few environment variables are
+    set. Running tests will cost you a very small bit in bandwidth charges.
+    If any tests fail, some buckets and/or keys may not be cleaned up
+    properly, so you should check with a tool like the S3 Firefox Organizer
+    to make sure they are not costing you storage money.
+
+    AMZ_S3_ID
+        Set to your Amazon S3 ID.
+
+    AMZ_S3_KEY
+        Set to your Amazon S3 Key.
+
+    AMZ_S3_STRESS
+        Optional. Set if you want to run the larger stress test that creates
+        150 keys.
+
+THANKS
+    The authors of Net::Amazon::S3, from which much code was borrowed:
+
+    Leon Brocard <acme@astray.com>
+
+    Brad Fitzpatrick <brad@danga.com>
+
+AUTHOR
+    Andy Grundman <andy@hybridized.org>
+
+SEE ALSO
+    Net::Amazon::S3
+
+    S3 Firefox Organizer, provides an FTP-like interface -
+    <https://addons.mozilla.org/firefox/3247/>
+
+NOTICE
+    This module contains code modified from Amazon that contains the
+    following notice:
+
+        This software code is made available "AS IS" without warranties of any
+        kind.  You may copy, display, modify and redistribute the software
+        code either by itself or as incorporated into your code; provided that
+        you do not remove any proprietary notices.  Your use of this software
+        code is at your own risk and you waive any claim against Amazon
+        Digital Services, Inc. or its affiliates with respect to your use of
+        this software code. (c) 2006 Amazon Digital Services, Inc. or its
+        affiliates.
+
+COPYRIGHT
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

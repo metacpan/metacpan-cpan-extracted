@@ -1,0 +1,24 @@
+---
+abstract: "Parser for IBM's Advanced Function Printing document format"
+author:
+  - 'Audrey Tang <cpan@audreyt.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: cc0
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-AFP
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Encode::IBM: 0.01
+  Parse::Binary: 0.08
+  perl: 5.8.2
+version: 0.25

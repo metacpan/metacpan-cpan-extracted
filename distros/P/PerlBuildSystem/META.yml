@@ -1,0 +1,200 @@
+---
+name: PerlBuildSystem
+version: 0.44
+author:
+  - 'Khemir Nadim ibn Hamouda. <nadim@khemir.net>'
+abstract: Build utility/modules in the same spirit as gmake
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::MethodMaker: 0
+  Cwd: 2.06
+  Data::Compare: 0
+  Data::Dumper: 2.12
+  Data::TreeDumper: 0.24
+  Devel::Cycle: 0
+  Devel::Depend::Cl: 0.04
+  Devel::Depend::Cpp: 0.08
+  File::Basename: 2.71
+  File::Copy::Recursive: 0
+  File::MkTemp: 0
+  File::Slurp: 0
+  File::Spec: 0
+  Getopt::Long: 2.32
+  IO::String: 0
+  Module::Build: 0.2611
+  Module::Util: 0.2611
+  Pod::Simple::Search: 0
+  Term::ReadKey: 0
+  Test::Class: 0
+  Test::Cmd: 0
+  Tie::Hash::Indexed: 0.03
+provides:
+  PBS::Attributes:
+    file: PBS/Attributes.pm
+    version: 0.01
+  PBS::Build:
+    file: PBS/Build.pm
+    version: 0.04
+  PBS::Build::Forked:
+    file: PBS/Build/Forked.pm
+    version: 0.04
+  PBS::Build::ForkedNodeBuilder:
+    file: PBS/Build/ForkedNodeBuilder.pm
+    version: 0.01
+  PBS::Build::LightWeightServer:
+    file: PBS/Build/LightWeightServer.pm
+    version: 0.02
+  PBS::Build::NodeBuilder:
+    file: PBS/Build/NodeBuilder.pm
+    version: 0.02
+  PBS::Build::Threaded:
+    file: PBS/Build/Threaded.pm
+    version: 0.01
+  PBS::Check:
+    file: PBS/Check.pm
+    version: 0.04
+  PBS::Config:
+    file: PBS/Config.pm
+    version: 0.03
+  PBS::Constants:
+    file: PBS/Constants.pm
+    version: 0.08
+  PBS::Cyclic:
+    file: PBS/Cyclic.pm
+    version: 0.03
+  PBS::Debug:
+    file: PBS/Debug.pm
+    version: 0.03
+  PBS::DefaultBuild:
+    file: PBS/DefaultBuild.pm
+    version: 0.04
+  PBS::Depend:
+    file: PBS/Depend.pm
+    version: 0.08
+  PBS::Digest:
+    file: PBS/Digest.pm
+    version: 0.05
+  PBS::Distributor:
+    file: PBS/Distributor.pm
+    version: 0.01
+  PBS::Documentation:
+    file: PBS/Documentation.pm
+    version: 0.02
+  PBS::Documentation::Indexer:
+    file: PBS/Documentation.pm
+    version: 0.02
+  PBS::FrontEnd:
+    file: PBS/FrontEnd.pm
+    version: 0.44
+  PBS::Graph:
+    file: PBS/Graph.pm
+    version: 0.04
+  PBS::Graph::Html:
+    file: PBS/Graph/Html.pm
+    version: 0.01
+  PBS::Graph::Snapshots:
+    file: PBS/Graph/Snapshots.pm
+    version: 0.02
+  PBS::GraphViz:
+    file: PBS/GraphViz.pm
+    version: 2.02
+  PBS::Information:
+    file: PBS/Information.pm
+    version: 0.04
+  PBS::Log:
+    file: PBS/Log.pm
+    version: 0.01
+  PBS::Output:
+    file: PBS/Output.pm
+    version: 0.03
+  PBS::PBS:
+    file: PBS/PBS.pm
+    version: 0.03
+  PBS::PBSConfig:
+    file: PBS/PBSConfig.pm
+    version: 0.03
+  PBS::PBSConfigSwitches:
+    file: PBS/PBSConfigSwitches.pm
+    version: 0.03
+  PBS::Plugin:
+    file: PBS/Plugin.pm
+    version: 0.04
+  PBS::PostBuild:
+    file: PBS/PostBuild.pm
+    version: 0.01
+  PBS::Prf:
+    file: PBS/Prf.pm
+    version: 0.01
+  PBS::ProgressBar:
+    file: PBS/ProgressBar.pm
+    version: 2.09
+  PBS::Rules:
+    file: PBS/Rules.pm
+    version: 0.09
+  PBS::Rules::Builders:
+    file: PBS/Rules/Builders.pm
+    version: 0.01
+  PBS::Rules::Creator:
+    file: PBS/Rules/Creator.pm
+    version: 0.01
+  PBS::Rules::Dependers:
+    file: PBS/Rules/Dependers.pm
+    version: 0.01
+  PBS::Rules::Dependers::Subpbs:
+    file: PBS/Rules/Dependers/Subpbs.pm
+    version: 0.01
+  PBS::Rules::Metarules:
+    file: PBS/Rules/Metarules.pm
+    version: 0.01
+  PBS::Shell:
+    file: PBS/Shell.pm
+    version: 0.02
+  PBS::Shell::SSH:
+    file: PBS/Shell/SSH.pm
+    version: 0.01
+  PBS::Shell::Telnet:
+    file: PBS/Shell/Telnet.pm
+    version: 0.01
+  PBS::SubpbsResult:
+    file: PBS/SubpbsResult.pm
+    version: 0.02
+  PBS::Triggers:
+    file: PBS/Triggers.pm
+    version: 0.01
+  PBS::Version:
+    file: PBS/Version.pm
+  PBS::Warp:
+    file: PBS/Warp.pm
+    version: 0.02
+  PBS::Warp::Warp0:
+    file: PBS/Warp/Warp0.pm
+    version: 0.01
+  PBS::Warp::Warp1_5:
+    file: PBS/Warp/Warp1_5.pm
+    version: 0.05
+  PBS::Warp::Warp1_7:
+    file: PBS/Warp/Warp1_7.pm
+    version: 0.02
+  PBS::Warp::Warp1_8:
+    file: PBS/Warp/Warp1_8.pm
+    version: 0.04
+  PBS::Watch::Client:
+    file: PBS/Watch/Client.pm
+    version: 0.03
+  PBS::Watch::InotifyWatcher:
+    file: PBS/Watch/InotifyWatcher.pm
+    version: 0.1
+  PBS::Watch::Win32Watcher:
+    file: PBS/Watch/Win32Watcher.pm
+    version: 0.1
+  PBS::Wizard:
+    file: PBS/Wizard.pm
+    version: 0.02
+  VisualStudioProjectFile:
+    file: PBSLib/Utils/VisualStudioProjectFile.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

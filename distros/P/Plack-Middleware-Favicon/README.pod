@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Plack::Middleware::Favicon>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Plack-Middleware-Favicon"><img src="https://secure.travis-ci.org/bayashi/Plack-Middleware-Favicon.png"/></a> <a href="https://coveralls.io/r/bayashi/Plack-Middleware-Favicon"><img src="https://coveralls.io/repos/bayashi/Plack-Middleware-Favicon/badge.png?branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Plack::Middleware::Favicon installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Plack::Middleware::Favicon
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Plack::Middleware::Favicon documentation is available as in POD. So you can do:
+
+    % perldoc Plack::Middleware::Favicon
+
+
+=head1 REPOSITORY
+
+Plack::Middleware::Favicon is hosted on github
+L<http://github.com/bayashi/Plack-Middleware-Favicon>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

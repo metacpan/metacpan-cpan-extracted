@@ -1,0 +1,18 @@
+Revision history for PPIx-Shorthand
+
+1.2.0  2010-03-14
+
+    Update to match PPI 1.208.  Note that this makes the incompatible change to
+    match the renaming of PPI::Structure::ForLoop to PPI::Structure::For.
+
+1.1.1  2008-05-28
+
+    Declare dependency upon Exporter 5.57.
+
+1.1.0  2008-05-11
+
+    Added plurals of the class names.
+
+1.0.0  2008-03-30
+
+    Initial release.

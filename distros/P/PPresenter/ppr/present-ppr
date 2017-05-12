@@ -1,0 +1,78 @@
+#!/usr/bin/perl -w
+
+use strict;
+use English;
+use Getopt::Long;
+
+use FindBin qw/$RealBin/;
+use lib "$RealBin/../lib";
+
+sub usage($)
+{   my $rc = shift;
+
+    warn <<USAGE;
+$PROGRAM_NAME [-help|-h|-?] file
+USAGE
+
+    exit $rc;
+}
+
+sub stripFlag($)
+{   my $flag = '-'.shift;
+    for(my $i=0; $i<@ARGV; $i++)
+    {   next unless $ARGV[$i] eq $flag;
+        splice @ARGV, $i, 1;
+        return 1;
+    }
+    0;
+}
+
+usage 0 if stripFlag 'help' || stripFlag 'h' || stripFlag '?';
+
+if(@ARGV < 1)
+{   warn "ERROR: one filename required.\n";
+    usage 22;
+}
+
+my $script = shift;
+exec $script, @_
+   or die "ERROR: Cannot run $script: $!.\n";
+
+#--------------------------------------- doc ---------------------
+
+=head1 NAME
+
+present-ppr - run Portable Presenter perl-scripts.
+
+=head1 SYNOPSIS
+
+B<present-ppr> [options] file
+
+=head1 DESCRIPTION
+
+Portable Presenter (PPresenter) is a package designed to give presentations.
+It is written in Perl/Tk only, which is available for UNIX and for Windows.
+Usually, you will run C<present> which will call this program when the
+file supplied is a Perl program.
+
+=over 4
+
+=item -help
+
+=item -h
+
+=item -?
+
+Show brief help message.
+
+=back
+
+=head1 SEE ALSO
+
+A full documentation in html is included in the package, and available
+on the website: C<http://ppresenter.org>.
+
+C<present(1)>, C<present-xml(1)>.
+
+=cut
+

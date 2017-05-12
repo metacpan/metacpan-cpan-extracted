@@ -1,0 +1,26 @@
+Changes					Log of changes
+MANIFEST				This file
+Makefile.PL				Makefile generator
+README					Document to get you going
+ToDo					Stuff I need to do
+examples/Person.pm			Example subclass
+examples/instance.pl			Example instantiation script
+examples/subclass.pl			Example subclass script
+lib/Persistent.pod			Documentation for Persistent classes
+lib/Persistent/Base.pm			Persistent abstract base class
+lib/Persistent/DBM.pm			Persistent subclass
+lib/Persistent/File.pm			Persistent subclass
+lib/Persistent/Memory.pm		Persistent subclass
+lib/Persistent/DataType/Base.pm		DataType abstract base class
+lib/Persistent/DataType/Char.pm		DataType subclass
+lib/Persistent/DataType/DateTime.pm	DataType subclass
+lib/Persistent/DataType/Number.pm	DataType subclass
+lib/Persistent/DataType/String.pm	DataType subclass
+lib/Persistent/DataType/VarChar.pm	DataType subclass
+t/00pre.t				Test script
+t/10insert.t				Test script
+t/20delete.t				Test script
+t/30update.t				Test script
+t/40copy.t				Test script
+t/90post.t				Test script
+t/common.pl				Test library

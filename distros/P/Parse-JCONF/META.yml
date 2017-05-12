@@ -1,0 +1,25 @@
+---
+abstract: 'Parse JCONF (JSON optimized for configs)'
+author:
+  - 'Oleg G <oleg@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Parse-JCONF
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  constant: '1.03'
+  parent: '0'
+resources:
+  repository: https://github.com/olegwtf/p5-Parse-JCONF
+version: '0.05'

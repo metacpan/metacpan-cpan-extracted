@@ -1,0 +1,123 @@
+NAME
+    Parse::ACNS - parser for Automated Copyright Notice System (ACNS) XML
+
+SYNOPSIS
+        use Parse::ACNS;
+        my $data = Parse::ACNS->new->parse( XML::LibXML->load_xml( string => $xml ) );
+
+DESCRIPTION
+    ACNS stands for Automated Copyright Notice System. It's an open source,
+    royalty free system that universities, ISP's, or anyone that handles
+    large volumes of copyright notices can implement on their network to
+    increase the efficiency and reduce the costs of responding to the
+    notices...
+
+    See <http://acns.net> for more details.
+
+    This module parses ACNS XML into a perl data structure. Supports 1.2,
+    1.1, 1.0, 0.7 and 0.6 revisions of the spec. Parser strictly follows XML
+    Schemas, so throws errors on malformed data.
+
+    However, it doesn't extract ACNS XML from email messages.
+
+SOME ACNS BACKGROUND
+    NBC Universal and UMG <http://mpto.unistudios.com/xml/> released two
+    revisions of the spec (0.6 and 0.7).
+
+    Motion Picture Laboratories, Inc. <http://www.movielabs.com/ACNS> took
+    over and named it ACNS 2.0 and released revisions 1.0, 1.1 and several
+    sub-revisions with letters (1.1f, 1.1j, 1.1p).
+
+    Then it was moved once again to <http://www.acns.net/spec.html> and
+    revision 1.2 was released.
+
+METHODS
+  new
+    Constructor, takes list of named arguments.
+
+    version - version of the specification
+
+        compat
+            default value, can parse 1.2 to 0.6 XML. Revision 1.2 is
+            backwards compatible with 0.7. Compat schema makes TimeStamp in
+            Infringement/Content/Item optional to make it compatible with
+            0.6 revision. Everything else new in 1.2 is optional.
+
+        1.2, 1.1, 1.0, 0.7 or 0.6
+            strict parsing of the specified version.
+
+  parse
+        my $data = Parse::ACNS->new->parse( XML::LibXML->load_xml(...) );
+
+    Takes XML::LibXML::Document containing an ACNS XML and returns it as a
+    perl struture. Read XML::LibXML::Parser on parsing from different
+    sources.
+
+    Newer versions of the spec describe more messages besides
+    "<Infringement>", for example "<StatusUpdate>". Top level element is not
+    returned as part of the result, but you always can get it from XML
+    document:
+
+        $xml_doc->documentElement->nodeName;
+
+    To simplify implementation of compat version parsing document can be
+    changed. At this moment XML namespace is adjusted on all elements.
+
+    Returned data structure follows XML and its Schema, for example:
+
+        {
+            'Case' => {
+                'ID' => 'A1234567',
+                'Status' => ...,
+                ...
+            },
+            'Complainant' => {
+                'Email' => 'antipiracy@contentowner.com',
+                'Phone' => ...,
+                ...
+            },
+            'Source' => {
+                'TimeStamp' => '2003-08-30T12:34:53Z',
+                'UserName' => 'guest',
+                'Login' => { ... },
+                'IP_Address' => ...,
+                ...
+            }
+            'Service_Provider' => { ... }
+            'Content' => {
+                'Item' => [
+                    {
+                        'TimeStamp' => '2003-08-30T12:34:53Z',
+                        'FileName' => '8Mile.mpg',
+                        'Hash' => {
+                                'Type' => 'SHA1',
+                                '_' => 'EKR94KF985873KD930ER4KD94'
+                              },
+                        ...
+                    },
+                    { ... },
+                    ...
+                ]
+            },
+            'History' => {
+                'Notice' => [
+                    {
+                        'ID' => '12321',
+                        'TimeStamp' => '2003-08-30T10:23:13Z',
+                        '_' => 'freeform text area'
+                    },
+                    { ... },
+                    ...
+                ]
+            },
+            'Notes' => '
+                Open area for freeform text notes, filelists, etc...
+            '
+        }
+
+AUTHOR
+    Ruslan Zakirov <ruz@bestpractical.com>
+
+LICENSE
+    Under the same terms as perl itself.
+

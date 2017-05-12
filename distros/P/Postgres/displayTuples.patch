@@ -1,0 +1,45 @@
+(Message inbox:2117)
+Replied: Sat, 11 Jan 1997 16:39:04 -0500
+Replied: desm@milquetoast.cs.mcgill.ca (Jacques DESMARAIS)
+Received: from milquetoast.cs.mcgill.ca (desm@[132.206.3.222]) by kci.kciLink.com (8.8.4/8.7.6) with ESMTP id NAA11257 for <khera@kciLink.com>; Sat, 11 Jan 1997 13:03:51 -0500 (EST)
+Received: (from desm@localhost)
+          by milquetoast.cs.mcgill.ca (8.8.4/8.8.4)
+	  id NAA12647 for khera@kciLink.com; Sat, 11 Jan 1997 13:02:53 -0500 (EST)
+Message-Id: <199701111802.NAA12647@milquetoast.cs.mcgill.ca>
+From: desm@milquetoast.CS.McGill.CA (Jacques DESMARAIS)
+Date: Sat, 11 Jan 1997 13:02:53 -0500
+X-Mailer: Mail User's Shell (7.2.6 beta(2) 2/29/96)
+To: khera@kciLink.com
+Subject: About PostgresPerl-1.3
+
+
+Hi there,
+
+	First of all, thanks alot for the perl module.  I have Perl 5.003
+    and Postgres95 1.09 on a linux machine, and everything seems to work
+    fine.  I will soon be trying it on SunOS and Solaris 2.5 servers.
+
+	I am bit surprised though that you didn't include an interface to
+    any of libpq-fe.h's print functions, such as displayTuples.  So I added
+    that.  Here is the code that I added to your Postgres.xs file:
+
+void
+query_printresults(q, fp, fieldSep)
+        QUERY *q;
+        FILE  *fp;
+        char  *fieldSep;
+    PROTOTYPE: $$$
+    CODE:
+        PQdisplayTuples(q->res, fp, 1, fieldSep, 1, 1);
+
+
+Cheers,
+
+-- 
+Jacques Desmarais
+
+Systems staff assistant
+School of Computer Science Help Desk
+209N McConnell Eng. Bldg.
+McGill University
+Phone: 398-7087

@@ -1,0 +1,86 @@
+set -x
+function run
+{
+	perl tools/benchmark.pl $*
+}
+
+# collect version info
+module_info PDL
+# Note that PDL::NDBin version information is most likely not correct, because
+# it will be the version of the installed module.
+#module_info PDL::NDBin
+module_info Math::Histogram
+module_info Math::SimpleHisto::XS
+module_info Math::GSL
+
+# GOALS:
+# 1. compare the performance of PDL::NDBin with competing libraries for the
+#    construction of a one- and two-dimensional histogram
+# 2. show that PDL::NDBin scales well for the large data files it was designed for
+#    a. show how libraries scale with data size
+#    b. show how libraries scale with number of bins (a high number of bins is
+#       sometimes useful, think of lat/lon binning per 5 degrees = 2592 bins! per
+#       1 degree = 64800 bins!)
+# 3. show the difference between action subs and XS-optimized action classes
+
+# basic one-dimensional histogram
+run -b10      -i1500 -f PND,want,selection,ndbinning,hist,histogram,MH,MSHXS,MGH --preload lat,lat_array,lat_ref_array tools/lib/nosync/data_66k.nc
+run -b10      -i50   -f PND,want,selection,ndbinning,hist,histogram,MH,MSHXS,MGH --preload lat,lat_array,lat_ref_array tools/lib/nosync/data_2M.nc
+# run on the largest data file, but exclude the slowest methods, and the
+# methods which consume a lot of memory (MH, MSHXS, and MGH, due to conversion
+# to Perl arrays being required)
+run -b10      -i5    -f PND,hist,histogram                                       --preload lat                         tools/lib/nosync/data_33M.nc
+# same, but with higher bin counts
+run -b50      -i1500 -f PND,want,selection,ndbinning,hist,histogram,MH,MSHXS,MGH --preload lat,lat_array,lat_ref_array tools/lib/nosync/data_66k.nc
+run -b50      -i50   -f PND,want,selection,ndbinning,hist,histogram,MH,MSHXS,MGH --preload lat,lat_array,lat_ref_array tools/lib/nosync/data_2M.nc
+run -b50      -i5    -f PND,hist,histogram                                       --preload lat                         tools/lib/nosync/data_33M.nc
+run -b100     -i1500 -f PND,want,selection,ndbinning,hist,histogram,MH,MSHXS,MGH --preload lat,lat_array,lat_ref_array tools/lib/nosync/data_66k.nc
+run -b100     -i50   -f PND,hist,histogram,MH,MSHXS,MGH                          --preload lat,lat_array,lat_ref_array tools/lib/nosync/data_2M.nc
+run -b100     -i5    -f PND,hist,histogram                                       --preload lat                         tools/lib/nosync/data_33M.nc
+# in tests with 1000 bins, leave out hist() as there is a problem with the
+# determination of the number of bins: due to round-off in the calculation of
+# the number of bins based on the step size, hist() uses only 999 bins, making
+# the comparisons fail
+run -b1000    -i1500 -f PND,ndbinning,histogram,MH,MSHXS,MGH                     --preload lat,lat_array,lat_ref_array tools/lib/nosync/data_66k.nc
+run -b1000    -i50   -f PND,histogram,MH,MSHXS,MGH                               --preload lat,lat_array,lat_ref_array tools/lib/nosync/data_2M.nc
+run -b1000    -i5    -f PND,histogram                                            --preload lat                         tools/lib/nosync/data_33M.nc
+# MH doesn't like 10000 or more bins (segfaults), so it is excluded from the list
+# ndbinning at 66k points and 10,000 bins or more is very slow: exclude
+run -b10000   -i1500 -f PND,hist,histogram,MSHXS,MGH                             --preload lat,lat_array               tools/lib/nosync/data_66k.nc
+run -b10000   -i50   -f PND,hist,histogram,MSHXS,MGH                             --preload lat,lat_array               tools/lib/nosync/data_2M.nc
+run -b10000   -i5    -f PND,hist,histogram                                       --preload lat                         tools/lib/nosync/data_33M.nc
+run -b100000  -i1500 -f PND,hist,histogram,MSHXS,MGH                             --preload lat,lat_array               tools/lib/nosync/data_66k.nc
+run -b100000  -i50   -f PND,hist,histogram,MSHXS,MGH                             --preload lat,lat_array               tools/lib/nosync/data_2M.nc
+run -b100000  -i5    -f PND,hist,histogram                                       --preload lat                         tools/lib/nosync/data_33M.nc
+run -b1000000 -i1500 -f PND,hist,histogram,MSHXS,MGH                             --preload lat,lat_array               tools/lib/nosync/data_66k.nc
+run -b1000000 -i50   -f PND,hist,histogram,MSHXS,MGH                             --preload lat,lat_array               tools/lib/nosync/data_2M.nc
+run -b1000000 -i5    -f PND,hist,histogram                                       --preload lat                         tools/lib/nosync/data_33M.nc
+
+# basic two-dimensional histogram
+run -b10      -i1500 -f PND2d,want2d,ndbinning2d,histogram2d,MH2d,MGH2d          --preload lat,lon,lat_lon_ref_array   tools/lib/nosync/data_66k.nc
+run -b10      -i50   -f PND2d,want2d,ndbinning2d,histogram2d,MH2d,MGH2d          --preload lat,lon,lat_lon_ref_array   tools/lib/nosync/data_2M.nc
+run -b10      -i5    -f PND2d,histogram2d                                        --preload lat,lon                     tools/lib/nosync/data_33M.nc
+# want2d is very slow at 50 bins and more: exclude
+run -b50      -i1500 -f PND2d,ndbinning2d,histogram2d,MH2d,MGH2d                 --preload lat,lon,lat_lon_ref_array   tools/lib/nosync/data_66k.nc
+run -b50      -i50   -f PND2d,ndbinning2d,histogram2d,MH2d,MGH2d                 --preload lat,lon,lat_lon_ref_array   tools/lib/nosync/data_2M.nc
+run -b50      -i5    -f PND2d,histogram2d                                        --preload lat,lon                     tools/lib/nosync/data_33M.nc
+# MH2d segfaults at 100 bins: exclude
+run -b100     -i1500 -f PND2d,ndbinning2d,histogram2d,MGH2d                      --preload lat,lon,lat_lon_ref_array   tools/lib/nosync/data_66k.nc
+run -b100     -i50   -f PND2d,ndbinning2d,histogram2d,MGH2d                      --preload lat,lon,lat_lon_ref_array   tools/lib/nosync/data_2M.nc
+run -b100     -i5    -f PND2d,histogram2d                                        --preload lat,lon                     tools/lib/nosync/data_33M.nc
+
+# run on multiple files
+run -b50      -i5    -f PND_multi,histogram_multi -m                                                                   tools/lib/nosync/multi/*.nc
+run -b50      -i5    -f PND_multi2d,histogram_multi2d -m                                                               tools/lib/nosync/multi/*.nc
+
+# show the performance difference between coderefs and XS-optimized classes
+run -b10      -i1500 -f coderef,class                                            --preload lat,lon,flux                tools/lib/nosync/data_66k.nc
+run -b10      -i50   -f coderef,class                                            --preload lat,lon,flux                tools/lib/nosync/data_2M.nc
+run -b10      -i5    -f coderef,class                                            --preload lat,lon,flux                tools/lib/nosync/data_33M.nc
+
+# expose performance hit with old flattening with large bin numbers
+run -b10      -i50   -f PND,histogram --old-flattening                           --preload lat                         tools/lib/nosync/data_2M.nc
+run -b50      -i50   -f PND,histogram --old-flattening                           --preload lat                         tools/lib/nosync/data_2M.nc
+run -b100     -i50   -f PND,histogram --old-flattening                           --preload lat                         tools/lib/nosync/data_2M.nc
+
+# vim:set filetype=sh:

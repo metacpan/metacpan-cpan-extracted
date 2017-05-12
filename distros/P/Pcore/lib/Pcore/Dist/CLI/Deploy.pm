@@ -1,0 +1,53 @@
+package Pcore::Dist::CLI::Deploy;
+
+use Pcore -class;
+
+with qw[Pcore::Dist::CLI];
+
+sub CLI ($self) {
+    return {
+        abstract => 'deploy distribution',
+        opt      => {
+            all        => { desc => 'implies --develop, --recommends and --suggeests', },
+            install    => { desc => 'install bin/ to PATH and lib/ to PERL5LIB', },
+            develop    => { desc => 'cpanm --with-develop', },
+            recommends => { desc => 'cpanm --with-recommends', },
+            suggests   => { desc => 'cpanm --with-suggests', },
+            verbose    => { desc => 'cpanm --verbose', },
+        },
+    };
+}
+
+sub CLI_RUN ( $self, $opt, $arg, $rest ) {
+    $self->new->run($opt);
+
+    return;
+}
+
+sub run ( $self, $args ) {
+    $self->dist->build->deploy( $args->%* );
+
+    return;
+}
+
+1;
+__END__
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Pcore::Dist::CLI::Deploy - deploy distribution
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 ATTRIBUTES
+
+=head1 METHODS
+
+=head1 SEE ALSO
+
+=cut

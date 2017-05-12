@@ -1,0 +1,69 @@
+---
+abstract: "KENTNL's amazing Pod::Weaver Plugin Bundle."
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::Differences: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Weaver-PluginBundle-Author-KENTNL
+provides:
+  Pod::Weaver::PluginBundle::Author::KENTNL:
+    file: lib/Pod/Weaver/PluginBundle/Author/KENTNL.pm
+    version: '0.001003'
+  Pod::Weaver::PluginBundle::Author::KENTNL::Collectors:
+    file: lib/Pod/Weaver/PluginBundle/Author/KENTNL/Collectors.pm
+    version: '0.001003'
+  Pod::Weaver::PluginBundle::Author::KENTNL::Core:
+    file: lib/Pod/Weaver/PluginBundle/Author/KENTNL/Core.pm
+    version: '0.001003'
+  Pod::Weaver::PluginBundle::Author::KENTNL::Postlude:
+    file: lib/Pod/Weaver/PluginBundle/Author/KENTNL/Postlude.pm
+    version: '0.001003'
+  Pod::Weaver::PluginBundle::Author::KENTNL::Prelude:
+    file: lib/Pod/Weaver/PluginBundle/Author/KENTNL/Prelude.pm
+    version: '0.001003'
+  Pod::Weaver::PluginBundle::Author::KENTNL::Role::Easy:
+    file: lib/Pod/Weaver/PluginBundle/Author/KENTNL/Role/Easy.pm
+    version: '0.001003'
+recommends:
+  Moo: '1.000008'
+requires:
+  Carp: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::Lsub: '0'
+  Pod::Weaver::Config::Assembler: '0'
+  Pod::Weaver::Plugin::SingleEncoding: '0'
+  Pod::Weaver::PluginBundle::CorePrep: '0'
+  Pod::Weaver::Section::Authors: '0'
+  Pod::Weaver::Section::Collect: '0'
+  Pod::Weaver::Section::Contributors: '0'
+  Pod::Weaver::Section::Generic: '0'
+  Pod::Weaver::Section::Leftovers: '0'
+  Pod::Weaver::Section::Legal: '0'
+  Pod::Weaver::Section::Name: '0'
+  Pod::Weaver::Section::Region: '0'
+  Pod::Weaver::Section::Version: '0'
+  Try::Tiny: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Pod-Weaver-PluginBundle-Author-KENTNL/issues
+  homepage: https://github.com/kentnl/Pod-Weaver-PluginBundle-Author-KENTNL
+  repository: https://github.com/kentnl/Pod-Weaver-PluginBundle-Author-KENTNL.git
+version: '0.001003'

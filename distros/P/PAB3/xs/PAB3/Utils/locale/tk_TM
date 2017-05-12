@@ -1,0 +1,57 @@
+grp:3;3
+fd:2
+ifd:2
+dp:."                             % 
+ts:,"                             % 
+cs:MANAT" % MANA
+ics:TMM "        % TM
+csa:r
+css:1
+ns:-"                             % 
+ps:+
+dtf:%d.%m.%Y %H:%M:%S
+df:%d.%m.%Y
+tf:%H:%M:%S
+apf:
+amu:
+pmu:
+aml:
+pml:
+lm1:Türkmenbaşy
+lm2:Baýdak
+lm3:Nowruz
+lm4:U0047>urbansoltan Eje
+lm5:Magtymguly
+lm6:Oguz
+lm7:Gorkut
+lm8:Alp Arslan
+lm9:Ruhnama
+lm10:Garaşsyzlyk
+lm11:Sanjar
+lm12:Bitaraplyk
+sm1:Tür
+sm2:Baý
+sm3:Now
+sm4:Gur
+sm5:Mag
+sm6:Ogu
+sm7:Gor
+sm8:Alp
+sm9:Ruh
+sm10:Gar
+sm11:San
+sm12:Bit
+ld1:Dynç Gün
+ld2:Baş Gün
+ld3:Yaş Gün
+ld4:Hoş Gün
+ld5:Sogap Gün
+ld6:Anna Gün
+ld7:Ruh Gün
+sd1:Dyn
+sd2:Baş
+sd3:Yaş
+sd4:Hoş
+sd5:Sog
+sd6:Ann
+sd7:Ruh

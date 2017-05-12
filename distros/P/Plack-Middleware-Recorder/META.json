@@ -1,0 +1,78 @@
+{
+   "abstract" : "Plack middleware that records your client-server interactions",
+   "author" : [
+      "Rob Hoelz <rob@hoelz.ro>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-Middleware-Recorder",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Message::PSGI" : "0",
+            "HTTP::Request" : "0",
+            "IO::String" : "0",
+            "Plack" : "0",
+            "Plack::Client" : "0",
+            "Plack::Middleware::Debug" : "0",
+            "Scope::Guard" : "0",
+            "Sereal" : "0",
+            "autodie" : "0",
+            "namespace::clean" : "0",
+            "perl" : "v5.8.8"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "HTML::Tree" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::TCP" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hoelzro/plack-middleware-recorder/issues"
+      },
+      "homepage" : "https://github.com/hoelzro/plack-middleware-recorder",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/hoelzro/plack-middleware-recorder.git",
+         "web" : "https://github.com/hoelzro/plack-middleware-recorder"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0219"
+}
+

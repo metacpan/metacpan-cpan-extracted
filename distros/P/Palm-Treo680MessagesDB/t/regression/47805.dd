@@ -1,0 +1,21 @@
+$VAR1 = {
+          'epoch' => 1193081138,
+          'number' => '+440270800592',
+          'time' => '20:25',
+          'date' => '2007-10-22',
+          'name' => 'Ed XXXX (M)',
+          'phone' => '+440270800592',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1193081138,
+          'text' => 'Police found a body in a field with a beer belly, saggy balls, wrinkly arse, small cock and a face like a slapped arse. Text me back so I know your O.K.
+',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7107307,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 47805
+        };

@@ -1,0 +1,27 @@
+.cvsignore
+Build
+Build.PL
+Changes
+lib/Pikeo/API.pm
+lib/Pikeo/API/Album.pm
+lib/Pikeo/API/Base.pm
+lib/Pikeo/API/Comment.pm
+lib/Pikeo/API/Contact.pm
+lib/Pikeo/API/Photo.pm
+lib/Pikeo/API/Photos.pm
+lib/Pikeo/API/User.pm
+lib/Pikeo/API/User/Logged.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/01-photos.t
+t/03-login.t
+t/api.pl
+t/boilerplate.t
+t/pikeo_beta.jpg
+t/pod-coverage.t
+t/pod.t
+TODO

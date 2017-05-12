@@ -1,0 +1,21 @@
+<h1 class="top_padded">Your account has been suspended.</h1>
+
+[% IF (profiled_user = authed_user) %]
+    <div class="yui-gf">
+        <div class="yui-u first align_right">
+            [%l('Nickname')%]:
+        </div>
+        <div class="yui-u">
+            [% profiled_user.forum_name %]
+        </div>
+    </div>
+
+    <div class="yui-gf top_padded">
+        <div class="yui-u first align_right">
+            [%l('Reason for suspension')%]:
+        </div>
+        <div class="yui-u">
+            [% ForumCode.escape(profiled_user.last_suspension.message) ||l('No reason given') %]
+        </div>
+    </div>
+[% END %]

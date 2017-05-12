@@ -1,0 +1,389 @@
+Revision history for Perl extension Pod::Tree
+
+
+1.25 2015.05.25
+    - Rename test files to have number prefix.
+    - Move test reqirements to TEST_REQUIRES or BUILD_REQUIRES for older EUMM
+    - Older versions of EU::MM require quotes around 2-dot versions (CHORNY)
+
+1.24  2015.05.22
+    - Include the rc files in the distribution to use the proper 
+      Perl::Critic configuration.
+    - use Test::Version to make sure we have the same version number
+      in every module.
+    - Configure Perl::Critic to be level 4.
+    - Lots of other refactorings.
+
+1.23  2015.05.20
+    -  Add version numbers to all the pm files.
+
+1.22  2015.05.20
+    - Refactoring code: 3 argument open, no bareword filehandles
+    - Refactoring code: convert indirect calls to direct calls
+    - Add optional test using Test::Perl::Critic
+    - Fix missing file issue introduced in 1.21
+    - Include the Test::Comile based test
+
+
+1.21  2015.05.20
+    - More tests (use Test::Compile)
+    - Refactoring code (use Path::Tiny)
+    - Run perltidy on the code.
+    - Separate packages to their own files.
+    - Add use warnings; use strict; remove use diagnostics;
+    - Remove remaining use 5.... statements.
+
+1.20  2015.05.19
+    - Refactor test script to use Test::More
+
+1.19  2015.05.18
+    - Include link to VCS, Bug tracking system, hopepage.
+
+1.18  2015.05.18
+    - Just to let PAUSE index it.
+
+1.17_01 2015.05.18
+    - New maintainer (SZABGAB)
+
+1.17	2010 Jun 21
+	pods2html
+	- quote paths in REs
+
+1.16    2009 Apr 10
+	Pod::Tree::HTML
+	- fix to work with IO::File 1.13 (RT 34755, 38307)
+
+	mod2html
+	- added to distribution
+
+	Makefile.PL
+	- added all required modules to PREREQ_PM
+
+
+1.15    2007 Jun 24
+	Rename pod2html -> podtree2html (RT 18742)
+
+	Pod::Tree::HTML
+	- Changed destination resolution to accept a scalar reference,
+	  or anything with a 'print' method. (RT 12335)
+
+        podtree2html, pods2html
+	- documented HTML elements for CSS rules (RT 6118)
+
+	pod.css
+	- add example style sheet
+
+
+1.14	2007 Jun 12
+	Pod::Tree::HTML
+	- remove use vars qw(&isa); (RT 14530)
+	- document translate() error conditions (RT 12336)
+
+	Makefile.PL
+	- add Text::Template prerequisite (RT 26440)
+
+
+1.13    2007 Apr 06
+	Pod::Tree
+	- rename the Stream package
+
+	Pod::Tree::HTML
+	- change the X<> markup to render as empty, per the perlpod manpage
+	- rename the BitBucket package
+	- add template support
+
+	Pod::Tree:PerlUtil
+	- handle malformed NAME paragraphs more gracefully
+
+	pod2html
+	- add template support
+
+	pods2html
+	- add template support
+
+
+1.12	2006 Apr 22
+	Pod::Tree::PerlBin
+	- ignore non-existant directories on $PATH
+	- protect File::Find::find from empty directory list
+
+	Pod::Tree:PerlFunc
+	- find the pod/ directory under either perl/ or perl/lib/ (Win32 issue)
+
+	Pod::Tree::PerlLib
+	- increase default col_width to 30
+
+	Pod::Tree:PerlTop
+	- find the pod/ directory under either perl/ or perl/lib/ (Win32 issue)
+
+	Pod::Tree:PerlUtil
+	- clean up whitespace in module names and descriptions
+
+	pods2html
+	- recursion check compares absolute paths instead of inodes (Win32 issue)
+
+	t/pods2html.t
+	- use rmtree instead of system "rm -r" (Win32 issue)
+
+
+1.11	2004 Oct
+	Pod::Tree
+	- recognize blank lines per perlpodspec
+	- added support for =head3 and =head4 commands
+	- recognize \n, \r, \r\n line endings
+	- separate paragraphs on blank (/^\s*$/) lines
+
+	Pod::Tree::HTML
+	- added support for =head3 and =head4 commands
+	- expose the emit_toc and emit_body methods
+	- drop the </li> tags in the TOC.
+	  It was the easiest way to fix the nesting problem.
+	- added { empty => 1 } option
+
+	Pod::Tree::Node
+	- added support for =head3 and =head4 commands
+	- consolidate consecutive verbatim paragraphs
+
+	pods2html
+	- added --module option
+	- get depth from module name, not file path
+	- added --empty option
+
+	t/pod2html.t
+	t/pods2html.t
+	- invoke $Config{perlpath}, not 'perl'
+
+	GENERAL
+	- Set default BGCOLOR to ffffff
+
+	- Removed all the
+	    use 5.x;
+	    require 5.x
+	  statements
+
+	- reviewed all the copyright notices
+
+1.10	2003 Jan
+	Pod::Tree
+	- documentation typos
+	- dropped the require 5.6.0; statement
+	
+	Pod::Tree::HTML
+	- added support for $link_map->url methods
+	- deprecated        $link_map->map methods
+	- exposed escape_2396 and assemble_url methods
+	- documentation
+
+	Pod::Tree::Node
+	- documentation typos
+
+	Pod::Tree::Pod
+	- dropped the require 5.6.0; statement
+
+	t/mapper.t
+	t/mapper.d
+	- created
+
+	
+1.09	2002 Jul
+	Makefile.PL
+	- traded in ABSTRACT for ABSTRACT_FROM
+
+	Pod::Tree::Node
+	- recoded _unescape_text to use Pod::Escapes
+	- expand the HTTP domain to include e.g. mailto:
+
+	Pod::Tree::Pod
+	- changed _escape to handle non-ASCII chars
+
+	Pod::Tree::PerlUtils
+	- Handle module names that contain dashes
+
+	Pod::Tree::HTML
+	- Handle PODs that have "name--description" with multiple dashes
+	- Change default bgcolor to white
+	- added css => $url option
+
+	perl2html
+	- traded in hard-coded /:/ for /$Config{path_sep}/
+
+	pod2html
+	- added -css URL option
+
+	pods2html
+	- added -css URL option
+	- fixed recursion check on Win32
+
+	t/pod2html.d
+	t/pod2html.t
+	- created
+
+	t/pods2html.t
+	- enable some tests on Win32
+	- wrote RDiff() to ignore CVS directories
+
+
+1.08	2001 May 30
+	t/pods2html.t
+	- skip test on Win32
+
+
+1.07	2001 May 29
+
+	Makefile.PL
+	- added EXE_FILES key
+	- added PREREQ_PM key
+
+	Pod::Tree
+	- preserve paragraph endings
+	- preserve non-POD content
+	- added has_pod() method
+	
+	Pod::Tree::Node
+	- added code() and is_code()
+	- added get_brackets() method
+	- added get_raw() method
+	- added clone() method
+	- added set_filename()/get_filename() methods
+	- added get_domain() and support for L<http://...>
+	- carry =pod and =cut in command nodes
+	- SplitBar() split(/\|/,,2) to protect links with a verbar
+	
+	Pod::Tree:HTML
+	- fixed load_paragraphs() call in resolve_source()
+	- added depth option
+	- render  =for image foo.gif  as  <img src="foo.gif">
+	- rewhacked _emit_link to support target domains
+
+	Pod::Tree::Pod
+	- correctly reconstructs L<> markups
+
+	Pod::Tree::PerlDist
+	- added perl* links for the README.* files
+
+	Pod::Tree::PerlFunc
+	- fixed ShiftItems() to handle the getpw* items in perlfunc.pod
+
+	Pod::Tree::PerlTop
+	- added _get_dist_links() to pick up the README.* files
+
+	pods2html
+	- fixed relative links
+	- don't translate foo.pm if foo.pod exists
+	- works if HTMLDir is a subdir of PodDir
+	- create HTMLDir with File::Path::mkpath
+
+	t/
+	- moved all the test files into .d/ directories
+
+
+1.06	2000 Oct 17
+
+	Added Pod::Tree::Pod
+
+	Pod::Tree::Node
+	- fixed SpitBar()
+
+
+1.05	2000 Oct 12
+
+	Pod::Tree::Node
+	- Added $VERSION to quiet CPAN.pm
+
+
+1.04	2000 Oct 11
+	
+	Pod::Tree::HTML
+	- Added $VERSION to quiet CPAN.pm
+
+
+1.03	2000 Oct 09
+
+	- Cleaned up $VERSION variables (we hope)
+
+	Pod::Tree::HTML
+	- fixed \$pod bug in new()
+
+	Pod::Tree::PerlBin
+	- fixed xsubpp bug
+
+	Pod::Tree::PerlFunc
+	- fixed to handle do() properly
+
+	Pod::Tree::PerlPod
+	- compress whitespace in description lines
+	
+	pods2html
+	- Fixed to handle relative paths
+
+	perl2html
+	- Fixed to handle relative paths
+
+
+1.02	2000 May 19
+
+	Pod::Tree::Node
+	- added support for x<<>> style markups
+
+	Pod::Tree::PerlFunc
+	- added <dl></dl> tags to lists in perlfunc.pod sub-pages
+	- sort function names within alphebetical index paragraphs
+
+	Pod::Tree::PerlLib
+	- scan for .pod files under @INC
+	- added stop_file list
+
+	Pod::Tree::PerlPod
+	- don't convert PODs under /ext/
+
+
+1.01	2000 Mar 11
+
+	Pod::Tree
+	- added limit => n option
+	- added get_root(), set_root()
+	- added push(), pop()
+	- added walk()
+
+	Pod::Tree::Node
+	- allow text items to begin with * or number
+	- parse L<sec tion> as "sec tion" in this man page
+	- close line breaks in L<> markups
+
+	Pod::Tree::HTML
+	- emit </p> and </li> tags
+	- suppress <p></p> markups from a single ordinary list item
+	- changed _escape_text() to conform to  RFC 2369
+	- added linkMap => \&linkMap option
+	- added link() constructor
+	- close line breaks in <a name=""> markups
+	- emit anchors for <DT> items in <DL> lists
+	- accept =for HTML or =for html
+	- emit <p></p> around =for HTLM paragraphs
+
+	Makefile.PL
+	- add DISTNAME key
+
+	pod2html
+	- fixed the shebang
+
+	pods2html
+	- fixed the shebang
+	- added --index option
+	
+	Added
+	- Pod::Tree::PerlBin
+	- Pod::Tree::PerlDist
+	- Pod::Tree::PerlFunc
+	- Pod::Tree::PerlLib
+	- Pod::Tree::PerlMap
+	- Pod::Tree::PerlPod
+	- Pod::Tree::PerlTop
+	- Pod::Tree::PerlUtil
+	- perl2html
+	- ToDo
+
+
+1.00	1999 Jun 23
+	- original version; created by h2xs 1.18
+

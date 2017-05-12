@@ -1,0 +1,81 @@
+{
+   "abstract" : "Use Perl5 lexer as a library.",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Lexer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "parent" : "0",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Lexer" : {
+         "file" : "lib/Perl/Lexer.pm",
+         "version" : "0.23"
+      },
+      "Perl::Lexer::Token" : {
+         "file" : "lib/Perl/Lexer/Token.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Perl-Lexer/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Perl-Lexer",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Perl-Lexer",
+         "web" : "https://github.com/tokuhirom/Perl-Lexer"
+      }
+   },
+   "version" : "0.23",
+   "x_contributors" : [
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Kenichi Ishigaki <charsbar@users.noreply.github.com>",
+      "Kenichi Ishigaki <ishigaki@cpan.org>"
+   ]
+}

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Plack::App::WebSocket</title>
+    <link rel="stylesheet" href="http://code.jquery.com/qunit/qunit-1.12.0.css">
+  </head>
+  <body>
+    <div id="qunit"></div>
+    <div id="qunit-fixture"></div>
+    <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="http://code.jquery.com/qunit/qunit-1.12.0.js"></script>
+<script>
+"use strict";
+
+function getPort() {
+    return 18888;
+    // var port_re = new RegExp("port=([0-9]+)");
+    // if(!port_re.test(document.location)) {
+    //     throw "cannot obtain port number";
+    // }
+    // return parseInt(port_re.$1, 10);
+}
+
+function createData(base, iteration_num) {
+    var data = "";
+    for(var i = 0 ; i < iteration_num ; i++) {
+        data += base;
+    }
+    return data;
+}
+
+var test_cases = [
+    {label: "5 bytes", data: "AAAAA" },
+    {label: "empty", data: ""},
+    {label: "zero", data: "0"},
+    {label: "256 bytes", data: createData("AAAA", 64)},
+    {label: "64 ki bytes", data: createData("AAAAAAAA", 8 * 1024)},
+];
+
+var ws_url = "ws://127.0.0.1:"+ getPort() +"/";
+
+module("connect, send, receive and passive close");
+
+$.each(test_cases, function(i, test_case) {
+    asyncTest(test_case.label, function() {
+        var ws = new WebSocket(ws_url);
+        var exp_received = ["connected", test_case.data];
+        var received_num = 0;
+        ws.onopen = function() {
+            ws.send(test_case.data);
+        };
+        ws.onmessage = function(event) {
+            if(received_num >= exp_received.length) {
+                ok(false, "too many data received");
+            }
+            strictEqual(event.data, exp_received[received_num], "data "+ received_num +" OK");
+            received_num++;
+            if(received_num === exp_received.length) {
+                ws.send("QUIT");
+            }
+        };
+        ws.onclose = function() {
+            strictEqual(received_num, exp_received.length, "received num OK");
+            start();
+        };
+    });
+});
+
+module("other cases");
+
+asyncTest("all test cases in parallel connections", function() {
+    var socket_num = 0;
+    $.each(test_cases, function(i, test_case) {
+        var ws = new WebSocket(ws_url);
+        var received = [];
+        var exp_received = ["connected", test_case.data];
+        socket_num++;
+        ws.onopen = function() {
+            ws.send(test_case.data);
+        };
+        ws.onmessage = function(event) {
+            received.push(event.data);
+            if(received.length === exp_received.length) {
+                ws.send("QUIT");
+            }
+        };
+        ws.onclose = function() {
+            deepEqual(received, exp_received, test_case.label + ": received data OK");
+            socket_num--;
+            if(socket_num === 0) {
+                start();
+            }
+        };
+    });
+});
+
+asyncTest("all test cases in a single connection", function() {
+    var ws = new WebSocket(ws_url);
+    var case_index = -1; // -1 for initial message from server
+    var received = [];
+    var exp_received = $.map(test_cases, function(test_case) { return test_case.data });
+    exp_received.unshift("connected");
+    ws.onmessage = function(event) {
+        received.push(event.data);
+        case_index++;
+        if(case_index < test_cases.length) {
+            ws.send(test_cases[case_index].data);
+        }else {
+            ws.send("QUIT");
+        }
+    };
+    ws.onclose = function() {
+        deepEqual(received, exp_received, "received data OK");
+        start();
+    };
+});
+
+asyncTest("passive close (TCP disconnection)", function() {
+    var ws = new WebSocket(ws_url);
+    var received_num = 0;
+    ws.onmessage = function(event) {
+        strictEqual(event.data, "connected", "initial message OK");
+        received_num++;
+        ws.send("UNDEF");
+    };
+    ws.onclose = function() {
+        strictEqual(received_num, 1, "received num OK");
+        start();
+    };
+});
+
+asyncTest("active close", function() {
+    var ws = new WebSocket(ws_url);
+    var received_num = 0;
+    ws.onmessage = function(event) {
+        strictEqual(event.data, "connected", "initial message OK");
+        received_num++;
+        ws.close();
+    };
+    ws.onclose = function() {
+        strictEqual(received_num, 1, "received num OK");
+        start();
+    };
+});
+
+QUnit.done(function() {
+    var ws = new WebSocket(ws_url);
+    ws.onopen = function() {
+        ws.send("DONE_TESTING");
+    };
+});
+
+
+</script>
+  </body>
+</html>

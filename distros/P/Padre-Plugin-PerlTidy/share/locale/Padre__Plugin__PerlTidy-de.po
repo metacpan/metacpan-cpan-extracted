@@ -1,0 +1,68 @@
+# German translations for PACKAGE package.
+# Copyright (C) 2009 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Heiko Jansen <heiko_jansen@web.de>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-PerlTidy\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-09-09 23:40+0200\n"
+"PO-Revision-Date: 2009-09-09 23:41+0100\n"
+"Last-Translator: Sebastian Willing\n"
+"Language-Team: German\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: lib/Padre/Plugin/PerlTidy.pm:38
+msgid "Tidy the active document\tAlt+Shift+F"
+msgstr "Aktives Dokument aufräumen\tAlt+Umschalt+F"
+
+#: lib/Padre/Plugin/PerlTidy.pm:39
+msgid "Tidy the selected text\tAlt+Shift+G"
+msgstr "Ausgewählten Text aufräumen\tAlt+Umschalt+G"
+
+#: lib/Padre/Plugin/PerlTidy.pm:40
+msgid "Export active document to HTML file"
+msgstr "Aktives Dokument in HTML Datei exportieren"
+
+#: lib/Padre/Plugin/PerlTidy.pm:41
+msgid "Export selected text to HTML file"
+msgstr "Ausgewählten Text in HTML Datei exportieren"
+
+#: lib/Padre/Plugin/PerlTidy.pm:55
+#: lib/Padre/Plugin/PerlTidy.pm:169
+msgid "Document is not a Perl document"
+msgstr "Dokument ist kein Perl Dokument"
+
+#: lib/Padre/Plugin/PerlTidy.pm:56
+#: lib/Padre/Plugin/PerlTidy.pm:170
+msgid "Error"
+msgstr "Fehler"
+
+#: lib/Padre/Plugin/PerlTidy.pm:74
+#: lib/Padre/Plugin/PerlTidy.pm:192
+msgid "PerlTidy Error"
+msgstr "PerlTidy Fehler"
+
+#: lib/Padre/Plugin/PerlTidy.pm:137
+msgid "Save file as..."
+msgstr "Speichere Datei als..."
+
+#: lib/Padre/Plugin/PerlTidy.pm:147
+msgid "File already exists. Overwrite it?"
+msgstr "Datei existiert bereits. Überschreiben?"
+
+#: lib/Padre/Plugin/PerlTidy.pm:148
+msgid "Exist"
+msgstr "Existiert"
+
+#~ msgid "ctrl"
+#~ msgstr "strg"
+#~ msgid "shift"
+#~ msgstr "umschalt"
+#~ msgid "alt"
+#~ msgstr "alt"
+

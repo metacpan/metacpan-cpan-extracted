@@ -1,0 +1,34 @@
+POE-Component-Client-CouchDB
+
+VERSION
+
+This document describes version 0.05 of the distribution.
+
+SYNOPSIS
+
+Asynchronous (POE based) communication with a CouchDB, in a similar style to
+Net::CouchDb.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc POE::Component::Client::CouchDB
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Paul Driver
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

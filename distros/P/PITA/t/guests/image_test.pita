@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<guest xmlns='http://ali.as/xml/schema/pita-xml/0.44'>
+  <driver>Image::Test</driver>
+  <file>
+  	<filename>image_test.img</filename>
+  	<resource>hda</resource>
+  	<digest>MD5.01234567890123456789012345678901</digest>
+  </file>
+  <config name="memory">256</config>
+  <config name="snapshot">1</config>
+</guest>

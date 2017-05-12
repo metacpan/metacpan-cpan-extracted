@@ -1,0 +1,78 @@
+Revision history for POE-Quickie
+
+0.18  Thu Dec 15 21:57:10 GMT 2011
+    - Depend on POE 1.350. In previous versions, sig_child would not be
+      delivered in some cases, causing a test failure.
+
+0.17  Wed May 25 05:44:37 GMT 2011
+    - Fix another error in t/09_resultevent.t which was causing failures
+
+0.16  Sat May 21 01:16:52 GMT 2011
+    - Add missing dependency on Test::Deep
+    - Fix test failure in 09_resultevent.t
+
+0.15  Thu May 19 16:14:53 GMT 2011
+    - Change the order of arguments to ResultEvent to fit my sense of their
+      order of importance
+    - Events/functions which return the complete stdout/stderr will now
+      return arrays instead of strings so it works with non-linebased output.
+    - Eliminate the 'WheelArgs' parameter. Instead, any extra arguments will
+      be passed to POE::Wheel::Run.
+    - Shut down the child's stdin if we don't have input to pass to it
+
+0.14  Fri Apr 29 03:17:16 GMT 2011
+    - Add a warning to the Pod about using the convenience functions in
+      synchronous event handlers.
+    - Add a ResultEvent to combine the best features of quickie() and run()
+    - Add a quickie_run() function as a shorthand for POE::Quickie->run()
+
+0.13  Wed Apr 27 07:49:39 GMT 2011
+    - Try to avoid a timing-related failure in the 04_timeout.t test
+    - Deliver StdoutEvent/StderrEvent/ExitEvent synchronously
+
+0.12  Sat Sep 25 07:57:23 GMT 2010
+    - Made the docs more readable and added more links
+    - Made the wording of one warning a bit clearer
+    - Rename programs() method to processes()
+    - Depend on POE 1.291 for correct exit value handling in POE::Wheel::Run
+    - If we catch an exception, prefix the warning with 'POE::Quickie'
+
+0.11  Thu Sep 2 21:11:57 GMT 2010
+    - Change the API a bit to make it more of a singleton
+
+0.10  Tue Aug 17 22:55:26 GMT 2010
+    - Make all warnings fatal
+
+0.09  Mon Aug 2 09:42:54 GMT 2010
+    - We were shutting down stdin too soon. Fixed and added a test for it.
+
+0.08  Mon Aug 2 09:19:37 GMT 2010
+    - Add an 'Input' parameter to run() for writing to the program's stdin
+
+0.07  Sat Jul 3 04:20:02 GMT 2010
+    - Enable CloseOnCall on non-Win32 only instead of on Win32 only.
+    - Make sure the testing dependencies go into build_requires
+
+0.06  Mon Jun 28 19:29:56 GMT 2010
+    - Improve docs in a few places
+    - Allow specifying a signal to killall()
+
+0.05  Sat Jun 26 02:02:56 GMT 2010
+    - Made 06_lazy.t a little less strict
+
+0.04  Thu Jun 24 11:09:18 GMT 2010
+    - Recreate our POE session in case it had run out of work and died
+
+0.03  Thu Jun 24 01:33:27 GMT 2010
+    - Fix a bug in the SYNOPSIS and improved the docs elsewhere as well
+
+0.02  Thu Jun 24 01:21:17 GMT 2010
+    - Renamed CopyINC to AltFork (like POE::Component::Generic and other
+      modules call this feature) and made it croak if used on Win32
+    - Make sure we have reaped the child process before we emit ExitEvent
+    - Added an Capture::Tiny-like interface which "blocks" (while running
+      other POE code) while executing programs
+    - Replaced the shutdown() method with killall()
+
+0.01  Wed Jun 23 13:30:10 GMT 2010
+    - Initial release

@@ -1,0 +1,27 @@
+Revision history for Perl extension Pod::HTML2Pod
+                                        Time-stamp: "2004-12-29 18:41:59 AST"
+
+2004-12-29  Sean M. Burke  sburke@cpan.org
+
+        * Release 4.05 -- just rebundling; no code changes
+		
+2000-10-04  Sean M. Burke  sburke@cpan.org
+	
+	* Release 4.04
+	
+	* No longer uses Pod::Text -- gets its entities table from
+	HTML::Entities, and then fiddles with that.
+
+	* Fixed a few incidental typos in the docs.
+	
+2000-10-04  Sean M. Burke  sburke@cpan.org
+
+	* Release 4.03 -- first public release.
+
+1998-12-06  Sean M. Burke  sburke@cpan.org
+
+	* I first modlist-register my idea for Pod::HTML2Pod.  Things keep
+	pulling me away from it -- like getting HTML::TreeBuilder to work
+	right, which is sort of a logical prerequisite.  Over the months,
+	I write and scrap about four different "near-working" (i.e.,
+	nearly useless) versions of Pod::HTML2Pod.

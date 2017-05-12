@@ -1,0 +1,17 @@
+COPYING						GNU General Public License text
+MANIFEST					This list of files
+Makefile.PL					MakeMaker script
+Pgreet.pm					Core routines for Penguin Greetings
+README						Description of package
+Pgreet/Config.pm			Penguin Greetings configuration module
+Pgreet/Error.pm				Penguin Greetings error handling module
+Pgreet/CGIUtils.pm			Penguin Greetings shared CGI utility routine module
+Pgreet/DaemonUtils.pm 		Penguin Greetings shared Daemon utility routines
+Pgreet/ExecEmbperl.pm		Penguin Greetings wrapper for Embperl execute tools
+Pgreet/ExecMason.pm			Penguin Greetings wrapper for Mason execute tools
+Pgreet/I18N.pm				Penguin Greetings Localization file.
+Pgreet/I18N/en_us.pm		Penguin Greetings US-English stub file
+Pgreet/I18N/fr_fr.pm		Penguin Greetings French translations file
+Pgreet/I18N/i_default.pm	Penguin Greetings Default translations stub file.
+t/Pgreet.t					Testing script
+META.yml                	Module meta-data (added by MakeMaker)

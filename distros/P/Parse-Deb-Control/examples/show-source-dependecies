@@ -1,0 +1,119 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+xxx - desc
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=cut
+
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use File::Find::Rule;
+use File::Spec;
+use Parse::Deb::Control;
+use List::MoreUtils 'uniq', 'any';
+
+exit main();
+
+sub main {
+    my $help;
+    my $prefix = '';
+    my $also_depends = 0;
+    GetOptions(
+        'help|h'       => \$help,
+        'prefix|p=s'   => \$prefix,
+        'also-depends' => \$also_depends,
+    ) or pod2usage;
+    pod2usage if $help;
+    
+    my $package_name = shift @ARGV;
+    pod2usage if not $package_name;
+    
+    my $pkg = $package_name;
+    return 0
+        if package_exists($pkg);
+
+    my $folder = pkg_folder($pkg);
+    die 'no folder for '.$pkg
+        if not $folder;
+
+    my @own_packages = map { chomp; $_; } `cd $folder; dh_listpackages`;
+    die 'failed to get list of own packages' if not @own_packages;
+
+    my @control_keys = qw{ Build-Depends Build-Depends-Indep };
+    push @control_keys, qw{ Depends Suggests Recommends }
+        if $also_depends;
+
+    my @deps;
+    my $parser = Parse::Deb::Control->new(File::Spec->catfile($folder, 'debian', 'control'));
+    foreach my $dep_line ($parser->get_keys(@control_keys)) {
+        my $value = ${$dep_line->{'value'}};
+        while ($value =~ m/(^|\s)($prefix lib[^\s,]+?-perl)(\s|,)/xmsg) {
+            my $dep_pkg = $2;
+            
+            # skip if in Depends is the same package name as our current building package
+            next if any { $dep_pkg eq $_ } @own_packages;
+            
+            if (($dep_line->{'key'} eq 'Build-Depends-Indep') or ($dep_line->{'key'} eq 'Depends')) {
+                # strip prefix
+                $dep_pkg =~ s/^$prefix//;
+
+                # parse reverse provides packages from Build-Depends-Indep dependencies
+                my $rp = 0;
+                my @rprovides =
+                    map { $prefix.$_ }
+                    map { (split '\s+', $_)[0] }
+                    grep { if ($_ eq "Reverse Provides: \n") { $rp = 1; 0; } elsif ($rp) { 1 } else { 0 }; }
+                    `apt-cache showpkg $dep_pkg 2> /dev/null`
+                ;
+                
+                # if found add them to source dependencies
+                if (@rprovides) {
+                    push @deps, @rprovides;
+                }
+                # else add unchanged package name
+                else {
+                    push @deps, $prefix.$dep_pkg;
+                }
+            }
+            else {
+                push @deps, $dep_pkg;
+            }
+        }
+    }
+    
+    @deps = grep { not package_exists($_) } uniq(@deps);
+    print join("\n", @deps);
+    print "\n"
+        if @deps;
+    
+    return 0;
+}
+
+sub pkg_folder {
+    my $pkg = shift;
+    my ($source_pkg) = map { chomp; substr($_,8) } grep { m/^Source: / } `apt-cache show "$pkg" 2> /dev/null`;
+    $source_pkg ||= $pkg;
+    my ($folder) = File::Find::Rule
+        ->directory
+        ->maxdepth(1)
+        ->name(qr/^$source_pkg-[.0-9]+/)
+        ->in('.');
+    return $folder;
+}
+
+sub package_exists {
+    my $pkg = shift;
+    die if not $pkg;
+
+    my @dsc = `apt-cache show "$pkg" 2> /dev/null`;
+    return scalar @dsc;
+}

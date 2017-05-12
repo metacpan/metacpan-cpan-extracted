@@ -1,0 +1,9 @@
+1.2     2015-03-04      Update dependency version for Palm::PDB, which
+                          seems to have mysteriously travelled back in
+                          time
+
+1.1     2007-07-30      Fixed for 5.6.2 - on perl < 5.8, we now pick the
+                          records apart by hand instead of using unpack.
+                          Yuck.
+
+1.0     2007-07-29      Original release

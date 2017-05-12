@@ -1,0 +1,25 @@
+%semantic token 'c' 'd'
+%{
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+%}
+%%
+S:      'c'+  D+ 
+           { 
+              print Dumper($_[1]);
+              print $_[1]->str."\n";
+              print Dumper($_[2]);
+              print $_[2]->str."\n";
+           } 
+;
+
+D: 'd'
+;
+
+%%
+
+sub Run {
+  my ($self) = shift;
+  return $self->YYParse( yybuildingtree => 1 );
+}
+

@@ -1,0 +1,10 @@
+README
+MANIFEST
+COPYING
+Changes
+Makefile.PL
+LibExtractor.pm
+bin/perl-libextractor
+t/00_load.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

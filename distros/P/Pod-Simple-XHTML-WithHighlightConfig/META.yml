@@ -1,0 +1,26 @@
+---
+abstract: 'Allow configuring syntax highlighting hints in Pod'
+author:
+  - 'haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>'
+build_requires:
+  Test::More: '0'
+configure_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Simple-XHTML-WithHighlightConfig
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  Moo: '0'
+  Pod::Simple::XHTML: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Simple-XHTML-WithHighlightConfig
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/haarg/Pod-Simple-XHTML-WithHighlightConfig
+version: '0.000001'

@@ -1,0 +1,100 @@
+Parse::GEDA::Gschem version 1.0.0
+
+NAME
+
+    Parse::GEDA::Gschem - gEDA/gaf gschem schematic file parser
+
+
+DESCRIPTION
+
+    Collection of routines used to parse and write back schematic files of the
+    format specified by gEDA gschem schematic capture tool as detailed at:
+    http://www.geda.seul.org/wiki/geda:file_format_spec
+
+
+REQUIREMENTS:
+    perl 5.10
+
+
+EXAMPLE:
+    my @schFiles = (); # array of schematic file path/names
+    my @files = ();    # array of schematic objects
+    bakSchFiles(\@schFiles); # backup schematic files in bak/year-m-d_h-m-s/
+    $files = @{readSchFiles(\@schFiles)}; # parses the schematic files
+    writeMsg(1, Dumper(\@files)); # prints out the entire data structure
+    writeSchFiles(\@files); # write the data structure into schematic files
+
+    Parse::gaf::gschem is a collection of routines used to parse a .sch file
+    into a convenient perl array of hashes data structure in memory.
+    This array can then be used to extract information about the schematics,
+    or it can be altered to apply specific changes to the schematics.
+    The array can then be written back to the schematic files.
+    One could even build such array of hashes data structure without reading
+    any input schematic file to programmatically generate new schematic files.
+
+
+LIMITATIONS
+
+    * Does not fetch data from the sym file referenced in the sch file.
+      I.e. the data structure created is only as deep as the sch file itself,
+      if a symbol is instantiated as a reference in the sch file then only the
+      attributes also instantiated in that sch file will be present in the
+      data structure. In other words, the referenced sym file in the symbol
+      library path is never accessed, only the schematic files are accessed.
+
+
+CHANGES AND FUTURE DEVELOPMENT
+
+    This readme refers to versions 1.XX.
+    For details of changes, refer to the file Changes.
+
+
+AUTHOR
+
+    JP Fricker (jpfricker@cpan.org)
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DEPENDENCIES
+
+    Parse::RecDescent
+    File::Copy
+    File::Basename
+    Data::Dumper
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2008, JP Fricker. All rights reserved.
+
+    This file is part of Parse::GEDA::Gschem
+
+    Parse::GEDA::Gschem is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Parse::GEDA::Gschem is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Parse::GEDA::Gschem.  If not, see <http://www.gnu.org/licenses/>.

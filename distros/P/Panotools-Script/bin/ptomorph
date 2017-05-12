@@ -1,0 +1,153 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Panotools::Script;
+use Getopt::Long;
+use Pod::Usage;
+use Storable qw/ dclone /;
+
+my $help = 0;
+my $path_out = 'morphed.pto';
+my $p_order = undef;
+
+GetOptions ('o|output=s' => \$path_out,
+            'p|polynomial=f' => \$p_order,
+            'h|help' => \$help);
+
+pod2usage (-verbose => 2) if $help;
+
+my $path_pto = shift || pod2usage;
+die "Can't find $path_pto" unless -e $path_pto;
+
+my $pto = new Panotools::Script;
+$pto->Read ($path_pto);
+$pto->InitTrafo ($path_pto);
+
+my $mapping;
+
+for my $cp (@{$pto->Control})
+{
+    my $cp_new = dclone $cp;
+    if ($cp->{t} == 0)
+    {
+        my @uv = $pto->Trafo ($cp->{n}, $cp->{x}, $cp->{y});
+        my @UV = $pto->Trafo ($cp->{N}, $cp->{X}, $cp->{Y});
+        my @average = (($uv[0] + $UV[0])/2, ($uv[1] + $UV[1])/2);
+
+        ($cp_new->{x}, $cp_new->{y}) = $pto->TrafoReverse ($cp->{n}, @average);
+        push @{$mapping->{$cp->{n}}}, join (',', $cp->{x}, $cp->{y}), join (',', $cp_new->{x}, $cp_new->{y});
+
+        ($cp_new->{X}, $cp_new->{Y}) = $pto->TrafoReverse ($cp->{N}, @average);
+        push @{$mapping->{$cp->{N}}}, join (',', $cp->{X}, $cp->{Y}), join (',', $cp_new->{X}, $cp_new->{Y});
+    }
+    $cp = $cp_new;
+}
+
+for my $id_image (0 .. scalar @{$pto->Image} -1)
+{
+    next unless defined $mapping->{$id_image};
+    next unless scalar @{$mapping->{$id_image}} > 2;
+
+    my $path_original = $pto->Image->[$id_image]->Path ($path_pto);
+    my $path_new = $path_out;
+    $path_new =~ s/\.pto/_/i;
+    $path_new .= sprintf("%04d", $id_image) .'.png';
+
+    if (defined $p_order)
+    {
+        my $o = $p_order;
+        while ((($o+1) * ($o+2) /2) > scalar @{$mapping->{$id_image}})
+        {
+            # reduce the order of the polynomial if there are not enough control points
+            $o--;
+        }
+        system ('convert', $path_original, '-alpha', 'on',
+            '-virtual-pixel', 'transparent',
+            '-distort', 'Polynomial', join ('  ', $o, @{$mapping->{$id_image}}),
+            $path_new);
+    }
+    else
+    {
+        system ('convert', $path_original, '-alpha', 'on',
+            '-virtual-pixel', 'transparent',
+            '-distort', 'Shepards', join ('  ', @{$mapping->{$id_image}}),
+            $path_new);
+    }
+
+    $pto->Image->[$id_image]->{n} = '"'. $path_new . '"';
+}
+
+@{$pto->Control} = () if defined $p_order;
+
+$pto->Write ($path_out);
+
+__END__
+
+=head1 NAME
+
+ptomorph - Distort photos before stitching
+
+=head1 SYNOPSIS
+
+ptomorph [options] project.pto
+
+ Options:
+  -h | --help           Outputs help documentation
+  -o | --output name    Output .pto project name, defaults to 'morphed.pto'
+  -p | --polynomial num Uses a polynomial best fit, num is 'order' of polynomial
+                            and must be 1, 2, 3, 4 or 5
+
+=head1 DESCRIPTION
+
+B<ptomorph> looks at control points in a Hugin PTO panorama project and creates
+a new set of photos that are distorted such that these control points line up
+perfectly.  Distortion is a 'rubber-sheet' type morph.
+
+A PTO project is created that references these distorted photos, this project
+can then be stitched as normal.
+
+Temporary distorted images are in PNG format with filenames based on the prefix
+of the new PTO filename. i.e. this command:
+
+  ptomorph -o /path/to/morphed.pto project.pto
+
+..will produce the following files:
+
+  /path/to/morphed.pto
+  /path/to/morphed_0000.png
+  /path/to/morphed_0001.png
+  /path/to/morphed_0002.png
+     etc...
+
+Control point positions are calculated using the 'pano_trafo' tool from the
+Hugin project, the morphed photos are created with 'convert' from the
+ImageMagick project.
+
+By default the 'Shepards' distortion is used, if a polynomial is specified then
+the ImageMagick 'Polynomial' distortion is used, see
+L<http://www.imagemagick.org/Usage/distorts/#polynomial> and
+L<http://www.imagemagick.org/Usage/distorts/#shepards>
+
+Masks and cropping settings are not distorted, so projects with masks that need
+lots of distortion may not work so well.
+
+Note: Due to the way that the 'pano_trafo' process is spawned, it is likely
+that this proof of concept tool doesn't currently work on Windows.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+L<http://www.imagemagick.org/>
+
+=head1 AUTHOR
+
+Bruno Postle - April 2012.
+
+=cut

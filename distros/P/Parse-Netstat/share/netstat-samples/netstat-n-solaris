@@ -1,0 +1,31 @@
+
+UDP: IPv4
+   Local Address        Remote Address      State
+-------------------- -------------------- ----------
+8.8.17.4.15934   8.8.7.7.53       Connected
+127.0.0.1.32859      127.0.0.1.514        Connected
+127.0.0.1.32860      127.0.0.1.514        Connected
+
+TCP: IPv4
+   Local Address        Remote Address    Swind Send-Q Rwind Recv-Q    State
+-------------------- -------------------- ----- ------ ----- ------ -----------
+8.8.17.4.1337    8.8.213.120.65472 262140      0 1049920      0 ESTABLISHED
+8.8.17.4.44306   8.8.17.4.111     57304      0 1055220      0 TIME_WAIT
+8.8.17.4.44064   8.8.17.4.32774   57260      0 1055220      0 TIME_WAIT
+8.8.17.4.44308   8.8.17.4.32774   57260      0 1055220      0 TIME_WAIT
+8.8.17.4.44066   8.8.17.4.111     57304      0 1055220      0 TIME_WAIT
+8.8.17.4.44310   8.8.17.4.111     57304      0 1055220      0 TIME_WAIT
+
+Active UNIX domain sockets
+Address  Type          Vnode     Conn  Local Addr      Remote Addr
+30258256428 stream-ord 00000000 00000000                               
+30575aa2b38 stream-ord 00000000 00000000                               
+305744acaf8 stream-ord 00000000 00000000                               
+30575aa3b88 stream-ord 00000000 00000000                               
+3013c427d68 stream-ord 00000000 00000000                               
+303b66230f8 stream-ord 00000000 00000000                               
+3042fbbb228 stream-ord 30b59894f40 00000000 /tmp/ssh-MyY25402/agent.25402                
+30186d43d70 stream-ord 00000000 00000000                               
+303e8e332f8 stream-ord 00000000 00000000                               
+3049e75ece0 stream-ord 302d8344500 00000000 /var/tmp/amavisd-new/abgeber/amavisd.sock                
+3049e75f250 stream-ord 00000000 00000000                               

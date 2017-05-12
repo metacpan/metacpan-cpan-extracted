@@ -1,0 +1,67 @@
+README for Pod::PalmDoc
+
+This module converts POD (Plain Old Documentation) to PalmDoc format.
+It uses Palm::PalmDoc and inherits most of its methods from Pod::Parser.
+
+Pod::PalmDoc can be used as follows.
+
+use Pod::PalmDoc;
+
+my $parser = Pod::PalmDoc->new();
+$parser->compress(1);
+$parser->title("POD Foo");
+$parser->parse_from_file($ARGV[0] || "Pod/PalmDoc.pm", "foo.pdb"); 
+# Read filename from command line or default value
+
+-or-
+
+use Pod::PalmDoc;
+
+my $parser = Pod::PalmDoc->new();
+$parser->compress(1);
+$parser->title("POD Foo");
+$parser->parse_from_file($ARGV[0],"foo.pdb");
+
+-or-
+
+use Pod::PalmDoc;
+
+my $parser = Pod::PalmDoc->new();
+$parser->compress(1);
+$parser->title("POD Foo");
+open(FOO,">foo.pdb") || die $!;
+$parser->parse_from_filehandle(\*STDIN, \*FOO); 
+close(FOO);
+
+-or-
+
+use Pod::PalmDoc;
+
+my $parser = Pod::PalmDoc->new();
+$parser->compress(1);
+$parser->title("POD Foo");
+open(FOO,"<Pod/PalmDoc.pm") || die $!;
+open(BAR,">foo.pdb") || die $!;
+$parser->parse_from_filehandle(\*FOO, \*BAR); 
+close(FOO);
+close(BAR);
+
+TODO
+
+Future releases probably will inherit from Pod::Select instead of Pod::Parser.
+
+DISCLAIMER
+
+This code is released under GPL (GNU Public License). More information can be 
+found on http://www.gnu.org/copyleft/gpl.html
+
+VERSION
+
+This is Pod::PalmDoc 0.0.2.
+
+
+This Module was written by Hendrik Van Belleghem (beatnik@quickndirty.org)
+
+SEE ALSO
+
+GNU & GPL - http://www.gnu.org/copyleft/gpl.html

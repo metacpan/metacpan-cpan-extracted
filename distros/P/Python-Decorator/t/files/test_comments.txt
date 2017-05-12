@@ -1,0 +1,55 @@
+Python::Decorator filtered the source into:
+-------------------------------
+use Carp qw(confess);
+
+sub loginout {
+    my $name = shift;
+    return sub {
+	my $f = shift;
+	return sub {
+	    print "entering sub $name\n";
+	    &$f(@_);
+	    print "leaving sub $name\n";
+	};
+    };
+}
+
+sub debug {
+    my ($a,$b) = @_;
+    return sub {
+	my $f = shift;
+	return sub {
+	    print "debug says $a $b before call\n";
+	    &$f();
+	    print "debug says $a $b after call\n";
+	}
+    };
+}
+
+sub memoize {
+    my $f = shift;
+    return sub {
+	print "well, this is where we could return memoized results\n";
+	&$f();
+	print "and this is where we could memoize results\n";
+    };
+}
+
+# and that is not a decorator
+#@blah
+
+
+
+{ no strict "refs"; *{__PACKAGE__."::foo"} = memoize(debug("just another","perl hacker")->(loginout('foo')->( sub  {
+    print "running foo()\n";
+} ))); }
+
+foo();
+-------------------------------
+well, this is where we could return memoized results
+debug says just another perl hacker before call
+entering sub foo
+running foo()
+leaving sub foo
+debug says just another perl hacker after call
+and this is where we could memoize results

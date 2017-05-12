@@ -1,0 +1,11 @@
+Changes
+lib/Perlbal/Plugin/Syslogger.pm
+Perlbal-Plugin-Syslogger.spec
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00-compile.t
+t/01-plugin.t
+t/lib/Perlbal/Plugin/TestPlugin.pm

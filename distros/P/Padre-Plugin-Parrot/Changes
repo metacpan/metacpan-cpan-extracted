@@ -1,0 +1,52 @@
+Revision history for Padre-Plugin-Parrot
+
+0.31   2010.12.06
+	- Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+
+0.30   2010.10.29
+	- Removed Test::NeedsDisplay dependency (AZAWAWI)
+
+0.29   2010.10.27
+	- t/00-load.t is magically injected by [@PadrePlugin] via [LoadTests] (AZAWAWI)
+
+0.28   2010.10.25
+	- Switched to Dist::Zilla (AZAWAWI)
+	- Added compatibility with the latest Padre (AZAWAWI)
+
+0.27 2010.9.20
+	- Add menu option to open one of the installed example files (SZABGAB)
+	- Enable context sensitive help on PIR files (SZABGAB)
+	- Made compatible with Padre 0.54 and later (ZENOG, AZAWAWI)
+	- Updated copyright notice (AZAWAWI)
+
+0.26 2009.10.02
+	- Allow the execution of PIR files.
+	- Allow the generation of pbc files from pir file.
+	- Fix colorize function to use current doc instead of assuming itself being a doc
+	- Add PIR examples.
+
+0.25 2009.07.23
+	- Remove the old Px:: constants
+	- Replace the PASM_XYZ constant names by PADRE_color names to make PASM files highlight
+
+0.24 2009.07.23
+	- removed taint mode for tests, leading to build failures (jquelin)
+	- move the pbc based syntax highlighting from the Perl 6 plugin to 
+	  the Parrot plugin (szabgab)
+	- Allow highlighting of Ruby files via Cardinal
+
+0.23    2009.02.18
+	- Upgrade to Padre 0.26 Plugin API
+
+0.22    2008.12.21
+	- Moved Document::PASM and Document::PIR from Padre
+	- Make sure Parrot::Embed can work (with a workaround for the
+	  case when the plugin is reloaded)
+
+0.16    2008.11.09
+	- Moved to its own distribution
+	- Checking if Parrot::Embed is available
+
+0.15
+	- First version, released on an unsuspecting world as part of Padre.
+

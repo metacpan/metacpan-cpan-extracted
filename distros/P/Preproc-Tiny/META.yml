@@ -1,0 +1,27 @@
+---
+abstract: 'Minimal stand-alone preprocessor for code generation using perl'
+author:
+  - 'Paulo Custodio, <pscust@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Path::Tiny: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Preproc-Tiny
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  repository: https://github.com/pauloscustodio/perl-Preproc-Tiny.git
+version: '0.02'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

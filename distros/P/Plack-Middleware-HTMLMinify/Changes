@@ -1,0 +1,23 @@
+1.0.0   March 29, 2011
+        - Fix a possible bug when body is empty.
+
+0.6.0   March 14, 2011
+        - Bump version.
+
+0.5.1   March 14, 2011
+        - Fix use of uninitialized message warning.
+
+0.5     March 13, 2011
+        - Support IO::Handle-like object as $res->[2].
+
+0.4     March 7, 2011
+        - Support multiple part in response.
+
+0.3     February 26, 2011
+        - If response body is undefined, then don't touch it.
+
+0.2     February 20, 2011
+        - If Content-Encoding is set, don't minify it.
+
+0.1     February 20, 2011
+        - Initial release.

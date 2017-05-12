@@ -1,0 +1,7 @@
+Makefile.PL
+lib/PerlIO/via/StripHTML.pm
+t/1.t
+t/1.html
+Changes
+README
+MANIFEST

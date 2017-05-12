@@ -1,0 +1,35 @@
+---
+abstract: 'Perl extension for blah blah blah'
+author:
+  - 'ioannis, <ioannis@macports.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.62
+  Test::CPAN::Meta: 0.12
+  Test::Dependencies: 0.11
+  Test::HasVersion: 0.012
+  Test::MinimumVersion: 0.101080
+  Test::Pod: 1.0
+  Test::Pod::Coverage: 1.0
+  Test::Spelling: 0.15
+configure_requires:
+  ExtUtils::MakeMaker: 6.62
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pg-Corruption
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  DBD::Pg: 2.10.7
+  Getopt::Compact: 0.04
+  perl: 5.12.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

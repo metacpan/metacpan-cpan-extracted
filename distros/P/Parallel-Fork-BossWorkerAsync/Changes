@@ -1,0 +1,38 @@
+Revision history for Perl extension Parallel::Fork::BossWorkerAsync.
+
+0.09 2017-01-02
+  - Add Windows support, thanks to code provided by Mario Roy.
+
+
+0.08 2013-09-09
+  - Remove large_return.t from the build, so as not to break BSD builds.
+
+0.07 2013-09-05
+  - Optimize socket read buffer size; make it configurable.
+  - Fix incorrect C-style fork() error return (perl returns undef, not -1).
+  - Fix overly aggressive child process reaping. Now you can fork() within
+    your work_handler and the module won't reap the completed process out from
+    under you. Thanks to Rob Navarro for both of these fixes.
+
+0.06 2010-12-03
+  - Test for, and bail on, Windows.
+
+0.05 2009-12-12
+  - Worker callback errors no longer cause child to exit.
+  - Introduce ERROR hash key into result.
+  - Wait for all child workers to be reaped before exiting boss.
+    - This will hopefully clean up the non-Windows test failures.
+
+0.04 2009-09-13
+  - Improve error messages.
+
+0.03  2009-04-01
+  - changed author email
+
+0.02  2009-04-01
+  - reduced required perl version to 5.6.0 in Makefile.PL
+  
+0.01  2009-03-09
+	- original version; created by h2xs 1.23 with options
+		-AX Parallel::Fork::BossWorkerAsync
+

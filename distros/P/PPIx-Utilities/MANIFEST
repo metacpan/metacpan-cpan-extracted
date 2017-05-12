@@ -1,0 +1,24 @@
+Build.PL
+Changes
+lib/PPIx/Utilities.pm
+lib/PPIx/Utilities/Exception/Bug.pm
+lib/PPIx/Utilities/Node.pm
+lib/PPIx/Utilities/Statement.pm
+MANIFEST			This list of files
+t/split-ppi-node-by-namespace.t
+xt/author/consistent_version_numbers.t
+xt/author/copyright.t
+xt/author/distribution.t
+xt/author/kwalitee.t
+xt/author/perlcritic-code.t
+xt/author/perlcritic-tests.t
+xt/author/perlcriticrc-code
+xt/author/perlcriticrc-tests
+xt/author/pod_coverage.t
+xt/author/pod_syntax.t
+xt/author/README
+xt/author/stop-words
+Makefile.PL
+README
+LICENSE
+META.yml

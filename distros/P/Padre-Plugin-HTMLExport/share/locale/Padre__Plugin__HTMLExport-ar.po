@@ -1,0 +1,55 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-HTMLExport\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2010-10-26 10:52+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"Language-Team: Ahmad M. Zawawi <ahmad.zawawi@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Arabic\n"
+
+#: lib/Padre/Plugin/HTMLExport.pm:48
+msgid "Export Colorful HTML"
+msgstr "تصدير إلى HTML ملون"
+
+#: lib/Padre/Plugin/HTMLExport.pm:49
+msgid "Export HTML..."
+msgstr "تصدير إلى HTML..."
+
+#: lib/Padre/Plugin/HTMLExport.pm:50
+msgid "Configure Color"
+msgstr "تعريف اللون"
+
+#: lib/Padre/Plugin/HTMLExport.pm:71
+msgid "Save as HTML..."
+msgstr "حفظ كHTML..."
+
+#: lib/Padre/Plugin/HTMLExport.pm:85
+msgid "File already exists. Overwrite it?"
+msgstr "الملف موجود أصلا. هل تريد الكتابة فوقه؟"
+
+#: lib/Padre/Plugin/HTMLExport.pm:86
+msgid "Exist"
+msgstr "موجود"
+
+#: lib/Padre/Plugin/HTMLExport.pm:103
+#, perl-format
+msgid "%s is not supported"
+msgstr "ال %s غير مدعوم"
+
+#: lib/Padre/Plugin/HTMLExport.pm:154
+#, perl-format
+msgid "Saved to %s. Do you want to open it now?"
+msgstr "تم الحفظ إلى %s. هل تريد فتحه الآن؟"
+
+#: lib/Padre/Plugin/HTMLExport.pm:155
+msgid "Done"
+msgstr "تم"
+
+#: lib/Padre/Plugin/HTMLExport.pm:168
+msgid "Not implemented, TODO"
+msgstr "لم تنفذ بعد، TODO"
+

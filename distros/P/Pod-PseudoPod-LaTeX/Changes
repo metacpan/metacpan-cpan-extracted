@@ -1,0 +1,43 @@
+Revision history for Pod-PseudoPod-LaTeX
+
+1.20160626 2016-06-26 19:32:03+02:00 Europe/Amsterdam
+
+    - add support to 'captions_below' to make captions below the
+      objects. (Alberto Simões)
+    - add --full option to generate a full LaTex document. (Paul Cochrane)
+    - Fixed translation of cedilla and plusmn characters. (Paul Cochrane)
+    - Avoid deprecation warnings in the test suite. (Moritz Lenz)
+
+1.20110710 2011-07-10 15:20:50 America/Los_Angeles
+    - added support for custom environments
+    - improved screen handling (Dean Serenevy, Moritz Lenz)
+    - support =for latex (Alberto Simões)
+    - render L<> and U<> as \url (Alberto Simões)
+    - make ligatures removal optional (Alberto Simões)
+    - support optional titles for 'screen' (Alberto Simões)
+    - support run-time defined environments with optional titles 
+      (Alberto Simões)
+    - support superscript G<> and subscript L<>. (Alberto Simões)
+
+1.101600  Wed Jun 9 13:48:24 2010
+    - made bin/ppod2latex installable (Jerome Quelin, RT #58269)
+    - used Git plugins for dzil
+
+1.101530  Wed Jun 2 11:39:29 2010
+    - pulled screen section changes from Moritz Lenz
+
+1.101060  Fri Apr 16 08:46:25 2010
+    - added repository information to distribution, no functional changes
+
+1.101050  Thu Apr 15 20:49:53 2010
+    - migrated build system to Dist::Zilla
+    - corrected escaping of the caret (^) character; closes [CPAN #50794]
+    - implemented markup in verbatim environments
+
+1.000  Fri Aug 14 02:07:38 UTC 2009
+    - added modifications from the Parrot PIR book
+    - removed unnecessary developer tests and Makefile.PL from tarball
+    - improved dependencies
+
+0.10   Thu Jun  1 00:02:17 UTC 2006
+        First version, released on an unsuspecting world.

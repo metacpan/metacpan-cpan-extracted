@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libbonobui
+Description: libbonoboui
+Requires: glib-2.0 libbonobo-2.0 libgnomecanvas-2.0 libgnome-2.0
+Requires.private: ORBit-2.0 libxml-2.0
+Version: 2.24.3
+Libs: -L${libdir} -lbonoboui-2
+Cflags: -I${includedir}/libbonoboui-2.0

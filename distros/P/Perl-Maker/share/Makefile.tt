@@ -1,0 +1,3 @@
+PERL_VERSION=[% perl_version %]
+
+# vim: ft=mk

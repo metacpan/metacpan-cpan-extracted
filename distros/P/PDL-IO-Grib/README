@@ -1,0 +1,49 @@
+Copyright (c) 2000 James P Edwards (jedwards@inmet.gov.br).  All
+rights reserved. This program is free software; you can redistribute
+it and/or modify it under the same terms as Perl itself.
+
+Grib.pm allows the user to read files in the grib FORM FM 92-IX
+Ext. GRIB into perl PDL - it may not read all possible grib format
+combinations.
+
+If you want to use this module you'll need to have some understanding
+of the format as the module refers to section octet numbers rather
+than trying to name all of the fields.  The manual is available on line at:
+http://www.wmo.ch/web/www/reports/Guide-binary-2.html
+
+Prerequisites - You need to have the perl PDL module installed.
+http://pdl.perl.org
+
+Build and Install:
+
+$ zcat PDL-IO-Grib-xx.tar.gz | tar xf -
+$ cd PDL-IO-Grib-xx
+$ perl Makefile.pl
+$ make 
+$ make install
+
+Changes / enhancements you plan to make in the future:
+
+Need to expand the list of possible grib flavors it can read.  
+ECMWF, NCEP, and DWD all have slight variations on the theme.
+It would be nice if it could write too.
+
+New in version  2.0 
+I had to change the version number scheme for compatibility with CPAN.
+I added a test.pl which first creates a grib file with various bits per value in the 
+packing scheme.  then reads it back in and makes sure it matchs within some tolerance.
+
+
+New in  version 1.20
+
+Added the script GribView.pl which can be used to view the Grib header data
+and with TriD or PGPLOT to plot simple contours of the data.
+GribView requires Tk and Tk::FileDialog
+
+Added partial write capability including the ability to update a
+pre-existing file.
+
+
+Uses xs and some code from wgrib to decode data.  Stores all section
+information in pdl format and only decodes on demand.  
+

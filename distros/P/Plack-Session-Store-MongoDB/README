@@ -1,0 +1,124 @@
+NAME
+    Plack::Session::Store::MongoDB - MongoDB based session store for Plack
+    apps.
+
+SYNOPSIS
+            use Plack::Builder;
+            use Plack::Middleware::Session;
+            use Plack::Session::Store::MongoDB;
+
+            my $app = sub {
+                    return [ 200, [ 'Content-Type' => 'text/plain' ], [ 'Hello Foo' ] ];
+            };
+
+            builder {
+                    enable 'Session',
+                            store => Plack::Session::Store::MongoDB->new(
+                                    session_db_name => 'myapp',
+                                    coll_name => 'myapp_sessions',  # defaults to 'session'
+                                    host => 'mongodb.myhost.com',   # defaults to 'localhost'
+                                    port => 27017                   # this is the default
+                            );
+                    $app;
+            };
+
+            # alternatively, you can just pass a MongoDB::Connection object:
+            builder {
+                    enable 'Session',
+                            store => Plack::Session::Store::MongoDB->new(
+                                    session_db_name => 'myapp',
+                                    conn => MongoDB::Connection->new
+                            );
+                    $app;
+            };
+
+DESCRIPTION
+    This module implements a MongoDB storage for session data. This has the
+    advantage of being a simple (no need to generate a database scheme or
+    even create the necessary database/collections), yet powerful backend.
+
+    It requires, of course, a running MongoDB daemon to work with.
+
+METHODS
+  new( %params )
+    Creates a new instance of this module. Requires a hash of parameters
+    containing 'session_db_name' with the name of the MongoDB database to
+    use and any options available by MongoDB::Connection, most probably
+    'host' (the hostname of the server where the MongoDB daemon is running,
+    defaults to 'localhost') and 'port' (the port where the MongoDB daemon
+    is listening, defaults to 27017, the default MongoDB port). You can also
+    optionally pass the 'coll_name' parameter, denoting the name of the
+    collection in which sessions will be stored (will default to
+    'sessions').
+
+    Alternatively, you can pass a 'conn' parameter and give it an already
+    created MongoDB::Connection object. You will still need to pass
+    'session_db_name' when doing this.
+
+    NOTE: in versions before 0.3, the 'session_db_name' option was called
+    'db_name'. This has been changed since 'db_name' is a
+    MongoDB::Connection option that might differ from you session database,
+    and you should be able to pass both if you need to.
+
+  fetch( $session_id )
+    Fetches a session object from the database.
+
+  store( $session_id, \%session_obj )
+    Stores a session object in the database. If a database error occurs when
+    attempting to store the session, this method will die.
+
+  remove( $session_id )
+    Removes the session object from the database. If a database error occurs
+    when attempting to remove the session, this method will generate a
+    warning.
+
+AUTHOR
+    Ido Perlmuter, "<ido at ido50 dot net>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-plack-session-store-mongodb at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Plack-Session-Store-Mong
+    oDB>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+            perldoc Plack::Session::Store::MongoDB
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Plack-Session-Store-MongoD
+        B>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Plack-Session-Store-MongoDB>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Plack-Session-Store-MongoDB>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Plack-Session-Store-MongoDB/>
+
+ACKNOWLEDGEMENTS
+    Daisuke Maki, author of Plack::Session::Store::DBI, on which this module
+    is based.
+
+    Tests adapted from the Plack::Middleware::Session distribution.
+
+LICENSE AND COPYRIGHT
+    Copyright 2010-2014 Ido Perlmuter.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

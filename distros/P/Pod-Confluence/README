@@ -1,0 +1,66 @@
+NAME
+
+    Pod::Confluence - Converts pod to confluence flavored markdown
+
+VERSION
+
+    version 1.01
+
+SYNOPSIS
+
+        my $parser = Pod::Confluence->new(
+            space_key => 'FooPod',
+            packages_in_space => [
+                'Foo',
+                'Foo::Bar',
+                'Foo::Baz',
+            ]);
+    
+        my $structured_storage_markdown;
+        $parser->output_string(\$structured_storage_markdown);
+        $parser->parse_file('/path/to/Foo.pm');
+
+DESCRIPTION
+
+    This module uses Pod::Simple to convert POD to Confluence structured
+    storage format. The output can be cut/paste into the source view of a
+    page, or you can use the Confluence API to push directly to the server.
+
+CONSTRUCTORS
+
+ new(%options)
+
+    Creates a new parser to process POD into markdown. Available options
+    are:
+
+    space_key
+
+      The spaceKey from the Confluence space this page will be added to.
+      This is necessary to ensure all the links between pages are properly
+      generated.
+
+    packages_in_space
+
+      This is a list of all the packages that will be in this space. When a
+      POD link is encountered, this list will be checked. If the package is
+      in the list, a local link will be generated. Otherwise, the link will
+      point to metacpan.
+
+AUTHOR
+
+    Lucas Theisen <lucastheisen@pastdev.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Lucas Theisen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Pod::Simple
+

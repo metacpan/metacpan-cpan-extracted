@@ -1,0 +1,7 @@
+
+0.002     2011-02-01
+    - Pod::Weaver munged my module in a pesky way, because I had 1\n__END__ and it stuck the pod there...
+    - (and I had no tests to tell me that'd happened)
+
+0.0001
+    - initial release, with yada support and some decent docs

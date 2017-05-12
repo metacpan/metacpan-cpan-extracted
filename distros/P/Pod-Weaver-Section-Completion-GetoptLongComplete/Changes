@@ -1,0 +1,48 @@
+Revision history for Pod-Weaver-Section-Completion-GetoptLongComplete
+
+0.08    2016-04-30 (PERLANCAR)
+
+	- Skip completer script (_foo).
+
+
+0.07    2015-08-26 (PERLANCAR)
+
+	- Adjust to PWR:SectionText::SelfCompletion 0.04.
+
+	- Remove Moose::Autobox.
+
+
+0.06    2015-01-13 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Refactor] Use PWR::AddTextToSection.
+
+
+0.05    2014-12-07 (PERLANCAR)
+
+	- No functional changes.
+
+	- Refactor: Move section text (common with pws-comp-pericmd) to
+	  Pod::Weaver::Role::SectionText::SelfCompletion.
+
+
+0.04    2014-11-29 (PERLANCAR)
+
+	- Add instruction for fish and tweak zsh instruction.
+
+
+0.03    2014-11-23 (PERLANCAR)
+
+	- Add instruction for zsh.
+
+
+0.02    2014-11-23 (PERLANCAR)
+
+        - Rename dist Pod-Weaver-Section-{Bash,Completion}-GetoptLongComplete
+          because now shell other than bash is also supported.
+
+
+0.01    2014-11-12 (PERLANCAR)
+
+        - First release.

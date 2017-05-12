@@ -1,0 +1,64 @@
+Petrophysics/Units version 0.01
+===============================
+
+Yes, "Yet Another Unit Conversion Module".
+
+Honestly, all of them are slightly different, and it's not trivial to make
+a common unit conversion module.  Different people have different needs.
+
+Please check out
+    Math::Units
+    Physics::Unit
+on CPAN to see if any of those are more appropriate for what you want to do.
+
+This module takes a database-like view on units of measurement.  In particular,
+this module is based on the following POSC (c) products:
+   - epsgUnits.xml
+   - poscUnits.xml
+These files can be downloaded from http://www.posc.org.  Please see
+http://www.posc.org/ebiz/pefxml/patternsobjects.html#units
+                                                                                
+Due to the POSC Product License Agreement, these files are *not*
+distributed in their original form.  Please get the originals directly from
+POSC.
+
+For this module, the dictionaries of unit of measurement provided by POSC have
+been reformatted to a "database" of perl objects.  The database is just an
+ordinary perl source code file containing a "Data::Dumper" representation of
+the original xml objects.  The perl objects are blessed into a class
+where methods for database search/lookup and unit conversion are provided. 
+
+The conversion utility (parse_units) is provided so that users can redo the
+conversion from the POSC files if needed/wanted.  The conversion utility is
+dependent on modules for parsing XML::LibXML and Data::Dumper.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module is pure Perl, and requires no other modules.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Bjarne Steinsbo <steinsbo@users.sourceforge.net>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+The following POSC (c) products were used in the creation of this work:
+   - epsgUnits.xml
+   - poscUnits.xml
+These files can be downloaded from http://www.posc.org.  Please see
+http://www.posc.org/ebiz/pefxml/patternsobjects.html#units
+
+Due to the POSC Product License Agreement, these files are not
+distributed in their original form.  In this derivative work they are
+converted to perl objects, and unit conversion functionality has been
+added to the objects.

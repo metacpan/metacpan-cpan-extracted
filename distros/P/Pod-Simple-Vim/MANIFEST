@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+README
+lib/Pod/Simple/Vim.pm
+t/00-load.t
+t/01-sample.t
+bin/pod2vim
+Makefile.PL

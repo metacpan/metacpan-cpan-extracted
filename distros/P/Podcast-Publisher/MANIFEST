@@ -1,0 +1,8 @@
+lib/Podcast/LoggerInterface.pm
+lib/Podcast/Publisher.pm
+lib/Podcast/UploadManager.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+samples/simple.pl

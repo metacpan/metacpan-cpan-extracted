@@ -1,0 +1,41 @@
+POE::Component::DBIAgent 0.10 README
+11-07-01
+
+The DBIAgent is your answer to non-blocking DBI in POE.
+
+This module was written because I was developing a system that was
+bogging down at ONLY 1 million hits/day on dual 1GHz processors.
+That's only 11.5 requests/second!  Needless to say, it was obvious
+that something wasn't working right.
+
+After much sweat, research, and profiling, I noticed an odd thing:
+Sometimes, my per-request times were in the milliseconds.  Other
+times, it was taking over 25 seconds to answer a single request.  The
+difference?  DBI.  During the times that my response times sucked, POE
+was blocking on a DBI request.  I was actually serving my requests,
+all code considered, in milliseconds.  But in the steps between
+assembling the response and delivering it, my program was stuck in a
+state that was making a DBI call, and waiting for the response.
+
+The answer?  FORK!  Or, more specifically, use POE's facility for
+forking off child processes to handle long-running tasks while the
+main program continues to cycle between states: Wheel::Run.
+
+DBIAgent forks off a configurable number of helper processes for
+running DBI queries.  The states that depend on the output of the
+queries only get called when there is data for them to process.  No
+more agonizing about query optimization in terms of milliseconds
+because the rest of your program will suffer.  Leave that to the
+operating system!  POE is designed for doing a lot of things
+concurrently.  Waiting isn't doing, it's waiting... :-)
+
+This module will ONLY work in the places where POE::Wheel::Run will
+work.  This generally means, *nix.  Meaning, not on Windows (yet).
+
+I can't take most of the credit for this module.  Fletch
+(fletch@fletch@phydeaux.org) had already done alot of this, and
+contributed the skeleton code for the Helper module.  The Queue module
+is 99.6% his.  I just packaged it up and wrote docs... (*his* was tied
+into his program... *I* made distributable. :-)
+
+Rob Bloodgood <rob@exitexchange.com>

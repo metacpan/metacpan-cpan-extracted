@@ -1,0 +1,114 @@
+/* a token and a syntactic with the same name: "type" */
+%{
+my $ID = qr{[A-Za-z][A-Za-z0-9_]*};
+             # Identifiers separated by commas
+my $IDLIST = qr{ \s*(?:\s*,\s* $ID)* \s* }x;
+             # list followed by a closing par and a semicolon 
+my $RESTOFLIST = qr{$IDLIST \) \s* ; }x;
+%}
+
+%conflict rangeORenum {
+  if (/\G(?= $RESTOFLIST)/gcx) { $self->YYSetReduce(')', 'ID:ENUM' ); }
+  else { $self->YYSetReduce(')', 'ID:RANGE' ); }
+}
+
+%lexer {
+  /\G(\s+)/gc and $self->tokenline($1 =~ tr{\n}{});
+
+  /\Gtype\b/gic                 and return ('type', 'type');
+  /\G($ID)/gc                   and return ('ID',  $1);
+  /\G([0-9]+)/gc                and return ('NUM', $1);
+  /\G\.\./gc                    and return ('..',  '..');
+  /\G(.)/gc                     and return ($1,    $1);
+}
+
+%strict
+
+%token ID NUM 
+%left   '-' '+'
+%left   '*' '/'
+
+%expect-rr 1
+
+%%
+
+type_decl : 'type' ID '=' type ';'
+;
+
+type : 
+      %name ENUM
+      '(' id_list ')'
+    | %name RANGE
+      expr '..' expr
+;
+
+id_list : 
+      %name ID:ENUM
+      ID                      %PREC rangeORenum
+    | id_list ',' ID
+;
+
+expr : '(' expr ')'   { $_[2] } /* bypass */
+    | %name PLUS     expr '+' expr
+    | %name MINUS    expr '-' expr
+    | %name TIMES    expr '*' expr
+    | %name DIV      expr '/' expr
+    | %name ID:RANGE
+      ID                     %PREC rangeORenum
+    | %name NUM      NUM
+;
+
+%%
+
+unless (caller()) {
+  #$Parse::Eyapp::Node::INDENT = 1;
+  my $prompt = << 'EOP';
+Try this input:
+    type 
+    r
+    =
+    (x)
+    ..
+    y
+    ;
+
+Here are other inputs you can try:
+
+    type r = (x+2)*3 ..  y/2 ;
+    type e = (x, y, z);
+    type e = (x);
+
+Press CTRL-D (CTRL-W in windows) to produce the end-of-file
+EOP
+  __PACKAGE__->main($prompt); 
+}
+
+=head1 SYNOPSIS
+
+See 
+
+=over 2
+
+=item * File pascalenumeratedvsrange.eyp in examples/debuggintut/
+
+=item * The Bison manual L<http://www.gnu.org/software/bison/manual/html_mono/bison.html>
+
+=back
+
+Compile it with:
+
+            eyapp -b '' pascalenumeratedvsrangesolvedviadyn.eyp
+
+run it with this options:
+
+            ./pascalenumeratedvsrangesolvedviadyn.pm -t
+
+Try these inputs:
+
+                type r = (x) ..  y ;
+                type r = (x+2)*3 ..  y/2 ;
+                type e = (x, y, z);
+                type e = (x);
+
+=cut
+

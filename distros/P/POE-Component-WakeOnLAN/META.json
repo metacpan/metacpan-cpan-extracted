@@ -1,0 +1,48 @@
+{
+   "abstract" : "A POE Component to send packets to power on computers.",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-WakeOnLAN",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.47"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::INET" : 0,
+            "Net::IP::Minimal" : 0,
+            "POE" : "1.004",
+            "Socket" : 0,
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/poe-component-wakeonlan",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/poe-component-wakeonlan.git",
+         "web" : "https://github.com/bingos/poe-component-wakeonlan"
+      }
+   },
+   "version" : "1.04"
+}
+

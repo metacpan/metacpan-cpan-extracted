@@ -1,0 +1,29 @@
+---
+abstract: 'Essentially a Code Review, on steroids.'
+author:
+  - 'C Hutchinson, C<< <taint at cpan.org> >>'
+  - 'C Hutchinson <taint@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perl-Police
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.8.5
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perl-Police
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: v0.0.2

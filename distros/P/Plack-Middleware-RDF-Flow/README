@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Plack-Middleware-RDF-Flow,
+version 0.171:
+
+  Serve RDF as Linked Data for RDF::Flow
+
+This software is copyright (c) 2011 by Jakob Voß.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,5 @@
+<ul>
+[% FOREACH entry = feed.entries -%]
+<li><a href="[% entry.link %]">[% entry.title %]</a></li>
+[% END %]
+</ul>

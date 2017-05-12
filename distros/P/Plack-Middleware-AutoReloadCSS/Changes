@@ -1,0 +1,8 @@
+Revision history for Perl extension Plack::Middleware::AutoReloadCSS
+
+0.02    Wed Apr 18 2012
+    - Added prerequisite modules into Build.PL
+    - cartonized
+
+0.01    Wed Apr 18 2012
+    - original version

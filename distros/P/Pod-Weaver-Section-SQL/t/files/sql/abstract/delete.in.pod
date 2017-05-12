@@ -1,0 +1,10 @@
+=pod
+
+=sql SQL::Abstract->delete(
+  'toto_table',
+  {
+    id => 1,
+  }
+)
+
+=cut

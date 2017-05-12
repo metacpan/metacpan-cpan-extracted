@@ -1,0 +1,10 @@
+Revision history for Perl extension POE::Filter::Log::IPTables.
+
+0.02  Fri Nov 18 18:48:44 2005
+    - looks up protocol names when it gets a protocol number
+    - handles hostnames containing -, ., and _ correctly
+
+0.01  Fri Nov 12 01:11:53 2004
+	- original version; created by h2xs 1.23 with options
+		-AX -n POE::Filter::Log::IPTables
+

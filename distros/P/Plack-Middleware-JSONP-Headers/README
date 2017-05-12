@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Plack-Middleware-JSONP-Headers,
+version 0.11:
+
+  Wraps JSON response with HTTP headers in JSONP
+
+This software is copyright (c) 2012 by Jakob Voß.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,61 @@
+$Id: README,v 1.2 2003/07/08 15:21:35 fletch Exp $
+
+--------
+Abstract
+--------
+
+POE::Component::Pcap is a POE wrapper for the Net::Pcap wrapper for
+libpcap.  It exists as a separate session which sends events back to a
+specified session when packets are ready.
+
+------------
+Requirements
+------------
+
+This module requires POE and Net::Pcap.  The requirements are encoded
+in Makefile.PL.  The NetPacket::* modules are also probably useful.
+
+------------------
+Basic Installation
+------------------
+
+POE::Component::Pcap may be installed through the CPAN shell in the
+usual CPAN shell manner.  This typically is:
+
+  $ perl -MCPAN -e 'intstall POE::Component::Pcap'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme POE::Component::Pcap
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install POE::Component::Pcap
+
+-------------------
+Manual Installation
+-------------------
+
+POE::Component::Pcap can also be installed manually.  The latest CPAN
+version can be found at
+<ftp://ftp.cpan.org/pub/CPAN/authors/id/F/FL/FLETCH/> or in a
+similarly named directory at your favorite CPAN mirror.  The most
+recent development snapshot, which only rarely contains hideous
+show-stopping bugs, is available from <http://phydeaux.org/>.
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+
+---------------------------
+EOF: Thank you for reading.
+---------------------------

@@ -1,0 +1,23 @@
+#!/sbin/runscript
+
+depend() {
+	need net
+}
+
+start() {
+	ebegin "Starting portagexsd"
+	start-stop-daemon --start --quiet --exec /usr/sbin/portagexsd
+	state=$?
+	if [ "$state" == "1" ]
+	then
+		eend 1 "portagexsd has not been configured yet. See /etc/pxs/portagexsd.conf"
+	else
+		eend 0
+	fi
+}
+
+stop() {
+	ebegin "Stopping portagexsd"
+	start-stop-daemon --stop --quiet --name portagexsd
+	eend $?
+}

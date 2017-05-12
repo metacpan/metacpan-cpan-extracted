@@ -1,0 +1,184 @@
+
+package Paws::MarketplaceCommerceAnalytics::GenerateDataSet;
+  use Moose;
+  has CustomerDefinedValues => (is => 'ro', isa => 'Paws::MarketplaceCommerceAnalytics::CustomerDefinedValues', traits => ['NameInRequest'], request_name => 'customerDefinedValues' );
+  has DataSetPublicationDate => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'dataSetPublicationDate' , required => 1);
+  has DataSetType => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'dataSetType' , required => 1);
+  has DestinationS3BucketName => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'destinationS3BucketName' , required => 1);
+  has DestinationS3Prefix => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'destinationS3Prefix' );
+  has RoleNameArn => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'roleNameArn' , required => 1);
+  has SnsTopicArn => (is => 'ro', isa => 'Str', traits => ['NameInRequest'], request_name => 'snsTopicArn' , required => 1);
+
+  use MooseX::ClassAttribute;
+
+  class_has _api_call => (isa => 'Str', is => 'ro', default => 'GenerateDataSet');
+  class_has _returns => (isa => 'Str', is => 'ro', default => 'Paws::MarketplaceCommerceAnalytics::GenerateDataSetResult');
+  class_has _result_key => (isa => 'Str', is => 'ro');
+1;
+
+### main pod documentation begin ###
+
+=head1 NAME
+
+Paws::MarketplaceCommerceAnalytics::GenerateDataSet - Arguments for method GenerateDataSet on Paws::MarketplaceCommerceAnalytics
+
+=head1 DESCRIPTION
+
+This class represents the parameters used for calling the method GenerateDataSet on the 
+AWS Marketplace Commerce Analytics service. Use the attributes of this class
+as arguments to method GenerateDataSet.
+
+You shouldn't make instances of this class. Each attribute should be used as a named argument in the call to GenerateDataSet.
+
+As an example:
+
+  $service_obj->GenerateDataSet(Att1 => $value1, Att2 => $value2, ...);
+
+Values for attributes that are native types (Int, String, Float, etc) can passed as-is (scalar values). Values for complex Types (objects) can be passed as a HashRef. The keys and values of the hashref will be used to instance the underlying object.
+
+=head1 ATTRIBUTES
+
+
+=head2 CustomerDefinedValues => L<Paws::MarketplaceCommerceAnalytics::CustomerDefinedValues>
+
+(Optional) Key-value pairs which will be returned, unmodified, in the
+Amazon SNS notification message and the data set metadata file. These
+key-value pairs can be used to correlated responses with tracking
+information from other systems.
+
+
+
+=head2 B<REQUIRED> DataSetPublicationDate => Str
+
+The date a data set was published. For daily data sets, provide a date
+with day-level granularity for the desired day. For weekly data sets,
+provide a date with day-level granularity within the desired week (the
+day value will be ignored). For monthly data sets, provide a date with
+month-level granularity for the desired month (the day value will be
+ignored).
+
+
+
+=head2 B<REQUIRED> DataSetType => Str
+
+The desired data set type.
+
+=over
+
+=item * I<customer_subscriber_hourly_monthly_subscriptions> - Available
+daily by 5:00 PM Pacific Time since 2014-07-21.
+
+=item * I<customer_subscriber_annual_subscriptions> - Available daily
+by 5:00 PM Pacific Time since 2014-07-21.
+
+=item * I<daily_business_usage_by_instance_type> - Available daily by
+5:00 PM Pacific Time since 2015-01-26.
+
+=item * I<daily_business_fees> - Available daily by 5:00 PM Pacific
+Time since 2015-01-26.
+
+=item * I<daily_business_free_trial_conversions> - Available daily by
+5:00 PM Pacific Time since 2015-01-26.
+
+=item * I<daily_business_new_instances> - Available daily by 5:00 PM
+Pacific Time since 2015-01-26.
+
+=item * I<daily_business_new_product_subscribers> - Available daily by
+5:00 PM Pacific Time since 2015-01-26.
+
+=item * I<daily_business_canceled_product_subscribers> - Available
+daily by 5:00 PM Pacific Time since 2015-01-26.
+
+=item * I<monthly_revenue_billing_and_revenue_data> - Available monthly
+on the 4th day of the month by 5:00 PM Pacific Time since 2015-02.
+
+=item * I<monthly_revenue_annual_subscriptions> - Available monthly on
+the 4th day of the month by 5:00 PM Pacific Time since 2015-02.
+
+=item * I<disbursed_amount_by_product> - Available every 30 days by
+5:00 PM Pacific Time since 2015-01-26.
+
+=item * I<disbursed_amount_by_product_with_uncollected_funds> -This
+data set is only available from 2012-04-19 until 2015-01-25. After
+2015-01-25, this data set was split into three data sets:
+disbursed_amount_by_product,
+disbursed_amount_by_age_of_uncollected_funds, and
+disbursed_amount_by_age_of_disbursed_funds.
+
+=item * I<disbursed_amount_by_instance_hours> - Available every 30 days
+by 5:00 PM Pacific Time since 2012-09-04.
+
+=item * I<disbursed_amount_by_customer_geo> - Available every 30 days
+by 5:00 PM Pacific Time since 2012-04-19.
+
+=item * I<disbursed_amount_by_age_of_uncollected_funds> - Available
+every 30 days by 5:00 PM Pacific Time since 2015-01-26.
+
+=item * I<disbursed_amount_by_age_of_disbursed_funds> - Available every
+30 days by 5:00 PM Pacific Time since 2015-01-26.
+
+=item * I<customer_profile_by_industry> - Available daily by 5:00 PM
+Pacific Time since 2015-10-01.
+
+=item * I<customer_profile_by_revenue> - Available daily by 5:00 PM
+Pacific Time since 2015-10-01.
+
+=item * I<customer_profile_by_geography> - Available daily by 5:00 PM
+Pacific Time since 2015-10-01.
+
+=item * I<sales_compensation_billed_revenue> - Available monthly on the
+4th day of the month by 5:00 PM Pacific Time since 2016-12.
+
+=item * I<us_sales_and_use_tax_records> - Available monthly on the 15th
+day of the month by 5:00 PM Pacific Time since 2017-02-15.
+
+=back
+
+
+Valid values are: C<"customer_subscriber_hourly_monthly_subscriptions">, C<"customer_subscriber_annual_subscriptions">, C<"daily_business_usage_by_instance_type">, C<"daily_business_fees">, C<"daily_business_free_trial_conversions">, C<"daily_business_new_instances">, C<"daily_business_new_product_subscribers">, C<"daily_business_canceled_product_subscribers">, C<"monthly_revenue_billing_and_revenue_data">, C<"monthly_revenue_annual_subscriptions">, C<"disbursed_amount_by_product">, C<"disbursed_amount_by_product_with_uncollected_funds">, C<"disbursed_amount_by_instance_hours">, C<"disbursed_amount_by_customer_geo">, C<"disbursed_amount_by_age_of_uncollected_funds">, C<"disbursed_amount_by_age_of_disbursed_funds">, C<"customer_profile_by_industry">, C<"customer_profile_by_revenue">, C<"customer_profile_by_geography">, C<"sales_compensation_billed_revenue">, C<"us_sales_and_use_tax_records">
+
+=head2 B<REQUIRED> DestinationS3BucketName => Str
+
+The name (friendly name, not ARN) of the destination S3 bucket.
+
+
+
+=head2 DestinationS3Prefix => Str
+
+(Optional) The desired S3 prefix for the published data set, similar to
+a directory path in standard file systems. For example, if given the
+bucket name "mybucket" and the prefix "myprefix/mydatasets", the output
+file "outputfile" would be published to
+"s3://mybucket/myprefix/mydatasets/outputfile". If the prefix directory
+structure does not exist, it will be created. If no prefix is provided,
+the data set will be published to the S3 bucket root.
+
+
+
+=head2 B<REQUIRED> RoleNameArn => Str
+
+The Amazon Resource Name (ARN) of the Role with an attached permissions
+policy to interact with the provided AWS services.
+
+
+
+=head2 B<REQUIRED> SnsTopicArn => Str
+
+Amazon Resource Name (ARN) for the SNS Topic that will be notified when
+the data set has been published or if an error has occurred.
+
+
+
+
+=head1 SEE ALSO
+
+This class forms part of L<Paws>, documenting arguments for method GenerateDataSet in L<Paws::MarketplaceCommerceAnalytics>
+
+=head1 BUGS and CONTRIBUTIONS
+
+The source code is located here: https://github.com/pplu/aws-sdk-perl
+
+Please report bugs to: https://github.com/pplu/aws-sdk-perl/issues
+
+=cut
+

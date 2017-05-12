@@ -1,0 +1,69 @@
+NAME
+    Pod::Simple::Wiki::Wikka - A class for creating Pod to Wikka wiki
+    filters.
+
+SYNOPSIS
+    This module isn't used directly. Instead it is called via
+    `Pod::Simple::Wiki':
+
+        #!/usr/bin/perl -w
+
+        use strict;
+        use Pod::Simple::Wiki;
+
+        my $parser = Pod::Simple::Wiki->new('Wikka');
+
+        ...
+
+    Convert Pod to a WakkaWiki wiki format using the installed `pod2wiki'
+    utility:
+
+        pod2wiki --style template file.pod > file.wiki
+
+DESCRIPTION
+    The `Pod::Simple::Wiki::Wikka' module is used for converting Pod text to
+    Wiki text.
+
+    Pod (Plain Old Documentation) is a simple markup language used for
+    writing Perl documentation.
+
+    For an introduction to WakkaWiki see:
+    http://docs.wikkawiki.org/WakkaWiki
+
+    This module isn't generally invoked directly. Instead it is called via
+    `Pod::Simple::Wiki'. See the Pod::Simple::Wiki and pod2wiki
+    documentation for more information.
+
+METHODS
+    Pod::Simple::Wiki::Wikka inherits all of the methods of `Pod::Simple'
+    and `Pod::Simple::Wiki'. See Pod::Simple and Pod::Simple::Wiki for more
+    details.
+
+SEE ALSO
+    This module also installs a `pod2wiki' command line utility. See
+    `pod2wiki --help' for details.
+
+ACKNOWLEDGEMENTS
+    Thanks to Portme McPortme and Portme O'Portme for patches, documentation
+    or bugfixes.
+
+HISTORY
+    Nov 21, 2008 - Fixed bug in test script. (No changes to actual code.)
+
+    Nov 20, 2008 - Inital release.
+
+DISCLAIMER OF WARRANTY
+    Please refer to the DISCLAIMER OF WARRANTY in Pod::Simple::Wiki.
+
+AUTHORS
+    John McNamara jmcnamara@cpan.org
+
+    Daniel T Staal DStaal@usa.net
+
+COPYRIGHT
+    Copyright 2008, Daniel T. Staal, adapted from boilerplate by John
+    McNamara.
+
+    All Rights Reserved. This module is free software. It may be used,
+    redistributed and/or modified under the same terms as Perl itself.
+

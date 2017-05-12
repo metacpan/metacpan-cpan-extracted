@@ -1,0 +1,36 @@
+verbose = %f:%l:%c:\n %p: %m\n
+theme = (core || more)
+
+[ControlStructures::ProhibitPostfixControls]
+allow = if unless
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 7
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print
+
+[Modules::PerlMinimumVersion]
+version = 5.008001
+
+[ValuesAndExpressions::ProhibitMagicNumbers]
+allowed_values = -1 0 1 2
+
+# Exclusions
+# I use svn - don't need the keywords.
+[-Miscellanea::RequireRcsKeywords]
+
+# I like to set up my own pod.
+[-Documentation::RequirePodSections]
+
+# No Emacs!
+[-Editor::RequireEmacsFileVariables]
+
+# The versioning I use does not allow this.
+[-ValuesAndExpressions::RequireConstantVersion]
+
+# Don't want exceptions for this small a module.
+# croak is fine.
+[-ErrorHandling::RequireUseOfExceptions]
+

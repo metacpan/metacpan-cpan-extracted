@@ -1,0 +1,8 @@
+Revision history for Perl extension Perf::Stopwatch.
+
+0.10  Thu Oct 30 16:16:38 2003
+	- original version; created by h2xs 1.22 with options
+		-A -X -n Perf::Stopwatch
+0.10_2 Fri Oct 31 2003
+	- updated the 1_norm.t test script to handle a 1 second
+	  sleep within a 20% norm ( 0.98 <= $elapsed <= 1.02 )

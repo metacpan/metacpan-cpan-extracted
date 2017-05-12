@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/POE/Component/Client/Feed.pm
+t/00-load.t
+t/01-fetchtest.t
+t/data/atom.xml
+t/data/rss.xml
+t/lib/Test/PoCoClFe/TestDaemon.pm
+t/release-pod-syntax.t

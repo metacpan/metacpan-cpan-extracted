@@ -1,0 +1,13 @@
+<html xmlns:tal="http://purl.org/petal/1.0/">
+  <body>
+    <p>
+    <!--? Substr -->
+    substr1: <span tal:replace="substr:$str">string</span>
+    substr2: <span tal:replace="substr:$str 2">string</span>
+    substr3: <span tal:replace="substr:$str 2 5">string</span>
+    substr4: <span tal:replace="substr:$str 2 4 1">string with ellipsis</span>
+    substr5: <span tal:replace="uc_first:substr:$str 2 4 1">string with ellipsis</span>
+    </p>
+  </body>
+</html>
+

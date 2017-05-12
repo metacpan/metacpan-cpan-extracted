@@ -1,0 +1,57 @@
+0.09    Tuesday 23rd May, 2006
+    Fixed for newer versions of POE where POE::Filter::HTTPD has
+    changed representation from hashref to arrayref.
+
+0.08	Friday 2nd September, 2005
+    Added documentation and tests for streaming mode from Philip Gwyn.
+    Fixes for rt.cpan.org bugs #6747, #11349
+    Fixed t/30_error.t's call to Test::Builder.
+
+0.07	Tuesday 22nd March, 2005
+    Make the test for 'close' in the Connection: close case
+    insensitive (iPhoto 5 fixup from Dieter Mücke)
+
+0.06	Sunday 2nd January, 2005
+    Added status messages to t/10_run.t
+    Added default ErrorHandler, that prints a simple message to STDERR
+    Improved detection of keepalive close
+    Renamed t/compile.t to t/00_compile.t
+    Added t/10_run.t
+    Added t/30_error.t
+    Added support for ErrorHandler
+    Added DEBUG messages to HTTP.pm
+    Added ->is_error to response and request objects
+    Renamed Handler to Queue to minimize confusion in code.
+    Cleaned up sub execute {} where $state was being set at funny places
+    Reorganized Map, for ErrorHandler and so that filenames don't get a 
+            trailing /
+    ->create() now returns a hashref, keys are httpd or tcp, values
+    are the session aliases of the respective sessions.
+	All work except test fixups by Philip Gwyn
+
+0.05	Tuesday 27th July, 2004
+	Rejigged things into the new-fangled lib/*, t/*.t arrangement (richardc)
+	The Fotango opensource repository is now subversion:
+	http://opensource.fotango.com/svn/trunk/POE-Component-Server-HTTP/
+	HTTP/1.1 keepalive behaviour
+
+0.04  Thu Oct  9 13:43:46 BST 2003
+        Removed old _signal handler
+        Specified correct dependencies in makefile
+	Imported into Fotango opensource CVS at
+        CVSROOT=:pserver:anonymous@she-ra.fotango.com:/var/repository
+
+0.03  Thu Nov 14 07:01:42 CET 2002
+	Applied patch https://rt.cpan.org/NoAuth/Bug.html?id=1609 from
+	Eric Calder to add a new shutdown event.
+	Added signature file
+
+0.02  2002-03-17
+	Incorpated long overdue patch from Matt Sargeant to support 5.005
+	Removed "use CGI::Cookie" since it wasn't used in the code.
+	Changed typo to avoid warning (From Eric Calder).
+	Made the installation work as intended with the subclasses
+
+0.01  Wed Jan 16 21:57:03 2002
+	First release
+

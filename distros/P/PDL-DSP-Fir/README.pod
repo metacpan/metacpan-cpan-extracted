@@ -1,0 +1,313 @@
+=head1 OVERVIEW
+
+Two modules for PDL providing some fir filtering. These are
+not yet on CPAN.
+
+=cut
+
+=head1 NAME
+
+PDL::DSP::Fir - Finite impulse response filter kernels.
+
+=head1 SYNOPSIS
+
+  use PDL;
+  use PDL::DSP::Fir qw( firwin );
+
+  # return a 10 sample lowpass filter kernel 
+  # with a cutoff at 90% of the Nyquist frequency.
+  $kernel = firwin( N => 10, fc => 0.9 );
+
+  # Equivalent way of calling.
+  $kernel = firwin( { N => 10, fc => 0.9 } );
+
+=head1 DESCRIPTION
+
+This module provides routines to create  one-dimensional finite impulse
+response (FIR) filter kernels.  This distribution inlcudes
+a simple interface for filtering in L<PDL::DSP::Fir::Simple>.
+
+The routine L</firwin> returns a filter kernel constructed
+from windowed sinc functions. Available filters are lowpass,
+highpass, bandpass, and bandreject. The window functions are
+in the module L<PDL::DSP::Windows>.
+
+Below, the word B<order> refers to the number of elements in the filter
+kernel.
+
+No functions are exported be default.
+
+=head1 FUNCTIONS
+
+=head2 firwin
+
+
+=head3 Usage
+
+=for usage
+
+ $kern = firwin({OPTIONS});
+ $kern = firwin(OPTIONS);
+
+=for ref
+
+Returns a filter kernel (a finite impulse response function)
+to be convolved with data. 
+
+The kernel is built from windowed sinc functions. With the
+option C<type =E<gt> 'window'> no sinc is used, rather the
+kernel is just the window. The options may be passed as
+a list of key-value pairs, or as an anonymous hash.
+
+=head3 OPTIONS
+
+=over
+
+=item N 
+
+order of filter. This is the number of elements in
+the returned kernel pdl.
+
+=item type
+
+Filter type. One of C<lowpass>, C<highpass>, C<bandpass>, 
+C<bandstop>, C<window>. Aliases for C<bandstop> are C<bandreject> and C<notch>.
+Default is C<lowpass>. For C<bandpass> and C<bandstop> the number of samples
+L</N> must be odd.
+If B<type> is C<window>, then the kernel returned is just the window function.
+
+=item fc
+
+Cutoff frequency for low- and highpass filters as a fraction of
+the Nyquist frequency. Must be a number between
+C<0> and C<1>. No default value.
+
+=item fclo, fchi
+
+Lower and upper cutoff frequencies for bandpass and bandstop filters.
+No default values.
+
+=back
+
+All other options to L</firwin> are passed to the function 
+L<PDL::DSP::Windows/window>.
+
+=cut
+=pod
+
+The following three functions are called by the C<firwin>, but
+may also be useful by themselves, for instance, to construct more
+complicated filters.
+
+=head2 ir_sinc
+
+=for usage
+
+  $sinc = ir_sinc($f_cut, $N);
+
+=for ref
+
+Return an C<$N> point sinc function representing a lowpass filter
+with cutoff frequency C<$f_cut>.
+
+C<$f_cut> must be between 0 and 1, with 1 being Nyquist freq.
+The output pdl is the function C<sin( $f_cut * $x ) / $x> where
+$x is pdl of C<$N> uniformly spaced values ranging from
+C< - PI * ($N-1)/2> through C<PI * ($N-1)/2>. For what it's
+worth, a bit of efficiency is gained by computing the index
+at which C<$x> is zero, rather than searching for it.
+
+=cut
+=head2 spectral_inverse
+
+=for usage
+
+  $fir_inv = spectral_inverse($fir);
+
+=for ref
+
+Return output kernel whose spectrum is the inverse of the spectrum
+of the input kernel.
+
+The number of samples in the input kernel must be odd.
+Input C<$fir> and output C<$fir_inv> are real-space fir filter kernels.
+The spectrum of the output kernel is the additive inverse
+with respect to 1 of the spectrum of the input kernel.
+
+=cut
+=head2 spectral_reverse
+
+=for usage
+
+  $fir_rev = spectral_reverse($fir);
+
+=for ref
+
+Return output kernel whose spectrum is the reverse of the spectrum
+of the input kernel.
+
+That is, the spectrum is mirrored about the center frequency.
+ 
+=cut
+=head1 AUTHOR
+
+John Lapeyre, C<< <jlapeyre at cpan.org> >>
+
+=head1 ACKNOWLEDGEMENTS
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 John Lapeyre.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut
+=head1 NAME
+
+PDL::DSP::Simple - Simple interface to windowed sinc filters.
+
+=head1 SYNOPSIS
+
+       use PDL::LiteF;
+       use PDL::DSP::Fir::Simple;
+
+=head1 DESCRIPTION
+
+At present, this module provides one filtering
+routine. The main purpose is to provide an easy-to-use
+lowpass filter that only requires the user to provide the
+data and the cutoff frequency. However, the routines take
+options to give the user more control over the
+filtering. The module implements the filters via convolution
+with a kernel representing a finite impulse response
+function, either directly or with fft. The filter kernel is
+constructed from windowed sinc functions. Available filters
+are lowpass, highpass, bandpass, and bandreject. All window
+functions in L<PDL::DSP::Windows> are available.
+
+See L<PDL::DSP::Iir/moving_average> for a moving average filter.
+
+Some of this functionality is already available in the PDL core.
+The modules L<PDL::Audio> and L<PDL::Stats:TS> (time series) also have
+filtering functions.
+
+Below, the word B<order> refers to the number of elements in the filter
+kernel. The default value is equal to the number of elements in the data
+to be filtered.
+
+No functions are exported by default.
+
+=head1 FUNCTIONS
+
+=head2 filter
+
+  $dataf = filter($data, {OPTIONS});
+
+       or
+
+  $dataf = filter($data, $kern);
+
+=head3 Examples
+
+=for example
+
+Apply lowpass filter to signal $x with a cutoff frequency of 90% of the
+Nyquist frequency (i.e. 45% of the sample frequency).
+
+ $xf = filter($x, { fc => 0.9 });
+
+
+Apply a highpass filter rather than the default lowpass filter
+
+  $xf = filter($x, {fc => 0.9 , type => 'highpass' });
+
+
+Apply a lowpass filter of order 20 with a blackman window rather than the default hamming window.
+
+  $xf = filter($x, {fc => 0.9 , window => 'blackman' , N => 20 });
+
+
+Apply a 10 point moving average. Note that this moving averaging is implemented via
+convolution. This is a relatively inefficient implementation.
+
+  $xf = filter($x, {window => 'rectangular', type => 'window', N => 10 });
+
+Return the kernel used in the convolution.
+
+  ($xf, $kern)  = filter($x, { fc => 0.9 });
+
+
+Apply a lowpass filter of order 20 with a tukey window with parameter I<alpha> = 0.5.
+
+  $xf = filter($x, {fc => 0.9 , 
+    window => { name => 'tukey', params => 0.5 } , N => 20 });
+
+=head3 OPTIONS
+
+=over
+
+=item N    
+
+Order of filter. I.e. the number of points in the filter kernel.
+Default: number of points in $data.
+ 
+=item  kern  
+
+A kernel to use for convolution rather than calculating a kernel
+from other parameters.
+
+=item boundary   
+
+Boundary condition passed to C<convolveND>. Must be one of
+'extend', 'truncate', 'periodic'. See L<PDL::ImageND>.
+
+=back
+
+All other options to C<filter> are passed to the function L<PDL::DSP::Fir/firwin> which creates the filter kernel.
+L<PDL::DSP::Fir/firwin> in turn passes options to L<PDL::DSP::Windows:window>.
+The option C<window> is either a string giving the name of the window function, or
+an anonymous hash of options to pass to  L<PDL::DSP::Windows:window>.
+For example C<< { name => 'window_name', ... } >>.
+
+If the second argument is not a hash of options then it is interpreted as a
+kernel C<$kern> to be convolved with the C<$data>.
+
+If called in a list context, the filtered data and kernel ($dataf,$kern)
+are returned.
+
+=cut
+=head2 testdata
+
+  $x = testdata($Npts, $freqs, $amps)
+
+For example:
+
+  $x = testdata(1000, [5,100], [1, .1] );
+
+Generate a signal by summing sine functions of differing
+frequencies. The signal has $Npts
+elements. $freqs is an array of frequencies, and $amps an
+array of amplitudes for each frequency. The frequencies should
+be between 0 and 1, with 1 representing the nyquist frequency.
+
+=cut
+=head1 AUTHOR
+
+John Lapeyre, C<< <jlapeyre at cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 John Lapeyre.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

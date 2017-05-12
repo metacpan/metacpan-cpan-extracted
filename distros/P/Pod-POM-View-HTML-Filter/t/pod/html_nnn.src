@@ -1,0 +1,24 @@
+=begin filter html nnn=1
+
+<p>line 1</p>
+    <p>line 2</p>
+
+    <p>line 4</p>
+
+=end filter
+__RESULT__
++html
+<html><body bgcolor="#ffffff">
+<pre><span class="h-lno">  1</span> <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 1<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<span class="h-lno">  2</span>     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 2<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+<span class="h-lno">  3</span> 
+<span class="h-lno">  4</span>     <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>line 4<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span></pre>
+</body></html>
+__RESULT__
+-html
+<html><body bgcolor="#ffffff">
+<pre>&lt;p&gt;line 1&lt;/p&gt;
+    &lt;p&gt;line 2&lt;/p&gt;
+
+    &lt;p&gt;line 4&lt;/p&gt;</pre>
+</body></html>

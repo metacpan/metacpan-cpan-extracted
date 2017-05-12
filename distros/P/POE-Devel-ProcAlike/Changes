@@ -1,0 +1,13 @@
+Revision history for Perl extension POE::Devel::ProcAlike
+
+* 0.02
+
+	Bump PoCo-Fuse prereq version
+
+	Converted to Test::Apocalypse for sane AUTHOR tests
+
+	Added the event_profile metric to session data, it's still pending a POE update ( stat_getprofile )
+
+* 0.01
+
+	initial release

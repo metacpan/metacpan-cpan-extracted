@@ -1,0 +1,5 @@
+Revision history for <?= $arg->{module_name} ?>
+
+0.001   <?= $arg->{today} ?>
+
+    - original version

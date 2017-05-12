@@ -1,0 +1,34 @@
+
+This is a plugin for use with mhonarc <http://mhonarc.org/> that
+adds purple numbers to the archived mail. It also extracts links
+found in the messages and stores them in a database file.
+Original version is available here
+
+  http://www.eekim.com/software/mhonarc/index.html
+
+This version allows the use of a central PurpleNumber sequence
+(see PurpleNumber::Sequence) as the source of PurpleNumbers.
+
+To use, add the following to the main.mrc of the archive or archives
+being used:
+
+<MIMEFilters>
+text/plain;    m2h_purple::filter;    /path/to/mhpurple.pl
+</MIMEFilters>
+
+<MIMEArgs>
+text/plain;    purple quote
+</MIMEArgs>
+
+In addition define the following either through -definevar on the
+mhonarc command line, or through <DEFINEVAR></DEFINEVAR> in main.mrc.
+
+LINKBASE=/path/to/link/storage
+BASEURL=http://url/pointing/to/archive/directory
+
+One of:
+
+SEQUENCE=/path/to/directory/containing/purple/sequence
+REMOTESEQUENCE=http://url/pointing/to/nid/service
+
+REMOTESEQUENCE overrides SEQUENCE if both are defined.

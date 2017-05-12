@@ -1,0 +1,30 @@
+---
+abstract: 'A POE component that provides NNTP server functionality.'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.046, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-Server-NNTP
+requires:
+  POE: '0.38'
+  POE::Component::Client::NNTP: '1.05'
+  POE::Component::Pluggable: '0.03'
+  POE::Filter::Line: '0'
+  POE::Wheel::ReadWrite: '0'
+  POE::Wheel::SocketFactory: '0'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/bingos/poe-component-server-nntp
+  repository: https://github.com/bingos/poe-component-server-nntp.git
+version: '1.06'

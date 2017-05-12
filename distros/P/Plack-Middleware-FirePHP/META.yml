@@ -1,0 +1,32 @@
+---
+abstract: 'Middleware for FirePHP::Dispatcher'
+author:
+  - 'Florian Helmberger <fh@25th-floor.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.92
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-FirePHP
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Class::Null: 0
+  FirePHP::Dispatcher: 0
+  Plack: 0.9022
+  Plack::Request: 0.09
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/fhelmberger/Plack-Middelware-FirePHP.git
+version: 0.01

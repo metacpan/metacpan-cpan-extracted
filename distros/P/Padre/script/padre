@@ -1,0 +1,238 @@
+#!/usr/bin/perl
+
+use 5.010000;
+use strict;
+use warnings;
+use Carp ();
+
+our $VERSION = '1.00';
+
+use constant WIN32 => !!( $^O eq 'MSWin32' and $^X =~ /wperl\.exe/ );
+
+local $| = 1;
+local $SIG{__DIE__} =
+	$ENV{PADRE_DIE}
+	? sub { print STDERR Carp::longmess "\nDIE: @_\n" . ( "-" x 80 ) . "\n" }
+	: $SIG{__DIE__};
+
+# Must run using wxPerl on OS X.
+if ( $^O eq 'darwin' and $^X !~ m{/wxPerl} ) {
+	require File::Which;
+	require File::Basename;
+	require File::Spec;
+
+	my $this_perl = File::Which::which($^X) || $^X;
+	if ( -l $this_perl ) {
+		my $link = readlink $this_perl;
+		$this_perl = $link if $link;
+	}
+
+	my $dir = File::Basename::dirname($this_perl);
+	my $wx_perl = File::Spec->catfile( $dir, 'wxPerl' );
+	my $perl =
+		  $wx_perl && -e $wx_perl && -x _
+		? $wx_perl
+		: File::Which::which('wxPerl');
+	chomp($perl);
+	if ( -e $perl ) {
+		warn "spawning 'wxPerl' interpreter for OS X\n";
+		system( $perl, '-S', $0, @ARGV );
+	} else {
+		warn "padre cannot find wxPerl executable (which it requires on OS X)\n";
+	}
+	exit 0;
+}
+
+# Disable overlay scrollbar on Linux.
+# Done ugly this way to satisfy Perl::Critic (grrr)
+local $ENV{LIBOVERLAY_SCROLLBAR} = ( $^O eq 'linux' ) ? 0 : $ENV{LIBOVERLAY_SCROLLBAR};
+
+# Handle special command line cases early, because options like --home
+# MUST be processed before the Padre.pm library is loaded.
+my $USAGE       = '';
+my $SHOWVERSION = '';
+my $HOME        = undef;
+my $RESET       = undef;
+my $SESSION     = undef;
+my $PRELOAD     = undef;
+my $DESKTOP     = undef;
+my $ACTIONS     = undef;
+my $LOCALE      = undef;
+if ( grep {/^-/} @ARGV ) {
+
+	# Avoid loading Getopt::Long entirely if we can,
+	# sneakily saving a meg or so of RAM.
+	require Getopt::Long;
+	Getopt::Long::GetOptions(
+		'help|usage'    => \$USAGE,
+		'version'       => \$SHOWVERSION,
+		'home=s'        => \$HOME,
+		'reset'         => \$RESET,
+		'session=s'     => \$SESSION,
+		'desktop'       => \$DESKTOP,
+		'actionqueue=s' => \$ACTIONS,
+		'locale=s'      => \$LOCALE,
+
+		# Keep this sekrit for now --ADAMK
+		'preload' => \$PRELOAD,
+	) or $USAGE = 1;
+}
+
+
+
+
+
+#####################################################################
+# Special Execution Modules
+
+# Padre command line usage
+if ($USAGE) {
+	print <<"END_USAGE";
+Usage: $0 [FILENAMES]
+
+--help              Shows this help message
+--home=dir          Forces Padre "home" directory to a specific location
+--reset             Flush entire local config directory and reset to defaults
+--session=name      Open given session during Padre startup
+--version           Prints Padre version and quits
+--desktop           Integrate Padre with your desktop
+--actionqueue=list  Run a list of comma-separated actions after Padre startup
+--locale=name       Locale name to use
+
+END_USAGE
+	exit(1);
+}
+
+# Lock in the home and constants, which are needed for everything else
+local $ENV{PADRE_HOME} = defined($HOME) ? $HOME : $ENV{PADRE_HOME};
+require Padre::Constant;
+
+# Padre version
+if ($SHOWVERSION) {
+	require Padre;
+	message("Perl Application Development and Refactoring Environment $Padre::VERSION");
+	exit(0);
+}
+
+# Destroy and reinitialise our config directory
+if ($RESET) {
+	require File::Remove;
+	File::Remove::remove( \1, Padre::Constant::CONFIG_DIR() );
+	Padre::Constant::init();
+}
+
+if ($DESKTOP) {
+	require Padre::Desktop;
+	unless ( Padre::Desktop::desktop() ) {
+		error("--desktop not implemented for $^O");
+	}
+	exit(1);
+}
+
+# local $ENV{PADRE_PAR_PATH} = $ENV{PAR_TEMP} || '';
+
+# If we have an action queue then we are running for automation reasons.
+# Avoid the startup logic and continue to the main startup.
+unless ( defined $ACTIONS ) {
+
+	# Run the Padre startup sequence before we load the main application
+	require Padre::Startup;
+	unless ( Padre::Startup::startup() ) {
+
+		# Startup process says to abort the main load and exit now
+		exit(0);
+	}
+}
+
+SCOPE: {
+	local $@;
+	eval {
+		require Padre;
+
+		# Load the entire application into memory immediately
+		Padre->import(':everything') if $PRELOAD;
+
+		#	use Aspect;
+		#	aspect( 'NYTProf',
+		#		call qr/^Padre::/ &
+		#		call qr/\b(?:refresh|update)\w*\z/ & !
+		#		call qr/^Padre::(?:Locker|Wx::Progress)::/
+		#	);
+	};
+	if ($@) {
+
+		# Major startup failure!
+		# Handle a few specialised cases we understand
+		if ( $@ =~ /Schema user_version mismatch/ ) {
+			error("Padre configuration database schema invalid");
+			if (WIN32) {
+				require Win32;
+				my $rv = Win32::MsgBox(
+					"Reset your configuration to try and fix it?",
+					4, "Padre",
+				);
+				if ( $rv == 6 ) {
+					require File::Remove;
+					File::Remove::remove( \1, Padre::Constant::CONFIG_DIR() );
+					error("Configuration directory reset");
+				}
+			}
+			exit(1);
+		}
+
+		# Handle other generic errors
+		my $message = $@;
+		$message =~ s/ at .*?line.*$//;
+		error("Major Startup Error: '$message'");
+		exit(1);
+	}
+}
+
+# Build the application
+my $ide = Padre->new(
+	files          => \@ARGV,
+	session        => $SESSION,
+	actionqueue    => $ACTIONS,
+	startup_locale => $LOCALE,
+) or die 'Failed to create Padre instance';
+
+# Start the application
+$ide->run;
+
+
+
+
+
+######################################################################
+# Support Functions
+
+sub message {
+	my $message = shift;
+	if (WIN32) {
+
+		# No console under wperl, so use native Win32 messaging
+		require Win32;
+		Win32::MsgBox( $message, 0, "Padre" );
+	} else {
+		print $message . "\n";
+	}
+	return 1;
+}
+
+sub error {
+	my $message = shift;
+	if (WIN32) {
+
+		# No console under wperl, so use native Win32 messaging
+		require Win32;
+		Win32::MsgBox( $message, 0, "Padre" );
+	} else {
+		print STDERR $message . "\n";
+	}
+	return 1;
+}
+
+# Copyright 2008-2013 The Padre development team as listed in Padre.pm.
+# LICENSE
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl 5 itself.

@@ -1,0 +1,24 @@
+=pod
+
+=head1 SYNOPSIS
+
+This is a synopsis.
+
+=head1 DESCRIPTION
+
+This is a simple document meant to be used in testing
+Pod::Weaver::Plugin::EnsureUniqueSections.
+
+It does not do very much.
+
+=head1 BUGS AND LIMITATIONS
+
+This section should be considered a duplicate of the next in
+non-strict checking mode.
+
+=head1 LIMITATION AND <BUG>
+
+This section should be considered a duplicate of the last in
+non-strict checking mode.
+
+=cut

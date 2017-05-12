@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title><: $INDEX.title :></title>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+
+: for $resources -> $resource {
+    <: $resource | raw :>
+: }
+
+    <script type="text/javascript">
+
+: if $ext.overrides {
+        <: $ext.overrides | raw :>
+: }
+
+        // configure loader
+        Ext.Loader.setConfig({
+            enabled: true,
+            disableCaching: false,
+            paths: <: $ext.loader_path | raw :>
+        });
+
+: if $ext.api_map {
+
+        // ExtDirect API
+        Ext.direct.Manager.addProvider(<: $ext.api_map | raw :>);
+: }
+
+        Ext.onReady(function() {
+
+            // disable aria warnings
+            Ext.ariaWarn = Ext.emptyFn;
+
+: if $ext.static_classes {
+            <: $ext.static_classes | raw :>
+: }
+
+            // create ExtJS application
+            Ext.application({
+                extend: 'Ext.app.Application',
+                requires: ['<: $ext.viewport_class :>'],
+                name: '<: $ext.app_namespace :>',
+                appFolder: '.',
+                glyphFontFamily: 'FontAwesome',
+                mainView: '<: $ext.viewport_class :>',
+            });
+        });
+    </script>
+</head>
+<body>
+<noscript>
+    <div style="position:absolute;left:0;top:0;width:100%;height:100%;text-align:center;vertical-align:middle;z-index:999999999;background:white;">
+        <h1>This Website requires your browser to be JavaScript enabled.</h1>
+        <br />
+        <a href="http://www.activatejavascript.org">Activate and enable your javascript</a>
+    </div>
+</noscript>
+</body>
+</html>

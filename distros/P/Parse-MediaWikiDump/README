@@ -1,0 +1,80 @@
+Parse-MediaWikiDump
+
+Parse::MediaWikiDump is a collection of classes for processing various
+MediaWiki dump files such as those at 
+http://download.wikimedia.org/wikipedia/en/; the package requires XML::Parser. 
+Using this software it is nearly trivial to get access to the information in 
+supported dump files.
+
+Currently the following dump files are supported:
+  * Current page dumps for all languages
+  * Current links dumps for all languages
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+EXAMPLE
+
+Extract the text for a given article from the given dump file:
+
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Parse::MediaWikiDump;
+
+my $file = shift(@ARGV) or die "must specify a MediaWiki dump of the current pages";
+my $title = shift(@ARGV) or die "must specify an article title";
+my $dump = Parse::MediaWikiDump::Pages->new($file);
+
+binmode(STDOUT, ':utf8');
+binmode(STDERR, ':utf8');
+
+#this is the only currently known value but there could be more in the future
+if ($dump->case ne 'first-letter') {
+  die "unable to handle any case setting besides 'first-letter'";
+}
+
+#enforce the MediaWiki case rules
+$title = case_fixer($title);
+
+#iterate over the entire dump file, article by article
+while(my $page = $dump->next) {
+  if ($page->title eq $title) {
+    print STDERR "Located text for $title\n";
+    my $text = $page->text;
+    print $$text;
+    exit 0;
+  }
+}
+
+print STDERR "Unable to find article text for $title\n";
+exit 1;
+
+#removes any case sensativity from the very first letter of the title
+#but not from the optional namespace name
+sub case_fixer {
+  my $title = shift;
+
+  #check for namespace
+  if ($title =~ /^(.+?):(.+)/) {
+    $title = $1 . ':' . ucfirst($2);
+  } else {
+    $title = ucfirst($title);
+  }
+
+  return $title;
+}
+
+COPYRIGHT & LICENSE
+       Copyright 2005 Tyler Riddle, all rights reserved.
+
+       This program is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+

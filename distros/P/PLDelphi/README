@@ -1,0 +1,118 @@
+
+=> NAME
+
+PLDelphi - This project will embed Perl into Delphi.
+
+=> USAGE
+
+  program ConsoleTest;
+  
+  {$APPTYPE CONSOLE}
+  
+  uses
+    SysUtils,
+    PLDelphi_dll ;
+  
+  var
+    browser , response : SV ;
+      
+  begin
+  
+    Perl.use('WWW::Mechanize');
+  
+    browser := Perl.NEW('WWW::Mechanize');
+  
+    response := browser.call_sv('get',' "http://www.perl.com/" ') ;
+  
+    writeln( response.call('content') ) ;
+  
+  end.
+
+
+=> PREREQUISITES
+
+*> DELPHI 6+
+
+Home:
+
+http://www.borland.com/
+
+*> Perl 5.6+
+
+Home:
+
+http://www.perl.com/
+
+Download from:
+
+http://www.activestate.com/Products/Download/Download.plex?id=ActivePerl
+
+http://www.activestate.com/Solutions/Programmer/Perl.plex
+
+=> BUILD/INSTALL
+
+First install Delphi and Perl binaries.
+
+You also will need to have Perl binaries in the search PATH:
+
+  PATH=C:\Perl\bin\;%PATH%
+
+After have the binaries well installed just type:
+
+  Perl MakeFile.PL
+  nmake
+
+Then you should compile the ConsoleTest test project in Delphi (ConsoleTest.dpr).
+After this you are able to run the B<ConsoleTest.exe> example.
+
+I<Note that after build PLDelphi you will have a I<./built> directory with all the
+files needed to be with your Delphi application. In this directory you also will
+have the I<ConsoleTest.exe> example to test it in this directory.>
+
+I<Note that maybe you will need to copy by hand Perl56.dll to the I<./built> directory
+to have full standalone version of PLDelphi (without the need to install Perl).>
+
+Enjoy!
+
+=> Delphi package:
+
+To use PLDelphi from your Delphi application without need to install Perl you
+will need this files in the main diretory of your application:
+
+  PLDelphi.dll     ## The PLDelphi library that loads the Perl interpreter.
+  PLDelphi.pm      ## Perl side of PLDelphi.
+  Perl56.dll       ## The Perl library in case that you have Perl built dynamic.
+  PLDelphi_dll.pas ## PLDelphi classes and DLL wrapper.
+  lib/*            ## A Perl lib directory with basic .pm files (strict, warnings, etc...)
+
+I<Take a look in the ./built directory after build PLDelphi.>
+
+=> Win32
+
+You will need to have VC++ 6 to compile PLDelphi, since your Perl version for Win32 (from ActiveState)
+will be probably compiled with VC++, and we need the same compiler of the interpreter
+to embed a Perl program.
+
+=> Linux
+
+I haven't ported it to Linux yet. Help welcome!
+
+=> Threads
+
+Note that if you are compiling PLDelphi with Perl 5.8+ you can use Perl Threads too.
+
+=> SEE ALSO
+
+L<PLJava>, L<LibZip>, L<PAR>.
+
+=> AUTHOR
+
+Graciliano M. P. <gm@virtuasites.com.br>
+
+I will appreciate any type of feedback (include your opinions and/or suggestions). ;-P
+
+=> COPYRIGHT
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

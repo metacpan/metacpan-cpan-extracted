@@ -1,0 +1,13 @@
+ARTISTIC.txt
+CHANGELOG
+GPL2.txt
+lib/Params/Validate/Dependencies/all_or_none_of.pm
+Makefile.PL
+t/01-basics.t
+t/02-data-domain.t
+t/pod-coverage.t
+t/pod.t
+MANIFEST
+MANIFEST.SKIP
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

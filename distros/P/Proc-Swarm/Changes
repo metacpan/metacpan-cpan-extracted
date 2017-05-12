@@ -1,0 +1,13 @@
+1.161060  2016-04-15 16:14:02-07:00 America/Los_Angeles 
+    - Make it work on Perl 5.22
+    - Modernize the tests
+
+1.133280  2013-11-24 12:03:23 America/Los_Angeles Sun Nov 24 12:02:45 PST 2013
+    - Code format tweaks; no functional changes
+
+1.132270  2013-08-14 18:33:37 PST8PDT
+    - Moving to Dist::Zilla
+
+0.5 Mon Oct 29 11:27:19 CST 2001
+	- original version;
+

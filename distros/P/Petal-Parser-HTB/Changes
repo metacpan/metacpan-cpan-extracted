@@ -1,0 +1,19 @@
+Revision history for Petal::Parser::HTB.
+
+1.04 Wed Jan 26 11:00:00 2005
+    - Add requirement for HTML::Parser v3.45 which fixes problems with entity
+      encoding that resulted in the mysterious appearance of &Acirc; characters in
+      the output (William McKee).
+    - Removed defunct email address
+    - Fixed Name in Makefile.PL
+
+1.03 Mon Mar 15 15:59:06 2004
+    - Updated entities test
+
+1.02 Tue Sep 30 13:03:33 2003
+    - Fixed failing tests on Perl 5.6.1
+
+1.00 Wed Sep 24 13:33:57 2003
+    - Extracted HTML::TreeBuilder parser from Petal 1.06
+    - Moved it to Petal::Parser::HTB
+    - Ported Petal's test suite

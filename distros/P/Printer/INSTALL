@@ -1,0 +1,12 @@
+INSTALLATION
+------------
+
+perl Makefile.PL
+make
+make install
+
+Windows user should use nmake instead of make. This is available from microsoft or 
+from http://perlprint.sourceforge.net/ 
+
+A ppm distribution for windows users is available from 
+http://perlprint.sourceforge.net/

@@ -1,0 +1,20 @@
+* item one
+* item two
+* item three
+#--------------------------------------------------------------------------#
+=over
+
+=item *
+
+item one
+
+=item *
+
+item two
+
+=item *
+
+item three
+
+=back
+

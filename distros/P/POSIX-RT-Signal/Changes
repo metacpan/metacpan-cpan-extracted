@@ -1,0 +1,60 @@
+          Revision history for POSIX-RT-Signal
+
+0.015     2014-09-03 14:26:17+02:00 Europe/Amsterdam
+          Correctly detect realtime signal numbers
+          Only add fd entry on operating systems supporting it
+
+0.014     2014-08-22 00:26:30+03:00 Europe/Sofia
+          Add fd to sigwaitinfo entries
+          Fix compilation issue on Solaris
+
+0.013     2014-07-31 17:42:04+02:00 Europe/Amsterdam
+          Use Sub::Exporter::Progressive instead of Sub::Exporter
+          Sort signals correctly after deallocation
+          Share signal allocation list between threads
+
+0.012     2012-09-03 19:20:25 Europe/Amsterdam
+          Check HAS_STRERROR_R correctly
+          Fix C89 compatibility
+
+0.011     2012-08-13 21:26:00 Europe/Bucharest
+          Made sigwait actually return the right value
+
+0.010     2012-04-23 02:20:47 Europe/Amsterdam
+          Added a proper sigwait function
+          Fixed union casting issue
+
+0.009     2011-12-10 17:25:37 Europe/Amsterdam
+          Renamed sigwait to the POSIX correct sigwaitinfo
+          Stop skipping the wrong test on FreeBSD
+          Add ptr value to hash
+
+0.008     2011-12-08 20:39:52 Europe/Amsterdam
+          Fixed configure requirements
+
+0.007     2011-12-06 17:47:30 Europe/Amsterdam
+          Add signal allocation helpers
+          Conditionally link to librt
+
+0.006     2011-11-27 17:27:50 Europe/Amsterdam
+          Link to librt
+          Skip invalid argument test on FreeBSD (false negative)
+
+0.005     2011-10-09 00:12:13 Europe/Amsterdam
+          Renamed module from Signal::More to POSIX::RT::Signal
+
+0.004     2011-09-15 01:22:19 Europe/Amsterdam
+          Handle 5.15.3's new POSIX::SigSet representation
+
+0.003     2011-06-30 15:04:32 Europe/Amsterdam
+          Make strerror_r happy on Linux
+          Make sure locales don't interfere with tests by calling setlocale
+          Try to make FreeBSD pass the illegal argument test, because it's stupid enough not to puke on signo -1
+
+0.002     2011-06-20 22:29:01 Europe/Amsterdam
+          Make sigwait return hashref instead of list
+
+0.001     2011-02-11 19:26:02 Europe/Amsterdam
+          First version, released on an unsuspecting world.
+
+   

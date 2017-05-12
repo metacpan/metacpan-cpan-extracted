@@ -1,0 +1,4 @@
+<xml xmlns:tal="http://purl.org/petal/1.0/"
+     xmlns:xi="http://www.w3.org/2001/XInclude">
+  <xi:include href="infinite_includes.xml" />
+</xml>

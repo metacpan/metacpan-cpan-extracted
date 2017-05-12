@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use FindBin '$Bin';
+use lib "$Bin/../lib";
+
+use Benchmark::Dumb qw(cmpthese);
+use Params::Sah qw(gen_validator);
+use Params::Validate qw(:all);
+
+my @data1_pos   = ("ujang");
+
+my @data2_named = (name=>"ujang", age=>30);
+my @data2_pos   = ("ujang", 30);
+
+cmpthese(0, {
+    'P::Sah, pos, str' => sub {
+        state $validator = gen_validator(
+            'str*',
+        );
+        $validator->(\@data1_pos);
+    },
+    'P::V, pos, str' => sub {
+        validate_pos(@data1_pos,
+             {type=>SCALAR},
+        );
+    },
+
+    'P::Sah, pos, str+int' => sub {
+        state $validator = gen_validator(
+            'str*',
+            'int',
+        );
+        $validator->(\@data2_pos);
+    },
+    'P::V, pos, str+int' => sub {
+        validate_pos(@data2_pos,
+             {type=>SCALAR},
+             {type=>SCALAR, regex=>qr/\A\d+\z/, optional=>1},
+        );
+    },
+    'P::Sah, named, str+int' => sub {
+        state $validator = gen_validator(
+            {named=>1},
+            name => 'str*',
+            age  => 'int',
+        );
+        $validator->({@data2_named});
+    },
+    'P::V, named, str+int' => sub {
+        validate(@data2_named, {
+            name => {type=>SCALAR},
+            age  => {type=>SCALAR, regex=>qr/\A\d+\z/, optional=>1},
+        });
+    },
+});

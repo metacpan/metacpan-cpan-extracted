@@ -1,0 +1,214 @@
+NAME
+
+    POE::Component::Captcha::reCAPTCHA - A POE implementation of the
+    reCAPTCHA API
+
+VERSION
+
+    version 0.04
+
+SYNOPSIS
+
+     # Create a reCAPTCHA component
+    
+     my $poco = POE::Component::Captcha::reCAPTCHA->spawn( alias => 'recaptcha' );
+    
+     # Start your own sessions etc.
+    
+     # When you need to check a captcha.
+    
+     my %opts = (
+                  event       => 'recaptcha',
+                  privatekey  => 'your private key here',
+                  remoteip    => $ENV{'REMOTE_ADDR'},
+                  challenge   => $challenge,
+                  response    => $response,
+                  _arbitary   => 'some stuff',
+     );
+    
+     $poe_kernel->post( 
+                        'recaptcha', 
+                        'check_answer', 
+                        \%opts
+     );
+    
+     # And define an event handler for it
+    
+     sub recaptcha {
+        my ($kernel,$result) = @_[KERNEL,ARG0];
+    
+        if ( $result->{is_valid} ) {
+            print "Yes!";
+        }
+        else {
+            # Error
+            print $result->{error};
+        }
+    
+        return;
+     }
+
+DESCRIPTION
+
+    POE::Component::Captcha::reCAPTCHA is a POE implementation of
+    Captcha::reCAPTCHA. It provides access to various Captcha::reCAPTCHA
+    methods and a non-blocking mechanism for checking the answer provided
+    by users.
+
+CONSTRUCTOR
+
+    spawn
+
+      Creates a new POE::Component::Captcha::reCAPTCHA session.
+
+      Takes one optional argument alias so you can set an alias on the
+      component to send it events later.
+
+      Returns an object reference which the following methods can be used
+      on.
+
+METHODS
+
+    session_id
+
+      Takes no arguments. Returns the POE::Session ID of the component.
+
+    shutdown
+
+      Takes no arguments. Terminates the component.
+
+    check_answer
+
+      After the user has filled out the HTML form, including their answer
+      for the CAPTCHA, use check_answer to check their answer when they
+      submit the form. The user's answer will be in two form fields,
+      recaptcha_challenge_field and recaptcha_response_field. The component
+      will make an HTTP request to the reCAPTCHA server and verify the
+      user's answer.
+
+      Requires a HASHREF as an argument with the following keys, all of
+      which are required:
+
+      event
+
+	The name of the event that should be sent to the requesting session
+	with the reply from the reCAPTCHA server.
+
+      privatekey
+
+	Your reCAPTCHA private key, from the API Signup Page.
+
+      remoteip
+
+	The user's IP address, in the format 192.168.0.1.
+
+      challenge
+
+	The value of the form field recaptcha_challenge_field
+
+      response
+
+	The value of the form field recaptcha_response_field.
+
+      See OUTPUT EVENTS below for what will be sent to your session in
+      reply.
+
+    These methods are directly equivalent to their Captcha::reCAPTCHA
+    counterparts. ( in fact they merely map to an instance of
+    Captcha::reCAPTCHA that the component creates internally ). See
+    Captcha::reCAPTCHA for more details.
+
+    get_html
+
+      Generates HTML to display the captcha.
+
+    get_options_setter
+
+      Enables customisation of look of the reCAPTCHA widget with some
+      JavaScript settings.
+
+INPUT EVENTS
+
+    These are POE events that the component will accept.
+
+    shutdown
+
+      Takes no arguments. Terminates the component.
+
+    check_answer
+
+      After the user has filled out the HTML form, including their answer
+      for the CAPTCHA, use check_answer to check their answer when they
+      submit the form. The user's answer will be in two form fields,
+      recaptcha_challenge_field and recaptcha_response_field. The component
+      will make an HTTP request to the reCAPTCHA server and verify the
+      user's answer.
+
+      Requires a HASHREF as an argument with the following keys, all of
+      which are required:
+
+      event
+
+	The name of the event that should be sent to the requesting session
+	with the reply from the reCAPTCHA server.
+
+      privatekey
+
+	Your reCAPTCHA private key, from the API Signup Page.
+
+      remoteip
+
+	The user's IP address, in the format 192.168.0.1.
+
+      challenge
+
+	The value of the form field recaptcha_challenge_field
+
+      response
+
+	The value of the form field recaptcha_response_field.
+
+      See OUTPUT EVENTS below for what will be sent to your session in
+      reply.
+
+      You may also set arbitary keys to pass arbitary data along with your
+      request. These must be prefixed with an underscore _.
+
+OUTPUT EVENTS
+
+    The component will send an event in response to check_answer. ARG0 of
+    the event will be a HASHREF containing the key/values of the original
+    request ( including any arbitary key/values passed ).
+
+    In addition the is_valid and error keys will indicate the status of the
+    request to the reCAPTCHA server:
+
+    is_valid
+
+      If this is set to a true value then the request was successful and
+      the challenge and response sent were valid.
+
+    error
+
+      If this is set then an error occurred.
+
+SEE ALSO
+
+    Captcha::reCAPTCHA
+
+    http://recaptcha.net/learnmore.html
+
+AUTHORS
+
+      * Chris Williams <chris@bingosnet.co.uk>
+
+      * Andy Armstrong <andy@hexten.net>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams and Andy
+    Armstrong.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

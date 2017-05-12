@@ -1,0 +1,39 @@
+Revision history for Plack::Middleware::Auth::Form.
+
+0.001     2011-02-26
+    First release.
+
+0.002     2011-02-27
+    No "use feature ':5.10'".
+
+0.005     2011-03-01
+    File::Spec to get the app.psgi file in tests.
+
+0.006     2011-03-01
+    Docs improvements
+
+0.008     2011-03-05
+    Some prerequisites added
+
+0.009     2011-05-23
+    More compliance with the PSGI spec:
+    Prefix for login form snippet is now 'Plack::Middleware::Auth::Form.LoginForm'
+    HTTP headers are now array reference (tokuhirom)
+
+0.010     2011-08-04
+    Experimental _wrap_body method (by chromatic)
+    ssl_port parameter added
+
+0.011     2012-04-06
+    session fixation attack protection (by hayajo)
+    session usage explanations (suggested by Kaare Rasmussen)
+    user dependent redirection page (suggested by Kaare Rasmussen)
+    fixing the 'logged user' check (suggested in https://rt.cpan.org/Ticket/Display.html?id=75899)
+    logging out after a failed login (suggested in https://rt.cpan.org/Ticket/Display.html?id=75899)
+    keeping the 'Expires' on the cookie (https://rt.cpan.org/Public/Bug/Display.html?id=75896)
+
+0.012     2014-01-30
+    _logout_hook (suggested by G. Paul Ziemba)
+    fix PSGI spec compliance in t/app.psgi (ilmari)
+    validate request/response with Plack::Middleware::Lint (Tokuhiro Matsuno <tokuhirom@gmail.com>)
+

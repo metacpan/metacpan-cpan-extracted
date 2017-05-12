@@ -1,0 +1,21 @@
+/* XPM */
+static char *sample_bpp_4[] = {
+/* columns rows colors chars-per-pixel */
+"13 7 8 1 ",
+"  c red",
+". c white",
+"X c black",
+"o c #FF00DD",
+"O c #00FF22",
+"+ c #FFDD00",
+"@ c #0022FF",
+"# c cyan",
+/* pixels */
+" .XXXXX..XooX",
+"..X.OX. .Xo.X",
+"..X..X...X..X",
+"X XX+XX@XX@XX",
+"..X..X...X.#X",
+"..O.OX@.@X.X#",
+"X+X.XXX@.X.#X"
+};

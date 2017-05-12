@@ -1,0 +1,90 @@
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+
+%{
+=head1 SYMOPSIS
+
+This example illustrates the directive C<%metatree> 
+to build I<translation schemes>.
+
+Compile and execute it with:
+
+   eyapp TSPostfix3.eyp; ./usetspostfix3.pl
+
+See perldoc L<Parse::Eyapp::translationschemestut>
+
+=cut
+
+%}
+
+%lexer {
+    s/^\s+//;
+
+    s/^([0-9]+(?:\.[0-9]+)?)//   and return('NUM',$1);
+    s/^([A-Za-z][A-Za-z0-9_]*)// and return('VAR',$1);
+    s/^(.)//s                    and return($1,$1);
+}
+
+
+%metatree
+
+%defaultaction { 
+  if (@_==2) {  # NUM and VAR
+    $lhs->{t} = $_[1]->{attr};
+    return 
+  }
+  if (@_==4) { # binary operations
+    $lhs->{t} = "$_[1]->{t} $_[3]->{t} $_[2]->{attr}";
+    return  
+  }
+  die "Fatal Error. Unexpected input. Numargs = ".scalar(@_)."\n".Parse::Eyapp::Node->str(@_);
+}
+
+%%
+line: %name PROG
+       exp <%name EXP + ';'> 
+         { @{$lhs->{t}} = map { $_->{t}} ($_[1]->children()); }
+         
+;
+
+exp:        %name NUM NUM                
+        |   %name VAR VAR               
+        |   %name ASSIGN VAR '=' exp  {  $lhs->{t} = "$_[1]->{attr} $_[3]->{t} ="; }      
+        |   %name PLUS   exp '+' exp         
+        |   %name MINUS  exp '-' exp        
+        |   %name TIMES  exp '*' exp       
+        |   %name DIV    exp '/' exp      
+        |   %name NEG    '-' exp %prec NEG { $_[0]->{t} = "$_[2]->{t} NEG" }
+        |   '(' exp ')' %begin { $_[2] }      
+;
+
+%%
+
+sub Run {
+    my($self)=shift;
+    my $input = shift || "a=-b*3\n";
+    $self->input(\$input);
+    print "Input: $input\n";
+
+    my $tree = $self->YYParse();
+
+    return if $self->YYNberr > 0;
+
+    $Parse::Eyapp::Node::INDENT = 2;
+    print "Tree after parsing the translation scheme and before traversing:\n".$tree->str."\n";
+
+    $tree->translation_scheme();
+
+    *NUM::info = *VAR::info = *PLUS::info = *MINUS::info = *TIMES::info = *DIV::info 
+    = *NEG::info = *ASSIGN::info = sub { $_[0]{t} };
+
+    print "After traversing:\n".$tree->str."\n";
+    {
+      local $" = ";";
+      print "Final translation:\n@{$tree->{t}}\n";
+    }
+}
+
+sub TERMINAL::info { $_[0]{attr} }

@@ -1,0 +1,94 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	
+	<head>
+		<title>Pangloss : Editor : Concept Detail</title>
+		<link rel="stylesheet" href="/pcie.css"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	</head>
+
+	<body bottommargin="0" topmargin="0" leftmargin="0" rightmargin="0" marginheight="0" marginwidth="0">
+
+		<xi:include href="../header.html"/>
+
+<!-- START OF PAGE BODY .............................................. -->
+		<table border="0" cellpadding="0" cellspacing="0" width="100%" height="90%">
+			<tr><td valign="top" height="19"><span class="vsmall"> </span></td></tr>
+			<tr>
+				<td valign="top" width="15"><span class="vsmall"> </span></td>
+				<td valign="top" petal:if="view">
+					<h1>Concept Detail</h1>
+
+					<xi:include href="../concept-error.html"/>
+
+ 					<?var name="set: can_edit session/user/is_admin"?>
+
+					<span petal:if="view/concept;">
+						<form method="post" action="concept.html">
+							<input type="hidden" name="selected_concept" value="$view/concept/key"/>
+							<span petal:if="view/concept/modified" style="color: green">Concept modified.</span>
+							<span petal:if="view/concept/removed" style="color: red">Concept removed.</span>
+							<table style="border: solid 1px" width="50%" cellpadding="0" cellspacing="0">
+								<tr>
+									<td align="left"  style="background-color: lightblue; border-bottom: solid 1px">Concept Details:</td>
+									<td align="right" style="background-color: lightblue; border-bottom: solid 1px"><input type="submit" name="remove_concept" value="remove concept" petal:if="true: can_edit; false: view/concept/removed;"/> </td>
+								</tr>
+								<tr>
+									<td>Concept Name:</td>
+									<td>
+										<input petal:if="can_edit" type="text" size="20" name="new_concept_name" value="$view/concept/name"/>
+										<span petal:if="false: can_edit" petal:replace="view/concept/name">name</span>
+									</td>
+								</tr>
+								<tr>
+									<td>Category:</td>
+									<td>
+										<select name="new_concept_category" petal:if="can_edit; $view/categories;">
+											<option petal:repeat="category view/categories"
+															petal:attributes="value category/key; selected true: equal: $category/key $view/concept/category">$category/name</option>
+										</select>
+										<span petal:if="false: can_edit" petal:replace="view/concept/category">category</span>
+									</td>
+								</tr>
+								<tr>
+									<td>Notes:</td>
+									<td>
+										<input petal:if="can_edit" type="text" size="20" name="new_concept_notes" value="$view/concept/notes"/>
+										<span petal:if="false: can_edit" petal:replace="view/concept/notes">notes</span>
+									</td>
+								</tr>
+								<tr>
+									<td>Creator:</td>
+									<td>$view/concept/creator</td>
+								</tr>
+								<tr>
+									<td>Created:</td>
+									<td><span class="small" petal:content="date: $view/concept/date">date</span></td>
+								</tr>
+							</table>
+							<table width="50%" petal:if="false: view/concept/removed">
+								<tr>
+									<td align="left"><a href="add_term.html?selected_concept=${uri_escape: view/concept/key}&get_concept=1&list_languages=1&list_concepts=1" petal:if="session/user/is_translator">add translation</a></td>
+									<td align="right"><input petal:if="can_edit;" type="submit" name="modify_concept" value="modify concept"/></td>
+								</tr>
+							</table>
+						</form>
+					</span>
+
+					<div petal:if="false: view/concept" class="error">
+						Application Error: no concept present in view!
+					</div>
+
+				</td>
+				<td valign="top" petal:if="false: view">
+					<div class="error">Application Error: no view present!</div>
+				</td>
+				<td valign="top" width="15"><span class="vsmall"> </span></td>
+			</tr>
+		</table>
+<!-- END OF PAGE BODY .............................................. -->
+
+	<xi:include href="../footer.html"/>
+
+  </body>
+</html>

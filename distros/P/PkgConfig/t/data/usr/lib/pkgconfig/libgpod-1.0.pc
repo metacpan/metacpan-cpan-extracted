@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libgpod
+Description: A library to manipulate songs and playlists stored on an ipod
+Version: 0.7.93
+Requires: glib-2.0 >= 2.8.0 gobject-2.0 
+Libs: -L${libdir} -lgpod
+Cflags: -I${includedir}/gpod-1.0

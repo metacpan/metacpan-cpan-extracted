@@ -1,0 +1,38 @@
+# Test that all the problems in an rc file get reported and not just the first
+# one that is found.
+
+# Purposely bad values
+necessity = 6
+theme = &&
+include = *
+exclude = *
+single-transformer = *
+profile-strictness = silly
+top = -1
+verbose = 2095
+color-necessity-highest  = chartreuse
+color-necessity-high     = fuschia
+color-necessity-medium   = aquamarine
+color-necessity-low      = paisley
+color-necessity-lowest   = they've gone to plaid
+
+# This profile is used by t/01_config_color_necessity.t to load invalid
+# necessity colors
+
+# Test non-existent parameter
+[BuiltinFunctions::RequireBlockGrep]
+# No test, since this is now a warning.
+# no_such_parameter = foo
+
+# Test invalid parameter value
+[Documentation::RequirePodSections]
+source = Zen_and_the_Art_of_Motorcycle_Maintenance
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=78 ft=conf expandtab shiftround :

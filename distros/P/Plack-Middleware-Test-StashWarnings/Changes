@@ -1,0 +1,27 @@
+Revision history for Perl extension Plack::Middleware::Test::StashWarnings
+
+0.08  2014-05-16
+        - Add a 'verbose' option to control if warnings are propagated
+          through to an existing WARN handler.
+
+0.07  2012-11-12
+        - Test updates to work with newer Test::Harness
+
+0.06  2012-03-21
+        - Added a method to add a warning by hand
+
+0.05  2011-06-08
+        - improved documentation
+        - try harder to use $SIG{__WARN__} if it's there
+
+0.04  2010-11-17
+        - add implied dep on Scalar::Util
+
+0.03  2010-11-09
+        - fix failing test on 5.8
+
+0.02  2010-10-19
+        - streaming API support (clkao++ for the assist)
+
+0.01  2010-10-07
+        - original version

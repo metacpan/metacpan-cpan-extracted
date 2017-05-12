@@ -1,0 +1,12 @@
+Revision history for Padre-Plugin-RunPerlExternal
+
+0.54	06.04.2011/12:20
+	add short-cut F6
+0.53	04.04.2011/13:57
+	fixing tests, fixing META-Data
+0.52    25.03.2011/23:57
+	add test, fix META.json
+0.51    24.03.2011/20:55
+        First version, released on an unsuspecting world.
+0.50    24.03.2011/22:45
+        add POD

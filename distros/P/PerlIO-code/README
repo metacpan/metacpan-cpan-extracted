@@ -1,0 +1,59 @@
+NAME
+    PerlIO::code - Makes a simple I/O filter
+
+SYNOPSIS
+            use PerlIO::code; # need to say explicitly
+
+            # make an input filter
+            open my $in, '<', sub{ uc scalar <> };
+            print while <$in>;
+
+            # make an output filter
+            open my $out, '>', sub{ print uc shift };
+            print $out while <>;
+
+DESCRIPTION
+    "PerlIO::code" helps to make an I/O filter. It is easier than "tie", but
+    provides very limited functions. All it can do is to "readline" and
+    "print".
+
+NOTES
+    *   For some reason, the actual layer name of "PerlIO::code" is ":Code",
+        not ":code".
+
+    *   "PerlIO::code" is slower than the "tie" interface.
+
+    *   "open my $in, '<', sub{ "foo" }; my $s = <$in>;" makes an endless
+        loop, because the internal "readline" routine reads $in on until
+        reaching EOF.
+
+CONFIGURATION AND ENVIRONMENT
+    No configuration files or environment variables.
+
+DEPENDENCIES
+    Perl 5.8.1 or later, and a C compiler.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-perlio-code@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/>.
+
+SEE ALSO
+    Tie::Handle.
+
+    PerlIO::via.
+
+    PerlIO.
+
+AUTHOR
+    Goro Fuji "<gfuji (at) cpan.org>"
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2008, Goro Fuji "<gfuji (at) cpan.org>". Some rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

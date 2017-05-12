@@ -1,0 +1,572 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- edited with XMLSpy v2010 rel. 2 (http://www.altova.com) by Craig Seidel (MovieLabs) -->
+<!--Created with Liquid XML Studio 6.1.17.0 (http://www.liquid-technologies.com)-->
+<xs:schema xmlns="http://www.movielabs.com/ACNS" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xmime="http://www.w3.org/2005/05/xmlmime" targetNamespace="http://www.movielabs.com/ACNS" elementFormDefault="qualified" version="1.1">
+	<xs:import namespace="http://www.w3.org/2005/05/xmlmime" schemaLocation="http://www.w3.org/2005/05/xmlmime"/>
+	<!--ACNS 2 v1.1-->
+	<xs:complexType name="Contact">
+		<xs:all>
+			<xs:element name="Entity" type="xs:string"/>
+			<xs:element name="Contact" type="xs:string" minOccurs="0"/>
+			<xs:element name="Address" type="xs:string" minOccurs="0"/>
+			<xs:element name="Phone" type="xs:string" minOccurs="0"/>
+			<xs:element name="Email" type="xs:string"/>
+			<xs:element name="ContactURL" type="xs:anyURI" minOccurs="0"/>
+		</xs:all>
+	</xs:complexType>
+	<xs:complexType name="Case">
+		<xs:all>
+			<xs:element name="ID" type="xs:string"/>
+			<xs:element name="Ref_URL" type="xs:anyURI" minOccurs="0"/>
+			<xs:element name="Status" type="xs:string" minOccurs="0"/>
+			<xs:element name="Severity" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:enumeration value="Normal"/>
+						<xs:enumeration value="Low"/>
+						<xs:enumeration value="High"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+		</xs:all>
+	</xs:complexType>
+	<xs:element name="Infringement" id="v0.7">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Case" type="Case"/>
+				<xs:element name="Complainant" type="Contact"/>
+				<xs:element name="Service_Provider" type="Contact"/>
+				<xs:element name="Source">
+					<xs:complexType>
+						<xs:all>
+							<xs:element name="TimeStamp" type="xs:dateTime"/>
+							<xs:element name="IP_Address" type="type_IPAddress"/>
+							<xs:element name="Port" type="type_Port" minOccurs="0"/>
+							<xs:element name="Protocol" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:int">
+										<xs:minInclusive value="0"/>
+										<xs:maxInclusive value="254"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DNS_Name" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:whiteSpace value="collapse"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="MAC_Address" type="xs:string" minOccurs="0"/>
+							<xs:element name="IP_Block" type="xs:string" minOccurs="0"/>
+							<xs:element name="Type" type="xs:string" minOccurs="0"/>
+							<xs:element name="SubType" minOccurs="0">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="BaseType" use="required">
+												<xs:simpleType>
+													<xs:restriction base="xs:string">
+														<xs:enumeration value="P2P"/>
+														<xs:enumeration value="SERVER"/>
+														<xs:enumeration value="LINK"/>
+														<xs:enumeration value="OTHER"/>
+													</xs:restriction>
+												</xs:simpleType>
+											</xs:attribute>
+											<xs:attribute name="Protocol">
+												<xs:simpleType>
+													<xs:restriction base="xs:string">
+														<xs:enumeration value="BITTORRENT"/>
+														<xs:enumeration value="ED2K"/>
+														<xs:enumeration value="GNUTELLA"/>
+														<xs:enumeration value="GNUTELLA2"/>
+														<xs:enumeration value="ARES"/>
+														<xs:enumeration value="WINNY"/>
+														<xs:enumeration value="FASTTRACK"/>
+														<xs:enumeration value="KAD"/>
+														<xs:enumeration value="FTP"/>
+														<xs:enumeration value="HTTP"/>
+														<xs:enumeration value="IRC"/>
+														<xs:enumeration value="OTHER"/>
+													</xs:restriction>
+												</xs:simpleType>
+											</xs:attribute>
+											<xs:attribute name="Application" type="xs:string"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="URL_Base" type="xs:anyURI" minOccurs="0"/>
+							<xs:element name="UserName" type="xs:string" minOccurs="0"/>
+							<xs:element name="Login" minOccurs="0">
+								<xs:complexType>
+									<xs:attribute name="Username" type="xs:string" use="required"/>
+									<xs:attribute name="Password" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="Number_Files" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:int">
+										<xs:minInclusive value="0"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="Deja_Vu" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration value="Yes"/>
+										<xs:enumeration value="No"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="IsSource" type="xs:boolean" minOccurs="0"/>
+						</xs:all>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Content">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Item" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="TimeStamp" type="xs:dateTime"/>
+										<xs:element name="AlsoSeen" type="type_AlsoSeen" minOccurs="0" maxOccurs="unbounded"/>
+										<xs:element name="Title" type="xs:string" minOccurs="0"/>
+										<xs:element name="Artist" type="xs:string" minOccurs="0"/>
+										<xs:element name="FileName">
+											<xs:simpleType>
+												<xs:restriction base="xs:string"/>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="FileSize" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:int">
+													<xs:minInclusive value="0"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="URL" type="xs:anyURI" minOccurs="0"/>
+										<xs:element name="Type" type="xs:string" minOccurs="0"/>
+										<xs:element name="ExplicitType" type="type_ExplicitType" minOccurs="0"/>
+										<xs:element name="Hash" type="type_Hash" minOccurs="0"/>
+										<xs:element name="UseNetHeader" type="xs:string" minOccurs="0"/>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="History" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Notice" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="ID" type="xs:anySimpleType" use="optional"/>
+											<xs:attribute name="TimeStamp" type="xs:anySimpleType" use="optional"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Notes" type="xs:string" minOccurs="0"/>
+				<xs:element name="Type" type="type_infringement_type" minOccurs="0"/>
+				<xs:element name="Detection" type="type_Detection" minOccurs="0"/>
+				<xs:element name="Verification" type="type_Verification" minOccurs="0"/>
+				<xs:element name="InternalTracking" type="type_InternalTracking" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element name="TextNotice" type="xs:string" minOccurs="0"/>
+				<xs:element name="VerifiedData" type="xs:base64Binary" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<!--ACNS 2.0 NEW TYPES AND ELEMENTS-->
+	<!--ACNS 2.0 Identification-->
+	<xs:simpleType name="type_IPAddress">
+		<xs:restriction base="xs:string"/>
+	</xs:simpleType>
+	<xs:simpleType name="type_Port">
+		<xs:restriction base="xs:int">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="65535"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:attributeGroup name="type_OriginalIPPortAttribute">
+		<xs:attribute name="OriginalIP" type="type_IPAddress" use="required"/>
+		<xs:attribute name="OriginalPort" type="type_Port" use="required"/>
+	</xs:attributeGroup>
+	<xs:attributeGroup name="type_MappedIPPortAttribute">
+		<xs:attribute name="MappedIP" type="type_IPAddress" use="required"/>
+		<xs:attribute name="MappedPort" type="type_Port" use="optional"/>
+		<xs:attribute name="MappedProtocol" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:int">
+					<xs:minInclusive value="0"/>
+					<xs:maxInclusive value="254"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:attributeGroup>
+	<xs:complexType name="type_Content">
+		<xs:sequence>
+			<xs:element name="Item" type="type_Item" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="type_Item">
+		<xs:sequence>
+			<xs:element name="TimeStamp" type="xs:dateTime"/>
+			<xs:element name="AlsoSeen" type="type_AlsoSeen" minOccurs="0" maxOccurs="unbounded"/>
+			<xs:element name="Title" type="xs:string" minOccurs="0"/>
+			<xs:element name="Artist" type="xs:string" minOccurs="0"/>
+			<xs:element name="FileName">
+				<xs:simpleType>
+					<xs:restriction base="xs:string"/>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="FileSize" minOccurs="0">
+				<xs:simpleType>
+					<xs:restriction base="xs:int">
+						<xs:minInclusive value="0"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:element>
+			<xs:element name="URL" type="xs:anyURI" minOccurs="0"/>
+			<xs:element name="HostURI" type="xs:anyURI" minOccurs="0"/>
+			<xs:element name="Type" type="xs:string" minOccurs="0"/>
+			<xs:element name="ExplicitType" type="type_ExplicitType" minOccurs="0"/>
+			<xs:element name="Hash" type="type_Hash" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:simpleType name="type_ExplicitType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Movie"/>
+			<xs:enumeration value="Game"/>
+			<xs:enumeration value="Software"/>
+			<xs:enumeration value="Music"/>
+			<xs:enumeration value="Document"/>
+			<xs:enumeration value="Image"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="type_Hash">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="Type" type="xs:string" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="type_AlsoSeen">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="Start" type="xs:dateTime" use="required"/>
+				<xs:attribute name="End" type="xs:dateTime" use="required"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:simpleType name="type_infringement_type_enumeration">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="OTHER"/>
+			<xs:enumeration value="INFRINGEMENT"/>
+			<xs:enumeration value="PRELIT"/>
+			<xs:enumeration value="INFO"/>
+			<xs:enumeration value="DMCA"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="type_infringement_type">
+		<xs:simpleContent>
+			<xs:extension base="type_infringement_type_enumeration">
+				<xs:attribute name="Retraction" type="xs:boolean"/>
+				<xs:attribute name="Comments" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="type_ContentMatched">
+		<xs:attribute name="Audio" type="xs:boolean"/>
+		<xs:attribute name="Video" type="xs:boolean"/>
+		<xs:attribute name="Text" type="xs:boolean"/>
+		<xs:attribute name="Image" type="xs:boolean"/>
+		<xs:attribute name="MatchThreshold">
+			<xs:simpleType>
+				<xs:restriction base="xs:int">
+					<xs:minInclusive value="0"/>
+					<xs:maxInclusive value="100"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="Fingerprint" type="xs:boolean"/>
+		<xs:attribute name="Human" type="xs:boolean"/>
+	</xs:complexType>
+	<xs:complexType name="type_WatermarkMatched">
+		<xs:simpleContent>
+			<xs:extension base="xs:string">
+				<xs:attribute name="type" type="xs:string" use="required"/>
+				<xs:attribute name="payload" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="type_Asset">
+		<xs:sequence>
+			<xs:element name="OriginalAssetName" type="xs:string"/>
+			<xs:element name="OriginalAssetID" minOccurs="0">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="type" type="xs:string" use="required"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="type_Detection">
+		<xs:sequence>
+			<xs:element name="Asset" type="type_Asset"/>
+			<xs:element name="ContentMatched" type="type_ContentMatched" minOccurs="0"/>
+			<xs:element name="HashMatched" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="MetadataMatched" type="xs:boolean" minOccurs="0"/>
+			<xs:element name="WatermarkMatched" type="type_WatermarkMatched" minOccurs="0"/>
+			<xs:element name="VerificationID" type="xs:string"/>
+			<xs:element name="VerifiedDataLoc" type="xs:anyURI" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="type_VerifiedImage">
+		<xs:sequence>
+			<xs:sequence>
+				<xs:element name="VerifiedImageBinary" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:base64Binary">
+								<xs:attribute name="title" type="xs:string"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="VerifiedImageLocation" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:simpleContent>
+							<xs:extension base="xs:anyURI">
+								<xs:attribute name="title"/>
+								<xs:attribute name="username"/>
+								<xs:attribute name="password"/>
+							</xs:extension>
+						</xs:simpleContent>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Detection" type="type_Detection"/>
+	<xs:complexType name="type_VerificationLevel">
+		<xs:simpleContent>
+			<xs:extension base="xs:int">
+				<xs:attribute name="Type" type="xs:string"/>
+			</xs:extension>
+		</xs:simpleContent>
+	</xs:complexType>
+	<xs:complexType name="type_Verification">
+		<xs:sequence>
+			<xs:element name="VerificationLevel" minOccurs="0">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:int">
+							<xs:attribute name="Type" type="xs:string"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Notes" type="xs:string" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Verification" type="type_Verification"/>
+	<!--ACNS 2.0 Notice Acknowlegement-->
+	<xs:complexType name="type_NoticeAck">
+		<xs:all>
+			<xs:element name="Case" type="Case"/>
+			<xs:element name="Complianant" type="Contact"/>
+			<xs:element name="Service_Provider" type="Contact"/>
+			<xs:element name="Addl_Contact" type="Contact" minOccurs="0"/>
+			<xs:element name="Notes" type="xs:string"/>
+		</xs:all>
+		<xs:attribute name="Accepted" type="xs:boolean"/>
+		<xs:attribute name="RejectReason" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="UNKNOWN_RECIPIENT"/>
+					<xs:enumeration value="IP_OUT_OF_RANGE"/>
+					<xs:enumeration value="MULTIPLE"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="TimeStamp" type="xs:dateTime"/>
+		<xs:attribute name="Sequence" type="xs:int" use="optional"/>
+	</xs:complexType>
+	<xs:element name="NoticeAck" type="type_NoticeAckList"/>
+	<!--ACNS 2.0 Status-->
+	<xs:attributeGroup name="type_contentType">
+		<xs:attribute name="contentType" use="required">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:minLength value="3"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+	</xs:attributeGroup>
+	<xs:complexType name="type_BinaryImage">
+		<xs:complexContent>
+			<xs:extension base="xmime:base64Binary"/>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="type_CounternoticeContent">
+		<xs:all>
+			<xs:element name="NoticeText" type="xs:string" minOccurs="0"/>
+			<xs:element name="NoticeImage" minOccurs="0">
+				<xs:complexType>
+					<xs:complexContent>
+						<xs:extension base="type_BinaryImage"/>
+					</xs:complexContent>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="Notes" type="xs:string" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="RejectReason" use="optional">
+			<xs:simpleType>
+				<xs:restriction base="xs:string">
+					<xs:enumeration value="IOWN"/>
+					<xs:enumeration value="FAIRUSEFREESPEECH"/>
+					<xs:enumeration value="MISIDENTIFIED"/>
+					<xs:enumeration value="OTHER"/>
+				</xs:restriction>
+			</xs:simpleType>
+		</xs:attribute>
+		<xs:attribute name="OtherReason" type="xs:string" use="optional"/>
+		<xs:attribute name="ProperlySigned" type="xs:boolean" use="optional"/>
+		<xs:attribute name="Consent" type="xs:boolean" use="optional"/>
+		<xs:attribute name="Statement" type="xs:string" use="optional"/>
+	</xs:complexType>
+	<xs:complexType name="type_CounterNotice">
+		<xs:all>
+			<xs:element name="Service_Provider" type="Contact"/>
+			<xs:element name="Addl_Contact" type="Contact" minOccurs="0"/>
+			<xs:element name="Subscriber" type="Contact"/>
+			<xs:element name="CounternoticeContent" type="type_CounternoticeContent"/>
+			<xs:element name="Notes" type="xs:string"/>
+		</xs:all>
+		<xs:attribute name="TimeStamp" type="xs:dateTime" use="required"/>
+		<xs:attribute name="DMCA" type="xs:boolean"/>
+	</xs:complexType>
+	<xs:complexType name="type_NoticeAckList">
+		<xs:sequence>
+			<xs:element ref="NoticeAck" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="type_StatusRequest">
+		<xs:all>
+			<xs:element name="Case" type="Case"/>
+			<xs:element name="Complainant" type="Contact"/>
+			<xs:element name="ServiceProvider" type="Contact"/>
+		</xs:all>
+		<xs:attribute name="TimeStamp" type="xs:dateTime"/>
+	</xs:complexType>
+	<xs:complexType name="type_StatusUpdate">
+		<xs:all>
+			<xs:element name="Case" type="Case"/>
+			<xs:element name="Complainant" type="Contact"/>
+			<xs:element name="Service_Provider" type="Contact"/>
+			<xs:element name="HumanInt" type="Contact" minOccurs="0"/>
+			<xs:element name="Disposition">
+				<xs:complexType>
+					<xs:attribute name="Status">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="OPEN"/>
+								<xs:enumeration value="CLOSED"/>
+								<xs:enumeration value="REJECTED"/>
+								<xs:enumeration value="COUNTERNOTICE"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+					<xs:attribute name="infoStatus" use="optional">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="INFO"/>
+								<xs:enumeration value="ACTION"/>
+								<xs:enumeration value="TERM"/>
+								<xs:enumeration value="NOACTION"/>
+								<xs:enumeration value="NONEPOS"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
+					<xs:attribute name="Level" type="xs:int"/>
+				</xs:complexType>
+			</xs:element>
+			<xs:element name="DispositionUsenet" type="type_UsenetDisposition" minOccurs="0"/>
+			<xs:element name="CounterNotice" type="type_CounterNotice" minOccurs="0"/>
+			<xs:element name="NoticeAckList" type="type_NoticeAckList" minOccurs="0"/>
+			<xs:element name="Content" type="type_Content" minOccurs="0"/>
+			<xs:element name="Notes" type="xs:string" minOccurs="0"/>
+		</xs:all>
+		<xs:attribute name="TimeStamp" type="xs:dateTime" use="required"/>
+		<xs:attribute name="ReqTime" type="xs:dateTime"/>
+	</xs:complexType>
+	<xs:complexType name="type_UsenetDisposition">
+		<xs:sequence>
+			<xs:element name="Article" type="xs:anyURI"/>
+			<xs:element name="Removed" type="xs:boolean"/>
+			<xs:element name="CancelMsg" type="xs:boolean" minOccurs="0"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="StatusRequest" type="type_StatusRequest"/>
+	<xs:element name="StatusUpdate" type="type_StatusUpdate"/>
+	<xs:element name="CounterNotice" type="type_CounterNotice"/>
+	<!--ACNS 2.0 INTERNAL TRACKING (part of 'Infringement')-->
+	<xs:complexType name="type_Subject">
+		<xs:sequence>
+			<xs:element name="SubjectContact" type="Contact"/>
+			<xs:element name="SubjectID">
+				<xs:complexType>
+					<xs:simpleContent>
+						<xs:extension base="xs:string">
+							<xs:attribute name="type" type="xs:string"/>
+						</xs:extension>
+					</xs:simpleContent>
+				</xs:complexType>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="type_Disposition">
+		<xs:sequence>
+			<xs:element name="InternalStatus" type="xs:string"/>
+			<xs:element name="Comments" type="xs:string" minOccurs="0"/>
+			<xs:element name="Contact" type="Contact"/>
+		</xs:sequence>
+		<xs:attribute name="Sequence" type="xs:int" use="required"/>
+		<xs:attribute name="Start" type="xs:dateTime" use="required"/>
+		<xs:attribute name="End" type="xs:dateTime"/>
+	</xs:complexType>
+	<xs:complexType name="type_IPAssignee">
+		<xs:complexContent>
+			<xs:extension base="type_Subject">
+				<xs:attribute name="Primary" type="xs:boolean"/>
+				<xs:attribute name="Relationship" type="xs:string"/>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+	<xs:complexType name="type_Mapping">
+		<xs:attributeGroup ref="type_OriginalIPPortAttribute"/>
+		<xs:attributeGroup ref="type_MappedIPPortAttribute"/>
+		<xs:attribute name="Time" type="xs:dateTime" use="required"/>
+		<xs:attribute name="LeaseTime" type="xs:time"/>
+		<xs:attribute name="LeaseHeld" type="xs:time"/>
+	</xs:complexType>
+	<xs:complexType name="type_InternalTracking">
+		<xs:sequence>
+			<xs:element name="PrimarySubject" type="type_Subject"/>
+			<xs:element name="Disposition" type="type_Disposition" minOccurs="0"/>
+			<xs:element name="Mapping" type="type_Mapping" minOccurs="0"/>
+		</xs:sequence>
+		<xs:attribute name="CurrentSequence" type="xs:int"/>
+		<xs:attribute name="InternalCaseNumber" type="xs:string" use="required"/>
+	</xs:complexType>
+</xs:schema>

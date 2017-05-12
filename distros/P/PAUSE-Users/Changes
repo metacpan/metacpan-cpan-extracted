@@ -1,0 +1,44 @@
+Revision history for Perl module PAUSE::Users
+
+0.07 2014-04-29
+    - Updated to work with MooX::Role::CachedURL 0.04 which split the
+      'path' attribute into 'cache_path' and 'path'.
+    - Fixed a bug in ReleaseIterator, which meant that you wouldn't
+      have been able to run two iterators side by side
+      (which wasn't a very likely use case, admittedly).
+
+0.06 2014-03-30
+    - Now use MooX::Role::CachedURL to grab/cache 00whois.xml
+
+0.05 2014-03-17
+    - Switched to using MooX::Role::CachedURL to handle the caching of
+      00whois.xml.
+    - Added a live test, which is skipped if you appear to be offline.
+    - Added CPAN::Source to SEE ALSO
+    - Stopped using MungeFile::WithData to set $DISTNAME in Users.pm --
+      it was a pain when testing during development.
+
+0.04 2014-02-27
+    - Added CPAN::Index::API::File::Whois and CPAN::Search::Author
+      to SEE ALSO.
+    - Added a note about the mailing lists included in 00whois.xml,
+      and that they're ignored by PAUSE::Users
+
+0.03 2013-12-11
+    - Added =encoding to pod, since I have UTF-8 in the pod
+    - Correction in the doc for has_cpandir following a chat with ANDK.
+
+0.02 2013-11-19
+
+    - has_cpandir now defaults to 0, as the <has_cpandir> element
+      is only present if it's set to 1.
+    - Now we skip entries with type=list, as they're not users they're
+      mailing lists. Dropped the 'type' field from PAUSE::Users::User,
+      since we're only dealing with one type.
+    - Added a bunch more documentation.
+    - Added Changes file
+
+0.01 2013-11-17
+
+    - First version released to CPAN
+

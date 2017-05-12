@@ -1,0 +1,27 @@
+This is Perl module Perlbal::Plugin::UrlGroup.
+
+INSTALLATION
+
+Perlbal::Plugin::UrlGroup installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Perlbal::Plugin::UrlGroup
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Perlbal::Plugin::UrlGroup documentation is available as in POD. So you can do:
+
+    % perldoc Perlbal::Plugin::UrlGroup
+
+to read the documentation online with your favorite pager.
+
+Atsushi Kobayashi

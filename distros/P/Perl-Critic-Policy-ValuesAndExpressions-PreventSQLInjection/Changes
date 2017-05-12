@@ -1,0 +1,60 @@
+Revision history for Perl-Critic-Policy-ValuesAndExpressions-PreventSQLInjection
+
+v1.4.0  2017-03-22
+        - Relicensed under Perl 5 terms.
+        - Cleaned up dependencies.
+
+v1.3.1  2014-04-20
+        - Fixed "package version matches dist version" for CPANTS.
+        - Fixed license declared in meta files.
+        - Refactored to use String::InterpolatedVariables.
+
+v1.3.0  2014-03-26
+        - (GH-12) Fixed handling of ternary operators.
+        - (GH-13) Added detection of function / class method calls, added
+          support for marking functions / class methods as safe from SQL
+          injection risks.
+        - (GH-13) Allowed configuring the list of safe functions, class
+          methods, and object methods via .perlcriticrc.
+        - (GH-14) Fixed handling of quoted heredoc blocks (thanks Victor Efimov
+          for finding the issue).
+        - (GH-16) Fixed double-quoted string test.
+        - Added many tests, thanks to Victor Efimov.
+        - Updated list of current limitations of the module.
+        - Clarified documentation.
+
+v1.2.0  2013-12-30
+        - Added support for commas (in addition to spaces) in safe variable
+          lists (GH-9).
+        - Fixed detection of array indexes in variables.
+        - Fixed parsing of spaces in quoted hash keys.
+        - Tightened detection of quoting methods.
+
+v1.1.5  2013-12-05
+        - Added detection of quote() and quote_identifier(), to prevent the
+          detection of false-positives (GH-8).
+
+v1.1.4  2013-12-03
+        - Fixed whitelisting of concatenated variables (GH-7).
+
+v1.1.3  2013-11-20
+        - Decreased false-positive by looking for SQL keywords at the beginning
+          of the strings (GH-6).
+
+v1.1.2  2013-11-19
+        - Fixed detection of the end of SQL statements in array elements
+          (GH-5).
+
+v1.1.1  2013-11-09
+        - Support for Perl v5.8.
+
+v1.1.0  2013-11-08
+        - Added detection of SQL injection flaws introduced via
+          heredoc blocks (GH-1) and concatenation (GH-2).
+
+v1.0.1  2013-10-15
+        - Added missing dependency.
+        - Ignored warnings in dependencies when testing.
+
+v1.0.0  2013-10-14
+        - Public release.

@@ -1,0 +1,9 @@
+Revision history for Parse-Range
+
+0.96 2009-12-15
+	- POD fixes
+	- kwalitee fixes
+	- added prereq
+
+0.95 2009-12-08
+	- initial release

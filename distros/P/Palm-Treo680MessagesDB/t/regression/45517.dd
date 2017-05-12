@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1192655672,
+          'number' => '+440270800592',
+          'time' => '22:14',
+          'date' => '2007-10-17',
+          'name' => 'Ed XXXX (M)',
+          'phone' => '+440270800592',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1192655672,
+          'text' => 'Woman going to jump off Tower Bridge, Sailor says Don\'t do it, I\'ll stow u away on ship and u can start a new life in the USA. 3 weeks later she is found and brought before the captain, he asks "what r u doing on my boat?" She replies, " 1 of ur sailors is stowing me away to the usa. He brings me 3 meals a day and in return for all that, i let him fuck me every nite." Captain replies "Oh he\'s fuckin you all right, this is the Woolwich Ferry!',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7107292,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 45517
+        };

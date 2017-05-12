@@ -1,0 +1,18 @@
+Revision history for Perl extension Proc::Safetynet.
+
+0.04  Wed Jan 14 15:40:01 2009
+    - fixed program name constraints to be limited to /^[\w\-\_]+$/ pattern
+    - API+Config change: refactored supervisor config keys for logpath and stdXXX log extensions
+    - replaced all warnings with eventlistener bcasts
+    - renamed shell binary into its formal name
+
+0.03  Thu Dec 11 19:04:52 2008
+    - added "update_program" provisioning command
+    - added STDERR redirection and logging
+
+0.02  Wed Dec 10 01:15:21 2008
+    - added shell provisioning commands
+
+0.01  Mon Nov 17 14:27:49 2008
+	- initial alpha release
+

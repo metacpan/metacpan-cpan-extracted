@@ -1,0 +1,75 @@
+=begin filter wikimedia extended=0 implicit_links=1
+
+= my interesting text =
+
+A NormalLink
+AnExtendedLink
+
+== my interesting lists ==
+
+* unordered one
+* unordered two
+
+# ordered one
+# ordered two
+## nested one
+## nested two
+
+  code one
+  code two
+
+The first line of a normal paragraph.
+The second line of a normal paragraph.  Whee.
+
+__RESULT__
++wikimedia
+<html><body bgcolor="#ffffff">
+<a name='my%20interesting%20text'></a><h1>my interesting text</h1>
+
+<p>A <a href='NormalLink'>NormalLink</a>
+<a href='AnExtendedLink'>AnExtendedLink</a></p>
+<a name='my%20interesting%20lists'></a><h2>my interesting lists</h2>
+
+<ul>
+<li>unordered one</li>
+<li>unordered two</li>
+</ul>
+<ol>
+<li>ordered one</li>
+<li>ordered two<ol>
+<li>nested one</li>
+<li>nested two</li>
+</ol>
+</li>
+</ol>
+<pre> code one
+ code two
+</pre>
+<p>The first line of a normal paragraph.
+The second line of a normal paragraph.  Whee.</p>
+
+</body></html>
+__RESULT__
+-wikimedia
+<html><body bgcolor="#ffffff">
+<pre>= my interesting text =
+
+A NormalLink
+AnExtendedLink
+
+== my interesting lists ==
+
+* unordered one
+* unordered two
+
+# ordered one
+# ordered two
+## nested one
+## nested two
+
+  code one
+  code two
+
+The first line of a normal paragraph.
+The second line of a normal paragraph.  Whee.</pre>
+</body></html>

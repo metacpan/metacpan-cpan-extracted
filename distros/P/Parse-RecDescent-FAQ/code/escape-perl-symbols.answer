@@ -1,0 +1,14 @@
+my $grammar = <<'EOGRAMMAR';		# The quotes are critical!
+   
+
+ export_line:	stock_symbol	COMMA   # 1
+   		stock_name	COMMA2  # 2
+   		stock_code	COMMA3  # 3
+   		trade_side	COMMA4  # 4
+   		trade_volume	COMMA5  # 5
+   		floating_point	COMMA6  # 6
+   		tc                      # 7
+ { print "got @item\n"; }
+    | <error>
+EOGRAMMAR
+

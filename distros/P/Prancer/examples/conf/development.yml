@@ -1,0 +1,8 @@
+session:
+    store:
+        # use the memory driver in dev
+        driver: Prancer::Session::Store::Memory
+
+static:
+    # use the development resources directory in dev
+    dir: /home/paul/myapp-dev/resources

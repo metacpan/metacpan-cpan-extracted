@@ -1,0 +1,21 @@
+Revision history for Padre-Plugin-Vi
+
+0.23	2010.07.24
+	actually install the translations (RSN)
+	compatibility to newer Padre versions (ZENOG)
+	added MANIFEST.SKIP     
+
+0.22    2009.06.22
+
+	Added translations:
+	- Arabic (azawawi)
+	- French (jquelin)
+	- Polish (therek)
+	- Chinese (Traditional) translation (BLUET)
+	- Spanish (brunov)
+	- Brazilian Portuguese (garu)
+
+0.21    2009.01.13
+	Moved to its own distribution
+	For earlier releases see the Padre Changes file and source code   
+

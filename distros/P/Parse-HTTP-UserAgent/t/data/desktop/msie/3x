@@ -1,0 +1,51 @@
+[AGENT]
+
+Mozilla/2.0 (compatible; MSIE 3.01; Windows 95)
+
+'parser'           => 'msie',
+'os'               => 'Windows 95',
+'version_raw'      => '3.01',
+'version'          => '3.010',
+'name'             => 'MSIE',
+
+[AGENT]
+
+Mozilla/2.0 (compatible; MSIE 3.01; Windows NT)
+
+'parser'           => 'msie',
+'os'               => 'Windows NT',
+'version_raw'      => '3.01',
+'version'          => '3.010',
+'name'             => 'MSIE',
+
+[AGENT]
+
+Mozilla/2.0 (compatible; MSIE 3.0; AOL 3.0; Windows 95)
+
+'parser'           => 'msie',
+'os'               => 'Windows 95',
+'extras'           => [ 'AOL 3.0' ],
+'version_raw'      => '3.0',
+'version'          => '3.000',
+'name'             => 'MSIE',
+
+[AGENT]
+
+Mozilla/2.0 (compatible; MSIE 3.0; Windows 3.1)
+
+'parser'           => 'msie',
+'os'               => 'Windows 3.1',
+'version_raw'      => '3.0',
+'version'          => '3.000',
+'name'             => 'MSIE',
+
+[AGENT]
+
+Mozilla/2.0 (compatible; MSIE 3.02; Windows CE; 240x320)
+
+'parser'      => 'msie',
+'os'          => 'Windows CE',
+'extras'      => ['240x320'],
+'version_raw' => '3.02',
+'version'     => '3.020',
+'name'        => 'MSIE',

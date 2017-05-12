@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:                Parallel-SubFork
+version:             0.10
+abstract:            Manage Perl functions in forked processes. 
+license:             ~
+author:              
+    - Emmanuel Rodriguez <emmanuel.rodriguez@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Class::Accessor::Fast:         0
+    FindBin:                       0
+    IPC::Semaphore:                0
+    IPC::SysV:                     0
+    POSIX:                         0
+    Test::More:                    0
+    Test::Pod:                     0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

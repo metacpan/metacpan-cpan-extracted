@@ -1,0 +1,134 @@
+package Perinci::Access::Manual::Examples; # just to make podweaver happy
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: Collection of examples
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perinci::Access::Manual::Examples - Collection of examples
+
+=head1 VERSION
+
+This document describes version 0.44 of Perinci::Access::Manual::Examples (from Perl distribution Perinci-Access), released on 2015-12-17.
+
+=head1 DESCRIPTION
+
+=head2 (Client) Simplest usage
+
+=head2 (Client) Meta action
+
+=head2 (Client) List action
+
+=head2 (Client) (HTTP)
+
+=head2 (Client) (Pipe)
+
+=head2 (Client) (Socket)
+
+=head2 (Client) (Server) Dealing with binary data
+
+The choice as JSON as the network transport protocol (because it is the lowest
+common denominator across languages like JavaScript, PHP, Python, Ruby, Perl)
+makes dealing with binary data requires an extra step or two. The Riap client
+libraries are equipped with some features to make this simpler and more
+convenient.
+
+First, to make a function that accepts binary data (in its arguments), you need
+to specify the argument type as C<buf>. To return binary data as result, you
+need to specify C<result>'s schema type as C<buf>. Example:
+
+ package MyLib;
+ our %SPEC;
+ $SPEC{gzip} = {
+     v => 1.1,
+     summary => 'Gzip some data',
+     args => {
+         data => {
+             summary => 'Data to compress',
+             schema => 'buf*',
+             req => 1,
+         },
+     },
+ };
+ sub gzip {
+     require IO::Compress::Gzip;
+
+     my %args = @_;
+     my $compressed;
+     IO::Compress::Gzip::gzip($args{data} => $compressed)
+         or return [500, "Compression failed"];
+     [200, "OK", $compressed];
+ }
+
+If you use this function via Riap in-process, there's nothing to worry about
+since there is no round-trip to JSON. You can just:
+
+ my $res = Perinci::Access->new->request(call => "/MyLib/gzip",
+                                         {args=>{data=>"some data"}});
+
+If you are using this function over HTTP or oher network protocol where JSON is
+involved, you will need to encode the argument:
+
+ use MIME::Base64;
+ my $res = Perinci::Access->new(riap_version=>1.2)->
+               request(call => "http://localhost:5000/api/MyLib/gzip",
+                       {args=>{"data:base64"=>encode_base64("some data","")}});
+
+Note that you also need to specify Riap version 1.2, as this is the first
+version that specifies argument encoding. Also note that the result returned by
+the server is actually base64-encoded to be safe to pass through JSON, e.g.:
+
+ [200, "OK", "base64 data...", {"riap.v"=>1.2, "riap.result_encoding"=>"base64"}]
+
+But the Riap client library decodes this automatically for you, so you don't
+have to see it.
+
+=head2 (Client) Debugging
+
+=head2 (Server) (HTTP)
+
+=head2 (Server) (Pipe)
+
+=head2 (Server) Debugging
+
+=head1 SEE ALSO
+
+L<Perinci::CmdLine::Manual>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Access>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Access>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Access>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

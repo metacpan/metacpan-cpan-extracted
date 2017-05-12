@@ -1,0 +1,22 @@
+Revision history for Parse-FixedRecord
+
+0.06  2012-05-17
+      - add 'ignore' command
+      - dzilify
+
+0.05  2012-02-09
+      - Make the error messages more informative
+
+0.04  2012-01-27
+      - Add proper test dependencies
+
+0.03  2012-01-26
+      - Multiple parsers can now exist in the same process
+
+      - Inheriting from Parse::FixedRecord::Row is no longer required
+
+0.02  2009-12-09
+      - Added missing dep on DateTime::Format::Strptime
+
+0.01  2009-12-08
+      - First version

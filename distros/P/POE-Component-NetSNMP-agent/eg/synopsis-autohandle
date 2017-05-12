@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+use strict;
+use NetSNMP::ASN;
+use POE qw< Component::NetSNMP::agent >;
+
+
+use constant {
+    BASE_OID    => ".1.3.6.1.4.1.32272",
+    AGENT_ALIAS => "snmp_agent",
+};
+
+POE::Session->create(
+    inline_states => {
+        _start => sub {
+            $_[KERNEL]->alias_set("main");
+
+            $_[HEAP]{agent} = POE::Component::NetSNMP::agent->spawn(
+                Alias       => AGENT_ALIAS,
+                AgentX      => 1,
+                AutoHandle  => BASE_OID,
+            );
+
+            $_[KERNEL]->yield("update_tree");
+        },
+        update_tree => \&update_tree,
+    },
+);
+
+POE::Kernel->run;
+exit;
+
+sub update_tree {
+    my ($kernel, $heap) = @_[ KERNEL, HEAP ];
+
+    # add one OID entry
+    $kernel->post(AGENT_ALIAS, add_oid_entry =>
+        BASE_OID.".1", ASN_OCTET_STR, "hello");
+
+    # add several OID entries at once
+    $kernel->post(AGENT_ALIAS, add_oid_tree => {
+        BASE_OID.".2" => [ ASN_INTEGER, 42 ],
+        BASE_OID.".3" => [ ASN_COUNTER, 1873541 ],
+        BASE_OID.".4" => [ ASN_GAUGE, 235 ],
+    });
+
+    # next update in 30 sec
+    $kernel->delay(update_tree => 30);
+}
+

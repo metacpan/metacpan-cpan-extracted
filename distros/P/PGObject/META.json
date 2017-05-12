@@ -1,0 +1,52 @@
+{
+   "abstract" : "A toolkit integrating intelligent PostgreSQL dbs into Perl objects",
+   "author" : [
+      "Chris Travers <chris.travers@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PGObject",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::Pg" : "2",
+            "Memoize" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ledgersmb/PGObject.git",
+         "web" : "https://github.com/ledgersmb/PGObject"
+      }
+   },
+   "version" : "v1.403.2",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

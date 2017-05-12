@@ -1,0 +1,134 @@
+=head1 NAME
+
+Physics::Unit::Implementation - This page discusses implementation issues of the Physics/Unit.pm module.
+
+=head1 OVERVIEW
+
+Each unit is defined by a conversion factor and
+a dimensionality vector.
+
+The conversion factor is a floating point number that specifies how
+this Unit relates to a reference Unit of the same dimensionality.
+
+The dimensionality vector holds a list of integers - each of which
+records the power of a base Unit that appears in this Unit.
+
+For example, consider the unit of speed, "miles per hour". This has a
+dimensionality of (Distance / Time), or of (Distance ^ 1 * Time ^ -1).
+So this unit's dimensionality vector has a 1 in the place
+corresponding to Distance, and a -1 in the place corresponding to
+Time.
+
+The reference unit for speed is "meters per second" (since meter is
+the base unit corresponding to Distance, and second is the base unit
+corresponding to Time). Therefore, the conversion factor for the unit
+"miles per hour" is 0.44704, since 1 mph equals 0.44704 meters / sec.
+
+=head1 PACKAGE VARIABLES
+
+=over
+
+=item $debug
+
+Turning this on enables copious debugging information.
+
+=item $number_re
+
+A (correct) regular expression for a floating point number,
+optionally in exponent form.
+
+=back
+
+=head1 DATA STRUCTURES
+
+=over
+
+=item %reserved_word
+
+A list of reserved words used in unit expressions.  For example, "per",
+"square", "cubic".
+
+=item %unit_by_name
+
+The keys of this hash are the known unit names. The values are references
+to the named unit objects.
+
+=item %prefix
+
+Keys are the valid prefixes. Values are references to the Unit objects.
+Note that the names here are also in C<%unit_by_name>.
+
+=item %prototype
+
+Keys are the names of the types. The values of this hash are references
+to Unit objects that exemplify these types.
+
+=item $NumBases
+
+The number of base units.
+
+=item @BaseName
+
+The name of each of the base units. These names also appear in
+C<%unit_by_name>.
+
+=back
+
+=head1 PRIVATE ROUTINES
+
+=over
+
+=item NewOne()
+
+Creates a new dimensionless unit.
+
+=item I<$u>->AddNames()
+
+This is called during the object's construction to add a list of
+names to the 'names' array, and to set the reference in the
+C<%unit_by_names> cross-reference hash.
+
+=item I<$u>->NewType(I<$typeName>)
+
+This is called when we are adding a new type to the system.  This
+happens both in C<InitBaseUnits()> and in C<InitTypes()>.
+
+=item CreateUnit(I<$unitDev>)
+
+This is used by several of the interface utility functions to create
+a new unit object from a unit definition (either a simple name, a
+unit expression, or a unit object).
+
+It differs from C<GetUnit()> in that it always creates a new, anonymous
+unit, whereas C<GetUnit()>, if given a simple name, returns a reference
+to a named Unit.
+
+=item CompareDim(I<$a1>, I<$a2>)
+
+Compare the dimension arrays.
+Return 0 if they are the same.
+
+=item LookName(I<$name>)
+
+Look up the name.  Returns:
+
+  0 not defined
+  1 reserved word
+  2 unit name
+  3 type name
+
+=item I<$u>->DebugString()
+
+Convert the unit to a factor - dimension vector format string, e.g.
+the unit '3 meters' would be converted to something like
+
+  3 [1, 0, 0]
+
+=item I<$u>->CheckChange()
+
+Complain if this unit has a name.  This is used by all the methods
+that modify the value of the unit.
+
+=back
+
+

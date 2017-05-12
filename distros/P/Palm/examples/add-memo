@@ -1,0 +1,118 @@
+#!/usr/bin/perl
+# $Id: add-memo,v 3.1 2002/02/08 13:55:59 arensb Exp $
+use strict;
+use Palm::Memo;
+
+use vars qw( $category $fname $pdb $cat_id $memo_text );
+
+# Set default values
+$category = undef;		# Default category to add to: "Unfiled"
+$cat_id = 0;			# Default category index is 0
+$fname = "$ENV{HOME}/.palm/backup/MemoDB.pdb";
+				# Default file to modify
+
+# Parse command-line arguments
+# XXX - Ought to read ~/.add-memo.args or some such: this should
+# contain the default command-line arguments. read it, split into
+# arguments, and prepend to @ARGV. Then continue as below.
+while ($ARGV[0] =~ /^-./)
+{
+	my $arg = shift;
+
+	if ($arg eq "-h" or $arg eq "-help" or $arg eq "--help")
+	{
+		&usage;
+		exit 0;
+	}
+
+	if ($arg eq "-c")		# Set category
+	{
+		$category = shift;
+		if (!defined($category))
+		{
+			print STDERR
+				"Error: -c argument requires an argument.\n";
+			&usage;
+			exit 1;
+		}
+		next;
+	}
+
+	if ($arg eq "-f")		# Specify PDB file
+	{
+		$fname = shift;
+		if (!defined($fname))
+		{
+			print STDERR
+				"Error: -f argument requires an argument.\n";
+			&usage;
+			exit 1;
+		}
+		next;
+	}
+}
+
+$pdb = new Palm::PDB;
+$pdb->Load($fname);
+
+# Given a category name, set $cat_id to its index.
+if ($category eq "")
+{
+	# No category specified. Default to "Unfiled"
+	$cat_id = 0;
+} else {
+	# Find the named category
+	my $i;
+	for ($i = 0; $i <= 16; $i++)
+	{
+		if ($pdb->{appinfo}{categories}[$i]{name} eq $category)
+		{
+			$cat_id = $i;
+			last;
+		}
+	}
+	if ($i >= 16)
+	{
+		# No such category
+		print STDERR "Warning: can't find category \"$category\".\n",
+			"Defaulting to \"Unfiled\".\n";
+	}
+}
+
+$memo_text = "";
+
+# This loop might iterate over several files
+while (<>)
+{
+	# XXX - If input file is STDIN, perhaps ought to print a
+	# message saying to hit <Ctrl-D> at EOF. Then again, that's
+	# not the Unix way.
+	$memo_text .= $_;
+	if (eof(ARGV))
+	{
+		# End of current file. Append the current record to
+		# the PDB, and reset $memo_text for the next file.
+
+		my $record;
+
+		$record = $pdb->append_Record;
+		$record->{data} = $memo_text;
+		$record->{category} = $cat_id;
+		$memo_text = "";
+	}
+}
+
+$pdb->Write($fname);
+
+# usage
+# Print a usage message
+sub usage
+{
+		print <<EOT;
+Usage: $0 [options] [files]
+Options:
+	-h		Help
+	-c category	Category to add to
+	-f fname	PDB file to modify
+EOT
+}

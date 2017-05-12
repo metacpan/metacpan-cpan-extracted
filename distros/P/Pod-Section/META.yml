@@ -1,0 +1,45 @@
+---
+abstract: "select specified section from Module's POD"
+author:
+  - 'Ktat, C<< <ktat at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.142690'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Section
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Pod::Section:
+    file: lib/Pod/Section.pm
+    version: '0.02'
+requires:
+  Getopt::Std: '0'
+  IO::String: '0'
+  Pod::Abstract: '0'
+  Pod::Perldoc: '0'
+  Pod::Perldoc::ToPod: '0'
+  Pod::Perldoc::ToText: '0'
+  Pod::Usage: '0'
+resources:
+  bugtracker: https://github.com/ktat/Pod-Section/issues
+  homepage: https://github.com/ktat/Pod-Section
+  repository: git://github.com/ktat/Pod-Section.git
+version: '0.02'
+x_contributors:
+  - 'ktat <ktat.is@gmail.com>'

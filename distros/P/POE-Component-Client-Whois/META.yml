@@ -1,0 +1,32 @@
+---
+abstract: 'A one shot non-blocking RFC 812 WHOIS query.'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-Client-Whois
+requires:
+  Carp: '0'
+  Net::IP::Minimal: '0'
+  Net::Netmask: '1.9012'
+  POE: '1.004'
+  POE::Filter::Line: '0'
+  POE::Wheel::ReadWrite: '0'
+  POE::Wheel::SocketFactory: '0'
+  Socket: '0'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/bingos/poe-component-client-whois
+  repository: https://github.com/bingos/poe-component-client-whois.git
+version: '1.36'

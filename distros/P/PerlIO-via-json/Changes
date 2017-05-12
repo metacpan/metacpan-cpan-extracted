@@ -1,0 +1,7 @@
+Change log for PerlIO::via::json
+
+0.02   2017-02-05
+  - adjusted t/020-write.t to workaround a bug in XML::XML2JSON
+    (reported by various CPAN testers)
+0.01   2009-02-01
+  - Initial release

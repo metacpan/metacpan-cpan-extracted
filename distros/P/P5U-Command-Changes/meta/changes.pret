@@ -1,0 +1,12 @@
+# This file acts as the project's changelog.
+
+`P5U-Command-Changes 0.001 cpan:TOBYINK`
+	issued  2012-09-12;
+	label   "Initial release".
+
+`P5U-Command-Changes 0.002 cpan:TOBYINK`
+	issued  2013-05-28;
+	changeset [
+		item "Use match::simple instead of smartmatch."^^Update;
+	].
+

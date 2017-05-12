@@ -1,0 +1,26 @@
+Revision history for Perl extension Perl::Metrics::Lite
+
+0.08 Sat Mar 14:14:00 2012
+	* Get the line number correctly (kzys++)
+
+0.07 Sat Jan 28 3:55:00 2012
+	* Requires PPI 1.205 (kzys++)
+
+0.061 Mon Dec 27 20:27:00 2011
+	* Use auto_include_deps 
+    * No functional change
+
+0.05 Mon Dec 24 14:00:00 2011
+	* Added POD for scripts 
+
+0.04 Mon Dec 24 13:44:00 2011
+	* Added threshold option to measureperl script 
+
+0.03 Mon Dec 23 23:20:00 2011
+	* Changed default threshold for sloc 
+
+0.02 Mon Dec 23 22:45:12 2011
+	* Added POD for some classes. No functional changes.
+
+0.01 Mon Dec 19 20:20:12 2011
+	* original version

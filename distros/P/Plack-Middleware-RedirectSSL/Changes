@@ -1,0 +1,27 @@
+Revision history for Plack-Middleware-RedirectSSL
+
+1.104 Mon 16 Mar 2015
+	- No functional changes
+	- Correct documentation of default HSTS maxage
+
+1.103 Sat 10 Jan 2015
+	- No functional changes
+	- No longer contains INSTALL file with install-as-root instructions
+
+1.102 Mov 05 Jan 2015
+	- No functional changes
+	- Test suite cleanup
+
+1.101 Thu 16 Oct 2014
+	- Default HSTS maxage now 26 weeks instead of 6
+	  (Qualys SSL Labs recommend at least 180 days)
+
+1.100 Thu 15 May 2014
+	- Support for HTTP Strict Transport Security (enabled by default)
+
+1.001 Wed 26 Dec 2012
+	- No functional changes
+	- POD typo fix
+
+1.000 Wed 26 Dec 2012
+	- Initial release

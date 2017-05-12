@@ -1,0 +1,11 @@
+Revision history for Perl extension Parse::Yapp::KeyValue.
+
+0.10  Mon Dec  8 18:54:59 CST 2008
+	- treat bare words as assignments with an empty key
+
+0.02  Thu Oct 25 10:57:16 2007
+	- fix broken prerequisities in the MakeMaker PREREQ_PM
+
+0.01  Tue Oct 23 10:44:35 2007
+	- initial release
+

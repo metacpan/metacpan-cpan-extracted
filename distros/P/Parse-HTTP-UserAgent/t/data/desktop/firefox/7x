@@ -1,0 +1,23 @@
+[AGENT]
+
+Mozilla/5.0 (Macintosh; Intel Mac OS X 10.6; rv:7.0.1) Gecko/20100101 Firefox/7.0.1
+
+'parser'      => 'firefox',
+'os'          => 'Intel Mac OS X 10.6',
+'toolkit'     => ['Gecko','20100101','20100101.000'],
+'version_raw' => '7.0.1',
+'version'     => '7.000001',
+'mozilla'     => ['7.0.1','7.000001'],
+'name'        => 'Firefox',
+
+[AGENT]
+
+Mozilla/5.0 (Windows NT 6.0; rv:7.0.1) Gecko/20100101 Firefox/7.0.1
+
+'parser'      => 'firefox',
+'os'          => 'Windows Vista / Server 2008',
+'toolkit'     => ['Gecko','20100101','20100101.000'],
+'version_raw' => '7.0.1',
+'version'     => '7.000001',
+'mozilla'     => ['7.0.1','7.000001'],
+'name'        => 'Firefox',

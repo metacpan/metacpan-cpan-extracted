@@ -1,0 +1,37 @@
+---
+abstract: 'managed work pool with Proc::tored and Parallel::ForkManager'
+author:
+  - 'Jeff Ober <jeffober@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Path::Tiny: '0.097'
+  Test2::Bundle::Extended: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Proc-tored-Pool
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Moo: '0'
+  Parallel::ForkManager: '1.19'
+  Proc::tored: '0.15'
+  Time::HiRes: '0'
+  Try::Tiny: '0'
+  Type::Library: '0'
+  Type::Tiny: '0'
+  Type::Utils: '0'
+  Types::Standard: '0'
+resources:
+  bugtracker: https://github.com/jsober/Proc-tored-Pool/issues
+  homepage: https://github.com/jsober/Proc-tored-Pool
+  repository: https://github.com/jsober/Proc-tored-Pool.git
+version: '0.07'
+x_serialization_backend: 'YAML::Tiny version 1.70'

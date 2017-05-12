@@ -1,0 +1,53 @@
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::BRUnitSP
+PROTOTYPES: DISABLE
+
+BRUnitSP BRUnitSP::new (int id) {
+    RETVAL = new BRUnitEnabled(id);
+}
+
+BRUnitSP new_enabled (SV* CLASS, int id) {
+    RETVAL = new BRUnitEnabled(id);
+}
+
+uint64_t br_addr (BRUnitSP THIS) {
+    xs::XSBackref* xsbr = panda::dyn_cast<xs::XSBackref*>(THIS.get());
+    if (!xsbr) croak("no xsbr");
+    RETVAL = (uint64_t)xsbr->perl_object;
+}
+
+int id (BRUnitSP THIS, SV* newval = NULL) {
+    if (newval) THIS->id = SvIV(newval);
+    RETVAL = THIS->id;
+}
+
+int xval (BRUnitSP THIS, SV* newval = NULL) {
+    if (newval) THIS_wrapper->xval = SvIV(newval);
+    RETVAL = THIS_wrapper->xval;
+}
+
+void DESTROY (BRUnitSP THIS) {
+    //XSBackref* br = panda::dyn_cast<XSBackref*>(THIS.get());
+    //printf("BRUnitSP::DESTROY id=%d BRSV=%x SV=%x RV=%x RCNT=%d\n", THIS->id, br->perl_object, SvRV(ST(0)), ST(0), SvREFCNT(SvRV(ST(0))));
+}
+
+
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::BRSPStorage
+PROTOTYPES: DISABLE
+
+BRSPStorage* BRSPStorage::new () {
+    RETVAL = new BRSPStorage();
+}
+
+BRUnitSP BRSPStorage::unit (BRUnitSP unit = BRUnitSP()) {
+    if (items > 1) {
+        THIS->set_unit(unit);
+        XSRETURN_UNDEF;
+    }
+    const char* CLASS = "Panda::XS::Test::BRUnitSP";
+    RETVAL = THIS->get_unit();
+}
+
+void BRSPStorage::DESTROY () {
+    //printf("BRSPStorage::DESTROY\n");
+}

@@ -1,0 +1,35 @@
+POE::Component::CPAN::Reporter
+==============================
+
+0.06	Sat Jun 20 08:33:28 BST 2009
+	- Meta updates to Makefile.PL
+	- Deprecation warnings.
+
+0.04	Mon Aug  4 10:25:21 BST 2008
+	- Added --logdir option to minireporter
+
+0.02	Sun Jul 20 22:25:28 BST 2008
+	- First stable release
+
+0.01_06 Fri Jun 13 10:07:12 BST 2008
+	- Added fix suggested by Dave Golden regarding build_dir_reuse and
+	  regenerate build dirs before calling reset_tested
+
+0.01_05 Thu Jun 12 12:31:33 BST 2008
+	- Fixed --recenturl option in minireporter. Documented it as well.
+
+0.01_04 Wed Jun 11 15:57:45 BST 2008
+	- Added eval check for the presence of Event to minireporter
+
+0.01_03 Wed Jun 11 15:49:31 BST 2008
+	- Added AUTOMATED_TESTING and PERL_MM_USE_DEFAULT environment
+	  variables to minireporter
+
+0.01_02 Wed Jun 11 12:40:38 BST 2008
+	- The smoke command syntax was wrong. Fixed.
+
+0.01_01	Wed Jun 11 12:17:36 BST 2008
+	- forgot to change the appdata semantics to reporterdir
+
+0.01_00 Wed Jun 11 12:01:57 BST 2008
+	- Initial public development release.

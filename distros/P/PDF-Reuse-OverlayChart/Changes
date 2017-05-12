@@ -1,0 +1,16 @@
+Revision history for Perl extension PDF::Reuse::OverlayChart.
+
+0.03  Fri Oct 28 2005
+      Added two new parameters, initialMaxY and initialMinY, to be used when you want to
+      force the module to start with specific values along the y-axis. 
+      Corrected two small bugs. (And used another method from Finance::QuoteHist in the
+      example how to mix graphs. The first method used, seem to have been removed.)
+
+0.02  Thu Jul 28 2005
+      Everything with JavaScript is removed from the documentation, as some methods with 
+      JavaScript do not work under Acrobat 7.0
+
+0.01  Wed Feb  4 17:36:11 2004
+	- original version; created by h2xs 1.22 with options
+		-AXOb 5.6.0 -skip-exporter PDF::Reuse::OverlayChart
+

@@ -1,0 +1,25 @@
+---
+abstract: 'Convenient utility functions/methods for use with PDL.'
+author:
+  - 'Joel Berger <joel.a.berger@gmail.com>'
+build_requires:
+  Capture::Tiny: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PDL-Util
+requires:
+  Carp: 0
+  Exporter: 0
+  PDL: 0
+  Scalar::Util: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+version: 0.010

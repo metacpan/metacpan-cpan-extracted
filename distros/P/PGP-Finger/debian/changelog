@@ -1,0 +1,15 @@
+pgpfinger (1.1) stable; urgency=low
+  * file input and debian/rpm packaging 
+  * fix some doc error in pgpfinger pod 
+
+ -- Markus Benning <ich@markusbenning.de>  Wed, 18 Mar 2015 21:32:53 +0000
+
+pgpfinger (1.0) stable; urgency=low
+  * a lot of updates and new functionality 
+  * Merge branch 'master' of https://github.com/benningm/pgpfinger 
+  * fix key armour 
+  * Create README.md 
+  * initial commit 
+
+ -- Markus Benning <ich@markusbenning.de>  Mon, 16 Mar 2015 14:10:53 +0000
+

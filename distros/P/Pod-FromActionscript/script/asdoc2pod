@@ -1,0 +1,78 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Pod::FromActionscript qw(asdoc2pod);
+
+my %opts = (
+   verbose => 0,
+   code => 0,
+   help => 0,
+   version => 0,
+   infile => "-",
+   outfile => "-",
+);
+
+Getopt::Long::Configure("bundling");
+GetOptions("v|verbose"  => \$opts{verbose},
+           "c|code"     => \$opts{code},
+           "h|help"     => \$opts{help},
+           "V|version"  => \$opts{version},
+          ) or pod2usage(1);
+pod2usage(-exitstatus => 0, -verbose => 2) if ($opts{help});
+print("$0 v$Pod::FromActionscript::VERSION\n"),exit(0) if ($opts{version});
+
+# These args are only used above
+delete $opts{help};
+delete $opts{version};
+
+$opts{infile} = shift if (@ARGV > 0);
+$opts{outfile} = shift if (@ARGV > 0);
+asdoc2pod(%opts);
+
+__END__
+
+=head1 NAME
+
+asdoc2pod - Read an Actionscript file with Javadoc and output POD
+
+=head1 SYNOPSIS
+
+asdoc2pod [options] [infile.as [outfile.pod]]
+
+  Options:
+       -c --code           output POD embedded in code instead of just POD
+       -v --verbose        more diagnostic output
+       -h --help           verbose help message
+       -V --version        print CAM::PDF version
+
+If the input or output files are omitted, STDIN and STDOUT are used,
+respectively.  Filenames of C<-> are interpreted as STDIN or STDOUT as
+well.
+
+=head1 DESCRIPTION
+
+Read in an Actionscript file and parse it, searching for Javadoc-style
+comments.  If any are found, convert them to POD (Perl's Plain Old
+Documentation format).  The output is just the POD, unless the
+C<--code> flag is used, in which case the original Actionscript is
+output with the Javadoc converted to POD.
+
+=head1 SEE ALSO
+
+L<Pod::FromActionscript>
+
+=head1 LICENSE
+
+Copyright 2005 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Clotho Advanced Media Inc., I<cpan@clotho.com>
+
+=cut

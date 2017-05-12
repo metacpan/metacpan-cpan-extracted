@@ -1,0 +1,3 @@
+<h1>[%l('Posting Not Allowed')%]</h1>
+
+[%l('Posting is not permitted from [_1]', c.request.address)%]

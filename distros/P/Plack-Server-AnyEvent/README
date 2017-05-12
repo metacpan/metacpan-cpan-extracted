@@ -1,0 +1,31 @@
+NAME
+    Plack::Server::AnyEvent - DEPRECATED. Use Twiggy
+
+WARNING
+    This software is deprecated. Use Twiggy instead.
+
+SYNOPSIS
+      my $server = Plack::Server::AnyEvent->new(
+          host => $host,
+          port => $port,
+      );
+      $server->run($app);
+
+DESCRIPTION
+    Plack::Server::AnyEvent is a Plack server implementation using AnyEvent.
+    This server runs in a non-blocking event loop and suitable for
+    event-driven web applications like streaming API servers.
+
+LICENSE
+    This module is licensed under the same terms as Perl itself.
+
+AUTHOR
+    Tokuhiro Matsuno
+
+    Yuval Kogman
+
+    Tatsuhiko Miyagawa
+
+SEE ALSO
+    Twiggy
+

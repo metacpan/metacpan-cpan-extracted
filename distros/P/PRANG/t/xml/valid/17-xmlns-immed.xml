@@ -1,0 +1,7 @@
+<!-- test the case where the xml namespace is defined on the node where it is used -->
+<Octothorpe>
+  <colon/>
+  <question_mark>
+    <aiieee crash="bang_eth">rip<Queen:swish xmlns:Queen="uri:type:A" xmlns:Sugar="uri:type:B" xmlns:Able="uri:type:X" Sugar:ker_plop="owww" Able:ker_plop="ouch" ker_plop="whack_eth"/></aiieee>
+  </question_mark>
+</Octothorpe>

@@ -1,0 +1,220 @@
+Revision history for Pod-Advent
+
+0.24	2011-12-21
+	* Upped Perl::Tidy prereq to v20101217 (RT#65142)
+	* inc'd copyright
+
+0.23	2010-12-13
+	* Fixed typo in Makefile.PL in perl minversion (5.6.1 instead of 5.6.10)
+	* Makefile.PL updates to use EU::MM's BUILD_REQUIRES functionality.
+	* Specify min version 2.03 of Test::Harness for TODO support.
+	* Fixed behavior of M<Foo::Bar|altname> (RT#63860)
+	* Added tests, POD, and example in sample.pod for linking to the
+	  anchored line numbers in =sourcedcode sections. (Adam Russell)
+	  Example:  A<#foo.pl.3|see line 3>
+	* Changed shebang line in bin/pod2advent to #!perl (Adam Russell)
+
+0.22	2010-12-06
+	* Fix win32 failing test
+	  (had to workaround win32 not supporting multi-line echo)
+	* minor doc typo fixes
+	* Removed hard-coded current-year references.  So now should
+	  no longer need a yearly $year++ update.
+
+0.21	2010-12-02
+	* Add html anchors to line numbers for "=sourcedcode" (RT#63526)
+	* Now installs cleanly when Text::Aspell is missing (RT#63541)
+	  Removed Text::Aspell as a required module in Makefile.PL
+	  Tests SKIP if Text::Aspell is missing.
+	* Support optional display text for M<> (RT#63525)
+	* Add optional paramter so that "=begin pre encode_entities" will
+	  auto-entify contents w/HTML::Entities::encode_entities(). (RT#63527)
+	  Added HTML::Entities as a dependency in Makefile.PL.
+	* test suite tweaks to add a little more coverage (now at 98.7%)
+	* added docs/coverage.txt to the distro.
+
+0.20	2010-11-22
+	* Updated for year 2010.
+
+0.19	2009-12-02 (unreleased)
+	* added a TOOD test for "=for advent_author foo D<bar> stuff" case (bill)
+	* added -npro flag to perltidy to ignore ~/.perltidyrc (steve)
+
+0.18    2009-12-01
+	* support for 2009 in P<>  (*P*ast) tag (bill)
+	  added 2009, suppressed warnings, updated t/snippets.t
+	* don't force upgrade of ExtUtils::MakeMaker (jerrad)
+
+0.17    2009-11-11
+	* test suite updates
+	* Changes updates
+
+0.16    2009-01-05 # unreleased
+	* TODO updates
+	* pod2advent options:
+		--css=foo.css
+		--noadvent
+		--nospellcheck
+	* warn cleanly if can't load Text::Aspell
+
+0.15    2008-12-20
+        * Support YYYY-12-DD for P<> (jerrad)
+        * Support |Name syntax for P<> (jerrad)
+        * updated pod and t/snippets.t for P<>
+        * pod2advent - added special filename of '-' to mean read from STDIN.
+        * pod2advent - added special filename of '+' to mean read a *snippet* from STDIN.
+        * updated t/pod2advent.t and pod2advent pod for syntax additions.
+        * removed hard-coded style from <blockquote> -- rely on css.
+
+0.14    2008-12-11
+        * Cleanly handle absence of Text::Aspell -- now gives a warning. Also
+          updated test suite (skips certain tests if no spellcheck).  Left
+          the prereq in Makefile.PL to warn users.
+        * Added a ->spellcheck_enabled() method.
+        * Combined docs/coverage.txt and pod TODO section into a TODO file.
+        * Removed <tt> formatting from A<>, L<>, and P<>.
+        * P<> now creates relative links (per Jerrad -- for mirrors)
+        * Added TODO test cases in t/snippets.t for html comment handling.
+        * Minor coverage-motivated tweaks. Coverage is at new high of 99.6%
+        * Removed extraneous newline before </tt> in C<> output (per Jerrad:
+          this can result in bad rendering in firefox).
+
+0.13    2008-12-11
+        * Makefile.PL - specified license as 'perl'.
+        * Makefile.PL - Specified min version of Perl::Tidy as 20030726 after
+          testing with backpan versions and seeing that 20021130 fails.
+        * Add new code P<> linking past entries in stanrard fashion.
+          Syntax: P<YYYY-DD>
+        * Add new code D<> assuming everything's in the Dictionary. Just
+          Disables spellchecking within the tag.
+        * t/snippets.t -- added P<> and D<> checks, and error handling checks
+          for footnotes.
+
+0.12    2008-12-09
+        * Specified minimum version of Pod::Simple as 3.06 after seeing v3.05
+          break (Test Reports #2777258, #2779853) and verifying it. I believe
+          it's the 'feature to parse additional text after =begin target as a
+          block title' that Pod::Advent requires (for footnotes).
+        * Made t/pod2advent.t and t/examples.t handle fatal errors better.
+        * Makefile.PL -- changed 'use ExtUtils::MakeMaker' statement to
+          include min version. This supports non-configure_requires aware
+          tools; also ExtUtils::MakeMaker doesn't have a way to specify
+          configure_requires directly.
+
+0.11    2008-12-08
+        * parse_file() now does a chdir to the .pod's directory.  This is so
+          that it can find =sourcedcode files specified relative to the .pod
+          file.  Makes testing easier -- don't have to chdir('ex/'). Also
+          safe, because by convention the .pod/sourced .pl's/.pm's should be
+          in a directory together.
+        * updated tests to remove chdir's
+        * added Cwd and File::Basename as prereqs
+        * Changed tests that compare large HTML chunks to use Test::Differences::eq_or_diff instead of Test::More::is
+        * add Test::Differences as a prereq
+        * removed IO::Scalar as a prereq; changed t/snippets.t to use
+          the ->parse_string_document method inherited from Pod::Simple.
+        * added pod re: html passing through
+        * added new pod re: footnotes
+        * Refactored the use of footnotes.  now auto-numbers them.  see POD.
+        * updated examples and tests for footnote changes
+        * Added ex/footnotes.pod and ex/footnotes.html
+        * Changed M<> behavior to link to http://search.cpan.org/perldoc?Foo::Bar
+        * Consolidated t/pod2advent-[ABC].t to a new t/pod2advent.t
+        * Consolidated t/sample.t and t.getting_started.t to a new t/examples.t
+
+0.10    2008-12-05
+        * fixed typos in display-spelling-errors part of pod2advent
+        * added t/pod2advent-A.t, t/pod2advent-B.t, and t/pod2advent-C.t
+        * added IO::CaptureOutput as a prereq
+
+0.09    2008-12-04
+        * Explicitly set Text::Aspell to language of en_US
+          + avoids test failures.
+          + Pod Advent Calendar is an english-language site.
+        * Added a  '<link rel="alternate" type="text/plain" href="<THISFILE>.pod" />' tag (RT#41330)
+        * "View Source (POD)" for visibility/clarity
+        * pod2advent - suppress duplicate misspelled words
+        * pod typo fix re: footnotes
+        * added tests to t/packagevars.t for $speller & @misspelled
+        * added tests to t/spellcheck.t for $speller and language=en_US
+
+0.08    2008-11-30
+        * Added spellcheck support
+          + Text::Aspell is now a pre-req
+          + New $speller and @misspelled pacakge vars
+          + New num_spelling_errors() and spelling_errors() methods
+          + New __spellcheck() internal method
+          + POD updates
+          + Added t/spellcheck.t
+          + Updated t/getting_started.t and t/sample.t w/spellcheck tests
+        * pod2advent will warn about misspelled words.
+        * inc'd copyright year
+        * misc pod updates
+
+0.07    2008-11-22
+        * Added POD 'GETTING STARTED' section, including a
+          permalink to ex/getting_started.html example.
+        * Renamed ex/sample.pod.txt back to ex/sample.pod
+        * Added IO::Scalar (used by test suite) to prereq list
+          to avoid test suite failures.
+        * Changed "you're" to "you are" in ex/getting_started.pod
+          to avoid t/getting_started.t failure when system does
+          different html encoding ("you're" vs "you&#39;re").
+
+0.06    2008-11-20
+        * added a 'Getting Started' example
+        * added 'use 5.006' and MIN_PERL_VERSION to Makefile.PL
+        * Updated examples to advent_year=2008
+        * Added $Pod::Advent::BODY_ONLY package var attribute to suppress
+          header & footer printing -- intended for testing purposes for
+          testing small POD snippets.
+        * Added a __reset() method to reset the package vars -- intended
+          for testing purposes for multiple parsing (e.g. t/snippets.t).
+        * Added t/snippets.t -- take advantage of $BODY_ONLY package vat.
+        * renamed coverage to docs/coverage.txt
+
+0.05    2007-12-26
+        * If input is a filename, adds a 'POD' link at the bottom of the html
+        * Added an accessor/mutator for css_url() to customize the stylesheet
+        * new tests: attributes.t & packagevars.t
+        * the '=for advent_*' tags no longer cause empty <p></p> tags
+        * Tweaks to make it pass HTML validation, including
+          changing the <B> & <I> tags to <span>'s w/css.
+        * added coverage (text file of Devel::Cover summary) to MANIFEST
+        * cleaned up TODO list
+
+0.04    2007-12-19
+        * fix to t/sample.t to completely strip the
+          'Generated By' lines before conmparison.
+          Otherwise any system not using the same
+          versions of Pod::Simple or Perl::Tidy
+          will fail the test.
+
+0.03    2007-12-19
+        * Bugfix -- $parser->output_fh() can be undef ..
+          have to default $fh to STDOUT in that case.
+        * Added t/sample.t -- it processes ex/sample.pod.txt
+          and compares results to ex/sample.html -- coverage
+          is very good from it; quality needs to be expaned in
+          future and additional test files, however.
+        * sync'd up ex/sample.html, and added additional examples
+        * removed obsolete Y<> and =head1 NAME/AUTHOR support
+        * Added full POD example in SYNOPSIS
+
+0.02    2007-12-18
+        * Changed M<> href back to ?module instead of ?query
+        * Added 'Generated by' string to HTML output
+        * Renamed br() to nl() for clarity
+        * Output is now written to $parser->output_fh instead of STDOUT
+          This allows calling code (such as tests!) to use Pod::Simple's
+          output_fh() and output_string() methods.
+        * Added style.css to MANIFEST
+        * Renamed ex/sample.pod to ex/sample.pod.txt
+        * Added pod to bin/pod2advent
+        * Added ex/sample.pl to MANIFEST
+        * Added t/general.t to MANIFEST as start of test suite.
+        * Pod/Advent.pm POD additions
+
+0.01    2007-12-17
+        * Initial release.
+

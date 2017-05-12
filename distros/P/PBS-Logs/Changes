@@ -1,0 +1,20 @@
+Revision history for Perl extension PBS::Logs.
+
+0.01  Fri Mar  4 10:17:29 2005
+	- original version; created by h2xs 1.23 with options
+		--compat-version=5.8.0 -XAn PBS::Logs
+
+0.02  Wed Jul 27 10:56:14 PDT 2005
+	- gave the test scripts more "descriptive" names
+	- changed the compat-version to 5.6
+	- have message_hash() honor some quoting of values
+
+0.03  Mon Oct 13 11:03:40 PDT 2008
+	- mostly document changes
+
+0.04  Tue Apr 28 16:07:16 PDT 2009
+	- added the current() method to return the current PBS "record"
+
+0.05  Wed Nov 24 10:26:46 PST 2010
+	- handle accounting records with key=value fields where the value
+	  may have an '=' within it (e.g. Resource_List.nodes=1:ppn=2)

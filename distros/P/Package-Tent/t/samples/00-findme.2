@@ -1,0 +1,11 @@
+use Package::Tent sub {
+  package Baz;
+  use constant thing => 7;
+  1;
+};
+
+use Package::Tent sub {
+  package Baz::Bat;
+  use constant thing => 7;
+  1;
+};

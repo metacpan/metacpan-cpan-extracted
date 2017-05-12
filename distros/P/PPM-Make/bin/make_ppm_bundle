@@ -1,0 +1,248 @@
+#!/usr/bin/perl
+
+use strict;
+# use warnings;
+use Getopt::Long qw(:config no_ignore_case auto_version auto_help);
+use PPM::Make::Bundle;
+use Pod::Usage;
+$main::VERSION = $PPM::Make::VERSION;
+my %opts = ();
+my @files = ();
+my %progs = ();
+my @reps = ();
+GetOptions(\%opts,
+           'zip_archive|z',
+           'force|f',
+           'ignore|i',
+           'cpan',
+           'no_cfg',
+           'no-cfg',
+           'no_case',
+           'binary|b:s',
+           'arch_sub|n',
+           'script|s:s',
+           'exec|e:s',
+           'os|o:s',
+           'arch|a:s',
+           'remove|r',
+           'as|A!',
+           'vs|V',
+           'vsr',
+           'vsp',
+           'zipdist',
+           'add|x:s' => \@files,
+           'program|p:s' => \%progs,
+           'ppd:s',
+           'ar:s',
+           'zip:s',
+           'host:s',
+           'user:s',
+           'passwd:s',
+	       'no-ppm4',
+	       'no-html',
+	       'no-remote-lookup',
+	       'reps:s' => \@reps,
+	       'clean',
+	       'no-upload',
+	       'bundle_name:s',
+	       'skip',
+          ) or pod2usage(2);
+
+my $dist = shift;
+my %upload = ();
+
+for (qw(binary script exec add program ppd ar host user passwd)) {
+  die "Please supply an argument to '$_'"
+     if ( defined $opts{$_} and $opts{$_} eq "");
+}
+
+for (qw(ppd ar host user passwd zip)) {
+  $upload{$_} = delete $opts{$_};
+}
+$opts{upload} = \%upload if defined $upload{ppd};
+$opts{dist} = $dist if $dist;
+
+for (qw(cfg ppm4 html upload remote-lookup)) {
+  my $given = 'no-' . $_;
+  next unless $opts{$given};
+  my $passed = 'no_' . $_;
+  $passed =~ s/-/_/g;
+  $opts{$passed} = delete $opts{$given};
+}
+
+my $bundle = PPM::Make::Bundle->new(%opts);
+$bundle->make_bundle();
+
+__END__
+
+=head1 NAME
+
+make_ppm_bundle - make a bundle of ppm packages
+
+=head1 SYNOPSIS
+
+   make_ppm_bundle [options] [Module | Distribution]
+
+Options:
+
+ [-z | --zip]              : make a zip distribution
+ [-f | --force]            : force remaking a distribution
+ [-i | --ignore]           : ignore any failing test results
+ [ --skip]                 : skip running the tests
+ [-b | --binary] location  : specify the binary location
+ [-n | --arch_sub]         : use \$Config{archname} as a subdirectory
+ [-s | --script] script    : specify a script in the <INSTALL> field
+ [-e | --exec] exec        : specify the executable to run the <INSTALL> script
+ [-x | --add] file         : add file to the archive
+ [-o | --os] os            : use os for the <OS> field
+ [-a | --arch] arch        : use arch for the <ARCHITECTURE> field
+ [-v | --version]          : print version information and exit
+ [-h | --help]             : print this help screen
+ [-r | --remove]           : remove the build directory after installation
+ [-p | --program]  b=a     : specify "a" to be used for the "b" program
+ [-A | --as]               : add Perl version number to ARCHITECTURE (>= 5.8)
+ [-V | --ppmv]             : add version string to ppd and archive filenames
+ [ --ppd ]  location       : copy the ppd to the specified location
+ [ --ar ]   location       : copy the archive file to the specified location
+ [ --zip ]   location      : copy the zipped file to the specified location
+ [ --host]  host           : use the specified host for copying the ppm files
+ [ --user]  user           : username to use when transferring ppm files
+ [ --passwd] password      : password associated with user
+ [ --cpan ]                : make a CPAN distribution
+ [ --no_case ]             : for module searches, ignore case
+ [ --no-case ]             : for module searches, ignore case
+ [ --no_cfg ]              : do not read a .ppmcfg configuration file
+ [ --no-cfg ]              : do not read a .ppmcfg configuration file
+ [ --vsr]                  : add version string to the archive filename
+ [ --vsp]                  : add version string to the ppd filename
+ [ --zipdist]              : create a zip file of the .ppd and .tar.gz files
+ [ --no-ppm4]              : don't add ppm4 extensions to the ppd file
+ [ --no-html]              : don't generate html documentation
+ [ --no-remote-lookup]     : don't use external data sources for meta information
+ [ --bundle_name ] name    : use the specified name as the bundle name
+ [ --no-upload]            : don't upload individual ppm packages
+ [ --clean ]               : remove the temporary build directory
+ [ --reps ] http://rep.com : specify repositories to search for ppm packages
+ 
+Additional Arguments:
+
+   Module       : specify a module to fetch (requires CPAN.pm)
+   Distribution : specify a distribution to fetch
+
+With no arguments, make_ppm_bundle will build a bundle
+inside the current directory, which assumes this is
+a CPAN distribution.
+
+=head1 DESCRIPTION
+
+C<make_ppm_bundle> is an interface to the C<PPM::Make::Bundle> module,
+bundled zip file of a
+package and all of it's required prerequisites. See L<PPM::Make::Bundle> 
+for further details.
+
+Apart from the options described below, without any arguments 
+C<make_ppm_bundle> will assume it is inside an unpacked source
+distribution and make the corresponding distribution.
+If it is given an argument of what looks like a module
+name (eg, I<Net::FTP>), it will use C<CPAN.pm> to look up the 
+corresponding distribution and fetch and build it. Otherwise, 
+additional arguments (eg, F<package.tar.gz>, or
+I<http://someplace.org/package.tar.gz>) will be interpreted
+as distributions to fetch and build.
+
+Options can be read from a configuration file C<.ppmcfg>
+(see L<PPM::Make>) and/or given as options to I<make_ppm_bundle>,
+unless the I<no_cfg> option is given. An example C<.ppmcfg> file is
+
+ [default]
+ 
+ host = me.wherever.ca
+ user = me
+ passwd = whatever
+ 
+ [ MSWin32-x86-multi-thread-5.8 ]
+ 
+ binary = http://me.wherever.ca/ppms/x86/
+ ppd = /usr/local/httpd/htdocs/ppms/
+ ar = /usr/local/httpd/htdocs/ppms/x86/
+ zip = /usr/local/httpd/htdocs/ppms/zips
+ zipdist = 1
+ reps = <<END
+ http://theoryx5.uwinnipeg.ca/ppms/
+ http://www.bribes.org/perl/ppm/
+ http://ppm.activestate.com/PPMPackages/5.8-windows/
+ END
+ bundle = /usr/local/httpd/htdocs/ppms/bundles
+ 
+ [ MSWin32-x86-multi-thread ]
+ 
+ binary = http://me.wherever.ca/ppmpackages/x86/
+ ppd = /usr/local/httpd/htdocs/ppmpackages/
+ ar = /usr/local/httpd/htdocs/ppmpackages/x86/
+ zip = /usr/local/httpd/htdocs/ppmpackages/zips
+ zipdist = 1
+ no_ppm4 = 1
+ reps = <<END
+ http://ppm.activestate.com/PPMPackages/5.6/
+ http://theoryx5.uwinnipeg.ca/ppmpackages/
+ http://www.bribes.org/perl/ppm/
+ END
+ bundle = /usr/local/httpd/htdocs/ppmpackages/bundles
+
+In case of duplicates, the options to I<make_ppm_bundle> take
+precedence. Available options include those of L<PPM::Make>,
+plus the following specific ones:
+
+=over
+
+=item --bundle_name $bundle_name
+
+This options specifes the name of the zip file containing
+all of the bundled ppm packages. If this is not specified,
+a default of C<Bundle-dist_name.zip> will be used, where
+C<dist_name> is the name of the main distribution being
+built.
+
+=item --no-upload
+
+By default, if a required package is built by C<PPM::Make>,
+and if the configuration file specifies that such ppm
+packages are to be uploaded to a repository, this upload
+will take place. The C<no-upload> option specifies that
+such individual package uploads not take place, although
+the bundled zip file will still be uploaded, if specified.
+
+=item --reps http://some.host/path/to/ppms
+
+This specifies a list of repositories to search for
+needed ppm packages. This option can be specified
+multiple times to specify a list of repsoitories.
+
+=item --clean
+
+The ppm packages are placed in a temporary directory
+for eventual inclusion in the zipped bundle file.
+The C<clean> option specifies that this temporary
+directory be removed after the bundle file is built.
+
+=item [--help]
+
+This prints out a short help screen and exits.
+
+=item [--version]
+
+This prints out some version information and exits.
+
+=back
+
+=head1 COPYRIGHT
+
+This program is copyright, 2006, by Randy Kobes 
+E<lt>r.kobes@uwinnipeg.caE<gt>.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<PPM::Make::Bundle>, L<PPM::Make>, and L<PPM>.
+
+=cut

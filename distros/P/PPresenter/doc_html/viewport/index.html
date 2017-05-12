@@ -1,0 +1,185 @@
+
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Viewport</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Viewports</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<B>Viewports</B><BR>
+<P>
+<A HREF=#howto>how to...</A><BR>
+<A HREF=#options>options</A><BR>
+<A HREF=#examples>examples</A><BR>
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.   A presentation is based on
+<A HREF=../slide/index.html>slides</A>, which are shown on viewports.
+<P>
+There are two kinds of viewports:
+<UL>
+<LI>viewports without any controls: these are described on this page, and
+<LI>exactly one viewport <A HREF=control.html>with controls</A>, showing
+    the show's progress, with a background-menu, etc.
+</UL>
+When you use more than one viewport, usually the viewport with controls
+will show slide-notes.  But none, or even more than one viewport showing
+the notes is possible, too.
+
+    </TD></TR>
+<TR><TD VALIGN=top>
+
+    </TD><TD VALIGN=top>
+
+<H2><A NAME=howto>How to</A> create a viewport</H2>
+
+<H4>Implicit creation</H4>
+
+Do not add any viewports explicitly: PPresenter will create one for you.
+You may specify the size of this viewport with the
+<CODE>-geometry</CODE> option of the show's constructor
+function <A HREF=../show/new.html>new()</A>.
+<P>
+If you specify the <CODE>-controlDisplay</CODE> variable at the
+show's new(), then PPresenter will create a control viewport which
+displays slide-notes.
+
+<H4>Explicit creation</H4>
+
+After the show's instantiation until you add your first
+<A HREF=../slide/index.html>slide</A>, you can add viewports explicitly.
+You can add as many viewport as you like, but only one can have controls.
+See the <A HREF=#examples>examples below</A> how it can be used.
+
+<H2><A NAME=options>Options for all viewport</H2>
+
+<H4>About the windowing system</H4>
+<DL>
+<DT><B>-display =&gt;</B> <I>display</I>
+<DD>On which visual should the viewport appear?  By default the screen
+    which you are using (for X11 this value is taken from
+    <CODE>$ENV{DISPLAY}</CODE>).
+    <P>
+<DT><B>-device =&gt;</B> <I>string</I>
+<DD>Type of device.  This is important for the decoration.  Currently
+    defined are <CODE>lcd</CODE>, <CODE>beamer</CODE>,
+    and <CODE>printer</CODE>.
+    Add a new device via the
+    <A HREF=../decoration/index.html>decoration</A> method
+    <CODE>addDevice()</CODE>.
+    <P>
+<DT><B>-geometry =&gt;</B> <I>geometry</I>
+<DD>The requested size and location of the window.  This defaults
+    to the <A HREF=../show/new.html>show's new()</A> option with the
+    same name, which on its turn defaults to the size of the screen.
+    <P>
+<DT><B>-resizable =&gt;</B> <I>boolean</I>
+<DD>Is the user permitted to resize the main window?  Usually not, so by default
+    this is turned off (<CODE>0</CODE>).
+    <P>
+</DL>
+There is no options to switch the title-bar off: this is an option for the
+window-manager.  Each window-manager has its own way to achieve that.
+
+<H4>About PPresenter</H4>
+<DL>
+<DT><B>-name =&gt;</B> <I>string</I>
+<DT><B>-aliases =&gt; [</B> <I>string, ...</I> <B>]</B>
+<DD>Name and optionally nicknames of the viewport.  Required when you
+    address the viewports yourself.
+    <P>
+<DT><B>-hasControl =&gt;</B> <I>boolean</I>
+<DD>Is this the control window?  There must be exactly one control window.
+    <P>
+<DT><B>-showSlideNotes =&gt;</B> <I>boolean</I>
+<DD>Does this viewports show slidenotes, or slides.  If you create a
+    window with controls, the default is notes (true, <CODE>1</CODE>).
+    For other windows, the default is slides (false, <CODE>0</CODE>).
+    <P>
+<DT><B>-style =&gt;</B> <I>string</I>
+<DD>Which <A HREF=../style/index.html>style</A> is used to describe the style.
+    Viewports which show slidenotes have
+    <A HREF=../style/slidenotes.html>style "slidenotes"</A> as default.
+    Other viewports get by default the
+    <A HREF=../function/select.html>selected</A>
+    style (usually the <A HREF=../style/default.html>default style</A>).
+    <P>
+</DL>
+
+<H2><A NAME=examples>Examples</A></H2>
+
+<H4>Example 1: Implicit Creation</H4>
+
+The easiest way to create one viewport for your show is just by
+<EM>not</EM> using <CODE>addViewport</CODE>:
+<PRE>
+   use PPresenter;
+   my $show = PPresenter->new();
+</PRE>
+Now you have only one viewport, with controls on that viewport.  The
+viewport covers the whole screen, unless you specify a <CODE>-geometry</CODE>
+with <CODE>new()</CODE>
+
+<H4>Example 2: Implicit Creation with Control Viewport</H4>
+
+If you want to have more than 1 viewport, you need a windowing system
+which enables Tk to do this.  Currently, this is only tested for UNIX.
+<PRE>
+   use PPresenter;
+   my $show = PPresenter->new
+      ( -controlDisplay  =&gt; 'far.away.com:0'
+      , -controlGeometry =&gt; '300x300+40+40'
+      );
+</PRE>
+When you specify the <CODE>-controlDisplay</CODE> you will get two
+viewports: one without controls and showing slides, the other
+with controls, showing slide-notes.  The default geometry is
+<CODE>'640x480'</CODE>.
+As test, you may try:
+<PRE>
+   -controlDisplay =&gt; $ENV{DISPLAY}
+</PRE>
+but this is not useful in a practical situation.
+
+<H4>Example 3: Explicit Creation of one viewport</H4>
+
+Explicit creation of one single window is also not hard, as long as
+you do not forget that one viewport --so this viewport-- requires
+control:
+<PRE>
+   $show = PPresenter->new;
+   $show->addViewport
+      ( -display    =&gt; 'anywhere'
+      , -hasControl =&gt; 1
+      , -geometry   =&gt; '400x600+30-20'
+      );
+</PRE>
+Because one viewport is explicitly added, PPresenter will not create one
+for you.  To be more precize: if there is at least one viewport
+which shows slides, then none is created automatically.
+<P>
+The number of options of a viewport with controls is much larger than
+for a viewport without controls.  See the special section of
+<A HREF=control.html#options>control options</A>.
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

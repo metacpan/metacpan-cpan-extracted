@@ -1,0 +1,44 @@
+Revision history for Padre-Plugin-Nopaste
+
+0.08 2013-09-25T22:22:22Z BST
+ - remove MYMETA from dist (BOWTIE)
+
+0.07 2013-05-03
+ - Update Changes to changes-strict (BOWTIE)
+ - Tweak plugin_enable to throw a more human readable error (BOWTIE)
+ - Update Makefile with midgen output (BOWTIE)
+
+0.06 2012-08-31
+ - remove cruff from MANIFEST, azawawi++ (BOWTIE)
+
+0.05 2012-08-31
+ - remove cruff, my bad, POD tweak, azawawi++ (BOWTIE)
+
+0.04 2012-08-31
+ - Update to Padre::Plugin for API 2.2
+ - Update to Padre::Task 3.0
+ - Update Makefile.PL
+ - Added README
+ - Tweak tests and POD
+ - Defaults to #padre
+ - Now with Prefs Dialog
+ - improved Dialog with reset (BOWTIE)
+
+0.3.1 2010-08-14
+ - Better pod for Padre::Plugin::Nopaste::Task
+
+0.3.0 2010-08-13
+ - Support Task API 2.0 (CHORNY)
+ - Added Padre::Plugin::Nopaste::Task (CHORNY)
+
+0.2.1 2009-04-05T12:46:24Z +02:00
+ - adding missing prereq
+
+0.2.0 2009-04-01T17:09:04Z +02:00
+ - nopasting in a padre::task in order not to freeze padre
+ - new icon to be displayed in padre's plugin manager
+ - fixing method name in padre's plugin interface
+
+0.1.0 2009-03-24T19:22:20Z +01:00
+ - first version: nopaste current selection or file
+

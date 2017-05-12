@@ -1,0 +1,13 @@
+2008.xs
+Changes
+COPYING
+Makefile.PL
+MANIFEST
+ppport.h
+README
+typemap
+t/POSIX-2008.t
+lib/POSIX/2008.pm
+lib/POSIX/2008.pod
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

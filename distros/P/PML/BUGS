@@ -1,0 +1,6 @@
+# Known Bugs #
+
+o The pml script gets installed in /usr/bin (on FreeBSD)
+o There are problems with whitespace being added in some
+  situations.
+o Line numbers for syntax errors are sometimes wrong

@@ -1,0 +1,349 @@
+=pod
+
+=head1 NAME
+
+Perl::Dist::WiX::Diagnostics - The list of exceptions that Perl::Dist::WiX catches.
+
+=head1 DESCRIPTION
+
+This documentation describes the exceptions that Perl::Dist::WiX uses in 
+case an error occurs.
+
+=head1 DIAGNOSTICS
+
+Note that most errors are defined as exception objects in the PDWiX,
+PDWiX::Parameter, and PDWiX::Caught classes.  Those errors will start 
+with C<< Perl::Dist::WiX error: >>
+
+Some parameter errors will be caught by Object::InsideOut. (Those errors 
+will be in the OIO class, and are not listed here.)
+
+This is not a complete list, but covers most of the exceptions that are 
+caught in Perl::Dist::WiX and the modules that come with it.
+
+=head2 C<< Perl::Dist::WiX error: >>
+
+=over 
+
+=item C<< Parameter missing or invalid >>
+
+(Implemented as a PDWiX::Parameter class)
+ 
+The parameter mentioned is either missing (and it is required) or 
+invalid (for example, a string where an integer is required).
+
+Often, but not always, exactly why the parameter is invalid is 
+mentioned, as well.
+
+=item C<< Internal Error: Missing or invalid id >>
+
+A Perl::Dist::WiX::Base::Component has been created with a 
+missing or invalid id parameter.  This should not happen.
+
+=item C<< Internal Error: Calling as_string improperly (most likely, not calling derived method) >>
+
+C<< Perl::Dist::WiX::Base::Component->as_spaces() >> is being called instead of 
+one of its derived methods.
+
+=item C<< Internal Error: Odd number of parameters to add_directories_id >>
+
+The L<< Perl::Dist::WiX->add_directories_id()|/add_directories_id >> method 
+takes pairs of directories and the id to use when adding them.  Somehow, 
+these got mismatched.
+
+=item C<< Can't add the directories required >>
+
+The directories that are requested to be added under this directory object
+aren't a subdirectory of the directory being referred to by the directory 
+object, so directory objects cannot be created within this object for them.
+
+=item C<< Internal Error: Parameters not passed in hash reference >>
+
+The method referred to takes all its parameters as a hash reference (i.e. 
+within C<< { } >> brackets) and this was not done.
+
+=item C<< Can't create intermediate directories when creating %s (unsuccessful search for %s) >>
+
+Perl::Dist::WiX::Directory->add_directory could not find a directory 
+object to add the new directory object to. (add_directory can only create
+a directory object immediately under another one.)
+
+=item C<< Complex feature tree not implemented in Perl::Dist::WiX %s. >>
+
+Having more than one feature (and supporting conditional installation
+of features by the user) has not been implemented in Perl::Dist::WiX 
+at this point.
+
+=item C<< Error reading directory %s: %s >>
+
+Something happened when attempting to get a list of files for the 
+directory mentioned.
+
+=item C<< Error reading packlist file %s: %s >>
+
+Something happened when attempting to read the packlist file mentioned.
+
+=item C<< Could not add %s >>
+
+The file to be added to the Perl distribution was completely outside the
+distribution's directories, so a directory object could not be found to 
+refer to.
+
+=item C<< The output_dir directory is not writable >>
+
+The directory specified by the C<output_dir> parameter is not writable by
+the current user.  Specify a different directory, or have your 
+administrator set the directory so it can be written to.
+
+=item C<< %s does not exist or is not readable >>
+
+Trying to use light.exe to compile a file that cannot be read or it
+does not exist (someone may be trying to modify your file system from 
+under you?)
+
+=item C<< Failed to find %s (Probably compilation error in %s) >>
+
+The first file mentioned could not be found.  There was probably a 
+error in compilation of the second file.
+
+=item C<< Could not open file %s for writing [$!] [$^E] >>
+
+Perl::Dist::WiX could not open the file mentioned.  The reason should
+be specified within the brackets.
+
+=item C<< Fragment %s does not exist >>
+
+An attempt to add a file or files to a fragment that had not been 
+created yet has been detected.
+
+=item C<< %s does not support Perl %s >> or C<< Cannot generate perl, missing $s method in %s >>
+
+You are attempting to install a version of the perl interpreter that 
+Perl::Dist::WiX does not support yet.  If this is a new version of 
+the interpreter, or if Perl::Dist::WiX is documented as supporting 
+this version of the interpreter, please report this as a bug.
+
+=item C<< Failed to resolve Module::CoreList hash for %s >>
+
+We could not get a hash of modules from L<Module::CoreList|Module::CoreList> 
+for the version of Perl mentioned.
+
+=item C<< Unknown package %s >>
+
+An improper package name was passed to L<Perl::Dist::WiX-E<gt>binary_url|/binary_url>.
+
+=item C<< Checkpoints require a temp_dir to be set >>
+
+There was no C<temp_dir> parameter set and a checkpoint routine was called.
+
+=item C<< Failed to find checkpoint directory >>
+
+L<< Perl::Dist::WiX->checkpoint_load|Perl::Dist::WiX::Checkpoint/checkpoint_load >> 
+could not find a directory C<temp_dir>\checkpoint to load a checkpoint from.
+
+Either a checkpoint was never saved, or the temporary directory is 
+different, or the checkpoint was deleted.
+
+=item C<< Did not provide a toolchain resolver >>
+
+A L<Perl::Dist::Util::Toolchain|Perl::Dist::Util::Toolchain> 
+object was not passed to 
+L<< Perl::Dist::WiX->install_perl_toolchain|Perl::Dist::WiX::BuildPerl/install_perl_toolchain >>, 
+and that method was unable to create one.
+
+=item C<< Cannot install CPAN modules yet, perl is not installed >>
+
+Perl::Dist::WiX->install_cpan_upgrades was called before 
+Perl::Dist::WiX->install_perl.
+
+=item C<< CPAN script %s failed >>
+
+An error happened creating or executing the script to upgrade or install 
+a CPAN module. The error will usually be mentioned on this line, and the 
+debug.err and debug.out files (in the C<output_dir>) can be examined for 
+assistance in determining what happened.
+
+=item C<< Failure detected during cpan upgrade, stopping [%s] >> or C<< Failure detected installing %s, stopping [%s] >>
+
+The script to upgrade or install a CPAN module reported an error.
+The error will usually be mentioned on this line, and the debug.err and 
+debug.out files (in the C<output_dir>) can be examined for assistance in 
+determining what happened.
+
+=item C<< Cannot build Perl yet, dmake has not been installed >>
+
+L<install_dmake|/install_dmake> needs to be ran before L<install_perl|/install_perl>.
+
+=item C<< Can't execute %s >>
+
+We just installed something, but a test to make sure that it is executable 
+did not pass.
+
+=item C<< Didn't expect install_to to be a %s >>
+
+The C<install_to> parameter was the wrong type. It either needs 
+to be a hashref of directory mappings or a directory to install to.
+
+=item C<< Failed to extract %s >>
+
+L<Perl::Dist::WiX-E<gt>install_distribution|/install_distribution> or 
+L<Perl::Dist::WiX-E<gt>install_distribution_from_file|/install_distribution_from_file> 
+could not extract the file referred to. The file may be corrupt.
+
+=item C<< Could not find Makefile.PL in %s >>
+
+This module did not have a Makefile.PL when it was unpacked.
+
+If it has only a Build.PL, it can be installed by 
+L<install_module|/install_module> or L<install_modules|/install_modules>, 
+but not L<install_distribution|/install_distribution>.  Otherwise, there 
+was probably an extraction error.
+
+=item C<< No .packlist found for %s. ... >>	
+
+When this module was being installed, Perl::Dist::WiX was looking for 
+a packlist in order to create a fragment for the module.
+
+The description given with this error tells how to tell Perl::Dist::WiX to 
+create the fragment another way.
+
+=item C<< Template processing failed for $from_tt >>
+
+L<Perl::Dist::WiX-E<gt>patch_file|/patch_file> tried to use the template 
+$from_tt to create a patch, and the patch creation failed.
+
+=item C<< Missing or invalid file $file or $file_tt in pathlist search >>
+
+L<Perl::Dist::WiX-E<gt>patch_file|/patch_file> tried to find a file 
+with these two names to create a patch, and the patch creation failed.
+
+=item C<< Failed to find file $file >>
+
+L<Perl::Dist::WiX-E<gt>patch_file|/patch_file> could not find the file 
+to patch.
+
+=item C<< Failed to create $dir >>
+
+Perl::Dist::WiX tried to create a directory to cache the downloaded 
+modules in, and the creastion failed.
+
+=item C<< No write permissions for L<LWP::UserAgent> cache '$dir' >>
+
+Perl::Dist::WiX created a directory to cache the downloaded 
+modules in, but it can't write to the cache directory.
+
+=item C<< make failed >> or C<< perl failed >>
+
+Trying to execute make or perl failed.
+
+=item C<< make failed (OS error) >> or C<< perl failed (OS error) >>
+
+When make or perl was executed, an error was reported.  Check the debug.out
+and debug.err files for more information. 
+
+=item C<< CPAN modules file error: $! >>
+
+In L<Perl::Dist::WiX-E<gt>install_module|/install_module>, we expected a file to be created
+to verify that CPAN could find the module to be installed.
+When install_module tried to read the file, we got the error reported.  
+
+=item C<< The script %s does not exist >>
+
+Install_launcher could not find a script at this location when 
+creating a shortcut.
+
+=item C<< PATH directory $dir does not exist >>
+
+The directory being added to the PATH does not exist.
+
+=item C<< Directory $path does not exist >>
+
+We tried to find the path to get patches from with L<Perl::Dist::WiX-E<gt>patch_include_path|/patch_include_path>,
+but the path to get the patches from does not exist. 
+
+=item C<< Copy error: %s >>	or C<< Move error: %s >>
+
+There was an error copying or moving a file.
+
+=item C<< Error in archive extraction >>
+
+The archive that was downloaded was corrupt when an extraction 
+attempt was made.
+
+=item C<< Didn't recognize archive type for $archive >>
+
+Perl::Dist::WiX can only install files with a .zip or .tar.gz extension.
+
+=item C<< %s has not been installed >>
+
+The install_* routine that adds this particular package needed to be called 
+before this one, but it wasn't.
+
+=item C<< pexports failed to generate .def file >> or C<< pexports failed to generate .a file >>
+
+pexports or dlltool had an error and was not able to generate the file required.
+
+=item C<< Failed to make_path for %s >> or C<< Failed to remake_path for %s >>
+
+The directory did not exist once made or remade.
+
+=item C<< Could not write out $filename_in: File already exists. >>
+
+The application name (as defined by the L<app_name|/app_name> parameter) 
+conflicts with one of the other fragments somehow. Please choose a different 
+application name.
+
+=back
+
+=head2 C<< Error caught by Perl::Dist::WiX from other module: >>
+
+These exceptions are members of the PDWiX::Caught class.
+
+The specific problem returned from the other module is reported on the next line.
+
+=over 
+
+=item C<< Unknown delegation error occured >>
+
+This error occurs after "Completed install_c_libraries in %i seconds" if 
+C<< trace => 0 >> or "Pregenerating toolchain..." if C<< trace => 1 >> or 
+greater.
+
+=item C<< Failed to generate toolchain distributions >>
+
+L<Perl::Dist::Util::Toolchain|Perl::Dist::Util::Toolchain> was not 
+able to find out which modules need upgraded in the CPAN toolchain.
+
+=item C<< Template error >>
+
+There was a problem creating or processing the main .wxs template.
+
+=item C<< Could not find distribution directory for Perl::Dist::WiX >>
+
+L<File::ShareDir|File::ShareDir> could not find the directory that 
+Perl::Dist::WiX uses to store its required data 
+(C<< $Config{sitelib}\auto\share\Perl-Dist-WiX >>)
+
+=back
+
+As other errors are noticed, they will be listed here.
+
+=head2 C<< OIO::Args error: Missing mandatory initializer '%s' for class '%s' >>
+
+This is the Object::InsideOut equivalent of a PDWiX::Parameter error.
+
+=head1 AUTHORS
+
+Curtis Jewell E<lt>csjewell@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<Perl::Dist|Perl::Dist>, L<Perl::Dist::WiX|Perl::Dist::WiX>, 
+L<http://ali.as/>, L<http://csjewell.comyr.com/perl/>
+
+=head1 COPYRIGHT AND LICENSE
+
+The license is the same as L<Perl::Dist::WiX|Perl::Dist::WiX>. 
+See that module for details.
+
+=cut

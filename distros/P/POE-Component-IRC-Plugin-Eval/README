@@ -1,0 +1,58 @@
+NAME
+    POE::Component::IRC::Plugin::Eval - Evaluate code with App::EvalServer
+
+SYNOPSIS
+    To quickly get an IRC bot with this plugin up and running, you can use
+    App::Pocoirc:
+
+     $ pocoirc -s irc.perl.org -j '#bots' -a BotCommand -a Eval
+
+    Or use it in your code:
+
+     use POE::Component::IRC::Plugin::BotCommand;
+     use POE::Component::IRC::Plugin::Eval;
+
+     $irc->plugin_add(BotCommand => POE::Component::IRC::Plugin::BotCommand->new());
+
+     # evaluate code in #foobar
+     $irc->plugin_add(Eval => POE::Component::IRC::Plugin::Eval->new(
+         Server_port => 14400,
+         Channels    => ['#foobar'],
+     ));
+
+DESCRIPTION
+    POE::Component::IRC::Plugin::Eval is a POE::Component::IRC plugin. It
+    reads 'eval' commands from IRC users and evaluates code with
+    App::EvalServer.
+
+    You must add a POE::Component::IRC::Plugin::BotCommand plugin to the IRC
+    component before adding this plugin.
+
+METHODS
+  "new"
+    Takes the following arguments:
+
+    'Server_host', the host where the App::EvalServer instance is running.
+    Default is 'localhost'.
+
+    'Server_port', the host where the App::EvalServer instance is running.
+    Default is 14400.
+
+    'Channels', an array reference of channel names. If you don't provide
+    this, the plugin will be active in all channels.
+
+    'Method', how you want messages to be delivered. Valid options are
+    'notice' (the default) and 'privmsg'.
+
+    Returns a plugin object suitable for feeding to POE::Component::IRC's
+    "plugin_add" method.
+
+AUTHOR
+    Hinrik Örn Sigurðsson, hinrik.sig@gmail.com
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Hinrik Örn Sigurðsson
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

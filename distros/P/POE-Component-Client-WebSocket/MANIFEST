@@ -1,0 +1,19 @@
+Changes
+ignore.txt
+lib/POE/Component/Client/WebSocket.pm
+Makefile
+Makefile.PL
+makeNotes
+MANIFEST			This list of files
+MANIFEST.bak
+MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,46 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+	<head>
+		<title>POE-XUL Demos</title>
+		<script>
+
+var demos = [
+	'App'
+];
+
+var linkTemplate =
+	"<li><a href=\"javascript:Link('DEMO')\">DEMO</a> " +
+	"[<a href=\"javascript:Source('DEMO')\">source</a>]</li>";
+
+function Init() {
+	if (navigator.userAgent.indexOf("Gecko")  == -1) {
+		var message = 'These applications will only run in Firefox';
+		alert(message);
+		throw(message);
+	}
+	var list = document.getElementById('demo_list');
+	var links = '';
+	var demo;
+	for (demo in demos) links += linkTemplate.replace(/DEMO/g, demos[demo]);
+	list.innerHTML = links;
+}
+
+function Link(name) {
+	window.open(
+		"start.xul?" + name + "#1" ,
+		(new Date()).getTime(),
+		"toolbar=0,menubar=0,status=1,resizable"
+	);
+}
+
+function Source(name) {
+	window.open(
+		"_view_source?name=" + name,
+		(new Date()).getTime()
+	);
+}
+
+		</script>
+	</head>
+	<body onload="Init()"><h1>POE-XUL Demos</h1><ol id="demo_list"/></body>
+</html>

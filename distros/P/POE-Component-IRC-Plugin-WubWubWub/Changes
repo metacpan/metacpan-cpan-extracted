@@ -1,0 +1,7 @@
+Revision history for POE-Component-IRC-Plugin-WubWubWub
+
+0.1	Forgot to have the module return a true value. Oops!
+	Added in wub_str for further customizability. 
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

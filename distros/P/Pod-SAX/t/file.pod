@@ -1,0 +1,14 @@
+
+=head1 NAME
+
+SomePod - Some Pod to parse
+
+=head1 DESCRIPTION
+
+Foo
+
+=head2 Sub Title
+
+More
+
+=cut

@@ -1,0 +1,56 @@
+$VAR1 = {
+          'scan_on' => {
+                         'index_name' => 'pg_class_oid_index',
+                         'table_name' => 'pg_class',
+                         'table_alias' => 'pg_class'
+                       },
+          'is_analyzed' => 1,
+          'actual_time_first' => '0.077',
+          'estimated_rows' => '1',
+          'estimated_total_cost' => '16.55',
+          'estimated_row_width' => '198',
+          'actual_time_last' => '0.078',
+          'estimated_startup_cost' => '8.27',
+          'actual_rows' => '1',
+          'extra_info' => [
+                            'Index Cond: (oid = $1)'
+                          ],
+          'initplans' => [
+                           {
+                             'scan_on' => {
+                                            'index_name' => 'pg_class_relname_nsp_index',
+                                            'table_name' => 'pg_class',
+                                            'table_alias' => 'pg_class'
+                                          },
+                             'is_analyzed' => 1,
+                             'actual_time_first' => '0.015',
+                             'estimated_rows' => '1',
+                             'estimated_total_cost' => '8.27',
+                             'estimated_row_width' => '4',
+                             'actual_time_last' => '0.016',
+                             'estimated_startup_cost' => '0',
+                             'actual_rows' => '1',
+                             'extra_info' => [
+                                               'Index Cond: (relname = \'pg_class\'::name)'
+                                             ],
+                             'type' => 'Index Scan',
+                             'actual_loops' => '1'
+                           }
+                         ],
+          'subplans' => [
+                          {
+                            'is_analyzed' => 1,
+                            'actual_time_first' => '0.049',
+                            'estimated_rows' => '1',
+                            'estimated_total_cost' => '0.01',
+                            'estimated_row_width' => '0',
+                            'actual_time_last' => '0.049',
+                            'estimated_startup_cost' => '0',
+                            'actual_rows' => '1',
+                            'type' => 'Result',
+                            'actual_loops' => '1'
+                          }
+                        ],
+          'type' => 'Index Scan',
+          'actual_loops' => '1'
+        };

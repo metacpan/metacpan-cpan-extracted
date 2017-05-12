@@ -1,0 +1,25 @@
+NAME
+    Plack::Handler::AnyEvent::FCGI - Asynchronous FCGI handler for PSGI
+    using AnyEvent::FCGI
+
+SYNOPSIS
+      > plackup -s AnyEvent::FCGI myapp.psgi
+
+DESCRIPTION
+    Plack::Handler::AnyEvent::FCGI is a PSGI adapter for AnyEvent::FCGI
+    allowing AnyEvent based non-blocking applications running behind a web
+    server using FastCGI as a protocol.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+COPYRIGHT
+    Copyright 2011- Tatsuhiko Miyagawa
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    AnyEvent::FCGI Plack::Handler::AnyEvent::SCGI Plack::Handler::FCGI
+

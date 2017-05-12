@@ -1,0 +1,24 @@
+---
+abstract: 'A simple non-threaded, non-OO, pre-forking, self-regulating, multi-purpose multi-processing module. Period.'
+author:
+  - 'Carsten Gaebler'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parallel-MPM-Prefork
+provides:
+  Parallel::MPM::Prefork:
+    file: lib/Parallel/MPM/Prefork.pm
+    version: 0.14
+requires:
+  perl: 5.010
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.14

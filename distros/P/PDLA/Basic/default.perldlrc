@@ -1,0 +1,39 @@
+
+# default.perldlrc
+
+# Default startup for perldl shell.
+# Note: any $HOME/.perldlrc file overrides this
+
+use PDLA;
+use PDLA::Dbg;                 # Enable useful commands
+use PDLA::Constants qw(PI E);  # add PI and E constants
+#use PDLA::Lite; # Alternative to above for hard-core freaks
+
+# These are some PDLA::Core parameters that you may wish
+# to set in an interactive PDLA session:
+#
+#   $PDLA::debug          When true, PDLA debugging information is printed.
+#   $PDLA::verbose        When true, PDLA functions provide chatty information.
+#   $PDLA::use_commas     Whether to insert commas when printing pdls
+#   $PDLA::floatformat    The default print format for floats
+#   $PDLA::doubleformat   The default print format for doubles
+#   $PDLA::undefval       The value to use instead of "undef" when creating pdls.
+#   $PDLA::toolongtoprint The maximal size pdls to print (defaults to 10000 elements)
+
+# PDLA waffle options (and pacify -w)
+BEGIN{
+   $PDLA::debug = $PDLA::debug = 0;
+   $PDLA::verbose = $PDLA::verbose = 1;
+   $PDLA::toolongtoprint = $PDLA::toolongtoprint = 10000;
+   $PDLA::IO::FlexRaw::writeflexhdr = 1;
+}
+
+if ( $PERLDL::TERM->ReadLine() =~ /::Perl$/ ) {
+   if ( defined $readline::rl_MaxHistorySize ) {
+      $readline::rl_MaxHistorySize = $PERLDL::HISTFILESIZE if defined $PERLDL::HISTFILESIZE;
+   }
+}
+
+use PDLA::Doc::Perldl; # online docs module
+
+1;

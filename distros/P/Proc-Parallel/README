@@ -1,0 +1,12 @@
+
+
+This distribution has multiple perl modules:
+
+	Proc::Parallel	- execute multiple jobs in parallel
+	RCP::ToWorker	- ssh to a host and run perl code
+
+It also has commands:
+
+	do.hosts	- run the same command in parallel
+	rkill		- kill remote processes
+

@@ -1,0 +1,40 @@
+{
+   "abstract" : "converts to warns to log messages",
+   "author" : [
+      "Geoffrey Darling <geoffreydarling@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-LogWarn",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack" : "0.9979",
+            "Test::Deep" : "0.108",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gedarling/Plack-Middleware-LogWarn.git",
+         "web" : "http://github.com/gedarling/Plack-Middleware-LogWarn"
+      }
+   },
+   "version" : "0.001002"
+}
+

@@ -1,0 +1,82 @@
+Revision history for Perl extension Tk::Peapod.
+
+0.01  Thu Mar 13 22:40:57 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n Tk::Peapod
+	- this is a non-working version.
+	- can view minimal POD documents,
+	- no new functionality added yet.
+
+0.02	- links are blue and cause mouse pointer to change to an arrow.
+	- clicking an internal link actually goes to that part of document.
+
+0.04	- Generate Table of Contents based on =head1, etc headers
+	-	make TOC have subparagraphs, such as 3.2.4 and similar
+	- Insert TOC numbers in POD view so a printout of TOC and POD
+	-	would actually be something semi-useful.
+	- Redesign widget as a composite widget of 2 ROText in a frame
+	-	separated by an Adjuster widget.
+	- Left ROText will eventually hold TOC
+	- Right TOText holds POD viewer.
+	- saving now because finally got the composite widget to work right.
+	-	it wasn't easy, and it'll probably get massaged in future.
+
+0.05	- change absolute font size tag name (12 14 16 18) to a 
+	- relative font size tag name (0 1 2 3)
+	- will be able to keep all tags in place and simply change
+	- the actual font size associated with it to change complete
+	- viewing of POD.
+	- added a binding in TOC so that clicking on an entry in TOC
+	- takes you to that entry in the POD.
+
+0.06	- rearrange relative font sizes to match headN numbers
+	- font '1' corresponds with =head1, which makes it the largest font.
+	- catch errors when clicking on a link to a non-existent marker.
+
+0.07	- Fixed a problem getting text between markers. 
+	- Was dropping the last character, which made links difficult...
+	- start differentiating between link to internal section and external POD
+
+0.40	- total rewrite in progress.
+	- took pieces from Peapod.pm that I liked and placed them in a 
+	- 	new class called Pod::Peapod::Base
+	- cleaned it up and polished it off.
+	- base class is now ready for derived classes.
+	- will want to rewrite Peapod.pm to use this base class.
+	- should also be able to use Base.pm to handle POD to text
+	-	and even pod to postscript (would like to do
+	- 	postscript so that large POD files can be printed
+	-	with page numbers and varying font sizes, etc.)
+	- Started a Pod::Peapod::Text class which uses Base.pm
+	-	and does a POD to text conversion with very little code.
+
+0.41	- The base class is now Pod::Peapod. All derived classes will be under
+	- Pod::Peapod, such as Pod::Peapod::Text which is a simple POD
+	- to text converter (in progress).
+	- Cleaned up Pod::Peapod so that there is a distinction between 
+	- the following methods: Output (Toc/Pod) (Text/NewLine).
+	- Had to be a little more intelligent about handling headers.
+	- =head This contains I<italics> in its text
+	- The header above would get hosed because I<> was a new element
+	- and it wouldn't see it as a header anymore, but then 'in its text'
+	- was back to being a header again. So basically, 'italics'
+	- would get dropped from a header.
+	- Tkpeapod has been polished off. scrollers are created for each
+	- Text widget so you can scroll Toc and Pod independently.
+	- Running the Tk pod viewer on Tk::Text.pm's POD looks like a 
+	- its getting there.
+	-
+	- need to get indenting and links working on Tk viewer.
+	- also, double check that font for code is right.
+
+0.42	- code uses correct font.
+	- fix bullets and indents for bullet subparagraphs.
+	- handle left margin more accurately.
+	- the POD to text converter has been improved.
+	-	bullets, indents, and line spacing
+	- the Tkpeapod has been improved.
+	-	bullets and indents.
+	- Visually, the sample.pod looks good.
+	-
+	- still need to get links working.
+

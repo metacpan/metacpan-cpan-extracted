@@ -1,0 +1,34 @@
+---
+abstract: 'The Perl Code Metrics System'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  Test::More: 0.47
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Perl::Metrics
+name: Perl-Metrics
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::DBI: 3.0.9
+  Class::Inspector: 1.12
+  DBD::SQLite: 1.08
+  DBI: 1.143
+  File::Find::Rule: 0.20
+  File::Find::Rule::Perl: 1.04
+  File::Spec: 0.80
+  List::Util: 1.15
+  Module::Pluggable: 2.2
+  PPI: 1.201
+  Params::Util: 0.10
+  perl: 5.00503
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.09

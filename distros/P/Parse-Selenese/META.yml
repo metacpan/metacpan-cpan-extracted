@@ -1,0 +1,73 @@
+---
+abstract: 'Parser for Selenese'
+author:
+  - 'Theodore Robert Campbell Jr <trcjr@cpan.org>'
+build_requires:
+  Algorithm::Diff: 0
+  Data::Dumper: 0
+  File::Find: 0
+  File::Spec: 0
+  FindBin: 0
+  Path::Class: 0
+  Test::Class::Load: 0
+  Test::Class::Most: 0
+  Test::Differences: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::Most: 0
+  Test::WWW::Selenium: 0
+  Time::HiRes: 0
+  YAML: 0
+  strict: 0
+  utf8: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-Selenese
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Parse::Selenese:
+    file: lib/Parse/Selenese.pm
+    version: 0.006
+  Parse::Selenese::Command:
+    file: lib/Parse/Selenese/Command.pm
+    version: 0.006
+  Parse::Selenese::TestCase:
+    file: lib/Parse/Selenese/TestCase.pm
+    version: 0.006
+  Parse::Selenese::TestSuite:
+    file: lib/Parse/Selenese/TestSuite.pm
+    version: 0.006
+requires:
+  Carp: 0
+  Cwd: 0
+  Encode: 0
+  File::Basename: 0
+  File::Temp: 0
+  HTML::Element: 0
+  HTML::TreeBuilder: 0
+  Moose: 0
+  MooseX::AttributeShortcuts: 0
+  Template: 0
+  Text::MicroTemplate: 0
+  Try::Tiny: 0
+  open: 0
+  perl: 5.008
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Parse-Selenese
+  homepage: http://github.com/trcjr/Parse-Selenese
+  repository: http://github.com/trcjr/Parse-Selenese
+version: 0.006

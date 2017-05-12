@@ -1,0 +1,17 @@
+build\.pl
+blib/.*
+\b\.gitignore$
+\.git/.*
+Makefile$
+pm_to_blib
+MYMETA..*
+.*\.bak
+^Parse-Diagnostics-[0-9\.]+/$
+^Parse-Diagnostics-[0-9\.]+\.tar\.gz$
+^timesheet.txt$
+# Template for building pod file.
+^lib/Parse/Diagnostics.pod.tmpl$
+# Don't include the script which makes the POD
+^make-pod.pl$
+# Don't include example outputs
+^examples/*-out.txt$

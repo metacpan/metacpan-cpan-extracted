@@ -1,0 +1,20 @@
+Revision history for Perl extension Plack::Middleware::RequestHeaders
+
+0.05      2013-10-25
+    - Update POD
+    - Update dzil setup
+
+0.04      2013-10-21
+    - Update dzil setup
+
+0.031     2012-05-26 17:48:51 Europe/Vienna
+    - Fix previous buggy release. No code changes.
+0.03      2012-05-26 17:08:06 Europe/Vienna
+    - Fix build_req_header_key method
+      CONTENT_(LENGTH|TYPE) are exceptions for the HTTP header keys
+    - Create accessors using Plack::Util::Accessor
+    - Use Dist::Zilla
+0.02 2012-01-14
+    - Minor doc fix
+0.01 2012-01-14
+    - Initial release

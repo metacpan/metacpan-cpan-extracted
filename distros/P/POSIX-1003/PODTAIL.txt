@@ -1,0 +1,13 @@
+=head1 SEE ALSO
+
+This module is part of $project distribution version $version,
+built on $today.$web.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights $year on the perl code and the related documentation
+$author.$contrib
+
+$lictext

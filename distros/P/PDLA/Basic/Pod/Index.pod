@@ -1,0 +1,615 @@
+
+=head1 NAME
+
+PDLA::Index - an index of PDLA documentation
+
+=head1 DESCRIPTION
+
+A meta document listing the documented PDLA modules and
+the PDLA manual documents
+
+=head1 PDLA manuals
+
+=over 4
+
+=item *
+
+L<PDLA::API|PDLA::API> - making piddles from Perl and C/XS code
+
+=item *
+
+L<PDLA::BadValues|PDLA::BadValues> - Discussion of bad value support in PDLA
+
+=item *
+
+L<PDLA::Course|PDLA::Course> - A journey through PDLA's documentation, from beginner to advanced.
+
+=item *
+
+L<PDLA::Dataflow|PDLA::Dataflow> - description of the dataflow philosophy
+
+=item *
+
+L<PDLA::Delta|PDLA::Delta> - PDLA changes between V1.0 and V2.0
+
+=item *
+
+L<PDLA::FAQ|PDLA::FAQ> - Frequently asked questions about PDLA
+
+=item *
+
+L<PDLA::IO|PDLA::IO> - An overview of the modules in the PDLA::IO namespace.
+
+=item *
+
+L<PDLA::Indexing|PDLA::Indexing> - Introduction to indexing and slicing piddles.
+
+=item *
+
+L<PDLA::Internals|PDLA::Internals> - description of some aspects of the current internals
+
+=item *
+
+L<PDLA::MATLAB|PDLA::MATLAB> - A guide for MATLAB users.
+
+=item *
+
+L<PDLA::Modules|PDLA::Modules> - A guide to PDLA's module reference.
+
+=item *
+
+L<PDLA::Objects|PDLA::Objects> - Object-Orientation, what is it and how to exploit it
+
+=item *
+
+L<PDLA::PP|PDLA::PP> - Generate PDLA routines from concise descriptions
+
+=item *
+
+L<PDLA::ParallelCPU|PDLA::ParallelCPU> - Parallel Processor MultiThreading Support in PDLA (Experimental)
+
+=item *
+
+L<PDLA::Philosophy|PDLA::Philosophy> - Why did we write PDLA?
+
+=item *
+
+L<PDLA::QuickStart|PDLA::QuickStart> - Quick introduction to PDLA features.
+
+=item *
+
+L<PDLA::Scilab|PDLA::Scilab> - A guide for Scilab users.
+
+=item *
+
+L<PDLA::Threading|PDLA::Threading> - Tutorial for PDLA's Threading feature
+
+=item *
+
+L<PDLA::Tips|PDLA::Tips> - Small tidbits of useful arcana. Programming tidbits and such.
+
+=item *
+
+L<PDLA::Tutorials|PDLA::Tutorials> - A guide to PDLA's tutorial documentation.
+
+
+=back
+
+=head1 PDLA scripts
+
+=over 4
+
+=item *
+
+L<pdl2|PDLA::pdl2> - Simple shell (version 2) for PDLA
+
+=item *
+
+L<pdldoc|PDLA::pdldoc> - shell interface to PDLA documentation
+
+=item *
+
+L<perldl|PDLA::perldl> - Simple shell for PDLA (see also L<pdl2>)
+
+=item *
+
+L<pptemplate|PDLA::pptemplate> - script to generate Makefile.PL and PP file skeleton
+
+
+=back
+
+=head1 PDLA modules
+
+=over 4
+
+=item *
+
+L<PDLA::PDLA|PDLA::PDLA> - the Perl Data Language
+
+=item *
+
+L<PDLA::AutoLoader|PDLA::AutoLoader> - MatLab style AutoLoader for PDLA
+
+=item *
+
+L<PDLA::Bad|PDLA::Bad> - PDLA does process bad values
+
+=item *
+
+L<PDLA::Basic|PDLA::Basic> - Basic utility functions for PDLA
+
+=item *
+
+L<PDLA::CallExt|PDLA::CallExt> - call functions in external shared libraries
+
+=item *
+
+L<PDLA::Char|PDLA::Char> - PDLA subclass which allows reading and writing of fixed-length character strings as byte PDLAs
+
+=item *
+
+L<PDLA::Complex|PDLA::Complex> - handle complex numbers
+
+=item *
+
+L<PDLA::Compression|PDLA::Compression> - compression utilities
+
+=item *
+
+L<PDLA::Constants|PDLA::Constants> - basic compile time constants for PDLA
+
+=item *
+
+L<PDLA::Core|PDLA::Core> - fundamental PDLA functionality and vectorization/threading
+
+=item *
+
+L<PDLA::Core::Dev|PDLA::Core::Dev> - PDLA development module
+
+=item *
+
+L<PDLA::Dbg|PDLA::Dbg> - functions to support debugging of PDLA scripts
+
+=item *
+
+L<PDLA::DiskCache|PDLA::DiskCache> - Non-memory-resident array object
+
+=item *
+
+L<PDLA::Doc|PDLA::Doc> - support for PDLA online documentation
+
+=item *
+
+L<PDLA::Doc::Perldl|PDLA::Doc::Perldl> - commands for accessing PDLA doc database from 'perldl' shell
+
+=item *
+
+L<PDLA::Exporter|PDLA::Exporter> - PDLA export control
+
+=item *
+
+L<PDLA::FFT|PDLA::FFT> - FFTs for PDLA
+
+=item *
+
+L<PDLA::FFTW|PDLA::FFTW> - PDLA interface to the Fastest Fourier Transform in the West v2.x
+
+=item *
+
+L<PDLA::Filter::LinPred|PDLA::Filter::LinPred> - Linear predictive filtering
+
+=item *
+
+L<PDLA::Filter::Linear|PDLA::Filter::Linear> - linear filtering for PDLA
+
+=item *
+
+L<PDLA::Fit::Gaussian|PDLA::Fit::Gaussian> - routines for fitting gaussians
+
+=item *
+
+L<PDLA::Fit::LM|PDLA::Fit::LM> - Levenberg-Marquardt fitting routine for PDLA
+
+=item *
+
+L<PDLA::Fit::Linfit|PDLA::Fit::Linfit> - routines for fitting data with linear combinations of functions.
+
+=item *
+
+L<PDLA::Fit::Polynomial|PDLA::Fit::Polynomial> - routines for fitting with polynomials
+
+=item *
+
+L<PDLA::Func|PDLA::Func> - interpolation, integration, & gradient estimation (differentiation) of functions
+
+=item *
+
+L<PDLA::GIS::Proj|PDLA::GIS::Proj> - PDLA interface to the Proj4 projection library.
+
+=item *
+
+L<PDLA::GSL::DIFF|PDLA::GSL::DIFF> - PDLA interface to numerical differentiation routines in GSL
+
+=item *
+
+L<PDLA::GSL::INTEG|PDLA::GSL::INTEG> - PDLA interface to numerical integration routines in GSL
+
+=item *
+
+L<PDLA::GSL::INTERP|PDLA::GSL::INTERP> - PDLA interface to Interpolation routines in GSL
+
+=item *
+
+L<PDLA::GSL::MROOT|PDLA::GSL::MROOT> - PDLA interface to multidimensional root-finding routines in GSL
+
+=item *
+
+L<PDLA::GSL::RNG|PDLA::GSL::RNG> - PDLA interface to RNG and randist routines in GSL
+
+=item *
+
+L<PDLA::GSLSF::AIRY|PDLA::GSLSF::AIRY> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::BESSEL|PDLA::GSLSF::BESSEL> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::CLAUSEN|PDLA::GSLSF::CLAUSEN> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::COULOMB|PDLA::GSLSF::COULOMB> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::COUPLING|PDLA::GSLSF::COUPLING> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::DAWSON|PDLA::GSLSF::DAWSON> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::DEBYE|PDLA::GSLSF::DEBYE> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::DILOG|PDLA::GSLSF::DILOG> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::ELEMENTARY|PDLA::GSLSF::ELEMENTARY> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::ELLINT|PDLA::GSLSF::ELLINT> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::ELLJAC|PDLA::GSLSF::ELLJAC> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::ERF|PDLA::GSLSF::ERF> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::EXP|PDLA::GSLSF::EXP> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::EXPINT|PDLA::GSLSF::EXPINT> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::FERMI_DIRAC|PDLA::GSLSF::FERMI_DIRAC> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::GAMMA|PDLA::GSLSF::GAMMA> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::GEGENBAUER|PDLA::GSLSF::GEGENBAUER> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::HYPERG|PDLA::GSLSF::HYPERG> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::LAGUERRE|PDLA::GSLSF::LAGUERRE> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::LEGENDRE|PDLA::GSLSF::LEGENDRE> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::LOG|PDLA::GSLSF::LOG> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::POLY|PDLA::GSLSF::POLY> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::POW_INT|PDLA::GSLSF::POW_INT> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::PSI|PDLA::GSLSF::PSI> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::SYNCHROTRON|PDLA::GSLSF::SYNCHROTRON> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::TRANSPORT|PDLA::GSLSF::TRANSPORT> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::TRIG|PDLA::GSLSF::TRIG> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::GSLSF::ZETA|PDLA::GSLSF::ZETA> - PDLA interface to GSL Special Functions
+
+=item *
+
+L<PDLA::Gaussian|PDLA::Gaussian> - Gaussian distributions.
+
+=item *
+
+L<PDLA::Graphics2D|PDLA::Graphics2D> - An object oriented interface to PDLA graphics
+
+=item *
+
+L<PDLA::Graphics::IIS|PDLA::Graphics::IIS> - Display PDLA images on IIS devices (saoimage/ximtool)
+
+=item *
+
+L<PDLA::Graphics::LUT|PDLA::Graphics::LUT> - provides access to a number of look-up tables
+
+=item *
+
+L<PDLA::Graphics::Limits|PDLA::Graphics::Limits> - derive limits for display purposes
+
+=item *
+
+L<PDLA::Graphics::OpenGL::Perl::OpenGL|PDLA::Graphics::OpenGL::Perl::OpenGL> - PDLA TriD OpenGL interface using POGL
+
+=item *
+
+L<PDLA::Graphics::OpenGLQ|PDLA::Graphics::OpenGLQ> - quick routines to plot lots of stuff from piddles.
+
+=item *
+
+L<PDLA::Graphics::PGPLOT|PDLA::Graphics::PGPLOT> - PGPLOT enhanced interface for PDLA
+
+=item *
+
+L<PDLA::Graphics::PGPLOT::Window|PDLA::Graphics::PGPLOT::Window> - A OO interface to PGPLOT windows
+
+=item *
+
+L<PDLA::Graphics::PGPLOTOptions|PDLA::Graphics::PGPLOTOptions> - Setting PGPLOT options
+
+=item *
+
+L<PDLA::Graphics::PLplot|PDLA::Graphics::PLplot> - Object-oriented interface from perl/PDLA to the PLPLOT plotting library
+
+=item *
+
+L<PDLA::Graphics::TriD|PDLA::Graphics::TriD> - PDLA 3D interface
+
+=item *
+
+L<PDLA::Graphics::TriD::ButtonControl|PDLA::Graphics::TriD::ButtonControl> - default event handler subroutines
+
+=item *
+
+L<PDLA::Graphics::TriD::Contours|PDLA::Graphics::TriD::Contours> - 3D Surface contours for TriD
+
+=item *
+
+L<PDLA::Graphics::TriD::Labels|PDLA::Graphics::TriD::Labels> - Text tools
+
+=item *
+
+L<PDLA::Graphics::TriD::MathGraph|PDLA::Graphics::TriD::MathGraph> - Mathematical Graph objects for PDLA
+
+=item *
+
+L<PDLA::Graphics::TriD::Objects|PDLA::Graphics::TriD::Objects> - Simple Graph Objects for TriD
+
+=item *
+
+L<PDLA::Graphics::TriD::Rout|PDLA::Graphics::TriD::Rout> - Helper routines for Three-dimensional graphics
+
+=item *
+
+L<PDLA::Graphics::TriD::Tk|PDLA::Graphics::TriD::Tk> - A Tk widget interface to the PDLA::Graphics::TriD.
+
+=item *
+
+L<PDLA::Graphics::TriD::VRML|PDLA::Graphics::TriD::VRML> - TriD VRML backend
+
+=item *
+
+L<PDLA::IO::Dicom|PDLA::IO::Dicom> - a module for reading DICOM images.
+
+=item *
+
+L<PDLA::IO::Dumper|PDLA::IO::Dumper> - data dumping for structs with PDLAs
+
+=item *
+
+L<PDLA::IO::FITS|PDLA::IO::FITS> - Simple FITS support for PDLA
+
+=item *
+
+L<PDLA::IO::FastRaw|PDLA::IO::FastRaw> - A simple, fast and convenient io format for PerlDL.
+
+=item *
+
+L<PDLA::IO::FlexRaw|PDLA::IO::FlexRaw> - A flexible binary I/O format for PerlDL
+
+=item *
+
+L<PDLA::IO::GD|PDLA::IO::GD> - Interface to the GD image library.
+
+=item *
+
+L<PDLA::IO::HDF|PDLA::IO::HDF> - An interface library for HDF4 files.
+
+=item *
+
+L<PDLA::IO::HDF::SD|PDLA::IO::HDF::SD> - PDLA interface to the HDF4 SD library.
+
+=item *
+
+L<PDLA::IO::IDL|PDLA::IO::IDL> - I/O of IDL Save Files
+
+=item *
+
+L<PDLA::IO::Misc|PDLA::IO::Misc> - misc IO routines for PDLA
+
+=item *
+
+L<PDLA::IO::Pic|PDLA::IO::Pic> - image I/O for PDLA
+
+=item *
+
+L<PDLA::IO::Pnm|PDLA::IO::Pnm> - pnm format I/O for PDLA
+
+=item *
+
+L<PDLA::IO::Storable|PDLA::IO::Storable> - helper functions to make PDLA usable with Storable
+
+=item *
+
+L<PDLA::Image2D|PDLA::Image2D> - Miscellaneous 2D image processing functions
+
+=item *
+
+L<PDLA::ImageND|PDLA::ImageND> - useful image processing in N dimensions
+
+=item *
+
+L<PDLA::ImageRGB|PDLA::ImageRGB> - some utility functions for RGB image data handling
+
+=item *
+
+L<PDLA::Lite|PDLA::Lite> - minimum PDLA module OO loader
+
+=item *
+
+L<PDLA::LiteF|PDLA::LiteF> - minimum PDLA module function loader
+
+=item *
+
+L<PDLA::Lvalue|PDLA::Lvalue> - declare PDLA lvalue subs
+
+=item *
+
+L<PDLA::Math|PDLA::Math> - extended mathematical operations and special functions
+
+=item *
+
+L<PDLA::Matrix|PDLA::Matrix> - a convenience matrix class for column-major access
+
+=item *
+
+L<PDLA::MatrixOps|PDLA::MatrixOps> - Some Useful Matrix Operations
+
+=item *
+
+L<PDLA::Minuit|PDLA::Minuit> - a PDLA interface to the Minuit library
+
+=item *
+
+L<PDLA::NiceSlice|PDLA::NiceSlice> - toward a nicer slicing syntax for PDLA
+
+=item *
+
+L<PDLA::Ops|PDLA::Ops> - Fundamental mathematical operators
+
+=item *
+
+L<PDLA::Opt::Simplex|PDLA::Opt::Simplex> - Simplex optimization routines
+
+=item *
+
+L<PDLA::Options|PDLA::Options> - simplifies option passing by hash in PerlDL
+
+=item *
+
+L<PDLA::Perldl2::Plugin::CleanErrors|PDLA::Perldl2::Plugin::CleanErrors> - filter out Moose cruft
+
+=item *
+
+L<PDLA::Perldl2::Plugin::NiceSlice|PDLA::Perldl2::Plugin::NiceSlice> - enable PDLA NiceSlice syntax
+
+=item *
+
+L<PDLA::Perldl2::Plugin::PDLACommands|PDLA::Perldl2::Plugin::PDLACommands> - implement perldl aliases/escapes
+
+=item *
+
+L<PDLA::Perldl2::Plugin::PrintControl|PDLA::Perldl2::Plugin::PrintControl> - disable default print output
+
+=item *
+
+L<PDLA::Perldl2::Profile::Perldl2|PDLA::Perldl2::Profile::Perldl2> - profile for Perldl2 shell
+
+=item *
+
+L<PDLA::Primitive|PDLA::Primitive> - primitive operations for pdl
+
+=item *
+
+L<PDLA::Reduce|PDLA::Reduce> - a C<reduce> function for PDLA
+
+=item *
+
+L<PDLA::Slatec|PDLA::Slatec> - PDLA interface to the slatec numerical programming library
+
+=item *
+
+L<PDLA::Slices|PDLA::Slices> - Indexing, slicing, and dicing
+
+=item *
+
+L<PDLA::Tests|PDLA::Tests> - tests for some PP features
+
+=item *
+
+L<PDLA::Transform|PDLA::Transform> - Coordinate transforms, image warping, and N-D functions
+
+=item *
+
+L<PDLA::Transform::Cartography|PDLA::Transform::Cartography> - Useful cartographic projections
+
+=item *
+
+L<PDLA::Transform::Proj4|PDLA::Transform::Proj4> - PDLA::Transform interface to the Proj4 projection library
+
+=item *
+
+L<PDLA::Types|PDLA::Types> - define fundamental PDLA Datatypes
+
+=item *
+
+L<PDLA::Ufunc|PDLA::Ufunc> - primitive ufunc operations for pdl
+
+
+=back
+
+=head1 HISTORY
+
+Automatically generated by scantree.pl for PDLA version 2.004_995.
+

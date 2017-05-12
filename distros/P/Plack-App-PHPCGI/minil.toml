@@ -1,0 +1,4 @@
+name = "Plack-App-PHPCGI"
+badges = ["travis"]
+requires_external_bin = ["php-cgi"]
+

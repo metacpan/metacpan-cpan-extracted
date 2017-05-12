@@ -1,0 +1,20 @@
+Revision history for POE-Component-Client-Feed
+
+0.901     2011-02-15 06:52:04 Europe/Berlin
+	- Small tuning of attributes
+
+0.900     2011-02-15 06:34:50 Europe/Berlin
+	- Added logger docking capability
+
+0.005     2010-11-08 22:19:53 Europe/Berlin
+	- Fixed tests (BinGOs++, kentnl++) 
+
+0.004     2010-11-06 20:49:28 Europe/Berlin
+
+0.003     2010-11-06 18:54:59 Europe/Berlin
+
+0.002     2010-11-06 05:14:43 Europe/Berlin
+	- Now adding proper version (cjm++)
+
+0.001     2010-11-06 04:29:41 Europe/Berlin
+	- Initial release

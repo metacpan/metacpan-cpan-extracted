@@ -1,0 +1,5 @@
+abstract class PlantUML::ClassDiagram::AbstractFactory {
+  {abstract} create()
+  _check_is_method()
+  _check_is_variable()
+}

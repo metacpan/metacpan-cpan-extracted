@@ -1,0 +1,52 @@
+{
+   "abstract" : "Add cropmarks to existing PDFs",
+   "author" : [
+      "Marco Pessotto <melmothx@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDF-Cropmarks",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "PDF::API2" : "2.027",
+            "Type::Tiny" : "1",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://amusewiki.org",
+      "repository" : {
+         "url" : "https://github.com/melmothx/pdf-cropmarks-perl"
+      },
+      "x_IRC" : "irc://chat.freenode.net/#amusewiki",
+      "x_WebIRC" : "https://webchat.freenode.net/?channels=#amusewiki"
+   },
+   "version" : "0.11"
+}

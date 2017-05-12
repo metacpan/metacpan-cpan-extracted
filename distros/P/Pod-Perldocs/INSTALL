@@ -1,0 +1,5 @@
+Installation follows the standard
+   perl Makefile.PL
+   make
+   make install
+

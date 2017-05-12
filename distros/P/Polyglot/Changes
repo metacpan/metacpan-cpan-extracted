@@ -1,0 +1,31 @@
+Revision history for Perl module Polyglot
+
+1.002 2017-01-07T21:16:13Z
+	* Remove prereq test because the nature of Test::Prereq has 
+	changed to something that can happen by static analysis.
+
+1.001 2016-02-03T02:02:12Z
+	* Freshen distro, update GitHub details
+
+0.14 - 2008-01-18
+	* Distro cleanups. No big whoop.
+
+0.13 - 2007-01-09
+	* updated copyright and license info
+	* no code changes, so no need to upgrade
+
+0.12 - 2006-06-08
+	* distro cleanups. No need to upgrade.
+
+0.11 - 2005-03-11
+	* Added POD coverage tests, fixed issues
+	* No code changes: no need to upgrade
+
+0.10 - 2004-09-15
+	* cleaned up the distro: no need to upgrade
+
+0.07 - 2003-01-20
+	* first release of my toy little language interpreter
+	* this is not even Alpha software, and lots of things are
+	going to change, but it is a fun little project.
+

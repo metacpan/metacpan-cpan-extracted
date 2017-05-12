@@ -1,0 +1,6 @@
+MANIFEST.bak
+Makefile(.old)?$
+^\.git
+debian
+blib
+pm_to_blib

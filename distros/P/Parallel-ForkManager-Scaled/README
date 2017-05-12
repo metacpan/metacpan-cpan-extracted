@@ -1,0 +1,321 @@
+NAME
+
+    Parallel::ForkManager::Scaled - Run processes in parallel based on CPU
+    usage
+
+VERSION
+
+    Version 0.17
+
+SYNOPSIS
+
+        use Parallel::ForkManager::Scaled;
+    
+        # my $pm = Parallel::ForkManager::Scaled->new( attrib => value, ... );
+        my $pm = Parallel::ForkManager::Scaled->new;
+    
+        # Used just like Parallel::ForkManager, so I'll paraphrase its documentation
+    
+        for my $data (@all_data) {
+            # $pid is set to the child process' PID
+            my $pid = $pm->start and next;
+    
+            # In the child process now
+            # do some work ..
+    
+            # Exit the child
+            $pm->finish; 
+        }
+
+DESCRIPTION
+
+    This module inherits from Parallel::ForkManager and adds the ability to
+    automatically manage the number of processes running based on how busy
+    the system is by watching the CPU idle time. Each time a child is about
+    to be start()ed a new value for max_procs may be calculated (if enough
+    time has passed since the last calculation). If a new value is
+    calculated, the number of processes to run will be adjusted by calling
+    set_max_procs with the new value.
+
+    Without specifying any attributes to the constructor, some defaults
+    will be set for you (see Attributes below).
+
+ Attributes
+
+    Attributes are just methods that may be passed to the constructor
+    (new()) and most may be changed during the life of the returned object.
+    They take as a parameter a new value to set for the attribute and
+    return the current value (or new value if one was passed).
+
+    hard_min_procs
+
+      The number of running processes will never be adjusted lower than
+      this value.
+
+      default: 1
+
+    hard_max_procs
+
+      The number of running processes will never be adjusted higher than
+      this value.
+
+      default: The detected number of CPUs * 2
+
+    soft_min_procs
+
+    soft_max_procs
+
+      This is initially set to hard_min_procs and hard_max_procs
+      respectively and is adjusted over time. These are used when
+      calculating adjustments as the minimum and maximum number of
+      processes respectively.
+
+      Over time soft_min_procs and soft_max_procs should approach the same
+      value for a consistent workload and a machine not otherwise busy.
+
+      Depending on the needs of the system, these values may also diverge
+      if necessary to try to reach idle_target.
+
+      You may adjust these values if you wish by passing a value to the
+      method but you probably shouldn't. :)
+
+    initial_procs (read-only)
+
+      The number of processes to start running before attempting any
+      adjustments, max_procs will be set to this value upon initialization.
+
+      default: half way between soft_min_procs and soft_max_procs
+
+    update_frequency
+
+      The minimum amount of time, in seconds, that must elapse between
+      checks of the system CPU's idle % and updates to the number of
+      running processes.
+
+      Set this to 0 to cause a check before each call to start().
+
+      Before each call to start() the time is compared with the last time a
+      check/update was performed. If this much time has passed, a new check
+      will be made of how busy the CPU is and the number of processes may
+      be adjusted.
+
+      default: 1
+
+    idle_target
+
+      Percentage of CPU idle time to try to maintain by adjusting the
+      number of running processes between hard_min_procs and hard_max_procs
+
+      default: 0 # try to keep the CPU 100% busy (0% idle)
+
+    idle_threshold
+
+      Only make adjustments if the current CPU idle % is this distance away
+      from idle_target. In other words, only adjust if abs(cur_idle -
+      idle_target) > idle_threshold. This may be a fractional value
+      (floating point).
+
+      You may notce that the default idle_target of 0 and idle_threshold of
+      1 would seem to indicate that the processes would never be adjusted
+      as idle can never be less than 0%. At the limits, the threshold is
+      adjusted so that we will still attempt adjustments, something like
+      this:
+
+          min_ok = max(0,   idle_target - idle_threshold)
+          max_ok = min(100, idle_target - idle_threshold)
+      
+          adjust if idle >= max_ok
+          adjust if idle <= min_ok
+
+      default: 1
+
+    run_on_update
+
+      This is a callback function that is run immediately after (possibly)
+      adjusting max_procs. This allows you to override the default behavior
+      of this module for your own nefarious purposes.
+
+      run_on_update expects a coderef which will be called with two
+      parameters:
+
+	* The object being adjusted. ($obj)
+
+	* The old value for $obj->max_procs. If you decide you have a
+	better idea of what max_procs should be, in your callback just set
+	it via $obj->set_max_procs($new_value).
+
+      The return value from the callback is ignored.
+
+      Example:
+
+        $pm->run_on_update( sub{
+            my ($obj, $old_max_procs) = @_;
+            $obj->set_max_procs($old_max_procs+1);
+        });
+
+    tempdir
+
+      This is passed to the Parallel::ForkManager constructor to set
+      tempdir. Where Parallel::ForkManager is constructed thusly:
+
+        my $pm = Parallel::ForkManager->new($procs, $tempdir);
+
+      The equivalent for this module would be:
+
+        my $pm = Parallel::ForkManager::Scaled->new(initial_procs => $procs, tempdir => $tempdir);
+
+ Methods
+
+    All methods inherited from Parallel::ForkManager plus the following:
+
+    dump_stats
+
+      Print the string returned by stats to STDERR. This may be used as a
+      callback with run_on_update to see diagnostics as processes are run:
+
+        $pm->run_on_update(\&Parallel::ForkManager::Scaled::dump_stats)
+
+    last_update
+
+      Returns the last time() stats were updated via update_stats_pct.
+
+    idle
+
+      Returns the system's idle percentage as of last_update.
+
+      Note that it's possible for idle to be NaN if not enough time has
+      elapsed between the when the object was built and the most recent
+      call to update_stats_pct. Once enough time has elapsed for an idle %
+      to be calculated, idle will never contain an NaN value.
+
+    ncpus
+
+      The number of CPUs detected on the system, this is just a wrapper to
+      the cpus function from Unix::Statgrab.
+
+    set_max_procs
+
+      This method overrides set_max_procs from Parallel::ForkManager and
+      automatically constrains the new value to be within soft_min_procs
+      and soft_max_procs inclusive.
+
+    stats
+
+      Returns a formatted string with information about the current status.
+      Takes a single parameter, the old value for max_procs. If no
+      parameter is passed, the vlaue max_procs will be used.
+
+  Method(s) you probably don't need to use
+
+    These are not meant for general consumption but are available anyway.
+    Probably best to avoid them :)
+
+    update_stats_pct
+
+      This method will attempt to update CPU stats (idle, etc). It is
+      automatically called before each child process is start()ed if at
+      least update_frequency seconds has elapsed since the last call.
+
+      If not enough time has elapsed since the last call to
+      update_stats_pct it's possible to get NaN for the new idle stat. In
+      this case no updates will be made.
+
+      If idle is updated, last_update will also be updated with the time.
+
+EXAMPLES
+
+    These examples are also provided in the examples/ directory of this
+    distribution.
+
+ Maximize CPU usage
+
+    see: examples/prun.pl
+
+    Run shell commands that are passed into the program and try to keep the
+    CPU busy, i.e. 0% idle
+
+        use Parallel::ForkManager::Scaled;
+    
+        my $pm = Parallel::ForkManager::Scaled->new(
+            run_on_update => \&Parallel::ForkManager::Scaled::dump_stats
+        );
+        
+        # just to be sure we can saturate the CPU
+        $pm->hard_max_procs($pm->ncpus * 4);
+    
+        $pm->set_waitpid_blocking_sleep(0);
+    
+        while (<>) {
+            chomp;
+            $pm->start and next;
+    
+            # In the child now, run the shell process
+            system $_;
+            $pm->finish;
+        }
+
+ Dummy Load
+
+    see: examples/dummy_load.pl
+
+    This example provides a way to test the capabilities of this module.
+    Try changing the idle_target and other settings to see the effect.
+
+        use Parallel::ForkManager::Scaled;
+    
+        my $pm = Parallel::ForkManager::Scaled->new(
+            run_on_update => \&Parallel::ForkManager::Scaled::dump_stats,
+            idle_target => 50,
+        );
+    
+        $pm->set_waitpid_blocking_sleep(0);
+    
+        for my $i (0..1000) {
+            $pm->start and next;
+    
+            my $start = time;
+            srand($$);
+            my $lifespan = 5+int(rand(10));
+    
+            # Keep the CPU busy until it's time to exit
+            while (time - $start < $lifespan) { 
+                my $a = time; 
+                my $b = $a^time/3;
+            }
+    
+            $pm->finish;
+        }
+
+NOTES
+
+    Currently this module only works on systems where Unix::Statgrab is
+    available, which is probably any system where the libstatgrab library
+    can compile.
+
+AUTHOR
+
+    Jason McCarver <slam@parasite.cc>
+
+SEE ALSO
+
+    Parallel::ForkManager
+
+    Unix::Statgrab
+
+REPOSITORY
+
+    The mercurial repository for this module may be found here:
+
+      https://bitbucket.org/jmccarv/parallel-forkmanager-scaled
+
+    You can clone it with
+
+      hg clone https://bitbucket.org/jmccarv/parallel-forkmanager-scaled
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Jason McCarver
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

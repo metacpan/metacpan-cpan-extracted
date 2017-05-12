@@ -1,0 +1,36 @@
+0.10    Released at 2010-05-25.
+        - Fixed a bug - rt #54750.
+
+0.09    Released at 2008-12-16.
+        - Renamed key 'ts' to 'rs'. The key 'rs' was documented
+          but were returned as 'ts'.
+
+0.08    Released at 2008-10-29.
+        - Just a full version.
+
+0.07_02 Released at 2008-10-27.
+        - If the apache version couldn't be determined then each
+          regex for each apache version is checked.
+
+0.07_01 Released at 2008-10-27.
+        - Added keys rs, bs and br.
+        - Now it's possible to parse server-status?auto.
+        - Key 'p' for parents will be kicked in future releases!
+
+0.06    Released at 2008-09-24.
+        Fixed a bug... newlines were not deleted from the statistics.
+
+0.05    Released at 2007-11-11.
+        Fixed regexes because they matched only if extended server-status
+          was activated. Now it should match ever.
+        Now it's possible to set the options url and timeout with new()
+          and access the LWP::UserAgent object with ua().
+0.04    Released at 2007-10-13.
+        Fixed parse() and add return() if there is no content.
+0.03    Released at 2007-09-13.
+        Added furhter server-status informations: Total accesses +
+          Total Traffic. The keys are ta and tt.
+0.02	Released at 2007-07-10.
+        Did some code improvements that annoys me a long time.
+0.01	Released at 2007-04-29.
+x.xx    Thanks to Larry Wall and all other Perl developers for Perl :-)

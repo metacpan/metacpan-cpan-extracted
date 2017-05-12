@@ -1,0 +1,24 @@
+NAME
+    Plack::Middleware::AddDefaultCharset - a port of Apache2's
+    AddDefaultCharset
+
+SYNOPSIS
+    use Plack::Builder;
+
+    builder { enable 'AddDefaultCharset', charset => $charset_to_add; $app;
+    }
+
+DESCRIPTION
+    Plack::Middleware::AddDefaultCharset is a port of the AddDefaultCharset
+    configuration directive of the Apache HTTP server.
+
+AUTHOR
+    Kazuho Oku <kazuhooku {at} gmail.com>
+
+SEE ALSO
+    <http://httpd.apache.org/docs/2.2/ja/mod/core.html#adddefaultcharset>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

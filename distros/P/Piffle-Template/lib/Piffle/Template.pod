@@ -1,0 +1,425 @@
+=head1 NAME
+
+Piffle::Template - Perlish templating language
+
+=head1 SYNOPSIS
+
+    use Piffle::Template;
+    use Piffle::Template qw{template_to_perl expand_template};
+
+    # OO syntax, with output stored and returned:
+    print Piffle::Template->expand(source_file => 'foo/fish.xml',
+                                   include_path => ['foo/inc','foo']);
+
+    # Immediate: OO syntax: output goes directly to STDOUT:
+    Piffle::Template->expand(source_file => 'foo/fish.xml',
+                             output_file => \*STDOUT);
+
+    # Procedural syntax, data from a string
+    $string = <<'__END__';
+      <?perl for $world (1 .. 10) { ?>
+       Hello world number {$world}.
+      <?perl     print random_greeting(); ?>
+      <?perl } ?>
+      <?include std_disclaimer.txt?>
+    __END__
+    expand_template(source => $string,
+                    output_file => \*FILE);
+
+=head1 DESCRIPTION
+
+This is a simple Perl-embedding syntax for template code which is geared
+towards allowing authors to validate their templates directly against schemas
+or DTDs. The embedded language is Perl itself, which allows great flexibility
+at the expense of having to be disciplined about the barrier between template
+code and module code.
+
+In operation, the source template is transformed to an in-memory Perl script
+which is then run using Perl's C<eval> operator. Errors can be redirected to
+files or subroutines, and the output can be either caught in a variable or
+written to a file or open filehandle.
+
+=head2 expand_template
+
+    # Generic syntax
+    expand_template(%OPT);
+
+    # -either-
+    my $result = expand_template(source_file => '...');
+
+    # -or-
+    expand_template(include_path => [qw{/tmp/foo /usr/local/lib/foo}],
+                    source_file => '/usr/local/lib/foo/foo.xml',
+                    output_file => \*FH,
+                    errors_to => sub {},
+    # -or-
+    expand_template(source => $long_string);
+
+Expands a template stored somewhere, and writes the output somewhere else. The
+generated script is executed in a uniquely-named package, without any enforced
+C<use strict> preceding it. This call normally stores the I<print>ed output
+from the template-script in a temporary scalar variable, and returns this
+scalar. You can redirect the output somewhere else though.
+
+With versions of Perl B<prior to 5.8>, you B<must redirect output> using the
+C<output_file> option. Your program will fail ungracefully if you don't. This
+is because the internal store-and-return mechanism relies on the ability to
+open a filehandle to a scalar ref, which was introduced with Perl 5.8.
+
+The options are:
+
+=over 4
+
+=item source
+
+A string containing the template to convert to Perl code and run. Either this
+or C<source_file> must be specified.
+
+=item source_file
+
+A source file containing the template to execute. This can be either a string
+containing the name of a file, or an open filehandle passed by reference.
+
+=item output_file
+
+Redirects output to a specific file. Like C<source_file>, this may be either a
+filename or a filehandle.
+
+=item errors_to
+
+Defines how errors raised by the template code are handled. This can be either
+a subroutine (which will be called with C<$@> as its single argument), or a
+filehandle (to which the error message will be printed). The default is to
+propagate them back via C<die>.
+
+=item include_path
+
+An array containing a number of directories to search when processing
+the C<E<lt>?include...?E<gt>> directive.
+
+=item reported_filename
+
+Overrides the filename associated with error messages.
+
+=back
+
+=head2 expand
+
+    Piffle::Template->expand(%opt);
+
+Identical arguments, and return values to C<expand_template()>, but
+with object-oriented syntax.
+
+=head2 template_to_perl
+
+    my $perl = template_to_perl($template_txt, $filename, @inc);
+
+This is what C<expand()> and C<expand_template()> use to generate the
+Perl script that gets C<eval()>ed. Useful for debugging. By the way,
+C<E<lt>?include?E<gt>> is processed in this pass.
+
+=head1 The Templating Language
+
+There are only three constructs to worry about, the rest is just Perl, and the
+language you're embedding it in.
+
+=head2 <?perl...?>
+
+    <p>
+      <?perl  print $polite_greeting;  ?>
+    </p>
+    <!-- You'll have to do your own escaping here. -->
+
+    <ul>
+      <?perl for (1 .. 10) { ?>
+      <li>Hello</li>
+      <?perl } ?>
+    </ul>
+
+The tokens C<E<lt>?perl> and the immediately following C<?E<gt>> denote a
+fragment of embedded Perl. Any calls to C<print> go to the currently
+C<select>ed output.  The syntax is supposed to look like an XML processing
+instruction. If you use it where an XML PI could be used, your document should
+validate.
+
+=head2 <?include...?>
+
+    <?include sidebars/easter_bunny.pl.html ?>
+
+This is a simple textual inclusion. The named file is searched for in the
+include paths passed to C<template_to_perl()>, and is opened, transformed
+to a Perl script, and included into the Perl script being generated.
+
+If the file doesn't exist, you get a warning about the problem; your template
+code doesn't fail before compilation if an inclusion can't be found. This is
+the right behaviour for template code; if you want to import vital constants
+and subroutines, you should be using C<use> or C<require> instead, and writing
+a proper Perl module.
+
+Textual inclusions happen before compilation, i.e. when C<template_to_perl()>
+is called.
+
+=head2 {$varname} etc.
+
+     <p>{$polite_greeting}<p>
+
+     <p>{@arrayvar}</p>
+
+     <a title="{$title}" href="foo.cgi?t={$title,uri}&amp;p=1">
+       {$title}</a>
+
+Variables with simple names (C</^[\$\@\%]\w+$/>)can be interpolated into plain
+text by writing their names inside curly brackets. The resulting code contains
+a C<print> statement wrapped around something which escapes the contents of the
+variable.
+
+You can optionally use a nonstandard character escaping style by appending a
+comma after the variable name, followed by the name of an escaping style. the
+escaping styles are:
+
+=over 4
+
+=item xml
+
+    {$varname}		;; typical
+    {$varname,xml}	;; canonical
+
+This is the default, and is also what you'll get if the escaping style you use
+isn't known. Characters in the set [C<&E<lt>E<gt>"'>] are turned into decimal
+XML character references suitable for all XML dialects and hopefully all
+parsers.
+
+=item uri
+
+    {%varname,uri}
+
+Bytes (not characters) which aren't safe for use as an unparsed token in a URI
+are escaped into their hexadecimal representation. It's pretty much what
+C<CGI::escape()> does.
+
+=item raw
+
+    {@varname,raw}
+
+Interpolates a variable without doing any escaping on its value whatsoever.
+Make sure you know what you're doing before trying this.
+
+=back
+
+The syntax for variable interpolation is intended to look something like the
+way Expressions can be interpolated into attributes in XSLT. The default escape
+style was chosen because in most template CGI template work, I've tended to use
+this style most often.
+
+Character escaping styles are intended to be extensible by module users. They
+just aren't yet.
+
+=head1 Order of Execution
+
+When your wrapper script calls:
+
+    Piffle::Template->expand(source_file => 'foo/bar.pl.html',
+                             output_file => \*STDOUT);
+
+The file C<foo/bar.pl.html> is slurped in, and transformed to a Perl script
+using C<template_to_perl()>. The resulting script is studded with C<#line>
+directives, so errors will be reported from the right place. Any textual
+inclusions happen at this point too.
+
+The script is then run using Perl's eval-string operator. Despite the fact that
+the data came from an external file, this operation is considered taint-safe
+due to the way the template language parse works. Do not use this module if
+there are doubts about whether the Perl code in your template files is
+trustworthy.
+
+Any C<print> statement in the template code, or in library code called from it,
+is sent to STDOUT.
+
+=head1 Worked Examples, Tricks and Tips
+
+=head2 Database Table Splats
+
+This charming term comes from my workplace, and describes dumping the results
+of a SQL query into an HTML table for display and viewing. A common approach to
+doing this in a Perlish templating language is:
+
+    <table>
+      <?perl
+        while (my ($id,$name,$colour,$partnum) = each_part($manuf))
+        {
+      ?>
+      <tr>
+        <td>{$id}</td>
+        <td>{$name}</td>
+        <td>{$colour}</td>
+        <td>{$partnum}</td>
+      </tr>
+      <?perl
+        }  #each_part
+      ?>
+    </table>
+
+The corresponding definition of C<each_part()> follows. It has to do a little
+state management so that it can behave a little like Perl's builtin C<each>
+operator.
+
+    use DBI;
+    our $dbh = DBI->connect('some_dsn', 'user', 'secret') or die;
+    our $each_part_sth;
+
+    sub each_part
+    {
+            my $manuf = shift;
+            if (! defined $each_part_sth)
+            {
+                    $each_part_sth = $dbh->prepare(q{
+                            SELECT p.id,p.name,s.colour,s.partnum
+                              FROM  Parts p, Styles s
+                             WHERE p.id = s.part
+                               AND p.manufacturer = ?
+                    });
+                    $each_part_sth->execute($manuf);
+            }
+            my @ret = $each_part_sth->fetchrow_array;
+            unless (@ret)
+            {
+                    $each_part_sth->finish;
+                    undef $each_part_sth;
+            }
+    }
+
+=head2 Optional Attributes
+
+Consider the HTML C<select> box:
+
+    <select name="colour" multiple="multiple">
+      <option value="r" selected="selected">Red</option>
+      <option value="g">Green</option>
+      <option value="b">Blue</option>
+    </select>
+
+The C<option> elements may or may not be selected. Sometimes you want to make
+template code that prints the above multiselect using information about the
+selection state from a database. Unfortunately, you can't just write
+
+    XXX Incorrect Code XXX
+    <option value="{$col_s}" {$is_sel}>{$col_l}</option>
+    XXX Incorrect Code XXX
+
+because your template wouldn't validate. The fix is to use the following messy
+workaround:
+
+    <select name="colour" multiple="multiple">
+      <?perl
+        my $sel_hack_on = '" selected="selected';
+        while (my ($col_s, $is_sel, $col_l) = each_col())
+        {
+             my $sel_hack = $is_sel ? $sel_hack_on : '';
+      ?>
+      <option value="{$col_s}{$sel_hack}">{$col_l}</option>
+      <?perl
+        }  #each_col
+      ?>
+    </select>
+
+It's ugly, but it works.
+
+=head2 Messing with Execution Order
+
+Special blocks such as C<BEGIN> and C<END> can be used to change the order in
+which output is generated, which is useful for generating HTTP headers in your
+code while retaining good XML syntax:
+
+   <?xml version="1.0"?>
+   <foo>
+     <?perl
+       # All of the above turns into prints. But we want the header to be
+       # printed before that.
+       use CGI;
+       BEGIN {
+               # ... do something with the POSTdata ...
+               print CGI->header(-type => 'application/xml',
+                                 -charset => 'UTF/8',
+                                 -status => "201 Created");
+       }
+     ?>
+     <bar name="Cheers" location="East West 13th St, NY, USA" />
+     <pub name="Eagle &amp; Child" location="Oxford, Oxon, UK" />
+   </foo>
+
+You can't put a lump of Perl before an XML declaration because that would break
+XML's syntax. Sticking the header print inside a C<BEGIN> block causes the HTTP
+header to be emitted in a place that keeps web servers happy.  C<END> is
+slightly less useful than C<BEGIN>, but could be used to clean up resources
+after you've finished executing. If you try to use C<INIT> or C<CHECK>, you'll
+get an error looking like:
+
+    Too late to run INIT block at DATA line 5, <DATA> line 1.
+
+This is because the Perl runtime has already started up, and you can't catch
+the transition between the compilation phase(s) and normal execution. See
+L<perlmod/BEGIN, CHECK, INIT and END> for more on this.
+
+=head1 Similar Modules and Related Software
+
+You may wish to consider a number of other modules which do a similar thing to
+C<Piffle::Template>. They're almost certainly far better.
+
+=over 4
+
+=item L<Text::Template|Text::Template> - Mark-Jason Dominus
+
+Good and simple, with more support than this thing. Perl code can be written
+between curly brackets: '{' and '}'. Each pair of brackets corresponds to an
+C<eval"">, and the resulting value of the block gets interpolated into the
+output, raw. Loops are done inside the brackets, and if you want each pass to
+generate output, you have to concatenate onto a variable. The delimiter syntax
+can be varied from the default.
+
+=item L<Embperl|Embperl> - G. Richter
+
+Uses a rather complicated syntax for its embedding glue, and features a
+pluggable framework, but does essentially the same thing as
+C<Piffle::Template>. Automatically HTML-escapes its interpolations.
+
+=item C<ePerl> - Ralf S. Engelschall
+
+A perl-in-plaintext dialect similar to C<Embperl> and C<Piffle::Template> which
+comes with its own Perl interpreter and an Apache plugin. Allows shorthand for
+interpolation. Bound to be much faster than my effort, at the expense of some
+extra weight and dependencies.
+
+=item C<mmm-mode>
+
+This is an Emacs mode for writing blocks of one language inside another
+language, using delimiters to separate the two. It can be used with any of the
+above, and features delimiter definitions for some of them. 
+
+=back
+
+=head1 BUGS
+
+The embedding syntax cannot be changed, and it's somewhat monopurpose in
+intent: write Perl in XML, but make it validate.
+
+You need to escape the embedding tokens to stop C<Piffle::Template> from
+choking on them.
+
+Error reports can catch some very strange code when the generated script is
+syntactically invalid, mostly around interpolations with escapes. You have to
+know what you're doing in order to debug this sometimes, despite the C<#line>
+directives. Experiment with C<template_to_perl()> to see the kinds of
+horrors that get generated.
+
+However, if you think this wheel is rounder than others out there, please tell
+me. I might make it into a more formal release. However, there are plenty of
+wheels out there to choose from. I think this one has the nicest syntax,
+however.
+
+=head1 AUTHOR
+
+Andrew Chadwick, <andrewc-ptemplate200402@piffle.org>.
+
+This software may be distributed under the same terms as Perl itself. 
+
+=cut

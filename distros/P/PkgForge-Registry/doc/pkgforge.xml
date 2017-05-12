@@ -1,0 +1,1213 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!-- $Header: /cvsroot/autodoc/autodoc/xml.tmpl,v 1.2 2006/05/16 19:01:27 rbt Exp $ -->
+
+<book id="database.pkgforge" xreflabel="pkgforge database schema"><title>pkgforge Model</title>
+
+
+
+
+  <chapter id="public.schema"
+           xreflabel="public">
+    <title>Schema public</title>
+    <para>standard public schema</para>
+
+
+      <section id="public.table.build-log"
+               xreflabel="public.build_log">
+        <title id="public.table.build-log-title">
+         Table:
+         
+         <structname>build_log</structname>
+        </title>
+ 
+
+
+        <para>
+          <variablelist>
+            <title>
+              Structure of <structname>build_log</structname>
+            </title>
+
+
+            <varlistentry>
+              <term><structfield>id</structfield></term>
+              <listitem><para>
+                <type>serial</type>
+
+
+                <literal>PRIMARY KEY</literal>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>task</structfield></term>
+              <listitem><para>
+                <type>integer</type>
+
+
+
+
+
+
+
+
+
+
+
+
+                <literal>REFERENCES</literal> <xref linkend="public.table.task"/>
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>builder</structfield></term>
+              <listitem><para>
+                <type>integer</type>
+
+
+
+
+
+
+
+
+
+
+
+
+                <literal>REFERENCES</literal> <xref linkend="public.table.builder"/>
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>modtime</structfield></term>
+              <listitem><para>
+                <type>timestamp with time zone</type>
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+                <literal>DEFAULT now()</literal>
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+        </variablelist>
+
+
+
+
+
+
+
+
+
+
+      </para>
+    </section>
+
+      <section id="public.table.builder"
+               xreflabel="public.builder">
+        <title id="public.table.builder-title">
+         Table:
+         
+         <structname>builder</structname>
+        </title>
+ 
+
+
+        <para>
+          <variablelist>
+            <title>
+              Structure of <structname>builder</structname>
+            </title>
+
+
+            <varlistentry>
+              <term><structfield>id</structfield></term>
+              <listitem><para>
+                <type>serial</type>
+
+
+                <literal>PRIMARY KEY</literal>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>name</structfield></term>
+              <listitem><para>
+                <type>character varying(50)</type>
+
+
+
+
+                      <literal>UNIQUE</literal>
+
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>platform</structfield></term>
+              <listitem><para>
+                <type>integer</type>
+
+
+
+
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+
+
+
+                <literal>REFERENCES</literal> <xref linkend="public.table.platform"/>
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>current</structfield></term>
+              <listitem><para>
+                <type>integer</type>
+
+
+
+
+
+
+
+
+                      <literal>UNIQUE</literal>
+
+
+
+
+
+
+
+
+
+                <literal>REFERENCES</literal> <xref linkend="public.table.task"/>
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>modtime</structfield></term>
+              <listitem><para>
+                <type>timestamp with time zone</type>
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+                <literal>DEFAULT now()</literal>
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+        </variablelist>
+
+
+
+        <variablelist>
+          <title>Constraints on builder</title>
+
+          <varlistentry>
+            <term>task_platform</term>
+            <listitem><para>CHECK (check_task(current, platform))</para></listitem>
+          </varlistentry>
+
+        </variablelist>
+
+
+
+
+
+
+
+        <itemizedlist>
+          <title>
+            Tables referencing build_log via Foreign Key Constraints
+          </title>
+
+          <listitem>
+            <para>
+              <xref linkend="public.table.build-log"/>
+            </para>
+          </listitem>
+
+        </itemizedlist>
+
+
+
+
+
+
+      </para>
+    </section>
+
+      <section id="public.table.job"
+               xreflabel="public.job">
+        <title id="public.table.job-title">
+         Table:
+         
+         <structname>job</structname>
+        </title>
+ 
+
+
+        <para>
+          <variablelist>
+            <title>
+              Structure of <structname>job</structname>
+            </title>
+
+
+            <varlistentry>
+              <term><structfield>id</structfield></term>
+              <listitem><para>
+                <type>serial</type>
+
+
+                <literal>PRIMARY KEY</literal>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>uuid</structfield></term>
+              <listitem><para>
+                <type>character varying(50)</type>
+
+
+
+
+                      <literal>UNIQUE</literal>
+
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>submitter</structfield></term>
+              <listitem><para>
+                <type>character varying(50)</type>
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>status</structfield></term>
+              <listitem><para>
+                <type>integer</type>
+
+
+
+
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+
+
+
+                <literal>REFERENCES</literal> <xref linkend="public.table.job-status"/>
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>size</structfield></term>
+              <listitem><para>
+                <type>integer</type>
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>modtime</structfield></term>
+              <listitem><para>
+                <type>timestamp with time zone</type>
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+                <literal>DEFAULT now()</literal>
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+        </variablelist>
+
+
+
+
+
+
+
+        <itemizedlist>
+          <title>
+            Tables referencing task via Foreign Key Constraints
+          </title>
+
+          <listitem>
+            <para>
+              <xref linkend="public.table.task"/>
+            </para>
+          </listitem>
+
+        </itemizedlist>
+
+
+
+
+
+
+      </para>
+    </section>
+
+      <section id="public.table.job-status"
+               xreflabel="public.job_status">
+        <title id="public.table.job-status-title">
+         Table:
+         
+         <structname>job_status</structname>
+        </title>
+ 
+
+
+        <para>
+          <variablelist>
+            <title>
+              Structure of <structname>job_status</structname>
+            </title>
+
+
+            <varlistentry>
+              <term><structfield>id</structfield></term>
+              <listitem><para>
+                <type>serial</type>
+
+
+                <literal>PRIMARY KEY</literal>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>name</structfield></term>
+              <listitem><para>
+                <type>character varying(20)</type>
+
+
+
+
+                      <literal>UNIQUE</literal>
+
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+        </variablelist>
+
+
+
+
+
+
+
+        <itemizedlist>
+          <title>
+            Tables referencing job via Foreign Key Constraints
+          </title>
+
+          <listitem>
+            <para>
+              <xref linkend="public.table.job"/>
+            </para>
+          </listitem>
+
+        </itemizedlist>
+
+
+
+
+
+
+      </para>
+    </section>
+
+      <section id="public.table.platform"
+               xreflabel="public.platform">
+        <title id="public.table.platform-title">
+         Table:
+         
+         <structname>platform</structname>
+        </title>
+ 
+
+
+        <para>
+          <variablelist>
+            <title>
+              Structure of <structname>platform</structname>
+            </title>
+
+
+            <varlistentry>
+              <term><structfield>id</structfield></term>
+              <listitem><para>
+                <type>serial</type>
+
+
+                <literal>PRIMARY KEY</literal>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>name</structfield></term>
+              <listitem><para>
+                <type>character varying(10)</type>
+
+
+
+
+                      <literal>UNIQUE#1</literal>
+
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>arch</structfield></term>
+              <listitem><para>
+                <type>character varying(10)</type>
+
+
+
+
+                      <literal>UNIQUE#1</literal>
+
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>active</structfield></term>
+              <listitem><para>
+                <type>boolean</type>
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+                <literal>DEFAULT false</literal>
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+        </variablelist>
+
+
+
+
+
+
+
+        <itemizedlist>
+          <title>
+            Tables referencing builder via Foreign Key Constraints
+          </title>
+
+          <listitem>
+            <para>
+              <xref linkend="public.table.builder"/>
+            </para>
+          </listitem>
+
+
+
+          <listitem>
+            <para>
+              <xref linkend="public.table.task"/>
+            </para>
+          </listitem>
+
+        </itemizedlist>
+
+
+
+
+
+
+      </para>
+    </section>
+
+      <section id="public.table.task"
+               xreflabel="public.task">
+        <title id="public.table.task-title">
+         Table:
+         
+         <structname>task</structname>
+        </title>
+ 
+
+
+        <para>
+          <variablelist>
+            <title>
+              Structure of <structname>task</structname>
+            </title>
+
+
+            <varlistentry>
+              <term><structfield>id</structfield></term>
+              <listitem><para>
+                <type>serial</type>
+
+
+                <literal>PRIMARY KEY</literal>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>job</structfield></term>
+              <listitem><para>
+                <type>integer</type>
+
+
+
+
+                      <literal>UNIQUE#1</literal>
+
+
+
+
+
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+
+
+
+
+
+                <literal>REFERENCES</literal> <xref linkend="public.table.job"/>
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>platform</structfield></term>
+              <listitem><para>
+                <type>integer</type>
+
+
+
+
+                      <literal>UNIQUE#1</literal>
+
+
+
+
+
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+
+
+
+
+
+                <literal>REFERENCES</literal> <xref linkend="public.table.platform"/>
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>status</structfield></term>
+              <listitem><para>
+                <type>integer</type>
+
+
+
+
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+
+
+
+                <literal>REFERENCES</literal> <xref linkend="public.table.task-status"/>
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>modtime</structfield></term>
+              <listitem><para>
+                <type>timestamp with time zone</type>
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+                <literal>DEFAULT now()</literal>
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+        </variablelist>
+
+
+
+
+
+
+
+        <itemizedlist>
+          <title>
+            Tables referencing build_log via Foreign Key Constraints
+          </title>
+
+          <listitem>
+            <para>
+              <xref linkend="public.table.build-log"/>
+            </para>
+          </listitem>
+
+
+
+          <listitem>
+            <para>
+              <xref linkend="public.table.builder"/>
+            </para>
+          </listitem>
+
+        </itemizedlist>
+
+
+
+
+
+
+      </para>
+    </section>
+
+      <section id="public.table.task-status"
+               xreflabel="public.task_status">
+        <title id="public.table.task-status-title">
+         Table:
+         
+         <structname>task_status</structname>
+        </title>
+ 
+
+
+        <para>
+          <variablelist>
+            <title>
+              Structure of <structname>task_status</structname>
+            </title>
+
+
+            <varlistentry>
+              <term><structfield>id</structfield></term>
+              <listitem><para>
+                <type>serial</type>
+
+
+                <literal>PRIMARY KEY</literal>
+
+
+
+
+
+
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+            <varlistentry>
+              <term><structfield>name</structfield></term>
+              <listitem><para>
+                <type>character varying(20)</type>
+
+
+
+
+                      <literal>UNIQUE</literal>
+
+
+
+
+                <literal>NOT NULL</literal>
+
+
+
+
+
+
+
+              </para>
+
+            </listitem>
+          </varlistentry>
+
+        </variablelist>
+
+
+
+
+
+
+
+        <itemizedlist>
+          <title>
+            Tables referencing task via Foreign Key Constraints
+          </title>
+
+          <listitem>
+            <para>
+              <xref linkend="public.table.task"/>
+            </para>
+          </listitem>
+
+        </itemizedlist>
+
+
+
+
+
+
+      </para>
+    </section>
+
+
+
+<!-- Function check_task(p integer, t integer) -->
+    <section id="public.function.check-task-p-integer-t-integer"
+             xreflabel="publiccheck_task(p integer, t integer)">
+      <title id="public.function.check-task-p-integer-t-integer-title">
+       check_task(p integer, t integer)
+      </title>
+      <titleabbrev id="public.function.check-task-p-integer-t-integer-titleabbrev">
+       check_task(p integer, t integer)
+      </titleabbrev>
+
+      <para>
+       <segmentedlist>
+        <title>Function Properties</title>
+        <?dbhtml list-presentation="list"?>
+        <segtitle>Language</segtitle>
+        <segtitle>Return Type</segtitle>
+        <seglistitem>
+         <seg>PLPGSQL</seg>
+         <seg>boolean</seg>
+        </seglistitem>
+       </segmentedlist>
+ 
+       
+        <programlisting>
+DECLARE correct BOOLEAN;
+BEGIN
+        SELECT  (platform = $2) INTO correct
+        FROM    task
+        WHERE   id = $1;
+
+        RETURN correct;
+END;
+</programlisting>
+      </para>
+    </section>
+
+<!-- Function update_job_status() -->
+    <section id="public.function.update-job-status"
+             xreflabel="publicupdate_job_status()">
+      <title id="public.function.update-job-status-title">
+       update_job_status()
+      </title>
+      <titleabbrev id="public.function.update-job-status-titleabbrev">
+       update_job_status()
+      </titleabbrev>
+
+      <para>
+       <segmentedlist>
+        <title>Function Properties</title>
+        <?dbhtml list-presentation="list"?>
+        <segtitle>Language</segtitle>
+        <segtitle>Return Type</segtitle>
+        <seglistitem>
+         <seg>PLPGSQL</seg>
+         <seg>trigger</seg>
+        </seglistitem>
+       </segmentedlist>
+ 
+       
+        <programlisting>
+DECLARE
+   total_count      INTEGER := 0;
+   fail_count       INTEGER := 0;
+   success_count    INTEGER := 0;
+   cancel_count     INTEGER := 0;
+   task_id          INTEGER := NEW.id;
+   job_id           INTEGER;
+   job_status_name  VARCHAR(20) := NULL;
+BEGIN
+
+   SELECT job INTO job_id
+       FROM task
+       WHERE id = task_id
+       LIMIT 1;
+
+   IF NOT FOUND THEN
+     RAISE NOTICE &#39;Could not find a job for task %&#39;, task_id;
+     RETURN NEW;
+   END IF;
+
+   SELECT COUNT(t.id) INTO total_count
+       FROM task AS t
+       WHERE t.job = job_id;
+
+   SELECT COUNT(t.id) INTO fail_count
+       FROM task AS t
+       JOIN task_status AS s ON t.status = s.id
+       WHERE t.job = job_id AND s.name = &#39;fail&#39;;
+
+   SELECT COUNT(t.id) INTO success_count
+       FROM task AS t
+       JOIN task_status AS s ON t.status = s.id
+       WHERE t.job = job_id AND s.name = &#39;success&#39;;
+
+   SELECT COUNT(t.id) INTO cancel_count
+       FROM task AS t
+       JOIN task_status AS s ON t.status = s.id
+       WHERE t.job = job_id AND s.name = &#39;cancelled&#39;;
+
+   IF total_count &gt; 0 THEN
+
+     IF fail_count &gt; 0 THEN
+
+       IF fail_count = total_count THEN
+         job_status_name := &#39;fail&#39;;
+       ELSE
+         job_status_name := &#39;partial fail&#39;;
+       END IF;
+
+     ELSIF success_count &gt; 0 THEN
+
+       IF success_count = total_count THEN
+         job_status_name := &#39;success&#39;;
+       ELSE
+         job_status_name := &#39;partial success&#39;;
+       END IF;
+
+     ELSIF cancel_count = total_count THEN
+         job_status_name := &#39;cancelled&#39;;
+     END IF;
+
+     IF job_status_name IS NOT NULL THEN
+
+       UPDATE job SET status = 
+         ( SELECT id FROM job_status WHERE name = job_status_name LIMIT 1)
+         WHERE id = job_id;
+
+     END IF;
+
+   END IF;
+
+   RETURN NEW;
+END;
+</programlisting>
+      </para>
+    </section>
+
+<!-- Function update_modification_time() -->
+    <section id="public.function.update-modification-time"
+             xreflabel="publicupdate_modification_time()">
+      <title id="public.function.update-modification-time-title">
+       update_modification_time()
+      </title>
+      <titleabbrev id="public.function.update-modification-time-titleabbrev">
+       update_modification_time()
+      </titleabbrev>
+
+      <para>
+       <segmentedlist>
+        <title>Function Properties</title>
+        <?dbhtml list-presentation="list"?>
+        <segtitle>Language</segtitle>
+        <segtitle>Return Type</segtitle>
+        <seglistitem>
+         <seg>PLPGSQL</seg>
+         <seg>trigger</seg>
+        </seglistitem>
+       </segmentedlist>
+ 
+       
+        <programlisting>
+BEGIN
+   NEW.modtime = now(); 
+   RETURN NEW;
+END;
+</programlisting>
+      </para>
+    </section>
+
+  </chapter>
+
+</book>
+

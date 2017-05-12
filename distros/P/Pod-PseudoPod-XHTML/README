@@ -1,0 +1,99 @@
+NAME
+    Pod::PseudoPod::XHTML - format PseudoPod as valid XHTML
+
+VERSION
+    version 1.02
+
+SYNOPSIS
+      use Pod::PseudoPod::XHTML;
+
+      my $parser = Pod::PseudoPod::XHTML->new();
+      $parser->parse_file('path/to/file.pod');
+
+DESCRIPTION
+    This class is a formatter that takes PseudoPod and renders it as valid
+    XHTML.
+
+    This is a subclass of Pod::PseudoPod::HTML, and from there
+    Pod::PseudoPod, and inherits all their methods.
+
+    This code has been shamelessly ripped off from Pod::PseudoPod::HTML and
+    jmcnamara's work on the Modern Perl epub book generator and massaged to
+    work.
+
+NAME
+EXPORT
+    Nothing is exported.
+
+METHODS
+  dtd_strict
+    Use the Strict DTD. (Default)
+
+  dtd_transitional
+    Use the Transitional DTD.
+
+SEE ALSO
+    Pod::PseudoPod::HTML, Pod::PseudoPod, Pod::Simple
+
+AUTHOR
+    Alan Young, "<harleypig at gmail.com>"
+
+BUGS
+    This project is hosted on github
+    (<http://github.com/harleypig/Pod-PseudoPod-XHTML>). I'll see any issues
+    submitted there much faster than anywhere else.
+
+    You may also report any bugs or feature requests to
+    "bug-pod-pseudopod-xhtml at rt.cpan.org", or through the web interface
+    at <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Pod-PseudoPod-XHTML>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Pod::PseudoPod::XHTML
+
+    You can also look for information at:
+
+    *   github
+
+        <http://github.com/harleypig/Pod-PseudoPod-XHTML>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pod-PseudoPod-XHTML>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Pod-PseudoPod-XHTML>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Pod-PseudoPod-XHTML>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Pod-PseudoPod-XHTML/>
+
+ACKNOWLEDGEMENTS
+    jmcnamara, Allison Randall, Larry Wall, the whole perl community
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Alan Young.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
+AUTHOR
+    Alan Young <harleypig@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Alan Young.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

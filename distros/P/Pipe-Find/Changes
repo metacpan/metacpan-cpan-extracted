@@ -1,0 +1,26 @@
+Revision history for Pipe-Find
+
+0.04    2016-03-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] There's still some errors in Synopsis, derp.
+
+
+0.03    2016-03-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix typo in Synopsis.
+
+
+0.02    2015-01-10 (PERLANCAR)
+
+	- No longer uses Proc::ProcessTable to become lighter, now only
+	  grabs /proc/PID/{cmdline,exe} (besides, usually what we need is
+	  just process name/path).
+
+
+0.01    2015-01-10 (PERLANCAR)
+
+        - First release.

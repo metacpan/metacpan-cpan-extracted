@@ -1,0 +1,28 @@
+---
+abstract: 'Easy Linux PID Management'
+author:
+  - 'Brad Haywood <bradh@cpan.org>'
+  - 'Brad Haywood <brad@geeksware.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.57
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.57
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Piddy
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Basename: 0
+  perl: 5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

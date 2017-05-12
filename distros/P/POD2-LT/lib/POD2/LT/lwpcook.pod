@@ -1,0 +1,244 @@
+=encoding iso-8859-13
+
+=head1 NAME
+
+lwpcook - libwww-perl bibliotekos receptai
+
+=head1 DESCRIPTION
+
+Ðiame dokumentacijos skyriuje galima rasti tipinius libwww-perl naudojimo pavyzdþius. Iðsamesnës informacijos ieðkokite individualiø moduliø dokumentacijose.
+
+Visi ðie pavyzdþiai yra pilnos programos.
+
+=head2 GET
+
+Naudojantis ðia biblioteka labai lengva parsiøsti dokumentus ið tinklo. LWP::Simple modulis turi funkcijà C<get()>, kuri gràþina URL turiná:
+
+    use LWP::Simple;
+    $doc = get 'http://www.linpro.no/lwp/';
+
+Arba tiesiai ið konsolës viena Perlo eilute:
+
+    perl -MLWP::Simple -e 'getprint "http://www.linpro.no/lwp/";'
+
+O ðtai taip galima parsisiøsti naujausià Perl versijà:
+
+    perl -MLWP::Simple -e '
+       getstore "ftp://ftp.sunet.se/pub/lang/perl/CPAN/src/latest.tar.gz",
+                "perl.tar.gz";'
+
+Be to galbût jums norësis suþinoti kur yra artimiausiais CPAN veidrodis:
+
+    perl -MLWP::Simple -e 'getprint 
+    "http://www.perl.com/perl/CPAN/CPAN.html";'
+
+Uþteks ðitø paprastø pavyzdþiø! LWP objektinë sàsaja leidþia kontroliuoti visà bendravimo su nutolusiu serveriu procesà. Naudojantis ðia sàsaja galite pilnai kontroliuoti headerius bei nurodyti kà daryti su gautais duomenimis.
+
+    use LWP::UserAgent;
+    $ua = LWP::UserAgent->new;
+    $ua->agent("$0/0.1 " . $ua->agent);
+    # $ua->agent("Mozilla/8.0") # arba apsimetam, kad mes labai paþengusi 
+    # narðyklë
+
+    $req = HTTP::Request->new(GET => 'http://www.linpro.no/lwp');
+    $req->header('Accept' => 'text/html');
+
+    # siunèiame uþklausà
+    $res = $ua->request($req);
+
+    # patikriname kà gavome
+    if ($res->is_success) {
+        print $res->content;
+    } else {
+        print "Klaida: " . $res->status_line . "\n";
+    }
+
+=head2 HEAD
+
+Jei tik norite paþiûrëti ar dokumentas egzistuoja (t.y. ar geras URL) pabandykite ðtai toká kodà:
+
+    use LWP::Simple;
+
+    if (head($url)) {
+        # ok, dokumentas egzistuoja
+    }
+
+Ið tikrøjø C<head()> funkcija gràþina sàraðà meta-informacijos apie apie dokumentà. Pirmos trys ðio sàraðo reikðmës yra dokumento tipas, jo dydis ir amþius.
+
+Norint turëti daugiau kontrolës bei pasiekti visus headerius reikia naudoti objektinæ sàsajà, kuri buvo jau apraðyta ðiek tiek aukðèiau GET metodui. Tiesiog visur pakeiskite GET á POST.
+
+=head2 POST
+
+Procedûrinës sàsajos duomenø siuntimui POST metodu á www serverá nëra. Tam reikai naudoti objektinæ sàsajà. Daþniausiai pasitaikanti POST operacija yra WWW formos uþpildymas:
+
+    use LWP::UserAgent;
+    $ua = LWP::UserAgent->new;
+
+    my $req = HTTP::Request->new(POST => 
+    'http://www.perl.com/cgi-bin/BugGlimpse');
+    $req->content_type('application/x-www-form-urlencoded');
+    $req->content('match=www&errors=0');
+
+    my $res = $ua->request($req);
+    print $res->as_string;
+
+Tinginiai daþniausiai naudoja B<HTTP::Request::Common> modulá, kuris teisingai, su visomis iðvengties sekomis, suformuoja C<POST> uþklausos duomenis bei nustato reikiamà C<content_type>:
+
+    use HTTP::Request::Common qw(POST);
+    use LWP::UserAgent;
+    $ua = LWP::UserAgent->new;
+    my $req = POST 'http://www.perl.com/cgi-bin/BugGlimpse',
+                   [ search => 'www', errors => 0 ];
+    print $ua->request($req)->as_string;
+
+Su libwww-perl biblioteka ateinanti C<POST> programa irgi gali bûti naudojama duomenims siøsti C<POST> protokolu.
+
+=head2 Proksiai
+
+Proksiai kai kur naudojami dël ugniasieniø arba keðavimo sumetimø. kartu naudojantis proksiais galima pasiekti duomenis per libwww-perl nepalaikomus (arba prastai palaikomus ;-) protokolus.
+
+Prieð siunèiant uþklausas jums reikia nurodyti proksiø nuostatas:
+
+    use LWP::UserAgent;
+    $ua = LWP::UserAgent->new;
+    $ua->env_proxy; # proxy nuostatos ið aplinkos kintamøjø
+    # arba
+    $ua->proxy(ftp  => 'http://proxy.myorg.com');
+    $ua->proxy(wais => 'http://proxy.myorg.com');
+    $ua->no_proxy(qw(no se fi));
+
+    my $req = HTTP::Request->new(GET => 'wais://xxx.com/');
+    print $ua->request($req)->as_string;
+
+B<LWP::Simple> modulis automatiðkai iðsikvieèia ir C<env_proxy()>. Programos kurios jau naudoja C<$ua-E<gt>env_proxy()> metodà daþniausiai nenaudos C<$ua-E<gt>proxy()> ir C<$ua-E<gt>no_proxy()> metodø.
+
+Kai kurie proksiai reikalauja, kad naudotumëte prisijungimo vardà ir slaptaþodá. Nesunku pridëti reikiamà headerá raðant ðitaip:
+
+    use LWP::UserAgent;
+
+    $ua = LWP::UserAgent->new;
+    $ua->proxy(['http', 'ftp'] => 
+        'http://username:password@proxy.myorg.com');
+
+    $req = HTTP::Request->new('GET',"http://www.perl.com";);
+
+    $res = $ua->request($req);
+    print $res->content if $res->is_success;
+
+Pakeiskite I<proxy.myorg.com>, I<username> ir I<password> kuo nors tinkanèiu jums.
+
+=head2 Apsaugotø dokumentø pasiekimas
+
+Dokumentai apsaugoti paprasta autorizacija gali bûti pasiekiami taip:
+
+    use LWP::UserAgent;
+    $ua = LWP::UserAgent->new;
+    $req = HTTP::Request->new(GET => 'http://www.linpro.no/secret/');
+    $req->authorization_basic('vardas', 'slaptazodis');
+    print $ua->request($req)->as_string;
+
+Kita alternatyva yra pasiraðyti B<LWP::UserAgent> subklasæ, kuri perraðo C<get_basic_credentials()> metodà. Kaip pavyzdá pasiþiûrëkite C<lwp-request> programà.
+
+=head2 Sausainiukai
+
+Kai kurios svetainës mëgsta pasiþaisti su sausainiukais (cookies). Pagal nutylëjimà LWP ignoruoja visus sausainiukus, kuriuos duoda serveriai. Bet jeigu nurodysite sausainiø dëþutæ, tai LWP saugos ir naudos sausainiukus kaip tikra narðyklë:
+
+    use LWP::UserAgent;
+    use HTTP::Cookies;
+
+    $ua = LWP::UserAgent->new;
+    $ua->cookie_jar(HTTP::Cookies->new(file => "lwpcookies.txt",
+                                          autosave => 1));
+
+    # o po to siunèiam uþklausas kaip ir iki ðiol
+    $res = $ua->request(HTTP::Request->new(GET => 
+           "http://www.yahoo.no";));
+    print $res->status_line, "\n";
+
+Byla C<lwpcookies.txt> palaipsniui didës, besilankant svetainëse, kurios duoda jums sausainiukø.
+
+=head2 HTTPS
+
+Dokumentai pasiekiami per SSL lygiai taip pat kaip ir per http, jeigu tik SSL modulis yra tinkamai ádiegtas (þiûrëkite README.SSL libwww-perl distribucijoje). Jei SSL sàsaja neádiegta, bandydami pasiekti dokumentus per HTTPS gausite klaidos praneðimus "C<501 Protocol scheme 'https' is not supported>".
+
+Ðtai SSL naudojimo pavyzdys:
+
+    use LWP::UserAgent;
+
+    my $ua = LWP::UserAgent->new;
+    my $req = HTTP::Request->new(GET => 'https://www.helsinki.fi/');
+    my $res = $ua->request($req);
+    if ($res->is_success) {
+        print $res->as_string;
+    } else {
+        print "Failed: ", $res->status_line, "\n";
+    }
+
+=head2 Veidrodþiai
+
+Jeigu norite turëti veidrodines WWW serverio dokumentø kopijas, bandykite paleisti panaðià programëlæ reguliariais intervalais:
+
+    use LWP::Simple;
+
+    %mirrors = (
+       'http://www.sn.no/'             => 'sn.html',
+       'http://www.perl.com/'          => 'perl.html',
+       'http://www.sn.no/libwww-perl/' => 'lwp.html',
+       'gopher://gopher.sn.no/'        => 'gopher.html',
+    );
+
+    while (($url, $localfile) = each(%mirrors)) {
+        mirror($url, $localfile);
+    }
+
+Arba viena perlo eilute konsolëje:
+
+    perl -MLWP::Simple -e 'mirror("http://www.perl.com/", 
+        "perl.html")';
+
+Jeigu dokumentas nebuvo nuo paskutinio karto nebuvo atnaujintas tai jis ir nebus persiøstas.
+
+=head2 Dideli dokumentai
+
+Jei dokumentas kurá bandot gauti yra per didelis kad tilptø atmintyje, tai turite du problemos sprendimo bûdus. Galite liepti bibliotekai raðyti dokymento turiná á bylà (antras C<$ua-E<gt>request()> argumentas yra byla):
+
+    use LWP::UserAgent;
+    $ua = LWP::UserAgent->new;
+
+    my $req = HTTP::Request->new(GET =>
+                    'http://www.linpro.no/lwp/libwww-perl-5.46.tar.gz');
+    $res = $ua->request($req, "libwww-perl.tar.gz");
+    if ($res->is_success) {
+        print "ok\n";
+    } else {
+        print $res->status_line, "\n";
+    }
+
+Arba galite apdoroti duomenis kai tik jie atvyksta (antras C<$ua-E<gt>request()> argumentas yra nuroda á kodà):
+
+    use LWP::UserAgent;
+    $ua = LWP::UserAgent->new;
+    $URL = 'ftp://ftp.unit.no/pub/rfc/rfc-index.txt';
+
+    my $expected_length;
+    my $bytes_received = 0;
+    my $res =
+        $ua->request(HTTP::Request->new(GET => $URL),
+                  sub {
+                        my($chunk, $res) = @_;
+                        $bytes_received += length($chunk);
+                        unless (defined $expected_length) {
+                            $expected_length = $res->content_length || 0;
+                        }
+                        if ($expected_length) {
+                             printf STDERR "%d%% - ",
+                                      100 * $bytes_received / $expected_length;
+                        }
+                        print STDERR "Gauta $bytes_received baitu\n";
+                        # XXX Kaþkà reiktø daryti su gautu kàsniuku
+                        # print $chunk;
+                  });
+     print $res->status_line, "\n";
+
+=cut
+

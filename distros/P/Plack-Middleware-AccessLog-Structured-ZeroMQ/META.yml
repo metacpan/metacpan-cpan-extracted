@@ -1,0 +1,42 @@
+---
+abstract: 'Access log middleware which passes structured log messages into ZeroMQ'
+author:
+  - 'Manfred Stock <mstock@cpan.org>'
+build_requires:
+  AnyEvent: '0'
+  Carp: '0'
+  File::Find: '0'
+  File::Temp: '0'
+  HTTP::Request::Common: '0'
+  Message::Passing::Filter::Decoder::JSON: '0'
+  Message::Passing::Input::ZeroMQ: '0'
+  Message::Passing::Output::Test: '0'
+  Module::Build: '0.28'
+  Plack::Test: '0'
+  Test::Class: '0'
+  Test::Deep: '0'
+  Test::More: '0.88'
+  Test::TCP: '0'
+  lib: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-AccessLog-Structured-ZeroMQ
+no_index:
+  file:
+    - perlcritic.rc
+requires:
+  MRO::Compat: '0'
+  Message::Passing::Output::ZeroMQ: '0'
+  Plack::Middleware::AccessLog::Structured: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/mstock/Plack-Middleware-AccessLog-Structured-ZeroMQ.git
+version: '0.001001'

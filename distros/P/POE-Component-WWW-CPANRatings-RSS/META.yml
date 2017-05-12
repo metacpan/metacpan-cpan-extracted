@@ -1,0 +1,23 @@
+---
+name: POE-Component-WWW-CPANRatings-RSS
+version: 0.0101
+author:
+  - 'Zoffix Znet <zoffix@cpan.org>'
+abstract: non-blocking wrapper around WWW::CPANRatings::RSS
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  POE: 0.9999
+  POE::Component::NonBlockingWrapper::Base: 0.002
+  WWW::CPANRatings::RSS: 0.0203
+build_requires:
+  Test::More: 0
+provides:
+  POE::Component::WWW::CPANRatings::RSS:
+    file: lib/POE/Component/WWW/CPANRatings/RSS.pm
+    version: 0.0101
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,12 @@
+Changes
+example/example.pod
+example/wxpoe.pl
+example/wxpoe2.pl
+example/wxpoe3.pl
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/POE/Loop/Wx.pm
+t/01_load.t
+t/98_pod.t

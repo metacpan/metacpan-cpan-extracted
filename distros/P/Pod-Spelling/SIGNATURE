@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 21a72ef5b9a831b07375993f6dcdb1268d6bb823 Changes
+SHA1 bc31fc77854c2994defefb1ac66805e27ca005ec MANIFEST
+SHA1 bde3557bd2d8f8d11725a7ff4ac2ad09cdc3c38e MANIFEST.skip
+SHA1 0238d2fa80aea5b6e00e77849da1f001e013c182 META.yml
+SHA1 791f013a676441b9d36b9376f55f88bd691ac275 Makefile.PL
+SHA1 8fa52c4188be8378480f85b1a09fbb089b17580f README
+SHA1 be8f42c1c4140b3fde86d180c20aac606b58a2d5 lib/Pod/POM/View/TextBasic.pm
+SHA1 c5815178e45d2684f43975ee2413cb598432b8c1 lib/Pod/Spelling.pm
+SHA1 4e7a5ebe113dc07ad75e3b3c9de4d40ad60fd8b4 lib/Pod/Spelling/Aspell.pm
+SHA1 2e9ddf73adf589ffb30fd206db7679880a99b924 lib/Pod/Spelling/Ispell.pm
+SHA1 a606151021e79381884cc24758c115e1030e727e lib/Test/Pod/Spelling.pm
+SHA1 a52e559d40e422843f4ee6f210ec0e973efa0706 t/bad.pod
+SHA1 6ab683f8ad49cd1eee06ed4bcdac039be173aca8 t/good.pod
+SHA1 ab1ce489c5081fc3c6dbb3774656b64fd3af0905 t/manifest.t
+SHA1 a1f76836c559630d33135e65c62b164922c75b17 t/pod_format.t
+SHA1 fc59891cfd202f553cbfa9d20eebf1dc2a532f5b t/pod_spelling_aispell.t
+SHA1 ee6ef2523e411da00f5eb052efae0c2894e3d480 t/pod_spelling_base.t
+SHA1 922d1747cca59402412d4657177b040a6d525ade t/pod_spelling_base_cb.t
+SHA1 16cd5a52359bae2023fd73dba9bdeb94ae2659e6 t/pod_spelling_import_speller.t
+SHA1 897e79c076dddd7dc4e33ca3280fe09db3139c54 t/pod_wordlist.pod
+SHA1 2d79c1e65f8551112b4300871d18189bd0cac9f1 t/test_pod_spelling.t
+SHA1 6add92fad1e568ee219b99d5d044f315608815d7 t/test_pod_spelling_add_stopwords.t
+SHA1 81a2f903cbc3cfdd8e39fd14611081cfe0d57aec t/textbasic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.14 (Darwin)
+
+iQEcBAEBAgAGBQJNkx7gAAoJEFbbDNKvu26XnAQIAIwpaDOBLn7ehIVVvs77gZWs
+44jNSN2pwVZGHrHnb8HcrUIDHJunmTZIL5ogQjxqbjvAbXLju+N1DNG0COtNaFlf
+9CizLG3AMw3y1rL7x7szFBfQEKcAuUvOMHxroskH115WSPlx3cPNr37m53z//o9F
+1ueLRkbS4cT7AFJkeDxs751JU4Z4XVoUTO6FIG5Ek84+uuDxmnybR9ki3sSxnZBG
+Avj7kS53ndasVkdrB42PKEnHk2Oz2jFAYQBshoJkACn+whidJTDutkXkfMYpED0L
+uQqEiD5WOOfp/ahrB7Qw7burnMeQLiOOV8zDQBE+DS8iu9MioJDamJienkG0hAY=
+=UZd3
+-----END PGP SIGNATURE-----

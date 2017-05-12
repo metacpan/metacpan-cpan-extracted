@@ -1,0 +1,22 @@
+%semantic token 'a' 'b' 
+%tree bypass
+
+%%
+
+S:
+      %name EMPTY
+    | %name SA
+      S A  A
+    | %name SB
+      S B  B 
+;
+A:
+      %name A
+      'a' 
+;
+B:
+      %name B
+      'b' 
+;
+
+%%

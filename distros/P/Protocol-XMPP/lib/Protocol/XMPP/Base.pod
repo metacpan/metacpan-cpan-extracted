@@ -1,0 +1,90 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::XMPP::Base
+at lib/Protocol/XMPP/Base.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=cut
+
+=head1 NAME
+
+Protocol::XMPP::Base - base class for L<Protocol::XMPP>
+
+=head1 VERSION
+
+Version 0.006
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 METHODS
+
+=head2 new
+
+Constructor. Stores all parameters on $self, including the top level stack item as L<parent>.
+
+=head2 debug
+
+Helper method for displaying a debug message. Only displayed if the debug flag was passed to L<configure>.
+
+=head2 _ref_to_xml
+
+Convert an arrayref to an XML fragment.
+
+Input such as the following:
+
+ [ 'iq', type => 'set', id => 'xyz', _content => [ [ 'session', _ns => 'xmpp-session' ] ] ]
+
+would be converted to:
+
+ <iq type=>'set' id=>'xyz'><session xmlns='...:xmpp-session'/></iq>
+
+=head1 PROXY METHODS
+
+The following methods are proxied to the L<Protocol::XMPP::Stream> class via L<stream>.
+
+=head2 is_loggedin
+
+Accessor for the loggedin state - will call the appropriate on_(login|logout) event when
+changing state.
+
+=head2 write_xml
+
+Write XML reference to stream.
+
+=head2 write_text
+
+Write XML reference to stream.
+
+=head2 dispatch_event
+
+Pass through an event (on_XXX handler).
+
+=head2 stream
+
+Returns the active L<Protocol::XMPP::Stream> object.
+
+=head2 next_id
+
+Returns the next ID for to use in outgoing messages.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Mixin::Event::Dispatch>
+
+L<add_handler_for_event|Mixin::Event::Dispatch/add_handler_for_event>, L<clear_event_handlers|Mixin::Event::Dispatch/clear_event_handlers>, L<event_handlers|Mixin::Event::Dispatch/event_handlers>, L<invoke_event|Mixin::Event::Dispatch/invoke_event>, L<subscribe_to_event|Mixin::Event::Dispatch/subscribe_to_event>, L<unsubscribe_from_event|Mixin::Event::Dispatch/unsubscribe_from_event>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@entitymodel.com>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2010-2014. Licensed under the same terms as Perl itself.

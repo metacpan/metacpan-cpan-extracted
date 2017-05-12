@@ -1,0 +1,47 @@
+{
+   "abstract" : "a web server for locally installed perl documentation",
+   "author" : [
+      "John BEPPU <beppu@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Server",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Which" : "0",
+            "HTML::AsSubs" : "0",
+            "Pod::Simple::HTML" : "0",
+            "Pod::Simple::Search" : "0",
+            "Squatting" : "0.81",
+            "Text::VimColor" : "0",
+            "aliased" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.14"
+}

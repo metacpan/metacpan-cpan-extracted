@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 13eb11750ce585a5f9b840d262079481eb8674c5 Changes
+SHA1 7193d3ad93fd5d64144f68ac20a4f25a41efd5c0 LICENSE
+SHA1 d9a5987b06cc12da85cf76e637f7cd6d7c8ce1c7 MANIFEST
+SHA1 bc9e43d92c07e0980dac90851a310b80948c52ca MANIFEST.SKIP
+SHA1 c49db61e4b59d4c820b5b951a4bafdb2f8831fd2 META.json
+SHA1 868d899f582dde1d850202ae54f75cd9c5382257 META.yml
+SHA1 0919d07cc66b2de7ce86d9422c5d11d4bc2dbcb1 Makefile.PL
+SHA1 0b102a4191deebdd2ef78404a51c4bb7b0484954 README
+SHA1 7cabeb7e9a29806d8482aa8b585e8d56bd16fcc3 dist.ini
+SHA1 382df06ff707d57fe2759f2bd2408e497175f1a0 lib/PowerDNS/API/Client.pm
+SHA1 1ed87a6cb0fb071712d2528bd32f6de192353bc9 lib/PowerDNS/API/Client/Request.pm
+SHA1 62f91c1b347a6a5d678caf13ffa8cd8f3b2c849a lib/PowerDNS/API/Client/Response.pm
+SHA1 2b50bdfbb9664a7669992d8b449b5449e9685b85 runtests
+SHA1 9ff1d8b9e15ed7c95dddd474e8299df7d3c39f72 t/00-compile.t
+SHA1 0a0e1b025d1f862e4eb02fa8e265880a5b01cfc2 t/basic.t
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 bf8570ef6888d79ca6a0c9e21b206b904b0775e2 t/release-distmeta.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 0068bf52fc88b39cc6509199f19a77890edb9bb0 t/release-has-version.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2.2 (Darwin)
+
+iQCVAwUBTV33hvkoKP1ixIspAQLbkQP+NHCwUn+0AB5WWkIirkTX8Di8OWQcvvVG
+r/Wwvmho4gkmC307YrOWPdElb34kL1VGE+PDtqHcT8eQGAPezgbLepXjTT6XiO1X
+Dk/cixyYKzKDs5uVWFrOyB0KXQ+2ewUi4iP0byj65BqtJCm0yJ05hro2cT13H13T
+SzmanGdSIqA=
+=BgmF
+-----END PGP SIGNATURE-----

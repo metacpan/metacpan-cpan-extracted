@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         POE-Component-ControlPort
+version:      0.01
+version_from: VERSION
+installdirs:  site
+requires:
+    Authen::Libwrap:               0
+    Carp:                          0
+    File::Basename:                0
+    Params::Validate:              0
+    POE:                           0.2802
+    Sys::Hostname:                 0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

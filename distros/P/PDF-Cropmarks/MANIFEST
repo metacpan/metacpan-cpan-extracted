@@ -1,0 +1,19 @@
+bin/pdf-cropmarks.pl
+Changes
+lib/PDF/Cropmarks.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/basic.t
+t/changes.t
+t/cover.t
+t/manifest.t
+t/memory-cycles.t
+t/metadata.t
+t/pod-coverage.t
+t/pod.t
+t/test-input.pdf
+t/thickness.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

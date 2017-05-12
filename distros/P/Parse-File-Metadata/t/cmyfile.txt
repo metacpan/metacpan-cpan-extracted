@@ -1,0 +1,12 @@
+# comment
+a=alpha
+b=beta,charlie,delta
+c=epsilon	zeta	eta
+spurious_line
+d=1234567890
+e=This is a string
+f=,
+
+some,body,loves,me
+I,wonder,wonder,who
+could,it,be,you

@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/POE/Session/Multiplex.pm
+t/00_compile.t
+t/01_pod.t
+t/02_pod_coverage.t
+t/10_object.t
+t/20_simple.t
+t/21_complex.t
+t/30_plaincall.t
+t/One.pm
+META.yml                                 Module meta-data (added by MakeMaker)

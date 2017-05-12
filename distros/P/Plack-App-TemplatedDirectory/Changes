@@ -1,0 +1,5 @@
+Revision history for Plack-App-TemplatedDirectory
+
+0.001     2014-07-14 19:09:43+02:00 Europe/Copenhagen
+ - First version, with functionality taken from Plack::App::Directory
+   Uses Text::Xslate for templates

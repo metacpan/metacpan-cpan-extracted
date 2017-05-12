@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.pod
+config.yml
+dist.ini
+lib/POE/Component/IRC/Plugin/Eval.pm
+t/01_compile.t
+t/02_load.t
+t/release-pod-syntax.t
+utils/developer/git-pre-commit

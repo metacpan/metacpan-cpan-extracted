@@ -1,0 +1,17 @@
+Revision history for Perl extension POE::Component::NomadJukebox::Device.
+
+0.03  Mon Sep 13 23:25:12 2004
+	- added GetFile
+	- fixed FileList
+	- added extended tags to TrackList
+	- few other fixes
+	
+0.02  Mon Sep 13 11:07:31 2004
+	- converted to POE::Component::NomadJukebox::Device
+		namespace from NJB (author: Anthony Taylor <tony@searchc.org>)
+	- added many more commands from the libnjb api
+
+0.01  Tue Nov 27 14:35:04 2001
+	- original version; created by h2xs 1.21 with options
+		-O -n NJB ../src/libnjb.h
+

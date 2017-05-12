@@ -1,0 +1,124 @@
+2005-7-27 Julian Onions
+	* Version 0.17
+	* Pant.pm(Snv): Svn support
+	* PANT/SVN.pm: Svn parsing support
+	
+2005-04-01  Julian Onions
+
+	* Version 0.16
+	* PANT.pm(FileCompare): Use File::Compare.
+	* Some more logging
+
+2005-03-17  Julian Onions
+
+	* PANT.pm (Phase): Add an <a name=> to each phase.
+
+2005-03-16  Julian Onions  
+
+	* Version 0.15
+	* Test.pm: Reduce the decimal places for pass rate!
+
+2005-03-15  Julian Onions  
+
+	* PANT.pm (BuildSolution): Documented and exported the call to
+	allow solutions to be built
+
+2005-03-14  Julian Onions  
+
+	* Version 0.14
+	* TEST.pm: Rewritten this completely to use the
+	Test::Harness::Straps stuff. Tag with pass/fail tag ids.
+	* PANT.pm(StartPant) Allow style data.
+	* various tests changed to test the new stuff
+
+2005-03-11  Julian Onions  
+
+	* PANT.pm: Added more commentary to tree copies
+	* t - improved some of the tests so they run on pure windows
+	* Several more tests added, and some internals adjusted.
+	* CopyTree dryrun flag, and return number of copied files
+	
+2005-03-04  Julian Onions
+
+	* PANT.pm: some tinkering with the CallPant routine
+	* PANT.pm: Added the CopyTree routine
+	* PANT.pm: Make dryrun apply to Tests - DOH!
+
+2005-02-28  Julian Onions
+
+	* Version 0.11
+	* PANT.pm: Made the FindPatternInFile exported and added tests
+
+2005-02-16  Julian Onions
+	
+	* Version 0.10
+	* Changed the Cvs interface
+	* Added the find in file method
+
+2005-02-09  Julian Onions
+
+	* Version 0.09
+	* Pant/Cvs.pm - correct some stupid errors in the documentation
+	* Pant/Zip.pm - some minor documentation tweaks
+
+2005-02-09  Julian Onions
+
+	* Version 0.08
+	* PANT.pm (StartPant): Added the Cvs
+	* Pant/Cvs.pm - some support for running cvs type things, and
+	seeing if anything happened.
+
+2005-02-07  Julian Onions 
+
+	* Version 0.07
+	* PANT.pm - added the Move* and MakeTree/RmTree commands.
+	* added tests to check these.
+
+2005-02-03  Julian Onions 
+
+	* Version 0.06
+	* PANT.pm: Added better diagnostics to the Copy* commands.
+
+2005-02-02  Julian Onions 
+
+	* Version 0.05
+	* PANT.pm revised the calling sequence - full paths for logs
+	including the .html. Makes calling sub pants a bit harder, but
+	thats my problem!
+	* new test for subpant calling 
+	
+	
+0.04 2005-02-01  Julian Onions
+
+	* Add dryrun support to the zip commands
+	* added compression options to the zip
+	* Added the filecompared based on hash technology
+	* small restructure of the Test stuff
+	 
+	
+0.03 2005-01-31  Julian Onions
+	* Added the treesource to the NewerThan command
+
+	* New test for UpdateFileVersion stuff.
+
+0.02 2005-01-27  Julian Onions
+
+        * Changed Command to have another option, log, to let the build
+	script pick up a produced log.
+
+	* Changed CallPant to take an optional directory
+	
+	* Changed Command to stream data out, rather than use qx. 
+	
+	* Added Test and Zip sub-modules
+
+
+0.01  Wed Jan 26 09:56:56 2005
+        - basic functionality, pod and test written.
+	- original version; created by h2xs 1.22 with options
+		-cfn PANT
+
+
+Local Variables:
+mode:change-log 
+End:

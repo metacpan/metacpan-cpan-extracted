@@ -1,0 +1,4 @@
+name = "Perl-Critic-CognitiveComplexity"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+authority = "cpan:OTROSIEN"

@@ -1,0 +1,29 @@
+Revision history for Perl extension Plack::App::OpenVPN::Status.
+
+0.16    Wed Mar 20 18:08:37 2013 +0000
+    - dzillify distribution
+    - updated pod documentation
+    - refactored *.t
+
+0.15 Fri Jan 10 20:45:26 2013
+    - changed versioning to x.yy
+    - added Test::Pod to build requirements
+    - added changelog
+    - removed README.md
+
+0.1.4 Fri Dec 21 06:09:26 2012
+    - added support for custom views to display sessions
+
+0.1.3 Thu Dec 6 20:17:17 2012
+    - added support for versions 2,3 of status.log
+    - fixed readme
+    - added Text::MicroTemplate to PREREQ_PM
+    - added tavis configuration
+    - added psgi example
+
+0.1.2 Tue Dec 4 11:42:06 2012
+    - updated Makefile.PL
+    - added logic and test
+
+0.1.1 Tue Dec 4 04:51:54 2012
+	- original version

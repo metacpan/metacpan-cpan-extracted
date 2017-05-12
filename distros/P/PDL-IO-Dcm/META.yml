@@ -1,0 +1,30 @@
+---
+abstract: 'Reads dicom files, sorts them and stores the result into piddles with headers '
+author:
+  - 'Albrecht Ingo Schmid <ingosch@gmx.at>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDL-IO-Dcm
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DicomPack::DB::DicomTagDict: '0'
+  DicomPack::DB::DicomVRDict: '0'
+  DicomPack::IO::DicomReader: '0'
+  Getopt::Tabular: '0'
+  List::MoreUtils: '0'
+  PDL: '0'
+  PDL::IO::Sereal: '0'
+  perl: '5.006'
+version: '1.003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

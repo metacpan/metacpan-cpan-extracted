@@ -1,0 +1,43 @@
+bin/pdf-impose.pl
+Changes
+examples/compile-and-impose-cover.pl
+lib/PDF/Imposition.pm
+lib/PDF/Imposition/Schema.pm
+lib/PDF/Imposition/Schema1repeat2side.pm
+lib/PDF/Imposition/Schema1repeat2top.pm
+lib/PDF/Imposition/Schema1repeat4.pm
+lib/PDF/Imposition/Schema1x1.pm
+lib/PDF/Imposition/Schema1x4x2cutfoldbind.pm
+lib/PDF/Imposition/Schema1x8x2.pm
+lib/PDF/Imposition/Schema2down.pm
+lib/PDF/Imposition/Schema2side.pm
+lib/PDF/Imposition/Schema2up.pm
+lib/PDF/Imposition/Schema2x4x2.pm
+lib/PDF/Imposition/Schema4up.pm
+lib/PDF/Imposition/Schemaea4x4.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/accessors.t
+t/available.t
+t/basics.t
+t/changes.t
+t/cropmarks-options.t
+t/cropmarks.t
+t/imposing.t
+t/leaks.t
+t/manifest.t
+t/memory_cycles.t
+t/metadata.t
+t/orig.lua
+t/pdf-v16.t
+t/pdfv16.pdf
+t/pod-coverage.t
+t/pod.t
+t/sample2e.pdf
+t/sig-table-39-59.txt
+t/signatures.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

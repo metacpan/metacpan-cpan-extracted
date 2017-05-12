@@ -1,0 +1,16 @@
+=pod
+
+=for stopwords
+asdf
+
+=begin stopwords
+
+xyz
+
+=end stopwords
+
+These are common words.
+
+This is not: asdf, xyz.
+
+=cut

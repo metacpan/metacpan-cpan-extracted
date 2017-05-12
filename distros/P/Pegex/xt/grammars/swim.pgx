@@ -1,0 +1,269 @@
+# Pegex grammar for the Swim markup language
+#
+#   Copyright 2014. Ingy döt Net <ingy@ingy.net>
+#
+
+%grammar swim
+%version 0.0.1
+
+document: block-top*
+
+block-top:
+  | block-blank
+  | block-comment
+  | line-comment
+  | block-rule
+  | block-head
+  | block-code
+  | block-pref
+  | block-list
+  | block-title
+  | block-verse
+  | block-para
+
+block-blank: line-blank
+
+block-comment: /
+  HASH HASH HASH EOL
+  (
+    (: ANY*? EOL)*?
+  )
+  HASH HASH HASH EOL
+  line-blank?
+/
+
+line-comment: /
+  HASH SPACE? ( ANY*? ) EOL
+  line-blank?
+/
+
+block-rule: /
+  DASH{4} EOL
+  line-blank?
+/
+
+block-head: /
+  ( EQUAL{1,4} ) SPACE+ (:
+    ( ANY+? ) SPACE+ EQUAL+ EOL
+  | ( ANY+ EOL (: [^ WS ] ANY* EOL )* [^ WS ] ANY*? ) SPACE+ EQUAL+ EOL
+  | ( ANY+ EOL (: [^ WS ] ANY* EOL )*) (= [ marker-block-start ] | EOL | EOS)
+  ) line-blank?
+/
+
+block-code: /
+  BACK BACK BACK
+/
+block-pref: /
+  (
+    (:
+      line-blank*
+      SPACE SPACE ANY* EOL
+    )+
+  )
+  line-blank?
+/
+
+block-pref: /
+  (
+    (:
+      line-blank*
+      SPACE SPACE ANY* EOL
+    )+
+  )
+  line-blank?
+/
+
+block-list:
+  | block-list-bullet
+  | block-list-number
+  | block-list-data
+
+block-list-bullet: /(
+  line-list-item-bullet
+  (: line-list-item-bullet | line-blank | line-indented )*
+  line-blank?
+)/
+
+block-list-number: /(
+  line-list-item-number
+  (: line-list-item-number | line-blank | line-indented )*
+  line-blank?
+)/
+
+block-list-data: /(
+  line-list-item-data
+  (: line-list-item-data | line-blank | line-indented )*
+)/
+
+line-list-item-bullet: /
+  STAR SPACE ANY* EOL
+/
+
+line-list-item-number: /
+  PLUS SPACE ANY* EOL
+/
+
+line-list-item-data: /
+  DASH SPACE ANY* EOL
+/
+
+block-list-item: (
+  | block-blank
+  | block-comment
+  | line-comment
+  | block-head
+  | block-pref
+  | block-list
+  | block-title
+  | block-verse
+  | block-para
+)*
+
+line-indented: /
+  SPACE SPACE ANY* EOL
+/
+
+block-title: /
+  ( text-line )
+  EQUAL{3,} EOL
+  (:
+    line-blank
+    ( text-line )
+    (= line-blank | EOS )
+  )?
+  line-blank?
+/
+
+block-verse: /
+  DOT EOL
+  ( text-line+ )
+  line-blank?
+/
+
+block-para: /
+  ( text-line+ )
+  line-blank?
+/
+
+text-markup: phrase-markup+
+
+phrase-markup:
+  | phrase-text
+  | marker-escape
+  | phrase-func
+  | phrase-code
+  | phrase-bold
+  | phrase-emph
+  | phrase-del
+  | phrase-under
+  | phrase-hyper
+  | phrase-link
+  | marker-next
+
+marker-escape: / BACK ( ANY ) /
+
+phrase-text: /
+  (
+    (: (! [ marker-phrase-start ] |https? COLON ) ALL)+
+  )
+/
+
+phrase-code: /
+  marker-code
+  ( [^ marker-code]*? )
+  marker-code
+/
+
+phrase-func: /
+  marker-func-start
+  ( [^ marker-func-end]+ )
+  marker-func-end
+/
+
+phrase-bold:
+  / marker-bold (= NS [^ marker-bold]) /
+  ( !marker-bold phrase-markup )+
+  marker-bold
+
+phrase-emph:
+  / marker-emph (= NS [^ marker-emph]) /
+  ( !marker-emph phrase-markup )+
+  marker-emph
+
+phrase-del:
+  / marker-del (= NS) (! marker-del) /
+  ( !marker-del phrase-markup )+
+  marker-del
+
+phrase-under:
+  / marker-under (= NS) (! marker-under) /
+  ( !marker-under phrase-markup )+
+  marker-under
+
+phrase-hyper:
+  | phrase-hyper-named
+  | phrase-hyper-explicit
+  | phrase-hyper-implicit
+
+phrase-hyper-named: /
+  DOUBLE ( [^ DOUBLE ]+ ) DOUBLE
+  LSQUARE (https?: NS*? ) RSQUARE
+/
+
+phrase-hyper-explicit: /
+  LSQUARE (https?: NS*? ) RSQUARE
+/
+
+phrase-hyper-implicit: /(https? COLON NS+)/
+
+phrase-link:
+  | phrase-link-named
+  | phrase-link-plain
+
+phrase-link-named: /
+  DOUBLE ( [^ DOUBLE ]+ ) DOUBLE
+  LSQUARE ( NS*? ) RSQUARE
+/
+
+phrase-link-plain: /
+  LSQUARE ( NS*? ) RSQUARE
+/
+
+marker-next: / ( ALL ) /
+
+text-line: / (: (! [ marker-block-start NL ] SPACE) ANY* NS ANY* (: EOL | EOS ) ) /
+
+line-blank: / (: SPACE* EOL ) /
+
+marker-block-start: /
+  marker-pref
+  marker-list
+  marker-head
+  marker-comment
+/
+
+marker-phrase-start: /
+  marker-func-start
+  marker-code
+  marker-bold
+  marker-emph
+  marker-del
+  marker-link
+  marker-esc
+/
+
+marker-pref: / SPACE /
+marker-list: / STAR /
+marker-head: / EQUAL /
+marker-comment: / HASH /
+marker-func-start: / LANGLE /
+marker-func-end: / RANGLE /
+marker-code: / GRAVE /
+marker-bold: / STAR /
+marker-emph: / SLASH /
+marker-del: / DASH DASH /
+marker-under: / UNDER /
+marker-link: / DOUBLE LSQUARE /
+marker-esc: / BACK /
+
+# vim: set lisp sw=2:

@@ -1,0 +1,903 @@
+package Perinci::CmdLine::Manual::Examples; # just to make podweaver happy
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: Collection of examples
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perinci::CmdLine::Manual::Examples - Collection of examples
+
+=head1 VERSION
+
+This document describes version 1.50 of Perinci::CmdLine::Manual::Examples (from Perl distribution Perinci-CmdLine), released on 2016-12-10.
+
+=head1 DESCRIPTION
+
+In the examples, L<Perinci::CmdLine::Any> is used to show examples that are
+applicable to either L<Perinci::CmdLine::Classic> or L<Perinci::CmdLine::Lite>.
+For examples that are more appropriate or only applicable to specific
+implementation, the specific module will be used.
+
+Perinci::CmdLine::Classic is hereby referred to as C<PC::Classic>, while
+Perinci::CmdLine as C<PC::Lite>.
+
+=head1 BASICS
+
+=head2 Simplest application
+
+Since Perinci::CmdLine is function- and metadata-based, you need to create at
+least one function and add some metadata for it. And you'll need to return the
+result as an enveloped response. The simplest is something like:
+
+ #!perl
+ use strict;
+ use warnings;
+ use Perinci::CmdLine::Any;
+
+ our %SPEC;
+ $SPEC{hello} = {
+     v => 1.1,
+     summary => 'Say hello',
+ };
+ sub hello {
+     [200, "OK", "Hello, world!"];
+ }
+
+ Perinci::CmdLine::Any->new(url => '/main/hello')->run;
+
+The C<url> attribute specifies the location of the function in URL format (see
+L<Riap> for more details on the syntax of URL). It is basically a
+fully-qualified function name, with C<::> replaced with C</>. With this
+URL-based syntax, it is possible to use a remote and/or non-Perl function for
+the CLI application.
+
+The hash in C<$SPEC{hello}> is called a L<Rinci> metadata. The keys are called
+properties. There are two properties: C<v> (which is always required with the
+value of 1.1 to specify version) and C<summary> (which is actually optional, to
+describe the function).
+
+In this example, the function and its metadata is put inside the same script.
+You can of course put them in a separate Perl module, and use them with e.g. C<<
+url => '/Your/Module/func' >>. It is also worth mentioning that if you use the
+Perinci::CmdLine framework, your functions can also be used directly by other
+Perl modules/code since they are just regular Perl functions.
+
+The function returns a 3-element array containing HTTP-like status code, a
+status message, and the actual result.
+
+If you save the above script as C<hello> run it on the command-line:
+
+ % ./hello
+ Hello, world!
+
+Yup, not very interesting. You get help message for free:
+
+ % ./hello --help
+ % ./hello -h
+
+As well as some common options like C<--format> to return the result in a
+different format:
+
+ % ./hello --json
+ [200,"OK","Hello, world!"]
+
+ % ./hello --format perl; # only in PC::Classic, not available in PC::Lite
+ [200, "OK", "Hello, world!"]
+
+=head1 FUNCTION ARGUMENTS AND COMMAND-LINE OPTIONS
+
+=head2 Basics
+
+Function arguments map to command-line options. Example:
+
+ #!perl
+ use strict;
+ use warnings;
+ use Perinci::CmdLine::Any;
+
+ our %SPEC;
+ $SPEC{hello} = {
+     v => 1.1,
+     summary => 'Say hello',
+     args => {
+         name => {
+             summary => 'Name to say hello to',
+         },
+     },
+ };
+ sub hello {
+     my %args = @_;
+     [200, "OK", "Hello, $args{name}!"];
+ }
+
+ Perinci::CmdLine::Any->new(url => '/main/hello')->run;
+
+When you run this:
+
+ % ./hello --name Jimmy
+ Hello, Jimmy!
+
+If you run C<./hello --help>, the option is now mentioned as well in the help
+message.
+
+Unknown arguments will result in an error:
+
+ % ./hello --gender m
+ ERROR 400: Unknown option '--gender'
+
+To specify that an argument is required, add C<req> property to the argument
+specification with a true value:
+
+     args => {
+         name => {
+             summary => 'Name to say hello to',
+             req => 1,
+         },
+     },
+
+So when you run the app:
+
+ % ./hello
+ ERROR 400: Missing required argument 'name'
+
+To specify that an argument can also be specified via positional command-line
+I<argument> instead of just command-line I<option>, add C<pos> property to the
+argument specification:
+
+     args => {
+         name => {
+             summary => 'Name to say hello to',
+             req => 1,
+             pos => 0,
+         },
+     },
+
+So when you run the app you can specify:
+
+ % ./hello --name Jimmy
+ Hello, Jimmy!
+
+as well as:
+
+ % ./hello Jimmy
+ Hello, Jimmy!
+
+Extra arguments will also result in an error:
+
+ % ./hello Jimmy Gideon
+ ERROR 400: Extra argument 'Gideon'
+
+=head2 Argument schema (and more on text output formats)
+
+Following up from the previous example, here's another example with more
+arguments. Also note that I use PC::Classic since PC::Lite doesn't do schema
+validation.
+
+ #!perl
+ use 5.010;
+ use strict;
+ use warnings;
+ use Perinci::CmdLine;
+
+ our %SPEC;
+ $SPEC{hello} = {
+     v => 1.1,
+     summary => 'Say hello',
+     args => {
+         name => {
+             summary => 'Name(s) to say hello to',
+             schema  => [array => {of => 'str', min_len=>1}],
+             req     => 1,
+             pos     => 0,
+             greedy  => 1,
+         },
+         gender => {
+             summary => 'The gender of the name(s)',
+             schema  => [str => {in => ['m','f']}],
+         },
+     },
+ };
+ sub hello {
+     my %args = @_;
+     my $g = $args{gender};
+     my @res;
+     for my $name (@{ $args{name} // [] }) {
+         push @res, join("",
+             "Hello, ",
+             (!$g ? "" : $g eq 'm' ? "Mr. " : "Mrs. "),
+             $name, '!',
+         );
+     }
+     [200, "OK", \@res];
+ }
+ Perinci::CmdLine->new(url => '/main/hello')->run;
+
+If you run this program:
+
+ % ./hello Jimmy Sion Habil
+ % ./hello --name Jimmy --name Sion --name Habil
+ Hello, Jimmy!
+ Hello, Sion!
+ Hello, Habil!
+
+ % ./hello --name-json '["Jimmy","Sion","Habil"]' --gender m
+ Hello, Mr. Jimmy!
+ Hello, Mr. Sion!
+ Hello, Mr. Habil!
+
+Some things you might notice. First, there is a C<schema> property for each
+argument. C<name> is specified as having a type of array of strings. To set this
+argument from the CLI, you can either specify multiple times (e.g. C<--name
+NAME1 --name NAME2 ...>) or specify using JSON (i.e. C<--name-json JSONSTR>).
+
+Second, the C<name> argument specifies the C<greedy> property. This is used in
+conjunction with the C<pos> property. It declares that the argument will gobble
+up command-line arguments from C<pos> to the end. So you can also specify the
+values of the C<name> argument with C<ARG1 ARG2 ...>.
+
+Third, if you specify value that does not validate, an error will be produced.
+
+ % ./hello --name-json '[]'
+ ERROR 400: Invalid value for argument 'name': Length must be at least 1
+
+ % ./hello --name Jimmy --name Sion --name Habil --gender x
+ ERROR 400: Invalid value for argument 'gender': Must be one of ["m","f"]
+
+See L<Data::Sah> for more about the schema syntax.
+
+Fourth, you return the result as a data structure (an array) instead of directly
+printing the result using C<print()> or C<say()>. This is done to make your
+function more reusable outside the context of CLI. PC::Classic will format your
+data structure nicely using L<Data::Format::Pretty>. Your array will be printed
+as a multicolumn ANSI table by default, on interactive mode. If you pipe the
+output of your program, you will by default get a simpler text output. This can
+be chosen explicitly using the C<--format> common option.
+
+ % ./hello Jimmy Sion Habil --format text; # will output pretty or simple depending on whether interactive
+ % ./hello Jimmy Sion Habil --format text-simple; # will still output simple table even when interactive
+ % ./hello Jimmy Sion Habil --format text-pretty; # will still output pretty table even when piped
+
+=head2 Short option aliases
+
+To add short options, you can use the C<cmdline_aliases> property in the
+argument specification:
+
+         name => {
+             ...
+             cmdline_aliases => { n => {} },
+         },
+         gender => {
+             ...
+             cmdline_aliases => { g => {} },
+         },
+
+Now instead of:
+
+ % ./hello --name Jimmy --name Sion --name Habil --gender m
+
+you can also use:
+
+ % ./hello -n Jimmy -n Sion -n Habil -g m
+
+=head2 More on command-line option aliases
+
+You are not limited to one alias, or one letter:
+
+         gender => {
+             ...
+             cmdline_aliases => { g => {}, sex => {} },
+         },
+
+Now all these are equivalent:
+
+ % ./hello ... --gender m
+ % ./hello ... -g m
+ % ./hello ... --sex m
+
+Suppose you want to create an alias C<-m> to mean C<--gender m> and C<-f> to
+mean C<--gender f> instead:
+
+         gender => {
+             ...
+             cmdline_aliases => {
+                 m => { schema=>'bool', code => sub {my $args=shift; $args->{gender} = 'm' } },
+                 f => { schema=>'bool', code => sub {my $args=shift; $args->{gender} = 'f' } },
+             },
+         },
+
+Now you can say:
+
+ % ./hello Jimmy Sion -m
+ Hello, Mr. Jimmy!
+ Hello, Mr. Sion!
+
+ % ./hello Nunung Misye -f
+ Hello, Mrs. Nunung!
+ Hello, Mrs. Misye!
+
+=head2 My function has some cmdline_aliases or cmdline_src defined but I want to change it!
+
+For example, your C<f1> function metadata might look like this:
+
+ package Package::F1;
+ our %SPEC;
+ $SPEC{f1} = {
+     v => 1.1,
+     args => {
+         foo => {
+             cmdline_aliases => { f=> {} },
+         },
+         bar => { ... },
+         fee => { ... },
+     },
+ };
+ sub f1 { ... }
+ 1;
+
+And your command-line script C<f1>:
+
+ #!perl
+ use Perinci::CmdLine;
+ Perinci::CmdLine->new(url => '/Package/F1/f1')->run;
+
+Now you want to create a command-line script interface for this function, but
+with C<-f> as an alias for C<--fee> instead of C<--foo>. This is best done by
+modifying the metadata and creating a wrapper function to do this, e.g. your
+command-line script C<f1> becomes:
+
+ package main;
+ use Perinci::CmdLine;
+ use Package::F1;
+ use Data::Clone;
+ our %SPEC;
+ $SPEC{f1} = clone $Package::F1::SPEC{f1};
+ delete $SPEC{f1}{args}{foo}{cmdline_aliases};
+ $SPEC{f1}{args}{fee}{cmdline_aliases} = {f=>{}};
+ *f1 = \&Package::F1::f1;
+ Perinci::CmdLine->new(url => '/main/f1')->run;
+
+This also demonstrates the convenience of having the metadata as a data
+structure: you can manipulate it however you want. There is also a convenient
+helper function available in L<Perinci::Sub::Util> when you want to create a
+modified subroutine based on another:
+
+ package main;
+ use Perinci::CmdLine;
+ use Perinci::Sub::Util qw(gen_modified_sub);
+
+ gen_modified_sub(
+     output_name => 'f1',
+     base_name   => 'Package::F1::f1',
+     modify_args => {
+         foo => sub { my $as = shift; delete $as->{cmdline_aliases}   },
+         fee => sub { my $as = shift; $as->{cmdline_aliases} = {f=>{} },
+     },
+ );
+ Perinci::CmdLine->new(url => '/main/f1')->run;
+
+=head2 Overriding common option
+
+Example: My function has argument named 'format', but it is blocked by common
+option '--format'!
+
+To add/remove/rename common options, see the documentation on C<common_opts>
+attribute. In this case, you want:
+
+ delete $cmd->common_opts->{format};
+ #delete $cmd->common_opts->{format_options}; # you might also want this
+
+or perhaps rename it:
+
+ $cmd->common_opts->{output_format} = $cmd->common_opts->{format};
+ delete $cmd->common_opts->{format};
+
+=head1 INPUT
+
+=head2 Accepting input from STDIN (or files)
+
+If you specify 'cmdline_src' to 'stdin' to a 'str' argument, the argument's
+value will be retrieved from standard input if not specified. Example:
+
+ use Perinci::CmdLine;
+ $SPEC{cmd} = {
+     v => 1.1,
+     args => {
+         arg => {
+             schema => 'str*',
+             cmdline_src => 'stdin',
+         },
+     },
+ };
+ sub cmd {
+     my %args = @_;
+     [200, "OK", "arg is '$args{arg}'"];
+ }
+ Perinci::CmdLine->new(url=>'/main/cmd')->run;
+
+When run from command line:
+
+ % cat file.txt
+ This is content of file.txt
+ % cat file.txt | cmd
+ arg is 'This is content of file.txt'
+
+If your function argument is an array, array of lines will be provided to your
+function.
+
+Note that this will glob the whole content of input into memory. If you want
+streaming, see the next section.
+
+=head2 Accept streaming input
+
+To accept streaming input, you specify one or more of your arguments as C<<
+stream=>1 >>. Also, these arguments need to specify their source either from
+file, STDIN, or STDIN/files, by setting C<< cmdline_src =>
+file|stdin|stdin_or_files >>, because otherwise, just receiving value from
+command-line option like C<--arg val> is not very interesting :-). You will
+receive your function argument as a coderef which you can call repeatedly until
+input is exhausted (at the point of which the coderef will return undef).
+
+ $SPEC{perl_wc} = {
+     v => 1.1,
+     args => {
+         input => {
+             schema => 'str*',
+             stream => 1,
+             cmdline_src => 'stdin_or_files',
+         },
+     },
+ };
+ sub perl_wc {
+     my %args = @_;
+     my $input = $args{input};
+
+     my $chars = 0;
+     my $words = 0;
+     my $lines = 0;
+     while (my $line = $input->()) {
+         $lines++;
+         $chars += length($line);
+         chomp $line;
+         my @w = split /[ \t]+/o, $line; $words += @w;
+     }
+
+     [200, "OK", {chars=>$chars, words=>$words, lines=>$lines}];
+ }
+
+When run:
+
+ % ls -l | perl_wc
+ +-------+-------+
+ | key   | value |
+ +-------+-------+
+ | chars |  1995 |
+ | lines |    42 |
+ | words |    61 |
+ +-------+-------+
+
+Note: by default you will get string/text input line-by-line, and for binary
+(C<buf>) per-64k. This will be configurable in the future.
+
+If argument type is not simple (e.g. an array or hash), then JSON stream input
+will be assumed. This means, each line of input will be parsed as JSON.
+
+=head1 OUTPUT
+
+=head2 Default output format
+
+TODO
+
+=head2 Removing borders
+
+By default, the text format produces bordered tables in interactive mode, e.g.
+if you have this program:
+
+ $SPEC{foo} = {v=>1.1};
+ sub foo {
+     [200, "OK", [[1,2], [3,4], [5,6]]];
+ }
+ use Perinci::CmdLine::Any;
+ Perinci::CmdLine::Any->new(url => '/main/foo')->run;
+
+and you run it, you will have:
+
+ % foo
+ +---+---+
+ | 1 | 2 |
+ | 3 | 4 |
+ | 5 | 6 |
+ +---+---+
+
+and if you use C<--format text-simple>, only then it will become a tab-separated
+format:
+
+ % foo --format text-simple
+ 1       2
+ 3       4
+ 5       6
+
+But if you don't like this formatting and want to default to simpler formatting
+by default, you can add C<cmdline.default_format> attribute to your function
+metadata:
+
+ $SPEC{foo} = {v=>1.1, 'cmdline.default_format' => 'text-simple'};
+
+Using this attribute, you can also default to JSON, and so on if you want.
+
+You can also do this on a per-result basis, by adding C<cmdline.default_format>
+attribute in your result metadata, e.g.:
+
+ sub foo {
+     [200, "OK", [[1,2], [3,4], [5,6]], {'cmdline.default_format'=>'text-simple'}];
+ }
+
+=head2 Streaming output
+
+To produce streaming output, set C<< stream=>1 >> in C<result> spec in function
+metadata. Then in your function, return a subroutine reference that will allow
+caller to read data from.
+
+ $SPEC{nat} = {
+     v => 1.1,
+     summary => 'Generate an infinite sequence of natural numbers',
+     args => {},
+     result => {
+         stream => 1,
+         schema => 'str*',
+     },
+ };
+ sub nat {
+     my $n = 1;
+     [200, "OK", sub { $n++ }];
+ }
+
+If result type is not simple (e.g. an array or hash), then each record will be
+encoded into JSON, to produce JSON stream.
+
+=head2 Adding support for new format
+
+TODO
+
+=head2 Pager
+
+TODO
+
+=head1 CONFIGURATION
+
+=head2 Basics
+
+In the function-centric world of Perinci::CmdLine, configuration is just another
+way to supply values to function arguments (before being potentially overridden
+by command-line arguments). Configuration files are written in L<IOD> format,
+which is basically "INI with extra features". By default, configuration files
+are searched in C</etc> and then your home directory, with the name of
+I<program_name> + C<.conf>. So if you have:
+
+ # ~/prog.conf
+ foo=1
+ bar=2
+
+and:
+
+ # prog
+ #!perl
+ use Perinci::CmdLine::Any;
+ $SPEC{prog} = {
+     v => 1.1,
+     args => {
+         foo => {},
+         bar => {},
+     },
+ };
+ sub prog {
+     my %args = @_;
+     [200, "OK", "foo is $args{foo}, while bar is $args{bar}"];
+ }
+ Perinci::CmdLine::Any->new(url=>'/main/prog')->run;
+
+When you run:
+
+ % prog
+
+you'll get:
+
+ foo is 1, while bar is 2
+
+Multiple configuration files will be merged, so if you have:
+
+ # /etc/prog.conf
+ foo=1
+ bar=2
+
+ # ~/prog.conf
+ foo=10
+
+you'll get:
+
+ foo is 10, while bar is 2
+
+=head2 Configuration profiles
+
+Configuration file can store more than one set of arguments, through specially
+named sections, called profiles:
+
+ # ~/prog.conf
+ foo=1
+ bar=2
+
+ [profile=p1]
+ foo=21
+ bar=22
+
+ [profile=p2]
+ foo=31
+ bar=32
+
+Running the program:
+
+ % prog
+ foo is 1, while bar is 2
+ % prog --config-profile p1
+ foo is 21, while bar is 22
+ % prog --config-profile p2
+ foo is 31, while bar is 32
+
+=head2 Configuration with subcommands
+
+TODO
+
+=head2 Ignoring configuration files
+
+If you don't want to use any configuration files, you can use:
+
+ % prog --noconfig ...
+
+=head2 DEBUGGING
+
+TODO
+
+=head2 REMOTE FUNCTION
+
+=head1 SHELL COMPLETION
+
+=head2 Custom completion
+
+By default, L<Perinci::Sub::Complete>'s C<complete_arg_val()> can employ some
+heuristics to complete argument values, e.g. from the C<in> clause or C<max> and
+C<min>:
+
+ $SPEC{set_ticket_status} = {
+     v => 1.1,
+     args => {
+         ticket_id => { ... },
+         status => {
+             schema => ['str*', in => [qw/new open stalled resolved rejected/],
+         },
+     },
+ }
+
+But if you want to supply custom completion, the L<Rinci::function>
+specification allows specifying a C<completion> property for your argument, for
+example:
+
+ use Complete::Util qw(complete_array_elem);
+ $SPEC{del_user} = {
+     v => 1.1,
+     args => {
+         username => {
+             schema => 'str*',
+             req => 1,
+             pos => 0,
+             completion => sub {
+                 my %args = @_;
+
+                 # get list of users from database or whatever
+                 my @users = ...;
+                 complete_array_elem(array=>\@users, word=>$args{word});
+             },
+         },
+         ...
+     },
+ };
+
+You can use completion in your command-line program:
+
+ % del-user --username <tab>
+ % del-user <tab> ; # since the 'username' argument has pos=0
+
+=head2 My custom completion does not work, how do I debug it?
+
+Completion works by the shell invoking our (the same) program with C<COMP_LINE>
+and C<COMP_POINT> environment variables. You can do something like this to see
+debugging information:
+
+ % COMP_LINE='myprog --arg x' COMP_POINT=13 PERL5OPT=-MLog::Any::App TRACE=1 myprog --arg x
+
+You can also use the L<testcomp> utility (included in the L<App::CompleteUtils>
+distribution) to help debug your custom completion:
+
+ % testcomp myprog --arg x^
+
+Place the C<^> caret character to simulate the position of the cursor when
+tab-completion is attempted.
+
+=head1 I18N
+
+=head1 OTHERS
+
+=head2 Modifying common options
+
+=head2 Customizing help message
+
+=head2 Dealing with binary data
+
+=head2 (Client) (Server) Dealing with binary data
+
+The choice as JSON as the network transport protocol for Riap (because it is the
+lowest common denominator across languages like JavaScript, PHP, Python, Ruby,
+Perl) makes dealing with binary data requires an extra step or two. The
+Perinci::CmdLine framework are equipped with some features to make this simpler
+and more convenient.
+
+First, to make a function that accepts binary data (in its arguments), you need
+to specify the argument type as C<buf>. To return binary data as result, you
+need to specify C<result>'s schema type as C<buf>. Example:
+
+ package MyLib;
+ our %SPEC;
+ $SPEC{gzip} = {
+     v => 1.1,
+     summary => 'Gzip some data',
+     args => {
+         data => {
+             summary => 'Data to compress',
+             schema => 'buf*',
+             req => 1,
+         },
+     },
+ };
+ sub gzip {
+     require IO::Compress::Gzip;
+
+     my %args = @_;
+     my $compressed;
+     IO::Compress::Gzip::gzip($args{data} => $compressed)
+         or return [500, "Compression failed"];
+     [200, "OK", $compressed];
+ }
+
+If you use this function in Perinci::CmdLine, you will get the command-line
+option C<--data-base64> in addition to the usual C<--data>. With
+C<--data-base64>, you can specify binary data including NUL bytes from the
+command-line.
+
+If you specify the argument as accepting data from stdin or files like this:
+
+     args => {
+         data => {
+             summary => 'Data to compress',
+             schema => 'buf*',
+             req => 1,
+             cmdline_src => 'stdin_or_files',
+         },
+     },
+
+you can pass binary data, e.g.:
+
+ % yourprog < /some/bindata
+
+Perinci::CmdLine will take care of encoding this data to network server when you
+specify C<riap_version> attribute to 1.2. So this process is transparent to you.
+
+When outputting binary result, in the C<text> output formats, Perinci::CmdLine
+will also print the binary result from server as-is without any newline added.
+So you can pipe binary data to files/processes unmodified.
+
+=head1 SUBCOMMANDS
+
+=head2 Default subcommand
+
+A default subcommand can be defined. This subcommand is selected without user
+specifying it the first command-line argument. A real-world example of this is
+from L<File::Trash::Undoable>. The B<trash-u> command is by default selecting
+the C<trash> subcommand:
+
+ % trash-u file1 file2
+
+is equivalent to:
+
+ % trash-u --cmd trash file1 file2
+
+To select another subcommand other than C<trash>, an explicit option is
+needed:
+
+ % trash-u --list-contents ; # select the list_contents subcommand
+ % trash-u --cmd empty     ; # select the empty subcommand
+
+This is done via something like:
+
+ Perinci::CmdLine->new(
+     subcommands => {
+         trash => { url=>... },
+         empty => { url=>... },
+         list_contents => { url=>... },
+     },
+     default_subcommand => 'trash',
+ )->run;
+
+=head2 Default subcommand (override via first command-line argument)
+
+There is also a choice to specify a default subcommand which is overrideable via
+first command-line argument. A real-world example of this is from
+L<App::GitUtils>. If the B<gu> command is specified without any argument:
+
+ % gu
+
+then it is equivalent to:
+
+ % gu info
+
+but user can specify other subcommands:
+
+ % gu post-commit
+
+This is accomplished by setting:
+
+ Perinci::CmdLine::Any->new(
+     subcommands => {
+         info        => {...},
+         run_hooks   => {...},
+         post_commit => {...},
+         ...
+     },
+     default_subcommand => 'info',
+     get_subcommand_from_arg => 2,
+ )->run;
+
+=head2 Dynamic list of subcommands
+
+TODO
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-CmdLine>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-CmdLine>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-CmdLine>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Perinci::CmdLine::Manual>
+
+L<Perinci::Examples>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

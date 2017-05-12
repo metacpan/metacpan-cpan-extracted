@@ -1,0 +1,402 @@
+NAME
+    Perl::LibExtractor - determine perl library subsets for building
+    distributions
+
+SYNOPSIS
+       use Perl::LibExtractor;
+
+DESCRIPTION
+    The purpose of this module is to determine subsets of your perl library,
+    that is, a set of files needed to satisfy certain dependencies (e.g. of
+    a program).
+
+    The goal is to extract a part of your perl installation including
+    dependencies. A typical use case for this module would be to find out
+    which files are needed to be build a PAR distribution, to link into an
+    App::Staticperl binary, or to pack with Urlader, to create stand-alone
+    distributions tailormade to run your app.
+
+METHODS
+    To use this module, first call the "new"-constructor and then as many
+    other methods as you want, to generate a set of files. Then query the
+    set of files and do whatever you want with them.
+
+    The command-line utility perl-libextract can be a convenient alternative
+    to using this module directly, and offers a few extra options, such as
+    to copy out the files into a new directory, strip them and/or manipulate
+    them in other ways.
+
+  CREATION
+    $extractor = new Perl::LibExtractor [key => value...]
+        Creates a new extractor object. Each extractor object stores some
+        configuration options and a subset of files that can be queried at
+        any time,.
+
+        Binary executables (such as the perl interpreter) are stored inside
+        bin/, perl scripts are stored under script/, perl library files are
+        stored under lib/ and shared libraries are stored under dll/.
+
+        The following key-value pairs exist, with default values as
+        specified.
+
+        inc => \@INC without "."
+            An arrayref with paths to perl library directories. The default
+            is "\@INC", with . removed.
+
+            To prepend custom dirs just do this:
+
+               inc => ["mydir", @INC],
+
+        use_packlist => 1
+            Enable (if true) or disable the use of ".packlist" files. If
+            enabled, then each time a file is traced, the complete
+            distribution that contains it is included (but not traced).
+
+            If disabled, only shared objects and autoload files will be
+            added.
+
+            Debian GNU/Linux doesn't completely package perl or any perl
+            modules, so this option will fail. Other perls should be fine.
+
+        extra_deps => { file => [files...] }
+            Some (mainly runtime dependencies in the perl core library)
+            cannot be detected automatically by this module, especially if
+            you don't use packlists and "add_core".
+
+            This module comes with a set of default dependencies (such as
+            Carp requiring Carp::Heavy), which you cna override with this
+            parameter.
+
+            To see the default set of dependencies that come with this
+            module, use this:
+
+               perl -MPerl::LibExtractor -MData::Dumper -e 'print Dumper $Perl::LibExtractor::EXTRA_DEPS'
+
+  TRACE/PACKLIST BASED ADDING
+    The following methods add various things to the set of files.
+
+    Each time a perl file is added, it is scanned by tracing either loading,
+    execution or compiling it, and seeing which other perl modules and
+    libraries have been loaded.
+
+    For each library file found this way, additional dependencies are added:
+    if packlists are enabled, then all files of the distribution that
+    contains the file will be added. If packlists are disabled, then only
+    shared objects and autoload files for modules will be added.
+
+    Only files from perl library directories will be added automatically.
+    Any other files (such as manpages or scripts installed in the bin
+    directory) are skipped.
+
+    If there is an error, such as a module not being found, then this module
+    croaks (as opposed to silently skipping). If you want to add something
+    of which you are not sure it exists, then you can wrap the call into
+    "eval {}". In some cases, you can avoid this by executing the code you
+    want to work later using "add_eval" - see "add_core_support" for an
+    actual example of this technique.
+
+    Note that packlists are meant to add files not covered by other
+    mechanisms, such as resource files and other data files loaded directly
+    by a module - they are not meant to add dependencies that are missed
+    because they only happen at runtime.
+
+    For example, with packlists, when using AnyEvent, then all event loop
+    backends are automatically added as well, but *not* any event loops
+    (i.e. AnyEvent::Impl::POE is added, but POE itself is not). Without
+    packlists, only the backend that is being used is added (i.e. normally
+    none, as loading AnyEvent does not instantly load any backend).
+
+    To catch the extra event loop dependencies, you can either initialise
+    AnyEvent so it picks a suitable backend:
+
+       $extractor->add_eval ("use AnyEvent; AnyEvent::detect");
+
+    Or you can directly load the backend modules you plan to use:
+
+       $extractor->add_mod ("AnyEvent::Impl::EV", "AnyEvent::Impl::Perl");
+
+    An example of a program (or module) that has extra resource files is
+    Deliantra::Client - the normal tracing (without packlist usage) will
+    correctly add all submodules, but miss the fonts and textures. By using
+    the packlist, those files are added correctly.
+
+    $extractor->add_mod ($module[, $module...])
+        Adds the given module(s) to the file set - the module name must be
+        specified as in "use", i.e. with "::" as separators and without .pm.
+
+        The program will be loaded with the default import list, any
+        dependent files, such as the shared object implementing xs
+        functions, or autoload files, will also be added.
+
+        If you want to use a different import list (for those rare modules
+        wghere import lists trigger different backend modules to be loaded
+        for example), you can use "add_eval" instead:
+
+          $extractor->add_eval ("use Module qw(a b c)");
+
+        Example: add Coro.pm and AnyEvent/AIO.pm, and all relevant files
+        from the distribution they are part of.
+
+          $extractor->add_mod ("Coro", "AnyEvent::AIO");
+
+    $extractor->add_require ($name[, $name...])
+        Works like "add_mod", but uses "require $name" to load the module,
+        i.e. the name must be a filename.
+
+        Example: load Coro and AnyEvent::AIO, but using "add_require"
+        instead of "add_mod".
+
+           $extractor->add_require ("Coro.pm", "AnyEvent/AIO.pm");
+
+    $extractor->add_bin ($name[, $name...])
+        Adds the given (perl) program(s) to the file set, that is, a program
+        installed by some perl module, written in perl (an example would be
+        the perl-libextract program that is part of the "Perl::LibExtractor"
+        distribution).
+
+        Example: add the deliantra client program installed by the
+        Deliantra::Client module and put it under bin/deliantra.
+
+           $extractor->add_bin ("deliantra");
+
+    $extractor->add_eval ($string)
+        Evaluates the string as perl code and adds all modules that are
+        loaded by it. For example, this would add AnyEvent and the default
+        backend implementation module and event loop module:
+
+           $extractor->add_eval ("use AnyEvent; AnyEvent::detect");
+
+        Each code snippet will be executed in its own package and under "use
+        strict".
+
+  OTHER METHODS FOR ADDING FILES
+    The following methods add commonly used files that are either not
+    covered by other methods or add commonly-used dependencies.
+
+    $extractor->add_perl
+        Adds the perl binary itself to the file set, including the libperl
+        dll, if needed.
+
+        For example, on UNIX systems, this usually adds a exe/perl and
+        possibly some dll/libperl.so.XXX.
+
+    $extractor->add_core_support
+        Try to add modules and files needed to support commonly-used builtin
+        language features. For example to open a scalar for I/O you need the
+        PerlIO::scalar module:
+
+           open $fh, "<", \$scalar
+
+        A number of regex and string features (e.g. "ucfirst") need some
+        unicore files, e.g.:
+
+           'my $x = chr 1234; "\u$x\U$x\l$x\L$x"; $x =~ /\d|\w|\s|\b|$x/i';
+
+        This call adds these files (simply by executing code similar to the
+        above code fragments).
+
+        Notable things that are missing are other PerlIO layers, such as
+        PerlIO::encoding, and named character and character class matches.
+
+    $extractor->add_unicore
+        Adds (hopefully) all files from the unicore database that will ever
+        be needed.
+
+        If you are not sure which unicode character classes and similar
+        unicore databases you need, and you do not care about an extra one
+        thousand(!) files comprising 4MB of data, then you can just call
+        this method, which adds basically all files from perl's unicode
+        database.
+
+        Note that "add_core_support" also adds some unicore files, but it's
+        not a subset of "add_unicore" - the former adds all files neccessary
+        to support core builtins (which includes some unicore files and
+        other things), while the latter adds all unicore files (but nothing
+        else).
+
+        When in doubt, use both.
+
+    $extractor->add_core
+        This adds all files from the perl core distribution, that is, all
+        library files that come with perl.
+
+        This is a superset of "add_core_support" and "add_unicore".
+
+        This is quite a lot, but on the plus side, you can be sure nothing
+        is missing.
+
+        This requires a full perl installation - Debian GNU/Linux doesn't
+        package the full perl library, so this function will not work there.
+
+  GLOB-BASED ADDING AND FILTERING
+    These methods add or manipulate files by using glob-based patterns.
+
+    These glob patterns work similarly to glob patterns in the shell:
+
+    /   A / at the start of the pattern interprets the pattern as a file
+        path inside the file set, almost the same as in the shell. For
+        example, /bin/perl* would match all files whose names starting with
+        perl inside the bin directory in the set.
+
+        If the / is missing, then the pattern is interpreted as a module
+        name (a .pm file). For example, Coro matches the file lib/Coro.pm ,
+        while Coro::* would match lib/Coro/*.pm.
+
+    *   A single star matches anything inside a single directory component.
+        For example, /lib/Coro/*.pm would match all .pm files inside the
+        lib/Coro/ directory, but not any files deeper in the hierarchy.
+
+        Another way to look at it is that a single star matches anything but
+        a slash (/).
+
+    **  A double star matches any number of characters in the path,
+        including /.
+
+        For example, AnyEvent::** would match all modules whose names start
+        with "AnyEvent::", no matter how deep in the hierarchy they are.
+
+    $extractor->add_glob ($modglob[, $modglob...])
+        Adds all files from the perl library that match the given glob
+        pattern.
+
+        For example, you could implement "add_unicore" yourself like this:
+
+           $extractor->add_glob ("/unicore/**.pl");
+
+    $extractor->filter ($pattern[, $pattern...])
+        Applies a series of include/exclude filters. Each filter must start
+        with either "+" or "-", to designate the pattern as *include* or
+        *exclude* pattern. The rest of the pattern is a normal glob pattern.
+
+        An exclude pattern ("-") instantly removes all matching files from
+        the set. An include pattern ("+") protects matching files from later
+        removals.
+
+        That is, if you have an include pattern then all files that were
+        matched by it will be included in the set, regardless of any further
+        exclude patterns matching the same files.
+
+        Likewise, any file excluded by a pattern will not be included in the
+        set, even if matched by later include patterns.
+
+        Any files not matched by any expression will simply stay in the set.
+
+        For example, to remove most of the useless autoload functions by the
+        POSIX module (they either do the same thing as a builtin or always
+        raise an error), you would use this:
+
+           $extractor->filter ("-/lib/auto/POSIX/*.al");
+
+        This does not remove all autoload files, only the ones not defined
+        by a subclass (e.g. it leaves "POSIX::SigRt::xxx" alone).
+
+    $extractor->runtime_only
+        This removes all files that are not needed at runtime, such as
+        static archives, header and other files needed only for compilation
+        of modules, and pod and html files (which are unlikely to be needed
+        at runtime).
+
+        This is quite useful when you want to have only files actually
+        needed to execute a program.
+
+  RESULT SET
+    $set = $extractor->set
+        Returns a hash reference that represents the result set. The hash is
+        the actual internal storage hash and can only be modified as
+        described below.
+
+        Each key in the hash is the path inside the set, without a leading
+        slash, e.g.:
+
+           bin/perl
+           lib/unicore/lib/Blk/Superscr.pl
+           lib/AnyEvent/Impl/EV.pm
+
+        The value is an array reference with mostly unspecified contents,
+        except the first element, which is the file system path where the
+        actual file can be found.
+
+        This code snippet lists all files inside the set:
+
+           print "$_\n"
+              for sort keys %{ $extractor->set });
+
+        This code fragment prints "filesystem_path => set_path" pairs for
+        all files in the set:
+
+           my $set = $extractor->set;
+           while (my ($set,$fspath) = each %$set) {
+              print "$fspath => $set\n";
+           }
+
+        You can implement your own filtering by asking for the result set
+        with "$extractor->set", and then deleting keys from the referenced
+        hash - since you can ask for the result set at any time you can add
+        things, filter them out this way, and add additional things.
+
+EXAMPLE
+    To package he deliantra client (Deliantra::Client), finding all (perl)
+    files needed to run it is a first step. This can be done by using
+    something like the following code snippet:
+
+       my $ex = new Perl::LibExtractor;
+
+       $ex->add_perl;
+       $ex->add_core_support;
+       $ex->add_bin ("deliantra");
+       $ex->add_mod ("AnyEvent::Impl::EV");
+       $ex->add_mod ("AnyEvent::Impl::Perl");
+       $ex->add_mod ("Urlader");
+       $ex->filter ("-/*/auto/POSIX/**.al");
+       $ex->runtime_only;
+
+    First it sets the perl library directory to pm and . (the latter to work
+    around some AutoLoader bugs), so perl uses only the perl library files
+    that came with the binary package.
+
+    Then it sets some environment variable to override the system default
+    (which might be incompatible).
+
+    Then it runs the client itself, using "require". Since "require" only
+    looks in the perl library directory this is the reaosn why the scripts
+    were put there (of course, since . is also included it doesn't matter,
+    but I refuse to yield to bugs).
+
+    Finally it exits with a clean status to signal "ok" to Urlader.
+
+    Back to the original "Perl::LibExtractor" script: after initialising a
+    new set, the script simply adds the perl interpreter and core support
+    files (just in case, not all are needed, but some are, and I am too lazy
+    to find out which ones exactly).
+
+    Then it adds the deliantra executable itself, which in turn adds most of
+    the required modules. After that, the AnyEvent implementation modules
+    are added because these dependencies are not picked up automatically.
+
+    The Urlader module is added because the client itself does not depend on
+    it at all, but the wrapper does.
+
+    At this point, all required files are present, and it's time to slim
+    down: most of the ueseless POSIX autoloaded functions are removed, not
+    because they are so big, but because creating files is a costly
+    operation in itself, so even small fiels have considerable overhead when
+    unpacking. Then files not required for running the client are removed.
+
+    And that concludes it, the set is now ready.
+
+SEE ALSO
+    The utility program that comes with this module: perl-libextract.
+
+    App::Staticperl, Urlader, Perl::Squish.
+
+LICENSE
+    This software package is licensed under the GPL version 3 or any later
+    version, see COPYING for details.
+
+    This license does not, of course, apply to any output generated by this
+    software.
+
+AUTHOR
+       Marc Lehmann <schmorp@schmorp.de>
+       http://home.schmorp.de/
+

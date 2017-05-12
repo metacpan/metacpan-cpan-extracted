@@ -1,0 +1,37 @@
+Fri Apr 15 21:15:17 IST 2005
+
+Version 0.07
+
+Trying to accelerate output generation, which seems to be the remaining bottleneck. 
+
+Thu Apr  7 15:02:22 IST 2005
+
+Version 0.06
+
+Noticed that Xtract fails with very large PDFs (>~500MB).  It is now fixed by changing the way the file is read and
+understood.  Fringe benefit: module uses less memory than before.  Additional variable is introduced: PDFReadSize,
+specify the number of bytes to read at a time when reading the input file.
+
+Documentation updated and corrected.  Test script added to distribution.
+
+--------------------------------------------------
+Thu Mar  10 15:02:47 IST 2005
+
+Noticed a problem with include objects!  Work around done.
+
+--------------------------------------------------
+Wed Mar  9 10:50:35 IST 2005
+
+No change in code, but making the distribution more acceptable for testing.
+--------------------------------------------------
+Thu Feb  20 15:02:47 IST 2005
+
+Operational sequences within the module is being changed.  New organisation will be as below:
+
+Essentioal variable for doing anything is PDFDoc.
+Extraction and making of document will run as and when PDFPages is defined.  It will be generated into
+the disk file named as PDFSaveAs if one exist, else will be taken to default extract file named as
+$TempExtractFile.
+
+Populating the PDFExtract is now secondary!  If some one ask for that, we will return the content of the
+file $TempExtractFile

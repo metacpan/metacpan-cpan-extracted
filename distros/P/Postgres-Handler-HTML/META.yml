@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Postgres-Handler-HTML
+version:             1
+abstract:            HTML Component for PostgreSQL data.
+license:             ~
+author:              
+    - Cyber Sprocket Labs <info@cybersprocket.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Postgres::Handler:             0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

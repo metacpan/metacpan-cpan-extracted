@@ -1,0 +1,10 @@
+Changes
+lib/Parallel/ForkControl.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+TODO
+t/Parallel_ForkControl.t
+t/pod.t
+t/pod-coverage.t

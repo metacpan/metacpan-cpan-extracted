@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libutouch-geis
+Description: Gesture Engine Implementation Support
+Version: 2.1.2
+Libs: -L${libdir} -lutouch-geis
+Cflags: -I${includedir}

@@ -1,0 +1,1107 @@
+=pod
+
+=head1 NAME
+
+Documentation for pb configuration files
+
+=head1 DESCRIPTION
+
+pb helps you build various packages directly from your project sources. 
+In order to work correctly, it relies on a certain number of configuration files. Most of these configuration parameters can be setup in all the configuration files, however, they generally make more sense in a specific one, which is indicated. There are mainly 4 configuration files, the one in the home directory of the user (used first), the one from the project (use in second), the one in the VM/VE hosting directory, and the one provided by the tool in /etc/pb or /usr/local/etc/pb (lastly).
+
+=head1 SYNOPSIS
+
+Those files have the same format, which is near from a perl hash structure:
+keyword key = value1[,value2,...]
+
+The key could be also default, in which case it will be used as a default value if no more precise content is given for the key.
+
+Each value is detailed below giving the nature of its use (Mandatory or Optional - only used for certain feature), the value of the key (could be the project, an OS name, default, ...), the value of the parameter field and its format, the default configuration file in which it should be defined (home $HOME/.pbrc, conf /etc/pb/pb.conf or /usr/local/etc/pb/pb.conf, VE vepath/.pbrc, VM vmpath/.pbrc,  or project project.pb) and an example of use.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<addrepo>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: comma separated list of URLs that point to repository files, or packages to install. The values may not include substitutions.
+ Conffile: project
+ Example: addrepo centos-5-x86_64 = file:///prj/extras.repo,http://mirror.centos.org/centos/5.8/extras/x86_64/RPMS/chrpath-0.13-3.el5.centos.x86_64.rpm
+
+=item B<cachedir>
+
+ Nature: Optional
+ Key: pb project: rpmbootstrap|pbmkbm|pb
+ Value: Directory to cache temporary content for the relevant pb project.
+ Conffile: pb
+ Example: cachedir rpbootstrap = /var/cache/rpmbootstrap
+
+=item B<checkexclude>
+
+ Nature: Optional
+ Key: package (as provided in defpkgdir or extpkgdir)
+ Value: comma separated list of OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch) that are excluded from the checkssh command (no build made for them). The OS name is generaly used here.
+ Conffile: project
+ Example: checkexclude pkg1 = centos,lsb,solaris
+
+=item B<cpandir>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: CPAN Pause directory to upload new modules
+ Conffile: pb
+ Example: cpandir default = incoming
+
+=item B<cpanpasswd>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: CPAN Pause user's password
+ Conffile: home
+ Example: cpanpasswd default = mycomplicatedpwd
+
+=item B<cpanpause>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: CPAN Pause site to upload new modules
+ Conffile: pb
+ Example: cpanpause default = pause.perl.org
+
+=item B<cpansubdir>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: CPAN Pause subdirectory in the user's area to upload into
+ Conffile: pb
+ Example: cpansubdir default = mydir
+
+=item B<cpanurl>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: CPAN Pause URL to activate the upload mecanism
+ Conffile: pb
+ Example: cpanurl default = http://pause.perl.org/pause/authenquery
+
+=item B<cpanuser>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: CPAN Pause user
+ Conffile: home
+ Example: cpanuser default = XXX
+
+=item B<defpkgdir>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: comma separated list of packages built by default in this project. When not using any package name as a parameter to pb commands, this list will be used.
+ Conffile: project
+ Example: defpkgdir mondorescue = mondo,mindi NB: a default value is not really meaningful.
+
+=item B<delivery>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: directory where to deliver packages once built for ftp/web access.
+ Conffile: project
+ Example: delivery mondorescue = prod
+
+=item B<dockeropt>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: List of the options to call docker with
+ Conffile: project
+ Example: dockeropt default = --bip=172.16.42.1/16
+
+=item B<dockerregistry>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: name of the docker registry to interact with if any
+ Conffile: project
+ Example: dockerregistry mondorescue = localhost:5900/mondorescue
+
+=item B<dockerrepository>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: name of the docker repository to interact with if any. It is mandatory if no dockerregistry is defined.
+ Conffile: project
+ Example: dockerrepository mondorescue = localhost:5000/mondorescue
+
+=item B<extpkgdir>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: comma separated list of packages built in addition in this project. When using the all package name as a parameter to pb commands, this list will be used, in addition to the defpkgdir list.
+ Conffile: project
+ Example: extpkgdir mondorescue = mondo-doc,mindi-mindibusybox
+
+=item B<filteredfiles>
+
+ Nature: Optional
+ Key: package (as provided in defpkgdir or extpkgdir)
+ Value: comma separated list of files that will be filtered using the macro system from pb, during the creation of the compressed source tar files for this package. Their path is relative to the directory containing the package.
+ Conffile: project
+ Example: filteredfiles mindi = rootfs/sbin/init,mindi,install.sh,doc/mindi.8
+
+=item B<ftp_proxy>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: string indicating the proxy to use
+ Conffile: pb
+ Example: ftp_proxy default = http://example.com:3128/
+
+=item B<http_proxy>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: string indicating the proxy to use
+ Conffile: pb
+ Example: http_proxy default = http://example.com:3128/
+
+=item B<logcmd>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: internal (the application then handles the logging of what it finds useful) or the name of an application to launch to log context (e.g. sos, cfg2html, ...).
+ Conffile: pb
+ Example: logcmd mageia = sos
+
+=item B<logcmds>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: In case the B<logcmd> command is internal, a comma separated list of the commands whose trace execution is to be captured in order to log context.
+ Conffile: pb
+ Example: logcmds mageia = mount,lsmod,esxcfg-module -l,df -T
+
+=item B<logfiles>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: In case the B<logcmd> command is internal, a comma separated list of the files to capture in order to log context.
+ Conffile: pb
+ Example: logfiles mageia = /etc/raidtab,/proc/cmdline,/proc/swaps
+
+=item B<logopt>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: In case the B<logcmd> command is not internal, the options of the B<logcmd> application to launch to log context
+ Conffile: pb
+ Example: logopt mageia = --all
+
+=item B<mkbmbootcmds>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: comma separated list of commands to be copied from the original OS to the target boot media tree (works recursively for directory creation on the target). Their actual path is deduced from the PATH variable.
+ Conffile: pb
+ Example: mkbmbootcmds linux = perl,awk,gawk,dd,grep,uname
+
+=item B<mkbmbootdirs>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: comma separated list of directories to be copied from the original OS to the target boot media tree (works recursively on the target).
+ Conffile: pb
+ Example: mkbmbootdirs linux = /etc/ssh,/etc/udev,/etc/mdadm
+
+=item B<mkbmbootfiles>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: comma separated list of files to be copied from the original OS to the target boot media tree (works recursively for directory creation on the target).
+ Conffile: pb
+ Example: mkbmbootfiles linux = /etc/mdadm.conf,/etc/raidtab,/etc/modprobe.conf
+
+=item B<mkbmkerneldir>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: path of the directory containing your kernel.
+ Conffile: pb
+ Example: mkbmkerneldir linux = /boot
+
+=item B<mkbmkernelfile>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: full path of the your kernel.
+ Conffile: pb
+ Example: mkbmkernelfile linux = /boot/vmlinuz-specific
+
+=item B<mkbmkernelnamere>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: Perl Regular Expression allowing to find OS kernel names in the B<kerneldir> directory.
+ Conffile: pb
+ Example: mkbmkerneldir linux = ^linu|^vmlinu|^xen
+
+=item B<mkbmtargetdirs>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: comma separated list of empty directory paths to be created on the target boot media.
+ Conffile: pb
+ Example: mkbmtargetdirs linux = /tmp,/dev
+
+=item B<namingtype>
+
+ Nature: Optional
+ Key: package (as provided in defpkgdir or extpkgdir)
+ Value: perl, if packages are CPAN perl modules that need to be named respecting the distribution perl convention (perl-Name for rpm, libname-perl for deb)
+ Conffile: project
+ Example: namingtype ProjectBuilder = perl
+
+=item B<osambiguous>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). In that case, should be an OS name.
+ Value: comma separated list of distributions which use the same file name in /etc for different distributions (ex: /etc/redhat-release for redhat, rhel, mandriva,...). Cf: B<osrelambfile>
+ Conffile: pb
+ Example: osambiguous debian = debian,ubuntu
+
+=item B<oschkcmd>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: package checker tool.
+ Conffile: pb
+ Example: oschkcmd deb = /usr/bin/lintian
+
+=item B<oschkopt>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: package checker tool options.
+ Conffile: pb
+ Example: oschkcmd rpm = -i
+
+=item B<oscmd>
+
+ Nature: Mandatory
+ Key: tool (pb or rpmbootstrap)
+ Value: come separated list of commands that are mandatory on the underlying system
+ Conffile: pb
+ Example: oscmd pb = tar,ls
+
+=item B<oscmdopt>
+
+ Nature: Mandatory
+ Key: tool (pb or rpmbootstrap)
+ Value: come separated list of commands that are optional on the underlying system
+ Conffile: pb
+ Example: oscmd pb = svn2cl,svn,cvs
+
+=item B<oscodename>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). In that case, should be an os-ver.
+ Value: code name. Mostly useful for debian and ubuntu, due to debootstrap.
+ Conffile: pb
+ Example: oscodename debian-5.0 = lenny
+
+=item B<osfamily>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). In that case, should be an os.
+ Value: OS family name (used to group similar distribution for handling)
+ Conffile: pb
+ Example: osfamily debian = du
+
+=item B<osins>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: OS command to lauch in order to automatically install packages on it.
+ Conffile: pb
+ Example: osins fedora = sudo yum -y install
+
+=item B<osmindep>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). NB: a default value is highly interesting here.
+ Value: comma separated list of packages needed before setupvm|ve can be run. Install them with your distribution in VM or automatically in VE when possible.
+ Conffile: pb
+ Example: osmindep default = perl,sudo,wget,tar,make,gzip
+
+=item B<osnover>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: true|false. True means that this OS has no need to keep the version
+ Conffile: pb
+ Example: osnover gentoo = true
+
+=item B<ospatchcmd>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: package patch command. For RPM is implicit.
+ Conffile: pb
+ Example: ospatchcmd deb = /usr/bin/patch
+
+=item B<ospatchopt>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: package patch options.
+ Conffile: pb
+ Example: ospatchcmd deb = -s -p1
+
+=item B<ospathcmd-*>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: Full path name of the command mentioned after the '-' for the relative OS
+ Conffile: pb
+ Example: ospathcmd-halt solaris = /usr/sbin/halt, ospathcmd-halt default = /sbin/halt
+
+=item B<osperldep>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: comma separated list of perl modules needed by pb and not provided in a package format for the relative OS, and that will be installed from CPAN in your VM/VE.
+ Conffile: pb
+ Example: osperldep rhel-5 = Module-Build,File-MimeInfo,File-BaseDir,Mail-Sendmail
+
+=item B<osperlver>
+
+ Nature: Mandatory (for each module mentioned in B<osperldep>)
+ Key: Perl Module (as defined in B<osperldep>)
+ Value: Version of the perl module that needs to be found on CPAN.
+ Conffile: pb
+ Example: Date-Manip = 5.54
+
+=item B<ospkg>
+
+ Nature: Optional (Mandatory if pbinstalltype is pkg)
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: comma separated list of packages that have to be installed in order for pb to be operational in the VE|VM
+ Conffile: pb
+ Example: ospkg rhel-5 = project-builder
+
+=item B<ospkgdep>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: comma separated list of packages that are needed by pb and should be installed automatically in the VM/VE during the setupvm|ve phasis by pb.
+ Conffile: pb
+ Example: ospkgdep rhel-5 = wget,make,ntp,patch,perl-DateManip
+
+=item B<osrelambfile>
+
+ Nature: Mandatory (per OS mentioned in B<osambiguous>)
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). Should be the OS name here.
+ Value: full path name of the ambiguous file describing that distribution, as well as some others. All the distributions mentioned here should also be mentioned with their ambiguous other distribution in the B<osambiguous> parameter.
+ Conffile: pb
+ Example: osrelambfile debian = /etc/debian_version
+
+=item B<osrelexpr>
+
+ Nature: Mandatory (per OS mentioned in B<osrelambfile> and B<osrelfile>)
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: the perl regular expression used to parse the B<osrelambfile> in order to extract from it the version of the distribution (in parenthesis to allow its usage as $1 by perl)
+ Conffile: pb
+osrelexpr rhel = Red Hat (?:Enterprise Linux|Linux Advanced Server) .*release ([0-9.]+).* \(
+ Example: 
+
+=item B<osrelfile>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). Should be the OS name here.
+ Value: full path name of the file describing non-ambiguously that distribution. There should be a bijection between the file and the distribution name.
+ Conffile: pb
+ Example: osrelfile fedora = /etc/fedora-release
+
+=item B<osremovedotinver>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: true|false. If true, then no '.' (dot) character is kept in the version name of that OS.
+ Conffile: pb
+ Example: osremovedotinver redhat = true
+
+=item B<osrepo>
+
+ Nature: Optional (Mandatory if pbinstalltype is pkg)
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: comma separated list of packages, yum repo or apt sources.list files to be added to the VE|VM to support package installation of pb
+ Conffile: pb
+ Example: osrepo rpm = ftp://ftp.project-builder.org/$ddir/$dver/pb.repo
+
+=item B<ossha>
+
+ Nature: Optional (Mandatory if rpm type of package)
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: sha algorithm used br createrepo
+ Conffile: pb
+ Example: ossha fedora-10 = sha1
+
+=item B<ossudoersmode>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: suffix that will be used in the name of the packages created. By default, concatenation of OS name and version.
+ Conffile: pb
+ Example: ossudoersmode novell = 640
+
+=item B<ossuffix>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: suffix that will be used in the name of the packages created. By default, concatenation of OS name and version.
+ Conffile: pb
+ Example: ossuffix mandriva = mdv
+
+=item B<ostype>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: build type grouping packages family. This is used internaly by pb to make various handling depending on that build type.
+ Conffile: pb
+ Example: ostype rh = rpm, ostype md = rpm, ostype novell = rpm
+
+=item B<osupd>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: OS command to lauch in order to automatically update th VM|VE
+ Conffile: pb
+ Example: osupd fedora = sudo yum -y update
+
+=item B<ossueminorrel>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: Should that OS distinguish between its minor version, considering them as different versions or not. Typically for CentOS where .x versions make incompatible changes.
+ Conffile: pb
+ Example: ossueminorrel centos = true
+
+
+=item B<pbconfurl>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: B<pb URL> giving access to where the pb configuration dir is stored. Under that directory you have the same tree infrastructure as the upstream project, and under the pb packaging infra, including the project configuration file. Cf: man 
+ Conffile: home|project
+ Example: pbconfurl fossology = svn+ssh://user@svn.project-builder.org/mondo/svn/pb/projects/fossology/pbconf, cvs+ssh://:ext:user@linuxcoe.cvs.sourceforge.net:/cvsroot/linuxcoe/pbconf
+
+=item B<pbdefdir>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: local directory under which every pb related operation will take place. if not defined then /var/cache. A default value is highly interesting here. If you want to use VMs/VEs, then use $ENV{'HOME'} to make it portable to it.
+ Conffile: home
+ Example: pbdefdir default = $ENV{'HOME'}/local/pb/projects
+
+=item B<pbgpgcheck>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: Whether the repository file should be generated specifying that gpg checking of the packages is on. Note that failures to sign packages is tolerated by default, which means that signatures can fail making the repository file generated not work. The default is to require gpg checks (value is 1)
+ Conffile: project
+ Example: pbgpgcheck Lintel = 0
+
+=item B<pbinstalltype>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: file or pkg. Indicates how pb will be installed during the setupve|vm phase in the virtual environment|machine, using CPAN files or upstream packages. Only the dev team needs to use file as packages do not yet exist for it. Or when no repository exists to pull project-builder.org from.
+ Conffile: pb
+
+=item B<pbml>
+
+ Nature: Optional (Mandatory if using announce command)
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: white space separated list of e-mail adresses used to send announces with the pb announce option.
+ Conffile: project
+ Example: pbml pb = pb-announce@project-builder.org pb-devel@project-builder.org
+
+=item B<pbpackager>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: Firstname Name and e-mail address of the person packaging the software.
+ Conffile: project
+ Example: pbpackager pb = Bruno Cornec <bruno@project-builder.org>
+
+=item B<pbparallel>
+
+ Nature: Optional
+ Key: tool (pb or rpmbootstrap)
+ Value: number of processes to execute in parallel. By default use the number of cores.
+ Conffile: pb
+ Example: pbparallel pb = 12
+
+=item B<pbpassfile>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: File containing the GPG passphrase that is used to sign packages
+ Conffile: home
+ Example: pbpassfile pb = /users/me/secret/passfile
+
+=item B<pbpasspath>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: The directory under which will be found your secret GPG key file.
+ Conffile: home
+ Example: pbpasspath pb = /home/me/.gnupg
+
+=item B<pbpassphrase>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: The GPG passphrase that is used to sign packages. Putting it in your conf file has security implications.
+ Conffile: home
+ Example: pbpassphrase pb = TheSecretPassPhrase
+
+=item B<pbpbr>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: whatever. As soon as this is defined, then that project is known as using pbr for source epansion.
+ Conffile: project
+ Example: pbpbr python-redfish = 1
+
+=item B<pbprojdir>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: local directory under which the project is locally exported. NB: a default value is highly interesting here. By default pbdefdir/projectname
+ Conffile: home
+ Example: pbprojdir mondorescue = $ENV{'HOME'}/local/mondorescue
+
+=item B<pbrepo>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: URL of the server hosting the upstream tar file.
+ Conffile: project
+ Example: pbrepo mondorescue = ftp://ftp.mondorescue.org
+
+=item B<pbshowsudo>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: false (by default), meaning that sudo commands executed with pb_system won't be shown in details, but that the associated comment will be used. For security cncerns, you may want to turn it to true in order to see what pb does with sudo to be safe. Turned on by debug flag.
+ Conffile: home
+ Example: pbshowsudo mondorescue = true
+
+=item B<pbsmtp>
+
+ Nature: Optional (Mandatory if using the announce command)
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: FQDN of the mail server to use to send announces. NB: a default value is highly interesting here.
+ Conffile: home
+ Example: pbsmtp mondorescue = localhost
+
+=item B<pbsockscmd>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: name of the command to use to socksify network calls. NB: a default value is highly interesting here.
+ Conffile: home
+ Example: pbsockscmd default = tsocks
+
+=item B<pbstoponerr>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: false (by default), meaning that commands giving errors will not stop execution of the pb job. For quicker error solving, you may want to turn it to true in order to stop at the first error. Be aware that project-builder.org is not robust enough to work fully correctly with this on. Especially some commands may in a justified way error out, and you still want the process to go on.
+ Conffile: home
+ Example: pbstoponerr mondorescue = true
+
+
+=item B<pburl>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: B<pburl> giving access to where the project is stored. Normaly provided by the project, but could be overloaded for specific authentication information in the home configuration file or when using a DVCS
+ Conffile: home|project
+ Example: pburl linuxcoe = cvs+ssh://:ext:user@linuxcoe.cvs.sourceforge.net:/cvsroot/linuxcoe, pburl pb = svk:////local/pb
+
+=item B<pbusesshagent>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: false means that you want pb to create a dedicated SSH key pair to dialog with VM|RM and false that you prefer to use an existing SSH Agent instead and existing keys
+ Conffile: pb
+ Example: pbusesshagent default = false
+
+=item B<pbwf>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: whatever. As soon as this is defined, then that project is known as not well formed (have a subdirectory in its tar file under which all sources are put named project-version). This should be reported upstream to the project. tar files generated by project-builder to not suffer from that. This is valid when packaging for tar files and not CMS.
+ Conffile: project
+ Example: pbwf afio = 1
+
+=item B<pkgtag>
+
+ Nature: Optional
+ Key: package (as provided in defpkgdir or extpkgdir)
+ Value: Tag that needs to be used in package name (on rpm: name-ver-tag.arch.rpm).  Useful when different from the project version B<projtag> and when republishing a package due to package build modification (not code).
+ Conffile: project
+ Example: pkgtag mindi-busybox = 2
+
+=item B<pkgver>
+
+ Nature: Optional
+ Key: package (as provided in defpkgdir or extpkgdir)
+ Value: Version that needs to be used in package name (on rpm: name-ver-tag.arch.rpm). Useful when different from the project version B<projver>.
+ Conffile: project
+ Example: pkgver mindi-busybox = 1.7.3
+
+=item B<projcomponent>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: The component in the distribution repository, e.g. main for debian/ubuntu free software, (or non-free, contrib) or contrib for mandriva non core component e.g.
+ Conffile: project
+ Example: projcomponent Lintel = main
+
+=item B<projtag>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: tag that will be used for all packages names (on rpm: name-ver-tag.arch.rpm) in the project. Each package can overwrite it using B<pkgtag>.
+ Conffile: project
+ Example: projtag mondorescue = 1
+
+=item B<projver>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: version that will be used for all packages names (on rpm: name-ver-tag.arch.rpm) in the project. Each package can overwrite it using B<pkgver>.
+ Conffile: project
+ Example: projver mondorescue = 2.2.9
+
+=item B<rbsconf>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: for mock it's the configuration directory. For rinse it's its configuration file. For rpmbootstrap it's not used yet.
+ Conffile: ve
+ Example: rbsconf default = /etc/mock, rbsconf default = /etc/pb/pb-rinse.conf
+
+=item B<rbsb4pi>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: for mock it's not used. For rinse it's the script to call before doing installation (in order change the mirror location). For rpmbootstrap it's not used yet.
+ Conffile: ve
+ Example: rbsb4pi centos = /home/rinse/bin/before-post-install.sh
+
+=item B<rbsmirrorsrv>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: URL for the mirror server for setting up a virtual environment
+ Conffile: ve
+ Example: rbsmirrorsrv debian = http://mirrors1.kernel.org/
+
+=item B<rbsmirrorupd>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: Relative path wrt B<rbsmirrorsrv> where updates are located
+ Conffile: ve
+ Example: rbsmirrorupd mageia = ../updates
+
+=item B<rbsopt>
+
+ Nature: Optional
+ Key: tool used for rpm based VE. Could be one of rpmbootstrap, rinse, mock, ...
+ Value: Additional option to pass to the command
+ Conffile: ve
+ Example: rbsopt rpmbootstrap = -k
+
+=item B<rbspi>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: for mock it's not used. For rinse it's the script to call after doing installation for customization. For rpmbootstrap it's the script to call after doing installation for customization.
+ Conffile: ve
+ Example: rbspi centos = /home/rinse/bin/post-install.sh
+
+=item B<rmhost>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: IP address or name of the Remote Machine running the OS mentioned in the key, accessed through ssh.
+ Conffile: rm
+ Example: rmhost default = localhost - rmhost hpux-11.3-ia64 = 10.10.10.10 - rmhost mandriva-2010.2-x86_64 = machine1.domain.name
+
+=item B<rmlist>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: list of comma separated OS (under the form of os-ver-arch). The corresponding machines running these distributions are given in the rmpool parameter.
+ Conffile: rm
+ Example: rmlist default = mandriva-2010.2-i386,fedora-14-i386,rhel-6-i386,rhel-5-i386,pensuse-11.3-i386,sles-11-i386,gentoo-nover-i386,debian-5.0-i386,ubuntu-10.10-i386,solaris-10-i386,mandriva-2010.2-x86_64,fedora-14-x86_64,rhel-6-x86_64,rhel-5-x86_64,opensuse-11.3-x86_64,sles-11-x86_64,gentoo-nover-x86_64,debian-5.0-x86_64,ubuntu-10.10-x86_64,solaris-10-x86_64,hp-ux-11.3-ia64,rhel-5-ia64
+
+=item B<rmlogin>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: account name to use on the Remote Machine to build packages. Communication is done with ssh.
+ Conffile: rm
+ Example: rmlogin default = pb
+
+=item B<rmmonport>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: TCP port that is used to dialog with the monitor of the Remote Machine, to pass orders.
+ Conffile: rm
+ Example: rmmonport default = 4444
+
+=item B<rmntp>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: NTP server to contact for time accuracy with B<ospathcmd-ntpdate> before building.
+ Conffile: rm
+ Example: rmntp default = 1.pool.ntp.org
+
+=item B<rmpath>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: path where to find configuration file for Remote Machines management.
+ Conffile: rm
+ Example: rmpath default = /home/remote
+
+=item B<rmport>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: port number to use to communicate with the RM using the SSH protocol. This localport is redirected to the port 22 of the RM.
+ Conffile: rm
+ Example: rmport pb = 2222,rmport mondorescue = 2223
+
+=item B<rmtmout>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). The family name is generaly used here.
+ Value: Time in seconds to wait before interacting with the RM. This may correspond to the time the RM takes to boot.
+ Conffile: rm
+ Example: rmtmout default = 10
+
+=item B<rmtype>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: ssh. For the moment, only ssh is supported as a communication means with RM.
+ Conffile: rm
+ Example: rmrtype default = ssh
+
+=item B<sshdir>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: dirname into which packages are uploaded on the B<sshhost> machine.
+ Conffile: project
+ Example: sshdir mondorescue = /pub/mondorescue
+
+=item B<sshhost>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: hostname to connect to in order to deliver packages to the repository server.
+ Conffile: project
+ Example: sshhost mondorescue = ftp.mondorescue.org
+
+=item B<sshlogin>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: login to use when connecting to the repository server B<sshhost> for package delivery. whoami result by default
+ Conffile: project
+ Example: sshlogin mondorescue = mylogin
+
+=item B<sshport>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: port to use when connecting to the repository server B<sshhost> for package delivery. 22 by default.
+ Conffile: project
+ Example: sshport mondorescue = 22
+
+=item B<supfiles>
+
+Not used yet.
+
+=item B<testver>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: true (meaning this is a test version, whose tag will be generated automatically, based on 0+date in order to allow regular updates, and still be inferior to tag 1 of the official version, and delivered under the test subdirectory of the ftp server). By default false.
+ Conffile: project
+ Example: testver mondorescue = true
+
+=item B<vedebtype>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: debootstrap (no other tool to create deb distro based chroot)
+ Conffile: ve
+ Example: vedebtype default = debootstrap
+
+=item B<velist>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: list of comma separated OS (under the form of os-ver-arch).
+ Conffile: ve
+ Example: velist default = centos-4-i386,centos-5-i386,centos-4-x86_64,centos-5-x86_64,debian-5.0-i386,debian-5.0-x86_64,lsb-4.0.1-i386,lsb-4.0.1-x86_64
+
+=item B<velogin>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: account name to use in the VE to build packages.
+ Conffile: ve
+ Example: velogin default = pb
+
+=item B<ventp>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: NTP server to contact for time accuracy with B<ospathcmd-ntpdate> before building.
+ Conffile: ve
+ Example: ventp default = 1.pool.ntp.org
+
+=item B<vepath>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: path where to find VEs. Ve will be created and used under that path. For each VE os-ver-arch, it will create a subdirectory tree os/ver/arch below that point.
+ Conffile: ve
+ Example: vepath default = /home/rpmbootstrap
+
+=item B<verebuild>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: true|false. True means that the VE should be rebuild before usage.
+ Conffile: ve
+ Example: verebuild default = true
+
+=item B<verpmtype>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: rpmbootstrap|rinse|mock (different tools to create a chroot environment for RPM based distributions. rpmbootstrap comes with pb. the 2 others are separate projects).
+ Conffile: ve
+ Example: verpmtype default = rpmbootstrap
+
+=item B<vesnap>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: true|false. True means that the snapshot of the VE should be used before call to the VE. This snapshot consists of a compressed tar pf the VE. Which means that you will always start from a known state, resulting of a former snapshot operation on the VE. Also speeds up a lot the VM launch operation.
+ Conffile: ve
+ Example: vesnap default = true
+
+=item B<vetype>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: chroot|schroot|docker. There are two different ways of launching a Virtual Environment activity in pb. For the moment only chroot and docker have been tested.
+ Conffile: ve
+ Example: vertype default = chroot
+
+=item B<vmbuildtm>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). Default value is set to vmtmout
+ Value: Time in seconds to wait before killing the VM if SSH port already used. This should corresponds to the time to send files, build the project and get packages in the VM.
+ Conffile: project
+ Example: vmbuildtm default = 600,vmbuildtm mandriva-2009.0-x86_64 = 1200
+
+=item B<vmcmd>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). NB: a default value is highly interesting here.
+ Value: Command to call to launch the VM emulator.  It can contain some options. Another way to pass options to the VM manager command launcher is by using the PBVMOPT environment variable, which comes in addition to the option vmopt.
+ Conffile: vm
+ Example: vmcmd default = /usr/bin/kvm
+
+=item B<vmhost>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: hostname to connect to in order to reach the VM through ssh. Generally redirected from a port on localhost.
+ Conffile: vm
+ Example: vmhost default = localhost
+
+=item B<vmlist>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: list of comma separated OS (under the form of os-ver-arch).
+ Conffile: vm
+ Example: vmlist default = asianux-2-i386,asianux-3-i386,mandrake-10.1-i386,mandrake-10.2-i386,mandriva-2006.0-i386,mandriva-2007.0-i386,mandriva-2007.1-i386,mandriva-2008.0-i386,mandriva-2008.1-i386,mandriva-2009.0-i386,mandriva-2009.1-i386,mandriva-2010.0-i386,redhat-7.3-i386,redhat-9-i386,fedora-4-i386,fedora-5-i386,fedora-6-i386,fedora-7-i386,fedora-8-i386,fedora-9-i386,fedora-10-i386,fedora-11-i386,fedora-12-i386,rhel-2.1-i386,rhel-3-i386,rhel-4-i386,rhel-5-i386,suse-10.0-i386,suse-10.1-i386,suse-10.2-i386,opensuse-10.3-i386,opensuse-11.0-i386,opensuse-11.1-i386,opensuse-11.2-i386,sles-9-i386,sles-10-i386,sles-11-i386,gentoo-nover-i386,debian-3.1-i386,debian-4.0-i386,debian-5.0-i386,ubuntu-6.06-i386,ubuntu-7.04-i386,ubuntu-7.10-i386,ubuntu-8.04-i386,ubuntu-8.10-i386,ubuntu-9.04-i386,ubuntu-9.10-i386,solaris-10-i386,asianux-2-x86_64,asianux-3-x86_64,mandriva-2007.0-x86_64,mandriva-2007.1-x86_64,mandriva-2008.0-x86_64,mandriva-2008.1-x86_64,mandriva-2009.0-x86_64,mandriva-2009.1-x86_64,mandriva-2010.0-x86_64,fedora-6-x86_64,fedora-7-x86_64,fedora-8-x86_64,fedora-9-x86_64,fedora-10-x86_64,fedora-11-x86_64,fedora-12-x86_64,rhel-3-x86_64,rhel-4-x86_64,rhel-5-x86_64,suse-10.2-x86_64,opensuse-10.3-x86_64,opensuse-11.0-x86_64,opensuse-11.1-x86_64,opensuse-11.2-x86_64,sles-10-x86_64,sles-11-x86_64,gentoo-nover-x86_64,debian-4.0-x86_64,debian-5.0-x86_64,ubuntu-7.04-x86_64,ubuntu-7.10-x86_64,ubuntu-8.04-x86_64,ubuntu-8.10-x86_64,ubuntu-9.04-x86_64,ubuntu-9.10-x86_64,solaris-10-x86_64
+
+=item B<vmlogin>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: account name to use in the VM to build packages. Communication is done with ssh.
+ Conffile: vm
+ Example: vmlogin default = pb
+
+=item B<vmmem>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: Memory size in MB to allocate to the VM.
+ Conffile: vm
+ Example: vmmem default = 512
+
+=item B<vmmonport>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: TCP port that is used to dialog with the monitor of the VM, to pass orders such as snapshot. Not really operational yet.
+ Conffile: vm
+ Example: vmmonport default = 4444
+
+=item B<vmntp>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: NTP server to contact for time accuracy with B<ospathcmd-ntpdate> before building.
+ Conffile: vm
+ Example: vmntp default = 1.pool.ntp.org
+
+=item B<vmopt>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). NB: a default value is highly interesting here.
+ Value: list of options to pass to the VM manager command launcher for that distribution. Another way to pass options to the VM manager command launcher is by using the PBVMOPT environment variable, which comes in addition to his option.
+ Conffile: vm
+ Example: vmopt default = -m 384 -daemonize,vmopt mandriva-2009.0-i386 = -m 256 -daemonize -no-kvm
+
+=item B<vmpath>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: path where to find VMs. They will be created and used under that path. For each VM os-ver-arch, it will create a os-ver-arch.qemu file below that point.
+ Conffile: vm
+ Example: vmpath default = /home/qemu
+
+=item B<vmport>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: port number to use to communicate with the VM using the SSH protocol. This localport is redirected to the port 22 of the VM.
+ Conffile: vm
+ Example: vmport pb = 2222,vmport mondorescue = 2223
+
+=item B<vmsize>
+
+ Nature: Mandatory
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch).
+ Value: Size of the VM to create when using the newvm command of pb.
+ Conffile: vm
+ Example: vmsize default = 7G
+
+=item B<vmsnap>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: true|false. True means that the snapshot of the VM called pb should be used. Which means that you will always start from a known state, resulting of a former snapshot operation on the VM. Also speeds up a lot the VM launch operation.
+ Conffile: vm
+ Example: vmsnap default = true
+
+=item B<vmtmout>
+
+ Nature: Optional
+ Key: OS (could be from the most generic up to the most specific from ostype, osfamily, os, os-ver, os-ver-arch). NB: a default value is highly interesting here.
+ Value: Time in seconds to wait before interacting with the VM. This should correspond to the time the VM takes to boot.
+ Conffile: vm
+ Example: vmtmout default = 180,vmtmout mandriva-2009.0-x86_64 = 500
+
+=item B<vmtype>
+
+ Nature: Mandatory
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: qemu|kvm. For the moment, only QEMU or KVM are supported as virtualization technologies.
+ Conffile: vm
+ Example: vmtype default = kvm
+
+=item B<webdir>
+
+ Nature: Optional
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: Target directory containing the web content in the project that should be delivered when using the sbx|cms2webssh|pkg command of pb.
+ Conffile: project
+ Example: webdir mondorescue = website
+
+=item B<websshdir>
+
+ Nature: Optional (when not using *2webssh commands)
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: dirname into which content is uploaded on the B<websshhost> machine.
+ Conffile: project
+ Example: websshdir mondorescue = /var/www/html
+
+=item B<websshhost>
+
+ Nature: Optional (when not using *2webssh commands)
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: hostname to connect to in order to deliver content to the Web server.
+ Conffile: project
+ Example: websshhost mondorescue = www.mondorescue.org
+
+=item B<websshlogin>
+
+ Nature: Optional (when not using *2webssh commands)
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: login to use when connecting to the Web server B<websshhost> for content delivery.
+ Conffile: project
+ Example: websshlogin mondorescue = mylogin
+
+=item B<websshport>
+
+ Nature: Optional (when not using *2webssh commands)
+ Key: project (as defined in the -p option or PBPROJ environment variable)
+ Value: port to use when connecting to the Web server B<websshhost> for content delivery.
+ Conffile: project
+ Example: websshport mondorescue = 22
+
+=back
+
+=head1 OTHER PARAMETERS
+
+=over 4
+
+=item B<pb_URL>
+
+=item B<pb_directory_desc>
+
+=item B<pb_environment_variables>
+
+=back
+
+=head1 COPYRIGHT
+
+ (c) B. Cornec 2007-2016
+ Eric Anderson's changes are (c) Copyright 2012 Hewlett Packard
+ Provided under the Attribution-ShareAlike 3.0 Unported (CC BY-SA 3.0) Creative Common License
+
+=cut

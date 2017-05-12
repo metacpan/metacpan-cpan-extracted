@@ -1,0 +1,18 @@
+Image codecs for win32
+----------------------
+
+Prima needs image libraries to work correctly. Unix and cygwin builds rely on
+existing installations of libjpeg, libungif, libtiff, libpng, libXpm, and
+libX11, all of them being optional dependencies.
+
+This binary distribution provides the libraries above and their include files,
+for MSVC build.
+
+Installation
+-------------------
+
+perl Makefile.PL
+make install
+
+
+Dmitry Karasik, April 2008

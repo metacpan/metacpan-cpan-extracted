@@ -1,0 +1,15 @@
+Revision history for Plack-Middleware-Acme-PHPE9568F34-D428-11d2-A769-00AA001ACF42
+
+3.141000  2012-11-17 16:18:27 CST6CDT
+       - Put MetaYAML back in dist
+
+3.140000  2011-06-11 13:51:36 CST6CDT
+       - Add a useless tests so I stop getting stupid emails
+
+3.100000  2011-05-29 01:21:27 CST6CDT
+       - Fix Misspelled Content-Type header (Olivier Mengué)
+       - Images were backwards for a couple of the parameters, fixed (Olivier Mengué)
+
+3.000100  2011-05-27 21:43:09 CST6CDT
+       - Initial Release
+

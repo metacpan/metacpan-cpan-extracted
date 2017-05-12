@@ -1,0 +1,43 @@
+NAME
+    Pod::Coverage::MethodSignatures - Pod::Coverage extension for
+    Method::Signatures
+
+SYNOPSIS
+      use Pod::Coverage::MethodSignatures;
+
+      my $pcm = Pod::Coverage::MethodSignatures->new(package => 'Foo::Bar');
+      print 'Coverage: ', $pcm->coverage, "\n";
+
+      # or in a pod-coverage.t
+
+      use Test::More;
+      eval "use Test::Pod::Coverage 1.00";
+      plan skip_all => "Test::Pod::Coverage 1.00 required for testing POD coverage" if $@;
+      all_pod_coverage_ok({ coverage_class => 'Pod::Coverage::MethodSignatures'});
+
+DESCRIPTION
+    This module works exactly as Pod::Coverage does, but with a more chill
+    approach to verifying code origin, as overridden in _get_syms(), and
+    with whitelisting of func() and method(), as overridden in
+    _trustme_check().
+
+    See the documentation for Pod::Coverage for more information on usage.
+
+    This module might also support other things such as MooseX::Declare and
+    MooseX::Method::Signatures but I haven't tested that.
+
+SEE ALSO
+    Method::Signatures, Pod::Coverage, Test::Pod::Coverage
+
+THANKS
+    Pod::Coverage::Moose authors - for the borrowed Pod
+
+    Michael Schwern - for the answered questions and verified hypotheses
+
+AUTHOR
+    Darian Anthony Patrick <dap@darianpatrick.com>
+
+COPYRIGHT AND LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

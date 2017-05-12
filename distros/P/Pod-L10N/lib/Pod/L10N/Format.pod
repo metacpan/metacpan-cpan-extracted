@@ -1,0 +1,87 @@
+
+=encoding euc-jp
+
+=head1 NAME
+
+=begin original
+
+Pod::L10N::Format - Specification for Pod::L10N
+
+=end original
+
+Pod::L10N::Format - Pod::L10N 対応フォーマット仕様
+
+=head1 DESCRIPTION
+
+Pod::L10N 対応フォーマットは、以下の目標を達成しつつ Pod の訳文を
+記述するために作成されています。
+
+=over
+
+=item Be compatible with original POD specifications (and POD files based on them)
+
+(既存の POD 仕様(及びそれで作成された POD ファイル)と互換性を持つ)
+
+例えば、POD 仕様では見出しの文字列がそのままリンクの識別子になるため、
+他の POD からアクセスできるように、見出しそのものは原文のまま残す
+必要があります。
+
+=item Print pretty well with existing tools
+
+(既存のツールでも違和感なく表示される)
+
+L10N 対応ツールは普及しているものではなく、変換先も一部しかないので、
+既存のツールで変換されることも考慮し、その場合でも違和感ない形で
+変換される必要があります。
+
+=item Be able to associate translated text with orignal ones automatically
+
+(原文と訳文を機械的に対応付けることを可能にする)
+
+単に訳文を表示するためだけでなく、専用のツールを使うことで原文と訳文を
+並べて表示したり、あるいは翻訳メモリで使用する、といった用途が
+考えられるため、原文と訳文を機械的に対応付けられることが望ましいです。
+
+=back
+
+=head1 SPECIFICATIONS
+
+(仕様)
+
+=head2 Ordinary and verbatim paragraphs
+
+(普通の(ordinary)段落とそのままの(verbatim)段落)
+
+通常の段落とそのままの段落は訳文のみを記述します。
+
+原文を併記する場合(これはオプションです)は、訳文の段落の B<前> に、
+C<=begin original> と C<=end original> で囲んだ原文の段落を置きます。
+
+=head2 Headings and C<=item>
+
+(見出しと C<=item>)
+
+見出しと C<=item> は、原文のまま残します。
+
+見出しと C<=item> を翻訳する場合(これはオプションです)は、原文の次の段落として
+C<(> と C<)> で囲んだ普通の段落として記述します。
+
+もし見出しと C<=item> を翻訳しないけれども、たまたま次の段落が C<(> と
+C<)> で囲まれた普通の段落の場合は、見出しや C<=item> の原文と同じ内容を
+訳文として記述することで、次の段落が訳文と認識させることを防ぎます。
+
+=head1 AUTHOR
+
+白方 健太郎 (SHIRAKATA Kentaro), E<lt>argrath@cpan.orgE<gt>.
+
+=head1 SEE ALSO
+
+L<perlpod>, L<Pod::Html>, L<Pod::L10N::Html>
+
+=head1 COPYRIGHT
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

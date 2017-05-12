@@ -1,0 +1,75 @@
+NAME
+    POE::Component::XUL - Easier use of XUL::Node when using POE
+
+DESCRIPTION
+    POE::Component::XUL uses POE::XUL::SessionManager and POE::XUL::Session
+    in a slightly different way to allow poe callbacks to your session for
+    XUL application calls.
+
+  SYNOPSIS
+            use POE qw( Component::XUL );
+            use XUL::Node;
+            use XUL::Node::Application;
+
+            use base 'XUL::Node::Application';
+
+            POE::Session->create(
+                    inline_states => {
+                            _start => sub {
+                                    my ($kernel, $heap, $session) = @_[KERNEL, HEAP, SESSION];
+
+                                    POE::Component::XUL->spawn({
+                                            port => 8001,
+                                            root => '/usr/local/xul-node',
+                                            apps => {
+                                                    # a callback
+                                                    Test => $session->callback("client_start"),
+                                                    # or a sub
+                                                    Test2 => sub {
+                                                            # code for app Test2 here
+                                                            # see client_start below
+                                                    },
+                                            },
+                                    });
+                            },
+                            client_start => sub {
+                                    my ($kernel, $heap, $session) = @_[KERNEL, HEAP, SESSION];
+                                    # the label object is kept in the heap to use it on callbacks
+                                    return Window(
+                                            VBox(FILL, $heap->{label} = Label(value => 'select item from list'),
+                                                    ListBox(FILL,
+                                                            (map { ListItem(label => "item #$_") } 1..10),
+                                                            Select => $session->callback('listbox_select')
+                                                    ),
+                                            ),
+                                    );
+                            },
+                            listbox_select => sub {
+                                    my ($kernel, $heap, $session, $event) = (@_[KERNEL, HEAP, SESSION], $_[ARG1]->[0]);
+                                    print "[".$event->{session}."] picked #".($event->{selectedIndex}+1)."\n";
+                                    # example of doing 2 or more things in request
+                                    # set the label text and make it change colors
+                                    my @colors = ('red','blue','green','yellow','white','black');
+                                    return $heap->{label}->value("you selected #".($event->{selectedIndex}+1)).
+                                            $heap->{label}->style('color:'.$colors[(int(rand($#colors)))]);         
+                            },
+                    },
+            );
+
+            $poe_kernel->run();
+
+DESCRIPTION
+    POE::Component::XUL allows you to use poe callbacks in your XUL::Node
+    apps. In its current state, XUL::Node doesn't give you a way to use POE
+    easily in your apps, but with this component you will have the control
+    you need.
+
+AUTHOR
+    David Davis, <xantus@cpan.org>
+
+THANKS
+    Rocco Caputo, for pushing me. :)
+
+SEE ALSO
+    perl(1), XUL::Node, XUL::Node::Application.
+

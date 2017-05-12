@@ -1,0 +1,72 @@
+=encoding utf-8
+
+=for stopwords
+
+=head1 名前
+
+Pod::MultiLang::Dict_ja - 見出し辞書管理
+
+=head1 概要
+
+ my $dictmgr = Pod::MultiLang::Dict->new();
+ $dictmgr->load_dict(@langs);
+ my @tranlates = $dictmgr->find_word([@langs],$word);
+
+=head1 説明
+
+Pod::MultiLang 用見出し語変換辞書.
+
+各言語用の辞書は, Pod::MultiLang::Dict::xx に
+配置します. load_dict から use されます.
+
+=head1 メソッド
+
+=over
+
+=item new
+
+  my $dictmgr = Pod::MultiLang::Dict->new();
+
+インスタンスの作成.
+でもパッケージ変数で処理してるのでどのインスタンスでも
+内部状態は同じ^^;;
+
+=item load_dict
+
+  $dictmgr->load_dict(@langs);
+  $dictmgr->load_dict(\@langs);
+
+辞書のロード. 
+多重ロードしちゃっても大丈夫.
+
+=item find_word
+
+  @multilingual = $dictmgr->find_word(\@langs,$text);
+
+指定した言語に変換.
+変換がなかったところには undef が入ります.
+a AND b とかの入力だと, a の訳, AND の訳, b の訳 を
+つなげて全体の訳になります.
+多少なら複数形も吸収します.
+入力は英語でよろしく.
+
+=back
+
+=head1 辞書に必要なメソッド
+
+=over
+
+=item static_table
+
+  $text = $dictmgr->make_link
+
+語句 => 訳語 なハッシュのリファレンスを返す.
+
+=item make_linktext
+
+  $text = $dictmgr->make_linktext($lang,$name,$section);
+
+指定した言語で, ラベルを持たない LZ<><> 用のラベルを生成.
+
+=back
+

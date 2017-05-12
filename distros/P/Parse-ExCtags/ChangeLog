@@ -1,0 +1,22 @@
+0.06:
+        Remove ;" from the address field.
+
+0.04:
+	Add a "%kind_map" to lookup single-character map
+	in "tags" file.
+
+0.03:
+	This version changes nothing but documentation.
+
+0.02:
+	Be able to handle tagfields. Replace the 'special' hash key
+	in previous version with 'field'.
+
+	The ->tags() now return a hashref of hashref, instead of
+	arrayref of hashref. You can use tag name as hash key.
+
+0.01:
+	This version simple do a split/\t/, and return it as a hash,
+	while hash keys are the name of the fields.
+	According to http://ctags.sourceforge.net/FORMAT
+

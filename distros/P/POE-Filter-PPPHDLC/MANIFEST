@@ -1,0 +1,10 @@
+Changes
+ex/poeppp.pl
+lib/POE/Filter/PPPHDLC.pm
+Makefile.PL
+MANIFEST
+README
+t/00use.t
+t/20fcs.t
+t/21get.t
+META.yml                                 Module meta-data (added by MakeMaker)

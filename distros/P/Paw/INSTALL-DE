@@ -1,0 +1,36 @@
+Copyright (c) 1999 SuSE Gmbh Nuernberg, Germany.  All rights reserved.
+
+Author  : Uwe Gansert <ug@suse.de>
+License : GPL, see LICENSE File for further information
+
+
+mache als root :
+
+perl Makefile.PL
+make test
+make install
+
+Einige Beispiele liegen in 
+/usr/lib/perl5/site_perl/PERL_VERSION/Paw/examples/
+und "perldoc Paw-de" zeigt die Dokumentation.
+Jedes widget hat seine eigene Dokumentation:
+
+perldoc Paw::Paw-de
+perldoc Paw::Button-de
+perldoc Paw::Label-de
+perldoc Paw::Scrollbar-de
+perldoc Paw::Listbox-de
+perldoc Paw::Line-de
+perldoc Paw::Box-de
+perldoc Paw::Radiobutton-de
+perldoc Paw::Textbox-de
+perldoc Paw::Filedialog-de
+perldoc Paw::Popup-de
+perldoc Paw::Menu-de
+perldoc Paw::Text_entry-de
+perldoc Paw::Progressbar-de
+
+Ich freue mich ueber jedes Feedback - gut oder schlecht :-)
+
+
+much fun , Uwe Gansert (ug@suse.de)

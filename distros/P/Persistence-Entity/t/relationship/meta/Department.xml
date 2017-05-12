@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<orm entity="dept"  class="Department" >
+    <column name="deptno" attribute="id" />
+    <column name="dname" attribute="name" />
+    <column name="loc" attribute="location" />
+    <one_to_many_relationship  name="emp" attribute="employees" fetch_method="EAGER" cascade="ALL"/>
+</orm>

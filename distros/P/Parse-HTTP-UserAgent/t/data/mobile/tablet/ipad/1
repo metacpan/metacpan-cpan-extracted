@@ -1,0 +1,89 @@
+[AGENT]
+
+Mozilla/5.0 (iPad; U; CPU OS 4_3_5 like Mac OS X; fr-fr) AppleWebKit/533.17.9 (KHTML, like Gecko) Mobile/8L1
+
+extras   => [ 'KHTML, like Gecko', 'Mobile/8L1' ],
+lang     => 'fr-fr',
+name     => 'iPad',
+os       => 'CPU OS 4_3_5 like Mac OS X',
+parser   => 'safari',
+strength => 'U',
+toolkit  => [ 'AppleWebKit', '533.17.9', '533.017009' ],
+mobile   => 1,
+tablet   => 1,
+
+[AGENT]
+
+Mozilla/5.0 (iPad; U; CPU OS OS 3_2 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B367 Safari/531.21.10
+
+extras      => [ 'KHTML, like Gecko', 'Mobile/7B367', 'Safari/531.21.10' ],
+lang        => 'en-us',
+name        => 'iPad',
+os          => 'CPU OS OS 3_2 like Mac OS X',
+parser      => 'safari',
+strength    => 'U',
+toolkit     => [ 'AppleWebKit', '531.21.10', '531.021010' ],
+version     => '4.000004',
+version_raw => '4.0.4',
+mobile      => 1,
+tablet      => 1,
+
+[AGENT]
+
+Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Version/4.0.4 Mobile/7B405 Safari/531.21.10
+
+extras      => [ 'KHTML, like Gecko', 'Mobile/7B405', 'Safari/531.21.10' ],
+lang        => 'en-us',
+name        => 'iPad',
+os          => 'CPU OS 3_2_1 like Mac OS X',
+parser      => 'safari',
+strength    => 'U',
+toolkit     => [ 'AppleWebKit', '531.21.10', '531.021010' ],
+version     => '4.000004',
+version_raw => '4.0.4',
+mobile      => 1,
+tablet      => 1,
+
+[AGENT]
+
+Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405
+
+extras   => [ 'KHTML, like Gecko', 'Mobile/7B405' ],
+lang     => 'en-us',
+name     => 'iPad',
+os       => 'CPU OS 3_2_1 like Mac OS X',
+parser   => 'safari',
+strength => 'U',
+toolkit  => [ 'AppleWebKit', '531.21.10', '531.021010' ],
+mobile   => 1,
+tablet   => 1,
+
+[AGENT]
+
+Mozilla/5.0 (iPad; U; CPU OS 4_3_5 like Mac OS X; en-us) AppleWebKit/533.17.9 (KHTML, like Gecko) Version/5.0.2 Mobile/8L1 Safari/6533.18.5
+
+extras      => [ 'KHTML, like Gecko', 'Mobile/8L1', 'Safari/6533.18.5' ],
+lang        => 'en-us',
+name        => 'iPad',
+os          => 'CPU OS 4_3_5 like Mac OS X',
+parser      => 'safari',
+strength    => 'U',
+toolkit     => [ 'AppleWebKit', '533.17.9', '533.017009' ],
+version     => '5.000002',
+version_raw => '5.0.2',
+mobile      => 1,
+tablet      => 1,
+
+[AGENT]
+
+Mozilla/5.0 (iPad; CPU OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3
+
+extras          => [ 'KHTML, like Gecko', 'Mobile/9A334', 'Safari/7534.48.3' ],
+mobile          => 1,
+name            => 'iPad',
+os              => 'CPU OS 5_0 like Mac OS X',
+parser          => 'safari',
+tablet          => 1,
+toolkit         => [ 'AppleWebKit', '534.46', '534.460' ],
+version         => '5.100',
+version_raw     => '5.1',

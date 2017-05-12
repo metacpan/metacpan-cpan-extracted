@@ -1,0 +1,12 @@
+0.04      2017-03-30 09:21:52+00:00 UTC
+    - Bugfix: specify exact List::Util version
+
+0.03      2017-03-21 14:24:26+00:00 UTC
+    - Bugfix: relax tag length check
+    - Bugfix: parse messages, defined in protocol extension
+
+0.02
+    - Reddit's feedback: add DESCRIPTION and NAME sections into POD
+
+0.01      2017-03-15 11:10:40+00:00 UTC
+    - Initial version, FIX 4.4 protocol

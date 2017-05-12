@@ -1,0 +1,42 @@
+{
+   "abstract" : "POE FastCGI server",
+   "author" : [
+      "David Leadbeater <cpan@dgl.cx>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200009, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-FastCGI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI::Util" : 0,
+            "HTTP::Request" : 0,
+            "HTTP::Response" : 0,
+            "POE" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/bingos/poe-component-fastcgi",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/bingos/poe-component-fastcgi",
+         "web" : "http://github.com/bingos/poe-component-fastcgi"
+      }
+   },
+   "version" : "0.19"
+}
+

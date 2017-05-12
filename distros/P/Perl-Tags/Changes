@@ -1,0 +1,62 @@
+Revision history for Perl-Tags
+
+0.32    2014-05-26
+        Fix RT#95776 via SREZIC
+
+0.31    2014-05-18
+        perl-tags: Added -files option. Fixed -no-vars (DMITRI)
+        Bugfixes:
+        - dependencies (PPI optional, parent, App::Fatpacker)
+        - errors caused by shebang lines in tests
+        - xt/strict.t
+
+0.30    2014-04-27
+        Reorganisation, extraction of various modules into separate files
+        Documentation update to reflect above
+        ::Hybrid tagger, solving problem of combining PPI and ::Naive taggers
+        ::Naive::Moose (by dr_bean)
+        Test improvements including Test::Perl::Tags
+        Improvements to bin/perl-tags flags and defaults
+        Fatpacked script for the benefit of editor integration
+
+0.28    2009-11-24
+        Update MANIFEST (via tsee++)
+
+0.27    2009-11-13
+        Do not parse example code in POD (DMITRI).
+        Now comes with a super-simple command line interface. (tsee)
+
+0.26    2008-08-07
+        Bruno Vecchi pointed out the example perl.vim doesn't work:
+            Added comment about 'EOF'
+            Uncommented call to s:do_tags
+
+0.25    2008-07-11
+        Removing t/pod-coverage.t until I have time to fix
+
+0.24    2008-07-06 -- the nuffintags version
+        Folded in changes from contributors
+        ::PPI module contributed by Wolverian
+        ::Naive::Spiffy and ::Naive::Lib by dr_bean
+        parser improvements
+        fixes to tests
+
+0.23    2006-07-05
+        Added the tests mentioned below to the distribution :-)
+        Test and documentation for exuberant extensions
+
+0.22    2006-07-05
+        Made subclassing easier
+        added basic tests (NB: not particularly high coverage, nor testing Exuberant extensions)
+        added subclassing tests
+
+0.21    2006-07-04
+        Added prerequesite Module::Locate
+
+0.2     2006-07-03
+        Bundled up for CPAN distribution, with better docs
+        (but only minimal tests, sorry 'bout that)
+
+0.01    2006-03-26
+        First version, integrated with my .vim
+

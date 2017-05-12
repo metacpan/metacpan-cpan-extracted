@@ -1,0 +1,15 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+camel_providerdir=${libdir}/evolution-data-server-1.2/camel-providers-14
+privlibdir=${libdir}/evolution-data-server-2.30
+privincludedir=${includedir}/evolution-data-server-2.30
+
+Name: camel-provider
+Description: The Evolution mail access library
+Version: 2.30.3
+Requires: camel-1.2
+Libs: -L${libdir} -lcamel-provider-1.2
+Cflags: -I${privincludedir}

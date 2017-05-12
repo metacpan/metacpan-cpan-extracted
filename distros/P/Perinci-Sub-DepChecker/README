@@ -1,0 +1,91 @@
+SYNOPSIS
+
+     use Perinci::Spec::DepChecker qw(check_deps dep_satisfy_rel list_mentioned_dep_clauses);
+    
+     my $err = check_deps($meta->{deps});
+     print "Dependencies not met: $err" if $err;
+    
+     print "We need to prepare foo"
+         if dep_satisfy_rel('foo', $meta->{deps}) =~ /^(?:must|might)$/;
+
+DESCRIPTION
+
+    The 'deps' spec clause adds information about subroutine dependencies.
+    This module performs check on it.
+
+    This module is currently mainly used by Perinci::Sub::Wrapper.
+
+FUNCTIONS
+
+    None is exported by default, but every function is exportable.
+
+ check_deps($deps) => ERRSTR
+
+    Check dependencies. Will in turn call various checkdep_NAME()
+    subroutines. Return empty string if all dependencies are met, or a
+    string containing an error message stating a dependency error.
+
+    Example:
+
+     my $err = check_deps({env=>'DEBUG'});
+
+    Will check environment variable DEBUG. If true, will return an empty
+    string. Otherwise will set $err with something like Environment
+    variable DEBUG not set/true.
+
+    Another example:
+
+     my $err = check_deps({ all=>[{env=>"A"}, {env=>"B", prog=>"bc"}] });
+
+    The above will check environment variables A, B, as well as program bc.
+    All dependencies must be met (because we use the and metaclause).
+
+    To support a custom dependency named NAME, just define checkdep_NAME
+    subroutine in Perinci::Sub::DepChecker package which accepts a value
+    and should return an empty string on success or an error message
+    string.
+
+ dep_satisfy_rel($name, $deps) => STR
+
+    Check dep satisfication relationship, i.e. whether dependency named
+    $name must be satisfied in $deps. Due to all, any, and none clauses,
+    this needs to be checked recursively and might yield an inconclusive
+    answer ("maybe").
+
+    Return "must" if $name definitely must be satisfied in $deps, "must
+    not" if definitely not, "" if need not be satisfied (dep clause does
+    not exist in deps), "impossible" if condition is impossible to be
+    satisfied (due to conflicts), "might" if dep might need to be satisfied
+    (but might also not).
+
+    Examples:
+
+     dep_satisfy_rel('env', {env=>"A"})              # => "must"
+     dep_satisfy_rel('a', {all=>[{a=>1}, {b=>1}]})   # => "must"
+     dep_satisfy_rel('a', {b=>2})                    # => ""
+     dep_satisfy_rel('a', {none=>[{a=>1}, {b=>1}]})  # => "must not"
+     dep_satisfy_rel('c', {none=>[{a=>1}, {b=>1}]})  # => ""
+     dep_satisfy_rel('a', {any=>[{a=>1}, {b=>1}]})   # => "might"
+     dep_satisfy_rel('a', {all=>[{a=>1},
+                                 {none=>[{a=>1}]}]}) # => "impossible"
+
+    This function is useful if we want to prepare something that "must" or
+    "might" be needed, or want to avoid preparing something that "must not"
+    be present.
+
+ list_mentioned_dep_clauses($deps) => ARRAYREF
+
+    List all dep clauses mentioned in $deps. The returned array is not
+    sorted alphabetically, so you will have to do it yourself if you need
+    it sorted.
+
+    Example:
+
+     list_mentioned_dep_clauses({any=>[{a=>1}, {b=>1}]}) # => [qw/any a b/]
+
+SEE ALSO
+
+    Perinci
+
+    'deps' section in Rinci::function
+

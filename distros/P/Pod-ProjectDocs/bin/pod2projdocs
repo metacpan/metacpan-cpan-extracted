@@ -1,0 +1,90 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+our $VERSION = '0.48'; # VERSION
+
+use Getopt::Long;
+use Pod::Usage;
+use Pod::ProjectDocs;
+
+my($out, $lib, $title, $lang, $desc, $index, $verbose, $forcegen, $except);
+my $help = @ARGV == 0;
+
+my %opt = (
+    'help|?'      => \$help,
+    'out|o=s'     => \$out,
+    'lib|l=s@'    => \$lib,
+    'except|e=s@' => \$except,
+    'title|t=s'   => \$title,
+    'desc|d=s'    => \$desc,
+    'index!'      => \$index,
+    'verbose|v'   => \$verbose,
+    'forcegen!'   => \$forcegen,
+    'lang=s'      => \$lang,
+);
+
+GetOptions(%opt);
+
+pod2usage(1) if $help;
+
+my $p = Pod::ProjectDocs->new(
+    outroot  => $out,
+    libroot  => $lib,
+    except   => $except,
+    title    => $title,
+    desc     => $desc,
+    index    => $index,
+    verbose  => $verbose,
+    forcegen => $forcegen,
+    lang     => $lang,
+);
+$p->gen();
+
+=head1 NAME
+
+pod2projdocs - generates CPAN like project documents from pod.
+
+=head1 SYNOPSIS
+
+pod2projdocs [options]
+
+ Options:
+    -help        display this help and exist
+    -out         directory path that you want to generate documents into
+    -lib         your project's library-root-directory path
+    -title       your project's title
+    -desc        your project's description
+    -noindex     don't create index for all generated pages
+    -forcegen    generate documents each time, ignoring last modified timestamp
+    -lang        set this language as xml:lang (default 'en')
+    -except      the files matches this regex won't be parsed
+
+ You can set each option with their first character,
+ for example, you can write -o instead of -out.
+
+ And you can generate documents from multiple library directories.
+
+  pod2projdocs -o /path/to/outputdir -l /path/to/lib1 -l /path/to/lib2
+
+=head1 DESCRIPTION
+
+generates CPAN like project documents from pod.
+
+=head1 SEE ALSO
+
+L<Pod::ProjectDocs>
+
+=head1 AUTHOR
+
+Lyo Kato E<lt>lyo.kato@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2005 Lyo Kato. All rights reserved.
+
+This library is free software. You can redistribute it and/or modify it under
+the same terms as perl itself.
+
+=cut

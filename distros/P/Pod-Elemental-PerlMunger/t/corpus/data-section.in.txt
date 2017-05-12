@@ -1,0 +1,11 @@
+my $hello = 'world';
+
+=head1 NAME
+
+Hello World
+
+=cut
+
+__DATA__
+
+To be read.

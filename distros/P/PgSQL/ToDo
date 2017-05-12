@@ -1,0 +1,21 @@
+
+ToDo in PgSQL module:
+
+* read/write BLOBs
+  se text file BLOB.txt
+* handle quoting
+* handle bool in perlish way
+* auth (se FIXME concerning CRYPT)
+* BUGS:
+	* errorhandling
+	  handshake no user 'ldap'
+	* errorhandling 
+	  select etc "NO GRANT"
+* write documentation
+
+
+
+
+
+
+

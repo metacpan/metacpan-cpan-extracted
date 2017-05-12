@@ -1,0 +1,58 @@
+DESCRIPTION
+
+    This module is a lightweight alternative to Perinci::Access. It has
+    less prerequisites but does fewer things. The things it supports:
+
+      * Local (in-process) access to Perl modules and functions
+
+      Currently only call, meta, and list actions are implemented.
+      Variables and other entities are not yet supported.
+
+      The list action only gathers keys from %SPEC and do not yet list
+      subpackages.
+
+      * HTTP/HTTPS
+
+      * HTTP over Unix socket
+
+    Differences with Perinci::Access:
+
+      * For network access, uses HTTP::Tiny module family instead of LWP
+
+      This results in fewer dependencies.
+
+      * No wrapping, no argument checking
+
+      For 'pl' or schemeless URL, no wrapping (Perinci::Sub::Wrapper) is
+      done, only normalization (using Perinci::Sub::Normalize).
+
+      * No transaction or logging support
+
+      * No support for some schemes
+
+      This includes: Riap::Simple over pipe/TCP socket.
+
+ATTRIBUTES
+
+ riap_version => float (default: 1.1)
+
+METHODS
+
+ new(%attrs) => obj
+
+ $pa->request($action, $url, $extra) => hash
+
+ADDED RESULT METADATA
+
+    This class might add the following property/attribute in result
+    metadata:
+
+ x.hint.result_binary => bool
+
+    If result's schema type is buf, then this class will set this attribute
+    to true, to give hints to result formatters.
+
+SEE ALSO
+
+    Perinci::Access
+

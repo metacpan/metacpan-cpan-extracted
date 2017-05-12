@@ -1,0 +1,38 @@
+---
+name: PPIx-Grep
+version: v0.0.6
+author:
+  - 'Elliot Shank <perl@galumph.com>'
+abstract: Search L<PPI> documents (not Perl code).
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  English: 0
+  Exporter: 5.57
+  File::Next: 1.02
+  Getopt::Long: 2.37
+  List::MoreUtils: 0
+  PPI: 1.201
+  PPIx::Shorthand: 1
+  Readonly: 1.03
+  String::Format: 1.14
+  strict: 0
+  utf8: 0
+  version: 0.74
+  warnings: 0
+build_requires:
+  Test::Deep: 0.098
+  Test::More: 0.72
+dynamic_config: 0
+provides:
+  PPIx::Grep:
+    file: lib/PPIx/Grep.pm
+    version: v0.0.6
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+configure_requires:
+  Module::Build: 0.2808

@@ -1,0 +1,39 @@
+-- Patch:
+--   From: 1.0.3
+--   To:   1.2.0
+--
+-- Description:
+--
+--      move all tables into a contained namespace
+
+BEGIN;
+
+-- patch starts here --
+    CREATE SCHEMA parley;
+    ALTER SCHEMA parley OWNER TO parley;
+
+    ALTER TABLE public.admin_action                 SET SCHEMA parley;
+    ALTER TABLE public.authentication               SET SCHEMA parley;
+    ALTER TABLE public.email_queue                  SET SCHEMA parley;
+    ALTER TABLE public.forum                        SET SCHEMA parley;
+    ALTER TABLE public.forum_moderator              SET SCHEMA parley;
+    ALTER TABLE public.ip_ban                       SET SCHEMA parley;
+    ALTER TABLE public.ip_ban_type                  SET SCHEMA parley;
+    ALTER TABLE public.log_admin_action             SET SCHEMA parley;
+    ALTER TABLE public.password_reset               SET SCHEMA parley;
+    ALTER TABLE public.person                       SET SCHEMA parley;
+    ALTER TABLE public.post                         SET SCHEMA parley;
+    ALTER TABLE public.preference                   SET SCHEMA parley;
+    ALTER TABLE public.preference_time_string       SET SCHEMA parley;
+    ALTER TABLE public.registration_authentication  SET SCHEMA parley;
+    ALTER TABLE public.role                         SET SCHEMA parley;
+    ALTER TABLE public.sessions                     SET SCHEMA parley;
+    ALTER TABLE public.terms                        SET SCHEMA parley;
+    ALTER TABLE public.terms_agreed                 SET SCHEMA parley;
+    ALTER TABLE public.thread                       SET SCHEMA parley;
+    ALTER TABLE public.thread_view                  SET SCHEMA parley;
+    ALTER TABLE public.user_roles                   SET SCHEMA parley;
+
+-- patch ends here --
+
+COMMIT;

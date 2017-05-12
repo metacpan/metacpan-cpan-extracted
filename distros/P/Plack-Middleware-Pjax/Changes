@@ -1,0 +1,10 @@
+Revision history for Perl extension Plack-Middleware-Pjax
+
+1.114400  2015-01-10 14:18:11EST-0500 America/Toronto
+    - switch to Marpa::R2 in favor of deprecated Marpa::HTML
+
+1.113400  2011-12-06 05:46:50 Europe/Paris
+    - pod fix! thanks @ioncache / MJubenville
+
+1.113390  2011-12-05 06:57:31 Europe/Paris
+    - Initial release.

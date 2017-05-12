@@ -1,0 +1,34 @@
+Revision history for Perl extension Perl::Compare
+
+0.11 Mon  2 Jun 2008
+	- No functional changes
+	- Upgraded to Module::Install 0.75
+
+0.10 Wed  9 Feb 2005
+	- Completely rewritten. New purpose. New API.
+	- All pre-0.10 code should port to PPI::Normal and Perl::Signature
+
+0.07 Fri 24 Sep 2004
+	- Back in good enough condition to upload
+
+0.06 Mon  9 Aug 2004
+	- Moved PPI::Analysis::Compare to Perl::Compare
+	- Inlined Perl::Compare::_NormalizedDocument
+	- Now this is seperate, don't take Tokenizers directly
+
+0.04 Thu  8 Jul 2004
+	- Normalised single and double quotes with the "optimize_literal_strings" transform
+	- Added PPI::Analysis::Compare::NormalizedDocument to allow cached normalisation
+	- Clean up symbol names with the "canonicalize_symbols" transform
+
+0.03 Mon  5 Jul 2004
+	- Refactored into something a bit more extensible
+	- Seperated out end/data/whitespace pruning
+	- Added a transform to remove null statements
+
+0.02 Thu  1 Jul 2004
+	- Upgraded to use ::PPI::Node->prune to actually remove the
+	  non-significant stuff.
+
+0.01 Tue 29 Jun 2004
+	- Created the guts of the module, but waiting for PPI scanning/filter engine

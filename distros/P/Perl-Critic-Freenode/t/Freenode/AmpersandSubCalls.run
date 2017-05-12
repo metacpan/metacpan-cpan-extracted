@@ -1,0 +1,27 @@
+## name AmpersandWithArgs
+## failures 2
+## cut
+
+&foo(1,2,3);
+&foo 1,2,3;
+
+## name AmpersandNoArgs
+## failures 2
+## cut
+
+&foo();
+&foo;
+
+## name SubRef
+## failures 0
+## cut
+
+my $ref = \&foo;
+
+## name AmpersandExemptions
+## failures 0
+## cut
+
+goto &foo;
+defined &foo;
+exists &foo;

@@ -1,0 +1,41 @@
+color = 1
+
+[ValuesAndExpressions::RequireNumberSeparators]
+min_value = 100000
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print say
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME | SYNOPSIS | AUTHOR | VERSION | COPYRIGHT AND LICENSE
+
+# dzil puts begin block before strictures. Using moose anyway
+[-TestingAndDebugging::RequireUseStrict]
+
+# complains about the { __PACKAGE__::VERSION = blah } block dzil puts at the top
+[-TestingAndDebugging::RequireUseWarnings]
+
+# allowing ifs because I prefer it for debug logging
+[ControlStructures::ProhibitPostfixControls]
+allow = if
+
+# handled elsewhere
+[-Documentation::PodSpelling]
+
+# pod::weaver always sticks it at the end, but before __END__
+[-Documentation::RequirePodAtEnd]
+
+# I prefer version strings and don't care about old perls
+[-ValuesAndExpressions::ProhibitVersionStrings]
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 12
+
+# doesn't know about Moo builders, etc
+[-Subroutines::ProhibitUnusedPrivateSubroutines]
+
+# don't care for these
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-RegularExpressions::RequireDotMatchAnything]
+[-Variables::ProhibitPunctuationVars]

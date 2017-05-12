@@ -1,0 +1,24 @@
+Revision history for Perl extension PerlX::Range
+
+0.05
+- re-write it with XS
+- make it file scoped like strict pragma
+- the min/max value of a range can now be numeric variables
+- disable the '*' and :by() syntax for now, but they'll be back!
+
+0.04
+- minor stupiditiy fixes
+- ensure that the syntax '..*:by(2)' works.
+
+0.03
+- add :by() syntax
+- allow * as the end of the range
+- range object can now deref to an array
+- and it has a to_a method that returns a list/array
+
+0.02
+- Implement methods
+- documentation
+
+0.01    Fri Sep 11 13:03:34 2009
+        - original version

@@ -1,0 +1,32 @@
+#!/usr/bin/perl -w
+
+use strict;
+use PerlBench qw(make_timeit_sub make_timeit_sub_code);
+use PerlBench::Stats qw(calc_stats);
+use PerlBench::Utils qw(sec_f);
+
+accuracy(10000000);
+
+sub accuracy {
+    my $count = shift;
+    my @m;
+    my $sub = make_timeit_sub('', '', 1, 1);
+    $sub->(100);  # cache warmup
+    for my $f (1, 1, 1.015, 1.020, 1.025) {
+	my $n = int($f * $count + 0.5);
+	my @t;
+	for (1..31) {
+	    push(@t, $sub->($n));
+	    print "$n,$t[-1]\n";
+	}
+	my $h = calc_stats(\@t);
+	push(@m, $h->{min});
+    }
+
+    my $first = shift(@m);
+    print sec_f($first), "\n";
+    for (@m) {
+	printf " %.3f%%\n", ($_ - $first) / $first * 100;
+    }
+}
+

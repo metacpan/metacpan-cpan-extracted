@@ -1,0 +1,43 @@
+Changes file for Perl::Critic::Policy::logicLAB::ProhibitUseLib
+
+0.04 2015-08-22 Maintenance release, update not required
+
+- Migrated from Module::Build to Dist::Zilla
+
+- Updated from artistic license 1.0 to artistic license 2.0
+
+
+0.03 2014-02-27 Maintenance release, update not required
+
+- Specified Module::Build version to be 0.40 as hinted by Module::Build
+
+- Specified requirement for Perl version 5.8.0
+
+- Added changes.t automatic assertion of the integrity of the Changes file,
+  see also PCPMPUL-10 [PCPMPUL-11]
+
+  https://logiclab.jira.com/browse/PCPMPUL-11
+
+
+0.02 2013-07-27 Maintenance release, update not required
+
+- Fixed up Changes file as part of my Questhub quest adhering to the standard
+  described in: CPAN::Changes::Spec [PCPMPUL-10]
+
+  Quest: http://questhub.io/realm/perl/quest/51f0fd8e18ba7dcf4b000040
+  Spec: https://metacpan.org/module/CPAN::Changes::Spec
+
+  https://logiclab.jira.com/browse/PCPMPUL-10
+
+- Perl::Critic boiler plate updated to latest version [PCPMPUL-6]
+
+  https://logiclab.jira.com/browse/PCPMPUL-6
+
+- Changes Perl::Critic theme to logicLAB as default [PCPMPUL-7]
+
+  https://logiclab.jira.com/browse/PCPMPUL-7
+
+
+0.01 2010-09-07 Initial release
+
+- Initial release

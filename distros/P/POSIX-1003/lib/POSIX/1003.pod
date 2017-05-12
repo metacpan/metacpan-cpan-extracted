@@ -1,0 +1,319 @@
+=encoding utf8
+
+=head1 NAME
+
+POSIX::1003 - bulk-load POSIX::1003 symbols
+
+=head1 SYNOPSIS
+
+  use POSIX::1003           qw(:termios :pc PATH_MAX);
+  # is short for all of these:
+  use POSIX::1003::Termios  qw(:all);
+  use POSIX::1003::Pathconf qw(:all);
+  use POSIX::1003::FS       qw(PATH_MAX);
+
+  # full modules, subsets, constants, functions
+  use POSIX::1003           qw(:pathconf :stat R_OK, cos);
+
+  # overview about all exported symbols (by a module)
+  show_posix_names 'POSIX::1003::Pathconf';
+  show_posix_names ':pc';
+  perl -MPOSIX::1003 'show_posix_names'
+
+=head1 DESCRIPTION
+
+The L<POSIX::1003|POSIX::1003> suite implements access to many POSIX functions. The
+POSIX module in I<core> (distributed with Perl itself) is ancient, the
+documentation is usually wrong, and it has too much unusable code in it.
+C<POSIX::1003> tries to provide cleaner access to the operating system.
+More about the choices made can be found in section L</Rationale>.
+
+=head2 POSIX
+
+The official POSIX standard is large, with over 1200 functions;
+L<POSIX::Overview|POSIX::Overview> does list them all. This collection of C<POSIX::1003>
+extension provides access to quite a number of those functions, when they
+are not provided by "core". They also define as many system constants
+as possible. More functions may get added in the future.
+
+B<Start looking in POSIX::Overview>, to discover which module
+provides certain functionality. You may also guess the location from
+the module names listed in L</DETAILS>, below.
+
+=head2 Bulk loading
+
+It can be quite some work to work-out which modules define what symbols
+and then write down all the explicit C<require> lines. Using bulk loading
+via this C<POSIX::1003> will be slower during the import (because it needs
+to load the location of each of the hundreds of symbols into memory),
+but provides convenience: it loads the right modules automagically.
+
+=head3 Exporter
+
+This module uses nasty export tricks, so is not based in Exporter.
+Some modules have more than one tag related to them, and one tag may
+load multiple modules. When you do not specify symbol or tag, then B<all>
+are loaded into your namespace(!), the same behavior as POSIX has.
+
+If your import list starts with C<+1>, the symbols will not get into
+your own namespace, but that of your caller. Just like
+C<$Exporter::ExportLevel> (but a simpler syntax).
+
+  use POSIX::1003 ':pathconf';
+  use POSIX::1003 ':pc';       # same, abbreviated name
+  use POSIX::1003 ':stat';     # subset from :filesystem
+
+  use POSIX::1003 qw(PATH_MAX :math sin);
+
+  sub MyModule::import(@)   # your own tricky exporter
+  {   POSIX::1003->import('+1', @_);
+  }
+
+=head3 EXPORT_TAGS including whole modules
+
+  (export tag)          (module)
+  :all                  <all symbols, default>
+  :cs      :confstr     POSIX::1003::Confstr
+  :errno   :errors      POSIX::1003::Errno
+  :ev      :events      POSIX::1003::Events
+           :fcntl       POSIX::1003::Fcntl
+  :fd      :fdio        POSIX::1003::FdIO
+  :fs      :filesystem  POSIX::1003::FS
+  :limit   :limits      POSIX::1003::Limit
+  :locale               POSIX::1003::Locale
+  :math                 POSIX::1003::Math
+  :none                 (nothing)
+  :os      :opsys       POSIX::1003::OS
+  :pc      :pathconf    POSIX::1003::Pathconf
+  :proc    :processes   POSIX::1003::Proc
+  :props   :properties  POSIX::1003::Properties
+  :posix   :property    POSIX::1003::Properties
+  :sc      :sysconf     POSIX::1003::Sysconf
+  :signals              POSIX::1003::Signals
+  :signals :sigaction   POSIX::SigAction
+  :signals :sigset      POSIX::SigSet
+  :termio  :termios     POSIX::1003::Termios
+  :time                 POSIX::1003::Time
+  :user                 POSIX::1003::User
+
+=head3 EXPORT_TAGS including subsets
+
+[0.96] Besides loading all the symbols of a module, you can also
+include a subset for some of the modules
+
+   (module)      (export tags of subsets)
+   fcntl         :flock   :lockf
+   fdio          :mode    :seek
+   filesystem    :access  :stat    :perms
+   limits        :rlimit  :ulimit
+   signals       :status  :signals
+   termios       :flush   :flags   :speed
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item B<posix_1003_modules>()
+
+Returns the names of all modules in the current release of POSIX::1003.
+
+=item B<posix_1003_names>([MODULES|TAGS])
+
+Returns  all the names, when in LIST content.  In SCALAR context,
+it returns (a reference to) an HASH which contains exported names
+to modules mappings.  If no explicit MODULES are specified, then all
+available modules are taken.
+
+=item B<show_posix_names>([MODULES|TAGS])
+
+Print all names defined by the POSIX::1003 suite in alphabetical
+(case-insensitive) order. If no explicit MODULES are specified, then all
+available modules are taken.
+
+=back
+
+=head1 DETAILS
+
+=head2 Modules in this distribution
+
+=over 4
+
+=item L<POSIX::1003::Confstr|POSIX::1003::Confstr>
+
+Provide access to the C<_CS_*> constants.
+
+=item L<POSIX::1003::Errno|POSIX::1003::Errno>
+
+Provide access to the C<E*> constants, for error numbers, and strerror().
+
+=item L<POSIX::1003::FdIO|POSIX::1003::FdIO>
+
+Provides unbuffered IO handling; based on file-descriptors.
+
+=item L<POSIX::1003::FS|POSIX::1003::FS>
+
+Some generic file-system information. See also L<POSIX::1003::Pathconf|POSIX::1003::Pathconf>
+for more precise info.
+
+=item L<POSIX::1003::Locale|POSIX::1003::Locale>
+
+Locales, see also L<perllocale>.
+
+=item L<POSIX::1003::Math|POSIX::1003::Math>
+
+Standard math functions of unknown precission.
+
+=item L<POSIX::1003::OS|POSIX::1003::OS>
+
+A few ways to get Operating system information.
+See also L<POSIX::1003::Sysconf|POSIX::1003::Sysconf>, L<POSIX::1003::Confstr|POSIX::1003::Confstr>, and
+L<POSIX::1003::Properties|POSIX::1003::Properties>,
+
+=item L<POSIX::1003::Pathconf|POSIX::1003::Pathconf>
+
+Provide access to the C<pathconf()> and its trillion C<_PC_*> constants.
+
+=item L<POSIX::1003::Properties|POSIX::1003::Properties>
+
+Provide access to the C<_POSIX_*> constants.
+
+=item L<POSIX::1003::Signals|POSIX::1003::Signals>
+
+With helper modules L<POSIX::SigSet|POSIX::SigSet> and L<POSIX::SigAction|POSIX::SigAction>.
+
+=item L<POSIX::1003::Sysconf|POSIX::1003::Sysconf>
+
+Provide access to the C<sysconf> and its zillion C<_SC_*> constants.
+
+=item L<POSIX::1003::Termios|POSIX::1003::Termios>
+
+Terminal IO
+
+=item L<POSIX::1003::Time|POSIX::1003::Time>
+
+Time-stamp processing
+
+=item L<POSIX::1003::User|POSIX::1003::User>
+
+Change active user and group.
+
+=item L<POSIX::1003::Limit|POSIX::1003::Limit>
+
+For getting and setting resource limits.
+
+=back
+
+=head2 Other modules
+
+=over 4
+
+=item User::pwent
+
+Provides an OO interface around C<getpw*()>
+
+=item User::grent
+
+Provides an OO interface around C<getgr*()>
+
+=back
+
+=head2 Rationale
+
+The POSIX module as distributed with Perl itself is ancient (it dates
+before Perl5)  Although it proclaims that it provides access to all
+POSIX functions, it only lists about 200 out of 1200. From that subset,
+half of the functions with croak when you use them, complaining that
+they cannot get implemented in Perl for some reason.
+
+Many other functions provided by POSIX-in-Core simply forward the caller
+to a function with the same name which is in basic perl (see perldoc).
+With a few serious complications: the functions in POSIX do not use
+prototypes, sometimes expect different arguments and sometimes return
+different values.
+
+Back to the basics: the L<POSIX::1003|POSIX::1003> provides access to the POSIX
+libraries where they can be made compatible with Perl's way of doing
+things. For instance, C<setuid> of POSIX is implemented with C<$)>,
+whose exact behavior depends on compile-flags and OS: it's not the pure
+C<setuid()> of the standard hence left-out. There is no C<isalpha()>
+either: not compatible with Perl strings and implemented very different
+interface from POSIX. And there is also no own C<exit()>, because we have
+a C<CORE::exit()> with the same functionality.
+
+=head2 POSIX::1003 compared to POSIX
+
+This distribution does not add much functionality itself: it is
+mainly core's POSIX.xs (which is always available and ported to
+all platforms). You can access these routines via POSIX as
+well.
+
+When you are used to POSIX.pm but want to move to L<POSIX::1003|POSIX::1003>,
+you must be aware about the following differences:
+
+=over 4
+
+=item *
+
+the constants and functions are spread over many separate modules,
+based on their purpose, where POSIX uses a header filename as
+tag to group provided functionality.
+
+=item *
+
+functions provided by CORE are usually not exported again by
+POSIX::1003 (unless to avoid confusion, for instance: is
+C<atan2()> in core or ::Math?)
+
+=item *
+
+constants which are already provided via Fcntl or Errno are
+not provided by this module as well. This should reduce the chance
+for confusion.
+
+=item *
+
+functions which are also in CORE can be imported, but will silently
+be ignored. In C<POSIX>, functions with the same name get exported
+without prototype, which does have consequences for interpretation of
+your program.  This module uses prototypes on all exported functions,
+like CORE does.
+
+=item *
+
+hundreds of C<E*>, C<_SC_*>, C<_CS_*>, C<_PC_*>, C<_POSIX_*>, C<UL_*>,
+and C<RLIMIT_*> constants were collected from various sources, not just
+a minimal subset. You get access to all defined on your system.
+
+=item *
+
+when an user program addresses a constant which is not defined by the
+system, POSIX will croak. Modules in POSIX::1003 on the other hand,
+will return C<undef>.
+
+This simplifies code like this:
+
+  use POSIX::1003::FS         'PATH_MAX';
+  use POSIX::1003::PathConfig '_PC_PATH_MAX';
+  my $max_fn = _PC_PATH_MAX($fn) // PATH_MAX // 1024;
+
+With the tranditional POSIX, you have to C<eval()> each use
+of a constant.
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of POSIX-1003 distribution version 0.98,
+built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights 2011-2013 on the perl code and the related documentation
+ by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

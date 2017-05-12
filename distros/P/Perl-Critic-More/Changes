@@ -1,0 +1,84 @@
+##############################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/distributions/Perl-Critic-More/Changes $
+#     $Date: 2013-10-29 09:37:40 -0700 (Tue, 29 Oct 2013) $
+#   $Author: thaljef $
+# $Revision: 4221 $
+##############################################################################
+
+[1.003] Released on 2013-10-29
+
+    - No code changes.
+
+    - Updated the postal address for FSF in the LICENSE.
+      This fixes RT #80380.  Thanks Petr Pisar.
+
+[1.002] Released on 2013-10-25
+
+
+    New Policies:
+    * ValuesAndExpressions::RequireConstantOnLeftSideOfEquality -- In
+      case you accidentally say "if ($foo = 42) {...}"
+
+    "use 5.006001" in Makefile.PL and Build.PL.
+
+[1.001] Released on 2013-10-25
+
+    This release was a flop.  Do not use it!
+    Changes summarized above under version 1.002
+
+[1.000] Released on 2008-05-26
+
+     Bug Fix:
+     * Modules::PerlMinimumVersion now handles $PERL_VERSION being an object,
+       as it is in perl 5.10.
+
+     Policy moved:
+     * ValuesAndExpressions::ProhibitMagicNumbers has been moved into the
+       core Perl::Critic distribution.
+
+     Dependencies:
+     * Now requires Perl::Critic 1.082.
+
+[0.999_002] Released on 2008-05-18
+[0.999_001] Released on 2008-05-04
+
+     Changes summarized into 1.000 above.  For exact details, see Changes in
+     0.999_002 on BackPAN.
+
+[0.16] Released on 2007-08-12
+
+     Bugfix release
+      * PPI version back down to 1.118, but turn off ProhibitMagicNumbers with older PPI
+      * work around v-string warning
+     [Thanks to users of CPAN::Reporter for identifying bugs!]
+
+[0.15]  Released on 2007-08-10
+
+     Bugfix release
+      * Readonly dependency omitted
+      * PPI version => 1.199_03
+
+[0.14]  Released on 2007-08-09
+
+     New Policies:
+     * ErrorHandling::RequireUseOfExceptions
+     * ValuesAndExpressions::RestrictLongStrings
+     * ValuesAndExpressions::ProhibitMagicNumbers
+
+[0.12]  Released on 2006-11-23
+
+     New Policies:
+     * CodeLayout::RequireASCII
+     * Modules::RequirePerlVersion
+     * Modules::PerlMinimumVersion
+       (depends on CPAN module Perl::MinimumVersion > 0.13)
+
+[0.11]  Released on 2006-11-15
+     Upload to the right PAUSE account this time...
+
+[0.1]   Released on 2006-11-15
+
+     Create this new distribution by moving stuff from the core Perl::Critic
+
+     New Policies:
+     * Editor::RequireEmacsFileVariables

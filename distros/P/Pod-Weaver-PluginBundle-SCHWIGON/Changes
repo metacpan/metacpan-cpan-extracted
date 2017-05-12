@@ -1,0 +1,7 @@
+Revision history for Pod-Weaver-PluginBundle-SCHWIGON
+
+0.003     2015-09-14
+        - replace ::Encoding with ::SingleEncoding (Sergey Romanov)
+
+0.002     2012-04-04 13:03:18 Europe/Berlin
+        - initial plugin bundle roughly based on FLORA

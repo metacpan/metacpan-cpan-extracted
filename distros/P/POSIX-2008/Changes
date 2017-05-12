@@ -1,0 +1,12 @@
+Revision history for POSIX::2008.
+
+0.04  2015-05-25
+        - Fixed _readlink50c (#96644).
+0.03  2013-09-15
+	- check SvGROW for NULL
+	- use shorter mPUSH macros
+0.02  2013-09-14
+	- added strptime()
+0.01  2013-09-13
+	- initial version
+

@@ -1,0 +1,46 @@
+Index: db/parley.psql
+===================================================================
+--- db/parley.psql	(revision 853)
++++ db/parley.psql	(working copy)
+@@ -31,12 +31,12 @@
+ -- some TZ strings
+ INSERT INTO preference_time_string (time_string, sample) VALUES ('%A %d %B %Y at %R', 'Thursday 13 July 2006 at 18:15');
+ INSERT INTO preference_time_string (time_string, sample) VALUES ('%F %T', '2006-07-13 18:15:00');
+-INSERT INTO preference_time_string (time_string, sample, comment) VALUES ('%c','Thu 13 Jul 2006 18:15:00 BST','locale\'s date and time'); 
++INSERT INTO preference_time_string (time_string, sample, comment) VALUES ('%c','Thu 13 Jul 2006 18:15:00 BST','locale''s date and time'); 
+ INSERT INTO preference_time_string (time_string, sample) VALUES ('%A at %R', 'Thursday at 18:15');
+ INSERT INTO preference_time_string (time_string, sample) VALUES ('%a, %d %b; %R', 'Thu, 13 Jul; 18:15');
+ INSERT INTO preference_time_string (time_string, sample) VALUES ('%a, %d %b; %R', 'Thu, 13 Jul; 18:15');
+ INSERT INTO preference_time_string (time_string, sample) VALUES ('%R, %b %d', '18:15, Jul 13');
+-INSERT INTO preference_time_string (time_string, sample) VALUES ('%R, %b %d ''%y', '18:15, Jul 13 \'06');
++INSERT INTO preference_time_string (time_string, sample) VALUES ('%R, %b %d ''%y', '18:15, Jul 13 ''06');
+ 
+ 
+ CREATE TABLE preference (
+@@ -188,7 +188,7 @@
+     last_notified       timestamp with time zone
+                         default NULL,
+ 
+-    unique(person, thread)
++    unique(person_id, thread_id)
+ );
+ 
+ -- overall it's better to queue outgoing emails, and have a separate process
+@@ -219,7 +219,7 @@
+     forum_id            integer     not null    references forum(id),
+     can_moderate        boolean     not null    default true,
+ 
+-    unique(person,forum)
++    unique(person_id,forum_id)
+ );
+ 
+ 
+@@ -318,7 +318,7 @@
+ 
+ -- #0 person info
+ INSERT INTO person
+-(id,first_name, last_name, email, forum_name, authentication, preference)
++(id,first_name, last_name, email, forum_name, authentication_id, preference_id)
+ VALUES
+ (0, 'Top','Dog','topdog@herlpacker.co.uk','TopDog', 0, 0);
+ 

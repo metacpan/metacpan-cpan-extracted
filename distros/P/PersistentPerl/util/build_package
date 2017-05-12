@@ -1,0 +1,213 @@
+#!/bin/sh -u
+
+# Build binary package.  Calls system-specific build script
+
+# Args passed in from the Makefile on the command-line
+VERSION=$1
+INSTALLBIN=$2
+INSTALLSITELIB=$3
+APACHE_VERSION=${4:-""}
+APACHE_LIBEXECDIR=${5:-""}
+APACHE_SYSCONFDIR=${6:-""}
+MOD_PERSISTENTPERL_DIR=${7:-""}
+
+PREFIX=/usr
+PM=src/PersistentPerl.pm
+URL="http://www.daemoninc.com/PersistentPerl/"
+MODULE_SRC="${MOD_PERSISTENTPERL_DIR}/mod_persistentperl.so"
+MODULE_DST="${APACHE_LIBEXECDIR}/mod_persistentperl.so"
+STD_FILES="perperl/perperl:$INSTALLBIN/perperl perperl_backend/perperl_backend:$INSTALLBIN/perperl_backend ${PM}:$INSTALLSITELIB/PersistentPerl.pm"
+APACHE_FILES="${MODULE_SRC}:${MODULE_DST}"
+PKGNM="persistentperl"
+MODNM="apache$APACHE_VERSION"
+PKGNM_PRETTY=PersistentPerl
+MODNM_PRETTY="PersistentPerl Apache Module"
+APACHE_DESC="Module to improve PersistentPerl performance under Apache-$APACHE_VERSION"
+HTTPD_CONF=$APACHE_SYSCONFDIR/httpd.conf
+OUTDIR=binaries
+VENDOR="Sam Horrocks"
+COPYRIGHT="Copyright (C) `date +%Y` $VENDOR"
+EMAIL=sam@daemoninc.com
+
+# Set up our temp directory 
+TMPDIR=/tmp/`basename $0`.$$
+rm_tmp() {
+    rm -rf $TMPDIR
+}
+adios() {
+    if test $1 -eq 0; then
+	rm_tmp
+    else
+	echo Leaving $TMPDIR intact for debugging purposes
+    fi
+    trap "" 0
+    exit $*
+}
+trap "adios 1" 1 2 3 15
+trap "adios $?" 0
+rm_tmp
+
+# Make directories
+mkdir -p $TMPDIR $OUTDIR 2>/dev/null
+
+# Get the description text out of the .pm file.
+grab_description() {
+    awk '
+	/^=head1/ {if (doit) { exit} }
+	{if (doit) {print}}
+	/^=head1 DESCRIPTION/ {doit = 1}
+    ' $PM
+}
+
+# Grab the summary text from the .pm file
+grab_summary() {
+    awk '
+	/head1 NAME/ {in_name = 1}
+	/^[A-z].*/ {
+	    if (in_name) {
+		for (i = 3; i <= NF; ++i) {
+		    printf("%s ", $i);
+		}
+		print "";
+		exit;
+	    }
+	}
+    ' $PM
+}
+
+# Get source path from ":" file spec
+file_source() {
+    echo $* | awk '{
+	for (i = 1; i <= NF; ++i) {
+	    split($i, a, ":");
+	    printf("%s%s", spc, a[1]);
+	    spc = " ";
+	}
+    }'
+}
+
+# Get the destination path from ":" file spec
+file_dest() {
+    echo $* | awk '{
+	for (i = 1; i <= NF; ++i) {
+	    split($i, a, ":");
+	    printf("%s%s", spc, a[2]);
+	    spc = " ";
+	}
+    }'
+}
+
+# Copy files from source to dest under a temporary directory.
+# If passed 1, then remove the prefix from the dest
+copy_pkgfiles() {
+    destdir=$1;		shift
+
+    for f in $*; do
+	src=`file_source $f`
+        dest="${destdir}`file_dest $f`"
+	mkdir -p `dirname $dest` 2>/dev/null
+	cp -p $src $dest
+    done
+}
+
+# Remove the install prefix from a full path name
+remove_prefix() {
+    sed -e "s|^${PREFIX}||" -e 's|^/||'
+}
+
+apache_update_file() {
+    cat <<-'END'
+    	apache_update_file() {
+	    cmp $1 $2 >/dev/null 2>&1
+	    if test $? -ne 0 -a -s $2; then
+		mv -f $1 "$1.$3"
+		mv -f $2 $1
+		echo $1 was updated - please restart httpd
+	    else
+		rm -f $2
+	    fi
+	}
+	END
+}
+
+# Create script to do apache install after package is installed
+apache_install_script() {
+    basedir=$1;		shift
+    savesuffix=$1;	shift
+
+    cat <<-END
+	PREFIX=$PREFIX
+	MODULE_DST=$MODULE_DST
+	HTTPD_CONF=$HTTPD_CONF
+	BASEDIR=$basedir
+	SAVESUFFIX=$savesuffix
+	APACHE_VERSION=$APACHE_VERSION
+	END
+
+    apache_update_file
+
+    cat <<-'END'
+	# Get relocated module
+	MODULE_DST=`echo $MODULE_DST | sed "s|^${PREFIX}|${BASEDIR}|"`
+	if test -w ${HTTPD_CONF}; then
+	    (
+		grep -v '^[^#].*Module.*mod_persistentperl.*' ${HTTPD_CONF}
+		echo "LoadModule persistentperl_module $MODULE_DST"
+		if test $APACHE_VERSION -lt 2; then
+		    echo "AddModule mod_persistentperl.c"
+		fi
+	    ) >${HTTPD_CONF}.$$
+	    apache_update_file ${HTTPD_CONF} ${HTTPD_CONF}.$$ $SAVESUFFIX
+	else
+	    echo ${HTTPD_CONF} could not be edited.  Please update it manually.
+	fi
+	END
+}
+
+# Create script to do apache install after package is installed
+apache_uninstall_script() {
+    cat <<-END
+	HTTPD_CONF=${HTTPD_CONF}
+	END
+
+    apache_update_file
+
+    cat <<-'END'
+	if test -w ${HTTPD_CONF}; then
+	    sed -e '/^LoadModule.*mod_persistentperl.so/d' \
+		-e '/^AddModule.*mod_persistentperl/d' \
+		${HTTPD_CONF} >${HTTPD_CONF}.$$
+	    apache_update_file ${HTTPD_CONF} ${HTTPD_CONF}.$$ old
+	fi
+	END
+}
+
+# Put a description entry into the output directory for builing and index later
+add_desc() {
+    out=$1;		shift
+    is_apache=$1;	shift
+    os=$1;		shift
+    arch=$1;		shift
+    (
+	echo OS=$os
+	echo ARCH=$arch
+	echo IS_APACHE=$is_apache
+	for d in "$@"; do
+	    echo DEPEND=$d
+	done
+    ) >${out}.desc
+}
+
+want_apache_package() {
+    test -f $MOD_PERSISTENTPERL_DIR/mod_persistentperl.so
+}
+
+# Call the script specific to this system to create the package
+case "`uname -a`" in
+*BSD*|*bsd*)
+    . ./util/build_bsdpkg ;;
+*SunOS*)
+    . ./util/build_solpkg ;;
+*)
+    . ./util/build_rpms ;;
+esac

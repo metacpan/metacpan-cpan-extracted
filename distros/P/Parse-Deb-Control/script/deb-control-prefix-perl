@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+deb-control-prefix-perl - prefix all perl packages with custom prefix in F<debian/control> file
+
+=head1 SYNOPSIS
+
+	deb-control-prefix-perl
+		"--prefix=opt-"
+		--maintainer=local@localhost
+		--to-prefix='lib \S+ perl | perl | perl-base | perl-modules | perl5 | perl5-base | libperl5.10 | libperl-dev | libapache2-mod-perl2 | libapreq2'
+		debian/control
+
+=head1 DESCRIPTION
+
+Requested prefix is added to all C<Source>, C<Package> lines and to all
+perl dependencies in C<Build-Depends>, C<Build-Conflicts>, C<Pre-Depends>,
+C<Conflicts>, C<Replaces>, C<Provides>, C<Suggests>.
+
+=cut
+
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Parse::Deb::Control;
+
+exit main();
+
+sub main {
+    my $help;
+    my $prefix;
+    my $maintainer = 'repackaging@with-prefix';
+    my $uploaders;
+    my $description;
+    my $to_prefix = 'lib \S+ perl | perl | perl-base | perl-modules | perl5 | perl5-base | libperl5.10 | libperl-dev | libapache2-mod-perl2 | libapreq2 | perl-doc | podlators-perl | cdbs | debhelper';
+    GetOptions(
+        'help|h'          => \$help,
+        'prefix|p=s'      => \$prefix,
+        'to-prefix|t=s'   => \$to_prefix,
+        'maintainer|m=s'  => \$maintainer,
+        'uploaders|u=s'   => \$uploaders,
+        'description|d=s' => \$description,
+    ) or pod2usage;
+    pod2usage if $help;
+    pod2usage if not $prefix;
+    
+    $uploaders ||= $maintainer;
+    $description = 'repackaged with "'.$prefix.'" prefix'
+    	if not defined $description;
+    
+    my $control_txt = ''; while (my $line = <>) { $control_txt .= $line; };
+    my $parser = Parse::Deb::Control->new($control_txt);
+
+	# modify Maintainer
+	foreach my $src_pkg ($parser->get_keys(qw{ Maintainer })) {
+		${$src_pkg->{'value'}} =~ s/^ (\s*) (\S.*) $/ $maintainer\n/xms;
+	}
+	# modify Uploaders
+	foreach my $src_pkg ($parser->get_keys(qw{ Uploaders })) {
+		${$src_pkg->{'value'}} =~ s/^ (\s*) (\S.*) $/ $uploaders\n/xms;
+	}
+    
+	# modify Source and Package name
+	foreach my $src_pkg ($parser->get_keys(qw{ Source Package })) {
+		${$src_pkg->{'value'}} =~ s/^ (\s*) (\S+) (\s*) $/$1$prefix$2$3/xms;
+	}
+	# modify dependencies
+	foreach my $dependecies ($parser->get_keys(qw{ Build-Depends Build-Depends-Indep Build-Conflicts Pre-Depends Depends Conflicts Replaces Provides Suggests Recommends })) {
+		${$dependecies->{'value'}} =~ s/(\s|,|:) ($to_prefix) (\s|,)/$1$prefix$2$3/xmsg;
+	}
+	
+	# add text to description
+	if ($description) {
+		foreach my $desc ($parser->get_keys(qw{ Description })) {
+			${$desc->{'value'}} .= qq{ .\n $description\n};
+		}
+	}
+	
+	print $parser->control;
+    
+    return 0;
+}

@@ -1,0 +1,85 @@
+{
+   "abstract" : "concat some static files to one resource",
+   "author" : [
+      "cho45"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-StaticShared",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Format::HTTP" : "0",
+            "Digest::SHA1" : "0",
+            "Filter::Util::Call" : "0",
+            "Path::Class" : "0",
+            "Plack" : "0",
+            "Plack::Request" : "0",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::StaticShared" : {
+         "file" : "lib/Plack/Middleware/StaticShared.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cho45/Plack-Middleware-StaticShared/issues"
+      },
+      "homepage" : "https://github.com/cho45/Plack-Middleware-StaticShared",
+      "repository" : {
+         "url" : "git://github.com/cho45/Plack-Middleware-StaticShared.git",
+         "web" : "https://github.com/cho45/Plack-Middleware-StaticShared"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "onishi <yasuhiro.onishi@gmail.com>",
+      "shiba_yu36 <shibayu36@gmail.com>",
+      "motemen <motemen@gmail.com>",
+      "cho45 <cho45@lowreal.net>"
+   ]
+}

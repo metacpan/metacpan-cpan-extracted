@@ -1,0 +1,18 @@
+SYNOPSIS
+
+     # import pyth()
+     use Perinci::Use "http://example.com/My/Math", 'pyth';
+     print pyth(3, 4); # 5
+    
+     # import all
+     use Perinci::Use "http://example.com/My/Math";
+
+DESCRIPTION
+
+    This module provides use_riap_package(), usually used as shown in
+    Synopsis, a la Perl's use().
+
+SEE ALSO
+
+    Perinci::Access
+

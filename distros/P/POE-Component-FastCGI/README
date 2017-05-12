@@ -1,0 +1,32 @@
+POE::Component::FastCGI version 0.1
+===================================
+
+This module provides an interface between the FastCGI protocol
+and POE. This means that it is possible to effectively proxy a
+POE server behind a webserver that supports FastCGI.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   POE
+   libwww-perl (for HTTP::Request and HTTP::Response)
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 David Leadbeater
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

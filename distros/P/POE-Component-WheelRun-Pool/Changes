@@ -1,0 +1,88 @@
+==================================================
+Changes from 2014-11-20 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2016-11-19 20:53:41 +0000
+------------------------------------------
+
+  Change: 2b50d4603ed1ae7553660dbe46e2d74f5be6d0e3
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-11-19 21:52:51 +0000
+
+    Prelease preparation
+
+    Code is well documented, needs a test suite. 
+
+  Change: b5bd3d10df316c2660973e1b3152a154714158b0
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-30 21:01:58 +0000
+
+    Enhancements for a working module.
+
+    * Install a _child handler, explicitly. * Initialize _workers_pid in the
+    heap. * Pass StdioFilter to the POE::Wheel::Run object. * Initialize
+    StdioFilter to POE::Filter::Reference if unset and nothing is
+
+    passed for Std(in|out)Filter * Bubble errors up via warn 
+
+  Change: 80acceacfe4be37123e7a972fd9c41e432e46ea3
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-25 16:54:45 +0000
+
+    Tweaks so this runs a pool of workers 
+
+  Change: edd2dbc7a232d16d4964568577c8cad9560c7a7e
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-02 14:55:03 +0000
+
+    Updated dist.ini to my new template. 
+
+  Change: 904d27c5728b9fc1bc83818a2290b0b2b489d477
+  Author: Brad Lhotsky <blhotsky@craigslist.org>
+  Date : 2016-08-02 14:55:03 +0000
+
+    Use Module::Load for optional dependencies and add stats
+
+    Replace the call to require with Module::Load's load() function. This is a
+    bit less aggressive at trying to satisfy dependencies and won't re-import
+    if the module is already loaded.
+
+    Changed a lot of "TODO: logs" to collect stats instead. This should provide
+    visibility without burdening the code with a ton of callbacks. 
+
+  Change: 2d0c8ad398d8b5917a4109a200383dd35ff4e281
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2016-03-09 21:07:41 +0000
+
+    Typo fix. 
+
+  Change: 57202555d911ffdafc85400554265b578f5bf143
+  Author: Brad Lhotsky <brad@divisionbyzero.net>
+  Date : 2015-07-31 14:19:39 +0000
+
+    fix bug in method call 
+
+  Change: 0679b3c846c14845aa206bcbf4e46652847ec71e
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2015-05-14 10:09:42 +0000
+
+    Handle Sys::CpuAffinity separately in the prereqs. 
+
+  Change: cd81dee3596f0cb89cdb3089306c2c8b3e119808
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2015-05-05 16:59:46 +0000
+
+    Added documentation for the module and the spawn() method and it's
+    attributes. Added MaxTasksPerChild and MaxTimePerChild feature. Fixed some
+    typos from extracting this module from other scripts. 
+
+  Change: 43fd8f3568fb4d5fe266ca962d8be1b59b7b7cb4
+  Author: Brad Lhotsky <brad.lhotsky@booking.com>
+  Date : 2015-01-08 21:25:55 +0000
+
+    Initial Import. 
+
+================
+End of releases.
+================

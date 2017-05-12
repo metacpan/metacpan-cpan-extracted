@@ -1,0 +1,19 @@
+Revision history for Plack-App-Apache-ActionWrapper
+
+0.31.0    2012-09-22 19:32:45 Europe/Oslo
+    * Fixed URL construction in Catalyst 5.9-based apps.
+      Reported by Jess Robinson (castaway).
+
+0.30.1    2011-11-28 10:31:48 Europe/Oslo
+    * RT #72634: Fix confusing AddHandler synopsis
+
+0.30.0    2010-12-20 09:16:26 Europe/Oslo
+    * Changed to semantic versioning.
+    * Various code cleanup.
+    * RT #63825: Added patch from Ron Schmidt.
+      Should now work properly with Apache on Windows.
+
+0.02      2009-12-20 18:25:58 Europe/Oslo
+
+0.01      2009-12-20 17:38:51 Europe/Oslo
+    * Initial release.

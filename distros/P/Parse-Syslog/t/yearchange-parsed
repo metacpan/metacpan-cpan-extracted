@@ -1,0 +1,102 @@
+time    : Mon Dec 31 22:11:21 2001
+host    : tardis-a1.ee.ethz.ch
+program : ftpd
+pid     : 14025
+text    : FTPD: command: NOOP^M
+
+time    : Tue Jan  1 22:10:39 2002
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Mon Dec 31 22:11:21 2001
+host    : tardis-a1.ee.ethz.ch
+program : ftpd
+pid     : 14025
+text    : FTPD: command: NOOP^M
+
+time    : Tue Jan  1 22:10:39 2002
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Fri Feb  1 22:10:39 2002
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Dec 31 22:11:21 2002
+host    : tardis-a1.ee.ethz.ch
+program : ftpd
+pid     : 14025
+text    : FTPD: command: NOOP^M
+
+time    : Wed Jan  1 22:10:39 2003
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Fri Feb 28 22:10:39 2003
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Sat Mar  1 22:10:39 2003
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Apr  1 22:10:39 2003
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Thu May  1 22:10:39 2003
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Sun Jun  1 22:10:39 2003
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Tue Jul  1 22:10:39 2003
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Fri Aug  1 22:10:39 2003
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Mon Sep  1 22:10:39 2003
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Wed Oct  1 22:10:39 2003
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+
+time    : Sat Nov  1 22:10:39 2003
+host    : otaniemi.ee.ethz.ch
+program : sshd
+pid     : 1517
+text    : error: Hm, dispatch protocol error: type 32 plen 4
+

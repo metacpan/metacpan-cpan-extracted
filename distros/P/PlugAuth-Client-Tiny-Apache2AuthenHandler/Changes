@@ -1,0 +1,15 @@
+Revision history for PlugAuth-Client-Tiny-Apache2AuthenHandler
+
+0.04      2015-11-11 13:24:55 -0500
+  - Document all public interfaces
+
+0.03      2015-11-11 10:37:51 -0500
+  - Fixed bug where if Apache2::RequestRec wasn't
+    already loaded the handler would crash
+
+0.02      2015-10-20 12:29:05 -0400
+  - First release to CPAN
+  - Fix PlugAuth::Tiny constructor call
+
+0.01      2015-10-20 12:26:44 -0400
+  - initial version

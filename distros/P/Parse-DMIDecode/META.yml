@@ -1,0 +1,31 @@
+---
+name: Parse-DMIDecode
+version: 0.03
+author:
+  - 'Nicola Worthington <nicolaw@cpan.org>'
+abstract: Interface to SMBIOS using dmidecode
+license: open_source
+requires:
+  Carp: 0
+build_requires:
+  Test: 0
+  Test::More: 0
+recommends:
+  File::Which: 0.05
+  Test::Deep: 0.093
+  Test::Pod: 1.2
+  Test::Pod::Coverage: 1.06
+provides:
+  Parse::DMIDecode:
+    file: lib/Parse/DMIDecode.pm
+    version: 0.03
+  Parse::DMIDecode::Constants:
+    file: lib/Parse/DMIDecode/Constants.pm
+    version: 0.03
+  Parse::DMIDecode::Handle:
+    file: lib/Parse/DMIDecode/Handle.pm
+    version: 0.03
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

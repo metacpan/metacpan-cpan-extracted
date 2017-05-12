@@ -1,0 +1,11 @@
+AE
+AnyEvent::Finger
+Clustericious
+EV
+ExtUtils::MakeMaker
+Log::Log4perl
+PlugAuth
+PlugAuth::Role::Plugin
+Role::Tiny
+Test::Clustericious::Cluster
+Test::More

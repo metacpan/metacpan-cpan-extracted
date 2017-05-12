@@ -1,0 +1,29 @@
+---
+abstract: '给输出内容转换成 JSON, 并且自动兼容 JSONP. '
+author:
+  - 'fukai <iakuf@163.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-JSON
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON::XS: '0'
+  Plack: '0'
+  Test::More: '0'
+  URI::Escape: '0'
+resources:
+  bugtracker: https://github.com/iakuf/Plack-Middleware-JSON/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/iakuf/Plack-Middleware-JSON.git
+version: '0.01'

@@ -1,0 +1,39 @@
+Revision history for Path-Resolver
+
+3.100454  2013-10-09 17:09:18 America/New_York
+          update bugtracker and repo
+
+3.100453  2013-08-12 21:45:38 America/New_York
+          drop use of AttributeHandlers
+
+3.100452  2011-08-11 16:30:34 America/New_York
+          add has_resolver_for and add_resolver_for methods
+
+3.100451  2010-09-14 18:26:27 America/New_York
+          use -excludes rather than excludes in role application
+
+3.100450  2010-02-14 14:58:29 America/New_York
+          documentation tweaks (thanks for feedback, Sartak, RSAVAGE)
+
+3.092200  2009-08-07
+          major reworking
+          entity_at method replaces content_at
+          native_type and type conversions added
+          simpleentity class
+
+2.003     2009-04-29
+          dump exceptions for now; this clearly needs design work
+
+2.002     2009-04-29
+          simplify some semantics; this still needs testing; specifically,
+          relative-versus-absolute (should be the same) and what to do on
+          various errors
+
+2.001     2009-04-28
+          add Hash resolver
+
+2.000     2009-03-09
+          add AnyDist resolver for arbitrary ShareDirs
+
+1.000     2009-02-24
+          initial release

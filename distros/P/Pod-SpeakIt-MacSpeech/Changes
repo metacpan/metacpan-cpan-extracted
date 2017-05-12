@@ -1,0 +1,9 @@
+0.10_01 - Tue Nov 20 09:30:52 2007
+	* initial release of a Pod translator that passes the text
+	to a speech synthesizer. This one uses Mac::Speech, but
+	this should really be a subclass.
+
+0.11 - Sat Aug  9 08:57:07 2008
+	* This is still a very early version of the module, but I'll
+	make it a release version anyway
+

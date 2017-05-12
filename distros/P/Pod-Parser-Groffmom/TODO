@@ -1,0 +1,6 @@
+* C<=for...> not handled.
+* Handle 'abstract' correctly.
+* Arguments to constructor to override title, subtitle, etc.
+* Add support for non-breaking space (S<>) sequences.
+* Beef up the tests for lists and add support for other mom list types (e.g.,
+  the Roman numerals.

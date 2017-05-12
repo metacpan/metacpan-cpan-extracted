@@ -1,0 +1,94 @@
+NAME
+
+    POE::Component::IRC::Plugin::Role - A Moose role for
+    POE::Component::IRC plugins
+
+VERSION
+
+    version 0.10
+
+SYNOPSIS
+
+      package My::Plugin;
+    
+      use Moose;
+      use POE::Component::IRC::Plugin qw(:ALL);
+    
+      with 'POE::Component::IRC::Plugin::Role';
+    
+      # PCI_register and PCI_unregister are automatically dealt with
+    
+      sub S_001 {
+        my $self = shift;
+        $self->irc->yield( 'join', '#channel' );
+        return PCI_EAT_NONE;
+      }
+    
+      1;
+
+DESCRIPTION
+
+    POE::Component::IRC::Plugin::Role is a Moose role that encapsulates
+    some of the boilerplate required to write POE::Component::IRC plugins
+    with Moose.
+
+    Simply consume the role in your Moose based plugins.
+
+ATTRIBUTES
+
+    irc
+
+      Should be a POE::Component::IRC object. It can not be set in the
+      constructor, but has set_irc and clear_irc writer and clearer
+      methods, respectively. It is usually set for you by PCI_register and
+      cleared by PCI_unregister methods.
+
+    S_events
+
+      An arrayref of SERVER events to register for when PCI_Register is
+      called. The default is to register events for the S_* prefixed
+      methods in your module.
+
+    U_events
+
+      An arrayref of USER events to register for when PCI_register is
+      called. The default is to register events for the U_* prefixed
+      methods in your module.
+
+METHODS
+
+    PCI_register
+
+      This is called everytime a plugin object is added to
+      POE::Component::IRC. It will set the irc attribute and register for
+      the requested S_events and U_events.
+
+    PCI_unregister
+
+      This is called everytime a plugin object is removed from
+      POE::Component::IRC. It will clear the irc attribute.
+
+SEE ALSO
+
+    POE::Component::IRC
+
+    POE::Component::IRC::Plugin
+
+    Moose::Role
+
+AUTHORS
+
+      * Chris Williams <chris@bingosnet.co.uk>
+
+      * Chris Prather
+
+      * Shawn M Moore
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams and Shawn M
+    Moore.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

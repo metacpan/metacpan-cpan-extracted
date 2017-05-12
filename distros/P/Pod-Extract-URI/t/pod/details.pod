@@ -1,0 +1,11 @@
+=pod
+
+http://www.example.com/
+
+http://www.google.com/
+
+http://www.example.com:80/
+
+<URL:http://www.google.com/>
+
+=cut

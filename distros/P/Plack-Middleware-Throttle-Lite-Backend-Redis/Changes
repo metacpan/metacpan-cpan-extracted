@@ -1,0 +1,17 @@
+Revision history for Perl extension Plack::Middleware::Throttle::Lite::Backend::Redis
+
+0.04    Thu Apr 11 09:22:45 2013 +0000
+    - removed named captures to make perl < v5.10 happy
+    - updated example of usage to support perl < v5.10
+
+0.03    Wed Apr 10 21:48:03 2013 +0000
+    - update test to support Throttle-Lite v0.02+
+    - update perl min version requirements
+    - better redis handling in tests
+
+0.02    Thu Mar 28 07:12:04 2013 +0000
+    - skip some tests in travis-ci environment
+    - parameters server and sock were replaced by parameter instance
+
+0.01    Tue Mar 26 16:56:04 2013 +0000
+    - initial commit/release

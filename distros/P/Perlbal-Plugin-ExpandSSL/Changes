@@ -1,0 +1,8 @@
+Revision history for Perlbal-Plugin-ExpandSSL
+
+0.02    09.06.10
+        * Added more tests, we reached 100% test coverage!
+
+0.01    27.05.10
+        First version, released on an unsuspecting world.
+

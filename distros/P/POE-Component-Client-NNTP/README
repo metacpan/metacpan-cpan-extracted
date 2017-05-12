@@ -1,0 +1,577 @@
+NAME
+    POE::Component::Client::NNTP - A POE component that implements an RFC
+    3977 NNTP client.
+
+VERSION
+    version 2.22
+
+SYNOPSIS
+       # Connects to NNTP Server, selects a group, then downloads all current articles.
+       use strict;
+       use POE;
+       use POE::Component::Client::NNTP;
+       use Mail::Internet;
+       use FileHandle;
+
+       $|=1;
+
+       my $nntp = POE::Component::Client::NNTP->spawn ( 'NNTP-Client', { NNTPServer => 'news.host' } );
+
+       POE::Session->create(
+            package_states => [
+                    'main' => { nntp_disconnected => '_shutdown',
+                                nntp_socketerr    => '_shutdown',
+                                nntp_421          => '_shutdown',
+                                nntp_200          => '_connected',
+                                nntp_201          => '_connected',
+                    },
+                    'main' => [ qw(_start nntp_211 nntp_220 nntp_223 nntp_registered)
+                    ],
+            ],
+       );
+
+       $poe_kernel->run();
+       exit 0;
+
+       sub _start {
+            my ($kernel,$heap) = @_[KERNEL,HEAP];
+
+            # Our session starts, register to receive all events from poco-client-nntp
+            $kernel->post ( 'NNTP-Client' => register => 'all' );
+            # Okay, ask it to connect to the server
+            $kernel->post ( 'NNTP-Client' => 'connect' );
+            undef;
+       }
+
+       sub nntp_registered {
+            my $nntp_object = $_[ARG0];
+            undef;
+       }
+
+       sub _connected {
+            my ($kernel,$heap,$text) = @_[KERNEL,HEAP,ARG0];
+
+            print "$text\n";
+
+            # Select a group to download from.
+            $kernel->post( 'NNTP-Client' => group => 'random.group' );
+            undef;
+       }
+
+       sub nntp_211 {
+            my ($kernel,$heap,$text) = @_[KERNEL,HEAP,ARG0];
+            print "$text\n";
+
+            # The NNTP server sets 'current article pointer' to first article in the group.
+            # Retrieve the first article
+            $kernel->post( 'NNTP-Client' => 'article' );
+            undef;
+       }
+
+       sub nntp_220 {
+            my ($kernel,$heap,$text,$article) = @_[KERNEL,HEAP,ARG0,ARG1];
+            print "$text\n";
+
+            my $message = Mail::Internet->new( $article );
+            my $filename = $message->head->get( 'Message-ID' );
+            my $fh = new FileHandle "> articles/$filename";
+            $message->print( $fh );
+            $fh->close;
+
+            # Set 'current article pointer' to the 'next' article in the group.
+            $kernel->post( 'NNTP-Client' => 'next' );
+            undef;
+       }
+
+       sub nntp_223 {
+            my ($kernel,$heap,$text) = @_[KERNEL,HEAP,ARG0];
+            print "$text\n";
+
+            # Server has moved to 'next' article. Retrieve it.
+            # If there isn't a 'next' article an 'nntp_421' is generated
+            # which will call '_shutdown'
+            $kernel->post( 'NNTP-Client' => 'article' );
+            undef;
+       }
+
+       sub _shutdown {
+            my ($kernel,$heap) = @_[KERNEL,HEAP];
+
+            # We got disconnected or a socketerr unregister and terminate the component.
+            $kernel->post ( 'NNTP-Client' => unregister => 'all' );
+            $kernel->post ( 'NNTP-Client' => 'shutdown' );
+            undef;
+       }
+
+DESCRIPTION
+    POE::Component::Client::NNTP is a POE component that provides
+    non-blocking NNTP access to other components and sessions. NNTP is
+    described in RFC 3977 <http://www.faqs.org/rfcs/rfc3977.html>, please
+    read it before doing anything else.
+
+    In your component or session, you spawn a NNTP client component, assign
+    it an alias, and then send it a 'register' event to start receiving
+    responses from the component.
+
+    The component takes commands in the form of events and returns the
+    salient responses from the NNTP server.
+
+CONSTRUCTOR
+    "spawn"
+        Takes two arguments, a kernel alias to christen the new component
+        with and a hashref.
+
+        Possible values for the hashref are:
+
+           'NNTPServer', the DNS name or IP address of the NNTP host to connect to;
+           'Port', the IP port on that host
+           'LocalAddr', an IP address on the client to connect from.
+           'UseSSL', set to a true value to indicate that the poco should use SSL
+           'TimeOut', number of seconds to wait for a response from server
+
+        If "NNTPServer" is not specified, the default is "news", unless the
+        environment variable "NNTPServer" is set. If "Port" is not specified
+        the default is 119.
+
+          POE::Component::Client::NNTP->spawn( 'NNTP-Client', { NNTPServer => 'news', Port => 119,
+                        LocalAddr => '192.168.1.99' } );
+
+        "UseSSL" requires that POE::Component::SSLify is installed.
+
+        "TimeOut" is an optional number of seconds to wait between sending a
+        command to the server and receiving a response. If the timeout
+        occurs then the connection to the server is terminated and a
+        "nntp_disconnected" event is triggered. The default behaviour is not
+        to enable timeouts.
+
+        Returns a POE::Component::Client::NNTP object.
+
+METHODS
+    "session_id"
+        Returns the session ID of the component's POE::Session.
+
+    "connected"
+        Indicates true or false as to whether the component is currently
+        connected to a server or not.
+
+INPUT
+    The component accepts the following events:
+
+    "register"
+        Takes N arguments: a list of event names that your session wants to
+        listen for, minus the 'nntp_' prefix, ( this is similar to
+        POE::Component::IRC ).
+
+        Registering for "all" will cause it to send all NNTP-related events
+        to you; this is the easiest way to handle it.
+
+    "unregister"
+        Takes N arguments: a list of event names which you don't want to
+        receive. If you've previously done a "register" for a particular
+        event which you no longer care about, this event will tell the NNTP
+        connection to stop sending them to you. (If you haven't, it just
+        ignores you. No big deal).
+
+    "connect"
+        Takes no arguments. Tells the NNTP component to start up a
+        connection to the previously specified NNTP server. You will receive
+        a "nntp_connected" event.
+
+    "disconnect"
+        Takes no arguments. Terminates the socket connection ungracelessly.
+
+    "shutdown"
+        Takes no arguments. Terminates the component.
+
+        Always ensure that you call "unregister" before shutting down the
+        component.
+
+    The following are implemented NNTP commands, check RFC 3977
+    <http://www.faqs.org/rfcs/rfc3977.html> for the arguments accepted by
+    each. Arguments can be passed as a single scalar or a list of arguments:
+
+    "article"
+        Takes either a valid message-ID or a numeric-ID.
+
+    "body"
+        Takes either a valid message-ID or a numeric-ID.
+
+    "head"
+        Takes either a valid message-ID or a numeric-ID.
+
+    "stat"
+        Takes either a valid message-ID or a numeric-ID.
+
+    "group"
+        Takes the name of a newsgroup to select.
+
+    "help"
+        Takes no arguments.
+
+    "ihave"
+        Takes one argument, a message-ID.
+
+    "last"
+        Takes no arguments.
+
+    "list"
+        Takes no arguments.
+
+    "newgroups"
+        Can take up to four arguments: a date, a time, optionally you can
+        specify GMT and an optional list of distributions.
+
+    "newnews"
+        Can take up to five arguments: a newsgroup, a date, a time,
+        optionally you can specify GMT and an optional list of
+        distributions.
+
+    "next"
+        Takes no arguments.
+
+    "post"
+        Takes no arguments. Once you have sent this expect to receive an
+        'nntp_340' event. When you receive this send the component a
+        'send_post' event, see below.
+
+    "send_post"
+        Takes one argument, an array ref containing the message to be
+        posted, one line of the message to each array element.
+
+    "quit"
+        Takes no arguments.
+
+    "slave"
+        Takes no arguments.
+
+    "capabilities"
+        Returns a list of capabilities.
+
+    "listgroup"
+        Provides a list of article numbers in a group.
+
+    "date"
+        Find out the current Coordinated Universal Time
+
+    "over"
+        The OVER command returns the contents of all the fields in the
+        database for an article specified by message-id.
+
+    "hdr"
+        The HDR command provides access to specific fields from an article
+        specified by message-id.
+
+    "authinfo"
+        Takes two arguments: first argument is either "user" or "pass",
+        second argument is the user or password, respectively. Not
+        technically part of RFC 3977
+        <http://www.faqs.org/rfcs/rfc3977.html>, but covered in RFC 2980
+        <http://www.faqs.org/rfcs/rfc2980.html>.
+
+    "send_cmd"
+        The catch-all event :) Anything sent to this is passed directly to
+        the NNTP server. Use this to implement any non-RFC commands that you
+        want, or to completely bypass all the above if you so desire.
+
+OUTPUT
+    The following events are generated by the component:
+
+    "nntp_registered"
+        Generated when you either explicitly "register" with the component
+        or you spawn a NNTP poco from within your own session. "ARG0" is the
+        poco's object.
+
+    "nntp_connected"
+        Generated when the component successfully makes a connection to the
+        NNTP server. Please note, that this is only the underlying network
+        connection. Wait for either an "nntp_200" or "nntp_201" before
+        sending any commands to the server.
+
+    "nntp_disconnected"
+        Generated when the link to the NNTP server is dropped for whatever
+        reason.
+
+    "nntp_socketerr"
+        Generated when the component fails to establish a connection to the
+        NNTP server.
+
+    "Numeric" responses ( See RFC 977 and RFC 2980 )
+        Messages generated by NNTP servers consist of a numeric code and a
+        text response. These will be sent to you as events with the numeric
+        code prefixed with "nntp_". "ARG0"is the text response.
+
+        Certain responses return following text, such as the "ARTICLE"
+        command, which returns the specified article. These responses are
+        returned in an array ref contained in "ARG1".
+
+        Eg.
+
+          $kernel->post( 'NNTP-Client' => article => $article_num );
+
+          sub nntp_220 {
+            my ($kernel,$heap,$text,$article) = @_[KERNEL,HEAP,ARG0,ARG1];
+
+            print "$text\n";
+            if ( scalar @{ $article } > 0 ) {
+                foreach my $line ( @{ $article } ) {
+                   print STDOUT $line;
+                }
+            }
+            undef;
+          }
+
+        Possible nntp_ values are:
+
+           100 help text follows
+           199 debug output
+
+           200 server ready - posting allowed
+           201 server ready - no posting allowed
+           202 slave status noted
+           205 closing connection - goodbye!
+           211 n f l s group selected
+           215 list of newsgroups follows
+           220 n <a> article retrieved - head and body follow
+           221 n <a> article retrieved - head follows
+           222 n <a> article retrieved - body follows
+           223 n <a> article retrieved - request text separately
+           230 list of new articles by message-id follows
+           231 list of new newsgroups follows
+           235 article transferred ok
+           240 article posted ok
+           250 authentication accepted, successful authentication using the AUTHINFO command extension.
+           281 authentication accepted, successful authentication using the AUTHINFO command extension.
+
+           335 send article to be transferred.  End with <CR-LF>.<CR-LF>
+           340 send article to be posted. End with <CR-LF>.<CR-LF>
+           381 more authentication information required, preliminary response to the AUTHINFO command extension.
+
+           400 service discontinued
+           411 no such news group
+           412 no newsgroup has been selected
+           420 no current article has been selected
+           421 no next article in this group
+           422 no previous article in this group
+           423 no such article number in this group
+           430 no such article found
+           435 article not wanted - do not send it
+           436 transfer failed - try again later
+           437 article rejected - do not try again.
+           440 posting not allowed
+           441 posting failed
+
+           500 command not recognized
+           501 command syntax error
+           502 access restriction or permission denied
+           503 program fault - command not performed
+
+PLUGINS
+    POE::Component::Client::NNTP now utilises POE::Component::Pluggable to
+    enable a POE::Component::IRC type plugin system.
+
+  PLUGIN HANDLER TYPES
+    There are two types of handlers that can registered for by plugins,
+    these are
+
+    "NNTPSERVER"
+        These are the "nntp_" prefixed events that are generated. In a
+        handler arguments are passed as scalar refs so that you may mangle
+        the values if required.
+
+    "NNTPCMD"
+        These are generated whenever an nntp command is sent to the
+        component. Again, any arguments passed are scalar refs for
+        manglement.
+
+  PLUGIN EXIT CODES
+    Plugin handlers should return a particular value depending on what
+    action they wish to happen to the event. These values are available as
+    constants which you can use with the following line:
+
+      use POE::Component::Client::NNTP::Constants qw(:ALL);
+
+    The return values have the following significance:
+
+    "NNTP_EAT_NONE"
+        This means the event will continue to be processed by remaining
+        plugins and finally, sent to interested sessions that registered for
+        it.
+
+    "NNTP_EAT_CLIENT"
+        This means the event will continue to be processed by remaining
+        plugins but it will not be sent to any sessions that registered for
+        it. This means nothing will be sent out on the wire if it was an
+        NNTPCMD event, beware!
+
+    "NNTP_EAT_PLUGIN"
+        This means the event will not be processed by remaining plugins, it
+        will go straight to interested sessions.
+
+    "NNTP_EAT_ALL"
+        This means the event will be completely discarded, no plugin or
+        session will see it. This means nothing will be sent out on the wire
+        if it was an NNTPCMD event, beware!
+
+  PLUGIN METHODS
+    The following methods are available:
+
+    "pipeline"
+        Returns the POE::Component::Pluggable::Pipeline object.
+
+    "plugin_add"
+        Accepts two arguments:
+
+          The alias for the plugin
+          The actual plugin object
+
+        The alias is there for the user to refer to it, as it is possible to
+        have multiple plugins of the same kind active in one
+        POE::Component::Client::NNTP object.
+
+        This method goes through the pipeline's push() method.
+
+         This method will call $plugin->plugin_register( $nntp )
+
+        Returns the number of plugins now in the pipeline if plugin was
+        initialized, undef if not.
+
+    "plugin_del"
+        Accepts one argument:
+
+          The alias for the plugin or the plugin object itself
+
+        This method goes through the pipeline's remove() method.
+
+        This method will call $plugin->plugin_unregister( $irc )
+
+        Returns the plugin object if the plugin was removed, undef if not.
+
+    "plugin_get"
+        Accepts one argument:
+
+          The alias for the plugin
+
+        This method goes through the pipeline's get() method.
+
+        Returns the plugin object if it was found, undef if not.
+
+    "plugin_list"
+        Has no arguments.
+
+        Returns a hashref of plugin objects, keyed on alias, or an empty
+        list if there are no plugins loaded.
+
+    "plugin_order"
+        Has no arguments.
+
+        Returns an arrayref of plugin objects, in the order which they are
+        encountered in the pipeline.
+
+    "plugin_register"
+        Accepts the following arguments:
+
+          The plugin object
+          The type of the hook, NNTPSERVER or NNTPCMD
+          The event name(s) to watch
+
+        The event names can be as many as possible, or an arrayref. They
+        correspond to the prefixed events and naturally, arbitrary events
+        too.
+
+        You do not need to supply events with the prefix in front of them,
+        just the names.
+
+        It is possible to register for all events by specifying 'all' as an
+        event.
+
+        Returns 1 if everything checked out fine, undef if something's
+        seriously wrong
+
+    "plugin_unregister"
+        Accepts the following arguments:
+
+          The plugin object
+          The type of the hook, NNTPSERVER or NNTPCMD
+          The event name(s) to unwatch
+
+        The event names can be as many as possible, or an arrayref. They
+        correspond to the prefixed events and naturally, arbitrary events
+        too.
+
+        You do not need to supply events with the prefix in front of them,
+        just the names.
+
+        It is possible to register for all events by specifying 'all' as an
+        event.
+
+        Returns 1 if all the event name(s) was unregistered, undef if some
+        was not found.
+
+  PLUGIN TEMPLATE
+    The basic anatomy of a plugin is:
+
+            package Plugin;
+
+            # Import the constants, of course you could provide your own
+            # constants as long as they map correctly.
+            use POE::Component::NNTP::Constants qw( :ALL );
+
+            # Our constructor
+            sub new {
+                    ...
+            }
+
+            # Required entry point for plugins
+            sub plugin_register {
+                    my( $self, $nntp ) = @_;
+
+                    # Register events we are interested in
+                    $nntp->plugin_register( $self, 'NNTPSERVER', qw(all) );
+
+                    # Return success
+                    return 1;
+            }
+
+            # Required exit point for pluggable
+            sub plugin_unregister {
+                    my( $self, $nntp ) = @_;
+
+                    # Pluggable will automatically unregister events for the plugin
+
+                    # Do some cleanup...
+
+                    # Return success
+                    return 1;
+            }
+
+            sub _default {
+                    my( $self, $nntp, $event ) = splice @_, 0, 3;
+
+                    print "Default called for $event\n";
+
+                    # Return an exit code
+                    return NNTP_EAT_NONE;
+            }
+
+CAVEATS
+    The group event sets the current working group on the server end. If you
+    want to use group and numeric form of article|head|etc then you will
+    have to spawn multiple instances of the component for each group you
+    want to access concurrently.
+
+SEE ALSO
+    RFC 977 <http://www.faqs.org/rfcs/rfc977.html>
+
+    RFC 2980 <http://www.faqs.org/rfcs/rfc2980.html>
+
+    POE::Component::Pluggable
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams and Dennis Taylor.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

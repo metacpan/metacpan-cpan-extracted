@@ -1,0 +1,41 @@
+% perl eg/sample.pl
+Hello World
+
+% perl eg/sample.pl --version
+sample.pl 0.01
+Copyright and License:
+    Public Domain
+
+Author:
+    Curt Tilmes
+
+
+% perl eg/sample.pl --help
+Usage:
+     sample [--help|-h|-q] [--man] [--version]
+
+
+% perl eg/sample.pl --man
+SAMPLE(1)             User Contributed Perl Documentation            SAMPLE(1)
+
+
+
+NAME
+       sample - sample program to illustrate Pod::Usage::CommandLine
+
+SYNOPSIS
+        sample [--help|-h|-q] [--man] [--version]
+
+DESCRIPTION
+       Sample program to illustrate Pod::Usage::CommandLine options.
+
+COPYRIGHT AND LICENSE
+       Public Domain
+
+AUTHOR
+       Curt Tilmes
+
+
+
+perl v5.8.8                       2008-08-07                         SAMPLE(1)
+

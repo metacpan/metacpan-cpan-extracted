@@ -1,0 +1,288 @@
+=head1 NAME
+
+PDL::FFTW3 - PDL interface to the Fastest Fourier Transform in the West v3
+
+=head1 SYNOPSIS
+
+ use PDL;
+ use PDL::FFTW3;
+ use PDL::Graphics::Gnuplot;
+ use PDL::Complex;
+
+ # Basic functionality
+ my $x = sin( sequence(100) * 2.0 ) + 2.0 * cos( sequence(100) / 3.0 );
+ my $F = rfft1( $x );
+ gplot( with => 'lines', inner($F,$F));
+
+ =====>
+
+  8000 ++------------+-------------+------------+-------------+------------++
+       +             +             +            +             +             +
+       |                                                                    |
+       |      *                                                             |
+  7000 ++     *                                                            ++
+       |      *                                                             |
+       |      *                                                             |
+       |      *                                                             |
+       |      *                                                             |
+  6000 ++     *                                                            ++
+       |      *                                                             |
+       |      *                                                             |
+       |      *                                                             |
+  5000 ++     *                                                            ++
+       |      *                                                             |
+       |      *                                                             |
+       |      **                                                            |
+  4000 ++     **                                                           ++
+       |      **                                                            |
+       |     * *                                                            |
+       |     * *                                                            |
+       |     * *                                                            |
+  3000 ++    * *                                                           ++
+       |     * *                                                            |
+       |     * *                                                            |
+       |     * *                                   *                        |
+  2000 ++    * *                                   *                       ++
+       |     * *                                   *                        |
+       |     * *                                   **                       |
+       |     * *                                   **                       |
+       |     * *                                   **                       |
+  1000 ++    *  *                                 * *                      ++
+       |     *  *                                 * *                       |
+       |    **   *                                *  *                      |
+       +   *     *   +             +            + *  *        +             +
+     0 ****-------*********************************--************************
+       0             10            20           30            40            50
+
+
+
+ # Correlation of two real signals
+
+ # two signals offset by 30 units
+ my $x    = sequence(100);
+ my $y1   = exp( 0.2*($x - 20.5) ** (-2.0) );
+ my $y2   = exp( 0.2*($x - 50.5) ** (-2.0) );
+
+ # compute the correlation
+ my $F12  = rfft1( cat($y1,$y2) );
+ my $corr = irfft1( Cmul(      $F12(:,:,(1)),
+                            Cconj $F12(:,:,(0)) ) );
+ # and find the peak
+ say maximum_ind($corr);
+
+ =====> 30
+
+=head1 DESCRIPTION
+
+This is a PDL binding to version 3 of the FFTW library. Supported are complex
+<-> complex and real <-> complex FFTs.
+
+=head2 NB to install
+
+  wget http://www.fftw.org/fftw-3.3.4.tar.gz
+  tar xvf fftw-3.3.4.tar.gz
+  cd fftw-3.3.4/
+  ./configure --prefix=/usr --enable-threads --enable-float --enable-shared --with-pic
+  make all install install-pkgconfigDATA
+  make clean
+  ./configure --prefix=/usr --enable-threads --enable-shared --with-pic
+  make all install install-pkgconfigDATA
+
+This will give you both fftw3f (first chunk) and fftw3 (second).
+
+=head2 Supported operations
+
+This module computes the Discrete Fourier Transform. In its most basic form,
+this transform converts a vector of complex numbers in the time domain into
+another vector of complex numbers in the frequency domain. These complex <->
+complex transforms are supported with C<fftN> functions for a rank-C<N>
+transform. The opposite effect (transform data in the frequency domain back to
+the time domain) can be achieved with the C<ifftN> functions.
+
+A common use case is to transform purely-real data. This data has 0 for its
+complex component, and FFTW can take advantage of this to compute the FFT faster
+and using less memory. Since a Fourier Transform of a real signal has an even
+real part and an odd imaginary part, only 1/2 of the spectrum is needed. These
+forward real -> complex transforms are supported with the C<rfftN> functions.
+The backward version of this transform is complex -> real and is supported with
+the C<irfftN> functions.
+
+=head2 Basic usage details
+
+Arbitrary C<N>-dimensional transforms are supported. All functions exported by
+this module have the C<N> in their name, so for instance a complex <-> complex
+3D forward transform is computed with the C<fft3> function. The rank I<must
+always> be specified in this way; there is no function called simply C<fft>.
+
+In-place operation is supported for complex <-> complex functions, but not the
+real ones (real function don't have mathing dimensionality of the input and
+output). An in-place transform of C<$x> can be computed with
+
+ fft1( $x->inplace );
+
+All the functions in this module support PDL threading. For instance, if we have
+4 different image piddles C<$a>, C<$b>, C<$c>, C<$d> and we want to compute
+their 2D FFTs at the same time, we can say
+
+ my $ABCD_transformed = rfft2( PDL::cat( $a, $b, $c, $d) );
+
+This takes advantage of PDL's automatic parallelization, if appropriate (See
+L<PDL::ParallelCPU>).
+
+=head2 Data formats
+
+FFTW supports single and double-precision floating point numbers directly. If
+possible, the PDL input will be used as-is. If not, a type conversion will be
+made to use the lowest-common type. So as an example, the following will perform
+a single-precision floating point transform (and return data of that type).
+
+ fft1( $x->byte )
+
+This module expects complex numbers to be stored as a (real,imag) pair in the
+first dimension of a piddle. Thus in a complex piddle C<$x>, it is expected that
+C<$x-E<gt>dim(0) == 2> (this module verifies this before proceeding).
+
+Generally, the sizes of the input and the output must match. This is completely
+true for the complex <-> complex transforms: the output will have the same size
+and the input, and an error will result if this isn't possible for some reason.
+
+This is a little bit more involved for the real <-> complex transforms. If I'm
+transforming a real 3D vector of dimensions C<K,L,M>, I will get an output of
+dimensions C<2,int(K/2)+1,L,M>. The leading 2 is there because the output is
+complex; the C<K/2> is there because the input was real. The first dimension is
+always the one that gets the C<K/2>. This is described in detail in section 2.4
+of the FFTW manual.
+
+Note that given a real input, the dimensionality of the complex transformed
+output is unambiguous. However, this is I<not> true for the backward transform.
+For instance, a 1D inverse transform of a vector of 10 complex numbers can
+produce real output of either 18 or 19 elements (because C<int(18/2)+1 == 10>
+and C<int(19/2)+1 == 10>).
+
+I<Without any extra information this module assumes the even-sized input>.
+
+Thus C<irfft1( sequence(2,10) )-E<gt>dim(0) == 18> is true. If we want the odd-sized output, we have to explicitly pass this into the function like this:
+
+ irfft1( sequence(2,10), zeros(19) )
+
+Here I create a new output piddle with the C<zeros> function; C<irfft1> then
+fills in this piddle with the result of the computation. This module validates
+all of its input, so only 18 and 19 are valid here. An error will be thrown if
+you try to pass in C<zeros(20)>.
+
+This all means that the following will produce surprising results if
+C<$x-E<gt>dim(0)> isn't even
+
+ irfft1( rfft1( $x ) )
+
+=head2 FFT normalization
+
+Following the widest-used convention for discrete Fourier transforms,
+this module normalizes the inverse transform (but not the forward
+transform) by dividing by the number of elements in the data set, so
+that
+
+ ifft1( fft1( $x ) )
+
+is a slow approximate no-op, if C<$x> is well-behaved.
+
+This is different from the behavior of the underlying FFTW3 library itself,
+but more consistent with other FFT packages for popular analysis languages
+including PDL.
+
+
+=head1 FUNCTIONS
+
+=head2 fftN (fft1, fft2, fft3, ..., fftn)
+
+The basic complex <-> complex FFT. You can pass in the rank as a
+parameter with the C<fftn> form, or append the rank to the function
+name for ranks up to 9. These functions all take one input piddle and
+one output piddle.  The dimensions of the input and the output are
+identical. The output parameter is optional and, if present, must be
+the last argument. If the output piddle is passed in, the user I<must>
+make sure the dimensions match.
+
+The 0 dim of the input PDL must have size 2 and run over (real,imaginary)
+components. The transform is carried out over dims 1 through N.
+
+The fftn form takes a minimum of two arguments: the PDL to transform,
+and the number of dimensions to transform as a separate argument.
+
+The following are equivalent:
+
+ $X = fftn( $x, 1 );
+ $X = fft1( $x );
+ fft1( $x, my $X = $x->zeros );
+
+
+=head2 ifftN (ifft1, ifft2, ifft3, ..., fftn)
+
+The basic, properly normalized, complex <-> complex backward
+FFT. Everything is exactly like in the C<fftN> functions, except the
+inverse transform is computed and normalized, so that (for example)
+
+ ifft1( fft1 ( $x ) )
+
+is a good approximation of C<$x> itself.
+
+=head2 rfftN (rfft1, rfft2, rfft3, ..., rfftn)
+
+The real -> complex FFT. You can pass in the rank with the C<rfftn>
+form, or append the rank to the function name for ranks up to 9.
+These functions all take one input piddle and one output piddle. The
+dimensions of the input and the output are not identical, but are
+related as described in L<Data formats>. The output can be passed in
+as the last argument, if desired. If the output piddle is passed in,
+the user I<must> make sure the dimensions match.
+
+In the C<rfftn> form, the rank is the second argument.
+
+The following are equivalent:
+
+ $X = rfftn( $x, 1 );
+ $X = rfft1( $x );
+ rfft1( $x, my $X = $x->zeroes );
+
+=head2 irfftN (irfft1, irfft2, irfft3, ..., irfftn)
+
+The complex -> real inverse FFT. You can pass in the rank with the
+C<irfftn> form, or append the rank to the function name for ranks up
+to 9. Argument passing and interpretation is as described in
+C<rfftN> above. Please read L<Data formats> for details about dimension
+interpretation. There's an ambiguity about the output dimensionality,
+which is described in that section.
+
+=head1 AUTHOR
+
+Dima Kogan, C<< <dima@secretsauce.net> >>; contributions from Craig
+DeForest, C<< <craig@deforest.org> >>.
+
+=head1 HISTORY
+
+=head2 VERSION 0.02
+
+=over
+
+=item Use Alien::FFTW3 for build (if present)
+
+=item add parametric rank functions
+
+=item normalize inverses
+
+=item shorter abbreviation for realfft functions
+
+=back
+
+=head2 VERSION 0.01
+
+Early working version in github
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2013 Dima Kogan and Craig DeForest.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the GNU General Public License.
+
+=cut

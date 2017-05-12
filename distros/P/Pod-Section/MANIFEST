@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+bin/podsection
+cpanfile
+lib/Pod/Section.pm
+logfile
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml
+MANIFEST

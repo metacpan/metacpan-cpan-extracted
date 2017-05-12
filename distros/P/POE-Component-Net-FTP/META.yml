@@ -1,0 +1,24 @@
+---
+name: POE-Component-Net-FTP
+version: 0.001
+author:
+  - 'Zoffix Znet <zoffix@cpan.org>'
+abstract: non-blocking wrapper around Net::FTP
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 1.04
+  Net::FTP: 2.77
+  POE: 0.9999
+  POE::Component::NonBlockingWrapper::Base: 0.002
+build_requires:
+  Test::More: 0
+provides:
+  POE::Component::Net::FTP:
+    file: lib/POE/Component/Net/FTP.pm
+    version: 0.001
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

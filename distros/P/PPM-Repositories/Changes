@@ -1,0 +1,101 @@
+Revision history for Perl extension PPM::Repositories
+
+0.20 Wed Oct 22 2014
+     - add activestate repos for 5.14 to 5.20
+     - remove activestate HP-UX repos; they seem to be gone
+     - add bribes repos for 5.14 to 5.18
+     - add sisyphusion repos for 5.16 and 5.18
+     - add trouchelle for 5.14
+     - add wxperl for 5.16
+
+0.19 Thu Jun 09 2011
+    - add 5.14 repos for sisyphusion
+    - add 5.14 repos for wxperl
+
+0.18 Mon Dec 06 2010
+    - add sisyphusion repository
+
+0.17 Tue May 25 2010
+    - add 5.12 repos for bribes, trouchelle and uwinnipeg [RT#57814]
+    - add bioperl and bioperl-rc to the old-style interface too
+    - prune dead repositories: devhelp, jenda, openi, sablotron
+
+0.16 Tue May 11 2010
+    - move test.pl to t/test.t to run it via Test::Harness
+    - remove outdated wxansi repository  [RT#55053]
+    - add additional architectures for wxperl repo [RT#55053]
+    - add ActiveState 64-bit Linux repos
+    - add ActivePerl 5.12 repos
+    - add bioperl and bioperl-rc repos
+
+0.15  Thu Jun 12 2008
+    - add "Paul Miller's Games::RolePlay::MapGen and Gtk2 repository"
+      as the "voltar" repository [RT#36254]
+    - add note to "gtk2" repo to also check "voltar" repo
+
+0.14  Wed Apr 23 2008
+    - Add wxperl and wxansi repositories
+    - Rename all 'theory' repositories to 'uwinnipeg'
+    - Append '-ppm3' to PPMServer style repositories and remove the
+      'S' (for "slower") suffix from the corresponding Website style repos
+      for a more consistent overall naming scheme.
+    - Rename 'uwinnipeg' to 'uwinnipeg56' for consistency.
+
+0.13  Fri Apr 18 2008
+    - devhelp repository has been cleaned up and only contains
+      Imager module for 5.8 now.
+    - Add devhelp repo to %REPO hash for new API too
+    - Add '=head1 NAME' line to properly define the module abstract
+
+0.12  Tue Apr 15 2008
+    - removed smueller repository [RT#23979]
+    - removed datetime repository [RT#17391]
+    - removed dead repositories: soulcage, esoft, savage, spurkis, crazy, dada, rto
+    - removed already commented out repositories: xray, perlxml
+    - turned jenda's repository to inactive
+    - added tcool and trouchelle repositories
+    - addded new gtk2 repo; renamed outdated "official" one to gtk2-old
+    - added get(), list() and used_archs() function
+    - updated documentation
+    - added some simple tests to test.pl
+    - added sample scripts in eg/ subdirectory
+
+0.11  Thu May 12 04:46:47 2005
+    - removed some repositories that are gone for good [RT#12761]
+
+0.10  Thu May 20 15:30:59 2004
+    - updated synopsis
+
+0.09  Sat Mar 13 19:08:08 2004
+    - some PerlO values were wrong (no biggie)
+
+0.08  Sat Mar 13 17:46:29 2004
+    - added smueller, bribes and soulcage/soulcage58 [RT#5367], [RT#5644], [RT#5477]
+
+0.07  Wed Nov  5 20:02:09 2003
+    - I realized the 0.05 Changes never happened (D'oh)
+    - really added pod pointing to guide(s) on setting up a repository
+
+0.06  Wed Nov  5 19:46:05 2003
+    - added esoft
+    - added log4perl "repository"
+    - updated pod
+
+0.05 
+    - added jmcnamara repository (he finally made it a repository)
+    - added pod pointing to guide(s) on setting up a repository
+
+0.04  Mon Jun  2 17:28:31 2003
+    - marked savage repository active (he finally fixed it)
+
+0.03  Fri May 30 14:43:28 2003
+    - added savage repository for 5.8 (which should be active soon),
+      fixed up some urls (trailing slash is known to mess up some versions of ppm)
+
+0.02  Tue May 27 05:12:34 2003
+    - finished writing pod, first upload to cpan
+
+0.01  Fri Apr  4 03:21:25 2003
+	- original version; created by h2xs 1.21 with options
+		-AX PPM::Repositories
+

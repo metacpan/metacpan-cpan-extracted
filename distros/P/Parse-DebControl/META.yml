@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Parse-DebControl
+version:      2.005
+version_from: lib/Parse/DebControl.pm
+installdirs:  site
+requires:
+    Compress::Zlib:                0
+    IO::Scalar:                    2.104
+    LWP::Simple:                   0
+    LWP::UserAgent:                0
+    Test::More:                    0.45
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

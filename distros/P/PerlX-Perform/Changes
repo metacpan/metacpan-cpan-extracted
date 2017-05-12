@@ -1,0 +1,36 @@
+PerlX-Perform
+=============
+
+Created:      2012-02-06
+Home page:    <https://metacpan.org/release/PerlX-Perform>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Perform>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.006	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.005	2012-03-05
+
+ [ Bug Fixes ]
+ - Remove space incorrectly included in a POD L<...> link.
+
+0.004	2012-03-05
+
+ [ Bug Fixes ]
+ - See Also links
+   Fixes RT#75022.
+   <https://rt.cpan.org/Ticket/Display.html?id=75022>
+
+ [ Other ]
+ - %EXPORT_TAGS now has tags :default, :all, :wherever and :whenever.
+ - Added: Add 'whenever' as an alias for 'wherever'.
+
+0.003	2012-02-27
+
+ - Reduce dependencies. No longer require 'common::sense', 'parent',
+   'Scalar::Util' or 'utf8', but do require 'strict'. No longer require
+   Perl 5.10, but require Perl 5.6.
+
+0.001	2012-02-06	Initial release

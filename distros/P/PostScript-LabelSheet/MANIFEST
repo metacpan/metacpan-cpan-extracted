@@ -1,0 +1,23 @@
+bin/pslabelsheet
+Build.PL
+Changes
+eg/design1.eps
+eg/design1.svg
+eg/design2.eps
+eg/design2.svg
+eg/eg1.pdf
+eg/eg2.pdf
+eg/examples.sh
+lib/PostScript/LabelSheet.pm
+lib/PostScript/LabelSheet/LabelSheet.ps
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-accessors.t
+t/02-add.t
+t/03-fill.t
+t/boilerplate.t
+t/test1.eps
+t/test2.eps
+META.yml

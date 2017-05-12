@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+# Very simple. No error cheking etc. Works or doesn't...
+my $t = int($ARGV[0]);
+print STDOUT "STDOUT: Sleeping for $t s\n";
+print STDERR "STDERR: Sleeping for $t s\n";
+
+sub sigh {
+    warn "Caught SIG$_[0]...";
+    exit(31);
+}
+
+$SIG{QUIT} = \&sigh;
+$SIG{INT } = \&sigh;
+$SIG{TERM} = \&sigh;
+
+sleep($t);
+
+exit(0);

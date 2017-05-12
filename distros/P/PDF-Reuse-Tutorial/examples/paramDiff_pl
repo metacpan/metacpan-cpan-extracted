@@ -1,0 +1,60 @@
+use strict;
+
+my ($line1, $line2, @lines1, @lines2, @sort1, @sort2, $last, $next, $word); 
+my $file1 = shift || die "You have to give 2 parameter files as arguments\n";
+my $file2 = shift || die "You have to give 2 parameter files as arguments\n";
+
+open (FILE1, "<$file1") || die "Couldn't open $file1, $! \n";
+open (FILE2, "<$file2") || die "Couldn't open $file2, $! \n";
+
+while (<FILE1>)
+{  push @lines1, $_;
+}
+
+while (<FILE2>)
+{  push @lines2, $_;
+}
+
+@sort1 = sort @lines1;
+@sort2 = sort @lines2;
+
+$line1 = shift @sort1 || 'z';
+$line2 = shift @sort2 || 'z';
+
+my $outFile = shift || 'diff.dat';
+
+open (OUTFILE, ">$outFile") || die "Couldn't open $outFile, $!\n"; 
+
+while (($line1 lt 'z') || ($line2 lt 'z'))
+{   if ($line1 lt $line2)
+    {  if ($line1 =~ m'^(\w+)\s'o)
+       {  $word = $1;
+          if (($word ne $last) && ($word ne $next) && ($word =~ m'^\d+'o))
+          {   print OUTFILE "$word => ['x', ' '],\n";
+          } 
+       }
+ 
+      $line1 = shift @sort1 || 'z';   
+    }
+    elsif ($line2 lt $line1)
+    {  print OUTFILE "$line2";
+       if ($line2 =~ m'^(\w+)\s'o)
+       {  $last = $1;
+       }
+       $line2 = shift @sort2 || 'z';
+       if ($line2 =~ m'^(\w+)\s'o)
+       {  $next = $1;
+       }
+
+    }
+    else
+    {  $line1 = shift @sort1 || 'z';
+       $line2 = shift @sort2 || 'z';
+       if ($line2 =~ m'^(\w+)\s'o)
+       {  $next = $1;
+       }
+
+    }
+}
+
+close OUTFILE;

@@ -1,0 +1,306 @@
+# Crazy Panda LLC
+
+TYPEMAP
+
+int32_t     T_IV
+int16_t     T_IV
+int8_t      T_IV
+uint32_t    T_UV
+uint16_t    T_UV
+uint8_t     T_UV
+
+# time_t should follow IV size of machine
+time_t      T_IV
+
+AV* T_AV
+HV* T_HV
+CV* T_CV
+IO* T_IO
+
+OSV*    T_OSV
+OAV*    T_OAV
+OHV*    T_OHV
+OIO*    T_OIO
+
+######################################################################
+OUTPUT
+
+T_REF
+    $arg = NULL;
+    $arg = $var ? newRV_noinc((SV*)$var) : &PL_sv_undef;
+T_AV : T_REF
+T_HV : T_REF
+T_CV : T_REF
+T_IO : T_REF
+
+T_OREF
+    $arg = NULL;
+    $arg = xs::_tm::out_oref(aTHX_ (SV*)$var, CLASS);
+T_OSV : T_OREF
+T_OAV : T_OREF
+T_OHV : T_OREF
+T_OIO : T_OREF
+
+
+# SVDUP CALLBACK FOR CLONING INTERPRETER. SUPPORTS WRAPPERS AND BACKREFS. MAGIC-BASED OBJECTS ONLY
+# PARAMS: $on_svdup, $name, $basetype, $stored_basetype, $wrapper, $backref, $refcnt
+__T_OBJECT_SVDUP
+    ${
+        die ("\n".("*"x80)."\n'retain' svdup strategy cannot be used with XSBackref objects\n".("*"x80)."\n") if $backref and $on_svdup eq 'retain';
+        my $svdup_funcs = {
+            'clone'  => "xs::_tm::svdup_clone<$stored_basetype>",
+            'retain' => "xs::_tm::svdup_retain<$stored_basetype>",
+        };
+        $on_svdup = $svdup_funcs->{$on_svdup} if exists $svdup_funcs->{$on_svdup};
+        if ($backref) {
+            my ($inner, $new_inner) = ('outer', 'new_outer');
+            if ($wrapper) {
+                ($inner, $new_inner) = ('inner', 'new_inner');
+                my $uw1 = $self->eval_input_typemap({ctype => $wrapper, type => $wrapper, var => 'inner', arg_base => 'outer', arg => 'outer_up'});
+                my $uw2 = $self->eval_input_typemap({ctype => $wrapper, type => $wrapper, var => 'new_inner', arg_base => 'new_outer', arg => 'new_outer_up'});
+                $unwrap_code = "$basetype inner; $basetype new_inner; $wrapper outer_up; $wrapper new_outer_up; { $uw1 } { $uw2 }";
+                $unwrap_code =~ s/\n//g;
+            }
+            elsif ($refcnt) { $refcnt_code = "xs::refcnt_inc(new_outer);"; }
+            $backref_code =
+                "XSBackref *br = xs::_tm::get_xsbr($inner), *new_br = xs::_tm::get_xsbr($new_inner);\n        ".
+                "if (br && br->perl_object && new_br) { new_br->perl_object = br->perl_object; new_br->on_perl_dup(aTHX_ xs::refcnt_get($new_inner)); }";
+        }
+    }
+    struct $name { static inline int get (pTHX_ MAGIC* mg, CLONE_PARAMS* param) { // THREAD CREATE HOOK
+        $stored_basetype outer; xs::_tm::in_oext_mgp(&outer, (void*)mg->mg_ptr);
+        $stored_basetype new_outer = $on_svdup(aTHX_ outer);
+        mg->mg_ptr = (char*)xs::_tm::out_oext_mgp(new_outer);
+        $unwrap_code
+        $refcnt_code
+        $backref_code
+        return 0;
+    }};
+
+
+# PRIVATE TYPEMAP CLASS - BASE FOR POINTER-BASED AND MAGIC-BASED(EXTANDABLE) OBJECTS
+# PARAMS: $basetype, $wrapper, $backref, $refcnt
+__T_OANY
+    $arg = NULL;
+    ${
+        $type =~ s/\s+//g;
+        $basetype           ||= $type;
+        my $downgraded        = $basetype eq $type ? $var : "xs::_tm::downgrade<$basetype>($var)";
+        my $stored_type       = $type;
+        my $stored_basetype   = $basetype;
+        my $stored_downgraded = $downgraded;
+        $refcnt_code = '';
+        
+        $refcnt_code = "if ($var) xs::refcnt_inc($var);" if $refcnt && !$wrapper;
+        
+        if ($wrapper) {
+            $stored_type = $wrapper;
+            $stored_downgraded = $var."_wrapper";
+            $stored_basetype = $self->output_typemap_param($wrapper, 'basetype');
+            my $wrapper_tmcode = $self->eval_output_typemap({
+                type  => $wrapper,
+                ctype => $wrapper,
+                arg   => $stored_downgraded,
+                var   => $var,
+            });
+            $wrapper_code = "$stored_basetype $stored_downgraded; if ($var) { $wrapper_tmcode } else xs::_tm::vnull(&$stored_downgraded);";
+        }
+        
+        if ($object_base eq 'pointer') {
+            $out_call = "xs::_tm::out_optr(aTHX_ $stored_downgraded, CLASS)";
+        }
+        elsif ($object_base eq 'magic') {
+            my $marker = "xs::SVPayloadMarker<$basetype>";
+            if ($has_threads && $on_svdup) {
+                my $svdup_name = "_pxs_svdup_${var}";
+                $svdup_code = $self->eval_output_typemap({
+                    xstype          => '__T_OBJECT_SVDUP',
+                    on_svdup        => $on_svdup,
+                    name            => $svdup_name,
+                    basetype        => $basetype,
+                    stored_basetype => $stored_basetype,
+                    wrapper         => $wrapper,
+                    backref         => $backref,
+                    refcnt          => $refcnt,
+                });
+                $marker .= "::get(${svdup_name}::get)";
+            } else {
+                $marker = "&${marker}::marker";
+            }
+            $out_call = "xs::_tm::out_oext(aTHX_ self, $stored_downgraded, CLASS, $marker)";
+        }
+        else { die "__T_OBJECT_BASE: unknown object base: $object_base" }
+        
+        if ($backref) {
+            my $skip_out_name = "SKIP_OUTPUT_$var";
+            $skip_out_label = "$skip_out_name:";
+            $backref_pre =
+              "xs::XSBackref* _pxs_${var}_br = xs::_tm::get_xsbr($var);\n".
+              "if (_pxs_${var}_br && _pxs_${var}_br->perl_object) { $arg = newRV(_pxs_${var}_br->perl_object); goto $skip_out_name; }";
+            $backref_post = "if (_pxs_${var}_br) {\n".
+                            "        _pxs_${var}_br->perl_object = SvRV($arg);\n".
+                            "        SvREFCNT(_pxs_${var}_br->perl_object) = xs::refcnt_get($var);\n".
+                            "    }";
+        }
+        
+        \"";
+    }
+    INIT_OUTPUT { $backref_pre }
+    $refcnt_code
+    $svdup_code
+    $wrapper_code
+    $arg = $out_call;
+    $backref_post
+    $skip_out_label
+    
+T_OPTR : __T_OANY(object_base=pointer)
+T_OEXT : __T_OANY(object_base=magic)
+    INIT { SV* self = NULL; }
+    
+T_OEXT_AV : T_OEXT
+    if (!self && $var) self = (SV*)newAV();
+    
+T_OEXT_HV : T_OEXT
+    if (!self && $var) self = (SV*)newHV();
+
+T_OWRAPPER
+    ${ $basetype ||= $type; \""; }
+
+######################################################################
+INPUT
+
+T_AV
+    if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) $var = (AV*)SvRV($arg);
+    else if (SvOK($arg)) croak("${Package}::$func_name() -- $var is not an ARRAY reference");
+    else $var = NULL;
+    
+T_HV
+    if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVHV) $var = (HV*)SvRV($arg);
+    else if (SvOK($arg)) croak("${Package}::$func_name() -- $var is not a HASH reference");
+    else $var = NULL;
+
+T_CV
+    if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVCV) $var = (CV*)SvRV($arg);
+    else if (SvOK($arg)) croak("${Package}::$func_name() -- $var is not a CODE reference");
+    else $var = NULL;
+
+T_IO
+    if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVIO) $var = (IO*)SvRV($arg);
+    else if (SvROK($arg) && SvTYPE(SvRV($arg)) == SVt_PVGV && ($var = GvIO(SvRV($arg)))) {} 
+    else if (SvOK($arg)) croak("${Package}::$func_name() -- $var is not an IO reference");
+    else $var = NULL;
+
+T_OSV
+    if (sv_isobject($arg) && SvTYPE(SvRV($arg)) <= SVt_PVMG) $var = SvRV($arg);
+    else if (${\($var eq 'THIS' ? '1' : "SvOK($arg)")}) croak("${Package}::$func_name() -- $var is not a blessed SCALAR reference");
+    else $var = NULL;
+
+T_OAV
+    if (sv_isobject($arg) && SvTYPE(SvRV($arg)) == SVt_PVAV) $var = (AV*)SvRV($arg);
+    else if (${\($var eq 'THIS' ? '1' : "SvOK($arg)")}) croak("${Package}::$func_name() -- $var is not a blessed ARRAY reference");
+    else $var = NULL;
+    
+T_OHV
+    if (sv_isobject($arg) && SvTYPE(SvRV($arg)) == SVt_PVHV) $var = (HV*)SvRV($arg);
+    else if (${\($var eq 'THIS' ? '1' : "SvOK($arg)")}) croak("${Package}::$func_name() -- $var is not a blessed HASH reference");
+    else $var = NULL;
+
+T_OIO
+    if (sv_isobject($arg) && SvTYPE(SvRV($arg)) == SVt_PVIO) $var = (IO*)SvRV($arg);
+    else if (sv_isobject($arg) && SvTYPE(SvRV($arg)) == SVt_PVGV && ($var = GvIO(SvRV($arg)))) {}
+    else if (${\($var eq 'THIS' ? '1' : "SvOK($arg)")}) croak("${Package}::$func_name() -- $var is not a blessed IO reference");
+    else $var = NULL;
+
+# PRIVATE TYPEMAP CLASS - BASE FOR POINTER-BASED AND MAGIC-BASED(EXTANDABLE) OBJECTS
+# PARAMS: $basetype, $wrapper, $backref, $static_cast, $refcnt
+__T_OANY
+    @PREVENT_DEFAULT_DESTROY
+    ${
+        $type =~ s/\s+//g;
+        $basetype           ||= $type;
+        my $marker            = "&xs::SVPayloadMarker<$basetype>::marker";
+        my $stored_type       = $type;
+        my $stored_basetype   = $basetype;
+        my $downgraded        = $var;
+        my $stored_downgraded = $var;
+        
+        $glob_init = $init_vars = $upgrade = $unwrap = '';
+        
+        if ($is_destroy) {
+            $glob_init .= "U32 __pxs_${var}_svorc = SvROK($arg) ? SvREFCNT(SvRV($arg)) : 0; PERL_UNUSED_VAR(__pxs_${var}_svorc); ";
+            unless ($wrapper) {
+                $mgp        = "__pxs_${var}_mgp";
+                $mgp_set    = "$mgp = ";
+                $mgp_unused = " PERL_UNUSED_VAR($mgp);";
+                $glob_init .= "void* $mgp;";
+            }
+        }
+        
+        if ($basetype ne $type) {
+            $init_vars .= "$basetype downgraded;";
+            $stored_downgraded = $downgraded = 'downgraded';
+            $upgrade = $static_cast ?
+                "$var = downgraded ? xs::_tm::downgrade<$type>(downgraded) : NULL;" :
+                "$var = xs::_tm::upgrade<$type>(downgraded);";
+        }
+        
+        if ($wrapper) {
+            my $wrapper_var = $var."_wrapper";
+            $glob_init .= "$wrapper $wrapper_var;";
+            $init_vars .= 'void* wrp;';
+            $stored_downgraded = 'wrp';
+            $unwrap = $self->eval_input_typemap({
+                type     => $wrapper,
+                ctype    => $wrapper,
+                arg_base => $stored_downgraded,
+                arg      => $wrapper_var,
+                var      => $downgraded,
+            });
+            $unwrap = "if (wrp) { $unwrap } else { xs::_tm::vnull(&$downgraded); xs::_tm::vnull(&$wrapper_var); }";
+        }
+        
+        $in_call = $object_base eq "pointer" ?
+            "xs::_tm::in_optr(aTHX_ $arg, &$stored_downgraded);" :
+            "xs::_tm::in_oext(aTHX_ $arg, &$stored_downgraded, $marker);";
+        
+        \"";
+    }
+    $glob_init
+    {
+        $init_vars
+        $mgp_set$in_call$mgp_unused;
+        $unwrap
+        $upgrade
+        if (!$var${\($var eq 'THIS' ? "" : " && SvOK($arg)")}) croak("${Package}::$func_name() -- $var($arg) is not a valid object");
+    }
+    DESTROY {
+        ${
+            my $ret = '';
+            if ($backref) {
+                $ret .= "xs::XSBackref* _pxs_${var}_br = xs::_tm::get_xsbr($var);\n".
+                        "    if (_pxs_${var}_br) { SvREFCNT(_pxs_${var}_br->perl_object) = __pxs_${var}_svorc; _pxs_${var}_br->perl_object = NULL; }\n";
+            }
+            if (!$prevent_default_destroy) {
+                if    ($wrapper) { $ret .= "xs::_tm::AutoDelete<$wrapper, $wrapper> __pxs_autodel_$var(${var}_wrapper, NULL);"; }
+                elsif ($refcnt)  { $ret .= "xs::_tm::AutoRelease<$type> __pxs_autorel_$var($var);"; }
+                else             { $ret .= "xs::_tm::AutoDelete<$type, $basetype> __pxs_autodel_$var($var, $mgp);"; }
+            }
+            \$ret;
+        }
+    }
+
+T_OPTR    : __T_OANY(object_base=pointer)
+T_OEXT    : __T_OANY(object_base=magic)
+T_OEXT_AV : T_OEXT
+T_OEXT_HV : T_OEXT
+
+# PARAMS: $basetype, $static_cast
+T_OWRAPPER
+    ${
+        $basetype ||= $type;
+        my $cast_op = $static_cast ? "static_cast<$type>" : "panda::dyn_cast<$type>";
+        \($type eq $basetype ?
+            "$arg = ($type)$arg_base;" :
+            "$arg = $cast_op(($basetype)$arg_base);"
+        );
+    }

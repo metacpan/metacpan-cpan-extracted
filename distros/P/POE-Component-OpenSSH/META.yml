@@ -1,0 +1,35 @@
+---
+abstract: 'Non-blocking SSH Component for POE using Net::OpenSSH'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  English: 0
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.28
+  POE::Kernel: 0
+  POE::Test::Helpers::MooseRole: 0
+  Term::ReadKey: 0
+  Term::ReadPassword: 0
+  Test::More: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  Module::Build: 0.28
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-OpenSSH
+requires:
+  Carp: 0
+  Net::OpenSSH: 0
+  POE::Component::Generic: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/xsawyerx/poe-component-openssh.git
+version: 0.11

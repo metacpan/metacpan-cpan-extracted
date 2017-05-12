@@ -1,0 +1,47 @@
+---
+abstract: 'Different authors, copyright holders, and licenses for each module.'
+author:
+  - 'Carnë Draug <cdraug@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  PPI::Document: '0'
+  Pod::Elemental: '0'
+  Pod::Weaver: '0'
+  Pod::Weaver::Config::Assembler: '0'
+  Software::License::GPL_3: '0'
+  Software::License::MIT: '0'
+  Software::License::Perl_5: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Weaver-Section-Legal-Complicated
+requires:
+  List::MoreUtils: '0'
+  Module::Load: '0'
+  Moose: '0'
+  MooseX::Types::Moose: '0'
+  Pod::Elemental::Element::Nested: '0'
+  Pod::Elemental::Element::Pod5::Ordinary: '0'
+  Pod::Weaver::Role::Section: '0'
+  Software::License: '0'
+  namespace::autoclean: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/carandraug/pod-weaver-section-legal-complicated/issues
+  homepage: https://github.com/carandraug/pod-weaver-section-legal-complicated
+  repository: git://github.com/carandraug/pod-weaver-section-legal-complicated.git
+version: '1.23'
+x_serialization_backend: 'YAML::Tiny version 1.70'

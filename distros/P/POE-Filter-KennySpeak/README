@@ -1,0 +1,94 @@
+NAME
+    POE::Filter::KennySpeak - Mmm PfmPpfMpp Mpfmffpmffmpmpppff fmpmfpmmmfmp
+    fmppffmmmpppfmmpmfmmmfmpmppfmm fmpppf mmmpppmpm mpfpffppfppm
+    PmpmppppppppffmFmmpfmmppmmmpmp
+
+VERSION
+    version 1.02
+
+SYNOPSIS
+            # A Kennyspeak echo server
+
+            use strict;
+            use warnings;
+
+            use POE;
+            use POE::Component::Server::TCP;
+            use POE::Filter::Stackable;
+            use POE::Filter::Line;
+            use POE::Filter::KennySpeak;
+
+            POE::Component::Server::TCP->new(
+                Port => 12345,
+                ClientInputFilter => POE::Filter::Stackable->new(
+                    Filters => [
+                            POE::Filter::Line->new(),
+                            POE::Filter::KennySpeak->new(),
+                    ],
+                ),
+                ClientOutputFilter => POE::Filter::Line->new(),
+                ClientInput => sub {
+                  $_[HEAP]{client}->put($_[ARG0]);
+                  return;
+                },
+            );
+
+            POE::Kernel->run();
+            exit;
+
+DESCRIPTION
+    POE::Filter::KennySpeak is a POE::Filter that translates given text to
+    and from KennySpeak <http://www.namesuppressed.com/kenny/>.
+
+    It is intended to be used in a stackable filter, POE::Filter::Stackable,
+    with POE::Filter::Line.
+
+CONSTRUCTOR
+    "new"
+        Creates a new POE::Filter::KennySpeak object.
+
+METHODS
+    "get"
+    "get_one_start"
+    "get_one"
+        Takes an arrayref which contains lines of text, returns an arrayref
+        of lines translated into Kennyspeak.
+
+    "get_pending"
+        Returns the filter's partial input buffer.
+
+    "put"
+        Takes an arrayref which contains lines of Kennyspeak and returns an
+        arrayref of lines translated back to "normal".
+
+    "clone"
+        Makes a copy of the filter and clears the buffer of the copy.
+
+KUDOS
+    Based on kenny.pl by:
+
+    Christian Garbs <mitch@cgarbs.de>, http://www.cgarbs.de Alan Eldridge
+    <alane@geeksrus.net>
+
+    KennySpeak invented by Kohan Ikin <syneryder@namesuppressed.com>
+    http://www.namesuppressed.com/kenny/
+
+SEE ALSO
+    POE::Filter
+
+    POE::Filter::Stackable
+
+    <http://www.cgarbs.de/kenny.en.html>
+
+    <http://www.namesuppressed.com/kenny/>
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Chris Williams, Christian Garbs
+    and Alan Eldridge.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

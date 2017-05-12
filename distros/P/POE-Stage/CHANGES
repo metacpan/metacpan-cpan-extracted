@@ -1,0 +1,186 @@
+==================================
+2009-07-28T06:40:58.934708Z v0_060
+==================================
+
+  2009-07-28 06:39:31 (r201) by rcaputo
+  Makefile.PL M; lib/POE/Stage.pm M; t/01_all_call_types.t M
+
+    Use latest POE. Prepare for new distribution. Fix tests to match
+    latest changes
+
+  2009-07-27 05:01:45 (r200) by rcaputo
+  examples/01_basics.perl M; examples/candygram.perl M;
+  examples/attributes.perl M; Makefile.PL M; lib/POE/Stage.pm M;
+  lib/POE/Request.pm M
+
+    Added a machine-readable repository directory to the distribution.
+    Documented the bug tracker, repository, and other resource URLs.
+    
+    Add an on_init() callback to rectify some scope issues. 
+
+  2009-07-15 20:50:50 (r199) by rcaputo
+  lab/less-indirection/patterns.pod M
+
+    Include Torsten Raudssus' comment about Javascript's DOM and XPath
+    use.
+
+  2009-07-08 21:57:49 (r198) by rcaputo
+  lab/less-indirection/patterns.pod M
+
+    Add a to-do: divide into descriptive and prescriptive sections.
+
+  2009-07-08 21:56:21 (r197) by rcaputo
+  lab/less-indirection/patterns.pod M
+
+    Document the old reflexive data members idea. 
+
+  2009-06-29 07:08:39 (r196) by rcaputo
+  lab/less-indirection/patterns.pod M
+
+    Document the documentation and solicit contributions.
+
+  2009-06-29 06:30:42 (r195) by rcaputo
+  lab/less-indirection/patterns.pod M
+
+    Clarify continuations a bit. The framework uses a slightly different
+    kind of continuation than people probably expect.
+
+  2009-06-29 06:15:19 (r194) by rcaputo
+  lab/less-indirection/patterns.pod M
+
+    Scrape more POE::Stage off some of the latter document. Discuss
+    helper proxies in a little more depth. Start exploring metaphors for
+    the final naming. Discuss XPath as a way to find object, and then the
+    reasons why it shouldn't be used. Ask some open-ended questions about
+    Moose as an implementation technology. 
+
+  2009-06-28 06:07:01 (r193) by rcaputo; lab/xml-registry.pl M
+
+    Searching by role is probably the most common use case. Promote roles
+    from attributes to the xml tags. 
+
+  2009-06-28 02:51:36 (r192) by rcaputo
+  lab/xml-registry.pl A; lab/less-indirection/Object.pm M;
+  lab/less-indirection/patterns.pod M
+
+    Implement an XML registry protytpe, entirely for the ability to find
+    objects with XPath. Finish the latest editing pass on the framework
+    documentation, and begin transcribing paper notes developed in the
+    meantime. 
+
+  2009-06-23 08:34:02 (r191) by rcaputo
+  lab/less-indirection/patterns.pod M
+
+    Make the discussions of messaging patterns and continuations more
+    abstract. Still needs more work, of course. 
+
+  2009-06-22 08:23:05 (r190) by rcaputo
+  lab/less-indirection/patterns.pod M
+
+    Restructure so basic concepts come first. Edit for clarity. Not done,
+    of course. 
+
+  2009-06-20 22:08:17 (r189) by rcaputo
+  lab/less-indirection/README M; lab/less-indirection/patterns.pod A
+
+    Add the growing paterns document. 
+
+  2009-06-20 08:17:45 (r188) by rcaputo
+  lab/less-indirection/detach.t A; lab/less-indirection/README M;
+  lab/less-indirection/Object.pm M
+
+    Explore self-management. Added children(), manage() and abandon()
+    methods to the base class. 
+
+  2009-06-19 16:14:30 (r187) by rcaputo
+  lab/less-indirection/Delay.pm M; lab/less-indirection/usecase.pl M
+
+    Add an auto_repeat option for delays, 'cause why not? 
+
+  2009-06-19 08:37:05 (r186) by rcaputo
+  lab/less-indirection/Delay.pm A; lab/less-indirection/README A;
+  lab/less-indirection A; lab/less-indirection/Object.pm A;
+  lab/less-indirection/usecase.pl A
+
+    Add an lab where we use the call stack to find out which object
+    created a helper. 
+
+  2009-06-11 06:46:03 (r185) by rcaputo; MANIFEST M; Makefile.PL M
+
+    Administrivia. Set the new dependency on Hash::Util::FieldHash, and
+    remove POE::Stage::TiedAttributes from the MANIFEST. 
+
+  2009-06-11 06:44:27 (r184) by rcaputo
+  lib/POE/Request/Recall.pm M; lib/POE/Request/Upward.pm M;
+  lib/POE/Callback.pm M; lib/POE/Stage/TiedAttributes.pm D;
+  lib/POE/Stage.pm M; lib/POE/Request.pm M
+
+    Replace POE::Stage::TiedAttributes with Hash::Util::FieldHash. 
+
+=================================
+2009-04-27T07:22:26.093569Z v0_05
+=================================
+
+  2009-04-27 07:21:50 (r182) by rcaputo
+  examples/moostage.perl D; lib/POE/Stage/TiedAttributes.pm M;
+  lib/POE/Stage.pm M
+
+    Remove moostage.perl from examples. It lives in the lab for now. Work
+    around the Perl segfault plaguing 0.04. 
+
+  2009-04-27 07:07:30 (r181) by rcaputo; lab/moosestage_actors.perl M
+
+    Fix a typo.
+
+  2008-12-20 07:18:43 (r180) by rcaputo; lab/moostage.perl A
+
+    Borrow liberally from moosestage_actor.perl, but not quite assimilate
+    the actors themselves. I'm not sure it's good to make actors 1:1 with
+    these objects.
+    
+    Get my MooseX::AttributeHelpers on. They're kinda nifty. 
+
+  2008-12-20 07:15:17 (r179) by rcaputo; lab/moosestage_actors.perl M
+
+    Minor changes. Add a bit of vim configuration so I don't blow the
+    author's style. Make actor IDs a bit more unique. 
+
+  2008-12-20 05:30:40 (r178) by perigrin; lab/moosestage_actors.perl M
+
+    add optimization for collecting messages
+
+  2008-12-20 03:22:43 (r177) by perigrin; lab/moosestage_actors.perl M
+
+    move actors up into the namespace
+
+  2008-12-20 03:03:13 (r176) by rcaputo; examples/moostage.perl M
+
+    Flesh out the dispatcher with some ideas that might find their way
+    back into POE::Loop. 
+
+  2008-12-20 02:56:44 (r175) by perigrin; lab/moosestage_actors.perl A
+
+    refactor moosestage into an actor model
+
+  2008-12-15 22:39:06 (r174) by rcaputo; examples/moostage.perl A
+
+    Add for tracking. 
+
+  2008-12-15 16:20:18 (r173) by rcaputo; Makefile.PL M
+
+    Keep UTF8 out of the README, because that messes up the SYNOPSIS.
+
+  2008-12-05 07:57:10 (r172) by rcaputo
+  examples/self-requesting-stage.perl M; lib/POE/Callback.pm M;
+  examples/tut-010-app.perl A; lib/POE/Stage.pm M; lib/POE/Request.pm M
+
+    Get self-requesting-stage.perl working again.
+    
+    Implement pass_to() but do not document it. The docs are a bit
+    outdated anyway, and pass_to() may not be final.
+    
+    Create a basic tutorial around the "hello, world!" synopsis example. 
+
+==============
+End of Excerpt
+==============

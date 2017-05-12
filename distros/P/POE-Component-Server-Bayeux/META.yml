@@ -1,0 +1,63 @@
+---
+name: POE-Component-Server-Bayeux
+version: 0.04
+author:
+  - 'Eric Waters <ewaters@uarc.com>'
+abstract: Bayeux/cometd server implementation in POE
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+requires:
+  CGI::Simple: 0
+  Class::Accessor: 0
+  Data::UUID: 0
+  JSON::Any: 0
+  JSON::XS: 0
+  LWP: 0
+  Log::Log4perl: 0
+  POE::Component::Client::HTTP: 0
+  POE::Component::Server::HTTP: 0.09
+  Params::Validate: 0
+  Switch: 0
+  URI: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  POE::Component::Client::Bayeux:
+    file: lib/POE/Component/Client/Bayeux.pm
+    version: 0.03
+  POE::Component::Client::Bayeux::Transport:
+    file: lib/POE/Component/Client/Bayeux/Transport.pm
+  POE::Component::Client::Bayeux::Transport::LongPolling:
+    file: lib/POE/Component/Client/Bayeux/Transport/LongPolling.pm
+  POE::Component::Client::Bayeux::Utilities:
+    file: lib/POE/Component/Client/Bayeux/Utilities.pm
+  POE::Component::Server::Bayeux:
+    file: lib/POE/Component/Server/Bayeux.pm
+    version: 0.04
+  POE::Component::Server::Bayeux::Client:
+    file: lib/POE/Component/Server/Bayeux/Client.pm
+  POE::Component::Server::Bayeux::Logger:
+    file: lib/POE/Component/Server/Bayeux.pm
+  POE::Component::Server::Bayeux::Message:
+    file: lib/POE/Component/Server/Bayeux/Message.pm
+  POE::Component::Server::Bayeux::Message::Factory:
+    file: lib/POE/Component/Server/Bayeux/Message/Factory.pm
+  POE::Component::Server::Bayeux::Message::Invalid:
+    file: lib/POE/Component/Server/Bayeux/Message/Invalid.pm
+  POE::Component::Server::Bayeux::Message::Meta:
+    file: lib/POE/Component/Server/Bayeux/Message/Meta.pm
+  POE::Component::Server::Bayeux::Message::Publish:
+    file: lib/POE/Component/Server/Bayeux/Message/Publish.pm
+  POE::Component::Server::Bayeux::Message::Service:
+    file: lib/POE/Component/Server/Bayeux/Message/Service.pm
+  POE::Component::Server::Bayeux::Request:
+    file: lib/POE/Component/Server/Bayeux/Request.pm
+  POE::Component::Server::Bayeux::Utilities:
+    file: lib/POE/Component/Server/Bayeux/Utilities.pm
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

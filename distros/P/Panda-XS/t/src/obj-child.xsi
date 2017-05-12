@@ -1,0 +1,46 @@
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::PTRMyChild
+PROTOTYPES: DISABLE
+
+BOOT {
+    av_push(get_av("Panda::XS::Test::PTRMyChild::ISA", GV_ADD), newSVpvs_share("Panda::XS::Test::PTRMyBase"));
+}
+
+PTRMyChild* PTRMyChild::new (int arg1, int arg2) {
+    RETVAL = new PTRMyChild(arg1, arg2);
+}
+
+int PTRMyChild::val2 (SV* newval = NULL) {
+    if (newval) THIS->val2 = SvIV(newval);
+    RETVAL = THIS->val2;
+}
+
+void PTRMyChild::set_from (PTRMyChild* other) {
+    if (other) {
+        THIS->val = other->val;
+        THIS->val2 = other->val2;
+    }
+}
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::MyChild
+PROTOTYPES: DISABLE
+
+BOOT {
+    av_push(get_av("Panda::XS::Test::MyChild::ISA", GV_ADD), newSVpvs_share("Panda::XS::Test::MyBase"));
+}
+
+MyChild* MyChild::new (int arg1, int arg2) {
+    if (arg1 || arg2) RETVAL = new MyChild(arg1, arg2);
+    else RETVAL = NULL;
+}
+
+int MyChild::val2 (SV* newval = NULL) {
+    if (newval) THIS->val2 = SvIV(newval);
+    RETVAL = THIS->val2;
+}
+
+void MyChild::set_from (MyChild* other) {
+    if (other) {
+        THIS->val = other->val;
+        THIS->val2 = other->val2;
+    }
+}

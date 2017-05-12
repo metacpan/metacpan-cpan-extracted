@@ -1,0 +1,37 @@
+/*
+$ eyapp -C shiftreduceconflict_fixed.eyp 
+$ ./shiftreduceconflict_fixed.pm -t -i --dot t.png -m 1 -c 'if e then if e then o else o'
+
+IFTHEN(
+  TERMINAL[e],
+  IFTHENELSE(
+    TERMINAL[e],
+    TERMINAL[o],
+    TERMINAL[o]
+  )
+)
+Also have a look at the t.png output file
+*/
+%syntactic token IF        = /(?i:if)/
+%syntactic token ELSE      = /(?i:else)/
+%syntactic token THEN      = /(?i:then)/
+%token EXPR      = /(?i:(e))/
+%token OTHERSTMT = /(?i:(o))/
+
+%left THEN
+%left ELSE
+
+%tree bypass
+%%
+stmt:
+          %name IFTHEN
+          IF expr THEN stmt
+        | %name IFTHENELSE
+          IF expr THEN stmt ELSE stmt
+        | OTHERSTMT
+        ;
+expr: 
+       EXPR
+    ;
+   
+%%

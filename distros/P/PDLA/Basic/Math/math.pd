@@ -1,0 +1,446 @@
+
+use strict;
+use Config;
+
+pp_addpm({At=>'Top'},<<'EOD');
+=head1 NAME
+
+PDLA::Math - extended mathematical operations and special functions
+
+=head1 SYNOPSIS
+
+ use PDLA::Math;
+
+ use PDLA::Graphics::TriD;
+ imag3d [SURF2D,bessj0(rvals(zeroes(50,50))/2)];
+
+=head1 DESCRIPTION
+
+This module extends PDLA with more advanced mathematical functions than
+provided by standard Perl.
+
+All the functions have one input pdl, and one output, unless otherwise
+stated.
+
+Many of the functions are linked from the system maths library or the
+Cephes maths library (determined when PDLA is compiled); a few are implemented
+entirely in PDLA.
+
+=cut
+
+### Kludge for backwards compatibility with older scripts
+### This should be deleted at some point later than 21-Nov-2003.
+BEGIN {use PDLA::MatrixOps;}
+
+EOD
+
+# Internal doc util
+
+my %doco;
+sub doco {
+  my @funcs = @_;
+  my $doc = pop @funcs;
+  for (@funcs) { $doco{$_} = $doc }
+}
+
+doco (qw/acos asin atan tan/,
+'The usual trigonometric function.');
+
+doco (qw/cosh sinh tanh acosh asinh atanh/,
+'The standard hyperbolic function.');
+
+doco (qw/ceil floor/,
+'Round to integer values in floating-point format.');
+
+doco ('rint',
+q/=for ref
+
+Round to integer values in floating-point format.
+
+=for method
+
+rint uses the 'round half to even' rounding method (also known as
+banker's rounding).  Half-integers are rounded to the nearest even
+number. This avoids a slight statistical bias inherent in always
+rounding half-integers up or away from zero.
+
+If you are looking to round half-integers up (regardless of sign), try
+C<floor($x+0.5)>.  If you want to round half-integers away from zero,
+try C<< floor(abs($x)+0.5)*($x<=>0) >>./);
+
+doco( 'pow',"Synonym for `**'.");
+
+doco ('erf',"The error function.");
+doco ('erfc',"The complement of the error function.");
+doco ('erfi',"The inverse of the error function.");
+doco ('ndtri',
+"=for ref
+
+The value for which the area under the
+Gaussian probability density function (integrated from
+minus infinity) is equal to the argument (cf L<erfi|/erfi>).");
+
+doco(qw/bessj0 bessj1/,
+     "The regular Bessel function of the first kind, J_n" );
+
+doco(qw/bessy0 bessy1/,
+     "The regular Bessel function of the second kind, Y_n." );
+
+doco( qw/bessjn/,
+'=for ref
+
+The regular Bessel function of the first kind, J_n
+.
+This takes a second int argument which gives the order
+of the function required.
+');
+
+doco( qw/bessyn/,
+'=for ref
+
+The regular Bessel function of the first kind, Y_n
+.
+This takes a second int argument which gives the order
+of the function required.
+');
+
+if ($^O !~ /win32/i || $Config{cc} =~ /\bgcc/i) {  # doesn't seem to be in the MS VC lib
+doco( 'lgamma' ,<<'EOD');
+=for ref
+
+log gamma function
+
+This returns 2 piddles -- the first set gives the log(gamma) values,
+while the second set, of integer values, gives the sign of the gamma
+function.  This is useful for determining factorials, amongst other
+things.
+
+EOD
+
+} # if: $^O !~ win32
+
+pp_addhdr('
+#include <math.h>
+#include "protos.h"
+/* Change names when fixing glibc-2.1 bug */
+#ifdef MY_FIXY0
+#define y0(a) fixy0(a)
+extern double fixy0(double a);
+#endif
+#ifdef MY_FIXYN
+#define yn(a,b) fixyn(a,b)
+extern double fixyn(int a, double b);
+#endif
+');
+
+## handle various cases of 'finite'
+#
+if ($^O =~ /MSWin/) {
+# _finite in VC++ 4.0
+pp_addhdr('
+#define finite _finite
+#include <float.h>
+#ifdef _MSC_VER
+double rint (double);
+#endif
+');
+}
+
+# patch from Albert Chin
+if ($^O =~ /hpux/) {
+pp_addhdr('
+#ifdef isfinite
+#define finite isfinite
+#endif
+');
+}
+
+# Standard `-lm'
+my (@ufuncs1) = qw(acos asin atan cosh sinh tan tanh); # F,D only
+my (@ufuncs1g) = qw(ceil floor rint); # Any type
+
+# Note:
+#  ops.pd has a power() function that does the same thing
+#  (although it has OtherPars => 'int swap;' as well)
+#  - left this in for now.
+#
+my (@bifuncs1) = qw(pow); # Any type
+
+# Extended `-lm'
+my (@ufuncs2) = qw(acosh asinh atanh erf erfc);  # F,D only
+my (@besufuncs) = qw(j0 j1 y0 y1); # "
+my (@besbifuncs) = qw(jn yn); # "
+# Need igamma, ibeta, and a fall-back implementation of the above
+
+sub code_ufunc    { return '$b() = ' . $_[0] . '($a());'; }
+sub badcode_ufunc {
+    my $name = $_[0];
+    return 'if ( $ISBAD(a()) ) { $SETBAD(b()); } else { $b() = ' . $name . '($a()); }';
+}
+
+sub code_bifunc {
+    my $name = $_[0]; my $a = $_[1] || 'a'; my $b = $_[2] || 'b';
+    my $c = $_[3] || 'c';
+    return "\$$c() = $name(\$$a(),\$$b());";
+}
+sub badcode_bifunc {
+    my $name = $_[0]; my $a = $_[1] || 'a'; my $b = $_[2] || 'b';
+    my $c = $_[3] || 'c';
+    return 'if ( $ISBAD('.$a.'()) || $ISBAD('.$b.'()) ) { $SETBAD('.$c.'()); } else { ' .
+	"\$$c() = $name(\$$a(),\$$b()); }";
+}
+
+sub inplace_doc {
+    my $func = shift;
+    return "$doco{$func} Works inplace.";
+}
+
+my $func;
+foreach $func (@ufuncs1) {
+    pp_def($func,
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   GenericTypes => ['F','D'],
+	   Pars => 'a(); [o]b();',
+	   Inplace => 1,
+	   Doc => inplace_doc( $func ),
+	   Code => code_ufunc($func),
+	   BadCode => badcode_ufunc($func),
+	   );
+}
+
+foreach $func (@ufuncs1g) {
+    pp_def($func,
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   Pars => 'a(); [o]b();',
+	   Inplace => 1,
+	   Doc => inplace_doc( $func ),
+	   Code => code_ufunc($func),
+	   BadCode => badcode_ufunc($func),
+	   );
+}
+
+foreach $func (@bifuncs1) {
+    pp_def($func,
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   Pars => 'a(); b(); [o]c();',
+	   Inplace => [ 'a' ],
+	   Doc => inplace_doc( $func ),
+	   Code => code_bifunc($func),
+	   BadCode => badcode_bifunc($func),
+	   );
+}
+
+# Functions provided by extended -lm
+foreach $func (@ufuncs2) {
+    pp_def($func,
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   GenericTypes => ['F','D'],
+	   Pars => 'a(); [o]b();',
+	   Inplace => 1,
+	   Doc => inplace_doc( $func ),
+	   Code => code_ufunc($func),
+	   BadCode => badcode_ufunc($func),
+	   );
+}
+
+foreach $func (@besufuncs) {
+    my $fname = "bess$func";
+    pp_def($fname,
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   GenericTypes => ['F','D'],
+	   Pars => 'a(); [o]b();',
+	   Inplace => 1,
+	   Doc => inplace_doc( $fname ),
+	   Code => code_ufunc($func),
+	   BadCode => badcode_ufunc($func),
+	   );
+}
+
+foreach $func (@besbifuncs) {
+    my $fname = "bess$func";
+    pp_def($fname,
+	   HandleBad => 1,
+	   NoBadifNaN => 1,
+	   GenericTypes => ['F','D'],
+	   Pars => 'a(); int n(); [o]b();',
+	   Inplace => [ 'a' ],
+	   Doc => inplace_doc( $fname ),
+	   Code => code_bifunc($func,'n','a','b'),
+	   BadCode => badcode_bifunc($func,'n','a','b'),
+	   );
+}
+
+if ($^O !~ /win32/i) {
+    pp_def("lgamma",
+	   HandleBad => 1,
+	   Pars => 'a(); [o]b(); int[o]s()',
+	   Doc => $doco{"lgamma"},
+	   Code =>
+	   'extern int signgam;
+	    $b() = lgamma($a());
+	    $s() = signgam;',     # what happens to signgam if $a() is bad?
+	   BadCode =>
+	   'extern int signgam;
+            if ( $ISBAD(a()) ) {
+               $SETBAD(b()); $SETBAD(s());
+            } else {
+               $b() = lgamma($a());
+               $s() = signgam;
+            }',
+	   );
+} # if: os !~ win32
+
+elsif ($Config{cc} =~ /\bgcc/i) {
+    pp_def("lgamma",
+	   HandleBad => 1,
+	   Pars => 'a(); [o]b(); int[o]s()',
+	   Doc => $doco{"lgamma"},
+	   Code =>
+	   '$b() = lgamma($a());
+	    $s() = tgamma($a()) < 0 ? -1 : 1;',     # what happens to signgam if $a() is bad?
+	   BadCode =>
+	   'if ( $ISBAD(a()) ) {
+               $SETBAD(b()); $SETBAD(s());
+            } else {
+               $b() = lgamma($a());
+               $s() = tgamma($a()) < 0 ? -1 : 1;
+            }',
+	   );
+} # elsif: cc =~ /\bgcc/i
+
+pp_def(
+       'badmask',
+       Pars => 'a(); b(); [o]c();',
+       Inplace => [ 'a' ],
+       HandleBad => 1,
+       Code =>
+       '$c() = finite($a()) ? $a() : $b();',
+       BadCode =>
+       '$c() = ( finite($a()) && $ISGOOD(a()) ) ? $a() : $b();',
+       CopyBadStatusCode =>
+       'if ( a == c && $ISPDLASTATEBAD(a) )
+           PDLA->propagate_badflag( c, 0 );  /* propagate badflag if inplace AND its changed */
+        $SETPDLASTATEGOOD(c);          /* always make sure the output is "good" */
+       ',
+       Doc =>
+'=for ref
+
+Clears all C<infs> and C<nans> in C<$a> to the corresponding value in C<$b>.
+
+badmask can be run with C<$a> inplace:
+
+  badmask($a->inplace,0);
+  $a->inplace->badmask(0);
+
+',
+       BadDoc =>
+       'If bad values are present, these are also cleared.',
+       );
+
+pp_def(
+       'isfinite',
+       Pars => 'a(); int [o]mask();',
+       Inplace => 1,
+       HandleBad => 1,
+       Code =>
+       '$mask() = finite((double) $a()) != 0;',
+       BadCode =>
+       '$mask() = finite((double) $a()) != 0 && $ISGOOD($a());',
+       CopyBadStatusCode =>
+       'if ( a == mask && $ISPDLASTATEBAD(a) )
+           PDLA->propagate_badflag( mask, 0 );  /* propagate badflag if inplace AND its changed */
+        $SETPDLASTATEGOOD(mask);          /* always make sure the output is "good" */
+       ',
+       Doc =>
+'Sets C<$mask> true if C<$a> is not a C<NaN> or C<inf> (either positive or negative). Works inplace.',
+       BadDoc =>
+'Bad values are treated as C<NaN> or C<inf>.',
+       );
+
+# Extra functions from cephes
+pp_def(
+       "erfi",
+       HandleBad => 1,
+       NoBadifNaN => 1,
+       GenericTypes => ['F','D'],
+       Pars => 'a(); [o]b()',
+       Inplace => 1,
+       Doc => inplace_doc( "erfi" ),
+       Code =>
+       'extern double ndtri(double), SQRTH;
+	$b() = SQRTH*ndtri((1+(double)$a())/2);',
+       BadCode =>
+       'extern double ndtri(double), SQRTH;
+        if ( $ISBAD(a()) ) { $SETBAD(b()); }
+        else { $b() = SQRTH*ndtri((1+(double)$a())/2); }',
+       );
+
+pp_def(
+       "ndtri",
+       HandleBad => 1,
+       NoBadifNaN => 1,
+       GenericTypes => ['F','D'],
+       Pars => 'a(); [o]b()',
+       Inplace => 1,
+       Doc => inplace_doc( "ndtri" ),
+       Code =>
+       'extern double ndtri(double);
+	$b() = ndtri((double)$a());',
+       BadCode =>
+       'extern double ndtri(double);
+        if ( $ISBAD(a()) ) { $SETBAD(b()); }
+	else { $b() = ndtri((double)$a()); }',
+       );
+
+pp_def("polyroots",
+      Pars => 'cr(n); ci(n); [o]rr(m); [o]ri(m);',
+      RedoDimsCode => 'int sn = $PDLA(cr)->dims[0]; $SIZE(m) = sn-1;',
+      GenericTypes => ['D'],
+      Code => '
+              extern int cpoly( double *cr, double *ci, int deg,
+                    double *rr, double *ri );
+              int deg = $SIZE(n)-1, i;
+              if (cpoly($P(cr), $P(ci), deg, $P(rr), $P(ri)))
+                 barf("PDLA::Math::polyroots failed");
+',
+      , Doc => '
+
+=for ref
+
+Complex roots of a complex polynomial, given coefficients in order
+of decreasing powers.
+
+=for usage
+
+ ($rr, $ri) = polyroots($cr, $ci);
+
+',);
+
+pp_addpm({At=>'Bot'},<<'EOD');
+
+=head1 BUGS
+
+Hasn't been tested on all platforms to ensure Cephes
+versions are picked up automatically and used correctly.
+
+=head1 AUTHOR
+
+Copyright (C) R.J.R. Williams 1997 (rjrw@ast.leeds.ac.uk), Karl Glazebrook
+(kgb@aaoepp.aao.gov.au) and Tuomas J. Lukka (Tuomas.Lukka@helsinki.fi).
+Portions (C) Craig DeForest 2002 (deforest@boulder.swri.edu).
+
+All rights reserved. There is no warranty. You are allowed
+to redistribute this software / documentation under certain
+conditions. For details, see the file COPYING in the PDLA
+distribution. If this file is separated from the PDLA distribution,
+the PDLA copyright notice should be included in the file.
+
+=cut
+
+EOD
+pp_done();

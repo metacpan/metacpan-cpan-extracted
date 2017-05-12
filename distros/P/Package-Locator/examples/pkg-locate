@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+
+# ABSTRACT: Find URL to distribution that contains a given package
+# PODNAME: pkg-locate
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Package::Locator;
+
+my @opts_spec = qw(cache_dir|cache=s);
+GetOptions(\my %opts, @opts_spec) || pod2usage();
+my @wanted = @ARGV ? @ARGV : pod2usage();
+
+my $locator   = Package::Locator->new(%opts);
+my %found     = map { my $p = $_; $p => $locator->locate($p) || '' } @wanted;
+my $longest = (sort { $b <=> $a } map { length } keys %found)[0];
+printf "%-${longest}s => %s\n", $_, $found{$_} for sort keys %found;
+
+exit;
+
+#-----------------------------------------------------------------------------
+
+=head1 SYNOPSIS
+
+  pkg-locate [ --cache=/some/dir ] PACKAGE_NAME_OR_DIST_PATH ...
+
+=head1 DESCRIPTION
+
+L<pkg-locate> is a simple command line tool demonstrating the use
+of L<Package::Locator>.  For each package, L<pkg-locate> will report
+the URL of a distribution that will provide that package.
+
+=head1 ARGUMENTS
+
+The arguments are the names of packages (e.g. 'FOO::Bar') or paths to
+distributions as they would appear in a CPAN-like index file
+(e.g. 'F/FO/FOO/Bar-1.2.tar.gz').
+
+=head1 OPTIONS
+
+=head2 --cache = /some/path
+
+A directory that will be used to cache index files for future
+lookups. If this directory does not exist it will be created for you.

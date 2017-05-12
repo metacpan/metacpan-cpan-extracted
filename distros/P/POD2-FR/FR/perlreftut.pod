@@ -1,0 +1,599 @@
+=encoding iso-8859-1
+
+=head1 NAME/NOM
+
+perlreftut - Le très court tutoriel de Mark sur les références
+
+=head1 DESCRIPTION
+
+Une des caractéristiques nouvelles les plus importantes de Perl 5 a
+été la capacité de gérer des structures de données compliquées comme
+les tableaux multidimensionnels et les tables de hachage
+imbriquées. Pour les rendre possibles, Perl 5 a introduit un mécanisme
+appelé "références" ; l'utilisation de celles-ci est le moyen de
+travailler avec des données complexes structurées en
+Perl. Malheureusement, cela fait une grande quantité de syntaxe
+nouvelle à apprendre, et la page de manuel est parfois difficile à
+suivre. Cette dernière est très complète, et cela peut être un
+problème parce qu'il est difficile d'en tirer ce qui est important et
+ce qui ne l'est pas.
+
+Heureusement, vous avez seulement besoin de savoir 10% de ce qui est
+dans la page de manuel principale pour tirer 90% de son bénéfice. Cette
+page espère vous montrer ces 10%.
+
+=head1 Qui a besoin de structures de données compliquées ?
+
+Un problème qui revenait souvent avec Perl 4 était celui de la
+représentation d'une table de hachage dont les valeurs sont des
+listes. Perl 4 avait les tables de hachage, bien sûr, mais les valeurs
+devaient être des scalaires ;  elles ne pouvaient être des listes.
+
+Pourquoi voudrait-on utiliser une table de hachage contenant des
+listes ? Prenons un exemple simple. Vous avez un fichier contenant des
+noms de villes et de pays, comme ceci:
+
+        Chicago, USA
+        Frankfort, Allemagne
+        Berlin, Allemagne
+        Washington, USA
+        Helsinki, Finlande
+        New York, USA
+
+et vous voulez produire une sortie comme cela, avec chaque pays
+mentionné une seule fois, suivi d'une liste des villes de ce paysE<nbsp>:
+
+        Finlande: Helsinki.
+        Allemagne: Berlin, Frankfort.
+        USA:  Chicago, New York, Washington.
+
+La façon naturelle de faire ceci est de construire une table de
+hachage dont les clés sont les noms des pays. A chaque pays clé on
+associe une liste des villes de ce pays. Chaque fois qu'on lit une ligne
+en entrée, on la sépare en un pays et une ville, on recherche la liste
+de villes déjà connues pour ce pays, et on y ajoute la nouvelle
+ville. Quand on a fini de lire les données en entrée, on parcourt la
+table de hachage, en triant chaque liste de villes avant de
+l'afficher.
+
+Si les valeurs des tables de hachage ne peuvent être des listes, c'est
+perdu. En Perl 4, c'est le cas ; ces valeurs ne peuvent être que de
+chaînes de caractères. C'est donc perdu. Nous devrions probablement
+essayer de combiner toutes les villes dans une seule grande chaîne de
+caractères, et au moment d'écrire la sortie, couper cette
+chaîne pour en faire une liste, la trier, et la reconvertir en
+chaîne de caractères. C'est compliqué, et il est facile de faire des
+erreurs dans le processus. C'est surtout frustrant, parce que Perl a
+déjà de très belles listes qui résoudraient le problème, si seulement
+nous pouvions les utiliser.
+
+=head1 La solution
+
+Avant même que Perl 5 ne pointât le bout de son nez, nous étions donc
+coincés avec ce fait de conceptionE<nbsp>: les valeurs de tables de hachage
+doivent être des scalaires. Les références sont la solution à ce
+problème.
+
+Une référence est une valeur scalaire qui I<fait référence à> un
+tableau entier ou à une table de hachage entière (ou à à peu près
+n'importe quoi d'autre). Les noms sont une forme de référence dont
+vous êtes déjà familier. Pensez au Président des États-Unis D'Amérique:
+ce n'est qu'un tas désordonné et inutilisable de sang et d'os. Mais
+pour parler de lui, ou le représenter dans un programme d'ordinateur,
+tout ce dont vous avez besoin est le sympathique et maniable scalaire
+"George Bush".
+
+Les références en Perl sont comme des noms pour les tableaux et les
+tables de hachage. Ce sont des noms privés et internes de Perl, vous
+pouvez donc être sûr qu'ils ne sont pas ambigus. Au contraire de
+"George Bush", une référence pointe vers une seule chose, et il est
+toujours possible de savoir vers quoi. Si vous avez une référence à un
+tableau, vous pouvez accéder au tableau complet qui est derrière. Si
+vous avez une référence à une table de hachage, vous pouvez accéder à
+la table entière. Mais la référence reste un scalaire, compact et
+facile à manipuler.
+
+Vous ne pouvez pas construire une table de hachage dont les valeurs
+sont des tableauxE<nbsp>: les valeurs des tables de hachage ne peuvent être
+que des scalaires. Nous y somme condamnés. Mais une seule référence
+peut pointer vers un tableau entier, et les références sont des
+scalaires, donc vous pouvez avoir une table de hachage de références à
+des tableaux, et elle agira presque comme une table de hachage de
+tableaux, et elle pourra servir juste comme une table de hachage de
+tableaux.
+
+Nous reviendrons à notre problème de villes et de pays plus tard,
+après avoir introduit un peu de syntaxe pour gérer les références.
+
+=head1 Syntaxe
+
+Il n'y a que deux façons de construire une référence, et deux façons de
+l'utiliser une fois qu'on l'a.
+
+=head2 Construire des références
+
+=head3 B<Règle de construction 1>
+
+Si vous mettez un C<\> devant une variable, vous obtenez une référence
+à cette variable.
+
+    $tref = \@tableau;       # $tref contient maintenant une référence
+                             # à @tableau
+    $href = \%hachage;       # $href contient maintenant une référence
+                             # à %hachage
+    $sref = \$scalaire;      # $sref contient maintenant une référence
+                             # à $scalaire
+
+Une fois que la référence est stockée dans une variable comme $tref ou
+$href, vous pouvez la copier ou la stocker ailleurs comme n'importe
+quelle autre valeur scalaireE<nbsp>:
+
+    $xy = $tref;             # $xy contient maintenant une référence
+                             # à @tableau
+    $p[3] = $href;           # $p[3] contient maintenant une référence
+                             # à  %hachage
+    $z = $p[3];              # $z contient maintenant une référence
+                             # à  %hachage
+
+Ces exemples montrent comment créer des références à des variables
+avec un nom. Parfois, on veut utiliser un tableau ou une table de
+hachage qui n'a pas de nom. C'est un peu comme pour les chaînes de
+caractères et les nombresE<nbsp>: on veut être capable d'utiliser la chaîne
+C<"\n"> ou le nombre 80 sans avoir à les stocker dans une variable
+nommée d'abord.
+
+=head3 B<Règle de construction 2>
+
+C<[ ELEMENTS ]> crée un nouveau tableau anonyme, et renvoie une
+référence à ce tableau. C<{ ELEMENTS }> crée une nouvelle table de
+hachage anonyme et renvoie une référence à cette table.
+
+    $tref = [ 1, "toto", undef, 13 ];
+    # $tref contient maintenant une référence à un tableau
+
+    $href = { AVR => 4, AOU => 8 };
+    # $href contient maintenant une référence à une table de hachage
+
+Les références obtenues grâce à la règle 2 sont de la même espèce que
+celles obtenues par la règle 1E<nbsp>:
+
+        # Ceci :
+        $tref = [ 1, 2, 3 ];
+
+        # Fait la même chose que cela :
+        @tableau = (1, 2, 3);
+        $tref = \@tableau;
+
+La première ligne est une abréviation des deux lignes suivantes, à
+ceci près qu'elle ne crée pas la variable tableau superflue
+C<@tableau>.
+
+Si vous écrivez C<[]>, vous obtenez une référence à un nouveau tableau
+anonyme vide.  Si vous écrivez C<{}>, vous obtenez une référence à un
+nouvelle table de hachage anonyme vide.
+
+=head2 Utiliser les références
+
+Une fois qu'on a une référence, que peut-on en faire? C'est une valeur
+scalaire, et nous avons vu que nous pouvons la stocker et la
+récupérer ensuite comme n'importe quel autre scalaire. Il y juste deux
+façons de plus de l'utiliserE<nbsp>:
+
+=head3 B<Règle d'utilisation 1>
+
+À la place du nom d'un tableau, vous pouvez toujours utiliser une
+référence à un tableau, tout simplement en la plaçant entre
+accolades. Par exemple, C<@{$tref}> la place de C<@tableau>.
+
+En voici quelques exemplesE<nbsp>:
+
+TableauxE<nbsp>:
+
+        @t              @{$tref}                Un tableau
+        reverse @t      reverse @{$tref}        Inverser un tableau
+        $t[3]           ${$tref}[3]             Un élément du tableau
+        $t[3] = 17;     ${$tref}[3] = 17        Affecter un élément
+
+Sur chaque ligne, les deux expressions font la même chose. Celles de
+gauche travaillent sur le tableau C<@t>, et celles de droite
+travaillent sur le tableau vers lequel pointe C<$tref> ; mais une fois
+qu'elle ont accédé au tableau sur lequel elles opèrent, elles leur
+font exactement la même chose.
+
+On utilise une référence à une table de hachage C<exactement> de la
+même façonE<nbsp>:
+
+        %h              %{$href}              Une table de hachage
+        keys %h         keys %{$href}         Obtenir les clés de la 
+                                              table
+        $h{'bleu'}      ${$href}{'bleu'}      Un élément de la table
+        $h{'bleu'} = 17 ${$href}{'bleu'} = 17 Affecter un élément
+
+Quelque soit ce que vous voulez faire avec une référence, vous pouvez
+y arriver en appliquant la B<Règle d'utilisation 1>. Vous commencez
+par écrire votre code Perl en utilisant un vrai tableau ou une vraie
+table de hachage puis vous remplacez le nom du tableau ou de la table
+par C<{$reference}>.
+
+"Comment faire une boucle sur un tableau pour lequel je ne possède
+qu'une référenceE<nbsp>?" Pour faire une boucle sur un tableau
+"normal" vous auriez écritE<nbsp>:
+
+        for my $element (@tableau) {
+           ...
+        }
+
+Remplaçons donc le nom du tableau (C<tableau>) par la
+référenceE<nbsp>:
+
+        for my $element (@{$tref}) {
+           ...
+        }
+
+"Comment afficher le contenu d'une table de hachage dont je possède
+une référenceE<nbsp>?" Tout d'abord, écrivons le code pour afficher le
+contenu d'une table de hachageE<nbsp>:
+
+        for my $cle (keys %hachage) {
+          print "$cle => $hachage{$cle}\n";
+        }
+
+Puis remplaçons le nom de la table par la référenceE<nbsp>:
+
+        for my $cle (keys %${href}) {
+          print "$cle => $${href}{$cle}\n";
+        }
+
+=head3 B<Règle d'utilisation 2>
+
+La B<Règle d'utilisation 1> est la seule réellement indispensable
+puisqu'elle vous permet de faire tout ce que vous voulez avec des
+références. Mais le chose la plus courante que l'on fait avec un
+tableau ou une table de hachage est d'accéder à une valeur et la
+notation induite par la B<Règle d'utilisation 1> est lourde. Il existe
+donc une notation raccourcie.
+
+C<${$tref}[3]> est trop dur à lire, vous pouvez donc écrire C<< $tref->[3] >>
+à la place.
+
+C<${$href}{bleu}> est trop dur à lire, vous pouvez donc écrire
+C<< $href->{bleu} >> à la place.
+
+Si C<$tref> est une référence à un tableau, alors C<< $tref->[3] >> est le
+quatrième élément du tableau. Ne mélangez pas ça avec C<$tref[3]>, qui est le
+quatrième élément d'un tout autre tableau, trompeusement nommé
+C<@tref>. C<$tref> et C<@tref> ne sont pas reliés, pas plus que C<$truc> et
+C<@truc>.
+
+De la même façon, C<< $href->{'bleu'} >> est une partie de la table de hachage
+vers laquelle pointe C<$href>, et qui ne porte peut-être pas de
+nom. C<$href{'bleu'}> est une partie de la table de hachage trompeusement
+nommée C<%href>. Il est facile d'oublier le C<< -> >>, et si cela vous arrive
+vous obtiendrez des résultats étranges comme votre programme utilisera des
+tableaux et des tables de hachage issus de tableaux et de tables de hachages
+qui n'étaient pas ceux que vous aviez l'intention d'utiliser.
+
+=head1 Un exemple
+
+Voyons un rapide exemple de l'utilité de tout ceci.
+
+D'abord, souvenez-vous que C<[1, 2, 3]> construit un tableau anonyme
+contenant C<(1, 2, 3)>, et vous renvoie une référence à ce tableau.
+
+Maintenant, considérez
+
+        @t = ( [1, 2, 3],
+               [4, 5, 6],
+               [7, 8, 9]
+             );
+
+@t est un tableau à trois éléments, et chacun d'entre eux est une
+référence à un autre tableau.
+
+C<$t[1]> est l'une de ces références. Elle pointe vers un tableau,
+celui contenant C<(4, 5, 6)>, et puisque c'est une référence à un
+tableau, la C<Règle d'utilisation 2> dit que nous pouvons écrire
+C<< $t[1]->[2] >> pour accéder au troisième élément du tableau.
+C<< $t[1]->[2] >> vaut 6. De la même façon, C<< $t[0]->[1] >> vaut
+2. Nous avons ce qui ressemble à un tableau de dimensions deux ; vous
+pouvez écrire C<< $t[LIGNE]->[COLONNE] >> pour obtenir ou modifier
+l'élément se trouvant à une ligne et une colonne données du tableau.
+
+Notre notation est toujours quelque peu maladroite, voici donc un
+raccourci de plusE<nbsp>:
+
+=head1 Règle de la flèche
+
+Entre deux B<indices>, la flèche et facultative.
+
+A la place de C<< $t[1]->[2] >>, nous pouvons écrire C<$t[1][2]> ;
+cela veut dire la même chose. A la place de C<< $t[0]->[1] = 23 >>, nous
+pouvons écrire C<$t[0][1] = 23> ; cela veut dire la même chose.
+
+Maintenant on dirait vraiment un tableau à deux dimensions !
+
+Vous pouvez voir pourquoi les flèches sont importantes. Sans elles,
+nous devrions écrire C<${$t[1]}[2]> à la place de C<$t[1][2]>. Pour
+les tableaux à trois dimensions, elles nous permettent d'écrire
+C<$x[2][3][5]> à la place de l'illisible C<${${$x[2]}[3]}[5]>.
+
+=head1 Solution
+
+Voici maintenant la réponse au problème que j'ai posé plus haut, qui
+consistait à reformater un fichier de villes et de pays.
+
+    1   my %table;
+
+    2   while (<>) {
+    3     chomp;
+    4     my ($ville, $pays) = split /, /;
+    5     $table{$pays} = [] unless exists $table{$pays};
+    6     push @{$table{$pays}}, $ville;
+    7   }
+    
+    8   foreach $pays (sort keys %table) {
+    9     print "$pays: ";
+   10     my @villes = @{$table{$pays}};
+   11     print join ', ', sort @villes;
+   12     print ".\n";
+   13   }
+
+Ce programme est constitué de deux partiesE<nbsp>: les lignes 2 à 7 lisent
+les données et construisent une structure de données puis les lignes 8
+à 13 analysent les données et impriment un rapport. Nous allons
+obtenir une table de hachage dont les clés sont les noms de pays et
+dont les valeurs sont des références vers des tableaux de noms de
+villes. La structure de données ressemblera à celaE<nbsp>:
+
+           %table
+        +-------+---+
+        |       |   |   +-----------+--------+
+        |Germany| *---->| Frankfurt | Berlin |
+        |       |   |   +-----------+--------+
+        +-------+---+
+        |       |   |   +----------+
+        |Finland| *---->| Helsinki |
+        |       |   |   +----------+
+        +-------+---+
+        |       |   |   +---------+------------+----------+
+        |  USA  | *---->| Chicago | Washington | New York |
+        |       |   |   +---------+------------+----------+
+        +-------+---+
+
+Commençons par détailler la seconde partie du code. Supposons donc que
+nous avons déjà cette structure. Comment l'afficher ?
+
+    8   foreach $pays (sort keys %table) {
+    9     print "$pays: ";
+   10     my @villes = @{$table{$pays}};
+   11     print join ', ', sort @villes;
+   12     print ".\n";
+   13   }
+
+C<%table> est une table de hachage ordinaire dont on extrait les clés
+en les triant afin de les parcourir. La seule utilisation d'une
+référence est en ligne 10. C<$table{$pays}> accède, via la clé $pays,
+à une valeur qui est une référence à un tableau de villes de ce
+pays. La B<Règle d'utilisation 1> indique que nous pouvons obtenir ce
+tableau en écrivant C<@{$table{$pays}}>. La ligne 10 est donc commeE<nbsp>:
+
+	@villes = @tableau;
+
+sauf que le nom C<tableau> a été remplacé par la référence
+C<{$table{$pays}}>. Le C<@> indique à Perl qu'on veut tout le
+tableau. Une fois le tableau des villes récupéré, on trie et on
+concatène ses valeurs pour finalement les afficher comme d'habitude.
+
+Les ligne 2 à 7 fabriquent la structure de données. Les voici à
+nouveauE<nbsp>:
+
+    2   while (<>) {
+    3     chomp;
+    4     my ($ville, $pays) = split /, /;
+    5     $table{$pays} = [] unless exists $table{$pays};
+    6     push @{$table{$pays}}, $ville;
+    7   }
+
+Les lignes 2 à 4 récupèrent les noms d'une ville et d'un pays. La
+ligne 5 regarde si ce pays existe déjà en tant que clé de la table de
+hachage. Si elle n'existe pas, le programme utilise la notation C<[]>
+(B<Règle de construction 2>) pour créer une référence à un nouveau
+tableau anonyme vide prêt à accueillir des noms de villes. Cette
+référence est associée à la clé appropriée dans la table de hachage.
+
+La ligne 6 ajoute le nom de la ville dans le tableau
+approprié. C<$table{$pays}> contient une référence au tableau de noms
+de villes du pays concerné. La ligne 6 est exactement commeE<nbsp>:
+
+   push @tableau, $ville;
+
+sauf que le nom C<tableau> a été remplacé par la référence
+C<{$table{$pays}}>. Le C<push> ajoute un nom de ville à la fin du
+tableau référencé.
+
+Il y a un détail que j'ai omis. La ligne 5 est en fait inutile et nous
+pourrions écrireE<nbsp>:
+
+    2   while (<>) {
+    3     chomp;
+    4     my ($ville, $pays) = split /, /;
+    5   ####  $table{$pays} = [] unless exists $table{$pays};
+    6     push @{$table{$pays}}, $ville;
+    7   }
+
+Si, dans C<%table>, il y a déjà une valeur associée à la clé C<$pays>,
+cela ne change rien. La ligne 6 retrouve la valeur de C<$table{$pays}>
+qui est une référence à un tableau et ajoute la ville dans ce
+tableau. Mais qeu se passe-t-il si C<$pays> contient un clé, disons
+C<Grèce>, qui n'existe pas encore dans C<%table> ?
+
+Comme c'est du Perl, il se passe exactement ce qu'il faut. Perl voit
+que nous voulons ajouter C<Athènes> à un tableau qui n'existe pas
+alors il crée un nouveau tableau vide pour nous, l'inscrit dans
+C<%table> et y ajoute C<Athènes>. Ceci s'appelle "l'autovivification"
+-- donner vie à quelque chose automagiquement. Perl voit que la clé
+n'existe pas dans la table de hachage et donc il crée cette nouvelle
+clé automatiquement. Perl voit ensuite que vous voulez utilisez cette
+valeur comme une référence à un tableau alors il crée un nouveau
+tableau vide et stocke automatiquement sa référence dans la table de
+hachage. Ensuite, comme d'habitude, Perl augmente la taille du tableau
+afin d'y ajouter le nouveau nom.
+
+=head1 Le reste
+
+J'ai promis de vous donner accès à 90% du bénéfice avec 10% des
+détails, et cela implique que j'ai laissé de côté 90% des
+détails. Maintenant que vous avez une vue d'ensemble des éléments
+importants, il devrait vous être plus facile de lire la page de manuel
+L<perlref>, qui passe en revue 100% des détails.
+
+Quelques unes de grande lignes de L<perlref>E<nbsp>:
+
+=over 4
+
+=item *
+
+Vous pouvez créer des références à n'importe quoi, ce qui inclut des
+scalaires, des fonctions, et d'autres références.
+
+=item *
+
+Dans la B<Règle d'utilisation 1>, vous pouvez omettre les accolades
+quand ce qui est à l'intérieur est une variable scalaire atomique
+comme C<$tref>. Par exemple, C<@$tref> est identique à C<@{$tref}>, et
+C<$$tref[1]> est identique à C<${$tref}[1]>. Si vous débutez, vous
+préférerez sûrement adopter l'habitude de toujours écrire les
+accolades.
+
+=item *
+
+Le code suivant ne recopie pas le tableau référencé par
+C<$tref1>E<nbsp>:
+
+    $tref2 = $tref1;
+
+Vous obtenez en fait deux références au même tableau. Si vous modifiez
+C<< $tref1->[23] >> et que vous regardez la valeur de C<< $tref2->[23] >>
+vous verrez la modification.
+
+Pour copier le contenu du tableau, écrivezE<nbsp>:
+
+   $tref2 = [@{$tref1}];
+
+On utilise la notation C<[...]> pour créer un nouveau tableau anonyme
+et affecter sa référence à C<$tref2>. Le contenu du nouveau tableau
+est initialisé avec les valeurs contenues dans le tableau référencé
+par C<$tref1>.
+
+De manière similaire, pour copier un table de hachage anonyme, on
+écritE<nbsp>:
+
+   $href2 = {%{$href1}};
+
+=item *
+
+Pour voir si une variable contient une référence, utilisez la fonction
+"ref". Elle renvoie vrai si son argument est une référence. En fait,
+c'est encore mieux que çaE<nbsp>: elle renvoie HASH pour les références à
+une table de hachage et ARRAY pour les références à un tableau.
+
+=item *
+
+Si vous essayez d'utiliser une référence comme une chaîne de
+caractères, vous obtenez quelque-chose comme
+
+        ARRAY(0x80f5dec)   ou    HASH(0x826afc0)
+
+Si jamais vous voyez une chaîne de caractères qui ressemble à ça, vous
+saurez que vous avez imprimé une référence par erreur.
+
+Un effet de bord de cette représentation est que vous pouvez utiliser
+C<eq> pour savoir si deux références pointent vers la même
+chose. (Mais d'ordinaire vous devriez plutôt utiliser C<==> parce que
+c'est beaucoup plus rapide.)
+
+=item *
+
+Vous pouvez utiliser une chaîne de caractères comme si c'était une
+référence. Si vous utilisez la chaîne C<"foo"> comme une référence à
+un tableau, elle est prise comme une référence au tableau C<@foo>. On
+appelle cela une C<référence symbolique>. Le pragma C<use strict
+'refs'> (NdTE<nbsp>: et même C<use strict>) désactive cette fonctionnalité
+qui, lorsqu'elle est utilisée accidentellement, peut provoquer plein
+de bugs.
+
+=back
+
+Vous pourriez préférer continuer avec L<perllol> au lieu de
+L<perlref>E<nbsp>: il y est traité des listes de listes et des
+tableaux multidimensionnels en détail. Après cela, vous devriez
+avancer vers L<perldsc>E<nbsp>: c'est un livre de recettes pour les
+structures de données (I<Data Structure Cookbook>) qui montre les
+recettes pour utiliser et imprimer les tableaux de tables de hachage,
+les tables de hachage de tableaux, et les autres sortes de données.
+
+=head1 Résumé
+
+Tout le monde a besoin de structures de données complexes, et les
+références sont le moyen d'y accéder en Perl. Il y a quatre règles
+importantes pour manipuler les référencesE<nbsp>: deux pour les construire,
+et deux pour les utiliser. Une fois que vous connaissez ces règles,
+vous pouvez faire la plupart des choses importantes que vous devez
+faire avec des références.
+
+=head1 Crédits
+
+AuteurE<nbsp>: Mark Jason Dominus, Plover Systems
+(C<mjd-perl-ref+@plover.com>)
+
+Cet article est paru à l'origine dans I<The Perl Journal>
+( http://www.tpj.com/ ) volume 3, # 2.  Réimprimé avec permission.
+
+Le titre original était I<Understand References Today> (I<Comprendre
+les références aujourd'hui>).
+
+=head2 Distribution conditions
+
+Copyright 1998 The Perl Journal ( http://www.tpj.com/ ). 
+
+This documentation is free; you can redistribute it and/or modify it
+ under the same terms as Perl itself.
+
+Irrespective of its distribution, all code examples in these files are
+hereby placed into the public domain.  You are permitted and
+encouraged to use this code in your own programs for fun or for profit
+as you see fit.  A simple comment in the code giving credit would be
+courteous but is not required.
+
+=head2 Conditions de distribution
+
+Copyright 1998 The Perl Journal ( http://www.tpj.com/ ).
+
+Cette documentation est libre ; vous pouvez la redistribuer et/ou la
+modifier sous les mêmes conditions que Perl lui-même.
+
+Quel que soit leur mode de distribution, tous les exemples de code de
+ces fichiers sont par ce document placés dans le domaine public. Vous
+êtes autorisé et encouragé à utiliser ce code dans vos programmes à
+fins commerciales ou d'amusement, comme vous le souhaitez. Un simple
+commentaire dans le code signalant son origine serait courtois mais
+n'est pas requis.
+
+=head1 TRADUCTION
+
+=head2 Version
+
+Cette traduction française correspond à la version anglaise distribuée avec
+perl 5.10.0.  Pour en savoir plus concernant ces traductions, consultez
+L<http://perl.enstimac.fr/>.
+
+=head2 Traducteur
+
+Traduction initialeE<nbsp>: Ronan Le Hy (C<rlehy@free.fr>). Mise à
+jourE<nbsp>: Paul Gaborit (C<paul.gaborit at enstimac.fr>).
+
+=head2 Relecture
+
+Personne pour l'instant.
+
+=cut

@@ -1,0 +1,71 @@
+{
+   "abstract" : "Quote-like operator returning http request for the URL provided.",
+   "author" : [
+      "Barry Walsh, C<< <draegtun at cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.032, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PerlX-QuoteOperator-URL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.14",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::Simple" : "0",
+            "PerlX::QuoteOperator" : "0.05",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "URI::file" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/draegtun/PerlX-QuoteOperator-URL/issues"
+      },
+      "homepage" : "https://github.com/draegtun/PerlX-QuoteOperator-URL",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/draegtun/PerlX-QuoteOperator-URL.git",
+         "web" : "https://github.com/draegtun/PerlX-QuoteOperator-URL"
+      }
+   },
+   "version" : "1.02",
+   "x_contributors" : [
+      "Barry Walsh <draegtun@googlemail.com>",
+      "Brian Rossmajer <BrianRossmajer@users.noreply.github.com>"
+   ]
+}
+

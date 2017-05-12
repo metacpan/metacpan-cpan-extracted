@@ -1,0 +1,88 @@
+##############################################################################
+#      $URL$
+#     $Date$
+#   $Author$
+# $Revision$
+##############################################################################
+
+## - Perl::Critic::Policy::Subroutines::ProhibitExportingUndeclaredSubs [4.0] -
+## name Exporting a sub that does *not* exist (via @EXPORT)
+## failures 2
+## cut
+
+package Bar;
+use base 'Exporter';
+
+@EXPORT = qw(baz &nuts $wango %tango); # Note that variables are ignored!
+
+## - Perl::Critic::Policy::Subroutines::ProhibitExportingUndeclaredSubs [4.1] -
+## name Exporting a sub that *does* exist (via @EXPORT)
+## failures 0
+## cut
+
+package Bar;
+use base 'Exporter';
+
+@EXPORT = qw(baz &nuts $wango %tango); # Note that variables are ignored!
+
+sub baz {...}
+sub nuts {...}
+
+## - Perl::Critic::Policy::Subroutines::ProhibitExportingUndeclaredSubs [4.2] -
+## name Exporting a sub that does *not* exist (via @EXPORT_OK)
+## failures 2
+## cut
+
+package Bar;
+use base 'Exporter';
+
+@EXPORT_OK = qw(baz &nuts $wango %tango); # Note that variables are ignored!
+
+## - Perl::Critic::Policy::Subroutines::ProhibitExportingUndeclaredSubs [4.3] -
+## name Exporting a sub that does exist (via @EXPORT_OK)
+## failures 0
+## cut
+
+package Bar;
+use base 'Exporter';
+
+@EXPORT_OK = qw(baz &nuts $wango %tango); # Note that variables are ignored!
+
+sub baz {...}
+sub nuts {...}
+
+## - Perl::Critic::Policy::Subroutines::ProhibitExportingUndeclaredSubs [4.4] -
+## name Exporting subs declared via "use constant", typical syntax
+## failures 0
+## cut
+
+package Bar;
+use base 'Exporter';
+
+@EXPORT_OK = qw(FOO BAR);
+
+use constant FOO => 1;
+use constant (BAR => 2);
+
+
+## - Perl::Critic::Policy::Subroutines::ProhibitExportingUndeclaredSubs [4.5] -
+## name Exporting subs declared via "use constant", alternate syntax
+## TODO These syntaxes are not supported yet
+## failures 0
+## cut
+
+@EXPORT = ('FOO', 'BAR');
+@EXPORT_OK = ('BAZ');
+
+use constant {FOO => 1, BAR => 2};
+use constant ('BAZ' => 3);
+
+##############################################################################
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 78
+#   indent-tabs-mode: nil
+#   c-indentation-style: bsd
+# End:
+# ex: set ts=8 sts=4 sw=4 tw=78 ft=perl expandtab :

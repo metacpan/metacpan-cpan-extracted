@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Pod-Usage-CommandLine
+version:      0.04
+version_from: lib/Pod/Usage/CommandLine.pm
+installdirs:  site
+requires:
+    File::Basename:                0
+    Getopt::Long:                  0
+    Pod::Usage:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

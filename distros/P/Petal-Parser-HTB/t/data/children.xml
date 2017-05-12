@@ -1,0 +1,28 @@
+<!--?
+
+  This is the listing of child documents 
+
+?-->
+<div
+  class="children"
+  xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:petal="http://purl.org/petal/1.0/"
+  petal:condition="true:self/children"
+>
+  <p
+    petal:repeat="child self/children"
+  >
+    <a 
+      href="http://example.com/"
+      hreflang="en"
+      xml:lang="en"
+      lang="en"
+      dir="ltr"
+      rel="dcterms:hasPart child"
+      petal:content="child/title"
+      petal:attributes="href child/uri; hreflang child/lang; dir child/direction; lang child/lang; xml:lang child/lang;"
+    >
+      Document Title
+    </a>
+  </p>
+</div>

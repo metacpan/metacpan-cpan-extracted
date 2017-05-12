@@ -1,0 +1,17 @@
+Changes for PDL::Finance::TA
+
+0.008   2014/09/05
+        - renaming PDL::Finance::Talib >> PDL::Finance::TA
+
+0.007   2014/09/02
+        - use Alien::TALib for ta-lib detection
+
+0.006   2014/06/09
+        - Makefile.PL cosmetics
+
+0.005   2014/05/21
+        - BAD val handling bug
+        - Makefile.PL cosmetics
+
+0.004   2014/05/20
+        - first public release

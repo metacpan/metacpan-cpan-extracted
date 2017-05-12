@@ -1,0 +1,8 @@
+prefix=/usr/local
+
+Name: shared-mime-info
+Description: Freedesktop common MIME database
+Version: 0.60
+Requires:
+Libs:
+Cflags:

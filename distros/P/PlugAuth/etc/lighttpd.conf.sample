@@ -1,0 +1,21 @@
+
+server.document-root = var.CWD
+server.port = env.lighttpd_port
+server.modules = ( "mod_fastcgi" )
+server.pid-file = env.lighttpd_pid
+fastcgi.server = ( "/" =>
+   ((
+     "socket" => env.lighttpd_socket,
+     "check-local" => "disable",
+     "fix-root-scriptname" => "enable"
+   ))
+)
+
+# Start the webserver like this :
+#
+# plackup -s FCGI --listen /tmp/fcgi.sock --daemonize plugauth.psgi
+# lighttpd -f ./lighttpd.conf
+#
+# See PlugAuth.conf for how to make this happen via "plugauth start"
+#
+

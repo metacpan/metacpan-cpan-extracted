@@ -1,0 +1,84 @@
+NAME
+    `Protocol::CassandraCQL' - wire protocol support functions for Cassandra
+    CQL
+
+DESCRIPTION
+    This module provides the basic constants and other support functions
+    required to communicate with a Cassandra database using `CQL'. It is not
+    in itself a CQL client; it simply provides the necessary support
+    functions to allow one to be written. It supports the additions added by
+    `CQL' version 2.
+
+    For a complete client, see instead Net::Async::CassandraCQL.
+
+CONSTANTS
+    The following families of constants are defined, along with export tags:
+
+  FLAG_* (:flags)
+    Bitmask of flags used in message frames.
+
+  OPCODE_* (:opcodes)
+    Opcodes used in message frames.
+
+  QUERY_* (:queryflags)
+    Flag constants used in `OPCODE_QUERY' frames.
+
+  BATCH_* (:batches)
+    Type constants used in `OPCODE_BATCH' frames.
+
+  RESULT_* (:results)
+    Result codes used in `OPCODE_RESULT' frames.
+
+  ROWS_* (:rowflags)
+    Flag constants used in `RESULT_ROWS' frames.
+
+  TYPE_* (:types)
+    Type codes used in `TYPE_ROWS' and `TYPE_PREPARED' column metadata.
+
+  CONSISTENCY_* (:consistencies)
+    Consistency levels used in `OPCODE_QUERY' and `OPCODE_EXECUTE' frames.
+
+FUNCTIONS
+  ( $version, $flags, $streamid, $opcode, $body ) = parse_frame( $bytes )
+    Attempts to parse a complete message frame from the given byte string.
+    If it succeeds, it returns the header fields and the body as an opaque
+    byte string. If it fails, it returns an empty list.
+
+    If successful, it will remove the bytes of the message from the `$bytes'
+    scalar, which must therefore be mutable.
+
+  ( $version, $flags, $streamid, $opcode, $body ) = recv_frame( $fh )
+    Attempts to read a complete frame from the given filehandle, blocking
+    until it is available. If an IO error happens, returns an empty list.
+    The results are undefined if this method is called on a non-blocking
+    filehandle.
+
+  $bytes = build_frame( $version, $flags, $streamid, $opcode, $body )
+    Returns a byte string containing a complete message with the given
+    fields as the header and body.
+
+  send_frame( $fh, $version, $flags, $streamid, $opcode, $body )
+    Sends a complete frame to the given filehandle.
+
+  $consistency = lookup_consistency( $name )
+    Returns the `CONSISTENCY_*' value for the given name (without the
+    initial `CONSISTENCY_' prefix).
+
+  $name = typename( $type )
+    Returns the name of the given `TYPE_*' value, without the initial
+    `TYPE_' prefix.
+
+TODO
+    *       Reimplement Protocol::CassandraCQL::Frame in XS code for better
+            performance.
+
+SPONSORS
+    This code was paid for by
+
+    * Perceptyx http://www.perceptyx.com/
+
+    * Shadowcat Systems http://www.shadow.cat
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

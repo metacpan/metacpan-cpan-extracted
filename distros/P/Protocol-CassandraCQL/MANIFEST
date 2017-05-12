@@ -1,0 +1,25 @@
+Build.PL
+Changes
+examples/cassandra-options
+examples/cqlsh
+lib/Protocol/CassandraCQL.pm
+lib/Protocol/CassandraCQL/Client.pm
+lib/Protocol/CassandraCQL/ColumnMeta.pm
+lib/Protocol/CassandraCQL/Frame.pm
+lib/Protocol/CassandraCQL/Frames.pm
+lib/Protocol/CassandraCQL/Result.pm
+lib/Protocol/CassandraCQL/Type.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01frame.t
+t/02types.t
+t/03meta.t
+t/04result.t
+t/05frames.t
+t/10client.t
+t/99pod.t

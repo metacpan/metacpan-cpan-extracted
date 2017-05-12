@@ -1,0 +1,31 @@
+Revision history for Perl module Pod::WordML
+
+0.164 2017-04-22T21:11:22Z
+	* Adjust a prerequisite for testing.
+
+0.163 2017-04-17T09:50:16Z
+	* Clarify that everything is under the Artistic License 2.0
+
+0.162 2017-04-17T09:44:59Z
+	* I renamed the GitHub repo, so lots of tiny references had to update
+
+0.161 2017-04-17T09:40:47Z
+	* Fix a relative require issue for the upcoming removal of .
+	in @INC in v5.26.
+
+0.16 - 2014-01-05
+	* Get rid of pod coverage tests, since almost all of the methods
+	come from the Pod::Simple interface
+
+0.15 - 2014-01-03
+	* Update the expected output to make the tests pass
+	* Get rid of MYMETA
+
+0.13 - 2009-11-16
+	* The claim that I handled =item, em dashes, and ellipsis
+	in 0.12 was a big lie. Let's hope it's the truth this
+	time.
+
+0.12 - 2009-11-15
+	* Handle =item
+

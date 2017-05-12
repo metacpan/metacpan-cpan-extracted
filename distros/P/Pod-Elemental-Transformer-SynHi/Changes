@@ -1,0 +1,16 @@
+Revision history for Pod-Elemental-Transformer-SynHi
+
+0.101000  2014-02-01 19:37:27-05:00 America/New_York
+          fix case of github links
+
+0.100891  2013-10-12 22:25:59 America/New_York
+          update bugtracker and repo
+
+0.100890  2010-03-30 23:11:14 America/New_York
+          fix CodeBox to not wrap in standard block; that's done by SynMux
+
+0.100250  2010-01-25 08:49:25 America/New_York
+          note requirement of perl 5.10.0
+
+0.093580  2009-12-24 21:09:58 America/New_York
+          first release!

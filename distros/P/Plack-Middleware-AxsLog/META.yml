@@ -1,0 +1,44 @@
+---
+abstract: 'Yet another AccessLog Middleware'
+author:
+  - 'Masahiro Nagano <kazeburo {at} gmail.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.11.0, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-AxsLog
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::AxsLog:
+    file: lib/Plack/Middleware/AxsLog.pm
+    version: 0.21
+requires:
+  Apache::LogFormat::Compiler: 0.30
+  HTTP::Message: 6.06
+  Plack: 1.0023
+  perl: v5.8.5
+resources:
+  bugtracker: https://github.com/kazeburo/Plack-Middleware-AxsLog/issues
+  homepage: https://github.com/kazeburo/Plack-Middleware-AxsLog
+  repository: git://github.com/kazeburo/Plack-Middleware-AxsLog.git
+version: 0.21
+x_contributors:
+  - 'zentooo <ankerasoy@gmail.com>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'

@@ -1,0 +1,183 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Getopt::Long;
+require Plient unless $ENV{PLIENT_BUNDLE_MODE};
+require Plient::Util unless $ENV{PLIENT_BUNDLE_MODE};
+Plient->import( 'plient', 'plient_support' );
+use Term::ReadLine;
+use Text::ParseWords;
+
+my %args;
+
+GetOptions( \%args, 'help|h', 'support=s', 'request|X=s', 'output|o=s',
+    'data|d=s', 'form|F=s', 'user|u=s' )
+  or die 'unknown option';
+
+my $USAGE =<<EOF;
+USAGE: plient URL [ ... ]
+EXAMPLES:
+    plient --support http_get                       # check if support HTTP GET
+    plient http://cpan.org/                         # fetch http://cpan.org
+    plient -o /tmp/cpan.html http://cpan.org/       # write to file
+    plient -u user:password http://foo.org          # use basic auth
+    plient -d foo=bar -d bar=baz http://foo.org     # post with urlencoded
+    plient -F foo=bar -F bar=baz http://foo.org     # post with form-data
+    plient -F foo=@/tmp/bar.log  http://foo.org     # post with file upload
+EOF
+
+if ( $args{support} ) {
+    support( $args{support} );
+    exit;
+}
+
+my $prompt = 'plient> ';
+my %actions = (
+    shell    => \&shell,
+    support  => \&support,
+    supports => \&support,
+    help     => \&help,
+);
+
+sub handler {
+
+    push @ARGV, 'shell' unless @ARGV;    # default to interactive mode
+    shift @ARGV if ( $ARGV[0] eq 'plient' );    # ignore a leading 'rt'
+    if ( @ARGV ) {
+        if ( exists $actions{ lc $ARGV[0] } ) {
+            $actions{ lc shift @ARGV }->();
+            return 0;
+        }
+        else {
+            handle();
+            return 0;
+        }
+    }
+    else {
+        print STDERR "plient: unknown command '@ARGV'.\n";
+        print STDERR "plient: For help, run 'plient help'.\n";
+        return 1;
+    }
+
+}
+
+exit handler();
+
+sub shell {
+    $| = 1;
+    my $term = Term::ReadLine->new( 'Plient' );
+    # I really don't like the underscores in the prompt
+    $term->ornaments(0);
+    while ( defined( $_ = $term->readline($prompt) ) ) {
+        next if /^#/ || /^\s*$/;
+        @ARGV = shellwords($_);
+        handler();
+    }
+}
+
+
+sub handle {
+
+    if ( $args{data} && $args{form} ) {
+        die "--data and --form can't be both set";
+    }
+
+    my $method = $args{'request'} || 'get';
+    $method = 'post' if $args{form} || $args{data};
+
+    my @body;
+    if ( $args{form} ) {
+        for my $data (
+            ref $args{form} eq 'ARRAY' ? @{ $args{form} } : $args{form} )
+        {
+            push @body, map {
+                my ( $k, $v ) = split /=/, $_, 2;
+                $v =~ s/\^@// ? ( $k, { file => $v } ) : ( $k, $v )
+            } split /;/, $data;
+        }
+    }
+    elsif ( $args{data} ) {
+
+        # can specify multiple times like -d foo=bar -d bar=baz
+        for my $data (
+            ref $args{data} eq 'ARRAY' ? @{ $args{data} } : $args{data} )
+        {
+            push @body, map { split /=/, $_, 2 } split /;/, $data;
+        }
+    }
+    my (@uri) = @ARGV;
+
+    for my $uri (@uri) {
+        $uri = 'http://' . $uri unless $uri =~ /^\w+:/;
+        my ( $user, $password );
+        if ($args{user}) {
+            ( $user, $password ) = split /:/, $args{user}, 2;
+            while ( !defined $password ) {
+                $password = prompt_password("password for $user:");
+            }
+        }
+
+        if ( $args{output} ) {
+            plient(
+                $method, $uri,
+                {
+                    output_file => $args{output},
+                    user        => $user,
+                    password    => $password,
+                    $args{form} ? ( content_type => 'form-data' ) : (),
+                    $method =~ /post/i ? ( body => \@body ) : (),
+                }
+            );
+        }
+        else {
+            print plient(
+                $method, $uri,
+                {
+                    user     => $user,
+                    password => $password,
+                    $args{form} ? ( content_type => 'form-data' ) : (),
+                    $method =~ /post/i ? ( body => \@body ) : (),
+                }
+            );
+        }
+    }
+}
+
+sub prompt_password {
+    my $prompt = shift;
+    my $password;
+    print "$prompt ";
+    eval { require Term::ReadKey; };
+    if ($@) {
+
+        # no Term::ReadKey available, let's use stty
+        if ( my $stty = Plient::Util::which('stty') ) {
+            system "stty -echo";
+            $password = <STDIN>;
+            system "stty echo";
+        }
+        else {
+            # no stty either, let's just read password as normal
+            # TODO this is bad, need improve
+            $password = <STDIN>;
+        }
+    }
+    else {
+        Term::ReadKey::ReadMode('noecho');
+        $password = Term::ReadKey::ReadLine(0);
+        Term::ReadKey::ReadMode(0); #reset
+    }
+    chomp $password;
+    return $password;
+}
+
+sub support {
+    my $value = shift;
+    my ( $protocol, $method ) = split /_/, $value || $ARGV[0];
+    print plient_support( $protocol, $method ) ? 'yes' : 'no';
+    print "\n";
+}
+
+sub help {
+    print $USAGE;
+}

@@ -1,0 +1,22 @@
+Revision history for Plack-Client
+
+0.06  2011-03-03
+      - allow passing arguments to the Plack::App::Proxy constructor
+
+0.05  2011-02-16
+      - bump dep on Plack::App::Proxy since older versions don't work
+
+0.04  2011-02-12
+      - clear query args before proxying with the http backend (stevan)
+      - a few other cleanups
+
+0.03  2011-01-12
+      - refactor backends a bit more, and document them
+
+0.02-TRIAL  2011-01-11
+      - url schemes are now handled by separate backends, which must be
+        explicitly requested in the constructor
+      - lots of other refactoring
+
+0.01-TRIAL  2011-01-07
+      - Initial release

@@ -1,0 +1,64 @@
+{
+   "abstract" : "Client to a {JSON:API} service (http://jsonapi.org/) v1.0",
+   "author" : [
+      "Mickey Nasriachi <mickey@cpan.org>",
+      "Stevan Little <stevan@cpan.org>",
+      "Brian Fraser <hugmeir@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PONAPI-Client",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ],
+      "namespace" : [
+         "PONAPI::Client"
+      ],
+      "package" : [
+         "PONAPI::Utils::URI"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Hijk" : "0",
+            "JSON::MaybeXS" : "0",
+            "Moose" : "0",
+            "URI" : "0",
+            "parent" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Moose" : "0",
+            "Test::More" : "0",
+            "Test::Simple" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/mickeyn/PONAPI/tree/master/Client"
+      }
+   },
+   "version" : "0.002008",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

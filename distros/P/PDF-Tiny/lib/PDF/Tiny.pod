@@ -1,0 +1,880 @@
+=encoding utf8
+
+=head1 NAME
+
+PDF::Tiny - Minimal Lightweight PDF Library
+
+=head1 VERSION
+
+Version 0.08
+
+This is an alpha version.  The API is still subject to change.
+
+=head1 SYNOPSIS
+
+  use PDF::Tiny;
+
+  # Count pages
+  my $filename = "filename.pdf"
+  my $pdf = new PDF::Tiny $filename;
+  my $page_count = $pdf->page_count;
+  print "$filename has $page_count page", 's'x($page_count!=1), ".\n";
+
+  # Extract pages
+  my $source_pdf  = new PDF::Tiny "other.pdf";
+  my $new_pdf     = new PDF::Tiny version => $source_pdf->version;
+  # Get just the first three
+  for (0..2) {
+    $new_pdf->import_page($source_pdf, $_);
+  }
+  $new_pdf->print(fh => \*STDOUT); # or filename => "out.pdf"
+
+  # Change title (low-level stuff)
+  my $pdf = new PDF::Tiny "foo.pdf";
+  $pdf->trailer->[1]->{Info}
+    ||= PDF::Tiny::make_ref($pdf->add_obj(PDF::Tiny::make_dict({})));
+  $pdf->vivify_obj('str', '/Info', '/Title')->[1] = "Tie Tool";
+  $pdf->append;
+
+=head1 DESCRIPTION
+
+This is a very lightweight (and limited) PDF parser.  If you need to do
+some simple PDF processing on a web server with limited RAM and CPU, and if
+slurping the entire file into memory is not an option, this module may well
+be for you, at the cost of far less functionality than other solutions out
+there.
+
+This module really does assume you know something about the PDF format.
+This documentation includes a brief section on L</THE PDF FILE FORMAT>, if
+you are too lazy to read the specification.
+
+=head1 LIMITATIONS
+
+=over
+
+=item
+
+Encrypted PDFs are not supported.
+
+=item
+
+The only stream encoding supported is FlateEncoding.  In practice, I have
+never seen any other encoding used in PDFs, except for graphics, so this is
+probably not a problem.
+
+=item
+
+Streams are only decoded, not encoded.
+
+=item
+
+Append mode only modifies the existing file.  It will not write to a new
+file.  Duplicate the file first if this is a problem.
+
+=item
+
+Files with PDF 1.5 (Acrobat 6) cross-reference and object streams cannot be
+appended to (updated incrementally).
+
+=item
+
+Hybrid-reference files (files with alternate cross-reference tables for
+different PDF versions) are not fully supported.  The objects referenced
+only by streams will be ignored.  I have never actually seen such a file.
+
+=item
+
+There is no capability (yet) in this module for handling text strings.
+The title example in the L</SYNOPSIS> is limited to ASCII unless you read
+the PDF spec and encode the string yourself.
+
+=item
+
+There are very few high-level functions.  If you know your way around the PDF spec, you can accomplish a lot with this module.  If not, your mileage
+may vary (but do read L</THE PDF FILE FORMAT>, below).  (I am open to
+suggestions for additions, but they need to be fairly general and tiny
+enough to implement in a Tiny module.)
+
+=item
+
+There is not much error checking.  PDFs are generally assumed to be
+well-formed.  If they are not, or if you use the low-level functions
+incorrectly, you may get errors that are hard to debug.
+
+=back
+
+=head1 INTERFACE
+
+This section uses many terms that are explained in L</THE PDF FILE FORMAT>
+and the L</GLOSSARY>, below.
+
+=head2 Constructor
+
+You can create a PDF from scratch:
+
+  $pdf = new PDF::Tiny;
+
+Or open an existing file:
+
+  $pdf = new PDF::Tiny $filename;
+
+The constructor also accepts hash-style arguments:
+
+  $pdf = new PDF::Tiny
+             filename => "foo.pdf",
+             empty    => 0,
+             version  => "1.4",
+  ;
+
+If C<filename> is absent, it is assumed that a PDF file is being created
+from scratch.
+
+C<empty> is a boolean parameter (ignored if a file name is given).  When it
+is false (the default), the new PDF::Tiny object will contain a root and a
+pages object (the latter containing a Kids array and a Count of 0).  If
+C<empty> is true, the root and the pages array will be absent.  Only use
+this if you are going to add the root yourself.  (A PDF without a root and
+a page tree is not well-formed.  High-level methods may not work until you
+have added those.)
+
+C<version> specifies the version of the PDF format.  It is ignored when
+opening an existing file.  It defaults to 1.4 when creating a PDF from
+scratch.  If you are going to make a PDF file that contains pages from
+another PDF, you should probably set it to the version of the other PDF
+file.
+
+=head2 High-Level Methods
+
+=over
+
+=item page_count
+
+Returns the number of pages in the PDF.
+
+=item delete_page
+
+  $pdf->delete_page(7);
+
+Deletes the specified page.  Pages are numbered from 0.  Negative numbers
+count from the end.  -1 means the last page.
+
+=item import_page
+
+  $pdf->import_page($source_pdf, $num, $offset)
+
+Imports the specified page from another PDF.  $offset specifies where to
+put it in the new PDF.  0 means before the first page.  -1 means before the
+last page.  C<undef> means at the very end.
+
+=item append
+
+Appends the modifications to the end of an existing PDF file.  (PDFs
+support incremental updates.)  This does not work with PDFs created from
+scratch or with PDFs containing cross-reference streams (version 1.5 and
+later).
+
+The PDF::Tiny object is not usable after you call C<append>.  This is for
+speed’s sake.  It is not worth doing extra work to keep an object
+functional that may not even be used again.  Just re-open the file if you
+need to continue doing stuff after calling C<append>.
+
+C<append> can be handy if you are batch-processing huge files and making
+tiny changes (e.g., changing the title), but there are some gotchas.  See
+L</modified>.  (The gotchas do not apply if you are only using high-level
+methods to make changes.)
+
+=item print
+
+  $pdf->print(fh => $handle);
+  $pdf->print(filename => "foo.pdf");
+
+Produces a PDF file from scratch.  Orphaned objects (indirect objects not
+referenced anywhere) are not included.  However, no objects are renumbered,
+so you may get a bloated cross-reference table.  (See also C<import_obj>.)
+If a filehandle is passed, it is not closed afterwards.
+
+Since the file is not actually read into memory in full, C<print> needs
+access to the original file.  It cannot read and clobber it at the same
+time.  So C<filename> must not be the file that was originally opened,
+unless you deleted it before calling C<print>.
+
+=item version
+
+An lvalue accessor function returning (optionally setting) the version of
+the PDF file format.
+
+=back
+
+=head2 Low-Level Methods
+
+=over
+
+=item xref
+
+Returns a reference to a hash containing the cross-reference table.  If you
+really know what you are doing, you can modify it.  (Don’t.)
+
+   # obj num
+  {  '1 0'  =>   324345,     # offset in the file
+     '2 0'  =>  ['10 0', 7], # object number 7 in object stream 10 0
+      ... }
+
+Newly-created PDFs have an empty, unused cross-reference table.
+
+=item modified
+
+  $pdf->modified;                     # get the hash
+  $pdf->modified("1 0");              # mark 1 0 as modified
+  $pdf->modified("/Info", "/Title");  # mark the indirect object con-
+                                      # taining the title as modified
+
+This method returns a reference to a hash of modified indirect objects.
+This is used to determine which objects need to be included in an
+incremental update.  If you pass arguments, the object in question will be
+marked as modified.
+
+If you are doing an incremental update and modifying objects by hand, you
+will need to call this for every object that is modified.  The exceptions
+are as follows:
+
+=over
+
+=item
+
+Objects that are imported with C<import_obj>
+
+=item
+
+Objects added with C<add_obj>
+
+=item
+
+Objects returned by C<vivify_obj>
+
+=item
+
+Any changes made by the high-level methods
+
+=back
+
+All of those methods themselves mark the objects as modified.
+
+The arguments follow the same format as described below for L</get_obj>,
+except that the first argument must be an object id ("1 0") or a trailer
+entry ("/Info").
+
+B<Warning>: Getting this right can be tricky.  If a modified object is not
+marked as such, the changes made will not be saved by C<append>.  If the
+file is small enough, it might be better to use the C<print> method and
+avoid this pitfall.
+
+The hash format is as follows:
+
+   # obj num    value should always be true
+  { '1 0'     => 1,
+    '2017 0'  => 1,
+     ... }
+
+(Yes, you can edit the hash manually.)
+
+=item objects
+
+Returns a reference to a hash of all parsed indirect objects.  See
+L</GUTS>.
+
+  { '1 0' => $obj, '2 0' => $obj2, ... }
+
+=item trailer
+
+Returns the PDF trailer dictionary as a parsed object.  If the PDF has
+cross-reference streams, then the trailer is actually the dictionary of the
+last cross-reference stream.
+
+In the latter case, any entries specific to cross-reference streams will be
+omitted by C<print>.  (The list used is based on the PDF 1.7 reference.)
+
+=item read_obj
+
+  $pdf->read_obj("4 0")
+
+Reads the specified object from the file and stores it as a token sequence
+or flat object
+(see L</GUTS>) in the C<objects> hash.  The stored object is also returned.
+
+If the object already exists in memory, it is simply returned.
+
+=item get_obj
+
+  $pdf->get_obj("4 0")
+
+Reads an indirect object from the file (if necessary), and parses and
+returns it.  If it is already in the C<objects> hash, it is upgraded to a
+first-class object (if it was flat or a token sequence) and then
+returned.  If the object cannot be found, or if it is null, nothing is
+returned (C<undef> or
+empty list).  See also
+L</vivify_obj>.
+
+  $pdf->get_obj("4 0", "/Pages", "/Kids", 3);
+
+Dereferences several levels of objects.  In this example, "4 0" is probably
+the root object (a dictionary), with a Pages entry (also a dictionary),
+with a Kids entry (an array), and it returns element 3 of the Kids array.
+If element 3 is a reference, the object it points to is returned.
+
+The slash is not optional.  It is used to distinguish between dictionary
+and array elements.  The characters following the slash must not be escaped
+(whereas in PDF source they can be escaped).
+
+  $pdf->get_obj("/Root", "/Pages", "/Kids");
+
+The first argument may be a dictionary element, in which case the lookup
+begins at the trailer dictionary.
+
+  $root = $pdf->get_obj("/Root");
+  $pdf->get_obj($root, "/Pages", "/Kids");
+
+The first argument may also be a parsed object.
+
+  $pdf->get_obj($root);
+
+If you pass just a single parsed object, it will be returned, unless it is
+actually an indirect reference, in which case the object will be looked up
+and returned.
+
+=item vivify_obj
+
+  $pdf->vivify_obj($type, ...)
+
+The first argument must be one of the types listed in L</GUTS>.  The
+remaining arguments are those accepted by C<get_obj>.  An object of the
+specified type will be vivified, along with all the intervening objects
+(whose type, array or dictionary, is determined by whether the element
+begins with a slash).  None of the vivified objects will be indirect
+objects.
+
+Any object returned by C<vivify_obj> (whether vivified or not) will be
+marked as modified, under the assumption that you are going to modify it.
+
+=item get_page
+
+  $pdf->get_page($num)
+
+Returns the parsed object associated with the page in question.  Pages are
+numbered from 0.  Negative numbers count from the end.  -1 means the last
+page.
+
+=item import_obj
+
+  $pdf->import_obj($other_pdf, $object)
+
+Imports an object, and all other objects it references, from another PDF
+file.  (This entails making sure that each imported object gets renumbered
+to a number that the destination $pdf is not already using.)  This method
+keeps track of which indirect objects have been imported already, so it can
+be called multiple times without duplicating the same objects.  (It also
+means that subsequent changes to objects in the source PDF will go
+unnoticed.)
+
+$object may be a string or a parsed object.
+
+If $object is a string, it must be an object id ("1 0").  The return value
+will also be an object id.
+
+If it is a parsed object, the object itself will not be added to the $pdf’s
+list of indirect objects, because it is assumed that it will be inserted
+directly inside another object.  (Or you can pass the return value to
+C<add_obj>.)  All objects it references though (by numeric id) will be
+imported.  The object itself will be cloned and the new value returned
+(with all references to other objects updated).
+
+B<Warning>: If you try to import pages from another PDF document with this,
+watch out for the ‘/Parent’ link from each page to its parent page array.
+You’ll end up pulling in the parent page array, too, bloating your PDF with
+page data that will not be displayed.
+
+This can also be used to renumber all the objects in a PDF (excluding
+orphans), to avoid bloated cross-reference tables (but this does entail
+reading the entire file into memory):
+
+ my $new_pdf = new PDF'Tiny version => $old_pdf->version,
+                            empty   => 1;
+ my $new_trailer = $new_pdf->trailer->[1];
+ my $old_trailer = $old_pdf->trailer->[1];
+ $new_trailer->{Root} =
+     $new_pdf->import_obj($old_pdf, $old_trailer->{Root});
+ $new_trailer->{Info} =
+     $new_pdf->import_obj($old_pdf, $old_trailer->{Info})
+  if $old_trailer->{Info};
+
+=item add_obj
+
+  $pdf->add_obj($parsed_obj);
+
+Adds a new indirect object to the PDF and returns the id that got used.
+
+=item decode_stream
+
+  $pdf->decode_stream($parsed_obj)
+  $pdf->decode_stream("10 0")
+  $pdf->decode_stream(qw< /Root /Pages /Kids 0 /Content >)
+
+Decodes a stream and returns it.  Currently the only filter supported is
+FlateDecode and the only predictor function supported is PNG.
+
+This is an lvalue function, so you can call it like this to avoid copying
+the stream yet again after decoding:
+
+  $streamref = \$self->decode_stream(...)
+
+(This also means you can assign to the C<decode_stream> call, which is
+pointless.)
+
+=back 
+
+=head2 Functions
+
+None of these functions is exported.  Call each one with a C<PDF::Tiny::>
+prefix.
+
+=over
+
+=item tokenize
+
+(Spelt C<tokenise> on Thursdays.)
+
+  PDF::Tiny::tokenize($string)
+  PDF::Tiny::tokenize($string, $delimiter_re, \&more)
+
+A low-level function used to break a piece of PDF source into a sequence of
+tokens.  Returns a list of strings.  Whitespace is stripped, so if you want
+to join it back into a string, use the C<join_tokens> function.
+
+The $string passed as an argument is consumed.  It must not be read-only.
+
+The second argument is a regular expression matching the token to stop on
+(e.g., C<qr/^endobj\z/>).  It only works for plain keywords, not strings,
+number, names, or what have you.  The third argument is a function that is
+expected to read more into $string if the ending delimiter is not found.
+These two arguments are used internally when parsing PDF files.
+
+=item join_tokens
+
+  PDF::Tiny::join_tokens(@tokens)
+
+Joins a list of tokens into a string, supplying necessary whitespace.
+
+=item parse_string
+
+  PDF::Tiny::parse_string($string)
+  PDF::Tiny::parse_string($string, $delimiter_re)
+
+Turns a string of tokens into a parsed object.  If $delimiter_re is
+supplied, any token than matches it will be the last token processed.  It
+only works for plain keywords (e.g., endobj, stream), not strings, number,
+names, or what have you.
+
+=item parse_tokens
+
+  PDF::Tiny::parse_tokens(@tokens)
+
+Turns a list of tokens into a parsed object.
+
+=item serialize
+
+(Also C<serialise>.)
+
+  PDF::Tiny::serialize($parsed_obj)
+
+Serializes a parsed object.  If the object is a stream, the stream content
+is not serialized (to avoid copying a potentially large stream).  The
+serialized output contains everything up to and including the word ‘stream’
+and the line feed that follows.
+
+=item make_bool
+
+  PDF::Tiny::make_bool(1) # or 0
+
+Returns a parsed boolean object.
+
+=item make_num
+
+  PDF::Tiny::make_num(1)
+  PDF::Tiny::make_num(1.1)
+
+Returns a parsed number object.
+
+=item make_str
+
+  PDF::Tiny::make_str("yuhu")
+
+Returns a parsed string object.
+
+=item make_name
+
+  PDF::Tiny::make_name("Catalog")
+
+Returns a parsed name (identifier) object.  The name must be given without
+the initial slash.
+
+=item make_array
+
+  PDF::Tiny::make_array([...])
+
+Returns a parsed array object that references the very same array passed to
+it.
+
+=item make_dict
+
+  PDF::Tiny::make_dict({...})
+
+Returns a parsed dictionary (hash) object that references the very same
+hash passed to it.
+
+=item make_stream
+
+  PDF::Tiny::make_stream($dict, $content)
+
+Returns a parsed stream object.  $dict must be a parsed dictionary object.
+$content contains the content of the stream.
+
+=item make_null
+
+  PDF::Tiny::make_null()
+
+Returns a parsed null object (the same one every time).
+
+=item make_ref
+
+  PDF::Tiny::make_ref("1 0")
+
+Returns a parsed indirect object reference.
+
+=back
+
+=head1 THE PDF FILE FORMAT
+
+=for later
+  Note that the content of the string may
+represent either binary or text.  This version of PDF::Tiny provides no
+facility for decoding and encoding strings representing text.
+
+The body of a PDF file consists of a collection of what are called objects,
+in no particular order.  Each has a numeric id that consists of two numbers
+separated by space.  Here is an example of what they look like:
+
+  23 0 obj
+  << /Type /Catalog /Pages 3 0 R >>
+  endobj
+
+This is object number 23 0.  The C<<<> and C<<< >> >>> indicate a
+dictionary object (like a hash).  The value of the ‘Type’ entry is the name
+‘Catalog’ (a slash before it indicates a name, or identifier).  The value
+of the ‘Pages’ entry is a reference to object number 3 0.
+
+Everything is an object.
+
+In PDF parlance, even something as simple as a number is called an object.
+An object embedded directly inside another one (such as the number in
+C<<< << /Length 1 >> >>> is called a I<direct object>.  An object with a
+numeric ID (such as 23 0) is called an I<indirect object>.  An object ID
+followed by the keyword C<R> is called an I<indirect reference>.
+
+Since the indirect objects can be in any order, there follows a
+cross-reference table giving the exact location in the file of each
+indirect object.
+
+After the cross-reference table is the trailer, an example of which is the
+following:
+
+  trailer
+  << /Size 34 /Root 23 0 R /Info 1 0 R
+     /ID [ <e2ca9df8c15ea42d17d5d724f61808b1>
+           <e2ca9df8c15ea42d17d5d724f61808b1> ] >>
+  startxref
+  7749
+  %%EOF
+
+Try opening an existing PDF file in a text editor (make sure it is PDF 1.4
+[Acrobat 5] format or earlier).  To see the structure of
+a PDF file, start with the trailer dictionary.  Metadata are stored in
+the ‘Info’ entry, which here refers to object 1 0.  For the actual document
+structure, you want to look at the ‘Root’ entry, which points to the
+document root or catalogue.  That is object 23 0, shown above.  If you find
+object 3 0 you will see that it is a dictionary containing a ‘Kids’ array
+of references to page objects, etc.
+
+Now, the actual content of pages is in a different language from the PDF
+structure, which is described here.  It goes inside a stream object,
+referenced by the pages, which is usually compressed with Deflate encoding.
+(This module does not handle streams per se, but its low-level functions
+will allow you to get to them.)  Even though the language for drawing pages
+is not the same as that used for PDF structure, it follows the same
+tokenization rules, so you can use this module’s C<tokenize> function if
+you are writing your own stream-processing code.
+
+=head1 GUTS
+
+Guts of the PDF::Tiny objects.
+
+Nothing is an object.
+
+By that I mean that PDF::Tiny does not use Perl objects to represent PDF
+objects.  Rather, it uses array refs.  These are referred to throughout
+this documentation as parsed objects.
+
+A parsed object looks like this:
+
+  [ $type, $value ]
+  [ 'num', 3 ]       # a number
+  [ 'dict', {...} ]  # a PDF dictionary (i.e., hash)
+  [ 'str', 'foo' ]   # The string 'foo'
+  [ 'array', [...] ] # An array
+  [ 'bool', 1 ]      # A boolean
+  [ 'name', "Root" ] # The name (identifier) /Root
+  [ 'ref', "2 0" ]   # A reference to an indirect object
+  [ 'null' ]         # This special value has one element
+  [ 'stream', $dict, $content ] # This exception has a parsed dictionary
+                                # object for element 1 and the stream
+                                # content for element 2
+
+The values of dictionaries and arrays are also parsed objects.
+
+The value of an indirect reference (not really an object) consists of two
+integers without leading zeroes (except 0 itself) separated by a space.
+Even though C<"000\n001 R"> is a valid reference in PDF syntax, this module
+always parses it as "0 1", which is important since it is used as a hash
+key.
+
+The various C<make_*> functions can be used to create these.
+
+There are also two special cases, which are handled transparently like the
+other objects (and converted into them if necessary by C<get_obj>):
+
+  [ 'flat', '.......' ]                # A flattened (serialized) object
+  [ 'tokens', [$token1, $token2, ...]] # A sequence of tokens
+
+So the following three are equivalent:
+
+  [ 'dict', { Type => [ 'name', 'Catalog' ], Pages => ['ref', '2 0'] } ]
+  [ 'flat', '<</Type/Catalog/Pages 2 0 R>>' ]
+  [ 'tokens', [qw '<< /Type /Catalog /Pages 2 0 R >>'] ]
+
+(This does not apply to the trailer.  Do not flatten the trailer.)
+
+Also, streams cannot be stored in flat or tokenized format, but their
+dictionaries can:
+
+  [ 'stream', ['dict', { Length => ['num', 9] }], 'scream!!!' ]
+  [ 'stream', ['tokens', ['<<','/Length','9','>>']], 'scream!!!' ]
+  [ 'stream', ['flat', '<</Length 9>>'], 'scream!!!' ]
+  # Invalid:
+  [ 'flat',  "<</Length 9>>stream\nscream!!!" ]
+
+=head1 GLOSSARY
+
+=over
+
+=item content stream
+
+The contents of PDF pages are stored in stream objects called I<content
+streams>.  (PDF::Tiny only deals with the structure of PDF files, not the
+contents of pages, though it will decode a content stream upon request.)
+
+=item cross-reference stream
+
+A cross-reference table stored in a compact format specific to Acrobat 6.0
+(PDF 1.5) and later.  L<PDF::Reuse>, L<CAM::PDF>, L<PDF::API2> and
+PDF::Tiny can read, but not write them.
+
+=item cross-reference table
+
+A table of offsets within a PDF file that indicate where indirect objects
+are to be found.
+
+=item direct object
+
+A PDF object embedded directly inside another PDF object.
+
+=item incremental update
+
+The process of appending changes to the end of a file, instead of rewriting
+the file from scratch.
+
+=item indirect object
+
+A PDF object with an ID, that gets referenced by its ID.
+
+=item indirect reference
+
+A parsed object containing an object ID, representing a PDF sequence such
+as "1 0 R".
+
+=item object ID
+
+Two numbers separate by a space; e.g. "1 0".  While PDF syntax allows
+initial zeroes and any whitespace, PDF::Tiny does not internally.  All
+functions expecting an object ID require exactly one space and no leading
+zeroes (except for 0 itself).
+
+=item object stream
+
+A compact way of storing objects, specific to Acrobat 6.0 (PDF 1.5) and
+later.
+
+=item parsed object
+
+This term is used throughout this documentation to refer to the array-ref
+form that all PDF objects take when parsed by this module.  It is used even
+if the object was created from scratch, and not the result of parsing.
+
+=item ram hog
+
+A mythical creature with the horns of a sheep and the snout of a swine.
+This term is also used to refer to memorivorous software.  This module aims
+not to be such.  Of course if you access every object in a huge PDF, you
+can defeat that aim.
+
+=item text string
+
+PDF strings that are I<not> part of content streams (e.g., metadata such as
+the title and author) are called I<text strings> as long as they represent
+text.  Which strings represent text depends on the context in the PDF file
+(a bit like Perl scalars).
+
+=back
+
+=head1 OTHER PDF MODULES
+
+Why yet another PDF module, considering how many there are?  Most of the
+other solutions were insufficiently lightweight for my needs.  (In
+particular, I needed to write a web service that would serve a single page
+at a time from a collection of PDFs, some of which are 200MB.  I needed it
+to be very responsive.)
+
+L<PDF::API2> (probably the best PDF module), L<CAM::PDF>,
+and L<PDF::Extract> all read the entire file into memory.
+
+L<Text::PDF> is quite fast compared with the others, but I could not figure
+out how to use it, except to get a page count.
+
+L<PDF::Reuse> is fast, but it has trouble with some PDF files, and it
+provides no page count feature (something I needed).
+
+L<PDF::Xtract> I did not find out about until after writing this module.
+It is a fork of PDF::Extract.
+
+That said, there is no reason why you could not use PDF::Tiny in conjunction with
+other modules.  CAM::PDF, for example, can generate PDFs from scratch
+fairly efficiently, but is slow at extracting pages from large PDFs.  You
+could use it to
+generate a PDF, and then use PDF::Tiny to add pages afterwards from some
+other PDF.  (Or extract pages with PDF::Tiny to a small PDF, and then
+import them with CAM::PDF.)
+
+=head2 Compatibility
+
+Unfortunately, many of the modules mentioned above do not fully understand
+PDF syntax, or interpret the spec too strictly, such that they are unable
+to read certain PDFs.  I have a large scanned book in the form of a PDF
+produced by ABBYY FineReader.  I tried rewriting it with
+C<< PDF::Tiny->new($old)->print(filename => $new) >>, and then I tested
+both PDFs with the above modules.  The results (with an Acrobat 6 column as
+a bonus):
+
+                                 PDF producer
+  PDF reader        | FineReader | PDF::Tiny | Acrobat 6+
+  ------------------+------------+-----------+-----------
+  CAM::PDF 1.60     | no         | yes       | yes
+  PDF::API2 2.031   | yes        | no        | yes
+  PDF::Tiny 0.05    | yes        | yes       | yes
+  Text::PDF 0.31    | no         | no        | no
+  PDF::Reuse 0.39   | yes*       | no        | yes
+  PDF::Extract 3.04 | yes        | no        | no
+  PDF::Xtract 0.08  | yes        | no        | no
+  Adobe Acrobat     | yes        | yes       | yes
+  Apple Preview     | yes        | yes       | yes
+
+  * It has trouble with the cross-reference table, such that it may or
+    may not be able to extract the information you want.  It happened
+    to work for my purposes, but was slow and produced a bloated file.
+    (The bug is fixed in the git repository and may be gone by the
+    time you read this.)
+
+Part of the reason for the large number of noes in the middle column is
+that PDF::Tiny tries to
+get the files as
+compact as possible as fast as is possible with a reasonably small amount
+of code.  To avoid reaching the PDF line length limit (which means entering
+a more complex and slower code path), it emits line breaks between tokens
+wherever whitespace is mandatory.  It is probably the only PDF producer
+that does that.
+
+I have filed bug reports against all the modules that have a no in either
+column.  I hope I do not have to slow down PDF::Tiny to work with these
+other modules.
+
+(If this proves to be a problem for anyone, let me know, and I can change
+the way it outputs whitespace.)
+
+=head2 Benchmarks
+
+Okay, so I took the PDF mentioned above (169.5 MB in size, containing 253
+scanned pages) and benchmarked (1) fetching a page count and (2) extracting
+a single page, which are the two tasks for which I am using PDF::Tiny.  The
+benchmark code (which uses L<Dumbbench>) can be found in the F<benchmark>
+file in the distribution.  The results (on a 2.8 GHz Intel Core 2 Duo):
+
+                      Page count | Page extraction | Resulting file size
+  ------------------+------------+-----------------+--------------------
+  PDF::Tiny 0.07    | 0.010499 s |   0.08672 s     | 952   KB
+  CAM::PDF 1.60     | 0.6923   s |   1.1849  s     | 995   KB
+  PDF::Xtract 0.08  | 3.7902   s |   3.7805  s     | 992   KB
+  PDF::API2 2.031   | 3.585    s |   4.613   s     | 953   KB
+  PDF::Reuse 0.39   | N/A        |  15.36    s     | 169.5 MB
+  PDF::Extract 3.04 | N/A        | 158.54    s     | 954   KB
+
+Some explanation of the numbers:  CAM::PDF and PDF::Xtract do not renumber
+objects, so they end up with a bloated 40K cross-reference table.
+PDF::Reuse drags in the
+entire contents of the source PDF but only includes one of its pages in the
+page tree.
+
+=head1 PREREQUISITES
+
+perl 5.10 or higher and core modules.
+
+This modules tries to be true to its Tininess by not loading any other
+modules unless absolutely necessary.  When loaded it loads L<warnings>.
+
+The C<import_obj> method loads L<Hash::Util::FieldHash>.  And
+C<import_page> calls C<import_obj>.
+
+The C<decode_stream> method loads L<Compress::Zlib> if the stream is
+compressed.  The constructor calls C<decode_stream> if the PDF has
+cross-reference streams (PDF 1.5/Acrobat 6).
+
+=head1 BUGS
+
+Probably lots.  Most of the limitations could be considered bugs.  Most of
+the limitations could also be considered features, because they make the
+module Tiny.
+
+This module is badly in need of tests.  (Or it needs to be tested badly.)
+No doubt more tests will uncover bugs.
+
+Please send bug reports to
+L<bug-PDF-Tiny@rt.cpan.org|mailto:bug-PDF-Tiny@rt.cpan.org>.
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to Pali for his contributions.
+
+=head1 AUTHOR & COPYRIGHT
+
+Copyright (C) 2017 Father Chrysostomos <sprout [at] cpan
+[dot] org>
+
+This program is free software; you may redistribute it, modify it or both
+under the same terms as perl.  The full text of the license can be found
+in the LICENSE file included with this module.

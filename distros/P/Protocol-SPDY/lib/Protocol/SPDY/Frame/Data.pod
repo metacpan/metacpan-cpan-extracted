@@ -1,0 +1,75 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::SPDY::Frame::Data
+at lib/Protocol/SPDY/Frame/Data.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Protocol::SPDY::Frame::Data - data frame support
+
+=head1 VERSION
+
+version 1.001
+
+=head1 DESCRIPTION
+
+See L<Protocol::SPDY> and L<Protocol::SPDY::Base>.
+
+=head1 METHODS
+
+=head2 stream_id
+
+The stream ID for this data packet.
+
+=head2 payload
+
+The bytes comprising this data packet. Note that there are no guarantees
+on boundaries: UTF-8 decoding for example could fail if this packet is
+processed in isolation.
+
+=head2 from_data
+
+Generates an instance from the given data.
+
+=head2 as_packet
+
+Returns the scalar bytes representing this frame.
+
+=head2 type_string
+
+Returns 'data' - data frames don't have a type field, so we pick a value
+that isn't going to conflict with any control frame types.
+
+=head2 type_name
+
+Returns 'data' - data frames don't have a type field, so we pick a value
+that isn't going to conflict with any control frame types.
+
+=head2 to_string
+
+String representation, for debugging.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Protocol::SPDY::Frame>
+
+L<< I<< E<98>E<111>E<111>E<108> overloading >>|Protocol::SPDY::Frame/I<< E<98>E<111>E<111>E<108> overloading >> >>, L<extract_frame|Protocol::SPDY::Frame/extract_frame>, L<extract_headers|Protocol::SPDY::Frame/extract_headers>, L<fin|Protocol::SPDY::Frame/fin>, L<is_control|Protocol::SPDY::Frame/is_control>, L<is_data|Protocol::SPDY::Frame/is_data>, L<length|Protocol::SPDY::Frame/length>, L<new|Protocol::SPDY::Frame/new>, L<parse|Protocol::SPDY::Frame/parse>, L<type|Protocol::SPDY::Frame/type>, L<version|Protocol::SPDY::Frame/version>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2011-2015. Licensed under the same terms as Perl itself.

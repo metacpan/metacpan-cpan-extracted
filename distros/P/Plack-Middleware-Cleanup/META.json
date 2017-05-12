@@ -1,0 +1,57 @@
+{
+   "abstract" : "Run cleanup code after request completion",
+   "author" : [
+      "Hans Dieter Pearcey <hdp@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.110930001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Cleanup",
+   "no_index" : {
+      "package" : [
+         "Plack::Middleware::Cleanup::Guard"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack::Middleware" : 0,
+            "parent" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : 0,
+            "Plack::Builder" : 0,
+            "Plack::Test" : 0,
+            "Test::More" : "0.87_01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hdp/Plack-Middleware-Cleanup/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hdp/Plack-Middleware-Cleanup.git",
+         "web" : "https://github.com/hdp/Plack-Middleware-Cleanup"
+      }
+   },
+   "version" : "0.003"
+}
+

@@ -1,0 +1,338 @@
+By: rschupp on 2012/10/15
+    * Fix RT #78194: PAR::Dist::parse_dist_name mis-parses par file name
+      Patch from KENO, thanks!
+    * This is 0.49.
+____________________________________________________________________________
+By: smueller on 2011/11/05
+    * Prefer MYMETA.yml over META.yml if possible.
+    * Try YAML implementations in different order (XS first).
+    * This is 0.48.
+____________________________________________________________________________
+By: smueller on 2009/11/29
+    * POD fixes (Frank Wiegand)
+    * This is 0.47.
+____________________________________________________________________________
+By: smueller on 2009/07/31
+    * Do not use Archive::Zip if its version is 1.28.
+    * This is 0.46.
+____________________________________________________________________________
+By: smueller on 2009/02/20
+    * Fix test skipping if certain optional dependencies couldn't be found.
+    * This is 0.45.
+____________________________________________________________________________
+By: smueller on 2009/02/02
+    * Abandon support for perl 5.005.
+    * Merging of the various requires-like META.yml sections in
+      merge_par.
+    * This is 0.44.
+____________________________________________________________________________
+By: smueller on 2009/01/23
+    * Don't rely on the return value of ExtUtils::Install::(un)?install
+      to indicate success or failure of the (un)?installation.
+    * This is 0.43.
+____________________________________________________________________________
+By: smueller on 2009/01/03
+    * Apply *correct* patch for blib_to_par across file system
+      boundaries from Radek. (Radek's patch was correct, just not my
+      application.)
+    * This is 0.42.
+____________________________________________________________________________
+By: smueller on 2008/12/17
+    * Apply patch for blib_to_par across file system boundaries from Radek.
+    * This is 0.41.
+____________________________________________________________________________
+By: smueller on 2008/10/27
+    * Rewrite parts of the install_par docs.
+    * Add the esoteric auto_inst_lib_conversion parameter to install_par.
+    * This is 0.40.
+____________________________________________________________________________
+By: smueller on 2008/10/21
+    * Add the "verbose" option to install_par and uninstall_par.
+    * Add the "uninstall_shadows" option to install_par.
+    * This is 0.39.
+____________________________________________________________________________
+By: smueller on 2008/10/16
+    * Fix _check_tools() to use *Foo{THING} syntax instead of \&{}.
+    * This is 0.38.
+____________________________________________________________________________
+By: smueller on 2008/10/08
+    * Fix the "Skip 03merge_meta tests if no A::Zip nor zip/unzip found." logic.
+    * Add more debug output to debug mode (system calls).
+    * Add internal _check_tools() sub which checks the availability of various
+      required tools (yaml, zip).
+    * This is 0.37.
+____________________________________________________________________________
+By: smueller on 2008/09/30
+    * Skip 03merge_meta tests if no YAML *DUMPER* could be found.
+    * Better debug output for the YAML-search.
+    * This is 0.36.
+____________________________________________________________________________
+By: smueller on 2008/09/30
+    * Skip 03merge_meta tests if no A::Zip nor zip/unzip found.
+    * Better error messages from _zip/_unzip
+    * This is 0.35.
+____________________________________________________________________________
+By: smueller on 2008/09/24
+    * Do not fail if _zip() doesn't return true, doh!
+    * This is 0.34.
+____________________________________________________________________________
+By: smueller on 2008/09/17
+    * Better diagnostics for the CPAN testers test failures.
+    * Extra -f check in _merge_meta.
+    * This is 0.33.
+____________________________________________________________________________
+By: smueller on 2008/09/12
+    * Version bump, fix tests.
+    * This is 0.32.
+____________________________________________________________________________
+By: smueller on 2008/09/01
+    * merge_par now requires a (i.e. any) YAML reader
+    * merge_par now merges the "provides" sections of the META.yml's
+    * blib_to_par now accepts a "quiet" option
+____________________________________________________________________________
+By: smueller on 2008/05/28
+    * Fix small bug in _unzip that could cause double extraction.
+    * This is 0.31.
+____________________________________________________________________________
+By: smueller on 2008/02/06
+    * Make file://foo.par URLs installable.
+    * This is 0.29.
+____________________________________________________________________________
+By: smueller on 2008/02/05
+    * Setting installation targets to undef with install_par
+      should remove them altogether now. This way, you can
+      make sure, some parts aren't installed. (Such as manpages
+      on win32)
+    * This is 0.28.
+    * Now hopefully back to bi-annual releases ;)
+____________________________________________________________________________
+By: smueller on 2008/02/04
+    * No more signature. I keep breaking things with it.
+    * This is 0.27.
+____________________________________________________________________________
+
+By: smueller on 2008/02/03
+    * If the return code from LWP::Simple is 304/not modified,
+      then that's a success. So we shouldn't throw an error.
+    * This is 0.26.
+____________________________________________________________________________
+
+By: smueller on 2007/06/29
+    * Use Archive::Unzip::Burst for unzipping if available.
+    * Some refactoring and code cleanup.
+    * This is 0.25.
+____________________________________________________________________________
+By: smueller on 2007/07/20
+    * Remove shebang from Makefile.PL. No assumptions about the user's perl.
+    * Port Makefile.PL to use ExtUtils::MakeMaker so I no longer need to
+      release for Module::Install upgrades. PAR::Dist wasn't using any of
+      the advanced features anyway!
+    * This is 0.24.
+____________________________________________________________________________
+By: smueller on 2007/06/20
+    * Add contains_binaries.
+    * This is 0.23
+____________________________________________________________________________
+By: smueller on 2007/04/30
+    * Patch from Jos Boumans: Remove use of "static" variable.
+____________________________________________________________________________
+By: smueller on 2006/10/28
+    * parse_dist_name now supports versions starting with a 'v'.
+____________________________________________________________________________
+By: smueller on 2006/10/12
+    * _install_or_uninstall tries to remove the temporary directory
+      while cwd() is in that directory. That fails on win32 leaving
+      temporary directories on disk. This is now fixed.
+    * This is 0.21
+____________________________________________________________________________
+By: smueller on 2006/10/11
+    * Added a more flexible way of using PAR::Dist::install_par's
+      custom target logic.
+    * This is 0.20
+____________________________________________________________________________
+By: smueller on 2006/10/02
+    * Repaired PAR::Dist::install_par's custom target logic.
+____________________________________________________________________________
+By: smueller on 2006/09/03
+Log:
+    * It's not possible to specify your own installation paths.
+    * Installation paths now documented.
+    * This is 0.19.
+____________________________________________________________________________
+By: smueller on 2006/08/28
+Log:
+    * Added optional POD tests.
+____________________________________________________________________________
+By: smueller on 2006/08/25
+Log:
+    * Added the generate_blib_stub method.
+    * Added parse_dist_name to @EXPORT_OK
+    * Upgraded Module::Install to 0.64
+    * This is PAR::Dist 0.18.
+____________________________________________________________________________
+By: smueller on 2006/08/23
+Log:
+    * Fixed merge_par for relative paths.
+    * This is PAR::Dist 0.17.
+____________________________________________________________________________
+By: smueller on 2006/08/09
+Log:
+    * Fixed tests for parse_dist_name.
+    * Release 0.15_02
+____________________________________________________________________________
+By: smueller on 2006/08/02
+Log:
+    * Added the parse_dist_name routine which was previously shipped with
+      both PAR::Repository and PAR::Repository::Client.
+    * Changed the distribution name detection heuristics to favour the
+      distribution name determined from META.yml and then those from
+      parse_dist_name.
+    * Version bump to 0.15_01.
+____________________________________________________________________________
+By: smueller on 2006/07/28
+Log:
+    * PAR::Dist would previously generate bad file names and META.yml if
+      the newlines contained Windows' \r. That's history.
+    * This is 0.15.
+____________________________________________________________________________
+By: smueller on 2006/07/25
+Log:
+    * Changed the calling conventions of remove_man to better resemble
+      those of the other functions. (This is backwards compatible.)
+    * Added get_meta() function.
+    * Slight documentation fixes.
+    * Version bump to 0.15.
+____________________________________________________________________________
+By: audreyt on 2006/07/19
+Log:
+    * The "version" field of META.yml files written by Module::Build
+      was not parsed correctly by the ad-hoc YAML parser.
+      Reported by: Jesse Vincent
+    * Remove the 0-signature.t.
+    * This be 0.14
+____________________________________________________________________________
+By: smueller on 2006/07/22
+Log:
+    * Added rudimentary support for installing to a prefix-ed location.
+    * Documented the new parameter "prefix" to install_par();
+____________________________________________________________________________
+By: smueller on 2006/07/22
+Log:
+    * Module::Install didn't regenerate META.yml because author bit
+      wasn't set.
+    * This is 0.13. (Sorry again, need to do this to make CPAN.pm happy.)
+____________________________________________________________________________
+By: smueller on 2006/07/21
+Log:
+    * Found a couple of path-related bugs in the new functions of 0.11.
+    * This be 0.12. Sorry!
+____________________________________________________________________________
+By: smueller on 2006/07/21
+Log:
+    * Fixed potential bugs where slashes were used as path separators.
+      Now using File::Spec everywhere (I think).
+    * Added merge_par() which merges two or more .par archives.
+    * Added remove_man() which removes all man pages and html docs from
+      a .par archive.
+    * Fixed a bit of indentation. (I know. Don't do it.)
+    * This be 0.11
+____________________________________________________________________________
+By: smueller on 2006/07/05
+Log:
+    * .par distributions fetched from URLs will now be installed as
+      distributions named "Module-Name" instead of
+      "http://foo.bar/path/Module-Name-0.01-architecture-version.par".
+    * Updated Module::Install to 0.63
+    * This be 0.10
+____________________________________________________________________________
+By: smueller on 2006/05/20
+Log:
+    * Updated Module::Install to 0.62
+    * This be 0.09
+____________________________________________________________________________
+By: smueller on 2006/02/13
+Log:
+    * Updated Module::Install
+    * Slight documentation fixes.
+    * This be 0.08
+____________________________________________________________________________
+[  9539] By: autrijus                              on 2004/01/01  10:23:13
+        Log: * This be 0.07.
+             * Do not use an identical README as PAR's. ;-)
+	   ! README
+____________________________________________________________________________
+[  9530] By: autrijus                              on 2004/01/01  05:24:09
+        Log: * bump version and switch to &WriteAll in Makefile.PL.
+	   ! MANIFEST Makefile.PL lib/PAR/Dist.pm
+____________________________________________________________________________
+[  9245] By: autrijus                              on 2003/12/09  00:06:37
+        Log: * manifest.
+	   ! MANIFEST
+____________________________________________________________________________
+[  9244] By: autrijus                              on 2003/12/09  00:04:28
+        Log: * switch to M::I-style Makefile.PL
+	   ! MANIFEST Makefile.PL
+____________________________________________________________________________
+[  9243] By: autrijus                              on 2003/12/09  00:02:25
+        Log: * This be 0.06.
+	   ! lib/PAR/Dist.pm
+____________________________________________________________________________
+[  9242] By: autrijus                              on 2003/12/09  00:01:32
+        Log: * patch from Ryan Briones to fix the case where
+             $args{name} is undefined.
+	   ! lib/PAR/Dist.pm
+____________________________________________________________________________
+[  8456] By: autrijus                              on 2003/10/17  11:01:55
+        Log: * add signature to makefile.pl
+	   ! Makefile.PL
+____________________________________________________________________________
+[  8350] By: autrijus                              on 2003/10/06  17:22:45
+        Log: * ekolve points out we are printing to a closed
+             filehandle META accidentally.
+	   ! lib/PAR/Dist.pm
+____________________________________________________________________________
+[  7541] By: autrijus                              on 2003/08/14  15:58:33
+        Log: * This be 0.05.
+             * Patch from Germain Garand: run MY->fixin for script/*
+             so different #! paths in script/ won't hurt each other
+	   ! lib/PAR/Dist.pm
+____________________________________________________________________________
+[  7355] By: autrijus                              on 2003/08/06  08:32:56
+        Log: * 0.04.
+	   ! lib/PAR/Dist.pm
+____________________________________________________________________________
+[  7340] By: autrijus                              on 2003/08/05  00:42:54
+        Log: * implements auto-appending -$suffix, so this is a valid
+	       $dist:
+             http://example.com/Foo-Bar-0.01
+             * implements cpan://AUTHOR/distname, so this is a valid
+	       $dist:
+             cpan://AUTRIJUS/PAR-0.73
+	   ! lib/PAR/Dist.pm
+____________________________________________________________________________
+[  7150] By: autrijus                              on 2003/07/27  08:00:27
+        Log: * no longer needs to guess version.
+	   ! MANIFEST
+____________________________________________________________________________
+[  7149] By: autrijus                              on 2003/07/27  07:57:11
+        Log: * This be 0.03.
+             * blib_to_par() was not correctly chdir'ing back to
+	       original cwd.
+             * blib_to_par($path) did not work; it was erroneously
+	       parsed as $dist.
+	   ! Makefile.PL lib/PAR/Dist.pm
+____________________________________________________________________________
+[  7045] By: autrijus                              on 2003/07/19  01:40:46
+        Log: * fix some doc errors
+	   ! lib/PAR/Dist.pm
+____________________________________________________________________________
+[  6987] By: autrijus                              on 2003/07/16  06:14:55
+        Log: * This be PAR::Dist, 0.01.
+	   + MANIFEST Makefile.PL README t/0-signature.t
+	   + t/1-basic.t
+	   ! lib/PAR/Dist.pm
+____________________________________________________________________________
+[  6986] By: autrijus                              on 2003/07/16  03:26:03
+        Log: * Initial check in of PAR-Dist, a module that manipulates
+             PAR distributions.
+	   + lib/PAR/Dist.pm

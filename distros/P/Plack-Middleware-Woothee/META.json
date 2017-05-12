@@ -1,0 +1,91 @@
+{
+   "abstract" : "Set woothee information based on User-Agent",
+   "author" : [
+      "Masayuki Matsuki <y.songmu@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Woothee",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Util::Accessor" : "0",
+            "Woothee" : "0",
+            "parent" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0.88",
+            "lib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::Woothee" : {
+         "file" : "lib/Plack/Middleware/Woothee.pm",
+         "version" : "0.05"
+      },
+      "Plack::Middleware::Woothee::Object" : {
+         "file" : "lib/Plack/Middleware/Woothee.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Songmu/p5-Plack-Middleware-Woothee/issues"
+      },
+      "homepage" : "https://github.com/Songmu/p5-Plack-Middleware-Woothee",
+      "repository" : {
+         "url" : "git://github.com/Songmu/p5-Plack-Middleware-Woothee.git",
+         "web" : "https://github.com/Songmu/p5-Plack-Middleware-Woothee"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "bayashi <bayashi@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

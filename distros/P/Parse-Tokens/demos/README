@@ -1,0 +1,15 @@
+Scripts in this directory demonstrate methods of using Parse::Tokens.
+
+There are two intended ways to use Parse::Tokens.
+
+1) As a subclass using @ISA or the 'use base' pragma. This method
+   is demonstrated in 'subclass.pl'. To execute the script issue
+   the command:
+
+       perl subclass.pl sample.dat
+
+2) By registering callbacks. This method is demonstrated in
+   'callback.pl'. To execute the script issue the command:
+
+       perl callback.pl sample.dat
+

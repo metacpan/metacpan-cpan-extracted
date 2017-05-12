@@ -1,0 +1,264 @@
+NAME
+    POE::Component::WWW::XKCD::AsText - non-blocking wrapper around
+    WWW::XKCD::AsText
+
+SYNOPSIS
+        use strict;
+        use warnings;
+
+        use POE qw(Component::WWW::XKCD::AsText);
+
+        my $poco = POE::Component::WWW::XKCD::AsText->spawn;
+
+        POE::Session->create(
+            package_states => [ main => [qw(_start retrieved )] ],
+        );
+
+        $poe_kernel->run;
+
+        sub _start {
+            $poco->retrieve( {
+                    id    => 333,
+                    event => 'retrieved',
+                }
+            );
+        }
+
+        sub retrieved {
+            my $in = $_[ARG0];
+
+            if ( $in->{error} ) {
+                print "Error: $in->{error}\n";
+            }
+            else {
+                printf "The comic on %s is:\n%s\n",
+                        @$in{ qw(uri text) };
+            }
+
+            $poco->shutdown;
+        }
+
+    Using event based interface is also possible of course.
+
+DESCRIPTION
+    The module is a non-blocking wrapper around WWW::XKCD::AsText which
+    provides interface to retrieve comics on <http://xkcd.com> in text
+    format (transcriptions)
+
+CONSTRUCTOR
+  spawn
+        my $poco = POE::Component::WWW::XKCD::AsText->spawn;
+
+        POE::Component::WWW::XKCD::AsText->spawn(
+            alias => 'xkcd',
+            timeout => 10,
+            # or:  ua => LWP::UserAgent->new( timeout => 10, agent => 'blah),
+            options => {
+                debug => 1,
+                trace => 1,
+                # POE::Session arguments for the component
+            },
+            debug => 1, # output some debug info
+        );
+
+    The "spawn" method returns a POE::Component::WWW::XKCD::AsText object.
+    It takes a few arguments, *all of which are optional*. The possible
+    arguments are as follows:
+
+   alias
+        POE::Component::WWW::XKCD::AsText->spawn( alias => 'xkcd' );
+
+    Optional. Specifies a POE Kernel alias for the component.
+
+   timeout
+        ->spawn( timeout => 10 );
+
+    Optional. Specifies the timeout argument of LWP::UserAgent's
+    constructor, which is used for retrieving. Defaults to: 30 seconds.
+
+   ua
+        ->spawn( ua => LWP::UserAgent->new( agent => 'Foos!' ) );
+
+    Optional. If the "timeout" argument is not enough for your needs of
+    mutilating the LWP::UserAgent object used for retrieving, feel free to
+    specify the "ua" argument which takes an LWP::UserAgent object as a
+    value. Note: the "timeout" argument to the constructor will not do
+    anything if you specify the "ua" argument as well. Defaults to: plain
+    boring default LWP::UserAgent object with "timeout" argument set to
+    whatever POE::Component::WWW::XKCD::AsText's "timeout" argument is set
+    to as well as "agent" argument is set to mimic Firefox.
+
+   options
+        my $poco = POE::Component::WWW::XKCD::AsText->spawn(
+            options => {
+                trace => 1,
+                default => 1,
+            },
+        );
+
+    Optional. A hashref of POE Session options to pass to the component's
+    session.
+
+   debug
+        my $poco = POE::Component::WWW::XKCD::AsText->spawn(
+            debug => 1
+        );
+
+    When set to a true value turns on output of debug messages. Defaults to:
+    0.
+
+METHODS
+  retrieve
+        $poco->retrieve( {
+                event   => 'event_for_output',
+                id      => 333,
+                _blah   => 'pooh!',
+                session => 'other',
+            }
+        );
+
+    Takes a hashref as an argument, does not return a sensible return value.
+    See "retrieve" event's description for more information.
+
+  session_id
+        my $poco_id = $poco->session_id;
+
+    Takes no arguments. Returns component's session ID.
+
+  shutdown
+        $poco->shutdown;
+
+    Takes no arguments. Shuts down the component.
+
+ACCEPTED EVENTS
+  retrieve
+        $poe_kernel->post( xkcd => retrieve => {
+                event   => 'event_for_output',
+                id      => 333,
+                _blah   => 'pooh!',
+                session => 'other',
+            }
+        );
+
+   event
+        { event => 'results_event', }
+
+    Mandatory. Specifies the name of the event to emit when results are
+    ready. See OUTPUT section for more information.
+
+   id
+        { id => 333 }
+
+    Mandatory. As a value takes an ID of the comic. In other words, if you
+    want to read the comic on <http://xkcd.com/333/> you would specify 333
+    as an "id" argument's value.
+
+   session
+        { session => 'other' }
+
+        { session => $other_session_reference }
+
+        { session => $other_session_ID }
+
+    Optional. Takes either an alias, reference or an ID of an alternative
+    session to send output to.
+
+   user defined
+        {
+            _user    => 'random',
+            _another => 'more',
+        }
+
+    Optional. Any keys starting with "_" (underscore) will not affect the
+    component and will be passed back in the result intact.
+
+  shutdown
+        $poe_kernel->post( xkcd => 'shutdown' );
+
+    Takes no arguments. Tells the component to shut itself down.
+
+OUTPUT
+        $VAR1 = {
+            'text' => 'comic\'s text here',
+            'uri' => bless( do{\(my $o = 'http://xkcd.com/333/')}, 'URI::http' ),
+        };
+
+    The event handler set up to handle the event which you've specified in
+    the "event" argument to "retrieve()" method/event will recieve input in
+    the $_[ARG0] in a form of a hashref. The possible keys/value of that
+    hashref are as follows:
+
+  text
+        { 'text' => 'comic\'s text here' }
+
+    The "text" key will contain the transcriptions of the comic.
+
+  error
+        { 'error' => 'No text for comic' }
+
+    If there was some problem while retrieving text for the comic, or text
+    for the comic does not exist yet (e.g. comic is very new and
+    transcription has not been submitted yet) the "error" key will be
+    present and will contain the description of the error.
+
+  uri
+        { 'uri' => bless( do{\(my $o = 'http://xkcd.com/333/')}, 'URI::http' ) }
+
+    The "uri" key will contain the URI object pointing to the page of the
+    paste you've retrieved.
+
+  user defined
+        { '_blah' => 'foos' }
+
+    Any arguments beginning with "_" (underscore) passed into the
+    "retrieve()" event/method will be present intact in the result.
+
+SEE ALSO
+    POE, LWP::UserAgent, WWW::XKCD::AsText
+
+AUTHOR
+    Zoffix Znet, "<zoffix at cpan.org>" (<http://zoffix.com>,
+    <http://haslayout.net>)
+
+AUTHOR
+    Zoffix Znet, "<zoffix at cpan.org>" (<http://zoffix.com>,
+    <http://haslayout.net>)
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-poe-component-www-xkcd-astext at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-WWW-XKCD-A
+    sText>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc POE::Component::WWW::XKCD::AsText
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-WWW-XKCD-AsT
+        ext>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/POE-Component-WWW-XKCD-AsText>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/POE-Component-WWW-XKCD-AsText>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/POE-Component-WWW-XKCD-AsText>
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Zoffix Znet, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

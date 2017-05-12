@@ -1,0 +1,26 @@
+Revision history for Perl extension Port-Selector
+
+0.1.6 2016-11-12T08:21:51Z
+    - fix - linux ReuseAddr, win don't
+
+0.1.5 2016-11-01T20:17:39Z
+    - Fix on windows
+
+0.1.4 2016-10-08T12:40:18Z
+    - Rename distribution from Port::Generator to Port::Selector
+
+0.1.3 2016-10-07T09:04:42Z
+    - Improved wording of documentation
+    - Added a SEE ALSO section in doc, with reference to Net::EmptyPort
+    - Added a minimal DESCRIPTION of the module
+
+0.1.2 2016-10-06T15:03:50Z
+    - fix SYNOPSIS
+
+0.1.1 2016-10-06T07:56:20Z
+    - travis test, travis budges
+
+0.1.0 2016-10-06T07:45:47Z
+
+    - original version
+

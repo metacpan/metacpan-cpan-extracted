@@ -1,0 +1,71 @@
+==================================================
+Changes from 2014-05-27 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version 0.0502 at 2015-05-27 23:29:12 +0000
+-------------------------------------------
+
+  Change: 20c5217a96f0e975d74cf3c349eece21d08837de
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-05-27 23:28:41 +0000
+
+    Added README file 
+
+  Change: 223b4fb4496804af992c29af68ceb81a3e4f4507
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-05-27 23:27:32 +0000
+
+    Added CHANGES file 
+
+  Change: 992a0a8fffbf3f58ae22d02fff310357e17ddb81
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-05-27 23:25:05 +0000
+
+    Large refactor with CHI and path_rules 
+
+  Change: 6f02c94aa0c36679f6728acf51c65952b1b17559
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-25 17:25:02 +0000
+
+    Added ENV variable support 
+
+  Change: 74c73b065d4322424a5b05cce7f9531a18781a3e
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-25 17:17:52 +0000
+
+    Some method refactoring 
+
+  Change: b1435403dadf0a0d1a65e5b0b75c8ba293280fb2
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-25 01:36:46 +0000
+
+    Initialized Agent 
+
+  Change: 70f9d2a9f77d7b42da7158ab9004f6b6134597f3
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-23 10:52:45 +0000
+
+    Added POD 
+
+  Change: 4f7b1f7e7cd0c61f0d08b505428d609e21b7ffa7
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-23 09:51:11 +0000
+
+    Bumped version 
+
+  Change: cc6c5be9e1943b2ca07ad73463c37f935a159613
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-23 09:50:37 +0000
+
+    Added dzil and travis config 
+
+  Change: edba0619b8fe03b003afd01ef3c20eadc955b881
+  Author: Ali Anari <ali@anari.me>
+  Date : 2015-04-23 09:46:57 +0000
+
+    First commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,28 @@
+NAME
+    Pod::Coverage::mop -- Pod::Coverage subclass for mop
+
+SYNOPSIS
+      use Test::More;
+  
+      plan skip_all => 'Author test. Set $ENV{AUTHOR_TESTING} to a true value to run.' unless $ENV{AUTHOR_TESTING};
+  
+      eval 'use Test::Pod::Coverage 1.00';
+      plan skip_all => 'Test::Pod::Coverage 1.00+ required for testing pod coverage' if $@;
+  
+      eval 'use Pod::Coverage::mop';
+      plan skip_all => 'Pod::Coverage::mop required for testing pod coverage' if $@;
+  
+      all_pod_coverage_ok({ coverage_class => 'Pod::Coverage::mop' });
+
+DESCRIPTION
+    In the spirit of Pod::Coverage::Moose, here is a Pod::Coverage (actually
+    Pod::Coverage::CountParents) subclass for mop-based classes.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install

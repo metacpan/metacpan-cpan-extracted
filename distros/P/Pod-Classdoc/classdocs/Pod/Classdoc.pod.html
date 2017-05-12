@@ -1,0 +1,346 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	
+<link rel="stylesheet" type="text/css" href="../podstyle.css" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <script type="text/javascript">
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  </script></head>
+<body>
+<div class="box">
+  <h1 class="t1">Pod::Classdoc</h1>
+  <table>
+    <tr>
+      <td class="label">Description</td>
+      <td class="cell">Generate merged project documentation</td>
+    </tr>
+  </table>
+</div>
+
+<div>
+
+</div>
+
+
+<div class="pod">
+
+
+<h1 id="NAME">NAME </h1>
+
+<p>Pod::Classdoc - Generate Javadoc-like detail class documentation from POD</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS </h1>
+
+<pre>	my $classdocs = Pod::Classdoc-&gt;new($path, $title, $verbose);
+	#
+	#	generate classdocs for an entire project directory
+	#
+	$classdocs-&gt;openProject(@srclibs) or die $@;
+	#
+	#	add source code of a single module
+	#
+	$classdocs-&gt;add($some_source, $filename) or die $@;
+	#
+	#	add source code of a single module from its file
+	#
+	$classdocs-&gt;open($srcfile) or die $@;
+	#
+	#	render the classdocs for all added/opened modules,
+	#	and write them out
+	#
+	$classdocs-&gt;writeClassdocs or die $@;
+	#
+	#	get a table of contents for the classdocs, with modules
+	#	in the order specified
+	#
+	my $toc = $classdocs-&gt;getTOC( Order =&gt; \@order);
+	#
+	#	write a table of contents for the classdocs
+	#	
+	$classdocs-&gt;writeTOC( Order =&gt; \@order ) or die $@;
+	#
+	#	get a frame container document
+	#
+	my $frames = $classdocs-&gt;getFrameContainer();
+	#
+	#	write a frame container
+	#	
+	$classdocs-&gt;writeFrameContainer( 'index.html' ) or die $@;
+	#
+	#	clear out the loaded modules to start anew
+	#	
+	$classdocs-&gt;clear();
+	#
+	#	change the output path
+	#	
+	$oldpath = $classdocs-&gt;path( $newpath );
+
+</pre><h1 id="DESCRIPTION">DESCRIPTION </h1>
+
+<p>Using either an input filename, or source code as a scalar string,
+or a list of source directories,
+collects and scans the source code for classdoc formatted POD sections
+to retrieve classnames, base classes, exported and imported symbols,
+and public methods and members, as well as any classdoc markup tags. When
+all files have been processed, a subclassing/inheritance cross reference
+is generated, and the accumulated documentation is formatted
+into a HTML document and written to a classdoc directory, along with
+an optional index file.</p>
+
+<p>Where applicable, classdoc tags are the same as javadoc; see
+<a href="http://java.sun.com/j2se/javadoc/writingdoccomments/">http://java.sun.com/j2se/javadoc/writingdoccomments/</a>
+for a complete discussion.</p>
+
+<p>Note that the @version and @serial/@serialField/@serialData
+tags are not supported; @version is replaced by the package $VERSION
+variable, and @serial is not relevant.</p>
+
+<p>Also note that @param values are interpretted as hash-based
+arguments if the param name is not preceded by any of [$%@*&amp;].</p>
+
+<h2 id="Supported_Tags">Supported Tags</h2>
+
+<h4 id="author_i_Name_i">@author <i>Name</i></h4>
+
+<p>(package level only) Specifies package author</p>
+
+<h4 id="constructor">@constructor</h4>
+
+<p>(method level only) Specifies the method is a constructor</p>
+
+<h4 id="deprecated">@deprecated</h4>
+
+<p>Indicates the package or sub is deprecated.</p>
+
+<h4 id="exports_i_NAME_i_i_description_i">@exports <i>NAME</i>  <i>description</i></h4>
+
+<p>(package level only) List symbols exported by the package</p>
+
+<h4 id="ignore">@ignore</h4>
+
+<p>Omit the package/method from classdocs.</p>
+
+<h4 id="imports_i_NAME_i_i_description_i">@imports <i>NAME</i>  <i>description</i></h4>
+
+<p>(package level only) List symbols that can be imported by the package</p>
+
+<h4 id="instance_i_array_hash_scalar_handle_">@instance <i>array | hash | scalar | handle</i> </h4>
+
+<p>(package level only) Specifies the base type of an instance; useful
+when public members are specified (see <a href="#member">@member</a>)</p>
+
+<h4 id="member_i_NAME_i_i_description_i">@member <i>NAME</i>  <i>description</i></h4>
+
+<p>(package level only) List public members of class instances</p>
+
+<h4 id="optional_code_variable_code_i_descri">@optional <code>variable</code>  <i>description</i></h4>
+
+<p>(method level only) Specifies an optional parameter</p>
+
+<h4 id="param_code_variable_code_i_descripti">@param <code>variable</code>  <i>description</i></h4>
+
+<p>(method level only) Specifies a required parameter</p>
+
+<h4 id="return_i_description_i">@return <i>description</i></h4>
+
+<p>(method level only) Specifies returned value in scalar context</p>
+
+<h4 id="returnlist_i_description_i">@returnlist <i>description</i></h4>
+
+<p>(method level only) Specify returned values in list context
+(if different from scalar context)</p>
+
+<h4 id="see_i_URL_i">@see <i>URL</i></h4>
+
+<p>Specifies reference documentation links. Note that links to CPAN packages can be abbreviated
+as <code>&lt;cpan&gt;Package::Name&lt;/cpan&gt;</code>. Links to methods, members, and export or import
+symbols (either local to the class, or as part of another classdoc package)
+can be specified using the tags described in <a href="#Special_URL_Tags">Special URL Tags</a>.</p>
+
+<h4 id="self_code_objectvar_code">@self <code>$objectvar</code></h4>
+
+<p>Specify the conventional variable name used for the object's instance
+(e.g., '$this', '$self', '$obj', etc.)</p>
+
+<h4 id="simplex">@simplex</h4>
+
+<p>(method level only) to specify a simplex method (for <a href="http://search.cpan.org/perldoc?Thread%3A%3AApartment">Thread::Apartment</a> or
+<a href="http://search.cpan.org/perldoc?Thread%3A%3ASociable%3A%3AApartment">Thread::Sociable::Apartment</a> based packages)</p>
+
+<h4 id="since_i_date_i">@since <i>date</i></h4>
+
+<p>Specifies original version date.</p>
+
+<h4 id="static">@static</h4>
+
+<p>(method level only) Specifies the sub is a static class method (rather
+than an instance method).</p>
+
+<h4 id="urgent">@urgent</h4>
+
+<p>(method level only) Specifies an urgent method (for <a href="http://search.cpan.org/perldoc?Thread%3A%3AApartment">Thread::Apartment</a> or
+<a href="http://search.cpan.org/perldoc?Thread%3A%3ASociable%3A%3AApartment">Thread::Sociable::Apartment</a> based packages)</p>
+
+<h4 id="xs_code_method_name_code">@xs <code>method_name</code></h4>
+
+<p>(method level only) Specifies classdocs for XS methods (or any methods without a Perl implementation)</p>
+
+<h2 id="Source_Format">Source Format</h2>
+
+<p>Classdoc sections are introduced by <code>=begin classdoc</code> and closed by
+<code>=end classdoc</code> POD directives. Intervening lines are simple free format text,
+except that classdoc tags must be specified as the first element on a line.</p>
+
+<p>E.g.,</p>
+
+<pre>	=pod
+
+	=begin classdoc
+
+	@xs InCaseItsAnXSsub
+
+	Description of the class/interface/method
+	continues up to the first tag, or the end of the
+	classdoc section, and may include HTML tags
+
+	@author	D. Arnold
+	@since	2005-12-09
+	@see	&lt;a href=&quot;http://java.sun.com/j2se/javadoc/writingdoccomments/&quot;&gt;Javadoc Reference&lt;/a&gt;
+	@see	&lt;cpan&gt;Some::Module::On::CPAN&lt;/cpan&gt;
+	@see	&lt;method&gt;another_method&lt;/method&gt;
+	@see	&lt;method&gt;DBI::errstr&lt;/method&gt;
+	@instance hash
+	@self	$obj
+
+	@param  $myVal		a description of the parameter being passed
+		which may wrap to the next
+		few
+		lines
+	@optional $myOptional	a description of an optional parameter
+
+	@return	 the scalar return value description which
+		may flow onto the next lines
+
+	@returnlist	the list context return value description
+
+	=end classdoc
+
+	=cut
+
+</pre><p>A classdoc section immediately preceding a <code>package</code> keyword
+is assumed to be package level; all others are assumed to apply
+to the immediately succeding <code>sub</code>, except for classdocs
+which include an <code>@xs</code> qualifier.</p>
+
+<p>The output is formatted into</p>
+
+<ul>
+	<li>an introductory package/class description</li>
+	<li>a listing of exported and imported symbols, and any public instance members,
+with associated descriptions</li>
+	<li>a table of constructor and method summaries, which includes only an example
+of the method's usage, and the first sentence
+of the method's description text</li>
+	<li>a listing of constructor and method details, which provides the complete
+description and associated markup tags</li>
+</ul>
+
+<p>Note that hash-based parameter list
+elements are presented as &quot;Name =&gt; value,&quot;.</p>
+
+<h3 id="Special_URL_Tags">Special URL Tags</h3>
+
+<p>As a convenience, several special URL tags are supported, including</p>
+
+<dl>
+	<dt><strong>&lt;cpan&gt;</strong></dt>
+		<dd><p>&quot;&lt;cpan&gt;modulename&lt;/cpan&gt;&quot; will be expanded into
+the equivalent search.cpan.org URL hyperlink for the specified module name.</p></dd>
+	<dt><strong>&lt;export&gt;</strong></dt>
+		<dd><p>&quot;&lt;export&gt;name&lt;/export&gt;&quot; will be expanded into
+the equivalent internal hyperlink for the specified exported symbol.</p></dd>
+		<dd><p>&quot;&lt;export&gt;Some::Package::name&lt;/export&gt;&quot; will attempt expansion of the
+package name into a filepath, with the internal exports symbol link
+appended.</p></dd>
+	<dt><strong>&lt;import&gt;</strong></dt>
+		<dd><p>&quot;&lt;import&gt;name&lt;/import&gt;&quot; will be expanded into
+the equivalent internal hyperlink for the specified imported symbol.</p></dd>
+		<dd><p>&quot;&lt;import&gt;Some::Package::name&lt;/import&gt;&quot; will attempt expansion of the
+package name into a filepath, with the internal imports symbol link
+appended.</p></dd>
+	<dt><strong>&lt;member&gt;</strong></dt>
+		<dd><p>&quot;&lt;member&gt;name&lt;/member&gt;&quot; will be expanded into
+the equivalent internal hyperlink for the specified public instance member.</p></dd>
+		<dd><p>&quot;&lt;member&gt;Some::Package::name&lt;/member&gt;&quot; will attempt expansion of the
+package name into a filepath, with the internal member link
+appended.</p></dd>
+	<dt><strong>&lt;method&gt;</strong></dt>
+		<dd><p>&quot;&lt;method&gt;name&lt;/method&gt;&quot; will be expanded into
+the equivalent internal hyperlink for the specified public method.</p></dd>
+		<dd><p>&quot;&lt;method&gt;Some::Package::name&lt;/method&gt;&quot; will attempt expansion of the
+package name into a filepath, with the internal method link
+appended.</p></dd>
+		<dd><p>Constructors are tagged as methods.</p></dd>
+	<dt><strong>&lt;package&gt;</strong></dt>
+		<dd><p>&quot;&lt;package&gt;Some::Package&lt;/package&gt;&quot; will attempt expansion of the
+package name into a filepath.</p></dd>
+</dl>
+<h1 id="METHODS">METHODS </h1>
+
+<p>Refer to the included classdocs for method descriptions.</p>
+
+<h3 id="Notes">Notes</h3>
+
+<p>Note that <code>@param</code> and <code>@optional</code> tags should be specified
+in the order they are expected by the method (except for named
+parameter lists, which may be specified in any order).</p>
+
+<p>Also note that embedded HTML tags are preserved in the output, but embedded
+POD tags are <strong>NOT</strong> processed.</p>
+
+<h1 id="TO_DO">TO DO </h1>
+
+<ul>
+	<li>Support method prototype parsing.</li>
+	<li>Support method attribute specification.</li>
+</ul>
+
+<h1 id="SEE_ALSO">SEE ALSO </h1>
+
+<p><a href="http://search.cpan.org/perldoc?Pod%3A%3AClassDocs%3A%3AProject">Pod::ClassDocs::Project</a> - used to generate complete project
+documents from <a href="http://search.cpan.org/perldoc?Pod%3A%3AProjectDocs">Pod::ProjectDocs</a> output, merged with classdocs
+rendered from this module, and a table of contents rendered
+from <a href="http://search.cpan.org/perldoc?HTML%3A%3AListToTree">HTML::ListToTree</a>.</p>
+
+<p><a href="http://www.presicient.com/classdoc/classdocs">http://www.presicient.com/classdoc/classdocs</a> for an example
+of classdocs generated from this package.</p>
+
+<h1 id="AUTHOR_COPYRIGHT_and_LICENSE">AUTHOR, COPYRIGHT, and LICENSE </h1>
+
+<p>Copyright(C) 2007, Dean Arnold, Presicient Corp., USA. All rights reserved.</p>
+
+<p>Permission is granted to use this software under the same terms as Perl itself.
+Refer to the <a href="http://search.cpan.org/perldoc?perlartistic">Perl Artistic License</a> for details.</p>
+
+
+</div><div class="footer">generated by <a href="http://search.cpan.org/perldoc?Pod%3A%3AProjectDocs">Pod::ProjectDocs</a></div></body>
+</html>

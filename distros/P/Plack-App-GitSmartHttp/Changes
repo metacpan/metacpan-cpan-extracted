@@ -1,0 +1,23 @@
+Revision history for Perl extension Plack::App::GitSmartHttp
+
+0.07 2014-11-22T08:08:10Z
+        - add missing dependency module for test
+          https://github.com/dragon3/Plack-App-GitSmartHttp/issues/1
+
+0.06 2014-11-03T14:14:45Z
+        - minil migrate
+
+0.05    Wed Nov 21 23:49:11 JST 2012
+        - improve response handling ( fix bad on memory handling )
+
+0.04    Mon Oct 22 15:55:35 2012
+        - improve request body handling ( fix bad on memory handling )
+
+0.03    Wed Aug 15 13:46:41 2012
+        - fix gzipped request body handling
+
+0.02    Sat Mar  3 13:49:00 2012
+        - fix tests
+
+0.01    Thu Apr 28 15:39:53 2011
+        - original version

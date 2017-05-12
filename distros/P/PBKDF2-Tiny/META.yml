@@ -1,0 +1,48 @@
+---
+abstract: 'Minimalist PBKDF2 (RFC 2898) with HMAC-SHA1 or HMAC-SHA2'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Encode: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.88'
+  perl: '5.008'
+  utf8: '0'
+configure_requires:
+  Config: '0'
+  ExtUtils::MakeMaker: '6.17'
+  File::Spec: '0'
+  Text::ParseWords: '0'
+  perl: '5.004'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.142690'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PBKDF2-Tiny
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  PBKDF2::Tiny:
+    file: lib/PBKDF2/Tiny.pm
+    version: '0.005'
+requires:
+  Carp: '0'
+  Exporter: '5.57'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/PBKDF2-Tiny/issues
+  homepage: https://github.com/dagolden/PBKDF2-Tiny
+  repository: https://github.com/dagolden/PBKDF2-Tiny.git
+version: '0.005'
+x_authority: cpan:DAGOLDEN

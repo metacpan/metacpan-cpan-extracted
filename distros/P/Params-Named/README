@@ -1,0 +1,24 @@
+Params/Util version 1.0.2
+
+=========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  PadWalker
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Dan Brook
+
+This code is distributed under the same copyright terms as Perl itself.

@@ -1,0 +1,207 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Panotools::Makefile;
+use Panotools::Photos;
+
+my $path_makefile;
+my $deg_fov;
+my $help = 0;
+
+my @argv_save = @ARGV;
+my $mk = new Panotools::Makefile;
+
+GetOptions ('o|output=s' => \$path_makefile,
+            'v|fov=s' => \$deg_fov,
+            'h|help' => \$help);
+
+pod2usage (-verbose => 2) if $help;
+pod2usage (2) unless scalar @ARGV > 1;
+$path_makefile = 'Makefile' unless defined $path_makefile;
+
+my $rule = $mk->Rule ('.PHONY');
+$rule->Prerequisites (qw/all pointless chained bound filled cleaned pto images clean/);
+
+$rule = $mk->Rule ('all');
+$rule->Prerequisites ('pto');
+
+# some variable definitions
+
+$mk->Variable ('MAKE_EXTRA_ARGS');
+$mk->Variable ('PTO2MK', 'pto2mk');
+$mk->Variable ('MATCHNSHIFT', 'match-n-shift');
+$mk->Variable ('PTOMERGE', 'ptomerge');
+$mk->Variable ('PTOCHAIN', 'ptochain');
+$mk->Variable ('PTOBIND', 'ptobind');
+$mk->Variable ('PTOVARIABLE', 'ptovariable');
+$mk->Variable ('PTOFILL', 'ptofill');
+$mk->Variable ('AUTOOPTIMISER', 'autooptimiser');
+$mk->Variable ('CPCLEAN', 'cpclean');
+
+my $all_photos = new Panotools::Photos (@ARGV);
+
+$mk->Variable ('INPUT_IMAGES', $all_photos->Paths);
+$mk->Variable ('PREFIX', $all_photos->Stub);
+
+# some phony targets, prerequisites will be populated later
+
+$rule = $mk->Rule ('pointless');
+$rule->Prerequisites ('$(PREFIX).pointless.pto');
+$rule = $mk->Rule ('chained');
+$rule->Prerequisites ('$(PREFIX).chained.pto');
+$rule = $mk->Rule ('bound');
+$rule->Prerequisites ('$(PREFIX).bound.pto');
+$rule = $mk->Rule ('placed');
+$rule->Prerequisites ('$(PREFIX).placed.pto');
+$rule = $mk->Rule ('filled');
+$rule->Prerequisites ('$(PREFIX).filled.pto');
+$rule = $mk->Rule ('cleaned');
+$rule->Prerequisites ('$(PREFIX).cleaned.pto');
+$rule = $mk->Rule ('pto');
+$rule->Prerequisites ('$(PREFIX).pto');
+$rule = $mk->Rule ('images');
+$rule->Prerequisites ('$(PREFIX).tif');
+
+$mk->Comment ('Create a pointless project file from a list of photos');
+$rule = $mk->Rule ('$(PREFIX).pointless.pto');
+$rule->Prerequisites ('$(INPUT_IMAGES)');
+
+my @command = ('$(MATCHNSHIFT_SHELL)', '--output', '$(PREFIX_SHELL).pointless.pto', '--noransac');
+push @command, ('--fov', $deg_fov) if defined $deg_fov;
+push @command, ('$(INPUT_IMAGES_SHELL)');
+$rule->Command (@command);
+
+$mk->Comment ('Add points between consecutive photos');
+$rule = $mk->Rule ('$(PREFIX).chained.mk', '$(PREFIX).chained.pto');
+$rule->Prerequisites ('$(INPUT_IMAGES)', '$(PREFIX).pointless.pto');
+$rule->Command ('$(PTOCHAIN_SHELL)', '--makefile', '$(PREFIX_SHELL).chained.mk',
+                    '--output', '$(PREFIX_SHELL).chained.pto', '$(PREFIX_SHELL).pointless.pto');
+$rule->Command ('$(MAKE)', '-e', '$(MAKE_EXTRA_ARGS_SHELL)', '-f', '$(PREFIX_SHELL).chained.mk', '$(PREFIX_SHELL).chained.pto');
+
+$mk->Comment ('Try and connect ends of chains');
+$rule = $mk->Rule ('$(PREFIX).bound.mk', '$(PREFIX).bound.pto');
+$rule->Prerequisites ('$(INPUT_IMAGES)', '$(PREFIX).chained.pto');
+$rule->Command ('$(PTOBIND_SHELL)', '--makefile', '$(PREFIX_SHELL).bound.mk',
+                    '--output', '$(PREFIX_SHELL).bound.pto', '$(PREFIX_SHELL).chained.pto');
+$rule->Command ('$(MAKE)', '-e', '$(MAKE_EXTRA_ARGS_SHELL)', '-f', '$(PREFIX_SHELL).bound.mk', '$(PREFIX_SHELL).bound.pto');
+$rule->Command ('$(PTOVARIABLE_SHELL)', '--pitch', '--yaw', '-p', 0, '$(PREFIX_SHELL).bound.pto');
+
+$mk->Comment ('Optimise approximate positions');
+$rule = $mk->Rule ('$(PREFIX).placed.1.pto', '$(PREFIX).placed.pto');
+$rule->Prerequisites ('$(PREFIX).bound.pto', '$(PREFIX).pointless.pto');
+$rule->Command ('$(AUTOOPTIMISER_SHELL)', '-n', '-l', '-o', '$(PREFIX_SHELL).placed.1.pto', '$(PREFIX_SHELL).bound.pto');
+$rule->Command ('$(PTOMERGE_SHELL)', '$(PREFIX_SHELL).placed.1.pto', '$(PREFIX_SHELL).pointless.pto', '$(PREFIX_SHELL).placed.pto');
+
+$mk->Comment ('Add points to overlapping pairs');
+$rule = $mk->Rule ('$(PREFIX).filled.mk', '$(PREFIX).filled.pto');
+$rule->Prerequisites ('$(INPUT_IMAGES)', '$(PREFIX).placed.pto');
+$rule->Command ('$(PTOFILL_SHELL)', '--makefile', '$(PREFIX_SHELL).filled.mk', '-f', '1.0',
+                    '--output', '$(PREFIX_SHELL).filled.pto', '$(PREFIX_SHELL).placed.pto');
+$rule->Command ('$(MAKE)', '-e', '$(MAKE_EXTRA_ARGS_SHELL)', '-f', '$(PREFIX_SHELL).filled.mk', '$(PREFIX_SHELL).filled.pto');
+
+$mk->Comment ('Clean unlikely control points');
+$rule = $mk->Rule ('$(PREFIX).cleaned.pto');
+$rule->Prerequisites ('$(PREFIX).filled.pto');
+$rule->Command ('$(CPCLEAN_SHELL)', '-o', '$(PREFIX_SHELL).cleaned.pto', '$(PREFIX_SHELL).filled.pto');
+
+$mk->Comment ('Optimise final positions');
+$rule = $mk->Rule ('$(PREFIX).pto');
+$rule->Prerequisites ('$(PREFIX).cleaned.pto');
+$rule->Command ('$(AUTOOPTIMISER_SHELL)', '-a', '-l', '-s', '-o', '$(PREFIX_SHELL).pto', '$(PREFIX_SHELL).cleaned.pto');
+
+$mk->Comment ('Normal seam blended output');
+$rule = $mk->Rule ('$(PREFIX).pto.mk', '$(PREFIX).tif');
+$rule->Prerequisites ('$(PREFIX).pto', '$(INPUT_IMAGES)');
+$rule->Command ('$(PTO2MK_SHELL)', '-o', '$(PREFIX_SHELL).pto.mk', '-p', '$(PREFIX_SHELL)', '$(PREFIX_SHELL).pto');
+$rule->Command ('$(MAKE)', '-e', '$(MAKE_EXTRA_ARGS_SHELL)', '-f', '$(PREFIX_SHELL).pto.mk', '$(PREFIX_SHELL).tif');
+
+$mk->Comment ('Rule to delete all intermediate files');
+$rule = $mk->Rule ('clean');
+$rule->Command ('$(MAKE)', '-e', '-f', '$(PREFIX_SHELL).chained.mk', 'clean');
+$rule->Command ('$(MAKE)', '-e', '-f', '$(PREFIX_SHELL).bound.mk', 'clean');
+$rule->Command ('$(MAKE)', '-e', '-f', '$(PREFIX_SHELL).filled.mk', 'clean');
+$rule->Command ('$(MAKE)', '-e', '-f', '$(PREFIX_SHELL).pto.mk', 'clean');
+
+$rule = $mk->Rule;
+$rule->Targets ($path_makefile);
+$rule->Prerequisites (@ARGV);
+$rule->Command ($0, @argv_save);
+
+$mk->Write ($path_makefile);
+
+__END__
+
+=head1 NAME
+
+gigastart - assemble multi-row panoramas
+
+=head1 SYNOPSIS
+
+gigastart [options] image1 image2 [...]
+
+ Options:
+  -o | --output name    Filename of created Makefile. Otherwise defaults
+                        to 'Makefile'
+  -v | --fov            Horizontal field of view in degrees.  Otherwise
+                        will be calculated from EXIF info.
+  -h | --help           Outputs help documentation.
+
+=head1 DESCRIPTION
+
+B<gigastart> takes a list of image files and creates a Makefile
+containing rules to generate a single panorama from the images.
+
+It utilises a multi-step strategy:
+
+1. Consecutive pairs of photos are linked into one or more chains.
+2. Photos from the ends of each chain are linked if possible.
+3. Photos are placed in a rough grid with approximate positions.
+4. overlapping images with no links are linked if possible.
+5. Positions are optimised
+
+This approach has some advantages:
+
+The number of connections checked is directly proportional to the number of
+images, so a 200 photo panorama should take twice as long as a 100 photo
+panorama.
+
+Different shooting strategies are supported: multi-row, zig-zag,
+middle-top-bottom row-ordering, different number of photos in each row,
+multiple angle-of-view.
+
+Feature points are only identified once per photo and are reused.
+
+The process is very suited to parallel processing, simply set the maximum
+number of processes by redefining the $MAKE built-in variable, e.g:
+
+  make MAKE='make -j 16'
+
+Each step and photo pair is written as an intermediate .pto project, so any
+problems can be fixed at this level, rerunning make will only repeat work
+required to integrate those changes - The entire process does not need to be
+rerun.
+
+A disadvantage is that features are identified by B<generatekeys> and matched
+by B<autopano> from the B<autopano-sift-C> package.  These features are saved
+in a verbose XML file format which adds a significant IO overhead, a future
+improvement could be to use a different caching format for these files.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+=head1 AUTHOR
+
+Bruno Postle - December 2009.
+
+=cut

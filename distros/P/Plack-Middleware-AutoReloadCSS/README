@@ -1,0 +1,26 @@
+NAME
+    Plack::Middleware::AutoReloadCSS - Enables CSS Refreshing without
+    Reloading Whole Page
+
+SYNOPSIS
+      # in your app.psgi
+      enable 'AutoReloadCSS', interval => 1000;
+
+DESCRIPTION
+    Plack::Middleware::AutoReloadCSS automatically inserts some JavaScript
+    snippets to enable CSS refreshing feature without reloading whole page.
+
+AUTHOR
+    *   Kentaro Kuribayashi <kentarok@gmail.com>
+
+    *   Nikita Vasilyev
+
+        CSS auto-reload is borrowed from
+        <http://nv.github.com/css_auto-reload/>
+
+LICENSE
+    Copyright (C) Kentaro Kuribayashi
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

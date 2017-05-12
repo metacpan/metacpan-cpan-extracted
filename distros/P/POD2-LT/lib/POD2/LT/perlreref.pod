@@ -1,0 +1,290 @@
+=encoding iso-8859-13
+
+=head1 PAVADINIMAS (NAME)
+
+perlreref - Perlo ápraiðkø þinynas
+
+=head1 APRAÐYMAS (DESCRIPTION)
+
+Tai trumpas Perlo ápraiðkø þinynas. Pilnos informacijos apie 
+ápraiðkas ieðkokite L<perlre> ir L<perlop> dokumentacijos skyriuose, 
+o taip pat ðio þinyno L<references|/"TOLIMESNË INFORMACIJA"> skyriuje.
+
+=head1 OPERATORIAI
+
+  =~ nustato kuriam kintamajam taikyti ðablonà.
+     Jei nenurodoma, naudoja $_                      
+
+        $var =~ /foo/;                             
+
+  m/ápraiðka/igmsoxc ieðko simboliø eilutëje ápraiðkos atitikimo,
+     su ðiais galimais nustatymais:
+
+        i  Nekreipiant dëmesio á didþiàsias/maþàsias raides
+        g  Globalus - visi atitikimai
+        m  Per kelias eilutes - ^ ir $ atitinka vidines eilutes
+        s  Taikyti kaip vienai eilutei - . atitinka \n
+        o  Kompiliuoja ápraiðkà tik vienà kartà
+        x  Iðplëstinës ápraiðkos - galima naudoti tarpus ir komentarus
+        c  Neatitaisyti pos kai ápraiðka neatitinka eilutës naudojant /g
+
+     Jei 'ápraiðka' yra tuðèia eilutë, vietoje jos naudojama paskutinë 
+     I<sëkmingai> atitikusi ápraiðka. Galima naudoti ir kitokius skirtukus 
+     nei '/' tiek ðitam operatoriui, tiek ir þemiau apraðytiesiems.
+
+  qr/ápraiðka/imsox leidþia iðsaugoti ápraiðkà á kintamàjá ar perduoti á 
+     funkcijà. Modifikatoriai saugomi kartu su ápraiðka, kaip ir m// atveju.
+
+  s/ápraiðka/pakeitimas/igmsoxe pakeièia simboliø eilutëje atitikusias 
+     'ápraiðkà' dalis á 'pakeitimà'. Modifikatoriai tokie patys kaip ir
+     m// atveju, tik su vienu papildymu:
+
+        e  Ávykdyti 'pakeitimà' kaip Perlo kodà
+
+     'e' gali bûti nurodytas ir keletà kartø. 'pakeitimas' yra 
+     interpretuojamas kaip simboliø eilutë tarp dvigubø kabuèiø, nebent ðio 
+     operatoriaus skirtukas yra vienguba kabutë (').
+
+  ?ápraiðka? lygiai taip pat kaip m/ápraiðka/ taèiau atitinka tik vienà kartà.
+     Negalima naudoti jokiø kitø skirtukø. Turi bûti atstatyta su 'reset'.
+
+=head1 SINTAKSË
+
+   \       Iðvengia tuoj po jo einanèio simbolio meta-reikðmës
+   .       Atitinka bet kurá vienà simbolá iðskyrus naujos eilutës simbolá
+	   (nebent naudojamas /s modifikatorius)
+   ^       Atitinka teksto pradþià (arba eilutës pradþià, jei naudojamas /m)
+   $       Atitinka teksto pabaigà (arba eilutës pabaigà, jei naudojamas /m)
+   *       Atitinka prieð tai einantá elementà 0 ar daugiau kartø
+   +       Atitinka prieð tai einantá elementà 1 ar daugiau kartø
+   ?       Atitinka prieð tai einantá elementà 0 ar 1 kartø
+   {...}   Nurodo prieð tai einanèio elemento pasikartojimø intervalà
+   [...]   Atitinka kurá nors simbolá ir nurodytos aibës
+   (...)   Sugrupuoja iðraiðkas ir priskiria jø rezultatus $1, $2...
+   (?:...) Sugrupuoja iðraiðkas be rezultatø priskyrimo
+   |       Atitinka iðraiðkà ið deðinës ARBA ið kairës (alternatyva)
+   \1, \2 ...  Tekstas ið N-tosios grupës
+
+=head2 SPECIALIOSIOS SEKOS
+
+Ðios sekos veikia taip kaip ir paprastose simboliø eilutëse:
+
+   \a       Skambutis
+   \e       Escape
+   \f       Formfeed
+   \n       Newline - nauja eilutë
+   \r       Carriage return
+   \t       Tab
+   \038     Bet kuri aðtuonetainë ASCII reikðmë
+   \x7f     Bet kuri ðeðioliktainë ASCII reikðmë
+   \x{263a} Plati ðeðioliktainë reikðmë
+   \cx      Control-x
+   \N{name} Vardinis simbolis
+
+   \l  Maþosios raidës iki kito simbolio
+   \u  Didþiosios raidës iki kito simbolio
+   \L  Maþosios raidës iki \E
+   \U  Didþiosios raidës iki \E
+   \Q  Iðjungia metasimbolius iki \E
+   \E  Didþiøjø/maþøjø raidþiø transformavimo pabaiga
+
+Ði seka veikia skirtingai nei simboliø eilutëse:
+
+   \b  Þodþio riba, o ne "backspace", iðskyrus simboliø aibëse
+
+=head2 SIMBOLIØ AIBËS
+
+   [amy]    Atitinka 'a', 'm' ar 'y'
+   [f-j]    Brûkðnelis nurodo "intervalà"
+   [f-j-]   Brûkðnelis paèioje pradþioje ar pabaigoje reiðkia brûkðnelá
+   [^f-j]   Stogelio þenklas reiðkia "atitinka viskà kas NËRA aibëje"
+
+Ðios sekos veikia tiek aibëse, tiek ir uþ jø:
+
+   \d      Skaitmuo, tas pats kaip [0-9]
+   \D      Ne skaitmuo, tas pats [^0-9]
+   \w      Raidës arba skaièiaus simbolis, tas pats kaip [a-zA-Z_0-9]
+   \W      Ne raidë ir ne skaièius, [^a-zA-Z_0-9]
+   \s      "Baltas" simbolis, tas pats kaip [ \t\n\r\f]
+   \S      "Nebaltas" simbolis, [^ \t\n\r\f]
+   \C      Atitinka baità (Unikode '.' atitinka simbolá)
+   \pP     Atitinka P-vardo (Unikodinæ) savybæ
+   \p{...} Atitinka Unikodo savybæ ilgu pavadinimu
+   \PP     Atitinka ne-P savybæ
+   \P{...} Atitinka ne-P unikodinæ savybæ ilgu pavadinimu
+   \X      Atitinka iðplëstinæ Unikodinæ sekà
+
+POSIX simboliø aibës bei jø Unikodiniai bei Perlo atitikmenys
+
+   alnum   IsAlnum             Raidës ir skaièiai
+   alpha   IsAlpha             Raidës
+   ascii   IsASCII             Bet koks ASCII simbolis
+   blank   IsSpace  [ \t]      horizontalûs "balti" simboliai (GNU)
+   cntrl   IsCntrl             Konrolës simboliai
+   digit   IsDigit  \d         Skaitmenys
+   graph   IsGraph             Raidës, skaièiai ir skyryba
+   lower   IsLower             Maþosios raidës (pagal lokalæ)
+   print   IsPrint             Raidës, skaièiai, skyryba, tarpø simboliai
+   punct   IsPunct             Skyryba
+   space   IsSpace  [\s\ck]    "Balti" simboliai
+           IsSpacePerl   \s    "Balti" simboliai pagal Perlo apibrëþimà
+   upper   IsUpper             Didþiosios raidës (pagal lokalæ)
+   word    IsWord   \w         Raidës, skaièiai ir _ (Perlas)
+   xdigit  IsXDigit [\dA-Fa-f] Ðeðioliktainis skaitmuo
+
+Simboliø aibëse:
+
+    POSIX       tradicinis    Unikodas
+    [:digit:]       \d        \p{IsDigit}
+    [:^digit:]      \D        \P{IsDigit}
+
+=head2 INKARAI
+
+Visos ðios sekos tik nurodo kurioje vietoje reikia taikyti ðablonà.
+
+   ^  Atitinka teksto pradþià (arba eilutës, jei naudojamas /m)
+   $  Atitinka teksto pabaigà (arba eilutës, jei naudojamas /m) arba prieð naujà eilutæ
+   \b Atitinka þodþio ribà (tarp \w ir \W)
+   \B Atitinka ne þodþio ribà
+   \A Atitinka teksto pradþià (nekreipia dëmesio á /m)
+   \Z Atitinka teksto pabaigà (prieð pabaigà einanèià nebûtinà \n)
+   \z Atitinka absoliuèià teksto pabaigà
+   \G Atitinka tà vietà, kurioje darbà baigë paskutinis m//g 
+   \c Ið naujo nenustatinëja paieðkos vietos kai naudojamas /g.
+      Be \c, kiekvienà kartà pradedama ieðkoti nuo pradþios
+
+=head2 KIEKINËS SEKOS
+
+Kiekinës sekos automatiðkai atitinka B<ilgiausià> sekà ið kairës.
+
+   Maksimalu Minimalu Leidþiamas intervalas
+   --------- -------- ---------------------
+   {n,m}     {n,m}?  Turi bûti ne maþiau kaip n kartø, bet ne daugiau nei m kartø
+   {n,}      {n,}?   Turi bûti bent n kartø
+   {n}       {n}?    Turi bûti lygiai n kartus
+   *         *?      0 arba daugiau kartø (tas pats kaip {0,})
+   +         +?      1 arba daugiau kartø (tas pats kaip {1,})
+   ?         ??      0 arba 1 kartà (tas pats kaip {0,1})
+
+=head2 IÐPLËSTINËS SEKOS
+
+   (?#tekstas)        Komentaras
+   (?imxs-imsx:...)   Ájungia/iðjungia nustatymà (taip kaip ir m//)
+   (?=...)            Nulinio ilgio teigiamas sprendinys uþ ðios vietos
+   (?!...)            Nulinio ilgio neigiamas sprendinys uþ ðios vietos
+   (?<...)            Nulinio ilgio teigiamas sprendinys prieð ðià vietà
+   (?<!...)           Nulinio ilgio neigiamas sprendinys prieð ðià vietà
+   (?>...)            Atitikti kiek galima daugiau nesaugant reikðmiø kintamuosiuose
+   (?{ kodas })       Áterptas kodas, gràþinta reikðmë tampa $^R
+   (??{ kodas })      Dinaminë ápraiðka, gràþinta reikðmë panaudojama kaip ápraiðka
+   (?(sàlyga)taip|ne) Sàlyga yra skaièius atitinkantis skliaustelius
+   (?(sàlyga)taip)       
+
+=head1 KINTAMIEJI
+
+   $_    Kintamais pagal nutylëjimà, kurá naudoja operatoriai
+   $*    Ájungia ðablonø taikymà keletui eiluèiø (nenaudotinas; nebëra 5.8.1+ versijose)
+
+   $&    Visa simboliø eilutë, kuri atitiko
+   $`    Viskas iki atitikusio simboliø eilutës
+   $'    Viskas po atitikusios simboliø eilutës
+
+Ðiø trijø kintamøjø vartojimas sulëtins B<visas> ápraiðkas jûsø programoje.
+Pasiskaitykite L<perlvar> dokumentacijà apie C<@LAST_MATCH_START>
+masyvà bei kà daryti kad sulëtëjimo nebûtø.
+Taip pat þiûrëkite L<Devel::SawAmpersand> modulio dokumentacijà.
+
+   $1, $2 ...  saugo n-tàjà iðsaugotà sekà
+   $+    Paskutinë skliausteliuose iðsaugota seka
+   $^N   Holds the most recently closed capture
+   $^R   Saugo (?{...}) iðraiðkos rezultatà
+   @-    Saugo grupiø pradþios vietas. $-[0] saugo viso atitikimo pradþià
+   @+    Saugo grupiø pabaigos vietas. $+[0] saugo viso atitikimo pabaigà
+
+Grupës yra numeruojamos pagal I<atsidaranèius> skliaustelius.
+
+=head1 FUNKCIJOS
+
+   lc          Pakeisti simboliø eilutæ á maþàsias raides
+   lcfirst     Pakeisti simboliø eilutës pirmà simbolá á maþàjá raidæ
+   uc          Pakeisti simboliø eilutæ á didþiàsias raides
+   ucfirst     Pakeisti simboliø eilutës pirmà simboliá á didþiàjà raidæ
+   pos         Gràþinti arba nustatyti dabartinæ ápraiðkos atitikimo vietà
+   quotemeta   Iðvengti meta simboliø
+   reset       Reset ?pattern? status
+   study       Analyze string for optimizing matching
+
+   split       Use regex to split a string into parts
+
+=head1 AUTORIUS
+
+Iain Truskett.
+
+Ðis dokumentas platinamas tokiomis pat sàlygomis kaip ir pats Perlas.
+
+Vertë: Petras Kudaras, 2003-2004
+
+=head1 TOLIMESNË INFORMACIJA
+
+=over 4
+
+=item *
+
+L<perlretut> pamokos apie ápraiðkas.
+
+=item *
+
+L<perlrequick> greitos pamokos apie ápraiðkas.
+
+=item *
+
+L<perlre> detalesnei informacijai.
+
+=item *
+
+L<perlvar> detalesnei informacijai apie kintamuosius.
+
+=item *
+
+L<perlop> detalesnei informacijai apie operatorius.
+
+=item *
+
+L<perlfunc> detalesnei informacijai apie funkcijas.
+
+=item *
+
+L<perlfaq6> daþnai uþduodamiems klausimams apie ápraiðkas.
+
+=item *
+
+L<re> modulio, kuris pakeièia ápraiðkø veikimà ir padeda jas 
+iðriktinti, dokumentacija.
+
+=item *
+
+L<perldebug/"Ápraiðkø iðriktinimas">
+
+=item *
+
+L<perluniintro>, L<perlunicode>, L<charnames> ir L<locale>
+detalesnei informacijai apie ápraiðkas ir internacionalizacijà.
+
+=item *
+
+I<Mastering Regular Expressions>, Jeffrey Friedl
+(L<http://regex.info/>) geram ápraiðkø supratimui.
+
+=back
+
+=head1 DËKUI
+
+David P.C. Wollmann,
+Richard Soderberg,
+Sean M. Burke,
+Tom Christiansen,
+Jim Cromie,
+ir
+Jeffrey Goff
+uþ naudingus patarimus.
+

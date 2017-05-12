@@ -1,0 +1,104 @@
+#!/usr/local/bin/perl -w
+
+print "Hello world\n";
+exit 0;
+
+=pod
+
+blah bla
+
+=head1 NAME
+
+har - blagh
+L<The B<great> perlE<sol> interpreter|perl>
+post link
+
+=cut
+
+print "Some more code\n";
+
+=head2 BLAH
+
+Here we have some spurious nesting B<bold C<and bolder not> so bold> and
+normal.
+
+Simple italic: This is normal and I<here is an emphasis with an I<EMPHASIS> within> back again.
+
+Italic nesting I<bold C<and I<bolder> not> so bold> and normal.
+
+=over 4
+
+We start with a plain par.
+
+=item first
+
+111 C<beginning>
+
+=item second
+
+222 before unrec !! after unrec
+
+See also L<"BLAH">.
+
+=item third
+
+333 normal I<italic E<gt>> norMal
+
+These are not ok:
+L</hghgh>
+L<"hhhh">
+L<"BLAH">
+L</first>
+
+=item fourth
+
+aha B<lala <openE<gt>closeCE<lt>hahaE<gt>end>
+
+See also L<"ERRORS"> and L</444>.
+
+=item fifth
+
+this Z<> is ok.
+This Z<> has contents.
+This one Z<> too.
+See also L</fourth>.
+
+=item sixth
+
+a URL link L<http://www.perl.org>
+and L<The Perl Home Page|http://www.perl.org>
+
+=back
+
+And now for an index entry X<444>.
+
+=head1 WARNINGS
+
+This link is evil L<haha/the < operator>.
+And L<hoho/the E<gt> operator>.
+
+=over 4
+
+=item Z<>* this is a bullet
+
+A par in a bullet.
+
+=item Z<>* this is another bullet
+
+la la la
+
+=item Z<>2. number
+
+blah blah
+
+=item my_definition
+
+A definition item!
+
+=back
+
+=head1 ERRORS
+
+lala lala
+
+=cut

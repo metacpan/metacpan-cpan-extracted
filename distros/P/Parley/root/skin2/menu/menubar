@@ -1,0 +1,157 @@
+<!-- menubar (YUI) -->
+[%- IF NOT current_forum  %][% SET  forum_disabled=' disabled' %][% END %]
+[%- IF NOT current_thread %][% SET thread_disabled=' disabled' %][% END %]
+<!-- Page-specific script -->
+<script type="text/javascript">
+    // Initialize and render the menu bar when it is available in the DOM
+    YAHOO.util.Event.onContentReady("parley_navbar", function () { var
+    oMenuBar = new YAHOO.widget.MenuBar("parley_navbar", { autosubmenudisplay: false, hidedelay: 250, lazyload: true }); oMenuBar.render();
+    });
+</script>
+
+<!-- start: stack grids here -->
+<div id="parley_navbar" class="yuimenubar yuimenubarnav">
+    <div class="bd">
+        <ul class="first-of-type">
+            <li class="yuimenubaritem first-of-type"><a class="yuimenubaritemlabel" href="#">[%l('Go')%]</a>
+                <div id="menu_go" class="yuimenu">
+                    <div class="bd">                                        
+                        <ul>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="[%c.request.base%]">[%l('Main Page')%]</a></li>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="[%c.request.base%]forum/list">[%l('Forum Summary')%]</a></li>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="[%c.request.base%]thread/recent">[%l('Recently Updated Threads')%]</a></li>
+                        </ul>
+
+                        <ul>
+                            [% WHILE (forum = available_forums.next) %]
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="forum/view?forum=[%forum.id%]">[% forum.name %]</a></li>
+                            [% END %]
+                        </ul>
+                    </div>
+                </div>                                        
+            </li>
+            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="#">[%l('Forum')%]</a>
+                <div id="menu_forum" class="yuimenu">
+                    <div class="bd">                                        
+                        [% IF current_forum %]
+                        <h6 class="first-of-type">[% ForumCode.escape(current_forum.name) %]</h6>
+                        [% END %]
+                        <ul>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel[%forum_disabled%]" href="[%IF forum_disabled%]#[%ELSE%]forum/view?forum=[%current_forum.id%][%END%]">[%l('View Threads')%]</a></li>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel[%forum_disabled%]" href="[%IF forum_disabled%]#[%ELSE%]thread/add?forum=[%current_forum.id%][%END%]">[%l('Create New Thread')%]</a></li>
+                        </ul>
+                    </div>
+                </div>                                        
+            </li>
+            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="#">[%l('Thread')%]</a>
+                <div id="menu_thread" class="yuimenu">
+                    <div class="bd">                                        
+                        [% IF current_thread %]
+                        <h6 class="first-of-type">[%ForumCode.escape(current_thread.subject)|truncate(25)%]</h6>
+                        [% END %]
+                        <ul>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel[%thread_disabled%]" href="[%IF thread_disabled%]#[%ELSE%]thread/reply?thread=[%current_thread.id%][%END%]">[%l('Add Reply')%]</a></li>
+                            [%- IF watching_thread %]
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel[%thread_disabled%]" href="[%IF thread_disabled%]#[%ELSE%]thread/watch?thread=[%current_thread.id%]&amp;page=[%page.current_page%]&amp;watch=0[%END%]">[%l('Remove Watch')%]</a></li>
+                            [%- ELSE %]
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel[%thread_disabled%]" href="[%IF thread_disabled%]#[%ELSE%]thread/watch?thread=[%current_thread.id%]&amp;page=[%page.current_page%]&amp;watch=1[%END%]">[%l('Add Watch')%]</a></li>
+                            [%- END %]
+                        </ul>
+                        <ul>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel[%forum_disabled%]" href="[%IF forum_disabled%]#[%ELSE%]thread/add?forum=[%current_forum.id%][%END%]">[%l('Create New Thread')%]</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </li>
+
+            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="javascript:YAHOO.parley.search.search_dialog.show();">[%l('Search')%]</a>
+            </li>
+
+            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="#">[%l('Me')%]</a>
+                <div id="menu_my" class="yuimenu">
+                    <div class="bd">                                        
+                        [% IF authed_user %]
+                        <ul>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="my/preferences">[%l('My Preferences')%]</a></li>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="thread/watches">[%l('My Watched Threads')%]</a></li>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="user/profile?user=[%authed_user.id%]">[%l('My Profile')%]</a></li>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="user/logout">[%l('Logout')%]</a></li>
+                        </ul>
+                        [% ELSE %]
+                        <ul>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="javascript:YAHOO.parley.login.login_dialog.show();">[%l('Login')%]</a></li>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="user/signup">[%l('Register')%]</a></li>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="user/password/forgotten">[%l('Password Reminder')%]</a></li>
+                        </ul>
+                        [% END %]
+                    </div>
+                </div>                                        
+            </li>
+            [% IF moderator %]
+            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="#">[%l('Moderate')%]</a>
+                <div id="menu_moderate" class="yuimenu">
+                    <div class="bd">                                        
+                        <ul>
+                            [% IF current_thread.locked %]
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="admin/lock?thread=[%current_thread.id%]&amp;lock=0">[%l('Unlock Thread')%]</a></li>
+                            [% ELSE %]
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="admin/lock?thread=[%current_thread.id%]&amp;lock=1">[%l('Lock Thread')%]</a></li>
+                            [% END %]
+
+                            [% IF current_thread.sticky %]
+                            <li class="yuimenuitem"><a
+                            class="yuimenuitemlabel" href="admin/sticky?thread=[%current_thread.id%]&amp;sticky=0">[%l('Unstick Thread')%]</a></li>
+                            [% ELSE %]
+                            <li class="yuimenuitem"><a
+                            class="yuimenuitemlabel" href="admin/sticky?thread=[%current_thread.id%]&amp;sticky=1">[%l('Stick Thread')%]</a></li>
+                            [% END %]
+                        </ul>
+                    </div>
+                </div>                                        
+            </li>
+            [% END %]
+            [% IF authed_user.can_view_site_menu %]
+            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="#">[%l('Site')%]</a>
+                <div id="menu_site_moderate" class="yuimenu">
+                    <div class="bd">                                        
+                        <ul>
+                            [% IF authed_user.is_site_moderator %]
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="terms/add">[%l('Add T-and-Cs')%]</a></li>
+                            [% END %]
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="#">[%l('Manage')%]</a>
+                                <div id="site" class="yuimenu">
+                                    <div class="bd">
+                                        <ul class="first-of-type">
+                                            [% IF authed_user.is_site_moderator %]
+                                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="site/services">[%l('Services')%]</a></li>
+                                            [% END %]
+                                            [% IF authed_user.is_site_moderator %]
+                                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="site/users">[%l('Users')%]</a></li>
+                                            [% END %]
+                                            [% IF authed_user.can_ip_ban %]
+                                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="site/ip_bans">[%l('IP Bans')%]</a></li>
+                                            [% END %]
+                                        </ul>            
+                                    </div>
+                                </div>                    
+                            </li>
+                        </ul>
+                    </div>
+                </div>                                        
+            </li>
+            [% END %]
+            <li class="yuimenubaritem"><a class="yuimenubaritemlabel" href="#">[%l('Help')%]</a>
+                <div id="menu_help" class="yuimenu">
+                    <div class="bd">                                        
+                        <ul>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="help">[%l('Contents')%]</a></li>
+                        </ul>
+                        <ul>
+                            <li class="yuimenuitem"><a class="yuimenuitemlabel" href="terms">[%l('Terms and Conditions')%]</a></li>
+                        </ul>
+                    </div>
+                </div>                                        
+            </li>
+        </ul>            
+    </div>
+</div>

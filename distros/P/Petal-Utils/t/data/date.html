@@ -1,0 +1,13 @@
+<html xmlns:tal="http://purl.org/petal/1.0/">
+	<body>
+		<p>
+			<!--? Dates & conversion -->
+			date = <span tal:replace="date: $date">date</span>
+			date1 = <span tal:replace="us_date: $date1">2003-09-05</span>
+			date2 = <span tal:replace="us_date: $date2">2003/09/05</span>
+			date3 = <span tal:replace="us_date: $date3">20030905</span>
+			date4 = <span tal:replace="us_date: $date3 --">20030905</span>
+		</p>
+	</body>
+</html>
+

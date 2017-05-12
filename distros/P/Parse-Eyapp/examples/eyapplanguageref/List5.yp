@@ -1,0 +1,14 @@
+%semantic token 'c' 
+%tree
+%%
+S: 'c' 'c'? 
+     { 
+       print $_[2]->str."\n";
+       print $_[2]->child(0)->attr."\n" if $_[2]->children;
+    }
+;
+
+%%
+# eyapp -C List5.yp
+# ./List5.pm -c 'cc'
+

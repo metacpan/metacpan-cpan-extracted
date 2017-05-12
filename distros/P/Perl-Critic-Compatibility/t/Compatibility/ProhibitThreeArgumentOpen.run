@@ -1,0 +1,66 @@
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/Perl-Critic-Compatibility/t/Compatibility/ProhibitThreeArgumentOpen.run $
+#     $Date: 2008-04-13 13:21:52 -0500 (Sun, 13 Apr 2008) $
+#   $Author: clonezone $
+# $Revision: 2221 $
+
+## name Basic passing
+## failures 0
+## cut
+
+open FILE, '<thingy'
+    or die 'blah';
+
+
+## name Basic failure
+## failures 2
+## cut
+
+open FILE, '<', 'thingy'
+    or die 'blah';
+
+open my $file, '<', 'thingy'
+    or die 'blah';
+
+
+## name Passing with declared perl version.
+## failures 0
+## cut
+
+use 5.006;
+
+open FILE, '<', 'thingy'
+    or die 'blah';
+
+open my $file, '<', 'thingy'
+    or die 'blah';
+
+
+## name Passing with declared perl v-string.
+## failures 0
+## cut
+
+require 5.8.8;
+
+open FILE, '<', 'thingy'
+    or die 'blah';
+
+open my $file, '<', 'thingy'
+    or die 'blah';
+
+
+## name Failure with declared perl version.
+## failures 2
+## cut
+
+use 5.005;
+
+open FILE, '<', 'thingy'
+    or die 'blah';
+
+open my $file, '<', 'thingy'
+    or die 'blah';
+
+
+# setup vim: set filetype=perl tabstop=4 softtabstop=4 expandtab :
+# setup vim: set shiftwidth=4 shiftround textwidth=78 nowrap autoindent :
+# setup vim: set foldmethod=indent foldlevel=0 :

@@ -1,0 +1,41 @@
+{
+   "abstract" : "Plack middleware to handle X-Forwarded-For headers",
+   "author" : [
+      "Graham Barr"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-XForwardedFor",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Net::Netmask" : "1.9015",
+            "Plack" : "0.9913",
+            "Regexp::Common" : "2010010201",
+            "parent" : "0.223"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gbarr/Plack-Middleware-XForwardedFor.git",
+         "web" : "http://github.com/gbarr/Plack-Middleware-XForwardedFor"
+      }
+   },
+   "version" : "0.103060"
+}
+

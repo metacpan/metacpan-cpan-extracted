@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+
+use Getopt::Long qw(GetOptions);
+use Pod::Usage qw(pod2usage);
+
+# This is a command line script to use the capabilities of this package
+# with a temporary API and a temporary name!
+
+pod2usage() if not @ARGV;
+my %opt;
+GetOptions(\%opt,
+	'inplace',
+	'RenameVariable',
+	'line=i',
+	'column=i',
+	'replacement=s',
+	'to-camel-case=s',
+
+	'help',
+) or pod2usage();
+pod2usage() if $opt{help};
+
+if ($opt{RenameVariable}) {
+	require PPIx::EditorTools::RenameVariable;
+	my $file = shift @ARGV;
+
+	my $code = read_file($file);
+
+	my %param;
+	if (exists $opt{replacement}) {
+		$param{replacement} = $opt{replacement};
+	} elsif (exists $opt{'to-camel-case'}) {
+		$param{'to_camel_case'} = $opt{'to-camel-case'};
+	} else {
+		die 'Need eiher replacement or to-camel-case';
+	}
+
+
+	my $result =
+		PPIx::EditorTools::RenameVariable->new->rename(
+			code        => $code,
+			line        => $opt{line},
+			column      => $opt{column},
+			%param,
+		)->code;
+	;
+	write_file($file, $result);
+} else {
+	pod2usage();
+}
+
+exit;
+
+
+sub read_file {
+	my ($file) = @_;
+	open my $in, '<', $file or die "Could not open file '$file' for reading: $!";
+	local $/ = undef;
+	return <$in>;
+}
+
+sub write_file {
+	my ($file, $data) = @_;
+	open my $out, '>', $file or die;
+	print $out $data;
+}
+
+
+=head1 NAME
+
+ppix_editortools - command line interface for the PPIx::EditorTools
+
+=head1 SYNOPSIS
+
+  --RenameVariable --line 8 column 12 --replacement NEW_NAME --inplace
+
+
+=cut
+

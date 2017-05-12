@@ -1,0 +1,997 @@
+=encoding iso-8859-1
+
+=head1 NAME/NOM
+
+perldebug - Débogage de Perl
+
+=head1 DESCRIPTION
+
+Tout d'abord, avez-vous essayé d'utiliser l'option B<-w>E<nbsp>?
+
+=head1 Le Débogueur Perl
+
+Si vous invoquez Perl avec l'option B<-d>, votre script tournera dans le
+débogueur de sources Perl. Il fonctionne comme un environnement Perl
+interactif, demandant des commandes de débogage qui vous laissent examiner le
+code source, placer des points d'arrêt, obtenir des traces des états passés de
+la pile, changer les valeurs des variables, etc. C'est si pratique que vous
+lancez souvent le débogueur tout seul juste pour tester interactivement des
+constructions en Perl afin de voir ce qu'elles font. Par exempleE<nbsp>:
+
+    $ perl -d -e 42
+
+En Perl, le débogueur n'est pas un programme séparé à la façon dont c'est
+habituellement le cas dans l'environnement compilé typique. À la place,
+l'option B<-d> dit au compilateur d'insérer des informations sur le source
+dans les arbres d'analyse qu'il va donner à l'interpréteur. Cela signfie que
+votre code doit d'abord se compiler correctement pour que le débogueur
+travaille dessus. Puis lorsque l'interpréteur démarre, il précharge une
+bibliothèque Perl spéciale contenant le débogueur lui-même.
+
+Le programme s'arrêtera I<juste avant> la première instruction de son
+exécution (mais voyez plus bas en ce qui concerne les instructions pendant la
+compilation) et vous demandera d'entrer une commande de
+débogage. Contrairement à ce qu'on pourrait attendre, lorsque le débogueur
+s'arrête et vous montre une ligne de code, il affiche toujours la ligne qu'il
+est I<sur le point> d'exécuter, plutôt que celle qu'il vient juste d'exécuter.
+
+Toute commande non reconnue par le débogueur est directement exécutée
+C<eval>uée) comme du code Perl dans le paquetage courant (Le débogueur utilise
+le paquetage DB pour gérer les informations sur son propre état).
+
+Tout espace blanc précédant ou suivant un texte entré au prompt du débogueur
+est d'abord supprimé avant tout autre traitement. Si une commande de débogage
+coïncide avec une fonction de votre propre programme, faites précéder
+simplement la fonction par quelque chose qui n'a pas l'air d'une commande de
+débogage, tel qu'un C<;>, ou peut-être un C<+>, ou en l'encadrant avec des
+parenthèses ou des accolades.
+
+=head2 Commandes du Débogueur
+
+Le débogueur comprend les commandes suivantesE<nbsp>:
+
+=over 12
+
+=item h [commande]
+
+Affiche un message d'aide.
+
+Si vous fournissez une autre commande de débogage comme argument de la
+commande C<h>, elle affichera uniquement la description de cette
+commande. L'argument spécial C<h h> produira un listage d'aide plus compact,
+conçu pour tenir en un seul écran.
+
+Si la sortie de la commande C<h> (ou de toute commande, en fait) est plus
+longue que votre écran, faites-la précéder d'un symbole de tube pour qu'elle
+soit affichée page par page, comme dans
+
+    DB> |h
+
+Vous pouvez changer le programme de pagination utilisé via la commande C<O
+pager=...>.
+
+=item p expr
+
+Identique à C<print {$DB::OUT} expr> dans le paquetage courant. Cela signifie
+en particulier que, puisque c'est simplement la propre fonction C<print> de
+Perl, les structures de données imbriquées et les objets ne sont pas affichés,
+contrairement à ce qui se passe avec la commande C<x>.
+
+Le handle de fichier C<DB::OUT> est ouvert vers F</dev/tty>, quelle que soit
+la redirection possible de STDOUT.
+
+=item x expr
+
+Évalue son expression dans un contexte de liste et affiche le résultat d'une
+façon joliment formatée. Les structures de données imbriquées sont affichées
+récursivement, contrairement à ce qui se passe avec la vraie fonction
+C<print>. Voir L<Dumpvalue> si vous aimeriez faire cela vous-même.
+
+Le format de sortie est gouverné par de multiples options décrites sous
+L<"Options Configurables">.
+
+=item V [pkg [vars]]
+
+Affiche la totalité (ou une partie) des variables du paquetage (avec par
+défaut C<main>) en utilisant un joli afficheur de données (les hachages
+montrent leurs couples clé-valeur de façon que vous voyiez qui correspond à
+qui, les caractères de contrôle sont rendus affichables, etc.). Assurez-vous
+de ne pas placer là de spécificateur de type (comme C<$>), mais juste les noms
+de symboles, comme ceciE<nbsp>:
+
+    V DB filename line
+
+Utilisez C<~pattern> et C<!pattern> pour avoir des expressions rationnelles
+positives et négatives.
+
+Ceci est similaire au fait d'appeler la commande C<x> pour chaque variable
+applicable.
+
+=item X [vars]
+
+Identique à C<V currentpackage [vars]>.
+
+=item T
+
+Produit une trace de la pile. Voir plus bas pour des détails sur sa sortie.
+
+=item s [expr]
+
+Pas à pas. Poursuit l'exécution jusqu'au début de l'instruction suivante, en
+descendant dans les appels de sous-programmes. Si une expression comprenant
+des appels de fonction est fournie, elle sera elle aussi suivie pas à pas.
+
+=item n [expr]
+
+Suivant. Exécute les appels de sous-programme, jusqu'à atteindre le début de
+la prochaine instruction. Si une expression comprenant des appels de fonction
+est fournie, ces fonctions seront exécutées avec des arrêts avant chaque
+instruction.
+
+=item r
+
+Continue jusqu'au retour du sous-programme courant. Affiche la valeur de
+retour si l'option C<PrintRet> est mise (valeur par défaut).
+
+=item <CR>
+
+Répète la dernière commande C<n> ou C<s>.
+
+=item c [line|sub]
+
+Continue, en insérant facultativement un point d'arrêt valable une fois
+seulement à la ligne ou au sous-programme spécifié.
+
+=item l
+
+Liste la prochaine fenêtre de lignes.
+
+=item l min+incr
+
+Liste C<incr+1> lignes en commençant à C<min>.
+
+=item l min-max
+
+Liste les lignes de C<min> à C<max>. C<l -> est synonyme de C<->.
+
+=item l line
+
+Liste une seule ligne.
+
+=item l subname
+
+Liste la première fenêtre de lignes en provenance d'un
+sous-programme. I<subname> peut être une variable contenant une référence de
+code.
+
+=item -
+
+Liste la précédente fenêtre de lignes.
+
+=item w [line]
+
+Liste une fenêtre (quelques lignes) autour de la ligne courante.
+
+=item .
+
+Retourne le pointeur de débogage interne sur la dernière ligne exécutée, et
+affiche cette ligne.
+
+=item f filename
+
+Passe à la visualisation d'un fichier différent ou d'une autre instruction
+C<eval>. Si I<filename> n'est pas un chemin complet tel que trouvé dans les
+valeurs de %INC, il est considéré être une expression rationnelle.
+
+=item /motif/
+
+Recherche un motif (une expression rationnelle de Perl) vers l'avantE<nbsp>;
+le / final est optionnel.
+
+=item ?motif?
+
+Recherche un motif vers l'arrièreE<nbsp>; le ? final est optionnel.
+
+=item L
+
+Liste tous les points d'arrêts et toutes les actions.
+
+=item S [[!]regex]
+
+Liste les noms de sous-programmes [sauf] ceux correspondant à
+l'expression rationnelle.
+
+=item t
+
+Bascule le mode de traçage (voir aussi l'C<O>option C<AutoTrace>).
+
+=item t expr
+
+Trace l'exécution de expr.  Voir L<perldebguts/"Exemples de Listages des
+Frames"> pour des exemples.
+
+=item b [ligne] [condition]
+
+Place un point d'arrêt avant la ligne donnée. Si ligne est omise, place un
+point d'arrêt sur la ligne qui est sur le point d'être exécutée. Si une
+condition est spécifiée, elle est évaluée chaque fois que l'instruction est
+atteinte : un point d'arrêt est réalisé seulement si la condition est
+vraie. Les points d'arrêt ne peuvent être placés que sur les lignes qui
+commencent une instruction exécutable. Les conditions n'utilisent pas
+B<if>E<nbsp>:
+
+    b 237 $x > 30
+    b 237 ++$count237 < 11
+    b 33 /pattern/i
+
+=item b subname [condition]
+
+Place un point d'arrêt avant la première ligne du sous-programme
+nommé. I<subname> peut être une variable contenant une référence de code (dans
+ce cas I<condition> n'est pas supporté).
+
+=item b postpone subname [condition]
+
+Place un point d'arrêt à la première ligne du sous-programme après sa
+compilation.
+
+=item b load filename
+
+Place un point d'arrêt avant la première ligne exécutée du I<fichier>, qui
+doit être un chemin complet trouvé parmi les valeurs %INC.
+
+=item b compile subname
+
+Place un point d'arrêt à la première instruction exécutée après que le
+sous-programme spécifié ait été compilé.
+
+=item d [ligne]
+
+Supprime un point d'arrêt sur la I<ligne> spécifiée. Si I<ligne> est omis,
+supprime le point d'arrêt sur la ligne sur le point d'être exécutée.
+
+=item D
+
+Supprime tous les points d'arrêt définis.
+
+=item a [ligne] commande
+
+Fixe une action devant être effectuée avant que la ligne ne soit exécutée. Si
+I<ligne> est omis, place une action sur la ligne sur le point d'être
+exécutée. La séquence d'opérations réalisées par le débogueur estE<nbsp>:
+
+  1. vérifie la présence d'un point d'arrêt sur cette ligne
+  2. affiche la ligne si nécessaire (trace)
+  3. effectue toutes les actions associées à cette ligne
+  4. interroge l'utilisateur en cas de point d'arrêt ou de pas à pas
+  5. évalue la ligne
+
+Par exemple, ceci affichera $foo chaque fois que la ligne 53 sera
+passéeE<nbsp>:
+
+    a 53 print "DB FOUND $foo\n"
+
+=item a [ligne]
+
+Supprime une action de la ligne spécifiée. Si I<ligne> est omis, supprime
+l'action de la ligne sur le point d'être exécutée.
+
+=item A
+
+Supprime toutes les actions définies.
+
+=item W expression
+
+Ajoute une expression de surveillance («E<nbsp>watchE<nbsp>»E<nbsp>? NDT)
+globale. Nous espérons que vous savez ce que c'est, car elles sont supposées
+être évidentes. B<AVERTISSEMENT>E<nbsp>: il est bien trop facile de détruire
+vos actions de surveillance en omettant accidentellement l'I<expression>.
+
+=item W
+
+Supprime toutes les expressions de surveillance.
+
+=item O booloption ...
+
+Fixe chaque option booléenne listée à la valeur C<1>.
+
+=item O anyoption? ...
+
+Affiche la valeur d'une ou plusieurs options.
+
+=item O option=value ...
+
+Fixe la valeur d'une ou plusieurs options. Si la valeur contient des espaces,
+elle doit être mise entre guillemets. Par exemple, vous pouvez définir C<O
++pager="less -MQeicsNfr"> pour appeler B<less> avec ces options
+spécifiques. Vous pouvez utiliser des apostrophes ou des guillemets, mais si
+vous le faites, vous devez protéger toutes les occurrences d'apostrophes ou de
+guillemets (respectivement) dans la valeur, ainsi que les échappements les
+précédant immédiatement mais ne devant pas les protéger. En d'autres termes,
+vous suivez les règles de guillemettage indépendamment du symboleE<nbsp>;
+e.g.E<nbsp>: C<O option='this isn\'t bad'> or C<O option="She said, \"Isn't
+it?\"">.
+
+Pour des raisons historiques, le C<=value> est optionnel, mais a pour valeur
+par défaut 1 uniquement lorsque cette valeur est sûre -- c'est-à-dire
+principalement pour les options booléennes. Il vaut toujours mieux affecter
+une valeur spécifique en utilisant C<=>. L'C<option> peut être abrégé, mais ne
+devrait probablement pas l'être par souci de clarté. Plusieurs options peuvent
+être définies ensemble. Voir L<"Options Configurables"> pour en trouver une
+liste.
+
+=item < ? 
+
+Affiche toutes les commandes Perl constituant les actions précédant le prompt.
+
+=item < [ command ]
+
+Définit une action (une commande Perl) devant se produire avant chaque prompt
+du débogueur. Une commande sur plusieurs lignes peut être entrée en protégeant
+les fins de ligne par une barre oblique inverse. B<AVERTISSEMENT> Si
+C<command> est absent, toutes les actions sont effacéesE<nbsp>!
+
+=item << command
+
+Ajoute une action (une commande Perl) devant se produire avant chaque prompt
+du débogueur. Une commande sur plusieurs lignes peut être entrée en protégeant
+les fins de ligne par une barre oblique inverse.
+
+=item > ?
+
+Affiche les commandes Perl constituant les actions suivant le prompt.
+
+=item > command
+
+Définit une action (une commande Perl) devant se produire après le prompt
+lorsque vous venez d'entrer une commande provoquant le retour à l'exécution du
+script. Une commande sur plusieurs lignes peut être entrée en protégeant les
+fins de ligne par des barres obliques inverses (parions que vous ne pouviez
+pas le deviner).  B<AVERTISSEMENT> Si C<command> est absent, toutes les
+actions sont effacéesE<nbsp>!
+
+=item >> command
+
+Définit une action (une commande Perl) devant se produire après le prompt
+lorsque vous venez d'entrer une commande provoquant le retour à l'exécution du
+script. Une commande sur plusieurs lignes peut être entrée en protégeant les
+fins de ligne par des barres obliques inverses.
+
+=item { ?
+
+Affiche les commandes du débogueur précédant le prompt.
+
+=item { [ command ]
+
+Définit une action (une commande du débogueur) devant se produire avant chaque
+prompt du débogueur. Une commande sur plusieurs lignes peut être entrée de la
+façon habituelle. B<AVERTISSEMENT> Si C<command> est absent, toutes les
+actions sont effacéesE<nbsp>!
+
+Puisque cette commande est en quelque sorte nouvelle, un avertissement est
+généré s'il apparaît que vous avez accidentellement entré un bloc. Si c'est ce
+que vous vouliez faire, écrivez-le sous la forme C<;{ ... }> ou même C<do {
+... }>.
+
+=item {{ command
+
+Ajoute une action (commande du débogueur) devant se produire avant chaque
+prompt du débogueur. Une commande sur plusieurs lignes peut être entrée, si
+vous ne savez pas commentE<nbsp>: voyez ci-dessus.
+
+=item ! number
+
+Relance une commande précédente (la commande précédente, par défaut).
+
+=item ! -number
+
+Relance la nième commande précédente
+
+=item ! pattern
+
+Relance la dernière commande ayant commencé par le motif. Voir aussi
+C<O recallCommand>.
+
+=item !! cmd
+
+Lance cmd dans un sous-processus (lisant sur DB::IN, écrivant sur
+DB::OUT). Voir aussi C<O shellBang>. Notez que le shell courant de
+l'utilisateur (en fait, sa variable C<$ENV{SHELL}>) sera utilisé, ce qui peut
+interférer avec une interprétation correcte du statut ou du signal de sortie
+et les informations de coredump.
+
+=item H -number
+
+Affiche les n dernières commandes. Seules les commandes de plus de un
+caractère sont affichées. Si I<number> est omis, les affiche toutes.
+
+=item q or ^D
+
+Quitte ("quit" ne marche pas ici, à moins que vous en ayez créé un
+alias). C'est la seule manière supportée pour quitter le débogueur, même si le
+fait d'entrer C<exit> deux fois peut fonctionner.
+
+Placez l'option C<inhibit_exit> à 0 si vous voulez être en mesure de sauter
+jusqu'à la fin du script. Vous pouvez aussi avoir besoin de placer $finished à
+0 si vous voulez avancer pas à pas dans la destruction globale.
+
+=item R
+
+Redémarre le débogueur en C<exec()>utant une nouvelle session. Nous essayons
+de maintenir votre historique en cours de route, mais certains réglages
+internes et les options de la ligne de commande peuvent être perdus.
+
+Les réglages suivants sont actuellement préservésE<nbsp>: l'historique, les
+points d'arrêt, les actions, les options du débogueur, et les options de ligne
+de commande de Perl B<-w>, B<-I>, and B<-e>.
+
+=item |dbcmd
+
+Exécute la commande du débogueur en redirigeant DB::OUT dans votre pager
+courant.
+
+=item ||dbcmd
+
+De même que C<|dbcmd> mais un C<select> temporaire de DB::OUT est réalisé.
+
+=item = [alias value]
+
+Définit un alias de commande, comme
+
+    = quit q
+
+ou liste les alias définis.
+
+=item command
+
+Exécute une commande en tant qu'instruction Perl. Un point-virgule final y
+sera ajouté. Si l'instruction Perl peut être confondue avec une commande du
+débogueur Perl, faites-la aussi précéder d'un point-virgule.
+
+=item m expr
+
+Liste quelles méthodes peuvent être appelées sur le résultat de l'expression
+évaluée. Cette évaluation peut être une référence à un objet consacré, ou à un
+nom de paquetage.
+
+=item man [manpage]
+
+Malgré son nom, cette commande appelle le visualisateur de documentation par
+défaut de votre système, pointant sur la page en argument, ou sur sa page par
+défaut si I<manpage> est omis. Si ce visualisateur est B<man>, les
+informations courantes de C<Config> sont utilisées pour invoquer B<man> via le
+MANPATH correct ou l'option S<B<-M> I<manpath>>. Les recherches ratées de la
+forme C<XXX> correspondant à des pages de manuel connues de la forme
+I<perlXXX> seront réessayées. Ceci vous permet de taper C<man debug> ou C<man
+op> depuis le débogueur.
+
+Sur les systèmes traditionnellement privés d'une commande B<man> utilisable,
+le débogueur invoque B<perldoc>. Cette détermination est occasionnellement
+incorrecte à cause de vendeurs récalcitrants ou, de façon plus fort à propos,
+du fait d'utilisateurs entreprenants. Si vous tombez dans une de ces
+catégories, fixez simplement manuellement la variable $DB::doccmd pour qu'elle
+pointe vers le visualisateur permettant de lire la documentation Perl sur
+votre système. Ceci peut être placé dans un fichier rc, ou défini via une
+affectation directe. Nous attendons toujours un exemple fonctionnel de quelque
+chose ressemblant àE<nbsp>:
+
+    $DB::doccmd = 'netscape -remote http://something.here/';
+
+=back
+
+=head2 Options Configurables
+
+Le débogueur a de nombreuses options définissables via la commande C<O>, soit
+de façon interactive, soit via l'environnement ou un fichier rc.
+
+=over 12
+
+=item C<recallCommand>, C<ShellBang>
+
+Les caractères utilisés pour rappeler une commande ou générer un nouveau
+shell. Par défaut, ces deux variables sont fixées à C<!>, ce qui est
+malheureux.
+
+=item C<pager>
+
+Programme à utiliser pour la sortie des commandes redirigées par un tube vers
+un paginateur (pager ? NDT) (celles qui commencent par un caractère C<|>). Par
+défaut, C<$ENV{PAGER}> sera utilisé. Puisque le debogueur utilise les
+caractéristiques de votre terminal courant pour les caractères gras et le
+soulignement, si le pager choisi ne transmet pas sans changements les
+séquences d'échappement, la sortie de certaines commandes du débogueur ne
+seront plus lisibles après qu'elles aient traversé le pager.
+
+=item C<tkRunning>
+
+Exécute Tk pour le prompt (avec ReadLine).
+
+=item C<signalLevel>, C<warnLevel>, C<dieLevel>
+
+Niveau de verbosité. Par défaut, le débogueur laisse tranquille vos exceptions
+et vos avertissements, parce que les altérer peut empêcher le bon
+fonctionnement de certains programmes. Il essayera d'afficher un message
+lorsque des signaux INT, BUS ou SEGV arriveront sans être traités (mais voyez
+la mention des signaux dans L<"BUGS"> ci-dessous).
+
+Pour désactiver ce mode sûr par défaut, placez ces valeurs à quelque chose
+supérieur à 0. À un niveau de 1, vous obtenez une trace pour tous les types
+d'avertissements (c'est souvent gênant) et toutes les exceptions (c'est
+souvent pratique). Malheureusement, le débogueur ne peut pas discerner les
+exceptions fatales et non-fatales. Si C<dieLevel> vaut 1, alors vos exceptions
+non-fatales sont aussi tracées et altérées sans cérémonie si elle proviennent
+de chaînes C<eval>uées ou de tout type d'C<eval> à l'intérieur des modules que
+vous essayez de charger. Si C<dieLevel> est à 2, le débogueur ne se soucie pas
+de leur provenanceE<nbsp>: il usurpe vos handlers d'exceptions et affiche une
+trace, puis modifie toutes les exceptions avec ses propres
+embellissements. Ceci peut être utile pour certaines traces particulières,
+mais tend à désespérément détruire tout programme qui prend au sérieux sa
+gestion des exceptions.
+
+=item C<AutoTrace>
+
+Mode de trace (similaire à la commande C<t>, mais pouvant être mise dans
+C<PERLDB_OPTS>).
+
+=item C<LineInfo>
+
+Fichier ou tube dans lequel écrire les infos sur les numéros de ligne. Si
+c'est un tube (disons, C<|visual_perl_db>), alors un court message est
+utilisé. C'est le mécanisme mis en oeuvre pour interagir avec un éditeur
+esclave ou un débogueur visuel, comme les hooks spéciaux de C<vi> ou
+d'C<emacs>, ou le débogueur graphique C<ddd>.
+
+=item C<inhibit_exit>
+
+si à 0, permet I<le passage direct> à la fin du script.
+
+=item C<PrintRet>
+
+Affiche la valeur de retour après la commande C<r> s'il est mis (par défaut).
+
+=item C<ornaments>
+
+Affecte l'apparence de l'écran de la ligne de commande (voir
+L<Term::ReadLine>). Il n'y a actuellement aucun moyen de les désactiver, ce
+qui peut rendre certaines sorties illisibles sur certains affichages, ou avec
+certains pagers. C'est considéré comme un bug.
+
+=item C<frame>
+
+Affecte l'affichage des messages à l'entrée et à la sortie des
+sous-programmes. Si C<frame & 2> est faux, les messages sont affichés
+uniquement lors de l'entrée (L'affichage à la sortie peut être utile si les
+messages sont entrecroisés).
+
+Si C<frame & 4> est faux, les arguments des fonctions sont affichés en plus du
+contexte et des infos sur l'appelant. Si C<frame & 8> est faux, les C<FETCH>
+surchargés C<chaînifiés> (stringify) et C<liés> (tie, NDT) sont autorisés sur
+les arguments affichés. Si C<frame & 16> est faux, la valeur de retour du
+sous-programme est affichée.
+
+La longueur à partir de laquelle la liste d'arguments est tronquée est régie
+par l'option suivanteE<nbsp>:
+
+=item C<maxTraceLen>
+
+La longueur à laquelle la liste d'arguments est tronquée lorsque le bit 4 de
+l'option C<frame> est mis.
+
+=back
+
+Les options suivantes affectent ce qui se produit avec les commandes C<V>,
+C<X>, et C<x>E<nbsp>:
+
+=over 12
+
+=item C<arrayDepth>, C<hashDepth>
+
+Affiche seulement les N premiers éléments ('' pour tous).
+
+=item C<compactDump>, C<veryCompact>
+
+Change le style du vidage des tableaux et des hachages. Si C<compactDump> est
+utilisé, les tableaux courts peuvent être affichés sur une seule ligne.
+
+=item C<globPrint>
+
+Définit si l'on doit afficher le contenu des globalisations.
+
+=item C<DumpDBFiles>
+
+Vidage des tableaux contenant des fichiers débogués.
+
+=item C<DumpPackages>
+
+Vidage des tables de symboles des paquetages.
+
+=item C<DumpReused>
+
+Vidage des contenus des adresses "réutilisées".
+
+=item C<quote>, C<HighBit>, C<undefPrint>
+
+Change le style du vidage des chaînes. La valeur par défaut de C<quote> est
+C<auto> ; on peut permettre le vidage soit entre guillemets, soit entre
+apostrophes en la fixant à C<"> ou C<'> respectivement. Par défaut, les
+caractères dont le bit de poids fort est mis sont affichés I<tels quels>.
+
+=item C<UsageOnly>
+
+Vidage rudimentaire de l'usage de la mémoire par paquetage. Calcule la taille
+totale des chaînes trouvées dans les variables du paquetage. Ceci n'inclut pas
+les lexicaux dans la portée d'un fichier de module, ou perdus dans des
+fermetures.
+
+=back
+
+Pendant le démarrage, les options sont initialisées à partir de
+C<$ENV{PERLDB_OPTS}>. Vous pouvez y placer les options d'initialisation
+C<TTY>, C<noTTY>, C<ReadLine>, et C<NonStop>.
+
+Si votre fichier rc contientE<nbsp>:
+
+  parse_options("NonStop=1 LineInfo=db.out AutoTrace");
+
+alors votre script s'exécutera sans intervention humaine, plaçant les
+informations de trace dans le fichier I<db.out> (Si vous l'interrompez, vous
+avez intérêt à réinitialiser C<LineInfo> sur F</dev/tty> si vous voulez voir
+quelque chose).
+
+=over 12
+
+=item C<TTY>
+
+Le TTY à utiliser pour les I/O de débogage.
+
+=item C<noTTY>
+
+Si elle est mise, le débogueur entre en mode C<NonStop>, sans se connecter à
+un TTY. En cas d'interruption (ou si le contrôle passe au débogueur via un
+réglage explicite de $DB::signal ou de $DB::single par le script Perl), il se
+connecte au TTY spécifié par l'option C<TTY> au démarrage, ou à un TTY trouvé
+lors de l'exécution en utilisant le module C<Term::Rendezvous> de votre choix.
+
+Ce module doit implémenter une méthode appelée C<new> qui retourne un objet
+contenant deux méthodesE<nbsp>: C<IN> et C<OUT>. Celles-ci devraient retourner
+deux handles de fichiers à utiliser pour déboguer les entrées et sorties,
+respectivement. La méthode C<new> devrait inspecter un argument contenant la
+valeur de C<$ENV{PERLDB_NOTTY}> au démarrage, ou de C<"/tmp/perldbtty$$">
+autrement. Ce fichier n'est pas inspecté du point de vue de la correction de
+son appartenance, des risques de sécurité sont donc théoriquement possibles.
+
+=item C<ReadLine>
+
+Si elle est fausse, le support de readline dans le débogueur est désactivé de
+façon à pouvoir déboguer les application l'utilisant.
+
+=item C<NonStop>
+
+Si elle est mise, le débogueur entre en mode non interactif jusqu'à ce qu'il
+soit interrompu manuellement, ou par programme en fixant $DB::signal ou
+$DB::single.
+
+=back
+
+Voici un exemple de l'utilisation de la variable C<$ENV{PERLDB_OPTS}>E<nbsp>:
+
+    $ PERLDB_OPTS="NonStop frame=2" perl -d myprogram
+
+Ceci exécutera le script B<myprogram> sans intervention humaine, affichant
+l'arbre des appels avec leurs points d'entrée et de sortie. Notez que
+C<NonStop=1 frame=2> est équivalent à C<N f=2>, et qu'à l'origine, les options
+ne pouvait être abrégées que par leur première lettre (modulo les options
+C<Dump*>). Il est néanmoins recommandé que vous les énonciez toujours
+complètement dans un souci de lisibilité et de compatibilité future.
+
+D'autres exemples incluent
+
+  $ PERLDB_OPTS="NonStop frame=2" perl -d myprogram
+
+qui exécute le script de façon non interactive, affichant les infos à chaque
+entrée dans un sous-programme et pour chaque ligne exécutée du fichier appelé
+F<listing> (Si vous l'interrompez, vous feriez mieux de réinitialiser
+C<LineInfo> vers quelque chose d'«E<nbsp>interactifE<nbsp>»E<nbsp>!).
+
+D'autres exemples incluent (en utilisant la syntaxe standard du shell pour
+montrer les valeurs des variables d'environnement)E<nbsp>:
+
+  $ ( PERLDB_OPTS="NonStop frame=1 AutoTrace LineInfo=tperl.out"
+      perl -d myprogram )
+
+qui peut être utile pour déboguer un programme qui utilise lui-même
+C<Term::ReadLine>. N'oubliez pas de détacher le shell du TTY dans la fenêtre
+qui correspond à F</dev/ttyXX>, en entrant une commande comme, disons
+
+  $ sleep 1000000
+
+Voir L<perldebguts/"Éléments Internes du Débogueur"> pour plus de détails.
+
+=head2 entrées/sorties du débogueur
+
+=over 8
+
+=item Prompt
+
+Le prompt du débogueur ressemble à
+
+    DB<8>
+
+ou même
+
+    DB<<17>>
+
+où ce nombre est le numéro de la commande, que vous utiliseriez pour y accéder
+avec le mécanisme intégré d'historique à la mode de B<csh>. Par exemple,
+C<!17> répéterait la commande numéro 17. La profondeur des signes inférieur à
+et supérieur à indique la profondeur d'imbrication du débogueur. Vous pouvez
+obtenir plus d'un ensemble de signes d'inégalité, par exemple, si vous êtes
+déjà sur un point d'arrêt et que vous affichez le résultat d'un appel de
+fonction qui lui-même contient un point d'arrêt, ou si vous sautez dans une
+expression via la commande C<s/n/t expression>.
+
+=item Commandes multilignes
+
+Si vous désirez entrer une commande multiligne, telle qu'une définition de
+sous-programme contenant plusieurs instructions ou bien un format, protégez
+par une barre oblique inverse les fins de lignes qui termineraient normalement
+la commande de débogage. En voici un exempleE<nbsp>:
+
+      DB<1> for (1..4) {         \
+      cont:     print "ok\n";   \
+      cont: }
+      ok
+      ok
+      ok
+      ok
+
+Notez que cette affaire de protection d'une fin de ligne est spécifique aux
+commandes interactives tapées dans le débogueur.
+
+=item Trace de la pile
+
+Voici un exemple de ce dont pourrait avoir l'air une trace de la pile via la
+commande C<T>E<nbsp>:
+
+    $ = main::infested called from file `Ambulation.pm' line 10
+    @ = Ambulation::legs(1, 2, 3, 4) called from file `camel_flea' line 7
+    $ = main::pests('bactrian', 4) called from file `camel_flea' line 4
+
+Le caractère à gauche ci-dessus indique le contexte dans lequel la fonction a
+été appelée, avec C<$> et C<@> désignant les contextes scalaires et de liste
+respectivement, et C<.> un contexte vide (qui est en fait une sorte de
+contexte scalaire). L'affichage ci-dessus signifie que vous étiez dans la
+fonction C<main::infested> lorsque vous avez effectué le vidage de la pile, et
+qu'elle a été appelée dans un contexte scalaire à la ligne 10 du fichier
+I<Ambulation.pm>, mais sans aucun argument, ce qui indique qu'elle a été
+appelée en tant que C<&infested>. La ligne suivante de la pile montre que la
+fonction C<Ambulation::legs> a été appelée dans un contexte de liste depuis le
+fichier I<camel_flea>, avec quatre arguments. La dernière ligne montre que
+C<main::pests> a été appelée dans un contexte scalaire, elle aussi depuis
+I<camel_flea>, mais à la ligne 4.
+
+Si vous exécutez la commande C<T> depuis l'intérieur d'une instruction C<use>
+active, la trace contiendra à la fois une ligne pour C<require> et une ligne
+pour C<eval>.
+
+=item Format de Listage des Lignes
+
+Ceci montre les types de listage que la commande C<l> peut produireE<nbsp>:
+
+    DB<<13>> l
+  101:                @i{@i} = ();
+  102:b               @isa{@i,$pack} = ()
+  103                     if(exists $i{$prevpack} || exists $isa{$pack});
+  104             }
+  105
+  106             next
+  107==>              if(exists $isa{$pack});
+  108
+  109:a           if ($extra-- > 0) {
+  110:                %isa = ($pack,1);
+
+Les lignes sur lesquelles on peut placer un point d'arrêt sont indiquées avec
+C<:>. Les lignes ayant un point d'arrêt sont indiquées par C<b> et celles
+ayant une actions par C<a>. La ligne sur le point d'être exécutée est indiquée
+par C<< => >>.
+
+=item Listage de frame (par quoi traduire ? NDT)
+
+Lorsque l'option C<frame> est utilisée, le débogueur affiche les entrées dans
+les sous-programmes (et optionnellement les sorties) dans des styles
+différents. Voir L<perldebguts> pour des exemples incroyablement longs de tout
+ceci.
+
+=back
+
+=head2 Débogage des instructions lors de la compilation
+
+Si vous avez des instructions exécutables lors de la compilation (comme du
+code contenu dans un bloc BEGIN ou CHECK ou une instruction C<use>), elles ne
+seront C<pas> stoppées par le débogueur, bien que les C<require>s et les blocs
+INIT le soient, et les instructions de compilation peuvent être tracées avec
+l'option C<AutoTrace> mise dans C<PERLDB_OPTS>. Depuis votre propre code Perl,
+toutefois, vous pouvez transférer de nouveau le contrôle au débogueur en
+utilisant l'instruction suivante, qui est inoffensive si le débogueur n'est
+pas actifE<nbsp>:
+
+    $DB::single = 1;
+
+Si vous fixez C<$DB::single> à 2, cela équivaut à avoir juste tapé la commande
+C<n>, tandis qu'une valeur de 1 représente la commande C<s>. La variable
+C<$DB::trace> devrait être mise à 1 pour simuler le fait d'avoir tapée la
+commande C<t>.
+
+Une autre façon de déboguer le code exécutable lors de la compilation est de
+démarrer le débogueur, de placer un point d'arrêt sur le I<load> d'un
+moduleE<nbsp>:
+
+    DB<7> b load f:/perllib/lib/Carp.pm
+  Will stop on load of `f:/perllib/lib/Carp.pm'.
+
+puis de redémarrer le débogueur en utilisant la commande C<R> (si
+possible). On peut utiliser C<b compile subname> pour obtenir la même chose.
+
+=head2 Personnalisation du Débogueur
+
+Le débogueur contient probablement suffisamment de hooks de configuration pour
+que vous n'ayez jamais à le modifier vous-même. Vous pouvez changer le
+comportement du débogueur depuis le débogueur lui-même, en utilisant sa
+commande C<O>, depuis la ligne de commande via la variable d'environnement
+C<PERLDB_OPTS>, et par des fichiers de personnalisation.
+
+Vous pouvez réaliser une certaine personnalisation en installant un fichier
+F<.perldb> contenant du code d'initialisation. Par exemple, vous pourriez
+créer des alias ainsi (le dernier en est un que tout le monde s'attend à y
+voir)E<nbsp>:
+
+    $DB::alias{'len'}  = 's/^len(.*)/p length($1)/';
+    $DB::alias{'stop'} = 's/^stop (at|in)/b/';
+    $DB::alias{'ps'}   = 's/^ps\b/p scalar /';
+    $DB::alias{'quit'} = 's/^quit(\s*)/exit/';
+
+Vous pouvez changer les options de F<.perldb> en utilisant des appels comme
+celui-ciE<nbsp>:
+
+    parse_options("NonStop=1 LineInfo=db.out AutoTrace=1 frame=2");
+
+Le code est exécuté dans le paquetage C<DB>. Notez que F<.perldb> est traité
+avant C<PERLDB_OPTS>. Si F<.perldb> définit le sous-programme C<afterinit>,
+cette fonction est appelée après que l'initialisation du débogueur soit
+terminée. F<.perldb> peut être contenu dans le répertoire courant, ou dans le
+répertoire home. Puisque ce fichier est utilisé par Perl et peut contenir des
+commandes arbitraires, pour des raisons de sécurité, il doit être la propriété
+du superutilisateur ou de l'utilisateur courant, et modifiable par personne
+d'autre que son propriétaire.
+
+Si vous voulez modifier le débogueur, copiez et renommez F<perl5db.pl> dans la
+bibliothèque Perl et bidouillez-le à coeur joie. Vous voudrez ensuite fixer
+votre variable d'environnement C<PERL5DB> pour qu'elle dise quelque chose
+comme ceciE<nbsp>:
+
+    BEGIN { require "myperl5db.pl" }
+
+En dernier recours, vous pouvez aussi utiliser C<PERL5DB> pour personnaliser
+le débogueur en modifiant directement des variables internes ou en appelant
+des fonctions du débogueur.
+
+Notez que toute variable ou fonction n'étant pas documentée ici (ou dans
+L<perldebguts>) est considérée réservée à un usage interne uniquement, et est
+sujette en tant que telle à des modifications sans préavis.
+
+=head2 Support de Readline
+
+Tel que Perl est distribué, le seul historique de ligne de commande fourni est
+simpliste, vérifiant la présence de points d'exclamation en début de
+ligne. Toutefois, si vous installez les modules Term::ReadKey et
+Term::ReadLine du CPAN, vous aurez des possibilités d'édition comparables à
+celle que fournit le programme I<readline>(3) du projet GNU. Recherchez-les
+dans le répertoire F<modules/by-module/Term> du CPAN. Ceux-ci ne supportent
+toutefois pas l'édition normale de ligne de commande de B<vi>.
+
+Une complétion rudimentaire de la ligne de commande est aussi
+disponible. Malheureusement, les noms des variables lexicales ne sont pas
+disponibles dans la complétion.
+
+=head2 Support d'un Éditeur pour le Débogage
+
+Si la version d'B<emacs> de la FSF est installée sur votre système, il peut
+interagir avec le débogueur Perl pour fournir un environnement de
+développement intégré cousin de ses interactions avec les débogueurs C.
+
+Perl est aussi fourni avec un fichier de démarrage pour faire agir B<emacs>
+comme un éditeur dirigé par la syntaxe comprenant (en partie) la syntaxe de
+Perl. Regardez dans le répertoire I<emacs> de la distribution des sources de
+Perl.
+
+Une configuration similaire de Tom Christiansen pour l'interaction avec toute
+version de B<vi> et du X window system est aussi disponible. Celle-ci
+fonctionne de façon similaire au support multifenêtré intégré que fournit
+B<emacs>, où c'est le débogueur qui dirige l'interface. Toutefois, à l'heure
+où ces lignes sont rédigées, la localisation finale de cet outil dans la
+distribution de Perl est encore incertaine.
+
+Les utilisateurs de B<vi> devraient aussi s'intéresser à B<vim> et B<gvim>,
+les versions pour rongeurs et huisseries, pour colorier les mots-clés de Perl.
+
+Notez que seul perl peut vraiment analyser du Perl, ce qui fait que tous ces
+outils d'aide à l'ingénierie logicielle manquent un peu leur but, en
+particulier si vous ne programmez pas en Perl comme le ferait un programmeur
+C.
+
+=head2 Le Profileur Perl
+
+Si vous désirez fournir un débogueur alternatif à Perl, invoquez juste votre
+script avec un deux points et un argument de paquetage donné au drapeau
+B<-d>. Un des débogueurs alternatifs les plus populaires pour Perl est le
+profileur Perl. Devel::Prof est maintenant inclus dans la distribution
+standard de Perl. Pour profiler votre programme Perl contenu dans le fichier
+F<mycode.pl>, tapez justeE<nbsp>:
+
+    $ perl -d:DProf mycode.pl
+
+Lorsque le script se terminera, le profileur écrira les informations de profil
+dans un fichier appelé F<tmon.out>. Un outil tel que B<dprofpp>, lui aussi
+fourni dans la distribution standard de Perl, peut être utilisé pour
+interpréter les informations de ce profil.
+
+=head1 Débogage des expressions rationnelles
+
+C<use re 'debug'> vous permet de voir les détails sanglants sur la façon dont
+le moteur d'expressions rationnelles de Perl fonctionne. De façon à comprendre
+ces sorties typiquement volumineuses, on doit non seulement avoir une certaine
+idée de la façon dont les recherches d'expressions rationnelles fonctionnent
+en général, mais aussi connaître la façon dont Perl compile en interne ses
+expressions rationnelles pour en faire des automates. Ces sujets sont explorés
+en détails dans +L<perldebguts/"Débogage des expressions rationnelles">.
+
+=head1 Débogage de l'usage de la mémoire
+
+Perl contient un support interne du reporting de son propre usage de la
+mémoire, mais ceci est un concept plutôt avancé qui requiert une compréhension
+de la façon dont l'allocation mémoire fonctionne. Voir L<perldebguts/"Débogage
+de l'utilisation de la mémoire par Perl"> pour les détails.
+
+=head1 VOIR AUSSI
+
+Vous avez essayé l'option B<-w>, n'est-ce pasE<nbsp>?
+
+Voir aussi L<perldebguts>, L<re>, L<DB>, L<Devel::Dprof>, L<dprofpp>,
+L<Dumpvalue> et L<perlrun>.
+
+=head1 BUGS
+
+Vous ne pouvez pas obtenir d'informations concernant les frames de la pile ou
+de toute façon les fonctions de débogage qui n'ont pas été compilées par Perl,
+comme celles des extensions C ou C++.
+
+Si vous modifiez vos arguments @_ dans un sous-programme (comme avec C<shift>
+ou C<pop>), la trace de la pile ne vous en montrera pas les valeurs
+originales.
+
+Le débogueur ne fonctionne actuellement pas en conjonction avec l'option de
+ligne de commande B<-W>, puisqu'elle n'est elle-même pas exempte
+d'avertissements.
+
+Si vous êtes dans un appel système lent (comme C<wait>, C<accept>, ou C<read>
+depuis le clavier ou une socket) et que vous n'avez pas mis en place votre
+propre handler C<$SIG{INT}>, alors vous ne pourrez pas revenir au débogueur
+par CTRL-C, parce que le propre handler C<$SIG{INT}> du débogueur ne sait pas
+qu'il doit lever une exception pour faire un longjmp(3) hors d'un appel
+système lent.
+
+=head1 TRADUCTION
+
+=head2 Version
+
+Cette traduction française correspond à la version anglaise distribuée avec
+perl 5.6.0.  Pour en savoir plus concernant ces traductions, consultez
+L<http://perl.enstimac.fr/>.
+
+=head2 Traducteur
+
+Roland Trique <F<roland.trique@uhb.fr>>
+
+=head2 Relecture
+
+Gérard Delafond

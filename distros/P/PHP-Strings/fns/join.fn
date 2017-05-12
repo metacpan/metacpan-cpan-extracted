@@ -1,0 +1,2 @@
+docs: |
+    PHP's C<join> is an alias for C<implode>. See L<"implode">.

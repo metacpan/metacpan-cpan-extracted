@@ -1,0 +1,54 @@
+# Cezary Morga <cm@therek.net>, 2009.
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Alarm\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-11 20:03+0300\n"
+"PO-Revision-Date: 2009-05-13 19:36+0200\n"
+"Last-Translator: Cezary Morga <cm@therek.net>\n"
+"Language-Team: Polish <>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Lokalize 0.3\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<"
+"10 || n%100>=20) ? 1 : 2);\n"
+
+#: lib/Padre/Plugin/Alarm.pm:44
+msgid "Time (eg: 23:55):"
+msgstr "Godzina (np. 23:55):"
+
+#: lib/Padre/Plugin/Alarm.pm:48
+msgid "Frequency:"
+msgstr "Częstotliwość:"
+
+#: lib/Padre/Plugin/Alarm.pm:58
+msgid "Set Alarm Time"
+msgstr "Ustaw godzinę alarmu"
+
+#: lib/Padre/Plugin/Alarm.pm:91
+msgid "Possible Value Format: \\d:\\d\\d or \\d\\d:\\d\\d like 6:13 or 23:55"
+msgstr ""
+"Dopuszczalny format: \\d:\\d\\d lub \\d\\d:\\d\\d, np. 6:13 lub 23:55"
+
+#: lib/Padre/Plugin/Alarm.pm:91
+msgid "Wrong Alarm Time"
+msgstr "Błędna godzina alarmu"
+
+#: lib/Padre/Plugin/Alarm.pm:127
+msgid "All Alarms are stopped"
+msgstr "Wszystkie alarmy są wyłączone"
+
+#: lib/Padre/Plugin/Alarm.pm:127
+msgid "Stop Alarm"
+msgstr "Wyłącz alarm"
+
+#: lib/Padre/Plugin/Alarm.pm:146
+msgid "All Alarms are cleared"
+msgstr "Wszystkie alarmy zostały usunięte"
+
+#: lib/Padre/Plugin/Alarm.pm:146
+msgid "Clear Alarm"
+msgstr "Usuń alarm"
+
+

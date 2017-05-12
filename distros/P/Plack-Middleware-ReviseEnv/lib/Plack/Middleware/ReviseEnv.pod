@@ -1,0 +1,811 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Plack::Middleware::ReviseEnv - Revise request environment at will
+
+=head1 VERSION
+
+This document describes Plack::Middleware::ReviseEnv version 0.004.
+
+=begin html
+
+<a href="https://travis-ci.org/polettix/Plack-Middleware-ReviseEnv">
+<img alt="Build Status" src="https://travis-ci.org/polettix/Plack-Middleware-ReviseEnv.svg?branch=master">
+</a>
+
+<a href="https://www.perl.org/">
+<img alt="Perl Version" src="https://img.shields.io/badge/perl-5.8+-brightgreen.svg">
+</a>
+
+<a href="https://badge.fury.io/pl/Plack-Middleware-ReviseEnv">
+<img alt="Current CPAN version" src="https://badge.fury.io/pl/Plack-Middleware-ReviseEnv.svg">
+</a>
+
+<a href="http://cpants.cpanauthors.org/dist/Plack-Middleware-ReviseEnv">
+<img alt="Kwalitee" src="http://cpants.cpanauthors.org/dist/Plack-Middleware-ReviseEnv.png">
+</a>
+
+<a href="http://www.cpantesters.org/distro/P/Plack-Middleware-ReviseEnv.html?distmat=1">
+<img alt="CPAN Testers" src="https://img.shields.io/badge/cpan-testers-blue.svg">
+</a>
+
+<a href="http://matrix.cpantesters.org/?dist=Plack-Middleware-ReviseEnv">
+<img alt="CPAN Testers Matrix" src="https://img.shields.io/badge/matrix-@testers-blue.svg">
+</a>
+
+=end html
+
+=head1 SYNOPSIS
+
+   use Plack::Middleware::ReviseEnv;
+
+   my $mw = Plack::Middleware::ReviseEnv->new(
+
+      # straight value
+      var1 => 'a simple, overriding value',
+
+      # value from %ENV
+      var2 => '[% ENV:USER %]',
+
+      # value from other element in $env
+      var3 => '[% env:foobar %]',
+
+      # mix and match, values are templates actually
+      var4 => 'Hey [% ENV:USER %] this is [% env:var1 %]',
+
+      # to delete an element just "undef" it
+      X_REMOVE_ME => undef,
+
+      # overriding is the default behaviour, but you can disable it
+      X_FOO => {
+         value => 'Get this by default',
+         override => 0,
+      },
+
+      # the key is a template too!
+      '[% ENV:USER %]' => '[% ENV:HOME %]',
+
+      # the "key" can be specified inside, ignoring the "outer" one
+      IGNORED_KEY => {
+         key => 'THIS IS THE KEY!',
+         value => 'whatever',
+      },
+
+      # more examples and features below in example with array ref
+
+   );
+
+   # you can also pass the key/value pairs as a hash reference
+   # associated to a key named 'revisors'. This is necessary e.g. if
+   # you want to set a variable in $env with name 'app', 'opts' or
+   # 'revisors'
+   my $mw2 = Plack::Middleware::ReviseEnv->new(revisors => \%revisors);
+
+   # when evaluation order or repetition is important... use an array
+   # reference for 'revisors'. You can also avoid passing the external
+   # key here, and just provide a sequence of hash definitions
+   my $mw3 = Plack::Middleware::ReviseEnv->new(
+      revisors => [
+         KEY => { ... specification ... },
+
+         # by default inexistent/undef inputs are expanded as empty
+         # strings.
+         {
+            key => 'weird',
+            value => '[% ENV:HOST %]:[% ENV:UNDEFINED %]',
+
+            # %ENV = (HOST => 'www.example.com'); # no UNDEFINED
+            # # weird => 'www.example.com:' # note trailing colon...
+         },
+
+         # you can "fail" generating a variable if something is missing,
+         # so you can avoid the trailing colon above in two steps:
+         {
+            key => 'correct_port_spec',
+            value => ':[% ENV:PORT %]',
+            require_all => 1,
+
+            # %ENV = (); # no PORT
+            # # -> no "correct_port_spec" is generated in $env
+
+            # %ENV = (PORT => 8080);
+            # # correct_port_spec => ':8080'
+         },
+         {
+            key => 'host_and_port',
+            value => '[% ENV:HOST %][% env:correct_port_spec %]',
+
+            # %ENV = (HOST => 'www.example.com'); # no PORT
+            # # host_and_port => 'www.example.com'
+
+            # %ENV = (HOST => 'www.example.com', PORT => 8080);
+            # # host_and_port => 'www.example.com:8080'
+         }
+
+         # the default value is "undef" which ultimately means "do not
+         # generate" or "delete if existent". You can set a different
+         # one for the key and the value separately
+         {
+            key         => '[% ENV:USER %]',
+            default_key => 'nobody',
+
+            value         => '[% ENV:HOME %]',
+            default_value => '/tmp',
+         },
+
+         # the default is applied only when the outcome is "undef", but
+         # you can extend it to the empty string too. This is useful to
+         # obtain the same effect of shell's test [ -z "$VAR" ] which is
+         # true both for missing and empty values
+         {
+            key         => '[% ENV:USER %]',
+            default_key => 'nobody',
+
+            value         => '[% ENV:HOME %]',
+            default_value => '/tmp',
+
+            empty_as_default => 1,
+         }
+
+         # We can revisit the example on host/port and set defaults for
+         # the missing variables, using two temporary variables that
+         # will be cleared afterwards
+         {
+            key => '_host',
+            value => '[% ENV:HOST %]',
+            default_value => 'www.example.com',
+            empty_as_default => 1,
+         },
+         {
+            key => '_port',
+            value => '[% ENV:PORT %]',
+            default_value => '8080',
+            empty_as_default => 1,
+         },
+         host_and_port => '[% env:_host %]:[% env:_port %]',
+         _host => undef, # clear temporary variable
+         _port => undef, # ditto
+      ]
+   );
+
+=head1 DESCRIPTION
+
+This module allows you to reshape L<Plack>'s C<$env> that is passed along
+to the sequence of I<app>s, taking values from an interpolation of items
+in C<%ENV> and C<$env>.
+
+At the most basic level, it allows you to get selected values from the
+environment and override some values in C<$env> accordingly. For
+example, if you want to use environment variables to configure a reverse
+proxy setup, you can use the following revisor definitions:
+
+   ...
+   'psgi.url_scheme' => '[% ENV:RP_SCHEME %]',
+   'HTTP_HOST'       => '[% ENV:RP_HOST   %]',
+   'SCRIPT_NAME'     => '[% ENV:RP_PATH   %]',
+   ...
+
+This would basically implement the functionality provided by
+L<Dancer::Middleware::Rebase> (without the C<strip> capabilities).
+
+Value definitions are actually templates with normal text and variables
+expansions between delimiters. So, the following definition does what
+you think:
+
+   salutation => 'Hello, [% ENV:USER %], welcome [% ENV:HOME %]',
+
+You are not limited to taking values from the environment and peek into
+C<$env> too:
+
+   ...
+   bar => 'baz', # no expansion in this template, just returns 'bar'
+   foo => '[% env:bar %]',
+   ...
+
+As you can understand, if you want to peek at other values in C<$env>
+and these values are generated too, order matters! Take a look at
+L</Ordering Revisors> to avoid being biten by this, but the bottom line
+is: use the array-reference form and put revisors in the order you want
+them evaluated.
+
+=head2 Defining Revisors
+
+There are multiple ways you can provide the definition of a revisor.
+Before explaining the details, it's useful to notice that you can invoke
+the constructor for C<Plack::Middleware::ReviseEnv> in different ways:
+
+   # the "hash" way, where %hash MUST NOT contain the "revisors" key
+   my $mwh  = Plack::Middleware::ReviseEnv->new(%hash);
+
+   # the "hash reference" way
+   my $mwhr = Plack::Middleware::ReviseEnv->new(revisors => \%hash);
+
+   # the "array reference" way
+   my $mwar = Plack::Middleware::ReviseEnv->new(revisors => \@array);
+
+The first two will be eventually turned into the last one by means of
+L</normalize_input_structure> by simply putting the sequence of
+key/value pairs in the array, I<ordered by key>.
+
+In the I<array reference> form, for each revisor you can provide:
+
+=over
+
+=item *
+
+a single hash reference with the details on the revisor (see below for
+the explaination), OR
+
+=item *
+
+a string key (that we will call I<external key>) and a hash reference.
+If the hash reference contains the key C<key> (sorry!) then the
+C<external key> will be ignored, otherwise it will be set corresponding
+to key C<key>. Example:
+
+   foo => { value => 'ciao' }
+
+is interpreted as:
+
+   { key => 'foo', value => 'ciao' }
+
+while:
+
+   foo => { key => 'bar', value => 'baz' }
+
+is interpreted as:
+
+   { key => 'bar', value => 'baz' }
+
+This is useful when you start from the I<hash> or I<hash-reference>
+forms, because the I<external key> will be used for ordering revisors
+only (see L</Ordering Revisors>);
+
+=item *
+
+two strings, one for the key and one for the value. Example:
+
+   foo => 'bar'
+
+is interpreted as:
+
+   { key => 'foo', value => 'bar' }
+
+=back
+
+While the normal key/value pairs should be sufficient in the general
+case, to trigger more advanced features you have to pass the whole hash
+reference definition for a revisors.  The hash can contain the following
+keys:
+
+=over
+
+=item C<cache>
+
+after computing a value the first time, cache the result for all following
+invocations. This will speed up the execution at the expense of flexibility.
+
+You might want to use this option if you're only relying on value coming from
+C<%ENV> and your code is not going to change its items dynamically. As this is
+probably the most common case, this option defaults to C<1>, which means that
+the value will be cached. You can disable it either in the C<opts> in the
+constructor, or per-revisor, by setting it to a Perl-false value;
+
+=item C<default_key>
+
+=item C<default_value>
+
+when the computed value for either the key or the value are undefined,
+the corresponding key is deleted. If you set a defined value, this will
+be used instead.
+
+Setting a default value makes sense only if either C<empty_as_default>
+or C<require_all> are set too; otherwise, whatever expansion will always
+yield a defined value (possibly empty).
+
+=item C<empty_as_default>
+
+when the computed value is empty, treat it as it were undefined. This is
+a single setting for both key and value.
+
+It is useful if you suspect that your environment might actually contain
+a variable, but with an empty value that you want to override with a
+default.
+
+=item C<esc>
+
+the escape character to use when parsing templates. It defaults to a
+single backslash, but you can override this with a different string as
+long as it's not empty, it does not start with a space and is different
+from both C<start> and C<stop> (see below) values. This might come handy
+in the (unlikely) case that you must use lots of backslashes.
+
+=item C<key>
+
+the key that will be set in C<$env>. It is a template itself, so it
+is subject to expansion and other rules explained here.
+
+If you set the revisor with the key/value pair style, the key will be
+used as the default value here; if you just provide a specification
+revisor via a hash reference, you MUST provide a key though.
+
+=item C<override>
+
+boolean flag to indicate that you want to overwrite any previously
+existing value in C<$env> for a specific computed key.
+
+It defaults to I<true>, but you can set it to e.g. C<0> to disable
+overriding and set the value in C<$env> only if there's nothing there
+already.
+
+=item C<require_all>
+
+boolean flag that makes an expansion I<fail> (returning C<undef>) if any
+component is missing. Defaults to a false value, meaning that missing
+values are expanded as empty (but defined!) strings.
+
+For example, consider the following revisors:
+
+   ...
+   inexistent => undef, # this removes inexistent from $env
+
+   set_but_awww => 'Foo: [% env:inexistent %]',
+
+   not_set_at_all => {
+      value => 'Foo: [% env:inexistent %]',
+      require_all => 1,
+   },
+   ...
+
+As a final result, C<< $env->{set_but_empty} >> ends up being
+present with value C<Foo: >, while C<< $env->{not_set_at_all} >> is
+not set or deleted if present.
+
+This can be also combined with C<default_key> or C<default_value>.
+
+=item C<start>
+
+=item C<stop>
+
+the delimiters for the expansion sections, defaulting to C<[%> and C<%]>
+respectively (or whatever option was set in C<opts> at object creation).
+You can override them with any non-empty string.
+
+=item C<value>
+
+the template for the value.
+
+=back
+
+=head2 Templates
+
+Both the key and the value of a revisor are I<templates>. They are
+initially I<parsed> (during C<prepare_app>) and later I<expanded> when
+needed (i.e. during C<call>).
+
+The parsing verifies that the template adheres to the
+L</Template rules>; the expansion is explained in section
+L</Expansion>.
+
+=head3 Template rules
+
+Templates are a sequence of plain text and variable expansion sections.
+The latter ones are delimited by a I<start> and I<stop> character
+sequence. So, for example, with the default start and stop markers the
+following text:
+
+   Foo [% ENV:BAR %] baz
+
+is interpreted as:
+
+   plain text        'Foo '
+   expansion section ' ENV:BAR '
+   plain text        ' baz'
+
+Plain text sections can contain whatever character sequences, except
+(unescaped) start for a variable expansion section. If you want to
+include a start sequence, prepend it with an I<escape> sequence
+(defaulting to a single backslash), like this:
+
+   Foo \[% ENV:BAR %] baz
+
+is interpreted as:
+
+   plain text 'Foo \[% ENV:BAR %] baz'
+
+The I<escape> just makes the character immediately following it be
+ignored during parsing, which happens in the expansion sections too. So,
+suppose that you have a variable whose name contains the end sequence,
+you can still use it like this:
+
+   Foo [% env:bar \%] %] baz
+
+is interpreted as:
+
+   plain text        'Foo '
+   expansion section ' env:bar \%] '
+   plain text        ' baz'
+
+After dividing the input template into sections, the plain text sections
+are just unescaped, while the expansion sections are futher analyzed:
+
+=over
+
+=item *
+
+the section string is trimmed while still honoring escape characters
+(i.e. escaped trailing spaces are I<kept>, even if it can sound crazy);
+
+=item *
+
+then it is unescaped;
+
+=item *
+
+then it is split into two components separated by a colon, checking that
+the first part is either C<ENV> or C<env> (the source for the expansion)
+and the second is the name of the item inside the source.
+
+=back
+
+Example:
+
+                      ' ENV:FOO\ \  '
+     trimmed to   --> 'ENV:FOO\ \ '
+     unescaped to --> 'ENV:FOO  '
+     split to     --> 'ENV', 'FOO  '
+
+In the example, the expansion section will be used to get the value of
+item C<FOO  > (with two trailing spaces) from C<%ENV>.
+
+You can set different I<start>, I<stop> and I<escape> sequences by:
+
+=over
+
+=item *
+
+setting options C<start>, C<stop> and C<esc> (respectively) in
+configuration hash C<opts> in the constructor, or
+
+=item *
+
+setting options C<start>, C<stop> and C<esc> (respectively) in the
+revisor definition (this takes precedence with respect to the ones in
+the C<opts> for the object, of course).
+
+=back
+
+
+=head3 Expansion
+
+While parsing happens once at the beginning (during phase C<prepare_app>),
+usage of a parsed template happens at C<call> time, i.e. at every request
+hitting the plugin.
+
+The first time the request comes, the parsed template is evaluated according to
+what described below. Depending on the value of C<cache> (which can be set both
+in C<opts> for the constructor, and in each revisor singularly), this value
+might be reused for following calls (providing better performance) or computed
+each time (providing greater flexibility to cope with changing inputs). Caching
+is enabled by default, assuming that most of the times you will just want to
+get values from an unchanging environment; if you need to do fancier things,
+though, you can disable it altogether (setting option C<cache> to a false value
+in the constructor parameters) or for each single revisor that needs special
+attention.
+
+During expansion, text parts are passed verbatim, while expansion
+sections take the value from either C<%ENV> or C<$env> depending on the
+expansion section itself. If the corresponding value is not present or
+is C<undef>:
+
+=over
+
+=item *
+
+by default the empty string is used
+
+=item *
+
+if option C<require_all> in the revisor definition is set to a (Perl)
+true value, the whole expansion I<fails> and returns C<undef> or
+whatever default value has been set in C<default_key> or
+C<default_value> for keys and values respectively.
+
+=back
+
+If the expansion above yields C<undef>:
+
+=over
+
+=item *
+
+if it's the expansion of a key, it is skipped;
+
+=item *
+
+if it's the expansion of a value, L<Removing Variables> applies (i.e.
+the variable is not set and removed if present).
+
+=back
+
+
+=head2 Removing Variables
+
+In addition to setting values, you can also remove them (e.g. suppose
+that you are getting some headers and you want to silence them (e.g. for
+debugging purposes). To do this, just set the corresponding key to
+C<undef>:
+
+   ...
+   remove_me => undef,
+   ...
+
+This actually works whenever the expanded value returns C<undef>,
+although this never happens by default because C<undef> values in the
+expansion are turned into empty strings:
+
+   ...
+   will_be_empty => '[% ENV:inexistent_value %]',
+   ...
+
+See L</Expansion> for making the above return C<undef> (via
+C<require_all>) and trigger the removal of C<will_be_empty>.
+
+=head2 Ordering Revisors
+
+If you plan using intermediate variables for building up complex values,
+you might want to switch to the I<array reference> form of the revisor
+definition (see L</Defining Revisors>), because the hash-based
+alternatives require more care.
+
+As an example, the following will NOT do what you think:
+
+   # using plain hash way... and being BITEN HARD!
+   my $me = Plack::Middleware::ReviseEnv->new(
+      foo => 'FOO',
+      bar => 'Hey [% env:foo %]',
+   );
+
+This is because the following array-based rendition will be used:
+
+   [
+      bar => 'Hey [% env:foo %]',
+      foo => 'FOO',
+   ]
+
+i.e. C<bar> will be eventually expanded I<before> C<foo>. This is
+because keys are used for ordering revisors when transforming to the
+array-based form.
+
+The ordering part is actually there to help you, because by default Perl
+does not guarantee I<any kind of order> when you expand a hash to the
+list of key/value pairs. So, at least, in this case you have some
+guarantees!
+
+So what can you do? You can take advantage of the full form for defining
+a revisor, like this:
+
+   # using plain hash way... more verbose but correct now
+   my $me = Plack::Middleware::ReviseEnv->new(
+      '1' => { key => foo => value => 'FOO' },
+      '2' => { key => bar => value => 'Hey [% env:foo %]'},
+   );
+
+The hash keys C<1> and C<2> will be used to order revisors, so they are
+set correctly now:
+
+   [
+      '1' => { key => foo => value => 'FOO' },
+      '2' => { key => bar => value => 'Hey [% env:foo %]'},
+   ]
+
+Note that the revisor definitions already contain a C<key> field, so
+neither C<1> nor C<2> will be used to override this field, which is the
+same as the following array form:
+
+   [
+      { key => foo => value => 'FOO' },
+      { key => bar => value => 'Hey [% env:foo %]'},
+   ]
+
+i.e. what you were after in the first place.
+
+Takeaway: if you can, always use the array-based form!
+
+
+=head1 METHODS
+
+The following methods are implemented as part of the interface for a
+Plack middleware. Although you can override them... there's probably
+little sense in doing this!
+
+=over
+
+=item call
+
+=item prepare_app
+
+=back
+
+Methods described in the following subsections can be overridden or used
+in derived classes, with the exception of L</new>.
+
+=head2 B<< escaped_index >>
+
+   my $i = $obj->escaped_index($template, $str, $esc, $pos);
+
+Low-level method for finding the first unescaped occurrence of C<$str>
+inside C<$template>, starting from C<$pos> and considering C<$esc> as
+the escape sequence. Returns -1 if the search is unsuccessful, otherwise
+the index value in the string (indexes start from 0), exactly as
+C<CORE::index>.
+
+=head2 B<< escaped_trim >>
+
+   my $trimmed = $obj->escaped_trim($str, $esc);
+
+Low-level function to trim away spaces from an escaped string. It takes
+care to remove all leading spaces, and all unescaped trailing spaces
+(there can be no "escaped leading spaces" because escape sequences
+cannot start with a space).
+
+Note that trimming targets only plain horizontal spaces (ASCII 0x20).
+
+=head2 B<< generate_revisor >>
+
+   my $revisor = $obj->generate_revisor($input_definition);
+
+Generate a revisor from an input definition.
+
+The input definition MUST be a hash reference with fields explained in
+section L</Defining Revisors>.
+
+Returns a new revisor.
+
+It is used by L</prepare_app> to set the list of revisors that will be
+used during expansion.
+
+=head2 B<< new >>
+
+   # Alternative 1, when %hash DOES NOT contain a "revisors" key
+   my $mw_h = Plack::Middleware::ReviseEnv->new(%hash);
+
+   # Alternative 2, "revisors" points to a hash ref
+   my $mw_r = Plack::Middleware::ReviseEnv->new(
+      revisors => $hash_or_array_ref, # array ref is PREFERRED
+      opts     => \%hash_with_options
+   )
+
+You are not supposed to use this method directly, although these are
+exactly the same parameters that you are supposed to pass e.g. to
+C<builder> in L<Plack::Builder>.
+
+The first form is I<quick and dirty> and should be fine in most of the
+simple cases, like if you just want to set a few variables taking them
+from the environment (C<%ENV>) and you're fine with the default options.
+
+The second form allows you to pass options, e.g. to change the
+delimiters for expansion sections, and also to define the sequence of
+revisors as an array reference, which is quite important if you are
+going to do fancy things (see L</Ordering Revisors> for example).
+
+Available opts are:
+
+=over
+
+=item C<cache>
+
+boolean flag indicating, when true, that expanded values (see L</Expansion>)
+should be cached for later reuse in following calls. This improves performance
+(values are computed only the first time they are needed) at the expense of
+flexibility (if you have a changing C<%ENV> or rely on values in C<$env> that
+depend on the specific call, caching will not take those changes). This can be
+overridden on a per-revisor basis.
+
+Defaults to 1 i.e. caching is enabled for all revisors by default; disable it
+inside a revisor that needs dynamic computing of its value.
+
+=item C<esc>
+
+the escape sequence to use when parsing a template (see
+L</Template rules>). This can be overridden on a per-revisor basis.
+
+Defaults to a single backslash C<\>.
+
+=item C<start>
+
+the start sequence to use when parsing a template (see
+L</Template rules>). This can be overridden on a per-revisor basis.
+
+Defaults to string C<[%>, in L<Template::Toolkit> spirit.
+
+=item C<stop>
+
+the stop sequence to use when parsing a template (see
+L</Template rules>). This can be overridden on a per-revisor basis.
+
+Defaults to string C<%]>, in L<Template::Toolkit> spirit.
+
+=back
+
+=head2 B<< normalize_input_structure >>
+
+   my $normal = $obj->normalize_input_structure($source, $defaults);
+
+normalizes the object internally landing you with the following fields:
+
+=over
+
+=item C<app>
+
+=item C<revisors>
+
+=item C<opts>
+
+=back
+
+where C<revisors> is in the array form and C<opts> has any missing item
+initialised to the corresponding default (if not already present).
+
+=head2 B<< parse_template >>
+
+   my $expandable = $obj->parse_template($template, $start, $stop, $esc);
+
+applies the parsing explained in section L</Template rules> and returns
+an array reference of sequences of either plain text chunks, or hash
+references each containing:
+
+=over
+
+=item C<src>
+
+either C<env> or C<ENV>
+
+=item C<key>
+
+the key to use inside the C<src> for expanding a variable.
+
+=back
+
+This method is quite low-level and you have to explicitly pass the
+start, stop and escaping sequences, making sure they don't tread on each
+other.
+
+Used by L</generate_revisor>.
+
+=head2 B<< unescape >>
+
+   my $text = $obj->unescape($escaped_text, $esc);
+
+Removes the escaping sequence C<$esc> from C<$escaped_text>.
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs either through RT or GitHub (patches welcome).
+
+=head1 SEE ALSO
+
+L<Plack>, L<Plack::Middleware::ForceEnv>,
+L<Plack::Middleware::ReverseProxy>,
+L<Plack::Middleware::SetEnvFromHeader>,
+L<Plack::Middleware::SetLocalEnv>.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

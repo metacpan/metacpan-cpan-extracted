@@ -1,0 +1,55 @@
+=head1 Pod-DocBook version 1.0
+
+This is a rewrite of Pod::DocBook; version 0.6 and earlier were
+written by a different author (see L<Pod::DocBook/AUTHOR>).
+
+Pod::DocBook is a module for translating Pod-formatted documents to
+DocBook 4.2 SGML (see L<http://www.docbook.org/>).  The B<pod2docbook>
+program is a simple driver for the module.
+
+=head2 Installation
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+=head2 Dependencies
+
+This module requires these other modules:
+
+=over
+
+=item *
+
+Digest::MD5
+
+=item *
+
+Pod::Parser
+
+=item *
+
+Pod::ParseLink
+
+=item *
+
+Text::ParseWords
+
+=item *
+
+Text::Wrap
+
+=back
+
+=head2 Copyright and License
+
+Copyright (C) 2004 by Nandu Shah.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

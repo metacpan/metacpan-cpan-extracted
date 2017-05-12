@@ -1,0 +1,28 @@
+---
+abstract: 'Forward proxy server'
+author:
+  - 'Piotr Roszatycki <dexter@cpan.org>'
+build_requires:
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Proxy-Requests
+provides:
+  Plack::Middleware::Proxy::Requests:
+    file: lib/Plack/Middleware/Proxy/Requests.pm
+    version: 0.0102
+recommends:
+  Twiggy: 0
+requires:
+  Plack: 0
+  Plack::App::Proxy: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Plack-Middleware-Proxy-Requests
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/dex4er/perl-Plack-Middleware-Proxy-Requests
+version: 0.0102

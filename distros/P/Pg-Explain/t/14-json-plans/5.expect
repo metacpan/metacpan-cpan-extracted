@@ -1,0 +1,30 @@
+{
+    'is_analyzed' => 1,
+    'actual_time_first' => '0.008',
+    'estimated_rows' => '1',
+    'estimated_total_cost' => '0.04',
+    'estimated_row_width' => '194',
+    'actual_time_last' => '0.008',
+    'estimated_startup_cost' => '0',
+    'actual_rows' => '1',
+    'sub_nodes' => [
+        {
+            'scan_on' => {
+                'table_alias' => 'pg_class',
+                'table_name' => 'pg_class'
+            },
+            'is_analyzed' => 1,
+            'actual_time_first' => '0.008',
+            'estimated_rows' => '281',
+            'estimated_total_cost' => '10.81',
+            'estimated_row_width' => '194',
+            'actual_time_last' => '0.008',
+            'estimated_startup_cost' => '0',
+            'actual_rows' => '1',
+            'type' => 'Seq Scan',
+            'actual_loops' => '1'
+        }
+    ],
+    'type' => 'Limit',
+    'actual_loops' => '1'
+}

@@ -1,0 +1,13 @@
+Revision history for Protocol-SOCKS
+
+0.003     2014-08-23 20:00:03+01:00 Europe/London
+	Fix IPv4 address extraction.
+
+0.002     2014-08-23 19:51:37+01:00 Europe/London
+	No new features.
+
+	Test fixes:
+	* Missing tests from previous release
+
+0.001     2014-08-23 19:40:37+01:00 Europe/London
+	Initial CPAN release

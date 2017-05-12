@@ -1,0 +1,31 @@
+Revision history for POE-Component-SmokeBox-Uploads-Rsync
+
+1.001 2014-11-04T06:34:16Z UTC
+ - Add the 'rsync_all' option for lazy people who want to rsync the entire
+   CPAN
+ - Updates to the automatically generated files
+
+ [STATISTICS]
+ - code churn: 5 files changed, 79 insertions(+), 33 deletions(-)
+
+1.000 2011-03-31T23:00:20Z UTC
+ - Converted to Dist::Zilla for the release process!
+ - Add the 'timeout' and 'contimeout' parameter to the default rsync
+   options
+ - We rsync *only* the CPAN/authors/id directory now, for more speed+sanity
+ - Kill the rsync subprocess on completion, so we save memory until the
+   next run
+ - Use the 'alt_fork' option to POE::Component::Generic to save even more
+   memory
+ - Add 'exit_str' to the rsyncdone event
+
+0.03 0000-00-00T00:00:00Z UTC
+ - Minor POD tweaks
+ - Bumped POE::Session::AttributeBased prereq, thanks CPANTesters!
+
+0.02 0000-00-00T00:00:00Z UTC
+ - Minor fixes for CPANTesters/Kwalitee purposes
+
+0.01 0000-00-00T00:00:00Z UTC
+ - initial release
+

@@ -1,0 +1,118 @@
+#0  gst_avi_demux_handle_src_event (pad=<value optimized out>, event=0x32f4380)
+at gstavidemux.c:372
+372         while (entry->stream_nr != stream_nr && n < avi->index_size - 1) {
+(gdb) bt
+#0  gst_avi_demux_handle_src_event (pad=<value optimized out>, event=0x32f4380)
+at gstavidemux.c:372
+#1  0x00007f2dbcaee168 in gst_pad_send_event (pad=0x32819c0, event=0x32f4380)
+at gstpad.c:4979
+#2  0x00007f2dbcaee778 in gst_pad_push_event (pad=0x3281b40, event=0x32f4380)
+at gstpad.c:4835
+#3  0x00007f2dbcaee168 in gst_pad_send_event (pad=0x3281cc0, event=0x32f4380)
+at gstpad.c:4979
+#4  0x00007f2dbcaee778 in gst_pad_push_event (pad=0x3281e40, event=0x32f4380)
+at gstpad.c:4835
+#5  0x00007f2db1a68d40 in gst_jpeg_dec_src_event (pad=0x32100c0,
+event=0x32f4380) at gstjpegdec.c:1173
+#6  0x00007f2dbcaee168 in gst_pad_send_event (pad=0x32100c0, event=0x32f4380)
+at gstpad.c:4979
+#7  0x00007f2dbcaee778 in gst_pad_push_event (pad=0x3296220, event=0x32f4380)
+at gstpad.c:4835
+#8  0x00007f2dbcaee168 in gst_pad_send_event (pad=0x31bf8c0, event=0x32f4380)
+at gstpad.c:4979
+#9  0x00007f2dbcaee778 in gst_pad_push_event (pad=0x7f2dac030050,
+event=0x32f4380) at gstpad.c:4835
+#10 0x00007f2dbcd8633c in gst_base_transform_src_eventfunc (trans=0x2aefc10,
+event=0x32f4380) at gstbasetransform.c:1779
+#11 0x00007f2dbcd872a4 in gst_base_transform_src_event (pad=<value optimized
+out>, event=0x32f4380) at gstbasetransform.c:1748
+#12 0x00007f2dbcaee168 in gst_pad_send_event (pad=0x7f2dac0301d0,
+event=0x32f4380) at gstpad.c:4979
+#13 0x00007f2dbcaee778 in gst_pad_push_event (pad=0x7f2dac0304d0,
+event=0x32f4380) at gstpad.c:4835
+#14 0x00007f2dbcd8633c in gst_base_transform_src_eventfunc (trans=0x309ec80,
+event=0x32f4380) at gstbasetransform.c:1779
+#15 0x00007f2db0e117f0 in gst_video_scale_src_event (trans=0x309ec80,
+event=0x32f4380) at gstvideoscale.c:958
+#16 0x00007f2dbcd872a4 in gst_base_transform_src_event (pad=<value optimized
+out>, event=0x32f4380) at gstbasetransform.c:1748
+#17 0x00007f2dbcaee168 in gst_pad_send_event (pad=0x7f2dac030650,
+event=0x32f4380) at gstpad.c:4979
+#18 0x00007f2dbcaee778 in gst_pad_push_event (pad=0x7f2dac0307d0,
+event=0x32f4380) at gstpad.c:4835
+#19 0x00007f2dbcd8633c in gst_base_transform_src_eventfunc (trans=0x2ee07e0,
+event=0x32f4380) at gstbasetransform.c:1779
+#20 0x00007f2dbcd872a4 in gst_base_transform_src_event (pad=<value optimized
+out>, event=0x32f4380) at gstbasetransform.c:1748
+#21 0x00007f2dbcaee168 in gst_pad_send_event (pad=0x7f2dac030950,
+event=0x32f4380) at gstpad.c:4979
+#22 0x00007f2dbcaee778 in gst_pad_push_event (pad=0x7f2dac030350,
+event=0x32f4380) at gstpad.c:4835
+#23 0x00007f2dbcd7b525 in gst_base_sink_send_event (element=<value optimized
+out>, event=0x32f4380) at gstbasesink.c:4167
+#24 0x00007f2dbcacf071 in gst_element_send_event (element=0x7f2dac01c800,
+event=0x32f4380) at gstelement.c:1470
+#25 0x00007f2dbcabd650 in gst_bin_send_event (element=<value optimized out>,
+event=0x32f4380) at gstbin.c:2496
+#26 0x00007f2dbcacf071 in gst_element_send_event (element=0x3115c40,
+event=0x32f4380) at gstelement.c:1470
+#27 0x00007f2dbd625dec in _wrap_gst_element_seek (self=0x29e7cd0, args=<value
+optimized out>, kwargs=<value optimized out>) at gst.c:4895
+#28 0x00000000004a2b03 in PyEval_EvalFrameEx ()
+#29 0x00000000004a3dae in PyEval_EvalFrameEx ()
+#30 0x00000000004a3dae in PyEval_EvalFrameEx ()
+#31 0x00000000004a3dae in PyEval_EvalFrameEx ()
+#32 0x00000000004a3dae in PyEval_EvalFrameEx ()
+#33 0x00000000004a3dae in PyEval_EvalFrameEx ()
+#34 0x00000000004a4649 in PyEval_EvalCodeEx ()
+#35 0x00000000005329ad in ?? ()
+#36 0x000000000041d3bd in PyObject_Call ()
+#37 0x0000000000424f48 in ?? ()
+#38 0x000000000041d3bd in PyObject_Call ()
+#39 0x000000000049cd46 in PyEval_CallObjectWithKeywords ()
+#40 0x00007f2db9c94155 in ?? () from
+/var/lib/python-support/python2.6/goocanvasmodule.so
+#41 0x00007f2db9a51d8b in ?? () from /usr/lib/libgoocanvas.so.3
+#42 0x00007f2db9a48520 in ?? () from /usr/lib/libgoocanvas.so.3
+#43 0x00007f2db9a48520 in ?? () from /usr/lib/libgoocanvas.so.3
+#44 0x00007f2db9a48520 in ?? () from /usr/lib/libgoocanvas.so.3
+#45 0x00007f2db9a48520 in ?? () from /usr/lib/libgoocanvas.so.3
+#46 0x00007f2db9a6690c in ?? () from /usr/lib/libgoocanvas.so.3
+#47 0x00007f2dc543edf8 in ?? () from /usr/lib/libgtk-x11-2.0.so.0
+#48 0x00007f2dc6cb727d in g_closure_invoke () from /usr/lib/libgobject-2.0.so.0
+#49 0x00007f2dc6cccb1e in ?? () from /usr/lib/libgobject-2.0.so.0
+#50 0x00007f2dc6cce2bd in g_signal_emit_valist () from
+/usr/lib/libgobject-2.0.so.0
+#51 0x00007f2dc6cce953 in g_signal_emit () from /usr/lib/libgobject-2.0.so.0
+#52 0x00007f2dc554709e in ?? () from /usr/lib/libgtk-x11-2.0.so.0
+#53 0x00007f2dc54389bd in gtk_main_do_event () from
+/usr/lib/libgtk-x11-2.0.so.0
+---Type <return> to continue, or q <return> to quit---
+#54 0x00007f2dc509acd5 in ?? () from /usr/lib/libgdk-x11-2.0.so.0
+#55 0x00007f2dc509b55e in gdk_window_process_updates () from
+/usr/lib/libgdk-x11-2.0.so.0
+#56 0x00007f2dc509b4dd in gdk_window_process_updates () from
+/usr/lib/libgdk-x11-2.0.so.0
+#57 0x00007f2dc509b4dd in gdk_window_process_updates () from
+/usr/lib/libgdk-x11-2.0.so.0
+#58 0x00007f2dc5420d9e in ?? () from /usr/lib/libgtk-x11-2.0.so.0
+#59 0x00007f2dc507f04b in ?? () from /usr/lib/libgdk-x11-2.0.so.0
+#60 0x00007f2dc661297b in ?? () from /usr/lib/libglib-2.0.so.0
+#61 0x00007f2dc661220a in g_main_context_dispatch () from
+/usr/lib/libglib-2.0.so.0
+#62 0x00007f2dc66158e0 in ?? () from /usr/lib/libglib-2.0.so.0
+#63 0x00007f2dc6615dad in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+#64 0x00007f2dc6ef9c48 in ?? () from
+/var/lib/python-support/python2.6/gtk-2.0/glib/_glib.so
+#65 0x00000000004a2d39 in PyEval_EvalFrameEx ()
+#66 0x00000000004a3dae in PyEval_EvalFrameEx ()
+#67 0x00000000004a3dae in PyEval_EvalFrameEx ()
+#68 0x00000000004a3dae in PyEval_EvalFrameEx ()
+#69 0x00000000004a4649 in PyEval_EvalCodeEx ()
+#70 0x00000000004a4762 in PyEval_EvalCode ()
+#71 0x00000000004c4c3c in PyRun_FileExFlags ()
+#72 0x00000000004c4f6b in PyRun_SimpleFileExFlags ()
+#73 0x00000000004189ce in Py_Main ()
+#74 0x00007f2dc720d5a6 in __libc_start_main () from /lib/libc.so.6
+#75 0x0000000000417ae9 in _start ()
+(gdb) quit

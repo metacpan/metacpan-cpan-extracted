@@ -1,0 +1,25 @@
+Revision history for POD2-PT_BR
+
+0.06    2010-12-11
+        added perlreftut
+
+0.05    2010-08-23
+        added perlstyle
+
+0.04    2010-08-20
+        updating copyright notice
+        removing unexisting references on pod (which also fixes RT54353)
+
+0.03    2010-08-20
+        updating Manifest to include all new files from previous release :)
+        adding utf8 encoding for module's own pod
+
+0.02    2010-08-19
+        added perlutil
+        added perlboot
+        added perlbook
+        added perldsc
+
+0.01    2009-12-28
+        First version, released on an unsuspecting world.
+

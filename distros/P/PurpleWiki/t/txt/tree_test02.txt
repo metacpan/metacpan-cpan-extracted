@@ -1,0 +1,19 @@
+== New Document ==
+What do you have to say for yourself?
+;'''Question''':Good!
+ Preformat this paragraph.
+== Another New Document ==
+* List item 1.
+* List item 2.
+::Hello, world!  Indent me twice!
+# Ordered item 1.
+# Ordered item 2.
+=== Subsection ===
+ Try preformatting to start.
+
+ Another preformatted paragraph.
+=== Another subsection ===
+This is a paragraph.
+:Indentation after a paragraph!  Oh my!
+= Top Level Section =
+A bit unorthodox, but what the heck!

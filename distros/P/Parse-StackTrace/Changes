@@ -1,0 +1,41 @@
+0.08 Sat Aug 8 2009
+	- The GDB parser wasn't recognizing frames without memory locations
+	  whose names started with an underscore or asterisk.
+	- Allow for hex thread ids that don't start with 0x.
+	+ Add the is_crash accessor to frames.
+
+0.07 Sun Aug 2 2009
+	+ The module has now parsed hundreds of thousands of traces from
+	  bugzila.gnome.org without throwing any significant errors.
+	  This release can be considered stable.
+	+ Support Django tracebacks for the Python parser.
+	+ Add the "error_location" accessor to Python frames,
+	  which shows what code character the eror happened at for
+	  SyntaxError exceptions.
+
+0.06 Sat Aug 1 2009
+	+ Tremendously improve GDB stack parsing (tested on thousands of recent
+	  traces from bugzilla.gnome.org).
+	+ Improve performance. As part of this, the module no longer
+	  throws exceptions as a regular part of its operation. (It
+	  still uses Exception::Class, but only internally and you
+	  should never need to worry about it.)
+
+0.05 Thu Jul 30 2009
+	+ Add the text and text_lines accessors to Parse::StackTrace.
+	- Make the "traces" accessor actually return threads in the order
+	  they were parsed. (It was returning them in numerical order
+	  instead.)
+
+0.04 Wed Jul 29 2009
+	+ Add the thread_with_crash method to Parse::StackTrace.
+
+0.03 Wed Jul 29 2009
+	- GDB Frame Regex was failing on Perl 5.8.8 but not 5.8.9.
+	  Thanks to Somni on FreeNode's #perl for the fix!
+
+0.02 Tue Jul 28 2009
+	- Fix a packaging error (the inc/ directory was not being shipped)
+
+0.01 Fri Jun 10 2009
+	- First release. Supports Python and GDB stack traces.

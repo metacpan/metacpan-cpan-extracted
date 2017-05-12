@@ -1,0 +1,53 @@
+{
+   "abstract" : "Plack middleware to set X-Frame-Options.",
+   "author" : [
+      "Gea-Suan Lin <gslin@gslin.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-XFrameOptions-All",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack::Middleware" : 0,
+            "Plack::Util" : 0,
+            "Plack::Util::Accessor" : 0,
+            "parent" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/gslin/plack-middleware-xframeoptions-all-perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gslin/plack-middleware-xframeoptions-all-perl.git",
+         "web" : "https://github.com/gslin/plack-middleware-xframeoptions-all-perl"
+      }
+   },
+   "version" : "0.2"
+}
+

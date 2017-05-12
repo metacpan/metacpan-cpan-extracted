@@ -1,0 +1,174 @@
+NAME
+    Pod::POM::View::Restructured - View for Pod::POM that outputs
+    reStructuredText
+
+SYNOPSIS
+     use Pod::POM::View::Restructured;
+     
+ my $view = Pod::POM::View::Restructured->new;
+     my $parser = Pod::POM->new;
+     my $pom = $parser->parse_file("$top_dir/lib/Pod/POM/View/Restructured.pm");
+     my $out = $pom->present($view);
+
+DESCRIPTION
+    This module outputs reStructuredText that is expected to be used with
+    Sphinx. Verbatim sections (indented paragraphs) in the POD will be
+    output with syntax highlighting for Perl code by default. See "POD
+    commands specifically for reStructuredText" for how to change this for a
+    particular block.
+
+    For a list of changes in recent versions, see the documentation for
+    Pod::POM::View::Restructured::Changes.
+
+    This module can be downloaded from
+    <http://www.cpan.org/authors/id/D/DO/DOWENS/>.
+
+METHODS
+  "new(\%params)"
+    Constructor. \%params is optional. If present, the following keys are
+    valid:
+
+    "callbacks"
+        See documentation below for "convert_file()".
+
+    "namespace"
+        If a namespace is declared then links to that namespace are
+        converted to cross references and an anchor is added for each head
+        tag.
+
+  "convert_file($source_file, $title, $dest_file, $callbacks)"
+    Converts the POD in $source_file to reStructuredText. If $dest_file is
+    defined, it writes the output there. If $title is defined, it is used
+    for the title of the document. Otherwise, an attempt is made to infer
+    the title from the NAME section (checks if the body looks like
+    "/\A\s*(\w+(?:::\w+)+)\s+-\s+/s").
+
+    Returns the output as a string.
+
+    $source_file and $dest_file can be either file names or file handles.
+
+  "convert_files($file_spec, $index_file, $index_title, $out_dir)"
+    Converts the files given in $file_spec to reStructuredText. If
+    $index_file is provided, it is the path to the index file to be created
+    (with a table of contents pointing to all of the files created). If
+    $index_title is provided, it is used as the section title for the index
+    file. $out_dir is the directory the generated files will be written to.
+
+    $file_spec is a reference to an array of hashes specifying attributes
+    for each file to be converted. The valid keys are:
+
+    "source_file"
+        File to convert.
+
+    "dest_file"
+        File to output the reStructuredText. If not provided, a file name
+        will be generated based on the title.
+
+    "title"
+        Section title for the generated reStructuredText. If not provided,
+        an attempt will be made to infer the title from the NAME section in
+        the POD, if it exists. As a last resort, a title will be generated
+        that looks like "section_(\d+)".
+
+    "callbacks"
+        A reference to a hash containing names and the corresponding
+        callbacks.
+
+        Currently the only valid callback is "link". It is given the text
+        inside a L<> section from the POD, and is expected to return a tuple
+        "($url, $label)". If the value returned for $label is undefined, the
+        value of $url is used as the label.
+
+    "no_toc"
+        Causes the item to not be printed to the index or return in the
+        "toc" field.
+
+    This method returns a hash ref with a table of contents (the "toc"
+    field) suitable for a reStructuredText table of contents.
+
+    E.g.,
+
+     my $conv = Pod::POM::View::Restructured->new;
+     
+ my $files = [
+                  { source_file => "$base_dir/Restructured.pm" },
+                  { source_file => "$base_dir/DWIW.pm" },
+                  { source_file => "$base_dir/Wrapper.pm" },
+                 ];
+     
+ 
+ my $rv = $conv->convert_files($files, "$dest_dir/index.rst", 'My Big Test', $dest_dir);
+
+POD commands specifically for reStructuredText
+    The following sequences can be used in POD to request actions
+    specifically for this module.
+
+  =for pod2rst next-code-block: *lang*
+    This sets up the next verbatim section, i.e., the next indented
+    paragraph to be highlighted according to the syntax of the
+    programming/markup/config language *lang*. Verbatim sections are assumed
+    to be Perl code by default. Sphinx uses Pygments to do syntax highlighting
+    in these sections, so you can use any value for *lang* that Pygments
+    supports, e.g., Python, C, C++, Javascript, SQL, etc.
+
+EXAMPLES
+    Converting a single file using "pod2rst"
+         pod2rst --infile=Restructured.pm --outfile=restructured.rst
+
+    Need to document:
+
+    Document example of setting up sphinx build, generating rst from pod,
+    and building
+
+TODO
+    code highlighting
+        Currently, a verbatim block (indented paragraph) gets output as a
+        Perl code block by default in reStructuredText. There should be an
+        option (e.g., in the constructor) to change the language for
+        highlighting purposes (for all verbatim blocks), or disable syntax
+        highlighting and just make it a preformatted paragraph. There is a way
+        to do this in POD (see "POD commands specifically for
+        reStructuredText"), but there should also be an option in the
+        constructor.
+
+    improve escaping
+        Text blocks are not escaped properly, so it is currently possible to
+        invoke a command in reStructuredText by accident.
+
+DEPENDENCIES
+    Inherits from Pod::POM::View::Text that comes with the Pod::POM
+    distribution.
+
+AUTHORS
+    Don Owens <don@regexguy.com>
+    Jeff Fearn <Jeff.Fearn@gmail.com>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2010 Don Owens <don@regexguy.com>. All rights reserved.
+    Copyright (c) 2016 Jeff Fearn <Jeff.Fearn@gmail.com>. All rights
+    reserved.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself. See perlartistic.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+    Pod::POM
+
+    Pod::POM::View::HTML
+
+    pod2rst (distributed with Pod::POM::View::HTML)
+
+    reStructuredText: <http://docutils.sourceforge.net/rst.html>
+
+    Sphinx (uses reStructuredText): <http://sphinx.pocoo.org/>
+
+    Pygments (used by Sphinx for syntax highlighting):
+    <http://pygments.org/>
+
+VERSION
+    0.03
+

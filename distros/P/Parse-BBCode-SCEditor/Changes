@@ -1,0 +1,29 @@
+==================================================
+Changes from 1740-10-27 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2014-08-11 22:21:27 +0000
+------------------------------------------
+
+  Change: 8b0aff1953caa4d8b38a0ee946948bf513f781ec
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-08-12 00:20:08 +0000
+
+    Added requirements, removed unrequired URI::Escape 
+
+  Change: 21c62b74ea02c7b2c615b88c443ead233e4a7819
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-08-12 00:19:15 +0000
+
+    First release - more todo 
+
+  Change: b06a9b2441448d1d4173db96e1c12a99bf0ec5d5
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-08-11 21:14:20 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

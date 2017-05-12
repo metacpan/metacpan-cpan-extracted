@@ -1,0 +1,21 @@
+Revision history for Perl extension PAB3::DB::Driver::Postgres.
+
+version 1.07
+    - changed version style
+    - added static linking to crt on windows
+
+version 1.0.6
+    - fixed type conversations on 64bit systems
+
+version 1.0.5
+    - fixed type conversations on 32bit system with perl 64bit number support
+
+version 1.0.4
+    - fixed MY_CXT api handling to run with perl/5.9.x
+
+version 1.0.3
+    - added missing file
+
+version 1.0.2
+    - fixed broken parameter binding in execute() method
+    - fixed internal statement names

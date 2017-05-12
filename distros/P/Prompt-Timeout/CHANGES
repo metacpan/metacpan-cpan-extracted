@@ -1,0 +1,6 @@
+#  1.03  2010/11/01 Fixed problem with non-working "click", thanks to bottomsc[.]missouri.edu for reporting (RT#62535)
+#                   Fixed potential problem with TAP output parsing
+#  1.02  2009/08/31 Fixed problem with hanging in Unix environment, thanks to leocharre@cpan.org for reporting
+#  1.01  2008/05/23 Documentation typo
+#                   Removed Term::ReadKey::ReadMode because it doesn't work on some terminals
+#  1.00  2008/05/22 Initial revision

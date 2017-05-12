@@ -1,0 +1,37 @@
+---
+abstract: "Querying your filehandle's capabilities"
+author:
+  - 'Leon Timmermans <fawaka@gmail.com>'
+build_requires:
+  Data::Dumper: 0
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.3601
+  Test::More: 0.82
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.011, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PerlIO-Layers
+provides:
+  PerlIO::Layers:
+    file: lib/PerlIO/Layers.pm
+    version: 0.011
+requires:
+  Carp: 0
+  Exporter: 5.57
+  List::Util: 0
+  PerlIO: 0
+  XSLoader: 0
+  perl: 5.008_001
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=PerlIO-Layers
+  repository: git://github.com/Leont/perlio-layers.git
+version: 0.011

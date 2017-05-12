@@ -1,0 +1,50 @@
+SYNOPSIS
+
+     use Parse::PayPal::TxFinderReport qw(parse_paypal_txfinder_report);
+    
+     my $res = parse_paypal_txfinder_report(file => );
+
+    Sample result when there is a parse error:
+
+     [400, "Doesn't find signature in first row"]
+
+    Sample result when parse is successful:
+
+     [200, "OK", {
+         format => "txfinder",
+         transactions           => [
+             {
+                 "3PL Reference ID"                   => "",
+                 "Auction Buyer ID"                   => "",
+                 "Auction Closing Date"               => "",
+                 "Auction Site"                       => "",
+                 "Authorization Review Status"        => 1,
+                 ...
+                 "Transaction Completion Date"        => 1467273397,
+                 ...
+             },
+             ...
+         ],
+     }]
+
+DESCRIPTION
+
+    PayPal provides various kinds reports which you can retrieve from their
+    website under Reports menu. This module provides routine to parse
+    PayPal transaction finder report into a Perl data structure (from the
+    website under Reports > Transactions > Transaction finder). The CSV
+    format is supported. No official documentation of the format is
+    available, but it's mostly regular CSV.
+
+    Some characteristics of this report:
+
+      * Date is MM/DD/YYYY only without hour/minute/second information
+
+      * No transaction status field
+
+SEE ALSO
+
+    https://www.paypal.com
+
+    Parse::PayPal::TxDetailReport
+

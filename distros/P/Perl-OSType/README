@@ -1,0 +1,86 @@
+NAME
+    Perl::OSType - Map Perl operating system names to generic types
+
+VERSION
+    version 1.010
+
+SYNOPSIS
+      use Perl::OSType ':all';
+
+      $current_type = os_type();
+      $other_type = os_type('dragonfly'); # gives 'Unix'
+
+DESCRIPTION
+    Modules that provide OS-specific behaviors often need to know if the
+    current operating system matches a more generic type of operating
+    systems. For example, 'linux' is a type of 'Unix' operating system and
+    so is 'freebsd'.
+
+    This module provides a mapping between an operating system name as given
+    by $^O and a more generic type. The initial version is based on the OS
+    type mappings provided in Module::Build and ExtUtils::CBuilder. (Thus,
+    Microsoft operating systems are given the type 'Windows' rather than
+    'Win32'.)
+
+USAGE
+    No functions are exported by default. The export tag ":all" will export
+    all functions listed below.
+
+  os_type()
+      $os_type = os_type();
+      $os_type = os_type('MSWin32');
+
+    Returns a single, generic OS type for a given operating system name.
+    With no arguments, returns the OS type for the current value of $^O. If
+    the operating system is not recognized, the function will return the
+    empty string.
+
+  is_os_type()
+      $is_windows = is_os_type('Windows');
+      $is_unix    = is_os_type('Unix', 'dragonfly');
+
+    Given an OS type and OS name, returns true or false if the OS name is of
+    the given type. As with "os_type", it will use the current operating
+    system as a default if no OS name is provided.
+
+SEE ALSO
+    *   Devel::CheckOS
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/Perl-Toolchain-Gang/Perl-OSType/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/Perl-Toolchain-Gang/Perl-OSType>
+
+      git clone https://github.com/Perl-Toolchain-Gang/Perl-OSType.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+
+    *   David Golden <xdg@xdg.me>
+
+    *   Graham Ollis <plicease@cpan.org>
+
+    *   Jonas B. Nielsen <jonasbn@hoarfrost.local>
+
+    *   Owain G. Ainsworth <oga@nicotinebsd.org>
+
+    *   Paul Green <Paul.Green@stratus.com>
+
+    *   Piotr Roszatycki <piotr.roszatycki@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2016 by David Golden.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

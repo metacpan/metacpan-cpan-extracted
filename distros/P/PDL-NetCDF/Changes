@@ -1,0 +1,143 @@
+Revision history for Perl extension PDL::NetCDFobj
+
+0.01  12/31/97
+	- original version
+
+0.03  11/30/98
+        - changed interface:  matrix slices indexed with [1,2,3], not long([1,2,3]), 
+	  i.e. perl array refs instead of PDLs of type long.
+
+          This helps when on 64 bit platforms--PDL long is not necessarily
+	  the same size as the native long used by netCDF as indices (size_t).
+
+          Ported to DEC alpha OSF 4.0
+
+	  Changed name to PDL::NetCDF
+
+0.70  12/16/99
+        - Added support in 'get' and 'put' for PDL::Char type PDLs to read/write
+          NetCDF character N-dimensional data as strings.  
+
+        - NOW REQUIRES PDL::Char (from a recent PDL version) to work!!
+
+0.78  1/20/2001
+        - Added read support for zero dimensional variables (variables with no dimension, just a scalar)
+        - Added the ability to reuse an old netCDF object for the 'new' call for similar files.
+          This speeds up the reading of many similar netCDF files considerably.
+
+0.81  5/15/2002
+        - Added Environment variables NETCDF_LIBDIR and NETCDF_INCDIR which
+          you can use to tell where to find netcdf.
+0.84  8/28/2002
+        - Added PREREQ_PM for PDL version 2.2 or later to satisfy CPANPLUS email.
+        - Changed barfs to croaks--give error info from point of view of caller
+        - Fixed two bugs in getdimensionnames and gettext:  Failed to check 
+          existance of $self->{VARIDS}{$varnm} before making netcdf library call.
+
+0.87  12/30/2003
+        - Added the PERL_SCALAR option to allow one to fetch single valued numeric
+          attributes and variables as perl scalars, not as PDLs.
+        - Added the PDL_BAD option to convert 'missing_value' or '_FillValue' 
+          numbers in a netCDF variable as PDL BADVALS.
+
+0.89  04/21/2004
+        - Added support for 64 bit little endian machines such as IBM AIX 
+          machines.  (Thanks to Jim Edwards).
+
+0.90  04/29/2005
+        - Added fix to properly handle get of zero length variable
+
+0.92  11/16/2006
+        - Updated test.pl to skip tests requiring BAD value support on machines
+          where PDL is not compiled with such support.
+          Now use Test::More in test.pl.
+
+0.93  07/27/2007
+        - Updated test.pl to handle new message from netcdf 3.6.2 for a bogus file
+
+0.94  03/04/2009
+        - Changes contributed by Heiko Klein:  Fix bug in which the same file is closed
+          and then opened again.  Updated VERSION variable to make it available programatically.
+
+
+4.01  7/2009
+        - Incorporated Changes by Heiko Klein: added netCDF 4 support
+
+4.02  8/3/2009
+        - Fix bug found by Brice Lambi.  Add ability to read PDL::Char by slice when
+          first dimension is unlimited.
+
+4.03  12/07/2009
+         - Fixed documentation bugs
+
+4.04  15/06/2010
+         - Changes by Heiko Klein:
+		   - Fix bug when reading one line (slice) of string when first
+		     dimension is unlimited
+	       - Enabling PDL::NetCDF to write variables without dimensions,
+		     e.g. projection-attribute variables in CF-1.x convention
+
+4.05  19/10/2010
+         - Added SLOW_CHAR_FETCH option to 'new'.  This makes a get of a PDL::Char
+           loop over all entries instead of doing one nc_get_var_text.  This is 
+           necessary if the character array contains embedded NULLs.
+
+4.06  17/12/2010
+         - Added patch from Sisyphus to help this to work on Windows.
+           Now test $Config{'ivsize'} instead of $Config{'longsize'}
+	   when determining size of offset and count vectors.
+4.07  12/30/2010
+         - Updated META.yml so CPAN (hopefully) indexes it correctly
+4.08  01/31/2011
+         Patches from Heiko Klein:
+         - Use recursive slicing for PDL::Chars to allow high-dimensional
+           string slices
+         - Generalize file test to allow OpenDAP to work.
+4.09  04/20/2011
+         Added setrec/putrec/getrec routines to quickly read/write one element
+         from/to a set of 1D variables.  Requested by Robb Kambic of UNIDATA.
+4.10  04/21/2011
+         Improved setrec/putrec/getrec routines to allow fixed-length character
+         variables to be read/written as well as numeric vectors.
+4.11  05/05/2011
+         Fix due to Sisyphus.  Get rid of '//' operator so it works with perl 5.8.
+4.12  05/05/2011
+         Fiddling with VERSION to try to get CPAN to index this.  Removed META.yml, 
+         commented out 'METAMERGE' in Makefile.PL and add 'our' to $VERSION in netcdf.pd.
+4.13  05/06/2011
+         Added package PDL::NetCDF to netcdf.pd (suggestion by kmx@atlas.cz)
+         Fiddled with $VERSION to make it more global.  Attempts to get CPAN to index this package!
+4.14  08/08/2011
+         Changes by Edward Baudrez, Royal Meteorological Institute of Belgium
+         - added /usr/lib64 to search path for netCDF library
+         - PDL::NetCDF now complains correctly when trying to open a nonexistent file
+           and when O_RDONLY is in effect
+         - PDL::NetCDF does not create a new, empty file when trying to open a
+           nonexistent file and when O_RDONLY is in effect
+         - in test suite: sum() < $tol used to pass erroneously with large negative
+           values, now checks vector norm instead of sum
+4.15  11/28/2011
+         Another attempt at indexing on CPAN.  Specify META_MERGE in Makefile.PL to
+         set version to 4.15.
+4.16  4/27/2012
+         Since netcdf-4.20, the NC_NETCDF4 preprocessor variable can no longer be used
+         to determine if HDF functionality is compiled in.  No perform a link/run
+         test in Makefile.PL to determine if nc_inq_var_deflate is defined or not.
+         Use this for the isNetcdf4 function as well.
+4.17  3/06/2013
+         Since netcdf-4.1, the netcdf-library changes the meaning of nc_sync from
+         release internal buffers to make sure everything known is written to disk.
+         This slows down writing a lot. PDL::NetCDF no longer calls nc_sync
+         automatically (except on close). To ensure writing the file to the disk
+         while keeping it open, $nc->sync is now provided.
+4.18  9/16/2013
+         Added new library path (/usr/local/lib64) and commented out PDL 2.2 requirement.
+         Requested by Hernan De Angelis.
+4.19  9/16/2013
+         Fixed errors in version number to help PAUSE indexer.
+4.20  11/18/2013
+         Added PREREQ_PM as PDL version 0 to Makefile.PL.
+         
+
+         
+

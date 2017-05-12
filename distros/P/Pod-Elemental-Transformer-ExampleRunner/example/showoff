@@ -1,0 +1,61 @@
+#! /usr/bin/perl -w
+#FOR: showing off the features of ExampleRunner
+use strict;             # boring
+use warnings;           # boring
+use lib 'somelib/lib';  # boring use libraries 
+use MyApp::Example;
+
+my $app = MyApp::Example->new();
+use SomeLib qw[ frobulate ];
+
+# {{{ ExampleRunnerHide read config files and do other stuff
+
+# the stuff in this block ( from yada_start to yada_end )
+# will be stripped out of the source listed in your POD
+# this way you can hide stuff that's not really that interesting
+# things like setting up stubs that let your example run without real libs
+#   (for example, SomeLib doesn't really export frobulate)
+
+sub frobulate {
+        "behold the awesome power of SomeLib's frobulate implementation\n"
+    }
+
+=pod 
+
+you can do things in your examples that would require lots of tedious
+configuration (say of a mysql server) that you really don't want to 
+force on your readers.
+
+They get to see the a couple of runs of your scripts without having to
+install everything, configure mysql and then find out your modules' not 
+as cool as they thought.
+
+And, you don't have to re-run the scripts and copy/paste their output
+every time you change them
+
+=cut 
+
+# ExampleRunnerShow }}}
+
+print frobulate(); 
+
+# an example of your module being used along with SomeLib
+for (@SomeLib::Plugins) { 
+    print "Setting up plugin: $_\n";
+    my $plugin_obj = SomeLib->factory( $_ );
+    
+    $plugin_obj->configure( SomeLib->configuration_for_plugin( $_ ) ); # boring
+    $plugin_obj->init; # boring feed $plugin_obj
+    $app->accept_frobulation( $_ => $plugin_obj->frobulate() );
+}
+$app->run(); # is now able to serve pre-frobulated results
+
+# {{{ ExampleRunnerHide
+# 
+#   This script is exclusive and non-transferrable property of yada yada 
+#   yada yada yada yada yada yada yada 
+#
+# ExampleRunnerShow }}}
+
+
+

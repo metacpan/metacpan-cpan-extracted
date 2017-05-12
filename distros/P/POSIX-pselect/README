@@ -1,0 +1,35 @@
+This is Perl module POSIX::pselect.
+
+INSTALLATION
+
+Install cpanm (App::cpanminus) and then run the following command to install
+POSIX::pselect:
+
+    $ cpanm POSIX::pselect
+
+If you get an archive of this distribution, unpack it and build it
+as per the usual:
+
+    $ tar xzf POSIX-pselect-$version.tar.gz
+    $ cd POSIX-pselect-$version
+    $ perl Makefile.PL
+    $ make && make test
+
+Then install it:
+
+    $ make install
+
+DOCUMENTATION
+
+POSIX::pselect documentation is available as in POD. So you can do:
+
+    $ perldoc POSIX::pselect
+
+to read the documentation online with your favorite pager.
+
+LICENSE AND COPYRIGHT
+
+Copyright (c) 2011, Fuji, Goro (gfx). All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

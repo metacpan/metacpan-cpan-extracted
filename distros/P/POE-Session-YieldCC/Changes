@@ -1,0 +1,21 @@
+Revision history for Perl extension POE::Session::YieldCC.
+
+0.202  2009-11-24 07:30:47
+        - POD patch from Frank Wiegand
+
+0.201  2009-04-09 21:13:55
+        - Updated for recent versions of POE and Coro, all tests pass.
+
+0.10  Sun Jun 12 13:45:17 BST 2005
+	- Made continuations into objects (and documented this)
+	- Added make_state to continuation objects
+	- Wrote more tests
+
+0.012 Sat Jun 11 14:00:51 BST 2005
+	- fixed leaks
+	- few more example scripts
+	- added sleep method
+
+0.01  Fri Apr  8 19:35:28 2005
+	- original version; created by h2xs 1.23 with options
+		-AXn POE::Coro --skip-exporter --skip-pport --skip-autoloader

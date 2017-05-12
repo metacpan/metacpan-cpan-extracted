@@ -1,0 +1,65 @@
+%{
+=head1 SYNOPSIS
+
+See 
+   
+   http://search.cpan.org/perldoc?Parse::Eyapp::debuggingtut
+   file Debug2.eyp
+
+This grammar fixes the conflicts an bugs in Debug.eyp and Debug1.eyp
+
+Be sure C<DebugTail.pm> is reachable
+compile it with 
+
+      eyapp -b '' Debug2.eyp
+
+See the C<.output> file generated
+execute the generated modulino with:
+
+      ./Debug2.pm -t
+
+=head1 See also
+
+    Debug1.eyp Debug2.eyp DebugLookForward.eyp
+
+=cut
+
+our $VERSION = '0.01';
+use base q{DebugTail}; 
+
+%}
+
+%token D S
+
+%tree
+
+%%
+p:
+    %name P
+      ds ';' ss  
+  | %name SS
+      ss
+;
+
+
+ds:
+    %name D2
+      ds ';' D
+  | %name D1
+      D       
+;
+
+ss:
+    %name S2
+    S ';' ss      
+  | %name S1
+    S       
+;
+
+
+%%
+
+__PACKAGE__->YYLexer( \&DebugTail::lex); 
+
+__PACKAGE__->main('Provide a statement like "D; D; S" and press <CR><CTRL-D>: ') unless caller;
+

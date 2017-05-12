@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+README.mkdn
+SIGNATURE
+bin/prophet-devel-setup
+dist.ini
+lib/Dist/Zilla/PluginBundle/Prophet.pm
+lib/Pod/Weaver/PluginBundle/Prophet.pm
+lib/Prophet/Devel.pm

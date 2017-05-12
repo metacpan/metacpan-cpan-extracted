@@ -1,0 +1,6 @@
+<body>
+a = <span petal:replace="a"></span> ***
+    <span petal:define="a string:hello">
+a = <span petal:replace="a"></span>
+    </span>
+</body>

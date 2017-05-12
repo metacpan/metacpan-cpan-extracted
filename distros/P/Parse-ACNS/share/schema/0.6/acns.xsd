@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+	<xs:complexType name="Contact">
+		<xs:sequence>
+			<xs:element name="Entity" type="xs:string"/>
+			<xs:element name="Contact" type="xs:string" minOccurs="0"/>
+			<xs:element name="Address" type="xs:string" minOccurs="0"/>
+			<xs:element name="Phone" type="xs:string" minOccurs="0"/>
+			<xs:element name="Email" type="xs:string"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:element name="Infringement">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Case">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="ID" type="xs:string"/>
+							<xs:element name="Ref_URL" type="xs:anyURI" minOccurs="0"/>
+							<xs:element name="Status" type="xs:string" minOccurs="0"/>
+							<xs:element name="Severity" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration value="Normal"/>
+										<xs:enumeration value="Low"/>
+										<xs:enumeration value="High"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Complainant" type="Contact"/>
+				<xs:element name="Service_Provider" type="Contact"/>
+				<xs:element name="Source">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="TimeStamp" type="xs:dateTime"/>
+							<xs:element name="IP_Address">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:whiteSpace value="collapse"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="Port" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:int">
+										<xs:minInclusive value="0"/>
+										<xs:maxInclusive value="65535"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="DNS_Name" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:whiteSpace value="collapse"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="MAC_Address" type="xs:string" minOccurs="0"/>
+							<xs:element name="IP_Block" type="xs:string" minOccurs="0"/>
+							<xs:element name="Type" type="xs:string"/>
+							<xs:element name="URL_Base" type="xs:anyURI" minOccurs="0"/>
+							<xs:element name="UserName" type="xs:string" minOccurs="0"/>
+							<xs:element name="Login" minOccurs="0">
+								<xs:complexType>
+									<xs:attribute name="Username" type="xs:string" use="required"/>
+									<xs:attribute name="Password" type="xs:string" use="required"/>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="Number_Files" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:int">
+										<xs:minInclusive value="0"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+							<xs:element name="Deja_Vu" minOccurs="0">
+								<xs:simpleType>
+									<xs:restriction base="xs:string">
+										<xs:enumeration value="Yes"/>
+										<xs:enumeration value="No"/>
+									</xs:restriction>
+								</xs:simpleType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Content">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Item" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="Title" type="xs:string" minOccurs="0"/>
+										<xs:element name="Artist" type="xs:string" minOccurs="0"/>
+										<xs:element name="FileName">
+											<xs:simpleType>
+												<xs:restriction base="xs:string"/>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="FileSize" minOccurs="0">
+											<xs:simpleType>
+												<xs:restriction base="xs:int">
+													<xs:minInclusive value="0"/>
+												</xs:restriction>
+											</xs:simpleType>
+										</xs:element>
+										<xs:element name="URL" type="xs:anyURI" minOccurs="0"/>
+										<xs:element name="Type" type="xs:string" minOccurs="0"/>
+										<xs:element name="Hash" minOccurs="0">
+											<xs:complexType>
+												<xs:simpleContent>
+													<xs:extension base="xs:string">
+														<xs:attribute name="Type" type="xs:string" use="required"/>
+													</xs:extension>
+												</xs:simpleContent>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="History" minOccurs="0">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="Notice" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:simpleContent>
+										<xs:extension base="xs:string">
+											<xs:attribute name="ID" type="xs:anySimpleType" use="optional"/>
+											<xs:attribute name="TimeStamp" type="xs:anySimpleType" use="optional"/>
+										</xs:extension>
+									</xs:simpleContent>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="Notes" type="xs:string" minOccurs="0"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>

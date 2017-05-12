@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               POE-Component-Cron
+version:            0.021
+abstract:           Schedule POE Events using a cron spec
+author:
+    - Chris Fedde <cfedde@littleton.co.us>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    DateTime:             0
+    DateTime::Event::Cron:  0
+    DateTime::Event::Random:  0
+    POE:                  0
+    POE::Component::Schedule:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.52
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

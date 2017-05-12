@@ -1,0 +1,51 @@
+---
+abstract: 'Perl extension for asynchronous non-blocking DBI calls in POE'
+author:
+  - 'David Davis <xantus@cpan.org>'
+build_requires:
+  Test::More: '0'
+  Test::Requires: '0.08'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-EasyDBI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  POE::Component::EasyDBI:
+    file: lib/POE/Component/EasyDBI.pm
+    version: '1.28'
+  POE::Component::EasyDBI::SubProcess:
+    file: lib/POE/Component/EasyDBI/SubProcess.pm
+    version: '1.28'
+requires:
+  Carp: '0'
+  DBI: '1.38'
+  POE: '0.3101'
+  Params::Util: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  perl: '5.00600'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/gps4net/POE-Component-EasyDBI
+  repository: git://github.com/gps4net/POE-Component-EasyDBI.git
+version: '1.28'
+x_authority: cpan:XANTUS
+x_contributors:
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Gelu Lupaș <gvl@cpan.org>'

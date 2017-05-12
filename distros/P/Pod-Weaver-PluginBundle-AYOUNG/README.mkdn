@@ -1,0 +1,65 @@
+# DESCRIPTION
+
+Roughly equivalent to:
+
+- *
+
+[@CorePrep]
+
+- *
+
+[Name]
+
+- *
+
+[Version]
+
+- *
+
+[Generic / SYNOPSIS]
+
+- *
+
+[Generic / DESCRIPTION]
+
+- *
+
+[Collect / ATTRIBUTES]
+
+- *
+
+[Collect / METHODS]
+
+- *
+
+[Leftovers]
+
+- *
+
+[Installation]
+
+- *
+
+[SeeAlso]
+
+- *
+
+[Authors]
+
+- *
+
+[Legal]
+
+- *
+
+[-Transformers / List]
+
+transformer = List
+
+# SEEALSO
+
+Any of the bundles found in the
+
+[Pod::Weaver::PluginBundle](http://search.cpan.org/perldoc?Pod::Weaver::PluginBundle)
+
+namespace.

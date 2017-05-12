@@ -1,0 +1,24 @@
+---
+abstract: "Convert POD to Github's specific markdown"
+author:
+  - 'Stefan Geneshky <minimal@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Pod-Markdown-Github
+requires:
+  Pod::Markdown: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/naturalist/pod-markdown-github
+  repository: https://github.com/naturalist/pod-markdown-github.git
+version: '0.01'

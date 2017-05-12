@@ -1,0 +1,35 @@
+Proc::ParallelLoop
+
+This is a perl module, along with an executable shell interface, that
+provides looping constructs similar to "for" and "foreach", except
+that the loop bodies can be executed in parallel.
+
+The number of child processes is controlled to not exceed a maximum.
+The module also serializes both the exit status of the child processes
+and the standard output and standard error, so it is practical to use
+it in most places where a normal foreach loop would go.
+
+There is a small perl program called "pardo" that you will find in the
+bin directory.  It provides Proc::ParallelLoop's functionality to shell
+programmers.  You can use it from shell scripts, or right from the
+command line.  A man page for it is in the man/man1 directory of this
+module.
+
+NOTES
+-----
+When running "make test", you should make sure that your user
+file handle limit is at least 400, and your maximum number of user
+processes is at least 150 or so, and you are not doing too much else
+at the time.  If you are using bourne shell, you can view and set your
+limits with the ulimit command.  If you use csh, use the limit
+command.  If you don't have privileges to set your limits that high,
+then the nesting test and/or the biglist test may fail.
+
+At least for now, this is not likely to work with Active Perl for
+Windows.  If you can get it to work without harming the unix
+functionality, I would love to hear from you.
+
+Enjoy,
+-- 
+Byron C. Darrah
+bdarrah@pacbell.net

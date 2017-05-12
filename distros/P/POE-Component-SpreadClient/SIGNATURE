@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e962c31178247504b19f894d036cf34848a7efa6 AUTHOR_PLEDGE
+SHA1 0930c5c347c1d10950b5dca0b672289ba7d344cd Build.PL
+SHA1 fa682ef4681d3cfde65d3b2f1c8f61653519bdf9 Changes
+SHA1 e35338afe57707e32053c610cb7a6c61b7de7f54 CommitLog
+SHA1 c1db656af04bf57c9753813d051121a62b28d2d0 INSTALL
+SHA1 e6514e4bc5abd3d1a8c7bd2a782c2f8737b413e7 LICENSE
+SHA1 dff4b4acf90e202c112df086bfccddda11c59a17 MANIFEST
+SHA1 69b8a0accb85effa4bd5f4ea93e4f2386d10ac8b MANIFEST.SKIP
+SHA1 7fe3fa165dbdfa94a3ea532582fd9d06163fd2d1 META.json
+SHA1 4b579c7340f52efa2d6c5457d73cc82a3944ed22 META.yml
+SHA1 d54a770eba955f4554ec88291778c77156cc26b0 Makefile.PL
+SHA1 a14366535ff581b41c71fb4e77fa62b8a3dbb826 README
+SHA1 f582f59fa1e3dc3b49480c86c8c877124690dc20 cpanfile
+SHA1 dfe190e9a99d9d2c40253351250dca7743d8f74b dist.ini
+SHA1 c1410c05b9e1a6088c0374457bdbdfcf9a97e4ff doap.xml
+SHA1 8127f43e704777b6c8f62284052541c7a599ff14 examples/simpleClient.pl
+SHA1 735e07d7700515f0d5ffc5ed7630d1dcb777b3aa lib/POE/Component/SpreadClient.pm
+SHA1 be3d5c395df62423ded6a0e5dcb0a99749606051 lib/POE/Driver/SpreadClient.pm
+SHA1 99b9399a68f5bb0a777ed5534c70fe1f6b6c2b53 lib/POE/Filter/SpreadClient.pm
+SHA1 901ba047606050ec18eab0fdeea90e265b8698ab t/00-compile.t
+SHA1 3fcf73fb362b351d8818bea8fc8240b3b2e25bb9 t/00-report-prereqs.dd
+SHA1 56e64f15388ee707c85e509e055ec87c500a91e1 t/00-report-prereqs.t
+SHA1 42cc0d2c3a6ba09b591cba5063f81284cc135e9a t/apocalypse.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRhHjwACgkQGfr7vsGKgxyRowCgkBr+jwUFePKmy2qcwBeOrzjy
+GUsAn3CFXPXp0sEw2N/4FpUnesLnp9tN
+=5pfy
+-----END PGP SIGNATURE-----

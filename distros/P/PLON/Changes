@@ -1,0 +1,42 @@
+Revision history for Perl extension PLON
+
+0.08 2014-04-07T06:24:57Z
+
+    - Oops. I forgot to rename encode_pson to encode_plon.
+    - Added experimental Scalar::perl
+
+0.07 2014-04-04T15:25:04Z
+
+    - Support glob, objects.
+    - Added 'canonical' option.
+
+0.06 2014-04-03T15:35:02Z
+
+    - Document deparse option.
+
+0.05 2014-04-03T15:22:40Z
+
+    - PSON renamed PLON. Because there is PHP library named PSON.
+    - Added CodeRef serialization feature.
+
+0.04 2014-04-02T12:03:09Z
+
+    - Added 'decode_pson' method.
+
+0.03 2014-04-02T12:01:05Z
+
+    - Support undefined value
+      (Reported by sharl++)
+      https://github.com/tokuhirom/PLON/issues/3
+    - Implemented 'encode_plon' method.
+      (Reported by syohex++)
+      https://github.com/tokuhirom/PLON/issues/2
+
+0.02 2014-04-02T00:04:00Z
+
+    - Documentation update
+
+0.01 2014-04-01T23:53:09Z
+
+    - original version
+

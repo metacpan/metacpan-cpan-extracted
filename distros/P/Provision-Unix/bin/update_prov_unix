@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+
+# by Matt Simerson
+# version 1.0
+# Jan 14, 2009
+
+use strict;
+use warnings;
+
+use English qw( -no_match_vars );
+use LWP::UserAgent;
+
+use lib 'lib';
+use Provision::Unix;
+my $prov = Provision::Unix->new( debug => 0 );
+my $util = $prov->get_util;
+
+my $module = 'Provision::Unix';
+my $version_wanted = latest_on_cpan($module);
+
+my ($version_installed);
+eval "require $module" and $version_installed = $module->VERSION;
+print "installed version is: $version_installed\n" if $version_installed;
+
+eval "use $module $version_wanted";
+if ( ! $EVAL_ERROR ) {
+    print "$module is up-to-date.\n";
+    exit;
+};
+
+print  "installing newer version from CPAN\n";
+
+$util->install_module($module);
+exit;
+
+sub latest_on_cpan {
+    my $module   = shift;
+    my $cpan     = 'http://search.cpan.org/~msimerson/Provision-Unix/';
+    my $ua       = LWP::UserAgent->new( timeout => 10);
+    my $response = $ua->get($cpan);
+
+    if ( ! $response->is_success ) {
+        die $response->status_line;
+    }
+
+    my $content = $response->content;
+
+    $module =~ s/::/-/g;  # convert the :: in the module name to -
+    #print "searching for $module on CPAN\n";
+
+    my ($version) = $content =~ m/$module-([0-9\.]{3,5})</;
+    $version or die "could not find latest version of $module on CPAN\n";
+    print "CPAN version is $version\n";
+    return $version;
+};
+

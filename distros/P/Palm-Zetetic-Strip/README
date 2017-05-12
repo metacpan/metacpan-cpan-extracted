@@ -1,0 +1,70 @@
+
+This is Palm-Zetetic-Strip, a set of Perl 5 modules for reading Palm
+database (PDB) files containing data from the Strip application from
+Zetetic.  Currently only read-only access is provided to the PDB
+files.  Versions 0.5i and 1.0 of Strip are supported.  Strip may be
+found here:
+
+  http://www.zetetic.net/
+
+Preqeuisites
+------------
+
+In addition to this module and Strip installed on your Palm, you will
+need the following modules, all of which may be found on CPAN.
+
+1) p5-Palm (Palm::PDB)
+
+   Required to read the PDB files.
+
+2) Crypt::IDEA
+3) Digest::MD5
+
+   Only required to decrypt Strip v0.5i databases.  If you have no
+   need to decrypt v0.5i databases, you need not install these
+   modules.
+
+4) Crypt::Rijndael
+5) Digest::SHA256
+
+   Only required to decrypt Strip v1.0 databases.  If you have no
+   need to decrypt v1.0 databases, you need not install these modules.
+
+Installing
+----------
+
+Once you have all the prequisites installed, just follow these
+instructions:
+
+  1) perl Makefile.PL
+  2) make
+  3) make test
+  4) make install
+
+Exmaple Script
+--------------
+
+An example script to dump a Strip database is included called
+"strip.pl".  It takes one argument which is a directory containing the
+three Strip PDB files:
+
+  StripPassword-SJLO.pdb
+  StripSystems-SJLO.pdb
+  StripAccounts-SJLO.pdb
+
+It will then prompt you for your Strip password.  If correct, it will
+dump the contents of the databases to standard output.  For example:
+
+  % strip_dump t/data/v1.0/
+
+Homepage
+--------
+
+The home page for this project is at:
+
+  http://www.dribin.org/dave/software/perl-strip/  
+
+Authors and Contributors
+------------------------
+
+  Dave Dribin <ddribin@cpan.org>

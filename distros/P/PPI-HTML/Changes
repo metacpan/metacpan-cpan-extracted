@@ -1,0 +1,33 @@
+Revision history for Perl extension PPI::HTML
+
+1.08 Mon 16 Nov 2009
+	- Correct spelling of "PPI::Statement::Compond" so that while, for, etc. work.
+	- Add support for given/when/default.
+
+1.07 Fri 12 May 2006
+	- No functional changes
+	- Upgraded to Module::Install 0.62 (final release version)
+	- Removed auto_install, it's too troublesome
+
+1.06 Sat 22 Apr 2006
+	- No functional changes
+	- Moved to a stable version number
+	- Moved from SourceForge CVS to new private SVN repository
+	- Upgraded to Module::Install 0.62
+
+0.05 Thu May 26 2005
+	- Added the option of custom CSS
+	- Got right-align for line numbers working
+	- Many additions to keyword and core function list
+
+0.04 Wed May 25 2005
+	- Updated for the API change at PPI 0.990
+
+0.03 Sun Mar 27 2005
+	- Correcting some documentation mistakes
+
+0.02 Sun Jan 16 2005
+	- Adding the ability to manually specify the colours
+
+0.01 Sun Jan 16 2005
+	- Created the initial version of the module

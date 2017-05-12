@@ -1,0 +1,31 @@
+---
+abstract: 'parses leases from isc dhcpd leases file'
+author:
+  - 'Jan Henning Thorsen, C<< <jhthorsen-at-cpan-org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.9
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Filter-DHCPd-Lease
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  POE::Filter: 1.2
+  Time::Local: 1.1
+  perl: 5.10.0
+resources:
+  bugtracker: https://github.com/jhthorsen/poe-filter-dhcpd-lease/issues
+  homepage: http://search.cpan.org/dist/POE-Filter-DHCPd-Lease
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jhthorsen/poe-filter-dhcpd-lease.git
+version: 0.0703

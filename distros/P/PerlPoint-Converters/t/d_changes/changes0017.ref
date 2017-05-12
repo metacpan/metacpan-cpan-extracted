@@ -1,0 +1,78 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!-- ZOOMSTOP -->
+
+<HTML>
+
+<!-- *** Created by pp2html, build 1.21 from PerlPoint-Converters 1.0205  -->
+
+<HEAD>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+
+<!-- ZOOMRESTART -->
+
+
+
+<TITLE>Version 1.0.205 07/02/2006</TITLE>
+</HEAD>
+
+<!-- ************************************************************** -->
+<BODY bgcolor="#FFFFFF" text="#000000" link="#0000CC" vlink="#AAAAAA" alink="#FF0000">
+<a name="Version 1.0.205 07/02/2006"></a>
+
+<H1>Version 1.0.205 07/02/2006
+</H1>
+
+<UL>
+<LI>New option for pp2latex: --section-sequence</LI>
+<LI>New option for pp2html: --tpl_define This allows to use user defined names in template files. The effect ist that tpl_define names in template files are automatically replaced with the value from the corresponding option:</LI>
+</UL>
+
+
+<TABLE CELLPADDING=5><TR><TD bgcolor="#E5E5E5"><PRE>
+<B><FONT COLOR="#000000">
+  Example:
+     --tpl_define &quot;bg_main_wd #FFCCBB&quot;
+
+     This will replace BG_MAIN_WD with #FFCCBB in all template
+     files from a style.</FONT></B></PRE></TD></TR></TABLE>
+
+<UL>
+<LI>Now it is possible to specify a class name for tables. This is useful when you want to use a css style sheet:</LI>
+</UL>
+
+
+<P>
+Style Sheet:
+</P>
+
+
+<TABLE CELLPADDING=5><TR><TD bgcolor="#E5E5E5"><PRE>
+<B><FONT COLOR="#000000">
+  .mytable {
+     margin-left:1mm;
+     background-color:#e0eeee;
+     padding-left:5px;
+     padding-right:5px;
+     width:15cm;
+  }</FONT></B></PRE></TD></TR></TABLE>
+
+
+<P>
+Perlpoint:
+</P>
+
+
+<TABLE CELLPADDING=5><TR><TD bgcolor="#E5E5E5"><PRE>
+<B><FONT COLOR="#000000">
+  \TABLE{class=&quot;mytable&quot; separator=&quot;|&quot;}
+  \B&lt;Head1&gt; | \B&lt;Head2&gt;
+   text1    | text 2
+   text1.1  | text 2.1
+  \END_TABLE
+</FONT></B></PRE></TD></TR></TABLE>
+</BODY>
+</HTML>

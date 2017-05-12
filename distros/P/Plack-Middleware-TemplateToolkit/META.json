@@ -1,0 +1,78 @@
+{
+   "abstract" : "Serve files with Template Toolkit and Plack",
+   "author" : [
+      "Leo Lapworth",
+      "Jakob Voss"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-TemplateToolkit",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "HTTP::Status" : "0",
+            "Plack::MIME" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Middleware::Debug::Base" : "0",
+            "Plack::Middleware::Debug::Timer" : "0",
+            "Plack::Request" : "0.994",
+            "Plack::Util::Accessor" : "0",
+            "Scalar::Util" : "0",
+            "Template" : "2",
+            "Time::HiRes" : "0",
+            "parent" : "0",
+            "perl" : "5.008_001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Middleware::ErrorDocument" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0.98",
+            "Test::Warn" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ranguard/Plack-Middleware-TemplateToolkit/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ranguard/Plack-Middleware-TemplateToolkit",
+         "web" : "https://github.com/ranguard/Plack-Middleware-TemplateToolkit"
+      }
+   },
+   "version" : "0.28"
+}
+

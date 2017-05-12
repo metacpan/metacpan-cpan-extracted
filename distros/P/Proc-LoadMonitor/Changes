@@ -1,0 +1,16 @@
+Revision history for Perl module Proc::LoadMonitor
+
+1.000 2015-04-19
+    - bump version to 1.000
+
+0.004 2015-02-27
+    - bump min Moo version to 1.002000
+
+0.003 2015-02-23
+    - include state in report
+    
+0.002 2015-02-10
+    - bump min perl version to 5.010
+
+0.001 2015-02-10
+    - Initial release

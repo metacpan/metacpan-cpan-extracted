@@ -1,0 +1,66 @@
+%strict
+%token ID INT NUM
+
+%right '='
+%left '+'
+
+%%
+prog:
+    /* empty */
+  | prog stmt
+;
+
+stmt: 
+    expr ';' 
+  | decl    
+;
+
+expr:
+    ID 
+  | NUM
+  | INT '(' expr ')' /* typecast */ 
+  | expr '+' expr
+  | expr '=' expr
+;
+
+decl:
+    INT declarator ';'
+  | INT declarator '=' expr ';'
+;
+
+declarator:
+    ID 
+  | '(' declarator ')'
+;
+
+%%
+
+=head1  C++ Ambiguities
+
+This grammar models a problematic part of the C++ grammar — the ambiguity between certain
+declarations and statements. For example,
+
+     int (x) = y+z;
+
+parses as either an expr or a stmt.
+
+
+=head1 SEE ALSO
+
+=over 2
+
+=item * L<http://www.gnu.org/software/bison/manual/html_mono/bison.html#GLR-Parsers>
+
+=item * L<http://en.wikipedia.org/wiki/Significantly_Prettier_and_Easier_C%2B%2B_Syntax>
+
+=item * L<http://www.csse.monash.edu.au/~damian/papers/PS/ModestProposal.ps> 
+
+=item * L<http://www.nobugs.org/developer/parsingcpp/>
+
+=item * Edward Willink's "Meta-Compilation for C++" PhD thesis at L<http://www.computing.surrey.ac.uk/Research/CSRG/fog/FogThesis.pdf>
+
+=back
+
+=cut
+
+

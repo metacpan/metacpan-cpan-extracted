@@ -1,0 +1,15 @@
+Revision history for Perl extension Postgres.
+
+0.01  Tue Oct 15 13:46:01 1996
+	- original version; created by h2xs 1.16
+
+1.1  First release to public
+
+1.2  Fixes two very minor memory leaks which only affected programs that did
+     lots of individual queries.
+
+1.3  Added code for putline/getline handling.  Minor clean up of execute()
+     method to allow for these new functions.
+
+1.4  Added notes on RedHat 5.0 to distribution.  Relinquish ownership of
+     the code.

@@ -1,0 +1,97 @@
+2009-04-20 08:42  cvs
+
+	* README, lib/PDF/OCR.pm, lib/PDF/OCR/Thorough.pm,
+	  lib/PDF/OCR/Thorough/Cached.pm: deprecated by PDF::OCR2
+
+2008-08-14 13:09  cvs
+
+	* INSTALL, MANIFEST, Makefile.PL: Removing pdftk dep, because pdftk
+	  will not compile on FC8
+
+2007-07-27 16:31  cvs
+
+	* lib/Image/OCR/Tesseract.pm: changed so it wont die so easy
+	  returns undef
+
+2007-07-18 10:14  cvs
+
+	* lib/PDF/OCR/Thorough.pm: changes
+
+2007-07-05 18:02  cvs
+
+	* lib/Image/OCR/Tesseract.pm, lib/PDF/OCR/Thorough.pm,
+	  lib/PDF/OCR/Thorough/Cached.pm, t/2_PDFOCRThorough.t: fixed page
+	  \f chars in wrong place.. wheh
+
+2007-06-28 12:15  cvs
+
+	* t/4_PDFGetImages.t: added test
+
+2007-06-28 12:14  cvs
+
+	* lib/PDF/GetImages.pm: added more specific test
+
+2007-06-26 12:00  cvs
+
+	* INSTALL: added command needed to install tesseract
+
+2007-06-23 15:43  cvs
+
+	* lib/PDF/GetImages.pm: working on cwd not returning
+
+2007-06-22 12:23  cvs
+
+	* lib/Image/OCR/Tesseract.pm, t/0.t, t/1.t: made it so tesseract
+	  output goes to /dev/null
+
+2007-06-21 16:10  cvs
+
+	* lib/PDF/OCR/Thorough.pm, t/2_PDFOCRThorough.t: made sure to
+	  cleanup temp dir unless debug is on
+
+2007-06-15 13:19  cvs
+
+	* MANIFEST, bin/pdf2ocr: made to cache for pdf2ocr
+
+2007-06-15 10:31  cvs
+
+	* PDF-OCR-1.02.tar.gz, bin/ocr, lib/Image/OCR/Tesseract.pm,
+	  lib/PDF/GetImages.pm: changes
+
+2007-06-14 19:38  cvs
+
+	* lib/PDF/OCR/Thorough.pm: changed not to die if pdftk burst system
+	  call fails
+
+2007-06-14 14:38  cvs
+
+	* lib/Image/OCR/Tesseract.pm: turns out tesseract can fail reading
+	  a certain tif, made so it just warns instead of dying
+
+2007-06-12 08:33  cvs
+
+	* Makefile.PL, lib/Image/OCR/Tesseract.pm, lib/PDF/GetImages.pm,
+	  lib/PDF/OCR.pm, lib/PDF/OCR/Thorough.pm: added some disclaimers
+	  etc
+
+2007-06-11 16:46  cvs
+
+	* Makefile.PL: improv
+
+2007-06-11 16:42  cvs
+
+	* INSTALL, MANIFEST, Makefile.PL, README, t/file4.pdf, bin/ocr,
+	  bin/pdf2ocr, bin/pdfgetext, lib/Image/OCR/Tesseract.pm,
+	  lib/PDF/GetImages.pm, lib/PDF/OCR.pm, lib/PDF/OCR/Thorough.pm,
+	  t/0.t, t/1.t, t/2_PDFOCRThorough.t, t/file1.pdf, t/file1ap.pdf,
+	  t/file2.pdf, t/file2ap.pdf, t/file3.pdf, t/file5ap.pdf: Initial
+	  revision
+
+2007-06-11 16:42  cvs
+
+	* INSTALL, MANIFEST, Makefile.PL, README, t/file4.pdf, bin/ocr,
+	  bin/pdf2ocr, bin/pdfgetext, lib/Image/OCR/Tesseract.pm,
+	  lib/PDF/GetImages.pm, lib/PDF/OCR.pm, lib/PDF/OCR/Thorough.pm,
+	  t/0.t, t/1.t, t/2_PDFOCRThorough.t, t/file1.pdf, t/file1ap.pdf,
+	  t/file2.pdf, t/file2ap.pdf, t/file3.pdf, t/file5ap.pdf: cleanedup
+

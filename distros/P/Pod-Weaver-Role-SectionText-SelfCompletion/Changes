@@ -1,0 +1,24 @@
+Revision history for Pod-Weaver-Role-SectionText-SelfCompletion
+
+0.04    2015-08-26 (PERLANCAR)
+
+	- [Incompatible change] Rename method section_text() ->
+	  section_text_self_completion() to avoid conflict with
+	  PWR:SectionText::HasCompletion.
+
+
+0.03    2015-08-26 (PERLANCAR)
+
+	- Mention PWR:SectionText::HasCompletion.
+
+
+0.02    2014-12-13 (PERLANCAR)
+
+	- Update (simplify) instruction to activate tab completion (mention
+	  shcompgen).
+
+
+0.01    2014-12-07 (PERLANCAR)
+
+        - First release, refactor common text from
+          Pod-Weaver-Section-Completion-{GetoptLongComplete,PerinciCmdLine}.

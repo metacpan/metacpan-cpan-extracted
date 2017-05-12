@@ -1,0 +1,354 @@
+NAME
+
+    POE::Component::CPAN::YACSmoke - Bringing the power of POE to CPAN
+    smoke testing.
+
+VERSION
+
+    version 1.38
+
+SYNOPSIS
+
+      use strict;
+      use POE qw(Component::CPAN::YACSmoke);
+      use Getopt::Long;
+    
+      $|=1;
+    
+      my ($perl, $jobs);
+    
+      GetOptions( 'perl=s' => \$perl, 'jobs=s' => \$jobs );
+    
+      my @pending;
+      if ( $jobs ) {
+        open my $fh, "<$jobs" or die "$jobs: $!\n";
+        while (<$fh>) {
+              chomp;
+              push @pending, $_;
+        }
+        close($fh);
+      }
+    
+      my $smoker = POE::Component::CPAN::YACSmoke->spawn( alias => 'smoker' );
+    
+      POE::Session->create(
+        package_states => [
+           'main' => [ qw(_start _stop _results _recent) ],
+        ],
+        heap => { perl => $perl, pending => \@pending },
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+    
+      sub _start {
+        my ($kernel,$heap) = @_[KERNEL,HEAP];
+        if ( @{ $heap->{pending} } ) {
+          $kernel->post( 'smoker', 'submit', { event => '_results', perl => $heap->{perl}, module => $_ } ) 
+            for @{ $heap->{pending} };
+        }
+        else {
+          $kernel->post( 'smoker', 'recent', { event => '_recent', perl => $heap->{perl} } ) 
+        }
+        undef;
+      }
+    
+      sub _stop {
+        $poe_kernel->call( 'smoker', 'shutdown' );
+        undef;
+      }
+    
+      sub _results {
+        my $job = $_[ARG0];
+        print STDOUT "Module: ", $job->{module}, "\n";
+        print STDOUT "$_\n" for @{ $job->{log} };
+        undef;
+      }
+    
+      sub _recent {
+        my ($kernel,$heap,$job) = @_[KERNEL,HEAP,ARG0];
+        $kernel->post( 'smoker', 'submit', { event => '_results', perl => $heap->{perl}, module => $_ } )
+            for @{ $job->{recent} };
+        undef;
+      }
+
+DESCRIPTION
+
+    POE::Component::CPAN::YACSmoke is a POE-based framework around CPANPLUS
+    and CPAN::YACSmoke. It receives submissions from other POE sessions,
+    spawns a POE::Wheel::Run to deal with running CPAN::YACSmoke, captures
+    the output and returns the results to the requesting session.
+
+    Only one job request may be processed at a time. If a job is in
+    progress, any jobs submitted are added to a pending jobs queue.
+
+    By default the component uses POE::Wheel::Run to fork another copy of
+    the currently executing perl, worked out from $^X. You can specify a
+    different perl executable to use though. MSWin32 users please see the
+    section of this document relating to your platform.
+
+    You are responsible for installing and configuring CPANPLUS and
+    CPAN::YACSmoke and setting up a suitable perl smoking environment.
+
+DEPRECATION NOTICE
+
+    POE::Component::CPAN::YACSmoke has been superceded by
+    POE::Component::SmokeBox. The minismoker script has been superceded by
+    App::SmokeBox::Mini.
+
+    Consider this module deprecated.
+
+CONSTRUCTOR
+
+    spawn
+
+      Spawns a new component session and waits for requests. Takes the
+      following optional arguments:
+
+        'alias', set an alias to send requests to later;
+        'options', specify some POE::Session options;
+        'debug', see lots of text on your console;
+        'idle', adjust the job idle time ( default: 600 seconds ), before jobs get killed;
+        'timeout', adjust the total job runtime ( default: 3600 seconds ), before a job is killed;
+        'perl', which perl executable to use as a default, instead of S^X;
+        'appdata', default path where CPANPLUS should look for it's .cpanplus folder;
+        'no_grp_kill', set to a true value to disable process group kill;
+
+      Returns a POE::Component::CPAN::YACSmoke object.
+
+METHODS
+
+    session_id
+
+      Returns the POE::Session ID of the component's session.
+
+    pending_jobs
+
+      In a scalar context returns the number of currently pending jobs. In
+      a list context, returns a list of hashrefs which are the jobs
+      currently waiting in the job queue.
+
+    current_job
+
+      Returns a hashref containing details of the currently executing smoke
+      job. Returns undef if there isn't a job currently running.
+
+    current_log
+
+      Returns an arrayref of log output from the currently executing smoke
+      job. Returns undef if there isn't a job currently running.
+
+    shutdown
+
+      Terminates the component. Any pending jobs are cancelled and the
+      currently running job is allowed to complete gracefully. Requires no
+      additional parameters.
+
+    pause_queue
+
+      Pauses processing of the jobs. The current job will finish
+      processing, but any pending jobs will not be processed until the
+      queue is resumed. This does not affect the continued submission of
+      jobs to the queue.
+
+    resume_queue
+
+      Resumes the processing of the pending jobs queue if it has been
+      previously paused.
+
+    paused
+
+      Returns a true value if the job queue is paused or a false value
+      otherwise.
+
+    statistics
+
+      Returns some statistical that the component gathers. In a list
+      context returns a list of data. In a scalar context returns an
+      arrayref of the said data.
+
+      The data is returned in the following order:
+
+        The time in epoch seconds when the smoker was started;
+        The total number of jobs that have been processed;
+        The current average job run time;
+        The minimum job run time observed;
+        The maximum job run time observed;
+
+INPUT EVENTS
+
+    All the events that the component will accept (unless noted otherwise )
+    require one parameter, a hashref with the following keys defined (
+    mandatory requirements are shown ):
+
+      'event', an event name for the results to be sent to (Mandatory);
+      'module', a module to test, this is passed to CPAN::YACSmoke's test() method
+                so whatever that requires should work (Mandatory);
+      'session', which session the result event should go to (Default is the sender);
+      'perl', which perl executable to use (Default whatever is in $^X);
+      'debug', turn on or off debugging information for this particular job;
+      'appdata', the path where CPANPLUS should look for it's .cpanplus folder;
+
+    It is possible to pass arbitrary keys in the hash. These should be
+    proceeded with an underscore to avoid possible future API clashes.
+
+    submit
+
+    push
+
+      Inserts the requested job at the end of the queue ( if there is one
+      ).
+
+    unshift
+
+      Inserts the requested job at the head of the queue ( if there is one
+      ). Guarantees that that job is processed next.
+
+    shutdown
+
+      Terminates the component. Any pending jobs are cancelled and the
+      currently running job is allowed to complete gracefully. Requires no
+      additional parameters.
+
+    recent
+
+      Obtain a list of recent uploads to CPAN.
+
+      Takes one parameter, hashref with the following keys defined:
+
+        'event', an event name for the results to be sent to (Mandatory);
+        'session', which session the result event should go to (Default is the sender);
+        'perl', which perl executable to use (Default whatever is in $^X);
+
+      It is possible to pass arbitrary keys in the hash. These should be
+      proceeded with an underscore to avoid possible future API clashes.
+
+    author
+
+      Obtain a list of distributions for a given author.
+
+      Takes one parameter, a hashref with the following keys defined:
+
+        'event', an event name for the results to be sent to (Mandatory);
+        'session', which session the result event should go to (Default is the sender);
+        'perl', which perl executable to use (Default whatever is in $^X);
+        'type', specify the type of search to conduct, 'cpanid', 'author' or 'email', default is 'cpanid';
+        'search', a string representing the search criteria to use (Mandatory);
+
+      It is possible to pass arbitrary keys in the hash. These should be
+      proceeded with an underscore to avoid possible future API clashes.
+
+    package
+
+      obtain a list of distributions given criteria to search for.
+
+      Takes one parameter, a hashref with the following keys defined:
+
+        'event', an event name for the results to be sent to (Mandatory);
+        'session', which session the result event should go to (Default is the sender);
+        'perl', which perl executable to use (Default whatever is in $^X);
+        'type', specify the type of search to conduct, 'package', 'name', etc., default is 'package';
+        'search', a string representing the search criteria to use (Mandatory);
+
+      It is possible to pass arbitrary keys in the hash. These should be
+      proceeded with an underscore to avoid possible future API clashes.
+
+    check
+
+      Checks whether CPAN::YACSmoke is installed. Takes one parameter a
+      hashref with the following keys defined:
+
+        'event', an event name for the results to be sent to (Mandatory);
+        'session', which session the result event should go to (Default is the sender);
+        'perl', which perl executable to use (Default whatever is in $^X);
+
+      It is possible to pass arbitrary keys in the hash. These should be
+      proceeded with an underscore to avoid possible future API clashes.
+
+    indices
+
+      Forces an update of the CPANPLUS indices. Takes one parameter, a
+      hashref with the following keys defined:
+
+        'event', an event name for the results to be sent to (Mandatory);
+        'session', which session the result event should go to (Default is the sender);
+        'perl', which perl executable to use (Default whatever is in $^X);
+        'prioritise', set to 1 to put action at the front of the job queue, default 0;
+
+      It is possible to pass arbitrary keys in the hash. These should be
+      proceeded with an underscore to avoid possible future API clashes.
+
+OUTPUT EVENTS
+
+    Resultant events will have a hashref as ARG0. All the keys passed in as
+    part of the original request will be present (including arbitrary
+    underscore prefixed ones), with the addition of the following keys:
+
+      'log', an arrayref of STDOUT and STDERR produced by the job;
+      'PID', the process ID of the POE::Wheel::Run;
+      'status', the $? of the process;
+      'submitted', the time in epoch seconds when the job was submitted;
+      'start_time', the time in epoch seconds when the job started running;
+      'end_time', the time in epoch seconds when the job finished;
+      'idle_kill', only present if the job was killed because of excessive idle;
+      'excess_kill', only present if the job was killed due to excessive runtime;
+
+    The results of a 'recent' request will be same as above apart from an
+    additional key:
+
+      'recent', an arrayref of recently uploaded modules;
+
+    The results of a 'package' or 'author' search will be same as other
+    events apart from an additional key:
+
+      'results', an arrayref of the modules returned by the search;
+
+MSWin32
+
+    POE::Component::CPAN::YACSmoke now supports MSWin32 in the same manner
+    as other platforms. Win32::Process is used to fix the issues
+    surrounding POE::Wheel::Run and forking alternative copies of the perl
+    executable.
+
+    The code is still experimental though. Be warned.
+
+KUDOS
+
+    Many thanks to all the people who have helped me with developing this
+    module.
+
+    Specially to Jos Boumans, the CPANPLUS dude, who has patiently
+    corrected me when I have asked stupid questions and speedily fixed
+    CPANPLUS when I made disgruntled remarks about bugs >:)
+
+    And to Robert Rothenberg and Barbie for CPAN::YACSmoke.
+
+SEE ALSO
+
+    POE::Component::SmokeBox
+
+    App::SmokeBox::Mini
+
+    minismoker
+
+    POE
+
+    CPANPLUS
+
+    CPAN::YACSmoke
+
+    http://cpantest.grango.org/cgi-bin/pages.cgi?act=wiki-page&pagename=YACSmokePOE
+
+    http://use.perl.org/~BinGOs/journal/
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

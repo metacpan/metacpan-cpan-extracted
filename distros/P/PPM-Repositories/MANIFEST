@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml                                Module meta-data (added by MakeMaker)
+Makefile.PL
+README
+Repositories.pm
+eg/obsolete.pl
+eg/sample.pl
+eg/synopsis.pl
+t/test.t
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,75 @@
+Revision history for Perl module Perl::PrereqInstaller
+
+0.6.2 2014-08-17
+
+  - Fix testing bug
+
+0.6.1 2014-08-16
+
+  - Only create README.md if './Build.PL --readme'
+
+0.6.0 2014-08-16
+
+  - Merge file scanning and directory scanning
+  - Add report() method to summarize scan/install results
+  - Turn off most of the output with quiet mode option
+  - Expand file types analyzed in directories to .pl/.pm/.cgi/.psgi/.t
+  - For files larger than PPI:Tokenizer's 1 MB limit, scan code in 0.5 MB chunks
+  - Catch and report scan warnings
+  - Add tests for summary reports
+  - Update and revise documentation
+  - And more little stuff
+  - Happy CPAN Day!
+
+0.5.0 2014-07-28
+
+  - Switch from Module::Extract::Use to Perl::PrereqScanner
+  - Rename Module::Extract::Install to Perl::PrereqInstaller
+  - Rename cpanm-missing(-deep) to install-perl-prereqs(-deep)
+
+0.4.4 2014-07-23
+
+  - Track build status with Travis CI
+  - Track coverage status with Coveralls.io
+  - Add tests for deep module checking
+
+0.4.3 2014-07-23
+
+  - Add tests
+
+0.4.2 2014-07-15
+
+  - Add dry-run option for cpanm-missing(-deep)
+  - Avoid situations that cause errors and warnings
+
+0.4.1 2014-07-14
+
+  - Add check_modules_deep() example to synopsis
+
+0.4.0 2014-07-14
+
+  - Traverse directory to install missing modules with check_modules_deep()
+  - Traverse directory to install missing modules via CLI with 'cpanm-missing-deep'
+  - Add help & version options for cpanm-missing(-deep)
+
+0.3.2 2014-07-14
+
+  - Add App::cpanminus as a dependency
+
+0.3.1 2014-07-14
+
+  - Reformat cpanm-missing output
+
+0.3.0 2014-07-14
+
+  - Install missing modules via command line with 'cpanm-missing'
+
+0.2.0 2014-07-14
+
+  - Track new and failed installations
+  - Analyze multiple files with single call
+  - Changed method names
+
+0.1.0 2014-07-14
+
+  - Install uninstalled modules explicitly loaded by a Perl script or module

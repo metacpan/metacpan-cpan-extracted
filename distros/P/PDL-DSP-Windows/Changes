@@ -1,0 +1,24 @@
+Revision history for PDL-DSP-Windows
+
+0.007  Fri, 27 Jul 2012 18:23:43 +0200
+       GJL. utf in pod
+
+0.006  Fri, 27 Jul 2012 10:33:47 +0200
+       GJL. try to get cpan to display doc.
+
+0.005  Thu, 26 Jul 2012 11:58:30 +0200 
+       GJL. condition running tests on presence of
+            libraries.
+
+0.004   Tue Jul 24 02:53:17 CEST 2012
+        GJL. No more trial and error with CPAN
+
+0.003   Mon Jul 23 21:38:30 CEST 2012
+        GJL. Testing README README.pod .pm files with github
+        and cpan.
+
+0.002   Fri, 20 Jul 2012 16:19:11 +0200
+        GJL. Trying new packaging scheme. Bumped version number
+
+0.01    Date/time
+        First version.

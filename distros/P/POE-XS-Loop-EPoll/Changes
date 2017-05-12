@@ -1,0 +1,63 @@
+This is the change history of POE::XS::Loop::EPoll.
+
+1.003 Sun Mar  3 12:58:26 EST 2013
+
+ - update the bundled Devel::CheckLib to support 5.17.x development
+   perls
+
+ - document that issues should be submitted through RT.
+
+ - require XSLoader and don't fall back to DynaLoader.
+
+1.002 Sun Aug 19 13:07:14 EST 2012
+
+ - moved to git:
+   https://github.com/tonycoz/poe-xs-loop-epoll
+
+ - fix a logic bug in a range check.  This could cause a crash.
+   https://rt.cpan.org/Ticket/Display.html?id=79013
+   Thanks to Thomas Edward Alexander Molesworth for reporting this.
+
+1.001_02 Fri Mar 19 18:42:18 EST 2010
+
+ - Devel::CheckLib:: assert_lib() only runs the test code when you
+   supply a library name, I didn't supply a library name so it didn't
+   properly check for epoll_create().  Supply a library name of "c"
+   (aka libc) to placate assert_lib().
+
+1.001_01 Mon Mar 15 20:57:48 EST 2010
+
+ - check that epoll is actually available, it's not available for all
+   Linux systems.
+
+1.001 Sun Mar  7 13:17:17 EST 2010
+
+ - don't mortalize the temp svs we use in tracing, we might be inside
+   lp_loop_run(), and the SVs won't be released until that returns.
+   Use SvREFCNT_dec() instead.
+
+ - use the poexs time function instead of defining our own.
+
+1.000 
+
+ - use META_MERGE in Makefile.PL instead of the obsolete EXTRA_META
+   https://rt.cpan.org/Ticket/Display.html?id=39700
+
+ - croak if loop methods are called when the loop hasn't been initialized
+   https://rt.cpan.org/Ticket/Display.html?id=55063
+
+ - treat EPOLLHUP events as read events
+   https://rt.cpan.org/Ticket/Display.html?id=53474
+
+ - if we notice a change in process id, assume the epoll fd has been
+   cloned, close it (for this process) and reload it with the events
+   we're watching.
+   https://rt.cpan.org/Ticket/Display.html?id=53474
+
+ - removing trailing newlines from trace output to avoid doubled PIDs
+   in the output
+
+ - disable assertions which 0.001 shipped with.
+
+0.001 Fri Aug 15 18:53:01 EST 2008
+ - initial release

@@ -1,0 +1,19 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Path/Iter.pm
+lib/Path/Iter.pod
+t/00.load.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+t/path/
+t/path/dir.a/
+t/path/dir.a/dir.a
+t/path/dir.a/dir.b
+t/path/dir.a/file.x
+t/path/dir.a/file.y
+t/path/file.b
+t/path/file.z
+META.yml                                 Module meta-data (added by MakeMaker)

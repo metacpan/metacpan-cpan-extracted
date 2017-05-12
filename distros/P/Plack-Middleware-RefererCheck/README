@@ -1,0 +1,52 @@
+NAME
+    Plack::Middleware::RefererCheck - check referer for defensive CSRF
+    attack.(DEPRECATED)
+
+SYNOPSIS
+      use Plack::Builder;
+
+      builder {
+          enable 'RefererCheck', host => 'www.example.com', same_scheme => 1, error_app => sub { [403, [], ['Forbidden']] };
+          $app;
+      };
+ 
+      or more simply(host from $env->{HTTP_HOST} and same_scheme => 0)
+      # this is vulnerabilly for DNS Rebinding
+      builder {
+          enable 'RefererCheck';
+          $app;
+      };
+
+DESCRIPTION
+    Please note that this module has been DEPRECATED.
+
+    Because Referer is not required and RFC2616 strongly recommends that the
+    user be able to select whether or not the field.
+
+    Please use other way. For example Plack::Middleware::CSRFBlock,
+    Catalyst::Controller::RequestToken and Amon2::Plugin::Web::CSRFDefender.
+
+CONFIGURATION
+    host
+        Instead of using $env->{HTTP_HOST} if you set.
+
+    same_scheme
+        Check if you are setting "1" the same scheme.default: "0"
+
+    error_app
+        Is an PSGI-app that runs on errors.default: return 403 Forbidden
+        app.
+
+    no_warn
+        mute DEPRECATED warnings.
+
+AUTHOR
+    Masahiro Chiba
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Plack::Middleware Plack::Builder
+

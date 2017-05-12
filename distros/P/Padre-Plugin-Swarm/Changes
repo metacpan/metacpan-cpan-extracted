@@ -1,0 +1,83 @@
+Changes for Perl extension Padre-Plugin-Swarm
+0.2	- Tue Nov 15 21:36:55 EST 2011
+        - move depends to Padre 0.92
+        - add margin symbol for feedback/comment
+	- add different cursor styling to indicate the original owner's cursor
+        - add ghost cursors in the editor margin showing where other remote editors cursors are
+	- pod updates
+	- first attempt at collaboration with bowtie from irc. (BRAMBLE)
+	- first real 2-way co-operative editing capability
+	- move to new Padre::Task api
+	- add Swarm::Universe container for tools and transports
+	- replace Wx::Socket and IO::Poll task transport with AnyEvent
+0.11  - Fri Jul 29 11:32:24 EST 2011
+        - adjustments to loading of Wx::Socket #1264.
+0.1   - Thu Feb  3 13:46:14 EST 2011
+	- fix Changes file
+0.094 - Thu Feb  3 13:35:14 EST 2011
+        - fix (1) bug causing crash when disabling plugin
+	- convert multicast service to new Task API
+	- add timestamps to chat window
+	- fix JSON parsing in WxSocket transport
+0.093 - Sat Feb 13 23:14:23  EST 2010
+	- extend the plugin pod and chat pod
+	- hackish keepalive on global transport wxsocket
+	- fix wx flags on chat control to behave on win32
+	- fix json decoding bug with large messages
+	- make chat text font fixed-width
+	- add tab completion of nickname in chat text entry
+0.092 - Sat Feb 13 13:47:38 EST 2010
+	- remove references to packages lost after refactor
+	- skip compile tests without DISPLAY 
+0.091 - Sat Feb 13 00:15:00 EST 2010
+	- broken
+0.09 - Fri Feb 12 23:45:11 EST 2010
+	- refactor network parts into Transport::* 
+	- more useful output returned from runme
+	- prevent loopback of runme message type
+	- prevent loopback of openme message type
+	- add preferences dialog
+
+0.08 - Fri Feb  5 
+	- add pod - mostly TODO 
+	- stop squatting in padre::wx namespace
+
+0.07 - Sun Jan 17 19:48:09 EST 2010
+	- allow document stealing
+	- observe other swarm users open editor documents
+	- hook editor_enable/disable and announce documents open/close
+	- add swarm resource tree next to directory/project tree
+	- remove deps on IO::Interface
+	- pass incoming swarm messages as Wx events
+	- internal reworking
+0.06 
+	- add feature Open in Other Editor
+	- attempt to select a usable multicast interface
+0.05 - Sun Dec 13 19:51:51 EST 2009
+	- add 'Run in other editor' feature 
+	- chat text restyled
+	- chat accept message type 'promote' 
+	- Replaced debug called with new TRACE() call
+0.04 - Wed Nov  4 17:36:05 EST 2009
+	- test updates
+	- version boilerplate (BRAMBLE) 
+0.03 *RELEASED POORLY*
+	- expunge IRC transport (BRAMBLE)
+	- remove list of chat users
+
+0.02 *RELEASED IN ERROR* 
+	- add some styling to user chat window , colourize output
+	- attempt to add a list of chat users
+	- apply diff snippets to current documents silently and with deadly force
+
+0.01 - Sun Nov 1 2009 
+	- add chat-join announcements to chat window (BRAMBLE)
+	- add support for '/nick' change (BRAMBLE)
+	- Moved Padre::Swarm::Transport::XMPP to it's own
+	  distribution (ADAMK)
+	- Made warnings toggle'able with a single constant (ADAMK)
+	- Three available transports - two of which appear to work.
+	- Achieve universal application milestone (embed chat client).
+	- Factor some rude parts out into Padre::Service
+	- Experiments in Multicast and Jabber
+	- Creating the initial skeleton

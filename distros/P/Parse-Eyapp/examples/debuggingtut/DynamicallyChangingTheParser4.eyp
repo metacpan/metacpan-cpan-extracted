@@ -1,0 +1,84 @@
+%{
+=head1 SYNOPSIS
+
+See section 'SOLVING CONFLICTS WITH THE POSTPONED CONFLICT STRATEGY' in
+http://search.cpan.org/perldoc?Parse::Eyapp::debuggingtut
+
+This example illustrates how to dynamically
+change the behavior of the parser for a shift-reduce conflict
+   
+Be sure C<DebugTail.pm> is reachable
+compile it with 
+
+      eyapp -b '' DynamicallyChangingTheParser.eyp
+
+execute the generated modulino with the option C<-t>:
+
+      ./DynamicallyChangingTheParser.pm -t
+
+=head1 See also
+
+    Debug.eyp Debug1.eyp Debug2.eyp and DebugLookForward.eyp
+
+=cut
+
+our $VERSION = '0.01';
+use base q{DebugTail}; 
+
+%}
+
+%token D S
+
+%tree bypass
+
+# Expect just 1 shift-reduce conflict
+%expect 1 
+
+%%
+p: %name PROG
+    block +
+;
+
+block:
+    %name BLOCK_DS
+    '{' ds ';' ss '}' 
+  | %name BLOCK_S
+    '{' ss '}'
+;
+
+ds:
+    %name D2
+    D conflict ';' ds    
+  | %name D1
+    D conflict        
+;
+
+ss:
+    %name S2
+    S ';' ss      
+  | %name S1
+    S       
+;
+
+conflict:
+      /* empty. This action solves the conflict using dynamic precedence */
+      {
+        my $self = shift;
+
+        if (${$self->input()} =~ m{^\s*;\s*S}) {
+          $self->YYSetReduce(';', 'D1' )
+        }
+        else {
+          $self->YYSetShift(';')
+        }
+
+        undef; # skip this node in the AST
+      }
+;
+
+%%
+
+__PACKAGE__->lexer( \&DebugTail::lex); 
+
+my $prompt = 'Provide a statement like "{D; S} {D; D; S}" and press <CR><CTRL-D>: ';
+__PACKAGE__->main($prompt) unless caller;

@@ -1,0 +1,21 @@
+Changes file for Perl::Critic::Policy::logicLAB::RequireParamsValidate
+
+Project change log:
+
+http://logiclab.jira.com/browse/PCPLRPV#selectedTab=com.atlassian.jira.plugin.system.project%3Achangelog-panel
+
+0.03 2015-08-27 Maintenance release, update not required
+
+- Migrated from Module::Build to Dist::Zilla
+
+
+0.02 2014-03-05 Maintenance release, update not required
+
+- Added minimum Perl version (5.6.0) to Build.PL
+
+- Added requirement for Module::Build 0.40 as hinted by Module::Build
+
+
+0.01 2014-02-27 Initial release
+
+- Initial release

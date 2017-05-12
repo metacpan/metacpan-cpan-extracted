@@ -1,0 +1,11 @@
+Revision history for Plack-Debugger-Panel-DBIC-QueryLog
+
+0.002 Fri  8 Jul 12:53:02 CEST 2016
+
+    * Read template from DATA into singleton on initial import instead of
+      inside template method since DATA might not be available on later calls
+      for certain Perl versions.
+
+0.001 Tue 26 Apr 19:40:21 CEST 2016
+
+    * Initial release, warts and all

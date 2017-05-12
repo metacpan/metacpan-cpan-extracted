@@ -1,0 +1,32 @@
+<html>
+<body bgcolor="#ffffff">
+<h1>NAME</h1>
+
+<p>120-verbatim-paragraphs</p>
+<h1>EXAMPLES</h1>
+
+<h2>Simple Verbatim Section Content</h2>
+<pre>    First line
+
+    Second line
+    (note blank line with one space and empty line follow)
+ 
+
+    Third line</pre>
+
+<h2>Verbatim Interspersed with Normal Text</h2>
+<p>Text before verbatim paragraph.</p>
+<pre>    Verbatim paragraph</pre>
+
+<p>Text between verbatim paragraphs</p>
+<pre>    Two line
+    verbatim paragraph</pre>
+
+<p>Text between verbatim paragraphs</p>
+<pre>    Verbatim paragraph
+
+    More text after a blank line</pre>
+
+<p>[EOF]</p>
+</body>
+</html>

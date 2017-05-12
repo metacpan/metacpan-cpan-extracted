@@ -1,0 +1,43 @@
+{
+   "abstract" : "A lightweight PSGI framework - Logger Plugin - Log::Log4perl",
+   "author" : [
+      "Paul Lockaby <plockaby AT cpan DOT org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Prancer::Plugin::Log4perl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Prancer" : "1.00",
+            "Log::Log4perl" : "0",
+            "Try::Tiny" : "0",
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.01"
+}

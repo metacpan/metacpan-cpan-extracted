@@ -1,0 +1,254 @@
+=pod
+
+=head1 NAME
+
+Examples for POE::Component::Server::HTTPServer
+
+=head1 EXAMPLES
+
+This document contains some examples of using HTTPServer in various
+ways.  HTTPServer uses the L<POE> framework, but you don't need to
+know much (if anything) about POE in order to use HTTPServer in most
+cases.  But if you're curious about what C<$poe_kernel-E<gt>run()>
+really does, or what the value returned by C<create_server()> might be
+used for, POE is where to look.
+
+=head2 Basic Server
+
+Setting up a basic server which uses all the defaults, is easy:
+
+    use POE;
+    use POE::Component::Server::HTTPServer;
+    
+    my $server = POE::Component::Server::HTTPServer->new();
+    $server->create_server();
+    $poe_kernel->run();
+    exit 0;
+
+Running this program should start a new HTTPServer listening on port
+8080 (the default port).  It will return a 404 Not Found response for
+any request (via the default backstop handler).
+
+The two C<use> lines, as well as the final three lines
+(C<create_server>, C<run>, C<exit>), are basic boilerplate.  They
+import the necessary modules and set the server in motion.
+
+=head2 Serving Static Files
+
+Serving a set of files from the file system is also easy:
+
+    my $server = POE::Component::Server::HTTPServer->new(
+      handlers => [ '/' => new_handler("StaticHandler", "./html") ]
+    );
+
+Any requests the server recieves will be mapped to files underneath
+the C<html> directory, and their contents will be served.  Any
+requests for non-existant files will fall through to the backstop
+handler, which will reply with a 404.
+
+=head2 A Simple Generated Response
+
+The easiest way to generate a response is something like this:
+
+    use POE::Component::Server::HTTPServer::Handler;
+
+    my $server = POE::Component::Server::HTTPServer->new();
+    $server->handlers( [ 
+      '/' => sub {
+               my $context = shift;
+               $context->{response}->code(200);
+               $context->{response}->content(
+                 "<HTML><BODY><H1>Hi There</H1></BODY></HTML>\n"
+               );
+               return H_FINAL;
+             }
+    ] );
+
+Notice that C<handlers()> takes as an argument a list reference.  The
+C<=E<gt>> notation is used to highlight the pairs in the list.
+
+In this example, the URI prefix '/' is associated with a handler sub,
+which returns a simple HTML page.  It sets the response code, the
+content of the response, and returns a value (H_FINAL, exported by
+HTTPServer::Handler) indicating that processing is finished.  Because
+every request to this server will match the handler prefix ('/'), and
+because the handler finalizes itself, every request will now get this
+sample response page.
+
+=head2 Passing on Requests
+
+You can choose to not handle certain requests:
+
+    $server->handlers( [
+      '/a/?' => sub {
+                  my $context = shift;
+                  if ( $context->{contextpath} eq '/chuck' ) {
+                    return H_CONT; # don't handle chuck!
+                  }
+                  $context->{response}->code(200);
+                  $context->{response}->content(
+                    "<HTML><BODY><H1>Hi There, A.</H1></BODY></HTML>\n"
+                  );
+                  return H_FINAL;
+                },
+      '/a/?' => sub {
+		  my $context = shift;
+    	          $context->{error_message} = "No chucks allowed!";
+                  return H_CONT;
+                },
+    ] );
+
+There are now two handlers defined, both of which are associated with
+the prefix '/a/?'.  These handlers will be invoked only for requests
+whose URIs begin with that prefix.  Order of handlers is important, so
+the first handler will be invoked and then, if it does not return
+H_FINAL, the second.
+
+The first handler passes on the request if the request URI is
+'/a/chuck'.  In that case, the second handler is invoked, which sets
+an attribute ("error_message") in the context and passes itself.
+Because the second handler also passes, the request falls through to
+the backstop, which will return a 404.
+
+In this example, any request not beginning with '/a/' will result in a
+404 response.
+
+=head2 A Simple Handler Object
+
+Another alternative for writing handlers is to package them
+seperately.  Aside from being a little more pretty (though taste
+varies), it allows you to write reusable, configurable handlers.
+
+This example does the same as the "Simple Generated Response" example:
+
+    my $server = POE::Component::Server::HTTPServer->new(
+      [ '/' => MyHandler->new() ]
+    );
+    $server->create_server();
+    $poe_kernel->run();
+    exit 0;
+    
+    package MyHandler;
+    use POE::Component::Server::HTTPServer::Handler;
+    our @ISA = qw(POE::Component::Server::HTTPServer::Handler);
+
+    sub handle {
+        my $self = shift;
+        my $context = shift;
+        $context->{response}->code(200);
+        $context->{response}->content(
+            "<HTML><BODY><H1>Hi There</H1></BODY></HTML>\n"
+        );
+        return H_FINAL;
+    }
+    
+    1;
+
+=head2 Accessing Parameters
+
+The ParameterParseHandler can be used to access CGI parameters:
+
+    my $server->handlers( [
+      '/' => new_handler( 'ParameterParseHandler' ),
+      '/' => sub {
+               my $context = shift;
+               my $name = $context->{param}->{name} || "(undefined)";
+               $context->code(200);
+               $context->content( qq{
+                   <HTML><BODY>
+                   Name was $name.<BR>
+                   <FORM method="GET" action="/">
+                   Enter name: <input type="text" name="name">
+                               <input type="submit">
+                   </FORM>
+                   </HTML></BODY>
+               } );
+               return H_FINAL;
+             }
+    ] );
+
+This will print a simple form with a text field, and should print the
+value entered on submission.
+
+=head2 Filtering Requests
+
+Though handlers are chosen by matching against the request URI, the
+URI matching is done against a path stored in the context.  This
+allows handlers to modify the request path seen by later handlers.
+
+You can use this to perform request filtering:
+
+    my $server->handlers( [
+      '/' => sub {
+               my $context = shift;
+               $context->{fullpath} =~ s{^/oldsite/}{/newsite/};
+               $context->{fullpath} =~ s{\.htm$}{\.html}i;
+               return H_CONT;
+             },
+      '/' => new_handler('StaticHandler', './html'),
+    ] );
+
+The first handler performs two url filtering operations: it changes
+any path beginning with "/oldsite", to one beginning with "/newsite",
+and it changes urls ending in ".htm" or ".HTM" to ".html".  Since this
+handler returns H_CONT, all requests fall through to the StaticHandler
+after being (possibly) modified.
+
+=head2 Redispatching Requests
+
+Sometimes, after a handler has done some work and modified the
+context, it may wish to restart the dispatch process from the top.
+HTTPServer's C<dispatch()> method restarts processing at the start at
+the handler list, but keeps the current context unchanged.  This can
+be used to perform an "internal redirect":
+
+    my $server->handlers( [
+      # our input forms are in here:
+      '/html/' => new_handler('StaticHandler', './html'),
+      # this handles a form submission:
+      '/sub/' => new_handler('ParameterParseHandler'),
+      '/sub/newEntry' => sub {
+        my $context = shift;
+        my($name, $value) =
+          ($context->{param}->{name},$context->{param}->{info});
+        # save the submitted data:
+        open(my $out, "> $DataDir/$name.txt") || die $!;
+        print $out $info;
+        $context->{status_message} = "Data for $name saved!";
+        return $context->{dispatcher}->dispatch($context,"/html/success.html");
+      },
+    ] );
+
+The handler for C</sub/newEntry> accepts a form submission
+(presumably, from a form in C</html>), writes the data to a file, and
+tells HTTPServer to start again, as though the request had been for
+C</html/success.html>.  The context now has the C<status_message>
+attribute, however.
+
+=begin comment
+
+todo:
+
+=head2 HTTP Basic Authentication
+
+=end comment
+
+
+=head1 SEE ALSO
+
+L<POE::Component::Server::HTTPServer>, 
+L<POE::Component::Server::HTTPServer::Handler>, 
+L<POE>.
+
+=head1 AUTHOR
+
+Greg Fast <gdf@speakeasy.net>
+
+=head1 COPYRIGHT
+
+Copyright 2003 Greg Fast.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

@@ -1,0 +1,28 @@
+NAME
+    Plack::App::Prack - Proxy plack requests to a rack application
+
+SYNOPSIS
+        use Plack::Builder;
+        use Plack::App::Prack;
+
+        builder {
+          mount "/rack" => Plack::App::Prack->new(config => "config.ru");
+        }
+
+DESCRIPTION
+    This app will fork a ruby process that can handle rack requests.
+    Requests are converted to JSON and sent over a unix socket as a
+    netstring, a response is then read and used as the psgi response.
+
+AUTHOR
+    Lee Aylward, "<leedo at cpan.org>"
+
+SEE ALSO
+    Nack <http://josh.github.com/nack/>
+
+    Plack::Builder
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

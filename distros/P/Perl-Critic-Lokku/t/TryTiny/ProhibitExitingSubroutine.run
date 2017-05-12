@@ -1,0 +1,257 @@
+## name A normal "try" invocation
+## failures 0
+## cut
+
+use Try::Tiny;
+
+sub hello {
+    for my $i (0..10) {
+        try {
+            print "$i\n";
+        }
+        catch {
+            warn $_;
+        };
+    }
+}
+
+hello();
+
+## name A "try" invocation with "next" inside it
+## failures 1
+## cut
+
+use Try::Tiny;
+
+sub hello {
+    for my $i (0..10) {
+        try {
+            print "$i\n";
+            next;
+        }
+        catch {
+            warn $_;
+        };
+    }
+}
+
+hello();
+
+## name A "try" invocation with "$i == 0 && next" inside it
+## failures 1
+## cut
+
+use Try::Tiny;
+
+sub hello {
+    for my $i (0..10) {
+        try {
+            print "$i\n";
+            $i == 0 && next;
+        }
+        catch {
+            warn $_;
+        };
+    }
+}
+
+hello();
+
+## name A "try" invocation with "next if $i == 0"
+## failures 1
+## cut
+
+use Try::Tiny;
+
+sub hello {
+    for my $i (0..10) {
+        try {
+            print "$i\n";
+            next if $i == 0;
+        }
+        catch {
+            warn $_;
+        };
+    }
+}
+
+hello();
+
+## name A "try" invocation with "next LABEL" inside it
+## failures 0
+## cut
+
+use Try::Tiny;
+
+sub hello {
+    LABEL:
+    for my $i (0..10) {
+        try {
+            print "$i\n";
+            next LABEL;
+        }
+        catch {
+            warn $_;
+        };
+    }
+}
+
+hello();
+
+## name A "try" invocation with "$i == 0 && next LABEL" inside it
+## failures 0
+## cut
+
+use Try::Tiny;
+
+sub hello {
+    LABEL:
+    for my $i (0..10) {
+        try {
+            print "$i\n";
+            $i == 0 && next LABEL;
+        }
+        catch {
+            warn $_;
+        };
+    }
+}
+
+hello();
+
+## name A "try" invocation with "next LABEL if $i == 0"
+## failures 0
+## cut
+
+use Try::Tiny;
+
+sub hello {
+    EXAMPLE_LABEL:
+    for my $i (0..10) {
+        try {
+            print "$i\n";
+            next EXAMPLE_LABEL if $i == 0;
+        }
+        catch {
+            warn $_;
+        };
+    }
+}
+
+hello();
+
+## name A "try" invorcation with an if-block inside it
+## failures 1
+## cut
+
+use Try::Tiny;
+
+for my $i (0..10) {
+    try {
+        if (1 == 1) {
+            next;
+        }
+        print "hi\n";
+    };
+    print "bla\n";
+}
+
+## name A "try" invocation with a for-loop, and a "next" inside
+## failures 0
+## cut
+
+use Try::Tiny;
+
+try {
+    for my $i (0..10) {
+        if (1 == 1) {
+            next;
+        }
+        print "bla\n";
+    }
+    print "bla\n";
+};
+
+## name A "try" invocation with a for-loop, and a "next" outside
+## failures 1
+## cut
+
+use Try::Tiny;
+
+try {
+    for my $i (0..10) {
+        if (1 == 1) {
+            next;
+        }
+        print "bla\n";
+    }
+    print "bla\n";
+    next;
+};
+
+## name A "try" invocation with subref, and a "return" inside
+## failures 0
+## cut
+
+use Try::Tiny;
+
+try {
+    my $callback = sub {
+        print "hello\n";
+        return "hello";
+    };
+    $callback->();
+};
+
+## name A "try" invocation with subref inside it, with "try" inside it, with "return"
+## failures 1
+## cut
+
+use Try::Tiny;
+
+try {
+    my $callback = sub {
+        try {
+            print "hello\n";
+            return "hello\n";
+        };
+        print "bla";
+    };
+    $callback->();
+};
+
+## name An empty catch block
+## failures 0
+## cut
+
+use Try::Tiny;
+
+try {
+    die "hi";
+}
+catch {
+};
+
+## name A "try" word on its own
+## failures 0
+## cut
+
+try
+
+## name Try::Tiny not imported, perhaps we will support TryCatch and others in future
+## failures 0
+## cut
+
+sub hello {
+    for my $i (0..10) {
+        try {
+            print "$i\n";
+            next;
+        }
+        catch {
+            warn $_;
+        };
+    }
+}
+
+hello();

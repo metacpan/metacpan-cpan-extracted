@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.51.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5433636b1da7fa6fdc7bfa9c09b94feadedd34f6 Changes
+SHA1 913f7510a73abc153084c0f700fed1eb99136c65 MANIFEST
+SHA1 ea76dabfa62240ea83c99e701298b1c8ead67416 META.yml
+SHA1 8d8cc67cfe8e099c363615d5ee7aa319806122e3 Makefile.PL
+SHA1 eed62ec0a7c0ef6b6b2daf51f2a2969d813e881a README
+SHA1 5b19dfefe1ef0e83b49fd79a713f373961346336 inc/Algorithm/Diff.pm
+SHA1 59e7214afc4a485b1053359d1ebdfe6559d084a7 inc/Module/AutoInstall.pm
+SHA1 af5e1b71ef6beec68dc3c2bb16457854f1215f5d inc/Module/Install.pm
+SHA1 e5ab295fd8b71c09331b674b668b5d6fbf1a1726 inc/Module/Install/AutoInstall.pm
+SHA1 726a6420b06d98e409bc105cc22f632855bbe3ed inc/Module/Install/Base.pm
+SHA1 1ae0b64895f73745680a2c2950053f64ccc116cc inc/Module/Install/Can.pm
+SHA1 d097dedadac0edcafbee3a14c262e24089f5795e inc/Module/Install/Fetch.pm
+SHA1 08bfc9e53d1e15f5556c9d282a7db70a68b9ff06 inc/Module/Install/Include.pm
+SHA1 9dc6e65553c7e70f57287ecbf2e072611bf2b27f inc/Module/Install/Makefile.pm
+SHA1 7b45ddc2699f9d248a6a3c0e873f16d48f732878 inc/Module/Install/Metadata.pm
+SHA1 8ee248d67d4c61a4f01e6a96c41afbd93be4c9ef inc/Module/Install/Win32.pm
+SHA1 3c099dd7fb73a49bcc489b152c3ca3c7a1b36427 inc/Module/Install/WriteAll.pm
+SHA1 c87bdabf9b9288866e4772df4b10bd826f1ecbad inc/Spiffy.pm
+SHA1 265ac347bde2031d83d52b8ae701271060356ad2 inc/Test/Base.pm
+SHA1 abc7a184c35573c261f66dffb4793c0b03c7119f inc/Text/Diff.pm
+SHA1 c4449e0f7e00addc721d68baf2902f35ecf4b8e6 inc/YAML.pm
+SHA1 5ad91a08a48fb399d507d5f36cb36cfd6f11934f inc/YAML/Base.pm
+SHA1 e4b9c8c359e6a7b9f47d80c137a933900e82d654 inc/YAML/Dumper/Base.pm
+SHA1 02da2ffcb2dda2146a7fff0318acc27f22076ea9 inc/YAML/Error.pm
+SHA1 9d4d93eddebaff597cf9c53edc6f9d7bb384237e inc/YAML/Family.pm
+SHA1 f66dd54dac2045017b28d35feee7dab8e19464d1 inc/YAML/Node.pm
+SHA1 e29e72ec6b157f68d5077c5ac2dd099627301616 lib/Parse/SVNDiff.pm
+SHA1 4d2eb2eb3e4f57b7b278e0266f1c2aa413c0889e lib/Parse/SVNDiff/Ber.pm
+SHA1 152c07d729e07e0340eb275b714c6feccbe5ca49 lib/Parse/SVNDiff/Instruction.pm
+SHA1 4d1bef83f2b81bbd5f99c2ef8379b02db4b15e03 lib/Parse/SVNDiff/Window.pm
+SHA1 c965596f4136c97e013dffd3e36188bc2f30fa69 t/1-basic.t
+SHA1 a1b08718d30f4c50c758d4653a99ad3d364ce1b6 t/SVNDiffTests.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (FreeBSD)
+
+iD8DBQFDug6BtLPdNzw1AaARAqQHAJ9pK+PQkqbJB+UI/h2XKLCIEFr3JwCeMi6W
+pN59luRb7WuYqEC1X6XymD4=
+=wrjz
+-----END PGP SIGNATURE-----

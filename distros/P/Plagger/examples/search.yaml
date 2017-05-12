@@ -1,0 +1,32 @@
+# Create your own search engine by aggregating data from variouis search engines
+# and store the updated entry data to the localhost HyperEstraier
+
+plugins:
+  # Subscribe to search engines using "Plagger" as a keyword
+  # and "http://plagger.org/" as a linking URL
+  - module: Subscription::Planet
+    config:
+      keyword: Plagger
+      url: http://plagger.org/
+
+  # Aggregate those feeds using Xango the asynchronous crawler
+  - module: Aggregator::Xango
+
+  # Fixup permalink by resolving redirector cruft to the canonicalized URL
+  - module: Filter::TruePermalink
+
+  # Upgrade entry body to fulltext if possible
+  - module: Filter::EntryFullText
+
+  # Create SmartFeed by merging search results into a single new feed
+  - module: SmartFeed::All
+
+  # Store merged feed entries to localhost Estraier instance
+  # by using its node HTTP API
+  - module: Search::Estraier
+    config:
+      url: http://localhost:1978/node/plagger
+      username: example
+      password: p4ssword
+    rule:
+      expression: $args->{feed}->id eq 'smartfeed:all'

@@ -1,0 +1,11 @@
+Revision history for Perl extension Plucene::Analysis::UTF8Analyzer.
+
+0.02	2007/07/25
+	- Don't style copyright info, pod will generate correctly.
+	- Add UTF8.pod to document.
+	- Add Pluence to dependency list.
+
+0.01	2007/07/25
+	- original version; created by h2xs 1.23 with options
+		-A -X Plucene::Analysis::UTF8Analyzer
+

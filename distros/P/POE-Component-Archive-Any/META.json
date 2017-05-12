@@ -1,0 +1,52 @@
+{
+   "abstract" : "a non-blocking wrapper around",
+   "author" : [
+      "Zoffix Znet <zoffix@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-Archive-Any",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Any" : "0",
+            "Carp" : "0",
+            "POE" : "0",
+            "POE::Filter::Line" : "0",
+            "POE::Filter::Reference" : "0",
+            "POE::Wheel::Run" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "POE::Component::Archive::Any" : {
+         "file" : "lib/POE/Component/Archive/Any.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.002"
+}

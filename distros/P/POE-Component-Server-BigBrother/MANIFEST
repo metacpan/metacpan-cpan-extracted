@@ -1,0 +1,14 @@
+ChangeLog
+examples/synopsis.pl
+GPL
+lib/POE/Component/Server/BigBrother.pm
+Makefile.PL
+MANIFEST
+README
+tools/regexp.pl
+tools/disable_smart_comments
+t/00_use.t
+t/99_pod.t
+t/99_pod_coverage.t
+t/99_distribution.t.disable
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,21 @@
+Revision history for Padre-Plugin-ClassSniff
+
+0.30   2010.12.06
+  - Bumped to version 0.30 to be able to actually upload (AZAWAWI)
+  - Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+  - Added translations:
+    - Brazilian Portuguese (garu)
+    - French (jquelin)
+    - Polish (therek)
+    - Chinese (Traditional) translation (BLUET)
+    - Arabic (azawawi)
+    - Spanish (brunov)
+  - actually install the translations (RSN)
+  - removed old copy-pasted information from Padre-Plugin-Git (ZENOG)
+  - Compatibility with the latest Padre (ZENOG, AZAWAWI)
+  - Code cleanup (AZAWAWI)
+  - Switched to Dist::Zilla (AZAWAWI)
+
+0.01    2009-03-19
+  - Initial version
+

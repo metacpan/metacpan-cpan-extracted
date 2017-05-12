@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+lib/Proc/Queue.pm
+samples/sample1.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+t/run.t
+t/pods.t

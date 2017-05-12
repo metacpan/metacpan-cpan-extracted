@@ -1,0 +1,18 @@
+=pod
+
+=head1 SYNOPSIS
+
+This is a synopsis
+
+=head1 SYNOPSIS
+
+This is another synopsis. Having two synopses is a problem.
+
+=head1 DESCRIPTION
+
+This is a simple document meant to be used in testing
+Pod::Weaver::Plugin::EnsureUniqueSections.
+
+It does not do very much.
+
+=cut

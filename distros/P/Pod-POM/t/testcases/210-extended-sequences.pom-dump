@@ -1,0 +1,66 @@
+pod
+  head1
+    @title
+      "NAME"
+    text
+      @text
+        "210-extended-sequences"
+  head1
+    @title
+      "TESTCASES"
+    text
+      @text
+        "This is "
+        B<<
+          "bold"
+        >>
+        "."
+    text
+      @text
+        "This is "
+        I<<
+          "italic"
+        >>
+        "."
+    text
+      @text
+        "This is code: "
+        C<<
+          "$obj-"
+          ">"
+          "method < 42"
+        >>
+        "."
+    text
+      @text
+        "This is a "
+        F<<
+          "filename"
+        >>
+        "."
+    text
+      @text
+        "This is an ampersand escape: "
+        E<<
+          "amp"
+        >>
+        "."
+    text
+      @text
+        "This is a "
+        S<<
+          "non-breaking space sequence"
+        >>
+        "."
+    text
+      @text
+        "This is an index entry."
+        X<<
+          "index entry"
+        >>
+        " (Nothing to see)"
+    text
+      @text
+        "This line contains a Z sequence."
+        Z<<
+        >>

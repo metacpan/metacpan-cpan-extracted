@@ -1,0 +1,97 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Styles</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+
+    </TD><TD ALIGN=center><H1>Styles</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<B>Styles</B>
+
+    </TD><TD VALIGN=top>
+
+The basic concept on the internal organization of
+<A HREF=../index.html>Portable Presenter</A> is the creation of
+styles.  A PPresenter-<EM>style</EM> is like a LaTeX-style: a description
+how you like to use the package.  You specify your style, and from
+then on can concentrate on the content of your presentation: the layout
+will be as it should be.
+
+    </TD></TR>
+<TR><TD VALIGN=top>
+
+    </TD><TD VALIGN=top>
+
+A <EM>Style</EM> is a composite object, which combines one or more from
+each of the style-elements below.  If you design your own style, you can
+specify which style-elements are allowed to be used.  It is really easy
+to develop a new element and to develop your own style (when you are
+familiar with Perl).
+
+<H2>Style-elements</H2>
+
+<DL>
+<DT><B><A HREF=../decoration/index.html>Decoration</A></B>
+<DD>The decoration describes how a slide should be decorated: background
+    images or solid background color?  Pen and backdrop color.
+    The images used in the unordered list.<BR>
+    Currently, only <A HREF=../decoration/solid.html>solid</A> backgrounds
+    are implemented.
+    <P>
+<DT><B><A HREF=../dynamic/index.html>Dynamics</A></B>
+<DD>Control on the process of the presentation.  Automatic progress, or
+    phased presentation.  There is currently only one way to specify
+    the dynamics: the <A HREF=../dynamic/default.html>default</A> way.
+    <P>
+<DT><B><A HREF=../fontset/index.html>Fontset</A></B>
+<DD>Fonts are very important for the presentation, of course.  On any
+    platform, there are many kinds of fonts.  Some are fast but poor, other
+    are beautiful but slow.
+    <P>
+    PPresenter now supports:
+    <UL>
+    <LI><A HREF=../fontset/tkfonts.html>Tk-fonts</A>; no large fonts.
+    <LI><A HREF=../fontset/xscaling.html>Scalable X-fonts</A>; nice but rather
+        slow.
+    </UL>
+    <P>
+<DT><B><A HREF=../formatter/index.html>Formatter</A></B>
+<DD>When we enter text, the result should be nice.  It is always a balance
+    between simplicity and beauty.  For everyone that point of balance is
+    somewhere else.
+    <P>
+    The PPresenter distribution contains
+    <UL>
+    <LI><A HREF=../formatter/plain.html>plain</A>:
+         a plaintext formatter: hard newline where you type one, and
+        no translations at all.
+    <LI><A HREF=../formatter/simple.html>simple</A>:
+        close to the plaintext formatter, although lines starting
+        with indented dashes are translated into correctly indented item-lists.
+    <LI><A HREF=../formatter/markup.html>markup</A>: an HTML-like editor.
+    </UL>
+    <P>
+<DT><B><A HREF=../template/index.html>Template</A></B>
+<DD>A screen will display the slide's title and text.  Where the title
+    and the text is located is determined by the templates.  There is one
+    set of templates: the <A HREF=../template/default.html>default</A> set.
+    <P>
+</DL>
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

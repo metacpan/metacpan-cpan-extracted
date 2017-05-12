@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Physics-Water-SoundSpeed.t
+lib/Physics/Water/SoundSpeed.pm
+misc/Sound-Speed-in-Water.html
+misc/sound-speed-water-isobar.png
+misc/sound-speed-water-isothermal.png
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

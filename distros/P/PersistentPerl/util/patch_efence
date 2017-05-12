@@ -1,0 +1,285 @@
+#!/bin/sh
+#
+# Patch ElectricFence-2.1 to work when using $EFENCE in src/PersistentMake.pl
+#
+
+patch <<EOF
+diff -c ./efence.c ../ElectricFence-2.1/efence.c
+*** ./efence.c	Thu Mar 12 11:51:34 1998
+--- ../ElectricFence-2.1/efence.c	Sat May 31 19:09:33 2003
+***************
+*** 43,48 ****
+--- 43,53 ----
+  #undef	calloc
+  #endif
+  
++ extern C_LINKAGE void *
++ efence_malloc(size_t size);
++ extern C_LINKAGE void
++ efence_free(void * address);
++ 
+  static const char	version[] = "\n  Electric Fence 2.0.5"
+   " Copyright (C) 1987-1998 Bruce Perens.\n";
+  
+***************
+*** 191,197 ****
+  	char *	string;
+  	Slot *	slot;
+  
+! 	EF_Print(version);
+  
+  	/*
+  	 * Import the user's environment specification of the default
+--- 196,202 ----
+  	char *	string;
+  	Slot *	slot;
+  
+! 	/* EF_Print(version); */
+  
+  	/*
+  	 * Import the user's environment specification of the default
+***************
+*** 314,320 ****
+  	noAllocationListProtection = 1;
+  	internalUse = 1;
+  
+! 	newAllocation = malloc(newSize);
+  	memcpy(newAllocation, allocationList, allocationListSize);
+  	memset(&(((char *)newAllocation)[allocationListSize]), 0, bytesPerPage);
+  
+--- 319,325 ----
+  	noAllocationListProtection = 1;
+  	internalUse = 1;
+  
+! 	newAllocation = efence_malloc(newSize);
+  	memcpy(newAllocation, allocationList, allocationListSize);
+  	memset(&(((char *)newAllocation)[allocationListSize]), 0, bytesPerPage);
+  
+***************
+*** 323,329 ****
+  	slotCount += slotsPerPage;
+  	unUsedSlots += slotsPerPage;
+  
+! 	free(oldAllocation);
+  
+  	/*
+  	 * Keep access to the allocation list open at this point, because
+--- 328,334 ----
+  	slotCount += slotsPerPage;
+  	unUsedSlots += slotsPerPage;
+  
+! 	efence_free(oldAllocation);
+  
+  	/*
+  	 * Keep access to the allocation list open at this point, because
+***************
+*** 356,362 ****
+   * working set is too big for a system's RAM is even slower. 
+   */
+  extern C_LINKAGE void *
+! memalign(size_t alignment, size_t userSize)
+  {
+  	register Slot *	slot;
+  	register size_t	count;
+--- 361,367 ----
+   * working set is too big for a system's RAM is even slower. 
+   */
+  extern C_LINKAGE void *
+! efence_memalign(size_t alignment, size_t userSize)
+  {
+  	register Slot *	slot;
+  	register size_t	count;
+***************
+*** 552,557 ****
+--- 557,565 ----
+  	if ( !internalUse )
+  		Page_DenyAccess(allocationList, allocationListSize);
+  
++ 	/* Make sure the new space is filled with non-zeros */
++ 	memset(address, 0xfe, userSize);
++ 
+  	return address;
+  }
+  
+***************
+*** 611,617 ****
+  }
+  
+  extern C_LINKAGE void
+! free(void * address)
+  {
+  	Slot *	slot;
+  	Slot *	previousSlot = 0;
+--- 619,625 ----
+  }
+  
+  extern C_LINKAGE void
+! efence_free(void * address)
+  {
+  	Slot *	slot;
+  	Slot *	previousSlot = 0;
+***************
+*** 690,698 ****
+  }
+  
+  extern C_LINKAGE void *
+! realloc(void * oldBuffer, size_t newSize)
+  {
+! 	void *	newBuffer = malloc(newSize);
+  
+  	if ( oldBuffer ) {
+  		size_t	size;
+--- 698,706 ----
+  }
+  
+  extern C_LINKAGE void *
+! efence_realloc(void * oldBuffer, size_t newSize)
+  {
+! 	void *	newBuffer = efence_malloc(newSize);
+  
+  	if ( oldBuffer ) {
+  		size_t	size;
+***************
+*** 715,726 ****
+  		if ( size > 0 )
+  			memcpy(newBuffer, oldBuffer, size);
+  
+! 		free(oldBuffer);
+  		noAllocationListProtection = 0;
+  		Page_DenyAccess(allocationList, allocationListSize);
+  
+  		if ( size < newSize )
+  			memset(&(((char *)newBuffer)[size]), 0, newSize - size);
+  		
+  		/* Internal memory was re-protected in free() */
+  	}
+--- 723,736 ----
+  		if ( size > 0 )
+  			memcpy(newBuffer, oldBuffer, size);
+  
+! 		efence_free(oldBuffer);
+  		noAllocationListProtection = 0;
+  		Page_DenyAccess(allocationList, allocationListSize);
+  
++ 		/* We want garbage left in the new buffer.
+  		if ( size < newSize )
+  			memset(&(((char *)newBuffer)[size]), 0, newSize - size);
++ 		*/
+  		
+  		/* Internal memory was re-protected in free() */
+  	}
+***************
+*** 729,747 ****
+  }
+  
+  extern C_LINKAGE void *
+! malloc(size_t size)
+  {
+  	if ( allocationList == 0 )
+  		initialize();	/* This sets EF_ALIGNMENT */
+  
+! 	return memalign(EF_ALIGNMENT, size);
+  }
+  
+  extern C_LINKAGE void *
+! calloc(size_t nelem, size_t elsize)
+  {
+  	size_t	size = nelem * elsize;
+! 	void *	allocation = malloc(size);
+  
+  	memset(allocation, 0, size);
+  	return allocation;
+--- 739,757 ----
+  }
+  
+  extern C_LINKAGE void *
+! efence_malloc(size_t size)
+  {
+  	if ( allocationList == 0 )
+  		initialize();	/* This sets EF_ALIGNMENT */
+  
+! 	return efence_memalign(EF_ALIGNMENT, size);
+  }
+  
+  extern C_LINKAGE void *
+! efence_calloc(size_t nelem, size_t elsize)
+  {
+  	size_t	size = nelem * elsize;
+! 	void *	allocation = efence_malloc(size);
+  
+  	memset(allocation, 0, size);
+  	return allocation;
+***************
+*** 752,758 ****
+   * will break some software.
+   */
+  extern C_LINKAGE void *
+! valloc (size_t size)
+  {
+! 	return memalign(bytesPerPage, size);
+  }
+--- 762,768 ----
+   * will break some software.
+   */
+  extern C_LINKAGE void *
+! efence_valloc (size_t size)
+  {
+! 	return efence_memalign(bytesPerPage, size);
+  }
+diff -c ./eftest.c ../ElectricFence-2.1/eftest.c
+*** ./eftest.c	Thu Jan 19 20:54:30 1995
+--- ../ElectricFence-2.1/eftest.c	Sat May 31 18:16:26 2003
+***************
+*** 77,83 ****
+  static int
+  allocateMemory(void)
+  {
+! 	allocation = (char *)malloc(1);
+  
+  	if ( allocation != 0 )
+  		return 0;
+--- 77,83 ----
+  static int
+  allocateMemory(void)
+  {
+! 	allocation = (char *)efence_malloc(1);
+  
+  	if ( allocation != 0 )
+  		return 0;
+***************
+*** 88,94 ****
+  static int
+  freeMemory(void)
+  {
+! 	free(allocation);
+  	return 0;
+  }
+  
+--- 88,94 ----
+  static int
+  freeMemory(void)
+  {
+! 	efence_free(allocation);
+  	return 0;
+  }
+  
+diff -c ./page.c ../ElectricFence-2.1/page.c
+*** ./page.c	Fri Apr 26 15:57:38 1996
+--- ../ElectricFence-2.1/page.c	Sat May 31 18:16:26 2003
+***************
+*** 31,37 ****
+  
+  #if ( !defined(sgi) && !defined(_AIX) )
+  extern int	sys_nerr;
+! extern char *	sys_errlist[];
+  #endif
+  
+  static const char *
+--- 31,37 ----
+  
+  #if ( !defined(sgi) && !defined(_AIX) )
+  extern int	sys_nerr;
+! extern const char *	const sys_errlist[];
+  #endif
+  
+  static const char *

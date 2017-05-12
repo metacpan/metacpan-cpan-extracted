@@ -1,0 +1,17 @@
+Revision history for Perl extension Persistent::Hash.
+
+0.5 Thurs Mar 27 2003
+- Allow reinitialisation of index and data fields from new blessed class.
+- Also, made storage module MySQL use the front side object for class lookups.
+- Cleaned up debugging.
+- Fixed a bug where if a key to a storable hash was a reference to another object,
+the object would not become dirty, thus would not save changes.
+(Fix is if a key to the storable object is a ref to something, data_status is always
+dirty even on load)
+- Added new dumper for support of nested objects.
+- Doc update.
+
+0.01  Sat Feb 16 13:05:55 2002
+	- original version; created by h2xs 1.21 with options
+		-n Persistent::Hash
+

@@ -1,0 +1,84 @@
+Revision history for PDL-IO-Dcm
+
+0.01    2016-12-19
+        * First version, already quite mature but needs further testing
+
+0.9	2016-12-20
+	* This is a release candidate for v1.0
+	
+	2017-1-12
+
+	* uploaded this version to PAUSE.
+
+0.9001	* reduced verbose output ( #say ...)
+	
+	2017-1-13
+
+	* Removed /r switch from regular expressions for backwards compatibility
+	
+	* better fromatting of list values in text header
+
+0.9002	2017-1-18
+
+	* renamed -n to -i, since there seem complaints about ambiguous options, heh?
+
+	* new switch -p to force split on slice groups, otherwise it tries to force-stack
+	  them, if dims allow. Split data sets have empty entries in the respective dimension.
+	  Need to find an elegant way to compact data.
+	
+	* load_dims has now an option reference as second parameter instead of the id-code.
+
+	* new function is_equal 
+
+0.9100	2017-1-19
+
+	* split dims are now compact, no empty entries any more
+
+0.9_200 * PDL::IO::Dcm::Plugin::MRI_Siemens created. Other such plugins can be provided to
+	  handle other data. Two functions should be exproted: populate_header and setup
+
+	* printStruct is moved to Dcm.pm
+
+	* default grouping to Dicom series number handled in Dcm.pm, set option
+	  id to point to \&sort_series.
+
+0.10	2017-1-20
+
+	* moved more stuff to Plugins, hopefully the interface is clean, now?
+
+	* Created a Plugins/Primitive, sorting simply on instance number. This should
+	  be general enough to load any data?
+	
+	2017-1-23
+
+	* adapted read_dcm.pl to load plugins (-u). Default to Primitive. 
+
+	* check for duplicate entries when loading and parsing dicoms.
+
+1.000	* Version confusion! Best increase major.
+
+	* Writes data using flex raw by default, now. 
+	
+	* Text header is generated for flexraw and nifit files.
+
+1.001	2017-1-25
+
+	* The header diff element did not contain the reference value, fixed. 
+
+	* added Echo Number, Echo Time, Echo Number(s), Pixel Bandwidth to key_list
+
+	* Integration of PDL::Dims when present and when using PDL::IO::Sereali - started, not used yet. 
+
+	* dcm_key is now Instance Number also for MRISiemens
+	
+	* the text header now contains the diff field
+
+1.002	2017-2-2
+
+	* Instance number is not always unique, Primitive handles this now by a second (unsorted) index.
+
+1.003	2017-2.8
+
+	* PDL::Dims in MRISiemens support improved, looks good so far, but needs testing.
+
+

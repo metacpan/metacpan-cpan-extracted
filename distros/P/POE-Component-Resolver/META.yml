@@ -1,0 +1,25 @@
+---
+abstract: 'A non-blocking getaddrinfo() resolver'
+author:
+  - 'Rocco Caputo <rcaputo@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-Resolver
+requires:
+  POE: 1.311
+  Scalar::Util: 1.23
+  Socket: 2.001
+  Storable: 2.18
+  Test::More: 0.96
+  Time::HiRes: 1.9711
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?POE-Component-Resolver
+  repository: git://github.com/rcaputo/poe-component-resolver.git
+version: 0.921

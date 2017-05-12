@@ -1,0 +1,150 @@
+%!PS-ADOBE-3.0
+%%BeginSetup
+%
+%%BeginFeature: *PageSize A4
+<</PageSize [[% sheet.width %] [% sheet.height %]] /ImagingBBox null>> setpagedevice
+%%EndFeature
+%%EndSetup
+
+/Helvetica findfont 10 scalefont setfont
+
+% The page dimensions
+/page_width  [% sheet.width %]  def
+/page_height [% sheet.height %] def
+
+% Page margin
+/h_margin [% sheet.h_margin %] def
+/v_margin [% sheet.v_margin %] def
+
+% Number of labels
+/columns [% sheet.columns %] def
+/rows [% sheet.rows %] def
+
+/labels_definitions [
+[%- FOREACH eps = sheet.labels %]
+<<
+% Bounding box of the EPS file
+/eps_bb_ll_x [% eps.eps_bb_ll_x %]
+/eps_bb_ll_y [% eps.eps_bb_ll_y %]
+/eps_bb_ur_x [% eps.eps_bb_ur_x %]
+/eps_bb_ur_y [% eps.eps_bb_ur_y %]
+/eps_filename ([% eps.path %])
+/eps_count [% eps.count %]
+/eps_code {[% eps.code %]}
+>> 
+[%- END %]
+] def
+/label_index 0 def
+
+% Padding inside each label
+/h_padding [% sheet.h_padding %] def
+/v_padding [% sheet.v_padding %] def
+
+% Spacing between labels
+/h_spacing [% sheet.h_spacing %] def
+/v_spacing [% sheet.v_spacing %] def
+
+/label_width  [% sheet.label_width %] def
+/label_height [% sheet.label_height %] def
+
+/portrait  [% sheet.portrait %] 1 eq { true } { false } ifelse def
+/landscape portrait not def
+
+/skip_number  [% sheet.skip %] def
+/total_number [% sheet.count_labels %] skip_number add def
+
+/with_grid [% sheet.grid %] 1 eq { true } { false } ifelse def
+
+/select_label {
+    label_index 1 labels_definitions length 1 sub {
+        labels_definitions exch get /label_definition exch def
+        /eps_current_count label_definition /eps_count get def
+        eps_current_count 0 le {
+            /label_index label_index 1 add def
+        }
+        {
+            label_definition /eps_count eps_current_count 1 sub put
+%             labels_definitions label_index label_definition put
+            exit
+        } ifelse
+    } for
+    label_definition
+} def
+
+/draw_content {
+    label_width 2 div label_height 2 div translate
+    select_label begin
+        /content_width  eps_bb_ur_x eps_bb_ll_x sub def
+        /content_height eps_bb_ur_y eps_bb_ll_y sub def
+        /content_ratio {
+            /content_ratio_x label_width  h_padding 2 mul sub portrait { content_width } { content_height } ifelse div def
+            /content_ratio_y label_height v_padding 2 mul sub portrait { content_height } { content_width } ifelse div def
+            content_ratio_x content_ratio_y lt { content_ratio_x } { content_ratio_y } ifelse
+        } def
+
+        content_ratio dup scale
+        landscape { 90 rotate } if
+        content_width 2 div neg content_height 2 div neg translate
+        save
+            /showpage {} def
+            /setpagedevice /pop load def
+            eps_code
+        restore
+    end
+} def
+
+/draw_grid {
+    gsave
+    0.8 setgray
+    .8 setlinewidth
+
+    newpath
+    0 0 moveto
+    label_width 0 rlineto
+    0 label_height rlineto
+    label_width neg 0 rlineto
+    closepath
+    stroke
+    grestore
+} def
+
+/set_label_clipping {
+    newpath
+    h_padding v_padding moveto
+    label_width h_padding 2 mul sub 0 rlineto
+    0 label_height v_padding 2 mul sub rlineto
+    label_width h_padding 2 mul sub neg 0 rlineto
+    closepath
+    clip
+} def
+
+/counter 1 def
+/upper_limit total_number def
+{
+    gsave
+        h_margin page_height v_margin sub label_height sub translate
+        0 1 rows 1 sub {
+            gsave
+                label_height v_spacing add mul neg 0 exch translate
+                0 1 columns 1 sub {
+                    gsave
+                        label_width h_spacing add mul 0 translate
+                        counter skip_number gt {
+			    with_grid { draw_grid } if
+			    set_label_clipping
+			    draw_content
+                        } if
+                        /counter counter 1 add def
+			/upper_limit upper_limit 1 sub def
+                    grestore
+		    upper_limit 0 le { exit } if
+                } for
+            grestore
+            upper_limit 0 le { exit } if
+        } for
+    grestore
+
+    showpage
+    upper_limit 0 le { exit } if
+} loop
+

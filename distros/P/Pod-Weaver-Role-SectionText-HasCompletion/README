@@ -1,0 +1,27 @@
+DESCRIPTION
+
+    This role provides text for "COMPLETION" POD section. The text
+    describes instructions for activating tab completion for script, for
+    several shells. It is meant for script that has a separate completer
+    script.
+
+    This role is currently used by
+    Pod::Weaver::Section::Completion::PerinciCmdLine.
+
+METHODS
+
+ $obj->section_text_has_completion(\%vars) => str
+
+    Variables:
+
+      * command_name => str
+
+      * completer_name => str
+
+      Defaults to _command_name (that is, command name with underscore
+      prefix).
+
+SEE ALSO
+
+    Pod::Weaver::Role::SectionText::SelfCompletion
+

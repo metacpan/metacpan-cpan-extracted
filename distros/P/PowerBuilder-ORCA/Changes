@@ -1,0 +1,22 @@
+Revision history for Perl extension PowerBuilder::ORCA.
+
+0.01  Wed Aug 11 11:39:46 1999
+	- original version; created by h2xs 1.18
+
+0.03  10/11/2002
+	- completed test suit, module tested with PB5, PB6 and PB8
+	- fixed bugs in EntryInfo,Import,ImportList
+	- documented method Del 
+	- module compatible with all versions of PB - ORCA dll loaded dynamically
+
+	  06/08/2004
+	- the documentation is translated to English
+
+0.04  09/08/2004
+	- module tested with PB 9
+	- the test.pl is corrected in view of changes in PB 9
+	- implemented PBORCA_ApplicationRebuild
+	- implemented PBORCA_SetExeInfo
+
+0.05  21/02/2005
+	- removed source size limit in Export

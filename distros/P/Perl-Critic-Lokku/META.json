@@ -1,0 +1,59 @@
+{
+   "abstract" : "A collection of Perl::Critic policies from Lokku",
+   "author" : [
+      "David D Lowe <flimm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Critic-Lokku",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Kwalitee" : "1.21"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic::Policy" : "0",
+            "Perl::Critic::Utils" : "0",
+            "Readonly" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0",
+            "Test::Perl::Critic" : "0",
+            "Test::Perl::Critic::Policy" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lokku/Perl-Critic-Lokku"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/lokku/Perl-Critic-Lokku.git",
+         "web" : "https://github.com/lokku/Perl-Critic-Lokku"
+      }
+   },
+   "version" : "0.002"
+}
+

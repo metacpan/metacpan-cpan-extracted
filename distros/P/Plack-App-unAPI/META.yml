@@ -1,0 +1,22 @@
+---
+abstract: 'Serve via unAPI'
+author:
+  - 'Jakob Voß'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-App-unAPI
+requires:
+  Plack: 1.0
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/nichtich/Plack-App-unAPI/issues
+  homepage: https://github.com/nichtich/Plack-App-unAPI
+  repository: https://github.com/nichtich/Plack-App-unAPI.git
+version: 0.61

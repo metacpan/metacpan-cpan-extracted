@@ -1,0 +1,87 @@
+#!/usr/bin/perl
+use 5.014000;
+use strict;
+use warnings;
+
+use IO::Prompter;
+use Plack::Middleware::Auth::Complex;
+
+if (@ARGV < 1) {
+	say STDERR "$0 USERNAME [DSN [DB_USER [DB_PASSWD]]]";
+	exit 1;
+}
+
+my ($username, $dsn, $dbuser, $dbpasswd) = @ARGV;
+$dsn //= $ENV{AUTHCOMPLEX_DSN};
+$dbuser //= $ENV{AUTHCOMPLEX_DBUSER};
+$dbpasswd //= $ENV{AUTHCOMPLEX_DBPASSWD};
+
+$dsn //= 'dbi:Pg:';
+$dbuser //= '';
+$dbpasswd //= '';
+
+my $password = prompt 'Password: ', -echo => '*', -in => *STDIN;
+my $confirm  = prompt 'Confirm password: ', -echo => '*', -in => *STDIN;
+
+if ($password ne $confirm) {
+	say STDERR 'The passwords do not match';
+	exit 1;
+}
+
+my $ac = Plack::Middleware::Auth::Complex->new({
+	dbi_connect => [$dsn, $dbuser, $dbpasswd]
+});
+
+$ac->init;
+$ac->set_passphrase($username, $password) or die "$@\n";
+say 'Password changed successfully';
+
+1;
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+authcomplex-passwd - change user password
+
+=head1 SYNOPSIS
+
+  authcomplex-passwd USERNAME [DSN [DB_USER [DB_PASSWD]]]
+
+  # For example:
+  authcomplex-passwd myuser # dsn defaults to 'dbi:Pg:'
+  authcomplex-passwd myuser 'dbi:Pg:dbname=www-data'
+  authcomplex-passwd myuser 'dbi:Pg:dbname=www-data' db_superuser password123
+
+=head1 DESCRIPTION
+
+The authcomplex-passwd script changes the password for an user.
+Takes one mandatory argument, the user whose password should be changed.
+
+The DBI Data Source Name is the second argument to the script, or the
+value of the AUTHCOMPLEX_DSN environment variable if set, or
+C<dbi:Pg:> otherwise.
+
+The username for the database is the third argument to the script, or
+the value of the AUTHCOMPLEX_DBUSER environment variable if set, or an
+empty string otherwise.
+
+The password for the database is the fourth argument to the script, or
+the value of the AUTHCOMPLEX_DBPASSWD environment variable if set, or
+an empty string otherwise.
+
+=head1 AUTHOR
+
+Marius Gavrilescu, E<lt>marius@ieval.roE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015-2017 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

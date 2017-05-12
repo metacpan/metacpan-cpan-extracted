@@ -1,0 +1,41 @@
+#! /usr/bin/perl
+#---------------------------------------------------------------------
+# Copyright 2012 Christopher J. Madsen
+#
+# Create a PDF using PostScript::File & PostScript::Convert
+#---------------------------------------------------------------------
+
+use strict;
+use warnings;
+
+use PostScript::File 2.20;
+use PostScript::Convert;
+
+my $ps = PostScript::File->new(
+  paper      => 'Letter',
+  reencode   => 'cp1252',
+  need_fonts => [qw(Helvetica)],
+  landscape  => 0,
+);
+
+$ps->use_functions(qw(drawBox));
+
+my ($left, $bottom, $right, $top) = $ps->get_bounding_box;
+
+$_ += 4 for ($left, $bottom);
+$_ -= 4 for ($right, $top);
+
+$ps->add_to_page( <<"END_PAGE" );
+  /Helvetica findfont
+  12 scalefont
+  setfont
+  72 72 moveto
+  (Hello, World!) show
+  4 setlinewidth
+  $left $top $right $bottom drawBox
+END_PAGE
+
+# $ps->output('hello_world.ps'); exit;
+# $PostScript::Convert::Debug = 1;
+
+psconvert($ps, 'hello_world.pdf');

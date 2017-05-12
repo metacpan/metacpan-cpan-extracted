@@ -1,0 +1,19 @@
+<html xmlns:tal="http://purl.org/petal/1.0/">
+	<body>
+		<p>
+			<!--? Comparison -->
+			first = <span tal:replace="first">first</span>
+			second = <span tal:replace="second">second</span>
+			first_name = <span tal:replace="first_name">first_name</span>
+			first or second = <span tal:replace="or: $first $second">or</span>
+			first and second = <span tal:replace="and: $first $second">and</span>
+			first eq second = <span tal:replace="eq: $first $second">equal</span>
+			first_name like regex = <span tal:replace="like: $first_name ^Will.+m">like</span>
+
+			<!--? If/then/else -->
+			if first then first else second = <span tal:replace="if: first then: first else: second">if</span>
+			if second then first else second = <span tal:replace="if: second then: first else: second">if</span>
+		</p>
+	</body>
+</html>
+

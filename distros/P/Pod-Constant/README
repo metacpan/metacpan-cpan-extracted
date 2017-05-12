@@ -1,0 +1,64 @@
+NAME
+    Pod::Constant - source constants from POD to avoid repetition
+
+VERSION
+    version 0.1
+
+SYNOPSIS
+     In your POD:
+
+         =head1 DESCRIPTION
+ 
+         The maximum number of flarns is X<$MAX_FLARNS=>4,096.
+
+     In your code:
+
+         use Pod::Constant qw($MAX_FLARNS);
+
+         # Use $MAX_FLARNS all over the place
+
+DESCRIPTION
+    It is often neccessary to refer to 'default values' or important
+    constant values in your POD, but then you have to put them in your code
+    as well, and they can easily get out of sync. "use" this module and you
+    can import variables from the POD directly, avoiding repetition.
+
+    The lazy may "use Pod::Constant ':all'" to import any and all variables
+    from POD.
+
+USAGE
+    The "X<...>" syntax allows you to place variable names next to any use
+    of a constant in your POD, e.g.
+
+      The maximum number of hops is X<$MAX_HOPS=>4,096.
+
+    These "X<...>" hints are rendered as an empty string by POD readers, but
+    can be seen by "Pod::Constant". The value following the "X<...>"
+    construct may be:
+
+    *   A quoted string (single, double or backticks) - quotes will be
+        removed. Special characters (e.g. "\n") are not treated specially.
+
+    *   An unquoted number. Commas and trailing punctuation are removed.
+
+    *   An unquoted string. Trailing punctuation is removed, and the string
+        will be read up to the first whitespace character. Not recommended
+        but works OK for file paths, etc.
+
+    Whitespace is ignored, so for example "X<$foo = > 123" is permissible.
+
+    "Trailing punctuation" is defined as the ASCII characters '.', ',', ':',
+    ';', '!' and '?'.
+
+LIMITATIONS
+    Currently only scalar values are supported.
+
+AUTHOR
+    Richard Harris <RJH@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Richard Harris.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

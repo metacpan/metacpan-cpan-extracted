@@ -1,0 +1,15 @@
+POE::XS::Queue::Array is an implementation of the POE::Queue XS interface.
+
+Unlike POE, you need a C compiler to install this module.
+
+To install do:
+
+  perl Makefile.PL
+  make
+  make test
+  make install  # you may need to be root for this step
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Copyright (c) 2006, 2008 Anthony Cook.

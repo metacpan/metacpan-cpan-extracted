@@ -1,0 +1,15 @@
+#!/bin/bash
+uid=$1
+user=$2
+
+chmod 0777 /tmp -R
+
+useradd -u $uid -d /web $user
+cpanm Carton --notest
+
+apt-get update
+apt-get install sudo -y
+
+sudo -u $user -H bash -c 'cd /web; cat .docker-base-camp | cpanm -L local --notest'
+
+exec perl -e sleep

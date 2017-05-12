@@ -1,0 +1,22 @@
+Revision history for Perl extension Plack-Middleware-DBIC-QueryLog
+
+0.05    26 November 2011
+        - Added a public sub 'find_querylog_in' so that consumers of the 
+          Querylog object (like the Catalyst DBIC Schema trait) can use this
+          consistent interface rather than invent a new one each time.
+        - Minor documentation tweaks.
+
+0.04    25 December 2010
+        - Merry Christmas!
+        - fixed broken test
+        - documentation tweaks
+
+0.03    22 December 2010
+        - added missing meta info to Makefile.PL
+
+0.02    22 December 2010
+        - documentation updates
+        - fixed broken build
+
+0.01    20 December 2010
+        - First release, buyer beware.

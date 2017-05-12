@@ -1,0 +1,37 @@
+[Changes for 0.9507 - Sat Sep 19 02:29:56 CST 2015]
+
+* Add LICENSE file. (Apache 2.0)
+
+  Contributed by: Jeremy Mates
+
+[Changes for 0.9506 - Mon Jul 27 23:07:16 CST 2015]
+
+* Allow use of Linux::Smaps::Tiny and prefer it over Linux::Smaps.
+
+  Contributed by: Tim Bunce
+
+[Changes for 0.9505 - Tue Jan 28 17:34:25 CST 2014]
+
+* Fix warnings in version detection on Mac OS X 10.10+.
+
+[Changes for 0.9504 - Tue Jan 28 17:34:25 CST 2014]
+
+* Fix warnings in version detection on Mac OS X 10.9.1.
+
+[Changes for 0.9503 - Fri Jun 14 20:33:25 CST 2013]
+
+* Compatibility with OSX 10.9+ which has no "rshrd" field in /usr/bin/top.
+
+[Changes for 0.9502 - Fri Nov 2 19:17:19 CST 2012]
+
+* Fixed bug where BSD::Resource was not being loaded on OSX.
+
+  Contributed by: Bob Stockdale
+
+[Changes for 0.9501 - Thu Jun 23 17:19:02 CST 2011]
+
+* Add "darwin" compatibility by calling "top -stats rshrd" to get shared memory size.
+
+[Changes for 0.95 - Mon Jun 13 21:18:54 CST 2011]
+
+* Initial release to CPAN.

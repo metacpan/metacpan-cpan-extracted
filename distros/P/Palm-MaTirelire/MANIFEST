@@ -1,0 +1,26 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Palm.t
+t/Palm-MaTirelire.t
+lib/Palm/MaTirelire.pm
+lib/Palm/MaTirelire/ExternalCurrencies.pm
+lib/Palm/MaTirelire/Types.pm
+lib/Palm/MaTirelire/Modes.pm
+lib/Palm/MaTirelire/Descriptions.pm
+lib/Palm/MaTirelire/AccountsV2.pm
+lib/Palm/MaTirelire/SavedPreferences.pm
+lib/Palm/MaTirelire/Currencies.pm
+lib/Palm/MaTirelire/AccountsV1.pm
+lib/Palm/MaTirelire/DBItem.pm
+lib/Palm/MaTirelire/DBItemId.pm
+lib/Palm/MaTirelire/CGICLI.pm
+lib/Palm/FieldPack.pm
+lib/Palm/BlockPack.pm
+tools/exportM2.pl
+tools/importM2.pl
+tools/M1toM2.pl
+tools/matidump.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

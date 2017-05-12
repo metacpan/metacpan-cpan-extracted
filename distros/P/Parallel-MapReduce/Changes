@@ -1,0 +1,23 @@
+Revision history for Perl extension Parallel::MapReduce.
+
+0.09  Wed Jul 30 06:17:29 CEST 2008
+	- changed: thread::joinable() now explicitly used as sub (made some perls complain about BAREWORD use)
+
+0.08  Sun Jul 27 18:46:05 CEST 2008
+	- changed: debugging output now goes into a Log4Perl object
+	- changed: SSH worker now split into client and server (SSHRemote) 
+
+0.07  Sun Jul 27 10:41:37 CEST 2008
+	- added:  missing guard not to run network test code without a memcached
+
+0.06  Mon Jul 21 19:50:27 CEST 2008
+	- added:  Test::Pod dependency
+	- added:  guards not to run threaded code with unthreaded Perls
+
+0.05  Sat Jul 19 21:44:10 CEST 2008
+	- first packaged version
+
+0.01  Fri Jul  4 20:16:11 2008
+	- original version; created by h2xs 1.23 with options
+		-n Parallel::MapReduce -X --compat-version=5.8.0
+

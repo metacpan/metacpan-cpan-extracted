@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Plack::Middleware::EnvTracer>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Plack-Middleware-EnvTracer"><img src="https://secure.travis-ci.org/bayashi/Plack-Middleware-EnvTracer.png?_t=1472964066"/></a> <a href="https://coveralls.io/r/bayashi/Plack-Middleware-EnvTracer"><img src="https://coveralls.io/repos/bayashi/Plack-Middleware-EnvTracer/badge.png?_t=1472964066&branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Plack::Middleware::EnvTracer installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Plack::Middleware::EnvTracer
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Plack::Middleware::EnvTracer documentation is available as in POD. So you can do:
+
+    % perldoc Plack::Middleware::EnvTracer
+
+
+=head1 REPOSITORY
+
+Plack::Middleware::EnvTracer is hosted on github
+L<http://github.com/bayashi/Plack-Middleware-EnvTracer>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

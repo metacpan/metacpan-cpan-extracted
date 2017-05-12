@@ -1,0 +1,48 @@
+What were you doing when the application crashed?
+Drag a samba share from the Nautilus Desktop into the Deskbar Preferences
+Window, Searches Tab, Loaded Extensions, in hopes that i could add it to the
+list of items that get searched.
+
+
+Distribution: Ubuntu 7.04 (feisty)
+Gnome Release: 2.18.1 2007-04-10 (Ubuntu)
+BugBuddy Version: 2.18.1
+
+System: Linux 2.6.20-16-generic #2 SMP Thu Jun 7 20:19:32 UTC 2007 i686
+X Vendor: The X.Org Foundation
+X Vendor Release: 70200000
+Selinux: No
+Accessibility: Disabled
+GTK+ Theme: Human
+Icon Theme: Human
+
+Memory status: size: 0 vsize: 0 resident: 0 share: 0 rss: 0 rss_rlim: 0
+CPU usage: start_time: 0 rtime: 0 utime: 0 stime: 0 cutime:0 cstime: 0 timeout:
+0 it_real_value: 0 frequency: 0
+
+
+
+----------- .xsession-errors (91 sec old) ---------------------
+X Error: BadDevice, invalid or uninitialized input device 166
+  Major opcode:  146
+  Minor opcode:  3
+  Resource id:  0x0
+Failed to open device
+X Error: BadDevice, invalid or uninitialized input device 166
+  Major opcode:  146
+  Minor opcode:  3
+  Resource id:  0x0
+Failed to open device
+** (gnome-cups-icon:31554): WARNING **: Could not start the printer tray icon,
+because the CUPS server could not be contacted.
+** Message: <information>       Activating VPN connection 'neocom2'.
+QImage::smoothScale: Image is a null image
+--------------------------------------------------
+Traceback (most recent call last):
+  File "/usr/lib/python2.5/site-packages/deskbar/ui/DeskbarPreferencesUI.py",
+line 552, in on_drag_data_received_data
+    if module_installer.install(data):
+  File "/usr/lib/python2.5/site-packages/deskbar/ModuleInstaller.py", line 145,
+in install
+    uri = gnomevfs.URI(uri_string)
+TypeError: could not parse URI

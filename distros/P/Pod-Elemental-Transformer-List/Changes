@@ -1,0 +1,20 @@
+Revision history for Pod-Elemental-Transformer-List
+
+0.102000  2013-11-05 17:37:21 America/New_York
+          allow bullet paragraphs to wrap if there's leading whitespace
+          (thanks, David Golden!)
+
+0.101621  2013-10-15 21:49:39 America/New_York
+          allow :over<x> for custom =over indent level (thanks, Alex Peters!)
+
+          add fully rendered examples (thanks, Karen Etheridge!)
+
+          update bugtracker and repo
+
+0.101620  2010-06-11 19:41:12 America/New_York
+
+0.101610  2010-06-10 21:47:19 America/New_York
+          Bump required version of Pod::Elemental so that tests pass.
+
+0.093580  2009-12-24 20:57:22 America/New_York
+          first release!  already used in limited cases privately

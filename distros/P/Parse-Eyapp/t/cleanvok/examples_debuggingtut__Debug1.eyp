@@ -1,0 +1,26 @@
+%token D S 
+%lexer 
+%tree
+
+%%
+
+p:
+      %name P
+      ds ';' ss
+    | %name SS
+      ss 
+;
+ds:
+      %name D2
+      ds ';' D
+    | %name D1
+      D 
+;
+ss:
+      %name S2
+      S ';' ss
+    | %name S1
+      S 
+;
+
+%%

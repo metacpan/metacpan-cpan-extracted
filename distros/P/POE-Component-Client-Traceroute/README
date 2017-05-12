@@ -1,0 +1,65 @@
+--------
+Abstract
+--------
+
+POE::Component::Client::Traceroute is an asynchronous, event driven client
+for UDP or ICMP traceroutes. It accepts events containing the specifics of
+a traceroute request and it returns, on either a per hop basis or at the end,
+the results of the traceroute.
+
+------------
+Requirements
+------------
+
+This module requires POE. It also requires root privileges, or the equivalent,
+to open raw sockets. Any hazards of doing this are left up to the implementor
+to work around. 
+
+------------------
+Basic Installation
+------------------
+
+POE::Component::Client::Traceroute may be installed through the CPAN shell
+in the usual CPAN shell manner. This typically is:
+    
+    $ perl -MCPAN -e 'install POE::Component::Client::Traceroute'
+
+You can also read this README from the CPAN shell:
+
+    $ perl -MCPAN -e shell
+    cpan> readme POE::Component::Client::Traceroute
+
+And you can install the module from the CPAN prompt as well:
+
+    cpan> install POE::Component::Client::Traceroute
+
+-------------------
+Manual Installation
+-------------------
+
+POE::Component::Client::Traceroute can also be installed manually.
+<ftp://ftp-mirror.internap.com/pub/CPAN/authors/id/A/AH/AHOYING/> or a similarly
+named directory at your favorite CPAN mirror should hold the latest version.
+
+Downloading and unpacking the distribution are left up to the reader.
+
+To build and test it:
+
+    perl Makefile.PL
+    make
+    make test
+
+The test program, t/01_trace.t, makes an excellent sample program. It was
+adapted from the code used to test and develop this module. There may be
+additional sample programs in the examples folder.
+
+When you are ready to install the module:
+
+    make install
+
+It should be ready to use.
+
+This module is supported by the author on an ad-hoc basis. Please try the 
+poe@perl.org mailing list if you need a more timely response.
+
+-- Andrew Hoying / ahoying@cpan.org

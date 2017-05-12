@@ -1,0 +1,5 @@
+Changes for Perl extension POE-Declare-Log-File
+
+0.01 Thu 14 Jul 2011
+	- Creating initial implementation
+	- Adding Lazy file creation support

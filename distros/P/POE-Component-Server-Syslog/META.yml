@@ -1,0 +1,36 @@
+---
+abstract: 'syslog services for POE'
+author:
+  - 'Matt Cashner (sungo@pobox.com)'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-Server-Syslog
+requires:
+  Carp: '0'
+  IO::Socket: '0'
+  IO::Socket::INET: '0'
+  POE: '0.24'
+  POE::Driver::SysRW: '0'
+  POE::Wheel::ReadWrite: '0'
+  POE::Wheel::SocketFactory: '0'
+  Params::Validate: '0'
+  Test::More: '0.47'
+  Time::ParseDate: '0'
+  perl: '5.006001'
+resources:
+  homepage: https://github.com/bingos/poe-component-server-syslog
+  repository: https://github.com/bingos/poe-component-server-syslog.git
+version: '1.22'
+x_serialization_backend: 'YAML::Tiny version 1.70'

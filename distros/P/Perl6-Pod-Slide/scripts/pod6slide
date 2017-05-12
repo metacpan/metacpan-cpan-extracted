@@ -1,0 +1,145 @@
+#!/usr/bin/perl
+#===============================================================================
+#
+#         FILE: pod6slide
+#
+#  DESCRIPTION:  save Perl Pod to slide
+#       AUTHOR:  Aliaksandr P. Zahatski ,  <zahatski@gmail.com>
+#===============================================================================
+#$Id$
+use strict;
+use warnings;
+use Data::Dumper;
+use Test::More;
+use Getopt::Long;
+use Pod::Usage;
+use Encode qw(encode decode is_utf8);
+use Perl6::Pod::Slide;
+use Perl6::Pod::Test;
+
+sub get_slides_info {
+    my $tree = shift;
+    my $res = shift || return;
+    my @nodes = ref( $tree ) eq 'ARRAY' ? @$tree : ($tree);
+    my @tree = ();
+    foreach my $n (@nodes) {
+        unless (ref($n)){ #skip text
+            push @tree, $n;
+            next;
+        }
+        if ($n->name =~ /^(DESCRIPTION)$/ ) {
+            $res->{$n->name} = $n;
+        } else {
+            push @tree,$n;
+            $n->childs(
+            &get_slides_info( $n->childs , $res )
+            )
+        }
+    }
+    \@tree
+}
+
+
+my ( $help, $man, $partner_id );
+my %opt =
+  ( help => \$help, man => \$man, pid => \$partner_id );    #meta=>\$meta,);
+GetOptions( \%opt, 'help|?', 'man', 'c=s', 'pid|s=s' )
+  or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+my $infile = shift;
+my $in_fd;
+if ($infile) {
+    $in_fd = new IO::File:: "< $infile" or die "$infile: $!";
+}
+else {
+    $in_fd = \*STDIN;
+}
+
+my $text;
+{local $/=undef; $text = <$in_fd>;
+}
+
+my $renderer = new Perl6::Pod::Slide:: headers=>1;
+#parse tree
+    use Perl6::Pod::Utl;
+    my $tree = Perl6::Pod::Utl::parse_pod(ref($text) ? $$text : $text, default_pod=>1) || die "can't parse Pod";
+
+    my %res;
+    $tree = get_slides_info($tree, \%res);
+
+ $renderer->start_write;
+ $renderer->visit($res{DESCRIPTION});
+ $renderer->w->say('\begin{document}');
+ my $need_close = 0;
+ if ( my $backimage = $res{DESCRIPTION}->get_attr->{backimage} ) {
+        $need_close++;
+        $renderer->w->say('{');
+        $renderer->w->say('\usebackgroundtemplate{
+\vbox to \paperheight{\vfil\hbox to \paperwidth{\hfil\includegraphics[width=\paperwidth]{'.$backimage.'}\hfil}\vfil}}');
+}
+ $renderer->w->raw(<<'TITLE');
+%--- the titlepage frame -------------------------%
+\begin{frame}[plain]
+  \titlepage
+\end{frame}
+TITLE
+   $renderer->w->say('}') if $need_close;
+ 
+ $renderer->write($tree);
+ $renderer->end_write;
+
+exit;
+
+=head1 NAME
+
+  pod6slide  - convert Perl pod to slide
+
+=head1 SYNOPSIS
+
+  pod6xml < somefile.pod > somefile.xml
+  pod6xml somefile.pod  > somefile.xml
+
+
+   options:
+
+    -help  - print help message
+    -man   - print man page
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits
+
+=item B<-man>
+
+Prints manual page and exits
+
+=back
+
+=head1 DESCRIPTION
+
+  B<pod6xml>  - convert Perl pod to XML
+
+=head1 EXAMPLE
+
+  pod6xml < somefile.pod > somefile.xml
+
+
+=head1 AUTHOR
+
+Zahatski Aliaksandr, E<lt>zahatski@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009 by Zahatski Aliaksandr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut
+

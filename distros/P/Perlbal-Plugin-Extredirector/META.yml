@@ -1,0 +1,31 @@
+---
+abstract: 'Use Squid rules in Perlbal.'
+author:
+  - 'Ilmari Vacklin <ilmari@dicole.com>'
+  - 'Antti Vähäkotamäki <antti@dicole.com>'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200019, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perlbal-Plugin-Extredirector
+requires:
+  IPC::Open2: 0
+  Net::Netmask: 0
+  Perlbal: 0
+  Socket: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Perlbal-Plugin-Extredirector
+  homepage: https://github.com/dicole/Perlbal-Plugin-Extredirector
+  repository: https://github.com/dicole/Perlbal-Plugin-Extredirector.git
+version: v0.0.4
+x_authority: cpan:WOLVERIAN

@@ -1,0 +1,107 @@
+NAME
+    POE::Component::IRC::Plugin::Hailo - A PoCo-IRC plugin which provides
+    access to a Hailo conversation simulator.
+
+SYNOPSIS
+    To quickly get an IRC bot with this plugin up and running, you can use
+    App::Pocoirc:
+
+     $ pocoirc -s irc.perl.org -j '#bots' -a 'Hailo{ "brain_resource": "brain.sqlite" }'
+
+    Or use it in your code:
+
+     use POE::Component::IRC::Plugin::Hailo;
+
+     $irc->plugin_add('Hailo', POE::Component::IRC::Plugin::Hailo->new(
+         Own_channel    => '#bot_chan',
+         Ignore_regexes => [ qr{\w+://\w} ], # ignore lines containing URLs
+         Hailo_args     => {
+             brain_resource => 'brain.sqlite',
+         },
+     ));
+
+DESCRIPTION
+    POE::Component::IRC::Plugin::Hailo is a POE::Component::IRC plugin. It
+    provides "intelligence" through the use of POE::Component::Hailo. It
+    will talk back when addressed by channel members (and possibly in other
+    situations, see "new"). An example:
+
+     --> hailo_bot joins #channel
+     <Someone> oh hi there
+     <Other> hello there
+     <Someone> hailo_bot: hi
+     <hailo_bot> oh hi there
+
+    It will occasionally send CTCP ACTIONS (/me) too, if the reply in
+    question happens to be based on an earlier CTCP ACTION from someone.
+
+    All NOTICEs are ignored, so if your other bots only issue NOTICEs like
+    they should, they will be ignored automatically.
+
+    Before using, you should read the documentation for Hailo, so you have
+    an idea of what to pass as the 'Hailo_args' parameter to "new".
+
+    This plugin requires the IRC component to be POE::Component::IRC::State
+    or a subclass thereof.
+
+METHODS
+  "new"
+    Takes the following optional arguments:
+
+    'Hailo', a reference to an existing POE::Component::Hailo object you
+    have lying around. Useful if you want to use it with multiple IRC
+    components. If this argument is not provided, the plugin will construct
+    its own object.
+
+    'Hailo_args', a hash reference containing arguments to pass to the
+    constructor of a new Hailo object.
+
+    'Channels', an array reference of channel names. If this is provided,
+    the bot will only listen/respond in the specified channels, rather than
+    all channels.
+
+    'Own_channel', a channel where it will reply to all messages. The plugin
+    will take care of joining the channel. It will part from it when the
+    plugin is removed from the pipeline. Defaults to none.
+
+    'Abuse_interval', default is 60 (seconds), which means that user X in
+    channel Y has to wait that long before addressing the bot in the same
+    channel if he wants to get a reply. Setting this to 0 effectively turns
+    off abuse protection.
+
+    'Talkative', when set to a true value, the bot will respond whenever
+    someone mentions its name (in a PRIVMSG or CTCP ACTION (/me)). If false,
+    it will only respond when addressed directly with a PRIVMSG. Default is
+    false.
+
+    'Ignore_masks', an array reference of IRC masks (e.g. "purl!*@*") to
+    ignore.
+
+    'Ignore_regexes', an array reference of regex objects. If a message
+    matches any of them, it will be ignored. Handy for ignoring messages
+    with URLs in them.
+
+    'Method', how you want messages to be delivered. Valid options are
+    'notice' (the default) and 'privmsg'.
+
+    'Replyrate', when set to a number (a percentage, 0 to 100) controls how
+    often the bot will respond to any message. Uses a uniform RNG and fires
+    whenever the random roll is less than this number.
+
+    Returns a plugin object suitable for feeding to POE::Component::IRC's
+    "plugin_add" method.
+
+  "brain"
+    Takes no arguments. Returns the underlying POE::Component::Hailo object
+    being used by the plugin.
+
+  "transplant"
+    Replaces the brain with the supplied POE::Component::Hailo instance.
+    Shuts down the old brain if it was instantiated by the plugin itself.
+
+AUTHOR
+    Hinrik Örn Sigurðsson, hinrik.sig@gmail.com
+
+    This distribution is based on POE::Component::IRC::Plugin::MegaHAL by
+    the same author.
+

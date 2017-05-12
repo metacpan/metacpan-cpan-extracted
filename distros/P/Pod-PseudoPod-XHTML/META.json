@@ -1,0 +1,76 @@
+{
+   "abstract" : "format PseudoPod as valid XHTML",
+   "author" : [
+      "Alan Young <harleypig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-PseudoPod-XHTML",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Pod::PseudoPod::HTML" : 0,
+            "base" : 0,
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Path::Class" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94",
+            "Test::NoWarnings" : 0,
+            "Test::Perl::Critic::Progressive" : 0,
+            "Try::Tiny" : 0,
+            "perl" : "5.004"
+         }
+      }
+   },
+   "provides" : {
+      "Pod::PseudoPod::XHTML" : {
+         "file" : "lib/Pod/PseudoPod/XHTML.pm",
+         "version" : "1.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/harleypig/pod-pseudopod-xhtml/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/harleypig/pod-pseudopod-xhtml.git",
+         "web" : "https://github.com/harleypig/pod-pseudopod-xhtml"
+      }
+   },
+   "version" : "1.02"
+}
+

@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+README.pod
+lib/POE/Component/Client/Icecast.pm
+examples/test.pl
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

@@ -1,0 +1,219 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Formatter Markup Tags</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Formatter Markup</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<A HREF=index.html>Formatter</A><BR>
+<A HREF=markup.html>Markup</A><BR>
+<B>Tags</B>
+<P>
+<A HREF=#visual>Visual tags</A><BR>
+<A HREF=#params>Visual params</A><BR>
+<A HREF=#logical>Logical tags</A><BR>
+<A HREF=#image>Images params</A><BR>
+
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> has a few formatters,
+which each enable someone to specify what text should appear on a slide.
+The <B>markup</B> formatter is very close to HTML.  This page describes
+the predefined tags.  See the <A HREF=markup.html>main page on markup</A>
+for how to use and change tags.
+
+<H2><A NAME=visual>Visual Tags</A></H2>
+Visual tags describe directly in what way things should be shown.  If there
+is a logical reason to change the visual representation text, then you
+should use (maybe first define) a <A HREF=#logical>logical tag</A>.
+<P>
+<TABLE CELLPADDING=0 CELLSPACING=0>
+<TR><TH>Visual Styles&nbsp;&nbsp;</TH>
+    <TH>HTML?&nbsp;&nbsp;</TH>
+    <TH ALIGN=left>Function</TH></TR>
+<TR><TD><CODE>A</CODE></TD><TD>*</TD>
+    <TD>Anchor (dummy)</TD></TR>
+<TR><TD><CODE>B</CODE></TD><TD>*</TD>
+    <TD><B>Bold font</B></TD></TR>
+<TR><TD><CODE>BD</CODE></TD><TD>&nbsp;</TD>
+    <TD>Backdrop</TD></TR>
+<TR><TD><CODE>BQ</CODE></TD><TD>*</TD>
+    <TD>Blockquote</TD></TR>
+<TR><TD><CODE>BR</CODE></TD><TD>*</TD>
+    <TD>Break line </TD></TR>
+<TR><TD><CODE>CENTER</CODE></TD><TD>*</TD>
+    <TD>Center text</TD></TR>
+<TR><TD><CODE>DIV</CODE></TD><TD>*</TD>
+    <TD>Division</TD></TR>
+<TR><TD><CODE>I</CODE></TD><TD>*</TD>
+    <TD><I>Italics</I></TD></TR>
+<TR><TD><CODE>IMG</CODE></TD><TD>*</TD>
+    <TD>image</TD></TR>
+<TR><TD><CODE>LI</CODE></TD><TD>*</TD>
+    <TD>List item in <CODE>UL</CODE> or <CODE>OL</CODE></TD></TR>
+<TR><TD><CODE>MARK</CODE></TD><TD>&nbsp;</TD>
+    <TD>Mark position and settings</TD></TR>
+<TR><TD><CODE>N</CODE></TD><TD></TD>
+    <TD><B>Normal font</B></TD></TR>
+<TR><TD><CODE>O</CODE></TD><TD>*</TD>
+    <TD><O>Overstrike</O></TD></TR>
+<TR><TD><CODE>OL</CODE></TD><TD>*</TD>
+    <TD>Ordered list</TD></TR>
+<TR><TD><CODE>P</CODE></TD><TD>*</TD>
+    <TD>Paragraph</TD></TR>
+<TR><TD><CODE>PRE</CODE></TD><TD>*</TD>
+    <TD>Preformatted</TD></TR>
+<TR><TD><CODE>PROP</CODE></TD><TD></TD>
+    <TD>Proportional font</TD></TR>
+<TR><TD><CODE>REDO</CODE></TD><TD>&nbsp;</TD>
+    <TD>Go back to a mark</TD></TR>
+<TR><TD><CODE>SUB</CODE></TD><TD>*</TD>
+    <TD><SUB>Sub</SUB>script</TD></TR>
+<TR><TD><CODE>SUP</CODE></TD><TD>*</TD>
+    <TD><SUP>Sup</SUP>erscript</TD></TR>
+<TR><TD><CODE>TEXT</CODE></TD><TD>&nbsp;</TD>
+    <TD>Text (dummy)</TD></TR>
+<TR><TD><CODE>TT</CODE></TD><TD>*</TD>
+    <TD><TT>Teletype</TT> font</TD></TR>
+<TR><TD><CODE>U</CODE></TD><TD>*</TD>
+    <TD><U>Under</U>line (not impl yet)</TD></TR>
+<TR><TD><CODE>UL</CODE></TD><TD>*</TD>
+    <TD>Unordered list</TD></TR>
+</TABLE>
+
+<H2><A NAME=params>Visual Parameters</A></H2>
+
+<TABLE CELLSPACING=0 CELLPADDING=0>
+<TR><TH>Parameter</TH><TH>HTML?</TH>
+    <TH ALIGN=left>Use with</TH><TH ALIGN=left>Value</TH></TR>
+<TR VALIGN=top><TD><CODE>SIZE</CODE></TD><TD><CODE>FONT</CODE></TD>
+    <TD>everywhere&nbsp;&nbsp;&nbsp;</TD>
+    <TD><EM>+digit</EM> and <EM>-digit</EM> relative fontsize
+        increment resp decrement.<BR>
+        Or: absolute value <CODE>1</CODE> to <CODE>7</CODE>.<BR>
+        Or: value from <CODE>-fontLabels</CODE> as defined in the
+        <A HREF=../fontset/index.html>fontset</A>.</TD></TR>
+<TR><TD><CODE>LARGE</CODE></TD><TD>&nbsp;</TD>
+    <TD>everywhere</TD>
+    <TD>equals <CODE>SIZE=+1</CODE></TD></TR>
+<TR><TD><CODE>SMALL</CODE></TD><TD>&nbsp;</TD>
+    <TD>everywhere</TD>
+    <TD>equals <CODE>SIZE=-1</CODE></TD></TR>
+<TR><TD><CODE>FACE</CODE></TD><TD><CODE>FONT</CODE></TD>
+    <TD>everywhere</TD>
+    <TD>*TBS*</TD></TR>
+<TR><TD><CODE>TT</CODE>, <CODE>B</CODE>, <CODE>I</CODE>,
+        <CODE>N</CODE></TD><TD>&nbsp;</TD>
+    <TD>everywhere</TD>
+    <TD>none</TD></TR>
+<TR><TD><CODE>START</CODE></TD><TD>*</TD>
+    <TD><CODE>OL</CODE>, <CODE>LI</CODE></TD>
+    <TD>Count (continue count) with digit or letter</TD></TR>
+<TR><TD><CODE>SRC</CODE></TD><TD>*</TD>
+    <TD><CODE>UL</CODE></TD>
+    <TD>Image to be used.</TD></TR>
+<TR VALIGN=top><TD><CODE>CLEAR</CODE></TD><TD>*</TD>
+    <TD><CODE>BR</CODE> and paragraphs</TD>
+    <TD>continue text when there is no image on the <CODE>left</CODE>,
+        <CODE>right</CODE>, or <CODE>all</CODE> sides</TD></TR>
+<TR><TD VALIGN=top><CODE>ALIGN</CODE></TD><TD>*</TD>
+    <TD VALIGN=top><CODE>P</CODE>, <CODE>DIV</CODE></TD>
+    <TD><CODE>left</CODE>, <CODE>right</CODE>, or <CODE>center</CODE> text
+        alignment.</TD></TR>
+<TR><TD><CODE>COLOR</CODE></TD><TD><CODE>FONT</CODE></TD>
+    <TD>everywhere</TD>
+    <TD>name or RGB-value</TD></TR>
+<TR VALIGN=top><TD><CODE>SHOW</CODE></TD><TD>&nbsp;</TD>
+    <TD>everywhere</TD>
+    <TD>As understood bij the selected
+        <A HREF=../dynamic/index.html>dynamics</A> style-element.</TD></TR>
+</TABLE>
+
+<H2><A NAME=logical>Logical Tags</A></H2>
+<EM>Logical tags</EM> are translated into <A HREF=#visual>visual tags</A>
+with optional parameters.
+Logical tags can not be used as parameter to each other
+nor as parameter to a visual tag, to avoid recursion.
+<P>
+<TABLE CELLPADDING=0 CELLSPACING=0>
+<TR><TH>Logical Style&nbsp;&nbsp;</TH>
+    <TH>HTML?&nbsp;&nbsp;</TH>
+    <TH ALIGN=left>Translates into</TH></TR>
+<TR><TD><CODE>BIG</CODE></TD><TD>*</TD>
+    <TD>=> <CODE>TEXT SIZE=+2</CODE></TD></TR>
+<TR><TD><CODE>BLOCKQUOTE</CODE></TD><TD>*</TD>
+    <TD>=> <CODE>BQ</CODE></TD></TR>
+<TR><TD><CODE>CITE</CODE></TD><TD>*</TD>
+    <TD>=> <CODE>I</CODE></TD></TR>
+<TR><TD><CODE>CODE</CODE></TD><TD>*</TD>
+    <TD>=> <CODE>TT</CODE></TD></TR>
+<TR><TD><CODE>EM</CODE></TD><TD>*</TD>
+    <TD>=> <CODE>I</CODE></TD></TR>
+<TR><TD><CODE>FONT</CODE></TD><TD>*</TD>
+    <TD>=> <CODE>TEXT</CODE></TD></TR>
+<TR><TD><CODE>HUGE</CODE></TD><TD>&nbsp;</TD>
+    <TD>=> <CODE>TEXT SIZE=+3</CODE></TD></TR>
+<TR><TD><CODE>LARGE</CODE></TD><TD>&nbsp;</TD>
+    <TD>=> <CODE>TEXT SIZE=+1</CODE></TD></TR>
+<TR><TD><CODE>SMALL</CODE></TD><TD>*</TD>
+    <TD>=> <CODE>TEXT SIZE=-1</CODE></TD></TR>
+<TR><TD><CODE>STRONG</CODE></TD><TD>*</TD>
+    <TD>=> <CODE>TEXT SIZE=+1 B</CODE></TD></TR>
+<TR><TD><CODE>TITLE</CODE></TD><TD>*</TD>
+    <TD>=> <CODE>CENTER SIZE=+1</CODE></TD></TR>
+<TR><TD><CODE>FOOTER</CODE></TD><TD>*</TD>
+    <TD>=> <CODE>RIGHT I SIZE=-1</CODE></TD></TR>
+</TABLE>
+<CODE>TITLE</CODE> and <CODE>FOOTER</CODE> tags are automatically added
+with the respective text-fields.  You'll never use it explicitly, but
+may redefine them.
+
+<H2><A NAME=image>Parameters to <CODE>IMG</CODE></A></H2>
+
+The exact function of parameters to images are described on
+<A HREF=../image/index.html>pages about images in PPresenter</A>.
+Images can be scaled, reused, and played with.
+<P>
+<TABLE CELLPADDING=0 CELLSPACING=0>
+<TR><TH>Image Parameter&nbsp;&nbsp;</TH>
+    <TH>HTML?&nbsp;&nbsp;</TH>
+    <TH ALIGN=left>Meaning</TH></TR>
+<TR><TD VALIGN=top><CODE>ALIGN</CODE></TD><TD>*</TD>
+    <TD>Put images <CODE>left</CODE>, <CODE>right</CODE>, or in
+        <CODE>center</CODE>.  Text floats around image.</TD></TR>
+<TR><TD VALIGN=top><CODE>BASE</CODE></TD><TD>&nbsp;</TD>
+    <TD>geometry of screen which was used to draw the image.  Image is
+        scaled to occupy same amount of space if resizing is done.</TD></TR>
+<TR><TD VALIGN=top><CODE>ENLARGE</CODE></TD><TD>&nbsp;</TD>
+    <TD>When this image is resized, is enlarging allowed?</TD></TR>
+<TR><TD><CODE>HSPACE</CODE></TD><TD>*</TD>
+    <TD>percentage screenheight</TD></TR>
+<TR><TD><CODE>RESIZE</CODE></TD><TD>&nbsp;</TD>
+    <TD>Should this image be resized?</TD></TR>
+<TR><TD><CODE>SRC</CODE></TD><TD>*</TD>
+    <TD>Image to be used.</TD></TR>
+<TR><TD><CODE>VSPACE</CODE></TD><TD>*</TD>
+    <TD>percentage screenwidth</TD></TR>
+</TABLE>
+
+<TR><TD VALIGN=top>
+
+    </TD><TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

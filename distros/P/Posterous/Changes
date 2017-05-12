@@ -1,0 +1,6 @@
+Revision history for Perl extension Posterous.
+
+0.01  Mon Aug 17 18:56:06 2009
+	- original version; created by h2xs 1.23 with options
+		-X -n Posterous
+

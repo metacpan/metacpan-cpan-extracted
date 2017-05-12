@@ -1,0 +1,6 @@
+Revision history for Perl extension POE::Wheel::UDP.
+
+0.00_01  Thu May 18 15:35:58 2006
+	- original version; created by h2xs 1.23 with options
+		--skip-exporter -ABXn POE::Wheel::UDP
+

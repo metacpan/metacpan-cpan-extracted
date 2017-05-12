@@ -1,0 +1,3 @@
+docs: |
+    See L<"md5">, mentally substituting L<Digest::SHA1> for L<Digest::MD5>,
+    although the user notes are not as funny.

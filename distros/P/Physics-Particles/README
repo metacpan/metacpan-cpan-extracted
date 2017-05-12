@@ -1,0 +1,59 @@
+Physics::Particles version 1.02
+===============================
+
+This module simulates a system of particles and the forces they
+excert on one another.
+
+As of version 1.00, there has been a major interface change and hence,
+version 1.00 and later are not compatible to versions before 1.00.
+Furthermore, Physics::Particles version 1.00 is not compatible to
+versions of Physics::Springs and Physics::Springs::Friction below 1.00.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+On platforms that don't support the "./" notation, that would be:
+
+   perl Build.PL
+   perl Build
+   perl Build test
+   perl Build install
+
+If you wish, you may use the old MakeMaker style instead:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   pray
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  Data::Dumper
+
+Some examples may need any of the following distributions:
+
+  Math::Project3D
+  Math::Project3D::Plot
+
+SEE ALSO
+
+You may find the newest versions of this module on CPAN or
+http://steffen-mueller.net
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002-2005 Steffen Mueller. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Author can be reached at physpart-module at steffen-mueller dot net.

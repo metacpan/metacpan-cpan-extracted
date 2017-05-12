@@ -1,0 +1,23 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Scripts.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Perldoc.pm
+lib/Perldoc/Base.pm
+lib/Perldoc/Emitter/HTML.pm
+lib/Perldoc/Parser/Kwid.pm
+lib/Perldoc/Reader.pm
+lib/Perldoc/Writer.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+perl-doc
+README
+t/kwid-to-html.t
+t/TestPerldoc.pm

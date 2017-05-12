@@ -1,0 +1,13 @@
+use inc::Module::Install;
+name 'Plack-Server-Coro';
+all_from 'lib/Plack/Server/Coro.pm';
+readme_from 'lib/Plack/Server/Coro.pm';
+requires 'Coro';
+requires 'Net::Server::Coro', 0.5;
+requires 'Plack';
+build_requires 'Test::More';
+use_test_base;
+auto_include_deps;
+author_tests('xt');
+auto_set_repository;
+WriteAll;

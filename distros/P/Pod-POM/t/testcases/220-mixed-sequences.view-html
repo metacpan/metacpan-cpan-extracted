@@ -1,0 +1,14 @@
+<html>
+<body bgcolor="#ffffff">
+<h1>NAME</h1>
+
+<p>220-mixed-sequences</p>
+<h1>TESTCASES</h1>
+
+<p>This is <b>bold and <i>bold italic</i></b>.</p>
+<p>This is <i>italic and <b>bold italic</b></i>.</p>
+<p>This is code with a replacable text as italic: <code>function(<i>argument</i>)</code>.</p>
+<p>This is an bold with embedded escapes: <b>bold &amp; bold</b>.</p>
+<p>Code within non-breaking space sequence: <code>code&nbsp;code&nbsp;code</code></p>
+</body>
+</html>

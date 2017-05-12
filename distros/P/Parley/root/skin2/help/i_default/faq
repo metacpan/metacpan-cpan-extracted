@@ -1,0 +1,81 @@
+<h1>Frequently Asked Questions</h1>
+
+<p>This page should answer common queries and problems.
+If it doesn't you're just being difficult *wink*</p>
+
+<h3>General Questions</h3>
+
+<ol class="help">
+    <li>
+    <b>Does the world need another piece of forum/message board software?</b>
+    <br />
+    <em>
+    Possibly not. This is a personal quest for me. If it's useful to someone
+    else that's even better.<br />
+    I've always thought that the Perl landscape was missing a well-written
+    and functional forum application.<br />
+    Add to that the emergence of the
+    <a href="http://catalystframework.org/">Catalyst framework</a>
+    and a desire to explore the benefits of this project and you've got Parley.
+    </em>
+    </li>
+</ol>
+
+<h3>Technical Questions</h3>
+
+<ol class="help">
+    <li>
+    <b>What software does this forum run on?</b>
+    <br />
+    <em>
+    The core elements of the application are:
+    <a href="http://perl.com/">Perl</a>,
+    <a href="http://postgresql.org/">PostgreSQL</a>
+    and
+    <a href="http://template-toolkit.org/">Template Toolkit</a>.
+    These elements are all tied together using the
+    <a href="http://catalystframework.org/">Catalyst framework</a>.
+    </em>
+    </li>
+
+    <li>
+    <b>PostgreSQL?! What about MySQL, SQLite, ...?</b>
+    <br />
+    <em>
+    I prefer PostgreSQL. I don't have the time or energy to make the application
+    compatible with everyone's preferred database. I'll happily accept patches
+    that don't break the application's coupling with PostgreSQL.
+    </em>
+    </li>
+
+    <li>
+    <b>How do I get my own copy?</b>
+    <br />
+    <em>
+    You can download releases of Parley from Berlios. Just visit the
+    <a href="http://developer.berlios.de/projects/parley/">Parley Project
+    Page</a>.
+    </em>
+    </li>
+
+    <li>
+    <b>How much does it cost?</b>
+    <br />
+    <em>
+    Other than your time and effort, it's <i>free</i>. The project has been
+    written and released under the
+    <a href="http://www.opensource.org/licenses/artistic-license.php">Artistic License</a>.
+    </em>
+    </li>
+
+    <li>
+    <b>Why is it taking you so long?</b>
+    <br />
+    <em>
+    Parley is my "commuting project". Ninety-five percent of the work on the
+    project has taken place on my commute to work. That's two forty-five
+    minute train journeys [it's really hard to operate a laptop whilst cycling
+    the remainder of the journey!] each day!
+    </em>
+    </li>
+</ol>

@@ -1,0 +1,79 @@
+{
+   "abstract" : "Serializes and deserializes Path::Class objects as file:// URI",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Path-Class-URI",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.9",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Lite" : "0",
+            "Module::Build::Tiny" : "0.039",
+            "Path::Class" : "0.29",
+            "Scalar::Util" : "0",
+            "Test::Base" : "0",
+            "Test::More" : "0",
+            "URI" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Base" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/zmughal/p5-Path-Class-URI/issues"
+      },
+      "homepage" : "https://github.com/zmughal/p5-Path-Class-URI",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/zmughal/p5-Path-Class-URI.git",
+         "web" : "https://github.com/zmughal/p5-Path-Class-URI"
+      }
+   },
+   "version" : "0.08",
+   "x_contributors" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
+      "Zakariyya Mughal <zaki.mughal@gmail.com>"
+   ]
+}
+

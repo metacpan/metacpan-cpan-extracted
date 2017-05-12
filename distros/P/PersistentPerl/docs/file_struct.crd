@@ -1,0 +1,638 @@
+Storage 
+{
+	{ Format 1.29 }
+	{ GeneratedFrom TCRD-version-1.96 }
+	{ WrittenBy sam }
+	{ WrittenOn "Sun Oct 22 16:13:44 2000" }
+}
+
+Document 
+{
+	{ Type "Class Relationship Diagram (obsolete)" }
+	{ Name file_struct.crd }
+	{ Author sam }
+	{ CreatedOn "Fri Nov 12 22:42:57 1999" }
+	{ Annotation "" }
+}
+
+Page 
+{
+	{ PageOrientation Portrait }
+	{ ShowHeaders False }
+	{ ShowFooters False }
+	{ ShowNumbers False }
+}
+
+# GRAPH NODES
+
+ClassNode 138588696
+{
+	{ Name "Free Slot" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Index "" }
+	{ Attributes 1 }
+	{ Attribute "next_slot=" }
+	{ Operations 0 }
+}
+
+ClassNode 138667784
+{
+	{ Name "Group" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Index "" }
+	{ Attributes 7 }
+	{ Attribute "next_slot=" }
+	{ Attribute "script_head=" }
+	{ Attribute "name=" }
+	{ Attribute "be_head=" }
+	{ Attribute "be_wait=" }
+	{ Attribute "fe_wait=" }
+	{ Attribute "fe_tail=" }
+	{ Operations 0 }
+}
+
+ClassNode 138675616
+{
+	{ Name "Header" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Index "" }
+	{ Attributes 6 }
+	{ Attribute "create_time" }
+	{ Attribute "group_head=" }
+	{ Attribute "slot_free=" }
+	{ Attribute "slots_alloced" }
+	{ Attribute "file_corrupt?" }
+	{ Attribute "file_removed?" }
+	{ Operations 0 }
+}
+
+ClassNode 138675888
+{
+	{ Name "Script" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Index "" }
+	{ Attributes 4 }
+	{ Attribute "next_slot=" }
+	{ Attribute "dev_num" }
+	{ Attribute "ino_num" }
+	{ Attribute "mtime" }
+	{ Operations 0 }
+}
+
+ClassNode 138683512
+{
+	{ Name "Group Name" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Index "" }
+	{ Attributes 1 }
+	{ Attribute "name" }
+	{ Operations 0 }
+}
+
+Comment 138821745
+{
+	{ Name "Copyright (C) 2003\r Sam Horrocks" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Index "" }
+}
+
+Comment 138821747
+{
+	{ Name "PersistentPerl Temp\rFile Structure" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Index "" }
+}
+
+ClassNode 138821749
+{
+	{ Name "Frontend" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Index "" }
+	{ Attributes 4 }
+	{ Attribute "next_slot=" }
+	{ Attribute "prev_slot=" }
+	{ Attribute "pid" }
+	{ Attribute "sent_sig?" }
+	{ Operations 0 }
+}
+
+Comment 138821750
+{
+	{ Name "? - boolean" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Index "" }
+}
+
+Comment 138821751
+{
+	{ Name "= - slot pointer" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Index "" }
+}
+
+ClassNode 138821752
+{
+	{ Name "Backend" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Index "" }
+	{ Attributes 6 }
+	{ Attribute "next_slot=" }
+	{ Attribute "prev_slot=" }
+	{ Attribute "pid" }
+	{ Attribute "be_wait_next" }
+	{ Attribute "be_wait_prev=" }
+	{ Attribute "maturity" }
+	{ Operations 0 }
+}
+
+# GRAPH EDGES
+
+Function 138683688
+{
+	{ Name "be_head" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Subject1 138667784 }
+	{ Subject2 138821752 }
+	{ Constraint "" }
+}
+
+Function 138683792
+{
+	{ Name "be_wait" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Subject1 138667784 }
+	{ Subject2 138821752 }
+	{ Constraint "" }
+}
+
+Function 138683896
+{
+	{ Name "slot_free" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Subject1 138675616 }
+	{ Subject2 138588696 }
+	{ Constraint "" }
+}
+
+Function 138692872
+{
+	{ Name "group_head" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Subject1 138675616 }
+	{ Subject2 138667784 }
+	{ Constraint "" }
+}
+
+Function 138694536
+{
+	{ Name "script_head" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Subject1 138667784 }
+	{ Subject2 138675888 }
+	{ Constraint "" }
+}
+
+Function 138696200
+{
+	{ Name "name" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Subject1 138667784 }
+	{ Subject2 138683512 }
+	{ Constraint "" }
+}
+
+Function 138697864
+{
+	{ Name "fe_wait" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Subject1 138667784 }
+	{ Subject2 138821749 }
+	{ Constraint "" }
+}
+
+Function 138699528
+{
+	{ Name "fe_tail" }
+	{ Annotation "" }
+	{ Parent 0 }
+	{ Subject1 138667784 }
+	{ Subject2 138821749 }
+	{ Constraint "" }
+}
+
+# VIEWS AND GRAPHICAL SHAPES
+
+View 138589824
+{
+	{ Index "0" }
+	{ Parent 0 }
+}
+
+DoubleBox 138701856
+{
+	{ View 138589824 }
+	{ Subject 138588696 }
+	{ Position 480 160 }
+	{ Size 92 52 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FillStyle Unfilled }
+	{ FillColor "white" }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+}
+
+DoubleBox 138707392
+{
+	{ View 138589824 }
+	{ Subject 138667784 }
+	{ Position 300 320 }
+	{ Size 98 130 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FillStyle Unfilled }
+	{ FillColor "white" }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+}
+
+DoubleBox 138718464
+{
+	{ View 138589824 }
+	{ Subject 138675616 }
+	{ Position 300 160 }
+	{ Size 120 117 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FillStyle Unfilled }
+	{ FillColor "white" }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+}
+
+T1Line 138724000
+{
+	{ View 138589824 }
+	{ Subject 138683688 }
+	{ FromShape 138707392 }
+	{ ToShape 138821753 }
+	{ Curved False }
+	{ End1 Empty }
+	{ End2 FilledArrow }
+	{ Points 2 }
+	{ Point 251 288 }
+	{ Point 183 301 }
+	{ NamePosition 215 285 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+	{ T1Position 243 307 }
+}
+
+T1Line 138728488
+{
+	{ View 138589824 }
+	{ Subject 138683792 }
+	{ FromShape 138707392 }
+	{ ToShape 138821753 }
+	{ Curved False }
+	{ End1 Empty }
+	{ End2 FilledArrow }
+	{ Points 2 }
+	{ Point 251 353 }
+	{ Point 183 360 }
+	{ NamePosition 216 347 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+	{ T1Position 242 362 }
+}
+
+T1Line 138733208
+{
+	{ View 138589824 }
+	{ Subject 138683896 }
+	{ FromShape 138718464 }
+	{ ToShape 138701856 }
+	{ Curved False }
+	{ End1 Empty }
+	{ End2 FilledArrow }
+	{ Points 2 }
+	{ Point 360 160 }
+	{ Point 434 160 }
+	{ NamePosition 397 150 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+	{ T1Position 370 170 }
+}
+
+DoubleBox 138737656
+{
+	{ View 138589824 }
+	{ Subject 138675888 }
+	{ Position 130 210 }
+	{ Size 64 90 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FillStyle Unfilled }
+	{ FillColor "white" }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+}
+
+T1Line 138743192
+{
+	{ View 138589824 }
+	{ Subject 138692872 }
+	{ FromShape 138718464 }
+	{ ToShape 138707392 }
+	{ Curved False }
+	{ End1 Empty }
+	{ End2 FilledArrow }
+	{ Points 2 }
+	{ Point 300 218 }
+	{ Point 300 255 }
+	{ NamePosition 286 236 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+	{ T1Position 314 228 }
+}
+
+T1Line 138747680
+{
+	{ View 138589824 }
+	{ Subject 138694536 }
+	{ FromShape 138707392 }
+	{ ToShape 138737656 }
+	{ Curved False }
+	{ End1 Empty }
+	{ End2 FilledArrow }
+	{ Points 2 }
+	{ Point 251 289 }
+	{ Point 162 230 }
+	{ NamePosition 213 251 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+	{ T1Position 233 290 }
+}
+
+DoubleBox 138752400
+{
+	{ View 138589824 }
+	{ Subject 138683512 }
+	{ Position 490 220 }
+	{ Size 76 52 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FillStyle Unfilled }
+	{ FillColor "white" }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+}
+
+T1Line 138757880
+{
+	{ View 138589824 }
+	{ Subject 138696200 }
+	{ FromShape 138707392 }
+	{ ToShape 138752400 }
+	{ Curved False }
+	{ End1 Empty }
+	{ End2 FilledArrow }
+	{ Points 2 }
+	{ Point 349 295 }
+	{ Point 452 240 }
+	{ NamePosition 394 259 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+	{ T1Position 367 297 }
+}
+
+T1Line 138762344
+{
+	{ View 138589824 }
+	{ Subject 138697864 }
+	{ FromShape 138707392 }
+	{ ToShape 138821754 }
+	{ Curved False }
+	{ End1 Empty }
+	{ End2 FilledArrow }
+	{ Points 2 }
+	{ Point 349 288 }
+	{ Point 452 318 }
+	{ NamePosition 403 294 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+	{ T1Position 358 300 }
+}
+
+T1Line 138767048
+{
+	{ View 138589824 }
+	{ Subject 138699528 }
+	{ FromShape 138707392 }
+	{ ToShape 138821754 }
+	{ Curved False }
+	{ End1 Empty }
+	{ End2 FilledArrow }
+	{ Points 2 }
+	{ Point 349 353 }
+	{ Point 452 363 }
+	{ NamePosition 401 349 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+	{ T1Position 360 363 }
+}
+
+TextBox 138821746
+{
+	{ View 138589824 }
+	{ Subject 138821745 }
+	{ Position 470 113 }
+	{ Size 136 30 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Invisible }
+	{ FillStyle Unfilled }
+	{ FillColor "white" }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+}
+
+TextBox 138821748
+{
+	{ View 138589824 }
+	{ Subject 138821747 }
+	{ Position 150 113 }
+	{ Size 94 30 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Invisible }
+	{ FillStyle Unfilled }
+	{ FillColor "white" }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+}
+
+DoubleBox 138821754
+{
+	{ View 138589824 }
+	{ Subject 138821749 }
+	{ Position 490 340 }
+	{ Size 76 91 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FillStyle Unfilled }
+	{ FillColor "white" }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+}
+
+TextBox 138821755
+{
+	{ View 138589824 }
+	{ Subject 138821750 }
+	{ Position 138 140 }
+	{ Size 70 20 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Invisible }
+	{ FillStyle Unfilled }
+	{ FillColor "white" }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+}
+
+TextBox 138821756
+{
+	{ View 138589824 }
+	{ Subject 138821751 }
+	{ Position 153 150 }
+	{ Size 100 20 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Invisible }
+	{ FillStyle Unfilled }
+	{ FillColor "white" }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+}
+
+DoubleBox 138821753
+{
+	{ View 138589824 }
+	{ Subject 138821752 }
+	{ Position 140 330 }
+	{ Size 86 117 }
+	{ Color "black" }
+	{ LineWidth 1 }
+	{ LineStyle Solid }
+	{ FillStyle Unfilled }
+	{ FillColor "white" }
+	{ FixedName False }
+	{ Font "-*-helvetica-medium-r-normal--10*" }
+	{ TextAlignment Center }
+	{ TextColor "black" }
+	{ NameUnderlined False }
+}
+

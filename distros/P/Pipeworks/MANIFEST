@@ -1,0 +1,13 @@
+lib/Pipeworks.pm
+lib/Pipeworks/Message/MyDoc.pm
+lib/Pipeworks/Pipeline.pm
+lib/Pipeworks/Stage.pm
+lib/Pipeworks/Stage/Callback.pm
+lib/Pipeworks/Stage/FetchURL.pm
+lib/Pipeworks/Stage/GetDocumentBody.pm
+Makefile.PL
+MANIFEST
+README.md
+script/pipeworks
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

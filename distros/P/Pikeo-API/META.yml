@@ -1,0 +1,43 @@
+---
+name: Pikeo-API
+version: 1.01
+author: []
+abstract: High-level OO interface to pikeo.com API!
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Data::Dumper: 0
+  DateTime: 0
+  DateTime::Format::ISO8601: 0
+  DateTime::Format::RSS: 0
+  Digest::MD5: 0
+  Digest::SHA1: 0
+  LWP::UserAgent: 0
+  MIME::Base64: 0
+build_requires:
+  Test::More: 0
+provides:
+  Pikeo::API:
+    file: lib/Pikeo/API.pm
+    version: 1.01
+  Pikeo::API::Album:
+    file: lib/Pikeo/API/Album.pm
+  Pikeo::API::Base:
+    file: lib/Pikeo/API/Base.pm
+  Pikeo::API::Comment:
+    file: lib/Pikeo/API/Comment.pm
+  Pikeo::API::Contact:
+    file: lib/Pikeo/API/Contact.pm
+  Pikeo::API::Photo:
+    file: lib/Pikeo/API/Photo.pm
+  Pikeo::API::Photos:
+    file: lib/Pikeo/API/Photos.pm
+  Pikeo::API::User:
+    file: lib/Pikeo/API/User.pm
+  Pikeo::API::User::Logged:
+    file: lib/Pikeo/API/User/Logged.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

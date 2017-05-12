@@ -1,0 +1,155 @@
+1.4.0-pre1
+----------
+2005-07-16	Ernst Rohlicek jun. <ernst.rohlicek@inode.at>
+
+	* Pvm.xs, Pvm.pm: Finished adding functionality of PVM v3.4 - siblings,
+	contexts and message boxes with their according new contants. All added
+	functionality tested.
+	
+	Message handlers still missing. Testing routines for inclusion in package
+	still missing.
+
+	NOTE: Also created an ebuild (installation script) for the Gentoo
+	distribution.
+
+
+1.3.0
+-----
+2001-11-16  Denis Leconte
+
+	* Patched in pvm_start_pvmd() support, code developed and
+          provided by Benjamin Holzman.
+
+2001-09-20  Ulrich Pfeifer  <upf@de.uu.net>
+
+	* Pvm.xs: Fixed memory leak in config(), tasks() and hostsync().
+
+2001-04-10  Florian Frank   <flori@neopoly.de>
+
+	* Pvm.xs: Added endtask() function.
+
+2001-02-24  Ulrich Pfeifer  <upf@de.uu.net>
+
+	* Pvm.xs: Removal of the remaining hand crafted prototypes changed the
+	signatures for mcast, pack, addhosts, and delhosts from "@" to ";@".
+	I am not sure if there is any difference, but I trust the generated
+	ones more :-)
+
+	* Pvm.xs: Removed obsolete stuff for 1:1 functions.  Only difference in
+	generated code is that hostsync() now has a prototype.  I assume it
+	was forgotten originally and keep it.  Also mkbuf had a wrong 
+	prototype of "$" instead of ";$".  This is why one should leaf this to 
+	programs ;-)
+
+2001-02-23  Ulrich Pfeifer  <upf@de.uu.net>
+
+	* Pvm.pm: Added code2symbol and code2text to have error texts
+	availbale for debugging.
+
+	* Pvm.xs: Added PROTOTYPES: to the group section.
+
+	* Pvm.pm: Added my name to the AUTHORS section.  Removed spurious
+	hint about the 100k limit. Documented new group functions.
+
+	* t/group.t: Fixed number of tests.
+
+	* Pvm.xs, t/group.t: Added pvm_gsize.
+
+	* Pvm.xs, t/group.t: Added pvm_getinst and pvm_gettid.
+
+	* Pvm.xs, t/group.t: Group functions except pvm_reduce done.
+
+	* Pvm.xs, t/group.t: Added some more group functions with
+	rudimentary tests.
+
+2001-02-22  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* Pvm.xs, t/group.t: Removed pvm_prefix
+
+	* Makefile.PL, Pvm.xs, t/group.t: First groups function works.
+
+	* Pvm.xs: removed the ifdef Stuff.  Short enough now.
+
+	* Pvm.xs:
+	Removed useless switch in constant().  The stuff is still too bulky.
+
+	* Pvm.pm: Fixed(?) the prototype for autoloaded functions.
+
+	* t/bigmsg.t: Test spawns to processes with different tids now
+
+	* Pvm.xs: Fixed of by one bug at string end.
+
+	* MANIFEST: Removed test.pl, added t/bigmsg.t
+
+2001-02-21  Ulrich Pfeifer  <pfeifer@wait.de>
+
+	* t/bigmsg.t: Waiting seems not to be the problem
+
+	* t/bigmsg.t: Must wait for listener to come up.
+
+	* t/bigmsg.t, test.pl: Tests start working.
+
+	* t/bigmsg.t: Added crude test for big message delivery.
+
+	* Pvm.xs: Fixed header
+
+	* Pvm.xs: Added some checks for return values.
+
+	* Pvm.pm: Fixed typos
+
+	* Pvm.xs: Accidentally removed initialization re-added.
+
+	* Pvm.pm: Documented signature changes.
+
+	* Pvm.xs: Seems to work
+
+	* Pvm.xs: precv: Added third optional argument "buflen".
+
+	* Pvm.xs: Removed buffer_string
+
+	* Makefile.PL: Make this work on my Linux box.
+
+	* Changes, MANIFEST, Makefile.PL, Pvm.pm, Pvm.xs, README, test.pl:
+	Initial import of D/DL/DLECONTE/Parallel-Pvm-1.2.2.tar.gz
+
+	* Changes, MANIFEST, Makefile.PL, Pvm.pm, Pvm.xs, README, test.pl:
+	New file.
+	
+Old revision history for Perl extension Pvm.
+
+1.2.1 to 1.2.2
+---------------
+Fix segfault in tasks() if there is an error.
+Get rid of string_type to avoid integer overflow problems.
+unpack() and precv() interpret everything as a string, like pack().
+Thanks to Sven Neuhaus <sn@neopoly.com> for the patch!
+
+1.2 to 1.2.1
+----------
+Debug for proper compilation under Perl 5.6.0.
+Thanks to Florian Frank <flori@neopoly.de>
+for the patch.
+Denis P. Leconte
+
+
+1.0 to 1.2
+----------
+Reimplement in a new xs shell so it will compile
+and test OK on Perl 5.0005 
+Denis P. Leconte
+
+
+1.0 to 1.1
+----------
+1, Parallel::Pvm::spawn now accepts argv argument
+
+2, Parallel::Pvm::notify accepts "cnt" argument
+   for PvmHostAdd
+
+3, Parallel::Pvm::recv_notify correctly receives
+   list of host tids for PvmHostAdd notification
+
+4, Some internal buffering optimization.
+
+(1--3 was contributed by Rob Torop)
+

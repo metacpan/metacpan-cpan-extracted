@@ -1,0 +1,25 @@
+PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'inc', 'blib/lib', 'blib/arch')" t/01app.t t/02pod.t t/03podcoverage.t t/04_forumcode.t t/05.userroles.t t/50.text_search.sql.t t/controller_Admin.t t/controller_Forum.t t/controller_Help.t t/controller_My.t t/controller_Post.t t/controller_Search.t t/controller_Site.t t/controller_Terms.t t/controller_Thread.t t/controller_User.t t/model_ParleyDB.t t/model_Post.t t/view_Plain.t t/view_TT.t
+t/01app.................ok
+t/02pod.................skipped
+        all skipped: Test::Pod 1.14 required
+t/03podcoverage.........skipped
+        all skipped: Test::Pod::Coverage 1.04 required
+t/04_forumcode..........ok
+t/05.userroles..........ok
+t/50.text_search.sql....ok
+t/controller_Admin......ok
+t/controller_Forum......ok
+t/controller_Help.......ok
+t/controller_My.........ok
+t/controller_Post.......ok
+t/controller_Search.....ok
+t/controller_Site.......ok
+t/controller_Terms......ok
+t/controller_Thread.....ok
+t/controller_User.......ok
+t/model_ParleyDB........ok
+t/model_Post............ok
+t/view_Plain............ok
+t/view_TT...............ok
+All tests successful, 2 tests skipped.
+Files=20, Tests=144, 27 wallclock secs (22.62 cusr +  1.17 csys = 23.79 CPU)

@@ -1,0 +1,50 @@
+---
+abstract: 'DAIA Server as Plack application'
+author:
+  - 'Jakob Voß'
+build_requires:
+  Test::Warn: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-App-DAIA
+provides:
+  Plack::App::DAIA:
+    file: lib/Plack/App/DAIA.pm
+    version: 0.55
+  Plack::App::DAIA::Test:
+    file: lib/Plack/App/DAIA/Test.pm
+    version: 0.55
+  Plack::App::DAIA::Test::Suite:
+    file: lib/Plack/App/DAIA/Test/Suite.pm
+    version: 0.55
+  Plack::App::DAIA::Validator:
+    file: lib/Plack/App/DAIA/Validator.pm
+    version: 0.55
+requires:
+  CGI: 0
+  DAIA: 0.43
+  File::ShareDir: 0
+  File::Spec::Functions: 0
+  Getopt::Long: 0
+  HTTP::Request::Common: 0
+  JSON: 0
+  LWP::Simple: 0
+  Plack: 1.0
+  Pod::Usage: 0
+  Test::Builder::Module: 0
+  Test::JSON::Entails: 0
+  Try::Tiny: 0
+  URI::Escape: 0
+  perl: v5.10.1
+resources:
+  bugtracker: https://github.com/nichtich/Plack-App-DAIA/issues
+  homepage: https://github.com/nichtich/Plack-App-DAIA
+  repository: https://github.com/nichtich/Plack-App-DAIA.git
+version: 0.55

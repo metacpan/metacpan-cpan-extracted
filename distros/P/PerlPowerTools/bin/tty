@@ -1,0 +1,25 @@
+#!/usr/bin/perl
+
+=begin metadata
+
+Name: tty
+Description: return user's terminal name
+Author:
+License:
+
+=end metadata
+
+=cut
+
+
+# implementation of tty in perl
+use POSIX ();
+use strict;
+die "not a tty" unless -t;
+print POSIX::ttyname(0), "\n";
+
+=encoding utf8
+
+=head1 NAME
+
+tty - return user's terminal name

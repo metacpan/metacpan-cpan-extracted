@@ -1,0 +1,19 @@
+Revision history for Perl extension Plack::Middleware::Auth::Digest
+
+0.05  2015-03-31 16:13:22 PDT
+        - fixed test dependency
+        - switched to Milla
+
+0.04  Thu Dec 16 11:27:29 PST 2010
+        - Passed $env to the callback as a second argument (blaze-x)
+        - Adde a documentation on using it with Apache environment
+
+0.03  Sun Feb  7 17:03:10 PST 2010
+        - Fixed a challenge header to quote qop, per RFC 2617
+
+0.02  Fri Jan  8 02:29:40 PST 2010
+        - Fixed a bug in Digest challenge parser originated from LWP where it fails when the
+          realm contains a comma.
+
+0.01  Thu Jan  7 05:08:19 2010
+        - original version

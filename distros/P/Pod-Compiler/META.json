@@ -1,0 +1,44 @@
+{
+   "abstract" : "Converts Perl Pod documentation to object tree, contains podlint and podchecker2",
+   "author" : [
+      "Marek Rouchal <marekr@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Compiler",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Pod::Parser" : "1.12",
+            "Storable" : "0",
+            "Test::Simple" : "0.44",
+            "Tree::DAG_Node" : "1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.21"
+}

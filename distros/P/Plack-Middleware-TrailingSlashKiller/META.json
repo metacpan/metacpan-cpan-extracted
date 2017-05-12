@@ -1,0 +1,68 @@
+{
+   "abstract" : "Dealing with that pesky trailing slash/",
+   "author" : [
+      "Menno Blom <blom@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-TrailingSlashKiller",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.038"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.8",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Plack" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/b10m/p5-Plack-Middleware-TrailingSlashKiller/issues"
+      },
+      "homepage" : "https://github.com/b10m/p5-Plack-Middleware-TrailingSlashKiller",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/b10m/p5-Plack-Middleware-TrailingSlashKiller.git",
+         "web" : "https://github.com/b10m/p5-Plack-Middleware-TrailingSlashKiller"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "B10m <menno@b10m.net>"
+   ]
+}
+

@@ -1,0 +1,7 @@
+-*- org -*-
+
+- check on alignment issues. plain PDL alloc seems ok...
+- can embedding be made to work?
+- Do something smarter than FFTW_ESTIMATE
+- support for reading/writing the wisdom
+- Support DCT, DST, Hartley transform

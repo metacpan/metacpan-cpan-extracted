@@ -1,0 +1,49 @@
+This is the TODO list for PerlPoint-Converters
+==============================================
+$Date: 2001/12/18 22:51:07 $
+$Revision: 1.3 $
+
+(sorted by priority: 1 = very high, ..., 6 = very low)
+
+  uninitialized value in array element at line 2508
+
+  *** SEQ tag: Reihenfolge falsch
+      Testfall dafuer schreiben, siehe neuKurs \TAB Verwendung
+
+[] FAQ to Umlaute (DOS --> UNIX)
+
+[] Monolithisches HTML (all in one file)
+
+
+[3] allow tags und html escapes in headers
+
+
+[3] \REQUIRE tag to make sure that a certain version of pp2html is used
+
+[2] link paths ...
+
+[3] internal reference error messages 
+
+[2] Doc: Precedence of \L  \B  \X  ...
+
+[3] Usage: tmp filename so that it will also work on Win32 platform
+
+[3] Enhance test suite (./t)
+
+[3] Start thinking about XML, and PPresenter Interface
+
+[4] pp2latex: implementation of all what's already in pp2htm
+
+[4] pp2latex: Better support for templates, provide examples
+
+[4] check config file: investigate first input file. if it looks like
+    a config file (containing options from %OPT) then warn the user,
+    he might have called the file without @ (common error with ArgvFile ...)
+
+[4] Improve Style Sheet Support
+
+[4] Interactive Perl/Tk edit-script for config files (get all options from pp2html 
+    source code !!!)
+
+[3] Error in extact_pod.pl (MKITALI) and extraction of \IMAGE
+list of innermost tags in docu: \X \L \A

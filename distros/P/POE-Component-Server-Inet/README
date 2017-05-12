@@ -1,0 +1,114 @@
+NAME
+    POE::Component::Server::Inet - a super-server daemon implementation in
+    POE
+
+VERSION
+    version 0.06
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use POE qw(Component::Server::Inet);
+
+      $|=1;
+
+      my $inetd = POE::Component::Server::Inet->spawn( options => { trace => 0 } );
+
+      my $echo = $inetd->add_tcp( port => 0, program => \&_echo );
+
+      print "Started echo server on port: $echo\n";
+
+      my $fake = $inetd->add_tcp( port => 0, program => \&_fake );
+
+      print "Started a 'fake' server on $fake\n";
+
+      my $fake2 = $inetd->add_tcp( port => 0, program => \&_fake2 );
+
+      print "Started another 'fake' server on $fake2\n";
+
+      $poe_kernel->run();
+      exit 0;
+
+      sub _echo {
+        use FileHandle;
+        autoflush STDOUT 1;
+        while(<STDIN>) {
+          print STDOUT $_;
+        }
+        return;
+      }
+
+      sub _fake {
+        return;
+      }
+
+      sub _fake2 {
+        sleep 10000000000;
+        return;
+      }
+
+DESCRIPTION
+    POE::Component::Server::Inet is an Inetd (
+    <http://en.wikipedia.org/wiki/Inetd> ) "super-server" implementation in
+    POE. It currently only supports TCP based connections.
+
+    You may either specify programs to run or use coderefs.
+
+    The component uses POE::Wheel::Run to do its magic.
+
+CONSTRUCTOR
+    spawn
+        Starts a POE::Component::Server::Inet session and returns an object.
+        Takes a number of optional arguments:
+
+          'alias', an alias to address the component by;
+          'options', a hashref of POE::Session options;
+          'timeout', a number in seconds to wait before forcefully terminating forked processes, default 30;
+
+METHODS
+    session_id
+        Takes no arguments. Returns the POE Session ID of the component.
+
+    add_tcp
+        Adds a TCP listener to the component. Takes a number of parameters:
+
+          'port', the port to listen on, mandatory ( can be set to 0 if required );
+          'program', a program or coderef to execute for each connection, mandatory;
+          'programargs', an arrayref of parameters for the program being run;
+          'allow', a Net::Netmask object of hosts to allow to connect;
+          'deny', a Net::Ntemask object of hosts to deny connections from;
+          'user', the UID of a user to switch to;
+          'group', the GID of a group to switch to;
+
+        Options "program", "programargs", "user" and "group" are passed
+        directly to POE::Wheel::Run's constructor, please check that
+        documentation for extra information.
+
+        The method call returns the port that was assigned.
+
+    del_tcp
+        Removes a TCP listener. Takes one mandatory parameter:
+
+          'port', the port to remove;
+
+        Any pending connections are dealt with.
+
+    shutdown
+        Terminates the component. All connections and wheels are closed.
+
+SEE ALSO
+    POE
+
+    <http://en.wikipedia.org/wiki/Inetd>
+
+    POE::Wheel::Run
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

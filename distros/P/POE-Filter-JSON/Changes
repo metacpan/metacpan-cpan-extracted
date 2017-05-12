@@ -1,0 +1,13 @@
+Revision history for POE::Filter::JSON.
+
+0.03 Mon Apr 16 2007
+    - added json_any param
+
+0.02 Thu Apr 05 2007
+    - Requires JSON::Any now
+    - added eval around the json method calls
+    - Moved buffer to pos 0 in the array
+    - Changed the buffer to an array
+
+0.01 Sun Aug 06 2006
+	- First version

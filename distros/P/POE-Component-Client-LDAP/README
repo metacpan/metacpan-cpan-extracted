@@ -1,0 +1,144 @@
+NAME
+    POE::Component::Client::LDAP - subclass of Net::LDAP which uses POE to
+    speak via sockets in async mode.
+
+SYNOPSIS
+     use POE;
+     use POE::Component::Client::LDAP;
+ 
+     POE::Session->create(
+            inline_states => {
+                    _start => sub {
+                            my ($heap, $session) = @_[HEAP, SESSION];
+                            $heap->{ldap} = POE::Component::Client::LDAP->new(
+                                    'localhost',
+                                    callback => $session->postback( 'connect' ),
+                            );
+                    },
+                    connect => sub {
+                            my ($heap, $session, $callback_args) = @_[HEAP, SESSION, ARG1];
+                            if ( $callback_args->[0] ) {
+                                    $heap->{ldap}->bind(
+                                            callback => $session->postback( 'bind' ),
+                                    );
+                            }
+                            else {
+                                    delete $heap->{ldap};
+                                    print "Connection Failed\n";
+                            }
+                    },
+                    bind => sub {
+                            my ($heap, $session) = @_[HEAP, SESSION];
+                            $heap->{ldap}->search(
+                                    base => "ou=People,dc=domain,dc=net",
+                                    filter => "(objectClass=person)",
+                                    callback => $session->postback( 'search' ),
+                            );
+                    },
+                    search => sub {
+                            my ($heap, $ldap_return) = @_[HEAP, ARG1];
+                            my $ldap_search = shift @$ldap_return;
+ 
+                            foreach (@$ldap_return) {
+                                    print $_->dump;
+                            }
+ 
+                            delete $heap->{ldap} if $ldap_search->done;
+                    },
+            },
+     );
+ 
+     POE::Kernel->run();
+
+DESCRIPTION
+    POE::Component::Client::LDAP->new() starts up a new POE::Session and
+    POE::Wheel to manage socket communications for an underlying Net::LDAP
+    object, allowing it to be used in async mode properly within a POE
+    program.
+
+INTERFACE DIFFERENCES
+    With regards to Net::LDAP, all interfaces are to be used as documented,
+    with the following exceptions.
+
+    POE::Component::Client::LDAP->new( hostname, OPTIONS ) =item
+    POE::Component::Client::LDAP->new( OPTIONS ) =item
+    POE::Component::Client::LDAP->new()
+      A call to new() is non-blocking, always returning an object.
+
+      If a hostname is supplied, new() also acts as though you have called
+      connect(). Please read the docs for connect() to see how the arguments
+      work.
+
+    $object->connect( hostname, OPTIONS ) =item $object->connect( OPTIONS )
+    =item $object->connect()
+      The 'callback' argument has been added and should always be supplied
+      to notify your code when a connection is established.
+
+      Only LDAP connections are supported at this time, LDAPS and LDAPI will
+      be in a future release.
+
+      Connection errors are not handled at this time, again in a future
+      release.
+
+      The 'async' option is always turned on, and whatever value you pass in
+      will be ignored.
+
+    $object->async()
+      Async mode is always turned on and so this call will always return
+      true, if you pass it a value to set it a fatal exception will be
+      raised, even if value is true.
+
+    $object->sync()
+      Async mode is required, this call will cause a fatal exception.
+
+    $object->sock()
+      This call will throw a fatal exception.
+
+      Because POE is being used to handle socket communications I have
+      chosen to not expose the raw socket at this time.
+
+CALLBACK SEMANTICS
+    The callback semantics documented here are for reference, the callbacks
+    are handled by Net::LDAP and I've only documented them for reference
+    here. The exception to this is the callback for new() which does not
+    exist in Net::LDAP, and thus I have defined myself.
+
+    new =item connect
+      No arguments are passed to indicate that an existing connection has
+      been closed.
+
+      The first argument is a boolean indicator of whether a connection has
+      succeeded or failed. The second argument contains the host spec used
+      to attempt the connection.
+
+      In the case of a success the third and fourth arguments contain the
+      address and port connected to respectively.
+
+      In the case of a failure the third argument contains the name of the
+      operation that failed, and the fourth and fifth arguments hold numeric
+      and string values of $! respectively.
+
+    search
+      The first argument is always the Net::LDAP::Search object presiding
+      over this search run. The 'done' method on this object may be
+      consulted to know when all the possible replies have been received.
+
+      The second and following arguments are Net::LDAP::Entry objects
+      returned from the search.
+
+    others
+      Forthcoming
+
+BUGS
+    Failures of many kinds are not very well handled at this time, also
+    canceling running connection requests is not implemented.
+
+AUTHOR
+    Jonathan Steinert hachi@cpan.org
+
+LICENSE
+    Copyright 2004 Jonathan Steinert (hachi@cpan.org)
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

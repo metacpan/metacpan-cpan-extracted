@@ -1,0 +1,13 @@
+$Id: README,v 1.1 2004/01/08 01:41:03 nothingmuch Exp $
+
+NAME
+
+Pod::Wrap
+    
+DESCRIPTION
+
+A simple module which can wrap pod sections of perl files using Text::Wrap, hopefully without causing too much damage.
+
+AUTHOR
+
+Yuval Kogman <nothingmuch@woobling.org>

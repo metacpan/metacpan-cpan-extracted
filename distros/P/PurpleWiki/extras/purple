@@ -1,0 +1,217 @@
+#!/usr/bin/perl
+#
+# purple -- Document authoring system using PurpleWiki.
+#
+# $Id: purple,v 1.1 2003/08/14 08:02:37 eekim Exp $
+#
+# Copyright (c) Blue Oxen Associates 2003.  All rights reserved.
+#
+# This file is part of PurpleWiki.  PurpleWiki is derived from:
+#
+#   UseModWiki v0.92          (c) Clifford A. Adams 2000-2001
+#   AtisWiki v0.3             (c) Markus Denker 1998
+#   CVWiki CVS-patches        (c) Peter Merel 1997
+#   The Original WikiWikiWeb  (c) Ward Cunningham
+#
+# PurpleWiki is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the
+#    Free Software Foundation, Inc.
+#    59 Temple Place, Suite 330
+#    Boston, MA 02111-1307 USA
+
+use strict;
+use File::Copy;
+use Getopt::Long;
+use IO::File;
+use PurpleWiki::Config;
+use PurpleWiki::Parser::WikiText;
+
+my $addNodeIds = 0;
+my $optionDriver = '';
+my $cssFile = '';
+my $url = '';
+
+GetOptions('add_ids'  => \$addNodeIds,
+           'driver=s' => \$optionDriver,
+           'css=s'    => \$cssFile,
+           'url=s'    => \$url);
+
+
+if (scalar @ARGV < 3) {
+    if (!($addNodeIds && scalar @ARGV == 2)) {
+        print <<EOM;
+Usage:
+  $0 --add_ids [--url=URL] /path/to/wikidb input.wiki
+      or
+  $0 [--add_ids] [--driver=drivername] [--css=stylesheet] [--url=URL] \\
+      /path/to/wikidb input.wiki output.[txt|html]
+EOM
+        exit;
+    }
+}
+
+my $config = new PurpleWiki::Config($ARGV[0]);
+my %params;
+$params{config} = $config;
+$params{css_file} = $cssFile if ($cssFile);
+$params{add_node_ids} = $addNodeIds if ($addNodeIds);
+$params{wikiword} = 0;
+#$params{freelink} = $config->FreeLinks;
+$params{freelink} = 0;
+$params{url} = $url if ($url);
+
+my $inputFile = $ARGV[1];
+my $outputFile = $ARGV[2];
+my $outputFileType;
+if ($optionDriver eq '') {
+    if ($outputFile =~ /\.html$/i) {
+        $outputFileType = 'html';
+    }
+    else {
+        $outputFileType = 'txt';
+    }
+}
+
+my $wikiContent = &readFile($inputFile);
+my $wikiParser = PurpleWiki::Parser::WikiText->new();
+my $wiki = $wikiParser->parse($wikiContent, %params);
+$wiki->title($outputFile) if (!$wiki->title);
+
+if (-e $outputFile) {
+    unlink "$outputFile~" if (-e "$outputFile~");
+    &File::Copy::move($outputFile, "$outputFile~");
+}
+
+if ($optionDriver eq '') {
+    if ($outputFileType eq 'html') {
+        &writeFile($outputFile, $wiki->view('xhtml', %params));
+    }
+    else {
+        &writeFile($outputFile, $wiki->view('text', %params));
+    }
+}
+else {
+    &writeFile($outputFile, $wiki->view($optionDriver, %params));
+}
+
+if ($addNodeIds) {
+    unlink "$inputFile~" if (-e "$inputFile~");
+    &File::Copy::move($inputFile, "$inputFile~");
+#    print $wiki->view('wikitext', %params);
+    &writeFile($inputFile, $wiki->view('wikitext', %params));
+}
+
+# fini
+
+### functions
+
+sub readFile {
+    my $fileName = shift;
+    my $fileContent;
+
+    my $fh = new IO::File $fileName;
+    if (defined $fh) {
+        local ($/);
+        $fileContent = <$fh>;
+        $fh->close;
+        return $fileContent;
+    }
+    else {
+        return;
+    }
+}
+
+sub writeFile {
+    my ($fileName, $fileContent) = @_;
+
+
+    my $fh = new IO::File ">$fileName";
+    if (defined $fh) {
+        print $fh $fileContent;
+        $fh->close;
+    }
+}
+
+=head1 NAME
+
+purple - Document authoring system
+
+=head1 SYNOPSIS
+
+  purple --add_ids [--url=URL] /path/to/wikidb F<inputFile.wiki>
+
+  purple [--add_ids] [--driver=driverName] [--css=stylesheet] [--url=URL] \
+    /path/to/wikidb F<inputFile.wiki> F<output.[txt|html]>
+
+=head1 OPTIONS
+
+=over 4
+
+=item --add_ids
+
+Add node IDs to the input file.
+
+=item --driver=driverName
+
+Use driverName as the View driver.
+
+=item --css=stylesheet
+
+Use stylesheet as the CSS stylesheet for HTML output.
+
+=item --url=URL
+
+The URL of the document.  This is used to maintain an index of node
+IDs and URLs, so that PurpleWiki can find the exact URL using only the
+NID.
+
+=back
+
+=head1 DESCRIPTION
+
+Add and maintain purple numbers to a WikiText source document, and
+generate text and HTML output files.
+
+=head1 AUTHORING PROCESS
+
+1. Write your document using WikiText formatting.
+
+2. When you're ready to add purple numbers, do:
+
+  purple --add_ids inputFile.wiki
+
+where inputFile.wiki is your document.
+
+3. When you're ready to generate a text version, do:
+
+  purple inputFile.wiki outputFile.txt
+
+where outputFile.txt is the name of the output file.  For an HTML
+version, do:
+
+  purple inputFile.wiki outputFile.html
+
+To combine steps 2 and 3, do:
+
+  purple --add_ids inputFile.wiki outputFile.html
+
+4. When you edit inputFile.wiki, don't touch the [nid] metatags.  If
+you add new content, run purple --add_ids again.
+
+=head1 AUTHORS
+
+Chris Dent, E<lt>cdent@blueoxen.orgE<gt>
+
+Eugene Eric Kim, E<lt>eekim@blueoxen.orgE<gt>
+
+=cut

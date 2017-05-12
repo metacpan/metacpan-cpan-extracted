@@ -1,0 +1,82 @@
+Pogo - Perl GOODS interface
+(C)1999-2004 Sey Nakajima <nakajima@netstock.co.jp>
+
+This is a Perl inteface module for GOODS (Generic Object Oriented Database 
+System). GOODS is written by Konstantin Knizhnik <knizhnik@altavista.net>.
+
+This is a free software.
+
+This module is in 'alpha' phase. All features may be changed.
+Please send me your bug reports or suggestions.
+
+I have developped and tested this on FreeBSD4.7 and FreeBSD4.9.
+Please test in another OS and send me your porting informations.
+
+-----
+Prepare GOODS 
+
+  get goods-x.xx.tar.gz from any one of follows (x.xx is a revision number)
+    http://www.garret.ru/~knizhnik/goods.html
+    http://hp1.jonex.ne.jp/~nakajima.yasushi/
+
+  NOTE: goods-2.74.tar.gz and goods-2.75.tar.gz has a bug. Please use
+  2.76 or later.
+
+  tar zxvf goods-x.xx.tar.gz
+  cd goods
+  ./config
+  make
+  su
+  make install
+
+  NOTE: GOODS has some makefiles corresponding to some OS's. Please do 
+  './config -h'.
+
+-----
+Make,test and install Pogo
+
+  tar zxvf Pogo-x.xx.tar.gz  (x.xx is a revision number)
+  cd Pogo-x.xx
+  perl Makefile.PL
+  make
+  ./startgoodsrv test &
+  make test
+  ./cmdgoodsrv test exit
+  su
+  make install
+
+  NOTE: You must use the Makefile.PL* corresponding to the GOODS makefile you
+  used. Sorry, I do not offer all corresponding Makefile.PL to the GOODS 
+  makefiles for now. If you met some errors, please edit Makefile.PL manually 
+  considering to the GOODS makefile you used.
+
+  A GOODS application needs running a server process 'goodsrv' with the 
+  corresponding configuration file. Before executing test script, you must 
+  run goodsrv with test.cfg. The command line './startgoodsrv test &' does 
+  this as background process and './cmdgoodsrv test exit' terminates the 
+  goodsrv.
+
+  NOTE: If 'make test' fails with segmentation fault, try 
+  'perl Makefile.PL -DGLOBALDB'.
+
+-----
+Database browser
+
+  To browse the database of 'test.cfg', type as follows. See 'perldoc Pogo'
+  for detail.
+
+  ./startgoodsrv test &
+  ./browse test
+  ./cmdgoodsrv test exit
+
+-----
+Sample script
+
+  There are some sample scripts in the sample directory. These scripts all 
+  use 'sample.cfg'. So do 'startgoodsrv sample &' before executing sample 
+  scripts.
+
+-----
+See also
+
+  perldoc Pogo

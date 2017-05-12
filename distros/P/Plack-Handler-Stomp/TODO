@@ -1,0 +1,7 @@
+- tests against real broker
+
+Then:
+- Catalyst script to load destinations from config/controllers
+- Catalyst controller base, or action class, for sub-dispatch (smarter
+  than Catalyst::Controller::MessageDriven)
+- tests against a Catalyst app

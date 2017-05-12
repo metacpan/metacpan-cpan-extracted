@@ -1,0 +1,2 @@
+#!/usr/bin/perperl
+print "Content-type: text/html\n\n$$\n";

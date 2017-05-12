@@ -1,0 +1,17 @@
+Revision history for Plack-Middleware-Debug-CatalystSession
+
+0.01    08/26/2014 - 12:22pm CDT
+        First version, released on an unsuspecting world.
+
+0.01001 08/26/2014 - 03:50 pm CDT
+        Updated acknowledgements and see also
+
+0.01002 07/17/2015 - 04:30pm CDT
+        Keep our psgi environment in a variable. Using $c->req->env no longer works.
+
+0.01003 07/20/2015 - 04:18pm CDT
+        Stupid mistake in copying fix from working directory into git directory.
+
+0.01004 06/18/2016 - 05:03pm CDT
+        Use the environment passed from Catalyst if Catalyst's version is 5.90100 or higher
+

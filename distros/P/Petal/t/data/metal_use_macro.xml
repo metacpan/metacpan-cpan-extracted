@@ -1,0 +1,6 @@
+<test>
+  This is some stuff which should appear. It's gonna use some 'test foo' stuff.
+  <hello metal:use-macro="./metal_define_macro.xml#foo">
+    This is some super mockup data. It should not appear.
+  </hello>
+</test>

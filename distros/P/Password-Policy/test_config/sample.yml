@@ -1,0 +1,24 @@
+---
+default:
+    length: 4
+    algorithm: "Plaintext"
+
+site_moderator:
+    inherit: "default"
+    length: 8
+    uppercase: 1
+
+site_admin:
+    algorithm: "ROT13"
+    inherit: "site_moderator"
+    length: 10
+    numbers: 2
+    # will have uppercase: 1 from site_moderator
+
+grab_bag:
+    algorithm: "ROT13"
+    length: 15
+    lowercase: 6
+    numbers: 3
+    uppercase: 4
+    whitespace: 2

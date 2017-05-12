@@ -1,0 +1,11 @@
+Revision history for PerlFM
+
+0.2.0	2009-12-18/11:30
+		-Now uses Dir::Watch for dir checking.
+
+0.1.0	2009-10-30/03:40
+		-Add the r menu.
+		-Add being able to change the default action type.
+
+0.0.0	2009-10-19/01:00
+		-Initial release.

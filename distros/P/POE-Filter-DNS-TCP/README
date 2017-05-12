@@ -1,0 +1,50 @@
+NAME
+    POE::Filter::DNS::TCP - A POE Filter to handle DNS over TCP connections
+
+VERSION
+    version 0.06
+
+SYNOPSIS
+      use POE::Filter::DNS::TCP;
+
+      my $filter = POE::Filter::DNS::TCP->new();
+      my $arrayref_of_net_dns_objects = $filter->get( [ $dns_stream ] );
+      my $arrayref_of_streamed_dns_pckts = $filter->put( $arrayref_of_net_dns_objects );
+
+DESCRIPTION
+    POE::Filter::DNS::TCP is a POE::Filter for parsing and generating DNS
+    messages received from or transmitted (respectively) over TCP as per RFC
+    1035.
+
+CONSTRUCTOR
+    "new"
+        Creates a new POE::Filter::DNS::TCP object.
+
+METHODS
+    "get"
+    "get_one_start"
+    "get_one"
+        Takes an arrayref which is contains streams of raw TCP DNS packets.
+        Returns an arrayref of Net::DNS::Packet objects.
+
+    "put"
+        Takes an arrayref of Net::DNS::Packet objects. Returns an arrayref
+        of raw TCP DNS packets.
+
+    "clone"
+        Makes a copy of the filter, and clears the copy's buffer.
+
+AUTHORS
+    *   Chris Williams <chris@bingosnet.co.uk>
+
+    *   Hans Dieter Pearcey <hdp@cpan.org>
+
+    *   Rocco Caputo <rcaputo@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Chris Williams, Hans Dieter
+    Pearcey and Rocco Caputo.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,16 @@
+Revision history for Perl extension Passwd::DB.
+
+1.00  Thu Mar 25 16:22:51 1999
+	- original version; created by h2xs 1.18
+
+1.01  who knows
+
+1.02  Mon Jun 30 08:55:16 2008
+	- added prereq_pm for makemaker so cpan testers are happier
+
+1.03  Mon Jun 30 18:30:52 2008
+	- added create flag for freebsd
+
+1.04  Fri Apr 01 11:59:37 2016
+   - perl deprecated control chars in vars, switch from $Ctrl-O to $^O
+   - removed deprecated defineds

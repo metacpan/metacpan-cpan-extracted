@@ -1,0 +1,64 @@
+NAME
+    Parcel::Track::KR::KGB - Parcel::Track driver for the KGB LOGIS
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+        use Parcel::Track;
+
+        # Create a tracker
+        my $tracker = Parcel::Track->new( 'KR::KGB', '1234-567-890' );
+
+        # ID & URI
+        print $tracker->id . "\n";
+        print $tracker->uri . "\n";
+    
+        # Track the information
+        my $result = $tracker->track;
+    
+        # Get the information what you want.
+        if ( $result ) {
+            print "$result->{from}\n";
+            print "$result->{to}\n";
+            print "$result->{result}\n";
+            print "$_\n" for @{ $result->{descs} };
+            print "$_\n" for @{ $result->{htmls} };
+        }
+        else {
+            print "Failed to track information\n";
+        }
+
+ATTRIBUTES
+  id
+METHODS
+  track
+  uri
+SEE ALSO
+    *   Parcel::Track
+
+    *   KGB LOGIS <https://www.kgbls.co.kr/>
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/keedi/Parcel-Track-KR-KGB/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/keedi/Parcel-Track-KR-KGB>
+
+      git clone https://github.com/keedi/Parcel-Track-KR-KGB.git
+
+AUTHOR
+    김도형 - Keedi Kim <keedi@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2015 by Keedi Kim.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

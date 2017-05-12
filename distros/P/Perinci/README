@@ -1,0 +1,80 @@
+DESCRIPTION
+
+    Perinci is a collection of modules for implementing/providing tools
+    pertaining to Rinci and Riap, spread over several distributions for
+    faster incremental releases. These tools include:
+
+      * Wrapper
+
+      Perinci::Sub::Wrapper is the subroutine wrapper which
+      implements/enforces many of the metadata properties, like argument
+      validation (using information in args) as well as offers features
+      like assign default values, convert argument passing style,
+      automatically envelope function result, etc.
+
+      It is extensible so you can implement wrapper for your properties
+      too.
+
+      * Riap clients and servers (Perinci::Access::*)
+
+      Perinci::Access::Perl is a client/server (well, neither really, since
+      everything is in-process) to access Perl modules/functions using the
+      Riap protocol. It is basically a way to call your modules/functions
+      using URI syntax; it also dictates a bit on how you should write your
+      functions and where to put the metadata, though it provides a lot of
+      flexibility.
+
+      Perinci::Access::HTTP::Client and Perinci::Access::HTTP::Server is a
+      pair of client/server library to access Perl modules/functions using
+      Riap over HTTP, implementing the Riap::HTTP specification.
+
+      Perinci::Access::Simple::Client,
+      Perinci::Access::Simple::Server::Socket,
+      Perinci::Access::Simple::Server::Pipe are client/server libraries
+      that implement Riap::Simple, either via TCP/Unix socket or piping.
+
+      Perinci::Access is a simple wrapper for all Riap clients, you give it
+      a URL/module name/whatever and it will try to select the appropriate
+      Riap client for you.
+
+      * Command-line libraries
+
+      Perinci::CmdLine is an extensible and featureful command-line library
+      to create command-line programs and API clients. Features include:
+      transparent remote access (thanks to Riap), command-line options
+      parsing, --help message, shell tab completion, etc.
+
+      * Documentation tools
+
+      See CPAN for Perinci::To::POD, Perinci::To::Text, Perinci::To::HTML.
+      These document generators support translations based on
+      Locale::Maketext.
+
+      * Function/metadata generators
+
+      These are convenient tools to generate common/generic function and/or
+      metadata. For example, Perinci::Sub::Gen::AccessTable can generate
+      accessor function + metadata for table data.
+
+      See CPAN for more Perinci::Sub::Gen::* modules.
+
+      * Others
+
+      Samples: Perinci::Use, Perinci::Exporter, Test::Rinci.
+
+      See CPAN for more Perinci::* modules.
+
+    To get started, read Perinci::Manual::Tutorial.
+
+FAQ
+
+ What does Perinci mean?
+
+    Perinci is taken from Indonesian word, meaning: to specify, to explain
+    in more detail. It can also be an abbreviation for "Perl implementation
+    of Rinci".
+
+SEE ALSO
+
+    Rinci
+

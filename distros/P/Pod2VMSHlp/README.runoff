@@ -1,0 +1,40 @@
+Notes on documentation for Digital Standard Runoff, DSR,
+or RUNOFF.
+
+I have had a hard time finding recent documentation for DSR.
+Hence this file lists some of the resources that you might
+be able to exploit.
+
+For online help with runoff on VMS be sure to see:
+
+   HELP RUNOFF
+
+as well as:
+
+   HELP DSR
+
+which are two distinct HELP subjects (present in at least VMS V7.1).
+
+There is also some information on how to use RUNOFF in the 
+B<OpenVMS User's Guide> online at (please note that these URLs were
+last verified in February of 2001 and may have fallen out of date
+by the time that you read this):
+
+ http://www.openvms.compaq.com/doc/ssb71/6489/6489p014.htm#bottom_014
+ http://www.openvms.compaq.com/doc/ssb71/6489/6489p015.htm
+ http://www.openvms.compaq.com/doc/ssb71/6489/6489p016.htm
+
+The only copy of the oft cited Reference Manual that I could find was an
+old hard copy version of B<VAX DIGITAL Standard Runoff Reference Manual>
+Order number: AA-LA15A-TE, April 1988, Software Version: Version 5.0.
+I do not know if that document or the apparent superseding one is still 
+available from Compaq.
+
+Within the VMS V6.2 B<Overview of Documentation> I have found mention of 
+an archived manual called B<OpenVMS DIGITAL Standard Runoff Reference Manual>
+which should be available in a file called F<OVMS_DSR_REF.PS> on the OpenVMS
+Documentation CD-ROM.  That document may still be separately orderable via 
+order number AA-PS6HA-TE for the DSR reference manual.
+
+PP
+

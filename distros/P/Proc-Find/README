@@ -1,0 +1,150 @@
+SYNOPSIS
+
+     use Proc::Find qw(find_proc proc_exists);
+    
+     # list all of a user's processes
+     my $procs = find_proc(user=>'ujang', detail=>1);
+    
+     # check if a program is running
+     die "Sorry, xscreensaver is not running"
+         unless proc_exists(name=>'xscreensaver').
+
+DESCRIPTION
+
+    This module provides a simple routine, proc_exists(), to check a
+    process' existence by name, something that is commonly done in shell
+    scripts using:
+
+     ps ax | grep name
+     pgrep name
+
+    and also some routines, find_*(), to list processes matching some
+    criteria.
+
+VARIABLES
+
+ $Proc::Find::CACHE => bool (default: 0)
+
+    If set to true, will cache the call to Proc::ProcessTable's table() so
+    subsequent invocation to find_proc() or proc_exists doesn't have to
+    call the method again. But this also means that the process
+    check/listing will be done on a past/stale process table.
+
+FUNCTIONS
+
+ find_proc(%args) => \@pids (or \@procs)
+
+    Find process by name, PID, or some other attributes. Return an arrayref
+    of PID's, or an empty arrayref if none match the criteria.
+
+    Currently use Proc::ProcessTable to list the processes.
+
+    Arguments:
+
+      * pid => int
+
+      Find by PID. Note that if you only want to check whether a PID
+      exists, there are cheaper methods (see "SEE ALSO").
+
+      * name => str|regex
+
+      Match against process' "name". Name is taken from the first word of
+      the cmndline, with path stripped.
+
+      If value is regex, will do a regex match instead of exact string
+      comparison.
+
+      Example:
+
+       find_proc(name => "bash")
+       find_proc(name => qr/^(Thunar|dolphin|konqueror)$/)
+
+      * cmndline => str|regex
+
+      Match against full cmndline.
+
+      If value is regex, will do a regex match instead of exact string
+      comparison.
+
+      * exec => str
+
+      Match against program (executable/binary)'s path. If value does not
+      contain a path separator character, will be matched against program's
+      name.
+
+      Example:
+
+       find_proc(exec => "perl")          # find any perl
+       find_proc(exec => "/usr/bin/perl") # find only a specific perl
+
+      * user => int|str
+
+      List processes owned by specified user/UID.
+
+      If given a username which does not exist, will simply not match.
+
+      * uid => int|str
+
+      Same as user.
+
+      * euser => int|str
+
+      List processes running as certain effective user/UID (will look
+      against euid).
+
+      If given a username which does not exist, will simply not match.
+
+      * euid => int|str
+
+      Same as euser.
+
+      * inverse => bool
+
+      If set to true, then will return all processes not matching the
+      criteria.
+
+      * table => obj
+
+      Supply result from Proc::ProcessTable object's table(). This can be
+      used to reuse the table() cached result instead of repeatedly call
+      table() on every invocation.
+
+      See also $Proc::Find::CACHE.
+
+      * detail => bool (default: 0)
+
+      Instead of returning just the PID for each result, return a hash
+      (record) of process information instead. Currently this is just the
+      entry from Proc::ProcTable object's table() result.
+
+ proc_exists(%args) => bool
+
+    Shortcut for:
+
+     @{ find_proc(%args) } > 0
+
+ find_all_proc(\%args, \%args2, ...) => \@pids (or \@procs)
+
+    Given multiple criteria, perform an AND search. Will only call
+    Proc::ProcessTable's table() method once.
+
+     # find all processes matching mutiple criteria (although the same thing can
+     # also be accomplished by find_proc() and combining the criteria)
+     find_all_proc([{name=>'mplayer'}, {cmndline=>qr/mp3/}]);
+
+ find_any_proc(\%args, \%args2, ...) => \@pids (or \@procs)
+
+    Given multiple criteria, perform an OR search. Will only call
+    Proc::ProcessTable's table() method once.
+
+     # find all processes belonging to either user
+     find_any_proc([{user=>'ujang'}, {user=>'titin'}]);
+
+SEE ALSO
+
+    Proc::Exists can be used to check if one or more PIDs exist. If you are
+    only concerned with POSIX systems, you can just do kill 0, $pid to
+    accomplish the same.
+
+    pgrep Unix command.
+

@@ -1,0 +1,84 @@
+NAME
+    Pod::XML - Module to convert POD to XML
+
+SYNOPSIS
+      use Pod::XML;
+      my $parser = Pod::XML->new();
+      $parser->parse_from_file("foo.pod");
+
+DESCRIPTION
+    This module uses Pod::Parser to parse POD and generates XML from
+    the resulting parse stream. It uses its own format, described
+    below.
+
+XML FORMAT
+    The XML format is not a standardised format - if you wish to
+    generate some standard XML format such as docbook, please use a
+    tool such as XSLT to convert between this and that format.
+
+    The format uses the namespace
+    "http://axkit.org/ns/2000/pod2xml". Do not try and request this
+    URI - it is virtual. You will get a 404.
+
+    The best way to describe the format is to show you:
+
+      <pod xmlns="http://axkit.org/ns/2000/pod2xml">
+        <head>
+          <title>The first =head1 goes in here</title>
+        </head>
+        <sect1>
+        <title>Subsequent =head1's create a sect1</title>
+          <para>
+          Ordinary paragraphs of text create a para tag.
+          </para>
+          <verbatim>
+          Indented verbatim sections go in verbatim tags.
+          </verbatim>
+          <sect2>
+          <title>=head2's go in sect2</title>
+            <para>
+            Up to =head4 is supported (despite not really being 
+            supported by pod), producing sect3 and 
+            sect4 respectively for =head3 and =head4.
+            </para>
+            <para>
+            Bold text goes in a <strong>strong</strong> tag.
+            </para>
+            <para>
+            Italic text goes in a <emphasis>emphasis</emphasis> tag.
+            </para>
+            <para>
+            Code goes in a <code>code</code> tag.
+            </para>
+            <para>
+            Lists (=over, =item, =back) go in list/item/itemtext 
+            tags. The itemtext element is only present if the 
+            =item text is <strong>not</strong> the "*" character.
+            </para>
+          </sect2>
+        </sect1>
+      </pod>
+
+    If the first =head1 is "NAME" (like standard perl modules are
+    supposed to be) it takes the next paragraph as the document
+    title. Other standard head elements of POD are left unchanged
+    (particularly, the SYNOPSIS and DESCRIPTION elements of standard
+    POD).
+
+    Pod::XML tries to be careful about nesting sect's based on the
+    head level in the original POD. Let me know if this doesn't work
+    for you.
+
+AUTHOR
+    Matt Sergeant, matt@sergeant.org
+
+SEE ALSO
+    Pod::Parser
+
+BUGS
+    There is no xml2pod.
+
+LICENSE
+    This is free software, you may use it and distribute it under
+    the same terms as Perl itself.
+

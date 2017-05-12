@@ -1,0 +1,17 @@
+Changes
+Changes.old
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/synopsis.pl
+lib/POE/Component/Client/DNSBL.pm
+t/00-compile.t
+t/01_lookup.t
+t/02_postback.t
+t/03_dbl.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

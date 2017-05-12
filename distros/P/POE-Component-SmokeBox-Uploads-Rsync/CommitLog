@@ -1,0 +1,53 @@
+==================================================
+Changes from 2013-11-04 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.001 at 2014-11-04 06:34:18 +0000
+------------------------------------------
+
+  Change: 9c6e8f29c6ee88e5b607d33272ebf7554eefde22
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 22:32:29 +0000
+
+    fix perlcritic stuff 
+
+  Change: b34851d5874d1bd88210a6895f9e5d802170f6b3
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 22:21:32 +0000
+
+    updates 
+
+  Change: 04cc5525627fd0eb8eb3f5ae5f645e57c3cadf56
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2011-05-06 09:00:15 +0000
+
+    tweak comment 
+
+  Change: e7e31a3a69b952d362094f0f3271d36d5a472593
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2011-05-02 14:03:54 +0000
+
+    add bingos' exclude stuff as a TODO 
+
+  Change: 3cf6587655f5a09aefce8ca84dc8ff753d41db74
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2011-04-29 11:33:47 +0000
+
+    switch to using mirrors.kernel.org as the example rsync mirror 
+
+  Change: c17b6a1dc2658ad9c992a4d88ffe4e8c305b42c1
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2011-04-28 22:59:03 +0000
+
+    missed one more place to check for rsync_all 
+
+  Change: 9aabb2cf2ba670b3b71689e460bd7cd37443ccd2
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2011-04-28 21:18:59 +0000
+
+    add rsync_all option 
+
+===============================================
+Plus 1 release after 2013-11-04 00:00:00 +0000.
+===============================================

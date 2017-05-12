@@ -1,0 +1,76 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-SpellCheck\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-25 02:34+0800\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Bruno Vecchi <vecchi.v@gmail>\n"
+"Language-Team: Bruno Vecchi <vecchi.b@gmail.com>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/SpellCheck.pm:31 lib/Padre/Plugin/SpellCheck.pm:56
+msgid "Spell check"
+msgstr "Corrección ortográfica"
+
+#: lib/Padre/Plugin/SpellCheck.pm:57
+msgid "Check spelling\tF7"
+msgstr "Comprobar ortografía\tF7"
+
+#: lib/Padre/Plugin/SpellCheck.pm:58
+msgid "Preferences"
+msgstr "Preferencias"
+
+#: lib/Padre/Plugin/SpellCheck.pm:80
+msgid "No document opened."
+msgstr "Ningún documento abierto."
+
+#: lib/Padre/Plugin/SpellCheck.pm:97 lib/Padre/Plugin/SpellCheck/Dialog.pm:292
+msgid "Spell check finished."
+msgstr "Comprobación ortográfica concluída."
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:43
+#, perl-format
+msgid "Spelling (%s)"
+msgstr "Ortografía (%s)"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:198
+msgid "Add to dictionary"
+msgstr "Agregar al diccionario"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:199
+msgid "Replace"
+msgstr "Reemplazar"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:200
+msgid "Replace all"
+msgstr "Reemplazar todo"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:201
+msgid "Ignore"
+msgstr "Ignorar"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:202
+msgid "Ignore all"
+msgstr "Ignorar todo"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:203
+msgid "Close"
+msgstr "Cerrar"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:233
+msgid "Not in dictionary:"
+msgstr "No se encuentra en el diccionario:"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:255
+msgid "Suggestions"
+msgstr "Sugerencias"
+
+#: lib/Padre/Plugin/SpellCheck/Preferences.pm:36
+msgid "Spelling preferences"
+msgstr "Preferencias ortográficas"
+
+#: lib/Padre/Plugin/SpellCheck/Preferences.pm:136
+msgid "Dictionary:"
+msgstr "Diccionario:"

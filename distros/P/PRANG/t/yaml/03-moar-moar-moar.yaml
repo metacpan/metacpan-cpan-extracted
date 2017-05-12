@@ -1,0 +1,29 @@
+--- !!perl/hash:Octothorpe
+colon: "vronk"
+hyphen: 1
+apostrophe: !!perl/hash:Ampersand
+  interpunct: 42
+pipe: !!perl/hash:Fingernails
+  currency: "€"
+  fishhooks: !!perl/hash:Deaeresis
+    asterism:
+      - !!perl/hash:Caret
+        solidus: !!perl/hash:Octothorpe
+          colon: owww
+      - clange
+      - !!perl/hash:Pilcrow
+        backslash:
+          - !!perl/hash:Asteriks
+            bullet:
+             - clank_est
+             - clank
+             - thwapp
+          - !!perl/hash:Asteriks
+            bullet: [ "need at least one!" ]
+          - !!perl/hash:Asteriks
+            bullet:
+             - clash
+             - 123
+             - qunckkk
+             - 456
+      - awkkkkkk

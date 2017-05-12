@@ -1,0 +1,19 @@
+Changes
+ignore.txt
+lib/PGObject/Type/JSON.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+README
+README.md
+t/00-load.t
+t/01-registration.t
+t/02-serialization.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

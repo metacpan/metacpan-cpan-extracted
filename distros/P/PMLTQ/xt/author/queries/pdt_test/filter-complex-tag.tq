@@ -1,0 +1,4 @@
+a-node $t :=
+[ m/tag ~ 'a' ];
+  >> give $t.m/form,$t.m/tag
+  >> for lower($1),$2 give $1,$2,count(),count(over $2)

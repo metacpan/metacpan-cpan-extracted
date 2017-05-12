@@ -1,0 +1,205 @@
+INFO 2009-07-07T09:37:44 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+ERROR 2009-07-07T09:39:31 supybot Exception while handling mail for bug 587696 on gnome.#bzbot
+Traceback (most recent call last):
+  File "/home/bugbot/plugins/Bugzilla/plugin.py", line 415, in handleBugmail
+    self._handleBugmailForChannel(bug, irc, channel)
+  File "/home/bugbot/plugins/Bugzilla/plugin.py", line 490, in _handleBugmailForChannel
+    bug.bug_id, channel)
+  File "/home/bugbot/plugins/Bugzilla/plugin.py", line 364, in getAttachmentsOnBug
+    bug = self._getBugXml([bug_id])[0]
+  File "/home/bugbot/plugins/Bugzilla/plugin.py", line 654, in _getBugXml
+    bugxml = utils.web.getUrl(queryurl)
+  File "/usr/lib/python2.4/site-packages/supybot/utils/web.py", line 122, in getUrl
+    fd = getUrlFd(url, headers=headers)
+  File "/usr/lib/python2.4/site-packages/supybot/utils/web.py", line 115, in getUrlFd
+    raise Error, strError(e.reason)
+Error: timed out
+ERROR 2009-07-07T09:39:31 supybot Exception id: 0x304f6
+INFO 2009-07-07T09:40:34 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T09:40:34 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T09:41:21 supybot Flushers flushed and garbage collected.
+INFO 2009-07-07T09:42:43 supybot Checking for announcements at <http://blogs.gnome.org/syndicate/ovitters>
+INFO 2009-07-07T09:42:44 supybot Checking for announcements at <http://www.justdave.net/dave/feed/>
+INFO 2009-07-07T09:42:44 supybot Checking for announcements at <http://www.google.com/reader/public/atom/user%2F13103727294548067251%2Fstate%2Fcom.google%2Fbroadcast>
+INFO 2009-07-07T09:42:44 supybot Checking for announcements at <http://testopia.blogspot.com/feeds/posts/default>
+INFO 2009-07-07T09:43:05 supybot Checking for announcements at <http://max.kanat.us/tag-syndicate/?user=avatraxiom&tag=tech>
+INFO 2009-07-07T09:43:05 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T09:43:05 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T09:43:05 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+INFO 2009-07-07T09:43:05 supybot Checking for announcements at <http://www.melez.com/mykzilla/atom.xml>
+INFO 2009-07-07T09:43:05 supybot Checking for announcements at <http://lpsolit.wordpress.com/feed/>
+INFO 2009-07-07T09:45:37 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T09:45:37 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T09:48:18 supybot Checking for announcements at <http://max.kanat.us/tag-syndicate/?user=avatraxiom&tag=tech>
+INFO 2009-07-07T09:48:18 supybot Checking for announcements at <http://blogs.gnome.org/syndicate/ovitters>
+INFO 2009-07-07T09:48:18 supybot Checking for announcements at <http://www.justdave.net/dave/feed/>
+INFO 2009-07-07T09:48:18 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T09:48:18 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T09:48:19 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+INFO 2009-07-07T09:48:19 supybot Checking for announcements at <http://www.google.com/reader/public/atom/user%2F13103727294548067251%2Fstate%2Fcom.google%2Fbroadcast>
+INFO 2009-07-07T09:48:19 supybot Checking for announcements at <http://lpsolit.wordpress.com/feed/>
+INFO 2009-07-07T09:48:19 supybot Checking for announcements at <http://www.melez.com/mykzilla/atom.xml>
+INFO 2009-07-07T09:48:19 supybot Checking for announcements at <http://testopia.blogspot.com/feeds/posts/default>
+INFO 2009-07-07T09:51:05 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T09:51:05 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T09:51:21 supybot Flushers flushed and garbage collected.
+INFO 2009-07-07T09:53:22 supybot Checking for announcements at <http://www.google.com/reader/public/atom/user%2F13103727294548067251%2Fstate%2Fcom.google%2Fbroadcast>
+INFO 2009-07-07T09:53:23 supybot Checking for announcements at <http://blogs.gnome.org/syndicate/ovitters>
+INFO 2009-07-07T09:53:23 supybot Checking for announcements at <http://www.justdave.net/dave/feed/>
+INFO 2009-07-07T09:53:23 supybot Checking for announcements at <http://max.kanat.us/tag-syndicate/?user=avatraxiom&tag=tech>
+INFO 2009-07-07T09:53:23 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+INFO 2009-07-07T09:53:23 supybot Checking for announcements at <http://lpsolit.wordpress.com/feed/>
+INFO 2009-07-07T09:53:23 supybot Checking for announcements at <http://www.melez.com/mykzilla/atom.xml>
+INFO 2009-07-07T09:53:23 supybot Checking for announcements at <http://testopia.blogspot.com/feeds/posts/default>
+INFO 2009-07-07T09:54:03 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T09:54:03 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T09:56:33 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T09:56:33 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T09:58:32 supybot Checking for announcements at <http://www.google.com/reader/public/atom/user%2F13103727294548067251%2Fstate%2Fcom.google%2Fbroadcast>
+INFO 2009-07-07T09:58:32 supybot Checking for announcements at <http://blogs.gnome.org/syndicate/ovitters>
+INFO 2009-07-07T09:58:32 supybot Checking for announcements at <http://www.justdave.net/dave/feed/>
+INFO 2009-07-07T09:58:32 supybot Checking for announcements at <http://max.kanat.us/tag-syndicate/?user=avatraxiom&tag=tech>
+INFO 2009-07-07T09:58:32 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+INFO 2009-07-07T09:58:32 supybot Checking for announcements at <http://lpsolit.wordpress.com/feed/>
+INFO 2009-07-07T09:58:32 supybot Checking for announcements at <http://www.melez.com/mykzilla/atom.xml>
+INFO 2009-07-07T09:58:32 supybot Checking for announcements at <http://testopia.blogspot.com/feeds/posts/default>
+INFO 2009-07-07T09:59:08 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T09:59:08 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:01:22 supybot Flushers flushed and garbage collected.
+INFO 2009-07-07T10:02:06 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:02:06 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:03:49 supybot Checking for announcements at <http://www.google.com/reader/public/atom/user%2F13103727294548067251%2Fstate%2Fcom.google%2Fbroadcast>
+INFO 2009-07-07T10:03:49 supybot Checking for announcements at <http://blogs.gnome.org/syndicate/ovitters>
+INFO 2009-07-07T10:03:50 supybot Checking for announcements at <http://www.justdave.net/dave/feed/>
+INFO 2009-07-07T10:03:50 supybot Checking for announcements at <http://max.kanat.us/tag-syndicate/?user=avatraxiom&tag=tech>
+INFO 2009-07-07T10:03:50 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+INFO 2009-07-07T10:03:50 supybot Checking for announcements at <http://lpsolit.wordpress.com/feed/>
+INFO 2009-07-07T10:03:50 supybot Checking for announcements at <http://www.melez.com/mykzilla/atom.xml>
+INFO 2009-07-07T10:03:50 supybot Checking for announcements at <http://testopia.blogspot.com/feeds/posts/default>
+INFO 2009-07-07T10:04:37 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:04:37 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:07:08 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:07:09 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:08:58 supybot Checking for announcements at <http://www.google.com/reader/public/atom/user%2F13103727294548067251%2Fstate%2Fcom.google%2Fbroadcast>
+INFO 2009-07-07T10:08:58 supybot Checking for announcements at <http://blogs.gnome.org/syndicate/ovitters>
+INFO 2009-07-07T10:08:59 supybot Checking for announcements at <http://www.justdave.net/dave/feed/>
+INFO 2009-07-07T10:08:59 supybot Checking for announcements at <http://max.kanat.us/tag-syndicate/?user=avatraxiom&tag=tech>
+INFO 2009-07-07T10:08:59 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+INFO 2009-07-07T10:08:59 supybot Checking for announcements at <http://lpsolit.wordpress.com/feed/>
+INFO 2009-07-07T10:08:59 supybot Checking for announcements at <http://www.melez.com/mykzilla/atom.xml>
+INFO 2009-07-07T10:08:59 supybot Checking for announcements at <http://testopia.blogspot.com/feeds/posts/default>
+INFO 2009-07-07T10:10:03 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:10:03 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:11:23 supybot Flushers flushed and garbage collected.
+INFO 2009-07-07T10:12:35 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:12:35 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:13:24 supybot Sending ghost (current nick: buggbot; ghosting: bugbot)
+INFO 2009-07-07T10:13:59 supybot Checking for announcements at <http://www.justdave.net/dave/feed/>
+INFO 2009-07-07T10:13:59 supybot Checking for announcements at <http://www.google.com/reader/public/atom/user%2F13103727294548067251%2Fstate%2Fcom.google%2Fbroadcast>
+INFO 2009-07-07T10:14:05 supybot Checking for announcements at <http://blogs.gnome.org/syndicate/ovitters>
+INFO 2009-07-07T10:14:05 supybot Checking for announcements at <http://max.kanat.us/tag-syndicate/?user=avatraxiom&tag=tech>
+INFO 2009-07-07T10:14:05 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+INFO 2009-07-07T10:14:05 supybot Checking for announcements at <http://lpsolit.wordpress.com/feed/>
+INFO 2009-07-07T10:14:05 supybot Checking for announcements at <http://www.melez.com/mykzilla/atom.xml>
+INFO 2009-07-07T10:14:06 supybot Checking for announcements at <http://testopia.blogspot.com/feeds/posts/default>
+INFO 2009-07-07T10:15:09 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:15:09 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:17:47 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:17:48 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:19:09 supybot Checking for announcements at <http://www.google.com/reader/public/atom/user%2F13103727294548067251%2Fstate%2Fcom.google%2Fbroadcast>
+INFO 2009-07-07T10:19:09 supybot Checking for announcements at <http://blogs.gnome.org/syndicate/ovitters>
+INFO 2009-07-07T10:19:09 supybot Checking for announcements at <http://www.justdave.net/dave/feed/>
+INFO 2009-07-07T10:19:09 supybot Checking for announcements at <http://max.kanat.us/tag-syndicate/?user=avatraxiom&tag=tech>
+INFO 2009-07-07T10:19:09 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+INFO 2009-07-07T10:19:09 supybot Checking for announcements at <http://lpsolit.wordpress.com/feed/>
+INFO 2009-07-07T10:19:09 supybot Checking for announcements at <http://www.melez.com/mykzilla/atom.xml>
+INFO 2009-07-07T10:19:09 supybot Checking for announcements at <http://testopia.blogspot.com/feeds/posts/default>
+INFO 2009-07-07T10:20:31 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:20:31 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:21:24 supybot Flushers flushed and garbage collected.
+INFO 2009-07-07T10:23:04 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:23:04 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:24:36 supybot Checking for announcements at <http://www.google.com/reader/public/atom/user%2F13103727294548067251%2Fstate%2Fcom.google%2Fbroadcast>
+INFO 2009-07-07T10:24:36 supybot Checking for announcements at <http://blogs.gnome.org/syndicate/ovitters>
+INFO 2009-07-07T10:24:36 supybot Checking for announcements at <http://www.justdave.net/dave/feed/>
+INFO 2009-07-07T10:24:36 supybot Checking for announcements at <http://max.kanat.us/tag-syndicate/?user=avatraxiom&tag=tech>
+INFO 2009-07-07T10:24:36 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+INFO 2009-07-07T10:24:36 supybot Checking for announcements at <http://lpsolit.wordpress.com/feed/>
+INFO 2009-07-07T10:24:36 supybot Checking for announcements at <http://www.melez.com/mykzilla/atom.xml>
+INFO 2009-07-07T10:24:36 supybot Checking for announcements at <http://testopia.blogspot.com/feeds/posts/default>
+INFO 2009-07-07T10:25:35 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:25:35 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:28:26 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:28:26 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:30:04 supybot Checking for announcements at <http://www.google.com/reader/public/atom/user%2F13103727294548067251%2Fstate%2Fcom.google%2Fbroadcast>
+INFO 2009-07-07T10:30:04 supybot Checking for announcements at <http://blogs.gnome.org/syndicate/ovitters>
+INFO 2009-07-07T10:30:04 supybot Checking for announcements at <http://www.justdave.net/dave/feed/>
+INFO 2009-07-07T10:30:04 supybot Checking for announcements at <http://max.kanat.us/tag-syndicate/?user=avatraxiom&tag=tech>
+INFO 2009-07-07T10:30:04 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+INFO 2009-07-07T10:30:04 supybot Checking for announcements at <http://lpsolit.wordpress.com/feed/>
+INFO 2009-07-07T10:30:05 supybot Checking for announcements at <http://www.melez.com/mykzilla/atom.xml>
+INFO 2009-07-07T10:30:05 supybot Checking for announcements at <http://testopia.blogspot.com/feeds/posts/default>
+ERROR 2009-07-07T10:30:36 supybot Unhandled error message from server: IrcMsg(prefix="wolfe.freenode.net", command="482", args=('buggbot', '#fedora-bugzappers', 'You need to be a channel operator to do that'))
+INFO 2009-07-07T10:31:09 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:31:09 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:31:25 supybot Flushers flushed and garbage collected.
+INFO 2009-07-07T10:33:50 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:33:50 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:35:09 supybot Checking for announcements at <http://www.google.com/reader/public/atom/user%2F13103727294548067251%2Fstate%2Fcom.google%2Fbroadcast>
+INFO 2009-07-07T10:35:09 supybot Checking for announcements at <http://blogs.gnome.org/syndicate/ovitters>
+INFO 2009-07-07T10:35:09 supybot Checking for announcements at <http://www.justdave.net/dave/feed/>
+INFO 2009-07-07T10:35:09 supybot Checking for announcements at <http://max.kanat.us/tag-syndicate/?user=avatraxiom&tag=tech>
+INFO 2009-07-07T10:35:10 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+INFO 2009-07-07T10:35:10 supybot Checking for announcements at <http://lpsolit.wordpress.com/feed/>
+INFO 2009-07-07T10:35:10 supybot Checking for announcements at <http://www.melez.com/mykzilla/atom.xml>
+INFO 2009-07-07T10:35:10 supybot Checking for announcements at <http://testopia.blogspot.com/feeds/posts/default>
+INFO 2009-07-07T10:36:26 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:36:26 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:39:07 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:39:07 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:40:39 supybot Checking for announcements at <http://www.google.com/reader/public/atom/user%2F13103727294548067251%2Fstate%2Fcom.google%2Fbroadcast>
+INFO 2009-07-07T10:40:39 supybot Checking for announcements at <http://blogs.gnome.org/syndicate/ovitters>
+INFO 2009-07-07T10:40:39 supybot Checking for announcements at <http://www.justdave.net/dave/feed/>
+INFO 2009-07-07T10:40:39 supybot Checking for announcements at <http://max.kanat.us/tag-syndicate/?user=avatraxiom&tag=tech>
+INFO 2009-07-07T10:40:39 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+INFO 2009-07-07T10:40:39 supybot Checking for announcements at <http://lpsolit.wordpress.com/feed/>
+INFO 2009-07-07T10:40:39 supybot Checking for announcements at <http://www.melez.com/mykzilla/atom.xml>
+INFO 2009-07-07T10:40:39 supybot Checking for announcements at <http://testopia.blogspot.com/feeds/posts/default>
+INFO 2009-07-07T10:41:26 supybot Flushers flushed and garbage collected.
+INFO 2009-07-07T10:42:03 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:42:03 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:44:39 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:44:39 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:45:49 supybot Checking for announcements at <http://www.google.com/reader/public/atom/user%2F13103727294548067251%2Fstate%2Fcom.google%2Fbroadcast>
+INFO 2009-07-07T10:45:49 supybot Checking for announcements at <http://blogs.gnome.org/syndicate/ovitters>
+INFO 2009-07-07T10:45:49 supybot Checking for announcements at <http://www.justdave.net/dave/feed/>
+INFO 2009-07-07T10:45:49 supybot Checking for announcements at <http://max.kanat.us/tag-syndicate/?user=avatraxiom&tag=tech>
+INFO 2009-07-07T10:45:49 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+INFO 2009-07-07T10:45:49 supybot Checking for announcements at <http://lpsolit.wordpress.com/feed/>
+INFO 2009-07-07T10:45:49 supybot Checking for announcements at <http://www.melez.com/mykzilla/atom.xml>
+INFO 2009-07-07T10:45:49 supybot Checking for announcements at <http://testopia.blogspot.com/feeds/posts/default>
+INFO 2009-07-07T10:47:09 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:47:10 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:50:39 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:50:39 supybot Checking for announcements at <rsszach>
+INFO 2009-07-07T10:51:10 supybot Checking for announcements at <http://www.google.com/reader/public/atom/user%2F13103727294548067251%2Fstate%2Fcom.google%2Fbroadcast>
+INFO 2009-07-07T10:51:10 supybot Checking for announcements at <http://blogs.gnome.org/syndicate/ovitters>
+INFO 2009-07-07T10:51:10 supybot Checking for announcements at <http://www.justdave.net/dave/feed/>
+INFO 2009-07-07T10:51:10 supybot Checking for announcements at <http://max.kanat.us/tag-syndicate/?user=avatraxiom&tag=tech>
+INFO 2009-07-07T10:51:10 supybot Checking for announcements at <http://www.codesimplicity.com/feed/atom>
+INFO 2009-07-07T10:51:10 supybot Checking for announcements at <http://lpsolit.wordpress.com/feed/>
+INFO 2009-07-07T10:51:10 supybot Checking for announcements at <http://www.melez.com/mykzilla/atom.xml>
+INFO 2009-07-07T10:51:10 supybot Checking for announcements at <http://testopia.blogspot.com/feeds/posts/default>
+INFO 2009-07-07T10:51:26 supybot Flushers flushed and garbage collected.
+ERROR 2009-07-07T10:51:55 supybot Exception while handling mail for bug 353 on freenode.#everythingsolved
+Traceback (most recent call last):
+  File "/home/bugbot/plugins/Bugzilla/plugin.py", line 415, in handleBugmail
+    self._handleBugmailForChannel(bug, irc, channel)
+  File "/home/bugbot/plugins/Bugzilla/plugin.py", line 490, in _handleBugmailForChannel
+    bug.bug_id, channel)
+  File "/home/bugbot/plugins/Bugzilla/plugin.py", line 364, in getAttachmentsOnBug
+    bug = self._getBugXml([bug_id])[0]
+IndexError: list index out of range
+ERROR 2009-07-07T10:51:55 supybot Exception id: 0xaf54a
+INFO 2009-07-07T10:53:10 supybot Checking for announcements at <rssjth>
+INFO 2009-07-07T10:53:10 supybot Checking for announcements at <rsszach>

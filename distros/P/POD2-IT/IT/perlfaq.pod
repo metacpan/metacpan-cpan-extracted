@@ -1,0 +1,859 @@
+=head1 NOME
+
+perlfaq - domande frequenti su Perl
+
+=head1 DESCRIZIONE
+
+I<perlfaq> comprende parecchi documenti che danno risposte alle domande
+piE<ugrave> comuni su Perl e sulla programmazione in Perl. E<Egrave> diviso, per
+argomenti, in nove sezioni principali descritte brevemente in questo
+documento.
+
+=head2 Dove ottenere I<perlfaq>
+
+I<perlfaq> E<egrave> inclusa nella distribuzione standard di Perl, per cui se
+avete Perl dovreste avere anche I<perlfaq>. Dovreste anche avere
+C<perldoc>, uno strumento che vi consente di leggere L<perlfaq>:
+
+	$ perldoc perlfaq
+
+Oltre al vostro sistema locale, potete anche trovare I<perlfaq> in rete,
+incluso su http://perldoc.perl.org/ .
+
+I<perlfaq> E<egrave> un documento in corso di evoluzione e potete leggerne
+la versione piE<ugrave> aggiornata all'indirizzo http://faq.perl.org/ .
+I I<perlfaq-workers> [lavoratori-su-perlfaq, N.d.T.] inviano
+periodicamente alcuni estratti del I<perlfaq> piE<ugrave> aggiornato al
+gruppo comp.lang.perl.misc.
+
+Potete vedere il sorgente all'indirizzo
+http://cvs.perl.org/viewcvs/cvs-public/perlfaq/ (che si trova al di
+fuori dell'albero dei sorgenti principali di Perl). La I<repository>
+CVS tiene traccia di tutti i cambiamenti alla FAQ e contiene l'ultimissima
+versione dei documenti di lavoro, i quali possono variare significativamente
+rispetto alla versione distribuita con l'ultima versione di Perl. Controllate
+la I<repository> prima di mandare correzioni.
+
+=head2 Come contribuire a I<perlfaq>
+
+Potete inviare correzioni, aggiunte e suggerimenti all'indirizzo email
+C<< <perlfaq-workers AT perl PUNTO org> >>. I volontari di I<perlfaq>
+utilizzano questo indirizzo per coordinare gli sforzi e tenere traccia
+dello sviluppo di I<perlfaq>. Questi volontari apprezzano i contributi,
+ma non hanno tempo per dare aiuto individuale, per cui non utilizzate
+questo indirizzo per fare altre domande.
+
+Il server I<perfaq> invia estratti di I<perlfaq> a quel gruppo di
+discussione ogni 6 ore (o giE<ugrave> di lE<igrave>), e la comunitE<agrave> dei volontari
+effettua revisioni ed aggiornamenti alle risposte. Se avete voglia
+di aiutare nella revisione e nell'aggiornamento delle risposte,
+date un'occhiata a comp.lang.perl.misc.
+
+=head2 Che succede se inviate i vostri problemi di programmazione Perl agli autori?
+
+Ai I<perlfaq-workers> piace tenere tutte le discussioni nella lista
+perlfaq-workers in modo che ognuno possa vedere il lavoro che viene
+svolto (e quello che c'E<egrave> bisogno di fare). La lista di distribuzione
+serve come registrazione ufficiale. Se mandate un'email direttamente
+agli autori o a coloro che si occupano della manutenzione, probabilmente
+vi risponderanno di inviare le richieste sulla lista. Se non ricevete
+risposta, probabilmente la persona non ha mai visto il messaggio o non
+aveva tempo di gestirlo. Inviare le richieste alla lista consente ai
+volontari che hanno un po' di tempo di lavorarci sopra quando gli altri
+sono occupati.
+
+Se avete una domanda che non E<egrave> inclusa nella FAQ e vorreste aiutare
+a riguardo, provate ad utilizzare le risorse in L<perlfaq2>.
+
+=head1 RICONOSCIMENTI
+
+Tom Christiansen ha scritto I<perlfaq> originale, espandendolo
+successivamente con l'aiuto di Nat Torkington. I I<perlfaq-workers>
+si occupano del documento corrente ed i "cittadini" di comp.lang.perl.misc
+revisionano ed aggiornano la FAQ con regolaritE<agrave>. Parecchie persone hanno
+contribuito con risposte, correzioni e commenti, e I<perlfaq> esplicita
+questi contributi dove appropriato.
+
+=head1 AUTORE E COPYRIGHT
+
+Tom Christiansen ha scritto la versione originale di questo documento.
+brian d foy C<< <bdfoy@cpan.org> >> ha scritto questa versione. Controllate
+i singoli documenti di I<perlfaq> per informazioni aggiuntive sul
+copyright.
+
+This document is available under the same terms as Perl itself. Code
+examples in all the perlfaq documents are in the public domain. Use
+them as you see fit (and at your own risk with no warranty from anyone).
+[Una nota di copyright E<egrave> usualmente valida legalmente solo nella sua
+lingua originale, il significato E<egrave> approssimativamente quello che segue:
+
+ Questo documento e` disponibile negli stessi termini di Perl stesso.
+ Gli esempi di codice in tutti i documenti di perlfaq sono di
+ pubblico dominio. Utilizzateli come vi sembra piu` adeguato (ed a vostro
+ rischio senza alcuna garanzia da alcuno.
+
+N.d.T.]
+
+=head1 Sommario
+
+=over 4
+
+=item perlfaq  - questo documento
+
+=item perlfaq1 - Domande Generali Sul Perl
+
+=item perlfaq2 - Ottenere ed Imparare Perl
+
+=item perlfaq3 - Strumenti di Programmazione
+
+=item perlfaq4 - Manipolazione dei dati
+
+=item perlfaq5 - File e Formati
+
+=item perlfaq6 - Espressioni Regolari
+
+=item perlfaq7 - Questioni Generali Sul Linguaggio Perl
+
+=item perlfaq8 - Interazione con il Sistema
+
+=item perlfaq9 - Programmazione di rete
+
+=back
+
+=head1 Le Domande
+
+=head2 L<perlfaq1>: Domande Generali Sul Perl
+
+Domande sul Perl molto generali, di alto livello.
+
+=over 4
+
+=item Cos'E<egrave> il Perl?
+
+=item Chi supporta Perl? Chi lo sviluppa? PerchE<eacute> E<egrave> libero?
+
+=item Quale versione di Perl devo usare?
+
+=item Cosa sono perl4 e perl5?
+
+=item Cos'E<egrave> Ponie?
+
+=item Cos'E<egrave> perl6?
+
+=item Quanto E<egrave> stabile il Perl?
+
+=item Il Perl E<egrave> difficile da imparare?
+
+=item Come regge il confronto il Perl con altri linguaggi come Java, Python, REXX, Scheme, o Tcl?
+
+=item Posso fare [questo lavoro] in Perl?
+
+=item Quando non dovrei programmare in Perl?
+
+=item Qual E<egrave> la differenza tra "perl e "Perl"?
+
+=item E<Egrave> un programma Perl o uno script Perl?
+
+=item Cos'E<egrave> un JAPH?
+
+=item Where can I get a list of Larry Wall witticisms?
+
+=item Come posso convincere il mio amministratore di sistema/supervisore/dipendenti ad usare la versione 5/5.6.1/Perl al posto di qualche altro linguaggio?
+
+=back
+
+
+=head2 L<perlfaq2>: Ottenere ed Imparare Perl
+
+Dove trovare i sorgenti
+e la documentazione per il Perl, nonchE<eacute> il supporto, e questioni
+collegate a questi argomenti.
+
+=over 4
+
+=item Quali macchine supportano perl? Dove posso ottenerlo?
+
+=item Come faccio a procurarmi una versione eseguibile del perl?
+
+=item Non ho un compilatore C. Come posso compilarmi un interprete Perl?
+
+=item Ho copiato il binario di perl da una macchina ad un'altra, ma i miei script non funzionano.
+
+=item Ho ottenuto i sorgenti ed ho tentato di compilarli ma gdbm/il caricamento dinamico/malloc/il linking sono falliti. Come faccio a farli funzionare?
+
+=item Quali moduli ed estensioni sono disponibili per il Perl? Cos'E<egrave> CPAN? Cosa significa CPAN/src/... ?
+
+=item Esiste una versione del Perl certificata ISO o ANSI?
+
+=item Dove posso ottenere informazioni sul Perl?
+
+=item Quali sono i newsgroup Usenet dedicati al Perl? Dove invio le domande?
+
+=item Dove devo inviare il codice sorgente?
+
+=item Libri sul Perl
+
+=item Quali riviste hanno dei contenuti sul Perl?
+
+=item Quali mailing list sono disponibili per il Perl?
+
+=item Dove sono gli archivi di comp.lang.perl.misc?
+
+=item Dove posso acquistare una versione commerciale di perl?
+
+=item Dove invio le segnalazioni di bug?
+
+=item Cos'E<egrave> perl.com? Perl Mongers? pm.org? perl.org? cpan.org?
+
+=back
+
+
+=head2 L<perlfaq3>: Strumenti di Programmazione
+
+Strumenti di programmazione ed al supporto.
+
+=over 4
+
+=item Come posso fare (qualsiasi cosa)?
+
+=item Come posso usare Perl interattivamente?
+
+=item C'E<egrave> una shell Perl?
+
+=item Come faccio a sapere quali moduli sono installati sul mio sistema?
+
+=item Come effettuo il debug dei miei programmi Perl?
+
+=item Come effettuo il profiling dei miei programmi Perl?
+
+=item Come posso fornire i miei programmi Perl di rimandi (cross-reference)?
+
+=item Esiste un pretty-printer (formattatore) per il Perl?
+
+=item Esite una versione di ctags per Perl?
+
+=item Esiste un IDE o un editor Perl per Windows? 
+
+=item Dove posso trovare delle macro per vi?
+
+=item Dove posso trovare perl-mode per emacs?
+
+=item Come si possono usare le curses con il Perl? 
+
+=item Come posso usare X oppure Tk con il Perl?
+
+=item Come posso rendere piE<ugrave> veloce il mio programma scritto in Perl?
+
+=item Come posso fare affinchE<eacute> i miei programmi in Perl occupino meno memoria?
+
+=item E<Egrave> sicuro restituire un riferimento a dati locali o a dati lessicali?
+
+=item Come posso liberare un array o un hash in modo che il mio programma si riduca (in memoria)?
+
+=item Come posso rendere piE<ugrave> efficienti i miei script CGI?
+
+=item Come posso nascondere il codice sorgente del mio programma Perl?
+
+=item Come posso compilare programmi Perl in C o in bytecode?
+
+=item Come si puE<ograve> compilare il Perl dentro Java?
+
+=item Come posso far funzionare "#!perl" su [MS-DOS,NT,...]?
+
+=item Posso scrivere, dalla linea di comando, programmi Perl utili?
+
+=item PerchE<eacute> gli one-liner Perl non funzionano sul mio sistema DOS/Mac/VMS?
+
+=item Dove posso imparare qualcosa sulla programmazione CGI o Web in Perl?
+
+=item Dove posso imparare qualcosa sulla programmazione orientata agli oggetti in Perl?
+
+=item Dove posso imparare qualcosa sul linking del C con il Perl?
+
+=item Ho letto le pagine di manuale perlembed, perlguts, ecc., ma non riesco ad incapsulare l'interprete perl nel mio programma C, dove sbaglio?
+
+=item Quando ho provato a lanciare il mio script, ho ricevuto questo messaggio. Cosa vuol dire?
+
+=item Cos'E<egrave> MakeMaker? 
+
+=back
+
+
+=head2 L<perlfaq4>: Manipolazione dei Dati
+
+Manipolazione
+di numeri, date, stringhe, array, hash, ed a varie questioni sui dati.
+
+=over 4
+
+=item PerchE<eacute> ottengo una lunga serie di decimali (es. 19.9499999999999) invece dei numeri che dovrei ottenere (es. 19.95)?
+
+=item Come mai int() non funziona?
+
+=item PerchE<eacute> i miei dati ottali non vengono interpretati correttamente?
+
+=item Perl ha una funzione round()? E ceil() e floor()? E le funzioni trigonometriche?
+
+=item Come si effettuano le conversioni tra rappresentazioni numeriche?
+
+=item PerchE<eacute> & non funziona come voglio io?
+
+=item Come si moltiplicano le matrici?
+
+=item Come si effettuano delle operazioni su una serie di interi?
+
+=item Come posso mostrare in output i numeri romani?
+
+=item PerchE<eacute> i miei numeri casuali non sono casuali?
+
+=item Come posso ottenere un numero a caso tra X e Y?
+
+=item Come ottengo la settimana o il giorno dell'anno?
+
+=item Come ottengo il secolo oppure il millennio correnti?
+
+=item Come confronto due date per trovarne la distanza?
+
+=item Come posso prendere una stringa e convertirla in secondi dall'epoch (*)?
+
+=item Come posso trovare il Giorno Giuliano?
+
+=item Come trovo la data di ieri?
+
+=item Il Perl ha un problema per l'anno 2000? Il Perl E<egrave> conforme a Y2K?
+
+=item Come si controlla la validitE<agrave> di un input?
+
+=item Come rimuovo gli escape da una stringa?
+
+=item Come rimuovo coppie consecutive di caratteri?
+
+=item Come espando le chiamate a funzione in una stringa?
+
+=item Come trovo coppie corrispondenti/annidate di qualcosa?
+
+=item Come inverto una stringa?
+
+=item Come espando i tab in una stringa?
+
+=item Come si riformatta un paragrafo?
+
+=item Come posso accedere o cambiare N caratteri di una stringa?
+
+=item Come si fa a modificare la N-esima occorrenza di qualcosa?
+
+=item Come conto il numero di occorrenze di una sottostringa all'interno di una stringa?
+
+=item Come rendo maiuscola la prima lettera di tutte le parole di una riga?
+
+=item Come posso dividere una stringa delimitata da [carattere], tranne quando mi trovo tra [carattere]?
+
+=item Come si possono togliere gli spazi dall'inizio/fine di una stringa?
+
+=item Come porto a lunghezza una stringa con spazi oppure un numero con zeri?
+
+=item Come estraggo determinate colonne da una stringa?
+
+=item Come trovo il valore soundex di una stringa?
+
+=item Come si espandono le variabili nelle stringhe di testo?
+
+=item Cosa c'E<egrave> di sbagliato nel racchiudere sempre le "$varabili" tra virgolette?
+
+=item Come mai i miei E<lt>E<lt>HERE document non funzionano?
+
+=item Qual E<egrave> la differenza tra una lista ed un array?
+
+=item Qual E<egrave> la differenza tra C<$array[1]> e C<@array[1]>?
+
+=item Come posso rimuovere gli elementi duplicati da una lista o da un array?
+
+=item Come posso determinare se un certo elemento E<egrave> contenuto in una lista o in un array?
+
+=item Come si calcola la differenza di due array? Come si calcola l'intersezione tra due array?
+
+=item Come stabilisco se due array o hash sono uguali?
+
+=item Come trovo il primo elemento di un array per il quale sia vera una determinata condizione?
+
+=item Come gestico le liste collegate?
+
+=item Come si trattano le liste circolari?
+
+=item Come mescolo a caso gli elementi di un array?
+
+=item Come tratto/modifico ciascun elemento di un array?
+
+=item Come si fa a selezionare a caso un elemento da un array?
+
+=item Come permuto N elementi di una lista?
+
+=item Come ordino un array per (qualcosa)?
+
+=item Come si manipolano gli array di bit?
+
+=item PerchE<eacute> defined() restituisce vero su array e hash vuoti?
+
+=item Come si compie un'elaborazione su un intero hash?
+
+=item Cosa succede se aggiungo o rimuovo chiavi da un hash mentre sto iterando su di esso?
+
+=item Come si cerca un elemento di un hash per valore?
+
+=item Come si puE<ograve> sapere quanti elementi ci sono in un hash?
+
+=item Come si ordina un hash (opzionalmente per valore invece che per chiave)?
+
+=item Come posso mantenere sempre ordinato il mio hash?
+
+=item Qual E<egrave> la differenza tra "delete" e "undef" con gli hash?
+
+=item PerchE<eacute> i miei hash legati fanno distinzione tra defined ed exists?
+
+=item Come azzero un'operazione each() parzialmente eseguita?
+
+=item Come posso ottenere le chiavi univoche da due hash?
+
+=item Come posso memorizzare un array multidimensionale in un file DBM?
+
+=item Come posso fare in modo che il mio hash ricordi l'ordine in cui ho inserito gli elementi al suo interno?
+
+=item PerchE<eacute> passare ad una subroutine un elemento indefinito in un hash, lo crea?
+
+=item Come posso costruire l'equivalente Perl di una struttura C/classe C++/hash o array di hash o array?
+
+=item Come posso usare un riferimento come una chiave di un hash?
+
+=item Come si gestiscono correttamente i dati binari?
+
+=item Come si fa a determinare se uno scalare E<egrave> un numero/naturale/intero/in virgola mobile?
+
+=item Come posso mantenere la persistenza dei dati tra le diverse invocazioni di un programma?
+
+=item Come si stampa o si copia una struttura dati ricorsiva?
+
+=item Come si definiscono i metodi per ogni classe/oggetto?
+
+=item Come si verifica il valore di controllo di una carta di credito?
+
+=item Come si impacchettano gli array di numeri in doppia precisione o in virgola mobile, per codice XS?
+
+=back
+
+
+=head2 L<perlfaq5>: File e Formati
+
+I/O e tutto ciE<ograve> che inizia per "f": filehandle,
+flushing, formati, e footer.
+
+=over 4
+
+=item Come faccio a terminare le operazioni di I/O in corso o a privare del buffer un filehandle di output? PerchE<eacute> devo fare questo?
+
+=item Come si cambia una riga di un file/cancella una riga di un file/inserisce una riga nel mezzo di un file/aggiunge all'inizio di un file?
+
+=item Come si conta il numero di righe di un file?
+
+=item Come posso usare l'opzione del Perl C<-i> dall'interno di un programma?
+
+=item Come posso copiare un file?
+
+=item Come si crea un file temporaneo?
+
+=item Come posso manipolare file contenenti record a lunghezza fissa?
+
+=item Come posso rendere un filehandle locale ad una subroutine? Come faccio a passare filehandle tra subroutine? Come faccio a creare un array di filehandle?
+
+=item Come posso utilizzare un filehandle in maniera indiretta?
+
+=item Come posso impostare un formato di fine pagina da utilizzare con write()?
+
+=item Come posso scrivere su una stringa con write()?
+
+=item Come posso mostrare dei numeri con l'aggiunta delle virgole?
+
+=item Come posso tradurre le tilde (~) nel nome di un file?
+
+=item Come mai quando apro un file in lettura e scrittura il suo contenuto viene eliminato?
+
+=item Come mai a volte ottengo un "Argument list too long" [lista degli argomenti troppo lunga, NdT] quando uso E<lt>*E<gt>?
+
+=item C'E<egrave> un bug/leak [perdita di memoria, NdT] in glob()?
+
+=item Come posso aprire un file contenente un ">" all'inizio o degli spazi alla fine?
+
+=item Come posso rinominare in modo efficace un file?
+
+=item Come si puE<ograve> fare il lock di un file?
+
+=item PerchE<eacute> non si puE<ograve> fare solamente open(FH, ">file.lock")?
+
+=item Non riesco ancora ad ottenere il lock. Voglio solo incrementare un numero nel file. Come faccio?
+
+=item Tutto ciE<ograve> che voglio fare E<egrave> aggiungere un po' di testo alla fine di un file. Devo comunque usare i lock?
+
+=item Come modifico, accedendovi in maniera casuale, un file binario?
+
+=item Come faccio ad ottenere il timestamp [1] di un file, in perl?
+
+=item Come si imposta il timestamp [1] di un file, in perl?
+
+=item Come faccio a stampare piE<ugrave> di un file alla volta?
+
+=item Come posso leggere un intero file tutto in una volta?
+
+=item Come posso leggere un file per paragrafi?
+
+=item Come posso leggere un singolo carattere da un file? E dalla tastiera?
+
+=item Come posso sapere se c'E<egrave> un carattere in attesa di essere ricevuto da un filehandle?
+
+=item Come posso realizzare C<tail -f> in perl?
+
+=item Come faccio a dup()licare un filehandle in Perl?
+
+=item Come faccio a chiudere un descrittore di file tramite numero?
+
+=item PerchE<eacute> non posso usare "C:\temp\fanfaluca" nei path DOS? PerchE<eacute> "C:\temp\fanfaluca.exe" non funziona?
+
+=item PerchE<eacute> glob("*.*") non ottiene tutti i file?
+
+=item PerchE<eacute> il Perl mi permette di cancellare file di sola lettura? PerchE<eacute> -i sovrascrive i file protetti? Non E<egrave> un bug del Perl?
+
+=item Come posso prendere una riga a caso da un file?
+
+=item PerchE<eacute> ottengo degli strani spazi quando stampo un array di linee?
+
+=back
+
+
+=head2 L<perlfaq6>: Espressioni Regolari
+
+Questa sezione e soprendentemente breve poiche il resto delle FAQ e
+inquinato da risposte riguardanti le espressioni regolari. Per esempio,
+la decodifica di una URL oppure il controllo se una stringa e un numero
+sono operazione gestite tramite espressioni regolari, ma quelle
+risposte si trovano da altre parti (in perlfaq9: "Come decodifico o
+creo quei %-codici sul web?" e perlfaq4: "Come si fa a determinare se
+uno scalare e un numero/naturale/intero/in virgola mobile?", per essere
+precisi).
+
+=over 4
+
+=item Come posso sperare di usare le espressioni regolari senza creare codice illeggibile e non manutenibile?
+
+=item Sto avendo dei problemi nel fare il match su piE<ugrave> di una linea. Cosa c'E<egrave> di sbagliato?
+
+=item Come posso tirar fuori le linee tra due pattern che sono loro stessi su linee diverse?
+
+=item Ho messo un'espressione regolare in $/ ma non ha funzionato. Cosa c'E<egrave> di sbagliato?
+
+=item Come posso effettuare delle sostituzioni non tenendo conto di maiuscole e minuscole nel lato sinistro e tenendone invece conto nel lato destro?
+
+=item Come si puE<ograve> far fare a C<\w> un match del set di caratteri nazionale?
+
+=item Come si puE<ograve> creare una versione localizzata di C</[a-zA-Z]/>?
+
+=item Come si puE<ograve> fare il quote di una variabile da usare in una regex?
+
+=item A cosa serve realmente C</o>?
+
+=item Come faccio ad usare un'espressione regolare per togliere da un file i commenti in stile C?
+
+=item Posso usare le espressioni regolari di Perl per fare il match di testo bilanciato?
+
+=item Cosa significa che un'espressione regolare E<egrave> avida (greedy)? Come posso evitarlo?
+
+=item Come faccio ad elaborare ciascuna parola di ogni linea?
+
+=item Come posso stampare un sommario in base alla frequenza delle parole oppure delle linee?
+
+=item Come posso fare un match approssimato?
+
+=item Come posso fare, in maniera efficiente, un match di piE<ugrave> espressioni regolari alla volta?
+
+=item PerchE<eacute> non mi funzionano le ricerche del limite di una parola effettuate con C<\b>?
+
+=item PerchE<eacute> utilizzare $&, $` o $' rallenta il mio programma?
+
+=item A cosa serve C<\G> in un'espressione regolare?
+
+=item Le espressioni regolari del Perl sono DFA o NFA? Sono aderenti allo standard POSIX?
+
+=item Cosa c'E<egrave> di sbagliato ad usare grep o map in un contesto vuoto? 
+
+=item Come posso effettuare il match di stringhe contenenti caratteri multibyte?
+
+=item Come faccio a trovare corrispondenze ad un pattern inserito dall'utente?
+
+=back
+
+
+=head2 L<perlfaq7>: Questioni Generali Sul Linguaggio Perl
+
+Questioni generali sul linguaggio Perl che non trovano
+posto in nessuna delle altre sezioni.
+
+=over 4
+
+=item E<Egrave> possibile ottenere una BNF/yacc/RE del linguaggio Perl?
+
+=item Cosa sono tutti quei segni di punteggiatura $@%&*, e come faccio a sapere quando usarli?
+
+=item Devo sempre/non devo mai mettere tra virgolette le mie stringhe, oppure usare i punti e virgola o le virgole?
+
+=item Come tralascio alcuni valori di ritorno?
+
+=item Come posso disabilitare temporaneamente i warning?
+
+=item Cos'E<egrave> un'estensione (extension)?
+
+=item PerchE<eacute> gli operatori del Perl hanno una precedenza diversa rispetto a quelli del C? 
+
+=item Come dichiaro/creo una struttura?
+
+=item Come si crea un modulo?
+
+=item Come faccio a creare una classe?
+
+=item Come faccio a stabilire se una variabile E<egrave> potenzialmente dannosa?
+
+=item Che cos'E<egrave> una chiusura?
+
+=item Cos'E<egrave> il suicidio di variabile e come si puE<ograve> prevenire?
+
+=item Come faccio a passare/restituire una {Funzione, FileHandle, Array, Hash, Metodo, Espressione Regolare}?
+
+=item Come si crea una variabile statica?
+
+=item Qual E<egrave> la differenza tra visibilitE<agrave> dinamica e visibilitE<agrave> lessicale (o statica)? Qual E<egrave> la differenza tra local() e my()?
+
+=item Come posso accedere ad una variabile dinamica quando E<egrave> visibile una variabile lessicale con lo stesso nome?
+
+=item Qual E<egrave> la differenza tra il deep binding (legame profondo) e lo shallow binding (legame superficiale)?
+
+=item PerchE<eacute> "my($pippo) = <FILE>;" non funziona bene?
+
+=item Come si fa a ridefinire una funzione, operatore o metodo predefinito?
+
+=item Qual E<egrave> la differenza tra il chiamare una funzione con &pippo e con pippo()?
+
+=item Come faccio a realizzare un'istruzione switch o case?
+
+=item Come posso intercettare gli accessi a variabili, funzioni o metodi indefiniti?
+
+=item PerchE<eacute> non si riesce a trovare un metodo incluso in questo stesso file?
+
+=item Come posso sapere qual E<egrave> il package corrente?
+
+=item Come posso commentare un vasto blocco di codice perl?
+
+=item Come si cancella un package?
+
+=item Come posso usare una variabile come nome di una variabile?
+
+=item Cosa significa "bad interpreter" ["interprete non valido", NdT]?
+
+=back
+
+
+=head2 L<perlfaq8>: Interazione con il Sistema
+
+Questa sezione delle Perl FAQ copre le domande riguardanti l'inter-
+azione con il sistema. Gli argomenti includono la comunicazione tra i
+processi (IPC), il controllo dell'interfaccia utente (tastiera, schermo
+e dispositivi di puntamento), e piu o meno qualsiasi altra cosa non
+riguardante la manipolazione di dati.
+
+Leggete le FAQ e la documentazione specifica riguardante la versione di
+perl specifica per il vostro sistema operativo (ad es. perlvms,
+perlplan9, ...). Tali risorse dovrebbero contenere informazioni piu
+dettagliate sulle stravaganze del vostro perl.
+
+
+=over 4
+
+=item Come faccio a sapere qual E<egrave> il sistema operativo in cui mi trovo?
+
+=item Come mai exec() non ritorna?
+
+=item Si possono fare cose bizzarre con tastiera/schermo/mouse?
+
+=item Come faccio a stampare qualcosa a colori?
+
+=item Come faccio a leggere solo un carattere senza aspettare il carattere di invio?
+
+=item Come posso controllare se E<egrave> pronto l'input dalla tastiera?
+
+=item Come posso cancellare lo schermo?
+
+=item Come posso ottenere le dimensioni dello schermo?
+
+=item Come si fa a chiedere una password all'utente?
+
+=item Come leggo e scrivo su una porta seriale?
+
+=item Come decifro i file delle password cifrati?
+
+=item Come faccio a far partire un processo in background?
+
+=item Come faccio ad intercettare caratteri/segnali di controllo?
+
+=item Come modifico il file delle shadow password su un sistema Unix?
+
+=item Come imposto l'ora e la data?
+
+=item Come posso usare sleep() o alarm() per tempi inferiori al secondo?
+
+=item Come posso misurare intervalli di tempo inferiori al secondo?
+
+=item Come si fa un atexit() o setjmp()/longjmp()? (Gestione delle eccezioni)
+
+=item PerchE<eacute> i miei programmi con i socket non funzionano su System V (Solaris)? Cosa significa il messaggio di errore "Protocollo non supportato"?
+
+=item Come posso chiamare da Perl le funzioni univoche del C del mio sistema?
+
+=item Dove trovo i file include per utilizzare ioctl() o syscall()?
+
+=item PerchE<eacute> gli script Perl con setuid lamentano problemi di kernel?
+
+=item Come posso aprire una pipe sia da che verso un comando?
+
+=item PerchE<eacute> non riesco ad ottenere l'output di un comando con system()?
+
+=item Come posso catturare STDERR da un comando esterno?
+
+=item Come mai open() non restituisce un errore quando l'apertura di una pipe fallisce?
+
+=item Cosa c'E<egrave> che non va nell'usare i backtick (apici inversi) in un contesto vuoto?
+
+=item Come posso utilizzare i backtick senza che avvenga alcuna interpretazione da parte della shell?
+
+=item PerchE<eacute> il mio script non riesce a leggere da STDIN dopo che gli ho dato EOF (^D su Unix, ^Z su MS-DOS)?
+
+=item Come posso convertire il mio script della shell in perl?
+
+=item Posso usare perl per effettuare una sessione telnet o ftp?
+
+=item Come faccio a scrivere expect in Perl?
+
+=item C'E<egrave> un modo per nascondere la linea di comando di perl da programmi quali "ps"?
+
+=item Ho {cambiato directory, modificato l'ambiente} in uno script perl. Come mai la modifica E<egrave> svanita quando lo script E<egrave> terminato? Come posso rendere visibili i miei cambiamenti?
+
+=item Come chiudo il filehandle di un processo senza aspettare che questo sia completato?
+
+=item Come effettuo il fork di un processo demone?
+
+=item Come faccio a sapere se sono un processo interattivo o no?
+
+=item Come faccio a far scadere un evento lento?
+
+=item Come si impostano i limiti di utilizzo della CPU?
+
+=item Come evito gli zombie su di un sistema Unix?
+
+=item Come faccio ad usare un database SQL?
+
+=item Come faccio a fare uscire una system() su un control-c?
+
+=item Come faccio ad aprire un file senza bloccarlo?
+
+=item Come riconosco la differenza tra errori dalla shell e perl?
+
+=item Come installo un modulo da CPAN?
+
+=item Qual E<egrave> la differenza tra require e use?
+
+=item Come gestisco la mia directory dei moduli/librerie?
+
+=item Come faccio ad aggiungere la directory dove si trova il mio programma, al path di ricerca dei moduli/librerie?
+
+=item Come faccio ad aggiungere una directory al mio path di inclusione (@INC), a tempo di esecuzione?
+
+=item Cos'E<egrave> socket.ph e dove posso trovarlo?
+
+=back
+
+
+=head2 L<perlfaq9>: Programmazione di rete
+
+Programmazione di
+rete, in internet, e qualche domanda sul web.
+
+=over 4
+
+=item Qual E<egrave> la forma corretta di risposta da uno script CGI
+
+=item I miei script funzionano dalla linea di comando ma non dal browser. (500 Errore del server)
+
+=item Come posso ottenere migliori messaggi di errore da un programma CGI?
+
+=item Come rimuovo i tag HTML presenti in una stringa?
+
+=item Come estraggo le URL?
+
+=item Come scarico un file dalla macchina dell'utente? Come apro un file situato su un'altra macchina?
+
+=item Come posso fare un menE<ugrave> pop-up in HTML?
+
+=item Come prelevo un file HTML?
+
+=item Come automatizzo l'invio di una form HTML?
+
+=item Come decodifico o creo quei %-codici sul web? 
+
+=item Come effettuo la redirezione ad un'altra pagina?
+
+=item Come faccio ad inserire una password nelle mie pagine web?
+
+=item Come si fanno a modificare i file .htpasswd e .htgroup in Perl?
+
+=item Come faccio ad assicurarmi che gli utenti non immettano in una form dei valori che possono far fare brutte cose al mio script CGI?
+
+=item Come effettuo il parsing dell'header di una mail?
+
+=item Come faccio a decodificare una form CGI?
+
+=item Come si fa a verificare la validitE<agrave> di un indirizzo di posta elettronica?
+
+=item Come si decodifica una stringa MIME/BASE64?
+
+=item Come ottengo l'indirizzo e-mail dell'utente?
+
+=item Come spedisco la posta?
+
+=item Come si usa MIME per creare un allegato ad un messaggio?
+
+=item Come faccio a leggere la posta elettronica?
+
+=item Come faccio a sapere il mio hostname, il nome del mio dominio e il mio indirizzo IP?
+
+=item Come prelevo una news o la lista dei newsgroup attivi?
+
+=item Come prelevo/invio un file via FTP?
+
+=item Come faccio a chiamare procedure remote in Perl? ["Remote Procedure Call", abbreviato in RPC, NdT]
+
+=back
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlfaq
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Flavio Poletti.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

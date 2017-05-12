@@ -1,0 +1,104 @@
+
+2003-09-09 GG (v.3.008)
+	- improved garbage collection. No more leaks of Q*Items.
+	  GC is now believed to be entirely sound.
+	- faster/cleaner build system (no more automake dependancy)
+	- speed optimizations (+50% gain)
+	- 9 new marshallers (Q*List are marshalled as a reference to a Perl array of Q*)
+	- tied marshallers for non-const QString/QByteArray
+		$ts = Qt::TextStream( $x, IO_WriteOnly );
+		$ts << "foo"; # will write to $x
+	- alternative Sig/Slot declaration syntax
+		sub a_signal : SIGNAL(int,QString);
+		sub a_slot : SLOT(int,QString) {
+		    #do something
+		}
+	- perleditor plugin for Qt Designer (released separately as pqt-designer package)
+		- Perl syntax highlighting
+		- thorough code completion (static and instance methods, &Qt::enums...)
+		- Perl aware Object Browser ("Class Declarations" tab)
+		- run your PerlQt project straight from the designer
+		- STDIN/STDOUT output and Perl messages are redirected to the Output Window view, 
+		  with corrected line numbers pointing to syntax errors.
+	- global scope Qt functions (bitBlt, qCompress...) are now available. 
+		- gathered in the Qt::GlobalSpace namespace
+		- import them to current namespace with "use Qt::GlobalSpace"
+	- global scope operators are available as well (e.g Qt::Point + Qt::point)
+	- bug fixes and other improvements.
+		=> see ChangeLog.CVS.delta and ChangeLog.CVS for details
+
+2002-02-13 GG (v.3.006)
+         - "use bytes" pragma now changes the way QStrings are marshalled 
+           back to Perl : within the scope,  instead of all utf-8, QStrings are
+           marshalled to ISO-Latin1 by default, or to locale if "use locale" is
+           active.
+         - Operator overloading is now functional. 21 operators are available.
+           e.g: 
+           $d = Qt::TextStream( $f );
+           $d << "Foo " << 12 << " Bar"; 
+           N.B: the copy constructor operator('=') isn't overloaded. 
+                It clashes with the perl paradigm.
+         - fixed a bug in QCString Marshaller : plain ASCII was tagged as UTF-8
+         - raised priority of QString in case of ambiguous call
+         - allow runtime definition of signals and slots (via eval)
+         - added two development tools : pqtsh (a graphical PerlQt shell) and
+           pqtapi (a command line introspection tool)
+         - look also in super classes when dumping possible candidates (Qt::debug)
+         - updated french and english documentation
+         - module Qt::constants for on-demand loading of global Qt constants
+           (as of now, only concerns IO_* constants defined in qiodevice.h)
+           e.g:
+               use Qt::constants qw(:IO)
+           or
+               use Qt::constants qw( IO_ReadOnly IO_WriteOnly )
+           from an idea by Marek Rouchal
+ 
+2002-12-16 GG (v.3.004-final)
+         - test suite ("make test" target) 
+         - one more example (progress.pl)
+         - fixed a bug related to pointer mapping and Smoke's cf_virtual flag
+           (regeneration of Smoke isn't mandatory, but is recommended)
+         - fixed possible redefinition of a sub in isa.pm
+         - raised default test threshold to 10
+         - some code optimizations (object construction/destruction)
+         - added an undocumented but supported CAST function
+           e.g  CAST $obj, "Qt::Application"; (it proved to be useful in some
+           situations)
+2002-12-11 GG. (v.3.004-RC2)
+         - turnaround for segfaults with some KDE themes (KThemeStyles)
+           =>will work witth kdelibs compiled with --disable-fast-malloc and --enable-fast-malloc,
+           but not with --enable-fast-malloc=full
+         - Qt::version() 
+         - updated documentation (marshallers, debugging, i18n)
+         - switch to Makefile.PL for driving ./configure
+
+2002-12-07 GG. (v.3.004-RC1)
+	- better ISO C++ compliance and portability
+	  -ansi -pedantic is now almost silent except for some Perl Macros
+	- speed improvements over 40%
+	  ported memoïze-like cache to C++ ; various code optimizations
+	- Signal/Slots inheritance now works as expected
+	- proper handling of Qt modules stored in a hierarchy
+	- introduced SUPER->method() construct for accessing methods in the
+	  superclass
+	- Internationalization
+	  Perl strings are marshalled to QStrings either in utf8, iso-latin-1 or 
+	  current locale according to context (the rule is: if they are tagged as utf8, use 
+	  utf8 ; if not, use iso-latin by default or current locale if  the "locale" 
+	  pragma is active)   ; they are always marshalled back as utf8.
+	- You can now safely "eval" PerlQt code.
+	- New marshallers:
+	  QCString /*/&, bool */&, QValueList<int> /*/&
+	- Debugging channels through "use Qt::debug"
+	  You can now monitor specific parts of your application's behaviour.
+	  Available channels are : ambiguous, calls, gc, autoload, virtual, 
+	  verbose, all.
+	- Updated documentation + french translation
+	  many thanks to Stéphane Payrard for the accurate french translation !
+	- Subclassing Qt::Application is now possible
+	- Smoke can be built with Qt-3.1
+	- Various other bug fixes
+
+2002-08-24  Germain Garand  <germain@ebooksfrance.com> (v.3.001)
+
+        * initial release

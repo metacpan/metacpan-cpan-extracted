@@ -1,0 +1,90 @@
+%{
+my $INT    = '(int)\b';
+my $ID     = '([a-zA-Z_][a-zA-Z_0-9]*)';
+my $NUM    = '(\d+)';
+
+my $ISDEC;
+
+%}
+
+%token NUM = /$NUM/
+%token INT = /$INT/
+%token ID  = /$ID/
+
+%right '='
+%left '+'
+
+%conflict decORexp {
+  if ($ISDEC) { $self->YYSetReduce(')', 'ID:DEC' ); }
+  else { $self->YYSetReduce(')', 'ID:EXP' ); }
+}
+
+%explorer decORexp {
+   #print "***********************\n";
+   $ISDEC = $self->YYPreParse('Decl', 
+      #0xF # debug
+   ); 
+}
+
+%expect-rr 1  # expect 1 reduce-reduce conflict
+
+%tree bypass
+%start decl
+
+%%
+prog:
+    %name EMPTY
+    /* empty */
+  | %name PROG
+    prog %decORexp? stmt
+;
+
+stmt: 
+    %name EXP
+    expr ';' 
+  | %name DECL
+    decl    
+;
+
+expr:
+    %name ID:EXP
+    ID                            %PREC decORexp 
+  | %name NUM 
+    NUM
+  | %name TYPECAST
+    INT '(' expr ')' /* typecast */ 
+  | %name PLUS
+    expr '+' expr
+  | %name ASSIGN
+    expr '=' expr
+;
+
+decl:
+    %name DECLARATOR
+    INT declarator ';'
+  | %name DECLARATORINIT
+    INT declarator '=' expr ';'
+;
+
+declarator:
+    %name ID:DEC
+    ID                            %PREC decORexp 
+  | '(' declarator ')'
+;
+
+%%
+
+####################################################
+
+=head1 SYNOPSIS
+
+Compile it with
+ 
+   eyapp -C CplusplusStartOption
+
+This compiletion must produce warnings
+
+   eyapp -S decl -C CplusplusStartOption
+
+=cut
+

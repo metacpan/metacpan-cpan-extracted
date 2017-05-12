@@ -1,0 +1,52 @@
+0.26 Thu Jul  9 10:36:54 PDT 2015
+ - Support PEGEX_COMBINATE_RULES
+
+0.25 Sat Aug 16 14:34:12 PDT 2014
+ - Remove =travis section
+
+0.24 Sat Aug 16 11:48:51 PDT 2014
+ - Meta 0.0.2
+
+0.23 Fri Aug 15 20:19:13 PDT 2014
+ - Add t/000-compile-modules.t
+ - rm t/use_ok.t
+
+0.22 Fri Aug  8 12:54:13 PDT 2014
+ - Switch hashbang to '#!/usr/bin/env perl'
+
+0.21 Tue Aug  5 10:11:47 PDT 2014
+ - Add badges to doc
+
+0.20 Mon Aug  4 00:01:32 PDT 2014
+ - Remove (c) from Copyright
+
+0.19 Sat Aug  2 16:13:59 PDT 2014
+ - Fix Copyright years.
+
+0.18 Wed Jul 16 23:09:06 PDT 2014
+ - Fix Meta and add Contributing file
+
+0.17 Wed Jul  2 14:16:12 PDT 2014
+ - Updated prereqs. sillymoose++
+
+0.16 Sun Jun 15 11:45:07 PDT 2014
+ - Add prereq modules
+
+0.15 Sat Jun 14 13:39:00 PDT 2014
+ - Switch to zild
+
+0.14 Fri Mar 21 08:23:24 PDT 2014
+ - Switch to dzil
+
+0.13 Thu Aug 30 00:31:16 PDT 2012
+ - Use Pegex 0.20 API
+
+0.12 Sat Jul  7 14:04:55 PDT 2012
+ - Add --boot for using Pegex::Boostrap compiler
+
+0.11 Sat Nov  5 01:14:39 PDT 2011
+ - Better docs for castaway++
+
+0.10 Tue Oct  4 00:05:44 BST 2011
+ - First Release
+

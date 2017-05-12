@@ -1,0 +1,29 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [Bugs::DefaultRT]
+
+    To specify a bugtracker other than RT (http://rt.cpan.org), in your
+    dist.ini:
+
+     [MetaResources]
+     bugtracker=http://example.com/
+
+    or to specify email address:
+
+     [MetaResources]
+     bugtracker.mailto=someone@example.com
+
+DESCRIPTION
+
+    This section plugin is like Pod::Weaver::Section::Bugs, except that it
+    gives RT as the default.
+
+SEE ALSO
+
+    Pod::Weaver::Section::Bugs which requires us setting bugtracker
+    metadata.
+
+    Pod::Weaver::Section::BugsRT which always uses RT.
+

@@ -1,0 +1,36 @@
+# The following grammar isn't a SLR(1) grammar but it is a LALR(1) grammar. 
+# Compile it with:
+#                    eyapp -b '' nonslrgrammar.eyp
+# and run it:
+#                  $ ./nonslrgrammar.pm 1 
+# Try with input: *a = b
+# Observe that it does not exists a rightmost derivation from s to "r = something" 
+# in which the last derivation was applying the production "r -> l"
+#
+
+%strict
+%token VAR '=' '*'
+
+%{
+use base q{Tail};
+%}
+
+%%
+s:
+    l '=' r
+  | r
+;
+
+l:
+    '*' r
+  | VAR
+;
+
+r:
+    l
+;
+
+%%
+
+__PACKAGE__->main(@ARGV) unless caller;
+

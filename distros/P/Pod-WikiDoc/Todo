@@ -1,0 +1,87 @@
+TODO list for Perl module Pod::WikiDoc
+
+#--------------------------------------------------------------------------#
+# Bugs
+#--------------------------------------------------------------------------#
+
+- {@foo} doesn't work
+
+- must support nested formats
+    - need to test for warning and best recovery for mismatched =end
+    - test warn/halt on =cut to start Pod
+
+#--------------------------------------------------------------------------#
+# General
+#--------------------------------------------------------------------------#
+
+- Add keyword definition to wikidoc script CLI
+
+- Add more tests for wikidoc utility script
+
+- Acknowledge Kwid and provide links to it
+
+#--------------------------------------------------------------------------#
+# Formatting
+#--------------------------------------------------------------------------#
+
+- Nothing right now
+
+#--------------------------------------------------------------------------#
+# Extraction
+#--------------------------------------------------------------------------#
+
+- Nothing right now
+
+#--------------------------------------------------------------------------#
+# Usage
+#--------------------------------------------------------------------------#
+
+- wikidoc script: add recursion of a directory
+
+- Add configuration option for substituting an alternate parser
+
+- Add parameter checks to new() 
+
+#--------------------------------------------------------------------------#
+# Potential future enhancements
+#--------------------------------------------------------------------------#
+
+- Add special handling in the Parser for any punctuation (e.g. open-parens)
+  that should be able to precede markup
+
+- Support a range of sharps to include; e.g. ## for private documentation
+  and ### for public documentation
+
+- Collapse multiple blank lines
+
+- Add multi-level lists (with what syntax?)
+
+- Add markup for some sort of definitional list; (":item: definition"?)
+    - would make it easier to write javadoc style details, e.g.
+    ## == {some_function}
+    ## :usage:
+    ##   code block example
+    ## :arguments:
+    ## * {foo}: blah blah 
+    ## * {bar}: blah blah
+    ## :returns:
+    ## blah blah blah
+    ##
+    ## blah blah blah description
+
+- Add markup for blockquote list; ("> blockquote blah blah blah"?)
+    
+- Markup for other pod markup (e.g. S<>, X<>, etc.) (?!)  
+
+- Passthrough for other formatting codes (e.g. S<>, X<>, etc.) (?!)
+
+- inclusion of other files, either verbatim or as pod
+
+#--------------------------------------------------------------------------#
+# Efficiency
+#--------------------------------------------------------------------------#
+
+- Profile on a long sample of wiki (e.g. Class::InsideOut)
+
+- Review and refactor grammer
+

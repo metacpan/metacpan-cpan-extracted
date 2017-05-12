@@ -1,0 +1,78 @@
+%right '=' 
+%left '<' '>' '>=' '<=' '==' '!=' 
+%left '-' '+' 
+%left '*' '/' 
+%left NEG 
+%nonassoc IF 
+%nonassoc ELSE 
+%tree			bypass
+
+%%
+
+program:
+      declaration <%name DECLS *> sts <%name STS + ';' >
+;
+declaration:
+      basictype declList ';' 
+;
+basictype:
+      %name INT
+      INT
+    | %name FLOAT
+      FLOAT
+    | %name BOOLEAN
+      BOOLEAN 
+;
+declList:
+      VAR <%name VARS + ',' >
+;
+sts:
+      %name PRINT
+      PRINT leftvalue
+    | %name BLOCK
+      '{' sts <%name STS + ';' >'}'
+    | %name IF
+      IF '(' exp ')' sts %prec IF
+    | %name IFELSE
+      IF '(' exp ')' sts ELSE sts
+    | %name WHILE
+      WHILE '(' exp ')' sts
+    | exp 
+;
+exp:
+      %name NUM
+      NUM
+    | %name VAR
+      VAR
+    | %name ASSIGN
+      leftvalue '=' exp
+    | %name PLUS
+      exp '+' exp
+    | %name MINUS
+      exp '-' exp
+    | %name TIMES
+      exp '*' exp
+    | %name DIV
+      exp '/' exp
+    | %name LT
+      exp '<' exp
+    | %name LE
+      exp '<=' exp
+    | %name GT
+      exp '>' exp
+    | %name GE
+      exp '>=' exp
+    | %name EQ
+      exp '==' exp
+    | %name NE
+      exp '!=' exp
+    | %no bypass NEG
+      '-' exp %prec NEG
+    | '(' exp ')' 
+;
+leftvalue:
+      %name VAR
+      VAR 
+;
+
+%%

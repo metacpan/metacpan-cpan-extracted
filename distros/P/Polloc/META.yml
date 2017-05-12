@@ -1,0 +1,152 @@
+---
+abstract: 'Polymorphic Loci analysis'
+author:
+  - 'Luis M. Rodriguez-R <lmrodriguezr@gmail.com>'
+build_requires:
+  Module::Build: 0.2
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3622'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Bio::Polloc
+provides:
+  Bio::Polloc:
+    file: lib/Bio/Polloc.pm
+    version: 1.0503
+  Bio::Polloc::Genome:
+    file: lib/Bio/Polloc/Genome.pm
+    version: 1.0503
+  Bio::Polloc::GroupCriteria:
+    file: lib/Bio/Polloc/GroupCriteria.pm
+    version: 1.0503
+  Bio::Polloc::GroupCriteria::operator:
+    file: lib/Bio/Polloc/GroupCriteria/operator.pm
+    version: 1.0503
+  Bio::Polloc::GroupCriteria::operator::bool:
+    file: lib/Bio/Polloc/GroupCriteria/operator/bool.pm
+    version: 1.0503
+  Bio::Polloc::GroupCriteria::operator::cons:
+    file: lib/Bio/Polloc/GroupCriteria/operator/cons.pm
+    version: 1.0503
+  Bio::Polloc::GroupCriteria::operator::num:
+    file: lib/Bio/Polloc/GroupCriteria/operator/num.pm
+    version: 1.0503
+  Bio::Polloc::GroupCriteria::operator::seq:
+    file: lib/Bio/Polloc/GroupCriteria/operator/seq.pm
+    version: 1.0503
+  Bio::Polloc::LociGroup:
+    file: lib/Bio/Polloc/LociGroup.pm
+    version: 1.0503
+  Bio::Polloc::Locus::amplicon:
+    file: lib/Bio/Polloc/Locus/amplicon.pm
+    version: 1.0503
+  Bio::Polloc::Locus::composition:
+    file: lib/Bio/Polloc/Locus/composition.pm
+    version: 1.0503
+  Bio::Polloc::Locus::crispr:
+    file: lib/Bio/Polloc/Locus/crispr.pm
+    version: 1.0503
+  Bio::Polloc::Locus::extend:
+    file: lib/Bio/Polloc/Locus/extend.pm
+    version: 1.0503
+  Bio::Polloc::Locus::generic:
+    file: lib/Bio/Polloc/Locus/generic.pm
+    version: 1.0503
+  Bio::Polloc::Locus::pattern:
+    file: lib/Bio/Polloc/Locus/pattern.pm
+    version: 1.0503
+  Bio::Polloc::Locus::repeat:
+    file: lib/Bio/Polloc/Locus/repeat.pm
+    version: 1.0503
+  Bio::Polloc::LocusI:
+    file: lib/Bio/Polloc/LocusI.pm
+    version: 1.0503
+  Bio::Polloc::LocusIO:
+    file: lib/Bio/Polloc/LocusIO.pm
+    version: 1.0503
+  Bio::Polloc::LocusIO::gff3:
+    file: lib/Bio/Polloc/LocusIO/gff3.pm
+    version: 1.0503
+  Bio::Polloc::Polloc::Config:
+    file: lib/Bio/Polloc/Polloc/Config.pm
+    version: 1.0503
+  Bio::Polloc::Polloc::Error:
+    file: lib/Bio/Polloc/Polloc/Error.pm
+    version: 1.0503
+  Bio::Polloc::Polloc::IO:
+    file: lib/Bio/Polloc/Polloc/IO.pm
+    version: 1.0503
+  Bio::Polloc::Polloc::Root:
+    file: lib/Bio/Polloc/Polloc/Root.pm
+    version: 1.0503
+  Bio::Polloc::Polloc::Version:
+    file: lib/Bio/Polloc/Polloc/Version.pm
+    version: 1.0503
+  Bio::Polloc::Rule::boolean:
+    file: lib/Bio/Polloc/Rule/boolean.pm
+    version: 1.0503
+  Bio::Polloc::Rule::composition:
+    file: lib/Bio/Polloc/Rule/composition.pm
+    version: 1.0503
+  Bio::Polloc::Rule::crispr:
+    file: lib/Bio/Polloc/Rule/crispr.pm
+    version: 1.0503
+  Bio::Polloc::Rule::pattern:
+    file: lib/Bio/Polloc/Rule/pattern.pm
+    version: 1.0503
+  Bio::Polloc::Rule::profile:
+    file: lib/Bio/Polloc/Rule/profile.pm
+    version: 1.0503
+  Bio::Polloc::Rule::repeat:
+    file: lib/Bio/Polloc/Rule/repeat.pm
+    version: 1.0503
+  Bio::Polloc::Rule::tandemrepeat:
+    file: lib/Bio/Polloc/Rule/tandemrepeat.pm
+    version: 1.0503
+  Bio::Polloc::RuleI:
+    file: lib/Bio/Polloc/RuleI.pm
+    version: 1.0503
+  Bio::Polloc::RuleIO:
+    file: lib/Bio/Polloc/RuleIO.pm
+    version: 1.0503
+  Bio::Polloc::RuleSet::cfg:
+    file: lib/Bio/Polloc/RuleSet/cfg.pm
+    version: 1.0503
+  Bio::Polloc::Typing::bandingPattern:
+    file: lib/Bio/Polloc/Typing/bandingPattern.pm
+    version: 1.0503
+  Bio::Polloc::Typing::bandingPattern::amplification:
+    file: lib/Bio/Polloc/Typing/bandingPattern/amplification.pm
+    version: 1.0503
+  Bio::Polloc::TypingI:
+    file: lib/Bio/Polloc/TypingI.pm
+    version: 1.0503
+  Bio::Polloc::TypingIO:
+    file: lib/Bio/Polloc/TypingIO.pm
+    version: 1.0503
+  Bio::Polloc::TypingIO::cfg:
+    file: lib/Bio/Polloc/TypingIO/cfg.pm
+    version: 1.0503
+recommends:
+  Bio::Tools::Run::Alignment::Muscle: 0
+  Bio::Tools::Run::Hmmer: 0
+  Bio::Tools::Run::StandAloneBlast: 0
+  File::Basename: 0
+  GD::Simple: 0
+requires:
+  Bio::SeqIO: 0
+  Config: 0
+  Cwd: 0
+  Error: 0
+  File::Path: 0
+  File::Spec: 0
+  File::Temp: 0
+  List::Util: 0
+  Symbol: 0
+  perl: v5.8.0
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+version: 1.0503

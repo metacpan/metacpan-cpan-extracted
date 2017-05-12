@@ -1,0 +1,619 @@
+=head1 NAME
+
+Panda::Lib - Collection of useful functions and classes with Perl and C interface.
+
+=head1 DESCRIPTION
+
+Panda::Lib contains a number of very fast useful functions, written in C. You can use it from Perl or directly from XS code.
+Also it contains several C++ classes.
+
+=head1 SYNOPSIS
+
+    use Panda::Lib qw/ hash_merge merge compare clone fclone crypt_xor string_hash string_hash32 /;
+                       
+    $result = hash_merge($dest, $source, $flags);
+    $result = merge($dest, $source, $flags);
+    $is_equal = compare($hash1, $hash2);
+    $is_equal = compare($array1, $array2);
+    $cloned = lclone($data);
+    $cloned = fclone($data);
+    $crypted = crypt_xor($data, $key);
+    $val = string_hash($str);
+    $val = string_hash32($str);
+
+=head1 C SYNOPSIS
+
+    #include <xs/lib.h>
+    using namespace xs::lib;
+    
+    HV* result = hash_merge(hvdest, hvsource, flags);
+    SV* result = merge(hvdest, hvsource, flags);
+    bool is_equal = hash_cmp(hv1, hv2);
+    bool is_equal = av_cmp(av1, av2);
+    SV* cloned = clone(sv, with_cross_checks);
+    panda::string str = sv2string(sv);
+    
+    // for XS code
+    PXS_TRY({
+        /* code that can throw c++ exceptions */;
+    });
+    
+    #include <panda/lib.h>
+    #include <panda/lib/hash.h>
+    using namespace panda::lib;
+    
+    char* crypted = crypt_xor(source, slen, key, klen);
+    uint32_t val = hash32(str, len);
+    uint64_t val = hash64(str, len);
+    
+    
+    #include <panda/string.h>
+    using panda::string;
+    
+    string abc("lala");
+    ... // everything that std::string supports
+    
+    
+    #include <panda/lib/memory.h>
+    void* mem = StaticMemoryPool<128>::instance()->alloc(); // extremely fast memory allocations
+    void* mem = StaticMemoryPool<128>::tls_instance()->alloc(); // TLS version (still very fast)
+    void* mem = ObjectAllocator::instance()->alloc(256); // dynamic-size fast allocator
+    
+    class MyClass : public AllocatedObject<MyClass> {}
+    MyClass* obj = new MyClass(); // get fast and thread-safe allocations with less code
+
+    class SingleThreadedClass : public AllocatedObject<SingleThreadedClass, false> {} // faster but thread-unsafe
+    
+    // override behaviour from thread-unsafe to thread-safe
+    class MultiThreadedClass : public SingleThreadedClass, public AllocatedObject<MultiThreadedClass> {
+        using AllocatedObject<MultiThreadClass>::operator new;
+        using AllocatedObject<MultiThreadClass>::operator delete;
+    }
+    
+    MemoryPool mypool(32);
+    void* mem = mypool.alloc(); // custom pool with maximum speed, but thread-unsafe
+   
+=head1 PERL FUNCTIONS
+
+=head4 hash_merge (\%dest, \%source, [$flags])
+
+Merges hash $source into $dest. Merge is done extremely fast. $source and $dest must be HASHREFS or undefs.
+New keys from source are added to dest. Existing keys(values) are replaced. If a key contains HASHREF both in source and dest,
+they are merged recursively. Otherwise it gets replaced by value from source. Returns resulting hashref (it may or may not be the
+the same ref as $dest, depending on $flags provided).
+
+$flags is a bitmask of these flags:
+
+=over
+
+=item MERGE_ARRAY_CONCAT
+
+By default, if a key contains ARRAYREF both in source and dest, it gets replaced by array from source. If you enable this flag,
+such arrays will be concatenated (like: push @{$dest->{key}}, @{$source->{key}).
+
+=item MERGE_ARRAY_MERGE
+
+If a key contains ARRAYREF both in source and dest, it gets merged. It means that $dest->{key}[0] is merged with $source->{key}[0],
+and so on. Values are merged using following rules: if both are hashrefs or arrayrefs, they are merged recursively, otherwise
+value in dest gets replaced.
+
+=item MERGE_LAZY
+
+If you set this flag, merge process won't override any existing and defined values in dest. Keep in mind that if you also set
+MERGE_ARRAY_MERGE, then the same is in effect while merging array elements.
+
+    my $hash1 = {a => 1, b => undef};
+    my $hash2 = {a => 2, b => 3, c => undef };
+    hash_merge($hash1, $hash2, MERGE_LAZY);
+    # $hash1 is {a => 1, b => 3, c => undef };
+
+=item MERGE_SKIP_UNDEF
+
+If enabled, values from source that are undefs won't replace anything in dest. 
+
+    my $hash1 = {a => 1};
+    my $hash2 = {a => undef, b => undef, c => 2};
+    hash_merge($hash1, $hash2, MERGE_SKIP_UNDEF);
+    # $hash1 is {a => 1, c => 2};
+
+=item MERGE_DELETE_UNDEF
+
+If enabled, values from source that are undefs acts as a 'deleters', i.e. the corresponding values get deleted from dest.
+
+    my $hash1 = {a => 1, b => 2};
+    my $hash2 = {a => undef};
+    hash_merge($hash1, $hash2, MERGE_DELETE_UNDEF);
+    # $hash1 is {b => 2};
+
+=item MERGE_COPY_DEST
+
+Makes deep copy of $dest, merges it with source and returns this new hashref.
+
+=item MERGE_COPY_SOURCE
+
+By default, if any value from source replaces value from dest, it doesn't get deep copied. For example:
+
+    my $hash1 = {};
+    my $hash2 = {a => [1,2]};
+    hash_merge($hash1, $hash2);
+    shift @{$hash1->{a}};
+    say scalar @{$hash2->{a}}; # prints 1
+
+Moreover, even primitive values are not copied, instead they get aliased for speed. For example:
+
+    my $hash1 = {};
+    my $hash2 = {a => 'mystring'};
+    hash_merge($hash1, $hash2);
+    substr($hash1->{a}, 0, 2);
+    say $hash2->{a}; # prints 'string'
+
+If you enable this flag, replacing values from source will be copied (references - deep copied).
+
+=item MERGE_COPY
+
+It is MERGE_COPY_DEST + MERGE_COPY_SOURCE
+
+=back
+
+This is how undefined $source or undefined $dest are handled:
+
+=over
+
+=item If $source is undef
+
+Nothing is merged, however if MERGE_COPY_DEST is set, deep copy of $dest is still returned.
+If $dest is also undef, then regardless of MERGE_COPY_DEST flag, empty hashref is returned.
+
+=item If $dest is undef
+
+Empty hashref is created, merged with $source and returned.
+
+=back
+
+=head4 merge ($dest, $source, [$flags])
+
+Acts much like 'hash_merge', but receives any scalar as $dest and $source, not only hashrefs.
+Returns merged value which may or may not be the same scalar (modified or not) as $dest.
+
+This function does the same work as 'hash_merge' does for its elements. I.e. if both $dest and $source are HASHREFs then they
+are merged via 'hash_merge'. If both are ARRAYREFs, then depending on $flags, $dest are either replaced, concatenated or merged.
+Otherwise $source replaces $dest following the rules described in 'hash_merge' function with respect to flags MERGE_COPY_DEST,
+MERGE_COPY_SOURCE and MERGE_LAZY.
+
+For example, if $source and $dest are scalars (not refs), and no flags provided, then $dest becomes equal $source.
+If MERGE_LAZY is provided and $dest is not an undef, $dest is unchanged.
+If MERGE_COPY_DEST is provided then $dest is unchaged and the result is returned in a new scalar.
+And so on.
+
+However there is one difference: if $dest and $source are primitive scalars, instead of creating an alias, the $source variable
+is copied to $dest (or new result). If MERGE_COPY_SOURCE is disabled, copying is not deep, like $dest = $source.
+
+=head4 lclone ($source)
+
+Light clone: makes a deep copy of $source and returns it.
+
+Does not handle cross-references: references to the same data will be different references.
+If a cycled reference is present in $source, it will croak.
+
+Handles CODEREFs and IOREFs, but doesn't clone it, just copies pointer to the same CODE and IO into new reference. All other
+data types are cloned normally.
+
+If C<clone> encounters a blessed object and it has a C<HOOK_CLONE> method, the return value of this method is used instead of a
+default behaviour. You can call C<[lf]clone($self)> again from C<HOOK_CLONE> if you need to, for example to prevent cloning some of
+your properties:
+
+    sub HOOK_CLONE {
+        my $self = shift;
+        my $tmp = delete local $self->{big_obj_backref};
+        my $ret = lclone($self);
+        $ret->{big_obj_backref} = $tmp;
+        return $ret;
+    }
+
+In this case second C<lclone()> call won't call C<HOOK_CLONE> again and will clone $self in a standart manner.
+
+=head4 fclone ($source)
+
+Full clone: same as C<lclone()> but handles cross-references: references to the same data will be the same references.
+If a cycled reference is present in $source, it will remain cycled in cloned data.
+
+=head4 clone ($source, [$with_cross_checks])
+
+If C<$with_cross_checks> is false or omitted, behaves like C<lclone()>, otherwise like C<fclone()>
+
+=head4 compare ($data1, $data2)
+
+Performs deep comparison and returns true if every element of $data1 is equal to corresponding element of $data2.
+
+The rules of equality for two elements (including the top-level $data1 and $data2 itself):
+
+=over
+
+=item If any of two elements is a reference.
+
+=over
+
+=item If any of elements is a blessed object
+
+If they are not objects of the same class, they're not equal
+
+If class has overloaded '==' operation, it is used for checking equality.
+If not, objects' underlying data structures are compared.
+
+=item If both elements are hash refs.
+
+Equal if all of the key/value pairs are equal.
+
+=item If both elements are array refs.
+
+Equal if corresponding elements are equal (a[0] equal b[0], etc).
+
+=item If both elements are code refs.
+
+Equal if they are references to the same code.
+
+=item If both elements are IOs (IO refs)
+
+Equal if both IOs contain the same fileno.
+
+=item If both elements are typeglobs
+
+Equal if both are references to the same glob.
+
+=item If both elements are refs to anything.
+
+They are dereferenced and checked again from the beginning.
+
+=item Otherwise (one is ref, another is not) they are not equal
+
+=back
+
+=item If both elements are not references
+
+Equal if perl's 'eq' or '==' (depending on data type) returns true.
+
+=back
+
+=head4 crypt_xor ($string, $key)
+
+Performs round-robin XOR $string with $key. Algorithm is symmetric, i.e.:
+
+    crypt_xor(crypt_xor($string, $key), $key) eq $string
+    
+=head4 string_hash ($string)
+
+Calculates 64-bit hash value for $string. Currently uses MurMurHash64A algorithm (very fast).
+
+=head4 string_hash32 ($string)
+
+Calculates 32-bit hash value for $string. Currently uses jenkins_one_at_a_time_hash algorithm.
+
+=head1 C FUNCTIONS
+
+Functions marked with C<[pTHX]> must receive C<aTHX_> as a first arg.
+
+=head4 HV* xs::lib::hash_merge (HV* dest, HV* source, IV flags = 0) [pTHX]
+
+=head4 SV* xs::lib::merge (SV* dest, SV* source, IV flags = 0) [pTHX]
+
+=head4 SV* xs::lib::clone (SV* source, bool cross_references = false) [pTHX]
+
+=head4 bool xs::lib::hv_compare (HV*, HV*) [pTHX]
+
+=head4 bool xs::lib::av_compare (AV*, AV*) [pTHX]
+
+=head4 bool xs::lib::sv_compare (SV*, SV*) [pTHX]
+
+=head4 uint64_t panda::lib::hash64 (const char* str, size_t len)
+
+=head4 uint64_t panda::lib::hash64 (const char* str)
+
+=head4 uint32_t panda::lib::hash32 (const char* str, size_t len)
+
+=head4 uint32_t panda::lib::hash32 (const char* str)
+
+All functions above behaves like its perl equivalents. See PERL FUNCTIONS docs.
+
+=head4 char* panda::lib::crypt_xor (const char* source, size_t slen, const char* key, size_t klen, char* dest = NULL)
+
+Performs XOR crypt. If 'dest' is null, mallocs and returns new buffer. Buffer must be freed by user manually via 'free'. If 'dest'
+is not null, places result into this buffer. It must have enough space to hold the result.
+
+=head4 panda::string xs::lib::sv2string (SV* svstr) [pTHX]
+
+Creates panda::string from SV string.
+
+Panda::Lib installs a typemap for panda::string, so it is okay to receive it in XS function.
+
+    using panda::string;
+    
+    ...
+    
+    void
+    myfunc (string str)
+    PPCODE:
+        printf("string is %s, len is %d", str.data(), str.length());
+        ...
+
+=head4 PXS_TRY({CODE})
+
+Macro that catches c++ exceptions and croaks (throws perl exceptions). Example
+
+    #include <xs/lib.h>
+
+    // somewhere in c++ code
+    PXS_TRY({
+        throw std::logic_error("hello");
+    });
+    
+    // in perl code
+    MyXSModule::function_that_leads_to_the_code_above();
+    
+    // possible output
+    "[std::logic_error] hello" at misc/mytest.plx line 30.
+    
+Output depends on exception type:
+
+=over
+
+=item Everything that inherits from std::exception
+
+[FQN_exception_class_name] exc.what()
+
+=item const char*
+
+string in const char*
+
+=item std::string, panda::string
+
+value.c_str()
+
+=item everything else
+
+unknown c++ exception thrown
+
+=back
+
+=head4 SV* xs::lib::error_sv(const std::exception& err)
+
+Returns perl string '[FQN_exception_class_name] exc.what()'
+
+=head4 panda::lib::h2be16, h2le16, be2h16, le2h16, h2be32, h2le32, be2h32, le2h32, h2be64, h2le64, be2h64, le2h64
+
+Endianess convertation functions. They use C<__builtin_bswap*>, C<_byteswap_*>, etc if possible. Otherwise they use code likely to be
+compiled as a single C<bswap> or C<rol> instruction.
+
+    #include <panda/lib/endian.h>
+    uint64_t network_order = h2be64(host_order);
+
+=head1 C++ CLASSES
+
+=head2 panda::string, panda::wstring, panda::u16_string, panda::u32_string, panda::basic_string
+
+This string is fully compatible with std::string API, however it supports COW (copy-on-write), even on substr-like functions, also supports
+creating from external buffer with destructor and from literal strings without copying or allocating anything,
+and therefore runs MUCH faster and zero-copy while still memory-managing in contrast to string_view.
+This approach is required like air for implementing TRULLY zero-copy parsers and so on.
+
+panda::string is an std::string drop-in replacement which has the same API but is much more flexible and allows for behaviors that in other case
+would lead to a lot of unnecessary allocations/copying.
+
+Most important features are:
+
+=over
+
+=item Copy-On-Write support (COW).
+
+    Not only when assigning the whole string but also when any form of substr() is applied.
+    If any of the COW copies is trying to change, it detaches from the original string, copying the content it needs.
+    
+=item External static(literal) string support
+ 
+    Can be created from external static(literal) data without allocating memory and copying it.
+    String will be allocated and copied when you first try to change it.
+    For example if a function accepts string, you may pass it just a string literal "hello" and nothing is allocated or copied and even the length
+    is counted in compile time.
+
+=item External dynamic string support
+    
+    Can be created from external dynamic(mortal) data without allocating memory and copying it.
+    External data will be deallocated via custom destructor when the last string that references to the external data is lost.
+    As for any other subtype of panda::string copying/substr/etc of such string does not copy anything
+    
+=item SSO support (small string optimization). Up to 23 bytes for 64bit / 11 bytes for 32bit.
+
+    It does not mean that all strings <= MAX_SSO_CHARS are in SSO mode. SSO mode is used only when otherwise panda::string would have to allocate
+    and copy something. For example if you call "otherstr = mystr.substr(offset, len)", then if mystr is not in SSO, otherstr will not use
+    SSO even if len <= MAX_SSO_CHARS, because it prefers to do nothing (COW-mode) instead of copying content to SSO location.
+    
+=item Support for getting r/w internal data buffer to manually fill it
+
+    The content of other strings which shares the data with current string will not be affected.
+    
+=item Reallocate instead of deallocate/allocate when possible, which in many cases is much faster
+ 
+=item Supports auto convertations between basic_strings with different Allocator template parameter without copying and allocating anything.
+
+    For example any basic_string<...> can be assigned to/from string as if they were of the same class.
+
+=item In either case, panda::basic_string will always do the operation in the way it could not be done faster even in custom C plain code for most common cases.
+
+=back
+
+All these features covers almost all generic use cases, including creating zero-copy cascade parsers which in other case would lead to a lot of pain.
+
+c_str() is not supported, because strings are not null-terminated, and even could not theoretically be
+ 
+=head3 SYNOPSIS
+
+    using panda::string;
+
+    string str("abcd"); // "abcd" is not copied, COW mode.
+    str.append("ef"); // str is copied on modification.
+    cout << str; // prints 'abcdef'
+    
+    void free_buf (char* buf, size_t size) { delete [] buf; }
+    char* mystr = new char[13];
+    memcpy(mystr, "hello, world", 13);
+    str.assign(mystr, 13, 13, free_buf); // external string mode with destructor, no allocations/copies
+    string str2 = str.substr(2, 5); // COW - no copy is done even for external strings
+    cout << str2; // 'llo, '
+    str.offset(10); // no move/copy/allocations
+    cout << str; // 'ld'
+    str.insert(1, ' hello '); // 'l hello d', no allocations! because source buffer (despite of that it is external) has space for that
+    
+    str2.erase(2); // no move/copy/allocations still! still points to external buffer
+    cout << str2; // 'll'
+    
+    str = str2; // COW mode
+    cout << str; // 'll'
+    str.append('!'); // detach on modification. no allocations though, because everything < 23 bytes goes to SSO mode
+    cout << str << str2; // 'll!ll'
+    
+    str.clear(); // nothing deallocated
+    str2.clear(); // last reference lost, free_buf() called
+    
+panda::string can be used in ostream's << operator.
+
+=head3 METHODS
+
+No docs sorry. See <panda/basic_string.h>
+
+=head2 panda::lib::MemoryPool
+
+Base object for fast memory allocations of particular size (commonly used for small objects allocation).
+This class is thread-unsafe, you can only allocate memory using this object from single thread at one time.
+It is about from 10x to 40x times faster than new+delete.
+
+=head3 METHODS
+
+=head4 MemoryPool (size_t blocksize)
+
+Creates object which allocates blocks of size C<blocksize>. There is no memory overheat, because it doesn't store any additional
+data before/after a memory block. However if you pass C<blocksize> less than 8 bytes, it will still allocate blocks large enough
+to hold 8 bytes.
+
+=head4 void* alloc ()
+
+Allocates new block. Can throw std::bad_alloc if no memory.
+
+=head4 void dealloc (void* ptr)
+
+Returns C<ptr> back to pool. If C<ptr> is a pointer that this object never allocated, the behaviour is undefined.
+
+=head4 ~MemoryPool
+
+Frees internal storage and returns memory to system. All pointers ever allocated by this object become invalid.
+
+=head2 template <int BLOCKSIZE> panda::lib::StaticMemoryPool
+
+This class provides access to singleton memory pool objects for particular block size. It is recommended to use memory pools
+via this interface to reduce memory consumption and fragmentation.
+
+=head3 METHODS
+
+=head4 static MemoryPool* instance ()
+
+Returns MemoryPool object for C<BLOCKSIZE> which is global to the whole process. This object is not thread-safe.
+
+=head4 static MemoryPool* tls_instance ()
+
+Returns MemoryPool object for C<BLOCKSIZE> which is global to the current thread. This object is not thread-safe.
+
+=head2 panda::lib::ObjectAllocator
+
+Sometimes you don't know the size of a block at compile time and therefore can't use StaticMemoryPool. From the other hand, creating
+MemoryPool objects for particular size every time is expensive. This class provides interface for allocating memory block of an
+arbitrary size. It holds a colletion of MemoryPool objects of various size which are created on-demand.
+
+=head3 METHODS
+
+=head4 ObjectAllocator ()
+
+Creates allocator object. However i would recommend using singleton interface via instance/tls_instance, see below.
+
+=head4 void* alloc (size_t size)
+
+Allocates block C<size> bytes long. If you pass C<size> less than 8 bytes, it will still allocate 8 bytes.
+
+=head4 void dealloc (void* ptr, size_t size)
+
+Returns C<ptr> back to pool. C<size> is required because MemoryPool doesn't store block sizes before/after blocks to avoid memory
+overheat. If you pass wrong size, or a pointer that was never allocated via this object, the behaviour is undefined.
+
+=head4 ~ObjectAllocator ()
+
+Frees internal storage of all pools and returns memory to system. All pointers ever allocated by this object become invalid.
+
+=head4 static ObjectAllocator* instance ()
+
+Returns ObjectAllocator object which is global to the whole process. This object is not thread-safe.
+
+=head4 static ObjectAllocator* tls_instance ()
+
+Returns ObjectAllocator object which is global to the current thread. This object is not thread-safe.
+
+=head2 template <class TARGET, bool THREAD_SAFE = true> panda::lib::AllocatedObject
+
+This class is a helper base class. If you inherit from it, objects of your class will be allocated via memory pools instead of
+using default new/delete operators.
+
+Normally, you would need to write this code in order to allocate your objects via MemoryPool:
+
+    class MyClass {
+        static void* operator new (size_t size) {
+            if (size == sizeof(MyClass)) return StaticMemoryPool<sizeof(MyClass)>::tls_instance()->alloc();
+            return ObjectAllocator::tls_instance()->alloc(size);
+        }
+        static void operator delete (void* p, size_t size) {
+            if (size == sizeof(MyClass)) StaticMemoryPool<sizeof(MyClass)>::tls_instance()->dealloc(p);
+            else ObjectAllocator::tls_instance()->dealloc(p, size);
+        }
+        ...
+    };
+    
+Size check (if/else) is needed to support inheritance, because in that case, size won't match sizeof(MyClass).
+Mostly, programmers use default operator ::new/::delete in case when sizes don't match, however ObjectAllocator can handle
+dynamic sizes and is much faster than default operators, so even in this case we save time.
+
+To avoid writing this code every time, just inherit from AllocatedObject passing your class name as a template parameter.
+You can pass C<false> as a second param to template if you don't need thread-safe allocations to achieve even more perfomance.
+
+    class MyClass : public AllocatedObject<MyClass> { ... }
+
+=head3 TIP
+
+    class MyChild : public MyClass { ... }
+    
+In this case we will still using memory pool, however via dynamic ObjectAllocator which is slightly slower.
+To restore original perfomance redefine new/delete operators again passing your child class name. We will also need to resolve
+multiple inheritance conflicts via C<using> operator.
+
+    class MyChild : public MyClass, public AllocatedObject<MyChild> {
+        using AllocatedObject<MyChild>::operator new;
+        using AllocatedObject<MyChild>::operator delete;
+        ...
+    }
+
+This code will allocate MyChild objects via static memory pool.
+
+=head1 TYPEMAPS
+
+=head4 panda::string
+
+=head4 std::string
+
+=head4 string
+
+typemap for panda::string or std::string or anything else you see as 'string' in your local scope. Such a class must have
+std::string-compatible API.
+
+=head1 AUTHOR
+
+Pronin Oleg <syber@crazypanda.ru>, Crazy Panda, CP Decision LTD
+
+=head1 LICENSE
+
+You may distribute this code under the same terms as Perl itself.
+
+=cut

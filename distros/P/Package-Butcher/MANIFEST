@@ -1,0 +1,14 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/Package/Butcher.pm
+lib/Package/Butcher/Inflator.pm
+t/00-load.t
+t/butcher.t
+t/lib/Dummy.pm
+t/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+Makefile.PL
+META.yml

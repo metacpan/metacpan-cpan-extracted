@@ -1,0 +1,248 @@
+Revision history for Perl extension POD2::ES
+
+5.24.0.5 January 1, 2017
+
+       * Fixed encoding names in perlopentut.pod 
+
+5.24.0.4 December 18, 2016
+
+        * Removed a tab before =head1 NAME in perlopentut
+
+5.24.0.3 December 18, 2016
+
+         * Added three revised documents (perhist, perlcheat, perlopentut) 
+           and two non-revised documents (perllol, perlreftut)
+
+         * Some fixes in the description of the previous release
+
+
+5.24.0.2 December 4, 2016
+
+         * Included 3 non-revised documents: perlfunc, perlop, perlopentut
+           as the prelude of a phased release of non-revised docs along with 
+           the revised documentation
+
+         * Added a warning message to non-revised files
+
+         * Reverted translation of NAME (the section): Doc descriptions were 
+           not shown in the documentation listing at metacpan/cpan because 
+           the NAME section in the documents was not found. As an interim 
+           solution, reverted NOMBRE to NAME in all files 
+
+         * Updated ES.pm and translated all the section names (except NAME)
+
+5.24.0.1 October 21, 2016
+
+          * Updated the latest release to v5.24.0
+
+5.22.0.03 September 27, 2016
+
+          * MANIFEST: Removed the names of two files not included in 
+            the distribution
+          * ES.pm: Commented out perlgit and perlre in pod_info
+
+5.22.0.02 May 9, 2016
+
+           * Changes in Makefile.PL
+                - Added use utf8
+                - Updated the github repository address
+           * Changes in ES.pm
+                - Changed the layer of the open pragma from locale to utf8
+                - Reverted the translation of section headings to check a 
+                  couple of issues
+
+5.22.0.01  May 7, 2016
+
+           * Updated most of the files in our latest release to v5.22.0
+             Pending files: perlcheat, perlclib, perldata, perlexperiment, 
+                            perlglossary, perlhist
+           * Changes in ES.pm:
+                - Updated copyright notice
+                - Added a reference to the Russian doc project POD2::RU
+                - Added a reference to our new github project repository
+                - Updated pod versions
+
+5.16.2.02  January 1, 2013
+
+           * Added the translation of perlre.pod and perlgit.pod
+           * Fixed typo in ES.pm
+           * Updated copyright year in ES.pm
+
+5.16.2.01  November 15, 2012
+
+           * Updated to 5.16.2
+           * Added the translation of perlglossary.pod and perlcheat.pod
+           * Changed the translation of 'closure'
+           * Fixed inconsistent translations of 'built-in'
+
+5.16.1.03  September 9, 2012
+
+           * Fixed bug in ES.pm (removed use 5.010 and forgot to
+             change defined-or operator)
+
+5.16.1.02  September 7, 2012
+
+           * Fixed POD formatting issues in perlhacktut.pod and
+             perlnumber.pod
+
+5.16.1.01  September 6, 2012
+
+           * Updated to 5.16.1
+           * Changed the encoding of all ES docs to UTF-8
+           * Implemented code and doc changes in ES.pm
+           * Added the translation of perlmod.pod, perlmodinstall.pod,
+             perlclib.pod, and perlhacktut.pod
+
+5.16.0.07  August 4, 2012
+
+           * Fixed a few things in perhist.pod
+
+5.16.0.06  August 2, 2012
+
+           * Added the translation of perlnewmod.pod, perlobj.pod, 
+             perlmroapi.pod, and perhist.pod
+           * Fixed bugs (mainly formatting) in several files 
+           * Restored '=encoding utf8' command in a few files 
+
+5.16.0.05  July 23, 2012
+
+           * Fixed a few bugs in perldata.pod, perlfaq1.pod, 
+             and perlfaq2.pod
+
+5.16.0.04  July 01, 2012
+
+           * Added the translation of perldata.pod
+           * Minor changes in perlintro.pod and perlootut.pod
+
+5.16.0.03  June 28, 2012
+
+           * Added the translation of perlootut.pod
+           * Several code and doc changes in ES.pm
+           * Added a test to 00base.t to check that the module works
+
+5.16.0.02  June 15, 2012
+
+           * Removed '=encoding utf8' command from perlboot.pod, 
+             perlbot.pod, perltooc.pod, and perltoot.pod
+
+5.16.0.01  June 14, 2012
+
+           * Updated translated files to v5.16.0
+           * Excluded perlcheat.pod (until v5.16.1)
+           * Added the translation of perlexperiment.pod
+           * Added the translation of stubs for removed files
+             (perlbot.pod, perlboot.pod, perltodo.pod, 
+             perltooc.pod, perltoot.pod)
+           * Fixed several bugs in a few pods
+
+5.14.2.08  May 11, 2012
+
+           * Fixed some formatting issues in perlunifaq.pod
+
+5.14.2.07  May 04, 2012
+
+           * Added the translation of perlunifaq.pod
+
+5.14.2.06  April 14, 2012
+
+           * Added the translation of perlcommunity.pod
+           * Added the names and e-mail addresses of 2 new collaborators to ES.pm
+           * Updated copyright info
+
+5.14.2.05  October 30, 2011
+
+           * Fixed typo and made other changes in perlpragma.pod
+
+5.14.2.04  October 29, 2011
+
+           * Added the translation of perlpragma.pod
+           * Minor changes in perlfaq1.pod and perlutil.pod
+           * Pod fix in perlstyle.pod
+
+5.14.2.03  October 22, 2011
+
+           * Added the translation of perlstyle.pod
+           * Minor changes in perldbmfilter.pod
+
+5.14.2.02  October 7, 2011
+
+           * Added the translation of perldoc.pod
+
+5.14.2.01  October 6, 2011
+
+           * Updated to Perl v5.14.2
+           * Added the translation of perldbmfilter.pod
+          
+5.14.1.06  August 21, 2011
+
+           * Added the translation of perlsource.pod and README.hurd
+           * Minor formatting changes
+           * Changed the translation of the following terms:
+             - hubris      -> soberbia
+             - test        -> prueba
+             - Perl core   -> núcleo de Perl
+
+5.14.1.05  July 31, 2011
+
+           * Removed use utf8; from Makefile.PL
+
+5.14.1.04  July 19, 2011
+
+           * Added the translation of perlfaq2.pod
+           * Changed the ABSTRACT_FROM section to ABSTRACT in Makefile.PL
+           * Fixed formatting issues in perlcheat.pod and perlnumber.pod
+
+5.14.1.03  July 18, 2011
+
+           * Added the translation of perlcheat.pod
+           * Fixed issue in META.yml
+           * Fixed formatting issue in perlnumber.pod
+
+5.14.1.02  July 17, 2011
+
+           * Added the translation of perlnumber.pod
+
+5.14.1.01  July 16, 2011
+
+           * Updated to Perl v5.14.1
+           * Added the translation of perlutil.pod
+           * Several terminology changes
+             - thread   -> hilo de ejecución
+             - sigil    -> sigilo
+             - built-in -> predefinido (for some contexts; otherwise, "integrado")
+
+5.12.3.07  April 6, 2011
+
+           * Added POD formatting to the Translators sections of README.openbsd
+             and README.freebsd
+
+5.12.3.06  April 6, 2011
+
+           * Added the translation of README.openbsd and README.freebsd
+
+5.12.3.05  April 4, 2011
+
+           * Added perlfaq1.pod to the MANIFEST...
+
+5.12.3.04  April 4, 2011
+
+           * Added the translation of perlfaq1.pod
+           * Added roles to the Translators section
+           * Fixed several bugs in doc (double-spaces, etc.)
+
+5.12.3.03  March 7, 2011
+
+           * Technical revision of ES.pm
+           * Changed formatting to 80 col and fixed some formatting issues
+           * Changed translation of "Support" from "Asistencia" to "Soporte"
+           * Tentative cloaking of e-mail addresses
+
+5.12.3.02  February 14, 2011
+
+           * Added translations of perl.pod, perlbook.pod, perlunitut.pod
+           * Changed access mode of Makefile.PL from +x to -x 
+
+5.12.3.01  February 4, 2011
+
+           * First version, including perlintro.pod
+

@@ -1,0 +1,179 @@
+#!/usr/bin/perl
+#PODNAME: winibw2pica
+#ABSTRACT: convert WinIBW PICA+ download to valid PICA+
+
+use strict;
+use warnings;
+
+use PICA::Parser qw(parsedata);
+use PICA::Field qw(parse_pp_tag);
+use Getopt::Long;
+use Encode;
+use Pod::Usage;
+
+my ($outfile, $pretty, $xml, $help, $man, $utf8, $version, $addppn);
+
+GetOptions(
+    "output:s" => \$outfile,
+    "utf8" => \$utf8,
+    "prettyxml" => \$pretty,
+    "help|?" => \$help,
+    "man" => \$man,
+    "ppn" => \$addppn,
+    "version" => \$version,
+    "xml" => \$xml
+) or pod2usage(2);
+pod2usage(-verbose => 2) if $man;
+print "winibw2pica version $VERSION\n" and pod2usage(1) if $version;
+pod2usage(1) if $help or @ARGV == 0;
+
+$outfile = "-" unless defined $outfile;
+my @p = ($outfile ne "-" ? $outfile : \*STDOUT);
+$xml = 1 if $pretty;
+push @p, ('format' => 'XML') if $xml;
+my $writer = PICA::Writer->new( @p, pretty => $pretty );
+
+my $FILE;
+my @buffer;
+my $setppn; # z.B. "077405625" in "SET: S2 [1] TTL: 1 PPN: 077405625 SEITE1"
+
+sub nextline {
+    return @buffer ? shift @buffer : readline($FILE);
+}
+sub lookahead {
+    push @buffer, readline($FILE) unless @buffer > 0;
+    return $buffer[0];
+}
+
+sub handle_record {
+    my $record = shift;
+    return if $record->empty;
+
+    if (not $record->ppn && $addppn && defined $setppn) {
+        $record->ppn( $setppn );
+    }
+
+    $record->sort;
+    $writer->write( $record );
+}
+
+foreach my $infile (@ARGV) {
+    open $FILE, $infile or die("Failed to open file $infile");
+    parsedata( \&winibw2pica, Record => \&handle_record );
+    close $FILE;
+}
+
+$writer->end;
+
+sub winibw2pica {
+    my $line = nextline();
+    return unless defined $line;
+  
+    if ( $line =~ /\x83/ ) {
+        $line =~ s/\x83/\x1F/g;
+    } elsif ( $line =~ /\xC6\x92/ ) {
+        $line =~ s/\xC6\x92/\x1F/g;
+    }
+
+    if ( $line !~ /^SET/ ) {
+        my $next = lookahead();    
+        while ( defined $next and not $next =~ /^\s*$/ and not
+                 $next =~ /^\[\d+\s*\].+$/ and not
+                ( $next =~  /^(....(\/..)?) / && parse_pp_tag($1) )
+              ) {
+            chomp($line);
+            $line .= nextline();
+            $next = lookahead();
+        }
+    }
+
+    if (defined $line and $line =~ /^SET/) {
+        $setppn = ($line =~ /PPN:\s*([0-9xX]+)/) ? $1 : undef; 
+        $line = nextline();
+    }
+    return unless defined $line;
+
+    # fake level 1
+    if ( $line =~ /^\[(\d+)\s*\]\s*(.+)$/ ) { # /^\[(\d+)\s*\]([^<]+)(<.*>)?/ 
+        return "101\@ \x1Fd$2\xA0";
+    }
+
+    # convert charset
+    if ( $utf8 ) {
+        $line = join("\x1F", map {Encode::decode_utf8($_);} split("\x1F", $line));
+    }
+
+    return $line;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+winibw2pica - convert WinIBW PICA+ download to valid PICA+
+
+=head1 VERSION
+
+version 0.585
+
+=head1 SYNOPSIS
+
+winibw2pica [options] inputfile(s)
+
+=head1 DESCRIPTION
+
+This script can be used to convert "PICA+" download files from WinIBW3 
+software to valid PICA+. You can download so called PICA+ from WinIBW with 
+the WinIBW command C<DOWNLOAD> (or just C<DOW>). The calling syntax is:
+
+  DOW <n1>[-<n2> ] P[<n3>]
+
+Where C<n1> ist the first and C<n2> is the last record number that you want to
+download from the current result list (staring with 1) and C<n3> is either a
+library number or C<A> for all libraries. If you omit C<n3> then only level 0
+will be downloaded. Unfortunately the resulting download format is not valid
+PICA+ nor valid UTF-8 but it includes some additional lines, linebreaks, control
+characters and other nasty stuff. This script tries to clean the WinIBW output
+and returns PICA+ on success.
+
+If this script failed to convert some data, please first make sure to install 
+the latest version of L<PICA::Record>. If there is still an error afterwards,
+send me a detailed bug report with the version number of this script, the
+downloaded data, your WinIBW version number and a B<detailed list> of which
+WinIBW commands you performed to produce the download.
+
+More information about WinIBW3 can be found in the WinIBW3 manual in German at
+L<http://www.gbv.de/wikis/cls/WinIBW3>.
+
+=head1 OPTIONS
+
+ -help          brief help message
+ -man           full documentation with examples
+ -output FILE   write PICA+ records to a given file (default: '-' for STDOUT)
+ -xml           print records in PICA/XML
+ -prettyxml     pretty print records in PICA/XML
+ -ppn           add a PPN from the 'SET...' line if no PPN is in the record
+ -utf8          read input field values as UTF-8
+ -version       show version information
+
+=head1 EXAMPLES
+
+winib2wpica -prettyxml mydownload.txt
+winib2wpica -utf8 -out mydownload.pica mydownload.txt
+
+=head1 AUTHOR
+
+Jakob Voß <voss@gbv.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Verbundzentrale Goettingen (VZG) and Jakob Voss.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,21 @@
+---
+abstract: 'Talks to Proliphix network thermostats'
+author:
+  - 'John Lifsey, <nebulous@crashed.net>'
+build_requires:
+  Test::More: 0.42
+distribution_type: module
+generated_by: 'Module::Install version 0.71'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Proliphix
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  LWP::UserAgent: 0
+  Moose: 0
+version: 0.01

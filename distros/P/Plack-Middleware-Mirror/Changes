@@ -1,0 +1,33 @@
+Revision history for Plack-Middleware-Mirror
+
+0.401     2011-07-15T00:03:28Z
+
+  - Update metadata
+
+0.400     2011-07-12T15:15:18Z
+
+  - Only mirror if status code is 200
+    (or anything else in 'status_codes' attribute).
+
+  - Add more/clearer debug statements
+  - Improve test scripts for smoke environments
+
+0.300     2011-07-05T23:34:43Z
+
+  - Set file mtime to reflect Last-Modified time of downloaded file
+  - Do dirname() manually to remove Path::Class dependency
+    (minimal usage didn't warrant it)
+
+0.200     2011-07-02T22:26:10Z
+
+  - make 'path' option consistent with Plack::Middleware::Static
+  - use Path::Class to translate PATH_INFO to on-disk file name
+  - use legacy interface to File::Path for older installs
+
+  - Document specific example of building a simple mirror site
+    with Plack::Middleware::Static and Plack::App::Proxy
+  - Add tests
+
+0.100     2011-07-01T01:51:01Z
+
+  - Initial release

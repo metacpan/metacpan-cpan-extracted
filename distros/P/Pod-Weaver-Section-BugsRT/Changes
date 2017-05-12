@@ -1,0 +1,10 @@
+Revision history for Pod::Weaver::Section::BugsRT
+
+0.52  2010-03-31
+    - fix compile test
+
+0.51  2010-03-30
+    - clarify ABSTRACT
+
+0.50  2010-03-30
+    - initial release

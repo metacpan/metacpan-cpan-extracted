@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+
+use 5.010;
+use strict;
+use utf8;
+use warnings;
+
+use Lingua::FR::Nums2Words ();
+use Perinci::CmdLine::Classic;
+
+our %SPEC;
+
+$SPEC{num2word_fr} = {
+    v => 1.1,
+    summary => 'Convert numbers to French words',
+    "summary.alt.lang.fr_FR" => "Convertir des nombres en mots français",
+    examples => [
+        {
+            argv => [101],
+            result => 'cent un',
+        },
+        {
+            args => {num=>-1.1},
+            result => 'moins un',
+            summary => 'Fractions are currently not supported',
+            "summary.alt.lang.fr_FR" => "Des fractions sont pas encore pris en charge",
+        },
+    ],
+    args => {
+        num => {
+            schema => 'num*',
+            req => 1,
+            pos => 0,
+            summary => 'Fractions are currently not supported',
+            "summary.alt.lang.fr_FR" => "Des fractions sont pas encore pris en charge",
+        },
+    },
+};
+sub num2word_fr {
+    my %args = @_;
+
+    # for error message, Sah already has translation
+    # return [400, "Please specify num"] unless defined($args{num});
+
+    [200, "OK", Lingua::FR::Nums2Words::num2word($args{num})];
+}
+
+Perinci::CmdLine::Classic->new(url=>'/main/num2word_fr')->run;

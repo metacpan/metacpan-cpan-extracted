@@ -1,0 +1,8 @@
+mount qemu image
+----------------
+
+wget http://qemu.dad-answers.com/download/qemu/utilities/QEMU-HD-Mounter/qemu-hd-mounter.tar.gz
+
+example:
+./lomount -diskimage /data4/qemu/debian-sarge-work/debian-sarge.img -partition 1 /mnt
+

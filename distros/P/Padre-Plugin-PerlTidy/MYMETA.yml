@@ -1,0 +1,32 @@
+---
+abstract: 'Format perl files using Perl::Tidy'
+author:
+  - 'Brian Cassidy <bricas@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.62
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.62
+dynamic_config: 0
+generated_by: 'Module::Install version 1.04, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Padre-Plugin-PerlTidy
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Padre::Plugin: 0.92
+  Params::Util: 1.04
+  Perl::Tidy: 20101217
+  perl: 5.008002
+resources:
+  bugtracker: http://padre.perlide.org/
+  homepage: http://padre.perlide.org/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-PerlTidy
+version: 0.21

@@ -1,0 +1,7 @@
+0.12 - Wed Jun 10 03:19:10 2009
+	* Initial release of my own version of ppi_version. Mostly
+	the same thing, but with output that pleases me.
+
+0.14 - Tue Dec 17 12:02:52 2013
+	* Handle `our $VERSION`
+

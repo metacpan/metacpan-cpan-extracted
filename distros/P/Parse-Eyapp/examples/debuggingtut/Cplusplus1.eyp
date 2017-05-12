@@ -1,0 +1,137 @@
+%{
+our $VERSION = '0.01';
+%}
+
+%strict
+
+%token INT = /(int\b)/
+%token ID  = /([a-zA-Z_]\w*)/
+%token NUM = /(\d+)/
+
+%right '='
+%left '+'
+
+%tree bypass
+
+%expect 0 1  # 0 shift-reduce conflicts, 1 reduce-reduce conflict
+
+%conflict decORexp 
+      {
+        if (m{\G
+                (?= 
+                    [)\s]* # ) ) ... )
+                    [;=]   
+                )
+             }gxc) {
+          $self->YYSetReduce(')', 'ID:DEC' );
+        }
+        else {
+          $self->YYSetReduce(')', 'ID:EXP' ); 
+        }
+      }
+
+%%
+prog:
+    %name EMPTY
+    /* empty */
+  | %name PROG
+    prog stmt
+;
+
+stmt: 
+    %name EXP
+    expr ';' 
+  | %name DECL
+    decl    
+;
+
+expr:
+    %name ID:EXP
+    ID                            %PREC decORexp 
+  | %name NUM 
+    NUM
+  | %name TYPECAST
+    INT '(' expr ')' /* typecast */ 
+  | %name PLUS
+    expr '+' expr
+  | %name ASSIGN
+    expr '=' expr
+;
+
+decl:
+    %name DECLARATOR
+    INT declarator ';'
+  | %name DECLARATORINIT
+    INT declarator '=' expr ';'
+;
+
+declarator:
+    %name ID:DEC
+    ID                            %PREC decORexp 
+  | '(' declarator ')'
+;
+
+%%
+
+
+####################################################
+
+=head1 SYNOPSIS
+
+Compile it with
+ 
+   eyapp -C Cplusplus1
+
+Run it with:
+
+   ./Cplusplus1.pm -t -i -c ' int (x) + 2; int (x) = 2;'
+
+the result will be the generated abstract sytax tree
+
+=head1  C++ Ambiguities
+
+This grammar models a problematic part of the C++ grammar—the ambiguity between certain
+declarations and statements. For example,
+
+     int (x) = y+z;
+
+parses as either an expr or a stmt.
+
+
+Eyapp detects this as a reduce/reduce conflict:
+
+  State 17 contains 1 reduce/reduce conflict
+
+  State 17:
+
+	expr -> ID .	(Rule 5)
+	declarator -> ID .	(Rule 11)
+
+	')'	[reduce using rule 11 (declarator)]
+	$default	reduce using rule 5 (expr)
+
+The C++ rule is: take it as a declaration if it looks as a declaration,
+otherwise is an expression.
+
+This Eyapp parser solves the problem by dynamically changing the parser.
+
+=head1 SEE ALSO
+
+=over 2
+
+=item * The file C<Cplusplus2.eyp> in C<examples/debuggintut>
+
+=item * L<http://www.gnu.org/software/bison/manual/html_mono/bison.html#GLR-Parsers>
+
+=item * L<http://en.wikipedia.org/wiki/Significantly_Prettier_and_Easier_C%2B%2B_Syntax>
+
+=item * L<http://www.csse.monash.edu.au/~damian/papers/PS/ModestProposal.ps> 
+
+=item * L<http://www.nobugs.org/developer/parsingcpp/>
+
+=item * Edward Willink's "Meta-Compilation for C++" PhD thesis at L<http://www.computing.surrey.ac.uk/Research/CSRG/fog/FogThesis.pdf>
+
+=back
+
+=cut
+

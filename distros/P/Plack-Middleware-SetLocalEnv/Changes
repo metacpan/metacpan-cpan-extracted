@@ -1,0 +1,9 @@
+Revision history for Perl extension Plack-Middleware-SetLocalEnv
+
+0.02 2016-07-01T04:29:23Z
+    - Set to %ENV only if exists in $env.
+
+0.01 2016-07-01T03:51:27Z
+
+    - original version
+

@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+use KDE;
+import KDE::app;
+
+package DemoWidget;
+use KDE;
+import KDE::app;
+
+@ISA = qw(Qt::Widget);
+
+sub new {
+    my $self = shift->SUPER::new(@_);
+    my $menu = $self->{menu} = new KDE::PopupMenu("Popup Menu:");
+    $menu->insertItem("Item1");
+    $menu->insertItem("Item2");
+    $menu->insertSeparator();
+    $menu->insertItem("Quit", $app, 'quit()');
+
+    return $self;
+}
+
+sub mousePressEvent { shift->{menu}->popup(Qt::Cursor::pos()) }
+sub paintEvent { shift->drawText(32, 32, "Press a Mouse Button!") }
+
+package main;
+
+$w = new DemoWidget;
+$app->setMainWidget($w);
+Qt::Application::setFont(new Qt::Font("helvetica", 12, Qt::Font::Bold), 1);
+$w->show;
+exit $app->exec;

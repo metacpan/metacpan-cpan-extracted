@@ -1,0 +1,56 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Plack-Middleware-GepokX-ModSSL/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "base 0"^^doap-deps:CpanId ], [ doap-deps:on "Crypt::X509 0"^^doap-deps:CpanId ], [ doap-deps:on "DateTime 0"^^doap-deps:CpanId ], [ doap-deps:on "Gepok 0.20"^^doap-deps:CpanId ], [ doap-deps:on "MIME::Base64 0"^^doap-deps:CpanId ], [ doap-deps:on "Net::SSLeay 0"^^doap-deps:CpanId ], [ doap-deps:on "Plack 0"^^doap-deps:CpanId ], [ doap-deps:on "strict 0"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ], [ doap-deps:on "Net::SSL"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Plack-Middleware-GepokX-ModSSL>;
+	doap:created         "2012-05-04"^^xsd:date;
+	doap:download-page   <https://metacpan.org/release/Plack-Middleware-GepokX-ModSSL>;
+	doap:homepage        <https://metacpan.org/release/Plack-Middleware-GepokX-ModSSL>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      [
+		a foaf:Person;
+		foaf:mbox <mailto:tobyink@cpan.org>;
+		foaf:name "Toby Inkster";
+	];
+	doap:name            "Plack-Middleware-GepokX-ModSSL";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Plack-Middleware-GepokX-ModSSL/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Plack-Middleware-GepokX-ModSSL/v_0-002>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-plack-middleware-gepokx-modssl>;
+	];
+	doap:shortdesc       "roughly compatible with Plack::Middleware::Apache2::ModSSL".
+
+<http://purl.org/NET/cpan-uri/dist/Plack-Middleware-GepokX-ModSSL/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:issued            "2012-05-23"^^xsd:date;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Plack-Middleware-GepokX-ModSSL-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Plack-Middleware-GepokX-ModSSL/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Plack-Middleware-GepokX-ModSSL-0.002"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Plack-Middleware-GepokX-ModSSL-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+

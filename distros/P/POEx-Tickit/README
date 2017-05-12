@@ -1,0 +1,27 @@
+NAME
+
+    POEx::Tickit - use Tickit with POE
+
+SYNOPSIS
+
+     use POE;
+     use POEx::Tickit;
+    
+     my $tickit = POEx::Tickit->new;
+    
+     # Create some widgets
+     # ...
+     
+     $tickit->set_root_widget( $rootwidget );
+    
+     $tickit->run;
+
+DESCRIPTION
+
+    This class allows a Tickit user interface to run alongside other
+    POE-driven code, using POE as a source of IO events.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

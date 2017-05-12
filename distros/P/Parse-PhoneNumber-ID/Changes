@@ -1,0 +1,90 @@
+Revision history for Parse-PhoneNumber-ID
+
+0.15    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.14    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.13    2015-01-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- Avoid using Data::Clone, to avoid depending on non-core XS module
+	  and stay fatpack-friendly.
+
+
+0.12    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.11    2014-10-16 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add cli script.
+
+
+0.10    2014-02-21 (SHARYANTO)
+
+        - Update data: mobile8 is renamed to smartfren since Apr 2011.
+
+
+0.09    2013-11-01 (SHARYANTO)
+
+        - Update data: 70- & 710-716 is flexi, but 717-719, 72-79 is telkom land
+          (there are lots of other 2-3 digit prefixes, haven't updated this)
+
+
+0.08    2013-05-10 (SHARYANTO)
+
+        - Update data: add gsm prefixes 0822, 0823, 0883-0886; add fwa prefixes
+          81, 82, 84, 85, 86, 88, 90, 94-97.
+
+
+0.07    2012-12-06 (SHARYANTO)
+
+        - No functional changes. Update schema in Rinci metadata.
+
+
+0.06    2012-01-31 (SHARYANTO)
+
+        - Add prefix for esia (89).
+
+
+0.05    2011-03-17 (SHARYANTO)
+
+        - Replace Clone::Any with Data::Clone.
+
+
+0.04    2011-03-15 (SHARYANTO)
+
+        - Declare requirement Test::More 0.96.
+
+
+0.03    2011-03-15 (SHARYANTO)
+
+        - Add missing requirement to 'Log::Any'.
+
+
+0.02    2011-03-11 (SHARYANTO)
+
+        - First public release.
+
+
+0.01    2011-03-09 (SHARYANTO)
+
+        - First private release.

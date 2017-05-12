@@ -1,0 +1,61 @@
+NAME
+    P5U::Command::Changes - p5u extension to view change logs
+
+SYNOPSIS
+    Show changes to Test-Fatal distribution
+
+            $ p5u changes Test-Fatal
+
+    Show changes to whatever distribution provides the Test::Fatal module
+
+            $ p5u changes Test::Fatal
+
+    Show changes for Test-Fatal 0.002
+
+            $ p5u changes Test-Fatal 0.002
+
+    Show changes between Test-Fatal 0.002 and 0.004 (inclusive)
+
+            $ p5u changes Test-Fatal 0.002..0.004
+
+    Show changes between Test-Fatal 0.002 and currently installed version
+    (only works for modules, not distributions).
+
+            $ p5u changes Test::Fatal 0.002..c
+
+    Show changes during the year 2011
+
+            $ p5u changes Test-Fatal 2011-01-01..2011-12-31
+
+    Show the "Changes" file from Test-Fatal with no further processing
+
+            $ p5u changes --verbatim Test-Fatal
+
+DESCRIPTION
+    Except when the "--verbatim" flag is used, this command relies on change
+    logs conforming to the CPAN::Changes::Spec. Changes files that deviate
+    from the specification may misbehave.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=P5U-Command-Changes>.
+
+SEE ALSO
+    P5U, CPAN::Changes::Spec.
+
+    <http://changes.cpanhq.org/>.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012-2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

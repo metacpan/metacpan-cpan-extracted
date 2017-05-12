@@ -1,0 +1,39 @@
+ROOT 
+{
+   CODE    
+   {
+      Not in pod.
+
+      Still not in pod.
+
+   }
+   COMMAND pod 
+   {
+   }
+   ORDINARY 
+   {
+      TEXT In pod.
+
+
+   }
+   COMMAND cut 
+   {
+   }
+   CODE    
+   {
+      Not in pod.
+
+   }
+   COMMAND head1 
+   {
+      TEXT POD
+
+
+   }
+   ORDINARY 
+   {
+      TEXT More in pod.
+
+
+   }
+}

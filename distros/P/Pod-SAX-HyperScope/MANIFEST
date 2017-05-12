@@ -1,0 +1,7 @@
+bin/pod2hs
+lib/Pod/SAX/HyperScope.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+META.yml                                 Module meta-data (added by MakeMaker)

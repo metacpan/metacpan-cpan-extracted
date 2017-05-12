@@ -1,0 +1,18 @@
+=begin filter perl -nnn
+
+    # now in verbatim
+    $A++;
+
+=end filter
+__RESULT__
++perl
+<html><body bgcolor="#ffffff">
+<pre>       1 <span class="c"># now in verbatim</span>
+       2 <span class="i">$A</span>++<span class="sc">;</span></pre>
+</body></html>
+__RESULT__
+-perl
+<html><body bgcolor="#ffffff">
+<pre>    # now in verbatim
+    $A++;</pre>
+</body></html>

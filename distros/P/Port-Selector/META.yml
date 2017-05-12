@@ -1,0 +1,43 @@
+---
+abstract: 'pick some unused port'
+author:
+  - 'Jan Seidl <seidl@avast.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Port-Selector
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Port::Selector:
+    file: lib/Port/Selector.pm
+    version: v0.1.6
+requires:
+  Class::Tiny: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/JaSei/Port-Selector/issues
+  homepage: https://github.com/JaSei/Port-Selector
+  repository: git://github.com/JaSei/Port-Selector.git
+version: 0.1.6
+x_authority: cpan:JASEI
+x_contributors:
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'perlancar (@netbook-zenbook-ux305) <perlancar@gmail.com>'
+  - 'Jan Seidl <janseidl@volny.cz>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

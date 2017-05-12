@@ -1,0 +1,148 @@
+version: 0.4
+date: Sun Dec 31
+changes:
+- readded compile tests
+---
+version: 0.33
+date: Sun Dec 29
+changes:
+- repaired some POD quirks
+---
+version: 0.32
+date: Sun Dec 25
+changes:
+- mark it DEPRECIATED, please use Perl6::Doc
+---
+version: 0.31
+date: Sun Dec 23 13:15:00 IST 2007
+changes:
+- updated: S26
+- added: S16 S29
+- added documentation
+---
+version: 0.30
+date: Sat Dec 22 15:35:00 IST 2007
+changes:
+- removed  A20 S29
+- updated: A01 A02 A03 A04 A05 A06                  A12
+               E02 E03 E04 E05 E06 E07 
+           S01 S02 S03 S04 S05 S06      S09 S10 S11 S12 S13
+---
+version: 0.29
+date: Tue Feb 28 17:18:59 IST 2006
+changes:
+- 'p6bible -c' now works again.
+- Update to r7898 from upstream documents.
+---
+version: 0.29
+date: Mon Feb 27 22:17:30 IST 2006
+changes:
+- Corrected heading of S03, reported by spinclad.
+---
+version: 0.28
+date: Mon Feb 27 15:02:04 IST 2006
+changes:
+- Update to the post-Mt.Arbel-hackathon Synopses.
+---
+version: 0.27
+date: Sun Dec 26 01:20:15 CST 2005
+changes:
+- Fix the TITLE line in S17 so it displays like NAME.
+---
+version: 0.26
+date:   Wed Dec 22 22:47:10 CST 2005
+changes:
+- Zero-pad the =head1 NAME line so it sorts at search.cpan.org correctly.
+---
+version: 0.25
+date:   Wed Dec 22 15:46:10 CST 2005
+changes:
+- Changed the =head1 NAME line again for better search.cpan.org indexing.
+---
+version: 0.24
+date:   Wed Dec 22 13:01:25 CST 2005
+changes:
+- Re-integrated the unofficial S17 (Concurrency) draft.
+- Changed the =head1 NAME line for better search.cpan.org indexing.
+---
+version: 0.23
+date:   Wed Dec 22 09:41:50 CST 2005
+changes:
+- Improved formatting for PAUSE indexing
+- Added Synopsis 22 draft (CPAN)
+- Mention the nascent Perl6::Doc project
+- Emphasis the role of Synopses, so "p6bible 12" displays S12
+---
+version: 0.22
+date:    Mon Oct 31 16:27:32 PST 2005
+changes:
+- Lots of tweaks
+---
+version: 0.21
+date:    Sun Oct 23 20:23:38 PDT 2005
+changes:
+- S06 tweaked
+---
+version: 0.20
+date:    Mon Oct 10 16:00:34 PDT 2005
+changes:
+- A20 added
+---
+version: 0.19
+date:    Tue Jun 28 08:29:57 PDT 2005
+changes:
+- S17 added
+- S04 S29 updated
+---
+version: 0.18
+date:    Sun Jun 12 16:03:02 PDT 2005
+changes:
+- S29draft Changed
+---
+version: 0.17
+date:    Tue May 17 08:58:12 PDT 2005
+changes:
+- S05 Changed
+- S29draft Changed
+---
+version: 0.16
+date:    Sat Apr 30 13:26:55 PDT 2005
+changes:
+- S06 Changed
+- Applied modified patch from Joshua Gatcomb to use some `perldoc` args
+---
+version: 0.15
+date:    Thu Apr 21 13:17:22 PDT 2005
+changes:
+- S03 S06 and A06 changed
+---
+version: 0.14
+date:    Sun Apr 10 03:22:35 PDT 2005
+changes:
+- Add S26 S27 S28 and S29 drafts
+- Trim TOC for `p6bible -c`
+- Add more examples to Synopsis
+---
+version: 0.13
+date:    Wed Apr  6 21:40:14 PDT 2005
+changes:
+- added a get_raw function per theorbtwo's request.
+---
+version: 0.12
+date:    Sat Apr  2 23:37:54 PST 2005
+changes:
+- Forgot the Makefile.PL (doh!)
+- S03 changed
+- Add overview paragraphs
+---
+version: 0.11
+date:    Sat Apr  2 03:36:23 PST 2005
+changes:
+- Add command line options
+- Move logics into Perl6::Bible
+- Add --help and --version
+---
+version: 0.10
+date: Fri Apr  1 22:38:42 PST 2005
+changes:
+- Initial version of Perl6::Bible

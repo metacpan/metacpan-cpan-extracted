@@ -1,0 +1,15 @@
+
+0.04 2013-02-22
+  - Add check for threads support to 04_web_threads.t
+
+0.03 2013-02-20
+  - Added threading tests
+  - Fixed bug when using legacy config files
+  - Added tests for legacy config files
+
+0.02 2013-02-19
+  - Minor bug fix when appender not defined
+  - Reset timer on each page load
+
+0.01 2012-09-16
+  - Initial Release

@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+# PODNAME: pln-pt
+# ABSTRACT: command line interface to http://api.pln.pt
+
+use warnings;
+use strict;
+
+use PLN::PT;
+use Path::Tiny;
+
+# get some args from the command line
+my $op = shift;
+my $file = shift;
+_help() unless $op;
+
+# get input from file, or stdin if no file arg is given
+my $input;
+if ($file) { $input = path($file)->slurp_raw; }
+else { $input = join('', <STDIN>); }
+_help() unless $input;
+
+my $pln = PLN::PT->new('http://api.pln.pt');
+my $opts = { output=>'raw' };
+
+if (lc($op) eq 'tokenizer') {
+  print $pln->tokenizer($input, $opts);
+}
+elsif (lc($op) eq 'tagger') {
+  print $pln->tagger($input, $opts);
+}
+elsif (lc($op) eq 'dep_parser') {
+  print $pln->dep_parser($input, $opts);
+}
+else { _help() }
+
+sub _help {
+  print "Usage: pln-pt <operation> <input>\n",
+          "  operation: tokenizer, tagger, dep_parser\n";
+  exit;
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+pln-pt - command line interface to http://api.pln.pt
+
+=head1 VERSION
+
+version 0.003
+
+=head1 AUTHOR
+
+Nuno Carvalho <smash@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 - 2017 by Nuno Carvalho.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

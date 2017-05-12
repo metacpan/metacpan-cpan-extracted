@@ -1,0 +1,29 @@
+Changes
+MANIFEST
+Makefile.PL
+add_doc.pl
+README.md
+Stats.pm
+Basic/stats_basic.pp
+Basic/Makefile.PL
+Distr/distr.pp
+Distr/Makefile.PL
+Distr/t/stats_distr.t
+GLM/glm.pp
+GLM/Makefile.PL
+GSL/gsl_cdf.pd
+GSL/Makefile.PL
+GSL/t/cdf.t
+Kmeans/kmeans.pp
+Kmeans/Makefile.PL
+t/01-checkmanifest.t
+t/stats_basic.t
+t/stats_glm.t
+t/stats_ols_rptd.t
+t/stats_kmeans.t
+t/stats_ts.t
+TS/ts.pp
+TS/Makefile.PL
+xt/00-check-changelog.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

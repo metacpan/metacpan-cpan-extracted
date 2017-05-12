@@ -1,0 +1,51 @@
+This is an 0.3 alpha release of a PGP module for Perl5.
+	 				       
+This module will allow for an easy interface to both Phil
+Zimmermann's PGP (v2.6.2) program and the international version of
+PGP (v2.6.2i). Although nearly any version of PGP should work. Pipe.pm
+will allow you to sign, encrypt (w/signature), decrypt and perform
+key management. The only requirement being that you already have PGP
+installed on your system to utilize this module.
+
+Previous users of this PGP module should note that the name has
+changed to PGP::Pipe to prevent conflicts with other PGP modules.
+This will allow for a PGP::Api when the PGP 3.0 API is released. The
+next release will split PGP::Pipe into PGP::Pipe, PGP::Keyring, and
+PGP::Key. 
+
+There are sure to be many changes in the structure of this module over
+the next couple of months--at least until a standard interface is 
+acheived. 				  
+
+*** Latest news ***
+
+I now have a mailing list setup for people that are working with the
+PGP module. This list is for working on both the module and applica-
+tions. To subscribe to the list, send a message to
+majordomo@dbc-mifco.com with the following line in the body of the
+message (not the subject line): 
+	subscribe perl-pgp
+      
+-----------------------------------------------------------------------
+INSTALLATION
+
+	perl Makefile.PL
+	make
+	make install
+	
+Thats all. Real easy--like it should be. There is not a 'make test'
+yet. Unfortunately I have not had time to write a bunch of test 
+routines. That position is currently looking to be filled :-)
+	
+-----------------------------------------------------------------------
+CREDITS
+
+Certainly a great deal of credit should go to Phil Zimmermann. Without
+him, the NSA would certainly be reading all of our private files! As
+if they are not already reading our files!
+
+There are also many unseen heros out on the internet. Some are helping
+Phil with his legal troubles. Others are working on developing 
+PGP v3.0. If you know of any of these people, thank them profusely 
+on behalf of all the users of PGP.
+

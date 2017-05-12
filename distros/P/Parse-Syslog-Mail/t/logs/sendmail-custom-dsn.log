@@ -1,0 +1,37 @@
+May 20 04:03:08 mailhost sendmail[12524]: j4K488I4001736: j4K6MJcE012524: sender notify: Warning: could not send message for past 4 hours
+May 20 04:03:16 mailhost sendmail[27873]: j4K93AYX027873: <nobody@example.edu>... User unknown
+May 20 04:04:04 mailhost sendmail[4249]: j4K944gN004249: somehost.example.edu [129.107.xxx.yyy]: ETRN netscaler.testing.smtp
+May 20 04:07:05 mailhost sendmail[28499]: j4K970hV028494: j4K975hV028499: DSN: Service unavailable
+May 20 04:07:42 mailhost sendmail[28633]: j4K97fD5028627: to=somebody@example.net, delay=00:00:01, xdelay=00:00:00, mailer=esmtp, pri=34674, relay=somehost.example.net. [204.127.xxx.yyy], dsn=2.0.0, stat=Sent (ok ; id=20050520090742r1700irb9oe)
+May 20 04:08:34 mailhost sendmail[29739]: j4K98Yl7029739: lost input channel from somehost.example.edu [129.107.xxx.yyy] to MTA after rcpt
+May 20 04:10:45 mailhost sendmail[29876]: j4K99tuR029876: message size (12382169) exceeds maximum (10000000)
+May 20 04:12:09 mailhost sendmail[30728]: j4K9BaxO030728: collect: premature EOM: unexpected close
+May 20 04:14:47 mailhost sendmail[8953]: j4K9EjQ0008950: j4K9ElQ0008953: postmaster notify: Data format error
+May 20 04:22:19 mailhost sendmail[1536]: grew WorkList for /var/spool/mqueue/spool2 to 2000
+May 20 04:27:30 mailhost sendmail[29478]: j4K97TIQ029478: timeout waiting for input from [61.250.xxx.yyy] during message collect
+May 20 04:45:16 mailhost sendmail[11770]: j4K9KvNJ011475: j4K9MoCO011770: postmaster notify: Error in ldap_search using postmaster in map Alias0: Can't contact LDAP server
+May 20 04:47:16 mailhost sendmail[19687]: j4K9lEiQ019678: j4K9lGiO019687: postmaster notify: Host unknown (Name server: mx3.speakbulb.com.: host not found)
+May 20 05:40:03 mailhost sendmail[26588]: j4KAaqB9026582: j4KAe3B9026588: postmaster notify: Data format error
+May 20 05:43:27 mailhost sendmail[6190]: j4KAfETR005770: j4KAhRTP006190: DSN: Remote protocol error
+May 20 05:43:27 mailhost sendmail[6190]: j4KAfETR005770: somehost.example.com.: SMTP DATA-2 protocol error: 571 Message Refused
+May 20 06:01:02 mailhost sendmail[3630]: j4KB119s003623: j4KB129s003630: DSN: Host unknown (Name server: attbi.com.: no data known)
+May 20 06:05:16 mailhost sendmail[4838]: j4KB4mbp004831: j4KB5Gbp004838: postmaster notify: Error getting LDAP results in map Alias0: Can't contact LDAP server
+May 20 06:48:50 mailhost sendmail[376]: j4EGMdrM030190: j4IIMlJ5000376: return to sender: Cannot send message for 4 days
+May 20 07:00:07 mailhost sendmail[24108]: j4KC064V024104: j4KC074V024108: DSN: Local configuration error
+May 20 07:01:47 mailhost sendmail[2847]: j4KC1gSG002847: <badguy@badhost.example.com,,0,>... Invalid route address
+May 20 07:36:13 mailhost sendmail[21380]: j4IIuhXi011472: j4IJMlLo021380: DSN: Return receipt
+May 20 07:55:04 mailhost sendmail[31412]: j4KC9bwK027299: j4KCMsk7031412: DSN: Error in ldap_search using someone in map Alias0: Can't contact LDAP server
+May 20 08:07:53 mailhost sendmail[16329]: j4KD7jBi016329: Syntax error in mailbox address "badguy@badhost.example.com.??" (non-printable character)
+May 20 08:11:16 mailhost sendmail[18063]: j4KDBEJ9018059: to=somebody@somehost.example.edu, delay=00:00:01, xdelay=00:00:00, mailer=esmtp, pri=36633, relay=somehost.example.edu. [129.xxx.yyy.zzz], dsn=2.0.0, stat=Sent ( <3ff3b59bb39d12de72fab184208a144a.nfp-xxx=example.edu@example.com> Queued mail for delivery)
+May 20 08:16:41 mailhost sendmail[20137]: j4KDGdaO020131: to=someone@somehost.example.edu, delay=00:00:02, xdelay=00:00:00, mailer=esmtp, pri=143778, relay=somehost.example.edu. [129.xxx.yyy.zzz], dsn=2.0.0, stat=Sent ( <!~!UENERkVCMDkAAQACAAAAAAAAAAAAAAAAAC4AAAAAAAAAB9iELtfNKESZVnBKK1msqQEAPAvcbwCfwEeWBdPt4LtfmgAAAAAUigAAEAAAAOKzuzR9S5ZEvPsOj4UU6BsBAAAAAA==@example.net> Queued mail for delivery)
+May 20 08:27:13 mailhost sendmail[2975]: j4KDR09b002965: j4KDRD9Z002975: postmaster notify: Data format error
+May 20 08:37:09 mailhost sendmail[28159]: j4KDb5SW028159: to=<someone@example.com>, delay=00:00:04, xdelay=00:00:04, mailer=esmtp, pri=36080, relay=mta.example.com. [61.140.xxx.yyy], dsn=2.0.0, stat=Sent (Requested mail action okay, completed.  Message-ID=<200505201337.j4KDb5SW028159@mailhost.example.edu>)
+May 20 08:37:32 mailhost sendmail[7215]: j4KDbUaV007215[2]: \263\273\270\276\264\353\267\316 \274\366\274\366\267\341 \276\370\264\302 \264\353\303\342 -\275\305\272\322\300\332\265\265 \260\241\264\311- clknwtmpxu dn
+May 20 08:44:26 mailhost sendmail[31655]: j4KDiPiE031648: Fixed MIME Content-Type header field (possible attack)
+May 20 09:00:31 mailhost sendmail[2655]: j4KDsO7I002647: j4KE0V7I002655: DSN: I/O error
+May 20 09:13:51 mailhost sendmail[11015]: j4KEDhOT010947: j4KEDpOT011015: DSN: Data format error
+May 20 09:24:37 mailhost sendmail[27249]: j4KEOYew027234: j4KEObew027249: postmaster notify: Too many hops 26 (25 max): from <> via somehost.example.edu, to <somebody@example.edu>
+May 20 10:10:56 mailhost sendmail[1621]: j4KFAp6f001621: <badguy@.com>... Invalid host name
+May 20 10:16:40 mailhost sendmail[10918]: j4IKMrAb010918: j4IKMrAc010918: return to sender: Service unavailable
+May 20 10:41:36 mailhost sendmail[13127]: j4KFfYNi013124: somehost.example.net.: SMTP DATA-2 protocol error: 500 Mail appears to be unsolicited -- send error reports to postmaster@example.net
+May 20 11:04:51 mailhost sendmail[7870]: j4KFM92t007844: j4KFMJWE007870: DSN: Too many hops 26 (25 max): from <someone@hotmail.com> via localhost, to <someone@example.edu>

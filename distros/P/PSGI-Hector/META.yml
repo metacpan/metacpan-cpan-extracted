@@ -1,0 +1,66 @@
+---
+abstract: 'Very simple PSGI web framework'
+author:
+  - 'MacGyveR <dumb@cpan.org>'
+build_requires:
+  Mock::Sub: '0'
+  Test::MockModule: '0'
+  Test::More: '0'
+  Test::Output: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PSGI-Hector
+provides:
+  PSGI::Hector:
+    file: lib/PSGI/Hector.pm
+    version: '1.9'
+  PSGI::Hector::Base:
+    file: lib/PSGI/Hector/Base.pm
+  PSGI::Hector::Log:
+    file: lib/PSGI/Hector/Log.pm
+  PSGI::Hector::Middleware:
+    file: lib/PSGI/Hector/Middleware.pm
+  PSGI::Hector::Request:
+    file: lib/PSGI/Hector/Request.pm
+  PSGI::Hector::Response:
+    file: lib/PSGI/Hector/Response.pm
+  PSGI::Hector::Response::Base:
+    file: lib/PSGI/Hector/Response/Base.pm
+  PSGI::Hector::Response::NotModified:
+    file: lib/PSGI/Hector/Response/NotModified.pm
+  PSGI::Hector::Response::Raw:
+    file: lib/PSGI/Hector/Response/Raw.pm
+  PSGI::Hector::Response::TemplateToolkit:
+    file: lib/PSGI/Hector/Response/TemplateToolkit.pm
+  PSGI::Hector::Session:
+    file: lib/PSGI/Hector/Session.pm
+  PSGI::Hector::Utils:
+    file: lib/PSGI/Hector/Utils.pm
+requires:
+  CGI::Simple::Cookie: '0'
+  CSS::Minifier::XS: '0'
+  Class::Load: '0'
+  Data::Dumper: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  HTTP::Response: '0'
+  Hash::MultiValue: '0'
+  IO::Compress::Gzip: '0'
+  JavaScript::Minifier::XS: '0'
+  Plack: '0'
+  Plack::Middleware::Deflater: '0'
+  Plack::Middleware::MCCS: '0'
+  Plack::Middleware::ReverseProxy: '0'
+  Plack::Middleware::ReverseProxyPath: '0'
+  Template: '0'
+  perl: '5.006'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/thedumbterminal/PSGI-Hector
+version: '1.9'

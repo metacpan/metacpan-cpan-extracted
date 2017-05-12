@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence name="test"  connection_name="test" >
+    <entities>
+        <entity_file  file="emp.xml"  />
+    </entities>
+    <value_generators>
+        <sequence_generator name="emp_seq" sequence_name="emp_seq" allocation_size="1" />
+        <table_generator name="pk_generator" table="seq_generator" primary_key_column_name="pk_column" primary_key_column_value="empno" value_column="value_column" allocation_size="20" />
+    </value_generators>
+</persistence>

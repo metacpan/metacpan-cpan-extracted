@@ -1,0 +1,28 @@
+Changes for Perl extension Perl-Dist-Padre
+
+0.630 Thu 3 Jun 2010
+    - Used to make Padre plus Strawberry 0.63.
+
+0.560 Tue 9 Feb 2010
+    - Used to make Padre plus Strawberry 0.56.
+    - Updated to new version of Strawberry.
+	- Uses Strawberry merge module.
+
+0.500 Wed 11 Nov 2009
+    - Used to make Padre Standalone 0.50.
+    - Updated to new version of Strawberry.
+    - Added padre.exe launcher.
+	
+0.270 Sun 2 Aug 2009
+    - Used to make "almost-six-0.41".
+    - Updated module list.
+    - Added author tests.
+
+0.260010 Fri 10 July 2009
+    - First release to CPAN.
+    - Updated module list.	
+	- Updated to use Perl::Dist::WiX 0.192.
+    - Directions to build added.
+	
+0.25 Mon 12 Jan 2009
+	- Created as a subclass of Strawberry

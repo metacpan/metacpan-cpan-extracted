@@ -1,0 +1,9 @@
+Revision     history for Padre-Plugin-HG
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+0.10    2009/11/03:1402
+        First release to CPAN,  Added more commands and improved the diffing to be usable. 
+0.15	2010/11/03:17:36 Update the Compatability Version to work with the latest Padre.
+0.16    2010/11/07:20:38 increase Version Number to skip failed upload to cpan
+0.17   2013/05/04  Fixes to work with latest version of Padre, auto refresh on file save

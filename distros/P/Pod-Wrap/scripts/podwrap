@@ -1,0 +1,90 @@
+#!/usr/bin/perl
+# $Id: podwrap,v 1.2 2004/01/08 03:21:02 nothingmuch Exp $
+
+use strict;
+use warnings;
+
+use Pod::Wrap;
+
+use Getopt::Long;
+use Pod::Usage;
+
+our $VERSION = 0.01;
+
+if (@ARGV){
+    my ($in, $out);
+    GetOptions(
+        'in=s' => \$in,
+        'out=s' => \$out,
+        'help' => sub { pod2usage(1) },
+        'man' => sub { pod2usage(-verbose => 2, -exitstatus => 1) },
+    ) or pod2usage(2);
+    
+    if (@ARGV){ $in ||= shift };
+    if (@ARGV){ $out ||= shift };
+    
+    pod2usage(3) if @ARGV;
+    
+    Pod::Wrap->new->parse_from_file($in || '-', $out || '-');
+    
+} else { Pod::Wrap->new->parse_from_filehandle }
+
+exit;
+
+__END__
+
+=pod
+
+=head1 SYNOPSIS
+
+    podwrap [ infile [ outfile ] ]
+    podwrap [ --in infile ] [ --out outfile ]
+    podwrap < infile > outfile
+
+=head1 OPTIONS
+
+=over 4
+
+=item --in
+
+A file to input.
+
+=item --out
+
+A file to output.
+
+=item --help
+
+Options list.
+
+=item --man
+
+Complete documentation.
+
+=back
+
+=head1 DESCRIPTION
+
+This little script allows to wrap POD embedded in perl files from the
+command line. It's pretty intuitive, behaving as you would probably expect
+it to.
+
+=head1 BUGS
+
+I'm working on that.
+
+=head1 COPYRIGHT & LICENSE
+
+    Copyright 2004 Yuval Kogman. All rights reserved.
+    This program is free software; you can redistribute it
+    and/or modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Yuval Kogman <nothingmuch@woobling.org>
+
+=head1 SEE ALSO
+
+L<Pod::Wrap>
+
+=cut

@@ -1,0 +1,296 @@
+#!/usr/bin/perl -w
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
+#
+# This file is overly complicated to demonstrate some of the possibilities.
+# Experiment a bit with (un-)commenting option lines.
+
+use lib '../..';
+use strict;
+
+#
+# Start of the program.
+# This is doing the job: invoke Portable Presenter.
+#
+
+use PPresenter;
+
+# Now, initialize a show.  The configuration options can be found in
+# module PPresenter.pm.
+
+my $show = PPresenter->new
+    ( -name       => 'my first show'    # Displayed on title-bar iff shown.
+#   , -trace      => '/dev/tty'         # Defaults to /dev/null ;)
+#   , -geometry   => '800x600'
+
+    , -totaltime      => 1000
+#   , -controlDisplay => $ENV{DISPLAY}
+    , -imageSizeBase  => '1024x768'
+    );
+
+# The fontset of the default style is Tk-internal (non-scaling)
+# Look for xlsfonts *-0-0-0-0-* for scalable fonts, if default doesn't work
+# or remove selection of scaling font.
+# If you use the changes more often, it might be a good idea to produce
+# a style PPresenter/Style/MyStyle.pm, and then specify -style => 'MyStyle'
+
+$show->select(fontset => 'scaling')
+     ->change(      # changes on the scaling fontset defaults.
+       -fixedFont            => 'bitstream-courier'
+     , -proportionalFont     => 'bitstream-charter'
+     );
+
+$show->select(formatter => 'markup')->addLogical(EMAIL => 'TT B');
+
+# Full dump off all knowledge about the settings.  A lot of information
+# for debugging purposes!
+#print $show->find('style')->tree,"\n";
+
+#$show->change
+#   ( template => 'ALL'
+#   , -showTemplateOutlines => 1     # black lines to see how screen is devided
+#   );
+
+#
+# Normal show things...
+#
+
+my $s = $show->addSlide
+    ( -title      => 'Frontpage'
+    , -template   => 'main'
+    , -main       => <<MAIN
+<P>
+<CENTER>
+<LARGE COLOR=red>Portable Presenter</LARGE>
+<P>
+<SMALL>by</SMALL><BR>
+Mark Overmeer<BR>
+<EMAIL>Mark\@Overmeer.net</EMAIL>
+<P>
+MAIN
+    , -notes      => <<NOTES
+This is only to demonstrate some of the features of
+Portable Presenter in one sequence.
+There are more specific demos available, too.
+But anyway, these are slide-notes, if you didn't recognized them yet.
+NOTES
+    );
+
+#print $s->tree;
+
+$show->addSlide
+    ( -title      => 'Moving back'
+    , -template   => 'dtm'
+    , -main       => <<MAIN
+Now I put some text.<BR>
+<UL>
+<LI><MARK>Double print.
+<LI>You can make many markings, to overwrite text or
+    replace images.  You need to specify a name when there
+    <MARK NAME=two>is more than one marking.
+<LI>Everything is restored, also <TEXT COLOR=green>Color, indentation,
+    etc.
+</UL>
+<REDO><BD>-Double</BD><BR>
+<REDO NAME=two><TEXT COLOR=red BD SHOW="after 5">are two or more markings.
+MAIN
+    );
+
+$show->addSlide
+    ( -title      => 'Phases'
+    , -template   => 'dtm'
+    , -main       => <<MAIN
+On each space-bar hit, a bit more text should appear.<BR>
+<UL>
+<LI SHOW="phase 1">first
+<LI SHOW="phase 2">second
+<LI SHOW="phase -2">disappears third
+<LI SHOW="phase 3">appears third
+<LI SHOW="phase 4">appears last
+</UL>
+MAIN
+    );
+
+$show->addSlide
+    ( -title      => 'More on phases'
+    , -template   => 'dtm'
+    , -main       => <<MAIN
+<OL>
+<LI SHOW="phase 5">shows last.
+<LI SHOW="phase 3">just mixing a bit.
+<LI SHOW="phase 4"><TEXT COLOR=blue>nearly there.</TEXT>
+<LI SHOW="phase 2">this appears later
+<LI SHOW="phase 1">Actually, you can make 9 phases, and the order on
+the slide does not matter.
+</OL>
+MAIN
+    );
+
+$show->addSlide
+    ( -title      => 'Center on images'
+    , -template   => 'dtm'
+    , -main       => <<MAIN
+some text is put above the image.
+<BR ALIGN=center><IMG SRC="ppr_large.gif" BASE=1280x1024>x</BR>
+And some text below.
+MAIN
+    );
+
+$show->addSlide
+    ( -title      => 'Nested lists'
+    , -template   => 'dtm'
+    , -main       => <<MAIN
+<UL>
+<LI>one
+    <OL>
+    <LI>two
+    <LI>three
+    </OL>
+    <OL START=C>
+    <LI>Count in letters
+    <LI>continues.
+    <LI>again.
+    </OL>
+<LI>four
+</UL>
+MAIN
+    );
+
+my $slide = $show->addSlide
+    ( -title      => 'Font types'
+    , -template   => 'dtlr'
+    , -backdrop   => 1
+    , -left       => <<LEFT
+Normal font, <SMALL>Small <SMALL>Smaller <SMALL>Even Smaller</SMALL></SMALL></SMALL><BR><LARGE>Large <LARGE>Larger <LARGE>Even Larger</LARGE></LARGE></LARGE>
+LEFT
+    , -right      => <<RIGHT
+<TT>Teletype</TT>
+<P COLOR=green>new paragraph... in green</P>
+<BR ALIGN=right>align right</BR>
+<BR ALIGN=center>centered</BR>
+<BQ>A blockquote indents on both sides</BQ>
+
+RIGHT
+    , -tags       => 'slow'
+    , -appear     => 'from ne'
+    );
+
+
+#print $slide->tree;
+
+$show->addSlide
+    ( -title      => 'Unordered lists'
+    , -template   => 'dtm'
+    , -main       => <<MAIN
+Text
+<UL>
+<LI>!Hola!
+  <UL SHOW="after 5 from e">
+  <LI>one more nesting.
+  <LI>This is even a few lines long.  Let's see what will happen then.
+      It should be left indented, all the time.
+  <LI SHOW="after 15 from s">Last from list, but a bit late.
+  </UL>
+<LI BD>Aloha!
+</UL>
+Some more text at <TT>the end</TT>.
+MAIN
+    );
+
+
+$show->addSlide
+    ( -title      => 'Nested lists'
+    , -main       => <<MAIN
+No nesting.
+<UL>
+<LI>nesting one.
+    <UL>
+    <LI>nesting two.
+        <UL>
+        <LI>nesting three.
+            <UL>
+            <LI>nesting four
+            </UL>
+        </UL>
+    </UL>
+</UL>
+MAIN
+    );
+
+$show->addSlide
+    ( -title      => 'Showing images -2'
+    , -main       => <<MAIN
+<IMG SRC="ppr_large.gif" ALIGN=left>
+Just a short text to see if the bounds are set right.
+Text just flows around the image, just as in HTML.<BR>
+Like HTML, you may specify <CODE B>VSPACE</CODE> and <CODE B>HSPACE</CODE>.
+You may <CODE B>ALIGN</CODE> to the left, center, and right.
+MAIN
+    );
+
+$show->addSlide
+    ( -title      => 'Exploding'
+    , -template   => 'dtm'
+    , -main       => <<MAIN
+<A SHOW="after 5 to e"><IMG SRC="perlmagick.gif" ALIGN=left></A>
+<A SHOW="after 5 to s"><IMG SRC="perlmagick.gif" ALIGN=right></A>
+A bit of text in between the images.<BR>
+I don't know how this should look like.<BR>
+<A SHOW="after 5 to n"><IMG SRC="perlmagick.gif" ALIGN=left></A>
+<A SHOW="after 5 to w"><IMG SRC="perlmagick.gif" ALIGN=right></A>
+MAIN
+    );
+
+$show->addSlide
+    ( -title      => 'preformat'
+    , -template   => 'dtm'
+    , -main       => <<MAIN
+Text
+<PRE>
+Preformatted, but will
+    it work <LARGE>with
+large</LARGE> and <SMALL>small</SMALL>
+  words
+included?
+</PRE>
+end
+MAIN
+    );
+
+$show->addSlide
+    ( -title      => 'single image'
+    , -template   => 'dtlr'
+    , -left       => <<LEFT
+<PRE>
+Is preformatted:
+  kind'a tables
+    aaa     10
+     bb    123
+      c     42
+</PRE>
+LEFT
+    , -right      => '<IMG SRC=ppr_large.gif>'
+    , -notes      => <<NOTES
+Ok, we can add notes for a slide, when we like.
+It is shown on the seperate control screen (if there is).
+NOTES
+    );
+
+$show->addSlide
+    ( -title      => 'preformat'
+    , -template   => 'dtm'
+    , -main       => <<MAIN
+This text <BD SHOW="after 5">arrives later</BD>.  Other parts come
+from <A SHOW="after 2 from w 5">the left</A>, and
+<A SHOW="after 2 from e 5">the right</A>.
+<BR>
+<A SHOW="after 10 disappear">Going away after some time.</A>
+<A SHOW="from n 3">North</A><BR>
+<A SHOW="from e 3">East</A><BR>
+<A SHOW="from w 3">West</A><BR>
+<A SHOW="from s 3">South</A>
+</PRE>
+MAIN
+    );
+
+# Now, start the show.
+$show->run;

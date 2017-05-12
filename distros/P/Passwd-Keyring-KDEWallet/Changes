@@ -1,0 +1,42 @@
+Revision history for Passwd::Keyring::KDEWallet
+
+0.60	2015-01-26
+	In case kwalletd is not running, we try to start it, and
+        wait a little bit. Only if that fails we fail. There is
+        construction parameter which disables this behaviour.
+
+0.2008	2015-01-06
+	Adding kwalitee tests
+
+0.2007	2013-07-04
+	Distribute example script.
+
+	(bitbucket #1) Documentation contained wrong example of using set_password
+
+0.2006	2012-11-20
+	Tests don't fail but are skipped when module is built on
+	system with DBUS but without KDEWallet.
+
+        Unifying exception texts.
+
+
+0.2005	2012-11-15
+	Fixed bugs in package dependencies and metadata (wrong homepage
+        and repository page links etc)
+
+0.2004	2012-11-11
+	Added example
+
+0.2003	2012-11-11
+	Skipping tests if not running under desktop session, so the
+        module can be installed from root shell etc.
+
+0.2002	2012-11-09
+        Documentation updates.
+
+0.2001  2012-11-08
+        Small documentation fixes, more info in CPAN metadata
+
+0.20    2012-11-08
+        First version (working, functionality equivalent to Passwd::Keyring::Gnome)
+

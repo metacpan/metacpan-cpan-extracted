@@ -1,0 +1,10 @@
+Revision history for Perl extension POE::Filter::Slim::CLI.
+
+0.02    2007-09-07 00:30:00
+        - Clone output requests so the filter doesn't URI-escape the
+          original arrayref.
+        - Changed required Perl version to 5.6.1.
+
+0.01    2007-09-06 15:00:00
+        - Initial release.
+

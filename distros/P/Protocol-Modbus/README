@@ -1,0 +1,36 @@
+Protocol-Modbus version 0.06
+============================
+
+Object-oriented class to abstract generation and parsing of Modbus
+protocol messages. This class only handles protocol messages generation
+and parsing. It does not directly interface with your PLC devices.
+For that task, see the Device::PLC CPAN module (when that will be released).
+
+STATUS
+
+The thing is incomplete now.
+Only the main design is sketched, though it already works!
+Check out the examples to know how it works.
+Documentation is incomplete.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+   none
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2012 by Cosimo Streppone <cosimo@cpan.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

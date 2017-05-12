@@ -1,0 +1,11 @@
+To install this module, please execute
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+"make test" may be omitted if you don't want to test. However, this is 
+not recommended.
+
+Ka-Wai Mak

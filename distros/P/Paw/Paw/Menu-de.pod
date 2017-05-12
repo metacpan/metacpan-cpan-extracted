@@ -1,0 +1,30 @@
+=head1 Pulldown Menu
+
+B<$pdm=Paw::Menu::new($title, [$name], [$border]);>
+
+B<Parameter>
+
+     $titel  => sichtbarer Titel des Pulldownmenus
+
+     $name   => Name des Widgets [optional]
+
+     $border => bisher nur "shade" als option [optional]
+
+B<Beispiel>
+
+     $pdm=Paw::Menu::new(title=>"Datei", border=>"shade");
+
+=head2 add_menu_point($text, \&callback), add_menu_point($other_menu)
+
+erzeugt einen Menupunkt (Text) und springt die Funktion callback an, wenn er aktiviert wird.
+Es besteht auch die Moeglichkeit nur ein anderes Menu zu uebergeben. Dadurch entstehen Untermenus.
+
+B<Beispiel>
+
+     $men->add_menu_point("Beep", \&menu_beep);
+
+     #Pulldownmenu "$men" in Pulldownmenu "$men2".
+     $men2->add_menu_point($men); 
+
+=cut
+

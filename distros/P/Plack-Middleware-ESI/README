@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Plack-Middleware-ESI,
+version 0.1:
+
+  PSGI middleware for Edge Side Includes (ESI)
+
+This software is copyright (c) 2010 by Baldur Kristinsson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

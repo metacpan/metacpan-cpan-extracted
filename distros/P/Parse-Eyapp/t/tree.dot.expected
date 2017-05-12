@@ -1,0 +1,14 @@
+digraph G {
+ordering=out
+
+  0 [label = <AT>];
+  0 -> 01;
+  0 -> 02;
+  01 [label = <AT>];
+  01 -> 011;
+  01 -> 012;
+  011 [label = <NUM<font color="red">[1]</font>>];
+  012 [label = <NUM<font color="red">[2]</font>>];
+  02 [label = <NUM<font color="red">[3]</font>>];
+
+}

@@ -1,0 +1,104 @@
+{
+   "abstract" : "Requests throttling for Plack",
+   "author" : [
+      "Anton Gerasimov <chim@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Throttle-Lite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "examples",
+         "corpus"
+      ],
+      "namespace" : [
+         "t::lib"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Kwalitee" : "1.12",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.26",
+            "List::MoreUtils" : "0.33",
+            "Net::CIDR::Lite" : "0.21",
+            "POSIX" : "0",
+            "Plack" : "1.0001",
+            "parent" : "0",
+            "perl" : "5.008009",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "HTTP::Message" : "6.01",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Plack" : "1.0001",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "Test::Pod" : "1.22"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::Throttle::Lite" : {
+         "file" : "lib/Plack/Middleware/Throttle/Lite.pm",
+         "version" : "0.05"
+      },
+      "Plack::Middleware::Throttle::Lite::Backend::Abstract" : {
+         "file" : "lib/Plack/Middleware/Throttle/Lite/Backend/Abstract.pm",
+         "version" : "0.05"
+      },
+      "Plack::Middleware::Throttle::Lite::Backend::Simple" : {
+         "file" : "lib/Plack/Middleware/Throttle/Lite/Backend/Simple.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Wu-Wu/Plack-Middleware-Throttle-Lite/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Plack-Middleware-Throttle-Lite",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Wu-Wu/Plack-Middleware-Throttle-Lite.git",
+         "web" : "https://github.com/Wu-Wu/Plack-Middleware-Throttle-Lite"
+      }
+   },
+   "version" : "0.05",
+   "x_authority" : "cpan:CHIM"
+}
+

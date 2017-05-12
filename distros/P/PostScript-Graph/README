@@ -1,0 +1,99 @@
+PostScript::Graph Suite
+=======================
+
+Modules in this suite adds graphs to a PostScript::File.  There are two user
+level modules
+
+    PostScript::Graph::Bar
+    PostScript::Graph::XY
+
+and three support modules
+
+    PostScript::Graph::Paper
+    PostScript::Graph::Key
+    PostScript::Graph::Style
+
+These support modules have had enough use under Finance::Shares::Chart to
+merit their promotion to beta status.  Bar and XY remain insufficiently
+exercised.  Note that the range of use is small.  Beta status indicates that the
+interface has settled; the code is still likely to be buggy.
+
+User Level Modules
+==================
+
+The data may be presented as a list of arrays or a CSV file.  The output may
+be an EPS file for inclusion in other documents or a PostScript file for
+immediate viewing or printing.  Useful defaults are provided throughout, but
+each chart may have 100 or more constructor options depending on the level of
+control required.
+
+Bar	Vertical bars are plotted on the chart, individually or in groups.
+	The bars within each group are colour coded, identified in the Key
+	panel.
+
+XY	Line and scatter graphs may be plotted.  Multiple data sets may be
+	added and the scales adjusted to fit all the data.  Lines are
+	identified in the Key by the shape, colour and size of the lines and
+	points.
+
+Support Modules
+===============
+
+Although these are components, not called directly by the user, their options
+can be given to the XY or Bar objects and so are still worthy of attention.
+In particular the Style module provides slightly different colour, dash
+pattern etc. for each data set.
+
+Paper	Draw a blank grid.  The graph paper is scaled and labelled.
+
+Key	A side panel showing what the different line, point or bar styles
+	refer to.
+
+Style	This holds all the display settings for lines, points and bars.
+	Suitable defaults are provided or complete control is available.  The
+	defaults are provided by a PostScript::Graph::Sequence object (in the
+	same module).  A Sequence controls which style aspect changes as new
+	Styles are created.
+
+
+Installation
+============
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+In the 't' directory there are various *.pl scripts as well as the *.t tests.
+The *.pl scripts are designed to be run from the main direcory, just like the
+*.t files . The resulting *.ps files can be inspected with GhostView or any
+other postscript viewer.
+
+Dependencies
+============
+
+This module requires these other modules and libraries:
+
+    Test::More
+    Text::CSV_XS
+    PostScript::File
+
+
+See Also
+========
+
+    Finance::Shares::Chart
+
+
+Copyright and Licence
+=====================
+
+Copyright (C) 2002 Christopher P Willmot.  All rights reserved.
+
+This work is published under the same terms as Perl itself, which may be found
+at http://www.perl.org.  The existance of this work does not imply that it is
+fit for any purpose implied by the code or accompanying documentation.  There is
+no warranty whatsoever.  Use at your own risk.
+

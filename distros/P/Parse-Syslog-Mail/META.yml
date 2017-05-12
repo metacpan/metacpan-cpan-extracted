@@ -1,0 +1,23 @@
+---
+name: Parse-Syslog-Mail
+version: 0.17
+author:
+  - 'Sebastien Aperghis-Tramoni <sebastien@aperghis.net>'
+abstract: Parse mailer logs from syslog
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Parse::Syslog: 0
+  perl: 5
+build_requires:
+  Test::More: 0
+provides:
+  Parse::Syslog::Mail:
+    file: lib/Parse/Syslog/Mail.pm
+    version: 0.17
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

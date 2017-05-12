@@ -1,0 +1,89 @@
+Revision history for PostScript-Report
+
+0.13   2013-11-30
+	- Builder now uses Module::Runtime to load classes
+	- Fix type library to be compatible with upcoming Moose 2.1200
+	  (fixes RT#90697 & RT#90698)
+	- Localize $@ before eval
+
+0.12   2013-05-04
+	- No functional changes; just updated metadata
+	- Add Moose & MooseX::Types to configure_requires.
+	  They're not actually required by Makefile.PL, but if they're
+	  not installed, it skips the version check introduced in
+	  version 0.11.  Since many CPAN testers don't install modules
+	  normally, but just build an @INC containing only the listed
+	  requirements, they always skipped the version check and
+	  continued to send reports for that Moose bug.
+
+0.11   2013-04-27
+	- Clean up type library
+	- Warn about conflict between MooseX::Types 0.32 and greater
+	  with Moose versions before 2.0800 (fixes RT#77299)
+	- Stabilize order of font creation.  Didn't affect printed
+	  output, but generated code could be different between runs,
+	  causing test failures on Perl 5.17.
+
+0.10   2012-04-04
+	- Use the function library provided by PostScript::File 2.20
+
+0.09   2011-05-05
+	- Use the improved API in PostScript::File 2.10
+	- Fixed LinkField to avoid deprecation warnings in Perl 5.12
+
+0.08   2010-07-20
+	- Added first_footer attribute
+	- Added "split" as a possible value for footer_align
+	- Include more report attributes in dump output
+	- Fixed bug in calculating required page count
+	  (could cause report footer to overlap report)
+
+0.07   2010-06-19
+	- Added extra_styles & get_style, which allows Components to
+	  inherit attributes without Containers and the Report needing
+	  to know every possible attribute
+	- Removed label_font from Report & Component
+	  (It's only used by FieldTL, and can be handled by extra_styles.)
+
+0.06   2010-03-26
+	- Added the LinkField component
+	- Added the metrics attribute to Font
+	- Fixed Image to round calculated dimensions to nearest point
+	  (A Component's height & width must be integers.)
+
+0.05   2010-02-26
+	- Use PostScript::File::Metrics (requires PostScript::File 2.00)
+	  You no longer need Font::AFM to get word wrapping.
+	- Call pstr as a method to take advantage of auto_hyphen
+	  processing in PostScript::File 2.00.	You should read
+	  Hyphens and Minus Signs in PostScript::File's documentation.
+	- Fixed memory leak (Font should have used a weak reference)
+	- Fixed Image to correctly initialize graphics state for EPS file
+	- Added get__PostScript_File method for PostScript::Convert
+	- Added examples/pdf_image.pl showing PostScript::Convert usage
+	- Require Moose 0.90 instead of MooseX::AttributeHelpers
+
+0.04   2009-10-29
+	- You can now indicate which sides should have a border
+	- You can now omit \%data and/or \@rows when calling run
+	- Use cp1252 encoding (requires PostScript::File 1.05)
+	- Fixed crash caused by a VBox with only 1 child
+
+0.03   2009-10-28
+	- Added background attribute to Component
+	- Added detail_background attribute to Report
+	- Added stripe & stripe_page to Builder
+	- Add PageOrder: Ascend comment
+	- Fixed bug in multiline FieldTL (was using wrong line height)
+	- Warn in documentation against making padding_bottom too small
+
+0.02   2009-10-22
+	- Builder allows scalar ref as shortcut for Value::Constant
+	  and _default overrides default_field_type in a container
+	- Warn if a field's value does not exist.
+	  Do not warn about existing but undefined values.
+	- Added the ps_parameters attribute to Report
+	- Updated documentation
+
+0.01   2009-10-20
+	- Initial release

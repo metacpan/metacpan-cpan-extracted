@@ -1,0 +1,245 @@
+NAME
+    Pye - Session-based logging platform on top of SQL/NoSQL databases
+
+SYNOPSIS
+            use Pye;
+
+            # start logging on top of a certain backend, say Pye::MongoDB
+            # (you can also call new() directly on the backend class, check
+            #  out the documentation of the specific backend)
+
+            my $pye = Pye->new('MongoDB',
+                    host => 'mongodb://logserver:27017',
+                    database => 'log_db',
+                    collection => 'myapp_log'
+            );
+
+            # if you've created your own backend, prefix it with a plus sign
+            my $pye = Pye->new('+My::Pye::Backend', \%options);
+
+            # now start logging
+            $pye->log($session_id, "Some log message", { data => 'example data' });
+
+DESCRIPTION
+    "Pye" is a dead-simple, session-based logging platform where all logs
+    are stored in a database. Log messages in "Pye" include a date, a text
+    message, and possibly a data structure (hash/array-ref) that
+    "illustrates" the text.
+
+    I built "Pye" due to my frustration with file-based loggers that
+    generate logs that are extremely difficult to read, analyze and
+    maintain.
+
+    "Pye" is most useful for services (e.g. web apps) that handle requests,
+    or otherwise work in sessions, but can be useful in virtually any
+    application, including automatic (e.g. cron) scripts.
+
+    In order to use "Pye", your program must define an ID for every session.
+    "Session" can really mean anything here: a client session in a web
+    service, a request to your web service, an execution of a script,
+    whatever. As long as a unique ID can be generated, "Pye" can handle
+    logging for you.
+
+    Main features:
+
+    *   Supporting data
+
+        With "Pye", any complex data structure (i.e. hash/array) can be
+        attached to any log message, enabling you to illustrate a situation,
+        display complex data, etc.
+
+    *   No log levels
+
+        Yeah, I consider this a feature. Log levels are a bother, and I
+        don't need them. All log messages in "Pye" are saved into the
+        database, nothing gets lost.
+
+    *   Easy inspection
+
+        "Pye" comes with a command line utility, pye, that offers quick
+        inspection of the log. You can easily view a list of current/latest
+        sessions and read the log of a specific session. No more mucking
+        about through endless log files, trying to understand which lines
+        belong to which session, or trying to find that area of the file
+        with messages from that certain date your software died on.
+
+    *   Multiple backends
+
+        "Pye" supports several database backends. Currently, Pye::MongoDB
+        supports MongoDB, and Pye::SQL supports MySQL, PostgreSQL and
+        SQLite.
+
+    This package provides two purposes. It provides a constructor that
+    dynamically loads the requested backend class and creates an object of
+    it. It is also a role (with Role::Tiny) detailing methods backend
+    classes are required to implement.
+
+  UPGRADING TO v2.0.0 AND UP
+    Originally, "Pye" was purely a MongoDB logging system, and this module
+    provided the MongoDB functionality. Since v2.0.0, "Pye" became a system
+    with pluggable backends, and the MongoDB functionality was moved to
+    Pye::MongoDB (not provided by this distribution, so you should install
+    that too if you've been using Pye before v2.0.0).
+
+    An improvement over v1.*.* was also introduced: before, every
+    application had two collections in the database - a log collection and a
+    session collection. The session collection is not needed anymore. You
+    can remove these session collections from your current database with no
+    repercussions.
+
+    Unfortunately, the API for v2.0.0 is not backwards compatible with
+    previous versions (but previous *data* is). You will probably need to
+    make two changes:
+
+    *   In your applications, change the lines instantiating a "Pye" object
+        to include the name of the backend:
+
+                my $pye = Pye->new('MongoDB', %options);
+
+        Alternatively, replace "use Pye" with "use Pye::MongoDB" and call:
+
+                my $pye = Pye::MongoDB->new(%options);
+
+        Also, in %options, the "log_db" option was renamed "database", and
+        "log_coll" was renamed "table" (or "collection", both are
+        supported).
+
+    *   The options for the pye command line utility have changed. You will
+        now need to provide a "-b|--backend" option (with "MongoDB" as the
+        value), and instead of "-l|--log_coll" you need to provide
+        "-c|--collection". Since the session collection has been deprecated,
+        the "-s|--session_coll" option has been removed, and now "-s" is an
+        alias for "-S|--session_id".
+
+    Also note the following dependency changes:
+
+    *   Getopt::Long instead of Getopt::Compact
+
+    *   JSON::MaybeXS instead of JSON
+
+CONSTRUCTOR
+  new( $backend, [ %options ] )
+    This is a convenience constructor to easily load a "Pye" backend and
+    create a new instance of it. "Pye" will load the $backend supplied, and
+    pass %options (if any) to its own constructor.
+
+    If you're writing your own backend which is not under the "Pye::"
+    namespace, prefix it with a plus sign, otherwise "Pye" will not find it.
+
+REQUIRED METHODS
+    The following methods must be implemented by consuming classes:
+
+  log( $session_id, $text, [ \%data ] )
+    Log a new message, with text $text, under session ID $session_id. An
+    optional reference can also be supplied and stored with the message.
+
+  session_log( $session_id )
+    Returns a list of all messages stored under session ID $session_id.
+    Every item in the array is a hash-ref with the following keys:
+    "session_id", "date" in (YYYY-MM-DD format), "time" (in HH:MM:SS.SSS
+    format), "text" and possibly "data".
+
+  list_sessions( [ \%options ] )
+    Returns a list of sessions in the log, based on the provided options. If
+    no options are provided, the latest 10 sessions should be returned. The
+    following options are supported:
+
+    *   sort - how to sort sessions (every backend will accept a different
+        value; defaults to descending order by "date")
+
+    *   skip - after sorting, skip a number of sessions (defaults to 0)
+
+    *   limit - limit the number of sessions returned (defaults to 10)
+
+    Every item (i.e. session) in the list should be a hash-ref with the keys
+    "id", "date" (in YYYY-MM-DD format) and "time" (in HH:MM:SS.SSS format).
+
+  _remove_session_logs( $session_id )
+    Removes all messages for a specific session.
+
+CONFIGURATION AND ENVIRONMENT
+    "Pye" requires no configuration files or environment variables.
+
+DEPENDENCIES
+    "Pye" depends on the following CPAN modules:
+
+    *   Carp
+
+    *   Role::Tiny
+
+    The command line utility, pye, depends on:
+
+    *   Getopt::Long
+
+    *   JSON::MaybeXS
+
+    *   Term::ANSIColor
+
+    *   Text::SpanningTable
+
+    It is recommended to install Cpanel::JSON::XS is recommended for fast
+    JSON (de)serialization.
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to "bug-Pye@rt.cpan.org", or
+    through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Pye>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+            perldoc Pye
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pye>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Pye>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Pye>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Pye/>
+
+AUTHOR
+    Ido Perlmuter <ido@ido50.net>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2013-2015, Ido Perlmuter "ido@ido50.net".
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either version 5.8.1 or any later
+    version. See perlartistic and perlgpl.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

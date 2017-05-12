@@ -1,0 +1,7 @@
+name = "POE-Component-EasyDBI"
+authors = ['David Davis <xantus@cpan.org>']
+authority = "cpan:XANTUS"
+license = "perl_5"
+readme_from = "lib/POE/Component/EasyDBI.pm"
+abstract_from = "lib/POE/Component/EasyDBI.pm"
+no_github_issues = true

@@ -1,0 +1,75 @@
+%{
+
+=head1 SYNOPSIS
+
+This example illustrates how to express the
+end of input (EOI) in the header section: use ''.
+I believe the fact that EOI can be involved in a 
+conflict resolution has been overlooked.
+
+It attempts to solve the conflict in 
+C<typicalrr.eyp> by giving priority
+only to the  'empty rules'. 
+Warning: Don't look too much at it if you 
+are new to LALR conflict resolution.
+
+Compile it with 
+
+            eyapp -b '' typicalrrwithprec.eyp
+
+Execute it with:
+
+   ./typicalrrwithprec.pm -t
+
+Try inputs C<4 5>,  C<a b> and C<4 5 a b>.
+
+=head1 SEE ALSO
+
+see  typicalrr.eyp, correcttypicalrr.eyp and typicalrr_fixed.eyp
+
+=cut
+
+use base q{RRTail}; 
+
+%}
+
+%right LNUM
+%right NUM 
+%right ID 
+%right '' # The string '' refers to the 'End of Input' token
+
+%tree bypass
+
+%%
+s:
+      %name EMPTY
+      /* empty */ %prec ''
+    | %name LIST
+       s ws
+    | %name LIST
+       s ns
+;
+
+ns:
+      %name EMPTYNUM
+      /* empty */  %prec NUM
+    | %name NUMS
+      NUM ns 
+;
+
+ws:
+      %name EMPTYID
+      /* empty */ %prec LNUM
+    |  %name IDS
+       ID ws
+;
+
+%%
+
+unless (caller()) {
+  $Parse::Eyapp::Node::INDENT = 1;
+  my $prompt = 'Try "4 5 a b 2 3" '.
+               '(press <CR><CTRL-D> to finish): ';
+  __PACKAGE__->main($prompt) 
+}
+

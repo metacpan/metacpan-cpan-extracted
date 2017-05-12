@@ -1,0 +1,43 @@
+ROOT 
+{
+   COMMAND head1 
+   {
+      TEXT HEAD1
+
+
+   }
+   ORDINARY 
+   {
+      TEXT Head 1 text
+
+
+   }
+   COMMAND head2 
+   {
+      TEXT HEAD
+      SEQUENCE I
+      {
+         TEXT 2
+      }
+      TEXT 
+
+
+   }
+   ORDINARY 
+   {
+      TEXT Head2 
+      SEQUENCE B
+      {
+         TEXT text
+      }
+      TEXT 
+
+
+   }
+   VERBATIM 
+    +------------------------------+
+    | This is a verbatim paragraph |
+    +------------------------------+
+
+
+}

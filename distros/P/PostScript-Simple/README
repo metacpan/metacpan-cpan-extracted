@@ -1,0 +1,76 @@
+PostScript::Simple
+==================
+
+INTRODUCTION
+
+PostScript::Simple allows you to have a simple method of writing PostScript
+files from Perl. It has several graphics primitives that allow lines, circles,
+polygons and boxes to be drawn. Text can be added to the page using standard
+PostScript fonts.
+
+It is named PostScript::Simple because it is intended to be simple
+to use to generate PostScript pages from Perl, not because it is a
+simplified interface for some other module, or can't do advanced
+things.
+
+Features include:
+
+    Generation of multi-page PostScript files
+    Generation of single-page EPS files
+    Creating lines/circles etc.
+    Rectangles and boxes
+    Text
+    Colour
+    Pre-defined paper sizes
+    Etc. etc.
+
+The file examples/example.pl provides some bad examples of what this module
+does.
+
+
+SOURCE
+
+The module source is now hosted on GitHub; see:
+
+  https://github.com/mcnewton/postscript-simple
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002-2014 Matthew C. Newton
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, version 2.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details,
+available at http://www.gnu.org/licenses/gpl.html.
+
+
+ACKNOWLEDGEMENTS
+
+Many people have contributed in different ways to PostScript::Simple. Thanks go
+to everyone involved! People who have helped include (in no particular order):
+
+  Mark Withall, Andreas Riechert, P Kent, Flemming Frandsen, Michael
+  Tomuschat, Vladi Belperchinov-Shabanski, Eric Voisard, Martin
+  McCarthy, Eric Wilhelm, Glen Harris, Peter Kuehn, Tomas Karlsson,
+  Satoshi Azuma
+
+I apologise if you should be here and I have missed you, please let me know.
+
+If you have sent me a patch for this module, and had no reply, please re-send
+it. I'm particularly bad at missing e-mails...
+

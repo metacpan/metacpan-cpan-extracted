@@ -1,0 +1,232 @@
+NAME
+
+    Paginator::Lite - A simple paginator
+
+VERSION
+
+    2.1.0
+
+SYNOPSIS
+
+    A simple tool to automate the creation of paging links
+
+        use Paginator::Lite;
+        
+        my $paginator = Paginator::Lite->new({
+            curr        => 3,
+            items       => 65,
+            frame_size  => 5,
+            page_size   => 10, 
+            base_url    => '/foo/items',
+            mode        => 'query',
+            params      => {
+                bar => 123
+            },
+        });
+        
+        ...
+        
+        $paginator->first       # 1
+        $paginator->last        # 7
+        $paginator->begin       # 1
+        $paginator->end         # 5
+        $paginator->next        # 4
+        $paginator->prev        # 2
+        $paginator->base_url    # '/foo/items'
+    
+        $paginator->first_url   # '/foo/items?bar=123&page=1'
+        $paginator->prev_url    # '/foo/items?bar=123&page=2'
+        $paginator->curr_url    # '/foo/items?bar=123&page=3'
+        $paginator->next_url    # '/foo/items?bar=123&page=4'
+        $paginator->last_url    # '/foo/items?bar=123&page=7'
+        
+
+DESCRIPTION
+
+    When handle with huge amounts of data sometimes you want to display
+    only a portion of it and provide controls to naviagte through it.
+
+    The classic way is to provide links or buttons to next, previous and
+    some pages around the current page, like this:
+
+        (prev)  1 2 [3] 4 5 (next)
+
+    But when the number of pages grow up too much this approach may be
+    annoying:
+
+        (prev) 1 2 3 4 5 6 7 8 9 10 [11] 12 13 14 15 16 16 18 19 20 21 (next)
+
+    So Paginator::Lite helps you calculating the numbers to feed your view
+    loops and implements the concept of frame. A frame is a small portion
+    of pages around the current page that will be displayed in addition to
+    (prev), (next) and other permanent buttons:
+
+        (prev) 10 11 12 [13] 14 15 16 (next)
+                \                  /
+                  ----- frame ----
+                    7 of 21 pages
+
+METHODS
+
+ new
+
+    Creates a Paginator::Lite object.
+
+    You must provide all required arguments: base_url, curr, frame_size,
+    items and page_size.
+
+    params is a optional argument that may be used to pass arbitrary data.
+
+    See more details about them in documentation of their respective
+    accessors.
+
+ base_url
+
+    Returns the value of base_url. It is the same value that you must
+    supply to constructor. This value will be used by the template to build
+    the links to direct pages.
+
+ curr
+
+    Returns the value of current page. It is the same value that you must
+    supply to constructor.
+
+ frame_size
+
+    Returns the value of frame_size. It is the same value that you must
+    supply to constructor. It is also the number of pages visible around
+    current page.
+
+    Usually frame_size may be calculated by:
+
+        my $frame_size = $pag->end - $pag->begin + 1
+
+    However when current page is too close to first or last, the frame may
+    be deformed but still trying to center in the current page.
+
+ page_size
+
+    Returns the value of page_size. It is the same value that you must
+    supply to constructor and means the number of items that you want
+    display in a single page.
+
+ items
+
+    Returns the value of items. It is the same value the you must provide
+    to constructor and means the total number of items that you are
+    paginating.
+
+ first
+
+    Returns the value of the first page, usually 1.
+
+ last
+
+    Returns the value of the last page. This value is calculated by
+    dividing the total amount of items by the number of items per page and
+    then rounding up the result.
+
+        $self->{last} = ceil( $self->items / $self->page_size );
+
+ begin
+
+    Returns the value of the first page of current frame. Usually you will
+    iterate between begin and end in your view to create direct links to
+    those pages.
+
+ end
+
+    Returns the value of the last page of current frame.
+
+ prev
+
+    Returns the value of previous page. Usually this value is curr - 1,
+    except when current page is 1.
+
+ next
+
+    Returns the value of next page. Usually this value is curr + 1, except
+    when current page is last.
+
+ params
+
+    Returns arbitrary data passed to contructor by params argument.
+
+ mode
+
+    Returns the chosen mode (path or query) of resulting URLs.
+
+ first_url
+
+    Returns the URL of the first page.
+
+ prev_url
+
+    Returns the URL of the previous page.
+
+ curr_url
+
+    Returns the URL of the current page.
+
+ next_url
+
+    Returns the URL of the next page.
+
+ last_url
+
+    Returns the URL of the last page.
+
+ page_url( $page )
+
+    Returns the URL of given page.
+
+ BUILD
+
+    Private. It casts the magic when building the object.
+
+AUTHOR
+
+    Blabos de Blebe, <blabos at cpan.org>
+
+BUGS
+
+    Please report any bugs or feature requests to bug-paginator-lite at
+    rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Paginator-Lite. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Paginator::Lite
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Paginator-Lite
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Paginator-Lite
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Paginator-Lite
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Paginator-Lite/
+
+COPYRIGHT & LICENSE
+
+    Copyright 2012 Blabos de Blebe.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

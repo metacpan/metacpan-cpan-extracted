@@ -1,0 +1,89 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.000003
+ [Added / configure requires]
+ - perl 5.008
+
+ [Added / test requires]
+ - perl 5.008
+
+1.000002 2014-08-15T23:24:23Z
+
+1.000001 2014-08-03T12:42:27Z
+ [Added / test requires]
+ - File::Spec
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - version
+
+1.000000 2014-07-15T06:28:56Z
+
+0.020 2014-04-17T11:11:41Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - version
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.98
+
+ [Removed / build requires]
+ - Module::Build 0.4202
+
+ [Removed / configure requires]
+ - Module::Build 0.4202
+
+0.011 2013-11-20T12:27:09Z
+ [Removed / test requires]
+ - File::Spec
+
+0.010 2013-11-20T04:28:29Z
+ [Added / runtime requires]
+ - Class::Tiny
+ - Path::Tiny
+ - subs
+
+ [Added / test requires]
+ - File::Spec
+ - lib
+
+ [Changed / build requires]
+ - Module::Build 0.4004 → 0.4202
+
+ [Changed / configure requires]
+ - Module::Build 0.4004 → 0.4202
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / runtime requires]
+ - File::Spec
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.003 2013-04-19T19:58:58Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / test requires]
+ - Test::More 0.96 → 0.98
+
+0.002 2012-04-11T05:44:56Z

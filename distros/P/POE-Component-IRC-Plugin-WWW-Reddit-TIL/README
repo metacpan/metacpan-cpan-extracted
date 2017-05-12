@@ -1,0 +1,57 @@
+NAME
+
+    POE::Component::IRC::Plugin::WWW::Reddit::TIL - IRC plugin that fetches
+    random TIL headlines from reddit.com/r/TodayILearned
+
+VERSION
+
+    Version 0.01
+
+SYNOPSIS
+
+        use strict;
+        use warnings;
+    
+        use POE qw(Component::IRC  Component::IRC::Plugin::WWW::Reddit::TIL);
+    
+        my $irc = POE::Component::IRC->spawn(
+            nick    => 'nickname',
+            server  => 'irc.freenode.net',
+            port    => 6667,
+            ircname => 'ircname',
+        );
+    
+        POE::Session->create(package_states => [main => [qw(_start irc_001)]]);
+    
+        $poe_kernel->run;
+    
+        sub _start {
+            $irc->yield(register => 'all');
+    
+            $irc->plugin_add('TIL' => POE::Component::IRC::Plugin::WWW::Reddit::TIL->new);
+    
+            $irc->yield(connect => {});
+        }
+    
+        sub irc_001 {
+            $irc->yield(join => '#channel');
+        }
+
+DESCRIPTION
+
+    type !til (casing does not matter) to get a random title and link from
+    the first page of http://www.reddit.com/r/todayilearned
+
+AUTHOR
+
+    Curtis Brandt, <curtis at cpan.org>
+
+BUGS
+
+    Please report bugs on my Github:
+    https://github.com/aggrolite/POE-Component-IRC-Plugin-WWW-Reddit-TIL
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2013-2017 Curtis Brandt. See LICENSE for details.
+

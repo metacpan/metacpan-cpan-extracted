@@ -1,0 +1,103 @@
+Revision history for Perl extension PPerl.
+
+0.25
+    - Fix exec code
+    - Call srand so children aren't all the same random seed
+    - Fix strange behaviour where perl can't see value in lexical $cycles
+      after loop. Making $cycles a package var fixes this for some reason.
+
+0.24
+    - More tests (richardc)
+    - Made exec() work (see t/19invoke_djbish.t if you're curious)
+
+0.23
+    - Locks around race points
+    - More improvements to cleanup
+
+0.22
+    - Attempt to work around a race condition
+    - Added support for turning off cleanup routines
+    - Cleanup socket a little better on shutdown
+
+0.21
+    - Support maxclients setting on command line
+    - Slightly improved debugging
+    - chomp $version in pperl.h - multiline strings are a gcc
+      extension and deprecated
+    - Fixed dickvd bug (again)
+
+0.20
+    - Fix for the Dick Van Dyke bug
+    
+0.19
+    - Rejig the generated code to fix a nasty closure bug
+
+0.18
+    - Made $$ changes work on perl 5.8
+    - Set $0
+    - Some bug fixes
+
+0.17
+    - Renamed pperl.c to main.c to allow building on case-insensitive file 
+      systems (HFS+, samba)
+    - pid propogation
+    - Minor rework of the script slurping including moving __DATA__ and
+      end blocks to the end. __END__ detection
+
+0.16
+    - Tests and fixes for: -T behaviour.  fork(), tied data, autoclose
+      behavior, signal propogation, broken test 00stevens.t.
+    - Cleanups for: argument passing.  Amount of stuff in PPerl.xs.
+      Strict prototyping of subs.  Internal use of macros for speed.
+
+0.15
+    - Minor fixes
+    
+0.14
+    - Switched entire model to pass fd's over the socket, rather than
+      all of STDIN/STDOUT. This means we no longer have to do lots of
+      messing with select() - it all just "works". Many beers to
+      RichardC for this work.
+
+0.13
+    - Implement wide-open sockets (for people who need to run the same
+      script as different users). Note this may have bad security "issues".
+    - Turn off strict for actual script (script may turn it on again).
+    - More help page stuff
+
+0.12
+    - Bug fixes for new daemon code
+
+0.11
+    - Remove need for Net::Server
+
+0.10
+    - Fix for scripts that use eval {} (Richard Clamp)
+
+0.09
+    - Better ENV support (Richard Clamp)
+    - Support CWD (Richard Clamp)
+
+0.08
+    - Slight performance improvement and cleanup patches from RichardC.
+
+0.07
+    - Nasty bug where temp files were left around fixed.
+    - Made pperl display proper version
+
+0.06
+    - Fixes for Solaris compiles
+
+0.05
+    - Compilation on big endian architectures from Richard Clamp
+    - Now works on Solaris and MacOSX
+
+0.04
+	- Many updates, with much help from Richard Clamp.
+	- Added -k/--kill option.
+	- Made it work with magic <>.
+
+0.01  Tue Sep 18 16:01:15 2001
+	- original version; created by h2xs 1.21 with options
+		-A -X -n PPerl
+

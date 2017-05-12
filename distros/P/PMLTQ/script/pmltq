@@ -1,0 +1,35 @@
+#!/usr/bin/env perl
+
+# ABSTRACT: Command line interface to PML-TQ
+
+use warnings;
+use strict;
+
+use File::Spec;
+use File::Basename 'dirname';
+use lib File::Spec->rel2abs( File::Spec->catdir( dirname(__FILE__), File::Spec->updir, 'lib' ) );
+
+require PMLTQ::Commands;
+
+PMLTQ::Commands->run(@ARGV);
+
+=head1 SYNOPSIS
+
+  pmltq <command> [<args>]
+
+  Available pmltq commands
+    convert
+    delete
+    help
+    initdb
+    load
+    man
+    query
+    verify
+    version
+
+=head1 DESCRIPTION
+
+B<pmltq> is a command-line interface to PML-TQ.
+
+=cut

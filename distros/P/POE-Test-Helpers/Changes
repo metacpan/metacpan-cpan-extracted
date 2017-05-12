@@ -1,0 +1,49 @@
+Revision history for POE-Test-Helpers
+
+# Day/Month/Year
+
+1.11    12.09.10
+        * Adding POE kernel run to synopsis for RT #61274
+
+1.10    14.08.10
+        * Separating tests
+        * Separating API documentation not to confuse beginners
+        * Corrected Changelog dates
+
+1.09    11.08.10
+        * Removed Build.PL creation for RT #60210
+        (it wasn't really necessary)
+
+1.08    10.08.10
+        * POD fixups
+
+1.07    09.08.10
+        [ HUGE REWRITE ]
+        * Now POE::Test::Helpers works for regular POE
+        * MUCH much cleaner code
+        * There is a Moose role for POE::Test::Helpers using the new API
+          (POE::Test::Helpers::MooseRole)
+
+0.06    21.10.09
+        * Removing remains of working title
+
+0.05    20.10.09
+        * adding a LOT of documentation
+
+0.04    20.10.09
+        * Hooking up to events automa{t,g}ically
+        (thanks to help from perigrin [Chris Prather]
+         and the great people at #moose)
+
+        * Got the official name POE::Test::Helpers
+        (thanks to dngor [Rocco Caputo])
+
+0.03    06.10.09
+        * Supports event parameters
+
+0.02    05.10.09
+        * Added sequence ordering
+
+0.01    05.10.09
+        * Supports minimal stuff, ordering
+

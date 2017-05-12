@@ -1,0 +1,258 @@
+%!PS-Adobe-2.0 EPSF-1.2
+%%BoundingBox: -5 250 225 310
+%%Creator: Gisle Aas (Copyright 1998)
+
+% Some handy aliases
+/M  /moveto       load def
+/L  /lineto       load def
+/RM /rmoveto      load def
+/RL /rlineto      load def
+/F  /fill         load def
+/S  /stroke       load def
+/CP /closepath    load def
+/LW /setlinewidth load def
+/SG /setgray      load def
+
+/SF    { exch findfont exch scalefont setfont         } def
+/cshow { dup stringwidth pop 2 div neg 0 rmoveto show } def
+/rshow { dup stringwidth pop       neg 0 rmoveto show } def
+
+% Some colors used
+/yellow    { 1 1 0.8 setrgbcolor } def
+/red       { 0.7 0 0 setrgbcolor } def
+/palered   { 1.0 0.8 0.8 setrgbcolor } def
+/palegreen { 0.8 1.0 0.8 setrgbcolor } def
+/paleblue  { 0.8 0.8 1.0 setrgbcolor } def
+
+/rect {               % <x1> <y1> <x2> <y2> rect -
+   4 dict begin
+      /y2 exch def /x2 exch def
+      /y1 exch def /x1 exch def
+      newpath x1 y1 moveto x2 y1 lineto x2 y2 lineto x1 y2 lineto closepath
+   end
+} def
+
+/rrect {             % <dx> <dy> rrect -
+   2 dict begin
+      /dy exch def  /dx exch def
+      dx 0 rlineto 0 dy rlineto dx neg 0 rlineto closepath
+   end
+} def
+
+/ptrn { % <x1> <y1> <x2> <y2> ... <xn> <yn> ptrn -
+   % first draw an bullet at first coordinate
+   count dup 2 sub roll
+   2 copy
+      newpath 2 0 360 arc F
+      M
+
+   count 0 gt {  % is there more than one point?
+      % then a line for all but the last
+      count 2 idiv 1 sub {
+         count dup 2 sub roll L
+      } repeat
+
+      % only the last one left, where the arrow-head must be
+      7 dict begin
+         /y exch def
+         /x exch def
+         currentpoint y sub neg /dy exch def
+         x sub neg /dx exch def
+
+         /al dx dx mul dy dy mul add sqrt def
+         /angle dy dx atan def
+         /b al 7 sub def
+
+         gsave
+            currentpoint translate
+            angle rotate
+            b 0 L S
+            b -2.5 M b 2.5 L al 0 L CP F  % arrow head
+         grestore
+      end
+   } if
+} def
+
+
+% <x1> <y> <x2> ptr1 -
+/ptr1 { 1 index ptrn } def
+
+/sv {
+   2 dict begin
+      /y exch def
+      /x exch def
+      x y sv2
+     %35 25 55 ptr1
+      x 35 add y 5 sub x 55 add ptr1
+   end
+} def
+
+/sv2 {                            % <x> <y> sv -
+   gsave
+      30 sub translate
+
+      % flags
+      0.5 setgray
+      0.1 LW
+      0 30 12 div 30 {
+         dup 10 M 6 L S
+      } for
+
+      paleblue  0 20 40 30 rect fill  % ANY background
+      palered  30  0 40 10 rect fill  % TYPE background
+
+      % box
+      0 setgray
+      0.8 LW
+      0 0 40 30 rect S
+
+      % separators
+      0.7 LW
+      0 10 M 40 10 L S
+      0 20 M 40 20 L S
+      30 0 M 30 10 L S
+
+     grestore
+} def
+
+% Routines to draw the struct boxes
+
+/box {                     % <x> <y> <no> box -
+   10 dict begin
+      /no exch def
+      /y  exch def
+      /x  exch def
+
+      /x2 x 50 add def
+      /y2 y no 15 mul sub def
+
+      y2 15 add 15 y {
+	dup x exch M
+        x2 exch L S
+      } for
+
+      x y M x2 y L x2 y2 L x y2 L CP S
+   end
+} def
+
+/newbox {                  % <x> <y> <start> <end> newbox -
+   4 dict begin
+     /to exch def
+     /from exch def
+     /y exch def
+     /x exch def
+
+     gsave
+       yellow
+       x y from 1 sub 15 mul sub 
+       x 50 add y to 15 mul sub rect
+       F
+     grestore
+   end
+} def
+
+
+0 300 sv
+
+/Courier 8 SF
+40  302 M (sv) rshow
+105 302 M (xpv) rshow
+
+55 300 1 3 newbox
+55 300 3 box
+
+
+
+/Helvetica 11 SF
+60 303 15 sub M
+
+[(PVX) (CUR) (LEN)] {
+    gsave
+    show
+    grestore
+    0 -15 rmoveto
+} forall
+
+/break {                  % <x> <y> break -
+   gsave
+      translate -153 -300 translate
+
+      % white background
+      gsave
+         153 283 moveto 143 290 163 295 153 302 curveto
+         158 302 lineto 168 295 148 290 158 283 curveto
+         closepath
+         1 setgray
+         fill
+      grestore
+
+      % dashed lines on each side
+      gsave
+         1 setlinewidth
+         0.5 setgray
+         [2 1] 0 setdash
+         153 283 moveto 143 290 163 295 153 302 curveto
+         158 302 moveto 168 295 148 290 158 283 curveto
+         stroke
+      grestore
+   grestore
+} def
+
+% arrow from PVX
+newpath 97.5 292.5 2 0 360 arc fill
+97.5 292.5 M 113 292.5 L stroke
+113 290 M 120 292.5 L 113 295 L closepath fill
+
+% char* box
+gsave
+   0.8 setgray
+   190 285 220 300 rect F
+grestore
+
+0.5 setlinewidth
+130 10 210 {
+   dup 300 M 285 L S
+} for
+1 setlinewidth
+120 285 220 300 rect S
+
+/Courier 8 SF
+220 302 M (char[]) rshow
+
+125 290 M
+[(a) (b) (c) (?) (x) (y) (z) (\\0)] {
+   gsave
+     dup stringwidth pop 2 div neg 0 RM show
+   grestore
+   10 0 RM
+} forall
+
+
+
+%break in the midle of char*
+153 300 break
+
+% Some lines indicating the value of CUR/LEN
+
+gsave
+red
+
+% CUR length
+0.5 setlinewidth
+120 275 M 120 280 L
+120 277.5 M 190 277.5 L
+190 275 M 190 280 L
+stroke
+120 277.5 M 124 279 L 124 276 L closepath fill
+190 277.5 M 186 279 L 186 276 L closepath fill
+
+% LEN length
+120 265 M 120 260 L
+120 262.5 M 220 262.5 L
+220 265 M 220 260 L
+stroke
+120 262.5 M 124 264 L 124 261 L closepath fill
+220 262.5 M 216 264 L 216 261 L closepath fill
+
+grestore
+

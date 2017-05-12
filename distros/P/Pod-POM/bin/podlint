@@ -1,0 +1,74 @@
+#!/usr/bin/perl -w
+
+use Pod::POM;
+use Getopt::Std;
+use File::Basename;
+
+my $program = basename($0);
+
+my %opts;
+getopts('fh', \%opts);
+die usage() if $opts{ h };
+
+my $file = shift || die usage();
+
+my $parser;
+{
+    no warnings 'once';
+    $parser = Pod::POM->new( warn => 1, code => 1 )
+    || die "$Pod::POM::ERROR\n";
+}
+
+my $pom = $parser->parse_file($file)
+    || die $parser->error(), "\n";
+
+print $pom if $opts{ f };
+
+
+sub usage {
+    return <<EOF;
+usage: $program [-f] file
+
+Checks Pod file for well-formedness, printing warnings to STDERR.  
+The -f option can be set to fix problems (where possible), printing 
+the modified output to STDOUT.
+EOF
+}
+
+=head1 NAME
+
+podlint - check POD for correctness using Pod::POM
+
+=head1 SYNOPSIS
+
+    podlint MyFile.pm
+
+=head1 DESCRIPTION
+
+This script uses Pod::POM to parse a Pod document with full 
+warnings enabled, effectively acting as a syntax and structure
+checker.
+
+The -f option can be specified to have the parsed Pod Object Model
+printed to STDOUT with any markup errors fixed.  Note there are some
+critical parse errors that can't be handled and fixed by the parser
+and in this case the script will terminate reporting the error.
+
+=head1 AUTHOR
+
+Andy Wardley E<lt>abw@kfs.orgE<gt>
+
+=head1 VERSION
+
+This is version 0.2 of podlint.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2000, 2001 Andy Wardley.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+For further information please see L<Pod::POM>.

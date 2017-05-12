@@ -1,0 +1,40 @@
+---
+name: Pod-ToDocBook
+version: 0.9
+author:
+  - Zahatski Aliaksandr zag@cpan.org
+abstract: Pluggable converter POD data to DocBook.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Encode: 0
+  Pod::Parser: 0
+  Text::ParseWords: 0
+  XML::ExtOn: 0.12
+  XML::Flow: 0
+  XML::SAX::Writer: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Pod::ToDocBook:
+    file: lib/Pod/ToDocBook.pm
+    version: 0.9
+  Pod::ToDocBook::DoSequences:
+    file: lib/Pod/ToDocBook/DoSequences.pm
+  Pod::ToDocBook::FormatList:
+    file: lib/Pod/ToDocBook/FormatList.pm
+  Pod::ToDocBook::Pod2xml:
+    file: lib/Pod/ToDocBook/Pod2xml.pm
+  Pod::ToDocBook::ProcessHeads:
+    file: lib/Pod/ToDocBook/ProcessHeads.pm
+  Pod::ToDocBook::ProcessItems:
+    file: lib/Pod/ToDocBook/ProcessItems.pm
+  Pod::ToDocBook::TableDefault:
+    file: lib/Pod/ToDocBook/TableDefault.pm
+  str2fd:
+    file: lib/Pod/ToDocBook/Pod2xml.pm
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

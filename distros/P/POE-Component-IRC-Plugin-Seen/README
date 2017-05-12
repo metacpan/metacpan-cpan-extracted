@@ -1,0 +1,35 @@
+POE-Component-IRC-Plugin-Seen version 0.001002
+==============================================
+
+POE::Component::IRC::Plugin::Seen is a PoCo-IRC plugin that remembers
+what each person around it did last. It remembers public messages,
+joins and parts.
+
+When somebody sends him a private message of the form 'seen NICKNAME'
+or somebody says 'seen NICKNAME' or 'botnick: seen NICKNAME' in a
+channel with the bot, the plugin answers with the last action NICKNAME
+did. There can be an exclamation mark before the word 'seen'.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+* POE::Component::IRC
+* IRC::Utils
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013-2015 by Marius Gavrilescu
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.

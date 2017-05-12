@@ -1,0 +1,8 @@
+Revision history for Plack-Middleware-Auth-Negotiate
+
+0.02    June 02, 2011
+        Removed POD Coverage test, since it is not applicable.
+
+0.01    May 31, 2011
+        Initial proof of concept release.
+

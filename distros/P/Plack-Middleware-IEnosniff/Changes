@@ -1,0 +1,10 @@
+Revision history for Perl extension Plack::Middleware::IEnosniff
+
+0.02    Sat Oct 27 23:30:00 JST 2012
+    [NO CODE CHANGES]
+        - fix POD
+        - add pod-coverage test
+        - support travis-ci
+
+0.01    Sun Jan 30 01:01:01 2011
+        - original version

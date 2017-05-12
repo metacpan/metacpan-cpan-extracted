@@ -1,0 +1,31 @@
+NAME
+    Plack::Middleware::RequestHeaders - modify HTTP request headers
+
+VERSION
+    version 0.05
+
+SYNOPSIS
+        enable 'RequestHeaders',
+            set => ['Accept-Encoding' => 'identity'],
+            unset => ['Authorization'];
+
+DESCRIPTION
+    This middleware allows the modification of HTTP request headers. For
+    instance, util for use with Plack::App::Proxy.
+
+ACKNOWLEDGMENT
+    Initial development sponsored by 123people Internetservices GmbH -
+    <http://www.123people.com/>
+
+SEE ALSO
+    Plack::Middleware::Headers, Plack::Middleware, Plack::Builder
+
+AUTHOR
+    Wallace Reis <wreis@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Wallace Reis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

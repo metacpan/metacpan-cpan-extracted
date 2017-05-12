@@ -1,0 +1,8 @@
+<html>
+    <body>
+        <: $foo :><br/>
+        <: baz() :><br/>
+        <: sha1_hex("asdf") :><br/>
+        <: Dumper("whatever") :><br/>
+    </body>
+</html>

@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+use strict;
+use lib '../../..';
+
+use Proc::PersistentControl;
+
+my $tp = Proc::PersistentControl->new(debug => $ARGV[0]);
+
+sub type {
+    print "$_[0]:\n";
+    open(T, $_[0]);
+    print while (<T>);
+    close(T);
+}
+
+sub printInfo {
+    my $r = shift;
+    foreach my $k (keys(%$r)) {
+	my $v = $r->{$k};
+	print "$k=$v\n";
+    }
+    type($r->{_dir} . '/STDOUT');
+    type($r->{_dir} . '/STDERR');
+}
+
+my @Plist = $tp->ProcList();
+
+foreach my $p (@Plist) {
+    print '=' x 78, "\n";
+    printInfo($p->Info());
+    print '=' x 78, "\n";
+}

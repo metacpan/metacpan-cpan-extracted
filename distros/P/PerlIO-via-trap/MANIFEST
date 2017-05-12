@@ -1,0 +1,5 @@
+MANIFEST			This list of files
+MANIFEST.SKIP
+Makefile.PL
+trap.pm
+t/1-basic.t

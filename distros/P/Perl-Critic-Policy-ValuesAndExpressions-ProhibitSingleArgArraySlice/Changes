@@ -1,0 +1,18 @@
+0.004     2016-12-21 17:20:34+01:00 Europe/Amsterdam
+
+    * Remove secondary $VERSION variable. Whoops.
+
+0.003     2016-12-21 17:18:00+01:00 Europe/Amsterdam
+
+    * Remove false positives. This now only detect a single digit
+      used. It might get smarter in the future, recognizing constants.
+    * GH #1: Correct wording. Sorry for spotting, Vincent Pit!
+    * Lower severity to "high", not "highest".
+
+0.002     2016-12-21 13:07:24+01:00 Europe/Amsterdam
+
+    * Fix dependencies.
+    * Fix Changes file.
+
+0.001   2016-12-21 13:04:23+01:00 Europe/Amsterdam
+    * Initial release.

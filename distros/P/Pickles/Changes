@@ -1,0 +1,93 @@
+Revision history for Perl extension Pickles
+
+0.10 - 05 Jan 2012
+    [MISCELLANEOUS]
+    * Force cache => 1 on Text::Xslate when PLACK_ENV is 'production'.
+
+0.09 - 14 Dec 2011
+    [MISCELLANEOUS]
+    * Stray semicolon(s) in Makefile.PL caused all kinds of havoc.
+    * Tests failed under new formatting for Plack.
+    * Remove use of auto_include
+
+0.08 - 28 Jul 2011
+    [MISCELLANEOUS]
+    * Now die()ing from the app produces a useful stacktrace (aska)
+    * Properly check for HTML::FillInForm before running tests that require it
+
+0.07 - 13 Apr 2011
+    [MISCELLANEOUS]
+    * Use require() instead of do() to read config files and container files
+    * Plugin::AntiCSRF now checks if it should check for CSRFs instead
+      of running it all the time. Now POST requests and URIs specified
+      with skip_csrf_check at connect() time will be ignored.
+
+    [BUGFIXES]
+    * Now Plugin::Encode decodes $c->args
+    * Properly call ->finished(1) in Plugin::AntiCSRF (aska)
+
+0.06 - 31 Jan 2011
+    [MISCELLANEOUS]
+    * Changed the storage location for Plugin::Session to be inside
+      $env->{'pickles.session'}
+
+    [BUGFIXES]
+    * Previously only $request->parameters were decoded in Plugin::Encode.
+      Now body_parameters() and query_parameters() are decoded as necessary,
+      along with parameters()
+
+0.05 - 24 Jan 2011
+    * Upload to CPAN
+
+    [ BACKWARDS INCOMPATIBLE CHANGES ]
+    * validate controller's action name. an acceptable pattern is /^[a-z][a-zA-Z0-9_]*/ and you can not override core methods (eg: new, add_trigger ...)
+
+    [ ENHANCEMENTS ]
+    * Plugin::Encode add charset parameter to Content-Type header.
+
+    * implement loading external file from config and container.
+
+0.04 - 05 Nov 2010
+
+    [ BACKWARDS INCOMPATIBLE CHANGES ]
+    * Generated application will use Xslate as the default template engine
+
+    * Generated PSGI file is now named MyApp.psgi instead of app.psgi
+
+    * Pickles::Dispatcher now reads an external file to grab the routing
+      rules. The rules should return a Router::Simple object
+
+    * Configuration files are now read in the following order:
+        1. $HOME/etc/config.pl
+        2. $HOME/etc/$ENV{MYAPP_CONFIG}.pl
+        3. $HOME/etc/$ENV{MYAPP_CONFIG}_$ENV{MYAPP_ENV}.pl
+
+    [ ENHANCEMENTS ]
+    * Pickles now support Text::MicroTemplate, Text::Xslate.
+
+    * Added plugins for Plugin::AntiCSRF, Plugin::FillInForm,
+      Plugin::Log and Plugin::Session
+
+    * Pickles::Context's container capabilities are now delegated to
+      Pickles::Container.
+
+    * Pickles::Container->register  now supports a second argument, 
+      which can make an object persistent by passing 
+        $container->register( \&code, { persisitent => 1 });
+
+    * Added MyApp->context_class to switch the context object
+
+    * View objects and controller objects are cached after creation.
+
+    * Controllers now can be initialized using the context via Controller->init
+
+    [ BUGFIXES ]
+    * Fixed a problem where closures used when reading config files were
+      causing problems on perl 5.8.8.
+
+0.03    NOT RELEASED
+
+0.02    NOT RELEASED
+
+0.01    Tue Mar  9 18:26:57 2010
+        - original version

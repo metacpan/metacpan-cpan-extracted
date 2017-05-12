@@ -1,0 +1,13 @@
+[% person.first_name %],
+
+Your username for [% c.config.name %] is:
+
+  [% person.authentication.username %]
+
+You can visit [% c.config.name %] at:
+
+  [% c.request.base %]
+
+Regards,
+
+The [% c.config.name %] team.

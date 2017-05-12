@@ -1,0 +1,92 @@
+#!/usr/bin/perl
+
+use strict;
+# use warnings;
+use Getopt::Long qw(:config no_ignore_case auto_version auto_help);
+use Pod::Usage;
+use PPM::Make::RepositorySummary;
+$main::VERSION = $PPM::Make::RepositorySummary::VERSION;
+my %opts = ();
+my @files = ();
+my %progs = ();
+GetOptions(\%opts, 
+           'rep:s',
+           'no-ppm4',
+           'arch:s',
+          ) or pod2usage(2);
+
+pod2usage(2) unless ($opts{rep});
+if ($opts{'no-ppm4'}) {
+  $opts{no_ppm4} = delete $opts{'no-ppm4'};
+}
+
+my $obj = PPM::Make::RepositorySummary->new(%opts);
+$obj->summary();
+
+__END__
+
+=head1 NAME
+
+rep_summary - generate summary files for a ppm repository
+
+=head1 SYNOPSIS
+
+ rep_summary --rep /path/to/ppm/repository
+
+Options:
+
+ [--version]          : print version information and exit
+ [--help]             : print this help screen
+ [--rep ] location    : specify the ppm repository location
+ [--no-ppm4 ]         : don't generate a package.xml file for ppm4
+ [--arch ] arch       : specify the architecture for package.xml
+
+=head1 DESCRIPTION
+
+C<rep_summary> is an interface to C<PPM::Make::RepositorySummary>,
+which may be used to generate various summary files as used by
+ActiveState's ppm system (C<summary.ppm>, C<searchsummary.ppm>,
+C<package.lst>, and, unless excluded by the I<--no_ppm4> option,
+C<package.xml>. See L<PPM::Make::RepositorySummary>
+for a description of these files. Options include
+
+=over
+
+=item --rep /path/to/ppds
+
+This option, which is required, specifies the path to where
+the I<ppd> files are found. The summary files will be written
+in this directory.
+
+=item --no-ppm4
+
+If this option is specified, the F<package.xml> file (which
+contains some extensions used by ppm4) will not be generated.
+
+=item --arch MSWin32-x86-multi-thread-5.8
+
+If this option is given, it will be used as the
+I<ARCHITECTURE> attribute of the I<REPOSITORYSUMMARY>
+element of F<package.xml>.
+
+=item [--help]
+
+This prints out a short help screen and exits.
+
+=item [--version]
+
+This prints out some version information and exits.
+
+=back
+
+=head1 COPYRIGHT
+
+This program is copyright, 2006, by Randy Kobes 
+E<lt>r.kobes@uwinnipeg.caE<gt>.
+It is distributed under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<PPM> and L<PPM::Make::RepositorySummary>
+
+=cut

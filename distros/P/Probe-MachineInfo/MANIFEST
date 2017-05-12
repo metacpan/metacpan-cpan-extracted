@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/Probe/MachineInfo.pm
+lib/Probe/MachineInfo/ClockSpeed.pm
+lib/Probe/MachineInfo/Distribution.pm
+lib/Probe/MachineInfo/Hostid.pm
+lib/Probe/MachineInfo/Hostname.pm
+lib/Probe/MachineInfo/IpAddress.pm
+lib/Probe/MachineInfo/KeepAlive.pm
+lib/Probe/MachineInfo/Metric.pm
+lib/Probe/MachineInfo/NumCPUs.pm
+lib/Probe/MachineInfo/OS.pm
+lib/Probe/MachineInfo/SimpleMetric.pm
+lib/Probe/MachineInfo/Uptime.pm
+MANIFEST			This list of files
+META.yml
+README
+t/01_distribution.t
+test.perl

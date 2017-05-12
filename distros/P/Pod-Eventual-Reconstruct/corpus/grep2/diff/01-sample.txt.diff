@@ -1,0 +1,22 @@
+--- input/01-sample.txt	2013-06-06 03:49:23.819427569 +1200
++++ output/01-sample.txt	2013-06-06 03:51:21.129211142 +1200
+@@ -4,7 +4,6 @@
+ use warnings;
+ use utf8;
+ 
+-=begin Foo
+ 
+ =end Foo
+ 
+@@ -18,11 +17,8 @@
+ 
+ # or here
+ 
+-=begin comment
+ 
+-    =begin indented is a comment
+ 
+-    =end indented is a comment
+ 
+ =end comment
+ 

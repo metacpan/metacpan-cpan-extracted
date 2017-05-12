@@ -1,0 +1,134 @@
+#!perl
+
+use strict;
+use warnings;
+use lib ();
+use Perl::PrereqScanner::NotQuiteLite::App;
+use Getopt::Long;
+use Pod::Usage;
+
+GetOptions(\my %opts, qw/
+  lib|I=s@
+  version
+  help
+  json
+  exclude-core
+  perl-version=s
+  base-dir=s
+  suggests
+  develop
+  blib
+/);
+
+if ($opts{version}) {
+  print "scan-perl-prereqs-nqlite v" . (Perl::PrereqScanner::NotQuiteLite->VERSION || 'DEV') . "\n";
+  exit;
+}
+
+if ($opts{help}) {
+  pod2usage(-verbose => 1);
+  exit;
+}
+
+lib->import(@{$opts{lib}}) if $opts{lib};
+
+for my $key (keys %opts) {
+  next unless $key =~ /\-/;
+  (my $replaced_key = $key) =~ s/\-/_/g;
+  $opts{$replaced_key} = $opts{$key};
+}
+
+$opts{print} = 1;
+
+Perl::PrereqScanner::NotQuiteLite::App->new(%opts)->run(@ARGV);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+scan-perl-prereqs-nqlite
+
+=head1 SYNOPSIS
+
+  scan-perl-prereqs-nqlite [DIRS|FILES]
+
+=head1 DESCRIPTION
+
+C<scan-perl-prereqs-nqlite> traverses several files and
+subdirectories in the current directory with L<File::Find> to
+collect all C<.pl>, C<.PL>, C<.pm>, C<.t>, C<.psgi> files (as well
+as all the files in C<scripts?> and C<bin> directories), and prints
+a single combined list of prerequisites, which should be suitable
+for piping to C<cpanm> or similar tools.
+
+You can also pass files and/or directories to limit files to scan.
+In this case, however, C<scan-perl-prereqs-nqlite> doesn't try to
+exclude modules that should belong to the same distribution.
+
+=head1 OPTIONS
+
+=over 4
+
+=item version
+
+Show the version.
+
+=item help
+
+Show this help.
+
+=item json
+
+Print prerequisites as a JSON if L<JSON::PP> is installed.
+
+=item suggests
+
+Print suggestions (C<use>d modules in C<eval>) as well.
+
+=item develop
+
+Print requirements/suggestions for developers (C<use>d modules
+in C<xt>, C<inc>, and C<author> directories) as well.
+
+=item exclude-core
+
+Ignore prerequisites that are bundled in the Perl core (of 5.008001
+by default). This requires L<Module::CoreList> version 2.99 or
+above.
+
+=item perl-version
+
+Ignore prerequisites that are bundled in the Perl core of specific
+version. This implies C<exclude-core> as well.
+
+=item base-dir
+
+Set the base directory from where C<scan-perl-prereqs-nqlite>
+starts traversing files and directories.
+
+=item blib
+
+If this is set, C<scan-perl-prereqs-nqlite> will traverse
+subdirectories under C<blib> to collect runtime requirements.
+It may return better results if some of the files are located in
+some uncommon places and/or some of them are listed in C<no_index>.
+However, files in C<blib> may be older than the ones under C<lib>
+etc, and you need to update them by running a make or a C<Build>
+script before you run C<scan-perl-prereqs-nqlite>.
+
+=back
+
+=head1 AUTHOR
+
+Kenichi Ishigaki, E<lt>ishigaki@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Kenichi Ishigaki.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

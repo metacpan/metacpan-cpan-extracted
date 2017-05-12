@@ -1,0 +1,94 @@
+NAME
+    Perl::SAX - Generate SAX events for perl source code (incomplete)
+
+DESCRIPTION
+    With the completion of PPI and the potential creation of a viable
+    refactoring Perl editor, there has been renewed interest in parsing perl
+    source code and "Doing Stuff" with it.
+
+    It was felt (actually, it was demanded) that there should be some sort
+    of event mechanism that could go through a chunk of perl source code and
+    emit events that would be handled by a variety of methods.
+
+    Rather than invent my own, it was much easier to hijack SAX for this
+    purpose.
+
+    "Perl::SAX" is the result of this need. Starting with a single object of
+    any type descended from PPI::Node, "Perl::SAX" will generate a stream of
+    SAX events.
+
+    For the sake of compatibility with SAX as a whole, and in the spirit of
+    not dictating the default behaviour based on any one use of this event
+    stream, the stream of events will be such that it can be passed to
+    XML::SAX::Writer and a "PerlML" file will be spat out.
+
+    This provides the highest level of detail, and allows for a variety of
+    different potential uses, relating to both the actual and lexical
+    content inside of perl source code.
+
+  Perl::SAX is just a SAX Driver
+    Please note that "Perl::SAX" is only a SAX Driver. It cannot be used as
+    a SAX Filter or some other form of SAX Handler, and will die fatally if
+    you try, as soon as it recieves a "start_document" event.
+
+    To restart Perl::SAX only creates events, it cannot consume them.
+
+  Current State of Completion
+    This basic first working version is being uploaded to support the
+    creation of an Acme::Bleach rip-off using PerlML.
+
+METHODS
+  new [ Handler => $Handler | Output => $WriterConsumer ]
+    The "new" constructor creates a new Perl SAX Driver instance.
+
+    If passed no arguments, it creates a new default XML::SAX::Writer
+    object, which by default will write the resulting PerlML file to STDOUT.
+
+    If passed an "Output => $Consumer" argument, this value will be passed
+    along to the XML::SAX::Writer constructor. Any value that is legal for
+    the Output parameter to XML::SAX::Writer is also legal here.
+
+    If passed a "Handler => $Handler" argument, $Handler will be used as the
+    SAX Handler directly. Any value provided via Output in this case will be
+    ignored.
+
+    Returns a new "Perl::SAX" object, or "undef" if you pass an illegal
+    Output value, and the XML::SAX::Writer cannot be created.
+
+TO DO
+    Design and create the PerlML Schema
+
+    Make any changes needed to conform to it
+
+    Write a bunch of tests
+
+SUPPORT
+    Because the development of the PerlML Schema (and thus this module) has
+    not been completed yet, please do not report bugs other than those that
+    are installation-related.
+
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Perl-SAX>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    <http://ali.as/>, PPI, Acme::PerlML
+
+COPYRIGHT
+    Thank you to Phase N (<http://phase-n.com/>) for permitting the Open
+    Sourcing and release of this distribution.
+
+    Copyright 2004 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

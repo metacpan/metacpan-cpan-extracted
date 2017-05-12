@@ -1,0 +1,58 @@
+{
+   "abstract" : "Feature-rich authentication system",
+   "author" : [
+      "Marius Gavrilescu <marius@ieval.ro>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Auth-Complex",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack::Test" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::Passphrase" : "0",
+            "Authen::Passphrase::BlowfishCrypt" : "0",
+            "Bytes::Random::Secure" : "0",
+            "DBI" : "0",
+            "Email::Sender::Simple" : "0",
+            "Email::Simple" : "0",
+            "IO::Prompter" : "0",
+            "Plack::Request" : "0",
+            "Tie::Hash::Expire" : "0",
+            "perl" : "5.014000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://git.ieval.ro/?p=plack-middleware-auth-complex.git"
+      }
+   },
+   "version" : "0.002",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

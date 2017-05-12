@@ -1,0 +1,83 @@
+=head1 NOME
+
+lineeguida - Linee guida per le traduzioni
+
+=head1 DESCRIZIONE
+
+Questo documento fornisce le linee guida per le traduzioni dei POD
+dall'inglese all'italiano
+
+=head1 LINEE GUIDA
+
+=head2 Lettere accentate
+
+Non vanno usati nE<egrave> gli apostrofi nE<egrave> direttamente le
+lettere accentate. Per gli accenti vanno utilizzate le seguenti
+entitE<agrave>:
+
+=over
+
+=item C<EE<lt>agraveE<gt>> - a grave
+
+=item C<EE<lt>egraveE<gt>> - e grave (E<egrave>, cioE<egrave>, ...)
+
+=item C<EE<lt>EgraveE<gt>> - E grave (E<Egrave>)
+
+=item C<EE<lt>eacuteE<gt>> - e acuta (perchE<eacute>, poichE<eacute>, ...)
+
+=item C<EE<lt>igraveE<gt>> - i grave
+
+=item C<EE<lt>ograveE<gt>> - o grave
+
+=item C<EE<lt>ugraveE<gt>> - u grave
+
+=back
+
+=head2 Forma personale
+
+La documentazione del Perl, come la maggior parte degli scritti in
+lingua inglese, si rivolge al lettore dandogli del "you", ad esempio:
+
+"Your program writes something on the screen."
+
+Come lo si traduce? Si E<egrave> deciso di scartare la troppo fredda
+forma impersonale, ed il troppo colloquiale C<tu>, propendendo
+invece per il C<voi>, che in italiano va decisamente per la maggiore.
+Ad esempio:
+
+I<Se ne avete bisogno, il vostro programma puo` passare parametri alla subroutine come parte dell'avvio del thread.>
+
+=head2 Nomi delle head di primo livello
+
+Le head di primo livello (B<head1>) vanno tradotte in ogni caso,
+ad esempio:
+
+=over
+
+=item NOME per NAME
+
+=item DESCRIZIONE per DESCRIPTION
+
+=item SINOSSI per SYNOPSIS
+
+=item AUTORE per AUTHOR
+
+=back
+
+=head2 Note del traduttore
+
+A volte E<egrave> necessario inserire delle note relative alla traduzione,
+per vari motivi. Ad esempio qualche termine va lasciato in inglese
+poichE<eacute> nessuna traduzione ne rende bene il significato, e poi
+esso va comunque spiegato. E<Egrave> raccomandabile, a tale scopo,
+utilizzate le B<Note del traduttore>, come nel seguente esempio:
+
+I<I moduli Perl hanno una grossa chance di essere thread-safe (NdT:
+compatibili con il threading) o di poterlo diventare facilmente.>
+
+=head1 AUTORE
+
+Questo documento E<egrave> a cura del progetto pod2it
+( http://pod2it.sourceforge.net ).
+
+=cut

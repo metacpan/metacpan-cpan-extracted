@@ -1,0 +1,21 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+datarootdir=${prefix}/share
+moduledir=${exec_prefix}/lib/xorg/modules
+sdkdir=${prefix}/include/xorg
+sysconfigdir=${datarootdir}/X11/xorg.conf.d
+
+abi_ansic=0.4
+abi_videodrv=10.0
+abi_xinput=12.3
+abi_extension=5.0
+
+Name: xorg-server
+Description: Modular X.Org X Server
+Version: 1.10.4
+Requires: pixman-1 pciaccess
+Requires.private: xproto >= 7.0.17 randrproto >= 1.2.99.3 renderproto >= 0.11 xextproto >= 7.1.99 inputproto >= 2.0.99.1 kbproto >= 1.0.3 fontsproto videoproto dri2proto >= 2.3 xineramaproto
+Cflags: -I${sdkdir} -fvisibility=hidden
+Libs: -L${libdir}

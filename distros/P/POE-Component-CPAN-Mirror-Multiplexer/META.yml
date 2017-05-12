@@ -1,0 +1,44 @@
+---
+abstract: 'Multiplex HTTP CPAN mirrors'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  HTTP::Request: 0
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-CPAN-Mirror-Multiplexer
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+provides:
+  POE::Component::CPAN::Mirror::Multiplexer:
+    file: lib/POE/Component/CPAN/Mirror/Multiplexer.pm
+    version: 0.04
+requires:
+  HTTP::Status: 5.817
+  Moose: 0.81
+  Moose::Util::TypeConstraints: 0
+  MooseX::POE: 0.205
+  Net::IP: 0
+  POE: 1.006
+  POE::Component::Client::HTTP: 0.88
+  POE::Filter::HTTP::Parser: 1.02
+  Test::POE::Client::TCP: 1.04
+  Test::POE::Server::TCP: 1.06
+  URI: 0
+  perl: 5.6.0
+resources:
+  homepage: http://github.com/bingos/poe-component-cpan-mirror-multiplexer/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bingos/poe-component-cpan-mirror-multiplexer.git
+version: 0.04

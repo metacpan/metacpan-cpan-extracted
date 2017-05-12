@@ -1,0 +1,28 @@
+POE::XS::Loop::Poll is an implementation of the abstract POE::Loop
+interface written in C using the poll(2) system call.
+
+So your system will need to have the poll(2) system call available,
+and appropriate headers.
+
+To install:
+
+  perl Makefile.PL
+  make
+  make test
+  make install  # you may need to be root for this step
+
+If you need to use POE's TRACE_FILES, TRACE_EVENTS or TRACE_STATISTICS
+facilities, you need to run Makefile.PL with the --trace option:
+
+  perl Makefile.PL --trace
+  make
+  make test
+  make install
+
+This will result in a slight reduction in performance, even if none of
+POE's trace flags are enabled.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Copyright 2008 Anthony Cook.

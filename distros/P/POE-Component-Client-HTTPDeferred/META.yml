@@ -1,0 +1,28 @@
+---
+abstract: 'Yet another poco http client with twist like deferred interface.'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  HTTP::Request::Common: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.85'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-Client-HTTPDeferred
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Any::Moose: 0
+  POE: 0
+  POE::Component::Client::HTTP: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

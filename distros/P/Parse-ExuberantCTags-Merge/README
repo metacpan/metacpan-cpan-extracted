@@ -1,0 +1,98 @@
+NAME
+    Parse::ExuberantCTags::Merge - Efficiently merge large exuberant ctags
+    files
+
+SYNOPSIS
+      use Parse::ExuberantCTags::Merge;
+      my $merger = Parse::ExuberantCTags::Merge->new();
+      $merger->add_file('perltags.old',  sorted => 0);
+      $merger->add_file('perltags.new',  sorted => 1);
+      $merger->add_file('perltags.new2', sorted => 1);
+      # potentially add more files...
+  
+      # sorting happens only when you call 'write':
+      $merger->write('perltags.out');
+
+DESCRIPTION
+    This Perl module is intended to merge multiple *exuberant ctags* files.
+    The synopsis says all about the interface. In order to be as efficient
+    as possible, the module uses different sort methods depending on the
+    input data. In the general case, it will use the Sort::External module
+    to process the data. There are a few exceptions:
+
+    Pre-sorted input files
+        If two or more input files contain sorted data, we use the a merge
+        sort to efficiently sort them before merging with the remaining
+        data.
+
+    Small input files
+        If the total size of the input files is small, we load them into
+        memory and use Perl's fast sort function. Default limit: "2^21B ==
+        4MB".
+
+    Super-small input files
+        If the total size of the input files is extremely small, we ignore
+        whether they're sorted or not and simply resort to Perl's sort.
+        Default limit: "2^17B == 128kB".
+
+    The sorting modules are loaded at run-time on demand only.
+
+METHODS
+  new
+    Creates a new merger object.
+
+  add_file
+    Adds a file to the merging process. First argument must be the file name
+    followed by an optional named argument 'sorted' (default: false) which
+    affects the way the data will be merged. Mixing sorted with unsorted
+    files is possible and will produce a sorted output.
+
+    Pre-sorted files are naturally somewhat faster to merge.
+
+  small_size_threshold
+    Set this to the threshold under which the total size of the input files
+    is to be considered small enough to be sorted in memory (see above). The
+    default should be fine.
+
+  super_small_size_threshold
+    Set this to the threshold under which the total size of the input files
+    is to be considered small enough to be sorted in memory regardless of
+    whether the input was partly sorted (see above). The default should be
+    fine.
+
+    This makes more sense than it sounds. Perl's sort function is fast. For
+    small amounts of data, its low overhead wins significantly over the sort
+    complexity.
+
+  tempdir
+    You can use this to set the location of the temporary files that are
+    used for sorting and merging large files. By default, it goes into
+    "File::Spec-"tmpdir()>.
+
+TODO
+    Benchmark.
+
+SEE ALSO
+    Exuberant ctags homepage: <http://ctags.sourceforge.net/>
+
+    Wikipedia on ctags: <http://en.wikipedia.org/wiki/Ctags>
+
+    Module that can produce ctags files from Perl code: Perl::Tags
+
+    Module that can parse exuberant ctags files: Parse::ExuberantCTags
+
+    Sorting modules: Sort::External, File::MergeSort (though we use a
+    home-grown merge-sort)
+
+    File::PackageIndexer
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Steffen Mueller
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.6 or, at your
+    option, any later version of Perl 5 you may have available.
+

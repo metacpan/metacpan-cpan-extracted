@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/POE/Wheel/Sendfile.pm
+t/00_compile.t
+t/01_pod.t
+t/02_pod_coverage.t
+t/10_init.t
+t/20_sendfile.t
+t/bigfile
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,4 @@
+[% dist.app_name %] [% dist.distribution_version_human %] includes these distributions installed
+on top of perl [% dist.perl_version_human %]:
+
+[% dist_list %]

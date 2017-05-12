@@ -1,0 +1,80 @@
+Revision history for Perl extension Perl-PrereqScanner-Lite
+
+0.26 2015-05-14T16:15:05Z
+
+    - Fix moose scanner (@charsbar++)
+
+0.25 2015-04-18T12:14:20Z
+
+    - Fix some Moose scanners bugs
+
+0.24 2015-02-28T05:01:13Z
+
+    - Improve plugin mechanism for extra scanners
+
+0.23 2015-02-22T10:59:30Z
+
+    - Fix lexical analysis processing
+      (#5, Thank you for reporting @perlancar)
+
+0.22 2015-02-19T02:46:39Z
+
+    - Fix the problem is that it truncates v-string if it has underscore
+      (#6, Thank you for reporting @miyagawa)
+
+0.21 2014-09-05T15:22:30Z
+
+    - Fix the bug that mixes the blank in dependencies (Thank you for reporting @jscook)
+
+0.20 2014-07-31T07:59:24Z
+
+    - Bug fix (#2)
+    - Upgrade the dependency of Compiler::Lexer
+
+0.19 2014-07-17T01:37:16Z
+
+    - Bug fix (#3)
+
+0.18 2014-04-17T07:00:00Z
+
+    - Support `no` statement to scan prereqs
+
+0.17 2014-04-03T13:19:35Z
+
+    - Fix miss detection
+    - Add documentation about speed comparison
+
+0.16 2014-04-03T07:04:04Z
+
+    - Fix scanner for Moose
+
+0.15 2014-04-02T15:38:20Z
+
+    - Support `with` notation for Moose
+    - Support `aliased` notation
+
+0.14 2014-03-29T04:44:12Z
+
+    - Change "## no prereq" to be option
+
+0.13 2014-03-29T03:49:54Z
+
+    - Support "## no prereq" comment
+
+0.12 2014-03-21T14:35:16Z
+
+    - Fix the handling of `use constant`
+
+0.11 2014-03-21T13:44:07Z
+
+    - Bug fix
+
+0.10 2014-03-21T09:43:52Z
+
+    - Change data representation format of prereqs
+      (Hash -> Instance of CPAN::Meta::Requirements)
+
+0.01 2014-03-21T08:37:04Z
+
+    - original version
+

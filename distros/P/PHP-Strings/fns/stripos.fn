@@ -1,0 +1,16 @@
+docs: |
+    Trivially implemented as:
+     
+        my $pos    = index( lc $haystack, lc $needle );
+        my $second = index( lc $haystack, lc $needle, $pos );
+
+    Note that unlike C<stripos>, C<index> returns C<-1> if
+    C<$needle> is not found. This makes testing much simpler.
+
+    If you want the additional behaviour of non-strings being
+    converted to integers and from there to characters of
+    that value, then you're silly. If you want to find a
+    character of particular value, explicitly use the
+    C<< L<chr|perlfunc/"chr"> >> function:
+
+        my $charpos = index( lc $haystack, lc chr $char );

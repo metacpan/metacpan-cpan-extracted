@@ -1,0 +1,12 @@
+prefix=/usr
+exec_prefix=${prefix}
+datadir=${prefix}/share
+pyexecdir=${exec_prefix}/lib/python2.6/dist-packages
+
+# same here.  Useful when calling the code generator in addon packages.
+defsdir=${datadir}/gst-python/0.10/defs
+
+Name: gst-python
+Description: Python bindings for GStreamer
+Requires: pygobject-2.0, gstreamer-0.10
+Version: 0.10.19

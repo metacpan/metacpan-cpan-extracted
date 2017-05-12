@@ -1,0 +1,39 @@
+Revision history for Proc-Find-Parents
+
+0.62    2014-12-05 (PERLANCAR)
+
+        - Rename module/dist from SHARYANTO-Proc-Util to Proc-Find-Parents.
+
+
+0.61    2014-04-14 (SHARYANTO)
+
+        - Skip test if get_parent_processes() returns undef [CT].
+
+
+0.60    2014-04-10 (SHARYANTO)
+
+        - Trap failure in loading Proc::ProcessTable so this module can still be
+          used without it.
+
+
+0.59    2013-11-11 (SHARYANTO)
+
+        - Use Proc::ProcessTable by default instead of 'pstree' command
+          (suggested by SREZIC, [RT#91932]).
+
+
+0.58    2013-11-11 (SHARYANTO)
+
+        - No functional changes. Revise test script to avoid CT failure reports.
+
+
+0.57    2013-09-26 (SHARYANTO)
+
+        - Fix failure on Ubuntu because pstree output is cut at 132 columns,
+          need to add -l (thanks Olivier Mengué).
+
+
+0.56    2013-09-10 (SHARYANTO)
+
+        - No functional changes. Split from SHARYANTO-Utils to minimize
+          dependencies (I'm trying to make Text::ANSITable work under Windows).

@@ -1,0 +1,31 @@
+---
+abstract: 'Avoid using HTTP::Cookies'
+author:
+  - 'Tom Hukins <tom@eborcom.com>'
+build_requires:
+  Perl::Critic::TestUtils: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-HTTPCookies
+provides:
+  Perl::Critic::Policy::HTTPCookies:
+    file: lib/Perl/Critic/Policy/HTTPCookies.pm
+    version: '0.53'
+requires:
+  Perl::Critic::Policy: '0'
+  Perl::Critic::Utils: '0'
+  Readonly: '0'
+  Scalar::Util: '0'
+  parent: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-HTTPCookies
+  repository: git://git.scrubhole.org/Perl-Critic-Policy-HTTPCookies
+version: '0.53'
+x_serialization_backend: 'YAML::Tiny version 1.69'

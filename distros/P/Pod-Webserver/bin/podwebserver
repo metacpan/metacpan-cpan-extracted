@@ -1,0 +1,6 @@
+#!/usr/bin/perl
+#-T
+
+use Pod::Webserver;
+
+Pod::Webserver::httpd();

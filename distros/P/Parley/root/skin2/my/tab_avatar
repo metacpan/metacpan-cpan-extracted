@@ -1,0 +1,25 @@
+<!-- preferences : tab_avatar -->
+<form action="my/preferences/update" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="form_name" value="user_avatar">
+
+    <div style="background-color:#ccc;margin-top:5px;margin-bottom:5px;">
+        &nbsp;
+    </div>
+
+
+    <div class="yui-gf top_padded">
+        <div class="yui-u first align_right">
+            [% INCLUDE shared/user_avatar person=authed_user %]
+        </div>
+        <div class="yui-u">
+            <div>
+                [%l('CHANGE AVATAR')%]:
+            </div>
+            <div class="top_padded">
+                <input type="file" id="avatar_file" name="avatar_file" />
+                <input type="submit" value="[%l('Upload')%]""/>
+            </div>
+        </div>
+    </div>
+</form>
+<!-- (end) preferences : tab_avatar -->

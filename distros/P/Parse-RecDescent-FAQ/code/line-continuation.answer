@@ -1,0 +1,38 @@
+use Parse::RecDescent;
+
+my @lines = << 'EOINST';
+// COMMAND ARG1-VALUE,ARG2-VALUE, +
+   ARG3-VALUE,ARG4-VALUE, +
+   EVEN-MORE-ARGS
+// ANOTHERCOMMAND
+* and a comment
+* or two
+EOINST
+
+my $parse = Parse::RecDescent->new(join '', <DATA>) or die "Bad Grammar!";
+
+use Data::Dumper 'Dumper';
+print Dumper [
+$parse->Instructions("@lines") or die "NOT parsable!!\n"
+];
+
+__DATA__
+
+Instructions: command(s)
+
+command: multiline_command
+       | singleline_command
+       | comment
+
+singleline_command: 
+	'//'  /.*/
+		{ {command => $item[-1]} }
+
+multiline_command:  
+	'//' /(.*?[+][ \t]*\n)+.*/
+		{ $item[-1] =~ s/[+][ \t]*\n//g; {command => $item[-1]} }
+
+comment:
+	'*'  /.*/
+		{ {comment => $item[-1]} }
+

@@ -1,0 +1,74 @@
+{
+   "abstract" : "Write logs to Firebug or Webkit Inspector",
+   "author" : [
+      "Tatsuhiko Miyagawa"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-Middleware-ConsoleLogger",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.42",
+            "Test::More" : "0",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.14",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JavaScript::Value::Escape" : "0.07",
+            "Plack" : "0.99",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/miyagawa/Plack-Middleware-ConsoleLogger/issues"
+      },
+      "homepage" : "https://github.com/miyagawa/Plack-Middleware-ConsoleLogger",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/miyagawa/Plack-Middleware-ConsoleLogger.git",
+         "web" : "https://github.com/miyagawa/Plack-Middleware-ConsoleLogger"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "franck cuny <franck@lumberjaph.net>",
+      "Jay Lenti <jlenti@riccagroup.com>",
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>",
+      "Tatsuhiko Miyagawa <miyagawa@gmail.com>"
+   ]
+}
+

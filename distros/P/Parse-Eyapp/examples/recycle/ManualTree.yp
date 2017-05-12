@@ -1,0 +1,76 @@
+%{
+=head1 SYNOPSIS
+
+This example illustrates the way the directive C<%tree> works.
+Compile it with:
+
+   eyapp -b '' ManualTree.yp 
+
+Run it with:
+
+    ./ManualTree.pm 
+
+=cut
+
+use Data::Dumper;
+$Data::Dumper::Indent=1;
+sub build_node { 
+  my $self = shift;
+
+  my @children = @_;
+  my @right = $self->YYRightside();
+  my $var = $self->YYLhs;
+  my $rule = $self->YYRuleindex();
+
+  for(my $i = 0; $i < @right; $i++) {
+    $_ = $right[$i];
+    if ($self->YYIsterm($_)) {
+      $children[$i] = bless { token => $_, attr => $children[$i] },
+                                          __PACKAGE__.'::TERMINAL';
+    }
+  }
+  bless { 
+    children => \@children, 
+    info => "$var -> @right"
+  }, __PACKAGE__."::${var}_$rule" 
+}
+%}
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+%defaultaction { build_node(@_) }
+
+%lexer {
+    s/^[ \t]+//;
+
+    s/^([0-9]+(?:\.[0-9]+)?)// and return('NUM',$1);
+    s/^([A-Za-z][A-Za-z0-9_]*)// and return('VAR',$1);
+    s/^(.)//s and return($1,$1);
+}
+
+%%
+input:                 { } 
+        |   input line { }
+;
+
+line:     '\n'       { } 
+        | exp '\n'   { print Dumper($_[1]);  } 
+        | error '\n' { $_[0]->YYErrok; }
+;
+
+exp:        NUM    
+        |   VAR   
+        |   VAR '=' exp         
+        |   exp '+' exp         
+        |   exp '-' exp        
+        |   exp '*' exp       
+        |   exp '/' exp      
+        |   '-' exp %prec NEG 
+        |   '(' exp ')'  { $_[2] } /* Let us simplify a bit the tree */
+;
+
+%%
+
+__PACKAGE__->main("exp: ") unless caller();
+

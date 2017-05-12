@@ -1,0 +1,18 @@
+#!/usr/local/bin/perl -w
+###########################################
+# custom filler simulator
+###########################################
+use strict;
+use Term::ReadKey;
+
+$|=1;
+print "$0\n";
+
+my $user = scalar getpwuid $>;
+
+ReadMode 2;
+print "type here:";
+my $pw1 = <STDIN>;
+ReadMode 1;
+
+print "\nNice.\n";

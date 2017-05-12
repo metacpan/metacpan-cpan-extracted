@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7b4b9a8ff56685f20f0767ea955dc2170def9395 Build.PL
+SHA1 40d43b388eb05df920908d2d4e727915637ae087 Changes
+SHA1 0a0703d1edf5017a66a91dbea8a3b00250097dae MANIFEST
+SHA1 c3a06b912c7433955b34146dda6f9dc3c3b5bc79 META.yml
+SHA1 65c647be7a083ae8d1d6e1eb54887f6c7c0b464b Makefile.PL
+SHA1 76ddcaa744c6853cac3a4873853abc17f68423cb README
+SHA1 0e93899b04e00a2d1a6f19e265415404b68238ba examples/autochangelog
+SHA1 ba920d60c85145013b6047060c15dd49ecc1e115 examples/build-all-from-source
+SHA1 37b4b077708e5991ec5f9257d72b940e1505f43f examples/build-pkg
+SHA1 e33692bd4b268176acea1484cb09c8bd270c79a5 examples/get-all-source-dependecies
+SHA1 a72884d95b2c8716e1d80614f4fb7d5e67414f6d examples/show-source-dependecies
+SHA1 ad6c6955dd445cd9ad33285a4b94ef488e71d411 lib/Parse/Deb/Control.pm
+SHA1 ab9eec774db543794d6af35d13fb8c147d104243 script/deb-control-key-values
+SHA1 9a8176c4eaa4976f5dceb297e77d0f1a9b4664b7 script/deb-control-prefix-perl
+SHA1 7c528fb97db6dbeca1949a486602591aacab1f41 t/01_Parse-Deb-Control.t
+SHA1 5525e99fceb0d20246bccf940545114ddd8d95a9 t/control/control-perl
+SHA1 1f9ea02e02b6a25f5c673a6909e1477b5571aa7d t/control/control-perl-simple
+SHA1 1379f2ff1afb655111e55d2e7399aad8dc002aad t/control/control-perl-simple-add-remove
+SHA1 67db814fe2d88aa64133589ab178d8cc053e1d03 t/control/control-perl-simple-comment
+SHA1 ee0fbfbb2d83554c7985905fc25344f67d507685 t/control/control-perl-simple-step1
+SHA1 c8fb9dcd68a628d3853528bf7c040e897f1b58d6 t/control/control-perl-simple-step2
+SHA1 d9ce3ca35596475bef4fefe58926889a01ef96f4 t/control/control-perl-simple-step3
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkuMFMcACgkQC0OgUPgL2SeGOgCgnPvtnCyszaE5715Q79AANue0
+0KMAoJgh9n4MLd1o74zcbGcaghiKLZ4y
+=qr5K
+-----END PGP SIGNATURE-----

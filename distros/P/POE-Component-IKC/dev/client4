@@ -1,0 +1,98 @@
+#!/usr/bin/perl -w
+use strict;
+
+use lib qw(blib/lib blib/arch);
+
+use POE qw(Session);
+use POE::Component::IKC::Client;
+
+my $name="Client$$";
+
+### Send a request to the time-server
+sub server_io
+{
+    my($kernel, $msg)=@_;
+}
+
+### Called when we connect to the time server
+sub create_me
+{
+    print "Creating session...\n";
+    POE::Session->new(
+        _start=>sub 
+        {
+            my($kernel)=$_[KERNEL];
+            $kernel->sig('USR1', 'hup');
+            $kernel->alias_set('me');
+
+            $kernel->post('poe://*/timeserver', 'connect', 
+                            "poe://$name/me/pulse");
+            $kernel->yield('pinger');
+            $kernel->yield('time');
+            $kernel->post('IKC', 'publish', 'me', [qw(pulse)]);
+        },
+        hup=>sub
+        {
+            my($kernel)=$_[KERNEL];
+            print "Got USR1\n";
+            $kernel->post('poe://Pulse/timeserver', 'disconnect', 
+                          "poe://$name/me/pulse");
+            return 1;
+        },
+        # output a . when the pulse is sent
+        # output a + if it took longer then a second to get from 
+        # the timerserver
+        pulse=>sub { print ($_[ARG0] eq localtime() ? '.' : '+'); },
+
+        'time'=>sub 
+        {
+            my($kernel, $time)=@_[KERNEL, ARG0];
+            if($time)
+            {
+                print "\n------ Foreign time is $time\n";
+                $kernel->delay('time', 60);
+            } else
+            {
+                print "hello\n";
+                unless($kernel->call('IKC', 'call',
+                                 'poe://*/timeserver/time', '', 
+                                 'poe:/me/time'))
+                {
+                    print "Unable to get time, exiting\n";
+                }
+            }
+        },
+        'pinger'=>sub
+        {
+            my($kernel, $ret)=@_[KERNEL, ARG0];
+            if($ret)
+            {
+                print "\nping response $ret\n";
+                $kernel->delay('pinger', 10);
+            } else
+            {
+                print "\nsending ping\n";
+                unless($kernel->call('IKC', 'call',
+                          'poe://localhost:31337/IKC/ping', 'PING', 
+                          'poe:/me/pinger'))
+                {
+                    print "Can't ping!\n";
+#                    $kernel->delay('pinger', 1);
+                }
+            }
+        }
+    );
+}
+
+$|++;
+POE::Component::IKC::Client->spawn(
+    ip=>'localhost',
+    port=>31336,
+    name=>$name,
+    subscribe=>[qw(poe://*/timeserver)],
+    on_connect=>\&create_me,
+);
+
+print "Running client...\n";
+$poe_kernel->run();
+

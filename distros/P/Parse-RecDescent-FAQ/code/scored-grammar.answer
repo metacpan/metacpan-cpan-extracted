@@ -1,0 +1,11 @@
+Use a scored grammar. For example, this scoring directive
+
+ opcode: /$match_text1/  <score: { length join '' @item}>
+ opcode: /$match_text2/  <score: { length join '' @item}>
+ opcode: /$match_text3/  <score: { length join '' @item}>
+
+would return the opcode with the longest length, as opposed to which
+one matched first.
+
+Just look for the section "Scored productions" in the .pod
+documentation. 

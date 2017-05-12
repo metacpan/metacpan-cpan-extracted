@@ -1,0 +1,17 @@
+bin/install-perl-prereqs
+Build.PL
+CHANGES
+MANIFEST
+README.md
+lib/Perl/PrereqInstaller.pm
+META.yml
+META.json
+t/00-load.t
+t/manifest.t
+t/perl-prereqinstaller.t
+t/pod-coverage.t
+t/pod.t
+t/bad/scan-error.pl
+t/deep/CausesWarning.pm
+t/deep/deep-script.pl
+t/deep/deeper/deeper-script.pl

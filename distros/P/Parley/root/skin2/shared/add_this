@@ -1,0 +1,14 @@
+[% IF c.config.add_this_account %]
+<!-- ADDTHIS BUTTON BEGIN -->
+<script type="text/javascript">
+addthis_pub             = '[%c.config.add_this_account%]'; 
+//addthis_logo            = 'http://www.addthis.com/images/yourlogo.png';
+addthis_logo_background = 'EFEFFF';
+addthis_logo_color      = '666699';
+addthis_brand           = '[%c.config.name%]';
+addthis_options         = 'delicious, twitter, favorites, email, more';
+</script>
+<a href="http://www.addthis.com/bookmark.php" onmouseover="return addthis_open(this, '', '[URL]', '[TITLE]')" onmouseout="addthis_close()" onclick="return addthis_sendto()"><img src="http://s7.addthis.com/static/btn/lg-share-en.gif" width="125" height="16" border="0" alt="Share" /></a>
+<script type="text/javascript" src="http://s7.addthis.com/js/152/addthis_widget.js"></script>
+<!-- ADDTHIS BUTTON END -->
+[% END %]

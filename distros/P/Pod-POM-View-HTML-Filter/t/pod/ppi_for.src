@@ -1,0 +1,21 @@
+=pod
+
+foo
+
+=for filter=ppi $A++; # this works too
+
+bar
+__RESULT__
++ppi
+<html><body bgcolor="#ffffff">
+<p>foo</p>
+<pre><span class="symbol">$A</span><span class="operator">++</span><span class="structure">;</span> <span class="comment"># this works too</span></pre>
+<p>bar</p>
+</body></html>
+__RESULT__
+-ppi
+<html><body bgcolor="#ffffff">
+<p>foo</p>
+<pre>$A++; # this works too</pre>
+<p>bar</p>
+</body></html>

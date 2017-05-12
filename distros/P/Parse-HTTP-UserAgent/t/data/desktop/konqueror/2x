@@ -1,0 +1,12 @@
+[AGENT]
+
+Mozilla/5.0 (compatible; Konqueror/2.2.2; Linux 2.4.18; X11; i686; en) LindowsOS (Lindows.com, Inc.)
+
+'parser'           => 'generic_compatible',
+'os'               => 'Linux 2.4.18',
+'extras'           => ['X11','i686','LindowsOS','Lindows.com, Inc.'],
+'version_raw'      => '2.2.2',
+'lang'             => 'en',
+'version'          => '2.002002',
+'name'             => 'Konqueror',
+'generic'          => 1

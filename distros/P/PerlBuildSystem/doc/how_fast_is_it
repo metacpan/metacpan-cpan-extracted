@@ -1,0 +1,210 @@
+Here is part of a mail I had with someone who wondered how fast PBS is
+
+> > - It is slow on windows, I have one or two solutions in mind none really
+> > good (that is as good as the way it works today). On a decent linux
+> > system , it is fast enough. I am talking big systems here not 100 files
+> > and 50 rules.
+>
+> What is slow? What is fast enough?
+
+*****************************************
+On linux:
+
+Nothing in the OS file cache.
+
+[nadim@khemir world]$ pbs -dpt
+No Build directory! Using '/devel/q04c1/TheBigO/projects/world/out_nadim'.
+Verifying warp 1.5: 1999 nodes ...
+Warp 1.5 verification time: 30.87 s.
+Running PBS in warp 1.5 mode. 2 nodes to rebuild.
+Processed 1 Pbsfile.
+Total dependency time: 0.01 s.
+   C depender time: 0.00 s.
+   C depender: 0 file of which 0 was cached.
+Total Check time: 0.03 s.
+Number of nodes in the dependency tree: 9 nodes.
+2 [1V, 2 P, 0 S] nodes scheduled for build.
+  0%[                                                                                           ]
+
+Building /devel/q04c1/TheBigO/projects/world/out_nadim/world-TheBigO : BUILD_FAILED :
+        Shell command failed!
+        Command   : 'distcc -O2 -Wall -Wshadow -Wpointer-arith -Wcast-qual -Wcast-align -Wwrite-strings -Wstrict-prototypes -Wmissing-prototypes -Wmissing-declarations -Wredundant-decls -Wnested-externs -Winline -D_MODULE  ...
+
+Total build time: 11.52 s. Perl subs time: 11.52 s.
+Build failed.
+Generating warp 1.5 file.
+Warp 1.5 generated in: 0.54 s.
+Total time in PBS: 43.33 s.
+
+11 secs in the linker!
+
+*****************************************
+Second run
+[nadim@khemir world]$ pbs -dpt
+No Build directory! Using '/devel/q04c1/TheBigO/projects/world/out_nadim'.
+Verifying warp 1.5: 1999 nodes ...
+Warp 1.5 verification time: 21.82 s.
+Running PBS in warp 1.5 mode. 2 nodes to rebuild.
+Processed 1 Pbsfile.
+Total dependency time: 0.01 s.
+   C depender time: 0.00 s.
+   C depender: 0 file of which 0 was cached.
+Total Check time: 0.01 s.
+Number of nodes in the dependency tree: 9 nodes.
+2 [1V, 2 P, 0 S] nodes scheduled for build.
+  0%[                                                                                        ]
+/devel/q04c1/TheBigO/projects/world/out_nadim/main.o(.text+0x35): In function `main':
+/devel/q04c1/TheBigO/projects/world/main.c:10: undefined reference to 
+
+Total build time: 5.73 s. Perl subs time: 5.73 s.
+Build failed.
+Generating warp 1.5 file.
+Warp 1.5 generated in: 0.53 s.
+Total time in PBS: 28.32 s.
+
+5 secs in the linker.
+
+*****************************************
+... 5th run
+
+[nadim@khemir world]$ pbs -dpt -time_builders
+No Build directory! Using '/devel/q04c1/TheBigO/projects/world/out_nadim'.
+Verifying warp 1.5: 1999 nodes ...
+Warp 1.5 verification time: 0.94 s.
+Running PBS in warp 1.5 mode. 2 nodes to rebuild.
+Processed 1 Pbsfile.
+Total dependency time: 0.01 s.
+   C depender time: 0.00 s.
+   C depender: 0 file of which 0 was cached.
+Total Check time: 0.01 s.
+Number of nodes in the dependency tree: 9 nodes.
+2 [1V, 2 P, 0 S] nodes scheduled for build.
+  0% [                                                             ]
+/devel/q04c1/TheBigO/projects/world/out_nadim/main.o(.text+0x35): In function `main':
+...
+
+Total build time: 4.31 s. Perl subs time: 4.31 s.
+Build failed.
+Generating warp 1.5 file.
+Warp 1.5 generated in: 0.51 s.
+Total time in PBS: 5.94 s.
+
+4 secs in the linker 2 in PBS. Remember we verify all the nodes here.
+
+*****************************************
+here is the timing with the cache filled and no building:
+
+[nadim@khemir world]$ pbs -dpt -time_builders -no_build
+No Build directory! Using '/devel/q04c1/TheBigO/projects/world/out_nadim'.
+Verifying warp 1.5: 1999 nodes ...
+Warp 1.5 verification time: 0.90 s.
+Running PBS in warp 1.5 mode. 2 nodes to rebuild.
+Processed 1 Pbsfile.
+Total dependency time: 0.01 s.
+   C depender time: 0.00 s.
+   C depender: 0 file of which 0 was cached.
+Total Check time: 0.01 s.
+Number of nodes in the dependency tree: 9 nodes.
+Build skipped. Done.
+Generating warp 1.5 file.
+Warp 1.5 generated in: 0.51 s.
+Total time in PBS: 1.58 s.
+
+I a normal development environment, I'd say less than 2 seconds to check and begin building when the file cache is full.
+
+*****************************************
+without PBS cache (but with the filesystem cache full)
+
+[nadim@khemir world]$ pbs -dpt -no_warp -no_build
+No Build directory! Using '/devel/q04c1/TheBigO/projects/world/out_nadim'.
+Processed 118 Pbsfiles.
+Total dependency time: 12.68 s.
+   C depender time: 2.16 s.
+   C depender: 691 files of which 691 were cached.
+Total Check time: 2.73 s.
+Number of nodes in the dependency tree: 1999 nodes.
+Build skipped. Done.
+Total time in PBS: 16.02 s.
+
+We went through 118 make files that each define it's own set of rules (the same ones but reloaded) Verified 700 C files and their dependencies (MD5)
+We also loaded perl and a bunch of modules.
+
+*****************************************
+
+For a smaller systems (OK still 500 C files):
+No Build directory! Using '/devel/q04c1/TheBigO/projects/PIP/out_nadim'.
+Verifying warp 1.5: 1349 nodes ...
+Warp 1.5 verification time: 0.59 s.
+Warp 1.5: Up to date.
+Total time in PBS: 0.67 s.
+
+[nadim@khemir PIP]$ rm -rf out_nadim/TheBigO/modules/stk
+[nadim@khemir PIP]$ pbs -dpt
+No Build directory! Using '/devel/q04c1/TheBigO/projects/PIP/out_nadim'.
+Verifying warp 1.5: 1349 nodes ...
+Warp 1.5 verification time: 0.50 s.
+Running PBS in warp 1.5 mode. 45 nodes to rebuild.
+Processed 10 Pbsfiles.
+Total dependency time: 0.32 s.
+   C depender time: 0.00 s.
+   C depender: 0 file of which 0 was cached.
+Total Check time: 0.03 s.
+Number of nodes in the dependency tree: 87 nodes.
+45 [1V, 45 P, 0 S] nodes scheduled for build.
+100% [=======================================]D 0h00m18s
+Total build time: 18.42 s. Perl subs time: 18.40 s.
+Build Done.
+Generating warp 1.5 file.
+Warp 1.5 generated in: 0.39 s.
+Total time in PBS: 19.86 s.
+
+Not too bad 20 sec of which 18.5 are spend doing stuff that is not PBS. 
+
+*****************************************
+
+Now for the real small systems:
+
+2 C files and 3 Pbsfiles.
+
+Tree for '__PBS_root_1_pbs_._Pbsfile.pl':
+`- ./all  [H1]
+   `- ./a.out  [H2]
+      |- ./main/main.o  [H3]
+      |  `- ./main/main.c  [H4]
+      |     `- /devel/perl_modules/PerlBuildSystem-0.28/test/hello2/common.h [H5]
+      `- ./world/world.o  [H6]
+         `- ./world/world.c  [H7]
+            |- /devel/perl_modules/PerlBuildSystem-0.28/test/hello2/common.h [H8 -> H5]
+            |- /devel/perl_modules/PerlBuildSystem-0.28/test/hello2/world/header/reverse.h  [H9]
+            `- /devel/perl_modules/PerlBuildSystem-0.28/test/hello2/world/world.h  [H10]
+               `- /devel/perl_modules/PerlBuildSystem-0.28/test/hello2/world/world2.h  [H11]
+
+[nadim@khemir hello2]$ pbs -dpt
+Verifying warp 1.5: 10 nodes ...
+Warp 1.5 verification time: 0.00 s.
+Warp 1.5: Up to date.
+Total time in PBS: 0.08 s.
+
+Doesn't take much more time to compile and link:
+[nadim@khemir hello2]$ pbs -dpt
+...
+Processed 3 Pbsfiles.
+Total dependency time: 0.11 s.
+   C depender time: 0.06 s.
+   C depender: 2 files of which 0 was cached. #generates C cache
+Total Check time: 0.00 s.
+Generating warp 1.5 file.
+Warp 1.5 generated in: 0.01 s.
+Number of nodes in the dependency tree: 10 nodes.
+6 [1V, 5 P, 1 S] nodes scheduled for build.
+100% [================================]D 0h00m00s
+Total build time: 0.15 s. Perl subs time: 0.11 s.
+Build Done.
+Generating warp 1.5 file.
+Warp 1.5 generated in: 0.01 s.
+Total time in PBS: 0.39 s.
+
+Almost had time to fetch coffee :-)
+
+
+ 

@@ -1,0 +1,22 @@
+---
+name: Pod-Simple-Vim
+version: 0.02
+author:
+  - 'Petar Shangov <pshangov@yahoo.com>'
+abstract: Render pod for display in vim
+license: perl
+resources:
+  license: ~
+requires:
+  Pod::Simple: 0
+build_requires:
+  Test::Differences: 0
+  Test::More: 0
+provides:
+  Pod::Simple::Vim:
+    file: lib/Pod/Simple/Vim.pm
+    version: 0.02
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

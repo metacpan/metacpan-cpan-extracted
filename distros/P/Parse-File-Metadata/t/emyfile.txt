@@ -1,0 +1,11 @@
+# comment
+a=alpha
+b=beta,charlie,delta
+c=epsilon	zeta	eta
+d=This is not a non-negative integer
+e=This is a string
+#f=,
+
+some,body,loves,me
+I,wonder,wonder,who
+could,it,be,you

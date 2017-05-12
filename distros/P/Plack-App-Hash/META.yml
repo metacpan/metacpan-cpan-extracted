@@ -1,0 +1,36 @@
+---
+abstract: 'Serve up the contents of a hash as a website'
+author:
+  - 'Aristotle Pagaltzis <pagaltzis@gmx.de>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  HTTP::Request::Common: 0
+  Plack::Test: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-App-Hash
+requires:
+  Array::RefElem: 0
+  HTTP::Status: 0
+  JSON::MaybeXS: 0
+  Plack::Component: 0
+  Plack::MIME: 0
+  Plack::Util: 0
+  Plack::Util::Accessor: 0
+  parent: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://github.com/ap/Plack-App-Hash/issues
+  homepage: http://github.com/ap/Plack-App-Hash
+  repository: git://github.com/ap/Plack-App-Hash
+version: 1.000

@@ -1,0 +1,41 @@
+# NAME
+
+Plucene::SearchEngine::Index::MSOffice - an unmaintained set of Plucene backends for indexing Microsoft Office formats
+
+# VERSION
+
+version 0.001
+
+# DESCRIPTION
+
+These plugins provide indexing capabilities for Microsoft Office formats (doc, ppt, xls).
+
+__This code is not currently actively maintained.__
+
+# AVAILABILITY
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
+site near you, or see [https://metacpan.org/module/Plucene::SearchEngine::Index::MSOffice/](https://metacpan.org/module/Plucene::SearchEngine::Index::MSOffice/).
+
+# SOURCE
+
+The development version is on github at [http://github.com/doherty/Plucene-SearchEngine-Index-MSOffice](http://github.com/doherty/Plucene-SearchEngine-Index-MSOffice)
+and may be cloned from [git://github.com/doherty/Plucene-SearchEngine-Index-MSOffice.git](git://github.com/doherty/Plucene-SearchEngine-Index-MSOffice.git)
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://github.com/doherty/Plucene-SearchEngine-Index-MSOffice/issues](https://github.com/doherty/Plucene-SearchEngine-Index-MSOffice/issues).
+
+# AUTHORS
+
+- Sopan Shewale <sopan.shewale@gmail.com>
+- Mike Doherty <doherty@pythian.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Sopan Shewale <sopan.shewale@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

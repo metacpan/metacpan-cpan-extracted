@@ -1,0 +1,13 @@
+%semantic token 'c' 'd' 
+%tree
+
+%%
+
+Start:
+      S 
+;
+S:
+      ( 'c' <%name Cs * ',' >'d' ) %name Cs_and_d * 
+;
+
+%%

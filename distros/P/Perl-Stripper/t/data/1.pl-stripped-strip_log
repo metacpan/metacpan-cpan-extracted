@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+
+use Log::Any::IfLOG qw($log);
+use vars qw($global $global3);
+
+
+
+
+
+our $our = 1;
+my $lexical = 2;
+$global = 3;
+
+sub foo { 
+    my $lexical = 4;
+    local $global;
+    $global2 = 5;
+    print "variables inside double quote: $lexical $global
+    ";
+    $log->info("Will not be stripped %s", $global);
+    
+    
+
+
+    
+
+
+
+
+
+}
+
+
+
+
+
+
+
+
+
+

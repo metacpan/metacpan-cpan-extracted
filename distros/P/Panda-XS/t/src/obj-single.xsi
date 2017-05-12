@@ -1,0 +1,39 @@
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::PTRMyBase
+PROTOTYPES: DISABLE
+
+PTRMyBase* PTRMyBase::new (int arg) {
+    if (arg) RETVAL = new PTRMyBase(arg);
+    else RETVAL = NULL;
+}
+
+int PTRMyBase::val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+void PTRMyBase::set_from (PTRMyBase* other) {
+    if (other) THIS->val = other->val;
+}
+
+void
+PTRMyBase::DESTROY ()
+
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::MyBase
+PROTOTYPES: DISABLE
+
+MyBase* MyBase::new (int arg) {
+    if (arg) RETVAL = new MyBase(arg);
+    else RETVAL = NULL;
+}
+
+int MyBase::val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+void MyBase::set_from (MyBase* other) {
+    if (other) THIS->val = other->val;
+}
+
+void MyBase::DESTROY ()

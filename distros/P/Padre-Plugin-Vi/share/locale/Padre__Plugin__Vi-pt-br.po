@@ -1,0 +1,19 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: padre-plugin-spellcheck\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-04-30 07:18+0200\n"
+"PO-Revision-Date: 2009-04-30 02:21-0300\n"
+"Last-Translator: Breno G. de Oliveira <garu@cpan.org>\n"
+"Language-Team: Brazilian Portuguese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/Vi.pm:297
+msgid "About"
+msgstr "Sobre"
+
+#: lib/Padre/Plugin/Vi.pm:307
+msgid "Copyright 2008 Gabor Szabo"
+msgstr "Copyright 2008 Gabor Szabo"

@@ -1,0 +1,161 @@
+#!/usr/bin/env perl
+
+use 5.021;
+use strict;
+use warnings;
+use DBI;
+use Getopt::Long qw(:config posix_default no_ignore_case gnu_compat);
+use Pgtools;
+use Pgtools::Config_diff;
+
+our $VERSION = Pgtools->VERSION;
+$| = 1; # auto-flush STDOUT
+
+my $help = 0;
+my $version = 0;
+GetOptions(
+    'help|h'    => \$help,
+    'version|v' => \$version,
+);
+
+if($help){
+    &print_help;
+    exit;
+}
+if($version){
+    print "Version: ".$VERSION."\n";
+    exit;
+}
+
+if (@ARGV < 2) {
+    die "Insufficient arguments.\nPlease check pg_config_diff -help\n";
+}
+
+my $s = Pgtools::Config_diff->new({"argv" => \@ARGV});
+$s->exec();
+
+sub print_help {
+    print <<'OUT';
+    pg_config_diff [-hv] arg1 arg2 [args ...]
+
+    Show different settings between plural PostgreSQL databases.
+
+    Options:
+      -help: show this help.
+      -version: show Pg-tools version.
+
+    Args:
+      This command needs more than 2 argument which is string to specify the PostgreSQL databases.
+      1 argument should contain hostname, port, username, password, and database.
+      These should be separated by commas.
+      You can omit these pieces except hostname, and then you should insert no character between colons.
+      Default setting is applied when you omit argument pieces.
+      Default setting is ...
+        Hostname: localhost
+        Port    : 5432
+        Username: postgres
+        Password: '' (empty)
+        Database: postgres
+
+    (Example)
+
+    $ pg_config_diff  "192.168.33.21,5432,postgres,," "192.168.33.22,,,," "192.168.33.23,5432,postgres,,dvdrental"
+    <Setting Name>           192.168.33.21           192.168.33.22           192.168.33.23
+    --------------------------------------------------------------------------------------------
+    max_connections          50                      100                     100
+    shared_buffers           32768                   16384                   65536
+    tcp_keepalives_idle      8000                    7200                    10000
+    tcp_keepalives_interval  75                      75                      10
+    wal_buffers              1024                    512                     2048
+
+OUT
+
+}
+
+__END__
+
+=head1 NAME
+
+Pgtools::pg_config_diff - compare plural PostgreSQL settings. 
+
+=head1 VERSION
+
+Version 0.009
+
+
+=head1 SYNOPSIS
+
+    Show different settings between 2 PostgreSQL databases.
+
+      This command needs more than 2 argument which is string to specify the PostgreSQL databases.
+      1 argument should contain hostname, port, username, password, and database.
+      These should be separated by commas. 
+      You can omit these pieces except hostname, and then you should insert no character between colons.
+      Default setting is applied when you omit argument pieces. 
+      Default setting is ...
+        Hostname: localhost 
+        Port    : 5432
+        Username: postgres
+        Password: '' (empty)
+        Database: postgres
+
+    (Example)
+
+    $ pg_config_diff  "192.168.33.21,5432,postgres,," "192.168.33.22,,,," "192.168.33.23,5432,postgres,,dvdrental"
+    <Setting Name>           192.168.33.21           192.168.33.22           192.168.33.23
+    --------------------------------------------------------------------------------------------
+    max_connections          50                      100                     100
+    shared_buffers           32768                   16384                   65536
+    tcp_keepalives_idle      8000                    7200                    10000
+    tcp_keepalives_interval  75                      75                      10
+    wal_buffers              1024                    512                     2048
+
+
+=head1 AUTHOR
+
+Tomoaki Otsuka, C<< <otsuka.tt at gmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to the Github page.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Pgtools::pg_config_diff
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=./>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/./>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/./>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/.//>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2016 Tomoaki Otsuka.
+
+This program is free software;
+
+
+=cut
+
+1; # End of Pgtools::pg_config_diff

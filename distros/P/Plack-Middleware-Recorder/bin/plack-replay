@@ -1,0 +1,158 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use HTTP::Message::PSGI;
+use HTTP::Request;
+use HTTP::Response;
+use Plack::Client;
+use Plack::VCR;
+use Plack::Util;
+use URI;
+
+sub usage {
+    require Pod::Usage;
+    Pod::Usage::pod2usage(0);
+}
+
+my $parser = Getopt::Long::Parser->new(
+    config => [ qw/no_ignore_case pass_through bundling/ ],
+);
+
+my $help;
+my $verbosity = 0;
+
+$parser->getoptions(
+    'h|help'     => \$help,
+    'v|verbose+' => \$verbosity,
+);
+
+usage if $help || !@ARGV;
+
+my ( $requests_file, $server ) = @ARGV;
+
+my $ua;
+
+if(defined $server) {
+    if(-f $server) {
+        my $app = Plack::Util::load_psgi($server);
+        $ua     = Plack::Client->new(
+            http => sub {
+                return $app;
+            },
+        );
+        undef $server;
+    } else {
+        $ua = Plack::Client->new(
+            http => {},
+        );
+        $server = 'http://' . $server unless $server =~ m!^https?://!;
+        $server = URI->new($server);
+    }
+}
+
+my $vcr = Plack::VCR->new(filename => $requests_file);
+
+while(my $interaction = $vcr->next) {
+    my $req      = $interaction->request;
+    my ( $host ) = $req->remove_header('Host');
+
+    if($server) {
+        $host = $server;
+    } else {
+        $host = 'http://' . $host unless $host =~ m!^https?://!;
+        $host = URI->new($host);
+    }
+
+    my $uri = $req->uri;
+    $uri->scheme($host->scheme);
+    $uri->host($host->host);
+    $uri->port($host->port);
+    $req->uri($uri);
+
+    my $res = $ua->request($req);
+       $res = HTTP::Response->from_psgi($res->finalize);
+
+    if($verbosity >= 2) {
+        print $res->as_string;
+    } elsif($verbosity == 1) {
+        print $res->status_line, "\n";
+    }
+}
+
+# PODNAME: plack-replay
+
+# ABSTRACT: Utility script for replaying PSGI app requests
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+plack-replay - Utility script for replaying PSGI app requests
+
+=head1 VERSION
+
+version 0.06
+
+=head1 SYNOPSIS
+
+  plack-replay requests.out
+
+  plack-replay requests.out http://my.server/
+
+  plack-replay requests.out app.psgi
+
+=head1 DESCRIPTION
+
+This script replays a sequence of requests previously recorded by
+L<plack-record> against a server or a PSGI application.  If the server
+is not specified, the requests are replayed against the server that recorded
+them.
+
+=head1 OPTIONS
+
+=over 4
+
+=item -h, --help
+
+Outputs the help for L<plack-replay>.
+
+=item -v, --verbose
+
+Increases the verbosity of L<plack-replay>.  By default, plack replay outputs
+nothing; verbosity level one outputs the status line of each response.
+Verbosity level two outputs each HTTP response in its entirety.
+
+=back
+
+=head1 SEE ALSO
+
+L<plack-record>, L<Plack::Middleware::Recorder>
+
+=head1 AUTHOR
+
+Rob Hoelz <rob@hoelz.ro>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Rob Hoelz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/hoelzro/plack-middleware-recorder/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

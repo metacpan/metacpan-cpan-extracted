@@ -1,0 +1,22 @@
+---
+abstract: 'manage connections, with keep-alive'
+author:
+  - 'Rocco Caputo <rcaputo@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-Client-Keepalive
+requires:
+  Net::IP::Minimal: '0.02'
+  POE: '1.311'
+  POE::Component::Resolver: '0.917'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Client-Keepalive
+  repository: git://github.com/rcaputo/poe-component-client-keepalive.git
+version: '0.272'

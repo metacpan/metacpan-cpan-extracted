@@ -1,0 +1,22 @@
+---
+abstract: 'Run a large number of similar processes using'
+author:
+  - 'Stephen Cavilia <stephen@cavilia.name>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.74, CPAN::Meta::Converter version 2.132830'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parallel-Batch
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Accessor::Fast: 0.34
+version: 0.04

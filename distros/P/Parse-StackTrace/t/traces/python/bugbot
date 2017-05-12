@@ -1,0 +1,14 @@
+Traceback (most recent call last):
+  File "/home/bugbot/plugins/Bugzilla/plugin.py", line 415, in handleBugmail
+    self._handleBugmailForChannel(bug, irc, channel)
+  File "/home/bugbot/plugins/Bugzilla/plugin.py", line 490, in _handleBugmailForChannel
+    bug.bug_id, channel)
+  File "/home/bugbot/plugins/Bugzilla/plugin.py", line 364, in getAttachmentsOnBug
+    bug = self._getBugXml([bug_id])[0]
+  File "/home/bugbot/plugins/Bugzilla/plugin.py", line 654, in _getBugXml
+    bugxml = utils.web.getUrl(queryurl)
+  File "/usr/lib/python2.4/site-packages/supybot/utils/web.py", line 122, in getUrl
+    fd = getUrlFd(url, headers=headers)
+  File "/usr/lib/python2.4/site-packages/supybot/utils/web.py", line 115, in getUrlFd
+    raise Error, strError(e.reason)
+Error: timed out

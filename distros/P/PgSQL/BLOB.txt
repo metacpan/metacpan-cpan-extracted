@@ -1,0 +1,17 @@
+
+This is me plan for accessing large objects in PostgreSQL:
+
+Large objects is handled by a specially design IO-class
+"IO::BLOB::PgSQL" (or something like that) with methods to:
+
+* open
+* close
+* read
+* write
+* seek
+* unlink
+
+From SELECT statement such an IO-object could be returned
+if an LO is available, create on transparent and nice API.
+
+

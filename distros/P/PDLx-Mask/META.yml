@@ -1,0 +1,44 @@
+---
+abstract: 'Mask multiple piddles with automatic two way feedback'
+author:
+  - 'The Smithsonian Astrophysical Observatory'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Safe::Isa: '0'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::PDL: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  ExtUtils::MakeMaker: '6.59'
+dynamic_config: '0'
+generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PDLx-Mask
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Data::GUID: '0'
+  Moo: '0'
+  MooX::ProtectedAttributes: '0'
+  PDL::Core: '0'
+  PDLx::DetachedObject: '0'
+  Package::Stash: '0'
+  Params::Check: '0'
+  Ref::Util: '0'
+  Safe::Isa: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  namespace::clean: '0.16'
+  perl: v5.10.0
+resources:
+  license: http://opensource.org/licenses/gpl-3.0.html
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

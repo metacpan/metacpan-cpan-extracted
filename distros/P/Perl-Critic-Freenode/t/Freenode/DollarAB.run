@@ -1,0 +1,42 @@
+## name OutsideSort
+## failures 4
+## cut
+
+$a = 1;
+$b = 2;
+asdf { $a = 1; $b = 2; };
+
+## name InsideSort
+## failures 0
+## cut
+
+sort { $a = 1; $b = 2; } ();
+
+## name MethodSort
+## failures 0
+## cut
+
+$collection->sort(sub { $a = 1; $b = 2 });
+
+## name HashKey
+## failures 0
+## cut
+
+push @c, [ @row{sort { $a <=> $b } keys %row } ];
+
+## name ApparentSigil
+## failures 0
+## cut
+
+my $x = $b[1]||" ";
+
+## name AllowedFunctions
+## failures 0
+## cut
+
+sort { $a; $b } ();
+reduce { $a; $b } ();
+pairgrep { $a; $b } ();
+pairfirst { $a; $b } ();
+pairmap { $a; $b } ();
+pairwise { $a; $b } ();

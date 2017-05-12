@@ -1,0 +1,18 @@
+use strict;
+use inc::Module::Install;
+name 'POE-Component-Client-Ident';
+author 'Chris Williams <chris@bingosnet.co.uk>';
+license 'perl';
+auto_license holder => 'Chris Williams, Dennis Taylor and Jan-Pieter Cornet';
+version_from 'lib/POE/Component/Client/Ident.pm';
+abstract_from 'lib/POE/Component/Client/Ident.pm';
+perl_version '5.006';
+build_requires 'Test::More' => 0.47;
+build_requires 'Test::POE::Server::TCP' => 0;
+requires 'POE'    => 0.38;
+requires 'POE::Wheel::SocketFactory' => 0;
+requires 'POE::Wheel::ReadWrite' => 0;
+requires 'POE::Filter::Line' => 0;
+auto_provides;
+githubmeta;
+WriteAll();

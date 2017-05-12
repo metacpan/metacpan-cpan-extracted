@@ -1,0 +1,212 @@
+use warnings;
+use strict;
+
+use PDF::Reuse;
+
+my %stdFont =
+       ( 'Times-Roman'          => 'Times-Roman',
+        'Times-Bold'            => 'Times-Bold',
+        'Times-Italic'          => 'Times-Italic',
+        'Times-BoldItalic'      => 'Times-BoldItalic',
+        'Courier'               => 'Courier',
+        'Courier-Bold'          => 'Courier-Bold',
+        'Courier-Oblique'       => 'Courier-Oblique',
+        'Courier-BoldOblique'   => 'Courier-BoldOblique',
+        'Helvetica'             => 'Helvetica',
+        'Helvetica-Bold'        => 'Helvetica-Bold',
+        'Helvetica-Oblique'     => 'Helvetica-Oblique',
+        'Helvetica-BoldOblique' => 'Helvetica-BoldOblique',
+        'Symbol'                => 'Symbol',
+        'ZapfDingbats'          => 'ZapfDingbats',
+        'TR'                    => 'Times-Roman',
+        'TB'                    => 'Times-Bold',
+        'TI'                    => 'Times-Italic',
+        'TBI'                   => 'Times-BoldItalic',
+        'C'                     => 'Courier',
+        'CB'                    => 'Courier-Bold',
+        'CO'                    => 'Courier-Oblique',
+        'CBO'                   => 'Courier-BoldOblique',
+        'H'                     => 'Helvetica',
+        'HB'                    => 'Helvetica-Bold',
+        'HO'                    => 'Helvetica-Oblique',
+        'HBO'                   => 'Helvetica-BoldOblique',
+        'S'                     => 'Symbol',
+        'Z'                     => 'ZapfDingbats');
+
+my ($line, $string);
+
+my $x = 25;
+my $y = 710;
+
+my ($xDim, $yDim, $xScale, $yScale, $pdf);
+
+my $file = shift;
+
+my $i = 1;
+
+prFile('myFile.pdf');
+prFontSize(7);
+
+while (1)
+{  my @vec = prForm( { file     => $file,
+                       page     => $i,
+                       effect   => 'add',
+                       tolerant => 1 });
+   my $form = $vec[0];
+   if ($form eq '0')
+   {  last;
+   }
+   if ($form)
+   {  $xDim = $vec[3] - $vec[1];
+      $yDim = $vec[4] - $vec[2];
+      $xScale = 100 / $xDim;
+      $yScale = 100 / $yDim;
+      if ($xScale < $yScale)
+      {  $yScale = $xScale;
+      }
+      else
+      {  $xScale = $yScale;
+      }
+      $string  = "q\n";
+      $string .= "$xScale 0 0 $yScale $x $y cm\n";  # scale and "move to"
+      $string .= "/$form Do\n";
+      $string .= "Q\n";
+      prAdd($string);
+   }
+   else
+   {  prText($x, ($y + 70), 'Can\'t be used by prForm.');
+      prText($x, ($y + 60), 'Concatenate the streams.');
+      prText($x, ($y + 50), 'Look at the documentation');
+      prText($x, ($y + 40), 'for "prForm" how that can');
+      prText($x, ($y + 30), 'be done ! Or use prDoc or');
+      prText($x, ($y + 20), 'prSinglePage');
+      $xDim = 0;
+      $yDim = 0;
+   }
+   $line = 'Form : ' . $file . ' ' . $i . ' D: ' . $xDim . ' X ' . $yDim;
+   prText($x, ($y - 15), $line);
+   move();
+   my $j = 0;
+   my $images = $vec[5];
+   while ($j < $images)
+   {   $j++;
+       my ($iName, $width, $height) = prImage({ file    => $file,
+                                                page    => $i,
+                                                imageNo => $j,
+                                                effect  => 'add' } );
+
+       if (($width < 101) && ($height < 101))
+       {  $xDim = $width;
+          $yDim = $height;
+       }
+       else
+       {
+          $xScale = 100 / $width;
+          $yScale = 100 / $height;
+
+
+          if ($xScale < $yScale)
+          {  $yScale = $xScale;
+          }
+          else
+          {  $xScale = $yScale;
+          }
+          $xDim = $xScale * $width;
+          $yDim = $yScale * $height;
+
+       }
+       $string  = "q\n";
+       $string .= "$xDim 0 0 $yDim $x $y cm\n";  # scale and "move to"
+       $string .= "/$iName Do\n";
+       $string .= "Q\n";
+       prAdd($string);
+       $line = 'Image :' . $file . ' ' . $i . ' ' . $j . ' D: '
+              . $width . ' X ' . $height;
+       prText($x, ($y - 15), $line);
+       move();
+   }
+   $i++;
+
+}
+
+$x = 25;
+$y -= 40;
+
+if ($y < 100)
+{  prPage();
+   $y  = 710;
+}
+prFontSize(20);
+prFont('TR');
+prText($x, $y, 'Found "non-standard" fonts: ');
+
+$y -= 40;
+
+my ($intnamn, $extnamn, $oldIntNamn, $oldExtNamn, $f) = prFont();
+
+my %font;
+for my $font (keys %{$f})
+{  if (exists $font{$font})
+   {  next;
+   }
+   if ($y < 100)
+   {  prPage();
+      $y  = 710;
+   }
+
+   if (! exists $stdFont{$font})
+   {  my @list = prFont($font);
+      if ($list[1] eq $font)
+      {   prFontSize(18);
+          prFont('TR');
+          prText($x, $y, "$font :");
+          $y -= 25;
+          prFontSize(10);
+          prFont($font);
+          prText($x, $y, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+-./0123456789:;<=>?@');
+          $y -= 14;
+          prText($x, $y, 'abcdefghijklmnopqrstuvwxyz{|}~\305\304\326\345\344\366[\]^_´`');
+          $y -= 40;
+      }
+   }
+   # $font{$font}++;
+}
+
+prEnd();
+
+
+sub move
+{   if ($x > 400)
+     {  $x = 25;
+        $y -= 120;
+     }
+     else
+     {  $x += 200;
+     }
+    if ($y < 0)
+     {  prPage();
+        $x = 25;
+        $y = 710;
+     }
+}
+
+__END__
+
+=head1 AUTHOR
+
+Lars Lundberg larslund@cpan.org
+Chris Nighswonger cnighs@cpan.org
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003 - 2004   Lars Lundberg, Solidez HB.
+Copyright (C) 2005          Karin Lundberg.
+Copyright (C) 2006 - 2010   Lars Lundberg, Solidez HB.
+Copyright (C) 2010 - 2014   Chris Nighswonger
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

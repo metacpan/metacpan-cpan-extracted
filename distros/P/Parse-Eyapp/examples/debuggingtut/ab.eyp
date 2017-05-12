@@ -1,0 +1,12 @@
+%token EOF = /\Z/
+%%
+s:   ab 'c'
+  |  ab EOF
+;
+
+ab: /* empty */ 
+  | 'a'  ab 'b'
+;
+
+%%
+

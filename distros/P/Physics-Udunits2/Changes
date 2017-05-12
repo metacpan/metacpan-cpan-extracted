@@ -1,0 +1,14 @@
+Revision history for Perl extension Physics::Udunits2.
+
+0.03  Thu Aug  6 11:43:44 CEST 2009
+    - adding documentation
+	- adding tests
+	- generalizing build system
+
+0.02  Wed Aug  5 19:05:23 CEST 2009
+    - adding most functions from C-API documentation, missing tests and docu
+
+0.01  Thu Jul 30 09:59:37 2009
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.6.0 -n Physics::Udunits2 include/udunits2.h -Llib -ludunits2
+

@@ -1,0 +1,75 @@
+{
+   "abstract" : "Solutions for L<< http://projecteuler.net >>",
+   "author" : [
+      "Adam Lesperance <lespea@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.102160",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Project-Euler",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "DateTime" : 0,
+            "DateTime::Format::DateParse" : 0,
+            "Exporter::Easy" : 0,
+            "List::MoreUtils" : 0,
+            "List::Util" : 0,
+            "Math::Big::Factors" : 0,
+            "Math::BigInt" : 0,
+            "Modern::Perl" : 0,
+            "Moose" : 0,
+            "Moose::Role" : 0,
+            "MooseX::Types" : 0,
+            "MooseX::Types::Moose" : 0,
+            "Readonly" : 0,
+            "String::Palindrome" : 0,
+            "namespace::autoclean" : 0,
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Spec" : 0,
+            "File::Temp" : 0,
+            "Test::Exception" : 0,
+            "Test::More" : 0,
+            "Test::Most" : 0,
+            "autodie" : 0,
+            "constant" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-project-euler at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Project-Euler"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/lespea/Project-Euler"
+      }
+   },
+   "version" : "0.20"
+}
+

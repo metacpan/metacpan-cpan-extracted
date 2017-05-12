@@ -1,0 +1,13 @@
+use inc::Module::Install;
+name 'Plack-Handler-AnyEvent-HTTPD';
+all_from 'lib/Plack/Handler/AnyEvent/HTTPD.pm';
+readme_from 'lib/Plack/Handler/AnyEvent/HTTPD.pm';
+build_requires 'Test::More';
+requires 'AnyEvent::HTTPD';
+requires 'Plack', 0.99_03;
+requires 'HTTP::Status';
+requires 'URI';
+test_requires 'Test::Requires';
+author_tests('xt');
+auto_set_repository;
+WriteAll;

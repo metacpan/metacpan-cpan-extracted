@@ -1,0 +1,25 @@
+---
+abstract: 'Create and manipulate PAR distributions'
+author:
+  - 'Audrey Tang <cpan@audreyt.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PAR-Dist
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Find: 0
+  File::Path: 0
+  File::Spec: 0
+  File::Temp: 0
+version: 0.49

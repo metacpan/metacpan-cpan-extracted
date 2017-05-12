@@ -1,0 +1,630 @@
+=head1 NAME
+ 
+Parse::Eyapp::Treeregexp - Tree transformations
+ 
+ 
+=head1 SYNOPSIS
+ 
+  use strict;
+  use Parse::Eyapp;
+  use Parse::Eyapp::Treeregexp;
+
+  my $grammar = q{
+    %right  '='
+    %left   '-' '+'
+    %left   '*' '/'
+    %left   NEG
+    %tree
+    %{
+    use Tail2;  # See file examples/Tail2.pm in the distribution
+    %}
+
+    %%
+    block:  exp <%name BLOCK + ';'> { $_[1] }
+    ;
+
+    exp:      %name NUM
+                NUM
+            | %name WHILE
+                'while'   exp  '{' block '}'
+            | %name VAR
+                VAR
+            | %name ASSIGN
+                VAR '=' exp
+            | %name PLUS
+                exp '+' exp
+            | %name MINUS
+                exp '-' exp
+            | %name TIMES
+                exp '*' exp
+            | %name DIV
+                exp '/' exp
+            | %name UMINUS
+                '-' exp %prec NEG
+            |   '(' exp ')'  { $_[2] } /* Let us simplify a bit the tree */
+    ;
+
+    %%
+  }; # end grammar
+
+  sub TERMINAL::info { $_[0]{attr} }
+  $Parse::Eyapp::Node::INDENT = 2;
+
+  our (@all,$moveinvariant, $condition, $assign, $before, $after);
+
+  Parse::Eyapp->new_grammar(
+    input=>$grammar,
+    classname=>'Rule6',
+    firstline=>7,
+  );
+  my $parser = Rule6->new();
+  my $program = "a =1000; c = 1; while (a) { c = c*a; b = 5; a = a-1 }\n";
+  my $t = $parser->Run(\$program);
+  my @output = split /\n/, $t->str;
+
+  my $p = Parse::Eyapp::Treeregexp->new( STRING => q{
+    moveinvariant: BLOCK(
+                     @prests,
+                     WHILE(VAR($b), BLOCK(@a, ASSIGN($x, NUM($e)), @c)),
+                     @possts
+                   )
+      => {
+           my $assign = $ASSIGN;
+           $BLOCK[1]->delete($ASSIGN);
+           $BLOCK[0]->insert_before($WHILE, $assign);
+         }
+    },
+  );
+  $p->generate();
+  $moveinvariant->s($t);
+  my @output2 = split /\n/, $t->str;
+
+  my ($node1, $node2);
+  format STDOUT_TOP =
+                          PROGRAM
+  -------------------------------------------------------
+  @||||||||||||||||||||||||||||||||||||||||||||||||||||||
+  $program
+  -------------------------------------------------------
+  Before                     |    After
+  ---------------------------|---------------------------
+  .
+
+  format STDOUT =
+  @<<<<<<<<<<<<<<<<<<<<<<<<<<@|@<<<<<<<<<<<<<<<<<<<<<<<<<
+  $node1,                    '|',$node2
+  .
+
+  for (1..$#output) {
+    $node1 = $output[$_];
+    $node2 = $output2[$_];
+    write;
+  }
+
+
+=head1 Introduction
+
+The example in the L<SYNOPSIS> 
+section uses C<Parse::Eyapp> to build an abstract
+syntax tree for the program
+
+  my $program = "a =1000; c = 1; while (a) { c = c*a; b = 5; a = a-1 }\n";
+
+The tree is transformed 
+using the transformation C<moveinvariant>:
+
+  my $p = Parse::Eyapp::Treeregexp->new( STRING => q{
+    moveinvariant: BLOCK(
+                     @prests,
+                     WHILE(VAR($b), BLOCK(@a, ASSIGN($x, NUM($e)), @c)),
+                     @possts
+                   )
+      => {
+           my $assign = $ASSIGN;
+           $BLOCK[1]->delete($ASSIGN);
+           $BLOCK[0]->insert_before($WHILE, $assign);
+         }
+    },
+  );
+
+The output shows the original tree versus the transformed
+tree:
+
+  pl@nereida:~/LEyapp/examples$ moveinvariantoutofloopcomplexformula.pl
+                          PROGRAM
+  -------------------------------------------------------
+
+  -------------------------------------------------------
+  Before                     |    After
+  ---------------------------|---------------------------
+  BLOCK(                     | BLOCK(
+    ASSIGN(                  |   ASSIGN(
+      TERMINAL[a],           |     TERMINAL[a],
+      NUM(                   |     NUM(
+        TERMINAL[1000]       |       TERMINAL[1000]
+      )                      |     )
+    ) # ASSIGN,              |   ) # ASSIGN,
+    ASSIGN(                  |   ASSIGN(
+      TERMINAL[c],           |     TERMINAL[c],
+      NUM(                   |     NUM(
+        TERMINAL[1]          |       TERMINAL[1]
+      )                      |     )
+    ) # ASSIGN,              |   ) # ASSIGN,
+    WHILE(                   |   ASSIGN(
+      VAR(                   |     TERMINAL[b],
+        TERMINAL[a]          |     NUM(
+      ),                     |       TERMINAL[5]
+      BLOCK(                 |     )
+        ASSIGN(              |   ) # ASSIGN,
+          TERMINAL[c],       |   WHILE(
+          TIMES(             |     VAR(
+            VAR(             |       TERMINAL[a]
+              TERMINAL[c]    |     ),
+            ),               |     BLOCK(
+            VAR(             |       ASSIGN(
+              TERMINAL[a]    |         TERMINAL[c],
+            )                |         TIMES(
+          ) # TIMES          |           VAR(
+        ) # ASSIGN,          |             TERMINAL[c]
+        ASSIGN(              |           ),
+          TERMINAL[b],       |           VAR(
+          NUM(               |             TERMINAL[a]
+            TERMINAL[5]      |           )
+          )                  |         ) # TIMES
+        ) # ASSIGN,          |       ) # ASSIGN,
+        ASSIGN(              |       ASSIGN(
+          TERMINAL[a],       |         TERMINAL[a],
+          MINUS(             |         MINUS(
+            VAR(             |           VAR(
+              TERMINAL[a]    |             TERMINAL[a]
+            ),               |           ),
+            NUM(             |           NUM(
+              TERMINAL[1]    |             TERMINAL[1]
+            )                |           )
+          ) # MINUS          |         ) # MINUS
+        ) # ASSIGN           |       ) # ASSIGN
+      ) # BLOCK              |     ) # BLOCK
+    ) # WHILE                |   ) # WHILE
+  ) # BLOCK                  | ) # BLOCK
+
+
+=head1 The Treeregexp Language
+
+A Treeregexp program is made of the repetition of three kind of 
+primitives: The treeregexp transformations, supporting Perl code 
+and Transformation Families.
+
+  treeregexplist:  treeregexp* 
+
+  treeregexp: 
+      IDENT ':' treereg ('=>' CODE)?  # Treeregexp 
+    | CODE                            # Auxiliar code
+    | IDENT '=' IDENT + ';'           # Transformation families
+
+Treeregexp themselves follow the rule:
+
+                  IDENT ':' treereg ('=>' CODE)?
+
+Several instances of this rule can be seen in the example in
+the L</SYNOPSIS> section.
+The identifier C<IDENT> gives the name to the rule.
+At the time of this writing (2006) there are the following kinds
+of treeregexes:
+
+  treereg: 
+        /* tree patterns with children */
+      IDENT '(' childlist ')' ('and' CODE)? 
+    | REGEXP (':' IDENT)? '(' childlist ')' ('and' CODE)? 
+    | SCALAR '(' childlist ')' ('and' CODE)?  
+    | '.' '(' childlist ')' ('and' CODE)? 
+          /* leaf tree patterns */
+    | IDENT ('and' CODE)? 
+    | REGEXP (':' IDENT)? ('and' CODE)? 
+    | '.' ('and' CODE)? 
+    | SCALAR ('and' CODE)? 
+    | ARRAY 
+    | '*' 
+
+=head2 Treeregexp rules
+
+When seen a rule like
+
+    zero_times: TIMES(NUM($x), ., .) and { $x->{attr} == 0 } => { $_[0] = $NUM }
+
+The Treeregexp translator creates a C<Parse::Eyapp:YATW> object
+that can be later referenced in the user code by the package variable
+C<$zero_times>.
+
+=head3 The treeregexp
+
+The first part of the rule C<TIMES(NUM($x), ., .)>
+indicates that for a matching to succeed the node being
+visited must be of C<type> C<TIMES>, have a left child
+of  C<type> C<NUM> and two more children.
+
+If the first part succeeded then the following part 
+takes the control to see if the I<semantic conditions>
+are satisfied.
+
+=head3 Semantic condition
+
+The second part is optional and must be prefixed by the reserved word C<and>
+followed by a Perl code manifesting the semantic conditions that must be hold
+by the node to succeed. Thus, in the example:
+
+  zero_times: TIMES(NUM($x), ., .) and { $x->{attr} == 0 } => { $_[0] = $NUM }
+
+the semantic condition C<$x-E<gt>{attr} == 0> states that the
+value of the number stored in the C<TERMINAL> node referenced
+by C<$x> must be zero.
+
+=head3 Referencing the matching nodes
+
+The node  being visited can be referenced/modified
+inside the semantic actions using C<$_[0]>. 
+
+The Treeregexp
+translator automatically creates a set of lexical variables
+for us. The scope of these variables is limited to the
+semantic condition and the transformation code. 
+
+Thus, in the example
+
+  zero_times: TIMES(NUM($x), ., .) and { $x->{attr} == 0 } => { $_[0] = $NUM }
+
+the node being visited C<$_[0]>
+can be also referenced using the lexical variable
+C<$TIMES> which is created by he Treeregexp compiler.
+In the same way a reference to the left child C<NUM> will be stored
+in the lexical variable C<$NUM> and a
+reference to the child of C<$NUM> will be stored in C<$x>.
+The semantic condition states that the attribute
+of the node associated with C<$x> must be zero.
+
+When the same type of node appears several times inside 
+the treeregexp part the associated lexical variable is 
+declared by the Treeregexp compiler as an array.
+This is the case in the C<constantfold> transformation
+in the L</SYNOPSIS> example, where there are two nodes of type C<NUM>:
+
+  constantfold: /TIMES|PLUS|DIV|MINUS/(NUM($x), ., NUM($y))
+     => {
+    $x->{attr} = eval  "$x->{attr} $W->{attr} $y->{attr}";
+    $_[0] = $NUM[0];
+  }
+
+Thus variable  C<$NUM[0]> references the node that matches the 
+first C<NUM> term in the formula and C<$NUM[1]> the one
+that matches the second.
+
+=head3 Transformation code
+
+The third part of the rule is also optional and comes prefixed by
+the big arrow C<=E<gt>>. The Perl code in this section usually 
+transforms the matching tree.
+To achieve the modification of the tree, the Treeregexp programmer
+B<must use C<$_[0]>> and not the lexical variables provided by the translator.
+Remember that in Perl C<$_[0]> is an alias of the actual parameter.
+The C<constantfold> example above B<will not work> if we rewrite the code C<$_[0] = $NUM[0]> as
+
+                            { $TIMES = $NUM }
+
+=head2 Regexp Treeregexes
+
+The previous C<constantfold> example used a classic Perl linear regexp
+to explicit that the root node of the matching subtree must match the Perl regexp.
+The general syntax for C<REGEXP> treeregexes patterns is:
+
+      treereg: REGEXP (':' IDENT)? '(' childlist ')' ('and' CODE)? 
+
+The C<REGEXP> must be specified between slashes (other delimiters
+as C<{}> are not accepted).
+It is legal to specify options after the second slash (like C<e>, C<i>, etc.).
+
+The operation of string oriented regexps is slightly modified
+when they are used inside a treeregexp:
+B<by default the option> 
+C<x> 
+B<will be assumed>.
+The treeregexp compiler will automatically insert it.
+Use the new option C<X> (upper case X) if you want to suppress such behavior.
+B<There is no need also to insert> C<\b> 
+B<word anchors> to delimit identifiers:
+all the identifiers in a regexp treeregexp are automatically
+surrounded by C<\b>. Use the option C<B> (upper case B)
+to suppress this behavior.
+
+The optional identifier after the C<REGEXP> indicates the name of the lexical variable
+that will be held a reference to the node whose type matches C<REGEXP>.
+Variable C<$W> (or C<@W> if there are more than one REGEXP and or dot treeregexes)
+will be used instead if no identifier is specified.
+
+
+=head2 Scalar Treeregexes
+
+A scalar treeregxp is defined writing a Perl scalar inside the treeregexp, like C<$x>
+in C<NUM($x)>. A scalar treeregxp immediately matches any node that exists
+and stores a reference to such node inside the Perl lexical scalar variable.
+The scope of the variable is limited to the semantic parts of the Treeregexp.
+Is illegal to use C<$W> or C<$W_#num> as variable names for scalar treeregexes.
+
+
+=head2 Dot Treeregexes
+
+A dot matches any node. It can be seen as an abbreviation for
+scalar treeregexes. The reference to the matching node
+is stored in the lexical variable C<$W>. 
+The variable C<@W> will be used instead
+if there are more than one REGEXP and or dot treeregexes
+
+=head2 Array Treeregexp Expressions
+
+The Treeregexp language permits expressions like:
+
+                   A(@a,B($x),@c)
+
+After the matching variable C<@A> contains the shortest prefix
+of C<$A-E<gt>children> that does not match C<B($x)>.
+The variable C<@c> contains the remaining suffix of
+ C<$A-E<gt>children>. 
+
+The following example uses 
+array treereg expressions to move the assignment C<b = 5>
+out of the C<while> loop:
+
+  ..  ......................................................................
+  93  my $program = "a =1000; c = 1; while (a) { c = c*a; b = 5; a = a-1 }\n";
+  94  $parser->YYData->{INPUT} = $program;
+  95  my $t = $parser->Run;
+  96  my @output = split /\n/, $t->str;
+  97
+  98  my $p = Parse::Eyapp::Treeregexp->new( STRING => q{
+  99    moveinvariant: BLOCK(
+ 100                     @prests,
+ 101                     WHILE(VAR($b), BLOCK(@a, ASSIGN($x, NUM($e)), @c)),
+ 102                     @possts
+ 103                   )
+ 104      => {
+ 105           my $assign = $ASSIGN;
+ 106           $BLOCK[1]->delete($ASSIGN);
+ 107           $BLOCK[0]->insert_before($WHILE, $assign);
+ 108         }
+ 109    },
+ 110    FIRSTLINE => 99,
+ 111  );
+ 112  $p->generate();
+
+=head2 Star Treeregexp 
+
+Deprecated. Don't use it. Is still there but not to endure.
+
+=head2 Transformation Families
+
+Transformations created by C<Parse::Eyapp::Treeregexp> can be grouped in 
+families. That is the function of the rule:
+
+                    treeregexp: IDENT '=' IDENT + ';' 
+
+
+The next example (file C<examples/TSwithtreetransformations3.eyp>)
+defines the family 
+
+     algebraic_transformations = constantfold zero_times times_zero comasocfold;
+
+Follows the code:
+
+     my $transform = Parse::Eyapp::Treeregexp->new( STRING => q{
+
+      uminus: UMINUS(., NUM($x), .) => { $x->{attr} = -$x->{attr}; $_[0] = $NUM }
+      constantfold: /TIMES|PLUS|DIV|MINUS/:bin(NUM($z), ., NUM($y))
+         => {
+        $z->{attr} = eval  "$z->{attr} $W->{attr} $y->{attr}";
+        $_[0] = $NUM[0];
+      }
+      commutative_add: PLUS($x, ., $y, .)
+        => { my $t = $x; $_[0]->child(0, $y); $_[0]->child(2, $t)}
+      comasocfold: TIMES(DIV(NUM($x), ., $b), ., NUM($y))
+         => {
+        $x->{attr} = $x->{attr} * $y->{attr};
+        $_[0] = $DIV;
+      }
+      zero_times: TIMES(NUM($x), ., .) and { $x->{attr} == 0 } => { $_[0] = $NUM }
+      times_zero: TIMES(., ., NUM($x)) and { $x->{attr} == 0 } => { $_[0] = $NUM }
+      algebraic_transformations = constantfold zero_times times_zero comasocfold;
+    },
+    );
+
+    $transform->generate();
+    our ($uminus);
+    $uminus->s($tree);
+ 
+
+The transformations belonging to a family are usually applied 
+together:
+
+                $tree->s(@algebraic_transformations);
+
+
+=head2 Code Support
+
+In between Treeregexp rules and family assignments the programmer can insert 
+Perl code between curly brackets. That code usually gives support to
+the semantic conditions and transformations inside the rules.
+See for example test 14 in the C<t/> directory of the Parse::Eyapp distribution.
+
+  {
+    sub not_semantic {
+      my $self = shift;
+      return  1 if $self->{token} eq $self->{attr};
+      return 0;
+    }
+  }
+
+  delete_tokens : TERMINAL and { not_semantic($TERMINAL) } 
+                           => { $delete_tokens->delete() }
+
+
+
+
+
+=head1 SEE ALSO
+
+=over
+
+=item * The project home is at L<http://code.google.com/p/parse-eyapp/>.
+Use a subversion client to anonymously check out the latest project source code:
+
+   svn checkout http://parse-eyapp.googlecode.com/svn/trunk/ parse-eyapp-read-only
+
+=item * The tutorial I<Parsing Strings and Trees with> C<Parse::Eyapp>
+(An Introduction to Compiler Construction in seven pages) in
+L<http://nereida.deioc.ull.es/~pl/eyapsimple/> 
+
+=item * 
+L<Parse::Eyapp>, 
+L<Parse::Eyapp::eyapplanguageref>, 
+L<Parse::Eyapp::debuggingtut>,
+L<Parse::Eyapp::defaultactionsintro>,
+L<Parse::Eyapp::translationschemestut>,
+L<Parse::Eyapp::Driver>,
+L<Parse::Eyapp::Node>,
+L<Parse::Eyapp::YATW>,
+L<Parse::Eyapp::Treeregexp>,
+L<Parse::Eyapp::Scope>,
+L<Parse::Eyapp::Base>,
+L<Parse::Eyapp::datagenerationtut>
+
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/languageintro.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/debuggingtut.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/eyapplanguageref.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/Treeregexp.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/Node.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/YATW.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/Eyapp.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/Base.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/translationschemestut.pdf> 
+
+=item * The pdf file in L<http://nereida.deioc.ull.es/~pl/perlexamples/treematchingtut.pdf> 
+
+=item *
+perldoc L<eyapp>, 
+
+=item *
+perldoc L<treereg>,
+
+=item *
+perldoc L<vgg>,
+
+=item * The Syntax Highlight file for vim at L<http://www.vim.org/scripts/script.php?script_id=2453>
+and L<http://nereida.deioc.ull.es/~vim/>
+
+=item * I<Analisis Lexico y Sintactico>, (Notes for a course in compiler 
+construction) by  Casiano Rodriguez-Leon. 
+Available at  L<http://nereida.deioc.ull.es/~pl/perlexamples/>
+Is the more complete and reliable source for Parse::Eyapp. However is in Spanish.
+
+=item *
+L<Parse::Yapp>,
+
+=item *
+Man pages of yacc(1) and
+bison(1),
+L<http://www.delorie.com/gnu/docs/bison/bison.html>
+
+=item *
+L<Language::AttributeGrammar>
+
+=item *
+L<Parse::RecDescent>.
+
+=item *
+L<HOP::Parser>
+
+=item *
+L<HOP::Lexer>
+
+=item * ocamlyacc tutorial at 
+L<http://plus.kaist.ac.kr/~shoh/ocaml/ocamllex-ocamlyacc/ocamlyacc-tutorial/ocamlyacc-tutorial.html>
+
+=back
+
+=head1 REFERENCES
+
+=over
+
+=item *
+The classic Dragon's book I<Compilers: Principles, Techniques, and Tools> 
+by Alfred V. Aho, Ravi Sethi and
+Jeffrey D. Ullman (Addison-Wesley 1986)
+
+=item *
+I<CS2121: The Implementation and Power of Programming Languages>
+(See L<http://www.cs.man.ac.uk/~pjj>, L<http://www.cs.man.ac.uk/~pjj/complang/g2lr.html> 
+and L<http://www.cs.man.ac.uk/~pjj/cs2121/ho/ho.html>) by 
+Pete Jinks
+
+=back
+
+
+
+=head1 CONTRIBUTORS
+
+=over 2
+
+=item * Hal Finkel L<http://www.halssoftware.com/> 
+
+=item * G. Williams L<http://kasei.us/>
+
+=item * Thomas L. Shinnick L<http://search.cpan.org/~tshinnic/>
+
+=item * Frank Leray
+
+=back
+
+=head1 AUTHOR
+ 
+Casiano Rodriguez-Leon (casiano@ull.es)
+
+=head1 ACKNOWLEDGMENTS
+
+This work has been supported by CEE (FEDER) and the Spanish Ministry of
+I<Educacion y Ciencia> through I<Plan Nacional I+D+I> number TIN2005-08818-C04-04
+(ULL::OPLINK project L<http://www.oplink.ull.es/>). 
+Support from Gobierno de Canarias was through GC02210601
+(I<Grupos Consolidados>).
+The University of La Laguna has also supported my work in many ways
+and for many years.
+
+A large percentage of  code is verbatim taken from L<Parse::Yapp> 1.05.
+The author of L<Parse::Yapp> is Francois Desarmenien.
+ 
+I wish to thank Francois Desarmenien for his L<Parse::Yapp> module, 
+to my students at La Laguna and to the Perl Community. Thanks to 
+the people who have contributed to improve the module (see L<Parse::Eyapp/CONTRIBUTORS>).
+Thanks to Larry Wall for giving us Perl.
+Special thanks to Juana.
+
+=head1 LICENCE AND COPYRIGHT
+ 
+Copyright (c) 2006-2008 Casiano Rodriguez-Leon (casiano@ull.es). All rights reserved.
+
+Parse::Yapp copyright is of Francois Desarmenien, all rights reserved. 1998-2001
+ 
+These modules are free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+ 
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+
+
+

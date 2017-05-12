@@ -1,0 +1,7 @@
+README                      Read this first
+MANIFEST                    This shipping list
+Makefile.PL                 Generic Makefile template
+Forking.pm                  Module to fork function and daemonize parent
+test.pl                     Basic test script
+Changelog		    minimal changelog
+META.yml                    Module meta-data (added by MakeMaker)

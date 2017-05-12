@@ -1,0 +1,23 @@
+Revision history for Plack-Middleware-NeverExpire
+
+1.006 Sat 10 Jan 2015
+	- No functional changes
+	- No longer contains INSTALL file with install-as-root instructions
+
+1.005 Sun 04 Jan 2015
+	- Be strict about no imports.
+
+1.004 Sun 03 Feb 2013
+	- Add `public` to the Cache-Control header so non-expiry is ensured even over SSL.
+
+1.003 Tue 01 Mar 2011
+	- Declare dependecy on Plack 0.9942. No functional changes.
+
+1.002 Fri 18 Feb 2011
+	- Switched to using `response_cb`.
+
+1.001 Thu 17 Feb 2011
+	- Declared depenencies. No functional changes.
+
+1.0 Thu 17 Feb 2011
+	- Initial release.

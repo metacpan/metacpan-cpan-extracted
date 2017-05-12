@@ -1,0 +1,21 @@
+.licensizer.yml
+Changes
+eg/parproc.pl
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+README
+Simple.pm
+t/bin/test-prog
+t/destroy.t
+t/esub.t
+t/exit.t
+t/muarg.t
+t/mult.t
+t/sh-c.t
+t/simple.t
+t/stdouterr.t
+t/time.t
+t/wait.t
+META.json                                Module JSON meta-data (added by MakeMaker)

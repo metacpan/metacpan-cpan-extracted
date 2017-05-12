@@ -1,0 +1,23 @@
+Revision history for Pye
+
+2.001001  2015-01-22 00:58:09+02:00 Asia/Jerusalem
+	- Small documentation update
+
+2.001000  2015-01-21 19:26:08+02:00 Asia/Jerusalem
+	- Feature: Added -u|--username and -p|--password to the pye command line
+	  utility, as they are relevant for basically all backends.
+	- Feature: unrecognized options to pye are passed to the backend, making it
+	  possible to provide backend-specific options, for example --find_master=1 to
+	  the MongoDB backend
+	- Docs: Fixed some documentation errors
+
+2.000001  2015-01-19 20:22:10+02:00 Asia/Jerusalem
+	- Small documentation fixes
+
+2.000000  2015-01-19 20:14:46+02:00 Asia/Jerusalem
+	- Pye now has multiple backends, and the MongoDB code has been moved to
+	  Pye::MongoDB. Read the "UPGRADING TO v2.0.0 AND UP" section in the README
+	  for more information.
+
+1.000000  2013-12-24 22:04:35 Asia/Jerusalem
+	- First public release

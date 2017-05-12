@@ -1,0 +1,73 @@
+use strict;
+use warnings;
+use feature 'switch';
+use utf8;
+
+package Pod::Weaver::PluginBundle::RTHOMPSON;
+# ABSTRACT: (DEPRECATED) A bundle that implements RTHOMPSON's preferred L<Pod::Weaver> config
+$Pod::Weaver::PluginBundle::RTHOMPSON::VERSION = '0.151680';
+use Moose;
+extends "Pod::Weaver::PluginBundle::Author::RTHOMPSON";
+use namespace::autoclean;
+
+before mvp_bundle_config => sub {
+  warn "!!! [\@RTHOMPSON] is deprecated and may be removed in the future; replace it with [\@Author::RTHOMPSON]\n";
+};
+
+1; # Magic true value required at end of module
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Pod::Weaver::PluginBundle::RTHOMPSON - (DEPRECATED) A bundle that implements RTHOMPSON's preferred L<Pod::Weaver> config
+
+=head1 VERSION
+
+version 0.151680
+
+=head1 SYNOPSIS
+
+DEPRECATED, use Pod::Weaver::PluginBundle::Author::RTHOMPSON instead.
+
+=head1 INSTALLATION
+
+See perlmodinstall for information and options on installing Perl modules.
+
+=head1 AUTHOR
+
+Ryan C. Thompson <rct@thompsonclan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Ryan C. Thompson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME
+THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES.
+
+=cut

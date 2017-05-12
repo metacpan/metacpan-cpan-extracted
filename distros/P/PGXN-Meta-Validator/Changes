@@ -1,0 +1,38 @@
+Revision history for Perl extension PGXN-Meta-Validator.
+
+0.16.0  2013-06-05T06:39:03Z
+      - Updated GitHub URLs to point to `/pgxn/` rather than `/theory/`.
+      - Now require SemVer 0.5.0, so that versions must adhere to the semantic
+        version 1.0.0 requirement that the prerelease version, if present,
+        begin with a dash.
+      - Removed the Pod tests from the distribution.
+
+0.15.0  2011-11-28T04:30:09Z
+      - Added `version_string` class method and made use of it in the
+        `validate_pgxn_meta` script.
+      - The command-line app now defaults to a file named `META.json` in the
+        current directory if no file name is passed.
+      - Fixed installation in the `pgxn` client libexec directory so that it
+        first creates the directory if it does not exist. This is to adjust to
+        a change in `pgxn` 1.0, which does not create the directory by default.
+
+0.14.0  2011-08-31T03:44:57Z
+      - Added tests to protect against autovivication of keys.
+      - Rewrote all error messages to be more consistent and informative.
+      - Removed unused `header()` method.
+      - Added support for running under
+        [pgxn](http://pgxnclient.projects.postgresql.org/) as `pgxn
+        validate-meta META.json`.
+
+0.13.0  2011-05-26T03:52:07
+      - Fixed invalid Unicode character class.
+
+0.12.0  2011-05-26T03:30:43
+      - Added "conflicts" relationship to prereqs.
+      - Documented `validate_pgxn_meta` options.
+
+0.11.0  2011-05-25T06:01:14
+      - Added `validate_pgxn_meta`.
+
+0.10.0  2011-05-25T05:33:38
+      - Initial public release on CPAN.

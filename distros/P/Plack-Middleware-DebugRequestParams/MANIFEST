@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Plack/Middleware/DebugRequestParams.pm
+t/00_compile.t
+t/01_basic.t
+t/02_ignore_path.t
+META.yml
+MANIFEST

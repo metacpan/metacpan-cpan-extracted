@@ -1,0 +1,170 @@
+NAME
+    Person::ID::CZ::RC::Generator - Perl class for Czech RC identification
+    generation.
+
+SYNOPSIS
+     use Person::ID::CZ::RC::Generator;
+     my $obj = Person::ID::CZ::RC::Generator->new(%params);
+     my $rc = $obj->rc;
+
+METHODS
+    "new(%params)"
+             Constructor.
+
+            *       "alternate"
+
+                     Alternate flag.
+                     Default value is undef.
+
+            *       "day"
+
+                     Day.
+                     Default value is undef.
+
+            *       "month"
+
+                     Month.
+                     Default value is undef.
+
+            *       "rc_sep"
+
+                     RC number separator.
+                     Possible values are:
+                     - empty string
+                     - /
+                     Default value is empty string.
+
+            *       "serial"
+
+                     Serial number from 1 to 999.
+                     Default value is undef.
+
+            *       "sex"
+
+                     Sex.
+                     Possible values are:
+                     - male
+                     - female
+                     Default value is undef.
+
+            *       "year"
+
+                     Year.
+                     Possible values are between 1946 and 2054.
+                     Default value is undef.
+
+    "rc()"
+             Get rc identification.
+             Returns string with rc identification.
+
+ERRORS
+     new():
+             Parameter 'rc_sep' has bad value.
+             Parameter 'serial' is greater than 999.
+             Parameter 'serial' is lesser than 1.
+             Parameter 'serial' isn't number.
+             Parameter 'sex' has bad value.
+             Parameter 'year' is greater than 2054.
+             Parameter 'year' is lesser than 1855.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Person::ID::CZ::RC::Generator;
+
+     # Object.
+     my $obj = Person::ID::CZ::RC::Generator->new(
+             'day' => 1,
+             'month' => 5,
+             'rc_sep' => '/',
+             'serial' => 133,
+             'sex' => 'male',
+             'year' => 1984,
+     );
+
+     # Print out.
+     print "Personal number: ".$obj->rc."\n";
+
+     # Output:
+     # Personal number: 840501/1330
+
+EXAMPLE2
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Person::ID::CZ::RC::Generator;
+
+     # Object.
+     my $obj = Person::ID::CZ::RC::Generator->new(
+             'day' => 1,
+             'month' => 5,
+             'rc_sep' => '/',
+             'serial' => 133,
+             'sex' => 'male',
+             'year' => 1952,
+     );
+
+     # Print out.
+     print "Personal number: ".$obj->rc."\n";
+
+     # Output:
+     # Personal number: 520501/133
+
+EXAMPLE3
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use Person::ID::CZ::RC::Generator;
+
+     # Object.
+     my $obj = Person::ID::CZ::RC::Generator->new(
+             'rc_sep' => '/',
+     );
+
+     # Print out.
+     print "Personal number: ".$obj->rc."\n";
+
+     # Output like:
+     # Personal number: qr{\d\d\d\d\d\d\/\d\d\d\d?}
+
+DEPENDENCIES
+    Class::Utils, DateTime, English, Error::Pure, List::MoreUtils,
+    Random::Day, Readonly.
+
+SEE ALSO
+    Business::DK::CPR
+        Danish CPR (SSN) number generator/validator
+
+    No::PersonNr
+        Check Norwegian Social security numbers
+
+    Person::ID::CZ::RC
+        Perl class for Czech RC identification.
+
+    Se::PersonNr
+        Module for validating and generating a Swedish personnummer.
+
+REPOSITORY
+    <https://github.com/tupinek/Person::ID::CZ::RC::Generator>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © Michal Špaček 2013-2015
+     BSD 2-Clause License
+
+VERSION
+    0.05
+

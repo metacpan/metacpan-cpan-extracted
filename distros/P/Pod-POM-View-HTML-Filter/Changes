@@ -1,0 +1,117 @@
+Revision history for Pod-POM-View-HTML-Filter
+
+0.09 Sun Jan 28 11:29:28 CET 2007
+        [ENHANCEMENTS]
+        - added support for aliases: perl is an alias perl_tidy,
+          and ppi is an alias for perl_ppi
+        - added support for wiki format thanks to chromatic's Text::WikiFormat
+        - added support for mediawiki format thanks to Derek Price's
+          Text::MediawikiFormat
+        [CHANGED BEHAVIOUR]
+        - non verbatim filters do not add <p></p> tags any more
+
+0.08 Thu Jan 25 23:53:59 CET 2007
+        [ENHANCEMENTS]
+        - Sébastien Aperghis-Tramoni added support for a new Perl
+          highlighter: PPI::HTML
+        [EXAMPLES]
+        - example stylesheets included for the following filters:
+          perl, html, kate and ppi
+
+0.07 Tue Jan 16 23:27:48 CET 2007
+        [ENHANCEMENTS]
+        - support for kate filtering, thanks to Hans Jeuken's
+          Syntax::Highlight::Engine::Kate
+        [TESTS]
+        - added the t/14indent.t test file, forgotten in the previous
+          release
+
+0.06 Tue Jan 16 01:59:05 CET 2007
+        [ENHANCEMENTS]
+        - add() behaves differently when called on the class or an
+          instance, and updates the appropriate list of filters:
+          + an instance always has access to the latest class filters (so
+            you can update the class with add() after creating an object
+            and it will DWYM)
+          + it's possible to override the class filter for a single
+            instance
+        - blocks are now automatically unindented before processing,
+          but it's possible to prevent this (at your own risks) with
+          auto_unindent => 0 in the constructor
+        - HTML characters '&', '<' and '>' are now escaped in the default
+          filter
+        - the result is enclosed in <pre>...</pre> if any of the filters
+          if declared as 'verbatim', and also if Pod::POM detected a
+          verbatim block inside the begin block (which it shouldn't do,
+          since begin block should be opaque to it... but that's a bug
+          in Pod::POM). Otherwise it's enclosed in <p>...</p> tags.
+        - when processing a filter stack, if one of the filters is not
+          available, the whole stack is replaced with the 'default'
+          filter
+        [DOCUMENTATION]
+        - the Caveats listed in the documentation are no longer valid,
+          since the content of the begin block is now processed as
+          a string where the POD escape sequences are left alone
+        [FIXES]
+        - the bug discovered in version 0.03 has been unexpectedly
+          removed, when reworking the processing of the filter stack
+        [TESTS]
+        - the main test script (t/20builtins.t) uses the files in t/pod/
+          as test data. Those files contain a pod source, and the expected
+          results according to a combination of available filters.
+        - the tests related to the "disappearing POM" bug are no longer
+          marked TODO
+
+0.05 Thu Oct 14 11:44:14 CEST 2004
+        [FEATURES]
+        - support stacking filters by using the | notation
+        [ENHANCEMENTS]
+        - =for blocks now accept filter options
+        - much better processing for the content of the begin section
+        - support for shell colouring with Maddingue's Syntax::Highlight::Shell
+        [DOCUMENTATION]
+        - much more documentation with many examples
+        [FIXES]
+        - removed the pasted code from Pod::POM::View::HTML (see 0.03)
+
+0.04 Tue Tue Oct 12 09:46:17 CEST 2004
+        [ENHANCEMENTS]
+        - when the filter is not known by PPVHF, simply use the default
+          filter (<pre>...</pre>)
+        - $Pod::POM::View::HTML::Filter::default is the default filter
+        [FIXES]
+        - set Getopt::Long::Configure back to defaults just before calling
+          perltidy, which may break otherwise
+        - consistently use carp and croak
+
+0.03 Thu Jul 29 01:05:02 CEST 2004
+        [ENHANCEMENTS]
+        - more flexible interface for the add() method, that lets one
+          add more parameters to a filter (requires, verbatim)
+        - the verbatim mode for filters prevent the present()
+          method to be called on the verbatim, text and code items it
+          contains. The content of all items is catenated and passed to
+          the filter as a single block.
+        - support for html filtering, thanks to Maddingue's
+          Syntax::Highlight::HTML.
+        [BUGS]
+        - for some unknown reason, presenting the pod twice is broken
+          with the perl filter (TODO test added).
+        - view_seq_text is copied verbatim from Pod::POM::View::HTML,
+          because I need to access a private variable. This should be
+          fixed, because duplicated code is never good.
+        [FIXES]
+        - Makefile.PL lists the prerequisites forgotten in 0.02
+
+0.02 Mon Jul 26 15:00:28 CEST 2004
+        [ENHANCEMENTS]
+        - limited support for =begin filter options
+        - perl_filter can now accept options (such as -nnn)
+
+0.01 Mon Jul 26 12:11:00 CEST 2004
+        [FEATURES]
+        - add(), know(), filters()
+        - =begin filter foo
+        - =for filter=foo
+        Did I mention it's the first version?
+

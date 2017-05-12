@@ -1,0 +1,33 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 26755664a478fe97bfc5cc1c42d870e93230ee67 Changes
+SHA1 24680eb2a8fe871c0f35e23caa5b528f4101a21b LICENSE
+SHA1 8e997fd210b14cdc2d77dc974412472d6eb80704 MANIFEST
+SHA1 c752e71bb4da519610158cee6ccb03876fdd3168 META.json
+SHA1 e1dee80021875b212c4aaeaf7c440ac3abe4add5 META.yml
+SHA1 cec3bcab91587c70ba27377617887959c680918c Makefile.PL
+SHA1 62e534a7cb20870539866eb017240b9e0ecbe404 README.md
+SHA1 0bf2c0471418d385e8312ec0fc72237b105fdd95 dist.ini
+SHA1 b8ea3c33cfe636b7602675053842297a7af0b35e lib/Plack/Middleware/XForwardedFor.pm
+SHA1 3bca04e5f471ede7f7c182f260873eaba5d50a7c t/basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (Darwin)
+
+iEYEARECAAYFAkzPWHUACgkQR0BL4gbYw3T+BQCdG4xrJrCXDv103nVbG3DgmPms
+5mMAnjOd40kFrWQgd5o44FuNRRlahZrl
+=1Yzc
+-----END PGP SIGNATURE-----

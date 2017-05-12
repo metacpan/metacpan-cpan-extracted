@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/PowerTools-Upload-File.t
+lib/PowerTools/Upload/File.pm
+META.yml                                 Module meta-data (added by MakeMaker)

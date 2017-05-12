@@ -1,0 +1,99 @@
+
+3.5 Tue Dec  2 19:15:58 CST 2014
+
+ - POD cleanups
+
+ - Up required version to v5.12.
+ 
+ - Up copyright to perl v5.20.
+
+3.2 Wed Jun  5 07:52:13 CDT 2013
+
+ - Correct error message left from removing switches.
+
+3.1 Tue May 28 12:26:09 CDT 2013
+
+ - Remove smart matches, given, when.
+
+3.0.4 Tue Feb 19 20:10:07 CST 2013
+
+ - set noexport as default for configure, allowing
+   user override.
+
+ - POD
+
+3.0.2 Wed Dec 26 19:47:21 CST 2012
+
+ - POD errors.
+
+3.0.1 Wed Dec  5 16:24:06 CST 2012
+
+ - use v5.12
+ - Copyright moved to Perl-5.12
+ - POD clenaups
+
+3.0 Wed Jun  6 06:46:39 CDT 2012
+
+ - Up version due to changes in interface.
+
+ -  use v5.10.
+
+ -  Add the option for an iterator instead of a pre-
+    generated queue: items on the stack are checked
+    for $item->can( 'next_job' ). When true then
+    $item->next_job is called until it returns false,
+    at which point it is shifted off the queue and the
+    next item examined. This allows for both package
+    names and object to act as iterators.
+
+ -  Gracefully handles placeholders: false entries are
+    silently discarded, true non-iterator, non-coderef
+    items are printed. At the very least this allows for
+    progress messages between iterators or if-logic to 
+    insert empty items where the job should not be run.
+
+    Eventually the text items could be used for control
+    entries (e.g. switching verbosity or parallel count).
+
+ -  debug now turns off fork and also sets verbose.
+
+ -  "fork" (defaut true) turns on forking; "nofork" or 
+    "fork=0" turns off forking.
+
+ -  More complete tests with ore descriptive names.
+
+2.02 Fri Nov 25 09:18:02 CST 2011
+
+Fix one doc bug has been floating around the POD
+for some time.
+
+2.01 Tue Apr 22 14:45:30 EDT 2008
+
+- The threads weren't being used by anyone so they
+  have been removed.
+
+- added "finish" option to ignore nonzero exits.
+
+- debug=0 will now override finding the perl debugger,
+  allowing debugging of forked proc's (with appropriate
+  use of terminal handlers).
+
+Wed Mar 15 13:16:04 EST 2006
+
+- Added failure mode tests
+
+- Use arghash to get defaults in class method call (bug).
+
+
+Tue Mar 14 18:13:43 EST 2006
+
+- Replace separate fork and loop with a single 
+  handler per mode (not externally visible).
+
+- POD.
+
+
+Fri Mar 10 18:02:39 EST 2006
+
+- Initial public release, based on the guts of 
+  Schedule::Parallel.

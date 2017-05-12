@@ -1,0 +1,124 @@
+# This file acts as the project's changelog.
+
+@prefix :        <http://usefulinc.com/ns/doap#> .
+@prefix dcs:     <http://ontologi.es/doap-changeset#> .
+@prefix dc:      <http://purl.org/dc/terms/> .
+@prefix dist:    <http://purl.org/NET/cpan-uri/dist/P5U/> .
+@prefix rdfs:    <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:     <http://www.w3.org/2001/XMLSchema#> .
+@prefix foaf:    <http://xmlns.com/foaf/0.1/> .
+
+dist:project :release dist:v_0-001 .
+dist:v_0-001
+	a               :Version ;
+	dc:issued       "2012-06-29"^^xsd:date ;
+	:revision       "0.001"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.001.tar.gz> ;
+	rdfs:label      "Initial release" .
+
+dist:project :release dist:v_0-002 .
+dist:v_0-002
+	a               :Version ;
+	dc:issued       "2012-07-01"^^xsd:date ;
+	:revision       "0.002"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.002.tar.gz> ;
+	dcs:changeset [
+		dcs:versus dist:v_0-001 ;
+		dcs:item   [ rdfs:label "Lots and lots of documentation."@en; a dcs:Documentation ];
+		dcs:item   [ rdfs:label "'whois' command."@en; a dcs:Addition ];
+	].
+
+dist:project :release dist:v_0-003 .
+dist:v_0-003
+	a               :Version ;
+	dc:issued       "2012-07-03"^^xsd:date ;
+	:revision       "0.003"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.003.tar.gz> ;
+	dcs:changeset [
+		dcs:versus dist:v_0-002 ;
+		dcs:item   [ rdfs:label "Fix a few abstracts."@en; a dcs:Documentation, dcs:Bugfix ];
+		dcs:item   [ rdfs:label "Fix 'bin/p5u' for Perl < 5.14."@en; a dcs:Bugfix ];
+	].
+
+dist:project :release dist:v_0-004 .
+dist:v_0-004
+	a               :Version ;
+	dc:issued       "2012-07-03"^^xsd:date ;
+	:revision       "0.004"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.004.tar.gz> ;
+	dcs:changeset [
+		dcs:versus dist:v_0-003 ;
+		dcs:item   [ rdfs:label "Debian package list regexp bugfix."@en; a dcs:Bugfix ];
+	].
+
+_:mst foaf:nick "MSTROUT" .
+
+dist:project :release dist:v_0-005 .
+dist:v_0-005
+	a               :Version ;
+	dc:issued       "2012-10-03"^^xsd:date ;
+	:revision       "0.005"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.005.tar.gz> ;
+	dcs:changeset [
+		dcs:versus dist:v_0-004 ;
+		dcs:item   [ rdfs:label "Switch from Any::Moose to Moo."@en; a dcs:Update; dcs:thanks _:mst ];
+	].
+
+dist:project :release dist:v_0-006 .
+dist:v_0-006
+	a               :Version ;
+	dc:issued       "2012-10-06"^^xsd:date ;
+	:revision       "0.006"^^xsd:string ;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.006.tar.gz> ;
+	dcs:changeset [
+		dcs:versus dist:v_0-005 ;
+		dcs:item   [ rdfs:label "use MooX::Types::MooseLike::Base"@en ];
+	].
+
+_:mxh
+	a foaf:Person;
+	foaf:name "Mateu X Hunter";
+	foaf:mbox <mailto:hunter@missoula.org>.
+
+dist:project :release dist:v_0-007.
+dist:v_0-007
+	a               :Version;
+	dc:issued       "2012-10-23"^^xsd:date;
+	:revision       "0.007"^^xsd:string;
+	rdfs:label      "Skyfall"@en;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.007.tar.gz>;
+	dcs:changeset [
+		dcs:versus dist:v_0-006;
+		dcs:item [
+			a dcs:Bugix;
+			rdfs:label "Fix for P5U::Command::Testers."@en;
+			dcs:blame _:mxh;
+			rdfs:seeAlso <https://bitbucket.org/tobyink/p5-p5u/pull-request/1/keep-cache_dir-as-an-instanceof-path-class/diff>;
+		];
+	].
+
+dist:project :release dist:v_0-100.
+dist:v_0-100
+	a               :Version;
+	dc:issued       "2013-05-24"^^xsd:date;
+	:revision       "0.100"^^xsd:string;
+	:file-release   <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/P5U-0.100.tar.gz>;
+	dcs:changeset [
+		dcs:versus dist:v_0-007;
+		dcs:item [
+			a dcs:Update;
+			rdfs:label "Switch from Path::Class and Path::Class::Rule to Path::Tiny and Path::Iterator::Rule";
+		];
+		dcs:item [
+			a dcs:Update;
+			rdfs:label "Switch from MooX::Types::MooseLike to Types::Standard";
+		];
+		dcs:item [
+			a dcs:Update;
+			rdfs:label "Switch from smartmatch to match::simple and match::smart";
+		];
+		dcs:item [
+			a dcs:Addition;
+			rdfs:label "whois command in verbose mode now shows a list of a user's most popular distributions";
+		];
+	].

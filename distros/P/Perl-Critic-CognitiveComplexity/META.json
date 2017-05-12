@@ -1,0 +1,92 @@
+{
+   "abstract" : "Cognitive Complexity, Because Testability != Understandability",
+   "author" : [
+      "Oliver Trosien"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.8",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Critic-CognitiveComplexity",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::Cover" : "1.23",
+            "Devel::Cover::Report::Clover" : "1.01",
+            "Minilla" : "v3.0.0",
+            "TAP::Harness::Archive" : "0.18",
+            "experimental" : "0.016"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic" : "1.126",
+            "Readonly" : "2.00",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "1.001014",
+            "Test::Perl::Critic" : "1.03"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::CognitiveComplexity" : {
+         "file" : "lib/Perl/Critic/CognitiveComplexity.pm",
+         "version" : "0.5"
+      },
+      "Perl::Critic::Policy::CognitiveComplexity::ProhibitExcessCognitiveComplexity" : {
+         "file" : "lib/Perl/Critic/Policy/CognitiveComplexity/ProhibitExcessCognitiveComplexity.pm",
+         "version" : "0.5"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/otrosien/Perl-Critic-CognitiveComplexity/issues"
+      },
+      "homepage" : "https://github.com/otrosien/Perl-Critic-CognitiveComplexity",
+      "repository" : {
+         "url" : "git://github.com/otrosien/Perl-Critic-CognitiveComplexity.git",
+         "web" : "https://github.com/otrosien/Perl-Critic-CognitiveComplexity"
+      }
+   },
+   "version" : "0.5",
+   "x_authority" : "cpan:OTROSIEN",
+   "x_contributors" : [
+      "Oliver Trosien <otrosien@epages.com>"
+   ]
+}

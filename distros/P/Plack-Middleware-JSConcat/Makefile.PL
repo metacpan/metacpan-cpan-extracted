@@ -1,0 +1,12 @@
+use inc::Module::Install 0.91;
+name 'Plack-Middleware-JSConcat';
+all_from 'lib/Plack/Middleware/JSConcat.pm';
+readme_from 'lib/Plack/Middleware/JSConcat.pm';
+requires 'Plack::Util';
+requires 'IPC::Run3';
+test_requires 'Test::More';
+use_test_base;
+auto_include_deps;
+author_tests('xt');
+auto_set_repository;
+WriteAll;

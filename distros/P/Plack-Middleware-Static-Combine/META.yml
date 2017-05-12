@@ -1,0 +1,30 @@
+---
+abstract: 'Serve multiple static files combined'
+author:
+  - 'Jakob Voß <voss@gbv.de>'
+build_requires:
+  HTTP::Request::Common: 0
+  Plack::Builder: 0
+  Plack::Test: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300023, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Static-Combine
+requires:
+  Plack::Middleware::Static: 0
+  Plack::Util: 0
+  Plack::Util::Accessor: 0
+  parent: 0
+  perl: v5.5.3
+  strict: 0
+resources:
+  bugtracker: https://github.com/nichtich/Plack-Middleware-Static-Combine/issues
+  homepage: https://github.com/nichtich/Plack-Middleware-Static-Combine
+  repository: https://github.com/nichtich/Plack-Middleware-Static-Combine.git
+version: 0.01

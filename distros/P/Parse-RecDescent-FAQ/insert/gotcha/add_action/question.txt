@@ -1,0 +1,23 @@
+My code quit working when I added
+
+  {print "Character: $item[1]\n"}
+
+to the end of the C<character> rule in the grammer below... any idea why?
+
+
+use strict;
+use warnings;
+
+use Parse::RecDescent;
+
+my $grammar = q {
+  
+  start    :  character character character(s)
+              {print "Found: ", $item[1], $item[2], join "", @{$item[3]}, "\n"; }
+
+  character:  /\w/ {print "Character: $item[1]\n"}
+};
+
+my $parser = Parse::RecDescent->new($grammar);
+
+defined $parser->start("ABCD") or die "didn't match";

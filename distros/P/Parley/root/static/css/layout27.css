@@ -1,0 +1,17 @@
+html,body{margin:0;padding:0}
+body{font-size: 85%; font-family: stockstill,tahoma,arial,sans-serif}
+p{margin:0 10px 10px}
+/*a{display:block;color: #981793;padding:10px}*/
+div#header h1{height:80px;line-height:80px;margin:0; padding-left:10px;background: #EEE;color: #79B30B}
+div#content { margin-top: 20px; margin-left: 20px; }
+div#content p{line-height:1.4}
+div#navigation{background:transparent}
+div#extra{background:transparent}
+div#footer{background: #333;color: #FFF; font-size: 77%;}
+div#footer p{margin:0;padding:5px 10px}
+div#footer span{margin:0;padding:5px 10px}
+div#footer a{color: #ccc};
+
+div#navigation{float:left;width:50%}
+div#extra{float:left;width:49.9%}
+div#footer{clear:left;width:100%}

@@ -1,0 +1,56 @@
+============================================================================
+                                Pod-WikiText
+============================================================================
+
+NAME 
+
+Pod::WikiText - Support for Wiki markup in POD
+
+SYNOPSIS
+
+    my $formatter = Pod::WikiText->new(infile=>'file_to_format');
+    $formatter->format;
+
+OPTIONS
+
+Options are many, please see both the POD documentation, and the WikiText 
+documentation in the module.
+
+INSTALLATION
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    - strict
+    - warnings
+    - Carp
+    - Cwd
+    - File::Spec
+    - Text::Wrap
+    - Text::Tiki
+    - Syntax::Highlight::Engine::Kate
+
+RATIONALE
+
+Provided an alternative for documentation of Perl source files which allows
+the use of a robust flavor of Wiki markup in place of POD markup. This 
+allows the creation of more expressive POD in your Perl source files, and 
+hence better documentation when published.
+
+AUTHOR
+
+Brad Adkins <dbijcl@gmail.com>
+
+COPYRIGHT
+
+Copyright (c) 2008, Brad Adkins. Rights Reserved. This module is free 
+software. It may be used, redistributed and/or modified under the terms of 
+the Perl Artistic License (see http://www.perl.com/perl/misc/Artistic.html).
+
+============================================================================

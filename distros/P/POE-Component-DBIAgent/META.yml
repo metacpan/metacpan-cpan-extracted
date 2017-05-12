@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         POE-Component-DBIAgent
+version:      0.26
+version_from: DBIAgent.pm
+installdirs:  site
+requires:
+    Class::MethodMaker:            0
+    DBI:                           0
+    POE:                           0.17
+    Socket:                        0
+    Storable:                      0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

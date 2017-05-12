@@ -1,0 +1,120 @@
+[Changes for 0.31 - 2010年 1月 8日 周五 18時58分48秒 CST]
+
+* Fix an incorrect MANIFEST leading to installation failure.
+  Reported by: Montaseri.
+
+[Changes for 0.30 - 2009年11月17日 周二 16時46分49秒 CST]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the nullary CC0 1.0 Universal terms:
+
+  To the extent possible under law, 唐鳳 has waived all copyright and
+  related or neighboring rights to PDF-FromHTML.
+
+* Updated Module::Install to 0.91, prompted by Florian Ragwitz.
+
+[Changes for 0.25 - 2009-01-01]
+
+* Added -l, -e, -f and -s flags to html2pdf.pl; see its POD for details.
+
+* Running "html2pdf.pl foo.html" now writes to "foo.html.pdf" instead of
+  STDOUT.  However, "html2pdf.pl foo.html > foo.pdf" is still supported.
+
+[Changes for 0.24 - 2007-02-14]
+
+* The "landscape" option to ->convert() now work as documented.
+
+[Changes for 0.23 - 2007-02-05]
+
+* Updated CAVEATS section to note that there is currently no plan
+  to support CSS for this module.
+  Contributed by: Craig Chant
+
+* Updated license info in scripts/html2pdf to MIT.
+
+* Various code warning/stricture/tidying up; no function changes.
+
+[Changes for 0.22 - 2007-01-25]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the permissive "MIT" license.  See the COPYRIGHT
+  section in README for the new terms.
+
+* PDF::FromHTML no longer fails when <table> contains width percentages
+  that are narrower than the widths of its <td> elements, or when <table>
+  contains no <td> elements at all.
+
+  Reported by: Craig Chant
+
+[Changes for 0.21 - 2006-12-07]
+
+Slight tweaks to PDF::FromHTML::Template to allow border lines with
+user-specified width.
+
+[Changes for 0.20 - 2006-09-11]
+
+Bundle our private fork of PDF::Template as PDF::FromHTML::Template
+to work around the bug that PDF::Template 0.30 is no longer available
+no CPAN.
+
+Redesigned the table layout engine, so that tables with borders,
+colspan settings, and per-td widths are all respected.
+
+[Changes for 0.12 - 2005-12-01]
+
+For Perl 5.8.1, "use constant" alone seems not enough to pass
+use strict subs.  Reported by Christian Pipi.
+
+Updateded to Module::Install 0.40 for better installation support.
+
+[Changes for 0.11 - 2005-12-01]
+
+For Perl 5.6.x, we have to use PDFLib as PDF::API2 only supports
+Perl 5.8+.  Reported by Jessie Chen.
+
+[Changes for 0.10 - 2005-11-29]
+
+Chase new versions of PDF::Template and PDF::Writer.
+
+Add support for PDFLib based rendering engine, in addition to PDF::API2.
+
+[Changes for 0.08 - 2005-05-06]
+
+Fix image handler bug in Twig.pm for zero-width and missing image
+files, contributed by Charleston Software Associates.
+
+[Changes for 0.07 - 2004-12-08]
+
+Heading fonts are made much bigger.
+
+Prelminary support for <img src="http://..."> via LWP.
+
+Use Image::Size to determine image size correctly.
+
+Correct layout for mixed colspan and rowspan.
+
+Variable support via a plain $__PAGE__ in text
+(this interface may change into <var> the future).
+
+[Changes for 0.06 - 2004-11-23]
+
+Correctly fallback to XML::Clean if HTML::Tidy is unavailable.
+
+Rowspan was only renfered properly on leading columns; now it should
+work on all columns.
+
+[Changes for 0.05 - 2004-11-18]
+
+HTML::Tidy is now preferred over XML::Clean.
+
+Graphics::ColorNames now replaces Color::Rgb.
+
+Dropped dependency on Spiffy and Hook::LexWrap.
+
+TD and TH's "rowspan" and "colspan" is now handled, albeit imperfectly.
+
+Widths in TD and TH in the same TR now always adds back to 100%.
+
+[Changes for 0.04 - 2004-09-23]
+
+Adds parameters to ->convert() so page size, font height etc can be tweaked.

@@ -1,0 +1,30 @@
+---
+abstract: 'Use __END__ for working code examples, self testing, executing'
+author:
+  - 'David Wright <dvwright@cpan.org>'
+build_requires:
+  Carp: 0
+  Config: 0
+  File::Basename: 0
+  File::Find: 0
+  File::Spec: 0
+  File::Temp: 0
+  Getopt::Long: 0
+  Pod::Usage: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perl-RunEND
+provides:
+  Perl::RunEND:
+    file: lib/Perl/RunEND.pm
+    version: v0.1.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.1.0

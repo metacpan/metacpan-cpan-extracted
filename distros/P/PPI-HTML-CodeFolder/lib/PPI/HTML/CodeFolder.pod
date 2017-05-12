@@ -1,0 +1,522 @@
+=pod
+
+=head1 NAME
+
+PPI::HTML::CodeFolder - PPI::HTML Subclass providing code folding and compression
+
+=head1 SYNOPSIS
+
+    use strict;
+    use File::Slurp ();
+    use PPI;
+    use PPI::HTML::CodeFolder;
+    use CSS::Tiny;
+    #
+    # Get the file
+    #
+    my $file = shift @ARGV;
+    $file    or die "File '$file' not provided";
+    -f $file or die "File '$file' does not exist";
+    #
+    # Determine the output file
+    #
+    my $output = shift(@ARGV) || $file . '.html';
+    my $foldjs = $output;
+    $foldjs=~s/\.html/\.js/;
+    my $foldcss = $output;
+    $foldcss=~s/\.html/\.css/;
+    #
+    #    PPI the file
+    #
+    my $Document = PPI::Document->new( $file )
+        or die "File '$file' could not be loaded as a document";
+    #
+    #    define our classname abbreviations
+    #
+    my %classabvs = qw(
+    arrayindex ai
+    backtick bt
+    cast cs
+    comment ct
+    core co
+    data dt
+    double db
+    end en
+    heredoc hd
+    heredoc_content hc
+    heredoc_terminator ht
+    interpolate ip
+    keyword kw
+    label lb
+    line_number ln
+    literal ll
+    magic mg
+    match mt
+    number nm
+    operator op
+    pod pd
+    pragma pg
+    prototype pt
+    readline rl
+    regex re
+    regexp re
+    separator sp
+    single sg
+    structure st
+    substitute su
+    symbol sy
+    transliterate tl
+    word wd
+    words wd
+    );
+    #
+    #    define colors for the full classnames
+    #
+    my %tagcolors = (
+    cast => '#339999',
+    comment => '#008080',
+    core => '#FF0000',
+    double => '#999999',
+    heredoc_content => '#FF0000',
+    interpolate => '#999999',
+    keyword => '#0000FF',
+    line_number => '#666666',
+    literal => '#999999',
+    magic => '#0099FF',
+    match => '#9900FF',
+    number => '#990000',
+    operator => '#DD7700',
+    pod => '#008080',
+    pragma => '#990000',
+    regex => '#9900FF',
+    single => '#999999',
+    substitute => '#9900FF',
+    transliterate => '#9900FF',
+    word => '#999999',
+    );
+    #
+    # Create the PPI::HTML::CodeFolder object
+    #
+    my $html = PPI::HTML::CodeFolder->new(
+        line_numbers => 1,
+        page         => 1,
+        colors       => \%tagcolors,
+        fold          => {
+            POD           => 1,
+            Comments      => 1,
+            Heredocs      => 1,
+            Imports       => 1,
+            Abbreviate    => \%tagabvs,
+            Javascript    => $jspath,
+            Stylesheet    => $csspath,
+            Expandable    => 1,
+            },
+        )
+        or die "Failed to create HTML syntax highlighter";
+    #
+    #    collect stylesheet and javascript; we'll serve those
+    #    separately
+    #
+    File::Slurp::write_file( $jspath, $html->foldJavascript());
+    File::Slurp::write_file( $csspath, $html->foldCSS());
+    #
+    #	better still, just write them out
+    #
+    $html->writeJavascript($jspath) or die $@;
+    $html->writeCSS($csspath) or die $@;
+    #
+    # Process the file
+    #
+    my $content = $html->html( $Document, $output )
+        or die "Failed to generate HTML";
+
+    File::Slurp::write_file( $output, $content );
+    #
+    #	write out a TOC
+    #
+    $html->writeTOC('toc.html') or die $@;
+
+=head1 DESCRIPTION
+
+A subclass of L<PPI::HTML> that compresses the generated
+output by
+
+=over 4
+
+=item *
+
+codefolding whitespace, POD, comments, heredocs, and imports sections, with an option to
+include hyperlinks to unfold/refold the folded sections in place.
+
+=item *
+
+abbreviating generated C<E<lt>spanE<gt>> classnames
+
+=item *
+
+converting linenumber C<E<lt>spanE<gt>>'s to simple
+Javascript to generate linenumbers within the browser when the document
+is loaded.
+
+=back
+
+The amount of compression that can be achieved varies signficantly,
+depending on the size and content of the source code. Gregarious modules
+with lots of commentary and POD can be significantly reduced.
+E.g., some simple benchmarks using the L<perl5b.pl> source (on WinXP, Perl 5.8.6):
+
+                 Original Source:    323,204
+                PPI::HTML Output:  1,008,471
+    PPI::HTML::CodeFolder Output:    608,118
+           (w/ expandable folds)    
+
+As always, YMMV.
+
+=begin html
+
+<h3>Samples</h3>
+
+<a href='http://www.presicient.com/ppicf/CodeFolder.html'>Folded version of CodeFolder.pm</a><br>
+
+=end html
+
+=head1 METHODS
+
+=head2 $ppicf = PPI::HTML::CodeFolder->new( %args )
+
+Same as the L<PPI::HTML> constructor, with the addition of a C<fold>
+parameter, which specifies a hashref of folding properties.
+If not specified, a default folding is applied (see individual
+fold properties below for default behavior). In addition,
+the L<PPI::HTML> C<page> property is always enabled.
+
+B<NOTE> that using the C<css> parameter is strongly discouraged, as the
+folding alignment and tooltips are very sensitive to stylesheet
+changes. Instead, use the C<fold> Stylesheet option I<(see below)>
+to export the CSS to an external file, and directly edit it.
+
+=head3 Folding Properties
+
+=head4 Abbreviate => \%abbreviations | $boolean
+
+Specifies a mapping of standard PPI::HTML class names to an alternate
+(presumably abbreviated) version. If a 'true' scalar is specified,
+enables abbreviation using the default mapping; if a 'false' scalar is
+specified, disables abbreviation. Default is to abbreviate.
+
+The default abbreviation map is
+
+    arrayindex         => ai
+    backtick           => bt
+    cast               => cs
+    comment            => ct
+    core               => co
+    data               => dt
+    double             => db
+    end                => en
+    heredoc            => hd
+    heredoc_content    => hc
+    heredoc_terminator => ht
+    interpolate        => ip
+    keyword            => kw
+    label              => lb
+    line_number        => ln
+    literal            => ll
+    magic              => mg
+    match              => mt
+    number             => nm
+    operator           => op
+    pod                => pd
+    pragma             => pg
+    prototype          => pt
+    readline           => rl
+    regex              => re
+    regexp             => re
+    separator          => sp
+    single             => sg
+    structure          => st
+    substitute         => su
+    symbol             => sy
+    transliterate      => tl
+    word               => wd
+    words              => wd
+
+Abbreviation helps compression due to the large number of
+C<E<lt>spanE<gt>> tags with class specifications in the output.
+
+B<NOTE>: any colormap provided to the constructor I<(via the color|colour parameter)>
+must use the full classname, B<not> the abbreviated name.
+
+=head4 Comments => $boolean
+
+If a true value, comment lines are folded.
+Default is to include comment lines.
+
+=head4 Expandable => $boolean
+
+If a true value, a hyperlink is provided in the margin for each folded source section
+which unfolds the source in place when clicked; once unfolded,
+the section can be refolded by clicking the hyperlinks next to the foldable
+source. Default is false (i.e., folded text is simply discarded).
+
+=head4 Heredocs => $boolean
+
+If a true value, embedded heredoc content is folded. Default is false.
+
+=head4 Imports => $boolean
+
+If a true value, 'use' and 'require' statements are folded.
+All statements which begin with 'use', including various pragmas,
+will be folded. Default is false.
+
+=head4 Javascript => $filename
+
+Causes the foldtip javascript to be linked by referencing the specified C<$filename>,
+rather than embedded in the output HTML.
+Default is embedded; ignored if Expandable is false.
+Note that this does B<not> write the specified file, but only uses
+the filename in the generated E<lt>scriptE<gt> tag.
+
+=head4 MinFoldLines => $number
+
+Specifies the minimum number of consecutive foldable lines (of B<any> type)
+required to actually apply folding. Default is 4. E.g., a value of 4 means that
+3 consecutive comment lines, followed by valid statement, will B<not> be folded.
+
+=head4 POD => $boolean
+
+If a true value, POD lines are folded.
+Default is to include POD lines.
+
+=head4 Stylesheet => $filename
+
+Causes color and foldtip CSS to be linked by referencing the specified C<$filename>,
+rather than embedded in the output HTML. Default is embedded.
+Note that this does B<not> write the specified file, but only uses
+the filename in the generated E<lt>linkE<gt> tag.
+
+=head2 $html = $ppicf->html( $src [, $output [, $script ] ] )
+
+Generate the code folded HTML output from C<$src>, using the properties
+previously specified for C<$ppicf>.
+
+Anchors are added to both package and method declarations
+which may be used via hyperlinks (e.g., from a table of contents document)
+to scroll the declaration into view within a browser.
+
+C<html()> may be repeatedly called for different sources in order to 
+accumulate a cross reference containing information for all
+the documents (e.g., to accumulate a single table of contents
+for a multi-module project).
+
+Parameters are
+
+=over
+
+=item $src I<(required)>
+
+Either a L<PPI::Document> object, a scalar reference to the source as a string,
+or the filename of the source.
+
+=item $output I<(optional)>
+
+The full pathname to the resulting HTML output, which is used for maintaining 
+a cross reference to package and method declarations within the file. If not 
+specified, and C<$src> is a filename, defaults to C<"$src.html">. Note
+the C<html()> does B<not> write out the document to C<$output>, but only 
+uses it for the cross reference (and any table of contents generated
+from it).
+
+=item $script I<(optional)>
+
+A name used if C<$src> is a script file (rather than a module definition).
+Script files might not include any explicit package or method declaration
+which would be mapped into the cross reference. By specifying this parameter, 
+an entry for the script is forced into the cross reference, so that any "main" 
+package methods within the script will be assigned to this script name. If not 
+specified, and C<$src> is not a filename, any methods outside of package
+declarations are assigned to the "main" package.
+
+=back
+
+=head2 $javascript = $ppicf->foldJavascript()
+
+Returns the Javascript required for foldtips as a string.
+
+=head2 $css = $ppicf->foldCSS()
+
+Returns the CSS required for the generated HTML as a string.
+
+=head2 $rc = $ppicf->writeJavascript($path)
+
+Writes out the Javascript required for foldtips to the file specified
+by C<$path>. Returns 1 on success, or undef on failure, with an error
+message in C<$@>.
+
+=head2 $rc = $ppicf->writeCSS($path)
+
+Writes out the CSS required for document to the file specified
+by C<$path>. Returns 1 on success, or undef on failure, with an error
+message in C<$@>.
+
+=head2 $xref = $ppicf->getCrossReference()
+
+For the prior processed source, returns the hashref mapping
+the package names within the source to a hashref of 
+
+	'URL' => <URL to anchored package definition statement>,
+	'Methods' => {
+		<method-name> => <URL to anchored method definition statement>,
+	}
+
+Note that the package mapping is cumulative, i.e., it is updated
+each time C<html()> is called on the same PPI::HTML::CodeFolder instance.
+Also note that script files (i.e.,
+"main" application files) use the script filename as the package name
+for any "main" package declarations or methods.
+
+=head2 $toc = $ppicf->getTOC( $path [, Order => \@packages ] )
+
+Return a table of contents HTML document derived from the current
+cross reference. Provides hyperlinks to declared packages and their methods
+in a form suitable for either embedding in a frame container, or for
+processing into a tree widget via L<HTML::ListToTree>. C<$path>
+specifies the pathname to which the TOC will be written, which is only
+used for properly rendering the hyperlinks. C<Order> specifies
+an arrayref of package (or script file) names; the position of the 
+names in the list determines the position of the package/script hyperlinks
+in the TOC document. Any packages/scripts not specified in C<Order> list
+will be sorted alphabetically and appended after the Ordered items
+(if any).
+
+Note that method hyperlinks in the TOC are ordered alphabetically under
+their parent package/script link.
+
+=head2 $ppicf->writeTOC( $path [, Order => \@packages ] )
+
+Calls C<getTOC()> and writes the output to the specified C<$path>.
+
+=head2 $container = $ppicf->getFrameContainer( $title [, $home ] )
+
+Renders an HTML frame container document to contain both a TOC
+and the rendered source code. C<$title> is the title
+string for the document. C<$home> specified the URL of a document 
+initially loaded into the main frame (default none).
+
+=head2 $ppicf->writeFrameContainer( $path, $title [, $home ] )
+
+Calls C<getFrameContainer( $title [, $home ] )> and writes the 
+resulting document to C<$path>/index.html.
+
+=head1 NOTES
+
+=over
+
+=item *
+
+The resulting HTML and supporting CSS and Javascripts have been
+tested as follows I<(* indicates known issues, see below)>:
+
+        Windows XP        Linux (Fedora 6 & 7)      Mac OS X
+        ----------        -------------------       --------
+        Firefox 1.5       Firefox 1.5               Firefox 2.0*
+        Firefox 2.0       Firefox 2.0               Safari 2.4
+        IE 6*             Opera 9.22 
+        Opera 9.22
+
+=item *
+
+Support for expandable folds requires the use of non-persistent cookies,
+in order to maintain the current open/close state of each fold section
+when switching between source files in a framed browser display.
+
+=item *
+
+Internet Explorer issue: all versions from IE4 do not
+properly preserve whitespace in <pre> sections
+(I<see> quirksmode.org: L<http://www.quirksmode.org/bugreports/archives/2004/11/innerhtml_and_t.html>),
+which requires major Javascript hacks, and causes unfolding, followed
+by refolding to leave blank lines in the output. B<DON'T CLICK THE BLUE E!!!>
+
+
+=item *
+
+Firefox issue: the emitted CSS color classes B<must>
+be preceded by a "dummy" class, otherwise the initial class
+is ignored by Firefox.
+
+
+=item *
+
+Firefox issue: empty lines within a span
+do not properly adhere to the defined line-height, which causes
+misalignment with the line number margin. Therefore,
+this module adds a single space to all blank lines in the output.
+I<Alas, this does not fix the issue on OS X...so use Safari instead>
+
+
+=item *
+
+Developer note:
+Firefox issue on OS X: a known bug causes the scrollbars of
+hidden DIVs to be displayed; the fix requires the CSS for
+hidden DIVs to include "overflow: hidden;". (This isn't a big deal,
+since PPI::HTML::CF only uses hidden divs as text containers)
+
+
+=item *
+
+Developer note:
+Firefox and Opera on Linux: Opacity settings cause performance on Linux 
+to nosedive, with 100% CPU for extended periods. This is only
+of concern if a popup solution is added.
+
+
+=item *
+
+Firefox + Firebug issue: Leaving Firebug enabled can severely
+slow rendering of large documents with numerous folds.
+Consider disabling Firebug when viewing CodeFolder
+output.
+
+
+=item *
+
+The alignment of the linenumber and foldbutton margins with the
+text is very sensitive to the font used, and depends heavily on the
+browser and O/S used. The best combination found thus far is
+"fixed, Courier", which only leaves Firefox on OS X with
+alignment issues (which don't appear to be font related).
+If you prefer to use another font, be aware that browser and
+OS compatibility may be impacted. Also, neither of those fonts
+is likely to properly support Unicode, and there don't appear
+many fixed-width Unicode fonts lying about <sigh/>.
+
+
+=back
+
+=head1 SEE ALSO
+
+L<PPI>
+
+L<PPI::HTML>
+
+=head1 TO DO
+
+=over
+
+=item *
+
+Provide interface for app-defined margins (e.g., for annotations,
+breakpoints, etc.)
+
+=back
+
+=head1 AUTHOR, COPYRIGHT, & LICENSE
+
+Copyright(C) 2007, Dean Arnold, Presicient Corp., USA. All rights reserved.
+
+Permission is granted to use this software under the terms of the
+L<Perl Artistic License|perlartistic>.
+
+=cut

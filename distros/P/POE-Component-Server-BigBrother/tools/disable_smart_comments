@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use File::Spec::Functions;
+
+my $distdir = '';    # option variable
+my $help    = 0;     # option variable
+my $verbose = 0;
+
+GetOptions(
+            'help|?'    => \$help,
+            'verbose|v' => \$verbose,
+            'distdir:s' => \$distdir
+          ) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+pod2usage(-exitstatus => 2, -verbose => 2) unless $distdir;
+
+my @files = map { catfile($distdir,$_) } @ARGV;
+
+foreach my $file (@files) {
+	print "Disabling Smart::Comments on $file\n" if $verbose;
+	local @ARGV = ($file);
+	local $^I = '';
+	while (<>) {
+		s/^(use\s+Smart::Comments.+)$/# $1/;
+		print;
+	}
+}
+	
+__END__
+
+=head1 NAME
+
+disable_smart_comments - Disable Smart::Comments in source files
+
+=head1 SYNOPSIS
+
+disable_smart_comments [options] -distdir=DISTDIR [file ...]
+
+ Options:
+   -help            brief help message
+   -verbose         verbose output
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits.
+
+=item B<-verbose>
+
+Make the ouput more verbose.
+
+=item B<-distdir>
+
+Base directory where to find input files.
+
+=back
+
+=head1 DESCRIPTION
+
+B<disable_smart_comments> will disable (comment the use Smart::Comments)
+Smart::Comments in input file(s) store under the distdir directory.
+
+=cut

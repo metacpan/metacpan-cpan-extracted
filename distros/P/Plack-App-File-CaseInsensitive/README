@@ -1,0 +1,34 @@
+NAME
+    Plack::App::File::CaseInsensitive - Serve static files with case
+    insensitive paths
+
+VERSION
+    version 0.001000
+
+SYNOPSIS
+     use Plack::App::File::CaseInsensitive;
+     my $app = Plack::App::File::CaseInsensitive
+        ->new(root => "/path/to/htdocs")->to_app;
+
+DESCRIPTION
+    This is a static file server PSGI application that tries its best to
+    work with urls that have a different case than the files on disk. The
+    idea is to help porting away from case insensitive systems like Windows.
+    It probably doesn't work very well for unicode and it is certainly
+    inefficient, but it is mostly just made as a stopgap. It will warn when
+    the case insensitive codepath is triggered and it will also warn if it
+    finds multiple files with the same case insensitive name (ie "foo" and
+    "FOO".)
+
+CONFIGURATION
+    See "CONFIGURATION" in Plack::App::File
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

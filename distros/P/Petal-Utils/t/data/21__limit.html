@@ -1,0 +1,11 @@
+<html xmlns:tal="http://purl.org/petal/1.0/">
+  <body>
+    <p>
+    <!--? Limit -->
+    nolimit: <span tal:repeat="item items" tal:replace="item">limit1</span>
+    limit1: <span tal:repeat="item limit:items 1" tal:replace="item">limit1</span>
+    limit2: <span tal:repeat="item limit: items 2" tal:replace="item">limit2</span>
+    </p>
+  </body>
+</html>
+

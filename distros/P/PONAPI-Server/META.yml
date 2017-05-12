@@ -1,0 +1,77 @@
+---
+abstract: 'PONAPI - Perl implementation of {JSON:API} (http://jsonapi.org/) v1.0'
+author:
+  - 'Mickey Nasriachi <mickey@cpan.org>'
+  - 'Stevan Little <stevan@cpan.org>'
+  - 'Brian Fraser <hugmeir@cpan.org>'
+build_requires:
+  DBD::SQLite: '1.48'
+  Data::Dumper: '0'
+  HTTP::Request::Common: '0'
+  Plack::Middleware::MethodOverride: '0.15'
+  Test::More: '0'
+  Test::Simple: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PONAPI-Server
+no_index:
+  file:
+    - README.pod
+  namespace:
+    - PONAPI::CLI
+    - PONAPI::DAO::Request
+    - PONAPI::Server
+    - Test::PONAPI
+  package:
+    - PONAPI::CLI
+    - PONAPI::DAO::Request
+provides:
+  PONAPI::Constants:
+    file: lib/PONAPI/Constants.pm
+    version: '0.003001'
+  PONAPI::DAO:
+    file: lib/PONAPI/DAO.pm
+    version: '0.003001'
+  PONAPI::Exception:
+    file: lib/PONAPI/Exception.pm
+    version: '0.003001'
+  PONAPI::Repository:
+    file: lib/PONAPI/Repository.pm
+    version: '0.003001'
+  PONAPI::Server:
+    file: lib/PONAPI/Server.pm
+    version: '0.003001'
+requires:
+  App::Cmd::Setup: '0'
+  DBD::SQLite: '1.48'
+  DBI: '0'
+  File::Path: '2.04'
+  HTTP::Headers::ActionPack: '0'
+  JSON::MaybeXS: '0'
+  Module::Runtime: '0'
+  Moose: '2.1604'
+  PONAPI::Document: '0'
+  PONAPI::Names: '0'
+  PONAPI::Tools: '0'
+  Path::Class: '0'
+  Plack: '1.0029'
+  Plack::Middleware::MethodOverride: '0.15'
+  Pod::Perldoc: '0'
+  YAML::XS: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/mickeyn/PONAPI/tree/master/Server
+version: '0.003001'
+x_contributors:
+  - 'Paolo Mazzoncini'
+  - 'Andrei Vereha'
+x_serialization_backend: 'YAML::Tiny version 1.69'

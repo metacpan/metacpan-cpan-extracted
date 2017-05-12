@@ -1,0 +1,218 @@
+#!/usr/bin/perl
+#Copyright (c) 2009, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Plugtools;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "pluadd 0.0.1\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+		      "-u <user name>  - The user to add.\n".
+			  "-U <UID>  - The UID for the new user.\n".
+			  "-g <group name>  - The primary group name for the user.\n".
+			  "-G <GID>  - The GID to use for when adding the primary group.\n".
+			  "-c <gecos>  - The GECOS value for new user.\n".
+			  "-h <home>  - The home directory for the new user.\n".
+			  "-s <shell>  - The shell for the new user.\n".
+			  "-H <createHome>  - A boolean value describing if the home directory should be created.\n".
+			  "-S <skel>  - The skeleton to use for the directory to use.\n".
+			  "-p <chmodHome>  - A boolean value describing if the home directory should be chmoded or not.\n".
+			  "-P <chmodValue>  - The chmod value for home.\n".
+			  "-O <chownHome>  - A boolean value describing if the home directory should be chowned or not.\n".
+			  "-l  - Call \$entry->dump on any new objects.\n".
+			  "\n".
+			  "createHome:\n".
+			  "The this overrides the default value. If nothing is specified, the default value is '1'.\n".
+			  "\n".
+			  "skel:\n".
+			  "This overrides the default value. If nothing is specified, '/etc/skel' is used.\n".
+			  "\n".
+			  "chownHome:\n".
+			  "This overrides the default value. If nothing is specified, '1' is used.\n".
+			  "\n".
+			  "chownValue:\n".
+			  "This overrides te default value. If nothing is specified, '640' is used.\n".
+			  "\n".
+			  "For more info, see the the perldocs for Plugtools and pluadd...\n".
+			  "perldoc pluadd\n".
+			  "perldoc Plugtools\n";
+}
+
+#gets the options
+my %opts=();
+getopts('u:U:g:G:c:h:s:H:S:p:P:O:l', \%opts);
+
+if (!defined($opts{u})) {
+	warn('pluadd:254: No user specified.');
+	exit 254;
+}
+
+my $pt=Plugtools->new;
+if ($pt->{error}) {
+	warn('pluadd: Failed to initialize the Plugtools object');
+	exit $pt->{error};
+}
+
+$pt->addUser({
+			  user=>$opts{u},
+			  uid=>$opts{U},
+			  group=>$opts{g},
+			  gid=>$opts{G},
+			  gecos=>$opts{c},
+			  shell=>$opts{s},
+			  home=>$opts{h},
+			  createHome=>$opts{H},
+			  chownHome=>$opts{O},
+			  chmodHome=>$opts{p},
+			  chmodValue=>$opts{P}
+			  });
+if ($pt->{error}) {
+	warn('pluadd: Failed to add the user');
+	exit $pt->{error};
+}
+
+exit 0;
+
+=head1 NAME
+
+pluadd - Add a user to LDAP.
+
+=head1 SYNOPSIS
+
+plurm B<-u> <user> [B<-U> <UID>] [B<-g> <group>] [B<-G> <GID>] [B<-c> <GECOS>] [B<-h> <home>] [B<-s> <shell>] [B<-S> <skel>] [B<-H> (0|1)] [B<-O> (0|1)] [B<-p> (0|1)] [B<-P> <chmodValue>] [B<-l>]
+
+=head1 SWITCHES
+
+=head2 -u <user>
+
+This specifies the user to add.
+
+=head2 -U <UID>
+
+The UID for the new user.
+
+=head2 -g <group>
+
+The group primary group for the user.
+
+=head2 -G <GID>
+
+The GID for the primary group.
+
+=head2 -c <GECOS>
+
+The GECOS field for the new user.
+
+=head2 -h <home>
+
+The home directory for the new user.
+
+=head2 -s <shell>
+
+The shell for the new user.
+
+=head2 -S <skel>
+
+The skeleton directory to use if the user directory is to be created.
+
+=head2 -H (0|1)
+
+Override the default of config specified setting creating the home directory.
+
+=head2 -O (0|1)
+
+Override the default of config specified setting chowning the home directory.
+
+=head2 -p (0|1)
+
+Override the default of config specified setting chmoding the home directory.
+
+=head2 -P <chownValue>
+
+Override the default of config specified setting number to use for chmoding the home directory.
+
+=head2 -l
+
+Print any newly created or modified entries.
+
+=head1 EXIT CODES
+
+If the exit code is not listed below, it is what was the error code returned by Plugtools.
+
+=head 254
+
+No user specified.
+
+=head1 AUTHOR
+
+Copyright (c) 2009, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+xFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 SCRIPT CATEGORIES
+
+UNIX : System_administration
+
+=head1 OSNAMES
+
+any
+
+=head2 SEE ALSO
+
+Plugtools
+
+=head1 README
+
+pluadd - Add a user to LDAP.
+
+=cut

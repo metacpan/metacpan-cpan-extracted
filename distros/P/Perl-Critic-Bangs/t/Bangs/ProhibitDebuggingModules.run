@@ -1,0 +1,37 @@
+## name Basic configuration - passes
+## failures 0
+## cut
+
+use Test::More;
+use strict;
+require warnings;
+use 5.8.8;
+require 5.8.8;
+
+## name Basic configuration - fail
+## failures 2
+## cut
+
+require Data::Dumper;
+use Data::Dumper 1;
+
+
+#### Once more with <s>feeling</s> configuration!
+## name With configuration - passes
+## failures 0
+## parms { debugging_modules => 'strict' }
+## cut
+
+use Test::More;
+require warnings;
+use 5.8.8;
+require 5.8.8;
+
+## name With configuration - fail
+## failures 3
+## parms { debugging_modules => 'strict' }
+## cut
+
+use strict;
+require Data::Dumper;
+use Data::Dumper 1;

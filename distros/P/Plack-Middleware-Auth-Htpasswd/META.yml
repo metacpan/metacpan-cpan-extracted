@@ -1,0 +1,169 @@
+---
+abstract: 'http basic authentication through apache-style .htpasswd files'
+author:
+  - 'Jesse Luehrs <doy at tozt dot net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Auth-Htpasswd
+requires:
+  Authen::Htpasswd: 0
+  MIME::Base64: 0
+  Path::Class: 0
+  Plack: 0.9949
+resources:
+  repository: git://github.com/doy/plack-middleware-auth-htpasswd.git
+version: 0.02
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@DOY/GatherDir'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@DOY/PruneCruft'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@DOY/ManifestSkip'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@DOY/MetaYAML'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@DOY/License'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@DOY/Readme'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@DOY/ExtraTests'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@DOY/ExecDir'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@DOY/ShareDir'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@DOY/MakeMaker'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@DOY/Manifest'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@DOY/TestRelease'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@DOY/ConfirmRelease'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@DOY/MetaConfig'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@DOY/MetaJSON'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@DOY/NextRelease'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@DOY/CheckChangesHasContent'
+      version: 0.003
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@DOY/PkgVersion'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@DOY/PodCoverageTests'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@DOY/PodSyntaxTests'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      name: '@DOY/NoTabsTests'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@DOY/EOLTests'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::CompileTests
+      name: '@DOY/CompileTests'
+      version: 1.101800
+    -
+      class: Dist::Zilla::Plugin::Repository
+      name: '@DOY/Repository'
+      version: 0.13
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@DOY/Git::Check'
+      version: 1.102010
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@DOY/Git::Tag'
+      version: 1.102010
+    -
+      class: Dist::Zilla::Plugin::BumpVersionFromGit
+      name: '@DOY/BumpVersionFromGit'
+      version: 0.007
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@DOY/PodWeaver'
+      version: 3.101640
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@DOY/UploadToCPAN'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::Prereq
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereq
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.102340
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.102340
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.102340

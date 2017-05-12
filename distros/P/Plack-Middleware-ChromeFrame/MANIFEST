@@ -1,0 +1,15 @@
+Changes
+lib/Plack/Middleware/ChromeFrame.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_compile.t
+t/01_chromeframe.t
+xt/kwalitee.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod.t
+xt/pod_coverage.t
+xt/portability_filenames.t
+xt/vars.t
+META.yml                                 Module meta-data (added by MakeMaker)

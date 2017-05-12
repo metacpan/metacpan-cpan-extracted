@@ -1,0 +1,118 @@
+NAME
+
+    POE::Component::Metabase::Client::Submit - a POE client that submits to
+    Metabase servers
+
+VERSION
+
+    version 0.14
+
+SYNOPSIS
+
+      use strict;
+      use warnings;
+      use POE qw[Component::Metabase::Client::Submit];
+    
+      POE::Session->create(
+        package_states => [
+          'main' => [qw(_start _status)],
+        ],
+      );
+    
+      sub _start {
+        POE::Component::Metabase::Client::Submit->submit(
+          event   => '_status',
+          uri     => 'https://foo.bar.com/metabase/',
+          fact    => $metabase_fact_object,
+          profile => $metabase_user_profile_object,
+          secret  => $metabase_user_secret_object,
+        );
+        return;
+      }
+    
+      sub _status {
+        my $data = $_[ARG0];
+    
+        print "Success!\n" if $data->{success};
+    
+        print $data->{error}, "\n" if $data->{error};
+    
+        return;
+      }
+
+DESCRIPTION
+
+    POE::Component::Metabase::Client::Submit provides a POE mechanism for
+    submitting facts to a Metabase web server.
+
+CONSTRUCTOR
+
+    submit
+
+        POE::Component::Metabase::Client::Submit->spawn( %args );
+
+      Constructs a POE session that will manage submitting a Metabase fact
+      to a Metabase web server.
+
+      Takes a number of mandatory arguments:
+
+       'profile', a Metabase::User::Profile object
+       'secret', a Metabase::User::Secret object
+       'fact', a Metabase::Fact object
+       'event', an event handler in the calling session to invoke on completion
+       'uri', the uri of a Metabase server to submit to.
+
+      And some optional arguments:
+
+       'session', a session alias, reference or ID to send 'event' to instead of the calling session
+       'http_alias', the alias or ID of an existing POE::Component::Client::HTTP session to use.
+       'context', anything that can be stored in a scalar that is meaningful to you.
+       'resolver', a reference to a POE::Component::Resolver object to use (ignored if http_alias is used).
+       'compress', a compressor to use - defaults to none ( available compressors: gzip, deflate, x-bzip2, none )
+
+OUTPUT EVENT
+
+    An event will be sent to either the calling session or the session
+    specified with session during submit.
+
+    ARG0 of the event will be a hashref with the following keys:
+
+    success
+
+      Indicates that the submission was successful.
+
+    error
+
+      If there was an error this will contain a string indicating the error
+      that occurred.
+
+    context
+
+      If you specified context in submit, whatever you passed will be here.
+
+    <content>
+
+      This will contain the content of any HTTP responses whether success
+      or failure.
+
+SEE ALSO
+
+    Metabase
+
+    POE
+
+AUTHORS
+
+      * Chris Williams <chris@bingosnet.co.uk>
+
+      * Ricardo SIGNES
+
+      * David A. Golden
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

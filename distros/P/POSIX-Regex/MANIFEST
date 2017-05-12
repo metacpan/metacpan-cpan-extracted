@@ -1,0 +1,18 @@
+Changes
+const-c.inc
+const-xs.inc
+inc/Devel/CheckLib.pm
+Makefile.PL
+MANIFEST
+README
+Regex.pm
+Regex.pod
+Regex.xs
+t/01_load.t
+t/02_simple_matching.t
+t/03_complicated_matching.t
+t/04_case.t
+t/05_extended.t
+t/06_fail.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

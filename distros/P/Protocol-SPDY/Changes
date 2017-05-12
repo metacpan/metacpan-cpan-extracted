@@ -1,0 +1,105 @@
+Revision history for Protocol-SPDY
+
+1.001     2015-02-01 16:21:37+00:00 Europe/London
+
+1.000     2013-08-23 23:17:58 Europe/London
+	Non-dev release.
+
+0.999_007 2013-08-11 04:10:12 Europe/London
+	Bug fixes:
+	* Pass unhandled frames to separate ->dispatch_unhandled_frame method so
+	that ::Tracer class is able to ignore these.
+	* Provide empty ->write method for ::Tracer since we don't expect to have
+	an on_write handler here.
+
+	Documentation:
+	* Document events on Protocol::SPDY::Base and Protocol::SPDY::Stream.
+	* Trim down the server example
+
+0.999_006 2013-08-10 01:35:08 Europe/London
+	Features:
+	* send_frame and receive_frame events on Protocol::SPDY::Base, for hooks on
+	frame send/receive - both will be called with the relevant frame instance.
+
+	Documentation:
+	* Clean up some inconsistencies in spdy/2 vs. spdy/3 versioning
+
+	Bug fixes:
+	* Placeholder classes for the old Protocol::SPDY::Frame::Control::SynStream
+	and Protocol::SPDY::Frame::Control::SynReply packages, to avoid cpan upgrade
+	from attempting to install 0.001.
+
+	Examples:
+	* Added dumper.pl example for analysing captured streams
+
+0.999_005 2013-08-08 22:51:28 Europe/London
+	No functional changes
+
+	Bug fixes:
+	* Previous release was built with PREREQ_FATAL in an attempt to pick up
+	the minimum perl dependency - ExtUtils::MakeMaker docs point out that
+	this is a really bad idea.
+
+0.999_004 2013-08-08 21:36:58 Europe/London
+	Features:
+	* send_settings method for notifying remote of our estimated/current
+	settings - needed for disabling server pusher (max_concurrent_streams=0)
+
+	Bug fixes:
+	* Initial settings notification method used incorrect ::SETTINGS class
+
+0.999_003 2013-08-08 05:40:40 Europe/London
+	Features:
+	* Window update messages now handled by Protocol::SPDY::Stream,
+	rather than leaving the implementation to send them manually.
+	* Incoming settings frames are now applied
+	* restore_initial_settings method for sending persisted values
+
+	Bug fixes:
+	* Length calculation was incorrect, this could cause undef frames.
+	* ->headers method support in Protocol::SPDY::Stream, needed for
+	proper server push support
+	* ->window_update method support in Protocol::SPDY::Stream
+	* FIN would cause remote_finished Future to fire before the data
+	event was invoked
+
+	Build:
+	* Uses cpanfile for dependency tracking
+
+	Documentation:
+	* Mention some of the constants available in Protocol::SPDY::Constants
+
+0.999_002 2013-08-06 04:59:45 Europe/London
+	No functional changes
+
+	Dependency fixes:
+	* Attempt to get MIN_PERL_VERSION into Makefile.PL (the
+	Dist::Zilla::Plugin::MinimumPerl module does not appear
+	to do this, perhaps because Dist::Zilla::Plugin::MakeMaker
+	explicitly deletes that hash entry in favour of putting
+	it as a 'use' line in Makefile.PL, unclear yet why this is)
+	This version uses a patched Dist::Zilla::Plugin::MakeMaker
+	to avoid removing the MIN_PERL_VERSION key.
+
+0.999_001 2013-08-05 06:43:11 Europe/London
+	Development version for cpantesters prior to 1.0 release
+
+	Features:
+	* Updated for spdy/3 support.
+	* Higher-level handling for streams and client/server
+	modes, to avoid duplication of logic when implementing
+	network transport
+	* State notification via futures
+	* Support for transfer windows
+	* Dropped NOOP frame (nothing seems to use it, as a
+	consequence we're only supporting spdy/3+ now - if
+	older versions are required please raise an RT)
+
+	Documentation:
+	* Examples for client, server and debug usage
+	* Next-protocol-negotiation is more widely available, so
+	documented ways of using that
+
+0.001     2012-03-03 22:41:48 Europe/London
+	Initial CPAN release.
+

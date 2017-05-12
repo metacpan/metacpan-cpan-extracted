@@ -1,0 +1,15 @@
+Changes
+ignore.txt
+lib/PDL/DSP/Fir.pm
+lib/PDL/DSP/Fir/Simple.pm
+Makefile.PL
+LICENSE
+MANIFEST			This list of files
+META.yml
+META.json
+README.pod
+t/00-load.t
+t/manifest.t
+t/0-simple.t
+t/1-fir.t
+t/pod.t

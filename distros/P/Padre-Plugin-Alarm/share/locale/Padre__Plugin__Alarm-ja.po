@@ -1,0 +1,53 @@
+# Japanese translations for PACKAGE package.
+# Copyright (C) 2009 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Kenichi Ishigaki <ishigaki@cpan.org>, 2009.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Alarm\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-18 23:29+0800\n"
+"PO-Revision-Date: 2009-07-27 01:06+0900\n"
+"Last-Translator: Kenichi Ishigaki <ishigaki@cpan.org>\n"
+"Language-Team: Japanese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: lib/Padre/Plugin/Alarm.pm:44
+msgid "Time (eg: 23:55):"
+msgstr "時刻(例: 23:55)"
+
+#: lib/Padre/Plugin/Alarm.pm:48
+msgid "Frequency:"
+msgstr "回数:"
+
+#: lib/Padre/Plugin/Alarm.pm:58
+msgid "Set Alarm Time"
+msgstr "アラームをセットする"
+
+#: lib/Padre/Plugin/Alarm.pm:91
+msgid "Possible Value Format: \\d:\\d\\d or \\d\\d:\\d\\d like 6:13 or 23:55"
+msgstr "可能なフォーマット: \\d:\\d\\d または \\d\\d:\\d\\d (6:13, 23:55など)"
+
+#: lib/Padre/Plugin/Alarm.pm:91
+msgid "Wrong Alarm Time"
+msgstr "時刻が間違っています"
+
+#: lib/Padre/Plugin/Alarm.pm:127
+msgid "All Alarms are stopped"
+msgstr "すべてのアラームを止めました"
+
+#: lib/Padre/Plugin/Alarm.pm:127
+msgid "Stop Alarm"
+msgstr "アラームを止める"
+
+#: lib/Padre/Plugin/Alarm.pm:146
+msgid "All Alarms are cleared"
+msgstr "すべてのアラームをクリアする"
+
+#: lib/Padre/Plugin/Alarm.pm:146
+msgid "Clear Alarm"
+msgstr "アラームをクリアする"

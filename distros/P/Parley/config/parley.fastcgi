@@ -1,0 +1,11 @@
+# Serve static content directly
+#DocumentRoot  /var/www/MyApp/root
+#Alias /static /var/www/MyApp/root/static
+DocumentRoot  /home/parley/parley/root
+Alias /static /home/parley/parley/root/static
+
+FastCgiServer /home/parley/parley/script/parley_fastcgi.pl -processes 3
+Alias /parley/ /home/parley/parley/script/parley_fastcgi.pl/
+
+# Or, run at the root
+#Alias / /var/www/MyApp/script/parley_fastcgi.pl/

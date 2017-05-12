@@ -1,0 +1,61 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; General Dynamics ;)</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>General Dynamics ;)</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<B>Dynamic</B>
+<UL>
+<LI><A HREF=default.html>default</A>
+</UL>
+<P>
+<A HREF=#options>Options</A><BR>
+<P>
+
+    </TD><TD VALIGN=top>
+
+The <EM>Dynamic</EM> style-element stores information which is used
+during the actual presentation, and what is not related to the display
+of the slide itself.  Actually, it is all the information shown in
+the <A HREF=../../control/index.html>control-display</A>, if that
+display is enabled.
+
+<H2>General Dynamics <A NAME=options>Options</A></H2>
+
+The Dynamic style-element contains the following options:
+<DL>
+<DT><B>-startPhase =&gt;</B> <I>number</I>
+<DD>The first phase of the slide to be shown.  Usually, this will contain
+    <CODE>0</CODE> to indicate all phases.
+    <P>
+    This option is overruled by the <A HREF=../show/index.html>show</A>'s
+    option <CODE>-flushPhases</CODE>.
+    <P>
+<DT><B>-exportPhases =&gt;</B> <I>boolean</I>
+<DT><B>-exportPhases =&gt; [</B> <I>phase number</I>, ... <B>]</B>
+<DD>Usually, only the final stage of each slide is incorporated in a
+    website or list of images, as created by an
+    <A HREF=../export/index.html>export</A> module.  When you set this on
+    true, then all phases are included.  When you assign a list, only the
+    listed phases are included.
+</DL>
+<P>
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

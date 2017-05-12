@@ -1,0 +1,20 @@
+Build.PL
+Changes
+lib/Padre/Document/CSS.pm
+lib/Padre/Plugin/CSS.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+share/locale/CSS-ar.po
+share/locale/CSS-es-es.po
+share/locale/CSS-fr-fr.po
+share/locale/CSS-nl-nl.po
+share/locale/CSS-pl.po
+share/locale/CSS-pt-br.po
+share/locale/CSS-ru.po
+share/locale/CSS-zh-cn.po
+share/locale/CSS-zh-tw.po
+share/locale/messages.pot
+t/00-load.t
+t/pod.t

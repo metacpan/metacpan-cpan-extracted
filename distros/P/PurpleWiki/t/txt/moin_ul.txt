@@ -1,0 +1,12 @@
+first paragraph
+ * item 1.
+ * item 2
+ continued.
+   * item 2a.
+     * item 2ai.
+ * item 3.
+concluding paragraph
+
+  * item 1 again.
+
+  * item 1 again again.

@@ -1,0 +1,291 @@
+=encoding iso-8859-1
+
+=head1 NAME/NOM
+
+perlapio - Interface d'abstraction des E/S internes à Perl
+
+=head1 SYNOPSIS
+
+    PerlIO *PerlIO_stdin(void);
+    PerlIO *PerlIO_stdout(void);
+    PerlIO *PerlIO_stderr(void);
+
+    PerlIO *PerlIO_open(const char *,const char *);
+    int     PerlIO_close(PerlIO *);
+
+    int     PerlIO_stdoutf(const char *,...)
+    int     PerlIO_puts(PerlIO *,const char *);
+    int     PerlIO_putc(PerlIO *,int);
+    int     PerlIO_write(PerlIO *,const void *,size_t);
+    int     PerlIO_printf(PerlIO *, const char *,...);
+    int     PerlIO_vprintf(PerlIO *, const char *, va_list);
+    int     PerlIO_flush(PerlIO *);
+
+    int     PerlIO_eof(PerlIO *);
+    int     PerlIO_error(PerlIO *);
+    void    PerlIO_clearerr(PerlIO *);
+
+    int     PerlIO_getc(PerlIO *);
+    int     PerlIO_ungetc(PerlIO *,int);
+    int     PerlIO_read(PerlIO *,void *,size_t);
+
+    int     PerlIO_fileno(PerlIO *);
+    PerlIO *PerlIO_fdopen(int, const char *);
+    PerlIO *PerlIO_importFILE(FILE *, int flags);
+    FILE   *PerlIO_exportFILE(PerlIO *, int flags);
+    FILE   *PerlIO_findFILE(PerlIO *);
+    void    PerlIO_releaseFILE(PerlIO *,FILE *);
+
+    void    PerlIO_setlinebuf(PerlIO *);
+
+    long    PerlIO_tell(PerlIO *);
+    int     PerlIO_seek(PerlIO *,off_t,int);
+    int     PerlIO_getpos(PerlIO *,Fpos_t *)
+    int     PerlIO_setpos(PerlIO *,Fpos_t *)
+    void    PerlIO_rewind(PerlIO *);
+
+    int     PerlIO_has_base(PerlIO *);
+    int     PerlIO_has_cntptr(PerlIO *);
+    int     PerlIO_fast_gets(PerlIO *);
+    int     PerlIO_canset_cnt(PerlIO *);
+
+    char   *PerlIO_get_ptr(PerlIO *);
+    int     PerlIO_get_cnt(PerlIO *);
+    void    PerlIO_set_cnt(PerlIO *,int);
+    void    PerlIO_set_ptrcnt(PerlIO *,char *,int);
+    char   *PerlIO_get_base(PerlIO *);
+    int     PerlIO_get_bufsiz(PerlIO *);
+
+=head1 DESCRIPTION
+
+Les sources de Perl doivent utiliser les fonctions listées ci-dessus à la
+place de celles définies dans l'en-tête I<stdio.h> de l'ANSI C.  Les en-têtes
+de perl les remplacent par le mécanisme d'entrée-sortie selectionné lors de
+l'exécution de Configure en utilisant des C<#define>.
+
+Ces fonctions sont calquées sur celles de I<sdio.h>, mais pour certaines,
+l'ordre des paramètres a été réorganisé.
+
+=over 4
+
+=item B<PerlIO *>
+
+Remplace FILE *. Comme FILE * , il doit être traité comme un type opaque
+(c'est probablement prudent de le considérer comme un pointeur sur quelque
+chose).
+
+=item B<PerlIO_stdin()>, B<PerlIO_stdout()>, B<PerlIO_stderr()>
+
+À utiliser à la place de C<stdin>, C<stdout>, C<stderr>. Elles ressemblent à
+des «E<nbsp>appels de fonctionsE<nbsp>» plutôt qu'à des variables pour que ce
+soit plus facile d'en faire des appels de fonctions si la plate-forme ne peut
+exporter des données vers des modules chargés, ou si (par exemple) des
+«E<nbsp>threadsE<nbsp>» différents peuvent avoir des valeurs différentes.
+
+=item B<PerlIO_open(path, mode)>, B<PerlIO_fdopen(fd,mode)>
+
+Correspondent à fopen()/fdopen() et utilise les mêmes arguments.
+
+=item B<PerlIO_printf(f,fmt,...)>, B<PerlIO_vprintf(f,fmt,a)>
+
+Équivalent à fprintf()/vfprintf() .
+
+=item B<PerlIO_stdoutf(fmt,...)>
+
+Équivalent à printf(). printf est #defined à cette fonction, donc il est (pour
+le moment) légal d'utiliser C<printf(fmt,...)> dans les sources perl.
+
+=item B<PerlIO_read(f,buf,compteur)>, B<PerlIO_write(f,buf,compteur)>
+
+Correspondent à fread () et fwrite (). Attention, les arguments sont
+différents, Il y a seulement un «E<nbsp>compteurE<nbsp>» et le fichier f est
+en premier.
+
+=item B<PerlIO_close(f)>
+
+=item B<PerlIO_puts(f,s)>, B<PerlIO_putc(f,c)>
+
+Correspondent à fputs() et fputc().  Attention, les arguments ont été
+réorganisés pour que le fichier soit en premier.
+
+=item B<PerlIO_ungetc(f,c)>
+
+Correspond à ungetc().  Attention, les arguments ont été réorganisé pour que
+le fichier soit en premier.
+
+=item B<PerlIO_getc(f)>
+
+Correspond à getc().
+
+=item B<PerlIO_eof(f)>
+
+Correspond à feof().
+
+=item B<PerlIO_error(f)>
+
+Correspond à ferror().
+
+=item B<PerlIO_fileno(f)>
+
+Correspond à fileno(). Attention, sur certaines plates-formes, la définition
+de «E<nbsp>filenoE<nbsp>» peut ne pas correspondre à celle d'Unix.
+
+=item B<PerlIO_clearerr(f)>
+
+Correspond à clearerr(), c.-à-d., retire les drapeaux «E<nbsp>eofE<nbsp>» et
+«E<nbsp>errorE<nbsp>» pour le «E<nbsp>fluxE<nbsp>».
+
+=item B<PerlIO_flush(f)>
+
+Correspond à fflush().
+
+=item B<PerlIO_tell(f)>
+
+Correspond à ftell().
+
+=item B<PerlIO_seek(f,o,w)>
+
+Correspond à fseek().
+
+=item B<PerlIO_getpos(f,p)>, B<PerlIO_setpos(f,p)>
+
+Correspondent à fgetpos() et fsetpos(). Si la plate-forme ne dispose pas de
+ces fonctions, elles sont implémentées à l'aide de PerlIO_tell() et
+PerlIO_seek().
+
+=item B<PerlIO_rewind(f)>
+
+Correspond à rewind(). NoteE<nbsp>: elle peut être définie à l'aide de
+PerlIO_seek().
+
+=item B<PerlIO_tmpfile()>
+
+Correspond à tmpfile(), c.-à-d., retourne un PerlIO anonyme qui sera
+automatiquement effacé lors de sa fermeture.
+
+=back
+
+=head2 Co-existence avec stdio
+
+Il existe un support de la coexistence de PerlIO avec stdio.  Évidemment, si
+PerlIO est implémenté à l'aide de stdio, il n'y aucun problème. Mais si perlio
+est implémenté au-dessus de sfio (par exemple) il doit exister des mécanismes
+permettant de créer un FILE * qui peut être passé aux fonctions de
+bibliothèques qui utilisent stdio.
+
+=over 4
+
+=item B<PerlIO_importFILE(f,flags)>
+
+Permet d'obtenir un PerlIO * à partir d'un FILE *.  Peut nécessiter plus
+d'arguments, interface en cours de réécriture.
+
+=item B<PerlIO_exportFILE(f,flags)>
+
+À partir d'un PerlIO * renvoie un FILE * pouvant être donné à du code devant
+être compilé et linké avec I<stdio.h> de l'ANSI C.
+
+Le fait qu'un FILE * a été «E<nbsp>exportéE<nbsp>» est enregistré, et peut
+affecter de futures opérations sur le PerlIO * original.  PerlIO *.
+
+=item B<PerlIO_findFILE(f)>
+
+Retourne un FILE * prédément «E<nbsp>exportéE<nbsp>» (s'il existe).  Ceci est
+un bouche-trou jusqu'à ce que l'interface soit complètement définie.
+
+=item B<PerlIO_releaseFILE(p,f)>
+
+L'appel à PerlIO_releaseFILE informe PerlIO que le FILE * ne sera plus
+utilisé. Il est alors retiré de la liste des FILE * «E<nbsp>exportéE<nbsp>»,
+et le PerlIO * associé retrouve son comportement normal.
+
+=item B<PerlIO_setlinebuf(f)>
+
+Correspond à setlinebuf(). Son utilisation est dépréciée en attendant une
+décision sur son sort. (Le noyau de Perl l'utilise I<uniquement> lors du
+dumpE<nbsp>; cela n'a rien à voir avec le vidage automatique $|.)
+
+=back
+
+En plus de l'API utilisateur décrite précédement, il existe une interface
+d'«E<nbsp>implémentationE<nbsp>» qui permet à Perl d'accèder aux structures
+internes de PerlIO.  Les appels suivants correspondent aux diverses macros
+FILE_xxx déterminées par Configure. Cette section n'a d'intérêt que pour ceux
+qui sont concerné par un descriptif détaillé de comportement du noyau perl ou
+qui implémentent un MAPPING PerlIO.
+
+=over 4
+
+=item B<PerlIO_has_cntptr(f)>
+
+L'implémentation peut retourner un pointeur vers la position courante dans le
+«E<nbsp>bufferE<nbsp>» et le nombre d'octets disponibles dans le buffer.
+
+=item B<PerlIO_get_ptr(f)>
+
+Retourne un pointeur vers le prochain octet du buffer à lire.
+
+=item B<PerlIO_get_cnt(f)>
+
+Retourne le nombre d'octets du buffer restant à lire.
+
+=item B<PerlIO_canset_cnt(f)>
+
+L'implémentation peut ajuster son idée sur le nombre d'octets dans le buffer.
+
+=item B<PerlIO_fast_gets(f)>
+
+L'implémentation a toutes les interfaces nécessaire pour permetre au code
+rapide de perl d'utiliser le mécanisme <FILE> .
+
+  PerlIO_fast_gets(f) = PerlIO_has_cntptr(f) && \
+                        PerlIO_canset_cnt(f) && \
+                        `Can set pointer into buffer'
+
+=item B<PerlIO_set_ptrcnt(f,p,c)>
+
+Place le pointeur dans le buffer et remplace le nombre d'octets encore dans le
+buffer. Doit être utilisé seulement pour positionner le pointeur à l'intérieur
+de la plage impliquée par un appel précédent à C<PerlIO_get_ptr> et
+C<PerlIO_get_cnt>.
+
+=item B<PerlIO_set_cnt(f,c)>
+
+Obscure - force le nombre d'octets dans le buffer. Déprécié.  Utilisé
+uniquement dans doio.c pour forcer un compteur <-1 à -1.  Deviendra peut-être
+PerlIO_set_empty ou similaire.  Cet appel peut éventuellement ne rien faire si
+«E<nbsp>compteurE<nbsp>» est déduit d'un pointeur et d'une
+«E<nbsp>limiteE<nbsp>».
+
+=item B<PerlIO_has_base(f)>
+
+L'implémentation a un buffer, et peut retourner un pointeur vers celui-ci
+ainsi que sa taille. Utilisé par perl pour les tests B<-T> / B<-B>.  Les
+autres usages seraient très obscurs...
+
+=item B<PerlIO_get_base(f)>
+
+Retourne le I<début> du buffer.
+
+=item B<PerlIO_get_bufsiz(f)>
+
+Retourne la I<taille totale> du buffer.
+
+=back
+
+=head1 TRADUCTION
+
+=head2 Version
+
+Cette traduction française correspond à la version anglaise distribuée avec
+perl 5.005_02.  Pour en savoir plus concernant ces traductions, consultez
+L<http://perl.enstimac.fr/>.
+
+=head2 Traducteurs
+
+Marc Carmier <carmier@immortels.frmug.org>
+
+=head2 Relecture
+
+Gérard Delafond.
+

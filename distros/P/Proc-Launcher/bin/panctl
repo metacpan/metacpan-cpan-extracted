@@ -1,0 +1,374 @@
+#!/usr/local/bin/perl -w
+use strict;
+use warnings;
+
+our $VERSION;
+
+use File::Path;
+use FindBin;
+use Getopt::Long;
+use Pod::Usage;
+use YAML;
+
+use lib "$FindBin::Bin/../lib";
+use Proc::Launcher::Manager;
+
+#
+#_* Command-line options processing
+#
+
+my %options;
+
+unless ( GetOptions ( '-start'       => \$options{start},
+                      '-stop'        => \$options{stop},
+                      '-restart'     => \$options{restart},
+                      '-force'       => \$options{force},
+                      '-supervisor'  => \$options{supervisor},
+                      '-tail:i'      => \$options{tail},
+                      '-config'      => \$options{configfile},
+                      '-d|daemon=s'  => \$options{daemon},
+                      '-a|all'       => \$options{all},
+                      '-e|enable'    => \$options{enable},
+                      '-dis|disable' => \$options{disable},
+                      '-v|verbose!'  => \$options{verbose},
+                      '-help|?'      => \$options{help},
+    )
+) { pod2usage( -exitval => 1, -verbose => 1 ) }
+
+if ( $options{help} ) {
+    pod2usage( -exitval => 0, -verbose => 2 );
+}
+
+#
+#_* Config
+#
+
+my $directory = join( "/", $ENV{HOME}, ".panctl" );
+print "DIRECTORY: $directory\n";
+
+# Make sure it worked:
+unless ( -d $directory ) {
+    mkpath( $directory );
+}
+
+# Config
+my $configfile = $options{configfile} || join( '/', $directory, 'panctl.conf' );
+unless ( -r $configfile ) {
+    die "ERROR: config file not found: $configfile\n";
+}
+
+# Load
+my $config = YAML::LoadFile( $configfile );
+
+#
+#_* Main
+#
+my $monitor = Proc::Launcher::Manager->new( app_name  => 'panctl',
+                                            pid_dir   => $directory,
+                                        );
+
+print "\n";
+for my $name ( keys %{ $config } ) {
+
+    if ( $options{daemon} ) {
+        next unless $options{all} || $options{daemon} eq "all" || $name =~ m/$options{daemon}/ || $options{supervisor};
+    }
+
+    print "Loaded: $name: $config->{$name}->{description}\n";
+
+    my $cmd = $config->{$name}->{command};
+
+    #print "COMMAND $name: $cmd\n";
+
+    $monitor->register( daemon_name  => $name,
+                        start_method => sub { exec( $cmd ) },
+                        debug        => $options{verbose},
+                    );
+
+}
+print "\n";
+
+### supervisor
+if ( $options{supervisor} ) {
+
+    # if stop was specified, shut it down
+    if ( $options{stop} ) {
+        if ( $options{force} ) {
+            print "Force stopping the supervisor process...\n";
+            $monitor->supervisor->force_stop();
+        }
+        else {
+            print "Stopping the supervisor process...\n";
+            $monitor->supervisor->stop();
+        }
+    }
+    else {
+        # if stop wasn't specified, start it up
+        print "Starting the supervisor process...\n";
+        $monitor->supervisor->restart();
+    }
+    exit;
+}
+
+# enable/disable daemons
+if ( $options{disable} ) {
+    print "Disabling daemon(s)...\n";
+    $monitor->disable();
+}
+elsif ( $options{enable} ) {
+    print "Enabling daemon(s)...\n";
+    $monitor->enable();
+}
+
+### daemons
+if ( $options{start} ) {
+    $monitor->start();
+}
+elsif ( $options{restart} && $options{force} ) {
+    $monitor->stop();
+    sleep 3;
+    $monitor->force_stop();
+    sleep 1;
+    $monitor->start();
+}
+elsif ( $options{restart} ) {
+    $monitor->stop();
+    sleep 1;
+    $monitor->start();
+}
+elsif ( $options{stop} && $options{force} ) {
+    $monitor->force_stop();
+}
+elsif ( $options{stop} ) {
+    $monitor->stop();
+}
+
+# following log files
+if ( defined $options{tail} ) {
+
+    $monitor->tail( sub { print @_ },
+                    $options{tail},
+                );
+}
+
+
+__END__
+
+=head1 NAME
+
+ panctl - start, stop, and manage daemons, programs, and scripts
+
+=head1 SYNOPSIS
+
+The config file should live in ~/.panctl/panctl.conf.
+
+    ssh-foo:
+      command: ssh -L 2222:foohost:22 somehost -N
+      description: ssh tunnel for otherhost
+    ssh-bar:
+      command: ssh -L 2223:barhost:22 somehost -N
+      description: ssh tunnel for someotherhost
+    synergy:
+      command: /Applications/synergy-1.3.1/synergys -c /my/synergy.conf -d INFO -f
+      description: synergy keyboard/mouse sharing
+
+Command line options:
+
+    # control a specific named daemon
+    panctl -daemon ssh-foo -start
+    panctl -daemon ssh-foo -stop
+    panctl -daemon ssh-foo -stop -force
+    panctl -daemon ssh-foo -restart
+
+    # control all daemons with 'ssh' in the name
+    panctl -daemon ssh -start
+
+    # control all configured daemons
+    panctl -all -start
+    panctl -all -stop
+    panctl -all -stop -force
+    panctl -all -restart
+
+    # monitor the log files (tail -f) of daemons
+    panctl -all -tail
+    panctl -daemon ssh-foo -tail
+    panctl -daemon ssh -tail
+    panctl -daemon ssh -tail -start
+
+    # start the supervisor process, restarts any enabled daemons that fail
+    panctl -all -supervisor
+    # start the supervisor, only watching the monitoring and rules daemons
+    panctl -mon -rules -supervisor
+
+    # disable/enable a daemon.  when disabled, the daemon will not
+    # start and will not be restarted by the supervisor.
+    panctl -d ssh-foo -disable
+    panctl -d ssh-foo -disable -stop
+    panctl -d ssh-foo -enable
+    panctl -d ssh-foo -enable -start
+
+
+
+=head1 DESCRIPTION
+
+This script will allow you to configure a list of services (e.g. ssh
+tunnels, daemons, scripts, etc.) that can be started and stopped
+apachectl-style.  In addition, a supervisor process can be spawned to
+monitor selected enabled daemons and automatically restart them in the event
+that they die.
+
+All daemon stdout/stderr is written to ~/.panctl/daemon_name.log, and
+the pid will be written to ~/.panctl/daemon_name.pid.
+
+This works great for keeping a bunch of ssh tunnels and other scripts
+and daemons running.
+
+=head2 OPTIONS
+
+The following options are supported by this command
+
+=over 8
+
+=item -daemon [regexp]
+
+Selects all daemons whose names match the specified regexp.
+
+=item -all
+
+Selects all configured daemons.
+
+=item -supervisor
+
+Combine with -start or -stop to start and stop the supervisor process.
+
+When daemons are selected (with the -daemon flag), the supervisor will
+only monitor the specified daemons.
+
+Note that only one supervisor can be running at a time!  If you start
+a supervisor for a selected daemon, and then start it again for a
+different selected daemon, only the latter will be supervised.
+
+=item -tail [timeout]
+
+Create a File::Tail to display all selected daemons' stdout/stderr log
+files.  The effect is similar to running 'tail -f' on all the log
+files.
+
+If a timeout is specified (optional), the log files will only be
+monitored for the specified number of seconds.
+
+When combined with other options, e.g. -start, the log file will be
+opened before performing any operations, so the output you see will
+reflect the output of any operations you performed.
+
+=item -start
+
+Start all selected daemons
+
+=item -stop
+
+Stop all selected daemons by sending them a 'kill -HUP'.
+
+When combined with -force, will send a 'kill -9'
+
+=item -restart
+
+Calls stop() on the selected daemons, followed by start().
+
+=item -disable
+
+Calls disable() on selected daemons.  Disabled daemons will no longer
+respond to start() until enable() is called.  If a supervisor is
+monitoring the daemon, it will no longer be restarted.
+
+Disabling a daemon does not stop any currently running processes.  Can
+be combined with the -stop option to immediately shut down the daemon
+if it's currently running.
+
+=item -enable
+
+Calls enable() on selected daemons.  If the daemon is disabled, it
+will be enabled.
+
+Enabling a daemon does not start it.  Can be combined with the -start
+option to immediately start the daemon if it's not already running.
+
+=back
+
+=head1 DEPENDENCIES
+
+This script relies heavily on L<Proc::Launcher>.  See the docs for
+L<Proc::Launcher> for more information.
+
+=head1 BUGS AND LIMITATIONS
+
+Only immediate child processes are tracked.  Any processes spawned by
+launched processes will not be tracked.
+
+The most obvious limitation is probably that backgrounding or doing a
+fork()/exec() (daemonizing) in executed scripts is not allowed.  The
+pid of any script that fully daemonizes will be lost by
+L<Proc::Launcher>, and will be considered failed which may lead to the
+process being restarted.
+
+Please see the L<Proc::Launcher> and L<Proc::Launcher::Manager> docs for
+limitations.
+
+Don't even try using this with apache.  While it is possible to make
+apache run in a non-daemonized mode, you probably don't want to do it
+that way.
+
+There is no log file maintenance.  If your daemons produce a lot of
+output, you will probably want to truncate the logs occasionally, e.g.:
+
+    echo >> ~/.panctl/daemon_name.log
+
+Alternately you could shut down the daemon, remove or gzip the log
+file, and then start the daemon back up.
+
+Patches are welcome.
+
+=head1 SEE ALSO
+
+  L<Proc::Launcher>
+  L<Proc::Launcher::Manager>
+  L<Proc::Launcher::Supervisor>
+
+
+=head1 AUTHOR
+
+VVu@geekfarm.org
+
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2008, VVu@geekfarm.org
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are
+met:
+
+- Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+
+- Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+
+
+

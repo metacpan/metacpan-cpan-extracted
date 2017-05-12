@@ -1,0 +1,13 @@
+=begin table
+
+Sample Table
+left,center,right
+Powers of Ten,Planets,Dollars
+10,Earth,$1
+100,Mercury,$5
+1000,Mars,$10
+10000,Venus,$20
+100000,"Jupiter, Saturn",$50
+
+=end table
+

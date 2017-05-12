@@ -1,0 +1,73 @@
+##################################
+# Perl Critic Configuration File #
+##################################
+
+#################################
+# Permanent Configuration Items #
+#################################
+
+##Level 5 warning changed
+##Allow two argument opens
+[Perl::Critic::Policy::InputOutput::ProhibitTwoArgOpen]
+severity = 3
+##Allow bare words as file handles
+[Perl::Critic::Policy::InputOutput::ProhibitBarewordFileHandles]
+severity = 3
+##Allow string evaluations
+[Perl::Critic::Policy::BuiltinFunctions::ProhibitStringyEval]
+severity = 3
+
+##Level 4 warnings changed
+[Perl::Critic::Policy::Modules::ProhibitAutomaticExportation]
+severity = 3
+
+##Level 3 warnings changed
+##Change cyclomatic complexity warnings from 3 to 4
+[Perl::Critic::Policy::Subroutines::ProhibitExcessComplexity]
+severity = 5
+max_mccabe = 20
+
+#Level 1 and 2 Warnings turned off 
+[-Perl::Critic::Policy::Miscellanea::RequireRcsKeywords]
+
+#################################
+# Temporary Configuration Items #
+#################################
+
+#To filter these warnings, uncomment them as needed.
+
+##The following items need new modules for batperl
+
+##Level 5 Warnings needing new modules
+##Requires Time::HiRes.pm
+#[Perl::Critic::Policy::BuiltinFunctions::ProhibitSleepViaSelect]
+#severity = 3
+#
+##Requires IO::Interactive.pm
+#[Perl::Critic::Policy::InputOutput::ProhibitInteractiveTest]
+#severity = 3
+
+##Level 4 Warnings needing new modules
+##Requires IO::Handle.pm
+#[Perl::Critic::Policy::InputOutput::ProhibitOneArgSelect]
+#severity = 3
+#
+##Requires Readonly.pm
+#[Perl::Critic::Policy::ValuesAndExpressions::ProhibitConstantPragma]
+#severity = 3
+
+##The following items are under investigation
+
+##Level 5 Warnings Under Investigation
+##Prohibit Leading Zeros
+#[Perl::Critic::Policy::ValuesAndExpressions::ProhibitLeadingZeros]
+#severity = 3
+
+##Level 4 Warnings Under Investigation
+##All modules should end with 1
+#[Perl::Critic::Policy::Modules::RequireEndWithOne]
+#severity = 3
+#
+#Only one package should be declared per module
+#[Perl::Critic::Policy::Modules::ProhibitMultiplePackages]
+#severity = 3

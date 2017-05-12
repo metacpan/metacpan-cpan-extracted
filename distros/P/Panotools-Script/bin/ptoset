@@ -1,0 +1,77 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Panotools::Script;
+use Getopt::Long;
+use Pod::Usage;
+
+my $help = 0;
+my %p;
+my %m;
+my %o;
+
+GetOptions ('p|panorama=s' => \%p,
+            'm|mode=s' => \%m,
+            'o|option=s' => \%o,
+            'h|help' => \$help);
+
+pod2usage (-verbose => 2) if $help;
+
+my $path_pto = shift || pod2usage;
+die "Can't find $path_pto" unless -e $path_pto;
+
+my $pto = new Panotools::Script;
+$pto->Read ($path_pto);
+
+for my $key (keys %p)
+{
+    $pto->Panorama->Set ($key => $p{$key});
+}
+for my $key (keys %m)
+{
+    $pto->Mode->Set ($key => $m{$key});
+}
+for my $key (keys %o)
+{
+    $pto->Option->{$key} = $o{$key};
+}
+
+$pto->Write ($path_pto);
+
+__END__
+
+=head1 NAME
+
+ptoset - change settings in a pto project
+
+=head1 SYNOPSIS
+
+ptoset [options] project.pto
+
+ Options:
+  -p | --panorama key=value  set 'p' panorama lines
+  -m | --mode key=value      set 'm' mode lines
+  -o | --option key=value    set '#hugin_' option lines
+  -h | --help                Outputs help documentation
+
+=head1 DESCRIPTION
+
+B<ptoset> sets global parameters for a hugin .pto project.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+L<ptoget>
+
+=head1 AUTHOR
+
+Bruno Postle - November 2008.
+
+=cut

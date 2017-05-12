@@ -1,0 +1,617 @@
+#!/usr/bin/perl -w
+
+my $RCS_Id  = '$Id: ppxml.pl,v 1.5 2000-03-07 16:25:24+01 johanv Exp johanv $ ';
+
+# Author          : Johan Vromans
+# Created On      : Mon Feb 28 12:59:04 2000
+# Last Modified By: Mark Overmeer
+# Last Modified On: Tue Jul  4 14:58:54 2000
+
+################ Common stuff ################
+
+use strict;
+
+my $my_package = 'PPresenter';
+my ($my_name, $my_version) = $RCS_Id =~ /: (.+).pl,v ([\d.]+)/;
+
+################ Command line parameters ################
+
+use FindBin qw/$RealBin/;
+use lib "$RealBin/../lib";
+
+use Getopt::Long 2.13;
+
+my $opt_geometry;
+my $opt_device;
+my $opt_exporter;
+my $opt_perl = 0;
+my $parse_esis = 0;
+my $verbose = 0;		# verbose processing
+
+# Development options (not shown with -help).
+my $debug = 0;			# debugging
+my $trace = 0;			# trace (show process)
+my $test = 0;			# test (no actual processing)
+
+app_options();
+
+# Options post-processing.
+$trace |= ($debug || $test);
+
+################ Presets ################
+
+# Default attributes for the Presentation.
+my $PPresenterData = {
+    -name		=> "Presentation",
+};
+
+# Default attributes for the viewport.
+my $viewportData = {
+    -device		=> 'lcd',
+    -geometry		=> '800x600',
+    -resizable		=> 1,
+    -hasControl		=> 1,
+    -includeControls	=> 0,
+    -showProgressBar	=> 0,
+    -showSlideButtons	=> 0,
+    -showNeighbours	=> 0,
+    -showPhases		=> 1,
+    -phaseLocation	=> 'se',
+    -phaseDirection	=> 'horizontal',
+    -phaseSymbol	=> 'square',
+};
+
+# Default for fontsets and such.
+my $fontsetData = {
+    fontset		=> 'scaling',
+};
+
+my $TMPDIR = $ENV{TMPDIR} || $ENV{TEMP}
+          || ($^O =~ /^Win/ ? 'C:/temp' : '/var/tmp');
+
+################ The Process ################
+
+parse_xml_Grove();
+
+# Command line args override...
+$viewportData->{-device}   = $opt_device   if defined $opt_device;
+$viewportData->{-geometry} = $opt_geometry if defined $opt_geometry;
+
+$opt_perl ? gen_perl() : run_show();
+
+exit 0;
+
+################ XML parser ################
+
+sub parse_xml_Grove {
+
+    require XML::Grove::Builder;
+    XML::Grove::Builder->import();
+    my $grove_builder = new XML::Grove::Builder::;
+
+    my $document;
+    my $parser;
+    my %parser_opts;
+
+    if ( $parse_esis ) {
+	# ESISParser is a validating parser using nsgmls underneat.
+	require XML::ESISParser;
+	XML::ESISParser->import();
+	foreach ( qw(/usr/share/sp/pubtext/xml.soc
+                     /usr/share/nsgmls/pubtext/xml.soc) ) {
+	    if ( -s ) {
+		$XML::ESISParser::NSGMLS_ENV_xml .=
+		  " SGML_CATALOG_FILES=$_";
+		last;
+	    }
+	}
+	warn ("Warning: ESIS parser could not find SGML_CATALOG_FILES\n")
+	  unless $XML::ESISParser::NSGMLS_ENV_xml =~ /SGML_CATALOG_FILES/;
+
+	$parser = new XML::ESISParser:: (Handler => $grove_builder);
+	%parser_opts = (Declaration => "");
+    }
+    else {
+	# PerlSAX is a SAX based, non-validating parser.
+	require XML::Parser::PerlSAX;
+	XML::Parser::PerlSAX->import();
+	$parser = new XML::Parser::PerlSAX:: (Handler => $grove_builder);
+    }
+
+    $document = $parser->parse ( Source => { SystemId => shift(@ARGV) },
+				 %parser_opts);
+
+    # Handle errors.
+    my $err = pop @{$document->{Errors}};
+    foreach ( @{$document->{Errors}}) {
+	warn $_->{Message}."\n";
+    }
+    die $err->{Message}."\n" if $err;
+
+    $document = $document->{Contents};
+
+    # Top level contains only one element. Locate the presentation
+    # element.
+    my $pres;
+    foreach my $e ( @$document ) {
+	next unless ref($e) eq 'XML::Grove::Element';
+	if ( $e->{Name} eq 'presentation' ) {
+	    $pres = $e;
+	    last;
+	}
+    }
+
+    die ("This document does not seem to contain a presentation\n")
+      unless defined ($pres);
+
+    # Process its contents, ignoring whitespace and comments and such.
+    my @sh;
+    foreach my $e ( @{$pres->{Contents}} ) {
+	next unless ref($e) eq 'XML::Grove::Element';
+	if ( $e->{Name} eq 'slide' ) {
+	    push (@sh, bless ({%$e}, ref($e)));
+	}
+    }
+
+    die ("This presentation does not seem to contain slides\n")
+      unless @sh;
+    print STDERR Dumper(\@sh) if $debug;
+
+    # Setup the presentation
+    presentation (undef, $pres->{Name}, %{$pres->{Attributes}});
+
+    # Setup the slides.
+    foreach my $s ( @sh ) {
+	grovepub ($s);
+    }
+
+    # Finish the presentation.
+    presentation_ (undef, $pres->{Name});
+}
+
+my $lvl;
+sub grovepub {
+    my ($s) = @_;
+    if ( ref($s) eq 'XML::Grove::Characters' ) {
+	add ($s->{Data});
+	return;
+    }
+
+    if ( ref($s) eq 'XML::Grove::Element' ) {
+	my $tag = $s->{Name};
+	my $contents = $s->{Contents};
+	$lvl = '' unless defined $lvl;
+	print STDERR "${lvl}grovepub:$tag ", Dumper($contents) if $debug;
+
+	&{$::{$tag} ||= \&start_tag}(undef, $tag,
+				     defined $s->{Attributes} ?
+				     %{$s->{Attributes}} : ());
+	$lvl .= ' ';
+	foreach my $e ( @$contents ) {
+	    grovepub ($e);
+	}
+	chop ($lvl);
+	&{$::{$tag.'_'} ||= \&end_tag}(undef, $tag);
+    }
+}
+
+################ Show handling routines ################
+
+my @show;			# show in progress
+
+sub run_show {
+
+    # Require instead of use -- don't need it unless we run the show.
+    require PPresenter;
+    PPresenter->import();
+
+    my $show = new PPresenter:: (%$PPresenterData);
+    $show->addViewport(%$viewportData);
+    $show->select(%$fontsetData);
+
+    if ( defined $opt_exporter && $opt_exporter ne '' ) {
+	$show->addExporter($opt_exporter);
+    }
+
+    foreach my $a ( @show ) {
+	foreach ( keys %$a ) {
+	    delete $a->{$_} unless defined $a->{$_};
+	}
+	$show->addSlide (%$a);
+    }
+
+    $show->run;
+}
+
+# Format a Perl string. Always produces a '' string.
+sub pstr {
+    my $val = shift;
+    return "<undef>" unless defined $val;
+
+    if ( ref $val eq 'ARRAY' ) {
+	my $ret = '[ ';
+	foreach ( @$val ) {
+	    $ret .= pstr ($_) . ', ';
+	}
+	substr ($ret, -2) = ' ]';
+	$ret;
+    }
+    else {
+	$val =~ s/([\\'])/\\$1/g;
+	"'".$val."'";
+    }
+}
+
+# Print the keys/values of a hash. Suitable for multiline strings.
+sub phash {
+    my $h = shift;
+    foreach ( sort keys %$h ) {
+	my $str;
+	next unless defined ($str = $h->{$_}) && $str ne "";
+	my $eod = 'End_of_Data';
+	if ( $str =~ /\n/ ) {
+	    print STDOUT ("  $_ => <<'$eod',\n", $str, "\n",
+			  $eod, "\n");
+	}
+	else {
+	    print STDOUT ("  $_ => ", pstr ($str), ",\n");
+	}
+    }
+}
+
+sub gen_perl {
+    print STDOUT <<EOD;
+#!/usr/bin/perl -w
+
+# Generated by $my_name $my_version, @{[scalar(localtime(time))]}, with Perl version $].
+# $my_name is part of PPresenter version v1.17.
+
+use strict;
+use PPresenter;
+
+EOD
+
+    print STDOUT ("my \$show = new PPresenter:: (\n");
+    phash ($PPresenterData);
+    print STDOUT (");\n\n");
+
+    if ( defined $opt_exporter && $opt_exporter ne '' ) {
+	print STDOUT ("\$show->addExporter(", pstr($opt_exporter), ");\n\n");
+    }
+
+    print STDOUT ("\$show->addViewport(\n");
+    phash ($viewportData);
+    print STDOUT (");\n\n");
+    print STDOUT ("\$show->select(\n");
+    phash ($fontsetData);
+    print STDOUT (");\n\n");
+
+    foreach my $a ( @show ) {
+	print STDOUT ("\$show->addSlide(\n");
+	phash ($a);
+	print STDOUT (");\n\n");
+    }
+
+    print STDOUT ("\$show->run;\n");
+}
+
+################ XML handling routines ################
+
+my $currenttext;
+
+sub add {
+    $$currenttext .= join('',@_);
+}
+
+#### Text
+sub handle_char {
+    my ($self, $str) = @_;
+    add($str) if defined $currenttext;
+}
+
+#### <presentation>
+sub presentation {
+    my ($self, $tag, %atts) = @_;
+
+    my $str;
+    if ( defined ($str = delete $atts{title}) ) {
+	$PPresenterData->{-name} = $str;
+    }
+    if ( defined ($str = delete $atts{imagesizebase}) ) {
+	$PPresenterData->{-imageSizeBase} = $str;
+    }
+    if ( defined ($str = delete $atts{exporter}) ) {
+	$opt_exporter = $str unless defined $opt_exporter;
+    }
+    if ( defined ($str = delete $atts{geometry}) ) {
+	# Really a viewport attribute.
+	$viewportData->{-geometry} = $str;
+    }
+
+    # Copy the rest into the default data.
+    foreach ( keys %atts ) {
+	$PPresenterData->{$_} = $atts{$_};
+    }
+}
+
+sub presentation_ {
+}
+
+#### <slide>
+my $slide_number;
+BEGIN { $slide_number = 1; }
+my $currentslide;
+my $slide_phase;
+
+sub slide {
+    my ($self, $tag, %atts) = @_;
+    $currentslide = { -title   => (delete $atts{title} || "Slide ".$slide_number)
+		    , -aliases => ["Slide ".$slide_number]
+		    };
+    $slide_number++;
+    $slide_phase = 1;
+    foreach ( keys %atts ) {
+	my $str;
+	if ( defined ($str = delete $atts{$_}) ) {
+	    $currentslide->{"-$_"} = $str;
+	}
+    }
+}
+
+sub slide_ {
+
+    unless ( defined $currentslide->{-template} ) {
+        $currentslide->{-template} = defined $currentslide->{-left}  ? 'tlr'
+                                   : defined $currentslide->{-right} ? 'tlr'
+	                           :                                   'tm';
+    }
+
+    print STDERR ("Slide:\n") if $debug;
+    foreach ( keys %$currentslide ) {
+	unless ( defined $currentslide->{$_} ) {
+	    delete $currentslide->{$_};
+	    next;
+	}
+	$currentslide->{$_} =~ s/^[\s\n]+//;
+	$currentslide->{$_} =~ s/[\n\s]+$//;
+	print STDERR ("  $_ => ", pstr($currentslide->{$_}), "\n") if $debug;
+    }
+
+    push (@show, $currentslide);
+    undef $currenttext;
+}
+
+##### <body>
+sub body {
+    my ($self, $tag, %atts) = @_;
+
+    # Attribute 'main' is default, but only a validating parser will
+    # see that...
+    $atts{target} ||= 'main';
+
+    if ( $debug ) {
+	# print STDERR Dumper(\@_);
+	foreach ( sort keys %atts ) {
+	    print STDERR $tag."::atts[$_] = \"", $atts{$_}, "\"\n";
+	}
+    }
+
+    ${$currenttext = \$currentslide->{'-'.$atts{target}}} = "";
+}
+
+sub body_ {}
+
+##### <notes>
+sub notes {
+    my ($self, $tag, %atts) = @_;
+    ${$currenttext = \$currentslide->{-notes}} = "";
+}
+
+sub notes_ {}
+
+##### <p>
+my @p;				# keep track of para attributes
+
+sub p {
+    my ($self, $tag, %atts) = @_;
+
+    add ("<$tag>");
+    push (@p, "<$tag>");
+    if ( ($atts{align}||'') eq 'center' ) {
+	add ("<center>");
+	push (@p, "center");
+    }
+}
+
+sub p_ {
+    my ($self, $tag) = @_;
+    my $p;
+    while ( ($p = pop (@p)) ne "<$tag>" ) {
+	add ("</$p>");
+    }
+    add ("</$tag>");
+}
+
+#### <img ...>
+sub img_ {}
+
+#### <mark ...>
+sub mark_ {}
+
+#### <a ...>
+sub a {
+    my ($self, $tag, %atts) = @_;
+    my $s = $atts{show} || '';
+
+    if ( $s ne '' ) {
+      if ( 0 && $s =~ /^(from|to|appear|disappear)/ ) {
+	  $s = "phase ".(++$slide_phase)." ".$1.$';
+      }
+      elsif ( $s =~ /^phase\s+-?(\d+)/ ) {
+	  $slide_phase = $1+1;
+      }
+      add ("<$tag show=", pstr($s), ">");
+    }
+    else {
+	add ("<$tag>");
+    }
+}
+
+#### <li ...>
+sub li { &a; }
+sub li_ {}
+
+#### <larger>/<smaller>
+
+sub larger   { $_[1] = 'large'; &start_tag; }
+sub larger_  { $_[1] = 'large'; &end_tag; }
+sub smaller  { $_[1] = 'small'; &start_tag; }
+sub smaller_ { $_[1] = 'small'; &end_tag; }
+
+#### All other tags are generic
+sub start_tag {
+    my ($self, $tag, %atts) = @_;
+    add("<$tag");
+    if ( %atts ) {
+	foreach my $k ( keys %atts ) {
+	    add(" $k=", pstr($atts{$k}));
+	}
+    }
+    add(">");
+}
+sub end_tag {
+    my ($self, $tag) = @_;
+    add ("</$tag>");
+}
+
+################ Command line parsing and help ################
+
+sub app_ident {
+    warn "This is $my_package [$my_name $my_version]\n";
+}
+
+sub app_usage {
+    my $exit = shift;
+    app_ident;
+
+    warn <<EndOfUsage;
+Usage: $0 [options] file
+    -device lcd|beamer|printer  device
+    -geometry wxh               geometry
+    -exporter package           specify exporter
+    -esis                       use nsgmls parser instead of SAX
+    -help                       this message
+    -ident                      show identification
+    -verbose                    verbose information
+EndOfUsage
+
+    exit $exit if defined $exit;
+}
+
+sub app_options {
+    my $help = 0;		# handled locally
+    my $ident = 0;		# handled locally
+
+    # Process options, if any.
+    # Make sure defaults are set before returning!
+    return unless @ARGV > 0;
+
+    app_usage 2 unless GetOptions(
+		     'geometry=s' => \$opt_geometry,
+		     'device=s'	=> \$opt_device,
+		     'exporter=s' => \$opt_exporter,
+		     'perl!'	=> \$opt_perl,
+		     'esis'	=> \$parse_esis,
+		     'ident'	=> \$ident,
+		     'verbose'	=> \$verbose,
+		     'trace'	=> \$trace,
+		     'help|h|?'	=> \$help,
+		     'debug'	=> \$debug,
+		    );
+    app_usage 0 if $help;
+    app_ident   if $ident;
+}
+
+#--------------------------------------- doc ---------------------
+
+=head1 NAME
+
+present-xml - run Portable Presenter via XML.
+
+=head1 SYNOPSIS
+
+B<present-xml> [options] file
+
+=head1 DESCRIPTION
+
+Portable Presenter (PPresenter) is a package designed to give presentations.
+It is written in Perl/Tk only, which is available for UNIX and for Windows.
+Usually, you will run C<present> which will call this program when the
+file supplied is contains xml.
+
+=over 4
+
+=item -debug
+
+Show debug information.  The XML-interpreter, PPresenter and Perl/Tk
+can all produce quite confusing messages, so running with debug on
+may clarify things sometimes.
+
+=item -device lcd|beamer|printer
+
+What kind of output device are you using (this time).  This will influence
+default color-settings and backdrop.
+
+=item -esis
+
+Use the validating ESIS XML interpreter in stead of the non-validating
+PerlSAX parser.  You may encounter some problems with the ESIS parser.
+
+=item -exporter module
+
+PPresenter can export a presentation into a website or handouts.  The
+html-based documentation describes how it works.  Specify the name
+of the exporter module which shall be loaded.
+
+=item -geometry geom
+
+Specifies the size of the window to be used.  Defaults to '800x600', but
+this might change.
+
+=item -help
+
+=item -h
+
+=item -?
+
+Brief help message.
+
+=item -ident
+
+Identify the version of the ppresenter-xml command.
+
+=item -noperl
+
+=item -perl
+
+Do (do not) create a runnable perl program from the XML file.  So, you
+may decide to run XML directly or create a perl program as intermediate.
+
+=item -verbose
+
+=item -trace
+
+More details about the normal flow of activities while interpreting the
+XML file.
+
+=back
+
+=head1 SEE ALSO
+
+A full documentation in html is included in the package, and available
+on the website: C<http://ppresenter.org>.
+
+C<present(1)>, C<present-xml(1)>.
+
+=cut
+

@@ -1,0 +1,131 @@
+SYNOPSIS
+
+    In list_countries.pl:
+
+     #!perl
+     use strict;
+     use warnings;
+     use Perinci::CmdLine;
+     use Perinci::Sub::Gen::AccessTable qw(gen_read_table_func);
+    
+     our %SPEC;
+    
+     my $countries = [
+         ['cn', 'China', 'Cina', [qw/panda/]],
+         ['id', 'Indonesia', 'Indonesia', [qw/bali tropical/]],
+         ['sg', 'Singapore', 'Singapura', [qw/tropical/]],
+         ['us', 'United States of America', 'Amerika Serikat', [qw//]],
+     ];
+    
+     my $res = gen_read_table_func(
+         name        => 'list_countries',
+         summary     => 'func summary',     # opt
+         description => 'func description', # opt
+         table_data  => $countries,
+         table_spec  => {
+             summary => 'List of countries',
+             fields => {
+                 id => {
+                     schema => 'str*',
+                     summary => 'ISO 2-letter code for the country',
+                     pos => 0,
+                     sortable => 1,
+                 },
+                 eng_name => {
+                     schema => 'str*',
+                     summary => 'English name',
+                     pos => 1,
+                     sortable => 1,
+                 },
+                 ind_name => {
+                     schema => 'str*',
+                     summary => 'Indonesian name',
+                     pos => 2,
+                     sortable => 1,
+                 },
+                 tags => {
+                     schema => 'array*',
+                     summary => 'Keywords/tags',
+                     pos => 3,
+                     sortable => 0,
+                 },
+             },
+             pk => 'id',
+         },
+     );
+     die "Can't generate function: $res->[0] - $res->[1]" unless $res->[0] == 200;
+    
+     Perinci::CmdLine->new(url=>'/main/list_countries')->run;
+
+    Now you can do:
+
+     # list all countries, by default only PK field is shown
+     $ list_countries.pl --format=text-simple
+     cn
+     id
+     sg
+     us
+    
+     # show as json, randomize order
+     $ list_countries.pl --format=json --random
+     ["id","us","sg","cn"]
+    
+     # only list countries which are tagged as 'tropical', sort by ind_name field in
+     # descending order, show all fields (--detail)
+     $ list_countries.pl --detail --sort -ind_name --tags-has '[tropical]'
+     .---------------------------------------------.
+     | eng_name  | id | ind_name  | tags           |
+     +-----------+----+-----------+----------------+
+     | Singapore | sg | Singapura | tropical       |
+     | Indonesia | id | Indonesia | bali, tropical |
+     '-----------+----+-----------+----------------'
+    
+     # show only certain fields, limit number of records, return in YAML format
+     $ list_countries.pl --fields '[id, eng_name]' --result-limit 2 --format=yaml
+     - 200
+     - OK
+     -
+       - id: cn
+         eng_name: China
+       - id: id
+         eng_name: Indonesia
+
+DESCRIPTION
+
+    This module is useful when you want to expose a table data (an array of
+    hashrefs, an array of arrays, or external data like a SQL table) as an
+    API function. This module will generate a function (along with its
+    Rinci metadata) that accepts arguments for specifying fields,
+    filtering, sorting, and paging. The resulting function can then be run
+    via command-line using Perinci::CmdLine (as demonstrated in Synopsis),
+    or served via HTTP using Perinci::Access::HTTP::Server, or consumed
+    normally by Perl programs.
+
+CAVEATS
+
+    It is often not a good idea to expose your database schema directly as
+    API.
+
+FAQ
+
+ I want my function to accept additional arguments.
+
+    You can use the extra_args argument:
+
+     gen_read_table_func(
+         name => 'myfunc',
+         extra_args => {
+             foo => {schema=>'int*'},
+             bar => {summary => 'Yet another arg for myfunc', schema=>'str*'},
+         },
+     );
+
+    As for the implementation, you can specify hooks to do things with the
+    extra arguments.
+
+SEE ALSO
+
+    Rinci
+
+    Perinci::CmdLine
+

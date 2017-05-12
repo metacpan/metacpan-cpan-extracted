@@ -1,0 +1,53 @@
+%{
+=head1 SYNOPSIS
+
+compile it with 
+
+  eyapp -b '/usr/bin/perl -I ../Calculator/lib' Precedencia.eyp
+
+execute the generated modulino with:
+
+      ./Precedencia.pm -nos -c '2@3@4' -info 
+
+Try also with inputs:
+   
+    4@3@5
+    4@3&5
+    4&3@5
+    4&3&5
+
+The result will be the term describing the generated
+Abstract Syntax Tree 
+
+=head1 See also
+
+    http://search.cpan.org/perldoc?Parse::Eyapp::debuggingtut
+
+=cut
+
+%}
+
+%token NUM=/(\d+)/
+%left '@'
+%right '&'  dummy
+
+%tree bypass
+%%
+list
+    : /* empty */
+    | list '\n' {}
+    | $list $e { print $e->str."\n"; 
+                 $e->png('tree'); 
+                 $e; 
+               }
+    ;
+
+e : %name NUM
+      NUM
+  | %name AMPERSAND
+      e '&' e
+  | %name AT
+      e '@' e %prec dummy
+  ;
+
+%%

@@ -1,0 +1,47 @@
+#!/usr/bin/env perl
+use strict;
+use v5.10;
+
+=head1 NAME
+
+multifilter - Pandoc filter to apply filters listed in field C<multifilter>
+
+=head1 DESCRIPTION
+
+This Pandoc filter applies other filters listed in document metadata field
+C<multifilter>. The filters can be specified like with pandoc option C<-F> or
+C<--filter>. For instance C<input.md>:
+
+  ---
+  filters:
+    - filter1        # in $PATH or ~/.pandoc/filters
+    - ./filter2.pl   # relative path
+    - /path/filter3  # absolute path
+  ...
+
+converted via
+
+  pandoc --filter multifilter input.md
+
+will be filtered like
+
+  pandoc -F filter1 -F ./filter2.pl -F /path/filter3 input.md
+
+In addition, filters are searched in C<~/.pandoc/filters>.
+
+=head1 OPTIONS
+
+=over
+
+=item --help|-h
+
+Print this help
+
+=back
+
+=cut
+
+use Pandoc::Filter;
+use Pandoc::Filter::Multifilter;
+
+pandoc_filter_document( Pandoc::Filter::Multifilter->new );

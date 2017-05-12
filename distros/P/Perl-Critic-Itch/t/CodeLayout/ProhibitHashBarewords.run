@@ -1,0 +1,47 @@
+## name Testing value values for hash keys
+## failures 0
+## cut
+
+$x->{'test1'};
+
+$x{'no_bareword'};
+
+my %hash =   ( 'testing' => 1 );
+
+my $hash_r = { 'testing' => 1 };
+
+
+## name Basic failure
+## failures 5
+## cut
+
+$x->{test1};
+$x{no_bareword};
+
+my %hash =   ( testing => '1' );
+my $hash_r = { testin => 1 };
+
+$x->{'gergerg'};
+
+$x->{hello};
+
+## name Some changes from version 0.04
+## failures 3
+## cut
+
+$x->{shift};
+
+#these should fail
+my %hash =   ( push => '1' );
+my $hash_r = { last => 1 };
+
+#these should run
+$x->{test()};
+$x->{$self->test};
+
+$x->{'shift'};
+
+
+
+
+

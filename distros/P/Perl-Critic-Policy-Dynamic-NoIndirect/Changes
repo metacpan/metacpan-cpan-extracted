@@ -1,0 +1,30 @@
+Revision history for Perl-Critic-Policy-Dynamic-NoIndirect
+
+0.06    2011-08-25 14:55 UTC
+        + Fix : Don't compile the audited code with strict and warnings
+                forcefully in use.
+        + Fix : Compilation failures are now safely reported.
+        + Upd : Bump indirect dependency to 0.25.
+
+0.05    2010-04-19 13:35 UTC
+        + Fix : Force the correct line number and file name before evaluating
+                the code.
+        + Fix : Work around Kwalitee test misfailures.
+
+0.04    2009-07-14 19:50 UTC
+        + Add : Report indirect method calls on blocks.
+        + Doc : Caveats.
+        + Upd : Bump indirect dependency to 0.16.
+
+0.03    2009-07-09 09:05 UTC
+        + Add : A sample script.
+        + Fix : Multiple violations with the same method on the same line were
+                not reported.
+        + Upd : Bump indirect dependency to 0.15.
+
+0.02    2009-07-07 16:25 UTC
+        + Fix : Incomplete MANIFEST.
+
+0.01    2009-07-07 16:20 UTC
+        First version.
+

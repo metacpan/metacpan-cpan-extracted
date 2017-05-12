@@ -1,0 +1,20 @@
+NAME
+    210-extended-sequences
+
+TESTCASES
+    This is *bold*.
+
+    This is _italic_.
+
+    This is code: '$obj->method < 42'.
+
+    This is a _filename_.
+
+    This is an ampersand escape: &.
+
+    This is a non-breaking space sequence.
+
+    This is an index entry. (Nothing to see)
+
+    This line contains a Z sequence.
+

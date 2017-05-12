@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               POE-Component-Client-Stomp
+version:            0.12
+abstract:           Perl extension for the POE Environment
+author:
+    - Kevin L. Esteb <kesteb@wsipc.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Net::Stomp:           0
+    POE:                  0.38
+    POE::Component::Client::Stomp::Utils:  0
+    POE::Filter::Stomp:   0.02
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

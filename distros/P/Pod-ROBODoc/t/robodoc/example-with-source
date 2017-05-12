@@ -1,0 +1,13 @@
+#****f* ModuleName/Foo
+# FUNCTION
+#   Foo computes the foo factor
+#   using a fudge factor.
+# SYNOPSIS
+int Foo( int fudge )
+# INPUTS
+#   fudge -- the fudge factor
+# SOURCE
+
+ more source code..
+
+#****

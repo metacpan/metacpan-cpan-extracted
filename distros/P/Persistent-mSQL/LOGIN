@@ -1,0 +1,19 @@
+########################################################################
+#
+# This file contains the username, password, and data source info
+# needed to connect to the database for the test programs.
+# You will probably want to remove this file after everything is working.
+#
+########################################################################
+
+### username to login to database as ###
+### leave blank if there isn't one ###
+User:		
+
+### password for user login ###
+### leave blank if there isn't one ###
+Passwd:		
+
+### DBI compliant data source name ###
+### Please see the DBD::mSQL documentation for valid DSNs ###
+DataSource:	dbi:mSQL:test

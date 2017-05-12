@@ -1,0 +1,54 @@
+---
+abstract: 'utilities for Perl 5 development and administration'
+author:
+  - 'Toby Inkster <tobyink@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.61
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: P5U
+name: P5U
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  App::Cmd: 0
+  Class::Load: 0
+  File::HomeDir: 0
+  File::pushd: 0
+  JSON: 2.00
+  LWP::Simple: 0
+  Module::Info: 0
+  Module::Manifest: 0
+  Moo: 1.002000
+  Object::AUTHORITY: 0
+  Path::Iterator::Rule: 0
+  Path::Tiny: 0
+  PerlX::Maybe: 0
+  Test::Pod: 0
+  Type::Utils: 0
+  Types::Standard: 0
+  autodie: 0
+  match::simple: 0
+  namespace::clean: 0.19
+  perl: 5.10.0
+resources:
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=P5U
+  homepage: https://metacpan.org/release/P5U
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/tobyink/p5-p5u
+version: 0.100
+x_contributors:
+  - 'Toby Inkster <tobyink@cpan.org>'
+  - 'Mateu X Hunter <hunter@missoula.org>'

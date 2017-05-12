@@ -1,0 +1,59 @@
+NAME
+    Proc::Find::Parents - Find parents of a process (up to the root)
+
+VERSION
+    This document describes version 0.62 of Proc::Find::Parents (from Perl
+    distribution Proc-Find-Parents), released on 2014-12-05.
+
+SYNOPSIS
+FUNCTIONS
+    None are exported by default, but they are exportable.
+
+  get_parent_processes($pid[, \%opts]) => ARRAY
+    Return an array containing information about parent processes of $pid up
+    to the parent of all processes (usually "init"). If $pid is not
+    mentioned, it defaults to $$. The immediate parent is in the first
+    element of array, followed by its parent, and so on. For example:
+
+     [{name=>"perl",pid=>13134}, {name=>"konsole",pid=>2232}, {name=>"init",pid=>1}]
+
+    Currently retrieves information by calling pstree program. Return undef
+    on failure.
+
+    Known options:
+
+    *   method => STR (default: "proctable")
+
+        Either "proctable" (the default, which means to use
+        Proc::ProcessTable) or "pstree" (which uses the pstree command,
+        which might not be portable between Unices).
+
+SEE ALSO
+    Proc::ProcessTable. Pros: does not depend on "pstree" command, process
+    names not truncated by "pstree", works on Windows. Cons: a little bit
+    more heavyweight (uses File::Spec, Cwd, File::Find).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Proc-Find-Parents>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-SHARYANTO-Proc-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Proc-Find-Parents>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

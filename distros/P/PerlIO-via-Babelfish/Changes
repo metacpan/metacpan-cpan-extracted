@@ -1,0 +1,7 @@
+# $Id: Changes,v 1.2 2003/09/03 15:11:03 cvspub Exp $
+Revision history for Perl extension PerlIO::via::Babelfish.
+
+0.01  Wed Sep  3 21:44:49 2003
+	- original version; created by h2xs 1.21 with options
+		-XA PerlIO::via::Babelfish
+

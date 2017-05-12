@@ -1,0 +1,46 @@
+---
+name: Palm-Progect
+version: 2.0.4
+author:
+  - Michael Graham <mag-perl@occamstoothbrush.com>
+abstract: Handler for Palm Progect databases.
+license: perl
+requires:
+  CLASS: 0
+  Class::Accessor: 0
+  Class::Constructor: 0
+  Palm::PDB: 1
+  Palm::Raw: 1.008
+  Palm::StdAppInfo: 1
+  Test::More: 0
+provides:
+  Palm::Progect:
+    file: lib/Palm/Progect.pm
+    version: 2.0.4
+  Palm::Progect::Constants:
+    file: lib/Palm/Progect/Constants.pm
+  Palm::Progect::Converter:
+    file: lib/Palm/Progect/Converter.pm
+  Palm::Progect::Converter::CSV:
+    file: lib/Palm/Progect/Converter/CSV.pm
+  Palm::Progect::Converter::HTML:
+    file: lib/Palm/Progect/Converter/HTML.pm
+  Palm::Progect::Converter::Text:
+    file: lib/Palm/Progect/Converter/Text.pm
+  Palm::Progect::DB_18::Prefs:
+    file: lib/Palm/Progect/DB_18/Prefs.pm
+  Palm::Progect::DB_18::Record:
+    file: lib/Palm/Progect/DB_18/Record.pm
+  Palm::Progect::DB_23::Prefs:
+    file: lib/Palm/Progect/DB_23/Prefs.pm
+  Palm::Progect::DB_23::Record:
+    file: lib/Palm/Progect/DB_23/Record.pm
+  Palm::Progect::Date:
+    file: lib/Palm/Progect/Date.pm
+  Palm::Progect::Prefs:
+    file: lib/Palm/Progect/Prefs.pm
+  Palm::Progect::Record:
+    file: lib/Palm/Progect/Record.pm
+  Palm::Progect::VersionDelegator:
+    file: lib/Palm/Progect/VersionDelegator.pm
+generated_by: Module::Build version 0.2611

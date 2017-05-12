@@ -1,0 +1,6 @@
+Revision history for Perl extension POE::Component::Rendezvous::Publish.
+
+0.01  Tue Mar 29 23:59:57 2005
+	- original version; created by h2xs 1.22 with options
+		-AX -n POE::Component::Rendezvous::Publish --use-new-tests --skip-exporter
+

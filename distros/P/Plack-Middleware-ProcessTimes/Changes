@@ -1,0 +1,7 @@
+Revision history for Plack-Middleware-ProcessTimes
+
+1.000000  2015-09-03 15:21:30-07:00 America/Los_Angeles
+ - Move data from response headers to simple plack values
+
+0.001000  2015-08-14 11:36:34-07:00 America/Los_Angeles
+ - Initial Release

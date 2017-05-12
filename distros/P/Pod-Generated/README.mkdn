@@ -1,0 +1,86 @@
+# NAME
+
+Pod::Generated - Generate POD documentation during "make" time
+
+# SYNOPSIS
+
+    use Pod::Generated 'add_doc';
+
+    my $pkg = __PACKAGE__;
+    add_doc($pkg, CODE   => 'new',   purpose => 'A constructor.');
+    add_doc($pkg, SCALAR => 'count', purpose => 'Number of flurbles.');
+
+# DESCRIPTION
+
+This module provides support for generating POD documentation for your modules
+during `make` time. It does not itself generate the documentation - the
+combination of [Module::Install::Template](http://search.cpan.org/perldoc?Module::Install::Template) and
+[Template::Plugin::PodGenerated](http://search.cpan.org/perldoc?Template::Plugin::PodGenerated) does that.
+
+Also see [Pod::Generated::Attributes](http://search.cpan.org/perldoc?Pod::Generated::Attributes).
+
+Modules that generate methods - such as [Class::Accessor](http://search.cpan.org/perldoc?Class::Accessor) - might want to use
+this module. [Class::Accessor::Complex](http://search.cpan.org/perldoc?Class::Accessor::Complex), [Class::Accessor::Constructor](http://search.cpan.org/perldoc?Class::Accessor::Constructor) and
+[Class::Accessor::FactoryTyped](http://search.cpan.org/perldoc?Class::Accessor::FactoryTyped) do support generated documentation, or will
+do so shortly.
+
+This modules exports two functions on request:
+
+- `add_doc`
+
+    add_doc($pkg, $glob_type, $symbol_name, $doc_type, $doc);
+
+Adds documentation. Takes as arguments the package for which to add
+documentation, a glob type (`CODE`, `SCALAR`, `ARRAY`, `HASH`), the symbol
+name for which to add documentation (i.e., the subroutine name or variable
+name), the documentation type (e.g., `purpose`, `example`) and the
+documentation string.
+
+The symbol name alone is insufficient to determine what is being documented -
+does `new` refer to the subroutine `new()` or any of the variables `$new`,
+C@new> or `%new`? Therefore you also need to pass the glob type.
+
+The documentation type is freely definable, but the code that actually
+generates the documentation (for example, [Template::Plugin::PodGenerated](http://search.cpan.org/perldoc?Template::Plugin::PodGenerated))
+needs to understand these documentation types.
+
+Documentation is stored in a nested hash.
+
+- `doc `
+
+Returns the documentation hash. This can be used by modules that actually
+generate the documentation to inspect which documentation has been defined.
+
+# TAGS
+
+If you talk about this module in blogs, on L<delicious.com> or anywhere else,
+please use the `podgenerated` tag.
+
+# BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to
+`bug-pod-generated@rt.cpan.org`, or through the web interface at
+<http://rt.cpan.org>.
+
+# INSTALLATION
+
+See perlmodinstall for information and options on installing Perl modules.
+
+# AVAILABILITY
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a CPAN
+site near you. Or see <http://search.cpan.org/dist/Pod-Generated/>.
+
+# AUTHOR
+
+Marcel Gr&uuml;nauer, `<marcel@cpan.org>`
+
+# COPYRIGHT AND LICENSE
+
+Copyright 2007-2009 by Marcel Gr&uuml;nauer
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,10 @@
+MANIFEST
+CHANGELOG
+README
+TODO
+VERSION
+Makefile.PL
+lib/PerlIO/via/QuotedPrint.pm
+t/QuotedPrint.t
+META.yml                                Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

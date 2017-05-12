@@ -1,0 +1,5 @@
+Revision history for Perl module Plack::Middleware::DirIndex:
+
+1.00 Tue 27 Jan 2015 08:48:45 GMT
+  - Some changes from CPAN Pull Request Challenge
+

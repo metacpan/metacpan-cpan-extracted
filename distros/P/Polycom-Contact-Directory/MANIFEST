@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+META.yml
+t/00-basic.t
+t/01-utf8.t
+t/02-entities.t
+t/pod.t
+t/pod-coverage.t
+lib/Polycom/Contact.pm
+lib/Polycom/Contact/Directory.pm
+script/add_contact.pl
+script/delete_contact.pl
+script/list_contacts.pl
+script/xml_to_csv.pl

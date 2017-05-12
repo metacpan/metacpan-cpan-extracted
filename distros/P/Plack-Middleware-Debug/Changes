@@ -1,0 +1,70 @@
+Revision history for Perl extension Plack-Middleware-Debug
+
+0.16  2013-09-06 11:41:25 PDT
+     - Merge with upstream
+
+0.15  2013-09-06 11:37:24 PDT
+     - Convert to Milla
+     - Fix broken latin-1 META.yml
+
+0.14  Sun Sep 18 12:51:49 PDT 2011
+     - Fixed warnings (chiselwright)
+
+0.13  Mon Jul 18 13:57:27 PDT 2011
+     - Fixed the way $spec mangling works (Jon Swartz)
+
+0.12  Mon Mar 28 16:20:54 PDT 2011
+     - Added experimental TrackObjects panel
+     - Fixed UUV warnings for Catalyst (jjn1016)
+
+0.11  Fri Jan 14 10:54:53 PST 2011
+     - Fixed memory leaks in Parameters panel (jnap)
+     - Fixed memory leaks in responses not HTML/XML (forwardever)
+
+0.10  Wed Aug 25 12:43:54 PDT 2010
+     - Support panels in non-200 responses as well since they're useful for debugging anyway (haarg)
+
+0.09  Tue May  4 16:24:09 PDT 2010
+     - Added new Parameters panel (franckcuny)
+
+0.08  Sat May  1 04:56:08 PDT 2010
+     - Update Encode.pm dependency RT #57087 (jnareb)
+     - Fixed packages
+     - Moved git URL
+
+0.07  Wed Feb  3 09:53:56 PST 2010
+     - No code change. Fixes the packaging issue due to the Module::Install::Share bug
+
+0.06  Sat Jan 30 05:21:21 PST 2010
+     - Fixes UTF-8 issues when panels such as Env contains UTF-8 wide characters
+       (Thanks to tomyhero)
+
+0.05  Sat Jan 30 00:24:39 PST 2010
+     - Major refactoring of middleware panels: Now panels are also middleware
+     - Support streaming interface as well (clkao)
+     - Added Session middleware panel
+     
+0.04  Tue 2009.12.15 22:25:16 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed 'uninitialized' warnings for undef values in vardump() (hanekomu)
+     - fix POD typos (hanekomu)
+
+0.03  Sun 2009.12.13 23:49:53 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - added CatalystLog panel (hanekomu, miyagawa)
+     - Added ability to pass arguments and objects to panels (hanekomu)
+     - circumvented a bug in Data::Dump(er) related typeglobs (miyagawa)
+     - DBITrace panel takes an optional 'level' argument (trace level) (hanekomu)
+     - nav_title() defaults to title() now, so need to set it in most panels (hanekomu)
+     - added documentation (hanekomu)
+     - fix a memory leak by declaring renderer only once (miyagawa)
+     - added very basic tests (hanekomu)
+     - Environment panel does its work in process_response() now
+     - various small bug fixes and improvements (miyagawa, hanekomu)
+     - refactoring (hanekomu)
+
+0.02  Sun 2009.12.13 12:01:29 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - For debug information to be sent, the Content-Type should contain
+       'text/html'; it's not necessary that it's equal to it. So 'text/html;
+       charset=utf-8' is ok as well (thanks tomyhero)
+
+0.01  Sun 2009.12.13 01:12:58 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

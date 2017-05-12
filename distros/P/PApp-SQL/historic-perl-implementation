@@ -1,0 +1,44 @@
+# this is of historical interest at best ;) well, actually the
+# calls to fancydie are quite nice...
+
+my %_sql_st;
+
+sub sql_exec($;@) {
+   my $statement = shift;
+   my $st = $_sql_st{$statement};
+   unless($st) {
+      $st = $db->prepare($statement) or fancydie "unable to prepare statement", $statement;
+      $_sql_st{$statement} = $st;
+   }
+   if (ref $_[0]) {
+      my $bind = shift;
+      $sql_exec = $st->execute(@_) or fancydie $db->errstr, "Unable to execute statement `$statement` with ".join(":",@_);
+      $st->bind_columns(@$bind) or fancydie $db->errstr, "Unable to bind_columns to statement `$statement` with ".join(":",@_);
+   } else {
+      $sql_exec = $st->execute(@_) or fancydie $db->errstr, "Unable to execute statement `$statement` with ".join(":",@_);
+   }
+   $st;
+}
+
+sub sql_fetch {
+   my $r = &sql_exec->fetchrow_arrayref;
+   $r ? wantarray ? @{$r}
+                  : $r->[0]
+      : ();
+}
+
+sub sql_fetchall {
+   my $r = &sql_exec->fetchall_arrayref;
+   ref $r && @$r ? @{$r->[0]}==1 ? map @$_,@$r
+                                 : @$r
+		 : ();
+}
+
+sub sql_exists($;@) {
+   my $select = shift;
+   my @args = @_;
+   $select = "select count(*) > 0 from $select limit 1";
+   @_ = ($select, @_);
+   goto &sql_fetch;
+}
+

@@ -1,0 +1,16 @@
+1.0.0 2013-12-12
+ - GH#4 Expanded Description section (Gene Boggs)
+ - Mark as stable, bump version to 1.0.0
+
+0.0.3 2011-12-03
+ - add file extension to asset uri (James Aitken)
+ - don't minify in a development environment (Randy Stauner)
+ - added support for filters and custom minifiers (Randy Stauner)
+ - make file separator configurable (Randy Stauner)
+ - some refactoring to allow custom types (Moritz Onken)
+
+0.0.2 2011-08-03
+ - Set Expires header
+
+0.0.1 2011-06-20
+ - initial release

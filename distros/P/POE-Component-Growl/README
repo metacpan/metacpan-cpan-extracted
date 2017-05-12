@@ -1,0 +1,63 @@
+# $Id: README,v 1.0 2005/07/31 17:31 $
+
+--------
+Abstract
+--------
+
+POE::Component::Growl provides a facility for notifying events through Growl
+using the Mac::Growl module as back-end. Integration with POE's architecture
+allows easy, non-blocking notifications.
+
+------------
+Requirements
+------------
+
+POE::Component::Growl requires POE and Mac::Growl.
+Installing it with the CPAN shell should cause it to do the right thing 
+with regards to these dependencies.
+
+------------------
+Basic Installation
+------------------
+
+POE::Component::Growl may be installed through the CPAN shell in
+the usual manner.  Typically:
+
+  $ perl -MCPAN -e 'intstall POE::Component::Growl'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme POE::Component::Growl
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install POE::Component::Growl
+
+-------------------
+Manual Installation
+-------------------
+
+This module may also be installed manually.  Its distribution is
+available from the author's CPAN directory,
+<ftp://ftp.cpan.org/pub/CPAN/authors/id/A/AA/AAR/>, or a similarly
+named directory at your favorite CPAN mirror.
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+The test program will build a POE application and send you a notification
+through Growl.
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+
+Thanks for reading!
+
+-- Alessandro Ranellucci / aar@cpan.org / http://alex.primafila.net

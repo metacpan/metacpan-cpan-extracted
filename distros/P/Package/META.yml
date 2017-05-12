@@ -1,0 +1,33 @@
+---
+abstract: 'The Acmeist Module Package Management Tool'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Package
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - example
+requires:
+  Hash::Merge: '0'
+  IO::All: '0'
+  Mouse: '0'
+  MouseX::App::Cmd: '0'
+  Template::Toolkit::Simple: '0'
+  YAML::XS: '0'
+  perl: v5.8.1
+resources:
+  bugtracker: https://github.com/ingydotnet/package-pm/issues
+  homepage: https://github.com/ingydotnet/package-pm
+  repository: https://github.com/ingydotnet/package-pm.git
+version: '0.26'

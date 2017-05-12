@@ -1,0 +1,142 @@
+<HTML>
+<HEAD>
+<TITLE>Persistent::Hash - Storage module Programmer Manual</TITLE>
+<LINK REV="made" HREF="mailto:bhcompile@daffy.perf.redhat.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#overview">OVERVIEW</A></LI>
+	<LI><A HREF="#manual conventions">MANUAL CONVENTIONS</A></LI>
+	<LI><A HREF="#standard storage api">STANDARD STORAGE API</A></LI>
+	<UL>
+
+		<LI><A HREF="#loadhashinfo()"><CODE>LoadHashInfo()</CODE></A></LI>
+		<LI><A HREF="#loadhashdata()"><CODE>LoadHashData()</CODE></A></LI>
+		<LI><A HREF="#loadhashindex()"><CODE>LoadHashIndex()</CODE></A></LI>
+		<LI><A HREF="#deletehash()"><CODE>DeleteHash()</CODE></A></LI>
+		<LI><A HREF="#inserthash()"><CODE>InsertHash()</CODE></A></LI>
+		<LI><A HREF="#updatehash()"><CODE>UpdateHash()</CODE></A></LI>
+	</UL>
+
+	<LI><A HREF="#copyright">COPYRIGHT</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>Persistent::Hash - Storage module Programmer Manual (0.1)</P>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Other Persistent::Hash manuals:</P>
+<P><A HREF="/Persistent/Hash.html">the Persistent::Hash manpage</A> - Persistent::Hash module overview and description</P>
+<P><A HREF="/Persistent/Hash/API.html">the Persistent::Hash::API manpage</A> - API Reference</P>
+<P><A HREF="/Persistent/Hash/Manual.html">the Persistent::Hash::Manual manpage</A> - Programmer Manual</P>
+<P>
+<HR>
+<H1><A NAME="overview">OVERVIEW</A></H1>
+<P>This manual briefly explains the main API for a Persistent::Hash storage module in the hopes
+more storage module come to life.</P>
+<P>
+<HR>
+<H1><A NAME="manual conventions">MANUAL CONVENTIONS</A></H1>
+<P>Glossary:</P>
+<UL>
+<LI><STRONG><A NAME="item_Source%3A_The_Persistent%3A%3AHash_source_code">Source: The Persistent::Hash source code</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Data_Type%3A_A_subclass_of_Persistent%3A%3AHash">Data Type: A subclass of Persistent::Hash</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Storage%3A_The_database%2C_flatfile_or_other_mediu">Storage: The database, flatfile or other medium where the data is stored</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Storage_module%3A_The_storage_module_that_knows_ho">Storage module: The storage module that knows how to store to Storage</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_constants">Configuration options: The subclass overloaded constants (API)</A></STRONG><BR>
+
+<LI><STRONG><A NAME="item_Hash_type%3A_The_hash_MIME_type_constructed_with_t">Hash type: The hash MIME type constructed with the project and package name</A></STRONG><BR>
+
+</UL>
+<P>
+<HR>
+<H1><A NAME="standard storage api">STANDARD STORAGE API</A></H1>
+<P>
+<H2><A NAME="loadhashinfo()"><CODE>LoadHashInfo()</CODE></A></H2>
+<P>This method will be called on the storage module when Persistent::Hash needs to load a 
+certain hash info (id,time_accessed,time_modified). The file docs/tables.pod describes
+the info table in detail.</P>
+<P>This method receives a classname (itself),an object package and an 'id'. Those three
+parameters need to be defined or else something is going wrong.</P>
+<P>A database handle can be obtained by called <CODE>DatabaseHandle()</CODE> on the object package, as
+a method call. This method should load the information from the media concerning the
+'id' and return a hash ref of the following type of format:</P>
+<PRE>
+        {
+                type =&gt; $type,
+                time_accessed =&gt; $time_accessed,
+                time_modified =&gt; $time_modified,
+        }</PRE>
+<P>
+<H2><A NAME="loadhashdata()"><CODE>LoadHashData()</CODE></A></H2>
+<P>This method will be called on the storage module when Persistent::Hash needs to load
+the 'data' chunk of a hash. (DATA_FIELDS). This method should receive the untied version
+of the hash from wich it can obtain the 'id'.</P>
+<P>You can get a database handle by calling <CODE>DatabaseHandle()</CODE> on the untied hash.</P>
+<P>This method should return a hash ref of the DATA_FIELDS with their according media values.</P>
+<P>
+<H2><A NAME="loadhashindex()"><CODE>LoadHashIndex()</CODE></A></H2>
+<P>This method will be called on the storage module when Persistent::Hash needs to load
+the 'index' chunk of a hash. (INDEX_FIELDS). This method should receive the untied version
+of the hash from wich it can obtain the 'id'.</P>
+<P>You can get a database handle by calling <CODE>DatabaseHandle()</CODE> on the untied hash.</P>
+<P>This method should return a hash ref of the INDEX_FIELDS with their according media values.</P>
+<P>
+<H2><A NAME="deletehash()"><CODE>DeleteHash()</CODE></A></H2>
+<P>This method will be called on the storage module when Persistent::Hash needs to delete a 
+hash from Storage. It should delete all known records of a hash in the media.
+This method should receive the tied hash as a parameter from wich it can extract the 'id'.</P>
+<P>You can get a database handle by calling <CODE>DatabaseHandle()</CODE> on the tied hash.</P>
+<P>This method should return true on success, undef on error.</P>
+<P>
+<H2><A NAME="inserthash()"><CODE>InsertHash()</CODE></A></H2>
+<P>This method will be called on the storage module when Persistent::Hash needs to insert a new
+hash in Storage. It should insert info,data and index records into the media.</P>
+<P>You should receive the tied version of the hash. More importantly, this method should generate
+the unique identifier for this object. The id HAS to be numeric.</P>
+<P>You can get a database handle by calling <CODE>DatabaseHandle()</CODE> on the tied hash.</P>
+<P>This method sould return the newly generated 'id' on success, undef on failure.</P>
+<P>
+<H2><A NAME="updatehash()"><CODE>UpdateHash()</CODE></A></H2>
+<P>This method will be called on the storage module when Persistent::Hash needs to insert a new
+hash in Storage. It should insert info,data and index records into the media.</P>
+<P>You should receive the tied version of the hash from wich it can extract the 'id'.</P>
+<P>You can get a database handle by calling <CODE>DatabaseHandle()</CODE> on the tied hash.</P>
+<P>This method sould return the id' on success, undef on failure.</P>
+<P>
+<HR>
+<H1><A NAME="copyright">COPYRIGHT</A></H1>
+<P><CODE>Copyright(c)</CODE> 2002 Benoit Beausejour &lt;<A HREF="mailto:bbeausej@pobox.com">bbeausej@pobox.com</A>&gt;</P>
+<P>All rights reserved. This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Benoit Beausejour &lt;<A HREF="mailto:bbeausej@pobox.com">bbeausej@pobox.com</A>&gt;</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>Persistent::Hash(1).
+perltie(1).
+perl(1).</P>
+
+</BODY>
+
+</HTML>

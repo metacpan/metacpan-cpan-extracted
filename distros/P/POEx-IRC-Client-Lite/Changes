@@ -1,0 +1,69 @@
+# Changes for POEx::IRC::Client::Lite
+
+0.004002 2015-05-15
+
+  - POD fixes (miniCruzer)
+
+  - Add MooX::POE example bot
+
+  - Switch to 'cpanfile' dependency management
+
+0.004001 2015-07-09
+
+  - Add 'ssl_opts' attribute
+
+  - Better IRC::Mode::Set handling in ->mode
+
+  - Switch to builders rather than defaults for easier extending
+
+0.003001 2015-07-02
+
+  - Add 'ssl' attribute & pass to Backend
+
+0.002005 2015-06-07
+
+  - Document 'irc_connected' & 'irc_connector_failed' events
+
+0.002004 2015-03-18
+
+  - Depend on a more modern Perl to fix <=5.14 test failures
+    (unless someone cares enough to send a PR ...)
+
+0.002003 2015-03-17
+
+  - Fix reconnect behavior when a disconnect is called while awaiting
+    a successful connection
+
+  - 'use strictures 2' for fatal saner warnings behavior
+
+  - Drop namespace::clean
+
+  - Depend on a more modern Moo
+
+0.002002 2013-10-27
+
+  - No significant code changes
+  
+  - Fix 'Changes' to conform to CPAN::Changes::Spec
+
+  - Switch to Type::Tiny
+
+  - Use namespace::clean
+
+0.002001 2013-03-17
+
+  - Test tweaks + depend on newer POEx::IRC::Backend
+
+0.002000 2013-02-15
+
+  - Accept IRC::Mode::Set objects via ->mode($target, $obj)
+
+  - Add default ->quit() message ("Leaving")
+
+0.001002 2013-02-10
+
+  - Documentation fixes regarding CTCP events
+
+0.001001 2013-02-10
+
+  - Initial release

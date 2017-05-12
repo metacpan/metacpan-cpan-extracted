@@ -1,0 +1,84 @@
+NAME
+    Pangloss - a multilingual web-based glossary.
+
+SYNOPSIS
+      use Pangloss;
+
+      # there's much more to it than that, of course...
+
+DESCRIPTION
+    Pangloss is a *terminology management system* who's goal is to help
+    translators produce consistent translations of common terms across
+    multiple languages. The system allows users to search through and manage
+    terms and their translations.
+
+    There are 4 main types of users:
+
+    Administrators
+      Admins can create, remove, or modify user accounts, languages,
+      categories, concepts and terms.
+
+    Translators
+      Translators can submit & modify term translations for a given concept.
+
+    Proofreaders
+      Proofreaders can accept/reject/etc. term translations by modifying a
+      term's status.
+
+    Generic users
+      Other users can search through the terms, but cannot modify any
+      content.
+
+SYSTEM OVERVIEW
+    Pangloss can be broken down into these parts:
+
+  The Application Model
+    In MVC terms, Pangloss::Application and its sub-components form the
+    *model* of the system. It includes exception-handling and validation
+    code for collections of the following objects:
+
+    * Pangloss::User
+    * Pangloss::Language
+    * Pangloss::Category
+    * Pangloss::Concept
+    * Pangloss::Term
+
+    Any action by the application classes results in a view of the system
+    represented by a Pangloss::Application::View.
+
+  The Web Application
+    Pangloss::WebApp acts as the *controller* of the system. It takes in a
+    request and passes it through a Pipeline of modules that talk to the
+    Pangloss::Application to figure out an appropriate response. Most of the
+    so-called *business logic* sits at this level.
+
+    By default Petal templates are used to present the application *view* to
+    the user.
+
+    Pangloss::WebApp is configured by environment variables passed to
+    Pangloss::Config. The controller is defined by a Pipeline::Config file.
+
+  The Shell
+    Pangloss has an off-line administration tool, pg_admin.
+
+INSTALLATION
+    For detailed installation instructions, see Pangloss::Install or the
+    INSTALL file.
+
+AUTHOR
+    Steve Purkis <spurkis@quiup.com>
+
+COPYRIGHT
+    Copyright (c) 2003, Quiup Ltd.
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+
+SEE ALSO
+    Pangloss::Config, Pangloss::Application
+
+    OpenFrame, Pixie
+
+    Pangloss mailing list:
+    <http://www.email-lists.org/mailman/listinfo/pangloss>
+

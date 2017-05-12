@@ -1,0 +1,99 @@
+NAME
+    PerlIO::via::ToFirePHP - log to FirePHP via an PerlIO layer
+
+VERSION
+    version 1.100860
+
+SYNOPSIS
+        use PerlIO::via::ToFirePHP;
+        my $fire_php = FirePHP::Dispatcher->new(HTTP::Headers->new);
+        open my $fh, '>:via(ToFirePHP)', $fire_php;
+        # Everything you print on the filehandle will be sent to FirePHP
+
+DESCRIPTION
+    This PerlIO layer sends everything it receives to FirePHP. When
+    constructing a filehandle using this layer using "open()", you need to
+    pass an object of type FirePHP::Dispatcher that has been initialized
+    with a HTTP::Headers object.
+
+    A typical use of this PerlIO layer is to send DBI trace output to
+    FirePHP:
+
+        use PerlIO::via::ToFirePHP;
+
+        my $dbh = DBI->connect(...);
+
+        open my $fh, '>:via(ToFirePHP)',
+            FirePHP::Dispatcher->new($http_headers_object);
+        $dbh->trace(2, $fh);
+
+    Now the trace output of all calls to that database handle will be sent
+    to FirePHP.
+
+    The PerlIO layer is implemented in "PerlIO::via::ToFirePHP" instead of
+    just "PerlIO::via::FirePHP" because of a bug in "PerlIO::via" in perl
+    5.10.0 and earlier versions. If we used just "PerlIO::via::FirePHP", we
+    would not be able to use the shorthand layer notation of "open my $fh,
+    ':"via(FirePHP), $fire_php>. "PerlIO::via" would look for a "PUSHED"
+    method in package "FirePHP". There is no such method, but because
+    "FirePHP::Dispatcher" has been loaded, the namespace "FirePHP" has been
+    autovivified. So "PerlIO::via" would stop looking. This bug seems to be
+    fixed in perl 5.10.1.
+
+METHODS
+  PUSHED
+    Called by PerlIO::via - read its documentation for details.
+
+  OPEN
+    Called by PerlIO::via - read its documentation for details.
+
+  WRITE
+    Called by PerlIO::via - read its documentation for details.
+
+    "WRITE()" accumulates input until a newline is seen, only then will it
+    remove the newline and send the accumulated input to the
+    FirePHP::Dispatcher object. The motivation for this was that DBI's
+    "trace()" method reports trace output in chunks, not necessarily whole
+    lines.
+
+  CLOSED
+    Called by PerlIO::via - read its documentation for details.
+
+SEE ALSO
+    HTTP::Engine::FirePHP
+        The "get_fire_php_fh()" method it places in HTTP::Engine::Response
+        returns a filehandle constructed with PerlIO::via::ToFirePHP.
+
+    PerlIO::via
+        See this module for how to implement PerlIO layers in Perl.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=PerlIO-via-ToFirePHP>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/PerlIO-via-ToFirePHP/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/PerlIO-via-ToFirePHP/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2009 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

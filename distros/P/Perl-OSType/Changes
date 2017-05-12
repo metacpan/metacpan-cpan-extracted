@@ -1,0 +1,99 @@
+Revision history for Perl module Perl::OSType
+
+1.010     2016-06-21 17:55:34-04:00 America/New_York
+
+    [ADDED]
+
+    - Added 'msys' as a Unix-type OS (Graham Ollis)
+
+1.009     2015-09-21 10:09:35-04:00 America/New_York
+
+    [ADDED]
+
+    - Added 'sco' as a Unix-type OS
+
+1.008     2015-01-26 22:12:22-05:00 America/New_York
+
+    [ADDED]
+
+    - Added 'minix' as a Unix-type OS (Chris Williams)
+
+1.007     2014-01-15 09:45:41-05:00 America/New_York
+
+    [ADDED]
+
+    - Added 'android' as a Unix-type OS (Piotr Roszatycki)
+
+1.006     2013-09-25 13:57:38 America/New_York
+
+    [FIXES]
+
+    - Compile test could hang on Windows
+
+    [PREREQS]
+
+    - Dropped configure_requires for ExtUtils::MakeMaker to 6.17
+
+1.005     2013-09-10 19:47:24 America/New_York
+
+    [CHANGED]
+
+    - Ensured no non-core test dependencies
+
+    - Various non-functional changes to files and metadata included with
+      the distribution
+
+1.004     2013-08-21 18:57:46 America/New_York
+
+    [ADDED]
+
+    - 'bitrig' is a Unix
+
+1.003     2013-03-20 15:33:16 America/New_York
+
+    [FIXED]
+
+    - Fixed detection of VOS; $^O reports 'vos', not 'VOS'
+
+1.002     2010-11-16 09:02:53 EST5EDT
+
+    - fixed documention typo (s/ostype/os_type/)
+
+1.001     2010-11-16 07:59:36 EST5EDT
+
+    - added 'iphoneos' to support Cydia port
+
+1.000     2010-06-09 16:01:50 EST5EDT
+
+    *** BACKWARDS INCOMPATIBLE CHANGE ***
+
+    - removed 'os_family' and 'is_os_family' functions
+        due to their inherent ambiguity
+
+0.005     2010-05-16 21:52:28 EST5EDT
+
+    - renamed from OSType to Perl::OSType in preparation for
+        addition to Perl core [requested by Jesse Vincent]
+
+0.004     2010-05-05 22:04:18 EST5EDT
+
+    - added 'beos' as Unix type
+
+    - fix broken tests on MSWin32
+        
+    - clean up test output
+
+    - migrate distribution to Dist::Zilla
+
+0.003 Wed Apr 22 13:30:41 EDT 2009
+
+    - fixed test bugs on Perl 5.6
+
+0.002 Tue Apr 21 08:54:55 EDT 2009
+
+    - improved handling of undefined/unknown arguments; improved test
+        coverage (JONASBN)
+
+0.001  Sun Apr 19 17:16:18 EDT 2009
+
+    - initial release based on Module::Build and Devel::CheckOS

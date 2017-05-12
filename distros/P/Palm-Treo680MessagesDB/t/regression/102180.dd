@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1206093360,
+          'number' => '+440270800592',
+          'time' => '09:56',
+          'date' => '2008-03-21',
+          'name' => 'Ed XXXX (M)',
+          'phone' => '+440270800592',
+          'device' => 'Treo 680',
+          'direction' => 'outbound',
+          'timestamp' => 1206093360,
+          'text' => 'there\'s some post for you inside my front door',
+          'type' => '0x0000',
+          'category' => 0,
+          'id' => 7107977,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 102180
+        };

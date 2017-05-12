@@ -1,0 +1,4 @@
+name = "Plack-Middleware-HTMLLint"
+badges = ["travis"]
+authority="cpan:KARUPA"
+module_maker="ModuleBuildTiny"

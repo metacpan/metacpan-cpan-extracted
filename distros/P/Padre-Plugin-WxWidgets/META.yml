@@ -1,0 +1,31 @@
+---
+abstract: 'wxWidgets support for Padre'
+author:
+  - 'Ahmad M. Zawawi <ahmad.zawawi@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Locale::Msgfmt: 0.15
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Padre-Plugin-WxWidgets
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  Padre: 0.94
+resources:
+  bugtracker: http://padre.perlide.org/
+  homepage: http://padre.perlide.org/trac/wiki/PadrePluginWxWidgets
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-WxWidgets
+version: 0.05

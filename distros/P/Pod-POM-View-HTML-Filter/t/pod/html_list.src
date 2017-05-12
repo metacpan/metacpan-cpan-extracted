@@ -1,0 +1,33 @@
+=begin filter html
+
+    <p>This is a list:</p>
+
+    <ul>
+      <li>first item</li>
+      <li>second
+          item</li>
+    </ul>
+
+=end filter
+__RESULT__
++html
+<html><body bgcolor="#ffffff">
+<pre>    <span class="h-ab">&lt;</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>This is a list:<span class="h-ab">&lt;/</span><span class="h-tag">p</span><span class="h-ab">&gt;</span>
+
+    <span class="h-ab">&lt;</span><span class="h-tag">ul</span><span class="h-ab">&gt;</span>
+      <span class="h-ab">&lt;</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>first item<span class="h-ab">&lt;/</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>
+      <span class="h-ab">&lt;</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>second
+          item<span class="h-ab">&lt;/</span><span class="h-tag">li</span><span class="h-ab">&gt;</span>
+    <span class="h-ab">&lt;/</span><span class="h-tag">ul</span><span class="h-ab">&gt;</span></pre>
+</body></html>
+__RESULT__
+-html
+<html><body bgcolor="#ffffff">
+<pre>    &lt;p&gt;This is a list:&lt;/p&gt;
+
+    &lt;ul&gt;
+      &lt;li&gt;first item&lt;/li&gt;
+      &lt;li&gt;second
+          item&lt;/li&gt;
+    &lt;/ul&gt;</pre>
+</body></html>

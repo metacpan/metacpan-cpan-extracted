@@ -1,0 +1,17 @@
+Revision history for PerlCritic extension Perl-Critic-CognitiveComplexity
+
+0.5 2017-01-06T20:19:09Z
+    - detect direct recursion
+    - detect foreach loops
+    - more POD
+
+0.03 2017-01-05T17:40:36Z
+    - support complexity increase for boolean operators
+
+0.02 2017-01-03T16:11:41Z
+    - basic calculation of nested structures
+    - initial release on CPAN
+
+0.01 2017-01-03T14:42:27Z
+    - initial version
+

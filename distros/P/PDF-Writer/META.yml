@@ -1,0 +1,24 @@
+---
+name: PDF-Writer
+version: 0.06
+author: ~
+abstract: PDF writer abstraction layer
+license: perl
+requires:
+  perl: 5.6.0
+build_requires:
+  Test::More: 0.47
+provides:
+  PDF::Writer:
+    file: lib/PDF/Writer.pm
+    version: 0.06
+  PDF::Writer::mock:
+    file: lib/PDF/Writer/mock.pm
+    version: 0.03
+  PDF::Writer::pdfapi2:
+    file: lib/PDF/Writer/pdfapi2.pm
+    version: 0.01
+  PDF::Writer::pdflib:
+    file: lib/PDF/Writer/pdflib.pm
+    version: 0.02
+generated_by: Module::Build version 0.2701

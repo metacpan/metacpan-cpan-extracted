@@ -1,0 +1,30 @@
+---
+abstract: 'Bringing the power of POE to CPAN smoke testing.'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Component-CPANPLUS-YACSmoke
+requires:
+  Digest::MD5: '0'
+  File::Spec: '0'
+  POE: '1.367'
+  POE::Wheel::Run: '0'
+  Storable: '0'
+  perl: '5.006'
+resources:
+  homepage: https://github.com/bingos/poe-component-cpanplus-yacsmoke
+  repository: https://github.com/bingos/poe-component-cpanplus-yacsmoke.git
+version: '1.64'
+x_serialization_backend: 'YAML::Tiny version 1.70'

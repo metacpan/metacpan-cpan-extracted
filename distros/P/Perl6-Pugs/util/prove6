@@ -1,0 +1,222 @@
+#!/usr/bin/env perl
+
+# This is a test harness for pugs and v6-alpha
+# XXX TODO: add support for the --js option
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Test::Harness;
+use File::Spec;
+
+my ($pugs, $pir, $perl5, $help, $inc);
+my $blib = 0;
+my $lib = 0;
+my $recurse = 0;
+my @ext = ();
+my @includes = ();
+my @switches = ();
+my $update_yml = 0;
+
+# Allow cuddling the paths with the -I
+@ARGV = map { /^(-I)(.+)/ ? ($1,$2) : $_ } @ARGV;
+
+# Stick any default switches at the beginning, so they can be overridden
+# by the command line switches.
+#unshift @ARGV, split( " ", $ENV{PROVE_SWITCHES} ) if defined $ENV{PROVE_SWITCHES};
+
+Getopt::Long::Configure( "no_ignore_case" );
+Getopt::Long::Configure( "bundling" );
+GetOptions(
+    haskell     => \$pugs,
+    pugs        => \$pugs,
+
+    pir         => \$pir,
+    parrot      => \$pir,
+    
+    perl5       => \$perl5,
+    perl        => \$perl5,
+    'v6-alpha'  => \$perl5,
+    
+    help        => \$help,
+
+    'I=s'       => \$inc,
+
+    'b|blib'        => \$blib,
+    'l|lib'         => \$lib,
+    'v|verbose'     => \$Test::Harness::verbose,
+    'r|recurse'     => \$recurse,
+    'ext=s@'        => \@ext,
+
+    'update-yml'    => \$update_yml,
+) or exit 1;
+
+$ENV{TEST_VERBOSE} = 1 if $Test::Harness::verbose;
+
+if ($help) {
+    print <<'_EOC_';
+prove6 - Pugs Test Suit Harness
+
+Usage:
+    prove6 --pugs  t/some-dir/*.t
+    prove6 --perl5 t/*/*.t
+    prove6 --pir   t/some-dir/some-test.t
+
+Options:
+    --pugs       Harness with the Haskell Pugs (default on)
+    --haskell    ditto
+
+    --pir        Harness with Pugs' PIR backend
+    --parrot     ditto
+    
+    --perl5      Harness with v6.pm (the Perl 5 implementation)
+    --perl       ditto
+    --v6-alpha   ditto
+
+    -I <path>     Prepends <path> to PERL6LIB.
+    -b, --blib    Adds blib/lib to the path for your tests, a la "use blib".
+    -l, --lib     Add lib to the path for your tests.
+    -v, --verbose Display standard output of test scripts while running them.
+    -r, --recurse Recursively descend into directories.
+    --ext=x       Extensions (defaults to .t)
+
+    --update-yml  Refresh Test.pm.yml and Prelude.pm.yml
+_EOC_
+    exit(0);
+}
+
+# Build up extensions regex
+@ext = map { split /,/ } @ext;
+s/^\.// foreach @ext;
+@ext = ("t") unless @ext;
+my $ext_regex = join( "|", map { quotemeta } @ext );
+$ext_regex = qr/\.($ext_regex)$/;
+
+my $sum = do { no warnings; $pugs + $perl5 + $pir };
+if ($sum > 1) { die "error: you can't specify multiple implementations/backends.\n"; }
+if ($sum == 0) { $pugs = 1 } # default to pugs
+
+my @tfiles = sort map { -d $_ ? all_in($_) : $_ } map glob, @ARGV;
+
+$ENV{PERL6LIB} ||= 'blib6/lib';
+my $sep = ($^O eq 'MSWin32')? ';' : ':';
+#warn $sep;
+
+#warn $inc;
+if ($inc) { $ENV{PERL6LIB} = $inc . $sep . $ENV{PERL6LIB}; }
+
+# Handle blib includes
+if ( $blib ) {
+    my @blibdirs = blibdirs();
+    if ( @blibdirs ) {
+        unshift @includes, @blibdirs;
+    } else {
+        warn "No blib directories found.\n";
+    }
+}
+
+# Handle lib includes
+if ( $lib ) {
+    unshift @includes, "lib";
+}
+
+# refresh Test.pm.yml and Prelude.pm.yml.
+if ($update_yml) {
+    warn "pugs -CParse-YAML ext/Test/lib/Test.pm > blib6/lib/Test.pm.yml\n";
+    system('pugs -CParse-YAML ext/Test/lib/Test.pm > blib6/lib/Test.pm.yml');
+    system("$^X util/gen_prelude.pl -v -i src/perl6/Prelude.pm -p pugs " .
+        "--output blib6/lib/Prelude.pm.yml");
+}
+
+# Build up TH switches
+push( @switches, map { /\s/ && !/^".*"$/ ? qq["-I$_"] : "-I$_" } @includes );
+$Test::Harness::Switches = join( " ", @switches );
+print "# \$Test::Harness::Switches: $Test::Harness::Switches\n" if $Test::Harness::debug;
+
+if ($perl5) {
+    warn "  info: Harness with v6.pm.\n";
+    #warn "  warning: make sure you have run 'make install'.\n";
+    $ENV{PERL5LIB} = "blib6/pugs/perl5/lib${sep}blib6/pugs/perl5/arch";
+} elsif ($pugs) {
+    warn "  info: Harness with pugs (Haskell backend).\n";
+    # Something like this seems better, but didn't work
+    # use ExtUtils::MM;
+    # my $mm = ExtUtils::MM->new();
+    # $mm->maybe_command('pugs')
+    if (!$ENV{HARNESS_PERL} && `pugs --version` =~ m/perl/i) {
+        $ENV{HARNESS_PERL} = 'pugs';
+    }
+    elsif ($ENV{HARNESS_PERL}) {
+        # Nothing to do, respect the current setting
+    }
+    # Guess that it's in the local directory
+    elsif (-x './pugs') {
+        $ENV{HARNESS_PERL} = './pugs';
+    }
+    else {
+       die "unable to find pugs binary to test with";
+    }
+} elsif ($pir) {
+    warn "  info: Harness with pugs (PIR packend).\n";
+    $ENV{PERL5LIB} = 'blib/lib${sep}blib/arch';
+    $ENV{HARNESS_PERL_SWITCHES} = '-B PIR';
+    $ENV{HARNESS_PERL} = 'blib/script/pugs';
+}
+
+runtests(@tfiles);
+
+# Stolen directly from 'prove'
+sub all_in {
+    my $start = shift;
+
+    my @hits = ();
+
+    local *DH;
+    if ( opendir( DH, $start ) ) {
+        my @files = sort readdir DH;
+        closedir DH;
+        for my $file ( @files ) {
+            next if $file eq File::Spec->updir || $file eq File::Spec->curdir;
+            next if $file eq ".svn";
+            next if $file eq "CVS";
+
+            my $currfile = File::Spec->catfile( $start, $file );
+            if ( -d $currfile ) {
+                push( @hits, all_in( $currfile ) ) if $recurse;
+            } else {
+                push( @hits, $currfile ) if $currfile =~ $ext_regex;
+            }
+        }
+    } else {
+        warn "$start: $!\n";
+    }
+
+    return @hits;
+}
+
+# Stolen directly from 'prove', which stole from blib.pm
+sub blibdirs {
+    my $dir = File::Spec->curdir;
+    if ($^O eq 'VMS') {
+        ($dir = VMS::Filespec::unixify($dir)) =~ s-/\z--;
+    }
+    my $archdir = "arch";
+    if ( $^O eq "MacOS" ) {
+        # Double up the MP::A so that it's not used only once.
+        $archdir = $MacPerl::Architecture = $MacPerl::Architecture;
+    }
+
+    my $i = 5;
+    while ($i--) {
+        my $blib      = File::Spec->catdir( $dir, "blib" );
+        my $blib_lib  = File::Spec->catdir( $blib, "lib" );
+        my $blib_arch = File::Spec->catdir( $blib, $archdir );
+
+        if ( -d $blib && -d $blib_arch && -d $blib_lib ) {
+            return ($blib_arch,$blib_lib);
+        }
+        $dir = File::Spec->catdir($dir, File::Spec->updir);
+    }
+    warn "$0: Cannot find blib\n";
+    return;
+}

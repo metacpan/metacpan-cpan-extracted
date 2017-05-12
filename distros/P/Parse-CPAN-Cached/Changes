@@ -1,0 +1,10 @@
+Revision history for Parse::CPAN::Cached
+
+0.02  Mon Jun 29 21:00:00 BST 2009
+    - Added test that $VERSION exists
+    - Hopefully improved the META.yml file
+    - Tests use auto cleaned tempdir for App::Cache
+      (via App::Cache 0.36 release)
+
+0.01  Sun Jun  7 12:00:00 BST 2009
+	- original version

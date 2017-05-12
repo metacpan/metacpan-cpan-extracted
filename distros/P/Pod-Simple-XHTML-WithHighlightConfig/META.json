@@ -1,0 +1,60 @@
+{
+   "abstract" : "Allow configuring syntax highlighting hints in Pod",
+   "author" : [
+      "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Simple-XHTML-WithHighlightConfig",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {}
+      },
+      "develop" : {
+         "requires" : {}
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "0",
+            "Pod::Simple::XHTML" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Pod-Simple-XHTML-WithHighlightConfig@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Simple-XHTML-WithHighlightConfig"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/haarg/Pod-Simple-XHTML-WithHighlightConfig",
+         "web" : "http://github.com/haarg/Pod-Simple-XHTML-WithHighlightConfig"
+      }
+   },
+   "version" : "0.000001"
+}

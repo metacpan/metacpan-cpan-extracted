@@ -1,0 +1,3 @@
+WXWIN32	/usr/local/share/perl/5.10.0/Padre/Util.pm	/use constant WXWIN32 => WIN32;/;"	c	line:58	class:Padre::Util
+IO::File	/usr/lib/perl/5.10/IO/File.pm	/package IO::File;/;"	p	line:3	class:IO::File
+Is_DOSish	/usr/local/share/perl/5.10.0/File/Which.pm	/my $Is_DOSish = (($^O eq 'MSWin32') or/;"	v	line:18	file:	class:File::Which

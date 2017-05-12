@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e0f39708ed109f3de8c8421c638b3e071ffc2b60 AUTHOR_PLEDGE
+SHA1 24e83ea4d22bd59729f659996dcc1a06f8dad36d Build.PL
+SHA1 cedfabb544364eacca0669a0e44aaa78c11ffc4a Changes
+SHA1 0e867a6e0c97c133d010fd96b94b3f21b03f3288 CommitLog
+SHA1 9decb5898925221b664ddc233405d3a10d44d8b7 INSTALL
+SHA1 e6514e4bc5abd3d1a8c7bd2a782c2f8737b413e7 LICENSE
+SHA1 92d4c902323f41f12a55536ce1111528df57676b MANIFEST
+SHA1 69b8a0accb85effa4bd5f4ea93e4f2386d10ac8b MANIFEST.SKIP
+SHA1 7851aa983ebbb56726fc88ae5ce251fe81595c3e META.json
+SHA1 fe9a870e3eab42c2b9a205b4bc28936a03598595 META.yml
+SHA1 89c3012f9ae846e1f6e563b5488001da697242b3 Makefile.PL
+SHA1 85eaf9d526f745cd138ed974445f37a1d0ddc165 README
+SHA1 838f08359533211bfcfc314b20f7d50046cb908e cpanfile
+SHA1 92bbb7c44f36b96337d86625d9536518291dc531 dist.ini
+SHA1 9617e32d4e18bf977e5ca6f2f371aa68e2cf3382 doap.xml
+SHA1 67382b893b807746ca4257451e8d68aadd43a822 examples/simple.pl
+SHA1 c58787852d24517a0b18ea8aba6331d543a54ba1 lib/Pod/Spell/CommonMistakes.pm
+SHA1 5acc2caeb1d6620142d2acd025a2c5a4055d49db lib/Pod/Spell/CommonMistakes/WordList.pm
+SHA1 1fe36c256982396564e18024dd97b7b3f73c70a6 t/00-compile.t
+SHA1 316eb42d73e076046a003310f45293a0d43c9a4c t/00-report-prereqs.dd
+SHA1 231b4606764e7269ddfcbade4a30390edca492c3 t/00-report-prereqs.t
+SHA1 4ae07f0124122fcc68e95e6b927fd5f43d76fbc5 t/apocalypse.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRZOZ4ACgkQGfr7vsGKgxwneQCgzNlVQHQzZfLgvsFpC1hkIkIn
+YQIAn1slnS373772zzwrty1XGPuOJy0t
+=QFBF
+-----END PGP SIGNATURE-----

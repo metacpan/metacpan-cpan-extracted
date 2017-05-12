@@ -1,0 +1,275 @@
+#!/usr/bin/perl
+use strict;
+use Test::Simple 'no_plan';
+use LEOCHARRE::CLI2 ':all','b';
+use File::PathInfo::Ext;
+use PDF::API2;
+use CAM::PDF;
+use PDF::Burst;
+use PDF::GetImages;
+use PDF::OCR2;
+#use File::Path;
+use Cwd;
+use vars qw/$VERSION/;
+$VERSION = sprintf "%d.%02d", q$Revision: 1.4 $ =~ /(\d+)/g;
+
+
+if ($opt_d){
+   #PDF::API2;
+   #CAM::PDF
+   $PDF::Burst::DEBUG = 1;
+   $PDF::GetImages::DEBUG = 1;
+   $PDF::OCR2::DEBUG = 1;
+}
+my $f = Cwd::abs_path($ARGV[0]);
+
+
+
+
+ok_part('initial file tests');
+
+ok( $f, 'have file argument') or exit;
+ok( -f $f, "file is on disk") or exit;
+
+
+
+my $test_id = int rand(99999).time();
+mkdir '/tmp/pdfcheck';
+mkdir "/tmp/pdfcheck/$test_id";
+$f=~/([^\/]+)$/ or die;
+my $filename = $1;
+system('cp',$f,"/tmp/pdfcheck/$test_id/$filename") == 0 or die($!);
+warn("$f copied to\n/tmp/pdfcheck/$test_id/$filename\n\n");
+$f = "/tmp/pdfcheck/$test_id/$filename";
+
+
+
+
+
+my $lslha = `ls -lha '$f'`;
+chomp $lslha;
+ok( $lslha,"got ls -lha :\n$lslha") or exit;
+
+my $file = `file '$f'`;
+chomp $file;
+ok( $file,"got 'file' output :\n$file") or exit;
+
+ok($file=~/pdf/i,"file output has PDF") or exit;
+
+my $pdf_version;
+ok( $file=~/version\s*([\d\.]+)/,'matched version into file output');
+$pdf_version = $1;
+
+ok($pdf_version,"pdf version: $pdf_version");
+
+my $p;
+ok( $p = File::PathInfo::Ext->new($f), "instanced File::PathInfo::Ext");
+
+
+
+my %dat;
+
+for my $att (qw/mode size filesize_pretty md5_hex ext/){
+   my $val = $p->$att;
+   ok( $val,"Got att '$att' : '$val'");
+}
+
+ok( lc( $p->ext ) eq 'pdf',"ext is pdf");
+
+ok( $p->filesize,"filesize() (has size)") or exit;
+
+
+
+
+
+
+
+ok_part('PDF::API2 ------------------------------------------------------');
+my $pc1;
+my $papi_works;
+my $papi;
+
+if (ok( eval { $papi = PDF::API2->open($f) },"PDF::API2->open()") ){
+
+   $papi_works = 1;
+   ok( $pc1 = $papi->pages, "pages() got page count $pc1");
+}
+else {
+      warn("ERRORS? $!, $@\n\n");      
+}
+
+
+   
+ok_part('CAM::PDF ------------------------------------------------------');
+my $camp;
+my $camp_works;
+my $pc2;
+if( ok( eval { $camp = CAM::PDF->new($f) }, "instanced CAM::PDF") ){
+   $camp_works = 1;
+   ok( $pc2 = $camp->numPages,"numPages() got $pc2");
+}
+
+
+
+
+if($camp_works and $papi_works ){
+   ok_part("compate PDF::API2 and CAM::PDF output");
+   ok( $pc1 == $pc2,"PDF::API2 pagecount [$pc1] == CAM::PDF pagecount [$pc2] ");
+}
+
+
+
+
+$opt_b or exit;
+
+
+
+my @working =();
+for my $burst_method ( qw/CAM_PDF PDF_API2 pdftk/ ){
+   ok_part("can we burst method: $burst_method");
+   $PDF::Burst::BURST_METHOD = $burst_method;
+
+   my @files;
+   if( ok( eval { @files= PDF::Burst::pdf_burst($f) },"pdf_burst() method '$burst_method'") ){
+      push @working, $burst_method;
+
+      my $pagefiles_count = scalar @files;
+      ok($pagefiles_count,"got $pagefiles_count pages bursted");
+
+      for my $page ( @files ){
+         my $fi;         
+         ok( $fi = File::PathInfo::Ext->new($page),"File::PathInfo::Ext instanced for:\n$page");
+         ok( $fi->filesize,"got filesize()");
+      }
+
+   }
+
+}
+
+my $countw = scalar @working;
+unless( ok( $countw,"busrt methods that work: [$countw] @working") ){
+   warn("no PDF::Burst methods worked.. the next run will likely croak on purpose to see output..\n");
+
+   my $pdfapi;
+   ok( $pdfapi = PDF::API2->open($f),"PDF::API2->open()");
+   
+
+   $PDF::Burst::DEBUG = 1;
+
+
+   for my $burst_method ( qw/CAM_PDF PDF_API2 pdftk/ ){
+   
+      $PDF::Burst::BURST_METHOD = $burst_method;
+      PDF::Burst::pdf_burst($f);
+   }
+}
+
+
+
+ok_part("can we do it all and get ocr? $f");
+
+my $po;
+if( ok( $po= PDF::OCR2->new($f),'instanced PDF::OCR2') ){
+   $PDF::OCR2::DEBUG = 1;
+   my $text = $po->text;
+   if( ok($text,"got text output.") ){
+      my $o = "$f.textoutput.txt";
+      open( FILE, '>',$o ) or warn("cant open $o for writing, $!") and exit;
+      print FILE $text;
+      close FILE;
+      print STDERR "Saved text output to:\n $o\n";
+   }
+}
+
+
+
+
+
+
+exit;
+
+
+
+sub usage {qq{pdfcheck [OPTION].. FILE
+Check a pdf document for correctness and compatibility with ocr.
+
+   -d       debug   
+   -h       help
+   -v       version
+   -b       attempt PDF::Burst and PDF::OCR2
+
+Try 'man pdfcheck' for more info.
+}}
+
+
+sub ok_part { printf STDERR "\n\n%s\n%s\n\n", '='x60, uc( "= @_" ) }
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+pdfcheck - check a pdf document for correctness and compatibility with ocr
+
+=head1 DESCRIPTION
+
+Test a pdf document for what we can do with it on this system.
+Test a pdf file for ability to pass ocr.
+This tests problem pdf documents, for things like malformed xref tables.
+These are pdf documents that for some reason are not spitting out text, and you think they should.
+
+The order of tests are
+
+   basic filesystem check
+   check for PDF::API2 and CAM::PDF
+   PDF::Burst
+   PDF::OCR2
+
+=head1 USAGE
+
+pdfcheck [OPTION].. [FILE]..
+
+=head2 OPTION
+
+   -d       debug   
+   -h       help
+   -v       version
+   -b       attempt PDF::Burst and PDF::OCR2
+
+=head2 Usage Examples
+
+   pdfcheck ./file.pdf
+
+=head1 SEE ALSO
+
+L<PDF::OCR2> - parent package.
+
+=head1 BUGS
+
+If the test fails, and you think this is an error- that the file should pass- then please
+contact leocharre at cpan dot org, with the output and the test file.
+
+   pdfcheck ./file.pdf > output.txt
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 COPYRIGHT
+
+Copyright (c) 2009 Leo Charre. All rights reserved.
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+=cut
+

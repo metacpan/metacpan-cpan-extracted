@@ -1,0 +1,6 @@
+  </div>
+  <div id="footer">
+   A demo of <a href="http://search.cpan.org/dist/Plack-Middleware-TemplateToolkit/">Plack::Middleware::TemplateToolkit</a>
+  </div>
+ </body>
+</html>

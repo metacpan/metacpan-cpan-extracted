@@ -1,0 +1,10 @@
+%semantic token 'c' 
+%tree
+
+%%
+
+S:
+      'c' + 'd' +  
+;
+
+%%

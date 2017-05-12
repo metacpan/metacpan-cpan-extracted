@@ -1,0 +1,9 @@
+Revision history - PGP::FindKey.
+
+0.02  Sun Nov 11 13:08:32 2001
+        - key name returned along with keyid.
+	- dependencies added to makefile.
+	- general tidying and POD re-writing.
+
+0.01  Tue Oct  6 22:17:20 2001 
+	- initial release. 

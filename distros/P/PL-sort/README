@@ -1,0 +1,38 @@
+NAME
+    PL::Sort
+
+SYNOPSIS
+            use PL::Sort qw( plcmp plsort );
+
+            my @sorted_1 = sort { plcmp( $a, $b ) } "N\x{f3}w", "Now", "N\x{f3}";
+            my @sorted_2 = plsort( "N\x{f3}w", "Now", "N\x{f3}" );
+
+DESCRIPTION
+    Implements polish sorting conventions, indepentent on current locales in
+    effect, which are often bad.
+
+SUBROUTINES/METHODS
+    plcmp( STRING1, STRING2 )
+        Subroutine, that makes comparison of two strings.
+
+    plsort( LIST )
+        Subroutine, that sort a list of a strings.
+
+DEPENDENCIES
+    None.
+
+INCOMPATIBILITIES
+    None known.
+
+BUGS AND LIMITATIONS
+    None known.
+
+AUTHOR
+    Strzelecki Łukasz <l.strzelecki@ita.wat.edu.pl>
+
+LICENCE AND COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

@@ -1,0 +1,60 @@
+Parallel-Simple-Dynamic 0.0.4
+
+This module can be used for partition a big list of data into separate parts 
+and processing all of them in parallel on multiple processor system.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+	make clean
+
+DEPENDENCIES
+
+Class::Std;
+Class::Std::Utils;
+Parallel::Simple;
+POSIX;
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Parallel::Simple::Dynamic
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parallel-Simple-Dynamic
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Parallel-Simple-Dynamic
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Parallel-Simple-Dynamic
+
+    Search CPAN
+        http://search.cpan.org/dist/Parallel-Simple-Dynamic/
+
+
+AUTHORS
+
+	Aleksandra Markovets, (marsa@cpan.org)
+        Roger A Hall, (rogerhall@cpan.org)
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 the Authors 
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

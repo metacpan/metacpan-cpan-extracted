@@ -1,0 +1,206 @@
+Package: 3dchess
+Priority: optional
+Section: games
+Installed-Size: 148
+Maintainer: Stephen Stafford <bagpuss@debian.org>
+Architecture: i386
+Version: 0.8.1-10
+Broken: in: Parse::Debian::Packages 0.01
+Depends: libc6 (>= 2.3.1-1), xaw3dg (>= 1.5-6), xlibs (>> 4.1.0)
+Filename: pool/main/3/3dchess/3dchess_0.8.1-10_i386.deb
+Size: 31396
+MD5sum: b6231d8740236f3e2cfa1c0e5ee10ca8
+Description: 3D chess for X11
+ 3 dimensional Chess for X11R6.  Three boards, 96 pieces and 26 directions.
+
+Package: 3ddesktop
+Priority: optional
+Section: utils
+Installed-Size: 400
+Maintainer: Marcelo E. Magallon <mmagallo@debian.org>
+Architecture: i386
+Version: 0.2.4-1
+Depends: libc6 (>= 2.3.1-1), libgcc1 (>= 1:3.2.1-1), libglut3, libimlib2, libstdc++5 (>= 1:3.2.1-1), libttf2, xlibmesa3 | libgl1, xlibs (>> 4.1.0)
+Filename: pool/main/3/3ddesktop/3ddesktop_0.2.4-1_i386.deb
+Size: 65510
+MD5sum: 832fbd9c1c818a7c8f64d87a4c22800a
+Description: "Three-dimensional" desktop switcher
+ 3D-Desktop is an OpenGL program for switching virtual desktops in
+ a seamless 3-dimensional manner.  The current desktop is mapped into a
+ fullscreen 3D environment where you may choose other screens.  Several
+ different visualization modes are available.  A window manager
+ compatible with the GNOME pager standard is required.
+ .
+ The transition from working desktop to fullscreen 3D environment is
+ seamless: when the pager activates you see your current desktop appear
+ to zoom out to a point in space where you can see your other virtual
+ desktops allowing you to select another.
+ .
+ The program is rather memory-hungry and it is CPU intensive, but it's
+ accessible from the command line, which makes it perfect for show
+ floors and impressing your non-UN*X-using friends.
+
+Package: 3dwm-clock
+Priority: optional
+Section: graphics
+Installed-Size: 108
+Maintainer: Debian QA Group <packages@qa.debian.org>
+Architecture: i386
+Source: 3dwm
+Version: 0.3.1-11.3
+Depends: libc6 (>= 2.3.2.ds1-4), libgcc1 (>= 1:3.3.2-1), libnobel (>= 0.3.1), libomniorb4, libomnithread3, libpng12-0 (>= 1.2.5.0-4), libstdc++5 (>= 1:3.3.2-1), omniorb4
+Filename: pool/main/3/3dwm/3dwm-clock_0.3.1-11.3_i386.deb
+Size: 36092
+MD5sum: 59d576dea1096bb9729fcff3d3094124
+Description: 3Dwm applications
+ The 3Dwm clock application (tdwm-clock) is the first real application
+ that is even remotely useful. It makes use of the 3Dwm Nobel API, including
+ the new solid modeling support, to create a three-dimensional analog clock
+ displaying the current time.
+ .
+ 3Dwm is the Three-Dimensional Workspace Manager. It defines a full user
+ environment with support for three-dimensional user interfaces using a 3D
+ widget kit. It also provides some backwards compatiility with all the major
+ existing windowing systems using VNC.
+
+Package: 3dwm-csgclient
+Priority: optional
+Section: graphics
+Installed-Size: 104
+Maintainer: Debian QA Group <packages@qa.debian.org>
+Architecture: i386
+Source: 3dwm
+Version: 0.3.1-11.3
+Depends: libc6 (>= 2.3.2.ds1-4), libgcc1 (>= 1:3.3.2-1), libnobel (>= 0.3.1), libomniorb4, libomnithread3, libpng12-0 (>= 1.2.5.0-4), libstdc++5 (>= 1:3.3.2-1), omniorb4
+Filename: pool/main/3/3dwm/3dwm-csgclient_0.3.1-11.3_i386.deb
+Size: 35096
+MD5sum: bfe05f9cb75577ecaee501ce00e47498
+Description: libsolid client example
+ libsolid is the core 3Dwm library that provides structured data trees for
+ the trace system.
+ .
+ This is a simple example of how libsolid works.
+ .
+ 3Dwm is the Three-Dimensional Workspace Manager. It defines a full user
+ environment with support for three-dimensional user interfaces using a 3D
+ widget kit. It also provides some backwards compatiility with all the major
+ existing windowing systems using VNC.
+
+Package: 3dwm-geoclient
+Priority: optional
+Section: graphics
+Installed-Size: 140
+Maintainer: Debian QA Group <packages@qa.debian.org>
+Architecture: i386
+Source: 3dwm
+Version: 0.3.1-11.3
+Depends: libc6 (>= 2.3.2.ds1-4), libgcc1 (>= 1:3.3.2-1), libmeshio0, libnobel (>= 0.3.1), libomniorb4, libomnithread3, libpng12-0 (>= 1.2.5.0-4), libstdc++5 (>= 1:3.3.2-1), omniorb4
+Filename: pool/main/3/3dwm/3dwm-geoclient_0.3.1-11.3_i386.deb
+Size: 44984
+MD5sum: 93b7022ab88f48bd9a5bb36e83105017
+Description: 3Dwm geometry client example
+ This is a very simple 3Dwm client that connects to the exported GeometryKit
+ in the server, creates a Geometry, loads a 3D file from the local system and
+ passes it to the 3Dwm server.
+ .
+ The 3Dwm server will happily render any geometry that is created, so
+ running geoclient several times will add more geometries to the graphical
+ output. Please note that you may need to zoom out (using the 'X' key) to
+ see graphical output.
+ .
+ The geoclient is able to open native .raw files as well as standard 3ds
+ files (using MeshIO). In other words, you may experiment by loading other
+ files than the supplied office model to the 3Dwm server.
+ .
+ 3Dwm is the Three-Dimensional Workspace Manager. It defines a full user
+ environment with support for three-dimensional user interfaces using a 3D
+ widget kit. It also provides some backwards compatiility with all the major
+ existing windowing systems using VNC.
+
+Package: 3dwm-pickclient
+Priority: optional
+Section: graphics
+Installed-Size: 104
+Maintainer: Debian QA Group <packages@qa.debian.org>
+Architecture: i386
+Source: 3dwm
+Version: 0.3.1-11.3
+Depends: libc6 (>= 2.3.2.ds1-4), libgcc1 (>= 1:3.3.2-1), libnobel (>= 0.3.1), libomniorb4, libomnithread3, libpng12-0 (>= 1.2.5.0-4), libstdc++5 (>= 1:3.3.2-1), omniorb4
+Filename: pool/main/3/3dwm/3dwm-pickclient_0.3.1-11.3_i386.deb
+Size: 34718
+MD5sum: 53f7b9b18a18024f88dbfc1aaa0af4a5
+Description: libzorn client example
+ libzorn is the core of 3Dwm's graphic output functions. It provides basic
+ painting functionalities as well as 3D widgets.
+ .
+ This is a simple example of how libzorn works.
+ .
+ 3Dwm is the Three-Dimensional Workspace Manager. It defines a full user
+ environment with support for three-dimensional user interfaces using a 3D
+ widget kit. It also provides some backwards compatiility with all the major
+ existing windowing systems using VNC.
+
+Package: 3dwm-server
+Priority: optional
+Section: graphics
+Installed-Size: 204
+Maintainer: Debian QA Group <packages@qa.debian.org>
+Architecture: i386
+Source: 3dwm
+Version: 0.3.1-11.3
+Depends: libc6 (>= 2.3.2.ds1-4), libcelsius (>= 0.3.1), libexpat1 (>= 1.95.6), libgarbo (>= 0.3.1), libgcc1 (>= 1:3.3.2-1), libnobel (>= 0.3.1), libomniorb4, libomnithread3, libpng12-0 (>= 1.2.5.0-4), libpolhem (>= 0.3.1), libsdl1.2debian (>> 1.2.6-0), libsolid (>= 0.3.1), libstdc++5 (>= 1:3.3.2-1), libzorn (>= 0.3.1), xlibmesa3-gl | libgl1, xlibmesa3-glu | libglu1, xlibs (>> 4.1.0), omniorb4
+Filename: pool/main/3/3dwm/3dwm-server_0.3.1-11.3_i386.deb
+Size: 64100
+MD5sum: 754c7a521fc6445d0f55d3dbb3077882
+Description: 3Dwm display server
+ This package contains the 3Dwm display server daemon, which commands the input
+ hardware. Clients can connect to it by using it's user interface services.
+ .
+ 3Dwm is the Three-Dimensional Workspace Manager. It defines a full user
+ environment with support for three-dimensional user interfaces using a 3D
+ widget kit. It also provides some backwards compatiility with all the major
+ existing windowing systems using VNC.
+
+Package: 3dwm-texclient
+Priority: optional
+Section: graphics
+Installed-Size: 100
+Maintainer: Debian QA Group <packages@qa.debian.org>
+Architecture: i386
+Source: 3dwm
+Version: 0.3.1-11.3
+Depends: libc6 (>= 2.3.2.ds1-4), libgcc1 (>= 1:3.3.2-1), libnobel (>= 0.3.1), libomniorb4, libomnithread3, libpng12-0 (>= 1.2.5.0-4), libstdc++5 (>= 1:3.3.2-1), omniorb4
+Filename: pool/main/3/3dwm/3dwm-texclient_0.3.1-11.3_i386.deb
+Size: 34306
+MD5sum: eb10c58bc0bea42d3e9950a89dd41ee0
+Description: 3Dwm texture client example
+ This is a simple client used to test the 3Dwm texture capabilities.
+ .
+ 3Dwm is the Three-Dimensional Workspace Manager. It defines a full user
+ environment with support for three-dimensional user interfaces using a 3D
+ widget kit. It also provides some backwards compatiility with all the major
+ existing windowing systems using VNC.
+
+Package: 3dwm-vncclient
+Priority: optional
+Section: graphics
+Installed-Size: 104
+Maintainer: Debian QA Group <packages@qa.debian.org>
+Architecture: i386
+Source: 3dwm
+Version: 0.3.1-11.3
+Depends: libc6 (>= 2.3.2.ds1-4), libgcc1 (>= 1:3.3.2-1), libnobel (>= 0.3.1), libomniorb4, libomnithread3, libpng12-0 (>= 1.2.5.0-4), libstdc++5 (>= 1:3.3.2-1), omniorb4
+Filename: pool/main/3/3dwm/3dwm-vncclient_0.3.1-11.3_i386.deb
+Size: 35142
+MD5sum: dd29dda6fdb4861bb02e2a9b9b7ec0cf
+Description: 3Dwm network client
+ This will open a connection to the VNC server from the 3Dwm server, and the
+ graphical output will be displayed on a single quad in the 3Dwm world (you
+ may need to zoom out to see it). Currently, vncclient supports no interaction
+ with the VNC window (the bindings and the actual communication code have been
+ implemented, only the 3Dwm side is missing).
+ .
+ 3Dwm is the Three-Dimensional Workspace Manager. It defines a full user
+ environment with support for three-dimensional user interfaces using a 3D
+ widget kit. It also provides some backwards compatiility with all the major
+ existing windowing systems using VNC.

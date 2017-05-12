@@ -1,0 +1,16 @@
+TYPEMAP
+Date*    T_PANDA_DATE
+DateRel* T_PANDA_DATEREL
+DateInt* T_PANDA_DATEINT
+
+OUTPUT
+
+T_PANDA_DATE    : T_OPTR(basetype=Date*)
+T_PANDA_DATEREL : T_OPTR(basetype=DateRel*)
+T_PANDA_DATEINT : T_OPTR(basetype=DateInt*)
+
+INPUT
+
+T_PANDA_DATE    : T_OPTR(basetype=Date*)
+T_PANDA_DATEREL : T_OPTR(basetype=DateRel*)
+T_PANDA_DATEINT : T_OPTR(basetype=DateInt*)

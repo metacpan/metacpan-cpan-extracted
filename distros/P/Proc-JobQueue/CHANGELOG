@@ -1,0 +1,33 @@
+
+=== 2012/03/03	0.903
+
+Bumping required version for File::Slurp::Remote
+
+=== 2011/07/26  0.902
+
+Bugfix for RemoteDependencyJob.
+
+=== 2011/06/29  0.901
+
+Major rewrite: moved DependencyQueue features into 
+the base JobQueue so that all JobQueue's can have 
+dependency graphs.  Added EventQueue and deprecated
+DependencyQueue.  Rewrote Sequence to use dependencies.
+
+=== 2011/06/24	0.601
+
+Deprecate the new() constructor of 
+Proc::JobQueue::RemoteDependencyJob in favor of create()
+since the parameters of new() don't make much sense.
+
+Wrote regression tests for dependency jobs.  Fixed many bugs.
+
+Updated documentation.
+
+=== 2011/06/18	0.501
+
+Proc::JobQueue::Move now deletes the orginal file when
+moving files to remote hosts.
+
+Proc::JobQueue::Sequence rewritten
+

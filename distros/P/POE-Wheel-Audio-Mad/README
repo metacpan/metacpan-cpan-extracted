@@ -1,0 +1,33 @@
+POE/Wheel/Audio/Mad version 0.3
+====================================
+
+  This is *slightly* beta right now..  it has a fair
+  amount of documentation but I can't guarantee that
+  it looks very pretty.  It does work,  for me.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Audio::Mad (>= 0.5)
+  Audio::OSS (>= 0.0501)
+  
+  libmad-0.14.x
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Mark McConnell
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself with the exception that you
+must also feel bad if you don't email me with your opinions of this 
+module.

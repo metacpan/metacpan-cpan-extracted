@@ -1,0 +1,39 @@
+Revision history for Plugin-Simple
+
+0.07    2016-03-28
+        - fixed a missed croak() if a plugin file can't be found, breaking
+          tests on certain MSWin platforms
+
+0.06    2016-03-25
+        - we now croak if a plugin package can't be found and no default is
+          set (closes #4)
+        - package in cwd is now loaded properly (closes #5)
+
+
+0.05    2016-03-22
+        - removed _cache()
+        - removed _config()
+        - updated POD to reflect 'default' option
+        - fixed bug where default plugin wasn't being loaded before can() was 
+          being tested
+
+
+0.04    2016-03-21
+        - in scalar context, plugins() will return the first plugin found
+        - we now use Module::Load to do the dirty work, as ExtUtils::Installed
+          relies on .packlist files, which not all modules provide
+        - changed certain tests to use local modules instead of skipping
+        - added github links into Makefile.PL (thanks Mohammad Anwar (MANWAR))
+
+0.03    2016-03-21
+        - fixed github links
+        - cleaned up POD errors
+
+0.02    2016-03-21
+        - added 'can => [sub1, sub2]' param to plugin()
+        - ability to load plugins from a file
+        - test coverage 100%
+
+0.01    2016-03-21
+        First version, released on an unsuspecting world.
+

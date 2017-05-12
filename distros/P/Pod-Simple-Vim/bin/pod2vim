@@ -1,0 +1,21 @@
+#!usr/bin/perl
+
+use strict;
+use warnings;
+
+use Pod::Find;
+use Pod::Simple::Vim;
+
+my $pod_name = shift; 
+die ("Usage: pod2vim Module::Name") unless $pod_name;
+
+my $pod_filename = Pod::Find::pod_where( {-inc => 1}, $pod_name );
+die("No documentation found for \"$pod_name\"") unless $pod_filename;
+
+my $parser = Pod::Simple::Vim->new;
+my $perldoc;
+
+$parser->output_string(\$perldoc);
+$parser->parse_file($pod_filename); 
+
+print $perldoc;

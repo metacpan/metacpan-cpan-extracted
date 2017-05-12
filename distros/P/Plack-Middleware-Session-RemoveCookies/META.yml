@@ -1,0 +1,27 @@
+---
+abstract: 'remove cookies from the requests'
+author:
+  - 'Wallace Reis <wreis@cpan.org>'
+build_requires:
+  Plack::Builder: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Session-RemoveCookies
+requires:
+  HTTP::Headers::Util: 0
+  Plack::Middleware: 0
+  Plack::Request: 0
+  Plack::Util::Accessor: 0
+  parent: 0
+resources:
+  bugtracker: https://github.com/wreis/Plack-Middleware-Session-RemoveCookies/issues
+  homepage: https://github.com/wreis/Plack-Middleware-Session-RemoveCookies
+  repository: git://github.com/wreis/Plack-Middleware-Session-RemoveCookies.git
+version: 0.02

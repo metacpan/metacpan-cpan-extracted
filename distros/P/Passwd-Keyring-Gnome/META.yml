@@ -1,0 +1,41 @@
+---
+abstract: 'Password storage implementation based on GNOME Keyring.'
+author:
+  - 'Marcin Kasperski <Marcin.Kasperski@mekk.waw.pl>'
+build_requires:
+  ExtUtils::CBuilder: '0'
+  Module::Build: '0.19'
+  Pod::Readme: '0'
+  Test::More: '0'
+  Test::Pod::Coverage: '1.0'
+configure_requires:
+  ExtUtils::PkgConfig: '1.12'
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.143240'
+keywords:
+  - passwords
+  - security
+  - secure-storage
+  - keyring
+  - GNOME
+  - seahorse
+  - gnome-keyring
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Passwd-Keyring-Gnome
+provides:
+  Passwd::Keyring::Gnome:
+    file: lib/Passwd/Keyring/Gnome.pm
+    version: '0.3003'
+requires:
+  File::ShareDir: '1.00'
+  perl: '5.006'
+resources:
+  bugtracker: https://bitbucket.org/Mekk/perl-keyring-gnome/issues
+  homepage: http://bitbucket.org/Mekk/perl-keyring-gnome
+  license: http://dev.perl.org/licenses/
+  repository: http://bitbucket.org/Mekk/perl-keyring-gnome
+version: '0.3003'

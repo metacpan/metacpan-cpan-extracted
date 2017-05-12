@@ -1,0 +1,51 @@
+SYNOPSIS
+
+     use Parse::PayPal::TxDetailReport qw(parse_paypal_txdetail_report);
+    
+     my $res = parse_paypal_txdetail_report(files => ["part1.csv", "part2.csv"]);
+
+    Sample result when there is a parse error:
+
+     [400, "Version (10) not supported, only version 11 supported"]
+
+    Sample result when parse is successful:
+
+     [200, "OK", {
+         format => "txdetail_v11",
+         account_id => "...",
+         report_generation_date => 1467375872,
+         report_version         => 11,
+         reporting_window       => "A",
+         transactions           => [
+             {
+                 "3PL Reference ID"                   => "",
+                 "Auction Buyer ID"                   => "",
+                 "Auction Closing Date"               => "",
+                 "Auction Site"                       => "",
+                 "Authorization Review Status"        => 1,
+                 ...
+                 "Transaction Completion Date"        => 1467273397,
+                 ...
+             },
+             ...
+         ],
+     }]
+
+DESCRIPTION
+
+    PayPal provides various kinds reports which you can retrieve from their
+    website under Reports menu. This module provides routine to parse
+    PayPal transaction detail report (from the website under Reports >
+    Transactions > Transactions detail) into a Perl data structure. Version
+    11 is supported. Multiple files are supported. Both the tab-separated
+    format and comma-separated (CSV) format are supported.
+
+SEE ALSO
+
+    https://www.paypal.com
+
+    Specification of transaction detail report format:
+    https://www.paypalobjects.com/webstatic/en_US/developer/docs/pdf/PP_LRD_Gen_TransactionDetailReport.pdf
+
+    Parse::PayPal::TxFinderReport
+

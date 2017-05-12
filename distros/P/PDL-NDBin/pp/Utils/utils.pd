@@ -1,0 +1,68 @@
+# use pp_addbegin() to force =head1 NAME to appear before =head1 FUNCTIONS
+pp_addbegin( <<'EOD' );
+
+# ABSTRACT: XS utils for PDL::NDBin
+
+=head1 NAME
+
+PDL::NDBin::Utils_PP - XS utils for PDL::NDBin
+
+=head1 DESCRIPTION
+
+This module contains internal utilities for PDL::NDBin. The
+subroutines are not intended to be called by the user.
+
+=cut
+
+# silence Test::Pod::Coverage warning
+=for Pod::Coverage set_boundscheck set_debugging
+
+=cut
+
+EOD
+
+# note that version numbers with trailing zeroes (e.g, 0.010) created problems
+# in some of the tests
+pp_setversion( '0.018' );
+
+# check for indx/PDL_Indx support
+use PDL::Lite; # load PDL to check definedness of &PDL::indx
+my $indx_type = defined( &PDL::indx ) ? 'indx' : 'int';
+my $PDL_Indx_type = defined( &PDL::indx ) ? 'PDL_Indx' : 'int';
+
+# ensure that a grid is monotonically increasing or decreasing
+
+my %MAP = ( PDL_Indx_type => $PDL_Indx_type );
+
+pp_def( '_validate_grid',
+	Pars => "grid(n)",
+	Doc => 'Validate a grid.
+
+This function throws an exception if a grid is not monotonically increasing or decreasing.',
+	Code => ( map { my $p = $_; $p =~ s/%([^%]+)%/$MAP{$1}/eg; $p } '
+	        %PDL_Indx_type% n = $SIZE(n);
+	        %PDL_Indx_type% nm1 = n - 1;
+		%PDL_Indx_type% idx;
+	        if ( $grid(n => 0 ) < $grid(n => nm1) ) {
+		  for ( idx = 0 ; idx < n - 1; idx++ ) {
+		      %PDL_Indx_type% idx1 = idx + 1;
+		      if ( $grid(n => idx ) >= $grid( n => idx1 ) )
+		        barf( "grid is not monotonically increasing\n" );
+		  }
+		}
+	        else if ( $grid(n => 0 ) > $grid(n => nm1) ) {
+		  for ( idx = 0 ; idx < n - 1; idx++ ) {
+		      %PDL_Indx_type% idx1 = idx + 1;
+		      if ( $grid(n => idx ) <= $grid( n => idx1 ) )
+		        barf( "grid is not monotonically decreasing\n" );
+		  }
+		}
+		else {
+	          barf( "grid is not monotonically increasing or decreasing\n" );
+		}
+	' ),
+);
+
+pp_done();
+
+# vim:set filetype=perl:

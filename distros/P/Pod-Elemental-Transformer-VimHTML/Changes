@@ -1,0 +1,12 @@
+Revision history for Pod-Elemental-Transformer-VimHTML
+
+0.093582  2013-10-12 22:18:38 America/New_York
+          update bugtracker and repo
+
+          fix spelling of dist name!
+
+0.093581  2011-11-02 16:21:31 America/New_York
+          work around Text::VimColor expecting encoded text
+
+0.093580  2009-12-24 21:19:32 America/New_York
+          first release!

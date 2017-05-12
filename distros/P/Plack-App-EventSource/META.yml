@@ -1,0 +1,43 @@
+---
+abstract: 'EventSource/SSE for Plack'
+author:
+  - 'Viacheslav Tykhanovskyi, <viacheslav.t@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-App-EventSource
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::App::EventSource:
+    file: lib/Plack/App/EventSource.pm
+    version: '0.03'
+  Plack::App::EventSource::Connection:
+    file: lib/Plack/App/EventSource/Connection.pm
+requires:
+  Plack: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/vti/plack-app-eventsource/issues
+  homepage: https://github.com/vti/plack-app-eventsource
+  repository: git://github.com/vti/plack-app-eventsource.git
+version: '0.03'
+x_authority: cpan:VTI
+x_contributors:
+  - 'Jakob Voss <voss@gbv.de>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

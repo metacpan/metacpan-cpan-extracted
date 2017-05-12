@@ -1,0 +1,20 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Repository.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Plack/Middleware/Reproxy.pm
+lib/Plack/Middleware/Reproxy/Callback.pm
+lib/Plack/Middleware/Reproxy/Furl.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README.md
+t/001_callback.t
+t/002_furl.t
+t/ReproxyTest.pm

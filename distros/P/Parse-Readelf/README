@@ -1,0 +1,70 @@
+Parse-Readelf version 0.18
+==========================
+
+Parse::Readelf is a module to parse the output of readelf from the GNU
+binutils suite.  At the moment only small parts of the debugging
+section are supported to get information about the structure layout of
+the variables of a binary object.  Also only Dwarf-2 debugging
+information is understood.
+
+INSTALLATION
+
+To build, test and install this module, run the following commands:
+
+    perl Build.PL
+    perl Build
+    perl Build test
+    perl Build install
+
+If you prefer the traditional way of installation, use the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+As this module parses the output of readelf of course you need that.
+objdump would work as well but as it's part of the same suite there is
+no real reason to use it instead of readelf (at least for Dwarf-2, for
+Stabs or other debugging formats there might be a difference).
+
+The test-suite needs the Unix command "cat" to simulate a test run
+with prepared output.
+
+In addition you'll need gcc (g++) if you like to test the examples in
+the "Examples" directory.
+
+Other than that the example script "run_examples.pl" needs a shell
+supporting I/O redirection.  If you don't have one, you probabely have
+to try the examples by hand.
+
+This module requires these other standard modules and libraries:
+
+    Carp
+    File::Spec
+    Test::More
+
+BUGS
+
+This is quite incomplete yet.  I only worked on that what I needed
+most which was the memory layout of variables and data types.
+
+Also note that though the self-tests almost completely cover the code,
+they use prerecorded input which may differ from your installation.
+If that's the case (and the results are not what you expected), please
+send me an example output of "readelf --debug-dump=line,info --wide"
+(e.g. from Examples/StructureLayoutTest.cpp, see head of that source
+for further details).
+
+Feedback, additional debugger outputs or patches are very much
+appreciated.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2009 by Thomas Dorner (dorner (AT) cpan (DOT) org)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.1 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,23 @@
+Changes for Perl extension Portable-Dist
+
+1.06 Mon 25 Feb 2013
+	- pl2bat & related hack - support for scripts in site/bin + vendor/bin
+
+1.05 Mon 7 May 2012
+	- removing dependency on Tie::Slurp
+
+1.04 Wed 2 Nov 2011
+	- Switch to a production version number (ADAMK)
+	- Updating to Module::Install 1.04 (ADAMK)
+	- Support for vendor directories (CSJEWELL)
+	- Fix some false negative test failures (KMX)
+
+0.03 Mon 9 Feb 2009
+	- Adding quotes around the "%~dp0perl.exe"
+
+0.02 Tue 5 Aug 2008
+	- Apply suggestions from snaury on use.perl to improve variables
+	- Adding tests that actually verify that the batch files work
+
+0.01 Thu 31 Jul 2008
+	- Creating initial version

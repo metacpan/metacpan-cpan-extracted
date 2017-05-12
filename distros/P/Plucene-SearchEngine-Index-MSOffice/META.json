@@ -1,0 +1,77 @@
+{
+   "abstract" : "an unmaintained set of Plucene backends for indexing Microsoft Office formats",
+   "author" : [
+      "Sopan Shewale <sopan.shewale@gmail.com>",
+      "Mike Doherty <doherty@pythian.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plucene-SearchEngine-Index-MSOffice",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "inc",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "IPC::Run3" : "0",
+            "Plucene::SearchEngine::Index::Base" : "0",
+            "Plucene::SearchEngine::Index::HTML" : "0",
+            "Plucene::SearchEngine::Index::Text" : "0",
+            "Spreadsheet::ParseExcel" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/doherty/Plucene-SearchEngine-Index-MSOffice/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/doherty/Plucene-SearchEngine-Index-MSOffice.git",
+         "web" : "https://github.com/doherty/Plucene-SearchEngine-Index-MSOffice"
+      }
+   },
+   "version" : "0.001"
+}
+

@@ -1,0 +1,47 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<!-- ZOOMSTOP -->
+
+<HTML>
+
+<!-- *** Created by pp2html, build 1.21 from PerlPoint-Converters 1.0202  -->
+
+<HEAD>
+
+  <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+  <meta http-equiv="Content-Script-Type" content="text/javascript">
+
+<!-- ZOOMRESTART -->
+
+
+
+<TITLE> Tags</TITLE>
+</HEAD>
+
+<!-- ************************************************************** -->
+<BODY bgcolor="#FFFFFF" text="#000000" link="#0000CC" vlink="#AAAAAA" alink="#FF0000">
+<a name=" Tags"></a>
+
+<H1> Tags
+</H1>
+
+
+<P>
+Color <FONT COLOR=red>tag</FONT> Color <FONT FACE=Arial COLOR=#ffff99>tag</FONT> Color <FONT COLOR=red SIZE=+2>tag</FONT>
+</P>
+
+<UL>
+<LI>Color <FONT COLOR=red>tag</FONT></LI>
+<LI>Color <FONT COLOR=red SIZE=+2>tag</FONT></LI>
+<LI>Color <FONT FACE=Arial COLOR=#ffff99>tag</FONT></LI>
+</UL>
+
+
+<TABLE CELLPADDING=5><TR><TD bgcolor="#E5E5E5"><PRE>
+<B><FONT COLOR="#000000">
+ Color <FONT COLOR=red>tag</FONT>
+ Color <FONT FACE=Arial COLOR=#ffff99>tag</FONT>
+ Color <FONT COLOR=red SIZE=2>tag</FONT></FONT></B></PRE></TD></TR></TABLE>
+</BODY>
+</HTML>

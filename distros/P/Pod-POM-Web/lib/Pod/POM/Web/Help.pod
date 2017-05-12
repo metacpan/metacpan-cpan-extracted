@@ -1,0 +1,193 @@
+=head1 NAME
+
+Pod::POM::Web::Help - How to use this Perl documentation
+
+=head1 DESCRIPTION
+
+L<Pod::POM::Web> is a Web application for browsing
+the documentation of Perl components installed
+on your local machine. Since pages are dynamically 
+generated, they are always in sync with code actually
+installed. 
+
+This application makes heavy use of dynamic HTML techniques
+like Ajax calls, autocompletion of search fields, etc., so 
+it requires a modern browser. It has been tested on Firefox 3.5.6
+and MSIE 8, but should also work more or less correctly in other browsers
+like Safari, Konqueror or Google Chrome.
+
+=head2 Searching
+
+Users can type search criteria in the single search input field
+and then hit C<RETURN>. The behaviour depends on which 
+search category was chosen in the search menu :
+
+=over
+
+=item perlfunc
+
+The input field should contain one of the (many) builtin
+perl functions. An autocompleter is automatically activated
+to help choose a proper function name. The answer will be
+an excerpt from the the L<perlfunc> documentation, just
+for that specific  function (more or less equivalent to the
+C<perldoc -f> command).
+
+
+=item perlfaq
+
+This will search all C<perlfaq> entries whose title contains
+the word given in the search input field.
+
+=item modules
+
+The input field should contain a module name.
+The answer will be the documentation for that module.
+If the local Perl installation was indexed (see below), then
+an autocompleter is automatically activated
+to help choose a proper module name. 
+
+
+=item fulltext
+
+This only works if the local Perl installation was indexed
+(see L<Pod::POM::Web::Indexer> on how to do it).
+In that case, the input field can contain 
+one or several words, possibly connected
+by boolean operators (L<Search::QueryParser>).
+The answer will be a list of modules that
+match that query, either in the documentation
+or in the source code. Each module is presented
+with some contextual excerpts of the matching words.
+
+=back
+
+
+=head2 Browsing
+
+The browsing tree starts with two sections B<Perl docs> and
+B<Pragmas>, containg core Perl documentation. The third section
+B<Scripts> reflects the structure of Perl scripts installed in 
+C<perl/bin>. The fourth section 
+B<Modules> reflects the structure of installed modules on the local
+machine (the various C<@INC> directories such as C<lib>, C<vendor/lib>,
+C<site/lib>, etc. are collapsed into a single tree). 
+Only top-level nodes are loaded initially; subnodes are
+fetched dynamically through Ajax calls when opening the nodes.
+
+Navigation in the tree is either with the mouse or with the
+keyboard. At any point in time, at most one node is I<selected> : this
+is the one that receives keyboard events. Hence if the tree has no
+selected node, no keyboard events are interpreted.
+
+=head3 Mouse events
+
+Clicking on a node label selects that node,
+and displays the corresponding documentation page
+in the other frame (if applicable -- some nodes
+are just containers of other nodes, without their own
+documentation page).
+
+Clicking on the square C<+>/C<-> icon on the left of the
+label toggles the open/closed status of the node.
+
+=head3 Keyboard events
+
+Typing a few letters will automatically select
+the next node starting with those letters.
+
+Furthermore, the following special keys can be used to navigate
+within the tree :
+
+
+=over
+
+=item C<keypad +>
+
+open the node
+
+=item C<keypad ->
+
+close the node
+
+=item C<keypad *>
+
+open the node and all its subnodes 
+
+=item C<keypad />
+
+close the node and all its subnodes
+
+=item C<Ctrl-keypad *>
+
+activate "show all" mode (the content of closed nodes is nevertheless
+visible, which may be useful for printing)
+
+
+=item C<Ctrl-keypad />
+
+deactivate the "show all" mode
+
+
+=item C<TAB>
+
+if closed, open the node; if already opened, pass focus to the next
+item (maybe the next node, or another tabindex-enabled HTML element,
+such as a form control).
+
+=item C<E<uarr>>
+
+move to previous displayed node
+
+=item C<E<darr>>
+
+move to next displayed node
+
+=item C<E<larr>>
+
+if open, close the node; if already closed, move to parent node
+
+=item C<E<rarr>>
+
+if closed, open the node; if already open, move to next subnode
+
+=item C<HOME>
+
+select the first node of the tree
+
+=item C<END>
+
+select the last visible subnode of the tree
+
+=item C<Ctrl-R>
+
+refresh the node's content (if that node has an URL for dynamic
+content).
+
+=item C<RETURN>
+
+select the node and display its documentation page
+
+=item C<Ctrl-1>..C<Ctrl-9>
+
+close all nodes at level of the specified digit, and open all nodes
+above
+
+=back
+
+=head1 SEE ALSO
+
+L<Pod::Webserver> is another, earlier implementation of a Perl documentation 
+server.
+
+L<Pod::Browser> is a L<Catalyst> application serving local POD modules.
+L<Pod::Server> is yet another 
+
+
+
+
+Perl documentation can be browsed in command-line mode
+through the L<perldoc> utility.
+
+See L<Pod::POM::Web> for information about how this application
+is implemented.

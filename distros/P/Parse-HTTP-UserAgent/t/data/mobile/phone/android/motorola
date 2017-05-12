@@ -1,0 +1,96 @@
+[AGENT]
+
+Mozilla/5.0 (Linux; U; Android 2.2; en-us; DROID2 GLOBAL Build/S273) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+
+'parser'      => 'android',
+'mobile'      => 1,
+'strength'    => 'U',
+'os'          => 'Android 2.2 (S273)',
+'extras'      => ['KHTML, like Gecko','Safari/533.1'],
+'toolkit'     => ['AppleWebKit','533.1','533.100'],
+'version_raw' => '4.0',
+'lang'        => 'en-us',
+'version'     => '4.000',
+'name'        => 'Android',
+'device'      => 'DROID2 GLOBAL',
+
+[AGENT]
+
+Mozilla/5.0 (Linux; U; Android 3.0; en-us; Xoom Build/HRI39) AppleWebKit/534.13 (KHTML, like Gecko) Version/4.0 Safari/534.13
+
+'parser'      => 'android',
+'mobile'      => 1,
+'strength'    => 'U',
+'os'          => 'Android 3.0 (HRI39)',
+'extras'      => ['KHTML, like Gecko','Safari/534.13'],
+'toolkit'     => ['AppleWebKit','534.13','534.130'],
+'version_raw' => '4.0',
+'tablet'      => 1,
+'lang'        => 'en-us',
+'version'     => '4.000',
+'name'        => 'Android',
+'device'      => 'Xoom',
+
+[AGENT]
+
+Mozilla/5.0 (Linux; U; Android 2.2; en-us; Droid Build/FRG22D) AppleWebKit/533.1 (KHTML, like Gecko) Version/4.0 Mobile Safari/533.1
+
+'parser'      => 'android',
+'mobile'      => 1,
+'strength'    => 'U',
+'os'          => 'Android 2.2 (FRG22D)',
+'extras'      => ['KHTML, like Gecko','Safari/533.1'],
+'toolkit'     => ['AppleWebKit','533.1','533.100'],
+'version_raw' => '4.0',
+'lang'        => 'en-us',
+'version'     => '4.000',
+'name'        => 'Android',
+'device'      => 'Droid',
+
+[AGENT]
+
+Mozilla/5.0 (Linux; U; Android 2.1-update1; en-us; DROIDX Build/VZW) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17 480X854 motorola DROIDX
+
+'parser'      => 'android',
+'mobile'      => 1,
+'strength'    => 'U',
+'os'          => 'Android 2.1-update1 (VZW)',
+'extras'      => ['KHTML, like Gecko','Safari/530.17','480X854','motorola','DROIDX'],
+'toolkit'     => ['AppleWebKit','530.17','530.170'],
+'version_raw' => '4.0',
+'lang'        => 'en-us',
+'version'     => '4.000',
+'name'        => 'Android',
+'device'      => 'DROIDX',
+
+[AGENT]
+
+Mozilla/5.0 (Linux; U; Android 2.1-update1; en-us; Droid Build/ESE81) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/530.17
+
+'parser'      => 'android',
+'mobile'      => 1,
+'strength'    => 'U',
+'os'          => 'Android 2.1-update1 (ESE81)',
+'extras'      => ['KHTML, like Gecko','Safari/530.17'],
+'toolkit'     => ['AppleWebKit','530.17','530.170'],
+'version_raw' => '4.0',
+'lang'        => 'en-us',
+'version'     => '4.000',
+'name'        => 'Android',
+'device'      => 'Droid',
+
+[AGENT]
+
+Mozilla/5.0 (Linux; U; Android 2.0; en-us; Droid Build/ESD20) AppleWebKit/530.17 (KHTML, like Gecko) Version/4.0 Mobile Safari/ 530.17 
+
+'parser'      => 'android',
+'mobile'      => 1,
+'strength'    => 'U',
+'os'          => 'Android 2.0 (ESD20)',
+'extras'      => ['KHTML, like Gecko','Safari/','530.17'],
+'toolkit'     => ['AppleWebKit','530.17','530.170'],
+'version_raw' => '4.0',
+'lang'        => 'en-us',
+'version'     => '4.000',
+'name'        => 'Android',
+'device'      => 'Droid',

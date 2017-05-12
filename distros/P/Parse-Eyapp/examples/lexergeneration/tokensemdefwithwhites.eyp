@@ -1,0 +1,16 @@
+%token NUM = /(\d+)/
+%token ID  = { /\G(\w+)/gc and return ('ID', $1); }
+%whites  { /\G(\s*(?:#.*)?\s*)/gc and $self->tokenline($1 =~ tr{\n}{}) }
+
+%%
+A:   
+      B
+    | A B
+;
+
+B: 
+      ID
+    | a
+    | NUM
+;
+%%

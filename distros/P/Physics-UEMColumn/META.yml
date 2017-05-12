@@ -1,0 +1,67 @@
+---
+abstract: 'An Implementation of the Analytic Gaussian (AG) Model for Ultrafast Electron Pulse Propagation'
+author:
+  - 'Joel Berger'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Physics-UEMColumn
+no_index:
+  directory:
+    - examples
+    - t
+  file:
+    - README.pod
+provides:
+  Physics::UEMColumn:
+    file: lib/Physics/UEMColumn.pm
+    version: 0.901
+  Physics::UEMColumn::Accelerator:
+    file: lib/Physics/UEMColumn/Accelerator.pm
+    version: 0
+  Physics::UEMColumn::Auxiliary:
+    file: lib/Physics/UEMColumn/Auxiliary.pm
+    version: 0
+  Physics::UEMColumn::Column:
+    file: lib/Physics/UEMColumn/Column.pm
+    version: 0
+  Physics::UEMColumn::DCAccelerator:
+    file: lib/Physics/UEMColumn/DCAccelerator.pm
+    version: 0
+  Physics::UEMColumn::Element:
+    file: lib/Physics/UEMColumn/Element.pm
+    version: 0
+  Physics::UEMColumn::Laser:
+    file: lib/Physics/UEMColumn/Laser.pm
+    version: 0
+  Physics::UEMColumn::MagneticLens:
+    file: lib/Physics/UEMColumn/MagneticLens.pm
+    version: 0
+  Physics::UEMColumn::Photocathode:
+    file: lib/Physics/UEMColumn/Photocathode.pm
+    version: 0
+  Physics::UEMColumn::Pulse:
+    file: lib/Physics/UEMColumn/Pulse.pm
+    version: 0
+  Physics::UEMColumn::RFCavity:
+    file: lib/Physics/UEMColumn/RFCavity.pm
+    version: 0
+recommends:
+  PDL: 0
+  PDL::Graphics::Prima: 0
+requires:
+  Method::Signatures: 0
+  Moose: 0
+  MooseX::Types::NumUnit: 0
+  PerlGSL::DiffEq: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: http://github.com/jberger/Physics-UEMColumn/issues
+  repository: http://github.com/jberger/Physics-UEMColumn
+version: 0.901

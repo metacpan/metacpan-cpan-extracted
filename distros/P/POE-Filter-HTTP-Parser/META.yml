@@ -1,0 +1,33 @@
+---
+abstract: 'A HTTP POE filter for HTTP clients or servers'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: '6.42'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.47'
+  Test::POE::Client::TCP: '0.1'
+  Test::POE::Server::TCP: '0.16'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Filter-HTTP-Parser
+requires:
+  Encode: '0'
+  HTTP::Parser: '0.06'
+  HTTP::Request: '0'
+  HTTP::Response: '0'
+  HTTP::Status: '0'
+  POE: '1.003'
+  perl: v5.6.0
+resources:
+  homepage: https://github.com/bingos/poe-filter-http-parser
+  repository: https://github.com/bingos/poe-filter-http-parser.git
+version: '1.08'

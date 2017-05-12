@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 fd95b68f03486ef0bc44ad34a47a130c661ed30e CONTRIBUTORS
+SHA1 1fb9b44941cd74036c466ec3a05229a84a6acda0 Changes
+SHA1 1fdb4343640b1dc9bf826eda0dd096ecbf52930d INSTALL
+SHA1 9dada6b6e91e293b8a7eec08f51e3b28af9d8b8f MANIFEST
+SHA1 f2e3caf3e6a69a99238d4d4264d203a45b883da0 META.json
+SHA1 55855abf212a7dafc16a2c7d91562a4274e451a9 META.yml
+SHA1 52760fb8f03cb7dba7a3f336d746e84709a3aa0b Makefile.PL
+SHA1 3016da42d4c55c751265d7e4272436b3c8212e46 README.mkdn
+SHA1 15c889dc5dae788fc02fb6a7cc28cb9c49e4d82e cpanfile
+SHA1 4d6679ceacdf96ba45b5e0e32d3f22f9a73770a0 doap.xml
+SHA1 0bc4eff0fe3043f9fe2feb21b028780856e87203 examples/callback.pl
+SHA1 1b7dab748d481089c80d416d93b96115dc4486d4 examples/callback_data.pl
+SHA1 e14c174c581239b856e5b5c279716951a70f6eca examples/parallel_get.pl
+SHA1 a010a71ce9cf3396a78247acd9144fcfc28bb7cf lib/Parallel/ForkManager.pm
+SHA1 562bfacd340b01259604e05492ef7f527d480958 t/00-compile.t
+SHA1 4439fa08acd3f8cfe4658640218be5fc4ed6c260 t/00-load.t
+SHA1 98b37452dda153ac3d85a6ae676ef248755d35ec t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 4db3efffcfef330a6451166d6c7993f92bbba218 t/01-utf8-all.t
+SHA1 7ff8a7ee4a5960791a23a739a43b1628279548ef t/02-callback.t
+SHA1 ff8a6cea67626e7da6bf58c29c9b994d3991e4c9 t/03-callback-data.t
+SHA1 19208bbd9b74cd32cbc76dcbaf67c8ca4c17e866 t/basic-methods.t
+SHA1 6dce2e71e2969e784eb9a390a63b95ea05baef54 t/callback.txt
+SHA1 cef973989a30e506d69e7ab93ad174fcd10a1d99 t/callback_data.txt
+SHA1 fabacecff55314ac9fddec9a583345bebe09663f t/changing-pids.t
+SHA1 e9904ab9b4005de2fcb193ace4657acd1c42f1b0 t/start_child.t
+SHA1 e5f4aae96fc318e949d2367743e5d2ee12063246 t/waitpid-conflict.t
+SHA1 a91aaaf17a7a2878a8b031d2f686dc4bebefd2e1 t/waitpid-waitonechild.t
+SHA1 2fb16c9b79833c349b8429bcb047ffcbf64772a6 t/waitpid_blocking.t
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAldzAe4ACgkQ34Hwf+GwC4y23wCgnxUtO6xVSRJbQgcBtkPr2t9k
+t4gAoJXtjUYebtyxZ+b4CEQCXFwvO//p
+=oOi+
+-----END PGP SIGNATURE-----

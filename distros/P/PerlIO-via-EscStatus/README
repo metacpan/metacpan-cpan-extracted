@@ -1,0 +1,41 @@
+Copyright 2008, 2009 Kevin Ryde
+
+This file is part of PerlIO-via-EscStatus.
+
+PerlIO-via-EscStatus is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+PerlIO-via-EscStatus is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with PerlIO-via-EscStatus.  If not, see <http://www.gnu.org/licenses/>.
+
+
+
+EscStatus is a PerlIO layer for printing a status line on a dumb
+terminal.  The line is erased and redrawn with carriage returns and
+backspaces.  Status lines are communicated "in band" to the layer
+using an escape sequence.
+
+The idea is that because it's a layer it sees all ordinary output made
+with "print" etc from anywhere in the program or libraries and can
+erase the status line to let that output go out as normal, with the
+status then reprinted.
+
+The prerequisites are
+
+    * Perl version 5.8.3 or higher (probably)
+    * Regexp::Common
+    * Term::Size
+
+An extension for ProgressMonitor is provided, but ProgressMonitor is
+entirely optional.
+
+The EscStatus home page is
+
+http://user42.tuxfamily.org/perlio-via-escstatus/index.html

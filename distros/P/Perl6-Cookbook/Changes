@@ -1,0 +1,25 @@
+Changes of Perl6::Cookbook
+
+v0.05 2009.01.23
+
+    Create Perl6::Cookbook/*.pod files for all the chapters.
+
+v0.04 2009.01.23
+    More examples
+    Special case in testing random numbers
+    Remove the need of the PARROT_PATH for the installation
+    Add load test for the Perl 5 module.
+    Add perl6_cookbook script to show the location of the
+        installed examples.
+
+v0.03 2009.01.21
+    More examples
+    Eliminate all TODO tests as they all pass now
+
+v0.02 2009.01.03
+    Add three more examples
+    TODO Test can now be separated for the STDOUT and STDERR
+
+v0.01 2009.01.02
+    First version released
+

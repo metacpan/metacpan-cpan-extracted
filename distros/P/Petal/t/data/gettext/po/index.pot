@@ -1,0 +1,71 @@
+# --- PLEASE EDIT THE LINES BELOW CORRECTLY ---
+# SOME DESCRIPTIVE TITLE.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2004-07-21 15:02+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI +ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0\n"
+"Language-Code: en\n"
+"Language-Name: English\n"
+"Preferred-Encodings: latin1 utf-8\n"
+"Domain: testdomain\n"
+
+#: t/data/gettext/html/menu-no-css.html
+#. <a accesskey="S" href="#page_content" i18n:attributes="xml:lang two-letter-lang-code;                         lang two-letter-lang-code;                         title menu-skip-nav-title" i18n:translate="menu-skip-nav" lang="en" title="Skip the navigation and jump straight to the page content [ Accesskey S ]" xml:lang="en">
+msgid "Skip the navigation and jump straight to the page content [ Accesskey S ]"
+msgstr ""
+
+
+#: t/data/gettext/html/index.html
+#. <a alt="a search engine" href="http://google.com/" i18n:attributes="alt a-search-engine">
+msgid "a search engine"
+msgstr ""
+
+
+#: t/data/gettext/html/menu-no-css.html
+#. <a accesskey="S" href="#page_content" i18n:attributes="xml:lang two-letter-lang-code;                         lang two-letter-lang-code;                         title menu-skip-nav-title" i18n:translate="menu-skip-nav" lang="en" title="Skip the navigation and jump straight to the page content [ Accesskey S ]" xml:lang="en">
+## 1 more: t/data/gettext/html/menu-no-css.html
+msgid "en"
+msgstr ""
+
+
+#: t/data/gettext/html/index.html
+#. <p i18n:translate="hello-this-is-a-test">
+#.  Hello, this is a test.
+#. </p>
+msgid "hello-this-is-a-test"
+msgstr "Hello, this is a test."
+
+
+#: t/data/gettext/html/menu-no-css.html
+#. <a accesskey="S" href="#page_content" i18n:attributes="xml:lang two-letter-lang-code;                         lang two-letter-lang-code;                         title menu-skip-nav-title" i18n:translate="menu-skip-nav" lang="en" title="Skip the navigation and jump straight to the page content [ Accesskey S ]" xml:lang="en">
+#.  Skip Navigation
+#. </a>
+msgid "menu-skip-nav"
+msgstr "Skip Navigation"
+
+
+#: t/data/gettext/html/index.html
+#. <p i18n:translate="you-are-user">
+#.         You are user
+#.  ${user}
+#. </p>
+msgid "you-are-user"
+msgstr "You are user ${user}"
+
+#- Removed msgids:
+# 
+
+#- Added msgids:
+#  hello-this-is-a-test you-are-user "a search engine" menu-skip-nav en
+# "Skip the navigation and jump straight to the page content [ Accesskey S ]"
+
+#- Added msgids by merging file None:
+# 

@@ -1,0 +1,190 @@
+Start off with an array of (references to) arrays: 
+
+    @array = ( [1,2,3], ['a', 'u', 'B', 'Q', 'M'], ['%'] );
+
+
+Now a shallow copy looks like this: 
+
+    @shallow = ( $array[0], $array[1], $array[2] );
+
+
+This copies the references over from @array to @shallow. Now @shallow
+is ( [1,2,3], ['a', 'u', 'B', 'Q', 'M'], ['%'] ) -- the same as
+@array. But there's only one 2 and one 'Q', since there are two
+references pointing to the same place.  
+
+Here's what it looks like in the debugger: 
+
+  DB<5> x \@array
+ 0  ARRAY(0x10e5560)
+   0  ARRAY(0x10e5464)
+      0  1
+      1  2
+      2  3
+   1  ARRAY(0x10e5638)
+      0  'a'
+      1  'u'
+      2  'B'
+      3  'Q'
+      4  'M'
+   2  ARRAY(0x10e568c)
+      0  '%'
+  DB<6> x \@shallow
+ 0  ARRAY(0xcaef60)
+   0  ARRAY(0x10e5464)
+      0  1
+      1  2
+      2  3
+   1  ARRAY(0x10e5638)
+      0  'a'
+      1  'u'
+      2  'B'
+      3  'Q'
+      4  'M'
+   2  ARRAY(0x10e568c)
+      0  '%'
+
+
+You can see that @array lives somewhere around 0x10e5560, whereas
+@shallow lives around 0xcaef60, but the three references point to
+arrays in the same place. If I now change $array[1][2] to 'C', watch
+what happens:  
+
+  DB<7> $array[1][2] = 'C'
+
+
+  DB<8> x \@array
+ 0  ARRAY(0x10e5560)
+   0  ARRAY(0x10e5464)
+      0  1
+      1  2
+      2  3
+   1  ARRAY(0x10e5638)
+      0  'a'
+      1  'u'
+      2  'C'
+      3  'Q'
+      4  'M'
+   2  ARRAY(0x10e568c)
+      0  '%'
+  DB<9> x \@shallow
+ 0  ARRAY(0xcaef60)
+   0  ARRAY(0x10e5464)
+      0  1
+      1  2
+      2  3
+   1  ARRAY(0x10e5638)
+      0  'a'
+      1  'u'
+      2  'C'
+      3  'Q'
+      4  'M'
+   2  ARRAY(0x10e568c)
+      0  '%'
+
+$shallow[1][2] is now also 'C'! This is because it just followed the
+pointer to the array at 0x10e5638 and found the modified data there.  
+
+Now see what happens when I do a copy that's one level deeper -- not
+just copying the references but the data behind the references:  
+
+ @deep = ( [ @{$array[0]} ], [ @{$array[1]} ], [ @{$array[2]} ] );
+
+This uses the knowledge that @array[0..2] are all references to
+arrays, and it only goes one level deeper. A more general algorithm
+(such as Storable's dclone, mentioned in `perldoc -q copy`) would do a
+walk and copy differently depending on the type of reference it
+encounters at each stage.  
+
+Now watch: 
+
+  DB<12> x \@array
+ 0  ARRAY(0x10e5560)
+   0  ARRAY(0x10e5464)
+      0  1
+      1  2
+      2  3
+   1  ARRAY(0x10e5638)
+      0  'a'
+      1  'u'
+      2  'C'
+      3  'Q'
+      4  'M'
+   2  ARRAY(0x10e568c)
+      0  '%'
+  DB<13> x \@deep
+ 0  ARRAY(0x10ef89c)
+   0  ARRAY(0x10eb298)
+      0  1
+      1  2
+      2  3
+   1  ARRAY(0x10eb2c4)
+      0  'a'
+      1  'u'
+      2  'C'
+      3  'Q'
+      4  'M'
+   2  ARRAY(0x10ef07c)
+      0  '%'
+
+
+The references point to different places. 
+
+Now if you change @array, @deep doesn't change: 
+
+  DB<14> push @{$array[2]}, '$'
+
+
+  DB<15> x \@array
+ 0  ARRAY(0x10e5560)
+   0  ARRAY(0x10e5464)
+      0  1
+      1  2
+      2  3
+   1  ARRAY(0x10e5638)
+      0  'a'
+      1  'u'
+      2  'C'
+      3  'Q'
+      4  'M'
+   2  ARRAY(0x10e568c)
+      0  '%'
+      1  '$'
+  DB<16> x \@shallow
+ 0  ARRAY(0xcaef60)
+   0  ARRAY(0x10e5464)
+      0  1
+      1  2
+      2  3
+   1  ARRAY(0x10e5638)
+      0  'a'
+      1  'u'
+      2  'C'
+      3  'Q'
+      4  'M'
+   2  ARRAY(0x10e568c)
+      0  '%'
+      1  '$'
+  DB<17> x \@deep
+ 0  ARRAY(0x10ef89c)
+   0  ARRAY(0x10eb298)
+      0  1
+      1  2
+      2  3
+   1  ARRAY(0x10eb2c4)
+      0  'a'
+      1  'u'
+      2  'C'
+      3  'Q'
+      4  'M'
+   2  ARRAY(0x10ef07c)
+      0  '%'
+
+
+@deep didn't change, since it's got its own value of the anonymous
+array containing '%', but @shallow did.  
+
+Hope this helps a bit. 
+
+Cheers, Philip -- Philip Newton <nospam.newton@gmx.li> 
+If you're not part of the solution, you're part of the precipitate

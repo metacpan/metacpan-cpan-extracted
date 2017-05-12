@@ -1,0 +1,38 @@
+Palm::DiabetesPilot
+
+DiabetesPilot (http://diabetespilot.com/) helper module for Palm::PDB
+(p5-Palm). Also included in the distribution is a ColdSync
+(http://coldsync.org) conduit for extracting Diabetes Pilot reports.
+
+LICENSING
+=========
+
+Copyright 2003, 2004 by Christophe Beauregard
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the Artistic License, a copy of which
+can be found with the Perl distribution.
+
+This code is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+This is from a reverse engineered database schema. That means it may
+not work in all instances, it may be broken by different versions (I've
+only tested with DiabetesPilot 3.0), and if you're making decisions about
+insulin consumption based entirely on what it says...
+
+INSTALLING
+==========
+
+This is a standard perl module.
+
+	perl Makefile.PL
+	make
+	make install
+
+FEEDBACK
+==========
+
+	cpb@cpan.org (Christophe Beauregard)
+

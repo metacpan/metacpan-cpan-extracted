@@ -1,0 +1,20 @@
+---
+name: Pod-Simple-Wiki-Wikka
+version: 0.09
+author:
+  - 'Daniel Staal - <DStaal@usa.net>'
+abstract: A class for creating Pod to WikkiWiki filters.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Pod::Simple::Wiki: 0
+dynamic_config: 0
+provides:
+  Pod::Simple::Wiki::Wikka:
+    file: lib/Pod/Simple/Wiki/Wikka.pm
+    version: 0.09
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

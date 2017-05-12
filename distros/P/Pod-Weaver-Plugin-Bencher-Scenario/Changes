@@ -1,0 +1,154 @@
+Revision history for Pod-Weaver-Plugin-Bencher-Scenario
+
+0.23    2017-01-04 (PERLANCAR)
+
+	- Add hint to use --format html+datatables.
+
+
+0.22    2016-10-21 (PERLANCAR)
+
+	- Allow sample bench to get result from JSON file instead of
+	  performing bencher().
+
+
+0.21    2016-10-19 (PERLANCAR)
+
+        - [Experimental] Create lib/Bencher/ScenarioR/* module files that
+          contain raw benchmark sample results. (Doing this in this Pod::Weaver
+          plugin is a bit too late though, because the generated files won't get
+          weaved. I plan to move the sample benchmarking into
+          Dist::Zilla::Plugin::Bencher::Scenario and pass the result to this
+          plugin).
+
+
+0.20    2016-09-25 (PERLANCAR)
+
+	- [ux] Add list of scenario modules at the beginning of Description
+	  section.
+
+
+0.19    2016-07-17 (PERLANCAR)
+
+	- Provide alternate location in #IMAGE so DZP:InsertDistImage can
+	  work when hosting=data (otherwise, the file in share/images/
+	  won't be found because they are not added to the build yet).
+
+
+0.18    2016-07-13 (PERLANCAR)
+
+        - Add option to generate chart image files (by default off).
+
+
+0.17    2016-06-30 (PERLANCAR)
+
+        - Add configuration: result_split_fields.
+
+        - Add configuration: gen_html_tables (turned off by default because
+          metacpan.org doesn't allow many HTML elements, e.g. <th> or <thead>,
+          not to mention <script>).
+
+
+0.16    2016-04-01 (PERLANCAR)
+
+	- Add --note to bencher.
+
+
+0.15    2016-03-16 (PERLANCAR)
+
+	- Add configuration: bench_startup.
+
+
+0.14    2016-03-15 (PERLANCAR)
+
+	- Add configuration: include_module, exclude_module.
+
+	- [Bugfix] metadata must be normalized.
+
+
+0.13    2016-03-15 (PERLANCAR)
+
+	- Adjust to Bencher 0.38 (backend split to Bencher::Backend).
+
+
+0.12    2016-03-13 (PERLANCAR)
+
+	- Show cmdline_template.
+
+
+0.11    2016-01-22 (PERLANCAR)
+
+	- Add option: bench to allow disabling the producing of sample
+	  results.
+
+	- Add note that version numbers shown are the ones used when
+	  getting sample benchmark results.
+
+
+0.10    2016-01-20 (PERLANCAR)
+
+	- [Bugfix] Used wrong variable, derp.
+
+
+0.09    2016-01-20 (PERLANCAR)
+
+	- Show participants' & datasets' tags in POD.
+
+	- Fix getting module versions from benchmark results, derp.
+
+
+0.08    2016-01-20 (PERLANCAR)
+
+	- Show bencher commands used when benchmarking with default options
+	  and benchmarking module startup overhead.
+
+
+0.07    2016-01-19 (PERLANCAR)
+
+	- Fix command shown in benchmark sample results.
+
+
+0.06    2016-01-19 (PERLANCAR)
+
+        - Add option 'sample_bench' to allow rendering multiple results.
+
+        - Add Benchmark Datasets POD section.
+
+        - Adjust to Bencher 0.30+.
+
+
+0.05    2016-01-13 (PERLANCAR)
+
+        - No functional changes.
+
+        - [doc] Tweak Abstract & Description.
+
+        - [doc] Mention DZP:Bencher::Scenario.
+
+
+0.04    2016-01-06 (PERLANCAR)
+
+	- Add modules that are listed only in scenario's 'modules' property
+	  to BENCHMARKED MODULES.
+
+	- Add blurb on Bencher in Description section even though there is
+	  no scenario's description.
+
+
+0.03    2016-01-05 (PERLANCAR)
+
+	- Add Benchmark Participants section.
+
+	- Show perl & modules' versions.
+
+
+0.02    2016-01-05 (PERLANCAR)
+
+        - Add SAMPLE BENCHMARK RESULTS section.
+
+        - Tweaks.
+
+
+0.01    2015-11-17 (PERLANCAR)
+
+        - First, early release. Currently only inserts "BENCHMARKED MODULES"
+          section.

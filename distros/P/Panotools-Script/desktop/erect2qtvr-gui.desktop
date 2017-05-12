@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=QTVR creator
+Comment=Convert equirectangular images to QTVR
+Exec=erect2qtvr-gui %f
+Icon=hugin
+Terminal=false
+Type=Application
+Categories=Graphics;
+MimeType=image/tiff;image/png;image/jpeg;
+GenericName=QTVR creator

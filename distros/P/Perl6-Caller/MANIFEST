@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+README
+lib/Perl6/Caller.pm
+t/00-load.t
+t/10-caller.t
+xt/pod-coverage.t
+xt/pod.t
+Makefile.PL

@@ -1,0 +1,30 @@
+Parse::MIME
+
+This module provides basic functions for handling mime-types. It can
+handle matching mime-types against a list of media-ranges. See section
+14.1 of the HTTP specification [RFC 2616] for a complete explanation:
+<http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html#sec14.1>
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

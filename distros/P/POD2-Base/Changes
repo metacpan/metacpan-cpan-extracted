@@ -1,0 +1,37 @@
+
+Revision history for Perl extension POD2::Base.
+
+0.043   Tue Feb 26 2008
+        - removed 'our' in t/02_basic.t (for 5.005's sake)
+
+0.042   Mon Feb 25 2008
+        - tweak POD2/PT/POD2/Base.pod
+        - (temporarily) skips POD test for 5.6
+
+0.041   Sun Feb 24 2008
+        - POD2/PT/POD2/Base.pod is now a complete
+          Portuguese translation (without much review)
+          of POD2::Base docs
+
+0.04    Sat Feb 23 2008
+        - File::Spec is a prereq now
+        - one more constructor param: 'inc'
+        - pod_dirs now accept options ('test')
+        - pod_dirs now search all over @INC for
+          "POD2/<lang>/" dirs
+        - included an example for listing lang-specific
+          installed files (eg/list.pl)
+        - included a hoax of a Portuguese translation
+          for the documentation of this module
+
+0.0301  Fri Feb  1 2008
+        - warning and vars in PREREQ_PM
+        - minor POD tweaks
+
+0.03    Tue Sep  4 2007
+        - rewrote "lib/POD2/Base.pod"
+
+0.02    Mon Sep  3 2007
+        - first version (after POD2::IT 0.11)
+        - request for comments at pod2it-translators
+          and roma-pm mailing lists

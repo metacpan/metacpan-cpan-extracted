@@ -1,0 +1,12 @@
+ChangeLog
+lib/Pod/PXML.pm
+lib/Pod/PXML.pod
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+pod2pxml
+pxml2pod
+README
+t/00_about_verbose.t
+t/01_old_junk.t
+META.yml                                 Module meta-data (added by MakeMaker)

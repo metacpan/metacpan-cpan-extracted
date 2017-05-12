@@ -1,0 +1,69 @@
+Perlmazing - A collection of helper functions powered by L<Perlmazing::Engine>.
+
+This module is the first practical example of a module powered by Perlmazing::Engine.
+It's a collection of helper functions that are loaded only when actually used, making it
+extremely fast to load and efficient to run. This manual will show you how to use this
+module and what its helper functions do, but you should look at Perlmazing::Engine to
+understand how it's being used and maybe look at the source code of this module to see
+how simple it was to implement Perlmazing::Engine for this example.
+
+As an additional benefit, this module automatically uses and imports Perlmazing::Feature,
+which basically will enable strict and warnings FATAL => 'all', along with the most recent
+features your version of Perl can enable.
+
+How this module works at the end:
+
+    use Perlmazing;
+    
+    # First of all, Perlmazing::Feature is automatically imported,
+    # so warnings and strict are automatically enabled and also
+    # any features that your version of Perl can have (similar to
+    # "use $]", if only that was a valid call).
+    
+    # Now all helper functions are available. Yes, it exports
+    # all symbols by default. Please read the rest of this POD
+    # to understand why and when it's considered a good thing.
+    
+    # Now use any of the helper functions from this module freely!
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Perlmazing
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Perlmazing
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Perlmazing
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Perlmazing
+
+    Search CPAN
+        http://search.cpan.org/dist/Perlmazing/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2015 Francisco Zarabozo
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+

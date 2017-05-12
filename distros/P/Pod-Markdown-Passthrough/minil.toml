@@ -1,0 +1,6 @@
+name = "Pod-Markdown-Passthrough"
+# badges = ["travis"]
+authority="cpan:DAVEWEBB"
+
+module_maker="ModuleBuildTiny"
+

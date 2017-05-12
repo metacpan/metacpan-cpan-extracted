@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<collection>
+  <record>
+  <datafield tag="021A">
+      <subfield code="0">Test 1</subfield>
+    </datafield>
+  </record>
+  <record>
+  <datafield tag="021A">
+      <subfield code="0">Test 2</subfield>
+    </datafield>
+  </record>
+</collection>

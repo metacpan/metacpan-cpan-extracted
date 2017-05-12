@@ -1,0 +1,12 @@
+SYNOPSIS
+
+    In function Rinci metadata:
+
+     "cmdline.default_format" => "text",
+
+DESCRIPTION
+
+    Currently this property does nothing by itself, it is just a namespace
+    for specifying command-line-related attributes (like shown in
+    Synopsis).
+

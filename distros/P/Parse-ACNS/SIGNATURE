@@ -1,0 +1,57 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3d6f1a22f63721f6223d80c2b01ef29f74ed1e7b Changes
+SHA1 fe503abf01e7d3259a3fefd423d6562e09cfaf29 MANIFEST
+SHA1 db49d41ca523a55e5c1b2ef489a68a702ca7068e META.yml
+SHA1 f4023472bec1b185d3deaef0784a6962680b989e Makefile.PL
+SHA1 cbc2d8740082b9cc7f0c9c60d5b76f32a3ac4aae README
+SHA1 9b5001bfa9cf8607b3b3935284d9253e0391c9f1 inc/Module/Install.pm
+SHA1 cab0e564f9bdf658535f683aa197157e06d0dcea inc/Module/Install/Base.pm
+SHA1 a1559b5b3b40f68efbbd256f4fef85970891b3ae inc/Module/Install/Can.pm
+SHA1 f15c1ba85f6d52e70c48c64bf0752c90a4ad66f9 inc/Module/Install/Fetch.pm
+SHA1 eb48df8bafd07c6a862126d9b274df42b4395742 inc/Module/Install/Makefile.pm
+SHA1 95c73873c6c3cb7024614c225c53863e1e90c134 inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 916813253f3ecced9ab88b7131d0a485fb59ec87 inc/Module/Install/Share.pm
+SHA1 f8b2ae3386f6ba26c33408968a953d450842eade inc/Module/Install/Win32.pm
+SHA1 f302bc703d76299cff243e5b44cecd61aac27b76 inc/Module/Install/WriteAll.pm
+SHA1 2e7766308f570bfca133ab99a8eada69511b1297 lib/Parse/ACNS.pm
+SHA1 1338d6afdb53d2f1d88ee0889b8fd6d2f000558c share/schema/0.6/acns.xsd
+SHA1 79eb9e2d0b75de9d031a2f80df74ed73f815040b share/schema/0.7/acns.xsd
+SHA1 0f4d4a261ecac777a996e6224aacb5e07ed0c036 share/schema/1.0/acns.xsd
+SHA1 8eb677a749310754f8e0dcdb9490063856cf012e share/schema/1.1/acns.xsd
+SHA1 de05a328363de107d3eed239a301f6589a1177d1 share/schema/1.2/acns.xsd
+SHA1 c3bf4ef65087206053fd5b9798928dfa948c2e8e share/schema/compat/acns.xsd
+SHA1 6e61b4fb62b292090b796b17b25e8215bca8e187 share/schema/xmldsig.xsd
+SHA1 3801111554ff29570ebf757e0938f815ee94bc18 share/schema/xmlmime.xsd
+SHA1 06b06bfd339c9c6c1487afb33eb835af1bb341ef t/basics.t
+SHA1 d7134a8bc50b7e4b271ff3fa0202df49c1417ae6 t/data/0.6/full.xml
+SHA1 3caff79a45a49b5fb59fbda0aa1d1b1d8e63887e t/data/0.6/full.yaml
+SHA1 0b01f1e6e1aaa4c3c323c3d2799e206a29a93e46 t/data/0.7/full.xml
+SHA1 9d0fe146cd6b78c2a59dc3712fb3506af40f3520 t/data/0.7/full.yaml
+SHA1 629a2e12852a8c40cad482a97567228a817fbf59 t/data/1.1/full.xml
+SHA1 b92b85b001f378b68d1cd18130d1a1aba90266b5 t/data/1.1/full.yaml
+SHA1 c430ae67bb66bfdd9ea047fbb165a2a147af6468 t/data/1.2/full.xml
+SHA1 eff6617cd4d6ea2bf11792409c8848be9b7849ba t/data/1.2/full.yaml
+SHA1 c4d077c6ba63590983028c862ea9d76342e3d486 t/parse.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlSR/KAACgkQMflWJZZAbqAiugCfdrPm2NKux50zxGYJcHthMGvg
+ATkAoKozua4RDmFObHQiVEOPzD8X33A+
+=rNyZ
+-----END PGP SIGNATURE-----

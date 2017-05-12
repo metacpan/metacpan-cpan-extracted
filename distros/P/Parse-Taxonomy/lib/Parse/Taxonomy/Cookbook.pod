@@ -1,0 +1,625 @@
+=head1 NAME
+
+Parse::Taxonomy::Cookbook - cookbook for Parse-Taxonomy
+
+=head1 DESCRIPTION
+
+This file is a cookbook holding usage examples -- recipes -- for various
+F<Parse::Taxonomy> subclasses.
+
+The documentation herein presumes that you have already studied the
+documentation in F<Parse::Taxonomy>, F<Parse::Taxonomy::MaterializedPath>,
+F<Parse::Taxonomy::AdjacentList>, etc.
+
+=head1 RECIPES
+
+=head2 Validate a taxonomy-by-materialized-path
+
+=head3 Problem
+
+You have a CSV file which you have been told is a taxonomy-by-materialized-path.  You want to
+confirm its validity.
+
+Let's say the file holds these records:
+
+    $> cat ./proposed_taxonomy.csv
+    "path","vertical","is_actionable"
+    "|Alpha","Auto",,"0"
+    "|Alpha|Epsilon|Kappa","Auto","0"
+    "|Alpha|Epsilon|Kappa","Auto","1"
+    "|Alpha|Zeta","Auto","0"
+    "|Alpha|Zeta|Lambda","Auto","1"
+    "|Alpha|Zeta|Mu","Auto","0"
+
+=head3 Solution
+
+Try to create a Parse::Taxonomy::MaterializedPath object using the C<file> interface.
+
+    local $@;
+    eval {
+        $self = Parse::Taxonomy::MaterializedPath->new( {
+            file => './proposed_taxonomy.csv',
+        } );
+    };
+    print STDERR "$@\n";
+
+If C<$self> is created successfully, the taxonomy meets the requirements
+described in F<Parse::Taxonomy>.  This particular file, however, will throw
+an exception.  Examination of the content of C<$@> will show that two records
+have the same materialized path, i.e., the same value in the C<path> column.
+
+=head2 Validate a taxonomy-by-adjacent-list
+
+=head3 Problem
+
+You have a CSV file which you have been told is a taxonomy-by-adjacent-list.  You want
+to confirm its validity.
+
+Let's say the file holds these records:
+
+    $> cat ./proposed_taxonomy_by_index.csv
+    "id","parent_id","name","vertical","is_actionable"
+    "1","","Alpha","Auto","0"
+    "2","1","Epsilon","Auto","0"
+    "3","2","Kappa","Auto","1"
+    "4","2","Kappa","Auto","1"
+    "5","1","Zeta","Auto","0"
+    "6","5","Lambda","Auto","1"
+    "7","5","Mu","Auto","1"
+
+=head3 Solution
+
+Try to create a Parse::Taxonomy::AdjacentList object using the C<file> interface.
+
+    local $@;
+    eval {
+        $self = Parse::Taxonomy::AdjacentList->new( {
+            file => './proposed_taxonomy_by_index.csv',
+        } );
+    };
+    print STDERR "$@\n";
+
+If C<$self> is created successfully, the taxonomy meets the requirements
+described in F<Parse::Taxonomy>.  This particular file, however, will throw
+an exception.  Examination of the content of C<$@> will show that two records
+with the same C<parent_id> have the same C<name>.
+
+=head2 Apply extra validations to a taxonomy
+
+=head3 Problem
+
+You have a taxonomy file from which you have successfully created a
+Parse::Taxonomy::MaterializedPath object.  From that you know that it is valid with
+respect to the requirements for a taxonomy imposed by this library.  But you
+have additional business requirements which a taxonomy must fulfill before you
+can use the taxonomy in production.
+
+Suppose that you have a taxonomy file with this data:
+
+    $> cat local_requirement.csv
+    "path","is_actionable"
+    "|Alpha","0"
+    "|Beta","0"
+    "|Alpha|Epsilon","0"
+    "|Alpha|Epsilon|Kappa","1"
+    "|Alpha|Zeta","0"
+    "|Alpha|Zeta|Lambda","1"
+    "|Alpha|Zeta|Mu","0"
+    "|Beta|Eta","1"
+    "|Beta|Theta","1"
+    "|Beta|Iota","0"
+
+Suppose further that you have a business requirement that all nodes which are
+"pure" leaf nodes -- all nodes which have no children of their own -- have a true value for C<is_actionable>.
+
+=head3 Solution
+
+Use Parse::Taxonomy:::Path accessor methods to get at the data in the taxonomy
+and then write your own functions to conduct local validations.
+
+In this case:
+
+    $self = Parse::Taxonomy::MaterializedPath->new( {
+        file    => 'local_requirement.csv',
+    } );
+    $hashified          = $self->hashify();
+    $descendant_counts  = $self->descendant_counts();
+
+Use C<hashify()> to turn the taxonomy into a hash.  Use C<descendant_counts()> to
+get the number of children each node has.  Then iterate over the hash checking
+whether an element has no children and, if so, whether the node's
+C<is_actionable> setting is true.
+
+    @non_actionable_leaf_nodes = ();
+    for my $node (keys %{$hashified}) {
+        if (
+            ($descendant_counts->{$node} == 0) &&
+            (! $hashified->{$node}->{is_actionable})
+        ) {
+            push @non_actionable_leaf_nodes, $node;
+        }
+    }
+    warn "leaf node '$_' is non-actionable"
+        for @non_actionable_leaf_nodes;
+
+Output will resemble:
+
+    leaf node '|Alpha|Zeta|Mu' is non-actionable at ...
+    leaf node '|Beta|Iota' is non-actionable at ...
+
+You can then decide how to handle this per your business requirements.
+
+=head2 Convert a taxonomy-by-materialized-path to a taxonomy-by-adjacent-list
+
+=head3 Problem
+
+You have a file which holds a validated taxonomy-by-materialized-path and you want to
+create a file which holds the equivalent taxonomy-by-adjacent-list.
+
+Suppose you have a file with this data:
+
+    "path","is_actionable"
+    "|Alpha","0"
+    "|Beta","0"
+    "|Alpha|Epsilon","0"
+    "|Alpha|Epsilon|Kappa","1"
+    "|Alpha|Zeta","0"
+    "|Alpha|Zeta|Lambda","1"
+    "|Alpha|Zeta|Mu","1"
+    "|Beta|Eta","1"
+    "|Beta|Theta","1"
+    "|Beta|Iota","1"
+
+=head3 Solution
+
+Use the C<adjacentify()> and C<write_adjacentified_to_csv()> methods.
+
+    $adjacentified = $self->adjacentify();
+    $file_taxonomy_by_index = $self->write_adjacentified_to_csv($adjacentified);
+
+The file whose path is stored in C<$file_taxonomy_by_index> will look like
+this:
+
+    id,parent_id,name,is_actionable
+    1,,Alpha,0
+    2,,Beta,0
+    3,1,Epsilon,0
+    4,1,Zeta,0
+    5,2,Eta,1
+    6,2,Theta,1
+    7,2,Iota,1
+    8,3,Kappa,1
+    9,4,Lambda,1
+    10,4,Mu,1
+
+=head2 Convert a taxonomy-by-adjacent-list to a taxonomy-by-materialized-path
+
+=head3 Problem
+
+In a relational database (RDB), you have hierarchical data stored in a flat table by
+way of C<id>, C<parent_id> and C<name> columns.  You need to communicate the
+current status of that taxonomy to someone who is familiar with CSV-formatted
+data and who would like to see the structure in that taxonomy expressed in a
+single column.
+
+=head3 Solution
+
+First you need to get the data out of the RDB and into a text file.  For that
+you might use a command-line language appropriate for that in RDB.  For
+example, in F<psql>, the command-line language associated with PostgreSQL, you
+would say:
+
+    $> \copy (SELECT id, parent_id, name, is actionable FROM my_table) TO /path/to/taxonomy.csv WITH CSV HEADERS
+
+The CSV file would then contain data like this:
+
+    "id","parent_id","name","is_actionable"
+    "1","","Alpha","0"
+    "2","","Beta","0"
+    "3","1","Epsilon","0"
+    "4","3","Kappa","1"
+    "5","1","Zeta","0"
+    "6","5","Lambda","1"
+    "7","5","Mu","0"
+    "8","2","Eta","1"
+    "9","2","Theta","1"
+
+First, create a Parse::Taxonomy::AdjacentList object from this source file, and then
+apply the C<pathify()> method to it with the C<as_string> option set to a true
+value.
+
+    $source = "/path/to/taxonomy.csv";
+    $self = Parse::Taxonomy::AdjacentList->new( {
+        file    => $source,
+    } );
+
+    $rv = $self->pathify( { as_string => 1 } );
+
+That returns a Perl reference to an array of array references:
+
+    [
+      ["path", "is_actionable"],
+      ["|Alpha", 0],
+      ["|Beta", 0],
+      ["|Alpha|Epsilon", 0],
+      ["|Alpha|Epsilon|Kappa", 1],
+      ["|Alpha|Zeta", 0],
+      ["|Alpha|Zeta|Lambda", 1],
+      ["|Alpha|Zeta|Mu", 0],
+      ["|Beta|Eta", 1],
+      ["|Beta|Theta", 1],
+    ]
+
+This array of arrays can provide values to the C<fields> and C<data_records>
+arguments in the C<components> interface to a new
+F<Parse::Taxonomy::MaterializedPath> object, as follows:
+
+    $newobj = Parse::Taxonomy::MaterializedPath->new( {
+        components => {
+            fields          => $rv->[0],
+            data_records    => [ @{$rv}[1..$#{$rv}] ],
+        },
+    } );
+
+=head2 Confirm that two taxonomies are equivalent
+
+=head3 Problem
+
+You have received a plain-text file which holds CSV-formatted records which
+constitute a taxonomy-by-materialized-path.  You passed the file off to the staff member
+with the "Big Data" t-shirt.  Big Data got the records inserted into an RDBMS
+where the materialized path is represented by "pointers" to records higher up
+in the taxonomy, I<i.e.,> by means of a C<parent_id> column.  You want to
+demonstrate that the taxonomic structure present in the incoming file has been
+correctly represented in the RDBMS.
+
+Let's suppose that the data in the incoming taxonomy file looked like this:
+
+    $> cat mu.csv
+
+    "path","is_actionable"
+    "--Alpha","0"
+    "--Beta","0"
+    "--Alpha--Epsilon","0"
+    "--Alpha--Epsilon--Kappa","1"
+    "--Alpha--Zeta","0"
+    "--Alpha--Zeta--Lambda","1"
+    "--Alpha--Zeta--Mu","0"
+    "--Beta--Eta","1"
+    "--Beta--Theta","1"
+
+Let's further suppose that the data was inserted into the F<greeks> table in
+the F<taxonomy> database:
+
+    taxonomy=# SELECT * FROM greeks;
+     id | parent_id |  name   | is_actionable
+    ----+-----------+---------+---------------
+      1 |           | Alpha   | f
+      2 |           | Beta    | f
+      3 |         1 | Epsilon | f
+      4 |         3 | Kappa   | t
+      5 |         1 | Zeta    | f
+      6 |         5 | Lambda  | t
+      7 |         5 | Mu      | f
+      8 |         2 | Eta     | t
+      9 |         2 | Theta   | t
+    (9 rows)
+
+How can we demonstrate that the data and the hierarchical structure implicit
+in the table matches that of the original file?
+
+=head3 Solution
+
+Copy the database table (or the relevant rows) to a plain-text file in CSV
+format.  In the case of PostgreSQL, that would look like this:
+
+    \copy (SELECT * FROM greeks) TO '/path/to/taxonomy/greeks.csv' WITH CSV HEADER
+
+Yielding:
+
+    id,parent_id,name,is_actionable
+    1,,Alpha,f
+    2,,Beta,f
+    3,1,Epsilon,f
+    4,3,Kappa,t
+    5,1,Zeta,f
+    6,5,Lambda,t
+    7,5,Mu,f
+    8,2,Eta,t
+    9,2,Theta,t
+
+Create a Parse::Taxonomy::AdjacentList object using F<greeks.csv> as the source:
+
+    $self = Parse::Taxonomy::AdjacentList->new( {
+        file    => '/path/to/taxonomy/greeks.csv',
+    } );
+
+Call the C<pathify> method on the object.
+
+    $pathified = $self->pathify;
+
+If we were to dump C<$pathified>, we would see:
+
+    $Data::Dump::pp($pathified);
+
+    [
+      ["path", "is_actionable"],
+      [["", "Alpha"], "f"],
+      [["", "Beta"], "f"],
+      [["", "Alpha", "Epsilon"], "f"],
+      [["", "Alpha", "Epsilon", "Kappa"], "t"],
+      [["", "Alpha", "Zeta"], "f"],
+      [["", "Alpha", "Zeta", "Lambda"], "t"],
+      [["", "Alpha", "Zeta", "Mu"], "f"],
+      [["", "Beta", "Eta"], "t"],
+      [["", "Beta", "Theta"], "t"],
+    ]
+
+Now, there's one little tweak needed here.  In the original taxonomy file, the
+C<is_actionable> column held Boolean data which represented C<TRUE> and
+C<FALSE> by C<"1"> and C<"0">, respectively.  When this data was inserted into the database
+(PostgreSQL, in this case), that Boolean data was stored as C<t> or C<f>,
+which was also the way it was stored in the CSV file created by copying data
+from the F<greeks> table.  We will need to rewrite the data in the
+second (C<is_actionable>) column of the elements of C<$pathified> as C<1> or
+C<0> to proceed with our test for equivalence.
+
+    $fields = $pathified->[0];
+    @data_records = ();
+    for $rec (@{$pathified}[1..$#{$pathified}]) {
+        $bool = ($rec->[1] eq 't') ? 1 : 0;
+        push @data_records, [
+            join('|' => @{$rec->[0]}),
+            ($rec->[1] eq 't') ? 1 : 0,
+        ];
+    }
+
+We're now in a position to create a B<new> Parse::Taxonomy::MaterializedPath object based
+on the data extracted from the database via the CSV file.  We'll use the
+C<components> interface to C<Parse::Taxonomy::MaterializedPath::new()> because our
+taxonomy now lives in the form of Perl data structures suitable for the
+C<components> interface.
+
+    $ptpobj = Parse::Taxonomy::MaterializedPath->new( {
+        components  => {
+            fields          => $fields,
+            data_records    => \@data_records,
+        },
+    } );
+
+We'll now call the C<fields_and_data_records_path_components()> method on the
+object.  This method returns an array of array references in which the first
+element is an array reference holding the column names and in which, in all
+subsequent elements, the first element is itself a reference to an array
+holding the components of the materialized path.
+
+    $fdr1 = $ptpobj->fields_and_data_records_path_components;
+
+Which, when dumped, gives:
+
+    [
+      ["path", "is_actionable"],
+      [["", "Alpha"], 0],
+      [["", "Beta"], 0],
+      [["", "Alpha", "Epsilon"], 0],
+      [["", "Alpha", "Epsilon", "Kappa"], 1],
+      [["", "Alpha", "Zeta"], 0],
+      [["", "Alpha", "Zeta", "Lambda"], 1],
+      [["", "Alpha", "Zeta", "Mu"], 0],
+      [["", "Beta", "Eta"], 1],
+      [["", "Beta", "Theta"], 1],
+    ]
+
+We now return to the original incoming taxonomy file, which we use as the
+source for a second Parse::Taxonomy::MaterializedPath object.  Remember that C<--> was
+used to separate the parts of the materialized path in that file.
+
+    $tax = Parse::Taxonomy::MaterializedPath->new( {
+        file => '/path/to/mu.csv,
+        path_col_sep => '--',
+    } );
+
+We now call the C<fields_and_data_records_path_components()> method on this
+object as well.
+
+    $fdr2 = $tax->fields_and_data_records_path_components;
+
+Finally, we feed C<$fdr1> and C<$fdr2> to C<Test::More::is_deeply()>.
+
+    is_deeply($fdr1, $fdr2, "QED");
+
+If this function returns true -- which it does -- then the taxonomy implicit
+in the F<greeks> table in the database is equivalent to that in the original
+incoming taxonomy file.
+
+=head2 Create taxonomically correct dummy data
+
+=head3 Problem
+
+You have a database table with views built on top of it.  The data in the
+table is hierarchical in nature and is structured as a
+taxonomy-by-adjacent-list.  You want to explore alternative definitions of the
+views. While conducting your research, however, you do not want to touch
+production data.  Hence, you want to create a dummy table and load suitable
+dummy data into it.  You know how to load a table from a CSV file and want to
+correctly populate that CSV file with hierarchical data.
+
+=head3 Solution
+
+Let's assume that you want to populate the table with three columns of data:
+
+    @input_columns = ( qw| path  letter_vendor_id  is_actionable |);
+
+In PostgreSQL, the table might be defined like this:
+
+                          Table "public.letters"
+          Column      |         Type          |       Modifiers
+    ------------------+-----------------------+------------------------
+     id               | integer               | not null
+     parent_id        | integer               |
+     name             | character varying(16) | not null
+     letter_vendor_id | integer               | not null
+     is_actionable    | boolean               | not null default false
+    Indexes:
+        "letters_pkey" PRIMARY KEY, btree (id)
+    Foreign-key constraints:
+        "letters_letter_vendor_id_fkey"
+            FOREIGN KEY (letter_vendor_id) REFERENCES letter_vendors(id)
+        "letters_parent_id_fkey"
+            FOREIGN KEY (parent_id) REFERENCES letters(id)
+    Referenced by:
+        TABLE "letters" CONSTRAINT "letters_parent_id_fkey"
+            FOREIGN KEY (parent_id) REFERENCES letters(id)
+
+The C<path> column holds a materialized path starting with the name of a root
+node, proceeding through the names of branch nodes and ending with the name of
+a leaf node.  All the names are concatenated with a delimiter string.  Example:
+
+    omega - joyride - Africa
+
+From this we infer that there is a root node named C<omega>, a branch node
+named C<joyride> and a leaf node named C<Africa>.
+
+To make the data somewhat more realistic, we'll say that C<letter_vendor_id>
+points to the C<id> column of a C<letter_vendors> table.
+
+    hierarchy=# SELECT * FROM letter_vendors;
+     id |  name  | namespace_code
+    ----+--------+----------------
+      1 | Athens | at
+      2 | Sparta | sp
+      3 | Thebes | th
+    (3 rows)
+
+As we create nodes, we'll sprinkle various C<letter_vendor_ids> among them.
+
+For another dollop of realism, we'll say that only 3-level nodes -- rows whose
+C<path> column have 3 elements will be assigned a C<TRUE> value for
+C<is_actionable>.  Nodes with only 1 or 2 elements will have C<FALSE> assigned
+to C<is_actionable>.
+
+Let's say that there will be 24 top-level nodes:  one for each letter in the
+Classical Greek alphabet.
+
+    @toplevels = ( qw|
+        alpha beta gamma delta epsilon zeta eta theta
+        iota kappa lamda mu nu xi omicron pi
+        rho sigma tau upsilon phi chi psi omega
+    | );
+
+Under each of the top-level nodes will be 10 second-level nodes.  To
+illustrate an unusual but important edge case, we'll name these second-level
+nodes exactly the same under each of the 24 top-level nodes.
+
+    @seconds = ( qw|
+        able baker charlie dogtag entry
+        fargo golfer hiphop icicle joyride
+    | );
+
+Under each of the second-level nodes will be 100 third-level nodes.
+Continuing along the same path as above, we'll named these third-level nodes
+exactly the same under each of the 240 (24 x 10) second-level nodes.
+
+    @thirds = (
+        "AOL", "Aachen", "Aaliyah", "Aaron", "Abbas",
+        # ...
+        "Agatha", "Aggie", "Aglaia", "Agnes", "Agnew",
+    );
+
+(A list extracted from F</usr/share/dict/words>; you can find the complete
+list in F<examples/create_letters_taxonomy.pl> in this distribution.)
+
+As promised, we'll distribute C<letter_vendor_ids> among the nodes as we
+create an array of data records with which we'll populate our database table.
+
+    my %toplevels_to_lvis = (
+        ( map { $_ => 1 } @toplevels[0..7]),
+        ( map { $_ => 2 } @toplevels[8..15]),
+        ( map { $_ => 3 } @toplevels[16..23]),
+    );
+
+    my @data_records;
+    for my $r (@toplevels) {
+        push @data_records, [ join('|' => ('', $r)), $toplevels_to_lvis{$r}, 0 ];
+        for my $s (@seconds) {
+            push @data_records, [ join('|' => ('', $r, $s)), $toplevels_to_lvis{$r}, 0 ];
+            for my $t (@thirds) {
+                push @data_records, [ join('|' => ('', $r, $s, $t)), $toplevels_to_lvis{$r}, 1 ];
+            }
+        }
+    }
+
+We expect to have 24,264 elements in the list of data records:  24 for
+top-level nodes, 240 for second-level nodes and 24,000 for third-level nodes.
+
+Between C<@input_columns> and C<@data_records> we have all the data we need to
+create a Parse::Taxonomy::MaterializedPath using the C<components> interface
+to that class's constructor.
+
+    my $self = Parse::Taxonomy::MaterializedPath->new( {
+        components  => {
+            fields          => [ @input_columns ],
+            data_records    => [ @data_records  ],
+        },
+        path_col_sep => '|',
+    } );
+
+If C<$self> is C<defined>, then we have a data structure in memory which is
+validated as a taxonomy -- in this case, a taxonomy-by-materialized-path.
+We're now in a position to call the C<adjacentify()> method to transform that
+taxonomy-by-materialized-path into a taxonomy-by-adjacent-list.
+
+    my $adjacentified = $self->adjacentify();
+
+And the next step is to write that data structure out to a new CSV file
+suitable for loading into the C<letters> table in our database.
+
+    my $csv_file = $self->write_adjacentified_to_csv( {
+        adjacentified => $adjacentified,
+        csvfile => './letters.csv',
+    } );
+
+Here is a peek at the contents of F<./letters.csv>:
+
+    id,parent_id,name,letter_vendor_id,is_actionable
+    1,,alpha,1,0
+    2,,beta,1,0
+    3,,gamma,1,0
+    4,,delta,1,0
+    5,,epsilon,1,0
+    6,,zeta,1,0
+    7,,eta,1,0
+    8,,theta,1,0
+    ...
+    23,,psi,3,0
+    24,,omega,3,0
+    25,1,able,1,0
+    26,1,baker,1,0
+    27,1,charlie,1,0
+    28,1,dogtag,1,0
+    29,1,entry,1,0
+    30,1,fargo,1,0
+    ...
+    263,24,icicle,3,0
+    264,24,joyride,3,0
+    265,25,AOL,1,1
+    266,25,Aachen,1,1
+    267,25,Aaliyah,1,1
+    268,25,Aaron,1,1
+    269,25,Abbas,1,1
+    270,25,Abbasid,1,1
+    ...
+    24257,264,Agamemnon,3,1
+    24258,264,Agassi,3,1
+    24259,264,Agassiz,3,1
+    24260,264,Agatha,3,1
+    24261,264,Aggie,3,1
+    24262,264,Aglaia,3,1
+    24263,264,Agnes,3,1
+    24264,264,Agnew,3,1
+
+And finally, here's how we would populate our database table (in PostgreSQL):
+
+    \copy letters (id,parent_id,name,letter_vendor_id,is_actionable) FROM './letters.csv' CSV HEADER
+
+=cut

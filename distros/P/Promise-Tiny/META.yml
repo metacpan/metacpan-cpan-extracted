@@ -1,0 +1,41 @@
+---
+abstract: 'A promise implementation written in Perl'
+author:
+  - 'hatz48 <hatz48@hatena.ne.jp>'
+build_requires:
+  Test::Class: '0'
+  Test::Fatal: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Promise-Tiny
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Promise::Tiny:
+    file: lib/Promise/Tiny.pm
+    version: '0.02'
+  Promise::Tiny::AnyEvent:
+    file: lib/Promise/Tiny/AnyEvent.pm
+requires:
+  AnyEvent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/hatz48/perl-promise-tiny/issues
+  homepage: https://github.com/hatz48/perl-promise-tiny
+  repository: git://github.com/hatz48/perl-promise-tiny.git
+version: '0.02'

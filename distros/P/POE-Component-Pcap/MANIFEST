@@ -1,0 +1,9 @@
+# $Id: MANIFEST,v 1.1.1.1 2001/02/16 14:35:51 fletch Exp $
+CHANGES
+Pcap.pm
+MANIFEST
+Makefile.PL
+README
+t/01basic.t
+eg/ArpWatch.pm
+eg/awtest

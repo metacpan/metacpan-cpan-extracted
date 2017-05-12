@@ -1,0 +1,84 @@
+Revision history for Perl extension Parse::Nibbler.
+
+0.20  Wed Aug 15 21:22:41 2001
+	- original version; created by h2xs 1.20 with options
+		-X -n Parse::Nibbler
+
+
+0.21	Mon Aug 27 20:00:00 2001
+		- fixed make test, added a use lib statement
+			and added a link in t/ directory
+		- added copyright/license to README file.
+
+0.22	Tue Aug 28 2001
+		- added link to VerilogGrammar.pm in top directory.
+
+0.23	Tue Aug 28 2001
+		- put use base module name in quotes, in VerilogGrammar.pm
+
+
+1.00	Tue Oct 15 2001
+		- Major rewrite
+		- interface is much easier to use.
+		- do not require a separate package for each rule.
+		- subroutine name is name of rule.
+		- added a lexer which gets rid of a window of text.
+		- now lex the file once, and then process lexicals after that.
+		- Still in alpha stages
+
+1.01	Thu Oct 18 2001
+		- stripped out all references to End Of File error checks.
+		- want to eventually rewrite EOF handling.
+		- error messages are now tagged so that they can be
+			distinguished from normal Perl errors.
+		- handle new quantifiers {?} {+} {*}
+		- improve VerilogGrammar.pm.
+		- fix bug in Parse::Nibbler so that AlternateRules
+			actually works now.
+
+
+1.02	
+
+1.03	Sun Oct 21, 2001
+		- In verilog grammar, add 'Number' rule to list of 
+			alternates that can connect to port.
+		- tried a couple of tweaks to speed up overall code.
+
+1.04	Tue Oct 23 2001
+		- verilog grammar needs to accept underscore as a 
+			valid leading character for identifiers.
+
+
+1.05	Wed Oct 31 2001
+		- speed improvements
+		- Register now installs two subroutines
+		-	one that handles arguments (quantifier, separator)
+		-	and one that doesn't take any arguments (faster)
+		- big_verilog.t benchmarks at 650 lines per second.
+		- include a rough draft of a profiler package
+
+1.06	Wed Oct 31 2001
+		- minor speed improvements (750 lines per second)
+
+
+1.07	Thur Nov 1 2001
+		- added Peek functionality which prevents a rule 
+		-	from being called if Peek can determine it will fail.
+		- Peek gives a major speed bonus.
+		- Now parsing ~1025 lines per second
+		- removed multiple flavors of rule 
+		-	(rule, rule_args, rule_save, rule_save_args)
+		-	was getting a minor speed saving (~5%)
+		-	But code maintenance was a nightmare.
+
+
+1.08	Thur Nov 8 2001
+		- rewrote lexer in verilog grammar for speed improvement.
+		- now parsing ~1140 lines per second.
+
+1.10	Wed Nov 21 2001
+		- rewrote entire packages to be subroutine based
+		- instead of method based for speed improvement.
+		- now parsing ~1420 lines per second.
+		- rewrite is pretty rough, just did it to see
+		- how much faster it would be. may recode to clean it up.

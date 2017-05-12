@@ -1,0 +1,44 @@
+Revision history for PONAPI-Client
+
+0.002008     2017-Feb-7
+             * JSON::XS --> JSON::MaybeXS.
+
+0.002007     2016-Feb-09
+             * Removed dependency (URI::Template)
+             * Client to send Accept instead of Content-Type
+               on bodyless requests
+
+0.002006     2016-Feb-05
+             * Bug fix (arguments handling)
+
+0.002005     2016-Feb-04
+             * Fixed dist.ini dependencies
+               (URI::Template needs to be installed)
+
+0.002004     2016-Feb-04
+             * Support uri_base parameter
+               (client object constructor or requests methods)
+             * Support uri_template in requests methods
+             * Updated document
+
+0.002003     2016-Feb-02
+             * Fixed abstracts
+             * Fixed the main pod file to work with dzil properly
+             * Dumped down the Test::Simple dependency to 0.98
+
+0.002002     2016-Jan-20
+             * Support extra escaping on URL values,
+               sends 'X-PONAPI-Escaped-Values: 1' (default)
+             * Links to repository in dist.ini (Alexandr Ciornii)
+
+0.002001     2016-Jan-14
+             * Updated dist.ini (AutoPrereqs)
+
+0.002000     2016-Jan-12
+             * First CPAN release
+
+0.001001     2016-Jan-07
+             * Set minimum version for Test::Simple (1.001014)
+
+0.001000     2016-Jan-07
+             * The Little Bang!

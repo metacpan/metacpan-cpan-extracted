@@ -1,0 +1,1255 @@
+#-*- Mode: CPerl -*-
+
+##======================================================================
+## Header Administrivia
+##======================================================================
+
+our $VERSION = '0.06004';
+pp_setversion($VERSION);
+
+##-- accomodate typo-fix in PDL-2.008 API
+eval "use PDL::Version;";
+use version;
+our $pdl_version       = version->parse($PDL::Version::VERSION);
+our $propagate_badflag = $pdl_version >= '2.008' ? "propagate_badflag" : "propogate_badflag";
+
+##------------------------------------------------------
+## pm additions
+pp_addpm({At=>'Top'},<<'EOPM');
+=pod
+
+=head1 NAME
+
+PDL::HMM - Hidden Markov Model utilities in PDL
+
+=head1 SYNOPSIS
+
+ use PDL::HMM;
+
+ ##-----------------------------------------------------
+ ## Dimensions
+
+ $N = $number_of_states;
+ $M = $number_of_symbols;
+ $T = $length_of_input;
+
+ $A = $maximum_ambiguity;
+
+ ##-----------------------------------------------------
+ ## Parameters
+
+ $af     = log(random($N,$N));
+ $bf     = log(random($N,$M));
+ $pif    = log(random($N));
+ $omegaf = log(random($N));
+
+ @theta = ($a,$b,$pi,$omega) = hmmmaximize($af,$bf,$pif,$omegaf);
+
+ $o  = long(rint($M*random($T)));
+
+ maximum_n_ind(dice_axis($a->logsumover+$pi+$b, 1,$o),
+               ($oq=zeroes(long,$A,$T))); ##-- for constrained variants
+
+ ##-----------------------------------------------------
+ ## Log arithmetic
+
+ $log0 = logzero;
+ $logz = logadd(log($x),log($y));
+ $logz = logdiff(log($x),log($y));
+ $logz = logsumover(log($x));
+
+ ##-----------------------------------------------------
+ ## Sequence Probability
+
+ $alpha  = hmmfw ($a,$b,$pi,    $o     ); ##-- forward (full)
+ $alphaq = hmmfwq($a,$b,$pi,    $o, $oq); ##-- forward (constrained)
+
+ $beta   = hmmbw ($a,$b,$omega,  $o    ); ##-- backward (full)
+ $betaq  = hmmbwq($a,$b,$omega,  $o,$oq); ##-- backward (constrained)
+
+ ##-----------------------------------------------------
+ ## Parameter Estimation
+
+ @expect = ($ea,$eb,$epi,$eomega) = hmmexpect0(@theta);    ##-- initialize
+
+ hmmexpect (@theta, $o,     $alpha, $beta,  $ea,$eb,$epi); ##-- expect (full)
+ hmmexpectq(@theta, $o,$oq, $alphaq,$betaq, $ea,$eb,$epi); ##-- expect (constrained)
+
+ ($a,$b,$pi,$omega) = hmmmaximize($ea,$eb,$epi,$eomega);   ##-- maximize
+
+ ##-----------------------------------------------------
+ ## Sequence Analysis
+
+ ($delta,$psi)   = hmmviterbi ($a,$b,$pi, $o);     ##-- trellis (full)
+ ($deltaq,$psiq) = hmmviterbiq($a,$b,$pi, $o,$oq); ##-- trellis (constrained)
+
+ $paths  = hmmpath (     $psi,  sequence($N));     ##-- backtrace (full)
+ $pathsq = hmmpathq($oq, $psiq, sequence($A));     ##-- backtrace (constrained)
+
+=cut
+
+EOPM
+## /pm additions
+##------------------------------------------------------
+
+##------------------------------------------------------
+## Exports: None
+#pp_export_nothing();
+
+##------------------------------------------------------
+## Includes / defines
+pp_addhdr(<<'EOH');
+
+#include <math.h>
+
+/*#define DEBUG_ALPHA*/
+/*#define DEBUG_BETA*/
+/*#define DEBUG_VITERBI*/
+
+EOH
+
+
+##======================================================================
+## C Utilities
+##======================================================================
+
+##----------------------------------------------------------------------
+## Log addition
+pp_addhdr(<<'EOH');
+
+/* logadd(x,y) = log(exp(x)+exp(y))
+ *   + Code from Manning & Schütze (1997), Sec. 9.4, page 337
+ *
+ * LOG_BIG = log(1E31)
+ */
+#define LOG_BIG    71.3801378828154
+#define LOG_ZERO  -1E+38
+#define LOG_ONE    0
+#define LOG_NONE   1
+double logadd1(double x, double y) {
+  if      (y-x > LOG_BIG) return y;
+  else if (x-y > LOG_BIG) return x;
+  /*else        return min(x,y) + log(exp(x-min(x,y)) + exp(y-min(x,y))); */
+  else if (x<y) return x        + log( 1              + exp(y-x));
+  else          return y        + log(exp(x-y)        + 1);
+}
+double logadd0(double x, double y) {
+  return log(exp(x)+exp(y));
+}
+
+/* logdiff(x,y) = log(exp(x)-exp(y))
+ *   + adapted from above
+ *   + always returns positive (i.e. symmetric difference)
+ */
+double logdiff1(double x, double y) {
+  if      (y-x > LOG_BIG) { return y; }
+  else if (x-y > LOG_BIG) { return x; }
+  /*else        { return max(x,y) + log(exp(max(x,y)-max(x,y)) - exp(min(x,y)-max(x,y))); } */
+  /*                   = max(x,y) + log( 1 - exp(min(x,y)-max(x,y))); } */
+  else if (x>y) { return x        + log( 1 - exp(y-x)); }
+  else          { return y        + log( 1 - exp(x-y)); }
+}
+double logdiff0(double x, double y) {
+  return log(x>y ? (exp(x)-exp(y)) : (exp(y)-exp(x)));
+}
+
+/*
+#define logadd(x,y) logadd0(x,y)
+#define logdiff(x,y) logdiff0(x,y)
+*/
+
+#define logadd(x,y) logadd1(x,y)
+#define logdiff(x,y) logdiff1(x,y)
+
+EOH
+
+
+##======================================================================
+## PDL::PP Wrappers
+##======================================================================
+
+##======================================================================
+## Basic Utilities
+pp_addpm(<<'EOPM');
+=pod
+
+=head1 Log Arithmetic
+
+=cut
+EOPM
+
+##------------------------------------------------------
+## logzero(): near approximation of log(0)
+pp_def('logzero',
+       Pars => 'float+ [o]a()',
+       Inplace=>['a'], ##-- can run inplace on a()
+       Code => '$a() = LOG_ZERO;',
+       CopyBadStatusCode =>
+	  (" if ( \$ISPDLSTATEBAD(a) ) PDL->${propagate_badflag}(a,0);"
+	   .'  $SETPDLSTATEGOOD(a);'),
+       HandleBad=>1,
+       Doc => 'Approximates $a() = log(0), avoids nan.',
+       BadDoc => 'logzero() handles bad values.  The state of the output PDL is always good.',
+      );
+
+
+##------------------------------------------------------
+## log addition: logadd(a,b) = log(exp(a)+exp(b))
+pp_def('logadd',
+       Pars => 'a(); b(); [o]c()',
+       Inplace=>['a'], ##-- can run inplace on a()
+       Code => '$c() = logadd($a(),$b());',
+       Doc => 'Computes $c() = log(exp($a()) + exp($b())), should be more stable.',
+      );
+
+##------------------------------------------------------
+## log subtraction: logdiff(a,b) = log(exp(max(a,b))-exp(min(a,b)))
+pp_def('logdiff',
+       Pars => 'a(); b(); [o]c()',
+       Inplace=>['a'], ##-- can run inplace on a()
+       Code => '$c() = logdiff($a(),$b());',
+       Doc => 'Computes log symmetric difference c = log(exp(max(a,b)) - exp(min(a,b))), may be more stable.',
+      );
+
+
+##------------------------------------------------------
+## log sum: logsumover(a) = log(sumover(exp(a)))
+pp_def('logsumover',
+       Pars => 'a(n); [o]b()',
+       Code => (join(" ",
+		     'double sum=LOG_ZERO;',
+		     'loop (n) %{ sum = logadd($a(),sum); %}',
+		     '$b() = sum;')),
+       Doc => 'Computes $b() = log(sumover(exp($a()))), should be more stable.',
+      );
+
+
+##======================================================================
+## Sequence Probability
+pp_addpm(<<'EOPM');
+=pod
+
+=head1 Sequence Probability
+
+=cut
+EOPM
+
+
+##------------------------------------------------------
+## Forward probability: hmmfw(A,B,pi, O, [o]alpha)
+pp_def
+('hmmfw',
+ Pars => 'a(N,N); b(N,M); pi(N);  o(T);  [o]alpha(N,T)',
+ Code =>
+('
+ /*-- Initialize: t==0 --*/
+ int i,j,t, o_tp1 = $o(T=>0);
+ loop (N) %{
+   $alpha(T=>0) = $pi() + $b(M=>o_tp1);
+
+   #ifdef DEBUG_ALPHA
+   printf("INIT: j=%u,t=0,o=%d:  pi(j=%u)=%.2e  b(j=%u,o=%d)=%.2e  alpha(j=%u,t=0)=%.2e\n",
+	  n,o_tp1,
+	  n,      exp($pi()),
+	  n,o_tp1 exp($b(M=>o_tp1)),
+	  n,      exp($alpha(T=>0))
+	 );
+   #endif
+ %}
+
+ #ifdef DEBUG_ALPHA
+ printf("\n\n");
+ #endif
+
+ /*-- Loop: time t>0 --*/
+ for (t=0; t < $SIZE(T)-1; t++) {
+   o_tp1 = $o(T=>t+1);
+
+   /*-- Loop: state_(t+1)==j --*/
+   for (j=0; j<$SIZE(N); j++) {
+     $GENERIC(alpha) alpha_j_tp1 = ($GENERIC(alpha))LOG_ZERO;
+
+
+     /*-- Loop: state_t==i --*/
+     for (i=0; i<$SIZE(N); i++) {
+       alpha_j_tp1 = logadd( $alpha(N=>i,T=>t) + $a(N0=>i,N1=>j),  alpha_j_tp1 );
+
+       #ifdef DEBUG_ALPHA
+        printf("i=%u,j=%u,t=%u,o=%d:  alpha(i=%u,t=%u)=%.2e  a(i=%u,j=%u)=%.2e  b(j=%u,o=%d)=%.2e  prod=%.2e  sum=%.2e\n",
+	       i,j,t,o_tp1,
+	       i,t,     exp($alpha(N=>i,T=>t)),
+	       i,j,     exp($a(N0=>i,N1=>j)),
+	       j,o_tp1, exp($b(N=>j,M=>o_tp1)),
+	       exp( $alpha(N=>i,T=>t) + $a(N0=>i,N1=>j) ), exp(alpha_j_tp1));
+       #endif
+     }
+
+     /*-- Storage: alpha(time=t+1, state=j) --*/
+     $alpha(N=>j,T=>t+1) = alpha_j_tp1 + $b(N=>j,M=>o_tp1);
+
+     #ifdef DEBUG_ALPHA
+      printf("----> alpha(j=%u,t=%u)=%.2E\n", j,t+1, exp($alpha(N=>j,T=>t+1)));
+     #endif
+   }
+   #ifdef DEBUG_ALPHA
+    printf("\n\n");
+   #endif
+ }
+'),
+
+Doc=>
+  ('Compute forward probability (alpha) matrix
+for input $o given model parameters
+@theta = ($a, $b, $pi, $omega).
+
+Output (pseudocode) for all 0<=i<N, 0<=t<T:
+
+ $alpha(i,t) = log P( $o(0:t), q(t)==i | @theta )
+
+Note that the final-state probability vector $omega() is neither
+passed to this function nor used in the computation, but
+can be used to compute the final sequence probability for $o as:
+
+  log P( $o | @theta ) = logsumover( $omega() + $alpha(:,t-1) )
+
+'),
+
+);
+
+pp_addpm('*hmmalpha = \&hmmfw;');
+pp_add_exported('','hmmalpha');
+
+
+##------------------------------------------------------
+## Forward probability (constrained): hmmfwq(A,B,pi, O,Q, [o]alphaq)
+pp_def
+('hmmfwq',
+ Pars => 'a(N,N); b(N,M); pi(N);  o(T); oq(Q,T);  [o]alphaq(Q,T)',
+ Code =>
+('
+ /*-- Initialize: t==0 --*/
+ int i,j,t, o_tp1 = $o(T=>0);
+ int qi,qj;
+
+ for (qi=0; qi < $SIZE(Q); qi++) {
+   j = $oq(Q=>qi,T=>0);
+   $alphaq(Q=>qi,T=>0) = (j>=0 ? $pi(N=>j) + $b(N=>j,M=>o_tp1) : ($GENERIC(alphaq))LOG_ZERO);
+ }
+
+ #ifdef DEBUG_ALPHA
+ printf("\n\n");
+ #endif
+
+ /*-- Loop: time t>0 --*/
+ for (t=0; t < $SIZE(T)-1; t++) {
+   o_tp1 = $o(T=>t+1);
+
+   /*-- Loop: q_(t+1)=qj : state_(t+1)=oq(qj,t+1)=j --*/
+   for (qj=0; qj < $SIZE(Q); qj++) {
+     $GENERIC(alphaq) alpha_j_tp1 = ($GENERIC(alphaq))LOG_ZERO;
+     j = $oq(Q=>qj,T=>t+1);
+
+     /*-- Loop: q_(t)=qi : state_(t)=oq(qi,t)=i --*/
+     for (qi=0; j>=0 && qi < $SIZE(Q); qi++) {
+       i = $oq(Q=>qi,T=>t);
+       if (i < 0) break;
+
+       alpha_j_tp1 = logadd( $alphaq(Q=>qi,T=>t) + $a(N0=>i,N1=>j),  alpha_j_tp1 );
+
+       #ifdef DEBUG_ALPHA
+        printf("qi=%u,i=%d,qj=%u,j=%d,t=%u,o=%d:  alphaq(qi=%u,t=%u)=%.2e  a(i=%d,j=%d)=%.2e  b(j=%d,o=%d)=%.2e  prod=%.2e  sum=%.2e\n",
+	       qi,i, qj,j, t,o_tp1,
+	       i,t,     exp($alphaq(Q=>qi,T=>t)),
+	       i,j,     ((i>=0 && j>=0) ? exp($a(N0=>i,N1=>j)) : 0),
+	       j,o_tp1, ((i>=0 && j>=0) ? exp($b(N=>j,M=>o_tp1)) : 0),
+               ((i>=0 && j>=0) ? exp( $alphaq(Q=>qi,T=>t) + $a(N0=>i,N1=>j) ) : 0),
+               exp(alpha_j_tp1));
+       #endif
+     }
+     /*-- End Loop: q_(t)=qi : state_(t)=oq(qi,t)=i --*/
+
+     /*-- Storage: alphaq(time=t+1, stateIndex=qj) --*/
+     if (j>=0) {
+       $alphaq(Q=>qj,T=>t+1) = alpha_j_tp1 + $b(N=>j,M=>o_tp1);
+     } else {
+       $alphaq(Q=>qj,T=>t+1) = ($GENERIC(alphaq))LOG_ZERO;
+     }
+
+     #ifdef DEBUG_ALPHA
+      printf("----> alphaq(qj=%u [j=%d], t=%u)=%.2E\n", qj,j,t+1, exp($alphaq(Q=>qj,T=>t+1)));
+     #endif
+   }
+   /*-- End Loop: q_(t+1)=qj : state_(t+1)=oq(qj,t+1)=j --*/
+
+   #ifdef DEBUG_ALPHA
+    printf("\n\n");
+   #endif
+ }
+ /*-- End Loop: time t>0 --*/
+'),
+
+Doc=>
+  ('Compute constrained forward probability (alphaq) matrix
+for input $o given model parameters
+@theta = ($a, $b, $pi, $omega),
+considering only the initial
+non-negative state indices in $oq(:,t) for each observation $o(t).
+
+Output (pseudocode) for all 0<=qi<Q, 0<=t<T:
+
+ $alphaq(qi,t) = log P( $o(0:t), q(t)==$oq(qi,t) | @theta )
+
+Note that the final-state probability vector $omega() is neither
+passed to this function nor used in the computation, but
+can be used to compute the final sequence probability for $o as:
+
+  log P( $o | @theta ) = logsumover( $alphaq(:,t-1) + $omega($oqTi) )
+
+where:
+
+  $oqTi = $oq(:,t-1)->where($oq(:,t-1)>=0)
+
+'),
+
+);
+
+pp_addpm('*hmmalphaq = \&hmmfwq;');
+pp_add_exported('','hmmalphaq');
+
+
+##------------------------------------------------------
+## Backward probability: hmmbw(A,B,omega, O, [o]beta)
+pp_def
+#@l=
+('hmmbw',
+ Pars => 'a(N,N); b(N,M); omega(N); o(T); [o]beta(N,T)',
+ Code =>
+('
+ int i,j,t = $SIZE(T)-1;
+
+ /*-- Initialize: time t==T --*/
+ loop(N) %{ $beta(T=>t) = $omega(); %}
+
+ /*-- Loop: time t < T --*/
+ for (t--; t >= 0; t--) {
+   int o_tp1 = $o(T=>t+1);
+
+   /*-- Loop: t<T: state_t == i  --*/
+   for (i=0; i<$SIZE(N); i++) {
+     $GENERIC(beta) beta_i_t = ($GENERIC(beta))LOG_ZERO;
+
+     /*-- Loop: t<T: state_(t+1) == i  --*/
+     for (j=0; j<$SIZE(N); j++) {
+       beta_i_t = logadd( $a(N0=>i,N1=>j) + $b(N=>j,M=>o_tp1) + $beta(N=>j,T=>t+1) ,  beta_i_t );
+
+       #ifdef DEBUG_BETA
+       printf("i=%u,j=%u,t=%u,o=%d:  a(i=%u,j=%u)=%.2e  b(j=%u,o=%u)=%.2e  beta(j=%u,t+1=%u)=%.2e   prod=%.2e  sum=%.2e\n",
+	      i,j,t,o_tp1,
+	      i,j,    exp($a(N0=>i,N1=>j)),
+	      j,o_t,  exp($b(N=>j,M=>o_t)),
+	      j,t+1,  exp($beta(N=>j,T=>t+1)),
+	      exp($a(N0=>i,N1=>j)+$b(N=>j,M=>o_t)+$beta(N=>j,T=>t+1)),  exp(beta_i_t));
+       #endif
+     }
+
+     /*-- t<T: state_t == i: update  --*/
+     $beta(N=>i,T=>t) = beta_i_t;
+
+     #ifdef DEBUG_BETA
+     printf("\n");
+     #endif
+   }
+   #ifdef DEBUG_BETA
+   printf("\n\n");
+   #endif
+ }
+'
+),
+
+Doc=>
+  ('Compute backward probability (beta) matrix
+for input $o given model parameters
+@theta = ($a, $b, $pi, $omega).
+
+Output (pseudocode) for all 0<=i<N, 0<=t<T:
+
+ $beta(i,t) = log P( $o(t+1:T-1) | q(t)==i, @theta )
+
+Note that the initial-state probability vector $pi() is neither
+passed to this function nor used in the computation, but
+can be used to compute the final sequence probability for $o as:
+
+  log P( $o | @theta ) = logsumover( $pi() + $b(:,$o(0)) + $beta(:,0) )
+
+'),
+
+);
+
+
+pp_addpm('*hmmbeta = \&hmmbw;');
+pp_add_exported('','hmmbeta');
+
+
+##------------------------------------------------------
+## Backward probability (constrained): hmmbwq(A,B,omega, O,Q, [o]beta)
+pp_def
+#@l=
+('hmmbwq',
+ Pars => 'a(N,N); b(N,M); omega(N); o(T); oq(Q,T); [o]betaq(Q,T)',
+ Code =>
+('
+ int i,j,t = $SIZE(T)-1;
+ int qi, qj;
+
+ /*-- Initialize: time t==T --*/
+ for (qi=0; qi < $SIZE(Q); qi++) {
+   i = $oq(Q=>qi,T=>t);
+   $betaq(Q=>qi,T=>t) = (i>=0 ? $omega(N=>i) : ($GENERIC(betaq))LOG_ZERO);
+ }
+
+ /*-- Loop: time t < T --*/
+ for (t--; t >= 0; t--) {
+   int o_tp1 = $o(T=>t+1);
+
+   /*-- Loop: t<T: q_(t)=qi : state_(t)=oq(qi,t)=i  --*/
+   for (qi=0; qi<$SIZE(Q); qi++) {
+     $GENERIC(betaq) beta_i_t = ($GENERIC(betaq))LOG_ZERO;
+     i = $oq(Q=>qi,T=>t);
+
+     /*-- Loop: t<T: q_(t+1)=qj : state_(t+1)=oq(qj,t+1)=j  --*/
+     for (qj=0; i>=0 && qj<$SIZE(Q); qj++) {
+       j = $oq(Q=>qj,T=>t+1);
+       if (j < 0) break;
+
+       beta_i_t = logadd( $a(N0=>i,N1=>j) + $b(N=>j,M=>o_tp1) + $betaq(Q=>qj,T=>t+1) ,  beta_i_t );
+     }
+
+     /*-- t<T: betaq(time=t, stateIndex=qi) --*/
+     $betaq(Q=>qi,T=>t) = beta_i_t;
+   }
+   /*-- End Loop: t<T: q_(t)=qi : state_(t)=oq(qi,t)=i  --*/
+ }
+ /*-- End Loop: time t < T --*/
+'
+),
+
+Doc=>
+  ('Compute constrained backward probability (betaq) matrix
+for input $o given model parameters
+@theta = ($a, $b, $pi, $omega),
+considering only the initial non-negative state indices in $oq(:,t) for
+each observation $o(t).
+
+Output (pseudocode) for all 0<=qi<Q, 0<=t<T:
+
+ $betaq(qi,t) = log P( $o(t+1:T-1) | q(t)==$oq(qi,t), @theta )
+
+Note that the initial-state probability vector $pi() is neither
+passed to this function nor used in the computation, but
+can be used to compute the final sequence probability for $o as:
+
+  log P( $o | @theta ) = logsumover( $betaq(:,0) + $pi($oq0i) + $b($oq0i,$o(0)) )
+
+where:
+
+  $oq0i = $oq(:,0)->where( $oq(:,0) >= 0 );
+
+'),
+
+);
+
+
+pp_addpm('*hmmbetaq = \&hmmbwq;');
+pp_add_exported('','hmmbetaq');
+
+
+##======================================================================
+## Parameter Estimation
+
+##------------------------------------------------------
+## Parameter Estimation: Initialize
+pp_addpm(<<'EOPM');
+=pod
+
+=head1 Parameter Estimation
+
+=head2 hmmexpect0
+
+=for sig
+
+  Signature: (a(N,N); b(N,M); pi(N); omega(N); [o]ea(N,N); [o]eb(N,M); [o]epi(N); [o]eomega(N))
+
+Initializes expectation matrices $ea(), $eb() and $epi() to logzero().
+For use with hmmexpect().
+
+=cut
+
+sub hmmexpect0 {
+  my ($a,$b,$pi,$omega, $ea,$eb,$epi,$eomega) = @_;
+
+  $ea  = zeroes($a->type,  $a->dims)  if (!defined($ea));
+  $eb  = zeroes($b->type,  $b->dims)  if (!defined($eb));
+  $epi = zeroes($pi->type, $pi->dims) if (!defined($epi));
+  $eomega = zeroes($omega->type, $omega->dims) if (!defined($eomega));
+
+  $ea  .= PDL::logzero();
+  $eb  .= PDL::logzero();
+  $epi .= PDL::logzero();
+  $eomega .= PDL::logzero();
+
+  return ($ea,$eb,$epi,$eomega);
+}
+
+
+EOPM
+
+pp_add_exported('', 'hmmexpect0');
+
+
+
+##------------------------------------------------------
+## Parameter Estimation: Expect
+pp_def
+('hmmexpect',
+ Pars => join(" ",
+	      qw(a(N,N);
+		 b(N,M);
+		 pi(N);
+		 omega(N);
+		 o(T);
+		 alpha(N,T);
+		 beta(N,T);),
+	      qw([o]ea(N,N);
+		 [o]eb(N,M);
+		 [o]epi(N);
+		 [o]eomega(N);)),
+ Code =>
+('
+ int i,j,t;
+ int o_tp1, o_t;
+ double p_o = LOG_ZERO;
+ double gamma_it;
+ double xi_ijt;
+
+ /*-- Initialize: t==(T-1): P(o|@theta) --*/
+ t = $SIZE(T)-1;
+ loop (N) %{ p_o = logadd(p_o, $omega() + $alpha(T=>t)); %}
+
+
+ /*-- Initialize: t==(T-1): Iterate: state_t==i: get gamma(i,t) --*/
+ o_t = $o(T=>t);
+ for (i=0; i<$SIZE(N); i++) {
+   gamma_it         = $alpha(N=>i,T=>t) + $beta(N=>i,T=>t) - p_o;
+   $eb(N=>i,M=>o_t) = logadd($eb(N=>i,M=>o_t), gamma_it);
+   $eomega(N=>i)    = logadd($eomega(N=>i)   , gamma_it);
+ }
+
+ /*-- Main: Iterate: T-1 > t >= 0 --*/
+ for (t--; t>=0; t--) {
+   o_tp1 = o_t;
+   o_t   = $o(T=>t);
+
+   /*-- Main: Iterate: state_t == i --*/
+   for (i=0; i<$SIZE(N); i++) {
+     gamma_it = $alpha(N=>i,T=>t) + $beta(N=>i,T=>t) - p_o;
+
+     /*-- Main: Iterate: state_(t+1) == j --*/
+     for (j=0; j<$SIZE(N); j++) {
+       xi_ijt = $alpha(N=>i,T=>t) + $a(N0=>i,N1=>j) + $b(N=>j,M=>o_tp1) + $beta(N=>j,T=>t+1) - p_o;
+
+       $ea(N0=>i,N1=>j) = logadd(xi_ijt, $ea(N0=>i,N1=>j));
+     }
+
+     /*-- Main: Update: pi --*/
+     if (t==0) $epi(N=>i) = logadd(gamma_it, $epi(N=>i));
+
+     /*-- Main: Update: b --*/
+     $eb(N=>i,M=>o_t)     = logadd(gamma_it, $eb(N=>i,M=>o_t));
+   }
+ }
+'),
+
+ Doc =>
+  ('Compute partial Baum-Welch re-estimation of the model @theta = ($a, $b, $pi, $omega)
+for the observation sequence $o() with forward- and backward-probability
+matrices $alpha(), $beta().  Result is recorded as log pseudo-frequencies
+in the expectation matrices $ea(), $eb(), $epi(), and $eomega(), which are required parameters,
+and should have been initialized (e.g. by L</hmmexpect0>()) before calling this function.
+
+Can safely be called sequentially for incremental reestimation.
+'),
+);
+
+
+##------------------------------------------------------
+## Parameter Estimation: Expect (constrained)
+pp_def
+('hmmexpectq',
+ Pars => join(" ",
+	      qw(a(N,N);
+		 b(N,M);
+		 pi(N);
+		 omega(N);),
+	      qw(o(T);
+		 oq(Q,T);),
+	      qw(alphaq(Q,T);
+		 betaq(Q,T);),
+	      qw([o]ea(N,N);
+		 [o]eb(N,M);
+		 [o]epi(N);
+		 [o]eomega(N);)),
+ Code =>
+('
+ int i,j,t, qi,qj;
+ int o_tp1, o_t;
+ double p_o = LOG_ZERO;
+ double gamma_it;
+ double xi_ijt;
+
+ /*-- Initialize: t==(T-1): P(o|@theta) --*/
+ t = $SIZE(T)-1;
+ for (qi=0; qi < $SIZE(Q); qi++) {
+   i = $oq(Q=>qi,T=>t);
+   if (i < 0) break;
+
+   p_o = logadd(p_o, $omega(N=>i) + $alphaq(Q=>qi,T=>t));
+ }
+
+ /*-- Initialize: t==(T-1): Iterate: q_(t)=qi: state_t=oq(qi,t)=i: get gamma(i,t) --*/
+ o_t = $o(T=>t);
+ for (qi=0; qi < $SIZE(Q); qi++) {
+   i                = $oq(Q=>qi,T=>t);
+   if (i < 0) break;
+   gamma_it         = $alphaq(Q=>qi,T=>t) + $betaq(Q=>qi,T=>t) - p_o;
+   $eb(N=>i,M=>o_t) = logadd($eb(N=>i,M=>o_t), gamma_it);
+   $eomega(N=>i)    = logadd($eomega(N=>i)   , gamma_it);
+ }
+
+ /*-- Loop: T-1 > t >= 0 --*/
+ for (t--; t>=0; t--) {
+   o_tp1 = o_t;
+   o_t   = $o(T=>t);
+
+   /*-- Loop: q_(t)=qi: state_(t)=oq(qi,t)=i --*/
+   for (qi=0; qi<$SIZE(Q); qi++) {
+     i        = $oq(Q=>qi,T=>t);
+     if (i < 0) break;
+     gamma_it = $alphaq(Q=>qi,T=>t) + $betaq(Q=>qi,T=>t) - p_o;
+
+     /*-- Loop: q_(t+1)=qj: state_(t+1)=oq(qj,t+1)=j --*/
+     for (qj=0; qj<$SIZE(Q); qj++) {
+       j      = $oq(Q=>qj,T=>t+1);
+       if (j < 0) break;
+
+       xi_ijt = $alphaq(Q=>qi,T=>t) + $a(N0=>i,N1=>j) + $b(N=>j,M=>o_tp1) + $betaq(Q=>qj,T=>t+1) - p_o;
+
+       $ea(N0=>i,N1=>j) = logadd(xi_ijt, $ea(N0=>i,N1=>j));
+     }
+
+     /*-- Update: pi --*/
+     if (t==0) $epi(N=>i) = logadd(gamma_it, $epi(N=>i));
+
+     /*-- Update: b --*/
+     $eb(N=>i,M=>o_t)     = logadd(gamma_it, $eb(N=>i,M=>o_t));
+   }
+   /*-- End Loop: q_(t)=qi: state_(t)=oq(qi,t)=i --*/
+ }
+ /*-- End Loop: T-1 > t >= 0 --*/
+'),
+
+ Doc =>
+  ('Compute constrained partial Baum-Welch re-estimation of the model @theta = ($a, $b, $pi, $omega)
+for the observation sequence $o(), 
+with constrained forward- and backward-probability
+matrices $alphaq(), $betaq(),
+considering only the initial non-negative state
+indices in $oq(:,t) for observation $o(t).
+Result is recorded as log pseudo-frequencies
+in the expectation matrices $ea(), $eb(), $epi(), and $eomega(), which are required parameters,
+and should have been initialized (e.g. by L</hmmexpect0>()) before calling this function.
+
+Can safely be called sequentially for incremental reestimation.
+'),
+);
+
+
+##------------------------------------------------------
+## Parameter Estimation: Maximization
+pp_addpm(<<'EOPM');
+=pod
+
+=head2 hmmmaximize
+
+=for sig
+
+  Signature: (Ea(N,N); Eb(N,M); Epi(N); Eomega(N); [o]ahat(N,N); [o]bhat(N,M); [o]pihat(N); [o]omegahat(N));
+
+Maximizes expectation values from $Ea(), $Eb(), $Epi(), and $Eomega()
+to log-probability matrices $ahat(), $bhat(), $pihat(), and $omegahat().
+Can also be used to compile a maximum-likelihood model
+from log-frequency matrices.
+
+=cut
+
+sub hmmmaximize {
+  my ($ea,$eb,$epi,$eomega, $ahat,$bhat,$pihat,$omegahat) = @_;
+
+  $ahat  = zeroes($ea->type,  $ea->dims)  if (!defined($ahat));
+  $bhat  = zeroes($eb->type,  $eb->dims)  if (!defined($bhat));
+  $pihat = zeroes($epi->type, $epi->dims) if (!defined($pihat));
+  $omegahat = zeroes($eomega->type, $eomega->dims) if (!defined($omegahat));
+
+  my $easumover = $ea->xchg(0,1)->logsumover->inplace->logadd($eomega);
+
+  $ahat  .= $ea  - $easumover;
+  $bhat  .= $eb  - $eb->xchg(0,1)->logsumover;
+  $pihat .= $epi - $epi->logsumover;
+  $omegahat .= $eomega - $easumover;
+
+  return ($ahat,$bhat,$pihat,$omegahat);
+}
+
+EOPM
+
+pp_add_exported('', 'hmmmaximize');
+
+
+##======================================================================
+## Sequence Analysis
+pp_addpm(<<'EOPM');
+=pod
+
+=head1 Sequence Analysis
+
+=cut
+EOPM
+
+
+##--------------------------------------------------------------
+## Sequence Analysis: Viterbi
+pp_def
+('hmmviterbi',
+ Pars => join(" ",
+	      qw(a(N,N);
+		 b(N,M);
+		 pi(N);),
+	      #qw(omega(N);),
+	      qw(o(T);
+		   [o]delta(N,T);),
+	      'int [o]psi(N,T)'),
+ Code =>
+('
+ int i,j, t, o_t;
+ double delta_jt, delta_tmp;
+ int psi_jt;
+
+ /*-- Initialize: t==0: Loop: state_0==N --*/
+ o_t = $o(T=>0);
+ loop (N) %{
+   $delta(T=>0) = $pi() + $b(M=>o_t);
+   $psi  (T=>0) = 0;
+#ifdef DEBUG_VITERBI
+   printf("t=0,j=%d,o_t=%d: delta(t=0,j=%d)=%.2e  psi(t=0,j=%d)=%.0g  b(j=%d,o=%d)=%.2e\n",
+           N,o_t,
+           N, exp($delta(T=>0)),
+           N, $psi(T=>0),
+           N,o_t, exp($b(M=>o_t)));
+#endif
+ %}
+
+#ifdef DEBUG_VITERBI
+   printf("\n");
+#endif
+
+ /*-- Main: t>0: Loop: time==t --*/
+ for (t=1; t<$SIZE(T); t++) {
+   o_t = $o(T=>t);
+
+   /*-- Main: t>0: Loop: state_t==j --*/
+   for (j=0; j<$SIZE(N); j++) {
+     psi_jt   = 0;
+     delta_jt = $delta(N=>0,T=>t-1) + $a(N0=>0,N1=>j);
+
+     /*-- Main: t>0: Loop: state_(t-1)==i --*/
+     for (i=1; i<$SIZE(N); i++) {
+       delta_tmp = $delta(N=>i,T=>t-1) + $a(N0=>i,N1=>j);
+
+       if (delta_tmp > delta_jt) {
+	 delta_jt = delta_tmp;
+	 psi_jt   = i;
+#ifdef DEBUG_VITERBI
+         printf("+");
+#endif
+       }
+
+#ifdef DEBUG_VITERBI
+       printf("t=%d,i=%d,j=%d,o_t=%d:  deltaX(i=%d,t=%d)=%.2e  psi(j=%d,t=%d)=%.0g  delta(j=%d,t=%d)=%.2e\n",
+              t,i,j,o_t,
+              i,t,  exp(delta_tmp),
+              j,t,  psi_jt,
+              j,t,  exp(delta_jt));
+#endif
+     }
+
+     /*-- Main: t>0: Store data for state,time=(j,t) --*/
+     $delta(N=>j,T=>t) = delta_jt + $b(N=>j,M=>o_t);
+     $psi  (N=>j,T=>t) = psi_jt;
+
+#ifdef DEBUG_VITERBI
+     printf("\n---> t=%d: b(j=%d,o=%d)=%.2e  delta(j=%d,t=%d)=%.2e  psi(j=%d,t=%d)=%.0g\n\n",
+            t, j,o_t, exp($b(N=>j,M=>o_t)),
+            j,t,      exp($delta(N=>j,T=>t)),
+            j,t,      $psi(N=>j,T=>t));
+#endif
+   }
+#ifdef DEBUG_VITERBI
+   printf("\n");
+#endif
+ }
+'),
+  Doc =>
+  ('Computes Viterbi algorithm trellises $delta() and $psi() for the
+observation sequence $o() given the model parameters @theta = ($a,$b,$pi,$omega).
+
+Outputs:
+
+Probability matrix $delta(): log probability of best path to state $j at time $t:
+
+ $delta(j,t) = max_{q(0:t)} log P( $o(0:t), q(0:t-1), $q(t)==j | @theta )
+
+Path backtrace matrix $psi(): best predecessor for state $j at time $t:
+
+ $psi(j,t) = arg_{q(t-1)} max_{q(0:t)} P( $o(0:t), q(0:t-1), $q(t)==j | @theta )
+
+Note that if you are using termination probabilities $omega(),
+then in order to find the most likely final state, you need to
+compute the contribution of $omega() yourself, which is easy
+to do:
+
+ $best_final_q = maximum_ind($delta->slice(",-1") + $omega);
+
+'),
+);
+
+
+##--------------------------------------------------------------
+## Sequence Analysis: Viterbi (constrained)
+pp_def
+('hmmviterbiq',
+ Pars => join(" ",
+	      qw(a(N,N);
+		 b(N,M);
+		 pi(N);),
+	      qw(o(T);
+		 oq(Q,T);),
+	      '[o]deltaq(Q,T);',
+	      'int [o]psiq(Q,T)',
+	      ),
+ Code =>
+('
+ int qi,qj, i,j, t, o_t;
+ double deltaq_jt, deltaq_tmp;
+ int psiq_jt;
+
+ /*-- Initialize: t=0: Loop: q_(0)=qi: state_(0)=oq(qi,0)=i --*/
+ o_t = $o(T=>0);
+ for (qi=0; qi<$SIZE(Q); qi++) {
+   i = $oq(Q=>qi,T=>0);
+   $psiq(Q=>qi,T=>0) = 0;
+   $deltaq(Q=>qi,T=>0) = (i>=0 ? ($pi(N=>i)+$b(N=>i,M=>o_t)) : ($GENERIC(deltaq))LOG_ZERO);
+ }
+
+ /*-- Loop: t>0: Loop: time==t --*/
+ for (t=1; t<$SIZE(T); t++) {
+   o_t = $o(T=>t);
+
+   /*-- Loop: t>0: q_(t)=qj : state_(t)=oq(qj,t)=j --*/
+   for (qj=0; qj<$SIZE(Q); qj++) {
+     j         = $oq(Q=>qj,T=>t);
+     i         = $oq(Q=>0, T=>t-1);
+     psiq_jt   = 0;
+
+     if (j >= 0 && i >=0) {
+       deltaq_jt = $deltaq(Q=>0,T=>t-1) + $a(N0=>i,N1=>j);
+     } else {
+       deltaq_jt = $deltaq(Q=>0,T=>t-1) + LOG_ZERO;
+     }
+
+     /*-- Loop: t>0: q_(t-1)=qi : state_(t-1)=oq(qi,t)=i --*/
+     for (qi=1; qi<$SIZE(Q); qi++) {
+       i         = $oq(Q=>qi,T=>t-1);
+       if (j < 0 || i < 0) break;
+
+       deltaq_tmp = $deltaq(Q=>qi,T=>t-1) + $a(N0=>i,N1=>j);
+
+       if (deltaq_tmp > deltaq_jt) {
+	 deltaq_jt = deltaq_tmp;
+	 psiq_jt   = qi;
+       }
+
+     }
+     /*-- End Loop: t>0: q_(t-1)=qi : state_(t-1)=oq(qi,t)=i --*/
+
+     /*-- Main: t>0: Store data for stateIndex,time=(qj,t) --*/
+     $deltaq(Q=>qj,T=>t) = deltaq_jt + (j>=0 ? $b(N=>j,M=>o_t) : LOG_ZERO);
+     $psiq  (Q=>qj,T=>t) = psiq_jt;
+
+   }
+   /*-- Loop: t>0: q_(t)=qj : state_(t)=oq(qj,t)=j --*/
+
+ }
+ /*-- End Loop: t>0: Loop: time==t --*/
+'
+),
+  Doc =>
+  ('Computes constrained Viterbi algorithm trellises $deltaq() and $psiq() for the
+observation sequence $o() given the model parameters @theta = ($a,$b,$pi,$omega),
+considering only the initial non-negative state indices $oq(:,t) for each
+observarion $o(t).
+
+Outputs:
+
+Constrained probability matrix $deltaq(): log probability of best path to state $oq(j,t) at time $t:
+
+ $deltaq(j,t) = max_{j(0:t)} log P( $o(0:t), q(0:t-1)==$oq(:,j(0:t-1)), q(t)==$oq(j,t) | @theta )
+
+Constrained path backtrace matrix $psiq(): best predecessor index for state $oq(j,t) at time $t:
+
+ $psiq(j,t) = arg_{j(t-1)} max_{j(0:t)} P( $o(0:t), q(0:t-1)=$oq(:,j(0:t-1)), q(t)==$oq(j,t) | @theta )
+
+Note that if you are using termination probabilities $omega(),
+then in order to find the most likely final state, you need to
+compute the contribution of $omega() yourself, which is quite easy
+to do:
+
+ $best_final_j = maximum_ind($deltaq->slice(",-1") + $omega->index($oq->slice(",(-1)")))
+
+'),
+);
+
+
+##--------------------------------------------------------------
+## Sequence Analysis: Backtrace
+pp_def
+('hmmpath',
+ Pars => q(psi(N,T); int qfinal(); int [o]path(T)),
+ Code =>
+('
+ /*-- Initialize: t==T-1: state_(t)==final() --*/
+ int t = $SIZE(T)-1;
+ $path(T=>t) = $qfinal();
+
+ /*-- Main: T-1 > t >= 0: Loop: time==t --*/
+ for (t--; t>=0; t--) {
+   int q_tp1   = $path(T=>t+1);
+   $path(T=>t) = $psi (T=>t+1,N=>q_tp1);
+ }
+'),
+  Doc =>
+  ('Computes best-path backtrace $path() for the final state $qfinal()
+from completed Viterbi trellis $psi().
+
+Outputs:
+
+Path backtrace $path(): state (in best sequence) at time $t:
+
+ $path(t) = arg_{q(t)} max_{q(0:T-1)} log P( $o(), q(0:T-2), $q(T-1)==$qfinal() | @theta )
+
+This even threads over multiple final states, if specified,
+so you can align paths to their final states just by calling:
+
+ $bestpaths = hmmpath($psi, sequence($N));
+
+Note that $path(T-1) == $qfinal(): yes, this is redundant,
+but also tends to be quite convenient.
+
+'),
+);
+
+##--------------------------------------------------------------
+## Sequence Analysis: Backtrace (constrained)
+pp_def
+('hmmpathq',
+ Pars => q(oq(Q,T); psiq(Q,T); int qfinalq(); int [o]path(T)),
+ Code =>
+('
+ /*-- Initialize: t==T-1: state_(t)==final() --*/
+ int t = $SIZE(T)-1;
+ $path(T=>t) = $qfinalq();
+
+ /*-- Get index backtrace --*/
+ for (t--; t>=0; t--) {
+   int qi_tp1  = $path(T=>t+1);
+   $path(T=>t) = $psiq(T=>t+1,Q=>qi_tp1);
+ }
+
+ /*-- Convert indices to state ids --*/
+ loop (T) %{
+   int qi  = $path();
+   $path() = $oq(Q=>qi);
+ %}
+'),
+  Doc =>
+  ('Computes constrained best-path backtrace $path() for the final state index $qfinalq()
+from completed constrained Viterbi trellis $psiq().
+
+Outputs:
+
+Path backtrace $path(): state (in best sequence) at time $t:
+
+ $path(t) = arg_{q(t)} max_{q(0:T-1)} log P( $o(), q(0:T-2), $q(T-1)==$oq($qfinalq(),T-1) | @theta )
+
+This is really just a convenience method for dealing with constrained
+lookup -- the same thing can be accomplished using hmmpath() and
+some PDL index magic.
+
+'),
+);
+
+
+
+##======================================================================
+## Footer Administrivia
+##======================================================================
+
+##------------------------------------------------------
+## pm additions
+pp_addpm(<<'EOPM');
+
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 COMMON PARAMETERS
+
+HMMs are specified by parameters $a(N,N), $b(N,M), $pi(N), and $omega(N);
+input sequences are represented as vectors $o(T) of integer values in the range [0..M-1],
+where the following notational conventions are used:
+
+=over 4
+
+
+=item States:
+
+The model has $N states, denoted $q,
+0 <= $q < $N.
+
+
+=item Alphabet:
+
+The input- (aka "observation-") alphabet of the model has $M elements,
+denoted $o(t), 0 <= $o(t) < $M.
+
+
+=item Time indices:
+
+Time indices are denoted $t,
+1 <= $t < $T.
+
+
+=item Input Sequences:
+
+Input- (aka "observation-") sequences are represented as vectors of
+of length $T whose component values are in the range [0..M-1],
+i.e. alphabet indices.
+
+
+
+=item Initial Probabilities:
+
+The vector $pi(N) gives the (log) initial state probability distribution:
+
+ $pi(i) = log P( $q(0)==i )
+
+
+
+=item Final Probabilities:
+
+The vector $omega(N) gives the (log) final state probability distribution:
+
+ $omega(i) = log P( $q($T)==i )
+
+This parameter is a nonstandard extension.
+You can simulate the behavior of more traditional definitions
+(such as that given in Rabiner (1989)) by setting:
+
+ $omega = zeroes($N);
+
+wherever it is required.
+
+
+
+=item Arc Probabilities:
+
+The matrix $a(N,N) gives the (log) conditional state-transition probability distribution:
+
+ $a(i,j) = log P( $q(t+1)==j | $q(t)==i )
+
+
+
+=item Emission Probabilities:
+
+The matrix $b(N,M) gives the (log) conditional symbol emission probability:
+
+ $b(j,o) = log P( $o(t)==o | $q(t)==j )
+
+
+
+=back
+
+=cut
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+Perl by Larry Wall.
+
+PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
+
+Implementation based largely on the formulae in:
+L. E. Rabiner, "A tutorial on Hidden Markov Models and selected
+applications in speech recognition," Proceedings of the IEEE 77:2,
+Februrary, 1989, pages 257--286.
+
+=cut
+
+##----------------------------------------------------------------------
+=pod
+
+=head1 KNOWN BUGS
+
+Probably many.
+
+=cut
+
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head2 Copyright Policy
+
+Copyright (C) 2005, 2006, 2008, 2011 by Bryan Jurish. All rights reserved.
+
+This package is free software, and entirely without warranty.
+You may redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1), PDL(3perl).
+
+=cut
+
+EOPM
+
+
+# Always make sure that you finish your PP declarations with
+# pp_done
+pp_done();
+##----------------------------------------------------------------------

@@ -1,0 +1,25 @@
+NAME
+    Pegex::vCard - Pegex Parser for vCard
+
+SYNOPSIS
+        use Pegex::vCard;
+        my $vcard = Pegex::vCard->parse($vcard);
+
+DESCRIPTION
+    This module provides a Pegex grammar driven parser for the vCard format.
+    It returns a hash containing all the data.
+
+SEE ALSO
+    *   <http://en.wikipedia.org/wiki/VCard>
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

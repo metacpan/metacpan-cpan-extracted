@@ -1,0 +1,55 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+my $cwd = `cat \$HOME/.process-masks-gui` || $ENV{'HOME'};
+chomp $cwd;
+
+unless (`which process-masks`)
+{
+    `zenity --error --text='process-masks not found in your \$PATH'`;
+    exit 1;
+}
+
+my @files;
+
+if (@ARGV)
+{
+    @files = @ARGV;
+}
+else
+{
+    my $result = `zenity --file-selection \\
+                         --filename=$cwd/ \\
+                         --title='Select enblend masks to process' \\
+                         --multiple` || exit 0;
+    chomp $result;
+    @files = split ('\|', $result);
+}
+
+my $index = 1;
+
+@files = map (quotemeta, @files);
+my $files = join ' ', @files;
+my $title = "processing ". scalar (@files) ."masks";
+`process-masks $files | \\
+ zenity --progress \\
+        --title='$title' \\
+        --auto-close \\
+        --pulsate \\
+        --text='Project: $files'`;
+
+$cwd = $files[0];
+$cwd =~ s/\/[^\/]*$//;
+$cwd =~ s/\\\//\//g;
+`echo '$cwd' > \$HOME/.process-masks-gui` if ($cwd =~ /^\//);
+
+$title = scalar (@files) . ' enblend masks processed';
+my $text = join ("\n", @files);
+
+`zenity --info \\
+        --title='$title' \\
+        --text='$text'`;
+
+exit 0;

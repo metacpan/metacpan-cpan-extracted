@@ -1,0 +1,216 @@
+Revision history for Path-Iterator-Rule
+
+1.012     2016-04-10 13:45:55-04:00 America/New_York
+
+    [PREREQS]
+
+    - Dropped minimum Perl version required to 5.008001
+
+1.011     2016-02-29 22:17:45-05:00 America/New_York
+
+    [ADDED]
+
+    - Added 'report_symlinks' option to include symlinks in results, even
+      if not descending into directories.  Defaults to 'follow_symlinks'
+      if not explictly set.
+
+1.010     2016-02-29 21:48:56-05:00 America/New_York
+
+    [FIXED]
+
+    - Protects tests from temporary directory names that cause false
+      errors.
+
+1.009     2015-09-20 22:02:20-04:00 America/New_York
+
+    [FIXED]
+
+    - Regular expressions flags were being lost.  Now name(qr/foo/i) works
+      like iname(qr/foo/)
+
+1.008     2014-02-04 17:40:45-05:00 America/New_York
+
+    [ADDED]
+
+    - Added VCS rules for DARCS (Gian Piero Carrubba)
+
+1.007     2014-01-25 14:39:09-05:00 America/New_York
+
+    [DOCS]
+
+    - Document the behavior of ->all in scalar context
+
+1.006     2013-10-09 11:14:28 America/New_York
+
+    [PREREQS]
+
+    - Removed dependencies on Data::Clone, namespace::clean and autodie
+
+    [DOCS]
+
+    - Typo fixes
+
+1.005     2013-04-02 09:33:44 America/New_York
+
+    [FIXED]
+
+    - Fixed broken t/content.t on Windows
+
+1.004     2013-03-27 23:14:01 America/New_York
+
+    [ADDED]
+
+    - contents_match and line_match rules
+
+1.003     2013-03-09 23:16:30 America/New_York
+
+    [FIXED]
+
+    - Fixed Windows test failure
+
+1.002     2013-03-08 22:35:51 America/New_York
+
+    [FIXED]
+
+    - Returning relative results now works with subclasses
+
+1.001     2013-03-02 08:50:25 America/New_York
+
+    [FIXED]
+
+    - A test unintentionally required 5.12; this has been fixed and 5.10 is
+      the minimum Perl once again
+
+1.000     2013-02-27 15:25:47 America/New_York
+
+    [INCOMPATIBLE CHANGES]
+
+    - Custom rule logic has changed.  The previous "0 but true" hack
+      will throw an exception.  Custom rules should return \1 or \0
+      to signal that a directory should be pruned but returned or
+      pruned and skipped, respectively
+
+    [ADDED]
+
+    - Added 'skip_subdirs' method (Issue #7)
+
+    [DOCUMENTED]
+
+    - Clarified max/min depth rules
+
+0.014     2013-02-16 09:57:39 America/New_York
+
+    [CHANGED]
+
+    - Refactored some internals to allow more flexible subclassing
+
+0.013     2013-02-15 10:51:59 America/New_York
+
+    [ADDED]
+
+    - Added 'relative' option to iterator
+
+0.012     2013-02-13 20:40:55 America/New_York
+
+    [ADDED]
+
+    - Includes PIR.pm as an empty subclass of Path::Iterator::Rule
+      for less typing for one-liners
+
+0.011     2013-02-06 16:24:16 America/New_York
+
+    [FIXED]
+
+    - Really fixed tests on Windows this time, I hope.
+
+0.010     2013-01-31 15:56:17 America/New_York
+
+    [ADDED]
+
+    - Added a "visitor" option to pass results to a code reference
+      during iteration
+
+    [CHANGED]
+
+    - Calling all() in void context will iterate but not store results
+
+    [FIXED]
+
+    - Another attempt at fixing tests on Windows. Damn those backslashes!
+
+0.009     2013-01-25 21:52:41 America/New_York
+
+    [FIXED]
+
+    - Fixed tests on Windows
+
+0.008     2013-01-24 09:05:01 America/New_York
+
+    [DOCUMENTED]
+
+    - Fixed typos that still talked about Path::Class objects
+
+    - Fixed documentation of test()
+
+    - Added Path::Class::Rule and IO::All::Rule to the list
+      of alternates
+
+0.007     2013-01-23 22:35:47 America/New_York
+
+    [DOCUMENTED]
+
+    - Fixed typo relating to Number::Compare.  "1M" is legal, "1MB" is not
+
+0.006     2013-01-23 21:54:31 America/New_York
+
+    [CHANGED]
+
+    - Even more internal optimization
+
+0.005     2013-01-23 19:55:57 America/New_York
+
+    [FIXED]
+
+    - Fixed broken t/fast.t on some systems
+
+0.004     2013-01-23 19:37:47 America/New_York
+
+    [ADDED]
+
+    - Added 'iter_fast' and 'all_fast' methods that switch default options
+      from safe to fast
+
+0.003     2013-01-23 18:32:31 America/New_York
+
+    [DOCUMENTED]
+
+    - Added PERFORMANCE section with tips
+
+    [CHANGED]
+
+    - Additional internal optimization
+
+0.002     2013-01-23 14:38:24 America/New_York
+
+    [INCOMPATIBLE CHANGES]
+
+    - Test subroutines now get path, basename and stash
+      instead of just path and stash; this saves substantial
+      overhead on name checks.
+
+    [ADDED]
+
+    - Add 'sorted' option that defaults to true; disabling
+      this can improve speed for directories with many files
+
+    [CHANGED]
+
+    - Setting 'error_handler' to undef disables error
+      checks for speed
+
+    - Various other optimizations for improved performance
+
+0.001     2013-01-22 06:22:44 America/New_York
+
+    - First release, based on Path::Class::Rule 0.015
+

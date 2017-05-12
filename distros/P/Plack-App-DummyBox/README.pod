@@ -1,0 +1,56 @@
+=encoding utf8
+
+
+This is Perl module B<Plack::App::DummyBox>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Plack-App-DummyBox"><img src="https://secure.travis-ci.org/bayashi/Plack-App-DummyBox.png"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Plack::App::DummyBox installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Plack::App::DummyBox
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+=head2 DEPENDENCY
+
+Plack::App::DummyBox requires gif and png libraries for L<Imager> module.
+You should install it before installing Plack::App::DummyBox.
+
+
+=head1 DOCUMENTATION
+
+Plack::App::DummyBox documentation is available as in POD. So you can do:
+
+    % perldoc Plack::App::DummyBox
+
+
+=head1 REPOSITORY
+
+Plack::App::DummyBox is hosted on github
+L<http://github.com/bayashi/Plack-App-DummyBox>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

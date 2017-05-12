@@ -1,0 +1,29 @@
+---
+abstract: 'render POD files as HTML'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Pod
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  HTTP::Request::Common: 0
+  Plack::Builder: 0
+  Plack::Middleware: 0
+  Plack::Test: 0
+  Pod::POM: 0
+  Test::More: 0
+resources:
+  repository: https://github.com/Corion/plack-middleware-pod
+version: 0.05

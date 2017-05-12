@@ -1,0 +1,30 @@
+NAME
+    Perl::Folder - Fold and Unfold Blocks in Perl Code
+
+DESCRIPTION
+    Using regexps to look for values in Perl code is problematic. This
+    module makes it much more reliable.
+
+    Say you are looking for a line like this one:
+
+        our $VERSION = '0.10';
+
+    Matching that line is easy. But that line might be in a heredoc, the
+    "DATA" section, a POD block or a comment. Also if you try to strip out
+    all heredocs you don't know if they are really part of a POD block of
+    "DATA" section, and vice versa.
+
+    This module correctly finds these four types of blocks and folds them
+    up, replacing their content with the SHA1 digest of their content.
+
+AUTHOR
+    Ingy döt Net
+
+COPYRIGHT
+    Copyright (c) 2007. Ingy döt Net. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

@@ -1,0 +1,35 @@
+Revision history for Parse-PayPal-TxDetailReport
+
+0.006   2016-12-30 (PERLANCAR)
+
+	- Add 'format' result key with value 'txdetail_v11'.
+
+
+0.005   2016-07-21 (PERLANCAR)
+
+	- Initialize transactions to avoid crash when there is no
+	  transactions in input.
+
+
+0.004   2016-07-21 (PERLANCAR)
+
+	- Also handle BOM on strings.
+
+
+0.003   2016-07-21 (PERLANCAR)
+
+	- Handle Byte Order Mark on files.
+
+
+0.002   2016-07-21 (PERLANCAR)
+
+        - Also accept strings as inputs as alternative to filenames.
+
+        - Fix error returning.
+
+        - Fix misplaced paragraph in doc.
+
+
+0.001   2016-07-21 (PERLANCAR)
+
+        - First version.

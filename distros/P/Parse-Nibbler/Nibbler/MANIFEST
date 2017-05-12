@@ -1,0 +1,15 @@
+README
+Changes
+MANIFEST
+Makefile.PL
+Nibbler.pm
+t/bones.t
+t/bones.txt
+t/verilog.t
+t/verilog.v
+t/big_verilog.t
+t/big_verilog.v
+t/VerilogGrammar.pm
+t/Profiler.pm
+legal/lgpl-license.html
+legal/lgpl.txt

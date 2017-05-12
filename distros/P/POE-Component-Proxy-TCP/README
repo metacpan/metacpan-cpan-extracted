@@ -1,0 +1,64 @@
+POE-Component-Proxy-TCP version 0.01
+====================================
+
+--------
+Abstract
+--------
+
+POE::Component::Proxy::TCP is an asynchronous, event driven proxy POE
+component.  It accepts tcp connection on a specified well-know port
+from a remote client, and then connects to a remote server at a specified host
+and port. After connection it copies all data received from either side to the other,
+calling given callbacks to perform any application specific processing.
+
+------------
+Requirements
+------------
+
+POE::Component::Proxy::TCP requires POE.  Some example programs
+require Tk.pm. The requirements are encoded in Makefile.PL, so the
+CPAN shell should do the right thing.  If this is installed without
+the CPAN shell, the person installing it will have to do the right
+thing manually.
+
+------------------
+Basic Installation
+------------------
+[NOT YET! Will not be in CPAN until in sourceforge first - AVP]
+
+POE::Component::Proxy::TCP may be installed through the CPAN shell
+in the usual CPAN shell manner.  This typically is:
+
+  $ perl -MCPAN -e 'intstall POE::Component::Proxy::TCP'
+
+You can also read this README from the CPAN shell:
+
+  $ perl -MCPAN -e shell
+  cpan> readme POE::Component::Proxy::TCP
+
+And you can install the component from the CPAN prompt as well:
+
+  cpan> install POE::Component::Proxy::TCP
+
+-------------------
+Manual Installation
+-------------------
+
+POE::Component::Proxy::TCP can also be installed manually.
+
+Downloading and unpacking the distribution are left as exercises for
+the reader.  To build and test it:
+
+  perl Makefile.PL
+  make test
+
+When you're ready to install the component:
+
+  make install
+
+It should now be ready to use.
+
+Thanks for reading!
+- Andrew V. Purshottam andy@andypurshottam.com
+
+(This README adapted from README written by Rocco Caputo / troc@netrus.net)

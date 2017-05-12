@@ -1,0 +1,58 @@
+#ifndef CONFIG_H_LOADED
+#define CONFIG_H_LOADED
+
+#undef const
+
+#undef CLOSEDIR_VOID
+#undef RETSIGTYPE
+
+#undef mode_t
+#undef pid_t
+#undef size_t
+
+#undef WORDS_BIGENDIAN
+
+#undef HAVE_STRFTIME
+#undef HAVE_STRERROR
+#undef HAVE_STRTOK
+#undef HAVE_VPRINTF
+
+#undef STDC_HEADERS
+#undef TM_IN_SYS_TIME
+#undef HAVE_DIRENT_H
+#undef HAVE_FCNTL_H
+#undef HAVE_LIMITS_H
+#undef HAVE_STRING_H
+#undef HAVE_NDIR_H
+#undef HAVE_SYS_DIR_H
+#undef HAVE_SYS_NDIR_H
+#undef HAVE_UNISTD_H
+#undef HAVE_SYS_TIME_H
+#undef HAVE_SOUNDCARD_H
+#undef HAVE_SYS_SOUNDCARD_H
+#undef HAVE_MACHINE_SOUNDCARD_H
+#undef HAVE_LIBC_H
+
+#define SIZEOF_INT 0
+#define SIZEOF_CHAR 0
+#define SIZEOF_LONG 0
+#define SIZEOF_SHORT 0
+#define SIZEOF_INT_P 0
+
+#undef LINUX
+#undef SGI
+#undef NEXT
+#undef ALPHA
+#undef HPUX
+#undef SUN
+#undef SOLARIS
+#undef SCO5
+#undef OPENBSD
+#undef WINDOZE
+#undef AIX
+#undef HAVE_ALSA
+
+#undef HAVE_GUILE
+#undef HAVE_MAKE_SMOB_TYPE
+
+#endif

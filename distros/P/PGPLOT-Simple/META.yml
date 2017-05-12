@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                PGPLOT-Simple
+version:             0.05
+abstract:            Simple Interface to PGPLOT
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Carp:                          0
+    List::MoreUtils:               0
+    List::Util:                    0
+    PGPLOT:                        2.18
+    Scalar::Util:                  0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Florian Merges <fmerges@cpan.org>

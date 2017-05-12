@@ -1,0 +1,24 @@
+COPYRIGHT
+hdf5.pd
+HDF5/Dataset.pm
+HDF5/Group.pm
+HDF5/tkview.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+Release_Notes
+t/attribPDL.t
+t/file.t
+t/group.t
+t/reference.t
+t/total.t
+t/unlink.t
+t/vlenString.t
+t/xData.t
+t/ztotal_index.t
+tkviewtest
+typemap
+varlen.hdf5
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/IO/HDF5.pm                 mod=PDL::IO::HDF5 pd=hdf5.pd (added by pdlpp_mkgen)

@@ -1,0 +1,13 @@
+Changes
+lib/Physics/Udunits2.pm
+lib/Physics/Udunits2/Converter.pod
+lib/Physics/Udunits2/System.pod
+lib/Physics/Udunits2/Unit.pod
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Physics-Udunits2.t
+typemap
+Udunits2.xs
+META.yml                                 Module meta-data (added by MakeMaker)

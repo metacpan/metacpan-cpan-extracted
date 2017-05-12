@@ -1,0 +1,79 @@
+{
+   "abstract" : "dynamically select error documents based on HTTP status code",
+   "author" : [
+      "Michael Jemmeson <michael.jemmeson@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-CustomErrorDocument",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Status" : "0",
+            "Plack::MIME" : "0",
+            "Plack::Middleware" : "0",
+            "Plack::Util" : "0",
+            "Plack::Util::Accessor" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Middleware::ErrorDocument" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::CustomErrorDocument" : {
+         "file" : "lib/Plack/Middleware/CustomErrorDocument.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mjemmeson/Plack-Middleware-CustomErrorDocument/issues"
+      },
+      "homepage" : "https://github.com/mjemmeson/Plack-Middleware-CustomErrorDocument",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/mjemmeson/Plack-Middleware-CustomErrorDocument.git",
+         "web" : "https://github.com/mjemmeson/Plack-Middleware-CustomErrorDocument"
+      }
+   },
+   "version" : "0.004"
+}
+

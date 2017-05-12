@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8'>
+  <title>[% IF title %][% title %] -[% END %] pjax</title>
+
+  <script src="static/jquery.js"></script>
+  <script src="static/jquery.cookie.js"></script>
+  <script src="static/pages.js"></script>
+
+  <script src="static/jquery.pjax.js"></script>
+  <script type="text/javascript">
+    $(function(){
+      // pjax
+      $('ul a').pjax('#main');
+    })
+  </script>
+
+  <style>
+    pre{
+      float:left;
+    }
+    #main{
+      font-family:Helvetica,Arial,sans-serif;
+      float:left;
+      margin-left:-120px;
+      padding-top:80px;
+      width:30%;
+    }
+    ul{padding-left:15px;}
+  </style>
+</head>
+
+[% USE date = DateTime(now = 1) %]
+
+<pre>
+
+               ／￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣￣
+               |　<b>It's [% date.strftime('%I:%M:%S %p') %]</b>
+               ＼＿　 ＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿
+        .--.     (  )
+       /    \   ( )
+      ## a  a  .
+      (   '._)
+       |'-- |
+     _.\___/_   ___<label><input type="checkbox" name="pjax" />pjax</label>___
+   ."\> \Y/|<'.  '._.-'
+  /  \ \_\/ /  '-' /
+  | --'\_/|/ |   _/
+  |___.-' |  |`'`
+    |     |  |
+    |    / './
+   /__./` | |
+      \   | |
+       \  | |
+       ;  | |
+       /  | |
+ jgs  |___\_.\_
+      `-"--'---'
+
+<a href="https://github.com/defunkt/jquery-pjax">github.com/defunkt/jquery-pjax</a>
+</pre>
+
+<div data-pjax-container id="main">
+    [% content %]
+</div>
+
+</html>

@@ -1,0 +1,14 @@
+# Return memory usage of either our process or our parent
+
+my $pid = $ARGV[0] ? getppid() : $$;
+my $getmem = $ARGV[1];
+
+if ($getmem) {
+    close(STDERR);
+    open(PS, "ps -o vsz -p $pid |");
+    scalar <PS>;
+    print int(<PS>);
+    close(PS);
+} else {
+    print 0;
+}

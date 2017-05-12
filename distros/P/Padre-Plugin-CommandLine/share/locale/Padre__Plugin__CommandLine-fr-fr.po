@@ -1,0 +1,26 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: padre-plugin-commandline\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-05-11 20:14+0300\n"
+"PO-Revision-Date: \n"
+"Last-Translator: Jérôme Quelin <jquelin@gmail.com>\n"
+"Language-Team: jérôme quelin <jquelin@cpan.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: French\n"
+"X-Poedit-Country: FRANCE\n"
+
+#: lib/Padre/Plugin/CommandLine.pm:60
+msgid "About"
+msgstr "A propos"
+
+#: lib/Padre/Plugin/CommandLine.pm:61
+msgid "Show Prompt\tAlt-`"
+msgstr "Montrer le prompt\tAlt-`"
+
+#: lib/Padre/Plugin/CommandLine.pm:85
+msgid "Command Line"
+msgstr "Ligne de commande"
+

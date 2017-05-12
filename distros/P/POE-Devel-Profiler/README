@@ -1,0 +1,27 @@
+POE-Devel-Profiler version 0.01
+==============================
+
+Use this module to get some nice profiling information about your
+POE application.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	POE
+
+COPYRIGHT AND LICENCE
+
+Copyright 2004 by Apocalypse
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

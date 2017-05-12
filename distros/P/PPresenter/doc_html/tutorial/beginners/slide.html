@@ -1,0 +1,106 @@
+
+
+<HTML>
+<HEAD>
+<TITLE>PPresenter; Beginners; Adding Slides</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Adding Slides</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../../index.html>PPresenter</A><BR>
+<A HREF=../../manual.html>Manual</A><BR>
+<A HREF=../index.html>Tutorials</A><BR>
+<A HREF=index.html>Beginners</A><BR>
+<P>
+<A HREF=define.html>Subject</A><BR>
+<A HREF=design.html>Design</A><BR>
+<A HREF=create.html>Creation</A><BR>
+<A HREF=style.html>Styles</A><BR>
+<B>Adding Slides</B><BR>
+<A HREF=change.html>Changing&nbsp;defaults</A><BR>
+<A HREF=timing.html>Timing</A><BR>
+<A HREF=tagging.html>Tagging</A><BR>
+<A HREF=dday.html>DDay</A><BR>
+
+    </TD><TD VALIGN=top>
+
+If we run the example created so far, it will immediately exit: no slides
+defined.  Seems alright to me.  Now let me create a real slide!
+<P>
+We selected a style: let us assume it is the default style (you do not have
+to do anything to get that one).  Within a style, you can select a
+style-element implementation.  The default selected style-elements of the
+default style are:
+<UL>
+<LI><A HREF=../../decoration/solid.html>Solid</A> backgrounds as decoration,
+<LI><A HREF=../../fontset/tkfonts.html>Tk fonts</A> as fontset,
+<LI>the <A HREF=../../template/default.html>Default</A> screen templates (with
+    as default template 'tm'),
+<LI>a <A HREF=../../formatter/markup.html>Markup</A> text formatter, and
+<LI>the <A HREF=../../dynamic/default.html>Default</A> dynamic specifications.
+</UL>
+We can live with that for the moment.  I don't think Tk-fonts are nice, but
+for the moment...
+<P>
+When you create a slide, you specify a number of options, which overrule
+the defaults as are set by the style-elements.  There is a huge amount of
+options (<A HREF=../../options.html>all options</A>).  If you try to use
+an option which is not part of any selected style-element you will be
+warned.
+<P>
+Adding a slide:
+<PRE>
+   #!/usr/local/bin/perl -w
+   use strict;
+
+   my $show = PPresenter-&gt;new;
+
+   $show-&gt;addSlide
+       ( -title    =&gt; 'first slide'
+       , -main     =&gt; '&lt;HUGE&gt;Hi there&lt;/HUGE&gt;'
+       );
+
+   $show-&gt;run;
+</PRE>
+Each slide shall have a title.  Furthermore, we used all the defaults:
+only the default style-elements, and from them the default options.
+<UL>
+<LI>The default for a solid decoration is yellow characters on a solid blue
+    background (if the screen's device is a lcd-projector).
+<LI>The default fontset is Tk-fonts: not too nice, but they will always work.
+<LI>The default template is '<CODE>tm</CODE>' which divides the screen (for
+    this slide) in a title and a main-part; yes, <CODE>tm</CODE> is the
+    abbreviation of '<CODE>title main</CODE>'.  The options <CODE>-title</CODE>
+    and <CODE>-main</CODE> tell PPresenter what to show in those regions.
+<LI>The text specified with the two options is interpreted by the selected
+    formatter, the Markup formatter.  The title does not contain any markup
+    tags, but PPresenter puts <CODE>&lt;TITLE&gt;</CODE> around it automatically.
+    The main part is put in a (much) larger than normal font.
+<LI>We do not use any dynamics in this example.
+</UL>
+You need to know the options which you can use.  For that you have to know
+which style-elements are selected, and then read those manual-pages.  However,
+farmost options are never changed.
+<P>
+You also have to understand the
+<A HREF=../../formatter/markup.html>markup formatter</A>.
+
+<P>
+Next: <A HREF=change.html>Changing defaults</A>.
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

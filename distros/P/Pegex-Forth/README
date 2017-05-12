@@ -1,0 +1,32 @@
+NAME
+    Pegex::Forth - Forth Interpreter with a Pegex Compiler
+
+SYNOPSIS
+    Commandline:
+
+        > pegex-forth program.forth
+        > echo '3 4 + .' | pegex-forth            # Print 7
+
+    In code:
+
+        use Pegex::Forth;
+        Pegex::Forth->new->run('3 4 + .');        # Print 7
+        $num = Pegex::Forth->new->run('3 4 +');   # Return 7
+
+DESCRIPTION
+    Pegex::Forth is a Forth interpreter engine that uses Pegex to drive it.
+
+SEE ALSO
+    *   Pegex
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,36 @@
+NAME
+    Protect-Unwind - Safe cleanup blocks, Common Lisp style
+
+SYNOPSIS
+        use Protect::Unwind;
+
+        protect {
+          goto ESCAPE;
+        } unwind {
+          print "This is printed no matter what happens in protect.";
+        };
+
+        ESCAPE:
+
+DESCRIPTION
+    This module is just syntactic sugar around Guard. It implements an
+    interface like Common Lisp's <unwind-protect>.
+
+    It only exists so that hopefully lisp programmers new to perl will find
+    this module before they find the buggy Unwind::Protect.
+
+    Note that if your unwind forms throw exceptions the behaviour is
+    somewhat complicated (see the Guard docs).
+
+SEE ALSO
+    Guard is a correct and efficient perl "unwind-protect" implementation
+    which is why this module uses it.
+
+AUTHOR
+    Doug Hoyte, "<doug@hcsw.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2012 Doug Hoyte.
+
+    This module is licensed under the same terms as perl itself.
+

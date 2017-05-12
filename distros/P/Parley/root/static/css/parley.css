@@ -1,0 +1,783 @@
+/* core layout styling */
+
+body {
+    background-color:   #fff;
+    font-family:        Verdana,Arial,Helvetica,sans-serif;
+}
+
+#hd {
+    height:         80px;
+    line-height:    80px;
+    margin:         0px;
+    padding-left:   10px;
+    background:     #EEE url('/static/images/parley_logo.jpg') no-repeat left;
+    color:          #79B30B
+    color:          #3366CC;
+}
+
+#hd h1 {
+    font-size:  200%;
+    text-align: left;
+}
+
+#advanced_search input[type="text"] {
+    width:      30em;
+}
+
+#advanced_search select.multiple {
+    width:      20em;
+}
+
+div#ft   {background: #666;color: #FFF; font-size: 77%; margin-top: 20px;}
+div#ft p {border:none;margin-top:30px;padding:5px 10px 5px 10px; text-align:right;display:block;}
+div#ft a {color: #ccc;}
+
+div#Xuser_information {
+    line-height:        1em;
+    font-size:          85%;
+    color:              #000;
+    background-color:   transparent;
+    position:           absolute;
+    top:                0px;
+    right:              10px;
+    height:             70px;
+    width:              200px;
+    padding-top:        3px;
+    text-align:         center;
+}
+div#user_information {
+    background-color:   transparent;
+    color:              #000000;
+    font-size:          85%;
+    height:             70px;
+    line-height:        1em;
+    margin-left:        760px;
+    padding-top:        3px;
+    right:              8px;
+    text-align:         center;
+    top:                0px;
+    width:              200px;
+}
+
+div#user_information .user_info_actions {
+    margin-top:         3px;
+}
+
+/* CSS bug fixes */
+
+.caretfix {
+    overflow:auto;
+}
+
+/* content styling */
+
+/* headers */
+#bd h1 {
+    font-weight:        bold;
+    background:         #666;
+    padding:            4px;
+    text-align:         left;
+    margin-top:         5px;
+    margin-bottom:      5px;
+}
+#bd h2 {
+    font-weight:        bold;
+    background:         #999;
+    padding:            4px;
+    text-align:         left;
+    margin-top:         5px;
+    margin-bottom:      5px;
+}
+#bd h3 {
+    font-weight:        bold;
+    background:         #eee;
+    padding:            4px;
+    text-align:         left;
+    margin-top:         5px;
+    margin-bottom:      5px;
+    color:              #79B30B
+    color:              #3366CC;
+}
+
+/* links */
+a.nav:hover {
+    background:         #000;
+    color:              #fff;
+}
+
+a, a:link, a:visited, a:active {
+    background:         transparent;
+    color:              blue;
+    text-decoration:    none;
+}
+
+/* lists */
+ol > li, ul > li {
+    margin-left:            8px;
+    list-style-position:    inside;
+}
+
+ol > li {
+    list-style-type:        decimal;
+}
+
+ul > li {
+    list-style-type:        disc;
+}
+
+
+/* tables */
+th {
+    font-size:          100%;
+    text-align:         left;
+    font-weight:        bold;
+}
+
+/* login dialog styling */
+#login_dialog form {
+    margin:             0;
+    padding:            0;
+    min-width:          400px;
+    max-width:          600px;
+}
+#login_dialog form fieldset {
+    / * clear: both; note that this clear causes inputs to break to left in ie5.x mac, commented out */
+    padding:            10px;
+    margin:             0;
+    border:             none;
+}
+#login_dialog form label { 
+    display:            block;  /* block float the labels to left column, set a width */
+    float:              left; 
+    width:              150px; 
+    padding:            0; 
+    margin:             5px 0 0; /* set top margin same as form input - textarea etc. elements */
+    text-align:         right; 
+    font-weight:        bold;
+    margin-bottom:      0;
+}
+#login_dialog form input, form textarea {
+    width:              auto;         /* set width of form elements to auto-size, otherwise watch for wrap on resize */
+    margin:             5px 0 0 10px; /* set margin on left of form elements rather than right of
+                                         label aligns textarea better in IE */
+}
+#login_dialog form p {
+    font-size:          85%;
+}
+
+/* generic row styling */
+.row {
+    border-top:         1px dotted #666;
+    border-bottom:      1px dotted #666;
+}
+/* alternating row styles */
+.row_odd {
+    background:         #eee;
+}
+.row_even {
+    background:         #ddd;
+}
+
+/* style classes */
+
+.add_this {
+    text-align:         right;
+}
+
+.admin_edited_post {
+    color:              #000;
+    background:         #ccc;
+    padding:            2px;
+    padding-left:       10px;
+    padding-right:      10px;
+    border:             1px dashed #000;
+    margin-left:        15px;
+    font-size:          93%;
+    text-align:         right;
+}
+
+.align_right {
+    text-align:         right;
+}
+
+
+.error_messages {
+    margin-top: 5px;
+    display: block;
+    line-height: 1.7em;
+    padding: 5px;
+    background-color: #993300;
+    color: #ffffff;
+    text-transform: none;
+    font-family: Arial, Avenir, "Lucida Grande", Verdana, "Bitstream Vera Sans", Helvetica, sans-serif;
+    font-weight: bold;
+    voice-family: "\"}\"";
+    voice-family: inherit;
+    font-size: 1.0em;
+    border: none;
+}
+
+.forum_description {
+    font-size:          93%;
+}
+.forum_lastpost {
+    font-size:          85%;
+    text-align:         right;
+}
+.forum_lastpost_subject a {
+    color:              #79B30B
+    color:              #3366CC;
+}
+.forum_link {
+    font-size:          100%;
+    font-weight:        bold;
+}
+.forum_list  {
+    margin-left:        auto;
+    margin-right:       auto;
+    margin-top:         15px;
+    width:              100%;
+    font-size:          93%;
+}
+.forum_list td {
+    vertical-align:     top;
+    border:             1px dashed #ddd;
+    border:             none;
+    line-height:        120%;
+    padding-left:       10px;
+    padding-right:      10px;
+}
+.forum_mini_pager {
+    font-size:          85%;
+}
+.forum_mini_pager a {
+    color:              #666;
+}
+.forum_name {
+    font-size:          100%;
+    text-align:         left;
+    font-weight:        bold;
+    margin-top:         5px;
+}
+.forum_name a {
+    color:              #79B30B
+    color:              #3366CC;
+}
+.forum_postcount {
+    font-size:          85%;
+    text-align:         right;
+    margin-top:         5px;
+}
+.forum_view  {
+    margin-left:        auto;
+    margin-right:       auto;
+    margin-top:         15px;
+    width:              100%;
+    font-size:          93%;
+}
+.forum_view td {
+    vertical-align:     top;
+    border:             1px dashed #ddd;
+    border:             none;
+    line-height:        120%;
+    padding-left:       10px;
+    padding-right:      10px;
+}
+
+.googlead_728_90 {
+    display:                block;
+    margin-top:             10px;
+    margin-left:            auto;
+    margin-right:           auto;
+    margin-bottom:          10px;
+    text-align:             center;
+}
+
+.google_ad_thread_view {
+    display:            block;
+    margin-left:        auto;
+    margin-right:       auto;
+    margin-top:         5px;
+    margin-bottom:      5px;
+    min-height:         90px;
+}
+
+.help li {
+    margin-top:         25px;
+    margin-right:       25px;
+    list-style-type:    none;
+    border-left:        2px solid #666;
+    padding-top:        5px;
+    padding-bottom:     5px;
+    padding-left:       10px;
+    background-color:   #ddd;
+}
+.help li ul li, .help li ol li{
+    margin-top:         5px;
+    margin-left:        10px;
+    list-style-type:    disc;
+    border-left:        none;
+    padding-left:       none;
+    padding-top:        none;
+    padding-bottom:     none;
+    background-color:   transparent;
+}
+
+.info_column {
+}
+
+.info_column_counts {
+}
+
+.innerpost {
+    margin-left:        10px;
+    padding:            5px;
+    overflow:           auto;
+    font-size:          93%;
+}
+
+.moderator_list {
+    font-size:          77%;
+    margin-bottom:      5px;
+    margin-top:         5px;
+    text-align:         right;
+}
+
+.pager_advanced {
+    font-size:          77%;
+    margin-bottom:      5px;
+    margin-top:         5px;
+}
+
+.post {
+    padding-top:        5px;
+    vertical-align:     top;
+    border-left:        1px solid #ddd;
+}
+
+.post_created {
+    text-align:         right;
+    font-size:          85%;
+}
+
+.post_creator {
+    font-weight:        bold;
+    font-style:         italic;
+    font-size:          85%;
+}
+
+.post_edited_alert {
+    font-weight:        bold;
+    font-style:         italic;
+}
+
+.post_info {
+    font-size:          77%;
+    line-height:        1.1em;
+    margin-top:         10px;
+    margin-bottom:      2px;
+    text-align:         right;
+}
+
+.post_subject {
+    font-weight:    bold;
+}
+
+.quote {
+    background-color:   #F9FBFF;
+    border:             1px solid #333;
+    font-size:          85%;
+    margin:             0 0 2px 4px;
+    padding:            6px;
+    width:              85%;
+    overflow:           hidden;
+}
+
+.recently_updated  {
+    margin-left:        auto;
+    margin-right:       auto;
+    margin-top:         15px;
+    width:              100%;
+    font-size:          93%;
+}
+.recently_updated td {
+    vertical-align:     top;
+    border:             1px dashed #ddd;
+    border:             none;
+    line-height:        120%;
+    padding-left:       10px;
+    padding-right:      10px;
+}
+
+.reply_post_message {
+    border:             1px dashed #666;
+}
+
+.search_match_context {
+    font-size:          85%;
+}
+
+.search_results {
+    margin-left:        auto;
+    margin-right:       auto;
+    margin-top:         15px;
+    width:              100%;
+    font-size:          93%;
+}
+.search_results td {
+    vertical-align:     top;
+    border:             1px dashed #ddd;
+    border:             none;
+    line-height:        120%;
+    padding-left:       10px;
+    padding-right:      10px;
+    padding-top:        5px;
+    padding-bottom:     5px;
+}
+.service_list  {
+    margin-left:        auto;
+    margin-right:       auto;
+    margin-top:         15px;
+    width:              100%;
+    font-size:          93%;
+}
+.service_list td {
+    vertical-align:     top;
+    border:             1px dashed #ddd;
+    border:             none;
+    line-height:        120%;
+    padding-left:       10px;
+    padding-right:      10px;
+}
+
+.site_terms {
+    width:              80%;
+    margin-left:        auto;
+    margin-right:       auto;
+    margin-bottom:      10px;
+    padding:            5px;
+    border:             1px solid #666;
+}
+
+.thread_add {
+    margin-left:        auto;
+    margin-right:       auto;
+    margin-top:         15px;
+    width:              100%;
+    font-size:          93%;
+}
+
+.thread_add td {
+    padding-top:        4px;
+    padding-bottom:     4px;
+}
+
+.thread_add .input_text {
+    width:              450px;
+    margin-left:        10px;
+}
+
+.thread_add_topic {
+    text-align:         right;
+    padding-right:      5px;
+}
+.thread_add_message {
+    text-align:         right;
+    vertical-align:     top;
+    padding-right:      5px;
+}
+
+.thread_header {
+    font-weight:        bold;
+    background:         #666;
+    padding:            4px;
+    text-align:         left;
+}
+.thread_header a {
+    color:              #ccc;
+}
+
+.thread_info {
+    margin:             0px;
+    width:              100%;
+    border:             none;
+    padding:            0px;
+    margin-bottom:      10px;
+}
+.thread_info td {
+    border:             none;
+    padding:            0px;
+}
+
+.thread_lastpost {
+    font-size:          85%;
+    text-align:         right;
+}
+
+.thread_post_row {
+    border-top:         1px solid #ddd;
+    border-bottom:      1px solid #ddd;
+}
+.thread_post_row td {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.thread_posts {
+    margin-left:        auto;
+    margin-right:       auto;
+    margin-top:         15px;
+    width:              100%;
+    font-size:          93%;
+}
+
+.thread_recent_forum {
+    float:              right;
+    font-size:          85%;
+}
+.thread_recent_forum a {
+    color:              #333;
+}
+
+.thread_reply {
+    font-size:          93%;
+}
+.thread_reply tr {
+    vertical-align:     top;
+}
+.thread_reply td {
+    padding-top:        10px;
+    padding-left:       10px;
+}
+.thread_reply textarea {
+    background-color:   transparent;
+    border:             2px inset black;
+}
+
+.thread_subject a {
+    font-size:          93%;
+    color:              #79B30B
+    color:              #3366CC;
+}
+
+.thread_watch {
+    margin-top:         5px;
+    font-size:          77%;
+    text-align:         left;
+}
+
+.top_padded {
+    margin-top:         10px;
+}
+
+.topic_creator {
+    display:            block;
+    font-size:          85%;
+    text-align:         right;
+}
+
+.user_login form {
+    width:              350px;
+    margin-left:        auto;
+    margin-right:       auto;
+    margin-top:         20px;
+}
+
+.user_login p {
+    margin-top:         5px;
+    margin-bottom:      5px;
+}
+
+.user_permission_list  {
+    margin-left:        auto;
+    margin-right:       auto;
+    margin-top:         15px;
+    font-size:          93%;
+    width:              100%;
+}
+.user_permission_list td {
+    vertical-align:     top;
+    border:             1px dashed #ddd;
+    border:             none;
+    line-height:        150%;
+    padding-left:       10px;
+    padding-right:      10px;
+    padding-top:        5px;
+    padding-bottom:     5px;
+}
+.user_permission_list img {
+    vertical-align: middle;
+}
+
+.forum_moderator_list div input{
+    height: 150%;
+}
+.forum_moderator_list img {
+    vertical-align: middle;
+}
+
+
+.user_post_info {
+    background:         #ccc;
+    background:         transparent;
+    font-size:          77%;
+    margin-left:        auto;
+    margin-right:       auto;
+    text-align:         center;
+    vertical-align:     top;
+    width:              110px;
+}
+
+/* add icons to some links with CSS styling */
+
+a[href $='.jpg']{
+    padding-left: 20px;
+    background:   transparent url(/static/images/filetypes/image.png) no-repeat center left;
+}
+
+a[href $='.pdf']{
+    padding-left: 20px;
+    background:   transparent url(/static/images/filetypes/pdf.png) no-repeat center left;
+}
+
+/* YUI element styling */
+#loader_wait.yui-overlay {
+    position:           fixed;
+    float:              right;
+    top:                10px;
+    right:              10px;
+    border:             none;
+    text-align:         right;
+}
+#preview_overlay {
+    border:             1px dashed #ccc;
+    text-align:         left;
+    padding:            0px;
+}
+#thread_message {
+    font-family:        monospace;
+    text-align:         left;
+    padding:            0px;
+    background-color:   #eee;
+    font-size:          93%;
+    width:              450px;
+}
+
+#validation_errors {
+    display:            block;
+    font-size:          83%;
+    border:             1px dashed #89d;
+    margin-top:         10px;
+    margin-bottom:      10px;
+    margin-left:        25px;
+    margin-right:       25px;
+    padding:            3px;
+}
+
+#ysearch {
+    text-align:         center;
+}
+#ysearchinput {
+    position:           static;
+    width:              20em;
+} /* to center, set static and explicit width: */
+#ysearchcontainer {
+    text-align:         left;
+    width:              20em;
+} /* to center, set left-align and explicit width: */
+
+/* ForumCode styles */
+.forumcode_code {
+    font-family:        monospace;
+    border:             1px solid #333;
+    font-size:          85%;
+    margin:             15px 20px 15px 20px;
+    padding:            6px;
+    width:              85%;
+    overflow:           auto;
+
+    color:              #ff0;
+    background-color:   #333;
+    border:             1px solid #666;
+
+    white-space:        pre;
+}
+
+.forumcode_pre {
+    background-color:   transparent;
+    font-family:        monospace;
+    border:             1px dashed #333;
+    font-size:          85%;
+    margin:             15px 20px 15px 20px;
+    padding:            6px;
+    width:              85%;
+    overflow:           auto;
+
+    white-space:        pre;
+}
+
+.forumcode_quote {
+    background-color:   #eee;
+    font-family:        monospace;
+    font-style:         italic;
+    border:             1px dotted #333;
+    font-size:          85%;
+    margin:             15px 20px 15px 20px;
+    padding:            6px;
+    width:              85%;
+    overflow:           auto;
+}
+
+.forumcode_quoting {
+    font-weight:        bold;
+    margin-bottom:      3px;
+}
+
+
+/* YUI CSS overrides */
+
+/* make disabled menuitems look 'different' */
+.yuimenuitem .disabled {
+    color:              #A6A6A6;
+    cursor:             default;
+}
+
+/* tabview (user prefs) */
+
+/* .yui-navset defaults to .yui-navset-top */ 
+.yui-skin-sam .yui-navset .yui-nav, 
+.yui-skin-sam .yui-navset .yui-navset-top .yui-nav { /* protect nested tabviews from other orientations */ 
+    border:solid #333; /* color between tab list and content */ 
+    border-width:0 0 5px; 
+    Xposition:relative; 
+    zoom:1; 
+}
+
+.yui-skin-sam .yui-navset .yui-content { 
+    background:transparent; /* content background color */ 
+}
+
+.yui-skin-sam .yui-navset .yui-nav a, 
+.yui-skin-sam .yui-navset .yui-navset-top .yui-nav a { 
+    background-image:   none;
+    background-color:   #999;
+    border:             solid #a3a3a3; 
+    border-width:       0 1px; 
+    color:              #fff;
+    text-decoration:    none; 
+}
+
+
+.yui-skin-sam .yui-navset .yui-nav .selected a, 
+.yui-skin-sam .yui-navset .yui-nav .selected a:focus, /* no focus effect for selected */ 
+.yui-skin-sam .yui-navset .yui-nav .selected a:hover { /* no hover effect for selected */ 
+    background:#333;
+    color:#fff;
+}
+
+.yui-skin-sam .yui-navset .yui-nav a:hover, 
+.yui-skin-sam .yui-navset .yui-nav a:focus { 
+    background: #666;
+    color: #fff;
+    outline:0; 
+}

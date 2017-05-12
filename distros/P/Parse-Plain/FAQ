@@ -1,0 +1,70 @@
+
+	FREQUENTLY ASKED QUESTIONS about Parse::Plain
+
+
+Q1. Why do you use %% and {{ }} as tag / block delimiters?
+A1. These symbols very rarely appear in pairs. More, unlike
+HTML-style comments and HTML-style tags they usually not 
+hidden by many WYSIWYG editors.
+
+
+Q2. What if I must use these symbols elsewhere in my template?
+A2. You can try this trick:
+$t->set_tag('DPERC', '%%');
+$t->set_tag('DCURLYL', '{{');
+$t->set_tag('DCURLYR', '}}');
+
+If your template is HTML the better idea is to use character entities:
+&#037; for %
+&#123; for {
+&#125; for }
+
+
+Q3. On which systems Parse:Plain may be run?
+A3. It was tested under FreeBSD, Linux and Windows 2000 with Perl 5.00503,
+Perl 5.6 and Perl 5.8.0 but it must run without any problems on any other
+system as well. If it won't work on yours one please let me know. Please, note:
+the module was never tested with Perl 6!
+
+
+Q4. Can I somehow use it with Perl 4?
+A4. No, because it's object-oriented.
+
+
+Q5. Is Parse::Plain version 3 compatible with version 2.x
+A5. Strictly speaking no. However most templates and code
+wouldn't require any changes (or require small). Things
+to check are:
+ - methods set_tag, get_tag, push_tag, unshift_tag,
+block, push_block, unshift_block now return references;
+ - methods block, push_block, unshift_block now have
+slightly different behavior. In version 2.x it always
+affected block source, now it may also affect block results. 
+If you need 100% compatibility with version 2.0x take a look
+at Parse::Plain version 2.1 which is released specially for
+compatibility with older versions but supports many new features
+introduced in 3.0. There are no plans for further support of
+version 2.x.
+
+
+Q6. Do you provide support?
+A6. No, but feel free to contact me if you have any question. If you've 
+found a bug, I'll probably try to fix it ASAP.
+
+
+Q7. Do you use Parse::Plain in real applications
+A7. Yes, I use it on many web sites including but not limited to
+http://www.an.kiev.ua/ It's also in heart of WSMS site engine 
+(http://www.an.kiev.ua/wsms/).
+
+
+Q8. Are there any other modules for parsing templates?
+A8. Yes, please check out (in alphabetical order):
+dTemplate
+HCKit::Template
+HTML::Template
+Template
+Text::FastTemplate
+Text::MetaText
+Text::SimpleTemplate
+All packages mentioned above available from http://www.cpan.org/

@@ -1,0 +1,235 @@
+=encoding utf8
+
+=head1 NAME
+
+perlnumber - Semántica de números y operaciones numéricas en Perl
+
+=head1 SINOPSIS
+
+    $n = 1234;              # entero decimal
+    $n = 0b1110011;         # entero binario
+    $n = 01234;             # entero octal
+    $n = 0x1234;            # entero hexadecimal
+    $n = 12.34e-56;         # notación exponencial
+    $n = "-12.34e56";       # número especificado como una cadena
+    $n = "1234";            # número especificado como una cadena
+
+=head1 DESCRIPCIÓN
+
+En este documento se describe el procesamiento interno de valores numéricos en
+Perl.
+
+Se omite completamente la funcionalidad de sobrecarga de operadores de Perl, 
+que permite establecer comportamientos definidos por el usuario para números,
+como operaciones con enteros arbitrariamente grandes, números de punto
+flotante de precisión arbitraria, operaciones con números "exóticos" (como
+la aritmética modular o la aritmética de números p-ádicos), etc.
+Encontrará información detallada en L<overload>.
+
+=head1 Cómo se almacenan los números
+
+Perl puede representar los números internamente de 3 maneras distintas: como
+enteros nativos, como números de punto flotante nativos y como cadenas
+decimales. Las cadenas decimales pueden tener una parte en notación
+exponencial (por ejemplo, C<"12.34e-56">). Aquí I<nativo> significa "formato
+admitido por el compilador de C que se usó para compilar perl".
+
+En el caso de los enteros nativos, el término "nativo" no tiene las mismas
+implicaciones que para los números de punto flotante nativos. La única
+implicación del término "nativo" para los enteros es que los límites máximo
+y mínimo de las cantidades verdaderamente enteras admitidas son cercanos a
+potencias de 2. En cambio, existe una restricción intrínseca para los
+números de punto flotante "nativos": solo se pueden representar los números
+que tengan una representación relativamente "corta" al convertirse en una
+fracción binaria. Por ejemplo, 0.9 no se puede representar como un número de
+punto flotante nativo porque la fracción binaria correspondiente a 0.9 es
+infinita:
+
+  binary0.1110011001100...
+
+donde la secuencia C<1100> se repite una y otra vez. Además de esta
+limitación, el exponente del número binario también está restringido cuando
+se representa como un número de punto flotante. En el hardware típico, los
+valores de punto flotante pueden almacenar números que tengan hasta 53
+dígitos binarios, y con exponentes binarios entre -1024 y 1024. En
+representación decimal, estos límites se acercan a 16 dígitos decimales y
+exponentes decimales en el intervalo -304..304. Como consecuencia, Perl no
+puede almacenar un número como 12345678901234567 en forma de número de punto
+flotante para estas arquitecturas sin pérdida de información.
+
+De manera similar, las cadenas decimales solo pueden representar números que
+tengan una expansión decimal finita. Al ser cadenas y, por tanto, al tener una
+longitud arbitraria, no existe un límite práctico para el exponente o el
+número de dígitos decimales para estos números. (Pero no olvide que lo que
+estamos describiendo son solo las normas del I<almacenamiento> de estos
+números. El hecho de poder almacenar números tan "grandes" no significa que
+en las I<operaciones> con estos números se usen todos los dígitos
+significativos. Encontrará información detallada en
+L<"Operadores numéricos y conversiones numéricas">).
+
+De hecho, los números almacenados en formato de entero nativo se pueden
+almacenar en forma nativa con signo o sin signo. Así, los límites para
+números Perl almacenados como enteros nativos serán normalmente
+-2**31..2**32-1, con las modificaciones correspondientes en el caso de los
+enteros de 64 bits. Insistimos: esto no significa que Perl sólo puede realizar
+operaciones con enteros de este intervalo; es posible almacenar muchos más
+enteros en formato de punto flotante.
+
+En resumen, en Perl los valores numéricos solo pueden almacenar números que
+tengan una expansión decimal finita o una expansión binaria "corta".
+
+=head1 Operadores numéricos y conversiones numéricas
+
+Como se mencionó antes, Perl puede almacenar un número en uno de tres
+formatos distintos, pero la mayoría de los operadores suelen admitir solo uno
+de esos formatos. Cuando se pasa un valor numérico como argumento a un
+operador así, se convierte a un formato comprensible para el operador.
+
+Hay seis conversiones posibles:
+
+  entero nativo         --> punto flotante nativo (*)
+  entero nativo         --> cadena decimal
+  punto flotante nativo --> entero nativo (*)
+  punto flotante nativo --> cadena decimal (*)
+  cadena decimal        --> entero nativo
+  cadena decimal        --> punto flotante nativo (*)
+
+Estas conversiones obedecen las siguientes normas generales:
+
+=over 4
+
+=item *
+
+Si el número de origen se puede representar en la forma de destino, se usa esa
+representación.
+
+=item *
+
+Si el número de origen está fuera de los límites representables en la forma
+de destino, se usa una representación del límite más cercano. (I<Pérdida
+de información>)
+
+=item *
+
+Si el número de origen está entre dos números representables en la forma de
+destino, se usa una representación de uno de estos números.  (I<Pérdida de
+información>)
+
+=item *
+
+En las conversiones C<< punto flotante nativo --> entero nativo >>, la magnitud
+del resultado es menor o igual que la magnitud del número de origen.
+(I<"Redondeo a cero">)
+
+=item *
+
+Si no se puede aplicar la conversión C<< cadena decimal --> entero nativo >>
+sin pérdida de información, el resultado es compatible con la secuencia de
+conversiones C<< cadena decimal --> punto flotante nativo --> entero nativo >>.
+En particular, hay un sesgo muy fuerte de redondeo a 0, aunque es posible que
+un número como C<"0.99999999999999999999"> se redondee a 1.
+
+=back
+
+B<RESTRICCIÓN>: las conversiones anteriores marcadas con C<(*)> implican pasos
+ejecutados por el compilador de C. En particular, determinados errores o
+características del compilador usado pueden provocar la infracción de algunas
+de las normas anteriores.
+
+=head1 Tipos de operaciones numéricas en Perl
+
+En Perl, las operaciones que consumen un argumento numérico tratan al
+argumento de una de cuatro maneras posibles: pueden forzar la conversión a uno
+de los formatos de entero/número de punto flotante/cadena, o pueden
+comportarse de una manera diferente en función del formato del operando.
+Forzar la conversión de un valor numérico a un formato específico no cambia
+el número almacenado en el valor.
+
+Todos los operadores que necesitan un argumento con formato de entero tratan al
+argumento como en la aritmética modular (p. ej., C<mod 2**32> en una
+arquitectura de 32 bits). Así, C<sprintf "%u", -1> produce el mismo resultado
+que C<sprintf "%u", ~0>.
+
+=over 4
+
+=item Operadores aritméticos
+
+Los operadores binarios C<+> C<-> C<*> C</> C<%> C<==> C<!=> C<E<gt>> C<E<lt>>
+C<E<gt>=> y C<E<lt>=>, y los operadores unarios C<abs> y C<-->, intentan
+convertir los argumentos en enteros. Si ambas conversiones son posibles sin
+pérdida de precisión y se puede realizar la operación sin pérdida de
+precisión, se usa el resultado entero. De lo contrario, los argumentos se
+convierten al formato de punto flotante y se usa el resultado de punto
+flotante. El almacenamiento en caché de las conversiones descritas arriba
+significa que la conversión a enteros no desecha las partes fraccionarias en
+los números de punto flotante.
+
+=item ++
+
+C<++> se comporta como los operadores anteriores, con la diferencia de que si
+se aplica a una cadena que tenga el formato C</^[a-zA-Z]*[0-9]*\z/>, se usa el
+incremento de cadena descrito en L<perlop>.
+
+=item Operadores aritméticos con C<use integer> activo
+
+En ámbitos en los que C<use integer;> está activo, casi todos los operadores
+indicados arriba forzarán la conversión de sus argumentos a formato de
+entero, y devolverán un resultado entero. Las excepciones son C<abs>, C<++> y
+C<-->, que no cambian su comportamiento con C<use integer;>
+
+=item Otros operadores matemáticos
+
+Algunos operadores, como C<**>, C<sin> y C<exp>, fuerzan la conversión de los
+argumentos al formato de punto flotante.
+
+=item Operadores bit a bit
+
+Fuerzan la conversión de los argumentos al formato de entero si no son
+cadenas.
+
+=item Operadores bit a bit con C<use integer> activo
+
+Fuerzan la conversión de los argumentos al formato de entero. Además, las
+operaciones de desplazamiento usan internamente enteros con signo en lugar de
+los enteros sin signo predeterminados.
+
+=item Operadores que consumen un entero
+
+Fuerzan la conversión del argumento al formato de entero. Esto es aplicable,
+por ejemplo, a los argumentos tercero y cuarto de C<sysread>.
+
+=item Operadores que consumen una cadena
+
+Fuerzan la conversión del argumento al formato de cadena. Por ejemplo, esto es
+aplicable a C<printf "%s", $valor>.
+
+=back
+
+Aunque forzar la conversión de un argumento a un formato específico no cambia
+el número almacenado, Perl recuerda el resultado de las conversiones. Así,
+aunque la primera conversión tarde un poco más, al repetir una operación no
+será necesario repetir la conversión.
+
+=head1 AUTOR
+
+Ilya Zakharevich C<ilya@math.ohio-state.edu>
+
+Ajustes editoriales de Gurusamy Sarathy <gsar@ActiveState.com>
+
+Actualizaciones para 5.8.0 de Nicholas Clark <nick@ccl4.org>
+
+=head1 VEA TAMBIÉN
+
+L<overload>, L<perlop>
+
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

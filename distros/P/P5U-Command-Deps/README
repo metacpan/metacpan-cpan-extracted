@@ -1,0 +1,63 @@
+NAME
+    P5U::Command::Deps - p5u plugin to scan a file or directory for Perl
+    dependencies
+
+SYNOPSIS
+     $ p5u deps lib/Foo/Bar.pm
+     # RUNTIME
+     Foo 1.000
+     constant 0
+     perl 5.010
+     strict 0
+     utf8 0
+
+     $ p5u deps --skipcore lib/Foo/Bar.pm
+     # RUNTIME
+     Foo 1.000
+
+DESCRIPTION
+    Given a list of filenames and/or directories, uses Perl::PrereqScanner
+    to calculate a combined list of dependencies. If no filenames are given,
+    then the current directory is assumed.
+
+    It uses file naming conventions to attempt to classify dependencies as
+    "runtime", "test" and "build".
+
+    Unless using the "--keep-provided" option, will use Class::Discover to
+    discover what packages are provided by the codebase, and skip those. For
+    example, if there's a lib/Foo/Bar.pm providing Foo::Bar, and the test
+    suite loads that module, it won't be included as a test_requires
+    dependency.
+
+    With the "--skip-core" option, will also skip dependencies that are
+    satisfied by Perl core. This requires at least one "use VERSION" line in
+    the files being scanned.
+
+    Output is in the text format shown above, but with "--format=mi" will
+    attempt to output Module::Install-style requirements. With
+    "--format=pretdsl" will output data in a format suitable for
+    RDF::TrineX::Parser::Pretdsl.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=P5U-Command-Deps>.
+
+SEE ALSO
+    P5U.
+
+    Class::Discover, Perl::PrereqScanner, App::PrereqGrapher.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012-2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

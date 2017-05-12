@@ -1,0 +1,224 @@
+<?xml version="1.0"?>
+<!DOCTYPE presentation SYSTEM "ppr-simple.dtd">
+
+<!--
+
+$Id: overview.xml,v 1.1 2000-03-02 14:56:28+01 johanv Exp johanv $
+
+This is the XML re-implementation of Mark Overmeer's "overview" demo.
+
+-->
+
+<presentation title='my first show' geometry='800x600' imagesizebase='1024x768'>
+
+<slide title='Frontpage' template='main'>
+ <body>
+  <p align='center'><larger color='red'>Portable Presenter</larger></p>
+  <p align='center'><smaller>by</smaller><br/>Mark Overmeer</p><br/>
+  <p align='center'><tt><b>Mark@Overmeer.net</b></tt></p>
+ </body>
+ <notes>
+This is only to demonstrate some of the features of
+Portable Presenter in one sequence.
+There are more specific demos available, too.
+But anyway, these are slide-notes, if you didn't recognized them yet.
+ </notes>
+</slide>
+
+<slide title='Moving back' template='dtm'>
+ <body>
+   Now I put some text.<br/>
+   <ul>
+    <li><mark/>Double print.</li>
+    <li>You can make many markings, to overwrite text or
+        replace images.  You need to specify a name when there
+	<mark name='two'/>is more than one marking.</li>
+    <li>Everything is restored, also <text color='green'>Color</text>,
+        indentation, etc.</li>
+   </ul>
+   <redo><bd>-Double</bd></redo><br/>
+   <redo name='two'><text color='red'><bd><a show="after 5">are two or
+   more markings.</a></bd></text></redo>
+ </body>
+</slide>
+
+<slide title='Phases' template='dtm'>
+ <body>
+  On each space-bar hit, a bit more text should appear.<br/>
+  <ul>
+   <li show="phase 1">first</li>
+   <li show="phase 2">second</li>
+   <li show="phase -2">disappears third</li>
+   <li show="phase 3">appears third</li>
+   <li show="phase 4">appears last</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title='More on phases' template='dtm'>
+ <body>
+  <ol>
+   <li show="phase 5">shows last.</li>
+   <li show="phase 3">just mixing a bit.</li>
+   <li show="phase 4"><text color='blue'>nearly there.</text></li>
+   <li show="phase 2">this appears later</li>
+   <li show="phase 1">Actually, you can make 9 phases, and the order on
+       the slide does not matter.</li>
+  </ol>
+ </body>
+</slide>
+
+<slide title='Center on images' template='dtm'>
+ <body>
+  some text is put above the image.
+  <br/><p align='center'><img src="ppr_large.gif" base='1280x1024'/>x</p>
+  And some text below.
+ </body>
+</slide>
+
+<slide title='Nested lists' template='dtm'>
+ <body>
+  <ul>
+   <li>one
+    <ol>
+     <li>two</li>
+     <li>three</li>
+    </ol>
+    <ol start='C'>
+     <li>Count in letters</li>
+     <li>continues.</li>
+     <li>again.</li>
+    </ol></li>
+   <li>four</li>
+  </ul>
+ </body>
+</slide>
+
+<slide title='Font types' template='dtlr' 
+ backdrop='1' tags='slow' appear='from ne'>
+ <body target='left'>
+Normal font, 
+<smaller>Small
+<smaller>Smaller 
+<smaller>Even smaller</smaller></smaller></smaller>
+<br/><larger>Large 
+<larger>Larger 
+<larger>Even Larger</larger></larger></larger>
+ </body>
+ <body target='right'>
+<tt>Teletype</tt>
+<p><text color='green'>new paragraph... in green</text></p>
+<br/><p align='right'>align right</p>
+<br/><p align='center'>centered</p>
+<bq>A blockquote indents on both sides</bq>
+ </body>
+</slide>
+
+<slide title='Unordered lists' template='dtm'>
+ <body>
+Text
+<ul>
+<li>!Hola!
+ <a show="after 5 from e">
+  <ul>
+    <li>one more nesting.</li>
+    <li>This is even a few lines long.  Let's see what will happen then.
+        It should be left indented, all the time.</li>
+    <li show="after 15 from s">Last from list, but a bit late.</li>
+  </ul></a></li>
+<li><bd>Aloha!</bd></li>
+</ul>
+Some more text at <tt>the end</tt>.
+ </body>
+</slide>
+
+<slide title='Showing images'>
+ <body>
+  No nesting.
+  <ul>
+   <li>nesting one.
+    <ul>
+     <li>nesting two.
+      <ul>
+       <li>nesting three.
+        <ul>
+         <li>nesting four</li>
+        </ul>
+       </li>
+      </ul>
+     </li>
+    </ul>
+   </li>
+  </ul>
+ </body>
+</slide>
+
+<slide title='Showing images -2'>
+ <body>
+  <img src="ppr_large.gif" align='left'/>
+Just a short text to see if the bounds are set right.
+Text just flows around the image, just as in HTML.<BR/>
+Like HTML, you may specify <code>vspace</code> and <code>hspace</code>.
+You may <code>align</code> to the left, center, and right.
+ </body>
+</slide>
+
+<slide title='Exploding' template='dtm'>
+ <body>
+  <a show="after 5 to e"><img src="perlmagick.gif" align='left'/></a>
+  <a show="after 5 to s"><img src="perlmagick.gif" align='right'/></a>
+  A bit of text in between the images.<br/>
+  I don't know how this should look like.<br/>
+  <a show="after 5 to n"><img src="perlmagick.gif" align='left'/></a>
+  <a show="after 5 to w"><img src="perlmagick.gif" align='right'/></a>
+ </body>
+</slide>
+
+<slide title='preformat' template='dtm'>
+ <body>
+  Text
+<pre>
+Preformatted, but will
+    it work <larger>with
+large</larger> and <smaller>small</smaller>
+  words
+included?
+</pre>
+end
+ </body>
+</slide>
+
+<slide title='single image'>
+ <body target="left">
+<pre>
+Is preformatted:
+  kind'a tables
+    aaa     10
+     bb    123
+      c     42
+</pre>
+ </body>
+ <body target="right">
+  <img src="ppr_large.gif"/>
+ </body>
+ <notes>
+Ok, we can add notes for a slide, when we like.
+It is shown on the seperate control screen (if there is).
+ </notes>
+</slide>
+
+<slide title='preformat' template='dtm'>
+ <body>
+This text <bd><a show="after 5">arrives later</a></bd>.  Other parts come
+from <a show="after 2 from w 5">the left</a>, and
+<a show="after 2 from e 5">the right</a>.
+<br/>
+<a show="after 10 disappear">Going away after some time.</a>
+<a show="from n 3">North</a><br/>
+<a show="from e 3">East</a><br/>
+<a show="from w 3">West</a><br/>
+<a show="from s 3">South</a>
+ </body>
+</slide>
+
+</presentation>

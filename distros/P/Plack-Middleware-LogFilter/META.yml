@@ -1,0 +1,39 @@
+---
+abstract: 'modify log output.'
+author:
+  - 'Uchiko <memememomo@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v1.1.0, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-LogFilter
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::LogFilter:
+    file: lib/Plack/Middleware/LogFilter.pm
+    version: 0.01
+requires:
+  Plack: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/memememomo/Plack-Middleware-LogFilter/issues
+  homepage: https://github.com/memememomo/Plack-Middleware-LogFilter
+  repository: git://github.com/memememomo/Plack-Middleware-LogFilter.git
+version: 0.01

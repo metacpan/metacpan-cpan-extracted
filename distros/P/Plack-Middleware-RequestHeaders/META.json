@@ -1,0 +1,56 @@
+{
+   "abstract" : "modify HTTP request headers",
+   "author" : [
+      "Wallace Reis <wreis@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-RequestHeaders",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack::Middleware" : "0",
+            "Plack::Util" : "0",
+            "Plack::Util::Accessor" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Plack::Builder" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wreis/Plack-Middleware-RequestHeaders/issues"
+      },
+      "homepage" : "https://github.com/wreis/Plack-Middleware-RequestHeaders",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/wreis/Plack-Middleware-RequestHeaders.git",
+         "web" : "https://github.com/wreis/Plack-Middleware-RequestHeaders"
+      }
+   },
+   "version" : "0.05"
+}
+

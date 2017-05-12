@@ -1,0 +1,22 @@
+Revision history for Perl extension Plack::Middleware::Auth::Complex.
+
+0.002 2017-03-25T21:13+03:00
+ - Prevent blocking (use /dev/urandom instead of /dev/random)
+ - Add a script to change user password (/usr/bin/passwd lookalike)
+
+0.001001 2015-03-08T16:54+02:00
+ - Call init at first request to allow non-delayed loading (e.g. starman --preload-app).
+ - Make "Invalid username" error message customizable
+
+0.001 2015-03-01T14:30+02:00
+ - First stable release
+ - Add authentication cache
+ - Change the default values of some options
+ - Split user creation logic from call_register to a new method
+ - Fix a POD bug
+ - Fix reset email subject
+ - Improve test coverage
+ - Add perlcritic tests and make code compliant
+
+0.000_001 2015-03-01T01:20+02:00
+ - Initial release

@@ -1,0 +1,14 @@
+Revision history for Perl extension Physics::Water::SoundSpeed.
+
+0.01  Sat Dec 24 10:54:40 2011
+	- original version; created by h2xs 1.23 with options
+		-AXs -n Physics::Water::SoundSpeed
+
+0.9   Sat Dec 31 10:00:00 2011
+       - Ready for production. Happy New Year! 
+
+ 
+0.92   Mon Apr 2 12:00:00 2012
+       - Fixed tests. Added sprintf's to prevent precision problems.
+
+ 

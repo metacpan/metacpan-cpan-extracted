@@ -1,0 +1,101 @@
+{
+   "abstract" : "HTML Template Engine + Custom HTML Elements",
+   "author" : [
+      "Carlos Fernando Avila Gratz <cafe@kreato.com.br>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plift",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "JSON" : "0",
+            "Moo" : "0",
+            "Path::Tiny" : "0",
+            "Ref::Util" : "0",
+            "URI" : "0",
+            "XML::LibXML::jQuery" : "0.08",
+            "namespace::clean" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0.43",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Plift" : {
+         "file" : "lib/Plift.pm",
+         "version" : "0.15"
+      },
+      "Plift::Context" : {
+         "file" : "lib/Plift/Context.pm"
+      },
+      "Plift::Handler::Include" : {
+         "file" : "lib/Plift/Handler/Include.pm"
+      },
+      "Plift::Handler::Meta" : {
+         "file" : "lib/Plift/Handler/Meta.pm"
+      },
+      "Plift::Handler::Render" : {
+         "file" : "lib/Plift/Handler/Render.pm"
+      },
+      "Plift::Handler::Snippet" : {
+         "file" : "lib/Plift/Handler/Snippet.pm"
+      },
+      "Plift::Handler::Wrap" : {
+         "file" : "lib/Plift/Handler/Wrap.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cafe01/template-plift/issues"
+      },
+      "homepage" : "https://github.com/cafe01/template-plift",
+      "repository" : {
+         "url" : "git://github.com/cafe01/template-plift.git",
+         "web" : "https://github.com/cafe01/template-plift"
+      }
+   },
+   "version" : "0.15",
+   "x_authority" : "cpan:CAFEGRATZ",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

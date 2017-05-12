@@ -1,0 +1,707 @@
+<HTML>
+<HEAD>
+<TITLE>Parse::Plain - template parsing engine</TITLE>
+<LINK REV="made" HREF="mailto:hackers@FreeBSD.org">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#METHODS">METHODS</A>
+	<UL>
+
+		<LI><A HREF="#new">new</A>
+		<LI><A HREF="#set_tag">set_tag</A>
+		<LI><A HREF="#get_tag">get_tag</A>
+		<LI><A HREF="#push_tag">push_tag</A>
+		<LI><A HREF="#unshift_tag">unshift_tag</A>
+		<LI><A HREF="#block">block</A>
+		<LI><A HREF="#block_src">block_src</A>
+		<LI><A HREF="#block_res">block_res</A>
+		<LI><A HREF="#push_block">push_block</A>
+		<LI><A HREF="#push_block_src">push_block_src</A>
+		<LI><A HREF="#push_block_res">push_block_res</A>
+		<LI><A HREF="#unshift_block">unshift_block</A>
+		<LI><A HREF="#unshift_block_src">unshift_block_src</A>
+		<LI><A HREF="#unshift_block_res">unshift_block_res</A>
+		<LI><A HREF="#reset_block_src">reset_block_src</A>
+		<LI><A HREF="#reset_block_src_all">reset_block_src_all</A>
+		<LI><A HREF="#get_oblock">get_oblock</A>
+		<LI><A HREF="#enum_blocks">enum_blocks</A>
+		<LI><A HREF="#set_text">set_text</A>
+		<LI><A HREF="#get_text">get_text</A>
+		<LI><A HREF="#set_parsed">set_parsed</A>
+		<LI><A HREF="#gtag">gtag</A>
+		<LI><A HREF="#callback">callback</A>
+		<LI><A HREF="#parse">parse</A>
+		<LI><A HREF="#unparse">unparse</A>
+		<LI><A HREF="#unparse_all">unparse_all</A>
+		<LI><A HREF="#output">output</A>
+	</UL>
+
+	<LI><A HREF="#TIPS_AND_CAVEATS">TIPS AND CAVEATS</A>
+	<LI><A HREF="#EXAMPLES">EXAMPLES</A>
+	<UL>
+
+		<LI><A HREF="#Using_blocks">Using blocks</A>
+		<LI><A HREF="#Using_hidden_blocks">Using hidden blocks</A>
+		<LI><A HREF="#Including_files">Including files</A>
+	</UL>
+
+	<LI><A HREF="#BUGS">BUGS</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+	<LI><A HREF="#COPYRIGHTS">COPYRIGHTS</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME</A></H1>
+<P>
+<PRE> Parse::Plain - template parsing engine (version 3.03)
+</PRE>
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS</A></H1>
+<P>
+<PRE> # in user's code
+ use Parse::Plain;
+ 
+ my $t = new Parse::Plain('/path/to/filename.tmpl');
+ my $t = new Parse::Plain('/path/to/filename.tmpl', 1, 2);
+ 
+ $t-&gt;set_tag('mytag', 'value');          # %%mytag%% set to value
+ $t-&gt;push_tag('mytag', '-pushed');       # %%mytag%% set to value-pushed
+ $t-&gt;set_tag({'mytag' =&gt; 'value'});      # %%mytag%% set to value
+ $t-&gt;unshift_tag('mytag', 'unshifted-'); # %%mytag%% set to unshifted-value
+ 
+ # set a callback for tags like %%url:<A HREF="http://host.com/doc.html%%">http://host.com/doc.html%%</A>
+ $t-&gt;callback('url', sub { return SomePackage::GetUrl($_[0]); });
+ 
+ $t-&gt;push_block_src('myblock', 'some text to append to the block source');
+ $t-&gt;unshift_block_res('myblock', 'some text to prepend to the block result');
+ 
+ $t-&gt;parse('myblock', {'blocktag' =&gt; 'block value'});  # parse block
+ $t-&gt;parse('myblock', {'blocktag' =&gt; 'another block value'});
+ 
+ $t-&gt;parse;   # parse whole document
+ $t-&gt;output;  # output parsed results to STDOUT
+ 
+ $t-&gt;unparse; # reset parsed result to original template
+ 
+</PRE>
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<P>
+Parse::Plain is a Perl module for parsing text-based templates. It was
+designed to use with HTML, XHTML, XML and other markup languages but
+usually can be used with arbitrary text files as well.
+
+<P>
+Basic constructions in the templates are tags and blocks. Both must have
+names. Valid symbols for using in tag and block names are digits, latin
+letters, underscores, dashes, dots, semicolons, colons, commas,
+parentheses, asterisks, ampersands, slashes and caret symbols. An
+exclamation mark ('<STRONG>!</STRONG>') has special meaning and will be discussed later. All names are case
+sensitive.
+
+<P>
+Tag is a string in form <STRONG>%%tagname%%</STRONG>. There may be any number of tags with the same name and any number of
+different tags in the template.
+
+<P>
+Block is a construction that begins with line
+
+<P>
+<PRE>  {{ blockname
+</PRE>
+<P>
+and ends with symbols <STRONG>}}</STRONG>
+
+
+
+<P>
+Block-start element must be on separate line. There may be no other symbols
+from the beginning of line to the block-end element. However you may have
+other text (except block-start) after block-end on the same line (same as
+having those symbols on next line). Symbols between block-start and
+block-end form block body. Blocks are especially useful for iterative
+elements like table rows. Blocks can be nested and tags are allowed within
+block body.
+
+<P>
+There is also a special form of tag names. Let's say you have a block named <EM>myblock</EM>. Then in the template you can use tags named <STRONG>%%!myblock%%</STRONG>
+and they will be substituted to current value of <EM>myblock</EM>.
+
+<P>
+You can also hide block from place in template where it is defined by
+prepending <STRONG>!</STRONG> to it's name. You'll still be able to use this block with appropriate tag
+names (with '<STRONG>!</STRONG>'). See <A HREF="#EXAMPLES">EXAMPLES</A> section.
+
+<P>
+There is a difference between source block and result block (as used in
+some method names). The source block is a chunk of text that is exactly as
+it appears in source template unless you have changed it using methods <A HREF="#block_src">block_src</A>, <A HREF="#unshift_block_src">unshift_block_src</A>, <A HREF="#push_block_src">push_block_src</A>. The result block is a chunk of text that appears in the output and
+affected by calls to <A HREF="#parse">parse</A> function on this block or may be modified with <A HREF="#block_res">block_res</A>, <A HREF="#unshift_block_res">unshift_block_res</A>, <A HREF="#push_block_res">push_block_res</A>
+methods as well. See description of these methods elsewhere in this
+document. To illustrate the difference:
+
+<P>
+<PRE>  
+  # source block named 'b' in template:
+  # {{ b
+  # -%%Y%%-
+  # }}
+  $val = $t-&gt;block_src('b');       # $val eq '-%%Y%%-'
+  $val = $t-&gt;block_res('b');       # $val == undef
+  
+  # now let's modify source block
+  $t-&gt;push_block_src('b', 'Z|');   # -%%Y%%-Z|
+  $t-&gt;unshift_block_src('b', 'X'); # X-%%Y%%-Z|
+  
+  $val = $t-&gt;block_src('b');       # $val eq 'X-%%Y%%-Z|'
+  $val = $t-&gt;block_res('b');       # $val == undef
+  
+  # now let's modify result block
+  $t-&gt;parse('b', '1');             # result block: X-1-Z|
+  $t-&gt;parse('b', '2');             # result block: X-1-Z|X-2-Z|
+  $t-&gt;unshift_block_res('b', '|'); # result block: |X-1-Z|X-2-Z|
+  
+  $val = $t-&gt;block_src('b');       # $val eq 'X-%%Y%%-Z|'
+  $val = $t-&gt;block_res('b');       # $val eq '|X-1-Z|X-2-Z|'
+  
+</PRE>
+<P>
+<HR>
+<H1><A NAME="METHODS">METHODS</A></H1>
+<P>
+<HR>
+<H2><A NAME="new">new</A></H2>
+<P>
+The constructor. The first parameter (mandatory) is a path to template
+file. Template file must exist and be readable. If file cannot be read
+several attempts will be made (by default 5 attemts with 1 second interval
+between attemts). You can optionally change these values by passing
+additional paramteres to constructor ($lcnt_max and <CODE>$ssec</CODE> are
+respectively number of maximum retries and number of seconds to sleep
+between retries). If template cannot be read script dies.
+
+<P>
+<HR>
+<H2><A NAME="set_tag">set_tag</A></H2>
+<P>
+This method allows you to set tag values. There are two prototypes for this
+method. You may either pass a hash reference containing any number of
+tagname =&gt; value pairs or just pass two scalars (tagname and value).
+
+<P>
+Examples:
+
+<P>
+<PRE> $t-&gt;set_tag('mytag', 'value'); # set %%mytag%% to 'value'
+ $t-&gt;set_tag({'mytag' =&gt; 'value', 'othertag' =&gt; 'otherval');
+</PRE>
+<P>
+Values may be another instances of Parse::Plain. In this case <A HREF="#parse">parse</A>
+method will be called on value object. Returned value is a hash reference
+containing tag_name =&gt; new_value pairs.
+
+<P>
+<HR>
+<H2><A NAME="get_tag">get_tag</A></H2>
+<P>
+Get current values of tags at. Parameter may be either array reference
+containing tag names or a list with tag names but not both intermixed.
+Returned value is a hash reference containing tag_name =&gt; value pairs. Using array reference as parameter is recommended.
+
+<P>
+<HR>
+<H2><A NAME="push_tag">push_tag</A></H2>
+<P>
+Append supplied values to current values of tags. There are two prototypes
+for this method. You may either pass a hash reference containing any number
+of tagname =&gt; value pairs or just pass two scalars (tagname and value). Values may be
+another instances of Parse::Plain. In this case
+<A HREF="#parse">parse</A> method will be called on value object. Returned value is a hash reference
+containing tag_name =&gt; new_value pairs.
+
+<P>
+<HR>
+<H2><A NAME="unshift_tag">unshift_tag</A></H2>
+<P>
+Prepend supplied values to current values of tags. There are two prototypes
+for this method. You may either pass a hash reference containing any number
+of tagname =&gt; value pairs or just pass two scalars (tagname and value). Values may be
+another instances of Parse::Plain. In this case
+<A HREF="#parse">parse</A> method will be called on value object. Returned value is a hash reference
+containing tag_name =&gt; new_value pairs.
+
+<P>
+<HR>
+<H2><A NAME="block">block</A></H2>
+<P>
+Block accessor, allows to set or get values of specific blocks. This method
+exists for backwards-compatibility and accepts as input parameter only list
+(blockname, value) to set blockname to value or just scalar blockname to
+get it's value. You should call
+<A HREF="#block_src">block_src</A> or <A HREF="#block_res">block_res</A> methods instead. This method acts exactly like <A HREF="#block_src">block_src</A> if the block being accessed hasn't been parsed yet (this means that you
+haven't called yet <A HREF="#parse">parse</A> method for this block from the object creation moment or after <A HREF="#unparse">unparse</A> call for this block). Elsewise this method acts like <A HREF="#block_res">block_res</A>.
+
+<P>
+<HR>
+<H2><A NAME="block_src">block_src</A></H2>
+<P>
+Block source accessor, allows to set or get values of sources of specific
+blocks. Arguments can be either scalar block name (to get it's value) or a
+pair of scalars ($block, $val) to set <CODE>$block</CODE> to
+<CODE>$val</CODE> or an array reference with block names to get their
+values or hash reference with { <CODE>$block</CODE> =&gt; $val, ... } pairs to set new values. Values may be another instances of
+Parse::Plain. In this case <A HREF="#parse">parse</A> method will be called on value object. Returned value is a hash reference
+containing block_name =&gt; value pairs.
+
+<P>
+<HR>
+<H2><A NAME="block_res">block_res</A></H2>
+<P>
+Block result accessor, allows to set or get values of results of specific
+blocks. Arguments can be either scalar block name (to get it's value) or a
+pair of scalars ($block, $val) to set <CODE>$block</CODE> to
+<CODE>$val</CODE> or an array reference with block names to get their
+values or hash reference with { <CODE>$block</CODE> =&gt; $val, ... } pairs to set new values. Values may be another instances of
+Parse::Plain. In this case <A HREF="#parse">parse</A> method will be called on value object. Returned value is a hash reference
+containing block_name =&gt; value pairs.
+
+<P>
+<HR>
+<H2><A NAME="push_block">push_block</A></H2>
+<P>
+Append supplied values to blocks. This method exists for
+backwards-compatibility and accepts only list with blockname, value as
+input parameter. You should call <A HREF="#push_block_src">push_block_src</A> or
+<A HREF="#push_block_res">push_block_res</A> methods instead. This method acts exactly like <A HREF="#push_block_src">push_block_src</A> if the block being accessed isn't parsed yet (this means that you haven't
+called yet <A HREF="#parse">parse</A> method for this block from the object creation moment or after <A HREF="#unparse">unparse</A>
+call for this block). Elsewise this method acts like <A HREF="#push_block_res">push_block_res</A>.
+
+<P>
+<HR>
+<H2><A NAME="push_block_src">push_block_src</A></H2>
+<P>
+Append supplied values to block sources. There are two prototypes for this
+method. You may either pass a hash reference containing any number of block
+=&gt; value pairs or just pass two scalars (blockname and value). Values may be
+another instances of Parse::Plain. In this case <A HREF="#parse">parse</A> method will be called on value object. Returned value is a hash reference
+containing block_name =&gt; new_value pairs.
+
+<P>
+<HR>
+<H2><A NAME="push_block_res">push_block_res</A></H2>
+<P>
+Append supplied values to block results. There are two prototypes for this
+method. You may either pass a hash reference containing any number of block
+=&gt; value pairs or just pass two scalars (blockname and value). Values may be
+another instances of Parse::Plain. In this case <A HREF="#parse">parse</A> method will be called on value object. Returned value is a hash reference
+containing block_name =&gt; new_value pairs.
+
+<P>
+<HR>
+<H2><A NAME="unshift_block">unshift_block</A></H2>
+<P>
+Prepend supplied values to blocks. TThis method exists for
+backwards-compatibility and accepts only list with blockname, value as
+input parameter. You should call <A HREF="#unshift_block_src">unshift_block_src</A> or
+<A HREF="#unshift_block_res">unshift_block_res</A> methods instead. This method acts exactly like <A HREF="#unshift_block_src">unshift_block_src</A> if the block being accessed isn't parsed yet (this means that you haven't
+called yet <A HREF="#parse">parse</A> method for this block from the object creation moment or after <A HREF="#unparse">unparse</A>
+call for this block). Elsewise this method acts like <A HREF="#unshift_block_res">unshift_block_res</A>.
+
+<P>
+<HR>
+<H2><A NAME="unshift_block_src">unshift_block_src</A></H2>
+<P>
+Prepend supplied values to block sources. There are two prototypes for this
+method. You may either pass a hash reference containing any number of block
+=&gt; value pairs or just pass two scalars (blockname and value). Values may be
+another instances of Parse::Plain. In this case <A HREF="#parse">parse</A> method will be called on value object. Returned value is a hash reference
+containing block_name =&gt; new_value pairs.
+
+<P>
+<HR>
+<H2><A NAME="unshift_block_res">unshift_block_res</A></H2>
+<P>
+Prepend supplied values to block results. There are two prototypes for this
+method. You may either pass a hash reference containing any number of block
+=&gt; value pairs or just pass two scalars (blockname and value). Values may be
+another instances of Parse::Plain. In this case <A HREF="#parse">parse</A> method will be called on value object. Returned value is a hash reference
+containing block_name =&gt; new_value pairs.
+
+<P>
+<HR>
+<H2><A NAME="reset_block_src">reset_block_src</A></H2>
+<P>
+Resets block source values. The block source value may be changed invoking <A HREF="#block">block</A>, <A HREF="#block_src">block_src</A>, <A HREF="#push_block">push_block</A>, <A HREF="#push_block_src">push_block_src</A>,
+<A HREF="#unshift_block">unshift_block</A>, <A HREF="#unshift_block_src">unshift_block_src</A>, methods. This method allows you to restore block sources to it's original
+values from the source template. Parameter is either array reference or
+list containing block names to be restored. Returned value is a hash
+reference containing block_name =&gt; original_value pairs. Unlike <A HREF="#unparse">unparse</A>
+method this one changes block sources, not results.
+
+<P>
+<HR>
+<H2><A NAME="reset_block_src_all">reset_block_src_all</A></H2>
+<P>
+Calls <A HREF="#reset_block_src">reset_block_src</A> for each block within template excpet outermost one (<EM>text</EM>).
+
+<P>
+<HR>
+<H2><A NAME="get_oblock">get_oblock</A></H2>
+<P>
+Get original block source values. The block source value may be changed
+invoking <A HREF="#block">block</A>, <A HREF="#block_src">block_src</A>, <A HREF="#push_block">push_block</A>, <A HREF="#push_block_src">push_block_src</A>,
+<A HREF="#unshift_block">unshift_block</A>, <A HREF="#unshift_block_src">unshift_block_src</A>, methods. This method returns original values of block sources from the
+template. Unlike <A HREF="#reset_block">reset_block</A> this method doesn't change current value of blocks. Parameter is either
+array reference or list containing block names to be restored. Returned
+value is a hash reference containing block_name =&gt; original_value pairs.
+
+<P>
+<HR>
+<H2><A NAME="enum_blocks">enum_blocks</A></H2>
+<P>
+Enumerate all blocks found in template. Takes no input. Return value is an
+array reference containing block names. Block names order is undefined.
+
+<P>
+<HR>
+<H2><A NAME="set_text">set_text</A></H2>
+<P>
+Set <EM>text</EM> to argument. <EM>text</EM> is a special member containing outermost block source. Argument can be
+another instance of Parse::Plain. In this case <A HREF="#parse">parse</A> method will be called on value object. Returns new value of
+<EM>text</EM>.
+
+<P>
+<STRONG>WARNING:</STRONG> Use with care and only when you are absolutely sure about what you are
+doing!
+
+<P>
+<HR>
+<H2><A NAME="get_text">get_text</A></H2>
+<P>
+Returns current value of text. <EM>text</EM> is a special member containing outermost block source.
+
+<P>
+<HR>
+<H2><A NAME="set_parsed">set_parsed</A></H2>
+<P>
+Set <EM>parsed</EM> to argument. <EM>parsed</EM> is a special member containing undef if outermost block has not been parsed
+yet or parsing result elsewise. Argument can be another instance of
+Parse::Plain. In this case <A HREF="#parse">parse</A>
+method will be called on value object. Returns new value of <EM>parsed</EM>.
+
+<P>
+<STRONG>WARNING:</STRONG> Use with care and only when you are absolutely sure about what you are
+doing!
+
+<P>
+<HR>
+<H2><A NAME="gtag">gtag</A></H2>
+<P>
+Global tag hash accessor. You may optionally set global tags that will be
+used in all blocks including outermost. These global tags have lesser
+priority then those set by <A HREF="#set_tag">set_tag</A> method or <A HREF="#parse">parse</A> arguments. Arguments can be either scalar tagname (to get it's value) or a
+pair of scalars (gtagname, val) to set gtagname to val or an array
+reference with tag names to get their values or hash reference with {
+<CODE>$tag</CODE> =&gt; $val, ... } pairs to set new values. Values may be another instances of
+Parse::Plain. In this case <A HREF="#parse">parse</A> method will be called on value object. Returned value is a hash reference
+containing gtag_name =&gt; value pairs. Pass undef as value to remove global tag.
+
+<P>
+<HR>
+<H2><A NAME="callback">callback</A></H2>
+<P>
+Set callbacks. A callback allows you to have special tags in the form:
+
+<P>
+<PRE>  %%tagname:param%%
+</PRE>
+<P>
+For each such tag specified callback function will be called with
+<EM>param</EM>. Arguments to this method may be either pair of tagname, code reference or
+a hash reference containing pairs: { tagname =&gt; coderef, ... }. There is
+no return values. Pass undef as a coderef to remove given callback. You may
+not use colon in <EM>tagname</EM>. There is one predefined callback that allows you to include another
+templates within current. to do that just use tag
+%%INCLUDE:/path/to/file%%. In the file included all %%INCLUDE:%% tags will
+be processed recursively.
+
+<P>
+<HR>
+<H2><A NAME="parse">parse</A></H2>
+<P>
+Parse chunk of text using defined tags and blocks. If called without
+parameters the outermost block is parsed using tags and blocks defined so
+far. There are three optional parameters: <EM>$blockname</EM>, <EM>$hashref</EM>,
+<EM>$useglobalhash</EM>. First specifies block name to be parsed. You must call
+<A HREF="#parse">parse</A> function on each block in your template at least once or the block will be
+ignored. You must also call <A HREF="#parse">parse</A> function for each iteration of the block. See <A HREF="#EXAMPLES">EXAMPLES</A> section elsewhere in this document. You can also provide a referense to
+hash of tags used for parsing current block. For example:
+
+<P>
+<PRE>  $t-&gt;parse('blockname', {'tag1' =&gt; 'val1', 'tag2' =&gt; 'val2'});
+</PRE>
+<P>
+If you don't specify this hash reference hash filled by
+<A HREF="#set_tag">set_tag</A> functions wiil be used instead. You can also use both hashes for parsing
+your block by setting third parameter to true. Returns parsing results
+(either text or block).
+
+<P>
+<HR>
+<H2><A NAME="unparse">unparse</A></H2>
+<P>
+Reset block result values. This method allows you to reset some block
+results or the whole <EM>text</EM> (outermost block) so that you could
+<A HREF="#parse">parse</A> it again from the scratch. Unlike <A HREF="#reset_block_src">reset_block_src</A> this method only resets block result not source. If no input argument
+passed resets <EM>text</EM> (outermost block). To reset specific blocks pass an array reference or list
+with blocknames. Returns hash reference with pairs: { 'blockname' =&gt;
+'old_block_result_value', ... }.
+
+<P>
+<HR>
+<H2><A NAME="unparse_all">unparse_all</A></H2>
+<P>
+Calls <A HREF="#unparse">unparse</A> method for each block including outermost (<EM>text</EM>). Takes no input. Returns hash reference with pairs: { 'blockname' =&gt;
+'old_block_result_value', ... } for each block except outermost one.
+
+<P>
+<HR>
+<H2><A NAME="output">output</A></H2>
+<P>
+Print parsing results to STDOUT. If text hasn't been parsed yet calls
+<A HREF="#parse">parse</A> method before. Returns parsed results.
+
+<P>
+<HR>
+<H1><A NAME="TIPS_AND_CAVEATS">TIPS AND CAVEATS</A></H1>
+<UL>
+<LI><STRONG><A NAME="item_Names">Names are case sensitive.</A></STRONG>
+<LI><STRONG><A NAME="item_Non">Non-defined tags and blocks are moved off from the result.</A></STRONG>
+<LI><STRONG><A NAME="item_Block">Block start and end elements may be padded with whitespaces or tabs
+for better readability.</A></STRONG>
+<LI><STRONG><A NAME="item_Always">Always parse innermost block before outer blocks or you may get mess.</A></STRONG>
+<LI><STRONG><A NAME="item_Block">Block start and end elements don't insert newline. Consider
+template fragment:</A></STRONG>
+<P>
+<PRE>       He
+  {{ myblock
+ll
+  }}
+o
+</PRE>
+<P>
+One will be parsed to
+
+<P>
+<PRE>       Hello
+</PRE>
+<P>
+line. However since version 3.00 you could also use such template:
+
+<P>
+<PRE>       He
+  {{ myblock
+ll
+  }}o
+</PRE>
+<P>
+to get the same results as in the previous example.
+
+<LI><STRONG><A NAME="item_You">You may not use colons in callback tagnames.</A></STRONG>
+<LI><STRONG><A NAME="item_Obviously">Obviously, it's not a very good idea to use this module for 
+binary templates. ;-)</A></STRONG>
+</UL>
+<P>
+<HR>
+<H1><A NAME="EXAMPLES">EXAMPLES</A></H1>
+<P>
+<HR>
+<H2><A NAME="Using_blocks">Using blocks</A></H2>
+<P>
+<STRONG>Template (template.tmpl):</STRONG>
+
+
+
+<P>
+<PRE> &lt;table&gt;
+ &lt;th&gt;%%name%%&lt;/th&gt;
+</PRE>
+<P>
+<PRE> {{ block1
+         &lt;tr&gt;&lt;td&gt;%%tag1%%&lt;/td&gt;&lt;td&gt;%%tag2%%&lt;/td&gt;&lt;/tr&gt;
+</PRE>
+<P>
+<PRE> }}
+ &lt;/table&gt;
+</PRE>
+<P>
+<STRONG>Code:</STRONG>
+
+
+
+<P>
+<PRE> use Parse::Plain;
+ $t = new Parse::Plain 'template.tmpl';
+ $t-&gt;set_tag('name', &quot;My table&quot;);
+ $t-&gt;parse('block1', {'tag1' =&gt; '01', 'tag2' =&gt; '02'});
+ $t-&gt;parse('block1', {'tag1' =&gt; '03', 'tag2' =&gt; '04'}); 
+ $t-&gt;output;
+</PRE>
+<P>
+<STRONG>Output:</STRONG>
+
+
+
+<P>
+<PRE> &lt;table&gt;
+ &lt;th&gt;My table&lt;/th&gt;
+         &lt;tr&gt;&lt;td&gt;01&lt;/td&gt;&lt;td&gt;02&lt;/td&gt;&lt;/tr&gt;
+         &lt;tr&gt;&lt;td&gt;03&lt;/td&gt;&lt;td&gt;04&lt;/td&gt;&lt;/tr&gt;
+ &lt;/table&gt;
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Using_hidden_blocks">Using hidden blocks</A></H2>
+<P>
+<STRONG>Template (template.tmpl):</STRONG>
+
+
+
+<P>
+<PRE> &lt;table %%border%%&gt;
+ 
+ {{ myblock
+         &lt;tr&gt;&lt;td %%!hidden%%&gt;%%value%%&lt;/td&gt;&lt;/tr&gt;
+ }} &lt;/table&gt;
+ 
+ {{ !hidden
+ class=&quot;%%class%%&quot; align=&quot;%%align%%&quot;
+ }}
+</PRE>
+<P>
+<STRONG>Code:</STRONG>
+
+
+
+<P>
+<PRE> use Parse::Plain;
+ $t = new Parse::Plain 'template.tmpl';
+ $t-&gt;parse('hidden', {'class' =&gt; 'red', 'align' =&gt; 'right'});
+ $t-&gt;parse('myblock', {'value' =&gt; '01'});
+ $t-&gt;parse('myblock', {'value' =&gt; '02'});
+ # we didn't define %%border%% tag
+ $t-&gt;output;
+</PRE>
+<P>
+<STRONG>Output:</STRONG>
+
+
+
+<P>
+<PRE> &lt;table &gt;
+         &lt;tr&gt;&lt;td  class=&quot;red&quot; align=&quot;right&quot;&gt;01&lt;/td&gt;&lt;/tr&gt;
+         &lt;tr&gt;&lt;td  class=&quot;red&quot; align=&quot;right&quot;&gt;02&lt;/td&gt;&lt;/tr&gt;
+ &lt;/table&gt;
+</PRE>
+<P>
+<HR>
+<H2><A NAME="Including_files">Including files</A></H2>
+<P>
+<STRONG>Template 1 (template1.tmpl):</STRONG>
+
+
+
+<P>
+<PRE> Some text %%INCLUDE:template2.tmpl%%!
+</PRE>
+<P>
+<STRONG>Template 2 (template2.tmpl):</STRONG>
+
+
+
+<P>
+<PRE> &gt;&gt;&gt;%%INCLUDE:template3.tmpl%%&lt;&lt;&lt;
+</PRE>
+<P>
+<STRONG>Template 3 (template3.tmpl):</STRONG>
+
+
+
+<P>
+<PRE> 0%%tag%%0
+</PRE>
+<P>
+<STRONG>Code:</STRONG>
+
+
+
+<P>
+<PRE> use Parse::Plain;
+ $t = new Parse::Plain 'template1.tmpl';
+ $t-&gt;set_tag('tag', '!!!');
+ $t-&gt;output;
+</PRE>
+<P>
+<STRONG>Output:</STRONG>
+
+
+
+<P>
+<PRE> Some text &gt;&gt;&gt;0!!!0&lt;&lt;&lt;
+</PRE>
+<P>
+<HR>
+<H1><A NAME="BUGS">BUGS</A></H1>
+<P>
+If you define a hidden block (with '<STRONG>!</STRONG>') and a nested block inside it and use then tag to show the hidden (outer)
+block behavior is undefined.
+
+<P>
+You have no way to change tag / block delimiters. See FAQ document provided
+with distribution for more details.
+
+<P>
+If you have found any other bugs or have any comments / wishes don't
+hesitate to contact me.
+
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+<PRE>  Andrew Alexandre Novikov.
+  mailto: perl@an.kiev.ua
+  www: <A HREF="http://www.an.kiev.ua/">http://www.an.kiev.ua/</A>
+  icq: 7593332
+</PRE>
+<P>
+<HR>
+<H1><A NAME="COPYRIGHTS">COPYRIGHTS</A></H1>
+<P>
+(C) Copyright 2003-2004 by Andrew A Novikov <A
+HREF="http://www.an.kiev.ua/">http://www.an.kiev.ua/</A>
+
+<P>
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+<P>
+See <A
+HREF="http://www.perl.com/perl/misc/Artistic.html">http://www.perl.com/perl/misc/Artistic.html</A>
+
+
+</BODY>
+
+</HTML>

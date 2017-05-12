@@ -1,0 +1,23 @@
+Revision history for Plack-App-CGIBin-Streaming
+
+0.06  2014-09-15 08:57:56 UTC
+        - set HTTP status 500 if possible if the script dies
+
+0.05  2014-09-13 12:59:05 UTC
+        - implement BINMODE and SEEK
+
+0.04  2014-09-12 16:37:33 UTC
+        - localize $/ and $\
+        - use our PerlIO layer also on STDIN to be more PSGI conform
+          (TODO: implement BINMODE, SEEK and perhaps FILENO)
+
+0.03  2014-08-04 05:30:29 UTC
+        - add EUMM based Makefile.PL
+        - add build-debian-package
+
+0.02  2014-08-01 05:07:04 UTC
+        - fix a problem with buffering PerlIO layers on top of our layer
+        - implement suppress_flush
+
+0.01  2014-07-14 03:27:26 UTC
+        - Initial release

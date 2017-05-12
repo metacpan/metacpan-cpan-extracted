@@ -1,0 +1,2895 @@
+1322432710.24958 parent got ->call (/)
+1322432710.24973 parent Starting new debugger
+1322432710.25075 parent saving child pid 9547
+1322432710.25111 parent fixing env
+1322432710.25141 parent sending fixed env
+1322432710.25148 parent send to_child request HASH(0x16e26f8)
+1322432710.25172 parent Creating debug client
+1322432710.25310 child waiting for env
+1322432710.25322 child receive from_parent
+1322432710.25327 got cmd 'request'
+1322432710.25351 child Loading ebug
+1322432710.29134 parent trying to connect to child debugger
+1322432710.76073 child Initial stop
+1322432711.32527 parent connected!
+1322432711.32534 parent Telling child via debugger to run
+1322432711.32552 child Initial run
+1322432711.32560 child Checking for immediate break condition
+1322432711.33185 child Running $app
+1322432711.33196 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1322432711.33213 child send to_parent response ARRAY(0x2215ae8)
+1322432711.33224 child response sent, stopping
+1322432711.33316 parent Setting up idle UI handler
+1322432711.33340 parent waiting for response
+1322432711.33344 parent receive from_child
+1322432711.33348 got cmd 'response'
+1322432711.33367 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1322432711.33378 parent Looking for response
+1322432711.33381 parent got response, sending to browser
+1322432717.94124 parent got ->call (/)
+1322432717.94137 parent Starting new debugger
+1322432717.94237 parent saving child pid 9562
+1322432717.94263 child waiting for env
+1322432717.94273 parent fixing env
+1322432717.94280 child receive from_parent
+1322432717.94308 parent sending fixed env
+1322432717.94315 parent send to_child request HASH(0x197d3d8)
+1322432717.94323 got cmd 'request'
+1322432717.94335 parent Creating debug client
+1322432717.94356 parent trying to connect to child debugger
+1322432717.94375 child Loading ebug
+1322432718.52109 child Initial stop
+1322432718.97119 parent connected!
+1322432718.97126 parent Telling child via debugger to run
+1322432718.97147 child Initial run
+1322432718.97160 child Checking for immediate break condition
+1322432718.97833 child Running $app
+1322432718.97847 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello adsf<br/>
+          also, hello adsf<br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1322432718.97862 child send to_parent response ARRAY(0x23b3218)
+1322432718.97876 child response sent, stopping
+1322432718.97973 parent Setting up idle UI handler
+1322432718.98001 parent waiting for response
+1322432718.98006 parent receive from_child
+1322432718.98011 got cmd 'response'
+1322432718.98027 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello adsf<br/>
+          also, hello adsf<br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1322432718.98039 parent Looking for response
+1322432718.98043 parent got response, sending to browser
+1322432755.23853 parent got ->call (/)
+1322432755.23866 parent Starting new debugger
+1322432755.23966 parent saving child pid 9649
+1322432755.23990 child waiting for env
+1322432755.24005 child receive from_parent
+1322432755.24011 parent fixing env
+1322432755.24036 parent sending fixed env
+1322432755.24043 parent send to_child request HASH(0x197d420)
+1322432755.24059 parent Creating debug client
+1322432755.24072 got cmd 'request'
+1322432755.24080 parent trying to connect to child debugger
+1322432755.24107 child Loading ebug
+1322432755.79069 child Initial stop
+1322432756.26313 parent connected!
+1322432756.26320 parent Telling child via debugger to run
+1322432756.26339 child Initial run
+1322432756.26349 child Checking for immediate break condition
+1322432756.26955 child stopping...
+1322432756.27033 parent Setting up idle UI handler
+1322432756.27056 parent Looking for response
+1322432756.27061 parent got response, sending to browser
+1322432762.38999 parent got ->call (/)
+1322432762.39012 parent Starting new debugger
+1322432762.39132 parent saving child pid 9668
+1322432762.39199 parent fixing env
+1322432762.39219 parent sending fixed env
+1322432762.39226 parent send to_child request HASH(0x147ddc8)
+1322432762.39247 parent Creating debug client
+1322432762.39280 parent trying to connect to child debugger
+1322432762.39395 child waiting for env
+1322432762.39412 child receive from_parent
+1322432762.39421 got cmd 'request'
+1322432762.39453 child Loading ebug
+1322432763.10392 child Initial stop
+1322432763.41678 parent connected!
+1322432763.41686 parent Telling child via debugger to run
+1322432763.41703 child Initial run
+1322432763.41714 child Checking for immediate break condition
+1322432763.42534 child stopping...
+1322432763.42611 parent Setting up idle UI handler
+1322432763.42636 parent Looking for response
+1322432763.42640 parent got response, sending to browser
+1322432769.18760 parent got ->call (/)
+1322432769.18775 parent Starting new debugger
+1322432769.18879 parent saving child pid 9683
+1322432769.18895 child waiting for env
+1322432769.18905 child receive from_parent
+1322432769.18912 parent fixing env
+1322432769.18941 parent sending fixed env
+1322432769.18948 parent send to_child request HASH(0x1ada6f8)
+1322432769.18975 parent Creating debug client
+1322432769.19314 got cmd 'request'
+1322432769.19355 child Loading ebug
+1322432769.23095 parent trying to connect to child debugger
+1322432769.72936 child Initial stop
+1322432770.26078 parent connected!
+1322432770.26089 parent Telling child via debugger to run
+1322432770.26119 child Initial run
+1322432770.26128 child Checking for immediate break condition
+1322432770.26713 child stopping...
+1322432770.26790 parent Setting up idle UI handler
+1322432770.26814 parent Looking for response
+1322432770.27806 parent sending codeline to debugger
+1322432770.27824 parent getting codelines from debugger
+1322432770.27831 parent building html for codelines
+1322432770.27837 parent about to get codelines for file
+1322432770.28008 parent err - 
+1322432770.28017 parent got codelines for file
+1322432770.28067 parent building each line for codelines
+1322432770.28123 parent Returning codelines as html
+1322432774.57261 parent got ->call (/)
+1322432774.57275 parent Already in debugger
+1322432774.57281 parent Looking for response
+1322432774.57317 parent sending next to debugger
+1322432774.57348 child Running $app
+1322432774.57362 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello joe<br/>
+          also, hello joe<br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1322432774.57382 child send to_parent response ARRAY(0x260e628)
+1322432774.57393 child response sent, stopping
+1322432774.57492 parent waiting for response
+1322432774.57499 parent receive from_child
+1322432774.57504 got cmd 'response'
+1322432774.57526 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello joe<br/>
+          also, hello joe<br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1322432774.57542 parent getting codelines from debugger
+1322432774.57547 parent building html for codelines
+1322432774.57551 parent about to get codelines for file
+1322432774.57556 parent err - 
+1322432774.57559 parent got codelines for file
+1322432774.57588 parent building each line for codelines
+1322432774.57612 parent Returning codelines as html
+1322432774.62198 parent got response, sending to browser
+1322432786.53506 parent got ->call (/)
+1322432786.53521 parent Starting new debugger
+1322432786.53625 parent saving child pid 9713
+1322432786.53640 child waiting for env
+1322432786.53652 child receive from_parent
+1322432786.53659 parent fixing env
+1322432786.53691 parent sending fixed env
+1322432786.53698 parent send to_child request HASH(0x2fee6f8)
+1322432786.53725 parent Creating debug client
+1322432786.53857 got cmd 'request'
+1322432786.53898 child Loading ebug
+1322432786.57784 parent trying to connect to child debugger
+1322432787.12071 child Initial stop
+1322432787.61087 parent connected!
+1322432787.61094 parent Telling child via debugger to run
+1322432787.61112 child Initial run
+1322432787.61119 child Checking for immediate break condition
+1322432787.62122 child stopping...
+1322432787.62200 parent Setting up idle UI handler
+1322432787.62225 parent Looking for response
+1322432787.62719 parent sending codeline to debugger
+1322432787.62730 parent getting codelines from debugger
+1322432787.62735 parent building html for codelines
+1322432787.62739 parent about to get codelines for file
+1322432787.62833 parent err - 
+1322432787.62838 parent got codelines for file
+1322432787.62869 parent building each line for codelines
+1322432787.62897 parent Returning codelines as html
+1322432789.23143 parent got ->call (/)
+1322432789.23153 parent Already in debugger
+1322432789.23159 parent Looking for response
+1322432789.23195 parent sending step to debugger
+1322432789.23334 parent getting codelines from debugger
+1322432789.23341 parent building html for codelines
+1322432789.23349 parent about to get codelines for file
+1322432789.23497 parent err - 
+1322432789.23506 parent got codelines for file
+1322432789.23556 parent building each line for codelines
+1322432789.23602 parent Returning codelines as html
+1322432790.79254 parent got ->call (/)
+1322432790.79271 parent Already in debugger
+1322432790.79281 parent Looking for response
+1322432790.79338 parent sending step to debugger
+1322432790.79631 parent getting codelines from debugger
+1322432790.79641 parent building html for codelines
+1322432790.79649 parent about to get codelines for file
+1322432790.79657 parent err - 
+1322432790.79667 parent got codelines for file
+1322432790.79705 parent building each line for codelines
+1322432790.79727 parent Returning codelines as html
+1322432791.92162 parent got ->call (/)
+1322432791.92174 parent Already in debugger
+1322432791.92180 parent Looking for response
+1322432791.92215 parent sending step to debugger
+1322432791.92339 parent getting codelines from debugger
+1322432791.92345 parent building html for codelines
+1322432791.92350 parent about to get codelines for file
+1322432791.92354 parent err - 
+1322432791.92358 parent got codelines for file
+1322432791.92387 parent building each line for codelines
+1322432791.92409 parent Returning codelines as html
+1322432793.76790 parent got ->call (/)
+1322432793.76806 parent Already in debugger
+1322432793.76817 parent Looking for response
+1322432793.76896 parent sending step to debugger
+1322432793.77215 parent getting codelines from debugger
+1322432793.77227 parent building html for codelines
+1322432793.77236 parent about to get codelines for file
+1322432793.77246 parent err - 
+1322432793.77254 parent got codelines for file
+1322432793.77303 parent building each line for codelines
+1322432793.77336 parent Returning codelines as html
+1322432794.36021 parent got ->call (/)
+1322432794.36037 parent Already in debugger
+1322432794.36048 parent Looking for response
+1322432794.36128 parent sending step to debugger
+1322432794.36356 parent getting codelines from debugger
+1322432794.36367 parent building html for codelines
+1322432794.36379 parent about to get codelines for file
+1322432794.36388 parent err - 
+1322432794.36397 parent got codelines for file
+1322432794.36459 parent building each line for codelines
+1322432794.36530 parent Returning codelines as html
+1322432795.14904 parent got ->call (/)
+1322432795.14915 parent Already in debugger
+1322432795.14922 parent Looking for response
+1322432795.14958 parent sending step to debugger
+1322432795.15143 parent getting codelines from debugger
+1322432795.15151 parent building html for codelines
+1322432795.15156 parent about to get codelines for file
+1322432795.15160 parent err - 
+1322432795.15164 parent got codelines for file
+1322432795.15215 parent building each line for codelines
+1322432795.15250 parent Returning codelines as html
+1322432796.87739 parent got ->call (/)
+1322432796.87758 parent Already in debugger
+1322432796.87769 parent Looking for response
+1322432796.87841 parent sending step to debugger
+1322432796.88062 parent getting codelines from debugger
+1322432796.88075 parent building html for codelines
+1322432796.88083 parent about to get codelines for file
+1322432796.88088 parent err - 
+1322432796.88092 parent got codelines for file
+1322432796.88124 parent building each line for codelines
+1322432796.88158 parent Returning codelines as html
+1322432798.07439 parent got ->call (/)
+1322432798.07448 parent Already in debugger
+1322432798.07453 parent Looking for response
+1322432798.07486 parent sending step to debugger
+1322432798.07607 parent getting codelines from debugger
+1322432798.07613 parent building html for codelines
+1322432798.07616 parent about to get codelines for file
+1322432798.07620 parent err - 
+1322432798.07624 parent got codelines for file
+1322432798.07653 parent building each line for codelines
+1322432798.07693 parent Returning codelines as html
+1322432805.70868 parent got ->call (/)
+1322432805.70879 parent Already in debugger
+1322432805.70886 parent Looking for response
+1322432805.70923 parent sending step to debugger
+1322432795.14990 child Running $app
+1322432805.71051 parent getting codelines from debugger
+1322432805.71057 parent building html for codelines
+1322432805.71061 parent about to get codelines for file
+1322432805.71066 parent err - 
+1322432805.71069 parent got codelines for file
+1322432805.71097 parent building each line for codelines
+1322432805.71122 parent Returning codelines as html
+1322432808.25553 parent got ->call (/)
+1322432808.25569 parent Already in debugger
+1322432808.25579 parent Looking for response
+1322432808.25634 parent sending step to debugger
+1322432808.25768 parent getting codelines from debugger
+1322432808.25774 parent building html for codelines
+1322432808.25779 parent about to get codelines for file
+1322432808.25833 parent err - 
+1322432808.25837 parent got codelines for file
+1322432808.25863 parent building each line for codelines
+1322432808.25883 parent Returning codelines as html
+1322432813.15747 parent got ->call (/)
+1322432813.15759 parent Already in debugger
+1322432813.15765 parent Looking for response
+1322432813.15800 parent sending step to debugger
+1322432813.15976 parent getting codelines from debugger
+1322432813.15985 parent building html for codelines
+1322432813.15990 parent about to get codelines for file
+1322432813.15995 parent err - 
+1322432813.15998 parent got codelines for file
+1322432813.16045 parent building each line for codelines
+1322432813.16080 parent Returning codelines as html
+1322432815.03853 parent got ->call (/)
+1322432815.03865 parent Already in debugger
+1322432815.03871 parent Looking for response
+1322432815.03906 parent sending step to debugger
+1322432815.04386 parent getting codelines from debugger
+1322432815.04396 parent building html for codelines
+1322432815.04400 parent about to get codelines for file
+1322432815.09057 parent err - 
+1322432815.09067 parent got codelines for file
+1322432815.09121 parent building each line for codelines
+1322432815.09148 parent Returning codelines as html
+1322432816.37423 parent got ->call (/)
+1322432816.37437 parent Already in debugger
+1322432816.37443 parent Looking for response
+1322432816.37479 parent sending step to debugger
+1322432816.37784 parent getting codelines from debugger
+1322432816.37792 parent building html for codelines
+1322432816.37797 parent about to get codelines for file
+1322432816.37802 parent err - 
+1322432816.37806 parent got codelines for file
+1322432816.37851 parent building each line for codelines
+1322432816.37875 parent Returning codelines as html
+1322432817.03978 parent got ->call (/)
+1322432817.04004 parent Already in debugger
+1322432817.04018 parent Looking for response
+1322432817.04098 parent sending step to debugger
+1322432817.04538 parent getting codelines from debugger
+1322432817.04548 parent building html for codelines
+1322432817.04555 parent about to get codelines for file
+1322432817.04562 parent err - 
+1322432817.04569 parent got codelines for file
+1322432817.04631 parent building each line for codelines
+1322432817.04670 parent Returning codelines as html
+1322432817.68204 parent got ->call (/)
+1322432817.68221 parent Already in debugger
+1322432817.68233 parent Looking for response
+1322432817.68288 parent sending step to debugger
+1322432817.68582 parent getting codelines from debugger
+1322432817.68594 parent building html for codelines
+1322432817.68602 parent about to get codelines for file
+1322432817.68611 parent err - 
+1322432817.68618 parent got codelines for file
+1322432817.68692 parent building each line for codelines
+1322432817.68766 parent Returning codelines as html
+1322432821.14280 parent got ->call (/)
+1322432821.14293 parent Already in debugger
+1322432821.14299 parent Looking for response
+1322432821.14347 parent sending step to debugger
+1322432821.14839 parent getting codelines from debugger
+1322432821.14849 parent building html for codelines
+1322432821.14855 parent about to get codelines for file
+1322432821.14860 parent err - 
+1322432821.14866 parent got codelines for file
+1322432821.14935 parent building each line for codelines
+1322432821.14974 parent Returning codelines as html
+1322432822.34168 parent got ->call (/)
+1322432822.34179 parent Already in debugger
+1322432822.34183 parent Looking for response
+1322432822.34216 parent sending step to debugger
+1322432822.34507 parent getting codelines from debugger
+1322432822.34512 parent building html for codelines
+1322432822.34516 parent about to get codelines for file
+1322432822.34521 parent err - 
+1322432822.34525 parent got codelines for file
+1322432822.34570 parent building each line for codelines
+1322432822.34594 parent Returning codelines as html
+1322432823.00359 parent got ->call (/)
+1322432823.00374 parent Already in debugger
+1322432823.00381 parent Looking for response
+1322432823.00432 parent sending step to debugger
+1322432823.00956 parent getting codelines from debugger
+1322432823.00965 parent building html for codelines
+1322432823.00969 parent about to get codelines for file
+1322432823.00973 parent err - 
+1322432823.00976 parent got codelines for file
+1322432823.01047 parent building each line for codelines
+1322432823.01083 parent Returning codelines as html
+1322432823.70727 parent got ->call (/)
+1322432823.70743 parent Already in debugger
+1322432823.70754 parent Looking for response
+1322432823.70809 parent sending step to debugger
+1322432823.71347 parent getting codelines from debugger
+1322432823.71355 parent building html for codelines
+1322432823.71359 parent about to get codelines for file
+1322432823.71364 parent err - 
+1322432823.71368 parent got codelines for file
+1322432823.71412 parent building each line for codelines
+1322432823.71434 parent Returning codelines as html
+1322432824.67182 parent got ->call (/)
+1322432824.67200 parent Already in debugger
+1322432824.67211 parent Looking for response
+1322432824.67269 parent sending step to debugger
+1322432824.67828 parent getting codelines from debugger
+1322432824.67837 parent building html for codelines
+1322432824.67845 parent about to get codelines for file
+1322432824.67854 parent err - 
+1322432824.67861 parent got codelines for file
+1322432824.67933 parent building each line for codelines
+1322432824.67981 parent Returning codelines as html
+1322432826.23165 parent got ->call (/)
+1322432826.23182 parent Already in debugger
+1322432826.23193 parent Looking for response
+1322432826.23248 parent sending step to debugger
+1322432826.23562 parent getting codelines from debugger
+1322432826.23570 parent building html for codelines
+1322432826.23574 parent about to get codelines for file
+1322432826.23579 parent err - 
+1322432826.23583 parent got codelines for file
+1322432826.23626 parent building each line for codelines
+1322432826.23650 parent Returning codelines as html
+1322432828.28823 parent got ->call (/)
+1322432828.28834 parent Already in debugger
+1322432828.28840 parent Looking for response
+1322432828.28887 parent sending step to debugger
+1322432828.29198 parent getting codelines from debugger
+1322432828.29206 parent building html for codelines
+1322432828.29210 parent about to get codelines for file
+1322432828.29215 parent err - 
+1322432828.29220 parent got codelines for file
+1322432828.29264 parent building each line for codelines
+1322432828.29304 parent Returning codelines as html
+1322432829.15586 parent got ->call (/)
+1322432829.15598 parent Already in debugger
+1322432829.15604 parent Looking for response
+1322432829.15639 parent sending step to debugger
+1322432829.15819 parent getting codelines from debugger
+1322432829.15828 parent building html for codelines
+1322432829.15832 parent about to get codelines for file
+1322432829.15837 parent err - 
+1322432829.15841 parent got codelines for file
+1322432829.15886 parent building each line for codelines
+1322432829.15924 parent Returning codelines as html
+1322432840.32602 parent got ->call (/)
+1322432840.32615 parent Already in debugger
+1322432840.32622 parent Looking for response
+1322432840.32663 parent sending codeline to debugger
+1322432840.32679 parent getting codelines from debugger
+1322432840.32684 parent building html for codelines
+1322432840.32688 parent about to get codelines for file
+1322432840.32693 parent err - 
+1322432840.32697 parent got codelines for file
+1322432840.32738 parent building each line for codelines
+1322432840.32763 parent Returning codelines as html
+1322432846.65405 parent got ->call (/)
+1322432846.65417 parent Already in debugger
+1322432846.65423 parent Looking for response
+1322432846.65460 parent sending codeline to debugger
+1322432846.65505 parent getting codelines from debugger
+1322432846.65510 parent building html for codelines
+1322432846.65515 parent about to get codelines for file
+1322432846.65545 parent err - 
+1322432846.65550 parent got codelines for file
+1322432846.65593 parent building each line for codelines
+1322432846.65628 parent Returning codelines as html
+1322432899.96850 parent got ->call (/)
+1322432899.96874 parent Already in debugger
+1322432899.96886 parent Looking for response
+1322432899.96963 parent sending step to debugger
+1322432899.97620 parent getting codelines from debugger
+1322432899.97630 parent building html for codelines
+1322432899.97635 parent about to get codelines for file
+1322432899.97640 parent err - 
+1322432899.97645 parent got codelines for file
+1322432899.97722 parent building each line for codelines
+1322432899.97762 parent Returning codelines as html
+1322432901.31132 parent got ->call (/)
+1322432901.31144 parent Already in debugger
+1322432901.31151 parent Looking for response
+1322432901.31187 parent sending step to debugger
+1322432901.31713 parent getting codelines from debugger
+1322432901.31721 parent building html for codelines
+1322432901.31726 parent about to get codelines for file
+1322432901.31730 parent err - 
+1322432901.31734 parent got codelines for file
+1322432901.31780 parent building each line for codelines
+1322432901.31804 parent Returning codelines as html
+1322432901.99547 parent got ->call (/)
+1322432901.99563 parent Already in debugger
+1322432901.99573 parent Looking for response
+1322432901.99628 parent sending step to debugger
+1322432902.00165 parent getting codelines from debugger
+1322432902.00173 parent building html for codelines
+1322432902.00181 parent about to get codelines for file
+1322432902.00185 parent err - 
+1322432902.00189 parent got codelines for file
+1322432902.00540 parent building each line for codelines
+1322432902.00583 parent Returning codelines as html
+1322432902.65827 parent got ->call (/)
+1322432902.65844 parent Already in debugger
+1322432902.65855 parent Looking for response
+1322432902.65910 parent sending step to debugger
+1322432902.66293 parent getting codelines from debugger
+1322432902.66300 parent building html for codelines
+1322432902.66305 parent about to get codelines for file
+1322432902.66309 parent err - 
+1322432902.66313 parent got codelines for file
+1322432902.66357 parent building each line for codelines
+1322432902.66379 parent Returning codelines as html
+1322432903.27292 parent got ->call (/)
+1322432903.27305 parent Already in debugger
+1322432903.27312 parent Looking for response
+1322432903.27361 parent sending step to debugger
+1322432903.27862 parent getting codelines from debugger
+1322432903.27872 parent building html for codelines
+1322432903.27876 parent about to get codelines for file
+1322432903.27882 parent err - 
+1322432903.27886 parent got codelines for file
+1322432903.27960 parent building each line for codelines
+1322432903.27997 parent Returning codelines as html
+1322432903.85516 parent got ->call (/)
+1322432903.85529 parent Already in debugger
+1322432903.85535 parent Looking for response
+1322432903.85572 parent sending step to debugger
+1322432903.85883 parent getting codelines from debugger
+1322432903.85891 parent building html for codelines
+1322432903.85895 parent about to get codelines for file
+1322432903.85900 parent err - 
+1322432903.85904 parent got codelines for file
+1322432903.85949 parent building each line for codelines
+1322432903.85973 parent Returning codelines as html
+1322432904.73868 parent got ->call (/)
+1322432904.73880 parent Already in debugger
+1322432904.73886 parent Looking for response
+1322432904.73923 parent sending step to debugger
+1322432904.74235 parent getting codelines from debugger
+1322432904.74243 parent building html for codelines
+1322432904.74248 parent about to get codelines for file
+1322432904.74252 parent err - 
+1322432904.74257 parent got codelines for file
+1322432904.74301 parent building each line for codelines
+1322432904.74325 parent Returning codelines as html
+1322432905.32104 parent got ->call (/)
+1322432905.32121 parent Already in debugger
+1322432905.32131 parent Looking for response
+1322432905.32174 parent sending step to debugger
+1322432905.32546 parent getting codelines from debugger
+1322432905.32554 parent building html for codelines
+1322432905.32558 parent about to get codelines for file
+1322432905.32563 parent err - 
+1322432905.32568 parent got codelines for file
+1322432905.32612 parent building each line for codelines
+1322432905.32638 parent Returning codelines as html
+1322432906.14718 parent got ->call (/)
+1322432906.14734 parent Already in debugger
+1322432906.14744 parent Looking for response
+1322432906.14799 parent sending step to debugger
+1322432906.15315 parent getting codelines from debugger
+1322432906.15323 parent building html for codelines
+1322432906.15327 parent about to get codelines for file
+1322432906.15754 parent err - 
+1322432906.15764 parent got codelines for file
+1322432906.15812 parent building each line for codelines
+1322432906.15835 parent Returning codelines as html
+1322432907.07276 parent got ->call (/)
+1322432907.07288 parent Already in debugger
+1322432907.07294 parent Looking for response
+1322432907.07331 parent sending step to debugger
+1322432907.07704 parent getting codelines from debugger
+1322432907.07714 parent building html for codelines
+1322432907.07718 parent about to get codelines for file
+1322432907.07723 parent err - 
+1322432907.07728 parent got codelines for file
+1322432907.07805 parent building each line for codelines
+1322432907.07842 parent Returning codelines as html
+1322432907.60190 parent got ->call (/)
+1322432907.60207 parent Already in debugger
+1322432907.60218 parent Looking for response
+1322432907.60273 parent sending step to debugger
+1322432907.61082 parent getting codelines from debugger
+1322432907.61093 parent building html for codelines
+1322432907.61100 parent about to get codelines for file
+1322432907.61109 parent err - 
+1322432907.61116 parent got codelines for file
+1322432907.61194 parent building each line for codelines
+1322432907.61238 parent Returning codelines as html
+1322432908.10805 parent got ->call (/)
+1322432908.10816 parent Already in debugger
+1322432908.10823 parent Looking for response
+1322432908.10859 parent sending step to debugger
+1322432908.11136 parent getting codelines from debugger
+1322432908.11143 parent building html for codelines
+1322432908.11148 parent about to get codelines for file
+1322432908.11152 parent err - 
+1322432908.11156 parent got codelines for file
+1322432908.11200 parent building each line for codelines
+1322432908.11222 parent Returning codelines as html
+1322432908.63777 parent got ->call (/)
+1322432908.63788 parent Already in debugger
+1322432908.63794 parent Looking for response
+1322432908.63830 parent sending step to debugger
+1322432908.63964 parent getting codelines from debugger
+1322432908.63971 parent building html for codelines
+1322432908.63976 parent about to get codelines for file
+1322432908.63980 parent err - 
+1322432908.63984 parent got codelines for file
+1322432908.64013 parent building each line for codelines
+1322432908.64038 parent Returning codelines as html
+1322432933.32695 parent got ->call (/)
+1322432933.32705 parent Already in debugger
+1322432933.32712 parent Looking for response
+1322432933.32748 parent sending step to debugger
+1322432933.32877 parent getting codelines from debugger
+1322432933.32883 parent building html for codelines
+1322432933.32886 parent about to get codelines for file
+1322432933.32891 parent err - 
+1322432933.32895 parent got codelines for file
+1322432933.32925 parent building each line for codelines
+1322432933.32947 parent Returning codelines as html
+1322432939.33485 parent got ->call (/)
+1322432939.33497 parent Already in debugger
+1322432939.33503 parent Looking for response
+1322432939.33538 parent sending step to debugger
+1322432939.33705 parent getting codelines from debugger
+1322432939.33712 parent building html for codelines
+1322432939.33717 parent about to get codelines for file
+1322432939.33721 parent err - 
+1322432939.33725 parent got codelines for file
+1322432939.33756 parent building each line for codelines
+1322432939.33778 parent Returning codelines as html
+1322432941.15034 parent got ->call (/)
+1322432941.15048 parent Already in debugger
+1322432941.15055 parent Looking for response
+1322432941.15105 parent sending next to debugger
+1322432941.15245 parent getting codelines from debugger
+1322432941.15252 parent building html for codelines
+1322432941.15257 parent about to get codelines for file
+1322432941.15262 parent err - 
+1322432941.15268 parent got codelines for file
+1322432941.15309 parent building each line for codelines
+1322432941.15343 parent Returning codelines as html
+1322432941.82044 parent got ->call (/)
+1322432941.82061 parent Already in debugger
+1322432941.82074 parent Looking for response
+1322432941.82128 parent sending next to debugger
+1322432941.82345 parent getting codelines from debugger
+1322432941.82356 parent building html for codelines
+1322432941.82364 parent about to get codelines for file
+1322432941.82373 parent err - 
+1322432941.82380 parent got codelines for file
+1322432941.82429 parent building each line for codelines
+1322432941.82478 parent Returning codelines as html
+1322432942.49129 parent got ->call (/)
+1322432942.49142 parent Already in debugger
+1322432942.49149 parent Looking for response
+1322432942.49201 parent sending next to debugger
+1322432942.49351 parent getting codelines from debugger
+1322432942.49358 parent building html for codelines
+1322432942.49363 parent about to get codelines for file
+1322432942.49368 parent err - 
+1322432942.49373 parent got codelines for file
+1322432942.49413 parent building each line for codelines
+1322432942.49451 parent Returning codelines as html
+1322432943.23217 parent got ->call (/)
+1322432943.23231 parent Already in debugger
+1322432943.23238 parent Looking for response
+1322432943.23276 parent sending next to debugger
+1322432943.23471 parent getting codelines from debugger
+1322432943.23481 parent building html for codelines
+1322432943.23485 parent about to get codelines for file
+1322432943.23489 parent err - 
+1322432943.23493 parent got codelines for file
+1322432943.23546 parent building each line for codelines
+1322432943.23581 parent Returning codelines as html
+1322432943.91931 parent got ->call (/)
+1322432943.91943 parent Already in debugger
+1322432943.91950 parent Looking for response
+1322432943.91998 parent sending next to debugger
+1322432943.92128 parent getting codelines from debugger
+1322432943.92134 parent building html for codelines
+1322432943.92139 parent about to get codelines for file
+1322432943.92144 parent err - 
+1322432943.92148 parent got codelines for file
+1322432943.92177 parent building each line for codelines
+1322432943.92200 parent Returning codelines as html
+1322432944.97944 parent got ->call (/)
+1322432944.97955 parent Already in debugger
+1322432944.97961 parent Looking for response
+1322432944.98009 parent sending next to debugger
+1322432944.98837 parent getting codelines from debugger
+1322432944.98851 parent building html for codelines
+1322432944.98858 parent about to get codelines for file
+1322432945.04053 parent err - 
+1322432945.04066 parent got codelines for file
+1322432945.04134 parent building each line for codelines
+1322432945.04160 parent Returning codelines as html
+1322432947.15118 parent got ->call (/)
+1322432947.15129 parent Already in debugger
+1322432947.15136 parent Looking for response
+1322432947.15171 parent sending next to debugger
+1322432947.16005 parent getting codelines from debugger
+1322432947.16014 parent building html for codelines
+1322432947.16018 parent about to get codelines for file
+1322432947.16023 parent err - 
+1322432947.16027 parent got codelines for file
+1322432947.16123 parent building each line for codelines
+1322432947.16162 parent Returning codelines as html
+1322432948.26561 parent got ->call (/)
+1322432948.26572 parent Already in debugger
+1322432948.26579 parent Looking for response
+1322432948.26614 parent sending next to debugger
+1322432948.26756 parent getting codelines from debugger
+1322432948.26763 parent building html for codelines
+1322432948.26768 parent about to get codelines for file
+1322432948.26772 parent err - 
+1322432948.26776 parent got codelines for file
+1322432948.26806 parent building each line for codelines
+1322432948.26830 parent Returning codelines as html
+1322432949.25750 parent got ->call (/)
+1322432949.25761 parent Already in debugger
+1322432949.25767 parent Looking for response
+1322432949.25803 parent sending next to debugger
+1322432943.23309 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello joe<br/>
+          also, hello joe<br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1322432949.26006 parent getting codelines from debugger
+1322432949.26015 parent building html for codelines
+1322432949.26019 parent about to get codelines for file
+1322432949.26024 parent err - 
+1322432949.26028 parent got codelines for file
+1322432949.26074 parent building each line for codelines
+1322432949.26112 parent Returning codelines as html
+1322432953.71859 parent got ->call (/)
+1322432953.71878 parent Already in debugger
+1322432953.71890 parent Looking for response
+1322432953.71966 parent sending next to debugger
+1322432953.72238 parent getting codelines from debugger
+1322432953.72244 parent building html for codelines
+1322432953.72249 parent about to get codelines for file
+1322432953.72254 parent err - 
+1322432953.72258 parent got codelines for file
+1322432953.72290 parent building each line for codelines
+1322432953.72326 parent Returning codelines as html
+1322432954.76662 parent got ->call (/)
+1322432954.76675 parent Already in debugger
+1322432954.76684 parent Looking for response
+1322432954.76719 parent sending next to debugger
+1322432954.76839 parent getting codelines from debugger
+1322432954.76844 parent building html for codelines
+1322432954.76849 parent about to get codelines for file
+1322432954.76853 parent err - 
+1322432954.76857 parent got codelines for file
+1322432954.76899 parent building each line for codelines
+1322432954.76922 parent Returning codelines as html
+1322432955.34169 parent got ->call (/)
+1322432955.34181 parent Already in debugger
+1322432955.34187 parent Looking for response
+1322432955.34223 parent sending next to debugger
+1322432955.34350 parent getting codelines from debugger
+1322432955.34356 parent building html for codelines
+1322432955.34361 parent about to get codelines for file
+1322432955.34366 parent err - 
+1322432955.34369 parent got codelines for file
+1322432955.34398 parent building each line for codelines
+1322432955.34421 parent Returning codelines as html
+1322432955.90859 parent got ->call (/)
+1322432955.90890 parent Already in debugger
+1322432955.90901 parent Looking for response
+1322432955.90955 parent sending next to debugger
+1322432955.91170 parent getting codelines from debugger
+1322432955.91179 parent building html for codelines
+1322432955.91188 parent about to get codelines for file
+1322432955.91196 parent err - 
+1322432955.91204 parent got codelines for file
+1322432955.91253 parent building each line for codelines
+1322432955.91305 parent Returning codelines as html
+1322432956.47280 parent got ->call (/)
+1322432956.47296 parent Already in debugger
+1322432956.47306 parent Looking for response
+1322432956.47361 parent sending next to debugger
+1322432956.47576 parent getting codelines from debugger
+1322432956.47586 parent building html for codelines
+1322432956.47594 parent about to get codelines for file
+1322432956.47603 parent err - 
+1322432956.47610 parent got codelines for file
+1322432956.47660 parent building each line for codelines
+1322432956.47705 parent Returning codelines as html
+1322432957.17474 parent got ->call (/)
+1322432957.17486 parent Already in debugger
+1322432957.17493 parent Looking for response
+1322432957.17530 parent sending next to debugger
+1322432957.17669 parent getting codelines from debugger
+1322432957.17677 parent building html for codelines
+1322432957.17681 parent about to get codelines for file
+1322432957.17687 parent err - 
+1322432957.17691 parent got codelines for file
+1322432957.17724 parent building each line for codelines
+1322432957.17748 parent Returning codelines as html
+1322432957.43849 parent got ->call (/)
+1322432957.43866 parent Already in debugger
+1322432957.43877 parent Looking for response
+1322432957.43931 parent sending next to debugger
+1322432957.44128 parent getting codelines from debugger
+1322432957.44135 parent building html for codelines
+1322432957.44139 parent about to get codelines for file
+1322432957.44144 parent err - 
+1322432957.44148 parent got codelines for file
+1322432957.44179 parent building each line for codelines
+1322432957.44201 parent Returning codelines as html
+1322432957.65836 parent got ->call (/)
+1322432957.65848 parent Already in debugger
+1322432957.65854 parent Looking for response
+1322432957.65890 parent sending next to debugger
+1322432957.66020 parent getting codelines from debugger
+1322432957.66027 parent building html for codelines
+1322432957.66032 parent about to get codelines for file
+1322432957.66036 parent err - 
+1322432957.66040 parent got codelines for file
+1322432957.66071 parent building each line for codelines
+1322432957.66094 parent Returning codelines as html
+1322432958.06018 parent got ->call (/)
+1322432958.06030 parent Already in debugger
+1322432958.06036 parent Looking for response
+1322432958.06080 parent sending next to debugger
+1322432958.06218 parent getting codelines from debugger
+1322432958.06226 parent building html for codelines
+1322432958.06230 parent about to get codelines for file
+1322432958.06235 parent err - 
+1322432958.06238 parent got codelines for file
+1322432958.06281 parent building each line for codelines
+1322432958.06323 parent Returning codelines as html
+1322432958.11109 parent got ->call (/)
+1322432958.11124 parent Already in debugger
+1322432958.11134 parent Looking for response
+1322432958.11188 parent sending next to debugger
+1322432958.11355 parent getting codelines from debugger
+1322432958.11363 parent building html for codelines
+1322432958.11368 parent about to get codelines for file
+1322432958.11373 parent err - 
+1322432958.11376 parent got codelines for file
+1322432958.11405 parent building each line for codelines
+1322432958.11427 parent Returning codelines as html
+1322432959.01620 parent got ->call (/)
+1322432959.01632 parent Already in debugger
+1322432959.01639 parent Looking for response
+1322432959.01679 parent sending next to debugger
+1322432959.01811 parent getting codelines from debugger
+1322432959.01817 parent building html for codelines
+1322432959.01821 parent about to get codelines for file
+1322432959.01826 parent err - 
+1322432959.01830 parent got codelines for file
+1322432959.01860 parent building each line for codelines
+1322432959.01884 parent Returning codelines as html
+1322432960.41049 parent got ->call (/)
+1322432960.41065 parent Already in debugger
+1322432960.41077 parent Looking for response
+1322432960.41133 parent sending next to debugger
+1322432960.41462 parent getting codelines from debugger
+1322432960.41474 parent building html for codelines
+1322432960.41483 parent about to get codelines for file
+1322432960.41492 parent err - 
+1322432960.41499 parent got codelines for file
+1322432960.41576 parent building each line for codelines
+1322432960.41656 parent Returning codelines as html
+1322432960.83210 parent got ->call (/)
+1322432960.83226 parent Already in debugger
+1322432960.83238 parent Looking for response
+1322432960.83297 parent sending next to debugger
+1322432958.11228 child send to_parent response ARRAY(0x3b22028)
+1322432960.83633 parent getting codelines from debugger
+1322432960.83645 parent building html for codelines
+1322432960.83653 parent about to get codelines for file
+1322432960.83661 parent err - 
+1322432960.83673 parent got codelines for file
+1322432960.83721 parent building each line for codelines
+1322432960.83757 parent Returning codelines as html
+1322432962.15655 parent got ->call (/)
+1322432962.15673 parent Already in debugger
+1322432962.15685 parent Looking for response
+1322432962.15740 parent sending next to debugger
+1322432962.16071 parent waiting for response
+1322432962.16084 parent receive from_child
+1322432962.16094 got cmd 'response'
+1322432975.08756 parent got ->call (/)
+1322432975.08772 parent Starting new debugger
+1322432975.08879 parent saving child pid 10038
+1322432975.08901 child waiting for env
+1322432975.08916 child receive from_parent
+1322432975.08917 parent fixing env
+1322432975.08945 parent sending fixed env
+1322432975.08952 parent send to_child request HASH(0x18f26f8)
+1322432975.08968 got cmd 'request'
+1322432975.08978 parent Creating debug client
+1322432975.09007 child Loading ebug
+1322432975.12990 parent trying to connect to child debugger
+1322432975.63693 child Initial stop
+1322432976.16441 parent connected!
+1322432976.16448 parent Telling child via debugger to run
+1322432976.16466 child Initial run
+1322432976.16475 child Checking for immediate break condition
+1322432976.17071 child Running $app
+1322432976.17080 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1322432976.17097 child send to_parent response ARRAY(0x24254e8)
+1322432976.17107 child response sent, stopping
+1322432976.17186 parent Setting up idle UI handler
+1322432976.17208 parent waiting for response
+1322432976.17213 parent receive from_child
+1322432976.17217 got cmd 'response'
+1322432976.17234 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1322432976.17248 parent Looking for response
+1322432976.17251 parent got response, sending to browser
+1322432978.36879 parent got ->call (/)
+1322432978.36893 parent Starting new debugger
+1322432978.37010 parent saving child pid 10045
+1322432978.37052 parent fixing env
+1322432978.37065 child waiting for env
+1322432978.37078 child receive from_parent
+1322432978.37082 parent sending fixed env
+1322432978.37089 parent send to_child request HASH(0x1b8ce08)
+1322432978.37101 got cmd 'request'
+1322432978.37110 parent Creating debug client
+1322432978.37130 child Loading ebug
+1322432978.37132 parent trying to connect to child debugger
+1322432978.92907 child Initial stop
+1322432979.39375 parent connected!
+1322432979.39383 parent Telling child via debugger to run
+1322432979.39401 child Initial run
+1322432979.39409 child Checking for immediate break condition
+1322432979.40342 child stopping...
+1322432979.40486 parent Setting up idle UI handler
+1322432979.40508 parent Looking for response
+1322432979.40512 parent got response, sending to browser
+1322436026.37068 parent got ->call (/)
+1322436026.37079 parent Starting new debugger
+1322436026.37166 parent saving child pid 15324
+1322436026.37186 child waiting for env
+1322436026.37198 child receive from_parent
+1322436026.37201 parent fixing env
+1322436026.37223 parent sending fixed env
+1322436026.37228 parent send to_child request HASH(0x13147c8)
+1322436026.37234 got cmd 'request'
+1322436026.37250 parent Creating debug client
+1322436026.37280 child Loading ebug
+1322436026.41067 parent trying to connect to child debugger
+1322436026.89106 child Initial stop
+1322436027.43900 parent connected!
+1322436027.43906 parent Telling child via debugger to run
+1322436027.43923 child Initial run
+1322436027.43931 child Checking for immediate break condition
+1322436027.44522 child Running $app
+1322436027.44591 parent Setting up idle UI handler
+1322436027.44614 parent Looking for response
+1322436027.45357 parent sending codeline to debugger
+1322436027.45373 parent getting codelines from debugger
+1322436027.45380 parent building html for codelines
+1322436027.45385 parent about to get codelines for file
+1322436027.45471 parent err - 
+1322436027.45479 parent got codelines for file
+1322436027.45521 parent building each line for codelines
+1322436027.45563 parent Returning codelines as html
+1322436036.90040 parent got ->call (/)
+1322436036.90050 parent Already in debugger
+1322436036.90054 parent Looking for response
+1322436036.90091 parent sending step to debugger
+1322436036.90202 parent getting codelines from debugger
+1322436036.90207 parent building html for codelines
+1322436036.90210 parent about to get codelines for file
+1322436036.90212 parent err - 
+1322436036.90215 parent got codelines for file
+1322436036.90238 parent building each line for codelines
+1322436036.90258 parent Returning codelines as html
+1322436041.21772 parent got ->call (/)
+1322436041.21781 parent Already in debugger
+1322436041.21786 parent Looking for response
+1322436041.21819 parent sending step to debugger
+1322436041.22120 parent getting codelines from debugger
+1322436041.22127 parent building html for codelines
+1322436041.22130 parent about to get codelines for file
+1322436041.22636 parent err - 
+1322436041.22644 parent got codelines for file
+1322436041.22686 parent building each line for codelines
+1322436041.22709 parent Returning codelines as html
+1322436042.37446 parent got ->call (/)
+1322436042.37455 parent Already in debugger
+1322436042.37460 parent Looking for response
+1322436042.37494 parent sending step to debugger
+1322436042.37794 parent getting codelines from debugger
+1322436042.37801 parent building html for codelines
+1322436042.37803 parent about to get codelines for file
+1322436042.37806 parent err - 
+1322436042.37809 parent got codelines for file
+1322436042.37852 parent building each line for codelines
+1322436042.37874 parent Returning codelines as html
+1322436043.27946 parent got ->call (/)
+1322436043.27959 parent Already in debugger
+1322436043.27967 parent Looking for response
+1322436043.28018 parent sending step to debugger
+1322436043.28551 parent getting codelines from debugger
+1322436043.28558 parent building html for codelines
+1322436043.28561 parent about to get codelines for file
+1322436043.28564 parent err - 
+1322436043.28566 parent got codelines for file
+1322436043.28605 parent building each line for codelines
+1322436043.28628 parent Returning codelines as html
+1322436043.96478 parent got ->call (/)
+1322436043.96495 parent Already in debugger
+1322436043.96506 parent Looking for response
+1322436043.96580 parent sending step to debugger
+1322436043.96864 parent getting codelines from debugger
+1322436043.96880 parent building html for codelines
+1322436043.96886 parent about to get codelines for file
+1322436043.96890 parent err - 
+1322436043.96895 parent got codelines for file
+1322436043.96937 parent building each line for codelines
+1322436043.96970 parent Returning codelines as html
+1322436055.74300 parent got ->call (/)
+1322436055.74309 parent Already in debugger
+1322436055.74314 parent Looking for response
+1322436055.74354 parent sending codeline to debugger
+1322436055.74382 parent getting codelines from debugger
+1322436055.74385 parent building html for codelines
+1322436055.74388 parent about to get codelines for file
+1322436055.74391 parent err - 
+1322436055.74423 parent got codelines for file
+1322436055.74472 parent building each line for codelines
+1322436055.74514 parent Returning codelines as html
+1322436236.80460 parent got ->call (/)
+1322436236.80474 parent Already in debugger
+1322436236.80481 parent Looking for response
+1322436236.80532 parent sending step to debugger
+1322436236.80955 parent getting codelines from debugger
+1322436236.80962 parent building html for codelines
+1322436236.80964 parent about to get codelines for file
+1322436236.80967 parent err - 
+1322436236.80970 parent got codelines for file
+1322436236.81010 parent building each line for codelines
+1322436236.81031 parent Returning codelines as html
+1322436237.87513 parent got ->call (/)
+1322436237.87527 parent Already in debugger
+1322436237.87534 parent Looking for response
+1322436237.87590 parent sending step to debugger
+1322436237.88171 parent getting codelines from debugger
+1322436237.88180 parent building html for codelines
+1322436237.88186 parent about to get codelines for file
+1322436237.88191 parent err - 
+1322436237.88196 parent got codelines for file
+1322436237.88264 parent building each line for codelines
+1322436237.88308 parent Returning codelines as html
+1322436238.54118 parent got ->call (/)
+1322436238.54131 parent Already in debugger
+1322436238.54137 parent Looking for response
+1322436238.54187 parent sending step to debugger
+1322436238.54633 parent getting codelines from debugger
+1322436238.54642 parent building html for codelines
+1322436238.54646 parent about to get codelines for file
+1322436238.54651 parent err - 
+1322436238.54655 parent got codelines for file
+1322436238.54712 parent building each line for codelines
+1322436238.54745 parent Returning codelines as html
+1322436239.05376 parent got ->call (/)
+1322436239.05385 parent Already in debugger
+1322436239.05390 parent Looking for response
+1322436239.05423 parent sending step to debugger
+1322436239.06192 parent getting codelines from debugger
+1322436239.06202 parent building html for codelines
+1322436239.06207 parent about to get codelines for file
+1322436239.06213 parent err - 
+1322436239.06217 parent got codelines for file
+1322436239.06292 parent building each line for codelines
+1322436239.06336 parent Returning codelines as html
+1322436239.64022 parent got ->call (/)
+1322436239.64032 parent Already in debugger
+1322436239.64037 parent Looking for response
+1322436239.64071 parent sending step to debugger
+1322436239.64368 parent getting codelines from debugger
+1322436239.64380 parent building html for codelines
+1322436239.64386 parent about to get codelines for file
+1322436239.64390 parent err - 
+1322436239.64392 parent got codelines for file
+1322436239.64433 parent building each line for codelines
+1322436239.64455 parent Returning codelines as html
+1322436240.57499 parent got ->call (/)
+1322436240.57509 parent Already in debugger
+1322436240.57514 parent Looking for response
+1322436240.57548 parent sending step to debugger
+1322436240.57872 parent getting codelines from debugger
+1322436240.57879 parent building html for codelines
+1322436240.57881 parent about to get codelines for file
+1322436240.57885 parent err - 
+1322436240.57887 parent got codelines for file
+1322436240.57934 parent building each line for codelines
+1322436240.57967 parent Returning codelines as html
+1322436241.85726 parent got ->call (/)
+1322436241.85739 parent Already in debugger
+1322436241.85747 parent Looking for response
+1322436241.85798 parent sending step to debugger
+1322436241.86185 parent getting codelines from debugger
+1322436241.86192 parent building html for codelines
+1322436241.86195 parent about to get codelines for file
+1322436241.86198 parent err - 
+1322436241.86200 parent got codelines for file
+1322436241.86240 parent building each line for codelines
+1322436241.86263 parent Returning codelines as html
+1322436242.79839 parent got ->call (/)
+1322436242.79852 parent Already in debugger
+1322436242.79857 parent Looking for response
+1322436242.79907 parent sending step to debugger
+1322436242.80090 parent getting codelines from debugger
+1322436242.80098 parent building html for codelines
+1322436242.80103 parent about to get codelines for file
+1322436242.80107 parent err - 
+1322436242.80110 parent got codelines for file
+1322436242.80148 parent building each line for codelines
+1322436242.80187 parent Returning codelines as html
+1322436253.70082 parent got ->call (/)
+1322436253.70092 parent Already in debugger
+1322436253.70096 parent Looking for response
+1322436253.70130 parent sending step to debugger
+1322436253.70435 parent getting codelines from debugger
+1322436253.70441 parent building html for codelines
+1322436253.70444 parent about to get codelines for file
+1322436253.70447 parent err - 
+1322436253.70449 parent got codelines for file
+1322436253.70489 parent building each line for codelines
+1322436253.70511 parent Returning codelines as html
+1322436255.55542 parent got ->call (/)
+1322436255.55557 parent Already in debugger
+1322436255.55564 parent Looking for response
+1322436255.55619 parent sending step to debugger
+1322436255.56200 parent getting codelines from debugger
+1322436255.56209 parent building html for codelines
+1322436255.56215 parent about to get codelines for file
+1322436255.56221 parent err - 
+1322436255.56225 parent got codelines for file
+1322436255.56292 parent building each line for codelines
+1322436255.56336 parent Returning codelines as html
+1322436256.29551 parent got ->call (/)
+1322436256.29564 parent Already in debugger
+1322436256.29575 parent Looking for response
+1322436256.29618 parent sending step to debugger
+1322436256.29916 parent getting codelines from debugger
+1322436256.29922 parent building html for codelines
+1322436256.29925 parent about to get codelines for file
+1322436256.29928 parent err - 
+1322436256.29930 parent got codelines for file
+1322436256.29972 parent building each line for codelines
+1322436256.29993 parent Returning codelines as html
+1322436257.17068 parent got ->call (/)
+1322436257.17081 parent Already in debugger
+1322436257.17089 parent Looking for response
+1322436257.17139 parent sending step to debugger
+1322436257.17722 parent getting codelines from debugger
+1322436257.17731 parent building html for codelines
+1322436257.17737 parent about to get codelines for file
+1322436257.17742 parent err - 
+1322436257.17747 parent got codelines for file
+1322436257.17816 parent building each line for codelines
+1322436257.17859 parent Returning codelines as html
+1324525446.75761 parent got ->call (/)
+1324525446.75835 parent Starting new debugger
+1324525446.75973 parent saving child pid 13490
+1324525446.76022 parent fixing env
+1324525446.76013 child waiting for env
+1324525446.76038 child receive from_parent
+1324525446.76062 parent sending fixed env
+1324525446.76070 parent send to_child request HASH(0x2a5bcb8)
+1324525446.76089 got cmd 'request'
+1324525446.76099 parent Creating debug client
+1324525446.76150 child Loading ebug
+1324525446.80645 parent trying to connect to child debugger
+1324525447.30493 child Initial stop
+1324525447.84987 parent connected!
+1324525447.84996 parent Telling child via debugger to run
+1324525447.85030 child Initial run
+1324525447.85037 child Checking for immediate break condition
+1324525447.85609 child Running $app
+1324525447.85619 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1324525447.85635 child send to_parent response ARRAY(0x354c5d8)
+1324525447.85645 child response sent, stopping
+1324525447.85729 parent Setting up idle UI handler
+1324525447.85763 parent waiting for response
+1324525447.85770 parent receive from_child
+1324525447.85777 got cmd 'response'
+1324525447.85807 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1324525447.85824 parent Looking for response
+1324525447.85830 parent got response, sending to browser
+1324525447.87390 parent got ->call (/favicon.ico)
+1324525447.87403 parent Starting new debugger
+1324525447.87516 parent saving child pid 13491
+1324525447.87551 child waiting for env
+1324525447.87564 parent fixing env
+1324525447.87570 child receive from_parent
+1324525447.87597 parent sending fixed env
+1324525447.87606 parent send to_child request HASH(0x299ad68)
+1324525447.87618 got cmd 'request'
+1324525447.87634 parent Creating debug client
+1324525447.87665 parent trying to connect to child debugger
+1324525447.87671 child Loading ebug
+1324525448.44194 child Initial stop
+1324525448.89903 parent connected!
+1324525448.89912 parent Telling child via debugger to run
+1324525448.89945 child Initial run
+1324525448.89953 child Checking for immediate break condition
+1324525448.90536 child Running $app
+1324525448.90545 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1324525448.90559 child send to_parent response ARRAY(0x36f8978)
+1324525448.90569 child response sent, stopping
+1324525448.90654 parent Setting up idle UI handler
+1324525448.90694 parent waiting for response
+1324525448.90701 parent receive from_child
+1324525448.90708 got cmd 'response'
+1324525448.90731 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1324525448.90754 parent Looking for response
+1324525448.90760 parent got response, sending to browser
+1324525452.80998 parent got ->call (/)
+1324525452.81012 parent Starting new debugger
+1324525452.81139 parent saving child pid 13497
+1324525452.81181 child waiting for env
+1324525452.81205 child receive from_parent
+1324525452.81207 parent fixing env
+1324525452.81257 parent sending fixed env
+1324525452.81265 parent send to_child request HASH(0x2a5bee0)
+1324525452.81280 got cmd 'request'
+1324525452.81297 parent Creating debug client
+1324525452.81329 parent trying to connect to child debugger
+1324525452.81361 child Loading ebug
+1324525453.36276 child Initial stop
+1324525453.83865 parent connected!
+1324525453.83874 parent Telling child via debugger to run
+1324525453.83908 child Initial run
+1324525453.83916 child Checking for immediate break condition
+1324525453.84512 child Running $app
+1324525453.84521 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello jkfkf<br/>
+          also, hello jkfkf<br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1324525453.84535 child send to_parent response ARRAY(0x3718df0)
+1324525453.84545 child response sent, stopping
+1324525453.84626 parent Setting up idle UI handler
+1324525453.84663 parent waiting for response
+1324525453.84671 parent receive from_child
+1324525453.84677 got cmd 'response'
+1324525453.84700 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello jkfkf<br/>
+          also, hello jkfkf<br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1324525453.84717 parent Looking for response
+1324525453.84722 parent got response, sending to browser
+1324525453.86489 parent got ->call (/favicon.ico)
+1324525453.86501 parent Starting new debugger
+1324525453.86618 parent saving child pid 13500
+1324525453.86665 child waiting for env
+1324525453.86680 parent fixing env
+1324525453.86690 child receive from_parent
+1324525453.86718 parent sending fixed env
+1324525453.86727 parent send to_child request HASH(0x29cdcf0)
+1324525453.86742 got cmd 'request'
+1324525453.86758 parent Creating debug client
+1324525453.86789 parent trying to connect to child debugger
+1324525453.86803 child Loading ebug
+1324525454.42355 child Initial stop
+1324525454.89672 parent connected!
+1324525454.89681 parent Telling child via debugger to run
+1324525454.89716 child Initial run
+1324525454.89723 child Checking for immediate break condition
+1324525454.90296 child Running $app
+1324525454.90305 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1324525454.90319 child send to_parent response ARRAY(0x37146b0)
+1324525454.90329 child response sent, stopping
+1324525454.90415 parent Setting up idle UI handler
+1324525454.90448 parent waiting for response
+1324525454.90455 parent receive from_child
+1324525454.90461 got cmd 'response'
+1324525454.90484 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1324525454.90501 parent Looking for response
+1324525454.90507 parent got response, sending to browser
+1324525479.90055 parent got ->call (/)
+1324525479.90068 parent Starting new debugger
+1324525479.90197 parent saving child pid 13511
+1324525479.90240 child waiting for env
+1324525479.90263 child receive from_parent
+1324525479.90263 parent fixing env
+1324525479.90302 parent sending fixed env
+1324525479.90311 parent send to_child request HASH(0x2a3edf8)
+1324525479.90324 got cmd 'request'
+1324525479.90343 parent Creating debug client
+1324525479.90373 parent trying to connect to child debugger
+1324525479.90392 child Loading ebug
+1324525480.45899 child Initial stop
+1324525480.93315 parent connected!
+1324525480.93325 parent Telling child via debugger to run
+1324525480.93359 child Initial run
+1324525480.93367 child Checking for immediate break condition
+1324525480.93946 child stopping...
+1324525480.94034 parent Setting up idle UI handler
+1324525480.94068 parent Looking for response
+1324525480.94074 parent got response, sending to browser
+1324525480.95471 parent got ->call (/favicon.ico)
+1324525480.95484 parent Starting new debugger
+1324525480.95610 parent saving child pid 13512
+1324525480.95655 child waiting for env
+1324525480.95679 child receive from_parent
+1324525480.95699 parent fixing env
+1324525480.95720 parent sending fixed env
+1324525480.95728 parent send to_child request HASH(0x2a379a0)
+1324525480.95740 got cmd 'request'
+1324525480.95759 parent Creating debug client
+1324525480.95788 parent trying to connect to child debugger
+1324525480.95806 child Loading ebug
+1324525481.52130 child Initial stop
+1324525481.98227 parent connected!
+1324525481.98237 parent Telling child via debugger to run
+1324525481.98269 child Initial run
+1324525481.98275 child Checking for immediate break condition
+1324525481.98854 child Running $app
+1324525481.98863 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1324525481.98877 child send to_parent response ARRAY(0x3716cb8)
+1324525481.98887 child response sent, stopping
+1324525481.98973 parent Setting up idle UI handler
+1324525481.99006 parent waiting for response
+1324525481.99013 parent receive from_child
+1324525481.99019 got cmd 'response'
+1324525481.99043 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1324525481.99060 parent Looking for response
+1324525481.99066 parent got response, sending to browser
+1324525510.37300 parent got ->call (/)
+1324525510.37316 parent Starting new debugger
+1324525510.37424 parent saving child pid 13716
+1324525510.37466 child waiting for env
+1324525510.37481 parent fixing env
+1324525510.37488 child receive from_parent
+1324525510.37520 parent sending fixed env
+1324525510.37528 parent send to_child request HASH(0x310b250)
+1324525510.37547 got cmd 'request'
+1324525510.37574 parent Creating debug client
+1324525510.37624 child Loading ebug
+1324525510.41187 parent trying to connect to child debugger
+1324525510.90398 child Initial stop
+1324525511.43976 parent connected!
+1324525511.43986 parent Telling child via debugger to run
+1324525511.44017 child Initial run
+1324525511.44025 child Checking for immediate break condition
+1324525511.44650 child stopping...
+1324525511.44742 parent Setting up idle UI handler
+1324525511.44777 parent Looking for response
+1324525511.45785 parent sending codeline to debugger
+1324525511.45801 parent getting codelines from debugger
+1324525511.45807 parent building html for codelines
+1324525511.45812 parent about to get codelines for file
+1324525511.45942 parent err - 
+1324525511.45949 parent got codelines for file
+1324525511.45987 parent building each line for codelines
+1324525511.46015 parent Returning codelines as html
+1324525511.51682 parent got ->call (/scrutinize/scrutinize.css)
+1324525511.51958 parent got ->call (/scrutinize/jquery.js)
+1324525511.52553 parent got ->call (/scrutinize/jquery.cookie.js)
+1324525511.62720 parent got ->call (/favicon.ico)
+1324525511.62729 parent Already in debugger
+1324525511.62735 parent Looking for response
+1324525511.62783 parent sending codeline to debugger
+1324525511.62802 parent getting codelines from debugger
+1324525511.62812 parent building html for codelines
+1324525511.62817 parent about to get codelines for file
+1324525511.62823 parent err - 
+1324525511.62827 parent got codelines for file
+1324525511.62882 parent building each line for codelines
+1324525511.62906 parent Returning codelines as html
+1324525529.62885 parent got ->call (/)
+1324525529.62904 parent Already in debugger
+1324525529.62914 parent Looking for response
+1324525529.63000 parent sending next to debugger
+1324525529.63053 child Running $app
+1324525529.63070 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1324525529.63100 child send to_parent response ARRAY(0x3c2c978)
+1324525529.63117 child response sent, stopping
+1324525529.63298 parent waiting for response
+1324525529.63306 parent receive from_child
+1324525529.63313 got cmd 'response'
+1324525529.63343 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1324525529.63362 parent getting codelines from debugger
+1324525529.63369 parent building html for codelines
+1324525529.63374 parent about to get codelines for file
+1324525529.63379 parent err - 
+1324525529.63384 parent got codelines for file
+1324525529.63435 parent building each line for codelines
+1324525529.63484 parent Returning codelines as html
+1324525529.68039 parent got response, sending to browser
+1324525529.70499 parent got ->call (/favicon.ico)
+1324525529.70507 parent Starting new debugger
+1324525529.70594 parent saving child pid 13725
+1324525529.70611 child waiting for env
+1324525529.70625 child receive from_parent
+1324525529.70635 parent fixing env
+1324525529.70661 parent sending fixed env
+1324525529.70666 parent send to_child request HASH(0x341d4b0)
+1324525529.70673 got cmd 'request'
+1324525529.70685 parent Creating debug client
+1324525529.70693 parent trying to connect to child debugger
+1324525529.70710 child Loading ebug
+1324525530.29263 child Initial stop
+1324525530.72706 parent connected!
+1324525530.72716 parent Telling child via debugger to run
+1324525530.72760 child Initial run
+1324525530.72766 child Checking for immediate break condition
+1324525530.72810 child Running $app
+1324525530.72817 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1324525530.72830 child send to_parent response ARRAY(0x345a760)
+1324525530.72839 child response sent, stopping
+1324525530.72901 parent Setting up idle UI handler
+1324525530.72934 parent waiting for response
+1324525530.72941 parent receive from_child
+1324525530.72947 got cmd 'response'
+1324525530.72972 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1324525530.72988 parent Looking for response
+1324525530.72994 parent got response, sending to browser
+1324525534.18187 parent got ->call (/favicon.ico)
+1324525534.18199 parent Starting new debugger
+1324525534.18307 parent saving child pid 13728
+1324525534.18337 child waiting for env
+1324525534.18355 child receive from_parent
+1324525534.18363 parent fixing env
+1324525534.18394 parent sending fixed env
+1324525534.18401 parent send to_child request HASH(0x33cf6f8)
+1324525534.18412 got cmd 'request'
+1324525534.18427 parent Creating debug client
+1324525534.18456 parent trying to connect to child debugger
+1324525534.18460 child Loading ebug
+1324525534.77122 child Initial stop
+1324525535.21075 parent connected!
+1324525535.21085 parent Telling child via debugger to run
+1324525535.21116 child Initial run
+1324525535.21124 child Checking for immediate break condition
+1324525535.21172 child Running $app
+1324525535.21179 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1324525535.21193 child send to_parent response ARRAY(0x3ddef10)
+1324525535.21202 child response sent, stopping
+1324525535.21262 parent Setting up idle UI handler
+1324525535.21298 parent waiting for response
+1324525535.21306 parent receive from_child
+1324525535.21312 got cmd 'response'
+1324525535.21335 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1324525535.21352 parent Looking for response
+1324525535.21358 parent got response, sending to browser
+1324525536.46074 parent got ->call (/)
+1324525536.46091 parent Starting new debugger
+1324525536.46250 parent saving child pid 13729
+1324525536.46273 child waiting for env
+1324525536.46293 child receive from_parent
+1324525536.46321 parent fixing env
+1324525536.46384 parent sending fixed env
+1324525536.46397 parent send to_child request HASH(0x3081870)
+1324525536.46439 parent Creating debug client
+1324525536.46445 got cmd 'request'
+1324525536.46475 parent trying to connect to child debugger
+1324525536.46511 child Loading ebug
+1324525537.04645 child Initial stop
+1324525537.48541 parent connected!
+1324525537.48550 parent Telling child via debugger to run
+1324525537.48583 child Initial run
+1324525537.48590 child Checking for immediate break condition
+1324525537.48636 child stopping...
+1324525537.48703 parent Setting up idle UI handler
+1324525537.48740 parent Looking for response
+1324525537.48746 parent got response, sending to browser
+1324525537.50483 parent got ->call (/favicon.ico)
+1324525537.50495 parent Starting new debugger
+1324525537.50623 parent saving child pid 13730
+1324525537.50735 parent fixing env
+1324525537.50767 parent sending fixed env
+1324525537.50767 child waiting for env
+1324525537.50778 parent send to_child request HASH(0x3427c60)
+1324525537.50790 child receive from_parent
+1324525537.50803 got cmd 'request'
+1324525537.50814 parent Creating debug client
+1324525537.50845 parent trying to connect to child debugger
+1324525537.50860 child Loading ebug
+1324525538.09472 child Initial stop
+1324525538.53710 parent connected!
+1324525538.53719 parent Telling child via debugger to run
+1324525538.53752 child Initial run
+1324525538.53760 child Checking for immediate break condition
+1324525538.53805 child Running $app
+1324525538.53812 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1324525538.53825 child send to_parent response ARRAY(0x345b3f8)
+1324525538.53835 child response sent, stopping
+1324525538.53896 parent Setting up idle UI handler
+1324525538.53928 parent waiting for response
+1324525538.53938 parent receive from_child
+1324525538.53945 got cmd 'response'
+1324525538.53972 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1324525538.53990 parent Looking for response
+1324525538.53996 parent got response, sending to browser
+1324525545.36868 parent got ->call (/)
+1324525545.36888 parent Starting new debugger
+1324525545.37005 parent saving child pid 13736
+1324525545.37046 child waiting for env
+1324525545.37061 parent fixing env
+1324525545.37069 child receive from_parent
+1324525545.37100 parent sending fixed env
+1324525545.37108 parent send to_child request HASH(0x235c630)
+1324525545.37119 got cmd 'request'
+1324525545.37151 parent Creating debug client
+1324525545.37177 child Loading ebug
+1324525545.41411 parent trying to connect to child debugger
+1324525545.90042 child Initial stop
+1324525546.44607 parent connected!
+1324525546.44617 parent Telling child via debugger to run
+1324525546.44651 child Initial run
+1324525546.44659 child Checking for immediate break condition
+1324525546.45234 child stopping...
+1324525546.45317 parent Setting up idle UI handler
+1324525546.45353 parent Looking for response
+1324525546.46364 parent sending codeline to debugger
+1324525546.46381 parent getting codelines from debugger
+1324525546.46388 parent building html for codelines
+1324525546.46394 parent about to get codelines for file
+1324525546.46565 parent err - 
+1324525546.46572 parent got codelines for file
+1324525546.46621 parent building each line for codelines
+1324525546.46673 parent Returning codelines as html
+1324525546.55800 parent got ->call (/favicon.ico)
+1324525546.55813 parent Already in debugger
+1324525546.55821 parent Looking for response
+1324525546.55869 parent sending codeline to debugger
+1324525546.55888 parent getting codelines from debugger
+1324525546.55894 parent building html for codelines
+1324525546.55899 parent about to get codelines for file
+1324525546.55905 parent err - 
+1324525546.55909 parent got codelines for file
+1324525546.55968 parent building each line for codelines
+1324525546.56018 parent Returning codelines as html
+1324525551.32608 parent got ->call (/)
+1324525551.32622 parent Already in debugger
+1324525551.32629 parent Looking for response
+1324525551.32681 parent sending step to debugger
+1324525551.32893 parent getting codelines from debugger
+1324525551.32901 parent building html for codelines
+1324525551.32906 parent about to get codelines for file
+1324525551.33048 parent err - 
+1324525551.33055 parent got codelines for file
+1324525551.33099 parent building each line for codelines
+1324525551.33142 parent Returning codelines as html
+1324525551.42721 parent got ->call (/favicon.ico)
+1324525551.42731 parent Already in debugger
+1324525551.42738 parent Looking for response
+1324525551.42790 parent sending codeline to debugger
+1324525551.42812 parent getting codelines from debugger
+1324525551.42818 parent building html for codelines
+1324525551.42823 parent about to get codelines for file
+1324525551.42829 parent err - 
+1324525551.42833 parent got codelines for file
+1324525551.42892 parent building each line for codelines
+1324525551.42933 parent Returning codelines as html
+1324525556.25097 parent got ->call (/)
+1324525556.25111 parent Already in debugger
+1324525556.25118 parent Looking for response
+1324525556.25175 parent sending step to debugger
+1324525556.25381 parent getting codelines from debugger
+1324525556.25389 parent building html for codelines
+1324525556.25394 parent about to get codelines for file
+1324525556.25400 parent err - 
+1324525556.25404 parent got codelines for file
+1324525556.25449 parent building each line for codelines
+1324525556.25490 parent Returning codelines as html
+1324525556.33042 parent got ->call (/favicon.ico)
+1324525556.33054 parent Already in debugger
+1324525556.33060 parent Looking for response
+1324525556.33095 parent sending codeline to debugger
+1324525556.33108 parent getting codelines from debugger
+1324525556.33112 parent building html for codelines
+1324525556.33115 parent about to get codelines for file
+1324525556.33118 parent err - 
+1324525556.33120 parent got codelines for file
+1324525556.33169 parent building each line for codelines
+1324525556.33193 parent Returning codelines as html
+1324525556.82637 parent got ->call (/)
+1324525556.82650 parent Already in debugger
+1324525556.82658 parent Looking for response
+1324525556.82709 parent sending step to debugger
+1324525556.82921 parent getting codelines from debugger
+1324525556.82928 parent building html for codelines
+1324525556.82934 parent about to get codelines for file
+1324525556.82940 parent err - 
+1324525556.82944 parent got codelines for file
+1324525556.82989 parent building each line for codelines
+1324525556.83032 parent Returning codelines as html
+1324525556.90903 parent got ->call (/favicon.ico)
+1324525556.90920 parent Already in debugger
+1324525556.90928 parent Looking for response
+1324525556.90975 parent sending codeline to debugger
+1324525556.90995 parent getting codelines from debugger
+1324525556.91001 parent building html for codelines
+1324525556.91006 parent about to get codelines for file
+1324525556.91012 parent err - 
+1324525556.91017 parent got codelines for file
+1324525556.91074 parent building each line for codelines
+1324525556.91117 parent Returning codelines as html
+1324525569.57244 parent got ->call (/)
+1324525569.57262 parent Already in debugger
+1324525569.57273 parent Looking for response
+1324525569.57336 parent sending step to debugger
+1324525569.57549 parent getting codelines from debugger
+1324525569.57556 parent building html for codelines
+1324525569.57562 parent about to get codelines for file
+1324525569.57567 parent err - 
+1324525569.57572 parent got codelines for file
+1324525569.57617 parent building each line for codelines
+1324525569.57661 parent Returning codelines as html
+1324525569.66682 parent got ->call (/favicon.ico)
+1324525569.66699 parent Already in debugger
+1324525569.66710 parent Looking for response
+1324525569.66781 parent sending codeline to debugger
+1324525569.66810 parent getting codelines from debugger
+1324525569.66819 parent building html for codelines
+1324525569.66827 parent about to get codelines for file
+1324525569.66835 parent err - 
+1324525569.66842 parent got codelines for file
+1324525569.66920 parent building each line for codelines
+1324525569.66972 parent Returning codelines as html
+1324525572.23391 parent got ->call (/)
+1324525572.23408 parent Already in debugger
+1324525572.23419 parent Looking for response
+1324525572.23482 parent sending next to debugger
+1324525572.23693 parent getting codelines from debugger
+1324525572.23701 parent building html for codelines
+1324525572.23706 parent about to get codelines for file
+1324525572.23712 parent err - 
+1324525572.23716 parent got codelines for file
+1324525572.23761 parent building each line for codelines
+1324525572.23804 parent Returning codelines as html
+1324525572.31595 parent got ->call (/favicon.ico)
+1324525572.31608 parent Already in debugger
+1324525572.31615 parent Looking for response
+1324525572.31662 parent sending codeline to debugger
+1324525572.31680 parent getting codelines from debugger
+1324525572.31687 parent building html for codelines
+1324525572.31692 parent about to get codelines for file
+1324525572.31697 parent err - 
+1324525572.31702 parent got codelines for file
+1324525572.31764 parent building each line for codelines
+1324525572.31807 parent Returning codelines as html
+1324525574.00047 parent got ->call (/)
+1324525574.00060 parent Already in debugger
+1324525574.00067 parent Looking for response
+1324525574.00118 parent sending next to debugger
+1324525574.00320 parent getting codelines from debugger
+1324525574.00327 parent building html for codelines
+1324525574.00332 parent about to get codelines for file
+1324525574.00343 parent err - 
+1324525574.00348 parent got codelines for file
+1324525574.00393 parent building each line for codelines
+1324525574.00440 parent Returning codelines as html
+1324525574.09205 parent got ->call (/favicon.ico)
+1324525574.09223 parent Already in debugger
+1324525574.09234 parent Looking for response
+1324525574.09282 parent sending codeline to debugger
+1324525574.09303 parent getting codelines from debugger
+1324525574.09309 parent building html for codelines
+1324525574.09314 parent about to get codelines for file
+1324525574.09319 parent err - 
+1324525574.09324 parent got codelines for file
+1324525574.09386 parent building each line for codelines
+1324525574.09430 parent Returning codelines as html
+1324525576.24173 parent got ->call (/)
+1324525576.24191 parent Already in debugger
+1324525576.24202 parent Looking for response
+1324525576.24271 parent sending next to debugger
+1324525576.24487 parent getting codelines from debugger
+1324525576.24495 parent building html for codelines
+1324525576.24500 parent about to get codelines for file
+1324525576.24506 parent err - 
+1324525576.24510 parent got codelines for file
+1324525576.24557 parent building each line for codelines
+1324525576.24600 parent Returning codelines as html
+1324525576.32201 parent got ->call (/favicon.ico)
+1324525576.32212 parent Already in debugger
+1324525576.32218 parent Looking for response
+1324525576.32251 parent sending codeline to debugger
+1324525576.32265 parent getting codelines from debugger
+1324525576.32269 parent building html for codelines
+1324525576.32271 parent about to get codelines for file
+1324525576.32274 parent err - 
+1324525576.32277 parent got codelines for file
+1324525576.32325 parent building each line for codelines
+1324525576.32351 parent Returning codelines as html
+1324525582.36591 parent got ->call (/)
+1324525582.36608 parent Already in debugger
+1324525582.36619 parent Looking for response
+1324525582.36697 parent sending next to debugger
+1324525582.36921 parent getting codelines from debugger
+1324525582.36929 parent building html for codelines
+1324525582.36934 parent about to get codelines for file
+1324525582.36940 parent err - 
+1324525582.36944 parent got codelines for file
+1324525582.36990 parent building each line for codelines
+1324525582.37035 parent Returning codelines as html
+1324525582.46166 parent got ->call (/favicon.ico)
+1324525582.46176 parent Already in debugger
+1324525582.46181 parent Looking for response
+1324525582.46214 parent sending codeline to debugger
+1324525582.46230 parent getting codelines from debugger
+1324525582.46233 parent building html for codelines
+1324525582.46236 parent about to get codelines for file
+1324525582.46239 parent err - 
+1324525582.46242 parent got codelines for file
+1324525582.46297 parent building each line for codelines
+1324525582.46322 parent Returning codelines as html
+1324525582.71606 parent got ->call (/)
+1324525582.71619 parent Already in debugger
+1324525582.71627 parent Looking for response
+1324525582.71678 parent sending next to debugger
+1324525574.00154 child Running $app
+1324525582.71892 parent getting codelines from debugger
+1324525582.71899 parent building html for codelines
+1324525582.71905 parent about to get codelines for file
+1324525582.71910 parent err - 
+1324525582.71915 parent got codelines for file
+1324525582.71961 parent building each line for codelines
+1324525582.72010 parent Returning codelines as html
+1324525582.79799 parent got ->call (/favicon.ico)
+1324525582.79815 parent Already in debugger
+1324525582.79824 parent Looking for response
+1324525582.79871 parent sending codeline to debugger
+1324525582.79891 parent getting codelines from debugger
+1324525582.79897 parent building html for codelines
+1324525582.79902 parent about to get codelines for file
+1324525582.79908 parent err - 
+1324525582.79912 parent got codelines for file
+1324525582.79973 parent building each line for codelines
+1324525582.80022 parent Returning codelines as html
+1324525588.06109 parent got ->call (/)
+1324525588.06126 parent Already in debugger
+1324525588.06137 parent Looking for response
+1324525588.06200 parent sending step to debugger
+1324525588.06395 parent getting codelines from debugger
+1324525588.06407 parent building html for codelines
+1324525588.06412 parent about to get codelines for file
+1324525588.06515 parent err - 
+1324525588.06521 parent got codelines for file
+1324525588.06564 parent building each line for codelines
+1324525588.06602 parent Returning codelines as html
+1324525588.14493 parent got ->call (/favicon.ico)
+1324525588.14510 parent Already in debugger
+1324525588.14521 parent Looking for response
+1324525588.14590 parent sending codeline to debugger
+1324525588.14618 parent getting codelines from debugger
+1324525588.14627 parent building html for codelines
+1324525588.14635 parent about to get codelines for file
+1324525588.14644 parent err - 
+1324525588.14650 parent got codelines for file
+1324525588.14725 parent building each line for codelines
+1324525588.14770 parent Returning codelines as html
+1324525594.48727 parent got ->call (/)
+1324525594.48748 parent Already in debugger
+1324525594.48759 parent Looking for response
+1324525594.48821 parent sending step to debugger
+1324525594.49015 parent getting codelines from debugger
+1324525594.49022 parent building html for codelines
+1324525594.49027 parent about to get codelines for file
+1324525594.49033 parent err - 
+1324525594.49038 parent got codelines for file
+1324525594.49081 parent building each line for codelines
+1324525594.49120 parent Returning codelines as html
+1324525594.57774 parent got ->call (/favicon.ico)
+1324525594.57791 parent Already in debugger
+1324525594.57802 parent Looking for response
+1324525594.57872 parent sending codeline to debugger
+1324525594.57901 parent getting codelines from debugger
+1324525594.57909 parent building html for codelines
+1324525594.57917 parent about to get codelines for file
+1324525594.57925 parent err - 
+1324525594.57932 parent got codelines for file
+1324525594.58011 parent building each line for codelines
+1324525594.58051 parent Returning codelines as html
+1324525597.68535 parent got ->call (/)
+1324525597.68548 parent Already in debugger
+1324525597.68556 parent Looking for response
+1324525597.68607 parent sending next to debugger
+1324525597.69192 parent getting codelines from debugger
+1324525597.69201 parent building html for codelines
+1324525597.69206 parent about to get codelines for file
+1324525597.73918 parent err - 
+1324525597.73930 parent got codelines for file
+1324525597.74009 parent building each line for codelines
+1324525597.74053 parent Returning codelines as html
+1324525597.78627 parent got ->call (/favicon.ico)
+1324525597.78641 parent Already in debugger
+1324525597.78648 parent Looking for response
+1324525597.78696 parent sending codeline to debugger
+1324525597.78716 parent getting codelines from debugger
+1324525597.78722 parent building html for codelines
+1324525597.78727 parent about to get codelines for file
+1324525597.78733 parent err - 
+1324525597.78747 parent got codelines for file
+1324525597.78828 parent building each line for codelines
+1324525597.78872 parent Returning codelines as html
+1324525599.65451 parent got ->call (/)
+1324525599.65465 parent Already in debugger
+1324525599.65473 parent Looking for response
+1324525599.65525 parent sending next to debugger
+1324525599.66107 parent getting codelines from debugger
+1324525599.66115 parent building html for codelines
+1324525599.66121 parent about to get codelines for file
+1324525599.66126 parent err - 
+1324525599.66131 parent got codelines for file
+1324525599.66198 parent building each line for codelines
+1324525599.66243 parent Returning codelines as html
+1324525599.72411 parent got ->call (/favicon.ico)
+1324525599.72427 parent Already in debugger
+1324525599.72438 parent Looking for response
+1324525599.72486 parent sending codeline to debugger
+1324525599.72508 parent getting codelines from debugger
+1324525599.72514 parent building html for codelines
+1324525599.72519 parent about to get codelines for file
+1324525599.72524 parent err - 
+1324525599.72529 parent got codelines for file
+1324525599.72608 parent building each line for codelines
+1324525599.72652 parent Returning codelines as html
+1324525600.59031 parent got ->call (/)
+1324525600.59043 parent Already in debugger
+1324525600.59047 parent Looking for response
+1324525600.59081 parent sending next to debugger
+1324525600.59622 parent getting codelines from debugger
+1324525600.59631 parent building html for codelines
+1324525600.59636 parent about to get codelines for file
+1324525600.59642 parent err - 
+1324525600.59646 parent got codelines for file
+1324525600.59713 parent building each line for codelines
+1324525600.59759 parent Returning codelines as html
+1324525600.63432 parent got ->call (/favicon.ico)
+1324525600.63442 parent Already in debugger
+1324525600.63448 parent Looking for response
+1324525600.63483 parent sending codeline to debugger
+1324525600.63497 parent getting codelines from debugger
+1324525600.63500 parent building html for codelines
+1324525600.63503 parent about to get codelines for file
+1324525600.63506 parent err - 
+1324525600.63509 parent got codelines for file
+1324525600.63568 parent building each line for codelines
+1324525600.63591 parent Returning codelines as html
+1324525601.11692 parent got ->call (/)
+1324525601.11706 parent Already in debugger
+1324525601.11713 parent Looking for response
+1324525601.11765 parent sending next to debugger
+1324525601.11960 parent getting codelines from debugger
+1324525601.11967 parent building html for codelines
+1324525601.11973 parent about to get codelines for file
+1324525601.11978 parent err - 
+1324525601.11983 parent got codelines for file
+1324525601.12031 parent building each line for codelines
+1324525601.12071 parent Returning codelines as html
+1324525601.20029 parent got ->call (/favicon.ico)
+1324525601.20044 parent Already in debugger
+1324525601.20052 parent Looking for response
+1324525601.20100 parent sending codeline to debugger
+1324525601.20120 parent getting codelines from debugger
+1324525601.20126 parent building html for codelines
+1324525601.20131 parent about to get codelines for file
+1324525601.20137 parent err - 
+1324525601.20141 parent got codelines for file
+1324525601.20196 parent building each line for codelines
+1324525601.20236 parent Returning codelines as html
+1324525622.56808 parent got ->call (/)
+1324525622.56821 parent Already in debugger
+1324525622.56828 parent Looking for response
+1324525622.56889 parent sending codeline to debugger
+1324525622.56909 parent getting codelines from debugger
+1324525622.56915 parent building html for codelines
+1324525622.56921 parent about to get codelines for file
+1324525622.56926 parent err - 
+1324525622.56931 parent got codelines for file
+1324525622.56990 parent building each line for codelines
+1324525622.57030 parent Returning codelines as html
+1324525622.66929 parent got ->call (/favicon.ico)
+1324525622.66940 parent Already in debugger
+1324525622.66944 parent Looking for response
+1324525622.66981 parent sending codeline to debugger
+1324525622.66996 parent getting codelines from debugger
+1324525622.66999 parent building html for codelines
+1324525622.67002 parent about to get codelines for file
+1324525622.67005 parent err - 
+1324525622.67007 parent got codelines for file
+1324525622.67044 parent building each line for codelines
+1324525622.67064 parent Returning codelines as html
+1324525721.87264 parent got ->call (/)
+1324525721.87278 parent Already in debugger
+1324525721.87285 parent Looking for response
+1324525721.87336 parent sending next to debugger
+1324525721.87912 parent getting codelines from debugger
+1324525721.87920 parent building html for codelines
+1324525721.87925 parent about to get codelines for file
+1324525721.87931 parent err - 
+1324525721.87938 parent got codelines for file
+1324525721.88006 parent building each line for codelines
+1324525721.88051 parent Returning codelines as html
+1324525721.92829 parent got ->call (/favicon.ico)
+1324525721.92839 parent Already in debugger
+1324525721.92843 parent Looking for response
+1324525721.92877 parent sending codeline to debugger
+1324525721.92893 parent getting codelines from debugger
+1324525721.92896 parent building html for codelines
+1324525721.92899 parent about to get codelines for file
+1324525721.92902 parent err - 
+1324525721.92905 parent got codelines for file
+1324525721.92982 parent building each line for codelines
+1324525721.93029 parent Returning codelines as html
+1324525722.88637 parent got ->call (/)
+1324525722.88650 parent Already in debugger
+1324525722.88657 parent Looking for response
+1324525722.88708 parent sending next to debugger
+1324525722.89298 parent getting codelines from debugger
+1324525722.89307 parent building html for codelines
+1324525722.89312 parent about to get codelines for file
+1324525722.89318 parent err - 
+1324525722.89322 parent got codelines for file
+1324525722.89394 parent building each line for codelines
+1324525722.89437 parent Returning codelines as html
+1324525722.94959 parent got ->call (/favicon.ico)
+1324525722.94970 parent Already in debugger
+1324525722.94974 parent Looking for response
+1324525722.95006 parent sending codeline to debugger
+1324525722.95018 parent getting codelines from debugger
+1324525722.95021 parent building html for codelines
+1324525722.95024 parent about to get codelines for file
+1324525722.95027 parent err - 
+1324525722.95029 parent got codelines for file
+1324525722.95078 parent building each line for codelines
+1324525722.95098 parent Returning codelines as html
+1324525723.42272 parent got ->call (/)
+1324525723.42287 parent Already in debugger
+1324525723.42298 parent Looking for response
+1324525723.42391 parent sending next to debugger
+1324525723.42983 parent getting codelines from debugger
+1324525723.42991 parent building html for codelines
+1324525723.42996 parent about to get codelines for file
+1324525723.43002 parent err - 
+1324525723.43006 parent got codelines for file
+1324525723.43077 parent building each line for codelines
+1324525723.43120 parent Returning codelines as html
+1324525723.47139 parent got ->call (/favicon.ico)
+1324525723.47158 parent Already in debugger
+1324525723.47167 parent Looking for response
+1324525723.47214 parent sending codeline to debugger
+1324525723.47234 parent getting codelines from debugger
+1324525723.47240 parent building html for codelines
+1324525723.47246 parent about to get codelines for file
+1324525723.47251 parent err - 
+1324525723.47256 parent got codelines for file
+1324525723.47336 parent building each line for codelines
+1324525723.47379 parent Returning codelines as html
+1324525723.98779 parent got ->call (/)
+1324525723.98794 parent Already in debugger
+1324525723.98805 parent Looking for response
+1324525723.98886 parent sending next to debugger
+1324525723.99479 parent getting codelines from debugger
+1324525723.99487 parent building html for codelines
+1324525723.99492 parent about to get codelines for file
+1324525723.99498 parent err - 
+1324525723.99502 parent got codelines for file
+1324525723.99575 parent building each line for codelines
+1324525723.99618 parent Returning codelines as html
+1324525724.03732 parent got ->call (/favicon.ico)
+1324525724.03741 parent Already in debugger
+1324525724.03745 parent Looking for response
+1324525724.03776 parent sending codeline to debugger
+1324525724.03788 parent getting codelines from debugger
+1324525724.03792 parent building html for codelines
+1324525724.03794 parent about to get codelines for file
+1324525724.03797 parent err - 
+1324525724.03800 parent got codelines for file
+1324525724.03860 parent building each line for codelines
+1324525724.03883 parent Returning codelines as html
+1324525724.84663 parent got ->call (/)
+1324525724.84677 parent Already in debugger
+1324525724.84685 parent Looking for response
+1324525724.84765 parent sending next to debugger
+1324525724.85340 parent getting codelines from debugger
+1324525724.85348 parent building html for codelines
+1324525724.85353 parent about to get codelines for file
+1324525724.85359 parent err - 
+1324525724.85364 parent got codelines for file
+1324525724.85431 parent building each line for codelines
+1324525724.85476 parent Returning codelines as html
+1324525724.90687 parent got ->call (/favicon.ico)
+1324525724.90702 parent Already in debugger
+1324525724.90709 parent Looking for response
+1324525724.90766 parent sending codeline to debugger
+1324525724.90789 parent getting codelines from debugger
+1324525724.90799 parent building html for codelines
+1324525724.90804 parent about to get codelines for file
+1324525724.90810 parent err - 
+1324525724.90814 parent got codelines for file
+1324525724.90890 parent building each line for codelines
+1324525724.90935 parent Returning codelines as html
+1324525725.89948 parent got ->call (/)
+1324525725.89961 parent Already in debugger
+1324525725.89969 parent Looking for response
+1324525725.90046 parent sending next to debugger
+1324525725.90621 parent getting codelines from debugger
+1324525725.90630 parent building html for codelines
+1324525725.90635 parent about to get codelines for file
+1324525725.90641 parent err - 
+1324525725.90646 parent got codelines for file
+1324525725.90719 parent building each line for codelines
+1324525725.90768 parent Returning codelines as html
+1324525725.94878 parent got ->call (/favicon.ico)
+1324525725.94890 parent Already in debugger
+1324525725.94898 parent Looking for response
+1324525725.94946 parent sending codeline to debugger
+1324525725.94965 parent getting codelines from debugger
+1324525725.94971 parent building html for codelines
+1324525725.94976 parent about to get codelines for file
+1324525725.94982 parent err - 
+1324525725.94987 parent got codelines for file
+1324525725.95069 parent building each line for codelines
+1324525725.95115 parent Returning codelines as html
+1324525726.43517 parent got ->call (/)
+1324525726.43530 parent Already in debugger
+1324525726.43550 parent Looking for response
+1324525726.43603 parent sending next to debugger
+1324525726.44229 parent getting codelines from debugger
+1324525726.44238 parent building html for codelines
+1324525726.44243 parent about to get codelines for file
+1324525726.44249 parent err - 
+1324525726.44253 parent got codelines for file
+1324525726.44321 parent building each line for codelines
+1324525726.44372 parent Returning codelines as html
+1324525726.48324 parent got ->call (/favicon.ico)
+1324525726.48336 parent Already in debugger
+1324525726.48341 parent Looking for response
+1324525726.48377 parent sending codeline to debugger
+1324525726.48391 parent getting codelines from debugger
+1324525726.48394 parent building html for codelines
+1324525726.48397 parent about to get codelines for file
+1324525726.48400 parent err - 
+1324525726.48403 parent got codelines for file
+1324525726.48465 parent building each line for codelines
+1324525726.48491 parent Returning codelines as html
+1324525726.71808 parent got ->call (/)
+1324525726.71821 parent Already in debugger
+1324525726.71829 parent Looking for response
+1324525726.71881 parent sending next to debugger
+1324525726.72077 parent getting codelines from debugger
+1324525726.72085 parent building html for codelines
+1324525726.72090 parent about to get codelines for file
+1324525726.72096 parent err - 
+1324525726.72100 parent got codelines for file
+1324525726.72151 parent building each line for codelines
+1324525726.72197 parent Returning codelines as html
+1324525726.82708 parent got ->call (/favicon.ico)
+1324525726.82721 parent Already in debugger
+1324525726.82726 parent Looking for response
+1324525726.82760 parent sending codeline to debugger
+1324525726.82773 parent getting codelines from debugger
+1324525726.82777 parent building html for codelines
+1324525726.82780 parent about to get codelines for file
+1324525726.82783 parent err - 
+1324525726.82785 parent got codelines for file
+1324525726.82833 parent building each line for codelines
+1324525726.82858 parent Returning codelines as html
+1324525727.69332 parent got ->call (/)
+1324525727.69345 parent Already in debugger
+1324525727.69352 parent Looking for response
+1324525727.69404 parent sending next to debugger
+1324525727.69989 parent getting codelines from debugger
+1324525727.70000 parent building html for codelines
+1324525727.70006 parent about to get codelines for file
+1324525727.70011 parent err - 
+1324525727.70016 parent got codelines for file
+1324525727.70089 parent building each line for codelines
+1324525727.70133 parent Returning codelines as html
+1324525727.74695 parent got ->call (/favicon.ico)
+1324525727.74708 parent Already in debugger
+1324525727.74712 parent Looking for response
+1324525727.74749 parent sending codeline to debugger
+1324525727.74762 parent getting codelines from debugger
+1324525727.74765 parent building html for codelines
+1324525727.74768 parent about to get codelines for file
+1324525727.74771 parent err - 
+1324525727.74774 parent got codelines for file
+1324525727.74836 parent building each line for codelines
+1324525727.74860 parent Returning codelines as html
+1324525736.36119 parent got ->call (/)
+1324525736.36132 parent Already in debugger
+1324525736.36140 parent Looking for response
+1324525736.36191 parent sending next to debugger
+1324525736.36789 parent getting codelines from debugger
+1324525736.36798 parent building html for codelines
+1324525736.36804 parent about to get codelines for file
+1324525736.36809 parent err - 
+1324525736.36814 parent got codelines for file
+1324525736.36886 parent building each line for codelines
+1324525736.36929 parent Returning codelines as html
+1324525736.42715 parent got ->call (/favicon.ico)
+1324525736.42729 parent Already in debugger
+1324525736.42740 parent Looking for response
+1324525736.42790 parent sending codeline to debugger
+1324525736.42813 parent getting codelines from debugger
+1324525736.42821 parent building html for codelines
+1324525736.42829 parent about to get codelines for file
+1324525736.42836 parent err - 
+1324525736.42841 parent got codelines for file
+1324525736.42938 parent building each line for codelines
+1324525736.42983 parent Returning codelines as html
+1324525737.35630 parent got ->call (/)
+1324525737.35644 parent Already in debugger
+1324525737.35652 parent Looking for response
+1324525737.35702 parent sending next to debugger
+1324525737.36280 parent getting codelines from debugger
+1324525737.36287 parent building html for codelines
+1324525737.36293 parent about to get codelines for file
+1324525737.36298 parent err - 
+1324525737.36303 parent got codelines for file
+1324525737.36373 parent building each line for codelines
+1324525737.36416 parent Returning codelines as html
+1324525737.40879 parent got ->call (/favicon.ico)
+1324525737.40891 parent Already in debugger
+1324525737.40897 parent Looking for response
+1324525737.40930 parent sending codeline to debugger
+1324525737.40943 parent getting codelines from debugger
+1324525737.40946 parent building html for codelines
+1324525737.40949 parent about to get codelines for file
+1324525737.40952 parent err - 
+1324525737.40955 parent got codelines for file
+1324525737.41017 parent building each line for codelines
+1324525737.41040 parent Returning codelines as html
+1324525738.08700 parent got ->call (/)
+1324525738.08714 parent Already in debugger
+1324525738.08721 parent Looking for response
+1324525738.08778 parent sending next to debugger
+1324525738.09365 parent getting codelines from debugger
+1324525738.09373 parent building html for codelines
+1324525738.09379 parent about to get codelines for file
+1324525738.09384 parent err - 
+1324525738.09389 parent got codelines for file
+1324525738.09456 parent building each line for codelines
+1324525738.09499 parent Returning codelines as html
+1324525738.14046 parent got ->call (/favicon.ico)
+1324525738.14059 parent Already in debugger
+1324525738.14065 parent Looking for response
+1324525738.14101 parent sending codeline to debugger
+1324525738.14116 parent getting codelines from debugger
+1324525738.14119 parent building html for codelines
+1324525738.14122 parent about to get codelines for file
+1324525738.14125 parent err - 
+1324525738.14128 parent got codelines for file
+1324525738.14189 parent building each line for codelines
+1324525738.14213 parent Returning codelines as html
+1324525738.65327 parent got ->call (/)
+1324525738.65340 parent Already in debugger
+1324525738.65348 parent Looking for response
+1324525738.65399 parent sending next to debugger
+1324525738.65976 parent getting codelines from debugger
+1324525738.65984 parent building html for codelines
+1324525738.65989 parent about to get codelines for file
+1324525738.65995 parent err - 
+1324525738.66003 parent got codelines for file
+1324525738.66071 parent building each line for codelines
+1324525738.66115 parent Returning codelines as html
+1324525738.71638 parent got ->call (/favicon.ico)
+1324525738.71649 parent Already in debugger
+1324525738.71656 parent Looking for response
+1324525738.71689 parent sending codeline to debugger
+1324525738.71703 parent getting codelines from debugger
+1324525738.71706 parent building html for codelines
+1324525738.71709 parent about to get codelines for file
+1324525738.71712 parent err - 
+1324525738.71715 parent got codelines for file
+1324525738.71778 parent building each line for codelines
+1324525738.71801 parent Returning codelines as html
+1324525739.09229 parent got ->call (/)
+1324525739.09243 parent Already in debugger
+1324525739.09250 parent Looking for response
+1324525739.09302 parent sending next to debugger
+1324525739.09882 parent getting codelines from debugger
+1324525739.09890 parent building html for codelines
+1324525739.09896 parent about to get codelines for file
+1324525739.09901 parent err - 
+1324525739.09906 parent got codelines for file
+1324525739.09978 parent building each line for codelines
+1324525739.10023 parent Returning codelines as html
+1324525739.14082 parent got ->call (/favicon.ico)
+1324525739.14092 parent Already in debugger
+1324525739.14097 parent Looking for response
+1324525739.14134 parent sending codeline to debugger
+1324525739.14149 parent getting codelines from debugger
+1324525739.14152 parent building html for codelines
+1324525739.14155 parent about to get codelines for file
+1324525739.14158 parent err - 
+1324525739.14160 parent got codelines for file
+1324525739.14224 parent building each line for codelines
+1324525739.14248 parent Returning codelines as html
+1324525740.38914 parent got ->call (/)
+1324525740.38927 parent Already in debugger
+1324525740.38935 parent Looking for response
+1324525740.38986 parent sending next to debugger
+1324525740.39563 parent getting codelines from debugger
+1324525740.39571 parent building html for codelines
+1324525740.39576 parent about to get codelines for file
+1324525740.39582 parent err - 
+1324525740.39587 parent got codelines for file
+1324525740.39655 parent building each line for codelines
+1324525740.39700 parent Returning codelines as html
+1324525740.43870 parent got ->call (/favicon.ico)
+1324525740.43881 parent Already in debugger
+1324525740.43885 parent Looking for response
+1324525740.43918 parent sending codeline to debugger
+1324525740.43936 parent getting codelines from debugger
+1324525740.43941 parent building html for codelines
+1324525740.43945 parent about to get codelines for file
+1324525740.43949 parent err - 
+1324525740.43951 parent got codelines for file
+1324525740.44015 parent building each line for codelines
+1324525740.44040 parent Returning codelines as html
+1324525741.77486 parent got ->call (/)
+1324525741.77495 parent Already in debugger
+1324525741.77499 parent Looking for response
+1324525741.77533 parent sending next to debugger
+1324525741.77836 parent getting codelines from debugger
+1324525741.77841 parent building html for codelines
+1324525741.77844 parent about to get codelines for file
+1324525741.77847 parent err - 
+1324525741.77849 parent got codelines for file
+1324525741.77891 parent building each line for codelines
+1324525741.77914 parent Returning codelines as html
+1324525741.84097 parent got ->call (/favicon.ico)
+1324525741.84109 parent Already in debugger
+1324525741.84116 parent Looking for response
+1324525741.84157 parent sending codeline to debugger
+1324525741.84172 parent getting codelines from debugger
+1324525741.84176 parent building html for codelines
+1324525741.84178 parent about to get codelines for file
+1324525741.84182 parent err - 
+1324525741.84184 parent got codelines for file
+1324525741.84237 parent building each line for codelines
+1324525741.84260 parent Returning codelines as html
+1324525743.94848 parent got ->call (/)
+1324525743.94865 parent Already in debugger
+1324525743.94877 parent Looking for response
+1324525743.94942 parent sending run to debugger
+1324525743.94999 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1324525743.95033 child send to_parent response ARRAY(0x2eaa058)
+1324525743.95049 child response sent, stopping
+1324525743.95228 parent waiting for response
+1324525743.95235 parent receive from_child
+1324525743.95242 got cmd 'response'
+1324525743.95265 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1324525743.95283 parent getting codelines from debugger
+1324525743.95290 parent building html for codelines
+1324525743.95295 parent about to get codelines for file
+1324525743.95300 parent err - 
+1324525743.95305 parent got codelines for file
+1324525743.95349 parent building each line for codelines
+1324525743.95397 parent Returning codelines as html
+1324525744.00074 parent got response, sending to browser
+1324525744.02298 parent got ->call (/favicon.ico)
+1324525744.02310 parent Starting new debugger
+1324525744.02438 parent saving child pid 13858
+1324525744.02473 child waiting for env
+1324525744.02499 child receive from_parent
+1324525744.02507 parent fixing env
+1324525744.02548 parent sending fixed env
+1324525744.02556 parent send to_child request HASH(0x26902d8)
+1324525744.02572 got cmd 'request'
+1324525744.02593 parent Creating debug client
+1324525744.02607 parent trying to connect to child debugger
+1324525744.02637 child Loading ebug
+1324525744.61076 child Initial stop
+1324525745.04718 parent connected!
+1324525745.04731 parent Telling child via debugger to run
+1324525745.04775 child Initial run
+1324525745.04786 child Checking for immediate break condition
+1324525745.04860 child Running $app
+1324525745.04873 child sending response [
+  200,
+  [
+    'Content-type',
+    'text/html'
+  ],
+  [
+    '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+  ]
+]
+1324525745.04896 child send to_parent response ARRAY(0x3054530)
+1324525745.04913 child response sent, stopping
+1324525745.05032 parent Setting up idle UI handler
+1324525745.05065 parent waiting for response
+1324525745.05072 parent receive from_child
+1324525745.05079 got cmd 'response'
+1324525745.05102 parent got response: $VAR1 = [
+          200,
+          [
+            'Content-type',
+            'text/html'
+          ],
+          [
+            '
+      <html>
+        <body>
+          hello <br/>
+          also, hello <br/>
+          <form method=POST>
+            <input type=text name=name>
+            <input type=submit>
+          </form>
+        </body>
+      </html>
+    '
+          ]
+        ];
+
+1324525745.05119 parent Looking for response
+1324525745.05125 parent got response, sending to browser

@@ -1,0 +1,69 @@
+{
+   "abstract" : "Add an AVAILABILITY pod section",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>",
+      "Nigel Metheringham <nigelm@cpan.org>",
+      "Mark Gardner <mjgardner@cpan.org>",
+      "Mike Doherty <doherty@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Weaver-Section-Availability",
+   "no_index" : {
+      "directory" : [
+         "corpus"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::Bugtracker" : 0,
+            "Dist::Zilla::Plugin::Homepage" : 0,
+            "Moose" : 0,
+            "Moose::Autobox" : 0,
+            "Pod::Weaver::Role::Section" : 0,
+            "namespace::autoclean" : 0,
+            "perl" : "5.008",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {},
+      "homepage" : "http://metacpan.org/release/Pod-Weaver-Section-Availability/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/doherty/Pod-Weaver-Section-Availability.git",
+         "web" : "https://github.com/doherty/Pod-Weaver-Section-Availability"
+      }
+   },
+   "version" : "1.20"
+}
+

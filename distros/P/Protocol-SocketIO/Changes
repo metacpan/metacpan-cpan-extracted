@@ -1,0 +1,29 @@
+Revision history for perl module Protocol::SocketIO
+
+0.07 2017-01-09T15:18:31Z
+
+ - escape braces
+
+0.06 2014-01-07T20:31:03Z
+
+ - just meta files update
+
+0.05 2013-06-22T05:24:37Z
+
+ - Fix test depending on hash sort (perl-5.18)
+
+0.04 2012-01-28
+
+ - Stringify by using to_string method
+
+0.0003 2012-01-23
+
+ - Fixed POD typos
+
+0.0002 2012-01-23
+
+ - Fixed POD typos
+
+0.0001 2012-01-21
+
+ - Initial release

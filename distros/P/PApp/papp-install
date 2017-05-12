@@ -1,0 +1,578 @@
+#!/usr/bin/perl
+
+use File::Copy;
+use File::Compare;
+use File::Glob ':glob';
+use DBI;
+
+use Compress::LZF qw(:compress :freeze);
+
+my $ETCDIR = "/etc/papp";
+
+@ARGV or die "this program shouldn't be called directly\n";
+
+for (@ARGV) {
+   /^--(\w+)$/ or die "really, don't call this program directly\n";
+   ${"mode_$1"}++;
+}
+
+BEGIN {
+   $ENV{PAPP_ETCDIR} = ".";
+   local $PApp::Config::NO_AUTOCONNECT = 1;
+   local @INC = (".", @INC);
+   require PApp::Config;
+}
+
+use blib;
+use lib '.';
+
+use PApp;
+use PApp::Admin;
+use PApp::SQL;
+use PApp::I18n;
+use PApp::Storable ();
+
+$|=1;
+
+*CFG = \%PApp::Config;
+
+my $lib = $CFG{LIBDIR};
+
+my $create_options = $ENV{PAPP_CREATE_TBALE_OPTIONS} || "ENGINE=MyISAM";
+
+sub crdir {
+   local $_ = shift;
+   print "Creating directory $_... ";
+   if (-d $_) {
+      print "[skipped] ";
+   } else {
+      mkdir $_, 0777 or die "$!\n";
+   }
+   chown $CFG{PAPP_UID}, $CFG{PAPP_GID}, $_;
+   print "ok\n";
+}
+
+sub install($$) {
+   my ($s, $d) = @_;
+   if (compare($s, $d)) {
+      copy($s, "$d~") or die "copy($s,$d~): $!\n";
+      chown $CFG{PAPP_UID}, $CFG{PAPP_GID}, "$d~";
+      chmod ((stat $s)[2] & 07777, "$d~");
+      rename "$d~", $d or die "rename($d~,$d): $!\n";
+      0;
+   } else {
+      chown $CFG{PAPP_UID}, $CFG{PAPP_GID}, $d;
+      chmod ((stat $s)[2] & 07777, $d);
+      1;
+   }
+}
+
+if ($mode_install) {
+   crdir $lib;
+   crdir $CFG{I18NDIR};
+
+   for my $dir (qw(style etc)) {
+      crdir "$lib/$dir";
+
+      for my $app (bsd_glob "$dir/{*.xsl,mimedb}",
+                                    GLOB_ERR|GLOB_NOSORT|GLOB_BRACE) {
+         $app =~ s/.*?([^\/]+)$/$1/;
+         print "Installing $dir/$app $lib/$dir...";
+         print "[skipped] " if install "$dir/$app", "$lib/$dir/$app";
+         print "ok\n";
+      }
+   }
+
+   my $umask = umask 022;
+   mkdir $ETCDIR, 0777;
+   umask 077;
+   install ("config", "$ETCDIR/config"); chmod 0644, "$ETCDIR/config";
+   install ("secure", "$ETCDIR/secure"); chmod 0600, "$ETCDIR/secure";
+   umask $umask;
+   print "\n$ETCDIR/secure is mode 600, better chown or chgrp it to the group
+   your webserver or trusted user is running under.\n\n";
+}
+
+if ($mode_init || $mode_update) {
+
+print <<EOF;
+
+This initializes the database and library directories used by PApp. It
+assumes that the DBD driver understands the "func" method. MySQL currently
+does this.
+
+You should be able to re-run "make update" as often as you like, no harm
+will be done.
+
+EOF
+
+if ($mode_update) {
+   print "trying to open papp database... ";
+
+   $DBH =
+      DBI->connect($CFG{STATEDB}, $CFG{STATEDB_USER}, $CFG{STATEDB_PASS},
+                   { RaiseError => 0, PrintError => 1 });
+
+   $DBH
+      or die "Unable to open database ($CFG{STATEDB}): $DBI::errstr\n";
+
+   $installed_version = sql_fetch $DBH, "select value from env where name = ?", "PAPP_VERSION";
+
+} elsif ($mode_init) {
+   $CFG{STATEDB} =~ /DBI:([^:]+):([^:]+).*?(?:host=([^;]*))?/i or die "unable to parse database name ($CFG{STATEDB})\n";
+
+   my ($driver, $db, $host) = ($1, $2, $3||"'localhost'");
+   print "trying to create $driver-database '$db' on host $host\n";
+   print "(might only work for mysql)... ";
+
+   $drh = DBI->install_driver($driver) or die "unable to find DBI driver $driver\n";
+   $drh->func("createdb", $db, "localhost", $CFG{STATEDB_USER}, $CFG{STATEDB_PASS}, "admin");
+
+   $DBH = DBI->connect($CFG{STATEDB}, $CFG{STATEDB_USER}, $CFG{STATEDB_PASS}, { RaiseError => 0, PrintError => 1 });
+   $DBH or die "unable to create database $CFG{STATEDB}, please create it manually and re-run papp-install\n";
+
+   print "seems to have worked\n";
+}
+
+$PApp::SQL::DBH = $DBH;
+
+print <<EOF;
+
+Now creating tables (that do not already exist). Existing tables will
+_not_ be dropped, so if you want to upgrade to a new (& incompatible)
+version, or you want to downgrade again, you have to drop the database
+manually. This is not normally required, as papp will automatically
+upgrade tables from older releases transparently.
+
+EOF
+
+sql_exec <<SQL;
+   create table /*! if not exists */ env (
+     name varchar(255) binary not null,
+     value longblob not null,
+     primary key (name)
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   create table /*! if not exists */ msgid (
+     nr mediumint(6) unsigned not null auto_increment,
+     id mediumblob not null,
+     domain varchar(30) not null,
+     lang varchar(16) not null,
+     context blob not null,
+     primary key (nr),
+     index (id(64))
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   create table /*! if not exists */ msgstr (
+     nr mediumint(6) unsigned default '0' not null,
+     lang varchar(16) not null,
+     flags set('valid','fuzzy','unused') not null,
+     msg mediumblob not null,
+     unique nr (nr,lang)
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   create table /*! if not exists */ event (
+     id int(10) unsigned not null auto_increment,
+     event tinyblob not null,
+     ctime timestamp,
+     data mediumblob default '' not null,
+     primary key (id, event(8))
+   ) $create_options
+SQL
+
+if ($installed_version < 0.142) {
+   $DBH->do("drop table state") if $mode_update;
+   sql_exec <<SQL;
+      create table /*! if not exists */ state (
+        id int(10) unsigned not null,
+        ctime timestamp,
+        previd int(10) unsigned default '0' not null,
+        alternative mediumint(8) unsigned default '0' not null,
+        userid int(10) unsigned default '0' not null,
+        sessid int(10) unsigned default '0' not null,
+        state mediumblob default '' not null,
+        primary key (id),
+        key (alternative, previd)
+      ) delay_key_write=1 $create_options
+SQL
+}
+
+if ($installed_version < 0.143) {
+   if ($mode_update) {
+      $DBH->do("drop table eventcount");
+
+      $DBH->do("alter table msgid change id id mediumblob not null, change context context blob not null");
+      $DBH->do("alter table msgstr change msg msg mediumblob not null");
+   }
+
+   sql_exec <<SQL;
+      create table /*! if not exists */ event_count (
+         count int(10) unsigned not null
+      ) $create_options
+SQL
+}
+
+unless (sql_fetch "select count(*) from event_count") {
+   sql_exec "insert into event_count values (0)";
+   sql_exec "delete from event";
+}
+
+sql_exec <<SQL;
+   create table /*! if not exists */ state_seq (
+      seq int(10) unsigned not null
+   ) $create_options
+SQL
+
+unless (sql_fetch "select count(*) from state_seq") {
+   sql_exec "insert into state_seq values (1)";
+   sql_exec "delete from state";
+}
+
+sql_exec <<SQL;
+   create table /*! if not exists */ session (
+     sid int(10) unsigned not null default '0',
+     name varchar(255) binary not null default '',
+     value mediumblob not null,
+     unique key id (sid,name(200))
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   create table /*! if not exists */ prefs (
+     uid int(10) unsigned not null default '0',
+     path varchar(255) binary not null default '',
+     name varchar(255) binary not null default '',
+     value mediumblob not null,
+     unique key id (path(140),name(100),uid)
+   ) $create_options
+SQL
+
+if ($mode_update && $installed_version < 0.142) {
+   eval {
+      my $st = sql_exec \my($userid, $prefs, $user, $pass, $comment),
+                        "select id, prefs, user, pass, comment from user";
+
+      print "Converting user preferences data to new format";
+
+      while ($st->fetch) {
+         print ".";
+         if ($user ne "") {
+            sql_exec "replace into prefs (uid, path, name, value) values (?,'',?,?)",
+                     $userid, "papp_username", sfreeze_cr $user;
+         }
+         if ($pass ne "") {
+            sql_exec "replace into prefs (uid, path, name, value) values (?,'',?,?)",
+                     $userid, "papp_password", sfreeze_cr $pass;
+         }
+         if ($comment ne "") {
+            sql_exec "replace into prefs (uid, path, name, value) values (?,'',?,?)",
+                     $userid, "papp_comment", sfreeze_cr $comment;
+         }
+         if ($prefs ne "") {
+            $prefs = PApp::Storable::thaw decompress $prefs;
+            while (my ($path, $keys) = each %$prefs) {
+               next unless %$keys;
+               sql_exec $DBH, "replace into prefs (uid, path, name, value) values (?,?,?,?)",
+                              $userid, $path, "papp_prefs", 
+                              compress PApp::Storable::nfreeze($keys);
+            }
+         }
+      }
+
+      print " done.\n";
+   };
+}
+
+if ($mode_update && $installed_version < 0.21) {
+   sql_exec "drop table /*! if exists */ obj_isa";
+}
+
+if ($mode_update && $installed_version < 0.22) {
+   sql_exec "drop table /*! if exists */ obj_attr";
+}
+
+sql_exec <<SQL;
+   create table /*! if not exists */ user_seq (
+      seq int(10) unsigned not null
+   ) $create_options
+SQL
+
+unless (sql_fetch "select count(*) from user_seq") {
+   sql_exec "insert into user_seq values (?)", 0+sql_fetch "select max(uid) + 1 from prefs";
+}
+
+$DBH->do("drop table user") if $mode_update && $installed_version < 0.142;
+
+$DBH->do("alter table grp add comment text not null") if $mode_update && $installed_version < 0.124;
+$DBH->do("alter table grp add unique key (name)") if $mode_update && $installed_version < 0.124;
+$DBH->do("alter table grp change name name varchar(160) not null") if $mode_update && $installed_version < 0.14;
+
+sql_exec <<SQL;
+   create table /*! if not exists */ grp (
+     id int(10) unsigned not null auto_increment,
+     name varchar(100) not null,
+     comment text not null,
+     primary key (id),
+     unique (name)
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   create table /*! if not exists */ usergrp (
+     userid int(10) unsigned default '0' not null,
+     grpid int(8) unsigned default '0' not null,
+     primary key (userid,grpid)
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   create table /*! if not exists */ app (
+     id smallint(6) unsigned not null auto_increment,
+     name varchar(255) binary default '' not null,
+     appset smallint(5) unsigned default '0' not null,
+     path varchar(255) binary default '' not null,
+     mountconfig mediumtext default '' not null,
+     config mediumtext default '' not null,
+     primary key (id),
+     unique (name)
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   create table /*! if not exists */ appset (
+     id smallint(5) unsigned not null auto_increment,
+     name varchar(255) default '' not null,
+     primary key (id),
+     unique (name)
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   create table /*! if not exists */ locks (
+     id varchar(255) binary default '' not null,
+     breaktime int(10) unsigned default '0' not null,
+     data varchar(255) binary default '' not null,
+     primary key (id)
+   ) $create_options
+SQL
+
+$DBH->do("drop table error") if $installed_version && $installed_version < 0.13;
+sql_exec <<SQL;
+   create table /*! if not exists */ error (
+     id mediumint(6) unsigned not null auto_increment,
+     ctime timestamp,
+     data blob default '' not null,
+     comment text default '' not null,
+     primary key (id)
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+  create table /*! if not exists */ ssluser (
+    userid int(10) unsigned not null default '0',
+    cert blob not null,
+    key idx_userid (userid),
+    key idx_cert (cert(20))
+  ) $create_options
+SQL
+
+if ($installed_version < 0.22) {
+sql_exec <<SQL;
+   CREATE TABLE d_fulltext (
+     id int unsigned not null,
+     type bigint unsigned not null,
+     data mediumtext,
+
+     index type (type),
+     fulltext data (data),
+     primary key (id, type)
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   CREATE TABLE d_string (
+     id int unsigned not null,
+     type bigint unsigned not null,
+     data tinyblob,
+
+     index type (type),
+     index data (data(32)),
+     primary key (id, type)
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   CREATE TABLE d_blob (
+     id int unsigned not null,
+     type bigint unsigned not null,
+     data mediumblob,
+
+     index type (type),
+     primary key (id, type)
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   CREATE TABLE d_double (
+     id int unsigned not null,
+     type bigint unsigned not null,
+     data double,
+
+     index type (type),
+     index data (data),
+     primary key (id, type)
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   CREATE TABLE d_int (
+     id int unsigned not null,
+     type bigint unsigned not null,
+     data bigint,
+
+     index type (type, data, id),
+     index data (data, type, id),
+     primary key (id, type)
+   ) $create_options
+SQL
+}
+
+# Agni
+if ($installed_version < 0.2) {
+
+sql_exec <<SQL;
+   CREATE TABLE obj (
+     id int unsigned not null auto_increment,
+     gid bigint unsigned NOT NULL default '0',
+     paths bigint unsigned NOT NULL default '0',
+     primary key (id),
+     unique (gid, paths)
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   CREATE TABLE obj_attr (
+     id int unsigned not null default '0',
+     type bigint unsigned not null default '0',
+     d_string tinyblob,
+     d_text mediumblob,
+     d_int bigint,
+     d_double double,
+
+     primary key (id, type),
+     index type(type),
+     index d_int(d_int, type),
+     index d_double(d_double, type),
+     index d_string(d_string(16), type)
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   CREATE TABLE obj_gidseq (
+     seq bigint unsigned NOT NULL
+   ) $create_options
+SQL
+
+sql_exec <<SQL;
+   CREATE TABLE obj_path (
+     id tinyint(8) unsigned NOT NULL,
+     path varchar(255) NOT NULL,
+     PRIMARY KEY (id)
+   ) $create_options
+SQL
+
+   sql_exec "update env set name = 'PAPP_SYSID' where name = 'SYSID'";
+}
+
+my $installed_sysid = sql_fetch "select value from env where name = 'PAPP_SYSID'";
+
+die "installation sysid and configured sysid don't match"
+   if $installed_sysid > 0 && $CFG{SYSID} > 0 && $installed_sysid != $CFG{SYSID};
+
+if ($CFG{SYSID} > 0 && $installed_sysid == 0) {
+   sql_exec "delete from env where name = 'PAPP_SYSID'";
+   sql_exec "insert into env (name, value) values ('PAPP_SYSID', ?)", $CFG{SYSID};
+   $installed_sysid = $CFG{SYSID};
+}
+
+if ($installed_sysid) {
+   my $measured_sysid = sql_fetch "select seq >> 32 from obj_gidseq";
+
+   if ($measured_sysid == 0) {
+      sql_exec "delete from obj_gidseq";
+      sql_exec "insert into obj_gidseq values ((? << 32) + 1)", $installed_sysid;
+   }
+
+   die "PAPP_SYSID and actual obj_gidseq do NOT match"
+     if $measured_sysid > 0 && $measured_sysid != $installed_sysid;
+}
+
+{
+   # check the sysid
+   my ($sysid, $oid) = sql_fetch "select seq >> 32, seq & 0xffffffff from obj_gidseq"
+      or die "no sysid installed, a sysid is now required, please make reconfig";
+
+   my $maxid = sql_fetch "select max(gid) & 0xffffffff from obj where gid >= (? << 32) and gid < (? << 32)",
+                         $sysid, $sysid+1;
+   $maxid < $oid
+      or die "installation check found objects > oidseq, either your sysid is broken or your database is corrupt";
+}
+
+print <<EOF;
+
+Now populating tables (that hopefully do exist now). Any errors in this
+section are supposedly fatal(!!).
+
+EOF
+
+if ($mode_init) {
+   $DBH->do("insert into appset values (1, 'default')")
+      or warn "unable to create 'default' appset: $DBI::errstr\n";
+
+   print "creating admin user and admin group... ";
+   eval {
+      my $pass = crypt "public", "xx";
+          $DBH->do("insert into prefs values (1, '', 'papp_username', 'admin')")
+      and $DBH->do("insert into prefs values (1, '', 'papp_password', '$pass')")
+      and $DBH->do("insert into prefs values (1, '', 'papp_comment', 'Main Administrator')")
+      and $DBH->do("insert into grp values (1, 'admin'      , 'hyperuser access rights')")
+      and $DBH->do("insert into grp values (2, 'poedit'     , 'general translator access')")
+      and $DBH->do("insert into grp values (3, 'poedit_*'   , 'translator access for all apps')")
+      and $DBH->do("insert into grp values (4, 'poedit_papp', 'translator access for papp itself')")
+      and $DBH->do("insert into usergrp values (1, 1)")
+      and $DBH->do("insert into usergrp values (1, 2)")
+      and $DBH->do("insert into usergrp values (1, 3)")
+      or die;
+      print <<EOF;
+   ok
+
+********* the admin user is named 'admin'           *********
+********* and has the initial password 'public'     *********
+********* please change this ASAP using             *********
+********* papp-admin -u admin --password <password> *********
+
+EOF
+   };
+   if ($@) {
+      print "failed (or already exists)\n";
+   }
+}
+
+print "\nimporting i18n tables\n";
+for my $domain (qw(papp bench dbedit demo iso639 iso3166)) {
+   PApp::Admin::import_po 0, "i18n/$domain.po", 1;
+   print "exporting $domain to $CFG{I18NDIR}/$domain\n";
+   PApp::I18n::export_dpo $domain, "$CFG{I18NDIR}/$domain", $CFG{PAPP_UID}, $CFG{PAPP_GID};
+}
+
+$DBH->do("delete from env where name='PAPP_VERSION'");
+$DBH->do("insert into env (name, value) values ('PAPP_VERSION', '$PApp::Config::VERSION')");
+
+}
+

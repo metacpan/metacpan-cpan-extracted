@@ -1,0 +1,55 @@
+## name Basic passing for Moose.
+## failures 0
+## cut
+
+use Moose;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+## name Basic failure for Moose.
+## failures 1
+## cut
+
+use Moose;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+    lazy_build => 1,
+);
+
+sub _build_foo {
+    ...;
+}
+
+## name Basic passing for Moose::Role.
+## failures 0
+## cut
+
+use Moose::Role;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+);
+
+
+## name Basic failure for Moose::Role.
+## failures 1
+## cut
+
+use Moose::Role;
+
+has foo => (
+    is  => 'rw',
+    isa => 'Str',
+    lazy_build => 1,
+);
+
+sub _build_foo {
+    ...;
+}
+

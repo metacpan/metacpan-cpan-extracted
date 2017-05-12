@@ -1,0 +1,60 @@
+pod
+  head1
+    @title
+      "NAME"
+    text
+      @text
+        "220-mixed-sequences"
+  head1
+    @title
+      "TESTCASES"
+    text
+      @text
+        "This is "
+        B<
+          "bold and "
+          I<
+            "bold italic"
+          >
+        >
+        "."
+    text
+      @text
+        "This is "
+        I<
+          "italic and "
+          B<
+            "bold italic"
+          >
+        >
+        "."
+    text
+      @text
+        "This is code with a replacable text as italic: "
+        C<
+          "function("
+          I<
+            "argument"
+          >
+          ")"
+        >
+        "."
+    text
+      @text
+        "This is an bold with embedded escapes: "
+        B<
+          "bold "
+          E<
+            "amp"
+          >
+          " bold"
+        >
+        "."
+    text
+      @text
+        "Code within non-breaking space sequence: "
+        S<<
+          C<<
+            "code code code"
+          >>
+        >>

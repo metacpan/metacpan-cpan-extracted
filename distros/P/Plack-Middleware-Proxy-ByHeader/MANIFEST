@@ -1,0 +1,7 @@
+Build.PL
+lib/Plack/Middleware/Proxy/ByHeader.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.pod
+t/01-basic.t

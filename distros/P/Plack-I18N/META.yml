@@ -1,0 +1,54 @@
+---
+abstract: 'I18N for Plack'
+author:
+  - 'Viacheslav Tykhanovskyi, <viacheslav.t@gmail.com>'
+build_requires:
+  Test::Fatal: '0'
+  Test::Lib: '0'
+  Test::MonkeyMock: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-I18N
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::I18N:
+    file: lib/Plack/I18N.pm
+    version: '0.04'
+  Plack::I18N::Handle:
+    file: lib/Plack/I18N/Handle.pm
+  Plack::I18N::Lexicon::Gettext:
+    file: lib/Plack/I18N/Lexicon/Gettext.pm
+  Plack::I18N::Lexicon::Maketext:
+    file: lib/Plack/I18N/Lexicon/Maketext.pm
+  Plack::I18N::Util:
+    file: lib/Plack/I18N/Util.pm
+  Plack::Middleware::I18N:
+    file: lib/Plack/Middleware/I18N.pm
+requires:
+  I18N::AcceptLanguage: '0'
+  Locale::Maketext::Lexicon: '0'
+  Plack: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/vti/plack-i18n/issues
+  homepage: https://github.com/vti/plack-i18n
+  repository: git://github.com/vti/plack-i18n.git
+version: '0.04'
+x_authority: cpan:VTI

@@ -1,0 +1,353 @@
+
+			      Changelog for makeztxt
+			      ----------------------
+
+
+
+makeztxt v1.62
+Thursday, June 21, 2007
+------------------------------
+
+* Fixed a double free bug in the PDB disassembly code.  Reported by Zider.
+* Fixed an alignment issue on 64bit systems.  UInt32 was mistakenly
+  defined as an 8 byte value rather than a 4 byte value.  Reported by Zider.
+* Fixed gcc 4.x compiler warnings.
+* makeztxt will now compile against latest weasel_common.h header.
+
+
+
+makeztxt v1.61   (* devel: not released *)
+Tuesday, January 27, 2004
+------------------------------
+
+* Fixed a small memory leak in libztxt.  Some buffers were not being freed
+  when a zTXT object was freed.
+* Patch submitted by Ron Aaron: Stop libztxt from stripping all characters
+  with the hi-bit on from bookmark/annotation titles.
+* Patch submitted by Kevin Ko: Fix several bugs in makeztxt related to the
+  -R option.  All were careless programming mistakes.  -R should now work
+  properly.
+
+
+
+makeztxt v1.60
+Tuesday, August 12, 2003
+------------------------------
+
+* Patch submitted by Roger Plant: Fixes subexpression matching for POSIX
+  regex.  Also adds short explanation of feature to README.
+* Removed command line options to set creator and type IDs.  They didn't
+  really serve any purpose since makeztxt is designed specifically for
+  making zTXT databases.
+* makeztxt now sanitizes the bookmark titles it generates.  Before,
+  newlines and control characters could end up in titles making the
+  display improperly.
+* Using the -m switch, you can now feed makeztxt a file containing a list
+  of premade bookmarks.  Each line must begin with an offset (location) in
+  the document.  The rest of the line will be treated as the bookmark
+  title.
+* makeztxt will now search for the .makeztxtrc file in multiple
+  locations.  It first searches $HOME, then the current directory.  If
+  neither of those works it will search for /etc/makeztxt.conf.
+* Fixed makefiles so that makeztxt is correctly rebuilt if a file in
+  libztxt is modified.
+* ztxt.h is now fully commented.  It should now provide reasonable
+  documentation for how libztxt is used to generate zTXT DBs.
+* Added ztxt_get_* functions so accessing members of the ztxt structure
+  directly should no longer be necessary for programs using libztxt.
+* Added ztxt_disect().  libztxt is now capable of taking an existing zTXT
+  database and disecting it into its component pieces.  This will allow
+  for bookmarks, annotations, and document text to be removed from a zTXT
+  and saved into separate files.
+* makeztxt can now output the disected components of a zTXT document.
+  zTXT deconstruction is enabled with the '-d' option.  The command line
+  argument is the database to take apart.  The output filename for the
+  document's text can be given with '-o'.  To save any bookmarks to a
+  file, give the filename with '-m'.  To save annotations to a file, give
+  the filename with '-A'.
+* Added ztxt_add_annotation function.
+* makezxt can now create a zTXT with annotations.  The annotations are
+  listed in a separate text file and the filename is given with -A.  This
+  should now enable creation and disassembly of any type of zTXT
+  document.
+* Added ztxt_crc32 function.  libztxt now stores a CRC32 value in the
+  record 0 header.  This will allow a user to check a document's integrity
+  once on a device.  Support will be added to Weasel Reader to perform
+  this operation.
+* Big documentation update.  The README should be useful now.  Also
+  includes a note about the command line nature of makeztxt and link to
+  Weasel website where the list of other more user-friendly converters
+  is.
+
+
+
+makeztxt v1.44
+Friday, November 29, 2002
+------------------------------
+
+* Patch submitted by Roman Shterenzon: Fix to allow makeztxt to compile on
+  FreeBSD.  Makeztxt is also now available in the FreeBSD ports
+  collection.
+* Makeztxt now strips the path from the input filename.  This should cause
+  the generated file to always go into the current directory if no output
+  filename is specified.  If no title is specified then the base filename
+  will also become the title.
+
+
+makeztxt v1.43
+Friday, March 1, 2002
+------------------------------
+
+* Attributes in the DB header were not being properly set.  The backup bit
+  would not get set, so if you installed the DB with some program and then
+  later HotSynced, it might not be backed up unless you had modified it in
+  some way.
+* Removed the -w set wbits option since it really has little use for
+  creating zTXTs.  It's still in libztxt, though.
+* Added a -L option to set the LaunchableData attribute in the header.  If
+  your version of Palm OS supports it, zTXTs created with this option will
+  show up in the launcher and if you tap them, Weasel will be launched and
+  start with the selected document.
+
+
+makeztxt v1.42
+Sunday, January 13, 2002
+------------------------------
+
+* The regex config file has been renamed .makeztxtrc from .gutenpalmrc
+  since it's for this program and not Weasel Reader.
+* Makefile now uses $(MAKE) instead of explicitly running "make".  Systems
+  where GNU make is not the default need to run as 'make MAKE=gmake_name'
+* New option in Makefile: Comment out the LONG_OPTS line if you do not
+  have getopt.h or do not have the getopt_long function.  This should
+  allow makeztxt to compile on systems without GNU stuff.
+
+
+makeztxt v1.41
+Friday, July 6, 2001
+------------------------------
+
+* Huge uber-important bugfix: Perhaps this will end all the email!
+  makeztxt wasn't opening its output file as *O_BINARY* with the Windows
+  port.  This caused all those important \n characters (where ever they
+  appeared) to be helpfully translated into \n\r pairs, thus totally
+  destroying what the output should be.  So... why did it sometimes work?
+  I suspect that with small files the chance of there being a \n in the
+  imporant header bytes is smaller than with large files.  Thanks for this
+  go to Roman Rusakov.  Huzzah!
+* Bugfix: Database titles were not being null-terminated, so if you
+  specified a large title (over 32 chars) it wouldn't install onto your Palm.
+
+
+makeztxt v1.40
+Saturday, May 26, 2001
+------------------------------
+
+* Bugfix: Finally found an example of POSIX regex being used, so now the
+  code should do the "right" thing and actually compile on other systems.
+* Bugfix: When using GNU regex, the position in the input was not being
+  updated properly, so it would not skip all of the previous match.  This
+  could result in submatches within the previous match, which is usually not
+  what you want.
+
+
+makeztxt v1.40b1
+Tuesday, April 3, 2001
+------------------------------
+
+* Bugfix: Didn't check for null regex, and this would cause it to sit and
+  spin its wheels for a very long time.
+* Switched over to use GNU regex, since they offer many more features and
+  are faster on large strings.  However, you can define POSIX_REGEX in the
+  Makefile to use POSIX regex still.
+* Auto-generated title is now always null terminated... just to be safe.
+* libztxt now has functions to report its version and build number.
+  makeztxt uses these when printing out version info.  The build number is
+  also stored in the zTXT header (for debugging purposes).  A script,
+  inc_bcounter.sh, has been added to the libztxt source.
+* Patch from "Temporal Weirdo" for improved bookmark matching in libztxt.
+  Now uses substring information returned by regex functions to better
+  construct the bookmark title, instead of just grabbing the 20 chars at
+  the beginning of the match.
+* Makefile fixup for makeztxt and libztxt.  Now you only need to set
+  compile time options in the makeztxt Makefile and they will be correctly
+  propagated.
+
+
+makeztxt v1.40beta
+Wednesday, February 7, 2001
+------------------------------
+
+* More new features.  makeztxt can now generate zTXTs to take advantage of
+  the on-demand decompression feature of GutenPalm 1.40.  This entails
+  compressing 8K chunks of text using the flush method Z_FULL_FLUSH.  This
+  allows random access (on a record boundary) once record #1 has been
+  decompressed.
+* New option -z or -compression.  A value of 1 uses the new method of
+  compression.  A value of 2 behaves as the old version did.  Method 2
+  also gets about 10% - 15% more compression at the sacrifice of no random
+  access.
+* With all of the changes, I decided to sync the version numbers of
+  GutenPalm and makeztxt.
+
+
+makeztxt v1.20
+Sunday, January 28, 2001
+------------------------------
+
+* Big rewrite of makeztxt.
+* If you specify "-" as your input file, makeztxt will read from stdin
+  instead of a file.  For this to work, you must use -t and -o to specify
+  the DB title and output filename.
+* Moved all of the zTXT specific stuff into libztxt.  This library should
+  be really portable and will be quite helpful to anyone who wants to make
+  zTXT databases without using makeztxt.
+
+
+makeztxt v1.12
+Thursday, January 25, 2001
+------------------------------
+
+* Bugfix from Zachary P. Landau <kapheine@hypa.net>.  On rare occasions,
+  makeztxt would overrun the input buffer by one causing a segfault.
+* Oops.  Forgot to include the Makefile in the source distribution.
+* Added better command line help for the 'adjust' option.
+* Because text files can all be formatted in different ways, makeztxt now
+  computes the averge length of a line throughout the entire file.  Lines
+  longer than this length minus five will have their linefeed stripped.
+  This can be overridden with either -adjust or -length.  This does, in
+  general, result it much better automatic formatting.
+* To take advantage of the new auto line length detection, -adjust mode 0
+  now uses the computed length instead of 70.
+
+
+makeztxt v1.10
+Tuesday, January 9, 2001
+------------------------------
+
+* The distribution has been split into two separate directories: one for
+  GutenPalm and one for makeztxt.  Hence, the ChangeLog has been split as
+  well.
+* You no longer need to run your input documents through a DOS to UNIX
+  conversion program before feeding them to makeztxt.  maketzt now strips off
+  a CR at the end of a line if present.  makeztxt also supports a user config
+  file in the home directory called .gutenpalmrc.  This file contains regular
+  expressions, one per line, which are automatically used when running
+  makeztxt.  These additions were provided by Martin Smith
+  (martin@sharrow.demon.co.uk).  Thank you again!
+* makeztxt now supports three modes of file conversion.  These are selected
+  with the -a/--adjust command line option.  Mode 0, the default, strips off
+  linefeeds only if the line is longer than 70 characters.  Mode 1 strips
+  linefeeds if the line contains any text at all.  Mode 2 leaves the text
+  unchanged.  The should help preserve some formatting in books, like chapter
+  titles, the table of contents, etc.
+
+
+GutenPalm v1.00
+Saturday, September 23, 2000
+------------------------------
+
+* First official release of GutenPalm!
+* No program changes from last beta.
+* My testing has continued and thus far, all is well.
+* A few doc updates regarding compiling the source yourself.  There was some
+  confusion due to the use of two copies of zLib (Palm and host machine).
+* Added a file called FILES which briefly describes what each file is for
+* Many website updates at http://gutenpalm.sourceforge.net
+
+
+
+GutenPalm v1.0b1
+Saturday, September 16, 2000
+------------------------------
+
+* Got rid of the bookmarks menu item under Options.  Didn't have anything to
+  use it for.
+* Completely overhauled the bookmarks system.  The old way was stupid and
+  separated the zTXT provided bookmarks and user bookmarks.  More complex and
+  didn't really add much.  Now it's simpler and all bookmarks are kept with
+  the zTXT DB.
+* As a consequence, removed the last modification data checking in the cache
+  code.  This was to determine if the cache was still valid, but now when you
+  add/remove bookmarks, that timestamp is changed frequently.
+* You can now add bookmarks while reading AND delete them.
+* Added a whole bunch more documentation in the README file including some
+  examples of the regex bookmark generation.
+
+
+
+GutenPalm v1.0b
+Monday, September 11, 2000
+------------------------------
+
+* Miscellaneous bug fixes all around.
+* makeztxt now accepts regular expressions on the command line to generate
+  bookmarks in the generated database.
+* GutenPalm now supports bookmarks!  Huzzah!  Well, mostly huzzah.  Most of
+  the code is present for user bookmarks added within GutenPalm, but it isn't
+  implemented yet.
+* Tapping on the percentage display now allows you to jump to an arbitrary
+  position in the zTXT.
+* Even more testing.  This version will likely become 1.0 even if I don't get
+  the user bookmarks added.  If I don't get them added in time, that will be
+  in version 1.1.  But... you never know...
+* The bookmarks menu option still doesn't do anything... don't know if it
+  will.  It might be used for some options dealing with user bookmarks.
+
+
+
+GutenPalm v0.9.9a
+Monday, September 4, 2000
+------------------------------
+
+* Finally fixed that stupid back-paging bug.  It was caused, more or less, by
+  bad code.  To that end, all of the document display code has been mostly
+  rewritten to use integer offsets into the text records rather than storing
+  pointers.  This should have been done from the beginning.
+* Options now exist to keep the cached data and to skip the Project Gutenberg
+  license text (if it is present).
+* A little dot appears in front of the document name in the document list if a
+  cache exists for that doc.
+* There are now menu options to delete the saved caches.  You can delete the
+  cache from the currently highlighted zTXT or delete them all.
+* Fixed a file naming bug in makeztxt which occured if the input file did not
+  have any extension.
+* Did a bunch of testing with POSE and several different text files.
+  GutenPalm didn't crash.  Huzzah!
+
+
+
+GutenPalm v0.9.8a
+Wednesday, August 30, 2000
+------------------------------
+
+* Cache stuff relied on LocalID's not changing.  They do.  So now it stores
+  the DB names instead of their LocalIDs.  Safer this way.
+* Restoring an in-progress document died horribly if the user stopped reading
+  on a record boundry.
+* Progress indicator while decompressing
+* Progress while reading (given as a percentage)
+* There still exists a nasty bug that will freeze GutenPalm when you are
+  paging backwards.  However, it only occurs *sometimes* and I've yet to
+  figure out the circumstances.  It only seems to occur on the boundry between
+  records 0 and 1.  Hmmmmm...
+
+
+
+GutenPalm v0.9.7a
+Tuesday, August 29, 2000
+------------------------------
+
+* Added preference databases
+* Caching structure for storing uncompressed data
+* Persistant position when you quit while reading
+* Options to keep uncompressed data around (no way to set it yet though)
+* Bug fixes...
+
+
+
+GutenPalm v0.9.5a
+Monday, August 28, 2000
+------------------------------
+
+* started keeping a changelog

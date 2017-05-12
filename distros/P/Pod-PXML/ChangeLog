@@ -1,0 +1,12 @@
+Revision history for Perl module Pod::PXML
+                                        Time-stamp: "2004-12-29 18:35:01 AST"
+
+2004-12-29  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.12   -- just repackaging, no code changes.  Still
+	experimental!  (Note: see also Pod::Simple, which is much more
+	mature.)
+	
+2001-05-25  Sean M. Burke  sburke@cpan.org
+
+	* Release 0.1001 -- first public release.  Experimental.

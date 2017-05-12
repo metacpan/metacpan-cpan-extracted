@@ -1,0 +1,574 @@
+#################################################################
+#!/usr/bin/sh
+#
+# (c) Copyright 1993~1995 Hewlett-Packard Company.  All Rights Reserved.
+#
+# $Header: /users/hpnp/odyssey/repository/sh/hpnp.model.sol,v 1.8 1998/03/08 11:40:44 hpnp Exp $
+#
+# HP-UX Network Peripheral Model Script
+#
+# This script invokes the original model script
+# from the subdirectory model.orig and pipes its
+# output to hpnpf.
+#
+###################################################################
+#####
+#
+# Until we get to the point below where the printer port
+# and physical printer are initialized, we can't do much
+# except exit if the Spooler/Scheduler cancels us.
+#####
+trap 'rm -f $PAGEF $LOG $JMLOCK; exit' 15
+
+#####
+#
+# We can be clever about getting a hangup or interrupt, though, at least
+# until the filter runs. Do this early, even though $LPTELL
+# isn't defined, so that we're covered.
+#####
+catch_hangup () {
+  if [ -n "${LPTELL}" ]
+  then
+                echo \
+"The connection to the printer dropped; perhaps the printer went off-line?" \
+                | ${LPTELL} ${printer}
+        fi
+        return 0
+}
+catch_interrupt () {
+        if [ -n "${LPTELL}" ]
+        then
+                echo \
+"Received an interrupt from the printer.  The reason is unknown,
+although a common cause is that the baud rate is too high." \
+                | ${LPTELL} ${printer}
+        fi
+        return 0
+}
+trap 'catch_hangup; exit_code=129 exit 129' 1
+trap 'catch_interrupt; exit_code=129 exit 129' 2 3
+
+#####
+#
+# Most of the time we don't want the standard error to be captured
+# by the Spooler, mainly to avoid "Terminated" messages that the
+# shell puts out when we get a SIGTERM. We'll save the standard
+# error channel under another number (5, in this case), so we can use 
+# it when it should be captured.
+#
+# Open another channel to the printer port (3), for use when the
+# regular standard output won't be directed there, such as in
+# command substitution (`cmd`).
+#####
+exec 5>&2 2>/dev/null 3>&1
+
+#####
+#
+# Set some globally used variables and functions.
+#####
+
+: ${TMP:=/var/tmp}
+
+# [ Modify by the Amit R. to solve the problem of security on 20th Feb. 1998
+HPNP=/opt/hpnp
+
+ID=/usr/bin/id
+CUT=/usr/bin/cut
+AWK=/usr/bin/awk
+
+MKDIR=/usr/bin/mkdir
+
+USERNAME=`$ID | $CUT -f1 -d" " | $CUT -f2 -d"(" | $CUT -f1 -d")"` # get user name
+
+if [ $USERNAME = "root" -o $USERNAME = "lp" ]
+then
+   TMP=$HPNP/tmp
+else
+
+   /usr/bin/sun > /dev/null 2>&1
+   if [ $? -eq 0 ]
+   then
+   HOME=`$AWK  'BEGIN   { FS=":" }
+         {if ( $1 == UNAME) print $6 ; }' UNAME=$USERNAME /etc/passwd`   # get home dir. from /etc/passwd 
+   else
+   HOME=`$AWK -v UNAME=$USERNAME 'BEGIN   { FS=":" }
+         {if ( $1 == UNAME) print $6 ; }' /etc/passwd`   # get home dir. from /etc/passwd 
+   fi
+
+
+   if [ ! -d $HOME/.jetadmin ]
+   then
+      $MKDIR $HOME/.jetadmin > /dev/null 2>&1
+      if [ $? -eq 0 ]
+      then
+        TMP=$HOME/.jetadmin
+      fi
+   else
+        TMP=$HOME/.jetadmin
+   fi
+
+fi
+
+
+
+: ${SPOOLDIR:=/usr/spool/lp}
+
+: ${LOCALPATH:=${SPOOLDIR}/bin}
+PATH="/bin:/usr/bin:${LOCALPATH}"
+
+
+#####
+# Use ${TMPPREFIX} as the prefix for all temporary files, so
+# that cleanup is easy. The prefix may be up to 13 characters
+# long, so you only have space for one more character to make
+# a file name. If necessary, make a directory using this prefix
+# for better management of unique temporary file names.
+#####
+TMPPREFIX=${TMP}/`uname -n`$$
+
+#####
+# Before exiting, set ${exit_code} to the value with which to exit.
+# Otherwise, the exit from this script will be 0.
+#####
+trap 'rm -fr ${TMPPREFIX}*; exit ${exit_code}' 0
+
+#####
+# ${LPTELL} is the name of a program that will send its
+# standard input to the Spooler. It is used to forward
+# the description of a printer fault to the Spooler,
+# which uses it in an alert to the administrator.
+#####
+if [ ! -x "${LPTELL:=${LOCALPATH}/lp.tell}" ]
+then
+        fake_lptell () {
+                header="no"
+                while read line
+                do
+                        if [ "no" = "${header}" ]
+                        then
+                                errmsg ERROR ${E_IP_UNKNOWN} \
+                "unknown printer/interface failure" \
+                "consult your system administrator;
+                reasons for failure (if any) follow:"
+                                header=yes
+                        fi
+                        echo "${line}" >&2
+                done
+                return 1
+        }
+        LPTELL=fake_lptell
+fi
+
+#####
+# Error message formatter:
+#
+# Invoke as
+#
+#       errmsg severity message-number problem help
+#
+# where severity is "ERROR" or "WARNING", message-number is
+# a unique identifier, problem is a short description of the
+# problem, and help is a short suggestion for fixing the problem.
+#####
+
+LP_ERR_LABEL="UX:lp"
+
+E_IP_ARGS=1
+E_IP_OPTS=2
+E_IP_STTY=4
+E_IP_UNKNOWN=5
+E_IP_BADFILE=6
+E_IP_BADCHARSET=7
+E_IP_BADCPI=8
+E_IP_BADLPI=9
+E_IP_BADWIDTH=10
+E_IP_BADLENGTH=11
+E_IP_ERRORS=12          # (in slow.filter)
+
+errmsg () {
+        case $1 in
+        ERROR )
+                sev="  ERROR";
+                ;;
+        WARNING )
+                sev="WARNING";
+                ;;
+        esac
+        echo "${LP_ERR_LABEL}: ${sev}: $3
+        TO FIX: $4" >&5
+}
+
+
+
+#####
+#
+# This program is invoked as
+#
+# ${SPOOLDIR}/.../printer request-id user title copies options files...
+#
+# The first three arguments are simply reprinted on the banner page,
+# the fourth (copies) is used to control the number of copies to print,
+# the fifth (options) is a blank separated list (in a single argument)
+# of user or Spooler supplied options (without the -o prefix),
+# and the last arguments are the files to print.
+#####
+
+if [ $# -lt 5 ]
+then
+  errmsg ERROR ${E_IP_ARGS} \
+    "wrong number of arguments to interface program" \
+    "consult your system administrator"
+  exit 1
+fi
+printer=`basename $0`
+
+MODEL=`basename $0`
+REALMODEL=`echo $0 | sed -e "s%$MODEL%model.orig/$MODEL%"`
+LPLOG=/var/spool/lp/logs/lpsched
+LOG=$TMP/jalog.$$
+DEFOUT=$TMP/jadump
+HPNPFLOG=""
+
+MANPATH=$MANPATH:/opt/hpnp/man
+export MANPATH
+
+LD_LIBRARY_PATH="/usr/dt/lib:/opt/SUNWmotif/lib/:/usr/openwin/lib"
+export LD_LIBRARY_PATH
+OPENWINHOME=/usr/openwin
+export OPENWINHOME
+HPNPBIN=/opt/hpnp/bin
+HPNPF=$HPNPBIN/hpnpf
+xPORT=
+PERIPH=128.197.12.248
+DEVTYPE="PJL"
+TEOJ="-w"
+PRINTERCFG=/opt/hpnp/admin/printers/11.cfg
+JRECOV="yes"
+STATUSLOG="/tmp/boris.statuslog"
+HPNPFOPT=
+TOJMON=""  
+ONUSTATUS="" 
+
+if [ -z "$PERIPH" ]
+then
+  PERIPH=$MODEL
+fi
+
+# job monitor related
+jobm="yes"       
+userjobm="yes"
+jstay=""
+defdsplay="`uname -n`:0"
+dsplay=""
+debugf=""
+dsplayfile="/opt/hpnp/etc/hpnpdisplay"
+XJETMON=$HPNPBIN/xjjm
+topazopt=""
+# LP job parameters
+job=$1
+# presever original string, for passing to net_ljxx
+user1=$2
+user=`echo $2 | line | cut -d! -f2`
+sysname=`echo $2 | line | cut -d! -f1`
+title=$3
+copy=$4
+options=$5
+shift 5
+files="$*"
+
+PAGEF=$TMP/pg.${job}
+JMLOCK=$TMP/jm.${job}
+
+#
+#
+# This is the start of the print quota stuff. This part of the code checks
+# the user's quota and returns that amount.
+#
+#
+quota=`/usr/local/sbin/pquota_user_admin.pl -Pboris check $user 2> /dev/null`
+if [ $? -ne 0 ]
+then
+	/usr/bin/mail -s "error with pquota_user_admin.pl check" savarese < /dev/null
+	exit 0
+fi
+
+if [ $quota -lt 1 ]
+then
+	/usr/local/bin/pquota -u $user | /usr/ucb/mail -s "Over print quota notice." $user
+	exit 0
+fi
+
+#
+# End first print quota segment.
+#
+
+if test ! -w $LPLOG
+then
+  #    chmod 666 $LPLOG; solaris 2.4 may set permission to non-writable
+  LPLOG=/dev/null
+fi
+if test ! -f $DEFOUT
+then
+  touch $DEFOUT
+fi
+chmod 666 $DEFOUT
+DEFOUT="-o${DEFOUT}"
+
+if [ -n "$STATUSLOG" ]
+then
+if test ! -f $STATUSLOG
+then
+  touch $STATUSLOG
+  chmod 666 $STATUSLOG
+fi
+fi
+
+# search for options
+for i in $options
+do
+  case "$i" in
+    debugm[/.a-zA-Z0-9_]*)
+      debugf="`echo "$i" | sed 's/^debugm//'`";;
+    debugm)
+      debugf="$TMP/$MODEL";;
+    job+[a-zA-Z0-9_:.]*)  
+      dsplay="`echo "$i" | sed 's/job+//'`" 
+      jobm="yes";;
+    job)  
+      jobm="yes";;
+    jobnp)
+      jobm="yes"
+      jstay="-nopersist";;
+    jobnp+[a-zA-Z0-9_:.]*)  
+      jobm="yes"
+      jstay="-nopersist"
+      dsplay="`echo "$i" | sed 's/jobnp+//'`";;
+    # following two keep job monitor permanently
+    jobp+[a-zA-Z0-9_:.]*)  
+      dsplay="`echo "$i" | sed 's/jobp+//'`" 
+      jobm="yes"
+      jstay="-persist";;
+    jobp)
+      jstay="-persist"
+      jobm="yes";;
+    nojob*)  
+      userjobm="no";;
+    hpnpflog)
+      HPNPFLOG="-l $TMP/hpnpflog"
+      if [ -f $TMP/hpnpflog ]
+      then
+        rm -f $TMP/hpnpflog
+        touch $TMP/hpnpflog
+        chmod 666 $TMP/hpnpflog
+      fi;;
+    relay)
+      lang="RELAY";;
+    topaz)
+      if [ $copy -gt 1 ]
+      then
+        topazopt="-m"
+      fi;;
+  esac
+done
+
+if [ "$debugf" != "" ]
+then
+  if [ ! -f "$debugf" ]
+  then
+    touch $debugf
+  fi
+  chmod 666 $debugf
+  if [ ! -w "$debugf" ]
+  then
+    echo "$debugf is not writable. write to $TMP/$MODEL."  >> $LPLOG
+    debugf=$TMP/$MODEL
+  fi
+  # use user1, not user.  the former is the original string
+  $REALMODEL $job $user1 "$title" $copy "$options" $files > $debugf
+  exit 0
+fi
+# if debug is on, stop here.
+
+
+# if PJL device, turn on PJL USTATUS ; 
+case "$DEVTYPE" in
+  PJL) 
+    ONUSTATUS="-a1";;
+  PJLEX)
+    ONUSTATUS="-a3";;
+  *)
+    if [ "$TEOJ" = "-w" ]  # it should not happen, but double check anyway
+    then                   # or it is set as default
+      TEOJ=""
+      echo "   Non-PJL printer, turn off True end-of-job" >> $LOG
+    fi
+esac
+#Turn off USTATUS and TEOJ if relay mode
+if [ "$lang" = "RELAY" ]
+then
+  ONUSTATUS=""
+  TEOJ=""
+fi
+
+# ready to output to printer
+# Determine if should output to Job Monitor (depending on hpnpsb)
+# if yes, set -b
+# then check if the printer is a PJL device (supporting USTATUS).
+# if yes, set -a
+
+# bring Job Monitor up 
+if $HPNPBIN/psbr
+then                  
+  if [ "$jobm" = "yes" -a -x "$XJETMON" ]
+  then
+    # settle where to display 
+    if [ "$dsplay" = "" ]
+    then
+      # get from a file 
+      if [ -s "$dsplayfile" ]
+      then
+        dsplay=`grep "^$user " $dsplayfile | cut -f2 -d" "`
+      fi
+      if [ "$dsplay" = "" ]
+      then      
+        if [ -n "$sysname" ]
+        then
+          dsplay=${sysname}:0
+        else
+          if [ "$dsplay" = "" ]
+          then
+            dsplay=$defdsplay
+          fi
+        fi
+      fi
+    fi
+    # get total file size
+    FSIZ=`$HPNPBIN/fsize $files` 
+    FSIZ=`expr $FSIZ \* $copy`
+    if [ -n "$FSIZ" ]
+    then
+      TOJMON="-b$FSIZ"
+    fi
+
+    if [ "$userjobm" = "yes" ]
+    then
+
+      if [ -s $PAGEF ]
+      then    
+        :
+      else
+        if [ ! -f "$JMLOCK" ]
+        then
+          touch $JMLOCK
+          echo "\t$XJETMON $dsplay $job &" >> $LOG
+          $XJETMON -display "${dsplay}" $jstay $job &
+        else
+          echo "   $JMLOCK exists, not bring up Job Monitor." >> $LOG 
+        fi
+      fi
+    fi
+  fi
+else
+  if [ "$jobm" = "yes" ]
+  then
+    echo "  hpnpd is not running, no job monitor" >> $LOG
+  fi
+fi
+
+HPNPFOPT="-j $job+$user $TEOJ $TOJMON $DEFOUT $ONUSTATUS $xPORT -x $PERIPH $HPNPFLOG $topazopt"
+if [ -n "$STATUSLOG" ]
+then
+  HPNPFOPT="$HPNPFOPT -s $STATUSLOG"
+fi
+
+# Check to see if insert option
+case "$DEVTYPE" in
+  PJL | PJLEX )
+    if [ -s $PAGEF ]
+    then
+      STARTPG=`grep "printed page" $PAGEF | cut -f2 -d:`  
+      if [ -n "$STARTPG" ]
+      then     
+        if [ -z "$options" ]
+        then
+          options="srbb$STARTPG"
+        else
+          options=`echo $options | sed -e "s/$options/$options srbb$STARTPG/"`
+        fi
+        echo "  Recover $job from page $STARTPG" >> $LOG
+      else
+        echo "   $PAGEF exists, but there is no page number in it." >> $LOG
+      fi
+    fi;;
+esac
+
+
+echo "$REALMODEL $options" >> $LOG 
+echo "$HPNPF $HPNPFOPT" >> $LOG 
+
+EXIT_CODE=${TMPPREFIX}e
+trap '' 1       # Let the filter handle a hangup
+trap '' 2 3     # and interrupts
+
+(   # executed in subshell
+    # hpnpf for solaris:
+    #     both stdout and stderr are passed to LPTELL by 2>&1
+    # REALMODEL:
+    #     stderr is piped to LPTELL
+    #     stdout is piped to hpnpf
+  $REALMODEL $job $user1 "$title" $copy "$options" $files | $HPNPF $HPNPFOPT 2>&1
+
+  retcode=$?
+  if [ "$retcode" -eq 0 ]
+  then
+    rm -f $PAGEF $JMLOCK
+  else
+    if [ "$retcode" -eq 2 -o "$JRECOV" != "yes" ]
+    then
+      rm -f $PAGEF $JMLOCK
+      retcode=2
+    else
+      retcode=1
+    fi
+  fi
+  echo $retcode > ${EXIT_CODE}
+) | ${LPTELL} ${printer}
+
+trap 'catch_hangup; exit_code=129 exit 129' 1
+trap 'catch_interrupt; exit_code=129 exit 129' 2 3
+
+exit_code=`cat ${EXIT_CODE}`
+rm ${EXIT_CODE}
+cat $LOG >> $LPLOG
+rm -f $LOG 
+
+if [ -n "${exit_code}" -a 0 -ne "${exit_code}" ]
+then
+  if [ "$exit_code" -eq 2 ]
+  then       # just let it die (cause errmsg displayed on lpstat -t),then
+    exit 2   # shift back to "waiting for auto-retry
+  else 
+    trap '' 15      # Avoid dying from disable
+    sleep 4         # Give $LPTELL a chance to tell
+    exit_code=129 exit 129
+  fi
+fi
+
+#
+#
+# This is the final part of pquota. We need to subtract the number of pages
+# that the user printed.
+#
+#
+
+# Get num pages printed
+PAGES=`grep $user $STATUSLOG | grep total | awk '{print $10}'`
+/usr/local/sbin/pquota_user_admin.pl-Pboris print $user $PAGES > /dev/null 2>&1
+
+rm -f $STATUSLOG
+
+#
+# End pquota stuff/
+#
+
+exit_code=0 exit 0

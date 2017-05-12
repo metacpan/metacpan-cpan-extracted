@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/POD2/PT_BR.pm
+lib/POD2/PT_BR/perlintro.pod
+lib/POD2/PT_BR/perlbook.pod
+lib/POD2/PT_BR/perlboot.pod
+lib/POD2/PT_BR/perldsc.pod
+lib/POD2/PT_BR/perlstyle.pod
+t/00-load.t
+META.yml                                 Module meta-data (added by MakeMaker)

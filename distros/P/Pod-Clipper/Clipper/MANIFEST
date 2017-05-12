@@ -1,0 +1,11 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Pod/Clipper.pm
+t/001_load.t
+t/002_simple.t
+t/003_whitespace.t
+t/004_misc.t

@@ -1,0 +1,214 @@
+Revision history for PkgConfig
+
+0.16026 2017-03-23
+  - Fix for Perl 5.25.11+ where '.' is not in @INC
+
+0.15026 2017-01-26
+  - New release with fixes to META.json
+
+0.14026 2017-01-26
+  - support for static cflags.  This has been supported
+    by pkgconf for a while.
+
+0.12026 2016-05-09
+  - Updated project URLs in README
+  - Spelling fixes in various documentation files
+  - Support for MSYS2
+
+0.11026 2016-01-25
+  - Do not install misc .pl files in the distribution root.
+
+0.10026 2016-01-08
+  - promote to production
+
+0.09026_02 2016-01-07
+  - Test and development changes only.  No functional or
+    bug fixes to PkgConfig.pm itself.
+
+0.09026_01 2016-01-05
+  - Remove use of flock
+    It isn't portable and was causing hang/failures on NFS
+  - Add --short-errors option
+
+0.09026 2015-03-18
+  - Add --errors-to-stdout option
+  - Support for Gentoo Linux
+
+0.08926 2015-03-05
+  - Add --atleast-pkgconfig-version option
+
+0.08826 2015-02-23
+  - Use 64bit pkgconfig paths on 64 bit solaris
+
+0.08726 2015-02-19
+  - Parallel test if multiple CPUs can be detected (Linux, Windows)
+  - Skip long running tests under ActiveState PPM build
+    These were causing timeouts in dependencies such as Alien::Base
+
+0.08626 2015-01-05
+  - Add support for --libs-only-other option (GH#18 garu)
+  - Add support for --cflags-only-other option (GH#17 garu)
+  - Remove system multi arch library directory flags (example: -L/usr/lib/x86_64-linux-gnu) for Debian 7+
+    (patches for other distributions are encouraged)
+
+0.08526 2014-10-15
+  - Add support for PKG_CONFIG_LIBDIR, PKG_CONFIG_ALLOW_SYSTEM_CFLAGS and PKG_CONFIG_ALLOW_SYSTEM_LIBS environment variables
+  - Add support for windows registry keys
+  - Use short (MSDOS 8.3) names on Windows for search paths that contain white space
+  - Replace forward slash (/) in search paths where back slash is provided (\)
+
+0.08420 2014-08-03
+  - promote to production
+  - Code named Salt Lake City
+
+0.08320_03 2014-08-02
+  - minor optimisations
+
+0.08320_02 2014-08-01
+  - get_cflags returns a string in scalar context
+  - get_ldflags returns a string in scalar context
+  - ppkg-config program correctly escapes spaces
+
+0.08320_01 2014-07-31
+  - handle quoted space
+
+0.08320 2014-07-16
+  - promote to production
+
+0.08220_02 2014-07-16
+  - fix regression in last revision:
+    error in dependent component is propagated to main component
+
+0.08220_01 2014-07-15
+  - fixed bug where dependent components were having their variables
+    overridden by the main .pc file
+
+0.08220 2014-06-25
+  - promote to production
+
+0.08120_01 2014-06-24
+  - better Debian detection and support
+  - silence warning on Debian 6 or earlier when
+    dpkg-dev is installed
+
+0.08120 2014-06-20
+  - require ExtUtils::MakeMaker 6.56 for BUILD_REQUIRES
+
+0.08020 2014-06-17
+  - promote to production
+
+0.07920_01 2014-06-16
+  - add support for the --cflags-only-I option
+
+0.07920 2014-06-13
+  - require Test::More >= 0.94 for subtest
+    reading comprehension is key
+
+0.07820 2014-06-13
+  - require Test::More > 0.90 and != 0.92 for subtest
+
+0.07720 2014-06-09
+  - promote to production
+  - added PERL_PKG_CONFIG_SCRIPTS environment variable
+
+0.07620_01 2014-06-08
+  - added get_var public accessor method
+  - support for constraints =, !=, >=, <=, >, and <
+
+0.07620 2014-06-06
+  - promote to production
+
+0.07520_04 2014-06-03
+  - windows test fix
+
+0.07520_03 2014-06-03
+  - fix split on Makefile.PL --script option
+
+0.07520_02 2014-06-03
+  - make appropriate exclusions for Strawberry Perl
+
+0.07520_01 2014-06-03
+  - support for ${pcfiledir}
+  - base strawberry root on $^X instead of Config.pm location
+
+0.07520 2014-06-02
+  - work around for Strawberry Perl 5.20.0.1
+
+0.07420 2014-05-09
+  - add --script option for Makefile.PL (GH#10 kmx)
+  - add --list-all option for ppkg-config script (GH#10 kmx)
+
+0.07320 2014-05-06
+  - Use .pc files from Strawberry Perl on MSWin32 + Strawberry Perl
+
+0.07220 2014-04-26
+  - fix possible 6.2 incompatibility
+  - remove unintentional new line from default paths on Debian
+
+0.07120 2014-03-26
+  - documentation tweak to improve Kwalitee score
+
+0.07020 2014-03-25
+  - use the same search path as the pkg-config normally used on these
+    systems:
+    
+      Debian Linux
+      Debian kFreeBSD
+      RedHat/CentOS/Fedora Linux
+      FreeBSD*
+      NetBSD
+      OpenBSD
+      
+      * FreeBSD 10 doesn't support PKG_CONFIG_DEBUG_SPEW so I can't verify
+        the path there, but the path is correct for FreeBSD 9
+        
+    Non .deb or .rpm based Linux distributions are not detected and will 
+    use the default non-platform specific search path.  .rpm based 
+    distributions other than RedHat/CentOS/Fedora may be misidentified 
+    as one of those.  Patches to correct unidentified or misidentified 
+    platforms would be eagerly received.
+    
+    this is a significant change in behavior, but arguably a useful one
+  - add file_path option for loading specific .pc file
+
+0.06420 2014-02-13
+  - use ; instead of : for PKG_CONFIG_PATH on MSWin32
+  - support --exact-version, --atleast-version and --max-version
+    (at least enough to support ExtUtils::PkgConfig)
+  - Fix Libs.private property and therefore --static option which
+    was being hidden due to a bug
+  - ExtUtils::PkgConfig compatibility
+
+0.06320 2014-02-08
+  - explicitly require Perl 5.6 (was already an undeclared requirement)
+  - include licensing meta data and LICENSE file
+  - make tests less verbose (copious diagnostics were obscuring warnings)
+
+0.06220 2014-02-06
+  - on MSWin32 require a more recent version of Archive::Tar that supports
+    symlinks (used by the tar in the test directory).  On other platforms,
+    any version of Archive::Tar will do.
+
+0.06120 2014-02-05
+  - use dedicated lock instead of tar for tests because
+    Archive::Extract sometimes wants to lock the tar too (plicease)
+
+0.06020 2014-02-04
+  - avoid infinite loop on windows (GH#8 plicease)
+  - install script as ppkg-config (everywhere) and pkg-config.pl (non-windows) (GH#7 plicease)
+  - removed non-core dependencies (GH#4 plicease)
+  - support for --variable (GH#5 Sanel Zukan)
+
+0.05020 2012-03-08
+  - release
+
+0.04020 2012-02-27
+  - release
+
+0.03_0  Feb 18 2012
+        Implemented user-defined variables and cleaned up variable
+        parsing
+
+0.01_0    Date/time
+        First version, released on an unsuspecting world.
+

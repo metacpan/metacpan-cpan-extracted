@@ -1,0 +1,107 @@
+
+
+=pod
+
+
+
+=head1 Simple Pod
+
+This is a block of text under the
+simple pod header. It contains 
+several new lines, but should be
+slurped together into one
+continuous line.
+
+
+=head2 THis is a secondary header
+
+this is a block of text under the secondary header
+it contains many new line characters in its raw form,
+but it should be displayed as one large continous line.
+
+this is a second block of text under the secondary
+header it is also muliline in raw form, but should
+be displayed as a continous line/paragraph
+
+=head1 this is a primary header for bullets
+
+now we're going to have bulleted items
+
+=over 4
+
+=item *
+
+lions
+
+=item *
+
+tigers
+
+=item *
+
+bears
+
+=back
+
+
+now we're going to have direct item lists
+
+=over 4
+
+=item Lions
+
+This is a paragraph under the Lions bullet. 
+It contains many lines in original file,
+but should be formatted as one large line
+in viewer. The entire paragraph should be 
+indented.
+
+=item Tigers
+
+=over 4
+
+=item Apples
+
+=item Bananas
+
+=item Pears
+
+=back
+
+=item Bears
+
+=back
+
+
+=head1 Now its time for code samples, etc
+
+this is a paragraph with inlined characteristics
+applied to individual words. For instance, this
+word is I<< italicized >>. This word is B<BOLD>. 
+Here is a snipped of code,C< my $a = $b + $c; >
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+=cut
+
+
+
+
+
+

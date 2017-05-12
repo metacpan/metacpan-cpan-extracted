@@ -1,0 +1,17 @@
+The tests are split in several categories:
+
+0x - basic tests
+1x - Papery::Pulp tests
+2x - Papery::Analyzer tests
+3x - Papery::Processor tests
+4x - Papery::Renderer tests
+5x - Papery hooks tests
+9x - functional tests
+
+Test files are stored in several directories:
+
+t/analyzer  - files for Papery::Analyzer::* tests
+t/processor - files for Papery::Processor::* tests
+t/renderer  - files for Papery::Renderer::* tests
+t/site      - files for complete site generation tests
+

@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/POE-Component-Omegle.t
+lib/POE/Component/Omegle.pm
+META.yml                                 Module meta-data (added by MakeMaker)

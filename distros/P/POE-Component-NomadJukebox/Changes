@@ -1,0 +1,15 @@
+Revision history for Perl extension POE::Component::NomadJukebox
+
+0.02  Mon Sep 13 15:15:10 2004
+	- fixed sendfile.pl example
+	- fixed playlists, added NAME, STATE, and removed TAG keys
+	- modified get_track to accept ID or TAG (TAG is faster)
+	- fixed get_track, it fired njb_get_track_done instead of 
+		njb_get_track
+	- added gettrack.pl example
+	- clarified docs a little bit more
+	- added get_file, guess i missed that one :)
+	- added extended tags to list_tracks
+
+0.01  Mon Sep 13 14:50:21 2004
+	- original version

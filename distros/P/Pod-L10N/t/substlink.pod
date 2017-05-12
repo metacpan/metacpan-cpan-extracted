@@ -1,0 +1,17 @@
+
+=encoding euc-jp
+
+=head1 title
+
+(タイトル)
+
+=over
+
+=item iC<te>m
+
+(アイテム)
+
+=back
+
+L</title>, L<< /item >>, L<Foo::Bar>
+

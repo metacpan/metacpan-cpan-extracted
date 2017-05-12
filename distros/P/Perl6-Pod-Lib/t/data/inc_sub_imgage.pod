@@ -1,0 +1,4 @@
+=begin pod
+=Include subdir/imagetest.pod
+=end pod
+

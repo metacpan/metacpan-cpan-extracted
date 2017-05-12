@@ -1,0 +1,46 @@
+{
+   "abstract" : "Implement PHP's best features with PSGI!",
+   "author" : [
+      "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-Acme-PHPE9568F34-D428-11d2-A769-00AA001ACF42",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Section" : "0",
+            "MIME::Base64" : "0",
+            "Plack" : "0.9979",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/frioux/Plack-Middleware-Acme-PHPE9568F34-D428-11d2-A769-00AA001ACF42",
+         "web" : "http://github.com/frioux/Plack-Middleware-Acme-PHPE9568F34-D428-11d2-A769-00AA001ACF42"
+      }
+   },
+   "version" : "3.141000"
+}
+

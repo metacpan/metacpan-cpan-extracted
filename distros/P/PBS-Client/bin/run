@@ -1,0 +1,237 @@
+#!/usr/bin/perl -w
+use strict;
+use vars qw($VERSION);
+use Pod::Usage;
+use PBS::Client;
+$VERSION = $PBS::Client::VERSION;
+
+#-----------------------------
+# Usage:
+# run [command [arguments]]
+# run [-h | -m | -v | -l | -e]
+# 
+# Example:
+# - Submit a.out to PBS
+#     run a.out
+#-----------------------------
+
+#------------------------
+# -h option; print help
+# -m option: print manual
+#------------------------
+pod2usage() if (@ARGV == 1 && $ARGV[0] eq '-h');
+pod2usage(-verbose => 2) if (@ARGV == 1 && $ARGV[0] eq '-m');
+
+#--------------------------------
+# -v option: print version number
+#--------------------------------
+if (@ARGV == 1 && $ARGV[0] eq '-v')
+{
+	print "$VERSION\n";
+	exit(0);
+}
+
+#-----------------------
+# -l option: list config
+#-----------------------
+if (@ARGV == 1 && $ARGV[0] eq '-l')
+{
+	my $cfgFile = "$ENV{HOME}/.runrc";
+	die "No config file is found.\n" if (!-e $cfgFile);
+	die "Config file is empty.\n" if (-z $cfgFile);
+	system("cat $cfgFile");
+	exit(0);
+}
+
+#-----------------------
+# -e option: edit config
+#-----------------------
+if (@ARGV == 1 && $ARGV[0] eq '-e')
+{
+	editCfg("$ENV{HOME}/.runrc");
+	exit(0);
+}
+
+#--------------------
+# Get jobs from stdin
+#--------------------
+my $JOB = join(" ", @ARGV);
+while (!$JOB)
+{
+	print "What to do?\n";
+	$JOB = <STDIN>;
+	chomp $JOB;
+}
+
+#----------------------------
+# Read config and submit jobs
+#----------------------------
+my ($server, $cfg) = readCfg("$ENV{HOME}/.runrc");
+my $pbs = PBS::Client->new;
+$pbs->server($server) if ($server ne '');
+my $job = PBS::Client::Job->new(
+	cmd    => $JOB,
+	%$cfg,
+);
+my $command = (split(/\s+/, $JOB))[0];
+$command =~ s/.+\///;
+$job->script("$command.sh") if (!defined $$cfg{script});
+$job->name("$command.sh") if (!defined $$cfg{name});
+$pbs->qsub($job);
+
+########################## SUBROUTINES ##########################
+
+#-------------------
+# Config file editor
+#-------------------
+sub editCfg
+{
+	my ($cfgFile) = @_;
+	my $editor = $ENV{EDITOR};
+	$editor = $ENV{VISUAL} if (!$editor);
+	$editor = `which $editor 2> /dev/null`;
+	chomp($editor);
+	$editor = 'vi' if (!$editor);
+
+	system("$editor $cfgFile");
+}
+
+
+#-------------------
+# Config file reader
+#-------------------
+sub readCfg
+{
+	my ($cfgFile) = @_;
+	my $server = '';
+	my %cfg;
+	open(CFG, "$cfgFile") || die "Please use \"run -e\" to config first.\n";
+	while(chomp($_ = <CFG>))
+	{
+		# ignore empty lines, comments and section headers
+		next if (/(^\s*$|^\s*#|^\s*\[.*\]\s*$)/);
+
+		my @a = split(/\s*=\s*/);
+		my $val = $a[1];
+
+		# Eval unless the value is a string beginning with a digit
+		$val = eval($a[1]) if ($a[1] !~ /^\d/ ||
+			$a[1] =~ /^([+-]?)(?=\d|\.\d)\d*(\.\d*)?([Ee]([+-]?\d+))?$/);
+
+		if ($a[0] eq "server")
+		{
+			$server = $a[1];
+		}
+		else
+		{
+			$cfg{$a[0]} = ($@)? ($a[1]) : ($val);
+		}
+	}
+	close(CFG);
+	return($server, \%cfg);
+}
+
+
+__END__
+
+=head1 NAME
+
+run - Script to submit job to PBS (Portable Batch System) as easy as possible
+
+=head1 SYNOPSIS
+
+  run "command line"
+  run [-h | -m | -v | -l | -e]
+    -h  help
+    -m  print the manual
+    -v  print the version number
+    -l  list the current config
+    -e  edit the config
+
+=head1 DESCRIPTION
+
+C<run> is a small script applying C<PBS::Client>. It aims at making job
+submission to PBS quick and easy. It reads queueing options from the config
+file F<.runrc> in the home directory, generate job script and then submit to
+PBS.
+
+Current config can be listed by the C<-l> option. The C<-e> option is used to
+create or edit the config, using the editor specified by the EDITOR or VISUAL
+environment variables.
+
+To submit a command (say C<./a.out>), simply add C<run> before it, e.g. C<run
+./a.out>. Arguments (say C<arg>) of C<a.out> can also be added behind, e.g.
+C<run ./a.out arg>.
+
+After submission, a job script will be generated. The default name is the
+command appended by ".sh". After the job is finished, two more files -- output
+and error file will be generated. They have names "[job name].o[job ID]" and
+"[job name].e[job ID]" respectively.
+
+=head1 CONFIG FILE
+
+Queueing options are declaring in F<.runrc> in the home directory. It has
+C<.ini>-style format, i.e.
+
+    Parameter_1 = Value_1
+    Parameter_2 = Value_2
+
+Spaces beside C<=> are optional. Also, lines beginning with "#" and blank lines
+are ignored. For example:
+
+    # This is a sample config file for the "run" utility
+	server = server01
+    queue  = queue01
+    name   = sample
+    
+    nodes  = ['node01', 'node02']
+    ppn    = 2
+    cput   = 01:00:00
+    mem    = 600mb
+
+To list the current configuration, use the C<-l> option. To create or edit the
+config file, use the C<-e> option. The default editor is C<vi>. To use other
+editor, please modify the environment variable C<EDITOR> or C<VISUAL>.
+
+For a sample config file, please see F<bin/runrc> in the module directory.
+
+=head1 EXAMPLES
+
+=over
+
+=item (1) Execute C<./a.out>
+
+    run "./a.out"
+
+=item (2) Execute C<./a.out -a arg1 -b arg2 arg3>
+
+    run "./a.out -a arg1 -b arg2 arg3"
+
+=item (3) Execute C<< ./a.out > /tmp/a.dat >>
+
+    run "./a.out > /tmp/a.dat"
+
+=back
+
+=head1 REQUIREMENTS
+
+L<PBS::Client>
+
+=head1 BUGS
+
+Not known yet. Please email to kwmak@cpan.org for bug report or suggestions.
+
+=head1 AUTHOR(S)
+
+Ka-Wai Mak <kwmak@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2006-2007 Ka-Wai Mak. All rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut

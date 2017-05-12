@@ -1,0 +1,16 @@
+Revision history for Perl extension POE::Component::Log4perl.
+
+0.01  Mon Sep 24 14:01:29 2007
+	- original version; created by h2xs 1.23 with options
+		-AXc -n POE::Component::Log4perl
+
+0.02  17-Sep-2008 K.Esteb
+      Updated the Makefile.PL to include POE and Log::Log4perl as
+      dependenices.
+      Bumped the version number.
+      Added some further tests to make sure the basic are working OK.
+
+0.03  03-Oct-2009 K.Esteb
+      Added a patch from Adam Flott to add a "trace" level that is now
+      supported by Log4perl.
+

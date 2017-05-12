@@ -1,0 +1,23 @@
+==================================================
+Changes from 2012-02-22 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.60 at 2017-02-20 15:21:00 +0000
+-----------------------------------------
+
+  Change: dd9a3afcc4cbf07631d1c6c33eb330583d954558
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-20 15:21:00 +0000
+
+    Convert dist to Dist::Zilla 
+
+  Change: e6a84e1991ab64f4708929d2f2ad66637f5c8258
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-03-31 20:55:45 +0000
+
+    Initial git import 
+
+================
+End of releases.
+================

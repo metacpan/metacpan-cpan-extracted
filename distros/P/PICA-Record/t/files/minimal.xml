@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="../script/pica2html.xsl"?>
+
+<collection xmlns="info:srw/schema/5/picaXML-v1.0">
+  <record>
+    <datafield tag="002@">
+      <subfield code="0">Aau</subfield>
+    </datafield>
+    <datafield tag="003@">
+      <subfield code="0">234529415</subfield>
+    </datafield>
+    <datafield tag="021A">
+      <subfield code="a">Das $-Kapital mit ☎</subfield>
+    </datafield>
+    <datafield tag="028A">
+      <subfield code="d">Karl</subfield>
+      <subfield code="a">Märx</subfield>
+    </datafield>
+  </record>
+</collection>

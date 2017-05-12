@@ -1,0 +1,5 @@
+docs: |
+    Trivially equivalent to:
+
+        my $cspn;
+        $cspn = $-[0]-1 if $string =~ m/[chars]/;

@@ -1,0 +1,35 @@
+Revision history for Perl extension Perl6::Gather.
+
+0.01  Wed Nov 19 22:27:28 2003
+	- original version; created by h2xs 1.22 with options
+		-A -P -X -f -n Perl6::Gather
+
+
+
+0.02	Thu Nov 20 04:50:44 2003
+
+
+
+0.03	Tue Dec 16 11:56:21 2003
+
+	- Returns Perl6-ish array ref in scalar context 
+
+
+0.04	Tue Mar  9 02:59:22 2004
+
+	- Updated internals to mirror interface changes in Perl6::Export
+
+
+
+0.41  Wed Aug 26 05:58:06 2009
+
+	- Updated Makefile.PL to note Perl6::Export 0.07 dependency
+
+
+
+0.42  Wed Dec 23 15:54:10 2009
+
+    - Removed undeclared version.pm dependency (thanks Andreas!)
+
+
+

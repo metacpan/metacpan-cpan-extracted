@@ -1,0 +1,35 @@
+---
+abstract: "interface to PAUSE's module permissions file (06perms.txt)"
+author:
+  - 'Neil Bowers <neil@bowers.com>'
+build_requires:
+  Path::Tiny: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PAUSE-Permissions
+requires:
+  Carp: '0'
+  File::HomeDir: '0'
+  File::Spec::Functions: '0'
+  HTTP::Date: '0'
+  HTTP::Tiny: '0'
+  List::Util: '1.33'
+  Moo: '0'
+  MooX::Options: '0'
+  Time::Duration::Parse: '0'
+  autodie: '0'
+  feature: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/neilbowers/PAUSE-Permissions
+  repository: https://github.com/neilbowers/PAUSE-Permissions.git
+version: '0.16'

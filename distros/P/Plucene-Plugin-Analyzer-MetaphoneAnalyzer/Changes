@@ -1,0 +1,7 @@
+Revision history for Perl extension Plucene::Plugin::Analyzer::MetaphoneAnalyzer.
+
+1.01 2007-08-11
+    - Correctly require IO::Scalar in Makefile.PL
+
+1.0  2004-04-30
+	- initial version

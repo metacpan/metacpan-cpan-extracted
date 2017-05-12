@@ -1,0 +1,20 @@
+The following features are fairly important, and need to be finished
+first:
+
+* Fix up parsing for date and time fields.
+* Fill in the handling of missing data types (11, 13, 14, 16, 17,
+  18).  In addition, the link type (12) support is very rudimentary,
+  and this could definitely use some work.
+* Correctly parse floating point fields, and pack them.
+* Write and modify list records.
+* Read and use field attributes.  I believe these are all packed into
+  the end of record type 1.
+* Enable creation of TinyBytes.
+
+This would be cool, but isn't totally necessary:
+
+* DBD::ThinkDB
+
+What would be really neat:  I'd like to talk to thinkingBytes and try
+to get the actual specifications for the binary format.  There are a
+lot of odd things that I don't quite understand.

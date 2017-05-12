@@ -1,0 +1,50 @@
+=head1 NAME
+
+Example::ClassB - Example Class A
+
+
+=head1 DESCRIPTION
+
+This is class B
+
+
+=head1 METHODS
+
+=head2 foo
+
+ foo($text);
+
+Foo does foo
+
+
+=head2 foo_bar
+
+ foo_bar($scalar);
+
+Bar is bar
+
+
+=head2 foo_bar2
+
+ foo_bar2($sometext);
+
+Bar is bar
+
+
+=head2 foo_bar3
+
+ foo_bar3(\%somevalues);
+
+Bar is bar
+
+
+=head2 foo_bar4
+
+ my $scalar = foo_bar4(\%somevalues);
+
+Bar is bar
+
+
+
+=cut
+

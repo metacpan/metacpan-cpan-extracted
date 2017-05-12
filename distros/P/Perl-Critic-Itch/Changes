@@ -1,0 +1,20 @@
+Revision history for Perl-Critic-Itch
+
+0.01    26 May 2009
+        First version, released on an unsuspecting world.
+0.04    27 May 2009
+        Few changes on documentation.
+0.05    28 May 2009
+        Bugfix: The following dependencies were missing: 
+                 Perl::Critic (1.052)
+                 Perl::Critic::Utils (1.052)
+                 Perl::Critic::Violation (1.052)
+                 Perl::Critic::TestUtils( 1.052)
+0.06    28 May 2009
+        Bugfix: Removed unnecessary lines from ProhibitHashBarewords
+        Enhancements: Test File added to check for Barewords on hash keys
+        Enhancements: Now reserved keys are also not allowed
+0.07    31 May 2009
+        Bugfix: pbp removed from default themes. Error message is more clear now.
+             (Thanks to Jeffrey Thalhammer for pointing this out)
+	Enhancements: itch theme added

@@ -1,0 +1,27 @@
+---
+abstract: 'Redis based session store for Plack apps.'
+author:
+  - 'Lee Aylward <leedo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Session-Store-Redis
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  JSON: 0
+  Plack: 0
+  Plack::Session: 0
+  Redis: 0
+  Test::Exception: 0
+  Test::More: 0
+version: 0.05

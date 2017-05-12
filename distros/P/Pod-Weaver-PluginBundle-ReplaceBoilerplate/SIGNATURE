@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 88753299b080a95dfbfd5b3970710c2fff0340a7 Build.PL
+SHA1 e0ae293ddfde3bab229618e6634fe8167433b978 Changes
+SHA1 9e7ce673dd325c5ce8ef8bcde9c6c74dc53f8056 MANIFEST
+SHA1 338757ecd0449a35e47f064a4ae4ea5d5ee946e2 META.yml
+SHA1 99b42ffa3f26a0ea9853e3eb25ddb2016a3a1fe4 README
+SHA1 8c863cff849a320c09cc096284dae131544e3667 ignore.txt
+SHA1 f7f3470994e5defc890c6cc781670aab2bca606f lib/Pod/Weaver/PluginBundle/ReplaceBoilerplate.pm
+SHA1 8aaccb78b0ec1f61979388c447fffd3ec29063a8 lib/Pod/Weaver/Section/ReplaceAuthors.pm
+SHA1 8a89226611e245bad5845f12559e0a225f0c7f0a lib/Pod/Weaver/Section/ReplaceLegal.pm
+SHA1 eb22f4b5638fe5b5c858e572dd2c3e4fa6f4efc3 lib/Pod/Weaver/Section/ReplaceName.pm
+SHA1 82725335fd7e8b1cee6e34ade0ffe6d09e4c0a92 lib/Pod/Weaver/Section/ReplaceVersion.pm
+SHA1 cfecf00db558410ad7f543b27317edb1b4be626f t/00-load.t
+SHA1 e0564aec61ae8a4729858fff18a8f0a767bc7c78 t/40-replace-section.t
+SHA1 aa126d1ce1a68b2c411f7290abc91bf1240c1c58 t/50-replace-boilerplate.t
+SHA1 57db22b18a2045d4776a6434e6b106922ef3a319 t/90-check-changes.t
+SHA1 dcf6c7fef5befbc5b8f754de3da707c0fbc22ae9 t/91-fixme.t
+SHA1 98cdccf1120f3c9b445d6bcfaa10339a9c821d54 t/92-hasversion.t
+SHA1 e6efcfd6a7173a136748ef560e913465fe03a854 t/93-meta.t
+SHA1 9f074af0f75805df778e06a6b2c0221aa9ae6a1f t/94-minimumversion.t
+SHA1 bae7f6978d6b9099f6f5b3321598871503e78781 t/95-manifest.t
+SHA1 8c57f2b89f12c54fd975c39ded1c100796ab5f17 t/98-pod.t
+SHA1 49835efe20e87aef3f67d9fdd75a6593acf811d2 t/99-pod-coverage.t
+SHA1 b17c6ab64550536817db515d4e176f19afb77da9 t/test_files/40-replace-authors.ini
+SHA1 21472a513f9979ccee6a20286a3b34b3cf886635 t/test_files/40-replace-legal.ini
+SHA1 7a7647952fc505ebb7d2480c76d32fa9393c5385 t/test_files/40-replace-name.ini
+SHA1 5ff79369c810370eddb95d614eedd94731000da4 t/test_files/40-replace-section-with-dupe-section-name.in.pod
+SHA1 2492430fd139f61698677e1db34935fd767e4966 t/test_files/40-replace-section-with-dupe-section-name.out.pod
+SHA1 c1c58d688ee75ef9773be6eca60db07b2c1a690e t/test_files/40-replace-section-with-section-name.in.pod
+SHA1 f902de6ae454848da8ed94bd3ba4c260c85f6aca t/test_files/40-replace-section-with-section-name.out.pod
+SHA1 ad039526b5eb71444fb28976519485ccb9f1222a t/test_files/40-replace-section-without-section.in.pod
+SHA1 f902de6ae454848da8ed94bd3ba4c260c85f6aca t/test_files/40-replace-section-without-section.out.pod
+SHA1 a5d8f8776eebcbbc87c645e39e16ab425ec42125 t/test_files/40-replace-version.ini
+SHA1 ad039526b5eb71444fb28976519485ccb9f1222a t/test_files/50-replace-boilerplate.in.pod
+SHA1 f416c91e43262b1f16a2ab48b4fc41d6d291ad47 t/test_files/50-replace-boilerplate.ini
+SHA1 272fca778d333986b42fc79c2b9542ea6ecd0aa2 t/test_files/50-replace-boilerplate.out.pod
+SHA1 f416c91e43262b1f16a2ab48b4fc41d6d291ad47 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkyQikoACgkQk0asf7iG0tTRAgCfajroBjwc8iW2MTX4jwyhravk
+PfYAoJNDY+P9R+fePBDj6V+LF0OViStD
+=jrdr
+-----END PGP SIGNATURE-----

@@ -1,0 +1,551 @@
+package Perinci::Manual::Tutorial; # make podweaver happy
+
+# VERSION
+
+1;
+# ABSTRACT: Tutorial for using the Perinci modules
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perinci::Manual::Tutorial - Tutorial for using the Perinci modules
+
+=head1 VERSION
+
+This document describes version 0.32 of Perinci::Manual::Tutorial (from Perl distribution Perinci), released on 2015-09-03.
+
+=head1 ABOUT PERINCI
+
+L<Perinci> is a suite of Perl modules for providing implementation and tools for
+L<Rinci> and L<Riap>. Rinci is a metadata specification for your code entities,
+implementable in Perl but also other languages. Code entities include functions,
+variables, packages, classes, and so on. Metadata include summary, description,
+function argument specification, dependencies, features that a function has;
+basically anything that can be described about your function (or other entity
+type). Riap is a protocol for accessing code entity and its metadata, either
+locally or remotely and across language.
+
+The main philosophy that guides the development of Rinci, Riap, and Perinci is
+laziness: not having to do much plumbing manually, not having to write needless
+code, not wanting to repeat yourself, not having to reimplement existing stuffs
+just because you switch language, not having to learn different ways to access
+API's for each web service. Another philosophy is to focus on functions (as
+opposed to classes or objects, or other kind of code entity). Function is the
+basic unit of reuse of a program. By making functions more powerful, reusable,
+flexible, we can greatly improve the development experience.
+
+=head1 GETTING STARTED
+
+Let us start this tutorial by writing an example function:
+
+ package MyApp;
+
+ use Exporter;
+ our @ISA       = qw(Exporter);
+ our @EXPORT_OK = qw(add_array);
+
+ sub add_array {
+     my ($a1, $a2) = @_;
+     my @sum;
+     for (0..@$a1-1) {
+         push @sum, $a1->[$_] + $a2->[$_];
+     }
+     return \@sum;
+ }
+
+ 1;
+
+To use this function:
+
+ use MyApp qw(add_array);
+ add_array([1, 2, 3], [4, 5, 6]); # returns [5, 7, 9]
+
+But suppose we want to check our input to make sure we are fed arrays of
+numbers:
+
+ use Scalar::Util qw(looks_like_number);
+ sub add_array {
+     my ($a1, $a2) = @_;
+
+     # validate
+
+     defined($a1) or die "Please specify a1";
+     ref($a1) eq 'ARRAY' or die "Invalid a1, must be an array";
+     for (@$a1) {
+         die "Found a non-number element in a1" unless looks_like_number($_);
+     }
+
+     defined($a2) or die "Please specify a2";
+     ref($a2) eq 'ARRAY' or die "Invalid a2, must be an array";
+     for (@$a2) {
+         die "Found a non-number element in a2" unless looks_like_number($_);
+     }
+
+     my @sum;
+     for (0..@$a1-1) {
+         push @sum, $a1->[$_] + $a2->[$_];
+     }
+
+     return \@sum;
+ }
+
+Here we see a problem: validating input can sometimes be tedious and boring. In
+the above example, it is even longer than the actual "business" routine.
+
+What about if we just specify, in a higher-level language, what kind of input we
+want, and later just let some code generator generate the validator code for us?
+Let us write our first function metadata.
+
+ our %SPEC;
+ $SPEC{add_array} = {
+     v            => 1.1,
+     result_naked => 1,
+     args_as      => 'array',
+     args         => {
+         a1 => { schema => ['array*' => {of=>'num*'}], pos => 0 },
+         a2 => { schema => ['array*' => {of=>'num*'}], pos => 1 },
+     },
+ };
+ sub add_array {
+     my ($a1, $a2) = @_;
+
+     my @sum;
+     for (0..@$a1-1) {
+         push @sum, $a1->[$_] + $a2->[$_];
+     }
+     return \@sum;
+ }
+
+Metadata is a hashref, put in the C<%SPEC> package variable, under the key name
+that is the same as the function name. (There is a way to put and look for
+metadata in other locations, like in a database, but the default location is in
+C<%SPEC>.)
+
+Now our function is nice and short again. But at first glance, the metadata does
+contain quite a few items (some seem weird and needless). Let us go through them
+key by key (or, as it is called, property):
+
+=over 4
+
+=item * v => 1.1
+
+This property is needed because there used to be an incompatible, first version
+of the metadata format (called 1.0). Specifications evolve, fact of life. To
+keep backward compatibility, if C<v> is not specified, it is assumed to be 1.0.
+
+=item * result_naked => 1
+
+This property is needed simply because the metadata encourages result_naked => 0
+(which is the default and does not have to be specified). We'll get to this a
+bit later.
+
+=item * args_as => 'array'
+
+This property is needed also because the metadata encourages args_as => 'hash'
+(the default). We'll get to this a bit later.
+
+=item * args => HASH
+
+This property specifies arguments of the function. It is a hashref, with each
+key being the name of the argument. Each argument specification is also a hash
+with the following known keys, among others: C<schema>, C<pos>. C<schema>
+describes the schema of the argument value, written in L<Sah> schema language.
+C<pos> specifies the position of the argument in the positional argument list,
+starting from 0.
+
+=back
+
+=head1 EXPORTER AND WRAPPER
+
+Adding a metadata to your function doesn't magically change your function, yet.
+The metadata is just a piece of data that we associate with the function, by
+itself it does not do anything. To actually do things, we need some tools. The
+first tool we shall use is the Perinci-specific exporter, to replace Exporter.
+Please install L<Perinci::Exporter> first from CPAN before continuing (or, just
+install L<Task::Perinci> to install everything, and ignore subsequent
+installation instructions until the end of the tutorial).
+
+ package MyApp;
+
+ use Perinci::Exporter;
+
+ our %SPEC;
+ $SPEC{add_array} = {
+     ...
+ };
+ sub add_array {
+     ...
+ }
+
+ 1;
+
+Here you can notice one thing: there is no longer any need to declare @ISA (a
+quirkiness of Exporter) and @EXPORT_OK. All functions which have metadata are
+assumed to be exportable.
+
+Now let us use our function again:
+
+ use MyApp qw(add_array);
+ add_array([1, 2, 3], 3); # now dies: "a2 must be an array"
+ add_array();             # now dies: "Missing arguments a1, a2"
+
+How does it work? Perinci::Exporter exports a wrapped version of the function.
+Function is wrapped using L<Perinci::Sub::Wrapper>. The module generates an
+anonymous subroutine that does argument validation (among other things) before
+calling the actual function. It also does things after calling function, e.g.
+automatic retries, post-processing of function result, etc. The list of things
+that the wrapper does is determined by settings in the metadata.
+
+Perinci::Exporter has other features too like exporting subroutines to different
+names, tags, customizing wrapping options, etc. But you are also not required to
+use Perinci::Exporter. I often use the venerable L<Exporter> module or no
+exporter at all. There are other tools to wrap or generate argument validators
+for functions, e.g. by accessing function through L<Perinci::Access::Perl>, or
+(if you use L<Dist::Zilla>) by embedding validators directly in built source
+code using L<Dist::Zilla::Plugin::Rinci::Validate>.
+
+=head1 COMMAND-LINE PROGRAMS
+
+Suppose you want to create a CLI program for your module. Some basic
+functionalities of a CLI program include command-line options processing and
+help/usage message. The "traditional" way of accomplishing this is with a module
+like L<Getopt::Long>, yet this is one example of boring, plumbing code. With
+another tool, we can replace all that tedious work with just a single line of
+code. Please install L<Perinci::CmdLine> first if you don't have it on your
+system.
+
+But before we use Perinci::CmdLine, let us add some text to our metadata:
+
+ $SPEC{add_array} = {
+     v            => 1.1,
+     result_naked => 1,
+     args_as      => 'array',
+     summary      => 'Add two arrays',
+     description  => <<'EOT',
+
+ This function adds two array numerically. You *should* supply two arrays of the
+ same length containing only numbers.
+
+ EOT
+     args         => {
+         a1 => {
+             schema  => ['array*' => {of=>'num*'}],
+             pos     => 0,
+             req     => 1,
+             summary => 'The first array',
+         },
+         a2 => {
+             schema  => ['array*' => {of=>'num*'}],
+             pos     => 1,
+             req     => 1,
+             summary => 'The second array',
+         },
+     },
+ };
+
+Now create a script C<myapp>:
+
+ #!/usr/bin/perl
+ use Perinci::CmdLine;
+ Perinci::CmdLine->new(url => '/MyApp/add_array')->run;
+
+To execute the program:
+
+ % myapp --a1-json '[1,2,3]' --a2-json '[4,5,6]'
+ % myapp '[1,2,3]' '[4,5,6]';           # ditto
+ .------.
+ |    5 |
+ |    7 |
+ |    9 |
+ '------'
+
+To output in other formats:
+
+ % myapp '[1,2,3]' '[4,5,6]' --format json
+ [200","OK",[5,7,9]]
+
+ % myapp '[1,2,3]' '[4,5,6]' --format=yaml
+ - 200
+ - OK
+ -
+   - 5
+   - 7
+   - 9
+
+To generate help message:
+
+ % myapp --help
+ myapp - Add two arrays
+
+ Usage:
+
+     myapp --help (or -h, -?)
+     myapp --version (or -v)
+     myapp [common options] [options]
+
+ Common options:
+
+     --format=FMT    Choose output format
+
+ Options:
+
+   --a1 [array] (or as argument #1)
+
+     The first array.
+
+   --a2 [array] (or as argument #2)
+
+     The second array.
+
+By just saying C<< Perinci::CmdLine->new(url => '/MyApp/add_array')->run; >> we
+have constructed a complete CLI program, which can parse command-line options
+(taken from function arguments), show help/usage message (using summary and
+other information from metadata), output result in a variety of formats (YAML,
+JSON, text, and more), among other things. Other features not demonstrated in
+this tutorial include subcommands, logging, Bash tab completion.
+
+Several things worth noting:
+
+=over 4
+
+=item * Riap URLs
+
+Instead of using Perl package and function names directly, Perinci::CmdLine
+refers to code entities using Riap URLs. This means C<MyApp::add_array> becomes
+C</MyApp/add_array> (or C<pl:/MyApp/add_array>). Other schemes are available,
+including http/https and tcp/unix/pipe. This means, Perinci::CmdLine can provide
+command-line interface for remote code entities. Many other Perinci tools also
+operate on URLs and thus share the remote access capability.
+
+=item * Parsing argument value
+
+Perinci::CmdLine can accept simple string values or complex structures. Complex
+structures will be parsed using JSON or YAML (in that order).
+
+=item * Markdown
+
+The value of C<description> property is in Markdown format.
+
+=back
+
+=head1 POD DOCUMENTATION
+
+Aside from generating help/usage message for a CLI program, the same information
+in metadata can also be used to generate POD documentation. Combined with tools
+like L<Dist::Zilla> and L<Pod::Weaver>, this means you do not have to write an
+API spec document in POD (and manually) ever again.
+
+This section needs a separate tutorial on its own. For now, please take a look
+at L<Pod::Weaver::Plugin::Perinci>.
+
+=head1 HTTP API
+
+Aside from exporting to a CLI program, exporting to an HTTP API is equally easy.
+Please install L<Perinci::Access::HTTP::Server> if you do not already have it.
+Then run (make sure first that MyApp.pm is in Perl's @INC search path):
+
+ % peri-htserve MyApp
+
+This will start a web server, by default at port 5000. To request to this
+server:
+
+ % curl -g 'http://localhost:5000/MyApp/add_array?a1:k=[1,2,3]&a2:j=[4,5,6]'
+ .------.
+ |    5 |
+ |    7 |
+ |    9 |
+ '------'
+
+To pass special arguments:
+
+ % curl -g 'http://localhost:5000/MyApp/add_array?a1:j=[1,2,3]&a2:j=[4,5,6]&-riap-fmt=json'
+ [200,"OK",[5,7,9]]
+
+Most things are configurable, from URL dispatching routes to parameter parsing.
+Perinci::Access::HTTP::Server is actually a set of L<PSGI> middleware, which you
+can compose and customize, and deploy using any PSGI web server.
+
+It is important to note that Riap is not just a protocol for calling function
+(a.k.a. the C<call> action), but also to access metadata and do other things. To
+get metadata for a code entity, use the C<meta> action:
+
+ $ curl http://localhost:5000/MyApp/add_array?-riap-action=meta
+ ---
+ args:
+   a1:
+     pos: 0
+     req: 1
+     schema:
+     - array
+     - of: num
+       req: 1
+     summary: The first array
+   a2:
+     pos: 1
+     req: 1
+     schema:
+     - array
+     - of: num
+       req: 1
+     summary: The second array
+ args_as: hash
+ description: '
+
+   This function adds two array numerically. You should supply two arrays of the
+
+   same length containing only numbers.
+
+
+ '
+ result_naked: 0
+ result_postfilter:
+   code: str
+   date: epoch
+   re: str
+ summary: Add two arrays
+ v: 1.1
+
+Let us add a couple more functions in MyApp, for demonstration (don't forget to
+restart the HTTP server afterwards):
+
+ $SPEC{foo} = {};
+ sub foo { }
+
+ $SPEC{bar} = {};
+ sub bar { }
+
+To list code entities contained in a package entity (in this case, functions
+inside a package), we can use the C<list> action:
+
+ $ curl 'http://localhost:5000/MyApp/?-riap-action=list&-riap-fmt=json'
+ [200,"OK",["pl:/MyApp/add_array", "pl:/MyApp/foo", "pl:/MyApp/bar"]]
+
+A host is viewed as a tree of code entities with the root package entity /. By
+using the Riap actions C<list> and C<meta>, we have a self-documenting and
+discoverable web service. This is applicable to every service implementing the
+Riap protocol.
+
+Aside from using raw HTTP clients like B<curl> or B<wget>, there are also a few
+other tools more specialized to Riap, e.g. L<riap> (a command-line Riap client
+shell).
+
+=head1 ENVELOPED RESULT
+
+If you see some of the above CLI curl outputs, we can see that function result
+is actually something like:
+
+ [200,"OK",[5,7,9]]
+
+instead of just [5,7,9]. This is called an enveloped result, an array containing
+3-digit HTTP status code as the first element, a string message as the second
+element, and the actual result as the third element.
+
+Result envelope is useful for putting error message (and other stuffs) along
+with result. It is also designed like an HTTP message so it translates
+straightforwardly to HTTP API's.
+
+You can return enveloped result from your function instead of just (naked)
+result:
+
+ our %SPEC;
+ $SPEC{add_array} = {
+     v            => 1.1,
+     args_as      => 'array',
+     args         => {
+         a1 => { schema => ['array*' => {of=>'num*'}], pos => 0 },
+         a2 => { schema => ['array*' => {of=>'num*'}], pos => 1 },
+     },
+ };
+ sub add_array {
+     my ($a1, $a2) = @_;
+
+     # here we also want another check
+     return [400, "Arrays are not of same length"]
+         unless @$a1 == @$a2;
+
+     my @sum;
+     for (0..@$a1-1) {
+         push @sum, $a1->[$_] + $a2->[$_];
+     }
+     return [200, "OK", \@sum];
+ }
+
+As you can see, if you do this, you no longer have to state that your results
+are naked. Let us see how this works in CLI and over HTTP:
+
+ % myapp --a1-json '[]' --a2-json '[1]'
+ ERROR 400: Arrays are not of same length
+
+ % curl -g 'http://localhost:5000/MyApp/add_array?a1:j=[]&a2:j=[1]&-riap-fmt=json'
+ [400,"Arrays are not of same length"]
+
+Wrapper can convert your function from generating naked result to enveloped or
+vice versa. For example, say a user does not like envelopes. She can export your
+function like this:
+
+ use MyApp add_array => {result_naked=>1};
+ my $res = add_array([1], [3]); # [4], instead of [200, "OK", [4]]
+
+=head1 WHAT ELSE IS AVAILABLE?
+
+What is covered in this tutorial is just the tip of the iceberg. Metadata can be
+as rich as you can. It can also be used to declare dependencies (e.g. checking
+whether B<rsync> is on your C<PATH>, or whether some Perl modules are available,
+before running your function). It has also been used to specify: currying,
+declaring dropping OS privilege, declaring features like
+undo/transaction/idempotence, etc.
+
+The metadata also facilitates putting text in different languages, to localize
+your generated documentation.
+
+There are also other tools to generate functions and metadata for you, so
+creating a complex function is semi-automated. Take a look, for example at:
+L<Perinci::Sub::Gen::AccessTable>, L<Perinci::Sub::Gen::Undoable>, and other
+Perinci::Sub::Gen::* modules.
+
+=head1 FAQ
+
+=head2 What about OO?
+
+Rinci metadata can also be added to classes, methods, and attributes. However,
+this is not specified in detail yet. Inputs and comments welcome.
+
+=head1 SEE ALSO
+
+L<Rinci>, L<Riap>
+
+L<Perinci>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

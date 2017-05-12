@@ -1,0 +1,28 @@
+---
+abstract: 'Experimental Perl 6 implementation of an INI file reader'
+author:
+  - 'Gabor Szabo <szabgab@gmail.com>'
+build_requires:
+  Test::More: 0.47
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: artistic2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perl6-Conf
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Perl6::Conf:
+    file: lib/Perl6/Conf.pm
+    version: 0.04
+requires:
+  File::Copy: 0
+  File::Spec: 0
+  perl: 5.008000
+resources:
+  repository: http://svn1.hostlocal.com/szabgab/trunk/Perl6-Conf
+version: 0.04

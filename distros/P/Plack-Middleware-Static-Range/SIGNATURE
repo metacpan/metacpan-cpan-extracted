@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9de261d1c1197149ea1d9138307561f57eb01cb6 Changes
+SHA1 18a162e33521706b8799ba6c4b5d381903228376 MANIFEST
+SHA1 33dccaf8c19ca842a20b1710225a99d35e3021ed META.yml
+SHA1 7dd7efeea4e6ad0e0afc9a6bd91a58c77eaf62f2 Makefile.PL
+SHA1 e18adfd31e20a3497b6ea3a6207e25d6d7c7ecc4 README
+SHA1 011d475e7d8277d6dffbdd52d0df1cf6c831c8f2 README.mkdn
+SHA1 7b4ae50ebac72d20761171c4c2b50c206344ea40 inc/Module/Install.pm
+SHA1 d9fe55a427fe2fd75b5029afeeaa61b592e07f79 inc/Module/Install/Base.pm
+SHA1 62d3922826d9f89f20c185e7031ac8f028504745 inc/Module/Install/Can.pm
+SHA1 dc809f64fb70a26b069a36f8d3d353d520dbb7e1 inc/Module/Install/Fetch.pm
+SHA1 82e6709c1cdb488770cb21f6149a7f22913cd8c1 inc/Module/Install/GithubMeta.pm
+SHA1 73ab91490a628452cc140db72ef9d13a1326d211 inc/Module/Install/Makefile.pm
+SHA1 8ce3f2b414e4617e6233dd4ba10830f8c5d672ec inc/Module/Install/Metadata.pm
+SHA1 a815f14e3aeaa8c6f5f318cda7a2fb431b462780 inc/Module/Install/Package.pm
+SHA1 3b0acd2eeac93a0afe48120f5648f0db362e5bbf inc/Module/Install/Win32.pm
+SHA1 f08924f051e623f8e09fa6a121993c4a9cf7d9eb inc/Module/Install/WriteAll.pm
+SHA1 5011127553463730d768e68ac9765d28d21490b1 inc/Module/Package.pm
+SHA1 ccb48d3fec5ef96403f50b13eec529ce10961c02 inc/Pod/Markdown.pm
+SHA1 bf5aff6515ff536b122afb84d77a66bf48997261 lib/Plack/App/File/Range.pm
+SHA1 23e23a4f0fdd17c9bcb13b41e542d1ee94b4b595 lib/Plack/Middleware/Static/Range.pm
+SHA1 94723fea811fbf5652c4549572b449ff15704515 t/01-basic.t
+SHA1 867ff491b14ee3cf7c41a4a57f62f00f0ec0a7cf t/foo.txt
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (Darwin)
+
+iEYEARECAAYFAk4qzm4ACgkQtLPdNzw1AaAysACgg1uK6VTqMaT+f1/pxMcYo7jg
+VCUAoLKR6klKo/EXGqwY0Si17nSkXdps
+=qoFZ
+-----END PGP SIGNATURE-----

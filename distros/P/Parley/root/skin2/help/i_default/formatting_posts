@@ -1,0 +1,242 @@
+<h1>Formatting Posts</h1>
+
+<p>Allowing raw HTML markup in posts leads to a very special
+world of pain. With that in mind a form of markup inspired by
+<a href="http://www.phpbb.com/community/faq.php?mode=bbcode">BBCode</a>
+was developed for this project. As it's
+not an identical implementation of BBCode it has it's own name
+- <i>ForumCode</i></p>
+
+<h2>Simple Formatting</h2>
+
+<h3>Bold, Italic and Underline</h3>
+<ul class="help">
+    <li>
+        To make a section of text appear in <b>bold</b> use
+        <code>[b]...[/b]</code>:
+        <br />
+        <em>e.g.</em>
+        <br />
+        <q><code>[b]This is bold text[/b]</code></q>
+        produces
+        [% ForumCode.forumcode('[b]This is bold text[/b]') %]
+    </li>
+    <li>
+        To make a section of text appear in <em>italics</em> use
+        <code>[i]...[/i]</code>:
+        <br />
+        <em>e.g.</em>
+        <br />
+        <q><code>[i]This is emphasised text[/i]</code></q>
+        produces
+        [% ForumCode.forumcode('[i]This is emphasised text[/i]') %]
+    </li>
+    <li>
+        To make a section of text appear <em>underlined</em> use
+        <code>[u]...[/u]</code>:
+        <br />
+        <em>e.g.</em>
+        <br />
+        <q><code>[u]This is emphasised text[/u]</code></q>
+        produces
+        [% ForumCode.forumcode('[u]This is underlined text[/u]') %]
+    </li>
+</ul>
+
+<h3>Making Lists</h3>
+<p>There are two types of list, ordered - the items are numbered, and unordered - the
+items are bulleted. Lists are always enclosed by <code>[list]...[/list]</code> markers.
+The type of list you create is dependant on whether you use <code>[1]</code> or <code>[*]</code>
+for list items.
+</p>
+<ul class="help">
+    <li>
+        To create an <em>ordered list</em> use <code>[1]</code>
+        to mark list items.
+        <br />
+        <em>e.g.</em>
+        <br />
+        <q><code>[list]<br />
+                [1]first<br />
+                [1]second<br />
+                [1]third<br />
+        [/list]</code></q>
+        <br />
+        produces:
+        [% ForumCode.forumcode('[list]
+        [1]first
+        [1]second
+        [1]third
+        [/list]') %]
+    </li>
+    <li>
+        To create an <em>unordered list</em> use <code>[*]</code>
+        to mark list items.
+        <br />
+        <em>e.g.</em>
+        <br />
+        <q><code>[list]<br />
+                [*]apple<br />
+                [*]orange<br />
+                [*]banana<br />
+        [/list]</code></q>
+        <br />
+        produces:
+        [% ForumCode.forumcode('[list]
+        [*]apple
+        [*]orange
+        [*]banana
+        [/list]') %]
+    </li>
+</ul>
+<p><b>NOTE:</b> Separating elements with line-breaks is required.
+<q><code>[list] [*]apple [*]orange [*]banana [/list]</code></q> will output:<br />
+[% ForumCode.forumcode('[list] [*]apple [*]orange [*]banana [/list]') %]
+</p>
+
+<h3>Blocks and quoting</h3>
+<p>At times it can be useful to have blocks in a post that stand out in some
+way, or are a fixed width font - for posting code examples. This is where
+[pre]...[/pre], [code]...[/code] and [quote]...[/quote] come into play.</p>
+
+<ul class="help">
+    <li>
+        To mark a block of code as 'preformatted' use
+        <code>[pre]...[/pre]</code>:
+        <br />
+        <em>e.g.</em>
+        <br />
+        <q><code>[pre]Something interesting[/pre]</code></q>
+        produces
+        [% ForumCode.forumcode('[pre]Something interesting[/pre]') %]
+    </li>
+    <li>
+        To mark a block of code as 'code' use
+        <code>[code]...[/code]</code>:
+        <br />
+        <em>e.g.</em>
+        <br />
+        <q><code>[code]my $tt_forum  = Template::Plugin::ForumCode->new();[/code]</code></q>
+        produces
+        [% ForumCode.forumcode('[code]my $tt_forum  = Template::Plugin::ForumCode->new();[/code]') %]
+    </li>
+    <li>
+        To mark a block of code as 'quoted' use
+        <code>[quote]...[/quote]</code>:
+        <br />
+        <em>e.g.</em>
+        <br />
+        <q><code>[quote]Something someone said in an earlier post[/quote]</code></q>
+        produces
+        [% ForumCode.forumcode('[quote]Something someone said in an earlier post[/quote]') %]
+    </li>
+    <li>To specify the author of the quoted block use
+        <code>[quote quoting="name"]...[/quote]</code>:
+        <br />
+        <em>e.g.</em>
+        <br />
+        <q><code>[quote quoting="Chisel"]Something Chisel said in an earlier post[/quote]</code></q>
+        produces
+        [% ForumCode.forumcode('[quote quoting="Chisel"]Something Chisel said in an earlier post[/quote]') %]
+    </li>
+</ul>
+
+<h3>Linking to external resources</h3>
+<p>The forum software does NOT automatically hunt out all text resembling URLs
+to turn them into clickable links. If you want a clickable link in a post
+you need to use the [url]...[/url] code:</p>
+<ul class="help">
+    <li>
+        To make a URL appear as a clickable link use
+        <code>[url]http://...[/url]</code>:
+        <br />
+        <em>e.g.</em>
+        <br />
+        <q><code>[url]http://google.com/[/url]</code></q>
+        produces
+        [% ForumCode.forumcode('[url]http://google.com/[/url]') %]
+    </li>
+</ul>
+
+<p>You may also make a section of text appear as a named link by
+using the "name=..." attribute in the code block:</p>
+<ul class="help">
+    <li>
+        To make a URL appear as a names clickable link use
+        <code>[url <em>name="XXX"</em>]http://...[/url]</code>:
+        <br />
+        <em>e.g.</em>
+        <br />
+        <q><code>[url name="Google"]http://google.com/[/url]</code></q>
+        produces
+        [% ForumCode.forumcode('[url name="Google"]http://google.com/[/url]') %]
+    </li>
+</ul>
+
+<p>As well as inserting clickable links, you may also insert images into posts.</p>
+<ul class="help">
+    <li>
+        To make an image appear in a posting use
+        <code>[img]...[/img]</code>:
+        <br />
+        <em>e.g.</em>
+        <br />
+        <q><code>[img][%c.request.base%]static/images/btn_88x31_powered.png[/img]</code></q>
+        produces
+        <br />
+        [% ForumCode.forumcode("[img]${c.request.base}static/images/btn_88x31_powered.png[/img]") %]
+    </li>
+    <li>
+        You may also include extra attributes such as
+        <code>title=</code>, <code>alt=</code>, etc.
+        Research the HTML
+        <a href="http://www.w3schools.com/tags/tag_img.asp">&lt;img&gt; tag</a>
+        for the full list of attributes.
+        <br />
+        <q><code>[img title='Powered by Catalyst' width='50'][%c.request.base%]static/images/btn_88x31_powered.png[/img]</code></q>
+        produces
+        <br />
+        [% ForumCode.forumcode("[img title='Powered by Catalyst' width='50']${c.request.base}static/images/btn_88x31_powered.png[/img]") %]
+    </li>
+</ul>
+
+<h3>Colouring</h3>
+<p>One surefire way to annoy people to the point where they'd like to remove
+your internal organs with a spoon is to use lots of unnecessary colours in your posts.
+The ForumCode to invoke this reaction is
+<code>[colour=<em>code</em>]...[/colour]</code>. In the spirit of furthering international
+relations, those of you with a preference for American spellings may use <code>[color=<em>code</em>]...[/color]</code>.
+</p>
+<p><code><em>code</em></code> can be any of the following: red, orange, yellow, green, blue, black, white.</p>
+<p><code><em>code</em></code> can also be any #RGB or #RRGGBB HTML colour values.</p>
+
+<em>e.g.</em>
+<ul class="help">
+    <li>
+        <q><code>[colour=red]Red Text[/colour]</code></q>
+        produces
+        [% ForumCode.forumcode('[colour=red]Red Text[/colour]') %]
+    </li>
+    <li>
+        <q><code>[colour=#f00]Red Text[/colour]</code></q>
+        produces
+        [% ForumCode.forumcode('[colour=#f00]Red Text[/colour]') %]
+    </li>
+    <li>
+        <q><code>[colour=#ff0000]Red Text[/colour]</code></q>
+        produces
+        [% ForumCode.forumcode('[colour=#ff0000]Red Text[/colour]') %]
+    </li>
+    <li>
+        <q><code>[colour=blue]Blue Text[/colour]</code></q>
+        produces
+        [% ForumCode.forumcode('[colour=blue]Blue Text[/colour]') %]
+    </li>
+    <li>
+        <q><code>[colour=white]White Text[/colour]</code></q>
+        produces
+        [% ForumCode.forumcode('[colour=white]White Text[/colour]') %]
+        <br />(usually white-on-white text, useful for novice spies; highlight the
+        line to see the white-on-white text)
+    </li>
+</ul>

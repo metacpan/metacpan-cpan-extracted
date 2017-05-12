@@ -1,0 +1,85 @@
+Revision history for perl module PocketIO
+
+0.17 2014-01-07T20:29:26Z
+
+ - just meta files update
+
+0.16 2013-10-25T16:55:13Z
+
+ - Fixed bug when attempting to broadcast->send (mvgrimes)
+ - support method other than 'run' (tokubass)
+
+0.15 2012-12-30
+
+ - Fixed room stringification problem (Peter Stuifzand)
+ - Skip hanging test on windows
+
+0.14 2012-06-05
+
+ - Fixed exception handling bugs (Jason May)
+ - Provide the status code when throwing a websocket exception (Jason May)
+ - Added room support (Michael FiG)
+
+0.12 2012-01-25
+
+ - Fixed test requirements
+
+0.11 2012-01-24
+
+ - Fixed modules requirements
+
+0.10 2012-01-22
+
+ - Plack::Request is not required
+ - Twiggy is not required for testing
+ - Extracted SocketIO protocol into a separated distribution
+ - Return raw object but wrap exceptions middelware on the fly
+ - Fixed on_disconnect callback
+
+0.009008 2011-12-06
+
+ - Fixed websocket test
+
+0.009007 2011-12-03
+
+ - Fixed CPAN dist
+
+0.009006 2011-12-02
+
+ - Made message parsing more robust. Closes #GH-10
+ - Socket emit should emit client event not server
+ - Use exceptions
+ - Updated socket.io.js in example
+ - Increased connection timeout
+ - Require Protocol::WebSocket 0.9.5
+ - Increased connection timeout to 30s
+
+0.009005 2011-09-23
+
+ - CPAN release
+ - Redis pool backend
+ - Socket.IO 0.8 version support
+
+0.009004 2011-05-12
+
+ - Renamed to PocketIO
+ - Implemented as a Plack app instead of middleware
+ - Fixed UTF issues
+
+0.009003 2011-04-09
+
+ - It is possible to pass class name or instance and method instead of inline
+   handler
+ - Added heartbeat to WebSockets too
+
+0.009002 2011-03-29
+
+ - Fixed live tests
+
+0.009001 2011-03-28
+
+ - Fixed dependencies list
+
+0.009000 2011-03-16
+
+ - Initial release

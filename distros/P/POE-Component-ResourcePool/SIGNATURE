@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 717ae32f0af59bf11eda9d79afbeb6f7c223b61f Changes
+SHA1 8ffdd065c9abf5733af9dff13e2996a4b10992b9 MANIFEST
+SHA1 190e9058eb9c6446a1a3f3ddf15b082f1ecde152 MANIFEST.SKIP
+SHA1 7e494168ec80dc1439667f2d590a2216869a71f2 META.yml
+SHA1 56d2a984fd557c40158546e00bfbd09513332330 Makefile.PL
+SHA1 d207b336cd207f84f1be51ee8059f86c8383b61a lib/POE/Component/ResourcePool.pm
+SHA1 b5a1b42d5e7634c747c8f3f6ac92d0369d9c9cd5 lib/POE/Component/ResourcePool/Request.pm
+SHA1 95ffc4b02cab353e3db963786278739f04bcc385 lib/POE/Component/ResourcePool/Resource.pm
+SHA1 9daa1da4e6df4cc8a942b1c4cac53a37c87522e1 lib/POE/Component/ResourcePool/Resource/Collection.pm
+SHA1 a40c68526cd1e44015e6e045526567c5d9188119 lib/POE/Component/ResourcePool/Resource/Semaphore.pm
+SHA1 e1c907929773a965b515c8e314c50cc40da73a4e lib/POE/Component/ResourcePool/Resource/TryList.pm
+SHA1 a5398eaae0d9f06b113ad2b73c7b0aa9b3688c41 t/00_use.t
+SHA1 5d7f8a6ac63e3d72db485dc17d60a9723e302e7f t/basic.t
+SHA1 352c50a872da9e2ebc5b4bab7ca8a1c268eb0dbf t/collection.t
+SHA1 153f79e8922e42c7b28292920996b77d728ca817 t/fallback.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFKm5mwVCwRwOvSdBgRAso+AJ0f9QELaVcEtCOdoQRg1qqYrr+K3gCgszB+
+qAKsM7bd45AjSnYNJ15DMUk=
+=BdoE
+-----END PGP SIGNATURE-----

@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4cf784e255df621d886b36c371e1cf15998e0d93 AUTHOR_PLEDGE
+SHA1 19a4a2ad4a6daa62f9a79f1e69ae22d8c9086446 Build.PL
+SHA1 8783f9b6bb292c3a5157c30f89a1597ef4bd9525 Changes
+SHA1 9d3fc48fcd705a1beb9a4c221b44ba57aa2c12d6 CommitLog
+SHA1 ce26576217da1a3329550d29da3b7c6fcc151b02 INSTALL
+SHA1 e6514e4bc5abd3d1a8c7bd2a782c2f8737b413e7 LICENSE
+SHA1 bb1b11a78046192470a232ddf4af3a804ead90e6 MANIFEST
+SHA1 69b8a0accb85effa4bd5f4ea93e4f2386d10ac8b MANIFEST.SKIP
+SHA1 85b5dbee61e3d50f6437f6bbd1177ff050f57650 META.json
+SHA1 77fb07fd8f782ff245e09194ff39c90dbf4594bf META.yml
+SHA1 2a3e6176efb03204bfb81a8c02f680f24728e9cf Makefile.PL
+SHA1 9a27392a38639bec12c6e79d60113b1661716da5 README
+SHA1 07d85b89fe942c5d2a272aca3741f6c59353a943 cpanfile
+SHA1 2310a8cd08db1cf8dbd525b7269b1ba77f8fa203 dist.ini
+SHA1 b1d5a7d14fe669df42f900cb029983cc6c83e4a7 doap.xml
+SHA1 4fd6c73101a6c1a4ba437ccb11a8f52c41487ed2 examples/db.pl
+SHA1 92b3590663f20a4230974b0eccdfc0f06735fd01 lib/POE/Component/SimpleDBI.pm
+SHA1 68efb15759ac93f2fc5b1e10cec1a1999a42fb44 lib/POE/Component/SimpleDBI/SubProcess.pm
+SHA1 719ab1241a41c1c18af9764fe10d91811b3f83a0 t/00-compile.t
+SHA1 2af0dddb788cd30ef853dd36682139b779bf1079 t/00-report-prereqs.dd
+SHA1 2e210e6876b2065624cc6f651c781f4a6bb4de20 t/00-report-prereqs.t
+SHA1 303772f7a8e5630c0433d5bf58ad7a6717f948b1 t/apocalypse.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRaoXQACgkQGfr7vsGKgxxRjQCfS2dFEE+NCmGxtjhcjrFeXznO
+eiEAoKI/aTqTFrmupn4eGEhcbeq9ub9t
+=dGYd
+-----END PGP SIGNATURE-----

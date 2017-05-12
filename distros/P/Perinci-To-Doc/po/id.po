@@ -1,0 +1,175 @@
+# Indonesian translations for Perinci-Sub-To-Text package.
+# Copyright (C) 2013 Steven Haryanto
+# This file is distributed under the same license as the Perinci-Sub-To-Text package.
+# Automatically generated, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Perinci-Sub-To-Text 0.30\n"
+"Report-Msgid-Bugs-To: stevenharyanto@gmail.com\n"
+"POT-Creation-Date: 2013-12-12 16:35+0700\n"
+"PO-Revision-Date: 2013-12-12 12:31+0700\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ASCII\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Perinci/To/Text.pm:33 lib/Perinci/To/POD.pm:40
+msgid "Name"
+msgstr "Nama"
+
+#: lib/Perinci/To/Text.pm:46 lib/Perinci/To/POD.pm:53
+msgid "Version"
+msgstr "Versi"
+
+#: lib/Perinci/To/Text.pm:61 lib/Perinci/To/POD.pm:66
+msgid "Description"
+msgstr "Deskripsi"
+
+#: lib/Perinci/To/Text.pm:82 lib/Perinci/To/POD.pm:99
+msgid "Functions"
+msgstr "Fungsi"
+
+#: lib/Perinci/Sub/To/Text.pm:36 lib/Perinci/Sub/To/POD.pm:163
+msgid "Arguments"
+msgstr "Argumen"
+
+#: lib/Perinci/Sub/To/Text.pm:37 lib/Perinci/Sub/To/POD.pm:164
+msgid "'*' denotes required arguments"
+msgstr "'*' menandakan argumen wajib"
+
+#: lib/Perinci/Sub/To/Text.pm:51 lib/Perinci/Sub/To/POD.pm:177
+#: lib/Perinci/Sub/To/POD.pm:207
+msgid "default"
+msgstr "bawaan"
+
+#: lib/Perinci/Sub/To/Text.pm:67
+msgid "This function dies on error."
+msgstr "Fungsi ini die() jika menemui kesalahan."
+
+#: lib/Perinci/Sub/To/Text.pm:70 lib/Perinci/Sub/To/POD.pm:217
+msgid "Return value"
+msgstr "Nilai kembali"
+
+#: lib/Perinci/Sub/To/Text.pm:74
+msgid ""
+"Returns an enveloped result (an array).\n"
+"\n"
+"First element (status) is an integer containing HTTP status code\n"
+"(200 means OK, 4xx caller error, 5xx function error). Second element\n"
+"(msg) is a string containing error message, or 'OK' if status is\n"
+"200. Third element (result) is optional, the actual result. Fourth\n"
+"element (meta) is called result metadata and is optional, a hash\n"
+"that contains extra information."
+msgstr ""
+"Mengembalikan hasil terbungkus (larik).\n"
+"\n"
+"Elemen pertama (status) adalah bilangan bulat berisi kode status HTTP\n"
+"(200 berarti OK, 4xx kesalahan di pemanggil, 5xx kesalahan di fungsi). "
+"Elemen kedua\n"
+"(msg) adalah string berisi pesan kesalahan, atau 'OK' jika status\n"
+"200. Elemen ketiga (result) bersifat opsional, berisi hasil yang diinginkan. "
+"Elemen keempat\n"
+"(meta) disebut metadata hasil, bersifat opsional, berupa hash\n"
+"informasi tambahan."
+
+#: lib/Perinci/Sub/To/POD.pm:46
+msgid "Examples"
+msgstr "Contoh"
+
+#: lib/Perinci/Sub/To/POD.pm:107
+#, fuzzy
+msgid "This function supports reverse operation."
+msgstr "Fungsi ini mendukung operasi reverse."
+
+#: lib/Perinci/Sub/To/POD.pm:110
+msgid "Pass -reverse=>1 to reverse operation."
+msgstr "Berikan -reverse=>1 untuk operasi reverse."
+
+#: lib/Perinci/Sub/To/POD.pm:115
+#, fuzzy
+msgid "This function supports undo operation."
+msgstr "Fungsi ini mendukung operasi undo."
+
+#: lib/Perinci/Sub/To/POD.pm:119
+msgid ""
+"To undo, pass -undo_action=>'undo' to function. You will also need to pass "
+"-undo_data. For more details on undo protocol, see L<Rinci::Undo>."
+msgstr ""
+"Untuk undo, berikan -undo_action=>'undo' pada fungsi. Anda juga perlu memberikan "
+"-undo_data. Untuk detil tentang protokol undo, lihat L<Rinci::Undo>."
+
+#: lib/Perinci/Sub/To/POD.pm:127
+msgid ""
+"Required if you pass -undo_action=>'undo'. For more details on undo "
+"protocol, see L<Rinci::function::Undo>."
+msgstr ""
+"Diperlukan jika Anda memberikan -undo_action=>'undo'. Untuk detail tentang protokol "
+"undo, lihat L<Rinci::function::Undo>."
+
+#: lib/Perinci/Sub/To/POD.pm:133
+#, fuzzy
+msgid "This function supports dry-run operation."
+msgstr "Fungsi ini mendukung mode simulasi (dry-run)."
+
+#: lib/Perinci/Sub/To/POD.pm:136
+msgid "Pass -dry_run=>1 to enable simulation mode."
+msgstr "Berikan -dry_run=>1 untuk menghidupkan mode simulasi."
+
+#: lib/Perinci/Sub/To/POD.pm:139
+msgid "This function is pure (produce no side effects)."
+msgstr "Fungsi ini murni (pure, tidak menghasilkan efek samping)."
+
+#: lib/Perinci/Sub/To/POD.pm:141
+msgid "This function is immutable (returns same result for same arguments)."
+msgstr "Fungsi ini bersifat imutabel (immutable, mengembalikan hasil yang sama untuk argumen yang sama)."
+
+#: lib/Perinci/Sub/To/POD.pm:144
+msgid ""
+"This function is idempotent (repeated invocations with same arguments has "
+"the same effect as single invocation)."
+msgstr ""
+"Fungsi ini bersifat idempoten (idempotent, pemanggilan berulang kali "
+"dengan argumen yang sama efeknya seperti pemanggilan sekali)."
+
+#: lib/Perinci/Sub/To/POD.pm:151
+#, fuzzy
+msgid "This function supports transactions."
+msgstr "Fungsi ini mendukung transaksi."
+
+#: lib/Perinci/Sub/To/POD.pm:155
+msgid "For more information on transaction, see L<Rinci::Transaction>."
+msgstr "Untuk informasi lebih lanjut tentang transaksi, lihat L<Rinci::Transaction>."
+
+#: lib/Perinci/Sub/To/POD.pm:189
+#, fuzzy
+msgid "No arguments"
+msgstr "Tidak ada argumen"
+
+#: lib/Perinci/Sub/To/POD.pm:194
+#, fuzzy
+msgid "Special arguments"
+msgstr "Argumen khusus"
+
+#: lib/Perinci/Sub/To/POD.pm:220
+#, fuzzy
+msgid ""
+"Returns an enveloped result (an array). First element (status) is an integer "
+"containing HTTP status code (200 means OK, 4xx caller error, 5xx function "
+"error). Second element (msg) is a string containing error message, or 'OK' "
+"if status is 200. Third element (result) is optional, the actual result. "
+"Fourth element (meta) is called result metadata and is optional, a hash that "
+"contains extra information."
+msgstr ""
+"Mengembalikan hasil terbungkus (larik).\n"
+"\n"
+"Elemen pertama (status) adalah bilangan bulat berisi kode status HTTP\n"
+"(200 berarti OK, 4xx kesalahan di pemanggil, 5xx kesalahan di fungsi). "
+"Elemen kedua\n"
+"(msg) adalah string berisi pesan kesalahan, atau 'OK' jika status\n"
+"200. Elemen ketiga (result) bersifat opsional, berisi hasil yang diinginkan. "
+"Elemen keempat\n"
+"(meta) disebut metadata hasil, bersifat opsional, berupa hash\n"
+"informasi tambahan."

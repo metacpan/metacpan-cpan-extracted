@@ -1,0 +1,55 @@
+Revision history for perl module PDF::Cropmarks
+
+0.11 2016-11-11
+
+ - Carry on metadata from input to output
+
+0.10 2016-11-01
+
+ - Optimization: load fonts once.
+
+0.09 2016-03-12
+
+ - Bumped dependency on PDF::API2 with xref support
+ - Removed depedency on CAM::PDF
+
+0.08 2016-02-13
+
+ - Added middle marks. Handy if the height or width is the same of the
+   original paper, as the cropmarks wouldn't be visible at all.
+
+0.07 2016-01-12
+
+ - Fixed memory cycles test which was loading an unneeded module
+
+0.06 2016-01-12
+
+ - Added cover option
+ - Removed redundant/useless tests
+
+0.05 2016-01-08
+
+ - Added title option
+
+0.04 2015-12-24
+
+ - Fixed rounding of 0 (or equivalent) RT#110566
+ - Do not require 5.10.1
+ - Do not require PDF::Imposition
+
+0.03 2015-12-22
+
+ - New option: signature
+ - New option: paper_thickness
+
+With these options you can tweak the correction for the trimming.
+
+0.02 2015-12-22
+
+ - Fixed missing dependency in Makefile
+
+0.01 2015-12-21
+
+ - Initial release
+
+

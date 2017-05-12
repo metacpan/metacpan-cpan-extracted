@@ -1,0 +1,147 @@
+#!/usr/bin/perl
+#Copyright (c) 2009, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Plugtools;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+        print "plgadd 0.0.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+        print "\n".
+		      "-g <group name>  - The group to add.\n".
+			  "-G <GID>  - The GID to use for the group.\n".
+			  "-l  - If \$entry->dump should be called for a newly created entry.\n".
+			  "\n".
+			  "For more info, see the the perldocs for Plugtools and plgadd...\n".
+			  "perldoc plgadd\n".
+			  "perldoc Plugtools\n";
+}
+
+#gets the options
+my %opts=();
+getopts('g:G:l', \%opts);
+
+if (!defined($opts{g})) {
+	warn('plgadd:254: No group name specified');
+	exit 254;
+}
+
+my $pt=Plugtools->new;
+if ($pt->{error}) {
+	warn('plgadd: Failed to initialize the Plugtools object');
+	exit $pt->{error};
+}
+
+$pt->addGroup({
+			   group=>$opts{g},
+			   gid=>$opts{G},
+			   dump=>$opts{l},
+			  });
+if ($pt->{error}) {
+	warn('plgadd: addGroup errored');
+	exit $pt->{error};
+}
+exit 0;
+
+=head1 NAME
+
+plgadd - Add a new group to LDAP.
+
+=head1 SYNOPSIS
+
+plgadd B<-g> <group> [B<-g> <gid>] [B<-l>]
+
+=head1 SWITCHES
+
+=head2 -g <group>
+
+This specifies the group to add.
+
+=head2 -l
+
+If this is specified, any modified LDAP entry is printed to STDOUT.
+
+=head2 -g <gid>
+
+The GID for the group.
+
+=head1 EXIT CODES
+
+If the exit code is not listed below, it is what was the error code returned by Plugtools.
+
+=head2 254
+
+No group specified.
+
+=head1 AUTHOR
+
+Copyright (c) 2009, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+xFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 SCRIPT CATEGORIES
+
+UNIX : System_administration
+
+=head1 OSNAMES
+
+any
+
+=head2 SEE ALSO
+
+Plugtools
+
+=head1 README
+
+plgadd - Add a new group to LDAP.
+
+=cut

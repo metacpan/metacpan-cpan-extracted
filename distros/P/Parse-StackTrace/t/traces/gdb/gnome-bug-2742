@@ -1,0 +1,7 @@
+/local/gnu/lib/X11/gimp/1.1/plug-ins/script-fu: Segmentation fault caught
+/local/gnu/lib/X11/gimp/1.1/plug-ins/script-fu (pid:1415): [E]xit, [H]alt, show
+[S]tack trace or [P]roceed: S
+#0  0x30001013cbc in g_on_error_stack_trace (
+#1  0x30001013b8c in g_on_error_query (
+#2  0x3000180c958 in gimp_request_wakeups ()
+#3  <signal handler called>

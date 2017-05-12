@@ -1,0 +1,17 @@
+2010-03-17  Yves Blusseau  <yblusseau@cpan.org>
+
+	* Version 0.13 released
+	* lib/POE/Filter/BigBrother.pm (get_one_start): improve performance
+	(get_one): likewise
+	* t/01_BigBrother.t: add a test to check messages with newlines in combo
+
+2008-11-10  Yves BLUSSEAU  <yblusseau@cpan.org>
+	
+	* Version 0.12 released
+	* lib/POE/Filter/BigBrother.pm: Remove leading NULL characters from streams 
+
+2008-06-24  Yves BLUSSEAU  <yblusseau@cpan.org>
+
+	* Version 0.11 released 
+	* Makefile.PL: add the license tag. 
+

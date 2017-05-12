@@ -1,0 +1,53 @@
+---
+abstract: 'Some add-on policies for Perl::Critic.'
+author:
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Pulp
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+    - xt
+  package:
+    - Perl::MinimumVersion
+optional_features:
+  maximum_policies:
+    description: 'Have the policies check as much as possible.'
+    requires:
+      Perl::MinimumVersion: '0'
+requires:
+  IO::String: '1.02'
+  List::MoreUtils: '0.24'
+  List::Util: '0'
+  PPI: '1.220'
+  PPI::Document: '0'
+  PPI::Dumper: '0'
+  Perl::Critic: '1.084'
+  Perl::Critic::Policy: '1.084'
+  Perl::Critic::Utils: '1.100'
+  Perl::Critic::Utils::PPI: '0'
+  Perl::Critic::Violation: '0'
+  Pod::Escapes: '0'
+  Pod::MinimumVersion: '50'
+  Pod::ParseLink: '0'
+  Pod::Parser: '0'
+  Scalar::Util: '0'
+  Test::More: '0'
+  perl: '5.006'
+  version: '0'
+resources:
+  homepage: http://user42.tuxfamily.org/perl-critic-pulp/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '93'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

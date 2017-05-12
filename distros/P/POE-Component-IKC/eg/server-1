@@ -1,0 +1,43 @@
+#!/usr/bin/perl -w
+use strict;
+
+use lib qw(blib/lib blib/arch);
+
+use POE qw(Session);
+use POE::Component::IKC::Server;
+use POE::Component::IKC::Specifier;
+
+POE::Component::IKC::Server->spawn(
+    port=>6666,
+    name=>'Pulse',
+    processes=>5,
+    babysit=>30,
+    verbose=>1,
+    connections=>3);
+
+POE::Session->create(
+    inline_states => {
+        _start => sub {
+                my($kernel, $heap, $arg)=@_[KERNEL, HEAP, ARG0];
+                $heap->{listeners}={};
+                $kernel->alias_set('Service');
+                $kernel->call('IKC', 'publish',  'Service',
+                                [qw(event)]);
+            },
+        _stop => sub {
+                warn "$$: _stop";
+            },
+        event => sub {
+                my($kernel, $heap, $args)=@_[KERNEL, HEAP, ARG0];
+                my $p=$args->[0];
+                my $rsvp=$args->[1];
+                warn "event $p";
+                $kernel->post( IKC => 'post', 
+                                $rsvp, { hello => $p->{Hi} } );
+            },
+    }
+);
+
+print "$$: Running server...\n";
+$poe_kernel->run();
+print "$$: Server exited...\n";

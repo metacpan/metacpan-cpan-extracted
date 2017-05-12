@@ -1,0 +1,30 @@
+<!-- Footer : Start -->
+            </div><!-- id="bd" -->
+
+            <div id="ft">
+                <p>
+This is skin2. Here's an annoying addition to the footer<br />
+                <a href="http://developer.berlios.de/projects/parley">[%c.config.name%]</a>
+                (version [%c.config.version%])
+                &copy; Chisel Wright 2006-2008. [%l('All Rights Reserved')%].
+                </p>
+            </div><!-- id="ft" -->
+
+            <span style="display: block; float: right; margin-right: 20px; margin-top: 5px;">
+                <a href="http://catalystframework.org"><img
+                    src="static/images/btn_88x31_powered.png"
+                    width="88"
+                    height="31"
+                    alt="Powered By Catalyst"
+                    style="border: none;"
+                    /></a>
+            </span>
+            [% PROCESS shared/search_dialog %]
+            [% PROCESS shared/small_loading_please_wait %]
+            [% PROCESS shared/login_dialog %]
+            [% PROCESS shared/language_dialog %]
+        </div><!-- id="doc3" -->
+    </body>
+</html>
+<!-- Footer : End -->
+

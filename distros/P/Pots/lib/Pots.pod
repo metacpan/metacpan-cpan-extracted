@@ -1,0 +1,40 @@
+=head1 NAME
+
+Pots - Perl ObjectThreads
+
+=head1 DESCRIPTION
+
+This module collection aims to provide an object-oriented way
+of working with Perl ithreads.
+
+Current features are:
+
+- Inter-thread communication through messages and message-queues
+
+- A simple "MethodServer" class that exposes a standard class to
+  other threads. Method calls are automatically handled.
+  (Kind of RPC for threads)
+
+=head1 AKNOWLEDGMENTS
+
+Thanks to Elizabeth Mattijsen for help on shared variables.
+
+Some code in this package is based on/revamped from:
+
+  Michael G Schwern's "Class::Accessor"
+  Jochen Wiedmann's "RPC::PlClient"
+
+=head1 SEE ALSO
+
+C<Pots::Tutorial> for an introduction on how to use this package.
+
+=head1 AUTHOR and COPYRIGHT
+
+Remy Chibois E<lt>rchibois at free.frE<gt>
+
+Copyright (c) 2004 Remy Chibois. All rights reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+=cut
+

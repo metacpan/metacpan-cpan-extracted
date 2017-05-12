@@ -1,0 +1,5 @@
+--- !!perl/hash:Octothorpe
+colon: "vronk"
+hyphen: 1
+apostrophe: !!perl/hash:Ampersand
+  interpunct: 42

@@ -1,0 +1,469 @@
+=head1 NOME
+
+perl - Practical Extraction and Report Language [Linguaggio Pratico di Estrazione e Report, NdT]
+
+=head1 SINOSSI
+
+B<perl>	S<[ B<-sTuU> ]> S<[ B<-hv> ] [ B<-V>[:I<variabilediconfigurazione>] ]>
+    S<[ B<-cw> ] [ B<-d>[:I<debugger>] ] [ B<-D>[I<numero/lista>] ]>
+    S<[ B<-pna> ] [ B<-F>I<pattern> ] [ B<-l>[I<ottale>] ] [ B<-0>[I<ottale>] ]>
+    S<[ B<-I>I<directory> ] [ B<-m>[B<->]I<modulo> ] [ B<-M>[B<->]I<'modulo...'> ]>
+    S<[ B<-P> ]> S<[ B<-S> ]> S<[ B<-x>[I<directory>] ]>
+    S<[ B<-i>[I<estensione>] ]> S<[ B<-e> I<'comando'> ] [ B<--> ]
+    [ I<filedelprogramma> ] [ I<argomento> ]...>
+
+Se per voi il Perl E<egrave> una novitE<agrave>, dovreste iniziare con L<perlintro>,
+una introduzione per principianti che fornisce qualche informazione generale per aiutarvi a
+consultare il resto dell'ampia documentazione.
+
+Per facilitarne l'accesso, il manuale del Perl E<egrave> stato suddiviso in diverse parti.
+
+=head2 In generale
+
+    perl		Perl in generale (questa parte)
+    perlintro		Introduzione al Perl per principianti
+    perltoc		Sommario della documentazione del Perl
+
+=head2 Tutorial
+
+    perlreftut		Breve introduzione ai riferimenti in Perl
+    perldsc		Introduzione alle strutture dati del Perl
+    perllol		Strutture dati del Perl: liste di liste
+
+    perlrequick 	Espressioni regolari in Perl in una breve sintesi
+    perlretut		Tutorial alle espressioni regolari in Perl
+
+    perlboot		Tutorial per principianti al Perl orientato agli oggetti
+    perltoot		Tutorial al Perl orientato agli oggetti, prima parte
+    perltooc		Tutorial al Perl orientato agli oggetti, seconda parte
+    perlbot		Perl orientato agli oggetti, trucchi ed esempi
+
+    perlstyle		Guida allo stile in Perl
+
+    perlcheat		Promemoria Perl
+    perltrap		Trappole del Perl per gli incauti
+    perldebtut		Tutorial al debugging in Perl
+
+    perlfaq		Perl FAQ: risposte alla domande più frequenti
+      perlfaq1		Domande generali sul Perl
+      perlfaq2		Ottenere ed imparare Perl
+      perlfaq3		Strumenti di programmazione
+      perlfaq4		Manipolazione dei dati
+      perlfaq5		File e formati
+      perlfaq6		Espressioni regolari
+      perlfaq7		Questioni generali sul linguaggio Perl
+      perlfaq8		Interazione con il sistema
+      perlfaq9		Programmazione di rete
+
+=head2 Guida di riferimento
+
+    perlsyn		Sintassi Perl
+    perldata		Strutture dati in Perl
+    perlop		Operatori e precedenza in Perl
+    perlsub		Subroutine in Perl
+    perlfunc		Funzioni predefinite del Perl
+      perlopentut	Tutorial all'open() di Perl
+      perlpacktut	Tutorial per pack() e unpack()
+    perlpod		Documentazione POD (plain old documentation) di programmi Perl
+    perlpodspec 	Specifiche di formattazione della documentazione POD di programmi Perl
+    perlrun		L'esecuzione del Perl e le opzioni
+    perldiag		Messaggi di diagnostica del Perl
+    perllexwarn 	Gli warning del Perl e il loro controllo
+    perldebug		Debugging del Perl
+    perlvar		Variabili predefinite in Perl
+    perlre		Espressioni regolari in Perl, il resto della storia
+    perlreref		Guida veloce alle espressioni regolari in Perl
+    perlref		Riferimenti in Perl, il resto della storia
+    perlform		Formati in Perl
+    perlobj		Oggetti in Perl
+    perltie		Oggetti Perl nascosti dietro a semplici variabili
+      perldbmfilter	Filtri DBM in Perl
+
+    perlipc		Comunicazione tra processi in Perl
+    perlfork		Informazioni su fork() in Perl
+    perlnumber		Semantica dei numeri in Perl
+
+    perlthrtut		Tutorial ai thread in Perl
+      perlothrtut	Vecchio tutorial ai thread in Perl
+
+    perlport		Guida alla portabilita` del codice Perl
+    perllocale		Supporto del Perl al locale 
+    perluniintro	Introduzione al Perl per Unicode
+    perlunicode 	Supporto del Perl per Unicode
+    perlebcdic		Considerazioni sull'esecuzione di codice Perl su piattaforme EBCDIC
+
+    perlsec		Perl e sicurezza
+
+    perlmod		Moduli Perl: come funzionano
+    perlmodlib		Moduli Perl: come scriverli e usarli
+    perlmodstyle	Moduli Perl: come scriverli con stile
+    perlmodinstall	Moduli Perl: come installarli da CPAN
+    perlnewmod		Moduli Perl: preparare un nuovo modulo per la distribuzione
+
+    perlutil		Utilita` incluse nella distribuzione del Perl
+
+    perlcompile 	Introduzione al compilatore del Perl
+
+    perlfilter		Filtri del sorgente del Perl
+
+    perlglossary	Glossario del Perl
+
+=head2 Questioni interne e interfaccia con il linguaggio C
+
+    perlembed		Modalita` di inclusione di codice Perl in applicazioni C o C++
+    perldebguts 	Meccanismi e suggerimenti al debugging del Perl
+    perlxstut		Tutorial a XS in Perl
+    perlxs		Interfaccia del Perl alla programmazione delle applicazioni in XS
+    perlclib		Sostituzione interna per librerie standard di funzioni C
+    perlguts		Funzioni interne del Perl per coloro che sviluppano estensioni
+    perlcall		Convenzioni di chiamata di Perl da C
+
+    perlapi		Lista delle API Perl (autogenerata)
+    perlintern		Funzioni interne del Perl (autogenerata)
+    perliol		API C per l'implementazione in perl di IO in layer (NdT: strati)
+    perlapio		Interfaccia all'astrazione IO interna del Perl
+
+    perlhack		Guida all'"hacking" del Perl
+
+=head2 Varie
+
+    perlbook		Informazioni di libri sul Perl
+    perltodo		Cose da fare sul Perl
+
+    perldoc		Look up Perl documentation in Pod format
+
+    perlhist		Registrazioni storiche di Perl
+    perldelta		Modifiche del Perl dalla versione precedente
+    perl587delta	Modifiche del Perl nella versione 5.8.7
+    perl586delta	Modifiche del Perl nella versione 5.8.6
+    perl585delta	Modifiche del Perl nella versione 5.8.5
+    perl584delta	Modifiche del Perl nella versione 5.8.4
+    perl583delta	Modifiche del Perl nella versione 5.8.3
+    perl582delta	Modifiche del Perl nella versione 5.8.2
+    perl581delta	Modifiche del Perl nella versione 5.8.1
+    perl58delta 	Modifiche del Perl nella versione 5.8.0
+    perl573delta	Modifiche del Perl nella versione 5.7.3
+    perl572delta	Modifiche del Perl nella versione 5.7.2
+    perl571delta	Modifiche del Perl nella versione 5.7.1
+    perl570delta	Modifiche del Perl nella versione 5.7.0
+    perl561delta	Modifiche del Perl nella versione 5.6.1
+    perl56delta 	Modifiche del Perl nella versione 5.6
+    perl5005delta	Modifiche del Perl nella versione 5.005
+    perl5004delta	Modifiche del Perl nella versione 5.004
+
+    perlartistic	Diritti d'autore sul Perl
+    perlgpl		Licenza pubblica generica (GNU)
+
+=head2 Lingue straniere
+
+    perlcn		Perl per la lingua cinese semplificata (EUC-CN)
+    perljp		Perl per la lingua giapponese (EUC-JP)
+    perlko		Perl per la lingua coreana (in EUC-KR)
+    perltw		Perl per la lingua cinese trazizionale (Big5)
+
+=head2 Piattaforme
+
+    perlaix		Osservazioni sul Perl per AIX
+    perlamiga		Osservazioni sul Perl per AmigaOS
+    perlapollo		Osservazioni sul Perl per Apollo DomainOS
+    perlbeos		Osservazioni sul Perl per BeOS
+    perlbs2000		Osservazioni sul Perl per POSIX-BC BS2000
+    perlce		Osservazioni sul Perl per WinCE
+    perlcygwin		Osservazioni sul Perl per Cygwin
+    perldgux		Osservazioni sul Perl per DG/UX
+    perldos		Osservazioni sul Perl per DOS
+    perlepoc		Osservazioni sul Perl per EPOC
+    perlfreebsd 	Osservazioni sul Perl per FreeBSD
+    perlhpux		Osservazioni sul Perl per HP-UX
+    perlhurd		Osservazioni sul Perl per Hurd
+    perllinux		Osservazioni sul Perl per Linux
+    perlirix		Osservazioni sul Perl per Irix
+    perlmachten 	Osservazioni sul Perl per Power MachTen
+    perlmacos		Osservazioni sul Perl per Mac OS (Classic)
+    perlmacosx		Osservazioni sul Perl per Mac OS X
+    perlmint		Osservazioni sul Perl per MiNT
+    perlmpeix		Osservazioni sul Perl per MPE/iX
+    perlnetware 	Osservazioni sul Perl per NetWare
+    perlopenbsd 	Osservazioni sul Perl per OpenBSD
+    perlos2		Osservazioni sul Perl per OS/2
+    perlos390		Osservazioni sul Perl per OS/390
+    perlos400		Osservazioni sul Perl per OS/400
+    perlplan9		Osservazioni sul Perl per Plan 9
+    perlqnx		Osservazioni sul Perl per QNX
+    perlsolaris 	Osservazioni sul Perl per Solaris
+    perltru64		Osservazioni sul Perl per Tru64
+    perluts		Osservazioni sul Perl per UTS
+    perlvmesa		Osservazioni sul Perl per VM/ESA
+    perlvms		Osservazioni sul Perl per VMS
+    perlvos		Osservazioni sul Perl per Stratus VOS
+    perlwin32		Osservazioni sul Perl per Windows
+
+Di regola le pagine di documentazione sopraelencate sono installate
+nella directory F</usr/local/man/>.
+
+E<Egrave> disponibile una documentazione aggiuntiva specifica per i moduli Perl.
+La configurazione standard del Perl prevede il posizionamento di tale
+documentazione nella directory F</usr/local/lib/perl5/man> (altrimenti
+nella sottodirectory F<man> nella directory riservata ai moduli).
+Parte di questa documentazione aggiuntiva E<egrave> inclusa nella distribuzione
+standard del Perl, ma E<egrave> possibile che sia inclusa anche documentazione
+di moduli sviluppati da terze parti.
+
+Dovreste essere in grado di vedere la documentazione del Perl con il
+vostro programma man(1) avendo inserito le giuste directory negli appropriati
+file di inizializzazione o nella variabile di ambiente MANPATH.
+Per sapere dove sono installate le documentazioni secondo la vostra
+configurazione, digitate:
+
+    perl -V:man.dir
+
+Se le directory hanno una derivazione in comune, del tipo
+F</usr/local/man/man1> e F</usr/local/man/man>, E<egrave> sufficiente aggiungere
+tale derivazione (F</usr/local/man>) ai file di inizializzazione di
+man(1) o nella variabile di ambiente MANPATH. In caso contrario,
+E<egrave> necessario aggiungere l'indicazione di entrambe.
+
+Se per qualche ragione non dovesse funzionare, potreste sempre usare
+lo script F<perldoc> fornito per visualizzare informazioni sui moduli.
+Potreste anche prendere in considerazione una rimpiazzo per il
+programma man.
+
+Se qualcosa va storto con il vostro programma e non siete sicuri su dove
+cercare aiuto, provate prima l'opzione B<-w>. Molto spesso fornirE<agrave> esatte
+indicazioni su dove E<egrave> localizzato il problema.
+
+=head1 DESCRIZIONE
+
+Il Perl E<egrave> un linguaggio ottimizzato per la scansione di qualsivoglia
+file di testo, per l'estrazione di informazioni da questi file, e per
+la stampa di report basati su tale informazione. E<Egrave> inoltre un buon
+linguaggio per finalitE<agrave> di amministrazione di sistemi. Il linguaggio
+E<egrave> volto piE<ugrave> alla praticitE<agrave> (facile da usare, efficiente, completo)
+che alla bellezza (breve, elegante, minimale).
+
+Il Perl combina (opinione dell'autore, almeno) alcune delle migliori
+caratteristiche del C, B<sed>, B<awk>, e B<sh>, in modo tale che chi ha
+dimestichezza con questi linguaggi dovrebbe avere poche difficoltE<agrave>.
+(Gli storici dei linguaggi troveranno anche alcune vestigia di B<csh>,
+Pascal, e pure BASIC-PLUS.) La sintassi delle espressioni ha una
+forte somiglianza con quella del C. A differenza di molte utility
+di Unix, il Perl non limita arbitrariamente le dimensioni dei vostri
+dati; se disponete di sufficiente memoria, Perl puE<ograve> accalappiare l'intero
+vostro file come una singola stringa. La ricorsione ha
+profonditE<agrave> illimitata. E le tabelle utilizzate per gli hash
+(talvolta chiamate "array associativi") crescono - se necessario -
+per prevenire peggioramenti in termini di performance.
+Il Perl puE<ograve> utilizzare tecniche sofisticate di pattern matching per
+la scansione veloce di grandi quantitE<agrave> di dati. Sebbene ottimizzato
+per la scansione di testi, Perl puE<ograve> anche trattare dati in forma
+binaria e puE<ograve> fare in modo da trattare come hash i file "dbm".
+Gli script "setuid" in Perl sono piE<ugrave> sicuri degli equivalenti in C
+a causa di un meccanismo di tracciamento del dataflow che previene
+diverse stupide falle di sicurezza.
+
+Se avete un problema che richiederebbe l'uso di B<sed> o B<awk> o
+B<sh>, ma eccede le loro capacitE<agrave> o volete che venga risolto un
+po' piE<ugrave> velocemente, e non volete scrivere stupidaggini in C,
+allora il Perl potrebbe fare al caso vostro. Esistono anche dei
+traduttori per trasformare i vostri script B<sed> e B<awk> in
+codice Perl.
+
+Ma aspettate, c'E<egrave> dell'altro...
+
+Nel 1993 (si veda L<perlhist>) E<egrave> iniziata una riscrittura quasi completa
+della versione 5 del Perl che comporta i seguenti benefici addizionali:
+
+=over 4
+
+=item *
+
+modularitE<agrave> e riusabilitE<agrave> utilizzando innumerevoli moduli
+
+Descritto in L<perlmod>, L<perlmodlib>, e L<perlmodinstall>.
+
+=item *
+
+integrabilitE<agrave> e estendibilitE<agrave>
+
+Descritto in L<perlembed>, L<perlxstut>, L<perlxs>, L<perlcall>,
+L<perlguts>, e L<xsubpp>.
+
+=item *
+
+variabili magiche fai-da-te (incluse multiple implementazioni DBM simultanee)
+
+Descritto in L<perltie> e L<AnyDBM_File>.
+
+=item *
+
+le subroutine possono adesso essere overridden, autoloaded, e prototipizzate
+
+Descritto in L<perlsub>.
+
+=item *
+
+strutture dati arbitrariamente annidate e funzioni anonime
+
+Descritto in L<perlreftut>, L<perlref>, L<perldsc>, e L<perllol>.
+
+=item *
+
+programmazione orientata agli oggetti
+
+Descritto in L<perlobj>, L<perlboot>, L<perltoot>, L<perltooc>,
+e L<perlbot>.
+
+=item *
+
+supporto per processi light-weight [leggeri, NdT] (thread)
+
+Descritto in L<perlthrtut> e L<threads>.
+
+=item *
+
+supporto per Unicode, internazionalizzazione e localizzazione
+
+Descritto in L<perluniintro>, L<perllocale> e L<Locale::Maketext>.
+
+=item *
+
+scoping lessicale
+
+Descritto in L<perlsub>.
+
+=item *
+
+miglioramenti alle espressioni regolari
+
+Descritto in L<perlre>, con esempi addizionali in L<perlop>.
+
+=item *
+
+enhanced debugger e ambiente Perl interattivo, con supporto integrato all'editor
+
+Descritto in L<perldebtut>, L<perldebug> e L<perldebguts>.
+
+=item *
+
+libreria conforme a POSIX 1003.1
+
+Descritto in L<POSIX>.
+
+=back
+
+Ok, di promozione ce n'E<egrave> I<veramente> abbastanza.
+
+=head1 DISPONIBILITE<Agrave>
+
+Perl E<egrave> disponibile per piE<ugrave> sistemi operativi, incluse virtualmente
+tutte le piattaforme che si basano su Unix.
+Si veda L<perlport/"Supported Platforms"> ["Piattaforme supportate", NdT] per un elenco.
+
+=head1 AMBIENTE
+
+Si veda L<perlrun>.
+
+=head1 AUTORE
+
+Larry Wall <larry@wall.org>, con l'aiuto di suggerimenti di altra gente.
+
+Se le vostre storie e testimonianze di successo con Perl possono essere
+di aiuto ad altri che desiderano raccomandare l'uso del Perl nelle loro
+applicazioni, o se desiderate semplicemente esprimere la vostra gratitudine
+a Larry e agli sviluppatori del Perl, scrivete a perl-thanks@perl.org.
+
+=head1 FILE
+
+ "@INC"			posizionamenti delle librerie Perl
+
+=head1 SI VEDA ANCHE
+
+ a2p	traduttore da awk a perl
+ s2p	traduttore da sed a perl
+
+ http://www.perl.org/       la homepage di Perl
+ http://www.perl.com/       articoli sul Perl (O'Reilly)
+ http://www.cpan.org/       l'archivio completo del Perl
+ http://www.pm.org/         i Perl "Mongers"
+
+=head1 DIAGNOSTICHE
+
+L'utilizzo della direttiva C<use warnings>  (e dell'opzione B<-w>)
+produce qualche diagnostica carina.
+
+Si veda L<perldiag> per una spiegazione di tutte le diagnostiche del
+Perl. La direttiva C<use diagnostics> trasforma automaticamente gli warning
+concisi del Perl e gli errori, in queste forme piE<ugrave> estese.
+
+Gli errori di compilazione indicheranno il numero della linea di codice
+che ha causato l'errore, con una indicazione del simbolo successivo o
+del tipo di simbolo che avrebbe dovuto essere esaminato.
+(In ogni script eseguito con l'opzione B<-e>, ogni B<-e> E<egrave> contato come
+una linea).
+
+Gli script "setuid" hanno restrizioni addizionali che possono produrre
+messaggi di errore del tipo "Insecure dependency" ["dipendenza rischiosa", NdT]. Si veda L<perlsec>.
+
+Abbiamo menzionato che E<egrave> caldamente consigliato l'uso dell'opzione B<-w>?
+
+=head1 BUG
+
+L'opzione B<-w> non E<egrave> obbligatoria.
+
+Il Perl E<egrave> alla mercE<eacute> di come la vostra macchina definisce varie
+operazioni come casting dei tipi, atof(), e output di floating-point
+con sprintf().
+
+Se la vostra stdio richiede un seek o un eof tra letture e scritture
+su uno certo stream, la stessa cosa vale per il Perl. (CiE<ograve> non vale per
+sysread() e syswrite()).
+
+BenchE<eacute> nessuno dei tipi di dato primitivi abbia un qualche limite in
+termini di dimensioni (ad eccezione della memoria disponibile), ci sono
+sempre alcuni limiti: il nome delle variabili non puE<ograve> essere piE<ugrave> lungo
+di 251 caratteri. I numeri di linea visualizzati per le diagnostiche sono
+memorizzati internamente come short integers (interi), per cui sono
+limitati fino a un massimo di 65535 (numeri maggiori di solito sono
+tagliati).
+
+Potete spedire i vostri bug report (siate sicuri di includere
+l'informazione completa sulla configurazione cosE<igrave> come viene
+riportata in output dal programma myconfig nella directory del
+sorgente del Perl, o eseguendo C<perl -V>) a perlbug@perl.org.
+Se avete compilato Perl con successo, lo script B<perlbug> nelle
+F<utils/> sottodirectory puE<ograve> essere usato come aiuto per spedire
+un bug report.
+
+Perl in realtE<agrave> sta per Pathologically Eclectic Rubbish Lister
+["patologicamente eclettico elencatore di robaccia", NdT], ma non
+dite a nessuno che ve l'ho detto.
+
+=head1 ANNOTAZIONI
+
+Il motto del Perl E<egrave> "C'E<egrave> piE<ugrave> di un modo per farlo".
+Indovinare quanti modi in piE<ugrave> E<egrave> lasciato per esercizio al lettore.
+
+Le tre principali virtE<ugrave> di un programmatore sono Pigrizia,
+Impazienza e Arroganza. Si veda il perchE<eacute> nel libro del cammello.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perl
+
+Per maggiori informazioni sul progetto di traduzione
+in italiano si veda http://pod2it.sourceforge.net/ .
+
+=head2 Traduttore
+
+Traduzione a cura di Raffaello Galli <galliraf at
+googlemail punto com>.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

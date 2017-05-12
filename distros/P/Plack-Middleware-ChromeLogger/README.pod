@@ -1,0 +1,51 @@
+=encoding utf8
+
+
+This is Perl module B<Plack::Middleware::ChromeLogger>.
+
+=begin html
+
+<a href="http://travis-ci.org/bayashi/Plack-Middleware-ChromeLogger"><img src="https://secure.travis-ci.org/bayashi/Plack-Middleware-ChromeLogger.png"/></a> <a href="https://coveralls.io/r/bayashi/Plack-Middleware-ChromeLogger"><img src="https://coveralls.io/repos/bayashi/Plack-Middleware-ChromeLogger/badge.png?branch=master"/></a>
+
+=end html
+
+
+=head1 INSTALLATION
+
+Plack::Middleware::ChromeLogger installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Plack::Middleware::ChromeLogger
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+
+=head1 DOCUMENTATION
+
+Plack::Middleware::ChromeLogger documentation is available as in POD. So you can do:
+
+    % perldoc Plack::Middleware::ChromeLogger
+
+
+=head1 REPOSITORY
+
+Plack::Middleware::ChromeLogger is hosted on github
+L<http://github.com/bayashi/Plack-Middleware-ChromeLogger>
+
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>

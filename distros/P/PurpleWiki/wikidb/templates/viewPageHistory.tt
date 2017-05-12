@@ -1,0 +1,10 @@
+[% INCLUDE common/header.tt
+           title = "History of $pageName"
+%]
+
+<p>If you "Edit" any of the revisions below, your changes will create
+a new version.  It will not overwrite the previous revision.</p>
+
+[% INCLUDE lib/pageHistory.tt %]
+
+[% INCLUDE common/footer.tt %]

@@ -1,0 +1,45 @@
+%{
+
+=head1  SYNOPSIS
+
+Minimal example of a Reduce-Reduce conflict
+
+Compile it with:
+
+   eyapp -b '' minimalrr2.eyp
+
+Execute it with:
+
+   ./minimalrr.pm -t
+
+=head1 SEE ALSO
+
+  File C<minimalrr.eyp>
+
+=cut
+
+use base q{DebugTail}; 
+%}
+
+%tree
+
+%start s
+
+%%
+A:
+      %name A_is_a
+      'a'
+;
+
+s:
+      %name S_is_a
+      'a'
+    | %name A
+      A
+;
+%%
+
+unless (caller) {
+  my $prompt = 'Try "a" and press <CR><CTRL-D>: ';
+  __PACKAGE__->main($prompt)
+}

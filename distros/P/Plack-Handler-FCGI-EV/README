@@ -1,0 +1,23 @@
+NAME
+    Plack::Handler::FCGI::EV - PSGI handler for FCGI::EV
+
+SYNOPSIS
+      > plackup -s FCGI::EV --listen :8080 myapp.psgi
+
+DESCRIPTION
+    Plack::Handler::FCGI::EV is an asynchronous PSGI handler using FCGI::EV
+    as its backend.
+
+AUTHORS
+    mala
+
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+COPYRIGHT
+    Copyright 2011- Tatsuhiko Miyagawa
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

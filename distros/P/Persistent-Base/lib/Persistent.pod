@@ -1,0 +1,892 @@
+=head1 NAME
+
+Persistent - A framework of classes that provides persistence for Perl objects
+
+=head1 SYNOPSIS
+
+  use Persistent::File;
+  use English;  # import readable variable names like $EVAL_ERROR
+
+  eval {  ### in case an exception is thrown ###
+
+    ### allocate a persistent object ###
+    my $person = new Persistent::File('people.txt');
+
+    ### define attributes of the object ###
+    $person->add_attribute('firstname', 'ID', 'VarChar', undef, 10);
+    $person->add_attribute('lastname',  'ID', 'VarChar', undef, 20);
+    $person->add_attribute('telnum', 'Persistent',
+                           'VarChar', undef, 15);
+    $person->add_attribute('bday', 'Persistent', 'DateTime', undef);
+    $person->add_attribute('age', 'Transient', 'Number', undef, 2);
+
+    ### query the datastore for some objects ###
+    $person->restore_where(qq{
+                              lastname = 'Flintstone' and
+                              telnum =~ /^[(]?650/
+                             });
+    while ($person->restore_next()) {
+      printf "name = %s, tel# = %s\n",
+             $person->firstname . ' ' . $person->lastname,
+             $person->telnum;
+    }
+  };
+
+  if ($EVAL_ERROR) {  ### catch those exceptions! ###
+    print "An error occurred: $EVAL_ERROR\n";
+  }
+
+=head1 ABSTRACT
+
+This framework of classes makes it easier to store and retrieve Perl
+objects to and from various types of data stores.  Using the common
+interface that all of these classes inherit, you can store objects to
+various types of data stores such as text and DBM files, relational
+databases, LDAP directories and so on, all with the same programming
+interface.  You can also query and retrieve these objects from the
+various types of data stores by using the query/search language of the
+data store.  Currently, there are three types of data stores that have
+been implemented:
+
+  o Perl based data stores (memory, text, and DBM files)
+  o SQL based data stores (Oracle, Sybase, MySQL, and mSQL databases)
+  o LDAP based data stores
+
+So you have the consistency of the common inherited interface with the
+flexibility of the data store's native query language.
+
+The most current version of the Persistent framework of classes is
+always available at:
+
+  http://www.bigsnow.org/persistent
+  ftp://ftp.bigsnow.org/pub/persistent
+
+=head2 Architecture of the Persistent Framework
+
+The Persistent framework of classes starts with an abstract base
+class, Base.pm, that defines the interface for all of the Persistent
+subclasses.  The subclasses inherit the interface from the base class
+class and provide the implementations for the various types of data
+stores that they support.  The class diagram for the framework looks
+something like this:
+
+                   +-----------+
+                   |           |
+                   |  Base.pm  |-------------------------+
+                   | (abstract)|                         |
+                   +-----------+                         |
+                     |       |                           |
+               +-----+       +------------+              |
+               |                          |              |
+         +-----------+              +-----------+  +-----------+
+         |           |              |           |  |           |
+         | Memory.pm |              |   DBI.pm  |  |  LDAP.pm  |
+         |           |              | (abstract)|  |           |
+         +-----------+              +-----------+  +-----------+
+           /       \                   /       \
+          /         \                 /         \
+         /           \               /           \
+  +-----------+  +-----------+  +-----------+  +-----------+
+  |           |  |           |  |           |  |           |
+  |  File.pm  |  |   DBM.pm  |  | Oracle.pm |  | Sybase.pm |
+  |           |  |           |  |           |  |           |
+  +-----------+  +-----------+  +-----------+  +-----------+
+
+=head1 INSTALLATION
+
+Because of the inheritance involved in the Persistent framework, the
+L<Persistent::Base> package will need to be installed first.  The
+L<Persistent::Base> package does include the L<Persistent::Memory>,
+L<Persistent::File>, and L<Persistent::DBM> classes since the modules that
+they require are part of the standard Perl distribution.  After the
+L<Persistent::Base> package has been installed, the other subclasses such
+as L<Persistent::DBI> and L<Persistent::LDAP> may be installed.
+
+The installation of these packages is like any other standard CPAN
+package.  You can find complete instructions in the README file that
+comes with each package.
+
+=head1 DESCRIPTION
+
+Before we get started describing the methods in detail, it should be
+noted that all error handling in this framework of classes is done
+with exceptions.  In Perl, you throw an exception by calling die or in
+our case by calling croak (from the Carp module).  You catch Perl
+exceptions by using an eval block such as the following code does:
+
+  eval {
+    open FILE, $filename or die "$!";
+    ### more stuff... ###
+  };
+
+  if ($@ ne '') {
+    warn "exception caught: $@\n";
+    ### clean up... ###
+  }
+
+By checking the special variable I<$@> (or I<$EVAL_ERROR> if the
+English module is used), you can determine whether or not an exception
+occurred within the eval block.  Some people worry when they see an
+eval that the code will be compiled dynamically and possibly more than
+once.  But, because it is an eval block (not a string), the code is
+only compiled once, which is at the same time as the surrounding code.
+
+So be sure to put an eval block around all of your code that uses the
+Persistent methods so you can catch any exceptions that may occur.
+Now, on to the methods!
+
+=head2 Instantiating a Persistent Class
+
+There are two ways to create a Persistent object.  The first way is by
+directly instantiating a Persistent class.  That is what we will cover
+in this section.
+
+Instantiating a Persistent class is very simple, but it does vary for each
+Persistent class.  All that is required is calling the constructor for
+the Persistent class and passing the required arguments.  The
+constructor arguments for each class are documented in the
+documentation for each class.  So check the documentation for the
+specific class's constructor before you call it.  Here's an example
+that creates a L<Persistent::File> object:
+
+  use Persistent::File;
+
+  eval {
+    ### call the constructor ###
+    my $car = new Persistent::File('cars.txt');
+
+    ### define attributes of the object ###
+    ### NOTE: This is covered in detail later! ;) ###
+    $this->add_attribute('firstname', 'id',
+                         'VarChar',  undef, 10);
+    $this->add_attribute('lastname',  'id',
+                         'VarChar',  undef, 20);
+    $this->add_attribute('telnum',    'persistent',
+                         'VarChar',  undef, 15);
+    $this->add_attribute('bday',      'persistent',
+                         'DateTime', undef);
+    $this->add_attribute('age',       'transient',
+                         'Number',   undef, 2);
+  };
+
+  if ($@) {
+    warn "Exception caught: $@\n";
+  }
+
+There is only one argument passed to the constructor in this example
+and it is the name of the file where the data is stored.  All possible
+constructor arguments for the L<Persistent::File> class can be found
+in its documentation.
+
+The only thing left to do is define the attributes of the object and
+this is covered in one of the following sections, L<Defining the
+Attributes of an Object>.
+
+=head2 Subclassing a Persistent Class
+
+The second way to create a Persistent object is by subclassing a
+Persistent class.  This is useful when the Persistent object will be
+used by multiple programs or when custom methods for the class will be
+written.
+
+An additional class will be created in this approach and it will
+inherit from a Persistent class such as Persistent::DBM like in the
+following example:
+
+  package Person;
+
+  ### we are a subclass of an all-powerful Persistent class ###
+  use Persistent::DBM;
+  @ISA = qw(Persistent::DBM);
+
+  sub initialize {   ### ALWAYS implement this method ###
+    my $this = shift;
+
+    ### call any ancestor initialization methods ###
+    $this->SUPER::initialize(@_);
+
+    ### define attributes of the object ###
+    ### NOTE: This is covered in detail later! ;) ###
+    $this->add_attribute('firstname', 'ID',
+                         'VarChar',  undef, 10);
+    $this->add_attribute('lastname',  'ID',
+                         'VarChar',  undef, 20);
+    $this->add_attribute('telnum',    'Persistent',
+                         'VarChar',  undef, 15);
+    $this->add_attribute('bday',      'Persistent',
+                         'DateTime', undef);
+    $this->add_attribute('age',       'Transient',
+                         'Number',   undef, 2);
+  }
+
+  sub print {  ### custom method ###
+    my $this = shift;
+
+    printf("%-10s %-10s %15s %s %2s\n",
+           defined $this->firstname ? $this->firstname : 'undef',
+           defined $this->lastname ? $this->lastname : 'undef',
+           defined $this->telnum ? $this->telnum : 'undef',
+           defined $this->bday ? $this->bday : 'undef',
+           defined $this->age ? $this->age : 'undef');
+  }
+
+  1;
+
+Defining the attributes of the object (and the method add_attribute)
+is explained in the next section.  To actually create an instance of
+this class, you just call the constructor of this class like so:
+
+  use Person;
+
+  eval {
+    ### call the constructor ###
+    my $person = new Person('people.dbm', undef, 'DB_File');
+
+    ### call Persistent methods here... ###
+  };
+
+  if ($@) {
+    warn "Exception caught: $@\n";
+  }
+
+The constructor (the method new) is not defined in the Person class,
+but in one of the parent classes and so it is inherited.  Now you just
+need to define the attributes of the object, which is explained in the
+next section, and your object will be ready to use.
+
+=head2 Defining the Attributes of an Object
+
+Defining of the attributes is either done after instantiating a
+Persistent class or in the I<initialize> method of the subclass.  The
+method I<add_attribute> is used to define an attribute and add it to
+the object.  The arguments to this method are the following:
+
+  $this->add_attribute($name, $type, $datatype, @args);
+
+Parameters:
+
+=over 4
+
+=item I<$name>
+
+Name of the attribute.  The rules for this can vary since the name
+needs to be a valid name for a Perl method (subroutine) and follow the
+rules for the data store that is being used by the Persistent class.
+For example, if you are using the Persistent::Oracle class, then the
+name needs to be a valid name for a Perl method and an Oracle column.
+
+=item I<$type>
+
+Type of the attribute.  The valid types are I<Identity>,
+I<Persistent>, and I<Transient>.  Identity attributes are what make
+the object unique.  These attributes can be used to uniquely identify
+a single object and are stored in the data store.  Persistent
+attributes are stored in the data store along with the Identity
+attributes.  Transient attributes are values that are not stored in
+the data store.  You currently cannot query for an object based on a
+value in a transient field.  All of the type arguments can be
+abbreviated to a shorter form; only a single character such as 'I',
+'P', or 'T' is required.  The type arguments are also
+case-insensitive, so 'ident', 'persist', or 'trans' would work as
+arguments.
+
+=item I<$datatype>
+
+Data type of the attribute.  The valid data types currently are: Char,
+VarChar, String, Number, and DateTime.  The I<@args> arguments that
+follow I<$datatype> are passed as arguments to the constructor of the
+data type.  So refer to the documentation for the data type for more
+details.  The data type documents are:
+
+L<Persistent::DataType::Char>
+
+L<Persistent::DataType::VarChar>
+
+L<Persistent::DataType::String>
+
+L<Persistent::DataType::Number>
+
+L<Persistent::DataType::DateTime>
+
+The data type is not case-sensitive, but no abbreviation is allowed.
+
+=item I<@args>
+
+Arguments for the data type of the attribute.  Usually these consist
+of an initial value, length, etc.
+
+=back
+
+Here is an example of defining attributes for an object:
+
+  $this->add_attribute('firstname', 'id',
+                       'VarChar',  undef, 10);
+  $this->add_attribute('lastname',  'id',
+                       'VarChar',  undef, 20);
+  $this->add_attribute('telnum',    'persistent',
+                       'VarChar',  undef, 15);
+  $this->add_attribute('bday',      'persistent',
+                       'DateTime', undef);
+  $this->add_attribute('age',       'transient',
+                       'Number',   undef, 2);
+
+In this example, five attributes were added to the object.  The first
+two make up the attributes that uniquely identify this object and the
+third and forth are just attributes that will be saved in the data
+store.  The fifth attribute is temporary and so will not be saved to
+the data store.  All of the attributes are initialized to undef and
+all of them have an initial maximum length except for the DateTime
+attribute.  See the data type documentation for more information on
+possible initialization (constructor) arguments.
+
+=head2 Accessing the Attributes of an Object
+
+To access the attributes of an object, you just invoke an attribute as
+a method of the object.  So it should look something like this:
+
+  $object->attribute($value);     ### set the attribute's value ###
+  $value = $object->attribute();  ### get the attribute's value ###
+
+Here is an example that uses the object that we created and defined
+earlier:
+
+  ### set the attributes ###
+  $person->firstname('Fred');
+  $person->lastname('Flintstone');
+  $person->telnum('650-555-1111');
+  $person->age(45);
+  $person->bday('1954-01-23 22:09:54');
+
+  ### print the attributes ###
+  printf("%-10s %-10s %15s %s %2s\n",
+         $person->firstname,
+         $person->lastname,
+         $person->telnum,
+         $person->bday,
+         $person->age);
+
+For those of you interested, we just take advantage of the Perl
+AUTOLOAD feature to implement these attribute accessor methods.
+Pretty cool, eh?  ;)
+
+If you have a collision between an attribute name and a method that is
+part of the Persistent interface then you can use the I<value> method
+to access an attribute's value.  It works like this:
+
+  ### get the attribute's value ###
+  $value = $object->value($attribute);
+
+  ### set the attribute's value ###
+  $object->value($attribute, $value);
+
+Here is an example:
+
+  ### set the attributes ###
+  $person->value('firstname', 'Fred');
+  $person->value('lastname', 'Flintstone');
+  $person->value('telnum', '650-555-1111');
+  $person->value('age', 45);
+  $person->value('bday', '1954-01-23 22:09:54');
+
+  ### print the attributes ###
+  printf("%-10s %-10s %15s %s %2s\n",
+         $person->value('firstname'),
+         $person->value('lastname'),
+         $person->value('telnum'),
+         $person->value('bday'),
+         $person->value('age'));
+
+When the value of an attribute is being set, the value arguments that
+are passed must be in a valid format for the data type of the
+attribute.  You can find valid formats of values for the data types in
+their respective documentation.  Look at the section for their
+I<value> method.  The data type documentation can be found in:
+
+L<Persistent::DataType::Char>
+
+L<Persistent::DataType::VarChar>
+
+L<Persistent::DataType::String>
+
+L<Persistent::DataType::Number>
+
+L<Persistent::DataType::DateTime>
+
+=head2 Accessing the Attribute Data of an Object
+
+Instead of using all of the individual accessor methods to access the
+attributes of an object, you can access all of the data as a hash with
+the I<data> method.  This method will return a reference to a hash
+containing values of all of the Identity and Persistent attributes of
+the object.  You can also set all of the Identity and Persistent
+fields of the object by passing the I<data> method a reference to a
+hash containing all of the values.  Of course, in both cases the keys
+of the hash are the attribute names and the values are the actual
+attribute values.  Here is an example:
+
+  ### set the attributes  ###
+  $person->data({firstname => 'Marge', lastname => 'Simpson'});
+
+  ### get and print the attributes ###
+  my $href = $person->data();
+  foreach my $key (keys %$href) {
+    print "key = $key, value = $href->{$key}\n";
+  }
+
+=head2 Clearing the Attributes of an Object
+
+Really easy, just do this:
+
+  $object->clear();
+
+All attributes (Identity, Persistent, and Transient) are set to undef.
+
+=head2 Setting the Data Store of an Object
+
+Sometimes, you may want to change the data store for an object.  You
+can do this with the I<datastore> method.  This method is
+implementation dependent, so you will need to refer to the
+documentation for the Persistent class that you using.  Here is an
+example that uses the L<Persistent::File> class:
+
+  use Persistent::File;
+  my $person = new Persistent::File('people.txt', '|');
+  $person->restore('Betty', 'Rubble');  ### covered later! ###
+  $person->datastore('employees.txt', '|');
+  $person->save();  ### covered later! ###
+
+In this example, the object was copied from the 'people.txt' file to
+the 'employees.txt' file by changing the data store and saving the
+object.  Refer to the L<Persistent::File> documentation for a
+description of the I<datastore> arguments.
+
+The I<datastore> method will also return either information regarding
+the datastore or a reference or some sort of handle to the data store.
+This can come in handy if you are trying to keep the number of
+connections to a database or file handles to a minimum.  Because you
+can pass them on to newly created objects like this:
+
+  my $person = new Persistent::Oracle('dbi:Oracle:ORCL',
+                                      'scott', 'tiger', 'emp');
+  my $dept = new Persistent::Oracle($person->datastore(), 'dept');
+
+In this example, both the I<$person> and I<$dept> objects share the
+same database connection.  Of course, the return values from the
+I<datastore> methods vary for each Persistent class implementation.
+So, check the documentation for the Persistent class.
+
+=head2 Inserting an Object
+
+After you set all of the Identity fields of an object and optionally
+any of the Persistent fields, you can insert the object into the data
+store.  If you have previously restored the object from the data store
+that you are about to insert into, then the insert will either fail or
+the object in the data store will be overwritten depending on the
+implementation of the Persistent class that you are using.  Use of the
+I<insert> method looks something like this:
+
+  $object->insert();
+
+=head2 Updating an Object
+
+After you have inserted an object into a data store or retrieved an
+object from a data store, you may update it.  If the object does not
+already exist in the data store that you are about to update, then the
+update may fail depending on the implementation of the Persistent
+class.  Use of the I<update> method looks something like this:
+
+  $object->update();
+
+=head2 Saving an Object
+
+As you can see, it can get pretty complicated at times determining
+whether or not you need to I<insert> or I<update> an object.  Here is
+where the I<save> method can come in handy.  With the save method, it
+will check the internal state of the object and determine whether it
+needs to do an I<insert> or an I<update>.  Its use looks something
+like this:
+
+  ### do stuff with the object ... ###
+  $person->firstname('Ted');
+  ...
+
+  ### Ooops!  Do I insert or update the object? ###
+  ### No worries!  I'll just save it.  :) ###
+  $person->save();
+
+The I<save> method should return a true value if the object did
+previously exist in the data store and a false value if it did not.
+Unfortunately, not all Persistent classes are implemented this way and
+so once again you will need to check the documentation for the
+Persistent class that you are using.
+
+=head2 Restoring an Object
+
+To restore an object from a datastore, you just need to pass the
+values of the Identity attributes for the object you wish to restore
+to the I<restore> method.  Here is an example that restores a
+I<Person> object that has Identity attributes of I<firstname> and
+I<lastname>:
+
+  $person->restore('Wilma', 'Flintstone');
+
+The order of the Identity attributes matters.  In this example, the
+I<firstname> attribute was added first and the I<lastname> attribute
+was added second.  And of course, the attributes were added to the
+object using the I<add_attribute> method.  The definition of the
+attributes probably looked something like this:
+
+  ### define attributes of the object ###
+  $person->add_attribute('firstname', 'ID', 'VarChar', undef, 10);
+  $person->add_attribute('lastname',  'ID', 'VarChar', undef, 20);
+
+=head2 Restoring all Objects
+
+To restore all objects from a data store, invoke the I<restore_all>
+method and loop through the objects one at a time using the
+I<restore_next> method.  The I<restore_next> method will restore an
+object from the data store, one at a time, until there are no more
+objects left to restore.  It will return a true value when it has
+restored an object and a false value when an object has not been
+restored and there are no more left to restore.  Here is an example:
+
+  $person->restore_all();
+  while ($person->restore_next()) {
+    print "Restored: ";  $person->print();
+  }
+
+You can also sort the objects so that you can process the objects in a
+certain order.  For instance, lets sort the objects by I<lastname>
+then I<firstname>:
+
+  $person->restore_all('lastname, firstname');
+  while ($person->restore_next()) {
+    print "Restored: ";  $person->print();
+  }
+
+How about sorting them by last name in ascending order, then first
+name, and then bday in descending order?
+
+  $person->restore_all('lastname ASC, firstname, bday DESC');
+  while ($person->restore_next()) {
+    print "Restored: ";  $person->print();
+  }
+
+Pretty cool, eh?  To you SQL gurus, this should look familiar.  It is
+just a SQL ORDER BY clause.  You can now sort your objects from any
+type of data store without having code a sort routine.  :)
+
+The I<restore_all> method also returns the number of objects restored
+from the data store.
+
+=head2 Conditionally Restoring Objects
+
+Sometimes you want to restore a group of objects that meet a certain
+set of conditions.  The I<restore_where> method allows selective
+restoring of objects.  Its usage looks something like this:
+
+  $object->restore_where($where, $order_by);
+  while ($object->restore_next()) {
+      ### do something with $object ###
+  }
+
+The I<$where> argument is implementation (data store) dependent, but
+for the Perl based and SQL based implementations is nearly identical
+to a SQL WHERE clause.  Refer to the documentation for the Persistent
+subclass implemented for the data store for more on the syntax of the
+I<$where> argument.  The I<$order_by> argument is the same for all
+implementations and is a SQL ORDER BY clause.  Both of these arguments
+are optional.
+
+The best way to understand this method is to take a look at a few
+examples.  Here is one that fetches all people who have a last name of
+Flintstone and live in the 650 area code:
+
+  use Persistent::File;
+  my $person = new Persistent::File('people.txt', '|');
+  $person->restore_where(
+    "lastname = 'Flintstone' and telnum =~ /^[(]?650/"
+  );
+  while ($person->restore_next()) {
+    print "Restored: ";  print_person($person);
+  }
+
+In this example, we restored all of those people from a text file.
+Nearly the same code works with an Oracle database.  Here is what the
+Oracle code would look like:
+
+  use Persistent::Oracle;
+  my $person = new Persistent::Oracle('dbi:Oracle:ORCL',
+                                      'scott', 'tiger', 'people');
+  $person->restore_where(
+    "lastname = 'Flintstone' and telnum like '650%'"
+  );
+  while ($person->restore_next()) {
+    print "Restored: ";  print_person($person);
+  }
+
+This code would work for any SQL compliant database (Sybase, MySQL,
+mSQL, etc.)  Performing this query using the LDAP based Persistent
+class would look like this:
+
+  use Persistent::LDAP;
+  my $person = new Persistent::LDAP('localhost', 389,
+				   'cn=Directory Manager', 'test1234',
+				   'ou=Engineering,o=Big Snow Org,c=US');
+  $person->restore_where(
+    "& (lastname=Flintstone)(telnum=650*)"
+  );
+  while ($person->restore_next()) {
+    print "Restored: ";  print_person($person);
+  }
+
+Please refer to the L<Persistent::LDAP> documentation for a full
+explanation of the LDAP search filters used in the I<restore_where>
+method.  And refer to the L<Persistent::DBI> documentation for further
+explanation of the SQL WHERE BY clauses used.
+
+For the Perl based subclasses (Persistent::DBM, Persistent::File,
+Persistent::Memory) the comparison operators supported are: <=, >=, <,
+>, !=, ==.  And of course you can use =~ for regular expression
+matching.  The boolean operators to join the comparison operators
+together are: B<and>, B<or>.  And of course parentheses are allowed
+and free.  You can really use any valid Perl expression since the
+I<$where> argument is just munged a bit and then evaled.
+
+In some cases, you may be making comparisons with strings that have
+quotes in them.  If this is the case, you can use the I<quote> method
+to take care of escaping those pesky quotes.
+
+  $person->restore_where(
+    sprintf("lastname = %s and telnum =~ /^[(]?650/",
+            $person->quote($lastname)));
+  while ($person->restore_next()) {
+    print "Restored: ";  $person->print();
+  }
+
+Now, if any last names contain quotes, they will be escaped and your
+program won't break.
+
+The I<restore_where> method also returns the number of objects
+restored from the data store.
+
+  $num_objs = $person->restore_where("lastname = 'Smith'");
+
+=head1 OTHER METHODS OF INTEREST
+
+=head2 data_type -- Returns the Data Type of an Attribute
+
+  eval {
+    my $data_type = $person->data_type($attribute);
+  };
+  croak "Exception caught: $@" if $@;
+
+Returns the data type of an attribute.  This method throws Perl
+execeptions so use it with an eval block.
+
+Parameters:
+
+=over 4
+
+=item I<$attribute>
+
+Name of an attribute of the object.
+
+=back
+
+Returns:
+
+=over 4
+
+=item I<$data_type>
+
+Name of the data type of an attribute.
+
+=back
+
+=head2 data_type_params -- Returns the Data Type Parameters of an Attribute
+
+  eval {
+    my $params_ref = $person->data_type_params($attribute);
+  };
+  croak "Exception caught: $@" if $@;
+
+Returns the data type parameters of an attribute.  The parameters are
+dependent on the data type.  This method throws Perl execeptions so
+use it with an eval block.
+
+Parameters:
+
+=over 4
+
+=item I<$attribute>
+
+Name of an attribute of the object.
+
+=back
+
+Returns:
+
+=over 4
+
+=item I<\@data_type_params>
+
+Reference to an array containing the data type parameters for the
+attribute.
+
+=back
+
+=head2 data_type_object -- Returns the Data Type Object of an Attribute
+
+  eval {
+    my $data_type_obj = $person->data_type_object($attribute);
+  };
+  croak "Exception caught: $@" if $@;
+
+Returns the data type object of an attribute.  This method throws Perl
+execeptions so use it with an eval block.
+
+Parameters:
+
+=over 4
+
+=item I<$attribute>
+
+Name of an attribute of the object.
+
+=back
+
+Returns:
+
+=over 4
+
+=item I<$data_type_obj>
+
+Data type object for the attribute.
+
+=back
+
+=head2 quote -- Quotes a String Literal for Use in a Query
+
+  $person->restore_where(sprintf("lastname = %s",
+                                 $person->quote($lastname)));
+
+Quotes a string literal for use in a query clause (I<$where_by>
+argument in I<restore_where> method) by escaping any special
+characters (such as quotation marks) contained within the string and
+adding the required type of outer quotation marks.  This method does
+not throw exceptions.
+
+Parameters:
+
+=over 4
+
+=item I<$str>
+
+String to quote and escape.
+
+=back
+
+Returns:
+
+=over 4
+
+=item I<$quoted_str>
+
+Quoted and escaped string.
+
+=back
+
+=head2 debug -- Returns/Sets the Debugging Flag
+
+  ### set the debugging flag ###
+  $object->debug($flag);
+
+  ### get the debugging flag ###
+  $flag = $object->debug();
+
+Returns (and optionally sets) the debugging flag of an object.  This
+method does not throw Perl execeptions.
+
+Parameters:
+
+=over 4
+
+=item I<$flag>
+
+If set to a true value then debugging is on, otherwise, a false value
+means off.
+
+=back
+
+=head1 EXAMPLES
+
+I used quite a few examples throughout this documentation, so I
+recommend taking a look at those.  But, if you are looking for a
+complete example, take a look in the I<examples> directory that is
+part of the Persistent Base package or any of the subclasses.  You
+should find quite a few complete working examples there.
+
+=head1 SEE ALSO
+
+L<Persistent::Base>, L<Persistent::DBM>, L<Persistent::File>,
+L<Persistent::Memory>, L<Persistent::DataType::Char>,
+L<Persistent::DataType::DateTime>, L<Persistent::DataType::Number>,
+L<Persistent::DataType::String>, L<Persistent::DataType::VarChar>
+
+=head1 BUGS
+
+This software is definitely a work in progress.  Though, we've used it
+on more than 10 real world applications.  So if you find any bugs
+please email them to me with a subject of 'Persistent Bug' at:
+
+  winters@bigsnow.org
+
+And you know, include the regular stuff, OS, Perl version, snippet of
+code, etc.
+
+=head1 ACKNOWLEDGMENTS
+
+We got a lot of great ideas from the B<Advanced Perl Programming> book
+by Sriram Srinivasan, especially Chapters 10 and 11 on Persistence.
+This is an excellent book.  It covers many adavnced topics like
+object-oriented Perl and persistence, extremely well.  In fact, even
+if you are not a Perl programmer, but you want to learn about OO, I
+would recommend it.
+
+A special thanks to some of our first users that without their
+feedback it would have taken a lot longer.
+
+Thanks!
+
+=over 4
+
+=item John Geldner
+
+=item Denise Skarupski
+
+=item Weston Stander
+
+=item Scott Stevelinck
+
+=item David Vandegrift
+
+=back
+
+=head1 AUTHORS
+
+  David Winters <winters@bigsnow.org>
+  Greg Bossert  <bossert@suddensound.com>
+
+Greg and I came up with the initial idea of a reuseable storage class
+and it kept evolving into what we have here today.  We've used it in
+many applications and it has saved us much development time.  I hope
+you find it as useful!
+
+=head1 COPYRIGHT
+
+Copyright (c) 1998-2000 David Winters.  All rights reserved. This program
+is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
+
+=cut

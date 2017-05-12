@@ -1,0 +1,14 @@
+Revision history for Pod-Weaver-PluginBundle-ReplaceBoilerplate
+
+1.00    Version released at 2010-09-15-09:56.
+        Released rc 0.99_02 as stable.
+
+0.99_02 Version released at 2010-09-13-14:05.  *** Development version. ***
+        Require Moose::Autobox 0.11 for $array->first().
+        Require Pod::Weaver 3.101630 to get expected Authors plugin behavior.
+        Require Pod::Elemental 0.101620.
+        Made plugin abstracts consistent.
+        Expanded overview documentation to include links to base plugins.
+
+0.99_01 Version released at 2010-09-12-16:10.  *** Development version. ***
+        Initial release.

@@ -1,0 +1,55 @@
+{
+   "abstract" : "AgentX clients with NetSNMP::agent and POE",
+   "author" : [
+      "Sebastien Aperghis-Tramoni <sebastien@aperghis.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-NetSNMP-agent",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "List::MoreUtils" : "0",
+            "NetSNMP::agent" : "5",
+            "POE" : "0.3502",
+            "SNMP" : "5",
+            "SNMP::ToolBox" : "0.01",
+            "Test::More" : "0",
+            "parent" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/maddingue/POE-Component-NetSNMP-agent"
+      }
+   },
+   "version" : "0.600",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

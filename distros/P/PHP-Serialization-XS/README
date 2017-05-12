@@ -1,0 +1,37 @@
+PHP-Serialization-XS version 0.01
+=================================
+
+This module provides the same interface as PHP::Serialization, but
+uses XS during deserialization, for speed enhancement.
+
+If you have code written for PHP::Serialization, you should be able to
+replace all references to PHP::Serialization with PHP::Serialization::XS
+and notice no change except for an increase in speed of deserialization.
+
+Node that serialization is still provided by PHP::Serialization, and its
+speed should therefore not be affected. This is why
+PHP::Serialization::XS requires PHP::Serialization to be installed.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    PHP::Serialization version 0.33
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Darren Kulp
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+

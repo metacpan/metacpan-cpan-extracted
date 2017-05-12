@@ -1,0 +1,118 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Panotools::Script;
+use Image::ExifTool;
+use LWP::UserAgent;
+use Pod::Usage;
+use URI;
+
+my $url = $ENV{LENS_URL} || 'http://oink.postle.net/';
+
+pod2usage (2) unless (scalar @ARGV);
+
+my $agent = new LWP::UserAgent;
+$agent->agent('lens-submit/'. $Panotools::Script::VERSION);
+$agent->timeout (5);
+$agent->env_proxy;
+
+for my $path_pto (@ARGV)
+{
+    print "Project file: $path_pto\n";
+    my $pto = new Panotools::Script;
+    $pto->Read ($path_pto);
+    unless (scalar @{$pto->Control} > 4)
+    {
+        print "Skipping: not enough control points\n"; next;
+    }
+
+    my $image = $pto->Image->[0];
+
+    my $query_image = {};
+    for my $parameter qw/w h f v a b c d e g t Ra Rb Rc Rd Re Va Vb Vc Vd Vx Vy/
+    {
+        $query_image->{$parameter} = $image->{$parameter}
+            if defined $image->{$parameter};
+    }
+
+    my $path_photo = $image->Path ($path_pto);
+    unless (-e $path_photo)
+    {
+        print "Skipping: Can't find $path_photo\n"; next;
+    }
+
+    my $exiftool = new Image::ExifTool;
+    $exiftool->Options (PrintConv => 0);
+    my $photo = $exiftool->ImageInfo ($path_photo);
+    unless (defined $photo->{Make} and defined $photo->{Model})
+    {
+        print "Skipping: Incomplete EXIF\n"; next;
+    }
+
+    my $query_photo = {};
+    for my $parameter qw/ColorSpace ExifVersion FileType FNumber FocalLength FOV
+        FocalLengthIn35mmFormat ImageHeight ImageWidth Lens LensModel LensType Make
+        Model ResolutionUnit ScaleFactor35efl Software SubjectDistanceRange XResolution
+        YResolution/
+    {
+        $query_photo->{$parameter} = $photo->{$parameter}
+            if defined $photo->{$parameter};
+    }
+
+    my $uri = new URI ($url);
+    $uri->query_form (%{$query_image}, %{$query_photo}, md5 => $pto->{md5});
+
+    my $response = $agent->get ($uri->as_string);
+
+    if ($response->is_success) {print 'Submitted: '}
+    else {print 'Failed: '}
+    print $query_photo->{Make} .' '. $query_photo->{Model}
+        .' : '. $response->status_line ."\n";
+}
+
+__END__
+
+=head1 NAME
+
+lens-submit - collect lens and EXIF data
+
+=head1 SYNOPSIS
+
+lens-submit project1.pto project2.pto [...]
+
+Options: None, use the LENS_URL environmental variable to vary the location of
+the data collection server, and http_proxy to set a proxy.
+
+=head1 DESCRIPTION
+
+B<lines-submit> is a simple tool that reads a Hugin .pto project, finds the
+first 'lens', gathers some lens and EXIF data, and submits it via HTTP to a
+central collecting server.
+
+Data submitted is anonymous, no serial numbers, user names, dates or file names
+are submitted.  Your ip-address can be logged by the server as the submission
+is via a normal HTTP GET request.
+
+IMPORTANT: Data submitted via this protocol may be collated, processed and
+redistributed under any or all of the following licenses:
+
+ GNU General Public License (any version)
+ GNU Lesser General Public License (any version)
+ Creative Commons Attribution ShareAlike (any version)
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+=head1 AUTHOR
+
+Bruno Postle - March 2010.
+
+=cut

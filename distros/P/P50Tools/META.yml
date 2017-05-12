@@ -1,0 +1,20 @@
+---
+abstract: "This tool is just to work with pen-test, but to study to. \r"
+author:
+  - 'Aureliano Guedes <acpguedes@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: P50Tools
+requires:
+  HTTP::Request: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  common::sense: 0
+version: 0.62

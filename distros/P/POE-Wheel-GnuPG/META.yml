@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               POE-Wheel-GnuPG
+version:            0.01
+abstract:           offer GnuPG interaction through POE
+author:
+    - Damien "dams" Krotkine <dams@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    GnuPG::Interface:  0
+    IO::Handle:        0
+    parent:            0
+    POE:               0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,19 @@
+Changes
+lib/Pod/Index.pm
+lib/Pod/Index/Builder.pm
+lib/Pod/Index/Entry.pm
+lib/Pod/Index/Extract.pm
+lib/Pod/Index/Search.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+perldoc-k.cgi
+podindex
+README
+t/Builder.t
+t/nocase.t
+t/pod.t
+t/Search.t
+t/subtopics.t
+t/test.pod
+t/test.txt

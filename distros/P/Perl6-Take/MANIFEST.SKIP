@@ -1,0 +1,8 @@
+\.swp
+\.swo
+\.cvsignore$
+^Makefile\.old$
+^Makefile$
+bak$
+Perl6-Take-.*/
+blib

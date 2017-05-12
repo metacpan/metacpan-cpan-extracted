@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1192267225,
+          'number' => '+440206028289',
+          'time' => '10:20',
+          'date' => '2007-10-13',
+          'name' => 'Roger XXXXXX XXXX (M)',
+          'phone' => '+440206028289',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1192267225,
+          'text' => 'Ingvar says: Gas leak at west ham. May cause tube delays. Jubilee suspended stratford to north greenwich.',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7107250,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 42435
+        };

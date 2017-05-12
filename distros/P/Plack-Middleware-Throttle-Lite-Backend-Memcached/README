@@ -1,0 +1,69 @@
+NAME
+    Plack::Middleware::Throttle::Lite::Backend::Memcached - Memcache-driven
+    storage backend for Throttle-Lite
+
+VERSION
+    version 0.03
+
+DESCRIPTION
+    This is implemetation of the storage backend for
+    Plack::Middleware::Throttle::Lite. It uses memcache-server to hold
+    throttling data, automatically sets expiration time for stored keys to
+    save memory consumption.
+
+SYNOPSYS
+        # inside your app.psgi
+        enable 'Throttle::Lite',
+            backend => [
+                'Memcached' => {
+                    servers => [
+                        'mc1.example.com:11211',
+                        'mc1.example.com:11212',
+                        'mc2.example.net:11210',
+                    ],
+                }
+            ];
+
+OPTIONS
+    There are no backend-specific options. All options directly passing to
+    downstream interface to memcached server. At the moment this is
+    Cache::Memcached::Fast. See Cache::Memcached::Fast for available
+    configuration options.
+
+METHODS
+  mc
+    Returns a memcached connection handle.
+
+  init
+    See "ABSTRACT METHODS" in
+    Plack::Middleware::Throttle::Lite::Backend::Abstract
+
+  reqs_done
+    See "ABSTRACT METHODS" in
+    Plack::Middleware::Throttle::Lite::Backend::Abstract
+
+  increment
+    See "ABSTRACT METHODS" in
+    Plack::Middleware::Throttle::Lite::Backend::Abstract
+
+BUGS
+    Please report any bugs or feature requests through the web interface at
+    <https://github.com/Wu-Wu/Plack-Middleware-Throttle-Lite-Backend-Memcach
+    ed/issues>
+
+SEE ALSO
+    Cache::Memcached::Fast
+
+    Plack::Middleware::Throttle::Lite
+
+    Plack::Middleware::Throttle::Lite::Backend::Abstract
+
+AUTHOR
+    Anton Gerasimov <chim@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Anton Gerasimov.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

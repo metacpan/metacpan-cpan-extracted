@@ -1,0 +1,15 @@
+Revision history for Parcel-Track-KR-CJKorea
+
+0.004     2016-02-18 17:10:56+09:00 Asia/Seoul
+    - Remove `wget` fetching, use only HTTP::Tiny
+
+0.003     2015-02-02 10:53:40+09:00 Asia/Seoul
+    - Encode content as UTF-8 when fetching via HTTP::Tiny
+    - Remove debugging code
+
+0.002     2015-01-29 20:27:51+09:00 Asia/Seoul
+    - Handle exception if tracking number is invalid
+    - Encode content as UTF-8 when fetching via wget
+
+0.001     2015-01-29 18:01:37+09:00 Asia/Seoul
+    - first release

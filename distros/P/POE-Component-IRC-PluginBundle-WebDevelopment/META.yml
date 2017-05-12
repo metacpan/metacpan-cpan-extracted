@@ -1,0 +1,401 @@
+---
+abstract: 'a collection of plugins useful for Web Development IRC bots'
+author:
+  - 'Zoffix Znet <cpan@zoffix.com>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-IRC-PluginBundle-WebDevelopment
+provides:
+  POE::Component::IRC::Plugin::AntiSpamMailTo:
+    file: lib/POE/Component/IRC/Plugin/AntiSpamMailTo.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::BrowserSupport:
+    file: lib/POE/Component/IRC/Plugin/BrowserSupport.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::CSS::Minifier:
+    file: lib/POE/Component/IRC/Plugin/CSS/Minifier.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::CSS::PropertyInfo:
+    file: lib/POE/Component/IRC/Plugin/CSS/PropertyInfo.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::CSS::PropertyInfo::Data:
+    file: lib/POE/Component/IRC/Plugin/CSS/PropertyInfo/Data.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::CSS::SelectorTools:
+    file: lib/POE/Component/IRC/Plugin/CSS/SelectorTools.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::ColorNamer:
+    file: lib/POE/Component/IRC/Plugin/ColorNamer.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::Google::PageRank:
+    file: lib/POE/Component/IRC/Plugin/Google/PageRank.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::HTML::AttributeInfo:
+    file: lib/POE/Component/IRC/Plugin/HTML/AttributeInfo.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::HTML::AttributeInfo::Data:
+    file: lib/POE/Component/IRC/Plugin/HTML/AttributeInfo/Data.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::HTML::ElementInfo:
+    file: lib/POE/Component/IRC/Plugin/HTML/HTML/ElementInfo.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::JavaScript::Minifier:
+    file: lib/POE/Component/IRC/Plugin/JavaScript/Minifier.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::Syntax::Highlight::CSS:
+    file: lib/POE/Component/IRC/Plugin/Syntax/Highlight/CSS.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::Syntax::Highlight::HTML:
+    file: lib/POE/Component/IRC/Plugin/Syntax/Highlight/HTML.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::Validator::CSS:
+    file: lib/POE/Component/IRC/Plugin/Validator/CSS.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::Validator::HTML:
+    file: lib/POE/Component/IRC/Plugin/Validator/HTML.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::WWW::Alexa::TrafficRank:
+    file: lib/POE/Component/IRC/Plugin/WWW/Alexa/TrafficRank.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::WWW::Cache::Google:
+    file: lib/POE/Component/IRC/Plugin/WWW/Cache/Google.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::WWW::DoctypeGrabber:
+    file: lib/POE/Component/IRC/Plugin/WWW/DoctypeGrabber.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::WWW::GetPageTitle:
+    file: lib/POE/Component/IRC/Plugin/WWW/GetPageTitle.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::WWW::HTMLTagAttributeCounter:
+    file: lib/POE/Component/IRC/Plugin/WWW/HTMLTagAttributeCounter.pm
+    version: 2.001003
+  POE::Component::IRC::Plugin::WWW::Lipsum:
+    file: lib/POE/Component/IRC/Plugin/WWW/Lipsum.pm
+    version: 2.001003
+  POE::Component::IRC::PluginBundle::WebDevelopment:
+    file: lib/POE/Component/IRC/PluginBundle/WebDevelopment.pm
+    version: 2.001003
+requires:
+  App::ColorNamer: 0
+  Carp: 0
+  HTML::Entities: 0
+  LWP::UserAgent: 0
+  POE: 0
+  POE::Component::CSS::Minifier: 0
+  POE::Component::IRC::Plugin: 0
+  POE::Component::IRC::Plugin::BasePoCoWrap: 0
+  POE::Component::IRC::Plugin::BaseWrap: 0
+  POE::Component::JavaScript::Minifier: 0
+  POE::Component::Syntax::Highlight::CSS: 0
+  POE::Component::Syntax::Highlight::HTML: 0
+  POE::Component::WWW::Alexa::TrafficRank: 0
+  POE::Component::WWW::Cache::Google: 0
+  POE::Component::WWW::DoctypeGrabber: 0
+  POE::Component::WWW::GetPageTitle: 0
+  POE::Component::WWW::Google::PageRank: 0
+  POE::Component::WWW::HTMLTagAttributeCounter: 0
+  POE::Component::WWW::Lipsum: 0
+  POE::Component::WWW::WebDevout::BrowserSupportInfo: 0
+  POE::Component::WebService::Validator::CSS::W3C: 0
+  POE::Component::WebService::Validator::HTML::W3C: 0
+  URI: 0
+  URI::Find::Schemeless: 0
+  base: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/zoffixznet/poe-component-irc-pluginbundle-webdevelopment/issues
+  homepage: http://metacpan.org/release/POE-Component-IRC-PluginBundle-WebDevelopment
+  repository: git://github.com/zoffixznet/poe-component-irc-pluginbundle-webdevelopment.git
+version: 2.001003
+x_Dist_Zilla:
+  perl:
+    version: 5.014002
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: '@Author::ZOFFIX/OurPkgVersion'
+      version: 0.005001
+    -
+      class: Dist::Zilla::Plugin::PromptIfStale
+      config:
+        Dist::Zilla::Plugin::PromptIfStale:
+          check_all_plugins: 1
+          check_all_prereqs: 1
+          modules: []
+          phase: release
+          skip:
+            - strict
+            - warnings
+            - base
+            - ExtUtils::MakeMaker
+            - IPC::Open3
+            - File::Copy
+      name: '@Author::ZOFFIX/PromptIfStale'
+      version: 0.016
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Author::ZOFFIX/GatherDir'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Author::ZOFFIX/PruneCruft'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Author::ZOFFIX/ManifestSkip'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Author::ZOFFIX/MetaYAML'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Author::ZOFFIX/License'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Author::ZOFFIX/Readme'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Author::ZOFFIX/ExecDir'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Author::ZOFFIX/ShareDir'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Author::ZOFFIX/MakeMaker'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Author::ZOFFIX/Manifest'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@Author::ZOFFIX/AutoPrereqs'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Author::ZOFFIX/MetaConfig'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::Prereqs::AuthorDeps
+      name: '@Author::ZOFFIX/Prereqs::AuthorDeps'
+      version: 0.002
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: '@Author::ZOFFIX/MinimumPerl'
+      version: 1.003
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::ZOFFIX/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: 5.012
+        Dist::Zilla::Role::MetaProvider::Provider:
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+      name: '@Author::ZOFFIX/MetaProvides::Package'
+      version: 2.000000
+    -
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: '@Author::ZOFFIX/GithubMeta'
+      version: 0.42
+    -
+      class: Dist::Zilla::Plugin::InstallGuide
+      name: '@Author::ZOFFIX/InstallGuide'
+      version: 1.200002
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@Author::ZOFFIX/ReadmeAnyFromPod'
+      version: 0.133360
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@Author::ZOFFIX/Test::Compile'
+      version: 2.039
+    -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: '@Author::ZOFFIX/Test::DistManifest'
+      version: 2.000004
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      name: '@Author::ZOFFIX/Test::EOL'
+      version: 0.10
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@Author::ZOFFIX/Test::Version'
+      version: 0.002004
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: '@Author::ZOFFIX/MetaTests'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
+      name: '@Author::ZOFFIX/Test::CPAN::Meta::JSON'
+      version: 0.003
+    -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: '@Author::ZOFFIX/MojibakeTests'
+      version: 0.5
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@Author::ZOFFIX/NoTabsTests'
+      version: 0.06
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::ZOFFIX/PodSyntaxTests'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      name: '@Author::ZOFFIX/Test::Portability'
+      version: 2.000005
+    -
+      class: Dist::Zilla::Plugin::Test::UnusedVars
+      name: '@Author::ZOFFIX/Test::UnusedVars'
+      version: 2.000005
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::LinkCheck
+      name: '@Author::ZOFFIX/Test::Pod::LinkCheck'
+      version: 1.001
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      name: '@Author::ZOFFIX/Test::CPAN::Changes'
+      version: 0.008
+    -
+      class: Dist::Zilla::Plugin::Test::PodSpelling
+      name: '@Author::ZOFFIX/Test::PodSpelling'
+      version: 2.006002
+    -
+      class: Dist::Zilla::Plugin::CheckSelfDependency
+      config:
+        Dist::Zilla::Plugin::CheckSelfDependency:
+          finder:
+            - ':InstallModules'
+      name: '@Author::ZOFFIX/CheckSelfDependency'
+      version: 0.007
+    -
+      class: Dist::Zilla::Plugin::CheckPrereqsIndexed
+      name: '@Author::ZOFFIX/CheckPrereqsIndexed'
+      version: 0.010
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: '@Author::ZOFFIX/Test::MinimumVersion'
+      version: 2.000005
+    -
+      class: Dist::Zilla::Plugin::AutoMetaResources
+      name: '@Author::ZOFFIX/AutoMetaResources'
+      version: 1.20
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromRelease
+      name: '@Author::ZOFFIX/CopyFilesFromRelease'
+      version: 0.001
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Author::ZOFFIX/TestRelease'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::InstallRelease
+      name: '@Author::ZOFFIX/InstallRelease'
+      version: 0.008
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::ZOFFIX/ConfirmRelease'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@Author::ZOFFIX/Git::Check'
+      version: 2.020
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Author::ZOFFIX/Git::Commit'
+      version: 2.020
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Author::ZOFFIX/Git::Tag'
+      version: 2.020
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@Author::ZOFFIX/Git::Push'
+      version: 2.020
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Author::ZOFFIX/UploadToCPAN'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: Git::NextVersion
+      version: 2.020
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: 5.012
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::ZOFFIX/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: 5.012
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 5.012

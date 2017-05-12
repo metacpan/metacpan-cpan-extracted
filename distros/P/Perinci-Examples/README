@@ -1,0 +1,17 @@
+DESCRIPTION
+
+    This distribution contains an odd mix of various functions, variables,
+    and other code entities, along with their Rinci metadata. Mostly used
+    for testing Rinci specification and the various Perinci modules.
+
+    Example scripts are put in a separate distribution (see
+    Perinci::Examples::Bin) to make dependencies for this distribution
+    minimal (e.g. not depending on Perinci::CmdLine::Any) since this
+    example module(s) are usually used in the tests of other modules.
+
+SEE ALSO
+
+    Perinci
+
+    Perinci::Examples::Bin
+

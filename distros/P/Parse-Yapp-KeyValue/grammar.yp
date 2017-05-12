@@ -1,0 +1,75 @@
+%token OP_ASSIGNMENT
+%token KEY
+%token TEXT_Q_SINGLE
+%token TEXT_Q_DOUBLE
+%token TEXT_NONQUOTED
+%start pairs
+
+%%
+pairs : pair
+      | pairs pair
+      | pairs EOI
+      ;
+
+pair : KEY OP_ASSIGNMENT string
+     {
+         my $data = $_[0]->YYData->{DATA};
+
+         if (exists $data->{$_[1]}) {
+            my $val = $data->{$_[1]};
+
+            if (ref $val eq 'ARRAY') {
+                push @{ $val }, $_[3];
+            } else {
+                $data->{$_[1]} = [ $val, $_[3] ];
+            }
+         } else {
+            $data->{$_[1]} = $_[3];
+         }
+     }
+     | OP_ASSIGNMENT string
+     {
+         my $data = $_[0]->YYData->{DATA};
+
+         if (exists $data->{''}) {
+            my $val = $data->{''};
+
+            if (ref $val eq 'ARRAY') {
+                push @{ $val }, $_[2];
+            } else {
+                $data->{''} = [ $val, $_[2] ];
+            }
+         } else {
+            $data->{''} = $_[2];
+         }
+     }
+     | string
+     {
+         my $data = $_[0]->YYData->{DATA};
+
+         if (exists $data->{''}) {
+            my $val = $data->{''};
+
+            if (ref $val eq 'ARRAY') {
+                push @{ $val }, $_[1];
+            } else {
+                $data->{''} = [ $val, $_[1] ];
+            }
+         } else {
+            $data->{''} = $_[1];
+         }
+     }
+     ;
+
+string : TEXT_Q_SINGLE
+       { chop $_[1]; substr $_[1], 1; }
+       | TEXT_Q_DOUBLE
+       { chop $_[1]; substr $_[1], 1; }
+       | TEXT_NONQUOTED
+       { $_[1] }
+       | KEY
+       { $_[1] }
+       ;
+
+%%
+# vim:ts=4:et:sw=4

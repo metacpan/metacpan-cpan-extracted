@@ -1,0 +1,6 @@
+Bugs in version.pm
+
+    1._1 produces garbage
+
+xdg: AndyA, as-tuple (or whatever you want to call it) should put the output in $version->normal() form
+xdg: AndyA, more specifically -- when bumping, it should convert the current version to normal() form and then bump it.

@@ -1,0 +1,12 @@
+%semantic token 'c' 
+
+%%
+
+S:
+      'c' + D +  
+;
+D:
+      'd' 
+;
+
+%%

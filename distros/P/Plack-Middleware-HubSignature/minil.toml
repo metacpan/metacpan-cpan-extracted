@@ -1,0 +1,6 @@
+name = "Plack-Middleware-HubSignature"
+# badges = ["travis"]
+authority="cpan:SONGMU"
+
+module_maker="ModuleBuildTiny"
+

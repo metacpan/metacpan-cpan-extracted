@@ -1,0 +1,334 @@
+Wikipedia Fallacies_of_Distributed_Computing
+
+The Fallacies of Distributed Computing are a set of common but flawed assumptions made by programmers when first developing distributed applications. The fallacies are summarized as follows [1]:
+
+   1. The network is reliable.
+   2. Latency is zero.
+   3. Bandwidth is infinite.
+   4. The network is secure.
+   5. Topology doesn't change.
+   6. There is one administrator.
+   7. Transport cost is zero.
+   8. The network is homogeneous.
+
+
+
+Notes on conflict
+
+    Initial state:
+    
+    clkao: record 1.   foo: bar (clkao@1)
+    
+     merge -> jesse
+     
+     clkao: record 1 foo:bar (@1)
+     jesse: record 1 foo:bar (@1) (merged from: clkao@1)
+     
+      clkao: changes record 1: foo  bar->baz     (@2)
+      jesse: changes record 1: foo  bar->frotz   (@2)
+      
+    Current state:
+      
+       clkao: record 1@2. foo: baz
+       jesse: record 1@2. foo: frotz 
+      
+      (right so far?)
+      
+      
+    merge: clkao -> jesse
+    
+        replay clkao@2 (first new rev)
+        
+        update record 1:
+            change foo from bar->baz
+            
+            CONFLICT!
+            
+            (jesse's proposed merge algorithm)
+            
+                 pre-fixup:  record 1, foo: revert frotz to bar jesse@3     
+      
+                apply clkao@2: record 1, foo:  bar->baz
+                
+                conflict resolution:
+                    baz vs frotz
+                    in the case that they were the same, resolve in favor of (always pick local?)
+                    
+                    but they're not the same, so we:    
+                        * look for a pre-existing resolution between
+                            clkao@2 and jesse@2?
+                            record 1, bar->baz AND record 1, bar->frotz?
+                
+      
+      
+    ya, that's because frotz does't match bar, not because frotz doesn't match baz.  if the two changesets make the same change, it's still a conflict which is.. normally resolved as "hey, we have the same change"  
+     ya
+      
+    ok
+    let me try to write out what I was thinking for merge here? or skip it and keep going with this as our definition of conflict?
+    
+    now I'll shut up. I feel like this is at the edges of my grasp of distributed systems.
+    
+    the thing is, the resolution strategy has to be in the db or be predefined. otherwise different replica can get different stuff. or is this going to be allowed? or if so we should layer it ontop as local changes to be applied to this replica, which should also be based on the head of the Database. so when merge, we either resolve conflict making the change gone, or keep it local on top of the Database. right, but not all replicas want that particular resolution, no?  so World will know all changes, except in replica A it's using X, in replica B it's using Y after the conflict Z ? ok. so your resolution is a new changeset that overrides the one conflicts with you.
+
+    A and B conflcit on X, resolved as Y
+    A and C conflict on X, resolved as Z
+    
+how about two variants of conflict resolution? as they are parallel.  who is to decide Y and Z? 
+
+In your example, do you assume the merges take place on B and C in parallel but neither feeds back to A yet?
+Assuming so,
+
+B@post-conflict = Y
+C@post-conflict=  Z
+
+B merges to A.
+
+A ends up with resolution as Y
+
+C merges to A. 
+
+There is a conflict between Y and Z. 
+
+Presumably that last update wins.
+    
+next time you sync A->B, B gets told that Y beat Z
+
+what if B<-> C sync before A<->B and A<->C sync.
+
+in the worst case, assume they decide on "Y beats Z"
+
+Do we need a 4th record for the pessimal case here?
+
+Then A<->C sync.
+
+I guess the main problem is "who is deciding", the one that initiates the sync?  practically yes, because you can publish a resolution based on the latest HEAD of the others. so there's no "they decide", it's up to who syncs the other first?    
+
+
+fwiw, I believe we're running into the byzantine generals problem.
+http://en.wikipedia.org/wiki/Paxos_algorithm
+
+
+But those require knowing how many replicas you have, don't they?
+
+so, how do we stabilize the system?
+
+hm. I wonder if there's a way to publish a list of "whom you trust in in the face of conflicts" and to have that be a higher-level function. that feels sort of evil and wrong, though
+
+the thing we're trying to avoid is ping-pong.
+
+and we can detect the ping-pong reliably, right?
+
+i don't think there'll ping-pong in our case, because the one who merges always wins (not that his version, but he gets to decide and publish), the resolution is a change based on the latest version of the other party, so the next sync will work without conflict
+
+and because we record all previous merge decisions, even if there's a long loop of other replicas off in the wilderness, when they come back, we'll still know what we decided originally?
+
+
+
+right, you get to "insist on" your change, but that's supposedly not a conflict, but of higher level functionality, which might cause ping-pong, but not in the db sync layer
+
+ok.
+    
+I need to be @client in 8 hours. I should probably go sleep.
+
+if this is interesting enough for you to hack on, the bits I stalled out on code wise were:
+    * storing merges
+    * actually beating SVN::Ra into giving me revision history (no easy-to-decode examples)
+
+get_logs(), it's quita painful.
+    
+    I noticed
+
+    * bin/merger had my state
+
+ok.  i will do customer stuff first next hour, and see how much i can get    
+
+much appreciated :)
+
+I'll commit this file
+
+enjoy the hacking. ->irc
+
+
+
+but then when X and Y sync, there will be conflict AA. and they'll need to resolve.
+
+it should not be possible to fork. conflicting Database HEAD is still a Conflict
+and when you sync, you'll propagate your resolutions.
+
+
+
+
+
+    hm. my vision had the resolution as something that got propagated. but when calcualating future conflicts, treating the resolution and the 
+
+Every replica needs to be eventually consistent.
+
+if you go back and forth, eventually, someone will win and someone will lose.
+
+    
+    
+but the goal is for us to end up with one current worldview when all is said and done.
+    
+    
+
+    I think we need to allow for users to make conflicting, distributed resolution decisions. and forcing reconcilation later.
+    possibly with:
+        * bob chose to reconcile this as A over B
+        * jesse and clkao chose to reconcile this as B over C
+        
+        
+can upstream reject the changes?  then we shouldn't call these replicas
+
+    I don't think there is 'upstream' 
+
+
+
+    
+    
+Resolution
+    When the local Replica 
+
+
+=head2 Assumptions about merge sources
+
+    - a source represents a branch 
+    - a branch has had many revisions applied
+    - revisions we apply to a branch from another branch are always applied UNCHANGED
+    - in the event of a conflict, we will apply a "pre-changeset" to smooth the application and a "post-changeset" if the applied changeset doesn't match the desired outcome.
+
+    on pull
+        we end up applying every single source changeset this peer has seen since the last time we saw this peer, one by one
+        we possibly apply another two changesets for each changeset to smooth the application
+
+
+
+        we skip any source changeset we've seen from another source before
+        
+
+    on push,
+        we publish each changeset we've made targetly.
+            - including "after" fixup changesets
+            - not including "before" fixup changesets.
+
+
+
+
+
+
+=head2 assumptions about merge changesets
+
+we can get (and hash):
+    -original database uuid
+    -original database revno
+    -original database author
+    -all changes
+
+
+
+
+
+
+Audrey@1:
+
+    Createdb
+    Add ticket 1 - subject 'foo'; status 'new'
+
+
+Jesse@1:
+
+    j pull from a@1
+
+    j@1 - foo;new
+    a@1 - foo;new
+
+    j@2  foo->bar
+    a@2  foo->baz
+        
+    c@1 pull from j@2
+
+        c now has:
+            a@1
+            j@2
+
+
+    c@2 bar->frotz
+
+    c@3 pull from a@2
+    
+        a hands c: a@2:foo->baz     
+
+        Conflict
+
+        to target c applies a pre-fixup:  
+            frotz->foo
+        to target c applies a@2:
+            foo->baz
+        to target c applies a conflict resolution
+            baz->frotz
+
+
+    c@4 push to a@2
+
+        beforehand, a's state: baz
+        beforehand, c's state: frotz
+
+        beforehand, c's unpushed transactions: 
+            j@2 foo->bar
+            c@2 bar->frotz
+            c@3
+                    pre-fixup: frotz->foo
+                    a@2: foo->baz
+                    post-fixup: baz->frotz
+
+            so, what do we push?
+            options:
+                fixup to get a to our earliest state unpushed. that's kind of stupid and results in us replaying everthing all the time.
+                compute a single large changeset from a@HEAD to c@HEAD and apply that?
+
+
+        
+investigate "rumor" peer to peer replication
+
+
+take 2
+
+    there's a new peer I've not seen before. I need to merge in all their changes:
+
+        if a changeset comes from a replica@rev lower than our last-seen version for replica, skip it
+
+        for each of their changesets, import it, applying fixups as needed
+    
+
+=head3 push
+    
+    get the source list of all merge tickets.
+    find all target revs which source has never seen.
+        - genuine target changesets
+        - third-party changesets that the source has no merge ticket for
+
+        - skip "before" fixup changesets 
+        - include "after" fixup changesets, since they're merge resolutions
+
+
+    iterate over these revs the source has never seen.
+    when the changeset applies cleanly, just apply it.
+
+    when the changeset does _not_ apply cleanly, 
+        - apply a 'before' fix up transaction
+        - apply the original changeset
+        - apply a merge resolution changeset.
+            - TODO: this doesn't feel quite right
+            - the resolution should be the same as the equivalent merge resolution transaction on the "pull" variant if it exists.
+	                    What info do we have here?
+	                        - record uuid
+	                        - nearest parent variant
+	                        - target variant
+	                        - source variant
+	                        - information from the 'future (target head)' about the eventual desired outcome 
+	                    
+    - audit stage:
+        compare target head and source head. - they should now be identical, since the last transactions we replayed were all target merge fixup changesets. (is that true?)
+
+=cut
+1;

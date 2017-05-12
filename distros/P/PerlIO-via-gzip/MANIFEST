@@ -1,0 +1,10 @@
+MANIFEST
+README
+LICENSE
+Changes
+Build.PL
+lib/PerlIO/via/gzip.pm
+t/001_roundtrip.t
+Makefile.PL
+META.yml
+META.json

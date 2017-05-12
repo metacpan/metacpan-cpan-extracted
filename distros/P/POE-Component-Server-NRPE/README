@@ -1,0 +1,165 @@
+NAME
+    POE::Component::Server::NRPE - A POE Component implementation of NRPE
+    Daemon.
+
+VERSION
+    version 0.18
+
+SYNOPSIS
+      use strict;
+      use POE;
+      use POE::Component::Server::NRPE;
+      use POE::Component::Server::NRPE::Constants qw(NRPE_STATE_OK);
+
+      my $port = 5666;
+
+      my $nrped = POE::Component::Server::NRPE->spawn(
+            port => $port;
+      );
+
+      $nrped->add_command( command => 'meep', program => \&_meep );
+
+      $poe_kernel->run();
+      exit 0;
+
+      sub _meep {
+            print STDOUT "OK meep\n";
+            exit NRPE_STATE_OK;
+      }
+
+DESCRIPTION
+    POE::Component::Server::NRPE is a POE component that implements an NRPE
+    (Nagios Remote Plugin Executor) daemon supporting both version 1 and
+    version 2 protocols. It also supports SSL encryption using Net::SSLeay
+    and a hacked version of POE::Component::SSLify.
+
+    Access is controlled by specifying Net::Netmask objects to the
+    constructor. The default behaviour is to allow access from any IP
+    address.
+
+CONSTRUCTOR
+    spawn
+        Takes a number of parameters, which are optional:
+
+          'address', bind the listening socket to a particular address, default is IN_ADDR_ANY;
+          'port', specify a port to listen on, default is 5666;
+          'version', the NRPE protocol version to use, default is 2;
+          'usessl', set this to 0 to disable SSL support with NRPE Version 2, default is 1;
+          'time_out', specify a time out in seconds for socket connections and commands, default is 10;
+          'access', an arrayref of Net::Netmask objects that will be granted access, default is 'any';
+
+        Returns a POE::Component::Server::NRPE object.
+
+METHODS
+    session_id
+        Returns the POE::Session ID of the component.
+
+    shutdown
+        Terminates the component. Shuts down the listener and disconnects
+        connected clients.
+
+    getsockname
+        Access to the POE::Wheel::SocketFactory method of the underlying
+        listening socket.
+
+    add_command
+        This will add a command that can be run. Takes a number of
+        parameters:
+
+          'command', a label for the command. This is what clients will request, mandatory;
+          'program', the program to run. Can be a coderef, mandatory;
+          'args', the command line arguments to pass to the above program, must be an arrayref;
+
+        The 'command' should behave like an NRPE plugin: It should print a
+        status message to STDOUT and exit() with the test's outcome.
+        POE::Component::Server::NRPE::Constants defines constants for the
+        valid exit() values.
+
+        add_command() eturns 1 if successful, undef otherwise.
+
+    del_command
+        Removes a previously defined command. Takes one argument, the
+        previously defined label to remove.
+
+        Returns 1 if successful, undef otherwise.
+
+INPUT EVENTS
+    These are events from other POE sessions that our component will handle:
+
+    register_command
+        This will register the sending session with given command. Takes a
+        number of parameters:
+
+           'command', a label for the command. This is what clients will request, mandatory;
+           'event', the name of the event in the registering session that will be triggered, mandatory;
+           'context', a scalar containing any reference data that your session demands;
+
+        The component will increment the refcount of the calling session to
+        make sure it hangs around for events. Therefore, you should use
+        either "unregister_command" or "shutdown" to terminate registered
+        sessions.
+
+        Whenever clients request the given command, the component will send
+        the indicated event to the registering session with the following
+        parameters:
+
+          ARG0, a unique id of the client;
+          ARG1, the context ( if any );
+
+        Your session should then do any necessary processing and use
+        "return_result" event to return the status and output to the
+        component.
+
+    unregister_command
+        This will unregister the sending session with the given command.
+        Takes one parameter:
+
+           'command', a previously registered command, mandatory;
+
+    return_result
+        After processing a command your session must use this event to
+        return the status and output to the component. Takes three values:
+
+           The unique id of the client;
+           The status which should be 0, 1 , 2 or 3, indicating OK, WARNING, CRITICAL or UNKNOWN, respectively;
+           A string with some meaning output;
+
+           $kernel->post( 'nrped', 'return_result', $id, 0, 'OK Everything was cool' );
+
+    shutdown
+        Terminates the component. Shuts down the listener and disconnects
+        connected clients.
+
+CAVEATS
+    Due to problems with Net::SSLeay mixing of client and server SSL is not
+    encouraged unless fork() is employed.
+
+TODO
+    Add a logging capability.
+
+SEE ALSO
+    POE
+
+    POE::Component::SSLify
+
+    <http://www.nagios.org/>
+
+KUDOS
+    This module uses code derived from
+    <http://www.stic-online.de/stic/html/nrpe-generic.html> Copyright (C)
+    2006, 2007 STIC GmbH, http://www.stic-online.de
+
+AUTHORS
+    *   Chris Williams <chris@bingosnet.co.uk>
+
+    *   Rocco Caputo <rcaputo@cpan.org>
+
+    *   Olivier Raginel <github@babar.us>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Chris Williams, Rocco Caputo,
+    Olivier Raginel and STIC GmbH.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

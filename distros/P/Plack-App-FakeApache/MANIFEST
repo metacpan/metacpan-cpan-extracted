@@ -1,0 +1,17 @@
+Build.PL
+Changes
+examples/generic.psgi
+examples/simple.psgi
+examples/wrapwrap.psgi
+lib/Plack/App/FakeApache.pm
+lib/Plack/App/FakeApache/Connection.pm
+lib/Plack/App/FakeApache/Log.pm
+lib/Plack/App/FakeApache/Request.pm
+lib/Plack/App/FakeApache/Server.pm
+lib/Plack/App/WrapApacheReq.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-require.t
+t/01-simple.t

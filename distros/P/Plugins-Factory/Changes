@@ -1,0 +1,6 @@
+Revision history for Perl extension Plugins::Factory.
+
+0.01  Tue Jun 22 21:34:46 2010
+	- original version; created by h2xs 1.23 with options
+		-AX Plugins::Factory
+

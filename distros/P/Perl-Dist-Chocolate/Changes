@@ -1,0 +1,5 @@
+Changes for Perl extension Perl-Dist-Chocolate
+
+1.07 Thu 23 Oct 2008
+	- Created as a subclass of Strawberry
+	- Adding a "splat" of initial probably-good module bloat

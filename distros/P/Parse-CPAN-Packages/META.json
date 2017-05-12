@@ -1,0 +1,59 @@
+{
+   "abstract" : "Parse 02packages.details.txt.gz",
+   "author" : [
+      "Leon Brocard <acme@astray.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parse-CPAN-Packages",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Peek" : "0",
+            "CPAN::DistnameInfo" : "0",
+            "Compress::Zlib" : "0",
+            "File::Slurp" : "0",
+            "Moo" : "0",
+            "PPI" : "0",
+            "Path::Class" : "0",
+            "Test::InDistDir" : "0",
+            "Test::More" : "0",
+            "Type::Utils" : "0",
+            "Types::Standard" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wchristian/parse-cpan-packages.git",
+         "web" : "https://github.com/wchristian/parse-cpan-packages"
+      }
+   },
+   "version" : "2.40"
+}

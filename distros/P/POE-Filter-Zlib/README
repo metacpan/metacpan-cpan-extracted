@@ -1,0 +1,100 @@
+NAME
+
+    POE::Filter::Zlib - A POE filter wrapped around Compress::Zlib
+
+VERSION
+
+    version 2.04
+
+SYNOPSIS
+
+        use POE::Filter::Zlib;
+    
+        my $filter = POE::Filter::Zlib->new();
+        my $scalar = 'Blah Blah Blah';
+        my $compressed_array   = $filter->put( [ $scalar ] );
+        my $uncompressed_array = $filter->get( $compressed_array );
+    
+        use POE qw(Filter::Stackable Filter::Line Filter::Zlib);
+    
+        my ($filter) = POE::Filter::Stackable->new();
+        $filter->push( POE::Filter::Zlib->new(),
+                       POE::Filter::Line->new( InputRegexp => '\015?\012', OutputLiteral => "\015\012" ),
+
+DESCRIPTION
+
+    POE::Filter::Zlib provides a POE filter for performing
+    compression/uncompression using Compress::Zlib. It is suitable for use
+    with POE::Filter::Stackable.
+
+    This filter is not ideal for streaming compressed data over sockets
+    etc. as it employs compress and uncompress zlib functions.
+
+    POE::Filter::Zlib::Stream is recommended for that type of activity.
+
+CONSTRUCTOR
+
+    new
+
+      Creates a new POE::Filter::Zlib object. Takes one optional argument,
+
+        'level': the level of compression to employ.
+
+      Consult Compress::Zlib for details.
+
+METHODS
+
+    get
+
+    get_one_start
+
+    get_one
+
+      Takes an arrayref which is contains lines of compressed input.
+      Returns an arrayref of uncompressed lines.
+
+    get_pending
+
+      Returns any data in a filter's input buffer. The filter's input
+      buffer is not cleared, however.
+
+    put
+
+      Takes an arrayref containing lines of uncompressed output, returns an
+      arrayref of compressed lines.
+
+    clone
+
+      Makes a copy of the filter, and clears the copy's buffer.
+
+    level
+
+      Sets the level of compression employed to the given value. If no
+      value is supplied, returns the current level setting.
+
+SEE ALSO
+
+    POE
+
+    POE::Filter
+
+    POE::Filter::Zlib::Stream
+
+    Compress::Zlib
+
+    POE::Filter::Stackable
+
+AUTHORS
+
+      * Chris Williams <chris@bingosnet.co.uk>
+
+      * Martijn van Beers
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams and Martijn van
+    Beers.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

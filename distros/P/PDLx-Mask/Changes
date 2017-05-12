@@ -1,0 +1,27 @@
+Revision history for PDLx-Mask
+
+0.03	2016-10-28T13:45:54-0400
+
+  [BUG FIX]
+
+    * if a mask unsubscribed data objects, they were not informed
+      and thus didn't update their valus.
+
+0.02	2016-10-28T09:57:59-0400
+
+  [BUG FIX]
+
+    * a mask object didn't update its effective mask if a subscriber
+      with a data_mask unsubscribed
+
+  [ENHANCEMENT]
+
+    * PDLx::MaskedData objects may now be explicitly subscribed and
+      unsubscribed
+
+
+0.01	2016-10-24T15:38:10-0400
+
+    * Initial release.
+
+

@@ -1,0 +1,29 @@
+
+
+%token NUM = /([0-9]+)/
+%token VAR = /([A-Za-z]+)/
+
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+
+%{
+        use Data::Dumper;
+%}
+
+%%
+
+gram: exp*   { print Dumper($_[1]) }
+    ;
+
+exp: exp '+' exp { return ['plus', $_[1], $_[3]] }
+   | exp '-' exp { return ['minus', $_[1], $_[3]] }
+   | exp '/' exp { return ['slash', $_[1], $_[3]] }
+   | exp '*' exp { return ['star', $_[1], $_[3]] }
+   | '(' exp ')' { return ['parenthesis', $_[2]] }
+   | NUM         { return ['number', $_[1]] }
+   | VAR         { return ['variable', $_[1]] }
+   | VAR '=' exp { return ['atrib', $_[1], $_[3]]}
+   ;
+
+%%

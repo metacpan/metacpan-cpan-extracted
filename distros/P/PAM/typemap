@@ -1,0 +1,3 @@
+TYPEMAP
+pam_handle_t *	T_PTROBJ_MG
+struct pam_conv *	T_PTROBJ_MG

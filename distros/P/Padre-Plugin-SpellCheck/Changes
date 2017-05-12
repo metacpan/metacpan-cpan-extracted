@@ -1,0 +1,134 @@
+Revision history for Padre-Plugin-SpellCheck
+
+1.33 2013-09-24
+ - Add MYMETA to MANIFEST.SKIP (BOWTIE)
+
+1.32 2013-05-02
+ - Update dependainces and bump version (BOWTIE)
+ - Tweak tests to increase coverage (BOWTIE)
+
+1.31_03 2013-01-14
+ - Tweak perl version dependancy and Makefile (BOWTIE)
+
+1.31_02 2013-01-11
+ - Bumped perl dependancie to 5.12.5 as test 05-Checker.t was failing under
+   perl 5.10.1 with Class::Accessor (BOWTIE)
+ - Update Changes file to CPAN::Changes::Spec (BOWTIE)
+
+1.31_01 2012-08-25
+ - Missing ellipsis on context menu (BOWTIE)
+ - changed to dev version number until padre 0.98 is released (BOWTIE)
+
+1.31 2012-08-23
+ - My Bad, forgot to add icon (BOWTIE)
+
+1.30 2012-08-22
+ - update preferences to new Padre::Util::run_in_dir_two format (BOWTIE)
+ - Add event_on_context_menu to enable changing preferences (BOWTIE)
+ - Tweak tests for above (BOWTIE) 
+
+1.29 2012-06-19
+ - Typo in fbp (BOWTIE)
+ - replacement text location slipping dod+ (BOWTIE)
+ - remove unused variable (BOWTIE)
+ - switch to Class::Accessor with 'antlers' (BOWTIE)
+
+1.28 2012-06-15
+ - POD tweak for clarification dod+ (BOWTIE)
+ - disable button when finished (BOWTIE)
+
+1.27 2012-05-13
+ - fix hunspell selection, which was not and tweak POD (BOWTIE)
+
+1.26 2012-05-13
+ - use v-string (BOWTIE)
+ - update to next version number (BOWTIE)
+
+1.25 2012-04-24
+ - dynamic Dialogue Titles (BOWTIE)
+ - Update POD, remove test code (BOWTIE)
+ - implement new plugin_disable (BOWTIE)
+ - use Try::Tiny implement (BOWTIE)
+ - moving to p-p-xx-yy for config,  tides code and makes more consistent
+   across plug-ins,  Padre 0.96 compatible only (BOWTIE)
+ - Tweak tests, add README (BOWTIE)
+
+1.24 2012-02-26
+ - remove unwanted test for Text::Aspell installed (BOWTIE)
+
+1.23 2012-02-26
+ - fix plugin_enable school boy error (BOWTIE)
+ - fix the config DB to check on enable for past and new install (BOWTIE)
+ - Bump version to 1.23 (BOWTIE)
+ - added Text::Hunspell (BOWTIE)
+ - Update Status info in Checker to show dictionary and language
+   (ALIAS)(BOWTIE)
+ - rename Method accessors to inc get/set (BOWTIE)
+ - remove un-used Methods (BOWTIE)
+ - add the standard License to the tail as and where (BOWTIE)
+
+1.22 2012-02-22
+ - remove dead code in plugin_icon method (ZENOG)
+ - Upgraded to use wxFormBuilder-based forms (BOWTIE)
+ - revert-> Added missing Data::Printer dependency (AZAWAWI)<-(BOWTIE)
+ - Access to Preferences is now via Plugin Manager (BOWTIE)
+ - Preferences now displays language name rather than ISO code (BOWTIE)
+ - use Padre Locale for dictionary names from ISO code (BOWTIE)
+ - Start on adding some tests, as there are none (BOWTIE)
+ - Preferences now shows and saves Aspell and Hunspell local dictionaries
+   (BOWTIE)
+
+1.21 2010-12-06
+ - Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+ - rename method 'spell_preferences' to 'plugin_preferences', so that the
+   dialogue can also be called from the plugin manager (ZENOG)
+ - add support for some filters (XML, HTML, LaTeX) (ZENOG)
+ - fix encoding information in German translation file: ASCII to UTF-8
+   #1070 (ZENOG)
+
+1.2 2010-10-29
+ - Removed Test::NeedsDisplay dependency (AZAWAWI)
+
+1.1.3 2010-10-27
+ - Compatibility with the latest Padre (ZENOG, AZAWAWI)
+ - Added German translation (ZENOG)
+ - Added Japanese translation (ISHIGAKI)
+ - Fixed translations in share directory and removed old one(AZAWAWI)
+ - Switched to Dist::Zilla (AZAWAWI)
+ - t/00-load.t is magically injected by [@PadrePlugin] via [LoadTests]
+   (AZAWAWI)
+
+1.1.2 2009-06-20
+ - Add Chinese (Traditional) translation (bluet)
+ - spanish translation added (brunov)
+ - remove .po files from MANIFEST.SKIP, they are needed for Debian since
+   they are the source for the .mo files (ryan52)
+ - if the user selects one of the suggestions, replace it (ryan52)
+
+1.1.1 2009-05-08
+ - work-around for unicode texts (therek)
+
+1.1.0 2009-04-29
+ - possibility to choose dictionary language (but wx::stc has unicode bugs
+   which prevents this feature to be really useful on non-ascii texts)
+ - plugin i18n-ed, ready to accept translations
+ - arabic translation added (azawawi)
+ - brazilian portuguese translation added (garu)
+ - french translation added
+ - polish translation added (therek)
+
+1.0.0 2009-04-22
+ - using a dedicated spellcheck dialog
+ - on error, possibility to replace, replace all, ignore, ignore all
+
+0.03 2009-04-05
+ - providing an icon for padre's plugin manager
+
+0.02 2009-04-05
+ - adding newline between wrongly spelled words
+ - changing maintainer
+ - moving away from module::install
+ - cleaning meta information
+
+0.01 2009-02-01
+ - First version, released on an unsuspecting world.

@@ -1,0 +1,57 @@
+^.*\.patch$
+^certs/
+doc/book-toc.txt
+doc/hacking/release-process.txt
+^\w+-stamp$
+conf/ljdev.conf
+conf/perlbal.conf
+lib/Perlbal/Plugin/AtomInject.pm
+lib/Perlbal/Plugin/AtomStream.pm
+lib/Perlbal/Plugin/pRuleLJ.pm
+Perlbal.spec
+.shipit
+
+^#
+\bCVS\b
+^MANIFEST\.
+^Makefile$
+~$
+\.html$
+\.old$
+^blib/
+_blib$
+^MakeMaker-\d
+^\.exists
+\bdebian\b
+\btest\b
+
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+,v$
+\B\.svn\b
+\.git
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib$
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+cover_db
+pm_to_blib
+.*\.bak
+^MYMETA.yml$
+\.project
+^Perlbal-.*
+^MYMETA\.json$

@@ -1,0 +1,7 @@
+Revision history for Padre::Plugin::RegexExplain
+
+0.02    Aug 22nd, 2011
+        plugins need to declare 'padre_interfaces' (#70375, thank to David Horner)
+
+0.01    Sep 8th, 2010
+        first version

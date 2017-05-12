@@ -1,0 +1,3 @@
+server.t -- start builtin server and check via LWP
+
+indexer.t -- build a partial index and test fulltext() method.

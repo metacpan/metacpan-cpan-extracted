@@ -1,0 +1,18 @@
+
+Pod::MultiLang
+
+ for write multi langual pod document.
+
+INSTALLATION
+
+ $ tar zxvf Pod-MultiLang-x.xx.tar.gz
+ $ cd Pod-MultiLang-x.xx/
+ $ perl Makefile.PL
+ $ make
+ # make install
+
+AUTHOR
+
+ YAMASHINA Hio <hio@hio.jp>
+ http://fleur.hio.jp/index.en.html
+   (most contents are written in Japanese ^^;;)

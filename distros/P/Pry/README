@@ -1,0 +1,88 @@
+NAME
+    Pry - intrude on your code
+
+SYNOPSIS
+       use Pry;
+   
+       ...;
+       pry;
+       ...;
+
+DESCRIPTION
+    Kind of a bit like a debugger, kind of a bit like a REPL.
+
+    This module gives you a function called `pry` that you can drop into your
+    code anywhere. When Perl executes that line of code, it will stop and drop
+    you into a REPL. You can use the REPL to inspect any lexical variables
+    (and even alter them), call functions and methods, and so on.
+
+    All the clever stuff is in the REPL. Rather than writing yet another Perl
+    REPL, Pry uses Reply, which is an awesome yet fairly small REPL with
+    support for plugins that can do some really useful stuff, such as
+    auto-complete of function and variable names.
+
+    Once you've finished using the REPL, just hit Ctrl+D and your code will
+    resume execution.
+
+  Functions
+    `pry()`
+        Starts the Pry REPL.
+
+    `pry(@varnames)`
+        Dumps selected variables before starting the Pry REPL.
+
+        Note a list of variable *names* is expected; not *values*. For
+        example:
+
+           my $x = 42;
+           my @y = (666, 999);
+           pry('$x', '@y');
+
+   Utility Functions
+    The following functions are provided for your convenience. They cannot be
+    exported, so you should access them, from the REPL, using their
+    fully-qualified name.
+
+    `Pry::Lexicals`
+        Returns a hashref of your lexical variables.
+
+    `Pry::Trace`
+        Returns the stack trace as a Devel::StackTrace object.
+
+    `Pry::Dump(@variable_names)`
+        Dumps variables (which must exist somewhere in the `Pry::Lexicals`
+        hashref).
+
+  Package Variable
+    $Pry::Dumper
+        Decides the backend dumper implementation used by `Pry::Dump()`. Valid
+        values are "Data::Dump" and "Data::Dumper".
+
+CONFIGURATION
+    Pry's REPL can be configured in the same way as Reply.
+
+CAVEATS
+    I imagine this probably breaks pretty badly in a multi-threaded or
+    multi-process scenario.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Pry>.
+
+SEE ALSO
+    <http://en.wikipedia.org/wiki/Read–eval–print_loop>, Reply.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

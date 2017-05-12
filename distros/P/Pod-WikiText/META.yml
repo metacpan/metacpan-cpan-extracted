@@ -1,0 +1,20 @@
+---
+name: Pod-WikiText
+version: 0.12
+author:
+  - 'Brad Adkins <dbijcl@gmail.com>'
+abstract: Support for the use of Wiki markup
+version_from: lib/Pod/WikiText.pm
+requires:
+  File::Spec: 0
+  Text::Wrap: 0
+  Text::Tiki: 0
+  Syntax::Highlight::Engine::Kate: 0
+build requires:
+  Test::Harness: 0
+  Test::More: 0
+provides:
+  Pod::WikiText
+    file: lib/Pod/WikiText.pm
+    version: 0.12
+distribution_type: module

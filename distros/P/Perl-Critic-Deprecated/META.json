@@ -1,0 +1,75 @@
+{
+   "abstract" : "Policies and modules that were formerly included with Perl::Critic itself, but which have been superseded by others.",
+   "author" : [
+      "Elliot Shank <perl@galumph.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Critic-Deprecated",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Carp" : "0",
+            "English" : "0",
+            "Perl::Critic::TestUtils" : "1.094",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Perl::Critic::Policy" : "1.094",
+            "Perl::Critic::Utils" : "1.094",
+            "Readonly" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::Deprecated" : {
+         "file" : "lib/Perl/Critic/Deprecated.pm",
+         "version" : "1.119"
+      },
+      "Perl::Critic::Policy::Miscellanea::RequireRcsKeywords" : {
+         "file" : "lib/Perl/Critic/Policy/Miscellanea/RequireRcsKeywords.pm",
+         "version" : "1.119"
+      },
+      "Perl::Critic::Policy::NamingConventions::ProhibitMixedCaseSubs" : {
+         "file" : "lib/Perl/Critic/Policy/NamingConventions/ProhibitMixedCaseSubs.pm",
+         "version" : "1.119"
+      },
+      "Perl::Critic::Policy::NamingConventions::ProhibitMixedCaseVars" : {
+         "file" : "lib/Perl/Critic/Policy/NamingConventions/ProhibitMixedCaseVars.pm",
+         "version" : "1.119"
+      },
+      "Perl::Critic::Utils::PPIRegexp" : {
+         "file" : "lib/Perl/Critic/Utils/PPIRegexp.pm",
+         "version" : "1.119"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://perlcritic.com",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://guest@perlcritic.tigris.org/svn/perlcritic/trunk/distributions/Perl-Critic-Deprecated/"
+      },
+      "x_MailingList" : "http://perlcritic.tigris.org/servlets/SummarizeList?listName=users"
+   },
+   "version" : "1.119"
+}

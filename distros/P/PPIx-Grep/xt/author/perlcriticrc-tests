@@ -1,0 +1,45 @@
+# Make things as strict as possible.
+profile-strictness = quiet
+severity = 1
+verbose = %f: %m at line %l, column %c.  %e.  (Severity: %s, %p)\n
+
+# Tags are good enough for me.
+[-Miscellanea::RequireRcsKeywords]
+
+# No Emacs around here.
+[-Editor::RequireEmacsFileVariables]
+
+# Need to write CodeLayout::RequireUTF8
+[-CodeLayout::RequireASCII]
+
+# Perl::Tidy wouldn't know a properly formatted conditional expression
+# if one stomped all over Perl::Tidy.pm.  (Not to say that P::T isn't
+# useful.)
+[-CodeLayout::RequireTidyCode]
+
+# Don't require POD for tests.
+[-Documentation::RequirePodSections]
+
+[InputOutput::RequireCheckedSyscalls]
+functions = open close
+
+[RegularExpressions::ProhibitUnusualDelimiters]
+allow_all_brackets = 1
+
+[RegularExpressions::RequireBracesForMultiline]
+allow_all_brackets = 1
+
+# Magic numbers BAD.  (It doesn't hurt that I wrote this policy.)
+[ValuesAndExpressions::ProhibitMagicNumbers]
+severity = 4
+
+# For some reason, this chokes on v-strings within a version constructor
+# and I don't have time to chase this down.
+[-Modules::PerlMinimumVersion]
+
+[-ErrorHandling::RequireUseOfExceptions]
+[-Tics::ProhibitLongLines]
+
+# setup vim: set filetype=conf tabstop=4 softtabstop=4 expandtab :
+# setup vim: set shiftwidth=4 shiftround textwidth=78 nowrap autoindent :
+# setup vim: set foldmethod=indent foldlevel=0 :

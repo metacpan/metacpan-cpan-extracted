@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1187790215,
+          'number' => '+441783376337',
+          'time' => '14:43',
+          'date' => '2007-08-22',
+          'name' => 'Bytemark (W)',
+          'phone' => '+441783376337',
+          'device' => 'Treo 680',
+          'direction' => 'inbound',
+          'timestamp' => 1187790215,
+          'text' => '(Server shutdown) Hi David, I\'ll shift your server as soon as you\'ve halted it.  cheers,  Matthew.',
+          'type' => '0x400C',
+          'category' => 0,
+          'id' => 7107023,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 23227
+        };

@@ -1,0 +1,25 @@
+2009-02-21  jmerelo  <jmerelo@localhost.localdomain>
+
+	* 0.2.1: fixed bad pod docs in POEtic, added more generations to
+	test to avoid problems with not improving average. 
+
+2009-02-12  Juan J. Merelo  <jmerelo@vega>
+
+	* Makefile.PL: Added an 'after_step' event to make easier do stuff
+	after each generation, changed Makefile and changed to 0.1 since
+	it looks like it already does something useful. 
+
+2009-02-10  jmerelo  <jmerelo@localhost.localdomain>
+
+	* 0.0.4.1 lib/POE/Component/Algorithm/Evolutionary.pm (new): Forgot to include POE in the dependencies.
+
+2009-02-09  Juan Julian Merelo Guervos  <jmerelo@geneura.ugr.es>
+
+	* lib/POE/Component/Algorithm/Evolutionary.pm: Changing to 0.0.4
+	for minor doc changes 
+
+Revision history for Poe-Component-Algorithm-Evolutionary
+
+0.0.1  Sun Feb  8 18:00:10 2009
+       Initial release.
+

@@ -1,0 +1,11 @@
+my $hello = 'world';
+
+__END__
+
+=pod
+
+=head1 NAME
+
+Hello World
+
+=cut

@@ -1,0 +1,25 @@
+=head1 NAME
+
+160-begin-block
+
+=head1 EXAMPLES
+
+=begin text
+
+This is a text-only block
+
+=end text
+
+=begin html
+
+<p>This is an HTML-only block</p>
+
+=end html
+
+=begin obscure
+
+This is an obscure block
+
+=end obscure
+
+[EOF]

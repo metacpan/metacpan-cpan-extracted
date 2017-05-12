@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Padre-Plugin-Encode
+version:             0.1.3
+abstract:            convert file to different encoding in Padre
+license:             ~
+author:              
+    - Keedi Kim - 김도형 <keedi@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Encode:                        2.26
+    Padre:                         0.23
+    Test::More:                    0
+    version:                       0
+    Wx::Perl::Dialog:              0.04
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

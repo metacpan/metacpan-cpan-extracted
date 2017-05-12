@@ -1,0 +1,33 @@
+<HTML>
+<HEAD>
+<TITLE>page</TITLE>
+<BASE href="http://www.site.com/dir/"></HEAD>
+<BODY BGCOLOR="#ffffff" TEXT="#000000">
+<UL>
+<LI><A HREF="#See%20also">See also
+
+</A></UL>
+<HR>
+<H1><A NAME="See%20also">See also
+
+</A></H1>
+
+<P><A HREF="page.html">page</A>
+
+</P>
+<P><A HREF="page.html#frag">page/frag</A>
+
+</P>
+<P><A HREF="page.html#frag">page/&quot;frag&quot;</A>
+
+</P>
+<P><A HREF="#frag">&quot;frag&quot;</A>
+
+</P>
+<P><A HREF="#frag">/frag</A>
+
+</P>
+<P><A HREF=""></A>
+</P>
+</BODY>
+</HTML>

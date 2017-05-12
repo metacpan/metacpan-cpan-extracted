@@ -1,0 +1,7 @@
+Revision history for PDF-PDFUnit
+
+0.17      2016-06-13 06:03:29+02:00 Europe/Berlin
+  - Minor changes in POD for better representation on CPAN 
+
+0.16      2016-06-05 14:01:03+02:00 Europe/Berlin
+  - Initial release

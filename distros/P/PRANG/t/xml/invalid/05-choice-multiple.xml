@@ -1,0 +1,9 @@
+<!-- error: /Single child node expected, multiple found/ -->
+<Octothorpe>
+  <colon/>
+  <pipe dollar_sign="£">
+    <fishhooks>
+      <space><braces>22</braces><parens><colon/></parens></space>
+    </fishhooks>
+  </pipe>
+</Octothorpe>

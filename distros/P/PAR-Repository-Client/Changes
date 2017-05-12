@@ -1,0 +1,142 @@
+Revision history for Perl extension PAR::Repository::Client.
+
+0.25  Fri Sep  4 21:29 2009
+    - Fix bug with respect to upgrading and priority (fallback=>0)
+      repositories.
+    - More caching: Add a timeout before fetching checksums again.
+
+0.24_01  Fri Feb 20 15:21 2009
+    - Many, many, many improvements to the caching algorithms.
+      In fact, I'd go as far as saying that this will be the first
+      release where the caching works well.
+    - Inter-run caching of the DBMs with local checksum
+      re-calculation.
+    - Introduce the private-cache-dir setting for controlling the
+      caching behaviour.
+    - Caching improves run-time of simple test by factor of three.
+    - Enforce the use of a temporary directory as a cache dir
+      in the tests much more so we are good CPAN testers citizens.
+
+0.24  Thu Feb 19 17:16 2009
+    - Promote to stable release
+
+0.23_02  Mon Feb  2 21:14 2009
+    - Attempt band-aid fix for a better error recovery in case
+      of a failing dependency resolution.
+    - Fix for the dependencies test (set arch and perl version
+      manually)
+
+0.23_01  Mon Feb  2 01:38 2009
+    - "static_dependencies" option for automatic resolution
+      of the statically declared dependencies.
+    - "get_module_dependencies" and "get_script_dependencies"
+      methods returning a list of all PAR distributions from
+      the repository required to use a given module or script.
+    - Much better abstraction of the (internal) X_dbm methods
+    - Upgrading the testing repositories to include deps.
+    - Require PAR 0.985 due to minor bug fix for the
+      "run script from repository" use case.
+
+0.22_01  Sun Jan 25 23:16 2009
+    - Implement/fix auto-upgrading.
+    - Require PAR 0.984 for upgrading.
+    - Require PAR::Dist 0.43 so install_module doesn't fail
+      with newer ExtUtils::Installs
+
+0.21_03  Wed Jan 14 08:00 2009
+    - Disable File::Temp exclusive locking or else BSD is
+      unhappy.
+
+0.21_02  Tue Jan 13 20:06 2009
+    - Support for setting custom cache directories with
+      the cache_dir parameter to new().
+    - Set PAR_TEMP to a real temporary directory with cleanup
+      for the tests so there are not files leftover after
+      testing (RT #30018)
+
+0.21_01  Tue Jan 13 18:00 2009
+    - Fix return values of modules_dbm and scripts_dbm:
+      Formerly, they would only return the hash (not the file)
+      if the checksums matched.
+    - Fix return value of need_dbm_update on success. Documented
+      to be the empty list, was 0.
+    - Fix need_dbm_update in case the checksums had never been
+      fetched before.
+    - Fix autovivification bug in _fetch_module(). (very minor)
+    - Fix bug in _fetch_module()
+    - Much, MUCH better tests.
+
+0.21  Mon Oct 20 20:49 2008
+    - Simple distribution fix. 0.20 was missing a file. Oops!
+
+0.20  Sun Oct 19 18:20 2008
+    - Require PAR 0.982: 
+    --> Only load PAR.pm when really needed, otherwise load just
+        the new PAR::Setup* modules to setup the environment.
+    - Support for manually specifying the preferred architecture
+      and perl version.
+
+0.18  Tue Jun  3 15:29 2008
+    - Don't refetch DBM files when deemed not necessary because the
+      checksums match..
+    - Add getters for dbm checksums in case the repository
+      supports them.
+    - Add PAR::Repository::Client::Util for small, common
+      private utility methods.
+
+0.17  Sun Jun  1 15:32 2008
+    - No autoflushing of DBM::Deep objects.
+
+0.16  Mon Oct 15 10:25 2007
+    - Add http_timeout option for HTTP transport.
+    - Minor documentation tweaks.
+
+0.15  Mon Oct 29 13:15 2006
+    - PAR::Repository::Client::prefered_distribution was silently dropping
+      any_version archives because of a typo.
+
+0.14  Mon Oct 12 16:05 2006
+    - PAR::Repository::Client::HTTP::_fetch_file was generating rather
+      long local file names. In fact long enough file names that some systems
+      go belly-up. Now generating shorter file names.
+
+0.13  Mon Oct  2 15:02 2006
+    - Added custom installation targets.
+
+0.12  Fri Sep 15 10:50 2006
+    - Added dependency on the new PAR::Repository::Client which defines
+      a unified interface for repository queries from both client and
+      server side software.
+    - _modules_dbm => modules_dbm
+    - _scripts_dbm => scripts_dbm
+    - _close_modules_dbm => close_modules_dbm
+    - _close_scripts_dbm => close_scripts_dbm
+
+0.11  Mon Aug 28 10:28 2006
+    - Explicitly depending on PAR::Dist 0.18.
+    - Added optional POD tests
+
+0.10  Sat Aug 26 14:25 2006
+    - Changed the repository version validation to check the
+      major version and the first digit after the period only.
+
+0.05  Tue Aug 22 16:02 2006
+    - Added upgrade_module() functionality.
+
+0.04  Tue Aug 22 12:52 2006
+    - Added install_module() functionality.
+    - Added "auto_install" flag to new().
+    - Fixed 03prefered_distribution.t.
+
+0.03  Fri Aug 11 16:14 2006
+    - Workaround for YAML::Syck/Tiny bug.
+    - Added run_script which runs a script from a repository.
+
+0.02  Thu Aug 10 15:23 2006
+    - Added text to README.
+    - Added support for the repository_info.yml file.
+    - Checks that a repository has a compatible version.
+
+0.01  Tue Jul 25 14:21 2006
+    - original version
+

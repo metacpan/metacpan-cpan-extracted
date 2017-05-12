@@ -1,0 +1,93 @@
+{
+    'type'                   => 'Limit',
+    'estimated_startup_cost' => 18602.75,
+    'estimated_total_cost'   => 19244.22,
+    'estimated_rows'         => 1,
+    'estimated_row_width'    => 636,
+    'actual_loops'           => '1',
+    'actual_rows'            => '1',
+    'actual_time_last'       => 126.517,
+    'actual_time_first'      => 126.516,
+    'is_analyzed'            => 1,
+    'sub_nodes'              => [
+        {
+            'type'                   => 'Nested Loop',
+            'estimated_startup_cost' => 0,
+            'estimated_total_cost'   => 2254139.98,
+            'estimated_rows'         => 3514,
+            'estimated_row_width'    => 636,
+            'actual_loops'           => '1',
+            'actual_rows'            => '30',
+            'actual_time_last'       => 126.488,
+            'actual_time_first'      => 2.637,
+            'is_analyzed'            => 1,
+            'sub_nodes'              => [
+                {
+                    'type'                   => 'Nested Loop',
+                    'estimated_startup_cost' => 0,
+                    'estimated_total_cost'   => 1860597.05,
+                    'estimated_rows'         => 73883,
+                    'estimated_row_width'    => 640,
+                    'actual_loops'           => '1',
+                    'actual_rows'            => '588',
+                    'actual_time_last'       => 121.234,
+                    'actual_time_first'      => 0.214,
+                    'is_analyzed'            => 1,
+                    'sub_nodes'              => [
+                        {
+                            'scan_on' => {
+                                'table_name' => 'stories',
+                                'index_name' => 'index_stories_on_published_at',
+                            },
+                            'extra_info'             => [ 'Filter: (NOT hidden)' ],
+                            'estimated_startup_cost' => '0',
+                            'estimated_rows'         => '1303286',
+                            'type'                   => 'Index Scan Backward',
+                            'estimated_total_cost'   => 405621.7,
+                            'estimated_row_width'    => '636',
+                            'actual_loops'           => '1',
+                            'actual_rows'            => '10157',
+                            'actual_time_last'       => 52.447,
+                            'actual_time_first'      => 0.099,
+                            'is_analyzed'            => 1,
+                        },
+                        {
+                            'scan_on' => {
+                                'table_name' => 'story_tag_attachments',
+                                'index_name' => 'index_story_tag_attachments_on_story_id_and_story_tag_id',
+                            },
+                            'estimated_startup_cost' => '0',
+                            'estimated_rows'         => '1',
+                            'type'                   => 'Index Scan',
+                            'extra_info'             => [ 'Index Cond: ((story_tag_attachments.story_id = stories.id) AND (story_tag_attachments.story_tag_id = 166))' ],
+                            'estimated_total_cost'   => 1.1,
+                            'estimated_row_width'    => '4',
+                            'actual_loops'           => '10157',
+                            'actual_rows'            => '0',
+                            'actual_time_last'       => 0.005,
+                            'actual_time_first'      => 0.005,
+                            'is_analyzed'            => 1,
+                        }
+                    ]
+                },
+                {
+                    'scan_on' => {
+                        'table_name' => 'story_region_attachments',
+                        'index_name' => 'index_story_region_attachments_on_story_id_and_region_id',
+                    },
+                    'estimated_startup_cost' => '0',
+                    'estimated_rows'         => '1',
+                    'type'                   => 'Index Scan',
+                    'extra_info'             => [ 'Index Cond: ((story_region_attachments.story_id = stories.id) AND (story_region_attachments.region_id = 26824))' ],
+                    'estimated_total_cost'   => 5.31,
+                    'estimated_row_width'    => '4',
+                    'actual_loops'           => '588',
+                    'actual_rows'            => '0',
+                    'actual_time_last'       => 0.007,
+                    'actual_time_first'      => 0.007,
+                    'is_analyzed'            => 1,
+                }
+            ],
+        },
+    ]
+}

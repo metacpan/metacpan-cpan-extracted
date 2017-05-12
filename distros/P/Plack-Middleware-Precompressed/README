@@ -1,0 +1,44 @@
+Plack::Middleware::Precompressed
+
+Plack::Middleware::Precompressed is an alternative (or rather,
+complement) to middlewares like Deflater, which will compress response
+bodies on the fly. For dynamic resources, that behaviour is necessary,
+but for static resources it is a waste: identical entities will be
+compressed over and over. Instead, *Precompressed* allows you to
+compress static resources once, e.g. as part of your build process, and
+then serve the compressed resource in place of the uncompressed one for
+compression-enabled clients.
+
+To do so, by default it appends a ".gz" suffix to the "PATH_INFO" and
+tries to serve that. If that fails, it will then try again with the
+unmodified URI.
+
+Note: this means requests for resources that are not pre-compressed will
+always be dispatched *twice*. You are are advised to use either the
+"match" parameter or the Conditional middleware or something of the
+sort, to prevent requests from passing through this middleware
+unnecessarily.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,58 @@
+-- Patch:
+--   From: 0.06
+--   To:   0.07
+--
+-- Description:
+--   + add preferences table
+--   + add new preference column to person table as FK to preference
+--   + give user #0 a preference
+
+BEGIN;
+
+-- patch starts here --
+
+CREATE TABLE preference (
+    preference_id   SERIAL      primary key,
+
+    timezone        text        not null
+            default 'UTC'
+);
+ALTER TABLE person ADD COLUMN preference
+    integer references preference
+;
+
+INSERT INTO preference
+(preference_id, timezone)
+VALUES
+(0, 'UTC');
+
+UPDATE person
+SET preference=0
+WHERE person_id=0
+
+
+-- add ReplyTo information for post
+ALTER TABLE post ADD COLUMN reply_to
+    integer references post
+;
+
+-- person posting information
+ALTER TABLE person ADD COLUMN last_post
+    integer references post
+;
+ALTER TABLE person ADD COLUMN post_count
+    integer NOT NULL default 0
+;
+
+-- deal with quoted replies
+ALTER TABLE post
+ADD COLUMN quoted_post
+integer REFERENCES post;
+
+ALTER TABLE post
+ADD COLUMN quoted_text text;
+
+
+-- patch ends here --
+
+COMMIT;

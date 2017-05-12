@@ -1,0 +1,12 @@
+Revision history for Perl extension PAR::Repository::Query.
+
+0.14     Thu May 14 09:19 2009
+    - Optimize DBM accesses somewhat (thanks, Rob Kinyon!)
+
+0.13     Sun Jun  1 11:56 2008
+    - Add query_script_hash() and implement query_script()
+      in terms of it.
+
+0.12     Fri Sep 15 10:45 2006
+    - original version
+

@@ -1,0 +1,92 @@
+%{
+  my $is_range = 0;
+%}
+
+%conflict rangeORenum {
+  if ($is_range) 
+    { $self->YYSetReduce([',', ')'], 'ID:RANGE' ); }
+  else 
+    { $self->YYSetReduce([',', ')'], 'ID:ENUM' ); }
+} 
+
+%token ID  = /([A-Za-z]\w*)/
+%token NUM = /(\d+)/
+
+%left   ','
+%left   '-' '+'
+%left   '*' '/'
+
+%expect-rr 2
+
+%%
+
+type_decl : 'type' ID '=' type ';'
+;
+
+type : 
+      %name ENUM
+      Lookahead '(' id_list ')'
+    | %name RANGE
+      Lookahead expr '..' expr
+;
+
+Lookahead: /* empty */  { $is_range = $_[0]->YYPreParse('Range'); }
+;
+
+id_list : 
+      %name ID:ENUM
+      ID                      %PREC rangeORenum
+    | id_list ',' ID
+;
+
+expr : '(' expr ')'   { $_[2] } /* bypass */
+    | %name PLUS     expr '+' expr
+    | %name MINUS    expr '-' expr
+    | %name TIMES    expr '*' expr
+    | %name DIV      expr '/' expr
+    | %name COMMA    expr ',' expr
+    | %name ID:RANGE
+      ID                     %PREC rangeORenum
+    | %name NUM      NUM
+;
+
+%%
+
+=head1 SYNOPSIS
+
+See 
+
+=over 2
+
+=item * File C<userange.pl>.
+
+=item * File C<Range.eyp>.
+
+=item * File pascalenumeratedvsrange.eyp in examples/debuggintut/
+
+=item * The Bison manual L<http://www.gnu.org/software/bison/manual/html_mono/bison.html>
+
+=back
+
+Compile it with:
+
+      eyapp Range.eyp
+      eyapp -TC pascalnestedeyapp2.eyp
+
+Run it with this options:
+
+    $ ./pascalnestedeyapp2.pm -t -i -m 1 -c 'type e = (x, y, z);'
+    $ ./pascalnestedeyapp2.pm -t -i -m 1 -c 'type e = (x, @, z);'
+
+Try also these inputs:
+
+                type e = (x) .. (y);
+                type r = (x) ..  y ;
+                type r = (x+2)*3 ..  y/2 ;
+                type e = (x, y, z);
+                type e = (x);
+                type e = (x, y, z) .. (u+v);
+
+
+=cut
+

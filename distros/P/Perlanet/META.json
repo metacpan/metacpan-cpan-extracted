@@ -1,0 +1,123 @@
+{
+   "abstract" : "A program for creating programs that aggregate web feeds (both",
+   "author" : [
+      "Dave Cross <dave@mag-sol.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "keywords" : [
+      "aggregate",
+      "aggregator",
+      "atom",
+      "feed",
+      "planet",
+      "rss",
+      "xml"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perlanet",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Alien::Tidyp" : "0",
+            "File::Path" : "0",
+            "MooseX::ConfigFromFile" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "CHI" : "0",
+            "Compress::Zlib" : "0",
+            "MooseX::ConfigFromFile" : "0",
+            "XML::OPML::SimpleGen" : "0"
+         },
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Duration" : "0",
+            "Encode" : "0",
+            "HTML::Scrubber" : "0",
+            "HTML::Tidy" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "MooseX::Traits" : "0",
+            "Template" : "0",
+            "Try::Tiny" : "0",
+            "URI::Fetch" : "0",
+            "XML::Feed" : "0.22",
+            "YAML" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.6.0"
+         }
+      }
+   },
+   "provides" : {
+      "Perlanet" : {
+         "file" : "lib/Perlanet.pm",
+         "version" : "0.58"
+      },
+      "Perlanet::Entry" : {
+         "file" : "lib/Perlanet/Entry.pm",
+         "version" : "0.58"
+      },
+      "Perlanet::Feed" : {
+         "file" : "lib/Perlanet/Feed.pm",
+         "version" : "0.58"
+      },
+      "Perlanet::Simple" : {
+         "file" : "lib/Perlanet/Simple.pm",
+         "version" : "0.58"
+      },
+      "Perlanet::Trait::Cache" : {
+         "file" : "lib/Perlanet/Trait/Cache.pm",
+         "version" : "0.58"
+      },
+      "Perlanet::Trait::FeedFile" : {
+         "file" : "lib/Perlanet/Trait/FeedFile.pm",
+         "version" : "0.58"
+      },
+      "Perlanet::Trait::OPML" : {
+         "file" : "lib/Perlanet/Trait/OPML.pm",
+         "version" : "0.58"
+      },
+      "Perlanet::Trait::Scrubber" : {
+         "file" : "lib/Perlanet/Trait/Scrubber.pm",
+         "version" : "0.58"
+      },
+      "Perlanet::Trait::TemplateToolkit" : {
+         "file" : "lib/Perlanet/Trait/TemplateToolkit.pm",
+         "version" : "0.58"
+      },
+      "Perlanet::Trait::Tidy" : {
+         "file" : "lib/Perlanet/Trait/Tidy.pm",
+         "version" : "0.58"
+      },
+      "Perlanet::Trait::YAMLConfig" : {
+         "file" : "lib/Perlanet/Trait/YAMLConfig.pm",
+         "version" : "0.58"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://code.mag-sol.com/Perlanet/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/davorg/perlanet.git"
+      },
+      "x_MailingList" : "http://lists.mag-sol.com/mailman/listinfo/perlanet"
+   },
+   "version" : "0.58"
+}

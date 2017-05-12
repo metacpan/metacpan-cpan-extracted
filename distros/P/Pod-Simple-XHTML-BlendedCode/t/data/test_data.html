@@ -1,0 +1,330 @@
+
+<html>
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+</head>
+<body>
+
+
+
+
+<pre>
+<span class="keyword">package</span> <span class="word">Pod::Simple::XHTML::BlendedCode</span><span class="structure">;</span>
+</pre>
+
+
+
+<pre>
+<span class="keyword">use</span> <span class="float">5.008001</span><span class="structure">;</span>
+<span class="keyword">use</span> <span class="pragma">warnings</span><span class="structure">;</span>
+<span class="keyword">use</span> <span class="pragma">strict</span><span class="structure">;</span>
+<span class="keyword">use</span> <span class="pragma">parent</span> <span class="words">qw(Pod::Simple::XHTML)</span><span class="structure">;</span>
+<span class="keyword">use</span> <span class="word">List::Util</span> <span class="words">qw(first)</span><span class="structure">;</span>
+<span class="keyword">use</span> <span class="word">Pod::Simple::XHTML::BlendedCode::Blender</span> <span class="float">1.000</span> <span class="words">qw()</span><span class="structure">;</span>
+<span class="keyword">use</span> <span class="word">IO::String</span> <span class="float">1.08</span> <span class="words">qw()</span><span class="structure">;</span>
+<span class="keyword">use</span> <span class="word">Carp</span> <span class="words">qw(croak)</span><span class="structure">;</span>
+</pre>
+
+
+
+<pre>
+<span class="keyword">our</span> <span class="symbol">$VERSION</span> <span class="operator">=</span> <span class="single">'1.003'</span><span class="structure">;</span>
+<span class="symbol">$VERSION</span> <span class="operator">=~</span> <span class="substitute">s/_//ms</span><span class="structure">;</span>
+</pre>
+
+
+
+<pre>
+<span class="keyword">sub</span> <span class="word">new</span> <span class="structure">{</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$self</span> <span class="operator">=</span> <span class="core">shift</span><span class="structure">;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$new</span>  <span class="operator">=</span> <span class="symbol">$self</span><span class="operator">-&gt;</span><span class="word">SUPER::new</span><span class="structure">(</span><span class="magic">@_</span><span class="structure">);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="symbol">$new</span><span class="operator">-&gt;</span><span class="word">_accessorize</span><span class="structure">(</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="single">'internal_modules_hash'</span><span class="operator">,</span> <span class="single">'internal_url_postfix'</span><span class="operator">,</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="single">'internal_url_prefix'</span><span class="operator">,</span>   <span class="single">'internal_url_divide_slashes'</span><span class="operator">,</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="structure">);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="symbol">$new</span><span class="operator">-&gt;</span><span class="word">internal_url_divide_slashes</span><span class="structure">(</span><span class="number">1</span><span class="structure">);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="symbol">$new</span><span class="operator">-&gt;</span><span class="word">internal_modules_hash</span><span class="structure">(</span> <span class="structure">{}</span> <span class="structure">);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="symbol">$new</span><span class="structure">;</span>
+<span class="structure">}</span>
+</pre>
+
+
+
+<pre>
+<span class="comment">## We cheat by processing through a preprocessor first.
+</span>
+</pre>
+
+
+
+<pre>
+<span class="keyword">sub</span> <span class="word">parse_file</span> <span class="structure">{</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$self</span>    <span class="operator">=</span> <span class="core">shift</span><span class="structure">;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$in_file</span> <span class="operator">=</span> <span class="core">shift</span><span class="structure">;</span>
+</pre>
+
+
+
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$pod</span>        <span class="operator">=</span> <span class="literal">q{}</span><span class="structure">;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$pod_handle</span> <span class="operator">=</span> <span class="word">IO::String</span><span class="operator">-&gt;</span><span class="word">new</span><span class="structure">(</span><span class="symbol">$pod</span><span class="structure">);</span>
+</pre>
+
+
+
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$preprocessor</span> <span class="operator">=</span> <span class="word">Pod::Simple::XHTML::BlendedCode::Blender</span><span class="operator">-&gt;</span><span class="word">new</span><span class="structure">();</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="symbol">$preprocessor</span><span class="operator">-&gt;</span><span class="word">parseopts</span><span class="structure">(</span> <span class="single">'-want_nonPODs'</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="structure">);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="symbol">$preprocessor</span><span class="operator">-&gt;</span><span class="word">parse_from_file</span><span class="structure">(</span> <span class="symbol">$in_file</span><span class="operator">,</span> <span class="symbol">$pod_handle</span> <span class="structure">);</span>
+</pre>
+
+
+
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="symbol">$self</span><span class="operator">-&gt;</span><span class="word">SUPER::parse_string_document</span><span class="structure">(</span><span class="symbol">$pod</span><span class="structure">);</span>
+<span class="structure">}</span> <span class="comment">## end sub parse_file</span>
+</pre>
+
+
+
+<pre>
+<span class="keyword">sub</span> <span class="word">parse_string_document</span> <span class="structure">{</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$self</span>      <span class="operator">=</span> <span class="core">shift</span><span class="structure">;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$in_string</span> <span class="operator">=</span> <span class="core">shift</span><span class="structure">;</span>
+</pre>
+
+
+
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$in_handle</span> <span class="operator">=</span> <span class="word">IO::String</span><span class="operator">-&gt;</span><span class="word">new</span><span class="structure">(</span><span class="symbol">$in_string</span><span class="structure">);</span>
+</pre>
+
+
+
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$pod</span>        <span class="operator">=</span> <span class="literal">q{}</span><span class="structure">;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$pod_handle</span> <span class="operator">=</span> <span class="word">IO::String</span><span class="operator">-&gt;</span><span class="word">new</span><span class="structure">(</span><span class="symbol">$pod</span><span class="structure">);</span>
+</pre>
+
+
+
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$preprocessor</span> <span class="operator">=</span> <span class="word">Pod::Simple::XHTML::BlendedCode::Blender</span><span class="operator">-&gt;</span><span class="word">new</span><span class="structure">();</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="symbol">$preprocessor</span><span class="operator">-&gt;</span><span class="word">parseopts</span><span class="structure">(</span> <span class="single">'-want_nonPODs'</span> <span class="operator">=&gt;</span> <span class="number">1</span> <span class="structure">);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="symbol">$preprocessor</span><span class="operator">-&gt;</span><span class="word">parse_from_file</span><span class="structure">(</span> <span class="symbol">$in_handle</span><span class="operator">,</span> <span class="symbol">$pod_handle</span> <span class="structure">);</span>
+</pre>
+
+
+
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="symbol">$self</span><span class="operator">-&gt;</span><span class="word">SUPER::parse_string_document</span><span class="structure">(</span><span class="symbol">$pod</span><span class="structure">);</span>
+<span class="structure">}</span> <span class="comment">## end sub parse_string_document</span>
+</pre>
+
+
+
+<pre>
+<span class="keyword">sub</span> <span class="word">resolve_pod_page_link</span> <span class="structure">{</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="structure">(</span> <span class="symbol">$self</span><span class="operator">,</span> <span class="symbol">$to</span><span class="operator">,</span> <span class="symbol">$section</span> <span class="structure">)</span> <span class="operator">=</span> <span class="magic">@_</span><span class="structure">;</span>
+</pre>
+
+
+
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="word">croak</span>
+<span class="literal">q{The parser's internal_modules_hash method is not returning a hashref}</span>
+&nbsp;&nbsp;&nbsp;&nbsp;  <span class="word">if</span> <span class="structure">(</span> <span class="single">'HASH'</span> <span class="operator">ne</span> <span class="word">ref</span><span class="structure">(</span> <span class="symbol">$self</span><span class="operator">-&gt;</span><span class="word">internal_modules_hash</span><span class="structure">()</span> <span class="structure">)</span> <span class="structure">);</span>
+</pre>
+
+
+
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$key</span><span class="structure">;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span> <span class="structure">(</span> <span class="core">defined</span> <span class="symbol">$to</span> <span class="structure">)</span> <span class="structure">{</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="symbol">$key</span> <span class="operator">=</span> <span class="word">first</span> <span class="structure">{</span> <span class="symbol">$to</span> <span class="operator">=~</span> <span class="match">m{\A$_\z}ms</span> <span class="structure">}</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="word">sort</span> <span class="structure">{</span> <span class="symbol">$a</span> <span class="operator">cmp</span> <span class="symbol">$b</span> <span class="structure">}</span> <span class="word">keys</span> <span class="cast">%</span><span class="structure">{</span> <span class="symbol">$self</span><span class="operator">-&gt;</span><span class="word">internal_modules_hash</span><span class="structure">()</span> <span class="structure">};</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="symbol">$self</span><span class="operator">-&gt;</span><span class="word">SUPER::resolve_pod_page_link</span><span class="structure">(</span> <span class="symbol">$to</span><span class="operator">,</span> <span class="symbol">$section</span> <span class="structure">)</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;  <span class="word">if</span> <span class="operator">not</span> <span class="core">defined</span> <span class="symbol">$key</span><span class="structure">;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="structure">}</span> <span class="keyword">else</span> <span class="structure">{</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span> <span class="symbol">$self</span><span class="operator">-&gt;</span><span class="word">SUPER::resolve_pod_page_link</span><span class="structure">(</span> <span class="symbol">$to</span><span class="operator">,</span> <span class="symbol">$section</span> <span class="structure">);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="structure">}</span>
+</pre>
+
+
+
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">my</span> <span class="symbol">$processed_to</span><span class="structure">;</span>
+</pre>
+
+
+
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span> <span class="structure">(</span> <span class="symbol">$self</span><span class="operator">-&gt;</span><span class="word">internal_url_divide_slashes</span><span class="structure">()</span> <span class="structure">)</span> <span class="structure">{</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="symbol">$processed_to</span> <span class="operator">=</span> <span class="symbol">$to</span><span class="structure">;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="symbol">$processed_to</span> <span class="operator">=~</span> <span class="substitute">s{::}{/}msg</span><span class="structure">;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="structure">}</span> <span class="keyword">else</span> <span class="structure">{</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="symbol">$processed_to</span> <span class="operator">=</span> <span class="word">encode_entities</span><span class="structure">(</span><span class="symbol">$to</span><span class="structure">);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="structure">}</span>
+</pre>
+
+
+
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">if</span> <span class="structure">(</span> <span class="core">defined</span> <span class="symbol">$section</span> <span class="structure">)</span> <span class="structure">{</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="symbol">$section</span> <span class="operator">=</span> <span class="literal">q{#}</span> <span class="operator">.</span> <span class="symbol">$self</span><span class="operator">-&gt;</span><span class="word">idify</span><span class="structure">(</span> <span class="symbol">$section</span><span class="operator">,</span> <span class="number">1</span> <span class="structure">);</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="structure">}</span> <span class="keyword">else</span> <span class="structure">{</span>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="symbol">$section</span> <span class="operator">=</span> <span class="literal">q{}</span><span class="structure">;</span>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="structure">}</span>
+</pre>
+
+
+
+<pre>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="keyword">return</span>
+&nbsp;&nbsp;&nbsp;&nbsp;    <span class="structure">(</span> <span class="symbol">$self</span><span class="operator">-&gt;</span><span class="word">internal_url_prefix</span><span class="structure">()</span> <span class="operator">||</span> <span class="literal">q{}</span> <span class="structure">)</span>
+&nbsp;&nbsp;&nbsp;&nbsp;  <span class="operator">.</span> <span class="structure">(</span> <span class="symbol">$self</span><span class="operator">-&gt;</span><span class="word">internal_modules_hash</span><span class="operator">-&gt;</span><span class="structure">{</span><span class="symbol">$key</span><span class="structure">}</span> <span class="operator">||</span> <span class="literal">q{}</span> <span class="structure">)</span>
+&nbsp;&nbsp;&nbsp;&nbsp;  <span class="operator">.</span> <span class="symbol">$processed_to</span>
+&nbsp;&nbsp;&nbsp;&nbsp;  <span class="operator">.</span> <span class="symbol">$section</span>
+&nbsp;&nbsp;&nbsp;&nbsp;  <span class="operator">.</span> <span class="structure">(</span> <span class="symbol">$self</span><span class="operator">-&gt;</span><span class="word">internal_url_postfix</span><span class="structure">()</span> <span class="operator">||</span> <span class="literal">q{}</span> <span class="structure">);</span>
+<span class="structure">}</span> <span class="comment">## end sub resolve_pod_page_link</span>
+</pre>
+
+
+
+<pre></pre>
+
+
+
+<pre>
+<span class="number">1</span><span class="structure">;</span>                                     <span class="comment"># Magic true value required at end of module</span>
+<span class="separator">__END__</span>
+<span class="end">
+</span></pre>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Pod::Simple::XHTML::BlendedCode - Blends syntax-highlighted code and pod in one XHTML document.</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>This document describes Pod::Simple::XHTML::BlendedCode version 1.003</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    use Pod::Simple::XHTML::BlendedCode 1.003 qw();
+        
+        my $parser = Pod::Simple::XHTML::BlendedCode-&gt;new();
+
+        # These routines are specific to Pod::Simple::XHTML::BlendedCode.
+        $parser-&gt;internal_modules_hash({
+                &#39;Perl::Dist::WiX(.*)?&#39;   =&gt; &#39;Perl-Dist-WiX/&#39;, # Key can be a regex.
+                &#39;Perl::Dist::VanillaWiX&#39; =&gt; &#39;Perl-Dist-WiX/&#39;,
+                &#39;File::List::Object&#39;     =&gt; &#39;File-List-Object/&#39;,
+                &#39;Alien::WiX&#39;             =&gt; &#39;Alien-WiX/&#39;,
+        });
+        $parser-&gt;internal_url_postfix(&#39;.pm.html&#39;);
+        $parser-&gt;internal_url_prefix(&#39;http://csjewell.comyr.com/perl/&#39;);
+        $parser-&gt;internal_url_divide_slashes(1);
+
+        # Since this is a subclass of Pod::Simple::XHTML,
+        # you can use all of its routines.
+        $parser-&gt;index(1);
+        $parser-&gt;html_css(&#39;code.css&#39;);
+        $parser-&gt;parse_file(&#39;Perl-Dist-WiX\\lib\\Perl\\Dist\\WiX.pm&#39;);</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>This class is a formatter that takes Pod and Perl code and renders it as XHTML validating HTML.</p>
+
+<p>This is a subclass of <a href="http://search.cpan.org/perldoc?Pod::Simple::XHTML">Pod::Simple::XHTML</a> and inherits all its methods.</p>
+
+<h1 id="METHODS">METHODS</h1>
+
+<p><code>Pod::Simple::XHTML::BlendedCode</code> offers additional methods that modify the format of the HTML output. Call these after creating the parser object, but before the call to <code>parse_file</code> or <code>parse_string_document</code>:</p>
+
+<pre><code>  my $parser = Pod::Simple::XHTML::BlendedCode-&gt;new();
+  $parser-&gt;set_optional_param(&quot;value&quot;);
+  $parser-&gt;parse_file($file);</code></pre>
+
+<h2 id="internal_modules_hash">internal_modules_hash</h2>
+
+<p>This determines which modules are internal to your own web site.</p>
+
+<p>The module names in <code>L&lt;&gt;</code> links are compared against the regular expressions (wrapped in <code>\A</code> and <code>\z</code>) that are contained in the keys. If no keys match, then normal link processing is used.</p>
+
+<p>If a key matches, then it is considered a &quot;site-internal&quot; link and the value is appended to <code>internal_url_prefix</code> for this link, and <code>internal_url_divide_slashes</code> and <code>internal_url_postfix</code> are also used when creating the link.</p>
+
+<p>If you are putting all modules in one path (so that there are no per-distribution prefixes), set the values to the empty string.</p>
+
+<p>This defaults to an empty hashref, and a hashref must be passed in.</p>
+
+<h2 id="internal_url_divide_slashes">internal_url_divide_slashes</h2>
+
+<p>If this is set to a true value, then slashes are used to divide the portions of a module name in the URL generated for an internal link.</p>
+
+<p>If not, then the module name is left as is.</p>
+
+<h2 id="internal_url_prefix">internal_url_prefix</h2>
+
+<p>In turning an internal link to <a href="http://search.cpan.org/perldoc?Foo::Bar">Foo::Bar</a> into <a href="http://whatever/Foo%3a%3aBar">http://whatever/Foo%3a%3aBar</a> or <a href="http://whatever/Foo/Bar">http://whatever/Foo/Bar</a>, what to put before the &quot;Foo%3a%3aBar&quot; or &quot;Foo/Bar&quot;. This option is not set by default.</p>
+
+<h2 id="perldoc_url_postfix">perldoc_url_postfix</h2>
+
+<p>What to put after &quot;Foo%3a%3aBar&quot; or &quot;Foo/Bar&quot; in the URL for an internal link. This option is not set by default.</p>
+
+<h1 id="DIAGNOSTICS">DIAGNOSTICS</h1>
+
+<p>&quot;The parser&#39;s internal_modules_hash method is not returning a hashref&quot; will be croaked upon processing of the first pod link when the interal_modules_hash method was passed anything but a hashref previously.</p>
+
+<p>Also, this module will report any diagnostic <a href="http://search.cpan.org/perldoc?Pod::Simple::XHTML">Pod::Simple::XHTML</a> will, as well as any diagnostic that <a href="http://search.cpan.org/perldoc?Pod::Parser">Pod::Parser</a> will during the blending process.</p>
+
+<h1 id="CONFIGURATION-AND-ENVIRONMENT">CONFIGURATION AND ENVIRONMENT</h1>
+
+<p>Pod::Simple::XHTML::BlendedCode requires no configuration files or environment variables.</p>
+
+<h1 id="DEPENDENCIES">DEPENDENCIES</h1>
+
+<p>Perl 5.8.1 is the mimimum version of perl that this module will run on.</p>
+
+<p>Other modules that this module depends on are <a href="http://search.cpan.org/perldoc?Pod::Simple::XHTML">Pod::Simple::XHTML</a>, <a href="http://search.cpan.org/perldoc?Pod::Parser">Pod::Parser</a>, <a href="http://search.cpan.org/perldoc?PPI::HTML">PPI::HTML</a> 1.08, and <a href="http://search.cpan.org/perldoc?parent">parent</a> 0.223.</p>
+
+<h1 id="INCOMPATIBILITIES">INCOMPATIBILITIES</h1>
+
+<p>None reported.</p>
+
+<h1 id="BUGS-AND-LIMITATIONS-SUPPORT-">BUGS AND LIMITATIONS (SUPPORT)</h1>
+
+<p>No bugs have been reported.</p>
+
+<p>Bugs should be reported via:</p>
+
+<p>1) The CPAN bug tracker at <a href="http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Pod-Simple-XHTML-BlendedCode">http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Pod-Simple-XHTML-BlendedCode</a> if you have an account there.</p>
+
+<p>2) Email to &lt;bug-Pod-Simple-XHTML-BlendedCode@rt.cpan.org&gt; if you do not.</p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>Curtis Jewell <code>&lt;csjewell@cpan.org&gt;</code></p>
+
+<h1 id="SEE-ALSO">SEE ALSO</h1>
+
+<p><a href="http://csjewell.comyr.com/perl/">http://csjewell.comyr.com/perl/</a> (for examples of the output of this module.)</p>
+
+<h1 id="LICENSE-AND-COPYRIGHT">LICENSE AND COPYRIGHT</h1>
+
+<p>Copyright (c) 2010, Curtis Jewell <code>&lt;csjewell@cpan.org&gt;</code>. All rights reserved.</p>
+
+<p>This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself, either version 5.8.1 or any later version. See <a href="http://search.cpan.org/perldoc?perlartistic">perlartistic</a> and <a href="http://search.cpan.org/perldoc?perlgpl">perlgpl</a>.</p>
+
+<p>The full text of the license can be found in the LICENSE file included with this module.</p>
+
+<h1 id="DISCLAIMER-OF-WARRANTY">DISCLAIMER OF WARRANTY</h1>
+
+<p>BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE SOFTWARE &quot;AS IS&quot; WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.</p>
+
+<p>IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+
+</body>
+</html>
+

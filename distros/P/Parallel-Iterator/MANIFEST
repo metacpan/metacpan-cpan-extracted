@@ -1,0 +1,22 @@
+Build.PL
+Changes
+examples/cpan-faces.pl
+examples/speedy.pl
+lib/Parallel/Iterator.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/000-load.t
+t/010-basic.t
+t/020-data.t
+t/030-block.t
+t/040-batch.t
+t/050-nofork-basic.t
+t/060-nofork-data.t
+t/070-nofork-block.t
+t/080-nofork-batch.t
+t/lib/NoFork.pm
+xt/author/pod-coverage.t
+xt/author/pod.t
+SIGNATURE                                Public-key signature (added by MakeMaker)

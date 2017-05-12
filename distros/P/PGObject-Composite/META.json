@@ -1,0 +1,46 @@
+{
+   "abstract" : "Composite Type Mapper for PGObject",
+   "author" : [
+      "Chris Travers <chris@efficito.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PGObject-Composite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "PGObject" : "v1.402.4",
+            "PGObject::Type::Composite" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ledgersmb/PGObject-Composite.git",
+         "web" : "https://github.com/ledgersmb/PGObject-Composite"
+      }
+   },
+   "version" : "0.02"
+}

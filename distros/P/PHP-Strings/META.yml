@@ -1,0 +1,16 @@
+name: PHP-Strings
+version: 0.28
+abstract: Implement some of PHP's functions
+author: Petras Kudaras (kudarasp@cpan.org)
+license: unknown
+distribution_type: module
+requires:
+  Params::Validate: 0.70
+  Scalar::Util: 1.13
+no_index:
+  directory:
+    - inc
+private:
+  directory:
+    - inc
+generated_by: Module::Install version 0.27

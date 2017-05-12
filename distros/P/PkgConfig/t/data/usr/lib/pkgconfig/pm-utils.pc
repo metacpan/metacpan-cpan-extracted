@@ -1,0 +1,15 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+sysconfdir=/etc
+
+pm_libdir=${libdir}/pm-utils
+pm_sysconfdir=${sysconfdir}/pm
+pm_sleephooks=${pm_libdir}/sleep.d
+pm_powerhooks=${pm_libdir}/power.d
+pm_sleepmodules=${pm_libdir}/module.d
+pm_configdir=${pm_sysconfdir}/config.d
+
+Name: pm-utils
+Description: Power management scripts for suspend and hibernate
+Version: 1.3.0

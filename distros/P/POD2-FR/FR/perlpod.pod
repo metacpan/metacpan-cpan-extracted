@@ -1,0 +1,792 @@
+=encoding iso-8859-15
+
+=for comment
+Ce document est au format Pod. Pour le lire, il vous faut utiliser un
+formateur de Pod comme "perldoc perlpod".
+
+=head1 NAME/NOM
+
+perlpod - Le format Pod (plain old documentation), la bonne vieille documentation
+
+X<POD> X<plain old documentation> X<bonne vieille documentation>
+
+=head1 DESCRIPTION
+
+Pod est un langage de balise, simple à utiliser pour écrire de la
+documentation pour Perl lui-même ainsi que pour les programmes Perl et
+les modules Perl.
+
+Des traducteurs existent pour convertir le Pod vers différents formats
+comme le texte brut, le HTML, les pages man et d'autres encore.
+
+Le langage Pod reconnait à la base trois sortes de S<paragraphes :>
+les paragraphes L<ordinaires|/"Les paragraphes ordinaires">, les
+paragraphes L<de commande|/"Les paragraphes de commande"> et les
+paragraphes L<verbatim|/"Les paragraphes verbatim">.
+
+=head2 Les paragraphes ordinaires
+
+X<POD, paragraphes ordinaires>
+
+La plupart des paragraphes d'une documentation sont des blocs de texte
+ordinaires, comme celui-ci. Il vous suffit de taper votre texte sans
+aucune marque particulière et avec une ligne vide avant et
+après. Lorsqu'il sera formaté, ce bloc subira une mise en forme
+minimale comme un redécoupage des lignes, problablement écrites dans
+une police à espacement proportionnelle, qui seront sans doute
+justifiées.
+
+Dans les paragraphes ordinaires, vous pouvez utiliser des codes de
+mise en forme pour le B<gras>, l'I<italique>, le style C<code>, les
+L<liens|perlfaq> et autres. Ces codes sont expliqués dans la section
+L<Codes de mise en forme|"Codes de mise en forme">, ci-dessous.
+
+=head2 Les paragraphes verbatim
+
+X<POD, paragraphes verbatim> X<POD, paragraphes mot pour mot> X<verbatim>
+
+Les paragraphes verbatim (mot pout mot) sont habituellement utilisés
+pour présenter des blocs de code ou d'autres bouts de texte qui ne
+requièrent aucune analyse, aucune mise en forme particulière et dont
+les lignes ne doivent pas être redécoupées.
+
+Un paragraphe verbatim se distingue par son premier caractère qui doit
+être un espace ou une tabulation. (Et habituellement, chacune de ses
+lignes commence par des espaces ou des tabulations.) Il devrait être
+reproduit à l'identique, en supposant que les tabulations sont
+alignées sur 8 caractères. Il n'existe aucun code de mise en forme et,
+par conséquent, aucune possibilité de faire de l'italique ou quoi que
+ce soit d'autre. Un \ est \ et rien d'autre.
+
+=head2 Les paragraphes de commande
+
+X<POD, commande>
+
+Un paragraphe de commande est utilisé pour spécifier des traitements
+spéciaux sur des parties du texte comme les titres ou les listes.
+
+Tous les paragraphes de commande (qui ne font habituellement qu'une
+seule ligne) commencent par le caractère S<« = »>, suivi d'un
+identificateur, suivi d'un texte arbitraire que la commande peut
+utiliser de la façon qui lui plaît.  Les commandes actuellement
+reconnues sont
+
+  =pod
+  =head1 titre
+  =head2 titre
+  =head3 titre
+  =head4 titre
+  =over niveauindentation
+  =item texte
+  =back
+  =beagin format
+  =end format
+  =for format
+  =encoding type
+  =cut
+
+Voici en détail des explications pour chacune S<d'elles :>
+
+=over
+
+=item C<=head1 I<Texte du titre>>
+
+X<=head1> X<=head2> X<=head3> X<=head4> X<head1> X<head2> X<head3> X<head4>
+
+=item C<=head2 I<Texte du titre>>
+
+=item C<=head3 I<Texte du titre>>
+
+=item C<=head4 I<Texte du titre>>
+
+Les commandes head1 à head4 produisent des titres et head1 est le
+titre de plus haut niveau. Le texte qui suit la commande et qui
+constitue le reste du paragraphe est le contenu du titre. Par
+S<exemple :>
+
+  =head2 Attributs des objets
+
+Le texte "Attributs des objets" est ici le titre. (Notez que les
+niveaux head3 et head4 sont des ajouts récents qui ne seront pas
+reconnus par de vieux traducteurs de Pod.) Le texte du titre peut
+utiliser des codes de mise en forme comme S<dans :>
+
+  =head2 Valeurs possibles pour C<$/>
+
+Ces codes sont expliqués dans la section L<Codes de mise en
+forme|"Codes de mise en forme">, ci-dessous.
+
+=item C<=over I<niveauindentation>>
+
+X<=over> X<=item> X<=back> X<over> X<item> X<back>
+
+=item C<=item I<texte...>>
+
+=item C<=back>
+
+Les commandes item, over, et back ont besoin d'un peu plus
+S<d'explications :> S<« =over »> débute une section destinée à créer
+une liste utilisant des commandes S<« =item »>, ou pour indenter un ou
+plusieurs paragraphes normaux.  Utilisez S<« =back »> à la fin de
+votre liste ou de votre groupe de paragraphes. L'option
+I<niveauindentation> de S<« =over »> indique le niveau d'indentation,
+généralement mesuré en em (où un em est la largeur d'un M de la police
+de base du document) ou en une unité comparable. Si l'option
+I<niveauindentation> est omise, sa valeur par défaut est quatre. (Et
+certains traducteurs ignoreront cette valeur quelle qu'elle soit.) 
+Dans le I<texte> de C<=item texte...> vous pouvez utiliser des
+codes de mise en forme comme par S<exemple :>
+
+  =item Utilisation de C<$|> pour contrôler l'usage des tampons
+
+Ces codes sont expliqués dans la section L<Codes de mise en
+forme|"Codes de mise en forme">, ci-dessous.
+
+Notez aussi les quelques règles basiques suivantes pour bien utiliser
+les sections S<« =over »> ... S<« =back » :>
+
+=over
+
+=item *
+
+N'utilisez pas S<« =item »> en dehors d'une section S<« =over »>
+... S<« =back »>.
+
+=item *
+
+La première chose qui suit une commande S<« =over »> devrait être une
+commande S<« =item »>, sauf s'il n'y a vraiment aucun item dans cette
+section S<« =over »> ... S<« =back »>.
+
+=item *
+
+N'utilisez pas de commande S<« =headI<n> »> dans une section S<« =over
+»> ... S<« =back »>.
+
+=item *
+
+Et, sans doute le plus important, utilisez des items cohérents entre
+S<eux :> soit ce sont tous des S<« =item * »> pour produire une liste
+à S<puces ;> soit ils sont tous de la forme S<« =item 1 »>, S<« =item
+2 »>, etc. pour produire une liste S<numérotée ;> soit ils sont tous
+de la forme S<« =item truc »>, S<« =item bidule »>, etc. pour produire
+une liste de définitions.
+
+Si vous commencez par une puce ou par un numéro, continuez de même,
+puisque les traducteurs se basent sur le premier S<« =item »> pour
+choisir le type de liste.
+
+=back
+
+=item C<=cut>
+
+X<=cut> X<cut>
+
+Pour terminer un bloc Pod, utilisez une ligne vide puis une ligne
+commençant par C<=cut> puis encore une ligne vide. Ceci informe Perl
+(et les traducteurs Pod) que c'est à cet endroit que le code Perl
+recommence. (La ligne vide avant le C<=cut> n'est pas techniquement
+indispensable mais beaucoup de vieux traducteurs Pod en ont besoin.)
+
+=item C<=pod>
+
+X<=pod> X<pod>
+
+La commande C<=pod> en elle-même ne sert pas à grand chose si ce n'est
+de signaler à Perl (et aux traducteurs Pod) qu'une section Pod
+commence à cet endroit. Une section Pod peut commencer par
+I<n'importe> quel paragraphe de commande. Une commande C<=pod> ne sert
+donc qu'à indiquer une section Pod qui débute directement par un
+paragraphe ordinaire ou un paragraphe verbatim. Par S<exemple :>
+
+  =item trucs()
+
+  Cette fonction fait des trucs.
+
+  =cut
+
+  sub trucs {
+    ...
+  }
+
+  =pod
+
+  Souvenez-vous de vérifier son S<résultat :>
+
+    trucs() || die "Ne peux pas faire des trucs !";
+
+  =cut
+
+=item C<=begin I<nomformat>>
+
+X<=begin> X<=end> X<=for> X<begin> X<end> X<for>
+
+=item C<=end I<nomformat>>
+
+=item C<=for I<nomformat> I<texte...>>
+
+Les commandes for, begin et end vous permettent d'utiliser des
+sections de texte/code/donnée qui ne seront pas interprétées comme du
+Pod normal mais qui pourront être utilisées directement par des
+traducteurs spécifiques ou qui pourront avoir un usage spécial. Seuls
+les traducteurs qui savent comment utiliser le format spécifié
+utiliseront cette section.  Sinon elle sera complètement ignorée.
+
+Une commande S<«=begin I<nomformat>»> puis quelques paragraphes et
+enfin une commande S<«=end I<nomformat>»> signifie que les paragraphes
+inclus sont réservés aux traducteurs comprenant le format spécial
+appelé I<nomformat>. Par S<exemple :>
+
+  =begin html
+
+  <hr> <img src="thang.png">
+  <p>Ceci est un paragraphe HTML</p>
+
+  =end html
+
+La commande S<« =for I<nomformat> I<texte...> »> indique que c'est
+uniquement ce paragraphe (le I<texte> qui est juste après
+I<nomformat>) qui est dans ce format spécial.
+
+  =for html <hr> <img src="thang.png">
+  <p>Ceci est un paragraphe HTML</p>
+
+Les deux exemples ci-dessus produiront le même résultat.
+
+La différence est qu'avec S<« =for »>, seul le paragraphe est concerné
+alors qu'entre le couple S<« =begin format »> ... S<« =end format »>,
+vous pouvez placer autant de contenu que nécessaire. (Notez que les
+lignes vides après la commande =begin et avant la commande =end sont
+requises.)
+
+Voici des exemples de l'utilisation de S<ceci :>
+
+ =begin html
+
+ <br>Figure 1.<IMG SRC="figure1.png"><br>
+
+ =end html
+
+ =begin text
+
+   ---------------
+   |  foo        |
+   |        bar  |
+   ---------------
+
+ ^^^^ Figure 1. ^^^^
+
+ =end text
+
+Parmi les noms de format actuellement connus pour être reconnus par
+les formateurs, on trouve S<« roff »>, S<« man »>, S<« latex »>, S<«
+tex »>, S<« text »> et S<« html »>. (Des traducteurs Pod peuvent en
+considérer certains comme synonymes.)
+
+Le nom de format S<« comment »> est pratique pour placer des notes
+(juste pour vous) qui n'apparaîtront dans aucune version mise en forme
+de la documentation S<Pod :>
+
+  =for comment
+  S'assurer que toutes les options sont documentées !
+
+Quelques I<nomformat>s utilisent le préfixe C<:> (comme par exemple
+C<=for :nomformat> ou C<=begin :nomformat> ... C<=end :nomformat>)
+pour indiquer que le texte ne doit pas être considéré comme brut mais
+qu'il contient en fait du texte Pod (c.-à-d. contenant éventuellement
+des codes de mise en forme) qui n'est pas à utiliser pour une mise
+forme normale (c.-à-d. qui n'est pas un paragraphe normal mais
+pourrait être utilisé, par exemple, comme note de bas de page).
+
+=item C<=encoding I<codage>>
+
+X<=encoding> X<encoding> X<codage>
+
+Cette commande permet de déclarer le codage utilisé dans le
+document. La plupart des utilisateurs n'en ont pas besoin ; mais si
+votre encodage n'est pas US-ASCII ou Latin-1 alors indiquez-le aux
+traducteurs Pod en plaçant une commande C<=encoding I<codage>> le plus
+tôt possible dans le document. Comme I<codage>, utilisez l'un des noms
+reconnus par le module C<Encode::Supported>. S<Exemples :>
+
+  =encoding utf8
+
+  =encoding koi8-r
+
+  =encoding ShiftJIS
+
+  =encoding big5
+
+=back
+
+N'oubliez pas, en utilisant une commande, que cette commande se
+termine à la fin de son I<paragraphe>, pas à la fin de sa ligne. D'où
+dans les exemples ci-dessus, les lignes vides que vous pouvez voir
+après chaque commande pour terminer son paragraphe.
+
+Quelques exemples de S<listes :>
+
+ =over
+
+ =item *
+
+ Premier item
+
+ =item *
+
+ Second item
+
+ =back
+
+ =over 
+
+ =item Foo()
+
+ Description de la fonction Foo
+
+ =item Bar()
+
+ Description de la fonction Bar
+
+ =back
+
+=head2 Codes de mise en forme
+
+X<POD, code de mise en forme> X<code de mise en forme>
+X<POD, séquence interne> X<séquence interne>
+
+Dans les paragraphes ordinaires et dans certains paragraphes de
+commande, plusieurs codes de mise en forme (appelés aussi S<«
+séquences> S<internes»>) peuvent être S<utilisés :>
+
+=for comment
+ "séquences internes" est un terme un peu abscons.
+ Préférez plutôt "codes de mise en forme".
+
+=over
+
+=item C<IE<lt>texteE<gt>> -- texte en italique
+
+X<I> X<< IZ<><> >> X<POD, code de mise en forme, italique> X<italique>
+
+Utilisé pour mettre en évidence (C<faites IE<lt>attention !E<gt>>) et
+pour les paramètres (C<redo IE<lt>LABELE<gt>>).
+
+=item C<BE<lt>texteE<gt>> -- texte en gras
+
+X<B> X<< BZ<><> >> X<POD, code de mise en forme, gras> X<gras>
+
+Utilisé pour les options (C<l'option BE<lt>-nE<gt> de perl>), pour les
+programmes (C<certains systèmes proposent BE<lt>chfnE<gt> pour ça>),
+pour mettre en évidence (C<faites BE<lt>attention !E<gt>>) et autres
+(C<cette propriété s'appelle BE<lt>l'autovivificationE<gt>>).
+
+=item C<CE<lt>codeE<gt>> -- du code
+
+X<C> X<< CZ<><> >> X<POD, code de mise en forme, code> X<code>
+
+Présente le code dans une police type machine à écrire ou donne une
+indication que le texte est un programme (C<CE<lt>gmtime($^T)E<gt>>)
+ou quelque chose liée à l'ordinateur (C<CE<lt>drwxr-xr-xE<gt>>).
+
+=item C<LE<lt>nomE<gt>> -- un hyperlien
+
+X<L> X<< LZ<><> >> X<POD, code de mise en forme, hyperlien> X<hyperlien>
+
+Il y a différentes syntaxes, présentées ci-dessous. Dans ces syntaxes,
+C<texte>, C<nom> et C<section> ne peuvent pas contenir les caractères
+'/' et '|' et les caractères '<' ou '>' doivent pouvoir s'associer.
+
+=over
+
+=item *
+
+C<LE<lt>nomE<gt>>
+
+Lien vers une page de documentation Perl (par exemple
+C<LE<lt>Net::PingE<gt>>).  Notez que C<nom> ne devrait pas contenir
+d'espaces. Cette syntaxe est aussi utilisé occasionnellement pour
+faire référence aux pages de manuel UNIX comme dans
+C<LE<lt>crontab(5)E<gt>>.
+
+=item *
+
+C<LE<lt>nom/"section"E<gt>> ou C<LE<lt>nom/sectionE<gt>>
+
+Lien vers une section particulière d'une autre page de
+documentation. Par exemple C<LE<lt>perlsyn/"Boucles for"E<gt>>.
+
+=item *
+
+C<LE<lt>/"section"E<gt>> ou C<LE<lt>/sectionE<gt>> ou C<LE<lt>"section"E<gt>>
+
+Lien vers une section particulière de ce même document. Par exemple
+C<LE<lt>/"Méthodes objets"E<gt>>.
+
+=back
+
+Une section débute par un titre ou un item. Par exemple,
+C<LE<lt>perlvar/$.E<gt>> ou C<LE<lt>perlvar/"$."E<gt>> seront tous
+deux liés à la section qui débute par C<=item $.> dans perlvar. Et
+C<LE<lt>perlsyn/Boucles forE<gt>> ou C<LE<lt>perlsyn/"Boucles
+for"E<gt>> sont tous deux liés à la section débutant par C<=head2
+Boucle for>" dans perlsyn.
+
+Pour contrôler le texte affiché comme lien, vous pouvez utiliser
+C<LE<lt>texte|...E<gt>> comme S<dans :>
+
+=over
+
+=item *
+
+C<LE<lt>texte|nomE<gt>>
+
+Lié ce texte à la page de documentation dont le nom est fourni. Par
+exemple C<LE<lt>Messages d'erreurs de Perl|perldiagE<gt>>.
+
+=item *
+
+C<LE<lt>texte|nom/"section"E<gt>> ou C<LE<lt>texte|nom/sectionE<gt>>
+
+Lié ce texte à la section de la page de documentation dont le nom est
+fourni. Par exemple
+C<LE<lt>postfix "if"|perlsyn/"Statement Modifiers"E<gt>>
+
+=item *
+
+C<LE<lt>texte|/"section"E<gt>> or C<LE<lt>texte|/sectionE<gt>> ou C<LE<lt>texte|"section"E<gt>>
+
+Lié ce texte à la section de ce même document. Par exemple
+C<< LE<lt>les différents attributs|/"Données membres"E<gt> >>
+
+=back
+
+Ou vous pouvez lier une page S<web :>
+
+=over
+
+=item *
+
+C<LE<lt>scheme:...E<gt>>
+
+Lien vers un URL absolu. Par exemple
+C<LE<lt>http://www.perl.org/E<gt>>. Mais notez que, pour différentes
+raisons, il n'existe pas de syntaxe du genre
+C<LE<lt>text|scheme:...E<gt>>.
+
+=back
+
+=item C<EE<lt>entitéE<gt>> -- un caractère nommé
+
+X<E> X<< EZ<><> >> X<POD, formatting code, entité> X<entité>
+
+Très similaire aux S<« entités »> HTML/XML C<&I<foo>;>.
+
+=over
+
+=item *
+
+C<EE<lt>ltE<gt>> -- un E<lt> littéral (plus petit que)
+
+=item *
+
+C<EE<lt>gtE<gt>> -- un  E<gt> littéral (plus grand que)
+
+=item *
+
+C<EE<lt>verbarE<gt>> -- un | littéral | (I<bar>re I<ver>ticale)
+
+=item *
+
+C<EE<lt>solE<gt>> -- un / littéral (barre oblique)
+
+=back
+
+Les quatre codes ci-dessus sont optionnels sauf s'ils sont utilisés à
+l'intérieur d'un autre de code de mise en forme, en particulier
+C<LE<lt>...E<gt>> ou lorsqu'ils sont directement précédés d'une lettre
+majuscule.
+
+=over
+
+=item *
+
+C<EE<lt>htmlentitéE<gt>>
+
+Quelques entités HTML non numériques telle que C<EE<lt>eacuteE<gt>>,
+qui signifie la même chose que C<&eacute;> en HTML -- c.-à-d. un e
+minuscule avec un accent aigu.
+
+=item *
+
+C<EE<lt>nombreE<gt>>
+
+Le caractère ASCII/Latin-1/Unicode dont le code est le nombre. Le
+préfixe "0x" indique que I<nombre> est en hexadécimal comme dans
+C<EE<lt>0x201EE<gt>>. Le préfixe "0" indique que le nombre est en
+octal comme dans C<EE<lt>075E<gt>>. Sinon, le I<nombre> est considéré
+en décimal comme dans C<EE<lt>181E<gt>>.
+
+Notez que les vieux traducteurs Pod peuvent ne pas reconnaitre l'octal
+et l'hexadécimal et que de nombreux traducteurs ne savent pas
+présenter correctement les caractères dont le code est supérieur à
+255. (Certains traducteurs peuvent même choisir un compromis pour
+présenter les caractères Latin-1, en présentant un simple "e" à la
+place de C<EE<lt>eacuteE<gt>>.)
+
+=back
+
+=item C<FE<lt>nomfichierE<gt>> -- utilisé pour un nom de fichier
+
+X<F> X<< FZ<><> >> X<POD, code de mise en forme, nom de fichier> X<nom de fichier>
+
+Typiquement affiché en italique. S<Exemple :> C<FE<lt>.cshrcE<gt>>
+
+=item C<SE<lt>texteE<gt>> -- texte contenant des espaces non sécables
+
+X<S> X<< SZ<><> >> X<POD, code de mise en forme, espace insécable> X<espaces insécable>
+
+Cela siginifie que les mots du I<texte> ne doivent pas être séparés
+sur plusieurs lignes. S<Exemple :> S<C<SE<lt>$x ? $y : $zE<gt>>>.
+
+=item C<XE<lt>nom de sujetE<gt>> -- une point d'entrée d'index
+
+X<X> X<< XZ<><> >> X<POD, code de mise en forme, point d'entrée d'index> X<point d'entrée d'index>
+
+Ce code est ignoré par la plupart des traducteurs mais certains
+peuvent l'utiliser pour construire un index. Il est toujours présenté
+comme la chaîne vide. S<Exemple :> C<XE<lt>URL absoluE<gt>>
+
+=item C<ZE<lt>E<gt>> -- un code de mise en forme nul (sans effet)
+
+X<Z> X<< ZZ<><> >> X<POD, code de mise en forme, nul> X<nul>
+
+C'est rarement utilisé. C'est l'un des moyens pour empêcher
+l'inteprétation d'un code EE<lt>...E<gt>. Par exemple, à la place de
+"C<NEE<lt>ltE<gt>3>" (pour "NE<lt>3"), vous pourriez écrire
+"C<NZE<lt>E<gt>E<lt>3>" (le code "ZE<lt>E<gt>" sépare le "N" et le
+"E<lt>" afin qu'ils ne soient pas considérés comme le début d'une
+(hypothétique) séquence "NE<lt>...E<gt>").
+
+=begin comment
+
+This was formerly explained as a "zero-width character".  But it in
+most parser models, it parses to nothing at all, as opposed to parsing
+as if it were a E<zwnj> or E<zwj>, which are REAL zero-width
+characters. So "width" and "character" are exactly the wrong words.
+
+=end comment
+
+=back
+
+La plupart du temps, un simple couple inférieur/supérieur suffira pour
+délimiter le début et la fin de votre code de mise en forme. Mais il
+se peut que vous ayez besoin de placer un symbole supérieur (un signe
+S<« plus> grand S<que »>, '>') dans un code de mise en forme. C'est
+très courant lorsqu'on souhaite présenter un extrait de code avec une
+police différente du reste du texte. Comme d'habitude en Perl, il y a
+plusieurs moyens pour le faire. Le premier consiste tout simplement à
+utiliser l'entité S<« plus> grand S<que »> via le code de mise en
+forme S<C<E> :>
+
+  C<$a E<lt>=E<gt> $b>
+
+Ce qui S<produira :> C<$a E<lt>=E<gt> $b>.
+
+Un moyen plus lisible et probablement plus "brut" est d'utiliser de
+délimiteurs qui n'imposent pas de codage spécial pour un simple
+">". Les traducteurs Pod proposent cela en standard depuis perl
+5.5.660 via les doubles délimiteurs ("<<" et ">>") qui peuvent être
+utilisés I<si et seulement si il y a un espace après le délimiteur
+ouvrant et un espace avant le délimiteur S<fermant !>>. Par S<exemple
+:>
+X<POD, formatting code, code de mise en forme avec délimiteurs multiples>
+
+  C<< $a <=> $b >>
+
+En fait, vous pouvez utiliser le nombre d'inférieurs et de supérieurs
+que vous souhaitez tant qu'il y en a autant dans le délimiteur ouvrant
+que dans le délimiteur fermant et si vous vous assurez qu'un espace
+suit immédiatement le dernier S<< « < » >> du délimiteur ouvrant et
+qu'un autre espace précède immédiatement le premier S<< « > » >> du
+délimiteur fermant (ces espaces seront ignorés). Les exemples suivants
+fonctionneront donc S<aussi :>
+X<POD, formatting code, code de mise en forme avec délimiteurs multiples>
+
+  C<<< $a <=> $b >>>
+  C<<<< $a <=> $b >>>>
+
+Et ils signifient exactement la même chose S<que :>
+
+  C<$a E<lt>=E<gt> $b>
+
+Prenons un autre S<exemple :> supposons que vous voulez présenter
+l'extrait de code suivant dans un style C<< CZ<><> >> (code)E<nbsp>:
+
+   open(X, ">>thing.dat") || die $!
+   $foo->bar();
+
+Vous pourrez le faire comme S<cela :>
+
+   C<<< open(X, ">>thing.dat") || die $! >>>
+   C<< $foo->bar(); >>
+
+qui est certainement plus facilement lisible que l'ancien S<méthode :>
+
+   C<open(X, "E<gt>E<gt>thing.dat") || die $!>
+   C<$foo-E<gt>bar();>
+
+Tout cela est actuellement accepté par pod2text (Pod::Text), pod2man
+(Pod::Man) et tout autre traducteur pod2xxx et Pod::Xxxx qui utilise
+Pod::Parser version 1.093 ou supérieure.
+
+=head2 L'objectif
+
+X<POD, l'objectif>
+
+L'objectif est la simplicité d'utilisation, pas la puissance
+expressive. Les paragraphes ont l'air de paragraphes (des blocs) pour
+qu'ils ressortent visuellement, et on peut les faire passer facilement
+à travers C<fmt> pour les reformater (c'est F7 dans ma version de
+B<vi> ou Esc-Q dans ma version de B<emacs>). Je voulais que le
+traducteur laisse les C<'>, les C<`> et les C<"> tranquilles en mode
+verbatim pour que je puisse copier/coller ces paragraphes dans un
+programme qui marche, les décaler de 4 espaces, et l'imprimer, euh,
+mot pour mot. Et probablement dans une fonte à chasse fixe.
+
+Le format Pod est certainement insuffisant pour rédiger un livre. Pod
+essaie juste d'être un format infaillible qui puisse servir de source
+pour nroff, HTML, TeX et autres langages de balises, lorsqu'ils sont
+utilisés pour de la documentation en ligne. Des traducteurs existent
+pour B<pod2text>, B<pod2html>, B<pod2man> (c'est pour nroff(1) et
+troff(1)), B<pod2latex> et B<pod2fm>. D'autres encore sont disponibles
+sur CPAN.
+
+=head2 Incorporer du Pod dans les modules Perl
+
+Vous pouvez inclure de la documentation Pod dans vos scripts et vos
+modules Perl. Commencez votre documentation par une ligne vide puis
+une commande S<« =head1 »> et terminez-la par une commande S<« =cut »>
+et une ligne vide. Perl ignorera le texte en Pod. Regardez n'importe
+lequel des modules fournis en standard pour vous servir d'exemple. Si
+vous souhaitez mettre votre Pod à la fin du fichier, et si vous
+utilisez un __END__ ou un __DATA__ comme marque de fin, assurez-vous
+de mettre une ligne vide avant votre première commande Pod.
+
+  __END__
+
+  =head1 NAME
+
+  Time::Local - efficiently compute time from local and GMT time
+
+Sans cette ligne vide avant C<=head1>, de nombreux traducteurs ne
+reconnaitront pas C<=head1> comme le début d'une section Pod.
+
+=head2 Conseils pour écrire en Pod
+
+=over
+
+=item *
+
+X<podchecker> X<POD, validation> X<POD, vérificateur>
+
+La commande B<podchecker> permet de vérifier le respect de la syntaxe
+Pod. Par exemple, elle vérifie les lignes entièrement blanches dans
+les sections Pod ou les commandes et les codes de mise en forme
+inconnus. Vous pouvez aussi passer votre document au travers d'un ou
+plusieurs traducteurs Pod et vérifier le résultat (en l'imprimant si
+besoin est). Certains problèmes rencontrés peuvent être liés à des
+bogues des traducteurs. À vous de décider si vous voulez les
+contourner ou non.
+
+=item *
+
+Si vous êtes plus à votre aise en rédigeant du HTML que du Pod, vous
+pouvez rédiger votre documentation en HTML simple puis la convertir en
+Pod grâce au module expérimental L<Pod::HTML2Pod|Pod::HTML2Pod>
+(disponible sur CPAN) et enfin vérifier le code obtenu. Le module
+expérimental L<Pod::PXML|Pod::PXML> peut aussi être utile.
+
+=item *
+
+De nombreux traducteurs Pod ont absolument besoin d'une ligne blanche
+avant et après chaque commande Pod (commande =cut y compris). Quelque
+chose comme S<ça :>
+
+  # - - - - - - - - - - - -
+  =item $firecracker->boom()
+
+  This noisily detonates the firecracker object.
+  =cut
+  sub boom {
+  ...
+
+...amènera ces traducteurs Pod à ignorer totalement la section Pod.
+
+À la place, préférez quelque chose comme S<ceci :>
+
+  # - - - - - - - - - - - -
+
+  =item $firecracker->boom()
+
+  This noisily detonates the firecracker object.
+
+  =cut
+
+  sub boom {
+  ...
+
+=item *
+
+Certains traducteurs Pod anciens ont absolument besoin de paragraphes
+(incluant les paragraphes de commande comme "=head2 Fonctions")
+séparés par des lignes I<complètement> vides. Si vous avez des lignes
+apparament vides mais contenant en fait des espaces, elles ne seront
+pas reconnues comme séparateurs par ces traducteurs et provoqueront
+peut-être de mauvaises mises en forme.
+
+=item *
+
+Des traducteurs Pod anciens ajoutent quelques mots autour de certains
+liens LE<lt>E<gt> de telle manière que C<LE<lt>Foo::BarE<gt>>
+deviendra par exemple "the Foo::Bar manpage". Vous ne pouvez donc pas
+écrire des choses telles que C<la documentation LE<lt>biduleE<gt>> si
+vous voulez que le résultat reste compréhensible. À la place, écrivez
+C<la documentation LE<lt>bidule|biduleE<gt>> ou C<< LE<lt>la
+documentation >> C<< bidule|biduleE<gt> >> pour contrôler l'apparence du lien.
+
+=item *
+
+Un texte qui dépasse la 70e colonne dans un bloc verbatim peut être
+arbitrairement coupé par certains traducteurs.
+
+=back
+
+=head1 VOIR AUSSI
+
+L<perlpodspec>, L<perlsyn/"POD: documentation intégrée">,
+L<perlnewmod>, L<perldoc>, L<pod2html>, L<pod2man>, L<podchecker>.
+
+=head1 AUTEUR
+
+Larry Wall, Sean M. Burke
+
+=head1 TRADUCTION
+
+=head2 Version
+
+Cette traduction française correspond à la version anglaise distribuée avec
+perl 5.10.0.  Pour en savoir plus concernant ces traductions, consultez
+L<http://perl.enstimac.fr/>.
+
+=head2 Traducteur
+
+Traduction S<initiale :> Roland Trique
+<F<roland.trique@free.fr>>. Mise à S<jour :> Paul Gaborit
+<paul.gaborit at enstimac.fr>.
+
+=head2 Relecture
+
+Gérard Delafond
+
+=cut

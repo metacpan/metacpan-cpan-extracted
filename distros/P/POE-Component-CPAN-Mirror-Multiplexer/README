@@ -1,0 +1,89 @@
+NAME
+    POE::Component::CPAN::Mirror::Multiplexer - Multiplex HTTP CPAN mirrors
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use Getopt::Long;
+      use POE qw(Component::CPAN::Mirror::Multiplexer);
+
+      my $port = 8080;
+      GetOptions('port=i',\$port) or die;
+
+      my $test_httpd = POE::Component::CPAN::Mirror::Multiplexer->new( port => $port );
+
+      $poe_kernel->run();
+      exit 0;
+
+DESCRIPTION
+    POE::Component::CPAN::Mirror::Multiplexer is a POE component that acts
+    as a HTTP server that multiplexes HTTP CPAN mirrors. CPAN clients such
+    as CPAN or CPANPLUS can be configured to use the multiplexer as their
+    CPAN mirror. The multiplexer will then query a list of HTTP CPAN mirrors
+    for the requested URLs.
+
+CONSTRUCTOR
+    "spawn"
+        Takes a number of options, only those marked as "mandatory" are
+        required:
+
+          'address', bind to a particular IP address, default is INADDR_ANY;
+          'port', bind to a particular TCP port, default is 0;
+          'event', an event in your session to send request meta to;
+          'session', specify an alternative session to send the above event to;
+          'postback', specify a POE::Session postback instead of the above;
+          'mirrors', an arrayref of http urls, the default should be fine;
+          'error_page', a scalar of HTML to be returned instead of the default on error conditions;
+
+METHODS
+    "get_session_id"
+        Returns the POE::Session ID of the component.
+
+    "port"
+        Returns the assigned TCP port.
+
+INPUT EVENTS
+    "shutdown"
+        Terminates the component.
+
+OUTPUT EVENTS
+    If "event" or "postback" is specified in "spawn" then the following
+    events will be emitted whenever a client makes a request.
+
+    "event"
+        "ARG0" will be a HTTP::Request object. "ARG1" will be a HASHREF with
+        the following keys:
+
+          'peeraddr', the client address;
+          'peerport', the client TCP port;
+          'sockaddr', our address;
+          'sockport', our TCP port;
+
+    "postback"
+        "ARG0" will be an ARRAYREF with the parameters that were specified
+        when the postback was created, see POE::Session for details. "ARG1"
+        will be an ARRAYREF with two items, a HTTP::Request object and a
+        HASHREF with the following keys:
+
+          'peeraddr', the client address;
+          'peerport', the client TCP port;
+          'sockaddr', our address;
+          'sockport', our TCP port;
+
+AUTHOR
+    Chris "BinGOs" Williams <chris@bingosnet.co.uk>
+
+LICENSE
+    Copyright © Chris Williams
+
+    This module may be used, modified, and distributed under the same terms
+    as Perl itself. Please see the license that came with your Perl
+    distribution for details.
+
+SEE ALSO
+    HTTP::Request
+
+    POE::Session
+
+    <http://mirrors.cpan.org/>
+

@@ -1,0 +1,9 @@
+Revision history for Perl extension Perl::Metrics::Plugin::MinimumVersion
+
+0.02 Mon  2 Jun 2008
+	- No functional changes
+	- Updating to Module::Install 0.75
+	- Pushing the version of Perl::MinimumVersion
+
+0.01 Thu  6 Oct 2005
+	- The first release of the distribution

@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# https://buildkite.com/docs/guides/writing-build-scripts
+set -eo pipefail
+
+# default to a known perl version of not specified
+BUILDKITE_PERLBREW_VERSION=${BUILDKITE_PERLBREW_VERSION:-perl-5.20.2};
+
+# make sure we have perlbrew and cpanm
+curl -kL http://install.perlbrew.pl |bash
+source ~/perl5/perlbrew/etc/bashrc
+
+# just in case it asks us if we're sure we want to continue
+yes Y |perlbrew install-cpanm ||true
+
+perlbrew available
+
+# install something similar to the version in perl-nap (as of Jul 2015)
+## this can take as long as 20-30 minutes; leave the window where you
+## can see it but get on with something else for a while
+## you only need to do this once (per version of perl you want available to you)
+
+# only try to install a version if we don't already have it
+## http://stackoverflow.com/questions/25843523/perlbrew-list-and-wrong-version-number
+if [ ! -f ~/perl5/perlbrew/perls/${BUILDKITE_PERLBREW_VERSION}/.version ]; then
+    perlbrew install ${BUILDKITE_PERLBREW_VERSION}
+fi
+
+# make sure it's our default
+perlbrew switch ${BUILDKITE_PERLBREW_VERSION}

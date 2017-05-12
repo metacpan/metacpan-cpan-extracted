@@ -1,0 +1,60 @@
+Revision history for Perl extension Pod::Constants.
+
+0.19 2016-07-05T23:39+03:00
+ - Fix license in README and add LICENSE file (RT #115861)
+ - Shorten README
+
+0.18 2015-07-19T16:25+03:00
+ - New maintainer
+ - Relicense from Artistic-2+ OR GPL-3+ to plain Artistic-2
+ - Apply spelling patch from gregoa @ Debian (RT #72452)
+ - Add a test for delete_hook
+
+ [Refactoring]
+ - Move POD after __END__
+ - Use warnings and our instead of vars
+ - Simplify tests
+ - Don't use Pod::Constants in Pod::Constants
+ - Make perlcritic a bit happier
+
+ [Packaging fixes]
+ - Remove extraneous files
+ - Move module to lib/
+ - Write a modern Makefile.PL (RT #80631)
+ - Rewrite Changes in CPAN::Changes::Spec format
+
+0.17 2015-03-10
+ - Drop ugly hack to get FULLPERL (RT #61780)
+
+0.16 2007-10-21T21:55:59+13:00
+ - Lots of boring release engineering. Imported to git, etc.
+ - Removed the debian/ directory.
+ - Updated the license (now not just Artistic)
+
+0.15 2002-04-08T19:43:38+01:00
+ - Really fixed lack of re-entrancy, added test script for same
+
+0.14 2002-04-08T17:34:35+01:00
+ - Fixed lack of re-entrancy
+ - Fixed CR/LF handling properly
+
+0.13 2002-01-23T16:55:59Z
+ - Fixed regular expression bug affecting perl versions <= 5.005.
+
+0.12 2001-12-10T16:21:54Z
+ - Added add_hook and delete_hook function
+ - more details on man page
+
+0.11 2001-11-20T18:24:34Z
+ - Corrected man page, added section on automatic Makefile.PL generation
+
+0.10 2001-11-10T01:14:00Z
+ - Added support for importing data into hashes, arrays, and processing
+   with closures.
+ - not released to world at large (man page incorrect)
+
+0.02 2001-11-02T04:15:54Z
+ - now handles "perl -c Module.pm" properly
+
+0.01 2001-10-15T19:39:20Z
+ - original version.  scalars only.

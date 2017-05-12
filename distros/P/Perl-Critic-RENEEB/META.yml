@@ -1,0 +1,22 @@
+---
+abstract: 'A collection of handy Perl::Critic policies'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-RENEEB
+requires:
+  Perl::Critic: '1.105'
+  Readonly: '1.03'
+resources:
+  bugtracker: http://github.com/reneeb/Perl-Critic-RENEEB/issues
+  homepage: http://github.com/reneeb/Perl-Critic-RENEEB
+  repository: http://github.com/reneeb/Perl-Critic-RENEEB.git
+version: '0.02'

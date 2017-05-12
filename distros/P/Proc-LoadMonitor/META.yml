@@ -1,0 +1,24 @@
+---
+abstract: 'Load monitoring for worker processes'
+author:
+  - 'Michael Langner <mila@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Proc-LoadMonitor
+requires:
+  Moo: '1.002000'
+  Time::HiRes: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/cpan-mila/perl-proc-loadmonitor.git
+version: '1.000'

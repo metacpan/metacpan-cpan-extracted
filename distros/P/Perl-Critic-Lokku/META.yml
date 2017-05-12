@@ -1,0 +1,29 @@
+---
+abstract: 'A collection of Perl::Critic policies from Lokku'
+author:
+  - 'David D Lowe <flimm@cpan.org>'
+build_requires:
+  English: 0
+  File::Basename: 0
+  File::Spec: 0
+  Test::More: 0
+  Test::Perl::Critic: 0
+  Test::Perl::Critic::Policy: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perl-Critic-Lokku
+requires:
+  Perl::Critic::Policy: 0
+  Perl::Critic::Utils: 0
+  Readonly: 0
+resources:
+  bugtracker: https://github.com/lokku/Perl-Critic-Lokku
+  repository: https://github.com/lokku/Perl-Critic-Lokku.git
+version: 0.002

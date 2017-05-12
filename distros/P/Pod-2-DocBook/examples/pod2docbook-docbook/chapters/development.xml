@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE chapter PUBLIC "-//CUSTOM//DOCKBOOK 4.4//EN" "../custom.dtd">
+<chapter id="chapter-dev">
+    <title>Developers documentation section</title>
+
+    <section>
+        <title>Overview</title>
+
+        <para>It's aways nice to read some documentation but to write it's
+        not so fun. And to write it and sync it on two different places it's
+        just annoing. To make our life easy let's see how a docbook sections
+        generated directly for Perl module can look like.
+        </para>
+
+        <section>
+            <title>Modules</title>
+            <xi:include href="pod/Pod-2-DocBook.xml" />
+        </section>
+        
+        <section id="dev.scripts">
+            <title>Scripts</title>
+            <xi:include href="pod/pod2docbook.xml" />
+        </section>
+
+    </section>
+
+</chapter>

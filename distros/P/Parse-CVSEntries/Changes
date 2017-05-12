@@ -1,0 +1,10 @@
+0.03	Thursday 11th September, 2003
+	->mtime accessor
+	backport to 5.00503
+	made the Date::Parse dependency explicit
+
+0.02	Thursday 26th June, 2003
+	Fixed MANIFEST to include module_build_entries
+
+0.01	Wednesday 25th June, 2003
+	Initial CPAN release

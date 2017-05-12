@@ -1,0 +1,8 @@
+- Test coverage:
+  - Missing coverage for most handlers
+  - Missing coverage for auto-altnick
+  - Missing coverage for ->set_nick
+
+- Flood protection:
+  - Default to hybrid algo?
+  - Per-destination fair queuing?

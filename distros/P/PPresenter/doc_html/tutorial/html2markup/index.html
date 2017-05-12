@@ -1,0 +1,174 @@
+
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Tutorial HTML2Markup</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Tutorial on<BR>
+                          differences between HTML and Markup</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../../index.html>PPresenter</A><BR>
+<A HREF=../../manual.html>Manual</A><BR>
+<A HREF=../index.html>Tutorials</A><BR>
+<B>html2Markup</B><BR>
+<P>
+    </TD><TD VALIGN=top>
+
+<A HREF=../../index.html>Portable Presenter</A> is a package designed
+to give presentations.  Of course, presentations do contain text (although
+it should be avoided: try to stick to images and drawings).  Text is
+entered using a <A HREF=../../formatter/index.html>formatter</A>.  The
+only formatter available now is the
+<A HREF=../../formatter/markup.html>Markup formatter</A>, which is described
+in this tutorial.
+<P>
+<H2>The Markup formatter and HTML</H2>
+The Markup formatter is a close brother to HTML: although there are a
+few basic differences, markup is easy to learn when you are acquainted
+to HTML.
+<P>
+What are the differences, and why:
+<UL>
+<LI>Markup is more <A HREF=#compact>compact</A>.
+<LI>Tags can be used as <A HREF=#parameter>parameter</A>.
+<LI>Tags can be used as <A HREF=#both>container and switch</A>.
+<LI>Many <A HREF=#more>more tags</A>.
+<LI>It is safe to <A HREF=#nest>nest</A>.
+<LI>Adding <A HREF=#logical>logical</A> tags.
+</UL>
+
+<H3>Markup is more <A NAME=compact>compact</A></H3>
+
+When you write a slide, you usually have many more font and color
+changes than on a web-site.  To simplify your work, you can specify
+many font-changes with any other tag:
+<PRE>
+   HTML:                          Markup:
+
+    &lt;CENTER&gt;&lt;FONT SIZE=-1          &lt;CENTER SIZE=-1
+     COLOR=green&gt;tekst              COLOR=green&gt;tekst
+    &lt;/FONT&gt;&lt;/CENTER&gt;               &lt;/CENTER&gt;
+</PRE>
+
+<H3>Tags can be used as <A NAME=parameter>parameter</A></H3>
+In Markup, any tag can be used as a parameter:
+<PRE>
+   HTML:                          Markup:
+
+    &lt;CENTER&gt;&lt;B&gt;                    &lt;CENTER B&gt;
+     bold centered text             bold centered text
+    &lt;/B&gt;&lt;/CENTER&gt;                  &lt;/CENTER&gt;
+</PRE>
+A parameter without value (as the <CODE>B</CODE>) is equivalent to
+<CODE>B=1</CODE>.  You can also use <CODE>B=0</CODE> to explicitly
+switch bold off.
+<P>
+Not permitted is <CODE>&lt;SIZE=+1&gt;</CODE>
+because a tag cannot carry a parameter, and a size without value is
+not useful.
+
+<H3>Tags can be used as <A NAME=both>container and switch</A></H3>
+In HTML, you have three types of tags:
+<DL>
+<DT>Switches:
+<DD>a tag which defines an action on one point in the text, like
+    <CODE>BR</CODE> and <CODE>HR</CODE>.
+<DT>Containers:
+<DD>tags which enclose a part of html, for instance
+    <CODE>TITLE</CODE>, <CODE>H1</CODE>, and <CODE>FONT</CODE>.
+<DT>Containers with optional end:
+<DD>tags which enclose a part of html, but where the terminating tag
+    may be left out.  The end of the tag is very obvious by the html
+    parser. For example
+    <CODE>P</CODE> (when the next paragraph or header is found, this
+    paragraph end automatically) and <CODE>HEAD</CODE> (ends when
+    <CODE>BODY</CODE> starts).
+</DL>
+In Markup, you can use each tag as container or as switch.  For
+example:
+<PRE>
+   Markup:                        HTML:
+
+    &lt;CENTER B&gt;                     &lt;CENTER&gt;&lt;B&gt;
+    text                           text
+    &lt;FONT COLOR=yellow&gt;            &lt;FONT COLOR=yellow&gt;
+    more                           more
+    &lt;FONT COLOR=green&gt;             &lt;/FONT&gt;&lt;FONT COLOR=green&gt;
+    last                           last
+    &lt;/CENTER&gt;                      &lt;/FONT&gt;&lt;/B&gt;&lt;/CENTER&gt;
+</PRE>
+In markup, containers are seen as brackets.  When you leave a container, all
+font settings are set back to the values as when the container was entered.<BR>
+In the example, in markup you may leave the <CODE>&lt;/CENTER&gt;</CODE>
+away, for instance when you reach the end of the text.
+
+<H3>Many <A NAME=more>more tags</A></H3>
+Markup has quite some tags more than html has.  Especially tags related to
+slides:
+<DL COMPACT>
+<DT><CODE>BD</CODE>
+<DD>Backdrop: a shadow character behind the real character, which improves
+    the readability on bad projectors.
+    <P>
+<DT><CODE>SHOW=<I>how</I></CODE>
+<DD>How the text shall be shown.  This is interpreted by the
+    <A HREF=../../dynamic/index.html>dynamics</A> modules.  For instance:
+    <PRE>
+    &lt;P SHOW="after 5"&gt;text
+</PRE>
+which shows the text after 5 seconds.
+</DL>
+A lot of useful abbreviations are defined, as <CODE>LARGE</CODE>,
+<CODE>HUGE</CODE>, <CODE>SMALL</CODE>, which are derived from
+<CODE>&lt;FONT SIZE=<I>number</I>&gt;</CODE>.
+
+<H3>It is safe to <A NAME=nest>nest</A></H3>
+<STRONG>Don not</STRONG> try this is HTML; browsers behave differently:
+<PRE>
+   &lt;CENTER&gt;
+   &lt;FONT SIZE=-1&gt;small
+      &lt;FONT SIZE=-1&gt;smaller&lt;/FONT&gt;
+   &lt;/FONT&gt;
+   &lt;/CENTER&gt;
+</PRE>
+But in Markup, you can safely do:
+<PRE>
+   &lt;CENTER&gt;
+   &lt;SMALL&gt;small
+      &lt;SMALL&gt;smaller&lt;/SMALL&gt;
+   &lt;/SMALL&gt;
+   &lt;/CENTER&gt;
+</PRE>
+or (optimized)
+<PRE>
+   &lt;CENTER&gt;
+   &lt;SMALL&gt;small
+      &lt;SMALL&gt;smaller
+   &lt;/CENTER&gt;
+</PRE>
+
+<H3>Adding <A NAME=logical>logical</A> tags</H3>
+You can add your own logical tags:
+<PRE>
+   $show-&gt;find(formatter =&gt; 'markup')
+        -&gt;addLogical(EMAIL =&gt; 'TT B');
+</PRE>
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

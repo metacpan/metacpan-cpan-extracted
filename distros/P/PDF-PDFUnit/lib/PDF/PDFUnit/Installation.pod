@@ -1,0 +1,124 @@
+=pod
+
+=head1 NAME
+
+PDF::PDFUnit::Installation - Installation instructions for PDF::PDFUnit
+
+=head1 IMPORTANT
+
+I<This Module is not useable on its own>!
+
+It it "just" a Perl wrapper
+around Carsten Siedentop's awesome L<B<PDFUnit>|http://pdfunit.com/>
+(a PDF testing framework written in Java).
+
+
+=head1 INSTALLATION OF PERL PREREQUISITES
+
+The most tricky part is the installation of our main dependency:
+L<Inline::Java>.
+
+This is typically not pre-packaged in any distribution of Linux or Perl,
+so we have to install it by hand.
+
+We generally recommend installing it via B<cpanm>, as described below.
+
+Some other dependencies should be fulfilled with distribution packages before:
+
+
+=head2 Linux
+
+=head3 Debian 8 (Jessie)
+
+  # aptitude install openjdk-7-jdk make gcc
+  # aptitude install cpanminus libinline-c-perl libtest-exception-perl
+  
+  # JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64  cpanm Inline::Java
+
+=head3 Ubuntu 14.04
+
+  $ sudo su -
+  # apt-get install openjdk-7-jdk make gcc
+  # apt-get install cpanminus libinline-perl libtest-exception-perl
+  
+  # JAVA_HOME=/usr/lib/jvm/java-7-openjdk-amd64  cpanm Inline::Java
+
+=head3 CentOS 7
+
+  # yum install java-1.8.0-openjdk-devel make gcc
+  # yum install perl-App-cpanminus perl-Inline perl-Test-Exception
+
+  # JAVA_HOME=/usr/lib/jvm/java-1.8.0  cpanm Inline::Java
+
+=head3 OpenSUSE 42.1
+
+  # zypper install java-1_8_0-openjdk-devel make gcc
+  # zypper install perl-App-cpanminus perl-Inline perl-Test-Exception
+
+  # cpanp install Parse::PMFile  # due to broken cpanm; "yes" to question
+
+  # JAVA_HOME=/usr/lib64/jvm/java-1.8.0-openjdk-1.8.0  cpanm Inline::Java
+
+
+=head2 Windows
+
+=head3 Windows 8.1 with Oracle JDK + ActiveState Perl 5.22.1 (both 64 Bit)
+
+  C:\> ppm install App-cpanminus MinGW
+  C:\> ppm install Inline Test-Exception
+
+  C:\> set JAVA_HOME=C:\Program Files\Java\jdk1.8.0_92
+  C:\> cpanm Inline::Java
+
+
+
+=head1 INSTALLATION OF THE JAVA PDFUNIT LIBRARY
+
+Download the latest release of PDFUnit-Java from L<http://pdfunit.com/>.
+
+Create a folder somewhere and unzip it there.
+
+If you have received a licence file, also drop it there.
+
+
+
+
+=head1 INSTALLATION OF THIS MODULE
+
+B<Attention!> Under Windows/ActivePerl, use B<dmake> instead of B<make>!
+
+  perl Makefile.PL
+  make
+
+If you want to run the tests, you have to create a configuration file.
+OK, since you have to create a config anyway, now would be a good time to read
+L<PDF::PDFUnit::Config>; if necessary via:
+
+  # Linux:
+  perldoc lib/PDF/PDFUnit/Config.pod
+
+  # Windows:
+  perldoc lib\PDF\PDFUnit\Config.pod
+
+
+With your new config file, you should now be able to:
+
+  make test
+
+  # or (to get a little bit more output):
+
+  prove -v 
+
+And finally (this requires root/Admin permissions where necessary):
+
+  make install
+
+
+If everything has succeeded up to now, please verify your setup with:
+
+  pdfunit-perl.pl -c
+
+
+Have fun with L<PDF::PDFUnit>!
+
+=cut

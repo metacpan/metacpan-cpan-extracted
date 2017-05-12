@@ -1,0 +1,43 @@
+---
+abstract: 'format PseudoPod as valid XHTML'
+author:
+  - 'Alan Young <harleypig@gmail.com>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Path::Class: 0
+  Scalar::Util: 0
+  Test::More: 0.94
+  Test::NoWarnings: 0
+  Test::Perl::Critic::Progressive: 0
+  Try::Tiny: 0
+  perl: 5.004
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-PseudoPod-XHTML
+no_index:
+  directory:
+    - t
+    - xt
+provides:
+  Pod::PseudoPod::XHTML:
+    file: lib/Pod/PseudoPod/XHTML.pm
+    version: 1.02
+requires:
+  Carp: 0
+  Pod::PseudoPod::HTML: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/harleypig/pod-pseudopod-xhtml/issues
+  repository: git://github.com/harleypig/pod-pseudopod-xhtml.git
+version: 1.02

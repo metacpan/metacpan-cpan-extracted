@@ -1,0 +1,16 @@
+[% INCLUDE common/header.tt
+           title = pageName
+%]
+
+[% IF showRevision %]
+  [% IF revision %]
+  <p><b>Showing revision [% revision %]</b></p>
+  [% ELSE %]
+  <p><b>Revision [% showRevision %] not available (showing current
+  revision instead)</b></p>
+  [% END %]
+[% END %]
+
+[% body %]
+
+[% INCLUDE common/footer.tt %]

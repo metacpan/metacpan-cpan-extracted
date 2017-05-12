@@ -1,0 +1,39 @@
+Revision history for Perl extension Perl::Configure.
+
+0.09 2016-07-18
+    (ms) [rt.perl.org #128139] Escaped literal { in regex to fix
+         "Unescaped left brace in regex is deprecated" warnings in
+         5.16 and up.
+
+0.08 03/05/2010
+    (ms) Really fixed "f" option bug in perl-configure script
+    (ms) Fixed 'dtrace' question for perl-5.10.1
+
+0.07 10/19/2007
+    (ms) Fixed "f" option bug in perl-configure script
+
+0.06 10/04/2007
+    (ms) Added yml configuration option and added it to the
+         perl-configure command line application.
+
+0.05 09/28/2007
+    (ms) Added remove() method to Perl::Configure::Questions.
+    (ms) Added missing perl-5.9 questions
+
+0.04 10/28/2006
+    (ms) Added optional override field to Perl::Configure::Questions.
+
+0.04 2006/10/28
+
+0.03 08/25/2006
+    (ms) added libperl question
+
+0.02 03/30/2006
+    (ms) fixed typo (thanks chocolateboy)
+    (ms) verbose mode for perl-configure
+    (ms) fixed yacc question
+    (ms) fixed bug with ANY{} pattern recognition
+    (ms) fixed token table format
+
+0.01 03/17/2006
+    (ms) Where it all began.

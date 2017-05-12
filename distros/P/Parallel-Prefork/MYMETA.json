@@ -1,0 +1,54 @@
+{
+   "abstract" : "A simple prefork server framework",
+   "author" : [
+      "Kazuho Oku"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.08, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parallel-Prefork",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::Requires" : "0",
+            "Test::SharedFork" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0.04",
+            "List::MoreUtils" : "0",
+            "Proc::Wait3" : "0.03",
+            "Scope::Guard" : "0",
+            "Signal::Mask" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.17",
+   "x_module_name" : "Parallel::Prefork"
+}

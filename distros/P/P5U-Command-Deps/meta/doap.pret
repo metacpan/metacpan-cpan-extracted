@@ -1,0 +1,19 @@
+# This file contains general metadata about the project.
+
+@prefix : <http://usefulinc.com/ns/doap#>.
+
+`P5U-Command-Deps`
+	:programming-language "Perl" ;
+	:shortdesc            "p5u plugin to scan a file or directory for Perl dependencies";
+	:homepage             <https://metacpan.org/release/P5U-Command-Deps>;
+	:download-page        <https://metacpan.org/release/P5U-Command-Deps>;
+	:bug-database         <http://rt.cpan.org/Dist/Display.html?Queue=P5U-Command-Deps>;
+	:repository           [ a :GitRepository; :browse <https://github.com/tobyink/p5-p5u-command-deps> ];
+	:created              2012-12-13;
+	:license              <http://dev.perl.org/licenses/>;
+	:maintainer           cpan:TOBYINK;
+	:developer            cpan:TOBYINK.
+
+<http://dev.perl.org/licenses/>
+	dc:title  "the same terms as the perl 5 programming language system itself".
+

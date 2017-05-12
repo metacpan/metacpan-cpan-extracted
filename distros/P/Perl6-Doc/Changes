@@ -1,0 +1,28 @@
+0.47  Mon Dec 6 03:25:57 GMT 2010
+    - Convert S26-documentation.pod to UTF-8
+
+0.46  Fri Dec 3 07:15:01 GMT 2010
+    - Use Dist::Zilla
+    - Fix Perl 6 tablet hyperlink link and some other stuff pointed out
+      by Herbert Breunung
+    - Update the Perl 6 tablets to the latest version
+    - Update all Synopses (and add S08-capture)
+
+0.45 Mon Aug 17 17:12:06 GMT 2009
+    - Added perlobjintro and perlreintro
+
+0.44 Wed Aug 12 16:44:05 GMT 2009
+    - Various small fixes to man pages
+
+0.43 Fri Jul 24 17:06:22 GMT 2009
+    - Add a test file
+
+0.42 Fri Jul 24 14:42:36 GMT 2009
+    - Added first drafts of perlintro and perlsyn
+
+0.41 Thu Jul 16 06:10:00 GMT 2009
+    - Add Pod-ified version of the Perl 6 Table Index
+
+0.40 Tue Jul 14 13:12:23 EDT 2009
+    - First release of a revamped doc-only version of this distribution, now
+      maintained by Hinrik Örn Sigurðsson

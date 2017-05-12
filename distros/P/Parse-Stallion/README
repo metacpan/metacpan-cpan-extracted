@@ -1,0 +1,39 @@
+Parse-Stallion
+===========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with perldoc.
+
+    perldoc Parse::Stallion
+    perldoc Parse::Stallion::EBNF
+    perldoc Parse::Stallion::RD
+    perldoc Parse::Stallion::CSV
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  Time::Local
+  File::Spec
+
+For Parse::Stallion::RD, the following module is needed
+
+  Text::Balanced
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-12 by Arthur Goldstein, arthur@acm.org
+
+Please email comments.

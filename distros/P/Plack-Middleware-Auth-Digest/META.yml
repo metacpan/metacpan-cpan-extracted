@@ -1,0 +1,44 @@
+---
+abstract: 'Digest authentication'
+author:
+  - 'Yuji Shimada <xaicron@cpan.org>'
+build_requires:
+  HTTP::Request::Common: '0'
+  LWP::UserAgent: '0'
+  Plack::Builder: '0'
+  Plack::Test: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Auth-Digest
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Digest::HMAC_SHA1: '0'
+  Digest::MD5: '0'
+  MIME::Base64: '0'
+  Plack::Middleware: '0'
+  Plack::Util::Accessor: '0'
+  Test::Builder::Module: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/miyagawa/Plack-Middleware-Auth-Digest/issues
+  homepage: https://github.com/miyagawa/Plack-Middleware-Auth-Digest
+  repository: https://github.com/miyagawa/Plack-Middleware-Auth-Digest.git
+version: '0.05'
+x_contributors:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+  - 'Tim <tim.esselens@gmail.com>'
+  - 'xaicron <xaicron@gmail.com>'

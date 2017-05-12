@@ -1,0 +1,7058 @@
+# TODO 'further details' ======= =========
+
+
+do('../Config');
+our $VERSION = '0.12';
+pp_setversion(qq{'$VERSION'});
+$VERSION = eval $VERSION;
+
+use PDL::Exporter;
+
+
+
+
+
+
+if ($config{CBLAS}){
+	pp_addhdr('#include <cblas.h>');
+}
+
+if ($^O =~ /MSWin/) {
+pp_addhdr('
+#include <float.h>
+');
+}
+
+pp_addhdr('
+#include <math.h>
+
+#if defined(PDL_CORE_VERSION) && PDL_CORE_VERSION < 10
+typedef PDL_Long PDL_Indx;
+#endif
+
+typedef PDL_Long logical;
+typedef PDL_Long integer;
+typedef PDL_Long ftnlen;
+
+#ifdef __cplusplus
+typedef logical (*L_fp)(...);
+#else
+typedef logical (*L_fp)();
+#endif
+
+#ifndef min
+#define min(a,b) ((a) <= (b) ? (a) : (b))
+#endif
+#ifndef max
+#define max(a,b) ((a) >= (b) ? (a) : (b))
+#endif
+
+
+static integer c_zero = 0;
+static integer c_nine = 9;
+');
+
+
+sub generate_code($){
+	if ($config{WITHOUT_THREAD}){
+	return '
+		#if 0
+		threadloop%{
+		%}
+		#endif'.$_[0];
+	}
+	else{
+		return $_[0];
+	}
+}
+
+
+sub pp_defc{
+	my $function = shift;
+	pp_def(('c'.$function), Doc=>"
+
+=for ref
+
+Complex version of $function
+
+", @_);
+
+}
+
+#pp_bless('PDL::Complex');
+pp_addpm({At=>'Top'},<<'EOD');
+use strict;
+use PDL::Complex;
+use PDL::LinearAlgebra::Real;
+
+{ 
+  package # hide from CPAN
+    PDL;
+	my $warningFlag;
+  	BEGIN{
+  		$warningFlag = $^W;
+		$^W = 0;
+	}
+	use overload (
+		'x'     =>  sub {UNIVERSAL::isa($_[1],'PDL::Complex') ? PDL::cmmult(PDL::Complex::r2C($_[0]), $_[1]):
+								PDL::mmult($_[0], $_[1]);
+				});
+	BEGIN{ $^W = $warningFlag ; }	
+}
+{ 
+  package # hide from CPAN
+    PDL::Complex;
+	my $warningFlag;
+  	BEGIN{
+  		$warningFlag = $^W;
+		$^W = 0;
+	}
+	use overload (
+		'x'     =>  sub {UNIVERSAL::isa($_[1],'PDL::Complex') ? PDL::cmmult($_[0], $_[1]) :
+						PDL::cmmult($_[0], PDL::Complex::r2C($_[1]));
+				},
+	);
+	BEGIN{ $^W = $warningFlag ; }
+}
+
+
+
+=encoding Latin-1
+
+=head1 NAME
+
+PDL::LinearAlgebra::Complex - PDL interface to the lapack linear algebra programming library (complex number)
+
+=head1 SYNOPSIS
+
+ use PDL::Complex
+ use PDL::LinearAlgebra::Complex;
+
+ $a = r2C random (100,100);
+ $s = r2C zeroes(100);
+ $u = r2C zeroes(100,100);
+ $v = r2C zeroes(100,100);
+ $info = 0;
+ $job = 0;
+ cgesdd($a, $job, $info, $s , $u, $v);
+
+
+=head1 DESCRIPTION
+
+This module provides an interface to parts of the lapack library (complex numbers).
+These routines accept either float or double piddles.
+
+
+EOD
+
+pp_defc("gesvd",
+       HandleBad => 0,
+	RedoDimsCode => '$SIZE(r) =  $PDL(A)->ndims > 2 ? min($PDL(A)->dims[1], $PDL(A)->dims[2]) : 1;',
+	Pars => '[io,phys]A(2,m,n); int jobu(); int jobvt(); [o,phys]s(r); [o,phys]U(2,p,q); [o,phys]VT(2,s,t); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		integer lwork;
+		char trau, travt;
+             types(F) %{
+
+		extern int cgesvd_(char *jobu, char *jobvt, integer *m, integer *n, float *a,
+		integer *lda, float *s, float *u, int *ldu,
+		float *vt, integer *ldvt, float *work, integer *lwork, float *rwork,
+		integer *info);
+		float *rwork;
+		float tmp_work[2];
+             %}
+             types(D) %{
+
+		extern int zgesvd_(char *jobz,char *jobvt, integer *m, integer *n,
+		double *a, integer *lda, double *s, double *u, int *ldu,
+		double *vt, integer *ldvt, double *work, integer *lwork, double *rwork,
+		integer *info);
+		double *rwork;
+		double tmp_work[2];
+             %}
+		lwork = ($PRIV(__m_size) < $PRIV(__n_size)) ? 5*$PRIV(__m_size) : 5*$PRIV(__n_size);
+             types(F) %{		
+		rwork = (float *)malloc(lwork *  sizeof(float));
+             %}
+             types(D) %{		
+		rwork = (double *)malloc(lwork *  sizeof(double));
+             %}
+		lwork = -1;
+
+
+		switch ($jobu())
+		{
+			case 1: trau = \'A\';
+				break;
+			case 2: trau = \'S\';
+				break;
+			case 3: trau = \'O\';
+				break;
+			default: trau = \'N\';
+		}
+		switch ($jobvt())
+		{
+			case 1: travt = \'A\';
+				break;
+			case 2: travt = \'S\';
+				break;
+			case 3: travt = \'O\';
+				break;
+			default: travt = \'N\';
+		}
+
+
+
+		$TFD(cgesvd_,zgesvd_)(
+		&trau,
+		&travt,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(s),
+		$P(U),
+		&(integer){$PRIV(__p_size)},
+		$P(VT),
+		&(integer){$PRIV(__s_size)},
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+
+		float *work = (float *)malloc(2*lwork *  sizeof(float));
+             %}
+             types(D) %{
+
+		double *work = (double *)malloc(2*lwork *  sizeof(double));
+             %}
+		$TFD(cgesvd_,zgesvd_)(
+		&trau,
+		&travt,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(s),
+		$P(U),
+		&(integer){$PRIV(__p_size)},
+		$P(VT),
+		&(integer){$PRIV(__s_size)},
+		work,
+		&lwork,
+		rwork,
+		$P(info));
+		free(work);
+		}
+		free(rwork);
+',
+Doc=>'
+
+=for ref
+
+Complex version of gesvd.
+
+The SVD is written
+
+ A = U * SIGMA * ConjugateTranspose(V)
+
+');
+
+pp_defc("gesdd",
+       HandleBad => 0,
+       RedoDimsCode => '$SIZE(r) =  $PDL(A)->ndims > 2 ? min($PDL(A)->dims[1], $PDL(A)->dims[2]) : 1;',
+	Pars => '[io,phys]A(2,m,n); int job(); [o,phys]s(r); [o,phys]U(2,p,q); [o,phys]VT(2,s,t); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		integer lwork;
+		integer *iwork;
+		char tra;
+             types(F) %{
+
+		extern int cgesdd_(char *jobz, integer *m, integer *n, float *
+		a, integer *lda, float *s, float *u, int *ldu,
+		float *vt, integer *ldvt, float *work, integer *lwork,
+		float *rwork, integer *iwork, integer *info);
+		float *rwork;
+		float tmp_work[2];
+             %}
+             types(D) %{
+
+		extern int zgesdd_(char *jobz, integer *m, integer *n, double *
+		a, integer *lda, double *s, double *u, int *ldu,
+		double *vt, integer *ldvt, double *work, integer *lwork,
+		double *rwork, integer *iwork, integer *info);
+		double *rwork;
+		double tmp_work[2];
+             %}
+		
+		lwork = ($PRIV(__m_size) < $PRIV(__n_size)) ? $PRIV(__m_size) : $PRIV(__n_size);
+		iwork = (integer *)malloc(lwork * 8 * sizeof(integer));
+
+		types(F) %{
+		switch ($job())
+		{
+
+			case 1: tra = \'A\';
+				rwork = (float *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof(float));
+				break;
+			case 2: tra = \'S\';
+				rwork = (float *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof(float));
+				break;
+			case 3: tra = \'O\';
+				rwork = (float *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof(float));
+				break;
+			default: tra = \'N\';
+				rwork = (float *)malloc( 7 * lwork  *  sizeof(float));
+				break;
+
+		}		
+		%}
+		types(D) %{
+		switch ($job())
+		{
+
+			case 1: tra = \'A\';
+				rwork = (double *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof(double));
+				break;
+			case 2: tra = \'S\';
+				rwork = (double *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof(double));
+				break;
+			case 3: tra = \'O\';
+				rwork = (double *)malloc( (5 * lwork *lwork + 5 * lwork) * sizeof(double));
+				break;
+			default: tra = \'N\';
+				rwork = (double *)malloc( 7 * lwork  *  sizeof(double));
+				break;
+
+		}
+		%}
+		lwork = -1;
+		$TFD(cgesdd_,zgesdd_)(
+		&tra,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(s),
+		$P(U),
+		&(integer){$PRIV(__p_size)},
+		$P(VT),
+		&(integer){$PRIV(__s_size)},
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		iwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+
+		float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(cgesdd_,zgesdd_)(
+		&tra,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(s),
+		$P(U),
+		&(integer){$PRIV(__p_size)},
+		$P(VT),
+		&(integer){$PRIV(__s_size)},
+		work,
+		&lwork,
+		rwork,
+		iwork,
+		$P(info));
+		free(work);
+		}
+		free(iwork);
+		free(rwork);
+',
+Doc=>'
+
+=for ref
+
+Complex version of gesdd.
+
+The SVD is written
+
+ A = U * SIGMA * ConjugateTranspose(V)
+
+');
+
+pp_defc("ggsvd",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); int jobu(); int jobv(); int jobq(); [io,phys]B(2,p,n); int [o,phys]k(); int [o,phys]l();[o,phys]alpha(n);[o,phys]beta(n); [o,phys]U(2,q,r); [o,phys]V(2,s,t); [o,phys]Q(2,u,v); int [o,phys]iwork(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		char pjobu = \'N\';
+		char pjobv = \'N\';		
+		char pjobq = \'N\';
+
+             types(F) %{
+
+		extern int cggsvd_(char *jobu, char *jobv, char *jobq, integer *m, 
+		integer *n, integer *p, integer *k, integer *l, float *a, 
+		integer *lda, float *b, integer *ldb, float *alpha, 
+		float *beta, float *u, integer *ldu, float *v, integer 
+		*ldv, float *q, integer *ldq, float *work, float *rwork, integer *iwork, 
+		integer *info);
+		float *work, *rwork;
+             %}
+             types(D) %{
+
+		extern int zggsvd_(char *jobu, char *jobv, char *jobq, integer *m, 
+		integer *n, integer *p, integer *k, integer *l, double *a, 
+		integer *lda, double *b, integer *ldb, double *alpha, 
+		double *beta, double *u, integer *ldu, double *v, integer 
+		*ldv, double *q, integer *ldq, double *work, double *rwork, integer *iwork, 
+		integer *info);
+		double *work, *rwork;
+             %}
+		integer lwork = ($SIZE (m) < $SIZE (n)) ? $SIZE (n): $SIZE (m);
+
+		if ($SIZE (p) > lwork)
+			lwork = $SIZE (p);
+		
+		types(F) %{
+			work = (float *)malloc(2*(3*lwork +  $SIZE (n))*  sizeof(float));
+			rwork = (float *)malloc(2 * $SIZE (n) *  sizeof(float));
+		%}
+		types(D) %{
+			work = (double *)malloc(2*(3*lwork +  $SIZE (n)) *  sizeof(double));
+			rwork = (double *)malloc(2 * $SIZE (n) *  sizeof(double));
+		%}		
+
+		if ($jobu())
+			pjobu = \'U\';
+		if ($jobv())
+			pjobv = \'V\';
+		if ($jobq())
+			pjobq = \'Q\';
+
+		
+		$TFD(cggsvd_,zggsvd_)(
+		&pjobu,
+		&pjobv,
+		&pjobq,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__p_size)},
+		$P(k),
+		$P(l),
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(alpha),
+		$P(beta),
+		$P(U),
+		&(integer){$PRIV(__q_size)},
+		$P(V),
+		&(integer){$PRIV(__s_size)},
+		$P(Q),
+		&(integer){$PRIV(__u_size)},
+		work,
+		rwork,
+		$P(iwork),
+		$P(info));
+		free(rwork);
+		free(work);
+');
+
+
+
+pp_defc("geev",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int jobvl(); int jobvr(); [o,phys]w(2,n); [o,phys]vl(2,m,m); [o,phys]vr(2,p,p); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		char jvl = \'N\';
+		char jvr = \'N\';
+             types(F) %{
+		extern int cgeev_(char *jobvl, char *jobvr, integer *n, float *a,
+		integer *lda, float *w, float *vl, integer *ldvl, float *vr,
+		integer *ldvr, float *work, integer *lwork, float *rwork, integer *info);
+		float tmp_work[2], *rwork;
+             %}
+             types(D) %{
+		extern int zgeev_(char *jobvl, char *jobvr, integer *n, double *
+		a, integer *lda, double *w, double *vl,
+		integer *ldvl, double *vr, integer *ldvr, double *work,
+		integer *lwork, double *rwork, integer *info);
+		double tmp_work[2], *rwork;
+             %}
+		integer lwork = -1;
+
+		if ($jobvl())
+			jvl = \'V\';
+		if ($jobvr())
+			jvr = \'V\';
+             types(F) %{
+			rwork = (float *)malloc( 2 * $PRIV(__n_size) *  sizeof(float));
+             %}
+             types(D) %{
+			rwork = (double *)malloc(2 * $PRIV(__n_size) *  sizeof(double));             
+             %}
+		$TFD(cgeev_,zgeev_)(
+		&jvl,
+		&jvr,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(w),
+		$P(vl),
+		&(integer){$PRIV(__m_size)},
+		$P(vr),
+		&(integer){$PRIV(__p_size)},
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+		float *work = (float *)malloc(2*lwork *  sizeof(float));
+             %}
+             types(D) %{
+		double *work = (double *)malloc(2*lwork *  sizeof(double));
+             %}
+		$TFD(cgeev_,zgeev_)(
+		&jvl,
+		&jvr,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(w),
+		$P(vl),
+		&(integer){$PRIV(__m_size)},
+		$P(vr),
+		&(integer){$PRIV(__p_size)},
+		work,
+		&lwork,
+		rwork,
+		$P(info));
+		free(work);
+		}
+		free(rwork);
+');
+
+
+pp_defc("geevx",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n);  int jobvl(); int jobvr(); int balance(); int sense(); [o,phys]w(2,n); [o,phys]vl(2,m,m); [o,phys]vr(2,p,p); int [o,phys]ilo(); int [o,phys]ihi(); [o,phys]scale(n); [o,phys]abnrm(); [o,phys]rconde(q); [o,phys]rcondv(r); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		char jvl = \'N\';
+		char jvr = \'N\';
+		char balanc, sens;
+		integer lwork = -1;
+             types(F) %{
+		extern int cgeevx_(char *balanc, char *jobvl, char *jobvr, char *
+		sense, integer *n, float *a, integer *lda, float *w,
+		float *vl, integer *ldvl, float *vr,
+		integer *ldvr, integer *ilo, integer *ihi, float *scale,
+		float *abnrm, float *rconde, float *rcondv, float
+		*work, integer *lwork, float *rwork, integer *info);
+		float tmp_work[2], *rwork;
+             %}
+             types(D) %{
+		extern int zgeevx_(char *balanc, char *jobvl, char *jobvr, char *
+		sense, integer *n, double *a, integer *lda, double *w,
+		double *vl, integer *ldvl, double *vr,
+		integer *ldvr, integer *ilo, integer *ihi, double *scale,
+		double *abnrm, double *rconde, double *rcondv, double
+		*work, integer *lwork, double *rwork, integer *info);
+		double tmp_work[2], *rwork;
+             %}
+
+		if ($jobvl())
+			jvl = \'V\';
+		if ($jobvr())
+			jvr = \'V\';
+
+		switch ($balance())
+		{
+			case 1: balanc = \'P\';
+				break;
+			case 2: balanc = \'S\';
+				break;
+			case 3: balanc = \'B\';
+				break;
+			default: balanc = \'N\';
+		}
+		switch ($sense())
+		{
+			case 1: sens = \'E\';
+				break;
+			case 2: sens = \'V\';
+				break;
+			case 3: sens = \'B\';
+				break;
+			default: sens = \'N\';
+		}
+             types(F) %{
+			rwork = (float *)malloc( 2 * $PRIV(__n_size) *  sizeof(float));
+             %}
+             types(D) %{
+			rwork = (double *)malloc(2 * $PRIV(__n_size) *  sizeof(double));             
+             %}
+		$TFD(cgeevx_,zgeevx_)(
+		&balanc,
+		&jvl,
+		&jvr,
+		&sens,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(w),
+		$P(vl),
+		&(integer){$PRIV(__m_size)},
+		$P(vr),
+		&(integer){$PRIV(__p_size)},
+		$P(ilo),
+		$P(ihi),
+		$P(scale),
+		$P(abnrm),
+		$P(rconde),
+		$P(rcondv),
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+
+		float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(cgeevx_,zgeevx_)(
+		&balanc,
+		&jvl,
+		&jvr,
+		&sens,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(w),
+		$P(vl),
+		&(integer){$PRIV(__m_size)},
+		$P(vr),
+		&(integer){$PRIV(__p_size)},
+		$P(ilo),
+		$P(ihi),
+		$P(scale),
+		$P(abnrm),
+		$P(rconde),
+		$P(rcondv),
+		work,
+		&lwork,
+		rwork,
+		$P(info));
+		free(work);
+		}
+		free(rwork);
+');
+
+pp_defc("ggev",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int jobvl();int jobvr();[phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VL(2,m,m);[o,phys]VR(2,p,p);int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+
+		integer lwork = -1;
+		char pjobvl = \'N\', pjobvr = \'N\';
+
+             types(F) %{
+		extern int cggev_(char *jobvl, char *jobvr, integer *n, float *
+		a, integer *lda, float *b, integer *ldb, float *alpha,
+		float *beta, float *vl, integer *ldvl,
+		float *vr, integer *ldvr, float *work, integer *lwork,
+		float *rwork, integer *info);
+		float tmp_work[2], *rwork;
+             %}
+             types(D) %{
+		extern int zggev_(char *jobvl, char *jobvr, integer *n, double *
+		a, integer *lda, double *b, integer *ldb, double *alpha,
+		double *beta, double *vl, integer *ldvl,
+		double *vr, integer *ldvr, double *work, integer *lwork,
+		double *rwork, integer *info);
+		double tmp_work[2], *rwork;
+             %}
+		if ($jobvl())
+			pjobvl = \'V\';
+		if ($jobvr())
+			pjobvr = \'V\';
+
+		types(F) %{
+			rwork = (float *)malloc(8 * $SIZE(n) *  sizeof(float));
+             	%}
+             	types(D) %{
+			rwork = (double *)malloc(8 * $SIZE(n) *  sizeof(double));
+             	%}
+		$TFD(cggev_,zggev_)(
+		&pjobvl,
+		&pjobvr,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(alpha),
+		$P(beta),
+		$P(VL),
+		&(integer){$PRIV(__m_size)},
+		$P(VR),
+		&(integer){$PRIV(__p_size)},
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             	%}
+
+		$TFD(cggev_,zggev_)(
+		&pjobvl,
+		&pjobvr,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(alpha),
+		$P(beta),
+		$P(VL),
+		&(integer){$PRIV(__m_size)},
+		$P(VR),
+		&(integer){$PRIV(__p_size)},
+		work,
+		&lwork,
+		rwork,
+		$P(info));
+		free(work);
+		}
+		free(rwork);
+
+');
+
+pp_defc("ggevx",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n);int balanc();int jobvl();int jobvr();int sense();[io,phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VL(2,m,m);[o,phys]VR(2,p,p);int [o,phys]ilo();int [o,phys]ihi();[o,phys]lscale(n);[o,phys]rscale(n);[o,phys]abnrm();[o,phys]bbnrm();[o,phys]rconde(r);[o,phys]rcondv(s);int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+
+		integer lwork = -1, *iwork, *bwork;
+		char pjobvl = \'N\', pjobvr = \'N\';
+		char pbalanc, psens;
+
+             types(F) %{
+		int cggevx_(char *balanc, char *jobvl, char *jobvr, char *
+		sense, integer *n, float *a, integer *lda, float *b,
+		integer *ldb, float *alpha, float *
+		beta, float *vl, integer *ldvl, float *vr, integer *ldvr,
+		integer *ilo, integer *ihi, float *lscale, float *rscale,
+		float *abnrm, float *bbnrm, float *rconde, float *
+		rcondv, float *work, integer *lwork, float *rwork, integer *iwork, logical *
+		bwork, integer *info);
+		float tmp_work[2], *rwork;
+		rwork = (float *)malloc(6 * $SIZE(n) *  sizeof(float));
+             %}
+             types(D) %{
+		extern int zggevx_(char *balanc, char *jobvl, char *jobvr, char *
+		sense, integer *n, double *a, integer *lda, double *b,
+		integer *ldb, double *alpha, double *
+		beta, double *vl, integer *ldvl, double *vr, integer *ldvr,
+		integer *ilo, integer *ihi, double *lscale, double *rscale,
+		double *abnrm, double *bbnrm, double *rconde, double *
+		rcondv, double *work, integer *lwork, double *rwork, integer *iwork, logical *
+		bwork, integer *info);
+		double tmp_work[2], *rwork;
+		rwork = (double *)malloc(6 * $SIZE(n) *  sizeof(double));
+             %}
+		if ($jobvl())
+			pjobvl = \'V\';
+		if ($jobvr())
+			pjobvr = \'V\';
+
+		switch ($balanc())
+		{
+			case 1: pbalanc = \'P\';
+				break;
+			case 2: pbalanc = \'S\';
+				break;
+			case 3: pbalanc = \'B\';
+				break;
+			default: pbalanc = \'N\';
+		}
+		switch ($sense())
+		{
+			case 1: psens = \'E\';
+				bwork = (integer *)malloc($SIZE(n) *  sizeof(integer));
+				break;
+			case 2: psens = \'V\';
+				iwork = (integer *)malloc(($SIZE(n) + 2) *  sizeof(integer));
+				bwork = (integer *)malloc($SIZE(n) *  sizeof(integer));
+				break;
+			case 3: psens = \'B\';
+				iwork = (integer *)malloc(($SIZE(n) + 2) *  sizeof(integer));
+				bwork = (integer *)malloc($SIZE(n) *  sizeof(integer));
+				break;
+			default: psens = \'N\';
+				iwork = (integer *)malloc(($SIZE(n) + 2) *  sizeof(integer));
+		}
+
+		$TFD(cggevx_,zggevx_)(
+		&pbalanc,
+		&pjobvl,
+		&pjobvr,
+		&psens,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(alpha),
+		$P(beta),
+		$P(VL),
+		&(integer){$PRIV(__m_size)},
+		$P(VR),
+		&(integer){$PRIV(__p_size)},
+		$P(ilo),
+		$P(ihi),
+		$P(lscale),
+		$P(rscale),
+		$P(abnrm),
+		$P(bbnrm),
+		$P(rconde),
+		$P(rcondv),
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		iwork,
+		bwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             	%}
+
+		$TFD(cggevx_,zggevx_)(
+		&pbalanc,
+		&pjobvl,
+		&pjobvr,
+		&psens,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(alpha),
+		$P(beta),
+		$P(VL),
+		&(integer){$PRIV(__m_size)},
+		$P(VR),
+		&(integer){$PRIV(__p_size)},
+		$P(ilo),
+		$P(ihi),
+		$P(lscale),
+		$P(rscale),
+		$P(abnrm),
+		$P(bbnrm),
+		$P(rconde),
+		$P(rcondv),
+		work,
+		&lwork,
+		rwork,
+		iwork,
+		bwork,
+		$P(info));
+		free(work);
+		}
+		free(rwork);
+		if ($sense())
+			free(bwork);
+		if ($sense() != 1)
+			free(iwork);
+');
+
+
+pp_addhdr('
+static SV*   fselect_func;
+PDL_Long fselect_wrapper(float *p)
+{
+   dSP ;
+
+   int count;
+   long ret;
+   SV *pdl1;
+   HV *bless_stash;
+
+   pdl *pdl;
+   PDL_Indx odims[1];
+
+   PDL_Indx dims[] = {2,1};
+   pdl = PDL->pdlnew();
+   PDL->setdims (pdl, dims, 2);
+   pdl->datatype = PDL_F;
+   pdl->data = p;
+   pdl->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
+   bless_stash = gv_stashpv("PDL::Complex", 0);
+
+   ENTER ;   SAVETMPS ;   PUSHMARK(sp) ;
+
+    pdl1 = sv_newmortal();
+    PDL->SetSV_PDL(pdl1, pdl);
+    pdl1 = sv_bless(pdl1, bless_stash); /* bless in PDL::Complex  */
+    XPUSHs(pdl1);
+
+   PUTBACK ;
+
+   count = perl_call_sv(fselect_func, G_SCALAR);
+
+   SPAGAIN;
+
+   if (count !=1)
+      croak("Error calling perl function\n");
+
+
+   // For pdl_free
+   odims[0] = 0;
+   PDL->setdims (pdl, odims, 0);
+   pdl->state &= ~ (PDL_ALLOCATED |PDL_DONTTOUCHDATA);
+   pdl->data=NULL;
+   ret = (long ) POPl ;
+   PUTBACK ;   FREETMPS ;   LEAVE ;
+   return ret;
+
+}
+
+static SV*   dselect_func;
+PDL_Long dselect_wrapper(double *p)
+{
+   dSP ;
+
+   int count;
+   long ret;
+   SV *pdl1;
+   HV *bless_stash;
+
+   pdl *pdl;
+   PDL_Indx odims[1];
+
+   PDL_Indx dims[] = {2,1};
+   pdl = PDL->pdlnew();
+   PDL->setdims (pdl, dims, 2);
+   pdl->datatype = PDL_D;
+   pdl->data = p;
+   pdl->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
+   bless_stash = gv_stashpv("PDL::Complex", 0);
+
+   ENTER ;   SAVETMPS ;   PUSHMARK(sp) ;
+
+    pdl1 = sv_newmortal();
+    PDL->SetSV_PDL(pdl1, pdl);
+    pdl1 = sv_bless(pdl1, bless_stash); /* bless in PDL::Complex  */
+    XPUSHs(pdl1);
+
+   PUTBACK ;
+
+   count = perl_call_sv(dselect_func, G_SCALAR);
+
+   SPAGAIN;
+
+   if (count !=1)
+      croak("Error calling perl function\n");
+
+
+   // For pdl_free
+   odims[0] = 0;
+   PDL->setdims (pdl, odims, 0);
+   pdl->state &= ~ (PDL_ALLOCATED |PDL_DONTTOUCHDATA);
+   pdl->data=NULL;
+   ret = (long ) POPl ;
+   PUTBACK ;   FREETMPS ;   LEAVE ;
+   return ret;
+
+}
+
+');
+
+pp_defc("gees",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n);  int jobvs(); int sort(); [o,phys]w(2,n); [o,phys]vs(2,p,p); int [o,phys]sdim(); int [o,phys]info()',
+	OtherPars => "SV* select_func" ,
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		char jvs = \'N\';
+		char psort = \'N\';
+		integer *bwork;
+		integer lwork = -1;
+
+             types(F) %{
+		extern int cgees_(char *jobvs, char *sort, L_fp select, integer *n,
+		float *a, integer *lda, integer *sdim, float *w,
+		float *vs, integer *ldvs, float *work,
+		integer *lwork, float *rwork, integer *bwork, integer *info);
+		float tmp_work[2];
+		float *rwork, *work;
+		rwork = (float *) malloc ($PRIV(__n_size) * sizeof (float));
+		fselect_func    = $PRIV(select_func);
+             %}
+             types(D) %{
+		extern int zgees_(char *jobvs, char *sort, L_fp select, integer *n,
+		double *a, integer *lda, integer *sdim, double *w,
+		double *vs, integer *ldvs, double *work,
+		integer *lwork, double *rwork, integer *bwork, integer *info);
+		double *rwork, *work;
+		double tmp_work[2];
+		dselect_func    = $PRIV(select_func);
+		rwork = (double *) malloc ($PRIV(__n_size) * sizeof (double));
+             %}
+
+
+
+		if ($jobvs())
+			jvs = \'V\';
+		if ($sort()){
+			psort = \'S\';
+			bwork  = (integer * ) malloc ($PRIV(__n_size) * sizeof (integer));
+		}
+             types(F) %{
+             cgees_(
+		&jvs,
+		&psort,
+		fselect_wrapper,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(sdim),
+		$P(w),
+		$P(vs),
+		&(integer){$PRIV(__p_size)},
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		bwork,
+		$P(info));             
+             %}
+             types(D) %{
+		zgees_(
+		&jvs,
+		&psort,
+		dselect_wrapper,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(sdim),
+		$P(w),
+		$P(vs),
+		&(integer){$PRIV(__p_size)},
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		bwork,
+		$P(info));
+             %}
+
+		lwork = (integer )tmp_work[0];
+
+		types(F) %{
+		work = (float *) malloc(2 * lwork *  sizeof(float));
+		cgees_(
+		&jvs,
+		&psort,
+		fselect_wrapper,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(sdim),
+		$P(w),
+		$P(vs),
+		&(integer){$PRIV(__p_size)},
+		work,
+		&lwork,
+		rwork,
+		bwork,
+		$P(info));
+		free(work);
+             %}
+
+             types(D) %{
+		work = (double *) malloc(2*lwork *  sizeof(double));
+		zgees_(
+		&jvs,
+		&psort,
+		dselect_wrapper,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(sdim),
+		$P(w),
+		$P(vs),
+		&(integer){$PRIV(__p_size)},
+		work,
+		&lwork,
+		rwork,
+		bwork,
+		$P(info));
+		free(work);
+             %}
+		if ($sort())
+			free(bwork);
+		free(rwork);
+		',
+	Doc=>'
+
+=for ref
+
+Complex version of gees
+
+    select_func:
+            If sort = 1, select_func is used to select eigenvalues to sort
+            to the top left of the Schur form.
+            If sort = 0, select_func is not referenced.
+            An complex eigenvalue w is selected if
+            select_func(PDL::Complex(w)) is true;
+            Note that a selected complex eigenvalue may no longer
+            satisfy select_func(PDL::Complex(w)) = 1 after ordering, since
+            ordering may change the value of complex eigenvalues
+            (especially if the eigenvalue is ill-conditioned); in this
+            case info is set to N+2.
+	
+
+');
+
+
+pp_defc("geesx",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n);  int jobvs(); int sort(); int sense(); [o,phys]w(2,n);[o,phys]vs(2,p,p); int [o,phys]sdim(); [o,phys]rconde();[o,phys]rcondv(); int [o,phys]info()',
+	OtherPars => "SV* select_func" ,
+	GenericTypes => [F,D],
+	Code => generate_code '
+		char jvs = \'N\';
+		char psort = \'N\';
+		integer *bwork;
+		integer lwork = 0;
+		char sens;
+
+             types(F) %{
+		extern int cgeesx_(char *jobvs, char *sort, L_fp select, char * sense,
+		integer *n, float *a, integer *lda, integer *sdim, float *w,
+		float *vs, integer *ldvs, float *rconde, float *rcondv,
+		float *work, integer *lwork, float *rwork,
+		integer *bwork, integer *info);
+		float *work, *rwork;
+		rwork = (float *) malloc ($PRIV(__n_size) * sizeof (float));
+		fselect_func    = $PRIV(select_func);
+             %}
+             types(D) %{
+		extern int zgeesx_(char *jobvs, char *sort, L_fp select, char * sense,
+		integer *n, double *a, integer *lda, integer *sdim, double *w,
+		double *vs, integer *ldvs, double *rconde, double *rcondv,
+		double *work, integer *lwork, double *rwork,
+		integer *bwork, integer *info);
+		double *work, *rwork;
+		dselect_func    = $PRIV(select_func);
+		rwork = (double *) malloc ($PRIV(__n_size) * sizeof (double));
+             %}
+
+
+		if ($jobvs())
+			jvs = \'V\';
+		if ($sort()){
+			psort = \'S\';
+			bwork  = (integer * )  malloc ($PRIV(__n_size) * sizeof (integer));
+		}
+
+		switch ($sense())
+		{
+			case 1: sens = \'E\';
+				lwork  = (integer ) ($PRIV(__n_size) * ($PRIV(__n_size)/2));
+				break;
+			case 2: sens = \'V\';
+				lwork  = (integer ) ($PRIV(__n_size) * ($PRIV(__n_size)/2));
+				break;
+			case 3: sens = \'B\';
+				lwork  = (integer ) ($PRIV(__n_size) * ($PRIV(__n_size)/2));
+				break;
+			default: sens = \'N\';
+				 lwork = (integer ) ($PRIV(__n_size) * 2);
+		}
+		types(D) %{
+			work  = (double * )malloc(2*lwork * sizeof (double));
+		%}
+		types(F) %{
+			work  = (float * )malloc(2*lwork * sizeof (float));
+		%}
+
+		types(F) %{
+		cgeesx_(
+		&jvs,
+		&psort,
+		fselect_wrapper,
+		&sens,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(sdim),
+		$P(w),
+		$P(vs),
+		&(integer){$PRIV(__p_size)},
+		$P(rconde),
+		$P(rcondv),
+		work,
+		&lwork,
+		rwork,
+		bwork,
+		$P(info));
+		%}
+
+		types(D) %{
+		zgeesx_(
+		&jvs,
+		&psort,
+		dselect_wrapper,
+		&sens,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(sdim),
+		$P(w),
+		$P(vs),
+		&(integer){$PRIV(__p_size)},
+		$P(rconde),
+		$P(rcondv),
+		work,
+		&lwork,
+		rwork,
+		bwork,
+		$P(info));
+		%}
+
+		free(work);
+		if ($sort())
+			free(bwork);
+		free(rwork);
+',
+      Doc => '
+
+=for ref
+
+Complex version of geesx
+
+    select_func:
+            If sort = 1, select_func is used to select eigenvalues to sort
+            to the top left of the Schur form.
+            If sort = 0, select_func is not referenced.
+            An complex eigenvalue w is selected if
+            select_func(PDL::Complex(w)) is true; 
+            Note that a selected complex eigenvalue may no longer
+            satisfy select_func(PDL::Complex(w)) = 1 after ordering, since
+            ordering may change the value of complex eigenvalues
+            (especially if the eigenvalue is ill-conditioned); in this
+            case info is set to N+2.
+	
+
+');
+
+
+
+pp_addhdr('
+static SV*   fgselect_func;
+PDL_Long fgselect_wrapper(float *p, float *q)
+{
+   dSP ;
+
+   int count;
+   long ret;
+   SV *svpdl1, *svpdl2;
+   HV *bless_stash;
+
+   pdl *pdl1, *pdl2;
+   PDL_Indx odims[1];
+
+   PDL_Indx dims[] = {2,1};
+   pdl1 = PDL->pdlnew();
+   PDL->setdims (pdl1, dims, 2);
+   pdl1->datatype = PDL_F;
+   pdl1->data = p;
+   pdl1->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
+   pdl2 = PDL->pdlnew();
+   PDL->setdims (pdl2, dims, 2);
+   pdl2->datatype = PDL_F;
+   pdl2->data = q;
+   pdl2->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
+
+
+
+   bless_stash = gv_stashpv("PDL::Complex", 0);
+
+   ENTER ;   SAVETMPS ;   PUSHMARK(sp) ;
+
+    svpdl1 = sv_newmortal();
+    PDL->SetSV_PDL(svpdl1, pdl1);
+    svpdl1 = sv_bless(svpdl1, bless_stash); /* bless in PDL::Complex  */
+    
+    svpdl2 = sv_newmortal();
+    PDL->SetSV_PDL(svpdl2, pdl2);
+    svpdl2 = sv_bless(svpdl2, bless_stash); /* bless in PDL::Complex  */
+    
+    XPUSHs(svpdl1);
+    XPUSHs(svpdl2);
+
+   PUTBACK ;
+
+   count = perl_call_sv(fgselect_func, G_SCALAR);
+
+   SPAGAIN;
+
+   if (count !=1)
+      croak("Error calling perl function\n");
+
+
+   // For pdl_free
+   odims[0] = 0;
+   PDL->setdims (pdl1, odims, 0);
+   pdl1->state &= ~ (PDL_ALLOCATED |PDL_DONTTOUCHDATA);
+   pdl1->data=NULL;
+
+   PDL->setdims (pdl2, odims, 0);
+   pdl1->state &= ~ (PDL_ALLOCATED |PDL_DONTTOUCHDATA);
+   pdl1->data=NULL;
+
+   ret = (long ) POPl ;
+   PUTBACK ;   FREETMPS ;   LEAVE ;
+   return ret;
+
+}
+
+static SV*   dgselect_func;
+PDL_Long dgselect_wrapper(double *p, double *q)
+{
+   dSP ;
+
+   int count;
+   long ret;
+   SV *svpdl1, *svpdl2;
+   HV *bless_stash;
+
+   pdl *pdl1, *pdl2;
+   PDL_Indx odims[1];
+
+   PDL_Indx dims[] = {2,1};
+   pdl1 = PDL->pdlnew();
+   PDL->setdims (pdl1, dims, 2);
+   pdl1->datatype = PDL_D;
+   pdl1->data = p;
+   pdl1->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
+   pdl2 = PDL->pdlnew();
+   PDL->setdims (pdl2, dims, 2);
+   pdl2->datatype = PDL_D;
+   pdl2->data = q;
+   pdl2->state |= PDL_DONTTOUCHDATA | PDL_ALLOCATED;
+
+   bless_stash = gv_stashpv("PDL::Complex", 0);
+
+
+   ENTER ;   SAVETMPS ;   PUSHMARK(sp) ;
+
+    svpdl1 = sv_newmortal();
+    PDL->SetSV_PDL(svpdl1, pdl1);
+    svpdl1 = sv_bless(svpdl1, bless_stash); /* bless in PDL::Complex  */
+    svpdl2 = sv_newmortal();
+    PDL->SetSV_PDL(svpdl2, pdl2);
+    svpdl2 = sv_bless(svpdl2, bless_stash); /* bless in PDL::Complex  */
+
+    XPUSHs(svpdl1);
+    XPUSHs(svpdl2);
+
+   PUTBACK ;
+
+   count = perl_call_sv(dgselect_func, G_SCALAR);
+
+   SPAGAIN;
+
+   if (count !=1)
+      croak("Error calling perl function\n");
+
+
+   // For pdl_free
+   odims[0] = 0;
+   PDL->setdims (pdl1, odims, 0);
+   pdl1->state &= ~ (PDL_ALLOCATED |PDL_DONTTOUCHDATA);
+   pdl1->data=NULL;
+   PDL->setdims (pdl2, odims, 0);
+   pdl2->state &= ~ (PDL_ALLOCATED |PDL_DONTTOUCHDATA);
+   pdl2->data=NULL;
+
+   ret = (long ) POPl ;
+   PUTBACK ;   FREETMPS ;   LEAVE ;
+   return ret;
+
+}
+
+');
+
+
+pp_defc("gges",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int jobvsl();int jobvsr();int sort();[io,phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VSL(2,m,m);[o,phys]VSR(2,p,p);int [o,phys]sdim();int [o,phys]info()',
+	OtherPars => "SV* select_func" ,
+	GenericTypes => [F,D],
+	Code => generate_code '
+
+		integer lwork = -1;
+		char pjobvsl = \'N\', pjobvsr = \'N\', psort = \'N\';
+		integer *bwork;
+
+             types(F) %{
+		extern int cgges_(char *jobvsl, char *jobvsr, char *sort, L_fp
+		delctg, integer *n, float *a, integer *lda, float *b,
+		integer *ldb, integer *sdim, float *alpha,
+		float *beta, float *vsl, integer *ldvsl, float *vsr,
+		integer *ldvsr, float *work, integer *lwork, float *rwork,
+		logical *bwork, integer *info);
+		float tmp_work[2], *rwork;
+		fgselect_func    = $PRIV(select_func);
+		rwork = (float *)malloc(8 * $SIZE(n) *  sizeof(float));	
+             %}
+             types(D) %{
+		extern int zgges_(char *jobvsl, char *jobvsr, char *sort, L_fp
+		delctg, integer *n, double *a, integer *lda, double *b,
+		integer *ldb, integer *sdim, double *alpha,
+		double *beta, double *vsl, integer *ldvsl, double *vsr,
+		integer *ldvsr, double *work, integer *lwork, double *rwork,
+		logical *bwork,	integer *info);
+		double tmp_work[2], *rwork;
+		dgselect_func    = $PRIV(select_func);
+		rwork = (double *)malloc(8 * $SIZE(n) *  sizeof(double));	
+             %}
+		if ($jobvsl())
+			pjobvsl = \'V\';
+		if ($jobvsr())
+			pjobvsr = \'V\';
+		if ($sort()){
+			psort = \'S\';
+			bwork = (integer *)malloc($PRIV(__n_size) *  sizeof(integer));
+		}
+		types(F) %{
+		cgges_(
+		&pjobvsl,
+		&pjobvsr,
+		&psort,
+		fgselect_wrapper,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(sdim),
+		$P(alpha),
+		$P(beta),
+		$P(VSL),
+		&(integer){$PRIV(__m_size)},
+		$P(VSR),
+		&(integer){$PRIV(__p_size)},
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		bwork,
+		$P(info));
+		%}
+
+		types(D) %{
+		zgges_(
+		&pjobvsl,
+		&pjobvsr,
+		&psort,
+		dgselect_wrapper,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(sdim),
+		$P(alpha),
+		$P(beta),
+		$P(VSL),
+		&(integer){$PRIV(__m_size)},
+		$P(VSR),
+		&(integer){$PRIV(__p_size)},
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		bwork,
+		$P(info));
+		%}
+
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             	%}
+
+		types(F) %{
+		cgges_(
+		&pjobvsl,
+		&pjobvsr,
+		&psort,
+		fgselect_wrapper,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(sdim),
+		$P(alpha),
+		$P(beta),
+		$P(VSL),
+		&(integer){$PRIV(__m_size)},
+		$P(VSR),
+		&(integer){$PRIV(__p_size)},
+		work,
+		&lwork,
+		rwork,
+		bwork,
+		$P(info));
+		%}
+
+		types(D) %{
+		zgges_(
+		&pjobvsl,
+		&pjobvsr,
+		&psort,
+		dgselect_wrapper,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(sdim),
+		$P(alpha),
+		$P(beta),
+		$P(VSL),
+		&(integer){$PRIV(__m_size)},
+		$P(VSR),
+		&(integer){$PRIV(__p_size)},
+		work,
+		&lwork,
+		rwork,
+		bwork,
+		$P(info));
+		%}		
+		free(work);
+		}
+		if ($sort())
+			free (bwork);
+		free(rwork);
+
+',
+Doc=>'
+
+=for ref
+
+Complex version of ggees
+
+    select_func:
+            If sort = 1, select_func is used to select eigenvalues to sort
+            to the top left of the Schur form.
+            If sort = 0, select_func is not referenced.
+            An eigenvalue w = w/beta is selected if
+            select_func(PDL::Complex(w), PDL::Complex(beta)) is true; 
+            Note that a selected complex eigenvalue may no longer
+            satisfy select_func(PDL::Complex(w),PDL::Complex(beta)) = 1 after ordering, since
+            ordering may change the value of complex eigenvalues
+            (especially if the eigenvalue is ill-conditioned); in this
+            case info is set to N+2.
+
+
+');
+
+pp_defc("ggesx",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int jobvsl();int jobvsr();int sort();int sense();[io,phys]B(2,n,n);[o,phys]alpha(2,n);[o,phys]beta(2,n);[o,phys]VSL(2,m,m);[o,phys]VSR(2,p,p);int [o,phys]sdim();[o,phys]rconde(q);[o,phys]rcondv(r);int [o,phys]info()',
+	OtherPars => "SV* select_func" ,
+	GenericTypes => [F,D],
+	Code => generate_code '
+
+		integer lwork, maxwrk;
+		integer liwork = 1;
+		integer minwrk = 1;
+		static integer c__0 = 0;
+		static integer c__1 = 1;
+		static integer c_n1 = -1;
+		char pjobvsl = \'N\';
+		char pjobvsr = \'N\';
+		char psort = \'N\';
+		char psens = \'N\';
+		integer *bwork;
+		integer *iwork;
+		extern integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
+		integer *n2, integer *n3, integer *n4, ftnlen name_len, ftnlen
+		opts_len);
+             types(F) %{
+		extern int cggesx_(char *jobvsl, char *jobvsr, char *sort, L_fp
+		delctg, char *sense, integer *n, float *a, integer *lda, float *b,
+		integer *ldb, integer *sdim, float *alpha,
+		float *beta, float *vsl, integer *ldvsl, float *vsr,
+		integer *ldvsr, float *rconde, float *rcondv,  float *work,
+		integer *lwork, float *rwork, integer *iwork, integer *liwork, logical *bwork,
+		integer *info);
+		float *rwork = (float *)malloc(8 * $SIZE(n) *  sizeof(float));	
+		fgselect_func    = $PRIV(select_func);
+             %}
+             types(D) %{
+		extern int zggesx_(char *jobvsl, char *jobvsr, char *sort, L_fp
+		delctg, char *sense, integer *n, double *a, integer *lda, double *b,
+		integer *ldb, integer *sdim, double *alpha,
+		double *beta, double *vsl, integer *ldvsl, double *vsr,
+		integer *ldvsr,  double *rconde, double *rcondv, double *work,
+		integer *lwork, double *rwork, integer *iwork, integer *liwork, logical *bwork,
+		integer *info);
+		double *rwork = (double *)malloc(8 * $SIZE(n) *  sizeof(double));	
+		dgselect_func    = $PRIV(select_func);
+             %}
+		if ($jobvsr())
+			pjobvsr = \'V\';
+
+		if ($sort()){
+			psort = \'S\';
+			bwork = (integer *)malloc($PRIV(__n_size) *  sizeof(integer));
+		}
+
+		switch ($sense())
+		{
+			case 1: psens = \'E\';
+				break;
+			case 2: psens = \'V\';
+				break;
+			case 3: psens = \'B\';
+				break;
+			default: psens = \'N\';
+		}
+//		if (!$sense())
+//			liwork = 1;
+//		else
+//		{
+			liwork = $SIZE(n) + 2;
+			iwork =  (integer *)malloc(liwork *  sizeof(integer));
+//		}
+
+
+		// Code modified from Lapack
+		// TODO other shur form above
+		// The actual updated release (clapack 09/20/2000) do not allow
+		// the workspace query. See release notes of Lapack
+		// for this feature.
+
+		minwrk = $SIZE(n)  << 1;
+		maxwrk = $SIZE(n)  + $SIZE(n) * ilaenv_(&c__1, "ZGEQRF", " ", &(integer){$PRIV(__n_size)}, &c__1,
+		&(integer){$PRIV(__n_size)}, &c__0, (ftnlen)6, (ftnlen)1);
+
+		if ($jobvsl())
+		{
+			integer i__1 = maxwrk;
+			integer i__2 = $SIZE(n) + $SIZE(n) * ilaenv_(&c__1, "ZUNGQR"
+		    		, " ", &(integer){$PRIV(__n_size)}, &c__1, &(integer){$PRIV(__n_size)}, &c_n1, (ftnlen)6, (ftnlen)1);
+	    		maxwrk = max(i__1,i__2);
+			pjobvsl = \'V\';
+		}
+		lwork = max(maxwrk,minwrk);
+
+		{
+		types(F) %{
+			float *work = (float *)malloc( 2 * lwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             	%}
+
+		
+		types(F) %{	
+		cggesx_(
+		&pjobvsl,
+		&pjobvsr,
+		&psort,
+		fgselect_wrapper,
+		&psens,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(sdim),
+		$P(alpha),
+		$P(beta),
+		$P(VSL),
+		&(integer){$PRIV(__m_size)},
+		$P(VSR),
+		&(integer){$PRIV(__p_size)},
+		$P(rconde),
+		$P(rcondv),
+		work,
+		&lwork,
+		rwork,
+		iwork,
+		&liwork,
+		bwork,
+		$P(info));
+		%}
+		
+		types(D) %{
+		zggesx_(
+		&pjobvsl,
+		&pjobvsr,
+		&psort,
+		dgselect_wrapper,
+		&psens,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(sdim),
+		$P(alpha),
+		$P(beta),
+		$P(VSL),
+		&(integer){$PRIV(__m_size)},
+		$P(VSR),
+		&(integer){$PRIV(__p_size)},
+		$P(rconde),
+		$P(rcondv),
+		work,
+		&lwork,
+		rwork,
+		iwork,
+		&liwork,
+		bwork,
+		$P(info));
+		%}
+
+		free(work);
+		}
+		if ($sort())
+			free (bwork);
+//		if ($sense())
+			free(iwork);
+		free(rwork);
+',
+Doc=>'
+
+=for ref
+
+Complex version of ggeesx
+
+    select_func:
+            If sort = 1, select_func is used to select eigenvalues to sort
+            to the top left of the Schur form.
+            If sort = 0, select_func is not referenced.
+            An eigenvalue w = w/beta is selected if
+            select_func(PDL::Complex(w), PDL::Complex(beta)) is true; 
+            Note that a selected complex eigenvalue may no longer
+            satisfy select_func(PDL::Complex(w),PDL::Complex(beta)) = 1 after ordering, since
+            ordering may change the value of complex eigenvalues
+            (especially if the eigenvalue is ill-conditioned); in this
+            case info is set to N+3.
+
+
+');
+
+
+pp_defc("heev",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		char jz = \'N\';
+		char puplo = \'U\';
+		integer lwork = -1;
+             types(F) %{
+		extern int cheev_(char *jobz, char *uplo, integer *n, float *a,
+	 	integer *lda, float *w, float *work, integer *lwork, float *rwork,
+		integer *info);
+		float *rwork;
+		float tmp_work[2];
+		rwork = (float *) malloc ((3*$PRIV(__n_size)-2) * sizeof(float));
+             %}
+             types(D) %{
+		extern int zheev_(char *jobz, char *uplo, integer *n, double *a,
+	 	integer *lda, double *w, double *work, integer *lwork, double *rwork,
+		integer *info);
+		double *rwork;
+		double tmp_work[2];
+		rwork = (double *) malloc ((3*$PRIV(__n_size)-2) * sizeof(double));
+             %}
+
+		if ($jobz())
+			jz = \'V\';
+		if ($uplo())
+			puplo = \'L\';
+
+
+		$TFD(cheev_,zheev_)(
+		&jz,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(w),
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+		float *work = (float *)malloc(2*lwork *  sizeof(float));
+             %}
+             types(D) %{
+		double *work = (double *)malloc(2*lwork *  sizeof(double));
+             %}
+		$TFD(cheev_,zheev_)(
+		&jz,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(w),
+		work,
+		&lwork,
+		rwork,
+		$P(info));
+		free(work);
+		}
+		free(rwork);
+',
+Doc=>'
+
+=for ref
+
+Complex version of syev for Hermitian matrix
+
+');
+
+pp_defc("heevd",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n);  int jobz(); int uplo(); [o,phys]w(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+		char jz = \'N\';
+		char puplo = \'U\';
+		integer lwork = -1;
+		integer lrwork, liwork;
+		integer tmpi_work;
+		integer *iwork;
+
+             types(F) %{
+		extern int cheevd_(char *jobz, char *uplo, integer *n, float *a,
+	 	integer *lda, float *w, float *work, integer *lwork, float *rwork, integer *lrwork,
+		integer *iwork, integer *liwork, integer *info);
+		float tmp_work[2];
+		float tmpr_work;
+             %}
+             types(D) %{
+		extern int zheevd_(char *jobz, char *uplo, integer *n, double *a,
+	 	integer *lda, double *w, double *work, integer *lwork, double *rwork, integer *lrwork,
+		integer *iwork, integer *liwork, integer *info);
+		double tmp_work[2];
+		double tmpr_work;
+             %}
+
+		if ($jobz())
+			jz = \'V\';
+		if ($uplo())
+			puplo = \'L\';
+
+
+		$TFD(cheevd_,zheevd_)(
+		&jz,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(w),
+		&tmp_work[0],
+		&lwork,
+		&tmpr_work,
+		&lwork,
+		&tmpi_work,
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		lrwork = (integer )tmpr_work;
+		liwork = (integer )tmpi_work;
+
+		iwork = (integer *)malloc(liwork *  sizeof(integer));
+
+		{
+		types(F) %{
+		float *work = (float *)malloc(2*lwork *  sizeof(float));
+		float *rwork = (float *)malloc(lrwork *  sizeof(float));
+             %}
+             types(D) %{
+		double *work = (double *)malloc(2*lwork *  sizeof(double));
+		double *rwork = (double *)malloc(lrwork *  sizeof(double));
+             %}
+		$TFD(cheevd_,zheevd_)(
+		&jz,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(w),
+		work,
+		&lwork,
+		rwork,
+		&lrwork,
+		iwork,
+		&liwork,
+		$P(info));
+		free(rwork);
+		free(work);
+		}
+
+		free(iwork);
+',
+Doc=>'
+
+=for ref
+
+Complex version of syevd for Hermitian matrix
+
+');
+
+
+pp_defc("heevx",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu(); [phys]abstol(); int [o,phys]m(); [o,phys]w(n); [o,phys]z(2,p,q);int [o,phys]ifail(r); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		char jz = \'N\';
+		char puplo = \'U\';
+		char prange = \'A\';
+		integer lwork = -1;
+		integer *iwork;
+
+             types(F) %{
+		extern int cheevx_(char *jobz, char *range, char *uplo, integer *n,
+		float *a, integer *lda, float *vl, float *vu, integer *
+		il, integer *iu, float *abstol, integer *m, float *w,
+		float *z__, integer *ldz, float *work, integer *lwork,
+		float *rwork, integer *iwork, integer *ifail, integer *info);
+		float *rwork;
+		float tmp_work[2];
+		rwork = (float *)malloc(7 * $SIZE(n) * sizeof(float));
+             %}
+             types(D) %{
+		extern int zheevx_(char *jobz, char *range, char *uplo, integer *n,
+		double *a, integer *lda, double *vl, double *vu, integer *
+		il, integer *iu, double *abstol, integer *m, double *w,
+		double *z__, integer *ldz, double *work, integer *lwork,
+		double *rwork, integer *iwork, integer *ifail, integer *info);
+		double *rwork;
+		double tmp_work[2];
+		rwork = (double *)malloc(7 * $SIZE(n) * sizeof(double));
+             %}
+
+		if ($jobz())
+			jz = \'V\';
+		if ($uplo())
+			puplo = \'L\';
+
+		switch ($range())
+		{
+			case 1: prange = \'V\';
+				break;
+			case 2: prange = \'I\';
+				break;
+			default: prange = \'A\';
+		}
+
+		iwork = (integer *)malloc(5 * $SIZE (n) * sizeof(integer));
+
+		$TFD(cheevx_,zheevx_)(
+		&jz,
+		&prange,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(vl),
+		$P(vu),
+		$P(il),
+		$P(iu),
+		$P(abstol),
+		$P(m),
+		$P(w),
+		$P(z),
+		&(integer){$PRIV(__p_size)},
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		iwork,
+		$P(ifail),
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+		float *work = (float *)malloc(2* lwork *  sizeof(float));
+             %}
+             types(D) %{
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(cheevx_,zheevx_)(
+		&jz,
+		&prange,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(vl),
+		$P(vu),
+		$P(il),
+		$P(iu),
+		$P(abstol),
+		$P(m),
+		$P(w),
+		$P(z),
+		&(integer){$PRIV(__p_size)},
+		work,
+		&lwork,
+		rwork,
+		iwork,
+		$P(ifail),
+		$P(info));
+		free(work);
+		}
+		free(iwork);
+		free(rwork);
+',
+Doc=>'
+
+=for ref
+
+Complex version of syevx for Hermitian matrix
+
+');
+
+pp_defc("heevr",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n);  int jobz(); int range(); int uplo(); [phys]vl(); [phys]vu(); int [phys]il(); int [phys]iu(); [phys]abstol(); int [o,phys]m(); [o,phys]w(n); [o,phys]z(2,p,q);int [o,phys]isuppz(r); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		char jz = \'N\';
+		char puplo = \'U\';
+		char prange = \'A\';
+		integer lwork = -1;
+		integer liwork,lrwork;
+		integer tmpi_work;
+
+             types(F) %{
+		extern int cheevr_(char *jobz, char *range, char *uplo, integer *n,
+		float *a, integer *lda, float *vl, float *vu, integer *
+		il, integer *iu, float *abstol, integer *m, float *w,
+		float *z__, integer *ldz, integer *isuppz, float *work, integer *lwork, float *rwork, integer *lrwork,
+		integer *iwork, integer *liwork, integer *info);
+		float tmp_work[2];
+		float tmpr_work;
+             %}
+             types(D) %{
+		extern int zheevr_(char *jobz, char *range, char *uplo, integer *n,
+		double *a, integer *lda, double *vl, double *vu, integer *
+		il, integer *iu, double *abstol, integer *m, double *w,
+		double *z__, integer *ldz, integer *isuppz, double *work, integer *lwork, double *rwork, integer *lrwork,
+		integer *iwork, integer *liwork, integer *info);
+		double tmp_work[2];
+		double tmpr_work;
+             %}
+
+		if ($jobz())
+			jz = \'V\';
+		if ($uplo())
+			puplo = \'L\';
+
+		switch ($range())
+		{
+			case 1: prange = \'V\';
+				break;
+			case 2: prange = \'I\';
+				break;
+			default: prange = \'A\';
+		}
+
+		$TFD(cheevr_,zheevr_)(
+		&jz,
+		&prange,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(vl),
+		$P(vu),
+		$P(il),
+		$P(iu),
+		$P(abstol),
+		$P(m),
+		$P(w),
+		$P(z),
+		&(integer){$PRIV(__p_size)},
+		$P(isuppz),
+		&tmp_work[0],
+		&lwork,
+		&tmpr_work,
+		&lwork,
+		&tmpi_work,
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		lrwork = (integer )tmpr_work;
+		liwork = (integer )tmpi_work;
+		{
+		types(F) %{
+		float *work = (float *)malloc(2* lwork *  sizeof(float));
+		float *rwork = (float *)malloc(lrwork *  sizeof(float));
+		integer *iwork = (integer *)malloc(liwork *  sizeof(integer));
+             %}
+             types(D) %{
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+		double *rwork = (double *)malloc(lrwork *  sizeof(double));
+		integer *iwork = (integer *)malloc(liwork *  sizeof(integer));
+             %}
+		$TFD(cheevr_,zheevr_)(
+		&jz,
+		&prange,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(vl),
+		$P(vu),
+		$P(il),
+		$P(iu),
+		$P(abstol),
+		$P(m),
+		$P(w),
+		$P(z),
+		&(integer){$PRIV(__p_size)},
+		$P(isuppz),
+		work,
+		&lwork,
+		rwork,
+		&lrwork,
+		iwork,
+		&liwork,
+		$P(info));
+		free(work);
+		free(iwork);
+		free(rwork);
+		}
+
+',
+Doc=>'
+
+=for ref
+
+Complex version of syevr for Hermitian matrix
+
+');
+
+pp_defc("hegv",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(2,n,n);[o,phys]w(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+
+		char jz = \'N\';
+		char puplo = \'U\';
+		integer lwork = -1;
+
+             types(F) %{
+		extern int chegv_(integer *itype, char *jobz, char *uplo, integer *
+		n, float *a, integer *lda, float *b, integer *ldb,
+		float *w, float *work, integer *lwork, float *rwork, integer *info);
+		float tmp_work[2], *rwork;
+		rwork = (float *) malloc( (3 * $SIZE(n) - 2 ) *  sizeof(float));
+             %}
+             types(D) %{
+		extern int zhegv_(integer *itype, char *jobz, char *uplo, integer *
+		n, double *a, integer *lda, double *b, integer *ldb,
+		double *w, double *work, integer *lwork, double *rwork, integer *info);
+		double tmp_work[2], *rwork;
+		rwork = (double *) malloc( (3 * $SIZE(n) - 2 ) *  sizeof(double));
+             %}
+
+		if ($jobz())
+			jz = \'V\';
+		if ($uplo())
+			puplo = \'L\';
+
+
+		$TFD(chegv_,zhegv_)(
+		$P(itype),
+		&jz,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(w),
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(chegv_,zhegv_)(
+		$P(itype),
+		&jz,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(w),
+		work,
+		&lwork,
+		rwork,
+		$P(info));
+		free(work);
+		}
+		free(rwork);
+',
+Doc=>'
+
+=for ref
+
+Complex version of sygv for Hermitian matrix
+
+');
+
+
+pp_defc("hegvd",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n);int [phys]itype();int jobz(); int uplo();[io,phys]B(2,n,n);[o,phys]w(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+
+		char jz = \'N\';
+		char puplo = \'U\';
+		integer lwork = -1;
+		integer liwork = -1;
+		integer lrwork = -1;
+		integer *iwork;
+		integer tmp_iwork;
+
+             types(F) %{
+		extern int chegvd_(integer *itype, char *jobz, char *uplo, integer *
+		n, float *a, integer *lda, float *b, integer *ldb,
+		float *w, float *work, integer *lwork, float *rwork, integer *lrwork,
+		integer *iwork,	integer *liwork, integer *info);
+		float tmp_work[2], tmp_rwork;
+             %}
+             types(D) %{
+		extern int zhegvd_(integer *itype, char *jobz, char *uplo, integer *
+		n, double *a, integer *lda, double *b, integer *ldb,
+		double *w, double *work, integer *lwork, double *rwork, integer *lrwork,
+		integer *iwork, integer *liwork, integer *info);
+		double tmp_work[2], tmp_rwork;
+             %}
+
+		if ($jobz())
+			jz = \'V\';
+		if ($uplo())
+			puplo = \'L\';
+
+
+		$TFD(chegvd_,zhegvd_)(
+		$P(itype),
+		&jz,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(w),
+		&tmp_work[0],
+		&lwork,
+		&tmp_rwork,	
+		&lrwork,	
+		&tmp_iwork,
+		&liwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		lrwork = (integer )tmp_rwork;
+		liwork = (integer )tmp_iwork;
+		iwork = (integer *)malloc(liwork *  sizeof(integer));
+
+		{
+		types(F) %{
+			float *work = (float *)malloc(2 * lwork *  sizeof(float));
+			float *rwork = (float *)malloc(lrwork *  sizeof(float));
+             %}
+             types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+			double *rwork = (double *)malloc(lrwork *  sizeof(double));
+             %}
+		$TFD(chegvd_,zhegvd_)(
+		$P(itype),
+		&jz,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(w),
+		work,
+		&lwork,
+		rwork,
+		&lrwork,
+		iwork,
+		&liwork,
+		$P(info));
+		free(work);
+		free(rwork);
+		}
+		free(iwork);
+',
+Doc=>'
+
+=for ref
+
+Complex version of sygvd for Hermitian matrix
+
+');
+
+
+pp_defc("hegvx",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n);int [phys]itype();int jobz();int range(); int uplo();[io,phys]B(2,n,n);[phys]vl();[phys]vu();int [phys]il();int [phys]iu();[phys]abstol();int [o,phys]m();[o,phys]w(n); [o,phys]Z(2,p,q);int [o,phys]ifail(r);int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		char jz = \'N\';
+		char puplo = \'U\';
+		char prange;
+		integer lwork = -1;
+		integer *iwork;
+
+             types(F) %{
+		extern int chegvx_(integer *itype, char *jobz, char *range, char *
+		uplo, integer *n, float *a, integer *lda, float *b, integer
+		*ldb, float *vl, float *vu, integer *il, integer *iu,
+		float *abstol, integer *m, float *w, float *z__,
+		integer *ldz, float *work, integer *lwork, float *rwork,
+		integer *iwork, integer *ifail, integer *info);
+		float tmp_work[2], *rwork;
+		rwork = (float *)malloc(7 * $SIZE(n) *  sizeof(float));
+             %}
+             types(D) %{
+		extern int zhegvx_(integer *itype, char *jobz, char *range, char *
+		uplo, integer *n, double *a, integer *lda, double *b, integer
+		*ldb, double *vl, double *vu, integer *il, integer *iu,
+		double *abstol, integer *m, double *w, double *z__,
+		integer *ldz, double *work, integer *lwork, double *rwork,
+		integer *iwork, integer *ifail, integer *info);
+		double tmp_work[2], *rwork;
+		rwork = (double *)malloc(7 * $SIZE(n) * sizeof(double));	
+             %}
+
+		if ($jobz())
+			jz = \'V\';
+		if ($uplo())
+			puplo = \'L\';
+
+		switch ($range())
+		{
+			case 1: prange = \'V\';
+				break;
+			case 2: prange = \'I\';
+				break;
+			default: prange = \'A\';
+		}
+
+		iwork = (integer *)malloc((5 * $SIZE(n)) *  sizeof(integer));
+
+		$TFD(chegvx_,zhegvx_)(
+		$P(itype),
+		&jz,
+		&prange,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(vl),
+		$P(vu),
+		$P(il),
+		$P(iu),
+		$P(abstol),
+		$P(m),
+		$P(w),
+		$P(Z),
+		&(integer){$PRIV(__p_size)},
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		iwork,
+		$P(ifail),
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+
+		float *work = (float *)malloc( 2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+
+		double *work = (double *)malloc( 2 * lwork *  sizeof(double));
+             %}
+		$TFD(chegvx_,zhegvx_)(
+		$P(itype),
+		&jz,
+		&prange,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(vl),
+		$P(vu),
+		$P(il),
+		$P(iu),
+		$P(abstol),
+		$P(m),
+		$P(w),
+		$P(Z),
+		&(integer){$PRIV(__p_size)},
+		work,
+		&lwork,
+		rwork,
+		iwork,
+		$P(ifail),
+		$P(info));
+		free(work);
+		}
+		free(iwork);
+		free(rwork);
+',
+Doc=>'
+
+=for ref
+
+Complex version of sygvx for Hermitian matrix
+
+');
+
+
+pp_defc("gesv",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n);  [io,phys]B(2,n,m); int [o,phys]ipiv(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+
+             types(F) %{
+		extern int cgesv_(integer *n, integer *nrhs, float *a, integer
+		*lda, integer *ipiv, float *b, integer *ldb, integer *info);
+             %}
+             types(D) %{
+		extern int zgesv_(integer *n, integer *nrhs, double *a, integer
+		*lda, integer *ipiv, double *b, integer *ldb, integer *info);
+             %}
+
+		$TFD(cgesv_,zgesv_)(
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(info));
+');
+pp_defc("gesvx",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int trans(); int fact(); [io,phys]B(2,n,m); [io,phys]af(2,n,n); int [io,phys]ipiv(n); int [io]equed(); [io,phys]r(n); [io,phys]c(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); [o,phys]rpvgrw(); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		char ptrans, pfact, pequed;
+
+             types(F) %{
+		extern int cgesvx_(char *fact, char *trans, integer *n, integer *
+		nrhs, float *a, integer *lda, float *af, integer *ldaf,
+		integer *ipiv, char *equed, float *r__, float *c__,
+		float *b, integer *ldb, float *x, integer *ldx, float *
+		rcond, float *ferr, float *berr, float *work, float *
+		rwork, integer *info);
+		float *work = (float *) malloc(4 * $PRIV(__n_size) *  sizeof(float));
+		float *rwork  = (float *) malloc(4 * $PRIV(__n_size) *  sizeof(float));
+             %}
+             types(D) %{
+		extern int zgesvx_(char *fact, char *trans, integer *n, integer *
+		nrhs, double *a, integer *lda, double *af, integer *ldaf,
+		integer *ipiv, char *equed, double *r__, double *c__,
+		double *b, integer *ldb, double *x, integer *ldx, double *
+		rcond, double *ferr, double *berr, double *work, double *
+		rwork, integer *info);
+		double *work = (double *) malloc(4 * $PRIV(__n_size) *  sizeof(double));
+		double *rwork  = (double *) malloc(4 * $PRIV(__n_size) *  sizeof(double));
+             %}
+
+		switch ($trans())
+		{
+			case 1: ptrans = \'T\';
+				break;
+			case 2: ptrans = \'C\';
+				break;
+			default: ptrans = \'N\';
+		}
+		switch ($fact())
+		{
+			case 1: pfact = \'N\';
+				break;
+			case 2: pfact = \'E\';
+				break;
+			default: pfact = \'F\';
+		}
+		switch ($equed())
+		{
+			case 1:   pequed = \'R\';
+				  break;
+			case 2:   pequed = \'C\';
+				  break;
+			case 3:   pequed = \'B\';
+				  break;
+			default:  pequed = \'N\';
+		}
+
+
+		$TFD(cgesvx_,zgesvx_)(
+		&pfact,
+		&ptrans,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(af),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		&pequed,
+		$P(r),
+		$P(c),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(X),
+		&(integer){$PRIV(__n_size)},
+		$P(rcond),
+		$P(ferr),
+		$P(berr),
+		work,
+		rwork,
+		$P(info));
+
+		free(work);
+		free(rwork);
+
+		switch (pequed)
+		{
+			case \'R\': $equed() = 1;
+				  break;
+			case \'C\': $equed() = 2;
+				  break;
+			case \'B\': $equed() = 3;
+				  break;
+			default: $equed()= 0;
+		}
+		$rpvgrw() = rwork[0];
+',
+Doc => '
+
+=for ref
+
+Complex version of gesvx.
+
+    trans:  Specifies the form of the system of equations:
+            = 0:  A * X = B     (No transpose)   
+            = 1:  A\' * X = B  (Transpose)   
+            = 2:  A**H * X = B  (Conjugate transpose)  
+
+');
+
+pp_defc("sysv",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n);  int uplo(); [io,phys]B(2,n,m); int [o,phys]ipiv(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+		char puplo = \'U\';
+		integer lwork = -1;
+             types(F) %{
+		extern int csysv_(char *uplo, integer *n, integer *nrhs, float
+		*a, integer *lda, integer *ipiv, float *b, integer *ldb,
+		float *work, integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zsysv_(char *uplo, integer *n, integer *nrhs, double
+		*a, integer *lda, integer *ipiv, double *b, integer *ldb,
+		double *work, integer *lwork, integer *info);
+		double tmp_work[2];
+             %}
+		if ($uplo())
+			puplo = \'L\';
+
+		$TFD(csysv_,zsysv_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+                &tmp_work[0],
+		&lwork,
+		$P(info));
+
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+
+		float *work = (float *)malloc(2*lwork *  sizeof(float));
+             %}
+             types(D) %{
+
+		double *work = (double *)malloc(2*lwork *  sizeof(double));
+             %}
+		$TFD(csysv_,zsysv_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+                work,
+		&lwork,
+		$P(info));
+
+
+             }
+');
+
+pp_defc("sysvx",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int uplo(); int fact(); [phys]B(2,n,m); [io,phys]af(2,n,n); int [io,phys]ipiv(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+
+		char pfact = \'N\';
+		char puplo = \'U\';
+		integer lwork = -1;
+
+             types(F) %{
+		extern int csysvx_(char *fact, char *uplo, integer *n, integer *
+		nrhs, float *a, integer *lda, float *af, integer *ldaf,
+		integer *ipiv, float *b, integer *ldb, float *x, integer *
+		ldx, float *rcond, float *ferr, float *berr,
+		float *work, integer *lwork, float *rwork, integer *info);
+		float *rwork = (float * )malloc ($PRIV(__n_size)* sizeof (float));
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zsysvx_(char *fact, char *uplo, integer *n, integer *
+		nrhs, double *a, integer *lda, double *af, integer *ldaf,
+		integer *ipiv, double *b, integer *ldb, double *x, integer *
+		ldx, double *rcond, double *ferr, double *berr,
+		double *work, integer *lwork, double *rwork, integer *info);
+		double *rwork = (double * )malloc ($PRIV(__n_size)* sizeof (double));
+		double tmp_work[2];
+             %}
+
+		if($fact())
+			pfact = \'F\';
+
+		if ($uplo())
+			puplo = \'L\';
+
+
+		$TFD(csysvx_,zsysvx_)(
+		&pfact,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(af),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(X),
+		&(integer){$PRIV(__n_size)},
+		$P(rcond),
+		$P(ferr),
+		$P(berr),
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2*lwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			double *work = (double *)malloc(2*lwork *  sizeof(double));
+             	%}
+
+		$TFD(csysvx_,zsysvx_)(
+		&pfact,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(af),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(X),
+		&(integer){$PRIV(__n_size)},
+		$P(rcond),
+		$P(ferr),
+		$P(berr),
+		work,
+		&lwork,
+		rwork,
+		$P(info));
+		free(work);
+		}
+		free(rwork);
+
+');
+
+pp_defc("hesv",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n);  int uplo(); [io,phys]B(2,n,m); int [o,phys]ipiv(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+		char puplo = \'U\';
+		integer lwork = -1;
+             types(F) %{
+		extern int chesv_(char *uplo, integer *n, integer *nrhs, float
+		*a, integer *lda, integer *ipiv, float *b, integer *ldb,
+		float *work, integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zhesv_(char *uplo, integer *n, integer *nrhs, double
+		*a, integer *lda, integer *ipiv, double *b, integer *ldb,
+		double *work, integer *lwork, integer *info);
+		double tmp_work[2];
+             %}
+		if ($uplo())
+			puplo = \'L\';
+
+		$TFD(chesv_,zhesv_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+                &tmp_work[0],
+		&lwork,
+		$P(info));
+
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+
+		float *work = (float *)malloc(2*lwork *  sizeof(float));
+             %}
+             types(D) %{
+
+		double *work = (double *)malloc(2*lwork *  sizeof(double));
+             %}
+		$TFD(chesv_,zhesv_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+                work,
+		&lwork,
+		$P(info));
+
+
+             }
+',
+Doc=>'
+
+=for ref
+
+Complex version of sysv for Hermitian matrix
+
+');
+
+pp_defc("hesvx",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int uplo(); int fact(); [phys]B(2,n,m); [io,phys]af(2,n,n); int [io,phys]ipiv(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+
+		char pfact = \'N\';
+		char puplo = \'U\';
+		integer lwork = -1;
+
+             types(F) %{
+		extern int chesvx_(char *fact, char *uplo, integer *n, integer *
+		nrhs, float *a, integer *lda, float *af, integer *ldaf,
+		integer *ipiv, float *b, integer *ldb, float *x, integer *
+		ldx, float *rcond, float *ferr, float *berr,
+		float *work, integer *lwork, float *rwork, integer *info);
+		float *rwork = (float * )malloc ($PRIV(__n_size)* sizeof (float));
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zhesvx_(char *fact, char *uplo, integer *n, integer *
+		nrhs, double *a, integer *lda, double *af, integer *ldaf,
+		integer *ipiv, double *b, integer *ldb, double *x, integer *
+		ldx, double *rcond, double *ferr, double *berr,
+		double *work, integer *lwork, double *rwork, integer *info);
+		double *rwork = (double * )malloc ($PRIV(__n_size)* sizeof (double));
+		double tmp_work[2];
+             %}
+
+		if($fact())
+			pfact = \'F\';
+
+		if ($uplo())
+			puplo = \'L\';
+
+
+		$TFD(chesvx_,zhesvx_)(
+		&pfact,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(af),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(X),
+		&(integer){$PRIV(__n_size)},
+		$P(rcond),
+		$P(ferr),
+		$P(berr),
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2*lwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			double *work = (double *)malloc(2*lwork *  sizeof(double));
+             	%}
+
+		$TFD(chesvx_,zhesvx_)(
+		&pfact,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(af),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(X),
+		&(integer){$PRIV(__n_size)},
+		$P(rcond),
+		$P(ferr),
+		$P(berr),
+		work,
+		&lwork,
+		rwork,
+		$P(info));
+		free(work);
+		}
+		free(rwork);
+
+',
+Doc=>'
+
+=for ref
+
+Complex version of sysvx for Hermitian matrix
+
+');
+
+
+pp_defc("posv",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n);  int uplo(); [io,phys]B(2,n,m); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+             char puplo = \'U\';
+
+             types(F) %{
+		extern int cposv_(char *uplo, integer *n, integer *nrhs, float
+		*a, integer *lda, float *b, integer *ldb, integer *info);
+             %}
+             types(D) %{
+		extern int zposv_(char *uplo, integer *n, integer *nrhs, double
+		*a, integer *lda, double *b, integer *ldb, integer *info);
+             %}
+
+		if ($uplo())
+			puplo = \'L\';
+
+		$TFD(cposv_,zposv_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(info));
+',
+Doc=>'
+
+=for ref
+
+Complex version of posv for Hermitian positive definite matrix
+
+');
+pp_defc("posvx",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int uplo(); int fact(); [io,phys]B(2,n,m); [io,phys]af(2,n,n); int [io]equed(); [io,phys]s(n); [o,phys]X(2,n,m); [o,phys]rcond(); [o,phys]ferr(m); [o,phys]berr(m); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+		char pfact;
+		char pequed = \'N\';
+		char puplo = \'U\';
+
+             types(F) %{
+		extern int cposvx_(char *fact, char *uplo, integer *n, integer *
+		nrhs, float *a, integer *lda, float *af, integer *ldaf,
+		char *equed, float *s, float *b, integer *ldb, float *
+		x, integer *ldx, float *rcond, float *ferr, float *
+		berr, float *work, float *rwork, integer *info);
+		float *work, *rwork;
+             %}
+             types(D) %{
+		extern int zposvx_(char *fact, char *uplo, integer *n, integer *
+		nrhs, double *a, integer *lda, double *af, integer *ldaf,
+		char *equed, double *s, double *b, integer *ldb, double *
+		x, integer *ldx, double *rcond, double *ferr, double *
+		berr, double *work, double *rwork, integer *info);
+		double *work, *rwork;
+             %}
+
+		switch ($fact())
+		{
+			case 1: pfact = \'N\';
+				break;
+			case 2: pfact = \'E\';
+				break;
+			default: pfact = \'F\';
+		}
+		if ($equed())
+			pequed = \'Y\';
+		if ($uplo())
+			puplo = \'L\';
+
+		types(F) %{
+
+		work = (float *) malloc(4 * $PRIV(__n_size) *  sizeof(float));
+		rwork = (float *) malloc(2 * $PRIV(__n_size) *  sizeof(float));
+             %}
+             types(D) %{
+
+		work = (double *) malloc(4 * $PRIV(__n_size) *  sizeof(double));
+		rwork = (double *) malloc(2 * $PRIV(__n_size) *  sizeof(double));
+             %}
+
+
+		$TFD(cposvx_,zposvx_)(
+		&pfact,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(af),
+		&(integer){$PRIV(__n_size)},
+		&pequed,
+		$P(s),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(X),
+		&(integer){$PRIV(__n_size)},
+		$P(rcond),
+		$P(ferr),
+		$P(berr),
+		work,
+		rwork,
+		$P(info));
+
+		free(work);
+		free(rwork);
+
+		switch (pequed)
+		{
+			case \'Y\': $equed() = 1;
+				  break;
+			default: $equed()= 0;
+		}
+
+',
+Doc => '
+
+=for ref
+
+Complex version of posvx for Hermitian positive definite matrix
+
+');
+
+pp_defc("gels",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); int trans(); [io,phys]B(2,p,q);int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+
+		char ptrans = \'N\';
+		integer lwork = -1;
+
+             types(F) %{
+		extern int cgels_(char *trans, integer *m, integer *n, integer *
+		nrhs, float *a, integer *lda, float *b, integer *ldb,
+		float *work, integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zgels_(char *trans, integer *m, integer *n, integer *
+		nrhs, double *a, integer *lda, double *b, integer *ldb,
+		double *work, integer *lwork, integer *info);
+		double tmp_work[2];
+             %}
+
+		if($trans())
+			ptrans = \'C\';
+
+
+
+		$TFD(cgels_,zgels_)(
+		&ptrans,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__q_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2*lwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			double *work = (double *)malloc(2*lwork *  sizeof(double));
+             	%}
+
+		$TFD(cgels_,zgels_)(
+		&ptrans,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__q_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+',
+Doc=>'
+
+=for ref
+
+Solves overdetermined or underdetermined complex linear systems   
+involving an M-by-N matrix A, or its conjugate-transpose.
+Complex version of gels.
+
+    trans:  = 0: the linear system involves A;
+            = 1: the linear system involves A**H.
+
+');
+
+
+pp_defc("gelsy",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); [io,phys]B(2,p,q); [phys]rcond(); int [io,phys]jpvt(n); int [o,phys]rank();int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+		integer lwork = -1;
+
+             types(F) %{
+		extern int cgelsy_(integer *m, integer *n, integer *nrhs,
+		float *a, integer *lda, float *b, integer *ldb, integer *
+		jpvt, float *rcond, integer *rank, float *work, integer *
+		lwork, float *rwork, integer *info);
+		float tmp_work[2];
+		float *rwork;
+             %}
+             types(D) %{
+		extern int zgelsy_(integer *m, integer *n, integer *nrhs,
+		double *a, integer *lda, double *b, integer *ldb, integer *
+		jpvt, double *rcond, integer *rank, double *work, integer *
+		lwork, double *rwork, integer *info);
+		double tmp_work[2];
+		double *rwork;
+             %}
+
+		types(F) %{
+			rwork = (float *)malloc( 2 * $PRIV(__m_size) *  sizeof(float));
+             	%}
+             	types(D) %{
+			rwork = (double *)malloc(2 * $PRIV(__m_size) *  sizeof(double));
+		%}
+
+		$TFD(cgelsy_,zgelsy_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__q_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(jpvt),
+		$P(rcond),
+		$P(rank),
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             	%}
+
+		$TFD(cgelsy_,zgelsy_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__q_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(jpvt),
+		$P(rcond),
+		$P(rank),
+		work,
+		&lwork,
+		rwork,
+		$P(info));
+		free(work);
+		}
+		free(rwork);
+
+');
+
+
+pp_defc("gelss",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); [io,phys]B(2,p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+		integer lwork = -1;
+		integer lrwork;
+
+             types(F) %{
+		extern int cgelss_(integer *m, integer *n, integer *nrhs,
+		float *a, integer *lda, float *b, integer *ldb, float *s,
+		float *rcond, integer *rank, float *work, integer *
+		lwork, float *rwork, integer *info);
+		float tmp_work[2];
+		float *rwork;
+             %}
+             types(D) %{
+		extern int zgelss_(integer *m, integer *n, integer *nrhs,
+		double *a, integer *lda, double *b, integer *ldb,
+		double *s,double *rcond, integer *rank, double *work, integer *
+		lwork, double *rwork, integer *info);
+		double tmp_work[2];
+		double *rwork;
+             %}
+
+		lrwork = min($PRIV(__m_size), $PRIV(__n_size));
+
+		types(F) %{
+			rwork = (float *)malloc(5 * lrwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			rwork = (double *)malloc(5 * lrwork *  sizeof(double));
+             	%}
+
+		$TFD(cgelss_,zgelss_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__q_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(s),
+		$P(rcond),
+		$P(rank),
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             	%}
+
+		$TFD(cgelss_,zgelss_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__q_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(s),
+		$P(rcond),
+		$P(rank),
+		work,
+		&lwork,
+		rwork,
+		$P(info));
+		free(work);
+		}
+		free(rwork);
+
+');
+
+pp_defc("gelsd",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); [io,phys]B(2,p,q); [phys]rcond(); [o,phys]s(r); int [o,phys]rank();int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+		integer lwork = -1;
+		integer smlsiz, size_i, nlvl, *iwork;
+		integer minmn = min( $SIZE(m), $SIZE(n) );
+
+		extern integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
+		integer *n2, integer *n3, integer *n4, ftnlen name_len, ftnlen
+		opts_len);
+
+             types(F) %{
+		extern int cgelsd_(integer *m, integer *n, integer *nrhs,
+		float *a, integer *lda, float *b, integer *ldb, float *s,
+		float *rcond, integer *rank, float *work, integer *
+		lwork,  float *rwork, integer *iwork, integer *info);
+		float *rwork;
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zgelsd_(integer *m, integer *n, integer *nrhs,
+		double *a, integer *lda, double *b, integer *ldb,
+		double *s,double *rcond, integer *rank, double *work, integer *
+		lwork, double *rwork, integer *iwork,integer *info);
+		double *rwork;
+		double tmp_work[2];
+             %}
+
+		minmn = max(1,minmn);
+
+
+             types(F) %{
+		smlsiz = ilaenv_(&c_nine, "CGELSD", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
+		size_i = (integer) (log((float) minmn / (float) (smlsiz + 1)) /log(2.)) + 1;
+		if ($PRIV(__m_size) >=  $PRIV(__n_size)){
+			rwork = (float *) malloc ((10*$PRIV(__n_size) + 2 * $PRIV(__n_size) * smlsiz + 8 * $PRIV(__n_size) * size_i + 3 * smlsiz * $PRIV(__q_size) + pow((smlsiz+1),2))  *  sizeof(float));
+		}
+		else{
+			rwork = (float *) malloc ((10*$PRIV(__m_size) + 2 * $PRIV(__m_size) * smlsiz + 8 * $PRIV(__m_size) * size_i + 3 * smlsiz * $PRIV(__q_size) + pow((smlsiz+1),2))  *  sizeof(float));
+		}
+             %}
+             types(D) %{
+		smlsiz = ilaenv_(&c_nine, "ZGELSD", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
+		size_i = (integer) (log((double) minmn / (double) (smlsiz + 1)) /log(2.)) + 1;
+		if ($PRIV(__m_size) >=  $PRIV(__n_size)){
+			rwork = (double *) malloc ((10*$PRIV(__n_size) + 2 * $PRIV(__n_size) * smlsiz + 8 * $PRIV(__n_size) * size_i + 3 * smlsiz * $PRIV(__q_size) + pow((smlsiz+1),2))  *  sizeof(double));
+		}
+		else{
+			rwork = (double *) malloc ((10*$PRIV(__m_size) + 2 * $PRIV(__m_size) * smlsiz + 8 * $PRIV(__m_size) * size_i + 3 * smlsiz * $PRIV(__q_size) + pow((smlsiz+1),2))  *  sizeof(double));
+		}
+             %}
+		nlvl = max(size_i, 0);
+		iwork = (integer *)malloc((3 * minmn * nlvl + 11 * minmn) *  sizeof(integer));
+
+
+		$TFD(cgelsd_,zgelsd_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__q_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(s),
+		$P(rcond),
+		$P(rank),
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		iwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             	%}
+
+		$TFD(cgelsd_,zgelsd_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__q_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(s),
+		$P(rcond),
+		$P(rank),
+		work,
+		&lwork,
+		rwork,
+		iwork,
+		$P(info));
+		free(work);
+		}
+		free (iwork);
+		free (rwork);
+');
+
+
+pp_defc("gglse",
+       HandleBad => 0,
+	Pars => '[phys]A(2,m,n); [phys]B(2,p,n);[io,phys]c(2,m);[phys]d(2,p);[o,phys]x(2,n);int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+		integer lwork = -1;
+
+             types(F) %{
+		extern int cgglse_(integer *m, integer *n, integer *p, float *
+		a, integer *lda, float *b, integer *ldb, float *c__,
+		float *d__, float *x, float *work, integer *lwork,
+		integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zgglse_(integer *m, integer *n, integer *p, double *
+		a, integer *lda, double *b, integer *ldb, double *c__,
+		double *d__, double *x, double *work, integer *lwork,
+		integer *info);
+		double tmp_work[2];
+             %}
+
+
+		$TFD(cgglse_,zgglse_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__p_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(c),
+		$P(d),
+		$P(x),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             	%}
+
+		$TFD(cgglse_,zgglse_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__p_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(c),
+		$P(d),
+		$P(x),
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+');
+
+pp_defc("ggglm",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,m); [phys]B(2,n,p);[phys]d(2,n);[o,phys]x(2,m);[o,phys]y(2,p);int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		integer lwork = -1;
+
+             types(F) %{
+		extern int cggglm_(integer *n, integer *m, integer *p, float *
+		a, integer *lda, float *b, integer *ldb, float *d__,
+		float *x, float *y, float *work, integer *lwork,
+		integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zggglm_(integer *n, integer *m, integer *p, double *
+		a, integer *lda, double *b, integer *ldb, double *d__,
+		double *x, double *y, double *work, integer *lwork,
+		integer *info);
+		double tmp_work[2];
+             %}
+
+
+		$TFD(cggglm_,zggglm_)(
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__p_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(d),
+		$P(x),
+		$P(y),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             	%}
+
+		$TFD(cggglm_,zggglm_)(
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__p_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(d),
+		$P(x),
+		$P(y),
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+');
+
+################################################################################
+#
+#		COMPUTATIONAL LEVEL ROUTINES
+#
+################################################################################
+# TODO IPIV = min(m,n)
+pp_defc("getrf",
+       HandleBad => 0,
+	RedoDimsCode => '$SIZE(p) =  $PDL(A)->ndims > 2 ? min($PDL(A)->dims[1], $PDL(A)->dims[2]) : 1;',
+	Pars => '[io,phys]A(2,m,n); int [o,phys]ipiv(p); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+             types(F) %{
+
+		extern int cgetrf_(integer *m, integer *n, float *a, integer *
+		lda, integer *ipiv, integer *info);
+             %}
+             types(D) %{
+
+		extern int zgetrf_(integer *m, integer *n, double *a, integer *
+		lda, integer *ipiv, integer *info);
+             %}
+		$TFD(cgetrf_,zgetrf_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(ipiv),
+		$P(info));
+');
+
+pp_defc("getf2",
+       HandleBad => 0,
+	RedoDimsCode => '$SIZE(p) =  $PDL(A)->ndims > 2 ? min($PDL(A)->dims[1], $PDL(A)->dims[2]) : 1;',
+	Pars => '[io,phys]A(2,m,n); int [o,phys]ipiv(p); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+             types(F) %{
+
+		extern int cgetf2_(integer *m, integer *n, float *a, integer *
+		lda, integer *ipiv, integer *info);
+             %}
+             types(D) %{
+
+		extern int zgetf2_(integer *m, integer *n, double *a, integer *
+		lda, integer *ipiv, integer *info);
+             %}
+		$TFD(cgetf2_,zgetf2_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(ipiv),
+		$P(info));
+');
+
+pp_defc("sytrf",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+             char puplo = \'U\';
+	     integer lwork = -1;
+
+	     types(F) %{
+		extern int csytrf_(char *uplo, integer *n, float *a, integer *
+		lda, integer *ipiv, float *work, integer *lwork, integer *info);
+
+		float tmp_work[2];
+             %}
+
+             types(D) %{
+		extern int zsytrf_(char *uplo, integer *n, double *a, integer *
+		lda, integer *ipiv, double *work, integer *lwork, integer *info);
+
+		double tmp_work[2];
+             %}
+		if ($uplo())
+			puplo = \'L\';
+
+		$TFD(csytrf_,zsytrf_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2*lwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			double *work = (double *)malloc(2*lwork *  sizeof(double));
+             	%}
+		$TFD(csytrf_,zsytrf_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		work,
+		&lwork,
+		$P(info));
+		free (work);
+             	}
+');
+
+pp_defc("sytf2",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+             char puplo = \'U\';
+
+	     types(F) %{
+		extern int csytf2_(char *uplo, integer *n, float *a, integer *
+		lda, integer *ipiv, integer *info);
+             %}
+
+             types(D) %{
+		extern int zsytf2_(char *uplo, integer *n, double *a, integer *
+		lda, integer *ipiv, integer *info);
+             %}
+		if ($uplo())
+			puplo = \'L\';
+
+		$TFD(csytf2_,zsytf2_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(info));
+');
+
+pp_defc("chetrf",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+             char puplo = \'U\';
+	     integer lwork = -1;
+	     integer blocksiz;
+
+		extern integer ilaenv_(integer *ispec, char *name__, char *opts, integer *n1,
+		integer *n2, integer *n3, integer *n4, ftnlen name_len, ftnlen
+		opts_len);
+
+	     types(F) %{
+		extern int chetrf_(char *uplo, integer *n, float *a, integer *
+		lda, integer *ipiv, float *work, integer *lwork, integer *info);
+		float *work;
+		blocksiz = ilaenv_(&c_nine, "CHETRF", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
+             %}
+
+             types(D) %{
+		extern int zhetrf_(char *uplo, integer *n, double *a, integer *
+		lda, integer *ipiv, double *work, integer *lwork, integer *info);
+		double *work;
+		blocksiz = ilaenv_(&c_nine, "ZHETRF", " ", &c_zero, &c_zero, &c_zero, &c_zero, (ftnlen)6, (ftnlen)1);
+             %}
+
+		if ($uplo())
+			puplo = \'L\';
+
+
+		lwork = (integer ) $PRIV(__n_size) * blocksiz;
+
+		types(F) %{
+			work = (float *)malloc(2*lwork *  sizeof(float));
+             	%}
+             	types(D) %{
+			work = (double *)malloc(2*lwork *  sizeof(double));
+             	%}
+		$TFD(chetrf_,zhetrf_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		work,
+		&lwork,
+		$P(info));
+		free (work);
+',
+Doc=>'
+
+=for ref
+
+Complex version of sytrf for Hermitian matrix
+
+');
+
+pp_defc("hetf2",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]ipiv(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+             char puplo = \'U\';
+
+	     types(F) %{
+		extern int chetf2_(char *uplo, integer *n, float *a, integer *
+		lda, integer *ipiv, integer *info);
+             %}
+
+             types(D) %{
+		extern int zhetf2_(char *uplo, integer *n, double *a, integer *
+		lda, integer *ipiv, integer *info);
+             %}
+		if ($uplo())
+			puplo = \'L\';
+
+		$TFD(chetf2_,zhetf2_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(info));
+',
+Doc=>'
+
+=for ref
+
+Complex version of sytf2 for Hermitian matrix
+
+');
+
+pp_defc("potrf",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+             char puplo = \'U\';
+
+	     types(F) %{
+
+		extern int cpotrf_(char *uplo, integer *n, float *a, integer *
+		lda, integer *info);
+             %}
+             types(D) %{
+
+		extern int zpotrf_(char *uplo, integer *n, double *a, integer *
+		lda, integer *info);
+             %}
+		if ($uplo())
+			puplo = \'L\';
+
+		$TFD(cpotrf_,zpotrf_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(info));
+',
+Doc=>'
+
+=for ref
+
+Complex version of potrf for Hermitian positive definite matrix
+
+');
+
+pp_defc("potf2",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+             char puplo = \'U\';
+
+	     types(F) %{
+
+		extern int cpotf2_(char *uplo, integer *n, float *a, integer *
+		lda, integer *info);
+             %}
+             types(D) %{
+
+		extern int zpotf2_(char *uplo, integer *n, double *a, integer *
+		lda, integer *info);
+             %}
+		if ($uplo())
+			puplo = \'L\';
+
+		$TFD(cpotf2_,zpotf2_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(info));
+',
+Doc => '
+
+=for ref
+
+Complex version of potf2 for Hermitian positive definite matrix
+
+');
+
+pp_defc("getri",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int [phys]ipiv(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+		integer lwork = -1;
+             types(F) %{
+
+		extern int cgetri_(integer *n, float *a, integer *lda, integer
+		*ipiv, float *work, integer *lwork, integer *info);
+
+		float tmp_work[2];
+             %}
+             types(D) %{
+
+		extern int zgetri_(integer *n, double *a, integer *lda, integer
+		*ipiv, double *work, integer *lwork, integer *info);
+
+		double tmp_work[2];
+             %}
+
+
+		$TFD(cgetri_,zgetri_)(
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2*lwork *  sizeof(float));
+		%}
+		types(D) %{
+			double *work = (double *)malloc(2*lwork *  sizeof(double));
+		%}
+		$TFD(cgetri_,zgetri_)(
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+');
+
+
+pp_defc("sytri",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int uplo(); int [phys]ipiv(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+
+             char puplo = \'U\';
+             types(F) %{
+
+		extern int csytri_(char *uplo, integer *n, float *a, integer *
+		lda, integer *ipiv, float *work, integer *info);
+
+		float *work = (float *)malloc(2*$PRIV(__n_size) *  sizeof(float));
+             %}
+             types(D) %{
+
+		extern int zsytri_(char *uplo, integer *n, double *a, integer *
+		lda, integer *ipiv, double *work, integer *info);
+
+		double *work = (double *)malloc(2*$PRIV(__n_size) *  sizeof(double));
+             %}
+		if ($uplo())
+			puplo = \'L\';
+
+		$TFD(csytri_, zsytri_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		work,
+		$P(info));
+		free(work);
+');
+
+pp_defc("hetri",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int uplo(); int [phys]ipiv(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+             char puplo = \'U\';
+             types(F) %{
+
+		extern int chetri_(char *uplo, integer *n, float *a, integer *
+		lda, integer *ipiv, float *work, integer *info);
+
+		float *work = (float *)malloc(2*$PRIV(__n_size) *  sizeof(float));
+             %}
+             types(D) %{
+
+		extern int zhetri_(char *uplo, integer *n, double *a, integer *
+		lda, integer *ipiv, double *work, integer *info);
+
+		double *work = (double *)malloc(2*$PRIV(__n_size) *  sizeof(double));
+             %}
+		if ($uplo())
+			puplo = \'L\';
+
+		$TFD(chetri_, zhetri_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		work,
+		$P(info));
+		free(work);
+',
+Doc => '
+
+=for ref
+
+Complex version of sytri for Hermitian matrix
+
+');
+
+pp_defc("potri",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int uplo(); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+             char puplo = \'U\';
+	     types(F) %{
+		extern int cpotri_(char *uplo, integer *n, float *a, integer *
+		lda, integer *info);
+             %}
+             types(D) %{
+		extern int zpotri_(char *uplo, integer *n, double *a, integer *
+		lda, integer *info);
+             %}
+		if ($uplo())
+			puplo = \'L\';
+
+		$TFD(cpotri_,zpotri_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(info));
+');
+
+pp_defc("trtri",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int uplo(); int diag(); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+             char puplo = \'U\';
+             char pdiag = \'N\';
+             types(F) %{
+
+		extern int ctrtri_(char *uplo, char *diag, integer *n, float *a, integer *
+		lda, integer *info);
+             %}
+             types(D) %{
+
+		extern int ztrtri_(char *uplo, char *diag, integer *n, double *a, integer *
+		lda, integer *info);
+             %}
+		if ($uplo())
+			puplo = \'L\';
+		if ($diag())
+			pdiag = \'U\';
+
+		$TFD(ctrtri_, ztrtri_)(
+		&puplo,
+		&pdiag,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(info));
+');
+
+pp_defc("trti2",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int uplo(); int diag(); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+             char puplo = \'U\';
+             char pdiag = \'N\';
+             types(F) %{
+
+		extern int ctrti2_(char *uplo, char *diag, integer *n, float *a, integer *
+		lda, integer *info);
+             %}
+             types(D) %{
+
+		extern int ztrti2_(char *uplo, char *diag, integer *n, double *a, integer *
+		lda, integer *info);
+             %}
+		if ($uplo())
+			puplo = \'L\';
+		if ($diag())
+			pdiag = \'U\';
+
+		$TFD(ctrti2_, ztrti2_)(
+		&puplo,
+		&pdiag,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(info));
+');
+
+pp_defc("getrs",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int trans(); [io,phys]B(2,n,m); int [phys]ipiv(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+             char transp = \'N\';
+	     types(F) %{
+		extern int cgetrs_(char *trans, integer *n, integer *nrhs,
+		float *a, integer *lda, integer *ipiv, float *b, integer *
+		ldb, integer *info);
+             %}
+             types(D) %{
+		extern int zgetrs_(char *trans, integer *n, integer *nrhs,
+		double *a, integer *lda, integer *ipiv, double *b, integer *
+		ldb, integer *info);
+             %}
+		if($trans() == 1)
+			transp = \'T\';
+		else if($trans() == 2)
+			transp = \'C\';
+
+		$TFD(cgetrs_,zgetrs_)(
+		&transp,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(info));
+',
+	Doc=>'
+
+=for ref
+
+Complex version of getrs
+
+    Arguments   
+    =========   
+	trans:   = 0:  No transpose;
+            	 = 1:  Transpose; 
+            	 = 2:  Conjugate transpose;
+
+');
+
+pp_defc("sytrs",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int uplo();[io,phys]B(2,n,m); int [phys]ipiv(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+             char puplo = \'U\';
+	     types(F) %{
+		extern int csytrs_(char *uplo, integer *n, integer *nrhs,
+		float *a, integer *lda, integer *ipiv, float *b, integer *
+		ldb, integer *info);
+             %}
+             types(D) %{
+		extern int zsytrs_(char *uplo, integer *n, integer *nrhs,
+		double *a, integer *lda, integer *ipiv, double *b, integer *
+		ldb, integer *info);
+             %}
+		if($uplo())
+			puplo = \'L\';
+
+		$TFD(csytrs_,zsytrs_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(info));
+');
+
+
+pp_defc("hetrs",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int uplo();[io,phys]B(2,n,m); int [phys]ipiv(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+             char puplo = \'U\';
+	     types(F) %{
+		extern int chetrs_(char *uplo, integer *n, integer *nrhs,
+		float *a, integer *lda, integer *ipiv, float *b, integer *
+		ldb, integer *info);
+             %}
+             types(D) %{
+		extern int zhetrs_(char *uplo, integer *n, integer *nrhs,
+		double *a, integer *lda, integer *ipiv, double *b, integer *
+		ldb, integer *info);
+             %}
+		if($uplo())
+			puplo = \'L\';
+
+		$TFD(chetrs_,zhetrs_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(info));
+',
+Doc => '
+
+=for ref
+
+Complex version of sytrs for Hermitian matrix
+
+');
+
+pp_defc("potrs",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int uplo(); [io,phys]B(2,n,m); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+             char puplo = \'U\';
+	     types(F) %{
+		extern int cpotrs_(char *uplo, integer *n, integer *nrhs,
+		float *a, integer *lda, float *b, integer *ldb, integer *
+		info);
+             %}
+             types(D) %{
+		extern int zpotrs_(char *uplo, integer *n, integer *nrhs,
+		double *a, integer *lda, double *b, integer *ldb, integer *
+		info);
+             %}
+		if($uplo())
+			puplo = \'L\';
+
+		$TFD(cpotrs_,zpotrs_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(info));
+',
+
+Doc=>'
+
+=for ref
+
+Complex version of potrs for Hermitian positive definite matrix
+
+');
+
+pp_defc("trtrs",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int uplo(); int trans(); int diag();[io,phys]B(2,n,m); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+             char puplo = \'U\';
+             char ptrans = \'N\';
+             char pdiag = \'N\';
+	     types(F) %{
+		extern int ctrtrs_(char *uplo, char *trans, char *diag, 
+		integer *n, integer *nrhs,
+		float *a, integer *lda, float *b, integer *
+		ldb, integer *info);
+             %}
+             types(D) %{
+		extern int ztrtrs_(char *uplo, char *trans, char *diag,
+		integer *n, integer *nrhs,
+		double *a, integer *lda, double *b, integer *
+		ldb, integer *info);
+             %}
+		if($uplo())
+			puplo = \'L\';
+		if($trans() == 1)
+			ptrans = \'T\';
+		else if($trans() == 2)
+			ptrans = \'C\';
+		if($diag())
+			pdiag = \'U\';
+
+		$TFD(ctrtrs_,ztrtrs_)(
+		&puplo,
+		&ptrans,
+		&pdiag,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(info));
+', 
+	Doc=>'
+
+=for ref
+
+Complex version of trtrs
+
+    Arguments   
+    =========   
+	trans:   = 0:  No transpose;
+            	 = 1:  Transpose; 
+            	 = 2:  Conjugate transpose;
+
+');
+
+
+pp_defc("latrs",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int uplo(); int trans(); int diag(); int normin();[io,phys]x(2,n); [o,phys]scale();[io,phys]cnorm(n);int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+             char puplo = \'U\';
+             char ptrans = \'N\';
+             char pdiag = \'N\';
+             char pnormin = \'N\';
+
+	     types(F) %{
+		extern int clatrs_(char *uplo, char *trans, char *diag, char *
+		normin, integer *n, float *a, integer *lda, float *x, 
+		float *scale, float *cnorm, integer *info);
+             %}
+             types(D) %{
+		extern int zlatrs_(char *uplo, char *trans, char *diag, char *
+		normin, integer *n, double *a, integer *lda, double *x, 
+		double *scale, double *cnorm, integer *info);
+             %}
+		if($uplo())
+			puplo = \'L\';
+		if($trans())
+			ptrans = \'T\';
+		else if($trans() == 2)
+			ptrans = \'C\';
+		if($diag())
+			pdiag = \'U\';
+		if($normin())
+			pnormin = \'Y\';
+
+		$TFD(clatrs_,zlatrs_)(
+		&puplo,
+		&ptrans,
+		&pdiag,
+		&pnormin,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(x),
+		$P(scale),
+		$P(cnorm),
+		$P(info));
+',
+	Doc=>'
+
+=for ref
+
+Complex version of latrs
+
+    Arguments   
+    =========   
+	trans:   = 0:  No transpose;
+            	 = 1:  Transpose; 
+            	 = 2:  Conjugate transpose;
+
+');
+
+
+
+pp_defc("gecon",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int norm(); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+             char pnorm = \'I\';
+
+	     types(F) %{
+		extern int sgecon_(char *norm, integer *n, float *a, integer *
+		lda, float *anorm, float *rcond, float *work, float *
+		rwork, integer *info);
+		float *work = (float *) malloc(($PRIV(__n_size) * 4) *  sizeof(float));
+		float *rwork = (float *) malloc(($PRIV(__n_size) * 2)*  sizeof(integer));
+             %}
+             types(D) %{
+		extern int dgecon_(char *norm, integer *n, double *a, integer *
+		lda, double *anorm, double *rcond, double *work, double *
+		rwork, integer *info);
+		double *work = (double *) malloc(($PRIV(__n_size)*4) *  sizeof(double));
+		double *rwork = (double *) malloc(($PRIV(__n_size)*2 )*  sizeof(integer));
+             %}
+
+
+		if($norm())
+			pnorm = \'O\';
+
+		$TFD(sgecon_,dgecon_)(
+		&pnorm,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(anorm),
+		$P(rcond),
+		work,
+		rwork,
+		$P(info));
+		free (work);
+		free(rwork);
+
+');
+
+pp_defc("sycon",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+             char puplo = \'U\';
+
+	     types(F) %{
+		extern int csycon_(char *uplo, integer *n, float *a, integer *
+		lda, integer *ipiv, float *anorm, float *rcond, float *
+		work, integer *info);
+		float *work = (float *) malloc(($PRIV(__n_size) * 4) *  sizeof(float));
+             %}
+             types(D) %{
+		extern int zsycon_(char *uplo, integer *n, double *a, integer *
+		lda, integer *ipiv, double *anorm, double *rcond, double *
+		work, integer *info);
+		double *work = (double *) malloc(($PRIV(__n_size)*4) *  sizeof(double));
+             %}
+
+		if($uplo())
+			puplo = \'L\';
+
+		$TFD(csycon_,zsycon_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(anorm),
+		$P(rcond),
+		work,
+		$P(info));
+		free (work);
+
+');
+
+pp_defc("hecon",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int uplo(); int ipiv(n); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		
+		
+
+		
+		
+
+             char puplo = \'U\';
+
+	     types(F) %{
+		extern int checon_(char *uplo, integer *n, float *a, integer *
+		lda, integer *ipiv, float *anorm, float *rcond, float *
+		work, integer *info);
+		float *work = (float *) malloc(($PRIV(__n_size) * 4) *  sizeof(float));
+             %}
+             types(D) %{
+		extern int zhecon_(char *uplo, integer *n, double *a, integer *
+		lda, integer *ipiv, double *anorm, double *rcond, double *
+		work, integer *info);
+		double *work = (double *) malloc(($PRIV(__n_size)*4) *  sizeof(double));
+             %}
+
+		if($uplo())
+			puplo = \'L\';
+
+		$TFD(checon_,zhecon_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ipiv),
+		$P(anorm),
+		$P(rcond),
+		work,
+		$P(info));
+		free (work);
+
+',
+Doc => '
+
+=for ref
+
+Complex version of sycon for Hermitian matrix
+
+');
+
+pp_defc("pocon",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int uplo(); [phys]anorm(); [o,phys]rcond();int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+
+             char puplo = \'U\';
+
+	     types(F) %{
+		extern int cpocon_(char *uplo, integer *n, float *a, integer *
+		lda, float *anorm, float *rcond, float *work, float *
+		rwork, integer *info);
+		float *work = (float *) malloc(($PRIV(__n_size) * 4) *  sizeof(float));
+		float *rwork = (float *) malloc($PRIV(__n_size) *  sizeof(integer));
+             %}
+             types(D) %{
+		extern int zpocon_(char *uplo, integer *n, double *a, integer *
+		lda, double *anorm, double *rcond, double *work, double *
+		rwork, integer *info);
+		double *work = (double *) malloc(($PRIV(__n_size)* 4) *  sizeof(double));
+		double *rwork = (double *) malloc($PRIV(__n_size) *  sizeof(integer));
+             %}
+
+
+		if($uplo())
+			puplo = \'L\';
+
+		$TFD(cpocon_, zpocon_)(
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(anorm),
+		$P(rcond),
+		work,
+		rwork,
+		$P(info));
+		free (work);
+		free(rwork);
+
+',
+Doc => '
+
+=for ref
+
+Complex version of pocon for Hermitian positive definite matrix
+
+');
+
+pp_defc("trcon",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,n); int norm();int uplo();int diag(); [o,phys]rcond();int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+             char puplo = \'U\';
+             char pdiag = \'N\';
+             char pnorm = \'I\';
+	     types(F) %{
+		extern int strcon_(char *norm, char *uplo, char *diag,integer *n, float *a, integer *
+		lda, float *rcond, float *work, float *rwork, integer *info);
+		float *work = (float *) malloc(($PRIV(__n_size) * 4) *  sizeof(float));
+		float *rwork = (float *) malloc($PRIV(__n_size) *  sizeof(integer));
+             %}
+             types(D) %{
+		extern int dtrcon_(char *norm, char *uplo, char *diag, integer *n, double *a, integer *
+		lda, double *rcond, double * work, double *rwork, integer *info);
+		double *work = (double *) malloc(($PRIV(__n_size)* 4) *  sizeof(double));
+		double *rwork = (double *) malloc($PRIV(__n_size) *  sizeof(integer));
+             %}
+
+		if($uplo())
+			puplo = \'L\';
+		if($diag())
+			pdiag = \'U\';
+		if($norm())
+			pnorm = \'O\';
+
+		$TFD(strcon_,dtrcon_)(
+		&pnorm,
+		&puplo,
+		&pdiag,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(rcond),
+		work,
+		rwork,
+		$P(info));
+		free (work);
+		free(rwork);
+
+');
+
+pp_defc("geqp3",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); int [io,phys]jpvt(n); [o,phys]tau(2,k); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+
+		integer lwork = -1;
+
+	     types(F) %{
+		extern int cgeqp3_(integer *m, integer *n, float *a, integer *
+		lda, integer *jpvt, float *tau, float *work, integer *lwork,
+		float *rwork, integer *info);
+		float tmp_work[2], *rwork;
+		rwork = (float *) malloc ($PRIV(__n_size) * 2  * sizeof(float));
+             %}
+             types(D) %{
+		extern int zgeqp3_(integer *m, integer *n, double *a, integer *
+		lda, integer *jpvt, double *tau, double *work, integer *lwork,
+		double *rwork, integer *info);
+		double tmp_work[2], *rwork;
+		rwork = (double *) malloc ($PRIV(__n_size) * 2 * sizeof(double));
+             %}
+
+		$TFD(cgeqp3_,zgeqp3_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(jpvt),
+		$P(tau),
+		&tmp_work[0],
+		&lwork,
+		rwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+			types(F) %{
+				float *work = (float *)malloc(2 * lwork *  sizeof(float));
+			%}
+			types(D) %{
+				double *work = (double *)malloc(2 * lwork *  sizeof(double));
+			%}
+			$TFD(cgeqp3_,zgeqp3_)(
+			&(integer){$PRIV(__m_size)},
+			&(integer){$PRIV(__n_size)},
+			$P(A),
+			&(integer){$PRIV(__m_size)},
+			$P(jpvt),
+			$P(tau),
+			work,
+			&lwork,
+			rwork,
+			$P(info));
+			free(work);
+		}
+		free(rwork);
+'
+);
+
+
+pp_defc("geqrf",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int cgeqrf_(integer *m, integer *n, float *a, integer *
+		lda, float *tau, float *work, integer *lwork,
+		integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zgeqrf_(integer *m, integer *n, double *a, integer *
+		lda, double *tau, double *work, integer *lwork,
+		 integer *info);
+		 double tmp_work[2];
+             %}
+
+		$TFD(cgeqrf_,zgeqrf_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+		float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(cgeqrf_,zgeqrf_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+');
+
+pp_defc("ungqr",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int cungqr_(integer *m, integer *n, integer *k, float *
+		a, integer *lda, float *tau, float *work, integer *lwork, 
+		integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zungqr_(integer *m, integer *n, integer *k, double *
+		a, integer *lda, double *tau, double *work, integer *lwork, 
+		integer *info);
+		 double tmp_work[2];
+             %}
+
+		$TFD(cungqr_, zungqr_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2 * lwork *  sizeof(float));
+		%}
+		types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+		%}
+		$TFD(cungqr_,zungqr_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+',
+	Doc=>'
+
+=for ref
+
+Complex version of orgqr
+
+');
+
+
+pp_defc("unmqr",
+       HandleBad => 0,
+	Pars => '[phys]A(2,p,k); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		char ptrans = \'N\', pside = \'L\';
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int cunmqr_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, float *a, integer *lda, float *tau, float *
+		c__, integer *ldc, float *work, integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zunmqr_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, double *a, integer *lda, double *tau, double *
+		c__, integer *ldc, double *work, integer *lwork, integer *info);
+		 double tmp_work[2];
+             %}
+		if($trans())
+			ptrans = \'C\';
+		if($side())
+			pside = \'R\';
+
+		$TFD(cunmqr_,zunmqr_)(
+		&pside,
+		&ptrans,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__p_size)},
+		$P(tau),
+		$P(C),
+		&(integer){$PRIV(__m_size)},
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2 * lwork *  sizeof(float));
+		%}
+		types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+		%}
+		$TFD(cunmqr_,zunmqr_)(
+		&pside,
+		&ptrans,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__p_size)},
+		$P(tau),
+		$P(C),
+		&(integer){$PRIV(__m_size)},
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+',
+	Doc=>'
+
+=for ref
+
+Complex version of ormqr. Here trans = 1 means conjugate transpose.
+
+');
+
+pp_defc("gelqf",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int cgelqf_(integer *m, integer *n, float *a, integer *
+		lda, float *tau, float *work, integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zgelqf_(integer *m, integer *n, double *a, integer *
+		lda, double *tau, double *work, integer *lwork, integer *info);
+		 double tmp_work[2];
+             %}
+
+		$TFD(cgelqf_,zgelqf_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+		float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(cgelqf_,zgelqf_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+');
+
+pp_defc("unglq",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int cunglq_(integer *m, integer *n, integer *k, float *
+		a, integer *lda, float *tau, float *work, integer *lwork, 
+		integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zunglq_(integer *m, integer *n, integer *k, double *
+		a, integer *lda, double *tau, double *work, integer *lwork, 
+		integer *info);
+		 double tmp_work[2];
+             %}
+
+		$TFD(cunglq_,zunglq_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+		float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(cunglq_,zunglq_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+',
+	Doc=>'
+
+=for ref
+
+Complex version of orglq
+
+');
+
+pp_defc("unmlq",
+       HandleBad => 0,
+	Pars => '[phys]A(2,k,p); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		char ptrans = \'N\', pside = \'L\';
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int cunmlq_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, float *a, integer *lda, float *tau, float *
+		c__, integer *ldc, float *work, integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zunmlq_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, double *a, integer *lda, double *tau, double *
+		c__, integer *ldc, double *work, integer *lwork, integer *info);
+		 double tmp_work[2];
+             %}
+		if($trans())
+			ptrans = \'C\';
+		if($side())
+			pside = \'R\';
+
+		$TFD(cunmlq_,zunmlq_)(
+		&pside,
+		&ptrans,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__k_size)},
+		$P(tau),
+		$P(C),
+		&(integer){$PRIV(__m_size)},
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+		float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(cunmlq_,zunmlq_)(
+		&pside,
+		&ptrans,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__k_size)},
+		$P(tau),
+		$P(C),
+		&(integer){$PRIV(__m_size)},
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+',
+	Doc=>'
+
+=for ref
+
+Complex version of ormlq. Here trans = 1 means conjugate transpose.
+
+');
+
+
+pp_defc("geqlf",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int cgeqlf_(integer *m, integer *n, float *a, integer *
+		lda, float *tau, float *work, integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zgeqlf_(integer *m, integer *n, double *a, integer *
+		lda, double *tau, double *work, integer *lwork, integer *info);
+		 double tmp_work[2];
+             %}
+
+		$TFD(cgeqlf_,zgeqlf_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2 * lwork *  sizeof(float));
+		%}
+		types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+		%}
+		$TFD(cgeqlf_,zgeqlf_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+');
+
+pp_defc("ungql",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int cungql_(integer *m, integer *n, integer *k, float *
+		a, integer *lda, float *tau, float *work, integer *lwork, 
+		integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zungql_(integer *m, integer *n, integer *k, double *
+		a, integer *lda, double *tau, double *work, integer *lwork, 
+		integer *info);
+		 double tmp_work[2];
+             %}
+
+		$TFD(cungql_,zungql_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+		float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(cungql_,zungql_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+',
+	Doc=>'
+
+=for ref
+
+Complex version of orgql.
+
+');
+
+pp_defc("unmql",
+       HandleBad => 0,
+	Pars => '[phys]A(2,p,k); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		char ptrans = \'N\', pside = \'L\';
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int cunmql_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, float *a, integer *lda, float *tau, float *
+		c__, integer *ldc, float *work, integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zunmql_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, double *a, integer *lda, double *tau, double *
+		c__, integer *ldc, double *work, integer *lwork, integer *info);
+		 double tmp_work[2];
+             %}
+		if($trans())
+			ptrans = \'C\';
+		if($side())
+			pside = \'R\';
+
+		$TFD(cunmql_,zunmql_)(
+		&pside,
+		&ptrans,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__p_size)},
+		$P(tau),
+		$P(C),
+		&(integer){$PRIV(__m_size)},
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+		float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(cunmql_,zunmql_)(
+		&pside,
+		&ptrans,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__p_size)},
+		$P(tau),
+		$P(C),
+		&(integer){$PRIV(__m_size)},
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+',
+	Doc=>'
+
+=for ref
+
+Complex version of ormql. Here trans = 1 means conjugate transpose.
+
+');
+
+pp_defc("gerqf",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int cgerqf_(integer *m, integer *n, float *a, integer *
+		lda, float *tau, float *work, integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zgerqf_(integer *m, integer *n, double *a, integer *
+		lda, double *tau, double *work, integer *lwork, integer *info);
+		 double tmp_work[2];
+             %}
+
+		$TFD(cgerqf_,zgerqf_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+		float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(cgerqf_,zgerqf_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+');
+
+pp_defc("ungrq",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); [phys]tau(2,k); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int cungrq_(integer *m, integer *n, integer *k, float *
+		a, integer *lda, float *tau, float *work, integer *lwork, 
+		integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zungrq_(integer *m, integer *n, integer *k, double *
+		a, integer *lda, double *tau, double *work, integer *lwork, 
+		integer *info);
+		 double tmp_work[2];
+             %}
+
+		$TFD(cungrq_,zungrq_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+
+		float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(cungrq_,zungrq_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+',
+	Doc=>'
+
+=for ref
+
+Complex version of orgrq.
+
+');
+
+pp_defc("unmrq",
+       HandleBad => 0,
+	Pars => '[phys]A(2,k,p); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		char ptrans = \'N\', pside = \'L\';
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int cunmrq_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, float *a, integer *lda, float *tau, float *
+		c__, integer *ldc, float *work, integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zunmrq_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, double *a, integer *lda, double *tau, double *
+		c__, integer *ldc, double *work, integer *lwork, integer *info);
+		 double tmp_work[2];
+             %}
+		if($trans())
+			ptrans = \'C\';
+		if($side())
+			pside = \'R\';
+
+		$TFD(cunmrq_,zunmrq_)(
+		&pside,
+		&ptrans,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__k_size)},
+		$P(tau),
+		$P(C),
+		&(integer){$PRIV(__m_size)},
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+
+		float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(cunmrq_,zunmrq_)(
+		&pside,
+		&ptrans,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		$P(A),
+		&(integer){$PRIV(__k_size)},
+		$P(tau),
+		$P(C),
+		&(integer){$PRIV(__m_size)},
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+',
+	Doc=>'
+
+=for ref
+
+Complex version of ormrq. Here trans = 1 means conjugate transpose.
+
+');
+
+pp_defc("tzrzf",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); [o,phys]tau(2,k); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int ctzrzf_(integer *m, integer *n, float *a, integer *
+		lda, float *tau, float *work, integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int ztzrzf_(integer *m, integer *n, double *a, integer *
+		lda, double *tau, double *work, integer *lwork, integer *info);
+		 double tmp_work[2];
+             %}
+
+		$TFD(ctzrzf_,ztzrzf_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+			float *work = (float *)malloc(2 * lwork *  sizeof(float));
+		%}
+		types(D) %{
+			double *work = (double *)malloc(2 * lwork *  sizeof(double));
+		%}
+		$TFD(ctzrzf_,ztzrzf_)(
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(tau),
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+');
+
+pp_defc("unmrz",
+       HandleBad => 0,
+	Pars => '[phys]A(2,k,p); int side(); int trans(); [phys]tau(2,k); [io,phys]C(2,m,n);int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		char ptrans = \'N\', pside = \'L\';
+		integer lwork = -1;
+		integer kk =  $SIZE(p) - $SIZE(k);
+             
+	     types(F) %{
+		extern int cunmrz_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, integer *l, float *a, integer *lda, float *tau, float *
+		c__, integer *ldc, float *work, integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zunmrz_(char *side, char *trans, integer *m, integer *n, 
+		integer *k, integer *l, double *a, integer *lda, double *tau, double *
+		c__, integer *ldc, double *work, integer *lwork, integer *info);
+		 double tmp_work[2];
+             %}
+		if($trans())
+			ptrans = \'C\';
+		if($side())
+			pside = \'R\';
+
+		$TFD(cunmrz_,zunmrz_)(
+		&pside,
+		&ptrans,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		&kk,
+		$P(A),
+		&(integer){$PRIV(__k_size)},
+		$P(tau),
+		$P(C),
+		&(integer){$PRIV(__m_size)},
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+		float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(cunmrz_,zunmrz_)(
+		&pside,
+		&ptrans,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__k_size)},
+		&kk,
+		$P(A),
+		&(integer){$PRIV(__k_size)},
+		$P(tau),
+		$P(C),
+		&(integer){$PRIV(__m_size)},
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+',
+	Doc=>'
+
+=for ref
+
+Complex version of ormrz. Here trans = 1 means conjugate transpose.
+
+');
+
+
+pp_defc("gehrd",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int [phys]ilo();int [phys]ihi();[o,phys]tau(2,k); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int cgehrd_(integer *n, integer *ilo, integer *ihi, 
+		float *a, integer *lda, float *tau, float *work, 
+		integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zgehrd_(integer *n, integer *ilo, integer *ihi, 
+		double *a, integer *lda, double *tau, double *work, 
+		integer *lwork, integer *info);
+		 double tmp_work[2];
+             %}
+
+		$TFD(cgehrd_,zgehrd_)(
+		&(integer){$PRIV(__n_size)},
+		$P(ilo),
+		$P(ihi),
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(tau),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+
+		float *work = (float *)malloc(2*lwork *  sizeof(float));
+             %}
+             types(D) %{
+
+		double *work = (double *)malloc(2*lwork *  sizeof(double));
+             %}
+		$TFD(cgehrd_,zgehrd_)(
+		&(integer){$PRIV(__n_size)},
+		$P(ilo),
+		$P(ihi),
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(tau),
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+');
+
+pp_defc("unghr",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int [phys]ilo();int [phys]ihi();[phys]tau(2,k); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+		
+		integer lwork = -1;
+             
+	     types(F) %{
+		extern int cunghr_(integer *n, integer *ilo, integer *ihi, 
+		float *a, integer *lda, float *tau, float *work, 
+		integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zunghr_(integer *n, integer *ilo, integer *ihi, 
+		double *a, integer *lda, double *tau, double *work, 
+		integer *lwork, integer *info);
+		 double tmp_work[2];
+             %}
+
+		$TFD(cunghr_,zunghr_)(
+		&(integer){$PRIV(__n_size)},
+		$P(ilo),
+		$P(ihi),
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(tau),
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+
+		float *work = (float *)malloc(2*lwork *  sizeof(float));
+             %}
+             types(D) %{
+
+		double *work = (double *)malloc(2*lwork *  sizeof(double));
+             %}
+		$TFD(cunghr_,zunghr_)(
+		&(integer){$PRIV(__n_size)},
+		$P(ilo),
+		$P(ihi),
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(tau),
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+',
+Doc=>'
+
+=for ref
+
+Complex version of orghr
+
+');
+
+
+pp_defc("hseqr",
+       HandleBad => 0,
+	Pars => '[io,phys]H(2,n,n); int job();int compz();int [phys]ilo();int [phys]ihi();[o,phys]w(2,n); [o,phys]Z(2,m,m); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+
+		char pcompz;
+		char pjob = \'E\';
+		integer lwork = -1;
+
+	     types(F) %{
+		extern int chseqr_(char *job, char *compz, integer *n, integer *ilo,
+	 	integer *ihi, float *h__, integer *ldh, float *w, 
+		float *z__, integer *ldz, float *work, 
+		integer *lwork, integer *info);
+		float tmp_work[2];
+             %}
+             types(D) %{
+		extern int zhseqr_(char *job, char *compz, integer *n, integer *ilo,
+		integer *ihi, double *h__, integer *ldh, double *w, 
+		double *z__, integer *ldz, double *work, 
+		integer *lwork, integer *info);
+		 double tmp_work[2];
+             %}
+
+		if($job())
+			pjob = \'S\';
+
+		switch ($compz())
+		{
+			case 1: pcompz = \'I\';
+				break;
+			case 2: pcompz = \'V\';
+				break;
+			default: pcompz = \'N\';
+		}
+
+		$TFD(chseqr_,zhseqr_)(
+		&pjob,
+		&pcompz,
+		&(integer){$PRIV(__n_size)},
+		$P(ilo),
+		$P(ihi),
+		$P(H),
+		&(integer){$PRIV(__n_size)},
+		$P(w),
+		$P(Z),
+		&(integer){$PRIV(__m_size)},
+		&tmp_work[0],
+		&lwork,
+		$P(info));
+
+		lwork = (integer )tmp_work[0];
+		{
+		types(F) %{
+
+		float *work = (float *)malloc(2 * lwork *  sizeof(float));
+             %}
+             types(D) %{
+
+		double *work = (double *)malloc(2 * lwork *  sizeof(double));
+             %}
+		$TFD(chseqr_,zhseqr_)(
+		&pjob,
+		&pcompz,
+		&(integer){$PRIV(__n_size)},
+		$P(ilo),
+		$P(ihi),
+		$P(H),
+		&(integer){$PRIV(__n_size)},
+		$P(w),
+		$P(Z),
+		&(integer){$PRIV(__m_size)},
+		work,
+		&lwork,
+		$P(info));
+		free(work);
+		}
+
+');
+
+pp_defc("trevc",
+       HandleBad => 0,
+	Pars => '[io,phys]T(2,n,n); int side();int howmny();int [phys]select(q);[io,phys]VL(2,m,r); [io,phys]VR(2,p,s);int [o,phys]m(); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+
+		char pside,phowmny;
+		integer mm = 0;
+
+	     types(F) %{
+		extern int ctrevc_(char *side, char *howmny, logical *select, 
+		integer *n, float *t, integer *ldt, float *vl, integer *
+		ldvl, float *vr, integer *ldvr, integer *mm, integer *m, 
+		float *work, float *rwork, integer *info);
+		float *work = (float *) malloc(5 * $SIZE(n) *sizeof(float));
+             %}
+             types(D) %{
+		extern int ztrevc_(char *side, char *howmny, logical *select, 
+		integer *n, double *t, integer *ldt, double *vl, integer *
+		ldvl, double *vr, integer *ldvr, integer *mm, integer *m, 
+		double *work, double *rwork, integer *info);
+		double *work = (double *) malloc (5 * $SIZE(n) * sizeof(double));
+             %}
+
+		switch ($howmny())
+		{
+			case 1: phowmny = \'B\';
+				break;
+			case 2: phowmny = \'S\';
+				break;
+			default: phowmny = \'A\';
+		}
+
+		switch ($side())
+		{
+			case 1: pside = \'R\';
+				mm = $SIZE(s);
+				break;
+			case 2: pside = \'L\';
+				mm = $SIZE(r);
+				break;
+			default:pside = \'B\';
+				mm = $SIZE(s);
+		}
+
+		$TFD(ctrevc_,ztrevc_)(
+		&pside,
+		&phowmny,
+		$P(select),
+		&(integer){$PRIV(__n_size)},
+		$P(T),
+		&(integer){$PRIV(__n_size)},
+		$P(VL),
+		&(integer){$PRIV(__m_size)},
+		$P(VR),
+		&(integer){$PRIV(__p_size)},
+		&mm,
+		$P(m), 
+		&work[$SIZE(n)],
+		work,
+		$P(info));
+		free(work);
+
+');
+
+pp_defc("tgevc",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int side();int howmny(); [io,phys]B(2,n,n);int [phys]select(q);[io,phys]VL(2,m,r); [io,phys]VR(2,p,s);int [o,phys]m(); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+
+		char pside,phowmny;
+		integer mm = 0;
+
+	     types(F) %{
+		extern int ctgevc_(char *side, char *howmny, logical *select, 
+		integer *n, float *a, integer *lda, float *b, integer *ldb,
+		float *vl, integer *ldvl, float *vr, integer *ldvr, 
+		integer *mm, integer *m, float *work, float *rwork, integer *info);
+		float *work = (float *) malloc(6 * $SIZE(n) *sizeof(float));
+             %}
+             types(D) %{
+		extern int ztgevc_(char *side, char *howmny, logical *select, 
+		integer *n, double *a, integer *lda, double *b, integer *ldb,
+		double *vl, integer *ldvl, double *vr, integer *ldvr, 
+		integer *mm, integer *m, double *work, double *rwork, integer *info);
+		double *work = (double *) malloc (6 * $SIZE(n) * sizeof(double));
+             %}
+
+		switch ($howmny())
+		{
+			case 1: phowmny = \'B\';
+				break;
+			case 2: phowmny = \'S\';
+				break;
+			default: phowmny = \'A\';
+		}
+
+		switch ($side())
+		{
+			case 1: pside = \'R\';
+				mm = $SIZE(s);
+				break;
+			case 2: pside = \'L\';
+				mm = $SIZE(r);
+				break;
+			default:pside = \'B\';
+				mm = $SIZE(s);
+		}
+
+		$TFD(ctgevc_,ztgevc_)(
+		&pside,
+		&phowmny,
+		$P(select),
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(B),
+		&(integer){$PRIV(__n_size)},
+		$P(VL),
+		&(integer){$PRIV(__m_size)},
+		$P(VR),
+		&(integer){$PRIV(__p_size)},
+		&mm,
+		$P(m), 
+		&work[2*$SIZE(n)],
+		work,
+		$P(info));
+		free(work);
+
+');
+
+
+pp_defc("gebal",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,n,n); int job(); int [o,phys]ilo();int [o,phys]ihi();[o,phys]scale(n); int [o,phys]info()',
+	GenericTypes => [F,D],
+	Code => generate_code '
+
+
+		char pjob;
+             
+	     types(F) %{
+		extern int cgebal_(char *job, integer *n, float *a, integer *
+		lda, integer *ilo, integer *ihi, float *scale, integer *info);
+             %}
+             types(D) %{
+		extern int zgebal_(char *job, integer *n, double *a, integer *
+		lda, integer *ilo, integer *ihi, double *scale, integer *info);
+             %}
+
+	        switch ($job())
+		{
+			case 1:   pjob = \'P\';
+				  break;
+			case 2:   pjob = \'S\';
+				  break;
+			case 3:   pjob = \'B\';
+				  break;
+			default:  pjob = \'N\';
+		}
+		
+		$TFD(cgebal_,zgebal_)(
+		&pjob,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		$P(ilo),
+		$P(ihi),
+		$P(scale),
+		$P(info));
+
+');
+
+
+#################################################################################
+pp_defc("lange",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,m); int norm(); [o]b()',
+	GenericTypes => [F,D],
+	Code =>  '
+             char pnorm;
+
+	     types(F) %{
+		extern float clange_(char *norm, integer *m, integer *n, float *a, integer
+		*lda, float *work);
+		float *work;
+             %}
+             types(D) %{
+		extern double zlange_(char *norm, integer *m, integer *n, double *a, integer
+		*lda, double *work);
+		double *work;
+             %}
+		switch ($norm())
+		{
+			case 1: pnorm = \'O\';
+				break;
+			case 2: pnorm = \'I\';
+			types(F) %{
+				work = (float *)malloc($PRIV(__n_size) *  sizeof(float));
+             		%}
+             		types(D) %{
+				work = (double *)malloc($PRIV(__n_size) *  sizeof(double));
+             		%}
+				break;
+			case 3: pnorm = \'F\';
+				break;
+			default: pnorm = \'M\';
+		}
+
+		$b() = $TFD(clange_,zlange_)(
+		&pnorm,
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		work);
+		if ($norm() == 2)
+			free (work);
+
+');
+
+
+pp_defc("lansy",
+       HandleBad => 0,
+	Pars => '[phys]A(2, n,n); int uplo(); int norm(); [o]b()',
+	GenericTypes => [F,D],
+	Code =>  '
+
+             char pnorm, puplo = \'U\';
+
+	     types(F) %{
+		extern float clansy_(char *norm, char *uplo, integer *n, float *a, integer 
+		*lda, float *work);
+		float *work;
+             %}
+             types(D) %{
+		extern double zlansy_(char *norm, char *uplo, integer *n, double *a, integer 
+		*lda, double *work);
+		double *work;
+             %}
+		switch ($norm())
+		{
+			case 1: pnorm = \'O\';
+			types(F) %{
+				work = (float *)malloc($PRIV(__n_size) *  sizeof(float));
+             		%}
+             		types(D) %{
+				work = (double *)malloc($PRIV(__n_size) *  sizeof(double));
+             		%}
+				break;
+			case 2: pnorm = \'I\';
+			types(F) %{
+				work = (float *)malloc($PRIV(__n_size) *  sizeof(float));
+             		%}
+             		types(D) %{
+				work = (double *)malloc($PRIV(__n_size) *  sizeof(double));
+             		%}
+				break;
+			case 3: pnorm = \'F\';
+				break;
+			default: pnorm = \'M\';
+		}
+		if($uplo())
+			puplo = \'L\';
+
+		$b() = $TFD(clansy_,zlansy_)(
+		&pnorm,
+		&puplo,
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		work);
+		if ($norm() == 2 || $norm() == 1)
+			free (work);
+
+');
+
+pp_defc("lantr",
+       HandleBad => 0,
+	Pars => '[phys]A(2,m,n);int uplo();int norm();int diag();[o]b()',
+	GenericTypes => [F,D],
+	Code =>  '
+
+             char pnorm, puplo = \'U\';
+             char pdiag = \'N\';
+
+	     types(F) %{
+		extern float clantr_(char *norm, char *uplo, char *diag, integer *m, integer *n, float *a, integer 
+		*lda, float *work);
+		float *work;
+             %}
+             types(D) %{
+		extern double zlantr_(char *norm, char *uplo, char *diag, integer *m, integer *n, double *a, integer 
+		*lda, double *work);
+		double *work;
+             %}
+		switch ($norm())
+		{
+			case 1: pnorm = \'O\';
+				break;
+			case 2: pnorm = \'I\';
+			types(F) %{
+				work = (float *)malloc($PRIV(__m_size) *  sizeof(float));
+             		%}
+             		types(D) %{
+				work = (double *)malloc($PRIV(__m_size) *  sizeof(double));
+             		%}
+				break;
+			case 3: pnorm = \'F\';
+				break;
+			default: pnorm = \'M\';
+		}
+		if($uplo())
+			puplo = \'L\';
+		if($diag())
+			pdiag = \'U\';
+
+		$b() = $TFD(clantr_,zlantr_)(
+		&pnorm,
+		&puplo,
+		&pdiag,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		work);
+		if ($norm() == 2)
+			free (work);
+
+');
+
+################################################################################
+#
+#		BLAS ROUTINES
+#
+################################################################################
+
+pp_defc("gemm",
+       HandleBad => 0,
+	Pars => '[phys]A(2,m,n); int transa(); int transb(); [phys]B(2,p,q);[phys]alpha(2); [phys]beta(2); [io,phys]C(2,r,s)',
+	GenericTypes => [F,D],
+	Code => '
+		char ptransa = \'N\';
+		char ptransb = \'N\';
+
+		types(F) %{
+			extern int cgemm_(char *transa, char *transb, integer *m, integer *
+			n, integer *k, float *alpha, float *a, integer *lda,
+			float *b, integer *ldb, float *beta, float *c__,
+			integer *ldc);
+		%}
+		types(D) %{
+			extern int zgemm_(char *transa, char *transb, integer *m, integer *
+			n, integer *k, double *alpha, double *a, integer *lda,
+			double *b, integer *ldb, double *beta, double *c__,
+			integer *ldc);
+		%}
+		integer kk = $transa() ? $SIZE(m) : $SIZE(n);
+
+		if ($transa() == 1)
+			ptransa = \'T\';
+		else if ($transa() == 2)
+			ptransa = \'C\';
+		if ($transb())
+			ptransb = \'T\';
+		else if ($transb() == 2)
+			ptransb = \'C\';
+
+		$TFD(cgemm_,zgemm_)(
+		&ptransa,
+		&ptransb,
+		&(integer){$PRIV(__r_size)},
+		&(integer){$PRIV(__s_size)},
+		&kk,
+		$P(alpha),
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(beta),
+		$P(C),
+		&(integer){$PRIV(__r_size)});
+',
+	Doc=>'
+
+=for ref
+
+Complex version of gemm. 
+
+    Arguments   
+    =========   
+	transa:  = 0:  No transpose;
+            	 = 1:  Transpose; 
+            	 = 2:  Conjugate transpose;
+
+	transb:  = 0:  No transpose;
+            	 = 1:  Transpose; 
+            	 = 2:  Conjugate transpose;
+
+');
+
+if ($config{CBLAS}){
+pp_def("rmcgemm",
+       HandleBad => 0,
+	Pars => '[phys]A(2,m,n); int transa(); int transb(); [phys]B(2,p,q);[phys]alpha(2); [phys]beta(2); [io,phys]C(2,r,s)',
+	GenericTypes => [F,D],
+	Code => '
+		int ptransa, ptransb;
+		types(F) %{
+			extern void cblas_cgemm(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA,
+				const enum CBLAS_TRANSPOSE TransB, const int M, const int N,
+				const int K, const void *alpha, const void *A,
+				const int lda, const void *B, const int ldb,
+				const void *beta, void *C, const int ldc);
+		%}
+		types(D) %{
+			extern void cblas_zgemm(const enum CBLAS_ORDER Order, const enum CBLAS_TRANSPOSE TransA,
+		                 const enum CBLAS_TRANSPOSE TransB, const int M, const int N,
+	        	         const int K, const void *alpha, const void *A,
+	                	 const int lda, const void *B, const int ldb,
+		                 const void *beta, void *C, const int ldc);
+		%}
+		integer kk = $transa() ? $SIZE(n) : $SIZE(m);
+
+		switch($transa()){
+			case 1:	ptransa = CblasTrans;
+				break;
+			case 2:	ptransa = CblasConjTrans;
+				break;
+			default:ptransa = CblasNoTrans;
+		}
+		switch($transb()){
+			case 1:	ptransb = CblasTrans;
+				break;
+			case 2:	ptransb = CblasConjTrans;
+				break;
+			default:ptransb = CblasNoTrans;
+		}
+
+		$TFD(cblas_cgemm,cblas_zgemm)(
+		CblasRowMajor,
+		ptransa,
+		ptransb,
+		$PRIV(__s_size),
+		$PRIV(__r_size),
+		kk,
+		$P(alpha),
+		$P(A),
+		$PRIV(__m_size),
+		$P(B),
+		$PRIV(__p_size),
+		$P(beta),
+		$P(C),
+		$PRIV(__r_size));
+',
+Doc=>'
+
+=for ref
+
+Complex version of rmgemm. 
+
+    Arguments   
+    =========   
+	transa:  = 0:  No transpose;
+            	 = 1:  Transpose; 
+            	 = 2:  Conjugate transpose;
+
+	transb:  = 0:  No transpose;
+            	 = 1:  Transpose; 
+            	 = 2:  Conjugate transpose;
+
+');
+}
+
+pp_defc("mmult",
+       HandleBad => 0,
+	Pars => '[phys]A(2,m,n); [phys]B(2,p,m); [o,phys]C(2,p,n)',
+	GenericTypes => [F,D],
+	Code =>  '
+		char ptrans = \'N\';
+		types(F) %{
+			extern int cgemm_(char *transa, char *transb, integer *m, integer *
+			n, integer *k, float *alpha, float *a, integer *lda,
+			float *b, integer *ldb, float *beta, float *c__,
+			integer *ldc);
+			float alpha[2] = {1,0};
+			float beta[2] = {0,0};
+		%}
+		types(D) %{
+			extern int zgemm_(char *transa, char *transb, integer *m, integer *
+			n, integer *k, double *alpha, double *a, integer *lda,
+			double *b, integer *ldb, double *beta, double *c__,
+			integer *ldc);
+			double alpha[2] = {1,0};
+			double beta[2] = {0,0};
+		%}
+
+		$TFD(cgemm_,zgemm_)(
+		&ptrans,
+		&ptrans,
+		&(integer){$PRIV(__p_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		&alpha[0],
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		&beta[0],
+		$P(C),
+		&(integer){$PRIV(__p_size)});
+');
+if ($config{STRASSEN}){
+pp_defc("smmult",
+       HandleBad => 0,
+	Pars => '[phys]A(2,m,n); [phys]B(2,p,m); [o,phys]C(2,p,n)',
+	GenericTypes => [F,D],
+	Code =>  '
+		char ptrans = \'N\';
+		types(F) %{
+			extern int cgemmb_(char *transa, char *transb, integer *m, integer *
+			n, integer *k, float *alpha, float *a, integer *lda,
+			float *b, integer *ldb, float *beta, float *c__,
+			integer *ldc);
+			float alpha[2] = {1,0};
+			float beta[2] = {0,0};
+		%}
+		types(D) %{
+			extern int zgemmb_(char *transa, char *transb, integer *m, integer *
+			n, integer *k, double *alpha, double *a, integer *lda,
+			double *b, integer *ldb, double *beta, double *c__,
+			integer *ldc);
+			double alpha[2] = {1,0};
+			double beta[2] = {0,0};
+		%}
+
+		$TFD(cgemmb_,zgemmb_)(
+		&ptrans,
+		&ptrans,
+		&(integer){$PRIV(__p_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		&alpha[0],
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		&beta[0],
+		$P(C),
+		&(integer){$PRIV(__p_size)});
+');
+}
+
+pp_defc("crossprod",
+       HandleBad => 0,
+	Pars => '[phys]A(2,n,m); [phys]B(2,p,m); [o,phys]C(2,p,n)',
+	GenericTypes => [F,D],
+	Code =>  '
+		char btrans = \'N\';
+		char atrans = \'C\';
+		types(F) %{
+			extern int cgemm_(char *transa, char *transb, integer *m, integer *
+			n, integer *k, float *alpha, float *a, integer *lda,
+			float *b, integer *ldb, float *beta, float *c__,
+			integer *ldc);
+			float alpha[2] = {1,0};
+			float beta[2] = {0,0};
+		%}
+		types(D) %{
+			extern int zgemm_(char *transa, char *transb, integer *m, integer *
+			n, integer *k, double *alpha, double *a, integer *lda,
+			double *b, integer *ldb, double *beta, double *c__,
+			integer *ldc);
+			double alpha[2] = {1,0};
+			double beta[2] = {0,0};
+		%}
+
+		$TFD(cgemm_,zgemm_)(
+		&btrans,
+		&atrans,
+		&(integer){$PRIV(__p_size)},
+		&(integer){$PRIV(__n_size)},
+		&(integer){$PRIV(__m_size)},
+		&alpha[0],
+		$P(B),
+		&(integer){$PRIV(__p_size)},
+		$P(A),
+		&(integer){$PRIV(__n_size)},
+		&beta[0],
+		$P(C),
+		&(integer){$PRIV(__p_size)});
+');
+
+pp_defc("syrk",
+       HandleBad => 0,
+	Pars => '[phys]A(2,m,n); int uplo(); int trans(); [phys]alpha(2); [phys]beta(2); [io,phys]C(2,p,p)',
+	RedoDimsCode => '$SIZE(p) = $trans() ? $SIZE(n) : $SIZE(m);',
+	GenericTypes => [F,D],
+	Code =>  '
+
+		char puplo = \'U\';
+		char ptrans = \'N\';
+
+		types(F) %{
+			extern int csyrk_(char *uplo, char *trans, integer *n, integer *k,
+			float *alpha, float *a, integer *lda, float *beta,
+			float *c__, integer *ldc);
+		%}
+		types(D) %{
+			extern int zsyrk_(char *uplo, char *trans, integer *n, integer *k,
+			double *alpha, double *a, integer *lda, double *beta,
+			double *c__, integer *ldc);
+		%}
+		integer kk = $trans() ? $SIZE(m) : $SIZE(n);
+
+		if ($uplo())
+			puplo = \'L\';
+
+		if ($trans())
+			ptrans = \'T\';
+
+
+		$TFD(csyrk_,zsyrk_)(
+		&puplo,
+		&ptrans,
+		&(integer){$PRIV(__p_size)},
+		&kk,
+		$P(alpha),
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(beta),
+		$P(C),
+		&(integer){$PRIV(__p_size)});
+');
+
+if ($config{CBLAS}){
+pp_def("rmcsyrk",
+       HandleBad => 0,
+	Pars => '[phys]A(2,m,n); int uplo(); int trans(); [phys]alpha(2); [phys]beta(2); [io,phys]C(2,p,p)',
+	GenericTypes => [F,D],
+	Code =>  '
+		int puplo = CblasUpper;
+		int ptrans;
+
+		types(F) %{
+			extern void cblas_csyrk(const enum CBLAS_ORDER Order, const enum CBLAS_UPLO Uplo,
+		                 const enum CBLAS_TRANSPOSE Trans, const int N, const int K,
+		                 const void *alpha, const void *A, const int lda,
+		                 const void *beta, void *C, const int ldc);
+		%}
+		types(D) %{
+			extern void cblas_zsyrk(const enum CBLAS_ORDER Order, const enum CBLAS_UPLO Uplo,
+		                 const enum CBLAS_TRANSPOSE Trans, const int N, const int K,
+	        	         const void *alpha, const void *A, const int lda,
+	                	 const void *beta, void *C, const int ldc);
+		%}
+		integer kk = $trans() ? $SIZE(n) : $SIZE(m);
+
+		if ($uplo())
+			puplo = CblasLower;
+
+		switch($trans()){
+			case 1:	ptrans = CblasTrans;
+				break;
+			case 2:	ptrans = CblasConjTrans;
+				break;
+			default:ptrans = CblasNoTrans;
+		}
+
+
+		$TFD(cblas_csyrk,cblas_zsyrk)(
+		CblasRowMajor,
+		puplo,
+		ptrans,
+		$PRIV(__p_size),
+		kk,
+		$P(alpha),
+		$P(A),
+		$PRIV(__m_size),
+		$P(beta),
+		$P(C),
+		$PRIV(__p_size));
+',
+Doc=>'
+
+=for ref
+
+Complex version of rmsyrk
+
+');
+}
+pp_defc("dot",
+       HandleBad => 0,
+	Pars => '[phys]a(2,n);int [phys]inca();[phys]b(2,n);int [phys]incb();[o,phys]c(2)',
+	GenericTypes => [F,D],
+	Code =>  '
+		types(F) %{
+			extern float cdotu_(float *ret, integer *n, float *dx, integer *incx, float *dy,
+			integer *incy);
+		%}
+		types(D) %{
+			extern double zdotu_(double *ret, integer *n, double *dx, integer *incx, double *dy,
+			integer *incy);
+		%}
+		integer n = (integer ) $PRIV(__n_size)/$inca();
+
+		$TFD(cdotu_,zdotu_)(
+		$P(c),
+		&n,
+		$P(a),
+		$P(inca),
+		$P(b),
+		$P(incb));
+');
+
+pp_def("cdotc",
+       HandleBad => 0,
+	Pars => '[phys]a(2,n);int [phys]inca();[phys]b(2,n);int [phys]incb();[o,phys]c(2)',
+	GenericTypes => [F,D],
+	Code =>  '
+		types(F) %{
+			extern float cdotc_(float *ret, integer *n, float *dx, integer *incx, float *dy,
+			integer *incy);
+		%}
+		types(D) %{
+			extern double zdotc_(double *ret, integer *n, double *dx, integer *incx, double *dy,
+			integer *incy);
+		%}
+		integer n = (integer ) $PRIV(__n_size)/$inca();
+
+		$TFD(cdotc_,zdotc_)(
+		$P(c),
+		&n,
+		$P(a),
+		$P(inca),
+		$P(b),
+		$P(incb));
+',
+Doc=>'
+
+=for ref
+
+Forms the dot product of two vectors, conjugating the first   
+vector.
+
+');
+
+pp_defc("axpy",
+       HandleBad => 0,
+	Pars => '[phys]a(2,n);int [phys]inca();[phys] alpha(2);[io,phys]b(2,n);int [phys]incb()',
+	GenericTypes => [F,D],
+	Code =>  '
+
+		types(F) %{
+			extern int caxpy_(integer *n, float *da, float *dx,
+			integer *incx, float *dy, integer *incy);
+		%}
+		types(D) %{
+			extern int zaxpy_(integer *n, double *da, double *dx,
+			integer *incx, double *dy, integer *incy);
+		%}
+		integer n = (integer ) $PRIV(__n_size)/$inca();
+
+		$TFD(caxpy_,zaxpy_)(
+		&n,
+		$P(alpha),
+		$P(a),
+		$P(inca),
+		$P(b),
+		$P(incb));
+');
+
+pp_defc("nrm2",
+       HandleBad => 0,
+	Pars => '[phys]a(2,n);int [phys]inca();[o,phys]b()',
+	GenericTypes => [F,D],
+	Code =>  '
+
+		types(F) %{
+			extern float scnrm2_(integer *n, float *dx,
+			integer *incx);
+		%}
+		types(D) %{
+			extern double dznrm2_(integer *n, double *dx,
+			integer *incx);
+		%}
+		integer n = (integer ) $PRIV(__n_size)/$inca();
+
+		$b() = $TFD(scnrm2_,dznrm2_)(
+		&n,
+		$P(a),
+		$P(inca));
+');
+
+pp_defc("asum",
+       HandleBad => 0,
+	Pars => '[phys]a(2,n);int [phys]inca();[o,phys]b()',
+	GenericTypes => [F,D],
+	Code =>  '
+
+		types(F) %{
+			extern float scasum_(integer *n, float *dx,
+			integer *incx);
+		%}
+		types(D) %{
+			extern double dzasum_(integer *n, double *dx,
+			integer *incx);
+		%}
+		integer n = (integer ) $PRIV(__n_size)/$inca();
+
+		$b() = $TFD(scasum_,dzasum_)(
+		&n,
+		$P(a),
+		$P(inca));
+');
+
+pp_defc("scal",
+        HandleBad => 0,
+	Pars => '[io,phys]a(2,n);int [phys]inca();[phys]scale(2)',
+	GenericTypes => [F,D],
+	Code =>  '
+
+		types(F) %{
+			extern int cscal_(integer *n, float *sa,
+			float *dx, integer *incx);
+		%}
+		types(D) %{
+			extern int zscal_(integer *n, double *sa,
+			double *dx,integer *incx);
+		%}
+		integer n = (integer ) $PRIV(__n_size)/$inca();
+
+		$TFD(cscal_,zscal_)(
+		&n,
+		$P(scale),
+		$P(a),
+		$P(inca));
+');
+
+pp_def("sscal",
+        HandleBad => 0,
+	Pars => '[io,phys]a(2,n);int [phys]inca();[phys]scale()',
+	GenericTypes => [F],
+	Code =>  '
+
+		extern int csscal_(integer *n, float *sa,
+		float *dx, integer *incx);
+		integer n = (integer ) $PRIV(__n_size)/$inca();
+
+		csscal_( &n, $P(scale), $P(a), $P(inca));
+',
+Doc=>'
+
+=for ref
+
+Scales a complex vector by a real constant.
+
+');
+
+
+pp_defc("rotg",
+       HandleBad => 0,
+	Pars => '[io,phys]a(2);[phys]b(2);[o,phys]c(); [o,phys]s(2)',
+	GenericTypes => [F,D],
+	Code =>  '
+
+		types(F) %{
+			extern int crotg_(float *dx,
+			float *dy, float *c, float *s);
+		%}
+		types(D) %{
+			extern int zrotg_(double *dx,
+			double *dy, double *c, double *s);
+		%}
+
+		$TFD(crotg_,zrotg_)(
+		$P(a),
+		$P(b),
+		$P(c),
+		$P(s)		
+		);
+');
+
+################################################################################
+#
+#		LAPACK AUXILIARY ROUTINES
+#
+################################################################################
+pp_defc("lacpy",
+       HandleBad => 0,
+	Pars => '[phys]A(2,m,n); int uplo(); [o,phys]B(2,p,n)',
+	GenericTypes => [F,D],
+	Code => '
+		char puplo;
+
+		types(F) %{
+			extern int clacpy_(char *uplo, integer *m, integer *n, float *
+			a, integer *lda, float *b, integer *ldb);
+		%}
+		types(D) %{
+			extern int zlacpy_(char *uplo, integer *m, integer *n, double *
+			a, integer *lda, double *b, integer *ldb);
+		%}
+
+
+		switch ($uplo())
+		{
+			case 0: puplo = \'U\';
+				break;
+			case 1: puplo = \'L\';
+				break;
+			default: puplo = \'A\';
+		}
+
+		$TFD(clacpy_,zlacpy_)(
+		&puplo,
+		&(integer){$PRIV(__m_size)},
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(B),
+		&(integer){$PRIV(__p_size)});
+');
+
+pp_defc("laswp",
+       HandleBad => 0,
+	Pars => '[io,phys]A(2,m,n); int [phys]k1(); int [phys]k2(); int [phys]ipiv(p);int [phys]inc()',
+	GenericTypes => [F,D],
+	Code => '
+		types(F) %{
+			extern int claswp_(integer *n, float *a, integer *lda, integer 
+			*k1, integer *k2, integer *ipiv, integer *incx);
+		%}
+		types(D) %{
+			extern int zlaswp_(integer *n, double *a, integer *lda, integer 
+			*k1, integer *k2, integer *ipiv, integer *incx);
+		%}
+
+
+		$TFD(claswp_,zlaswp_)(
+		&(integer){$PRIV(__n_size)},
+		$P(A),
+		&(integer){$PRIV(__m_size)},
+		$P(k1),
+		$P(k2),
+		$P(ipiv),
+		$P(inc));
+');
+
+################################################################################
+#
+#		OTHER AUXILIARY ROUTINES
+#
+################################################################################
+pp_def(
+	'ctricpy',
+	Pars => 'A(c=2,m,n);int uplo();[o] C(c=2,m,n)',
+	Code => '
+		PDL_Long i, j, k;
+		
+		if ($uplo())
+		{
+			for (i = 0; i < $SIZE(n);i++)
+			{
+				k = min(i,($SIZE(m)-1));
+				for (j = 0; j <= k; j++)
+				{
+	               			$C(c=>0,m=>j,n=>i) = $A(c=>0,m=>j,n=>i);
+					$C(c=>1,m=>j,n=>i) = $A(c=>1,m=>j,n=>i);
+				}
+			}
+		}
+		else
+		{
+			for (i = 0; i < $SIZE(n);i++)
+			{
+				for (j = i; j < $SIZE(m); j++)
+				{
+	               			$C(c=>0,m=>j,n=>i) = $A(c=>0,m=>j,n=>i);
+					$C(c=>1,m=>j,n=>i) = $A(c=>1,m=>j,n=>i);
+				
+				}
+				if (i >= $SIZE(m))
+					break;
+			}
+		}
+		
+
+	',
+	Doc => <<EOT
+
+=for ref
+
+Copy triangular part to another matrix. If uplo == 0 copy upper triangular part.
+
+=cut
+
+EOT
+
+);
+
+pp_bless('PDL');
+pp_def(
+	'cmstack',
+	DefaultFlow => 1,
+	Reversible => 1,
+	Pars => 'x(c,n,m);y(c,n,p);[o]out(c,n,q);',
+	RedoDimsCode => '$SIZE(q) = $PDL(x)->dims[2] + $PDL(y)->dims[2];',
+	Code => '
+	  register PDL_Long i,j;
+	  loop(m)%{
+		  loop(n)%{
+			  loop(c)%{
+				$out(c=>c,n=>n,q=>m) = $x(c=>c,n=>n,m=>m);
+			%}
+		  %}
+	  %}
+	  j=0;
+	  for (i = $SIZE(m); i < $SIZE(q) ;i++,j++)
+	  {
+		  loop(n)%{
+			loop(c)%{
+				$out(c=>c,n=>n,q=>i) = $y(c=>c,n=>n,p=>j);
+			%}
+		  %}
+	  }	
+	',
+
+       BackCode => '
+	  register PDL_Long i,j;
+	  loop(m)%{
+		  loop(n)%{
+			loop(c)%{
+				$x(c=>c,n=>n,m=>m) = $out(c=>c,n=>n,q=>m);
+			%}
+		  %}
+	  %}
+	  j=0;
+	  for (i = $SIZE(m); i < $SIZE(q) ;i++,j++)
+	  {
+		  loop(n)%{
+			loop(c)%{
+				$y(c=>c,n=>n,p=>j) = $out(c=>c,n=>n,q=>i);
+			%}
+		  %}
+	  }
+       ',
+	Doc => <<EOT
+
+=for ref
+
+Combine two 3D piddles into a single piddle.
+This routine does backward and forward dataflow automatically.
+
+=cut
+EOT
+
+);
+
+pp_addhdr('
+void cftrace(int n, float *mat, float *res)
+{
+  int i;
+  res[0] = mat[0];
+  res[1] = mat[1];
+  for (i = 1; i < n; i++)
+  {
+   	res[0] += mat[(i*(n+1))*2];
+   	res[1] += mat[(i*(n+1))*2+1];
+  }
+}
+void cdtrace(int n, double *mat, double *res)
+{
+  int i;
+  res[0] = mat[0];
+  res[1] = mat[1];
+  for (i = 1; i < n; i++)
+  {
+   	res[0] += mat[(i*(n+1))*2];
+   	res[1] += mat[(i*(n+1))*2+1];
+  }
+}
+');
+
+pp_defc(
+	'charpol',
+	RedoDimsCode => '$SIZE(p) = $PDL(A)->dims[1] + 1;',
+	Pars => '[phys]A(c=2,n,n);[phys,o]Y(c=2,n,n);[phys,o]out(c=2,p);',
+	GenericTypes => [F,D],
+	Code => '
+	int i,j,k;
+	$GENERIC() *p, tr[2], b[2];
+	//$GENERIC() *tmp;	
+	char ptrans = \'N\';	
+	types(F) %{
+		extern int cgemm_(char *transa, char *transb, integer *m, integer *
+		n, integer *k, float *alpha, float *a, integer *lda,
+		float *b, integer *ldb, float *beta, float *c__,
+		integer *ldc);
+		float alpha[2] = {1,0};
+		float beta[2] = {0,0};
+	%}
+	types(D) %{
+		extern int zgemm_(char *transa, char *transb, integer *m, integer *
+		n, integer *k, double *alpha, double *a, integer *lda,
+		double *b, integer *ldb, double *beta, double *c__,
+		integer *ldc);
+		double alpha[2] = {1,0};
+		double beta[2] = {0,0};
+	%}
+
+	p = ($GENERIC() * ) malloc (2* $SIZE(n) * $SIZE(n) * sizeof($GENERIC()));
+	loop(n0)%{
+		loop(n1)%{
+			$Y(c=>0,n0=>n0,n1=>n1) = (n0 == n1) ?  ($GENERIC()) 1.0 : ($GENERIC()) 0.0;
+			$Y(c=>1,n0=>n0,n1=>n1) = ($GENERIC()) 0.0;
+		%}	
+	%}
+	$out(c=>0,p=>0) = 1;
+	$out(c=>1,p=>0) = 0;
+
+	i = 0;
+	for (;;)
+	{
+		i++;
+		$TFD(cgemm_,zgemm_)(&ptrans,&ptrans,&(integer){$PRIV(__n_size)},&(integer){$PRIV(__n_size)},
+			&(integer){$PRIV(__n_size)},&alpha[0],$P(Y),&(integer){$PRIV(__n_size)}, $P(A), &(integer){$PRIV(__n_size)},
+			&beta[0], p, &(integer){$PRIV(__n_size)});
+		
+		if (i == $SIZE(n)) break;
+
+		// if (k+1) & 1 without the copy below => return diagonal matrix
+		// with determinant (on my 5-year-old-pentium (windows)) !!!???
+		// tmp = $P(Y);
+		// $P(Y) = p;
+		// p = tmp;
+		
+		
+		
+		memmove($P(Y), p, 2* $SIZE(n) * $SIZE(n) * sizeof($GENERIC()));
+		
+//		loop(n1)
+//		%{
+//			loop(n0)
+//			%{
+//				$Y(c=>0,n0=>n0,n1=>n1) = p[((n1*$SIZE(n))+n0)*2];
+//				$Y(c=>1,n0=>n0,n1=>n1) = p[((n1*$SIZE(n))+n0)*2+1];
+//			%}	
+//		%}
+	
+		$TFD(cftrace,cdtrace)($SIZE(n), $P(Y), &tr[0]);
+		
+		b[0] = $out(c=>0,p=>i) = - tr[0] / i;
+		b[1] = $out(c=>1,p=>i) = - tr[1] / i;
+		for (j = 0; j < $SIZE(n); j++)
+		{
+			$Y(c=>0,n0=>j,n1=>j) +=  b[0];
+			$Y(c=>1,n0=>j,n1=>j) +=  b[1];
+		}
+
+	}
+
+	k = $SIZE(n);
+	$TFD(cftrace,cdtrace)(k, p, &tr[0]);	
+	$out(c=>0,p=>k) = - tr[0] / k;
+	$out(c=>1,p=>k) = - tr[1] / k;
+	if ((k+1) & 1)
+	{
+		loop(n0)
+		%{
+			loop(n1)
+			%{
+				$Y(c=>0,n0=>n0,n1=>n1) = -$Y(c=>0,n0=>n0,n1=>n1);
+				$Y(c=>1,n0=>n0,n1=>n1) = -$Y(c=>1,n0=>n0,n1=>n1);
+			%}	
+		%}
+	}
+	free(p);
+	'
+);
+
+
+pp_addpm({At=>'Bot'},<<'EOD');
+
+=head1 AUTHOR
+
+Copyright (C) Grégory Vanuxem 2005-2007.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the artistic license as specified in the Artistic
+file.
+
+=cut
+
+EOD
+
+pp_done();  # you will need this to finish pp processing
+

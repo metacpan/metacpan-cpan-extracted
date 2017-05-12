@@ -1,0 +1,7 @@
+[% INCLUDE common/header.tt
+           title = "Error!"
+%]
+
+<h2>Too many / characters in page [% pageName %]</h2>
+
+[% INCLUDE common/footer.tt %]

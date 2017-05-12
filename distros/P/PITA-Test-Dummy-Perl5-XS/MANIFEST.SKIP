@@ -1,0 +1,9 @@
+^XS\.c$
+^pm_to_blib$
+^blib/
+\.o$
+\.bs$
+~$
+^Makefile$
+\.bak$
+^\.\#

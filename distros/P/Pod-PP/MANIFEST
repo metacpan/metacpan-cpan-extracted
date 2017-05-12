@@ -1,0 +1,32 @@
+README                      The main README file
+MANIFEST                    This shipping list
+ChangeLog                   List of changes
+Makefile.PL                 Generic Makefile template
+PP.pm                       The Pod::PP pre-processor
+PP/Env.pm                   Maintains pre-processing environment
+PP/State.pm                 Maintains state machine information for if/else
+PP/State/Info.pm            Individual stack state information
+scripts/podpp.PL            Generates the podpp script
+t/code.pl                   Common testubg routines
+t/comment.t                 Tests =pp comment
+t/define.t                  Tests =pp define
+t/doc/bad_include           Document for bad file inclusion testing
+t/doc/comments              Document for comment testing
+t/doc/defines               Document for symbol definition testing
+t/doc/h/bar.pp              Include file for inclusion testing
+t/doc/h/def.pp              Include file defining symbols
+t/doc/h/foo.pp              Include file for inclusion testing
+t/doc/image                 Document for image testing
+t/doc/include               Document for include testing
+t/doc/mixing                Document mixing regular POD with Pod::PP
+t/doc/normalize             Document to check normalization
+t/doc/require               Document for require testing
+t/doc/tests                 Document for if/else testing
+t/doc/undef                 Document for symbol undefining testing
+t/image.t                   Tests =pp image
+t/include.t                 Tests =pp include
+t/normalize.t               Tests output normalization
+t/pass_through.t            Tests that regular POD passes through
+t/require.t                 Tests =pp require
+t/tests.t                   Tests the if/else tests
+t/undef.t                   Tests =pp undef

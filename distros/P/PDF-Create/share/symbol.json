@@ -1,0 +1,1026 @@
+[
+   {
+      "codepoint" : 0,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 1
+   },
+   {
+      "codepoint" : 2,
+      "width" : 250
+   },
+   {
+      "codepoint" : 3,
+      "width" : 250
+   },
+   {
+      "codepoint" : 4,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 5
+   },
+   {
+      "width" : 250,
+      "codepoint" : 6
+   },
+   {
+      "codepoint" : 7,
+      "width" : 250
+   },
+   {
+      "codepoint" : 8,
+      "width" : 250
+   },
+   {
+      "codepoint" : 9,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 10
+   },
+   {
+      "codepoint" : 11,
+      "width" : 250
+   },
+   {
+      "codepoint" : 12,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 13
+   },
+   {
+      "codepoint" : 14,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 15
+   },
+   {
+      "width" : 250,
+      "codepoint" : 16
+   },
+   {
+      "width" : 250,
+      "codepoint" : 17
+   },
+   {
+      "width" : 250,
+      "codepoint" : 18
+   },
+   {
+      "codepoint" : 19,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 20
+   },
+   {
+      "codepoint" : 21,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 22
+   },
+   {
+      "codepoint" : 23,
+      "width" : 250
+   },
+   {
+      "codepoint" : 24,
+      "width" : 250
+   },
+   {
+      "codepoint" : 25,
+      "width" : 250
+   },
+   {
+      "codepoint" : 26,
+      "width" : 250
+   },
+   {
+      "codepoint" : 27,
+      "width" : 250
+   },
+   {
+      "codepoint" : 28,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 29
+   },
+   {
+      "codepoint" : 30,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 31
+   },
+   {
+      "codepoint" : 32,
+      "width" : 250
+   },
+   {
+      "width" : 333,
+      "codepoint" : 33
+   },
+   {
+      "width" : 713,
+      "codepoint" : 34
+   },
+   {
+      "codepoint" : 35,
+      "width" : 500
+   },
+   {
+      "codepoint" : 36,
+      "width" : 549
+   },
+   {
+      "width" : 833,
+      "codepoint" : 37
+   },
+   {
+      "codepoint" : 38,
+      "width" : 778
+   },
+   {
+      "width" : 439,
+      "codepoint" : 39
+   },
+   {
+      "codepoint" : 40,
+      "width" : 333
+   },
+   {
+      "width" : 333,
+      "codepoint" : 41
+   },
+   {
+      "codepoint" : 42,
+      "width" : 500
+   },
+   {
+      "width" : 549,
+      "codepoint" : 43
+   },
+   {
+      "width" : 250,
+      "codepoint" : 44
+   },
+   {
+      "width" : 549,
+      "codepoint" : 45
+   },
+   {
+      "codepoint" : 46,
+      "width" : 250
+   },
+   {
+      "codepoint" : 47,
+      "width" : 278
+   },
+   {
+      "codepoint" : 48,
+      "width" : 500
+   },
+   {
+      "width" : 500,
+      "codepoint" : 49
+   },
+   {
+      "codepoint" : 50,
+      "width" : 500
+   },
+   {
+      "width" : 500,
+      "codepoint" : 51
+   },
+   {
+      "width" : 500,
+      "codepoint" : 52
+   },
+   {
+      "width" : 500,
+      "codepoint" : 53
+   },
+   {
+      "codepoint" : 54,
+      "width" : 500
+   },
+   {
+      "codepoint" : 55,
+      "width" : 500
+   },
+   {
+      "codepoint" : 56,
+      "width" : 500
+   },
+   {
+      "width" : 500,
+      "codepoint" : 57
+   },
+   {
+      "width" : 278,
+      "codepoint" : 58
+   },
+   {
+      "codepoint" : 59,
+      "width" : 278
+   },
+   {
+      "codepoint" : 60,
+      "width" : 549
+   },
+   {
+      "codepoint" : 61,
+      "width" : 549
+   },
+   {
+      "codepoint" : 62,
+      "width" : 549
+   },
+   {
+      "codepoint" : 63,
+      "width" : 444
+   },
+   {
+      "codepoint" : 64,
+      "width" : 549
+   },
+   {
+      "codepoint" : 65,
+      "width" : 722
+   },
+   {
+      "width" : 667,
+      "codepoint" : 66
+   },
+   {
+      "width" : 722,
+      "codepoint" : 67
+   },
+   {
+      "codepoint" : 68,
+      "width" : 612
+   },
+   {
+      "codepoint" : 69,
+      "width" : 611
+   },
+   {
+      "codepoint" : 70,
+      "width" : 763
+   },
+   {
+      "codepoint" : 71,
+      "width" : 603
+   },
+   {
+      "width" : 722,
+      "codepoint" : 72
+   },
+   {
+      "codepoint" : 73,
+      "width" : 333
+   },
+   {
+      "codepoint" : 74,
+      "width" : 631
+   },
+   {
+      "width" : 722,
+      "codepoint" : 75
+   },
+   {
+      "width" : 686,
+      "codepoint" : 76
+   },
+   {
+      "width" : 889,
+      "codepoint" : 77
+   },
+   {
+      "width" : 722,
+      "codepoint" : 78
+   },
+   {
+      "codepoint" : 79,
+      "width" : 722
+   },
+   {
+      "codepoint" : 80,
+      "width" : 768
+   },
+   {
+      "width" : 741,
+      "codepoint" : 81
+   },
+   {
+      "codepoint" : 82,
+      "width" : 556
+   },
+   {
+      "codepoint" : 83,
+      "width" : 592
+   },
+   {
+      "codepoint" : 84,
+      "width" : 611
+   },
+   {
+      "width" : 690,
+      "codepoint" : 85
+   },
+   {
+      "codepoint" : 86,
+      "width" : 439
+   },
+   {
+      "codepoint" : 87,
+      "width" : 768
+   },
+   {
+      "codepoint" : 88,
+      "width" : 645
+   },
+   {
+      "codepoint" : 89,
+      "width" : 795
+   },
+   {
+      "width" : 611,
+      "codepoint" : 90
+   },
+   {
+      "width" : 333,
+      "codepoint" : 91
+   },
+   {
+      "codepoint" : 92,
+      "width" : 863
+   },
+   {
+      "codepoint" : 93,
+      "width" : 333
+   },
+   {
+      "width" : 658,
+      "codepoint" : 94
+   },
+   {
+      "codepoint" : 95,
+      "width" : 500
+   },
+   {
+      "codepoint" : 96,
+      "width" : 500
+   },
+   {
+      "codepoint" : 97,
+      "width" : 631
+   },
+   {
+      "codepoint" : 98,
+      "width" : 549
+   },
+   {
+      "width" : 549,
+      "codepoint" : 99
+   },
+   {
+      "codepoint" : 100,
+      "width" : 494
+   },
+   {
+      "width" : 439,
+      "codepoint" : 101
+   },
+   {
+      "width" : 521,
+      "codepoint" : 102
+   },
+   {
+      "codepoint" : 103,
+      "width" : 411
+   },
+   {
+      "codepoint" : 104,
+      "width" : 603
+   },
+   {
+      "codepoint" : 105,
+      "width" : 329
+   },
+   {
+      "width" : 603,
+      "codepoint" : 106
+   },
+   {
+      "width" : 549,
+      "codepoint" : 107
+   },
+   {
+      "codepoint" : 108,
+      "width" : 549
+   },
+   {
+      "codepoint" : 109,
+      "width" : 576
+   },
+   {
+      "codepoint" : 110,
+      "width" : 521
+   },
+   {
+      "codepoint" : 111,
+      "width" : 549
+   },
+   {
+      "width" : 549,
+      "codepoint" : 112
+   },
+   {
+      "codepoint" : 113,
+      "width" : 521
+   },
+   {
+      "codepoint" : 114,
+      "width" : 549
+   },
+   {
+      "width" : 603,
+      "codepoint" : 115
+   },
+   {
+      "codepoint" : 116,
+      "width" : 439
+   },
+   {
+      "width" : 576,
+      "codepoint" : 117
+   },
+   {
+      "codepoint" : 118,
+      "width" : 713
+   },
+   {
+      "width" : 686,
+      "codepoint" : 119
+   },
+   {
+      "width" : 493,
+      "codepoint" : 120
+   },
+   {
+      "width" : 686,
+      "codepoint" : 121
+   },
+   {
+      "width" : 494,
+      "codepoint" : 122
+   },
+   {
+      "codepoint" : 123,
+      "width" : 480
+   },
+   {
+      "width" : 200,
+      "codepoint" : 124
+   },
+   {
+      "width" : 480,
+      "codepoint" : 125
+   },
+   {
+      "codepoint" : 126,
+      "width" : 549
+   },
+   {
+      "width" : 250,
+      "codepoint" : 127
+   },
+   {
+      "width" : 250,
+      "codepoint" : 128
+   },
+   {
+      "codepoint" : 129,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 130
+   },
+   {
+      "codepoint" : 131,
+      "width" : 250
+   },
+   {
+      "codepoint" : 132,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 133
+   },
+   {
+      "codepoint" : 134,
+      "width" : 250
+   },
+   {
+      "codepoint" : 135,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 136
+   },
+   {
+      "codepoint" : 137,
+      "width" : 250
+   },
+   {
+      "codepoint" : 138,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 139
+   },
+   {
+      "width" : 250,
+      "codepoint" : 140
+   },
+   {
+      "codepoint" : 141,
+      "width" : 250
+   },
+   {
+      "codepoint" : 142,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 143
+   },
+   {
+      "width" : 250,
+      "codepoint" : 144
+   },
+   {
+      "width" : 250,
+      "codepoint" : 145
+   },
+   {
+      "codepoint" : 146,
+      "width" : 250
+   },
+   {
+      "codepoint" : 147,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 148
+   },
+   {
+      "codepoint" : 149,
+      "width" : 250
+   },
+   {
+      "codepoint" : 150,
+      "width" : 250
+   },
+   {
+      "codepoint" : 151,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 152
+   },
+   {
+      "codepoint" : 153,
+      "width" : 250
+   },
+   {
+      "codepoint" : 154,
+      "width" : 250
+   },
+   {
+      "codepoint" : 155,
+      "width" : 250
+   },
+   {
+      "width" : 250,
+      "codepoint" : 156
+   },
+   {
+      "width" : 250,
+      "codepoint" : 157
+   },
+   {
+      "codepoint" : 158,
+      "width" : 250
+   },
+   {
+      "codepoint" : 159,
+      "width" : 250
+   },
+   {
+      "codepoint" : 160,
+      "width" : 250
+   },
+   {
+      "width" : 620,
+      "codepoint" : 161
+   },
+   {
+      "width" : 247,
+      "codepoint" : 162
+   },
+   {
+      "codepoint" : 163,
+      "width" : 549
+   },
+   {
+      "width" : 167,
+      "codepoint" : 164
+   },
+   {
+      "codepoint" : 165,
+      "width" : 713
+   },
+   {
+      "width" : 500,
+      "codepoint" : 166
+   },
+   {
+      "width" : 753,
+      "codepoint" : 167
+   },
+   {
+      "width" : 753,
+      "codepoint" : 168
+   },
+   {
+      "codepoint" : 169,
+      "width" : 753
+   },
+   {
+      "codepoint" : 170,
+      "width" : 753
+   },
+   {
+      "width" : 1042,
+      "codepoint" : 171
+   },
+   {
+      "width" : 987,
+      "codepoint" : 172
+   },
+   {
+      "width" : 603,
+      "codepoint" : 173
+   },
+   {
+      "width" : 987,
+      "codepoint" : 174
+   },
+   {
+      "width" : 603,
+      "codepoint" : 175
+   },
+   {
+      "width" : 400,
+      "codepoint" : 176
+   },
+   {
+      "codepoint" : 177,
+      "width" : 549
+   },
+   {
+      "codepoint" : 178,
+      "width" : 411
+   },
+   {
+      "codepoint" : 179,
+      "width" : 549
+   },
+   {
+      "codepoint" : 180,
+      "width" : 549
+   },
+   {
+      "codepoint" : 181,
+      "width" : 713
+   },
+   {
+      "codepoint" : 182,
+      "width" : 494
+   },
+   {
+      "codepoint" : 183,
+      "width" : 460
+   },
+   {
+      "codepoint" : 184,
+      "width" : 549
+   },
+   {
+      "width" : 549,
+      "codepoint" : 185
+   },
+   {
+      "width" : 549,
+      "codepoint" : 186
+   },
+   {
+      "codepoint" : 187,
+      "width" : 549
+   },
+   {
+      "codepoint" : 188,
+      "width" : 1000
+   },
+   {
+      "width" : 603,
+      "codepoint" : 189
+   },
+   {
+      "codepoint" : 190,
+      "width" : 1000
+   },
+   {
+      "codepoint" : 191,
+      "width" : 658
+   },
+   {
+      "codepoint" : 192,
+      "width" : 823
+   },
+   {
+      "width" : 686,
+      "codepoint" : 193
+   },
+   {
+      "codepoint" : 194,
+      "width" : 795
+   },
+   {
+      "width" : 987,
+      "codepoint" : 195
+   },
+   {
+      "width" : 768,
+      "codepoint" : 196
+   },
+   {
+      "codepoint" : 197,
+      "width" : 768
+   },
+   {
+      "width" : 823,
+      "codepoint" : 198
+   },
+   {
+      "codepoint" : 199,
+      "width" : 768
+   },
+   {
+      "codepoint" : 200,
+      "width" : 768
+   },
+   {
+      "codepoint" : 201,
+      "width" : 713
+   },
+   {
+      "codepoint" : 202,
+      "width" : 713
+   },
+   {
+      "codepoint" : 203,
+      "width" : 713
+   },
+   {
+      "codepoint" : 204,
+      "width" : 713
+   },
+   {
+      "codepoint" : 205,
+      "width" : 713
+   },
+   {
+      "codepoint" : 206,
+      "width" : 713
+   },
+   {
+      "codepoint" : 207,
+      "width" : 713
+   },
+   {
+      "width" : 768,
+      "codepoint" : 208
+   },
+   {
+      "width" : 713,
+      "codepoint" : 209
+   },
+   {
+      "width" : 790,
+      "codepoint" : 210
+   },
+   {
+      "width" : 790,
+      "codepoint" : 211
+   },
+   {
+      "width" : 890,
+      "codepoint" : 212
+   },
+   {
+      "codepoint" : 213,
+      "width" : 823
+   },
+   {
+      "width" : 549,
+      "codepoint" : 214
+   },
+   {
+      "codepoint" : 215,
+      "width" : 250
+   },
+   {
+      "codepoint" : 216,
+      "width" : 713
+   },
+   {
+      "width" : 603,
+      "codepoint" : 217
+   },
+   {
+      "codepoint" : 218,
+      "width" : 603
+   },
+   {
+      "width" : 1042,
+      "codepoint" : 219
+   },
+   {
+      "codepoint" : 220,
+      "width" : 987
+   },
+   {
+      "width" : 603,
+      "codepoint" : 221
+   },
+   {
+      "width" : 987,
+      "codepoint" : 222
+   },
+   {
+      "codepoint" : 223,
+      "width" : 603
+   },
+   {
+      "codepoint" : 224,
+      "width" : 494
+   },
+   {
+      "width" : 329,
+      "codepoint" : 225
+   },
+   {
+      "width" : 790,
+      "codepoint" : 226
+   },
+   {
+      "codepoint" : 227,
+      "width" : 790
+   },
+   {
+      "codepoint" : 228,
+      "width" : 786
+   },
+   {
+      "codepoint" : 229,
+      "width" : 713
+   },
+   {
+      "width" : 384,
+      "codepoint" : 230
+   },
+   {
+      "width" : 384,
+      "codepoint" : 231
+   },
+   {
+      "width" : 384,
+      "codepoint" : 232
+   },
+   {
+      "width" : 384,
+      "codepoint" : 233
+   },
+   {
+      "codepoint" : 234,
+      "width" : 384
+   },
+   {
+      "width" : 384,
+      "codepoint" : 235
+   },
+   {
+      "codepoint" : 236,
+      "width" : 494
+   },
+   {
+      "codepoint" : 237,
+      "width" : 494
+   },
+   {
+      "width" : 494,
+      "codepoint" : 238
+   },
+   {
+      "width" : 494,
+      "codepoint" : 239
+   },
+   {
+      "width" : 250,
+      "codepoint" : 240
+   },
+   {
+      "width" : 329,
+      "codepoint" : 241
+   },
+   {
+      "codepoint" : 242,
+      "width" : 274
+   },
+   {
+      "width" : 686,
+      "codepoint" : 243
+   },
+   {
+      "width" : 686,
+      "codepoint" : 244
+   },
+   {
+      "codepoint" : 245,
+      "width" : 686
+   },
+   {
+      "codepoint" : 246,
+      "width" : 384
+   },
+   {
+      "width" : 384,
+      "codepoint" : 247
+   },
+   {
+      "codepoint" : 248,
+      "width" : 384
+   },
+   {
+      "width" : 384,
+      "codepoint" : 249
+   },
+   {
+      "codepoint" : 250,
+      "width" : 384
+   },
+   {
+      "width" : 384,
+      "codepoint" : 251
+   },
+   {
+      "width" : 494,
+      "codepoint" : 252
+   },
+   {
+      "width" : 494,
+      "codepoint" : 253
+   },
+   {
+      "width" : 494,
+      "codepoint" : 254
+   },
+   {
+      "codepoint" : 255,
+      "width" : 250
+   }
+]

@@ -1,0 +1,6 @@
+Revision history for POE component Player::Mpg123 .
+
+0.01  Tue Sep 10 02:14:49 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n POE-Component-Player-Mpg123
+

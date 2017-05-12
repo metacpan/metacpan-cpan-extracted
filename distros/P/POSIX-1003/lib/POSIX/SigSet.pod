@@ -1,0 +1,88 @@
+=encoding utf8
+
+=head1 NAME
+
+POSIX::SigSet - collect signal flags
+
+=head1 SYNOPSIS
+
+  use POSIX::SigSet ();
+  use POSIX::1003::Signals;
+
+  $sigset = POSIX::SigSet->new;
+  $sigset = POSIX::SigSet->new(SIGUSR1);
+  $sigset->addset(SIGUSR2);
+  $sigset->delset(SIGUSR2);
+  $sigset->emptyset();
+  $sigset->fillset();
+  if( $sigset->ismember(SIGUSR1) ) { ... }
+
+=head1 DESCRIPTION
+
+The C<POSIX::SigSet> object is simple a collection of signal flags. The
+object is administered in POSIX.xs.  See L<POSIX::SigAction|POSIX::SigAction> for
+examples of its usage.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item POSIX::SigSet-E<gt>B<new>([SIGNALS])
+
+Create a new SigSet object. One or more SIGNALS can be added immediately.
+The object will be destroyed automatically when it is no longer needed.
+
+=back
+
+=head2 Other
+
+=over 4
+
+=item $obj-E<gt>B<addset>(SIGNAL)
+
+Add one signal to a SigSet object. Returns C<undef> on failure.
+
+=item $obj-E<gt>B<delset>(SIGNAL)
+
+Remove one signal from the SigSet object.
+Returns C<undef> on failure.
+
+=item $obj-E<gt>B<emptyset>()
+
+Initialize the SigSet object to be empty.  Returns C<undef> on failure.
+
+=item $obj-E<gt>B<fillset>()
+
+Initialize the SigSet object to include all signals.  Returns C<undef>
+on failure.
+
+=item $obj-E<gt>B<ismember>()
+
+Tests the SigSet object to see if it contains a specific signal.
+
+example: 
+
+  if($sigset->ismember(SIGUSR1)) {
+      print "contains SIGUSR1\n";
+  }
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of POSIX-1003 distribution version 0.98,
+built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights 2011-2013 on the perl code and the related documentation
+ by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

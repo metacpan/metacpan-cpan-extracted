@@ -1,0 +1,112 @@
+#!/usr/bin/perl -w
+# Copyright (C) 2000-2002, Free Software Foundation FSF.
+#
+
+use lib '../..';
+use strict;
+
+# This is doing the job: invoke Portable Presenter.
+use PPresenter;
+
+# Now, initialize a show.  The configuration options can be found in
+# module PPresenter.pm.
+
+my $show = PPresenter->new
+    ( -name       => 'my first show'    # Displayed on title-bar iff shown.
+#   , -trace      => '/dev/tty'         # Defaults to /dev/null ;)
+    , -controlDisplay => $ENV{DISPLAY}  # Creates seperate control with
+                                        # defaults.  Named 'control'
+    );
+
+$show->select(fontset => 'scaling');
+
+$show->addViewport                      # Own viewport added, hence no default
+    ( -geometry   => '800x800'          # created.
+    , -name       => 'primary'
+    , -aliases    => [ 'one' ]          # easier.
+#   , -device     => 'lcd'              # default
+    );
+
+$show->addViewport
+    ( -geometry   => '500x400'
+    , -name       => 'secondary'
+    , -aliases    => [ 'two' ]          # easier.
+    , -device     => 'beamer'
+    );
+
+$show->addSlide
+    ( -title      => 'all in one'
+    , -template   => 'tm'
+    , -main       => <<MAIN
+When you do not specify any screen, then the content of the
+slide will be displayed on all windows which do not show
+slide-notes.
+MAIN
+    , -notes      => <<NOTES
+Slide-Notes are displayed in a viewport which has the <TT>-showSlideNotes</TT> flag set to <TT>1</TT>.
+
+This is default for the <TT>control</TT> window.
+NOTES
+    );
+
+$show->addSlide
+    ( -title      => 'different'
+    , -tags       => 'nesting'
+    , -notes      => <<NOTES
+Define the nested option-lists after the general options.
+NOTES
+    , { -viewport => 'two'
+      , -template => 'tm'
+      , -main     => <<MAIN
+This is text for the first viewport, which may
+include things like text <A SHOW="after 3 from s">moving in</A>
+or phases: (press space to activate)
+<UL>
+<LI SHOW="phase 1">item on phase 1
+<LI SHOW="phase 2">item on phase 2
+</UL>
+MAIN
+      }
+    , { -viewport => 'one'
+      , -template => 'tlr'
+      , -left     => <<LEFT
+This screen is different.  It also has things
+<A SHOW="after 3 to n">moving</A>, and phases.
+Press &lt;space&gt;
+<UL>
+<LI SHOW="phase 3">item on phase 3.
+<LI SHOW="phase 2">item on phase 2.
+</UL>
+LEFT
+      , -right    => <<RIGHT
+<UL>
+<LI>this viewport has a different template.
+<LI>multi-screen presentations is something
+    for experienced users.
+</UL>
+RIGHT
+      }
+    );
+
+$show->addSlide
+    ( -title      => 'devices'
+    , { -viewport => 'one', -main => <<MAIN}
+Viewport one has the defaults for a
+<LARGE COLOR=green>lcd</LARGE>-projector device.
+MAIN
+    , { -viewport => 'two', -main => <<MAIN}
+Viewport two has the defaults for a
+<LARGE COLOR=green>beamer</LARGE> device.
+MAIN
+    );
+      
+$show->addSlide
+    ( -title      => 'change only one'
+    , -viewport   => 'one'
+    , -template   => 'tm'
+    , -main       => 'only this screen changes, while the other
+stays the same.  This may be a problem when moving back!'
+    );
+
+$show->run;
+

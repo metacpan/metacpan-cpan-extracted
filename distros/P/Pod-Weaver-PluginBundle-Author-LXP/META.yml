@@ -1,0 +1,35 @@
+---
+abstract: 'configure Pod::Weaver like LXP'
+author:
+  - 'Alex Peters <lxp@cpan.org>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Weaver-PluginBundle-Author-LXP
+no_index:
+  directory:
+    - t
+provides:
+  Pod::Weaver::PluginBundle::Author::LXP:
+    file: lib/Pod/Weaver/PluginBundle/Author/LXP.pm
+    version: v1.0.0
+requires:
+  Pod::Elemental::Transformer::List: 0.101610
+  Pod::Weaver: 3.101634
+  Pod::Weaver::Plugin::StopWords: 1.003
+  Pod::Weaver::Section::SeeAlso: 1.001
+  Pod::Weaver::Section::Support: 1.001
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-PluginBundle-Author-LXP
+  homepage: https://metacpan.org/release/Pod-Weaver-PluginBundle-Author-LXP
+  repository: git://github.com/lx/perl5-Pod-Weaver-PluginBundle-Author-LXP
+version: 1.0.0

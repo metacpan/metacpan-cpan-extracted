@@ -1,0 +1,10 @@
+%%
+S:   
+      ('a' S ) 'b'  { shift; [ @_ ] }
+    | 'c'   
+;
+%%
+
+# eyapp -TC Parenthesis.eyp
+# ./Parenthesis.pm -t -c 'acb'
+

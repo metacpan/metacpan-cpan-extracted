@@ -1,0 +1,14 @@
+Revision history for Parse-Hosts
+
+0.002   2016-10-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention App::ParseHosts and parse-hosts.
+
+	- Tweak Rinci metadata.
+
+
+0.001   2016-10-17 (PERLANCAR) (unreleased)
+
+        - First release.

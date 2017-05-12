@@ -1,0 +1,437 @@
+Memory status: size: 90136576 vsize: 90136576 resident: 33230848 share:
+20516864 rss: 33230848 rss_rlim: 4294967295
+CPU usage: start_time: 1213743310 rtime: 116 utime: 102 stime: 14 cutime:0
+cstime: 0 timeout: 0 it_real_value: 0 frequency: 100
+
+Backtrace was generated from '/usr/bin/ekiga'
+
+(no debugging symbols found)
+Using host libthread_db library "/lib/i686/cmov/libthread_db.so.1".
+(no debugging symbols found)
+[Thread debugging using libthread_db enabled]
+[New Thread 0xb579e740 (LWP 4155)]
+[New Thread 0xb3178b90 (LWP 4249)]
+[New Thread 0xb333ab90 (LWP 4247)]
+[New Thread 0xb337bb90 (LWP 4246)]
+[New Thread 0xb33bcb90 (LWP 4245)]
+[New Thread 0xb33fdb90 (LWP 4244)]
+[New Thread 0xb4596b90 (LWP 4180)]
+[New Thread 0xb3bfeb90 (LWP 4170)]
+[New Thread 0xb5513b90 (LWP 4161)]
+[New Thread 0xb5554b90 (LWP 4160)]
+(no debugging symbols found)
+0xffffe410 in __kernel_vsyscall ()
+#0  0xffffe410 in __kernel_vsyscall ()
+#1  0xb6359ae7 in poll () from /lib/i686/cmov/libc.so.6
+#2  0xb73e0bef in ?? () from /usr/lib/libglib-2.0.so.0
+#3  0x087aa8e8 in ?? ()
+#4  0x00000008 in ?? ()
+#5  0x000005d5 in ?? ()
+#6  0x087aa8e8 in ?? ()
+#7  0x00000008 in ?? ()
+#8  0xb74555f8 in ?? () from /usr/lib/libglib-2.0.so.0
+#9  0xb7455620 in ?? () from /usr/lib/libglib-2.0.so.0
+#10 0xbf9e8024 in ?? ()
+#11 0x00000001 in ?? ()
+#12 0x00000001 in ?? ()
+#13 0x08132b80 in ?? ()
+#14 0x087aa8e8 in ?? ()
+#15 0xb6359a70 in ?? () from /lib/i686/cmov/libc.so.6
+#16 0xb6502df0 in ?? () from /lib/i686/cmov/libpthread.so.0
+#17 0xb6501520 in ?? () from /lib/i686/cmov/libpthread.so.0
+#18 0xb7404f92 in g_thread_self () from /usr/lib/libglib-2.0.so.0
+#19 0xb73e0f57 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+#20 0xb7b43d04 in gtk_main () from /usr/lib/libgtk-x11-2.0.so.0
+#21 0x0808e381 in ?? ()
+#22 0x085f2238 in ?? ()
+#23 0x00000000 in ?? ()
+
+Thread 10 (Thread 0xb5554b90 (LWP 4160)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb6503dd2 in pthread_cond_timedwait@@GLIBC_2.3.2 ()
+   from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb7205d0f in PSyncPoint::Wait () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#3  0xb683b41d in OpalManager::GarbageMain () from /usr/lib/libopal.so.2.2
+No symbol table info available.
+#4  0xb68411e5 in OpalManager::GarbageMain_PNotifier::Call ()
+   from /usr/lib/libopal.so.2.2
+No symbol table info available.
+#5  0xb721dd3f in PSimpleThread::Main () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#6  0xb7205603 in PThread::PX_ThreadStart () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#7  0xb64ff4fb in start_thread () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#8  0xb6363d7e in clone () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 9 (Thread 0xb5513b90 (LWP 4161)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb635c761 in select () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#2  0xb7204fa0 in PHouseKeepingThread::Main () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#3  0xb7205603 in PThread::PX_ThreadStart () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#4  0xb64ff4fb in start_thread () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#5  0xb6363d7e in clone () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 8 (Thread 0xb3bfeb90 (LWP 4170)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb6359ae7 in poll () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#2  0xb73e0bef in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#3  0x0849c2c0 in ?? ()
+No symbol table info available.
+#4  0x00000001 in ?? ()
+No symbol table info available.
+#5  0xffffffff in ?? ()
+No symbol table info available.
+#6  0x0849c2c0 in ?? ()
+No symbol table info available.
+#7  0x00000001 in ?? ()
+No symbol table info available.
+#8  0xb74555f8 in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#9  0xb7455620 in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#10 0xb3bfe2a4 in ?? ()
+No symbol table info available.
+#11 0x00000001 in ?? ()
+No symbol table info available.
+#12 0x00000001 in ?? ()
+No symbol table info available.
+#13 0x0849c110 in ?? ()
+No symbol table info available.
+#14 0x0849c2c0 in ?? ()
+No symbol table info available.
+#15 0xb6359a70 in ?? () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#16 0xb6502df0 in ?? () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#17 0xb6501520 in ?? () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#18 0xb7404f92 in g_thread_self () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#19 0xb73e0f57 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#20 0xb772c652 in ?? () from /usr/lib/libebook-1.2.so.9
+No symbol table info available.
+#21 0x0849c2b0 in ?? ()
+No symbol table info available.
+#22 0x00000000 in ?? ()
+No symbol table info available.
+
+Thread 7 (Thread 0xb4596b90 (LWP 4180)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb6359ae7 in poll () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#2  0xb73e0bef in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#3  0x0847e968 in ?? ()
+No symbol table info available.
+#4  0x00000009 in ?? ()
+No symbol table info available.
+#5  0xffffffff in ?? ()
+No symbol table info available.
+#6  0x0847e968 in ?? ()
+No symbol table info available.
+#7  0x0000000a in ?? ()
+No symbol table info available.
+#8  0xb74555f8 in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#9  0xb7455620 in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#10 0xb45962b4 in ?? ()
+No symbol table info available.
+#11 0x00000001 in ?? ()
+No symbol table info available.
+#12 0x00000001 in ?? ()
+No symbol table info available.
+#13 0x0849cf28 in ?? ()
+No symbol table info available.
+#14 0x0847e968 in ?? ()
+No symbol table info available.
+#15 0xb6359a70 in ?? () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#16 0xb6502df0 in ?? () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#17 0xb6501520 in ?? () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#18 0xb7404f92 in g_thread_self () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#19 0xb73e0f57 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#20 0xb74f8b50 in ?? () from /usr/lib/libORBit-2.so.0
+No symbol table info available.
+#21 0x0849cdf8 in ?? ()
+No symbol table info available.
+#22 0xb7455248 in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#23 0xb4596338 in ?? ()
+No symbol table info available.
+#24 0xb74054ff in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#25 0x00000000 in ?? ()
+No symbol table info available.
+
+Thread 6 (Thread 0xb33fdb90 (LWP 4244)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb65078eb in waitpid () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb74138a4 in g_spawn_sync () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#3  0xb7413bbc in g_spawn_command_line_sync () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#4  0xb7f55198 in ?? () from /usr/lib/gtk-2.0/modules/libgnomebreakpad.so
+No symbol table info available.
+#5  <signal handler called>
+No symbol table info available.
+#6  0xd0000000 in ?? ()
+No symbol table info available.
+#7  0xb70db523 in ?? () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#8  0xb70d9cff in tinyjpeg_decode () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#9  0xb70caedf in PStandardColourConverter::MJPEGtoYUV420PSameSize ()
+   from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#10 0xb70cb13d in PStandardColourConverter::MJPEGtoYUV420P ()
+   from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#11 0xb70cb252 in P_MJPEG_YUV420P::Convert () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#12 0xb70c8f6c in P_MJPEG_YUV420P::Convert () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#13 0xb55f6cbd in PVideoInputDevice_V4L2::GetFrameDataNoDelay ()
+   from /usr/lib/pwlib/1.11.2/device/videoinput/v4l2_pwplugin.so
+No symbol table info available.
+#14 0xb55f6ef8 in PVideoInputDevice_V4L2::GetFrameData ()
+   from /usr/lib/pwlib/1.11.2/device/videoinput/v4l2_pwplugin.so
+No symbol table info available.
+#15 0xb70bf7fd in PVideoInputDevice::GetFrame () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#16 0x0809d7a3 in ?? ()
+No symbol table info available.
+#17 0x085f72a0 in ?? ()
+No symbol table info available.
+#18 0xb33fd2bc in ?? ()
+No symbol table info available.
+#19 0x00000000 in ?? ()
+No symbol table info available.
+
+Thread 5 (Thread 0xb33bcb90 (LWP 4245)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb635c761 in select () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#2  0xb7204a60 in PThread::PXBlockOnIO () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#3  0xb71f7f11 in PChannel::PXSetIOBlock () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#4  0xb71f1cc3 in PSocket::os_accept () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#5  0xb7212903 in PTCPSocket::Accept () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#6  0xb6874f47 in OpalListenerTCP::Accept () from /usr/lib/libopal.so.2.2
+No symbol table info available.
+#7  0xb6871602 in OpalListener::ListenForConnections ()
+   from /usr/lib/libopal.so.2.2
+No symbol table info available.
+#8  0xb6878aa2 in OpalListener::ListenForConnections_PNotifier::Call ()
+   from /usr/lib/libopal.so.2.2
+No symbol table info available.
+#9  0xb721dd3f in PSimpleThread::Main () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#10 0xb7205603 in PThread::PX_ThreadStart () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#11 0xb64ff4fb in start_thread () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#12 0xb6363d7e in clone () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 4 (Thread 0xb337bb90 (LWP 4246)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb635c761 in select () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#2  0xb71f1a98 in PSocket::Select () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#3  0xb72158f5 in PSocket::Select () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#4  0xb68779cf in OpalListenerUDP::Accept () from /usr/lib/libopal.so.2.2
+No symbol table info available.
+#5  0xb6871602 in OpalListener::ListenForConnections ()
+   from /usr/lib/libopal.so.2.2
+No symbol table info available.
+#6  0xb6878aa2 in OpalListener::ListenForConnections_PNotifier::Call ()
+   from /usr/lib/libopal.so.2.2
+No symbol table info available.
+#7  0xb721dd3f in PSimpleThread::Main () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#8  0xb7205603 in PThread::PX_ThreadStart () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#9  0xb64ff4fb in start_thread () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#10 0xb6363d7e in clone () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 3 (Thread 0xb333ab90 (LWP 4247)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb6503aa5 in pthread_cond_wait@@GLIBC_2.3.2 ()
+   from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb7205e43 in PSyncPoint::Wait () from /usr/lib/libpt.so.1.10.10
+No symbol table info available.
+#3  0x080b656c in ?? ()
+No symbol table info available.
+#4  0x085b2fb0 in ?? ()
+No symbol table info available.
+#5  0x085b3090 in ?? ()
+No symbol table info available.
+#6  0x00000001 in ?? ()
+No symbol table info available.
+#7  0x00000002 in ?? ()
+No symbol table info available.
+#8  0xb333a218 in ?? ()
+No symbol table info available.
+#9  0x08149530 in ?? ()
+No symbol table info available.
+#10 0x085b2fb0 in ?? ()
+No symbol table info available.
+#11 0xb64c6e67 in operator new () from /usr/lib/libstdc++.so.6
+No symbol table info available.
+#12 0x080a509b in ?? ()
+No symbol table info available.
+#13 0x085b2f08 in ?? ()
+No symbol table info available.
+#14 0x00000000 in ?? ()
+No symbol table info available.
+
+Thread 2 (Thread 0xb3178b90 (LWP 4249)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb635417b in read () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#2  0xb62f395d in _IO_file_underflow () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#3  0xb62f40cb in _IO_default_uflow () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#4  0xb62f5494 in __uflow () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#5  0xb62e8b66 in _IO_getline_info () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#6  0xb62e8ab1 in _IO_getline () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#7  0xb62e7a2a in fgets () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#8  0xb4507dd7 in ?? () from /lib/libnss_mdns4.so.2
+No symbol table info available.
+#9  0xb3176ef8 in ?? ()
+No symbol table info available.
+#10 0x00000100 in ?? ()
+No symbol table info available.
+#11 0x08797c30 in ?? ()
+No symbol table info available.
+#12 0x00000100 in ?? ()
+No symbol table info available.
+#13 0x087a33f0 in ?? ()
+No symbol table info available.
+#14 0x00000000 in ?? ()
+No symbol table info available.
+
+Thread 1 (Thread 0xb579e740 (LWP 4155)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb6359ae7 in poll () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#2  0xb73e0bef in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#3  0x087aa8e8 in ?? ()
+No symbol table info available.
+#4  0x00000008 in ?? ()
+No symbol table info available.
+#5  0x000005d5 in ?? ()
+No symbol table info available.
+#6  0x087aa8e8 in ?? ()
+No symbol table info available.
+#7  0x00000008 in ?? ()
+No symbol table info available.
+#8  0xb74555f8 in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#9  0xb7455620 in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#10 0xbf9e8024 in ?? ()
+No symbol table info available.
+#11 0x00000001 in ?? ()
+No symbol table info available.
+#12 0x00000001 in ?? ()
+No symbol table info available.
+#13 0x08132b80 in ?? ()
+No symbol table info available.
+#14 0x087aa8e8 in ?? ()
+No symbol table info available.
+#15 0xb6359a70 in ?? () from /lib/i686/cmov/libc.so.6
+No symbol table info available.
+#16 0xb6502df0 in ?? () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#17 0xb6501520 in ?? () from /lib/i686/cmov/libpthread.so.0
+No symbol table info available.
+#18 0xb7404f92 in g_thread_self () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#19 0xb73e0f57 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#20 0xb7b43d04 in gtk_main () from /usr/lib/libgtk-x11-2.0.so.0
+No symbol table info available.
+#21 0x0808e381 in ?? ()
+No symbol table info available.
+#22 0x085f2238 in ?? ()
+No symbol table info available.
+#23 0x00000000 in ?? ()
+No symbol table info available.
+#0  0xffffe410 in __kernel_vsyscall ()
+The program is running.  Quit anyway (and detach it)? (y or n) [answered Y;
+input not from terminal]
+
+
+----------- .xsession-errors (18 sec old) ---------------------
+(gnome-panel:3919): GConf-WARNING **: Directory
+`/apps/panel/toplevels/top_panel_screen1/screen' was not being monitored by
+GConfClient 0x80e9158
+seahorse nautilus module initialized
+Starting gdesklets-daemon...
+Connecting to daemon [###          ]Connecting to daemon [ ###        
+]Connecting to daemon [  ###        ]Connecting to daemon [   ###      
+]Connecting to daemon [    ###      ]Connecting to 
+Connecting to daemon [ ###         ]Connecting to daemon [###         
+]Connecting to daemon [ ###         ]Connecting to daemon [  ###       
+]Connecting to daemon [   ###       ]Connecting to 
+Connecting to daemon [      ###    ]Connecting to daemon [     ###    
+]Connecting to daemon [    ###      ]Connecting to daemon [   ###      
+]Connecting to daemon [  ###        ]Connecting to 
+Connecting to daemon [      ###    ]compiz.real (snow) - Info: Loaded Texture
+snowflake.png
+compiz.real (snow) - Info: Loaded Texture
+/home/anh3l/Desktop/downloads/images/textures/test.png
+compiz.real (snow) - Info: Loaded Texture
+/home/anh3l/Desktop/downloads/images/textures/test2.png
+Connecting to daemon [     ###     ]Connecting to daemon [    ###     
+]Connecting to daemon [   ###       ]Connecting to daemon [  ###       
+]Connecting to daemon [ ###         ]Connecting to 
+(gnome-panel:3919): Gtk-WARNING **: gtk_widget_size_allocate(): attempt to
+allocate widget with width -15 and height 24
+                                        Connected to daemon in 7335
+milliseconds.
+** Message: <info>  You are now connected to the wireless network 'NAZGUL'.
+--------------------------------------------------

@@ -1,0 +1,23 @@
+---
+abstract: 'Middleware to apply Google Anlytics javascript code.'
+author:
+  - 'Plack-Middleware-GoogleAnalytics <logie@cpan.org>'
+build_requires:
+  HTTP::Request::Common: 0
+  Plack::Builder: 0
+  Plack::Test: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300008, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-GoogleAnalytics
+requires:
+  Moo: 0
+  Plack::Util: 0
+  Text::MicroTemplate: 0
+version: 0.001

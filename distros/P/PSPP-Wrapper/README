@@ -1,0 +1,51 @@
+PSPP::Wrapper - Wrapper for the pspp command-line interface
+
+PSPP is a program for statistical analysis of sampled data. 
+It is a Free replacement for the proprietary program SPSS, and appears very similar to it with a few exceptions.
+PSPP is particularly aimed at statisticians, social scientists and students requiring fast convenient analysis of sampled data.
+
+For more information, see http://www.gnu.org/software/pspp
+
+Please note, this module is just a simple wrapper around the pspp command-line infterface. 
+For a module that actually groks PSPP and hence allows you to read/write 
+PSPP and/or SPSS native files, see the PSPP module on CPAN.
+
+INSTALLATION
+
+To install this module, you first need to install PSPP and make sure it is in your path. 
+After you have done that, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc PSPP
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=PSPP
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/PSPP
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/PSPP
+
+    Search CPAN
+        http://search.cpan.org/dist/PSPP/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Patrick Donelan
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

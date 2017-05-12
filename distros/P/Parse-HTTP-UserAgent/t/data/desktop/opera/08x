@@ -1,0 +1,11 @@
+[AGENT]
+
+Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; ru) Opera 8.01
+
+parser      => 'opera_post',
+os          => 'Windows XP',
+extras      => ['Windows NT 5.1'],
+version_raw => '8.01',
+lang        => 'ru',
+version     => '8.010',
+name        => 'Opera',

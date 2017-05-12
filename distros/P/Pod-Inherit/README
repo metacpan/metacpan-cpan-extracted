@@ -1,0 +1,112 @@
+NAME
+    Pod::Inherit - auto-create pod sections listing inherited methods
+
+SYNOPSIS
+      use Pod::Inherit;
+
+      my $config = { 
+        out_dir => "/usr/src/perl/dbix-class/bast/DBIx-Class/0.08/trunk/doc",
+        input_files => ['/usr/src/perl/dbix-class/bast/DBIx-Class/0.08/trunk/lib/'],
+        skip_underscored => 1,
+        class_map => 
+          { 
+              "DBIx::Class::Relationship::HasMany" => "DBIx::Class::Relationship", 
+              "DBIx::Class::Relationship::HasOne" => "DBIx::Class::Relationship", 
+              "DBIx::Class::Relationship::BelongsTo" => "DBIx::Class::Relationship", 
+              "DBIx::Class::Relationship::ManyToMany" => "DBIx::Class::Relationship", 
+              "DBIx::Class::ResultSourceProxy" => "DBIx::Class::ResultSource",
+              "DBIx::Class::ResultSourceProxy::Table" => "DBIx::Class::ResultSource",
+          }
+       };
+
+      my $pi = Pod::Inherit->new( $config );
+      $pi->write_pod;
+
+DESCRIPTION
+    Ever written a module distribution with base classes and dependencies,
+    that had the pod for the various methods next to them, but hard to find
+    for the user of your modules? Ever wished POD could be inheritable? Now
+    it can.
+
+    This module will load each of the classes in the list of input files or
+    directories given (default: @ARGV), auto-discover which methods each
+    class provides, locate the actual class the method is defined in, and
+    produce a list in pod.
+
+    The resulting documentation is written out to a separate .pod file for
+    each class (.pm) encountered. The new file contains the original POD
+    from the Perl Module file, plus a section called "INHERITED METHODS".
+    The new section lists each class that the current class inherits from,
+    plus each method that can be used in the current class as a result.
+
+    By default, methods beginning with an underscore, "_" are skipped, as by
+    convention these are private methods.
+
+  METHODS
+   new
+    Arguments: \%config
+    Return value: Pod::Inherit object
+
+    Create a new Pod::Inherit object.
+
+    The config hashref can contain the following keys:
+
+    skip_underscored
+        Default: true.
+
+        Do not display inherited methods that begin with an underscore. Set
+        to 0 to display these as well.
+
+    input_files
+        Default: @ARGV
+
+        Arrayref of directories to search for .pm files in, or a list of .pm
+        files or a mixture.
+
+    out_dir
+        Default: Same as input_files
+
+        A directory to output the results into. If not supplied, the .pod
+        file is created alongside the .pm file it came from.
+
+    class_map
+        Default: none
+
+        A hashref of key/value string pairs. The keys represent classes in
+        which inherited methods will be found, the values are the classes
+        which it should link to in the new pod for the actual pod of the
+        methods.
+
+        Some distributions will already have noticed the plight of the
+        users, and documented the methods of some of their base classes
+        further up the inheritance chain. This config option lets you tell
+        Pod::Inherit where you moved the pod to.
+
+   write_pod
+    Arguments: none
+    Return value: none
+
+    Run the pod creation stage.
+
+   create_pod
+    The semantics of the $docmap argument need to go something like this: -
+    Something being in the docmap means that it will be documented, even if
+    it starts with an underscore, or would otherwise be skipped. - If the
+    value is '1', then that's the only effect; it will be documented as
+    being where it is. - Otherwise, the value is the name of the module that
+    it should be documented as if it was in. - That module needs to show up,
+    even if it isnt really in the inheritence tree at all. - It should show
+    up after the real modules that actually exist.
+
+  Inline configuration
+    As well as passing explicit configuration options to "new", you can also
+    leave Pod::Inherit hints in your actual code. To define in a class that
+    all methods with a leading underscore should be included when listing
+    methods in that module, use the following snippet in your code:
+
+      our %_pod_inherit_config = ( skip_underscored => 0 );
+
+AUTHOR
+    James Mastros <james@mastros.biz>
+
+LICENSE

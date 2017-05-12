@@ -1,0 +1,6 @@
+name = "Plack-App-EventSource"
+# badges = ["travis"]
+authority="cpan:VTI"
+
+module_maker="ModuleBuildTiny"
+

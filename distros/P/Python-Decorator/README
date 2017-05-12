@@ -1,0 +1,32 @@
+Python::Decorator
+=================
+
+A proof-of-concept implementation of Python's decorators in Perl5.
+
+See perldoc Python::Decorator for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    PPI
+    Filter::Util::Call
+
+AUTHOR
+
+Erwan Lemonnier
+
+COPYRIGHT AND LICENCE
+
+See included LICENSE file
+
+

@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3eab69f9e6bd9de2759817f815635e5fd2226b58 Changes
+SHA1 7654f94a28d1b969efb6c0a4581d90146e35ee30 Generator.pm
+SHA1 7d9986bc37f4cfa2dc2bfb0ee5323b1a046e91ff LICENSE
+SHA1 b4704d215544b569c4c7978cc5ba00130494d30e MANIFEST
+SHA1 21bffb1c4928d684781972ef93154d969b91b09a META.yml
+SHA1 cb1edada212ffabb65f39bda476b7f7463e9be1d Makefile.PL
+SHA1 9b3c03146943d650fd2a1a17a74c06a754ce1241 README
+SHA1 13ca755551cbfc2a07488d0dc00e20e43f2f666f examples/ex1.pl
+SHA1 9b21bb95e5d3eb706cec509ffbe439b97f7a0b2c examples/ex2.pl
+SHA1 23b48ee433f48cb99f5e06a06ea531d7a5942cb5 examples/ex3.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 34c002753b5cea2c331358419941906d6ad9ad59 t/Person-ID-CZ-RC-Generator/01-use.t
+SHA1 7e6c84599502c75d9c99714af9364ef9f84c6592 t/Person-ID-CZ-RC-Generator/02-version.t
+SHA1 de2daf148bb304364febcd23d5df8df08d74d0d1 t/Person-ID-CZ-RC-Generator/04-new.t
+SHA1 2d763e01def8e5427f6a20a5fce9c5484a7de520 t/Person-ID-CZ-RC-Generator/05-rc.t
+SHA1 240f0d5cb64e9b53cd37e65a24a78778cd27bbe7 xt/Person-ID-CZ-RC-Generator/01-pod_coverage.t
+SHA1 82efecc33032f9d49c450c4d97c1dd7cfc188bbb xt/Person-ID-CZ-RC-Generator/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWCWMkAAoJEJe+XXKaIuTl6a0H/1Hr6DJI2AnoLreXHtbs8gKT
+seWfCGh2t1VtVXlEpNXZOb6iyZtMBgdJR0SBF/43i4PRJaQi6zB70zKjMPWaqMDq
+pV8jnV1yS1GRIWVfGkviMsTsXRn2dRmNeIXtwdF6m5WT2lY8FX1cEKzHZWbWnTPJ
+HvMbd32XlvlR1kcLotFaF1EJ2znAlnAsU/yIlLYH/DkTMS+ObOWlg6SdrMD0ySxo
+dB/C/B1gQjV9EHGxvYQgPJzxDK9jzodGHxdP/UFzbVN035dC7sliwE0y7si1UPz5
+3mo5kdvEiTQyPI12yF6spzwO1a1sn/MG0V2r15ph78FOjDbwG49zPqUHsBr1rNA=
+=krKn
+-----END PGP SIGNATURE-----

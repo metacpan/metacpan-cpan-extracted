@@ -1,0 +1,17 @@
+Revision history for Package-Data-Inheritable
+
+0.05    2007-10-03
+        Added support for constant scalars.
+
+0.03    2007-09-10
+        Avoid 'Perl lib version (x.y.z) doesn't match executable version' error
+        on systems with multiple perl installs, like CPAN testers.
+
+0.02    2007-09-06
+        Fixed perl executable path in tests.
+
+0.01    2007-08-23
+        First version.
+        Method interface and Exporter like interface working.
+        Interface not stable.
+

@@ -1,0 +1,32 @@
+2013-05-29  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.2.0 released
+
+	* Added option ALLOW_SHELL.
+
+2013-05-26  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.1.3 released
+
+	* Fixed few tests.
+
+2013-05-21  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.1.2 released
+
+	* Fixed details in the documentation and in the tests.
+
+2013-05-19  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.1.1 released
+
+	* Fixed is_finished().
+
+2013-05-18  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.1.0 released
+
+2012-06-11  Martin Senger  <martin.senger&#64;gmail.com>
+
+	* Version 0.1.0 started.
+

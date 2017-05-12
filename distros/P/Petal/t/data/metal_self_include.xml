@@ -1,0 +1,4 @@
+<test>
+  <test metal:define-macro="foo">Foo</test>
+  <glop metal:use-macro="#foo">Glop</glop> 
+</test>

@@ -1,0 +1,10 @@
+prefix=/usr
+exec_prefix=${prefix}
+includedir=${prefix}/include
+datadir=${prefix}/share
+
+api_version=1.0
+
+Name: PyGtkGLExt
+Description: Python Bindings for GtkGLExt
+Version: 1.1.0

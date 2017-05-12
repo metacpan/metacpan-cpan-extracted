@@ -1,0 +1,10 @@
+A graphical parser debugger. Requires Parse::YALALR to generate the LALR(1)
+parser and Perl/Tk to display the results.
+
+perl Makefile.PL
+make
+make test
+make install
+
+man Parse::Vipar for more info. Or before you install it, you can do
+perldoc -F lib/Parse/Vipar.pm

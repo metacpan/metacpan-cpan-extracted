@@ -1,0 +1,105 @@
+==================================================
+Changes from 2013-07-08 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.949 at 2014-07-08 18:08:22 +0000
+------------------------------------------
+
+  Change: 85e65e6e90de281c8212e152aa1a5681cfbedc54
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-08 14:05:32 +0000
+
+    Enable POE::Kernel::ASSERT_DEFAULT during test. 
+
+  Change: 4ca245d4725b829f95ee3176db92cd0a20e96e47
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-12-11 00:10:29 +0000
+
+    Avoid having two different HTTP version numbers in the response
+    status line.
+
+    Addresses a condition where response objects reported their status as
+    "HTTP/0.9 200 OK HTTP/1.1". 
+
+  Change: 03af0affe03b90d3277b5b0b5be702bd0a88ac1a
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-09-14 19:09:44 +0000
+
+    Style changes. 
+
+  Change: e4fb6f3b483e26d09492b3667a06fb6558fdb022
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-09-12 00:01:29 +0000
+
+    Consolidate connection closing code.
+
+    Makes connection shutdown a little more consistent. Also fixes a bug
+    where the wrong object ID was used to look up part of the connection
+    state. 
+
+  Change: d1a4eda2246275b887edf63a18d9fb9678a55017
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-09-11 23:59:36 +0000
+
+    Style change. Consolidate C<use constant> statements. 
+
+  Change: efe0ad26dfdea6e79a18c85ab31a70557d7693d7
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-09-08 01:30:46 +0000
+
+    Provide a dummy version number for development testing.
+
+    The default connection string is based on the component version,
+    which stopped being defined in-house since the move to Dist::Zilla.
+    Tests were noisy and ugly with moot "uninitialized value" warnings. 
+
+  Change: 2de81a5dd9989077cdf5748a779c22aacde0ac1d
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-09-08 01:28:08 +0000
+
+    On a shutdown, deallocate the proper keep-alive connection ID.
+
+    It was deallocating the PoCo::Client::HTTP request ID, which isn't
+    coupled to the PoCo::Client::Keepalive ID at all.
+
+    The problem wasn't apparent before because IDs were coincidentally in
+    synch. Recent changes finally desynchronized them. 
+
+  Change: f4e02b31ad4cc65d7444b02a982225ba57949570
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-09-07 23:29:20 +0000
+
+    Honor "Connection: close" response header by closing the connection.
+
+    Without closing the connection, POE::Component::Client::Keepalive
+    would put the connection back into its pool and detect closure when
+    the server later shut down the socket.
+
+    Nicolas Dehaine and Brad Sacks discovered this to be a problem when
+    they tried to make a lot of rapid connections to a single address.
+    The to-be-defunct connection didn't have enough time to shut down, so
+    it would be returned to POE::Component::Client::HTTP. The HTTP
+    transaction would then fail, and an error would be reported.
+
+    Their test case allowed me to repeat the problem and diagnose it.
+    Otherwise this would still be broken. Thanks, guys! 
+
+  Change: cca6b68f0df0cacb6b82c961f5456bd98a9978fa
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-09-07 23:28:56 +0000
+
+    Clean up some constant definitions. No change in functionality. 
+
+  Change: 525cd6d8e64790e5ad14b6b986106210e82564d4
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-07-15 23:56:30 +0000
+
+    Bypass proxies for tests that make localhost connections.
+
+    Localhost is relative, and it's often not what's expective when
+    proxying is turned on without an exception for it. 
+
+=================================================
+Plus 61 releases after 2013-07-08 00:00:00 +0000.
+=================================================

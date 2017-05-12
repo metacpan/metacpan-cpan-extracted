@@ -1,0 +1,8 @@
+[% IF userName %]
+[% userName %]
+ (<a href="[% preferencesUrl %]">preferences</a> |
+<a href="[% baseUrl %]?action=logout">logout</a>)
+[% ELSE %]
+<a href="[% baseUrl %]?action=login">Login</a>
+(<a href="[% preferencesUrl %]">create account</a>)
+[% END %]

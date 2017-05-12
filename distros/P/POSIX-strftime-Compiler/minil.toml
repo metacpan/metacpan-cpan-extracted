@@ -1,0 +1,2 @@
+name = "POSIX-strftime-Compiler"
+badges = ["travis"]

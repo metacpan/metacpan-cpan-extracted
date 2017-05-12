@@ -1,0 +1,13 @@
+0.04
+	- Now maintained by SARTAK
+	- Switch from ExtUtils::MakeMaker to Module::Install
+	- Fix error reporting for key collision
+
+0.03
+	- Add missing dep on Set::Object
+
+0.02
+	- Add Prompt::ReadKey::Sequence
+
+0.01
+	- Initial release

@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/PerlGSL/DiffEq.pm
+lib/PerlGSL/DiffEq.xs
+MANIFEST			This list of files
+README.pod
+src/common.c
+src/common.h
+src/container.c
+src/container.h
+src/ppport.h
+t/00-use.t
+t/ode_system.t
+t/odes_simple.t
+t/sine.t
+t/sine_bad.t
+t/sine_jacobian.t
+META.yml
+META.json

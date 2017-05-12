@@ -1,0 +1,69 @@
+%{
+=head1 SYNOPSIS
+
+This is a modification of the example in rrconflictnamefirst.eyp.
+That is an example of a non ambiguous grammar with a reduce-reduce conflict.
+The main difference here is the introduction of the syntactic variable 
+typeafter
+
+Compile it with:
+
+            eyapp -b '' rrconflictnamefirst_fix1.eyp
+
+run it with this options:
+
+            ./rrconflictnamefirst_fix1.pm -t -i -m 1 -c 'a,b:c d:e,'
+
+See also:
+
+=over 2
+
+=item * Files C<reducereduceconflict.eyp> and C<reducereduceconflict_fix2.eyp> 
+offer other solutions to the problem. 
+
+=item * Section "Reduce-Reduce Conflicts with Unambiguous Grammars" in Parse::Eyapp::debuggingtut
+
+=back
+
+=cut
+
+%}
+
+%lexer {
+      m{\G([ \t\n]*(\#.*)?\s*)}gc and $self->tokenline($1 =~ tr/\n//);
+
+      m{\G([0-9]+(?:\.[0-9]+)?)}gc   and return ('NUM', $1);
+      m{\G([A-Za-z][A-Za-z0-9_]*)}gc and return ('VAR', $1);
+      m{\G(.)}gc                     and return ($1,    $1);
+}
+
+%namingscheme { \&give_rhs_name }
+
+%tree
+
+%%
+def:    param_spec return_spec ','
+        ;
+param_spec:
+             type
+        |    name_list ':' type
+        ;
+return_spec:
+             typeafter
+        |    name ':' typeafter
+        ;
+name:        VAR
+        ;
+type:        VAR
+        ;
+typeafter:   VAR
+        ;
+name_list:
+             name
+        |    name ',' name_list
+        ;
+%%
+
+__PACKAGE__->main('Try input "a,b:c d:e," then press CTRL-D (Unix) or CTRL-Z (Windows) to finish: ') unless caller();
+
+

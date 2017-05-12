@@ -1,0 +1,55 @@
+Revision history for Perl extension PDFLib.
+
+0.14
+    - Fixed a problem with the bounding box code reporting the end of the
+      box too early.
+    - added support for underlining text via new sub
+    - fix bounding box wraparound font/color mixup bug
+    - add more scaling options to add_image
+
+0.12
+    - Fixed a nasty bug in bounding boxes whereby a circular reference
+      was created, causing wierd errors
+
+0.11
+    - Major bug in font handling fixed
+    - Changed all die()'s for croak().
+    - Allow bounding boxes starting at 0,0
+
+0.10
+    - Added all coordinate translation methods
+    
+0.09
+    - Default pagesize properly
+    - Even more bounding box fixes
+
+0.08
+    - More BB fixes
+
+0.07
+    - Fixed BoundingBox::print to return the characters it couldn't
+      fit into the box, useful for multi-column or multi-page
+      printouts. Updated test file as an example of this.
+
+0.06
+    - Added Bounding Box API
+
+0.05
+    - Better font defaults (size defaults to current size or 10.0)
+    - Allow set_font(handle => ...)
+    - Fixed make_spot_color
+
+0.04
+    - Added access to all graphics primitives
+    - Added string_width
+    - Revamped some of the documentation
+
+0.03
+    - Bug fixes
+
+0.02
+    - Added documentation
+
+0.01  Fri May  4 14:46:06 2001
+	- original version; created by h2xs 1.19
+

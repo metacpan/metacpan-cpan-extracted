@@ -1,0 +1,293 @@
+
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Export as HTML Website</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Export website in HTML</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../../index.html>PPresenter</A><BR>
+<A HREF=../../manual.html>Manual</A><BR>
+<A HREF=../index.html>Export</A><BR>
+<A HREF=index.html>Website</A><BR>
+<B>HTML</B><BR>
+<P>
+<A HREF=#simple>Simple Website</A><BR>
+<A HREF=#options>Options</A><BR>
+<A HREF=#use>Use&nbsp;an&nbsp;Exporter</A><BR>
+<A HREF=#your>Own&nbsp;Contents</A><BR>
+<A HREF=#override>Override</A><BR>
+<A HREF=#struct>Structure</A><BR>
+<A HREF=#example>Example</A><BR>
+
+    </TD><TD VALIGN=top>
+
+<A HREF=../index.html>Portable Presenter</A> is a package designed to give
+presentations.  Doing the presentation is one thing, but you like to
+have this show publicly available afterwards.
+<P>
+The most popular way to present your slides after "the real thing" is
+by creating a website.  The module
+<CODE>PPresenter::<WBR>Export::<WBR>Website::HTML.pm</CODE> can do this
+for you, although this is not a really easy thing: you need a bit more
+knowledge about Perl for this.
+<P>
+This export option is useless whithout Image::Magick installed.
+
+<H2><A NAME=simple>A Simple Website</A></H2>
+
+Exporters are not automatically added to your show.  It is not (but could be)
+a part of a style.  So: anywhere in your program you have to add the line
+<PRE>
+   $show->addExporter('PPresenter::Export::Website::HTML');
+</PRE>
+Start the show.  When the compilation of the exporter module is successful,
+you can access the options of the module via the background module.
+<P>
+Some basic changes can be made, like the format and the width of the
+images to be produced (the height of the image is scaled the same as
+the width is).  Most changes you want to make to the produced site require
+you to write your own exporter module.
+
+<H2><A NAME=options>Options</A></H2>
+
+The Website object extends to <A HREF=im_images.html#options>IM_Images</A>
+object and the general <A HREF=index.html#options>Export</A> object.
+Next to those options, you may set:
+<DL>
+<DT><B>-slideAs =&gt;</B> <I>way-to-dump</I><BR>
+    <B>-notesAs =&gt;</B> <I>way-to-dump</I>
+<DD>The default settings how the slides should be included in the
+    webpages.  The way-do-dump value is one of
+    <DL>
+    <DT><B>IMAGE</B>
+    <DD>Requires Image::Magick.  The screens are copied using XWD and
+        then converted into the specified format and width.
+    <DT><B>TABLE</B>
+    <DD>The template should have a makeHTMLTable function and the
+        formatter shall provide a toHTML function for this to work.
+        The text is transformed into HTML which should show similar to
+        the screen.
+    <DT><B>LINEAR</B>
+    <DD>The formatter should provide a makeHTMLLinear function for
+        this to work.  The template layout be be lost, but the content
+        of slides is translated into HTML.
+    <DT><B>SKIP</B>
+    </DL>
+    <P>
+<DT><B>-outputDir =&gt;</B> <I>directory</I>
+<DD>The specified directory will contain the site.  If this directory
+    does not exist, it will be created.
+    <P>
+<DT><B>-indexFile =&gt;</B> <I>file</I>
+<DD>Each slide will be stored in a seperate directory, in a file under
+    this name.  All links between the pages will be very explicit about
+    the filename specified here, although it is the default of the
+    machine where the site resides.  Because of that, you can test your
+    site with the <CODE>file:</CODE> primitive too.
+</DL>
+
+<H2><A NAME=use>Using an Exporter</A></H2>
+You can only use an export if you invoke it explicitly in your presentation
+program.  There are two ways to do this:
+<PRE>
+   my $show   = PPresenter->new(<I>options</I>);
+   my $export =
+       $show->addExporter('PPresenter::Export::Website::HTML');
+   $export->change(<I>options</I>);
+</PRE>
+or
+<PRE>
+   my $show   = PPresenter->new(<I>options</I>);
+   my $export =
+       PPresenter::Export::Website::HTML->new(<I>options</I>);
+</PRE>
+
+<H2><A NAME=your>Your own Website Contents</A></H2>
+
+Each website is different.  An option-menu is not sufficient to all demands.
+Therefore, if you want to produce your own layout, you have to override
+parts of the standard exporter.
+<P>
+Perl offers two ways to override the functionality: a very dirty but
+fast one, and a pretty OO-version which is a bit more work.
+<P>
+<B>The dirty way:</B>
+<PRE>
+    $show-&gt;addExporter('PPresenter::Export::Website::HTML');
+
+    sub PPresenter::Export:Website::HTML::PageLogo($$)
+    {   my ($export, $show, $slide) = @_;
+        my $file = $slide ? "../logo.gif" : "logo.gif";
+        "&lt;IMG SRC=$file WIDTH=150 HEIGHT=107&gt;";
+    }
+</PRE>
+and <B>the nice OO-way:</B>
+<PRE>
+    $show-&gt;addExporter('MyWebsite');
+</PRE>
+file MyWebsite.pm
+<PRE>
+    package MyWebsite;
+    use PPresenter::Export:Website::HTML';
+    use base 'PPresenter::Export:Website::HTML';
+
+    sub PageLogo($$)
+    {   my ($export, $show, $slide) = @_;
+        my $file = $slide ? "../logo.gif" : "logo.gif";
+        "&lt;IMG SRC=$file WIDTH=150 HEIGHT=107&gt;";
+    }
+
+    1;
+</PRE>
+
+<H2><A NAME=override>The Functions to Override</A></H2>
+
+The Page table built by calling a huge amount of functions, which all can
+be overridden when needed.  The main structure of the default webpages is:
+
+<TABLE WIDTH=80% BORDER=0>
+<TR><TH>Normal pages:</TH><TH>Front page:</TH></TR>
+<TR><TD VALIGN=top ALIGN=center>
+
+<TABLE BORDER=1 CELLSPACING=5>
+<TR><TD COLSPAN=2>Commercial</TD></TR>
+<TR><TD>PageLogo</TD><TD ALIGN=center><B>Chapter</B></TD></TR>
+<TR><TD VALIGN=top>VerticalIndex</TD>
+    <TD>SlideExports<BR>
+        ExtraText<BR>
+        HorizontalIndex<BR>
+        <HR NOSHADE>
+        Signature</TD></TR>
+</TABLE>
+
+</TD><TD VALIGN=top ALIGN=center>
+
+<TABLE BORDER=1 CELLSPACING=5>
+<TR><TD COLSPAN=2>Commercial</TD></TR>
+<TR><TD>PageLogo</TD><TD ALIGN=center><B>Chapter</B></TD></TR>
+<TR><TD VALIGN=top>VerticalIndex</TD>
+    <TD>ExtraText<BR>
+        MainPageIndex<BR>
+        HorizontalIndex<BR>
+        <HR NOSHADE>
+        Signature</TD></TR>
+</TABLE>
+</TD></TR>
+</TABLE>
+
+<P>
+Now the name of the functions.  The parameters show which arguments are
+passed on.  In each case, the <CODE>$slide</CODE> can have the value
+<CODE>undef</CODE> to indicate that the result is used in the frontpage.
+<DL>
+<DT><B>$export->Title($show, $slide)</B>
+<DD>Constructs the text to be included in the <CODE>TITLE</CODE>
+    container of the web-page.  This should be kept short.
+<DT><B>$export->Chapter($show, $slide)</B>
+<DD>The main header of the page.  This will be included in a <CODE>H1</CODE>
+    container of each produced page.
+<DT><B>$export->PageLogo($show, $slide)</B>
+<DD>The piece of code which is locked-up in the top-left corner of each
+    page.  This will usually be an image, optionally enclosed in by a link.
+<DT><B>$export->VerticalIndex($show, $slide, $previous, $next)</B>
+<DD>As good practice, the left column of a page is used to refer to other
+    related pages.  It may also contain an index of the same page, when this
+    page gets too long.
+<DT><B>$export->ExtraText($show, $slide)</B>
+<DD>Text you want to add to a page.  Most useful for the frontpage to
+    tell the site's visitor where the slides are about.
+<DT><B>$export->MainPageIndex($show)</B>
+<DD>This function produces a table of defined slides, by default.
+<DT><B>$export->HorizontalIndex($show, $slide, $previous, $next)</B>
+<DD>Like the vertical index, but now horizontally.  Usually produces a
+    pointer to the previous and to the next slide in the presentation.
+<DT><B>$export->Commercial($show, $slide)</B>
+<DD>May produce text which is included in the HTML as first in the
+    <CODE>BODY</CODE>.  This may be used to show commercial messages, and
+    such alike.
+<DT><B>$export->Signature($show, $slide)</B>
+<DD>Displayed at the bottom of the page.
+</DL>
+There are more routines which you can override, but then the programming
+gets tough.  Look at the source to see how this is done.
+
+<H2><A NAME=struct>Change the Structure</A></H2>
+The structure of the produced sites is controled by the following
+functions (can be overruled too)
+<DL>
+<DT><B>sub $export->slideDir($slide)</B>
+<DD>Returns the directory where the slide's page for that phase is
+    stored.  By default, this is the slide's sequence-number, followed
+    by a dash, followed by the actual slide's phase.<BR>
+    For example: "<CODE>23-2</CODE>".
+<DT><B>sub $export->slide2filename($slide)</B>
+<DD>The filename of the slide. 
+    For example: "<CODE>website/3/index.html</CODE>".
+<DT><B>sub $export->slide2main()</B>
+<DD>The path to follow to go from slide to the main page.  By default,
+    this is one directory up, and there the <CODE>-indexFile</CODE>.
+    For example: "../index.html".
+<DT><B>sub $export->main2slide($slide)</B>
+<DD>The path to follow from the main page to a slide.
+    For example: "<CODE>23-2/index.html</CODE>".
+<DT><B>sub $export->slide2slide($slide)</B>
+<DD>How to refer from one slide to the other.
+    May result in "<CODE>../23-2/index.html</CODE>".
+</DL>
+With these functions, you can change the structure of the pages produced, but
+it is not adviced to do so.
+
+<H2><A NAME=example>An Example</A></H2>
+As example, a exporter module which has some things changed to personal
+whishes.
+<PRE>
+package MyWebsite;
+
+use PPresenter::Export::Website::HTML;
+use base 'PPresenter::Export::Website::HTML';
+
+sub PageLogo($$)
+{   my ($export, $show, $slide) = @_;
+    my $file = $slide ? "../logo.gif" : "logo.gif";
+    "&lt;IMG SRC=$file WIDTH=150 HEIGHT=107 HSPACE=5 VSPACE=5&gt;";
+}
+
+sub ExtraText($$)
+{   my ($export, $show, $slide) = @_;
+
+    return '' if $slide;   # only extra text for the intro page.
+
+    &lt;&lt;INTRO;
+This presentation was given for....
+INTRO
+}
+</PRE>
+<P>
+In the main program, you have to add the one line:
+<PRE>
+$show-&gt;addExporter('MyWebsite');
+</PRE>
+<P>
+Start your presentation and select in your background menu the entry
+<CODE>export/Website</CODE>.  After pressing <CODE>EXPORT</CODE> and
+<CODE>OK</CODE>, followed by a cup of coffee, you'll have your site.
+
+</TD></TR>
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

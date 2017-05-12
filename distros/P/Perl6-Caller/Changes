@@ -1,0 +1,21 @@
+Revision history for Perl6-Caller
+
+0.100   October 18, 2009
+        - Move author tests out of the way.
+
+0.04    April 21, 2007
+        - Got rid of the alternate package altogether.
+
+0.03    April 21, 2007
+        - Had to rename the 'caller' package to '_caller' because
+          FindBin::libs has a 'package caller' declaration and thus the author
+          now owns that namespace.
+
+0.02    April 21, 2007
+        - First public release.
+        - I lied.  This is the second public release, but I fixed a few doc
+          nits.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

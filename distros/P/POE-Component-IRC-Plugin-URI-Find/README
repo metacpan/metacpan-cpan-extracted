@@ -1,0 +1,95 @@
+NAME
+    POE::Component::IRC::Plugin::URI::Find - A POE::Component::IRC plugin
+    that finds URIs in channel traffic
+
+VERSION
+    version 1.10
+
+SYNOPSIS
+      use strict;
+      use warnings;
+      use POE qw(Component::IRC Component::IRC::Plugin::URI::Find);
+      use Data::Dumper;
+
+      my $nickname = 'UriFind' . $$;
+      my $ircname = 'UriFind the Sailor Bot';
+      my $ircserver = 'irc.blah.org';
+      my $port = 6667;
+      my $channel = '#IRC.pm';
+
+      my $irc = POE::Component::IRC->spawn(
+            nick => $nickname,
+            server => $ircserver,
+            port => $port,
+            ircname => $ircname,
+            debug => 0,
+            plugin_debug => 1,
+            options => { trace => 0 },
+      ) or die "Oh noooo! $!";
+
+      POE::Session->create(
+            package_states => [
+                    'main' => [ qw(_start irc_001 irc_urifind_uri) ],
+            ],
+      );
+
+      $poe_kernel->run();
+      exit 0;
+
+      sub _start {
+        # Create and load our plugin
+        $irc->plugin_add( 'UriFind' =>
+            POE::Component::IRC::Plugin::URI::Find->new() );
+
+        $irc->yield( register => 'all' );
+        $irc->yield( connect => { } );
+        undef;
+      }
+
+      sub irc_001 {
+        $irc->yield( join => $channel );
+        undef;
+      }
+
+      sub irc_urifind_uri {
+        my @data = @_[ARG0..ARG4];
+        print Dumper( \@data );
+        undef;
+      }
+
+DESCRIPTION
+    POE::Component::IRC::Plugin::URI::Find, is a POE::Component::IRC plugin
+    that parses public channel traffic for URIs and generates irc events for
+    each URI found.
+
+CONSTRUCTOR
+    "new"
+        Creates a new plugin object.
+
+OUTPUT
+    The following irc event is generated whenever a URI is found in channel
+    text:
+
+    "irc_urifind_uri"
+        With the following parameters:
+
+          ARG0, nick!user@host of the person who said what;
+          ARG1, the channel where it was said;
+          ARG2, the url found;
+          ARG3, the URI::URL object;
+          ARG4, what was originally said;
+
+SEE ALSO
+    POE::Component::IRC
+
+    URI::Find
+
+AUTHOR
+    Chris Williams
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

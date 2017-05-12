@@ -1,0 +1,52 @@
+{
+   "abstract" : "Add a list of roles to your POD.",
+   "author" : [
+      "Mike Friedman <friedo@friedo.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Weaver-Section-Consumes",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Inspector" : "0",
+            "Module::Load" : "0",
+            "Moose" : "0",
+            "Pod::Elemental::Element::Nested" : "0",
+            "Pod::Elemental::Element::Pod5::Command" : "0",
+            "Pod::Weaver::Role::Section" : "0",
+            "aliased" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/friedo/pod-weaver-section-consumes.git",
+         "web" : "https://github.com/friedo/pod-weaver-section-consumes"
+      }
+   },
+   "version" : "0.010"
+}
+

@@ -1,0 +1,338 @@
+=head1 NOME
+
+perlstyle - Guida allo stile Perl
+
+=head1 DESCRIZIONE
+
+Ogni programmatore avrE<agrave>, ovviamente, le sue preferenze riguardo
+alla formattazione, ma qui ci sono alcune linee guida generali che
+renderanno i vostri programmi piE<ugrave> facili da leggere, capire e 
+manutenere.
+
+La cosa piE<ugrave> importante E<egrave> che i programmi vengano sempre fatti
+girare con il flag B<-w>. PuE<ograve> essere disabilitato esplicitamente
+per particolari porzioni di codice con la direttiva C<no warnings>
+o la variabile C<$^W> se proprio E<egrave> necessario. Dovreste anche
+scrivere sempre con C<use strict> o essere ben coscienti delle
+ragioni per cui non lo state facendo. Anche le direttive C<use sigtrap>
+e C<use diagnostics> possono rivelarsi utili.
+
+Riguardo all'estetica del codice, l'unica cosa che davvero importa
+a Larry E<egrave> che la graffa finale di un blocco di codice su piE<ugrave> righe
+sia allineata con la parola chiave che ha aperto il costrutto.
+A parte questo, lui ha altre preferenze ma non sono cosE<igrave> fondamentali.
+
+=over 4
+
+=item *
+
+Rientri di 4 spazi.
+
+=item *
+
+Parentesi graffa aperta sulla stessa linea della parola chiave, possibilmente,
+altrimenti allineata verticalmente.
+
+=item *
+
+Uno spazio prima della graffa aperta di un blocco di codice su piE<ugrave> righe.
+
+=item *
+
+Blocchi di codice di una riga sola possono stare tutti sulla riga,
+incluse le graffe.
+
+=item *
+
+Nessuno spazio prima del punto e virgola.
+
+=item *
+
+Punto e virgola omesso in blocchi di codice "corti" da una riga.
+
+=item *
+
+Spazi intorno a quasi tutti gli operatori.
+
+=item *
+
+Spazio intorno ad una subscript "complessa" (all'interno di parentesi graffe).
+
+=item *
+
+Linee vuote fra pezzi di codice che fanno cose diverse.
+
+=item *
+
+C<else> su una riga a parte.
+
+=item *
+
+Nessuno spazio tra il nome della funzione e la sua parentesi aperta.
+
+=item *
+
+Uno spazio dopo ogni virgola.
+
+=item *
+
+Linee lunghe spezzate dopo un operatore (eccetto per C<and> e C<or>).
+
+=item *
+
+Uno spazio dopo l'ultima parentesi chiusa corrispondente alla prima aperta sulla riga corrente
+
+=item *
+
+Allineare verticalmente cose simili fra loro.
+
+=item *
+
+Omettere la punteggiatura ridondante fintanto che la chiarezza
+non ne risente.
+
+=back
+
+Larry ha le sue ragioni per ognuna di queste cose, ma non pretende
+che il cervello di tutti gli altri lavori come il suo.
+
+Qui ci sono altre questioni piE<ugrave> sostanziali su cui riflettere:
+
+=over 4
+
+=item *
+
+Solo perchE<eacute> I<POTETE> fare qualcosa in un certo modo non vuol dire
+che I<DOVRESTE> farlo in quel modo. Il Perl E<egrave> progettato in modo da
+darvi numerosi modi di fare qualunque cosa, quindi pensate a scegliere
+quello piE<ugrave> leggibile. Ad esempio
+
+    open(PIPPO,$pippo) || die "Impossibile aprire $pippo: $!";
+
+E<egrave> meglio di
+
+    die "Impossibile aprire $pippo: $!" unless open(PIPPO,$pippo);
+
+perchE<eacute> il secondo modo nasconde il punto principale dell'istruzione
+con un modificatore. D'altra parte
+
+    print "Avvio analisi\n" if $verboso;
+
+E<egrave> meglio di
+
+    $verboso && print "Avvio analisi\n";
+
+perchE<eacute> il punto principale non E<egrave> se l'utente abbia scritto B<-> o meno.
+
+Inoltre, solo perchE<eacute> un operatore vi lascia sottintendere degli
+argomenti di default, non vuol dire che dovete utilizzare i default.
+I default sono lE<igrave> per i programmatori pigri che stanno scrivendo
+programmi "usa e getta". Se volete che il vostro programma sia leggibile,
+fareste meglio ad esplicitare gli argomenti.
+
+Sulla stessa lunghezza d'onda, solo perchE<eacute> I<POTETE> omettere le parentesi
+in molti casi, non vuol dire che lo dobbiate fare:
+
+    return print reverse sort num values %array;
+    return print(reverse(sort num (values(%array))));
+
+Quando siete in dubbio, mettete le parentesi. Se non altro consentiranno a qualche 
+balordo di giocare con il tasto % in B<vi>.
+
+Anche se non siete in dubbio, considerate la sanitE<agrave> mentale della persona
+che dovrE<agrave> manutenere il codice dopo di voi, e che probabilmente metterE<agrave>
+le parentesi nel posto sbagliato.
+
+=item *
+
+Non fate inutili contorsioni per uscire da un ciclo all'inizio
+o alla fine, quando il Perl ha l'operatore C<last> che permette
+di uscirne anche a metE<agrave>. Solo, rendetelo un po' piE<ugrave> visibile diminuendo
+il rientro da destra.
+
+    LINEA:
+	for (;;) {
+	    istruzioni;
+	  last LINEA if $foo;
+	    next LINEA if /^#/;
+	    istruzioni;
+	}
+
+=item *
+
+Non temete di usare delle etichette per i cicli, sono lE<igrave> per
+migliorare la leggibilitE<agrave> oltre che per consentire l'uscita
+da cicli annidati. Vedete l'esempio precedente.
+
+=item *
+
+Evitate di usare grep() (o map()) o le `backticks` in contesto vuoto,
+ossia quando scartate ciE<ograve> che restituiscono. Queste funzioni hanno dei
+valori resituiti, quindi utilizzateli. Altrimenti usate un ciclo foreach()
+o la chiamata system().
+
+=item *
+
+Per mantenere la portabilitE<agrave>, quando utilizzate funzionalitE<agrave> che
+potrebbero non essere implementate su macchine diverse, racchiudete
+il costrutto in un eval per vedere se fallisce. Se sapete giE<agrave> che una
+particolare funzionalitE<agrave> E<egrave> stata implementata in una versione del Perl,
+potete controllare C<$]> (C<$PERL_VERSION> usando C<English>) per
+verificare che ci sia. Il modulo C<Config> inoltre vi dE<agrave> la possibilitE<agrave>
+di interrogare i valori determinati dal programma B<Configure>
+quando E<egrave> stato installato il Perl.
+
+=item *
+
+Scegliete identificatori mnemonici. Se non vi ricordate cosa vuol dire mnemonico,
+avete un grosso problema.
+
+=item *
+
+Anche se identificatori corti come $sonoqui sono ok, utilizzate i trattini bassi
+per separare le parole. E<Egrave> generalmente piE<ugrave> facile leggere C<$nomi_come_questi>
+che C<$NomiComeQuesti>, specialmente per chi non parla il vostro stesso linguaggio.
+E<Egrave> anche una semplice regola che E<egrave> coerente con C<NOMI_COME_QUESTI>.
+
+I nomi dei package sono spesso un'eccezione a questa regola. Il Perl 
+si riserva informalmente i nomi di modulo in minuscolo per le direttive
+come C<integer> e C<strict>. Gli altri moduli dovrebbero iniziare con
+una lettera maiuscola e utilizzare MaiuscoleAdInizioParola, possibilmente
+senza trattini bassi per via di limitazioni in file system primitivi che devono
+rappresentare il nome del modulo come nome di file che deve entrare in
+una manciata di byte.
+
+=item *
+
+Potreste trovare utile utilizzare le maiuscole o minuscole per indicare
+lo scope o la natura di una variabile. Ad esempio:
+
+    $TUTTO_MAIUSCOLO    solo costanti (attenzione ai conflitti con le variabili perl!)
+    $Qualche_Maiuscola  globali/statiche in un package
+    $tutto_minuscolo    variabili di funzione my() o local()
+
+I nomi di funzioni e metodi sembrano andare meglio tutti in minuscolo.
+Ad es. C<$obj-E<gt>as_string()>.
+
+Potete utilizzare un trattino basso iniziale per indicare che una variabile
+o funzione non dovrebbe essere utilizzata al di fuori del package che
+l'ha definita.
+
+=item *
+
+Se avete un'espressione regolare molto complicata, utilizzate il modificatore
+C</x> e metteteci un po' di spazi per farla assomigliare un po' meno a
+una sequenza insensata di caratteri. Non utilizzate la barra (C</>) come
+delimitatore se la vostra espressione regolare contiene barre o backslash.
+
+=item *
+
+Utilizzate i nuovi operatori "and" e "or" per evitare un po' di parentesi,
+e per ridurre l'incidenza della punteggiatura di operatori come C<&&>
+e C<||>. Chiamate le vostre subroutine come se fossero funzioni od operatori
+di lista per evitare eccessive "e commerciali" e parentesi.
+
+=item *
+
+Usate gli "here documents" [C<print E<lt>E<lt>FINE>, NdT] invece di 
+ripetere tante istruzioni C<print()>.
+
+=item *
+
+Allineate verticalmente cose simili fra loro, specialmente se sono in ogni
+caso troppo lunghe per stare su una riga.
+
+    $IDX = $ST_MTIME;
+    $IDX = $ST_ATIME 	   if $opt_u;
+    $IDX = $ST_CTIME 	   if $opt_c;
+    $IDX = $ST_SIZE  	   if $opt_s;
+
+    mkdir $dirtmp, 0700	or die "errore in mkdir $dirtmp: $!";
+    chdir($dirtmp)      or die "errore in chdir $dirtmp: $!";
+    mkdir 'tmp',   0777	or die "errore in mkdir $dirtmp/tmp: $!";
+
+=item *
+
+Controllate sempre il valore restituito dalle chiamate di sistema.
+Dei buoni messaggi di errore dovrebbero andare su C<STDERR>, includere
+il nome del programma che ha causato il problema, la chiamata di sistema
+fallita ed i suoi argomenti, e (MOLTO IMPORTANTE) dovrebbe contenere
+l'errore standard restituito dal sistema operativo per capire cosa non
+E<egrave> andato bene. Di seguito un esempio molto semplice ma sufficientemente
+esplicativo:
+
+    opendir(D, $dir)	 or die "errore in opendir $dir: $!";
+
+=item *
+
+Allineate le traslitterazioni quando ha senso:
+
+    tr [abc]
+       [xyz];
+
+=item *
+
+Pensate alla riutilizzabilitE<agrave>. PerchE<eacute> buttar via risorse su un programma
+"usa e getta" quando potreste voler fare qualcosa di simile un'altra volta
+in futuro? Considerate la possibilitE<agrave> di generalizzare il vostro codice. 
+Valutate se scrivere un modulo o una classe di oggetti. Pensate a far
+girare bene il vostro codice con C<use strict> e C<use warnings> (o B<-w>).
+Considerate la possibilitE<agrave> di rilasciare ad altri il vostro codice. 
+Considerate la possibilitE<agrave> di cambiare interamente la vostra visione del mondo.
+Considerate... beh, lasciamo stare.
+
+=item *
+
+Provate a documentare il vostro codice e ad usare la formattazione Pod in maniera coerente.
+Ecco le convezioni che di solito ci si aspetta:
+
+=over 4
+
+=item *
+
+usate C<CE<lt>E<gt>> per i nomi di funzioni, variabili e moduli (e piE<ugrave>
+in generale qualsiasi cosa che puE<ograve> essere considerata parde del codice, come i filehandle
+oppure degli specifici valori). Va notato che i nomi delle funzioni sono considerati piE<ugrave>
+leggibili con le parentesi dopo il nome, cioE<egrave> come in C<funzione()>.
+
+=item *
+
+usate C<BE<lt>E<gt>> per i nomi dei comandi come B<cat> oppure B<grep>.
+
+=item *
+
+usate C<FE<lt>E<gt>> oppure C<CE<lt>E<gt>> per i nomi dei file. C<FE<lt>E<gt>> dovrebbe
+essere il solo codice Pod per i nomi di file, ma dato che molti formattatori di Pod lo
+visualizzano in corsivo, i path di Unix e Windows con i loro slash e backslash
+[barre e barre inverse, NdT] possono essere meno leggibili e meglio riprodotti con C<CE<lt>E<gt>>.
+
+=item *
+
+Siate coerenti.
+
+=item *
+
+Comportatevi bene.
+
+=back
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlsytle
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Aldo "dada" Calpini.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

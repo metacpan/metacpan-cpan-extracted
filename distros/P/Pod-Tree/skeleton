@@ -1,0 +1,148 @@
+use strict;
+
+
+sub WalkTree
+{
+    my $tree = shift;		# a Pod::Tree object
+    my $root = $tree->get_root;	# the root node of the tree
+    WalkNode($root);
+}
+
+
+sub WalkNode
+{
+    my $node = shift;
+    my $type = $node->get_type;
+
+    for ($type)
+    {
+	/root/     and WalkRoot    ($node), last;
+	/verbatim/ and WalkVerbatim($node), last;
+	/ordinary/ and WalkOrdinary($node), last;
+	/command/  and WalkCommand ($node), last;
+	/sequence/ and WalkSequence($node), last;
+	/text/     and WalkText    ($node), last;
+	/list/     and WalkList	   ($node), last;
+	/item/     and WalkItem    ($node), last;
+	/for/      and WalkFor	   ($node), last;
+    }
+}
+
+
+sub WalkRoot
+{
+    my $node = shift;
+    WalkChildren($node);
+}
+
+
+sub WalkVerbatim
+{
+    my $node = shift;
+    my $text = $node->get_text;
+}
+
+
+sub WalkOrdinary
+{
+    my $node = shift;
+    WalkChildren($node);
+}
+
+
+sub WalkCommand
+{
+    my $node    = shift;
+    my $command = node->get_command;
+    WalkChildren($node);
+}
+
+
+sub WalkSequence
+{
+    my $node   = shift;
+    my $letter = node->get_letter;
+
+    is_link $node and do
+    {
+	my $target  = $node->get_target;
+	my $page    = $target->get_page;
+	my $section = $target->get_section;
+    };
+
+    WalkChildren($node);
+}
+
+
+sub WalkText
+{
+    my $node = shift;
+    my $text = $node->get_text;
+}
+
+
+sub WalkList
+{
+    my $node      = shift;
+    my $indent    = $node->get_arg;
+    my $list_type = $node->get_list_type;
+
+    for ($list_type)
+    {
+	/bullet/ and last;
+	/number/ and last;
+	/text/   and last;
+    }
+
+    WalkChildren($node);	# text of the =over paragraph
+    WalkSiblings($node);	# items in the list
+}
+
+
+sub WalkItem
+{
+    my $node      = shift;
+    my $item_type = $node->get_list_type;
+
+    for ($item_type)	# could be different from $list_type
+    {
+	/bullet/ and last;
+	/number/ and last;
+	/text/   and last;
+    }
+
+    WalkChildren($node);	# text of the =item paragraph
+}
+
+
+sub WalkFor
+{
+    my $node      = shift;
+    my $formatter = $node->get_arg;
+    my $text      = $node->get_text;
+}
+
+
+sub WalkChildren
+{
+    my $node     = shift;
+    my $children = $node->get_children;
+
+    for my $child (@$children)
+    {
+	WalkNode($child);
+    }
+}
+
+
+sub WalkSiblings
+{
+    my $node     = shift;
+    my $siblings = $node->get_siblings;
+
+    for my $sibling (@$siblings)
+    {
+	WalkNode($sibling);
+    }
+}
+

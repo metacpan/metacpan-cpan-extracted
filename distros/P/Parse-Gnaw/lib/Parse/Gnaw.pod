@@ -1,0 +1,902 @@
+package Parse::Gnaw;
+
+use 5.006;
+use strict;
+use warnings FATAL => 'all';
+
+=head1 NAME
+
+Parse::Gnaw - Write extensible, recursive, grammars in 
+pure perl code (grammar rules are perl arrays) and apply them to 
+whatever parsee you want. 
+
+
+
+
+=head1 SYNOPSIS
+
+Write extensible, recursive, grammars using pure perl code.
+Grammar rules are perl arrays. Apply them to whatever parsee you want.
+Normal parsees would be strings. Interesting parsees might be a 
+three-dimensional array of characters.
+
+	no strict 'vars';
+	use Parse::Gnaw;
+	use Parse::Gnaw::String;
+
+	rule('SayHello', 'Hello', 'World');
+	my $string=Parse::Gnaw::String->New('So Hello World of mine');
+	$string->parse('SayHello');
+
+This is the second generation of Parse::Gnaw starting from revision 0.600.
+Gen1 stored rules as code references and that prevented recursive calls
+within a rule as calling the code ref for the rule would go into an 
+infinite loop. Gen2 uses array references to store rule, with the name
+of the array reference variable matching the name of the rule.
+
+	our $rulename = [ .... rule content .... ];
+
+It should allow recursive rules, although it will probably get hung
+in an infinite loop trying to match a left recursive rule.
+
+=head2 Define a Grammar
+
+Before you can parse anything, you have to create a grammar.
+Grammars are created with the "rule" subroutine, which is imported 
+when you use Parse::Gnaw.
+
+	# see t/doc_ex_rule_hi.t
+	use Parse::Gnaw;
+	rule('SayHello', 'H', 'I');
+
+This will create a package scalar in your current package. 
+The name of the scalar will be the name of the rule.
+The scalar will be a reference to an array that contains the rule.
+You can treat it like any other perl variable.
+
+	print Dumper $SayHello;
+
+This will print out something like:
+
+$VAR1 = [
+          [
+            'rule',
+            'rule1',
+            {
+              'methodname' => 'rule',
+              'filename' => 't/doc_ex_rule_hi.t',
+              'linenum' => 18,
+              'payload' => 'rule1',
+              'quantifier' => '',
+              'package' => 'main'
+            }
+          ],
+          [
+            'lit',
+            'H',
+            {
+              'methodname' => 'lit',
+              'filename' => 't/doc_ex_rule_hi.t',
+              'linenum' => 18,
+              'payload' => 'H',
+              'package' => 'main'
+            }
+          ],
+          [
+            'lit',
+            'I',
+            {
+              'methodname' => 'lit',
+              'filename' => 't/doc_ex_rule_hi.t',
+              'linenum' => 18,
+              'payload' => 'I',
+              'package' => 'main'
+            }
+          ]
+        ];
+
+
+The array shows three elements.
+The first is a "rule" which defines the name of the rule
+and also holds extra information about the rule.
+The next two elements are literals looking for 'H' and then 'I'.
+
+
+=head2 Create Something to be Parsed
+
+A grammar is half of the puzzle. You also need to create
+the thing you want to parse. A simple example is a string:
+
+	# see t/doc_ex_string_dog.t
+	use Parse::Gnaw::LinkedListDimensions1;
+	my $ab_string=Parse::Gnaw::LinkedListDimensions1->new("dog");
+	$ab_string->display();
+
+What this does is take the string 'dog' and turn it
+into a linked list that can be parsed.
+
+Because Data::Dumper() does not handle linked lists well
+(they do not display in an easy-to-read format),
+the display() method was created. It will output a 
+Parse::Gnaw string-ish object of some kind in a more readable format
+
+	Dumping LinkedList object
+	LETPKG => Parse::Gnaw::Blocks::Letter # package name of letter objects
+	CONNMIN1 => 0 # max number of connections, minus 1
+	HEADING_DIRECTION_INDEX => 0
+	HEADING_PREVNEXT_INDEX  => 0	
+	FIRSTSTART => 
+
+		letterobject: Parse::Gnaw::Blocks::Letter=ARRAY(0xa08c820)
+		payload: 'FIRSTSTART'
+		from: unknown
+		connections:
+			 [ ........... , ........... ]
+	
+	LASTSTART => 
+	
+		letterobject: Parse::Gnaw::Blocks::Letter=ARRAY(0xa18d70c)
+		payload: 'LASTSTART'
+		from: unknown
+		connections:
+			 [ ........... , ........... ]
+	
+	CURRPTR => 
+	
+		letterobject: Parse::Gnaw::Blocks::Letter=ARRAY(0xa08c820)
+		payload: 'FIRSTSTART'
+		from: unknown
+		connections:
+			 [ ........... , ........... ]
+	
+	
+	letters, by order of next_start_position()
+	letterobject: Parse::Gnaw::Blocks::Letter=ARRAY(0xa252d2c)
+		payload: 'd'
+		from: file t/doc_ex_string_dog.t, line 22, column 0	
+		connections:
+			 [ ........... , (0xa252de0) ]
+
+
+		letterobject: Parse::Gnaw::Blocks::Letter=ARRAY(0xa252de0)
+		payload: 'o'
+		from: file t/doc_ex_string_dog.t, line 22, column 1
+		connections:		
+			 [ (0xa252d2c) , (0xa252ef8) ]
+
+
+		letterobject: Parse::Gnaw::Blocks::Letter=ARRAY(0xa252ef8)
+		payload: 'g'
+		from: file t/doc_ex_string_dog.t, line 22, column 2
+		connections:
+			 [ (0xa252de0) , ........... ]
+	
+
+		letterobject: Parse::Gnaw::Blocks::Letter=ARRAY(0xa18d70c)
+		payload: 'LASTSTART'
+		from: unknown
+		connections:
+			 [ ........... , ........... ]
+
+
+
+=head2 Apply the Grammar to the Grammee. 
+
+Now that you have a Grammar and a Grammee, you can parse.
+
+The parse() method is something that Parse::Gnaw::LinkedList type objects have available.
+It takes in one argument, a string containing the name of the top level rule or grammar
+that you want to apply to the string. If the rule matches the string, parse() will return
+true 1. If the rule does NOT match the string, parse() will return false ''.
+
+	$string->parse('rulename');
+
+The parse() method is used for parsing an an entire string from the beginning.
+It is similar to putting ^ or \A at the front of a regular expression:
+
+	m/^(rule)/ or m/\A(rule)/ 
+
+Here's a full example of parsing a string:
+
+	# see t/doc_ex_rule_and_string.t
+	use Parse::Gnaw;
+	use Parse::Gnaw::LinkedListDimensions1;
+
+	# A Simple Rule Example
+	rule( 'rule1', 'H', 'I' );
+
+	# A simple string example
+	my $histring=Parse::Gnaw::LinkedListDimensions1->new("HI THERE");
+
+	ok($histring->parse('rule1'), "This is like regex   'HI THERE' =~ m/HI/ ");
+
+
+
+
+
+=head2 rule
+
+The rule function is used to create rules. Rules are created as package scalar 
+in caller's namespace. The name of the scalar is the name of the rule.
+
+	package main;
+	rule( 'rule1', 'H', 'I' );
+
+The above example will create a rule called "main::rule1". 
+You can call Data::Dumper on $rule1 and see that it is an array reference.
+
+Rules by themselves don't match anything in a string or block of text.
+Rules are just a way to handle a grammar in managable chunks.
+They could be thought of as similar to a perl subroutine, a container
+for the code that does something.
+
+The first parameter is a string with the name of the rule.
+
+Everything after that defines what the rule does.
+These can be string literals or character classes or alternations
+or quantifiers, and so on. Another thing you can do inside a rule
+is call another rule.
+
+
+=cut
+
+=head2 Rules and Subrules
+
+This rule
+
+	rule('rule1','H','I');
+
+turns into a $rule1 scalar holding a reference to an array.
+
+	$VAR1 = [
+          [
+            'rule',
+            'rule1',
+            {
+              'methodname' => 'rule',
+              'filename' => 't/doc_ex_rule_hi.t',
+              'linenum' => 18,
+              'payload' => 'rule1',
+              'quantifier' => '',
+              'package' => 'main'
+            }
+          ],
+          [
+            'lit',
+            'H',
+            {
+              'methodname' => 'lit',
+              'filename' => 't/doc_ex_rule_hi.t',
+              'linenum' => 18,
+              'payload' => 'H',
+              'package' => 'main'
+            }
+          ],
+          [
+            'lit',
+            'I',
+            {
+              'methodname' => 'lit',
+              'filename' => 't/doc_ex_rule_hi.t',
+              'linenum' => 18,
+              'payload' => 'I',
+              'package' => 'main'
+            }
+          ]
+        ];
+
+You may have noticed that the rule array is just an array of smaller arrays. 
+These smaller arrays are created by the subrules passed into rule().
+For example, a lit() subrule:
+
+	lit('H')
+
+might create a subarray that looks like this:
+
+          [
+            'lit',
+            'H',
+            {
+              'methodname' => 'lit',
+              'filename' => 't/doc_ex_rule_hi.t',
+              'linenum' => 18,
+              'payload' => 'H',
+              'package' => 'main'
+            }
+          ],
+
+All subrule functions return a subarray of this format so that the rule() function can easily handle them.
+
+The first element in the subarray is the method name associated with the subrule. In the above example, 
+we used the lit() function to create the literal subarray. When the rule1 gets parsed, it will see
+this ['lit', 'H', {}] array and call the 'lit' *method*. Because the first element will be used as 
+a methodname, the first element is always a string.
+
+The second element in the subarray is the payload. The payload is whatever is the important bit of 
+information for the method. For a lit(), the important information is the actual literal you're 
+looking for, such as 'H' above. i.e. a capital letter H. Some payloads are more complicated.
+For a character class, the payload is a hash reference, and the keys are the different letters
+in the character class.
+
+The third element is a hash reference that contains all the information for the subrule,
+including stuff that is only used for error reporting. For example, if a subrule throws
+a die"" while parsing a string, it would be helpful to know where the original subrule
+was defined and put that in the error message. Therefore, a number of entries in the hashref
+is location information as to where the subrule was originally defined in the code. In the above
+example, if we went to file t/doc_ex_rule_hi.t line number 18, we should see something
+that looks like:
+
+	rule(....,
+		lit('H'),
+	...
+	);
+
+or possibly just 
+
+	rule(...,
+		'H',
+	...
+	);
+ 
+If while parsing a string, an error occurs while looking for this lit('H'), the hashref
+contains the information needed to point back to where the original subrule was declared.
+
+=head2 Subrule Function versus Subrule Method
+
+The lit() function in Parse::Gnaw returns an array where the first element is 'lit'. 
+When parsing a rule, the parser will take 'lit' and call that method on the text object
+being parsed.
+
+This does get a little confusing from time to time. 
+
+	The lit() function is contained in the Parse::Gnaw package.
+
+	The 'lit' method is contained in Parse::Gnaw::Blocks::ParsingMethods package.
+
+And the Parse::Gnaw::Blocks::ParsingMethods package is a child package of Parse::Gnaw::LinkedList. 
+The Parse::Gnaw::LinkedList package is the base package for defining any string/text object that
+you want to parse. As a string is parsed, the subarrays in the rule array is iterated through
+and whatever method is contained in the subrule is called.
+
+There is a subrule function defined in Parse::Gnaw for defining rules.
+
+There is a subrule method defined in Parse::Gnaw::Blocks::ParsingMethods for parsing the string.
+
+One reason for this split is because the way the subrule is defined in the rule is usually the
+same regardless of what kind of string we're parsing. But depending on what kind of string
+we're parsing, we might have to handle the subrule method differently.
+
+If you're just starting to use Parse::Gnaw, this split between rule/function and string/method 
+won't stop you from using the module. But if you want to do more advanced things with the
+package, like create your own subrule, then you'll need to know that you need to create a subrule
+function and a string method.
+
+=head2 Subrules
+
+The next set of documentation covers the subrule functions that can be called to 
+define a rule. The subrule returns an array reference which is then passed into 
+the rule function.
+
+	rule('rulename', subrule(..blah..)  );
+
+The subrule functions are defined in Parse::Gnaw. For every subrule, there is some
+corresponding method defined in Parse::Gnaw::Blocks::ParsingMethods.
+
+=head2 call
+
+Use the 'call;' subroutine to have one rule call another rule.
+
+	rule( 'rule1', 'a', 'b');
+	rule( 'rule2', 'c', call('rule1') );
+
+Note: if you call a rule that doesn't exist, script will throw a warning.
+You can pre-declare a rule with the predeclare() function:
+
+	predeclare('rule1');
+	rule( 'rule2', 'c', call('rule1') );
+	rule( 'rule1', 'a', 'b');
+
+Recursive calls currently work as long as some text in the string is consumed before making the recursive call.
+This will work fine:
+
+	rule( 'myrule', 'a', call('myrule') );
+
+The above example will work fine because it has to match something (the literal 'a') before
+it recursively calls itself ('myrule'). 
+
+However, this example below will compile, but will get stuck in an infinite loop if you try to parse with the rule:
+
+	rule( 'myrule', call('myrule'), 'a');
+
+The last example above won't work because the first thing 'myrule' does is call 'myrule' again, 
+which then wants to call 'myrule', which then wants to call 'myrule'. The parser currently doesn't
+detect this is happening, and so your code will get infinite recursion until the stack crashes.
+
+=cut
+
+
+=head2 	predeclare
+
+When declaring rule1 that calls rule2, and you haven't yet declared rule2, 
+you will get a warning message about the rule not existing.
+You can ignore this warning as long as you declare rule2 before you start parsing.
+
+But if you want to supress the warning, use predeclare() and pass in the name of the
+rule you want to predeclare.
+
+	predeclare('rule1');
+	rule( 'rule2', 'c', call('rule1') );
+
+	... later ...
+
+	rule( 'rule1', 'a', 'b');
+
+
+=cut
+
+
+
+=head2 	lit
+
+Pass the lit() function a string containing the literal value you want to match.
+
+	rule( 'greeting', lit('hello') );
+
+As a shorthand, any string passed into rule() will be assumed to be a lit().
+
+	rule( 'greeting', 'hello' );
+
+Note that 'greeting' is the name of the rule looking for a literal 'hello'.
+
+=cut
+
+
+=head2 cc
+
+Call this and pass in a string defining a character class.
+
+	cc('aeiou');
+
+This is like [aeiou] in perl regular expressions.
+
+=cut
+
+=head2 notcc
+
+Call this and pass in a string defining an inverted character class.
+
+	notcc('aeiou');
+
+This is like [^aeiou] in perl regular expressions.
+
+=cut
+
+=head2 alt
+
+The alt() function is for defining grammars that contain alternations or alternatives.
+
+The rule 'fruit' might be a choice between 'banana', 'apple', and 'orange'. The three possible choices are an alternation.
+
+	rule('fruit', alt([apple'], ['banana'], ['orange']));
+
+In a perl regular expression, this might look like:
+
+	m/apple|banana|orange/
+
+The problem is that we can't use pipe '|' as a separator. 
+So, instead, we have to use array references to bundle the different alternatives. 
+It's a bit more typing, but we need some way to associate different pieces of alternatives,
+because most alternatives won't be just alternatives of just one word.
+
+	rule('greetings', alt(['howdy','partner'], ['hello', 'friend'], ['hey', 'sport']));
+
+In the 'greetings' example, the only way to know which literals are bundled together is to put them in array references.
+With the array references acting to bundle the alternatives, the rule is functionally equivalent to the following regexp:
+
+	m/(howdy partner)|(hello friend)|(hey sport)/
+
+without the array references, we might assume each individual word is an alternative, 
+leading to a regexp that might look like this:
+
+	m/howdy|partner|hello|friend|hey|sport/
+
+The alt() function will create rules for each alternative which will follow the pattern "alternate_" followed by an integer.
+
+
+
+=cut
+
+=head2 thrifty
+
+Quantifier. Pass in a series of subrules to thrifty and it will
+attempt to match that series as defined by the last entry in the 
+elements passed into the function call.
+
+A perl regular expression
+	/(abc)+/
+becomes
+	thrifty('a', 'b', 'c', '+');
+
+All arguments but the last one are essentially put in parenthesis and 
+associated with the quantity specifier
+i.e.
+	/(abc)+/
+becomes
+	thrifty('a','b','c','+')
+
+Note the only quantifier mode supported is thrifty.
+Parse::Gnaw does not support greedy quantifiers.
+
+Here is a list of ways you can define the last element passed into thrifty:
+
+	thrifty( ... , [3,9] 	);	3 to 9
+	thrifty( ... , [3,] 	);	3 or more
+	thrifty( ... , [,9] 	);	0 to 9
+	thrifty( ... , '3,9'	);	3 to 9
+	thrifty( ... , '3,'	);	3 or more
+	thrifty( ... , ',9'	);	0 to 9
+	thrifty( ... , '3'	);	3, no more, no less
+	thrifty( ... , '+'	);	1 or more
+	thrifty( ... , '*'	);	0 or more
+	thrifty( ... , '?'	);	0 or 1
+
+Note that there is more than one way to express the min/max pair.
+
+'3', could also be specified as '3,3' as well as [3,3].
+
+The thrifty function depends greatly on the internal 'fragment_a_rule' function.
+
+=cut
+
+
+
+
+
+
+=head2 process_first_arguments_and_return_hash_ref
+
+Internal subroutine.
+
+This processes the various ways to call the various Parse::Gnaw functions
+and fills in the pieces the caller doesn't pass in.
+Should always return a hash reference will all info filled in.
+
+	rule('rulename', ... );
+	rule('rulename', {ruleinfo}, ... );
+
+	lit('literalvalue');
+	thrifty({quantifierinfo}, ...);
+
+The purpose of the function is to support all the above forms of calling
+Parse::Gnaw functions, extract the information regardless of the format,
+and return a generic hashref of information that can be used by any function.
+
+=cut
+
+
+=head2 fragment_a_rule
+
+Internal subroutine. Used to break up a rule into pieces so that a 
+quantifier can operate correctly.
+
+the rest of the code in this subroutine is to "reorder" the grammar. 
+for example, this grammar:
+
+	rule1 : 'a' rule2 'b'
+	rule2 : 'c' thrifty('d') 'e'
+
+needs to rearrange the thrifty so that it can try to match a number of 'd'
+then it has to match 'e', then it has to match 'b' from the previous rule.
+if the thrifty quantifier fails, it has to try to match another 'd',
+then match 'e', then match 'b' from the previous rule.
+
+This can't be done treating each rule as a subroutine/function as they appear
+because a quantifier can't return after it's matched 'd'.
+it has to match 'd', then match anything in the grammar anywhere in
+the grammar that occurs after it, and THEN it can return.
+
+The way we're going to do this is by fragmenting/chopping up the rules
+any time we have a CALL or QUANTIFIER (quantifiers are actually calls)
+we are going to take everything AFTER THE CALL, and put it in its own 
+rule fragment.
+
+the original call gets modified with a thencall=>rulefragment added to it.
+ 
+for example: 
+
+	rule1 : 'a' call('rule2') 'c' qty(thrifty1) 'e'
+	rule2 : 'b'
+	thrifty1 : 'd'
+
+we need to fragment rule1
+
+	rule1 : 'a' call('rule2') 'c' qty(thrifty1) 'e'
+
+It can be viewed as getting fragmented as follows:
+	rule1 : 'a' call('rule2') [ 'c' qty(thrifty1) ['e']]
+	                          ^frag1              ^frag2
+
+therfore it becomes
+	rule1 : 'a' call('rule2',thencall=>rule1frag1)
+	rule1frag1 : 'c' call('thrifty1', thencall=>rule1frag2) 
+	rule1frag2 : 'e'
+
+this will allow all calls and quantifiers to treat the rest of the
+grammar after the call/quantifier as if it were part of a nested function call.
+The "thrifty" call doesn't return until it matches all the way
+to the end of the grammar, therefore, everything after the thrifty
+call needs to be treated as part of the thrifty function call.
+ 
+in the above example, when we call rule 'thrifty1', we also pass in
+the fact that the rule after that is 'rule1frag2'
+this means 'thrifty1' can match 1 'd', and then call rule1frag2 to 
+see if the rest of the grammar matches.
+if it fails, we can trap the failure in the 'thrifty1' call, and 	
+then we can try to match another 'd', and then try calling rule1frag2
+again to see if the rest of the rule matches THAT.
+
+Explaining it from another angle, fragment_a_rule() breaks up the rules
+to rearrange the *associativity* while maintaining the same functionality.
+
+The original rule:
+
+	rule1 : 'a' rule2 'b'
+	rule2 : 'c' thrifty('d') 'e'
+
+Could be flattened to look like this:
+
+	rule1: 'a' ('c' thrifty('d') 'e') 'b'
+
+However the quantifier will not operate with the above associativity.
+What fragment_a_rule() does is break up the rule into fragments
+and rearrange the associativity so that the rule can be reformed as
+function calls.
+
+The original rules look like this:
+
+	rule1 : 'a' rule2 'b'
+	rule2 : 'c' thrifty('d') 'e'
+
+And the fragmentation turns it into this:
+
+	rule1 : 'a' call('rule2',thencall=>'b')
+	rule2 : 'c' call(('d', {thrifty}), thencall=> 'e')
+
+The 'b' and 'e' fragments in the "thencall" sections get turned into their
+own rule fragments, with their own rulenames.
+
+And the "thrifty" because a call() that passes in {thrifty} specific information
+in a hashref.
+
+The calls then can be handled like subroutines, with extra information being passed in, 
+such as the {thrifty} information and the "thencall" rule name.
+
+For a third example, imagine this rule:
+
+	rule( 'myrule', thrifty('a','+'), thrifty('b','+'), 'c');
+
+And then imagine trying to apply the above rule to the following string:
+
+	"abbbc"
+
+The rule would be fragmented to look more like this:
+
+	myrule : call('a',{thrifty,'+'}, thencall=>('b',{thrifty,'+'}, thencall=>'c'));
+
+The first thrifty 'a' in the rule would match the first 'a' in teh string:
+
+	"(a(aaab"
+
+THe rule would thencall the second fragment, which would start with the thrifty 'b'.
+This would match the first 'b' in the string.
+	
+	"(a(b(bbc"
+
+The rule would thencall the 'c' rule, which would fail. THe thrifty 'b' would then
+expand to include the second 'b' in the string.
+
+	"(a(bb(bc"
+
+The thrifty 'b' would thencall the 'c' fragment again, which would fail.
+The thrifty 'b' would then expand to include the third 'b' in the string.
+
+	"(a(bbb(c"
+
+The thrifty 'b' would thencall=> the 'c' fragment, which this time would match.
+
+	"(a(bbb(c"
+
+The 'c' thencall rule would return successfully
+
+	"(a(bbb(c)"
+
+The thrifty 'b' would return successfully
+
+	"(a(bbb(c))"
+
+And then the thrifty 'a' would return successfully
+
+	"(a(bbb(c)))"
+
+At which point, we've returned all the way to the very first rule, therefore the parse matched and succeeded.
+
+So, while the original rule might look at the matches like this:
+
+	"(a)(bbb)(c)"
+
+The above associativity doesn't allow the rules to be handled like subroutines.
+If we fragment the rules and change the associativity to this:
+
+	"(a(bbb(c)))"
+
+Then the rules match the flow of a subroutine, and we can parse a rule simply by treating each rule call() as a subroutine call.
+
+=cut
+
+
+
+=head2 	copy_location_info_and_make_new_hash_ref
+
+Internal subroutine.
+
+given a hash created by process_first_arguments_and_return_hash_ref(), 
+extract all location information and copy it to a newly created hash.
+
+=cut 
+
+
+=head2 	eval_string
+
+Internal subroutine.
+
+Pass in a string. Will call eval("") on it. 
+If you want the eval to return a value, assign it to a special variable $eval_return.
+The value of $eval_return will be returned by eval_string() function.
+
+=cut
+
+=head2 	fragment_suffix
+
+Internal subroutine. returns a string that will be used to fragment any rules.
+
+When a rule is fragmented, the fragments are named 
+
+	originalrule.fragment_suffix().integer_counter
+
+Call this subroutine to return the string value for fragment_suffix().
+
+
+=cut 
+
+
+
+=head2 	get_ref_to_rulebook
+
+Internal subroutine. Used to get a reference to the rulebook in the caller's package.
+
+All rules for a package are placed into a package variable called (packagename)::rulebook.
+
+This variable is a hash reference where the keys are the names of the rules and
+the data is an array reference for each rule.
+
+=cut
+
+=head2 	get_ref_to_rulename
+
+Internal subroutine. Used to get a reference to a specific rulename in the caller's package.
+
+Each rule generated for a package is placed into the package as a scalar containing an array reference.
+
+The array reference contains the rule information needed to parse a string.
+
+=cut
+
+=head2 format_package
+
+Internal subroutine. Formats the package name into consistent string.
+
+=cut 
+
+=head2 format_filename
+
+Internal subroutine. Formats the filename into a consistent string.
+
+=cut
+
+
+=head2 format_linenum
+
+Internal subroutine. Formats the line number into a consistent string.
+
+=cut
+
+
+
+Greg London, C<< <email at greglondon.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-parse-Gnaw at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Parse-Gnaw>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Parse::Gnaw
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parse-Gnaw>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Parse-Gnaw>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Parse-Gnaw>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Parse-Gnaw/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2013 Greg London.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=cut
+
+1; # End of Parse::Gnaw

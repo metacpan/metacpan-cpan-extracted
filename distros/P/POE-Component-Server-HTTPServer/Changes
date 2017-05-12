@@ -1,0 +1,19 @@
+Revision history for Perl extension HTTPServer.
+
+0.9.2 Fri May 20 12:00:00 2005
+      - Bugfix: TemplateHandler.pm needs a 'use HTML::Template' (LARRYSH)
+      - Added add_handler() method to HTTPServer.
+      - Bugfix: StaticHandler.pm: bad-path regexp was incorrect (Bob Faist)
+
+0.9.1 Thu Jul 01 12:00:00 2004
+      - Bugfix: binmode() on plainfiles in StaticHandler (Ran Eilam)
+      - Included prerequisite modules in Makefile.PL
+      - More tests
+
+0.9   Fri Jan 16 16:00:00 2003
+      First public release.
+
+0.01  Sat Dec 20 23:53:34 2003
+	- original version; created by h2xs 1.22 with options
+		-A -X -n HTTPServer -v 1.0
+

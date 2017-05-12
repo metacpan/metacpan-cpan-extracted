@@ -1,0 +1,3 @@
+docs: |
+    L<Text::Metaphone> and L<Text::DoubleMetaphone> and
+    L<Text::TransMetaphone> all provide metaphonic calculations.

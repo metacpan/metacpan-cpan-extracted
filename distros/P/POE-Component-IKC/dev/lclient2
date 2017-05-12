@@ -1,0 +1,27 @@
+#!/usr/bin/perl -w
+use strict;
+
+use lib qw(blib/lib blib/arch);
+
+use POE::Component::IKC::ClientLite;
+$|++;
+
+my @connections;
+
+my $name=$ARGV[0]||0;
+print "$$: Connecting $name\n";
+my $remote=POE::Component::IKC::ClientLite->spawn(
+            port=>31337,            
+            name=>"lclient2-$$-$name",
+            timeout=>5,
+        );
+
+die "--$POE::Component::IKC::ClientLite::error" unless $remote;
+
+for (0..3)
+{
+    my $ret;
+    $ret=$remote->call('timeserver/time', 'PING') 
+            or print '-'.$remote->name().$POE::Component::IKC::ClientLite::error;
+    print '(', $remote->name(), " $ret $name)\n" if $ret;
+}

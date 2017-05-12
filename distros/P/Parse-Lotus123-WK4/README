@@ -1,0 +1,32 @@
+NAME
+
+    Parse::Lotus123::WK4 - extract data from Lotus 1-2-3 .WK4 files.
+
+SUMMARY
+
+    Parse::Lotus123::WK4 is a module to extract data from Lotus 1-2-3 .WK4 files.
+
+    This distribution also contains the command-line tool wk42csv.
+
+NO DOCUMENTATION
+
+    This code is experimental, not documented and not properly tested.
+    
+    Look at the source code of wk42csv for a code example.
+
+CHANGES
+
+    See L<https://github.com/f20/parse-lotus123-wk4>.    
+
+BUGS
+
+    This code comes with ABSOLUTELY NO WARRANTY of any kind.
+
+AUTHOR
+
+    Copyright 2008 Reckon LLP and Franck Latrémolière.
+    L<http://www.reckon.co.uk/staff/franck/>
+
+LICENCE
+
+    This is free software; you can redistribute it and/or modify it under the same terms as Perl.

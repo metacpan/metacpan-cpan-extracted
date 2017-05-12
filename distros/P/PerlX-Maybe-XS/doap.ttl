@@ -1,0 +1,130 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe-XS/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-recommendation [ doap-deps:on "PerlX::Maybe"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Maybe-XS>;
+	doap:created         "2013-03-13"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/PerlX-Maybe-XS>;
+	doap:homepage        <https://metacpan.org/release/PerlX-Maybe-XS>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "PerlX-Maybe-XS";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe-XS/v_0-003>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe-XS/v_0-004>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe-XS/v_0-005>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe-XS/v_0-999_01>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe-XS/v_1-000>, <http://purl.org/NET/cpan-uri/dist/PerlX-Maybe-XS/v_1-001>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-perlx-maybe-xs>;
+	];
+	doap:shortdesc       "XS backend for PerlX::Maybe".
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe-XS/v_0-003>
+	a                    doap:Version;
+	rdfs:label           "Initial release; feature compatible with PerlX::Maybe 0.003";
+	dc:identifier        "PerlX-Maybe-XS-0.003"^^xsd:string;
+	dc:issued            "2013-03-13"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-XS-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe-XS/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "PerlX-Maybe-XS-0.004"^^xsd:string;
+	dc:issued            "2013-03-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Prototype for `provided` function.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-XS-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe-XS/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "PerlX-Maybe-XS-0.005"^^xsd:string;
+	dc:issued            "2013-03-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix README.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-XS-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe-XS/v_0-999_01>
+	a                    cpan-uri:DeveloperRelease, doap:Version;
+	dc:identifier        "PerlX-Maybe-XS-0.999_01"^^xsd:string;
+	dc:issued            "2013-08-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch from plain ExtUtils::MakeMaker to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-XS-0.999_01.tar.gz>;
+	doap:revision        "0.999_01"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe-XS/v_1-000>
+	a                    doap:Version;
+	dc:identifier        "PerlX-Maybe-XS-1.000"^^xsd:string;
+	dc:issued            "2013-08-27"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-XS-1.000.tar.gz>;
+	doap:revision        "1.000"^^xsd:string;
+	rdfs:comment         "No functional changes.".
+
+<http://purl.org/NET/cpan-uri/dist/PerlX-Maybe-XS/v_1-001>
+	a                    doap:Version;
+	dc:identifier        "PerlX-Maybe-XS-1.001"^^xsd:string;
+	dc:issued            "2014-02-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Recommend PerlX::Maybe, not Perl::Maybe!";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/93227>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/kentnl>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/PerlX-Maybe-XS-1.001.tar.gz>;
+	doap:revision        "1.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/kentnl>
+	a                    foaf:Person;
+	foaf:name            "Kent Fredric";
+	foaf:nick            "KENTNL";
+	foaf:page            <https://metacpan.org/author/KENTNL>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/93227>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "93227"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=93227>.
+

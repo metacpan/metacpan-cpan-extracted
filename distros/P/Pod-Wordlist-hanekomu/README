@@ -1,0 +1,55 @@
+NAME
+    Pod::Wordlist::hanekomu - Add words for spell checking POD (DEPRECATED)
+
+VERSION
+    version 1.132680
+
+SYNOPSIS
+        use Test::Spelling;
+        use Pod::Wordlist::hanekomu;
+        all_pod_files_spelling_ok('lib');
+
+DESCRIPTION
+    When loaded, this module automatically adds Test::Spelling stopwords for
+    POD spell checking, that is, words that should be ignored by the spell
+    check.
+
+    The stopword list includes some CPAN author names, technical terms (e.g.
+    JSON, URI) and other commonly-used words not included in the default
+    word list (e.g. mixin, munging).
+
+DEPRECATION
+    All non-name words from this list have been merged into the master
+    Pod::Wordlist module. Names are often grabbed directly from author and
+    contributor metadata by relevant tools and are unlikely to be as
+    necessary.
+
+    Therefore, this list is no longer maintained.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Wordlist-hanekomu>
+    .
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <https://metacpan.org/module/Pod::Wordlist::hanekomu/>.
+
+AUTHORS
+    *   Marcel Gruenauer <marcel@cpan.org>
+
+    *   David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2009 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,106 @@
+# Configuration values are followed by major and minor options.
+# The options are boolean settings. If they are commented out,
+# they are off. At the end are file locations with the data
+# directory, these should not need any changes.
+
+# An empty string for the config values is the default but
+# AppConfig isn't happy with that, so those items must be
+# commented out.
+
+ScriptName  = http://your.site/cgi-bin/wiki.pl  # The name of the wiki script, for use in urls
+ScriptDir   = /cgi-bin/         # The directory to the Wiki script (for the cookie)
+SiteName    = YourWiki          # Name of site (used for titles)
+HomePage    = FrontPage         # Home page (change space to _)
+RCName      = RecentChanges     # Name of changes page (change space to _)
+#FullUrl     = ""                # Set if the auto-detected URL is wrong
+#ScriptTZ    = ""                # Local time zone
+#Umask       = 0002	             # the umask used when writing files
+LocalSequenceDir = $DataDir     # The directory where purple number sequences live
+#RemoteSequenceURL = http://www.burningchrome.com:8000/~cdent/nid # EXPERIMENTAL
+
+# Recent Changes
+RcDefault   = 30               # Default number of RecentChanges days
+RcDays      = 1                # List of days for links on RecentChanges
+RcDays      = 3
+RcDays      = 7
+RcDays      = 30
+RcDays      = 90
+KeepDays    = 30               # Days to keep old revisions
+
+# HttpAuth username and password
+#HttpUser    = ""
+#HttpPass    = ""
+
+# HTML additions and characteristics
+#HttpCharset = ""             # Charset for pages, like "iso-8859-2"
+
+# Post sizes
+MaxPost     = 215040           # Maximum 210K posts (about 200K for pages)
+
+# Major options:
+#LoginToEdit            # require logged in user to edit pages
+#UseINames              # if set use i-names
+UseSubpage             # if set allow subpages
+EditAllowed            # if set editing allowed
+UseDiff                # if set use diff features
+FreeLinks              # if set use [[word]] links
+WikiLinks              # if set use LinkPattern
+RunCGI                 # if set Run script as CGI
+ShowNid                # if set value of Nid is shown
+#NonEnglish             # non english characters in links?
+#SimpleLink
+
+# Create Link Options
+#CreateLinkBefore       # if set, puts create link (?) before the text
+                       # (PHPWiki-style)
+CreateLinkText = "?"   # text displayed in create link.  If not set,
+                       # displays the link using the "create" CSS style (
+                       # (MoinMoin and SocialText-style)
+
+# Minor options:
+RecentTop              # if set recent on top
+UseDiffLog             # if set save diffs to log
+KeepMajor              # if set keep major rev
+KeepAuthor             # if set keep author rev
+BracketText            # if set allow [URL text]
+UseAmPm                # if set use am/pm in times
+FreeUpper              # if set force upper case
+#ShowEdits             # if set show minor edits
+
+# Search Modules:
+SearchModule	=	Wiki
+#SearchModule	=	MovableType
+#SearchModule	=	Blosxom
+#SearchModule	=	Arts
+#SearchModule	=	IrcLogger
+#SearchModule	=	Google
+
+# Template Modules
+TemplateDriver = TT
+
+# Search Additional Config
+#MovableTypeDirectory	= 	/home/cdent/www/mt/
+#MovableTypeBlogID	=	1
+#ArtsDirectory		=	/usr/local/etc/
+#IrcLogConfig		=	/home/kb-dev/ircquotes/kbdev.config
+#IrcLogConfig		=	/home/kb-dev/ircquotes/kbeditors.config
+#GoogleWSDL             =       /home/cdent/lib/GoogleSearch.wsdl
+#GoogleKey              =       XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
+# Identity Commons e-names
+#ServiceProviderName = "blueoxen"
+#ServiceProviderKey = ""
+#ReturnUrl			= "http://your.site/cgi-bin/wiki.pl?"
+
+# == You should not have to change anything below this line. =============
+PageDir     = $DataDir/page      # Stores page data
+UserDir     = $DataDir/user      # Stores user data
+KeepDir     = $DataDir/keep      # Stores kept (old) page data
+TempDir     = $DataDir/temp      # Temporary files and locks
+LockDir     = $TempDir/lock      # DB is locked if this exists
+InterFile   = $DataDir/intermap  # Interwiki site->url map
+RcFile      = $DataDir/rclog     # New RecentChanges logfile
+RcOldFile   = $DataDir/oldrclog  # Old RecentChanges logfile
+TemplateDir = $DataDir/templates # templates
+
+# == End of Configuration =================================================

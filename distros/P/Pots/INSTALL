@@ -1,0 +1,8 @@
+Installation instructions for Pots.
+
+issue the standard mantra:
+
+perl Makefile.PL
+make
+make test
+make install

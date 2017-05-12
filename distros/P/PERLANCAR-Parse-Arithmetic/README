@@ -1,0 +1,13 @@
+SYNOPSIS
+
+     use PERLANCAR::Parse::Arithmetic qw(parse_arithmetic);
+     say parse_arithmetic('1 + 2 * 3'); # => 7
+
+DESCRIPTION
+
+    This is a temporary module.
+
+FUNCTIONS
+
+ parse_arithmetic
+

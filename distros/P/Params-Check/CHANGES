@@ -1,0 +1,96 @@
+Changes for 0.38    Thu Jun 20 10:43:37 2013
+============================================
+* Typo fixes by David Steinbrunner
+
+Changes for 0.36    Fri Apr 27 22:57:02 2012
+============================================
+* More speed enhancements by Vincent Pit
+
+Changes for 0.34    Wed Apr 25 13:51:31 2012
+============================================
+* check() now works fasteh thanks to 
+  Vincent Pit
+
+Changes for 0.32    Mon Aug  8 10:53:36 2011
+============================================
+* Removed unnecessary use Data::Dumper
+
+Changes for 0.30    Mon Jul 25 14:44:40 2011
+============================================
+* Resolve [rt #69626] reported by Diab Jerius,
+  WARNINGS_FATAL should apply to all check()
+  failures now.
+
+Changes for 0.28    Fri Jan  7 21:52:28 2011
+============================================
+* Apply blead patch from Peter Acklam
+
+Changes for 0.26    Thu Mar  1 12:05:08 2007
+============================================
+
+* Set install_dirs to 'perl' if perl >= 5.9.5
+* Address #23824: Bug concering the loss of the
+  last_error message when checking recursively.
+
+Changes for 0.25    Wed Jul  5 17:13:07 2006
+============================================
+
+* Apply patch from #20299 that implements the
+  $Params::Check::CALLER_DEPTH variable.
+* Add a warning if the store => variable
+  is not a reference.
+
+Changes for 0.24    Thu Mar  2 13:04:27 2006
+============================================
+
+* Fix issue where allow() wouldn't shortcut
+    after the first successful match (#17364)
+
+Changes for 0.22    Thu Nov 11 11:11:33 2004
+============================================
+
+* Make error reporting of invalid keys contain
+    the stringified version of the disallowed
+    value.
+
+Changes for 0.21    Fri Jun 18 18:38:21 2004
+============================================
+
+* Make template defaults of '' (empty string)
+    work as they should.
+
+Changes for 0.20    Thu Jun 17 19:33:41 2004
+============================================
+
+* ground up rewrite of both code and tests
+    to improve performance
+
+Changes for 0.07    Thu Feb 25 11:14:48 2004
+============================================
+
+* quell a 'use of undefined variable' warning
+    when checking 'undef' values
+
+Changes for 0.06    Thu Feb 19 15:14:48 2004
+============================================
+
+* add template option 'defined'
+
+Changes for 0.05    Tue Feb 10 18:18:23 2004
+============================================
+
+* allow nested lists in allow()
+
+Changes for 0.04    Thu Sep 18 13:41:48 2003
+============================================
+
+* Use carp to get a better caller perspective
+* add the last_error() routine
+* add the allow() routine
+
+
+Changes for 0.03    Wed May 14 14:33:17 2003
+============================================
+
+* Verbosity's default setting depends on $^W
+* New global flag to not change the casing of keys

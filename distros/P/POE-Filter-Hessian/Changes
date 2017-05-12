@@ -1,0 +1,9 @@
+Revision History for POE::Filter::Hessian
+
+
+1.00 Tue Mar 02 2010
+	Changing version number to conform to more widely accepted Perl5 standard.
+
+0.1.2 Thu Mar 16 2009
+        BUGFIX: Returning an empty array from get_one for empty results after
+        noting that POE::Wheel::ReadWrite throws an error.

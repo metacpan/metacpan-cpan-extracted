@@ -1,0 +1,18 @@
+time    : Fri Oct  1 11:30:56 2004
+host    : localhost
+program : amavis
+pid     : undef
+text    : (23837-08) TIMING [total 1101 ms] - SMTP EHLO: 1 (0%), SMTP pre-MAIL: 0 (0%)
+
+time    : Fri Oct  1 11:30:56 2004
+host    : localhost
+program : postfix/smtp
+pid     : undef
+text    : 5FC753D3A6: to=<blabla@fwef>
+
+time    : Fri Oct  1 11:30:59 2004
+host    : localhost
+program : postfix/smtpd
+pid     : undef
+text    : disconnect from x
+

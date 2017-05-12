@@ -1,0 +1,18 @@
+---
+abstract: 'PSGI Server implementation for POE'
+author:
+  - 'Paul Driver <frodwith@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101600'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-Server-PSGI
+requires:
+  Moose: 0
+  POEx::Role::PSGIServer: 0
+version: 0.6

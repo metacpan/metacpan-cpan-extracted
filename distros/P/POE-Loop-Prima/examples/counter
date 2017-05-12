@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+# $Id: counter,v 1.2 2007/08/10 13:37:52 dk Exp $
+
+# ripped off from http://poe.perl.org/?POE_Cookbook/Gtk_Interfaces -- dk
+#
+# This sample program creates a very simple Prima counter.  Its
+# interface consists of three widgets: A label, a rapidly increasing
+# counter, and a button to reset that counter.
+
+use warnings;
+use strict;
+
+use Prima qw(Buttons Label);
+use POE::Kernel { loop => "Prima" };
+use POE::Session;
+
+# Create the session that will drive the user interface.
+
+POE::Session->create(
+	inline_states => {
+		_start   => \&ui_start,
+		ev_count => \&ui_count,
+		ev_clear => \&ui_clear,
+	}
+);
+
+# Run the program until it is exited.
+
+$poe_kernel->run();
+exit 0;
+
+sub ui_start 
+{
+	my ( $kernel, $session, $heap ) = @_[ KERNEL, SESSION, HEAP ];
+
+	$heap->{main_window} = Prima::MainWindow->new(
+		visible => 0,
+	);
+	$kernel-> signal_ui_destroy( $heap->{main_window} );
+
+	my $label = Prima::Label->new( 
+		owner => $heap->{main_window},
+		text  => "Counter", 
+		pack  => {},
+	);
+
+	$heap->{counter}       = 0;
+	$heap->{counter_label} = Prima::Label->new( 
+		owner => $heap->{main_window},
+		text  => $heap->{counter}, 
+		pack  => {} 
+	);
+
+	my $button = Prima::Button->new(
+		owner   => $heap->{main_window},
+		text    => "Clear",
+		onClick => $session-> postback("ev_clear"),
+		pack    => {},
+	);
+
+	$heap->{main_window}-> show;
+
+	$kernel->yield("ev_count");
+}
+
+# Handle the "ev_count" event by increasing a counter and displaying
+# its new value.
+
+sub ui_count {
+	my ( $kernel, $heap ) = @_[ KERNEL, HEAP ];
+	$heap->{counter_label}->text( ++$_[HEAP]->{counter} );
+	$kernel->yield("ev_count");
+}
+
+# Handle the "ev_clear" event by clearing and redisplaying the
+# counter.
+
+sub ui_clear {
+	$_[HEAP]->{counter} = 0;
+}
+

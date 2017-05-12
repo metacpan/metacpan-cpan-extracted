@@ -1,0 +1,117 @@
+Revision history Pod-Spell
+
+1.20      2016-04-22
+	- Stable release, made in Rugby, UK during Perl QA Hackathon 2016
+
+1.19_91   2016-04-21
+	- Drop use of File::ShareDir::ProjectDistDir (GitHub #26). Thanks Kent
+	  Fredric!
+	- Allow stop words with '.' (GitHub #28). Thanks Paulo Custodio!
+
+1.19_90   2016-02-20
+	- Hide internals: the POD parser is moved to a private package and
+	  the Pod::Spell package now only exposes the public interface.
+	  This is a first step towards rewriting the parser using Pod::Simple
+	  (planned for Pod-Spell-2.0).
+	- 'parse_from_file' and 'parse_from_filehandle' are now explicitely
+	  documented (by copying doc from Pod::Parser).
+
+1.19      2016-02-20
+	- Don't set $Text::Wrap::huge globally, but localize it
+	- Load Pod::Wordlist only if used
+
+1.18      2016-01-30
+	- New maintainer: Olivier Mengué (DOLMEN)
+	  Repo is now hosted at github.com/perl-pod/Pod-Spell
+	- Fix warning in strip_stopwords (GH #23)
+	- re-apply "podspell script: set output encoding from locale CTYPE"
+	  (GH #22, #17). The issue in 1.16 was an incorrect dependency
+	  on I18N::Langinfo.
+
+1.17      2015-03-08
+	- revert changes in 1.16 they are not compatible with windows GH #18
+
+1.16      2015-02-24
+	- podspell script: set output encoding from locale CTYPE (DOLMEN)
+
+1.15      2014-02-28
+	- Convert to strict mode of File::ShareDir::ProjectDistDir (KENTNL)
+	- change to use Path::Tiny->lines_utf8
+
+1.14      2014-02-12
+	- Discontinue use of File::Slurp, use Path::Tiny->lines instead
+	  GH #15 ( Ether )
+
+1.13      2013-11-02
+	- fix encoding issues issues in pod for perldoc
+
+1.12      2013-10-17
+	- improve documentation
+
+1.11      2013-10-17
+	- fix shebang to /usr/bin/perl for EUMM replacment GH #13 (dolmen)
+
+1.10      2013-09-27
+	[FEATURES]
+	- added 'no_wide_chars' option to strip words with such characters
+	  from the output.  This may help spellcheckers that can't cope
+	  with UTF-8
+	[CHANGED]
+	- improved punctuation stripping algorithm for better word
+	  isolation (example C<< "hello". >> now is found as "hello")
+	- strips all word that do not have at least one \w character
+	  as a spellchecker isn't likely to do anything useful with them
+	[DOCUMENTED]
+	- added recommendations for dealing with character encoding
+
+1.09      2013-09-25
+	[FIXED]
+	- stopwords with 's are learned without 's to match how they are
+	  checked
+	[CHANGED]
+	- leading and trailing punctuation is entirely stripped since the
+	  spellchecker won't care anyway.  Trailing periods are *not*
+	  stripped as they might be abbreviations ("Ph.D."), but such words
+	  are checked against the stoplist both with and without
+	  trailing periods to account for abbreviations and words at the
+	  end of a sentence.
+
+1.08      2013-09-24
+	[FIXED]
+	- hyphenated word parts are also checked against the stoplist
+	  and stripped (dagolden) GH #9
+	[DOCUMENTED]
+	- noted that stopwords must be added before words appear in Pod
+
+1.07      2013-09-14
+	- add many words
+	[FEATURES]
+	- Pod::Wordlist is an Object ( dagolden )
+	- Lingua::EN::Inflect is used to reduce requiring plurals in the list
+	  ( dagolden )
+	- the wordlist is now a sharedir file
+	[DEPRECATED]
+	- accessing %Pod::Wordlist::Wordlist directly
+
+1.06      2013-09-08
+	- import stopwords from Pod::Wordlist::hanekomu except names
+
+1.05      2013-07-07
+	- add stopwords
+
+1.04      2013-05-08
+	- fix tests to work on older perls
+
+1.03      2013-05-08
+	- update copyright info
+	- require 5.8 (let me know if this is a problem for you)
+	- improve tests
+	- hopefully fix failing test on windows
+	- improve code readability
+	- remove DEBUG for private _is_debug method
+
+1.02      2013-05-07
+	- convert to dzil and adopt
+
+1.01	2001-10-27
+	- first release version ( SBURKE )

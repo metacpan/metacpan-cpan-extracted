@@ -1,0 +1,14 @@
+color_distance.c
+color_distance.h
+color_distance.pp
+ColorDistance.pm
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+cpanfile
+pdlmaker.plm
+README.pod
+README.txt
+t/ciede2000testdata.txt
+t/color_distance.t

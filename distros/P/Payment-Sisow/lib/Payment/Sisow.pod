@@ -1,0 +1,242 @@
+=encoding utf8
+
+=head1 NAME
+
+Payment::Sisow - payments via Sisow
+
+=head1 INHERITANCE
+
+ Payment::Sisow is extended by
+   Payment::Sisow::SOAP
+
+=head1 SYNOPSIS
+
+  my $sisow = Payment::Sisow::SOAP->new(%opts);
+
+  foreach my $bank ($sisow->listIdealBanks)
+  {   print "$bank->{id}\t$bank->{name}\n";
+  }
+
+  my ($trxid, $redirect) = $sisow->startTransaction(%opts);
+  my $status = $sisow->transactionStatus($trxid);
+  my $info   = $sisow->transactionInfo($trxid);
+
+=head1 DESCRIPTION
+
+Sisow (F<http://sisow.nl>) is a Dutch payment broker, which offers a
+SOAP and a REST interface for communication.  This implementation tries
+to offer a common API which will work for both protocols, although currently
+only the SOAP version is realized.  The REST interface offers more.
+
+You can test this module using the script in the F<examples/> directory
+contained in the CPAN distribution of C<Payment-Sisow>.  It is an
+extensive demo.
+
+Please support my development work by submitting bug-reports, patches
+and (if available) a donation.
+
+=head1 METHODS
+
+=head2 Constructors
+
+=over 4
+
+=item Payment::Sisow-E<gt>B<new>(OPTIONS)
+
+Inside Sisow's customer website, you can find the generated merchant
+B<id> (semi-secret registration number) and B<key> (secret which
+is used to sign the replies).
+
+ -Option      --Default
+  merchant_id   <required>
+  merchant_key  <required>
+  test          <false>
+
+=over 2
+
+=item merchant_id => STRING
+
+The Sisow customer's unique key.
+
+=item merchant_key => STRING
+
+The "merchants" password.
+
+=item test => BOOLEAN
+
+You have to enable the permission to run tests in the customer website
+of Sisow.  If not enabled, you will get "317" errors.
+
+=back
+
+=back
+
+=head2 Accessors
+
+=over 4
+
+=item $obj-E<gt>B<isTest>()
+
+=item $obj-E<gt>B<merchantId>()
+
+=item $obj-E<gt>B<merchantKey>()
+
+=back
+
+=head2 Calls
+
+=over 4
+
+=item $obj-E<gt>B<listIdealBanks>(OPTIONS)
+
+List the banks which offer iDEAL.  With iDEAL, the webshop lists the
+customer banks, which each have their own landing page.  Returned is a
+(reference to an) ARRAY of HASHes, each with a bank and id field.
+
+example: 
+
+  foreach my $bank ($sisow->listIdealBanks)
+  {   print "$bank->{name}\n";
+  }
+
+=item $obj-E<gt>B<startTransaction>(OPTIONS)
+
+Returns a transaction id and an url where the user needs to get
+redirected to.
+
+ -Option      --Default
+  amount        <required>
+  bank_id       <undef>
+  callback_url  <return_url>
+  cancel_url    <return_url>
+  description   undef
+  notify_url    <return_url>
+  payment       'ideal'
+  purchase_id   <required>
+  return_url    <required>
+
+=over 2
+
+=item amount => FLOAT_EURO
+
+=item bank_id => ISSUERID
+
+Required when C<payment> is C<ideal>
+
+=item callback_url => URL
+
+=item cancel_url => URL
+
+=item description => STRING
+
+=item notify_url => URL
+
+Pick from:
+
+  ideal         iDEAL  (The Netherlands)
+  mistercash    BanContact/MisterCash (Belgium)
+  sofort        DIRECTebanking (Germany)
+  webshop       WebShop GiftCard (The Netherlands)
+  podium        Podium Cadeaukaart (The Netherlands)
+  ebill         indirect payments
+
+=item payment => PROVIDER
+
+=item purchase_id => STRING
+
+=item return_url => URL
+
+=back
+
+example: 
+
+  my ($trxid, $redirect) = try { $sisow->startTransation(%args) };
+  die $@->wasFatal if $@;
+
+=item $obj-E<gt>B<transactionInfo>(TRANSACTION_ID)
+
+Returns a HASH with complex information.
+
+example: 
+
+   my $info = $sisow->transactionStatus($trxid)
+       or die "cannot retrieve info for $trxid\n";
+
+=item $obj-E<gt>B<transactionStatus>(TRANSACTION_ID)
+
+Returns C<undef>, "Open", "Success", "Expired", "Cancelled", "Failure",
+"Pending", "Credited", or "Reversed".
+
+example: 
+
+  my $status = $sisow->transactionStatus($trxid) || 'MISSING';
+  if($status eq 'Expired') ...
+
+=back
+
+=head2 Helpers
+
+=over 4
+
+=item $obj-E<gt>B<isValidDescription>(STRING)
+
+=item $obj-E<gt>B<isValidPurchaseId>(STRING)
+
+=item $obj-E<gt>B<securedPayment>(QS|PAIRS)
+
+Check whether the payment response was created by Sisow.  QS is a HASH with
+the URI parameters, or the same parameters as LIST of PAIRS
+
+=back
+
+=head1 DETAILS
+
+=head2 About Sisow
+
+Originally, Sisow focussed on the Dutch cheap and easy iDEAL payment
+system --offered by most Dutch banks-- but later it added other types
+of payments:
+
+=over 4
+
+=item * ideal; iDEAL for about 12 Dutch banks (NL)
+
+=item * sofort; SofortBanking/DIRECTebanking (DE)
+
+=item * mistercash; Bancontact/MisterCash (BE)
+
+=item * paypalec; PayPal Express Checkout
+
+=item * webshop; Webshop Gift Card (NL)
+
+=item * fijncadeau; Fijn Cadeaukaart (NL)
+
+=item * podium; Podium Cadeaukaart (NL)
+
+=back
+
+Sisow also offers payment services:
+
+=over 4
+
+=item * ecare; pay after delivery
+
+=item * ebill; digital accept giro
+
+=item * overboeking; pay received accept giro
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of Payment-Sisow distribution version 0.13,
+built on January 08, 2014. Website: F<http://perl.overmeer.net/>
+
+=head1 LICENSE
+
+Copyrights 2013-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,514 @@
+#!perl
+use strict;
+
+package PPerlServer;
+
+use IO::Socket;
+use IO::File;
+use Fcntl ':flock', 'F_GETFL';
+use POSIX qw(:signal_h setsid WNOHANG);
+use Carp 'croak','cluck';
+use PPerl qw( recv_fd read_int );
+
+use vars qw(%CHILDREN $spid $data_at %FILEHANDLES $logfile);
+
+$spid = $$;      # stash it as we change to be someone else later
+$data_at = tell main::DATA
+  if fileno main::DATA;  # strangely it moves!
+
+BEGIN {
+    $logfile = '/tmp/pperl.log';
+    
+    $PPERL::SOCKET_NAME = $ARGV[0];
+    $PPERL::MAX_SERVERS = $ARGV[1] || 3;
+    $PPERL::MAX_REQUESTS = $ARGV[2] || 100;
+    $PPERL::WIDE_OPEN = $ARGV[3] || 0;
+    $PPERL::NO_CLEANUP = $ARGV[4] || 0;
+    $0 = $ARGV[5];
+}
+
+sub log_error {
+    local *FH;
+    open(FH, ">>$logfile")
+      or die "Can't open logfile: '$logfile' $!";
+    print FH @_;
+}
+
+
+my $____self;
+my $should_exit = 0;
+my $exit_code = 0;
+
+BEGIN {
+    *CORE::GLOBAL::exit = sub {
+        my $retval = shift || 0;
+        my $package = (caller)[0];
+
+        log_error("exit $package $retval $should_exit\n");
+        if ($package eq 'PPerlServer' || $should_exit) {
+            exit($retval);
+        }
+        $exit_code = $retval;
+        goto __PPerl_exit;
+    };
+
+    *CORE::GLOBAL::fork = sub {
+        my $package = (caller)[0];
+        my $ret = fork();
+        if (defined $ret && !$ret && $package ne 'PPerlServer') {
+            # forked children should just exit
+            $should_exit = 1;
+        }
+        return $ret;
+    };
+
+    *CORE::GLOBAL::exec = sub {
+        # This is so horribly wrong, overloading exec() to be
+        # system();exit() - but there's no other way to make this
+        # work. See the documentation in t/19invoke_djbish.t for
+        # further info on this issue.
+        my $package = (caller)[0];
+        log_error("exec $package $should_exit\n");
+        if ($package eq 'PPerlServer' || $should_exit) {
+            exec(@_);
+        }
+        my $code = system(@_);
+        $exit_code = $code >> 8;
+        goto __PPerl_exit;
+    };
+}
+
+sub barf {
+    print $____self "XX @_";
+    exit 1;
+}
+
+use vars qw( $pid $pidfile $saved_dir );
+
+
+# lifted from B::walksymtable - mild tweaks to avoid all that slow
+# slow recursion
+
+my ($count, $closed);
+sub find_open_filehandles {
+    my ($symref, $prefix) = @_;
+    return if $PPERL::NO_CLEANUP;
+    my $sym;
+    my $ref;
+    no strict 'vars';
+    
+    $prefix = '' unless defined $prefix;
+    push @packages, [ $symref, $prefix ];
+
+    local(*GLOB);
+    
+    my %fhs;
+    
+    my $foo;
+    while ($foo = shift @packages) {
+        ($symref, $prefix) = @$foo;
+        
+        log_error("Examining $prefix\n");
+        
+        while (($sym, $ref) = each %$symref) {
+            $count++;
+            *GLOB = "*main::".$prefix.$sym;
+            
+            log_error("Processing: $sym\n");
+            if ($sym =~ /::$/) {
+                $sym = $prefix . $sym;
+                if ($sym ne "main::" && $sym ne "<none>::") {
+                    push @packages, [ \%GLOB, $sym ];
+                }
+            }
+            else {
+                next if $sym eq 'DATA';
+                if (defined *GLOB{IO} and fileno(*GLOB{IO})) {
+                    log_error("Adding: *main::".$prefix.$sym. " to FILEHANDLES\n");
+                    $fhs{"*main::".$prefix.$sym} = *GLOB{IO};
+                }
+            }
+        }
+    }
+    
+    return %fhs;
+}
+
+sub close_over {
+    return if $PPERL::NO_CLEANUP;
+    log_error("closing over\n");
+    my %fhs = find_open_filehandles(@_);
+    foreach my $key (keys %fhs) {
+        next if exists $FILEHANDLES{$key};
+        my $fh = $fhs{$key};
+        log_error("closing $key\n");
+        $closed++;
+        close $fh;
+    }
+}
+
+sub init_server {
+  ($pidfile) = @_;
+  my $fh = open_pid_file($pidfile);
+  become_daemon();
+  log_error("became daemon with pid $$\n");
+  print $fh $$;
+  close $fh;
+  return $pid = $$;
+}
+
+sub safe_fork {
+  ### block signal for fork
+  my $sigset = POSIX::SigSet->new(SIGINT);
+  POSIX::sigprocmask(SIG_BLOCK, $sigset)
+    or die "Can't block SIGINT for fork: [$!]\n";
+
+  ### fork off a child
+  my $pid = fork;
+  unless( defined $pid ) {
+    die "Couldn't fork: [$!]\n";
+  }
+
+  ### make SIGINT kill us as it did before
+  $SIG{INT} = 'DEFAULT';
+
+  ### put back to normal
+  POSIX::sigprocmask(SIG_UNBLOCK, $sigset)
+    or die "Can't unblock SIGINT for fork: [$!]\n";
+
+  return $pid;
+}
+
+sub become_daemon {
+  my $child = fork;
+  die "Can't fork: $!" unless defined($child);
+  exit(0) if $child;    # parent dies;
+  POSIX::setsid();     # become session leader
+  open(STDIN,"</dev/null");
+  open(STDOUT,">/dev/null");
+  open(STDERR, '>&STDOUT');
+  chdir '/';           # change working directory
+  umask(0);            # forget file mode creation mask
+  $ENV{PATH} = '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin';
+  delete @ENV{'IFS', 'CDPATH', 'ENV', 'BASH_ENV'};
+  $SIG{CHLD} = \&reap_child;
+
+  # signal handler for child die events
+  $SIG{TERM} = $SIG{INT} = \&do_term;
+  $SIG{HUP}  = \&do_hup;
+}
+
+sub launch_child {
+  my $callback = shift;
+  my $signals = POSIX::SigSet->new(SIGINT,SIGCHLD,SIGTERM,SIGHUP);
+  sigprocmask(SIG_BLOCK,$signals);  # block inconvenient signals
+  die("Can't fork: $!") unless defined (my $child = fork());
+  # my $child = safe_fork();
+  if ($child) {
+    $CHILDREN{$child} = $callback || 1;
+    $SIG{CHLD} = \&reap_child;
+  }
+  else {
+    $SIG{HUP} = $SIG{INT} = $SIG{CHLD} = $SIG{TERM} = 'DEFAULT';
+    $< = $>;  # set real UID to effective UID
+  }
+  sigprocmask(SIG_UNBLOCK,$signals);  # unblock signals
+  return $child;
+}
+
+sub reap_child {
+  log_error("$$ reap_child\n");
+  while ( (my $child = waitpid(-1,WNOHANG)) > 0) {
+    log_error("$$ reaped $child\n");
+    $CHILDREN{$child}->($child) if ref $CHILDREN{$child} eq 'CODE';
+    delete $CHILDREN{$child};
+  }
+  $SIG{CHLD} = \&sig_chld;
+}
+
+sub kill_children {
+  log_error("Killing children: ". join(', ', keys(%CHILDREN)). "\n");
+  kill INT => keys %CHILDREN;
+  # wait until all the children die
+  # sleep while %CHILDREN;
+}
+
+sub open_pid_file {
+  my $file = shift;
+  if (-e $file) {  # oops.  pid file already exists
+    my $fh = IO::File->new($file) || return;
+    my $pid = <$fh>;
+    if ($pid != $$) {
+      croak "Invalid PID file" unless $pid =~ /^(\d+)$/;
+      croak "Server already running with PID $1" if kill 0 => $1;
+      croak "Can't unlink PID file $file" unless -w $file && unlink $file;
+    }
+  }
+  return IO::File->new($file,O_WRONLY|O_CREAT|O_EXCL,($PPERL::WIDE_OPEN ? 0666 : 0644))
+    or die "Can't create $file: $!\n";
+}
+
+END {
+  $> = $<;  # regain privileges
+  if (defined $pid and $$ == $pid) {
+    unlink $pidfile;
+    unlink $PPERL::SOCKET_NAME;
+  }
+}
+
+my $CHILD_COUNT = 0;   # number of children
+my $DONE        = 0;   # set flag to true when server done
+
+# $SIG{INT} = $SIG{TERM} = sub { $DONE++ };
+
+$PPERL::SOCKET_NAME =~ m~^([a-z0-9/_-]+)$~i
+  or die "unclean socket name '$PPERL::SOCKET_NAME'";
+$PPERL::SOCKET_NAME = $1;
+if (-e $PPERL::SOCKET_NAME) {
+  if (-e "${PPERL::SOCKET_NAME}.pid") {
+    die "socket and pid file both exist - possible error state. Delete both and retry";
+  }
+  unlink($PPERL::SOCKET_NAME);
+}
+my $socket = IO::Socket::UNIX->new( Local     => $PPERL::SOCKET_NAME,
+                                    Type      => SOCK_STREAM,
+                                    Listen    => 1,
+                                    Reuse     => 1,
+                                  ) or croak("Can't create listen socket: $!");
+
+if ($PPERL::WIDE_OPEN) {
+  chmod(0777, $PPERL::SOCKET_NAME);
+}
+
+# create PID file, initialize logging, and go into background
+init_server("${PPERL::SOCKET_NAME}.pid");
+
+sub cleanup_child {
+  my $child = shift;
+  $CHILD_COUNT--;
+}
+
+sub do_term {
+  log_error("TERM signal received, terminating children...\n");
+  close($socket);
+  kill_children();
+  exit(0);
+}
+
+sub do_hup {
+  log_error("HUP signal received by $$\n");
+  close($socket);
+  kill_children();
+  exit(0);
+}
+
+sub setup_chunk {
+    my $sd = $_[0];
+    $sd->autoflush(1);
+
+    $spid = $$;
+    my $sock = $sd->fileno();
+
+    log_error("$$ starting handshake\n");
+
+    # potentially flaky magic number - certainly pid gets more than 10
+    # decimal digits on my dev machines - richardc
+    my $pid = sprintf('%010d', $$);
+    POSIX::write($sock, $pid, 10);
+
+    log_error("$$ duping fds from $sock\n");
+
+    my $target;
+    while ((my $target = read_int($sock)) >= 0) {
+        log_error("$$ targeting $target\n");
+        if ( $target == $sock ) {
+            log_error("$$ performing the Dick Van Dyke shuffle\n");
+            # Mary Poppins, step in time
+            my $newsock = POSIX::dup($sock);
+            unless (defined $newsock) {
+                log_error("$$ gor blimey Mary Poppins, I can't move ($!)\n");
+                barf("$$ Dick Van Dyke exception! ($!)\n");
+            }
+            log_error("$$ dup sock: $sock newsock: $newsock\n");
+            POSIX::close($sock);
+            $sock = $newsock;
+            unless ($sd = $_[0] = IO::Socket->new_from_fd( $sock, "+<" )) {
+                log_error("$$ failed to step in time ($!)\n");
+                barf("$$ Dick Van Dyke shuffle failed! ($!)\n");
+            }
+        }
+        my $fd = recv_fd( $sock );
+        if ($fd < 0) {
+            my $err = "$$ recv_fd for $target returned -1: $!\n";
+            log_error($err);
+            barf($err);
+        }
+        log_error("$$ $fd wants to be $target\n");
+        if ($fd != $target) {
+            my $ret = POSIX::dup2($fd, $target);
+            log_error("$$ dup2 returns $ret\n");
+            barf("$$ dup2($fd, $target) failed") unless $ret;
+            $ret = POSIX::close($fd);
+            log_error("$$ close of $fd returns $ret\n");
+            barf("$$ close($fd) failed after dup2($fd, $target)") unless $ret;
+        }
+    }
+
+
+    local $/ = "\0";
+    while (<$sd>) {
+        chomp;
+        if ($_ eq '[PID]') {
+            chomp( my $pid = <$sd> );
+            log_error("$$ is talking to $pid\n");
+            $pid =~ /^(\d+)$/ or barf("$$ pid is mangled\n");
+            if ($] > 5.006001) {
+                PPerl::setreadonly('$', $1); # ');
+            }
+            else {
+                $$ = $1;
+            }
+            next;
+        }
+        if ($_ eq '[CWD]') {
+            chomp ( my $cwd = <$sd> );
+            log_error("$$ cwd $cwd\n");
+            # we are bad people
+            $cwd =~ /^(.*)$/
+              or barf("cwd '$cwd' unclean");
+            $cwd = $1;
+            chdir $cwd or barf("couldn't chdir '$cwd':  '$!'");
+            next;
+        }
+        if ($_ eq '[ENV]') {
+            log_error("$$ setting env\n");
+            chomp( my $env = <$sd> );
+            for (1..$env) {
+                local $_ = <$sd>;
+                chomp;
+                my ($key, $value) = split(/\s*=\s*/, $_, 2);
+                $ENV{$key} = $value;
+            }
+            next;
+        }
+        if ($_ eq '[ARGV]') {
+            chomp( my $args = <$sd> );
+            log_error("$$ setting $args args\n");
+            for (1..$args) {
+                chomp( $_ = <$sd> );
+                log_error("$$ Read arg: $_\n");
+                push @ARGV, $_;
+            }
+            next;
+        }
+        if ($_ eq '[DONE]') {
+            return;
+        }
+        log_error("got unexpected '$_'\n");
+        barf("what's this then? '$_'");
+    }
+}
+
+use vars qw($cycles);
+
+while (!$DONE) {
+    while ($CHILD_COUNT < $PPERL::MAX_SERVERS) {
+        my $child = launch_child(\&cleanup_child);
+        if ($child) {  # child > 0, so we are the parent
+            log_error("$$ launched child $child\n");
+            $CHILD_COUNT++;
+        }
+        else {
+            $cycles = $PPERL::MAX_REQUESTS;
+            while ($cycles-- && !$should_exit) {
+                log_error("$$ waiting for $cycles more new jobs\n");
+                $____self = $socket->accept;
+                unless ($____self) {
+                    log_error("$$ accept failed: $!\n");
+                    last;
+                }
+
+                %ENV  = ();
+                @ARGV = ();
+
+                setup_chunk($____self);
+
+                local *ARGV if !@ARGV; # mumble, grumble, scoping
+                if (!@ARGV) { # magic for <ARGV>
+                    log_error("$$ Set argv magic\n");
+                    open(ARGV, "<&STDIN");
+                }
+
+                log_error("$$ sending OK message\n");
+                POSIX::write($____self->fileno, "OK\n", 3);
+                log_error("$$ sent\n");
+
+                # reset bogus '<STDIN>, line 99' count
+                $. = 0;
+                $? = $! = $^E = 0;
+                select STDOUT;
+                '' =~ m/^$/; # should reset match variables
+		srand (time ^ $$);
+
+                goto ____PPerlCode;
+              ____PPerlBackAgain:
+
+                if ($@) {
+                    print STDERR $@;
+                    $exit_code = 255;
+                }
+
+              __PPerl_exit:
+
+                log_error("$$ disabling alarms\n");
+                alarm 0;
+
+                log_error("$$ closing everything\n");
+
+                $closed = $count = 0;
+                close_over(\%::);
+                log_error("$$ considered $count things, closed $closed\n");
+
+                open(STDIN,"</dev/null");
+                open(STDOUT,">/dev/null");
+                open(STDERR, '>&STDOUT');
+
+                if ( fileno main::DATA && $data_at ) {
+                    my $ret = seek(main::DATA, $data_at, 0);
+                    log_error("seek returned $ret\n");
+                }
+                log_error("$$ run done - exit code $exit_code\n");
+
+                print $____self $exit_code;
+                log_error("$$ closing down socket\n");
+                close($____self);
+            }
+            log_error("$$ child is done (should_exit: $should_exit, cycles: $cycles)\n");
+            exit 0;                 # child is done
+        }
+    }
+    sleep;         # wait for a signal
+}
+
+PPerl::kill_children();
+log_error("normal termination\n");
+exit 0;
+
+#putting it here avoids accidental closures
+____PPerlCode:
+
+eval {
+    package main;
+    no strict;
+    
+    # should you change the line below change write_pperl_h too
+    #### Your Code Here ####
+};
+
+goto ____PPerlBackAgain;
+
+BEGIN {
+    log_error("finding open filehandles ($PPERL::NO_CLEANUP)\n");
+    %FILEHANDLES = find_open_filehandles(\%::);
+}
+

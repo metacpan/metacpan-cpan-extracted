@@ -1,0 +1,11 @@
+
+my $x = 1;
+
+=pod
+
+This is mid-code!
+
+=cut
+
+my $y = 2;
+

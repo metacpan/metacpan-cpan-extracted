@@ -1,0 +1,51 @@
+0.05    Tue Oct 17 19:04:08 AKDT 2000
+
+    - A recent change could cause backwards compatibility problems.  If the
+      value to be pulled from a parsed file for a given symbol is a scalar,
+      and that scalar is undefined, the symbol will be omitted from the
+      configuration hash entirely.  This is due to a quirk of perl, see the
+      BUGS section in Parse::PerlConfig's documentation.
+
+      The reason for this change is to prevent symbols from populating the
+      hash if they are simply undef scalars; this can either be caused by
+      actually setting a scalar to undef, or, more likely, by a non-scalar
+      value being set that is not then pulled out due to a Symbols or
+      Thing_Order argument.
+
+      For example, given a Thing_Order of '@$' and a configuration file
+      containing only '%foo = ()' the configuration hash would have gotten a
+      'foo' key, set to the undef value, due to how Perl is implemented (all
+      symbols have a scalar thing, regardless of whether or not it's ever
+      used).  The aforementioned change prevents this useless key from
+      getting into the configuration hash.
+
+
+0.04    Sat Sep 16 02:07:53 AKDT 2000
+
+    - No new news.
+
+
+0.03    Fri Jul 14 18:15:26 AKDT 2000
+
+    - Removed the $namespace and $filename lexicals that were once
+      accessible from configuration files.  %parse_perl_config is now the
+      only way to access that information.
+
+    - Added File, Handler, Warn_default, Warn_eval, and
+      Error_invalid_namespace arguments.
+
+    - Renamed the Error_preparse argument to Warn_preparse.  This causes a
+      slight backwards-compatibility issue if someone is currently
+      specifying something other than 'noop' for the Error_preparse
+      argument.
+
+
+0.02    Mon Mar 20 22:57:26 AKST 2000
+
+    - Added a Taint_Clean option, for untainting the opened filehandle
+      before evaling the file's contents.
+
+
+0.01    Wed Feb 16 04:19:33 AKST 2000
+
+    - Initial version.

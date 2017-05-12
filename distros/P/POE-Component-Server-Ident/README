@@ -1,0 +1,148 @@
+NAME
+
+    POE::Component::Server::Ident - A POE component that provides
+    non-blocking ident services to your sessions.
+
+VERSION
+
+    version 1.18
+
+SYNOPSIS
+
+       use strict;
+       use warnings;
+       use POE qw(Component::Server::Ident);
+    
+       POE::Component::Server::Ident->spawn ( Alias => 'Ident-Server' );
+    
+       POE::Session->create (
+            package_states => [
+                    'main' => [qw(_start identd_request)],
+            ],
+       );
+    
+       $poe_kernel->run();
+       exit 0;
+    
+       sub _start {
+          $poe_kernel->post( 'Ident-Server' => 'register' );
+          undef;
+       }
+    
+    
+       sub identd_request {
+          my ($kernel,$sender,$peeraddr,$port1,$port2) = @_[KERNEL,SENDER,ARG0,ARG1,ARG2];
+          my ($val1,$val2);
+          $val1 = $val2 = int(rand(99999));
+          $val1 =~ tr/0-9/A-Z/;
+          $kernel->call ( $sender => ident_server_reply => 'OTHER' => "$val1$val2" );
+          undef;
+       }
+
+DESCRIPTION
+
+    POE::Component::Server::Ident is a POE component that provides a
+    non-blocking Identd for other components and POE sessions.
+
+    Spawn the component, give it an an optional lias and it will sit there
+    waiting for Ident clients to connect. Register with the component to
+    receive ident events. The component will listen for client connections.
+    A valid ident request made by a client will result in an
+    'identd_server' event being sent to your session. You may send back
+    'ident_server_reply' or 'ident_server_error' depending on what the
+    client sent.
+
+    The component will automatically respond to the client requests with
+    'ERROR : HIDDEN-USER' if your sessions do not send a respond within a
+    10 second timeout period. This can be adjusted with 'Random' and
+    'Default' options to spawn().
+
+CONSTRUCTOR
+
+    spawn
+
+      Takes a number of arguments:
+
+        'Alias',    a kernel alias to address the component with;
+        'BindAddr', the IP address that the component should bind to,
+                    defaults to INADDR_ANY;
+        'BindPort', the port that the component will bind to, default is 113;
+        'Multiple', specify whether the component should allow multiple ident queries
+                    from clients by setting this to 1, default is 0 which terminates
+                    client connections after a response has been sent;
+        'TimeOut',  this is the idle timeout on client connections, default
+                    is 60 seconds, accepts values between 60 and 180 seconds.
+        'Default',  provide a default userid to return if your sessions don't provide a
+                    response.
+        'Random',   the component will generate a random userid string if your sessions
+                    don't provide a response.
+
+METHODS
+
+    session_id
+
+      Retrieve the component's POE session ID.
+
+    getsockname
+
+      Access to the POE::Wheel::SocketFactory method of the underlying
+      listening socket.
+
+INPUT
+
+    The component accepts the following events:
+
+    register
+
+      Takes no arguments. This registers your session with the component.
+      The component will then send you 'identd_request' events when clients
+      make valid ident requests. See below.
+
+    unregister
+
+      Takes no arguments. This unregisters your session with the component.
+
+    ident_server_reply
+
+      Takes two arguments, the first is the 'opsys' field of the ident
+      response, the second is the 'userid'.
+
+    ident_server_error
+
+      Takes one argument, the error to return to the client.
+
+    shutdown
+
+      Terminates the component. The listener is closed and all current
+      client connections are disconnected.
+
+OUTPUT
+
+    The component will send the following events:
+
+    identd_request
+
+      Sent by the component to 'registered' sessions when a client makes a
+      valid ident request. ARG0 is the IP address of the client, ARG1 and
+      ARG2 are the ports as specified in the ident request. You can use the
+      'ident_server_reply' and 'ident_server_error' to respond to the
+      client appropriately. Please note, that you send these responses to
+      $_[SENDER] not the kernel alias of the component.
+
+SEE ALSO
+
+    POE
+
+    RFC 1413 http://www.faqs.org/rfcs/rfc1413.html
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

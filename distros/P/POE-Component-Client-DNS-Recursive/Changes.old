@@ -1,0 +1,26 @@
+POE::Component::Client::DNS::Recursive
+======================================
+
+1.00	Mon May 18 22:33:05 BST 2009
+	- Added postbacks for event and trace
+
+0.12	Wed Apr 15 23:41:27 BST 2009
+	- Finally tracked down the fails with nameservers parameter
+
+0.10	Wed Apr 15 15:36:40 BST 2009
+	- The 'host' and 'event' parameters weren't mandatory, made
+	  them so.
+
+0.08	Thu Apr  9 12:42:51 BST 2009
+	- Fixed some issues with only one nameserver being specified.
+	- Resolved issues with select not being removed on the socket.
+
+0.06	Wed Apr  8 08:59:58 BST 2009
+	- Make auto_set_repository() only run at author-time
+	- Better error checking for when we can't make a socket address
+
+0.04	Mon Apr  6 14:40:57 BST 2009
+	- Added some diagnostics to the test that CPAN Testers are failing on
+
+0.02	Thu Apr  2 21:49:48 BST 2009
+	- Initial CPAN release

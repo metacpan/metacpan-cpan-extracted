@@ -1,0 +1,49 @@
+Padre-Plugin-Shell-Base
+=======================
+
+A base class for plugins that use the system shell to extend Padre.
+
+INSTALLATION
+============
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+=========================
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Padre::Plugin::Shell::Base
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Padre-Plugin-Shell-Base
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Padre-Plugin-Shell-Base
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Padre-Plugin-Shell-Base
+
+    Search CPAN
+        http://search.cpan.org/dist/Padre-Plugin-Shell-Base/
+
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2009 Gregory Siems
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+See http://dev.perl.org/licenses/ for more information.
+

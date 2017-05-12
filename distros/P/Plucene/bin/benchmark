@@ -1,0 +1,32 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Plucene;
+use Plucene::TestCase;
+
+use Benchmark 'cmpthese';
+use File::Slurp;
+
+chomp(my @words = read_file('/usr/share/dict/enable'));
+
+my $sentence = sub {
+	my $words = shift;
+	return join " ", map $words[ rand @words ], 1 .. $words;
+};
+
+sub add_sentences {
+	my $length = shift;
+	new_index { add_document(content => $sentence->($length)) for 1 .. 100 };
+}
+
+print Plucene->VERSION, "\n";
+
+cmpthese(
+	10 => {
+		'short'  => sub { add_sentences(1) },
+		'medium' => sub { add_sentences(10) },
+		'long'   => sub { add_sentences(100) },
+	});
+

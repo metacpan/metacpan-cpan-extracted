@@ -1,0 +1,271 @@
+CHANGELOG
+
+v2.05 (2017/03/23)
+==================
+--pkmdir would fail when given paths that included . or .. subdirs,
+  fixed
+--improved error message from pkmdir to make it obvious what specific
+  portion of the path failed
+--fixed a bug in popen where reopening a filehandle that was stored 
+  under its absolute name deleted the internal cache record
+--fixed sigchld signal preemption so it doesn't miss children exit
+  codes
+
+v2.04 (2016/09/19)
+==================
+--Added signal dispatcher functionality to Paranoid::Process
+
+v2.03 (2016/08/09)
+==================
+--Bad plan for non-IPv6-enabled systems
+
+v2.02 (2016/08/09)
+==================
+--Typos in documentation (Debial Perl Group)
+--Regex improvement for IPv6 addresses (theodore@grcrun11.gr)
+
+v2.01 (2016/06/23)
+==================
+--Fixed error in prm where files weren't actually deleted if there was a 
+  previous error in $! that set ENOENT
+--Fixed error in Paranoid::Filesystem where umask was improperly applied
+--Fixed error in popen where mode & perms weren't detainted completely
+--Adjusted log file test to account for some timing issues on some platforms
+--Expanded documentation for Paranoid::Input (documenting known regexes)
+
+v2.00 (2015/10/12)
+==================
+--Dropped support for Perl 5.6
+--Eliminated most instances of croak/die in favor of expecting developers 
+  to check the return value
+--Complete rewrite of I/O layers and functions
+--Added Paranoid::IO
+--Added Paranoid::IO::Line
+--Moved slurp, sip, etc., to Paranoid::IO::Line
+--Rewrote slurp, sip, etc., to provide non-locking versions of functions
+--Rewrote slurp, sip, etc., to leverage tuneable performance options from
+  Paranoid::IO
+--Rewrote and moved Paranoid::Lockfile to Paranoid::IO::Lockfile
+--Rewrote Paranoid::Log, Paranoid::Log::Buffer, and Paranoid::Log::File
+--Renamed perror to pderror in Paranoid::Debug to avoid name conflict 
+  with POSIX
+--Added printf functionality to pdebug
+--Added platform-agnostic pchomp to Paranoid::Input
+--Added passed regex functionality to detaint
+--Updated detaint to make target var (third argument) optional
+--Updated detaint to work on arrays and hashes as well
+--Improved/expanded module unit tests
+--Eliminated use of prototypes except where absolutely needed 
+  (which eliminates the need to pass by reference for many functions)
+--Eliminated pglob from Paranoid::Filesystem.  Globs should be handled
+  exclusively through Paranoid::Glob.
+--Modified all Paranoid::Filesystem functions to reorder arguments in 
+  actual order of importance, making optional arguments truly optional
+--Made all Paranoid::Filesystem functions consistent in declaring 
+  a filesystem target:  you can pass either a string or a glob, but if
+  specifying disparate targets as a list you must pass it as a 
+  Paranoid::Glob.
+--Removed Paranoid::BerkeleyDB, Paranoid::Log::Syslog, and 
+  Paranoid::Log::Email.  Those are now in their own CPAN distributions.
+--Added/improved various regexes in Paranoid::Input
+--Improved Paranoid::Network's extractIPs to also extract network 
+  addresses
+--Added deepCmp to the Paranoid::Data module.
+
+v0.36 (2012/09/24)
+==================
+--Documentation updates
+--Added IPv4/6 sorting functions, supporting string, packed, and 
+  integer formats
+--Fixed MAXIPV6CIDR constant to 128
+--Fixed bare words warnings in Perl 5.6 for IPv6 modules
+
+v0.34 (2012/05/29)
+==================
+--Added Paranoid::Network::IPv4 & Paranoid::Network::IPv6 to provide 
+  general protocol-specific functions
+--Added ipv4NetConvert function to convert IPv4 IPs to native integer 
+  format, and network ranges to base, broadcast, and netmasks in 
+  native integer format
+--Added ipv6NetConvert function to convert IPv6 IPs to 32bit integer 
+  arrays, and network ranges to base, broadcast, and netmasks in 
+  32bit integer arrays
+--Added ipv4NetIntersect function to test whether two IPv4 IP/network 
+  address ranges intersect
+--Added ipv6NetIntersect function to test whether two IPv6 IP/network 
+  address ranges intersect
+--Reworked Paranoid::Network to make use of IPv4/IPv6 modules for 
+  use in ipInNetwork
+--Added netIntersect to Paranoid::Network, which is an IPv4/IPv6-
+  agnostic wrapper for the related functions in the IPv4/IPv6 modules
+--Typo fixed in Paranoid::Network::Socket documentation
+
+v0.33 (2011/12/29)
+==================
+--Detection of imported symbols in the local namespace wasn't working
+  correctly.  Fixed.
+
+v0.32 (2011/12/19)
+==================
+--Added new wrapper module for simpler, more portable IPv6 support and 
+  checking (Paranoid::Network::Socket)
+--Modified Paranoid::Network to use Paranoid::Network::Socket, and removed 
+  Socket, Socket6, and Paranoid::Module dependencies
+--Improved Paranoid::Module to reduce the number of detaints, requires, 
+  and evals for high frequency calls
+--Improved debug output of Paranoid::Module
+
+v0.31 (2011/12/06)
+==================
+--Use of cached file handles in Paranoid::Lockfile is now fork-safe
+--Use of open databases in Paranoid::BerkeleyDB is now fork-safe
+--Added lock/unlock methods to Paranoid::BerkeleyDB objects for 
+  multiple operations that need to be atomic
+--Socket6 is no longer needed or looked for if on Perl 5.14 or newer
+
+v0.30 (2011/08/17)
+==================
+--Added file permissions support to BerkekelyDB module
+--Moved flocking of lockfile to the BerkelelyDB internals
+--plock, etc., now returns exit value of flock routine in Lockfile
+--Fixed optional prereqs in generated META.yml file
+--Added CREDITS file (with recognition for Slaven Rezic (srezic@cpan.org))
+
+v0.29 (2011/04/15)
+==================
+--Perl-5.6 compatibility fix:  Socket in 5.6 doesn't export AF/PF_INET6, 
+  so using Socket6's exclusively
+--Perl-5.8 compatibility fix:  Perl's parser chokes on the use of 'bare
+  word' imports (i.e., AF_INET), so calling them as subs.
+--Optimizing regexes with code-based interpolations of constants
+--Misc code adjustments
+
+v0.28 (2011/04/12)
+==================
+--Updated ipInNetwork in Paranoid::Network to support IPv6 networks &
+  addresses
+--Added new function extractIPs to Paranoid::Network which can extract IPv4/
+  IPv6 addresses from arbitrary text
+--Minor tweaks to some regexes in Paranoid::Input
+
+v0.27 (2010/06/03)
+==================
+--Added the ability to restrict level of indentation for pdebug messages in
+  Paranoid::Debug
+--Fixed pchmod so that relative permissions applied to a symlink doesn't use 
+  the symlink's permissions to apply, but rather the target
+--Rewrote Paranoid::Log's internals
+--Added '!' as a supported scope for logging facilities
+--Added more severity level aliases
+
+v0.26 (2010/05/08)
+==================
+--Changed daemonize's behavior:  reopening STD* on /dev/null and chdir'ing
+  to /.  Hindsight's 20/20, eh?
+--Made backup/restore of SIGCHLD in pcapture dependent upon an actual
+  sighandler being installed
+
+v0.25 (2010/05/05)
+==================
+--Fixed tail's behavior to be consistent with documentation
+--Fixed tail/sip to preserve file position and buffers when 
+  reopening the file in children
+--Fixed tail functionality to handle deleted, truncated, moved, or replaced
+  files
+--Expanded tail/sip documentation
+--Added daemonize function to Paranoid::Process
+
+v0.24 (2010/04/15)
+==================
+
+--Added Paranoid::Glob
+--Major cleanup to satisfy PerlCritic and PerlTidy
+--Fixed pmkdir to allow permissions that include sticky bits, etc.
+--Updated filesystem functions to use Paranoid::Glob instead of pglob
+--pglob is now just a wrapper around Paranoid::Glob as well
+--Removed excessive external locking in Paranoid::BerkeleyDB -- hopefully
+  internal CDB locking mechanism is robust enough
+--Made user input validation on Paranoid::Filesystem non-fatal (handing in
+  undefs as filenames, etc.)
+--Removed MAXLINKS in Paranoid::Filesystem
+
+
+v0.23  (2009/03/17)
+===================
+--Fixed tests that weren't fully supported on all platforms
+--Commented out pchown tests which were failing to due to a bug
+  in Perl.  A patch has been submitted to bleadperl to address it.
+--Added manual detaint of TERM environment variable in psecureEnv
+--Updated documentation to include Paranoid::Data
+--Made getKeys in Paranoid::BerkeleyDB use finer grained locking
+--Added Paranoid::Data
+--Added sip, tail, and closeFile functions
+--Fixed bug in preadDir that added undef records while filtering out
+  symlinks (bug introduced in v0.21)
+
+v0.21  (2009/03/04)
+===================
+--Massive reformat with Perl::Tidy
+--Massive rewrite to accommodate Perl::Critic
+--Converted all tests to use Test::More
+--Converted licensing to be same as Perl
+--Documentation updates
+--Updated to only support Perl 5.6 or better
+--Fixed bug in pcapture to return appropriate return values
+--Fixed bug in pchmodR/pchownR to return correct RV (false)
+  with non-existant targets
+--Added Paranoid::Args
+
+v0.20  (2008/04/28)
+===================
+--Misc. POD updates
+
+Paranoid::Filesystem:
+--Fixed bug in the recursion wrapper where there were errors in certain
+  modes when called on a hierarchy that included an empty subdirectory
+--Fixed bug in pchmod where subtracting perms (i.e., o-w) wouldn't result
+  in the correct permissions
+--Added automatic argument detainting for most functions
+--Replaced the horrible manual kludge of pglob with an intelligent wrapper for
+  the shell glob
+--ptouch now supports full shell globbing, even for non-existent files.
+--ptouchR can now create files, but won't automatically create subdirectories
+
+Paranoid::Input:
+--Added automatic filename detainting for slurp
+--Updated filename/fileglob regexes (expanded allowed characters)
+
+Paranoid::Log & Paranoid::Module:
+--Added automatic detainting of module names
+
+Paranoid::Log::File:
+--Added automatic detainting of log filenames
+
+v0.19  (2008/04/28)
+===================
+--Made the croak statements more internally consistent
+--Made releasing the lockfiles and db entries in BerkeleyDB more explicit
+--Updated filename regex in Input
+--Added study to stringMatch
+--Added pcapture function to Process
+
+v0.18  (2008/02/29)
+===================
+--Fixed mail headers for Email module when there are multiple recipients
+--Fixed tests to account for FreeBSD's comments in /etc/passwd, /etc/group
+
+v0.17  (2008/02/28)
+===================
+--Made more tests conditional to account for more types of
+  system configurations
+--Made error checking more explicit for e-mail logging, and storing
+  those errors in Paranoid::ERROR
+
+v0.16  (2008/02/27)
+===================
+--Fixed conditional tests
+--Added new function to Paranoid::Debug (psetDebug)
+
+v0.15  (2008/02/26)
+===================
+--Initial public release

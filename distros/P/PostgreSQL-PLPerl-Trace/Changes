@@ -1,0 +1,10 @@
+=head1 NAME
+
+Changes - List of significant changes to PostgreSQL::PLPerl::Trace
+
+=head2 Changes in 1.001
+
+  Initial version.
+
+=cut
+

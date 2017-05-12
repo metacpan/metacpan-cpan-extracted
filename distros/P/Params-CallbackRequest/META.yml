@@ -1,0 +1,41 @@
+---
+abstract: 'Functional and object-oriented callback architecture'
+author:
+  - 'David E. Wheeler <david@justatheory.com>'
+build_requires:
+  Module::Build: 0.2701
+  Test::More: 0.17
+configure_requires:
+  Module::Build: 0.2701
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Params-CallbackRequest
+provides:
+  Params::Callback:
+    file: lib/Params/Callback.pm
+    version: 1.20
+  Params::CallbackRequest:
+    file: lib/Params/CallbackRequest.pm
+    version: 1.20
+  Params::CallbackRequest::Exceptions:
+    file: lib/Params/CallbackRequest/Exceptions.pm
+    version: 1.20
+recommends:
+  Test::Pod: 1.41
+requires:
+  Attribute::Handlers: 0.77
+  Class::ISA: 0
+  Exception::Class: 1.10
+  Params::Validate: 0.59
+  Test::Simple: 0.17
+  perl: 5.006
+resources:
+  bugtracker: http://github.com/theory/params-callbackrequest/issues/
+  homepage: http://search.cpan.org/dist/Params-CallbackRequest/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/theory/params-callbackrequest/
+version: 1.20

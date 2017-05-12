@@ -1,0 +1,85 @@
+#!perl
+
+use strict;
+use warnings;
+
+use File::Basename;
+use File::Spec::Functions;
+use File::Path qw(mkpath);
+use Pod::PseudoPod::LaTeX;
+use Getopt::Long;
+use Pod::Usage;
+
+GetOptions(
+    "keep_ligatures" => \my $keep_ligatures,
+    "captions_below" => \my $captions_below,
+    "full"           => \my $full,
+) or pod2usage(2);
+
+pod2usage(
+    -msg     => "Please enter a file or list of files",
+    -exitval => 2,
+) unless @ARGV;
+
+for my $file (@ARGV)
+{
+    die "Cannot read '$file': $!\n" unless -e $file;
+    my $outfile   = catfile(
+        'build',
+        (fileparse( $file, qr/\.pod$/ ))[0] . '.tex'
+    );
+    mkpath( 'build' ) unless -e 'build';
+    open( my $fh, '>', $outfile ) or die "Can't write to '$outfile': $!\n";
+
+    my $parser    = Pod::PseudoPod::LaTeX->new(
+	keep_ligatures => $keep_ligatures,
+	captions_below => $captions_below,
+	full           => $full,
+    );
+    $parser->output_fh( $fh );
+
+    warn "$file -> $outfile\n";
+
+    $parser->parse_file( $file );
+}
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+ppod2latex - convert PseudoPod to LaTeX
+
+=head1 SYNOPSIS
+
+    ppod2latex [--keep_ligatures] [--captions_below] [--full] <file-list>
+
+=head1 DESCRIPTION
+
+Convert a file (or list of files) written in PseudoPod into LaTeX for later
+processing to e.g. PDF via C<pdflatex>.
+
+The output LaTeX text requires a LaTeX preamble and needs to be wrapped
+within a C<document> environment.
+
+=head1 OPTIONS
+
+=over 4
+
+=item keep_ligatures
+
+Retain ligatures in LaTeX output text.  Thus the character pairs fi, fl, and
+ft will be joined when LaTeX produces its output.
+
+=item captions_below
+
+Put figure and table captions below the object as opposed to above, which is
+the default.
+
+=item full
+
+Create a standalone document which can immediately be run through C<latex>
+or C<pdflatex>.
+
+=back

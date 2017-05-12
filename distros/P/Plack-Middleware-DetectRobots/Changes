@@ -1,0 +1,13 @@
+
+0.03      2015-01-25 19:06:20+01:00 Europe/Berlin
+	- Synced with latest robot list as of rev. 2d289e, 2014-11-20
+	  (no new bot specs added)
+	- Fixed a typo and the link to the robot list source in POD
+
+0.02      2014-01-14 22:19:41 Europe/Berlin
+	- Fix compatibility with Plack <= 1.0015
+
+0.01      2014-01-11 20:59:48 Europe/Berlin
+	- Initial release
+	- Based on AWStats robots.pm revision 1.71
+

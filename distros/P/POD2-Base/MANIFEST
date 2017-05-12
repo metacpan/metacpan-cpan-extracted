@@ -1,0 +1,18 @@
+
+lib/POD2/Base.pm
+lib/POD2/Base.pod
+lib/POD2/PT/POD2/Base.pod       A PT translation of POD2::Base docs
+
+Makefile.PL
+Changes
+README
+MANIFEST			This list of files
+
+t/01_use.t
+t/02_basic.t
+t/99_pod.t
+t/98_pod-coverage.t
+t/lib/.exists                   Existence marker for t/lib/
+eg/list.pl
+
+META.yml                                 Module meta-data (added by MakeMaker)

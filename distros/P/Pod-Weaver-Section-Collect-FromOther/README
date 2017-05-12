@@ -1,0 +1,67 @@
+NAME
+    Pod::Weaver::Section::Collect::FromOther - Import sections from other
+    POD
+
+VERSION
+    This document describes 0.002 of
+    Pod::Weaver::Section::Collect::FromOther - released February 28, 2012 as
+    part of Pod-Weaver-Section-Collect-FromOther.
+
+DESCRIPTION
+    Copy chunks of POD from other documents, and incorporate them. Our
+    purpose here is to enable the easy documentation of packages that serve
+    to combine parts of preexisting packages (and thus preexisting
+    documentation).
+
+METHODS
+  prepare_input($input)
+    Check the given $input for any commands that would trigger us, and
+    extract/insert pod as requested.
+
+  copy_sections_from_other($module, $header_text, $opts)
+    Loads the POD from $module (specified as a package name, in our @INC),
+    looks for a "=head1" section with $header_text, and copies everything
+    pulls it out until the next "=head1" section.
+
+    We return the elements we find from the first command until the next
+    section; this is to enable preface text to be skipped. This behaviour
+    can be altered by setting $opts to 'all';
+
+    We return a series of elements suitable for inclusion directly into
+    another document. Note that if this set includes a list, that list will
+    be converted, with each "=item" command becoming a "=head2".
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   Pod::Weaver
+
+    *   Pod::Weaver::Section::Collect
+
+    *   Reindeer uses this package to collect documentation from various
+        sources.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/pod-weaver-section-collect-fromother> and
+    may be cloned from
+    <git://github.com/RsrchBoy/pod-weaver-section-collect-fromother.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/pod-weaver-section-collect-fromother/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2011 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

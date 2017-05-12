@@ -1,0 +1,44 @@
+Revision history for POE::Component::Client::UserAgent
+======================================================
+
+POE::Component::Client::UserAgent 0.06
+2004-09-03
+	- test fix since hotmail stopped redirecting
+        - Improve file:// support on some systems.
+
+POE::Component::Client::UserAgent 0.04
+2002-01-03
+	- bug fix in _pococ_ua_postback
+	- added 03chunks.t
+
+POE::Component::Client::UserAgent 0.03
+2001-06-07
+	- timeout handling added
+	- removed code copied from LWP::Parallel, instead use
+	  the new hooks added by the LWP::PUA maintainer
+	- use the non-blocking connect code included in LWP::Parallel,
+	  the modified http.pm file is no longer needed
+	- this version requires POE 0.1402 and LWP::Parallel 2.51 or later
+	- a readme file added
+
+POE::Component::Client::UserAgent 0.02
+2001-05-17
+	- new method made an alias of the spawn method
+	- expedite selects and _error event added to catch TCP errors
+	- postbacks are used to keep the client session alive.
+	  The client session is responsible for creating the postback.
+	- component renamed to POE::Component::Client::UserAgent
+	- discard_entry overridden to try and do better cleanup
+	- documentation added and posted on the web
+	- CPAN style distribution created
+
+POE::Component::UserAgent 0.01
+2001-03-21
+	- new method
+	- _start, _stop, _signal standard events
+	- request and shutdown events
+	- _write and _read event code taken almost verbatim from LWP::PUA
+	- _connect, on_return and on_failure overrides
+	- 01basic.t and 02multi.t test scripts
+	- debugging facilities, debug method
+	- hacked version of LWP::Parallel::Protocol::http for non-blocking connects

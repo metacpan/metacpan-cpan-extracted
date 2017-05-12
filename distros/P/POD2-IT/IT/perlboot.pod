@@ -1,0 +1,887 @@
+=head1 NOME
+
+perlboot - Introduzione alla tecnologia Orientata agli Oggetti
+(titolo originale: Beginner's Object-Oriented Tutorial)
+
+=head2 DESCRIZIONE
+
+Se non avete giE<agrave> una certa familiaritE<agrave> con la tecnologia ad oggetti 
+degli altri linguaggi di programmazione, parte della documentazione 
+sulla OOP in Perl potrebbe essere un po' intimidatoria: L<perlobj>, una 
+guida di riferimento sull'utilizzo degli oggetti e L<perltoot> che 
+introduce il lettore alle particolaritE<agrave> della tecnologia ad oggeti 
+del Perl con un taglio introduttivo.
+
+Partiamo dunque con un approccio differente, non assumendo a priori
+alcuna esperienza con gli oggetti.
+PuE<ograve> aiutare la conoscenza delle subroutine (L<perlsub>), dei riferimenti
+(L<perlref> e seguenti), e dei package (L<perlmod>), dunque se non la possedete 
+giE<agrave>, conviene che vi familiarizzate con questi argomenti.
+
+=head2 Se potessimo parlare con gli animali...
+
+Per un attimo, lasciamo parlare gli animali:
+
+    sub Mucca::parla {
+      print "la Mucca fa muuuu!\n";
+    }
+    sub Cavallo::parla {
+      print "il Cavallo fa hiiii!\n";
+    }
+    sub Pecora::parla {
+      print "la Pecora fa beee!\n"
+    }
+
+    Mucca::parla;
+    Cavallo::parla;
+    Pecora::parla;
+
+Questo produce:
+
+    la Mucca fa muuuu!
+    il Cavallo fa hiiii!
+    la Pecora fa beee!
+
+Fino a qui niente di spettacolare. Semplici subroutine, anche se da package 
+separati e chiamate usando il nome completo del package.
+Creiamo dunque un intero pascolo:
+
+    # Mucca::parla, Cavallo::parla, Pecora::parla come prima
+    @pascolo = qw(Mucca Mucca Cavallo Pecora Pecora);
+    foreach $animale (@pascolo) {
+      &{$animale."::parla"};
+    }
+
+Questo produce:
+
+    la Mucca fa muuuu!
+    la Mucca fa muuuu!
+    il Cavallo fa hiiii!
+    la Pecora fa beee!
+    la Pecora fa beee!
+
+Urca. Questa dereferenziazione di un riferimento simbolico a codice E<egrave> 
+piuttosto brutta. Ci stiamo affidando al comportamento dato da C<no strict subs>, 
+che non E<egrave> certamente raccomandato per programmi di una certa dimensione.
+E perchE<eacute> era necessario? PerchE<eacute> il nome del package sembra essere
+inseparabile dal nome della subroutine che vogliamo invocare all'interno
+di quel package.
+
+O no?
+
+=head2 Presentiamo la freccia per invocare i metodi
+
+Per ora, diciamo che C<< Classe->metodo >> invoca la subroutine
+C<metodo> nel package C<Classe>. (In questo contesto, "Classe" E<egrave>
+usata nel suo significato "categorico", non nel suo significato "scolastico").
+Questo non E<egrave> del tutto preciso, ma lo rivedremo a tempo debito.
+Per ora, utilizziamolo in questa maniera:
+
+    # Mucca::parla, Cavallo::parla, Pecora::parla come prima
+    Mucca->parla;
+    Cavallo->parla;
+    Pecora->parla;
+
+Ancora una volta, questo produce:
+
+    la Mucca fa muuuu!
+    il Cavallo fa hiiii!
+    la Pecora fa beee!
+
+Questo non E<egrave> ancora divertente. Stesso numero di caratteri, solo costanti,
+nessuna variabile. Malgrado tutto, le parti ora sono separabili. Osservate:
+
+    $a = "Mucca";
+    $a->parla; # invoca Mucca->parla
+
+Ahh! Ora che il nome del package E<egrave> stato separato dal nome della
+subroutine, possiamo usare un nome di package variabile.
+E questa volta abbiamo qualcosa che funziona anche quando
+C<use strict refs> E<egrave> in funzione.
+
+=head2 Invochiamo un cortile
+
+Prendiamo questa nuova invocazione a freccia e utilizziamola
+nell'esempio del cortile:
+
+    sub Mucca::parla {
+      print "la Mucca fa muuuu!\n";
+    }
+    sub Cavallo::parla {
+      print "il Cavallo fa hiiii!\n";
+    }
+    sub Pecora::parla {
+      print "la Pecora fa beee!\n"
+    }
+
+    @pascolo = qw(Mucca Mucca Cavallo Pecora Pecora);
+    foreach $animale (@pascolo) {
+      $animale->parla;
+    }
+
+Ecco! Ora abbiamo tutti gli animali che parlano, e in modo sicuro,
+senza l'uso di riferimenti simbolici a codice.
+
+Ma guardate tutto quel codice in comune.
+Ognuna delle routine C<parla> ha infatti una struttura similare: 
+un operatore C<print> ed una stringa che contiene testo identico
+tranne che per due parole. Sarebbe carino poter raccogliere a
+fattor comune le similitudini, nel caso si decida in seguito di mettere
+"dice" al posto di "fa".
+
+E in effetti abbiamo un sistema per farlo senza troppo sforzo, anche
+se dobbiamo imparare qualcosa in piE<ugrave> su cosa faccia davvero
+la freccia per invocare i metodi.
+
+=head2 I parametri addizionali dell'invocazione di metodo
+
+L'invocazione di:
+
+    Classe->metodo(@argomenti)
+
+tenta di invocare la subroutine C<Classe::metodo> come se avessimo scritto:
+
+    Classe::metodo("Classe", @argomenti);
+
+(Se la subroutine non puE<ograve> essere trovata, l'"ereditarietE<agrave>" entra in
+funzione, ma ci arriveremo piE<ugrave> avanti). Questo significa che riceviamo
+il nome della classe come primo parametro (il solo parametro, se non
+viene fornito alcun argomento). Possiamo dunque riscrivere il parlare
+della C<Pecora> come:
+
+    sub Pecora::parla {
+      my $classe = shift;
+      print "una $classe fa beeeeh!\n";
+    }
+
+Gli altri due animali risultano simili:
+
+    sub Mucca::parla {
+      my $classe = shift;
+      print "una $classe fa muuuu!\n";
+    }
+    sub Cavallo::parla {
+      my $classe = shift;
+      print "un $classe fa hiiii!\n";
+    }
+
+In ogni caso, C<$classe> prenderE<agrave> il valore appropriato per quella
+subroutine. Ma di nuovo, abbiamo un mucchio di struttura simile.
+Possiamo raccogliere a fattor comune quello che ancora resta?
+SE<igrave>, chiamando un ulteriore metodo nella 
+stessa classe.
+
+=head2 Chiamare un secondo metodo per semplificare le cose
+
+Richiamiamo da C<parla> un metodo di supporto
+che chiamiamo C<suono>. Questo metodo fornisce una costante
+di testo per il suono stesso.
+
+    { package Mucca;
+      sub suono { "muuu" }
+      sub parla {
+	my $classe = shift;
+	print "una $classe fa ", $classe->suono, "!\n"
+      }
+    }
+
+Ora, quando chiamiamo C<< Mucca->parla >>, riceviamo una C<$classe>
+C<Mucca> in C<parla>. Questo a sua volta seleziona il metodo
+C<< Mucca->suono >> che restituisce C<"muuuu">. Ma questo, quanto sarE<agrave> 
+differente per il C<Cavallo>?
+
+    { package Cavallo;
+      sub suono { "hiiii" }
+      sub parla {
+	my $classe = shift;
+	print "un $classe fa ", $classe->suono, "!\n"
+      }
+    }
+
+Cambiano solo il nome del package, l'articolo e il suono.
+Allora in quale maniera possiamo condividere la definizione di C<parla>
+tra la C<Mucca> e il C<Cavallo>?  Con l'ereditarietE<agrave>!
+
+=head2 Ereditare le trachee
+
+Definiamo un package di subroutine comuni chiamato C<Animale>, con la
+definizione per C<parla>:
+
+    { package Animale;
+      sub parla {
+	my $classe = shift;
+	print $classe->articolo," $classe fa ", $classe->suono, "!\n"
+      }
+    }
+
+Poi, per ogni animale, diciamo che esso "eredita" da C<Animale>, 
+e definiamo lo specifico suono e l'articolo per quell'animale:
+
+    { package Mucca;
+      @ISA = qw(Animale);
+      sub suono { "muuuu" }
+      sub articolo { "una" }
+    }
+
+Da notare l'aggiunta dell'array C<@ISA>. Ci arriveremo tra un minuto.
+
+Ma cosa succede quando ora invochiamo C<< Mucca->parla >>?
+
+Per prima cosa, Perl costruisce la lista degli argomenti. In questo
+caso c'E<egrave> solo C<Mucca>. Poi Perl cerca C<Mucca::parla>. Ma qui non 
+c'E<egrave>, cosE<igrave> Perl controlla l'array di ereditarietE<agrave> 
+C<@Mucca::ISA>. Questo c'E<egrave> e contiene il solo nome C<Animale>.
+
+Quindi, Perl controlla C<parla> all'interno di C<Animale>, ovvero
+C<Animale::parla>. E questo c'E<egrave>, per cui Perl invoca la subroutine con la
+lista di argomenti fissata precedentemente.
+
+All'interno della subroutine C<Animale::parla>, C<$classe> diventa
+C<Mucca> (che E<egrave> il primo argomento). CosE<igrave> quando arriva il momento di
+invocare C<< $classe->suono >>, si cercherE<agrave> C<< Mucca->suono >>,
+che si ottiene al primo tentativo senza esaminare C<@ISA>. Vittoria!
+
+=head2 Qualche nota su @ISA
+
+Questa magica variabile chiamata C<@ISA> (da "is a"
+[E<egrave> un/una, NdT]), ha dichiarato che C<Mucca>
+"E<egrave> un" C<Animale>.  Da notare che questa E<egrave> un array,
+non un singolo valore, visto che in rare occasioni ha senso cercare i
+metodi mancanti in piE<ugrave> di una classe madre.
+
+Se anche C<Animale> ha una sua C<@ISA>, allora si cercherE<agrave>
+anche lE<igrave>.  La ricerca E<egrave> ricorsiva, in
+profonditE<agrave> [depth-first, NdT] e da sinistra a destra per
+ciascun C<@ISA>.  Di solito, ogni C<@ISA> possiede un solo elemento
+(avere piE<ugrave> di un elemento significa ereditarietE<agrave>
+multipla e multipli mal di testa), dunque abbiamo un simpatico albero
+di ereditarietE<agrave>.
+
+Quando utilizziamo C<use strict>, avremo delle lamentele su C<@ISA> da parte sua,
+dato che non E<egrave> una variabile contenente un nome di package esplicito,
+nE<eacute> E<egrave> una variabile lessicale (dichiarata con C<my>). Non possiamo 
+comunque farne una variabile lessicale (deve appartenere al package per essere trovata 
+dal meccanismo di ereditarietE<agrave>), ma il problema si puE<ograve> risolvere in 
+maniera comoda, in un paio di modi.
+
+La maniera piE<ugrave> semplice E<egrave> quella di specificare il nome del package:
+
+    @Mucca::ISA = qw(Animale);
+
+Altrimenti possiamo dichiararla in modo da tenere il nome del package implicito:
+
+    package Mucca;
+    use vars qw(@ISA);
+    @ISA = qw(Animale);
+
+Se si sta caricando la classe dall'esterno, attraverso un modulo
+orientato agli oggetti, si puE<ograve> sostituire:
+
+    package Mucca;
+    use Animale;
+    use vars qw(@ISA);
+    @ISA = qw(Animale);
+
+con:
+
+    package Mucca;
+    use base qw(Animale);
+
+E questo E<egrave> proprio compatto.
+
+=head2 Ridefinire i metodi
+
+Aggiungiamo un Topo, che si sente appena:
+
+    # Il package Animale e` come prima
+    { package Topo;
+      @ISA = qw(Animale);
+      sub suono { "squit" }
+      sub articolo { "un" }
+      sub parla {
+        my $classe = shift;
+	print $classe->articolo," $classe fa ", $classe->suono, "!\n";
+	print "[ma si sente appena!]\n";
+      }
+    }
+
+    Topo->parla;
+
+che produce:
+
+    un Topo fa squit!
+    [ma si sente appena!]
+
+In questo caso, C<Topo> ha la sua personale routine per parlare,
+dunque C<< Topo->parla >> non invoca immediatamente C<< Animale->parla >>.
+Tutto ciE<ograve> prende il nome di "ridefinizione" ["override"
+in Inglese, NdT]. In effetti, non avevamo neppure bisogno di affermare che
+un C<Topo> sia un C<Animale>, dato che tutti i metodi che sono
+necessari a C<parla> sono completamente definiti in C<Topo>.
+
+Ma ora abbiamo duplicato parte del codice di C<< Animale->parla >>,
+e questo puE<ograve> portare ancora una volta ad un mal di testa per la
+manutenzione del codice. Come possiamo evitarlo?  Possiamo dire in qualche
+modo che un C<Topo> fa tutto quello che fa ogni altro C<Animale>, ma 
+aggiungendo il commento in piE<ugrave>? Sicuro!
+
+Per prima cosa, possiamo invocare direttamente il metodo C<Animale::parla>:
+
+    # Il package Animale e` come prima
+    { package Topo;
+      @ISA = qw(Animale);
+      sub suono { "squit" }
+      sub articolo { "un" }
+      sub parla {
+        my $classe = shift;
+        Animale::parla($classe);
+	print "[ma si sente appena!]\n";
+      }
+    }
+
+Notate che ora dobbiamo includere il parametro C<$classe> (che quasi
+certamente ha il valore C<"Topo">) come primo parametro per
+C<Animale::parla>, dal momento che non usiamo piE<ugrave> la
+freccia. PerchE<eacute> non la usiamo? Vediamo, se qui invochiamo C<< Animale->parla >>,
+il primo parametro per il metodo sarE<agrave>
+C<"Animale"> e non C<"Topo">, e quando sarE<agrave> il momento di
+chiamare il C<suono>, non si avrE<agrave> la giusta classe per
+ritornare a questo package.
+
+Resta il fatto che invocare direttamente C<Animale::parla> E<egrave> un pasticcio.
+Cosa succederebbe se C<Animale::parla> non esistesse, ma fosse
+ereditato da una classe menzionata in C<@Animale::ISA>?  Visto che non
+stiamo piE<ugrave> usando l'invocazione a freccia, abbiamo una ed una sola possibilitE<agrave>
+di trovare la giusta subroutine.
+
+C'E<egrave> anche da notare che il nome della classe C<Animale> E<egrave> ora cablato
+nella subroutine. Questo E<egrave> un pasticcio se qualcuno fa
+manutenzione del codice, cambiando C<@ISA> per C<Topo> senza accorgersi di quel
+C<Animale> in C<parla>. Quindi E<egrave> probabile che questa non sia la
+maniera corretta di agire.
+
+=head2 Iniziare la ricerca da un posto diverso
+
+Una soluzione migliore E<egrave> quella di dire a Perl di cominciare a cercare da un
+punto piE<ugrave> in alto nella catena di ereditarietE<agrave>:
+
+    # Animale e` come prima
+    { package Topo;
+      # stessi @ISA, &suono e &articolo di prima
+      sub parla {
+        my $classe = shift;
+        $classe->Animale::parla;
+	print "[ma si sente appena!]\n";
+      }
+    }
+
+Ahh. Questo funziona. Utilizzando questa sintassi, partiamo con C<Animale>
+per trovare C<parla>, ed utilizziamo tutta la catena di ereditarietE<agrave> di
+C<Animale> se non la trovassimo immediatamente. Inoltre, il primo parametro
+sarE<agrave> C<$classe>, dunque il metodo C<parla> trovato avrE<agrave> C<Topo> come suo
+primo parametro, e riuscirE<agrave> a trovare C<Topo::suono> per i dettagli.
+
+Ma questa non E<egrave> la soluzione ottima. Dobbiamo ancora mantenere coordinati
+C<@ISA> e il package da cui iniziare la ricerca. E peggio ancora, se C<Topo>
+avesse piE<ugrave> elementi in C<@ISA>, potremmo non sapere quale
+di questi ha effettivamente definito C<parla>. Ma allora, c'E<egrave> una soluzione
+ancora migliore?
+
+=head2 Il modo SUPER di fare le cose
+
+Cambiando la classe C<Animale> nella classe C<SUPER> in quella invocazione,
+abbiamo una ricerca automatica di tutte le nostre classi madri presenti
+in C<@ISA>:
+
+    # Animale e` come prima
+    { package Topo;
+      # stessi @ISA, &suono e &articolo di prima
+      sub parla {
+        my $classe = shift;
+        $classe->SUPER::parla;
+	print "[ma si sente appena!]\n";
+      }
+    }
+
+Dunque, C<SUPER::parla> significa cercare C<parla> nell'C<@ISA> del package 
+corrente, invocando il primo trovato. Va notato che I<non> guarda nell'C<@ISA> di C<$classe>.
+
+=head2 A che punto siamo arrivati...
+
+Fino a qui, abbiamo visto la sintassi a freccia per i metodi:
+
+  Classe->metodo(@argomenti);
+
+o in maniera analoga:
+
+  $a = "Classe";
+  $a->metodo(@argomenti);
+
+che costruisce una lista di argomenti formata da:
+
+  ("Classe", @argomenti)
+
+e cerca di invocare
+
+  Classe::metodo("Classe", @Argomenti);
+
+Ad ogni modo, se C<Classe::metodo> non viene trovato, allora C<@Classe::ISA>
+viene esaminato (ricorsivamente) per individuare un package che effettivamente contenga
+C<metodo>, e quella subrotuine viene invocata al suo posto.
+
+Utilizzando questa semplice sintassi, abbiamo i metodi di classe, 
+l'ereditarietE<agrave> (multipla), la ridefinizione e l'estendibilitE<agrave>. Usando quello
+che abbiamo visto fino a qui, siamo stati in grado di rendere a fattor comune
+il codice simile e di fornire una maniera carina per riutilizzare le
+implementazioni con delle variazioni. Questo fa parte del nucleo di quello che
+possono offrirci gli oggetti, ma essi ci forniscono anche i dati di istanza,
+che non abbiamo ancora iniziato a vedere.
+
+=head2 Un cavallo E<egrave> un cavallo, senza inganno senza inganno -- o no?
+
+Partiamo con il codice per la classe C<Animale> e per la classe
+C<Cavallo>:
+
+  { package Animale;
+    sub parla {
+      my $classe = shift;
+      print $classe->articolo," $classe fa ", $classe->suono, "!\n"
+    }
+  }
+  { package Cavallo;
+    @ISA = qw(Animale);
+    sub suono { "hiiii!" }
+    sub articolo { "un" }
+  }
+
+Questo ci permette di invocare C<< Cavallo->parla >>, che risale fino a
+C<Animale::parla>, riscende per chiamare C<Cavallo::suono> e C<Cavallo::articolo> per ottenere il
+suono e l'articolo giusto, ottenendo infine l'output seguente:
+
+  un Cavallo fa hiiii!
+
+Ma tutti i nostri oggetti Cavallo devono essere assolutamente identici.
+Se viene aggiunta una subroutine, tutti i cavalli automaticamente la
+condividono. Questo E<egrave> ottimo se vogliamo che tutti i cavalli siano lo
+stesso, ma come catturiamo la distinzione tra un singolo cavallo ed un altro?
+Per esempio supponiamo che io voglia dare un nome al mio primo cavallo. Ci deve
+essere un modo per mantenere il suo nome separato dagli altri cavalli.
+
+Possiamo fare questo tracciando una nuova distinzione, chiamata una "istanza".
+Una "istanza" di solito E<egrave> creata da una classe. In Perl, ogni riferimento puE<ograve>
+essere un'istanza, dunque partiamo con il riferimento piE<ugrave> semplice che possa
+contenere il nome di un cavallo: un riferimento ad uno scalare.
+
+  my $nome = "Sig. Ed";
+  my $parlante = \$nome;
+
+PerciE<ograve> ora C<$parlante> E<egrave> un riferimento a quello che sarE<agrave> il dato specifico
+dell'istanza (il nome). Il passo finale per renderlo una vera istanza consiste
+nell'usare lo speciale operatore chiamato C<bless>:
+
+  bless $parlante, Cavallo;
+
+Questo operatore immagazzina l'informazione sul package chiamato C<Cavallo>
+nella cosa puntata dal riferimento. A questo punto, diciamo che 
+C<$parlante> E<egrave> una istanza di C<Cavallo>. Ovvero, E<egrave> uno specifico cavallo.
+Nessun altro aspetto del riferimento E<egrave> cambiato, e puE<ograve> ancora essere usato con i
+tradizionali operatori di derefenziazione.
+
+=head2 Invocare un metodo di istanza
+
+L'invocazione a freccia puE<ograve> essere usata con le istanze, cosE<igrave> come con i nomi
+dei package (classi). Dunque prendiamo il suono che produce C<$parlante>:
+
+  my $rumore = $parlante->suono;
+
+Per invocare C<suono>, il Perl per prima cosa si accorge che C<$parlante>
+E<egrave> un riferimento blessed (e quindi una istanza). Poi costruisce una lista
+di argomenti, in questo caso formata dal solo C<$parlante>. (PiE<ugrave> avanti
+vedremo che gli argomenti si posizioneranno di seguito alla variabile
+istanza, proprio come con le classi).
+
+Adesso viene la parte divertente: Perl prende la classe nella quale
+l'istanza E<egrave> stata blessed, in questo caso C<Cavallo>, e la usa per
+individuare la subroutine per invocare il metodo. In questo caso,
+C<Cavallo::suono> viene trovato direttamente (senza l'uso dell'ereditarietE<agrave>),
+producendo l'invocazione finale della subroutine:
+
+  Cavallo::suono($parlante)
+
+Da notare che in questo caso il primo parametro E<egrave> ancora l'istanza e non
+il nome della classe come era prima. Avremo C<"hiiii"> come valore di ritorno,
+che finirE<agrave> nella variable C<$rumore>.
+
+Se C<Cavallo::suono> non fosse stato trovato, si sarebbe scorsa tutta la lista di
+elementi di C<@Cavallo::ISA> per cercare di trovare il metodo in una delle
+superclassi, analogamente a un metodo di classe.
+La sola differenza tra un metodo di classe e un metodo di istanza sta nel primo parametro, che puE<ograve>
+essere un'istanza (un riferimento blessed) o un nome di classe (una stringa).
+
+=head2 Accesso ai dati dell'istanza
+
+Dato che riceviamo l'istanza come primo parametro, possiamo ora 
+accedere ai suoi dati specifici. In questo caso, andiamo
+ad aggiungere una maniera per ottenere il nome:
+
+  { package Cavallo;
+    @ISA = qw(Animale);
+    sub suono { "hiiii" }
+    sub articolo { "un" }
+    sub nome {
+      my $self = shift;
+      $$self;
+    }
+  }
+
+Ora chiamiamo per ottenere il nome:
+
+  print $parlante->nome, " dice ", $parlante->suono, "\n";
+
+All'interno di C<Cavallo::nome>, l'array C<@_> contiene solo C<$parlante>,
+che C<shift> scrive in C<$self>. (E<Egrave> consuetudine
+trasferire il primo parametro in una variabile chiamata C<$self> per i
+metodi di istanza, perciE<ograve> fate altrettanto a meno che
+non abbiate ottime ragioni).
+Alla riga successiva, C<$self> viene dereferenziata come un riferimento a scalare,
+producendo C<Sig. Ed>, e con questo siamo a posto. Il risultato E<egrave>:
+
+  Sig. Ed dice hiiii.
+
+=head2 Come costruire un cavallo
+
+Naturalmente, se costruiamo tutti i nostri cavalli a mano, molto
+probabilmente faremo degli errori di tanto in tanto.
+Inoltre, stiamo violando una delle proprietE<agrave> della programmazione
+orientata agli oggetti, in quanto le "interiora" di un C<Cavallo>
+sono visibili.
+Questo E<egrave> positivo se voi siete dei veterinari, ma non se vi interessa
+solo possedere un cavallo. Lasciamo allora che la classe C<Cavallo>
+costruisca un nuovo cavallo:
+
+  { package Cavallo;
+    @ISA = qw(Animale);
+    sub suono { "hiiii" }
+    sub articolo { "un" }
+    sub nome {
+      my $self = shift;
+      $$self;
+    }
+    sub chiamato {
+      my $classe = shift;
+      my $nome = shift;
+      bless \$nome, $classe;
+    }
+  }
+
+Ora con il nuovo metodo C<chiamato>, possiamo costruire un cavallo:
+
+  my $parlante = Cavallo->chiamato("Sig. Ed");
+
+C'E<egrave> da notare che siamo tornati ad un metodo di classe, dunque i
+due argomenti di C<Cavallo::chiamato> sono C<Cavallo> e C<"Sig. Ed">.
+L'operatore C<bless> non solo fa un bless su C<$nome>, ma restituisce
+anche il riferimento a C<$nome>, che E<egrave> comodo come valore di ritorno.
+E questo E<egrave> come si costruisce un cavallo.
+
+In questo caso, abbiamo chiamato il costruttore C<chiamato> in maniera
+che indichi chiaramente che l'argomento del costruttore E<egrave> il nome
+per questo particolare C<Cavallo>.
+Si possono usare costruttori differenti con nomi differenti per
+differenti modi di "dare vita" all'oggetto (come ad esempio
+registrare il suo pedigree o la data di nascita). Comunque sia,
+noterete che molte persone che arrivano al Perl proveniendo da
+linguaggi piE<ugrave> limitati, utilizzano un unico costruttore chiamato
+C<new>, interpretando in svariati modi gli argomenti di C<new>.
+Ciascuno dei due stili E<egrave> adeguato, purchE<eacute> si documenti la propria
+particolare maniera di dare vita ad un oggetto. (E I<< stavate giE<agrave> >> progettando di farlo, vero?)
+
+=head2 Ereditare il costruttore
+
+C'era qualcosa di specifico di C<Cavallo> in quel metodo?  No. Quindi
+E<egrave> anche la stessa ricetta per costruire qualsiasi cosa che eredita da
+C<Animale>, dunque scriviamolo al suo posto:
+
+  { package Animale;
+    sub parla {
+      my $classe = shift;
+      print $classe->articolo," $classe fa ", $classe->suono, "!\n"
+    }
+    sub nome {
+      my $self = shift;
+      $$self;
+    }
+    sub chiamato {
+      my $classe = shift;
+      my $nome = shift;
+      bless \$nome, $classe;
+    }
+  }
+  { package Cavallo;
+    @ISA = qw(Animale);
+    sub suono { "hiiii" }
+    sub articolo { "un" }
+  }
+
+Ahh, ma cosa succede se invochiamo C<parla> su un'istanza?
+
+  my $parlante = Cavallo->chiamato("Sig. Ed");
+  $parlante->parla;
+
+Ci ritroviamo con un valore di debug:
+
+  un Cavallo=SCALAR(0xaca42ac) dice hiiii!
+
+PerchE<eacute>? PerchE<eacute> la routine C<Animale::parla> si aspetta un nome di classe
+come suo primo parametro, non una istanza. Quando l'istanza viene passata,
+finiamo per usare un riferimento blessed a scalare come se fosse una stringa, e questo produce
+quello che abbiamo appena visto.
+
+=head2 Fare un metodo che funzioni sia con le classi che con le istanze
+
+Ci serve che il metodo possa distinguere se E<egrave> stato
+chiamato su una classe o su un'istanza. La maniera piE<ugrave> diretta E<egrave> tramite
+l'operatore C<ref>. Questo restituisce una stringa (il nome della classe)
+quando viene usato su di un riferimento blessed, e C<undef> quando
+viene usato su di una stringa (come un nome di una classe).
+Andiamo a modificare il metodo C<nome> per notare la differenza:
+
+  sub nome {
+    my $cosa = shift;
+    ref $cosa
+      ? $$cosa # e` un'istanza, restituisco il nome
+      : $cosa->articolo()." $cosa senza nome"; # e` una classe
+  }
+
+Qui, l'operatore C<?:> E<egrave> comodo per selezionare o la dereferenziazione
+o la stringa derivata. Ora possiamo usare il metodo sia per un'istanza sia per
+una classe. Da notare che ho cambiato il nome del primo parametro
+in C<$cosa> per sottolineare che vogliamo sapere I<cosa> E<egrave> stato passato:
+
+  my $parlante = Cavallo->chiamato("Sig. Ed.");
+  print Cavallo->nome, "\n"; # stampa "un Cavallo senza nome\n"
+  print $parlante->nome, "\n"; # stampa "Sig. Ed\n"
+
+Ora correggiamo C<parla> per sfruttarlo:
+
+  sub parla {
+    my $cosa = shift;
+    print $cosa->nome, " fa ", $cosa->suono, "\n";
+  }
+
+Dato che C<suono> funziona giE<agrave> sia con una classe che con un'istanza,
+siamo a posto!
+
+=head2 Aggiungere parametri ad un metodo
+
+Addestriamo i nostri animali a mangiare:
+
+  { package Animale;
+    sub chiamato {
+      my $classe = shift;
+      my $nome = shift;
+      bless \$nome, $classe;
+    }
+    sub nome {
+      my $cosa = shift;
+      ref $cosa
+        ? $$cosa # e` un'istanza, restituisco il nome
+        : $cosa->articolo()." $cosa senza nome"; # e` una classe
+    }
+    sub parla {
+      my $cosa = shift;
+      print $cosa->nome, " fa ", $cosa->suono, "\n";
+    }
+    sub mangia {
+      my $cosa = shift;
+      my $cibo = shift;
+      print $cosa->nome, " mangia $cibo.\n";
+    }
+  }
+  { package Cavallo;
+    @ISA = qw(Animale);
+    sub suono { "hiiii" }
+    sub articolo { "un" }
+  }
+  { package Pecora;
+    @ISA = qw(Animale);
+    sub suono { "beeee" }
+    sub articolo { "una" }
+  }
+
+Ora proviamoli:
+
+  my $parlante = Cavallo->chiamato("Sig. Ed");
+  $parlante->mangia("fieno");
+  Pecora->mangia("erba");
+
+che stampa:
+
+  Sig. Ed mangia fieno.
+  una Pecora senza nome mangia erba.
+
+Un metodo di istanza con parametri viene invocato con l'istanza seguita
+dell'elenco dei parametri. Quindi la prima invocazione E<egrave> come se fosse:
+
+  Animale::mangia($parlante, "fieno");
+
+=head2 Istanze piE<ugrave> interessanti
+
+Cosa succede se un'istanza ha bisogno di piE<ugrave> dati? Le istanze piE<ugrave>
+interessanti sono fatte da molte voci, ognuna delle quali puE<ograve> essere a sua volta
+un riferimento o anche un altro oggetto. La maniera piE<ugrave> semplice per
+memorizzarli E<egrave> spesso all'interno di un hash.
+Le chiavi dell'hash vengono utilizzate come i nomi delle parti dell'oggetto
+(spesso chiamate "variabili di istanza" o "variabili membro"), e i corrispondenti
+valori sono, beh, i valori.
+
+Ma come facciamo stare un cavallo in un hash?  Ricordiamoci che un oggetto
+era un qualsiasi riferimento blessed. Possiamo usare senza problemi un riferimento
+ad hash invece che un riferimento a scalare, purchE<eacute> tutto ciE<ograve> che esamina
+il rifemento venga modificato in conseguenza.
+
+Facciamo una pecora che abbia un nome ed un colore:
+
+  my $cattiva = bless { Nome => "Malvagia", Colore => "nero" }, Pecora;
+
+dunque C<< $cattiva->{Nome} >> E<egrave> C<Malvagia>, e C<< $cattiva->{Colore} >> E<egrave> nero.
+Ma noi vogliamo che C<< $cattiva->nome >> acceda al nome e fare questo ora non funziona
+piE<ugrave> dato che si aspetta un riferimento ad uno scalare.
+Non c'E<egrave> da preoccuparsi, visto che E<egrave> davvero facile correggerlo:
+
+  ## in Animale
+  sub nome {
+    my $cosa = shift;
+    ref $cosa ?
+      $cosa->{Nome} :
+      $cosa->articolo()." $cosa senza nome";
+  }
+
+Naturalmente C<chiamato> costruisce ancora una pecora scalare, dunque
+correggiamo pure quello:
+
+  ## in Animale
+  sub chiamato {
+    my $classe = shift;
+    my $nome = shift;
+    my $self = { Nome => $nome, Colore => $classe->colore_di_default };
+    bless $self, $classe;
+  }
+
+Cos'E<egrave> questo C<colore_di_default>?  Beh, se C<chiamato> riceve solo il nome,
+dobbiamo definire un colore, dunque avremo uno specifico colore iniziale per 
+la classe.
+Per una pecora, possiamo definirlo come bianco:
+
+  ## in Pecora
+  sub colore_di_default { "bianco" }
+
+E poi, per evitare di doverne definire uno per ogni classe aggiuntiva, 
+definiremo direttamente in C<Animale> un metodo a mo' di "rete di sicurezza" 
+che funga da "default default":
+
+  ## in Animale
+  sub colore_di_default { "marrone" }
+
+Ora, visto che C<nome> e C<chiamato> sono gli unici metodi che
+esaminano la "struttura" dell'oggetto, il resto dei metodi puE<ograve>
+rimanere lo stesso, dunque C<parla> funziona ancora come prima.
+
+=head2 Un cavallo di un altro colore
+
+Avere tutti i nostri cavalli di colore marrone sarebbe noioso. Aggiungiamo
+dunque un metodo o due per ottenere e modificare il colore.
+
+  ## in Animale
+  sub colore {
+    $_[0]->{Colore}
+  }
+  sub cambia_colore {
+    $_[0]->{Colore} = $_[1];
+  }
+
+Notate il modo alternativo per accedere agli argomenti: viene usato direttamente C<$_[0]>, 
+piuttosto che uno C<shift>. (Questo ci fa risparmiare un po' di tempo per un
+qualcosa che puE<ograve> essere invocato di frequente). E ora possiamo
+aggiustare il colore al Sig. Ed:
+
+  my $parlante = Cavallo->chiamato("Sig. Ed");
+  $parlante->cambia_colore("bianco-e-nero");
+  print $parlante->nome, " e` di colore ", $parlante->colore, "\n";
+
+che produce:
+
+  Sig. Ed e` di colore bianco-e-nero
+
+=head2 Sommario
+
+Dunque, a questo punto abbiamo metodi di classe, costruttori, metodi di istanza,
+dati di istanza ed anche metodi per accedere ai dati. Ma questo E<egrave> solo l'inzio di
+cosa puE<ograve> offrire il Perl. Non abbiamo ancora inziato a parlare
+dei metodi di accesso che funzionano sia in lettura sia in scrittura, dei distruttori, della notazione
+a oggetto indiretto, delle sotto-classi che aggiungono dati di istanza, dei dati locali alle classi, dell'overloading,
+dei test C<isa> e C<can>, della classe C<UNIVERSAL>, e di un sacco di altre cose. Tutto ciE<ograve> viene descritto dal
+resto della documentazione Perl. Ad ogni modo, speriamo che questo documento vi sia servito per prendere il via.
+
+=head1 ULTERIORI INFORMAZIONI
+
+Per ulteriori informazioni, consultate L<perlobj> (per tutti quei dettagli
+sugli oggetti in Perl, ora che avete visto le basi), L<perltoot> 
+(il tutorial per chi conosce giE<agrave> gli oggetti), L<perltootc> (che ha a che
+fare con i dati delle classi), L<perlbot> (per qualche altro trucco), e i libri
+quali l'eccellente I<Object Oriented Perl> di Damian Conway.
+
+Alcuni moduli che possono dimostarsi interessanti sono: Class::Accessor,
+Class::Class, Class::Contract, Class::Data::Inheritable,
+Class::MethodMaker e Tie::SecureHash
+
+=head1 COPYRIGHT
+
+Copyright (c) 1999, 2000 di Randal L. Schwartz e Stonehenge
+Consulting Services, Inc. E<Egrave> permessa la distribuzione di questo 
+documento, integro, assieme alla distribuzione Perl, e in accordo con le licenze 
+della distribuzione Perl; i documenti derivati devono includere, 
+intatta, questa nota di copyright.
+
+Parti di questo testo sono tratte dal materiale didattico apparso
+originariamente nel corso I<Packages, References, Objects and Modules> 
+[Package, Riferimenti, Oggetti e Moduli, NdT] tenuto dagli istruttori 
+di Stonehenge Consulting Services, Inc, e sono usate con l'autorizzazione.
+
+Parti di questo testo sono tratte da materiale apparso
+originariamente su I<Linux Magazine> e sono usate con l'autorizzazione.
+
+Copyright (c) 1999, 2000 by Randal L. Schwartz and Stonehenge
+Consulting Services, Inc.  Permission is hereby granted to distribute
+this document intact with the Perl distribution, and in accordance
+with the licenses of the Perl distribution; derived documents must
+include this copyright notice intact.
+
+Portions of this text have been derived from Perl Training materials
+originally appearing in the I<Packages, References, Objects, and Modules>
+course taught by instructors for Stonehenge Consulting
+Services, Inc. and used with permission.
+
+Portions of this text have been derived from materials originally
+appearing in I<Linux Magazine> and used with permission.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlboot
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di dree.
+
+=head2 Revisore
+
+Revisione a cura di Gianni Ceccarelli e Hakim Cassimally.
+
+=cut

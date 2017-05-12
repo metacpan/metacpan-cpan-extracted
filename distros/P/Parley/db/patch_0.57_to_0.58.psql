@@ -1,0 +1,127 @@
+-- Patch:
+--   From: 0.57
+--   To:   0.58
+--
+-- Description:
+--  clean up column naming
+
+BEGIN;
+
+-- patch starts here --
+
+--
+-- authentication table
+--
+ALTER TABLE authentication
+    RENAME authentication_id TO id;
+
+--
+-- email_queue table
+--
+ALTER TABLE email_queue
+    RENAME email_queue_id TO id;
+ALTER TABLE email_queue
+    RENAME recipient TO recipient_id;
+ALTER TABLE email_queue
+    RENAME cc TO cc_id;
+ALTER TABLE email_queue
+    RENAME bcc TO bcc_id;
+
+--
+-- forum table
+--
+ALTER TABLE forum
+    RENAME forum_id TO id;
+ALTER TABLE forum
+    RENAME last_post TO last_post_id;
+
+--
+-- forum_moderator table
+--
+ALTER TABLE forum_moderator
+    RENAME person TO person_id;
+ALTER TABLE forum_moderator
+    RENAME forum TO forum_id;
+
+--
+-- password_reset table
+--
+ALTER TABLE password_reset
+    RENAME password_reset_id TO id;
+ALTER TABLE password_reset
+    RENAME recipient TO recipient_id;
+
+--
+-- person table
+--
+ALTER TABLE person
+    RENAME person_id TO id;
+ALTER TABLE person
+    RENAME preference TO preference_id;
+ALTER TABLE person
+    RENAME authentication TO authentication_id;
+ALTER TABLE person
+    RENAME last_post TO last_post_id;
+
+--
+-- post table
+--
+ALTER TABLE post
+    RENAME post_id TO id;
+ALTER TABLE post
+    RENAME thread TO thread_id;
+ALTER TABLE post
+    RENAME creator TO creator_id;
+ALTER TABLE post
+    RENAME reply_to TO reply_to_id;
+ALTER TABLE post
+    RENAME quoted_post TO quoted_post_id;
+
+--
+-- preference table
+--
+ALTER TABLE preference
+    RENAME preference_id TO id;
+ALTER TABLE preference
+    RENAME time_format TO time_format_id;
+
+--
+-- preference_time_string table
+--
+ALTER TABLE preference_time_string
+    RENAME preference_time_string_id TO id;
+
+--
+-- registration_authentication table
+--
+ALTER TABLE registration_authentication
+    RENAME registration_authentication_id TO id;
+ALTER TABLE registration_authentication
+    RENAME recipient TO recipient_id;
+
+--
+-- thread table
+--
+ALTER TABLE thread
+    RENAME thread_id TO id;
+ALTER TABLE thread
+    RENAME forum TO forum_id;
+ALTER TABLE thread
+    RENAME creator TO creator_id;
+ALTER TABLE thread
+    RENAME last_post TO last_post_id;
+
+--
+-- thread_view table
+--
+ALTER TABLE thread_view
+    RENAME thread_view_id TO id;
+ALTER TABLE thread_view
+    RENAME person TO person_id;
+ALTER TABLE thread_view
+    RENAME thread TO thread_id;
+
+
+-- patch ends here --
+
+COMMIT;

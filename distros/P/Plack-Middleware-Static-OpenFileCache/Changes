@@ -1,0 +1,10 @@
+Revision history for Perl extension Plack-Middleware-Static-OpenFileCache
+
+0.02 2013-10-22T05:45:35Z
+
+    - preread and cache small files
+
+0.01 2013-10-22T02:51:47Z
+
+    - original version
+

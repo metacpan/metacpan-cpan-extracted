@@ -1,0 +1,122 @@
+NAME
+    PYX::SGML::Tags - Processing PYX data or file and write as SGML via
+    Tags.
+
+SYNOPSIS
+     use PYX::SGML::Tags;
+     my $obj = PYX::SGML::Tags->new(%parameters);
+     $obj->parse($pyx, $out);
+     $obj->parse_file($input_file, $out);
+     $obj->parse_handle($input_file_handler, $out);
+     $obj->finalize;
+
+METHODS
+    "new()" Constructor.
+
+            *       "input_encoding"
+
+                     Input encoding.
+                     Default value is 'utf-8'.
+
+            *       "tags"
+
+                     Tags object.
+                     Can be any of Tags::Output::* objects.
+                     Default value is Tags::Output::Raw->new('output_handler' => \*STDOUT).
+                     It's required.
+
+    "parse($pyx[, $out])"
+             Parse PYX text or array of PYX text.
+             Output is serialization to SGML by Tags::Output::* module.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+    "parse_file($input_file[, $out])"
+             Parse file with PYX data.
+             Output is serialization to SGML.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+    "parse_handler($input_file_handler[, $out])"
+             Parse PYX handler.
+             Output is serialization to SGML.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+    "finalize()"
+             Finalize opened tags, if exists.
+             Returns undef.
+
+ERRORS
+     new():
+             Bad 'Tags::Output::*' object.
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+     parse():
+             From PYX::Parser::parse():
+                     Bad PYX line '%s'.
+             From Tags::Output::Raw::flush():
+                     Cannot write to output handler.
+
+     parse_file():
+             From PYX::Parser::parse_file():
+                     Bad PYX line '%s'.
+                     No input handler.
+             From Tags::Output::Raw::flush():
+                     Cannot write to output handler.
+
+     parse_handler():
+             From PYX::Parser::parse_handler():
+                     Bad PYX line '%s'.
+                     No input handler.
+             From Tags::Output::Raw::flush():
+                     Cannot write to output handler.
+
+EXAMPLE
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use PYX::SGML::Tags;
+
+     # Input.
+     my $pyx = <<'END';
+     (element
+     -data
+     )element
+     END
+
+     # Object.
+     my $obj = PYX::SGML::Tags->new;
+
+     # Process.
+     $obj->parse($pyx);
+     print "\n";
+
+     # Output:
+     # <element>data</element>
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, PYX::Parser, PYX::Utils, Tags::Output::Raw.
+
+SEE ALSO
+    Task::PYX
+        Install the PYX modules.
+
+REPOSITORY
+    <https://github.com/tupinek/PYX-SGML-Tags>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2011-2016 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.02
+

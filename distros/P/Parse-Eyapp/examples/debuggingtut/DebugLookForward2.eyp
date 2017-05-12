@@ -1,0 +1,71 @@
+/*VIM: set ts=2 */
+%{
+=head1 SYNOPSIS
+
+See 
+   
+   http://search.cpan.org/perldoc?Parse::Eyapp::debuggingtut
+   file DebugLookForward2.eyp
+
+This grammar fixes the conflicts an bugs in Debug.eyp and Debug1.eyp
+
+Be sure C<DebugTail.pm> is reachable
+compile it with 
+
+      eyapp -b '' DebugLookForward2.eyp
+
+execute the generated modulino with:
+
+      ./DebugLookForward2.pm -t -i -nos
+
+=head1 See also
+
+    Debug.eyp Debug1.eyp Debug2.eyp 
+
+=cut
+
+our $VERSION = '0.01';
+
+%}
+
+%lexer {
+       s{^(\s+)}{} and $self->tokenline($1 =~ tr{\n}{});
+       return ('',undef) unless $_;
+
+       return ($1,$1) if s/^([sSDd])//;
+       return ('SEMICOLONS', 'SEMICOLONS') if s/^;\s*S/S/;
+       return (';', ';') if s/^;//;
+       die "Syntax error at line num ${$self->line()}: ${substr($_,0,10)}\n";
+    }
+
+%token D S
+%syntactic token SEMICOLONS 
+
+%tree
+
+%%
+p:
+    %name P
+    ds SEMICOLONS ss  
+  | %name SS
+    ss
+;
+
+ds:
+    %name D2
+      D ';' ds   
+  | %name D1
+      D       
+;
+
+ss:
+    %name S2
+      S SEMICOLONS ss     
+  | %name S1
+      S       
+;
+
+%%
+
+__PACKAGE__->main('Provide a statement like "D; D; S" and press <CR><CTRL-D>: ') unless caller;
+

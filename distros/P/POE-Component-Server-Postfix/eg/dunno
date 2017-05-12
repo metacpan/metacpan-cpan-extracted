@@ -1,0 +1,20 @@
+#!perl
+#
+# trivial policy server that logs and returns DUNNO for all requests.
+
+use strict;
+use warnings;
+use POE::Component::Server::Postfix;
+use Data::Dumper;
+
+POE::Component::Server::Postfix->new(
+  path => '/tmp/dunno.sock',
+  mode => 0777,
+  filter => 'Plain',
+  handler => sub {
+    my ($server, $attr) = @_;
+    warn Dumper($attr);
+    return { action => 'DUNNO' };
+  },
+);
+POE::Kernel->run;

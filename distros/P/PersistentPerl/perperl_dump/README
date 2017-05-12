@@ -1,0 +1,9 @@
+
+This is not built by default.  Use the Makefile.PL here to build
+perperl.ph.  Then use perperl_dump.pl to dump out the contents of the
+perperl temp file.
+
+The missing_slots script will check for any missing slots in the output
+from perperl_dump.pl
+
+struct_sizes.pl shows the sizes of the slot structs

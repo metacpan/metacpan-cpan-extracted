@@ -1,0 +1,13 @@
+<body>
+  <h3>The Non-Working Tests</h3>
+  <h4>Canonical tag error in XHTML parser</h4>
+  <p>Errors occur when trying to use the canonical format in templates parsed by the XHTML parser.</p>
+  <?repeat name="student students"?>
+  <ul>
+    <li><?var name="student.first_name"?>
+        <?var name="student.last_name"?>
+        - <?var name="student.email"?>
+    </li>
+  </ul>
+  <?end?>
+</body>

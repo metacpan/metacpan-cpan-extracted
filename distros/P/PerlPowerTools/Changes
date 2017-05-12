@@ -1,0 +1,89 @@
+Revision history for Perl module PerlPowerTools
+
+1.012 2017-01-11T13:07:08Z
+	* Fix a { for v5.24
+	* Fix a deprecated use of POSIX::isprint
+
+1.011_03 2016-08-31T17:32:53Z
+	* Fix Makefile to work with v5.8
+	* Fix some programs to work with v5.26 (escape { in regexes)
+
+1.011_02 2016-08-31T15:12:44Z
+	* A Makefile.PL fix for v5.8
+
+1.011_01 2016-08-31T14:25:21Z
+	* Escape { in regexes in dc and glob. Perl v5.26 will demand this.
+
+1.011 2016-08-30T16:52:26Z
+	* Back out the Term::UI stuff in bin/patch since that module
+	isn't core.
+
+1.009 2016-08-30T08:16:23Z
+	* Fix some Makefile.PL issues (pauloscustodio)
+
+1.007_01 2016-03-07T19:05:46Z
+	* Exit gracefully in robots if Curses isn't installed
+	since a die in a BEGIN is a compilation error when 
+	triggered
+	* Skip -x tests on Windows.
+
+1.007 2016-03-06T18:24:26Z
+	* Make it easier to install on Windows (Kevin Phair)
+	GitHub issue #32/33
+
+1.006 2015-04-20T23:49:58Z
+	* Add docs about the default install location to the
+	README and module docs.
+	* Fix the diff docs (GitHub #20)
+
+1.005 2015-04-17T01:20:12Z
+	* Don't install at the same location as perl. Make the
+	user think about where to install them so these tools
+	don't interfere with the real tools of the same name.
+
+1.004 - 2014-12-20
+	* Try to get first come permissions on ppt so I can close those
+	tickets (and release something to replace ppt)
+
+1.003 - 2014-12-18
+	* Fix all the issues in the old ppt bugs list (https://rt.cpan.org/Dist/Display.html?Queue=ppt)
+	* All programs have embedded metadata (Tim Gim Yee)
+	* Fixes to wc, paste (Dmitri Tikhonov)
+	* The repo is now PerlPowerTools, not the old ppt
+	* factor now works correctly (Dana Jacobsen)
+	* A typo fix in diff (Sergey Romanov)
+
+1.002_03 - 2014-09-15
+	* Add tests for true and false (that's easy!)
+	* Start the TODO file with what needs to happen
+	* Fix some programs for v5.21 and disappearing syntax
+
+1.002_02 - 2014-09-15
+	* Fix syntax deprecations enforced in v5.22
+
+1.02_01 - 2014-09-14
+	* Let's try a different way of running the command to compile
+	the programs
+
+1.02 - 2014-09-12
+	* Trim the distribution, drastically. Let MetaCPAN be the website.
+
+1.01 - 2014-09-12
+	* Let's update Perl Power Tools and make it easier to find
+	* I'm not sure all of the programs even ran, but at least they
+	compile now
+	* I've probably broken some things, but now I want to see what's
+	unauthorized.
+
+0.14 - 2004-08-04
+	* 'make manifest' skips legit tarballs, fixed with new utillity, Casey West
+	* New col and words, Ronald J Kimball
+	* Website now includes version number, Casey West
+
+0.13 - 2004-07-23
+	* Casey West takes over management.
+	* grep/tcgrep - New revision by Paul Johnson
+	* sort/sort.pudge - New revision by Chris Nandor
+	* html/poem.html - Added, found in LWN archives, Casey West
+	* Tom's ambition was found in his mkidx script, exposed by Casey West
+	* Most recent known original ppt dist included, Casey West

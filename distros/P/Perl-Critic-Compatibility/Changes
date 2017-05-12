@@ -1,0 +1,12 @@
+Revision history for Perl-Critic-Compatibility.
+
+[1.001] Released on 2008-06-17
+
+    "use 5.006001" in Makefile.PL and Build.PL.
+
+[1.000] Released on 2008-06-07
+
+    Only build and testing changes.
+
+[0.999_001]  2008-04-13
+    Initial release.

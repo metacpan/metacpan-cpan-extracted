@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<REPOSITORYSUMMARY>
+  <SOFTPKG NAME="Apache-Authen-Program" VERSION="0,93,0,0">
+    <TITLE>Apache-Authen-Program</TITLE>
+    <ABSTRACT>mod_perl external program authentication module</ABSTRACT>
+    <AUTHOR>Mark Leighton Fisher &lt;mark-fisher@fisherscreek.com&gt;</AUTHOR>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="Apache-Session" VERSION="1,80,0,0">
+    <TITLE>Apache-Session</TITLE>
+    <ABSTRACT>A persistence framework for session data</ABSTRACT>
+    <AUTHOR>Casey West &lt;casey@geeknest.com&gt;</AUTHOR>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="AppConfig" VERSION="1,56,0,0">
+    <TITLE>AppConfig</TITLE>
+    <ABSTRACT>AppConfig is a bundle of Perl5 modules for reading configuration files and parsing command line arguments.</ABSTRACT>
+    <AUTHOR>Andy Wardley &lt;abw@wardley.org&gt;</AUTHOR>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="Archive-Zip" VERSION="1,1,0,0">
+    <TITLE>Archive-Zip</TITLE>
+    <ABSTRACT>Provide an interface to ZIP archive files.</ABSTRACT>
+    <AUTHOR>Ned Konz (perl@bike-nomad.com)</AUTHOR>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="PPI" VERSION="1,117,0,0">
+    <TITLE>PPI</TITLE>
+    <ABSTRACT>Parse, Analyze and Manipulate Perl (without perl)</ABSTRACT>
+    <AUTHOR>Adam Kennedy &lt;cpan@ali.as&gt;, L&lt;http://ali.as/&gt;</AUTHOR>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+  <SOFTPKG NAME="mod_perl" VERSION="2,0,2,0">
+    <TITLE>mod_perl</TITLE>
+    <ABSTRACT>Embed a Perl interpreter in the Apache/2.0 HTTP server</ABSTRACT>
+    <AUTHOR>Philippe M. Chiasson &lt;gozer@cpan.org&gt;</AUTHOR>
+    <IMPLEMENTATION>
+      <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+    </IMPLEMENTATION>
+  </SOFTPKG>
+</REPOSITORYSUMMARY>

@@ -1,0 +1,63 @@
+NAME
+    Pod::Simple::Wiki - A class for creating Pod to Wiki filters.
+
+
+DESCRIPTION
+    The `Pod::Simple::Wiki' module is used for converting Pod text
+    to Wiki text.
+
+    Pod (Plain Old Documentation) is a simple markup language used
+    for writing Perl documentation.
+
+    A Wiki is a user extensible web site. It uses very simple mark-
+    up that is converted to Html.
+
+    For an introduction to Wikis see: http://en.wikipedia.org/wiki/Wiki
+
+
+SYNOPSIS
+    To create a simple `pod2wiki' filter:
+
+        #!/usr/bin/perl
+
+        use strict;
+        use warnings;
+        use Pod::Simple::Wiki;
+
+        my $parser = Pod::Simple::Wiki->new();
+
+        if ( defined $ARGV[0] ) {
+            open IN, $ARGV[0] or die "Couldn't open $ARGV[0]: $!\n";
+        }
+        else {
+            *IN = *STDIN;
+        }
+
+        if ( defined $ARGV[1] ) {
+            open OUT, ">$ARGV[1]" or die "Couldn't open $ARGV[1]: $!\n";
+        }
+        else {
+            *OUT = *STDOUT;
+        }
+
+        $parser->output_fh( *OUT );
+        $parser->parse_file( *IN );
+
+        __END__
+
+
+SEE ALSO
+    This module also installs a `pod2wiki' command line utility. See
+    `pod2wiki --help' for details.
+
+
+AUTHOR
+    John McNamara jmcnamara@cpan.org
+
+
+COPYRIGHT
+    Copyright MMIII-MMXV, John McNamara.
+
+    All Rights Reserved. This module is free software. It may be
+    used, redistributed and/or modified under the same terms as Perl
+    itself.

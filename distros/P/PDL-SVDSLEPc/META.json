@@ -1,0 +1,44 @@
+{
+   "abstract" : "PDL interface to SLEPc sparse singular value decomposition",
+   "author" : [
+      "Bryan Jurish"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDL-SVDSLEPc",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Devel::CheckLib" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "PDL" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.003"
+}

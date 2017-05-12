@@ -1,0 +1,103 @@
+NAME
+    Plack::App::OpenVPN::Status - Plack application to display the sessions
+    of OpenVPN server
+
+VERSION
+    version 0.16
+
+SYNOPSIS
+        use Plack::Builder;
+        use Plack::App::File;
+        use Plack::App::OpenVPN::Status;
+
+        builder {
+            mount '/static' => Plack::App::File->new(root => "/path/to/static");
+            mount '/' =>
+                Plack::App::OpenVPN::Status->new(
+                    status_from => "/path/to/openvpn/status.log"
+                );
+        };
+
+DESCRIPTION
+    Plack::App::OpenVPN::Status is an application to display active sessions
+    of the OpenVPN server.
+
+    It parses OpenVPN status log and displays active sessions. Supported all
+    three versions of the status log. Check the OpenVPN server documentation
+    how to set up version. Howewer, there is no needs (and no ability, at
+    the moment) to point version of status log. Application detect it
+    authomatically. Also status log version will be diplayed on the
+    generated web page.
+
+    *Twitter Bootstrap* layout is used to diplay active OpenVPN sessions.
+
+METHODS
+  new([%options])
+    Creates a new application. The following options are supported:
+
+    status_from
+        Path to OpenVPN server status log file. This option is required. At
+        the moment, the application can able to read versions 1, 2, 3 of the
+        status log file.
+
+    custom_view
+        Coderef used as a view to display sessions. This must be a valid
+        Text::MicroTemplate's template. The hashref of params is passed to
+        the view as first argument. So you can use it like this:
+
+            % my $vars = $_[0];
+
+        Now $vars contains the structure like this:
+
+            $vars = {
+                'updated' => 'Wed Dec  5 21:25:58 2012',
+                'version' => '2',
+                'users'   => [
+                    {
+                        'common-name' => 'cadvecisvo',
+                        'remote-ip'   => '1.2.3.4',
+                        'remote-port' => '4944',
+                        'rx-bytes'    => '1.21 Mio',
+                        'tx-bytes'    => '503.1 Kio',
+                        'connected'   => 'Wed Dec  5 21:16:58 2012',
+                        'virtual'     => '00:ff:de:ad:be:ef',
+                        'last-ref'    => 'Wed Dec  5 21:25:55 2012',
+                    }
+                ]
+            }
+
+  default_view
+    This is the default view to display sessions. It uses Twitter Bootstrap
+    layout.
+
+  openvpn_status
+    Parses OpenVPN status log. Automatically selects parser for given
+    version of file.
+
+  prepare_app
+    See Plack::Component
+
+  call
+    See Plack::Component
+
+SEE ALSO
+    Plack
+
+    Plack::Component
+
+    Text::MicroTemplate
+
+    OpenVPN Manual
+    <http://openvpn.net/index.php/open-source/documentation/manuals.html>
+
+    Twitter Bootstrap <https://github.com/twitter/bootstrap>
+
+AUTHOR
+    Anton Gerasimov <chim@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Anton Gerasimov.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

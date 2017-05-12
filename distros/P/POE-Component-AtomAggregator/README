@@ -1,0 +1,159 @@
+NAME
+    POE::Component::AtomAggregator - Watch Muliple Atom Feeds for New
+    Headlines
+
+VERSION
+    Version 1.0
+
+SYNOPSIS
+        #!/usr/bin/perl
+        use strict;
+        use warnings;
+        use POE qw( Component::AtomAggregator );
+
+        my @feeds = (
+            {   url   => "http://xantus.vox.com/library/posts/atom.xml",
+                name  => "xantus",
+                delay => 600,
+            },
+            {   url   => "http://www.vox.com/explore/posts/atom.xml",
+                name  => "vox",
+                delay => 60,
+            },
+        );
+
+        POE::Session->create(
+            inline_states => {
+                _start      => \&init_session,
+                handle_feed => \&handle_feed,
+            },
+        );
+
+        $poe_kernel->run();
+
+        sub init_session {
+            my ( $kernel, $heap, $session ) = @_[ KERNEL, HEAP, SESSION ];
+            $heap->{atomagg} = POE::Component::AtomAggregator->new(
+                alias    => 'atomagg',
+                debug    => 1,
+                callback => $session->postback('handle_feed'),
+                tmpdir   => '/tmp',        # optional caching 
+            );
+            $kernel->post( 'atomagg', 'add_feed', $_ ) for @feeds;
+        }
+
+        sub handle_feed {
+            my ( $kernel, $feed ) = ( $_[KERNEL], $_[ARG1]->[0] );
+            for my $entry ( $feed->late_breaking_news ) {
+        
+                # this is where this module differs from RSSAggregator!
+            
+                # do stuff with the XML::Atom::Entry object
+                print $entry->title . "\n";
+            }
+        }
+
+CONSTRUCTORS
+  POE::Component::AtomAggregator->new( %hash );
+    Create a new instace of PoCo::AtomAggregator.
+
+    * alias
+        POE alias to use for your instance of PoCo::AtomAggregator.
+
+    * debug
+        Boolean value to turn on verbose output.
+
+    * tmpdir
+        The tmpdir argument is used as the directory to cache Atom between
+        fetches (and instances).
+
+    * http_alias
+        Optional. Alias of an existing PoCo::Client::HTTP.
+
+    * follow_redirects
+        Optional. Only if you don't have an exiting PoCo::Client::HTTP.
+        Argument is passed to PoCoCl::HTTP to tell it the follow redirect
+        level. (Defaults to 2)
+
+METHODS
+  $atomagg->feed_list
+    Returns the current feeds as an array or array_ref.
+
+  $atomagg->feeds
+    Returns a hash ref of feeds with the key being the feeds name.
+
+  $atomagg->feed( $feed_name )
+    Accessor to access a the XML::Atom::Feed object via a feed's name.
+
+  $atomagg->add_feed( $hash_ref )
+    The hash reference you pass in to add_feed is passed to
+    XML::Atom::Feed->new($hash_ref). ( see XML::Atom::Feed )
+
+  $atomagg->remove_feed( $feed_name )
+    Pass in the name of the feed you want to remove.
+
+  $atomagg->pause_feed( $feed_name )
+    Pass in the name of the feed you want to pause.
+
+  $atomagg->resume_feed( $feed_name )
+    Pass in the name of the feed you want to resume (that you previously
+    paused).
+
+  $atomagg->shutdown
+    Shutdown the instance of PoCo::AtomAggregator.
+
+AUTHOR
+    David Davis, aka Xantus, "<xantus at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-poe-component-atomaggregator at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-AtomAggreg
+    ator>.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc POE::Component::AtomAggregator
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/POE-Component-AtomAggregator>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/POE-Component-AtomAggregator>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-AtomAggregat
+        or>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/POE-Component-AtomAggregator>
+
+NOTES
+    All XML::Atom::Feed objects mentioned in this doc are actually
+    POE::Component::AtomAggregator::Feed objects that have extra accessors
+    and methods to add late_breaking_news functionality and non blocking
+    file IO. You can use the object as if it were a XML::Atom::Feed object.
+
+ACKNOWLEDGEMENTS
+    A big thank you to Jeff Bisbee for POE::Component::RSSAggregator
+
+    This module entirely based off his work, with changes to use XML::Atom
+    instead of XML::RSS
+
+    Also a big thanks to miyagawa for XML::Atom::Feed.
+
+COPYRIGHT & LICENSE
+    Copyright 2006 David Davis, aka Xantus
+
+    All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    XML::Atom::Feed, XML::Atom::Entry
+

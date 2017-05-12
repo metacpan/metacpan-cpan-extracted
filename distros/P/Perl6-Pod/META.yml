@@ -1,0 +1,194 @@
+---
+abstract: 'Pod6 implementation'
+author:
+  - 'Zahatski Aliaksandr zag@cpan.org'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl6-Pod
+provides:
+  Perl6::Pod:
+    file: lib/Perl6/Pod.pm
+    version: '0.72'
+  Perl6::Pod::Block:
+    file: lib/Perl6/Pod/Block.pm
+    version: '0.01'
+  Perl6::Pod::Block::SEMANTIC:
+    file: lib/Perl6/Pod/Block/SEMANTIC.pm
+    version: '0.01'
+  Perl6::Pod::Block::code:
+    file: lib/Perl6/Pod/Block/code.pm
+    version: '0.01'
+  Perl6::Pod::Block::comment:
+    file: lib/Perl6/Pod/Block/comment.pm
+    version: '0.01'
+  Perl6::Pod::Block::head:
+    file: lib/Perl6/Pod/Block/head.pm
+    version: '0.01'
+  Perl6::Pod::Block::input:
+    file: lib/Perl6/Pod/Block/input.pm
+    version: '0.01'
+  Perl6::Pod::Block::item:
+    file: lib/Perl6/Pod/Block/item.pm
+    version: '0.01'
+  Perl6::Pod::Block::nested:
+    file: lib/Perl6/Pod/Block/nested.pm
+    version: '0.01'
+  Perl6::Pod::Block::output:
+    file: lib/Perl6/Pod/Block/output.pm
+    version: '0.01'
+  Perl6::Pod::Block::para:
+    file: lib/Perl6/Pod/Block/para.pm
+    version: '0.01'
+  Perl6::Pod::Block::table:
+    file: lib/Perl6/Pod/Block/table.pm
+    version: '0.01'
+  Perl6::Pod::Codeactions:
+    file: lib/Perl6/Pod/Codeactions.pm
+    version: '0.01'
+  Perl6::Pod::Directive::alias:
+    file: lib/Perl6/Pod/Directive/alias.pm
+    version: '0.01'
+  Perl6::Pod::Directive::config:
+    file: lib/Perl6/Pod/Directive/config.pm
+    version: '0.01'
+  Perl6::Pod::Directive::use:
+    file: lib/Perl6/Pod/Directive/use.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode:
+    file: lib/Perl6/Pod/FormattingCode.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::A:
+    file: lib/Perl6/Pod/FormattingCode/A.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::B:
+    file: lib/Perl6/Pod/FormattingCode/B.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::C:
+    file: lib/Perl6/Pod/FormattingCode/C.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::D:
+    file: lib/Perl6/Pod/FormattingCode/D.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::E:
+    file: lib/Perl6/Pod/FormattingCode/E.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::I:
+    file: lib/Perl6/Pod/FormattingCode/I.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::K:
+    file: lib/Perl6/Pod/FormattingCode/K.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::L:
+    file: lib/Perl6/Pod/FormattingCode/L.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::M:
+    file: lib/Perl6/Pod/FormattingCode/M.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::N:
+    file: lib/Perl6/Pod/FormattingCode/N.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::P:
+    file: lib/Perl6/Pod/FormattingCode/P.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::R:
+    file: lib/Perl6/Pod/FormattingCode/R.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::S:
+    file: lib/Perl6/Pod/FormattingCode/S.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::T:
+    file: lib/Perl6/Pod/FormattingCode/T.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::U:
+    file: lib/Perl6/Pod/FormattingCode/U.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::X:
+    file: lib/Perl6/Pod/FormattingCode/X.pm
+    version: '0.01'
+  Perl6::Pod::FormattingCode::Z:
+    file: lib/Perl6/Pod/FormattingCode/Z.pm
+    version: '0.01'
+  Perl6::Pod::Grammars:
+    file: lib/Perl6/Pod/Grammars.pm
+    version: '0.01'
+  Perl6::Pod::Lex:
+    file: lib/Perl6/Pod/Lex.pm
+    version: '0.01'
+  Perl6::Pod::Lex::Block:
+    file: lib/Perl6/Pod/Lex/Block.pm
+    version: '0.01'
+  Perl6::Pod::Lex::FormattingCode:
+    file: lib/Perl6/Pod/Lex/FormattingCode.pm
+    version: '0.01'
+  Perl6::Pod::Lex::RawText:
+    file: lib/Perl6/Pod/Lex.pm
+    version: '0.01'
+  Perl6::Pod::Lex::Text:
+    file: lib/Perl6/Pod/Lex.pm
+    version: '0.01'
+  Perl6::Pod::Parser::AddIds:
+    file: lib/Perl6/Pod/Parser/AddIds.pm
+    version: '0.01'
+  Perl6::Pod::Parser::Context:
+    file: lib/Perl6/Pod/Parser/Context.pm
+    version: '0.01'
+  Perl6::Pod::Parser::CustomCodes:
+    file: lib/Perl6/Pod/Parser/CustomCodes.pm
+    version: '0.01'
+  Perl6::Pod::Parser::Utils:
+    file: lib/Perl6/Pod/Parser/Utils.pm
+    version: '0.01'
+  Perl6::Pod::Test:
+    file: lib/Perl6/Pod/Test.pm
+    version: '0.01'
+  Perl6::Pod::To:
+    file: lib/Perl6/Pod/To.pm
+    version: '0.01'
+  Perl6::Pod::To::DocBook:
+    file: lib/Perl6/Pod/To/DocBook.pm
+    version: '0.01'
+  Perl6::Pod::To::Latex:
+    file: lib/Perl6/Pod/To/Latex.pm
+    version: '0.01'
+  Perl6::Pod::To::Test:
+    file: lib/Perl6/Pod/Test.pm
+    version: '0.01'
+  Perl6::Pod::To::XHTML:
+    file: lib/Perl6/Pod/To/XHTML.pm
+    version: '0.01'
+  Perl6::Pod::Utl:
+    file: lib/Perl6/Pod/Utl.pm
+    version: '0.01'
+  Perl6::Pod::Utl::AbstractVisiter:
+    file: lib/Perl6/Pod/Utl/AbstractVisiter.pm
+    version: '0.01'
+  Perl6::Pod::Utl::Context:
+    file: lib/Perl6/Pod/Utl/Context.pm
+    version: '0.01'
+  Perl6::Pod::Writer:
+    file: lib/Perl6/Pod/Writer.pm
+    version: '0.01'
+  Perl6::Pod::Writer::Latex:
+    file: lib/Perl6/Pod/Writer/Latex.pm
+    version: '0.01'
+requires:
+  Encode: '0'
+  Filter::Simple: '0'
+  Getopt::Long: '0'
+  Pod::Usage: '0'
+  Regexp::Grammars: '1.044'
+  Test::Class: '0'
+  Tie::UnionHash: '0.02'
+  XML::Flow: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Perl6::Pod
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/zag/p5-Perl6-Pod.git
+version: '0.72'

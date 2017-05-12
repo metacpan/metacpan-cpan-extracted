@@ -1,0 +1,15 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+libglade_module_path=/usr/lib/libglade/2.0
+glade_catalog_path=
+glade_pixmap_path=
+glade_module_path=
+
+Name: libxfcegui4
+Description: libxfcegui4
+Requires: gdk-2.0 gtk+-2.0 libxfce4util-1.0
+Version: 4.8.1
+Libs:   -L${libdir} -lxfcegui4
+Cflags:   -I${includedir}/xfce4

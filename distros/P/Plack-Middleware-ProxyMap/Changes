@@ -1,0 +1,36 @@
+0.20 Sat Aug 16 12:04:13 PDT 2014
+ - Meta 0.0.2
+
+0.19 Fri Aug 15 21:27:04 PDT 2014
+ - Remove t/use_ok.t
+
+0.18 Fri Aug 15 20:35:35 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.17 Sat Aug  9 00:22:34 PDT 2014
+ - Fix swim errors
+
+0.16 Mon Aug  4 00:22:35 PDT 2014
+ - Remove old README and update files.
+
+0.15 Wed Jul 30 16:06:44 PDT 2014
+ - Switch IRC to
+
+0.14 Wed Jul 16 22:46:40 PDT 2014
+ - Fix Meta and add Contributing file
+
+0.13 Sun Jul  6 08:20:03 PDT 2014
+ - Apply PR/1 to add `backend` option. @rhesa++
+ - Switch to Zilla::Dist
+
+0.12 Wed Mar 23 12:30:02 CST 2011
+ - Use REQUEST_URI instead of PATH_INFO so we get entire URI.
+ - Add debug option.
+ - Clear PATH_INFO QUERY_STRING and HTTP_COOKIE by default
+
+0.11 Thu Jan 27 00:08:47 EST 2011
+ - Add credits to pod
+
+0.10 Wed Jan 26 20:53:29 EST 2011
+ - First Release
+

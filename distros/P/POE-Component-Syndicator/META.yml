@@ -1,0 +1,30 @@
+---
+abstract: 'A POE component base class which implements the Observer pattern'
+author:
+  - 'Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-Syndicator
+no_index:
+  directory:
+    - t
+    - xt
+    - utils
+requires:
+  Object::Pluggable: 1.29
+  POE: 1.311
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Syndicator
+  homepage: http://search.cpan.org/dist/POE-Component-Syndicator/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hinrik/poe-component-syndicator.git
+version: 0.06
+x_authority: cpan:HINRIK

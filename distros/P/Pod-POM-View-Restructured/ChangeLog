@@ -1,0 +1,8 @@
+Version 0.03
+	* Apply debian patch to POD (Closes: RT#119200)
+	* Add namespace option to convert links to cross references (Closes: CPAN RT#115777)
+
+Version 0.02
+	* Added callbacks parameter
+	* Fixed bug where the module tried to write to an unopened index file
+	    

@@ -1,0 +1,131 @@
+NAME
+
+    POE::Component::SmokeBox::Uploads::CPAN::Mini - Obtain uploaded CPAN
+    modules via a CPAN::Mini mirror
+
+VERSION
+
+    version 1.02
+
+SYNOPSIS
+
+      # Create a CPAN::Mini::Devel mirror
+      use strict;
+      use warnings;
+      use POE qw(Component::SmokeBox::Uploads::CPAN::Mini);
+      use Data::Dumper;
+    
+      $|=1;
+    
+      POE::Session->create(
+            package_states => [
+              'main' => [qw(_start upload)],
+            ],
+      );
+    
+      $poe_kernel->run();
+      exit 0;
+    
+      sub _start {
+        POE::Component::SmokeBox::Uploads::CPAN::Mini->spawn(
+            event => 'upload',
+            remote => 'ftp://ftp.funet.fi/pub/CPAN/',
+            'local' => '/home/ftp/CPAN/',
+            class => 'CPAN::Mini::Devel',
+        );
+        return;
+      }
+    
+      sub upload {
+        print Dumper( $_[ARG0] );
+        return;
+      }
+
+DESCRIPTION
+
+    POE::Component::SmokeBox::Uploads::CPAN::Mini is a POE component that
+    maintains a minimal CPAN mirror using CPAN::Mini and generates events
+    for when new distributions are added to the mirror and distributions
+    are removed from the mirror.
+
+    The component uses POE::Wheel::Run to run CPAN::Mini's update_mirror
+    class method.
+
+CONSTRUCTOR
+
+    spawn
+
+      Takes a number of parameters:
+
+        'event', the event handler in your session where each new upload alert should be sent, mandatory;
+        'session', optional if the poco is spawned from within another session;
+        'remote', URL to the remote cpan mirror (required)
+        'local', path to where the local minicpan will reside (required)
+        'interval', the interval in seconds between mirror updates, default is 14400 ( ie. 4 hours );
+
+      The 'session' parameter is only required if you wish the output event
+      to go to a different session than the calling session, or if you have
+      spawned the poco outside of a session.
+
+      Other CPAN::Mini options may be specified.
+
+        'class', specify the CPAN::Mini class to use, defaults to CPAN::Mini;
+        'force', check all directories, even if indices are unchanged, default is true;
+        'skip_perl', skip the major language distributions: perl, parrot, and ponier, default false;
+
+      There are some debugging options:
+
+        'debug', if set to true the component will print output from update_mirror();
+        'dump', if set to true, the component will add additional fields to the output event;
+        'options', pass a hashref of POE::Session options to the component;
+
+      Returns an object.
+
+METHODS
+
+    session_id
+
+      Returns the POE::Session ID of the component.
+
+    shutdown
+
+      Terminates the component.
+
+INPUT EVENTS
+
+    shutdown
+
+      Terminates the component.
+
+OUTPUT EVENTS
+
+    An event will be triggered each time the local mirror is updated by the
+    component. ARG0 of the event will be a hashref with the following keys:
+
+      'uploads', an arrayref containing the distributions that were updated;
+      'cleaned', an arrayref containing the distributions that were removed;
+      'status', the exit code of the update_mirror() fork;
+
+    If dump has been set to true in the spawn constructor then these
+    additional keys will be set:
+
+      'buffer', an arrayref containing the STDOUT messages from the update_mirror() call;
+      'errors', an arrayref containing the STDERR messages from the update_mirror() call;
+
+SEE ALSO
+
+    POE
+
+    CPAN::Mini
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

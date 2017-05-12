@@ -1,0 +1,11 @@
+Revision history for Perl extension Physics::Psychrometry.
+
+1.0  Tue Mar 20 08:21:09 2007
+	- original version; created by h2xs 1.23 with options
+		-cfn Physics::Psychrometry
+
+1.1  Sat Dec 31 11:45:00 2011
+     Fixed incorrect value of 273.16 to 273.15 in dbw2v. Reported by "Dave Ahijevych via RT".
+
+1.2  Fri Mar 22 10:29:37 EST 2013
+     Updated author and distribution location details to airspayce.com

@@ -1,0 +1,96 @@
+=pod
+
+=head1 Name
+
+Perl::Syntax -- Syntax Check Perl files and strings 
+
+=head1 Summary
+
+This module syntax checks Perl files and strings. It is identical
+to running C<perl -c ...>, but output doesn't go by default to STDOUT.
+
+You run his like this from a command line:
+
+    $ perl -MPerl::Syntax perl-program.pl
+    $ perl -MPerl::Syntax -e 'your perl code' 
+
+which is like: 
+
+    $ perl -c perl-program.pl 2>/dev/null
+    $ perl -MPerl::Syntax -e 'your perl code' 2>/dev/null
+
+Or from inside Perl: 
+
+     system($^X, '-M', 'Perl::Syntax', $perl_program);
+     system("$^X -M Perl::Syntax $perl_program");
+     # check $? 
+
+By default, no output is produced. You will get a zero return code if
+everything checks out or nonzero if there was a syntax error. 
+
+To capture output to a file, you can specify a file name by adding an
+equal sign after "Perl::Syntax" like this:
+
+    perl -MPerl::Syntax=/tmp/output-file.txt perl-program.pl 
+
+or inside PerL:
+
+     system($^X, '-M', 'Perl::Syntax=/tmp/outfile-file.txt', $perl_program);
+
+File I</tmp/output-file.txt> will have either the messages Perl
+normally produces on C<STDERR>:
+
+    XXXX syntax OK
+
+or
+
+    syntax error at XXXX line DDDD ...
+    ...
+
+=head1 Examples
+
+     use English;
+     my @prefix = ($EXECUTABLE_NAME, '-MPerl::Syntax');
+
+     # test this Perl code to see if it is syntactically correct;
+     system(@prefix, __FILE__); 
+     print "Yep, we're good" unless $? >> 8;
+
+     # test of invalid Perl code: 
+     system(@prefix, '-e', '$Incomplete + $Expression +'; 
+     print "Try again" if $? >> 8;
+
+     # Show capturing output
+     system($EXECUTABLE_NAME, '-MPerl::Syntax=/tmp/Syntax.log', __FILE__);
+     # results are in /tmp/Syntax.log
+
+=head1 Bugs/Caveats
+
+There doesn't seem to be much benefit here over using C<perl -c> with
+C<STDERR> redirected. What I really want is a kind of eval that just
+does the syntax checking.
+
+=head1 Author
+
+Rocky Bernstein
+
+=head1 See Also 
+
+C<-c> switch from L<perlrun#Command-Switches>
+
+=head1 Copyright
+
+Copyright (C) 2012 Rocky Bernstein <rocky@cpan.org>
+
+This program is distributed WITHOUT ANY WARRANTY, including but not
+limited to the implied warranties of merchantability or fitness for a
+particular purpose.
+
+The program is free software. You may distribute it and/or modify it
+under the terms of the GNU General Public License as published by the
+Free Software Foundation (either version 2 or any later version) and
+the Perl Artistic License as published by O'Reilly Media, Inc. Please
+open the files named gpl-2.0.txt and Artistic for a copy of these
+licenses.
+
+=cut

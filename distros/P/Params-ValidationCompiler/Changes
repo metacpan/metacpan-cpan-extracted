@@ -1,0 +1,188 @@
+0.24     2017-04-08
+
+- The source_for() exported by Params::ValidationCompiler did not work at
+  all. Reported by Diab Jerius. GH #16.
+
+
+0.23     2017-01-23
+
+- Trying to create a validator for positional parameters where a required
+  param came after one with a default did not throw an exception.
+
+- A positional params validator with a slurpy type which had coercions did not
+  return the coerced values. It returned the original values instead.
+
+
+0.22     2016-12-31
+
+- Explicitly load the B module. Previously the code relied on this already
+  being loaded by something else. Fixed by Tomasz Konojacki. PR #11.
+
+- Removed the alpha warning from the docs.
+
+
+0.21     2016-12-06
+
+- Switched to using GitHub issues.
+
+
+0.20     2016-12-05
+
+- The keys for parameter specifications are now validated. If an unknown key
+  is seen then an exception will be thrown. This will help you catch typos in
+  your parameter specification. Implemented by Greg Oschwald. PR #8.
+
+
+0.19     2016-11-21
+
+- Non-inlinable Specio types caused a syntax error when used with positional
+  params.
+
+- Positional params with coercions and defaults did not work properly. The
+  coerced value and the default would simply not be returned in any case.
+
+
+0.18     2016-11-13
+
+- Using coercions with positional parameters could cause a "Modification of a
+  read-only value attempted" exception when the generated code tried to assign
+  to elements of @_. This is now fixed by making a copy if any of the types
+  have a coercion.
+
+- Using Moose types with coercions in a positional params check would cause
+  invalid code to be generated. This could also happen with Type::Tiny if
+  either the type or a coercion could not be inlined.
+
+
+0.17     2016-11-04
+
+- When using positional parameters, parameters with a default are now
+  optional. For named parameters, this was already the case.
+
+
+0.16     2016-11-03
+
+- Moose and Specio types (and coercions) which provide variables to close over
+  when being inlined did not always compile properly. Most notable, this was
+  not being handled at all for Moose types, and not completely handled for
+  Specio coercions.
+
+
+0.15     2016-11-03
+
+- Previously, using a default with a positional parameter would result in an
+  error when compiling the validator subroutine. Defaults now work with
+  positional parameters. Implemented by Greg Oschwald. Based on PR #5.
+
+
+0.14     2016-11-02
+
+- Added a "named_to_list" option to support returning only the parameter
+  values from a named parameter validator rather than the key-value
+  pairs. Implemented by Greg Oschwald. Based on PR #4.
+
+- Errors from calls to validation_for() now use croak so as to show up at the
+  call site, rather than in the internals
+
+
+0.13     2016-09-16
+
+- Small fixes to make sure that you can pass both readonly and locked hashes
+  to both validation_for and the subroutine it creates for you. Locked hashes
+  work and readonly hashes sort of work on some Perls.
+
+- Added a new parameter, "name_is_optional". When this is true, the "name"
+  parameter is simply ignored when Sub::Util is not available, rather than
+  causing an exception.
+
+- Removed List::SomeUtils as a prereq.
+
+
+0.12     2016-08-16
+
+- Require Specio for tests instead of Type::Tiny. Type::Tiny does not work
+  with blead and the maintainer has not responded to bug reports for a while.
+
+
+0.11     2016-08-14
+
+- Use Sub::Util instead of Sub::Name as our optional sub-naming module, since
+  Sub::Util is part of core as of 5.22.
+
+
+0.10     2016-08-10
+
+- The parameters you pass when creating a validator are now validated.
+
+- The $e->message returned when a Moose type fails now includes the parameter
+  name or position. Adding these for other type systems will come in a future
+  release.
+
+
+0.09     2016-07-04
+
+- Really make Sub::Name optional.
+
+
+0.08     2016-07-03
+
+- Renamed from Params-CheckCompiler to Params-ValidationCompiler.
+
+- Made Sub::Name optional. If you try to set the name of a generation
+  validation sub without Sub::Name installed, you will get a fatal error.
+
+
+0.07     2016-06-18
+
+- Make the compiled sub for checking named params die if given a single object
+  as an argument, even if the object is implemented using a hashref. However,
+  if the object overloads hash dereferencing then the overloading is
+  used. Reported by Mark Fowler. GitHub #3.
+
+- Renamed compile() to validation_for(). The latter is not a very specific
+  name. Requested by Mark Fowler. GitHub #1.
+
+
+0.06     2016-06-18
+
+- Require Type::Tiny for tests. Reported by Slave Rezic. RT #115413.
+
+- Fix tests when Moose is installed but Devel::PartialDump is not. Reported by
+  Slave Rezic. RT #115413.
+
+
+0.05     2016-06-18
+
+- Removed all remaining uses of Moo.
+
+
+0.04     2016-06-17
+
+- Removed more modules from test prereqs that are only used in optional tests.
+
+- Replace Throwable with Exception::Class.
+
+
+0.03     2016-06-17
+
+- Remove Moose from test prereqs. This is only used for an optional test.
+
+- When generating the source for named params checking, sort the parameters so
+  that the order in which keys are checked is consistent.
+
+- You can now pass a name parameter when creating a check subroutine. This
+  will be used to name the generated subroutine using Sub::Name.
+
+
+0.02     2016-05-28
+
+- Add support for positional parameters.
+
+- Add support for type checking extra parameters.
+
+- Renamed allow_extra to slurpy.
+
+
+0.01     2016-05-24
+
+- First release upon an unsuspecting world.

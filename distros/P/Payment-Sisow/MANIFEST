@@ -1,0 +1,15 @@
+ChangeLog
+MANIFEST
+Makefile.PL
+README
+examples/config.ini.templ
+examples/soap-client.pl
+lib/Payment/Sisow.pm
+lib/Payment/Sisow.pod
+lib/Payment/Sisow/SOAP.pm
+lib/Payment/Sisow/SOAP.pod
+lib/Payment/Sisow/sisow-soap-v2.0.wsdl
+t/01use.t
+xt/99pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+    Name: pagedup.xml
+    Author: Cosimo Streppone <cosimo@cpan.org>
+    Description:
+    Simple 100x50 mm barcode label to be used in the
+    pagedup.pl script to be applied and duplicated onto
+    an A4 page.
+-->
+<report version="1.0">
+
+    <definition>
+        <name>Page processing example</name>
+        <url>pagedup.pdf</url>
+        <destination>labeltemp.pdf</destination>
+        <paper>100 x 50 mm</paper>
+        <orientation>portrait</orientation>
+        <font>Helvetica</font>
+        <default_font>Helvetica</default_font>
+        <default_font_size>24</default_font_size>
+        <x_margin>5</x_margin>
+        <y_margin>5</y_margin>
+    </definition>
+
+    <data>
+        <page>
+            <footerless>1</footerless>
+            <header>
+                <!-- 50 mm = 142 postscript points -->
+                <cell x="142" y="110">
+                    <font_size>26</font_size>
+                    <align>center</align>
+                    <text>SKUyyxxxxxxx</text>
+                    <percent>80</percent>
+                </cell>
+                <cell x="142" y="20">
+                    <font_size>13</font_size>
+                    <type>code128</type>
+                    <barcode>SKUyyxxxxxxx</barcode>
+                    <percent>90</percent>
+                    <align>center</align>
+                    <zone>35</zone>
+                    <scale>1.4</scale>
+                </cell>
+            </header>
+        </page>
+    </data>
+
+</report>

@@ -1,0 +1,42 @@
+Perl6::Gather version 0.42
+=========================
+
+This module prototypes the Perl 6 gather/take mechanism.
+
+For example:
+
+	use Perl6::Gather;
+
+	@odds = gather {
+				for (@data) {
+					take if /(one|three|five|nine)$/;
+					take if /^\d+$/ && $_ %2;
+				}
+				take 99, 101 unless gathered;
+			};
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Perl6::Export
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

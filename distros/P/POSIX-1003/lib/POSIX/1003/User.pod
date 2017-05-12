@@ -1,0 +1,167 @@
+=encoding utf8
+
+=head1 NAME
+
+POSIX::1003::User - POSIX handling user and groups
+
+=head1 INHERITANCE
+
+ POSIX::1003::User
+   is a POSIX::1003::Module
+
+=head1 SYNOPSIS
+
+  use POSIX::1003::User;
+
+=head1 DESCRIPTION
+
+See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
+ 
+=over 4
+
+=item POSIX::1003::User-E<gt>B<exampleValue>(NAME)
+
+See L<POSIX::1003::Module/"METHODS">
+
+=item $obj-E<gt>B<import>()
+
+See L<POSIX::1003::Module/"METHODS">
+
+=back
+
+=head1 FUNCTIONS
+
+=head2 Standard POSIX
+
+User and group management is provided via many functions, which are
+not portable either in implementation or in availability.
+See also L<http://www.cs.berkeley.edu/~daw/papers/setuid-usenix02.pdf>
+
+=head3 Get/set users
+
+The implementation of L<setuid()|POSIX::1003::User/"Get/set users"> differs per platform.  L<seteuid()|POSIX::1003::User/"Get/set users">
+is more consistent and widely available.  L<setresuid()|POSIX::1003::User/"Get/set users"> is the most
+powerful, but not everywhere.  Functions which are not implemented
+will return error ENOSYS.
+
+=over 4
+
+=item B<geteuid>()
+
+=item B<getresuid>()
+
+=item B<getuid>()
+
+=item B<seteuid>(EUID)
+
+=item B<setresuid>(RUID, EUID, SUID)
+
+example: 
+
+  # see also the set*uid examples above
+  my @mygroups = getgroups();
+  @mygroups or die $!;
+
+  setgroups(1,2,3) or die $!;
+
+=item B<setreuid>(RUID, EUID)
+
+=item B<setuid>(UID)
+
+=back
+
+=head3 Get/set groups
+
+The same use and limitations as the uid functions.
+
+=over 4
+
+=item B<getegid>()
+
+=item B<getgid>()
+
+=item B<getgroups>()
+
+Returns a list of group-ids, which may (or may not) contain the effective
+group-id.
+
+=item B<getresgid>()
+
+=item B<setegid>(EGID)
+
+=item B<setgid>(GID)
+
+=item B<setregid>(RGID, EGID)
+
+=item B<setresgid>(RGID, EGID, SGID)
+
+=back
+
+=head3 Information about users
+
+=over 4
+
+=item B<getlogin>()
+
+The username associated with the controling terminal.
+Simply L<perlfunc/getlogin>
+
+=item B<getpwent>()
+
+Simply L<perlfunc/getpwent>
+
+=item B<getpwnam>(USERNAME)
+
+Simply L<perlfunc/getpwnam>
+
+=item B<getpwuid>(USERID)
+
+Simply L<perlfunc/getpwuid>
+
+example: 
+
+  my ($name, $passwd, $uid, $gid, $quota, $comment,
+      $gcos, $dir, $shell, $expire) = getpwuid($uid);
+  my $uid  = getpwnam($username);
+  my $name = getpwuid($userid);
+
+=back
+
+=head3 Information about groups
+
+=over 4
+
+=item B<getgrent>()
+
+Simply L<perlfunc/getgrent>
+
+=item B<getgrgid>(GROUPID)
+
+Simply L<perlfunc/getgrgid>
+
+=item B<getgrnam>(GROUPNAME)
+
+Simply L<perlfunc/getgrnam>
+
+=back
+
+=head1 SEE ALSO
+
+This module is part of POSIX-1003 distribution version 0.98,
+built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights 2011-2013 on the perl code and the related documentation
+ by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

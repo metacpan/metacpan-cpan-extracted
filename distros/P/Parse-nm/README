@@ -1,0 +1,43 @@
+
+Parse::nm - Run and parse 'nm' command output with filter callbacks
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+DEPENDENCIES
+
+(see META.yml for up-to-date information)
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing you can find documentation for this module with the
+perldoc command:
+
+        perldoc Parse::nm
+
+You can also view the documentation of the latest release online:
+
+    http://search.cpan.org/dist/Parse-nm/lib/Parse/nm.pm
+
+Report bugs on the RT queue:
+
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=Parse-nm
+
+
+COPYRIGHT & LICENSE
+
+Copyright © 2010 Olivier Mengué
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.0 or,
+at your option, any later version of Perl 5 you may have available.

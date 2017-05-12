@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 db23e41ac291fe109d31b34105f39ee328f131a9 Changes
+SHA1 bcf25151d01a207955dbab3ecdbd872ff9cbac04 LICENSE
+SHA1 efc2d77a211572f92984271f7d294030bb25b46d MANIFEST
+SHA1 af9bf64da6713da6a8e5d40d18b35d3cdb9ea2ee MANIFEST.SKIP
+SHA1 8fe7cb0b61e375ce92f3579e32bf927b1756f388 META.json
+SHA1 76a69798bb97b503d59f1991109ac98347452a5c META.yml
+SHA1 4ae4a7dede2617f7a7d46df592e980490b4c7541 Makefile.PL
+SHA1 ceccd29d423a89cd4262989ba66eaf9e0fc49e86 README
+SHA1 3a3e5f87812aee2e12705e6b20f28d570983a73d doc/Contributors
+SHA1 2403423f3aebb5311cf5d8d73166a8a86849ab46 doc/example.pl
+SHA1 a3190e6b668875ffb65f4c83fc80c7469cf0473e lib/Parse/DNS/Zone.pm
+SHA1 c853133425eaf95c7aff9dcfc1c99d3dc1f7ed66 t/01-dist.t
+SHA1 2c58832a801021cb5fcc678f7e760d45baeefee4 t/03-filehandling.t
+SHA1 b721c08b3f8600423ead23e0fbb47c176a6e252e t/03-fqdnize.t
+SHA1 8b17bfb80ed0ef70eb656f7ed99390c43e7bb42a t/03-parser.t
+SHA1 6bcbb756dd07761d7927cf0064370d60609b595a t/03-strip_quotes.t
+SHA1 c4d4ed2eca9d08c2b6af74cf67f006c6cd7ab934 t/data/db.include
+SHA1 11164d654d275cf0171d4ff712512e54206d1728 t/data/db.nottl
+SHA1 b3d81b281eab9d89bb95c9f458f1c9fe4de3b0a7 t/data/db.simple
+-----BEGIN PGP SIGNATURE-----
+
+iQIcBAEBCgAGBQJYJgs3AAoJEFDVLxLOThOZiLsP/i93sHjCYA51Me9LND1ruL3Z
+OTC5Q5Pkqnhe7XgtST+RB8YhoJAfhfIw0A4avnRDsM0vDbPdr0Wc187TCMrmI0mX
+4yGlh/v4VmQLaOxYhMHrZWbyQfXT6pqsxYgaQ+kFghLdmxJioGPIypK3pltKXZjn
+M85EoFTWVv3jNipJPTqI3N7J9I5jwsQ9nr2zoe4COyfuJHxbdqQyUWo0lub49HNb
+3kFqLrf0IRnd25Z2ll7rUM/6PA6UXyIV+D224U6dXALdbnk0MgKN3oDK2uh7GHZ/
+ow57KcDi2K53jw6U/tELIOTrywhSpCbQ6XX55C0KDePwVZk3Z1aHoI5FgqYGhRQp
+w6gObdbMcZWpy0S7PkcUP/vNF4zUoSWrqSLcszNJuUp3Kuh7UGyZMU3i/fF5MTlf
+CRGw3D1OvwVU3x6rxoU3WfoGckTO77MgTGoyz9VFeBlqkKWVkXO5Q8msMJ5r63Zl
+mNrYSkCh2reqS58ZvB1NEm6yNk18VLu9mBeqwL2D1JFJ3ixvx+4gsDsvcvYgK0Yl
+52NnH3F9KKgXxFUqudyKyLsbK1N6nSpVmZEjVnZougmvqYhdi/K8E3ijR4xIZLsJ
+6BhNoBv8OYtT5V83Gme61yGOwYwq2MVKKBncInLg/mLbcetqdtlPZTu0meU44fzK
+qK5GogavfIniWmlm/b18
+=z8i4
+-----END PGP SIGNATURE-----

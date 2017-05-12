@@ -1,0 +1,29 @@
+---
+abstract: 'Proxy plack requests to a rack application'
+author:
+  - 'Lee Aylward, C<< <leedo at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-App-Prack
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  JSON: 0
+  Plack: 0
+  parent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/leedo/Plack-App-Prack.git
+version: 0.02

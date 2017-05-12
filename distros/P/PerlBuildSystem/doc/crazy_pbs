@@ -1,0 +1,18 @@
+[01:13] <nadim> I haven't named distributed and heterogen warp yet
+[01:13] <ali> "cache consistensy hell"? :)
+[01:15] <nadim> when the cache is distributed and pbs nodes only hold part of it and there is never a single node encompassing all of the cache, then it will be hairy :)
+[01:15] <ali> hehe no shit :)
+[01:15] <ali> I don't even want to think about synchronising
+[01:17] <nadim> ali: you don't synch you just go building what you think has to be build and some times later you findout you didn't build what was necessary, you do a stack exception back in the build and iterate again.
+[01:17] <nadim> Hold it right there! That is not so dumb!
+[01:18] <ali> next keyword in pbs: setjmp/longjmp :D
+[01:18] <nadim> don't laugh too much, this is a very cool idea. it's like fuzzy building.
+[01:19] <ali> I dunno, fuzzy build sounds just like Visual Studio 2003 :D
+[01:19] <pom> ROTFLOL
+[01:19] <nadim> hehe
+[01:19] <ali> *build*random failure*press build again*success*
+[01:19] <nadim> something like that
+[01:19] <nadim> except that it's effective because it's distributed
+[01:20] <nadim> the pbs nodes continue synchronizing while building thus adapt the build sequence iteratively
+[01:20] <nadim> this would mean merging the dependency tree iteratively too, mmmmmm synch hell!
+[01:21] <nadim> I must write this somewhere 

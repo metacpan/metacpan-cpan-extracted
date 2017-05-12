@@ -1,0 +1,7 @@
+Revision history for POE-Component-Client-MogileFS
+
+0.01    2007-04-27/18:34:00
+        First version, released on an unsuspecting world.
+
+0.02	2007-05-17/10:04:00
+		Hopefully fixed some warnings and a possible memory leak

@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Synopsys_Open_Source_License.pdf
+test.lib
+t/Parse-Liberty.t
+lib/Parse/Liberty.pm
+lib/Parse/Liberty/Attribute.pm
+lib/Parse/Liberty/Constants.pm
+lib/Parse/Liberty/Define.pm
+lib/Parse/Liberty/Group.pm
+lib/Parse/Liberty/Simple.pm
+lib/Parse/Liberty/Value.pm
+META.yml                                 Module meta-data (added by MakeMaker)

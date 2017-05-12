@@ -1,0 +1,30 @@
+<h1>[% current_forum.name %] : List Of Active Threads</h1>
+
+[%- IF thread_list.count > 0 %]
+
+<div style="float:right; font-size: 85%;">
+    <span class="yui-button yui-link-button">
+        <span class="first-child">
+            <a href="[%c.uri_for('/thread/add',{'forum'=>current_forum.id})%]">[%l('Create New Thread')%]</a>
+        </span>
+    </span>
+</div>
+[% PROCESS shared/pager_advanced %]
+
+<table class="forum_view">
+    <tbody>
+        [%- WHILE (thread = thread_list.next) %]
+        [% PROCESS shared/postinfo_table_row %]
+        [% END %]
+        <tr>
+            <td colspan="5">
+                [% PROCESS shared/moderator_list %]
+            </td>
+        </tr>
+    </tbody>
+</table>
+
+[% PROCESS shared/pager_advanced %]
+[% ELSE %]
+  No active threads in this forum
+[% END %]

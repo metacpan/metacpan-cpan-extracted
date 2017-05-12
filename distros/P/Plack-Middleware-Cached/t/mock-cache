@@ -1,0 +1,13 @@
+package Mock::Cache;
+use Clone qw(clone);
+
+sub new { bless( { objects => {} }, shift ); }
+sub get { $_[0]->{objects}->{ $_[1] } }
+
+sub set {
+    my ( $self, $key, $object, @options ) = @_;
+    $self->{objects}->{$key} = clone($object);
+    $self->{options} = \@options;
+}
+
+1;

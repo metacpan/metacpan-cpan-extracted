@@ -1,0 +1,14 @@
+port ffport vars clk:clock, rst:reset, d:data, q:register;
+
+module myff_template(clock, reset, data, register);
+   input  clock, reset, data;
+   output register;
+
+   reg 	  register;
+
+   always @(posedge clock or posedge reset)
+      if (reset)
+	 register <= #1 0;
+      else
+	 register <= #1 data;
+endmodule

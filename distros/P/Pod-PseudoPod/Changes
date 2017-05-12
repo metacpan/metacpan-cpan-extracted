@@ -1,0 +1,74 @@
+Revision history for Pod::PseudoPod
+
+0.15 Jun 11, 2009
+	- Update Tutorial for change in maintainership.
+        - Further improvements to the DocBook formatter.
+
+0.14 Mar 20, 2007
+	- Add a DocBook 4.4. formatter, to output the new format
+	  O'Reilly needs for book production with help from Lakshmi
+	  Sadasiv at O'Reilly.
+
+0.13 Aug 03, 2006
+	- Resolve failing tests, check for encoded entities with
+	  pattern match instead of exact text match.
+
+0.12 Jul 17, 2005
+	- Now install ppod2html, ppod2txt, and ppodchecker during the
+	  make or build process.
+	- Applied patch from chromatic and Timothy Appnel to
+	  HTML formatter to automatically escape certain characters in
+	  verbatim sections.
+	- Added support for listing blocks at the request of a user.
+
+0.11 Jun 26, 2004
+	- Applied patch from Boris Zentner to make example scripts 
+	  use File::Basename.
+	- Applied patch from chromatic to display figure titles in HTML
+	  formatter, and display a "no errors" message from the checker
+	  when the file parses without errors.
+	- Updated main Pod::PseudoPod module to take advantage of
+	  Pod::Simple 3.02 (pieces of Pod::PseudoPod were integrated
+	  into Pod::Simple).
+
+0.10 Apr 26, 2004
+	- Added the tutorial to the manifest, ooops.
+
+0.09 Apr 24, 2004
+	- Added a PseudoPod tutorial, based on O'Reilly's docs.
+	- Added rudimentary text index generation.
+	- Now supports 'Build' or 'make'.
+	- Makefile.PL explicitly generates list of tests (change
+	  suggested by Jeff Zucker because Win98 couldn't read the
+	  "*.t".)
+
+0.08 Feb 18, 2004
+	- Parse formatting codes in verbatim code blocks.
+	- Preserve entities in HTML formatter.
+	- Update text formatter to take advantage of new features.
+
+0.07 Jan 6, 2004
+	- Also allow =for directives with '=end for' directives. The
+	  PseudoPod docs disagree on which is right, so I'm allowing
+	  both.
+
+0.06 Jan 5, 2004
+	- Allow =for directives with empty =end directives.
+
+0.05 Jan 2, 2004
+	- Fixed sidebars and tables so they can handle codes within
+	  their text.
+
+0.04 Jan 1, 2004
+	- Add support for tables, including: "=begin table", =row,
+	  =cell, =headrow, =bodyrows.
+
+0.03 Dec 31, 2003
+	- Add generic support for =begin entities with title text
+	  after the target name.
+
+0.02 Nov 30, 2003
+	- Switch to call style similar to Pod::Simple::Methody.
+
+0.01 Jan  6, 2003
+	- Original simple subclass of Pod::Simple.

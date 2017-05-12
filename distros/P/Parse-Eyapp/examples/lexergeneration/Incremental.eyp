@@ -1,0 +1,50 @@
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+
+%tree
+
+%%
+input:                
+        |   input $line  { print $line->str."\n" }
+;
+
+line:     '\n'      
+        | exp '\n'   
+        | error '\n'  
+;
+
+exp:        NUM             
+        |   VAR              
+        |   VAR '=' exp         
+        |   exp '+' exp         
+        |   exp '-' exp        
+        |   exp '*' exp       
+        |   exp '/' exp      
+        |   '-' exp %prec NEG 
+        |   '(' exp ')'       
+;
+
+%%
+
+sub _Lexer {
+    my($parser)=shift;
+
+    if ($parser->YYEndOfInput) {
+      my $input = <STDIN>;
+      return('', undef) unless $input;
+      $parser->input($input);
+    };
+
+    for (${$parser->YYInput}) {
+        m/\G[ \t]*/gc;
+        m/\G([0-9]+(?:\.[0-9]+)?)/gc and return('NUM',$1);
+        m/\G([A-Za-z][A-Za-z0-9_]*)/gc and return('VAR',$1);
+        m/\G(.)/gcs and return($1,$1);
+        return('', undef);
+    }
+}
+
+__PACKAGE__->lexer(\&_Lexer);
+

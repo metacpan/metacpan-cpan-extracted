@@ -1,0 +1,26 @@
+---
+abstract: 'modify HTTP request headers'
+author:
+  - 'Wallace Reis <wreis@cpan.org>'
+build_requires:
+  Plack::Builder: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-RequestHeaders
+requires:
+  Plack::Middleware: 0
+  Plack::Util: 0
+  Plack::Util::Accessor: 0
+  parent: 0
+resources:
+  bugtracker: https://github.com/wreis/Plack-Middleware-RequestHeaders/issues
+  homepage: https://github.com/wreis/Plack-Middleware-RequestHeaders
+  repository: git://github.com/wreis/Plack-Middleware-RequestHeaders.git
+version: 0.05

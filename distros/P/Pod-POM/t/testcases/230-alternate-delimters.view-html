@@ -1,0 +1,11 @@
+<html>
+<body bgcolor="#ffffff">
+<h1>NAME</h1>
+
+<p>230-alternate-delimiters</p>
+<h1>TESTCASES</h1>
+
+<p>Code containing a greater than symbol should be legal:</p>
+<p><code>$obj-&gt;clone</code> makes a deep copy of the object.</p>
+</body>
+</html>

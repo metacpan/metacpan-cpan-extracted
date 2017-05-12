@@ -1,0 +1,9 @@
+<test>
+  <a petal:replace="string:REPLACE" />
+  <a petal:content="string:CONTENT" />
+  <a petal:condition="string:true">CONDITION</a>
+  <a petal:repeat="item loop">LOOP</a>
+  <a petal:omit-tag="" class="OMIT_ME">No surrounding tags</a>
+  <a foo-bar="baz" />
+  <span petal:content="first_name">First</span>
+</test>

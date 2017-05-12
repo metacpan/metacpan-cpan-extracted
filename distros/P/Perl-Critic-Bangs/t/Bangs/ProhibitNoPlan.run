@@ -1,0 +1,21 @@
+## name Suspicious but OK
+## failures 0
+## cut
+
+my $foo = 'Test::More qw( no_plan );';
+use Test::More qw( ono_plan );
+my @foo = qw( no_plan );
+# use Test::More qw( no_plan );
+
+#-----------------------------------------------------------------------------
+
+## name No Plan
+## failures 2
+## cut
+
+use Test::More qw( no_plan );
+use Test::More qw( some_plan no_plan );
+
+#-----------------------------------------------------------------------------
+
+

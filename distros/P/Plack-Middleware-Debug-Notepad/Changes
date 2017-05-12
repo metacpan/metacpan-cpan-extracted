@@ -1,0 +1,43 @@
+0.12 2016-10-01T13:04:34Z
+    - No way I can deny it: I'm an idiot.
+
+0.11 2016-09-30T16:16:23Z
+    - Corrected the tests and hopefully did less stupid things this time.
+
+0.10 2016-09-27T23:22:36Z
+
+    - Use a proper temporary directory during testing
+
+0.09 2016-09-27T23:19:14Z
+
+    - borked. sorry.
+
+0.08 2014-08-17T07:12:27Z
+
+    - Seems like "on build" isn't the right kind of phase for the Test::* Modules
+
+0.07 2014-08-16T13:34:10Z
+
+    - Add some stlyes for links
+
+0.06 2014-03-19T08:51:32Z
+
+    - Fix the generated HTML: close the outer div, too.
+
+0.05 2014-03-15T18:57:41Z
+
+    - More work on the cancel button: it now reloads the original markdown from disk
+
+0.04 2014-03-15T14:47:57Z
+
+    - Add a primitive cancel button and fix styling of ul lists
+
+0.03 2014-03-15T14:21:04Z
+
+    - fixed styling of the edit and save buttons and the textread
+
+0.02 Sun Mar 09 14:28:00 GMT 2014
+    - forgot to list the most important dependency: Plack::Middleware::Debug
+
+0.01 Sat Mar 08 22:00:00 GMT 2014
+    - initial release

@@ -1,0 +1,5 @@
+Revision history for Perl extension POE::Component::Enc::Flac.
+
+1.01  Fri Apr  23 23:35:47 2004
+	- original version; created from POE::Component::Enc::Ogg 1.03
+

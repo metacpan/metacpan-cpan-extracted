@@ -1,0 +1,83 @@
+package Perinci::Access::Manual; # just to make podweaver happy
+
+# DATE
+# VERSION
+
+1;
+# ABSTRACT: Perinci::Access manual
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Perinci::Access::Manual - Perinci::Access manual
+
+=head1 VERSION
+
+This document describes version 0.44 of Perinci::Access::Manual (from Perl distribution Perinci-Access), released on 2015-12-17.
+
+=head1 DESCRIPTION
+
+Perinci::Access (P::A for short) is family of L<Riap> client/server libraries.
+It allows you to access code entities and its L<Rinci> metadata from Perl.
+
+=head1 MODULE ORGANIZATION
+
+L<Perinci::Access> is a front-end interface for all of the
+L<Perinci::Access::Base>-based (regular) Riap clients. Each transport protocol
+will have its own specific backend module, e.g. for accessing in-process/Perl
+modules and functions you have L<Perinci::Access::Perl>, for accessing Riap over
+HTTP you have L<Perinci::Access::HTTP::Client> and so on. When you pass a URL to
+Perinci::Access, it will check its URL scheme and pass to the appropriate
+backend.
+
+L<Perinci::Access::Lite> is the exception from these and is not under the
+Perinci::Access umbrella. It is designed to be lightweight (especially in terms
+of startup overhead), has less features, and used by L<Perinci::CmdLine::Lite>.
+
+=head1 CONCEPTS
+
+Please read up on L<Rinci> and L<Riap> first.
+
+=head1 SEE ALSO
+
+L<Perinci>
+
+L<Perinci::Access::Manual::Examples>
+
+L<Perinci::Access::Manual::FAQ>
+
+L<App::riap>
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Perinci-Access>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Perinci-Access>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Perinci-Access>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

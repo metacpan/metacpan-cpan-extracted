@@ -1,0 +1,15 @@
+Revision history for Perlmazing
+
+1.2      2016-01-16
+         First public version, released after several years of private use and development.
+1.22 .. 1.2802
+         Minor adjustments for PAUSE
+1.2804   2016-02-24
+         Bugfix for older Perl versions
+1.2806   2016-02-25
+         Bugfix for older Perl versions
+1.2808   2016-02-25
+         Bugfix in function dir affecting Linux
+1.2810   2016-02-26
+         Fix in Perlmazing::Engine POD markup, improperly scaped -> sequences
+		 Fix in test case causing an error in rare cases like http://www.cpantesters.org/cpan/report/db62e0b6-dc2a-11e5-ad39-220c874cb8f0

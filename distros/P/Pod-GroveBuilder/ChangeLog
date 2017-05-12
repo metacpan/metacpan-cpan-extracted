@@ -1,0 +1,4 @@
+Fri Jan  2 15:32:51 1998  Ken MacLeod  <ken@bitsko.slc.ut.us>
+
+	* MANIFEST: typo, change COPYRIGHT to COPYING
+	add ChangeLog, Pod-GroveBuilder.spec

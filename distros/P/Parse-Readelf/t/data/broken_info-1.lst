@@ -1,0 +1,26 @@
+  Compilation Unit @ offset 0x0:
+   Length:        139
+   Version:       2
+   Abbrev Offset: 0
+   Pointer Size:  8
+ <0><b>: Abbrev Number: 1 (DW_TAG_compile_unit)
+     DW_AT_stmt_list   : 0	
+     DW_AT_high_pc     : 0x40070c	
+     DW_AT_low_pc      : 0x40070c	
+     DW_AT_producer    : (indirect string, offset: 0x11): GNU C 4.1.0 (SUSE Linux)	
+     DW_AT_language    : 1	(ANSI C)
+     DW_AT_name        : (indirect string, offset: 0x0): init.c	
+     DW_AT_comp_dir    : (indirect string, offset: 0x66): /usr/src/packages/BUILD/glibc-2.4/csu	
+ <1><2d>: Abbrev Number: 2 (DW_TAG_base_type)
+     DW_AT_name        : (indirect string, offset: 0x54): long unsigned int	
+     DW_AT_byte_size   : 8	
+     DW_AT_encoding    : 7	(unsigned)
+
+Dump of debug contents of section .debug_line:
+
+  DWARF Version:               2
+
+ The Directory Table is empty.
+
+ The File Name Table:
+  1	0	0	0	init.c

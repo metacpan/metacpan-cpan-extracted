@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Pod-Licensizer
+version:            0.03
+abstract:           Keep your project's AUTHOR and LICENSE sections in sync
+author:
+    - Mike Schilli <cpan@perlmeister.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Log::Log4perl:  1
+    Pod::Abstract:  0.2
+    Pod::Parser:    1.37
+    Pod::Usage:     1.36
+    YAML:           0.71
+resources:
+    repository:  http://github.com/mschilli/pod-licensizer-perl
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

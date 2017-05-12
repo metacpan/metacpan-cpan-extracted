@@ -1,0 +1,15 @@
+Revision history for Pod-ROBODoc
+
+0.3     Tue Jan 26 07:50:54 2010
+        Fixed version number.
+
+0.2     Tue Jan 26 07:36:05 2010
+        Added missing dependency for IO::String to build file; added missing 
+        LICENSE and makefile to dist; updated README with actual documentation
+
+        Fixed RT email address for bug reporting and added blurb about using 
+        the github issues tracker.
+
+0.1     Mon Jan 25 07:36:46 2010
+        Initial writing.
+

@@ -1,0 +1,66 @@
+{
+   "abstract" : "PubSubHubbub subscriber implementation as a Plack App",
+   "author" : [
+      "Antoine Imbert <antoine.imbert@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-App-PubSubHubbub-Subscriber",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Message" : 0,
+            "LWP" : 0,
+            "Plack" : 0,
+            "URI" : 0,
+            "perl" : "v5.10.0"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::App::PubSubHubbub::Subscriber" : {
+         "file" : "lib/Plack/App/PubSubHubbub/Subscriber.pm",
+         "version" : "0.2"
+      },
+      "Plack::App::PubSubHubbub::Subscriber::Client" : {
+         "file" : "lib/Plack/App/PubSubHubbub/Subscriber/Client.pm",
+         "version" : 0
+      },
+      "Plack::App::PubSubHubbub::Subscriber::Config" : {
+         "file" : "lib/Plack/App/PubSubHubbub/Subscriber/Config.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.2",
+   "x_resource" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ant0ine/Plack-App-PubSubHubbub-Subscriber.git",
+         "web" : "http://github.com/ant0ine/Plack-App-PubSubHubbub-Subscriber"
+      }
+   }
+}

@@ -1,0 +1,106 @@
+{
+   "abstract" : "Perl extension to parse Vixie crontab file",
+   "author" : [
+      "Masayuki Matsuki <y.songmu@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parse-Crontab",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0.06"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "Mouse" : "0",
+            "Path::Class" : "0",
+            "Time::Piece" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Parse::Crontab" : {
+         "file" : "lib/Parse/Crontab.pm",
+         "version" : "0.05"
+      },
+      "Parse::Crontab::Entry" : {
+         "file" : "lib/Parse/Crontab/Entry.pm"
+      },
+      "Parse::Crontab::Entry::Comment" : {
+         "file" : "lib/Parse/Crontab/Entry/Comment.pm"
+      },
+      "Parse::Crontab::Entry::Empty" : {
+         "file" : "lib/Parse/Crontab/Entry/Empty.pm"
+      },
+      "Parse::Crontab::Entry::Env" : {
+         "file" : "lib/Parse/Crontab/Entry/Env.pm"
+      },
+      "Parse::Crontab::Entry::Error" : {
+         "file" : "lib/Parse/Crontab/Entry/Error.pm"
+      },
+      "Parse::Crontab::Entry::Job" : {
+         "file" : "lib/Parse/Crontab/Entry/Job.pm"
+      },
+      "Parse::Crontab::Schedule" : {
+         "file" : "lib/Parse/Crontab/Schedule.pm"
+      },
+      "Parse::Crontab::Schedule::Entity" : {
+         "file" : "lib/Parse/Crontab/Schedule/Entity.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Songmu/p5-Parse-Crontab/issues"
+      },
+      "homepage" : "https://github.com/Songmu/p5-Parse-Crontab",
+      "repository" : {
+         "url" : "git://github.com/Songmu/p5-Parse-Crontab.git",
+         "web" : "https://github.com/Songmu/p5-Parse-Crontab"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "masartz <masartz@gmail.com>"
+   ]
+}

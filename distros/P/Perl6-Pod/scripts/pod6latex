@@ -1,0 +1,135 @@
+#!/usr/bin/perl
+#===============================================================================
+#
+#         FILE: pod6latex
+#
+#  DESCRIPTION:  save pod6 as latex
+#       AUTHOR:  Aliaksandr P. Zahatski ,  <zag@cpan.org>
+#===============================================================================
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Perl6::Pod::To::Latex;
+use Perl6::Pod::Writer::Latex;
+my ( $help, $man, $doctype, $add_head, $custom_formatter, %use_block );
+my %opt = ( help => \$help, man => \$man, );
+GetOptions(
+    \%opt, 'help|?', 'man',
+    'doctype|t=s'   => \$doctype,
+    'add_head|ah'   => \$add_head,
+    'formatter|f=s' => \$custom_formatter,
+    'use_block=s'   => \%use_block
+) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage( -exitstatus => 0, -verbose => 2 ) if $man;
+
+my $infile = shift;
+my $in_fd;
+if ($infile) {
+    $in_fd = new IO::File:: "< $infile" or die "$infile: $!";
+}
+else {
+    $in_fd = \*STDIN;
+}
+my $text;
+{
+    local $/;
+    $text = <$in_fd>
+}
+
+my $renderer = new Perl6::Pod::To::Latex::
+  writer  => new Perl6::Pod::Writer::Latex( out => \*STDOUT ),
+  doctype => $doctype,
+  header  => $add_head;
+    use Perl6::Pod::Utl;
+    my $tree = Perl6::Pod::Utl::parse_pod( $text, default_pod => 1 )
+      || return "Error";
+    $renderer->w->raw(<<TXT);
+\\documentclass{article}
+\\begin{document}
+TXT
+    $renderer->write($tree);
+    $renderer->w->raw('\end{document}');
+
+
+exit;
+
+=head1 NAME
+
+    pod6latex  - convert pod6 to Latex
+
+=head1 SYNOPSIS
+
+  pod6latex < somefile.pod6 > somefile.tex
+  pod6latex somefile.pod6  > somefile.tex
+
+
+   options:
+    -doctype|t - set docbook type ( ie chapter, article, book ...). Default chapter;
+    -add_head|ah - If this option is set , pod6latex will emit a DOCTYPE as the first line of output.
+    -formatter|f - set output formatter class, default Perl6::Pod::To::Latex
+    -use_block MOD_NAME=Block_name  - set module for handle Block_name. Equivalent for:
+         =begin pod
+         =use MOD_NAME Block_name
+         =end pod
+
+    -help  - print help message
+    -man   - print man page
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-help>
+
+Print a brief help message and exits
+
+=item B<-man>
+
+Prints manual page and exits
+
+=item B<-doctype>, B<-t>
+
+Set docbook type ( ie chapter, article, book ...). Default chapter
+
+=item B<-add_head>,B<-ah>
+
+If this option is set , pod6latex will emit a DOCTYPE as the first line of output
+
+=item B<-formatter>, B<-f>
+
+Set output formatter class, default Perl6::Pod::To::Latex
+
+=item B<-use_block>
+
+Set module for handle Block_name Equivalent for B<=use> direcive :
+
+         =begin pod
+         =use MOD_NAME Block_name
+         =end pod
+
+=back
+
+=head1 DESCRIPTION
+
+  B<pod6latex>  - convert pod6 to Latex
+
+=head1 EXAMPLE
+
+  pod6latex < somefile.pod6 > somefile.tex
+
+
+=head1 AUTHOR
+
+Zahatski Aliaksandr, E<lt>zag@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009-2015 by Zahatski Aliaksandr
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+=cut
+

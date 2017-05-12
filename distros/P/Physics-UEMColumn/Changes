@@ -1,0 +1,10 @@
+Revision history for Perl module Physics::UEMColumn.
+
+0.901  Mar 12, 2013
+	- Various bug fixes
+	- Remove bin model initial conditions (see Physics::Photoemission on github)
+	- Use Dowell initial conditions
+
+0.900  Dec 12, 2012
+	- Initial release
+

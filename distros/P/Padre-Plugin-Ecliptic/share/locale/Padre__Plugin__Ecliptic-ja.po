@@ -1,0 +1,171 @@
+# Japanese translations for PACKAGE package.
+# Copyright (C) 2009 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Kenichi Ishigaki <ishigaki@cpan.org>, 2009.
+# 
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Ecliptic\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-07-19 20:43+0300\n"
+"PO-Revision-Date: 2009-07-27 04:07+0900\n"
+"Last-Translator: Kenichi Ishigaki <ishigaki@cpan.org>\n"
+"Language-Team: Japanese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: lib/Padre/Plugin/Ecliptic.pm:29
+msgid "Ecliptic"
+msgstr "Ecliptic"
+
+#: lib/Padre/Plugin/Ecliptic.pm:70
+msgid "Open Resource\tCtrl-Shift-R"
+msgstr "リソースを開く\tCtrl-Shift-R"
+
+#: lib/Padre/Plugin/Ecliptic.pm:77
+msgid "Quick Assist\tCtrl-Shift-L"
+msgstr "クイックアシスタント\tCtrl-Shift-L"
+
+#: lib/Padre/Plugin/Ecliptic.pm:84
+msgid "Quick Menu Access\tCtrl-3"
+msgstr "クイックメニューアクセス\tCtrl-3"
+
+#: lib/Padre/Plugin/Ecliptic.pm:91
+msgid "Quick Outline Access\tCtrl-4"
+msgstr "クイックアウトラインアクセス\tCtrl-4"
+
+#: lib/Padre/Plugin/Ecliptic.pm:98
+msgid "Quick Module Access\tCtrl-5"
+msgstr "クイックモジュールアクセス\tCtrl-5"
+
+#: lib/Padre/Plugin/Ecliptic.pm:105
+msgid "Open in Explorer\tCtrl-6"
+msgstr "エクスプローラで開く\tCtrl-6"
+
+#: lib/Padre/Plugin/Ecliptic.pm:112
+msgid "Quick Fix\tCtrl-Shift-1"
+msgstr "クイックフィックス\tCtrl-Shift-1"
+
+#: lib/Padre/Plugin/Ecliptic.pm:122
+msgid "About"
+msgstr "このプラグインについて"
+
+#: lib/Padre/Plugin/Ecliptic.pm:139
+msgid "Provides Eclipse-like useful features to Padre.\n"
+msgstr "PadreにExlipse的な便利機能を追加します。\n"
+
+#: lib/Padre/Plugin/Ecliptic/OpenInExplorerAction.pm:39
+msgid "Failed to execute process\n"
+msgstr "プロセスの実行に失敗しました\n"
+
+#: lib/Padre/Plugin/Ecliptic/OpenInExplorerAction.pm:55
+#: lib/Padre/Plugin/Ecliptic/QuickFixDialog.pm:33
+msgid "No filename"
+msgstr "ファイル名がありません"
+
+#: lib/Padre/Plugin/Ecliptic/OpenInExplorerAction.pm:55
+#: lib/Padre/Plugin/Ecliptic/OpenInExplorerAction.pm:83
+#: lib/Padre/Plugin/Ecliptic/QuickFixDialog.pm:33
+msgid "Error"
+msgstr "エラー"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:48
+msgid "Open Resource"
+msgstr "リソースを開く"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:133
+msgid "&Select an item to open (? = any character, * = any string):"
+msgstr "開くアイテムを選択(&S) (? = 任意の文字, * = 任意の文字列):"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:137
+msgid "Ignore CVS/.svn/.git/blib folders"
+msgstr "CVS/.svn/.git/blibフォルダは無視"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:142
+msgid "&Matching Items:"
+msgstr "マッチするアイテム(&M)"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:148
+msgid "Current Search Directory: "
+msgstr "現在の検索ディレクトリ: "
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:203
+msgid " items selected"
+msgstr " アイテム選択しました"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:224
+msgid "Reading items. Please wait..."
+msgstr "アイテムを読み込んでいます。お待ちください..."
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:248
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:224
+msgid "Finished Searching"
+msgstr "検索終了"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:279
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:248
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:236
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:247
+msgid " item(s) found"
+msgstr " アイテム見つかりました"
+
+#: lib/Padre/Plugin/Ecliptic/OpenResourceDialog.pm:281
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:250
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:238
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:249
+msgid "No items found"
+msgstr "見つかりませんでした"
+
+#: lib/Padre/Plugin/Ecliptic/QuickAssistDialog.pm:31
+msgid "Quick Assist"
+msgstr "クイックアシスト"
+
+#: lib/Padre/Plugin/Ecliptic/QuickFixDialog.pm:46
+msgid "Quick Fix"
+msgstr "クイックフィックス"
+
+#: lib/Padre/Plugin/Ecliptic/QuickFixDialog.pm:191
+msgid "No suggestions"
+msgstr "修正案はありません"
+
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:33
+msgid "Quick Menu Access"
+msgstr "クイックメニューアクセス"
+
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:116
+msgid "&Type a menu item name to access:"
+msgstr "アクセスしたいメニュー項目名(&T):"
+
+#: lib/Padre/Plugin/Ecliptic/QuickMenuAccessDialog.pm:121
+msgid "&Matching Menu Items:"
+msgstr "マッチするメニュー項目(&M):"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:34
+msgid "Quick Module Access"
+msgstr "クイックモジュールアクセス"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:127
+msgid "&Type a module name to access:"
+msgstr "アクセスしたいモジュール名(&T):"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:132
+msgid "&Matching modules:"
+msgstr "マッチするモジュール(&M):"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:220
+msgid "Reading modules. Please wait..."
+msgstr "モジュールを読み込んでいます。お待ちください..."
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:33
+msgid "Quick Outline Access"
+msgstr "クイックアウトラインアクセス"
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:115
+msgid "&Type a Outline item name to access:"
+msgstr "アクセスしたいアウトライン項目名(&T):"
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:120
+msgid "&Matching Outline Items:"
+msgstr "マッチするアウトライン項目(&T):"

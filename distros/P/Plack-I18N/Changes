@@ -1,0 +1,20 @@
+Revision history for Perl extension Plack-I18N
+
+0.04 2015-02-02T08:26:57Z
+
+    - fix order in tests
+    - more docs
+
+0.03 2015-02-02T07:26:22Z
+
+    - use abs paths in tests
+
+0.02 2015-02-01T11:32:15Z
+
+    - fix dist meta information
+    - more reference documentation
+
+0.01 2015-01-30T15:04:12Z
+
+    - original version
+

@@ -1,0 +1,22 @@
+{
+    'type'                   => 'Limit',
+    'estimated_startup_cost' => 0,
+    'estimated_total_cost'   => 0.08,
+    'estimated_rows'         => 2,
+    'estimated_row_width'    => 36,
+    'is_analyzed'            => 0,
+    'sub_nodes'               => [
+        {
+            'type'                   => 'Index Scan Backward',
+            'estimated_startup_cost' => 0,
+            'estimated_total_cost'   => 5770.49,
+            'estimated_rows'         => 149976,
+            'estimated_row_width'    => 36,
+            'is_analyzed'            => 0,
+            'scan_on'                => {
+                'index_name'  => 'w',
+                'table_name'  => 'x',
+            },
+        },
+    ]
+}

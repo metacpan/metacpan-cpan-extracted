@@ -1,0 +1,14 @@
+{
+   "bookmark": "devel",
+   "branch": "default",
+   "date": "2017-03-18T21:50:24Z",
+   "desc": "Added tag latest, v0.7.2 for changeset 1de4709832f5",
+   "node": "ceacffdc6f0f",
+   "phase": "public",
+   "release": "v0.7.2",
+   "release_distance": 0,
+   "release_id": "v0.7.2",
+   "tags": [
+      "tip"
+   ]
+}

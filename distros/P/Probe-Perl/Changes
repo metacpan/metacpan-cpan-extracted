@@ -1,0 +1,19 @@
+Revision history for ExtUtils-MyPerlConfig
+
+0.03  Wed Aug  7 21:24:56 CDT 2013
+
+ - Improved the backticks/quoting situation on Windows, which
+   unfortunately didn't fare well with the fixes in 0.02.
+
+0.02  Thu Apr 18 07:22:46 CDT 2013
+
+ - Switched to Git and Dist::Zilla
+
+ - Fixed an issue with perls installed in directories containing
+   spaces or other special shell characters. [Spotted by Samuel
+   Ferencik - RT #84643]
+
+0.01  Tue Apr  5 22:42:26 CDT 2005
+
+ - First version, released on an unsuspecting world.
+

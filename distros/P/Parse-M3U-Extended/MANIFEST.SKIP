@@ -1,0 +1,13 @@
+# vcs
+^\.git\b
+
+# eu::mm generated files
+^Makefile$
+^MYMETA\.(?:json|yml)$
+^blib/
+\.old$
+\.bak$
+^pm_to_blib$
+
+# vim swap files
+\.sw[a-z]$

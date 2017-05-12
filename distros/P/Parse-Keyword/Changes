@@ -1,0 +1,37 @@
+Revision history for Parse-Keyword
+
+0.09  2017-02-02
+      - fixed test failure on perl 5.22+
+      - added x_deprecated metadata
+
+0.08  2013-10-10
+      - doc tweaks to make the deprecation notice more visible
+
+0.07  2013-10-10
+      - THIS MODULE IS NO LONGER SUPPORTED DUE TO UNFIXABLE BROKENNESS
+        see the warning in the documentation for more details
+      - fix tests for newer Carp (abraxxa)
+
+0.06  2013-08-01
+      - support building on windows (forwardever, #3)
+
+0.05  2013-07-24
+      - fix skipping tests
+
+0.04  2013-07-23
+      - pass the keyword name into the parsing function
+
+0.03  2013-07-23
+      - the parse_* functions now return undef when there was a parse error
+      - various bugs related to error handling should be fixed
+      - remove unnecessary test dep on B::Hooks::EndOfScope
+
+0.02  2013-07-22
+      - work around some issues that would happen when you peeked past the end
+        of the line
+      - allow parsing into non-anonymous subs (this makes a difference in some
+        obscure situations)
+      - fix compilation on threaded perls
+
+0.01  2013-07-21
+      - Initial release

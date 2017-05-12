@@ -1,0 +1,49 @@
+%whites    =  /([ \t]*(?:#.*)?)/
+%token VAR =  /([A-Za-z][A-Za-z0-9_]*)/
+
+#%conflict ToN EMPTY? TYPE:VAR : NAME:VAR
+%conflict ToN {
+  if ($self->YYIs('EMPTY'))
+    { $self->YYSetReduce('TYPE:VAR' ); }
+  else 
+    { $self->YYSetReduce('NAME:VAR' ); }
+}
+
+%explorer ToN { $self->YYIs('EMPTY', 1); } 
+
+%%
+
+def:    param_spec %ToN? return_spec ','
+        ;
+param_spec:
+             type
+        |    name_list ':' type
+        ;
+return_spec:
+             type
+        |    name ':' type
+        ;
+type:        %name TYPE:VAR
+             VAR    %PREC ToN
+        ;
+name:        %name NAME:VAR
+             VAR    %PREC ToN
+        ;
+name_list:
+             name
+        |    name ',' name_list
+        ;
+%%
+
+=head1 SYNOPSIS
+
+Compile it with:
+
+            eyapp -vTC reducereduceconflictPPCR.eyp
+
+See the C<.output> file. Run it with this options:
+
+            ./reducereduceconflictPPCR.pm -deb -t -i -m 1 -c 'a,b:c d:e,'
+
+=cut
+

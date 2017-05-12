@@ -1,0 +1,3 @@
+Mar 24 16:52:57 fence sendmail[26245]: j2OFquVD026245: ruleset=check_rcpt, arg1=<fwipada@dakkitydak.fap>, relay=mx2.laboris.fr [123.456.789.1], reject=553 5.1.8 <fwipada@dakkitydak.fap>... Domain of sender address antoine@infirmiers.co does not exist
+Mar 24 16:57:53 fence sendmail[27664]: j2OFvqLI027664: ruleset=check_rcpt, arg1=<fwipada@dakkitydak.fap>, relay=mx2.laboris.fr [123.456.789.1], reject=553 5.1.8 <fwipada@dakkitydak.fap>... Domain of sender address abuse@gov.us does not exist
+Mar 24 17:04:00 fence sendmail[29646]: j2OG3s7N029646: ruleset=check_rcpt, arg1=<sittzle@glurpp.baf>, relay=c-24-98-81-172.hsd1.ga.comcast.net [24.98.81.172], reject=553 5.1.8 <sittzle@glurpp.baf>... Domain of sender address prontjm@mail.giantsfan.com does not exist

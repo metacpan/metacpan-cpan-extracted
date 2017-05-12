@@ -1,0 +1,12 @@
+%incremental lexer 'Try aaabbb: '
+%%
+S:      /* empty */ 
+    |   'a' S 'b'  
+;
+%%
+
+=head1 SYNOPSIS
+
+This example illustrates the C<yydebug> option.
+Compile it with C<eyapp aSb> and the run the
+script C<use_aSb.pl>.

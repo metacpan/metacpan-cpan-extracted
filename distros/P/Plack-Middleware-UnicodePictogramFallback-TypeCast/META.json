@@ -1,0 +1,61 @@
+{
+   "abstract" : "unicode pictogram fallback to html",
+   "author" : [
+      "Masayuki Matsuki E<lt>y.songmu@gmail.comE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-UnicodePictogramFallback-TypeCast",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0.06"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode::JP::Mobile" : "0",
+            "Encode::JP::Mobile::UnicodeEmoji" : "0",
+            "Plack" : "1.00",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Plack::Middleware::UnicodePictogramFallback::TypeCast" : {
+         "file" : "lib/Plack/Middleware/UnicodePictogramFallback/TypeCast.pm",
+         "version" : "0.02"
+      },
+      "Plack::Middleware::UnicodePictogramFallback::TypeCast::EmoticonMap" : {
+         "file" : "lib/Plack/Middleware/UnicodePictogramFallback/TypeCast/EmoticonMap.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

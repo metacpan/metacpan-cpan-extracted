@@ -1,0 +1,21 @@
+This is the Parse::Tokens module.
+
+Parse::Tokens is a package for parsing text with embedded tokens.
+
+To install the module:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Once installed, see the demos/ directory for demonstration scripts.
+
+See the CPAN module 'Text::Oyster' for an full featured example.
+
+See 'Changes' for history
+
+--
+Steve McKay
+sm@z33.org
+

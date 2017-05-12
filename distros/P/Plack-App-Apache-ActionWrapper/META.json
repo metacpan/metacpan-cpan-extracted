@@ -1,0 +1,43 @@
+{
+   "abstract" : "Wrapper for Apache2 Action directive for running PSGI apps on shared hosting with FastCGI",
+   "author" : [
+      "Robin Smidsr\u00c3\u00b8d <robin@smidsrod.no>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300023, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-App-Apache-ActionWrapper",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "Plack" : "0.9021",
+            "Plack::Component" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robinsmidsrod/Plack-App-Apache-ActionWrapper.git",
+         "web" : "http://github.com/robinsmidsrod/Plack-App-Apache-ActionWrapper"
+      }
+   },
+   "version" : "0.31.0"
+}
+

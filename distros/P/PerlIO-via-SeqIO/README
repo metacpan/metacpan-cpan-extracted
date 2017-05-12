@@ -1,0 +1,19 @@
+PerlIO::via::SeqIO - PerlIO layer for biological sequence data
+
+PerlIO::via::SeqIO is a layer using the BioPerl (http://bioperl.org)
+toolkit for reading and writing flat sequence formats (such as fasta
+or embl) using magic filehandles and our old friends <> and print.
+
+BioPerl will need to be installed before use.  See
+http://bioperl.org/Installation.
+
+Thanks for downloading!
+
+To install, simply:
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+EOT

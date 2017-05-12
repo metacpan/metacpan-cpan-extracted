@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+bin/pdfburst
+lib/PDF/Burst.pm
+lib/PDF/Burst.pod
+t/00_find_which_burst_works.t
+t/01_burst14.t
+t/02_burst_scan1.t
+t/03_burst_ext.t
+t/04_fails.t
+t/99_cleanup.pl
+t/benchmark_burst_methods.pl
+t/campdf-burst.pl
+t/pdfapi2-burst.pl
+t/scan1.pdf
+t/trees14pgs.pdf
+META.yml                                 Module meta-data (added by MakeMaker)

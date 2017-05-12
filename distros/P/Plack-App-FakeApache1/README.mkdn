@@ -1,0 +1,18 @@
+# NAME
+
+Plack::App::FakeApache1 - Perl distro to aid in mod\_perl1->PSGI migration
+
+# VERSION
+
+version 0.0.5
+
+# AUTHOR
+
+Chisel <chisel@chizography.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Chisel Wright.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

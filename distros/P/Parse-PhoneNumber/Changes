@@ -1,0 +1,18 @@
+Revision history for Perl module Parse::PhoneNumber
+
+1.9  13 DEC 2012
+	- Add Git repo metadata (CPAN RT #81510)
+	- Correct version numbers in Changes
+
+1.8  26 NOV 2012
+        - Add SEE ALSO section to POD (CPAN RT #75632)
+        - Add Changes (this file!) (CPAN RT #75631)
+        - Switch to a traditional Makefile.PL built by Module::Build
+        - Minor documentation cleanup (authors/copyrights)
+
+1.7  04 NOV 2011
+        - Warnings fix from CPAN RT #70867
+        - Cleanup/modernization of build
+
+1.6  Unknown
+        - Lost to the sands of time

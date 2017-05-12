@@ -1,0 +1,20 @@
+##############################################################################
+#      $URL: http://perlcritic.tigris.org/svn/perlcritic/trunk/distributions/Perl-Critic/xt/author/43_perlcriticrc-run-files $
+#     $Date: 2009-02-15 14:02:34 -0500 (Sun, 15 Feb 2009) $
+#   $Author: clonezone $
+# $Revision: 3120 $
+##############################################################################
+
+profile-strictness = fatal
+severity = 1
+only = 1
+verbose = %f: %m at line %l, column %c.  %e.  (Severity: %s, %p)\n
+
+#-----------------------------------------------------------------------------
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 0
+
+[CodeLayout::ProhibitTrailingWhitespace]
+
+[Editor::RequireEmacsFileVariables]

@@ -1,0 +1,428 @@
+NAME
+
+    POE::Component::SpreadClient - Handle Spread communications in POE
+
+VERSION
+
+      This document describes v1.003 of POE::Component::SpreadClient - released November 10, 2014 as part of POE-Component-SpreadClient.
+
+SYNOPSIS
+
+            use POE;
+            POE::Component::SpreadClient->spawn( 'spread' );
+    
+            POE::Session->create(
+                inline_states => {
+                    _start => \&_start,
+                    _sp_message => \&do_something,
+                    _sp_admin => \&do_something,
+                    _sp_connect => \&do_something,
+                    _sp_disconnect => \&do_something,
+                    _sp_error => \&do_something,
+                }
+            );
+    
+            sub _start {
+                    $poe_kernel->alias_set('displayer');
+                    $poe_kernel->post( spread => connect => 'localhost', $$ );
+                    $poe_kernel->post( spread => subscribe => 'chatroom' );
+                    $poe_kernel->post( spread => publish => 'chatroom', 'A/S/L?' );
+            }
+
+DESCRIPTION
+
+    POE::Component::SpreadClient is a POE component for talking to Spread
+    servers.
+
+    This module should only be used with Spread 3.17.4 ( or compatible
+    versions )
+
+    XXX Beware: this module hasn't been tested with Spread 4! XXX
+
+METHODS
+
+ spawn
+
+    Creates a new instance of this module. Returns the session ID.
+
+            POE::Component::Spread->spawn( 'spread' );
+    
+            # ARGS
+            - The alias the component will take ( default: "SpreadClient" )
+
+Public API
+
+ connect
+
+    Connect this POE session to the Spread server on port 4444 on
+    localhost. Will send a _sp_error event if unable to connect;
+    _sp_connect if successful.
+
+            $poe_kernel->post( spread => connect => '4444@localhost' );
+            $poe_kernel->post( spread => connect => '4444@localhost', 'logger' );
+    
+            # ARGS
+            - The Server location
+            - The private name for the Spread connection ( default: "spread-PID" )
+
+ disconnect
+
+    Forces this session to disconnect. ( DOES NOT REMOVE ALIAS => look at
+    destroy below ) Will send a _sp_disconnect event if disconnected;
+    _sp_error if failure.
+
+            $poe_kernel->post( spread => disconnect );
+
+ subscribe
+
+    Subscribe to a Spread messaging group. Messages will be sent to
+    _sp_message and join/leave/etc to _sp_admin in the registered
+    listeners. Automatically adds the session to the registered listeners.
+    Will send a _sp_error if unable to subscribe; _sp_admin with join
+    message if successful.
+
+            $poe_kernel->post( spread => subscribe => 'chatroom' );
+            $poe_kernel->post( spread => subscribe => [ 'chatroom', 'testing' ] );
+
+ unsubscribe
+
+    Unsubscribes to a Spread messaging group. Does not remove the session
+    from the listener list. Will send a _sp_error if unable to unsubscribe;
+    _sp_admin with self_leave if successful.
+
+            $poe_kernel->post( spread => unsubscribe => 'chatroom' );
+            $poe_kernel->post( spread => unsubscribe => [ 'foobar', 'chatroom' ] );
+
+ publish
+
+    Send a string to the group(s). THIS WILL ONLY SEND STRINGS! If you need
+    to send perl structures, use your own serializer/deserializer! Will
+    send a _sp_error if unable to publish.
+
+            $poe_kernel->post( spread => publish => 'chatroom', 'A/S/L?' );
+            $poe_kernel->post( spread => publish => [ 'chatroom', 'stats' ], 'A/S/L?' );
+            $poe_kernel->post( spread => publish => 'chatroom', 'special', 5 );
+            $poe_kernel->post( spread => publish => 'chatroom', 'A/S/L?', undef, RELIABLE_MESS & SELF_DISCARD );
+    
+            # ARGS
+            - The group name(s)
+            - 2nd parameter ( int ) is the Spread mess_type -> application-defined ( default: 0 )
+            - The 3rd parameter is the spread message type -> import them from Spread.pm ( default: SAFE_MESS )
+
+    REMEMBER about the message size limitation! Therefore max message size
+    is 100 * 1440 =~ 140kB.
+
+            From spread-src-3.17.4 in sess_types.h
+            #define MAX_MESSAGE_BODY_LEN    (MAX_SCATTER_ELEMENTS * (MAX_PACKET_SIZE - 32)) /* 32 is sizeof(packet_header) */
+            #define MAX_SCATTER_ELEMENTS    100
+            #define MAX_PACKET_SIZE 1472    /*1472 = 1536-64 (of udp)*/
+
+ register
+
+    Registers the current session as a "registered listener" and will
+    receive all events.
+
+            $poe_kernel->post( spread => register );
+
+ unregister
+
+    Removes the current session from the "registered listeners" list.
+
+            $poe_kernel->post( spread => unregister );
+
+ destroy
+
+    Destroys the session by removing it's alias and disconnecting if needed
+    with _sp_disconnect
+
+            $poe_kernel->post( spread => destroy );
+
+EVENTS
+
+    You will receive those events in the session that registered as a
+    listener.
+
+ _sp_connect
+
+            sub _sp_connect : State {
+                    my( $priv_name, $priv_group ) = @_[ ARG0, ARG1 ];
+                    # We're connected!
+            }
+
+ _sp_disconnect
+
+            sub _sp_disconnect : State {
+                    my $priv_name = $_[ ARG0 ];
+                    # We're disconnected!
+            }
+
+ _sp_error
+
+            sub _sp_error : State {
+                    my( $priv_name, $type, $sperrno, $msg, $data ) = @_[ ARG0 .. ARG4 ];
+    
+                    # Handle different kinds of errors
+                    if ( $type eq 'CONNECT' ) {
+                            # $sperrno = Spread errno/error string, $msg = server name, $data = priv name
+                    } elsif ( $type eq 'PUBLISH' ) {
+                            # $sperrno = Spread errno, $msg = $groups ( may be undef ), $data = $message ( may be undef )
+                    } elsif ( $type eq 'SUBSCRIBE' ) {
+                            # $sperrno = Spread errno, $msg = $groups ( may be undef )
+                    } elsif ( $type eq 'UNSUBSCRIBE' ) {
+                            # $sperrno = Spread errno, $msg = $groups ( may be undef )
+                    } elsif ( $type eq 'RECEIVE' ) {
+                            # $sperrno = error string
+                    }
+            }
+
+ _sp_message
+
+            sub _sp_message : State {
+                    my( $priv_name, $sender, $groups, $mess_type, $message ) = @_[ ARG0 .. ARG4 ];
+    
+                    # $mess_type is always 0 unless defined ( mess_type in Spread )
+            }
+
+ _sp_admin
+
+            sub _sp_admin : State {
+                    my( $priv_name, $data ) = @_[ ARG0, ARG1 ];
+                    # $data is hashref with several fields:
+                    # TYPE => string ( JOIN | LEAVE | DISCONNECT | SELF_LEAVE | TRANSITIONAL | NETWORK )
+                    # GROUP => string ( group name )
+                    # GID => [ GID1, GID2, GID3 ] ( look at Spread documentation about this! )
+                    # MEMBERS => arrayref of member names
+                    # WHO => string ( whomever left/join/discon )
+                    # INDEX => index of self in group list
+                    # MESSAGE => raw unpacked message ( needed for NETWORK's special parsing, not done! )
+    
+                    # if TYPE = JOIN | LEAVE | DISCONNECT
+                    # GROUP, MEMBERS, WHO, GID, INDEX
+    
+                    # if TYPE = SELF_LEAVE
+                    # GROUP
+    
+                    # if TYPE = TRANSITIONAL
+                    # GROUP
+    
+                    # if TYPE = NETWORK
+                    # GROUP, MEMBERS, GID, INDEX, MESSAGE
+            }
+
+SpreadClient Notes
+
+    You can enable debugging mode by doing this:
+
+            sub POE::Component::SpreadClient::DEBUG () { 1 }
+            use POE::Component::SpreadClient;
+
+ Installing Spread on Ubuntu Trusty
+
+    This documentation is really for myself, ha! As of Ubuntu 14.04
+    (Trusty) Spread is no longer included in the distribution nor any PPA
+    hosts. In order to install this module I had to do the following:
+
+            wget http://mirrors.kernel.org/ubuntu/pool/universe/s/spread/spread_3.17.4-3_amd64.deb
+            wget http://mirrors.kernel.org/ubuntu/pool/universe/s/spread/libspread1_3.17.4-3_amd64.deb
+            wget http://mirrors.kernel.org/ubuntu/pool/universe/s/spread/libspread1-dev_3.17.4-3_amd64.deb
+            sudo dpkg -i *spread*.deb
+            wget --post-data "FILE=spread-src-3.17.4.tar.gz&name=a&company=a&email=a%40a.com&comment=a&Stage=Download" http://www.spread.org/download/download_full_release_only_spread.cgi --output-document=spread-src-3.17.4.tar.gz
+            tar -zxf spread-src-3.17.4.tar.gz
+            cd spread-src-3.17.4
+            sudo "./configure && make && make install"
+            sudo nano /etc/default/spread # and set ENABLED=1
+            sudo nano /etc/spread/spread.conf # and change the Spread_Segment ... localhost 127.0.0.1 to 127.0.1.1 - I think it's because of my virt-manager vlan...
+            sudo /etc/init.d/spread start
+            sudo cpanp i POE::Component::SpreadClient
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Spread
+
+      * http://www.spread.org
+
+      * Spread::Client::Constants
+
+      * Spread::Session
+
+SUPPORT
+
+ Perldoc
+
+    You can find documentation for this module with the perldoc command.
+
+      perldoc POE::Component::SpreadClient
+
+ Websites
+
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+      * MetaCPAN
+
+      A modern, open-source CPAN search engine, useful to view POD in HTML
+      format.
+
+      http://metacpan.org/release/POE-Component-SpreadClient
+
+      * Search CPAN
+
+      The default CPAN search engine, useful to view POD in HTML format.
+
+      http://search.cpan.org/dist/POE-Component-SpreadClient
+
+      * RT: CPAN's Bug Tracker
+
+      The RT ( Request Tracker ) website is the default bug/issue tracking
+      system for CPAN.
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-SpreadClient
+
+      * AnnoCPAN
+
+      The AnnoCPAN is a website that allows community annotations of Perl
+      module documentation.
+
+      http://annocpan.org/dist/POE-Component-SpreadClient
+
+      * CPAN Ratings
+
+      The CPAN Ratings is a website that allows community ratings and
+      reviews of Perl modules.
+
+      http://cpanratings.perl.org/d/POE-Component-SpreadClient
+
+      * CPAN Forum
+
+      The CPAN Forum is a web forum for discussing Perl modules.
+
+      http://cpanforum.com/dist/POE-Component-SpreadClient
+
+      * CPANTS
+
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
+
+      http://cpants.cpanauthors.org/dist/overview/POE-Component-SpreadClien
+      t
+
+      * CPAN Testers
+
+      The CPAN Testers is a network of smokers who run automated tests on
+      uploaded CPAN distributions.
+
+      http://www.cpantesters.org/distro/P/POE-Component-SpreadClient
+
+      * CPAN Testers Matrix
+
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
+
+      http://matrix.cpantesters.org/?dist=POE-Component-SpreadClient
+
+      * CPAN Testers Dependencies
+
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
+
+      http://deps.cpantesters.org/?module=POE::Component::SpreadClient
+
+ Email
+
+    You can email the author of this module at APOCAL at cpan.org asking
+    for help with any problems you have.
+
+ Internet Relay Chat
+
+    You can get live help by using IRC ( Internet Relay Chat ). If you
+    don't know what IRC is, please read this excellent guide:
+    http://en.wikipedia.org/wiki/Internet_Relay_Chat. Please be courteous
+    and patient when talking to us, as we might be busy or sleeping! You
+    can join those networks/channels and get help:
+
+      * irc.perl.org
+
+      You can connect to the server at 'irc.perl.org' and join this
+      channel: #perl-help then talk to this person for help: Apocalypse.
+
+      * irc.freenode.net
+
+      You can connect to the server at 'irc.freenode.net' and join this
+      channel: #perl then talk to this person for help: Apocal.
+
+      * irc.efnet.org
+
+      You can connect to the server at 'irc.efnet.org' and join this
+      channel: #perl then talk to this person for help: Ap0cal.
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests by email to
+    bug-poe-component-spreadclient at rt.cpan.org, or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-SpreadClie
+    nt. You will be automatically notified of any progress on the request
+    by the system.
+
+ Source Code
+
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    https://github.com/apocalypse/perl-poe-spreadclient
+
+      git clone https://github.com/apocalypse/perl-poe-spreadclient.git
+
+AUTHOR
+
+    Apocalypse <APOCAL@cpan.org>
+
+ACKNOWLEDGEMENTS
+
+    The base for this module was lifted from POE::Component::Spread by Rob
+    Partington <perl-pcs@frottage.org>.
+
+    Thanks goes to Rob Bloodgood ( RDB ) for making sure this module still
+    works!
+
+    This product uses software developed by Spread Concepts LLC for use in
+    the Spread toolkit. For more information about Spread see
+    http://www.spread.org
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Apocalypse.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this distribution.
+
+DISCLAIMER OF WARRANTY
+
+    THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+    APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
+    HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT
+    WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+    PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE
+    OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU
+    ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR
+    CONVEYS THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
+    INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES
+    ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT
+    NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES
+    SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO
+    OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY
+    HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+

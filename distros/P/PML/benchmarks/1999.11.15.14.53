@@ -1,0 +1,8 @@
+This benchmark was taken just after I changed the internal
+PML object from a hash to a array reference. There is a 
+very small speed improvment. I think that the real improvment 
+is probably a little better because my bechmark script sucks.
+
+-- Peter
+
+100 calls to PML took: 17 wallclock secs ( 6.89 usr  0.05 sys +  0.00 cusr  0.05 csys =  0.00 CPU)

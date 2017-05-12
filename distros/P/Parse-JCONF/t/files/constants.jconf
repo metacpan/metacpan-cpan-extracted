@@ -1,0 +1,6 @@
+ 
+	false # bareword
+	=     # eq sign
+	false # false value
+
+not_false = true, нуль = null

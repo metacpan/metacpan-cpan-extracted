@@ -1,0 +1,31 @@
+CHANGES      -- Change history
+README       -- Main information file
+MANIFEST     -- This shipping list
+Makefile.PL  -- Perl Makefile template
+META.yml     -- Module meta-data (added by MakeMaker)
+
+lib/Pod/Usage.pm   -- The Pod::Usage module source
+
+scripts/pod2usage.PL -- Script to print usage from a file's embeded pod docs
+                        (a command-line interface to pod2usage()).
+
+t/inc/Pod/Parser.pm   -- old Pod::Parser code only required for testing
+t/inc/Pod/InputObjects.pm
+t/inc/Pod/PlainText.pm
+t/inc/Pod/Select.pm   -- test to be refactored to get rid of this
+
+t/pod/testcmp.pl      -- module used to compare output against expected results
+t/pod/testp2pt.pl     -- module used to test Pod::PlainText for a given file
+t/pod/pod2usage.t     -- test input file for processing pod2usage.PL
+t/pod/p2u_data.pl     -- test script for POD in __DATA__ section
+t/pod/pod2usage2.t    -- more Pod::Usage tests
+t/pod/pod2usage.xr    -- expected result from processing pod2usage.PL
+t/pod/usage.pod       -- test POD for pod2usage tests
+t/pod/usage2.pod      -- test POD for pod2usage tests
+t/pod/selectheaders.pl -- corner case for section selection
+t/pod/selectheaders.t  -- test for section selection
+t/pod/headwithmarkup.pl -- make sure marked up text in headings is not lost
+t/pod/headwithmarkup.t  -- test for the above
+t/pod/selectsections.pl -- testcase for -sections options
+t/pod/selectsections.t  -- test for -sections options
+META.json                                Module JSON meta-data (added by MakeMaker)

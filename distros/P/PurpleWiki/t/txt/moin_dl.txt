@@ -1,0 +1,2 @@
+ PurpleWiki:: The greatest Wiki ever.
+   perplog:: The greatest IRC logger to use PurpleWiki.

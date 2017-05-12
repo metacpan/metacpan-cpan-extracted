@@ -1,0 +1,23 @@
+
+PerlQt is a Perl Object Oriented interface to Trolltech's Qt v3.x - a well known 
+C++ GUI toolkit.
+
+See INSTALL for quick installation instructions
+
+See doc/en/index.html or doc/fr/index.html for installation procedure and detailed 
+documentation.
+
+See also PerlQt/tutorials and PerlQt/examples to get started.
+
+
+
+Requirements :
+------------
+
+ - Perl >= 5.6
+
+ - Qt   >= 3.0
+
+ - GNU tools : automake(>=1.5), autoconf (>=2.13), aclocal...
+
+

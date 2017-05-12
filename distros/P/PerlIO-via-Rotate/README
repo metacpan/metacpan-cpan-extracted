@@ -1,0 +1,21 @@
+README for PerlIO::via::Rotate
+
+PerlIO layer that handles automatic encoding using rotational deviation.
+Intended to be used while opening a file with the ":via()" PerlIO layer.
+
+Copyright (c) 2002, 2003, 2004, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>.
+All rights reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+Version:
+ 0.08
+
+Required Modules:
+ (none)
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

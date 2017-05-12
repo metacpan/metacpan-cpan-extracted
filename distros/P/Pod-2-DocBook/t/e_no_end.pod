@@ -1,0 +1,7 @@
+=pod
+
+=begin foo
+
+text
+
+=cut

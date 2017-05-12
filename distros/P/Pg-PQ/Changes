@@ -1,0 +1,65 @@
+Revision history for Perl extension Pg::PQ.
+
+0.14  Oct 28, 2014
+        - use Test::PostgreSQL for testing
+
+0.13  Jun 21, 2013
+        - rowAsHash and rowsAsHashes were handling NULL values
+          incorrectly, resulting in "Modification of non-creatable
+          hash value attempted" errors
+        - wrap PQconndefaults
+        - fix POD errors
+
+0.12  Apr 16, 2013
+        - fix error in rowsAsHashes that could result in segmentation
+          fault in some cases
+
+0.11  Apr 9, 2013
+        - add support for rowAsHash and rowsAsHashes methods
+
+0.10  Feb 1, 2013
+        - Makefile.PL LIB parameters were in the wrong order (bug
+          report and solution by Geoffrey D. Bennett).
+        - nonBlocking() was broken
+
+0.09  Jul 2, 2012
+        - return libpq version as obtained from pg_config instead of
+          from libVersion
+
+0.08  May 10, 2012
+        - wrap libVersion
+        - set client_encoding to UTF8 on new connections
+        - allow compiling against development versions of PostgreSQL
+          (bug report by erix@perlmonks)
+
+0.07  May 9, 2012
+        - assume database encoding is UTF8
+        - better handling of errorDescription and errorField
+        - use Test::postgresql for testing
+        - add support for payload field in notifies (bug report by
+          Mischa Spiegelmock)
+
+0.06  Jan 3, 2012
+        - allow compilation with older versions of libpq
+        - OUTPUT directive was missing from PQcmdTuples wrapper
+
+0.05  Jul 18, 2011
+        - accept a hash ref as conninfo
+        - start was calling PQconnectdb instead of PQconnectStart
+          under the hood
+
+0.04  Jun 13, 2011
+	- add conditional code to leave out methods not available from
+          libpq 8.x.x when this version of the client library is used
+
+0.03  Jun 9, 2011
+        - several doc improvements
+        - include typemap file in distribution
+
+0.02
+        - several doc improvements
+
+0.01  Mon May 30 16:54:48 2011
+	- original version; created by h2xs 1.23 with options
+		-An Pg::PQ
+

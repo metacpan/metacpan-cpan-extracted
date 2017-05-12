@@ -1,0 +1,49 @@
+pod
+  head1
+    @title
+      "NAME"
+    text
+      @text
+        "120-verbatim-paragraphs"
+  head1
+    @title
+      "EXAMPLES"
+    head2
+      @title
+        "Simple Verbatim Section Content"
+      verbatim
+        @text
+          "    First line"
+          ""
+          "    Second line"
+          "    (note blank line with one space and empty line follow)"
+          " "
+          ""
+          "    Third line"
+    head2
+      @title
+        "Verbatim Interspersed with Normal Text"
+      text
+        @text
+          "Text before verbatim paragraph."
+      verbatim
+        @text
+          "    Verbatim paragraph"
+      text
+        @text
+          "Text between verbatim paragraphs"
+      verbatim
+        @text
+          "    Two line"
+          "    verbatim paragraph"
+      text
+        @text
+          "Text between verbatim paragraphs"
+      verbatim
+        @text
+          "    Verbatim paragraph"
+          ""
+          "    More text after a blank line"
+      text
+        @text
+          "[EOF]"

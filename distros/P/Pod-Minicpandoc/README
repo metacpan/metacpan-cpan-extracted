@@ -1,0 +1,87 @@
+NAME
+    Pod::Minicpandoc - perldoc that works for modules you don't have
+    installed
+
+SYNOPSIS
+        mcpandoc File::Find
+            -- shows the documentation of your installed File::Find
+
+        mcpandoc Acme::BadExample
+            -- works even if you don't have Acme::BadExample installed!
+
+        mcpandoc -c Text::Xslate
+            -- shows the changelog file for Text::Xslate
+
+        mcpandoc -v '$?'
+            -- passes everything through to regular perldoc
+
+        mcpandoc -m Acme::BadExample | grep system
+            -- options are respected even if the module was scraped
+
+        vim `mcpandoc -l Web::Scraper`
+            -- getting the idea yet?
+
+        mcpandoc http://darkpan.org/Eval::WithLexicals::AndGlobals
+            -- URLs work too!
+
+DESCRIPTION
+    "mcpandoc" is a perl script that acts like "perldoc" except that if it
+    would have bailed out with "No documentation found for
+    "Uninstalled::Module"", it will instead consult your minicpan, or scrape
+    a CPAN index for the module's documentation if that doesn't work. It is
+    a fork of cpandoc, with added support for consulting a minicpan.
+
+    One important feature of "mcpandoc" is that it *only* scrapes the live
+    index if you do not have the module installed and if it cannot grab it
+    from your minicpan. So if you use "mcpandoc" on a module you already
+    have installed, then it will just read the already-installed
+    documentation. This means that the version of the documentation matches
+    up with the version of the code you have. As a fringe benefit,
+    "mcpandoc" will be fast for modules you've installed. :)
+
+    All this means that you should be able to drop in "mcpandoc" in place of
+    "perldoc" and have everything keep working. See "SNEAKY INSTALL" for how
+    to do this.
+
+    If you set the environment variable "MCPANDOC_FETCH" to a true value,
+    then we will print a message to STDERR telling you that "mcpandoc" is
+    going to make a request against the live CPAN index.
+
+SNEAKY INSTALL
+        cpanm Pod::Minicpandoc
+
+        then: alias perldoc=mcpandoc
+        or:   function perldoc () { mcpandoc "$@" }
+
+        Now `perldoc Acme::BadExample` works!
+
+    "perldoc" should continue to work for everything that you're used to,
+    since "mcpandoc" passes all options through to it. "mcpandoc" is merely
+    a subclass that falls back to scraping a CPAN index when it fails to
+    find your queried file in @INC.
+
+SEE ALSO
+    Pod::Cpandoc, CPAN::Mini
+
+    The sneaky install was inspired by <https://github.com/defunkt/hub>.
+
+    <http://tech.bayashi.jp/archives/entry/perl-module/2011/003305.html>
+
+    <http://perladvent.org/2011/2011-12-15.html>
+
+    <http://sartak.org/talks/yapc-na-2011/cpandoc/>
+
+AUTHOR
+    Shawn M Moore "sartak@gmail.com" (original implementation), Rob Hoelz
+    "rob@hoelz.ro" (minicpan support)
+
+THANKS
+    Many thanks to Shawn M Moore, for writing Pod::Cpandoc and giving me
+    something base this on!
+
+COPYRIGHT
+    Copyright 2011-2013 Robert Hoelz.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

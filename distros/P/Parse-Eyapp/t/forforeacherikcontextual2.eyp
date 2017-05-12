@@ -1,0 +1,14 @@
+# Inspired in an example seen in
+# "Context Aware Scanning for Parsing Extensible Languages"
+# by Van Wyk and Schwerdfeger
+
+%token FE   = %/(for\s*each)\b/=C
+%token F    = %/(for)\b/
+%token ID   = /([a-zA-Z_]\w*)/
+
+%%
+s: FE ID 's'
+ | F ID
+;
+%%
+

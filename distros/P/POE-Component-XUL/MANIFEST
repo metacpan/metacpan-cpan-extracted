@@ -1,0 +1,11 @@
+README
+Changes
+lib/POE/Component/XUL.pm
+lib/POE/XUL/Session.pm
+lib/POE/XUL/SessionManager.pm
+lib/POE/XUL/ChangeManager.pm
+lib/POE/XUL/EventManager.pm
+examples/poe-xul.pl
+MANIFEST
+Makefile.PL
+t/00_compile.t

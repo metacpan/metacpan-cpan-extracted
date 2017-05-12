@@ -1,0 +1,55 @@
+{
+   "abstract" : "Make your html more iPhone friendly",
+   "author" : [
+      "Patrick Donelan <pat@patspam.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-iPhone",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : 0,
+            "File::Slurp" : 0,
+            "HTML::DOM" : 0,
+            "Plack::Middleware" : 0,
+            "Plack::Util::Accessor" : 0,
+            "UNIVERSAL::require" : 0,
+            "parent" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "HTML::Tidy" : 0,
+            "HTTP::Request::Common" : 0,
+            "Plack::Builder" : 0,
+            "Plack::Test" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {},
+   "version" : "1.102060"
+}
+

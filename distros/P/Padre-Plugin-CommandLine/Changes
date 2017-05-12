@@ -1,0 +1,21 @@
+Revision history for Padre-Plugin-CommandLine
+
+0.03    2010.07.27
+	Renamed to the new Padre 0.43 PO naming scheme (azawawi)
+	Added translations:
+	- French (jquelin)
+	- Polish (therek)
+	- Chinese (Traditional) translation (BLUET)
+	- Arabic translation (azawawi)
+	- Spanish (brunov)
+        removed taint mode for tests, leading to build failures (jquelin)
+        compatibility with new Padre for plugin menu (CHORNY)
+        compatibility with latest Padre (CHORNY)
+
+0.02    2008.12.23
+        Add prereq Wx::Perl::Dialog
+
+
+0.01    2008.11.12
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,458 @@
+#!/usr/bin/perl
+
+# $Id: pscdcover,v 1.32 2004/05/31 20:06:46 cbouvi Exp $
+#
+#  Copyright (C) 2004 Cédric Bouvier
+#
+#  This program is free software; you can redistribute it and/or modify it
+#  under the terms of the GNU General Public License as published by the Free
+#  Software Foundation; either version 2 of the License, or (at your option)
+#  any later version.
+#
+#  This program is distributed in the hope that it will be useful, but WITHOUT
+#  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#  FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+#  more details.
+#
+#  You should have received a copy of the GNU General Public License along with
+#  this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+#  Place, Suite 330, Boston, MA  02111-1307  USA
+
+# $Log: pscdcover,v $
+# Revision 1.32  2004/05/31 20:06:46  cbouvi
+# Removed references to /usr/local
+#
+# Revision 1.31  2004/05/28 21:32:26  cbouvi
+# Updated POD
+#
+# Revision 1.30  2004/05/26 21:00:26  cbouvi
+# *** empty log message ***
+#
+# Revision 1.29  2004/05/21 20:51:45  cbouvi
+# Moved all the functionality to PostScript::CDCover
+#
+# Revision 1.28  2004/03/23 22:27:26  cbouvi
+# Typo in POD
+#
+# Revision 1.27  2004/03/23 21:29:03  cbouvi
+# Added --conf option to specify an alternate config file. Updated POD
+#
+# Revision 1.26  2004/03/12 16:35:54  cbouvi
+# Added support for configuration file
+#
+# Revision 1.25  2004/03/12 11:32:23  cbouvi
+# Centralised the handling of default option values
+#
+# Revision 1.24  2004/03/09 15:41:33  cbouvi
+# Changed default values for --minwidth and --root. Updated POD. Allowed empty strings as --title.
+#
+# Revision 1.23  2004/03/09 15:18:49  cbouvi
+# Incremented version number and updated change log
+#
+# Revision 1.22  2004/03/09 14:09:25  cbouvi
+# Make default title the root directory
+#
+# Revision 1.21  2004/02/24 15:04:41  cbouvi
+# Inverted default colors for CD and folder (oops!)
+#
+# Revision 1.20  2004/02/24 14:35:35  cbouvi
+# Added --cd-color and --folder-color to override icons default colors
+#
+# Revision 1.19  2004/02/24 13:51:30  cbouvi
+# Added support for --color
+#
+# Revision 1.18  2004/02/12 12:33:44  cbouvi
+# Changed version number
+#
+# Revision 1.17  2004/02/12 12:32:42  cbouvi
+# Centralised the quoting of parentheses and applied it to the CD title as well
+#
+# Revision 1.16  2004/02/11 14:47:52  cbouvi
+# Added limited support for MP3 files
+#
+# Revision 1.15  2004/02/05 10:38:58  cbouvi
+# Precisions in POD
+#
+# Revision 1.14  2004/02/04 12:44:08  cbouvi
+# Added switch --separator to add a column separator line
+#
+# Revision 1.13  2004/02/02 12:56:55  cbouvi
+# Added --minwidth to eliminate too narrow columns
+#
+# Revision 1.12.2.1  2004/02/04 09:42:04  cbouvi
+# Added $File::Find::dont_use_nlink to prevent problem with older versions of File::Find
+#
+# Revision 1.12  2004/02/02 12:26:46  cbouvi
+# Update version number
+#
+# Revision 1.11  2004/02/02 12:23:53  cbouvi
+# Added switch --all to force printing even empty pages
+#
+# Revision 1.10  2004/02/02 10:19:40  cbouvi
+# Update version number
+#
+# Revision 1.9  2004/02/02 10:18:40  cbouvi
+# Update POD
+#
+# Revision 1.8  2004/01/30 09:58:11  cbouvi
+# Changed version number
+#
+# Revision 1.7  2004/01/30 09:47:43  cbouvi
+# Added --columns option
+#
+# Revision 1.6  2004/01/29 14:39:52  cbouvi
+# Switched name from cdcover to pscdcover (already existed on Freshmeat.net)
+#
+# Revision 1.5  2004/01/29 14:20:53  cbouvi
+# Added LICENSE and version
+#
+# Revision 1.4  2004/01/29 12:23:38  cbouvi
+# Added pod and default options
+#
+# Revision 1.3  2004/01/28 14:40:50  cbouvi
+# Added support for optional bounding boxes
+#
+# Revision 1.2  2004/01/28 13:56:01  cbouvi
+# PostScript template now in external file, no longer in __DATA__
+#
+
+use File::Find;
+use Pod::Usage;
+use Getopt::Long;
+
+use PostScript::CDCover;
+
+our $VERSION = 1.0;
+$File::Find::dont_use_nlink = 1;
+
+# Reads a configuration file and stores the key/value pairs into a hashref.
+sub load_rc_file {
+
+    my ($opt, $filename) = @_;
+
+    return unless -f $filename;
+    open IN, "<$filename" or die "Cannot read $filename: $!\n";
+    while ( <IN> ) {
+        chomp;
+        s/[#;].*//;     # skip comments
+        s/^\s+|\s+$//g; # get rid of leading or trailing whitespace
+        next unless $_; #         of blank lines
+
+        my ($name, $value) = split /\s*=\s*/, $_, 2;
+        $value = 1 if ! /=/; # boolean values need not a right member (being
+                             # there at all means "true")
+
+        $opt->{lc $name} = $value;
+    }
+    close IN;
+}
+
+# Provide a default value to an option while issuing a warning.
+sub default_option {
+    my ($opt, $option, $default) = @_;
+    if ( !defined($opt->{$option}) ) {
+        warn "Option --$option not defined: defaulting to $default\n";
+        $opt->{$option} = $default;
+    }
+}
+
+#
+# Get command-line options.
+#
+# It would be handy to read the configuration file
+# first and *then*, override its values with the arguments passed on the
+# command line. However, the command line may provide an alternate config file
+# location. So we read the command line first, then get the configuration
+# file(s) and drop those options that were already provided on the
+# command-line.
+my %opt;
+GetOptions \%opt => qw/
+         mp3|3
+         all|a
+         box|b!
+     columns|c=i
+       depth|d=i
+       files|f!
+        help|h
+    minwidth|m=i
+          ps|p=s
+        root|r=s
+   separator|s
+       title|t:s
+     version|v
+        conf|config:s
+       color
+    cd-color=s
+folder-color=s
+/ or pod2usage -message => "Try $0 --help", -verbose => 0;
+
+pod2usage -verbose => 1 if $opt{help};
+if ( $opt{version} ) {
+    print "pscdcover version $VERSION\n";
+    exit 0;
+}
+
+# Default configuration file locations:
+my @rc_file = ('/etc/pscdcoverrc', glob('~/.pscdcoverrc'));
+# Might be overridden with the --conf switch.
+@rc_file = ($opt{conf}) if $opt{conf};
+
+# An extra option hash, with hard-coded default values
+my %rc_opt = ( box => 1, columns => 2, all => 0, minwidth => 25, separator => 0, color => 0 );
+# Read the configuration files, in turn
+load_rc_file \%rc_opt, $_ foreach @rc_file; 
+# Insert in the main %opt only those values from the config files that haven't
+# already been provided by the command-line.
+foreach ( keys %rc_opt ) {
+    $opt{$_} = $rc_opt{$_} unless exists $opt{$_};
+}
+
+$opt{color} = 1 if ($opt{'cd-color'} || $opt{'folder-color'}) && !defined($opt{color});
+$opt{'cd-color'}     ||= 'ccd8e5';
+$opt{'folder-color'} ||= 'ffff80';
+for ( $opt{'cd-color'}, $opt{'folder-color'} ) {
+    s/^0x//i;
+    # Double the hex digits if there are only three of them
+    s/./$&$&/g if length($_) == 3;
+    # Convert to an integer
+    $_ = hex $_;
+}
+
+default_option \%opt, root => '/media/cdrom'; # CHANGE HERE
+default_option \%opt, title => $opt{root};
+
+if ( $opt{mp3} ) {
+    require MP3::Info;
+    import  MP3::Info qw/ get_mp3tag get_mp3info /;
+    $opt{files} = 1 unless defined $opt{files};
+}
+
+my $cdcover = new PostScript::CDCover
+    -cdcolor => $opt{'cd-color'},
+    -foldercolor => $opt{'folder-color'},
+    map { $_ => $opt{$_} } qw/ all box columns minwidth separator title root color /;
+
+$cdcover->ps($opt{ps}) if $opt{ps};
+
+find sub {
+    return if -f && !$opt{files};
+    (my $path = $File::Find::name) =~ s/$opt{root}//;
+
+    my $depth = $path =~ tr/\///;
+    return unless $depth--;
+    return unless !defined($opt{depth}) || $depth <= $opt{depth};
+
+    if ( $opt{mp3} ) {
+        my $tag;
+        if ( $tag = get_mp3tag($_) and $tag->{TITLE} ) {
+            (my $time = get_mp3info($_)->{TIME} . '"') =~ s/:/'/;
+            $_ = $tag->{TITLE} . " ($time)";
+        }
+    }
+    if ( -d ) {
+        print STDERR "Adding directory $File::Find::name\n";
+        $cdcover->add_directory($File::Find::name);
+    }
+    else {
+        print STDERR "Adding file $File::Find::name\n";
+        $cdcover->add_file($File::Find::name);
+    }
+}, $opt{root};
+
+$cdcover->flush();
+
+=head1 NAME
+
+pscdcover - generate a cover for a mounted CD-ROM.
+
+=head1 SYNOPSIS
+
+    pscdcover --title="CD Title" | lpr
+    pscdcover --title="CD Title" --files > cover.ps
+
+=head1 DESCRIPTION
+
+C<pscdcover> traverses a mounted CD-ROM directory tree and generates a
+PostScript program that prints a CD box cover.  The output of this program can
+be directly sent to a PostScript compatible printer, or saved to a file for
+editing.
+
+The directory tree is printed in two colums, first on the front page, then on
+the inner page (the one that is visible when you open the box), and finally on
+the back label. All in all, the output consists of two A4 pages, one for the
+front and inner pages, and one for the back label. People using alien paper
+formats should still be able to print, provided that their paper size is close
+enough to A4, as the labels are drawn rather far from the paper edge. Printing
+on Letter should not cause any trouble.
+
+The title is printed on top of the front page, and on the sides of the back
+label. Various command-line switches alter the behaviour of the program and the
+layout of the generated covers.
+
+=head2 Editing the output
+
+The layout of the files in the different columns and pages is done by the
+PostScript program. This makes it possible and easy to edit the resulting
+PostScript program with a text editor and remove some lines.
+
+The editable section looks like this (text within parentheses are the files and
+directory names):
+
+    (directory 1) 0 folder_title
+      (file 1) 1 file_title
+      (file 2) 1 file_title
+      (file 3) 1 file_title
+      (file 4) 1 file_title
+      (file 5) 1 file_title
+      (file 6) 1 file_title
+      (file 7) 1 file_title
+      (file 8) 1 file_title
+      (file 9) 1 file_title
+      (file 10) 1 file_title
+      (file 11) 1 file_title
+      (file 12) 1 file_title
+    (directory 2) 0 folder_title
+
+In order to shorten the list (so that it fits on the three pages, for
+instance), you may simply change the above to:
+
+    (directory 1) 0 folder_title
+      (...) 1 file_title
+      (lots of files) 1 file_title
+      (...) 1 file_title
+    (directory 2) 0 folder_title
+
+You need not worry about the final layout, whether a directory has changed
+columns or not, all this is taken care of by the PostScript interpreter.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--conf>=I<FILE>
+
+Specifies an alternate configuration file. If not specified,
+F</etc/pscdcoverrc> and F<~/.pscdcoverrc> are read instead, in that order.
+
+=item B<-p> I<FILE>, B<--ps>=I<FILE>
+
+Specifies the path to the PostScript template. The default is
+F<pscdcover.ps> in the same directory as the module PostScript::CDCover.
+
+=item B<-t> I<TEXT>, B<--title>=I<TEXT>
+
+Provides a title for the CD. The title will be printed on top of the first
+page, and on the sides of the back label. If this option is omitted, it
+defaults to the value of the C<--root> option, or its default value. C<--title>
+can be explicitely forced to an empty string: C<--title=''>
+
+=item B<-r> I<PATH>, B<--root>=I<PATH>
+
+Specifies the mount point of the CD-ROM. Default is C</media/cdrom>.
+
+=item B<-f>, B<--files>
+
+When specified, the regular files are also printed, not just the directories.
+The default is C<--nofiles>.
+
+=item B<-3>, B<--mp3>
+
+When set, MP3 files will be checked for an ID3 tag. The title of the song
+together with its length will be printed out instead of the filename. This
+implies C<--files>. You must have the C<MP3::Info> Perl module installed to use
+this option.
+
+=item B<-d> I<INTEGER>, B<--depth>=I<INTEGER>
+
+When omitted or set to 0, the program traverses the CD-ROM as deep as possible.
+This option allows for limiting the depth of the search. A value of 1 will only
+ouput the top-level directories, i.e., those just below C<--root>.
+
+=item B<--box>
+
+When set (which is the default), the edges of the labels are drawn in dim gray.
+Use C<--nobox> to prevent this (only the text will be printed out).
+
+=item B<-s>, B<--separator>
+
+When set, prints a line as column separator (default is off).
+
+=item B<-a>, B<--all>
+
+Forces the printing of all the pages (front and back), even if the whole
+directory tree could be printed on only the first page.
+
+=item B<-c> I<INTEGER>, B<--columns>=I<INTEGER>
+
+Specifies the number of columns to print on each page (default is 2). When set
+to 0, the column widths will be calculated dynamically, so that the longest
+filename in each column fits.
+
+=item B<-m> I<INTEGER>, B<--minwidth>=I<INTEGER>
+
+Specifies the minimum allowed width for a column (in millimeters). If the room
+left on the right side of the page is lower than this limit, the next column
+will be printed on the next page. This option is only relevant with
+C<--columns>=0. The default is 25 mm (which is slightly less than an inch, for
+those who wonder).
+
+=item B<--color>
+
+Generate color output: the CD and folder icons will be drawn in colors, light
+blue and light yellow respectively. These default colors can be overridden with
+the C<--cd-color> and C<--folder-color> switches.
+
+=item B<--cd-color>=I<STRING>
+
+=item B<--folder-column>=I<STRING>
+
+Override the default color for the CD and folder icons respectively.  I<STRING>
+should be an hexadecimal triplet representing the shares of red, green and blue
+in the desired color, like those commonly found in HTML or CSS. The value may
+optionally be prefixed with C<0x>.  Three-digits triplets will be doubled (e.g.
+C<0xC30> is the same as C<CC3300>).  Specifying at least one of these options
+implies C<--color>.
+
+=item B<-v>, B<--version>
+
+Prints the program's version and exists.
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item F</etc/pscdcoverrc>
+
+=item F<~/.pscdcoverrc>
+
+The system-wide and user specific configuration files. Any command-line option
+can be set in one of these configuration files (the user's one taking
+precedence over the system-wide one). Both files are read in that order, the
+parameters from the latter overriding those from the former (i.e., any user can
+override system wide defaults by providing his/her own defaults, but need not
+copy the whole configuration file from F</etc>).
+
+The syntax of the configuration file quite simple. Blank lines are ignored,
+commeents start with a colon (C<;>) or a hash (C<#>) and stop at the end of the
+line. Options are given as C<key = value> pairs, one per line. The key should
+be a valid command-line switch (long version). Leading and trailing whitespace
+is ignored, as well as the optional whitespace surrounding the equal sign.
+Parameters that are counterparts of a boolean command-line switch should be
+given a value of 1 for true and 0 for false.
+
+Example:
+
+    files     = 0
+    separator = 1
+    color     = 1
+    root      = /cdrom
+
+=back
+
+=head1 AUTHOR
+
+Cédric Bouvier <cbouvi@cpan.org>
+
+=cut

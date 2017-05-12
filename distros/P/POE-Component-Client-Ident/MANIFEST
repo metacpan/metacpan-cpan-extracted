@@ -1,0 +1,23 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/AutoLicense.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/GithubMeta.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/POE/Component/Client/Ident.pm
+lib/POE/Component/Client/Ident/Agent.pm
+lib/POE/Filter/Ident.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_use.t
+t/01_ident.t
+t/99_pod.t
+t/99_pod_coverage.t

@@ -1,0 +1,132 @@
+<html>
+ <head>
+  <base href="">
+  <link href="" rel="stylesheet" type="text/css">
+  <title>Links</title>
+ </head>
+ <body bgcolor="#ffffff" text="#000000">
+  <UL>
+<LI><A HREF="#NAME">NAME
+
+</A><UL>
+<LI><A HREF="#Original">Original
+
+</A><LI><A HREF="#Total%20Control">Total Control
+
+</A><LI><A HREF="#Targets">Targets
+
+</A><LI><A HREF="#Links">Links
+
+</A></UL>
+</UL>
+<HR>
+
+  <H1><A NAME="NAME">NAME
+
+</A></H1>
+
+<P>Links
+
+</P><H2><A NAME="Original">Original
+
+</A></H2>
+
+<P>A  <A HREF="name.html">name</A> manual page.
+
+</P>
+<P>An <A HREF="name.html#ident">name/ident</A> item in manual page. 
+
+</P>
+<P>A  <A HREF="name.html#sec">name/&quot;sec&quot;</A> section in other manual page.
+
+</P>
+<P>A  <A HREF="#sec">&quot;sec&quot;</A>      section in this manual page (the quotes are <B>not</B> optional).
+
+</P>
+<P>A  <A HREF="#sec"> sec </A>      section in this manual page
+
+</P>
+<P>A  <A HREF="#sec%20tion">sec tion </A>   section in this manual page
+
+</P>
+<P>A  <A HREF="mod/ule.foo.html">mod::ule.foo</A>  link to a module POD
+
+</P>
+<P>A  <A HREF="#sec">/&quot;sec&quot;</A>     section in this manual page (the quotes are optional).
+
+
+</P><H2><A NAME="Total%20Control">Total Control
+
+</A></H2>
+
+<P>A  <A HREF="name.html">text</A> manual page.
+
+</P>
+<P>An <A HREF="name.html#ident">text</A> item in manual page. 
+
+</P>
+<P>A  <A HREF="name.html#sec">text</A> section in other manual page.
+
+</P>
+<P>A  <A HREF="#sec">text</A>      section in this manual page (quotes are <B>not</B> optional).
+
+</P>
+<P>A  <A HREF="#sec">text</A>      section in this manual page 
+
+</P>
+<P>A  <A HREF="#sec%20tion">text</A>   section in this manual page 
+
+</P>
+<P>A  <A HREF="bar-mod/ule.html">text</A>   link to a module POD
+
+</P>
+<P>A  <A HREF="#sec">text</A>     section in this manual page (quotes are optional).
+
+
+</P><H2><A NAME="Targets">Targets
+
+</A></H2>
+
+<P><A NAME="target"></A>
+
+</P>
+<P><A NAME="target%20with%20spaces"></A>
+
+</P>
+<P><A NAME="target%20w%2fspaces"></A>
+
+</P>
+<P><A NAME="italic%20target"></A>
+
+
+</P><H2><A NAME="Links">Links
+
+</A></H2>
+
+<P><A HREF="#target">/target</A>
+
+</P>
+<P><A HREF="#target%20with%20spaces">&quot;target with spaces&quot;</A>
+
+</P>
+<P><A HREF="#target%20w%2fspaces">&quot; target w/spaces &quot;</A>
+
+</P>
+<P><A HREF="#target%20with%20line%20breaks">&quot;target with
+line 
+breaks&quot;</A>
+
+</P>
+<P><A HREF="#italic%20target">/<I>italic</I> <B>target</B></A>
+
+</P>
+<P><A HREF="page.html#section"><I>page</I>/<I>section</I></A>
+
+</P>
+<P><A HREF="http://world.std.com/~swmcd/steven/index.html">http://world.std.com/~swmcd/steven/index.html</A>
+
+</P>
+<P><A HREF="http://world.std.com/~swmcd/steven/index.html">Steven McDougall</A>
+</P>
+ </body>
+</html>

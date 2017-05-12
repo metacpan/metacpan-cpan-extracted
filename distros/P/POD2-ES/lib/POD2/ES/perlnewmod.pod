@@ -1,0 +1,300 @@
+=encoding utf8
+
+=head1 NAME
+
+perlnewmod - Preparar la distribución de un módulo nuevo
+
+=head1 DESCRIPCIÓN
+
+Este documento ofrece algunas sugerencias para escribir módulos Perl, preparar
+su distribución y publicarlos en CPAN.
+
+Uno de los factores que hacen que Perl sea una herramienta realmente eficaz es
+el hecho de que los hackers que usan este lenguaje suelen compartir el código
+que desarrollan al solucionar problemas para que sus camaradas no tengan que
+enfrentarse a esos mismos problemas.
+
+La forma principal de compartir código es abstraer la solución en un módulo
+Perl. Si no sabe lo que es un módulo Perl, este documento no le va a ser de
+gran ayuda. Además, eso significa que aún no se está beneficiando de una
+enorme cantidad de código que puede resultarle muy útil; antes de leer este
+documento debería leer L<perlmod>, L<perlmodlib> y L<perlmodinstall>.
+
+Si no existe ningún módulo para lo que usted necesita, y ya se ha encargado
+de escribir el código, sería un detalle que empaquetara la solución en un
+módulo y lo subiera a CPAN para que otros programadores puedan usarlo.
+
+También puede consultar L<perlmodstyle>, donde se describe procedimientos
+recomendados para desarrollar módulos.
+
+=head2 Advertencia
+
+Vamos a centrarnos principalmente en módulos de Perl puro, no en módulos XS.
+Los módulos XS se usan para otros fines y hay que tener en cuenta varias cosas
+antes de distribuirlos, como la popularidad de la biblioteca para la que se
+está creando un enlace, la portabilidad a otros sistemas operativos, etc. Sin
+embargo, las notas sobre cómo preparar la parte Perl del módulo y la forma de
+empaquetarlo para su distribución se aplican tanto a un módulo XS como a un
+módulo Perl puro.
+
+=head2 ¿Qué se debe incluir en un módulo?
+
+En un módulo debe incluir código que crea que puede ser de utilidad para
+otros programadores. Todo aquello que llene un vacío en la biblioteca común y
+que alguien pueda usar directamente en sus programas. También son buenos
+candidatos los fragmentos de código que pueda aislar y extraer para
+conectarlos a otro componente.
+
+Veamos un ejemplo. Supongamos que ha escrito un programa que lee datos en un
+formato local y los almacena en un hash de hashes de Perl. Después los
+convierte en un árbol, recorre el árbol y canaliza cada nodo hacia un
+servidor Acme Transmogrifier.
+
+Hay muchos usuarios de Acme Transmogrifier y ha tenido que partir de cero para
+escribir el código de comunicación del protocolo. Con toda seguridad, este
+código podría ser un buen candidato a módulo. El nivel al que desee afrontar
+la tarea es cosa suya: puede que desee crear módulos de nivel de protocolo
+análogos a L<Net::SMTP|Net::SMTP> para comunicarse con módulos de nivel
+superior análogos a L<Mail::Send|Mail::Send>. La elección es suya, pero lo
+que está claro es que debe publicar un módulo para ese protocolo de servidor.
+
+Nadie más en el planeta va a comunicarse con su formato de datos local, por lo
+que podemos ignorar esta parte. Pero, ¿qué pasa con el resto? Crear
+estructuras de árbol a partir de variables Perl y después recorrerlas es un
+problema de aplicación general interesante, y si nadie ha creado un módulo
+que haga eso, es posible que desee convertir también este código en un
+módulo.
+
+Ya sabe qué partes podría convertir en módulos. Veamos la manera de hacerlo.
+
+=head2 Paso a paso: hacer los preparativos
+
+Antes de empezar a preparar el código debe hacer algunas cosas.
+
+=over 3
+
+=item Examine código de otros programadores
+
+Analice minuciosamente unos cuantos módulos para ver cómo los han programado.
+Es recomendable empezar con L<Text::Tabs|Text::Tabs> (un módulo interesante y
+sencillo disponible en la biblioteca estándar) y después pasar a algo un poco
+más complejo, como L<File::Copy|File::Copy>. C<WWW::Mechanize> y los módulos
+C<Email::*> son buenos ejemplos de código orientado a objetos.
+
+Estos módulos le proporcionarán una idea general de cómo se estructura y
+desarrolla un módulo.
+
+=item Asegúrese de que su contribución es novedosa
+
+En CPAN hay muchos módulos, por lo que es fácil pasar por alto alguno similar
+al que pretende publicar. Investigue a fondo en L<http://search.cpan.org> y
+asegúrese de que no va a reinventar la rueda.
+
+=item Evalúe la necesidad
+
+Es posible que su módulo le encante y que crea que a todo el mundo le vendría
+bien, pero puede ocurrir que a nadie le interese. Si no está seguro de la
+demanda que puede tener su módulo, puede sondear opiniones en el grupo de
+noticias C<comp.lang.perl.modules> o, como último recurso, preguntar en la
+lista sobre módulos, escribiendo a la dirección C<modules@perl.org>. Recuerde
+que se trata de una lista cerrada con un tiempo de respuesta largo; seguramente
+tardarán en contestar.
+
+=item Elija un nombre
+
+Los módulos Perl incluidos en CPAN tienen una jerarquía de nomenclatura;
+procure respetarla. Encontrará los detalles sobre esta nomenclatura en
+L<perlmodlib>. Puede examinar CPAN y la lista de módulos para familiarizarse
+con ella. Como mínimo, debe recordar que las palabras que componen el nombre
+de un módulo deben escribirse con la letra inicial mayúscula (Este::Programa)
+y que cada módulo debe pertenecer a una categoría e incluir una descripción
+de su propósito.
+
+=item Compruébelo otra vez
+
+Y al hacerlo asegúrese de que no ha pasado por alto ningún módulo similar al
+que va a escribir.
+
+Cuando se haya decidido por un nombre y esté seguro de que su módulo es
+necesario y que actualmente no hay nada parecido disponible, puede empezar a
+programar.
+
+=back
+
+=head2 Paso a paso: crear el módulo
+
+=over 3
+
+=item Para empezar, use F<module-starter> o F<h2xs>
+
+La utilidad F<module-starter> se distribuye como parte del paquete de CPAN
+L<Module::Starter|Module::Starter>. Crea un directorio con el esqueleto de
+todos los archivos necesarios para iniciar un nuevo módulo, según las
+"prácticas recomendadas" actuales para el desarrollo de módulos, y se invoca
+desde la línea de comandos de la siguiente manera:
+
+    module-starter --module=Foo::Bar \
+       --author="Su nombre" --email=sunombre@cpan.org
+
+Si no desea instalar el paquete L<Module::Starter|Module::Starter> de CPAN,
+puede usar F<h2xs>, una herramienta más antigua que se creó originalmente
+para desarrollar módulos XS, y que se incluye en la distribución de Perl.
+
+Una invocación típica de L<h2xs|h2xs> para crear un módulo Perl puro es:
+
+    h2xs -AX --skip-exporter --use-new-tests -n Foo::Bar 
+
+El modificador C<-A> omite el código de Autoloader, C<-X> omite los elementos
+XS, C<--skip-exporter> omite el código de Exporter, C<--use-new-tests>
+configura un entorno de pruebas moderno y C<-n> especifica el nombre del
+módulo.
+
+=item Use L<strict|strict> y L<warnings|warnings>
+
+Debe usar los pragmas warnings y strict en el código de su módulo, ya que no
+sabe en qué condiciones se va a usar. Además, no querrá distribuir código
+que no respete los pragmas warnings y strict, ¿no?
+
+=item Use L<Carp|Carp>
+
+El módulo L<Carp|Carp> permite presentar los mensajes de error desde la
+perspectiva del código que llama; esto permite indicar que el problema está
+en el código que hace la llamada y no en su módulo. Por ejemplo, si escribe:
+
+    warn "No se ha especificado un nombre de host";
+
+el usuario verá algo similar a:
+
+ No se ha especificado un nombre de host at
+ /usr/local/lib/perl5/site_perl/5.6.0/Net/Acme.pm line 123.
+
+que parece indicar que su módulo ha producido un error. En lugar de ello,
+tiene que atribuir la culpa al usuario y decir esto:
+
+    No se ha especificado ningún nombre de host en programa_deficiente, línea 10.
+
+Para ello debe usar L<Carp|Carp> y reemplazar C<warn> por C<carp>. Asimismo, si
+el código incluye C<die>, debe usar C<croak> en su lugar. Sin embargo,
+mantenga las instrucciones C<warn> y C<die> necesarias para realizar
+comprobaciones (para los casos en que la culpa la tenga realmente su módulo).
+
+=item Use L<Exporter|Exporter> con sensatez
+
+L<Exporter|Exporter> ofrece una manera estándar de exportar símbolos y
+subrutinas de su módulo al espacio de nombres del autor de la llamada. Por
+ejemplo, C<use Net::Acme qw(&frob)> importará la subrutina C<frob>.
+
+La variable de paquete C<@EXPORT> determina qué símbolos se exportan cuando
+en el código que llama solo se usa C<use Net::Acme>. Es muy probable que nunca
+tenga que colocar nada aquí. Por otra parte, C<@EXPORT_OK> le permite
+especificar los símbolos que desea exportar. Si desea exportar un conjunto de
+símbolos, use C<%EXPORT_TAGS> y defina un conjunto de exportación definido.
+Encontrará más detalles en L<Exporter>.
+
+=item Use L<Documentación en texto simple (Plain Old Documentation)|perlpod>
+
+No habrá acabado el trabajo hasta que tenga listo el papeleo. Tiene que
+dedicar algo de tiempo a escribir la documentación del módulo.
+C<module-starter> y C<h2xs> proporcionan un esqueleto que puede rellenar; si no
+conoce el formato POD y desea ver una introducción, consulte L<perlpod>. Debe
+incluir una sinopsis adecuada que explique cómo se usa el módulo, una
+descripción, notas sobre la sintaxis y el propósito de las subrutinas o los
+métodos individuales. Use los comentarios del código Perl como notas de
+desarrollo y la documentación POD como notas para los usuarios finales.
+
+=item Escriba pruebas
+
+Le animamos a crear pruebas automáticas del módulo para asegurarse de que
+funciona de la manera prevista en las distintas plataformas compatibles con
+Perl; si sube el módulo a CPAN, una legión de comprobadores dedicará tiempo
+a compilar su módulo y enviarle los resultados de las pruebas.
+C<module-starter> y C<h2xs> proporcionan un entorno de pruebas que puede
+ampliar; no debe limitarse a comprobar que el módulo se compila.
+L<Test::Simple|Test::Simple> y L<Test::More|Test::More> son buenos puntos de
+partida para escribir una batería de pruebas.
+
+=item Escriba el archivo README (LÉAME)
+
+Si va a subir el módulo a CPAN, los enanitos automatizados extraerán el
+archivo README y lo colocarán en su directorio de CPAN. También aparecerá en
+los directorios principales F<by-module> (por módulo) y F<by-category> (por
+categoría) si registra el módulo en la lista de módulos. Es recomendable
+incluir en el README una descripción detallada de lo que hace el módulo, así
+como los cambios visibles para el usuario con respecto a la versión anterior.
+
+=back
+
+=head2 Paso a paso: distribuir el módulo
+
+=over 3
+
+=item Obtenga un identificador de usuario de CPAN
+
+Para poder publicar módulos en CPAN, un programador necesita un identificador
+de CPAN. Visite C<http://pause.perl.org/>, seleccione "Request PAUSE Account"
+(Solicitar cuenta de PAUSE) y espere a que los administradores de PAUSE
+aprueben su solicitud.
+
+=item C<perl Makefile.PL; make test; make dist>
+
+Una vez más, C<module-starter> (o C<h2xs>) se encarga de todo. Crea el archivo
+C<Makefile.PL> estándar que se usa para instalar los módulos descargados, y
+que produce un archivo Makefile con un destino C<dist>.
+
+Cuando se haya asegurado de que el módulo supera todas las pruebas (algo que
+siempre es recomendable), puede ejecutar C<make dist> para que Makefile
+produzca un paquete tar del módulo, listo para enviarlo a CPAN.
+
+=item Suba el paquete tar
+
+En el mensaje de correo electrónico que recibió con el identificador de CPAN
+se incluyen instrucciones sobre cómo iniciar sesión en PAUSE (Perl Authors
+Upload Server, el servidor de carga para autores de módulos Perl). Puede usar
+los menús de PAUSE para subir el módulo a CPAN.
+
+=item Anuncie el módulo en la lista de módulos
+
+Una vez subido, el módulo se alojará en su directorio de autor sin hacer
+ruido. Si desea conectarlo con el resto de CPAN, tendrá que registrar el
+espacio de nombres a través de "Register Namespace" en PAUSE. Una vez
+registrado, el módulo figurará en las listas I<by-module> y I<by-category> de
+CPAN.
+
+=item Anuncie el módulo en clpa
+
+Si está impaciente por dar a conocer su módulo, publique un anuncio en el
+grupo de noticias moderado C<comp.lang.perl.announce>.
+
+=item Corrija los errores
+
+Cuando empiece a acumular usuarios, también empezará a recibir informes de
+error. Con suerte, hasta le enviarán parches. Así probará las mieles del
+mantenimiento de un proyecto de software...
+
+=back
+
+=head1 AUTOR
+
+Simon Cozens, C<simon@cpan.org>
+
+Actualizado por Kirrily "Skud" Robert, C<skud@cpan.org>
+
+=head1 VEA TAMBIÉN
+
+L<perlmod>, L<perlmodlib>, L<perlmodinstall>, L<h2xs>, L<strict>, L<Carp>,
+L<Exporter>, L<perlpod>, L<Test::Simple>, L<Test::More> L<ExtUtils::MakeMaker>,
+L<Module::Build>, L<Module::Starter>, http://www.cpan.org/ , y el tutorial de
+Ken Williams sobre cómo crear su propio módulo en
+http://mathforum.org/~ken/perl_modules.html
+
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

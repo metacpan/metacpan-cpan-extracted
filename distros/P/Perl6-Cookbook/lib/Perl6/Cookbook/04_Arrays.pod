@@ -1,0 +1,128 @@
+package Perl6::Cookbook::Arrays;
+
+
+=head1 01 Specifying a List in Your Program
+
+   #!/usr/bin/perl6
+   use v6;
+   
+   # Creating an array
+   # see also S09
+   
+   my @names = ('foo', 'bar', 'baz');
+   @names.perl.say;
+   
+   my @others = qw(foo bar baz);
+   @others.perl.say;
+
+
+=cut
+
+
+=head1 02 Printing a List with Commas
+
+   #!/usr/bin/perl6
+   use v6;
+   
+   my @names = qw(foo bar baz);
+   
+   sub commify_series {
+   #    @_.perl.say;
+       (@_ == 0) ?? ''                 !!
+       (@_ == 1) ?? @_[0]              !!
+       (@_ == 2) ?? join(" and ", @_)  !!
+                    join(", ", @_[0 .. (@_-2)], "and " ~ @_[*-1]);
+   }
+   
+   # TODO due to a parsing bug in Rakudo this ; is required here
+   ;
+   
+   say commify_series(|@names);
+   @names.pop;
+   say commify_series(|@names);
+   @names.pop;
+   say commify_series(|@names);
+   
+   # TODO: this should also work, but then we have to enable the @_.perl.say in the sub
+   # say commify_series(@names);
+
+
+=cut
+
+
+=head1 05 Iterating Over an Array
+
+   #!/usr/bin/perl6
+   use v6;
+   
+
+=head2 Description
+
+Quite similar to how it is done in Perl 5 using a for loop,
+though the syntax of creating an array from a list of words
+has changed from qw to be <>
+
+
+   
+   
+   my @names = <foo bar baz>;
+   
+   for @names -> $name {
+       say $name;
+   }
+   
+
+
+=cut
+
+
+=head1 10 Appending One Array to Another
+
+   #!/usr/bin/perl6
+   use v6;
+   
+
+=head2 Description
+
+This is quite similar to the same code in Perl 5.
+
+   
+   
+   my @names      = <foo bar baz>;
+   my @more_names = <moo barney>;
+   
+   say @names.perl;
+   say @more_names.perl;
+   push @names, @more_names;
+   say @names.perl;
+   
+
+
+=cut
+
+
+=head1 11 Reversing an Array
+
+   #!/usr/bin/perl6
+   use v6;
+   
+
+=head2 Description
+
+This is quite similar to the same code in Perl 5.
+
+   
+   
+   my @names      = <foo bar baz>;
+   
+   say @names.perl;
+   @names = reverse @names;
+   say @names.perl;
+   
+
+
+=cut
+
+
+1;
+

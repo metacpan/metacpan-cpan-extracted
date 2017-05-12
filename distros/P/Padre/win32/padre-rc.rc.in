@@ -1,0 +1,68 @@
+/**
+# Copyright 2009 The Padre development team as listed in Padre.pm.
+# LICENSE
+# This program is free software; you can redistribute it and/or
+# modify it under the same terms as Perl 5 itself.
+*/
+/**
+ * @author Olivier Mengué <dolmen@cpan.org>
+ * @author Ahmad M. Zawawi <ahmad.zawawi@gmail.com>
+ */
+
+#include "padre-rc.h"
+
+IDI_APP ICON DISCARDABLE "padre.ico"
+
+// Embed the manifest in the exe
+// http://msdn.microsoft.com/fr-fr/library/bb773175%28en-us,VS.85%29.aspx
+CREATEPROCESS_MANIFEST_RESOURCE_ID RT_MANIFEST "padre.exe.manifest"
+
+
+// Languages list:
+// http://msdn.microsoft.com/en-us/library/dd318693%28VS.85%29.aspx
+
+STRINGTABLE DISCARDABLE
+LANGUAGE LANG_FRENCH, SUBLANG_FRENCH
+BEGIN
+   IDS_APP_TITLE,  "Padre"
+   IDS_ERR_WPERL,  "Programme « WPerl.exe » introuvable !"
+   IDS_ERR_SCRIPT, "Script « padre » introuvable !"
+   IDS_ERR_RUN,    "Echec du lancement du script avec « padre » avec « WPerl.exe » !"
+END
+
+STRINGTABLE DISCARDABLE
+LANGUAGE LANG_ENGLISH, SUBLANG_NEUTRAL
+BEGIN
+   IDS_APP_TITLE,  "Padre"
+   IDS_ERR_WPERL,  "Cannot find 'WPerl.exe'!"
+   IDS_ERR_SCRIPT, "Cannot find the 'padre' script!"
+   IDS_ERR_RUN,    "Failed to run 'padre' using 'WPerl.exe'"
+END
+
+VS_VERSION_INFO VERSIONINFO 
+ FILEVERSION __PADRE_WIN32_VERSION__
+ PRODUCTVERSION __PADRE_WIN32_VERSION__
+ FILEFLAGSMASK  VS_FFI_FILEFLAGSMASK
+ FILEFLAGS      0L                     //Final version
+ FILEOS         VOS__WINDOWS32
+ FILETYPE       VFT_APP
+ FILESUBTYPE    VFT2_UNKNOWN
+BEGIN
+    BLOCK "StringFileInfo" 
+    BEGIN
+        BLOCK "040904E4" 
+        BEGIN
+            VALUE "Comments", "Perl Application Development and Refactoring Environment\0" 
+            VALUE "FileDescription", "Perl Application Development and Refactoring Environment\0" 
+            VALUE "FileVersion", "__PADRE_VERSION__\0" 
+            VALUE "LegalCopyright", "Copyright 2008-2010\0" 
+            VALUE "OriginalFilename", "padre.exe\0" 
+            VALUE "ProductName", "Padre IDE\0" 
+            VALUE "ProductVersion", "__PADRE_VERSION__\0" 
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END

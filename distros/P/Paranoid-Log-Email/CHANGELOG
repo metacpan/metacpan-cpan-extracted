@@ -1,0 +1,7 @@
+CHANGELOG
+
+v2.0 (10/22/2015)
+=================
+--Adjusted to work with new Paranoid v2.0 API
+--Split into independent distribution
+

@@ -1,0 +1,399 @@
+NAME
+| POE::Component::Client::TCPMulti - A high performance client TCP library.
+SYNOPSIS
+|| # Short Usage
+|| POE::Component::Client::TCPMulti->create
+|| ( InputEvent       => sub {
+||       printf "%s:%d: %s", 
+||           $_[CHEAP]->ADDR, $_[CHEAP]->PORT, $_[ARG0];
+||   },
+||   SuccessEvent     => sub {
+||       printf "%s:%d: Connection Recieved", 
+||           $_[CHEAP]->ADDR, $_[CHEAP]->PORT;
+||       $_[KERNEL]->yield( send => "" );
+||   },
+||   inline_states    => {
+||       _start       => sub {
+||           $_[KERNEL]->yield( connect => "127.0.0.1", $_ )
+||               for 1..1024;
+||       },
+||   },
+||   InputTimeout     => 15,
+|| );
+|| 
+|| # Longer Usage
+|| POE::Component::Client::TCPMulti->create
+|| ( InputEvent       => sub {
+||       $_[KERNEL]->yield(send => $_[CHEAP]->ID, "Some Stuff");
+||   },
+||  
+||   Initialize       => sub {
+||       $_[CHEAP]->input_filter
+||           ( "POE::Filter::Block", BlockSize => 4);
+||   },
+||   ErrorEvent       => \&ErrorHandle,   
+||   Disconnected     => \&ErrorHandle,   
+||   TimeoutEvent     => \&TimeoutHandle,
+||   FailureEvent     => \&FailureHandle,
+||   SuccessEvent     => sub {
+||       $_[CHEAP]->filter("POE::Filter::Line");
+||   
+||       # Set timeout for this connection to 350 seconds.
+||       $_[CHEAP]->timeout(350);
+||   
+||       # This state is part of the component interface
+||       $_[KERNEL]->yield(send => $_[CHEAP]->ID, "Some Data");
+||   },
+||  
+||   Domain           => AF_INET,     # Optional
+||  
+||   Alias            => "MySession", # Optional
+||   InputTimeout     => 360,         # Seconds, Optional
+||   ConnectTimeout   => 30,      # Seconds, Optional
+||   Timeout          => 30,      # Seconds, Optional
+||   Filter           => "POE::Filter::Something", # Optional
+||    
+||   inline_states => {
+||       _start => sub {
+||           $_[KERNEL]->yield(connect => q(127.0.0.1), 25);
+||           # _start isn't needed if you use an alias.
+||       },
+||   },
+||   
+||   args => $Session_Args,                # Optional
+||   object_states => $Object_States,      # Optional
+||   package_states => $Package_States,    # Optional
+|| );
+|| 
+|| # This should be done from within a state in the TCPMulti
+|| # Session.  Its purpose is to allow prepropigation of the
+|| # connection heap as well as connection specific timeout
+|| # Settings.
+|| POE::Component::Client::TCPMulti->connect
+|| ( RemoteAddress  => "127.0.0.1",
+||   RemotePort     => 25,
+||   BindAddress    => "127.0.0.1", # Optional
+||   BindPort       => 0,           # Optional
+||   ConnectTimeout => 50,          # Connect only.
+||   InputTimeout   => 300,         # Input only.
+||   Heap           => \%Propigation );
+|| 
+DESCRIPTION
+| POE::Component::Client::TCPMulti is a very lightweight, highly optimized
+| component designed for large numbers of simultaneous outgoing connections.
+| The major advantage to this module over POE::Component::Client::TCP is that
+| it runs in a single session, regardless of the number of outgoing
+| simultaneous connections.  I have found this in fact to use considerable less
+| overhead than POE::Component::Client::TCP in high traffic.  The disadvantage
+| is that it has a significantly more complex API than
+| POE::Component::Client::TCP.  
+|
+| It is in fact due to this added API complexity that I decided to create a
+| separate module, rather than altering POE::Component::Client::TCP [ or
+| coaxing Rocco to let me ].  POE::Component::Client::TCP is a great module and
+| this is not designed to completely replace it.  It is however designed as a
+| solution for extremely high traffic situations when the overhead of an
+| individual session for each outgoing connection is not appropriate for the
+| added simplicity in the API.  Especially considering that this API is not
+| really *that* much more complex.
+CONSTRUCTOR PARAMETERS 
+Event Parameters
+	- SuccessEvent
+	| SuccessEvent, takes a CODE reference as a parameter, and is the event
+	| which will be called after a connection attempt has decidedly been
+	| successful.  (See L<POE::Wheel::SocketFactory>)
+	|
+		- ARG0 
+		| will hold the new socket handle, which you should never actually
+		| need.
+		- ARG1
+		| will hold the sockets remote address, which is packed.  You will need
+		| to use inet_ntoa() (See L<Socket>) if a human readable version is
+		| neccesary.
+		- ARG2
+		| will hold the sockets remote port.
+		- ARG3
+		| holds the OLD id for the connection.
+		- ARG4
+		| holds the NEW id for the connection, synonymous with $_[CHEAP]->ID
+	- FailureEvent
+	| FailureEvent, takes a CODE references as a parameter.  FailureEvent will
+	| be called when a socket error occurs while attempting to create the
+	| connection. (See L<POE::Wheel::SocketFactory>)
+		- ARG0
+		| The name of the operation that failed.
+		- ARG1
+		| Numeric value describing the error (L<perlvar> $!)
+		- ARG2
+		| A string which describes the error.
+		- ARG3
+		| The wheels unique ID (synonymous with $_[CHEAP]->ID)
+	- ErrorEvent
+	| ErrorEvent, takes a CODE reference as a parameter.  It is the event that
+	| will be called after a connection has been successfull, but has closed
+	| unexpectedly.  (See L<POE::Wheel::ReadWrite>)
+		- ARG0
+		| The name of the operation that failed.  This is not a function but an
+		| operation.  Usually "read".
+		- ARG1
+		| A numeric value describing the error (See L<perlipc> $!)
+		- ARG2
+		| A string describing the error.
+		- ARG3
+		| The connections unique id (synonymous with $_[CHEAP]->ID)
+	- Disconnected
+	| Disconnected takes a CODE reference, and is the event taht will be called
+	| after a shutdown event was succesfull.  This will happen for any type of
+	| disconnection or connection failure, as the shutdown routine is used not
+	| only to close a connection but to clean up after it as well.
+	- TimeoutEvent
+	| TimeoutEvent takes a CODE reference, and is the event that will be called
+	| when a connection has been idle for longer than the specified value of
+	| Timeout.  (See Timeout below)  When this event occurs, Disconnected will
+	| not be called.
+	- Initialize
+	| Initialize takes a CODE reference, and is the event which called
+	| immediately after a "connect" event is recieved by the Component Session.
+	| It was initially created for integration convience, because many people
+	| use _start at the begining of thier ::Client::TCP sessions to perform
+	| verious initialization for thier connection.  This event can be used
+	| instead.
+	Session Options
+	- inline_states
+	| inline_states will actually create inline states with 3 exceptions,
+	| _start, _child and _stop inline states, and any inline state named
+	| "connect", "shutdown", "send", or "die" will be overwritten.  However,
+	| _start, _child, or _stop inline states will be called during _start,
+	| _child, and _stop appropriately, only prior to ::Client::TCPMulti
+	| completing its own internal tasks for these times. I cant really see any
+	| reason for using _child within the session this component creates, but
+	| you never know :)  If you're trying to figure out why your _start only
+	| gets called once, see "Initialize", above.
+	- object_states
+	| Creates object states for the session, _start, _child, and _stop states
+	| will be removed and routed by the component when its own internal events
+	| of the same name are called.  States named connect, shutdown, send or die
+	| will simply be removed.
+	- package_states
+	| Creates package states for the session, _start, _child, and _stop states
+	| will be removed and routed by the component when its own internal events
+	| of the same name are called.  States named connect, shutdown, send or die
+	| will simply be removed.
+	- options
+	| options describes the options to be set for the created POE::Session, and
+	| is expected to be a hashref.  (See L<POE::Session>).  Useful options are
+	| commonly trace and assert, which turn on trace and assertion debug output
+	| for the session itself.
+	- args
+	| args will be passed on to the created POE::Session, and is expected to be
+	| an ARRAY ref.  The value of args will be passed on to the _start state of
+	| your code.  (See L<POE::Session>) 
+	Component Options
+	- InputTimeout
+	| InputTimeout will set the default timeout for the ReadWrite Wheel, which
+	| means it will only be in effect while the connection is active.  If
+	| you're looking for a way to timeout on outgoing connections, instead of
+	| timeout on lack of input from the socket, then see ConnectTimeout.
+	- ConnectTimeout
+	| ConnectTimeout will set the default timeout for the SocketFactory Wheel
+	| in seconds.  The value it is given only will take effect while the
+	| connection attempt is pending.  If and when the connection is successful,
+	| the InputTimeout will be used
+	- Timeout [ depriciated ]
+	| Timeout will set the default ConnectTimeout for all connections.
+	- Alias
+	| This will set a session alias for your convience.  This parameter expects
+	| a string.
+METHODS
+| Currently this module only provides one package method outside of its
+| constructor.  This method allows you to open connections within the current
+| session, and is utilized by the connect state (See INTERNAL STATES, below) for
+| constructing its connection wheels.  The purpose of publicizing this method
+| is to allow connection settings to be set during connection construction.
+	connect MANY_OPTIONS
+	| The connect method takes a list of name and value pairs (hash) as its
+	| argument.  The following pairs will be used, and all others will be
+	| ignored
+	| 
+	| Since TCPMulti has been redesigned so there can be multiple TCPMulti
+	| sessions, the connect method must be called from within a state in the
+	| TCPMulti session you wish to bind your connection to.  If you are not in
+	| a TCPMulti session, you will experience undefined behavior.
+	|
+	| The connect method implements the connect interface state.
+	- RemoteAddress
+	| The RemoteAddress parameter expects a single argument, a string which
+	| describes the hostname or address in which to make the outgoing
+	| connection to.  This argument is required.
+	- RemotePort
+	| The RemotePort parameter expects a number, which will specify the port to
+	| connect to on the remote host.  This argument is required.
+	- BindAddress
+	| The BindAddress parameter describes the local address to bind for the
+	| outgoing connection.  This argument is optional.
+	- BindPort
+	| The BindPort parameter describes the local port to bind for the outgoing
+	| connection.  This argument is optional.
+	- ConnectTimeout
+	| The ConnectTimeout paramter expects a numerical value in seconds, which
+	| will be the value used as the timeout for this connection attempt.  Once
+	| the connection is made the InputTimeout is used.  This parameter is
+	| optional, and the default for the session will be used if it is ommited.
+	| A value of zero disables.  Also see 'timeout' CHEAP Method.
+	- InputTimeout
+	| The InputTimeout describes the timeout in seconds for the connection in
+	| seconds.  This means with an InputTimeout of 300 seconds, if the server
+	| sends no data for that number of seconds the connection will be closed
+	| and a TimeoutError will be dispatched.
+	- Heap
+	| The Heap argument expects a hash reference, which will prepropigate the
+	| Connection Heap for the connection being constructed.  This can be used
+	| to provide the data needed to process the outgoing connection before the
+	| connection is even attempted.
+INTERNAL STATES
+| This component defines a number of inline states which cannot be overridden.
+| They are used as part of the API, for performing tasks that were handled in
+| the constructor of ::Client::TCP, as well as a few which are predefined for
+| convenience.
+	connect ADDRESS, PORT
+	connect ADDRESS, PORT, BIND_ADDRESS
+	connect ADDRESS, PORT, BIND_ADDRESS, BIND_PORT
+	connect C_HEAP_REF, ADDRESS, PORT
+	connect C_HEAP_REF, ADDRESS, PORT, BIND_ADDRESS
+	connect C_HEAP_REF, ADDRESS, PORT, BIND_ADDRESS, BIND_PORT
+	| The "connect" state creates a new connection to the specified remote
+	| address and port, using the optionally specified local address and port.
+	| It can be posted to, yielded, or called just as a normal inline state
+	| would be.
+	|
+	| If the first argument is a reference, then it will be treated as the
+	| heap for the connection.  This way you can pre-propigate heaps with
+	| specific information for tracking the connection.
+	send CONNECTION_ID
+	| The "send" state appends data to a connections queue for sending.  It is
+	| almost exactly the same as the "send" state used in the POE Cookbook.  It
+	| takes a connection id, and data as arguments.
+	shutdown CONNECTION_ID
+	| The "shutdown" state attempts to close a connection gracefully.  It is
+	| the same as the "shutdown" state for ::Client::TCP.  It takes a
+	| connection id as an argument, and marks the connection inactive, waits
+	| for it to flush, then cleans up its resources.
+	die
+	| The "die" state attempts to close all open connections gracefully,
+	| removes all alarms in the session, stops all alarms, and hopes for the
+	| best.  This should always cleanly remove the session it is called on.
+OPTIMIZATIONS
+| This module has a number of optimizations, as it is in fact designed for
+| extremely high traffic situations, and easy migration from ::Client::TCP.
+	Event Routing
+	| All component event routing is done independantly of POE::Kernel.  While
+	| it is true that POE::Kernel is extremely fast, and very light weight, it
+	| is already issuing the events to this Components inline states.  So while
+	| it is a common practice to use POE::Kernel for Component Event routing,
+	| it has been opted against.  Its just extra overhead, and each of this
+	| module's inline states are extremely low in overhead, so all event
+	| routing is done completely aside from any event queue.  The event queue
+	| is used to issue the intial event.
+	|
+	| Alot of testing has proven this to actually create a faster runtime
+	| without reducing responsive time of POE.  In fact, in most instances it
+	| was greatly increased since less work was put in the event queue
+	| unnecessarily. 
+CONNECTION HEAP
+| Each event dispatched from this component includes an addition to the normal
+| event parameters (think @_), called the connection heap (or CHEAP).  A
+| constant is exported to the application which calls import on this module for
+| accessing the connection heap in normal forms.  Its name is "CHEAP".  The
+| connection heap provides storage for connection specific informations, as
+| well as accessors to the wheel and various settings for the specific
+| connection.  The CHEAP has two rules, it must be a hash reference, and it
+| cannot be reassigned.
+	Localization
+	| Each *connection* has its own internal heap, which can be accessed via
+	| $_[CHEAP]. This was provided as a solution to each connection not having
+	| its own session, and in turn, its own $_[HEAP].  Events that do not go
+	| through the component will have a $_[CHEAP] which is undefined.  So if
+	| you want it, you will have to fetch it (Or just store a $_[CHEAP]
+	| reference for each connection in your $_[HEAP]). See fetchCHEAP for
+	| fetching the $_[CHEAP].  The $_[HEAP] can still be used for global
+	| information amongst all client connections in the current session.
+	|
+	| Again, yes, you can use $_[CHEAP] as a "normal" heap.  It will contain
+	| values with special meanings, however thier keys are all prefixed with
+	| "-" For this reason, prefixing your heap keys with "-" is not suggested.
+	Blessing
+	| The Connection Heap does more than provide a datastructure free for your
+	| per-connection enjoyment.  It is also a blessed reference to a special
+	| package that provides several methods for you to make various realtime
+	| adjustments to your connection.  This is done because the ReadWrite wheel
+	| is hidden from you, since we need to keep complete control over it for
+	| the components connection indexing.
+		Methods
+		- ID
+		| The ID method is simply an accessor to the current ID of the current
+		| connection.  The ID of your connection will change at various stages
+		| in the connecting processes, but will remain static once the
+		| connection is successfull.
+		- ADDR
+		| Just for reference, this is the remote address the current connection
+		| is connected or attempting to connect to.
+		- PORT
+		| The PORT method returns the remote port your current connection is
+		| attempting to connect to, as an integer.
+		- filter
+		| The filter method will set the filter object being used by the
+		| ReadWrite Wheel for both input and output.  This method should only
+		| be used after the connection has been made successfully.
+		- input_filter
+		| This method will set the input filter for the current connection.
+		- output_filter
+		| This method will set the output filter for the current connection.
+		- timeout
+		| The timeout method adjusts the timeout of the current connection and
+		| resets its alarm.  It expects one argument, an integer, which is the
+		| value the timeout should be set to in seconds.  If the argument
+		| provided is zero, the timeout is disabled.  If no argument is given,
+		| then the current timeout setting is returned.  The timeout for the
+		| current status of the connection is set.  For example, if this method
+		| is called in the Initialize event, then the timeout for the
+		| connection attempt is reset.  If this method is called in a
+		| SuccessEvent, then the input timeout for the connection is set.  As
+		| usual with the timeouts in this module, a value of zero disables the
+		| timeout alarm.
+	Passing
+	| Some times you may need to do a few things before you alter the connection
+	| heap, or you may need to use the connection heap to store data until you
+	| wait for results from other sessions.  In these cases, it is suggested
+	| that you pass the connection heap reference as the last parameter in your
+	| event.  Example:
+	|
+	|| my ($kernel, $cheap) = @_[ KERNEL, CHEAP ];
+	|| 
+	|| $kernel->post
+	||   (named => resolve => [ postback => $cheap ] => $address, "MX");
+	| 
+	| The logic behind this being that you can access the connection heap in
+	| the postback state the exact same way you normally would ($_[CHEAP]).
+	| Incase this hasn't made sense to you yet, CHEAP is a compile time
+	| constant with the value of -1, so $_[CHEAP] will always be the last
+	| element of @_, but it wont automatically exist in events that were not
+	| routed by this component.
+BUGS
+| Currently none that I know of.  Please contact the author if you find one.
+TODO
+| Classical inter-session communication (postbacks/event registering) is being
+| considered as an alternative interface.  However this would hinder
+| performance considerably.
+THANKS
+- Rocco Caputo
+| Rocco provided a tremendous amount of insight when making various decisions
+| about this modules design.
+- Matt Cashner
+| Matt found the most fundamental design flaw when it came to production use of
+| this module thats been discovered yet, and offered some suggestions on how to
+| approach addressing the issue.
+LICENSE
+| This module is released under the BSD Compatible BEERWARE license.  See the
+| source code for more details.
+AUTHOR
+| Scott McCoy (tag@cpan.org)

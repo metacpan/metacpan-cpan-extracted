@@ -1,0 +1,16 @@
+Build.PL
+CHANGES
+LICENSE
+MANIFEST
+META.json
+README.md
+cpanfile
+lib/Pcore/API/Whois.pm
+lib/Pcore/API/Whois/Response.pm
+lib/Pcore/API/Whois/Server.pm
+script/pcore-whois.pl
+share/data/whois.perl
+share/dist-id.json
+share/dist.perl
+t/001.t
+t/author-pod-syntax.t

@@ -1,0 +1,21 @@
+Revision history for POE-Component-CPAN-SQLite-Info
+
+0.11    2013-11-12
+        - Fixed a "bug" that supposedly rendered this module dead:
+          for some reason crucial code was commented out.
+
+0.10    2013-11-06
+        - Minor fixes to comply with specs and Kwalitee game
+
+0.09    2012-12-12
+	- Tests are blocking smokers due to some kind of
+          bug--disabled all of them.
+	- Once I get more time, going to look into why the module
+	  blocks up on Windows (always?) and occasionally on Linux too
+
+0.08    2008-10-13
+        - Fixed broken test suit
+
+0.01    2008-06-06
+        - First version, released on an unsuspecting world.
+

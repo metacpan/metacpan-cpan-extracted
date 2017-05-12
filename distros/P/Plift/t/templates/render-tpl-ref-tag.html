@@ -1,0 +1,38 @@
+<section>
+    <div id='name'>Hello <x-render data="fullname">John Doe</x-render></div>
+
+    <dl id='contact'>
+        <dt>Phone</dt>
+        <dd class='phone'><x-render data="contact.phone">(xxx) xxx-xxxx</x-render></dd>
+        <dt>Email</dt>
+        <dd class='email'><x-render data="contact.email" /></dd>
+    </dl>
+
+    <x-render data="[contact]">
+        <dl id='contact2'>
+            <dt>Phone</dt>
+            <dd class='phone'><x-render data="phone">(xxx) xxx-xxxx</x-render></dd>
+            <dt>Email</dt>
+            <dd class='email'><x-render data="email" /></dd>
+        </dl>
+    </x-render>
+
+    <div>
+        <x-render data="[posts]">
+            <article>
+                <span class="position"><x-render data="loop.index"></x-render></span>
+                <a class="post-title post-link" data-render="title url@href">Post Title</a>
+                <div class="post-content">
+                    <x-render data="content@HTML"></x-render>
+                </div>
+
+                <ul>
+                    <x-render data="[tags]">
+                        <li class="tag"><a data-render="name url@href"/></li>
+                    </x-render>
+                </ul>
+            </article>
+        </x-render>
+    </div>
+
+</section>

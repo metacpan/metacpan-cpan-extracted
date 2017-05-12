@@ -1,0 +1,515 @@
+Changes
+
+0.71   2010.12.15
+	Fixed Padre crash when functions list is enabled (AZAWAWI)
+
+0.70   2010.12.06
+	Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+	Renamed method 'show_preferences' to 'plugin_preferences' (ZENOG)
+	Use App::Grok when you actually need it in Perl 6 Help (AZAWAWI)
+
+0.69   2010.10.31
+	Fixed a regression in the highlighter and syntax checker (AZAWAWI)
+
+0.68   2010.10.29
+	Removed Test::NeedsDisplay dependency (AZAWAWI)
+
+0.67   2010.10.27
+	t/00-load.t is magically injected by [@PadrePlugin] via [LoadTests] (AZAWAWI)
+	Support Padre 0.76 syntax checker (AZAWAWI)
+
+0.66   2010.10.23
+	Switch to Dist::Zilla
+	Removed "Update Six" experimental feature
+	Removed "Perl refactor" undeveloped feature
+	Fixed a syntax error in "Create Perl 6 Module" template
+	Fixed crashes while exporting document to HTML
+
+0.65 2010.10.19
+
+	No need for cleanup STD lex cache anymore
+	Translation files are now installed via Module::Build 0.36 share_dir
+	Fixed a Padre compatibility problem with the syntax checker and outline
+	Renamed some packages to more Perl-ish names
+	Outline is working again with the latest STD.pm for package declarators
+
+0.64 2010.03.24
+
+	Depends on Padre 0.57 for various module naming changes
+	Fixed ticket #883: Opening an existing Perl 6 script Hangs Padre on win32
+
+0.63 2010.02.24
+
+	Depends on Padre 0.56 and later
+	Depends on S:H:P6 0.79 for the latest STD innovation
+	Fixed Help provider API change that was introduced in Padre 0.56
+	Ignore MYMETA.yml
+	Fixed the out-of-memory Storable nfreeze/thaw bug by using YAML::XS instead
+
+0.62 2010.01.07
+
+	Depends on S:H:P6 v0.77 for the latest STD
+	Replace Padre::Debug by Padre::Logger
+
+0.61 2009.12.10
+
+	Replaced debug called with new TRACE() call
+
+0.60 2009.9.18
+
+	Depends now on Net::HTTP, HTTP::Status and Archive::Zip
+	Depends on S:H:P6 v0.74 for the latest STD
+	First attempt at upgrading Six distribution on win32 via the web
+	"Update Six" is now in the maintenance menu above "Cleanup std lex cache"
+	When "update six" is selected, a dialog is shown and when a release is selected,
+		it is downloaded & then unzipped in c:\strawberry. This is at
+		the moment a win32-only functionality.
+	The Six updater is a background task that downloads six distros, backups
+		up old six and unzips the new downloaded six and it outputs its
+		progress meanwhile to the output panel
+	The Six updater dialog features a new cool camelia-enabled look and a 
+	"View Release Notes" button
+
+0.59 2009.9.8
+
+	Find perl6.exe in PDX and later Six releases and stay compatible with 0.41
+	print -> Padre::Util::debug
+
+0.58 2009.8.24
+
+	Updated translations:
+		Arabic
+		French (jquelin++)
+		German (Sewi++)
+	Integrated with Padre's 0.44 Quick Fix Helper
+	Integrated with Padre's 0.44 Help Provider
+	Reverting back to _sharedir until we get the Module::Build gets a sharedir property
+	STD.pm error prefix was recently switched from ### PARSE FAILED ### to ===SORRY!===
+	Prevent STD from inserting that block unicode character into error messages. $PERL6HERE
+	Removed "Perl 6 Executable" until rakudo actually supports it again
+	Depends on Syntax:Highlight:Perl6 0.72
+	Depends on Perl6::Doc 0.45
+	Added perlobjintro and perlreintro that Perl6::Doc 0.45 now supports
+
+0.57 2009.8.17
+
+	Depends on Padre 0.43 to make use of plugin_directory_share
+	Depends on S:H:P6 0.71 and App::Grok 0.19
+	Perl 6 Help dialog is moved to Padre core as "Help Search"
+	Create Perl 6 menu is working again. (szabgab)
+	Reuse Padre::Wx::Main help method (szabgab)
+	Updated translations:
+		German translation update (Sewi++)
+		French translation (jquelin++)
+		dutch translation (ddn123456++)
+	Renamed to the new Padre 0.43 PO naming scheme
+	use the new Padre::Perl API for finding perl5 (szabgab)
+	safety crash hiding (szabgab)
+	double quote temporary directory
+
+0.56 2009.7.28
+
+	- Updated Translations:
+		Arabic
+		Brazilian portuguese (garu++)
+		Japanese (ishigaki++)
+	- Camelia icon on all dialogs.
+	- use Padre::Constant::WIN32 in all locations.
+	- IRC Live support menu items are simpler.
+	- Added an easy-to-use menu option to access perlintro and perlsyn directly (Hinrik++).
+	- Depends on App::Grok 0.17 for more bug fixes/enhancements..
+
+0.55 2009.7.25
+
+	- This is a bugfix release for Padre's Birthday Six Release.
+	- Removed commented highlighter, and tidied the files using Padre's
+		perltidyrc.
+	- Fixed missing use (szabgab++).
+	- Grok target location is now shown in the dialog's title.
+	- Fixed the environment detection code, disable Perl 6 Executable menu
+		entry if there's no parrot.exe (adamk++).
+	- Depends on App::Grok 0.14 for less dependencies.
+	- Find the path to hard perl6.exe hard coded in strawberry six (szabgab++).
+	- return the path to the perl6 executable if it exists (szabgab++).
+
+0.54 2009.7.24
+
+	- Depends on S:H:P6 version 0.65 to fix ticket:461 "Syntax check hanging
+		with perl6 infix & regex"
+	- Depends on Padre 0.41. Please upgrade it or otherwise it will not work.
+	- Allow the use of the new syntax highlighter configuration of Padre 0.41 (szabgab++)
+	- Move the Parrot based syntax highlighting to the Parrot plugin (szabgab++)
+	- F2 now works on select text - if there is any (szabgab++)
+	- Updated translations:
+		- Dutch (ddn123456++)
+		- French (jquelin++)
+	- move the text_with_on_nl method from the Perl 6 document to the Padre::Document
+	- Remove obsolete colorizer selection list. It is now handled by Padre.
+	- Updated dutch translation.
+
+0.53 2009.7.18
+
+	- Moved Rakudo Perl 6 functionality into a separate menu.
+	- Fixed ticket:457 "Store Perl 6 temporary folders in a persistent
+		temporary directory"
+	- Cleanup STD lex cache now works with ticket:457
+	- Updated Arabic translation.
+
+0.52 2009.7.18
+
+	- Removed parse_perl6_table_index.pl & perl6_table_index.pod since this is
+		grok's territory now...
+	- Fixed a couple of Perl6->Perl 6 typos, and added some missing POD.
+	- Unified copyright on all files.
+	- Added 03-copyright.t to author-only test for copyright.
+	- Moved Cleanup STD Lex Cache into "Maintenance" sub menu/
+	- #padre, #perl6 and perl6-projects.org are now accessible via the "More Help?" menu
+	- Added a TM to Larry Wall's Camelia icon.
+	- Depends on Perl6::Refactor.
+	- Initial stub implementation of refactoring tools menu with a coming-soon message
+		box to Perl 6 refactoring support.
+	- Don't hold the editor and document objects in the task as they might be gone
+		by the time the background process finished (see bug #445  and #299)
+		(szabgab++)
+
+0.51 2009.7.16
+
+	- Exact case-insensitive matches are always displayed first in Perl 6 Help results.
+	- Depends on lucky grok 0.13 which knows about Perl 6 tablets.
+	- No need to extend grok with Perl 6 tablets anymore; grok 0.13 knows about it now.
+	- Updated translations:
+		Brazilian portuguese (garu++)
+
+0.50 2009.7.10
+
+	- Wrote a script to read http://www.perlfoundation.org/perl6/index.cgi?perl_table_index
+		and write a POD named perl6_table_index.pod. Thanks to Herbert Breunung and
+		Martin Berends.
+	- Extended Grok in an unofficial way to support perl6_table_index.pod and thus
+		we now have more Perl 6 keywords/builtin and operator documentation.
+	- use only one grok instance per dialog lifetime
+	- Help topics can now be anything that is not whitespace which means Perl 6
+		operators, keywords and built-ins are now supported.
+	- Removed obsolete keywords support. Perl 6 Help now will take its place.
+	- require Locale::Msgfmt 0.14
+	- Converted EOL to Unix for some template files
+	- Updated translations:
+		Dutch (ddn123456++)
+		French (jquelin++)
+
+0.49 2009.7.6
+
+	- Two more helper quick fixes using App::Grok :
+		Convert POD 6 into HTML
+		Convert POD 6 into Text
+	- Implemented Perl 6 Help free-text search that is powered by App::Grok topics
+		with an HTML Auto Preview pane :)
+	- Bye bye S29-functions.pod. That's App::Grok's domain now.
+	- Updated the lovely About box with more useful information
+	- Updated Translations:
+		- Brazilian Portuguese
+		- Arabic
+
+0.48 2009.6.29
+
+	- Only require Locale::Msgfmt when building the .mo files (RSN)
+
+0.47 2009.6.27
+
+	- Updated Arabic translation.
+	- Depends on Locale::Msgfmt to build the .mo files at install time (RSN, Ryan52++)
+	- Depends on S:H:P6 0.64 which allows whitespacey forms on rand(N) and .[-1] checkers.
+
+0.46 2009.6.24
+
+	- More source documentation on quick fixes.
+	- No more insertion of text; just current line string replacement.
+	- Comment error line' is more accurate.
+	- Fixed a possible point of failure.
+	- Respect document newline and user's indentation.
+	- Comment error line quick fix is always the last one if an error occurs is
+		on the current line
+	- Finally implemented 'Surround with try { ... }' quick fix. Perl 6
+		exception handling with indentation.
+	- use a # and a space to toggle comments to avoid '#(' parametric comments
+
+0.45 2009.6.23
+
+	- Fixed Inlined P6 template to be recognized as Perl 5.
+	- Added "New Perl 6 Script" for consistency.
+	- No more string interpolation (just in case) in quick fix messages.
+	- Quick fix messages are more user friendly.
+	- Error/warnings messages are now trimmed before testing for possible fixes.
+	- Implemented the following quick fixes:
+		- Use $! instead of $@ for eval errors
+		- Use $::PERL_VERSION
+		- Use +> for numeric right shift
+		- Use ~> for string right shift
+		- Use +< for numeric left shift
+		- Use ~< for string left shift
+		- Use !~~ instead of !~ for negated pattern matching.
+		- Use ~~ instead of =~
+		- Use ~= instead of .=.
+		- Use ?? !! instead of ? :.
+		- Use ?? (...) !! instead" to fix precedence errors.
+		- Use !! instead of ::" in Perl 6 ternary ?? operator
+		- Use [N..*] for indefinite range
+		- Use (1..N).pick instead of rand(N)
+		- Use N.pick instead of rand(N)
+		- Use [*-1] instead of [-1]
+		- Use loop (;;) instead of for (;;)
+	- "Comment error line" now adds a # and then a space to handle conflict with Perl 6 embedded comments
+	- More case insensitive error matching
+	- "Comment error line" quick fix is always shown when there is an issue on the current line
+	- Removed unneeded \-escaping from s//replacement/ from some of the quick fixes
+	- Depends on S:H:P6 0.63 which fixes undeclared Bar for 'module Foo::Bar { }; module Bar { };'
+
+0.44 2009.6.21
+
+	- A Perl 6 document supports both Ecliptic's event_on_quick_fix and Padre's
+		right click menu
+	- Implemented quick fixes for the following STD warnings/errors:
+		- Undeclared routine and keywords: foo() or if()
+		- Variable is not predeclared
+		- Use ~ instead of . for string concatenation
+		- use of C++ constructor syntax
+		- Use . instead of -> for method call
+	- Implemented Comment error line quick fix
+	- Fixed highlighting to work over multiple Perl 6 document tabs
+
+0.43 2009.6.20
+
+	- Cleaned up Perl 6 menu to be more elegant.
+	- Added Create Perl 6 class/grammar/..etc menu
+	- Added the concept of export/generate sub menu.
+	- Refactored preferences dialog:
+		- Removed unwanted stuff
+		- Enabled localization
+		- 'Enable coloring' is now in preferences and it is enabled by default.
+	- Depends on S:H:P6 0.62 which fixes the undefined return value from
+		STD->parse(\s*) bug
+	- Fixed ticket:393 - Perl 6: switching to Parrot based highlighting does
+		not work
+	- Refactored colorizer task into separate PGE and STD tasks.
+	- Handle STD's undeclared rountine(s) warning more properly.
+	- Implemented the creation of the Perl 6 template files by borrowing code
+		from Padre :)
+	- Added a bigger Perl 6 Camelia icon in the about box.
+	- No more manual syntax highlighting menu item.
+	- Handled no document situation in a couple of actions.
+	- Remove building of .mo files as it is now managed by szabgab++ release.pl
+	- Fixed S29-functions.pod bad location
+	- Fixed "Generate PIR" dying when rakudo does not parse the Perl 6 file.
+
+0.42 2009.6.18
+
+	- Fixed "p6tokens.pl was not being copied" by renaming it to p6tokens.p5
+	- Depends on S:H:P6 0.61 which fixes ticket:392 undeclared prompt()
+	- Updated to version 43 of S29-functions.pod (30-May-2009)
+	- Major refactoring to stop polluting Padre::Document and Padre::Task
+		namespaces.
+	- STD error/warning parsing is now case insensitive. and added support
+		for "Undeclared routine" warning.
+	- STD lex corruption message was misleading and not localized. This usually
+		happens when you upgrade Syntax::Highlight::Perl6.
+	- Decreased wait time before starting another colorizing task to 100 ms
+		instead 1 sec.
+	- A couple of various refactorings:
+		- _T -> Wx::gettext.
+		- use -> require to improve startup speed.
+
+0.41 2009.5.30
+
+	- Added Spanish translation (BRUNOV)
+	- Added Brazilian Portuguese translation (GARU)
+	- Added Camelia plugin icon.
+	- Unified usage of PADRE_PLUGIN_PERL6 for author-only stuff across
+		Build.PL and tests.
+	- Added "Generate Perl6 EXEcutable" feature.
+	- Added "Generate Perl6 PIR" feature.
+	- Fixed name typos "Perl6" is "Perl 6" (Moritz Lenz)++
+	- Added missing dependency to Class::XSAccessor
+	- Switch over to the new constant package for the colour constants
+	- Updated the Padre::Plugin dependency to Padre 0.36
+
+0.40 2009.5.23
+
+	- Now uses Module::Build instead of Module::Install (Thanks for jquelin for the idea)
+	- Added author tests for compilation and pod correctness that can be enabled by
+		PADRE_PLUGIN_PERL6 environment variable.
+	- Changes is now POD instead of plain text.
+	- Depends on S:H:P6 0.57 which contains Two important fixes.
+	- Added localization via Wx::gettext and started a sample Arabic translation.
+	- Added French translation (jquelin).
+	- Added Polish translation (therek).
+	- Added Chinese (Traditional) translation (BLUET).
+
+0.39 2009.5.9
+
+	- Added support for slang and knowhow package declarators in outline view.
+	- F6->F7 refresh coloring since F6 is used by Padre
+	- Depends on S:H:P6 0.54 which contains the latest STD with the new slang package declarator keyword.
+	- Fixed a bug where File::Which::where should be used in a scalar context and caused export html feature to fail sometimes.
+
+0.38 2009.5.7
+
+	- Fixed ticket:234 - improve the automatic syntax highlighting of Perl6
+	- Depends on S:H:P6 0.53 which has a better STD error message for 'for lines {...}'
+
+0.37 2009.5.6
+
+	- Issue an error in the syntax check window if the STD lex cache is corrupted
+	- Depends on S:H:P6 0.52 which contains the tmp_prefix fix
+		and the latest STD and has less depdendencies
+	- Added a preview preferences UI dialog which is not finished btw :)
+
+0.36 2009.5.5
+
+	- Depends on S:H:P6 0.50 which contains the latest STD.pm parser.
+	- Fixed ticket:302 perl6 syntax highlighting and outline not active on vista using wperl.exe
+	- Identify Perl6 .HOW / ^ class methods in outline view...
+
+0.35 2009.4.30
+
+	- Depends on S:H:P6 0.48 which contains latest STD that warns about redeclared types.
+	- Update syntax and outline windows when syntax highlighting finishes.
+
+0.34 2009.4.26
+
+	- Supports private methods in Outline view
+	- Supports attributes in Outline view
+
+0.33 2009.4.25
+
+	- Displays STD.pm and November fully in Outline view
+	- Updated to the latest S29-functions.pod
+	- Perl 6 Plugin depends now on Syntax::Highlight::Perl6 v0.45 which fixes an
+		can parse STD.pm again without any warnings.
+	- A new symbol table method is used in outline view since
+		Perl 6 identifiers/expressions can be multi-token like
+		set-cache-entry (5 tokens)
+
+0.32 2009.4.24
+
+	- Parent nodes have their type between brackets next to their name
+	- use/require-s are now in Modules node.
+	- For P6 code the default package is GLOBAL.
+
+0.31 2009.4.24
+
+	- Outline view now handles subroutines, methods, submethods, macros,
+		regexes, tokens and rules.
+
+0.30 2009.4.24
+
+	- Fixed a missing Outline.pm in MANIFEST
+
+0.29 2009.4.24
+
+	- Initial Working Perl 6 Outline view
+	- Depends on Syntax::Highlight::Perl6 0.043 which has line number information
+
+0.28 2009.4.20
+
+	- Depends on Syntax::Highlight::Perl6 0.041 which has the newest STD with CORE.pad
+
+0.27 2009.4.19
+
+	- update the path to reach the perl 6 executable
+	- Changed version numbers so all the modules will have the same number.
+
+0.026 2009.2.04
+
+	- Takes advantage of STD.pm performance improvements by using Syntax::Highlight::Perl6 0.040
+	- Updated to S29-function.pod pugs r25021
+	- Works with Padre 0.26
+
+0.025 2009.1.8
+
+	- Depends on Syntax::Highlight::Perl6 0.030 which fixes hilitep6 binmode STDIN issue for utf8
+	- Limit number of S29 function calltip text to the first 10 lines.
+	- Remove ANSI color escape sequences from STD.pm warnings/errors.
+	- Fix S29-function.pod parsing case sensitivity bug on *nix platforms.
+	- Fix STD.pm highlighting to actually work. ;-)
+	- STD.pm errors/warnings are shown on console.
+
+0.024 2009.1.7
+
+	- Fix run rakudo script on win32
+	- STD.pm is now syntax highlighted correctly since we use IPC::Run3 binmode utf8
+	- Replaced IPC::Run 0.82 with the improved IPC::Run3 0.42
+	- Revised menu structure
+	- Updated to S29-Function.pod revision 24793 to fix some common function docs like say, print ..etc
+
+0.023 2009.1.6
+
+	- Added the lex cache directory cleanup option
+
+0.022 2009.1.5
+
+	- Added S29 function documentation calltips
+	- F2 now launches the S29 documentation in your default browser
+	- requires Syntax::Highlight::Perl6 0.0297
+	- requires Padre 0.24
+
+0.021 2009.1.5
+
+	- S29 function documentation when you hit F2 over a function (or a word)
+
+0.020 2009.1.4
+
+	- Fixed plugin to work with AdamK's r2436 refactoring.
+
+0.019 2009.1.3
+
+	- Implemented manual refresh and selective of Perl 6 syntax highlighter.
+
+0.018 2009.1.3
+
+	- Fixed missing dependency on IPC::Run
+	- Added tests
+
+0.017 2009.1.3
+
+	- Fixed syntax check to work again with Padre-Plugin-Perl6
+	- More stable, one thread solution to ticket:194.
+
+0.016 2009.1.3
+
+	- Possible fix to trac ticket:194, Slow Perl6 syntax highlighting
+
+0.015 2009.1.1
+
+	- differentiate between STD warnings and errors in syntax check (ticket:193)
+	- Requires S::H::P6 version 0.02962 to fix Class:MOP/Moose win32
+	installation failures.
+
+0.014 2008.12.28
+
+	- export html now asks the user if he/she wants to open the HTML in the default browser
+	- Requires Syntax::Highlight::Perl6 version 0.02961
+
+0.013 2008.12.24
+
+	- Added a menu separator before About menu item in Padre::Plugin::Perl6
+	- Another message typo fix in Padre::Document::Perl6
+	- Show an error message box in the following situations:
+		- exporting a non-Perl6 file
+		- STD.pm parsing error occurs
+
+0.012 2008.12.22
+
+	- Added Perl6 Syntax checking.
+	- Handled newlines for Mac/Unix and Win platforms in export feature.
+	- Added Export simple, snippet and full HTML.
+
+0.011 2008.12.21
+
+	- Source cleanup and POD fixes.
+
+0.01  2008.12.20
+
+	- Initial release to CPAN
+	- Support keyword scintilla auto completion
+	- Supports Perl6 highlighting via Syntax::Highlight::Perl6
+	- Moving out from the Padre source code

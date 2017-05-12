@@ -1,0 +1,9 @@
+#debug{margin-top:10px}
+.debugcella{font-family:Courier New;font-size:8pt}
+#tablist{margin-left:0;margin-bottom:0;margin-top:.1em;font:bold 12px Verdana;padding:3px 0}
+#tablist li{list-style:none;display:inline;margin:0}
+#tablist li a{margin-left:3px;border:1px solid #778;border-bottom:none;background:#FFF;padding:3px .5em}
+#tablist li a:link,#tablist li a:visited{color:navy}
+#tablist li a.current{background:#FFFFE0}
+#tabcontentcontainer{width:99%;border:1px solid #000;padding:5px}
+.tabcontent{display:none}

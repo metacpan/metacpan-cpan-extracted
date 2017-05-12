@@ -1,0 +1,24 @@
+Revision history for POE-Component-Syndicator
+
+0.06  Mon Jun 20 08:35:15 GMT 2011
+    - Support non-numeric session IDs
+    - Make warnings fatal
+
+0.05  Wed May 25 06:26:11 GMT 2011
+    - Fix incorrect return value from delay_remove() and the
+      syndicator_delay_removed event
+
+0.04  Fri May 20 12:11:17 GMT 2011
+    - Make it so that register/unregister without arguments are equivalent
+      to passing 'all' as an argument.
+
+0.03  Sat May 14 18:42:39 GMT 2011
+    - Croak if the user tries to supply handlers for the register/unregister
+      events.
+
+0.02  Sat May 14 18:34:26 GMT 2011
+    - Document what a subclass should do in a custom _default handler, and
+      allow it to be specified in object_states when calling new()
+
+0.01  Tue May 3 10:57:44 GMT 2011
+    - First release, excised from the guts of POE::Component::IRC.

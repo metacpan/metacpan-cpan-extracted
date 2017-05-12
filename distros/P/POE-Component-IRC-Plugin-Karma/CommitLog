@@ -1,0 +1,71 @@
+==============================
+9999-99-99 99:99:99 +0000 HEAD
+==============================
+
+  commit 965a407287f575e1e27f97f41c2e1ca0e8062661
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Fri Apr 15 18:32:49 2011 -0700
+  
+    fix regex bug
+
+  commit 9f464a9b4b43c518daf1fd25f8e7cb7fd2bf8786
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Thu Apr 14 08:08:19 2011 -0700
+  
+    add karma stopword
+
+  commit c1d008c1e0db0c86fb5207e5108c2d351e1308ed
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Sat Apr 2 23:16:17 2011 -0700
+  
+    add more todo 
+
+=======================================
+2011-04-02 15:59:51 -0700 release-0.002
+=======================================
+
+  commit 2d24f7803b7c6377f159cce1dc5018d47cf018e0
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Sat Apr 2 15:59:51 2011 -0700
+  
+    New CPAN release of POE-Component-IRC-Plugin-Karma - v0.002
+
+    Released: 2011-04-02 22:59:11 UTC
+
+    Add 'casesens' option to control case-sensitive searching
+
+    Tweak some sqlite pragma for performance
+
+  commit aee9cb62eb0c9b0cf31658132bea7d4467e8fb94
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Sat Apr 2 15:55:14 2011 -0700
+  
+    minor pod tweaks
+
+  commit 0b7f8af67918e7821c4144bba10b3415c836e437
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Sat Apr 2 15:47:39 2011 -0700
+  
+    add case insensitive searching
+
+  commit e20479ab4aaa9c0267c0d71e703a2d9b408a0576
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Sat Apr 2 13:16:05 2011 -0700
+  
+    more strict db debugging
+
+  commit e60c6682609e0db362e1eda0bfd33b6a82d4c931
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Sat Apr 2 13:01:05 2011 -0700
+  
+    add note about sqlite perms
+
+  commit 51812d2f46e66b1726148dc0a751e2d702909334
+  Author: Apocalypse <perl@0ne.us>
+  Date:   Sat Apr 2 12:22:09 2011 -0700
+  
+    add todo note from Hinrik about parsing logic 
+
+===================================
+End of changes in the last 365 days
+===================================

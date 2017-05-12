@@ -1,0 +1,31 @@
+Source: libpostfix-contentfilter-perl
+Section: perl
+Priority: optional
+Maintainer: Debian Perl Group <pkg-perl-maintainers@lists.alioth.debian.org>
+Uploaders: David Zurborg <zurborg@cpan.org>
+Build-Depends: debhelper (>= 8)
+Build-Depends-Indep: libclass-load-perl,
+ libipc-run-perl (>= 0.92),
+ libmodern-perl-perl,
+ libtest-most-perl,
+ libtry-tiny-perl (>= 0.11),
+ perl,
+ perl-modules
+Standards-Version: 3.9.2
+Vcs-Browser: http://anonscm.debian.org/gitweb/?p=pkg-perl/packages/libpostfix-contentfilter-perl.git
+Vcs-Git: git://git.debian.org/pkg-perl/packages/libpostfix-contentfilter-perl.git
+Homepage: http://search.cpan.org/dist/Postfix-ContentFilter/
+
+Package: libpostfix-contentfilter-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends},
+ libclass-load-perl,
+ libipc-run-perl (>= 0.92),
+ libmodern-perl-perl,
+ libtest-most-perl,
+ libtry-tiny-perl (>= 0.11)
+Description: a perl content_filter for postfix
+ Postfix::ContentFilter can be used for content_filter scripts, as described
+ here: http://www.postfix.org/FILTER_README.html.
+ .
+ This description was automagically extracted from the module by dh-make-perl.

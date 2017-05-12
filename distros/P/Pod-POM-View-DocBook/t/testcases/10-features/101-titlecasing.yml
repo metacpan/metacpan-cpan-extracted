@@ -1,0 +1,4 @@
+desc: sectioning with title-casing
+viewoptions:
+  titlecasing: 1
+  preservecase: XYZZY fubar

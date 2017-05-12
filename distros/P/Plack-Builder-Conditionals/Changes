@@ -1,0 +1,18 @@
+Revision history for Perl extension Plack::Builder::Conditionals
+
+0.05 2013-05-19T09:21:03Z
+
+       - fix browser(). (thanks ks0608)
+       - re-packaging with Minilla
+
+0.04    Wed Feb 6 10:21:34 2013
+       - supports IPv6 in addr function
+
+0.03    Fri Feb 18 14:35:36 2011
+        - add method(qw(FOO BAR)) as alternative to method(qr/.../) (hdp)
+
+0.02    Wed Feb 2 13:04:27 2011
+        - added browser function for checking user-agent
+
+0.01    Wed Jul 14 23:49:58 2010
+        - original version

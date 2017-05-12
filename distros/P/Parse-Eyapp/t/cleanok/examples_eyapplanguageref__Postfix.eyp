@@ -1,0 +1,28 @@
+# File examples/eyapplanguageref/Postfix.eyp
+# Compile it with:  eyapp -C Postfix.eyp
+# Execution:        ./Postfix.pm
+%token NUM =/([0-9]+(?:\.[0-9]+)?)/ 
+%token VAR =/([A-Za-z][A-Za-z0-9_]*)/ 
+%right '=' 
+%left '-' '+' 
+%left '*' '/' 
+%left NEG 
+
+%%
+
+line:
+      exp 
+;
+exp:
+      NUM
+    | VAR
+    | VAR '=' exp
+    | exp '+' exp
+    | exp '-' exp
+    | exp '*' exp
+    | exp '/' exp
+    | '-' exp %prec NEG
+    | '(' exp ')'  
+;
+
+%%

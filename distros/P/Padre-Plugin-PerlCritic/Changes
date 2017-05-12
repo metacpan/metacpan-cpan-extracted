@@ -1,0 +1,53 @@
+Revision history for Perl extension Padre-Plugin-PerlCritic.
+
+0.12   2010.12.06
+    - Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+
+0.11   2010.10.29
+    - Removed Test::NeedsDisplay dependency (AZAWAWI)
+
+0.10   2010.10.27
+    - Fixed t/01-menu.t to work under no DISPLAY (AZAWAWI)
+    - t/00-load.t is magically injected by [@PadrePlugin] via [LoadTests] (AZAWAWI)
+
+0.09   2010.10.25
+    - Switched to Dist::Zilla (AZAWAWI)
+    - Fixed t/* to work under no DISPLAY (AZAWAWI)
+    - Added Italian translation (SBLADIN)
+    - Updated Arabic translation (AZAWAWI)
+    - Fixed RT #59680: Module::Install included missing (AZAWAWI)
+
+0.08 Tue Jul 27 2010
+    - Turkish translation updated (BURAK)
+    - Compatibility with latest Padre (CHORNY)
+
+0.07 Tue Mar 02 2010
+    - Changed build to Module::Install
+    - Added integration with config_perlcritic config entry
+    - Added translations:
+      - French (jquelin)
+      - Polish (therek)
+      - Chinese (Traditional) translation (BLUET)
+      - Arabic (azawawi)
+      - Spanish (brunov)
+      - Brazilian Portuguese (garu)
+
+0.06  Sun Feb 01 2009
+    - Update requirement of Padre to 0.26
+    - Update plugin to use API for output window
+
+0.05  Mon Dec 15 2008
+    - Wish the output window would stay in one place
+
+0.04  Mon Nov 24 2008
+    - Adhere to new Padre::Plugin API
+    - Require instead of Use Perl::Critic
+
+0.03  Sat Nov 8 2008
+    - Say something when we don't have anything to say
+
+0.02  Tue Nov 3 2008
+    - We really only need one menu item
+
+0.01  Tue Nov 3 2008
+    - original version

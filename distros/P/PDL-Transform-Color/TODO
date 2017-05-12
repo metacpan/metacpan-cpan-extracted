@@ -1,0 +1,8 @@
+
+- Many of the transforms are awkward and slow using
+  threaded/vectorized expressions.  PP would greatly improve matters.
+  Conversions probably run 3x-10x slower than they could because of this.
+
+- Even using threaded/vectorized expressions, the expressions are
+  better optimized for programmer understanding than for speed.  This probably
+  induces another 2x speed hit over an optimized PP solution.

@@ -1,0 +1,13 @@
+#!/bin/sh -x
+
+echo I HOPE YOU BUMPED THE VERSION NUMBER!!!
+
+perl Makefile.PL PREFIX=$PERL
+rm *.tar.gz
+
+db-backup.pl hindu_courses
+cp /tmp/hindu_courses.pgsql .
+
+make tardist
+pause *.tar.gz
+

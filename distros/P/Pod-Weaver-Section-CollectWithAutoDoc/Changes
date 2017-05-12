@@ -1,0 +1,14 @@
+Revision history for Perl extension Pod-Weaver-Section-CollectWithAutoDoc
+
+1.100980  2010-04-08 16:25:46 Europe/Vienna
+    - prepare_input(): Undefine any UNIVERSAL::AUTOLOAD a loaded module may
+      have defined, as it most likely interferes
+
+1.100881  2010-03-29 21:26:00 Europe/Vienna
+    - helper methods uses =item with C<> to visually distinguish
+    - prepare_input(): don't load the file if it seems to have been already
+      loaded
+    - use $self->log() instead of warning
+
+1.100880  2010-03-29 19:33:48 Europe/Vienna
+     - original version

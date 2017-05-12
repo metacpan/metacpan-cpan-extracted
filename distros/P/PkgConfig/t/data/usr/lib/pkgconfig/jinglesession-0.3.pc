@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/libjingle-0.3
+
+Name: JingleSession
+Description: Jingle Session Library
+Version: 0.3.11
+Requires: jinglebase-0.3 jinglexmllite-0.3 jinglexmpp-0.3 jinglep2p-0.3 
+Libs: -L${libdir} -ljinglesessionphone-0.3 -ljinglesessiontunnel-0.3
+Cflags: -I${includedir}

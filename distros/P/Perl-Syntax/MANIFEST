@@ -1,0 +1,12 @@
+Build.PL
+ChangeLog
+Changes
+MANIFEST			This list of files
+META.json
+META.yml
+Makefile.PL
+README.pod
+lib/Perl/Syntax.pm
+t/01-test.t
+t/bad.pl
+SIGNATURE    Added here by Module::Build

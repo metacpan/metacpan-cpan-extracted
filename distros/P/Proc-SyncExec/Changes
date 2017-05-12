@@ -1,0 +1,17 @@
+Revision history for Perl extension Proc::SyncExec.
+
+1.01  Fri Feb  4 07:00:07 EST 2005
+
+    - Oops, sync_popen_noshell() always returned true.
+    - Oops, sync_*open*() would have allowed a failed close() to clobber
+      a failed exec()'s $!.
+
+1.00  Sat Sep 23 22:26:04 EDT 2000
+
+    - Add a synopsis and tests.
+
+0.01  Wed Aug 13 12:41:00 EDT 1997
+
+    - Initial version.
+
+$Id: Changes,v 1.3 2005/02/04 12:15:56 roderick Exp $

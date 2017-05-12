@@ -1,0 +1,32 @@
+
+0.29   2010.12.06
+        Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+
+0.28   2010.10.29
+        Removed Test::NeedsDisplay dependency (AZAWAWI)
+        Removed Class::Autouse dependency (AZAWAWI)
+
+0.27   2010.10.27
+        Switched to Dist::Zilla (AZAWAWI)
+        Added compatibility with the latest Padre (AZAWAWI)
+        Added Arabic translation (AZAWAWI)
+
+0.26    2010.8.12
+        compatibility with new Padre (CHORNY)
+        add JE (Syntax Check)
+        New module name for JS document (CHORNY)
+        Ability to release on Windows (CHORNY)
+        
+0.25    2009.2.1
+        for Padre 0.26
+
+0.24    2009.1.5
+        for Padre 0.23
+
+0.23    2008.12.19
+        fix Padre::Document::JavaScript get_functions/get_function_regex for Mac
+
+0.22    2008.12.18
+        First release separately from Padre
+        add JavaScrip::Beautifier
+        add JavaScript::Minifier::XS

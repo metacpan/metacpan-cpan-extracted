@@ -1,0 +1,29 @@
+# Linux: OpenSuSE11.3, kernel 2.6.37
+
+UL_GETFSIZE
+UL_SETFSIZE
+UL_GETOPENMAX
+
+# http://h21007.www2.hp.com/portal/download/files/unprot/stk/solaris_stk/impacts/i186.html
+UL_GMEMLIM
+UL_GDESLIM
+UL_GETMAXBRK
+
+# AIX without UL_ ?
+# AIX: ftp://public.dhe.ibm.com/aix/freeSoftware/aixtoolbox/docs/apidiffs.html#ulimit
+GET_FSIZE
+SET_FSIZE
+GET_DATALIM
+SET_DATALIM
+GET_STACKLIM
+SET_STACKLIM
+GET_REALDIR
+SET_REALDIR
+
+# IRIX/ Xenix compatible
+# http://www.cs.arizona.edu/~collberg/Research/Modula-3/m3sources/html/unix/src/irix-5.2/Unix.i3
+UL_GFILLIM
+UL_SFILLIM
+UL_GMEMLIM
+UL_GDESLIM
+UL_GTXTOFF

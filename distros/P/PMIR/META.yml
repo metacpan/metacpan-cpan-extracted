@@ -1,0 +1,13 @@
+abstract: Personally Man, I'd Relax
+author: "Ingy d\xC3\xB6t Net"
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: PMIR
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  perl: 5.6.1
+version: 0.01

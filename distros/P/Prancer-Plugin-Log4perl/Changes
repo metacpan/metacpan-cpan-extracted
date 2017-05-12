@@ -1,0 +1,9 @@
+Revision history for Perl extension Prancer::Plugin::Log4perl
+
+1.00 Fri Dec 12 17:01:22 UTC 2014
+	- Initial release.
+
+1.01 Wed Dec 24 04:55:36 UTC 2014
+	- Removing invalid pre-req.
+	- Fixing perldoc.
+	- Fixing example code.

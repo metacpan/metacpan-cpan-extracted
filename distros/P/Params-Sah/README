@@ -1,0 +1,182 @@
+SYNOPSIS
+
+     use Params::Sah qw(gen_validator);
+    
+     # for subroutines that accept positional parameters
+     sub mysub1 {
+         state $validator = gen_validator('str*', 'int');
+         $validator->(\@_);
+     }
+    
+     # for subroutines that accept named parameters
+     sub mysub2 {
+         my %args = @_;
+    
+         state $validator = gen_validator({named=>1}, name=>'str*', age=>'int');
+         $validator->(\%args);
+     }
+
+    Examples for more complex schemas:
+
+     gen_validator(
+         {named => 1},
+         name => ['str*', min_len=>4, match=>qr/\S/],
+         age  => ['int', min=>17, max=>120],
+     );
+
+    Validator generation options:
+
+     # default is to 'croak', valid values include: carp, die, warn, bool, str
+     gen_validator({on_invalid=>'croak'}, ...);
+
+DESCRIPTION
+
+    This module provides a way for functions to validate their parameters
+    using Sah schemas.
+
+    The interface is rather different than Params::Validate because it
+    returns a validator code instead of directly validating parameters. The
+    returned validator code is the actual routine that performs parameters
+    checking. This is done for performance reason. For efficiency, you need
+    to cache this validator code instead of producing them at each function
+    call, thus the use of state variables.
+
+    Performance is faster than Params::Validate, since you can avoid
+    recompiling specification or copying array/hash twice. Sah also
+    provides a rich way to validate data structures.
+
+FUNCTIONS
+
+    None exported by default, but exportable.
+
+ gen_validator([\%opts, ] ...) => code
+
+    Generate code for subroutine validation. It accepts an optional hashref
+    as the first argument for options. The rest of the arguments are Sah
+    schemas that correspond to the function parameters in the same
+    position, i.e. the first schema will validate the function's first
+    argument, and so on. Example:
+
+     gen_validator('schema1', 'schema2', ...);
+     gen_validator({option=>'val', ...}, 'schema1', 'schema2', ...);
+
+    Will return a coderef which is the validator code. The code accepts an
+    arrayref (usually \@_).
+
+    Known options:
+
+      * named => bool (default: 0)
+
+      If set to true, it means we are generating validator for subroutine
+      that accepts named parameters (e.g. f(name=>'val', other=>'val2'))
+      instead of positional (e.g. f('val', 'val2')). The validator will
+      accept the parameters as a hashref. And the arguments of
+      gen_validator are assumed to be a hash of parameter names and schemas
+      instead of a list of schemas, for example:
+
+       gen_validator({named=>1}, arg1=>'schema1', arg2=>'schema2', ...);
+
+      * on_invalid => str (default: 'croak')
+
+      What should the validator code do when function parameters are
+      invalid? The default is to croak (see Carp) to report error to STDERR
+      from the caller perspective. Other valid choices include: warn, carp,
+      die, bool (return false on invalid, or true on valid), str (return an
+      error message on invalid, or empty string on valid).
+
+PERFORMANCE NOTES
+
+    Sample benchmark against Params::Validate:
+
+    #EXAMPLE: devscripts/bench
+
+    Sample benchmark result on my laptop:
+
+                                       Rate P::V, named, str+int P::V, pos, str+int P::V, pos, str P::Sah, named, str+int P::Sah, pos, str+int P::Sah, pos, str
+     P::V, named, str+int    77993.2+-0.14/s                   --             -28.3%         -72.3%                 -83.0%               -90.7%           -92.9%
+     P::V, pos, str+int        108710+-140/s         39.38+-0.18%                 --         -61.4%                 -76.3%               -87.0%           -90.1%
+     P::V, pos, str            281590+-530/s        261.04+-0.68%      159.03+-0.59%             --                 -38.6%               -66.4%           -74.4%
+     P::Sah, named, str+int    458440+-180/s               487.8%      321.71+-0.57%   62.81+-0.31%                     --               -45.2%           -58.3%
+     P::Sah, pos, str+int      837250+-880/s          973.5+-1.1%        670.2+-1.3%  197.33+-0.64%            82.63+-0.2%                   --           -23.9%
+     P::Sah, pos, str       1.0997e+06+-24/s              1310.0%        911.6+-1.3%  290.54+-0.73%                 139.9%         31.35+-0.14%               --
+
+FAQ
+
+ How do I learn more about Sah (the schema language)?
+
+    See the specification: Sah. The Sah::Examples distribution also
+    contains more examples. Also, for other examples, lots of my
+    distributions contain Rinci metadata which includes schemas for each
+    function arguments.
+
+ Why does the validator code accept arrayref/hashref instead of array/hash?
+
+    To be able to modify the original array/hash, e.g. set default value.
+
+ How to give default value to parameters?
+
+    By using the Sah default clause:
+
+     gen_validator(['str*', default=>'green']);
+
+ Why is my program failing with error message: Can't call method "state" on
+ an undefined value?
+
+    You need to use Perl 5.10 or newer and enable the 5.10 feature 'state':
+
+     use 5.010;
+
+    or:
+
+     use feature 'state';
+
+ How do I see the validator code being generated?
+
+    Set $Params::Sah::DEBUG=1 before gen_validator(), for example:
+
+     use Params::Sah qw(gen_validator);
+    
+     $Params::Sah::DEBUG = 1;
+     gen_validator('int*', 'str');
+
+    Sample output:
+
+       1|sub(\@) {
+       2|    my $_ps_args = shift;
+       3|    my $_ps_res;
+        |
+        |
+       6|    ### validating 0:
+       7|    no warnings 'void';
+       8|    my $_sahv_dpath = [];
+       9|    Carp::croak("arg0: $_ps_res") if !(    # req #0
+      10|    ((defined($_ps_args->[0])) ? 1 : (($_ps_res //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Required but not specified"),0))
+        |
+      12|    &&
+        |
+      14|    # check type 'int'
+      15|    ((Scalar::Util::Numeric::isint($_ps_args->[0])) ? 1 : (($_ps_res //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type integer"),0)));
+        |
+        |
+      18|    ### validating 1:
+      19|    Carp::croak("arg1: $_ps_res") if !(    # skip if undef
+      20|    (!defined($_ps_args->[1]) ? 1 :
+        |
+      22|    (# check type 'str'
+      23|    ((!ref($_ps_args->[1])) ? 1 : (($_ps_res //= (@$_sahv_dpath ? '@'.join("/",@$_sahv_dpath).": " : "") . "Not of type text"),0)))));
+      24|    return;
+        |
+      26|};
+
+SEE ALSO
+
+    Sah, Data::Sah
+
+    Params::Validate
+
+    Perinci::Sub::Wrapper, if you want to do more than parameter
+    validation.
+
+    Perinci::Sub::ValidateArgs and Data::Sah::Params, an accidental
+    reimplementation of the same idea a year later :-)
+

@@ -1,0 +1,96 @@
+# NAME
+
+Plack::Middleware::Debug::Profiler::NYTProf - Runs NYTProf on your app
+
+## SYNOPSIS
+
+    use Plack::Builder;
+
+    my $app = ...; ## Build your Plack App
+
+    builder {
+        enable 'Debug', panels =>['Profiler::NYTProf'];
+        $app;
+    };
+
+    # or with options
+
+    builder {
+        enable 'Debug', panels => [
+            [
+                'Profiler::NYTProf',
+                base_URL => 'http://example.com/NYTProf',
+                root     => '/path/to/NYTProf',
+                minimal  => 1,
+            ]
+        ];
+        $app;
+    };
+
+
+
+# DESCRIPTION
+
+Adds a debug panel that runs and displays Devel::NYTProf on your perl source
+code.
+
+# OPTIONS
+
+This debug panel defines the following options.
+
+## root
+
+Where to store nytprof.out and nytprofhtml output (default: '/tmp').
+
+## base_URL
+
+By default, this module will grab requests with the string __nytprofhtml__ to
+the server, and deliver the reports with Plack::App::File. If instead you don't
+want to serve the reports from the same server you're debugging, then you can
+set this option to the URL where the __root__ folder above can be reached.
+
+## exclude
+
+List of excluded paths (default: [qw(.*\.css .*\.png .*\.ico .*\.js)]).
+
+## minimal
+
+By default, __nytprofhtml__ will generate graphviz .dot files and
+block/sub-level reports. Setting this to a true value will disable this
+behaviour and make __nytprofhtml__ considerably faster.
+
+## no_merge_evals
+
+By defaut, __nytprofhtml__ will merge string evals in the reports. Setting this
+to a true value will disable this behaviour. __Warning__: this will make
+__nytprohtml__ considerably slower, and might timeout the HTTP request.
+
+# Environment Variable
+
+## NYTPROF
+
+You can customize Devel::NYTProf's behaviour by setting the __NYTPROF__
+environment variable as specified in its documentation. However, this module
+requires the following to hold:
+
+### addpid=1
+
+### start=begin
+
+# SEE ALSO
+
+[Plack::Middleware::Debug](http://search.cpan.org/perldoc?Plack::Middleware::Debug)
+[Devel::NYTProf](http://search.cpan.org/perldoc?Devel::NYTProf)
+
+# AUTHOR
+
+Sebastian de Castelberg, `<sdecaste@cpan.org>`
+
+# CONTRIBUTORS
+
+Nuba Princigalli, `<nuba@cpan.org>`
+
+# COPYRIGHT & LICENSE
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

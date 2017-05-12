@@ -1,0 +1,17 @@
+#!/usr/local/bin/perl -w
+use strict;
+use PPresenter;
+
+# The next line creates a presentation (object).  All things you add will
+# refer to this object.
+my $show = PPresenter->new
+   ( -name   => 'name of the presentation'
+   );
+
+# Add here: change the defaults.
+
+# Add here:  your slides.
+
+# Now, the show is ready to be run.
+$show->run;
+

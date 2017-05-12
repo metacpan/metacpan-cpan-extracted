@@ -1,0 +1,18 @@
+Build.PL
+Changes
+eg/app.psgi
+eg/static/css/main.css
+lib/Plack/Middleware/AutoReloadCSS.pm
+MANIFEST			This list of files
+t/00_compile.t
+t/01_insert.t
+xt/01_podspell.t
+xt/02_perlcritic.t
+xt/03_pod.t
+xt/04_minimum_version.t
+xt/05_cpan_meta.t
+xt/06_meta_author.t
+README
+LICENSE
+META.yml
+META.json

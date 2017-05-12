@@ -1,0 +1,67 @@
+=begin ikiwiki
+
+[[toc levels=3]]
+
+=end ikiwiki
+
+=head1 NAME 
+
+This is the document's title.
+
+=head2 Example 
+
+This is a I<very> simple text example.
+
+There are several options, but for a more descriptive information about the
+methods, see L<the man page|Pod::Parser>:
+
+=begin not_include
+
+This paragraph will be ignored.
+
+=end not_include 
+
+=over
+
+=item * One
+
+=item * Two
+
+    This paragraph will be a verbatim text.
+
+=item * Three
+
+=back
+
+=head3 Subsection 
+
+In the following paragraph i've included some special sequences.
+
+Text in B<bold>, I<italic> or C<monospaced>.
+
+Please, visit L<http://google.com> for more info.
+
+=head2 Another section
+
+=over 
+
+=item *   This is a list item with two paragraphs.
+
+This is the second paragraph in the list item. 
+
+With a sublist: 
+
+=over 
+
+=item 1. One ordered sublist 
+
+=item 1. Another B<item>
+
+=back 
+
+=item * Another item in the first list.
+
+=back
+
+=for ikiwiki See also [[my_other_page|path/to/other/page]] and enjoy.
+

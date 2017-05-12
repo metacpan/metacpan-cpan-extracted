@@ -1,0 +1,24 @@
+setPage
+	1
+	RESET
+	yellow
+	"This is an example of a simple sign command parser."
+	blank
+	chain(2)
+
+setPage
+	2
+	RESET
+	green
+	"Using this tool, you can easily access all of the Prolite "
+	"sign's functionality and experiment with it."
+	blank
+	chain(3)
+
+setPage
+	3
+	"Yippee!"
+	blank
+	chain(1)
+
+

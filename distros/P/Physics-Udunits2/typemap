@@ -1,0 +1,41 @@
+TYPEMAP
+uu2System *  O_SYSTEM_OBJECT
+uu2Unit * O_UNIT_OBJECT
+uu2Converter * O_CONVERTER_OBJECT
+  
+INPUT
+O_SYSTEM_OBJECT
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+            $var = INT2PTR($type,SvIV((SV*)SvRV( $arg )));
+    else{
+            warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+            XSRETURN_UNDEF;
+    }
+
+O_UNIT_OBJECT
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+            $var = INT2PTR($type,SvIV((SV*)SvRV( $arg )));
+    else{
+            warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+            XSRETURN_UNDEF;
+    }
+
+O_CONVERTER_OBJECT
+    if( sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG) )
+            $var = INT2PTR($type,SvIV((SV*)SvRV( $arg )));
+    else{
+            warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+            XSRETURN_UNDEF;
+    }
+
+
+OUTPUT
+O_SYSTEM_OBJECT
+    sv_setref_pv( $arg, (char *)\"Physics::Udunits2::System\", (void*)$var );
+
+O_UNIT_OBJECT
+    sv_setref_pv( $arg, (char *)\"Physics::Udunits2::Unit\", (void*)$var );
+
+O_CONVERTER_OBJECT
+    sv_setref_pv( $arg, (char *)\"Physics::Udunits2::Converter\", (void*)$var );
+    

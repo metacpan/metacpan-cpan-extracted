@@ -1,0 +1,49 @@
+SYNOPSIS
+
+     # in app.psgi
+     use Plack::Builder;
+    
+     builder {
+        enable 'AccessLog::Structured',
+           extra_field => {
+             'pt.cpu-user' => 'CPU-User-Time',
+             'pt.cpu-sys'  => 'CPU-Sys-Time',
+           };
+    
+        enable 'ProcessTimes';
+    
+        $app
+     };
+
+DESCRIPTION
+
+    Plack::Middleware::ProcessTimes defines some environment values based
+    on the "times" in perlfunc function. The following values are defined:
+
+      * pt.real - Actual recorded wallclock time
+
+      * pt.cpu-user
+
+      * pt.cpu-sys
+
+      * pt.cpu-cuser
+
+      * pt.cpu-csys
+
+    Look up times(2) in your system manual for what these all mean.
+
+CONFIGURATION
+
+ measure_children
+
+    Setting measure_children to true will "waitpid" in perlfunc for
+    children so that child times can be measured. If set responses will be
+    somewhat slower; if not set, the headers will be set to -.
+
+THANKS
+
+    This module was originally written for Apache by Randal L. Schwartz
+    <merlyn@stonehenge.com> for the ZipRecruiter
+    <https://www.ziprecruiter.com/> codebase. Thanks to both Randal and
+    ZipRecruiter for allowing me to publish this module!
+

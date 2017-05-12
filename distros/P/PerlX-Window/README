@@ -1,0 +1,106 @@
+NAME
+    PerlX::Window - sliding windows on a string or array
+
+SYNOPSIS
+       use feature qw(say);
+       use PerlX::Window;
+   
+       my $string = "Foobar";
+   
+       while (defined window $string, 3)
+       {
+          say $window;  # says "Foo"
+                        # says "oob"
+                        # says "oba"
+                        # says "bar"
+       }
+
+DESCRIPTION
+    This module provides a sliding window over a long string or array. It
+    exports two functions `window` and `window_pos`, and two variables $window
+    and @window.
+
+    `window $string, $length`
+        Calling this function returns the current window onto the string, and
+        increments the stored position. The window returned is an *lvalue*
+        which means you can assign to it (like `substr`).
+
+        Once the string has been exhausted, it returns `undef` (or in list
+        context, the empty list), and resets the stored position for the
+        string.
+
+    `window @array, $length`
+        Like the string version, but instead of operating on a substring of a
+        string, operates on a slice of an array.
+
+    `window_pos $string`
+        Returns the position of the most recent window onto the string; a
+        zero-indexed integer.
+
+    `window_pos @array`
+        Returns the position of the most recent window onto the array; a
+        zero-indexed integer.
+
+    `window_pos`
+        Called with no arguments, defaults to the string or array from the
+        most recent call to `window`.
+
+    $window
+        An alias to the current window onto the string that has most recently
+        had `window` called upon it.
+
+        $window is implemented using Variable::Magic if installed, and a tie
+        otherwise.
+
+    @window
+        An alias to the current window onto the array that has most recently
+        had `window` called upon it.
+
+        You may not assign to this in list context, nor perform `pop`, `push`,
+        `shift`, `unshift`, or `slice` operations on it, nor any other
+        operation that would change the length of the array. You may however
+        assign to indexes within the array:
+
+           $window[0] = "Fee" if $window[0] eq "Foo";
+
+        @window is implemented using a tie.
+
+CAVEATS
+    `window` is prototyped `(\[$@]$)` which means that the first argument must
+    be a literal scalar or array variable, and `window` will actually fetch a
+    reference to that variable. This means the following are not the same:
+
+       my $tmp = "Foobar";
+       say $window
+          while window $tmp, 3;
+
+       say $window
+          while window my $tmp = "Foobar", 3;
+
+    The second example says "Foo" infinitely because $tmp is redefined in each
+    loop, so is a separate variable as far as `window` is concerned.
+
+    This module currently requires Perl 5.16, though I believe that
+    backporting it to Perl 5.8 is feasible.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=PerlX-Window>.
+
+SEE ALSO
+    Data::Iterator::SlidingWindow.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,47 @@
+---
+abstract: 'PreForking support for SimpleHTTP'
+author:
+  - 'Apocalypse <APOCAL@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  POE::Component::Client::HTTP: 0.82
+  POE::Filter::HTTP::Parser: 1.06
+  Test::More: 0.47
+  Test::POE::Client::TCP: 0.1
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-Server-SimpleHTTP-PreFork
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  POE::Component::Server::SimpleHTTP::PreFork:
+    file: lib/POE/Component/Server/SimpleHTTP/PreFork.pm
+    version: 2.10
+requires:
+  Carp: 0
+  HTTP::Date: 0
+  HTTP::Request: 0
+  HTTP::Response: 0
+  IPC::Shareable: 0
+  Moose: 0.9
+  MooseX::POE: 0.205
+  POE: 1.0000
+  POE::Component::Server::SimpleHTTP: 2.04
+  Socket: 0
+  Storable: 0
+  Sys::Hostname: 0
+  perl: 5.6.0
+resources:
+  homepage: https://github.com/bingos/poe-component-server-simplehttp-prefork/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/bingos/poe-component-server-simplehttp-prefork.git
+version: 2.10

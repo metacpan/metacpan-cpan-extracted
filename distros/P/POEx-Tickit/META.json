@@ -1,0 +1,48 @@
+{
+   "abstract" : "use C<Tickit> with C<POE>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POEx-Tickit",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "POE" : "0",
+            "Tickit" : "0.32"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::HexString" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "POEx::Tickit" : {
+         "file" : "lib/POEx/Tickit.pm",
+         "version" : "0.04"
+      },
+      "POEx::Tickit::Driver" : {
+         "file" : "lib/POEx/Tickit/Driver.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

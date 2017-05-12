@@ -1,0 +1,9 @@
+ChangeLog               	Change log 
+README				A readme file
+MANIFEST                	This file
+Makefile.PL             	Makefile maker
+lib/Proc/Fork/Control.pm	The module
+LICENSE           	     	This modules LICENSE policy
+t/00basic.t             	A simple test
+META.yml                	Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

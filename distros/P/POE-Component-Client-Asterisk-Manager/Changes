@@ -1,0 +1,35 @@
+Revision history for Perl extension POE::Component::Client::Asterisk::Manager
+
+0.08 Sun Jan 06 2008
+    - Added tests to the manifest
+
+0.07 Wed Jan 02 2008
+    - Applied patches from Andrew Ruthven, and Paul Williams
+    - rt.cpan.28103, rt.cpan.13586
+
+0.06 Thu May 12 2005
+	- overhauled the ugly code
+	- removed INT handling, it wasn't doing anything
+	- added Aefirion
+	- improved docs
+	
+0.05 Thu Oct 28 2004
+	- added an undocumented param: requeue_posts
+
+0.04 Tue Oct 12 2004
+	- added :all to callbacks to catch all events
+	- fixed the docs
+	- added simple compile test
+	- depricated external dependency on POE::Filter::Asterisk::Manager (to be removed)
+	- added above mentioned filter to Manger.pm
+	- found a bug, events fired weren't getting anything in ARG0
+
+0.03 Mon Nov 24 2003
+	- debug flag change
+
+0.02 Fri Sep 05 2003
+	- removed test script until I can finish it
+	- change Digest::MD5 version requirement to 2.20 instead of 2.25
+
+0.01 Thu Sep 04 2003
+	- first externally released version.

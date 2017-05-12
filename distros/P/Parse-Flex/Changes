@@ -1,0 +1,34 @@
+Revision history for Perl extension Parse::Flex.
+
+0.12  Sat Jul 26 22:42:17 2008
+	- Fixed license and meta files
+	- Disabled test 05_default.t
+
+0.11  Tue Feb 21 21:56:48 2006
+	- Added facade functions for Parse::Yapp
+
+0.10  Wed Feb 15 09:21:01 2006
+	- Major changes
+	- New api, new package layout, new docs
+	- Old functionality has completely changed. The new
+	  way is to generate a custom lexer via a script.
+
+0.04  Sat Feb 11 10:13:11 2006
+	- Renamed src/default.c to src/default.l, and made it work
+	  with Flex 2.5, the re-entrant version.
+	- Renamed yyylex() to yylex() .
+
+0.03  Sat Nov  9 11:03:01 2003
+	- Enhanced documentation
+	- Faster loading of module
+	- General cleanup of dist files
+
+0.02  Fri Nov  8 00:02:05 2003
+	- Removed 2nd of test since it should only work on my machine
+	- Minor changes not worthy to announce
+	- Fixed manifest file
+
+0.01  Thu Nov  6 16:41:35 2003
+	- original version; created by h2xs 1.21 with options
+		-A -P -O Parse::Flex
+

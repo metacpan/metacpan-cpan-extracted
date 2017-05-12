@@ -1,0 +1,19 @@
+use strict;
+use warnings;
+use Inline::Rakudo;
+
+my $rakudo = Inline::Rakudo->rakudo;
+my $code  = <<'END_CODE';
+	sub f($n) {
+		return $n+1;
+	}
+END_CODE
+
+# compile the code
+$rakudo->run_code($code);   
+
+# run the code (the answer should be 42)
+my $answer = $rakudo->run_code('f(41)');
+
+# provide the parameters separately
+my $other = $rakudo->run_sub('f', 41);

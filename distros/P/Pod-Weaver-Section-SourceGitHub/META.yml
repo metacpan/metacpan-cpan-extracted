@@ -1,0 +1,27 @@
+---
+abstract: 'Add SOURCE pod section for a github repository'
+author:
+  - 'Michael Schout <mschout@cpan.org>'
+build_requires:
+  Module::Signature: 0
+  Socket: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Weaver-Section-SourceGitHub
+requires:
+  Dist::Zilla: 4.101800
+  Moose: 0
+  Moose::Autobox: 0
+  Pod::Weaver::Role::Section: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-Section-SourceGitHub
+  homepage: http://search.cpan.org/dist/Pod-Weaver-Section-SourceGitHub/
+  repository: git://github.com/mschout/pod-weaver-section-sourcegithub.git
+version: 0.54

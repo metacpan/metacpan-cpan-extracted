@@ -1,0 +1,60 @@
+POE-Component-IRC-Plugin-FTP-EasyUpload
+
+DESCRIPTION
+
+Being a bot herder as I am I often needed to upload some file there
+somewhere and post a link to IRC so other users could grab the file...
+So here it is, FTP uploading plugin which watches for special "tags" in
+the outgoing messages which tell it to upload certain file.
+
+B<Note:> uploading is done in a B<non-blocking> way, keep that in mind
+in case you'd want to send some messages in a certain sequence.
+
+HOW DOES IT WORK
+
+Process is simple. Your "tag" is a regex with one to three capturing
+parentheses (see C<tag> argument to constructor). Based on those captures
+the specified file will be uploaded to a specified directory and the
+"tag" will be replaced by the URI pointing to that file. After all that
+message will be sent where it was supposed to go.
+
+The plugin watches for "tags" in C<privmsg> and C<notice> message.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc POE::Component::IRC::Plugin::FTP::EasyUpload
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-IRC-Plugin-FTP-EasyUpload
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/POE-Component-IRC-Plugin-FTP-EasyUpload
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/POE-Component-IRC-Plugin-FTP-EasyUpload
+
+    Search CPAN
+        http://search.cpan.org/dist/POE-Component-IRC-Plugin-FTP-EasyUpload
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Zoffix Znet
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

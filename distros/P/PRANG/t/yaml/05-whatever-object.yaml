@@ -1,0 +1,13 @@
+--- !!perl/hash:Octothorpe
+# this is another use case for "Whatever" - throwing arbitrary PRANG
+# classes in the slot values and expecting them to serialise as if they
+# were expected there.  This test will not round-trip ( NO_ROUNDTRIP )
+colon: ''
+question_mark: !!perl/hash:PRANG::XMLSchema::Whatever
+  contents:
+    - !!perl/hash:Ampersand
+       interpunct: 42
+  nodenames:
+    - sugar
+  nodenames_ns:
+    - 'uri:type:Z'

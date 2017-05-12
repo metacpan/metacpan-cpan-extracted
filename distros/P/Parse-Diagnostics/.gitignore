@@ -1,0 +1,19 @@
+# Generated from Makefile.PL
+Makefile
+Makefile.old
+Makefile.bak
+# Ignore distribution files.
+Parse-Diagnostics-[0-9]*/
+Parse-Diagnostics-[0-9]*.tar.gz
+# Ignore outputs of XS compilation.
+Diagnostics.c
+Diagnostics.bs
+# Ignore Perl compilation files.
+pm_to_blib
+blib/*
+MYMETA.*
+META.*
+ppport.h
+lib/Parse/Diagnostics.pod
+MANIFEST
+README

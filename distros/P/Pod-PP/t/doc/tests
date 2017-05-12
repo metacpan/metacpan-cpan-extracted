@@ -1,0 +1,75 @@
+#
+# $Id: tests,v 0.1 2001/04/25 10:41:49 ram Exp $
+#
+#  Copyright (c) 2000-2001, Raphael Manfredi
+#  
+#  You may redistribute only under the terms of the Artistic License,
+#  as specified in the README file that comes with the distribution.
+#
+# HISTORY
+# $Log: tests,v $
+# Revision 0.1  2001/04/25 10:41:49  ram
+# Baseline for first Alpha release.
+#
+# $EndLog$
+#
+
+==pp define DIR		/var/tmp
+==pp include "h/def.pp"
+
+=pp ifdef DIR
+
+DIR defined
+
+=pp else
+
+Bug #1!!
+
+=pp endif
+
+=pp ifndef DEF_DIR
+
+Bug #2!!
+
+=pp else
+
+==pp define X 3
+==pp define Y 4
+==pp define Z 5
+
+=pp endif
+
+=pp if (X*X + Y*Y) == Z*Z
+
+Fermat OK for dim=2
+
+=pp else
+
+Fermat FAILED
+
+=pp endif
+
+=pp if X == 0
+
+Bug #3!!
+
+=pp elif X == 3
+
+X = 3
+
+=pp else
+
+Bug #4!!
+
+=for pp endif
+
+=for pp ifndef IS_NOT_DEFINED
+
+ifndef works
+
+=pp else
+
+Bug #5!!
+
+=pp endif
+

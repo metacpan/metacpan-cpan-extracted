@@ -1,0 +1,64 @@
+Perl::Visualize version 1.02
+============================
+
+Perl::Visualize generates GIF/Perl polyglots.  A polyglot is a program
+that can be validly executed by multiple interpreters.  Usually,
+polyglots are written in multiple *programming* languages -
+Perl::Visualize is slightly different in that one of the languages
+being generated is GIF - a format ordinarily used to encode images.
+See perldoc for Perl::Visualize for more information.
+
+SYNOPSIS
+
+  # In program
+  use Perl::Visualize qw/etch paint/;
+  etch "larry.gif", "larrysig.gif", 'print "This is Larry Wall\n"';
+  etch "nagra.gif", "nagraview.gif", 'exec "/usr/bin/display $0"';
+  paint "damian.gif", "poetic-damian.gif", <<EOF;
+  use Coy;
+  Recite war "poetry";
+  EOF
+
+  # Sometime later
+  bash$ perl larrysig.gif
+  This is Larry Wall
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Although this module does not require any other module to function
+correctly, some of the examples included rely on other modules.  In
+particular, the examples involving Piet require Piet::Interpreter and
+the "99 bottles of beer example" requires perlmagick to be installed.
+In fact, because using Perl::Visualize will result in the user wanting
+to manipulate images, it is highly recommended that imagemagick and
+perlmagick be installed to make full explore the module fully.
+
+ACKNOWLEDGMENTS
+
+I would like to thank Christian Collberg for not dissuading me from
+writing this module. :-)
+
+AUTHOR
+
+Jasvir Nagra, <http://www.cs.auckland.ac.nz/~jas>
+
+AVAILABILITY
+
+Perl::Visualize has been uploaded to the CPAN and is also available
+from http://www.cs.auckland.ac.nz/~jas/downloads/Perl-Visualize.tar.gz
+
+COPYRIGHT AND LICENCE
+
+   Copyright (c) 2003, Jasvir Nagra. All Rights Reserved.
+ This module is free software. It may be used, redistributed
+and/or modified under the terms of the Perl Artistic License
+     (see http://www.perl.com/perl/misc/Artistic.html)

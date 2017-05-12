@@ -1,0 +1,19 @@
+Changes
+Haru.xs
+Makefile.PL
+MANIFEST
+README
+typemap
+t/PDF-Haru.t
+lib/PDF/Haru.pm
+examples/text_demo.pl
+examples/text_demo.pdf
+examples/text_demo2.pl
+examples/text_demo2.pdf
+examples/line_demo.pl
+examples/line_demo.pdf
+examples/jpeg_demo.pl
+examples/jpeg_demo.pdf
+examples/images/gray.jpg
+examples/images/rgb.jpg
+META.yml                                 Module meta-data (added by MakeMaker)

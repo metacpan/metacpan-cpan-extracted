@@ -1,0 +1,39 @@
+---
+abstract: 'make files and directories as scaffolding'
+author:
+  - 'Shoichi Kaji <skaji@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Path-Maker
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Path::Maker:
+    file: lib/Path/Maker.pm
+    version: '0.004'
+requires:
+  Data::Section::Simple: '0.07'
+  Text::MicroTemplate::File: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/shoichikaji/Path-Maker/issues
+  homepage: https://github.com/shoichikaji/Path-Maker
+  repository: git://github.com/shoichikaji/Path-Maker.git
+version: '0.004'

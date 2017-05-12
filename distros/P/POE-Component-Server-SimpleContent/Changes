@@ -1,0 +1,29 @@
+==================================================
+Changes from 2012-03-02 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.16 at 2017-03-01 21:48:14 +0000
+-----------------------------------------
+
+  Change: f21b4c9927d4b9e1e790d185ec6f9d088bb58e0f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-03-01 21:48:14 +0000
+
+    Various changes:
+
+    - Switch dist to Dist::Zilla
+
+    - Fix examples/simple.pl
+
+    - Switch to File::LibMagic as optional mimeification determiner 
+
+  Change: 9fb680b6a1939205df78995d3fb40300e80b9258
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-03-31 16:28:40 +0000
+
+    Initial git import 
+
+================
+End of releases.
+================

@@ -1,0 +1,9 @@
+Revision history for Perl extension PAR::Indexer.
+
+0.91     Tue Feb  3 17:56 2009
+    - Add dependency-from-meta function.
+
+0.90     Tue Sep  2 15:13 2008
+    - original version, as split out from
+      PAR::Repository
+

@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+use Pod::Site;
+Pod::Site->go;
+
+=head1 Name
+
+podsite - Build browsable HTML documentation for your app
+
+=head1 Usage
+
+  podsite --name App                      \
+          --doc-root /path/to/output/html \
+          --base-uri /browser/base/uri    \
+          /path/to/perl/libs              \
+          /path/to/perl/bins
+
+=head1 Options
+
+  -d --doc-root DIRECTORY   Browser document root
+  -u --base-uri URI         Browser base URI
+  -n --name NAME            Site name
+  -t --versioned-title      Include main module version number in title
+  -l --label LABEL          Label to append to site title
+  -m --main-module MODULE   Primary module for the documentation
+  -s --sample-module MODULE Module to use for sample links
+  -i --index-file FILENAME  File name for index file
+  -c --css-path PATH        Path to CSS file
+  -j --js-path PATH         Path to CSS file
+     --replace-css          Replace existing CSS file
+     --replace-js           Replace existing JavaScript file
+     --favicon-uri URI      Add a favicon linking to the given URI
+  -V --verbose              Incremental verbose mode.
+  -h --help                 Print a usage statement and exit.
+  -M --man                  Print the complete documentation and exit.
+  -v --version              Print the version number and exit.
+
+=head1 Author
+
+David E. Wheeler <david@justatheory.com>
+
+=head1 Copyright and License
+
+Copyright (c) 2004-2015 David E. Wheeler. Some Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+

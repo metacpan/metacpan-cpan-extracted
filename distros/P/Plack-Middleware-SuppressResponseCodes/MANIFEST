@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Plack/Middleware/SuppressResponseCodes.pm
+t/00_compile.t
+t/10_codes.t
+t/20_streaming.t

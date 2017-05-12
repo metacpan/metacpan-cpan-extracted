@@ -1,0 +1,67 @@
+NAME
+    Pod::Weaver::PluginBundle::ReplaceBoilerplate - A Pod::Weaver bundle for
+    replacing the boilerplate in a Pod document.
+
+VERSION
+    version 1.00
+
+OVERVIEW
+    This is a plugin bundle intended to replace use of [@Default] with
+    equivilent behaviour but with Pod::Weaver::Role::SectionReplacer enabled
+    plugins.
+
+    It is nearly equivalent to the following:
+
+      [@CorePrep]
+
+      [ReplaceName]
+      [ReplaceVersion]
+
+      [Leftovers]
+
+      [ReplaceAuthors]
+      [ReplaceLegal]
+
+INSTALLATION
+    To install this module, run the following commands:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+SUPPORT AND DOCUMENTATION
+    After installing, you can find documentation for this module with the
+    perldoc command.
+
+      perldoc Pod::Weaver::PluginBundle::ReplaceBoilerplate
+
+    You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Pod-Weaver-PluginBundle-Rep
+        laceBoilerplate
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Pod-Weaver-PluginBundle-ReplaceBoilerplate
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Pod-Weaver-PluginBundle-ReplaceBoilerp
+        late
+
+    Search CPAN
+        http://search.cpan.org/dist/Pod-Weaver-PluginBundle-ReplaceBoilerpla
+        te/
+
+AUTHOR
+    Sam Graham <libpod-weaver-pluginbundle-replaceboilerplate-perl BLAHBLAH
+    illusori.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Sam Graham
+    <libpod-weaver-pluginbundle-replaceboilerplate-perl BLAHBLAH
+    illusori.co.uk>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

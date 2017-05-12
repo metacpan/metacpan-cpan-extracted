@@ -1,0 +1,7 @@
+t-node $n :=
+[ a/lex.rf a-node $l := [  ],
+     a/aux.rf a-node $a :=
+     [ afun ~ "Aux[CP]" ] ];
+  >> give concat( lower($a.m/form), ' + ' over $n sort by $a.ord ) &
+     ' + ' & substr($l.m/tag ,4,1)
+  >> for $1 give $1,count()

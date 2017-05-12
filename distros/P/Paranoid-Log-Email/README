@@ -1,0 +1,8 @@
+Paranoid::Log::Email
+====================
+
+  This module provides SMTP support from within the Paranoid::Log 
+framework.
+
+  Please send bugs, requests, and flames to Arthur Corliss
+<corliss@digitalmages.com>.

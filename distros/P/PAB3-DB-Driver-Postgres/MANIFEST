@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Postgres.pm
+Postgres.xs
+my_postgres.c
+my_postgres.h
+copy_dlls.PL
+t/00_postgres_basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

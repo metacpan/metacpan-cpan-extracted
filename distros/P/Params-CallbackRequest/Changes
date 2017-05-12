@@ -1,0 +1,87 @@
+Revision history for Perl extension Params::CallbackRequest.
+
+1.20  2011-06-23T05:47:01
+      - Moved repostitory to
+        [GitHub](https://github.com/theory/params-callbackrequest/).
+      - Switched to a "traditional" `Makefile.PL`.
+
+1.19  2008-06-23T18:00:43
+      - Fixed a pasto in the "Support" section of the documentaion, and added
+        that section to all of the modules in this distribution.
+      - Fixed Perl 5.6 requirement to be properly detected by earlier Perls.
+        Thanks to Slaven Rezic for testing on Perl 5.5.
+
+1.18  2008-05-03T23:44:20
+      - Updated POD test to take advantage of Test::Pod 1.20 or later.
+      - Reformatted the code a bit.
+      - Added a link to the Subversion repository.
+
+1.17  2007-03-27T16:21:34
+      - Updated copyright date.
+      - Now requiring (rather than recommending) Class::ISA and
+        Attribute::Handlers, since the module requires Perl 5.6 or later
+        anyway, and virtually no one will want to use the module without these
+        modules. Test failure report from David Cantrell.
+
+1.16  2007-03-26T21:25:17
+      - Fixed a bug detecting mod_perl2. Reported by Jimmy Li.
+      - Fixed a bug in the redirect() method under mod_perl2. Report and fix
+        from Jimmy Li.
+      - Added the "configure_requires" parameter to Build.PL and added
+        Test::Pod to the "recommends" parameter.
+
+1.15  2006-05-26T21:28:55
+      - Added the 'requester' attribute to Params::Callback. This can be
+        specified by passing the 'requester' parameter to request(), and can
+        be anything.
+
+1.14  2006-03-02T20:07:28
+      - Removed an unnecessary eval block around the loading of Class::ISA
+        and Attribute::Handlers that would prevent the failure of either of
+        those modules to load to propagate.
+      - Fixed typo in the Synopsis spotted by Scott Lanning.
+      - Added support for mod_perl2, as well as mod_perl 1 and mod_perl 1.99.
+
+1.13  2004-04-20T18:29:37
+      - Apache 2 compatability added thanks to Fred Moyer.
+
+1.12  2004-03-15T15:27:54
+      - No longer using a Params::Validate callback to transform a value,
+        since that's not a supported feature of Params::Validate and it led
+        to problems on some platforms.
+
+1.11  Wed Oct  8 19:27:32 2003
+      - Fixed execution of pre and post callbacks so that they execute in the
+        order in which they're declared. Thanks to Perl 5.8.1 for rubbing my
+        nose in this one!
+
+1.10  Mon Sep  8 21:15:42 2003
+      - Code moved over from MasonX::ApacheHandler::WithCallbacks, which is
+        deprecated. Differences from that class are as follows.
+      - Code from MasonX::ApacheHandler::WithCallbacks has been migrated to
+        Params::CallbackRequest.
+      - Code from MasonX::CallbackHandler has been migrated to
+        Params::Callback.
+      - MasonX::CallbackTester has been removed, since it isn't necessary
+        in a non-mod_perl environment.
+      - Created Params::CallbackRequest::Exceptions to create all of the exception
+        classes used by Params::CallbackRequest. These no longer inherit from
+        HTML::Mason::Exception, of course, but from Exception::Class::Base.
+      - Renamed the "exec_null_cb_values" parameter to "ignore_nulls". It is
+        now false by default, and you pass a true value to enable it. Thus the
+        semantics are the opposite of "exec_null_cb_values", but the result is
+        the same.
+      - Renamed the "cb_exception_handler" to "exception_handler", since it's
+        now obvious that it applies to callbacks.
+      - Changed the request_args() accessor from MasonX::CallbackHandler to
+        params() in Params::Callback, to reflect the idea that this is a
+        generic parameter-triggered callback architecture.
+      - Replaced the ah() accessor, since the callback controller isn't a
+        Mason ApacheHandler anymore, with cb_request() in Params::Callback.
+      - Replaced the "exec_null_cb_values" parameter from
+        MasonX::ApacheHandler::WithCallbaks, which had defaulted to true, with
+        "ignore_nulls" in Params::CallbackRequest, which defaults to false.
+      - Added notes() to manage per-request notes. Pass a true value to the
+        "leave_notes" parameter to new() to allow notes to persist beyond
+        calls to request(). In such cases, use clear_notes() to manually clear
+        the notes.

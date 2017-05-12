@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         PerlPoint-Generator-XML
+version:      0.04
+version_from: 
+installdirs:  site
+requires:
+    PerlPoint::Constants:          0.14
+    PerlPoint::Parser:             0.4
+    PerlPoint::Tags::Basic:        0.01
+    PerlPoint::Tags::HTML:         0.01
+    Test::Harness:                 1.25
+    Test::More:                    0.11
+    XML::Generator:                0.99
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

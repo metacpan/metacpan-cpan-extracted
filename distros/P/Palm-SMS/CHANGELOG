@@ -1,0 +1,86 @@
+2015-02-24      0.04  Minor fix to make modern Test::Pod cope with
+                        non-ASCII in doco. No functional changes.
+
+2009-01-10  David Cantrell       <david@cantrell.org.uk>
+
+        * lib/Palm/SMS.pm, bin/smsdump: Add support for Treo 680
+
+2005-01-28  Lorenzo Cappelletti  <lorenzo.cappelletti@email.com>
+
+        * META.yml: Added YAML header as an attempt to overcome the
+        YAML_PARSE_ERR_NO_SEPARATOR signled by the robot at PAUSE.
+
+2005-01-21  Lorenzo Cappelletti  <lorenzo.cappelletti@email.com>
+
+        * lib/Palm/SMS.pm, bin/smsdump: Enanched and cleaned documentation
+        via podchecker.
+
+2005-01-20  Lorenzo Cappelletti  <lorenzo.cappelletti@email.com>
+
+        * bin/smsdump: Added --filter switch that allows to selectively
+        include messages to print.
+
+2005-01-03  Lorenzo Cappelletti  <lorenzo.cappelletti@email.com>
+
+        * bin/smsdump: Added --text-format option with which txt type
+        output can be widly customized.
+
+        * lib/Palm/SMS.pm, bin/smsdump: Added --date-format option as to
+        specify how message timestamps should be formatted.
+
+2005-01-02  Lorenzo Cappelletti  <lorenzo.cappelletti@email.com>
+
+        * MANIFEST: Forgot t/sample.pdb.
+
+        * Makefile.PL, META.yml, MANIFEST: META.yml is no longer generated
+        by a 'make dist', because we want to be able to specify our own
+        field like 'reccomends:' or 'license:'.
+
+        * README, Makefile.PL, lib/Palm/SMS.pm: I expect to update
+        lib/Palm/SMS.pm less frequently than bin/smsdump.  Hence, module
+        version can not be automatically determined from lib/Palm/SMS.pm,
+        but manually set.  Noteworthy changes section in README will be
+        showing both lib/Palm/SMS.pm and bin/smsdump versions.
+
+2004-12-31  Lorenzo Cappelletti  <lolo@gnupg.org>
+
+        * bin/smsdump: Added --version flag.
+
+        * lib/Palm/SMS.pm: VERSION number is now fixed.
+
+        * lib/Palm/SMS.pm, bin/smsdump: Improved copyright stuff.
+
+        * COPYING: Added copyleft file.
+
+2004-12-30  Lorenzo Cappelletti  <lorenzo.cappelletti@email.com>
+
+        * lib/Palm/SMS.pm: Added a notice about timestamp-always-locale
+        issue.
+
+2004-12-29  Lorenzo Cappelletti  <lorenzo.cappelletti@email.com>
+
+        * bin/smsdump: Added support to raw output format.
+        Wrote most of the embedded documentation.
+
+2004-12-19  Lorenzo Cappelletti  <lorenzo.cappelletti@email.com>
+
+        * t/Palm-SMS.t: First chunk of tests written.
+
+2004-12-09  Lorenzo Cappelletti  <lorenzo.cappelletti@email.com>
+
+        * README: First draft.
+
+        * MANIFEST, Makefile.PL: created by h2xs 1.23 with options "-AX -n
+        Palm::SMS".
+
+2004-12-08  Lorenzo Cappelletti  <lorenzo.cappelletti@email.com>
+
+        * lib/Palm/SMS.pm (ParseRecord): Found a solution for correctly
+        extracting Inbox messages.
+        (PackRecord): First implementation.
+
+2004-12-04  Lorenzo Cappelletti  <lorenzo.cappelletti@email.com>
+
+        * lib/Palm/SMS.pm (ParseRecord): First implementation.
+
+        * bin/smsdump: First implementation.

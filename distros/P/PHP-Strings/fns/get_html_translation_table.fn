@@ -1,0 +1,1 @@
+docs: Use the L<HTML::Entities> module to escape and unescape characters.

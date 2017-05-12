@@ -1,0 +1,51 @@
+NAME
+    Pod::Webserver::Source - Plugin to Pod::Webserver for Viewing Source
+    Code
+
+SYNOPSIS
+      use Pod::Webserver;
+      use Pod::Webserver::Source; # Add this line to 'podwebserver' CLI.
+      Pod::Webserver::httpd();
+
+DESCRIPTION
+    This software adds source code viewing support to "Pod::Webserver".
+    Optional "Perl::Tidy" support is included. If "Perl::Tidy" has been
+    installed, the source code will be formatted using the following
+    "Perl::Tidy" arguments: "-html -npod -nnn". You may override these
+    arguments by resetting the package variable
+    $Pod::Webserver::Source::PERLTIDY_ARGV to a list reference or string
+    containing your personal preferences. Your ~/.perltidyrc file will be
+    honored in the same way "Perl::Tidy" would honor it. If "Perl::Tidy" is
+    not installed source code will be formatted in plain text and prefixed
+    with line numbers.
+
+    Viewing the source of a module is simple, just click on the link in the
+    header next to the back link called Source.
+
+    Due to the nature of this code it is imperitive that
+    "Pod::Webserver::Source" be loaded *after* "Pod::Webserver" as
+    demonstrated in the SYNOPSIS.
+
+MODIFY podwebserver
+    Here's a Perl-ish way to modify podwebserver as I know it, distributed
+    with version 3.02 of "Pod::Webserver".
+
+      perl -pi -e'eof and
+        $_ .= "use Pod::Webserver::Source;\n"' `which podwebserver`
+
+SEE ALSO
+    Pod::Webserver, "Perl::Tidy", perl.
+
+THANKS
+    Much of this code was ripped from various pieces written by Sean Burke
+    who did all the hard work. I merely mutilated his code to produce this
+    functionality.
+
+AUTHOR
+    Casey West, <casey@geeknest.com>.
+
+COPYRIGHT
+      Copyright (c) 2005 Casey West.  All rights reserved.
+      This module is free software; you can redistribute it and/or modify it
+      under the same terms as Perl itself.
+

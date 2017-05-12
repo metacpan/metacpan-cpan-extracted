@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Plack/App/Proxy/WebSocket.pm
+perlcritic.rc
+t/00-basic.t
+t/author-critic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

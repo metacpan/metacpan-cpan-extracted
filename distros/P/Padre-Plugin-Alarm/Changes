@@ -1,0 +1,55 @@
+Revision history for Padre-Plugin-Alarm
+
+0.14   2010.12.06
+	- Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+
+0.13   2010.10.28
+	- Removed Test::NeedsDisplay dependency (AZAWAWI)
+
+0.11   2010.10.28
+	- Fixed Test::NeedsDisplay dependency in [LoadTests] and [CompileTests] uses now
+	  both no_display and needs_display (AZAWAWI)
+
+0.10   2010.10.27
+	- t/00-load.t is magically injected by [@PadrePlugin] via [LoadTests] (AZAWAWI)
+
+0.09   2010.10.22
+	- Switched to Dist::Zilla (AZAWAWI)
+	- Fixed 00-load.t failure when $ENV{DISPLAY} is not set (AZAWAWI)
+	- Fixed RT #53691 for Padre-Plugin-Alarm: More events when timer reached (AZAWAWI)
+	- The alarm is also more accurate than before (AZAWAWI)
+	- Added an alarm wave sample that is licensed under Creative Commons Creative Commons
+	  Sampling Plus 1.0 (GETTY)
+
+0.08  2010.10.19
+	- Renamed to the new Padre 0.43 PO naming scheme (AZAWAWI)
+	- Fixed RT #61653: Plugin not compatible with Padre 0.70 (AZAWAWI)
+	- Translation files are now copied to share folder using Module::Build's share_dir (AZAWAWI)
+
+0.07  2009.05.31
+    - Removed taint mode for test, which lead to some failures (JQUELIN)
+
+0.06  2009.05.26
+	- Add Chinese (Traditional) translation (BLUET).
+	- Added Arabic translation (AZAWAWI).
+	- Added Spanish translation (BRUNOV).
+
+0.05  2009.05.18
+	- Added translations:
+		- Brazilian Portuguese (GARU)
+		- French (JQUELIN)
+		- Polish (THEREK)
+		- Chinese Simpified (FAYLAND)
+
+0.04  2009.02.03
+	- Fix http://www.nntp.perl.org/group/perl.cpan.testers/2009/02/msg3185057.html
+
+0.03  2009.02.01
+	- Compatibility with Padre 0.26
+
+0.02  2008.12.08
+	- Fix clear_alarm
+
+0.01  Date/time
+	- First version, released on an unsuspecting world.
+

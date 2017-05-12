@@ -1,0 +1,24 @@
+Revision history for Perl extension Perl::Squish
+
+1.06 Wed  9 Apr 2009
+	- Upgrading to Module::Install::DSL 0.81
+
+1.05 Sun  5 Apr 2009
+	- Upgrading to Module::Install 0.81
+	- Upgrading Test::More to use it's new_ok
+	- Strip whitespace in qw//
+	- Minimum Perl version is now 5.006
+
+1.04 Sat 16 Aug 2008
+	- No functional changes
+	- Upgrading to Module::Install 0.77
+
+0.03 Thu 29 Jun 2007
+	- No functional changes
+	- Upgrading to Module::Install 0.65
+
+0.02 Fri Jun 17 2005
+	- Ported to the new PPI::Transform API
+
+0.01 Wed May 25 2005
+	- Created the initial version for the Perl.com article

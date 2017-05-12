@@ -1,0 +1,10 @@
+Revision history for Perl extension Plack-Middleware-DevFavicon
+
+0.02 2013-09-20T03:38:09Z
+
+    - depend on 5.8.1, not 5.10.1
+
+0.01 2013-09-07T16:03:14Z
+
+    - original version
+

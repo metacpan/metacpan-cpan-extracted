@@ -1,0 +1,163 @@
+#!/usr/bin/perl -w
+use KDE;
+import KDE::app;
+
+# example 1
+{
+    my $w = new Qt::Dialog(undef, "A common dialog", 1);
+    $w->setCaption("Example 1");
+    my $tl = new Qt::VBoxLayout($w, 5);
+    my $l = new Qt::Label("A very common dialog\n\n" .
+                           "Ok and Cancel are left aligned, Help\n" .
+                           "is right aligned. Try resizing\n" .
+                           "the window!\n" .
+                           "Press OK or Cancel when done"
+                           , $w);
+    $l->setAlignment(Qt::AlignVCenter | Qt::AlignLeft | Qt::WordBreak);
+    $l->setMinimumSize($l->sizeHint);
+    $tl->addWidget($l, 1);
+    my $bbox = new KDE::ButtonBox($w);
+    my $b = $bbox->addButton("OK");
+    $b->setDefault(1);
+    $w->connect($b, 'clicked()', 'accept()');
+    $w->connect($bbox->addButton("Cancel"), 'clicked()', 'accept()');
+    $bbox->addStretch(1);
+    $bbox->addButton("Help");
+    $bbox->layout;
+    $tl->addWidget($bbox, 0);
+    $tl->activate;
+    $w->exec;
+    $w->delete;
+}
+
+# example 2
+{
+    my $w = new Qt::Dialog(undef, "Right aligned buttons", 1);
+    $w->setCaption("Example 2");
+    my $tl = new Qt::VBoxLayout($w, 5);
+    my $l = new Qt::Label("Another common dialog\n\n" .
+                          "Ok and Cancel are right aligned\n" .
+                          "Try resizing the window!", $w);
+    $l->setAlignment(Qt::AlignVCenter | Qt::AlignLeft | Qt::WordBreak);
+    $l->setMinimumSize($l->sizeHint);
+    $tl->addWidget($l, 1);
+    my $bbox = new KDE::ButtonBox($w);
+    $bbox->addStretch(1);
+    my $b = $bbox->addButton("OK");
+    $b->setDefault(1);
+    $w->connect($b, 'clicked()', 'accept()');
+    $w->connect($bbox->addButton("Cancel"), 'clicked()', 'accept()');
+    $bbox->layout();
+    $tl->addWidget($bbox, 0);
+    $tl->activate;
+    $w->exec;
+    $w->delete;
+}
+
+# example 3
+{
+    my $w = new Qt::Dialog(undef, "Middle aligned buttons", 1);
+    $w->setCaption("Example 3");
+    my $tl = new Qt::VBoxLayout($w, 5);
+    my $l = new Qt::Label("Another common dialog\n\n" .
+                          "Ok and Cancel are middle aligned\n" .
+                          "Try resizing the window!", $w);
+    $l->setAlignment(Qt::AlignVCenter | Qt::AlignLeft | Qt::WordBreak);
+    $l->setMinimumSize($l->sizeHint);
+    $tl->addWidget($l, 1);
+    my $bbox = new KDE::ButtonBox($w);
+    $bbox->addStretch(1);
+    my $b = $bbox->addButton("OK");
+    $b->setDefault(1);
+    $w->connect($b, 'clicked()', 'accept()');
+    $w->connect($bbox->addButton("Cancel"), 'clicked()', 'accept()');
+    $bbox->addStretch(1);
+    $bbox->layout();
+    $tl->addWidget($bbox, 0);
+    $tl->activate;
+    $w->exec;
+    $w->delete;
+}
+
+# example 4
+{
+    my $w = new Qt::Dialog(undef, "Bad example", 1);
+    $w->setCaption("Example 4");
+    my $tl = new Qt::VBoxLayout($w, 5);
+    my $l = new Qt::Label("A very bad example\n\n" .
+                          "Sometimes it's a bad idea to take\n" .
+                          "the maximum width for all buttons\n" .
+                          "since it will look ugly -- " .
+                          "anyway, it works", $w);
+    $l->setAlignment(Qt::AlignVCenter | Qt::AlignLeft | Qt::WordBreak);
+    $l->setMinimumSize($l->sizeHint);
+    $tl->addWidget($l, 1);
+    my $bbox = new KDE::ButtonBox($w);
+    $bbox->addStretch(1);
+    my $b = $bbox->addButton("OK");
+    $b->setDefault(1);
+    $w->connect($b, 'clicked()', 'accept()');
+    $w->connect($bbox->addButton("Cancel"), 'clicked()', 'accept()');
+    $bbox->addButton("Push me and I give you a banana");
+    $bbox->addStretch(1);
+    $bbox->layout;
+    $tl->addWidget($bbox, 0);
+    $tl->activate;
+    $w->exec;
+    $w->delete;
+}
+
+# example 5
+{
+    my $w = new Qt::Dialog(undef, "Bad example", 1);
+    $w->setCaption("Example 5");
+    my $tl = new Qt::VBoxLayout($w, 5);
+    my $l = new Qt::Label("A better solution for the bad example\n\n" .
+                          "Use \"addButton(\"Push me and I give" .
+                          "you a banana\", 1);\" to\n" .
+                          "prevent this strange effect as seen\n" .
+                          "the former example!"
+                          , $w);
+    $l->setAlignment(Qt::AlignVCenter | Qt::AlignLeft | Qt::WordBreak);
+    $l->setMinimumSize($l->sizeHint);
+    $tl->addWidget($l, 1);
+    my $bbox = new KDE::ButtonBox($w);
+    $bbox->addStretch(1);
+    my $b = $bbox->addButton("OK");
+    $b->setDefault(1);
+    $w->connect($b, 'clicked()', 'accept()');
+    $w->connect($bbox->addButton("Cancel"), 'clicked()', 'accept()');
+    $bbox->addButton("Push me and I give you a banana", 1);
+    $bbox->addStretch(1);
+    $bbox->layout;
+    $tl->addWidget($bbox, 0);
+    $tl->activate;
+    $w->exec;
+    $w->delete;
+}
+
+# example 6
+{
+    my $w = new Qt::Dialog(undef, "Vertical", 1);
+    $w->setCaption("Example 6 (last)");
+    my $tl = new Qt::HBoxLayout($w, 5);
+    my $l = new Qt::Label("Did I mention that it's possible\n" .
+                          "to make vertically aligned buttons\n" .
+                          "too?"
+                          , $w);
+    $l->setAlignment(Qt::AlignVCenter | Qt::AlignLeft | Qt::WordBreak);
+    $l->setMinimumSize($l->sizeHint);
+    $l->setMinimumSize($l->sizeHint);
+    $tl->addWidget($l, 1);
+    my $bbox = new KDE::ButtonBox($w, KDE::ButtonBox::VERTICAL);
+    my $b = $bbox->addButton("OK");
+    $b->setDefault(1);
+    $w->connect($b, 'clicked()', 'accept()');
+    $w->connect($bbox->addButton("Cancel"), 'clicked()', 'accept()');
+    $bbox->addStretch(1);
+    $bbox->layout;
+    $tl->addWidget($bbox, 0);
+    $tl->activate;
+    $w->exec;
+    $w->delete;
+}

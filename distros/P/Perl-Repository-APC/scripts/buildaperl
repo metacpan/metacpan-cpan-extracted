@@ -1,0 +1,333 @@
+#!/usr/bin/perl -w
+
+
+# line 4
+use strict;
+use Getopt::Long;
+use Carp;
+use File::Spec ();
+use File::Temp qw(tempdir);
+use File::Path qw(mkpath rmtree);
+
+our %Opt;
+
+our $Id = q$Id: buildaperl 294 2008-02-22 10:42:30Z k $;
+
+my $DEFAULT_CONFIG = "-Dinstallusrbinperl=n -Uversiononly -Doptimize=-g ".
+    "-des -Duse64bitint -Dusedevel";
+
+GetOptions(
+           \%Opt,
+           "apcdir=s",
+           "branch=s",
+           "config=s",
+           "h!",
+           "noconfigure!",
+           "noinstall!",
+           "notest!",
+           "prefix=s",
+           "remo!",
+           "start=s",
+           "target=s",
+           "verbose!",
+           "version!",
+           "writedotpatch!",
+          ) or die Usage();
+
+if ($Opt{h}) {
+  print Usage();
+  exit;
+}
+
+if ($Opt{version}) {
+  print $Id, "\n";
+  exit;
+}
+
+@ARGV == 1 or die Usage();
+
+sub Usage {
+  qq{"Usage: $0 [options] version
+     [--config=...]     # Configure options except --prefix; default:
+        $DEFAULT_CONFIG
+     [--apcdir=...]     # where to find APC; defaults to "APC"
+     [--branch=...]     # where to install: perl, maint-5.6, etc.
+     [--h]              # this help message
+     [--noconfigure!]   # Run without ./Configure
+     [--notest]         # Run without make test
+     [--noinstall]      # Run without ./installperl
+     [--prefix=...]     # prefix of the inst directory; default ./installed-perls
+     [--remo]           # remove source dir at the end
+     [--start]          # start argument to patchaperlup
+     [--target=...]     # e.g. miniperl
+     [--verbose]        # noise
+     [--writedotpatch!] # write the .patch file for PERL_PATCHLEVEL
+
+Version may be '\@', '5.7.0\@', '5.7.0\@7100', '\@7100', etc.
+
+}; #
+}
+
+our @SYSTEMTIMES;
+sub mysystem ($);
+
+$Opt{branch} ||= "perl";
+
+$Opt{apcdir} ||= "APC";
+
+use Cwd;
+my $pwd = cwd;
+$Opt{prefix} ||= "$pwd/installed-perls";
+
+$Opt{config} ||= $DEFAULT_CONFIG;
+
+my($arg) = shift;
+
+unless ($arg && $arg =~ /\@/) {
+  die "$0: argument must contain an \@";
+}
+
+my($baseperl,$patchlevel) = $arg =~ /^([^\@]*)@(\d*)$/;
+die "baseperl not defined" unless defined $baseperl;
+die "patchlevel not defined" unless defined $patchlevel;
+die "patchlevel not > 0" if length $patchlevel && ! $patchlevel > 0;
+
+use Perl::Repository::APC;
+my $apc = Perl::Repository::APC->new($Opt{apcdir});
+
+# determine simultaneously $baseperl and $patchlevel
+my $diffdir;
+use Perl::Repository::APC::BAP;
+my $bap = Perl::Repository::APC::BAP->new($apc);
+# This may die:
+($baseperl,my $nextperl,my $firstpatch,$patchlevel,my $dir)=$bap->translate($Opt{branch},$baseperl,$patchlevel);
+warn "Info: Target $baseperl\@$patchlevel, firstpatch $firstpatch, nextperl $nextperl, ".
+    "branch $Opt{branch}\n";
+if ($dir =~ /-diffs$/) {
+  $diffdir = "$Opt{apcdir}/$dir";
+} else {
+  $diffdir = "$Opt{apcdir}/$dir/diffs";
+}
+my $upto_arg = " --upto='$patchlevel'";
+my($branch_letter) = substr($Opt{branch},0,1);
+my $target_dir = "perl-$branch_letter-$baseperl\@$patchlevel";
+die "Directory $target_dir exists but would be needed for building. Giving up "
+    if -e $target_dir;
+
+my($src,$bdir,$start_arg);
+
+my $ptempdir = tempdir( "psrc-XXXX", DIR => ".", CLEANUP => 1);
+if ($baseperl eq "0") {
+  $src = "";
+  $bdir = File::Spec->catdir($ptempdir,"emptydir");
+  mkdir $bdir or die "Could not create $bdir: $!";
+  $start_arg = " --start='0'";
+} else {
+  my $tarball = $apc->tarball($baseperl) or die "Could not determine tarball for $baseperl";
+  if (File::Spec->file_name_is_absolute($tarball)
+      ||
+      -e $tarball
+     ) {
+    $src = $tarball;
+  } else {
+    # before Perl::Repository::APC 1.276 we only returned the basename
+    $src = "$Opt{apcdir}/$baseperl/$tarball";
+  }
+  die "src[$src] not found" unless -f $src;
+  open my $TAR, "tar -tzf $src |" or die;
+  my $exbdir = <$TAR>;
+  chomp $exbdir;
+  $exbdir =~ s|^\./||;
+  $exbdir =~ s|/.*$||;
+  close $TAR;
+  $bdir = File::Spec->catdir($ptempdir,$exbdir);
+
+  my $apcsrc = File::Spec->abs2rel($src);
+  my $cwd = Cwd::cwd();
+  chdir $ptempdir or die "Could not chdir to '$ptempdir': $!";
+  my $relsrc = File::Spec->catdir($cwd,$apcsrc);
+  mysystem "tar -xzf $relsrc";
+  chdir $cwd or die "Could not chdir to '$cwd': $!";
+
+  $start_arg = $Opt{start} ? " --start='$Opt{start}'" : " --start='$firstpatch'";
+}
+
+my $verbose_switch = $Opt{verbose} ? "--verbose " : "";
+my $branch_arg = " --branch='$Opt{branch}'";
+my $writedotpatch_switch = $Opt{writedotpatch} ? " --writedotpatch" : "";
+$0 = "buildaperl:$branch_arg$upto_arg$start_arg";
+mysystem "patchaperlup $verbose_switch$branch_arg$writedotpatch_switch".
+    " --perldir='$bdir' --diffdir='$diffdir'$upto_arg$start_arg";
+
+# concurrency disallowed intentionally: it makes no sense that two
+# processes build the exact same perl (yes, there may be exceptions
+# and then we will have to revisit this)
+rename $bdir, $target_dir or die "Could not rename to $target_dir";
+rmdir $ptempdir or die "Could not remove temporary directory '$ptempdir': $!";
+system "chmod -R u+w $target_dir";
+chdir $target_dir or die "Could not chdir to $target_dir";
+if ($Opt{branch} eq "perl" &&
+    -e "patchlevel.h" &&
+    $patchlevel >= 18749
+   ) {
+  0==system($^X,
+            "-x",
+            "patchlevel.h",
+            "patchaperlup:$branch_arg$upto_arg$start_arg",
+           ) or die;
+}
+
+unless ($Opt{noconfigure}) {
+  my $absprefix = File::Spec->file_name_is_absolute($Opt{prefix}) ? 
+      $Opt{prefix} : File::Spec->catfile($pwd,$Opt{prefix});
+  mkpath "$absprefix/$Opt{branch}";
+  my $tempdir = tempdir( "pXXXXXX", DIR => "$absprefix/$Opt{branch}");
+  chmod 0755, $tempdir or die "Could not chmod to mode 0755 on directory '$tempdir': $!";
+
+  # too many versions come without a wince/perl.ico:
+  if (open my $fh, "MANIFEST") {
+    my @manifest =  <$fh>;
+    if (grep { /^wince\/perl\.ico\s/ } @manifest
+        and not -f "wince/perl.ico") {
+      close $fh;
+      chmod 0644, "MANIFEST" or die "Could not chmod 0644 MANIFEST: $!";
+      open $fh, ">", "MANIFEST" or die "Could not open >MANIFEST: $!";
+      print $fh grep { ! /^wince\/perl\.ico\s/ } @manifest;
+      close $fh;
+    }
+  }
+
+  # here we do not need $target_dir, because branch is visible in directory
+  mysystem "sh Configure -Dprefix=$tempdir/perl-$baseperl\@$patchlevel $Opt{config}";
+  my $target = "";
+  if ($Opt{target}) {
+    $target = " $Opt{target}";
+  }
+  my $makeout = "";
+  open my($make), "make$target 2>&1 |" or die;
+  while (<$make>) {
+    print;
+    $makeout .= $_;
+  }
+  unless (close $make) {
+    my $ret = $?;
+    # if ($makeout =~ /No rule to make target.*built-in/) {
+    if ($makeout =~ /(?:no rule to make target|don't know how to make).*built-in/i) {
+      print "\aWARNING: Running 'make' failed. It produced the infamous
+  <built-in> error that old perls have with new gccs. I'll work around this
+  in the makefiles now and retry. If you do not like that, hit ^C and FIXME.
+  Sleeping 5 seconds...\n";
+      sleep 5;
+      {
+        local @ARGV = qw( makefile x2p/makefile);
+        local $^I = "~";
+        while (<>) {
+          print unless /<(built-in|command line)>/;
+        }
+      }
+      mysystem "make$target";
+    } else {
+      die "make failed with ret[$ret]";
+    }
+  }
+  mysystem "make test" unless $Opt{notest};
+  mysystem "LD_LIBRARY_PATH=. ./perl installperl" unless $Opt{noinstall};
+}
+
+if ($Opt{remo}){
+  chdir $pwd;
+  my $rmtree = $target_dir;
+  warn "Removing $rmtree\n";
+  rmtree $rmtree;
+}
+
+sub mysystem ($) {
+  my $system = shift;
+  warn "Running $system\n";
+  my $start = time;
+  $ENV{LANG} = "C"; # we rely on system messages!
+  my $ret = system($system);
+  unless ($ret==0) {
+    my $cwd = cwd;
+    Carp::confess("system[$system] failed with ret[$ret] in cwd[$cwd]");
+  }
+  push @SYSTEMTIMES, $system, time-$start;
+  for (my $i = 0; $i < @SYSTEMTIMES; $i+=2){
+    printf "%3d secs for[%s]\n", @SYSTEMTIMES[$i+1, $i];
+  }
+}
+
+__END__
+
+=head1 NAME
+
+buildaperl - Build an arbitrary perl version from APC
+
+=head1 SYNOPSIS
+
+ buildaperl 5.7.0@7100
+ buildaperl 5.8.0@
+ buildaperl @
+ buildaperl --h
+
+=head1 DESCRIPTION
+
+This script builds the sources for any perl version between 5.004 and
+bleadperl.
+
+The --h option displays all available options.
+
+The argument consists of C<PERL_VERSION@PATCHNUMBER>. The C<@> is
+mandatory, both C<PERL_VERSION> and C<PATCHNUMER> are optional.
+
+If C<PERL_VERSION> is missing, the script picks the most recent
+version in the branch. If the C<PATCHNUMBER> is missing, all available
+patches for a given base will be applied. There is one important
+restriction: the script can not iterate over more than one APC
+directory when patching. This means you cannot build 5.6.0@18000. If
+you want @18000, just specify @18000 as the argument. If the --branch
+argument and the version@patch argument do not fit together,
+C<buildaperl> dies.
+
+The most convenient setup to run this script is to start it in a
+directory that contains a single subdirectory: APC. APC should be a
+full or partial mirror (***partial mirror is untested***) of I<
+Archive of Perl Changes >. APC is located at
+
+  rsync://ftp.linux.activestate.com/all-of-the-APC-for-mirrors-only/
+
+Make sure you are at least mirroring C<additional_tarballs>, the
+C<5.*>, and the c</perl-*-diffs> directories.
+
+Beware that you will need about a gigabyte of storage if you want to
+rsync all of the archive.
+
+Buildaperl uses a temporary directory to build a perl and then renames
+this directory to
+
+   perl-X-PERL_VERSION@PATCHNUMBER (e.g. perl-p-5.7.2@15915)
+        \ \            \
+         \ \            `-> e.g. 15915
+          \ `-> e.g. 5.7.2
+           `-> either "p" for trunk or "m" for a maintenance branch
+
+and lets it lying around (unless the --remo switch is used). This is
+considered a feature: if buildaperl tries to build a perl that has
+already been built, it will recognize the fact from seeing the
+associated directory name. It builds a perl only if this directory
+does not yet exist, otherwise it will die.
+
+Other files and directories will also be created by default, namely
+the directory to install all created perls into (unless the
+--noinstall option is given), C< installed-perls >.
+
+=head1 PREREQUISITES
+
+Same prerequisites as mentioned in patchaperlup.
+
+=head1 AUTHOR
+
+Andreas Koenig <andk@cpan.org>
+
+=cut
+

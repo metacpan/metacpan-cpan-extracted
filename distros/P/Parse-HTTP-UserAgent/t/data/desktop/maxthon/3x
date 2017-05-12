@@ -1,0 +1,68 @@
+[AGENT]
+
+Mozilla/5.0 (Windows NT 5.1) AppleWebKit/535.12 (KHTML, like Gecko) Maxthon/3.0 Chrome/18.0.966.0 Safari/535.12
+
+extras           => [ 'KHTML, like Gecko', 'AppleWebKit/535.12' ],
+name             => 'Maxthon',
+original_name    => 'Maxthon',
+original_version => '3.0',
+os               => 'Windows XP',
+parser           => 'maxthon',
+toolkit          => [ 'Chrome', '18.0.966.0', '18.000966000' ],
+version          => '535.120',
+version_raw      => '535.12',
+
+[AGENT]
+
+Mozilla/5.0 (Windows NT 6.1) AppleWebKit/535.12 (KHTML, like Gecko) Maxthon/3.0 Chrome/18.0.966.0 Safari/535.12
+
+extras           => [ 'KHTML, like Gecko', 'AppleWebKit/535.12' ],
+name             => 'Maxthon',
+original_name    => 'Maxthon',
+original_version => '3.0',
+os               => 'Windows 7',
+parser           => 'maxthon',
+toolkit          => [ 'Chrome', '18.0.966.0', '18.000966000' ],
+version          => '535.120',
+version_raw      => '535.12',
+
+[AGENT]
+
+Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.12 (KHTML, like Gecko) Maxthon/3.0 Chrome/18.0.966.0 Safari/535.12
+
+extras           => [ 'KHTML, like Gecko', 'AppleWebKit/535.12', 'WOW64' ],
+name             => 'Maxthon',
+original_name    => 'Maxthon',
+original_version => '3.0',
+os               => 'Windows 7',
+parser           => 'maxthon',
+toolkit          => [ 'Chrome', '18.0.966.0', '18.000966000' ],
+version          => '535.120',
+version_raw      => '535.12',
+
+[AGENT]
+
+Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/535.12 (KHTML, like Gecko) Maxthon/3.4.2.3000 Chrome/18.0.966.0 Safari/535.12
+
+extras           => [ 'KHTML, like Gecko', 'AppleWebKit/535.12', 'WOW64' ],
+name             => 'Maxthon',
+original_name    => 'Maxthon',
+original_version => '3.4.2.3000',
+os               => 'Windows 7',
+parser           => 'maxthon',
+toolkit          => [ 'Chrome', '18.0.966.0', '18.000966000' ],
+version          => '535.120',
+version_raw      => '535.12',
+
+[AGENT]
+
+Mozilla/5.0 (Windows; U; Windows NT 6.1; ) AppleWebKit/534.12 (KHTML, like Gecko) Maxthon/3.0 Safari/534.12
+
+extras           => [ 'Windows', 'like', 'Gecko', 'AppleWebKit/534.12' ],
+name             => 'Maxthon',
+original_name    => 'Maxthon',
+original_version => '3.0',
+os               => 'Windows 7',
+parser           => 'maxthon',
+strength         => 'U',
+toolkit          => [ 'Safari', '534.12', '534.120' ],

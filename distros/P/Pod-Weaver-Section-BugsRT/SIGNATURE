@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7dab89d008738e62a27b6cc5af81f0c89a4081ce Changes
+SHA1 2567ebef08c659e7f40bee2fbd29f69f00c6c863 LICENSE
+SHA1 6f97499a87bbb933a5c31b70343feeefb4cc48df MANIFEST
+SHA1 6d63ff0d83bec5330cd36409855a9ca9b2ad220f META.yml
+SHA1 eaa10ad178e772dd46df7c9d3f0da8242ea74282 Makefile.PL
+SHA1 dd8e1319e2be8f4f4aee8a9681e71e01cac0b343 README
+SHA1 14e873c74f7d7c4d02cb8093af7d7ba3e25362e4 dist.ini
+SHA1 22386830c9373718caf428c9a129450f1b998e76 lib/Pod/Weaver/Section/BugsRT.pm
+SHA1 18cc32eac268e24f3b92448e29ab1d9a9c84eb42 t/compile.t
+SHA1 5da741e4cabd859cbd6a3f2ad1c9901b892da4d0 t/release-pod-coverage.t
+SHA1 946206d2ce9fba0e8fda1d429e01245fb8934622 t/release-pod-syntax.t
+SHA1 46a3b211d86fc7da03762365c626e33fc9d9ad44 t/signature.t
+SHA1 b683e5354a6b991da17a94e51852513b95acb60b weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAku0B6MACgkQ+CqvSzp9LOzDgACffmfLM1cBhiyTfWTJsmhac+PG
+l/QAn0aGCQehAvBTYyt4aUyQB7Vpw6Sm
+=FRo+
+-----END PGP SIGNATURE-----

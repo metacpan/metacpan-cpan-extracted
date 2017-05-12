@@ -1,0 +1,10 @@
+Revision history for Perl extension Person::CNPclass.
+
+0.02  2015-11-06
+	Added new function _init and _run.
+	Added pod documentation.
+
+0.01  Thu Oct 22 06:37:36 2015
+	- original version; created by h2xs 1.23 with options
+		-XAn Person::CNPclass
+

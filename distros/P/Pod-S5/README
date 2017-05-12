@@ -1,0 +1,138 @@
+NAME
+    Pod::S5 - Generate S5 slideshow from POD source file.
+
+SYNOPSIS
+     pod2s5 [-hv] [options] inputfile.pod
+        --theme <theme>     the theme to use, default is 'default'. Available
+                            themes: default, flower, i18n, pixel, yatil.
+
+        --dest <directory>  target directory where to install the slideshow.
+                            If not specified the target directory name will
+                            be generated from the B<name> parameter or from
+                            the filename of the source pod file.
+
+        --author <author>   the name of the slideshow author.
+
+        --creation <date>   when the slideshow were generated (default: current date).
+
+        --company <org>     company or organisation (default: none).
+
+        --where <location>  where the slideshow were made (default: hostname).
+
+        --name <name>       the name of the slideshow (title).
+
+     -v --version           print the current version of the program.
+
+     -h --help              print usage information.
+
+DESCRIPTION
+    pod2s5 converts POD input to a S5 HTML slideshow. No additional software
+    is required. Just write a POD file, run pod2s5 on it - and you're done.
+
+POD
+    Beside the known perlpod markup some additions have been made:
+
+    Since we are generating a slideshow, the POD must be devided into pieces
+    which can be used as slides. Slides will be separated by the =head1
+    title tag (which itself becomes the title of the slide.
+
+     =head1 Intro --+
+                    |
+     [..]           +------- Slide 1
+     [..]           |
+                ----+
+ 
+     =head1 Intro --+
+                    |
+     [..]           +------- Slide 2
+     [..]           |
+                ----+
+ 
+     =head1 End   --+
+                    |
+     [..]           +------- Slide 3
+     [..]           |
+                ----+
+
+    Each slide may contain any valid POD.
+
+    *   Images can be included using the tag G<image.png>. You must manually
+        copy images to the target directory.
+
+    *   Plain HTML code can be included using the html formatter, eg:
+
+         =begin html
+ 
+         <title>Blah</title>
+ 
+         =end html
+
+    *   You can create incremental slides using bullet lists, that is each
+        list item will appear separately, as if it were on an extra slide.
+
+        Example:
+
+         =over
+ 
+         =item *
+ 
+         1st item
+ 
+         =item *
+ 
+         2nd item
+ 
+         =back
+
+    *   You can add special formatters for code, which will be syntax
+        highlighted if the module Syntax::Highlight::Engine::Kate is
+        installed. Use the name of the programming language as the formatter
+        name.
+
+        Example:
+
+         =begin perl
+ 
+         if ($var) {
+          exit;
+         }
+ 
+         =end perl
+
+        To get a list of the available languages, refer to the
+        Syntax::Highlight::Engine::Kate manpage.
+
+DEPENDENCIES
+    Pod::S5
+
+    unzip(1)
+
+    Syntax::Highlight::Engine::Kate is optional.
+
+    S5 is already included in the script and will automatically installed if
+    you generate a new slide.
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2007-2013 Thomas Linden
+
+    This tool is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    S5 Copyright (c) 2007 Eric Meyer S5 Version 1.2a (Attribution-ShareAlike
+    2.0 License)
+
+BUGS AND LIMITATIONS
+    See rt.cpan.org for current bugs, if any.
+
+INCOMPATIBILITIES
+    None known.
+
+DIAGNOSTICS
+    To debug pod2s5 use debug() or the perl debugger, see perldebug.
+
+AUTHOR
+    Thomas Linden <tlinden |AT| cpan.org>
+
+VERSION
+    0.09
+

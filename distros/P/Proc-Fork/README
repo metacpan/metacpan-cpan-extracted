@@ -1,0 +1,53 @@
+Proc::Fork
+
+This module provides an intuitive, Perl-ish way to write forking
+programs by letting you use blocks to illustrate which code section
+executes in which fork. The code for the parent, child, retry handler
+and error handler are grouped together in a "fork block". The clauses
+may appear in any order, but they must be consecutive (without any other
+statements in between).
+
+All four clauses need not be specified. If the retry clause is omitted,
+only one fork will be attempted. If the error clause is omitted the
+program will die with a simple message if it can't retry. If the parent
+or child clause is omitted, the respective (parent or child) process
+will start execution after the final clause. So if one or the other only
+has to do some simple action, you need only specify that one. For
+example:
+
+ # spawn off a child process to do some simple processing
+ run_fork { child {
+     exec '/bin/ls', '-l';
+     die "Couldn't exec ls: $!\n";
+ } };
+ # Parent will continue execution from here
+ # ...
+
+If the code in any of the clauses does not die or exit, it will continue
+execution after the fork block.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This documentation is copyright (c) 2002 by Eric J. Roode.
+
+This software is copyright (c) 2013 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

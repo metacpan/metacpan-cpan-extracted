@@ -1,0 +1,990 @@
+msgid "%1 wrote:"
+msgstr "%1 wrote:"
+
+msgid "%quant(%1,post)"
+msgstr "%quant(%1,post,posts)"
+
+msgid "%quant(%1,Forum)"
+msgstr "%quant(%1,Forum,Forums)"
+
+msgid "%quant(%1,Reply)"
+msgstr "%quant(%1,Reply,Replies)"
+
+msgid "%quant(%1,reply)"
+msgstr "%quant(%1,reply,replies)"
+
+msgid "%quant(%1,View)"
+msgstr "%quant(%1,View,Views)"
+
+msgid "%quant(%1,view)"
+msgstr "%quant(%1,view,views)"
+
+msgid "SEARCH FOR MESSAGES MATCHING"
+msgstr "Search for messages matching"
+
+msgid "OF THE FOLLOWING CRITERIA"
+msgstr "of the following criteria"
+
+msgid "404 Not Found"
+msgstr "404 Not Found"
+
+msgid "ACCEPT TERMS"
+msgstr "You need to accept the Terms and Conditions below to continue using the site"
+
+msgid "Access Denied"
+msgstr "Access Denied"
+
+msgid "Access to this application is not permitted from %1"
+msgstr "Access to this application is not permitted from %1"
+
+msgid "Activate Your %s Registration"
+msgstr "Activate Your %s Registration"
+
+msgid "Active"
+msgstr "Active"
+
+msgid "ADD THREAD WATCH"
+msgstr "Add a Thread Watch"
+
+msgid "Add Reply"
+msgstr "Add Reply"
+
+msgid "Add T-and-Cs"
+msgstr "Add T&amp;Cs"
+
+msgid "Add Watch"
+msgstr "Add Watch"
+
+msgid "ADMIN LOCK POST"
+msgstr "Lock this post"
+
+msgid "ADMIN SPECIFY LOCK THREAD"
+msgstr "You must specify the thread to lock"
+
+msgid "ADMIN SPECIFY STICK THREAD"
+msgstr "You must specify the thread to stick"
+
+msgid "Administration"
+msgstr "Administration"
+
+msgid "ago"
+msgstr "ago"
+
+msgid "All Forums"
+msgstr "All Forums"
+
+msgid "All Rights Reserved"
+msgstr "All Rights Reserved"
+
+msgid "An email has been sent to"
+msgstr "An email has been sent to"
+
+msgid "An error has occurred"
+msgstr "An error has occurred"
+
+msgid "ALL"
+msgstr "all"
+
+msgid "ANY"
+msgstr "any"
+
+msgid "AUTHENTICATION FAILED"
+msgstr "Unable to authenticate the supplied login credentials"
+
+msgid "AUTHORS_NAME"
+msgstr "Author's Name"
+
+msgid "Avatar"
+msgstr "Avatar"
+
+msgid "Cancel"
+msgstr "Cancel"
+
+msgid "CHANGE AVATAR"
+msgstr "Change your avatar image by selecting a file and clicking the Upload button below"
+
+msgid "Click on the login link to continue"
+msgstr "Click on the login link to continue"
+
+msgid "Close"
+msgstr "Close"
+
+msgid "Comment"
+msgstr "Comment"
+
+msgid "Confirm Password"
+msgstr "Confirm Password"
+
+msgid "CONTAINS"
+msgstr "contains"
+
+msgid "Contents"
+msgstr "Contents"
+
+msgid "Continue"
+msgstr "Continue"
+
+msgid "Continue reading"
+msgstr "Continue reading"
+
+msgid "Create New Thread"
+msgstr "Create New Thread"
+
+msgid "created by"
+msgstr "created by"
+
+msgid "created by (%1)"
+msgstr "created by %1"
+
+msgid "Current Avatar"
+msgstr "Current Avatar"
+
+msgid "Current Forum"
+msgstr "Current Forum"
+
+msgid "Current User"
+msgstr "Current User"
+
+msgid "DATABASE CRITERIA MISSING"
+msgstr "Missing criteria in database lookup"
+
+msgid "DATABASE TOO MANY RECORDS"
+msgstr "The database lookup returned too many records"
+
+msgid "Default"
+msgstr "Default"
+
+msgid "DFV FIELDS MISSING"
+msgstr "One or more required fields are missing."
+
+msgid "DFV FIELDS INVALID"
+msgstr "One or more fields are invalid."
+
+msgid "DFV FILL REQUIRED"
+msgstr "You must fill in all the required fields."
+
+msgid "EDIT LOCKED POST"
+msgstr "You can't edit locked posts."
+
+msgid "EDIT LOGIN REQUIRED"
+msgstr "You must be logged in before you can edit your posts."
+
+msgid "EDIT OWN POSTS ONLY"
+msgstr "You can only edit posts you have made."
+
+msgid "Edit"
+msgstr "Edit"
+
+msgid "Edited"
+msgstr "Edited"
+
+msgid "Email Address"
+msgstr "Email Address"
+
+msgid "Email Engine"
+msgstr "Email Engine"
+
+msgid "EMAIL FAILED STORE"
+msgstr "Sorry, we are currently unable to store your information. Please try again later."
+
+msgid "EMAIL IN USE (%1)"
+msgstr "The email address you have chosen is already in use.<br />Please try a different one, or use the <a href=\"%1\">Forgotten Password</a> page."
+
+msgid "EMAIL SEND PROBLEM"
+msgstr "There was a problem sending an email from the system"
+
+msgid "EMAIL MISSING SUBJECT"
+msgstr "Subject Line Missing"
+
+msgid "ENTER REPLY"
+msgstr "Please enter your reply in the form below"
+
+msgid "FILE NOT IMAGE"
+msgstr "Uploaded file does not appear to be an image file"
+
+msgid "FILE NEWDIR FAILED"
+msgstr "Failed to create destination directory.  Unable to store upload."
+
+msgid "FILE STORE FAILED"
+msgstr "Failed to store upload."
+
+msgid "FILE TOO LARGE"
+msgstr "File size too large. File must be no larger than 20K."
+
+msgid "FORUMNAME_NOT_UNIQUE"
+msgstr "The forum name you have chosen is already in use. Please try a different one."
+
+msgid "First"
+msgstr "First"
+
+msgid "First Name"
+msgstr "First Name"
+
+msgid "Forgotten Password"
+msgstr "Forgotten Password"
+
+msgid "FORUM"
+msgstr "Forum"
+
+msgid "Forum"
+msgstr "Forum"
+
+msgid "Forums"
+msgstr "Forums"
+
+msgid "Forum List"
+msgstr "Forum List"
+
+msgid "Forum Moderators"
+msgstr "Forum Moderators"
+
+msgid "Forum Name"
+msgstr "Forum Name"
+
+msgid "Forum Summary"
+msgstr "Forum Summary"
+
+msgid "FORUMNAME IN USE"
+msgstr "The forum name you have chosen is already in use. Please try a different one."
+
+msgid "FORUMNAME USED"
+msgstr "has already been used by another user."
+
+msgid "General"
+msgstr "General"
+
+msgid "Guest User"
+msgstr "Guest User"
+
+msgid "Go"
+msgstr "Go"
+
+msgid "Help"
+msgstr "Help"
+
+# Search for [....] _in_ [......]
+msgid "in"
+msgstr "in"
+
+msgid "Incomplete authentication URL"
+msgstr "Incomplete authentication URL"
+
+msgid "Incomplete URL"
+msgstr "Incomplete URL"
+
+# e.g. Invalid user-id
+msgid "Invalid %1"
+msgstr "Invalid %1"
+
+msgid "Invalid requested value"
+msgstr "Invalid requested value"
+
+msgid "IP Bans"
+msgstr "IP Bans"
+
+msgid "IP Information"
+msgstr "IP Information"
+
+msgid "IP Logged"
+msgstr "IP Logged"
+
+msgid "IS"
+msgstr "is"
+
+msgid "Last"
+msgstr "Last"
+
+msgid "Last Modified"
+msgstr "Last Modified"
+
+msgid "Last Name"
+msgstr "Last Name"
+
+msgid "Last Post"
+msgstr "Last Post"
+
+msgid "last post by"
+msgstr "last post by"
+
+msgid "last post by (%1)"
+msgstr "last post by %1"
+
+msgid "Last Viewed"
+msgstr "Last Viewed"
+
+msgid "LOCK AFTER POSTING"
+msgstr "Lock thread after posting"
+
+msgid "Lock Thread"
+msgstr "Lock Thread"
+
+msgid "Locked"
+msgstr "Locked"
+
+msgid "Locked Post"
+msgstr "Locked Post"
+
+msgid "LOGIN ADD REPLY"
+msgstr "You must be logged in before you can add a reply."
+
+msgid "LOGIN NEW TOPIC"
+msgstr "You must be logged in to add a new topic."
+
+msgid "LOGIN REQUIRED"
+msgstr "You must be logged in before you can access this area."
+
+msgid "LOGIN THREAD CONTINUE"
+msgstr "You must be logged in before you can use the thread continuation function."
+
+msgid "LOGIN USE NEW"
+msgstr "Please log-in using your username and your <u>new</u> password."
+
+msgid "LOGIN VIEW WATCHES"
+msgstr "You must be logged in before you can view your watched threads."
+
+msgid "LOGIN WATCH TOPIC"
+msgstr "You must be logged in before you can watch a topic."
+
+msgid "LOGIN_AND_REPLY"
+msgstr "Login and Reply"
+
+msgid "LOGIN_AND_QUOTE"
+msgstr "Login and Quote Reply"
+
+msgid "Logged in as"
+msgstr "Logged in as"
+
+msgid "Login"
+msgstr "Login"
+
+msgid "Login Not Allowed"
+msgstr "Login Not Allowed"
+
+msgid "Logins are not permitted from %1"
+msgstr "Logins are not permitted from %1"
+
+msgid "Logout"
+msgstr "Logout"
+
+msgid "MISSING_CONFIRM_EMAIL"
+msgstr "Please confirm your email address"
+
+msgid "MISSING_CONFIRM_PASSWORD"
+msgstr "Please confirm your password"
+
+msgid "MISSING_EMAIL"
+msgstr "Please provide an email address"
+
+msgid "MISSING_FIRST_NAME"
+msgstr "Please provide your first name"
+
+msgid "MISSING_FORUM_NAME"
+msgstr "Please provide a forumname"
+
+msgid "MISSING_LAST_NAME"
+msgstr "Please provide your last name"
+
+msgid "MISSING_NEW_PASSWORD"
+msgstr "Please provide a password"
+
+msgid "MISSING_NEW_USERNAME"
+msgstr "Please provide a username"
+
+msgid "MISSING_SEARCH_MATCH_TYPE"
+msgstr "Please specify the method you would like to match by"
+
+msgid "MISSING_SEARCH_TERMS"
+msgstr "Please provide something to search for"
+
+msgid "Manage"
+msgstr "Manage"
+
+msgid "Manage user roles"
+msgstr "Manage user roles"
+
+msgid "Me"
+msgstr "Me"
+
+msgid "Main Page"
+msgstr "Main Page"
+
+msgid "MESSAGE"
+msgstr "Message"
+
+msgid "Message"
+msgstr "Message"
+
+msgid "Moderate"
+msgstr "Moderate"
+
+msgid "My Preferences"
+msgstr "My Preferences"
+
+msgid "My Profile"
+msgstr "My Profile"
+
+msgid "My Watched Threads"
+msgstr "My Watched Threads"
+
+msgid "Name"
+msgstr "Name"
+
+msgid "Never Posted"
+msgstr "Never Posted"
+
+msgid "New Password"
+msgstr "New Password"
+
+msgid "Next"
+msgstr "Next"
+
+msgid "Nickname"
+msgstr "Nickname"
+
+msgid "No"
+msgstr "No"
+
+msgid "No posts"
+msgstr "No posts"
+
+msgid "No reason given"
+msgstr "No reason given"
+
+msgid "NO MATCHING USERS"
+msgstr "There are no users matching that information"
+
+msgid "NO RECENT THREADS"
+msgstr "No recent threads to display"
+
+msgid "NO SEARCH RESULTS"
+msgstr "No results found matching specified terms"
+
+msgid "NO SITE TERMS"
+msgstr "This site has no Terms and Conditions to view"
+
+msgid "No Such Form"
+msgstr "No Such Form"
+
+msgid "No User Avatar"
+msgstr "No User Avatar"
+
+msgid "No User Specified"
+msgstr "No User Specified"
+
+msgid "non-integer forum id passed"
+msgstr "Non-integer forum id passed"
+
+msgid "non-integer post id passed"
+msgstr "Non-integer post id passed"
+
+msgid "non-integer thread id passed"
+msgstr "Non-integer thread id passed"
+
+msgid "non-integer user id passed"
+msgstr "Non-integer user id passed"
+
+msgid "None"
+msgstr "None"
+
+msgid "No Moderators"
+msgstr "None"
+
+msgid "Notifications"
+msgstr "Notifications"
+
+msgid "Not Authenticated"
+msgstr "Not Authenticated"
+
+msgid "of"
+msgstr "of"
+
+msgid "or"
+msgstr "or"
+
+msgid "Page"
+msgstr "Page"
+
+msgid "Page %1 of %2"
+msgstr "Page %1 of %2"
+
+msgid "PASSWORD DETAILS SENT"
+msgstr "You should receive an email in the next few minutes with further instructions to reset your password."
+
+msgid "PASSWORD EMAIL SEND FAILED"
+msgstr "The application failed to send the password reset email."
+
+msgid "PASSWORD ENTER DETAILS"
+msgstr "Please enter your username and password"
+
+msgid "PASSWORD GAIN"
+msgstr "To gain access to your account your password can be re-set, and an authentication email re-sent."
+
+msgid "PASSWORD IMPOSSIBLE"
+msgstr "This makes it impossible to remind you of your current password."
+
+msgid "PASSWORD PROCEED"
+msgstr "If you wish to proceed please enter the username or email address you signed up with."
+
+msgid "PASSWORD RESET"
+msgstr "To reset your password enter your username and your desired password in the fields below, then click the <em>reset my password</em> button to proceed."
+
+msgid "PASSWORD RESET ID BOGUS"
+msgstr "Bogus password reset ID"
+
+msgid "PASSWORD RESET SUCCESS"
+msgstr "Your password has been set to the value you entered."
+
+msgid "PASSWORD RESET URL INCOMPLETE"
+msgstr "Incomplete password reset URL."
+
+msgid "PASSWORD STORES"
+msgstr "stores an encrypted copy of your password or email address you signed up with."
+
+msgid "Password"
+msgstr "Password"
+
+msgid "Password Reminder"
+msgstr "Password Reminder"
+
+msgid "Password Reminder"
+msgstr "Password Reminder"
+
+msgid "person"
+msgstr "person"
+
+msgid "Please choose a language"
+msgstr "Please choose a language"
+
+msgid "Please enter suspension information"
+msgstr "Please enter suspension information"
+
+msgid "Please enter your information"
+msgstr "Please enter your information"
+
+msgid "Please enter your username and password"
+msgstr "Please enter your username and password"
+
+msgid "people"
+msgstr "people"
+
+msgid "POSTED"
+msgstr "Posted"
+
+msgid "posted by"
+msgstr "posted by"
+
+msgid "Posting is not permitted from %1"
+msgstr "Posting is not permitted from %1"
+
+msgid "Posting Not Allowed"
+msgstr "Posting Not Allowed"
+
+msgid "Post Edited By: %1"
+msgstr "Post Edited By: %1"
+
+msgid "Posted from %1"
+msgstr "Posted from %1"
+
+msgid "Posts"
+msgstr "Posts"
+
+msgid "posts"
+msgstr "posts"
+
+msgid "Posts Made"
+msgstr "Posts Made"
+
+msgid "PREFS ADD WATCHES"
+msgstr "Automatically add watches for new posts"
+
+msgid "PREFS DESIRED LOCATION"
+msgstr "Select your desired location. This will be used to display times using your local timezone."
+
+msgid "PREFS EMAIL NOTIFICATION"
+msgstr "Receive email notification for watched threads"
+
+msgid "Preview"
+msgstr "Preview"
+
+msgid "Previous"
+msgstr "Previous"
+
+msgid "PROFILE NOT FOUND"
+msgstr "Can't locate a profile for the requested user."
+
+msgid "PROVE YOU ARE HUMAN"
+msgstr "Prove you're human"
+
+msgid "Post New Terms"
+msgstr "Post New Terms"
+
+msgid "Post New Topic"
+msgstr "Post New Topic"
+
+msgid "Quote"
+msgstr "Quote"
+
+msgid "Reason for suspension"
+msgstr "Reason for suspension"
+
+msgid "Recently Updated Threads"
+msgstr "Recently Updated Threads"
+
+msgid "Register"
+msgstr "Register"
+
+msgid "Registration Complete"
+msgstr "Registration Complete"
+
+msgid "Registrations are not permitted from %1"
+msgstr "Registrations are not permitted from %1"
+
+msgid "Registration Not Allowed"
+msgstr "Registration Not Allowed"
+
+msgid "Remove Watch"
+msgstr "Remove Watch"
+
+msgid "REPLY LOCKED THREAD"
+msgstr "You can't reply to a locked thread."
+
+msgid "Reply"
+msgstr "Reply"
+
+msgid "Replying To"
+msgstr "Replying To"
+
+msgid "Reset My Password"
+msgstr "Reset My Password"
+
+msgid "Return to"
+msgstr "Return to"
+
+msgid "Return to the forum"
+msgstr "Return to the forum"
+
+msgid "Reset Your %s Password"
+msgstr "Reset Your %s Password"
+
+msgid "said"
+msgstr "said"
+
+msgid "Search"
+msgstr "Search"
+
+msgid "Search For"
+msgstr "Search For"
+
+msgid "Search Results"
+msgstr "Search Results"
+
+msgid "Searching for"
+msgstr "Searching for"
+
+msgid "Select Zone"
+msgstr "Select Zone"
+
+msgid "Service"
+msgstr "Service"
+
+msgid "Services"
+msgstr "Services"
+
+msgid "Show timezone"
+msgstr "Show timezone"
+
+msgid "Sign Up"
+msgstr "Sign Up"
+
+msgid "SIGNUP COMPLETE FORM"
+msgstr "Complete the form below to create a new user account."
+
+msgid "SIGNUP EMAIL"
+msgstr "Your Email Address"
+
+msgid "SIGNUP EMAIL CONFIRM"
+msgstr "Confirm Email Address"
+
+msgid "SIGNUP EMAIL USAGE"
+msgstr "Your email address will not be passed on to any third parties. It will be used to send an activation link for the new account. If you request thread update alerts this address will also be used for the notification emails."
+
+msgid "SIGNUP ERRORS"
+msgstr "The following errors were found in your submission"
+
+msgid "SIGNUP FORUMNAME"
+msgstr "Forum Name"
+
+msgid "SIGNUP FORUMNAME DESCRIPTION"
+msgstr "Your <em>Forum Name</em> will be displayed with all postings you make on the forums.  Forum names are all unique, so when two "John Smith"s register, only one will appear as \"John Smith\" when posting. (Sorry other John Smith!)"
+
+msgid "SIGNUP PASSWORD"
+msgstr "Desired Password"
+
+msgid "SIGNUP PASSWORD CONFIRM"
+msgstr "Confirm password"
+
+msgid "SIGNUP USERNAME"
+msgstr "Desired Username"
+
+msgid "SITE MODERATOR REQUIRED"
+msgstr "You need to be a site moderator to access this section of the site."
+
+msgid "Site"
+msgstr "Site"
+
+msgid "Snippet"
+msgstr "Snippet"
+
+msgid "Start"
+msgstr "Start"
+
+msgid "Start A New Topic"
+msgstr "Start A New Topic"
+
+msgid "Stick Thread"
+msgstr "Stick Thread"
+
+msgid "Sticky"
+msgstr "Sticky"
+
+msgid "Sticky Topic"
+msgstr "Sticky Topic"
+
+msgid "Stop"
+msgstr "Stop"
+
+msgid "Subject"
+msgstr "Subject"
+
+msgid "SUBJECT"
+msgstr "Subject"
+
+msgid "Summary of Changes"
+msgstr "Summary of Changes"
+
+msgid "Suspend Account"
+msgstr "Suspend Account"
+
+msgid "Suspended"
+msgstr "Suspended"
+
+msgid "TERMS ADD NEW"
+msgstr "Add New Site Terms &amp; Conditions"
+
+msgid "TERMS AGREE"
+msgstr "I AGREE to the terms above"
+
+msgid "TERMS REJECT"
+msgstr "I DO NOT agree to the terms above"
+
+msgid "Terms and Conditions"
+msgstr "Terms &amp; Conditions"
+
+msgid "Thanks for signing up"
+msgstr "Thanks for signing up"
+
+msgid "The following error message was returned by the application"
+msgstr "The following error message was returned by the application"
+
+msgid "There is no current forum to view"
+msgstr "There is no current forum to view"
+
+msgid "There is no current thread to view"
+msgstr "There is no current thread to view"
+
+msgid "THREAD NO INFORMATION"
+msgstr "No information exists for the thread or post you are trying to reply to."
+
+msgid "THREAD NO POSTS"
+msgstr "You are trying to reply to a thread with no posts in it."
+
+msgid "THREAD WATCH FAILED"
+msgstr "Failed to add a watch for the requested thread."
+
+msgid "Thread"
+msgstr "Thread"
+
+msgid "threads"
+msgstr "threads"
+
+msgid "Thread Locked"
+msgstr "Thread Locked"
+
+msgid "Time"
+msgstr "Time"
+
+msgid "Time formatting example"
+msgstr "Time formatting example"
+
+msgid "Topic"
+msgstr "Topic"
+
+msgid "Unauthorized!"
+msgstr "Unauthorized!"
+
+msgid "Unknown field name"
+msgstr "Unknown field name"
+
+msgid "Unlock Thread"
+msgstr "Unlock Thread"
+
+msgid "Unread posts"
+msgstr "Unread posts"
+
+msgid "Unstick Thread"
+msgstr "Unstick Thread"
+
+msgid "Update"
+msgstr "Update"
+
+msgid "Update Reply"
+msgstr "Update Reply"
+
+msgid "Upload"
+msgstr "Upload"
+
+msgid "Use UTC"
+msgstr "Use UTC"
+
+msgid "USER ACTIVATE"
+msgstr "To activate your account click on the link in the email"
+
+msgid "USER ALMOST THERE"
+msgstr "Almost there..."
+
+msgid "USER AUTHENTICATED"
+msgstr "Your registration has been authenticated"
+
+msgid "User Profile"
+msgstr "User Profile"
+
+msgid "User has never posted"
+msgstr "User has never posted"
+
+msgid "USERNAME IN USE"
+msgstr "The username you have chosen is already in use. Please try a different one."
+
+msgid "USERNAME_NOT_UNIQUE"
+msgstr "The username you have chosen is already in use. Please try a different one."
+
+msgid "USERNAME INCORRECT"
+msgstr "Incorrect Username Supplied."
+
+msgid "Username"
+msgstr "Username"
+
+msgid "Users"
+msgstr "Users"
+
+msgid "User Roles"
+msgstr "User Roles"
+
+msgid "View"
+msgstr "View"
+
+msgid "view"
+msgstr "view"
+
+msgid "View all"
+msgstr "View all"
+
+msgid "views"
+msgstr "views"
+
+msgid "View Threads"
+msgstr "View Threads"
+
+msgid "Watch this thread"
+msgstr "Watch this thread"
+
+msgid "watching this thread"
+msgstr "watching this thread"
+
+msgid "We're not in Kansas any more"
+msgstr "We're not in Kansas any more"
+
+msgid "Users"
+msgstr "Users"
+
+msgid "wrote"
+msgstr "wrote"
+
+msgid "Yes"
+msgstr "Yes"
+
+msgid "You are not watching any threads"
+msgstr "You are not watching any threads"
+
+msgid "You are watching this thread"
+msgstr "You are watching this thread"
+
+msgid "You don't have the required privileges to do that"
+msgstr "You don't have the required privileges to do that"
+
+msgid "Your Details"
+msgstr "Your Details"
+
+msgid "Your Preferences"
+msgstr "Your Preferences"
+
+msgid "Your %s Username"
+msgstr "Your %s Username"
+
+
+# UNITS OF TIME
+msgid "AT ANY TIME"
+msgstr "at any time"
+
+msgid "IN THE LAST HOUR"
+msgstr "in the last hour"
+
+msgid "IN THE LAST DAY"
+msgstr "in the last day"
+
+msgid "IN THE LAST MONTH"
+msgstr "in the last month"
+
+msgid "IN THE LAST SIX MONTHS"
+msgstr "in the last six months"
+
+msgid "IN THE LAST YEAR"
+msgstr "in the last year"
+
+msgid "OVER A YEAR AGO"
+msgstr "over a year ago"
+
+msgid "second"
+msgstr "second"
+
+msgid "seconds"
+msgstr "seconds"
+
+msgid "minute"
+msgstr "minute"
+
+msgid "minutes"
+msgstr "minutes"
+
+msgid "hour"
+msgstr "hour"
+
+msgid "hours"
+msgstr "hours"
+
+msgid "day"
+msgstr "day"
+
+msgid "days"
+msgstr "days"
+
+msgid "month"
+msgstr "month"
+
+msgid "months"
+msgstr "months"
+
+msgid "year"
+msgstr "year"
+
+msgid "years"
+msgstr "years"

@@ -1,0 +1,1 @@
+<bar petal:repeat="list object/list">$object/as_string</bar>

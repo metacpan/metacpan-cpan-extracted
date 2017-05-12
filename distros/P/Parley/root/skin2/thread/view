@@ -1,0 +1,201 @@
+<!-- thread/view -->
+[% SET dummy_value = post_list.reset %]
+
+<!-- thread contents -->
+<table class="thread_posts">
+    <tbody>
+        <tr>
+            <td colspan="2" class="thread_header">
+                <a href="forum/view?forum=[% current_forum.id %]">[% ForumCode.escape(current_forum.name) %]</a>
+                &nbsp;:&nbsp;
+                [% ForumCode.escape(current_thread.subject) %]
+            </td>
+        </tr>
+
+        <!-- I'd really like to do this without a nested table -->
+        <tr>
+            <td colspan="2">
+                <table class="thread_info">
+                    <tbody>
+                        <tr>
+                            <td width="50%">
+                                <small>
+                                    [%l('[quant,_1,view]',current_thread.view_count)%].
+                                </small>
+                            </td>
+                            <td width="50%" align="right">
+                                [% PROCESS shared/pager_advanced %]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="50%">
+                                [% PROCESS shared/thread_watch %]
+                            </td>
+                            <td width="50%" align="right">
+                                <small>
+                                [% IF current_thread.locked %]
+                                    [%l('Thread Locked')%] 
+                                    <img src="static/images/icons/lock.png" alt="[%l('Locked')%]" title="[%l('Locked Topic')%]" width="16" height="16" />
+                                [% ELSIF authed_user %]
+                                    <span class="yui-button yui-link-button">
+                                        <span class="first-child">
+                                            <a href="thread/reply?thread=[% current_thread.id %]">[%l('Reply')%]</a>
+                                        </span>
+                                    </span>
+                                [% END %]
+                                </small>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <!-- end : nested table evil -->
+
+    <!-- thread posts -->
+    [% WHILE (post = post_list.next) %]
+        <tr class="thread_post_row">
+            <td class="user_post_info">
+                <a name="[%post.id%]"></a>
+                <!-- user avatar -->
+                [% avatar_file = c.path_to('root') _ "/static/user_file/${post.creator.id}/avatar.jpg" %]
+                [% TRY %]
+                    [% USE avatar = Image(avatar_file) %]
+                    [% tmp = avatar.attr %]
+                    <img class="picborder" src="/static/user_file/[% post.creator.id %]/avatar.jpg" border="0" [% avatar.attr %] alt="Avatar" />
+                    <br />
+                [% CATCH %]
+                    <!-- No User Avatar -->
+                [% END %]
+                <!-- end : user avatar -->
+
+                <a href="user/profile?user=[% post.creator.id %]">[% post.creator.forum_name %]</a>
+
+                <br />
+                [%l('[quant,_1,post]', post.creator.post_count)%]
+            </td>
+
+            <td class="post">
+                    [% IF post.admin_editor %]
+                    <div class="admin_edited_post">
+                        [%l('Post Edited By: [_1]', post.admin_editor.forum_name)%]:
+                        [% IF post.locked %]
+                        <img src="static/images/icons/lock.png" alt="[%l('Locked')%]" title="[%l('Locked Post')%]" width="16" height="16" />
+                        [% END %]
+                    </div>
+                    [% END %]
+                <!-- the body of the post -->
+                <div class="innerpost">
+                    [% IF post.quoted_post %]
+                    <div class="quote">
+                    <strong>[%l('[_1] wrote:', post.quoted_post.creator.forum_name)%]</strong><br>
+                    [% ForumCode.forumcode(post.quoted_text) %]<br />
+                    </div>
+                    <br />
+                    [% END %]
+                    [% ForumCode.forumcode(post.message) %]<br />
+                </div>
+                <!-- end : the body of the post -->
+
+                <div class="post_info">
+                    [% post.interval_ago %] ago
+                    <br />
+                    [% nicedate(post.created) %]
+                    [% IF post.edited %]
+                    <br /><span class="post_edited_alert">[%l('Edited')%]: [% nicedate(post.edited) %]</span>
+                    [% END %]
+                    <br />
+                    [% IF post.ip_addr %]
+                        [% IF moderator %]
+                        <a href="[%c.uri_for('/site/ip_info',{address=>post.ip_addr})%]">
+                            [%l('Posted from [_1]', post.ip_addr)%]
+                        </a>
+                        [% ELSE %]
+                           [%l('IP Logged')%] 
+                        [% END %]
+                    [% END %]
+                    [% IF (!current_thread.locked && authed_user) %]
+                        <br />
+                        <br />
+                        [% IF ((authed_user.id == post.creator.id) && !post.locked) || moderator %]
+                        <span class="yui-button yui-link-button">
+                            <span class="first-child">
+                                <a href="post/edit?post=[% post.id %]">[%l('Edit')%]</a>
+                            </span>
+                        </span>
+                        [% END %]
+                        <span class="yui-button yui-link-button">
+                            <span class="first-child">
+                                <a href="thread/reply?post=[% post.id %]">[%l('Quote')%]</a>
+                            </span>
+                        </span>
+                        <span class="yui-button yui-link-button">
+                            <span class="first-child">
+                                <a href="thread/reply?thread=[% current_thread.id %]">[%l('Reply')%]</a>
+                            </span>
+                        </span>
+                    [% END %]
+                </div>
+            </td>
+        </tr>
+    [% END %]
+    <!-- end : thread posts -->
+
+    <!-- post thread info -->
+        <!-- I'd really like to do this without a nested table -->
+        <tr>
+            <td colspan="2">
+                <table class="thread_info">
+                    <tbody>
+                        <tr>
+                            <td width="50%">
+                                [% PROCESS shared/thread_watch %]
+                            </td>
+                            <td width="50%" align="right">
+                                [% PROCESS shared/pager_advanced %]
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="50%">
+                                <small>
+                                    [% current_thread.view_count %]
+                                    [% IF current_thread.view_count == 1 %][%l('view')%][% ELSE %][%l('views')%][% END %].
+                                </small>
+                            </td>
+                            <td width="50%" align="right">
+                                <small>
+                                [% IF current_thread.locked %]
+                                    [%l('Thread Locked')%] 
+                                    <img src="static/images/icons/lock.png" alt="[%l('Locked')%]" title="[%l('Locked Topic')%]" width="16" height="16" />
+                                [% ELSIF authed_user %]
+                                    <span class="yui-button yui-link-button">
+                                        <span class="first-child">
+                                            <a href="thread/reply?thread=[% current_thread.id %]">[%l('Reply')%]</a>
+                                        </span>
+                                    </span>
+                                [% END %]
+                                </small>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+        <!-- end : nested table evil -->
+    <!-- end : post thread info -->
+    <tr>
+        <td colspan="2">
+            [% PROCESS shared/moderator_list %]
+        </td>
+    </tr>
+
+    <tr>
+        <td colspan="2" class="add_this">
+            [% PROCESS shared/add_this %]
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+<!-- end : thread contents -->
+<!-- end : thread/view -->

@@ -1,0 +1,12 @@
+authcomplex-passwd
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Plack-Middleware-Auth-Complex.t
+t/perlcriticrc
+t/perlcritic.t
+lib/Plack/Middleware/Auth/Complex.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

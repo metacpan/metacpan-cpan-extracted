@@ -1,0 +1,50 @@
+Perl6/Tokener version 0.01
+============================
+
+This is the first version of the Perl 6 tokener. There are known bugs,
+which will soon be addressed. However, this much is enough to allow you
+to start writing a parser. And that's gotta rock.
+
+SYNOPSIS
+           use Perl6::Tokener;
+           my $t = new Perl6::Tokener(file=>"foo.pl", buffer => $code);
+           while ($t->{buffer}) {
+               my ($type, $token) = $t->toke();
+               ...
+           }
+
+DESCRIPTION
+       I don't think there's really much I need to say about
+       this. It isn't perfect, but I'm working on it. The synop-
+       sis pretty much gives you all you need to know to drive
+       the thing, and, bluntly, if you're futzing with tokenising
+       Perl 6, you're already beyond the need for most kinds of
+       documentation. So have fun.
+
+       Oh, one thing - when you're parsing, you probably want to
+       discard the type of everything called "operator" or "term"
+       and just use the token value. Oh, and white space will
+       return "undef" for token and type, so don't try using this
+       in a "while" loop.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Text::Balanced
+
+COPYRIGHT AND LICENCE
+
+GPL and AL.
+
+Copyright (C) 2002 Simon Cozens
+

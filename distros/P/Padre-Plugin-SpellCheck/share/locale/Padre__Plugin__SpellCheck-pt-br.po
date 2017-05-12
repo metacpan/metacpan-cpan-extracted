@@ -1,0 +1,79 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-SpellCheck\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-04-30 07:18+0200\n"
+"PO-Revision-Date: 2009-04-30 02:21-0300\n"
+"Last-Translator: Breno G. de Oliveira <garu@cpan.org>\n"
+"Language-Team: Brazilian Portuguese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: lib/Padre/Plugin/SpellCheck.pm:31
+#: lib/Padre/Plugin/SpellCheck.pm:56
+msgid "Spell check"
+msgstr "Verificação ortográfica"
+
+#: lib/Padre/Plugin/SpellCheck.pm:57
+msgid "Check spelling\tF7"
+msgstr "Verificar ortografia\tF7"
+
+#: lib/Padre/Plugin/SpellCheck.pm:58
+msgid "Preferences"
+msgstr "Preferências"
+
+#: lib/Padre/Plugin/SpellCheck.pm:80
+msgid "No document opened."
+msgstr "Nenhum documento aberto."
+
+#: lib/Padre/Plugin/SpellCheck.pm:97
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:292
+msgid "Spell check finished."
+msgstr "Verificação ortográfica conluída."
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:43
+#, perl-format
+msgid "Spelling (%s)"
+msgstr "Ortografia (%s)"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:198
+msgid "Add to dictionary"
+msgstr "Adicionar ao dicionário"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:199
+msgid "Replace"
+msgstr "Substituir"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:200
+msgid "Replace all"
+msgstr "Substituir todas"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:201
+msgid "Ignore"
+msgstr "Ignorar"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:202
+msgid "Ignore all"
+msgstr "Ignorar todas"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:203
+msgid "Close"
+msgstr "Fechar"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:233
+msgid "Not in dictionary:"
+msgstr "Não existentes no dicionário:"
+
+#: lib/Padre/Plugin/SpellCheck/Dialog.pm:255
+msgid "Suggestions"
+msgstr "Sugestões"
+
+#: lib/Padre/Plugin/SpellCheck/Preferences.pm:36
+msgid "Spelling preferences"
+msgstr "Preferências de ortografia"
+
+#: lib/Padre/Plugin/SpellCheck/Preferences.pm:136
+msgid "Dictionary:"
+msgstr "Dicionário:"
+

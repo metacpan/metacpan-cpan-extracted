@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+
+# this script does not set log_any_app attribute, so you can still turn off
+# logging by setting env LOG=0, e.g.
+#
+#  % LOG=0 turn-off-log-any-app
+
+use 5.010;
+use strict;
+use warnings;
+use Perinci::CmdLine::Classic;
+
+our %SPEC;
+
+$SPEC{sc1} = {
+    v => 1.1,
+    summary => "This subcommand doesn't set log_any_app",
+    args => {},
+};
+sub sc1 { [200, "OK", "This is sc1"] }
+
+$SPEC{sc2} = {
+    v => 1.1,
+    summary => "This subcommand is run with log_any_app=0",
+    args => {},
+};
+sub sc2 { [200, "OK", "This is sc2"] }
+
+Perinci::CmdLine::Classic->new(
+    subcommands=>{
+        sc1 => {url=>"/main/sc1"},
+        sc2 => {url=>"/main/sc2", log_any_app=>0},
+    },
+)->run;

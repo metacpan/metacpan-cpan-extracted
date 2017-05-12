@@ -1,0 +1,21 @@
+SYNOPSIS
+
+     use Perinci::Sub::Wrapper::HandlePHPArray;
+
+DESCRIPTION
+
+    This module patches Perinci::Sub::Wrapper so the generated function
+    wrapper code can convert argument {} to [] when function expects
+    argument to be an array, or vice versa [] to {} when function expects a
+    hash argument. This can help if function is being called by PHP
+    clients, because in PHP Array() is ambiguous, it can be an empty hash
+    or an empty array.
+
+    To make this work, you have to specify schema in your argument
+    specification in your Rinci metadata, and the type must be hash or
+    array.
+
+    This is a temporary/stop-gap solution. The more "official" solution is
+    to use Perinci::Access::HTTP::Server which has the
+    deconfuse_php_clients option (by default turned on).
+

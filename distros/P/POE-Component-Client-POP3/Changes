@@ -1,0 +1,8 @@
+Revision history for Perl extension POE::Component::Client::POP3.
+
+0.01  Thu Feb 21 01:57:11 2002
+        - original version; created by h2xs 1.21 with options
+                -X -n POE::Component::Client::POP3
+0.02  Sat Mar 16 15:27:27 2002
+        - Fixed bug with several POP operations not functioning.
+        - Silenced some -w warnings.

@@ -1,0 +1,7 @@
+docs: |
+    See L<Digest::MD5> which provides a number of functions for computing
+    MD5 hashes from various sources and to various formats.
+
+    Note: the user notes for this function at http://www.php.net/md5 are
+    among the most unintentionally funny and misinformed I've read.
+

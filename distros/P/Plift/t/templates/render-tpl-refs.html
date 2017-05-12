@@ -1,0 +1,30 @@
+<section>
+    <div>Hello <span id='name' data-render="fullname fullname@title">John Doe</span>!</div>
+
+    <dl id='contact'>
+        <dt>Phone</dt>
+        <dd class='phone' data-render="contact.phone">(xxx) xxx-xxxx</dd>
+        <dt>Email</dt>
+        <dd class='email' data-render="contact.email">aaa@email.com</dd>
+    </dl>
+
+    <dl id='contact2' data-render="[contact]">
+        <dt>Phone</dt>
+        <dd class='phone' data-render="phone">(xxx) xxx-xxxx</dd>
+        <dt>Email</dt>
+        <dd class='email' data-render="email">aaa@email.com</dd>
+    </dl>
+
+    <div>
+        <article data-render="[posts]">
+            <span class="position" data-render="loop.index"></span>
+            <a class="post-title post-link" data-render="title url@href">Post Title</a>
+            <div class="post-content" data-render="content@HTML">Lorem ipsum dolor sit.</div>
+
+            <ul>
+                <li class="tag" data-render="[tags]"><a data-render="name url@href"/></li>
+            </ul>
+        </article>
+    </div>
+
+</section>

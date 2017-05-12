@@ -1,0 +1,25 @@
+Makefile.PL
+MANIFEST
+CHANGELOG
+ARTISTIC.txt
+GPL2.txt
+lib/Params/Validate/Dependencies.pm
+lib/Data/Domain/Dependencies.pm
+t/01-basics.t
+t/02-data-domain.t
+t/pod-coverage.t
+t/pod.t
+t/03-autodoco.t
+t/04-autodoco-dd.t
+lib/Params/Validate/Dependencies/Documenter.pm
+lib/Params/Validate/Dependencies/Extending.pod
+t/05-extra-validator-without-doco.t
+t/06-extra-validator-with-doco.t
+t/lib/Params/Validate/Dependencies/two_of.pm
+t/coverage.sh
+t/git-issue-1-return-values.t
+MANIFEST.SKIP
+t/git-issue-4-export-variables.t
+t/git-issue-5-exclusively.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,55 @@
+Date: Thu, 17 Jul 2008 17:02:21 +0200
+From: "Michal Seliga (Selmi)" <hidden>
+Subject: Re: Treo680MessagesDBformat
+
+i will write replies into your text.... and i cutted away parts not 
+neccesary
+
+David Cantrell wrote:
+> Could you let me know the offset of each record, and whether there are
+> any other records in between?  I expect that I'll need that so I can
+> relate the three records to each other.
+
+  if you look to name of each record, then first number is index in pdb, 
+second is record flags (category), rest is id
+ so i don't have offsets in pdb itself, but from what i saw there are 
+never any records between
+
+but mms can have more attachments, for example picture and sound, so 
+maybe there can be more then 3 records...
+logic says that they should have something in common, the most simple 
+solution for programmer would be to have in
+first messagesome number of how many records are attachments. and i see 
+some 2 in last line of hexdump, maybe thats it?
+
+> In this, I assume that 0901234567 is the phone number, and "TaXX (M)" is
+> the name of the other party.  What is "Skusam mmsky"?  mmsky doesn't
+> look like a word, is it just a typo?  What about the stuff that looks
+> like email addresses at the bottom?  Is that visible to the user on the
+> phone?  And did you send or receive this message?
+>   
+its sent message
+
+09012345567 - number
+TaXX(m) - name of other party
+skusam mmsky - subject (no, its not typo, its slovak slang...  
+translatedto english its 'i am trying mms')
+
+these 2 numbers which look like mail adresses are not visible on device 
+in messaging application, but
+when you try to send mms from your phone it opens network connection and 
+sends it through it. not
+like ordinary sms. so these are probably set by phone operator and taken 
+from sim card or newtork itself.
+
+> Also, once I've figured it out, would you object to me including the
+> data in the test suite for the module?  This would mean that other
+> people would be able to read it.  I would be able to obfuscate the phone
+> number and text, but not the image.
+
+no problem, purpose of this mesage was to try if mms work on my phone. 
+so image is just random garbage, subject says that i am trying mms and 
+text means 'if you will receive it let me know'
+so probably change them to something in english. and number is real but 
+incomplete (international prefix is missing) so most probably its 
+harmless to leave it as it is

@@ -1,0 +1,57 @@
+grp:3;3
+fd:0
+ifd:0
+dp:.
+ts:,
+cs:$
+ics:ERN
+csa:l
+css:1
+ns:-
+ps:+
+dtf:%A, %B %e, %Y %r %Z
+df:%d/%m/%Y
+tf:%l:%M:%S
+apf:%l:%M:%S %p
+amu:SAAKU
+pmu:CARRA
+aml:saaku
+pml:carra
+lm1:Qunxa Garablu
+lm2:Naharsi Kudo
+lm3:Ciggilta Kudo
+lm4:Agda Baxisso
+lm5:Caxah Alsa
+lm6:Qasa Dirri
+lm7:Qado Dirri
+lm8:Leqeeni
+lm9:Waysu
+lm10:Diteli
+lm11:Ximoli
+lm12:Kaxxa Garablu
+sm1:Qun
+sm2:Nah
+sm3:Cig
+sm4:Agd
+sm5:Cax
+sm6:Qas
+sm7:Qad
+sm8:Leq
+sm9:Way
+sm10:Dit
+sm11:Xim
+sm12:Kax
+ld1:Naba Sambat
+ld2:Sani
+ld3:Salus
+ld4:Rabuq
+ld5:Camus
+ld6:Jumqata
+ld7:Qunxa Sambat
+sd1:Nab
+sd2:San
+sd3:Sal
+sd4:Rab
+sd5:Cam
+sd6:Jum
+sd7:Qun

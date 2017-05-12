@@ -1,0 +1,116 @@
+Ase  p1;p2           Adjusts the potentiometer sensors
+Db   p1;p2;data      Downloads a Bitmap
+Dbc  P1;p2;p3;p4     Downloads a compressed color Bitmap
+Dbp  p1;p2;p3;p4     Partial downloads of a color Bitmap
+Dbpc p1;p2;p3;p4     Partial downloads of a compressed color
+Dbmp p1;p2;p3;p4;Bitmap file Downloads a logo in the Monochrome
+Mc   p1;p2           Runs Step Motor
+Mf   p1              Runs Feeder Motor
+Mh   P1              Runs Up &amp;Down Motor
+Mr   p1              Runs Ribbon Motor
+Pbm  p1              Sets Monochrome Bitmap Printing Mode
+Pc   p1;p2;p3        Sets Color Contrast Value
+Pem  p1;o1           Sets Errors Management
+Pkn  p1              Sets Print Head Kit Number
+Pl   p1;p2;p3        Sets Color Luminosity Value
+Pmi  p1              Sets the card insertion mode
+Pmk  p1;o1           Sets the speed for card insert/eject
+Pms  p1;p2           Sets Speed Motor Parameter
+Pnl  p1;p2           Sets Number of Lines to be printed
+Pnw  val             Sets Number of Lines to be printed in Y
+Ppk  p1              Sets the monochrome heating mode
+Ppn  p1              Sets Bi-directional Parallel Mode
+Pr   p1              Sets Ribbon Type
+Prm  p1              Sets Ribbon Synchronization Management
+Pro  p1              Sets Ribbon Offset
+Prs  p1;p2           Sets Rinbon Size
+Ps   p1;p2;p3        Sets Printing Speed Parameter
+Psc  Start;Sep;End   Sets Characters to be used for command
+Psp  p1;o1           Sets start printing position for ½ YMCKO
+Px   p1;p2           Sets Horizontal Offset Parameter
+Py   p1;p2           Sets Vertical Offset Parameter
+Pwb  p1              Sets Monochrome Bitmap
+Pwcs p1              Sets the checking text position mode
+Pwjs p1              Sets the writing justification mode
+Pwm  p1              Sets the Printing Mode
+Pwr  p1              Sets Text Orientation
+Rbm                  Reads selected Monochrome Printing Mode
+Rc   p1              Reads the Contrast Value
+Rck                  Reads Firmware Checksum Value
+Rco  p1              Reads Counters Values
+Rcr                  Reads Current Ribbon
+Rem                  Reads the Error Management Mode
+Rfv                  Reads Firmware Version
+Rfn                  Reads Resident Font Types
+Rkn                  Reads Print Head Kit Number
+Rks                  Reads Monochrome Shift Parameter
+Rl   p1              Reads Color Luminosity Value
+Rlr  p1              Reads Last Answer
+Rmi                  Reads Card Insertion Mode
+Rmk                  Reads Monochrome Printing Speed Mode
+Rms                  Reads Stepper Motor Speed
+Rnl                  Reads Number of Printed Lines
+Rnw                  Reads Number of Printed Lines in Y Orientation
+Rpk                  Reads Monochrome Heating Mode
+Rpn                  Reads Bi-directional Parallel Mode
+Rps  p1              Reads Sensor Potentiometer  values
+Rr                   Reads Ribbon Type
+Rrm                  Reads Ribbon Synchronization Management
+Rro                  Read the current Ribbon Offset
+Rrs                  Reads Ribbon Size
+Rs   p1              Reads Speed Parameters
+Rsc                  Reads Characters used for command definition
+Rse  p1              Reads a Sensor Value
+Rsn                  Reads Printer Serial Number
+Rsp                  Reads Start Printing Position
+Rtp                  Reads the printer Model
+Rx                   Reads Horizontal Offset Value
+Ry                   Reads Vertical Offset Value
+Sa   o1              Self adjusts the printer
+Sc   p1              Copies
+Scom p1;p2;p3        Sequence Transmission through Serial Port
+Scp                  Runs Printer Cleaning Sequence
+Scs                  Sequence Clear Status
+Sdm  p1              Sequence Delay in Milliseconds
+Sdu  p1              Sequence Delay in Microseconds
+Se                   Ends a sequence
+Si                   Inserts a card
+Sib                  Inserts a card from back
+Sp   p1              Prints one panel
+Sr                   Sequence Recto
+Srs                  Sequence Reset Software
+Ss                   Starts a sequence
+Ssd  p1              Simulates the downloading of one panel
+St                   Prints a Test Card (auto test)
+Stt  o1              Prints a Technical Test Card
+Sv                   Sequence Verso
+Wb   p1;p2;p3;p4;p5;p6;p7;Data Writes barcode
+Wcb  p1,o1           Fills bitmap with data (clear bitmap)
+Wl   P1;p2;p3;p4;p5  Writes Monochrome Line
+Wt                   Writes Monochrome Text
+Dm   p1;data         Downloads Magnetic Data
+Pmbs p1              Sets Start Coding Value for all three tracks
+Pmc  p1              Sets Coercivity Value
+Pmd  p1              Sets Track Density Value (in BPI)
+Pml                  Sets Magnetic Encoding Length
+Pmt  p1;p2           Sets the ISO Track Format
+Pmtc p1;p2;p3;p4     Sets Start, Stop and LRC for each track
+Pmts p1;p2           Sets Coding Start value for one track
+Rmbs                 Reads Start Magnetic Coding Default Value
+Rmc                  Reads Coercivity Value
+Rmd                  Reads Track Density Value (in BPI)
+Rml                  Reads Magnetic Encoding Length
+Rmms                 Reads Encoding Speed
+Rmt  p1              Reads the ISO track format
+Rmtc                 Reads Start, Stop and LRC for each track
+Rmts p1              Reads the coding Start value
+Smr  p1              Reads Magnetic Tracks
+Smw  p1              Writes Magnetic Tracks
+Pos  p1;p2           Sets Offset for Smart Card Position
+Psm  p1;o1           Sets Smart Card Signal Level
+Ros                  Reads Smart Card Offset Value
+Rsm                  Reads Smart Card Signal Level
+Sis                  Inserts a Smart Card under Smart Card Contact
+Poc  p1;p2           Sets the Contactless Card Offset Value
+Roc                  Reads the Contactless Card Offset Value
+Sk   p1;o1           Sequence discuss with Feeder

@@ -1,0 +1,256 @@
+#!/usr/bin/perl
+#Copyright (c) 2009, Zane C. Bowers
+#All rights reserved.
+#
+#Redistribution and use in source and binary forms, with or without modification,
+#are permitted provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright notice,
+#    this list of conditions and the following disclaimer.
+#   * Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+#THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+#ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+#WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+#IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+#INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+#BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+#DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+#LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+#OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+#THE POSSIBILITY OF SUCH DAMAGE.
+
+use strict;
+use warnings;
+use Getopt::Std;
+use Phone::Info;
+
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+#version function
+sub main::VERSION_MESSAGE {
+	print "phoneinfo 0.0.0\n";
+}
+
+#print help
+sub main::HELP_MESSAGE {
+	print "\n".
+	      "-t <type>\n".
+		  "-a <apt>\n".
+		  "-h <house>\n".
+		  "-s <street>\n".
+		  "-c <city>\n".
+		  "-S <state>\n".
+		  "-z <zip>\n".
+		  "-A <areacode>\n".
+		  "-m <metro>\n".
+		  "-p <phone>\n".
+		  "-f <firstname>\n".
+		  "-l <lastname>\n".
+	      "\n".
+		  "types:\n".
+		  "fp - Call the find_phone method. This is the default.\n".
+		  "ra - Call the reverse_address method.\n".
+		  "rp - Call the reverse_phone method.\n".
+		  "\n".
+		  "See perldoc for Phone::Info and phoneinfo for more information.\n";
+}
+
+#gets the options
+my %opts=();
+getopts('t:a:h:s:c:S:z:A:m:p:f:l:', \%opts);
+
+my $pi=Phone::Info->new;
+
+#default to fp
+if (!defined($opts{t})) {
+	$opts{t}='fp';
+}
+
+#initiate this variable here for the purpose of it
+my $res;
+
+#handle fp
+if ($opts{t} eq 'fp') {
+	$res=$pi->find_person({
+						   firstname=>$opts{f},
+						   lastname=>$opts{l},
+						   name=>$opts{n},
+						   house=>$opts{h},
+						   street=>$opts{s},
+						   city=>$opts{c},
+						   state=>$opts{S},
+						   zip=>$opts{z},
+						   areacode=>$opts{A},
+						   metro=>$opts{m},
+						   })
+}
+
+#handle ra
+if ($opts{t} eq 'ra') {
+	$res=$pi->reverse_address({
+							   house=>$opts{h},
+							   street=>$opts{s},
+							   city=>$opts{c},
+							   state=>$opts{S},
+							   zip=>$opts{z},
+							   areacode=>$opts{A},
+							   apt=>$opts{a},
+							   });
+}
+
+#handle ra
+if ($opts{t} eq 'rp') {
+	$res=$pi->reverse_phone({
+							 phone=>$opts{p},
+							 state=>$opts{S},
+							 });
+}
+
+if ($pi->{error}) {
+	warn('phoneinfo: The called Phone::Info method failed');
+	exit $pi->{error};
+}
+
+#format it
+my $output=$pi->resFormat({
+						   res=>$res,
+						   });
+
+#error if resFormat errored
+if ($pi->{error}) {
+	warn('phoneinfo: $pi->resFormat({res=>$res}) failed');
+	exit $pi->{error};
+}
+
+print $output;
+
+exit 0;
+
+=head1 NAME
+
+phoneinfo - Make use of Phone::Info. Search for information and display it.
+
+=head1 SYNOPSIS
+
+phoneinfo B<-l> <lastname> [B<-f> <firstname>] [B<-h> <house>] [B<-s> <street>] [B<-c> <city>] [B<-S> <state>] [B<-z> <zip>] [B<-m> (0|1)] [B<-A> <areacode>]
+phoneinfo B<-t> fp B<-l> <lastname> [B<-f> <firstname>] [B<-h> <house>] [B<-s> <street>] [B<-c> <city>] [B<-S> <state>] [B<-z> <zip>] [B<-m> (0|1)] [B<-A> <areacode>]
+phoneinfo B<-t> ra B<-s> <street> [B<-a> <apt>] [B<-h> <house>] [B<-c> <city>] [B<-S> <state>] [B<-z> <zip>] [B<-A> <areacode>]
+phoneinfo B<-t> rp B<-p> <phone> [B<-S> <state>]
+
+=head1 USAGE
+
+You will need to set the Whitepages.com API TOKEN to use via setting $ENV{WHITEPAGESTOKEN}.
+
+=head1 SWITCHES
+
+=head2 B<-t> <type>
+
+This is the type. The default is 'fp'.
+
+=head3 fp
+
+Call the find_person method.
+
+=head3 ra
+
+Call the reverse_address method.
+
+=head3 rp
+
+Call the reverse_phone method.
+
+=head2 B<-a> <apt>
+
+Apartment number.
+
+=head2 B<-h> <house>
+
+House number.
+
+=head2 B<-s> <street>
+
+Street name.
+
+=head2 B<-c> <city>
+
+City.
+
+=head2 B<-S> <state>
+
+State.
+
+=head2 B<-z> <zip>
+
+The 5 digit zip code.
+
+=head2 B<-A> <areacode>
+
+Area code.
+
+=head2 B<-m> (0|1)
+
+Wether or not the metro area should be searched as well.
+
+=head2 B<-p> <phone>
+
+Phone number.
+
+=head2 B<-f> <firstname>
+
+First name.
+
+=head2 B<-l> <lastname>
+
+Last name.
+
+=head1 EXIT CODES
+
+Any exit codes reflect the error codes returned by Phone::Info.
+
+=head1 AUTHOR
+
+Copyright (c) 2009, Zame C. Bowers <vvelox@vvelox.net>
+
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE
+xFOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS` OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=head1 SCRIPT CATEGORIES
+
+Search
+
+=head1 OSNAMES
+
+any
+
+=head2 SEE ALSO
+
+Phone::Info
+
+=head1 README
+
+phoneinfo - Make use of Phone::Info. Search for information and display it.
+
+=cut
+

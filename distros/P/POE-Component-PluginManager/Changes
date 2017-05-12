@@ -1,0 +1,44 @@
+Revision history for Perl extension POE::Component::PluginManager.
+
+0.67 Sa 15. Nov 14:04:11 UTC 2008
+	- fixed bug "attempt to reload $class"
+
+0.66 Sun Sep 21 23:20:52 CEST 2008
+	- made show_plugin_list return the plugin list, so that it can be
+	used synchronously.
+
+0.65 Sun Sep 21 22:56:59 CEST 2008
+	- made the load_plugin signal re-entrant
+	(see bug 39491: http://rt.cpan.org/Public/Bug/Display.html?id=39491)
+
+0.64 Sun Sep 21 22:56:17 CEST 2008
+	- automatic unregistering of all sessions when component is shut down
+	(fixes "dangling" idle-sessions)
+
+0.63 Sat Jul 19 18:30:46 CEST 2008
+	- tested with perl 5.8.8, changed makefile. Added delayed warnings.
+
+0.62 Sat Jul 19 18:30:46 CEST 2008
+	- tested with POE 0.9999, changed Makefile.PL.
+        
+0.61  Sun Jul 13 16:54:56 2008
+	- cleaned up POD, added better examples.
+    
+0.6  Sun Jul 13 16:54:56 2008
+	- bugfixes, added documentation and examples
+
+0.5  Sun Jul 13 16:54:56 2008
+	- bugfixes, added a few more signals
+
+0.4  Sun Jul 13 16:54:56 2008
+	- bugfixes, changed API a bit around, added refcount
+    incrementing for registered sessions
+
+0.3  Sun Jul 13 16:54:56 2008
+	- bugfixes, added capability to display plugin list
+
+0.2  Sun Jul 13 16:54:56 2008
+	- added plugin unloading capabilities
+
+0.1  Sun Jul 13 16:54:56 2008
+	- original version

@@ -1,0 +1,446 @@
+0.79    2017-01-12 (PERLANCAR)
+
+	- Perinci::Examples::Tiny: add function noop2() like in
+	  Perinci::Examples.
+
+
+0.78    2017-01-12 (PERLANCAR)
+
+	- Perinci::Examples::Tiny: Add function sum() like in
+	  Perinci::Examples.
+
+
+0.77    2016-12-10 (PERLANCAR)
+
+	- test_completion(): Add arguments h1 & h2 to test completion of hash
+          elements.
+
+
+0.76    2016-10-29 (PERLANCAR)
+
+	- Add functions Perinci::Examples::Tiny::foo{1,2,3,4}.
+
+
+0.75    2016-10-26 (PERLANCAR)
+
+	- Completion: Return result for debugging.
+
+
+0.74    2016-10-25 (PERLANCAR)
+
+	- Tweak Completion: add answer that contains space.
+
+
+0.73    2016-06-02 (PERLANCAR)
+
+        - Add functions: Tiny::Args::has_duration_arg,
+          Tiny::Args::has_date_and_duration_args.
+
+        - Add module: Tiny::Result.
+
+
+0.72    2016-05-20 (PERLANCAR)
+
+	- Update to Data::Sah 0.76+ and Perinci::CmdLine::Lite 1.55.
+
+	- Handle undef arg.
+
+
+0.71    2016-02-26 (PERLANCAR)
+
+        - Add modules: ArgsAs, ResultNaked.
+
+        - Delete devscripts/bench-startup (moved to
+          Bencher::Scenario::PerinciExamples::Startup in
+          Bencher-Scenarios-Perinci).
+
+
+0.70    2016-02-26 (PERLANCAR)
+
+	- CmdLineSrc: Add example for cmdline_src=stdin_or_args (Rinci 1.1.79).
+
+
+0.69    2016-02-04 (PERLANCAR)
+
+	- Stream: Fix schemas, all streams must be arrays.
+
+
+0.68    2016-01-22 (PERLANCAR)
+
+	- [Incompatible change] Rename functions to make them clearer.
+
+
+0.67    2016-01-22 (PERLANCAR)
+
+	- Add function: Stream::num_words to test validation of streaming
+          output.
+
+
+0.66    2016-01-22 (PERLANCAR)
+
+	- Add functions: Stream::word, Stream::word_err to test validation of
+          streaming output.
+
+
+0.65    2016-01-20 (PERLANCAR)
+
+	- [Bugfix] Fix metadata of Stream::wc & Stream::wc_keys.
+
+
+0.64    2016-01-19 (PERLANCAR)
+
+	- Add module: Perinci::Examples::Table.
+
+	- Bump prereq version Log::Any::IfLOG to 0.07.
+
+
+0.63    2015-11-28 (PERLANCAR)
+
+        - Add function: Tiny::hello_naked.
+
+
+0.62    2015-11-27 (PERLANCAR)
+
+	- Add module: Perinci::Examples::CSV.
+
+	- Add more input streaming examples: square_input_from_stdin,
+	  square_input_from_stdin_or_file, square_input_from_file.
+
+
+0.61    2015-09-29 (PERLANCAR)
+
+	- Add function: ::Tiny::Args::as_is.
+
+
+0.60    2015-09-26 (PERLANCAR)
+
+	- Add function: Perinci::Examples::Tiny::Args::has_date_arg.
+
+
+0.59    2015-09-23 (PERLANCAR)
+
+	- Add module: Perinci::Examples::Tiny::Args.
+
+
+0.58    2015-09-03 (PERLANCAR)
+
+	- Update x.schema.entity name (file -> filename).
+
+
+0.57    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.56    2015-08-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.55    2015-07-25 (PERLANCAR)
+
+	- Add module: Perinci::Examples::Version to demonstrate Riap
+	  package metadata which contains entity_v that is different from
+	  package $VERSION.
+
+
+0.54    2015-06-16 (PERLANCAR)
+
+	- Add devscripts/bench-startup.
+
+
+0.53    2015-06-16 (PERLANCAR)
+
+	- Add Perinci::Examples::Tiny.
+
+
+0.52    2015-04-07 (PERLANCAR)
+
+	- Add function: noop2.
+
+
+0.51    2015-04-02 (PERLANCAR)
+
+	- Adjust to DefHash 1.0.9 (rename alt.numnoun.* ->
+	  alt.plurality.*).
+
+	- [doc] Some rewording of description, remove Synopsis.
+
+
+0.50    2015-03-18 (PERLANCAR)
+
+	- Add examples for cmdline_src=stdin_or_file.
+
+
+0.49    2015-01-20 (PERLANCAR)
+
+	- Add options --num (-n) to nat() & hash_stream().
+
+
+0.48    2015-01-20 (PERLANCAR)
+
+	- Add module: Perinci::Examples::Stream.
+
+
+0.47    2015-01-17 (PERLANCAR)
+
+        - Update to Rinci 1.1.71: FileStream now uses coderef for streaming
+          input/output instead of filehandle.
+
+
+0.46    2015-01-11 (PERLANCAR)
+
+	- No functional changes.
+
+        - Add description to functions in Perinci::Examples::FileStream.
+
+        - Typo fixes.
+
+
+0.45    2015-01-04 (PERLANCAR)
+
+	- Fix/tweak completion example: add description to each answer
+	  entry.
+
+
+0.44    2014-12-03 (PERLANCAR)
+
+	- Add function: demo_cli_opts_shorter.
+
+	- Tweak Rinci metadata, change summary.alt.neg ->
+	  summary.alt.bool.not to comply with DefHash 1.0.8; add
+	  summary.alt.numnoun.singular in example.
+
+
+0.43    2014-11-20 (PERLANCAR)
+
+	- Rename function: funcname -> demo_cli_opts (for better name when
+	  being made a CLI script).
+
+
+0.42    2014-11-20 (PERLANCAR)
+
+	- Add module: Perinci::Examples::CLI (for testing
+          Perinci-Sub-To-CLIOptSpec).
+
+
+0.41    2014-11-12 (PERLANCAR)
+
+	- Missed a function.
+
+
+0.40    2014-11-12 (PERLANCAR)
+
+	- CmdLineSrc: return raw args in extra result (in result metadata), to
+          allow testing for special arguments (without breaking existing tests).
+
+
+0.39    2014-10-30 (PERLANCAR)
+
+	- Rename module Perinci::Examples::File to
+          Perinci::Examples::FilePartial.
+
+	- Add module: Perinci::Examples::FileStream.
+
+
+0.38    2014-10-29 (PERLANCAR)
+
+	- Add module: Perinci::Examples::File.
+
+	- Add function: multi_status().
+
+
+0.37    2014-10-24 (PERLANCAR)
+
+	- Add function: test_binary (in Perinci::Examples::CmdLineSrc).
+
+
+0.36    2014-10-24 (PERLANCAR)
+
+	- Add more explanation about the functions/arguments; add function
+	  'gen_random_bytes'.
+
+
+0.35    2014-10-23 (PERLANCAR)
+
+	- Update Rinci version.
+
+
+0.34    2014-10-11 (PERLANCAR)
+
+	- Use is_flag property (Rinci 1.1.57).
+
+
+0.33     2014-10-11 (PERLANCAR)
+
+         - Add argument submetadata examples in Perinci::Examples::SubMeta.
+
+
+0.32     2014-09-11 (PERLANCAR)
+
+         - Add example to demonstrate cmdline_src=stdin_line and is_password
+           (Rinci 1.1.53).
+
+         - Adjust to Perinci::Sub::Wrapper 0.62
+           (_perinci.sub.wrapper.validate_args is now renamed).
+
+         - Add function: is_palindrome (another demonstration of
+           cmdline.result).
+
+
+0.31     2014-08-23 (SHARYANTO)
+
+         - Add module: Perinci::Examples::{CmdLineResMeta}. This contains
+           functions that set cmdline.* result metadata to be tested when
+           testing Perinci::CmdLine & Perinci::CmdLine::Lite.
+
+
+0.30     2014-08-22 (SHARYANTO)
+
+         - Add modules: Perinci::Examples::{CmdLineSrc,Tx}. These are moved from
+           test script for Perinci::CmdLine.
+
+
+0.29     2014-08-21 (SHARYANTO)
+
+         - Add function: test_dry_run.
+
+
+0.28     2014-07-31 (SHARYANTO)
+
+         - Add functions: test_args_as_{array,arrayref,hashref}.
+
+
+0.27     2014-07-29 (SHARYANTO)
+
+         - test_completion(): Fix putting 'greedy' metadata property on
+           non-array arg.
+
+
+0.26     2014-07-29 (SHARYANTO)
+
+         - test_completion(): Add pos/greedy properties to help test
+           Perinci::Sub::Complete.
+
+
+0.25     2014-07-23 (SHARYANTO)
+
+         - Add function: gen_sample_data().
+
+
+0.24     2014-07-03 (SHARYANTO)
+
+         - Add function: test_common_opts().
+
+
+0.23     2014-06-26 (SHARYANTO)
+
+         - Add more arguments to test_completion() to test various stuffs.
+
+
+0.22     2014-06-18 (SHARYANTO)
+
+         - Add a2 argument to test_completion() to test element_completion.
+
+
+0.21     2014-06-18 (SHARYANTO)
+
+         - Add a1 argument to test_completion() to test complete_arg_elem.
+
+
+0.20     2014-06-11 (SHARYANTO)
+
+         - Add function: return_args.
+
+
+0.19     2014-03-15 (SHARYANTO)
+
+         - No functional changes. Rebuild to fix POD documentation (function
+           argument documentation was broken in Perinci-To-POD < 0.42).
+
+0.18    2013-12-21 (SHARYANTO)
+
+	- Add some response content to call_randlog().
+
+        - Add function arg_default to test default value from default and/or
+          schema.
+
+
+0.17    2013-11-14 (SHARYANTO)
+
+	- Add module: Perinci::Examples::Completion.
+
+
+0.16    2013-11-12 (SHARYANTO)
+
+	- No functional changes. Rebuild to fix t/00-compile.t generated by
+	  older DZP::Test::Compile (2.019 < x < 2.033).
+
+
+0.15     2013-10-15 (SHARYANTO)
+
+         - Add function: undescribed_args.
+
+         - sum: Add examples with 'src'.
+
+
+0.14     2012-12-22 (SHARYANTO)
+
+         - Split scripts (bin/) to Perinci-Examples-Bin to make dependencies for
+           this distribution minimal (e.g. not depending on Perinci::CmdLine)
+           since Perinci::Examples is used in tests for other modules.
+
+
+0.13     2012-11-29 (SHARYANTO)
+
+         - Add call_gen_array() and call_randlog().
+
+
+0.12     2012-11-08 (SHARYANTO)
+
+         - No functional changes. Add some # VALIDATE_ARG and rebuild with
+           DZP::Rinci::Validate enabled.
+
+
+0.11     2012-10-31 (SHARYANTO)
+
+         - rename script: peri-{ex,eg}-test-completion
+
+         - sum_array(): Add examples in metadata and 'round' option (to test
+           Test::Rinci).
+
+
+0.10     2012-07-19 (SHARYANTO)
+
+         - Add function: merge_hash
+
+
+0.09     2012-07-19 (SHARYANTO)
+
+         - Add function: sum
+
+         - Add script: peri-ex-test-completion
+
+         - Tweak some metadata
+
+
+0.08     2012-02-17 (SHARYANTO)
+
+         - No functional changes. Fix schema for 'test_completion'.
+
+
+0.07     2012-02-16 (SHARYANTO)
+
+         - Add function: test_completion.
+
+
+0.06     2012-02-13 (SHARYANTO)
+
+         - First release of Perinci-Examples. Rename distribution from
+           Sub-Spec-Examples.

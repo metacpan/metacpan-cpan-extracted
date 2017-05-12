@@ -1,0 +1,48 @@
+Revision history for Perl extension Parallel::SubFork.
+
+0.10 Fri Jan 29 16:25:41 CET 2010
+	- Bug fix: wait_for($timeout) returned without waiting.
+	  [Reported by Michael J Vanole throgh email]
+
+0.09 Sat Jan 16 16:37:15 CET 2010
+	- Documentation update.
+
+0.08 Sat Nov 14 13:02:05 CET 2009
+	- Implement the timeout in $task->wait_for through sleep instead of alarm.
+	  [Ticket #51465]
+
+0.07 Thu Nov 12 20:59:10 CET 2009
+	- Add a prototype to sub_fork.
+
+0.06 Thu May  7 07:42:05 CEST 2009
+	- New release with all the changes from the 0.06_XX releases.
+
+0.06_02  Fri Feb  6 22:34:52 CET 2009 
+	- Added unit tests for wait_for($timeout).
+	- The unit tests are skipped if the semaphore can't be created.
+
+0.06_01  Fri Feb  5 19:56:21 CET 2009 
+	- The method wait_for() can accept a timeout.
+
+0.05  Sun Mar 16 09:57:14 2008 
+	- Added the function sub_fork.
+	- Updated the documentation: removed all links to the functions as CPAN can't
+	  link to them properly.
+
+0.04  Wed Mar 12 18:37:41 2008 
+	- The tests where missing the file Tsemaphore.pm
+	  [Ticket #34016]
+
+0.03  Tue Mar 11 21:27:48 2008 
+	- Fixed a race condition in the tests by replacing kill/pause with semaphores
+	  [Ticket #33955]
+	- Skipping the test under Windows since fork is broken and unreliable and 
+	  IPC::SysV is missing
+
+0.02  Mon Mar  10 07:33:57 2008
+	- Fixed the AUTHOR entry in Makefile.PL
+	- Formatted some white spaces in the LICENSE
+
+0.01  Sat Mar  8 09:13:14 2008
+	- original version; created by h2xs 1.23 with options
+		-XA -n Parallel::SubFork

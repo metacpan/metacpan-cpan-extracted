@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+# $Id: pod2html 237 2007-01-17 19:46:26Z brian $
+
+=head1 NAME
+
+pod2tpr - turn pseudopod files into tagged text for The Perl Review
+
+=head1 SYNOPSIS
+
+	pod2html *.pod
+	
+=head1 DESCRIPTION
+
+This script turns pseudopod files into tagged text files. It takes the name
+of the pseudopod file, removes the extension, and adds the .txt extension
+to create the new file.
+
+=head1 SEE ALSO
+
+L<Pod::InDesign::TaggedText>
+
+=head1 AUTHOR
+
+brian d foy, C<< <bdfoy@cpan.org> >>
+
+I think I saw some similar code from chromatic, so I might have stolen
+some stuff.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2007, brian d foy, All Rights Reserved.
+
+You may redistribute this under the same terms as Perl itself.
+
+=cut
+
+use strict;
+
+use File::Basename;
+use Log::Log4perl qw(:easy);
+
+use Pod::SpeakIt::MacSpeech;
+
+Log::Log4perl->easy_init( $DEBUG );
+ 
+foreach my $file ( @ARGV )
+	{
+	my $parser = Pod::SpeakIt::MacSpeech->new();
+
+	unless( -e $file )
+		{
+		ERROR "Unable to open '$file': $!\n";
+		next;
+		}
+
+	# HTML output goes to the 'html' subdirectory of the source directory.
+	my $basename = basename($file);
+	
+	$basename =~ /(.*)\.pod$/;        
+	my $outfile = $1 . '.txt';    
+	DEBUG "The output file is $outfile\n";
+	
+	open my $outfh, ">> /dev/null" or 
+		do { ERROR "Can't write to $outfile: $!"; next };
+
+	$parser->output_fh( $outfh );
+	$parser->parse_file( $file );
+
+	close $outfh;
+	}

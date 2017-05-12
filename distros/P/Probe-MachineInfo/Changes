@@ -1,0 +1,21 @@
+Revision history for Probe-MachineInfo
+
+0.11    POD Updates
+
+0.06    Linux::Distribution mentioned in Build.PL
+        test.perl script
+
+0.05    Non default README file
+
+0.04    Minor documentation fix.
+        Thanks to Sébastien Aperghis-Tramoni (SAPER) for the spot
+
+				Sign the distribution
+
+0.03    Added missing Proc::Reliable dependency to Build.PL
+
+0.02    Renamed from Config::MachineInfo to Probe::MachineInfo after
+				reading chatter on perl.qa a litle more closely
+
+0.01    First version, released on an unsuspecting world.
+

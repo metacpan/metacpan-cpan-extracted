@@ -1,0 +1,103 @@
+[
+  {
+    "unMeta": {
+      "officia": {
+        "t": "MetaInlines",
+        "c": [
+          {
+            "t": "Str",
+            "c": "molestias"
+          }
+        ]
+      },
+      "error": {
+        "t": "MetaMap",
+        "c": {
+          "magni": {
+            "t": "MetaInlines",
+            "c": [
+              {
+                "t": "Str",
+                "c": "repellendus"
+              }
+            ]
+          },
+          "minima": {
+            "t": "MetaList",
+            "c": [
+              {
+                "t": "MetaInlines",
+                "c": [
+                  {
+                    "t": "Str",
+                    "c": "nihil"
+                  }
+                ]
+              },
+              {
+                "t": "MetaMap",
+                "c": {
+                  "aliquam": {
+                    "t": "MetaInlines",
+                    "c": [
+                      {
+                        "t": "Str",
+                        "c": "voluptas"
+                      }
+                    ]
+                  },
+                  "eos": {
+                    "t": "MetaInlines",
+                    "c": [
+                      {
+                        "t": "Str",
+                        "c": "odit"
+                      }
+                    ]
+                  },
+                  "true": {
+                    "t": "MetaBool",
+                    "c": true
+                  }
+                }
+              }
+            ]
+          },
+          "perferendis": {
+            "t": "MetaInlines",
+            "c": [
+              {
+                "t": "Str",
+                "c": "aut"
+              }
+            ]
+          }
+        }
+      },
+      "illo": {
+        "t": "MetaList",
+        "c": [
+          {
+            "t": "MetaInlines",
+            "c": [
+              {
+                "t": "Str",
+                "c": "nesciunt"
+              }
+            ]
+          }
+        ]
+      },
+      "tempora": {
+        "t": "MetaInlines",
+        "c": [
+          {
+            "t": "Str",
+            "c": "nisi"
+          }
+        ]
+      }
+    }
+  },
+  []
+]

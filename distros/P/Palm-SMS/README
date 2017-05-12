@@ -1,0 +1,27 @@
+This is Palm::SMS, a Perl module for reading, manipulating, and
+writing the .pdb files used by Handspring SMS application on PalmOS
+devices such as Handspring Treo 270.  More recent devices have
+partial support, and will use other device-specific modules if they
+are available.
+
+Palm::SMS module is the result of a reverse engineering attempt of
+trasforming a Handspring Treo 270 SMS PDB file into a plain text file.
+The PDB test file was produced by Handspring's application SMS
+v. 3.5H.
+
+Due to lack of knowledge about how PDB files work and what format SMS
+database files conform to, at present this module is not suitable for
+from-scratch SMS generation.  Conversely, you may find it extremely
+useful if you intend to extract SMS messages from merged PDB files and
+convert them to a human readable form.
+
+I heard rumors that SMS format changes with GSM network providers.
+Please, contact me if this module cannot correctly handle your
+messages, hopefully attaching a patch which corrects the shortcoming.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

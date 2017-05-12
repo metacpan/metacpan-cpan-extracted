@@ -1,0 +1,83 @@
+{
+   "abstract" : "Indent outputs indented as per source code indentation",
+   "author" : [
+      "motemen <motemen@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.8.3",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Print-Indented",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "List::MoreUtils" : "0",
+            "Path::Tiny" : "0",
+            "Scalar::Util" : "0",
+            "Symbol" : "0",
+            "Tie::Handle" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IPC::Run" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Print::Indented" : {
+         "file" : "lib/Print/Indented.pm",
+         "version" : "0.01"
+      },
+      "Print::Indented::Handle" : {
+         "file" : "lib/Print/Indented/Handle.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/motemen/perl5-Print-Indented/issues"
+      },
+      "homepage" : "https://github.com/motemen/perl5-Print-Indented",
+      "repository" : {
+         "url" : "git://github.com/motemen/perl5-Print-Indented.git",
+         "web" : "https://github.com/motemen/perl5-Print-Indented"
+      }
+   },
+   "version" : "0.01"
+}

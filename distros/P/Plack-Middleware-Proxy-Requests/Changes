@@ -1,0 +1,18 @@
+------------------------------------------------------------------------
+0.0102  2013-05-24      Piotr Roszatycki <dexter@cpan.org>
+
+* Prefer Twiggy as a server (after long testing it seems to be the best
+  choice)
+
+------------------------------------------------------------------------
+0.0101  2013-05-23      Piotr Roszatycki <dexter@cpan.org>
+
+* Prefer Starlet as a server.
+* Added an example for caching proxy server.
+
+------------------------------------------------------------------------
+0.01    2012-08-14      Piotr Roszatycki <dexter@cpan.org>
+
+* First CPAN release.
+
+------------------------------------------------------------------------

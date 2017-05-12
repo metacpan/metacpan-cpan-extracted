@@ -1,0 +1,26 @@
+---
+abstract: 'Trace your application performance with PerlGuard'
+author:
+  - 'Jonathan Taylor <jon@stackhaus.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PerlGuard-Agent
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::UUID: '0'
+  HTTP::Async: '0'
+  JSON: '0'
+  Moo: '1'
+  Time::HiRes: '0'
+version: '0.15'

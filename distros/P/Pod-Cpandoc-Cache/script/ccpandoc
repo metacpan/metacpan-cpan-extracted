@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+use Pod::Cpandoc::Cache;
+exit( Pod::Cpandoc::Cache->run() );
+
+__END__
+
+=head1 NAME
+
+ccpandoc
+
+=head1 DESCRIPTION
+
+See L<Pod::Cpandoc::Cache>
+
+=cut
+

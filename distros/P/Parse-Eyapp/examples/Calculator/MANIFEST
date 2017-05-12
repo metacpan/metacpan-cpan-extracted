@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+scripts/calc.pl
+scripts/expressions1
+scripts/witherrors
+t/01smoke.t
+t/02semanticerrors.t
+t/03syntacticerrors.t
+lib/Math/Calc.eyp
+lib/Math/Calc.pod
+lib/Math/Calc.pm
+lib/Math/Tail.pm

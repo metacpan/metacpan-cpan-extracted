@@ -1,0 +1,7 @@
+alarm(1);
+if ($ARGV[0]) {
+    print "$$\n";
+} else {
+    sleep(2);
+    print "failed\n";
+}

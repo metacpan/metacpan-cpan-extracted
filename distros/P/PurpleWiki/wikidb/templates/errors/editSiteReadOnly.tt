@@ -1,0 +1,7 @@
+[% INCLUDE common/header.tt
+           title = "Editing Denied"
+%]
+
+<p>Editing not allowed: [% siteName %] is read-only.</p>
+
+[% INCLUDE common/footer.tt %]

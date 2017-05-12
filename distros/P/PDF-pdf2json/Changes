@@ -1,0 +1,9 @@
+0.002 2014-04-19 23:37:16-0500
+    - pages now use 1-based indexing
+
+      It was 0-based, but this would interfere with internal links.
+
+    - add internal and external links to test PDF
+
+0.001 2014-04-19 23:13:45-0500
+    - initial version

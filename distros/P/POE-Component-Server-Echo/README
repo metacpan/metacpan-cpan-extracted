@@ -1,0 +1,87 @@
+NAME
+
+    POE::Component::Server::Echo - A POE component that implements an RFC
+    862 Echo server.
+
+VERSION
+
+    version 1.66
+
+SYNOPSIS
+
+      use POE::Component::Server::Echo;
+    
+      my $self = POE::Component::Server::Echo->spawn( 
+            Alias => 'Echo-Server',
+            BindAddress => '127.0.0.1',
+            BindPort => 7777,
+            options => { trace => 1 },
+      );
+
+DESCRIPTION
+
+    POE::Component::Server::Echo implements a RFC 862
+    http://www.faqs.org/rfcs/rfc862.html TCP/UDP echo server, using POE.
+    The component encapsulates a class which may be used to implement
+    further RFC protocols.
+
+CONSTRUCTOR
+
+    spawn
+
+      Takes a number of optional values:
+
+        "Alias", the kernel alias that this component is to be blessed with; 
+        "BindAddress", the address on the local host to bind to, 
+              defaults to L<POE::Wheel::SocketFactory|POE::Wheel::SocketFactory> default; 
+        "BindPort", the local port that we wish to listen on for requests, 
+              defaults to 7 as per RFC, this will require "root" privs on UN*X; 
+        "options", should be a hashref, containing the options for the component's session, 
+              see POE::Session for more details on what this should contain.
+
+METHODS
+
+    sockname_tcp
+
+      Takes no arguments. Returns a list consisting of the socket port and
+      address of the TCP listening socket as returned by Socket's
+      sockaddr_in function.
+
+    sockname_udp
+
+      Takes no arguments. Returns a list consisting of the socket port and
+      address of the UDP listening socket as returned by Socket's
+      sockaddr_in function.
+
+INPUT EVENTS
+
+    shutdown
+
+      Takes no arguments. Shuts down the component gracefully, terminating
+      all listeners and disconnecting all connected clients.
+
+BUGS
+
+    Report any bugs through http://rt.cpan.org/.
+
+SEE ALSO
+
+    POE
+
+    POE::Session
+
+    POE::Wheel::SocketFactory
+
+    http://www.faqs.org/rfcs/rfc862.html
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,9 @@
+Revision history for Plack-Middleware-JSON-ForBrowsers
+
+0.002000  2014-01-14 20:09:59 Europe/Zurich
+
+ - Make HTML head and foot configurable
+
+0.001000  2012-02-06 20:52:16 UTC
+
+ - Initial release

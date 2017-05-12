@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                Parallel-Iterator
+version:             1.00
+abstract:            Simple parallel execution
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.36_01
+distribution_type:   module
+requires:     
+    Config:                        0
+    IO::Handle:                    0
+    IO::Select:                    0
+    Storable:                      0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Andy Armstrong <andy@hexten.net>

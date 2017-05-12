@@ -1,0 +1,20 @@
+Changes
+lib/Perl/Critic/Nits.pm
+lib/Perl/Critic/Policy/ValuesAndExpressions/ProhibitAccessOfPrivateData.pm
+Makefile.PL
+MANIFEST
+MANIFEST.skip
+README
+t/00-load.t
+t/boilerplate.t
+t/exercise-policy.t
+t/initial-setup.t
+t/manifest.t
+t/perl-critic.t
+t/perlcriticrc
+t/perltidyrc
+t/pod.t
+t/todo.t
+t/unix-text.t
+t/ValuesAndExpressions/ProhibitAccessOfPrivateData.run
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,163 @@
+=encoding utf8
+
+=head1 NAME
+
+Payment::Sisow::SOAP - payments via the SOAP interface of Sisow
+
+=head1 INHERITANCE
+
+ Payment::Sisow::SOAP
+   is a Payment::Sisow
+
+=head1 SYNOPSIS
+
+See L<Payment::Sisow|Payment::Sisow>
+
+=head1 DESCRIPTION
+
+Sisow (F<http://sisow.nl>) is a Dutch payment broker, which offers a SOAP
+and a REST interface for communication.  This class extends their
+common interface with SOAP specific features.  Oh, the REST interface is
+larger...
+
+The full specification of the SOAP interface can be
+L<downloaded from Sisow|http://www.sisow.nl/downloads/WebService.pdf>.
+However, the REST specification is more clear about the content of
+certain fields.
+
+See L<documentation in the base class|Payment::Sisow/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+See L<documentation in the base class|Payment::Sisow/"METHODS">.
+ 
+=head2 Constructors
+
+See L<documentation in the base class|Payment::Sisow/"Constructors">.
+ 
+=over 4
+
+=item Payment::Sisow::SOAP-E<gt>B<new>(OPTIONS)
+
+ -Option      --Defined in     --Default
+  merchant_id   Payment::Sisow   <required>
+  merchant_key  Payment::Sisow   <required>
+  test          Payment::Sisow   <false>
+
+=over 2
+
+=item merchant_id => STRING
+
+=item merchant_key => STRING
+
+=item test => BOOLEAN
+
+=back
+
+=back
+
+=head2 Accessors
+
+See L<documentation in the base class|Payment::Sisow/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<isTest>()
+
+See L<Payment::Sisow/"Accessors">
+
+=item $obj-E<gt>B<merchantId>()
+
+See L<Payment::Sisow/"Accessors">
+
+=item $obj-E<gt>B<merchantKey>()
+
+See L<Payment::Sisow/"Accessors">
+
+=item $obj-E<gt>B<wsdl>()
+
+Returns the XML and SOAP handler object, used internally.  It is a
+XML::Compile::WSDL11 object.
+
+=back
+
+=head2 Calls
+
+=for trace
+
+local *TRACE;
+if(open TRACE, '>', "/tmp/sisow.$$")
+{   use Data::Dumper; $Data::Dumper::Indent =1; $Data::Dumper::Quotekeys=1;
+    print TRACE Dumper $answer, $trace;
+    close TRACE;
+}
+
+See L<documentation in the base class|Payment::Sisow/"Calls">.
+ 
+=over 4
+
+=item $obj-E<gt>B<listIdealBanks>(OPTIONS)
+
+See L<Payment::Sisow/"Calls">
+
+=item $obj-E<gt>B<startTransaction>(OPTIONS)
+
+See L<Payment::Sisow/"Calls">
+
+=item $obj-E<gt>B<transactionInfo>(TRANSACTION_ID)
+
+See L<Payment::Sisow/"Calls">
+
+=item $obj-E<gt>B<transactionStatus>(TRANSACTION_ID)
+
+See L<Payment::Sisow/"Calls">
+
+=back
+
+=head2 Helpers
+
+See L<documentation in the base class|Payment::Sisow/"Helpers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<isValidDescription>(STRING)
+
+See L<Payment::Sisow/"Helpers">
+
+=item $obj-E<gt>B<isValidPurchaseId>(STRING)
+
+See L<Payment::Sisow/"Helpers">
+
+=item $obj-E<gt>B<securedPayment>(QS|PAIRS)
+
+See L<Payment::Sisow/"Helpers">
+
+=back
+
+=head1 DETAILS
+
+See L<documentation in the base class|Payment::Sisow/"DETAILS">.
+ 
+=head2 About Sisow
+
+See L<documentation in the base class|Payment::Sisow/"About Sisow">.
+ 
+=head2 errors
+
+Undocumented error codes:   (spec version 1.0)
+
+  317   testing not allowed
+
+=head1 SEE ALSO
+
+This module is part of Payment-Sisow distribution version 0.13,
+built on January 08, 2014. Website: F<http://perl.overmeer.net/>
+
+=head1 LICENSE
+
+Copyrights 2013-2014 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

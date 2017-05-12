@@ -1,0 +1,57 @@
+grp:3
+fd:3
+ifd:3
+dp:,
+ts:.
+cs:Lek
+ics:ALL
+csa:l
+css:0
+ns:-
+ps:+
+dtf:%Y-%b-%d %I.%M.%S.%p %Z
+df:%Y-%b-%d
+tf:%I.%M.%S. %Z
+apf:%I.%M.%S.%p %Z
+amu:PD
+pmu:MD
+aml:pd
+pml:md
+lm1:janar
+lm2:shkurt
+lm3:mars
+lm4:prill
+lm5:maj
+lm6:qershor
+lm7:korrik
+lm8:gusht
+lm9:shtator
+lm10:tetor
+lm11:nëntor
+lm12:dhjetor
+sm1:Jan
+sm2:Shk
+sm3:Mar
+sm4:Pri
+sm5:Maj
+sm6:Qer
+sm7:Kor
+sm8:Gsh
+sm9:Sht
+sm10:Tet
+sm11:Nën
+sm12:Dhj
+ld1:e diel 
+ld2:e hënë 
+ld3:e martë 
+ld4:e mërkurë 
+ld5:e enjte 
+ld6:e premte 
+ld7:e shtunë 
+sd1:Die 
+sd2:Hën 
+sd3:Mar 
+sd4:Mër 
+sd5:Enj 
+sd6:Pre 
+sd7:Sht 

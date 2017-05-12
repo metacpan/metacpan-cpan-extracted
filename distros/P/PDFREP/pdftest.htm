@@ -1,0 +1,122 @@
+<HTML>
+
+<HEAD>
+
+  <TITLE>PDF File Creation Test Module</TITLE>
+
+</HEAD>
+
+<BODY TEXT="#FFFFFF" ALINK="#FFFFFF" VLINK="#FFFFFF" BGCOLOR="228B22">
+
+  <BR>
+  <CENTER>
+    <H2>
+      <U>PDF File Creation Test Module</U>
+    </H2>
+  </CENTER>
+
+  <FORM NAME="FORM1" ACTION="/cgi-bin/pdftest.cgi" METHOD="GET">
+
+  <P ALIGN="JUSTIFY">
+    <FONT SIZE="4">
+      This page is a pure HTML document which is used as a front to run the PDF REP PERL MODULE
+      which is currently available. Each file created will be documented on this page for 
+      future reference, together with it's usage.
+      <BR>
+    </FONT>
+  </P>
+
+  <P ALIGN="JUSTIFY">
+    <H3>
+      Created Files:
+    </H3>
+  </P>
+
+  <P ALIGN="JUSTIFY">
+    <TABLE WIDTH="100%" BORDER="1" CELLSPACING="0" CELLPADDING="0">
+      <TR>
+        <TH WIDTH="16%" ALIGN="LEFT" VALIGN="TOP">
+          File Name
+        </TH>
+        <TH WIDTH="60%" ALIGN="LEFT" VALIGN="TOP">
+          Description
+        </TH>
+        <TH WIDTH="24%" ALIGN="LEFT" VALIGN="TOP">
+          Location
+        </TH>
+      </TR>
+
+      <TR>
+        <TD WIDTH="16%" ALIGN="LEFT" VALIGN="TOP">
+          pdftest.htm
+        </TD>
+        <TD WIDTH="60%" ALIGN="LEFT" VALIGN="TOP">
+          This file is this page the main HTML reference Page for kicking off the CGI Perl Scripts
+        </TD>
+        <TD WIDTH="24%" ALIGN="LEFT" VALIGN="TOP">
+          &nbsp
+        </TD>
+      </TR>
+
+      <TR>
+        <TD WIDTH="16%" ALIGN="LEFT" VALIGN="TOP">
+          pdftest.cgi
+        </TD>
+        <TD WIDTH="60%" ALIGN="LEFT" VALIGN="TOP">
+          This file is the main CGI kick off program which calls the .pm program
+        </TD>
+        <TD WIDTH="24%" ALIGN="LEFT" VALIGN="TOP">
+          cgi-bin
+        </TD>
+      </TR>
+
+      <TR>
+        <TD WIDTH="16%" ALIGN="LEFT" VALIGN="TOP">
+          pdftest.pm
+        </TD>
+        <TD WIDTH="60%" ALIGN="LEFT" VALIGN="TOP">
+          This is the main Perl program which will read the data and output it to the pdf file
+        </TD>
+        <TD WIDTH="24%" ALIGN="LEFT" VALIGN="TOP">
+          cgi-bin
+        </TD>
+      </TR>
+
+      <TR>
+        <TD WIDTH="16%" ALIGN="LEFT" VALIGN="TOP">
+          PDFREP.pm
+        </TD>
+        <TD WIDTH="60%" ALIGN="LEFT" VALIGN="TOP">
+          This is the perl module which generates the PDF file from the parameters passed by the
+          pdftest.pm program or future Perl programs.
+        </TD>
+        <TD WIDTH="24%" ALIGN="LEFT" VALIGN="TOP">
+          cgi-bin
+        </TD>
+      </TR>
+
+      <TR>
+        <TD WIDTH="16%" ALIGN="LEFT" VALIGN="TOP">
+          pdftest1.pdf
+        </TD>
+        <TD WIDTH="60%" ALIGN="LEFT" VALIGN="TOP">
+          This is the output file produced by the PDFREP.pm module.
+        </TD>
+        <TD WIDTH="24%" ALIGN="LEFT" VALIGN="TOP">
+         &nbsp
+        </TD>
+      </TR>
+    </TABLE>
+  </P>
+
+  <P ALIGN="JUSTIFY">
+    <CENTER>
+      <INPUT TYPE="SUBMIT" NAME="SUBMIT" VALUE="The Go Button">
+    </CENTER>
+  </P>
+
+  </FORM>
+
+</BODY>
+
+</HTML>

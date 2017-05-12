@@ -1,0 +1,21 @@
+### Simple Include directive
+### Note how you can also alias things:  Foo.pm is aliased to Foo
+
+=Include Foo.pm as Foo
+=Include Bar.pm
+
+=pod
+
+=head1 NAME 
+
+Simple Include Directive
+
+=head2 Imported from Foo.pm:
+
+=Insert Foo->example
+
+=head2 Imported from Bar.pm:
+
+=Insert Bar.pm->example
+
+=cut

@@ -1,0 +1,111 @@
+#!/usr/bin/perl
+
+use File::Util;
+use warnings;
+use strict;
+
+# create directories
+
+my $f = File::Util->new();
+
+# create directories
+$f->make_dir('conf',0755);
+$f->make_dir('endpoints',0755);
+$f->make_dir('log',0755);
+$f->make_dir('mqdb',0755);
+
+my $aes_conf = 
+q{# Main AES Section
+[aes]
+
+# AES Network Conf
+host = localhost
+addr = 127.0.0.1
+port = 61614
+
+# IKC
+ikc_addr = 127.0.0.1
+ikc_port = 12345
+
+# Path to the Logger Configuration
+log_conf = conf/aes_log.conf
+
+# EP Watchdog entry in secs
+cwdg = 15
+
+# Watchdog retries before restarting endpoint
+wdgr = 3
+
+# Seconds to delay channel restart
+rstc = 5
+
+# AES MQ Database
+[mqdb]
+
+# The data directory
+data_dir = mqdb
+
+# Database DSN
+dsn = dbi:SQLite:dbname=mqdb/mq.db
+
+
+};
+
+my $aes_log_conf = 
+q{# MQ Loggers configuration see POE::Component::Logger for details on
+# configuring this file. These settings are good to start
+# Log dispatchers
+dispatchers = screen syslog file
+
+# Screen log details
+[screen]
+class = Log::Dispatch::Screen
+min_level = debug
+stderr = 1
+format = %d %m %n
+
+# Syslog details
+[syslog]
+class = Log::Dispatch::Syslog
+min_level = warning
+
+# Filelog details
+[file]
+class = Log::Dispatch::File
+filename = log/mq_main_server.log
+min_level = warning
+mode = append
+};
+
+
+my $aes_server = 
+q{#!/usr/bin/perl
+use POE::Component::Server::AsyncEndpoint;
+my $aes = POE::Component::Server::AsyncEndpoint->new();
+$aes->run();
+};
+
+# create the basic conf file
+$f->write_file(
+    file => 'conf/aes.conf',
+    bitmask => 0644,
+    mode => 'append',
+    content => $aes_conf,
+);
+
+# create the basic log conf file
+$f->write_file(
+    file => 'conf/aes_log.conf',
+    bitmask => 0644,
+    mode => 'append',
+    content => $aes_log_conf,
+);
+
+# create the basic server executable
+# create the basic log conf file
+$f->write_file(
+    file => 'aes',
+    bitmask => 0755,
+    mode => 'append',
+    content => $aes_server,
+);

@@ -1,0 +1,50 @@
+# [[[ EXCLUDE ALL GITHUB, UNUSED, AND AUTOMATICALLY-GENERATED FILES FROM CPAN ]]]
+# [ GitHub ]
+^\.git
+^\.gitignore$
+^\.travis\.yml$
+
+# [ CPAN Build & Distribution ]
+# NEED UPDATE, CORRELATION #pp00: list of CPAN files & directories to delete/exclude in Makefile.PL, .gitignore, and MANIFEST.SKIP
+# MANIFEST.SKIP is not auto-generated, do not exclude self
+# MANIFEST is needed by CPAN, do not exclude
+^MANIFEST\.bak
+# META.yml & META.json are needed by CPAN, do not exclude
+^MYMETA\.
+^Makefile$
+^Makefile\.old
+^blib
+^pm_to_blib
+^PhysicsPerl-
+^MakeMaker-
+
+# [ Temporary Files, Ending With Tilde ~ Or swp ]
+~$
+swp$
+
+# [ POD ]
+^pod2htmd\.tmp$
+
+# [ PhysicsPerl Unused ]
+^backup
+^lib\/PhysicsPerl\/Astro\/Body\.cpp\.CPPOPS_CPPTYPES
+^lib\/PhysicsPerl\/Astro\/Body\.h\.CPPOPS_CPPTYPES
+^lib\/PhysicsPerl\/Astro\/Body\.pmc\.CPPOPS_DUALTYPES
+^lib\/PhysicsPerl\/Astro\/monolith\/clean\/System\.pm
+^lib\/PhysicsPerl\/Astro\/monolith\/System\.pm
+^lib\/PhysicsPerl\/Astro\/System\.cpp\.CPPOPS_CPPTYPES
+^lib\/PhysicsPerl\/Astro\/System\.cpp\.CPPOPS_CPPTYPES_SSE
+^lib\/PhysicsPerl\/Astro\/System\.h\.CPPOPS_CPPTYPES
+^lib\/PhysicsPerl\/Astro\/System\.pmc\.CPPOPS_DUALTYPES
+^lib\/PhysicsPerl\/Astro\/unused\/Body\.cpp\.CPPOPS_CPPTYPES\.comments
+^lib\/PhysicsPerl\/Astro\/unused\/Body\.h\.CPPOPS_CPPTYPES\.comments
+^lib\/PhysicsPerl\/Astro\/unused\/System\.cpp\.CPPOPS_CPPTYPES_SSE\.comments
+^lib\/PhysicsPerl\/Astro\/unused\/System\.cpp\.CPPOPS_CPPTYPES_SSE_get\.comments
+^lib\/PhysicsPerl\/Astro\/unused\/System\.h\.CPPOPS_CPPTYPES\.comments
+^lib\/PhysicsPerl\/Test\/Astro_NBody\/n_body_good_10\.pl\.DISABLED_RUNS_TOO_LONG
+^lib\/PhysicsPerl\/Test\/Astro_NBody\/n_body_good_11\.pl\.DISABLED_RUNS_TOO_LONG
+^mathematica
+^script\/unused
+
+# [ PhysicsPerl Placeholders ]
+^script\/physicsperl

@@ -1,0 +1,119 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use 5.010;
+use Panotools::Script;
+use Image::ExifTool;
+use Pod::Usage;
+
+pod2usage (2) unless (scalar @ARGV);
+
+for my $path_pto (@ARGV)
+{
+    say "Project file: $path_pto";
+
+    my $path_jpg = $path_pto;
+    $path_jpg =~ s/\.pto/.jpg/;
+    next unless -e $path_jpg;
+
+    my $pto = new Panotools::Script;
+    $pto->Read ($path_pto) || next;
+
+    my $format = undef;
+    $format = 'equirectangular' if $pto->Panorama->{f} == 2;
+    next unless $format;
+
+    my $left = 0;
+    my $top = 0;
+    my $width = $pto->Panorama->{w};
+    my $height = $pto->Panorama->{h};
+
+    if (defined $pto->Panorama->{S})
+    {
+        #  S100,600,100,800   Selection(left,right,top,bottom)
+        my @crop = split ',', $pto->Panorama->{S};
+        $left = $crop[0];
+        $top = $crop[2];
+        $width = $crop[1] - $crop[0];
+        $height = $crop[3] - $crop[2];
+    }
+
+    my $full_width = $pto->Panorama->{w};
+    if ($pto->Panorama->{v} < 360)
+    {
+        $full_width = int (360 * $full_width / $pto->Panorama->{v});
+        $left += int (($full_width - $pto->Panorama->{w}) /2);
+    }
+
+    my $vfov = $pto->Panorama->{v} * $pto->Panorama->{h} / $pto->Panorama->{w};
+    my $full_height = $pto->Panorama->{h};
+    if ($vfov < 180)
+    {
+        $full_height = int (180 * $full_height / $vfov);
+        $top += int (($full_height - $pto->Panorama->{h}) /2);
+    }
+
+    my $path_first = $pto->Image->[0]->Path ($path_pto);
+    my $path_last = $pto->Image->[-1]->Path ($path_pto);
+
+    my $exiftool = new Image::ExifTool;
+    $exiftool->SetNewValue ('UsePanoramaViewer', 'True');
+    $exiftool->SetNewValue ('StitchingSoftware', 'Hugin');
+    $exiftool->SetNewValue ('ProjectionType', $format);
+    $exiftool->SetNewValue ('CroppedAreaLeftPixels', $left);
+    $exiftool->SetNewValue ('CroppedAreaTopPixels', $top);
+    $exiftool->SetNewValue ('CroppedAreaImageWidthPixels', $width);
+    $exiftool->SetNewValue ('CroppedAreaImageHeightPixels', $height);
+    $exiftool->SetNewValue ('FullPanoWidthPixels', $full_width);
+    $exiftool->SetNewValue ('FullPanoHeightPixels', $full_height);
+    $exiftool->SetNewValue ('FirstPhotoDate', Image::ExifTool::ImageInfo ($path_first)->{DateTimeOriginal}) if -e $path_first;
+    $exiftool->SetNewValue ('LastPhotoDate', Image::ExifTool::ImageInfo ($path_last)->{DateTimeOriginal}) if -e $path_last;
+    $exiftool->SetNewValue ('SourcePhotosCount', scalar @{$pto->Image});
+
+    $exiftool->WriteInfo ($path_jpg);
+    say "JPEG file: $path_jpg";
+}
+
+0;
+
+
+__END__
+
+=head1 NAME
+
+pto2gpano - set XMP GPano metadata in a JPEG panorama
+
+=head1 SYNOPSIS
+
+pto2gpano project1.pto project2.pto [...]
+
+Options: None
+
+=head1 DESCRIPTION
+
+Sets XMP metadata as described here, panoramas tagged with this metadata will
+display in the Google+ panorama viewer:
+
+https://developers.google.com/panorama/metadata/
+
+This tool assumes that for each project.pto, there is an equivalent
+equirectangular project.jpg that needs updated metadata.  It also assumes that
+the original photos are available to extract EXIF data info.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+L<http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/XMP.html#GPano>
+
+=head1 AUTHOR
+
+Bruno Postle - January 2013.
+
+=cut

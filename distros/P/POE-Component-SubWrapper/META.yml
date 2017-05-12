@@ -1,0 +1,23 @@
+---
+author:
+  - 'Matt Cashner (sungo@pobox.com)'
+build_requires:
+  Test::Distribution: 0
+  Test::Pod::Coverage: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-SubWrapper
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Devel::Symdump: 2.01
+  Exporter::Lite: 0
+  POE: 0.23
+  Test::More: 0.08
+version: 0.09

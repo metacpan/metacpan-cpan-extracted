@@ -1,0 +1,6 @@
+DESCRIPTION
+
+    This documentation is geared more into documenting HTTP API. If you
+    want something more Perl-oriented, try Perinci::To::POD (and convert
+    the resulting POD to HTML).
+

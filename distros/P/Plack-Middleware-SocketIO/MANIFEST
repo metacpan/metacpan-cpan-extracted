@@ -1,0 +1,28 @@
+Changes
+examples/chat.psgi
+examples/flash-policy-server
+lib/Plack/Middleware/SocketIO.pm
+lib/Plack/Middleware/SocketIO/Base.pm
+lib/Plack/Middleware/SocketIO/Connection.pm
+lib/Plack/Middleware/SocketIO/Handle.pm
+lib/Plack/Middleware/SocketIO/Htmlfile.pm
+lib/Plack/Middleware/SocketIO/JSONPPolling.pm
+lib/Plack/Middleware/SocketIO/Resource.pm
+lib/Plack/Middleware/SocketIO/WebSocket.pm
+lib/Plack/Middleware/SocketIO/XHRMultipart.pm
+lib/Plack/Middleware/SocketIO/XHRPolling.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/conn.t
+t/lib/Handler.pm
+t/lib/Utils.pm
+t/live/jsonp-polling.t
+t/live/websocket.t
+t/live/xhr-multipart.t
+t/live/xhr-polling.t
+t/middleware.t
+xt/changes.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,48 @@
+---
+abstract: 'Serve static files and Text::Xslate template files from document root with directory index'
+author:
+  - 'Kenta Sato <karupa@cpan.org>'
+build_requires:
+  HTTP::Request: 0
+  Plack::Test: 0
+  Test::More: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.4, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-App-Directory-Xslate
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::App::Directory::Xslate:
+    file: lib/Plack/App/Directory/Xslate.pm
+    version: 0.07
+requires:
+  Encode: 0
+  Plack: 0
+  Plack::App::Directory: 0
+  Plack::App::File: 0
+  Plack::Util: 0
+  Plack::Util::Accessor: 0
+  Text::Xslate: 0
+  parent: 0
+resources:
+  bugtracker: https://github.com/karupanerura/p5-Plack-App-Directory-Xslate/issues
+  homepage: https://github.com/karupanerura/p5-Plack-App-Directory-Xslate
+  repository: git://github.com/karupanerura/p5-Plack-App-Directory-Xslate.git
+version: 0.07

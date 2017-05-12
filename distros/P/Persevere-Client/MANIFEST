@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Persevere/Client/Class.pm
+lib/Persevere/Client.pm
+t/Persevere-Client.t
+examples/example1.pl
+examples/example2.pl
+examples/example3.pl
+examples/example4.pl
+examples/conf-test.pl
+examples/delete-item.pl
+examples/delete-test.pl
+examples/index.pl
+examples/talker-test.pl

@@ -1,0 +1,27 @@
+---
+name: Padre-Plugin-CSS
+version: 0.08
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+abstract: L<Padre> and CSS
+license: perl
+resources:
+  homepage: http://padre.perlide.org/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Padre-Plugin-CSS/
+build_requires:
+  CSS::Minifier::XS: 0
+  Padre: 0.26
+  Test::More: 0
+  WebService::Validator::CSS::W3C: 0
+provides:
+  Padre::Document::CSS:
+    file: lib/Padre/Document/CSS.pm
+    version: 0.22
+  Padre::Plugin::CSS:
+    file: lib/Padre/Plugin/CSS.pm
+    version: 0.08
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

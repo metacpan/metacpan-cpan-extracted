@@ -1,0 +1,335 @@
+=encoding utf8
+
+=head1 NAME
+
+perlbook - Libros sobre Perl y otros libros relacionados
+
+=head1 DESCRIPCIÓN
+
+Hay muchos libros sobre Perl o relacionados con Perl. Algunos son buenos y
+otros aceptables, pero muchos no merecen la pena. En L<http://books.perl.org/>
+encontrará una lista de estos libros. De algunos de ellos se incluyen extensas
+reseñas. En este documento se hace referencia a algunos de estos libros. Los
+que figuran en la lista son libros que recomendamos; no obstante, el que un
+libro no figure en la lista no quiere decir que sea malo.
+
+La mayoría de estos libros están disponibles en línea a través de Safari
+Books Online ( L<http://safaribooksonline.com/> ).
+
+=head2 Los libros más populares
+
+El principal libro de referencia sobre Perl, escrito por el creador del
+lenguaje, es I<Programming Perl>:
+
+=over 4
+
+=item I<Programming Perl> (el "Libro del Camello"):
+
+ Tom Christiansen, brian d foy y Larry Wall, con Jon Orwant
+ ISBN 978-0-596-00492-7 [4ª edición, febrero de 2012]
+ ISBN 978-1-4493-9890-3 [libro electrónico]
+ http://oreilly.com/catalog/9780596004927
+
+=back
+
+El "Libro del Carnero" es un recetario que incluye cientos de ejemplos del uso
+de Perl para realizar tareas específicas:
+
+=over 4
+
+=item I<The Perl Cookbook> (el "Libro del Carnero"):
+
+ Tom Christiansen y Nathan Torkington,
+ con prólogo de Larry Wall
+ ISBN 978-0-596-00313-5 [2ª edición - Agosto de 2003]
+ ISBN 978-0-596-15888-0 [libro electrónico]
+ http://oreilly.com/catalog/9780596003135/
+
+=back
+
+Si desea aprender los conceptos básicos de Perl, puede empezar por el Libro de
+la Llama, cuya lectura requiere unos conocimientos mínimos de programación:
+
+=over 4
+
+=item I<Learning Perl>  (el "Libro de la Llama")
+
+ Randal L. Schwartz, Tom Phoenix y brian d foy
+ ISBN 978-1-4493-0358-7 [6ª edición, junio de 2011]
+ ISBN 978-1-4493-0458-4 [libro electrónico]
+ http://www.learning-perl.com/
+
+=back
+
+El tutorial iniciado en el Libro de la Llama continúa en el Libro de la
+Alpaca, que presenta material de nivel intermedio, como referencias,
+estructuras de datos, programación orientada a objetos y módulos:
+
+=over 4
+
+=item I<Intermediate Perl> (el "Libro de la Alpaca")
+
+ Randal L. Schwartz y brian d foy, con Tom Phoenix
+         prólogo de Damian Conway
+ ISBN 978-1-4493-9309-0 [2ª edición, agosto de 2012]
+ ISBN 978-1-4493-0459-1 [libro electrónico]
+ http://www.intermediateperl.com/
+
+=back
+
+=head2 Referencias
+
+Es probable que desee tener estas referencias a mano:
+
+=over 4
+
+=item I<Perl 5 Pocket Reference>
+
+ Johan Vromans
+ ISBN 978-1-4493-0370-9 [5ª edición, julio de 2011]
+ ISBN 978-1-4493-0813-1 [libro electrónico]
+ http://oreilly.com/catalog/0636920018476/
+
+=item I<Perl Debugger Pocket Reference>
+
+ Richard Foley
+ ISBN 978-0-596-00503-0 [1ª edición - Enero de 2004]
+ ISBN 978-0-596-55625-9 [libro electrónico]
+ http://oreilly.com/catalog/9780596005030/
+
+=item I<Regular Expression Pocket Reference>
+
+ Tony Stubblebine
+ ISBN 978-0-596-51427-3 [2ª edición, julio de 2007]
+ ISBN 978-0-596-55782-9 [libro electrónico]
+ http://oreilly.com/catalog/9780596514273/
+
+=back
+
+=head2 Tutoriales
+
+=over 4
+
+=item I<Beginning Perl>
+
+(Hay dos libros con este mismo título)
+
+ Curtis "Ovid" Poe
+ ISBN 978-1-118-01384-7
+ http://www.wrox.com/WileyCDA/WroxTitle/productCd-1118013840.html
+
+ James Lee
+ ISBN 1-59059-391-X [3ª edición, abril de 2010, y libro electrónico]
+ http://www.apress.com/9781430227939
+
+=item I<Learning Perl> (el "Libro de la Llama")
+
+ Randal L. Schwartz, Tom Phoenix y brian d foy
+ ISBN 978-1-4493-0358-7 [6ª edición, junio de 2011]
+ ISBN 978-1-4493-0458-4 [libro electrónico]
+ http://www.learning-perl.com/
+
+=item I<Intermediate Perl> (el "Libro de la Alpaca")
+
+ Randal L. Schwartz y brian d foy, con Tom Phoenix
+         prólogo de Damian Conway
+ ISBN 978-1-4493-9309-0 [2ª edición, agosto de 2012]
+ ISBN 978-1-4493-0459-1 [libro electrónico]
+ http://www.intermediateperl.com/
+
+=item I<Mastering Perl>
+
+    brian d foy
+ ISBN 9978-1-4493-9311-3 [2ª edición, enero de 2014]
+ ISBN 978-1-4493-6487-8 [libro electrónico]
+ http://www.masteringperl.org/
+
+=item I<Effective Perl Programming>
+
+ Joseph N. Hall, Joshua A. McAdams, brian d foy
+ ISBN 0-321-49694-9 [2ª edición - 2010]
+ http://www.effectiveperlprogramming.com/
+
+=back
+
+=head2 Libros orientados a tareas específicas
+
+=over 4
+
+=item I<Writing Perl Modules for CPAN>
+
+ Sam Tregar
+ ISBN 1-59059-018-X [1ª edición, agosto de 2002, y libro electrónico]
+ http://www.apress.com/9781590590188
+
+=item I<The Perl Cookbook>
+
+ Tom Christiansen y Nathan Torkington,
+     con prólogo de Larry Wall
+ ISBN 978-0-596-00313-5 [2ª edición - Agosto de 2003]
+ ISBN 978-0-596-15888-0 [libro electrónico]
+ http://oreilly.com/catalog/9780596003135/
+
+=item I<Automating System Administration with Perl>
+
+ David N. Blank-Edelman
+ ISBN 978-0-596-00639-6 [2ª edición - Mayo de 2009]
+ ISBN 978-0-596-80251-6 [libro electrónico]
+ http://oreilly.com/catalog/9780596006396
+
+=item I<Real World SQL Server Administration with Perl>
+
+ Linchi Shea
+ ISBN 1-59059-097-X [1ª edición, julio de 2003, y libro electrónico]
+ http://www.apress.com/9781590590973
+
+=back
+
+=head2 Temas especiales
+
+=over 4
+
+=item I<Regular Expressions Cookbook>
+
+ Jan Goyvaerts y Steven Levithan
+ ISBN 978-1-4493-1943-4 [2ª edición, agosto de 2012]
+ ISBN 978-1-4493-2747-7 [libro electrónico]
+ http://shop.oreilly.com/product/0636920023630.do
+
+=item I<Programming the Perl DBI>
+
+ Tim Bunce y Alligator Descartes
+ ISBN 978-1-56592-699-8 [Febrero de 2000]
+ ISBN 978-1-4493-8670-2 [libro electrónico]
+ http://oreilly.com/catalog/9781565926998
+
+=item I<Perl Best Practices>
+
+ Damian Conway
+ ISBN 978-0-596-00173-5 [1ª edición, julio de 2005]
+ ISBN 978-0-596-15900-9 [libro electrónico]
+ http://oreilly.com/catalog/9780596001735
+
+=item I<Higher-Order Perl>
+
+ Mark-Jason Dominus
+ ISBN 1-55860-701-3 [1ª edición, marzo de 2005]
+ Libro electrónico gratuito http://hop.perl.plover.com/book/
+ http://hop.perl.plover.com/
+
+=item I<Mastering Regular Expressions>
+
+ Jeffrey E. F. Friedl
+ ISBN 978-0-596-52812-6 [3ª edición - Agosto de 2006]
+ ISBN 978-0-596-55899-4 [libro electrónico]
+ http://oreilly.com/catalog/9780596528126
+
+=item I<Network Programming with Perl>
+
+ Lincoln Stein
+ ISBN 0-201-61571-1 [1ª edición - 2001]
+ http://www.pearsonhighered.com/educator/product/Network-Programming-with-Perl/9780201615715.page
+
+=item I<Perl Template Toolkit>
+
+ Darren Chamberlain, Dave Cross y Andy Wardley
+ ISBN 978-0-596-00476-7 [Diciembre de 2003]
+ ISBN 978-1-4493-8647-4 [libro electrónico]
+ http://oreilly.com/catalog/9780596004767
+
+=item I<Object Oriented Perl>
+
+ Damian Conway
+     con prólogo de Randal L. Schwartz
+ ISBN 1-884777-79-1 [1ª edición, agosto de 1999, y libro electrónico]
+ http://www.manning.com/conway/
+
+=item I<Data Munging with Perl>
+
+ Dave Cross
+ ISBN 1-930110-00-6 [1ª edición - 2001, y libro electrónico]
+ http://www.manning.com/cross
+
+=item I<Mastering Perl/Tk>
+
+ Steve Lidie y Nancy Walsh
+ ISBN 978-1-56592-716-2 [1ª edición - Enero de 2002]
+ ISBN 978-0-596-10344-6 [libro electrónico]
+ http://oreilly.com/catalog/9781565927162
+
+=item I<Extending and Embedding Perl>
+
+ Tim Jenness y Simon Cozens
+ ISBN 1-930110-82-0 [1ª edición, agosto de 2002, y libro electrónico]
+ http://www.manning.com/jenness
+
+=item I<Pro Perl Debugging>
+
+ Richard Foley con Andy Lester
+ ISBN 1-59059-454-1 [1ª edición, julio de 2005, y libro electrónico]
+ http://www.apress.com/9781590594544
+
+=back
+
+=head2 Libros gratuitos
+
+Algunos de estos libros están disponibles como descargas gratuitas:
+
+I<Higher-Order Perl>: L<http://hop.perl.plover.com/>
+
+I<Modern Perl>: L<http://onyxneon.com/books/modern_perl/>
+
+=head2 Otros libros interesantes (no específicos de Perl)
+
+Es posible que encuentre varios conceptos de Perl familiares en esta colección
+de artículos de la ACM escritos por Jon Bentley. La similitud con el título
+del libro principal de Perl (que se publicó posteriormente) no es totalmente
+accidental:
+
+=over 4
+
+=item I<Programming Pearls>
+
+ Jon Bentley
+ ISBN 978-0-201-65788-3 [2ª edición - Octubre de 1999]
+
+=item I<More Programming Pearls>
+
+ Jon Bentley
+ ISBN 0-201-11889-0 [Enero de 1988]
+
+=back
+
+=head2 ¿Está la lista al día?
+
+Cada versión de Perl incluye documentación actualizada en el momento del
+lanzamiento. Esto supone un problema para mantener una lista de libros
+actualizada. Es probable que se hayan publicado libros muy interesantes desde
+que se incluyó la lista en esta versión de Perl. Si lo desea, puede consultar
+la versión más reciente de la lista en
+L<http://perldoc.perl.org/perlbook.html>.
+
+En la escala temporal de Internet, algunos de los libros de la lista parecen
+anticuados, pero los hemos incluido porque su contenido sigue siendo válido en
+la actualidad. En Perl no todo cambia a diario. Muchos de los libros para
+principiantes describen características y técnicas básicas que mantienen su
+vigencia. Sin embargo, en general intentaremos limitar esta lista a libros
+publicados en los últimos cinco años.
+
+=head2 Cómo incluir su libro en la lista
+
+Si su libro sobre Perl no está en la lista y cree que deberíamos incluirlo,
+póngase en contacto con nosotros. L<mailto:perl5-porters@perl.org>
+
+=cut
+
+=head1 TRADUCTORES
+
+=over
+
+=item * Joaquín Ferrero (Tech Lead)
+
+=item * Enrique Nell (Language Lead)
+
+=back
+

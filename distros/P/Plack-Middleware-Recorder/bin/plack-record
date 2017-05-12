@@ -1,0 +1,94 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Plack::Builder;
+use Plack::Runner;
+use Plack::Middleware::Recorder;
+use Plack::Util;
+
+my $runner = Plack::Runner->new;
+$runner->parse_options(@ARGV);
+
+if($runner->{'help'}) {
+    exec 'plackup', '--help';
+}
+
+my $args = $runner->{'argv'};
+my $app  = $runner->{'app'} || $args->[0] || 'app.psgi';
+$app     = Plack::Util::load_psgi $app;
+
+my $output;
+if(@$args > 1) {
+    $output = $args->[1];
+} else {
+    $output = \*STDOUT;
+}
+
+$runner->run(builder {
+    enable 'Recorder', output => $output;
+    $app;
+});
+
+# PODNAME: plack-record
+
+# ABSTRACT: Utility script for recording PSGI app requests
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+plack-record - Utility script for recording PSGI app requests
+
+=head1 VERSION
+
+version 0.06
+
+=head1 SYNOPSIS
+
+  plack-record > requests.out
+
+  plack-record app.psgi > requests.out
+
+  plack-record app.psgi requests.out
+
+=head1 DESCRIPTION
+
+This script records the requests that go to your PSGI application and writes
+their serialized forms to a file.  If no file is provided, the requests are
+written to standard out.
+
+=head1 OPTIONS
+
+Supports all options that L<plackup> does.
+
+=head1 SEE ALSO
+
+L<plackup>, L<Plack::Middleware::Recorder>, L<plack-replay>
+
+=head1 AUTHOR
+
+Rob Hoelz <rob@hoelz.ro>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Rob Hoelz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website
+L<https://github.com/hoelzro/plack-middleware-recorder/issues>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=cut

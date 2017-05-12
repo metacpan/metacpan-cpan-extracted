@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Protocol-IMAP,
+version 0.004:
+
+  Support for RFC3501 Internet Message Access Protocol (IMAP4)
+
+This software is copyright (c) 2011 by Tom Molesworth.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

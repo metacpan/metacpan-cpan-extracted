@@ -1,0 +1,10 @@
+Revision history for Perl extension Perl6ish
+
+0.02:
+  - Implement constant declaractor
+  - Add Perl6::Perl
+  - Add Perl6::Contexts
+  - Add Perl6::Junction
+
+0.01    Sun Jan 11 00:23:42 2009
+        - original version

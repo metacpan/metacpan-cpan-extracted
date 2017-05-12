@@ -1,0 +1,5 @@
+BEGIN {
+    (open(X, "<&STDIN") && open(Y, ">&STDOUT") && open(Z, ">&STDERR")) ||
+	die;
+}
+exit 0;

@@ -1,0 +1,9 @@
+Revision history for Perl extension POE::Component::OSCAR.
+
+0.04  Tue Nov 28 20:43:11 2006
+	- Replaced references to the obsolete POE::Preprocessor with Filter::Template
+
+0.03  Tue Jan 03 19:17:21 2006
+	- Added throttle argument to prevent rate problems with server
+	- Added sleep 0.1 statements as a hack to interact better with Net::OSCAR
+

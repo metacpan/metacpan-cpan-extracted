@@ -1,0 +1,17 @@
+Build.PL
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+dist.ini
+lib/POSIX/RT/Scheduler.pm
+lib/POSIX/RT/Scheduler.xs
+lib/POSIX/RT/ppport.h
+script/idle
+t/00-compile.t
+t/release-kwalitee.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

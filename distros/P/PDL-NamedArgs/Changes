@@ -1,0 +1,19 @@
+Revision history for Perl extension PDL::NamedArgs.
+
+0.12  Sat Jul 28 22:41:02 PDT 2001
+	- Fixed circular dependency on PDL::R::math
+
+0.11  Thu Jul 19 23:23:00 PDT 2001
+	- Forgot to scope arg_names, causing rentrancy problems
+
+0.10  Thu Jul 19 21:50:04 PDT 2001
+	- Fixed a nasty little bug when dealing with refs
+	- Fixed a nasty little bug while trying to preserver lowercase keys
+
+0.02  Wed Jul 18 20:56:18 PDT 2001
+	- Good enough shape to post to the list.
+
+0.01  Wed Jul 18 19:43:24 PDT 2001
+	- original version; created by h2xs 1.21 with options
+		-XA PDL::NamedArgs
+

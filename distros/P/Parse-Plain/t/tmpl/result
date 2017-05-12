@@ -1,0 +1,23 @@
+Template start
+  _une < 1
+    deux < 2
+      troi < 3
+RSTUV < t
+
+second template 33333
+33333
+
+GT
+[ARG(:.)]
+	 In block 1		 In block 2 			 IN block 3 %% {{ }} 	hidden block %% {{ }}GTblock8		 In block 2 again
+
+		Hello
+	 
+	 	hidden block %% {{ }}GTblock8
+   	
+
+>><<
+
+=========
+
+Template end

@@ -1,0 +1,162 @@
+Revision history for Perl6-Perldoc
+
+0.0.1  Wed Feb 14 13:53:15 2007
+       Initial release.
+
+
+
+0.0.2  Fri Apr 13 00:04:20 2007
+       No changes logged
+
+
+
+0.0.3  Fri Apr 13 20:30:47 2007
+
+    - Fixed test suite
+      (Removed YAML dependency;
+       Instead of line-by-line comparison of serializations, the
+       tests now walk the expected and actual DOM representations in parallel,
+       comparing node values via the objects' accessor methods;
+       This version of the test suite could easily be adapted to any
+       implementation of Pod parsing. Look at the 'make_tests' program and
+       the 't_source' directory to see how the tests are now declaratively
+       specified and auto-generated.
+      )
+
+    - Added missing style() accessor method
+
+    - Fixed handling (and on-the-fly creation) of =headN and =itemN classes
+
+    - Numerous other minor fixes pointed out by new test suite
+
+
+0.0.4  Fri Apr 20 12:03:05 2007
+
+    - Fixed bleadperl support for on-the-fly carping and croaking (thanks Aevar)
+
+    - Added tests for diagnostics
+
+    - Added filtering kludge for Windows-style newlines (thanks Thom)
+
+    - Changed "missing =itemN" from error to warning
+
+    - Added Filter::Simple dependency (thanks Dave)
+
+    - Added support for P<toc:...> for inserting tables-of-contents
+
+    - Numerous documentation tweaks
+
+    - Vastly improved robustness of XHTML translation of internal links
+
+    - Numerous fixes to XHTML conformance errors:
+        * Removed spurious <di/> from definition item generation
+        * fixed closing of <th> tags
+        * balanced all <a>..</a> tags
+
+    - Made XHTML strict conforming:
+        * Quoted value in <li value=...>
+        * s{<br>}{<br/>}g
+
+    - Added 'full_doc' option to XHTML translator (thanks Nick)
+
+
+0.0.5  Wed Apr 25 18:24:46 2007
+
+    - Enhanced Perl6::Perldoc::Parser::parse() so that it now accepts either
+      a filename, a filehandle, or a reference to a string, as its data
+      source.
+
+    - Several doc tweaks (thanks John)
+
+    - Added is_verbatim() method to DOM
+
+    - Fixed propagation of config info into table cells (thanks John!)
+
+    - Improved robustness of table parsing with respect to single/double
+      horizontal lines (e.g. no longer treats isolated =>, ==, --, etc.
+      as possible vertical boundary components)
+
+    - Fixed bug in DTD generation under 'full_doc' option
+
+    - Add embedded style_sheet support
+
+    - [BACKWARDS INCOMPATIBLE CHANGE] Refactored 'full_doc' option with
+      'DTD', 'title', and 'style' suboptions
+      
+    - Added stylesheet to bin/perldoc2xhtml to improve rendering of tables
+      in Firefox, Safari, and Explorer
+
+    - Added -toc option to bin/perldoc2xhtml to autogenerate a table of
+      contents for the document
+
+    - Added 'text_to_entities' option: see bin/perldoc2xhtml_enhanced
+      for an example (thanks John)
+
+
+
+0.000_006  Tue Apr  5 17:28:25 2011
+
+    - Fixed handling of nested '=begin comment' blocks (thanks Larry)
+
+    - Fixed handling of table header rows: now only header if separator
+      below first row contains at least one horizontal separator character
+
+    - Fixed bug in translation of S<> to XHTML (thanks Adriano)
+
+    - Fixed handling of X<no targets only text> entries (thanks Joseph)
+
+    - Fixed handling of =END and =for END (thanks again Joseph)
+
+    - Fixed (non-)removal of certain types of pod during filtering
+      (thanks Carl)
+
+    - Added warning about C«...» etc. without utf8 (thanks Hinrik)
+
+    - Added bleadperl fix for localized var in regex (thanks Father C!)
+
+
+0.000007  Sat Nov  5 17:34:16 2011
+
+    - No changes: reuploaded to overcome non-perlish CPAN numbering system
+      (thanks Father Chrysostomos)
+
+
+0.000008  Sun Aug 19 17:03:55 2012
+
+    - Patch to add missing handler for =defn (thanks Darren)
+
+    - Changed module's own =encoding to Latin-1
+      to support «...» in docs.
+
+
+0.000009  Tue Dec 18 19:14:53 2012
+
+    - Numerous bugfixes and improvements
+      (thanks Lionel!)
+
+
+0.000010  Tue Jan 22 18:17:19 2013
+
+    - Added id() method to normalize internal IDs.
+      (thanks Lionel)
+
+
+0.000011  Mon Feb 25 22:38:55 2013
+
+    - Added filename option
+      (thanks Lionel)
+
+    - Added support for inlined POD and HTML files via P<> directive
+      (many thanks, Lionel)
+
+
+0.000012  Sun Oct 26 12:09:39 2014
+
+    - Improved handling of + as border marker
+      (Thanks Lionel!)
+
+
+0.000013  Wed Oct 29 07:30:04 2014
+
+    - Tweak to handling of border markers
+      (Thanks again, Lionel)

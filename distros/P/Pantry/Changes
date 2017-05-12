@@ -1,0 +1,122 @@
+Revision history for pantry
+
+0.012     2012-10-11 18:39:13 America/New_York
+
+    [Added]
+
+    - Added a --reboot flag to the sync command
+
+0.011     2012-10-11 17:02:23 America/New_York
+
+    [Fixed]
+
+    - Removed a spurious dump of node data during environment syncs
+
+0.010     2012-09-28 17:25:07 America/New_York
+
+    [Added]
+
+    - Added support for data bags
+
+0.009     2012-08-16 14:56:25 America/New_York
+
+    [Added]
+
+    - Added support for multiple environments, including
+      environment attributes and environment-specific
+      run lists in roles
+
+0.008     2012-08-02 22:53:18 America/New_York
+
+    [Added]
+
+    - 'pantry create' now supports creating empty cookbook boilerplate
+
+0.007     2012-08-02 19:20:08 America/New_York
+
+    [Added]
+
+    - 'pantry apply' now converts 'true' and 'false' to
+      actual JSON booleans in the configuration file
+
+0.006     2012-07-12 14:34:17 America/New_York
+
+    [Added]
+
+    - 'pantry create' now accepts 'host', 'port', and 'user'
+      parameters that override the default SSH connection
+      settings.
+
+0.005     2012-05-11 13:25:40 America/New_York
+
+    [Added]
+
+    - Added support for Chef roles: creating, deleting, apply
+      recipes, etc.  Chef roles may also be applied to node
+      and role run_lists
+
+    - Node and role names can often be abbreviated to
+      a unique prefix, e.g. "foo" for "foo.example.com"
+
+0.004     2012-05-04 16:01:12 America/New_York
+
+    [Added]
+
+    - 'pantry sync' downloads the node run-report to the 'reports'
+      directory in the pantry.  This is useful for examining the
+      state of the node and eventually may be useful for searching
+      nodes based on configuration/state data.
+
+    - 'pantry rename' command added to rename nodes
+
+    - 'pantry delete' command added to delete nodes
+
+    - pantry commands that take a single 'node NAME' target may
+      specify a NAME of '-' to run the command against a list of
+      names read from STDIN
+
+    [Fixed]
+
+    - 'pantry sync' was crashing due to Net::OpenSSH not working with
+      Path::Class objects; fixed by stringifying paths before handing
+      off to Net::OpenSSH
+
+    [Changed]
+
+    - node names (and data file paths) are always converted to lower case
+      (since they are supposed to be DNS names, which are case insensitive
+      anyway)
+
+    - 'pantry list' outputs nodes alphabetically
+
+0.003     2012-05-02 18:06:55 America/New_York
+
+    [Fixed]
+
+    - 'pantry list' now lists node *names* not *filenames*
+
+0.002     2012-05-02 17:15:46 America/New_York
+
+    [Added]
+
+    - 'pantry apply' and 'pantry strip' commands added to support
+      applying/stripping recipes and attributes for nodes at the command
+      line instead of requiring an external editor
+
+    - 'pantry list' command added to list nodes managed in a pantry
+
+    - 'pantry show' command added to print out node JSON data
+
+    [Fixed]
+
+    - 'pantry sync' now includes the "--delete" flag during rsync
+
+    [Changed]
+
+    - pantry now uses model classes (Pantry::Model::*) to separate
+      manipulation of pantry objects from the command line app
+      interface
+
+0.001     2012-01-13 18:22:46 America/New_York
+    - Initial release
+

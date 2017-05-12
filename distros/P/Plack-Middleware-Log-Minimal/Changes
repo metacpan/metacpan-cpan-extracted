@@ -1,0 +1,21 @@
+Revision history for Perl extension Plack::Middleware::Log::Minimal
+
+0.06    Tue Jul 26 13:32:44 2011
+        - bugfix: raw_message text had color seq, using Log::Minimal $raw_message
+        - requires Log::Minimal 0.09
+
+0.05    Fri Jun 10 17:25:28 2011
+        - use Log::Minimal::COLOR
+
+0.04    Tue May 10 10:16:47 2011
+        - made log encoding configurable
+
+0.03    Mon May 9 17:01:55 2011
+        - do encode_utf8 all message
+
+0.02    Wed Dec 29 00:53:38 2010
+        - customize fomatter, loglevel and autodump 
+        - requries Log::Minimal 0.04
+
+0.01    Thu Nov  4 23:39:39 2010
+        - original version

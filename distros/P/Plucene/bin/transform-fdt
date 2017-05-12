@@ -1,0 +1,49 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+transform-fdt - transform .fdt files to new file format
+
+=head1 SYNOPSIS
+
+	transform-fdt *.fdt
+
+=head1 DESCRIPTION
+
+We are going to change the file format slightly for .fdt files. This
+script will take files of the old format and rewrite them using the new
+format. Old files will be renamed to have a ".BAK" extension.
+
+Running this script multiple times against the same file should cause
+an error. 
+
+NOTE: The file format has not changed yet, so you should not run this.
+It is for testing purposes for core developers only at this point.
+
+=cut
+
+use strict;
+use warnings;
+
+use File::Slurp;
+use Plucene::Store::InputStream;
+
+while (my $file = shift) {
+	eval {
+		my $back = $file . ".BAK";
+		local $SIG{__WARN__} = sub { die "$file already converted" };
+
+		my $in  = Plucene::Store::InputStream->new($file);
+		my $out = "";
+		while (!$in->eof) {
+			my @docs = map [ $in->read_vint, $in->read_byte, $in->read_string ],
+				1 .. $in->read_vint;
+			my $template = "w" . ("wCw/a*" x @docs);
+			$out .= pack $template, scalar @docs, map @$_, @docs;
+		}
+
+		rename $file => $back;
+		write_file $file, $out;
+	};
+	warn $@ if $@;
+}

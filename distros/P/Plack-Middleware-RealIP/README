@@ -1,0 +1,48 @@
+NAME
+    Plack::Middleware::RealIP - Override client IP with header value
+    provided by proxy/load balancer
+
+SYNOPSIS
+      enable 'Plack::Middleware::RealIP',
+          header => 'X-Forwarded-For',
+          trusted_proxy => [qw(192.168.1.0/24 192.168.2.1)];
+
+DESCRIPTION
+    Plack::Middleware::RealIP is loose port of the Apache module
+    mod_remoteip. It overrides "REMOTE_ADDR" with the IP address advertised
+    in the request header configured with "header".
+
+    When multiple, comma delimited IP addresses are listed in the header
+    value, they are processed from right to left. The first untrusted IP
+    address found, based on "trusted_proxy", stops the processing and is set
+    to be "REMOTE_ADDR". The header field is updated to this remaining list
+    of unconfirmed IP addresses, or if all IP addresses were trusted, this
+    header is removed from the request altogether.
+
+CONFIGURATION
+  header
+    Sets a request header to trust as the client IP, e.g. X-Client-IP
+
+  trusted_proxy
+    A list of IP addresses or subnet blocks which are trusted to provide IP
+    header.
+
+AUTHOR
+    Sherwin Daganato <sherwin@daganato.com>
+
+    Most of the logic is based on Plack::Middleware::XForwardedFor by Graham
+    Barr
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    mod_remoteip <http://httpd.apache.org/docs/trunk/mod/mod_remoteip.html>
+
+    Plack::Middleware::XForwardedFor
+
+    Plack::Middleware::ReverseProxy
+
+    Net::Netmask
+

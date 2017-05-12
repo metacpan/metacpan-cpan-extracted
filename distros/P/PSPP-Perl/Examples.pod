@@ -1,0 +1,146 @@
+=pod
+
+=head1 PSPP::Examples
+
+This page shows some simple examples of using the PSPP module.
+See L<PSPP> for details on each of the subroutines.
+
+=head2 A Simple example
+
+This example creates a system file called F<foo.sav>, containing one 
+variable called "id".  It contains no data.
+
+	use PSPP;
+
+	my $dict = PSPP::Dict->new ();
+	my $var = PSPP::Var->new ($dict, "id");
+
+	my $sysfile = PSPP::Sysfile->new ("foo.sav", $dict);
+	$sysfile->close();
+
+
+=head2 A slightly more complex example
+
+In this example there are three variables, called "id", "name" and "dob".
+Their formats are F2.0, A80 and DATETIME17 respectively.
+
+	use PSPP;
+
+	my $dict = PSPP::Dict->new ();
+	PSPP::Var->new ($dict, "id",
+		   (fmt=>PSPP::Fmt::F, width=>2, decimals=>0) );
+	
+	PSPP::Var->new ($dict, "name", (fmt=>PSPP::Fmt::A, width=>80) );
+	PSPP::Var->new ($dict, "dob",  (fmt=>PSPP::Fmt::DATETIME) );
+
+	my $sysfile = PSPP::Sysfile->new ("foo.sav", $dict);
+	$sysfile->close();
+
+=head2 Changing the properties of variables
+
+After a variable has been created, parameters may be set for it.
+
+	use PSPP;
+
+	my $dict = PSPP::Dict->new ();
+	my $var1 = PSPP::Var->new ($dict, "id");
+
+	$var1->set_label ("A unique identifier");
+	$var1->add_value_label (0, "Zero");
+	$var1->add_value_label (1, "One");
+
+
+=head2 Appending data to the file
+
+When a file is created, it contains no data.  Data is added by
+appending cases to the file.
+
+This example creates a file with 3 cases.
+
+	use PSPP;
+
+	my $dict = PSPP::Dict->new ();
+	PSPP::Var->new ($dict, "id", 
+	   (fmt=>PSPP::Fmt::F, width=>2, decimals=>0) );
+
+	PSPP::Var->new ($dict, "name", (fmt=>PSPP::Fmt::A, width=>8) );
+
+	my $sysfile = PSPP::Sysfile->new ("foo.sav", $dict);
+
+	$sysfile->append_case ( [1, "Alf"] );
+	$sysfile->append_case ( [2, "Bert"] );
+	$sysfile->append_case ( [3, "Charlie"] );
+
+	$sysfile->close();
+
+=head2  Variables with differing input and output formats
+
+By default,  a variable's output format corresponds to the input format.
+However, the output format may be changed after the variable has 
+been created.
+
+This example shows how  to create a DATETIME variable using the current time
+as its value.  Since pspp uses a different epoch to perl, the constant 
+PSPP::PERL_EPOCH needs to be added to the value returned from time(), in order 
+that it be correctly represented by pspp.
+
+	use PSPP;
+
+	my $dict = PSPP::Dict->new ();
+
+	my $var1 = PSPP::Var->new ($dict, "entrytime", 
+		(fmt=>PSPP::Fmt::F) );
+
+	$var1->set_output_format ( (fmt=>PSPP::Fmt::DATETIME, width=>20) );
+
+	my $sysfile = PSPP::Sysfile->new ("foo.sav", $dict);
+
+	my $now = time ();
+
+	$sysfile->append_case ( [ $now  + PSPP::PERL_EPOCH]  ) 
+		|| die "Cant write case";
+	
+	$sysfile->close();
+
+=head2  Reading data
+
+Data can be read from a system file or other source:
+
+	use PSPP;
+
+	my $sf = PSPP::Reader->open ("foo.sav");
+
+	my $dict = $sf->get_dict ();
+
+
+Once opened, the dictionary can be used like any other.
+
+	for ($v = 0 ; $v < $dict->get_var_cnt() ; $v++)
+	{
+	    my $var = $dict->get_var ($v);
+
+	    # Print the variables
+	    my $name = $var->get_name ();
+	    my $label = $var->get_label ();
+	    print "Var: $name, Label: $label\n";
+
+	    # Retrieve and print the value labels
+	    my $vl = $var->get_value_labels ();
+	    print "$_: $vl->{$_}\n" for keys %$vl;
+	}
+
+
+Reading of data must be done sequentially using the C<get_next_case> method.
+
+	while (my $c = $sf->get_next_case () )
+	{
+	    my $v;
+	    for ($v = 0; $v < $dict->get_var_cnt(); $v++)
+	    {
+	        print "val$v: @$c[$v] ";
+	    }
+	    print "\n";
+	}
+
+
+=cut

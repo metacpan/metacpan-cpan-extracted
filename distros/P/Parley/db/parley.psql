@@ -1,0 +1,431 @@
+-- Parley schema
+
+-- to get your user and database:
+--  createuser -A -d parley
+--  createdb -U parley -E UTF8 parley
+--  psql -U parley -d parley -f db/parley.psql
+
+\set QUIET 'on'
+
+-- wrap it all in a transaction
+BEGIN;
+
+-- put all tables in a separate namespace
+CREATE SCHEMA parley;
+ALTER SCHEMA parley OWNER TO parley;
+
+
+-- Create a table in your database for sessions
+-- [from Catalyst::Plugin::Session::Store::DBIC docs]
+CREATE TABLE parley.sessions (
+    id              CHAR(72) PRIMARY KEY,
+    session_data    TEXT,
+    expires         INTEGER,
+
+    -- we like to know when a session was created
+    created         timestamp with time zone
+                    default CURRENT_TIMESTAMP
+                    not null
+);
+ALTER TABLE parley.sessions OWNER TO parley;
+
+-- we have authentication
+CREATE TABLE parley.authentication (
+    id                      SERIAL          not null        primary key,
+    username                text            not null,
+    password                text            not null,
+    authenticated           boolean         NOT NULL        default False,
+
+    UNIQUE (username)
+);
+
+
+-- a table of acceptable TZ strings
+CREATE TABLE parley.preference_time_string (
+    id                              SERIAL      primary key,
+    time_string                     text        not null,
+    sample                          text        not null,
+    comment                         text
+);
+-- some TZ strings
+INSERT INTO preference_time_string (time_string, sample) VALUES ('%A %d %B %Y at %R', 'Thursday 13 July 2006 at 18:15');
+INSERT INTO preference_time_string (time_string, sample) VALUES ('%F %T', '2006-07-13 18:15:00');
+INSERT INTO preference_time_string (time_string, sample, comment) VALUES ('%c','Thu 13 Jul 2006 18:15:00 BST','locale''s date and time'); 
+INSERT INTO preference_time_string (time_string, sample) VALUES ('%A at %R', 'Thursday at 18:15');
+INSERT INTO preference_time_string (time_string, sample) VALUES ('%a, %d %b; %R', 'Thu, 13 Jul; 18:15');
+INSERT INTO preference_time_string (time_string, sample) VALUES ('%a, %d %b; %R', 'Thu, 13 Jul; 18:15');
+INSERT INTO preference_time_string (time_string, sample) VALUES ('%R, %b %d', '18:15, Jul 13');
+INSERT INTO preference_time_string (time_string, sample) VALUES ('%R, %b %d ''%y', '18:15, Jul 13 ''06');
+
+
+CREATE TABLE parley.preference (
+    id             SERIAL      primary key,
+
+    timezone        text        not null
+            default 'UTC',
+    time_format_id  integer     references preference_time_string(id),
+    show_tz         boolean     default True,
+
+    notify_thread_watch     boolean     default False,
+    watch_on_post           boolean     default True,
+    skin                    varchar(100) NULL
+);
+
+CREATE TABLE parley.person (
+    id                  SERIAL      primary key,
+    
+    first_name          text        not null,
+    last_name           text        not null,
+    email               text        not null,
+    
+    forum_name          text        not null,
+
+    preference_id       integer
+                        references preference(id),
+
+    authentication_id   integer
+                        references authentication(id),
+
+    suspended           boolean     not null
+                        default False,
+
+    UNIQUE(forum_name),
+    UNIQUE(email)
+);
+
+CREATE TABLE parley.registration_authentication (
+    id              text  primary key,
+    recipient_id    integer     not null
+                    references person(id),
+    expires         date
+);
+
+-- new table used during forgotten password process
+CREATE TABLE parley.password_reset (
+    id                      text        primary key,
+    recipient_id            integer     not null
+                            references person(id),
+    expires                 timestamp
+);
+
+CREATE TABLE parley.forum (
+    id              SERIAL      primary key,
+    name            text        not null,
+    description     text,
+
+    active          boolean     not null    default True,
+
+    post_count      integer     not null    default 0,
+
+    UNIQUE(name)
+);
+
+CREATE TABLE parley.thread (
+    id              SERIAL      primary key,
+    forum_id        integer     not null
+                    references forum(id),
+
+    subject         text        not null,
+    
+    created         timestamp with time zone
+                    default CURRENT_TIMESTAMP,
+    creator_id      integer     not null
+                    references person(id),
+    post_count      integer     not null    default 0,
+    view_count      integer     not null    default 0,
+
+    active          boolean     not null    default True,
+
+    sticky          boolean     not null    default False,
+    locked          boolean     not null    default False
+);
+
+CREATE TABLE parley.post (
+    id              SERIAL      primary key,
+    thread_id       integer     not null
+                    references thread(id),
+
+    subject         text,
+    message         text        not null,
+
+    created         timestamp with time zone
+                    default CURRENT_TIMESTAMP,
+    creator_id      integer     not null
+                    references person(id),
+
+    ip_addr         inet,
+
+    admin_editor_id integer
+                    references person(id),
+    locked          boolean     not null
+                    default False
+);
+
+-- add ReplyTo information for post
+ALTER TABLE parley.post ADD COLUMN reply_to_id
+    integer references post(id)
+;
+-- deal with quoted replies
+ALTER TABLE parley.post
+ADD COLUMN quoted_post_id
+integer REFERENCES post(id);
+
+ALTER TABLE parley.post
+ADD COLUMN quoted_text text;
+
+-- add LastPost information
+ALTER TABLE parley.thread ADD COLUMN last_post_id
+    integer references post(id)
+;
+ALTER TABLE parley.forum ADD COLUMN last_post_id
+    integer references post(id)
+;
+
+-- person posting information
+ALTER TABLE parley.person ADD COLUMN last_post_id
+    integer references post(id)
+;
+ALTER TABLE parley.person ADD COLUMN post_count
+    integer NOT NULL default 0
+;
+
+-- post edited time (if any)
+ALTER TABLE parley.post
+    ADD COLUMN
+        edited  timestamp with time zone
+;
+
+
+-- when a user last viewed a thread
+CREATE TABLE parley.thread_view (
+    id                  SERIAL      not null        primary key,
+    person_id           integer     not null        references person(id),
+    thread_id           integer     not null        references thread(id),
+    timestamp           timestamp with time zone    not null
+                        default CURRENT_TIMESTAMP,
+
+    watched             boolean     not null        default False,
+    last_notified       timestamp with time zone
+                        default NULL,
+
+    unique(person_id, thread_id)
+);
+
+-- overall it's better to queue outgoing emails, and have a separate process
+-- deal with them
+CREATE TABLE parley.email_queue (
+    id                  SERIAL      not null        primary key,
+    queued              timestamp with time zone    not null
+                        default CURRENT_TIMESTAMP,
+
+    recipient_id        integer     not null        references person(id),
+    cc_id               integer                     references person(id),
+    bcc_id              integer                     references person(id),
+
+    sender              text        not null,
+
+    subject             text        not null,
+    text_content        text        not null,
+    html_content        text,
+
+    -- delivery statuses
+    attempted_delivery  boolean     not null        default False
+);
+
+
+-- a table of person/forum to show who's a moderator
+CREATE TABLE parley.forum_moderator (
+    id                  SERIAL      primary key,
+    person_id           integer     not null    references person(id),
+    forum_id            integer     not null    references forum(id),
+    can_moderate        boolean     not null    default true,
+
+    unique(person_id,forum_id)
+);
+
+
+-- a table to contain site terms & conditions
+CREATE TABLE parley.terms (
+    id              serial      primary key,
+    created         timestamp with time zone
+                    default CURRENT_TIMESTAMP
+                    not null,
+
+    content         text        not null,
+
+    change_summary  text
+);
+-- keep track of who agreed to what, and when
+CREATE TABLE parley.terms_agreed (
+    id              serial      primary key,
+
+    person_id       integer     not null
+                    references person(id),
+    terms_id        integer     not null
+                    references terms(id),
+
+    accepted_on     timestamp with time zone
+                    default CURRENT_TIMESTAMP
+                    not null,
+
+    UNIQUE(person_id, terms_id)
+);
+
+-- roles / authentication
+CREATE TABLE parley.role (
+    id              serial      primary key,
+    idx             integer     not null default 9999,
+    name            varchar(30) not null unique,
+    description     text
+);
+CREATE INDEX idx_role_name ON role(name);
+
+CREATE TABLE parley.user_roles (
+    id                  serial      primary key,
+    authentication_id   integer     not null
+                                    references authentication(id),
+    role_id             integer     not null
+                                    references role(id),
+    UNIQUE (authentication_id, role_id)
+);
+CREATE INDEX idx_userroles_authenticationid ON user_roles(authentication_id);
+CREATE INDEX idx_userroles_roleid           ON user_roles(role_id);
+
+-- admin action log actions/messages
+CREATE TABLE parley.admin_action (
+    id              serial      primary key,
+    name            text        not null,
+
+    UNIQUE(name)
+);
+INSERT INTO admin_action (id, name) VALUES (0, 'undefined');
+INSERT INTO admin_action (name) VALUES ('suspend_user');
+
+CREATE TABLE parley.log_admin_action (
+    id              serial      primary key,
+    person_id       integer     not null
+                                references person(id),
+    admin_id        integer     not null
+                                references person(id),
+    created         timestamp   with time zone
+                                not null
+                                default CURRENT_TIMESTAMP,
+
+    action_id       integer     not null
+                                default 0
+                                references admin_action(id),
+
+    message         text        not null
+                                default 'No Message Supplied'
+);
+CREATE INDEX idx_adminaction_personid ON log_admin_action(person_id);
+CREATE INDEX idx_adminaction_adminid  ON log_admin_action(admin_id);
+
+
+CREATE TABLE parley.ip_ban_type (
+    id          serial      primary key,
+    name        text        not null,
+    description text,
+
+    UNIQUE(name)
+);
+INSERT INTO ip_ban_type (name,description) VALUES ('access','Restrict all access by IP');
+INSERT INTO ip_ban_type (name,description) VALUES ('login','Restrict login by IP');
+INSERT INTO ip_ban_type (name,description) VALUES ('posting','Restrict posting by IP');
+INSERT INTO ip_ban_type (name,description) VALUES ('signup','Restrict sign-up by IP');
+
+CREATE TABLE parley.ip_ban (
+    id          serial      primary key,
+    ban_type_id integer     not null
+                            references ip_ban_type(id),
+    ip_range    text,
+
+    UNIQUE(ban_type_id)
+);
+
+--
+-- some default stuff
+--
+
+-- #0 authentication
+INSERT INTO authentication
+(id, username, password, authenticated)
+VALUES
+(0, 'topdog', md5('k1tt3n'), true);
+
+-- #0 preference
+INSERT INTO preference
+(id, timezone)
+VALUES
+(0, 'UTC');
+
+-- #0 person info
+INSERT INTO person
+(id,first_name, last_name, email, forum_name, authentication_id, preference_id)
+VALUES
+(0, 'Top','Dog','topdog@herlpacker.co.uk','TopDog', 0, 0);
+
+
+-- #1 authentication
+INSERT INTO authentication
+(id, username, password, authenticated)
+VALUES
+(1, 'norm', md5('k1tt3n'), true);
+-- #1 preference
+INSERT INTO preference
+(id, timezone)
+VALUES
+(1, 'UTC');
+-- #1 person info
+INSERT INTO person
+(id,first_name, last_name, email, forum_name, authentication_id, preference_id)
+VALUES
+(1, 'Norman','Normal','norman.normal@herlpacker.co.uk','Norman', 1, 1);
+-- fix PK sequences
+SELECT setval('authentication_id_seq',  1);
+SELECT setval('preference_id_seq',      1);
+SELECT setval('person_id_seq',          1);
+
+INSERT INTO forum (id, name, description) VALUES (0, 'Off-Topic', 'General off-topic discussion');
+INSERT INTO forum (name, description) VALUES ('Suggestions', 'Things you think should be added');
+INSERT INTO forum (name, description) VALUES ('Bugs', 'If you find anything broken, report it here');
+
+-- some roles
+INSERT INTO role (idx, name, description) VALUES (
+    0,
+    'site_moderator',
+    'Site Moderator'
+);
+INSERT INTO role (idx, name, description) VALUES (
+    50,
+    'suspend_account',
+    'Suspend Account'
+);
+INSERT INTO role (idx, name, description) VALUES (
+    100,
+    'ip_ban_posting',
+    'Restrict Posting by IP'
+);
+INSERT INTO role (idx, name, description) VALUES (
+    100,
+    'ip_ban_signup',
+    'Restrict Sign-Up by IP'
+);
+INSERT INTO role (idx, name, description) VALUES (
+    100,
+    'ip_ban_login',
+    'Restrict Login by IP'
+);
+
+-- make topdog a site_moderator
+INSERT INTO user_roles
+    (authentication_id, role_id)
+VALUES (
+    0,
+    (SELECT id FROM role WHERE name='site_moderator')
+);
+
+-- commit our schema
+COMMIT;
+
+-- vim:ft=sql

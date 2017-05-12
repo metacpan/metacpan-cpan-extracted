@@ -1,0 +1,19 @@
+SYNOPSIS
+
+     use Perinci::Result::Util qw(is_env_res);
+    
+     say is_env_res([200, "OK"]); # 1
+     say is_env_res("ok");        # 0
+     say is_env_res([1, 2, 3]);   # 0
+
+FUNCTIONS
+
+ is_env_res($res) => BOOL
+
+    Return true if $res looks like enveloped result. It employs some
+    heuristics.
+
+SEE ALSO
+
+    Rinci::function
+

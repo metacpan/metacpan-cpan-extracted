@@ -1,0 +1,45 @@
+[AGENT]
+
+Mozilla/5.0 (iPhone; U; CPU like Mac OS X; en) AppleWebKit/420+ (KHTML, like Gecko) Version/3.0 Mobile/1A543a Safari/419.3
+
+parser             => 'safari',
+strength           => 'U',
+os                 => 'CPU like Mac OS X',
+extras             => ['KHTML, like Gecko','Mobile/1A543a','Safari/419.3'],
+version_raw        => '3.0',
+lang               => 'en',
+version            => '3.000',
+name               => 'Safari',
+device             => 'iPhone',
+toolkit            => ['AppleWebKit','420+','420.000'],
+mobile             => 1,
+
+[AGENT]
+
+Mozilla/5.0 (iPhone; CPU iPhone OS 5_0 like Mac OS X) AppleWebKit/534.46 (KHTML, like Gecko) Version/5.1 Mobile/9A334 Safari/7534.48.3
+
+device          => 'iPhone',
+extras          => [ 'KHTML, like Gecko', 'Mobile/9A334', 'Safari/7534.48.3' ],
+mobile          => 1,
+name            => 'Safari',
+os              => 'CPU iPhone OS 5_0 like Mac OS X',
+parser          => 'safari',
+toolkit         => [ 'AppleWebKit', '534.46', '534.460' ],
+version         => '5.100',
+version_raw     => '5.1',
+
+[AGENT]
+
+Mozilla/5.0 (iPhone; U; CPU iPhone OS 5_1 like Mac OS X; 6534.46) AppleWebKit/en_SG (KHTML, like Gecko) Mobile/8C148 Safari/6533.18.5
+
+device          => 'iPhone',
+extras          => [ 'KHTML, like Gecko', 'Safari/6533.18.5' ],
+lang            => 'en_SG',
+mobile          => 1,
+name            => 'Safari',
+os              => 'CPU iPhone OS 5_1 like Mac OS X',
+parser          => 'safari',
+strength        => 'U',
+toolkit         => [ 'AppleWebKit', undef, 0 ],
+version         => '8.148',
+version_raw     => '8C148',

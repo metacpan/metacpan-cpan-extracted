@@ -1,0 +1,144 @@
+{
+   "abstract" : "Build strawberry-perl-like distribution for MS Windows",
+   "author" : [
+      "KMX <kmx@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Dist-Strawberry",
+   "no_index" : {
+      "directory" : [
+         "share",
+         "HelperCA.dll_src"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "Archive::Zip" : "0",
+            "Data::Dump" : "0",
+            "Data::UUID" : "0",
+            "Digest::SHA1" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::Find::Rule" : "0",
+            "File::Glob" : "0",
+            "File::Path" : "2.04",
+            "File::ShareDir" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "3.2701",
+            "File::pushd" : "0",
+            "Getopt::Long" : "0",
+            "HTML::Entities" : "0",
+            "IO::Capture" : "0",
+            "IPC::Run3" : "0",
+            "LWP::UserAgent" : "0",
+            "Pod::Usage" : "0",
+            "Portable::Dist" : "1.06",
+            "Storable" : "0",
+            "Template" : "0",
+            "Test::More" : "0.86",
+            "Text::Diff" : "0",
+            "Text::Patch" : "0",
+            "URI::file" : "0",
+            "Win32::File::Object" : "0",
+            "Win32::TieRegistry" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "1.00",
+            "Module::Build" : "0.38",
+            "perl" : "5.012"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Dist::Strawberry" : {
+         "file" : "lib/Perl/Dist/Strawberry.pm",
+         "version" : "4.013"
+      },
+      "Perl::Dist::Strawberry::Step" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step.pm"
+      },
+      "Perl::Dist::Strawberry::Step::BinaryToolsAndLibs" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/BinaryToolsAndLibs.pm"
+      },
+      "Perl::Dist::Strawberry::Step::CreateReleaseNotes" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/CreateReleaseNotes.pm"
+      },
+      "Perl::Dist::Strawberry::Step::CreateRelocationFile" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/CreateRelocationFile.pm"
+      },
+      "Perl::Dist::Strawberry::Step::FilesAndDirs" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/FilesAndDirs.pm"
+      },
+      "Perl::Dist::Strawberry::Step::FixShebang" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/FixShebang.pm"
+      },
+      "Perl::Dist::Strawberry::Step::InstallModules" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/InstallModules.pm"
+      },
+      "Perl::Dist::Strawberry::Step::InstallPerlCore" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/InstallPerlCore.pm"
+      },
+      "Perl::Dist::Strawberry::Step::OutputLogZIP" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/OutputLogZIP.pm"
+      },
+      "Perl::Dist::Strawberry::Step::OutputMSI" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/OutputMSI.pm"
+      },
+      "Perl::Dist::Strawberry::Step::OutputMSM_MSI" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/OutputMSM_MSI.pm"
+      },
+      "Perl::Dist::Strawberry::Step::OutputPdlZIP" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/OutputPdlZIP.pm"
+      },
+      "Perl::Dist::Strawberry::Step::OutputPortableZIP" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/OutputPortableZIP.pm"
+      },
+      "Perl::Dist::Strawberry::Step::OutputZIP" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/OutputZIP.pm"
+      },
+      "Perl::Dist::Strawberry::Step::SetupPortablePerl" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/SetupPortablePerl.pm"
+      },
+      "Perl::Dist::Strawberry::Step::UninstallModules" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/UninstallModules.pm"
+      },
+      "Perl::Dist::Strawberry::Step::UpgradeCpanModules" : {
+         "file" : "lib/Perl/Dist/Strawberry/Step/UpgradeCpanModules.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Dist-Strawberry"
+      },
+      "homepage" : "http://strawberryperl.com/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/StrawberryPerl/Perl-Dist-Strawberry"
+      },
+      "x_IRC" : "irc://irc.perl.org/#win32",
+      "x_MailingList" : "http://groups.google.com/group/perl.win32.vanilla"
+   },
+   "version" : "4.013"
+}

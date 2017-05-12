@@ -1,0 +1,235 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings FATAL => qw( all );
+
+use vars qw( $VERSION );
+$VERSION = '0.04';
+
+use Pod::Tidy;
+use Text::Glob qw( glob_to_regex );
+
+use Getopt::Long qw( GetOptions :config auto_version auto_help gnu_getopt );
+use Pod::Usage qw( pod2usage );
+
+my ($inplace, $ignore, $nobackup, $recursive, $verbose, $columns);
+# for some reason the single letter abv.s must be explicitly declared when
+# bundling is enabled
+GetOptions(
+    'inplace|i'     => \$inplace,
+    'Ignore|I=s@'   => \$ignore,
+    'nobackup|n'    => \$nobackup,
+    'recursive|r'   => \$recursive,
+    'verbose|v'     => \$verbose,
+    'columns|c=i'   => \$columns,
+) or pod2usage( 2 );
+
+unless (@ARGV) {
+    pod2usage( -msg => "Options: --Ignore --inplace --nobackup --recursive require <filelist>", -exitval => 2 )
+        if $ignore or $inplace or $nobackup or $recursive;
+}
+
+if ($nobackup) {
+    pod2usage( -msg => "Option: --nobackup requires --inplace", -exitval => 2 )
+        unless $inplace;
+}
+
+if (@ARGV) {
+    # handle files/dir
+    Pod::Tidy::tidy_files(
+        files       => [@ARGV],
+        recursive   => $recursive,
+        verbose     => $verbose,
+        inplace     => $inplace,
+        ignore      => [map { glob_to_regex($_) } @$ignore],
+        nobackup    => $nobackup,
+        columns     => $columns,
+    );
+} else {
+    # always filter STDIN - we don't know how large or how slow it will be
+    open(my $input, '-') or die "can't open STDIN: $!";
+    Pod::Tidy::tidy_filehandle($input);
+}
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+podtidy - reformat Pod documents without affecting other text or code
+
+=head1 SYNOPSIS
+
+    podtidy [--inplace] [--nobackup] [--recursive] [--verbose]
+            [--columns=NUM] {[--Ignore <pattern>]} [<filelist>]
+    podtidy [--help|-h|-?]
+
+=head1 DESCRIPTION
+
+This program processes a Pod document and attempts to I<tidy> it's formatting.
+Currently this is limited to redoing the line breaks in text Pod paragraphs but
+it is hoped that more features will be added in the future.
+
+=head1 USAGE
+
+The default behavior of C<podtidy> is to read in a list of filenames and to
+write the reformatted contents of these files to the C<STDOUT>.  If no file
+list is provided input is read from C<STDIN>.  The C<--inplace> flag causes a
+backup of the input file to be made and the original file to overwritten with a
+reformatted version.  It should be noted that only files that are actually
+having there format changed will to written to.  When C<--inplace> is combined
+with C<--nobackup> the backup of the original file is omitted.  If
+C<--recursive> is specified then any directory names in <filelist> will be
+recursively expanded.  File and directories may be explicitly omitted from
+processing by using the C<--Ignore> option and specifying a Perl5 compatible
+regex.  Multiple C<--Ignore> options may be specified.  Lastly, the
+C<--verbose> flag enables additional warnings and error messages.
+
+=head1 OPTIONS
+
+=over 4
+
+=item * --Ignore|I <pattern>
+
+Causes files and directories matching C<pattern> to be omitted from processing.
+Where C<pattern> is C<glob(3)> compatible.  Each pattern is tried for a match
+against (in order) the absolute file path, the relative file path (canonical),
+and the basename.  In the case of directories, the "basename" is considered to
+be the right most path component.  For example, the "basename" of
+C</foo/bar/baz/> would be C<baz>. Multiple C<--Ignore> options may be
+specified.
+
+This flag is optional.
+
+=item * --inplace|i
+
+Make a backup of the original file and overwrite it with a reformatted version.
+The backup file will have the same name as the original file with a C<~>
+appended to it.  This operation only applies to files that are having changes
+made to their formatting.  Unmodified files will be skipped and no backup file
+will be created.  C<perltidy> guarantees to not change a file's C<mtime> if no
+formatting changes need to be made.
+
+This flag is optional.
+
+=item * --nobackup|-n
+
+When making an inplace reformatting, omit the backup file.
+
+This flag is optional.  This flag is only valid in combination with
+C<--inplace>.
+
+=item * --recursive|-r
+
+Recursively expand any directories included in <filelist>.
+
+This flag is optional.
+
+=item * --verbose|-v
+
+Enable additional warnings and error messages that will be sent to C<STDERR>.
+
+This flag is optional.
+
+=item * <filelist>
+
+This is a list of filenames and/or directories if C<--recursive> is specified.
+If it is omitted input will be read from C<STDIN>.
+
+This list is optional.
+
+=item * --columns|-c NUM
+
+Set the width of the wrapped columns to NUM, default is 76
+
+This flag is optional.
+
+=item * --help|-h|-?
+
+Print usage info to C<STDERR> and exit.
+
+This flag is optional.
+
+=back
+
+=head1 DEVELOPER NOTES
+
+=head2 Why reinvent the C<podwrap> wheel?
+
+Primarily because C<podwrap> is based on the L<Pod::Wrap> module, which is
+mostly concerned with breaking long lines and not the production of I<tidy>
+paragraphs.  Further, while this utility currently only handles Pod text block
+reformatting it is hoped that additional functionality that would cover other
+parts of a Pod document will be added in the future.  C<podwrap> is also
+missing a couple of other features that C<podtidy> provides for convenience,
+including:
+
+=over 4
+
+=item * recursive file/directory processing
+
+=item * backups of files being modified in place
+
+=item * file ignore patterns
+
+=item * preservation of the file's C<mtime> unless the file is actually being
+modified
+
+=item * verbose warnings/diagnostics
+
+=back
+
+=head2 Subversion Working Copies
+
+When using C<podtidy> on a C<svn> I<Working Copy> it's important to remember
+that copies of all working files are stored under a directory named F<.svn>,
+including copies of Pod files.  If you use C<podtidy>'s C<--recursive> option
+I<Be Sure> that you don't accidentally process a F<.svn> directory. For
+example:
+
+    podtidy --recursive --inplace --nobackup --Ignore .svn docs
+
+Note that because any Pod files are already under revision control that it's
+completely safe to use the C<--nobackup> flag.  Also, the above example may be
+shorted to just:
+
+    podtidy -rin -I .svn docs
+
+=head2 Efficiency concerns
+
+See L<Pod::Tidy/Efficiency concerns>.
+
+=head1 GOTCHAS
+
+See L<Pod::Tidy/GOTCHAS>.
+
+=head1 CREDITS
+
+See L<Pod::Tidy/CREDITS>.
+
+=head1 SUPPORT
+
+Please contact the author directly via e-mail.
+
+=head1 AUTHOR
+
+Joshua Hoblitt <jhoblitt@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2005  Joshua Hoblitt. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as Perl
+itself.
+
+The full text of the licenses can be found in the F<LICENSE> file included with
+this module, or in L<perlartistic> and L<perlgpl> Pods as supplied with Perl
+5.8.1 and later.
+
+=head1 SEE ALSO
+
+L<Pod::Tidy>, L<Pod::Wrap::Pretty>, L<podwrap>, L<Pod::Wrap>, L<Perl::Tidy>
+
+=cut

@@ -1,0 +1,73 @@
+{
+   "abstract" : "PerlIO layer for normalizing line endings",
+   "author" : [
+      "Shlomi Fish <shlomif@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "PerlIO-eol",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Kwalitee::Extra" : "0",
+            "Test::More" : "0.96",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::TrailingSpace" : "0.0203"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "XSLoader" : "0",
+            "perl" : "5.007003",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01"
+         }
+      }
+   },
+   "provides" : {
+      "PerlIO::eol" : {
+         "file" : "lib/PerlIO/eol.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-perlio-eol@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=PerlIO-eol"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/shlomif/perl-PerlIO-eol.git",
+         "web" : "https://github.com/shlomif/perl-PerlIO-eol"
+      }
+   },
+   "version" : "0.16"
+}
+

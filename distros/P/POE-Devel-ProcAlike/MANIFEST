@@ -1,0 +1,17 @@
+Makefile.PL
+Build.PL
+MANIFEST
+MANIFEST.SKIP
+README
+lib/POE/Devel/ProcAlike.pm
+lib/POE/Devel/ProcAlike/POEInfo.pm
+lib/POE/Devel/ProcAlike/ModuleInfo.pm
+lib/POE/Devel/ProcAlike/PerlInfo.pm
+META.yml
+Changes
+LICENSE
+
+examples/simple.pl
+
+t/1_load.t
+t/apocalypse.t

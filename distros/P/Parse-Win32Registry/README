@@ -1,0 +1,36 @@
+Parse::Win32Registry
+====================
+
+Parse::Win32Registry is a module for parsing Windows Registry files,
+allowing you to read the keys and values of a registry file
+without going through the Windows API.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+On Win32 systems, you can use Microsoft's nmake.
+
+DEPENDENCIES
+
+Requires Perl 5.8.1 and the Carp, Encode, File::Basename
+and Time::Local modules. These are all core modules in 5.8.1.
+
+The tests require the Test::More and Data::Dumper modules.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2012 by James Macfarlane
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS
+OR IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION,
+THE IMPLIED WARRANTIES OF MERCHANTIBILITY AND FITNESS
+FOR A PARTICULAR PURPOSE.

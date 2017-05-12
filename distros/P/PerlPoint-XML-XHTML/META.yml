@@ -1,0 +1,19 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         PerlPoint-XML-XHTML
+version:      0.07
+version_from: 
+installdirs:  site
+requires:
+    Class::Accessor::Fast:         0
+    Class::Data::Inheritable:      0
+    Digest::MD5:                   0
+    HTML::TagCloud::Extended:      0.1
+    Memoize:                       1
+    PerlPoint::Generator::XML:     0.04
+    Readonly:                      0
+    Test::Harness:                 1.25
+    Test::More:                    0.11
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

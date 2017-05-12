@@ -1,0 +1,5 @@
+TYPEMAP
+SSL *		     T_IV
+BIO *         T_IV
+BIO_METHOD *  T_IV
+X509 *		  T_IV

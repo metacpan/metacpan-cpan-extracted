@@ -1,0 +1,28 @@
+Revision history for Perl module Parallel::Fork::BossWorker.
+
+0.05  04 NOV 2011
+	- Improved test suite
+	- Deserialization improvement for large data
+
+0.04  16 July 2011
+	- Add Data::Dumper dependency to Makefile.PL
+	- Fix for RT#63125 - corrupted data on pipe from workers
+          Now uses an IO::Select object and multiple pipes to avoid
+	  interleaving.
+	- Changed indentations to 4 space tabs instead of \t
+	- Fix for RT#40026 - wait for children to avoid filling process
+          table with zombies.
+
+0.03  Thu May 03 17:04:00 2007
+	- OOized some functions I missed originally
+	- Changed from Storable to Data::Dumper due to a show-stopper bug in Storable.
+	- Removed the usage of pack and unpack
+	- Added a new msg_delimiter parameter
+
+0.02  Wed May 02 14:26:00 2007
+	- Fixed copyright, also added a use Storable statement in the module.
+	- Updated metadata to require Storable.
+
+0.01  Thu Apr 26 15:45:23 2007
+	- original version; created by h2xs 1.23 with options
+	  -AX --skip-exporter --use-new-tests -n Parallel::Fork::BossWorker

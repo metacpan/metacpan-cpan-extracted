@@ -1,0 +1,19 @@
+Changes for PDL::IO::Image
+
+0.004   2014/12/15
+        - new methods for color conversion:
+            color_to_4bpp, color_to_8bpp, color_to_8bpp_grey,
+            color_to_16bpp_555, color_to_16bpp_565, color_to_24bpp, color_to_32bpp
+        - new methods: dump_bitmap, clone
+        - save() method now accepts scalar ref (output is saved into perl variable)
+        - new_from_file() method now accepts scalar ref (image is loaded from perl variable)
+        - rotate() method accepts bgcolor param(s)
+
+0.003   2014/12/09
+        - requires Alien-FreeImage-0.011 (-fPIC issue)
+        - void methods return self: $pimage->save("im.png")->save("im.bmp")->save("im.gif")
+        - new methods: color_dither, color_threshhold, color_quantize
+        - pod fixes
+
+0.002   2014/12/09
+        - initial version

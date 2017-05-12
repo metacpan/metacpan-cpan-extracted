@@ -1,0 +1,126 @@
+SYNOPSIS
+      my $config = Package::Configure->new();
+      my $value1 = $config->setting1();               #get
+      $config->setting1('a new value for setting 1'); #set
+
+DESCRIPTION
+    Package::Configure - Access package configuration values from
+    command-line options (Getopt::Long style), previously specified cached
+    settings, or default values. This package is a kindred spirit to the GNU
+    automake and autoconf tools.
+
+    When a Package::Configure object is instantiated, the following
+    happens:
+
+      1. A. If F<pkg_config.cache> exists, load it into L</ini()> accessor as a
+            Config::IniFiles object.
+         B. Otherwise, if F<pkg_config.in> exists, load that.
+         C. Otherwise, load nothing.
+
+      2. If a configuration file was loaded, process commandline arguments
+         Using Getopt::Long, overriding configuration setings with those provided
+         from Getopt::Long.
+
+      3. A. If C<--help> was given as a Makefile.PL argument, render the configuration
+            as a usage document to STDOUT and exit(0).
+
+            -otherwise-
+
+         B. If a configuration file was loaded, and C<--interactive> was given as a
+            Makefile.PL argument, query the user on STDOUT/STDIN for new configuration
+            values.
+
+      4. Variable values may also be accessed using C<$config-E<gt>my_setting_name()>
+         to get the current value, or C<$config-E<gt>my_setting_name('a new value')> to
+         update the value of the variable.
+
+      5. When the object is destroyed (by falling out of scope, being undefined, etc),
+         the current state of the object is written to F<pkg_config.cache>.
+
+CONFIGURATION FILES pkg_config.in AND pkg_config.cache
+    The configuration files are in INI format, and are parsed using
+    Config::IniFiles. You should be familiar with the INI format and
+    Config::IniFiles.
+
+  RESERVED VARIABLES
+    These variables have a built-in function and are reserved for use by
+    Package::Configure.
+
+    * help * interactive
+
+    Run "Makefile.PL --help" for a display of what parameters are available,
+    and "Makefile.PL --interactive" for an interactive query for values of
+    said parameters.
+
+  DECLARING CONFIGURATION VARIABLES
+    Package::Configure recognizes variables in the following INI
+    sections:
+
+    for single value parameters:
+
+    * [option integer] * [option float] * [option string] * [option dir] *
+    [option file]
+
+    for multi value parameters:
+
+    * [option integers] * [option floats] * [option strings] * [option dirs]
+    * [option files]
+
+    Comments on sections/parameters are recognized and displayed when
+    Makefile.PL is run with the "--help" option.
+
+    Typechecking is performed on the integer, float, dir, and file sections,
+    see "validate_type()".
+
+    for scripts:
+
+    * [PL_FILES] * [EXE_FILES]
+
+    thes sections are special -- they are passed to ExtUtils::MakeMaker to
+    determine which scripts are processed at make-time (PL_FILES), and which
+    are installed (EXE_FILES). See ExtUtils::MakeMaker for details on how
+    that system works.
+
+  SETTING VARIABLE VALUES
+    See Config::IniFiles
+
+    Default values can be set in pkg_config.in, as well as collected from
+    the command-line using Getopt::Long-style options, or with interactive
+    question/answer.
+
+    The Getopt::Long parameters available are created dynamically from the
+    variable names in pkg_config.in or pkg_config.cache (preferred if
+    present).
+
+   EDITING CONFIGURATION FILE
+    See Config::IniFiles for a description of the configuration file format.
+
+   COMMAND-LINE OPTIONS
+    For a script called script.pl, valid executions of the script might be:
+
+    "script.pl --color red --number 9"
+
+    "script.pl"
+
+    Argument names are identical to those in pkg_config.in or
+    pkg_config.cache.
+
+   INTERACTIVE QUERY
+    A few runs of "script.pl --interactive" might look like the following:
+
+     [14:38]aday@asti:~/cvsroot/Package-Tools> /usr/bin/perl ./script.pl --interactive
+     color - what is your favorite color? (currently: "blue")? red
+     number - what is your favorite number? (currently: "2")? 9
+
+     [14:38]aday@asti:~/cvsroot/Package-Tools> /usr/bin/perl ./script.pl --interactive
+     color - what is your favorite color? (currently: "red")? yellow
+     number - what is your favorite number? (currently: "9")? 8
+
+     [14:38]aday@asti:~/cvsroot/Package-Tools> /usr/bin/perl ./script.pl --interactive --color 6 --number orange
+     Value "orange" invalid for option number (number expected)
+     color - what is your favorite color? (currently: "6")? orange
+     number - what is your favorite number? (currently: "8")? 6
+
+AUTHOR
+    Allen Day, <allenday@ucla.edu>
+

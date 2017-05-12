@@ -1,0 +1,15 @@
+Changes
+lib/Palm/ListDB/Writer.pm
+script/csv2lsdb
+Makefile.PL
+MANIFEST
+README
+t/1.t
+t/1.ref
+t/2.t
+t/2.dat
+t/dbcmp.pl
+Palm-ListDB-Writer.spec.in
+perl-Palm-ListDB-Writer.spec
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

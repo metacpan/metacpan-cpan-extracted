@@ -1,0 +1,29 @@
+=head1 HEAD1
+
+Head 1 text
+
+=head2 HEADI<2>
+
+Head2 B<text>
+
+    +------------------------------+
+    | This is a verbatim paragraph |
+    +------------------------------+
+
+
+    +----------------------------------+
+    | Anda nother verbatim paragraph   |
+    +----------------------------------+
+
+    +----------------------------------+
+    | Stella nother verbatim paragraph |
+    +----------------------------------+
+
+
+=head3 HEAD3
+    
+Sub head
+
+=head4 HEAD4
+
+Sub sub head

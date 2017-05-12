@@ -1,0 +1,11 @@
+Revision history for Perl module Physics-RayTransfer.
+
+0.003  Apr 5, 2012
+	- Some cleanup in the POD, including some references
+
+0.002  Apr 3, 2012
+	- PAUSE indexer barfed on MooseX::Declare-type classes, fixed
+
+0.001  Apr 3, 2012
+	- Initial release
+

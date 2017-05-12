@@ -1,0 +1,45 @@
+---
+abstract: 'simply download multiple files at once'
+author:
+  - 'Christian Walde <walde.christian@googlemail.com>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  HTTP::Request::Common: 0
+  Test::InDistDir: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parallel-Downloader
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Parallel::Downloader:
+    file: lib/Parallel/Downloader.pm
+    version: 0.132071
+requires:
+  AnyEvent::HTTP: 0
+  Moo: 0
+  MooX::Types::MooseLike: 0.03
+  Sub::Exporter::Simple: 0
+  perl: 5.006
+  strictures: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Parallel-Downloader
+  homepage: https://github.com/wchristian/parallel-downloader
+  repository: https://github.com/wchristian/parallel-downloader.git
+version: 0.132071

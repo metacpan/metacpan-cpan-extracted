@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Mysql.pm
+Mysql.xs
+my_mysql.c
+my_mysql.h
+install_files.PL
+t/00_mysql_basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

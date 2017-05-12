@@ -1,0 +1,30 @@
+---
+abstract: 'hiredis based parser compatible with Protocol::Redis'
+author:
+  - 'David Leadbeater <dgl@dgl.cx>'
+build_requires:
+  Protocol::Redis: 0.9001
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::Depends: 0
+  ExtUtils::MakeMaker: 6.31
+  XS::Object::Magic: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Protocol-Redis-XS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Protocol::Redis: 0.9001
+  XS::Object::Magic: 0
+  XSLoader: 0
+  parent: 0
+resources:
+  repository: https://github.com/dgl/protocol-redis-xs
+version: 0.05

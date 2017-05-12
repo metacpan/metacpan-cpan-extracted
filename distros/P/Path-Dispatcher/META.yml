@@ -1,0 +1,33 @@
+---
+abstract: 'flexible and extensible dispatch'
+author:
+  - 'Shawn M Moore, C<< <sartak at bestpractical.com> >>'
+build_requires:
+  Test::Fatal: 0
+  Test::More: 0.88
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Path-Dispatcher
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Any::Moose: 0.12
+  Try::Tiny: 0.02
+  constant: 0
+  overload: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Path-Dispatcher
+  homepage: https://github.com///github.com/sartak/path-dispatcher/wiki
+  repository: git://github.com///github.com/sartak/path-dispatcher.git
+version: 1.06

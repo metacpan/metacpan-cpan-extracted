@@ -1,0 +1,106 @@
+NAME
+    PYX::XMLSchema::List - Processing PYX data or file and print list of XML
+    schemas.
+
+SYNOPSIS
+     use PYX::XMLSchema::List;
+     my $obj = PYX::XMLSchema::List->new(%parameters);
+     $obj->parse($pyx, $out);
+     $obj->parse_file($input_file, $out);
+     $obj->parse_handle($input_file_handler, $out);
+     $obj->reset;
+     my $stats_hr = $obj->stats;
+
+METHODS
+    "new(%parameters)"
+             Constructor.
+
+            *       "output_handler"
+
+                     Output handler.
+                     Default value is \*STDOUT.
+
+    "parse($pyx[, $out])"
+             Parse PYX text or array of PYX text and print list of XML schemas of PYX input.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+    "parse_file($input_file[, $out])"
+             Parse file with PYX data and print list of XML schemas of PYX input.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+    "parse_handler($input_file_handler[, $out])"
+             Parse PYX handler and print list of XML schemas of PYX input.
+             If $out not present, use 'output_handler'.
+             Returns undef.
+
+    "reset()"
+             Resets internal structure with statistics.
+             Returns undef.
+
+    "stats()"
+             Gets statistics structure.
+             Returns undef.
+
+ERRORS
+     new():
+             From Class::Utils::set_params():
+                     Unknown parameter '%s'.
+
+EXAMPLE1
+     # Pragmas.
+     use strict;
+     use warnings;
+
+     # Modules.
+     use PYX::XMLSchema::List;
+
+     # Example data.
+     my $pyx = <<'END';
+     (foo
+     Axmlns:bar http://bar.foo
+     Axmlns:foo http://foo.bar
+     Afoo:bar baz
+     (foo:bar
+     Axml:lang en
+     Abar:foo baz
+     )foo:bar
+     )foo
+     END
+
+     # PYX::XMLSchema::List object.
+     my $obj = PYX::XMLSchema::List->new;
+
+     # Parse.
+     $obj->parse($pyx);
+
+     # Output:
+     # [ bar ] (E: 0000, A: 0001) http://bar.foo
+     # [ foo ] (E: 0001, A: 0001) http://foo.bar
+     # [ xml ] (E: 0000, A: 0001)
+
+DEPENDENCIES
+    Class::Utils, Error::Pure, List::Util, PYX::Parser, Readonly.
+
+SEE ALSO
+    PYX A perl module for PYX handling.
+
+    Task::PYX
+        Install the PYX modules.
+
+REPOSITORY
+    <https://github.com/tupinek/PYX-XMLSchema-List>
+
+AUTHOR
+    Michal Špaček <mailto:skim@cpan.org>
+
+    <http://skim.cz>
+
+LICENSE AND COPYRIGHT
+     © 2015 Michal Špaček
+     BSD 2-Clause License
+
+VERSION
+    0.04
+

@@ -1,0 +1,7 @@
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+t/t00smoke.t
+XS.pm
+XS.xs

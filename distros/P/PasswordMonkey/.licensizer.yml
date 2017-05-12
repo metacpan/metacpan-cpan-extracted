@@ -1,0 +1,17 @@
+# .licensizer.yml
+
+author: 
+  text: |
+    2011, Mike Schilli <cpan@perlmeister.com>
+  heading: AUTHOR
+
+license:
+  text: |
+    Copyright (c) 2011 Yahoo! Inc. All rights reserved. The copyrights to 
+    the contents of this file are licensed under the Perl Artistic License 
+    (ver. 15 Aug 1997).
+  license_heading: COPYRIGHT & LICENSE
+
+path_exclude:
+  - t/
+  - blib/

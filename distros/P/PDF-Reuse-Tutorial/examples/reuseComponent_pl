@@ -1,0 +1,210 @@
+use PDF;
+use PDF::Reuse;
+use strict;
+
+my %stdFont = 
+       ( 'Times-Roman'           => 'Times-Roman',
+        'Times-Bold'            => 'Times-Bold',
+        'Times-Italic'          => 'Times-Italic',
+        'Times-BoldItalic'      => 'Times-BoldItalic',
+        'Courier'               => 'Courier',
+        'Courier-Bold'          => 'Courier-Bold',
+        'Courier-Oblique'       => 'Courier-Oblique',
+        'Courier-BoldOblique'   => 'Courier-BoldOblique',
+        'Helvetica'             => 'Helvetica',
+        'Helvetica-Bold'        => 'Helvetica-Bold',
+        'Helvetica-Oblique'     => 'Helvetica-Oblique',
+        'Helvetica-BoldOblique' => 'Helvetica-BoldOblique',
+        'Symbol'                => 'Symbol',
+        'ZapfDingbats'          => 'ZapfDingbats',
+         'TR'  => 'Times-Roman',
+         'TB'  => 'Times-Bold',
+        'TI'  => 'Times-Italic',
+        'TBI' => 'Times-BoldItalic',
+        'C'   => 'Courier',
+        'CB'  => 'Courier-Bold',
+        'CO'  => 'Courier-Oblique',
+        'CBO' => 'Courier-BoldOblique',
+        'H'   => 'Helvetica',
+        'HB'  => 'Helvetica-Bold',
+        'HO'  => 'Helvetica-Oblique',
+        'HBO' => 'Helvetica-BoldOblique',
+        'S'   => 'Symbol',
+        'Z'   => 'ZapfDingbats');
+
+my ($line, $string);
+
+my $x = 25;
+my $y = 710;
+
+my ($xDim, $yDim, $xScale, $yScale);
+
+my $file   = shift;
+my $pageNo = shift;
+
+my $i = $pageNo || 1;
+
+################################################################################
+# PDF always croaks about 'bad object reference >'  when the info-part of  
+# the PDF-file is missing. That doesn't hinder 'myFile.pdf' from being created
+################################################################################
+
+my $pdf   = PDF->new($file);
+my $pages = $pdf->Pages;
+
+prFile('myFile.pdf');
+prFontSize(7);
+
+while (($pages) && ($i <= $pages))
+{  if (($pageNo) && ($i != $pageNo))
+   {  last;
+   }
+   my @vec = prForm( { file     => $file,
+                       page     => $i,
+                       effect   => 'add',
+                       tolerant => 1 });
+   my $form = $vec[0];
+   if ($form)
+   {  $xDim = $vec[3] - $vec[1];
+      $yDim = $vec[4] - $vec[2];                      
+      $xScale = 100 / $xDim;
+      $yScale = 100 / $yDim;
+      if ($xScale < $yScale)
+      {  $yScale = $xScale;
+      }
+      else
+      {  $xScale = $yScale;
+      }
+      $string  = "q\n";
+      $string .= "$xScale 0 0 $yScale $x $y cm\n";  # scale and "move to" 
+      $string .= "/$form Do\n";
+      $string .= "Q\n";
+      prAdd($string);
+   }
+   else
+   {  prText($x, ($y + 70), 'Can\'t be used now.');
+      prText($x, ($y + 60), 'Concatenate the streams');
+      prText($x, ($y + 50), 'or save the file as');
+      prText($x, ($y + 40), 'PostScript and redistill');
+      prText($x, ($y + 30), 'the file with a new name,');
+      prText($x, ($y + 20), '(but you might loose fonts');
+      prText($x, ($y + 10), 'and interactive functions)');
+      $xDim = 0;
+      $yDim = 0;
+   }
+   $line = 'Form : ' . $file . ' ' . $i . ' D: ' . $xDim . ' X ' . $yDim;
+   prText($x, ($y - 15), $line);
+   move();
+   my $j = 0;
+   my $images = $vec[5];
+   while ($j < $images)
+   {   $j++;
+       my ($iName, $width, $height) = prImage({ file    => $file,
+                                                page    => $i,
+                                                imageNo => $j,
+                                                effect  => 'add' } );
+                             
+       if (($width < 101) && ($height < 101))
+       {  $xDim = $width;
+          $yDim = $height;
+       }
+       else
+       {
+          $xScale = 100 / $width;
+          $yScale = 100 / $height;
+          if ($xScale < $yScale)
+          {  $yScale = $xScale;
+          }
+          else
+          {  $xScale = $yScale;
+          }
+          $xDim = $xScale * $width;
+          $yDim = $yScale * $height;
+       }
+       $string  = "q\n";
+       $string .= "$xDim 0 0 $yDim $x $y cm\n";  # scale and "move to" 
+       $string .= "/$iName Do\n";
+       $string .= "Q\n";
+       prAdd($string);
+       $line = 'Image :' . $file . ' ' . $i . ' ' . $j . ' D: ' 
+              . $width . ' X ' . $height;
+       prText($x, ($y - 15), $line);
+       move();
+   }
+   $i++;
+   
+}
+
+open (INFILE, "<$file") || die "Couldn't open $file, $! aborts\n";
+# binmode INFILE;
+
+my $length = (stat($file))[7];
+
+my $res = sysread INFILE, $line, $length, 0;
+
+my @fonts = ($line =~ m?/BaseFont\s*/(\S+)[^\)>]*>>?osg);
+
+close INFILE;
+
+$x = 25;
+$y -= 40;
+
+if ($y < 100)
+{  prPage();
+   $y  = 710;
+}
+prFontSize(20);
+prFont('TR');
+prText($x, $y, 'Found "non-standard" fonts: ');
+
+$y -= 40;
+
+
+my %font;
+for my $font (@fonts)
+{  if (exists $font{$font})
+   {  next;
+   }
+   if ($y < 100)
+   {  prPage();
+      $y  = 710;
+   }
+
+   if (! exists $stdFont{$font})
+   {  my @list = prFont($font);
+      if ($list[1] eq $font)
+      {   prFontSize(18);
+          prFont('TR');
+          prText($x, $y, "$font :");
+          $y -= 25;
+          prFontSize(10);
+          prFont($font);
+          prText($x, $y, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&\'()*+-./0123456789:;<=>?@');
+          $y -= 14;
+          prText($x, $y, 'abcdefghijklmnopqrstuvwxyz{|}~ÅÄÖåäö[\]^_´`');
+          $y -= 40;
+      }
+   }
+   $font{$font}++;
+}
+
+prEnd();
+
+         
+sub move
+{   if ($x > 400)
+     {  $x = 25;
+        $y -= 120;
+     }
+     else
+     {  $x += 200;
+     } 
+    if ($y < 0)
+     {  prPage();
+        $x = 25;
+        $y = 710;
+     }
+}
+ 
+
+   

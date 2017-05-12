@@ -1,0 +1,96 @@
+<html>
+  <head>
+    <title>[% title | html %]</title>
+    <link href="/static/css/css.css" rel="stylesheet" rev="stylesheet" type="text/css" />
+    <script src="/static/js/OpenThought.js"></script>
+    <script src="/static/js/PerlSyntax.js"></script>
+  </html>
+  <body onLoad="PerlSyntax.highlight();">
+  
+  <div id="pageHeader">
+    <div id="pageHeaderLogo">
+      <img src="/static/images/onion.gif">
+    </div>
+    <div id="pageHeaderText">
+      <a href="/">Perldoc::Server on [% c.config.host %]</a>
+    </div>
+  </div>
+
+  <div id="pageBody">
+    <div id="left">
+      <div id="leftContent">
+        <h1>Manual:</h1>
+        <ul>
+          <li><a href="[% c.uri_for('/index','overview') %]">Overview</a></li>
+          <li><a href="[% c.uri_for('/index','tutorials') %]">Tutorials</a></li>
+          <li><a href="[% c.uri_for('/index','faq') %]">FAQs</a></li>
+          <li><a href="[% c.uri_for('/index','history') %]">History / Changes</a></li>
+          <li><a href="[% c.uri_for('/index','licence') %]">Licence</a></li>
+        </ul>
+        <h2>Modules:</h2>
+        <ul>
+          <li><a href="[% c.uri_for('/index/pragmas') %]">Pragmas</a>
+          <li><a href="[% c.uri_for('/index/modules') %]">Installed modules</a>
+        </ul>
+        <h2>Reference:</h2>
+        <ul>
+          <li><a href="[% c.uri_for('/index','language') %]">Language</a></li>
+          <li><a href="[% c.uri_for('/index/functions') %]">Functions</a></li>
+          <li><a href="[% c.uri_for('/view','perlop') %]">Operators</a></li>
+          <li><a href="[% c.uri_for('/view','perlvar') %]">Special variables</a></li>
+          <li><a href="[% c.uri_for('/index','internals') %]">Internals</a></li>
+          <li><a href="[% c.uri_for('/index','platforms') %]">Platform specific</a></li>
+        </ul>
+      <h2>See also:</h2>
+      <ul>
+        <li><a href="http://search.cpan.org">CPAN search</a></li>
+        <li><a href="http://www.perl.org">Perl.org</a></li>
+        <li><a href="http://www.perlfoundation.org/perl5/index.cgi">Perl 5 Wiki</a></li>
+        <li><a href="http://www.pm.org">Perl Mongers</a></li>
+        <li><a href="http://www.perlmonks.org">Perl Monks</a></li>
+      </ul>
+      </div>
+    </div>
+    <div id="center">
+      <div id="centerContent">
+        <div id="contentHeader">
+          <div id="contentHeaderLeft"></div>
+          <div id="contentHeaderCentre">-- Perl [% c.config.perl_version %] documentation --</div>
+          <div id="contentHeaderRight"></div>
+        </div>
+        [% INCLUDE breadcrumb.tt %]
+        <div id="contentBody">
+          [% INCLUDE $page_template %]
+        </div>
+      <div id="contentFooter">Powered by Perldoc::Server version [% c.config.version %]</div>
+      </div>
+    </div>
+    <div id="right">
+      <div id="rightContent">
+        <h1>Goto:</h1>
+        <p>
+          <form action="[% c.uri_for('/search') %]" name="perldoc_search">
+	    <input type="text" name="q" size="10" class="grey">
+	  </form>
+        </p>
+        <h2>Most viewed:</h2>
+        <p>
+          <a href="#" onClick="OpenThought.CallUrl('POST','[% c.uri_for('/ajax/clear_most_viewed') %]')">Clear list</a>
+        </p>
+        [% IF most_viewed.size && most_viewed.size > 0 %]
+          <div class="labels" id="most_viewed">
+          [% FOREACH page IN most_viewed %]
+            [% IF page.link %]
+              <div class="label">
+                <a href="[% page.link %]">[% page.name.replace('::','::<wbr>') %]</a>
+              </div>
+            [% END %]
+          [% END %]
+          </div>
+        [% END %]
+      </div>
+    </div>
+  </div>  
+  
+  </body>
+</html>

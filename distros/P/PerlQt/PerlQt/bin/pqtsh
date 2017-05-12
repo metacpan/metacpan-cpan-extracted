@@ -1,0 +1,675 @@
+#!/usr/bin/perl
+
+# pqtsh : a graphical shell for PerlQt.
+#
+# author: Germain Garand <germain@ebooksfrance.org>
+# license: GNU Public License v2
+#
+
+use utf8;
+use strict 'vars';
+
+package QtShellControl;
+
+use Qt;
+use Qt::isa qw(Qt::MainWindow);
+use Qt::slots
+    fileOpen => [],
+    fileSave => [],
+    fileSaveAs => [],
+    filePrint => [],
+    fileExit => [],
+    helpExample => [];
+use Qt::signals
+    fileNeedsEval => [QString];
+use Qt::attributes qw(
+    menubar
+    fileMenu
+    helpMenu
+    toolBar
+    fileName
+    fileOpenAction
+    fileSaveAction
+    fileSaveAsAction
+    filePrintAction
+    fileExitAction
+    helpExampleAction
+    comboBox
+    sessionLog
+    executedLines
+    printer
+);
+
+our $image0_data =
+["22 22 7 1",
+". c None",
+"# c #000000",
+"b c #292c29",
+"c c #5a5d5a",
+"d c #838583",
+"e c #c5c2c5",
+"a c #ffffff",
+"......................",
+"....##########........",
+"....#aaaaaaa#b#.......",
+"....#aaaaaaa#cb#......",
+"....#aaaaaaa#dcb#.....",
+"....#aaaaaaa#edcb#....",
+"....#aaaaaaa#aedcb#...",
+"....#aaaaaaa#######...",
+"....#aaaaaaaaaaaaa#...",
+"....#aaaaaaaaaaaaa#...",
+"....#aaaaaaaaaaaaa#...",
+"....#aaaaaaaaaaaaa#...",
+"....#aaaaaaaaaaaaa#...",
+"....#aaaaaaaaaaaaa#...",
+"....#aaaaaaaaaaaaa#...",
+"....#aaaaaaaaaaaaa#...",
+"....#aaaaaaaaaaaaa#...",
+"....#aaaaaaaaaaaaa#...",
+"....#aaaaaaaaaaaaa#...",
+"....###############...",
+"......................",
+"......................"];
+
+our $image1_data =
+["22 22 5 1",
+". c None",
+"# c #000000",
+"c c #838100",
+"a c #ffff00",
+"b c #ffffff",
+"......................",
+"......................",
+"......................",
+"............####....#.",
+"...........#....##.##.",
+"..................###.",
+".................####.",
+".####...........#####.",
+"#abab##########.......",
+"#babababababab#.......",
+"#ababababababa#.......",
+"#babababababab#.......",
+"#ababab###############",
+"#babab##cccccccccccc##",
+"#abab##cccccccccccc##.",
+"#bab##cccccccccccc##..",
+"#ab##cccccccccccc##...",
+"#b##cccccccccccc##....",
+"###cccccccccccc##.....",
+"##cccccccccccc##......",
+"###############.......",
+"......................"];
+
+our $image2_data =
+["22 22 5 1",
+". c None",
+"# c #000000",
+"a c #838100",
+"b c #c5c2c5",
+"c c #cdb6d5",
+"......................",
+".####################.",
+".#aa#bbbbbbbbbbbb#bb#.",
+".#aa#bbbbbbbbbbbb#bb#.",
+".#aa#bbbbbbbbbcbb####.",
+".#aa#bbbccbbbbbbb#aa#.",
+".#aa#bbbccbbbbbbb#aa#.",
+".#aa#bbbbbbbbbbbb#aa#.",
+".#aa#bbbbbbbbbbbb#aa#.",
+".#aa#bbbbbbbbbbbb#aa#.",
+".#aa#bbbbbbbbbbbb#aa#.",
+".#aaa############aaa#.",
+".#aaaaaaaaaaaaaaaaaa#.",
+".#aaaaaaaaaaaaaaaaaa#.",
+".#aaa#############aa#.",
+".#aaa#########bbb#aa#.",
+".#aaa#########bbb#aa#.",
+".#aaa#########bbb#aa#.",
+".#aaa#########bbb#aa#.",
+".#aaa#########bbb#aa#.",
+"..##################..",
+"......................"];
+
+our $image3_data =
+["22 22 88 2",
+"Qt c None",
+".2 c #000000",
+".S c #08ff08",
+"#v c #100810",
+".U c #101010",
+"#c c #101018",
+".M c #181018",
+"#e c #181818",
+".A c #181820",
+".L c #201820",
+"#l c #202020",
+".z c #202029",
+"#m c #292029",
+"#u c #292829",
+"#n c #292831",
+".R c #29ff29",
+"#o c #312831",
+".T c #313031",
+"#p c #313039",
+".Z c #31ff31",
+"#q c #393039",
+"#t c #393839",
+".y c #393841",
+"#s c #413841",
+".o c #414041",
+"#h c #4a4852",
+".n c #5a505a",
+"#r c #5a5962",
+".I c #5ace5a",
+"#b c #6a616a",
+".p c #6a696a",
+".x c #6a6973",
+".Y c #6aff62",
+".l c #736973",
+".t c #7b717b",
+".s c #7b7183",
+".0 c #7bff7b",
+".r c #837983",
+".u c #83798b",
+"#g c #83858b",
+".v c #8b7994",
+"#i c #8b858b",
+".w c #8b8594",
+"#j c #8b8d8b",
+".8 c #8b8d94",
+".m c #948d94",
+"#k c #948d9c",
+"#f c #949594",
+".q c #94959c",
+".J c #94c694",
+"#d c #9c959c",
+"#a c #9c95a4",
+".k c #9c9d9c",
+".N c #9c9da4",
+".H c #9ccea4",
+".K c #a49da4",
+"#. c #a49dac",
+".i c #a4a5a4",
+".3 c #a4a5ac",
+"## c #ac9dac",
+".V c #aca5ac",
+".d c #acaeac",
+".j c #acaeb4",
+".9 c #b4aeb4",
+".# c #b4b6b4",
+".a c #bdbebd",
+".7 c #bdd6bd",
+".c c #c5c6c5",
+".5 c #cdc6cd",
+".b c #cdcecd",
+".4 c #cdced5",
+".F c #d5ced5",
+".G c #d5cede",
+".h c #d5d6d5",
+".E c #d5d6de",
+".Q c #d5ffd5",
+".B c #ded6de",
+".1 c #ded6e6",
+".g c #dedede",
+".D c #dedee6",
+".6 c #e6dee6",
+".f c #e6e6e6",
+".C c #e6e6ee",
+".X c #e6ffe6",
+".O c #eee6ee",
+".e c #eeeeee",
+".W c #f6f6f6",
+".P c #ffffff",
+"QtQtQtQtQtQt.#.a.b.b.b.b.c.c.a.a.d.aQtQtQtQt",
+"QtQtQtQtQtQt.a.e.f.f.f.f.f.e.e.e.g.aQtQtQtQt",
+"QtQtQtQtQtQt.a.c.c.c.b.b.c.c.c.c.a.cQtQtQtQt",
+"QtQtQtQtQtQt.#.a.a.a.a.#.a.a.#.#.d.aQtQtQtQt",
+"QtQtQtQtQt.c.d.c.a.c.c.c.a.a.a.c.#QtQtQtQtQt",
+"QtQtQtQtQt.a.a.#.a.a.a.a.a.a.c.c.#QtQtQtQtQt",
+"QtQtQtQtQt.a.#.c.a.a.a.a.a.c.a.c.dQtQtQtQtQt",
+"QtQtQtQtQt.c.a.a.a.a.a.a.a.a.a.a.#QtQtQtQtQt",
+"QtQtQtQtQt.d.b.f.g.g.g.g.g.g.h.g.i.i.jQtQtQt",
+"QtQtQt.a.k.l.#.h.b.h.b.h.b.h.g.g.m.n.o.p.#Qt",
+"QtQt.a.q.r.s.t.t.t.t.t.t.t.u.v.w.x.y.z.A.o.i",
+"Qt.a.k.B.C.D.B.E.E.E.E.F.G.H.I.J.K.o.L.L.M.y",
+".a.N.O.P.P.P.P.P.P.P.P.P.Q.R.S.R.b.v.T.A.U.L",
+".V.W.P.P.P.P.P.P.P.P.P.P.X.Y.Z.0.P.1.t.A.2.L",
+".3.E.4.5.4.h.E.E.g.6.D.B.D.E.7.F.4.5.8.M.2.A",
+".m.9.j.V.3#..3.K#.#..i#..K#.###a.q.8#b#c.2.L",
+".m.j.j#..3.K.K.K.N.K.N.N.N.N#a#d#d.w#b#c.2#e",
+"#f#.#..K.N.K.N.N.N#a.k#a#d#d#d#a.m#g#b.M.2#h",
+".m.3.K.K#a.k#a#d#a.k#a#d#a#d.q.m.8#i.x#c#e.d",
+"#f#g#i.w#j.w#i.8.w#i.8.8.m.8.m#k.8.w#b#e#fQt",
+".#.l.z.A#l.z#m#m#m#n#o#o#p#p#q#q#p#o#p#fQtQt",
+"QtQt.d#r#s#s#t#p.T.T.T#u#u.z#e#e#v.o.kQtQtQt"];
+
+
+sub NEW
+{
+    shift->SUPER::NEW(@_);
+
+    my $image0 = Qt::Pixmap($image0_data);
+    my $image1 = Qt::Pixmap($image1_data);
+    my $image2 = Qt::Pixmap($image2_data);
+    my $image3 = Qt::Pixmap($image3_data);
+    my $box = VBox(this);
+    sessionLog = TextEdit($box, "sessionLog");
+    sessionLog->setTextFormat(Qt::RichText());
+    sessionLog->setReadOnly(1);
+    comboBox = ComboBox($box, "comboBox");
+    comboBox->setEditable(1);
+    comboBox->setAutoCompletion(1);
+    this->setCentralWidget($box);
+    comboBox->setFocus;
+    this->resize(500,300);
+    setCaption("PerlQt Shell");
+#   fileNewAction= Qt::Action(this, "fileNewAction");
+#   fileNewAction->setIconSet(Qt::IconSet($image0));
+#   fileNewAction->setText(trUtf8("New"));
+#   fileNewAction->setMenuText(trUtf8("&New"));
+#   fileNewAction->setAccel(KeySequence(trUtf8("Ctrl+N")));
+    fileOpenAction= Qt::Action(this, "fileOpenAction");
+    fileOpenAction->setIconSet(Qt::IconSet($image1));
+    fileOpenAction->setText(trUtf8("Open"));
+    fileOpenAction->setMenuText(trUtf8("&Open..."));
+    fileOpenAction->setAccel(KeySequence(trUtf8("Ctrl+O")));
+    fileSaveAction= Qt::Action(this, "fileSaveAction");
+    fileSaveAction->setIconSet(Qt::IconSet($image2));
+    fileSaveAction->setText(trUtf8("Save"));
+    fileSaveAction->setMenuText(trUtf8("&Save"));
+    fileSaveAction->setAccel(KeySequence(trUtf8("Ctrl+S")));
+    fileSaveAsAction= Qt::Action(this, "fileSaveAsAction");
+    fileSaveAsAction->setText(trUtf8("Save As"));
+    fileSaveAsAction->setMenuText(trUtf8("Save &As..."));
+    fileSaveAsAction->setAccel(KeySequence(trUtf8("Ctrl+A")));
+    filePrintAction= Qt::Action(this, "filePrintAction");
+    filePrintAction->setIconSet(Qt::IconSet($image3));
+    filePrintAction->setText(trUtf8("Print"));
+    filePrintAction->setMenuText(trUtf8("&Print..."));
+    filePrintAction->setAccel(KeySequence(trUtf8("Ctrl+P")));
+    fileExitAction= Qt::Action(this, "fileExitAction");
+    fileExitAction->setText(trUtf8("Exit"));
+    fileExitAction->setMenuText(trUtf8("E&xit"));
+    fileExitAction->setAccel(KeySequence(trUtf8("Ctrl+E")));
+
+    helpExampleAction= Qt::Action(this, "helpExampleAction");
+    helpExampleAction->setText(trUtf8("Example"));
+    helpExampleAction->setMenuText(trUtf8("Examp&le"));
+    helpExampleAction->setAccel(KeySequence(trUtf8("Ctrl+L")));
+
+    toolBar = Qt::ToolBar("", this, DockTop());
+
+    toolBar->setLabel(trUtf8("Tools"));
+    fileOpenAction->addTo(toolBar);
+    fileSaveAction->addTo(toolBar);
+    filePrintAction->addTo(toolBar);
+
+
+    menubar= Qt::MenuBar( this, "menubar");
+
+    fileMenu= Qt::PopupMenu(this);
+#   fileNewAction->addTo(fileMenu);
+    fileOpenAction->addTo(fileMenu);
+    fileSaveAction->addTo(fileMenu);
+    fileSaveAsAction->addTo(fileMenu);
+    fileMenu->insertSeparator;
+    filePrintAction->addTo(fileMenu);
+    fileMenu->insertSeparator;
+    fileExitAction->addTo(fileMenu);
+    menubar->insertItem(trUtf8("&File"), fileMenu);
+
+    menubar->insertSeparator;
+
+    helpMenu= Qt::PopupMenu(this);
+    helpExampleAction->addTo(helpMenu);
+    menubar->insertItem(trUtf8("&Help"), helpMenu);
+
+#   Qt::Object::connect(fileNewAction, SIGNAL "activated()", this, SLOT "fileNew()");
+    Qt::Object::connect(fileOpenAction, SIGNAL "activated()", this, SLOT "fileOpen()");
+    Qt::Object::connect(fileSaveAction, SIGNAL "activated()", this, SLOT "fileSave()");
+    Qt::Object::connect(fileSaveAsAction, SIGNAL "activated()", this, SLOT "fileSaveAs()");
+    Qt::Object::connect(filePrintAction, SIGNAL "activated()", this, SLOT "filePrint()");
+    Qt::Object::connect(fileExitAction, SIGNAL "activated()", this, SLOT "fileExit()");
+    Qt::Object::connect(helpExampleAction, SIGNAL "activated()", this, SLOT "helpExample()");
+
+
+    executedLines = [];
+}
+
+#sub fileNew
+#{
+#    print "Form1->fileNew(): Not implemented yet.\n";
+#}
+
+sub fileOpen
+{
+    my $fn = Qt::FileDialog::getOpenFileName(
+                    ".",
+                    "Pqtsh Session (*.pqts)",
+                    this,
+                    "open session",
+                    "Choose a file to open" );
+    $fn or return;
+    emit fileNeedsEval($fn);
+
+}
+
+sub getFileName
+{
+    fileName = Qt::FileDialog::getSaveFileName(
+               ".",
+               "Pqtsh Session (*.pqts)",
+               this,
+               "save session",
+               "Choose a filename" );
+    fileName !~ /\.pqts$/ and fileName = fileName . ".pqts";
+    return fileName;
+}
+
+
+sub save
+{
+    my $fn = shift;
+    open( OUT, ">$fn") or do {
+        Qt::MessageBox::critical( 
+                     this, 
+                     "Error" , 
+                     "Couldn't open $fn for writing: $!", 
+                     &Qt::MessageBox::Ok, 
+                     &Qt::MessageBox::NoButton );
+        return
+    };
+    for (@{ &executedLines })
+    {
+        next if /^\s*$/;
+        chomp;
+        $_ .= ";" unless /;\s*$/;
+        print OUT $_, "\n"
+    }
+    close OUT
+}
+
+sub fileSave
+{
+    emptySession() and return;     
+    my $fn = fileName || getFileName();
+    $fn or return;
+    save($fn)
+}
+
+sub fileSaveAs
+{
+    emptySession() and return; 
+    my $fn;
+    my ($cond, $doit);
+    AGAIN:
+    {
+        $fn  = getFileName();
+        $fn or return;
+        if( -e $fn )
+        {
+            $cond++;
+            $doit = Qt::MessageBox::warning(
+                        this,
+                        "Warning" ,
+                        "File exists, overwrite ?",
+                        &Qt::MessageBox::Yes,
+                        &Qt::MessageBox::No );
+        }
+        else
+        {  $cond = 0  }
+    }
+    goto AGAIN if $cond and $doit == &Qt::MessageBox::No;
+    save($fn)       
+}
+
+sub filePrint
+{
+    my $Margin = 10;
+    my $pageNo = 1;
+    emptySession() and return; 
+    printer = Qt::Printer unless printer;
+    if ( printer->setup(this) ) {  
+        statusBar()->message( "Printing..." );
+        my $p = Qt::Painter;
+        if( !$p->begin( printer ) )  
+        { 
+            statusBar()->message( "An error occured..." );
+            return               
+        }
+
+        $p->setFont( sessionLog->font() );
+        my $yPos = 0; 
+        my $fm = $p->fontMetrics;
+        my $metrics = Qt::PaintDeviceMetrics( printer );
+  
+        for( my $i = 0 ; $i < @{ &executedLines } ; $i++ ) {
+            if ( $Margin + $yPos > $metrics->height() - $Margin ) {
+                my $msg ="Printing (page ". ++$pageNo . ")...";
+                statusBar()->message( $msg );
+                printer->newPage();             
+                $yPos = 0;                      
+            }
+            $p->drawText( $Margin, $Margin + $yPos,
+                        $metrics->width(), $fm->lineSpacing(),
+                        &ExpandTabs | &DontClip,
+                        ${ &executedLines }[ $i ] );
+            $yPos = $yPos + $fm->lineSpacing();
+        }
+        $p->end();       
+        statusBar()->message( "Printing completed", 3000 );
+    } else {
+        statusBar()->message( "Printing aborted", 3000 );
+    }  
+}
+
+sub fileExit
+{
+    emit Qt::app()->quit() if confirmExit();
+}
+
+sub closeEvent
+{
+   my $e = shift;
+   if(confirmExit())
+   {
+       $e->accept
+   }
+   else
+   {
+       $e->ignore
+   }
+}
+
+sub confirmExit
+{
+    my $doit;
+    if(@{ &executedLines })
+    {
+        $doit = Qt::MessageBox::warning(
+                    this,
+                    "Warning" ,
+                    "A session is opened, quit anyway ?",
+                     &Qt::MessageBox::Yes,
+                     &Qt::MessageBox::No );
+    }
+    else
+    {  return 1  }
+ 
+    return (($doit == &Qt::MessageBox::No) ? 0 : 1);
+}
+
+sub emptySession
+{
+    unless (@{ &executedLines })
+    {
+        statusBar()->message("Session is empty...", 3000);
+        return 1;
+    }
+    0
+}
+
+sub helpExample
+{
+    emit fileNeedsEval("__DATA__")
+}
+
+1;
+
+package QtShell;
+
+use Qt;
+use Qt::isa qw(Qt::MainWindow);
+use Qt::slots
+    evalInput=>[],
+    evalFile=>[QString];
+use Qt::attributes qw(
+    shellWindow
+);
+use QtShellControl;   
+
+sub NEW
+{
+    shift->SUPER::NEW(@_);
+
+    shellWindow = QtShellControl(undef, "shellWindow");
+    this->resize(350,350);
+    this->move(Point(10,10));
+    shellWindow->move(Point(300,200));
+    this->show;
+    shellWindow->show;
+
+
+    this->connect(shellWindow->comboBox->lineEdit, SIGNAL 'returnPressed()', SLOT 'evalInput()');
+    this->{'prompt'} = '<b><font color="blue">$&gt;</font></b>';
+    setCaption("MainWindow - this");
+    shellWindow->sessionLog->setText("Ready.<br>");
+    Qt::Object::connect(shellWindow, SIGNAL 'fileNeedsEval(QString)', this, SLOT 'evalFile(QString)');
+}
+
+sub logAppend
+{
+    shellWindow->sessionLog->setText( shellWindow->sessionLog->text . shift )
+}
+
+sub evalInput
+{
+    evalOneLine( shellWindow->comboBox->currentText );
+}
+
+sub evalOneLine
+{
+    my $prot = my $ln = shift;
+    $prot =~ s/</&lt;/gs;
+    $prot =~ s/>/&gt;/gs;    
+    logAppend( this->{'prompt'}. "$prot<br>" );
+    {
+      no strict;
+      eval $ln;
+    }
+    if($@)
+    {
+        my $prot = $@ ;
+        $prot =~ s/</&lt;/gs;
+        $prot =~ s/>/&gt;/gs;    
+        my $c = shellWindow->sessionLog->color;
+        $prot =~ s/\n/<br>/gs;
+        logAppend('<font color="red">'.$prot.'</font><br>');
+        shellWindow->sessionLog->setColor( $c );
+    }
+    else
+    {        
+        push @{ shellWindow()->{'executedLines'} }, $ln;
+        shellWindow->comboBox->clearEdit;
+        shellWindow->comboBox->setFocus;
+    }   
+    shellWindow->sessionLog->scrollToBottom
+}
+
+sub evalFile
+{
+    my $fn = shift;
+    my $fh;
+    if($fn eq "__DATA__")
+    {
+        $fh = \*::DATA
+    }
+    else
+    {
+        open($fh, $fn) or do {
+            Qt::MessageBox::warning ( 
+                this, 
+                "Error" , 
+                "Couldn't open $fn: $!", 
+                &Qt::MessageBox::Ok, 
+                &Qt::MessageBox::NoButton );
+            return
+        };
+    }
+    while(<$fh>)
+    {
+        evalOneLine($_)    
+    }
+    close $fh
+}
+
+1;
+
+package Qt::TextHandle;
+
+sub TIEHANDLE { my ( $classnm, $widg, $color) = @_;
+  my $h = { widg => $widg, color => $color};
+  bless  $h, $classnm;
+
+}
+
+sub PRINT {
+  my $me = shift;
+  my $color = $me->{color};
+  my $printed = join $/,  @_;
+  $printed =~ s/</&lt;/gs;
+  $printed =~ s/>/&gt;/gs;
+  $printed =~ s/\n/<br>/gs;
+  $me->{widg}->setText( $me->{widg}->text . "<font color=\"$color\">$printed</font>" );
+
+}
+
+sub PRINTF { shift->PRINT(sprintf shift, @_); }
+sub CLOSE  { shift->UNTIE; }
+sub UNTIE  { }
+
+
+1;
+
+package main;
+use strict;
+use Qt;
+use QtShell;
+use Qt::debug;
+
+my $app = Qt::Application(\@ARGV);
+my $w = QtShell(undef, "mainWindow");
+my $shw = $w->shellWindow;
+$app->setMainWidget($shw);
+tie *STDOUT, 'Qt::TextHandle', $shw->sessionLog, 'black';
+tie *STDERR, 'Qt::TextHandle', $shw->sessionLog, 'red';
+
+exit $app->exec;
+
+__DATA__
+statusBar()->message("Hello World !");
+use Qt::attributes qw|datetime button textedit sample vbox| ;
+vbox = VBox(this);
+datetime = DateTimeEdit(vbox);
+textedit = Qt::TextEdit(vbox);
+button = PushButton("Hello World!", vbox) ;
+this->setCentralWidget(vbox);
+resize(220,240);
+vbox->show;
+sample = Qt::PopupMenu( this );
+use Qt::slots 'there' => [];
+sample->insertItem("&There", this, SLOT 'there()');
+menuBar()->insertItem("&Here", sample);
+sub there { statusBar()->message("There...", 2000) };

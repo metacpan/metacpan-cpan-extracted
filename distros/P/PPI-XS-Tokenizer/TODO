@@ -1,0 +1,10 @@
+This is just what I noticed in passing, feel free to expand --Steffen
+
+- Transform "magics" and "operators" instance data in Tokenizer
+  into static/class data
+- Style: Stick to either foo_bar or camelCase notation for members and
+  methods. Either use the m_foo or the fFoo syntax for member names
+  (and specifically use some consistent syntax whatever it is).
+- freeToken (or free_token or whatever) should be an object method of
+  the tokens? Maybe?
+

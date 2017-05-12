@@ -1,0 +1,29 @@
+#!/usr/bin/perl
+
+######################################################################
+#
+# A sample PseudoPod checker that uses
+# Pod::PseudoPod::Checker.
+#
+# usage:
+#
+# $ ppodchecker filename1.pod filename2.pod
+#
+# Sends errors to STDOUT.
+#
+######################################################################
+
+use strict;
+use Pod::PseudoPod::Checker;
+
+foreach my $file (@ARGV) {
+	my $parser = Pod::PseudoPod::Checker->new();
+
+	if (-e $file) {
+		$parser->parse_file($file);
+	} else {
+		die "Unable to open file\n";
+	}
+}
+
+exit;

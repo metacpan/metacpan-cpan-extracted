@@ -1,0 +1,921 @@
+#!/opt/bin/perl
+
+=head1 NAME
+
+perlstrip - make perl sources smaller by removing comments, pod, whitespace...
+
+=head1 SYNOPSIS
+
+   perlstrip file...
+   perlstrip --size --cache file...
+
+   -v                verbose
+   --size            optimise for size (also: -s)
+   --cache           use a cache (also: -c)
+   --cache-dir path  cache directory to use
+   --output path     output file for next input file (also: -o)
+
+WARNING: like its counterpart strip, by default files are overwritten!
+
+=head1 DESCRIPTION
+
+This program can be used to reduce the filesize of perl sources, for
+example, before bundling them using L<PAR>, L<App::Staticperl>, or when
+using them in a situation where disk space is premium (such as within
+firmwares, boot floppies etc.).
+
+It does this by removing unnecessary whitespace, commands, POD and a few
+other things.
+
+By default, it works through the list of files given on the commandline,
+strips them and writes them again. This can be influenced via switches.
+
+=head2 OPTIONS
+
+=over 4
+
+=item C<--verbose>
+
+=item C<-v>
+
+Increases verbosity - highly recommended for interactive use.
+
+=item C<--output> path
+
+=item C<-o> path
+
+Write the stripped contents of the I<following> files on the commandline
+to this path, instead of overwriting the original file. This can be used
+to copy files instead of (destructively) overwriting them, by specifying
+C<-o> before each file, e.g.:
+
+   perlstrip -o strippedfile origsource
+
+=item C<--size>
+
+=item C<-s>
+
+Optimise for size instead of for compressibility - the default is to
+optimise the file for later compression. Optimising for size makes the raw
+file size smaller, but might compress a bit worse.
+
+=item C<--cache>
+
+=item C<-c>
+
+Stripping files can take a very long time. When this option is enabled,
+then C<perlstrip> will cache larger files in a special directory
+(default: F<~/.cache/perlstrip>), to improve repeated calls to strip
+sources.
+
+This is mainly useful when you strip a whole perl installation repeatedly.
+
+=item C<--cache-dir> path
+
+Enables caching, but uses an alternative cache directory (which will be
+created if it doesn't exist yet).
+
+=back
+
+=head1 SEE ALSO
+
+L<App::Staticperl>, L<Perl::Squish>.
+
+=head1 AUTHOR
+
+ Marc Lehmann <schmorp@schmorp.de>
+ http://software.schmorp.de/pkg/staticperl.html
+
+=cut
+
+use Perl::Strip;
+use Getopt::Long;
+use common::sense;
+
+our $VERBOSE;
+our $OPTIMISE_SIZE;
+our $CACHE;
+our $CACHEDIR;
+our $OUTPUT;
+
+$|=1;
+
+sub usage {
+   require Pod::Usage;
+
+   Pod::Usage::pod2usage (-output => *STDOUT, -verbose => 1, -exitval => 1, -noperldoc => 1);
+}
+
+sub process {
+   my $file = shift;
+
+   # GetOotions apparently wraps us into an eval :/
+   eval {
+      my @cache;
+
+      if (defined $CACHEDIR) {
+         @cache = (cache => $CACHEDIR);
+      } elsif ($CACHE) {
+         mkdir "$ENV{HOME}/.cache";
+         @cache = (cache => "$ENV{HOME}/.cache/perlstrip");
+      }
+
+      print "$file... " if $VERBOSE;
+
+      my $output = defined $OUTPUT ? $OUTPUT : $file;
+
+      my $src = do {
+         open my $fh, "<:perlio", $file
+            or die "$file: $!\n";
+
+         local $/;
+         <$fh>
+      };
+
+      printf "%d ", length $src if $VERBOSE;
+
+      $src = (new Perl::Strip @cache, optimise_size => $OPTIMISE_SIZE)->strip ($src);
+
+      printf "to %d bytes... ", length $src if $VERBOSE;
+      print $output eq $file ? "writing... " : "saving as $output... " if $VERBOSE;
+
+      open my $fh, ">:perlio", "$output~"
+         or die "$output~: $!\n";
+      length $src == syswrite $fh, $src
+         or die "$output~: $!\n";
+      close $fh;
+      rename "$output~", $output;
+
+      print "ok\n" if $VERBOSE;
+   };
+
+   if ($@) {
+      print STDERR "$@\n";
+      exit 2;
+   }
+}
+
+@ARGV
+   or usage;
+
+Getopt::Long::Configure ("bundling", "no_auto_abbrev", "no_ignore_case");
+
+GetOptions
+   "cache|c"       => \$CACHE,
+   "cache-dir=s"   => \$CACHEDIR,
+   "verbose|v"     => sub { ++$VERBOSE },
+   "quiet|q"       => sub { --$VERBOSE },
+   "size|s"        => \$OPTIMISE_SIZE,
+   "output|o=s"    => \$OUTPUT,
+   "<>"            => \&process,
+   or usage;
+
+__END__
+
+
+die "cannot specify both --app and --perl\n"
+   if $PERL and defined $APP;
+
+# required for @INC loading, unfortunately
+trace_module "PerlIO::scalar";
+
+#############################################################################
+# apply include/exclude
+
+{
+   my %pmi;
+
+   for (@incext) {
+      my ($inc, $glob) = @$_;
+
+      my @match = grep /$glob/, keys %pm;
+
+      if ($inc) {
+         # include
+         @pmi{@match} = delete @pm{@match};
+
+         print "applying include $glob - protected ", (scalar @match), " files.\n"
+            if $VERBOSE >= 5;
+      } else {
+         # exclude
+         delete @pm{@match};
+
+         print "applying exclude $glob - removed ", (scalar @match), " files.\n"
+            if $VERBOSE >= 5;
+      }
+   }
+
+   my @pmi = keys %pmi;
+   @pm{@pmi} = delete @pmi{@pmi};
+}
+
+#############################################################################
+# scan for AutoLoader, static archives and other dependencies
+
+sub scan_al {
+   my ($auto, $autodir) = @_;
+
+   my $ix = "$autodir/autosplit.ix";
+
+   print "processing autoload index for '$auto'\n"
+      if $VERBOSE >= 6;
+
+   $pm{"$auto/autosplit.ix"} = $ix;
+
+   open my $fh, "<:perlio", $ix
+      or die "$ix: $!";
+
+   my $package;
+
+   while (<$fh>) {
+      if (/^\s*sub\s+ ([^[:space:];]+) \s* (?:\([^)]*\))? \s*;?\s*$/x) {
+         my $al = "auto/$package/$1.al";
+         my $inc = find_inc $al;
+
+         defined $inc or die "$al: autoload file not found, but should be there.\n";
+
+         $pm{$al} = $inc;
+         print "found autoload function '$al'\n"
+            if $VERBOSE >= 6;
+
+      } elsif (/^\s*package\s+([^[:space:];]+)\s*;?\s*$/) {
+         ($package = $1) =~ s/::/\//g;
+      } elsif (/^\s*(?:#|1?\s*;?\s*$)/) {
+         # nop
+      } else {
+         warn "WARNING: $ix: unparsable line, please report: $_";
+      }
+   }
+}
+
+for my $pm (keys %pm) {
+   if ($pm =~ /^(.*)\.pm$/) {
+      my $auto    = "auto/$1";
+      my $autodir = find_inc $auto;
+
+      if (defined $autodir && -d $autodir) {
+         # AutoLoader
+         scan_al $auto, $autodir
+            if -f "$autodir/autosplit.ix";
+
+         # extralibs.ld
+         if (open my $fh, "<:perlio", "$autodir/extralibs.ld") {
+            print "found extralibs for $pm\n"
+               if $VERBOSE >= 6;
+
+            local $/;
+            $extralibs .= " " . <$fh>;
+         }
+
+         $pm =~ /([^\/]+).pm$/ or die "$pm: unable to match last component";
+
+         my $base = $1;
+
+         # static ext
+         if (-f "$autodir/$base$Config{_a}") {
+            print "found static archive for $pm\n"
+               if $VERBOSE >= 3;
+
+            push @libs, "$autodir/$base$Config{_a}";
+            push @static_ext, $pm;
+         }
+
+         # dynamic object
+         die "ERROR: found shared object - can't link statically ($_)\n"
+            if -f "$autodir/$base.$Config{dlext}";
+
+         if ($PACKLIST && open my $fh, "<:perlio", "$autodir/.packlist") {
+            print "found .packlist for $pm\n"
+               if $VERBOSE >= 3;
+
+            while (<$fh>) {
+               chomp;
+               s/ .*$//; # newer-style .packlists might contain key=value pairs
+
+               # only include certain files (.al, .ix, .pm, .pl)
+               if (/\.(pm|pl|al|ix)$/) {
+                  for my $inc (@INC) {
+                     # in addition, we only add files that are below some @INC path
+                     $inc =~ s/\/*$/\//;
+
+                     if ($inc eq substr $_, 0, length $inc) {
+                        my $base = substr $_, length $inc;
+                        $pm{$base} = $_;
+
+                        print "+ added .packlist dependency $base\n"
+                           if $VERBOSE >= 3;
+                     }
+
+                     last;
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+#############################################################################
+
+print "processing bundle files (try more -v power if you get bored waiting here)...\n"
+   if $VERBOSE >= 1;
+
+my $data;
+my @index;
+my @order = sort {
+   length $a <=> length $b
+      or $a cmp $b
+} keys %pm;
+
+# sorting by name - better compression, but needs more metadata
+# sorting by length - faster lookup
+# usually, the metadata overhead beats the loss through compression
+
+for my $pm (@order) {
+   my $path = $pm{$pm};
+
+   128 > length $pm
+      or die "ERROR: $pm: path too long (only 128 octets supported)\n";
+
+   my $src = ref $path
+           ? $$path
+           : do {
+              open my $pm, "<", $path
+                 or die "$path: $!";
+
+              local $/;
+              
+              <$pm>
+           };
+
+   my $size = length $src;
+
+   unless ($pmbin{$pm}) { # only do this unless the file is binary
+      if ($pm =~ /^auto\/POSIX\/[^\/]+\.al$/) {
+         if ($src =~ /^    unimpl \"/m) {
+            print "$pm: skipping (raises runtime error only).\n"
+               if $VERBOSE >= 3;
+            next;
+         }
+      }
+
+      $src = cache +($STRIP eq "ppi" ? "$UNISTRIP,$OPTIMISE_SIZE" : undef), $src, sub {
+         if ($UNISTRIP && $pm =~ /^unicore\/.*\.pl$/) {
+            print "applying unicore stripping $pm\n"
+               if $VERBOSE >= 6;
+
+            # special stripping for unicore swashes and properties
+            # much more could be done by going binary
+            $src =~ s{
+               (^return\ <<'END';\n) (.*?\n) (END(?:\n|\Z))
+            }{
+               my ($pre, $data, $post) = ($1, $2, $3);
+
+               for ($data) {
+                  s/^([0-9a-fA-F]+)\t([0-9a-fA-F]+)\t/sprintf "%X\t%X", hex $1, hex $2/gem
+                     if $OPTIMISE_SIZE;
+
+#                  s{
+#                     ^([0-9a-fA-F]+)\t([0-9a-fA-F]*)\t
+#                  }{
+#                     # ww - smaller filesize, UU - compress better
+#                     pack "C0UU",
+#                          hex $1,
+#                          length $2 ? (hex $2) - (hex $1) : 0
+#                  }gemx;
+
+                  s/#.*\n/\n/mg;
+                  s/\s+\n/\n/mg;
+               }
+
+               "$pre$data$post"
+            }smex;
+         }
+
+         if ($STRIP =~ /ppi/i) {
+            require PPI;
+
+            if (my $ppi = PPI::Document->new (\$src)) {
+               $ppi->prune ("PPI::Token::Comment");
+               $ppi->prune ("PPI::Token::Pod");
+
+               # prune END stuff
+               for (my $last = $ppi->last_element; $last; ) {
+                  my $prev = $last->previous_token;
+
+                  if ($last->isa (PPI::Token::Whitespace::)) {
+                     $last->delete;
+                  } elsif ($last->isa (PPI::Statement::End::)) {
+                     $last->delete;
+                     last;
+                  } elsif ($last->isa (PPI::Token::Pod::)) {
+                     $last->delete;
+                  } else {
+                     last;
+                  }
+
+                  $last = $prev;
+               }
+
+               # prune some but not all insignificant whitespace
+               for my $ws (@{ $ppi->find (PPI::Token::Whitespace::) }) {
+                  my $prev = $ws->previous_token;
+                  my $next = $ws->next_token;
+
+                  if (!$prev || !$next) {
+                     $ws->delete;
+                  } else {
+                     if (
+                        $next->isa (PPI::Token::Operator::) && $next->{content} =~ /^(?:,|=|!|!=|==|=>)$/ # no ., because of digits. == float
+                        or $prev->isa (PPI::Token::Operator::) && $prev->{content} =~ /^(?:,|=|\.|!|!=|==|=>)$/
+                        or $prev->isa (PPI::Token::Structure::)
+                        or ($OPTIMISE_SIZE &&
+                            ($prev->isa (PPI::Token::Word::)
+                               && (PPI::Token::Symbol:: eq ref $next
+                                   || $next->isa (PPI::Structure::Block::)
+                                   || $next->isa (PPI::Structure::List::)
+                                   || $next->isa (PPI::Structure::Condition::)))
+                           )
+                     ) {
+                        $ws->delete;
+                     } elsif ($prev->isa (PPI::Token::Whitespace::)) {
+                        $ws->{content} = ' ';
+                        $prev->delete;
+                     } else {
+                        $ws->{content} = ' ';
+                     }
+                  }
+               }
+
+               # prune whitespace around blocks
+               if ($OPTIMISE_SIZE) {
+                  # these usually decrease size, but decrease compressability more
+                  for my $struct (PPI::Structure::Block::, PPI::Structure::Condition::) {
+                     for my $node (@{ $ppi->find ($struct) }) {
+                        my $n1 = $node->first_token;
+                        my $n2 = $n1->previous_token;
+                        $n1->delete if $n1->isa (PPI::Token::Whitespace::);
+                        $n2->delete if $n2 && $n2->isa (PPI::Token::Whitespace::);
+                        my $n1 = $node->last_token;
+                        my $n2 = $n1->next_token;
+                        $n1->delete if $n1->isa (PPI::Token::Whitespace::);
+                        $n2->delete if $n2 && $n2->isa (PPI::Token::Whitespace::);
+                     }
+                  }
+
+                  for my $node (@{ $ppi->find (PPI::Structure::List::) }) {
+                     my $n1 = $node->first_token;
+                     $n1->delete if $n1->isa (PPI::Token::Whitespace::);
+                     my $n1 = $node->last_token;
+                     $n1->delete if $n1->isa (PPI::Token::Whitespace::);
+                  }
+               }
+
+               # reformat qw() lists which often have lots of whitespace
+               for my $node (@{ $ppi->find (PPI::Token::QuoteLike::Words::) }) {
+                  if ($node->{content} =~ /^qw(.)(.*)(.)$/s) {
+                     my ($a, $qw, $b) = ($1, $2, $3);
+                     $qw =~ s/^\s+//;
+                     $qw =~ s/\s+$//;
+                     $qw =~ s/\s+/ /g;
+                     $node->{content} = "qw$a$qw$b";
+                  }
+               }
+
+               $src = $ppi->serialize;
+            } else {
+               warn "WARNING: $pm{$pm}: PPI failed to parse this file\n";
+            }
+         } elsif ($STRIP =~ /pod/i && $pm ne "Opcode.pm") { # opcode parses its own pod
+            require Pod::Strip;
+
+            my $stripper = Pod::Strip->new;
+
+            my $out;
+            $stripper->output_string (\$out);
+            $stripper->parse_string_document ($src)
+               or die;
+            $src = $out;
+         }
+
+         if ($VERIFY && $pm =~ /\.pm$/ && $pm ne "Opcode.pm") {
+            if (open my $fh, "-|") {
+               <$fh>;
+            } else {
+               eval "#line 1 \"$pm\"\n$src" or warn "\n\n\n$pm\n\n$src\n$@\n\n\n";
+               exit 0;
+            }
+         }
+
+         $src
+      };
+
+#      if ($pm eq "Opcode.pm") {
+#         open my $fh, ">x" or die; print $fh $src;#d#
+#         exit 1;
+#      }
+   }
+
+   print "adding $pm (original size $size, stored size ", length $src, ")\n"
+      if $VERBOSE >= 2;
+
+   push @index, ((length $pm) << 25) | length $data;
+   $data .= $pm . $src;
+}
+
+length $data < 2**25
+   or die "ERROR: bundle too large (only 32MB supported)\n";
+
+my $varpfx = "bundle_" . substr +(Digest::MD5::md5_hex $data), 0, 16;
+
+#############################################################################
+# output
+
+print "generating $PREFIX.h... "
+   if $VERBOSE >= 1;
+
+{
+   open my $fh, ">", "$PREFIX.h"
+      or die "$PREFIX.h: $!\n";
+
+   print $fh <<EOF;
+/* do not edit, automatically created by mkstaticbundle */
+
+#include <EXTERN.h>
+#include <perl.h>
+#include <XSUB.h>
+
+/* public API */
+EXTERN_C PerlInterpreter *staticperl;
+EXTERN_C void staticperl_xs_init (pTHX);
+EXTERN_C void staticperl_init (void);
+EXTERN_C void staticperl_cleanup (void);
+
+EOF
+}
+
+print "\n"
+   if $VERBOSE >= 1;
+
+#############################################################################
+# output
+
+print "generating $PREFIX.c... "
+   if $VERBOSE >= 1;
+
+open my $fh, ">", "$PREFIX.c"
+   or die "$PREFIX.c: $!\n";
+
+print $fh <<EOF;
+/* do not edit, automatically created by mkstaticbundle */
+
+#include "bundle.h"
+
+/* public API */
+PerlInterpreter *staticperl;
+
+EOF
+
+#############################################################################
+# bundle data
+
+my $count = @index;
+
+print $fh <<EOF;
+#include "bundle.h"
+
+/* bundle data */
+
+static const U32 $varpfx\_count = $count;
+static const U32 $varpfx\_index [$count + 1] = {
+EOF
+
+my $col;
+for (@index) {
+   printf $fh "0x%08x,", $_;
+   print $fh "\n" unless ++$col % 10;
+
+}
+printf $fh "0x%08x\n};\n", (length $data);
+
+print $fh "static const char $varpfx\_data [] =\n";
+dump_string $fh, $data;
+
+print $fh ";\n\n";
+
+#############################################################################
+# bootstrap
+
+# boot file for staticperl
+# this file will be eval'ed at initialisation time
+
+my $bootstrap = '
+BEGIN {
+   package ' . $PACKAGE . ';
+
+   PerlIO::scalar->bootstrap;
+
+   @INC = sub {
+      my $data = find "$_[1]"
+         or return;
+
+      $INC{$_[1]} = $_[1];
+
+      open my $fh, "<", \$data;
+      $fh
+   };
+}
+';
+
+$bootstrap .= "require '//boot';"
+   if exists $pm{"//boot"};
+
+$bootstrap =~ s/\s+/ /g;
+$bootstrap =~ s/(\W) /$1/g;
+$bootstrap =~ s/ (\W)/$1/g;
+
+print $fh "const char bootstrap [] = ";
+dump_string $fh, $bootstrap;
+print $fh ";\n\n";
+
+print $fh <<EOF;
+/* search all bundles for the given file, using binary search */
+XS(find)
+{
+  dXSARGS;
+
+  if (items != 1)
+    Perl_croak (aTHX_ "Usage: $PACKAGE\::find (\$path)");
+
+  {
+    STRLEN namelen;
+    char *name = SvPV (ST (0), namelen);
+    SV *res = 0;
+
+    int l = 0, r = $varpfx\_count;
+
+    while (l <= r)
+      {
+        int m = (l + r) >> 1;
+        U32 idx = $varpfx\_index [m];
+        int comp = namelen - (idx >> 25);
+
+        if (!comp)
+          {
+            int ofs = idx & 0x1FFFFFFU;
+            comp = memcmp (name, $varpfx\_data + ofs, namelen);
+
+            if (!comp)
+              {
+                /* found */
+                int ofs2 =  $varpfx\_index [m + 1] & 0x1FFFFFFU;
+
+                ofs += namelen;
+                res = newSVpvn ($varpfx\_data + ofs, ofs2 - ofs);
+                goto found;
+              }
+          }
+
+        if (comp < 0)
+          r = m - 1;
+        else
+          l = m + 1;
+      }
+
+    XSRETURN (0);
+
+  found:
+    ST (0) = res;
+    sv_2mortal (ST (0));
+  }
+
+  XSRETURN (1);
+}
+
+/* list all files in the bundle */
+XS(list)
+{
+  dXSARGS;
+
+  if (items != 0)
+    Perl_croak (aTHX_ "Usage: $PACKAGE\::list");
+
+  {
+    int i;
+
+    EXTEND (SP, $varpfx\_count);
+
+    for (i = 0; i < $varpfx\_count; ++i)
+      {
+        U32 idx = $varpfx\_index [i];
+
+        PUSHs (newSVpvn ($varpfx\_data + (idx & 0x1FFFFFFU), idx >> 25));
+      }
+  }
+
+  XSRETURN ($varpfx\_count);
+}
+
+EOF
+
+#############################################################################
+# xs_init
+
+print $fh <<EOF;
+void
+staticperl_xs_init (pTHX)
+{
+EOF
+
+@static_ext = ("DynaLoader", sort @static_ext);
+
+# prototypes
+for (@static_ext) {
+   s/\.pm$//;
+   (my $cname = $_) =~ s/\//__/g;
+   print $fh "  EXTERN_C void boot_$cname (pTHX_ CV* cv);\n";
+}
+
+print $fh <<EOF;
+  char *file = __FILE__;
+  dXSUB_SYS;
+
+  newXSproto ("$PACKAGE\::find", find, file, "\$");
+  newXSproto ("$PACKAGE\::list", list, file, "");
+EOF
+
+# calls
+for (@static_ext) {
+   s/\.pm$//;
+
+   (my $cname = $_) =~ s/\//__/g;
+   (my $pname = $_) =~ s/\//::/g;
+
+   my $bootstrap = $pname eq "DynaLoader" ? "boot" : "bootstrap";
+
+   print $fh "  newXS (\"$pname\::$bootstrap\", boot_$cname, file);\n";
+}
+
+print $fh <<EOF;
+  Perl_av_create_and_unshift_one (&PL_preambleav, newSVpv (bootstrap, sizeof (bootstrap) - 1));
+}
+EOF
+
+#############################################################################
+# optional perl_init/perl_destroy
+
+if ($APP) {
+   print $fh <<EOF;
+
+int
+main (int argc, char *argv [])
+{
+  extern char **environ;
+  int exitstatus;
+
+  static char *args[] = {
+    "staticperl",
+    "-e",
+    "0"
+  };
+
+  PERL_SYS_INIT3 (&argc, &argv, &environ);
+  staticperl = perl_alloc ();
+  perl_construct (staticperl);
+
+  PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
+
+  exitstatus = perl_parse (staticperl, staticperl_xs_init, sizeof (args) / sizeof (*args), args, environ);
+  if (!exitstatus)
+    perl_run (staticperl);
+
+  exitstatus = perl_destruct (staticperl);
+  perl_free (staticperl);
+  PERL_SYS_TERM ();
+
+  return exitstatus;
+}
+EOF
+} elsif ($PERL) {
+   print $fh <<EOF;
+
+int
+main (int argc, char *argv [])
+{
+  extern char **environ;
+  int exitstatus;
+
+  PERL_SYS_INIT3 (&argc, &argv, &environ);
+  staticperl = perl_alloc ();
+  perl_construct (staticperl);
+
+  PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
+
+  exitstatus = perl_parse (staticperl, staticperl_xs_init, argc, argv, environ);
+  if (!exitstatus)
+    perl_run (staticperl);
+
+  exitstatus = perl_destruct (staticperl);
+  perl_free (staticperl);
+  PERL_SYS_TERM ();
+
+  return exitstatus;
+}
+EOF
+} else {
+   print $fh <<EOF;
+
+EXTERN_C void
+staticperl_init (void)
+{
+  extern char **environ;
+  int argc = sizeof (args) / sizeof (args [0]);
+  char **argv = args;
+
+  static char *args[] = {
+    "staticperl",
+    "-e",
+    "0"
+  };
+
+  PERL_SYS_INIT3 (&argc, &argv, &environ);
+  staticperl = perl_alloc ();
+  perl_construct (staticperl);
+  PL_origalen = 1;
+  PL_exit_flags |= PERL_EXIT_DESTRUCT_END;
+  perl_parse (staticperl, staticperl_xs_init, argc, argv, environ);
+
+  perl_run (staticperl);
+}
+
+EXTERN_C void
+staticperl_cleanup (void)
+{
+  perl_destruct (staticperl);
+  perl_free (staticperl);
+  staticperl = 0;
+  PERL_SYS_TERM ();
+}
+EOF
+}
+
+print -s "$PREFIX.c", " octets (", (length $data) , " data octets).\n\n"
+   if $VERBOSE >= 1;
+
+#############################################################################
+# libs, cflags
+
+{
+   print "generating $PREFIX.ccopts... "
+      if $VERBOSE >= 1;
+
+   my $str = "$Config{ccflags} $Config{optimize} $Config{cppflags} -I$Config{archlibexp}/CORE";
+   $str =~ s/([\(\)])/\\$1/g;
+
+   open my $fh, ">$PREFIX.ccopts"
+      or die "$PREFIX.ccopts: $!";
+   print $fh $str;
+
+   print "$str\n\n"
+      if $VERBOSE >= 1;
+}
+
+{
+   print "generating $PREFIX.ldopts... ";
+
+   my $str = $STATIC ? "-static " : "";
+
+   $str .= "$Config{ccdlflags} $Config{ldflags} @libs $Config{archlibexp}/CORE/$Config{libperl} $Config{perllibs}";
+
+   my %seen;
+   $str .= " $_" for grep !$seen{$_}++, ($extralibs =~ /(\S+)/g);
+
+   for (@staticlibs) {
+      $str =~ s/(^|\s) (-l\Q$_\E) ($|\s)/$1-Wl,-Bstatic $2 -Wl,-Bdynamic$3/gx;
+   }
+
+   $str =~ s/([\(\)])/\\$1/g;
+
+   open my $fh, ">$PREFIX.ldopts"
+      or die "$PREFIX.ldopts: $!";
+   print $fh $str;
+
+   print "$str\n\n"
+      if $VERBOSE >= 1;
+}
+
+if ($PERL or defined $APP) {
+   $APP = "perl" unless defined $APP;
+
+   print "building $APP...\n"
+      if $VERBOSE >= 1;
+
+   system "$Config{cc} \$(cat bundle.ccopts\) -o \Q$APP\E bundle.c \$(cat bundle.ldopts\)";
+
+   unlink "$PREFIX.$_"
+      for qw(ccopts ldopts c h);
+
+   print "\n"
+      if $VERBOSE >= 1;
+}
+

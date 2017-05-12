@@ -1,0 +1,25 @@
+---
+abstract: 'Loads 320x200 8-bit PCX-format graphics.'
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PCX-Loader
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: 5.008008
+resources:
+  repository: https://github.com/asb-capfan/PCX-Loader
+version: 0.51

@@ -1,0 +1,138 @@
+
+#
+# Copyright (C) 2003  Sam Horrocks
+# 
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+# 
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+#
+
+# Type:
+#    str		string
+#    whole		whole number (>=0)
+#    natural		natural number (>=1)
+#
+# Context:
+#    perperl		command-line
+#    mod_persistentperl	apache module
+#    module		PersistentPerl module
+#    all		all of the above
+#    frontend		perperl and mod_persistentperl
+#
+#    If no context specified, then not available externally.
+#
+
+option	Timeout
+type	whole
+letter	t
+defval	3600
+defdesc	one hour
+context	all
+desc	If no new requests have been received after <number> seconds,
+desc	exit the persistent perl interpreter.  Zero indicates no timeout.
+
+option	MaxRuns
+type	whole
+letter	r
+defval	500
+context	all
+desc	Once the perl interpreter has run <number> times, re-exec the
+desc    backend process.  Zero indicates no maximum.  This option is useful
+desc	for processes that tend to consume resources over time.
+
+option	MaxBackends
+type	whole
+defval	0
+defdesc	no max
+letter	M
+context	frontend
+desc	If non-zero, limits the number of perperl backends running for this
+desc	perl script to <number>.
+
+option	BackendProg
+type	str
+letter	p
+context	frontend
+defval	$INSTALLBIN/perperl_backend
+desc	Path to the perperl backend program.
+
+option	TmpBase
+type	str
+letter	T
+defval	/tmp/perperl
+context	frontend
+desc	Use the given prefix for creating temporary files.  This must be
+desc	a filename prefix, not a directory name.
+
+option	PerlArgs
+type	str
+context mod_persistentperl
+desc	Command-line options to pass to the perl interpreter.
+
+option	BufsizPost
+type	natural
+letter	b
+context	perperl
+defval	131072
+desc	Use <number> bytes as the maximum size for the buffer that sends
+desc	data to the perl backend.
+
+option	BufsizGet
+type	natural
+letter	B
+context	perperl
+defval	131072
+desc	Use <number> bytes as the maximum size for the buffer that receives
+desc	data from the perl backend.
+
+option  BECheckTimeout
+type	natural
+defval	1
+desc	The frontend waits <number> seconds before waking up and checking for
+desc	dead backends.
+
+option	RestatTimeout
+type	natural
+defval	5
+desc	The frontend re-stats the perl-script this often while waiting for
+desc	a backend.  Also used as a timeout for re-opening the temp-file.
+
+option	BESpawns
+type	natural
+defval	1
+desc	The frontend can spawn this many backends simultaneously when there
+desc	are frontends waiting for backends.  More may not be better.
+
+option	Version
+type	toggle
+letter	v
+context	perperl
+desc	Print the PersistentPerl version and exit.
+
+option	Group
+type	str
+letter	g
+context	frontend
+defval	none
+desc	Allow a single perl interpreter to run multiple scripts.
+desc	All scripts that are run with the same group name and by the same user
+desc	will be run by the same group of perl interpreters.
+desc	If the group name is "none" then grouping is disabled and each
+desc	interpreter will run one script.
+desc	Different group names allow scripts to be separated into
+desc	different groups.
+desc	Name is case-sensitive, and only the first 12-characters are
+desc	significant.
+desc	Specifying an empty group name is the same as specifying
+desc	the group name "default" - this allows just specifying "-g"
+desc	on the command line to turn on grouping.

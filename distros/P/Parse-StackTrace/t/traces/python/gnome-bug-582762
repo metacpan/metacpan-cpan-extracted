@@ -1,0 +1,16 @@
+Traceback (most recent call last):
+  File "/usr/games/gnome-sudoku", line 67, in <module>
+    start_game()
+  File "/var/lib/python-support/python2.6/gnome_sudoku/gnome_sudoku.py", line
+21, in start_game
+    import main
+  File "/var/lib/python-support/python2.6/gnome_sudoku/main.py", line 11, in
+<module>
+    import gsudoku, sudoku, saver, sudoku_maker, printing, sudoku_generator_gui
+  File "/var/lib/python-support/python2.6/gnome_sudoku/gsudoku.py", line 8, in
+<module>
+    import sudoku
+  File "/var/lib/python-support/python2.6/gnome_sudoku/sudoku.py", line 100
+    self.ox_coords[box_num]=[]
+         ^
+SyntaxError: invalid syntax

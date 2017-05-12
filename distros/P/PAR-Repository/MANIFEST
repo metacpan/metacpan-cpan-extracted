@@ -1,0 +1,25 @@
+bin/parrepo
+Changes
+dump_db.pl
+lib/PAR/Repository.pm
+lib/PAR/Repository/DBM.pm
+lib/PAR/Repository/Zip.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00pod.t
+t/00podcover.t
+t/01use.t
+t/10create_dbm.t
+t/20create.t
+t/25inject.t
+t/30md5perl.t
+t/34create_nosymlinks.t
+t/35inject_nosymlinks.t
+t/40inject_convert_nosymlinks.t
+t/data/Test-Kit-0.02-any_arch-any_version.par
+t/lib/RepoTest.pm
+t/lib/RepoTest/TestKit.pm
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,51 @@
+0.12
+    * Fixed inconsistent VERSION
+
+0.11
+
+    * Added repository and bugtracker information to metadata
+    * Removed unneeded dependency on Carp::Always
+
+0.10
+
+    * Added Changes file & fixed POD (RT 94939, reported by Florian)
+
+0.09
+
+    * Fixed VERSION
+
+0.08
+
+    * Added VERSION to FixMissingBodyInRedirect.pm
+
+0.07
+
+    * Fixed missing content-length header & set the test plan (Mark Ellis)
+
+0.06
+
+    * Minor correction in POD
+
+0.05
+
+    * Handle filehandle like object edge case (John Napiorkowski)
+    * Simplify code (Graham Knop)
+    * Added some more tests for empty body and filehandle case
+      (Upasana, John Napiorkowski)
+
+0.04
+
+    * Added code & tests for body containing zeros
+
+0.03
+
+    * Added sub _is_body_set & test cases
+
+0.02
+
+    * Minor POD corrections
+
+0.01
+
+    * First release
+

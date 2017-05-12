@@ -1,0 +1,61 @@
+PFIX
+
+Perl FIX protocol implementation.
+
+The Financial Information eXchange (FIX) Protocol is a messaging standard developed specifically for the real-time electronic exchange of securities transactions. FIX is a public-domain specification owned and maintained by FIX Protocol, Ltd.
+
+This module offers some simple methods to parse or build a FIX message.
+It has knowledge of the FIX dictionary.
+
+The module here is vastly imcomplete but was written for an interface project (now in production) and thus is operational.
+However to take it to the next step it needs more work.
+
+Although I will do my best to minimise radical changes, next versions may not be backward compatible - be prepared (sorry).
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc PFIX
+    perldoc PFIX::Message
+    perldoc PFIX::Dictinary
+
+You can also look for information at:
+
+    FIX website
+        http://www.fixprotocol.org 
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=PFIX
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/PFIX
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/PFIX
+
+    Search CPAN
+        http://search.cpan.org/dist/PFIX/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 "Gabriel Galibourg"
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

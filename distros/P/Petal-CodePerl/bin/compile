@@ -1,0 +1,19 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+
+use lib './lib';
+
+use Petal::CodePerl;
+use Petal::CodePerl::Compiler;
+use Code::Perl::Expr qw( scal );
+
+my $expr = shift;
+
+my $hash = scal("hash");
+$Petal::CodePerl::Compiler::root->setExpr($hash);
+
+my $comp = Petal::CodePerl::Compiler->compile($expr);
+
+print $comp->perl, "\n";

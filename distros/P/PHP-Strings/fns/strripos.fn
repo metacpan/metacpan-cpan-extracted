@@ -1,0 +1,4 @@
+docs: |
+    This is just getting silly.
+
+    See L<rindex|perlfunc/"rindex"> and L<lc|perlfunc/"lc">.

@@ -1,0 +1,20 @@
+---
+abstract: 'Calls a subroutine with I/O interface'
+author:
+  - 'Goro Fuji <gfuji(at)cpan.org>.'
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PerlIO-code
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

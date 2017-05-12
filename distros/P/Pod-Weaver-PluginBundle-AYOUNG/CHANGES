@@ -1,0 +1,72 @@
+Revision History for Pod-Weaver-PluginBundle-AYOUNG
+===================================================
+
+v0.12 2010-12-09
+----------------
+
+commit 32685a254c5fa8b9483ef1424732110743207efb
+Author: Harley Pig <harleypig@gmail.com>
+
+    hopefully final changes
+
+v0.08 2010-12-09
+----------------
+
+commit 1c11302a6d3f31473920b0bd525ac2b7e58e7e44
+Author: Harley Pig <harleypig@gmail.com>
+
+    I think I broke something
+
+commit ce727fc03961f72ecf7896980df98bf13f9306ab
+Author: Harley Pig <harleypig@gmail.com>
+
+    Build results of 2edac0b (on master)
+
+v0.06 2010-12-09
+----------------
+
+commit 2edac0be405dedabc4afb01ab1fd6a2a21316d96
+Author: Harley Pig <harleypig@gmail.com>
+
+    keep testing
+
+v0.05 2010-12-09
+----------------
+
+commit 7285b010040444a3a47f97499f88866da60cb999
+Author: Harley Pig <harleypig@gmail.com>
+
+    mindless committment
+
+v0.04 2010-12-09
+----------------
+
+commit 551bab9028c155c64bcb60ccbd8abfe4378750c8
+Author: Harley Pig <harleypig@gmail.com>
+
+    more changes to dist.ini
+
+v0.03 2010-12-09
+----------------
+
+commit 27adadde7503822df8b0c961509b063bd2009b22
+Author: Harley Pig <harleypig@gmail.com>
+
+    added/updated admin files
+
+commit eaa7ef74969e1cdc1c7b7cf76c1d14b0f8d7aa91
+Author: Harley Pig <harleypig@gmail.com>
+
+    added/updated admin files
+
+v0.02 2010-12-09
+----------------
+
+commit 0c46ba9373f87eca1e0e60ca70eae56978308bad
+Author: Harley Pig <harleypig@gmail.com>
+
+    Get changes into git
+
+===================================
+End of changes in the last 365 days
+===================================

@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+POE-Component-ICal.komodoproject
+README
+dist.ini
+lib/POE/Component/ICal.pm
+t/00-compile.t
+t/000-report-versions-tiny.t
+t/01_api.t
+t/02_basic.t
+t/03_two.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

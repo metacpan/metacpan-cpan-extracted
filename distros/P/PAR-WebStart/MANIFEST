@@ -1,0 +1,31 @@
+lib/PAR/WebStart.pm
+lib/PAR/WebStart/PNLP.pm
+lib/PAR/WebStart/Util.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+Changes
+scripts/perlws.pl
+scripts/make_par.pl
+scripts/pnlp_registry.pl
+lib/Makefile.PL
+lib/t/basic.t
+lib/t/config.t
+lib/t/make_par.t
+lib/t/hello.pnlp
+ex/hello.pnlp
+ex/A.par
+ex/C.par
+ex/A.par.md5
+ex/C.par.md5
+ex/D/lib/D.pm
+ex/D/script/main.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+Apache2/Makefile.PL
+Apache2/Apache2/WebStart.pm
+Apache2/t/TEST.PL
+Apache2/t/ws/webstart.t
+Apache2/t/conf/extra.last.conf.in
+Apache2/t/conf/extra.conf.in
+
+

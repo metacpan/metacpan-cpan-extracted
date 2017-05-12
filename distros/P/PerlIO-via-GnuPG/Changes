@@ -1,0 +1,25 @@
+Revision history for PerlIO-via-GnuPG
+
+0.006     2015-08-10 16:51:45 PDT-0700
+	* We now check for 'gpg' on distribution configuration.
+
+0.005     2015-08-07 15:30:12 PDT-0700
+	* Explicitly make v5.14 our minimum supported version of Perl.  This isn't
+	  really a change from the status quo, but at least we're actually being
+	  up-front about it now.
+
+0.004     2014-04-14 14:33:13 PDT-0700
+	* Refactor passthrough logic
+	* Add custom warning categories
+
+0.003     2014-04-08 01:11:07 PDT-0700
+	* Add PerlIO::via::GnuPG::Maybe
+	* Additional tests, POD, mode changes
+
+0.002     2013-07-20 14:24:07 PDT-0700
+	* don't run our tests if the gpg executable is not present (pointless)
+	* travis config changes to run 5.8 (but allow it to fail) and not test
+	  the release/cpan branch
+
+0.001     2013-07-14 00:28:36 CDT-0500
+	* first release

@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: gnome-window-settings-2.0
+Description: Utility library for getting window manager settings
+Requires: gtk+-2.0 gnome-desktop-2.0
+Version: 2.30.1
+Libs: -L${libdir} -lgnome-window-settings
+Cflags: -I${includedir}/gnome-window-settings-2.0

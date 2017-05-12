@@ -1,0 +1,53 @@
+{
+   "abstract" : "Serve static files with case insensitive paths",
+   "author" : [
+      "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-App-File-CaseInsensitive",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Plack" : "1.0016",
+            "perl" : "5.009005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "6",
+            "Plack" : "1.0016",
+            "Test::More" : "1.001002"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/frioux/Plack-App-File-CaseInsensitive",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frioux/Plack-App-File-CaseInsensitive.git",
+         "web" : "https://github.com/frioux/Plack-App-File-CaseInsensitive"
+      }
+   },
+   "version" : "0.001000"
+}
+

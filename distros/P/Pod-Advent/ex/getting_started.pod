@@ -1,0 +1,25 @@
+=for advent_year 2008
+
+=for advent_day 00
+
+=for advent_title Getting Started
+
+=for advent_author David Westbrook
+
+This is a basic POD example
+for using M<Pod::Advent> to generate a
+A<Perl Advent Calendar|http://perladvent.pm.org> entry such as this.
+Once the POD is written or updated, simply execute
+the F<pod2advent> script and save the output:
+
+=begin code
+
+$ pod2advent getting_started.pod > pod2advent getting_started.html
+
+=end code
+
+And we get the file that you are now reading.
+The POD source is included below
+(normally this would be your I<.pl> script file):
+
+=sourcedcode getting_started.pod

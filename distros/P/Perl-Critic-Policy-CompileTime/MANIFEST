@@ -1,0 +1,11 @@
+lib/Perl/Critic/Policy/CompileTime.pm
+lib/PPIx/PerlCompiler/Element.pm
+lib/PPIx/PerlCompiler/Statement.pm
+lib/PPIx/PerlCompiler/Structure/List.pm
+CONTRIBUTING
+COPYRIGHT
+Makefile.PL
+MANIFEST			This list of files
+README.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

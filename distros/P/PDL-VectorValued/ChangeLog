@@ -1,0 +1,71 @@
+v1.0.6 Mon, 06 Jun 2016 11:29:23 +0200 moocow
+	* win32/NaN fixes for tests (RT bug #115076)
+
+v1.0.5 Thu, 17 Dec 2015 10:02:25 +0100 moocow
+	* fixed wrongly succeeding bogus tests with unary ok()
+	  - tests now use Test::More and re-factored common test subroutines
+	* pdlmaker.plm doesn't distribute generated PM files any more (PDL now does this for us)
+	* added vector-cosine similarity vv_vcos()
+
+v1.0.4 Mon, 23 Nov 2015 12:10:32 +0100 moocow
+	* shared $VERSION now via perl-revision script from Perl::Version (debian libperl-version-perl)
+	  as suggested by Corion in thread http://www.perlmonks.org/?node_id=1148116
+	* may or may not help with weird errors building PDL::Ngrams with stale PDL::VectorValued,
+	  - new version of PDL::VectorValued will probably mask that bug anyways
+
+v1.0.3 Tue, 04 Aug 2015 12:19:25 +0200 moocow
+	* enumvec() regression fix
+
+v1.0.2 Wed, 29 Jul 2015 10:05:34 +0200 moocow
+	* enumvecg() fix
+
+v1.0.1 Tue, 28 Jul 2015 16:51:18 +0200 moocow
+	* added enumvecg(): global vector id-enumerator
+
+v1.0.0 Mon, 27 Jul 2015 10:06:35 +0200 moocow
+	* explicit 3-component versioning for more transparent version.pm compatiblity
+	* added rleseq(), rldseq() for run-length encoding subsequence vectors
+
+v0.09002 Thu, 09 Apr 2015 10:31:50 +0200 moocow
+	* tweaked bootstrap logic snafu with PDL::VectorValued::Dev including PDL::VectorValued::Version
+	  even though ::Dev is needed at module build time when ::Version is not yet present
+	  - this seemed to be causing a lot of UNKNOWN results on cpantesters
+
+v0.09001 Wed, 08 Apr 2015 10:58:04 +0200 moocow
+	* added $CMPVAL() and $LB() macros
+	* added v_{union,intersect,setdiff} set operations for flat, sorted, unique-valued PDLs
+	  - new implementation is much faster than builtin PDL::Primitive::intersect() [via PDL::Primitive::setops()]
+	  - for large-ish intersection (NA=2973, NB=221013) v_intersect($a,qsort($b)) is 2x faster than setops($a,'AND',$b),
+	    and v_intersect($a,$b) with all data pre-sorted $b is 42x faster than setops($a,'AND',$b)
+
+v0.08001 2014-11-05  moocow
+	* fix annoying PAUSE messages about incompatible version numbers
+	* improved handling of empty pdls
+
+v0.07002 Wed, 25 Sep 2013 10:16:54 +0200 moocow
+	* PREREQ_PM{PDL}=CONFIGURE_REQUIRES{PDL}=0, for CPAN-testers friendliness
+	* added support for PDL v2.007 PDL_Indx type (64-bit indices)
+	* changed version convention X.BBCCC to jive with both pp_setversion() and version->parse()
+
+v0.06 2012-11-06  moocow
+	* added enumvec(): enumerate repetitions in a sorted vector list
+
+v0.05 2012-01-02  moocow
+	* pdlmaker.plm version: for CPAN-friendly docs
+
+v0.0401 2011-12-20  moocow
+	* added 'generic' pdlmaker.plm : cpan-friendly pdl module hacks
+	* still not playing too nicely with embedded pd->pm conversions
+	  (e.g. Utils/utils.pd -> Utils/utils.pm)
+
+v0.04 Wed, 30 Mar 2011 15:12:32 +0200 (moocow)
+	+ renamed qsortveci() to vv_qsortveci to avoid conflicts with pdl-2.4.7 (debian squeeze)
+
+v0.03 Mon, 16 Apr 2007 09:58:49 +0200
+	+ added @PDL::VectorValued::Dev::MACROS
+
+v0.02 Tue, 10 Apr 2007 14:45:00 +0200 (moocow)
+	+ added setops: vv_union, vv_intersect, vv_setdiff
+
+v0.01 Fri, 06 Apr 2007 11:41:00 +0200 (moocow)
+	+ initial version

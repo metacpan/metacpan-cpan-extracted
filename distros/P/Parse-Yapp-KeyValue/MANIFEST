@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+README
+META.yml
+Makefile.PL
+MakeParser.PL
+grammar.yp
+lib/Parse/Yapp/KeyValue.pm
+t/1pod.t
+t/2keyvalue.t

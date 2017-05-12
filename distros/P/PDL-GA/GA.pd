@@ -1,0 +1,835 @@
+##-*- Mode: CPerl -*-
+
+##======================================================================
+## Header Administrivia
+##======================================================================
+
+our $VERSION = '0.07';
+pp_setversion($VERSION);
+
+##------------------------------------------------------
+## bad hacks
+require PDL::Bad;
+sub ISBAD     { return $PDL::Bad::Status ? ("\$ISBAD(".join(',',@_).")") : '0 /* ISBAD(): no bad support available */'; }
+sub ISBADVAR  { return $PDL::Bad::Status ? ("\$ISBADVAR(".join(',',@_).")") : '0 /* ISBADVAR(): no bad support available */'; }
+
+sub ISGOOD    { return $PDL::Bad::Status ? ("\$ISGOOD(".join(',',@_).")") : '1 /* ISGOOD(): no bad support available */'; }
+sub ISGOODVAR { return $PDL::Bad::Status ? ("\$ISGOODVAR(".join(',',@_).")") : '1 /* ISGOODVAR(): no bad support available */'; }
+
+##------------------------------------------------------
+## index-type hacks
+require PDL::Core;
+my ($INDX);
+if (defined(&PDL::indx)) {
+  #print STDERR "PDL >= v2.007 detected : using built-in PDL_Indx type\n";
+  $INDX = 'indx';
+  pp_addhdr("/* No PDL_Indx typedef needed for PDL >= v2.007 */\n");
+  pp_addpm("*ga_indx = \&PDL::indx;\n");
+} else {
+  #print STDERR "PDL < v2.007 detected : using hacked PDL_Indx type\n";
+  $INDX = 'int';
+  $pindx = 'long';
+  pp_addhdr("/* PDL_Indx typedef hack for PDL < v2.007 */\n"
+	    ."typedef int PDL_Indx;\n"
+	   );
+  pp_addpm("*ga_indx = \&PDL::long;\n");
+}
+
+##------------------------------------------------------
+## pm additions
+pp_addpm({At=>'Top'},<<'EOPM');
+use strict;
+
+=pod
+
+=head1 NAME
+
+PDL::GA - Genetic algorithm utilities for PDLs
+
+=head1 SYNOPSIS
+
+ use PDL;
+ use PDL::GA;
+
+ ##-------------------------------------------------------------
+ ## TODO...
+
+=cut
+
+EOPM
+## /pm additions
+##------------------------------------------------------
+
+##------------------------------------------------------
+## Exports: None
+pp_export_nothing();
+
+##------------------------------------------------------
+## Includes / defines
+require Config; ##-- perl configuration, for drand01 macro
+pp_addhdr(<<"EOH");
+
+/*-- Macro to be used to generate normalized random numbers --*/
+#define GA_RAND01() $Config::Config{drand01}
+
+EOH
+
+##======================================================================
+## C Utilities
+##======================================================================
+pp_addhdr(<<'EOH');
+/*-- C header stuff goes here --*/
+#include <stdlib.h>
+EOH
+
+##======================================================================
+## PDL::PP Wrappers
+##======================================================================
+
+##======================================================================
+## Basic Utilities
+#pp_addpm(<<'EOPM');
+#=pod
+#
+#=head1 Basic Utilities
+#
+#=cut
+#EOPM
+
+##======================================================================
+## Weighted Selection
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head1 Weighted Selection
+
+=cut
+
+EOPM
+
+
+##------------------------------------------------------
+## Roulette-wheel selection
+pp_add_exported('','roulette');
+pp_addpm(<<'EOPM');
+=pod
+
+=head2 roulette
+
+=for sig
+
+  Signature: (weightmap(M); %options)
+  Options:
+    n  => $n
+    to => [o]selindices($n)
+
+Stochastic (roulette-wheel) selection of $n objects from
+$M objects, governed by the likelihood distribution $weightmap(), allowing repetitions.
+Calls PDL::Primitive::vsearch().
+
+=cut
+
+sub roulette {
+  my ($wmap,%opts) = @_;
+  my ($seli);
+  if (defined($opts{to})) {
+    $seli = $opts{to};
+  } elsif (defined($opts{n})) {
+    $seli = zeroes(ga_indx(), (($wmap->dims)[1..($wmap->ndims-1)]), $opts{n}) if (!defined($seli));
+    $seli->resize((($wmap->dims)[1..($wmap->ndims-1)]), $opts{n})
+      if ($seli->ndims != $wmap->ndims || $seli->dim(-1) != $opts{n});
+  } else {
+    $seli = zeroes(ga_indx(),1);
+  }
+  my $wsum = $wmap->sumover->slice(',*1');
+  my $selw = PDL->random($seli->dims);
+  $selw *= $wsum;
+  $selw->vsearch($wmap->cumusumover, $seli);
+  return $seli;
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## Roulette-wheel selection (no repetition)
+pp_add_exported('','roulette_nr');
+pp_addpm(<<'EOPM');
+=pod
+
+=head2 roulette_nr
+
+=for sig
+
+  Signature: (weightmap(M); %options)
+  Options:
+    n  => $n
+    to => [o]selindices($n)
+
+Stochastic (roulette-wheel) selection of $n objects from
+$M objects, governed by the likelihood distribution $weightmap(), without repetitions.
+Wrapper for cumuweighselect_nr.
+
+=cut
+
+sub roulette_nr {
+  my ($wmap,%opts) = @_;
+  my ($seli);
+  if (defined($opts{to})) {
+    $seli = $opts{to};
+  } elsif (defined($opts{n})) {
+    $seli = zeroes(ga_indx(), (($wmap->dims)[1..($wmap->ndims-1)]), $opts{n}) if (!defined($seli));
+    $seli->resize((($wmap->dims)[1..($wmap->ndims-1)]), $opts{n})
+      if ($seli->ndims != $wmap->ndims || $seli->dim(-1) != $opts{n});
+  } else {
+    $seli = zeroes(ga_indx(),1);
+  }
+  my $wsum = $wmap->sumover->slice(',*1');
+  my $selw = PDL->random($seli->dims);
+  $selw *= $wsum;
+  return cumuweightselect_nr($wmap->cumusumover, $selw, $seli);
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## weightselect() : weighted selection
+pp_add_exported('','weightselect');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 weightselect
+
+=for sig
+
+  Signature: (weightmap(M); selweights(S); [o]selindices(S))
+
+Stochastically select $S objects from a pool $M objects, allowing repetitions.
+Likelihood selecting an object $i is given by $weightmap($i).  Target
+selection likelihoods are passed as $selweights(), which should have
+values in the range [0,sum($weightmap)\(.  Selected targets are
+returned as indices in the range [0,$M\( in the PDL $selindices().
+
+See also:
+roulette(),
+cumuweightselect(),
+roulette_nr(),
+weightselect_nr(),
+cumuweightselect_nr(),
+PDL::Primitive::vsearch(),
+PDL::Ufunc::cumusumover().
+
+=cut
+
+sub weightselect {
+  #my ($wmap,$selw,$seli) = @_;
+  return
+    #$selw->vsearch($wmap->cumusumover, @_);
+    $_[1]->vsearch($_[0]->cumusumover, @_[2..$#_]);
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## weightselect_nr() : weighted selection, no repetition
+pp_add_exported('','weightselect_nr');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 weightselect_nr
+
+=for sig
+
+  Signature: (weightmap(M); selweights(S); [o]selindices(S))
+
+Like weightselect() without repetition.
+Wraps cumuweightselect_nr().
+
+=cut
+
+sub weightselect_nr {
+  #my ($wmap,$selw,$seli) = @_;
+  return
+    #cumuweightselect_nr($wmap->cumusumover,$selw,$seli);
+    cumuweightselect_nr($_[0]->cumusumover, @_[1..$#_]);
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## cumuweightselect() : weighted selection (cumulative)
+pp_add_exported('','cumuweightselect');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 cumuweightselect
+
+=for sig
+
+  Signature: (cumuweightmap(M); selweights(S); indx [o]selindices(S))
+
+Stochastically select $S objects from a pool $M objects, allowing repetitions.
+Cumulative likelihood selecting an object $i is given by $cumweightmap($i).  Target
+selection likelihoods are passed as $selweights(), which should have
+values in the range [0,$cumuweightmap[-1]\(.  Selected targets are
+returned as indices in the range [0,$M\( in the PDL $selindices().
+Really just a wrapper for PDL::Primitive::vsearch().
+
+See also:
+roulette(),
+weightselect(),
+roulette_nr(),
+weightselect_nr(),
+cumuweightselect_nr(),
+PDL::Primitive::vsearch(),
+PDL::Ufunc::cumusumover().
+
+=cut
+
+sub cumuweightselect {
+  #my ($cwmap,$selw,$seli) = splice(@_,0,2);
+  return
+    #$selw->vsearch($cwmap, @_);
+    $_[1]->vsearch($_[0], @_[2..$#_]);
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## cumuweightselect_nr() : weighted selection (cumulative), no repeats
+pp_add_exported('','cumuweightselect_nr');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 cumuweightselect_nr
+
+=for sig
+
+  Signature: (cumuweightmap(M); selweights(S); indx [o]selindices(S); indx [t]trynext(M); byte [t]ignore(M))
+
+Stochastically select $S objects from a pool $M objects, without repetitions.
+Really just a wrapper for PDL::Primitive::vesarch() and ga_make_unique().
+
+=cut
+
+sub cumuweightselect_nr {
+  my ($cwmap,$selw,$seli,$try,$ignore) = @_;
+  $seli = zeroes(ga_indx(),$selw->dims) if (!defined($seli));
+  $selw->vsearch($cwmap, $seli);
+  $try  = 1+PDL->sequence(ga_indx(),$cwmap->dim(0)) if (!defined($try));
+  $seli->inplace->ga_make_unique($try, (defined($ignore) ? $ignore : qw()));
+  return $seli;
+}
+
+EOPM
+
+##------------------------------------------------------
+## ga_make_unique() : make an integer-set unique
+pp_add_exported('','ga_make_unique');
+pp_def
+('ga_make_unique',
+ Pars => "$INDX selected(S); int trynext(M); $INDX \[o]unique_selected(S); byte [t]ignore(M)",
+ Inplace=>['selected','unique_selected'],
+ HandleBad=>1,
+ Code =>
+'
+ PDL_Indx s_max = $SIZE(S)-1;
+ PDL_Indx m_max = $SIZE(M)-1;
+ PDL_Indx i_items;
+ PDL_Indx item, ntried;
+ /*-- sanity check --*/
+ if ($SIZE(S) > $SIZE(M)) {
+   barf("PDL::GA::ga_make_unique(): too many selections requested (S > M)");
+ }
+ threadloop %{
+   loop (M) %{ $ignore() = 0; %} /*-- initially, all choices are open --*/
+   loop (S) %{
+     PDL_Indx item0 = $selected();
+     if ( '.ISGOODVAR('item0,selected').' ) {
+       for (ntried=0,item=item0; $ignore(M=>item) && ntried < $SIZE(M); ntried++) {
+	 item = $trynext(M=>item);
+	 if ( '.ISBADVAR('item,trynext').' ) { break; }
+	 item %= $SIZE(M);
+	 if (item < 0) item += $SIZE(M);
+	 if (item==item0) break;  /*-- loop detected --*/
+       }
+       if ( '.ISGOODVAR(item,selected).' ) {
+	 $ignore(M=>item)   = 1;
+       }
+     } else { item = item0; }
+     $unique_selected() = item;
+   %}
+ %}
+',
+ Doc=>
+q(
+Remove repetitions from a vector of selected items $selected() while retaining vector length.
+$selected() should have values in the range [0..($M-1)], and it must be the case
+that $S <= $M.
+The vector $trynext() is used to (iteratively) map a non-unique item to the "next-best" item,
+and are implicitly interpreted modulo $M.
+The temporary $ignore is used to record which items have already appeared.
+May be run in-place on $selected().
+Generally, $trynext() should be something like 1+sequence($M).
+),
+ );
+
+
+##======================================================================
+## bits <-> integer type conversions
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head1 Gene Encoding and Decoding
+
+=cut
+
+EOPM
+
+##------------------------------------------------------
+## int->bits: tobits (safe)
+pp_add_exported('','tobits');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 tobits
+
+=for sig
+
+  Signature: (ints(); [o]bits(B))
+
+Extract individual bits from integer type pdls.
+Output pdl will be created with appropriate dimensions if unspecified.
+Serious waste of memory, since PDL does not have a 'bit' type.
+
+=cut
+
+sub tobits {
+  my ($ints,$bits) = @_;
+  $bits = zeroes($ints->type,8*PDL::howbig($ints->type),$ints->dims) if (!defined($bits));
+  _tobits($ints,$bits);
+  return $bits;
+}
+
+EOPM
+
+##------------------------------------------------------
+## int->bits: _tobits (requires output pdl)
+require PDL::Types;
+my @pdlpp_integer_typechars = grep {/^(?:[BSULQN]|LL|US)$/} map {$_->{ppsym}} values %PDL::Types::typehash;
+
+pp_add_exported('','_tobits');
+pp_def
+('_tobits',
+ Pars => 'a(); [o]bits(B)',
+ GenericTypes => \@pdlpp_integer_typechars,
+ Code=>
+('
+  int i;
+  int nbits = 8*sizeof($GENERIC(a));
+  if (nbits > $SIZE(B)) nbits = $SIZE(B);
+  threadloop %{
+    for (i=0; i < nbits; i++) {
+      $bits(B=>i) = $a() & (1<<i);
+    }
+  %}
+'),
+  Doc=>
+('(Low-level method)
+
+Extract individual bits from integer type pdls.
+Output pdl $bits() must be specified!
+'),
+);
+
+##------------------------------------------------------
+## bits->int: frombits
+pp_add_exported('','frombits');
+pp_def
+('frombits',
+ Pars => 'bits(B); [o]a()',
+ GenericTypes => \@pdlpp_integer_typechars,
+ Code=>
+('
+ int i;
+ int nbits = 8*sizeof($GENERIC(a));
+ $GENERIC(a) val;
+ if (nbits > $SIZE(B)) nbits = $SIZE(B);
+ threadloop %{
+   val = 0;
+   for (i=0; i < nbits; i++) {
+     if ($bits(B=>i)) { val |= (1<<i); }
+   }
+   $a() = val;
+ %}
+'),
+  Doc=>
+('Compress expanded bit-pdls to integer types.
+'),
+);
+
+
+
+##======================================================================
+## Mutation
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head1 Mutation
+
+=cut
+
+EOPM
+
+##------------------------------------------------------
+## mutate_bool() : logical (boolean) mutation
+pp_add_exported('','mutate_bool');
+pp_def
+('mutate_bool',
+ Pars => 'genes(G); float+ rate(G); [o]mutated(G)',
+ Inplace=>['genes'],
+ Code =>
+('
+ loop(G) %{
+   if (GA_RAND01() < $rate()) {
+     $mutated() = !$genes();
+   } else {
+     $mutated() = $genes();
+   }
+ %}
+'),
+  Doc =>
+  ('Mutate binary-valued (boolean) genes.'),
+);
+
+
+##------------------------------------------------------
+## mutate_range() : mutation of interval-data genes
+pp_def
+('mutate_range',
+ Pars => 'genes(G); float+ rate(G); min(G); max(G); [o]mutated(G)',
+ Inplace=>['genes'],
+ Code =>
+('
+ loop(G) %{
+   if (GA_RAND01() < $rate()) {
+     $mutated() = $min() + GA_RAND01()*($max()-$min());
+   } else {
+     $mutated() = $genes();
+   }
+ %}
+'),
+  Doc =>
+  ('Mutate genes in the range [$min,$max\(.'),
+);
+
+##------------------------------------------------------
+## mutate_addrange() : additive mutation of scalar genes
+pp_def
+('mutate_addrange',
+ Pars => 'genes(G); float+ rate(G); min(G); max(G); [o]mutated(G)',
+ Inplace=>['genes'],
+ Code =>
+('
+ loop(G) %{
+   if (GA_RAND01() < $rate()) {
+     $mutated()  = $genes() + $min() + GA_RAND01()*($max()-$min());
+   } else {
+     $mutated()  = $genes();
+   }
+ %}
+'),
+  Doc =>
+  ('Mutate genes by adding values in the range [$min,$max\(.'),
+);
+
+
+
+##------------------------------------------------------
+## mutate_bits
+pp_add_exported('','mutate_bits');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 mutate_bits
+
+=for sig
+
+  Signature: (genes(G); rate(); [o]mutated(G))
+
+Mutate traditional bit-string genes.
+Calls mutate_bool(), tobits(), frombits().
+
+=cut
+
+sub mutate_bits {
+  #my ($pop,$rate,$dst) = @_;
+  #return $pop->tobits->inplace->mutate_bool($rate)->frombits(defined($dst) ? $dst : qw());
+  return $_[0]->tobits->inplace->mutate_bool($_[1])->frombits(@_[2..$#_]);
+}
+
+EOPM
+
+##------------------------------------------------------
+## _mutate_bits() : bitwise mutation (integer types only!)
+pp_def
+('_mutate_bits',
+ Pars => 'genes(G); float+ rate(G); [o]mutated(G)',
+ GenericTypes => \@pdlpp_integer_typechars,
+ Inplace=>['genes'],
+ Code =>
+('
+ loop(G) %{
+   $GENERIC(genes) gene  = $genes();
+   $GENERIC(rate)  mrate = $rate();
+   int i;
+   for (i=0; i < 8*sizeof($GENERIC(genes)); i++) {
+     int mask = 1<<i;
+     if (GA_RAND01() < mrate) {
+       if (gene & mask) { gene &= ~mask; }
+       else             { gene |=  mask; }
+     }
+   }
+   $mutated() = gene;
+ %}
+'),
+  Doc =>
+  ('(Low-level method)
+
+Mutate traditional bit-string genes.
+This should be equivalent to mutate_bits(), but appears to involve
+less overhead (faster for many calls).
+'),
+);
+
+
+
+##======================================================================
+## Crossover: low-level
+
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head1 Crossover
+
+=cut
+
+EOPM
+
+
+##------------------------------------------------------
+## _xover1() : single-point crossover
+pp_def
+('_xover1',
+ Pars => "mom(G); dad(G); $INDX xpoint(); [o]kid(G)",
+ Inplace => ['mom'],
+ Code =>
+('
+ PDL_Indx xat = $xpoint();
+ loop(G) %{
+   if (G < xat) {
+     $kid() = $mom();
+   } else {
+     $kid() = $dad();
+   }
+ %}
+'),
+  Doc =>
+  ('(Low-level method)
+
+Single-point crossover.
+$kid() is computed by single-point crossover of $mom() (initial subsequence)
+and $dad() (final subsequence).  For symmetric crossover (two offspring per crossing),
+call this method twice:
+
+  $kid1 = _xover1($mom, $dad, $points);
+  $kid2 = _xover1($dad, $mom, $points);
+
+'),
+);
+
+
+
+##------------------------------------------------------
+## _xover2() : dual-point crossover
+pp_def
+('_xover2',
+ Pars => "mom(G); dad(G); $INDX xstart(); int xend(); [o]kid(G)",
+ Inplace => ['mom'],
+ Code =>
+('
+ PDL_Indx xstartat = $xstart();
+ PDL_Indx xendat   = $xend();
+ loop(G) %{
+   if (G < xstartat || G >= xendat) {
+     $kid() = $mom();
+   } else {
+     $kid() = $dad();
+   }
+ %}
+'),
+  Doc =>
+  ('(Low-level method)
+
+Dual-point crossover.
+$kid() is computed by dual-point crossover of $mom() (initial and final subsequences)
+and $dad() (internal subsequence).  For symmetric crossover (two offspring per crossing),
+call this method twice:
+
+  $kid1 = _xover2($mom, $dad, $points1, $points2);
+  $kid2 = _xover2($dad, $mom, $points1, $points2);
+
+'),
+);
+
+##======================================================================
+## Crossover: high-level
+
+##------------------------------------------------------
+## xover1
+pp_add_exported('','xover1');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 xover1
+
+=for sig
+
+  Signature: (mom(G); dad(G); float+ rate(); [o]kid(G))
+
+Random single-point crossover.
+Calls _xover1().
+
+=cut
+
+sub xover1 {
+  my ($mom, $dad, $rate, $kid) = @_;
+  my $xwhich = (PDL->random($mom->dim(1)) < $rate)->which;
+  if ($xwhich->isempty) {
+    return ($mom->is_inplace
+	    ? $mom
+	    : (defined($kid)
+	       ? ($kid .= $mom)
+	       : ($kid  = pdl($mom))));
+  }
+  my $xpoint = PDL->zeroes(ga_indx(),$mom->dim(1)) + $mom->dim(0);
+  $xpoint->index($xwhich) .= PDL->random($xwhich->nelem)*($mom->dim(0)-1)+1;
+  return _xover1($mom,$dad, $xpoint, (defined($kid) ? $kid : qw()));
+}
+
+EOPM
+
+
+##------------------------------------------------------
+## xover2
+pp_add_exported('','xover2');
+pp_addpm(<<'EOPM');
+
+=pod
+
+=head2 xover2
+
+=for sig
+
+  Signature: (mom(G); dad(G); float+ rate(); [o]kid(G))
+
+Random dial-point crossover.
+Calls _xover2().
+
+=cut
+
+sub xover2 {
+  my ($mom, $dad, $rate, $kid) = @_;
+  my $xwhich = (PDL->random($mom->dim(1)) < $rate)->which;
+  if ($xwhich->isempty) {
+    return ($mom->is_inplace
+	    ? $mom
+	    : (defined($kid)
+	       ? ($kid .= $mom)
+	       : ($kid  = pdl($mom))));
+  }
+  my $xpoint1 = PDL->zeroes(ga_indx(),$mom->dim(1)) + $mom->dim(0);
+  $xpoint1->index($xwhich) .= PDL->random($xwhich->nelem)*($mom->dim(0)-1)+1;
+  my $xpoint2 = pdl($xpoint1);
+  $xpoint2->index($xwhich) += 1+PDL->random($xwhich->nelem)*($mom->dim(0)-$xpoint1->index($xwhich));
+  return _xover2($mom,$dad, $xpoint1, $xpoint2, (defined($kid) ? $kid : qw()));
+}
+
+EOPM
+
+
+##======================================================================
+## Footer Administrivia
+##======================================================================
+
+##------------------------------------------------------
+## pm additions
+pp_addpm(<<'EOPM');
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+Perl by Larry Wall.
+
+PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
+
+=cut
+
+##----------------------------------------------------------------------
+=pod
+
+=head1 KNOWN BUGS
+
+Probably many.
+
+=cut
+
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.org<gt>
+
+=head2 Copyright Policy
+
+Copyright (C) 2006-2007, Bryan Jurish. All rights reserved.
+
+This package is free software, and entirely without warranty.
+You may redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1), PDL(3perl).
+
+=cut
+
+EOPM
+
+
+# Always make sure that you finish your PP declarations with
+# pp_done
+pp_done();
+##----------------------------------------------------------------------

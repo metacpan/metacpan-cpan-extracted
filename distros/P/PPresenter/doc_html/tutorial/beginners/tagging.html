@@ -1,0 +1,66 @@
+
+<HTML>
+<HEAD>
+<TITLE>PPresenter; Beginners; Tagging</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Tagging the Slides</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../../index.html>PPresenter</A><BR>
+<A HREF=../../manual.html>Manual</A><BR>
+<A HREF=../index.html>Tutorials</A><BR>
+<A HREF=index.html>Beginners</A><BR>
+<P>
+<A HREF=define.html>Subject</A><BR>
+<A HREF=design.html>Design</A><BR>
+<A HREF=create.html>Creation</A><BR>
+<A HREF=style.html>Styles</A><BR>
+<A HREF=slide.html>Adding Slides</A><BR>
+<A HREF=change.html>Changing&nbsp;defaults</A><BR>
+<A HREF=timing.html>Timing</A><BR>
+<B>Tagging</B><BR>
+<A HREF=dday.html>DDay</A><BR>
+
+    </TD><TD VALIGN=top>
+
+
+<IMG SRC=../../viewport/tagcontrol.gif WIDTH=297 HEIGHT=262 ALIGN=right
+ HSPACE=10>
+The final step you may take is tagging your slides.  With tagging, you
+label slides to be enabled or disabled per group.  If you run the
+presentation and press `<CODE>s</CODE>' (or achieve the same result via
+the background menu) you will have a menu showing slides, times, and
+tags.  The tag-list is shown on the left.
+<P>
+All slides automatically get tagged with `<CODE>all</CODE>'.  If you
+want to add tags, just specify them per slide.
+Examples:
+<BR CLEAR=right>
+<PRE>
+   $show-&gt;addSlide(-tag  =&gt; 'demo1');
+
+   $show-&gt;addSlide(-tags =&gt; [ 'demo1', 'long' ]);
+</PRE>
+With these tags, you can easily use one set of slides for various, different
+length, presentations.
+
+<P>
+Next: <A HREF=dday.html>DDay</A>.
+
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

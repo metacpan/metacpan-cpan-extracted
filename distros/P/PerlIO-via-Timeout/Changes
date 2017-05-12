@@ -1,0 +1,67 @@
+0.32      2015-07-30 14:25:27CEST+0200 Europe/Paris
+        . reverted the previous race condition, as it's causing code to hang
+        insome cases
+
+0.31      2015-07-29 07:59:46CEST+0200 Europe/Paris
+        . fixed a potential race condition case where read or write would be
+          blocking even with a timeout (thanks to Luciano Rocha)
+
+0.30      2015-05-13 20:33:08CEST+0200 Europe/Amsterdam
+
+0.29      2013-12-28 22:31:38 Europe/Paris
+
+0.28      2013-12-24 03:50:48 Europe/Paris
+        . rebuild
+
+0.27      2013-12-18 00:02:39 Europe/Paris
+        . fix 5.8 compatatibility
+
+0.26      2013-12-18 00:01:12 Europe/Paris
+        . small compatibility fixes
+
+0.25      2013-12-01 23:41:53 Europe/Paris
+        . Updated doc
+
+0.24      2013-10-28 20:44:53 Europe/Paris
+
+0.23      2013-10-10 14:43:52 Europe/Paris
+        . Add internal method for inheritance features (for IO::Socket::Timeout)
+
+0.22      2013-10-09 18:04:58 Europe/Paris
+        . Get rid of Alarm strategy. Simplify the code. Change the API a bit
+
+0.21      2013-10-03 17:43:12 Europe/Paris
+        . take care of EINTR in the Notimeout strategy.
+
+0.20      2013-10-03 15:54:10 Europe/Paris
+        . take care of EINTR in the Notimeout strategy.
+
+0.19      2013-10-01 16:33:25 Europe/Paris
+
+0.18      2013-10-01 15:39:13 Europe/Paris
+        . fix default sysread / syswrite when an error happens
+
+0.17      2013-10-01 12:58:34 Europe/Paris
+        . fixed enable/disable timeout
+
+0.16      2013-09-24 18:02:06 Europe/Paris
+        . don't use Time::HiRes anymore
+        . updated prereqs
+
+0.15      2013-09-24 17:53:49 Europe/Paris
+
+0.14      2013-09-24 17:31:53 Europe/Paris
+        . fixed a lot of small bugs
+        . implemented passing an instance of Strategy
+        . new strategy, Alarm
+
+0.13      2013-09-23 14:58:52 Europe/Paris
+        . fix bug when reading last character of a fh
+
+0.12      2013-09-23 12:22:19 Europe/Paris
+        . fix tests
+
+0.11      2013-09-21 19:06:01 Europe/Paris
+
+0.10      2013-09-20 16:03:11 Europe/Paris
+        . first implementation

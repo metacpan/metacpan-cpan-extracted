@@ -1,0 +1,23 @@
+diff -u3 -r Crypt-IDEA-1.08/_idea.c Crypt-IDEA-1.08-patched/_idea.c
+--- Crypt-IDEA-1.08/_idea.c	2006-04-21 04:37:59.000000000 -0600
++++ Crypt-IDEA-1.08-patched/_idea.c	2010-03-05 06:09:29.271393600 -0700
+@@ -9,6 +9,7 @@
+ #include "idea.h"
+ 
+ #ifdef WIN32
++#include <windows.h>
+ #include <wininet.h>
+ # else
+ #include <netinet/in.h>
+diff -u3 -r Crypt-IDEA-1.08/IDEA.pm Crypt-IDEA-1.08-patched/IDEA.pm
+--- Crypt-IDEA-1.08/IDEA.pm	2006-04-21 04:06:46.000000000 -0600
++++ Crypt-IDEA-1.08-patched/IDEA.pm	2010-03-05 06:10:54.513966400 -0700
+@@ -23,7 +23,7 @@
+ 
+ package IDEA;
+ 
+-$VERSION="1.08";
++$VERSION="1.080000001";
+ 
+ use strict;
+ use Carp;

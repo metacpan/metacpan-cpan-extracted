@@ -1,0 +1,20 @@
+[Changes for 1.002  - 2014-05-28]
+
+* Adding a repository into the metafiles.  No code changes.
+
+[Changes for 1.001  - 2014-03-26]
+
+* Oh boy was this obnoxious.  5.8.9 didn't like 1.000 as
+  a version number for XS, saying 1 was not 1.000
+
+[Changes for 1.0  - 2014-03-26]
+
+* Cosmetic - I just wanted to officially bump this to 1.0
+
+[Changes for 0.03 - 2014-02-17]
+
+* Remove 'use utf8;' from tests; its actually counterproductive
+
+[Changes for 0.01 - 2013-11-19]
+
+* Initial release to CPAN.

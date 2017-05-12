@@ -1,0 +1,38 @@
+---
+abstract: 'Document SQL more easily by referencing only the SQL command in POD'
+author:
+  - 'Armand Leclercq <armand.leclercq@gmail.com>'
+build_requires:
+  PPI: 0
+  Pod::Weaver: 4.002
+  Software::License::Artistic_1_0: 0
+  Test::Differences: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Weaver-Section-SQL
+requires:
+  Carp: 0
+  List::Util: 1.33
+  Moose: 0
+  Pod::Elemental::Selectors: 0
+  Pod::Elemental::Transformer::Gatherer: 0
+  Pod::Elemental::Transformer::Nester: 0
+  Pod::Weaver: 4.002
+  Pod::Weaver::Role::Section: 0
+  Pod::Weaver::Role::Transformer: 0
+  SQL::Abstract: 0
+  SQL::Statement: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/marmand/Pod-Weaver-Section-SQL/issues
+  homepage: https://github.com/marmand/Pod-Weaver-Section-SQL/wiki
+  repository: git://github.com/marmand/Pod-Weaver-Section-SQL.git
+version: 0.03

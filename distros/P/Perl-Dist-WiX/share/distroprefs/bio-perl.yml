@@ -1,0 +1,13 @@
+---
+comment: |
+
+  Bio::Perl needs a patch to install in Strawberry Perl. (RT#54702)
+
+match:
+  distribution: |
+    ^(?x:
+    .^   # never matches, only purpose is to let things align nicely
+    |CJFIELDS/BioPerl-1.6.1.tar.gz          # Needs a patch to install.
+    )|
+patches:
+    - "BioPerl-1.6.1.patch"

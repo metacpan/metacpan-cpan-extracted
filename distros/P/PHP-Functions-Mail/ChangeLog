@@ -1,0 +1,15 @@
+Revision history for Perl extension PHP::Functions::Mail.
+
+0.04  Mon Apr 11 2005
+	- 'use warnings;' is deleted from Mail.pm. 
+	- 'use 5.008005;' is deleted from Makefile.PL.
+	- items of PREREQ_PM is added to Makefile.PL.
+
+0.03  Mon Apr 11 2005
+	- LF is added to Japanese header.
+
+0.02  Wed Jan 12 2005
+	- Change in the order of outputting Net::SMTP->from.
+	
+0.01  Wed Jan 12 2005
+	- Release

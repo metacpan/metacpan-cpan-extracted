@@ -1,0 +1,63 @@
+{
+   "abstract" : "a perl implementation of a client for the Pingdom REST API.",
+   "author" : [
+      "Dominik Schulz <dominik.schulz@gauner.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pingdom-Client",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "JSON" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "Try::Tiny" : "0",
+            "URI::Escape" : "0",
+            "feature" : "0",
+            "mro" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010_000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gittex/Pingdom-Client/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gittex/Pingdom-Client.git",
+         "web" : "https://github.com/gittex/Pingdom-Client"
+      }
+   },
+   "version" : "0.13"
+}
+

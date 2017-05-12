@@ -1,0 +1,13 @@
+=head1 Random test of character escaping
+
+This is a test to see whether or not E<quot>specialE<quot> characters & (or
+should the be E<amp>?) 'quotable' characters are escaped propery!
+
+Aacute should be C1 - E<Aacute>
+
+HEX E<0xBB>, should be E<amp>#xBB;
+OCTAL E<075>, should be E<amp>#x3D;
+DECIMAL E<181>, should be E<amp>#xB5;
+
+But remember! < (or E<lt>) and > (or E<gt>) must be escaped! As E<amp>lt; and
+E<amp>gt; respectively

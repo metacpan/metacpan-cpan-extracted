@@ -1,0 +1,12 @@
+0.02	2016-05-12
+
+	Bug Fixes
+	* Decrease perl version requirement to v5.10
+	* Minor documentation fixes
+
+	Other
+	* Add Travis-CI build test
+	* Add test for usage message
+
+0.01	2016-05-12
+	- first version

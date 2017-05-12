@@ -1,0 +1,42 @@
+Tue May 13 14:52:29 EDT 1997
+How time flies.  Here at last is Penguin3.
+
+Known problems: this probably doesn't work on a Mac.
+
+Wed Apr 17 13:51:29 CDT 1996
+This is the second release candidate of One Penguin, the first public
+version of Penguin.
+
+Although this is 92% of the way towards what I want to release, it
+still isn't exactly where it needs to be yet.  This release is
+a bugfix release of One_Penguin-pre1; I expect that the beta
+testing of this release will result in something that is very,
+very close to a releasable thing.
+
+For information about what Penguin is, consult the FAQ; the
+rest of this document (and indeed this release) is somewhat technical.
+
+That said, here are the things which have changed since the
+last release candidate:
+
+1.  Unable to work around problems with the latest PGP module,
+    I wrote my own PGP module (FPGP.pm).  It acts like the PGP
+    module, but implements *only* digital signatures and
+    verification.  Also, it's a lot smaller and simpler, and
+    it hides the PGP user's password in a more secure fashion.
+    
+2.  I added the 'getinfo' method to the Channel interface.
+    This allows Penguin programs to discover what the remote
+    end's hostname is without breaking encapsulation.  I'll
+    probably add the ability to 'setinfo' a line of user-
+    understandable text.
+
+3.  penguind is a bit more macho, and it handles problems better.
+
+4.  Various bugs, typos and oversights have been fixed.
+
+_Please_send_comments!_
+_Please_subscribe_to_the_mailing_list_if_interested!_
+
+Felix
+fsg@ultranet.com

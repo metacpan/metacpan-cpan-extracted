@@ -1,0 +1,21 @@
+--- #YAML:1.0
+name:               PerlIO-via-escape_ansi
+version:            0.01
+abstract:           PerlIO layer to escape ANSI sequences
+author:
+    - Sebastien Aperghis-Tramoni <sebastien@aperghis.net>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    PerlIO::via:  0
+    Test::More:   0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

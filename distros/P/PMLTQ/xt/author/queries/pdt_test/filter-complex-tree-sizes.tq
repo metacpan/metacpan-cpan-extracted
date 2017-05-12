@@ -1,0 +1,3 @@
+a-root [  ];
+  >> give descendants()
+  >> give min(),max(),round(avg(),4),sum()

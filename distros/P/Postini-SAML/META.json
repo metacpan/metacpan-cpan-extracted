@@ -1,0 +1,53 @@
+{
+   "abstract" : "Do SAML-based sign-in to Postini services",
+   "author" : [
+      "Robert Norris <rob@eatenbyagrue.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200014, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Postini-SAML",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::OpenSSL::RSA" : 0,
+            "Data::Random" : 0,
+            "Date::Format" : 0,
+            "Digest::SHA1" : 0,
+            "MIME::Base64" : 0,
+            "XML::CanonicalizeXML" : 0,
+            "XML::Spice" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-postini-saml@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Postini-SAML"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robn/Postini-SAML.git",
+         "web" : "http://github.com/robn/Postini-SAML"
+      }
+   },
+   "version" : "0.001"
+}
+

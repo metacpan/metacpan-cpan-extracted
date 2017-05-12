@@ -1,0 +1,41 @@
+0.10  Tue Aug 17 22:52:59 GMT 2010
+    - Use Dist::Zilla
+    - Make all warnings fatal
+
+0.09 Sat Mar  6 03:27:57 GMT 2010
+    - Always propagate error messages from Hailo
+    - Document 'options' parameter
+
+0.08 Tue Mar  2 22:32:36 GMT 2010
+    - Just fork instead of fork & exec, memory use should be fine. I fail
+      at Unix. (Copy On Write)++
+
+0.07 Fri Feb 26 01:45:14 GMT 2010
+    - Pass the parent process' @INC to the subprocess
+
+0.06 Thu Feb 25 19:15:50 GMT 2010
+    - Running Hailo was broken in 0.05 in cases where Hailo_args
+      contained a value that was a hash, e.g. C<Hailo_args => {
+      storage_args => { ... } }>.
+
+0.05 Mon Feb 22 22:33:02 GMT 2010
+    - Run Hailo code as an external command instead of forking. This way our
+      memory usage is constant, rather than scaling with the size of the
+      parent application.
+
+0.04 Mon Feb 22 17:13:51 GMT 2010
+    - Pod fix: remove duplicate METHODS section
+    - Only use Hailo in the subprocess, saves a few megabytes of memory
+    - Actually complain if we can't load Hailo
+    - Don't call DESTROY manually, it's unnecessary
+
+0.03 Sun Feb 21 05:59:18 GMT 2010
+    - Support Hailo->save()
+
+0.02 Sun Feb 21 02:51:38 GMT 2010
+    - Some Pod fixes
+    - Manage our own child process with POE::Wheel::Run instead of relying
+      on POE::Component::Generic
+
+0.01 Fri Jan 29 00:43:55 GMT 2010
+    - First CPAN release

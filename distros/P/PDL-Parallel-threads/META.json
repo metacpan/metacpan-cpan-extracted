@@ -1,0 +1,70 @@
+{
+   "abstract" : "sharing PDL data between Perl threads",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDL-Parallel-threads",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t"
+      ],
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::ParseXS" : "3.0",
+            "Test::Exception" : "0",
+            "Test::Warn" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28",
+            "PDL" : "v2.4.0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDL" : "v2.4.10",
+            "perl" : "v5.8.0"
+         }
+      }
+   },
+   "provides" : {
+      "PDL::Parallel::threads" : {
+         "file" : "lib/PDL/Parallel/threads.pm",
+         "version" : "0.03"
+      },
+      "PDL::Parallel::threads::SIMD" : {
+         "file" : "lib/PDL/Parallel/threads/SIMD.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/run4flat/PDL-Parallel-threads/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/run4flat/PDL-Parallel-threads"
+      }
+   },
+   "version" : "0.03"
+}

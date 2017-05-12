@@ -1,0 +1,17 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+libexecdir=${prefix}/lib/gnome-screensaver
+includedir=${prefix}/include
+datadir=${prefix}/share
+
+privlibexecdir=${libexecdir}/gnome-screensaver
+privdatadir=${datadir}/gnome-screensaver
+themesdir=${datadir}/applications/screensavers
+
+Name: gnome-screensaver
+Description: gnome screensaver
+Version: 2.30.0
+Requires:
+Libs:
+Cflags:

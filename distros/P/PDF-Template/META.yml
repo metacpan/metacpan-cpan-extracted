@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         PDF-Template
+version:      0.22
+version_from: lib/PDF/Template.pm
+installdirs:  site
+requires:
+    File::Basename:                0.01
+    IO::File:                      0.01
+    pdflib_pl:                     3
+    Test::More:                    0.01
+    XML::Parser:                   0.01
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.21

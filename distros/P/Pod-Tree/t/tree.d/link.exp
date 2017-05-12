@@ -1,0 +1,380 @@
+ROOT 
+{
+   COMMAND head1 
+   {
+      TEXT NAME
+
+
+   }
+   ORDINARY 
+   {
+      TEXT Links
+
+
+   }
+   COMMAND head2 
+   {
+      TEXT Original
+
+
+   }
+   ORDINARY 
+   {
+      TEXT A  
+      SEQUENCE L name / 
+      {
+         TEXT name
+      }
+      TEXT  manual page.
+
+
+   }
+   ORDINARY 
+   {
+      TEXT An 
+      SEQUENCE L name / ident
+      {
+         TEXT name/ident
+      }
+      TEXT  item in manual page. 
+
+
+   }
+   ORDINARY 
+   {
+      TEXT A  
+      SEQUENCE L name / sec
+      {
+         TEXT name/"sec"
+      }
+      TEXT  section in other manual page.
+
+
+   }
+   ORDINARY 
+   {
+      TEXT A  
+      SEQUENCE L  / sec
+      {
+         TEXT "sec"
+      }
+      TEXT       section in this manual page (the quotes are 
+      SEQUENCE B
+      {
+         TEXT not
+      }
+      TEXT  optional).
+
+
+   }
+   ORDINARY 
+   {
+      TEXT A  
+      SEQUENCE L  / sec
+      {
+         TEXT  sec 
+      }
+      TEXT       section in this manual page
+
+
+   }
+   ORDINARY 
+   {
+      TEXT A  
+      SEQUENCE L  / sec tion
+      {
+         TEXT sec tion 
+      }
+      TEXT    section in this manual page
+
+
+   }
+   ORDINARY 
+   {
+      TEXT A  
+      SEQUENCE L mod::ule.foo / 
+      {
+         TEXT mod::ule.foo
+      }
+      TEXT   link to a module POD
+
+
+   }
+   ORDINARY 
+   {
+      TEXT A  
+      SEQUENCE L  / sec
+      {
+         TEXT /"sec"
+      }
+      TEXT      section in this manual page (the quotes are optional).
+
+
+
+   }
+   COMMAND head2 
+   {
+      TEXT Total Control
+
+
+   }
+   ORDINARY 
+   {
+      TEXT A  
+      SEQUENCE L name / 
+      {
+         TEXT text
+      }
+      TEXT  manual page.
+
+
+   }
+   ORDINARY 
+   {
+      TEXT An 
+      SEQUENCE L name / ident
+      {
+         TEXT text
+      }
+      TEXT  item in manual page. 
+
+
+   }
+   ORDINARY 
+   {
+      TEXT A  
+      SEQUENCE L name / sec
+      {
+         TEXT text
+      }
+      TEXT  section in other manual page.
+
+
+   }
+   ORDINARY 
+   {
+      TEXT A  
+      SEQUENCE L  / sec
+      {
+         TEXT text
+      }
+      TEXT       section in this manual page (quotes are 
+      SEQUENCE B
+      {
+         TEXT not
+      }
+      TEXT  optional).
+
+
+   }
+   ORDINARY 
+   {
+      TEXT A  
+      SEQUENCE L  / sec
+      {
+         TEXT text
+      }
+      TEXT       section in this manual page 
+
+
+   }
+   ORDINARY 
+   {
+      TEXT A  
+      SEQUENCE L  / sec tion
+      {
+         TEXT text
+      }
+      TEXT    section in this manual page 
+
+
+   }
+   ORDINARY 
+   {
+      TEXT A  
+      SEQUENCE L bar-mod::ule / 
+      {
+         TEXT text
+      }
+      TEXT    link to a module POD
+
+
+   }
+   ORDINARY 
+   {
+      TEXT A  
+      SEQUENCE L  / sec
+      {
+         TEXT text
+      }
+      TEXT      section in this manual page (quotes are optional).
+
+
+
+   }
+   COMMAND head2 
+   {
+      TEXT Targets
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE X
+      {
+         TEXT target
+      }
+      TEXT 
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE X
+      {
+         TEXT target with spaces
+      }
+      TEXT 
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE X
+      {
+         TEXT target w/spaces
+      }
+      TEXT 
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE X
+      {
+         SEQUENCE I
+         {
+            TEXT italic
+         }
+         TEXT  target
+      }
+      TEXT 
+
+
+
+   }
+   COMMAND head2 
+   {
+      TEXT Links
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE L  / target
+      {
+         TEXT /target
+      }
+      TEXT 
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE L  / target with spaces
+      {
+         TEXT "target with spaces"
+      }
+      TEXT 
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE L  / target w/spaces
+      {
+         TEXT " target w/spaces "
+      }
+      TEXT 
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE L  / target with line breaks
+      {
+         TEXT "target with
+              line 
+              breaks"
+      }
+      TEXT 
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE L  / italic target
+      {
+         TEXT /
+         SEQUENCE I
+         {
+            TEXT italic
+         }
+         TEXT  
+         SEQUENCE B
+         {
+            TEXT target
+         }
+      }
+      TEXT 
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE L page / section
+      {
+         SEQUENCE I
+         {
+            TEXT page
+         }
+         TEXT /
+         SEQUENCE I
+         {
+            TEXT section
+         }
+      }
+      TEXT 
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE L  / c|foo.html
+      {
+         TEXT target
+      }
+      TEXT  This probably won't do what you want
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE L http://world.std.com/~swmcd/steven/index.html / 
+      {
+         TEXT http://world.std.com/~swmcd/steven/index.html
+      }
+      TEXT 
+
+
+   }
+   ORDINARY 
+   {
+      SEQUENCE L http://world.std.com/~swmcd/steven/index.html / 
+      {
+         TEXT Steven McDougall
+      }
+      TEXT 
+
+   }
+}

@@ -1,0 +1,196 @@
+<HTML>
+<HEAD>
+<TITLE>Portable Presenter; Images</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>Images</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../index.html>PPresenter</A><BR>
+<A HREF=../manual.html>Manual</A><BR>
+<B>Images</B><BR>
+<UL>
+<LI><A HREF=tkphoto.html>tkPhoto</A>
+<LI><A HREF=magick.html>Magick</A>
+</UL>
+<P>
+Options:
+<UL>
+<LI><A HREF=#general>general</A>
+<LI><A HREF=#related>related</A>
+</UL>
+<P>
+<A HREF=#examples>Examples</A>
+<P>
+
+    </TD><TD VALIGN=top>
+
+An important part of the design of
+<A HREF=../../index.html>Portable Presenter</A> is the requirement for
+screen-size independency; fonts and also images are scaled, dependent on
+the actual screen-size.
+<P>
+There are two packages which handle images which you can use:
+<UL>
+<LI><A HREF=tkphoto.html>Tk::Photo images</A>, which are part of tk, but
+    only support a view formats and rather primitive operations;
+<LI><A HREF=magick.html>Image::Magick images</A>, which is a package
+    available for many operating-systems, capable of processing hardly
+    any image format imaginable.<BR>
+    See the <A HREF=../download/index.html>download page</A> on how
+    to retrieve this optional package.
+</UL>
+<P>
+They way how images work do differ on which package you use: Tk::Photo
+images are related to a canvas
+(say <A HREF=../viewport/index.html>viewport</A>), while Image::Magick
+images are device independent.
+
+<H2><A NAME=general>General</A> Image Options</H2>
+
+<DL>
+<DT><B>-file =&gt;</B> <I>filename</I>
+<DD>The name of the file to be used.  PPresenter searches the directories in
+    the <CODE>imageDirs</CODE> list (see the <CODE>addImageDir</CODE>
+    function described below) for the file, except when this is an
+    absolute path, of course.
+    <P>
+    Each file is read only once.  Each images is scaled at most once per
+    viewport which shows the image.
+    <P>
+<DT><B>-sizeBase =&gt;</B> <I>geometry</I>
+<DD>Overrules what the show's <CODE>-imageSizeBase</CODE> is defining on what
+    screen-size this image is made.  During the presentation, the image
+    is scaled to occupy the same amount of screen-space.  Of course only
+    when resizing is enabled.
+    <P>
+<DT><B>-resize =&gt;</B> <I>boolean</I>
+<DD>Overrules the show's <CODE>-resize</CODE> (by default on), on whether
+    the images should be resized or not.  Resizing can only take place when
+    a sizeBase is defined.
+    <P>
+<DT><B>-enlarge =&gt;</B> <I>boolean</I>
+<DD>Overrules the show's <CODE>-enlarge</CODE> (by default off), on whether
+    enlarging is allowed when resizing.   This is usually not a good idea,
+    because your image quality will be decrease.
+    <P>
+<DT><B>imageDirs =&gt; [</B>  <I>dir, ...</I> <B>]</B>
+<DD>Directories where images can reside.  You shall not change
+    anything directly in this list, but only using the function:
+<PRE>
+$show->addImageDir(<I>dir, ...</I>);
+</PRE>
+    PPresenter searches all directories from <CODE>@INC</CODE> to find
+    the directories you specified, and adds them in from of the
+    list in <CODE>imageDirs</CODE>.
+    <P>
+    At start, the paths "<CODE>PPresenter/images</CODE>" and
+    "<CODE>.</CODE>" are added.
+</DL>
+
+<H2><A NAME=related>Related Options</A></H2>
+
+Related options of <A HREF=../show/new.html#images>show new()</A>:
+<DL>
+<DT><B>-imageSizeBase =&gt;</B> <I>geometry</I>
+<DT><B>-resizeImages =&gt;</B> <I>boolean</I>
+<DT><B>-enlargeImages =&gt;</B> <I>boolean</I>
+<DT><B>-scaledImagesDir =&gt;</B> <I>dirname</I>
+</DL>
+Related options of <A HREF=../decoration/index.html>decoration</A>:
+<DL>
+<DT><B>-bgcolor</B>
+<DD>Determines the color to be used in anti-aliasing while resizing
+    transparent images.
+<DT><B>-nestImages</B>
+</DL>
+
+<H2><A NAME=examples>Examples</A></H2>
+
+<H4>Example 1: Use in the Markup Formatter</H4>
+
+A way to include an image in a show:
+<PRE>
+   use PPresenter;
+   my $show = PPresenter-&gt;new;
+   $show-&gt;addSlide(-template =&gt; 'main'
+     , -main =&gt; '&lt;IMG SRC=image.gif&gt;');
+</PRE>
+Options to the <CODE>IMG</CODE> tag of the markup-formatter are
+<CODE>RESIZE</CODE> (reflects -resize), <CODE>ENLARGE</CODE> (-enlarge),
+<CODE>BASE</CODE> (-sizeBase), and some more for markup.
+<P>
+If the package Image::Magick is installed, then PPresenter will resize the image with
+ImageMagick.  In that case, nearly all imaginable image formats can be
+used.  If the package is not installed, the image is read via Tk::Photo,
+which supports only a small set of formats (see manual on Tk::Photo).
+
+<H4>Example 2: Same image twice</H4>
+If you use the same image for the second time in the same show, those
+specified options will be neglected: the first use is defining the image.
+<PRE>
+   use PPresenter;
+   my $show = PPresenter-&gt;new;
+   $show-&gt;addSlide(-main =&gt; '&lt;IMG SRC=image.gif RESIZE&gt;');
+   $show-&gt;addSlide(-main =&gt; '&lt;IMG SRC=image.gif RESIZE=0&gt;');
+</PRE>
+In both cases, the resized version of the same image is shown!  For the
+second use, I also could have written <CODE>SRC=image</CODE>, because
+the basename of the file is an alias for an already defined image.
+
+<H4>Example 3: Predefining images</H4>
+The previous example has a hazard: if you run your presentation out of
+order: start with the second slide and then the first.  In that case, the
+image is not resized.
+<P>
+To avoid the hazard, but also to improve your possibilities to specify
+the images, you can define an image outside a slide:
+<PRE>
+   use PPresenter;
+   my $show = PPresenter->new;
+   $show->image(-file =&gt; 'image.gif', -resize =&gt; 0);
+   $show-&gt;addSlide(-main =&gt; '&lt;IMG SRC=image&gt;');
+   $show-&gt;addSlide(-main =&gt; '&lt;IMG SRC=image&gt;');
+</PRE>
+Calling the <CODE>image()</CODE> function, you can specify the options
+described in this manual-page.  You can refer to the image under its
+filename, the basename of the filename, or other aliases (as with all
+PPresenter-objects, you may specify an option
+<PRE>
+    -aliases =&gt; [ 'alias', 'alias2', ... ]
+</PRE>
+
+<H4>Example 4: Reading the images yourself</H4>
+
+It is possible to read the images yourself, in your Perl-program, and
+then offer it to PPresenter.  The possibilities are different if you want to
+use Tk::Photo or Image::Magick;
+<A HREF=tkphoto.html>Tk::Photo</A> images are related to a MainWindow
+(<A HREF=../viewport/index.html>viewport</A>), while
+<A HREF=magick.html>Image::Magick</A> images are not.
+Read their manual-pages for more details.
+<P>
+If you have created you own Photo or Magick image, you can add this to
+PPresenter with:
+<PRE>
+   $object = ...; # create Tk::Photo or Image::Magick object
+   $show-&gt;image($object, -name =&gt; 'image');
+</PRE>
+You do not have to specify a name in case of Image::Magick (the
+output filename will be taken by default), but it is clearer this
+way.
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+
+</TABLE>
+</HTML>
+

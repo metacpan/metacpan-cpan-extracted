@@ -1,0 +1,24 @@
+---
+abstract: "'print' -- but no newline needed"
+author:
+  - 'Alexandr Ciornii (alexchorny@gmail.com)'
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Perl6-Say
+provides:
+  Perl6::Say:
+    file: lib/Perl6/Say.pm
+    version: 0.16
+requires:
+  Carp: 0
+  IO::Handle: 0
+  Scalar::Util: 1.07
+  Test::More: 0.44
+  perl: 5.008
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/chorny/Perl6-Say
+version: 0.16

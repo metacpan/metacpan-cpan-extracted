@@ -1,0 +1,13 @@
+=pod
+
+=head1 CollectWithIntro
+
+hi there!
+
+=head2 one
+
+=head2 two
+
+=head2 three
+
+=cut

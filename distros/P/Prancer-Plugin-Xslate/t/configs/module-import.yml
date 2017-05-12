@@ -1,0 +1,6 @@
+template:
+    cache: 0
+    module:
+        - Digest::MD5
+        -
+            - md5_hex

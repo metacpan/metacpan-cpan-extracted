@@ -1,0 +1,30 @@
+This module tries to compile itself with "-lmpi", some systems require
+additional compiler flags when building and linking MPI applications.
+
+If mpicc is present, this module tries to use `mpicc -compile-info` and
+`mpicc -link-info` to work out how to compile and link itself.  You may
+need to make sure that mpicc is in your path for this to work during
+installation.
+
+You may need to ensure that an appropriate daemon is running before
+using mpirun/mpiexec.  mpich2 requires that mpd is running.
+
+If `make && make test` doesn't work, try specifying CCFLAGS and
+LDFLAGS and LIBS correctly and re-run Makefile.PL.
+
+Some systems might be a lot happier with the module if you build a static
+perl, instead of one which dynamically loads the C portion of this module.
+You will also need to statically link the Storable module.  See the
+ExtUtils::MakeMaker manpage for more details.
+
+Windows: This works, but the Makefile is generated incorrectly by Makemaker,
+so you might need to hand edit it to get it working, by searching through for
+repeated {{ characters where there should be none.  I do not know why this is.
+
+### Working systems
+SGI	- IRIX64 6.5 IP30 -  2 nodes
+SGI	- IRIX64 6.5 IP27 - 16 nodes
+CRAY	- 2.0.5.55 unicosmk CRAY T3E
+FreeBSD	- FreeBSD4.4 w/lam
+Linux	- Debian with mpich2
+Windows - Windows7 with mpich2 v1.1.1 (some later mpich versions fail to include libmpi.a properly, once they fix this, this should work)

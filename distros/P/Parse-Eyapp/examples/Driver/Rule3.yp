@@ -1,0 +1,70 @@
+%{
+=head1 SYNOPSIS
+
+This example illustrate how the C<%tree> directive is implemented.
+
+Compile it with:
+
+        eyapp Rule3
+
+run:
+
+       ./userule3.pl
+
+give as input a valid expression like C<a=2*3>
+
+=cut
+
+use Data::Dumper;
+$Data::Dumper::Indent=1;
+sub build_node { 
+  my $self = shift;
+  my @children = @_;
+  my @right = $self->YYRightside();
+  my $var = $self->YYLhs;
+  my $rule = $self->YYRuleindex();
+
+  for(my $i = 0; $i < @right; $i++) {
+    $_ = $right[$i];
+    if ($self->YYIsterm($_)) {
+      $children[$i] = bless { token => $_, attr => $children[$i] }, __PACKAGE__.'::TERMINAL';
+    }
+  }
+  bless { children => \@children, info => "$var -> @right" }, __PACKAGE__."::${var}_$rule" 
+}
+%}
+
+%incremental lexer 'Try a valid expression like "a = b*2": '
+%whites /([ \t]+)/
+%token NUM = /([0-9]+(?:\.[0-9]+)?)/
+%token VAR = /([A-Za-z][A-Za-z0-9_]*)/
+
+%right  '='
+%left   '-' '+'
+%left   '*' '/'
+%left   NEG
+
+%defaultaction { build_node(@_) }
+
+%%
+input:                 { } 
+        |   input line { }
+;
+
+line:     '\n'       { } 
+        | exp '\n'   { print Dumper($_[1]);  } 
+        | error '\n' { $_[0]->YYErrok; }
+;
+
+exp:        NUM    
+        |   VAR   
+        |   VAR '=' exp         
+        |   exp '+' exp         
+        |   exp '-' exp        
+        |   exp '*' exp       
+        |   exp '/' exp      
+        |   '-' exp %prec NEG 
+        |   '(' exp ')'  { $_[2] } /* Let us simplify a bit the tree */
+;
+
+%%

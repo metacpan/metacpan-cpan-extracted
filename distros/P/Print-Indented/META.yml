@@ -1,0 +1,47 @@
+---
+abstract: 'Indent outputs indented as per source code indentation'
+author:
+  - 'motemen <motemen@gmail.com>'
+build_requires:
+  IPC::Run: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.8.3, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Print-Indented
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Print::Indented:
+    file: lib/Print/Indented.pm
+    version: 0.01
+  Print::Indented::Handle:
+    file: lib/Print/Indented/Handle.pm
+requires:
+  List::MoreUtils: 0
+  Path::Tiny: 0
+  Scalar::Util: 0
+  Symbol: 0
+  Tie::Handle: 0
+  parent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/motemen/perl5-Print-Indented/issues
+  homepage: https://github.com/motemen/perl5-Print-Indented
+  repository: git://github.com/motemen/perl5-Print-Indented.git
+version: 0.01

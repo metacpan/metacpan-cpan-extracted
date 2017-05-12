@@ -1,0 +1,15 @@
+Revision history for Perl extension POE::Event::Message.
+
+0.11  Mon Feb 22 16:11:32 2010
+	- added patch to remove message length limitation
+	  contributed by Martin Holste
+	- fixed typo in dependency list for Time::HiRes
+	  noticed by Martin Holste
+
+0.10  Mon Apr 30 11:55:09 2007
+	- fixed 'call' return value
+	- updated documentation
+
+0.09  Wed Mar 21 07:22:48 2007
+	- First release to CPAN
+

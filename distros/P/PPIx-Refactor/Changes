@@ -1,0 +1,21 @@
+Revision history for PPIx-Refactor
+0.09
+       Make dzil point to my fork rather than (blank) original.
+0.08
+        Dzil improvemnts
+        Remove stray debugging symbol
+        Use PPI::Document::File so indexing/location works correctly.
+        Add manifest.skip so README.pod is not distributed
+
+0.07    More fixes for cpan dist (remove mymeta from manifest)
+
+0.06
+        Hide examples/lib/SomePackage.pm from pause.
+        Manifest.skip file
+
+0.05    Mon 29 Feb 2016 08:29 EST
+        Added examples dir and changed internal interface slightly for working on prior results better.
+
+0.01    Tue 18 Aug 2015 17:34:34 EST
+        Initial Implementation
+

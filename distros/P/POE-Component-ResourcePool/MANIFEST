@@ -1,0 +1,16 @@
+Changes
+lib/POE/Component/ResourcePool.pm
+lib/POE/Component/ResourcePool/Request.pm
+lib/POE/Component/ResourcePool/Resource.pm
+lib/POE/Component/ResourcePool/Resource/Collection.pm
+lib/POE/Component/ResourcePool/Resource/Semaphore.pm
+lib/POE/Component/ResourcePool/Resource/TryList.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/00_use.t
+t/basic.t
+t/collection.t
+t/fallback.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

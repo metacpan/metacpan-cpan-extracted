@@ -1,0 +1,33 @@
+#!/usr/local/bin/perl -w
+###########################################
+# adduser-simulator simulator
+###########################################
+use strict;
+use Term::ReadKey;
+
+$|=1;
+print "$0\n";
+print "Copying files from `/etc/skel' ...\n";
+
+ReadMode 2;
+print "Enter new UNIX password: ";
+my $pw1 = <>;
+ReadMode 1;
+
+
+ReadMode 2;
+print "\nRetype new UNIX password: ";
+my $pw2 = <>;
+ReadMode 1;
+
+print "\n";
+
+if( $pw1 !~ /\S/ ) {
+    die "Empty password";
+}
+
+if( $pw1 ne $pw2 ) {
+    die "Passwords didn't match\n";
+}
+
+1;

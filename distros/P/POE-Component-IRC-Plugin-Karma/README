@@ -1,0 +1,240 @@
+NAME
+    POE::Component::IRC::Plugin::Karma - A POE::Component::IRC plugin that
+    keeps track of karma
+
+VERSION
+      This document describes v0.003 of POE::Component::IRC::Plugin::Karma - released April 15, 2011 as part of POE-Component-IRC-Plugin-Karma.
+
+SYNOPSIS
+            # A simple bot to showcase karma capabilities
+            use strict; use warnings;
+
+            use POE qw( Component::IRC Component::IRC::Plugin::Karma Component::IRC::Plugin::AutoJoin );
+
+            # Create a new PoCo-IRC object
+            my $irc = POE::Component::IRC->spawn(
+                    nick => 'karmabot',
+                    ircname => 'karmabot',
+                    server  => 'localhost',
+            ) or die "Oh noooo! $!";
+
+            # Setup our plugins + tell the bot to connect!
+            $irc->plugin_add( 'AutoJoin', POE::Component::IRC::Plugin::AutoJoin->new( Channels => [ '#test' ] ));
+            $irc->plugin_add( 'Karma', POE::Component::IRC::Plugin::Karma->new( extrastats => 1 ) );
+            $irc->yield( connect => { } );
+
+            POE::Kernel->run;
+
+DESCRIPTION
+    This plugin keeps track of karma ( perl++ or perl-- ) said on IRC and
+    provides an interface to retrieve statistics.
+
+    The bot will watch for karma in channel messages, privmsgs and ctcp
+    actions.
+
+  IRC USAGE
+    *   thing++ # comment
+
+        Increases the karma for <thing> ( with optional comment )
+
+    *   thing-- # comment
+
+        Decreases the karma for <thing> ( with optional comment )
+
+    *   (a thing with spaces)++ # comment
+
+        Increases the karma for <a thing with spaces> ( with optional
+        comment )
+
+    *   karma thing
+
+        Replies with the karma rating for <thing>
+
+    *   karma ( a thing with spaces )
+
+        Replies with the karma rating for <a thing with spaces>
+
+ATTRIBUTES
+  addressed
+    If this is a true value, the karma commands has to be sent to the bot.
+
+            # addressed = true
+            <you> bot: perl++
+
+            # addressed = false
+            <you> perl++
+
+    The default is: false
+
+  casesens
+    If this is a true value, karma checking will be done in a case-sensitive
+    way.
+
+    The default is: false
+
+  privmsg
+    If this is a true value, all karma replies will be sent to the user in a
+    privmsg.
+
+    The default is: false
+
+  selfkarma
+    If this is a true value, users are allowed to karma themselves.
+
+    The default is: false
+
+  replykarma
+    If this is a true value, this bot will reply to all karma additions with
+    the current score.
+
+    The default is: false
+
+  extrastats
+    If this is a true value, this bot will display extra stats about the
+    karma on reply.
+
+    The default is: false
+
+  sqlite
+    Set the path to the SQLite database which will hold the karma stats.
+
+    From the DBD::SQLite docs: Although the database is stored in a single
+    file, the directory containing the database file must be writable by
+    SQLite because the library will create several temporary files there.
+
+    The default is: karma_stats.db
+
+    BEWARE: In the future this might be changed to a more "fancy" system!
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   POE::Component::IRC
+
+    *   Bot::BasicBot::Pluggable::Module::Karma
+
+SUPPORT
+  Perldoc
+    You can find documentation for this module with the perldoc command.
+
+      perldoc POE::Component::IRC::Plugin::Karma
+
+  Websites
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/POE-Component-IRC-Plugin-Karma>
+
+    *   RT: CPAN's Bug Tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=POE-Component-IRC-Plugin-K
+        arma>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/POE-Component-IRC-Plugin-Karma>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/POE-Component-IRC-Plugin-Karma>
+
+    *   CPAN Forum
+
+        <http://cpanforum.com/dist/POE-Component-IRC-Plugin-Karma>
+
+    *   CPANTS Kwalitee
+
+        <http://cpants.perl.org/dist/overview/POE-Component-IRC-Plugin-Karma
+        >
+
+    *   CPAN Testers Results
+
+        <http://cpantesters.org/distro/P/POE-Component-IRC-Plugin-Karma.html
+        >
+
+    *   CPAN Testers Matrix
+
+        <http://matrix.cpantesters.org/?dist=POE-Component-IRC-Plugin-Karma>
+
+  Email
+    You can email the author of this module at "APOCAL at cpan.org" asking
+    for help with any problems you have.
+
+  Internet Relay Chat
+    You can get live help by using IRC ( Internet Relay Chat ). If you don't
+    know what IRC is, please read this excellent guide:
+    <http://en.wikipedia.org/wiki/Internet_Relay_Chat>. Please be courteous
+    and patient when talking to us, as we might be busy or sleeping! You can
+    join those networks/channels and get help:
+
+    *   irc.perl.org
+
+        You can connect to the server at 'irc.perl.org' and join this
+        channel: #perl-help then talk to this person for help: Apocalypse.
+
+    *   irc.freenode.net
+
+        You can connect to the server at 'irc.freenode.net' and join this
+        channel: #perl then talk to this person for help: Apocal.
+
+    *   irc.efnet.org
+
+        You can connect to the server at 'irc.efnet.org' and join this
+        channel: #perl then talk to this person for help: Ap0cal.
+
+  Bugs / Feature Requests
+    Please report any bugs or feature requests by email to
+    "bug-poe-component-irc-plugin-karma at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=POE-Component-IRC-Plugin
+    -Karma>. You will be automatically notified of any progress on the
+    request by the system.
+
+  Source Code
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    <http://github.com/apocalypse/perl-pocoirc-karma>
+
+      git clone git://github.com/apocalypse/perl-pocoirc-karma.git
+
+AUTHOR
+    Apocalypse <APOCAL@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Apocalypse.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this distribution.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

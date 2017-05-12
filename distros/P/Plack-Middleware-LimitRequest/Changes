@@ -1,0 +1,7 @@
+Revision history for Perl extension Plack::Middleware::LimitRequest
+
+0.02 Thu Nov  6 2014
+    - tidy loose Makefile.PL to solve dependencies.
+
+0.01 Wed Nov  5 2014
+    - original version

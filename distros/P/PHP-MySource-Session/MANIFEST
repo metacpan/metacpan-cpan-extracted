@@ -1,0 +1,8 @@
+Changes
+INSTALL
+Makefile.PL
+MANIFEST
+README
+lib/PHP/MySource/Session.pm
+t/00_compile.t
+t/lib/TestUtil.pm

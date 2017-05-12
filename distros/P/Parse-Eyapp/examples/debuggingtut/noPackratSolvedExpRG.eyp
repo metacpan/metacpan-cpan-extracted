@@ -1,0 +1,69 @@
+%token NUM = /(\d+)/
+%token OP  = /([-+*\/])/
+
+%{
+use feature 'state';
+
+my $nxr = 0;
+
+%}
+
+%conflict isInTheMiddle {
+
+  state $nxs = 0;
+
+  $nxs++;
+
+  if ($nxs == $nxr+1) { 
+    print "Reducing by :MIDx\n";
+    $self->YYSetReduce(['NUM','OP'], ':MIDx' );
+    
+    $nxr = $nxs = 0; 
+  }
+  else { $self->YYSetShift('NUM') } 
+}
+
+%%
+T: preproc S  'other'
+;
+
+preproc: /* empty */
+   {
+     ($nxr) = $_[0]->YYPreParse('ExpList'); 
+     warn "Number of x's = $nxr\n";
+     $nxr = int ($nxr/2);
+   }
+;
+
+S:
+     x  %PREC isInTheMiddle S x  
+  |  %name :MIDx 
+     x  %PREC isInTheMiddle 
+;
+
+x:
+     NUM
+  |  x OP NUM
+;
+%%
+
+=head1 SYNOPSIS
+
+This grammar is similar to the one in file C<nopackrat.eyp>.
+It can't be parsed by LR(k) nor LL(k) algorithms.
+Backtracking LR and GLR algorithms can but will perform poorly.
+
+Compile it with:
+
+   $ eyapp -TC noPackratPPCR.eyp.eyp
+
+Run it with:
+
+   $ ./noPackratPPCR.pm -t -i -c '2-3 3*4 5+2'
+
+=head1 SEE ALSO
+
+Files C<nopackrat.eyp>, C<noLRk_exp.eyp>, C<noLRk_expSolved.eyp>
+
+=cut
+

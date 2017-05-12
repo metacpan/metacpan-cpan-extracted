@@ -1,0 +1,30 @@
+=pod
+
+=head1 SYNOPSIS
+
+This is a synopsis.
+
+=head1 DESCRIPTION
+
+This is a simple document meant to be used in testing
+Pod::Weaver::Plugin::EnsureUniqueSections.
+
+This POD already has an AUTHORS section, but a second one will be
+generated when it is processed by Pod::Weaver. Hopefully this problem
+will be caught.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Ricardo Signes <rjbs@example.com>
+
+=item *
+
+Molly Millions <sshears@orbit.tash>
+
+=back
+
+=cut

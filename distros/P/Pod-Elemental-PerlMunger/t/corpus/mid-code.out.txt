@@ -1,0 +1,15 @@
+
+my $x = 1;
+
+
+my $y = 2;
+
+__END__
+
+=pod
+
+=head1 Foo
+
+This is mid-code!
+
+=cut

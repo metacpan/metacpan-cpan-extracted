@@ -1,0 +1,10 @@
+This module is a simple wrapper around Palm::Doc that takes a text
+file downloaded from Project Gutenberg, makes it line-wrap better,
+and converts to Palm Doc.
+
+To install, do the usual dance:
+
+    perl Makefile.PL
+    make
+    make test
+    make install

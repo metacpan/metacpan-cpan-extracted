@@ -1,0 +1,29 @@
+---
+abstract: 'A POE Filter to handle DNS over TCP connections'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+  - 'Hans Dieter Pearcey <hdp@cpan.org>'
+  - 'Rocco Caputo <rcaputo@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: POE-Filter-DNS-TCP
+requires:
+  Net::DNS: '0.66'
+  Net::DNS::Packet: '0'
+  POE::Filter: '1.311'
+  perl: v5.6.0
+resources:
+  homepage: https://github.com/bingos/poe-filter-dns-tcp
+  repository: https://github.com/bingos/poe-filter-dns-tcp.git
+version: '0.06'

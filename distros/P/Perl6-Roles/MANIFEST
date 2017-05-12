@@ -1,0 +1,13 @@
+Build.PL
+MANIFEST
+Changes
+Makefile.PL
+META.yml
+lib/Perl6/Roles.pm
+t/000_interface.t
+t/001_roles.t
+t/002_method_conflict.t
+t/003_subroles.t
+t/004_runtime_composition.t
+t/998_pod.t
+t/999_pod_coverage.t

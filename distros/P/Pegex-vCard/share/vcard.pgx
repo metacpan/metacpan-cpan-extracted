@@ -1,0 +1,14 @@
+vcard:
+  begin-line
+  version-line
+  info-line+
+  end-line
+
+begin-line: 'BEGIN:VCARD' EOL
+version-line: 'VERSION:2.1' EOL
+info-line: key-path COLON info-value EOL
+end-line: 'END:VCARD' EOL
+
+key-path: / (!END) ([ UPPERS SEMI EQUAL DASH ]+) /
+
+info-value: / ( ANY+ ) /

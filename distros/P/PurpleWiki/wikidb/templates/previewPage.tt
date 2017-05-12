@@ -1,0 +1,51 @@
+[% INCLUDE common/header.tt
+           title = "Editing $pageName"
+%]
+
+[% IF revision %]
+<p><b>Editing old revision [% revision %]. Saving this page will
+replace the latest revision with this text.</b></p>
+[% END %]
+
+<form method="post" action="[% baseUrl %]" enctype="application/x-www-form-urlencoded">
+<input type="hidden" name="title" value="[% id %]" />
+<input type="hidden" name="oldtime" value="[% pageTime %]" />
+<input type="hidden" name="oldconflict" value="0" />
+[% IF revision %]
+  <input type="hidden" name="revision" value="[% revision %]" />
+[% END %]
+
+<textarea name="text" rows="20" cols="80" style="width:100%">
+[% oldText %]
+</textarea>
+
+<p class='editsubmit'>Summarize changes: <input type="text" name="summary" size="60" maxlength="200" /><br />
+<input type="checkbox" name="recent_edit" value="on" />This change is a minor edit.<br />
+<input type="submit" name="Save" value="Save" />
+[% IF userName %]
+  (Your user name is [% userName %].)
+[% ELSE %]
+  (<a href="[% baseUrl %]?action=login">Login</a> if you already have an
+  account, or visit <a href="[% preferencesUrl %]">Preferences</a> to
+  create one.)
+[% END %]
+<input type="submit" name="Preview" value="Preview" /></p>
+
+<div><input type="hidden" name=".cgifields" value="recent_edit" /></div></form>
+
+<hr />
+
+<h2>Preview:</h2>
+
+[% IF isConflict %]
+<p><b>NOTE: This preview shows the revision of the other author.</b></p>
+<hr />
+[% END %]
+
+[% body %]
+
+<hr />
+
+<h2>Preview only, not yet saved</h2>
+
+[% INCLUDE common/footer.tt %]

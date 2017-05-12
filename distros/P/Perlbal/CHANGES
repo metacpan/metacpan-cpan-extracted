@@ -1,0 +1,897 @@
+1.80: 2012-02-26
+
+    -- FLV streaming plugin (Gosuke Miyashita <gosukenator@gmail.com>)
+
+    -- New Throttle plugin (Adam Thomason <thomason@reticulatedsplines.net>)
+
+    -- Force keepalives off when we haven't finished reading a request body, but we
+       are already sending a response. (Jonathan Steinert <hachi@kuiki.net>)
+
+    -- Add support for Content-MD5 checking on PUT requests to web server services.
+       (Eric Wong <normalperson@yhbt.net>)
+
+    -- Include an XFFExtras plugin that can add X-Forwarded-Port and X-Forwarded-Proto
+       headers to help proxy backends construct canonical URLs with less configuration.
+       (RT 60260) (Jonathan Steinert <hachi@kuiki.net>)
+
+    -- Fix perlbal-check's age calculation to get the maximum age of queues across all
+       Perlbals. (Abe Hassan <ahassan@saymedia.com>)
+
+    -- Add DEFAULT command to allow setting default values for later service tunables
+       (Mark Smith <mark@qq.is>)
+
+    -- Change IO::Socket::SSL version requirement error to reflect what we actually
+       require. (Jonathan Steinert <hachi@kuiki.net>)
+
+    -- Completely redo the deps list for perlbal. This addresses an issue exposed when
+       LWP was split into component modules (RT 68490) , plus other subtle issues we've
+       been ignoring or unaware of. (Jonathan Steinert <hachi@kuiki.net>)
+
+    -- Stop loading Storable, we don't use it (Jonathan Steinert <hachi@kuiki.net>)
+
+    -- Switch Devel::Peek to an optional requirement (Jonathan Steinert <hachi@kuiki.net>)
+
+    -- Change perlbal-check to use IO::Socket::INET, not just IO::Socket
+       (Jonathan Steinert <hachi@kuiki.net>)
+
+    -- Can use PERLBAL_REMOVE_FIELDS=1 to disable fields and improve performance
+       (Nicolas Rochelemagne <nicolas.rochelemagne@cpanel.net>)
+
+    -- Optimize handling of SET for bool values
+       (Nicolas Rochelemagne <nicolas.rochelemagne@cpanel.net>)
+
+1.79: 2011-06-15
+
+    -- Make SSL sockets time out if they go stale, like we claimed was
+       fixed two versions ago, but this time we also clean up the FDs too.
+       (Jonathan Steinert <hachi@kuiki.net>)
+
+    -- fix DELETE's failing if using IO::AIO 3.7 or newer (dormando <dormando@rydia.net>)
+
+    -- ship perlbal-check with perlbal. (dormando <dormando@rydia.net>)
+
+1.78: 2011-01-22
+
+    -- Fix corruption of idle socket handlers introduced by SSL fix in 1.77.
+
+1.77: 2011-01-15
+
+    -- Import of the documentation project:
+       http://news.perlfoundation.org/2010/12/perlbal-documentation---final.html
+       (José Castro and Bruno Martins)
+
+    -- Make SSL sockets time out if they go stale during SSL negotiation. Fixes a
+       visible socket/object leak that slows down the server.
+
+    -- Refactor socket cleanup, might work better in environments that embed Perlbal.
+
+1.76: 2010-06-17
+
+    -- Allow "0" as a HEADER ADD/SET value (Andreas Koenig)
+
+    -- Cap our read buffers before AIO file operations to 1MB, this will prevent
+       memory over-use on systems with slow disks for PUT, or buffered upload temp
+       files. Assuming you system is fast enough to keep up with the writes this
+       will not harm upload speeds.
+
+1.75: 2010-04-02
+
+    -- Stop doubleforking on daemonization. Seems useless and triggered a bug
+       with newer IO::AIO's.
+
+    -- Fix tests on OSX. (plugin loader doesn't play nicely with a case-
+       insensitive filesystem)
+
+    -- added links to http://contributing.appspot.com/perlbal
+
+1.74: 2010-03-20
+
+    -- Change headers->headers_list method to return original case for PP
+
+    -- Add Slaven Rezic's SSL Client cert verification patch.
+
+    -- Change all the example configs to use a lower port
+       (Andreas J Koenig <andreas.j.koenig@gmail.com>)
+
+    -- Fix typo in help for MIME command (Jeremy James <jeremy.james@gmail.com>)
+
+    -- Allow HEADER command on all service roles
+
+    -- Switch Redirect plugin to use ->send_full_response, which fixes
+       keep-alive handling for this plugin.
+
+    -- Add a ClientHTTPBase method ->send_full_response, which is intended
+       as a plugin's interface to send full http responses back while still
+       having perlbal handle things like keepalives correctly.
+
+    -- Make keep-alive results during reproxy work even if the initial
+       response doesn't have a content-length.
+
+    -- Fix SSL socket close race crash.  (Jab <jk@ciphron.de>)
+
+    -- Make service selectors have the 'observed_ip' concept available to
+       them.
+
+    -- Add extra_config awareness for plugin added tunables to dumpconfig.
+
+    -- Plugins may now use the $set argument of add_tunable's interface
+       to automatically set an extra_config value from within a setter
+       override. Previously this would result in an error.
+
+    -- Split the persist_client_timeout into two other options;
+       persist_client_idle_timeout and idle_timeout. Depricate and
+       add compatability for the old option.
+
+    -- Silence a warning in PERLBAL_DEBUG >= 4 that we really don't
+       need to see.
+
+    -- Fix chained service selectors to have their 'start_http_request'
+       hook to be called.
+
+    -- Fix reproxy to not skip urls when the previous URL is a 'failure'
+       HTTP status response. IE. don't skip the second url when the first
+       one is a 404.
+
+    -- Don't require a space after the HTTP status in responses. In some
+       situations a server may not give it.
+
+    -- Perlbal::log should act the same whether it is calling syslog or
+       printf. Make it a little more DWIM.
+
+    -- Let's make SSL clients work with service selectors, and even
+       chained service selectors, when serving static files.
+
+    -- Fix a fields glitch in Perlbal::Cache which would sometimes
+       cause errors and abnormal shutdown.
+
+1.73: 2009-10-05
+
+    -- Add 'dumpconfig' command and related framework.
+       *** BETA FEATURE STATUS ***
+
+    -- Fix obscure race condition (spontaneously closed keepalives
+       after POST requests, Andreas J Koenig)
+
+    -- make Perlbal::Test be more robust and only use free ports.
+       (Bart van der Schans <herengracht@gmail.com>)
+
+    -- Make Content-Range replies work (Ask Bjørn Hansen) 
+
+    -- Make Redirect plugin more standards compliant (Ask Bjørn Hansen)
+
+    -- Fix X-REPROXY-FILE to work with SSL connections (Greg Denton)
+
+    -- Syslog as 'crit' rather than 'critical' (noticed by Richard Bronosky)
+
+    -- Allow zero byte PUT requests (in normal PUT situations)
+
+    -- Fix for serving files from the filesystem over SSL (Greg Denton) 
+
+    -- Beginnings of IPv6 support.  You can now set 'listen' to just a port
+       number and if you have IPv6 setup, have IO::Socket::INET6, and have
+       Danga::Socket 1.61, it'll listen on both IPv6 and IPv4 on that port.
+       (the equivalent to 0.0.0.0).  By default, with the old required syntax
+       of 'listen' being n.n.n.n:port, that'll force IPv4 mode and there are
+       no changes.  Even without IPv6 support, you can now listen on a port
+       without specifying e.g. 0.0.0.0:80.  Currently unimplemented: listening
+       on specific IPv6 addresses, connecting to IPv6 backends, etc.
+       (Brad Fitzpatrick <brad@danga.com>)
+
+    -- support filenames with +'s in webserver mode (Jordi Funollet).
+
+    -- change the VHost plugin to treat 'www.example.com.' and
+       'www.example.com' the same. (Ask)
+
+    -- silence warnings when things that look like variables on comment lines
+       in config input.
+
+    -- silence warnings from mgmt system when showing an object that doesn't
+       have a listening socket.
+
+    -- don't fail on t/90-accesscontrol.t if Net::Netmask isn't
+       installed. (Boris Zentner <bzm@2bz.de>)
+
+1.72: 2008-09-21
+
+    -- Removed version check in Plugin/Include.pm
+
+    -- No other changes; fixing CPAN upload.
+
+1.71: 2008-09-13
+
+    -- SECURITY: Remote crash reported by Dan Conlon, patched perlbal to send
+       error on negative content length to prevent this.
+
+    -- Move manage_multi() from test script into Perlbal::Test class.
+
+    -- Add documentation to Perlbal::Test.
+
+    -- Fix building the package on debian.
+
+    -- Lots of typo corrections in documentation and comments from Nick Andrew
+
+    -- Add SERVER crash_backtrace= setting, to make a crash of perlbal report
+       a backtrace along with the error message.
+
+    -- Add backend_send_verify and backend_read_verify hooks to make custom
+       verification methods possible.
+
+    -- Add BackendHTTP method 'verify_success' and adjust code to follow
+       this. Intended for use with the above hooks.
+
+    -- Add a 'scratch' field to BackendHTTP objects so plugins can store
+       per-backend scratch data.
+
+1.70: 2008-03-08
+
+    -- SECURITY: patch from Jeremey James <jbj@forbidden.co.uk> to not crash
+       on zero byte chunked upload when buffered uploads are enabled.
+
+    -- on successful write, update Perlbal::Socket's alive_time, so slowly
+       reproxied writes don't timeout the connection and kill it.  Patch
+       from Jonty <jonty@last.fm>.  r765
+
+    -- Perl 5.10 support.  Patch from Andy Armstrong <andy@hexten.net>.
+       Disclaimer: at least the tests all pass now, but no real-world use yet.
+       Should be fine, though.  Please report your success to the mailing list
+       and/or brad@danga.com.
+
+    -- Add Include plugin by Eamon Daly <edaly@nextwavemedia.com>; plugin
+       allows you to use "INCLUDE = /etc/conf.d/*" or "INCLUDE = /foo.conf"
+       to bring in more config; can be nested.
+
+    -- SECURITY: Previously a single upward directory traversal was possible
+       when concat get was enabled. This behavior has been fixed in code to
+       match with standard file serving.
+
+    -- Fix 'No such pseudo-hash field "high_priority"' issue in Stats plugin
+       (Eamon Daly and Jonty Wareing)
+
+    -- Support for "anonymous services", for API callers that really don't
+       care what their service is called but just want to get hold of a
+       Service object. These aren't really anonymous, but they have suitably
+       ugly names that no sane human should ever conflict with them.
+
+    -- add some new methods that make it a little nicer to embed Perlbal
+       in another application that uses Danga::Socket. Some refactoring
+       was done to avoid duplicate code between the "end-user" way and the
+       API way.
+
+    -- Chained selectors.  from Jeremy James <jbj@forbidden.co.uk>.
+
+    -- add "cgilike" plugin which offers a simple API very loosely based on
+       mod_perl for handling responses
+
+    -- add HTTPHeaders method set_request_uri so plugins can modify the uri
+       being requested
+
+    -- access control test
+
+    -- add option to AccessControl plugin to use observed_ip_string instead
+
+    -- add observed_ip_string method to perlbal sockets, allowing http
+       connections to set an observed ip string when an upstream proxy is
+       trusted.
+
+    -- add blind_proxy option, which disables appending to the end of the
+       X-Forwarded-For header when connections arrive from a trusted proxy.
+
+    -- make socket closing more verbose when Perlbal::DEBUG is set
+
+    -- verify_backend_path configuration option
+
+    -- don't overwrite $^P, allows use of perl debugger on perlbal.
+
+1.60: 2007-10-23
+
+    -- accept LFLF to end HTTP request headers, instead of just
+       CRLFCRLF.  easier monitoring with netcat & other popular
+       webservers accept LFLF anyway.  (Paul Baker)
+
+    -- SHUTDOWN GRACEFUL [timeout] - now accepts optional timeout
+       parameter to force shutdown after that period in seconds
+
+    -- make SSL non-blocking
+
+    -- make persist_client_timeout service tunable apply to the max_idle_time
+       value used to kill sockets that are idle
+
+    -- add Vpath plugin for selectors; can select on URI regex now
+
+    -- add ability to set default_service on selector services; any
+       request that is not caught by a selector plugin instead gets
+       routed to the defined default service
+
+    -- add MIME [ LIST | REMOVE <ext> | SET <ext> <mime> ] command for
+       managing the internal list of mime-types
+
+    -- return an error when trying to use HEADER command on a
+       service that isn't of role reverse_proxy
+
+    -- add hook to attach when a service selector is getting a client
+       returned to it.
+
+    -- fixed huge memory leak in Stats plugin
+
+    -- Fix t/15-webserver.t to not fail once in a while (timing glitch)
+
+    -- Fix handling of a proxy response that doesn't have a Reason-Phrase
+       on the HTTP status line.
+
+    -- Update 'queues' management command to output information about low
+       priority queue, now that we use it.
+
+    -- the buffered upload rate test should pass more reliably now.  some
+       people reported it sporadically (or often) failing before
+
+    -- new per-service configuration value: persist_client_timeout -
+       timeout in seconds for HTTP keep-alives to the end user
+       (defaults to 30 seconds)
+
+    -- new server configuration value: pidfile - for managing an internal
+       pidfile.
+
+1.59: 2007-05-22
+
+    -- only call die_gracefully on a socket if it CAN die_graceully.  fixes
+       shutdown graceful on mogstored, which has things betsides subclasses
+       of Perlbal::Socket in its Danga::Socket event loop
+
+    -- WARNING:  removed Linux::AIO support.  go get IO::AIO 1.6 at least if
+       you use webserver mode or reproxy files or do buffered uploads.
+
+1.58: 2007-05-11
+
+    -- plugin reload support, if plugin supports it.  plugin must implement
+           sub can_reload { 1 }
+       and optionally:
+           sub pre_reload_unload { ... }
+       (which is called before the ->unload, module reload, and ->load)
+       new management command is:
+           reload <plugin_name>
+
+1.57: 2007-04-26
+
+    -- make ClientHTTP (webserver mode) support transfer-encoding
+       "chunked" PUTs, when PUTs are already enabled.  useful
+       for things like MogileFS, where writing clients may not
+       know the final length ahead of time to predeclare in the
+       Content-Length request header.
+
+    -- Add the client_ip to the X-Forwarded-For header when the
+       upstream is "trusted" (Ask Bjoern Hansen).
+
+1.56: 2007-04-16
+
+    -- make HTML proper in ClientManage interface Jacques Marneweck
+       <jacques@powertrip.co.za>
+
+    -- fix "make test" on OS X.  Radu Greab <radu@yx.ro> and
+       Chuck Remes <cremes.devlist@mac.com> fixed & confirmed.
+
+    -- let accesscontrol plugin have a new match action, "queue_low",
+       to make a match force a request onto the low-priotity queue.
+       this match action is in addition to the two previous ones
+       (allow and deny).
+
+    -- start of work on making BackendHTTPs be abstract, dispatching
+       to a child process over a socketpair which speaks HTTP on
+       stdin/stdout.  Unfinished.  To be polished in future.
+
+    -- new hook "make_low_priority", like "make_high_priority"
+
+1.55: 2007-03-21
+
+    -- add plugin that returns 304 automatically on incoming requests
+       with If-Modified-Since header and matching a regular expression
+       on the Host header. (for hostnames serving immutable resources,
+       where if client has ANY version, it's the correct one.)  see:
+       example conf at conf/not-modified-plugin.conf
+
+    -- do HEAD to reproxied hosts, if client did a HEAD (Radu Greab
+       <radu@yx.ro>)
+
+    -- fix race+crash in buffered upload writing/purging
+
+1.54: 2007-02-05
+
+    -- supported for "Transfer-Encoding: chunked" requests (HTTP/1.1 feature)
+       as well as the "Expect: 100-continue", which generally accompany
+       chunked requests.  requires "buffered_uploads" be enabled.  see
+       doc/http-versions.txt for details.
+
+1.53: 2006-12-05
+
+    -- fix a crash as reported on mailing lists, with backends not
+       releasing references to clientproxies when coming through
+       service selectors, and backends then timing out, crashing
+       the server.
+
+    -- if backend sends x-reproxy-url and HTTP 204 No Content, upgrade
+       that to a 200 when sending to the client.
+
+    -- let non-Perlbal::Socket Danga::Socket objects exist without
+       crashing in cleanup handler (allows use of Gearman::Client::Async
+       in plugins)
+
+1.52: 2006-11-13
+
+    -- fix crash in buffered uploads when *::AIO doesn't write everything
+       to disk that's requested of it.  we were unshifting back onto the
+       write queue a scalar, not a scalarref.
+
+    -- AIO channels.  from the code:
+
+       "prevents all AIO threads from being consumed by requests for same
+        failing/overloaded disk by isolating them into separate 'channels' in
+        parent process and not dispatching more than the max in-flight count
+        allows.  think of a channel as a named queue.  or in reality, a disk."
+
+    -- allow setting of SO_SNDBUF on a per-service level
+
+1.51: 2006-10-04
+
+    -- set alive_time during slow PUTs.  was causing problems
+       replicating large files in mogile, hitting fake idle timeout.
+
+    -- pipelining HTTP injection fix.
+
+    -- include Host header to reproxy backends
+           patch by Jonty Wareing <jonty.wareing@gmail.com>
+
+1.50: 2006-09-08
+
+    -- add in optional Devel::Gladiator usage for memory tracking
+
+    -- fix memory leaks in concatenanted GETs on error cases
+
+    -- fixes to run / run better on OS X (Artur Bergman)
+
+1.49: 2006-08-30
+
+    -- Very basic help hints command, simply dumps all possible commands.
+
+    -- Add another statistic for reproxy caches, the current size of a particular
+       service's cache, maximum size, and fill percentage.
+
+1.48: 2006-08-18
+
+    -- optionally cache in-process the results of X-Reproxy-URL reponses
+
+1.47: 2006-08-15
+
+    -- concatenanted GETs sent 304 Not Modified w/ content-lengths.  should
+       be without.  fixed.  also including t/17-webserver-concat which forgot
+       to be checked into svn/MANIFEST earlier
+
+1.46: 2006-08-10
+
+    -- fix Mart's broken win32 support that broke Unix, part 2:  syslog when
+       daemonized.  TODO: test case should test daemonization mode.
+
+1.45: 2006-08-10
+
+    -- fix Mart's broken win32 support that broke Unix.  TODO:  test to raise/check
+       fd limit so this doesn't happen again on unix.
+
+1.44: 2006-08-10
+
+    -- allow a no-op ?foo at the end of concatenated-get URLs, so they'd be of
+       the form:  http://host/dir??file1,file2,file3?noopsection.  the no-op
+       section is good for cache-busting, putting in, say, the modtime of the
+       newest file, forcing browsers like safari (who over-cache) to reload.
+
+    -- set a mime-type other than text/plain on concatenated-get requests,
+       only falling back to text/plain if none of files have a known mime type.
+       in practice a request is all css or all js, so match is found by looking
+       at 1st file.  this is required since mozilla won't show CSS if not text/css.
+
+    -- actually be able to start up using 'perlbal' command.  test
+       suite passed before, but moving $VERSION into Perlbal.pm
+       had quitely broke it all.
+
+1.43: 2006-08-09
+
+    -- there's a case where offset gets past end of file in static file
+       code, but very rarely.  sendfile handles this w/ an error that
+       we dealt with, but the new readahead code didn't and crashed.
+       working around for now, until root cause is found for offset
+       going past.
+
+    -- eliminate some warnings in error cases.  only really affects noise
+       in test suite
+
+    -- work better on win32
+
+    -- added the ability for plugins to create custom service roles and
+       add custom configuration options to services, demo is available
+       as conf/echoservice.conf and lib/Perlbal/Plugin/EchoService.pm
+
+1.42: 2006-08-03
+
+    -- debug management command 'varsize' to track size of internal
+       data structures, to make sure none get out of control.
+       there's a report that CPU/mem grow slowly over time, and after
+       a month or so of uptime, a restart is needed.  this might help
+       diagnose that.
+
+    -- allow expansion/interoplation of stuff in config files/commands.
+       for now just mapping network device names to IP addresses:
+          SET listen = ${ip:eth0}:80
+
+    -- more hooks as requested by community
+
+    -- concatenated get feature.  where a client have use a
+       comma-separated list of files to return, always in text/plain.
+       Useful for webapps which have dozens/hundreds of tiny css/js
+       files, and don't trust browsers/etc to do pipelining.
+       Decreases overall roundtrip latency a bunch, but requires app
+       to be modified to support it.  See t/17-concat.t test for
+       details.
+
+    -- do AIO readahead before sendfile to reduce blocking caused
+       by disk reads from sendfile.  increases throughput.  see:
+       http://brad.livejournal.com/2228488.html
+
+    -- add 'latency' configuration on selector roles
+
+1.41: 2006-02-06
+
+    -- IE sends a request header like "If-Modified-Since: <DATE>;
+       length=<length>" so we have to remove the length bit before
+       comparing it with our date then we save the length to compare
+       later.
+
+    -- support for reproxying to a named service.  if backend returns
+       "X-Reproxy-Service: <name>" and no content, the entire original
+       client GET/HEAD request is re-sent to the new named service.
+       the "enable_reproxy" option has to be enabled for the original
+       service.
+
+1.40: 2006-01-17
+
+    -- support for optional retrying of requests after a 500 error,
+       so user won't see the 500 error.  boolean option, as well
+       as configurable schedule of how often to retry backends.
+
+    -- clean up directory indexing HTML: Mark Smith and Fred Moyer
+       (fred@redhotpenguin.com)
+
+1.39: (beta for 1.40) 2005-10-26
+
+    -- new feature for virtual host plugin:  the Host header can be trumped
+       by a magical URL form, if allowed in config.  for instance, you can
+       make an HTTP request to host "foo.com" but actually get "bar.com"
+       if you do this:
+
+          VHOST foo.com;using:bar.com  = bar
+
+       and request /__using/bar.com/IDENT from foo.com, where IDENT is
+       just \w+.  perlbal then updates the Host record to bar.com and
+       sends request URI (unaltered) to the "bar" service.
+
+       this is useful for circumventing browser host restrictions (java,
+       javascript, flash, etc...) when you actually control both
+       domains.
+
+1.38: (beta for 1.40) 2005-10-19
+
+    -- some paranoia evals around some parts of buffered uploads that
+       SAPO reported crashes in occasionally.  added FIXMEs to investigate
+       too.  for now, though, evals around closing files is safer.
+
+    -- new feature: inter-perlbal upload tracking.  for fancy upload
+       bars driven by XmlHttpRequest when clients are upload large files
+
+    -- WARNING: reproxying (files or URLs) is now disabled by default,
+       and must be enabled per-service with "enable_reproxy = true"
+
+    -- do a final little read before closing an HTTP connection
+       to make sure we have no unread data in kernel (notably
+       an extra "\r\n" from an IE post), so when we do close, we
+       don't send a RST packet to the end user.  Thanks to Kevin
+       Lewandowski from discogs.com for the bug report.
+
+    -- use Danga::Socket's AddTimer interface to disconnect
+       stale persistent connections every 5 seconds, driven by
+       a timer, rather than every 15 seconds, driven by
+       socket creation.
+
+    -- there was a bug where 304 Not Modified responses would
+       cause a connection close (and thus RST packets) even
+       though keep-alive was negotiated and would've worked
+
+    -- ignore URL arguments when doing directory indexing
+
+    -- work a little better under "trickle".  (but still not perfect...
+       trickle doesn't quite work on Perlbal, unfortunately. it's useful,
+       or would've been useful, for testing some parts...)
+
+    -- avoid an occasional warning with dirindexing on unreadable directories
+
+1.37 (beta for 1.40) 2005-08-29
+
+    -- "use <name>" command to set the direct object for future commands
+
+    -- AccessControl plugin to allow/deny by default or on IPs or
+       netmasks.
+
+    -- ClientManage could spin in its inherited event_write, causing
+       99.9% cpu usage.  Bug is arguably Danga::Socket's, but also
+       ours because it's documented what we should do and we didn't.
+       The fix is to shut down watching writability when we're done
+       writing.
+
+    -- make accept_client and its callers deal with the possibility
+       that accept_client fails not because the backend is bogus, but
+       because the client is.  so now accept_client can close the
+       client and callers have to be aware of that.
+
+    -- after running this version on production on LiveJournal.com for
+       a bit, we discovered some cases that we'd flag as should never happen,
+       but actually do, so updated the comments and behavior to
+       do the right thing and not just crash with an assertion.
+
+    -- fix misspellings of trusted_upstream_proxies that didn't
+       come along for the renaming ride earlier
+
+    -- webserver mode now ignores URL arguments when looking up
+       filename
+
+    -- remove warnings accessing undefs in ranges and vhosts
+
+    -- new --version and --help flags.  also a usage message on bogus
+       options (or when --help).  props to Jacques Marneweck
+       <jacques@powertrip.co.za> for the help and motivation.
+
+1.36 (beta for 1.40) 2005-08-19
+
+    -- fix bug in ClientProxy when user disconnects after POST/PUTing
+       a content body, but before a response comes back.
+
+    -- now checks correctly for Danga::Socket version 1.44 or above.
+       (required version was in quotes, confusing perl.)
+
+    -- vhost plugin: strip off port specification from the Host header
+       before trying to match with configured patterns.
+
+1.35: (beta of 1.40) 2005-08-16
+
+    -- beta SSL support in a few lines of code.  maybe it's completely
+       done.  maybe it's barely done.  But it seems to work?  I'm no
+       SSL master... IO::Socket::SSL just made it so easy.
+
+    -- lots more tests
+
+    -- lots more cleanup
+
+    -- fix potential crashing bugs in the PUT path.  luckily ones we
+       never hit.
+
+    -- lots and lots of code cleanup
+
+    -- load plugins by either the exact case specified, all lowercase,
+       or all lowercase with first letter uppercase.  then remember
+       the case for unloading (which was never implemented?)
+
+    -- reorganize/cleanup code related to stalling the backend due to
+       client's buffer size exceeding one of the two limits.
+       introduce "backend_stalled"
+
+    -- buffer uploads to disk
+
+1.3: (2005-06-26)
+
+    -- introduce CommandContext, so management commands can be less
+       verbose when in config files (service/pool names can be left off
+       when you just created them a couple lines before)
+
+    -- remove sendstats support
+
+    -- exit with 0 vs non-zero when/if Perlbal crashes.  new command
+       "crash" to fake a crash, for testing.
+
+    -- entirely redone management command parsing/dispatching (major
+       code cleanup)
+
+    -- virtual host plugin on service selector framework
+
+    -- service selector framework
+
+    -- make Net::Netmask optional
+
+    -- byte range support for both webserver mode and reproxy-file mode
+       Giao Phan <giao@guba.com>.  so clients can resume large transfers.
+
+    -- test suite
+
+    -- IO::AIO support (brad)
+
+    -- change response code to client to 200 on reproxy-file from backend
+
+    -- 'nodes' command now takes as an optional argument a specific ip:port to
+       dump the node stats for
+
+    -- AIO abstraction layer (Perlbal::AIO) which can currently do either
+       Linux::AIO or "none" (doing everything sync).  also in future File::FDpasser
+       and other OS-specific modes [brad]
+
+    -- add buffer_backend_connect to do in memory buffering of data before we
+       request a backend; assists slow clients without tying up a mod_perl
+
+    -- fix spinning issue when webnodes unavailable; should now not consume 100%
+       CPU in those cases
+
+    -- revamp verbose functionality; by default it's still of, but if you specify
+       VERBOSE ON in the config file, it turns it on for management connections
+       by default.  management connections, when specifying VERBOSE ON/OFF, will
+       now set the flag only for that connection.
+
+    -- new command for config file; VERBOSE ON/OFF; can be used to enable or
+       disable confirmation of all commands such as SET, SERVER, CREATE, etc.
+       by default, it's off for config files, but on for management connections.
+
+    -- add generation count to services that increments every time a pool is
+       switched.  this data is now stored on backends when they're spawned as
+       well, and when we allocate a backend we verify the generation so old ones
+       are thrown away.
+
+    -- allow setting of nodefile on pools to 'none' or 'null' or 'undef' or just
+       an empty set of quotes ("", '') in order to stop using node files
+
+    -- automatically set use count to 0 on new nodes coming in from nodefile
+
+    -- made auto-vivification of pulls throw warnings, and made Perlbal die if it
+       tries to vivify a pool and the user has previously manually declared a pool
+
+    -- updated pool commands to be more flexible (POOL pool ADD node, etc)
+
+    -- add pools; a way of having different sets of nodes and instantly switching
+       between them, so traffic stops going to old nodes; see the example config
+       file for usage
+
+    -- work partially without Linux::AIO (does sync stat of node file in reverse
+       proxy mode, and webserver mode doesn't work) --brad
+
+1.2 (2005-03-07)
+    -- add new stats command 'nodes' that shows information on each node that we've
+       been connecting to -- last connect time, last attempt time, a breakdown of
+       the last 500 status codes returned, etc
+
+    -- add ability to use new Danga::Socket profiling; 'profile on', 'profile data'
+       to see the info so far, and 'profile off' to disable it
+
+    -- graceful shutdown now flags sockets that are busy to die so they die when
+       they're done with their current connection
+
+    -- sockets in persist_wait now get closed immediately during a graceful shutdown
+
+    -- fix handling of OPTIONS responses; used to do its own state clearing but
+       it now uses the next_request method as it should
+
+    -- fix bug with determination of keep-alive in http 1.1 case specifying
+       a connection: close header
+
+    -- added 'uptime' management command to track how long Perlbal has been up
+
+    -- new config commands: HEADER INSERT <svc> <header>: <value> and HEADER
+       REMOVE <svc> <header> which will insert and remove headers from user
+       requests before they're sent to backend proxy nodes.
+
+    -- add dependency to Net::Netmask; now you can specify trusted_upstream_proxies
+       on a service (SET service.trusted_upstream_proxies = 10.0.0.0/8, etc)
+       which will allow requests from that range to set X-Forwarded-For, X-Host,
+       and X-Forwarded-Host headers.
+
+    -- fixed a bug that caused connections to hang when the backend responded
+       before the user was done sending data
+
+    -- reset some variables that weren't being reset: read_buf, read_ahead, read_size
+
+    -- "proc" management command shows user and system CPU usage for Perlbal
+       this run, as well as a delta since the last time you ran "proc"
+
+    -- added Perlbal::XS interface for modules to use; also 'xs' management
+       command to see the status of XS modules
+
+    -- bug in PalImg caused crash on files with no length (or when another
+       error occurs that causes no data to be sent to new_gif_palette function)
+
+    -- ReproxyManager would sometimes let closed backends back into the pool
+       and hand them off to clients, fixed to check for that
+
+    -- new policy: you don't muck around with the internals of other classes.
+       notably, clients don't change the internals of a backend and backends
+       don't change the internals of a client.  this was causing all sorts of
+       problems because nobody was cleaning up properly.  (especially with regard
+       to "who is my backend's client" type questions.)
+
+    -- fixed up code that did its own keep-alive checks to use the HTTPHeaders
+       functions so that in the future every part of the code stays up to date
+
+    -- Perlbal::Socket now has the option to keep track of all objects that
+       are created.  new command to management interface 'leaks' will show
+       all objects currently in memory.  turn this functionality on by enabling
+       the TRACK_OBJECTS constant in Perlbal::Socket.
+
+    -- split keep-alive logic into request and response methods and cleared
+       up how that works
+
+    -- rewrote reproxy URI support.  new class Perlbal::ReproxyManager does all
+       of the work relating to reproxies.  it's basically a service class but
+       stripped down and dealing with single endpoints instead of pools.  much
+       much much more robust under heavy load.  (Junior, Brad)
+
+    -- now that we support persistent connections, the 'queues' command didn't
+       have an accurate time; added ClientProxy member last_request_time so
+       we can accurately tell how long requests have been waiting for
+
+    -- Danga::Socket got an overhaul; close and steal_socket now share a lot
+       of code by calling _cleanup.  some more paranoia on making sure the
+       object isn't already closed when we try to do things.
+
+    -- lots more paranoia in close events and event_err handling for backends
+
+    -- added tracking mode for helping look for leaked objects; records a
+       backtrace of every object created.  "server track_obj = 0/1" to enable
+       or disable it, and then "tracking" in a management interface to see.
+
+    -- made Perlbal::objctor/objdtor take an object as their first parameter.
+       much faster than using caller().
+
+    -- fix Highpri plugin to not check hosts for high priority values when
+       the host isn't defined
+
+    -- made Palimg plugin far more paranoid about errors, and also uses new
+       ClientHTTPBase scratch area for keeping track of data instead of using
+       headers (which are generally slower)
+
+    -- fixed bug in HTTPHeaders that set_version would inadvertently
+       run into when used on a header created through new_response
+
+    -- ClientProxy class now supports persistence; set persist_client on
+       the proxy service in order to enable it.
+
+    -- Palimg plugin now supports fallback to web server mode if the
+       requested URI doesn't fit our desired pattern
+
+    -- did some cleanup; made a bunch of HTTPHeaders accesses use the
+       accessor methods instead of referencing into the object's private
+       store of data
+
+    -- fixed a crash caused by calling getsockname/getpeername on sockets
+       that have been undefined after having been stolen during an internal
+       redirect to another webserver
+
+    -- fixed _simple_response to not return a body if we're serving
+       to a HEAD request
+
+    -- bug fix: don't send Not-Modified responses to requests for dynamic
+       directory listings.  it was messing up persistent connections
+       since the directory serving code didn't get passed down whether we
+       were sending a body or not.  and not modifies on directories are hard:
+       modify time isn't altogether useful.  (file sizes could change)
+
+       this still does not-modifieds on indirect index.html directory
+       requests, because _serve_request ends up eventually calling
+       _serve_request on a different URI.  (brad)
+
+    -- added BSD::Resource as dependency to Makefile.PL (brad)
+
+    -- fixed 304 Not Modified responses to not send Content-Length
+       and Content-Type headers.  (jr)
+
+1.01 (2004-10-22)
+    -- when internally redirecting a URL, perlbal advertises
+       that it supports persisent HTTP connections now,
+       and caches those sockets for 5 seconds.  (not configurable)
+       useful under load, otherwise you waste all local ports
+       on a machine
+
+    -- ditch dependence on IO::SendFile.  do it ourselves (1 line)
+       with perl's syscall function
+
+    -- add doc/* and conf/* to MANIFEST file
+
+1.00
+    -- initial packaged release

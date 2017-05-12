@@ -1,0 +1,27 @@
+SYNOPSIS
+
+    In your weaver.ini:
+
+     [-App::lcpan]
+
+DESCRIPTION
+
+    This plugin is to be used when building App::lcpan::* distribution.
+    Currently it does the following:
+
+    For each lib/App/lcpan/CmdBundle/* module files:
+
+      * Add general Description text
+
+    For each lib/App/lcpan/Cmd/* module files:
+
+      * Add general Description text
+
+CONFIGURATION
+
+SEE ALSO
+
+    App::lcpan
+
+    Dist::Zilla::Plugin::App::lcpan
+

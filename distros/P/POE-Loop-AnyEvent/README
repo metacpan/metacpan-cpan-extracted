@@ -1,0 +1,67 @@
+NAME
+    POE::Loop::AnyEvent - AnyEvent event loop support for POE
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+      use POE qw( Loop::AnyEvent );
+
+      # The rest of your program goes here.
+      # There should be little or no changes necessary.
+      # All POE APIs and most modules should work with no changes.
+
+DESCRIPTION
+    POE::Loop::AnyEvent replaces POE's default select() event loop with
+    AnyEvent. This allows POE programs to transparently use most of the
+    event loops AnyEvent can provide.
+
+    POE::Loop::AnyEvent changes POE's internal implementation without
+    altering its APIs. By design, nearly all software that are already uses
+    POE should continue to work normally without any changes.
+
+  Conflicts
+    It may seem obvious, but AnyEvent::Impl::POE and POE::Loop::AnyEvent are
+    mutually exclusive of one another. Using both would result in a deadlock
+    as each event system called upon the other in infinite recursion.
+
+    This deadlock also affects AnyEvent's support of Wx and Prima. AnyEvent
+    doesn't natively support these event loops. Instead it takes advantage
+    of POE's more flexible, comprehensive, and open event loop abstractions.
+
+  Callbacks from AnyEvent to POE
+    POE::Session's callback() and postback() methods simplify callbacks from
+    plain-coderef systems like Tk and AnyEvent to POE's named event
+    handlers. Please see POE::Session for more details.
+
+  Private Methods
+    POE::Loop::AnyEvent implements the private POE::Loop API. Please see
+    POE::Loop for an explanation of that API, especially if you'd like to
+    publish support for a new event loop. POE is structured so that new
+    event loops can be supported without core distribution changes.
+
+    Also see POE::Test::Loops for over 35 test files and more than 490 tests
+    you can use for free when writing new POE::Loop modules.
+
+SEE ALSO
+    POE
+
+    POE::Kernel
+
+    POE::Session
+
+    POE::Loop
+
+    POE::Test::Loops
+
+    AnyEvent
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

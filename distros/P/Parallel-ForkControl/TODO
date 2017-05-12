@@ -1,0 +1,17 @@
+TODO:
+
+06/15/2011 - brad@divisionbyzero.net
+	- Clean up the ugly looking codebase
+
+
+DONE:
+
+06/04/2007 - brad@divisionbyzero.net
+	- Cyclic process creation not working.
+	- Blocking on groups of processes.
+
+01/08/04 - brad@divisionbyzero.net
+	- Integrate with /proc
+
+12/08/03 - brad@divisionbyzero.net
+	- Move to Factory model to utilize OS specific process monitoring

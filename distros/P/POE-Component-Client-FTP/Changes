@@ -1,0 +1,48 @@
+==================================================
+Changes from 2012-03-01 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.24 at 2017-02-28 19:53:48 +0000
+-----------------------------------------
+
+  Change: f08852915a8ab66607c9b873f4c8fcd54a35c3ab
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-28 19:53:48 +0000
+
+    Switch dist to Dist::Zilla 
+
+  Change: 5f24fef49d45d7a1743de2eb69ee08b4006cf8e7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-01 19:09:40 +0000
+
+    Did some fiddling with the LICENSE 
+
+  Change: f4abd3fc3e824526e5e0b713ec61bcbb80d4933f
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-02-13 12:31:33 +0000
+
+    Added numerous new tests, applied patch and fixed from Jeremy Palmer
+    RT#34609 
+
+  Change: b33e6b07981bccfe85559e13ea7992fd4b2411c3
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-01-15 17:01:13 +0000
+
+    Added simple, active and passive tests 
+
+  Change: a2e3f68dc0bc10fc384eb237ddb4ad6a32dae92f
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-01-13 17:18:39 +0000
+
+    Added simple connection authentication testcase 
+
+  Change: 90d693ae761683a18399a5ca286cb4f7d6225863
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2009-01-13 16:02:45 +0000
+
+    Added the missing test and fixed up dependencies list in Makefile.PL 
+
+================================================
+Plus 5 releases after 2012-03-01 00:00:00 +0000.
+================================================

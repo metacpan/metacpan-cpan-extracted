@@ -1,0 +1,6 @@
+docs: |
+    Also in the FAQ.
+
+    L<http://faq.perl.org/perlfaq4.html#How_do_I_strip_blank>
+
+    See also L<"rtrim"> and L<"ltrim">.

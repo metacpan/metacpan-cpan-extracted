@@ -1,0 +1,134 @@
+Revision history for Perinci-Sub-Normalize
+
+0.19    2016-12-11 (PERLANCAR)
+
+	- No functional changes.
+
+	- Bump prereq version Sah::Schema::rinci::function_meta to 1.1.82
+	  (introduced 'index_completion' argument spec property).
+
+
+0.18    2016-05-11 (PERLANCAR)
+
+        - [test] Bump optional test prereq version
+          Perinci::Sub::Property::{test,result::table} to avoid test failures
+          [RT#114308].
+
+
+0.17    2016-05-10 (PERLANCAR)
+
+        - Update to Sah::Schema::rinci::function_meta which replaces
+          Sah::Schema::Rinci.
+
+
+0.16    2016-04-12 (PERLANCAR)
+
+        - No functional changes.
+
+        - Fix test [RT#113688].
+
+
+0.15    2016-01-07 (PERLANCAR)
+
+	- Downgrade dependency to Perinci::Sub::Property::retry optional,
+	  to avoid circular dependency problem [RT#110958].
+
+
+0.14    2015-12-23 (PERLANCAR)
+
+	- Move accessing %Sah::Schema::Rinci::SCHEMAS inside function, to
+	  allow more flexibility (e.g. Sah::Schema::Rinci reloaded between
+	  invocation).
+
+	- Remove devscripts/bench (see
+	  Bencher::Scenario::Perinci::Sub::Normalize now).
+
+
+0.13    2015-09-30 (PERLANCAR)
+
+	- No functional changes.
+
+	- Bump prereq Sah::Schema::Rinci to 1.1.78.
+
+
+0.12    2015-09-04 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.11    2015-04-24 (PERLANCAR)
+
+	- [Bugfix] Regression: 'summary (id)' should be a syntax error;
+	  refactor code to be cleaner.
+
+
+0.10    2015-04-24 (PERLANCAR)
+
+        - Normalize 'prop(LANG)' to 'prop.alt.lang.LANG' (DefHash 1.0.10).
+
+        - Add benchmark devscript.
+
+
+0.09    2015-01-07 (PERLANCAR)
+
+	- No functional changes.
+
+	- Include require() error in error message.
+
+
+0.08    2014-10-17 (PERLANCAR)
+
+	- Support loading argument specification property module
+          (Perinci/Sub/Property/arg/<prop>.pm).
+
+
+0.07    2014-10-09 (PERLANCAR)
+
+	- Support argument submetadata (introduced in Rinci 1.1.55).
+
+
+0.06     2014-07-08 (SHARYANTO)
+
+         - No functional changes.
+
+         - Replace Data::Sah with Data::Sah::Normalize (smaller, less deps).
+
+
+0.05     2014-05-01 (SHARYANTO)
+
+         - No functional changes.
+
+         - Add more test.
+
+         - Bump version requirement of Sah::Schema::Rinci to avoid fail reports
+           [CT].
+
+
+0.04     2014-04-30 (SHARYANTO)
+
+         - No functional changes.
+
+         - Hide error message from Perl's require() which is too technical and
+           exposes @INC (paths).
+
+
+0.03     2014-04-30 (SHARYANTO)
+
+         - Try loading Perinci::Sub::Property::* module first before croaking of
+           unknown property.
+
+
+0.02     2014-04-28 (SHARYANTO)
+
+         - Add option: remove_internal_properties (bool, default 0).
+
+         - Fix handling of attributes.
+
+
+0.01     2014-04-28 (SHARYANTO)
+
+         - First release.

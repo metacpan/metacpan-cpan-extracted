@@ -1,0 +1,10 @@
+Changes
+lib/ParaDNS.pm
+lib/ParaDNS/Resolver.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00basic.t
+META.yml                                 Module meta-data (added by MakeMaker)
+fast-rdns.pl

@@ -1,0 +1,235 @@
+Revision history for Perl extension Perl6::Pod.
+TODO:
+    - Declarator blocks
+    - Formatting code: P<>, S<>, M<>, 
+    - Config: :margin, :formatted
+
+0.72 2015-12-16
+    * fix deps
+
+0.71 2015-12-12
+    * restore functionality after 5.18
+
+0.60 2013-11-13
+    * improve perl6 pod parser
+    (thanks Ivan Baidakou! )
+
+0.59 2013-02-11
+    * fix =headX in docbook
+
+0.58 2013-01-18
+    * update deps up to Regexp::Grammars 1.021
+
+0.57 2013-01-15
+    * pod6latex
+
+0.56 2012-06-20
+    * fix tests 
+
+0.55 2012-06-19
+    * trailing spaces in default FormattingCodes
+    * fix code block 
+
+0.54 2012-05-22
+    * fix scripts;
+    * fix =item and tests;
+
+0.53 2012-95-15
+    * tests
+
+0.52 2012-05-13
+    * fix docbook head levels
+    * X<> 
+
+0.51 2012-05-12
+    * fix scripts
+
+0.50 2012-05-11
+    * reimplement Perl6::Pod
+
+0.35 2011-10-24
+   * fix schemes for L<>
+
+0.34 2011-10-20
+   * add -c, -M, -nb options for pod6xhtml
+
+0.33 2011-01-04
+   * fix exclude
+
+0.32 2011-01-14
+   * exclude rule for FilterPattern.pm
+   * fix sorting for notes (<sup>)
+
+0.31 2011-05-24
+    *  fix context for parse_chank()
+
+0.30 2011-05-19
+    * fix invoke start() for TO::XHTML 
+
+0.29 2011-05-13
+    * fix defn, R<>
+
+0.28 2011-04-25
+    * track Pod filepath
+
+0.27 2011-08-17
+   * S<>, D<>, R<>, K<>, T<>, D<>, Z<>
+
+0.26_13 2011-03-30
+    * U<> code
+
+0.26_12 2011-03-26
+    * fix Test.pm
+
+0.26_11 2011-03-26
+    * use para for content of =nested
+    * multi_paragraph for =para
+    * skip  blocks _UPPER_CASE_BLOCKS_ when rendering
+    * implicit code blocks in =nested, =item, =defn blocks
+
+0.26_10 2011-03-15
+   * lists (ordered, unordered, =defn, multi-paragraph, 
+      :!numbered, :continued, levels for items)
+
+0.26_9 2011-02-15
+   * =nested, :nested - nested
+
+0.26_8 2011-01-25
+   * =alias, A<> - aliases
+
+0.26_6 2010-12-25
+    * L<>: add support nested codes
+
+0.26_6 2010-11-29
+    * add :allow context for childs formatting codes
+
+0.26_5  2010-11-28
+    * fix N xhtml footer
+    * convert N to docbook
+
+0.26_4 2010-11-25
+    * fix escaping
+
+0.26_3 2010-11-18
+    * reimplement allow (codeblock  and C format code);
+
+0.26_2 2010-11-07
+    * implement N<> (to xhtml);
+
+0.26_1 2010-11-04
+    * fix parsing formatcodes from text;
+    * clean deprecated code
+    * fix test
+    
+0.25 2010-10-29
+    * fix escape for code
+    * fix E<>
+
+0.24 2010-10-17
+    * fix escaping
+
+0.23 2010-10-13
+    * implement E<> code
+    * allow formatting codes in =code block
+
+0.22 2010-09-04
+    * implement X<> formatting code
+    * fix cell content for =table
+
+0.21 2010-08-18
+    * implement C<> formatting code
+
+0.20 2010-08-15
+    * use standart tags( xhtml and docbook) for user input and output
+
+0.19 2010-08-14
+    * I/O blocks : =input, =output
+
+0.18 2010-05-27
+    * =use : handle class attributes, eval PERL6POD for included mods
+    * M<>: The M<> formatting code is the inline equivalent of a named block.
+    * mark semantic blocks as =head1 ( level 1)
+    
+0.17 2010-04-25
+    * B<>, I<> formatting codes
+    * export =code to docbook 
+
+0.16 2010-04-11
+    * Perl6::Pod::Test - base class for tests
+    * add utility mods
+
+0.15  2010-04-07
+    * handle :allow attribute
+
+0.14 
+    * implement =table
+
+0.13
+    * implement :formatted
+
+0.12
+    * implement :like
+
+0.11
+    *fix depends
+
+0.10
+    *add souce filter for perl5 scripts
+    *fix docbook TERM
+
+0.9
+    * use utf8 for open 
+    * [fix] L<name|link>
+
+0.8
+    * fix tests
+
+0.7
+    * add L<> schemes and tests
+
+0.6
+    * add lists tests
+    * fix format codes in lists
+
+0.5
+    * base support of formatting codes
+    * pod6xhtml: add css option
+    * imporove XHTML formatter
+
+0.4
+    * =code, =para blocks
+    * =format block ( pass text to particular formatters: xhtml, xml, docbook)
+    * =pod block ( supprt ordinary and verbatim paragrapths )
+    
+0.3
+    * xhtml formatter
+    * itemlists : ordered, unordered and definitions (without nesting)
+	in dokbook, xhtml
+    * scripts/pod6xhtml - convert pod to xhtml
+    * add tests
+
+0.02_2
+    * fix depends
+
+0.02_1
+    * add docbook formater
+    * scripts/pod6docbook - convert pod to docbook
+    * add test
+    * support lists
+    * generate id attribute
+
+0.01_03
+    * add levels of headers
+    * pod6xml  - utility fot convert Perl pod to XML
+    * To::XML - add namespace for extra attrs
+    * add To::Mem formatter for use in tests
+    * implement M<> ( custom formatting codes)
+
+0.01_02
+    * implement =comment, =use, =config
+    * paragraph text of block_data can be modifyed before parse FormattingCodes
+       ( Perl6::Pod::Block::on_para)
+    * fix package deps and tests
+
+0.01_01
+    * developer release of Perl6::Pod suite

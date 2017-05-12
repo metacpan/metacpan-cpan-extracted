@@ -1,0 +1,18 @@
+Changes
+lib/PDL/IO/XLSX.pm
+lib/PDL/IO/XLSX/Reader.pm
+lib/PDL/IO/XLSX/Writer.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/_sample1.xlsx
+t/_sample2.xlsx
+t/_sample3.xlsx
+t/_sample4.xlsx
+t/_sample5.xlsx
+t/basic.t
+t/compile.t
+t/datetime.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

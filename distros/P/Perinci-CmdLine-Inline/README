@@ -1,0 +1,62 @@
+SYNOPSIS
+
+     % gen-inline-pericmd-script /Perinci/Examples/gen_array -o gen-array
+    
+     % ./gen-array
+     ERROR 400: Missing required argument(s): len
+    
+     % ./gen-array --help
+     ... help message printed ...
+    
+     % ./gen-array 3
+     2
+     3
+     1
+    
+     % ./gen-array 3 --json
+     [200,"OK",[3,1,2],{}]
+
+DESCRIPTION
+
+COMPILATION DATA KEYS
+
+    A hash structure, $cd, is constructed and passed around between
+    routines during the generation process. It contains the following keys:
+
+      * module_srcs => hash
+
+      Generated script's module source codes. To reduce startup overhead
+      and dependency, these modules' source codes are included in the
+      generated script using the datapack technique (see Module::DataPack).
+
+      Among the modules are Getopt::Long::EvenLess to parse command-line
+      options, Text::Table::Tiny to produce text table output, and also a
+      few generated modules to modularize the generated script's structure.
+
+      * vars => hash
+
+      Generated script's global variables. Keys are variable names
+      (including the sigils) and values are initial variable values (undef
+      means unitialized).
+
+      * sub_srcs => hash
+
+      Generated script's subroutine source codes. Keys are subroutines'
+      names and values are subroutines' source codes.
+
+FAQ
+
+ What about tab completion?
+
+    Use App::GenPericmdCompleterScript to generate a separate completion
+    script. If you use Dist::Zilla, see also
+    Dist::Zilla::Plugin::GenPericmdScript which lets you generate script
+    (and its completion script) during build.
+
+SEE ALSO
+
+    Perinci::CmdLine, Perinci::CmdLine::Any, Perinci::CmdLine::Lite,
+    Perinci::CmdLine::Classic
+
+    App::GenPericmdScript
+

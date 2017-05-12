@@ -1,0 +1,41 @@
+#!/usr/bin/perl
+
+# this script turns off log_any_app explicitly, so you cannot turn it on by
+# LOG=1. however, subcommands can still turn it on.
+
+use 5.010;
+use strict;
+use warnings;
+use Perinci::CmdLine::Classic;
+
+our %SPEC;
+
+$SPEC{sc1} = {
+    v => 1.1,
+    summary => "This subcommand doesn't set log_any_app",
+    args => {},
+};
+sub sc1 { [200, "OK", "This is sc1"] }
+
+$SPEC{sc2} = {
+    v => 1.1,
+    summary => "This subcommand is run with log_any_app=0",
+    args => {},
+};
+sub sc2 { [200, "OK", "This is sc2"] }
+
+$SPEC{sc3} = {
+    v => 1.1,
+    summary => "This subcommand is run with log_any_app=1",
+    args => {},
+};
+sub sc3 { [200, "OK", "This is sc3"] }
+
+Perinci::CmdLine::Classic->new(
+    log_any_app => 0,
+    subcommands=>{
+        sc1 => {url=>"/main/sc1"},
+        sc2 => {url=>"/main/sc2", log_any_app=>0},
+        sc3 => {url=>"/main/sc3", log_any_app=>1},
+    },
+)->run;

@@ -1,0 +1,84 @@
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::PTRWBase
+PROTOTYPES: DISABLE
+
+PTRWBase* PTRWBase::new (int arg) {
+    RETVAL = new PTRWBase(arg);
+}
+
+int PTRWBase::val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+int PTRWBase::xval (SV* newval = NULL) {
+    if (newval) THIS_wrapper->xval = SvIV(newval);
+    RETVAL = THIS_wrapper->xval;
+}
+
+void PTRWBase::DESTROY ()
+
+
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::PTRWChild
+PROTOTYPES: DISABLE
+
+BOOT {
+    av_push(get_av("Panda::XS::Test::PTRWChild::ISA", GV_ADD), newSVpvs_share("Panda::XS::Test::PTRWBase"));
+}
+
+PTRWChild* PTRWChild::new (int arg1, int arg2) {
+    RETVAL = new PTRWChild(arg1, arg2);
+}
+
+int PTRWChild::val2 (SV* newval = NULL) {
+    if (newval) THIS->val2 = SvIV(newval);
+    RETVAL = THIS->val2;
+}
+
+int PTRWChild::xval2 (SV* newval = NULL) {
+    if (newval) THIS_wrapper->xval2 = SvIV(newval);
+    RETVAL = THIS_wrapper->xval2;
+}
+
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::WBase
+PROTOTYPES: DISABLE
+
+WBase* WBase::new (int arg) {
+    RETVAL = new WBase(arg);
+}
+
+int WBase::val (SV* newval = NULL) {
+    if (newval) THIS->val = SvIV(newval);
+    RETVAL = THIS->val;
+}
+
+int WBase::xval (SV* newval = NULL) {
+    if (newval) THIS_wrapper->xval = SvIV(newval);
+    RETVAL = THIS_wrapper->xval;
+}
+
+void WBase::DESTROY ()
+
+
+
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test::WChild
+PROTOTYPES: DISABLE
+
+BOOT {
+    av_push(get_av("Panda::XS::Test::WChild::ISA", GV_ADD), newSVpvs_share("Panda::XS::Test::WBase"));
+}
+
+WChild* WChild::new (int arg1, int arg2) {
+    RETVAL = new WChild(arg1, arg2);
+}
+
+int WChild::val2 (SV* newval = NULL) {
+    if (newval) THIS->val2 = SvIV(newval);
+    RETVAL = THIS->val2;
+}
+
+int WChild::xval2 (SV* newval = NULL) {
+    if (newval) THIS_wrapper->xval2 = SvIV(newval);
+    RETVAL = THIS_wrapper->xval2;
+}

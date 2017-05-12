@@ -1,0 +1,12 @@
+[AGENT]
+
+# edge case
+Mozilla/4.0 (compatible; Opera/3.0; Windows 4.10) 3.50
+
+'parser'           => 'generic_compatible',
+'os'               => 'Windows 98',
+'extras'           => [ '3.50' ],
+'version_raw'      => '3.0',
+'version'          => '3.000',
+'name'             => 'Opera',
+'generic'          => 1,

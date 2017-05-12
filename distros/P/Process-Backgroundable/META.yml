@@ -1,0 +1,29 @@
+---
+abstract: 'A Process::Storable object that can be backgrounded'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  File::Remove: 1.42
+  File::Spec: 0.80
+  Test::More: 0.42
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Process::Backgroundable
+name: Process-Backgroundable
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  File::Temp: 0
+  IPC::Run3: 0.034
+  Process::Storable: 0.20
+  Storable: 2.14
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.21

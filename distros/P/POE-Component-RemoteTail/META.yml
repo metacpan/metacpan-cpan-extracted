@@ -1,0 +1,29 @@
+---
+abstract: 'tail to remote server''s access_log on ssh connection.'
+author:
+  - 'Takeshi Miki <miki@cpan.org>'
+build_requires:
+  List::Util: 0
+  Test::More: 0
+  YAML: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Component-RemoteTail
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Inspector: 0
+  Debug::STDERR: 0
+  POE: 0
+  POE::Wheel::Run: 0
+  UNIVERSAL::require: 0
+  constant: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01011

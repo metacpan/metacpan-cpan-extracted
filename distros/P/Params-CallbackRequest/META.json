@@ -1,0 +1,70 @@
+{
+   "abstract" : "Functional and object-oriented callback architecture",
+   "author" : [
+      "David E. Wheeler <david@justatheory.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Params-CallbackRequest",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.2701",
+            "Test::More" : "0.17"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.2701"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::Pod" : "1.41"
+         },
+         "requires" : {
+            "Attribute::Handlers" : "0.77",
+            "Class::ISA" : 0,
+            "Exception::Class" : "1.10",
+            "Params::Validate" : "0.59",
+            "Test::Simple" : "0.17",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Params::Callback" : {
+         "file" : "lib/Params/Callback.pm",
+         "version" : "1.20"
+      },
+      "Params::CallbackRequest" : {
+         "file" : "lib/Params/CallbackRequest.pm",
+         "version" : "1.20"
+      },
+      "Params::CallbackRequest::Exceptions" : {
+         "file" : "lib/Params/CallbackRequest/Exceptions.pm",
+         "version" : "1.20"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/theory/params-callbackrequest/issues/"
+      },
+      "homepage" : "http://search.cpan.org/dist/Params-CallbackRequest/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/theory/params-callbackrequest/"
+      }
+   },
+   "version" : "1.20"
+}

@@ -1,0 +1,22 @@
+---
+abstract: 'Execute forked subref array and join return values, timeouts and error captures.'
+author:
+  - 'Eugene Grigoriev,'
+build_requires:
+  Test::Deep: 0.103
+  Test::More: 0.86
+distribution_type: module
+generated_by: 'Module::Install version 0.78'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parallel-SubArray
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Storable: 2.18
+  perl: 5.8.0
+version: 0.6

@@ -1,0 +1,64 @@
+{
+   "abstract" : "a collection of statistics modules in Perl Data Language, with a quick-start guide for non-PDLA people.",
+   "author" : [
+      "Maggie J. Xiong  <maggiexyz users.sourceforge.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0529, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PDLA-Stats",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "PDLA::Core" : "2.008",
+            "PDLA::Graphics::PGPLOT" : "0",
+            "PDLA::Slatec" : "0",
+            "PGPLOT" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "PDLA::Core" : "2.008"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "PDLA::Core" : "2.008",
+            "PDLA::Graphics::PGPLOT" : "0",
+            "PDLA::Slatec" : "0",
+            "PGPLOT" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "PDLA::Core" : "2.008",
+            "PDLA::Graphics::PGPLOT" : "0",
+            "PDLA::Slatec" : "0",
+            "PGPLOT" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/PDLPorters/pdla-stats",
+         "web" : "https://github.com/PDLPorters/pdla-stats"
+      }
+   },
+   "version" : "0.72"
+}
+

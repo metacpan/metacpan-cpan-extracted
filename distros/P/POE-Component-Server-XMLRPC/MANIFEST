@@ -1,0 +1,9 @@
+# $Id: MANIFEST,v 1.2 2003/03/20 23:24:07 mah Exp $
+CHANGES
+MANIFEST
+Makefile.PL
+README
+XMLRPC.pm
+examples/ping-client
+examples/ping-server
+t/use.t

@@ -1,0 +1,55 @@
+{
+   "abstract" : "Convert POD to ANSI-colored text",
+   "author" : [
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Text-Ansi",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "utils"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Pod::Text" : "3.13",
+            "Term::ANSIColor" : 0,
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Pod-Text-Ansi@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Text-Ansi"
+      },
+      "homepage" : "http://search.cpan.org/dist/Pod-Text-Ansi/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hinrik/pod-text-ansi.git",
+         "web" : "http://github.com/hinrik/pod-text-ansi"
+      }
+   },
+   "version" : "0.05",
+   "x_authority" : "cpan:HINRIK"
+}
+

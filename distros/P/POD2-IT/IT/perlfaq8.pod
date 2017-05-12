@@ -1,0 +1,1357 @@
+=head1 NOME
+
+perlfaq8 - Interazione con il Sistema ($Revision: 1.20 $, $Date: 2006/05/22 21:08:57 $)
+
+=head1 DESCRIZIONE
+
+Questa sezione delle Perl FAQ copre le domande riguardanti l'interazione
+con il sistema. Gli argomenti includono la comunicazione tra i
+processi (IPC), il controllo dell'interfaccia utente (tastiera,
+schermo e dispositivi di puntamento), e piE<ugrave> o meno qualsiasi
+altra cosa non riguardante la manipolazione di dati.
+
+Leggete le FAQ e la documentazione specifica riguardante la versione
+di perl specifica per il vostro sistema operativo (ad es. L<perlvms>,
+L<perlplan9>, ...). Tali risorse dovrebbero contenere informazioni
+piE<ugrave> dettagliate sulle stravaganze del vostro perl.
+
+=head2 Come faccio a sapere qual E<egrave> il sistema operativo in cui mi trovo?
+
+La variabile $^O ($OSNAME se usate il modulo English) contiene un'indicazione
+del nome del sistema operativo (non il numero della versione) per il quale
+il vostro binario perl E<egrave> stato compilato. 
+
+=head2 Come mai exec() non ritorna?
+
+PerchE<eacute> questo E<egrave> quello che fa: sostituisce il vostro
+corrente programma in esecuzione con uno differente. Se invece volete
+mantenerlo in esecuzione (com'E<egrave> probabilmente il caso, se state
+facendo questa domanda) utilizzate system().
+
+=head2 Si possono fare cose bizzarre con tastiera/schermo/mouse?
+
+La maniera con cui si accedono e si controllano le tastiere, schermi e
+dispositivi di puntamento (mouse) E<egrave> dipendente dal sistema.
+Provate con i seguenti moduli:
+
+=over 4
+
+=item Tastiera
+
+	Term::Cap		Distribuzione perl standard
+	Term::ReadKey		CPAN
+	Term::ReadLine::Gnu	CPAN
+	Term::ReadLine::Perl	CPAN
+	Term::Screen		CPAN
+
+=item Schermo
+
+	Term::Cap		Distribuzione perl standard
+	Curses			CPAN
+	Term::ANSIColor		CPAN
+
+=item Mouse
+
+	Tk			CPAN
+
+=back
+
+Alcuni di questi casi specifici sono mostrati quali esempi in altre risposte
+in questa sezione della perlfaq.
+
+=head2 Come faccio a stampare qualcosa a colori?
+
+In generale non potete perchE<eacute> non si sa se il destinatario abbia un
+device video a colori. Se siete a conoscenza della disponibilitE<agrave> di
+un terminale ANSI che riconosce i colori, potete usare il modulo
+Term::ANSIColor da CPAN:
+
+      use Term::ANSIColor;
+      print color("red"), "Stop!\n", color("reset");
+      print color("green"), "Vai!\n", color("reset");
+
+O come questo:
+
+      use Term::ANSIColor qw(:constants);
+      print RED, "Stop!\n", RESET;
+      print GREEN, "Vai!\n", RESET;
+
+=head2 Come faccio a leggere solo un carattere senza aspettare il carattere di invio?
+
+Controllare l'utilizzo del buffer sull'input E<egrave> una questione
+notevolmente dipendente dal sistema. Su molti sistemi, potete semplicemente
+usare il comando B<stty> come mostrato in L<perlfunc/getc>, ma come potete
+vedere, questo vi sta giE<agrave> portando in problematiche di
+portabilitE<agrave>.
+
+    open(TTY, "+</dev/tty") or die "nessun tty: $!";
+    system "stty  cbreak </dev/tty >/dev/tty 2>&1";
+    $chiave = getc(TTY); # forse questo funziona
+    # O ANCHE
+    sysread(TTY, $chiave, 1); # probabilmente questo va
+    system "stty -cbreak </dev/tty >/dev/tty 2>&1";
+
+Il modulo Term::ReadKey da CPAN offre un'interfaccia semplice da usare che
+dovrebbe essere piE<ugrave> efficiente che non richiamare B<stty> in una
+shell esterna per ogni chiave. Include anche un limitato supporto a Windows.
+
+    use Term::ReadKey;
+    ReadMode('cbreak');
+    $chiave = ReadKey(0);
+    ReadMode('normal');
+
+Ad ogni modo, usare il codice richiede l'avere un compilatore C
+funzionante e la possibilitE<agrave> di usarlo per configurare e installare un modulo
+CPAN. Ecco una soluzione che utilizza un modulo POSIX standard che
+E<egrave> giE<agrave> sui vostri sistemi (assumendo che il vostro
+sistema supporti POSIX).
+
+    use HotKey;
+    $chiave = readkey();
+
+Ed ecco il modulo HotKey che nasconde le, talvolta mistificatrici,
+chiamate per manipolare le strutture termios di POSIX.
+
+    # HotKey.pm
+    package HotKey;
+
+    @ISA = qw(Exporter);
+    @EXPORT = qw(cbreak cooked readkey);
+
+    use strict;
+    use POSIX qw(:termios_h);
+    my ($term, $oterm, $echo, $noecho, $fd_stdin);
+
+    $fd_stdin = fileno(STDIN);
+    $term     = POSIX::Termios->new();
+    $term->getattr($fd_stdin);
+    $oterm     = $term->getlflag();
+
+    $echo     = ECHO | ECHOK | ICANON;
+    $noecho   = $oterm & ~$echo;
+
+    sub cbreak {
+        $term->setlflag($noecho);  # ok, non voglio nemmeno echo
+        $term->setcc(VTIME, 1);
+        $term->setattr($fd_stdin, TCSANOW);
+    }
+
+    sub cooked {
+        $term->setlflag($oterm);
+        $term->setcc(VTIME, 0);
+        $term->setattr($fd_stdin, TCSANOW);
+    }
+
+    sub readkey {
+        my $chiave = '';
+        cbreak();
+        sysread(STDIN, $chiave, 1);
+        cooked();
+        return $chiave;
+    }
+
+    END { cooked() }
+
+    1;
+
+=head2 Come posso controllare se E<egrave> pronto l'input dalla tastiera?
+
+Il modo piE<ugrave> facile in assoluto per farlo E<egrave> leggere un tasto in
+modalitE<agrave> non bloccante, con il modulo Term::ReadKey da CPAN,
+passando come argomento -1 ad indicare il non blocco:
+
+      use Term::ReadKey;
+
+      ReadMode('cbreak');
+
+      if (defined ($carattere = ReadKey(-1)) ) {
+          # l'input sta aspettando ed era $carattere
+      } else {
+          # nessun input sta aspettando
+      }
+
+      ReadMode('normal');       # ripristina le normali impostazioni tty
+
+=head2 Come posso cancellare lo schermo?
+
+Se dovete farlo poco frequentemente, usate system:
+
+	system("clear");
+
+Se dovete farlo molte volte, salvate la stringa clear di modo che potete
+stamparla per 100 volte senza chiamare il programma 100 volte:
+
+	$stringa_pulisci = `clear`;
+	print $stringa_pulisci;
+
+Se state state progettando di fare altre manipolazioni dello schermo,
+come la posizione del cursore, ecc, dovreste usare il modulo Term::Cap:
+
+	use Term::Cap;
+ 	$terminale = Term::Cap->Tgetent( {OSPEED => 9600} );
+	$stringa_pulisci = $terminale->Tputs('cl');
+
+=head2 Come posso ottenere le dimensioni dello schermo?
+
+Se avete il modulo Term::ReadKey installato da CPAN, potete usarlo per
+ottenere la larghezza e altezza in caratteri e pixel:
+
+	use Term::ReadKey;
+	($larg_car, $alt_car, $larg_pixel, $alt_pixel) = GetTerminalSize();
+
+Questo E<egrave> piE<ugrave> portabile della C<ioctl> nuda e cruda ma non
+cosE<igrave> illustrativo:
+
+    require 'sys/ioctl.ph';
+    die "nessun TIOCGWINSZ " unless defined &TIOCGWINSZ;
+    open(TTY, "+</dev/tty")   or die "Nessuna tty: $!";
+    unless (ioctl(TTY, &TIOCGWINSZ, $winsize='')) {
+        die sprintf "$0: ioctl TIOCGWINSZ (%08x: $!)\n", &TIOCGWINSZ;
+    }
+    ($riga, $colonna, $xpixel, $ypixel) = unpack('S4', $grandezzafinestra);
+    print "(riga,colonna) = ($riga,$colonna)";
+    print "  (xpixel,ypixel) = ($xpixel,$ypixel)" if $xpixel || $ypixel;
+    print "\n";
+
+=head2 Come si fa a chiedere una password all'utente?
+
+(Questa domanda non ha nulla a che fare con il web. Per quello, consultate
+un'altra FAQ.)
+
+C'E<egrave> un esempio in L<perlfunc/crypt>.
+Per prima cosa, impostate il terminale in modalitE<agrave> "no echo", e
+poi leggete normalmente la password. Potete farlo alla vecchia
+maniera con la funzione ioctl(), oppure usando i controlli POSIX del
+terminale (consultate la pagina del manuale di L<POSIX> o il Camel
+Book), oppure con una chiamata al programma B<stty>, con diversi
+gradi di portabilitE<agrave>.
+
+In molti sistemi potete anche farlo usando il modulo Term::ReadKey
+scaricabile da CPAN, che E<egrave> piE<ugrave> facile da usare e teoricamente
+piE<ugrave> portabile.
+
+    use Term::ReadKey;
+
+    ReadMode('noecho');
+    $password = ReadLine(0);
+
+=head2 Come leggo e scrivo su una porta seriale?
+
+CiE<ograve> dipende dal sistema operativo su cui sta girando il vostro
+programma. Nel caso di Unix, le porte seriali saranno accessibili tramite
+i file in /dev; su altri sistemi, i nomi dei device saranno senz'altro
+diversi. Di seguito sono descritte molte tipologie di problemi comuni a
+tutti i tipi di interazione con i device:
+
+=over 4
+
+=item lockfile
+
+Il vostro sistema potrebbe utilizzare dei lockfile per controllare gli 
+accessi multipli. Assicuratevi di seguire il protocollo corretto. Se piE<ugrave>
+processi leggono da uno stesso device nello stesso momento, il risultato
+puE<ograve> essere imprevedibile.
+
+=item modo di open
+
+Se prevedete di effettuare sia operazioni di lettura che di scrittura
+sul device, dovrete aprirlo in modalitE<agrave> di aggiornamento (consultate
+L<perlfunc/"open"> per maggiori dettagli). Potreste volerlo aprire senza
+incorrere nel rischio di blocco utilizzando sysopen() e
+C<O_RDWR|O_NODELAY|O_NOCITY> dal modulo Fcntl (incluso nella distribuzione
+standard di perl). Consultate L<perlfunc/"sysopen"> per maggiori
+informazioni su questo approccio.
+
+=item fine linea
+
+Alcuni device si aspetteranno un "\r" alla fine di ciascuna linea al
+posto di di un "\n". In alcuni port di perl, "\r" e "\n" hanno valori
+diversi da quelli ASCII (Unix) usuali di "\012" e "\015". E<Egrave> possibile
+che dobbiate indicare direttamente i valori numerici, utilizzando gli
+ottali ("\015"), gli esadecimali ("0x0D"), o specificando un carattere
+di controllo ("\cM").
+
+    print DEV "atv1\012"; # sbagliato, per alcuni device
+    print DEV "atv1\015"; # corretto, per alcuni device
+
+BenchE<eacute> con i file di testo normali un "\n" vada benissimo,
+non c'E<egrave> uno schema unificato per la terminazione delle righe che
+sia portabile tra Unix, DOS/Win, e Macintosh, a meno di non terminare
+I<TUTTE> le linee con "\015\012", rimuovendo dall'output ciE<ograve> di cui
+non avete bisogno. CiE<ograve> E<egrave> valido in particolare per l'I/O
+da socket e per il flush [completamento delle operazioni di I/O, NdT]
+automatico, discusso di seguito.
+
+=item flush dell'output
+
+Se prevedete che i caratteri raggiungano il vostro device quando li
+stampate con print(), vorrete certamente impostare il flush automatico
+per tale filehandle. Potete servirvi di select() e della variabile C<$|>
+per controllare il flush automatico (consultate L<perlvar/$E<verbar>>)
+e L<perlfunc/select>, oppure L<perlfaq5>, "Come faccio a terminare le
+operazioni di I/O in corso o a privare del buffer un filehandle di
+output? PerchE<eacute> devo fare questo?"):
+
+    $vecchioh = select(DEV);
+    $| = 1;
+    select($vecchioh);
+
+Troverete anche codice che fa ciE<ograve> senza una variabile temporanea,
+come in
+
+    select((select(DEV), $| = 1)[0]);
+
+Oppure, se vi va bene importare qualche migliaio di righe di codice
+solo perchE<eacute> avete paura di una piccola variabile $| :
+
+    use IO::Handle();
+    DEV->autoflush();
+
+Come indicato in precedenza, questo non funziona quando si utilizza un
+socket di I/O tra Unix e Macintosh. In quel caso dovrete indicare i
+terminatori di linea direttamente nel codice. 
+
+=item input che non blocca
+
+Se state eseguendo una read() o sysread() che blocca, dovrete fare in modo
+che un handler di un'allarme indichi un timeout (consultate
+L<perlfunc/alarm>). Se avete una open che non blocca, probabilmente avrete
+una read che non blocca, il che significa che potreste dover utilizzare
+una select() con 4 argomenti per determinare se l'I/O E<egrave> pronto su quel 
+device (consultate L<perlfunc/"select">).
+
+=back
+
+Mentre tentava di leggere dal suo dispositivo per l'identificativo del chiamante, il famoso
+Jamie Zawinski <jwz@netscape.com>, dopo aver digrignato un bel po' i denti
+e combattuto con sysread, sysopen, tcgetattr di POSIX, e varie altre
+funzioni che si perdono nella notte, alla fine ha ottenuto quanto segue:
+
+    sub apri_modem {
+	use IPC::Open2;
+	my $stty = `/bin/stty -g`;
+	open2( \*MODEM_IN, \*MODEM_OUT, "cu -l$modem_device -s2400 2>&1");
+	# l'avvio di cu elimina le impostazioni stty di /dev/tty, anche se
+	# e` stato aperto su una pipe...
+	system("/bin/stty $stty");
+	$_ = <MODEM_IN>;
+	chomp;
+	if ( !m/^Connected/ ) {
+	    print STDERR "$0: cu ha stampato `$_' al posto di `Connected'\n";
+	}
+    }
+
+=head2 Come decifro i file delle password cifrati?
+
+Spendendo molti ma molti soldi in hardware dedicato, ma ciE<ograve>
+farE<agrave> sE<igrave> che si parli male di voi.
+
+Seriamente, non lo potete fare se sono file delle password di Unix--il
+sistema delle password di Unix impiega la cifratura one-way (ad una via).
+E<Egrave> piE<ugrave> simile all'uso di funzioni di hash che alla cifratura.
+La cosa migliore che potete verificare E<egrave> se qualcos'altro E<egrave>
+codificato dalla funzione di hash nella medesima stringa. Non potete far
+tornare un hash alla stringa originale. Programmi come Crack possono
+tentare di indovinare le password con la forza (e in maniera intelligente),
+ma non garantiscono (non lo possono fare) un rapido successo.
+
+Se siete preoccupati per gli utenti che scelgono cattive password, dovreste
+preventivamente controllare quando cambiano la loro password (ad esempio,
+modificando passwd(1)).
+
+=head2 Come faccio a far partire un processo in background?
+
+Diversi moduli possono far partire altri processi che non bloccano il 
+vostro programma Perl. Potete usare IPC::Open3, Parallel::Jobs, IPC::Run
+e alcuni dei moduli POE. Consultate CPAN per maggiori dettagli.
+
+Potete anche usare
+
+    system("cmd &")
+
+oppure potete usare fork come documentato in L<perlfunc/"fork">, con
+ulteriori esempi in L<perlipc>. Alcune cose di cui bisogna essere
+consapevoli, se si E<egrave> su un sistema a-la Unix:
+
+=over 4
+
+=item STDIN, STDOUT, e STDERR sono condivisi
+
+Sia il processo principale che quello messo in background (il processo
+"figlio") condividono gli stessi filehandle di STDIN, STDOUT e STDERR.
+Se entrambi tentano di accedervi contemporaneamente, possono accadere
+strane cose. Magari chiudeteli e riapriteli per il figlio. Potreste eludere
+questo tramite l'<open> di una pipe (si veda L<perlfunc/"open">) ma su
+alcuni sistemi operativi questo significa che il processo figlio non
+puE<ograve> vivere piE<ugrave> a lungo del genitore.
+
+=item Segnali
+
+Dovrete intercettare il segnale SIGCHLD e forse anche SIGPIPE. SIGCHLD
+viene inviato quando il processo in background finisce. SIGPIPE viene
+inviato quando scrivete su un filehandle il cui processo figlio ha chiuso
+(un SIGPIPE non catturato puE<ograve> causare una terminazione silenziosa
+del vostro programma). Questo non E<egrave> un problema con C<system("cmd&")>.
+
+=item Zombie
+
+Dovete essere preparati a "raccogliere" il processo figlio quando finisce.
+
+    $SIG{CHLD} = sub { wait };
+    
+    $SIG{CHLD} = 'IGNORE';
+
+Potete utilizzare anche un doppio fork. Aspetterete immediatamente con il
+wait() il vostro primo figlio, e il demone di init aspetterE<agrave> con
+il wait() vostro nipote una volta che questo E<egrave> uscito.
+
+       unless ($pid = fork) {
+          unless (fork) {
+             exec "cosa vuoi fare realmente";
+             die "exec fallito!";
+	  }
+          exit 0;
+       }
+       waitpid($pid,0);
+
+Consultate L<perlipc/"Signals"> ["Segnali", NdT] per altri esempi di codice per fare questo
+tipo di cose. Gli zombie non sono un problema con C<system("prog &")>.
+
+=back
+
+=head2 Come faccio ad intercettare caratteri/segnali di controllo?
+
+Non si puE<ograve> "intercettare" un carattere di controllo. Quello che
+avviene E<egrave> che il carattere genera un segnale che viene inviato al
+gruppo di processi del terminale in foreground, che potete intercettare nel
+vostro processo. I segnali sono documentati nella sezione L<perlipc/"Signals"> ["Segnali", NdT]
+o nella sezione "Signals" del Camel.
+
+Potete impostare i valori dell'hash %SIG in modo che siano le funzioni che
+volete che si occupano del segnale. Dopo che il perl ha catturato il segnale,
+cerca in %SIG una chiave con lo stesso nome del segnale, poi chiama il valore
+della subroutine per quella chiave.
+
+	# come una subroutine anonima
+	
+	$SIG{INT} = sub { syswrite(STDERR, "ahi\n", 5 ) };
+	
+	# oppure un riferimento ad una funzione
+	
+	$SIG{INT} = \&ahi;
+	
+	# oppure il nome della funzione come una stringa
+	
+	$SIG{INT} = "ahi";
+
+Le versioni di Perl precedenti alla 5.8 avevano nel proprio sorgente C dei gestori
+di segnali che intercettavano il segnale ed, eventualmente, eseguivano una
+funzione Perl da voi messa in %SIG. Questo vE<iacute>ola le regole della gestione dei
+segnali a quel livello causando un core dump del perl. A partire dalla versione
+5.8.0, il perl cerca in %SIG *dopo* che il segnale E<egrave> stato catturato,
+piuttosto che nel mentre il segnale venga catturato. Le precendeti versioni di
+questa domanda erano non corrette.
+
+=head2 Come modifico il file delle shadow password su un sistema Unix?
+
+Se perl E<egrave> correttamente installato sul vostro sistema e la vostra
+libreria shadow propriamente scritta, le funzioni getpwd*() descritte in
+perlfunc dovrebbero teoricamente fornire accesso (in sola lettura) alle voci
+del file delle shadow password. Per modificare il file, createne uno nuovo
+(il formato cambia da sistema a sistema--vedete passwd(5) per le specifiche)
+e servitevi di pwd_mkdb(8) per installarlo (consultate pwd_mkdb(8) per
+ulteriori dettagli).
+
+=head2 Come imposto l'ora e la data?
+
+Ponendo che il vostro programma sia in esecuzione con sufficienti permessi,
+dovreste essere in grado di impostare la data e l'ora del sistema
+eseguendo il programma date(1). (Non E<egrave> possibile impostare l'ora 
+solamente per un processo). Questo sistema funziona sotto Unix, MS-DOS,
+Windows, e NT; l'equivalente VMS E<egrave> set time.
+
+In ogni caso, se volete semplicemente cambiare il vostro fuso orario,
+ve la potete proabilmente cavare impostando una variabile d'ambiente:
+
+    $ENV{TZ} = "MST7MDT";		   # stile unix
+    $ENV{'SYS$TIMEZONE_DIFFERENTIAL'}="-5" # vms
+    system "trn comp.lang.perl.misc";
+
+=head2 Come posso usare sleep() o alarm() per tempi inferiori al secondo?
+
+Se volete una granularitE<agrave> piE<ugrave> fine di quella, pari a un
+secondo, fornita dalla funzione sleep(), il modo piE<ugrave> semplice
+E<egrave> usare la funzione select() come documentato in
+L<perlfunc/"select">. Provate i moduli Time::HiRes e BSD::Itimer
+(disponibili su CPAN, e parte della distribuzione standard a partire da
+Perl 5.8).
+
+=head2 Come posso misurare intervalli di tempo inferiori al secondo?
+
+In generale, potreste non essere in grado di farlo. Il modulo Time::Hires
+(disponibile su CPAN, e parte della distribuzione standard a partire da
+Perl 5.8) fornisce questa funzionalitE<agrave> per alcuni sistemi.
+
+Se il vostro sistema supporta la funzione syscall() in Perl e la chiamata
+di sistema gettimeofday(2), allora potreste esser in grado di fare qualcosa
+del genere:
+
+    require 'sys/syscall.ph';
+
+    $TIMEVAL_T = "LL";
+
+    $fatto = $inizio = pack($TIMEVAL_T, ());
+
+    syscall(&SYS_gettimeofday, $inizio, 0) != -1
+               or die "gettimeofday: $!";
+
+       #################################
+       # FATE LE VOSTRE OPERAZIONI QUI #
+       #################################
+
+    syscall( &SYS_gettimeofday, $fatto, 0) != -1
+           or die "gettimeofday: $!";
+
+    @inizio = unpack($TIMEVAL_T, $inizio);
+    @fatto  = unpack($TIMEVAL_T, $fatto);
+
+    # converte i microsecondi
+    for ($fatto[1], $inizio[1]) { $_ /= 1_000_000 }
+
+    $delta_t = sprintf "%.4f", ($fatto[0]  + $fatto[1]  )
+                                          -
+                               ($inizio[0] + $inizio[1] );
+
+=head2 Come si fa un atexit() o setjmp()/longjmp()? (Gestione delle eccezioni)
+
+La versione 5 del Perl ha aggiunto il blocco END che puE<ograve> essere usato 
+per simulare atexit(). Ogni blocco END di un package viene chiamato 
+quando il programma o il thread termina (consultate L<perlmod> per maggiori 
+dettagli).
+
+Per esempio, potete usare quanto segue per assicurarsi che il vostro
+programma che implementa un filtro possa dare un output senza riempire
+il disco:
+
+     END {
+        close(STDOUT) || die "il close dello STDOUT e` fallito: $!";
+     }
+
+Il blocco END non viene chiamato quando un segnale non catturabile termina
+il programma, quindi se usate dei blocchi END dovreste anche usare
+
+        use sigtrap qw(die normal-signals);
+
+Il meccanismo di gestione delle eccezioni del Perl E<egrave> il suo
+operatore eval(). Potete usare eval() come setjmp e die() come
+longjmp. Per dettagli su questi aspetti consultate la sezione sui segnali,
+specialmente "time-out handler for a blocking flock()" ["gestore di time
+out per un flock() non bloccante", NdT] in L<perlipc/"Signals"> ["Segnali", NdT] o la sezione
+sui "Signals" nel Camel Book.
+
+Se la gestione delle eccezione E<egrave> tutto quello a cui siete 
+interessati, provate la libreria exceptions.pl (parte della distribuzione
+perl standard).
+
+Se volete la sintassi atexit() (come pure quella per rmexit) provate
+il modulo AtExit disponibile su CPAN. 
+
+=head2 PerchE<eacute> i miei programmi con i socket non funzionano su System V (Solaris)? Cosa significa il messaggio di errore "Protocollo non supportato"?
+
+Alcuni sistemi basati su Sys-V, degno di nota Solaris 2.x, ridefiniscono
+alcune delle costanti standard riguardanti i socket. Visto che queste
+erano costanti tra le varie architetture, erano spesso cablate nel codice
+perl. La maniera corretta per affrontare la questione E<egrave> usare "use Socket"
+per ottenere i valori corretti.
+
+Va notato che anche se SunOS e Solaris sono compatibili a livello binario,
+questi valori sono differenti. ChissE<agrave> perchE<eacute>.
+
+=head2 Come posso chiamare da Perl le funzioni univoche del C del mio sistema?
+
+Nella maggior parte dei casi, scrivete un modulo esterno per farlo--consultate 
+la risposta a "Dove posso imparare qualcosa sul linking del
+C con il Perl? [h2xs, xsubpp]". Ad ogni modo, se la funzione E<egrave>
+una chiamata di sistema e il vostro sistema supporta syscall(), potete
+usare la funzione syscall (documentata in L<perlfunc>).
+
+Ricordatevi di controllare i moduli inseriti nella vostra distribuzione, e
+anche CPAN--qualcuno potrebbe aver giE<agrave> scritto un modulo per farlo.
+Su Windows, provate Win32::API. Sui Mac, provate Mac::Carbon. Se nessun
+modulo dispone di un'interfaccia alla funzione C che vi serve, potete
+inserire un po' di C nel vostro sorgente Perl con Inline::C.
+
+=head2 Dove trovo i file include per utilizzare ioctl() o syscall()?
+
+Storicamente, essi erano generati dal programma h2ph, incluso nella
+distribuzione standard di perl. Questo programma converte le direttive
+cpp(1) contenute nei file header C in file contenenti definizioni di
+subroutine, come &SYS_gettimer, che potete usare come argomenti alle
+vostre funzioni. Non funziona perfettamente, ma nella maggior parte dei
+casi risolve i problemi. Semplici file come F<errno.h>, F<syscall.h>, e
+F<socket.h> erano perfetti, ma quelli difficili come F<ioctl.h> avevano
+quasi sempre bisogno di essere modificati a mano. Ecco come si fa ad
+installare i file *.ph:
+
+    1. diventate superuser
+    2. cd /usr/include
+    3. h2ph *.h */*.h
+
+Se il vostro sistema supporta il caricamento dinamico, per ragioni di
+portabilitE<agrave> e sicurezza probabilmente dovreste usare h2xs (anch'esso
+parte della distribuzione standard di perl). Questo programma converte i
+file header C in estensioni Perl. Consultate L<perlxstut> per informazioni
+su come partire con h2xs.
+
+Se il vostro sistema non supporta il caricamento dinamico, probabilmente
+fareste comunque meglio ad utilizzare h2xs. Consultate perlxstut ed
+L<ExtUtils::MakeMaker> per maggiori informazioni (in breve, utilizzate
+B<make perl> al posto di un semplice B<make> per ricompilare perl con
+la nuova estensione statica).
+
+=head2 PerchE<eacute> gli script Perl con setuid lamentano problemi di kernel?
+
+Alcuni sistemi operativi hanno dei bug nel kernel tali da rendere gli
+script con setuid intrinsecamente insicuri. Il Perl fornisce un numero
+di opzioni (descritto in L<perlsec>) per aggirare tali sistemi.
+
+=head2 Come posso aprire una pipe sia da che verso un comando?
+
+Il modulo IPC::Open2 (parte della distribuzione standard del Perl)
+E<egrave> un approccio facile da usare, che internamente usa pipe(),
+fork() e exec() per eseguire il compito. Assicuratevi, perE<ograve>, di
+aver letto gli avvertimenti a proposito dello stallo, nella sua
+documentazione (consultate il manuale di L<IPC::Open2>). Consultate
+L<perlipc/"Bidirection Communication with Another Process"> e
+L<perlipc/"Bidirection Communication with Yourself"> ["Comunicazione
+bidirezionale con un altro processo" e "Comunicazione bidirezionale con
+voi stessi", NdT].
+
+Potreste anche usare il modulo IPC::Open3 (parte della distribuzione perl
+standard) ma siete avvisati che ha un differente ordine degli argomenti
+rispetto a IPC::Open2 (si veda L<IPC::Open3>).
+
+=head2 PerchE<eacute> non riesco ad ottenere l'output di un comando con system()?
+
+State confondendo lo scopo di system() con quello dei backticks (``).
+system() esegue un comando e restituisce l'informazione relativa allo
+stato di uscita (come valore a 16 bit: i 7 bit inferiori rappresentano
+il segnale che ha ucciso il processo, se esiste, e gli 8 bit superiori
+rappresentano l'effettivo valore di uscita). I backticks (``) lanciano
+il comando e restituiscono quello che E<egrave> stato mandato su STDOUT.
+
+     $stato_in_uscita   = system("invia-mail");
+     $stringa_di_output = `ls`;
+
+=head2 Come posso catturare STDERR da un comando esterno?
+
+Ci sono tre modi principali per lanciare comandi esterni:
+
+    system $cmd;            # usando system()
+    $output = `$cmd`;       # usando i backtick (``)
+    open (PIPE, "cmd |");   # usando open()
+
+Con system(), sia STDOUT che STDERR andranno a finire nello stesso posto
+in cui andranno a finire lo STDOUT e lo STDERR dello script, a meno che
+il comando passato a system() non li rediriga. I backtick e open()
+leggono B<soltanto> lo STDOUT del vostro comando.
+
+Potete anche usare la funzione open3() da IPC::Open3. Benjamin
+Goldberg ha fornito del codice di esempio:
+
+Per catturare lo STDOUT di un programma, ma scartare il suo STDERR:
+
+    use IPC::Open3;
+    use File::Spec;
+    use Symbol qw(gensym);
+    open(NULL, ">", File::Spec->devnull);
+    my $pid = open3(gensym, \*PH, ">&NULL", "cmd");
+    while( <PH> ) { }
+    waitpid($pid, 0);
+
+Per catturare lo STDERR di un programma, ma scartare il suo STDOUT:
+
+    use IPC::Open3;
+    use File::Spec;
+    use Symbol qw(gensym);
+    open(NULL, ">", File::Spec->devnull);
+    my $pid = open3(gensym, ">&NULL", \*PH, "cmd");
+    while( <PH> ) { }
+    waitpid($pid, 0);
+
+Per catturare lo STDERR di un programma e far sE<igrave> che il suo STDOUT vada sul nostro STDERR:
+
+    use IPC::Open3;
+    use Symbol qw(gensym);
+    my $pid = open3(gensym, ">&STDERR", \*PH, "cmd");
+    while( <PH> ) { }
+    waitpid($pid, 0);
+
+Per leggere sia lo STDOUT di un comando che il suo STDERR separatamente, potete
+redirezionarli su file temporanei, lasciare che il comando venga eseguito poi leggete
+i file temporanei:
+
+    use IPC::Open3;
+    use Symbol qw(gensym);
+    use IO::File;
+    local *CATTURAOUT = IO::File->new_tmpfile;
+    local *CATTURAERR = IO::File->new_tmpfile;
+    my $pid = open3(gensym, ">&CATTURAOUT", ">&CATTURAERR", "cmd");
+    waitpid($pid, 0);
+    seek $_, 0, 0 for \*CATTURAOUT, \*CATTURAERR;
+    while( <CATTURAOUT> ) {}
+    while( <CATTURAERR> ) {}
+
+Ma non c'E<egrave> un vero motivo affinchE<eacute> *entrambi* siano dei file
+temporanei... quello che segue dovrebbe funzionare allo stesso modo, senza deadlock:
+
+    use IPC::Open3;
+    use Symbol qw(gensym);
+    use IO::File;
+    local *CATTURAERR = IO::File->new_tmpfile;
+    my $pid = open3(gensym, \*CATTURAOUT, ">&CATTURAERR", "cmd");
+    while( <CATTURAOUT> ) {}
+    waitpid($pid, 0);
+    seek CATTURAERR, 0, 0;
+    while( <CATTURAERR> ) {}
+
+E sarE<agrave> anche piE<ugrave> veloce, visto che possiamo iniziare ad
+elaborare immediatamente lo stdout del programma, piuttosto che aspettare
+che il programma finisca.
+
+Con ciascuno di questi, potete modificare il descrittore di file prima 
+della chiamata:
+
+    open(STDOUT, ">logfile");
+    system("ls");
+
+oppure potete usare la redirezione dei descrittori di file della Bourne shell.
+
+    $output = `$cmd 2>un_qualche_file`;
+    open (PIPE, "cmd 2>un_qualche_file |");
+
+Potete anche usare la redirezione dei descrittori di file per rendere STDERR
+un duplicato di STDOUT:
+
+    $output = `$cmd 2>&1`;
+    open (PIPE, "cmd 2>&1 |");
+
+Notate che I<non> si puE<ograve> semplicemente aprire STDERR affinchE<eacute> diventi,
+nel vostro programma, un duplicato di STDOUT, evitando di fare ricorso alla
+shell per effetturare la redirezione. Questo non funziona:
+
+    open(STDERR, ">&STDOUT");
+    $output_completo = `cmd args`;  # stderr continua a sfuggire
+
+Questo fallisce perchE<eacute> open() fa in modo che STDERR vada a finire dove
+andava a finire STDOUT al momento della chiamata a open(). I backtick poi
+fanno in modo che B<solo> STDOUT vada a finire in una stringa, ma non
+modificano STDERR (che continua ad andare laddove andava il vecchio STDOUT).
+
+Notate che per la redirezione, nei backtick, si I<deve> usare la sintassi
+della Bourne shell (sh(1)), non quella di csh(1)! Dettagli sul perchE<eacute>
+la funzione system(), i backtick e le aperture di pipe usino tutte la
+Bourne shell stanno nell'articolo F<versus/csh.whynot> della collezione
+"Far More Than You Ever Wanted To Know" ["Molto piE<ugrave> di quello che avete
+sempre voluto sapere sul Perl", NdT] reperibile all'url
+http://www.cpan.org/misc/olddoc/FMTEYEWTK.tgz . Per catturare allo
+stesso tempo lo STDOUT e lo STDERR di un comando:
+
+    $output = `cmd 2>&1`;           # con i backtick
+    $pid = open(PH, "cmd 2>&1 |");  # o con una pipe
+    while (<PH>) { }                #    con relativa lettura
+
+Per catturare lo STDOUT di un comando, buttando via il suo STDERR:
+
+    $output = `cmd 2>/dev/null`;           # con i backtick
+    $pid = open(PH, "cmd 2>/dev/null |");  # o con una pipe
+    while (<PH>) { }                       #    con relativa lettura
+
+Per catturare lo STDERR di un comando, buttando via il suo STDOUT:
+
+    $output = `cmd 2>&1 1>/dev/null`;           # con i backtick
+    $pid = open(PH, "cmd 2>&1 1>/dev/null |");  # o con una pipe
+    while (<PH>) { }                            #    con relativa lettura
+
+Per scambiare lo STDOUT e lo STDERR di un comando, con lo scopo di
+catturarne lo STDERR lasciando che il suo STDOUT si sostituisca al nostro STDERR:
+
+    $output = `cmd 3>&1 1>&2 2>&3 3>&-`;        # con i backtick
+    $pid = open(PH, "cmd 3>&1 1>&2 2>&3 3>&-|");# o con una pipe
+    while (<PH>) { }                            #    con relativa lettura
+
+Per leggere lo STDOUT e lo STDERR di un comando separatamente, E<egrave>
+piE<ugrave> facile redirigerli su file separatamente,
+e poi leggere da questi file quando il programma E<egrave> terminato:
+
+    system("programma args 1>programma.stdout 2>programma.stderr");
+
+L'ordine E<egrave> importante in tutti questi esempi, poichE<eacute> la
+shell processa le redirezioni di descrittori di file rigorosamente da
+sinistra a destra.
+
+    system("prog args 1>tmpfile 2>&1");
+    system("prog args 2>&1 1>tmpfile");
+
+Il primo comando manda sia lo standard out che lo standard error in un file
+temporaneo. Il secondo comando manda nel file solo il vecchio standard
+output, e il vecchio standard error finisce soltanto nel vecchio
+standard out.
+
+=head2 Come mai open() non restituisce un errore quando l'apertura di una pipe fallisce?
+
+Se il secondo argomento ad una open su pipe contiene metacaratteri della
+shell, perl esegue una fork(), e poi una exec() di una shell per
+decodificare i metacaratteri e poi lanciare il programma desiderato. Se
+il programma non puE<ograve> essere eseguito, il messaggio di errore giunge
+alla shell, non a Perl. Tutto ciE<ograve> che il vostro programma puE<ograve>
+scoprire E<egrave> se E<egrave> stato possibile avviare con successo la
+shell stessa. Tuttavia, potete sempre catturare lo STDERR della shell e
+controllare eventuali messaggi di errore. Consultate L<"Come posso
+catturare STDERR da un comando esterno?"> contenuto sempre in questo
+documento, oppure utilizzate il modulo IPC::Open3.
+
+Se l'argomento di open non contiene metacaratteri della shell, Perl
+esegue direttamente il comando, senza utilizzare la shell, e puE<ograve>
+correttamente riportare se il comando sia partito o meno.
+
+=head2 Cosa c'E<egrave> che non va nell'usare i backtick (apici inversi) in un contesto vuoto?
+
+A rigor di termini, niente. A livello stilistico, non E<egrave> un buon
+modo per scrivere codice manutenibile. Il Perl ha diversi operatori per 
+l'esecuzione di comandi esterni. I backtick sono uno di questi; essi collezionano
+l'output dal comando per usarlo nel vostro progamma. La funzione C<system> E<egrave>
+un'altra; essa non fa cosE<igrave>.
+
+Scrivere backtick nel vostro programma manda un chiaro segnale a coloro
+che leggono il vostro codice che volete raccogliere l'output del comando.
+PerchE<eacute> mandare un chiaro segnale che non E<egrave> vero?
+
+Si consideri questa linea:
+
+    `cat /etc/termcap`;
+
+Avete scordato di controllare C<$?> per vedere se il programma E<egrave> stato anche
+eseguito correttamente. Anche se scrivete
+
+    print `cat /etc/termcap`;
+
+questo potrebbe e probabilmente dovrebbe essere scritto come
+
+    system("cat /etc/termcap") == 0
+        or die "il programm cat non e` andato a buon fine!";
+
+con il quale si otterrE<agrave> l'output velocemente (mentre viene generato,
+invece che soltanto alla fine) e si controlla anche il valore
+restituito.
+
+system() dE<agrave> la possibilitE<agrave> di decidere se la sostituzione dei
+caratteri jolly deve essere effettuata dalla shell, con i backticks
+ciE<ograve> non E<egrave> possibile.
+
+=head2 Come posso utilizzare i backtick senza che avvenga alcuna interpretazione da parte della shell?
+
+La cosa E<egrave> un po' ingannevole. Non potete semplicemente scrivere il
+comando cosE<igrave>:
+
+    @ok = `grep @opzioni '$stringa_di_ricerca' @nomifile`;
+
+Dal Perl 5.8.0, potete usare open() con piE<ugrave> argomenti. Come nel caso
+delle chiamate in formato lista a system() e ad exec(), non avviene
+alcun escape da parte della shell.
+
+    open( GREP, "-|", 'grep', @opzioni, $stringa_di_ricerca, @nomifile );
+    chomp(@ok = );
+    close GREP;
+
+Potete anche fare cosE<igrave>:
+
+    my @ok = ();
+    if (open(GREP, "-|")) {
+        while () {
+            chomp;
+            push(@ok, $_);
+        }
+        close GREP;
+    } else {
+        exec 'grep', @opzioni, $stringa_di_ricerca, @nomifile;
+    }
+
+Come con system(), non si ha un escape da parte della shell nemmeno utilizzando 
+exec() su una lista. Ulteriori esempi si possono trovare in 
+L<perlipc/"Safe Pipe Opens"> ["Aperture Sicure di Pipe", NdT].
+
+Notate che, se utilizzate Microsoft, non E<egrave> possibile alcuna soluzione
+a questo fastidioso problema. Anche se Perl ha la possibilitE<agrave> di
+emulare fork(), non combinate comunque, poichE<eacute> Microsoft non ha una
+API del tipo argc/argv.
+
+=head2 PerchE<eacute> il mio script non riesce a leggere da STDIN dopo che gli ho dato EOF (^D su Unix, ^Z su MS-DOS)?
+
+Alcune librerie stdio impostano un flag eof (fine del file) che ha
+bisogno di essere azzerato. Il modulo POSIX definisce clearerr() che
+puE<ograve> essere utilizzato. Questo E<egrave> tecnicamente il modo
+corretto per farlo. Ci sono perE<ograve> altre scapaptoie meno affidabili:
+
+=over 4
+
+=item 1
+
+Tentare di memorizzare il puntatore della posizione nel file e poi spostarsi su
+di esso, come ad esempio:
+
+    $dove = tell(LOG);
+    seek(LOG, $dove, 0);
+
+=item 2
+
+Se questo non funziona, provare a spostarsi in una parte diversa del
+file e poi di nuovo alla posizione memorizzata.
+
+=item 3
+
+Se questo non funziona, provare a spostarsi in una parte diversa del
+file, leggere qualcosa, e poi spostarsi di nuovo alla posizione memorizzata.
+
+=item 4
+
+Se questo non funziona, lasciar perdere la libreria stdio e utilizzare sysread.
+
+=back
+
+=head2 Come posso convertire il mio script della shell in perl?
+
+Imparate Perl e riscrivetelo. Seriamente, non c'E<egrave> un convertitore
+semplice. Le cose che nella shell risultano difficili da fare sono
+facili in Perl, e questa difficoltE<agrave> E<egrave> ciE<ograve> che
+rende quasi impossibile la scrittura di un convertitore shell->perl.
+Riscrivendo il codice, penserete a ciE<ograve> che state veramente
+cercando di fare, e (si spera) riuscirete ad uscire dal paradigma del
+flusso di dati in pipeline della shell che, sebbene sia conveniente in
+certi casi, E<egrave> origine di molte inefficienze.
+
+=head2 Posso usare perl per effettuare una sessione telnet o ftp?
+
+Provate i moduli Net::FTP, TCP::Client e Net::Telnet (disponibili
+su CPAN). Anche http://www.cpan.org/scripts/netstuff/telnet.emul.shar
+vi aiuterE<agrave> nel simulare il protocollo telnet ma Net::Telnet
+E<egrave> davvero piE<ugrave> facile da usare..
+
+Se tutto quello che si vuole fare E<egrave> simulare l'azione di un
+telnet ma non si necessita dell'iniziale procedura di handshake, allora
+l'approccio standard a due processi sarE<agrave> sufficiente:
+
+    use IO::Socket;             # nuovo nel 5.004
+    $handle = IO::Socket::INET->new('www.perl.com:80')
+        || die "non posso connettermi alla porta 80 su www.perl.com: $!";
+    $handle->autoflush(1);
+    if (fork()) {               # XXX: undef vuol dire fallimento
+         select($handle);
+         print while <STDIN>;   # tutto dallo stdin al socket
+    } else {
+        print while <$handle>;  # tutto dal socket allo stdout
+    }
+    close $handle;
+    exit; 
+
+=head2 Come faccio a scrivere expect in Perl?
+
+Tanto tempo fa c'era una libreria chiamata chat2.pl (parte della
+distribuzione standard del Perl), che non E<egrave> mai stata realmente
+finita. Se la trovate da qualche parte, I<non usatela>. Al giorno d'oggi la
+cosa migliore E<egrave> dare un'occhiata al modulo Expect che si trova
+su CPAN, il quale richiede altri due moduli da CPAN, IO::Pty e IO::Stty.
+
+=head2 C'E<egrave> un modo per nascondere la linea di comando di perl da programmi quali "ps"?
+
+Notate prima di tutto che se lo state facendo per ragioni di sicurezza
+(per evitare, ad esempio, che le persone possano vedere le password),
+allora dovreste riscrivere i vostri programmi in maniera tale da
+non passare mai come argomento l'informazione sensibile. Nascondere gli
+argomenti non renderE<agrave> il vostro programma completamente sicuro.
+
+Per alterare effettivamente la visibilitE<agrave> della linea di comando,
+potete fare un assegnamento alla variabile $0, come documentato
+in L<perlvar>. PerE<ograve> questo non funzionerE<agrave> su tutti i
+sistemi operativi. I programmi di tipo demone come sendmail pongono il
+proprio stato lE<igrave>, come in:
+
+     $0 = "demone [si accettano connessioni]";
+
+=head2 Ho {cambiato directory, modificato l'ambiente} in uno script perl. Come mai la modifica E<egrave> svanita quando lo script E<egrave> terminato? Come posso rendere visibili i miei cambiamenti?
+
+=over 4
+
+=item Unix
+
+In senso stretto, non puE<ograve> essere fatto--lo script viene eseguito
+come un processo differente da quello della shell da cui E<egrave> partito.
+I cambiamenti di un processo non si riflettono al processo genitore--solo in
+ogni processo figlio creato dopo il cambiamento. C'E<egrave> una magia
+della shell che permette di aggirare questo mediante l'eval() dell'output
+dello script nella vostra shell; per i dettagli controllate la FAQ di
+comp.unix.questions .
+
+=back
+
+=head2 Come chiudo il filehandle di un processo senza aspettare che questo sia completato?
+
+Assumendo che il vostro sistema supporti questo tipo di cose, mandate
+semplicemente un segnale appropriato al processo (consultate L<perlfunc/"kill">).
+E<Egrave> comune mandare prima una segnale TERM, aspettare qualche istante e poi
+mandare un segnale KILL per terminarlo.
+
+=head2 Come effettuo il fork di un processo demone?
+
+Se per processo demone intendete un processo detached (dissociato dal
+proprio tty) allora il metodo descritto qui sotto funziona con la maggior
+parte dei sistemi di tipo Unix. Gli utilizzatori di sistemi operativi
+diversi dovrebbero consulatare la documentazione del modulo
+Vostro_SO::Process per altre soluzioni.
+
+=over 4
+
+=item *
+
+Aprite /dev/tty ed applicategli TIOCNOTTY ioctl. Consultate tty(4)
+per i dettagli. Meglio ancora, potete utilizzare semplicemente la
+funzione POSIX::setsid(), il che eviterE<agrave> di dovervi
+preoccupare dei gruppi di processi.
+
+=item *
+
+Cambiate la directory a /
+
+=item *
+
+Riaprite STDIN, STDOUT e STDERR di modo che non siano piE<ugrave>
+connessi al vecchio tty
+
+=item *
+
+Passate in background eseguendo:
+
+    fork && exit;  
+
+=back
+
+Il modulo Proc::Daemon, disponibile su CPAN, fornisce una funzione che
+esegue tutte queste operazioni per voi.
+
+=head2 Come faccio a sapere se sono un processo interattivo o no?
+
+Bella domanda. A volte C<-t STDIN> e C<-t STDOUT> possono aiutare, altre
+volte no.
+
+    if(-t STDIN && -t STDOUT) {
+        print "Ed ora? ";
+    }
+
+Su sistemi POSIX, potete verificare che il vostro gruppo di processi sia lo
+stesso del terminale di controllo; esempio: 
+
+    use POSIX qw/getpgrp tcgetpgrp/;
+    open(TTY, "/dev/tty") or die $!;
+    $tpgrp = tcgetpgrp(TTY);
+    $pgrp = getpgrp();
+    if ($tpgrp == $pgrp) {
+        print "interattivo";
+    } else {
+        print "non interattivo";
+    } 
+
+=head2 Come faccio a far scadere un evento lento?
+
+Usate la funzione alarm(), verosimilmente assieme ad un gestore di segnali,
+come documentato in L<perlipc/"Signals"> ["Segnali", NdT] e nella sezione
+sui "Signals" nel Camel. Potreste usare al suo posto il piE<ugrave>
+flessibile modulo Sys::AlarmCall, disponibile su CPAN.
+
+La funzione alarm() non E<egrave> implementata in tutte le versioni di Windows.
+Controllate la documentazione relativa alla vostra specifica versione di Perl.
+
+=head2 Come si impostano i limiti di utilizzo della CPU?
+
+Usate il modulo BSD::Resource da CPAN.
+
+=head2 Come evito gli zombie su di un sistema Unix?
+
+Usate il codice raccoglitore tratto da L<perlipc/"Signals"> ["Segnali", NdT]
+per chiamare wait() quando viene ricevuto un SIGCHLD oppure usate la
+tecnica di double-fork descritta in L<perlfaq8/"How do I start a process
+in the background?"> ["Come faccio a far partire un processo in background?", NdT].
+
+=head2 Come faccio ad usare un database SQL?
+
+Il modulo DBI fornisce una interfaccia astratta a molti server e tipi
+di database, inclusi Oracle, DB2, Sybase, mysql, Postresql, ODBC e
+semplici file. Il modulo DBI accede ogni tipo di database attraverso un
+driver di database detto DBD. Potete vedere una lista completa dei driver
+disponibili su CPAN: http://www.cpan.org/modules/by-module/DBD/ .
+Potete leggere di piE<ugrave> riguardo a DBI su http://dbi.perl.org .
+
+Altri moduli che forniscono un accesso piE<ugrave> specifico: Win32::ODBC, 
+Alzabo, iodbc ed altri che si trovano su CPAN Search: http://search.cpan.org .
+
+=head2 Come faccio a fare uscire una system() su un control-c?
+
+Non si puE<ograve>. Dovete imitare la chiamata system (consultate
+L<perlipc> per del codice di esempio) e poi avere un signal handler
+[gestore di segnale, NdT] per il segnale INT, che passi il segnale ai
+sottoprocessi. Oppure lo potete verificare:
+
+     $rc = system($cmd);
+     if ($rc & 127) { die "segnale mortale" }
+
+=head2 Come faccio ad aprire un file senza bloccarlo?
+
+Se siete abbastanza fortunati da usare un sistema che supporta la lettura
+non bloccante (lo supportano molti sistemi a-la Unix), avete bisogno
+soltanto dei flag O_NDELAY oppure O_NONBLOCK dal modulo Fcntl in
+combinazione con sysopen():
+
+    use Fcntl;
+    sysopen(FH, "/pippo/unqualchefile", O_WRONLY|O_NDELAY|O_CREAT, 0644)
+        or die "non posso aprire /pippo/unqualchefile: $!";
+
+=head2 Come riconosco la differenza tra errori dalla shell e perl?
+
+(risposta fornita da brian d foy, C<< <bdfoy@cpan.org> >>
+
+Quando eseguite uno script Perl, qualcos'altro sta eseguendo lo script per voi e 
+questo qualcos'altro potrebbe dare in output dei messaggi d'errore. Lo script 
+potrebbe emettere i propri avvertimenti e messaggi d'errore. Per la maggior 
+parte del tempo non potrete distinguere chi sta dicendo cosa.
+
+Probabilmente non potete mettere a posto la cosa che esegue il per ma 
+potete cambiare come il perl manda in output i suoi avvertimenti definendo delle 
+funzioni warning e die su misura.
+
+Considerate questo script che ha un errore che potreste non notare immediatamente.
+
+	#!/usr/locl/bin/perl
+
+	print "Ciao Mondo\n";
+
+Ho ottenuto un errore quando l'ho eseguito dalla shell (si dE<agrave> il caso sia bash).
+Potrebbe sembrare che il perl abbia dimenticato di avere una funzione print(), ma la mia 
+shebang non E<egrave> il percorso al perl, dunque la shell esegue lo script ed ottengo 
+l'errore.
+
+	$ ./test
+	./test: line 3: print: command not found
+
+[./test: linea3: print: comando non trovato, NdT]
+
+Una correzione alla buona implica un po' di codice, ma questo potrebbe essere 
+tutto quello che vi occorre per risolvere il problema.
+
+	#!/usr/bin/perl -w
+	
+	BEGIN {
+	$SIG{__WARN__} = sub{ print STDERR "Perl: ", @_; };
+	$SIG{__DIE__}  = sub{ print STDERR "Perl: ", @_; exit 1};
+	}
+	
+	$a = 1 + undef;
+	$x / 0;
+	__END__
+
+Il messaggio perl viene fuori con davanti "Perl". Il blocco BEGIN 
+funziona a tempo di compilazione cosicchE<eacute> anche tutti gli errori di compilazione e i 
+warning ottengano il prefisso "Perl:".
+
+	Perl: Useless use of division (/) in void context at ./test line 9.
+	Perl: Name "main::a" used only once: possible typo at ./test line 8.
+	Perl: Name "main::x" used only once: possible typo at ./test line 9.
+	Perl: Use of uninitialized value in addition (+) at ./test line 8.
+	Perl: Use of uninitialized value in division (/) at ./test line 9.
+	Perl: Illegal division by zero at ./test line 9.
+	Perl: Illegal division by zero at -e line 3.
+
+[
+	Perl: Utilizzo inutile della divisione (/) in un contesto vuoto in ./test alla linea 9.
+	Perl: Nome "main::a" usato solo una volta: possibile errore di battitura in ./test alla linea 8.
+	Perl: Nome "main::x" usato solo una volta: possibile errore di battitura in ./test alla linea 9.
+	Perl: Uso di un valore non inizializzato nell'addizione (+) in ./test alla linea 8.
+	Perl: Uso di un valore non inizializzato nella divisione (/) in ./test alla linea 9.
+	Perl: Divisione per zero illegale in ./test alla linea 9.
+	Perl: Divisione per zero illegale in ./test alla linea 3.
+
+,NdT]
+
+Se non vedete quel "Perl:", non viene dal perl.
+
+Potreste anche conoscere proprio tutti gli errori del perl e benchE<eacute> 
+ci sia qualcuno che potrebbe conoscerli tutti, probabilmente voi no. Ad ogni modo, 
+dovrebbero essere tutti nella manpage perldiag. Se non vi trovate l'errore, 
+probabilmente non E<egrave> un errore del perl.
+
+Cercare ogni messaggio non E<egrave> la maniera piE<ugrave> semplice, dunque lasciate 
+che il perl lo faccia per voi. Usate la direttiva diagnostics che converte i normali 
+messaggi del per in lunghe discussioni sull'argomento.
+
+	use diagnostics;
+
+Se non ottenete un paragrafo o due due di un'ampia discussione, potrebbe non essere 
+stato un messaggio del perl.
+
+=head2 Come installo un modulo da CPAN?
+
+La maniera piE<ugrave> semplice E<egrave> avere un modulo anch'esso
+chiamato CPAN, che lo fa per voi. Questo modulo viene fornito con la
+versione del perl 5.004 e successive.
+
+    $ perl -MCPAN -e shell
+
+    cpan shell -- CPAN exploration and modules installation (v1.59_54)
+    ReadLine support enabled
+
+    cpan> install Unqualche::Modulo
+
+[shell di cpan - esplorazione e installazione di moduli CPAN (v1.59_54).
+Il supporto a Readline E<egrave> abilitato, NdT]
+
+Per installare manualmente il modulo CPAN o comunque qualsiasi modulo di
+CPAN ben educato, seguite questi passaggi:
+
+=over 4
+
+=item 1
+
+Decomprimete i sorgenti in una zona temporanea.
+
+=item 2
+
+    perl Makefile.PL
+
+=item 3
+
+    make
+
+=item 4
+
+    make test
+
+=item 5
+
+    make install
+
+=back
+
+Se la vostra versione del perl E<egrave> compilata senza caricamento
+dinamico, allora dovete semplicemente rimpiazzare il passo 3 (B<make>)
+con B<make perl> e otterrete una nuova versione binaria di F<perl> con
+la vostra estensione linkata in esso.
+
+Consultate L<ExtUtils::MakeMaker> per maggiori dettagli sulle estensione di
+configurazione. Si veda anche la domanda successiva, "Qual E<egrave> la
+differenza tra require e use?".
+
+=head2 Qual E<egrave> la differenza tra require e use?
+
+Perl offre parecchi modi diversi per includere in un file il codice contenuto
+in un altro file. Ecco le differenze fra i vari costrutti di inclusione:
+
+    1)  do $file e` come eval `cat $file`, ma il primo
+        1.1) cerca in @INC e aggiorna %INC.
+        1.2) tramanda uno scope lessicale *non correlato* sul codice compilato da eval.
+
+    2)  require $file e` come do $file, ma il primo
+        2.1) verifica la ridondanza nel caricamento, saltando i file che sono gia` stati inclusi.
+        2.2) eleva un'eccezione se non riesce a trovare, compilare o eseguire $file.
+
+    3)  require Modulo e` come require "Modulo.pm", ma il primo
+        3.1) traduce ogni "::" nel carattere di separazione delle directory definito sul sistema.
+        3.2) prepara l'analizzatore sintattico a dirimere le ambiguita` della classe Modulo come oggetto indiretto.
+
+    4)  use Modulo e` come require Modulo, ma il primo
+        4.1) carica il modulo durante la compilazione del programma, non durante l'esecuzione.
+        4.2) importa i simboli e le semantiche dal package dentro quello corrente.
+
+In generale, quello che vi servirE<agrave> piE<ugrave> di frequente
+sarE<agrave> C<use> e un modulo Perl appropriato.
+
+=head2 Come gestisco la mia directory dei moduli/librerie?
+
+Quando configurate dei moduli, usate le opzioni PREFIX e LIB quando generate i Makefile:
+
+    perl Makefile.PL PREFIX=/io/miadir/perl LIB=/mydir/perl/lib
+
+poi o impostate la variabile d'ambiente PERL5LIB prima di eseguire script
+che usano i moduli/librerie (consultate L<perlrun>) oppure dichiarate
+
+    use lib '/miadir/perl/lib';
+
+Che E<egrave> quasi lo stesso di
+
+    BEGIN {
+           unshift(@INC, '/miadir/perl/lib');
+    }
+
+eccetto che il modulo lib controlla le directory dipendenti
+dall'architettura. Consultate la L<lib> di Perl per maggiori informazioni.
+
+=head2 Come faccio ad aggiungere la directory dove si trova il mio programma, al path di ricerca dei moduli/librerie?
+
+    use FindBin;
+    use lib "$FindBin::Bin";
+    use i_vostri_moduli; 
+
+=head2 Come faccio ad aggiungere una directory al mio path di inclusione (@INC), a tempo di esecuzione?
+
+Ecco i modi consigliati per modificare il vostro path di inclusione:
+
+    la variabile d'ambiente PERLLIB
+    la variabile d'ambiente PERL5LIB
+    il flag a riga di comando del perl -Idir
+    la direttiva use lib, come in
+        use lib "$ENV{HOME}/lamia_perllib";
+
+L'ultima E<egrave> particolarmente utile perchE<eacute> E<egrave> a
+conoscenza degli aspetti architetturali dipendenti dalla macchina. Il
+modulo di direttive lib.pm E<egrave> stato incluso per la prima volta con
+la versione 5.002 del Perl.
+
+=head2 Cos'E<egrave> socket.ph e dove posso trovarlo?
+
+E<Egrave> un file con lo stile del perl4 che definisce i valori per le costanti
+di sistema relative alle reti. Talvolta viene formato utilizzando h2ph quando
+il Perl viene installato, ma altre volte no. I moderni programmi invece
+utilizzano il modulo Socket (C<use Socket;>).
+
+=head1 AUTORE E COPYRIGHT
+
+Copyright (c) 1997-2006 Tom Christiansen, Nathan Torkington e altri autori menzionati.
+Tutti i diritti riservati.
+
+Questa documentazione E<egrave> libera; potete ridistribuirla e/o modificarla
+secondo gli stessi termini applicati al Perl.
+
+Indipendentemente dalle modalitE<agrave> di distribuzione, tutti gli esempi di
+codice in questo file sono rilasciati al pubblico dominio. Potete, e siete
+incoraggiati a farlo, utilizzare il presente codice o qualunque forma
+derivata da esso nei vostri programmi per divertimento o per profitto.
+Un semplice commento nel codice che dia riconoscimento alle FAQ sarebbe
+cortese ma non E<egrave> obbligatorio.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlfaq8
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Michele Beltrame.
+
+=head2 Revisore
+
+Revisione a cura di dree.
+
+=cut

@@ -1,0 +1,48 @@
+---
+abstract: 'tidy perl files in Komodo with a project rc'
+author:
+  - 'Christian Walde <walde.christian@googlemail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::InDistDir: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Tidy-Komodo
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Perl::Tidy::Komodo:
+    file: lib/Perl/Tidy/Komodo.pm
+    version: '1.151340'
+requires:
+  File::chdir: '0'
+  Perl::Tidy: '0'
+  perl: '5.006'
+  strictures: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Tidy-Komodo
+  homepage: https://github.com/wchristian/perl-tidy-komodo
+  repository: https://github.com/wchristian/perl-tidy-komodo.git
+version: '1.151340'

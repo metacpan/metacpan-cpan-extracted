@@ -1,0 +1,10 @@
+Perldoc::Server - Local Perl Documentation
+
+Based on http://perldoc.perl.org, Perldoc::Server is a documentation browser
+for your own Perl installation.
+
+After installing, run
+
+  perldoc-server
+  
+(installed to your Perl bin/ directory) then browse to http://localhost:7375

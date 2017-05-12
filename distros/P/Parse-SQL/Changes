@@ -1,0 +1,7 @@
+Revision history for Parse-SQL
+
+0.002     2011-10-27 08:41:26 Europe/London
+	parent.pm is not a core module, include it in the dependency list
+
+0.001     2011-10-26 04:17:31 Europe/London
+	Initial CPAN release

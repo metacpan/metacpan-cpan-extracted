@@ -1,0 +1,12 @@
+# $Id: MANIFEST,v 1.3 2000/11/24 04:46:44 jgoff Exp $
+CHANGES
+UserBase.pm
+MANIFEST
+Makefile.PL
+README
+t/01_basic.t
+t/02_file.t
+t/03_dbi.t
+t/files/plain
+samples/tutorial-chat.perl
+samples/auth.file

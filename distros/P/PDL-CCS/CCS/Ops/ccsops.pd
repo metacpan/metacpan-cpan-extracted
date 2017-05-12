@@ -1,0 +1,270 @@
+##-*- Mode: CPerl -*-
+
+##======================================================================
+## Header Administrivia
+##======================================================================
+
+use PDL::VectorValued::Dev;
+my $VERSION = '1.23.3'; ##-- update with perl-reversion from Perl::Version module
+pp_setversion($VERSION);
+
+##------------------------------------------------------
+## pm headers
+pp_addpm({At=>'Top'},<<'EOPM');
+
+#use PDL::CCS::Version;
+use strict;
+
+=pod
+
+=head1 NAME
+
+PDL::CCS::Ops - Low-level binary operations for compressed storage sparse PDLs
+
+=head1 SYNOPSIS
+
+ use PDL;
+ use PDL::CCS::Utils;
+
+ ##---------------------------------------------------------------------
+ ## ... stuff happens
+
+=cut
+
+EOPM
+## /pm additions
+##------------------------------------------------------
+
+##------------------------------------------------------
+## Exports: None
+#pp_export_nothing();
+
+##------------------------------------------------------
+## Includes / defines
+pp_addhdr(<<'EOH');
+EOH
+
+##------------------------------------------------------
+## index datatype
+require "../Config.pm";
+our $INDX = $PDL::CCS::Config::ccsConfig{INDX_SIG};
+pp_addpm( $PDL::CCS::Config::ccsConfig{INDX_FUNCDEF} );
+pp_addhdr( $PDL::CCS::Config::ccsConfig{INDX_TYPEDEF} );
+
+
+##======================================================================
+## C Utilities
+##======================================================================
+# (none)
+
+##======================================================================
+## PDL::PP Wrappers
+##======================================================================
+
+
+##======================================================================
+## Operations: Binary: ALIGN: missing-is-annihilator
+##======================================================================
+
+vvpp_def
+  ('ccs_binop_align_block_mia',
+   Pars => ("\n    "
+	    .join("\n    ",
+		  "$INDX\ ixa(Ndims,NnzA); $INDX\ ixb(Ndims,NnzB); $INDX\    istate(State);",
+		  "$INDX\ [o]nzai(NnzC);   $INDX\ [o]nzbi(NnzC);   $INDX\ [o]ostate(State);",
+		  '')),
+   Code =>
+(q(
+ CCS_Indx sizeNnzA=$SIZE(NnzA), sizeNnzB=$SIZE(NnzB), sizeNnzC=$SIZE(NnzC);
+ CCS_Indx nnzai=0, nnzbi=0,nnzbi0, nnzci=0, nnzai_nxt=0,nnzbi_nxt=0,nnzci_nxt=0;
+ CCS_Indx cmpme1,cmpme2;
+ int cmpval=0;
+ //
+ //-- initialize: parse istate() [ nnzai,nnzai_nxt, nnzbi,nnzbi_nxt, nnzci,nnzci_nxt, cmpval ]
+ if ($SIZE(State) >= 7) {
+   nnzai     = $istate(State=>0);
+   nnzai_nxt = $istate(State=>1);
+   nnzbi     = $istate(State=>2);
+   nnzbi_nxt = $istate(State=>3);
+   nnzci     = $istate(State=>4);
+   nnzci_nxt = $istate(State=>5);
+   cmpval    = $istate(State=>6);
+ }
+ //
+ //-- main loop: start at current nnzai,nnzbi,nnzci
+ for ( ; nnzai<sizeNnzA && nnzbi<sizeNnzB && nnzci_nxt<=sizeNnzC; ) {
+   //
+   //-- dispatch on cached cmpval for current index-runs (nnzai..nnzai_nxt),(nnzbi..nnzbi_nxt)
+   if (cmpval < 0) {
+     //-- CASE ixa(,ai) < ixb(,bi) : INSERT ( ixa(,ai) => (ixa(,ai) . -1) ); INCR(ai);
+     //-- increment ai: detect next run-length
+     for (nnzai=nnzai_nxt, nnzai_nxt=nnzai+1; nnzai_nxt<sizeNnzA; nnzai_nxt++) {
+       $CMPVEC('$ixa(NnzA=>nnzai)','$ixa(NnzA=>nnzai_nxt)','Ndims','cmpval',var1=>'cmpme1',var2=>'cmpme2');
+       if (cmpval != 0) break;
+     }
+   }
+   else if (cmpval > 0) {
+     //-- CASE ixa(,ai) > ixb(,bi) : INSERT ( ixb(,bi) => (-1 . ixb(,bi)) ); INCR(bi);
+     //-- increment bi: detect next run-length
+     for (nnzbi=nnzbi_nxt, nnzbi_nxt=nnzbi+1; nnzbi_nxt<sizeNnzB; nnzbi_nxt++) {
+       $CMPVEC('$ixb(NnzB=>nnzbi)','$ixb(NnzB=>nnzbi_nxt)','Ndims','cmpval',var1=>'cmpme1',var2=>'cmpme2');
+       if (cmpval != 0) break;
+     }
+   }
+   else {
+     //-- CASE ixa(,ai) == ixb(,bi) : INSERT ( ixa(,ai) => (ixa(,ai) . ixb(,bi)) ); INCR(ai); INCR(bi);
+     for (nnzbi0=nnzbi; nnzai<nnzai_nxt; nnzai++) {
+       for (nnzbi=nnzbi0; nnzbi<nnzbi_nxt; nnzbi++, nnzci++) {
+	 $nzai(NnzC=>nnzci) = nnzai;
+	 $nzbi(NnzC=>nnzci) = nnzbi;
+       }
+     }
+     //-- increment ai,bi: detect next run-lengths
+     for (nnzai_nxt=nnzai+1; nnzai_nxt<sizeNnzA; nnzai_nxt++) {
+       $CMPVEC('$ixa(NnzA=>nnzai)','$ixa(NnzA=>nnzai_nxt)','Ndims','cmpval',var1=>'cmpme1',var2=>'cmpme2');
+       if (cmpval != 0) break;
+     }
+     for (nnzbi_nxt=nnzbi+1; nnzbi_nxt<sizeNnzB; nnzbi_nxt++) {
+       $CMPVEC('$ixb(NnzB=>nnzbi)','$ixb(NnzB=>nnzbi_nxt)','Ndims','cmpval',var1=>'cmpme1',var2=>'cmpme2');
+       if (cmpval != 0) break;
+     }
+   }
+   //
+   //-- compare current index-run values
+   $CMPVEC('$ixa(NnzA=>nnzai)','$ixb(NnzB=>nnzbi)','Ndims','cmpval',var1=>'cmpme1',var2=>'cmpme2');
+   if      (cmpval < 0) { nnzci_nxt = nnzci + (nnzai_nxt-nnzai); }
+   else if (cmpval > 0) { nnzci_nxt = nnzci + (nnzbi_nxt-nnzbi); }
+   else                 { nnzci_nxt = nnzci + (nnzai_nxt-nnzai)*(nnzbi_nxt-nnzbi); }
+ } //-- end main loop
+ //
+ //-- gobble leftovers
+ if (nnzci_nxt < sizeNnzC) {
+   nnzai = nnzai_nxt = sizeNnzA;
+   nnzbi = nnzbi_nxt = sizeNnzB;
+   nnzci_nxt = nnzci;
+ }
+ //
+ //-- save state
+ if ($SIZE(State) >= 7) {
+   $ostate(State=>0) = nnzai;
+   $ostate(State=>1) = nnzai_nxt;
+   $ostate(State=>2) = nnzbi;
+   $ostate(State=>3) = nnzbi_nxt;
+   $ostate(State=>4) = nnzci;
+   $ostate(State=>5) = nnzci_nxt;
+   $ostate(State=>6) = cmpval;
+ }
+)),
+  Doc =>
+(q{
+Partially aligns a pair of lexicographically sorted index-vector lists C<$ixa()> and C<$ixb()>,
+e.g. for block-wise incremental computation of binary operations over sparse index-encoded PDLs,
+assuming missing indices correspond to annihilators.
+
+On return, the vectors C<$nzai> and C<$nzbi> hold indices into C<NnzA> and C<NnzB>
+respectively, and are constructed such that:
+
+ ($ixa(,$nzai->slice("0:$nzci_max")) == $ixb(,$nzbi->slice("0:$nzci_max"))
+
+At most C<NnzC> alignments are performed, and alignment ceases
+as soon as any of the PDLs C<$ixa()>, C<$ixb()>, C<$nzai()>, or C<$nzbi()>
+has been exhausted.
+
+The parameters C<$istate()> and C<$ostate()> hold the state of the algorithm,
+for incremental block-wise computation at the perl level.  Each state PDL
+is a 7-element PDL containting the following values:
+
+ INDEX LABEL       DESCRIPTION
+ -----------------------------------------------------------------------
+   0   nnzai       minimum offset in NnzA of current $ixa() value
+   1   nnzai_nxt   minimum offset in NnzA of next $ixa() value
+   2   nnzbi       minimum offset in NnzB of current $ixb() value
+   3   nnzbi_nxt   minimum offset in NnzB of next $ixb() value
+   4   nnzci       minimum offset in NnzC of current ($ixa(),$ixb()) value pair
+   5   nnzci_nxt   minimum offset in NnzC of next ($ixa(),$ixb()) value pair
+   6   cmpval      3-way comparison value for current ($ixa(),$ixb()) value pair
+
+For computation of the first block, $istate() can be safely set to C<zeroes(long,7)>.
+
+Repetitions may occur in input index PDLs C<$ixa()> and C<$ixb()>.
+If an index-match occurs on such a "run", I<all pairs> of matching values are
+added to the output PDLs.
+
+All alignments have been performed if:
+
+ $ostate(0)==$NnzA && $ostate(1)==$NnzB
+
+B<WARNING:> this alignment method ignores index-vectors which are not present
+in I<both> C<$ixa()> and C<$ixb()>, which is a Good Thing if your are feeding
+the aligned values into an operation for which missing values are annihilators:
+
+ $missinga * $bval     == ($missinga * $missingb)  for each $bval \in $b, and
+ $aval     * $missingb == ($missinga * $missingb)  for each $aval \in $a
+
+This ought to be the case for all operations if missing values are C<BAD> (see L<PDL::Bad>),
+but might cause unexpected results if e.g. missing values are zero and the operation
+in question is addition.
+
+}),
+
+ ); ##--/ccs_binop_align_block_mia
+
+
+
+##======================================================================
+## Footer Administrivia
+##======================================================================
+
+##------------------------------------------------------
+## pm additions: footer
+pp_addpm(<<'EOPM');
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+Perl by Larry Wall.
+
+PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
+
+=cut
+
+##----------------------------------------------------------------------
+=pod
+
+=head1 KNOWN BUGS
+
+No support for (pseudo)-threading.
+
+=cut
+
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head2 Copyright Policy
+
+All other parts Copyright (C) 2007-2013, Bryan Jurish. All rights reserved.
+
+This package is free software, and entirely without warranty.
+You may redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1), PDL(3perl)
+
+=cut
+
+EOPM
+
+
+# Always make sure that you finish your PP declarations with
+# pp_done
+pp_done();
+##----------------------------------------------------------------------

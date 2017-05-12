@@ -1,0 +1,10 @@
+# Suite Script to run all individual test scripts
+
+RunDir	scripts
+
+# or to be explicit
+
+#Run	scripts/test_addition.pact
+#Run	scripts/test_subtraction.pact
+#Run	scripts/test_multiplication.pact
+#Run	scripts/test_division.pact

@@ -1,0 +1,11 @@
+use Parse::RecDescent;  
+my $teststr="blah1,blah2(blah3,blah4(blah5,blah6(blah7))),blah8";  
+my $grammar = q {
+ list: <leftop: item ',' item> 
+ item: word '(' list ')' <commit>
+     | word 
+ word: /\w+/  
+};  
+my $parser = new Parse::RecDescent ($grammar) or die "Bad grammar!\n";
+
+defined $parser->list($teststr) or print "Bad text!\n";

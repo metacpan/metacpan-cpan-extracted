@@ -1,0 +1,109 @@
+#! perl
+use strict;
+use warnings;
+use File::Basename;
+use Perl::PrereqInstaller;
+use Getopt::Long;
+
+=head1 NAME
+
+install-perl-prereqs - Install missing modules explicitly
+loaded in Perl files
+
+=head1 VERSION
+
+Version 0.6.2
+
+=head1 SYNOPSIS
+
+    install-perl-prereqs FILE_OR_DIR [FILE_OR_DIR ...]
+        -h, --help
+        -d, --dry-run
+        -q, --quiet
+        -v, --version
+
+=head1 AUTHOR
+
+Michael F. Covington, <mfcovington@gmail.com>
+
+=head1 BUGS
+
+Please report any bugs or feature requests at
+L<https://github.com/mfcovington/Perl-PrereqInstaller/issues>.
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2014 Michael F. Covington.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+=cut
+
+my ( $help, $dry_run, $quiet, $version );
+
+my $options = GetOptions(
+    "help"    => \$help,
+    "dry-run" => \$dry_run,
+    "quiet"   => \$quiet,
+    "version" => \$version,
+);
+
+my @paths = @ARGV;
+
+my $script_path = $0;
+my $script_name = fileparse $script_path;
+
+if ( defined $version ) {
+    die "$script_name v$Perl::PrereqInstaller::VERSION\n";
+}
+
+my $usage = <<EOF;
+
+Usage: $script_name FILE_OR_DIR [FILE_OR_DIR ...]
+    -h, --help
+    -d, --dry-run
+    -q, --quiet
+    -v, --version
+
+Please report bugs or feature requests: https://github.com/mfcovington/Perl-PrereqInstaller/issues
+
+EOF
+
+die $usage if defined $help;
+die $usage if scalar @paths == 0;
+
+my $installer = Perl::PrereqInstaller->new;
+$installer->quiet(1) if $quiet;
+$installer->scan(@paths);
+
+$installer->report(
+    {   'not_installed'        => 1,
+        'previously_installed' => 1,
+        'newly_installed'      => 0,
+        'failed_install'       => 0,
+        'scan_errors'          => 1,
+        'scan_warnings'        => 0,
+    }
+);
+
+exit if $dry_run;
+
+$installer->cpanm;
+my @results = ( $installer->newly_installed, $installer->failed_install );
+print "\n" if scalar @results;
+
+$installer->report(
+    {   'not_installed'        => 0,
+        'previously_installed' => 0,
+        'newly_installed'      => 1,
+        'failed_install'       => 1,
+        'scan_errors'          => 0,
+        'scan_warnings'        => 0,
+    }
+);
+
+exit;

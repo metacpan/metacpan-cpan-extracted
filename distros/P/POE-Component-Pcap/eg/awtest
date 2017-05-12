@@ -1,0 +1,64 @@
+#!/usr/bin/perl
+
+use strict;
+
+#BEGIN { sub POE::Kernel::TRACE_DEFAULT { 0 } }
+use POE;
+
+use Pcap;
+use ArpWatch;
+
+my $device = shift || 'wi0';
+
+POE::Session->create( 
+		     inline_states => {
+				       _start => \&start,
+				       _stop => sub {
+					 $_[KERNEL]->post( arp_watch => 
+							   'shutdown' )
+				       },
+				       got_packet => \&got_packet,
+				       signal => \&signal,
+				      },
+		    );
+
+$poe_kernel->run;
+
+exit 0;
+
+sub start {
+  POE::Component::ArpWatch->spawn( 
+				  Alias => 'arp_watch',
+				  Device => $device, 
+				  Dispatch => 'got_packet',
+				  Session => $_[SESSION],
+			         );
+
+  $_[KERNEL]->sig( $_ => 'signal' ) for qw( INT HUP TERM QUIT );
+
+  $_[KERNEL]->post( arp_watch => 'run' );
+
+  print "Waiting for packets . . .\n";
+}
+
+sub signal {
+  print "Got signal ", $_[ARG0], ", exiting\n";
+
+  $_[KERNEL]->post( arp_watch => 'shutdown' );
+
+  $_[KERNEL]->sig_handled();
+}
+
+sub got_packet {
+  my $packet = $_[ARG0];
+
+  print join( ':', (localtime( $packet->{tv_sec} ))[2,1,0]), 
+        '.', $packet->{tv_usec}, ': ',
+        $packet->{type}, "\n";
+
+  print "\tsha: ", $packet->{source_haddr}, 
+        "\tspa: ", $packet->{source_ipaddr}, "\n",
+        "\ttha: ", $packet->{target_haddr}, 
+        "\ttpa: ", $packet->{target_ipaddr}, "\n";
+}
+

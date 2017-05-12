@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/PDL/Util.pm
+t/00-use.t
+t/10-add_method.t
+t/20-import_method_hash.t
+t/25-import_method_array.t
+t/export2d.t
+t/unroll.t

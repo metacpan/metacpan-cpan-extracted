@@ -1,0 +1,25 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/With.pm
+inc/Module/Install/WriteAll.pm
+lib/Portable/Dist.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01_compile.t
+t/02_run.t
+t/03_batch.t
+t/data/bin/echo.bat
+t/data/bin/hello.bat
+t/data/bin/interp.bat
+t/data/bin/perl.exe
+t/data/bin/pl2bat.bat
+t/data/lib/Config.pm
+t/data/lib/CPAN/Config.pm
+t/data/site/lib/File/HomeDir.pm

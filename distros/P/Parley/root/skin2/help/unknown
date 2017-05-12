@@ -1,0 +1,7 @@
+<h1>Help Item Not Found</h1>
+
+<p><i>[% template_name %]</i> doesn't relate to a known
+page in the help system.</p>
+
+<p>See if you can find what you want from the
+<a href="help">contents</a> page.</p>

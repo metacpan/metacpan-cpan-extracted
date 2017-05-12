@@ -1,0 +1,24 @@
+[
+ {
+  "type": "directive",
+  "tag": "EXTM3U"
+ },
+ {
+  "type": "directive",
+  "tag": "EXT-X-STREAM-INF",
+  "value": "PROGRAM-ID=1,BANDWIDTH=956000,RESOLUTION=704x396,CODECS=\"avc1.66.30, mp4a.40.5\""
+ },
+ {
+  "type": "item",
+  "value": "http://svtplay6c-f.example.net/i/world/open/20121215/1215811-016B/FRAGA_DOKTORN_H-016B"
+ },
+ {
+  "type": "directive",
+  "tag": "EXT-X-STREAM-INF",
+  "value": "PROGRAM-ID=1,BANDWIDTH=315000,RESOLUTION=320x180,CODECS=\"avc1.66.30, mp4a.40.5\""
+ },
+ {
+  "type": "item",
+  "value": "http://svtplay6c-f.example.net/i/world/open/20121215/1215811-016A/FRAGA_DOKTORN_H-016A"
+ }
+]

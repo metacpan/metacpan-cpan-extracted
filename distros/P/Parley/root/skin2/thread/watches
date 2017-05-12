@@ -1,0 +1,94 @@
+<h1>Watched Threads</h1>
+
+[% IF thread_watches > 0 %]
+<form method="post" style="width:98%;max-width:none;">
+    <table class="thread_watches">
+        <tbody>
+            <tr>
+                <th style="width:14px;">&nbsp;</th>
+                <th>Subject</th>
+                <th>Last Post Made</th>
+                <th>Last Post Viewed</th>
+            </tr>
+            [% WHILE (watch = thread_watches.next) %]
+            [% thread = watch.thread %]
+            <tr>
+                <td style="width:14px; vertical-align: middle;">
+                    [% IF (thread.last_post.created > watch.timestamp) %]
+                    <img src="static/images/unread_posts.gif" width="12" height="12" alt="Unread Posts" title="Unread Posts" />
+                    [% ELSE %]
+                    &nbsp;
+                    [% END %]
+                </td>
+                <td>
+                    <a href="thread/view?thread=[% thread.id %]" class="topic_link">
+                    [% ForumCode.escape(watch.thread.subject) |truncate(45) %]
+                    </a>
+                    <br />
+                    <span class="forum_mini_pager">
+                        [%- IF authed_user || mini_pager %]
+                        [
+                            [%- IF authed_user %]
+                            <a href="thread/next_post?thread=[% thread.id %]">Continue</a>
+                            [%- END %]
+                        ]
+                        [%- END %]
+                    </span>
+                </td>
+
+                <td>
+                    [% nicedate(thread.last_post.created) %]
+                    <br /><span class="interval_ago">
+                        [% thread.last_post.interval_ago %] ago
+                        </span>
+                    <br />
+                    <span class="topic_creator">last post by
+                    <span class="post_creator">[% thread.last_post.creator.forum_name %]</span>
+                    </span>
+                </td>
+
+                <td>
+                    [% nicedate(watch.timestamp) %]
+                    <br /><span class="interval_ago">
+                        [% watch.interval_ago %] ago
+                        </span>
+                    <br />
+                    [% IF (thread.last_post.created > watch.timestamp) %]
+                    <span class="topic_creator">Unread posts</span>
+                    [% END %]
+                </td>
+                <td style="width:14px;">
+                    <input type="checkbox" name="stop_watching" value="[% thread.id %]" />
+                </td>
+            </tr>
+            [% END %]
+            <tr>
+                <td colspan="5" class="right_align">
+                    <small>
+                        <a href="javascript:toggle_all('stop_watching',1);">Select All</a>
+                        <a href="javascript:toggle_all('stop_watching',0);">Deselect All</a>
+                    </small>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="5" class="center_align">
+                    <input type="submit" value="Stop Watching Selected Threads" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+[% ELSE %]
+    <p>You are not watching any threads</p>
+[% END %]
+
+<script type="text/javascript">
+    /* set the 'checked' value for all items matching 'name' to 'value' (0|1) */
+    function toggle_all(name,value) {
+        //alert( name );
+        var cboxes = document.getElementsByName( name );
+        for (var i=0;i<cboxes.length;i++) {
+            cboxes[i].checked = value;
+        }
+    }
+</script>

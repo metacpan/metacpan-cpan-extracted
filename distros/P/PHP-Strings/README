@@ -1,0 +1,20 @@
+PHP::Strings
+
+    Implement some of PHP's string functions.
+
+For installation details, see INSTALL.
+
+For usage, see the doco. Either use perldoc or view it
+on the web at:
+    <http://search.cpan.org/dist/PHP-Strings/>
+
+Changes for 0.28 (28 Jan 2004)
+   - Maintainer change
+
+For a complete list of changes, see the Changes file.
+
+by Petras Kudaras.
+
+
+The previous maintainer, Iain "Spoon" Truskett, has 
+passed away. He will be missed by all Perl community.

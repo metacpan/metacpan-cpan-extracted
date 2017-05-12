@@ -1,0 +1,242 @@
+<html>
+<head>
+<title>PkgForge - Incoming Queue Processor</title>
+</head>
+<body>
+
+<h1>Package Forge - The Incoming Queue Processor</h1>
+
+<p>
+Once a user has submitted a job into the incoming directory it is
+picked up by the incoming queue processor. The submitted job goes
+through a number of stages of processing and validation before tasks
+are registered for each target platform and architecture required.
+</p>
+
+<p>
+Typically the incoming queue processor runs as a single daemon, on a
+server usually referred to as the PkgForge <em>master</em>. The daemon
+will scan the incoming job directory and form a queue from all the
+jobs found within. It will process each of these jobs in turn, the
+processing sequence is based on the order in which
+the <code>readdir</code> function returns them (usually alphabetical
+based on your locale). Once all discovered jobs have been processed it
+will wait for a certain amount of time (controlled by
+the <em>poll</em> option) before doing another scan.
+</p>
+
+<h2>The Processing Stages</h2>
+
+
+<p>The processing of a submitted job can be broken down into a number
+of basic stages:</p>
+
+<ol>
+  <li><a href="#stage1">Discovery</a></li>
+  <li><a href="#stage2">Loading</a></li>
+  <li><a href="#stage3">Validation</a></li>
+  <li><a href="#stage4">Transfer</a></li>
+  <li><a href="#stage5">Registration</a></li>
+  <li><a href="#stage6">Clean-Up</a></li>
+</ol>
+
+<h3><a name="stage1">Stage 1: Discovery</a></h3>
+
+<p>
+In the first stage <strong>any</strong> directory which is discovered
+within the incoming job directory is considered to contain a new
+job. Anything which is not a directory will have been discarded when
+the queue of jobs was formed.
+</p>
+
+<h3><a name="stage2">Stage 2: Loading</a></h3>
+
+<p>
+An attempt will be made to load each potential job directory into
+a <code>PkgForge::Job</code> object. If the loading fails this will
+not be initially considered as a complete failure. A <em>soft</em>
+failure will have occurred where the job will be allowed to remain in
+the incoming directory, in an unloadable form, for up to 5 minutes
+(controlled by the <em>wait_for_job</em> option). This waiting is done
+because the new jobs are typically submitted over a network filesystem
+and it will take a finite amount of time for all the necessary files
+to become available.
+</p>
+
+<p>
+Once a job has been successfully loaded into
+a <code>PkgForge::Job</code> object the next stage is to check that
+the identifier string has not been previously used in the job
+registry. If it has not been seen previously then the new job will be
+added into the registry database. An entry is added to
+the <code>job</code> table for the new identifier along with copies of
+the information in a subset of the options which are specified in the
+job metadata. Only the information necessary to schedule the job is
+added (e.g. submission time, submitter name, job size). It is not
+intended to be a complete copy of the job metadata.</p>
+
+<p>
+Once a new job has been successfully added into the registry it is in
+the <em>incoming</em> state.
+</p>
+
+<p>
+If the job identifier had been previously seen or it was not possible
+to add the new job to the registry then an immediate <em>hard</em>
+failure will occur and there will be no further attempts to process
+the job. In that situation the job will then move immediately to the
+Clean-Up stage.
+</p>
+
+<h3><a name="stage3">Stage 3: Validation</a></h3>
+
+<p>
+Once a new job has been loaded it is necessary to validate the
+associated payload. This is done by calling the <code>validate</code>
+method on the <code>PkgForge::Job</code> object. Firstly this method
+checks to see if a 
+
+<ol>
+  <li>The job must contain at least one source package.</li>
+  <li>The SHA1 sum of each source package file must be correct.</li>
+  <li>The source package must be valid.</li>
+</ol>
+
+<p>
+Presently the checking of the SHA1 sum for each source package is
+purely to ensure that the file is the same as that submitted by the
+user. This ensures that it is not still in transit and has not been
+corrupted. The system has been designed to make it possible to add
+support for the user to digitally sign the job manifest. Currently it
+would be possible to alter both a source package and the associated
+manifest after the user has completed their submission. A
+digitally-signed manifest could be used to guarantee that no tampering
+has occurred.
+</p>
+
+<p>
+Each source package is represented by a Perl class which implements
+the <code>PkgForge::Source</code> Moose role. The role requires that
+the class <strong>must</strong> implement a <code>validate</code>
+method which returns true or false to indicate whether or not the
+source package is valid. Currently only the SRPM file type is
+supported. For that class the following validity checks are done:
+</p>
+
+<ol>
+  <li>The file name must have a <code>.src.rpm</code> suffix.</li>
+  <li>The file must exist.</li>
+  <li>The file must be a valid Source RPM.</li>
+  <li>The SRPM must contain a file which has the <code>.spec</code>
+  suffix.</li>
+</ol>
+
+<p>
+If a new job has passed all the validation checks then it will be
+marked as <em>valid</em> in the registry database. If the new job has
+failed any checks then, as with the loading stage, it will initially
+be considered a <em>soft</em> failure and the job will be left in the
+incoming queue up to the time specified in
+the <code>wait_for_job</code> option. With each queue run it will be
+reconsidered to see if it has become valid. This allows time for the
+complete submission of files over a slow network when a network
+filesystem is being used. Once that time limit is exceeded then
+a <em>hard</em> failure will have occurred and the job will be marked
+in the registry database as <code>invalid</code>. The job would then
+move immediately the Clean-Up stage.
+</p>
+
+<h3><a name="stage4">Stage 4: Transfer</a></h3>
+
+<p>
+Once the job has been validated it is copied to the directory
+where <em>accepted</em> jobs are stored. Throughout the copying
+process the new <code>PkgForge::Job</code> object for the recently
+validated job is kept in memory. Once the copying is complete this
+object is used to, once more, check the SHA1 sums of the copied source
+files to ensure that no tampering or corruption has occurred. This
+object is also used to write-out a new job metadata file into the
+accepted job directory.
+</p>
+
+<p>
+The intention is that, for security, only the user which the incoming
+queue processor runs as is permitted to write into the accepted job
+directory. If a standard, local unix filesystem is being and anything
+else is run as the same user then this probably does not give much
+extra confidence. However, if something like AFS is being used then
+there can be a high-level of trust in the data integrity of the
+accepted job directory if the write/insert access is highly
+restricted.
+</p>
+
+<p>
+If, for any reason, the transfer fails, then the processing of this
+job will be considered to have failed. It will then be marked in the
+registry database as being in the <em>failed</em> state and it will be
+moved immediately to the Clean-Up stage.
+</p>
+
+<h3><a name="stage5">Stage 5: Registration</a></h3>
+
+<p>
+Once a job has been validated and accepted then <em>tasks</em> can be
+registered for each platform. Terminology is used here to avoid
+confusion, a <em>task</em> is purely a <em>job</em> which has been
+registered for a specific platform/architecture. It should be noted
+that a job can be considered completely valid but not result in the
+registration of any tasks. In that case nothing will actually be done
+with the submitted job and its source packages.
+</p>
+
+<p>
+As part of the processing instructions specified by the user, each
+submitted job has a list of applicable platforms and a list of
+applicable architectures. Typically, these might actually be just the
+special &quot;<em>all</em>&quot; string in both cases, as expected,
+this signifies that tasks should be registered for all platforms
+and/or architectures. There is plenty of scope for a user to be able
+to specify and restrict the sets of platforms and architectures for
+which tasks should be registered, this is fully described in
+the <a href="/doc/job.html">job documentation</a>. The sets of target
+platforms and architectures are computed by examining the list of
+available, active, platforms in the registry database and applying the
+filters specified by the user for the new job.
+</p>
+
+<p>
+Note that having a task registered for an active platform does not
+guarantee that a build daemon is currently available for that
+platform. It is perfectly acceptable to queue tasks for a platform
+which currently has no build daemons registered. It may also, of
+course, be the case that a build daemon is busy or currently
+unavailable due to maintenance. It is also worth noting that a
+platform may have multiple build daemons. It is not possible to
+guarantee which build daemon will accept a particular task, as they
+should all have identical build environments this should not cause
+problems. Full details of the task scheduling is available in
+the <a href="/doc/server/builder.html">build daemon</a>
+documentation.
+</p>
+
+<p>
+Once tasks have been successfully registered the new job will be
+marked in the registry database as being in the <em>registered</em>
+state.  If, for any reason, the task registration fails, then the
+processing of this job will be considered to have failed. It will then
+be marked in the registry database as being in the <em>failed</em>
+state and it will be moved immediately to the Clean-Up stage.
+</p>
+
+<h3><a name="stage6">Stage 6: Clean-Up</a></h3>
+
+<p>
+The final stage, no matter which final state a submitted job has
+achieved, is the clean-up of the incoming queue directory. The
+directory for the submitted job and all of the contents will be
+removed.
+</p>
+
+
+</body>
+</html>

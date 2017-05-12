@@ -1,0 +1,63 @@
+Revision history for Perl extension POE::Component::Server::FTP.
+
+0.08 Fri Nov 09 2007
+    - "When connecting to the server and enabling passive mode, the port
+       returned to the client reports the upper 8 bits of the 2-byte port range
+       as a 16-bit number." -Eric Rybski, Thanks Eric!
+
+0.07 Wed Mar 21 2007
+	- Fixed typo in MDTM, and SIZE
+    - Added prereq for POE
+    - Fix spelling of scheme. It still supports the old spelling 'Sceme' :(
+   
+0.06 Sun Apr 18 19:56:25 2004
+	- Fixed bug that killed the server if a datasession connection wasn't made and _drop was called
+	- Now we depend on v0.04 of Filesys::Virtual
+
+0.05 Sun Apr 18 13:57:50 2004
+	- Fixed a bug related to using PASV and bandwidth limiting
+	- Added version to example server.pl
+	- XSEN command support added, calls xsen event, return undef if not allowed
+	- Fixed a bug that didn't flush the response before disconnecting,
+		via a timeout or a QUIT
+	- Sending data via the control connection is more reliable, and
+		won't kill the server when the connection is dropped unexpectedly
+	- Forking doesn't look feasable right now, suggestions welcome...
+	- Changed all events dispatched to the registered session, so they will have
+		ftpd_ in front
+	- added ftpd_write_log, see examples
+	- Started a Curses::UI::POE client/server example, currently it doesn't have
+		authentication or anything to connect to the server_daemon.pl server.
+		I'm using this as a basis of what I should add to the component to function
+		as a great ftpd :) Run server_daemon.pl then as many server_manager.pl as you
+		like. Theres chat too.
+	- I started to add a virus checking routine, ignore it. its going to be a post
+		processor.  Optional of course.
+
+0.04 Mon Feb 16 16:19:48 2004
+	- Fixed a nasty bug that involved the data session disconnecting early
+	- Bandwidth limiting added (upload and download), you can choose by ip or by connection
+	- Options added: LimitScheme (ip/per), DownloadLimit (bytes), UploadLimit (bytes)
+	- Forking isn't working yet (Wheel::Run)
+	- Logging has improved. Added an option (LogLevel) (1-4)
+	- Added SIZE command
+	- Added SITE CHMOD (some clients add SITE for some reason
+	- Added a timeout (option TimeOut (seconds))
+
+0.03 Thu Feb 5 23:32:45 2004
+	- oops, fixed hardcoded ip for pasv
+
+0.02 Thu Feb 5 22:15:16 2004
+	- (PASV) Passive transfers work
+	- Anonymous login allow/deny
+	- (REST) resume added
+	- Cleaned up the code ALOT
+	- (ABOR) abort added
+	- (XMKD XRMD XPWD XCUP XCWD) added these commands, but they might
+		not be totally rfc compliant
+	- Probably more...
+
+0.01 Sat Dec 1 15:19:32 2001
+	- original version; created by h2xs 1.1.1.4 with options
+		-XA -n POE::Component::Server::FTP
+

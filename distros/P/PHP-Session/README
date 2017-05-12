@@ -1,0 +1,99 @@
+NAME
+    PHP::Session - read / write PHP session files
+
+SYNOPSIS
+      use PHP::Session;
+
+      my $session = PHP::Session->new($id);
+
+      # session id
+      my $id = $session->id;
+
+      # get/set session data
+      my $foo = $session->get('foo');
+      $session->set(bar => $bar);
+
+      # remove session data
+      $session->unregister('foo');
+
+      # remove all session data
+      $session->unset;
+
+      # check if data is registered
+      $session->is_registered('bar');
+
+      # save session data
+      $session->save;
+
+      # destroy session
+      $session->destroy;
+
+      # create session file, if not existent
+      $session = PHP::Session->new($new_sid, { create => 1 });
+
+DESCRIPTION
+    PHP::Session provides a way to read / write PHP4 session files, with
+    which you can make your Perl application session shared with PHP4.
+
+    If you like Apache::Session interface for session management, there is a
+    glue for Apache::Session of this module, Apache::Session::PHP.
+
+OPTIONS
+    Constructor "new" takes some options as hashref.
+
+    save_path
+        path to directory where session files are stored. default: "/tmp".
+
+    serialize_handler
+        type of serialization handler. Currently only PHP default
+        serialization is supported.
+
+    create
+        whether to create session file, if it's not existent yet. default: 0
+
+    auto_save
+        whether to save modification to session file automatically. default:
+        0
+
+        Consider cases like this:
+
+          my $session = PHP::Session->new($sid, { auto_save => 1 });
+          $session->param(foo => 'bar');
+
+          # Oops, you forgot save() method!
+
+        If you set "auto_save" to true value and when you forget to call
+        "save" method after parameter modification, this module would save
+        session file automatically when session object goes out of scope.
+
+        If you set it to 0 (default) and turn warnings on, this module would
+        give you a warning like:
+
+          PHP::Session: some keys are changed but not modified.
+
+NOTES
+    *   Array in PHP is hash in Perl.
+
+    *   Objects in PHP are restored as objects blessed into
+        PHP::Session::Object (Null class) and original class name is stored
+        in "_class" key.
+
+    *   Locking when save()ing data is acquired via exclusive "flock", same
+        as PHP implementation.
+
+    *   Not tested so much, thus there may be some bugs in
+        (des|s)erialization code. If you find any, tell me via email.
+
+TODO
+    *   WDDX support, using WDDX.pm
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Apache::Session::PHP manpage, the WDDX manpage, the Apache::Session
+    manpage, the CGI::kSession manpage
+

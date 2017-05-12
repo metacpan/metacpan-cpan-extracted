@@ -1,0 +1,39 @@
+=encoding utf8
+
+=head1 NAME
+
+POE::Component::IRC::Cookbook::Disconnecting - How to disconnect gracefully
+with PoCo-IRC
+
+=head1 SYNOPSIS
+
+Shutting down an IRC bot can be quick and messy, or slow and graceful.
+
+=head1 DESCRIPTION
+
+There are two ways you can shut down an IRC bot/client. The quick and dirty way
+is rather simple:
+
+ exit;
+
+It exits the program, shutting down the socket, and everybody online sees yet
+another "Connection reset by peer" or "Remote end closed the socket" or
+something.
+
+As of version 6.50, all you need to do in order to shut down gracefully is to
+send a L<C<shutdown>|POE::Component::IRC/shutdown> event to the IRC component.
+It will make sure your quit message (if any) gets delivered, and will forcibly
+disconnect if there are any problems (faulty server or network issues). After
+doing this, it will unregister all sessions and clean up after itself.
+
+If you want to do something more elaborate on your own, take a look at
+the following documentation: L<logged in|POE::Component::IRC/logged_in>,
+L<C<connected>|POE::Component::IRC/connected>,
+L<C<quit>|POE::Component::IRC/quit>,
+L<C<disconnect>|POE::Component::IRC/disconnect>, and
+L<C<unregister>|POE::Component::IRC/unregister>.
+
+=head1 AUTHOR
+
+Rocco Caputo and Hinrik E<Ouml>rn SigurE<eth>sson.
+

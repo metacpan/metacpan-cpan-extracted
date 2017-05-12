@@ -1,0 +1,12 @@
+lib/POD2/RU/PSGI.pm
+lib/POD2/RU/PSGI.pod
+lib/POD2/RU/PSGI/Extensions.pod
+lib/POD2/RU/PSGI/FAQ.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+MYMETA.json
+MYMETA.yml
+README.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

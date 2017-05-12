@@ -1,0 +1,174 @@
+Changes for Perl extension POE-Declare
+
+0.59 Fri 3 Feb 2012
+	- Removed the use of the deprecated defined @array
+
+0.58 Fri 10 Jun 2011
+	- It is now legal to ->finish a session twice, as long as the session
+	  still exists in POE terms. The second call will silently shortcut.
+
+0.57 Thu 9 Jun 2011
+	- Improved the error message from ->finish when the session does not
+	  exist at the time that ->finish is called.
+
+0.56 Tue 31 May 2011
+	- Bumping POE and Test::POE::Stopping dependencies to get past the
+	  POE::API::Peek explosion.
+
+0.55 Fri 27 May 2011
+	- Updating Module::Install::DSL to 1.01
+	- Updating Test::POE::Stopping dependency to 1.08 to be able to deal
+	  with the change to session internals in POE 1.310.
+	- Test scripts compensate for a hardcoded assumption that the ID of the
+	  first session is 2 in POE, it is now 1 (and the tests adapt)
+
+0.54 Fri 15 Apr 2011
+	- Add support for timeout variance both in declaration and overridden
+	  timeout lengths.
+	- Overriding timeout delays were being ignored (major bug fix)
+
+0.53 Wed 9 Mar 2011
+	- Fixed #51697: [Patch] POD nit (FWIE)
+	- Upgrade Class::XSAccessor dependency to 1.10 to fix some crashes
+	  that occur during END in certain circumstances. Use of POE::Wheel::Run
+	  seems to be a particular culprit (maybe).
+
+0.52 Mon 7 Mar 2011
+	- Adding check for event declaration on finalised class
+	- Adding check for use of an uncompiled class
+	- Moved dependency version checks into module code
+	- Removing apparently redundant IO::File dependency
+
+0.51 Wed 23 Feb 2011
+	- Renaming _compile to as_perl
+	- Bumped the POE dependency again
+	- Fixed a POD typo
+
+0.50 Thu 21 Oct 2010
+	- Major upgrade, not backward compatible in all cases.
+	- Bumped the POE dependency as I am struggling to test against
+	  older ones.
+	- Timeout events are now implemented using POE named timers
+	  rather than numbered timers. The implementation is much
+	  closer to POE's prefered usage, and results in significantly
+	  less code in 80% less code in generated timeout code.
+	- Added the new method ->finish, which will clear all timers
+	  and remove the session alias. It should be called when you
+	  are ready for your session to be shut down.
+	  The finish method MUST be called while in the session you
+	  are calling it on. Removed the _finish event.
+	- Removed the _alias_set and _alias_remove events. With the
+	  introduction of the finish method, we fully control all
+	  the places where the session alias needs to be created and
+	  removed. Direct user access to this is now unneeded and
+	  likely to be a source of bugs.
+	- Any code previously using _alias_remove directly to do their
+	  equivalent of what the finish method now does will break.
+
+0.26 Mon 19 Jul 2010
+	- Updating to Module::Install 1.00
+	- Added _finish event which clears all timeouts and removes the
+	  alias. Intended to be a common way to say "I'm done now".
+	- Added alternate compile-time hash usage for declarations.
+	- Corrected timeout_start bug where restarts were being done via
+	  non-existant method timeout_clear.
+
+0.25 Thu 27 May 2010
+	- Updating to Module::Install 0.97
+	- Updating Class::XSAccessor dependency to faster 1.05
+	- Expanding documentation
+
+0.24 Thu  8 Oct 2009
+	- Moving child disconnection change to production version.
+	- Bumping Test::POE::Stopping dependency to 1.05 for increased
+	  rigour of stop validation.
+
+0.23_01 Fri 11 Sep 2009
+	- Experimental change, immediately disconnect every session from
+	  their parent at _start time so that we never use POE's internal
+	  child session reference tracking.
+
+0.22 Wed 12 Aug 2009
+	- Fixing some bugs in Message events, and improved tests for it.
+
+0.21 Thu 19 Mar 2009
+        - Improved checking of Message params
+        - Adding an Alias format check
+
+0.20 Tue 17 Mar 2009
+	- Disable Test::NoWarnings when using Test::POE::Stopping.
+	  It uses POE::Peek::API, which will throw a warnings when
+	  loaded against a development version of POE.
+	- Adding a specific META.yml dependency check.
+
+0.19 Tue 17 Mar 2009
+	- Allowing Message params to be optional
+
+0.18 Fri 13 Mar 2009
+	- Changing the Message implementation to be much simpler
+
+0.17 Fri 13 Mar 2009
+	- Adding POD documentation for _alias_remove
+	- Moving the events into their own documentation section
+
+0.16 Fri 13 Mar 2009
+	- Adding missing Test::Exception dependency
+	- Dropping the superfluous timeout_start method
+
+0.15 Fri 13 Mar 2009
+	- Moving package_states and params to private methods
+	- Add strict checking of constructor params
+	- POE::Declare::Object->meta is not code-generated per-class
+
+0.14 Thu 12 Mar 2009
+	- Adding the initial implementation of Timeout that actually works
+
+0.13 Wed 11 Mar 2009
+	- Adding a missing dependency on Test::NoWarnings
+
+0.12 Tue 10 Mar 2009
+	- Adding a missing dependency on Test::POE::Stopping
+
+0.11 Mon  9 Mar 2009
+	- Adding use warnings to all classes
+	- Adding Test::NoWarnings to all tests
+	- Fixing some bugs in _alias_remove
+
+0.10 Mon  9 Mar 2009
+	- Adding specific _alias_set and _alias_remove methods
+
+0.09 Thu  5 Mar 2009
+	- Converting all simple accessors to Class::XSAccessor
+	- Switching to a better and faster error check in lookback
+
+0.08 Thu  5 Mar 2009
+	- Adding tests for half a dozen or so more methods
+	- Fixed a bug in ->lookback
+
+0.07 Thu  5 Mar 2009
+	- compile is now prototyped ()
+	- package_states caches now, making spawning faster
+
+0.06 Wed  4 Mar 2009
+	- use POE::Declare is now also an implicit use POE
+
+0.05 Mon 23 Feb 2009
+	- Completing most of the initial pass over the documentation
+	- Switching to using Class::XSAccessor
+
+0.04 skipped
+
+0.03 Fri 20 Feb 2009
+	- Upgrading to Module::Install 0.79
+	- Correcting dependencies
+	- Timeout events are modelled correctly now
+	- No functional changes
+
+0.02 Tue 12 Sep 2006
+	- More thorough testing
+	- Fixing various bugs
+	- Added event auto-registration
+	- Added a base meta-model for POE::Declare::Object, removing the special case
+
+0.01 Thu  7 Sep 2006
+	- original version

@@ -1,0 +1,11 @@
+#![% style.bin_perl %]
+
+[% IF style.use_strict %]
+use strict;
+[% END %]
+[% IF style.use_warnings %]
+use warnings;
+[% END %]
+use Test::More tests => 1;
+
+ok( 0, 'Dummy Test' );

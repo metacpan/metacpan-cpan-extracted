@@ -1,0 +1,45 @@
+Revision history for Pod-Abstract
+
+0.20    03/01/2010
+        Removed usage of UNIVERSAL isa and can as functions, will correct
+        a deprecation warning with Perl 5.11. Fixed a bug with
+        nodes->from_pod which did not work as documented. Corrected some
+        minor errors with documentation formatting. Added test coverage
+        for from_pod.
+
+0.19    21/06/2009
+        Added =head1 NAME blocks to those modules missing them. Added some
+        additional Pod. Added "Task::Weaken" dependancy to ensure that the
+        target platform has a working "weaken" in their Scalar::Util
+
+0.18    08/06/2009
+        Replaced "=" operator with "eq", added the full set of Perl
+        compatible binary comparison operators (eq and friends, == and
+        friends). This will break your code if you used the "=" operator
+        in 0.17, you will need to change it to "eq".
+
+0.17    26/05/2009
+		Added Union and Intersection operators to paths (conjunction of
+        multiple simple paths). Support for multi-name selectors in paths.
+        Fix for memory leak. Testing of pPath expressions. Added "="
+        operator with support for combinational matching (any node on left
+        expression = any node on right expression)
+
+0.16    11/05/2009
+        Changed constant declarations to allow older Perl 5.6 constants.
+        Removed body components from heading and label attributes in
+        BuildNode, which would cause ->select to behave incorrectly on
+        newly added nodes.
+
+0.15    12/03/2009
+        Improved documentation. Added some real documentation for
+        Pod::Abstract::Path. Had an attempt at fixing the compile
+        issues for Perl 5.6. No significant changes in function.
+
+0.14    03/03/2009
+        Improved paf filter suite. Bug fixes. paf defaults to "load as
+        perldoc". Allow mandatory positional arguments for filters.
+
+0.10    28/02/2009
+        Package build with functional library and "paf" utility.
+

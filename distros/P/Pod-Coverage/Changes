@@ -1,0 +1,162 @@
+0.23    Wednesday 1st May, 2013
+        Distinguish 'package didn't compile' from 'package has no
+        symbols' (Gareth Tunley)
+
+0.22    Tuesday 7th February, 2012
+        POD spelling corrections. (rt #22113)
+        Add "unimport" to the stoplist. (rt #33914)
+
+0.21    Tuesday 27th July, 2010
+        Add SCALAR to the stoplist (implementaion method for tied
+        hashes).  Report by David Cantrell.
+
+0.20    Thursday 19th February, 2009
+        Fix t/lib/Fully/Qualified.pm to have a 1; (Zefram)
+        Ship t/09whitespace.t - had missed it before
+
+0.19    Thursday 13th September, 2007
+        Don't use _CvGV to determine if a sub was imported, there's a handy
+        flag - GVf_IMPORTED_CV.  Fixes 5.9.5 and future perls
+        (solution by Nicholas Clark)
+
+
+0.18    Friday 4th August, 2006
+        Rewrite _CvGV in terms of B::CV - no xs dependency anymore
+        (suggested by Tim Bunce)
+
+        Add the (FETCH|MODIFY)_$foo_ATTRIBUTES methods to the private
+        stoplists. (rt #12451)
+
+        Support documentation where the method name is documented in a
+        ::qualified style (rt #14635)
+
+        Ignores new (5.8) magic CLONE and CLONE_SKIP methods. (rt #17489)
+
+        Added a nonwhitespace option (Alex - rt #14950)
+
+
+0.17    Tuesday 23rd November, 2004
+        Fixed a further case reported by Jos Boumans where
+        =head2 $self->foo(); was intepreted as documentation for a
+        C<foo()> method.  (more XS4ALL house style)
+
+0.16    Wednesday 20th October, 2004
+        Fixed a MANIFEST bug.
+        Fixed a case reported by Jos Boumans where
+        =head2 $self->foo; was intepreted as documentation for a
+        C<foo;> method.  (XS4ALL house style)
+        
+0.15    Tuesday 19th October, 2004
+        Correctly ignores tie subroutines (David Cantrell)
+
+0.14    Sunday 9th May, 2004
+        Small fix from Andy Lester for when people entity escape
+        the greater than in the method call arrow.
+
+0.13    Monday 29th December, 2003
+        Fixed a case reported by Earle Martin, where 
+        =head2 C<foo(),bar(),baz()> wasn't working correctly
+
+        Pod and Test fixes by Andy Lester
+
+        Now we install the pod_cover command line utility.
+
+0.12    Tuesday 30th September, 2003
+        Added 'trustme' so that you don't have to lie about subs being private
+        when the module fails to find their docs.  Work by David Cantrell.
+
+        Pulled HISTORY out into a Changes file.
+
+        Deprecated and gutted Pod::Coverage::Overloader.  The ignored
+        patterns in the base class now include qr/^\(/ which is all it
+        really did only in a stupidly complex manner.
+
+0.11    2002-02-27
+        Sort the uncovered subs reported from the import form.  From a
+        bug report from Tels.
+
+0.10    2002-02-18
+        Added Pod::Coverage::CountParents which counts the Pod
+        sections from higher in the inheritance tree (it walks @ISA).
+
+        Refactored C<_get_pods> into its own method to allow this.
+
+0.09    2001-12-17
+        Fixed a typo in mstevens' name (oopsie)
+
+        Added C<examples/script-covered> based on an email exchange.
+
+        Modified the import form so that if given one argument it's
+        assumed to be the package.  From a suggestion by Mark Fowler.
+
+        Changed tracing to use optimisable constants.
+
+        Added why_unrated.
+
+0.08 2001-11-14
+        Paul Johnson beat me to making Pod::Coverage a Devel::Cover
+        plugin, so that's one less thing in the TODO section.
+
+        Ran the code through perltidy, made some of the changes it
+        suggested.
+
+        Worked over the parsing of the also_private flag to give it more
+        consistent semantics
+
+        Assimilated C<examples/pod_cover.t> from Tels
+
+0.07
+        Implemented _CvGV based upon code from Robin Houston.  This
+        removes the dependency on Devel::Peek (the CPAN version of
+        Devel::Peek doesn't supply CvGV).  This also happily makes the
+        module work with perl 5.005_03.
+
+        Fixed a bug in the import routine which was preventing the use
+        form of derived classes.  Reports a module is unrated if
+        coverage returns undef.
+
+        Added Pod::Checker::Overloader.
+
+0.06
+        First cut at making inheritance easy.
+        Pod::Checker::ExportOnly isa Pod::Checker which only checks
+        what Exporter is allowed to hand out.
+
+        Fixed up bad docs from the 0.05 release.
+
+0.05
+        Used Pod::Find to deal with alternative locations for pod
+        files.  
+
+        Introduced pod_from.  
+
+        Merged some patches from Schwern. 
+        Added in covered.  
+
+        Assimilated C<examples/check_installed> as contributed by
+        Kirrily "Skud" Robert <skud@cpan.org>.  
+
+        Copes with multple functions documented by one section.  
+
+        Added uncovered as a synonym for naked.
+
+0.04
+        Just 0.03 with a correctly generated README file
+
+0.03
+        Applied a patch from Dave Rolsky (barely 6 hours after release
+        of 0.02) to improve scanning of pod markers.
+
+0.02
+        Fixed up the import form.  
+
+        Removed dependency on List::Util.
+
+        Added naked method.  
+        
+        Exposed private configuration.
+
+0.01
+        As #london.pm invaded Brighton, people taked about
+        documentation standards.  mstevens scribbled something down,
+        richardc coded it, the rest is ponies.

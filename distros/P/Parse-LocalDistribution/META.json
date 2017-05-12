@@ -1,0 +1,54 @@
+{
+   "abstract" : "parses local .pm files as PAUSE does",
+   "author" : [
+      "Kenichi Ishigaki <ishigaki@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Parse-LocalDistribution",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.88",
+            "Test::UseAllModules" : "0.10"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.07"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "List::Util" : "0",
+            "Parse::CPAN::Meta" : "0",
+            "Parse::PMFile" : "0.37"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/charsbar/Parse-LocalDistribution"
+      }
+   },
+   "version" : "0.19"
+}

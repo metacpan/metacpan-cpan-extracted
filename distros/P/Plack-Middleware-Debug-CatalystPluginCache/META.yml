@@ -1,0 +1,33 @@
+---
+abstract: "Panel for monitoring Catalyst::Plugin::Cache's"
+author:
+  - 'Tim Bunce <Tim.Bunce@pobox.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.101610'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-Debug-CatalystPluginCache
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+requires:
+  Catalyst::Plugin::Cache: 0.10
+  Class::Method::Modifiers: 1.05
+  Plack::Middleware::Debug: 0.10
+  Plack::Util::Accessor: 0
+  Text::MicroTemplate: 0
+  parent: 0
+  perl: 5.008
+resources:
+  homepage: http://github.com/timbunce/Plack-Middleware-Debug-CatalystPluginCache/tree
+  repository: git://github.com/timbunce/Plack-Middleware-Debug-CatalystPluginCache.git
+version: 0.101

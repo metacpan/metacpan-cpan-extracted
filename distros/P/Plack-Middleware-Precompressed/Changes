@@ -1,0 +1,37 @@
+Revision history for Plack-Middleware-Precompressed
+
+1.103 Sat 10 Jan 2015
+	- No functional changes
+	- No longer contains INSTALL file with install-as-root instructions
+
+1.102 Tue 25 Dec 2012
+	- No functional changes.
+	- Cleaned up test suite.
+	- Specified mininmum Perl requirement.
+
+1.101 Tue 25 Dec 2012
+	- Prevent wrapped middlewares from attempting compression when trying
+	  to retrieve a precompressed response.
+
+1.100 Sat 15 Dec 2012
+	- Added support for `rules` and `env_keys` options as well as for
+	  subclassing.
+
+1.005 Tue 01 Mar 2011
+	- Declare dependecy on Plack 0.9942. No functional changes.
+
+1.004 Sun 27 Feb 2011
+	- Made the code pass under warnings, for cleanliness. No functional
+	  changes.
+
+1.003 Wed 23 Feb 2011
+	- Fall back to uncompressed file if serving precompressed file fails.
+
+1.002 Fri 18 Feb 2011
+	- Switched to using `response_cb`.
+
+1.001 Thu 17 Feb 2011
+	- Declared depenencies. No functional changes.
+
+1.0 Thu 17 Feb 2011
+	- Initial release.

@@ -1,0 +1,16 @@
+PerlIO::locale
+==============
+
+PerlIO layer to use the encoding of the current locale.
+
+DEPENDENCIES
+
+This needs at least Perl 5.8.0 or later.
+See the Makefile.PL for details.
+
+COPYRIGHT AND LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Copyright (c) 2004, 2005, 2007, 2008, 2011 Rafael Garcia-Suarez

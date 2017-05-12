@@ -1,0 +1,24 @@
+Build.PL
+Changes
+cpanfile
+lib/Plack/App/WebSocket.pm
+lib/Plack/App/WebSocket/Connection.pm
+MANIFEST			This list of files
+t/00-load.t
+t/corona.t
+t/testlib/CustomServer.pm
+t/testlib/Cycle.pm
+t/testlib/Echo.pm
+t/testlib/Error.pm
+t/testlib/Handlers.pm
+t/testlib/Master.pm
+t/testlib/Responder.pm
+t/testlib/Util.pm
+t/twiggy.t
+xt/browser.t
+xt/consistent_version.t
+xt/js/browser.html
+xt/manifest.t
+xt/pod.t
+META.yml
+META.json

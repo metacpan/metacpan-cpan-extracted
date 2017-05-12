@@ -1,0 +1,30 @@
+---
+abstract: 'N dimensional version of functions'
+author:
+  - 'Diab Jerius'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+  Test::Trap: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.12'
+license: gpl3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: PDL-FuncND
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  PDL: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=PDL-FuncND
+  license: http://opensource.org/licenses/gpl-3.0.html
+  repository: http://bitbucket.org/djerius/pdl-funcnd
+version: 0.11

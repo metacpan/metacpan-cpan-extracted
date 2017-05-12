@@ -1,0 +1,57 @@
+#include <knotebook.h>
+
+suicidal virtual class KNoteBook : virtual KDialog {
+    KNoteBook(QWidget * = 0, const char * = 0, bool = false, WFlags = 0);
+    virtual ~KNoteBook();
+    int addPage(KWizardPage *);
+    int addTab(QTab *, KWizardPage * = 0L);
+    virtual void adjustSize();
+    bool directionsReflectsPage();
+    bool enableArrowButtons();
+    bool enablePopupMenu();
+    QButton *getCancelButton();
+    QButton *getDefaultButton();
+    QButton *getHelpButton();
+    QPopupMenu *getMenu();
+    QButton *getOkButton();
+    KTabBar *getTabBar();
+    void gotoTab(int);
+    bool isPageEnabled(int, int);
+    bool isTabEnabled(int);
+    int numTabs();
+    void setCancelButton();
+    void setCancelButton(const char *);
+    void setDefaultButton();
+    void setDefaultButton(const char *);
+    void setDirectionsReflectsPage(bool);
+    void setEnableArrowButtons(bool);
+    void setEnablePopupMenu(bool);
+    void setHelpButton();
+    void setHelpButton(const char *);
+    void setOkButton();
+    void setOkButton(const char *);
+    void setPageEnabled(int, int, bool);
+    void setTabEnabled(int, bool);
+    virtual QSize sizeHint() const;
+protected:
+    void cancelClicked() slot;
+    void cancelclicked() signal;
+    QSize childSize();
+    void defaultClicked() slot;
+    void defaultclicked(int) signal;
+    void directionButton(bool, bool) slot;
+    virtual bool eventFilter(QObject *, QEvent *);
+    void helpClicked() slot;
+    void helpclicked(int) signal;
+    void init();
+    void menuChoice(int) slot;
+    void menuChoiceRedirect(int) slot;
+    void okClicked() slot;
+    void okclicked() signal;
+    virtual void paintEvent(QPaintEvent *);
+    void popupMenu(QPoint) slot;
+    virtual void resizeEvent(QResizeEvent *);
+    void setSizes();
+    void showSection(int) slot;
+    void tabScroll(ArrowType);
+} KDE::NoteBook;

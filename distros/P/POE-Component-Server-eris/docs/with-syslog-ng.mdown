@@ -1,0 +1,54 @@
+# Using eris with Syslog-ng
+
+## Background
+
+[Syslog-ng](http://www.balabit.com/network-security/syslog-ng) allow the use
+of an external program to handle syslog messages.  This is awesome because
+of the way in which is handles passing messages to the external program.
+Most other syslog daemons would spawn the program for each line of syslog
+inbound.  Syslog-ng starts the program and maintains a tie to that program's
+STDIN.
+
+### Benefits
+ * Startup overhead of external program incurred only at syslog-ng startup
+ * Restarting Syslog-ng restarts the external program, no additional daemons
+   to monitor and start!
+
+## eris dispatcher setup
+
+Check out the examples/ directory for the eris-dispatcher-stdin.pl example.
+Slight modification may be necessary or desired to handle debugging events.
+
+## syslog-ng setup
+
+Let's say we've installed examples/eris-dispatcher-stdin.pl to
+/usr/local/sbin/eris-dispatcher-stdin.pl.  In order to use the eris dispatch
+system with syslog-ng, we need to add a new destination declaration, I
+recommend:
+
+    destination d_eris {
+       program("/usr/local/sbin/eris-dispatcher-stdin.pl" template("<$PRI>$DATE $HOST $PROGRAM $MSG\n"));
+    };
+
+Using this template, the priority and facility tags are forwarded along so
+they can be evaluated by eris clients.
+
+### Sending to this destination
+
+Just make sure your destintation is included in a syslog-ng log statement,
+maybe like this:
+
+    log { source(s_sys); filter(f_nodebug); destination(d_eris); };
+
+Once you restart syslog-ng, you should be able to connect to your eris
+dispatch server and test:
+
+    $ nc localhost 9514
+    EHLO Streamer (KERNEL: dev.example.com-4ec4c1d4-000047fc-00000001:11)
+    sub dhcpd
+    Subscribed to : dhcpd
+    <30>Nov 17 20:05:01 1.2.3.4 dhcpd DHCPDISCOVER from 00:00:00:7a:00:9d via bge0
+    unsub dhcpd
+    Subscription removed for : dhcpd
+
+## El Fin.

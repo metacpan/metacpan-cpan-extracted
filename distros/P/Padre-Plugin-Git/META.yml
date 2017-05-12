@@ -1,0 +1,50 @@
+---
+abstract: 'A Simple Git interface for Padre, the Perl IDE,'
+author:
+  - 'Kevin Dawson <bowtie@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Deep: 0.11
+  Test::More: 0.98
+  Test::Requires: 0.07
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 0
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Padre::Plugin::Git
+name: Padre-Plugin-Git
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+recommends:
+  ExtUtils::MakeMaker: 6.76
+  File::Spec::Functions: 3.4
+  List::Util: 1.32
+  Test::Pod: 1.48
+  Test::Pod::Coverage: 1.08
+requires:
+  CPAN::Changes: 0.23
+  Carp: 1.32
+  File::Slurp: 9999.19
+  File::Spec: 3.4
+  File::Which: 1.09
+  Padre: 0.98
+  Pithub: 0.0102
+  Try::Tiny: 0.18
+  constant: 1.27
+  parent: 0.227
+  perl: 5.10.1
+resources:
+  bugtracker: https://github.com/PadreIDE/Padre-Plugin-Git/issues
+  homepage: http://padre.perlide.org/trac/wiki/PadrePluginGit
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/PadreIDE/Padre-Plugin-Git.git
+version: 0.12

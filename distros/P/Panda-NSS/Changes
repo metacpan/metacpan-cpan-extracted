@@ -1,0 +1,16 @@
+0.004     2017-03-08 09:54:06+03:00 Europe/Moscow
+
+  - Upade dependencies
+  - Improve configure
+
+0.003     2014-07-31 00:34:05+04:00 Europe/Moscow
+
+  - Fix compilation with gcc-4.4.7 in ANSI mode (Centos 6.5)
+
+0.002     2014-07-30 01:49:34+04:00 Europe/Moscow
+
+  - Fix $cert->serial_number_hex method
+
+0.001     2014-07-30 00:04:54+04:00 Europe/Moscow
+
+  - Initial release to CPAN

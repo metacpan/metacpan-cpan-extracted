@@ -1,0 +1,19 @@
+Revision history for Perinci-Sub-Property-hide_args
+
+0.03    2016-05-11 (PERLANCAR)
+
+	- [dist] Bump prereq version Perinci::Sub::PropertyUtil to 0.11
+	  (incompatible change due to schema for Rinci function now in
+	  Sah::Schema::rinci::function_meta instead of Sah::Schema::Rinci).
+
+
+0.02     2016-03-09 (PERLANCAR)
+
+         - No functional changes.
+
+         - Re-release/re-upload (accidentally deleted from CPAN).
+
+
+0.01     2014-06-15 (SHARYANTO)
+
+         - First release.

@@ -1,0 +1,33 @@
+0.07	5 April 2012
+	Brought up to date to current code esthetics.  Verified it runs with
+	5.14.2, threaded and unthreaded.
+
+0.06	28 December 2003
+	Added automatic required modules update using Devel::Required.
+
+0.05	13 August 2003
+	Cleaned up Makefile.PL and updated copyright info.  Made sure the
+	test-suite runs with strict and warnings enabled.
+
+0.04	11 July 2002
+        Upgraded test-suite to make it ready for Perl core inclusion (if that
+        ever happens).  Added check for PerlIO and EBCDIC also, by courtesy of
+	Jarkko Hietaniemi.
+
+	Updated MANIFEST: test.md5 was missing, so I was the only one in the
+	world where the tests worked.
+
+	Rearranged top of source to not need fully qualified VERSION anymore.
+
+        Checked for defined() problems: none found.
+
+0.03	10 July 2002
+	Moved to the PerlIO::via namespace.
+
+0.02	9 July 2002
+	Fixed some documentation problems reported by Rafael Garcia-Suarez.
+
+	Version number now a '' string (oops).
+
+0.01	1 July 2002
+	Moved from the now obsoleted IOLayer:: namespace.

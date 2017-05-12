@@ -1,0 +1,22 @@
+---
+abstract: 'Handy package munging utilities'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Package-Pkg
+requires:
+  Class::Load: 0
+  Clone: 0
+  Mouse: 0
+  Sub::Install: 0
+  Try::Tiny: 0
+version: 0.0020

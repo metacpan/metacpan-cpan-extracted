@@ -1,0 +1,14 @@
+Release history for Parse::WWWAuthenticate
+==========================================
+
+0.03 2016-07-22
+
+  Order of challenges should be kept, so store them in an array rather a hash
+
+0.02 2016-07-21
+
+  I made a mistake when I released 0.01...
+
+0.01 2016-07-21
+
+  Initial release

@@ -1,0 +1,37 @@
+SYNOPSIS
+
+     use Parse::PhoneNumber::ID qw(parse_id_phone extract_id_phones);
+     use Data::Dump;
+    
+     dd parse_id_phone(text => 'Jual dalmatian 2bl lucu2x. Hub: 7123 4567',
+                       default_area_code=>'022');
+
+    Will print something like:
+
+     { raw          => 'Hub: 7123 4567',
+       pretty       => '022-7123-4567',
+       standard     => '+62.22.71234567',
+       is_cell      => 1,
+       is_gsm       => 0,
+       is_cdma      => 1,
+       operator     => 'telkom',
+       product      => 'flexi',
+       area_code    => '022',
+       province     => 'jabar',
+       cities       => 'Bandung, Cimahi, ...',
+       local_number => '71234567',
+       country      => 'Indonesia',
+       country_code => '62',
+       ext          => undef, }
+
+    To extract more than one numbers in a text:
+
+     my $phones = extract_id_phones(text => 'some text containing phone number(s):'.
+                                            '0812 2345 6789, +62-22-91234567');
+     say "There are ", scalar(@$phones), "phone number(s) found in text";
+     for (@$phones) { say $_->{pretty} }
+
+SEE ALSO
+
+    Parse::PhoneNumber
+

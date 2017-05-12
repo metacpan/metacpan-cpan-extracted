@@ -1,0 +1,10 @@
+Revision history for Perl extension Promise-Tiny
+
+0.02 2015-08-04T15:14:25Z
+
+    - implement constructor alias
+
+0.01 2015-07-25T07:33:12Z
+
+    - original version
+

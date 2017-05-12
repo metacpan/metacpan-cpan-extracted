@@ -1,0 +1,24 @@
+---
+abstract: 'Params::Validate checks for functions taking integer arguments'
+author:
+  - 'Stephen Cardie <stephenca@cpan.org>'
+build_requires:
+  English: 0
+  File::Spec: 0
+  Test::More: 0
+  Test::Most: 0.23
+  Test::Perl::Critic: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110440'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Params-Validate-Checks-Integer
+requires:
+  Params::Validate: 0.95
+  Params::Validate::Checks: 0.01
+  Scalar::Util::Numeric: 0.22
+version: 0.01

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entity name="emp" alias="e">
+    <primary_key>empno</primary_key>
+    <columns>
+        <column name="empno" />
+        <column name="ename" unique="1" />
+    </columns>
+    <value_generator column="empno">pk_generator</value_generator>
+</entity>

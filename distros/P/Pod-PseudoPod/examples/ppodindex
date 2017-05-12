@@ -1,0 +1,48 @@
+#!/usr/bin/perl
+
+######################################################################
+#
+# A sample PseudoPod to TXT converter script that uses
+# Pod::PseudoPod::Index.
+#
+# usage:
+#
+# ./textindex filename1.pod filename2.pod
+#
+# Will produce one html file for each pod file passed in.
+#
+#   filename1.html
+#   filename2.html
+#
+######################################################################
+
+use strict;
+use lib "../lib"; # delete this line
+use Pod::PseudoPod::Index;
+
+my $parser;
+
+my $outfile = 'index.txt'; # in the current working directory
+
+open TXTOUT, ">$outfile" or die "Can't write to $outfile: $!";
+
+my $index = {};
+
+foreach my $file (@ARGV) {
+	$parser = Pod::PseudoPod::Index->new($index);
+	$parser->no_errata_section(1); # don't put errors in doc output
+	$parser->complain_stderr(1);   # output errors on STDERR instead
+
+	if (-e $file) {
+		$parser->parse_file($file);
+	} else {
+		die "Unable to open file\n";
+	}
+}
+
+$parser->output_fh(*TXTOUT);
+$parser->output_text;
+
+close TXTOUT;
+
+exit;

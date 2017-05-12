@@ -1,0 +1,9 @@
+Manager.pm
+Changes
+README
+MANIFEST
+Makefile.PL
+examples/ring.pl
+t/00_compile.t
+t/80_pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

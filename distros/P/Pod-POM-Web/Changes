@@ -1,0 +1,113 @@
+Revision history for Pod-POM-Web
+
+1.20 27.04.2014
+  - #95075 fix relative urls to absolutes in initial frameset
+  - get rid of old method "redirect_index"
+  - fix obsolete hyperlinks (cpanforum, Kobes)
+
+1.19 15.04.2013
+  - meta_merge ref. to Github repo
+
+1.18 24.08.2012
+  - fixed [rt.cpan.org #79079] Non-ASCII character seen before =encoding
+
+1.17 01.05.2011
+  - skip tests on systems that do not have 'perlfunc.pod' or 'perlvar.pod'
+
+1.16 28.04.2011
+  - Export 'server' and 'index' functions into main:: namespace if
+    called from command-line (suggested by DOLMEN -- Olivier Mengué)
+  - fix titles containing POD markup
+  - explicit error message if perlfunc or perlvar are not installed
+
+1.15 20.11.2010
+  - H1 header can be either NAME or TITLE
+  - adapt to new structure of perlvar.pod in bleadperl
+  - CSS fix for diplaying AnnoCPAN notes
+  - dependency on Pod::POM 0.25
+
+1.14 08.06.2010 
+  - fix for pods/perl.pod change of structure since perl 5.12
+
+1.13
+  - ignoring dirs starting with '.'
+  - no HTML rendering for perltoc (too slow)
+  - support for perlvar
+  - computing TOC layout, works for MSIE6, MSIE8, FF, Chrome and Safari
+  - many JS fixes (done in Alien-GvaScript 1.20)
+  - applied patch by Elliot Shank for specifiying the page title
+  - tested on MSIE8, FF3.5, safari4, Chrome3
+
+1.12
+  - sync TOC, automatically open nodes in TOC
+  - support aliases in links L<alias|http://...>
+  - fixed bugs in URLs containing special chars like L<http://foo$/...>
+  - disabled automatic links within text nodes
+  - links to external resources will open in a blank page
+  - fixed bugs in displaying scripts (as opposed to modules)
+  - toc ignores directories starting with '.'
+  - toc_pragmas ignores "pod", "pods" and "inc" subdirs
+
+1.11 13.11.2008
+  - removed =begin BUGS section in Pod that was preventing proper display
+  - fixed perlio layer for pass-through binary files
+  - ref to PodPOMWeb.css used wrong case (undetected on -Win32!)
+  - fixed page titles when the name has no "-- description"
+
+1.10 07.11.2008
+  - passthrough for non-POD files (i.e. images, css, etc.)
+  - clicking hrefs in the TOC really loads the pages
+  - recompute height of treeNavigator
+  - alphabetical sort of Perl docs in each section
+  - sync displayed pages / TOC
+  - tooltips for Perl docs
+  - fixed hyperlinks in perlfunc
+  - initial page is 'perl' instead of 'perlintro', with hyperlinks
+
+1.09
+  - Hyperlink to search.cpan.org/perldoc
+  - look for perl* files in both "pod" and "pods" subdirs
+
+1.08
+  - fixed bug with onComplete introduced in 1.07
+  - fixed bug: no entries in section "Unclassified" (patch from A. Jousset)
+  - adaptation for Search::Indexer v0.75 (bugfix on incremental reindexing)
+
+1.07
+  - reorganised TOC : modules by initial letter
+  - also serve scripts
+  - display installation date [and CPAN latest version]
+  - bug fix: entity encoding when no syntax colouring package
+  - onComplete sends form.submit() in Search input box
+
+1.06    30.05.2007
+  - fixed Firefox CSS bug introduced in v1.05
+  - updated doc for modperl configuration
+  - friendly message in /index if javascript is disabled
+        
+1.05    11.05.2007
+  - patch from CDOLAN to add <head><title>
+  - patch from CDOLAN to insert AnnoCPAN comments
+  - fixed CSS for Firefox H1 .. H6
+
+1.04    24.04.2007
+  - patch from CDOLAN to show tooltips in module tree
+  - hyperlinks from source code to use'd modules
+
+1.03    24.04.2007
+  - t/indexer.t no longer fails if Search::Indexer is not installed
+  - a little more help in Pod::POM::Web::Help.pod
+
+1.02    22.04.2007
+  - fixes in standalone server (thanks BooK and CDOLAN) 
+
+1.01    11.03.2007
+  - explicit dependency on Pod::POM 0.17
+  - avoid double indexing when finding overlapping paths in @INC
+  - indexing is incremental and skips big files
+  - indexing without word positions (less precise, but much smaller)
+  - paging in fulltext results
+
+1.00    08.03.2007
+  - first public release
+

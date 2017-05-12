@@ -1,0 +1,213 @@
+=pod
+
+=head1 NAME
+
+PDF::Burst - create one pdf doc for each page in existing pdf document
+
+=head1 SYNOPSIS
+
+   use PDF::Burst ':all';
+
+   my $abs_pdf = '/home/myself/file.pdf';
+   
+   my @abs_pdf_pagefiles = pdf_burst_CAM_PDF($abs_pdf);
+   my @abs_pdf_pagefiles = pdf_burst_PDF_API2($abs_pdf);
+   my @abs_pdf_pagefiles = pdf_burst_pdftk($abs_pdf);
+
+   
+   # uses CAM_PDF by default:
+   my @abs_pdf_pagefiles = pdf_burst($abs_pdf);
+
+   # change default to PDF_API2:
+   $PDF::Burst::BURST_METHOD = 'PDF_API2';
+   my @abs_pdf_pagefiles = pdf_burst($abs_pdf);
+
+   # change default to pdftk:
+   $PDF::Burst::BURST_METHOD = 'pdftk';
+   my @abs_pdf_pagefiles = pdf_burst($abs_pdf);
+
+   # change default to CAM_PDF
+   $PDF::Burst::BURST_METHOD = 'CAM_PDF';
+   my @abs_pdf_pagefiles = pdf_burst($abs_pdf);
+
+   my @new_filenames = pdf_burst($abs_pdf) or die($PDF::Burst::errstr);
+   # we get 
+   #     /home/myself/file_page_0001.pdf, 
+   #     /home/myself/file_page_0002.pdf, 
+   #     ..
+   
+   
+   my $abs_pdf = '/home/myself/ogre.pdf';
+   
+   my @new_filenames = pdf_burst($abs_pdf, 'hi' );
+   # we get 
+   #     /home/myself/hi_page_0001.pdf, 
+   #     /home/myself/hi_page_0002.pdf, 
+   #     ..
+   
+   my @new_filenames = pdf_burst($abs_pdf, 'hi', '/home/stuff' )
+      or die($PDF::Burst::errstr);
+   # we get 
+   #     /home/stuff/hi_page_0001.pdf, 
+   #     /home/stuff/hi_page_0002.pdf, 
+   #     ..
+
+
+
+=head1 DESCRIPTION
+
+Bursting a pdf means if you have  a pdf doc with 10 pages, you want to have 10 docs,
+each representing one page.
+
+I just need to burst a pdf into many, so here is the module.
+
+We provide three different $PDF::Burst::BURST_METHOD to get out pdf pages.
+   
+   CAM_PDF
+   PDF_API2
+   pdftk
+
+You can call pdf_burst_CAM_PDF(), pdf_burst_PDF_API2(), pdf_burst_pdftk(), or pdf_burst().
+Calling pdf_burst() will use the default method. 
+The default method is CAM_PDF.
+
+=head2 IF PDF::Burst FAILS
+
+Try another burst method.
+See L<CHANGING BURST METHOD>
+
+
+=head2 pdftk
+
+I was using the excellent pdftk, but the present version will not 
+compile with the new gcc compiler. I get a missing libgcj.so.7rh error. 
+Can only install libgcj.so.8rh on fc8 so far.
+
+=head2 PDF_API2 vs. CAM_PDF
+
+CAM_PDF uses CAM::PDF, slower but apparently more stable.
+PDF_API2 uses PDF::API2, quicker but not supported on all architectures.
+
+
+=head1 SUBROUTINES
+
+None are exported by default.
+
+=head2 pdf_burst()
+
+Argument is abs path to pdf document to split up. Original is unchanged.
+Optional arguments are the 'groupname', and the abs location (dir) you want
+to output the files to.
+
+Any individual page files pre existing are written over. 
+
+Returns array list of abs paths to the files created.
+
+=head2 pdf_burst_CAM_PDF()
+
+Same as pdf_burst.
+Used by default.
+Requires CAM::PDF.
+
+=head2 pdf_burst_PDF_API2()
+
+Same as pdf_burst.
+Obviously requires PDF::API2.
+
+=head2 pdf_burst_pdftk()
+
+Same as pdf_burst.
+Requires that pdftk be installed.
+
+=head1 CHANGING BURST METHOD
+
+The api is designed so you call pdf_burst(), period.
+Various methods may fail on your system. 
+If your code calls pdf_burst(), and you want to change overall what the method is.. 
+Instead of writing pdf_burst_ANOTHERMETHOD() you can instead set..
+
+   $PDF::Burst::BURST_METHOD = $method;
+
+Where $method is one of : pdftk, PDF_API2, CAM_PDF
+
+=head1 DEBUG
+
+To turn on debug..
+
+   $PDF::Burst::DEBUG = 1;
+
+To get last fail message..
+
+   $PDF::Burst::errstr
+
+=head1 BUGS
+
+Please contact the AUTHOR.
+
+=head1 CAVEATS
+
+pdftk is wonderful. If it doesn't work, use this.
+PDF::API2 2.015 will not properly split up docs on some architectures.
+Note that this module is not for working with the innards of pdfs, it's to quickly split up
+a pdf into pages, each its own document on disk.
+
+If you have other methods to burst a pdf, please suggest/submit to AUTHOR.
+
+This module is meant to work with POSIX environments, if you're on windows, that means it won't work- and it
+was never meant to. No support is planned for non POSIX operating environments.
+
+If you use method pdftk, I suggest always cleaning up after bursting, or using a temporary directory.
+
+=head1 PREREQUISITES
+
+=over 4
+
+=item CAM::PDF
+
+=item Carp
+
+=item Cwd
+
+=item Exporter
+
+=item File::Copy
+
+=item File::Which
+
+=item LEOCHARRE::CLI
+
+=item LEOCHARRE::Dir
+
+=item PDF::API2
+
+=item Test::Simple
+
+=back
+
+=head1 SEE ALSO
+
+L<PDF::API2> - excellent pdf api.
+
+L<CAM::PDF> - works when sometimes PDF::API2 will not.
+
+pdftk - http://www.pdfhacks.com/pdftk/
+
+L<PDF::Extract>.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+
+
+=cut
+

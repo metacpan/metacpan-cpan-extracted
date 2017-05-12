@@ -1,0 +1,34 @@
+## name HasSwitch
+## failures 1
+## cut
+#!/usr/bin/perl -w
+
+## name EmbeddedSwitch
+## failures 1
+## cut
+#!/usr/bin/perl -w -T
+
+## name BundledSwitch1
+## failures 1
+## cut
+#!/usr/bin/perl -wT
+
+## name BundledSwitch2
+## failures 1
+## cut
+#!/usr/bin/perl -Tw
+
+## name BundledSwitch3
+## failures 1
+## cut
+#!/usr/bin/perl -TwT
+
+## name NoSwitch
+## failures 0
+## cut
+#!/usr/bin/perl -T
+
+## name NoShebang
+## failures 0
+## cut
+package Foo;

@@ -1,0 +1,133 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	
+	<head>
+		<title>Pangloss : Editor : Term Detail</title>
+		<link rel="stylesheet" href="/pcie.css"/>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	</head>
+
+	<body bottommargin="0" topmargin="0" leftmargin="0" rightmargin="0" marginheight="0" marginwidth="0">
+
+		<xi:include href="../header.html"/>
+
+<!-- START OF PAGE BODY .............................................. -->
+		<table border="0" cellpadding="0" cellspacing="0" width="100%" height="90%">
+			<tr><td valign="top" height="19"><span class="vsmall"> </span></td></tr>
+			<tr>
+				<td valign="top" width="15"><span class="vsmall"> </span></td>
+				<td valign="top" petal:if="view">
+				  <h1>Term Detail</h1>
+
+					<xi:include href="../term-error.html"/>
+
+					<span petal:if="true: view/term">
+
+						<?var name="set: can_edit session/user/is_admin"?>
+						<?var name="set: can_proof session/user/can_proofread view/term/language"?>
+
+						<form method="post" action="term.html">
+							<input type="hidden" name="selected_term" value="$view/term/key"/>
+							<input type="hidden" name="list_languages" value="1"/>
+							<input type="hidden" name="list_concepts"  value="1"/>
+							<span petal:if="view/term/modified" style="color: green">Term modified.</span>
+							<span petal:if="view/term/removed" style="color: red">Term removed.</span>
+							<table style="border: solid 1px" width="50%" cellpadding="0" cellspacing="0">
+								<tr>
+									<td align="left"  style="background-color: lightblue; border-bottom: solid 1px">Term Details:</td>
+									<td align="right" style="background-color: lightblue; border-bottom: solid 1px"><input type="submit" name="remove_term" value="remove term" petal:if="true: can_edit; false: view/term/removed"/> </td>
+								</tr>
+								<tr>
+									<td>Term Name:</td>
+									<td>
+										<input petal:if="can_edit" type="text" size="20" name="new_term_name" value="$view/term/name"/>
+										<span petal:if="false: can_edit" petal:replace="view/term/name">name</span>
+									</td>
+								</tr>
+								<tr>
+									<td>Concept:</td>
+									<td>
+										<select name="new_term_concept" petal:if="can_edit; $view/concepts;">
+											<option petal:repeat="concept view/concepts"
+															petal:attributes="value concept/key; selected true: equal: $concept/key $view/term/concept">$concept/name</option>
+										</select>
+										<span petal:if="false: can_edit" petal:replace="view/term/concept">concept</span>
+									</td>
+								</tr>
+								<tr>
+									<td>Language:</td>
+									<td>
+										<select name="new_term_language" petal:if="can_edit; $view/languages;">
+											<option petal:repeat="language view/languages"
+															petal:attributes="value language/key; selected true: equal: $language/key $view/term/language">$language/name</option>
+										</select>
+										<span petal:if="false: can_edit" petal:replace="view/term/language">language</span>
+									</td>
+								</tr>
+								<tr>
+									<td>Notes:</td>
+									<td>
+										<input petal:if="can_edit" type="text" size="20" name="new_term_notes" value="$view/term/notes"/>
+										<span petal:if="false: can_edit" petal:replace="view/term/notes">notes</span>
+									</td>
+								</tr>
+								<tr>
+									<td>Translator:</td>
+									<td>$view/term/creator</td>
+								</tr>
+								<tr>
+									<td>Created:</td>
+									<td><span class="small" petal:content="date: $view/term/date">date</span></td>
+								</tr>
+								<tr><td colspan="2" height="9" class="vsmall"> </td></tr>
+								<tr>
+									<td colspan="2" style="background-color: lightblue; border-bottom: solid 1px">Term Status:</td>
+								</tr>
+								<tr>
+									<td>Status:</td>
+									<td class="small">
+										<span petal:if="true: $view/term/status/is_approved">approved</span>
+										<span petal:if="true: $view/term/status/is_rejected">rejected</span>
+										<span petal:if="true: $view/term/status/is_pending">pending</span>
+										<a petal:if="true: can_proof" href="term-status.html?selected_term=${uri_escape: view/term/key}&get_term=1">[edit]</a>
+									</td>
+								</tr>
+								<tr>
+									<td>Proofreader:</td>
+									<td>$view/term/status/creator</td>
+								</tr>
+								<tr>
+									<td>Date:</td>
+									<td><span class="small" petal:content="date: $view/term/status/date">date</span></td>
+								</tr>
+								<tr>
+									<td>Notes:</td>
+									<td>$view/term/status/notes</td>
+								</tr>
+							</table>
+							<table width="50%" petal:if="true: can_edit; false: view/term/removed">
+								<tr>
+									<td align="center"><input type="submit" name="modify_term" value="modify term"/></td>
+								</tr>
+							</table>
+						</form>
+
+					</span>
+
+					<div petal:if="false: view/term" class="error">
+						Application Error: no term present in view!
+					</div>
+
+				</td>
+				<td valign="top" petal:if="false: view">
+					<div class="error">Application Error: no view present!</div>
+				</td>
+				<td valign="top" width="15"><span class="vsmall"> </span></td>
+			</tr>
+		</table>
+<!-- END OF PAGE BODY .............................................. -->
+
+	<xi:include href="../footer.html"/>
+
+  </body>
+</html>

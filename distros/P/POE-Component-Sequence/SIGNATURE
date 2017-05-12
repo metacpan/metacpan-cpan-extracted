@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 cffbf8515181ddf2642ef0a38620e906692233ff Build.PL
+SHA1 62d11683fd6a41e28f0b3ed53d883cd29681ed24 CHANGES
+SHA1 0586b96be61a6eaa59bacbf3f2ff5b579add3f1a MANIFEST
+SHA1 168bccae2ff5e5f885164ee63064089ac5504b51 META.json
+SHA1 12efe76e1915020ad44d4ea7f263b1479750bca6 META.yml
+SHA1 84ed757df8b7e0e2bfd98a77ae072d6df4f4f007 Makefile.PL
+SHA1 d1101a3420d40e330a34d2dee78f316e13ac544d README
+SHA1 31611eacafd04d1fd59d7f84a21581b36d64e8dd lib/POE/Component/Sequence.pm
+SHA1 e49fc1e3f3ea5dcc453d6971c31298d7312d2a53 lib/POE/Component/Sequence/Nested.pm
+SHA1 4baf3eb3b1976340fbfe638fefe952a3341a5162 t/001_load.t
+SHA1 6e6d851648517b99c4b9abbfc84580f132ff2748 t/002_methods.t
+SHA1 877ba2fb0cd5cf8ebe1c0be73ec24cc4df875094 t/003_simple.t
+SHA1 77dc74c76adea746c57bb1b9f655e83d6725e447 t/004_pause_and_delays.t
+SHA1 39ef81c9339072cc73508c7e4d493bd9ef8f4c85 t/005_nested_actions.t
+SHA1 19349272ace9231c1870565c74ff4b0dabe794ad t/006_custom_handler.t
+SHA1 6803c3a01c8f595e0371326744792c90859f5548 t/007_synchronous.t
+SHA1 f8fac2fbfb58d6f7c5f27ef87d06a6aaaefe50e9 t/lib/MyTests.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (Darwin)
+
+iEYEARECAAYFAlBXSb0ACgkQHHIpFH/pKkKAwgCfVKDpxxVMVnHMIYbKgbQufliD
+wHIAnR2596mN0fVFYvB29gjnz6rhiLht
+=jyEJ
+-----END PGP SIGNATURE-----

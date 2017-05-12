@@ -1,0 +1,21 @@
+pod
+  head1
+    @title
+      "NAME"
+    text
+      @text
+        "230-alternate-delimiters"
+  head1
+    @title
+      "TESTCASES"
+    text
+      @text
+        "Code containing a greater than symbol should be legal:"
+    text
+      @text
+        C<<
+          "$obj-"
+          ">"
+          "clone"
+        >>
+        " makes a deep copy of the object."

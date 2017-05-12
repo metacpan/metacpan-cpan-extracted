@@ -1,0 +1,14 @@
+<html>
+<body>
+	<!-- pass vars back to the templating engine in petal:if statements: -->
+	<span petal:if="test/object_type foo">
+		Object 0: <?var name="test/object_type foo"?>
+	</span>
+	<span petal:if="test/sub_test/object_type foo">
+		Object 1: <?var name="test/sub_test/object_type foo"?>
+	</span>
+	<?if name="test/object_type foo/bar"?>
+		Object 2: <?var name="test/object_type foo"?>
+	<?end?>
+</body>
+</html>

@@ -1,0 +1,212 @@
+# NAME
+
+POE::Component::Server::eris - POE eris message dispatcher
+
+# VERSION
+
+version 2.0
+
+# SYNOPSIS
+
+POE session for integration with your central logging infrastructure
+By itself, this module is useless.  It is designed to take an stream of data
+from anything that can generate a POE Event.  Examples for syslog-ng and
+rsyslog are included in the examples directory!
+
+    use POE qw(
+        Component::Server::TCP
+        Component::Server::eris
+    );
+
+    # Message Dispatch Service
+    my $SESSION = POE::Component::Server::eris->spawn(
+            ListenAddress       => 'localhost',         #default
+            ListenPort          => '9514',              #default
+            GraphiteHost        => undef,               #default
+            GraphitePort        => 2003,                #default
+            GraphitePrefix      => 'eris.dispatcher',   #default
+    );
+
+    # $SESSION = { alias => 'eris_dispatcher', ID => POE::Session->ID };
+
+
+    # Take Input from a TCP Socket
+    my $input_log_session_id = POE::Component::Server::TCP->spawn(
+
+        # An event will post incoming messages to:
+        # $poe_kernel->post( eris_dispatch => dispatch_message => $msg );
+        #        or
+        # $poe_kernel->post( $SESSION->{alias} => dispatch_message => $msg );
+        ...
+
+    );
+
+    POE::Kernel->run();
+
+# METHODS
+
+## spawn
+
+Creates the POE::Session for the eris correlator.
+
+Parameters:
+    ListenAddress           => 'localhost',         #default
+    ListenPort              => '9514',              #default
+
+# ACKNOWLEDGEMENTS
+
+- Mattia Barbon
+
+# AUTHOR
+
+Brad Lhotsky <brad@divsionbyzero.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2016 by Brad Lhotsky.
+
+This is free software, licensed under:
+
+    The (three-clause) BSD License
+
+# EVENTS
+
+## debug
+
+Controls Debugging Output to the controlling terminal
+
+## dispatcher\_start
+
+Sets the alias and creates in-memory storages
+
+## graphite\_connect
+
+Establish a connection to the graphite server
+
+## flush\_stats
+
+Send statistics to the graphite server and the debug clients
+
+## dispatch\_message
+
+Based on clients connected and their feed settings, distribute this message
+
+## dispatch\_messages
+
+Splits multiple messages by line feeds into many messages.
+
+## server\_error
+
+Handles errors related to the PoCo::TCP::Server
+
+## register\_client
+
+Client Registration for the dispatcher
+
+## debug\_client
+
+Enables debugging for the client requesting it
+
+## nobug\_client
+
+Disables debugging for a particular client
+
+## fullfeed\_client
+
+Adds requesting client to the list of full feed clients
+
+## nofullfeed\_client
+
+Disables the full feed from the requesting client.
+
+## subscribe\_client
+
+Handle program name subscription
+
+## unsubscribe\_client
+
+Handle unsubscribe requests from clients
+
+## match\_client
+
+Handle requests for string matching from clients
+
+## flush\_client
+
+Flushes the outstanding buffer to the client.
+
+## nomatch\_client
+
+Remove a match based feed from a client
+
+## regex\_client
+
+Handle requests for string regexes from clients
+
+## noregex\_client
+
+Remove a match based feed from a client
+
+## status\_client
+
+Send current server statistics to client
+
+## dump\_client
+
+Dump something interesting to the client
+
+## hangup\_client
+
+This handles cleaning up from a client disconnect
+
+## server\_shutdown
+
+Announce server shutdown, shut off PoCo::Server::TCP Session
+
+## client\_connect
+
+PoCo::Server::TCP Client Establishment Code
+
+## client\_print
+
+PoCo::Server::TCP Write to Client
+
+## broadcast
+
+PoCo::Server::TCP Broadcast Messages
+
+## debug\_message
+
+Send debug message to DEBUG clients
+
+## client\_input
+
+Parse the Client Input for eris::dispatcher commands and enact those commands
+
+## client\_term
+
+PoCo::Server::TCP Client Termination
+
+# SUPPORT
+
+## Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+- MetaCPAN
+
+    A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+    [http://metacpan.org/release/POE-Component-Server-eris](http://metacpan.org/release/POE-Component-Server-eris)
+
+- RT: CPAN's Bug Tracker
+
+    The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+    [https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Server-eris](https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-Server-eris)
+
+## Source Code
+
+This module's source code is available by visiting:
+[https://github.com/reyjrar/POE-Component-Server-eris](https://github.com/reyjrar/POE-Component-Server-eris)

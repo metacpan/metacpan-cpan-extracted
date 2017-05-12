@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Plack/Middleware/ServerStatus/Availability.pm
+minil.toml
+t/00_compile.t
+t/01_builder.t
+t/02_server.t
+t/03_reject.t
+META.yml
+MANIFEST

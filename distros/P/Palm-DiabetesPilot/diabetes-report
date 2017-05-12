@@ -1,0 +1,152 @@
+#!/usr/bin/perl
+#
+# ColdSync DiabetesPilot reporting conduit
+#
+# $Id: diabetes-report,v 1.1 2004/01/25 01:16:29 cpb Exp $
+#
+use strict;
+use Palm::DiabetesPilot;
+use ColdSync;
+use Text::Wrap;
+
+# Default values for headers
+%HEADERS = (
+	"Directory" => "$ENV{HOME}/diabetes",
+	"Wrap"		=> 74,	# Note wrapping
+	"MealItems" => 0,
+	"GlucUnits" => "mmol/L",
+);
+
+my $VERSION = (qw( $Revision: 1.1 $ ))[1];	# Conduit version
+
+StartConduit("dump");
+
+mkdir $HEADERS{'Directory'} unless -d $HEADERS{'Directory'};
+die "404 No log directory '$HEADERS{Directory}'" 
+	unless -d $HEADERS{'Directory'};
+
+$Text::Wrap::columns = $HEADERS{'Wrap'};
+
+my %seen;
+
+for (@{$PDB->{records}}) {
+	my $f = "$HEADERS{Directory}/$_->{'year'}-$_->{'month'}-$_->{'day'}.txt";
+
+	# we're gonna rewrite it...
+	unlink $f unless exists $seen{$f} and -f $f;
+
+	open F, ">> $f" or die "404 $!";
+	select F;
+
+	$seen{$f} = 1;
+
+	printf "%04d-%02d-%02d %02d:%02d %-17s ",
+		$_->{'year'}, $_->{'month'}, $_->{'day'},
+		$_->{'hour'}, $_->{'minute'},
+		$PDB->{appinfo}{categories}[$_->{category}]{name};
+
+	print $_->{'type'}, " ";
+	if( $_->{'type'} eq "med" ) {
+		print $_->{'med'}, " ", $_->{'quantity'}, "\n";
+	} elsif( $_->{'type'} eq "gluc" ) {
+		print $_->{'quantity'}, " $HEADERS{GlucUnits}\n";
+	} elsif( $_->{'type'} eq "exer" ) {
+		print $_->{'quantity'}, " ", $_->{'exer'}, "\n";
+	} elsif( $_->{'type'} eq "meal" ) {
+		print $_->{'quantity'}, " carbs\n";
+
+		if( $HEADERS{'MealItems'} ) {
+			for( @{$_->{'items'}} ) {
+				print "($_->{servings}) $_->{name}\n",
+					"  Carb:$_->{carbs} Fiber:$_->{fiber} Cal:$_->{calories} ",
+					"Prot:$_->{protein} Fat:$_->{fat}\n";
+			}
+		}
+	} else {
+		print "\n";
+	}
+
+	if( exists $_->{'note'} ) {
+		my $note = $_->{note};
+
+		$note .= "\n" if $note !~ /\n$/m;
+		$note = wrap("Note: ", "  ", $note );
+
+		print $note;
+	}
+
+	print "--------------------------------------------------------\n";
+
+	select STDOUT;
+	close F;
+}
+
+EndConduit;
+
+__END__
+
+=head1 NAME
+
+diabetes-report - ColdSync conduit to make DiabetesPilot status reports
+
+=head1 SYNOPSIS
+
+conduit dump {
+    type: DGA1/DATA;
+    path: "<...>/diabetes-report";
+  arguments:
+    Directory:  /home/cpb/diabetes;
+    GlucUnits:  mmol/L;
+    MealItems:  0;
+    Wrap:  		74;
+}
+
+=head1 DESCRIPTION
+
+The C<diabetes-report> conduit bundles up all records in the
+DiabetesPilot database and dumps them into text files containing all the
+relevant bits. It's primarily intended for sharing with a specific nurse,
+but others might find it useful.
+
+=head1 OPTIONS
+
+=over 4
+
+=item C<Directory>
+
+Output files are placed, one per day, in this directory. By default, it's
+C<$HOME/diabetes>.
+
+=item C<Wrap>
+
+Specifies the column at which to wrap long notes. Defaults to 74. A
+value of 0 specifies that text should not be wrapped.
+
+=item C<GlucUnits>
+
+Sets the appropriate units for a glucose reading. mmol/L is the default.
+
+=item C<MealItems>
+
+When non-zero, specific details of each meal item will be output. By default,
+this is disabled. In many cases, this might be either too much information
+or too private to publish. And some people might find the calorie
+information just too darn depressing.
+
+=head1 BUGS
+
+We really should try to get the units from the app preferences.
+
+=head1 AUTHOR
+
+E<lt>christophe.beauregard@sympatico.caE<gt>
+
+=head1 SEE ALSO
+
+coldsync(8)
+
+http://www.diabetespilot.com/
+
+Palm::DiabetesPilot
+
+F<ColdSync Conduits>, in the ColdSync documentation.

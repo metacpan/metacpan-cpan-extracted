@@ -1,0 +1,13 @@
+Revision history for PHP-Var
+
+0.022   Sun Jan  3 14:52:18 JST 2010
+	* Specified the required module version for test.
+
+0.021   Fri Jan  1 23:10:42 JST 2010
+	* Updated a file "Makefile.PL".
+
+0.02    Tue Dec 29 10:39:13 JST 2009
+	* Fixed some bugs.
+
+0.01    Sat Dec 26 17:36:48 JST 2009
+	* First version.

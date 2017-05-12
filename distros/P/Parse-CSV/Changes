@@ -1,0 +1,64 @@
+Revision history for Perl extension Parse-CSV
+
+2.04      2015-07-15 20:48:16 America/Chicago
+	- Fixed a regression that resulted in some failures in the
+          Parse::CSV::Colnames distribution [Spotted by H.Merijn Brand]
+	- Deprecate calling fields()/string() after fetch() [bc5453f]
+	- Various doc clarifications/improvements [bddba50]
+	- Simplify processing & reduce copying in fetch() [b47286b]
+
+2.03      2015-07-06 00:03:56 America/Chicago
+     	- Now accepts embedded newlines in fields.  Previously parsing
+          would fail when embedded newlines were encountered. [Ken
+          Williams]
+
+	- Now sets 'binary => 1' by default, as recommended by the
+          Text::CSV_XS docs.  This also allows multi-line data by
+          default. [Ken Williams]
+	  
+	- The distribution now lives on GitHub, is controlled by
+          Dist::Zilla, and this version was released by Ken Williams.
+          Feel free to fork it or send pull requests or whatever.
+
+2.01 Sun 4 Nov 2012
+	- Upgrading to Module::Install 1.06
+	- The names method returns a null list if there are no names
+
+2.00 Thu 23 Feb 2012
+	- IO::File 1.14 dependency was too aggressive and wouldn't install
+	  on RHEL5. Moved back to 1.13 (Kirby Smith)
+
+1.99 Tue 29 Nov 2011
+	- Significant refactoring of the way column names are handled
+	- Upgrade to Module::Install::DSL 1.04
+	- The 'fields' constructor param is now 'names'
+	- The 'names' param treats any true non-reference as 'auto'
+	- Added back-compatibility support for older 'fields' indefinitely
+	- Added 'names' accessor to get or set the column names on the fly
+	- POD changes
+	- Adding tests for names
+	- RT bug #31389 "fields" is a method of Text::CSV_XS
+	- RT Bug #51692
+	- RT bug #51081 Some replacements of "CVS" with "CSV"
+	- Added tests for fields and string
+
+1.02 not released
+
+1.01 not released
+
+1.01 Sat 10 May 2008
+	- Methods combine/string/print were infinite looping, fixed
+	- Big CSV_XS dependency increase, *substantial* numbers of
+	  important bugs were fixed in April 2008.
+
+1.00 Tue 17 Oct 2006
+	- Converting to _CODELIKE
+	- Cleaning up the docs
+	- Added shortcuts to combine, string, print
+	- Fixing the RT bugs
+
+0.02 Fri 11 Aug 2006
+	- Adding support for filters dropping records
+
+0.01 Thu 10 Aug 2005
+	- Completed the first implementation

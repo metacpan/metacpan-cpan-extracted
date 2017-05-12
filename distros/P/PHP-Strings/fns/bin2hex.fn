@@ -1,0 +1,8 @@
+---
+name: bin2hex
+
+docs: |
+    This is trivially implemented using L<pack|perlfunc/"pack">.
+
+        my $hex = unpack "H*", $data;
+

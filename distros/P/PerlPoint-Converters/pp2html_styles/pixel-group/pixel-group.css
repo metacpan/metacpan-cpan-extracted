@@ -1,0 +1,65 @@
+
+/*   widb.css   */
+/*   style sheet fuer Wissensdatenbank don   */
+/*   $Id: don.css,v 1.3 2003/05/12 17:44:37 lorenz Exp $   */
+
+BODY {
+   font-family: helvetica, sans-serif;
+ /*  font-size: 24pt; */
+   font-size: 18pt;
+   font-style: normal;
+   font-weight: normal;
+   color: rgb(0,0,0);
+   background: rgb(255,255,255);
+   margin-left: 1cm;
+}
+
+/* H1
+   fuer die Ueberschrift im Titelbereich */
+H1.title {
+   font-size: 42pt;
+   font-weight: bold;
+   color: rgb(255,64,0);
+}
+H1 {
+   font-size: 24pt;
+   font-weight: bold;
+   color: rgb(255,64,0);
+}
+
+/* H2
+   fuer die Ueberschrift einer Funktion */
+H2 {
+   font-size: large;
+   font-weight: bold;
+   color: rgb(0,0,0);
+}
+
+TD.mmtop {
+   font-family: helvetica, sans-serif;
+/* font-size: 32pt; */
+   font-size: 18pt;
+   font-style: normal;
+   font-weight: normal;
+   color: rgb(255,255,255);
+}
+TD.nav {
+   font-family: helvetica, sans-serif;
+   font-size: 8pt;
+   font-style: normal;
+   font-weight: normal;
+}
+TD {
+   font-family: helvetica, sans-serif;
+ /*  font-size: 24pt; */
+   font-size: 18pt;
+   font-style: normal;
+   font-weight: normal;
+}
+PRE {
+   font-family: courier;
+/* font-size: 14pt; */
+   font-size: 12pt;
+   font-style: normal;
+   font-weight: normal;
+}

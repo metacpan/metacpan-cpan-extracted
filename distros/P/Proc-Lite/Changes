@@ -1,0 +1,53 @@
+changes from 0.09 to 0.10
+=========================
+
+  * fixed new() in Proc::Lite to use 2-arg form of bless
+
+  * fixed error message in Proc::Hevy::Writer to reflect call to POSIX::dup2()
+
+  * added debugging to t/reopen.t for failed test reports
+
+  * removed MYMETA.yml and MYMETA.json from module distribution
+    per CPAN standards
+
+  * updated documentation to reflect new formatting standards
+
+changes from 0.08 to 0.09
+=========================
+
+  * added priority parameter as suggested by Jason McCarver
+
+  * added parent/child callback parameters as suggested in a patch from
+    Knut-Olav Hoven (rt #70298)
+
+changes from 0.07 to 0.08
+=========================
+
+ * fixed bug where reading blank lines caused them to be skipped as
+   reported by Jason McCarver
+
+changes from 0.06 to 0.07
+=========================
+
+ * changed error handling if exec() fails to avoid problems with block eval
+
+changes from 0.05 to 0.06
+=========================
+
+  * added filehandle duping to reset STD* filenos in the child process
+
+changes from 0.04 to 0.05
+=========================
+
+  * fixed the order of filehandle processing in the child process
+
+changes from 0.02 to 0.04
+=========================
+
+  * fixed tests for better taint-mode handling
+
+changes from 0.01 to 0.02
+=========================
+
+  * documentation fixes
+

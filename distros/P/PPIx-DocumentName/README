@@ -1,0 +1,43 @@
+PPIx::DocumentName
+
+This module contains a few utilities for extracting a "name" out of an
+arbitrary Perl file.
+
+Typically, this is the "module" name, in the form:
+
+  package Foo
+
+However, it also supports extraction of an override statement in the
+form:
+
+  # PODNAME: OverrideName::Goes::Here
+
+Which may be more applicable for documents that lack a "package"
+statement, or the "package" statement may be "wrong", but they still
+need the document parsed under the guise of having a name ( for purposes
+such as POD )
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

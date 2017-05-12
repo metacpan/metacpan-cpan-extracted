@@ -1,0 +1,10 @@
+%from pascalnestedeyapp2 import expr
+# alternative syntax to include also semantic actions
+#%from pascalnestedeyapp2 use expr
+
+%%
+range: expr '..' expr ';'
+;
+
+%%
+

@@ -1,0 +1,24 @@
+bin/podsite
+Build.PL
+Changes
+lib/Pod/Site.pm
+lib/Pod/Site/podsite.css
+lib/Pod/Site/podsite.js
+MANIFEST			This list of files
+README.md
+t/base.t
+t/bin/foo/yay
+t/bin/howdy
+t/bin/yo.pl
+t/build.t
+t/config.t
+t/get_desc.t
+t/lib/Foo/Bar.pm
+t/lib/Foo/Bar/Baz.pm
+t/lib/Foo/Shizzle.pm
+t/lib/Hello.pm
+t/lib/Heya.pm
+t/lib/Heya/Man.pm
+t/lib/Heya/Man/What.pm
+META.yml
+META.json

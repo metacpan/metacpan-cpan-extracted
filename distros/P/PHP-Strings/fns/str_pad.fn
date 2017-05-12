@@ -1,0 +1,52 @@
+exports:
+  - str_pad
+  - STR_PAD_RIGHT
+  - STR_PAD_LEFT
+  - STR_PAD_BOTH
+
+docs: TBD
+
+code: |
+    use constant STR_PAD_RIGHT => 1;
+    use constant STR_PAD_LEFT  => 2;
+    use constant STR_PAD_BOTH  => 3;
+
+    sub str_pad
+    {
+        my ( $input, $length, $pad, $options ) = validate_pos( @_,
+            STRING,
+            INTEGER,
+            { %{+STRING}, optional => 1, default => ' ' },
+            { %{+INTEGER}, optional => 1, default => STR_PAD_RIGHT },
+        );
+
+        return $input if $length < length $input;
+
+        # Work out where to place our string.
+        my $start = 0;
+        my $diff = $length - length $input;
+        my $rv;
+
+        if ( $options == STR_PAD_RIGHT )
+        {
+            my $padding = substr( $pad x $diff, 0, $diff );
+            $rv = $input . $padding;
+        }
+        elsif ( $options == STR_PAD_LEFT )
+        {
+            my $padding = substr( $pad x $diff, 0, $diff );
+            $rv = $padding . $input;
+        }
+        elsif ($options == STR_PAD_BOTH )
+        {
+            $rv = substr( $pad x $length, 0, $length );
+            substr( $rv, $diff / 2, length $input ) = $input;
+        }
+        else
+        {
+            croak "Invalid 4th argument to str_pad";
+        }
+
+        $rv;
+    }
+

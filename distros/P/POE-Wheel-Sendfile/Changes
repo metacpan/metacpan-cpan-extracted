@@ -1,0 +1,12 @@
+Revision history for Perl extension POE::Wheel::Sendfile.
+
+0.02  Wed May 18 2011
+    - Fixed _mk_fallback
+    - Use sysseek if an offset is required
+    - Respect {size} during the fallback
+    - Tweak doco
+
+0.01  Wed Dec 15 17:16:58 2010
+	- original version; created by h2xs 1.23 with options
+		-AX POE::Wheel::Sendfile
+

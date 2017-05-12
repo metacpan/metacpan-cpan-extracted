@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Proc-Info-Environment
+version:            0.01
+abstract:           Read Environment Variables of any Process
+author:
+    - Mike Schilli <cpan@perlmeister.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:  {}
+resources:
+    repository:  http://github.com/mschilli/proc-info-environment-perl
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,137 @@
+dnl Process this file with autoconf to produce a configure script.
+
+AC_INIT(io.c)
+AC_CANONICAL_HOST
+AC_CONFIG_HEADER(config.h)
+
+AC_ARG_WITH(alsa,
+    	[  --with-alsa		  use ALSA if possible],
+   	use_alsa="$withval",use_alsa=no)
+
+AC_PROG_CC
+
+AC_CHECK_LIB(m,main)
+AC_CHECK_LIB(c,main)
+
+AC_HEADER_DIRENT
+AC_HEADER_STDC
+AC_CHECK_HEADERS(fcntl.h limits.h unistd.h string.h sys/soundcard.h soundcard.h machine/soundcard.h libc.h)
+dnl soundcard.h is sometimes in /usr/lib/oss/include or /usr/local/lib/oss/include (gad...)
+
+AC_C_CONST
+AC_TYPE_MODE_T
+AC_TYPE_SIZE_T
+AC_TYPE_PID_T
+AC_STRUCT_TM
+AC_C_BIGENDIAN
+
+AC_CHECK_SIZEOF(int)
+AC_CHECK_SIZEOF(char)
+AC_CHECK_SIZEOF(short)
+AC_CHECK_SIZEOF(long)
+AC_CHECK_SIZEOF(int *)
+
+AC_TYPE_SIGNAL
+AC_FUNC_STRFTIME
+AC_CHECK_FUNCS(getcwd strerror strtok)
+AC_FUNC_CLOSEDIR_VOID
+AC_FUNC_VPRINTF
+
+GUILE_LDFLAGS=""
+GUILE_CFLAGS=""
+
+dnl SGI specialty
+AUDIO_LIB=""
+AC_CHECK_LIB(audio,main,[
+AUDIO_LIB="-laudio"
+])
+AC_SUBST(AUDIO_LIB)
+
+A_LD="ld"
+A_LD_FLAGS=""
+
+dnl we need the sndlib.h equivalents to try to find the native sound support (see config.guess)
+dnl this only matters for those cases where we've implemented the audio code in audio.c
+dnl test for ALSA courtesy of Paul Barton-Davis
+audio_system="unknown"
+case "$host" in
+    *-*-linux*) 
+	AC_DEFINE(LINUX)
+        AC_CHECK_LIB(asound,main,[ 
+	if test "$use_alsa" = yes ; then 
+	       audio_system=ALSA;
+	       AC_DEFINE(HAVE_ALSA)
+	       AUDIO_LIB="-lasound"
+	       AC_SUBST(AUDIO_LIB)
+	else 
+	       echo "ALSA appears to be installed, but you asked for OSS";
+	       audio_system=OSS;
+        fi
+],[ 
+audio_system=OSS
+])
+	if test $audio_system != OSS ; then
+		AC_CHECK_HEADER(sys/asoundlib.h, [
+:
+],[ 
+if test $audio_system = ALSA ; then
+   echo "I can't find the ALSA library - falling back to OSS"; 
+   audio_system=OSS;
+fi
+])
+	fi
+	;;
+    *-*-sunos4*) 
+        AC_DEFINE(SUN)
+	audio_system=Sun
+        ;;
+    *-*-solaris*) 
+        AC_DEFINE(SOLARIS)
+	AC_DEFINE(SUN)
+	audio_system=Sun
+        ;;
+    *-*-hpux*) 
+        AC_DEFINE(HPUX)
+	audio_system=Hpux
+        ;;
+    *-next*) 
+        AC_DEFINE(NEXT)
+	audio_system=NeXT
+        ;;
+    *-sgi*) 
+        AC_DEFINE(SGI)
+	audio_system=SGI
+	A_LD_FLAGS="-non_shared"
+	LIB_NAME="sndlib.a"
+	# to get this to work in both cases, we'd need to run all the cc cases twice with/out -shared as in libtool
+        ;;
+    alpha*) 
+        AC_DEFINE(ALPHA)
+        ;;
+    *-*-openbsd*) 
+        AC_DEFINE(OPENBSD)
+	audio_system=Sun
+        ;;
+    *-*-sco*) 
+        AC_DEFINE(SCO5)
+	audio_system=OSS
+        ;;
+    *-*-cygwin*)
+	AC_DEFINE(WINDOZE)
+	audio_system=Windoze
+	;;
+    *-aix*) 
+        AC_DEFINE(AIX)
+	audio_system=aix
+        ;;
+
+esac
+AC_MSG_CHECKING([for audio system])
+AC_MSG_RESULT($audio_system)
+AC_SUBST(A_LD)
+AC_SUBST(A_LD_FLAGS)
+AC_SUBST(LIB_NAME)
+
+AC_OUTPUT(Makefile
+../config.pl)
+

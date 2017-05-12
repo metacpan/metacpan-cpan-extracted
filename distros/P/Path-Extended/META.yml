@@ -1,0 +1,39 @@
+---
+abstract: 'yet another Path class'
+author:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.98'
+  Test::UseAllModules: '0.09'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.06'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Path-Extended
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Encode: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Copy::Recursive: '0'
+  File::Find::Rule: '0'
+  File::Path: '0'
+  File::Spec: '3.23'
+  File::Temp: '0'
+  File::stat: '1'
+  IO: '1.23'
+  Log::Dump: '0'
+  Scalar::Util: '0'
+  Sub::Install: '0'
+resources:
+  repository: https://github.com/charsbar/path-extended
+version: '0.23'

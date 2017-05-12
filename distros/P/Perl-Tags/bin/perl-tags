@@ -1,0 +1,40 @@
+#!/usr/bin/env perl
+use 5.006;
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+=head1 SYNOPSIS
+
+  Usage: perl-tags <options> <input files or dirs...>
+  Generates "perltags" files for use with your editor of choice.
+  
+  Options:
+
+  -h/--help      Display this help
+  -v/--version   Display the version number
+
+  -o/--outfile   Set the path/name of the output file (default: perltags)
+  -d/--depth     Set the max recursion depth (recursion into "use Module", etc)
+                 (default: 10, use 0 to set no limit)
+  --vars/--no-vars/--variables/--no-variables
+                 Set whether variables should be indexed. (Default: yes)
+
+  -p/--ppi       use PPI parsing (Default: no)
+  --prune        Glob patterns to prune. May be passed multiple times. 
+                 (Default: .git, .svn)
+  --files/-L     Instead of input files or dirs specified after the options,
+                   read paths of the files to process from this file, one
+                   per line.  If '-' is specified, stdin is read.
+
+=cut
+
+use App::Perl::Tags;
+App::Perl::Tags->run;
+
+=head1 AUTHOR
+
+Copyright 2009-2014, Steffen Mueller, with contributions from osfameron
+
+=cut

@@ -1,0 +1,50 @@
+Revision history for Perl extension Pg::Simple.
+
+1.20 2006-08-15  Diab Jerius
+        * bug in connect() caused the User and Password
+        attributes passed to the constructor to be ignored.
+        (Thanks to John Lewis for catching this)
+
+1.10 2004-10-24 Diab Jerius
+        * added fetch_hashref method
+
+1.00  Fri Feb 15 23:46:52 EST 2002
+        - renamed from PgSimple to Pg::Simple for public release.
+
+2000-01-14  Diab Jerius  <dj@pelf>
+
+	* Simple.pm, MANIFEST, COPYRIGHT, LICENSE, Makefile.PL,
+	  INSTALL, Changes, GNUmakefile: *** empty log message ***
+
+1999-04-14  Diab Jerius  <dj@pelf>
+
+	* Simple.pm: added abort method.  routines now use it upon error
+
+	attributes given to execute method are now valid for that method call
+	only
+
+	added attributes to do method
+
+	added ntuples method
+
+	optimized fetch method using the Pg fetchrow method instead
+	of getvalue.
+
+	_error wasn't correctly accessing the RaiseError attribute
+
+1999-04-12  Diab Jerius  <dj@pelf>
+
+	* Simple.pm: added User attribute to new and connect
+
+1998-11-23  Diab Jerius  <dj@pelf>
+
+	* Simple.pm: added support for passwords
+
+	* Simple.pm: fix problems in documentation
+
+1998-11-20  Diab Jerius  <dj@pelf>
+
+	* GNUmakefile, INSTALL, Simple.pm:
+
+	* GNUmakefile, INSTALL, Simple.pm: New file.
+

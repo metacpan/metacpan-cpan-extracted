@@ -1,0 +1,109 @@
+0.21  Thu Nov 22 22:01:12 CET 2012
+    - FixRT #81332: _is_symlink fails test 157 using fake_symlinks in
+
+0.20  Wed Aug 26 15:19 2009
+    - Many temporary-file-locking fixes to make
+      PAR::Repository work on FreeBSD (Slaven Rezic)
+    - Fix to the test count for MD5 checksums (Slaven Rezic)
+    - Documentation/POD fixes (Slaven Rezic)
+    - Dependency fix for File::Temp. Require 0.19 (Slaven Rezic)
+
+0.19  Thu Feb 19 16:48 2009
+    - Promote to stable version.
+
+0.18_01  Mon Feb  2 02:46 2009
+    - Add ignore_provides switch to package injection.
+    - Add static dependencies
+    - Remove warning in Makefile.PL about symlink support
+    - Fix bug in _update_info_version.
+    - Add _create_dbm as an abstraction.
+    - Slight fixes to 'parrepo' (verbosity)
+
+0.17  Tue Jan 13 19:48 2009
+    - Do a chmod(644) of the dbm checksums file after creation.
+
+0.16_02  Thu Oct 23 20:51 2008
+    - Occasionally, using defined($hash->{$foo}), we were inserting bogus
+      records into the dbs.
+    - Archive injection/removal test with symlink conversion in between
+    - Slight refactoring of the test code.
+
+0.16_01  Mon Oct 21 00:16 2008
+    - Support for running without symlinks finally arrived!
+    - fake_symlinks option to the constructor (default if
+      symlinks not available)
+    - convert_symlinks option to the constructor for converting
+      existing repositories with symlinks to those without.
+    - Fix to the ::DBM docs: the symlinks DB doesn't have paths.
+    - Optimize the symlinks db space usage after deleting from it.
+    - Expose the new options with parrepo (with a new command
+      convert_symlinks, too)
+    - Much improved test suite.
+    - No longer use base if @ISA is ample.
+
+0.16     Thu Sep  4 16:21 2008
+    - Fix the documentation in ::DBM on the symlinks database.
+    - Fix the name of the env. variable for disabling the
+      no-symlinks warning on installation. (Cosimo Streppone)
+    - Removed the PAR::Repository::ScanPAR module and use the
+      PAR::Indexer module from CPAN instead. PAR::Indexer
+      is essentially just PAR::Repository::ScanPAR, but usable
+      by other distributions.
+    - Fixed fallback to Digest::Perl::MD5
+    - Finally add some meaningful tests.
+
+0.15     Sun Aug 10 11:48 2008
+    - Properly close scripts dbm on DESTROY.
+    - Calculate DBM checkums.
+    - Require DBM::Deep 1.0012: No more XS dependency.
+
+0.14     Sat Nov  4 22:47 2006
+    - Fixed a bug during injection.
+    - META.yml now conforms to spec. 1.20.
+    - Now including t/00podcover.t
+
+0.13     Fri Sep 15 10:50 2006
+    - Broke out PAR::Repository::Query into its own distribution
+      so that PAR::Repository and PAR::Repository::Client can share
+      the same querying interface.
+    - Slight change to the interface!
+      modules_dbm(), symlinks_dbm(), and scripts_dbm() now all return
+      the name of the temporary file as second return value in order
+      to make *_dbm() work consistently across PAR::Repository::Query
+      uses.
+
+0.12     Sun Aug 28 10:31 2006
+    - Explicitly depending on PAR::Dist 0.18.
+    - Added optional POD tests.
+    - Fixed spelling error in query output of parrepo
+
+0.11     Sat Aug 28 19:18 2006
+    - Relaxed the "query dist" command syntax a bit.
+
+0.10     Sat Aug 28 18:26 2006
+    - Implemented querying.
+      --> Added Query.pm
+      --> Added "query script", "query module" and "query dist" to parrepo
+
+0.03     Thu Aug 10 18:01 2006
+    - Added scripts support.
+    - Added support for upgrading repository versions.
+    - Fixed a dangerous bug in the remove() method. (It didn't work
+      correctly for symlinks before!)
+    - Removing files from the repository by specifying individual bits
+      of information now works.
+
+0.02     Thu Aug 10 15:00 2006
+    - Added new file "repository_info.yml" to the repositories.
+    - Checks for compatible repository versions when opening a
+      repository.
+    - Corrected a couple of error messages.
+    
+0.01_02  Sat Aug 05 18:34 2006
+    - Added documentation for the remove command in "parrepo".
+    - Corrected documentation error.
+    - Now including POD correctness tests.
+
+0.01     Tue Jul 25 14:21 2006
+    - original version
+

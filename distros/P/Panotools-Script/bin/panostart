@@ -1,0 +1,244 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Panotools::Makefile;
+use Panotools::Photos;
+
+my $path_makefile;
+my $d_inc = 15;
+my $projection;
+my $deg_fov;
+my $crop_s;
+my $linkstacks;
+my $help = 0;
+my $verbose = 0;
+my $nostacks = 0;
+
+# FIXME tonemapped output
+# FIXME RAW files
+# FIXME fused then mapped then blended output
+
+my @argv_save = @ARGV;
+my $mk = new Panotools::Makefile;
+
+GetOptions ('o|output=s' => \$path_makefile,
+            't|time=s' => \$d_inc,
+            'f|projection=i' => \$projection,
+            'v|fov=s' => \$deg_fov,
+            'k|selection=s' => \$crop_s,
+            'linkstacks' => \$linkstacks,
+            'l|loquacious' => \$verbose,
+            'n|nostacks' => \$nostacks,
+            'h|help' => \$help);
+
+pod2usage (-verbose => 2) if $help;
+pod2usage (2) unless scalar @ARGV > 1;
+$path_makefile = 'Makefile' unless defined $path_makefile;
+
+my $rule = $mk->Rule ('.PHONY');
+$rule->Prerequisites (qw/all images pto pointless pointless_mk mk qtvr hdr/);
+
+$rule = $mk->Rule ('all');
+$rule->Prerequisites ('images');
+
+# some phony targets, prerequisites will be populated later
+
+my $rule_ptos = $mk->Rule ('pto');
+my $rule_mks = $mk->Rule ('mk');
+my $rule_pointless = $mk->Rule ('pointless');
+my $rule_pointless_mk = $mk->Rule ('pointless_mk');
+my $rule_imgs = $mk->Rule ('images');
+my $rule_movs = $mk->Rule ('qtvr');
+my $rule_hdrs = $mk->Rule ('hdr');
+
+# some variable definitions
+
+$mk->Variable ('MAKE_EXTRA_ARGS', 'clean');
+$mk->Variable ('HUGINDATADIR', '/usr/share/hugin');
+$mk->Variable ('PTO2MK', 'pto2mk');
+$mk->Variable ('MATCHNSHIFT', 'match-n-shift');
+$mk->Variable ('PTOANCHOR', 'ptoanchor');
+
+# split the list of photos into likely panoramas
+
+my $all_photos = new Panotools::Photos (@ARGV);
+
+for my $photo_set ($all_photos->SplitInterval ($d_inc))
+{
+    next if scalar $photo_set->Paths == 1;
+
+    my $stub = $photo_set->Stub;
+    my $stub_fused = $stub .'_fused';
+    my $stub_blended_fused = $stub .'_blended_fused';
+    my $stub_hdr = $stub .'_hdr';
+
+    if ($photo_set->Bracketed)
+    {
+        $rule_imgs->Prerequisites ("$stub_fused.tif");
+        $rule_movs->Prerequisites ("$stub_fused.mov");
+        $rule_hdrs->Prerequisites ("$stub_hdr.exr");
+        print STDERR "$stub_fused.tif: ". scalar $photo_set->Paths ." images\n" if $verbose;
+    }
+    elsif ($photo_set->Layered)
+    {
+        $rule_imgs->Prerequisites ("$stub_blended_fused.tif");
+        $rule_movs->Prerequisites ("$stub_blended_fused.mov");
+        print STDERR "$stub_blended_fused.tif: ". scalar $photo_set->Paths ." images\n" if $verbose;
+    }
+    else
+    {
+        $rule_imgs->Prerequisites ("$stub.tif");
+        $rule_movs->Prerequisites ("$stub.mov");
+        print STDERR "$stub.tif: ". scalar $photo_set->Paths ." images\n" if $verbose;
+    }
+
+    # rules for pto project files and .pto.mk files
+
+    $rule_ptos->Prerequisites ("$stub.pto");
+    $rule_mks->Prerequisites ("$stub.pto.mk");
+    $rule_pointless->Prerequisites ("$stub.pointless.pto");
+    $rule_pointless_mk->Prerequisites ("$stub.pointless.pto.mk");
+
+    $mk->Comment ('Create a pointless project file from a list of photos');
+    $rule = $mk->Rule;
+    $rule->Targets ("$stub.pointless.pto");
+    $rule->Prerequisites ($photo_set->Paths);
+
+    my @command = ('$(MATCHNSHIFT_SHELL)');
+    push @command, ('--output', "$stub.pointless.pto");
+    push @command, ('--projection', $projection) if defined $projection;
+    push @command, ('--fov', $deg_fov) if defined $deg_fov;
+    push @command, ('--selection', $crop_s) if defined $crop_s;
+    push @command, ('--linkstacks') if $linkstacks;
+    push @command, ($photo_set->Paths);
+    $rule->Command (@command);
+
+    $mk->Comment ('Create a Makefile to make a finished project from a pointless project');
+    $rule = $mk->Rule;
+    $rule->Targets ("$stub.pointless.pto.mk");
+    $rule->Prerequisites ("$stub.pointless.pto");
+    $rule->Command ('$(PTOANCHOR_SHELL)', '--makefile', "$stub.pointless.pto.mk",
+                        '--output', "$stub.pto", "$stub.pointless.pto");
+
+    $mk->Comment ('Create a finished .pto project');
+    $rule = $mk->Rule;
+    $rule->Targets ("$stub.pto");
+    $rule->Prerequisites ("$stub.pointless.pto.mk");
+    $rule->Command ('$(MAKE)', '-e', '-f', "$stub.pointless.pto.mk",
+                        'all', '$(MAKE_EXTRA_ARGS_SHELL)');
+
+    $mk->Comment ('Create a .pto.mk Makefile from a finished project file');
+    $rule = $mk->Rule;
+    $rule->Targets ("$stub.pto.mk");
+    $rule->Prerequisites ("$stub.pto");
+    $rule->Command ('$(PTO2MK_SHELL)', '-o', "$stub.pto.mk", '-p', $stub, "$stub.pto");
+
+    $mk->Comment ('Rules for all possible output images');
+
+    $mk->Comment ('Normal seam blended output');
+    $rule = $mk->Rule;
+    $rule->Targets ("$stub.tif");
+    $rule->Prerequisites ("$stub.pto", "$stub.pto.mk", $photo_set->Paths);
+    $rule->Command ('$(MAKE)', '-e', '-f', "$stub.pto.mk", "$stub.tif", '$(MAKE_EXTRA_ARGS_SHELL)');
+
+    $mk->Comment ('Exposure fused then seam blended output');
+    $rule = $mk->Rule;
+    $rule->Targets ("$stub_fused.tif");
+    $rule->Prerequisites ("$stub.pto", "$stub.pto.mk", $photo_set->Paths);
+    $rule->Command ('$(MAKE)', '-e', '-f', "$stub.pto.mk",
+                        "$stub_fused.tif", '$(MAKE_EXTRA_ARGS_SHELL)');
+
+    $mk->Comment ('Seam blended then fused output');
+    $rule = $mk->Rule;
+    $rule->Targets ("$stub_blended_fused.tif");
+    $rule->Prerequisites ("$stub.pto", "$stub.pto.mk", $photo_set->Paths);
+    $rule->Command ('$(MAKE)', '-e', '-f', "$stub.pto.mk",
+                        "$stub_blended_fused.tif", '$(MAKE_EXTRA_ARGS_SHELL)');
+
+    $mk->Comment ('HDR merged then seam blended output');
+    $rule = $mk->Rule;
+    $rule->Targets ("$stub_hdr.exr");
+    $rule->Prerequisites ("$stub.pto", "$stub.pto.mk", $photo_set->Paths);
+    $rule->Command ('$(MAKE)', '-e', '-f', "$stub.pto.mk",
+                        "$stub_hdr.exr", '$(MAKE_EXTRA_ARGS_SHELL)');
+
+    $mk->Comment ('Rules for secondary output (QTVR, little planets etc...)');
+
+    $mk->Comment ('Normal seam blended output');
+    $rule = $mk->Rule;
+    $rule->Targets ("$stub.mov", "$stub-sky.jpg", "$stub-planet.jpg", "$stub-mercator.jpg");
+    $rule->Prerequisites ("$stub.pto", "$stub.pto.mk", "$stub.tif");
+    $rule->Command ('$(MAKE)', '-e', '-f', '$(HUGINDATADIR_SHELL)/Makefile.equirect.mk',
+        'equirect_all', 'equirect_clean', "PTO=$stub.pto", 'FUSED_SUFFIX=');
+
+    $mk->Comment ('Exposure fused then seam blended output');
+    $rule = $mk->Rule;
+    $rule->Targets ("$stub_fused.mov", "$stub_fused-sky.jpg",
+                        "$stub_fused-planet.jpg", "$stub_fused-mercator.jpg");
+    $rule->Prerequisites ("$stub.pto", "$stub.pto.mk", "$stub_fused.tif");
+    $rule->Command ('$(MAKE)', '-e', '-f', '$(HUGINDATADIR_SHELL)/Makefile.equirect.mk',
+        'equirect_all', 'equirect_clean', "PTO=$stub.pto", 'FUSED_SUFFIX=_fused');
+
+    $mk->Comment ('Seam blended then fused output');
+    $rule = $mk->Rule;
+    $rule->Targets ("$stub_blended_fused.mov", "$stub_blended_fused-sky.jpg",
+                        "$stub_blended_fused-planet.jpg", "$stub_blended_fused-mercator.jpg");
+    $rule->Prerequisites ("$stub.pto", "$stub.pto.mk", "$stub_blended_fused.tif");
+    $rule->Command ('$(MAKE)', '-e', '-f', '$(HUGINDATADIR_SHELL)/Makefile.equirect.mk',
+        'equirect_all', 'equirect_clean', "PTO=$stub.pto", 'FUSED_SUFFIX=_blended_fused');
+}
+
+$rule = $mk->Rule;
+$rule->Targets ($path_makefile);
+$rule->Prerequisites (@ARGV);
+$rule->Command ($0, @argv_save);
+
+$mk->Write ($path_makefile);
+
+__END__
+
+=head1 NAME
+
+panostart - identify likely panorama sequences
+
+=head1 SYNOPSIS
+
+panostart [options] image1 image2 [...]
+
+ Options:
+  -o | --output name    Filename of created Makefile
+  -t | --time           Number of seconds between panoramas
+  -f | --projection     Panotools style input projection number. Use
+                          0 for rectilinear, 2 for circular fisheye and
+                          3 for full-frame fisheye images.
+  -v | --fov            Horizontal field of view in degrees.  Otherwise will
+                        be calculated from EXIF info.
+  -k | --selection      Crop selection boundary, eg -459,2459,-57,2861
+       --linkstacks     Hard link positions of stacked photos.
+  -h | --help           Outputs help documentation.
+  -l | --loquacious     Verbose output listing targets and numbers of images.
+
+=head1 DESCRIPTION
+
+B<panostart> takes a list of image files and creates a Makefile
+containing rules to generate panoramas from the images.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License
+as published by the Free Software Foundation; either version 2
+of the License, or (at your option) any later version.
+
+=head1 SEE ALSO
+
+L<http://hugin.sourceforge.net/>
+
+=head1 AUTHOR
+
+Bruno Postle - August 2008.
+
+=cut

@@ -1,0 +1,30 @@
+POE::Component::Client::POP3 version 0.01
+=========================================
+
+This module provides an event based interface to the POP3
+(Post Office Protocol - Version 3) protocol.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  POE
+  Socket
+
+COPYRIGHT AND LICENCE
+
+Except where otherwise noted, POE::Component::Client::POP3 is Copyright
+1998-2002 Scott Beck <scott@gossamer-threads.com>. All rights reserved.
+POE::Component::Client::POP3 is free software; you may redistribute it and/or
+modify it under the same terms as Perl itself.
+
+

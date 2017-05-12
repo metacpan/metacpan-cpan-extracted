@@ -1,0 +1,19 @@
+/* 
+ * PPI::HTML CSS rules
+ */
+.comment            { color: #228B22;                     }
+.double             { color: #CD5555;                     }
+.heredoc_content    { color: #CD5555;                     }
+.interpolate        { color: #CD5555;                     }
+.keyword            { color: #8B4513; font-weight:bold;   }
+.line_number        { color: #AAAAAA;                     }
+.number             { color: #B452CD;                     }
+.operator           { color: #000000;  font-weight: bold; }
+.pragma             { color: #8B008B;  font-weight: bold; }
+.single             { color: #CD5555;                     }
+.structure          { color: #000000;                     }
+.substitute         { color: #CD5555;                     }
+.symbol             { color: #00688B;                     }
+.word               { color: #8B008B;  font-weight: bold; }
+.words              { color: #CD5555;                     }
+.match              { color: #CD5555;                     }

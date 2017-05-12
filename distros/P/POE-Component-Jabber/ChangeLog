@@ -1,0 +1,46 @@
+2009-03-22 nperez <nperez@cpan.org>
+	* Major revision: 3.00
+	* NOT BACKWARD COMPATIBLE WITH PREVIOUS 2.X BRANCH
+	* Use new 5.10.0 constructs and features
+	* New publish/subscribe interface for status events and more
+	* Based on new POE::Filter::XML 0.35 which is now based on XML::LibXML
+	* Revert to dependency on POE::Component::SSLify
+	* Drop Filter::Template dependency
+	* All constants are now exported through POE::Component::Jabber
+	* New XPATH based filtering (due to XML::LibXML usage)
+
+2008-07-26 nperez <nperez@cpan.org>
+	* Maint revision: 2.03
+	* Package and distribute SSL code to avoid dep explosion
+
+2007-08-20 nperez <nperez@cpan.org>
+	* Maint revision: 2.02
+	* Fix alias_remove call on _stop (Thanks to Mark Morgan)
+
+2007-01-26 nperez <nperez@cpan.org>
+	* Maint revision: 2.01
+	* Automated tests are still very new to me. Fix problems with defaults.
+	* Update all module version numbers to stay in sync
+
+2007-01-20 nperez <nperez@cpan.org>
+	* Major revision: 2.0
+	* Reorganized guts into object_states and extensible Protocol specifics
+	* Full documentation for all included modules
+	* Examples reworked with documentation inline
+	* Automated testing written to cover all Protocol dialects
+
+2006-04-30 nperez <nperez@cpan.org>
+	* Bumped version to: 1.21
+	* New handlers for failed connections
+	* New export in PCJ::Error
+	* Update dependancies
+	* Updated installer to Module::Build
+	* Stem off bitrot
+
+2005-12-04 nperez <nperez@cpan.org>
+
+	* Removed kludged TLS support.
+	* Updated PCJ Error to include SSL failures
+	* New dependency: POE::Component::SSLify
+	* Bumped version to: 1.12
+	

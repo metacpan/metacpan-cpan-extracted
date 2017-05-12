@@ -1,0 +1,25 @@
+Revision history for Perl extension Padre::Plugin::Autodia.
+
+0.04 2013-11-08
+ - Update Makefile.PL (BOWTIE)
+ - Add Autodia icon (BOWTIE)
+ - Add README (BOWTIE)
+
+0.03 2012-11-21
+ - Make Padre API v2 compatable (BOWTIE)
+ - Added Tasks for background working (BOWTIE)
+ - Added Project diagrams, jpg and dia with auto loading of App (BOWTIE)
+
+0.02 2010-09-09
+ - Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+ - Switched to Dist::Zilla (AZAWAWI)
+ - Added compatibility with the latest Padre API (AZAWAWI)
+ - Added GraphViz 2.04 missing dependency (AZAWAWI)
+ - Added Arabic translation (AZAWAWI)
+ - Fix error in About box (ZENOG)
+ - Added Dutch translation (ddn123456 - Dirk De Nijs)
+ - Added Brazilian Portuguese translation (GARU)
+
+0.01 2009-11-09
+ - Initial release with UML menu options for This File and Selected Files
+

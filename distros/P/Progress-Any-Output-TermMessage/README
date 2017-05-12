@@ -1,0 +1,66 @@
+NAME
+    Progress::Any::Output::TermMessage - Output progress to terminal as
+    simple message
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+     use Progress::Any::Output;
+     Progress::Any::Output->set('TermMessage', template=>"[%n] (%P/%T) %m");
+
+DESCRIPTION
+    This output displays progress indicators as messages on terminal.
+
+METHODS
+  new(%args) => OBJ
+    Instantiate. Usually called through
+    "Progress::Any::Output->set("TermMessage", %args)".
+
+    Known arguments:
+
+    *   template => STR (default: '(%P/%T) %m')
+
+        Will be used to do "$progress->fill_template()". See Progress::Any
+        for supported template strings.
+
+    *   single_line_task => BOOL (default: 0)
+
+        If set to true, will reuse line using a series of "\b" to get back
+        to the original position, as long as the previous update is for the
+        same task and the "finished" attribute is false. For example:
+
+         use Progress::Any;
+         use Progress::Any::Output;
+
+         Progress::Any::Output->set("TermMessage",
+             single_line_task=>0, template=>"%t %m");
+         my $progress = Progress::Any->get_indicator(
+             task => 'copy', title => 'Copying file ... ');
+         $progress->update(message=>'file1.txt');
+         $progress->update(message=>'file2.txt');
+         $progress->update(message=>'file3.txt');
+         $progress->finish(message=>'success');
+
+        will result in:
+
+         Copying file ... file1.txt_
+         Copying file ... file2.txt_
+         Copying file ... file3.txt_
+         Copying file ... success
+         _
+
+        all in one line.
+
+SEE ALSO
+    Progress::Any
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,221 @@
+Revision history for Path-Dispatcher
+
+1.06 2015-02-18
+        Switch packaging system to Dist::Zilla (David Pottage)
+            https://github.com/sartak/path-dispatcher/pull/1
+            Thanks to the CPAN Pull Request Challenge :)
+
+1.05 Thu Mar 14 2013
+        eval q{$'} before regex match when needed to soothe bleadperl
+            Thanks Dave Mitchell! http://www.nntp.perl.org/group/perl.perl5.porters/2013/03/msg200156.html
+
+1.04 Thu Sep 1 2011
+        Explicitly depend on Test::Fatal (reported by Jérôme Quelin  [rt.cpan.org #70666])
+        Convert all tests from Test::Exception to Test::Fatal
+
+1.03 Tue Aug 30 2011
+        Provisional support for arbitrary payloads, not just code blocks, as results
+            See https://github.com/sartak/path-dispatcher/blob/master/t/200-payload.t
+        Eventually blocks will be deprecated, but not for a while. Internally blocks are
+        rewritten as payloads so if you're doing deep magic with PD you may be exposed to
+        that implementation detail.
+
+1.02 Tue Nov 2 2010
+        Various improvements to the handling of $match->leftover with undef
+
+1.01 Sun Oct 24 2010
+        Skip t/026-named-captures.t if you don't have 5.10.1
+
+        Give matches a ->parent for inspecting an Under prefix rule's
+            captures etc
+
+1.00 Sun Oct 17 2010
+        Bump to 1.0 to indicate back compat breakage
+
+        Add match->named($key) for pulling out a named capture
+
+        Use Try::Tiny to avoid swallowing exceptions (rafl)
+
+0.16 Sun Oct 17 2010
+        ** BACKWARDS INCOMPATIBLE CHANGE: Pass the match object into rule
+        **    blocks rather than assigning $1, $2, $3. Use ->pos(1), (2), (3),
+        **    etc. instead. This cleans up the code a lot and makes
+        **    Path-Dispatcher more flexible.
+
+        Add support for named captures
+
+        Make all attributes read-only. If you need something to be read-write,
+            I am open to such a change. Just let me know!
+
+        Make _dispatcher_rule private
+
+        Remove trace/readable_attribute/name support. This wants to be
+            implemented in a different, better, more comprehensive way.
+
+        Add documentation for shell tab completion
+
+        Plenty other updated documentation
+
+0.15 Tue Mar 16 09:40:40 2010
+        ** Factored Path-Dispatcher-Declarative into its own distribution
+        ** Be sure to update your dependency lists!
+
+        Implement ->complete for Rule::Dispatch
+
+        Add Path::Dispatcher::Rule::Alternation
+
+        Implement case insensitivity for Rule::Eq
+
+        Add Path::Dispatcher::Rule::Sequence - like Rule::Tokens but
+            better!
+
+        Add Path::Dispatcher::Rule::Enum
+
+        Path autoboxing has been factored out into a private method for
+            more overridability
+
+        A few documentation improvements as usual :)
+
+0.14 Thu Dec 31 13:18:19 2009
+        Add Path::Dispatcher->complete for tab-completion
+
+        Handle delimiters better in Path::Dispatcher::Rule::Tokens
+
+        Factor out a _prefix method for rules to simplify their logic
+
+0.13 Sun Aug 9 13:38:19 2009
+        Add unshift_rule to classes that do Role::Rules
+
+        Several distribution improvements
+
+0.12 Fri Apr 17 03:21:05 2009
+        Fix a bug with undefined capture variables being converted to the
+            empty string and throwing warnings (reported by obra)
+
+        Give Path::Dispatcher::Rule::Dispatch a "rules" method
+
+0.11 Wed Apr 15 02:47:50 2009
+        Fix some misnamed keys caused by de-AttributeHelper-ing
+
+        Stop using some deprecated Moose features
+
+        Doc fixes (Sartak and confound)
+
+0.10 Fri Mar 6 23:40:42 2009
+        The way you specify token_delimiter and case_sensitive_tokens has
+            changed! You now say:
+                use Path::Dispatcher::Declarative -base, -defaults => {
+                    token_delimiter       => '/',
+                    case_sensitive_tokens => 0,
+                };
+
+        Added Path::Dispatcher::Cookbook (grink)
+
+        Added Path::Dispatcher::Builder which now backs
+            Path::Dispatcher::Declarative (grink)
+
+        then {} rule which is an "always" with that uses next_rule (grink)
+
+        chain {} rule which is like Catalyst's chain (grink)
+
+        Remove the last vestiges of stages (Sartak)
+
+        Many minor fixes (Sartak)
+
+0.09 Mon Feb 9 21:12:18 2009
+        Avoid using method modifiers since it's potentially another dep.
+
+0.08 Thu Feb 5 12:15:38 2009
+        Inline uses of MooseX::AttributeHelpers.
+
+        Now use "Any::Moose" (basically Squirrel done right)
+
+0.07 Wed Jan 28 01:39:37 2009
+        Paths are now boxed with the new Path::Dispatcher::Path.
+
+        New rule type "Intersection" which matches only when each of its
+        subrules match.
+
+        New rule type "Metadata" which matches the optional metadata (a hash)
+        of the path. The sugar for this is: on { foo => "bar" }
+
+        New rule type "Eq" which just does basic string equality.
+
+        Rules can now be named. In Path::Dispatcher::Declarative, each rule is
+        named with its dispatcher's name and the file:line where the rule was
+        defined.
+
+        Dispatch tracing output, for debugging. Set environment variable
+        PATH_DISPATCHER_TRACE to a number. The higher the number, the more
+        output will be generated. The current maximum value of 10 will dump
+        code references.
+
+0.06 Sat Nov 15 21:02:29 2008
+        New rule type "Empty" which matches only the empty path.
+
+        Declarative:
+            on '' now matches only the empty path.
+
+0.05 Sat Nov 15 16:36:41 2008
+        Improve test coverage
+        New rule type "Always" which always matches.
+
+        Match:
+            ends_dispatch is now an attribute
+
+        Rule::Tokens:
+            Support for case insensitive matching
+            Fix for tokens' type constraint
+
+        Dispatcher:
+            Allow rules to be specified in the constructor (a typo prevented it)
+
+        Dispatch:
+            first_match, has_match methods which do what you'd expect
+            The run method will now collect return values and return them
+
+        Declarative:
+            redispatch_to sugar which adds a Dispatch rule
+            "on '' => sub" as a special case will match all paths
+
+
+0.04 Tue Oct 28 17:56:41 2008
+        Dist fixes
+
+0.03 Tue Oct 28 17:42:47 2008
+        "rewrite" rules
+        Super dispatchers are GONE! Yay.
+        New Rule::Dispatch which just takes some other dispatcher. nothingmuch++
+
+        Rule::Tokens:
+            Fix for always matching just a prefix whether you wanted to or not
+            Make tokenization and untokenization into methods for overriding
+
+        Declarative:
+            -base is required, otherwise unrelated modules using your dispatcher
+                would get their @ISA set!
+
+
+0.02 Mon Oct 20 14:10:12 2008
+        Documentation!
+        Prefix matches
+        "under" rules
+        Remove stages until they're actually needed
+
+        Rule:
+            The codeblock is no longer required
+            Empty tokens are ignored
+            The token attribute is now 'delimiter' instead of 'splitter'
+            Allow regexes and alternations in the token rules
+
+        Match:
+            No longer Dispatch::Match
+            Created by the Rule instead of the Dispatcher
+
+        Declarative:
+            You now must subclass Path::Dispatcher::Declarative
+            Allow overriding the token delimiter
+
+0.01 Wed Aug 27 11:04:18 2008
+        Initial release
+

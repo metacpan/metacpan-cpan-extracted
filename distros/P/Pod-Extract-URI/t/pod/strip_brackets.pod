@@ -1,0 +1,6 @@
+=pod
+
+<http://www.example.com/1>
+<URL:http://www.example.com/2>
+<URI:http://www.example.com/3>
+http://www.example.com/4

@@ -1,0 +1,259 @@
+
+/*
+ * Copyright (C) 2003  Sam Horrocks
+ * 
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * 
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ *
+ */
+
+Frontend
+========
+- Save original argv
+- Do "Frontend Connect"
+- Do the perperl protocol
+
+Frontend Connect
+================
+- While no connection:
+    - Stat our script file
+    - Call "Get a Backend"
+    - If we got a backend:
+	- Try to connect
+	- If connection successful, return
+	- If connection failed:
+	    - Unless there's a bug in the code somewhere, this BE must've
+	      been killed and not yet cleaned up.  Since we've already
+	      unlocked the file, if we try to go do a cleanup, we may get
+	      there after another process does.  So, we may be overwriting
+	      some other unrelated slot data instead.  This could be
+	      solved with some data in the BE slot where we allocate
+	      this BE to our pid before unlocking, making us the only pid
+	      allowed to clean it up.  Or we could go back and track down our
+	      group/script again and find this BE on the group's list,
+	      if it's still there.  But, both of these options are a lot
+	      of trouble for what should be a rare occurance anyways -
+	      if the process is dead, the normal cleanup mechanism should
+	      eventually get rid of it anyways (assuming no PID wrap).
+	      For now just ignore a connection failed and move on.
+    - Endif
+- End Loop
+
+Get a Backend
+=============
+- Lock file
+- Do "Find Script" to find our group/script slots
+- Allocate an FE slot and add it to the end of the FE list for this group
+- While no timeout:
+    - Call "Send Sigs"
+    - If our sent_sig flag is set and there are BE's available:
+	- Remove a BE from the idle list
+	- Break out of loop
+    - Endif
+    - Do a "Backend Check"
+    - Block alarm signal, saving previous state
+    - Unlock file
+    - Set alarm for 1-second
+    - Wait for an alarm
+    - Lock file
+    - Revert alarm signal to previous state
+    - If our group slot is invalid, break out of loop
+- End Loop
+- Remove our FE slot
+- Unlock file
+- Return the BE slotnum, if one was found
+
+
+Send Sigs
+=========
+- Foreach BE in the be_wait list
+    - Loop Forever
+	- Get the next FE from fe_wait
+	- If no more FE's, end loop
+	- If pid is not ours:
+	    - Send alarm signal using kill
+	    - If kill failed:
+		- Dispose of FE
+		- Continue loop
+	    - Endif
+	- Endif
+	- Set the sent_sig flag for this FE
+	- Break out of loop
+    - End Loop
+- End Loop
+
+
+Backend Check
+=============
+- Loop Forever
+    - Check the first BE on the groups be_list with a signal-0
+    - If running, end-loop
+    - If not running do a "BE Dispose"
+- End Loop
+- If number of BE's running is too low (below one, or below the run limit),
+  then do a "Backend Spawn"
+
+
+Backend Spawn
+=============
+- Fork/exec the perperl_backend prog with original argv[]
+
+
+Backend
+=======
+- Stat our script
+- Lock temp file
+- Find our group/script in the temp file
+- Do "Allocate Slot"
+- Write pid into slot
+- Put BE onto group's be list
+- Unlock temp file
+- Bring up perl interpreter and compile cgi code
+- Listen on socket
+- Loop Forever
+    - Lock temp file
+    - If our group is invalid, cleanup and exit
+    - Add our slot to the beginning of the be_wait list
+    - Do "Send Sigs"
+    - Unlock temp file
+    - Do "Backend Accept"
+    - Read environment and argv on stdin
+    - Run perl code
+    - Shutdown stdio
+- End Loop
+
+Backend Accept
+==============
+- Loop Forever
+    - Wait for accept or timeout
+    - If got accept, return
+    - Do "Try Exit"
+- End Loop
+
+
+Try Exit
+========
+Lock file
+Set timeout to zero
+Wait for accept or timeout
+If no accept is pending:
+    - Do a Backend Dispose on our slot
+    - Exit
+Else:
+    - Unlock file
+    - Return
+
+Exit Unconditionally
+====================
+- "Try Exit"
+- Exit
+
+
+Backend Dispose
+===============
+- Remove this BE from the group's be list
+- Remove this BE from the be_wait list
+- Unlink the socket associated with this slot
+- Do "Free Slot"
+- If group is now empty free the group
+
+
+Frontend Dispose
+================
+- ???
+
+
+File Operations
+---------------
+
+File Lock
+=========
+- If file is already locked, return.
+- If file-descriptor is marked suspect:
+    - If file is open:
+	- Fstat the open file-descriptor
+	- If fstat fails or different dev/inode:
+	    - "Unmap the file"
+	    - Forget this file-descriptor
+	- Endif
+    - Endif
+    - Mark file-descriptor OK
+- Endif
+- Loop forever
+    - If file is not open, open it.
+    - Lock the file
+    - Fstat the file-descriptor
+    - "Map the file"
+    - If file is too small:
+	- truncate to a new length
+	- Fstat the file-descriptor
+	- remap the file
+    - Endif
+    - If file is marked as valid, break out of loop
+- End Loop
+
+
+Unmap the file
+==============
+- If file is mapped, call munmap()
+
+
+Map the file
+============
+- If file is not mmaped with the correct size:
+    - "Unmap the file"
+    - Call mmap()
+- Endif
+
+
+File Unlock
+===========
+- Release lock on file-descriptor
+
+
+FD Is Suspect
+=============
+- Mark fd as suspect
+
+
+Close File
+==========
+- Unlock file
+- "Unmap the file"
+- Close file
+
+
+Remove File
+===========
+- Lock the file
+- Set the "invalid flag" in the file
+- Unlink the file
+- "Close File"
+
+
+Find Script
+===========
+- Find our script by searching for dev/ino
+- If not found:
+    - Unlock file
+    - Read command-line options from script
+    - Lock file
+    - Create a new script entry
+    - Find our group and point our script entry to it
+- If entry has older mtime:
+    - Invalidate this group
+    - Send shutdown requests to all be's on the be_wait queue
+    - Update the mtime
+- Endif
+- If no valid group, create a new group and point our script entry to it.

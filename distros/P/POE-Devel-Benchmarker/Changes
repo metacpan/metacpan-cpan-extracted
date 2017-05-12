@@ -1,0 +1,41 @@
+Revision history for Perl extension POE::Devel::Benchmarker
+
+* 0.05
+
+	Minor tweaks on the YAML output ( nothing new, hah! )
+	Added the socket tests, yay! ( still need more work so we test various methods of socket creation )
+	Some more tweaks to the BasicStatistics plugin for prettier graphs
+	Lots of refactoring to get things cleaned up :)
+	Added test versioning, so we make sure we're processing the right version :)
+	added examples/test.pl to satisfy kwalitee requirements, ha!
+
+* 0.04
+
+	Started work on the image generator ( Imager ) and added the BasicStatistics plugin, yay!
+	Added automatic "pick up where we left off" to the benchmarker
+	Added the freshstart option to benchmark()
+	Tweaked the GetPOEdists sub so it will work in the "work directory" and in the poedists dir
+	Tweaked the YAML output so it's smaller
+	Removed POE::Loop::Wx from autoprobing ( I'm unable to get it to work )
+	Removed POE::Loop::Kqueue from autoprobing ( I'm unable to get it to work )
+	Hardcoded the Benchmarker routines to skip POE < 0.13 ( I'm unable to get it to work )
+
+* 0.03
+
+	Added the loop option to benchmark(), thanks dngor!
+	Added the poe option to benchmark(), thanks dngor!
+	Added the noxsqueue option to benchmark()
+	Added the noasserts option to benchmark()
+	Automatically enable noxsqueue option if we cannot load POE::XS::Queue::Array, saving time
+	Bump Test::More version requirement because some people reported failures with note()
+	Fixed bug in SubProcess where it crashed on old POEs that didn't load IO::Handle
+	More documentation additions/tweaks
+
+* 0.02
+
+	Added the Analyzer module ( and dump YAML files, yay! )
+	A lot of minor changes+tweaks to get a better dump format
+
+* 0.01
+
+	initial release

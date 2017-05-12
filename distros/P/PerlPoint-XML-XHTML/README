@@ -1,0 +1,101 @@
+
+
+Note: this release is published as a beta, as it contains no tests
+      so far. Nevertheless, it is considered stable as it was used
+      in several larger projects.
+
+
+INTRO
+
+Welcome!
+
+This is the C<PerlPoint::Generator::XML::XHTML> package, providing
+two formatters for the generator C<PerlPoint::Generator::XML>:
+C<XHTML> produces monolythic, all in one pages containing the
+whole document, which C<XHTML::Paged> makes each chapter a new
+page.
+
+After successfull installation, you can use these formatters this way:
+
+  pp2tdo -target XML -format XHTML ... yoursource.pp
+
+  pp2tdo -target XML -format XHTML::Paged ... yoursource.pp
+
+As usual with C<pp2tdo>, each formatter brings new options.
+Please add C<-help> to a valid C<pp2tdo> call to get a list of all the
+options available.
+
+
+INSTALLATION
+
+Install this package the usual manual way by
+
+unpacking
+make test install distclean
+
+Or use C<cpanp> or C<cpan> to install including all prerequisites.
+
+
+DOCUMENTATION
+
+Each module comes with its own POD documentation. For an introduction on how to use
+PerlPoint, please see the manual provided with the C<PerlPoint::Package> distribution.
+
+
+SUPPPORT
+
+A PerlPoint mailing list is set up to discuss usage, ideas,
+bugs, suggestions and translator development. To subscribe,
+please send an empty message to perlpoint-subscribe@perl.org.
+
+If you prefer, you can contact me via perl@jochen-stenzel.de
+as well.
+
+
+CREDITS
+
+Thanks to Jürgen Christoffel for his continued requests for more
+valid XHTML while we finished the production of the German Perl
+Workshop CDs (now: proceedings online) together (with PerlPointCD).
+
+
+AUTHOR
+
+Copyright (c) Jochen Stenzel (perl@jochen-stenzel.de), 1999-2005.
+All rights reserved.
+
+This module is free software, you can redistribute it and/or modify it
+under the terms of the Artistic License distributed with Perl version
+5.003 or (at your option) any later version. Please refer to the
+Artistic License that came with your Perl distribution for more
+details.
+
+The Artistic License should have been included in your distribution of
+Perl. It resides in the file named "Artistic" at the top-level of the
+Perl source tree (where Perl was downloaded/unpacked - ask your
+system administrator if you dont know where this is).  Alternatively,
+the current version of the Artistic License distributed with Perl can
+be viewed on-line on the World-Wide Web (WWW) from the following URL:
+http://www.perl.com/perl/misc/Artistic.html.
+
+
+DISCLAIMER
+
+This software is distributed in the hope that it will be useful, but
+is provided "AS IS" WITHOUT WARRANTY OF ANY KIND, either expressed or
+implied, INCLUDING, without limitation, the implied warranties of
+MERCHANTABILITY and FITNESS FOR A PARTICULAR PURPOSE.
+
+The ENTIRE RISK as to the quality and performance of the software
+IS WITH YOU (the holder of the software).  Should the software prove
+defective, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR
+CORRECTION.
+
+IN NO EVENT WILL ANY COPYRIGHT HOLDER OR ANY OTHER PARTY WHO MAY CREATE,
+MODIFY, OR DISTRIBUTE THE SOFTWARE BE LIABLE OR RESPONSIBLE TO YOU OR TO
+ANY OTHER ENTITY FOR ANY KIND OF DAMAGES (no matter how awful - not even
+if they arise from known or unknown flaws in the software).
+
+Please refer to the Artistic License that came with your Perl
+distribution for more details.
+

@@ -1,0 +1,58 @@
+SYNOPSIS
+
+     use PERLANCAR::Permute::Named;
+    
+     my @p = permute_named(bool => [ 0, 1 ], x => [qw(foo bar baz)]);
+     for (@p) {
+         some_setup() if $_->{bool};
+         other_setup($_->{x});
+         # ... now maybe do some tests ...
+     }
+
+DESCRIPTION
+
+    This module is like Permute::Named, except that it uses a different
+    technique: dynamically generates nested loop Perl code, evals that, and
+    avoids repetitive deep cloning. It can be faster than Permute::Named as
+    the number of keys and values increase.
+
+FUNCTIONS
+
+ permute_named(@list) => @list | $arrayref
+
+    Takes a list of key-specification pairs where the specifications can be
+    single values or references to arrays of possible actual values. It
+    then permutes all key-specification combinations and returns the
+    resulting list (or arrayref) of permutations, depending on context.
+
+    The function expects the pairs as an even-sized list. Each
+    specification can be a scalar or a reference to an array of possible
+    values.
+
+    Example 1:
+
+     permute_named(bool => [ 0, 1 ], x => [qw(foo bar baz)])
+
+    returns:
+
+     [ { bool => 0, x => 'foo' },
+       { bool => 0, x => 'bar' },
+       { bool => 0, x => 'baz' },
+       { bool => 1, x => 'foo' },
+       { bool => 1, x => 'bar' },
+       { bool => 1, x => 'baz' }, ]
+
+    Example 2:
+
+     permute_named(bool => 1, x => 'foo')
+
+    just returns the one permutation:
+
+     {bool => 1, x => 'foo'}
+
+SEE ALSO
+
+    Permute::Named, Permute::Named::Iter and CLI <permute-named>
+
+    Set::CrossProduct and cross
+

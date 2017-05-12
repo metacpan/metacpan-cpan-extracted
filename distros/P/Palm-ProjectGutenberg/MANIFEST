@@ -1,0 +1,13 @@
+ARTISTIC.txt
+bin/pg2pdb
+CHANGES
+GPL2.txt
+lib/Palm/ProjectGutenberg.pm
+Makefile.PL
+MANIFEST
+README
+t/all.t
+t/ARTISTIC.pdb
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

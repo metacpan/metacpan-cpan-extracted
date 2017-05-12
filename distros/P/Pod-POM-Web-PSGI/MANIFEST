@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Pod/POM/Web/PSGI.pm
+t/10-psgi.t
+t/11-status.t

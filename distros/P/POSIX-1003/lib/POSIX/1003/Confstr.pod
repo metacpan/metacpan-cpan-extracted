@@ -1,0 +1,186 @@
+=encoding utf8
+
+=head1 NAME
+
+POSIX::1003::Confstr - POSIX access to confstr()
+
+=head1 INHERITANCE
+
+ POSIX::1003::Confstr
+   is a POSIX::1003::Module
+
+=head1 SYNOPSIS
+
+  use POSIX::1003::Confstr;   # import all
+
+  use POSIX::1003::Confstr 'confstr';
+  my $path = confstr('_CS_PATH');
+
+  use POSIX::1003::Confstr '_CS_PATH';
+  my $path = _CS_PATH;
+
+  use POSIX::1003::Confstr '%confstr';
+  my $key = $confstr{_CS_PATH};
+  $confstr{_CS_NEW_CONF} = $key;
+
+=head1 DESCRIPTION
+
+With C<confstr()> you can retreive string values from the operating
+system. It is the counterpart of C<sysconf()> which can only return
+numeric values.
+
+See L<documentation in the base class|POSIX::1003::Module/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+See L<documentation in the base class|POSIX::1003::Module/"METHODS">.
+ 
+=over 4
+
+=item POSIX::1003::Confstr-E<gt>B<exampleValue>(NAME)
+
+See L<POSIX::1003::Module/"METHODS">
+
+=item $obj-E<gt>B<import>()
+
+See L<POSIX::1003::Module/"METHODS">
+
+=back
+
+=head1 FUNCTIONS
+
+=head2 Standard POSIX
+
+=over 4
+
+=item B<confstr>(NAME)
+
+Returns the confstr value related to the NAMEd constant.  The NAME
+must be a string. C<undef> will be returned when the NAME is not
+known by the system.
+
+example: 
+
+  my $path = confstr('_CS_PATH') || '/bin:/usr/bin';
+
+=back
+
+=head2 Additional
+
+=over 4
+
+=item B<confstr_names>()
+
+Returns a list with all known names, unsorted.
+
+=back
+
+=head1 CONSTANTS
+
+=over 4
+
+=item B<%confstr>
+
+This exported variable is a (tied) HASH which maps C<_CS_*>
+names to the unique numbers to be used with the system's C<confstr()>
+function.
+
+=back
+
+The following constants where detected on your system when the
+module got installed.  The second column shows the value which
+where returned at that time.
+
+=for comment
+#TABLE_CONFSTR_START
+
+  _CS_GNU_LIBC_VERSION                 'glibc 2.15'
+  _CS_GNU_LIBPTHREAD_VERSION           'NPTL 2.15'
+  _CS_LFS64_CFLAGS                     '-D_LARGEFILE64_SOURCE'
+  _CS_LFS64_LDFLAGS                    ''
+  _CS_LFS64_LIBS                       ''
+  _CS_LFS64_LINTFLAGS                  '-D_LARGEFILE64_SOURCE'
+  _CS_LFS_CFLAGS                       ''
+  _CS_LFS_LDFLAGS                      ''
+  _CS_LFS_LIBS                         ''
+  _CS_LFS_LINTFLAGS                    ''
+  _CS_PATH                             '/bin:/usr/bin'
+  _CS_POSIX_V5_WIDTH_RESTRICTED_ENVS   'XBS5_LP64_OFF64'
+  _CS_POSIX_V6_ILP32_OFF32_CFLAGS      ''
+  _CS_POSIX_V6_ILP32_OFF32_LDFLAGS     ''
+  _CS_POSIX_V6_ILP32_OFF32_LIBS        ''
+  _CS_POSIX_V6_ILP32_OFF32_LINTFLAGS   ''
+  _CS_POSIX_V6_ILP32_OFFBIG_CFLAGS     ''
+  _CS_POSIX_V6_ILP32_OFFBIG_LDFLAGS    ''
+  _CS_POSIX_V6_ILP32_OFFBIG_LIBS       ''
+  _CS_POSIX_V6_ILP32_OFFBIG_LINTFLAGS  ''
+  _CS_POSIX_V6_LP64_OFF64_CFLAGS       '-m64'
+  _CS_POSIX_V6_LP64_OFF64_LDFLAGS      '-m64'
+  _CS_POSIX_V6_LP64_OFF64_LIBS         ''
+  _CS_POSIX_V6_LP64_OFF64_LINTFLAGS    ''
+  _CS_POSIX_V6_LPBIG_OFFBIG_CFLAGS     ''
+  _CS_POSIX_V6_LPBIG_OFFBIG_LDFLAGS    ''
+  _CS_POSIX_V6_LPBIG_OFFBIG_LIBS       ''
+  _CS_POSIX_V6_LPBIG_OFFBIG_LINTFLAGS  ''
+  _CS_POSIX_V6_WIDTH_RESTRICTED_ENVS   'POSIX_V6_LP64_OFF64'
+  _CS_POSIX_V7_ILP32_OFF32_CFLAGS      ''
+  _CS_POSIX_V7_ILP32_OFF32_LDFLAGS     ''
+  _CS_POSIX_V7_ILP32_OFF32_LIBS        ''
+  _CS_POSIX_V7_ILP32_OFF32_LINTFLAGS   ''
+  _CS_POSIX_V7_ILP32_OFFBIG_CFLAGS     ''
+  _CS_POSIX_V7_ILP32_OFFBIG_LDFLAGS    ''
+  _CS_POSIX_V7_ILP32_OFFBIG_LIBS       ''
+  _CS_POSIX_V7_ILP32_OFFBIG_LINTFLAGS  ''
+  _CS_POSIX_V7_LP64_OFF64_CFLAGS       '-m64'
+  _CS_POSIX_V7_LP64_OFF64_LDFLAGS      '-m64'
+  _CS_POSIX_V7_LP64_OFF64_LIBS         ''
+  _CS_POSIX_V7_LP64_OFF64_LINTFLAGS    ''
+  _CS_POSIX_V7_LPBIG_OFFBIG_CFLAGS     ''
+  _CS_POSIX_V7_LPBIG_OFFBIG_LDFLAGS    ''
+  _CS_POSIX_V7_LPBIG_OFFBIG_LIBS       ''
+  _CS_POSIX_V7_LPBIG_OFFBIG_LINTFLAGS  ''
+  _CS_POSIX_V7_WIDTH_RESTRICTED_ENVS   'POSIX_V7_LP64_OFF64'
+  _CS_V5_WIDTH_RESTRICTED_ENVS         'XBS5_LP64_OFF64'
+  _CS_V6_WIDTH_RESTRICTED_ENVS         'POSIX_V6_LP64_OFF64'
+  _CS_V7_WIDTH_RESTRICTED_ENVS         'POSIX_V7_LP64_OFF64'
+  _CS_XBS5_ILP32_OFF32_CFLAGS          ''
+  _CS_XBS5_ILP32_OFF32_LDFLAGS         ''
+  _CS_XBS5_ILP32_OFF32_LIBS            ''
+  _CS_XBS5_ILP32_OFF32_LINTFLAGS       ''
+  _CS_XBS5_ILP32_OFFBIG_CFLAGS         ''
+  _CS_XBS5_ILP32_OFFBIG_LDFLAGS        ''
+  _CS_XBS5_ILP32_OFFBIG_LIBS           ''
+  _CS_XBS5_ILP32_OFFBIG_LINTFLAGS      ''
+  _CS_XBS5_LP64_OFF64_CFLAGS           '-m64'
+  _CS_XBS5_LP64_OFF64_LDFLAGS          '-m64'
+  _CS_XBS5_LP64_OFF64_LIBS             ''
+  _CS_XBS5_LP64_OFF64_LINTFLAGS        ''
+  _CS_XBS5_LPBIG_OFFBIG_CFLAGS         ''
+  _CS_XBS5_LPBIG_OFFBIG_LDFLAGS        ''
+  _CS_XBS5_LPBIG_OFFBIG_LIBS           ''
+  _CS_XBS5_LPBIG_OFFBIG_LINTFLAGS      ''
+
+
+=for comment
+#TABLE_CONFSTR_END
+
+
+
+
+
+=head1 SEE ALSO
+
+This module is part of POSIX-1003 distribution version 0.98,
+built on December 03, 2013. Website: F<http://perl.overmeer.net>.  The code is based on L<POSIX>, which
+is released with Perl itself.  See also L<POSIX::Util> for
+additional functionality.
+
+=head1 COPYRIGHTS
+
+Copyrights 2011-2013 on the perl code and the related documentation
+ by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

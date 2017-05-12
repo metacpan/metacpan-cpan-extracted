@@ -1,0 +1,29 @@
+---
+abstract: 'Highly flexible CSV parser for large files'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  File::Spec::Functions: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-CSV
+requires:
+  Carp: 0
+  IO::File: 1.13
+  Params::Util: 1.00
+  Text::CSV_XS: 0.80
+  perl: 5.005
+  strict: 0
+resources:
+  bugtracker: http://github.com/kenahoo/Perl-Parse-CSV/issues
+  repository: git://github.com/kenahoo/Perl-Parse-CSV.git
+version: 2.04

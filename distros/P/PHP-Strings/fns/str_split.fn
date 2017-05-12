@@ -1,0 +1,4 @@
+docs: |
+    See L<perlfunc/"split"> for details.
+
+        my @bits = split /(.{,$len})/, $string;

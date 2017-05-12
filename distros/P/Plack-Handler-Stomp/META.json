@@ -1,0 +1,96 @@
+{
+   "abstract" : "Plack handler for the STOMP protocol",
+   "author" : [
+      "Gianni Ceccarelli <gianni.ceccarelli@net-a-porter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Plack-Handler-Stomp",
+   "no_index" : {
+      "directory" : [
+         "t/lib"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ChangeNotify" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::Common::String" : "0",
+            "MooseX::Types::Moose" : "0",
+            "MooseX::Types::Structured" : "0",
+            "Net::Stomp" : "0",
+            "Net::Stomp::Frame" : "0",
+            "Net::Stomp::MooseHelpers::CanConnect" : "2.6",
+            "Net::Stomp::MooseHelpers::CanSubscribe" : "2.6",
+            "Net::Stomp::MooseHelpers::Exceptions" : "0",
+            "Net::Stomp::MooseHelpers::ReadTrace" : "1.7",
+            "Net::Stomp::MooseHelpers::ReconnectOnFailure" : "0",
+            "Net::Stomp::MooseHelpers::TraceOnly" : "0",
+            "Net::Stomp::MooseHelpers::Types" : "0",
+            "Net::Stomp::StupidLogger" : "0",
+            "Path::Class" : "0",
+            "Plack::Util" : "0",
+            "Sub::Exporter" : "0",
+            "Throwable" : "0",
+            "Try::Tiny" : "0",
+            "bytes" : "0",
+            "namespace::autoclean" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Alien::ActiveMQ" : "0",
+            "Data::Printer" : "0",
+            "File::Temp" : "0",
+            "JSON::XS" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util" : "0",
+            "Net::Stomp::Producer" : "0",
+            "Test::Deep" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Test::Routine" : "0",
+            "Test::Routine::Util" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dakkar/Plack-Handler-Stomp.git",
+         "web" : "https://github.com/dakkar/Plack-Handler-Stomp"
+      }
+   },
+   "version" : "1.13"
+}
+

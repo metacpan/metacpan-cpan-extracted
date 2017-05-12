@@ -1,0 +1,40 @@
+---
+abstract: 'Prevent perlsecrets entering your codebase'
+author:
+  - 'Lance Wicks <lancew@cpan.org>'
+build_requires:
+  Perl::Critic::TestUtils: '0'
+  Test::FailWarnings: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Perl-Critic-Policy-Perlsecret
+provides:
+  Perl::Critic::Policy::Perlsecret:
+    file: lib/Perl/Critic/Policy/Perlsecret.pm
+    version: v0.0.11
+requires:
+  Carp: '0'
+  List::Util: '0'
+  Perl::Critic::Policy: '0'
+  Perl::Critic::Utils: '0'
+  parent: '0'
+  perl: '5.006001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/lancew/Perl-Critic-Policy-Perlsecret/issues
+  homepage: https://github.com/lancew/Perl-Critic-Policy-Perlsecret
+  repository: https://github.com/lancew/Perl-Critic-Policy-Perlsecret.git
+version: 0.0.11
+x_contributors:
+  - 'Lance Wicks <l.wicks@cv-library.co.uk>'
+  - 'Lance Wicks <lw@judocoach.com>'
+  - 'Sawyer X <xsawyerx@cpan.org>'

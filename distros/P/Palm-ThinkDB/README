@@ -1,0 +1,24 @@
+This is Palm::ThinkDB, a Perl module for reading and modifying ThinkDB
+version 2 database files.  ThinkDB is the property of thinkingBytes
+Technology.
+
+WARNING:  This is ALPHA SOFTWARE.  It has might corrupt data, destroy
+TinyBytes, and be incredibly incompatable with whatever version of
+ThinkDB you're using.  I've only tested it with ThinkDB 2.0, and it
+doesn't even support all of those fields yet.
+
+Please send me e-mail and let me know how this software package works
+for you.  I can be reached at erik@aarg.net.
+
+
+	Copyright (C) 2001 by Erik Arneson
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the Artistic License, a copy of which
+    can be found with the Perl distribution.
+
+    This code is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    Artistic License for more details.
+

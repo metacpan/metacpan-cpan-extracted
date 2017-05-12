@@ -1,0 +1,26 @@
+---
+abstract: 'Pod::Coverage subclass to calculate coverage for mop-based classes'
+author:
+  - 'Fabrice Gabolde <fabrice.gabolde@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.36_14
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4203, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Pod-Coverage-mop
+provides:
+  Pod::Coverage::mop:
+    file: lib/Pod/Coverage/mop.pm
+    version: 0.002
+requires:
+  Pod::Coverage::CountParents: 0
+  mop: 0
+  perl: 5.012
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://bitbucket.org/fgabolde/pod-coverage-mop
+version: 0.002

@@ -1,0 +1,75 @@
+Revision history for Perl extension Petal::Tiny
+
+1.16      2015-05-13 15:32:32+02:00 Europe/Copenhagen
+        - Release without nytprof files...
+1.15      2015-05-13 15:27:50+02:00 Europe/Copenhagen
+        - Fixed issue with recognizing single-character tags, e.g. "<p>".
+        - Fixed issue with matching multiline tags, e.g. "<foo\n>".
+        - Better error message when reporting on close tags not matching start tags.
+1.14      2015-05-12 15:51:56+02:00 Europe/Copenhagen
+        - Lots and lots of optimizations, much faster now.
+          Given a large benchmark, Devel::NYTProf reports:
+                1.13  "Executed 2158858 statements in 3.19s"
+                1.14  "Executed 454786 statements in 463ms"
+        - Fix the value '0' getting turned into the empty string in the
+          expression engine
+        - Use same quote-char for attributes as was in original html
+          (instead of forcing "").
+1.13      2014-11-12 14:35:53+01:00 Europe/Copenhagen
+        - fixed old bug in tal_condition relating to anding ;-seperated values
+1.12      2014-11-12 12:11:45+01:00 Europe/Copenhagen
+        - dollar interpolation now warns the expression when you try to interpolate undef
+1.11      2014-10-06 13:49:57+02:00 Europe/Copenhagen
+        - make string: use the same $-interpolation as the one for the xml.
+          (Which actually fixes the problem mentioned below.)
+1.10      2014-10-03 15:28:31+02:00 Europe/Copenhagen
+        - fix '${}' to match documentation. Now '${' will eat everything
+          up to the '}', allowing
+                string:The current CGI 'action' param is: ${cgi/param --action}
+
+          '${foo' (without any '}') and '$foo}' will still interpolate foo (and eat the '}').
+
+1.09      2014-08-06 14:17:32+02:00 Europe/Copenhagen
+        - allow tal:repeat to loop over a single element
+        - add nested looping to tal:repeat
+
+1.08      2014-08-04 13:28:23+02:00 Europe/Copenhagen
+        - never try to xmlencode references!
+          (Actual issue for Mojolicious::Plugin::PetalTinyRenderer,
+          since Mojo::Collection stringifies, so if a Mojo::Collection
+          contained a string that needed encoding, it would turn into
+          a string...)
+
+1.07      2014-07-31 16:04:13+02:00 Europe/Copenhagen
+        - refactored expression internals to pass around $self, to
+          make it possible to subclass Petal::Tiny.
+        - added reftype method, to make it easier to add support for
+          blessed references that you actually want to treat like
+          e.g. array references (like Mojo::Collection). (This could
+          be conceptually purer, but is "good enough" for what i want;
+          patches welcome).
+
+1.06      2014-06-28 09:53:19CEST+0200 Europe/Copenhagen
+        - mocked CGI in regression test, since CGI moved out of core in 5.21+.
+          Thanks, cpantesters!
+
+1.05      2014-06-26 14:27:55+02:00 Europe/Copenhagen
+        - added dynamic hash/array lookups and anonymous functions to resolve
+        - added + feature to tal:attributes to append to existing attributes
+        - changed distribution to Dist::Zilla
+
+1.04	Fri Dec 28 17:26:49 MUT 2012
+	- fixed it so that tal:content result is no longer interpolated
+
+1.03	Fri May  4 12:04:00 MUT 2012
+	- moved $VERSION from Makefile to module $VERSION
+
+1.02	Mon Apr 23 23:06:19 MUT 2012
+	- updated a bit of documentation
+
+1.01	Sun Apr 22 01:13:01 MUT 2012
+	- fixed tal:on-error bug
+
+1.00	Sat Apr 21 23:11:28 MUT 2012
+	- original release
+

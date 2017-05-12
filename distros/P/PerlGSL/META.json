@@ -1,0 +1,60 @@
+{
+   "abstract" : "A Collection of Perlish Interfaces to the Gnu Scientific Library",
+   "author" : [
+      "Joel Berger <joel.a.berger@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.3901, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "PerlGSL",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "PerlGSL::DiffEq" : "0.08"
+         },
+         "requires" : {
+            "PerlGSL::DiffEq" : "0.08",
+            "PerlGSL::Integration::MultiDim" : "0.003",
+            "PerlGSL::Integration::SingleDim" : "0.002",
+            "PerlGSL::RootFinding::SingleDim" : "0.001",
+            "parent" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "PerlGSL" : {
+         "file" : "lib/PerlGSL.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jberger/PerlGSL/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jberger/PerlGSL"
+      }
+   },
+   "version" : "0.002"
+}

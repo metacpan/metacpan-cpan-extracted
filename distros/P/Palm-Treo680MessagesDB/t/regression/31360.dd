@@ -1,0 +1,20 @@
+$VAR1 = {
+          'epoch' => 1189023051,
+          'number' => '+440200814254',
+          'time' => '21:10',
+          'date' => '2007-09-05',
+          'name' => 'John XXXX (M)',
+          'phone' => '+440200814254',
+          'device' => 'Treo 680',
+          'direction' => 'outbound',
+          'timestamp' => 1189023051,
+          'text' => 'I\'ve grovelled at the admins to see if we can gwt your account back, and will email you some links to read avout how bittorrent works',
+          'type' => '0x0002',
+          'category' => 0,
+          'id' => 7107121,
+          'attributes' => {
+                            'Dirty' => 1,
+                            'dirty' => 1
+                          },
+          'offset' => 31360
+        };

@@ -1,0 +1,73 @@
+NAME
+    POE::Component::YahooMessenger - POE component for Yahoo! Messenger
+
+SYNOPSIS
+      use POE qw(Component::YahooMessenger);
+
+      # spawn YM session
+      POE::Component::YahooMessenger->spawn(Alias => 'ym');
+
+      # register your session for callbacks
+      $kernel->post(ym => 'register');
+
+      # tell YM how to connect
+      $kernel->post(ym => connect => {
+          id       => 'your_id',
+          password => 'xxxxxxx',
+      });
+
+      # associate this callback with 'ym_goes_online'
+      sub goes_online {
+          my $event = $_[ARG0];
+          printf "buddy %s goes online\n", $event->buddy_id;
+      }
+
+      # send message
+      $kernel->post(ym => send_message => {
+          to => $buddy_id,
+          message => "Hello World",
+      });
+
+      # change your status
+      $kernel->post(ym => change_my_status => {
+          busy => 0, # 0 = not busy
+          message => "going for lunch now!",
+      });
+
+      # retrieve your buddies list
+      $kernel->post(ym => buddies => 'retrieve_buddies');
+      sub retrieve_buddies {
+          my $buddies = $_[ARG0];
+          for my $group (keys %$buddies) {
+              print "$group:\n", map "  $_\n", @{$buddies->{$group}};
+          }
+      }
+
+      $poe_kernel->run();
+
+DESCRIPTION
+    POE::Component::YahooMessenger is a POE component to connect Yahoo!
+    Messener. This module ripoffs a lot of code from Net::YahooMessenger for
+    protocol implementations.
+
+    API is intentionally made similar to that of PoCo::IRC.
+
+EVENTS
+    TBD.
+
+CAVEATS
+    This is ALPHA SOFTWARE: There maybe some bugs. API might change.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    YahooMessenger protocol implementation is based on Net::YahooMessenger
+    by Hiroyuki Oyama <oyama[cpan.org>.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the POE manpage, the POE::Component::IRC manpage, the
+    Net::YahooMessenger manpage, http://ymca.infoware.ne.jp/
+

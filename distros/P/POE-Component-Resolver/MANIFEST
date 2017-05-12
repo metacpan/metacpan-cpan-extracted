@@ -1,0 +1,16 @@
+CHANGES
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml
+Makefile.PL
+README
+README.mkdn
+dist.ini
+lib/POE/Component/Resolver.pm
+lib/POE/Component/Resolver/Sidecar.pm
+t/000-report-versions.t
+t/01-basic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/rt76550.t

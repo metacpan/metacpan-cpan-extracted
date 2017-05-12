@@ -1,0 +1,44 @@
+{
+   "abstract" : "Peek into the internals of a running POE environment",
+   "author" : [
+      "sungo <sungo@sungo.us>",
+      "Yuval Kogman <nothingmuch@woobling.org>",
+      "Chris 'BinGOs' Williams <bingos@cpan.org>",
+      "Philip Gwyn <gwyn@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-API-Peek",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::Size" : 0,
+            "POE" : "1.311",
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/poe-api-peek",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/poe-api-peek.git",
+         "web" : "https://github.com/bingos/poe-api-peek"
+      }
+   },
+   "version" : "2.20"
+}
+

@@ -1,0 +1,38 @@
+---
+abstract: 'Set localized environment variables from the value of PSGI environment.'
+author:
+  - 'FUJIWARA Shunichiro <fujiwara.shunichiro@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-SetLocalEnv
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Plack::Middleware::SetLocalEnv:
+    file: lib/Plack/Middleware/SetLocalEnv.pm
+    version: '0.02'
+requires:
+  Plack: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/fujiwara/Plack-Middleware-SetLocalEnv/issues
+  homepage: https://github.com/fujiwara/Plack-Middleware-SetLocalEnv
+  repository: git://github.com/fujiwara/Plack-Middleware-SetLocalEnv.git
+version: '0.02'
+x_authority: cpan:FUJIWARA

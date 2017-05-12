@@ -1,0 +1,16 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${prefix}/lib
+includedir=${prefix}/include/qt4/QtXml
+qt_config=lex yacc warn_on uic resources qt warn_on release incremental link_prl exceptions no_mocdepend release stl qt_no_framework system-sqlite release shared dll largefile stl precompile_header mmx 3dnow sse sse2 dylib create_prl link_prl depend_includepath QTDIR_build nostrip use_libmysqlclient_r qt_install_headers qt warn_on depend_includepath qmake_cache target_qt hide_symbols create_libtool create_pc explicitlib moc thread shared dll
+moc_location=/usr/bin/moc-qt4
+uic_location=/usr/bin/uic-qt4
+
+Name: Qtxml
+Description: Qtxml Library
+Version: 4.6.3
+Libs: -L${libdir} -lQtXml 
+Libs.private: -L/usr/lib  -lQtCore -L/usr/lib -lfontconfig -lpthread   
+Cflags: -DQT_SHARED -I/usr/include/qt4 -I${includedir}
+Requires: QtCore
+

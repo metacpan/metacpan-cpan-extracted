@@ -1,0 +1,17 @@
+########################################################################
+#
+# This file contains the username, password, and data source info
+# needed to connect to the database for the test programs.
+# You will probably want to remove this file after everything is working.
+#
+########################################################################
+
+### username to login to database as ###
+User:		testdbo
+
+### password for user login ###
+Passwd:		test123
+
+### DBI compliant data source name ###
+### Please see the DBD::Sybase documentation for valid DSNs ###
+DataSource:	dbi:Sybase:server=ENDODB

@@ -1,0 +1,73 @@
+{
+   "abstract" : "configure Pod::Weaver like LXP",
+   "author" : [
+      "Alex Peters <lxp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Pod-Weaver-PluginBundle-Author-LXP",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Pod::Elemental::Transformer::List" : "0.101610",
+            "Pod::Weaver" : "3.101634",
+            "Pod::Weaver::Plugin::StopWords" : "1.003",
+            "Pod::Weaver::Section::SeeAlso" : "1.001",
+            "Pod::Weaver::Section::Support" : "1.001",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Pod::Weaver::PluginBundle::Author::LXP" : {
+         "file" : "lib/Pod/Weaver/PluginBundle/Author/LXP.pm",
+         "version" : "v1.0.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-pod-weaver-pluginbundle-author-lxp@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Pod-Weaver-PluginBundle-Author-LXP"
+      },
+      "homepage" : "https://metacpan.org/release/Pod-Weaver-PluginBundle-Author-LXP",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/lx/perl5-Pod-Weaver-PluginBundle-Author-LXP",
+         "web" : "https://github.com/lx/perl5-Pod-Weaver-PluginBundle-Author-LXP"
+      }
+   },
+   "version" : "1.0.0"
+}
+

@@ -1,0 +1,21 @@
+README for PerlIO::via::QuotedPrint
+
+PerlIO layer that handles automatic conversion from and to quoted-printable
+format.  Intended to be used while opening a file with the ":via()" layer.
+
+Copyright (c) 2002, 2003, 2004, 2012 Elizabeth Mattijsen <liz@dijkmat.nl>.
+All rights reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+Version:
+ 0.08
+
+Required Modules:
+ MIME::QuotedPrint (any)
+
+The build is standard:
+
+perl Makefile.PL
+make
+make test
+make install

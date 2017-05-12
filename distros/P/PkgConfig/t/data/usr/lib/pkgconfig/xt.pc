@@ -1,0 +1,13 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+appdefaultdir=/etc/X11/app-defaults
+
+Name: Xt
+Description: X Toolkit Library
+Version: 1.0.7
+Requires: xproto
+Requires.private: x11 sm
+Cflags: -I${includedir}
+Libs: -L${libdir} -lXt

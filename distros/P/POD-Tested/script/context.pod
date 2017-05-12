@@ -1,0 +1,29 @@
+=head1 HEADER
+
+Some text
+
+=begin common
+
+  my $cc_value = 'CC' ;
+  
+  print "CC = '$cc_value'\n" ;
+
+=end common
+
+More text or code examples. The code below will not be tested as it is not in 
+test section. You should put all your code in test sections.
+
+  my $non_testable_code = 1 ;
+  
+  # call a sub
+  
+  DoSomething() ;
+
+=begin test
+
+  my $expected_output = 'gcc' ;
+  is($cc_value, $expected_output, 'expected value') ;
+
+=end test
+
+=cut 

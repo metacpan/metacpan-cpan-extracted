@@ -1,0 +1,78 @@
+{
+   "abstract" : "Critique unused variables in Perl source",
+   "author" : [
+      "Thomas R. Wyant, III (wyant at cpan dot org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter",
+   "no_index" : {
+      "directory" : [
+         "doc",
+         "examples",
+         "inc",
+         "tools",
+         "xt"
+      ],
+      "file" : [
+         "TODO.pod"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Carp" : "0",
+            "lib" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "File::Which" : "0",
+            "Readonly::XS" : "0"
+         },
+         "requires" : {
+            "PPI::Token::Symbol" : "0",
+            "PPIx::QuoteLike" : "0.005",
+            "Perl::Critic::Document" : "1.119",
+            "Perl::Critic::Policy" : "1.119",
+            "Perl::Critic::Utils" : "1.119",
+            "Readonly" : "0",
+            "Scalar::Util" : "0",
+            "base" : "0",
+            "perl" : "5.006001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Perl::Critic::Policy::Variables::ProhibitUnusedVarsStricter" : {
+         "file" : "lib/Perl/Critic/Policy/Variables/ProhibitUnusedVarsStricter.pm",
+         "version" : "0.100"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "wyant@cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter.git",
+         "web" : "https://github.com/trwyant/perl-Perl-Critic-Policy-Variables-ProhibitUnusedVarsStricter"
+      }
+   },
+   "version" : "0.100",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

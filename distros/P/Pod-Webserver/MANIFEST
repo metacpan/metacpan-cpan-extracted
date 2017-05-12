@@ -1,0 +1,19 @@
+bin/podwebserver
+Build.PL
+Changelog.ini
+Changes
+lib/Pod/Webserver.pm
+lib/Pod/Webserver/Connection.pm
+lib/Pod/Webserver/Daemon.pm
+lib/Pod/Webserver/Request.pm
+lib/Pod/Webserver/Response.pm
+Makefile.PL
+MANIFEST
+META.json
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/about_verbose.t
+t/daemon.t
+t/pod_webserver.t
+t/version.t
+xt/author/pod.t

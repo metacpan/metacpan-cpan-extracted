@@ -1,0 +1,12 @@
+Revision history for Parse-Tektronix-ISF (Parse-ISF)
+
+0.0103  28 Jan 2009
+        Fixed a bug on big endian platforms
+        Renamed to Parse::Tektronix::ISF from Parse::ISF
+
+0.0102  14 Jan 2009
+        Fixed a bug in t/02-convert.t
+
+0.01    12 Jan 2009
+        First version
+

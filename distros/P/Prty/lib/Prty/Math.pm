@@ -1,0 +1,478 @@
+package Prty::Math;
+use base qw/Prty::Object/;
+
+use strict;
+use warnings;
+
+our $VERSION = 1.106;
+
+use Prty::Formatter;
+use POSIX ();
+use Math::Trig ();
+
+# -----------------------------------------------------------------------------
+
+=encoding utf8
+
+=head1 NAME
+
+Prty::Math - Mathematische Funktionen
+
+=head1 BASE CLASS
+
+L<Prty::Object>
+
+=head1 METHODS
+
+=head2 Konstanten
+
+=head3 pi() - Liefere PI
+
+=head4 Synopsis
+
+    $pi = $class->pi;
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub pi {
+    return 4*CORE::atan2(1,1);
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Rundung
+
+=head3 roundTo() - Runde Zahl auf n Nachkommastellen
+
+=head4 Synopsis
+
+    $y = $class->roundTo($x,$n);
+    $y = $class->roundTo($x,$n,$normalize);
+
+=head4 Description
+
+Runde $x auf $n Nachkommastellen und liefere das Resultat zurück.
+
+Ist $normalize "wahr", wird die Zahl nach der Rundung mit
+normalizeNumber() normalisiert.
+
+Bei $n > 0 rundet die Methode mittels
+
+    $y = sprintf '%.*f',$n,$x;
+
+bei $n == 0 mittels roundToInt().
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub roundTo {
+    my ($class,$x,$n,$normalize) = @_;
+
+    if ($n == 0) {
+        return $class->roundToInt($x);
+    }
+
+    $x = sprintf '%.*f',$n,$x;
+    if ($normalize) {
+        $x = Prty::Formatter->normalizeNumber($x);
+    }
+
+    return $x;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 roundToInt() - Runde Zahl zu Ganzer Zahl (Integer)
+
+=head4 Synopsis
+
+    $n = $class->roundToInt($x);
+
+=head4 Description
+
+Runde Zahl $x zu ganzer Zahl und liefere das Resultat zurück, nach
+folgender Regel:
+
+Für Nachkommastellen < .5 runde ab, für Nachkommastellen >= .5 runde auf.
+Für negative $x ist es umgekehrt.
+
+Folgender Ansatz funktioniert nicht
+
+    $n = sprintf '%.0f',$x;
+
+denn dieser gibt inkonsistente Ergebnisse
+
+    0.5 => 0
+    1.5 => 2
+    2.5 => 2
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub roundToInt {
+    return $_[1] > 0? int($_[1]+0.5): -int(-$_[1]+0.5);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 roundMinMax() - Runde Breichsgrenzen auf nächsten geeigneten Wert
+
+=head4 Synopsis
+
+    ($minRounded,$maxRounded) = $class->roundMinMax($min,$max);
+
+=head4 Description
+
+Die Methode rundet $min ab und $max auf, so dass geeignete
+Bereichsgrenzen für eine Diagrammskala entstehen.
+
+Sind $min und $max gleich, schaffen wir einen künstlichen Bereich
+($min-1,$max+1).
+
+Die Rundungsstelle leitet sich aus der Größe des Bereichs
+$max-$min her.
+
+=head4 Examples
+
+8.53, 8.73 -> 8.5, 8.8
+
+8.53, 8.53 -> 7, 10
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub roundMinMax {
+    my ($class,$min,$max) = @_;
+
+    if ($min == $max) {
+        # Sind Minimum und Maximum gleich, schaffen wir einen
+        # künstlichen Bereich
+
+        $min -= 1;
+        $max += 1;
+    }
+
+    my $delta = $max-$min;
+    for (0.0001,0.001,0.01,0.1,1,10,100,1_000,10_000,100_000) {
+        if ($delta < $_) {
+            my $step = $_/10;
+            $min = POSIX::floor($min/$step)*$step;
+            $max = POSIX::ceil($max/$step)*$step;
+            last;
+        }
+    }
+
+    return ($min,$max)
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Größter gemeinsamer Teiler
+
+=head3 gcd() - Größter gemeinsamer Teiler
+
+=head4 Synopsis
+
+    $gcd = $class->gcd($a,b);
+
+=head4 Description
+
+Berechne den größten gemeinsamen Teiler (greatest common divisor)
+der beiden natürlichen Zahlen $a und $b und liefere diesen
+zurück. Die Methode ist nach dem L<Euklidschen Algorithmus|https://de.wikipedia.org/wiki/Euklidischer_Algorithmus#Rekursive_Variante> implementiert.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub gcd {
+    my ($class,$a,$b) = @_;
+    return $b == 0? $a: $class->gcd($b,$a%$b);
+}
+
+# -----------------------------------------------------------------------------
+
+=head2 Geo-Koordinaten
+
+=head3 geoMidpoint() - Mittelpunkt von Geo-Postionen
+
+=head4 Synopsis
+
+    ($latitude,$longitude) = $class->geoMidpoint(\@coordinates);
+
+=head4 Description
+
+Berechne den geografischen Mittelpunkt der Geo-Koordination (plus
+optionaler Gewichtung) und liefere diesen zurck.
+
+Beschreibung des Alogrithmus siehe
+L<http://www.geomidpoint.com/example.html>
+
+=head4 Arguments
+
+=over 4
+
+=item @coordinates
+
+Array von Geo-Koordinaten. Eine einzelne Geo-Koordinate ist ein
+Tipel [$latitude,$logitude,$weight], wobei die Gewichtung $weight
+optial ist. Wenn die Gewichtung fehlt, wird als Wert 1 angenommen.
+
+=back
+
+=head4 Returns
+
+Breite und Länge des geografischen Mittelpunkts
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub geoMidpoint {
+    my ($class,$coordinateA) = @_;
+
+    my $x = 0;
+    my $y = 0;
+    my $z = 0;
+    my $w = 0;
+
+    for (@$coordinateA) {
+        my ($latitude,$longitude,$weight) = @$_;
+
+        if (!defined($latitude) || !defined($longitude)) {
+            # Undefiniert Ortskoordinaten übergehen wir
+            next;
+        }
+    
+        $latitude = $class->degreeToRad($latitude);
+        $longitude = $class->degreeToRad($longitude);
+        $weight //= 1;
+
+        $x += cos($latitude) * cos($longitude) * $weight;
+        $y += cos($latitude) * sin($longitude) * $weight;
+        $z += sin($latitude) * $weight;
+        $w += $weight; 
+    }
+
+    my ($midLongitude,$midLatitude);
+    if ($w) {
+        $x /= $w;
+        $y /= $w;
+        $z /= $w;
+
+        $midLongitude = $class->radToDegree(atan2($y,$x));
+        my $hyp = sqrt($x*$x+$y*$y);
+        $midLatitude = $class->radToDegree(atan2($z,$hyp));
+    }
+                    
+    return ($midLatitude,$midLongitude);
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 degreeToRad() - Wandele Grad in Bogenmaß (rad)
+
+=head4 Synopsis
+
+    $rad = $class->degreeToRad($degree);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub degreeToRad {
+    my ($class,$degree) = @_;
+    return $degree*$class->pi/180;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 radToDegree() - Wandele Bogenmaß (rad) in Grad
+
+=head4 Synopsis
+
+    $degree = $class->radToDegree($rad);
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub radToDegree {
+    my ($class,$rad) = @_;
+    return 180/$class->pi*$rad;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 geoToDegree() - Wandele Geo-Ortskoordinate in dezimale Gradangabe
+
+=head4 Synopsis
+
+    $dezDeg = $class->geoToDegree($deg,$min,$sec,$dir);
+
+=head4 Description
+
+Wandele eine geographische Ortsangabe in Grad, Minuten, Sekunden,
+Himmelsrichtung in eine dezimale Gradzahl und liefere diese zurück.
+
+=head4 Example
+
+    50 6 44 N -> 50.11222
+    50 6 44 S -> -50.11222
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub geoToDegree {
+    my ($class,$deg,$min,$sec,$dir) = @_;
+
+    $deg = $deg + $min/60 + $sec/3600;
+
+    if ($dir) {
+        if ($dir eq 'N' || $dir eq 'E') {
+            # nixtun
+        }
+        elsif ($dir eq 'S' || $dir eq 'W') {
+            $deg = -$deg;
+        }
+        else {
+            $class->throw(
+                q{MATH-00001: Unbekannte Himmelsrichtung},
+                Direction=>$dir,
+            );
+        }
+    }
+
+    return $deg;
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 geoDistance() - Entfernung zw. zwei Punkten auf der Erdoberfäche
+
+=head4 Synopsis
+
+    $km = $class->geoDistance($lat1,$lon1,$lat2,$lon2);
+
+=head4 Description
+
+Berechne die Entfernung zwischen den beiden Geokoordinaten ($lat1,$lon1)
+und (lat2,$lon2) und liefere die Distanz in Kilometern zurück. Die Angabe
+der Geokoordinaten ist in Grad.
+
+Der Berechnung liegt die Formel zugrunde:
+
+    km = 1.852*60*180/pi*acos(
+        sin($lat1*pi/180)*sin($lat2*pi/180)+
+        cos($lat1*pi/180)*cos($lat2*pi/180)*cos(($lon2-$lon1)*pi/180)
+    )
+
+=head4 Examples
+
+Abstand zw. zwei Längengraden (359. und 360.) am Äquator:
+
+    sprintf '%.2f',Prty::Math->geoDistance(0,359,0,360);
+    # -> 111.12
+
+Abstand zw. zwei Längengraden am Pol:
+
+    Prty::Math->geoDistance(90,359,90,360);
+    # -> 0
+
+=head4 See Also
+
+=over 2
+
+=item *
+
+L<Prof. Dirk Reichhardt - Hinweise zur Berechnung von Abständen|http://wwwlehre.dhbw-stuttgart.de/~reichard/content/vorlesungen/lbs/uebungen/abstandsberechnung.pdf>
+
+=item *
+
+L<Blog Martin Kompf - Entfernungsberechnung|http://www.kompf.de/gps/distcalc.html>
+
+=back
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub geoDistance {
+    my ($class,$lat1,$lon1,$lat2,$lon2) = @_;
+
+    # Wir rechnen im Bogenmaß
+
+    $lat1 = $class->degreeToRad($lat1);
+    $lon1 = $class->degreeToRad($lon1);
+    $lat2 = $class->degreeToRad($lat2);
+    $lon2 = $class->degreeToRad($lon2);
+
+    return 1.852*60*$class->radToDegree(Math::Trig::acos(
+        sin($lat1)*sin($lat2)+cos($lat1)*cos($lat2)*cos($lon2-$lon1)));
+
+    # 6371
+    # 6366.7
+    #return 6371*Math::Trig::acos(sin($lat1)*sin($lat2)+
+    #    cos($lat1)*cos($lat2)*cos($lon2-$lon1));
+}
+
+# -----------------------------------------------------------------------------
+
+=head3 latitudeDistance() - Abstand zwischen zwei Längengraden
+
+=head4 Synopsis
+
+    $km = $class->latitudeDistance($lat);
+
+=head4 Description
+
+Liefere den Abstand zwischen zwei Längengraden bei Breitengrad $lat.
+Die Methode ist eigentlich nicht nötig, da sie einen Spezialfall der
+Mehode geoDistance() behandelt. Die Formel stammt von Herrn Petersen.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+sub latitudeDistance {
+    my ($class,$lat) = @_;
+
+    $lat = $class->degreeToRad($lat); # Breite im Bogenmaß
+    my $d = $class->degreeToRad(1);   # 1 Grad im Bogenmaß
+
+    return 1.852*60*$class->radToDegree(
+        Math::Trig::acos((sin($lat)**2+cos($lat)**2*cos($d))));
+}
+
+# -----------------------------------------------------------------------------
+
+=head1 VERSION
+
+1.106
+
+=head1 AUTHOR
+
+Frank Seitz, L<http://fseitz.de/>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2017 Frank Seitz
+
+=head1 LICENSE
+
+This code is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+# -----------------------------------------------------------------------------
+
+1;
+
+# eof

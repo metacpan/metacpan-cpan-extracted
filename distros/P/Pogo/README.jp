@@ -1,0 +1,88 @@
+Pogo - Perl GOODS interface
+(C)1999-2004 中島 靖 <nakajima@netstock.co.jp>
+
+Pogo は、オブジェクト指向データベース GOODS (Generic Object Oriented  
+Database System) の Perl インターフェースです。GOODS は Konstantin    
+Knizhnik <knizhnik@altavista.net> 氏によって書かれたソフトウェアです。
+
+Pogo はフリーソフトウェアです。
+
+本モジュールはアルファバージョンの段階にあります。すべての機能は変更の
+可能性があります。ぜひバグレポートや提案をお寄せください。
+
+作者は FreeBSD4.7, FreeBSD4.9 上で、開発とテストを行っています。他の  
+OS でのテスト結果や、移植についての情報も歓迎します。
+
+-----
+GOODS の準備
+
+  goods-x.xx.tar.gz を次のいずれかの場所からダウンロードしてください。
+  (x.xx はバージョン番号)
+    http://www.garret.ru/~knizhnik/goods.html
+    http://hp1.jonex.ne.jp/~nakajima.yasushi/
+
+  注意: goods-2.74.tar.gz と goods-2.75.tar.gz にはバグがあります。2. 
+  76以降を使ってください。
+
+  tar zxvf goods-x.xx.tar.gz
+  cd goods
+  ./config
+  make
+  su
+  make install
+
+  注意：各OS用のいくつかのmakefileがありますので、適切に選んでください。
+  './config -h' をやってみてください。
+
+-----
+Pogo の作成、テスト、インストール
+
+  tar zxvf Pogo-x.xx.tar.gz  (x.xx はバージョン番号)
+  cd Pogo-x.xx
+  perl Makefile.PL
+  make
+  ./startgoodsrv test &
+  make test
+  ./cmdgoodsrv test exit
+  su
+  make install
+  
+  注意：Makefile.PL は、GOODS のコンパイルに使った makefile に対応した
+  ものを使う必要があります。今のところ、GOODS の makefile すべてに対応
+  した Makefile.PL が用意できているわけではありません。エラーがあれば、
+  GOODS のコンパイルに使った makefile を見ながら手作業で Makefile.PL  
+  を修正してください。
+
+  GOODS のアプリケーションは、対応する設定ファイルによるサーバープロセ
+  ス'goodsrv'が実行中であることを必要とします。テストを実行する前に、 
+  goodsrv を test.cfg によって起動しなくてはなりません。それには、'./ 
+  startgoodsrv test &' と実行してください。バックグラウンドで実行され 
+  ます。終了するには、'./cmdgoodsrv test exit' と実行してください。
+
+  もしmake testがsegmentation faultで失敗するようなら、
+  perl Makefile.PL -DGLOBALDB を試してみてください。
+
+
+-----
+データベースブラウザ
+
+  test.cfg のデータベースの内容を覗くには、次のようにします。
+
+  ./startgoodsrv test &
+  ./browse test
+  ./cmdgoodsrv test exit
+
+-----
+サンプルスクリプト
+
+  sample ディレクトリにサンプルスクリプトがあります。すべて、sample.  
+  cfg を使います。実行前に「startgoodsrv sample &」してください。
+
+-----
+後は…
+
+  perldoc Pogo を読んでください。
+
+なお、同じ内容を日本語で書いたものを Pogo.jp.pod として同梱してありま 
+す。pod2html などで処理して読んでください。例えば
+'pod2html Pogo.jp.pod > Pogo.jp.html' とすればよいでしょう。

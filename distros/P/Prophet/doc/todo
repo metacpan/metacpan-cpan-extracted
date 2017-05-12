@@ -1,0 +1,84 @@
+Todo 
+
+    - document sd & replica format
+
+
+    - native replica type isn't properly transactional. aborting at the wrong time will cause great sadness and possible corruption
+
+
+      - make merge aware of database uuids
+                - and does it mean if the db is initialized with a pull, it uses the same UUID
+                - yes. in general, dbs should be initialized with pull or be new projects
+                - merging between replicas with different uuids should require a 'force' argument of some kind.
+
+     "publish my changes for remote pulling"    - mostly done. needs test and cleanup, "publish" scp wrapper
+
+    - move merge-ticket logic out of handle and only provides metadata storage
+    - validation on bug tracker fields	- severity
+    - Replace this todo list with a svb database
+    - elegant support for large attachments
+    - RESTy web server API to let third-parties build non-perl apps against a Prophet Depot
+    - define a value for a property that is a reference to:
+      - another record
+      - a set of records @done
+
+    - sketch out RT scrips replacement
+
+
+
+
+
+Saturday done
+    - implement a simple Prophet::Replica::Hiveminder for "personal tasks only"
+    - extract the reusable bits of Prophet::Replica::RT to
+            Prophet::ForeignReplica
+    - implement uuids for prophet databases DONE
+    - light dinner
+    - dinner @done
+
+    
+
+
+
+
+Todo after saturday:
+
+
+
+Archive:
+
+- ability to add comments to a bug (visible history entries)
+    - maybe long-prop edits
+
+
+
+- when committing any change:
+    - record the original depot uuid and change sequence_no as revprops
+    - record two merge tickets:
+        - sequence_no from the source that gave it to us
+        - sequence_no from the original recording source
+
+- naive support for large attachments
+- ability to pull non-conflicting updates from a remote db
+- implement merge of conflicts with: "local always wins"
+- record conflict resolution data 
+- reuse conflict resolution data on repeated resolve
+- ability to 'pull' conflicting updates from a remote db
+- prompt for resolution of conflicts
+- handle file_conflict
+
+- test byzantine sync behaviour
+- handle conflicting conflict resolutions
+- base bug tracking schema
+
+-  ::CLI should automatically discover an app's model class based on the type name @done
+- Creation of bug tracking model classes @done
+	- status @done
+    - relations between models @done
+    - find out what the remote _would_ pull by inspecting its merge tickets on  @done
+            - current replica @done
+        - once we do that, we can find out who _we_ have synced from after that point, right? Then we want: @done
+            - anyone we have a merge ticket for _since_ the last time the other party saw us. @done
+    - nobu @done
+    - get RT to give us a list of ticket records matching our query @done
+    - get rt ro give us a list of history entries on those ticket records @done

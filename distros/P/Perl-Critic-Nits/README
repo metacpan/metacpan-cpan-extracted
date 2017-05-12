@@ -1,0 +1,24 @@
+Perl-Critic-Nits version 1.0.0
+
+This module provides one Perl::Critic policy in version 1.0.0.  More policies
+may be included in future releases.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+NON-STANDARD BUILD TARGETS
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Kent Cowgill
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,19 @@
+<SOFTPKG NAME="File-HomeDir" VERSION="0,58,0,0">
+    <TITLE>File-HomeDir</TITLE>
+    <ABSTRACT>Get the home directory for yourself or other users</ABSTRACT>
+    <AUTHOR>Adam Kennedy (cpan@ali.as)</AUTHOR>
+    <IMPLEMENTATION>
+        <DEPENDENCY NAME="Win32-TieRegistry" VERSION="0,0,0,0" />
+        <DEPENDENCY NAME="Win32API-Registry" VERSION="0,0,0,0" />
+        <OS NAME="MSWin32" />
+        <ARCHITECTURE NAME="MSWin32-x86-multi-thread" />
+        <CODEBASE HREF="File-HomeDir-0.58-PPM56.tar.gz" />
+    </IMPLEMENTATION>
+    <IMPLEMENTATION>
+        <DEPENDENCY NAME="Win32-TieRegistry" VERSION="0,0,0,0" />
+        <DEPENDENCY NAME="Win32API-Registry" VERSION="0,0,0,0" />
+        <OS NAME="MSWin32" />
+        <ARCHITECTURE NAME="MSWin32-x86-multi-thread-5.8" />
+        <CODEBASE HREF="File-HomeDir-0.58-PPM58.tar.gz" />
+    </IMPLEMENTATION>
+</SOFTPKG>

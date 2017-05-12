@@ -1,0 +1,20 @@
+Revision history for Perl module Parse::RecDescent::Topiary
+
+0.05 Mon May 19 2008
+    - Module Kwalitee review
+
+0.04 Mon Jul  3 2006
+    - Expose delegation_class function
+
+0.03 Sat Jul  1 2006
+    - Namespace can now be a search list (array ref)
+    - Consolidate option for optional quantifiers.
+    - Default constructor omits __RULE__ item.
+
+0.02 Thu Jun 22 2006
+    - Pass in user args
+
+0.01 Sun Jun 18 2006
+    - original version; created by ExtUtils::ModuleMaker 0.47
+
+

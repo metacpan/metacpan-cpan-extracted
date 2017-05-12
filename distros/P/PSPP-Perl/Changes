@@ -1,0 +1,13 @@
+Revision history for Perl extension Pspp.
+
+0.7.0 Sun Jan 11 10:35:56 2009
+      Integrated the module into Pspp's build environment. Added support for 
+      reading from an existing system file.
+
+0.4.3 Sat May 19 14:24:05 2007
+	- first release
+
+0.01  Fri Apr  6 14:13:45 2007
+	- original version; created by h2xs 1.23 with options
+		-A -n Pspp pspp/src/libpspp/version.h
+

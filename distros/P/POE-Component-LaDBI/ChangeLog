@@ -1,0 +1,63 @@
+2002-08-24 13:48  seanegan
+
+	* t/: 02_dbi_create_test_table.t, 99_dbi_drop_test_table.t:
+	
+	Removed Postgres specific ';' SQL terminator (dumb dumb dumb). 
+	Added AutoCommit => 1 to connect options so CREATE TABLE could be
+	run on Sybase ASE 12.5 which complained about CREATE TABLE being
+	run in a multi command transaction.
+
+2002-08-24 13:46  seanegan
+
+	* lib/POE/Component/LaDBI.pm:
+	
+	Updated $VERSION
+
+2002-08-24 13:46  seanegan
+
+	* ladbi_config.pl:
+	
+	Changed the SQL to remove a ';' which was Postgres specific.  Tests
+	have now been tested on Sybase 12.5 .
+
+2002-08-24 12:41  seanegan
+
+	* Changes, MANIFEST, Makefile.PL, README, example.pl,
+	ladbi_config.pl, lib/POE/Component/LaDBI.pm,
+	lib/POE/Component/LaDBI/Commands.pm,
+	lib/POE/Component/LaDBI/Engine.pm,
+	lib/POE/Component/LaDBI/Request.pm,
+	lib/POE/Component/LaDBI/Response.pm, t/00_use.t,
+	t/01_test_config.t, t/02_dbi_create_test_table.t, t/10_connect.t,
+	t/11_prepare.t, t/12_execute.t, t/13_finish.t, t/14_rows.t,
+	t/15_fetchrow.t, t/16_fetchrow_hash.t, t/17_fetchall.t,
+	t/18_fetchall_hash.t, t/19_selectrow.t, t/20_selectall.t,
+	t/21_selectall_hash.t, t/22_selectcol.t, t/23_ping.t, t/24_quote.t,
+	t/25_do.t, t/26_rollback.t, t/27_commit.t, t/28_begin_work.t,
+	t/99_dbi_drop_test_table.t:
+	
+	Initial revision
+
+2002-08-24 12:41  seanegan
+
+	* Changes, MANIFEST, Makefile.PL, README, example.pl,
+	ladbi_config.pl, lib/POE/Component/LaDBI.pm,
+	lib/POE/Component/LaDBI/Commands.pm,
+	lib/POE/Component/LaDBI/Engine.pm,
+	lib/POE/Component/LaDBI/Request.pm,
+	lib/POE/Component/LaDBI/Response.pm, t/00_use.t,
+	t/01_test_config.t, t/02_dbi_create_test_table.t, t/10_connect.t,
+	t/11_prepare.t, t/12_execute.t, t/13_finish.t, t/14_rows.t,
+	t/15_fetchrow.t, t/16_fetchrow_hash.t, t/17_fetchall.t,
+	t/18_fetchall_hash.t, t/19_selectrow.t, t/20_selectall.t,
+	t/21_selectall_hash.t, t/22_selectcol.t, t/23_ping.t, t/24_quote.t,
+	t/25_do.t, t/26_rollback.t, t/27_commit.t, t/28_begin_work.t,
+	t/99_dbi_drop_test_table.t:
+	
+	POE::Component::LaDBI is a POE Component to allow for non-blocking
+	access to most of the DBI API. Each LaDBI component session started
+	spawns a sub-process which it communicates with via
+	POE::Wheel::Run.  Multiple DBI database handles can be created in
+	the sub-process, but withing the sub-process DBI calls will still
+	block.
+

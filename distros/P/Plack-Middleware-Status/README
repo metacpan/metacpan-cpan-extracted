@@ -1,0 +1,27 @@
+NAME
+    Plack::Middleware::Status - Plack Middleware for mapping urls to status
+    code-driven responses
+
+VERSION
+    version 1.101150
+
+SYNOPSIS
+        # app.psgi
+        use Plack::Builder;
+        my $app = sub { 
+            # ... 
+        };
+        builder {
+            enable 'Status', path => qr{/not-implemented}, status => 501;
+            $app;
+        };
+
+AUTHOR
+      Patrick Donelan <pat@patspam.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Patrick Donelan.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               POE-Component-Client-opentick
+version:            0.21
+abstract:           A POE component for working with opentick.com's market data feeds.
+author:
+    - Jason McManus (INFIDEL) <infidel@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    POE:          0
+    Test::More:   0
+    Time::HiRes:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

@@ -1,0 +1,90 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-Ecliptic\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2009-12-17 21:20+0200\n"
+"PO-Revision-Date: 2010-05-17 23:33+0200\n"
+"Last-Translator: Burak Gürsoy <burak@cpan.org>\n"
+"Language-Team: Turkish\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Turkish\n"
+"X-Poedit-Country: TURKEY\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: lib/Padre/Plugin/Ecliptic.pm:19
+msgid "Ecliptic"
+msgstr "Ecliptic"
+
+#: lib/Padre/Plugin/Ecliptic.pm:96
+msgid "Quick Assist\tCtrl-Shift-L"
+msgstr "Hızlı Yardım\tCtrl-Shift-L"
+
+#: lib/Padre/Plugin/Ecliptic.pm:103
+msgid "Quick Outline Access\tCtrl-4"
+msgstr "Hızlı Taslak Erişimi\tCtrl-4"
+
+#: lib/Padre/Plugin/Ecliptic.pm:110
+msgid "Quick Module Access\tCtrl-5"
+msgstr "Hızlı Modül Erişimi\tCtrl-5"
+
+#: lib/Padre/Plugin/Ecliptic.pm:120
+msgid "About"
+msgstr "Hakkında"
+
+#: lib/Padre/Plugin/Ecliptic.pm:136
+msgid "Provides Eclipse-like useful features to Padre.\n"
+msgstr "Padre için Eclipse-türü kullanışlı özellikler sağlar\n"
+
+#: lib/Padre/Plugin/Ecliptic/QuickAssistDialog.pm:30
+msgid "Quick Assist"
+msgstr "Hızlı Yardım"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:33
+msgid "Quick Module Access"
+msgstr "Hızlı Modül Erişimi"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:127
+msgid "&Type a module name to access:"
+msgstr "Erişmek için bir modül adı &girin:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:134
+msgid "&Matching modules:"
+msgstr "Eşleşen &modüller:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:245
+msgid "Reading modules. Please wait..."
+msgstr "Modüller okunuyor. Lütfen bekleyin..."
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:257
+msgid "Finished Searching"
+msgstr "Arama Bitti"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:269
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:273
+msgid " item(s) found"
+msgstr "unsur(lar) bulundu"
+
+#: lib/Padre/Plugin/Ecliptic/QuickModuleAccessDialog.pm:271
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:275
+msgid "No items found"
+msgstr "Hiçbirşey bulunamadı"
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:32
+msgid "Quick Outline Access"
+msgstr "Hızlı Taslak Erişimi"
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:118
+msgid "&Type a Outline item name to access:"
+msgstr "Erişim için bir &taslak unsur adı girin:"
+
+#: lib/Padre/Plugin/Ecliptic/QuickOutlineAccessDialog.pm:125
+msgid "&Matching Outline Items:"
+msgstr "&Eşleşen Taslak Unsurları"
+

@@ -1,0 +1,10 @@
+this text should not be \*bold* here
+and not \~italic~ and \[not a link]
+not \{code markup}
+but \\ is a backslash
+#--------------------------------------------------------------------------#
+this text should not be *bold* here
+and not ~italic~ and [not a link]
+not {code markup}
+but \ is a backslash
+

@@ -1,0 +1,103 @@
+NAME
+
+PDF::Create - create PDF files
+
+DESCRIPTION
+
+PDF::Create allows you to create PDF documents using a large number of primitives
+and emit the result as a PDF file/stream.PDF stands for Portable Document Format.
+
+Documents  can have several pages, a table of content, an information section and
+many other PDF elements. More functionnalities will be added as needs arise.
+
+Documents are  constructed on  the fly so the memory footprint is not tied to the
+size of the pages but only to their number.
+
+It's main advantage over the other PDF modules is that it doesn't depend on other
+modules and is perl only (no compiler needed).
+
+If you want a  quick  and dirty way of creating pdf's, PDF::Create is for you. If
+you  need  a complete Framework to create complex PDF stuff, you better dive into
+the PDF::API2 based modules.
+
+More information about this module is included in this package.
+
+SYNOPSIS
+
+    use strict; use warnings;
+    use PDF::Create;
+
+    my $pdf = PDF::Create->new(
+        'filename'     => 'sample.pdf',
+        'Author'       => 'John Doe',
+        'Title'        => 'Sample PDF',
+        'CreationDate' => [ localtime ]
+    );
+
+    # add a A4 sized page
+    my $a4 = $pdf->new_page('MediaBox' => $pdf->get_page_size('A4'));
+
+    # Add a page which inherits its attributes from $a4
+    my $page = $a4->new_page;
+
+    # Prepare a font
+    my $f1 = $pdf->font('BaseFont' => 'Helvetica');
+
+    # Prepare a Table of Content
+    my $toc = $pdf->new_outline('Title' => 'Title Page', 'Destination' => $page);
+
+    # Write some text
+    $page->stringc($f1, 40, 306, 426, "PDF::Create");
+    $page->stringc($f1, 20, 306, 396, "version $PDF::Create::VERSION");
+    $page->stringc($f1, 20, 306, 300, 'by John Doe <john.doe@example.com>');
+
+    # Add another page
+    my $page2 = $a4->new_page;
+
+    # Draw some lines
+    $page2->line(0, 0, 612, 792);
+    $page2->line(0, 792, 612, 0);
+
+    $toc->new_outline('Title' => 'Second Page', 'Destination' => $page2);
+
+    # Close the file and write the PDF
+    $pdf->close;
+
+INSTALLATION
+
+Quick answer:
+
+    perl -MCPAN -e 'install PDF::Create'
+
+Long answer:
+
+To install manually, cd to the directory containing the unpacked distribution and
+do one of the following:
+
+a) Create a makefile by running Makefile.PL  using  the  perl  program into whose
+library you want to install and then run make three times:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+b) To install into a private library, for example your home directory:
+
+   perl Makefile.PL INSTALLSITELIB=$HOME/lib INSTALLMAN3DIR=$HOME/man
+   make
+   make test
+   make pure_install
+
+AUTHORS
+
+- Fabien Tassin
+
+  Original Author of PDF::Create
+
+- Markus Baertschi, markus@markus.org
+
+  I have taken  over maintenence of PDF::Create as Fabien has disappeared and did
+  no longer maintain it in  the  last years. The last version of PDF::Create from
+  Fabien  is 0.06.  All  newer  versions have been modified by me. I maintain the
+  PDF::Create in git. You can access the repository directly at http://github.com/markusb/pdf-create.

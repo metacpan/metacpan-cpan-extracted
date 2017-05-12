@@ -1,0 +1,8 @@
+Revision history for POE-Attributes
+
+0.02    Refactored code for two-pass mode with reverse symbol
+        resolution - to allow require()d modules to work.
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

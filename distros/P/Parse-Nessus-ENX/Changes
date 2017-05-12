@@ -1,0 +1,15 @@
+Revision history for Perl extension Parse::Nessus::ENX
+
+1.1  Tue Apr 27 16:23:17 2004
+        - added one function (estatvulns)
+        - added %EXPORT_TAG support, thanks Gwen <gwen@reptiles.org> 
+	- updated POD
+
+1.0  Thu Jan 22 18:38:46 2004
+	- Added two functions (estatos, estatservices)
+	- updated POD
+
+0.01  Thu May 15 10:32:12 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n Parse::Nessus::ENX
+

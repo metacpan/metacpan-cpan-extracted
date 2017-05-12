@@ -1,0 +1,132 @@
+# NAME
+ 
+
+Plack::Middleware::AdaptFilehandleRead - Give a filehandle a getline method when its missing
+ 
+
+# SYNOPSIS
+  
+
+    use Plack::Builder;
+    use AppReturnsFileHandleWithRead;
+
+    my $app = AppReturnsFileHandleWithRead->new;
+
+       builder {
+         enable 'AdaptFilehandleRead';
+         $app;
+       };
+    
+
+# DESCRIPTION
+
+[PSGI](https://metacpan.org/pod/PSGI) allows for the body content to be a glob filehandle or a Filehandle
+like object.  For the later case the object must have a method `getline`
+which works as described in [IO::Handle](https://metacpan.org/pod/IO::Handle).  However sometimes you may have
+a custom filehandle like object that support the common `read` method.  For
+example many versions of [Catalyst](https://metacpan.org/pod/Catalyst) allowed the body of a response to be a
+glob or object that does `read`.  People might have written custom streaming
+applications that had this `read` method but not `getline`.  As a result
+these custom Filehandle like objects are not compatible with the expectations
+of [PSGI](https://metacpan.org/pod/PSGI).
+
+This middleware exists to help you convert such a custom made filehandle like
+object.  If you have created something like this (or for example using some
+shared code like [MogileFS::Client](https://metacpan.org/pod/MogileFS::Client) that returns a filehandle that does `read`
+but not `getline`) you can use this middleware to wrap said object in a proxy
+that does the `getline` method by reading from the exising `read` method.
+
+By default, if this middleware is enabled, it will examine any body values and
+check if they are 1) an object, 2) that does `read` and 3) doesn't do `getline`
+If such a case exists it will create an instance of [Plack::Middleware::AdaptFilehandleRead::Proxy](https://metacpan.org/pod/Plack::Middleware::AdaptFilehandleRead::Proxy)
+which had the `getline` method.  It also will delegate any other method calls
+to the wrapped object via AUTOLOAD so if you have some additional custom methods
+it will still work as expected.  It does not currently proxy any [overload](https://metacpan.org/pod/overload)ing.
+
+If for some reason your custom filehandle like object does `getline` but its
+faulty and the `read` method is correct, you can set `always_adapt` to true
+and the proxy will be applied even if a `getline` method is detected.
+
+    builder {
+      enable 'AdaptFilehandleRead', always_adapt=>1;
+      $app;
+    };
+
+This middleware will do its best to respect the various allowed values of
+`$/` for deciding how to return content from `getline`  Currently we support
+`$/` values of scalar ref (like \\8192 for reading fixed length chunks) or
+simple scalars (like \\n for reading newline delimited records).  Currently
+we don't support `$/` as undef (for slurping full content) and some of the other
+more esoteric values of `$/` as the author percieves that support was not needed
+withing the context of adapting `read` for [PSGI](https://metacpan.org/pod/PSGI) uses (all exampled [Plack](https://metacpan.org/pod/Plack)
+handlers seemed to use the scalar ref fixed length chunk value for `$/`, but
+we choose to also support the scalar record deliminator option since its very
+commonly seen elsewhere).
+
+# ATTRIBUTES
+
+This middleware has the following attributes:
+
+## always\_adapt
+
+Defaults to false, Optional.
+
+Set this to any true value and the proxy will always wrap any filehandle like
+object, as long as it has a `read` method (even it if already has a `getline`
+method.)  Use this if you have a custom filehandle like object that you are using
+as the body of a [PSGI](https://metacpan.org/pod/PSGI) reponse that has both `read` and `getline` but the
+`getline` is broken in some way (but `read` isn't). 
+
+## chunksize
+
+Defaults to 65536, Optional.
+
+When adapting `read`, we call for chunks of data 65536 in length.  This may not be the
+most efficient way to read your files based on your specific requirements.  If so, you
+may override the size of the chunks:
+
+    builder {
+      enable 'AdaptFilehandleRead', chunksize=>65536;
+      $app;
+    };
+
+__NOTE__: Be aware that the chunk is read into memory as each chunk is read.  Should a
+chunk fail to find the deliminator indicated by `$/`, another chunk would be read.
+If you entire file contains no match, it is not impossible for the entire file to be 
+thus read into memory should `getline` be used.  In these cases you might wish to 
+make sure your underlying [Plack](https://metacpan.org/pod/Plack) server has other ways to handle these types of 
+files (for example using XSendfile or via some other optimization.) or instead be sure
+to use the fixed chunk sized option for `$/`.
+
+__NOTE__: For most [Plack](https://metacpan.org/pod/Plack) handlers, "$/" is set to a scalar refer, such as:
+
+    local $/ = \'4096'
+
+which is a flag indicating we'd prefer ->getline to return fixed length chunks
+instead of variable length lines.  In this case the 'chunksize' attribute is
+ignored.  Which means if you are using this with [Plack](https://metacpan.org/pod/Plack) chances are this
+attribute will not be respected :)  You probably should not worry about this!
+
+# SEE ALSO
+ 
+
+[Plack](https://metacpan.org/pod/Plack), [Plack::Middleware](https://metacpan.org/pod/Plack::Middleware), [IO::File](https://metacpan.org/pod/IO::File).
+
+See 'perlvar' docs for more on the possible values of `$/`.
+ 
+
+# AUTHOR
+ 
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+ 
+
+# COPYRIGHT & LICENSE
+ 
+
+Copyright 2014, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+ 
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+ 

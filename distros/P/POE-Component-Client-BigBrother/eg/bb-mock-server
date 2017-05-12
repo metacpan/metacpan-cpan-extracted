@@ -1,0 +1,34 @@
+#!perl
+use strict;
+use POE qw< Component::Server::TCP >;
+
+# this is just a TCP listener on port 1984
+# for a true Big Brother server, see POE:Component::Server::BigBrother
+
+POE::Component::Server::TCP->new(
+    Hostname     => "localhost",
+    Port         => 1984,
+    ClientFilter => "POE::Filter::Stream",
+
+    Started => sub {
+        print "listening on localhost:1984\n";
+    },
+
+    ClientConnected => sub {
+        # reset buffer on client connection
+        $_[HEAP]->{buffer} = "";
+    },
+
+    ClientInput => sub {
+        # accumulate data
+        $_[HEAP]->{buffer} .= $_[ARG0];
+    },
+
+    ClientDisconnected => sub {
+        my ($kernel, $heap) = @_[ KERNEL, HEAP ];
+        print "* received: $heap->{buffer}\n";
+    },
+);
+
+POE::Kernel->run;
+

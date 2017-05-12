@@ -1,0 +1,378 @@
+Version: 2.0.3
+
+What were you doing when the application crashed?
+Nothing, I just started it (fresh reboot) and got this bugbuddy dialog.
+
+
+Distribution: Ubuntu 6.10 (edgy)
+Gnome Release: 2.16.1 2006-10-02 (Ubuntu)
+BugBuddy Version: 2.16.0
+
+Memory status: size: 116654080 vsize: 0 resident: 116654080 share: 0 rss:
+26664960 rss_rlim: 0
+CPU usage: start_time: 1161505509 rtime: 0 utime: 219 stime: 0 cutime:165
+cstime: 0 timeout: 54 it_real_value: 0 frequency: 0
+
+Backtrace was generated from '/usr/bin/ekiga'
+
+(no debugging symbols found)
+Using host libthread_db library "/lib/tls/i686/cmov/libthread_db.so.1".
+(no debugging symbols found)
+[Thread debugging using libthread_db enabled]
+[New Thread -1247730000 (LWP 5645)]
+[New Thread -1310676064 (LWP 6314)]
+[New Thread -1310000224 (LWP 6311)]
+[New Thread -1309733984 (LWP 6309)]
+[New Thread -1309467744 (LWP 6308)]
+[New Thread -1309201504 (LWP 6051)]
+[New Thread -1308628064 (LWP 6049)]
+[New Thread -1300235360 (LWP 6047)]
+[New Thread -1249653856 (LWP 5912)]
+[New Thread -1249387616 (LWP 5911)]
+(no debugging symbols found)
+0xffffe410 in __kernel_vsyscall ()
+#0  0xffffe410 in __kernel_vsyscall ()
+#1  0xb658534b in __waitpid_nocancel ()
+   from /lib/tls/i686/cmov/libpthread.so.0
+#2  0xb7e851b6 in gnome_gtk_module_info_get () from /usr/lib/libgnomeui-2.so.0
+#3  <signal handler called>
+#4  0xb73e6c34 in g_string_new () from /usr/lib/libglib-2.0.so.0
+#5  0xb76cff15 in gnome_vfs_uri_to_string () from /usr/lib/libgnomevfs-2.so.0
+#6  0xb3947353 in fs_module_create ()
+   from /usr/lib/gtk-2.0/2.10.0/filesystems/libgnome-vfs.so
+#7  0xb76bef18 in gnome_vfs_job_get_count () from /usr/lib/libgnomevfs-2.so.0
+#8  0x00000012 in ?? ()
+#9  0x081c8a30 in ?? ()
+#10 0xb2808820 in ?? ()
+#11 0xb744ff75 in ?? () from /usr/lib/libgthread-2.0.so.0
+#12 0x00000002 in ?? ()
+#13 0xb74301e4 in ?? () from /usr/lib/libglib-2.0.so.0
+#14 0xbf978aa8 in ?? ()
+#15 0xb73e1762 in g_slice_alloc () from /usr/lib/libglib-2.0.so.0
+#16 0xb73c8aa1 in g_source_is_destroyed () from /usr/lib/libglib-2.0.so.0
+#17 0xb73ca802 in g_main_context_dispatch () from /usr/lib/libglib-2.0.so.0
+#18 0xb73cd7df in g_main_context_check () from /usr/lib/libglib-2.0.so.0
+#19 0xb73cdb89 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+#20 0xb7b20574 in gtk_main () from /usr/lib/libgtk-x11-2.0.so.0
+#21 0x0808c747 in PList<PString>::~PList ()
+#22 0xb63498cc in __libc_start_main () from /lib/tls/i686/cmov/libc.so.6
+#23 0x08067311 in ?? ()
+
+Thread 10 (Thread -1249387616 (LWP 5911)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb6581a8c in pthread_cond_timedwait@@GLIBC_2.3.2 ()
+   from /lib/tls/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb722d5a3 in PSyncPoint::Wait () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#3  0xb687c76f in OpalManager::GarbageMain () from /usr/lib/libopal.so.2.2
+No symbol table info available.
+#4  0x08146cf4 in ?? ()
+No symbol table info available.
+#5  0xb587d3d0 in ?? ()
+No symbol table info available.
+#6  0x00000000 in ?? ()
+No symbol table info available.
+
+Thread 9 (Thread -1249653856 (LWP 5912)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb658401e in __lll_mutex_lock_wait ()
+   from /lib/tls/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb6580673 in _L_mutex_lock_49 () from /lib/tls/i686/cmov/libpthread.so.0
+No symbol table info available.
+#3  0xb583bdf8 in ?? ()
+No symbol table info available.
+#4  0x08076506 in PString::~PString ()
+No symbol table info available.
+#5  0xb797a1cc in gdk_threads_leave () from /usr/lib/libgdk-x11-2.0.so.0
+No symbol table info available.
+#6  0xb797a150 in gdk_threads_enter () from /usr/lib/libgdk-x11-2.0.so.0
+No symbol table info available.
+#7  0x080a7d38 in PList<PIPSocket::InterfaceEntry>::~PList ()
+No symbol table info available.
+#8  0xb7245495 in PTimer::OnTimeout () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#9  0xb7245661 in PTimer::Process () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#10 0xb7247d61 in PTimerList::Process () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#11 0xb722ca55 in PHouseKeepingThread::Main () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#12 0xb722d04d in PThread::PX_ThreadStart () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#13 0xb657e504 in start_thread () from /lib/tls/i686/cmov/libpthread.so.0
+No symbol table info available.
+#14 0xb640151e in clone () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 8 (Thread -1300235360 (LWP 6047)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb63f7803 in poll () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+#2  0xb73cd813 in g_main_context_check () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#3  0xb73cdb89 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#4  0xb7745e62 in e_book_get_type () from /usr/lib/libebook-1.2.so.9
+No symbol table info available.
+#5  0xb73e838f in g_thread_create_full () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#6  0xb657e504 in start_thread () from /lib/tls/i686/cmov/libpthread.so.0
+No symbol table info available.
+#7  0xb640151e in clone () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 7 (Thread -1308628064 (LWP 6049)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb63f7803 in poll () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+#2  0xb73cd813 in g_main_context_check () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#3  0xb73cdb89 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#4  0xb74917e0 in link_set_io_thread () from /usr/lib/libORBit-2.so.0
+No symbol table info available.
+#5  0xb73e838f in g_thread_create_full () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#6  0xb657e504 in start_thread () from /lib/tls/i686/cmov/libpthread.so.0
+No symbol table info available.
+#7  0xb640151e in clone () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 6 (Thread -1309201504 (LWP 6051)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb658401e in __lll_mutex_lock_wait ()
+   from /lib/tls/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb6580673 in _L_mutex_lock_49 () from /lib/tls/i686/cmov/libpthread.so.0
+No symbol table info available.
+#3  0xb1f722c8 in ?? ()
+No symbol table info available.
+#4  0xb7258e88 in PString::InternalCompare () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#5  0xb797a1cc in gdk_threads_leave () from /usr/lib/libgdk-x11-2.0.so.0
+No symbol table info available.
+#6  0xb797a150 in gdk_threads_enter () from /usr/lib/libgdk-x11-2.0.so.0
+No symbol table info available.
+#7  0x0809072d in PAssertFunc ()
+No symbol table info available.
+#8  0x08099d09 in PSound::~PSound ()
+No symbol table info available.
+#9  0x0809a33c in PSound::~PSound ()
+No symbol table info available.
+#10 0xb70ec3cd in PVideoInputDevice::GetFrame () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#11 0x0809c9c3 in PPluginServiceDescriptor::~PPluginServiceDescriptor ()
+No symbol table info available.
+#12 0xb722d04d in PThread::PX_ThreadStart () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#13 0xb657e504 in start_thread () from /lib/tls/i686/cmov/libpthread.so.0
+No symbol table info available.
+#14 0xb640151e in clone () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 5 (Thread -1309467744 (LWP 6308)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb63fa321 in select () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+#2  0xb722c3c8 in PThread::PXBlockOnIO () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#3  0xb721fa0b in PChannel::PXSetIOBlock () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#4  0xb7219b43 in PSocket::os_accept () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#5  0xb723946f in PTCPSocket::Accept () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#6  0xb68b559b in OpalListenerTCP::Accept () from /usr/lib/libopal.so.2.2
+No symbol table info available.
+#7  0x084d7838 in ?? ()
+No symbol table info available.
+#8  0x084d3138 in ?? ()
+No symbol table info available.
+#9  0x000003f0 in ?? ()
+No symbol table info available.
+#10 0xb730575c in ?? () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#11 0x000003e8 in ?? ()
+No symbol table info available.
+#12 0x00000016 in ?? ()
+No symbol table info available.
+#13 0xb1f31308 in ?? ()
+No symbol table info available.
+#14 0xb7259f79 in PAbstractArray::InternalSetSize ()
+   from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#15 0xb68b2608 in OpalListener::ListenForConnections ()
+   from /usr/lib/libopal.so.2.2
+No symbol table info available.
+#16 0x084d3100 in ?? ()
+No symbol table info available.
+#17 0xb1f313d0 in ?? ()
+No symbol table info available.
+#18 0x00000000 in ?? ()
+No symbol table info available.
+
+Thread 4 (Thread -1309733984 (LWP 6309)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb63fa321 in select () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+#2  0xb7219a20 in PSocket::Select () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#3  0xb723ba35 in PSocket::Select () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#4  0xb68b6bdb in OpalListenerUDP::Accept () from /usr/lib/libopal.so.2.2
+No symbol table info available.
+#5  0xb1ef02f0 in ?? ()
+No symbol table info available.
+#6  0xb1ef03d0 in ?? ()
+No symbol table info available.
+#7  0xb1ef03d8 in ?? ()
+No symbol table info available.
+#8  0x084f3000 in ?? ()
+No symbol table info available.
+#9  0x00000000 in ?? ()
+No symbol table info available.
+
+Thread 3 (Thread -1310000224 (LWP 6311)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb6581816 in pthread_cond_wait@@GLIBC_2.3.2 ()
+   from /lib/tls/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb722d6c1 in PSyncPoint::Wait () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#3  0x080b3aac in PSafePtr<SIPInfo>::InternalIsDescendant ()
+No symbol table info available.
+#4  0x080a2784 in PList<PIPSocket::InterfaceEntry>::~PList ()
+No symbol table info available.
+#5  0x0809ee82 in PVideoOutputDevice::Close ()
+No symbol table info available.
+#6  0xb722d04d in PThread::PX_ThreadStart () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#7  0xb657e504 in start_thread () from /lib/tls/i686/cmov/libpthread.so.0
+No symbol table info available.
+#8  0xb640151e in clone () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 2 (Thread -1310676064 (LWP 6314)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb63f7803 in poll () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+#2  0xb5f453ad in __res_queriesmatch () from /lib/tls/i686/cmov/libresolv.so.2
+No symbol table info available.
+#3  0xb5f44153 in __libc_res_nquery () from /lib/tls/i686/cmov/libresolv.so.2
+No symbol table info available.
+#4  0xb5f443f0 in __libc_res_nquery () from /lib/tls/i686/cmov/libresolv.so.2
+No symbol table info available.
+#5  0xb5f4473b in __libc_res_nsearch () from /lib/tls/i686/cmov/libresolv.so.2
+No symbol table info available.
+#6  0xb3928976 in _nss_dns_gethostbyname3_r ()
+   from /lib/tls/i686/cmov/libnss_dns.so.2
+No symbol table info available.
+#7  0xb3928c4b in _nss_dns_gethostbyname2_r ()
+   from /lib/tls/i686/cmov/libnss_dns.so.2
+No symbol table info available.
+#8  0xb641803e in gethostbyname2_r () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+#9  0xb63e7f03 in freeaddrinfo () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+#10 0xb63e8716 in getaddrinfo () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+#11 0xb723eaee in PHostByName::GetHost () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#12 0xb723ee3f in PHostByName::GetHostAddress () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#13 0xb723ef15 in PIPSocket::GetHostAddress () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#14 0xb71893a8 in PSTUNClient::SetServer () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#15 0xb7189944 in PSTUNClient::PSTUNClient () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#16 0xb6880d16 in OpalManager::SetSTUNServer () from /usr/lib/libopal.so.2.2
+No symbol table info available.
+#17 0xb2809058 in ?? ()
+No symbol table info available.
+#18 0x085835b8 in ?? ()
+No symbol table info available.
+#19 0x000013c4 in ?? ()
+No symbol table info available.
+#20 0x000013ec in ?? ()
+No symbol table info available.
+#21 0x00001388 in ?? ()
+No symbol table info available.
+#22 0x000013c2 in ?? ()
+No symbol table info available.
+#23 0xb7f02942 in _dl_rtld_di_serinfo () from /lib/ld-linux.so.2
+No symbol table info available.
+#24 0x080b4803 in PSafePtr<SIPInfo>::InternalIsDescendant ()
+No symbol table info available.
+#25 0xb722d04d in PThread::PX_ThreadStart () from /usr/lib/libpt.so.1.10.2
+No symbol table info available.
+#26 0xb657e504 in start_thread () from /lib/tls/i686/cmov/libpthread.so.0
+No symbol table info available.
+#27 0xb640151e in clone () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+
+Thread 1 (Thread -1247730000 (LWP 5645)):
+#0  0xffffe410 in __kernel_vsyscall ()
+No symbol table info available.
+#1  0xb658534b in __waitpid_nocancel ()
+   from /lib/tls/i686/cmov/libpthread.so.0
+No symbol table info available.
+#2  0xb7e851b6 in gnome_gtk_module_info_get () from /usr/lib/libgnomeui-2.so.0
+No symbol table info available.
+#3  <signal handler called>
+No symbol table info available.
+#4  0xb73e6c34 in g_string_new () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#5  0xb76cff15 in gnome_vfs_uri_to_string () from /usr/lib/libgnomevfs-2.so.0
+No symbol table info available.
+#6  0xb3947353 in fs_module_create ()
+   from /usr/lib/gtk-2.0/2.10.0/filesystems/libgnome-vfs.so
+No symbol table info available.
+#7  0xb76bef18 in gnome_vfs_job_get_count () from /usr/lib/libgnomevfs-2.so.0
+No symbol table info available.
+#8  0x00000012 in ?? ()
+No symbol table info available.
+#9  0x081c8a30 in ?? ()
+No symbol table info available.
+#10 0xb2808820 in ?? ()
+No symbol table info available.
+#11 0xb744ff75 in ?? () from /usr/lib/libgthread-2.0.so.0
+No symbol table info available.
+#12 0x00000002 in ?? ()
+No symbol table info available.
+#13 0xb74301e4 in ?? () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#14 0xbf978aa8 in ?? ()
+No symbol table info available.
+#15 0xb73e1762 in g_slice_alloc () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#16 0xb73c8aa1 in g_source_is_destroyed () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#17 0xb73ca802 in g_main_context_dispatch () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#18 0xb73cd7df in g_main_context_check () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#19 0xb73cdb89 in g_main_loop_run () from /usr/lib/libglib-2.0.so.0
+No symbol table info available.
+#20 0xb7b20574 in gtk_main () from /usr/lib/libgtk-x11-2.0.so.0
+No symbol table info available.
+#21 0x0808c747 in PList<PString>::~PList ()
+No symbol table info available.
+#22 0xb63498cc in __libc_start_main () from /lib/tls/i686/cmov/libc.so.6
+No symbol table info available.
+#23 0x08067311 in ?? ()
+No symbol table info available.
+#0  0xffffe410 in __kernel_vsyscall ()
+
+Here is some text after the stack trace, just for kicks.

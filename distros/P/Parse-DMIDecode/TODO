@@ -1,0 +1,7 @@
+- Finish POD.
+- Try and reduce the number of parser errors.
+- Try and account for older dmidecode outputs.
+- Implement a propper way of getting at all
+  the data in a handle object for data that
+  is not accessable through a keyword call.
+  (Duplicate keywords for example).

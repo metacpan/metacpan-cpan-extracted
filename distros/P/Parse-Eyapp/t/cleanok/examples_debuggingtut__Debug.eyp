@@ -1,0 +1,17 @@
+
+%%
+
+p:
+      ds ';' ss
+    | ss 
+;
+ds:
+      D ';' ds
+    | D /* this production is never used */
+;
+ss:
+      S ';' ss
+    | S 
+;
+
+%%

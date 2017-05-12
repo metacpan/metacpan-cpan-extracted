@@ -1,0 +1,15 @@
+Changelog for POE::Component::IRC::Plugin::QueryDNS
+===================================================
+
+1.00	Fri Apr 17 21:52:22 BST 2009
+	- Import to git repo
+	- bump to stable release
+
+0.06	Mon May 12 14:49:48 BST 2008
+	- Removed kwalitee test and added license information.
+
+0.04	Tue Apr 15 12:31:43 BST 2008
+	- Kwalitee fixes.
+
+0.02	Wed Mar  5 16:51:49 GMT 2008
+	- Initial CPAN Release

@@ -1,0 +1,21 @@
+PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-e" "test_harness(0, 'inc', 'blib/lib', 'blib/arch')" t/*.t t/bug/*.t t/mechanize/*.t
+t/01app.........................ok
+t/02pod.........................skipped: set TEST_POD to enable this test
+t/03podcoverage.................skipped: set TEST_POD to enable this test
+t/04_forumcode..................ok
+t/05.userroles..................ok
+t/06.aggregate.controller.......ok
+t/07.aggregate.schematests......ok
+t/50.text_search.sql............ok
+t/bug/01.forum_list_no_posts....ok
+t/mechanize/00.login............ok
+t/mechanize/01.main_page........ok
+t/mechanize/02.forum............ok
+t/model_ParleyDB................ok
+t/model_Post....................ok
+t/view_JSON.....................ok
+t/view_Plain....................ok
+t/view_TT.......................ok
+All tests successful.
+Files=17, Tests=464, 16 wallclock secs ( 0.19 usr  0.04 sys + 13.18 cusr  0.81 csys = 14.22 CPU)
+Result: PASS

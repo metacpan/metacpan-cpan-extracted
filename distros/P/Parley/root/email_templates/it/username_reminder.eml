@@ -1,0 +1,11 @@
+[% person.first_name %],
+
+Il nome utente di [% c.config.name %] è:
+
+  [% person.authentication.username %]
+
+[% c.config.name %] si può visitare cliccando su:
+
+  [% c.request.base %]
+
+Il team [% c.config.name %].

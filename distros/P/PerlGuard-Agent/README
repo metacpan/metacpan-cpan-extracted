@@ -1,0 +1,44 @@
+PerlGuard-Agent version 0.03
+============================
+
+PerlGuard::Agent - Trace your application performance with PerlGuard
+
+This is the PerlGuard agent which will help you collect and store 
+metrics also known as application performance monitoring. You will usually use
+on of the plugins to integrate assuming you are using a supported framework.
+
+DBI is required for DBI monitoring
+Net::HTTP is requires for HTTP monitoring
+
+  use PerlGuard::Agent;
+  my $agent = PerlGuard::Agent->new($config);
+  my $profile = $agent->create_new_profile();
+  $profile->start_recording;
+  $profile->url( $my_url );
+  $profile->http_method( $my_http_method );
+  $profile->controller( "My::Controller" );
+  $profile->controller_action( "index_pages" );
+  $profile->finish_recording;
+  # Let variables fall out of scope to perform cleanup
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2015 by Jonathan Taylor
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.18.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

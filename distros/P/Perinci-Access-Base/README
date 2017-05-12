@@ -1,0 +1,33 @@
+DESCRIPTION
+
+    This is a thin base class for all Riap clients (Perinci::Access::*). It
+    currently only provides check_request() which does the following:
+
+      * perform some basic sanity checking of the Riap request hash $req
+
+      * split request keys uri
+
+      Split result is put in $req->{-uri_scheme}, $req->{-uri_auth},
+      $req->{-uri_path}, $req->{-uri_query}, and $req->{-uri_frag}.
+
+ATTRIBUTES
+
+ riap_version => float (default: 1.1)
+
+METHODS
+
+ new(%args) => OBJ
+
+    Constructor. Does nothing except creating a blessed hashref from %args.
+    Subclasses should override this method and do additional stuffs as
+    needed.
+
+ check_request($req) => RESP|undef
+
+    Should be called by subclasses during the early phase in request().
+    Will return an enveloped error response on error, or undef on success.
+
+SEE ALSO
+
+    Perinci::Access
+

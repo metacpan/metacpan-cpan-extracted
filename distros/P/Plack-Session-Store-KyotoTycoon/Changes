@@ -1,0 +1,59 @@
+==================================================
+Changes from 2012-05-24 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.1 at 2013-05-24 04:22:28 +0000
+----------------------------------------
+
+  Change: b54a45cd48c6a8b46472e2375a50373828a8c845
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-24 16:22:21 +0000
+
+    satisfy Perl::Critic 
+
+  Change: 19e88499d4e2c5da8ec7acf589ddb7f325db127e
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-24 16:21:47 +0000
+
+    satisfy Perl::Critic 
+
+  Change: 5764b8796827c04b7783c2be6f30b6dca7067d91
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-24 16:19:47 +0000
+
+    satisfy Perl::Critic 
+
+  Change: e33346cd051868e1d418e23d3900d7f197d1bd59
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-24 16:13:03 +0000
+
+    more cleanup 
+
+  Change: c77397e81591e0615433926f42f585fa488a0419
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-24 16:11:38 +0000
+
+    cleanup 
+
+  Change: 3f854011fbfd35ccc94113a0361f6ec4437d8a3f
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-24 16:10:45 +0000
+
+    first run of Dzil 
+
+  Change: dc9ac0545ed0858d4e8f0f334b435e7e0d6613f0
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-24 16:08:08 +0000
+
+    initial import 
+
+  Change: 53036d2b5cfd0e46787b0262f7dd16ca501229e5
+  Author: Lenz Gschwendtner <lenz@springtimesoft.com>
+  Date : 2013-05-24 15:55:28 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+
+# this script turns on log_any_app explicitly, so you cannot turn it off by
+# LOG=0. however, subcommands can still turn it off.
+
+use 5.010;
+use strict;
+use warnings;
+use Perinci::CmdLine::Classic;
+
+our %SPEC;
+
+$SPEC{greedy} = {
+    v => 1.1,
+    summary => 'Will return entered arguments',
+    args => {
+        args => {
+            #schema=>['array*'=>{of=>'str*', min_len=>1}],
+            schema=>'str*',
+            pos=>0,
+            req=>1,
+            greedy=>1,
+        },
+    },
+};
+sub greedy {
+    my %args = @_;
+    [200, "OK", $args{args}];
+}
+
+Perinci::CmdLine::Classic->new(url=>'/main/greedy')->run;

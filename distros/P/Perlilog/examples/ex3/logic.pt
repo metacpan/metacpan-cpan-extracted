@@ -1,0 +1,7 @@
+port theport vars rw0:data1, rw1:data2, r2:out1, r3:out2;
+
+  input  [:]  data1, data2;
+  output [:]  out1, out2;
+
+  assign out1 = data1 & data2;
+  assign out2 = data1 | data2;

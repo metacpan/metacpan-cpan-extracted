@@ -1,0 +1,12 @@
+Changes
+lib/POE/Component/AtomAggregator.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+examples/example-1.pl
+t/00-load.t
+t/01-basic.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

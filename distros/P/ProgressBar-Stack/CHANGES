@@ -1,0 +1,11 @@
+1.01
+====
+* Name changed to ProgressBar::Stack
+* file/file_progress optimized (single iteration overhead is 4-6 times less now)
+* running_time/remaining_time/total_time methods added
+* Default renderer outputs remaining time
+* Multithread tests fixed
+
+1.00
+====
+Initial revision

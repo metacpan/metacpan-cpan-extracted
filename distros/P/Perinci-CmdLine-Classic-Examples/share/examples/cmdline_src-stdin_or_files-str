@@ -1,0 +1,23 @@
+#!perl
+
+use 5.010;
+use strict;
+use warnings;
+
+use Perinci::CmdLine::Classic;
+
+our %SPEC;
+
+$SPEC{cmdline_src_stdin_or_files_str} = {
+    v => 1.1,
+    summary => 'This function has str arg with cmdline_src=stdin_or_files',
+    args => {
+        a1 => {schema=>'str*', cmdline_src=>'stdin_or_files'},
+    },
+};
+sub cmdline_src_stdin_or_files_str {
+    my %args = @_;
+    [200, "OK", "a1=$args{a1}"];
+}
+
+Perinci::CmdLine::Classic->new(url => '/main/cmdline_src_stdin_or_files_str')->run;

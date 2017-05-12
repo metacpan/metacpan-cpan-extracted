@@ -1,0 +1,3 @@
+TYPEMAP
+PerlIO * T_IN
+SSize_t T_IV

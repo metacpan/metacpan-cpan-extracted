@@ -1,0 +1,36 @@
+PPIx-Shorthand version 1.2.0
+
+Translation from strings to PPI classes, primarily targeted at allowing
+users to specify said classes without typing in their full names.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+
+NOTE ON ENCODINGS
+
+All files in this distribution should be considered to be in UTF-8 format.
+Some standard documentation tools do not presently deal very well with this and
+their output is mangled.  Give that it is the 21st century, this is considered
+a bug in those tools and not in this distribution.
+
+
+COPYRIGHT AND LICENSE
+
+Copyright ©2008-2010, Elliot Shank
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

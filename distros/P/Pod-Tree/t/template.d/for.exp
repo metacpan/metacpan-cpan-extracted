@@ -1,0 +1,38 @@
+<html>
+ <head>
+  <base href="">
+  <link href="" rel="stylesheet" type="text/css">
+  <title></title>
+ </head>
+ <body bgcolor="#ffffff" text="#000000">
+  <UL>
+<LI><A HREF="#HEAD">HEAD
+
+</A><UL>
+<LI><A HREF="#Really%20a%20commmand.">Really a commmand.
+</A></UL>
+</UL>
+<HR>
+
+  <H1><A NAME="HEAD">HEAD
+
+</A></H1>
+
+<P>Line 1<br> &lt;<em>Line 2</em>&gt;
+
+</P>
+<P><a href="http://world.std.com/~swmcd/steven/index.html">Steven</a>
+
+</P>
+<PRE>	VERBATIM
+	VERBATIM
+	VERBATIM</PRE>
+
+<P>Fee, Fie, Foe, Fum
+Foo, Bar, Baz, Buz
+
+</P><IMG src="flower.gif"><H2><A NAME="Really%20a%20commmand.">Really a commmand.
+</A></H2>
+
+ </body>
+</html>

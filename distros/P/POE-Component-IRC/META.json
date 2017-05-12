@@ -1,0 +1,82 @@
+{
+   "abstract" : "A fully event-driven IRC client module",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>",
+      "Hinrik Örn Sigurðsson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-IRC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "utils",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "POE::Component::Client::DNS" : "0.99"
+         },
+         "requires" : {
+            "IRC::Utils" : "0.12",
+            "List::MoreUtils" : "0",
+            "POE" : "1.311",
+            "POE::Component::Syndicator" : "0",
+            "POE::Driver::SysRW" : "0",
+            "POE::Filter::IRCD" : "2.42",
+            "POE::Filter::Line" : "0",
+            "POE::Filter::Stackable" : "0",
+            "POE::Filter::Stream" : "0",
+            "POE::Session" : "0",
+            "POE::Wheel::ReadWrite" : "0",
+            "POE::Wheel::SocketFactory" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Differences" : "0.61",
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-POE-Component-IRC@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-IRC"
+      },
+      "homepage" : "http://metacpan.org/release/POE-Component-IRC",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/bingos/poe-component-irc.git",
+         "web" : "http://github.com/bingos/poe-component-irc"
+      }
+   },
+   "version" : "6.88",
+   "x_authority" : "cpan:HINRIK"
+}
+

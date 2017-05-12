@@ -1,0 +1,64 @@
+{
+   "abstract" : "Evaluate code with App::EvalServer",
+   "author" : [
+      "Hinrik \u00c3\u0096rn Sigur\u00c3\u00b0sson <hinrik.sig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Component-IRC-Plugin-Eval",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "utils"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "POE::Component::IRC" : "6.36",
+            "POE::Component::IRC::Plugin::BotCommand" : 0,
+            "POE::Filter::JSON" : 0,
+            "POE::Session" : 0,
+            "POE::Wheel::ReadWrite" : 0,
+            "POE::Wheel::SocketFactory" : 0,
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-POE-Component-IRC-Plugin-Eval@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=POE-Component-IRC-Plugin-Eval"
+      },
+      "homepage" : "http://search.cpan.org/dist/POE-Component-IRC-Plugin-Eval/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hinrik/poe-component-irc-plugin-eval.git",
+         "web" : "http://github.com/hinrik/poe-component-irc-plugin-eval"
+      }
+   },
+   "version" : "0.07",
+   "x_authority" : "cpan:HINRIK"
+}
+

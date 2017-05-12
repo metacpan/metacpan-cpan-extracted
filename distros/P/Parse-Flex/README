@@ -1,0 +1,39 @@
+Parse/Flex version 0.01
+=======================
+
+Parse::Flex works similar to Parse::Lex, but it uses XS for faster per-
+formance.
+
+This module allows the user to implement a customized lexer analyzer
+with his own rules.  It is expected that you will supply your own
+rules; otherwise, the default rules might not be very useful.
+
+Read the perldoc about Custom Rules & Libraries, and how to load them.
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   make compare   ( This benchmark will be removed in future versions. You
+		    will need Parse::Lex to perform the comparison.)
+
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Test::More
+Parse::Lex    ( Only for the benchmarks. Note, it is not required through PREREQ_PM )
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Ioannis Tambouras <ioannis@earthlink.net>
+LICENSE:  Latest version of GPL , read terms at  www.fsf.org .
+

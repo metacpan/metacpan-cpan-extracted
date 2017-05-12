@@ -1,0 +1,8 @@
+Proc::Topus -
+
+To install this module, use the following steps:
+
+  perl Makefile.PL
+  make
+  make test
+  make install

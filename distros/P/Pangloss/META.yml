@@ -1,0 +1,509 @@
+--- #YAML:1.0
+name: Pangloss
+version: 0.06
+author:
+  - Steve Purkis <spurkis@quiup.com>
+abstract: distribution version for Pangloss.
+license: perl
+requires:
+  Cache::Cache: 1.0
+  Date::Format: 2.0
+  Error: 0.15
+  HTML::Parser: 3.00
+  LWP::Simple: 1.0
+  MIME::Types: 1.06
+  OpenFrame: 3.03
+  OpenFrame::WebApp: 0.04
+  Petal: 1.06
+  Petal::Utils: 0.05
+  Pipeline: 3.04
+  Pipeline::Config: 0.03
+  Pixie: 2.06
+  Pod::Usage: 1.0
+  Storable: 2.0
+  Term::ReadKey: 2.0
+  URI: 1.0
+  YAML: 0.35
+  accessors: 0.02
+  perl: 5.8.0
+recommends:
+  Apache: 1.0
+  Apache::Cookie: 0.1
+  HTTP::Daemon: 1.0
+  HTTP::Headers: 1.47
+  OpenFrame::Segment::Apache: 1.05
+build_requires:
+  Data::Random: 0.05
+  Module::Build: 0.20
+  Test::More: 0.47
+provides:
+  Pangloss:
+    file: lib/Pangloss.pm
+    version: 0.05_01
+  Pangloss::Apache::Handler:
+    file: lib/Pangloss/Apache/Handler.pm
+    version: 0.06
+  Pangloss::Application:
+    file: lib/Pangloss/Application.pm
+    version: 0.06
+  Pangloss::Application::Base:
+    file: lib/Pangloss/Application/Base.pm
+    version: 0.06
+  Pangloss::Application::CategoryEditor:
+    file: lib/Pangloss/Application/CategoryEditor.pm
+    version: 0.06
+  Pangloss::Application::CollectionEditor:
+    file: lib/Pangloss/Application/CollectionEditor.pm
+    version: 0.06
+  Pangloss::Application::ConceptEditor:
+    file: lib/Pangloss/Application/ConceptEditor.pm
+    version: 0.06
+  Pangloss::Application::LanguageEditor:
+    file: lib/Pangloss/Application/LanguageEditor.pm
+    version: 0.06
+  Pangloss::Application::Searcher:
+    file: lib/Pangloss/Application/Searcher.pm
+    version: 0.06
+  Pangloss::Application::TermEditor:
+    file: lib/Pangloss/Application/TermEditor.pm
+    version: 0.06
+  Pangloss::Application::UserEditor:
+    file: lib/Pangloss/Application/UserEditor.pm
+    version: 0.06
+  Pangloss::Application::View:
+    file: lib/Pangloss/Application/View.pm
+    version: 0.06
+  Pangloss::Categories:
+    file: lib/Pangloss/Categories.pm
+    version: 0.06
+  Pangloss::Category:
+    file: lib/Pangloss/Category.pm
+    version: 0.06
+  Pangloss::Category::Error:
+    file: lib/Pangloss/Category/Error.pm
+    version: 0.06
+  Pangloss::Collection:
+    file: lib/Pangloss/Collection.pm
+    version: 0.06
+  Pangloss::Collection::Item:
+    file: lib/Pangloss/Collection/Item.pm
+    version: 0.06
+  Pangloss::Concept:
+    file: lib/Pangloss/Concept.pm
+    version: 0.06
+  Pangloss::Concept::Error:
+    file: lib/Pangloss/Concept/Error.pm
+    version: 0.06
+  Pangloss::Concepts:
+    file: lib/Pangloss/Concepts.pm
+    version: 0.06
+  Pangloss::Config:
+    file: lib/Pangloss/Config.pm
+    version: 0.06
+  Pangloss::Error:
+    file: lib/Pangloss/Error.pm
+    version: 0.06
+  Pangloss::HTML::Stripper:
+    file: lib/Pangloss/HTML/Stripper.pm
+  Pangloss::IO::YAML:
+    file: lib/Pangloss/IO/YAML.pm
+    version: 0.06
+  Pangloss::Install:
+    file: lib/Pangloss/Install.pm
+  Pangloss::Language:
+    file: lib/Pangloss/Language.pm
+    version: 0.06
+  Pangloss::Language::Error:
+    file: lib/Pangloss/Language/Error.pm
+    version: 0.06
+  Pangloss::Languages:
+    file: lib/Pangloss/Languages.pm
+    version: 0.06
+  Pangloss::Object:
+    file: lib/Pangloss/Object.pm
+    version: 0.06
+  Pangloss::Search:
+    file: lib/Pangloss/Search.pm
+    version: 0.06
+  Pangloss::Search::Filter:
+    file: lib/Pangloss/Search/Filter.pm
+    version: 0.06
+  Pangloss::Search::Filter::Base:
+    file: lib/Pangloss/Search/Filter/Base.pm
+    version: 0.06
+  Pangloss::Search::Filter::Category:
+    file: lib/Pangloss/Search/Filter/Category.pm
+    version: 0.06
+  Pangloss::Search::Filter::Concept:
+    file: lib/Pangloss/Search/Filter/Concept.pm
+    version: 0.06
+  Pangloss::Search::Filter::DateRange:
+    file: lib/Pangloss/Search/Filter/DateRange.pm
+    version: 0.06
+  Pangloss::Search::Filter::Document:
+    file: lib/Pangloss/Search/Filter/Document.pm
+    version: 0.06
+  Pangloss::Search::Filter::Keyword:
+    file: lib/Pangloss/Search/Filter/Keyword.pm
+    version: 0.06
+  Pangloss::Search::Filter::Language:
+    file: lib/Pangloss/Search/Filter/Language.pm
+    version: 0.06
+  Pangloss::Search::Filter::Proofreader:
+    file: lib/Pangloss/Search/Filter/Proofreader.pm
+    version: 0.06
+  Pangloss::Search::Filter::Status:
+    file: lib/Pangloss/Search/Filter/Status.pm
+    version: 0.06
+  Pangloss::Search::Filter::Translator:
+    file: lib/Pangloss/Search/Filter/Translator.pm
+    version: 0.06
+  Pangloss::Search::Request:
+    file: lib/Pangloss/Search/Request.pm
+    version: 0.06
+  Pangloss::Search::Results:
+    file: lib/Pangloss/Search/Results.pm
+    version: 0.06
+  Pangloss::Search::Results::Pager:
+    file: lib/Pangloss/Search/Results/Pager.pm
+    version: 0.06
+  Pangloss::Segment::AddCategory:
+    file: lib/Pangloss/Segment/AddCategory.pm
+    version: 0.06
+  Pangloss::Segment::AddConcept:
+    file: lib/Pangloss/Segment/AddConcept.pm
+    version: 0.06
+  Pangloss::Segment::AddLanguage:
+    file: lib/Pangloss/Segment/AddLanguage.pm
+    version: 0.06
+  Pangloss::Segment::AddTerm:
+    file: lib/Pangloss/Segment/AddTerm.pm
+    version: 0.06
+  Pangloss::Segment::AddUser:
+    file: lib/Pangloss/Segment/AddUser.pm
+    version: 0.06
+  Pangloss::Segment::Decline::CantAddCategories:
+    file: lib/Pangloss/Segment/Decline/CantAddCategories.pm
+    version: 0.06
+  Pangloss::Segment::Decline::CantAddConcepts:
+    file: lib/Pangloss/Segment/Decline/CantAddConcepts.pm
+    version: 0.06
+  ? |-
+    Pangloss::Segment::Decline::CantProofreadSelectedTerm
+:
+    file: |-
+      lib/Pangloss/Segment/Decline/CantProofreadSelectedTerm.pm
+    version: 0.06
+  Pangloss::Segment::Decline::CantProofreadTerm:
+    file: lib/Pangloss/Segment/Decline/CantProofreadTerm.pm
+    version: 0.06
+  Pangloss::Segment::Decline::CantTranslateTerm:
+    file: lib/Pangloss/Segment/Decline/CantTranslateTerm.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoCategory:
+    file: lib/Pangloss/Segment/Decline/NoCategory.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoConcept:
+    file: lib/Pangloss/Segment/Decline/NoConcept.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoLanguage:
+    file: lib/Pangloss/Segment/Decline/NoLanguage.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoListCategories:
+    file: lib/Pangloss/Segment/Decline/NoListCategories.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoListConcepts:
+    file: lib/Pangloss/Segment/Decline/NoListConcepts.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoListLanguages:
+    file: lib/Pangloss/Segment/Decline/NoListLanguages.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoListProofreaders:
+    file: lib/Pangloss/Segment/Decline/NoListProofreaders.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoListStatusCodes:
+    file: lib/Pangloss/Segment/Decline/NoListStatusCodes.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoListTerms:
+    file: lib/Pangloss/Segment/Decline/NoListTerms.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoListTranslators:
+    file: lib/Pangloss/Segment/Decline/NoListTranslators.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoListUsers:
+    file: lib/Pangloss/Segment/Decline/NoListUsers.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoPager:
+    file: lib/Pangloss/Segment/Decline/NoPager.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoSearchRequest:
+    file: lib/Pangloss/Segment/Decline/NoSearchRequest.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoSelectedCategory:
+    file: lib/Pangloss/Segment/Decline/NoSelectedCategory.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoSelectedConcept:
+    file: lib/Pangloss/Segment/Decline/NoSelectedConcept.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoSelectedLanguage:
+    file: lib/Pangloss/Segment/Decline/NoSelectedLanguage.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoSelectedSearch:
+    file: lib/Pangloss/Segment/Decline/NoSelectedSearch.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoSelectedTerm:
+    file: lib/Pangloss/Segment/Decline/NoSelectedTerm.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoSelectedUser:
+    file: lib/Pangloss/Segment/Decline/NoSelectedUser.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoTerm:
+    file: lib/Pangloss/Segment/Decline/NoTerm.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoTermStatus:
+    file: lib/Pangloss/Segment/Decline/NoTermStatus.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoUser:
+    file: lib/Pangloss/Segment/Decline/NoUser.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NoUserInSession:
+    file: lib/Pangloss/Segment/Decline/NoUserInSession.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NotAdmin:
+    file: lib/Pangloss/Segment/Decline/NotAdmin.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NotProofreader:
+    file: lib/Pangloss/Segment/Decline/NotProofreader.pm
+    version: 0.06
+  Pangloss::Segment::Decline::NotTranslator:
+    file: lib/Pangloss/Segment/Decline/NotTranslator.pm
+    version: 0.06
+  Pangloss::Segment::GetCategory:
+    file: lib/Pangloss/Segment/GetCategory.pm
+    version: 0.06
+  Pangloss::Segment::GetConcept:
+    file: lib/Pangloss/Segment/GetConcept.pm
+    version: 0.06
+  Pangloss::Segment::GetLanguage:
+    file: lib/Pangloss/Segment/GetLanguage.pm
+    version: 0.06
+  Pangloss::Segment::GetTerm:
+    file: lib/Pangloss/Segment/GetTerm.pm
+    version: 0.06
+  Pangloss::Segment::GetUser:
+    file: lib/Pangloss/Segment/GetUser.pm
+    version: 0.06
+  Pangloss::Segment::ListCategories:
+    file: lib/Pangloss/Segment/ListCategories.pm
+    version: 0.06
+  Pangloss::Segment::ListConcepts:
+    file: lib/Pangloss/Segment/ListConcepts.pm
+    version: 0.06
+  Pangloss::Segment::ListLanguages:
+    file: lib/Pangloss/Segment/ListLanguages.pm
+    version: 0.06
+  Pangloss::Segment::ListProofreaders:
+    file: lib/Pangloss/Segment/ListProofreaders.pm
+    version: 0.06
+  Pangloss::Segment::ListStatusCodes:
+    file: lib/Pangloss/Segment/ListStatusCodes.pm
+    version: 0.06
+  Pangloss::Segment::ListTerms:
+    file: lib/Pangloss/Segment/ListTerms.pm
+    version: 0.06
+  Pangloss::Segment::ListTranslators:
+    file: lib/Pangloss/Segment/ListTranslators.pm
+    version: 0.06
+  Pangloss::Segment::ListUsers:
+    file: lib/Pangloss/Segment/ListUsers.pm
+    version: 0.06
+  Pangloss::Segment::LoadCategory:
+    file: lib/Pangloss/Segment/LoadCategory.pm
+    version: 0.06
+  Pangloss::Segment::LoadConcept:
+    file: lib/Pangloss/Segment/LoadConcept.pm
+    version: 0.06
+  Pangloss::Segment::LoadLanguage:
+    file: lib/Pangloss/Segment/LoadLanguage.pm
+    version: 0.06
+  Pangloss::Segment::LoadTerm:
+    file: lib/Pangloss/Segment/LoadTerm.pm
+    version: 0.06
+  Pangloss::Segment::LoadTermStatus:
+    file: lib/Pangloss/Segment/LoadTermStatus.pm
+    version: 0.06
+  Pangloss::Segment::LoadUser:
+    file: lib/Pangloss/Segment/LoadUser.pm
+    version: 0.06
+  Pangloss::Segment::ModifyCategory:
+    file: lib/Pangloss/Segment/ModifyCategory.pm
+    version: 0.06
+  Pangloss::Segment::ModifyConcept:
+    file: lib/Pangloss/Segment/ModifyConcept.pm
+    version: 0.06
+  Pangloss::Segment::ModifyLanguage:
+    file: lib/Pangloss/Segment/ModifyLanguage.pm
+    version: 0.06
+  Pangloss::Segment::ModifyTerm:
+    file: lib/Pangloss/Segment/ModifyTerm.pm
+    version: 0.06
+  Pangloss::Segment::ModifyTermStatus:
+    file: lib/Pangloss/Segment/ModifyTermStatus.pm
+    version: 0.06
+  Pangloss::Segment::ModifyUser:
+    file: lib/Pangloss/Segment/ModifyUser.pm
+    version: 0.06
+  Pangloss::Segment::Pager::GetFromSession:
+    file: lib/Pangloss/Segment/Pager/GetFromSession.pm
+    version: 0.06
+  Pangloss::Segment::Pager::SaveInSession:
+    file: lib/Pangloss/Segment/Pager/SaveInSession.pm
+    version: 0.06
+  Pangloss::Segment::Pager::Session:
+    file: lib/Pangloss/Segment/Pager/Session.pm
+    version: 0.06
+  Pangloss::Segment::Pager::SetCurrentPage:
+    file: lib/Pangloss/Segment/Pager/SetCurrentPage.pm
+    version: 0.06
+  Pangloss::Segment::RemoteUserLoader:
+    file: lib/Pangloss/Segment/RemoteUserLoader.pm
+    version: 0.06
+  Pangloss::Segment::RemoveCategory:
+    file: lib/Pangloss/Segment/RemoveCategory.pm
+    version: 0.06
+  Pangloss::Segment::RemoveConcept:
+    file: lib/Pangloss/Segment/RemoveConcept.pm
+    version: 0.06
+  Pangloss::Segment::RemoveLanguage:
+    file: lib/Pangloss/Segment/RemoveLanguage.pm
+    version: 0.06
+  Pangloss::Segment::RemoveTerm:
+    file: lib/Pangloss/Segment/RemoveTerm.pm
+    version: 0.06
+  Pangloss::Segment::RemoveUser:
+    file: lib/Pangloss/Segment/RemoveUser.pm
+    version: 0.06
+  Pangloss::Segment::Request::GetCategory:
+    file: lib/Pangloss/Segment/Request/GetCategory.pm
+    version: 0.06
+  Pangloss::Segment::Request::GetConcept:
+    file: lib/Pangloss/Segment/Request/GetConcept.pm
+    version: 0.06
+  Pangloss::Segment::Request::GetLanguage:
+    file: lib/Pangloss/Segment/Request/GetLanguage.pm
+    version: 0.06
+  Pangloss::Segment::Request::GetTerm:
+    file: lib/Pangloss/Segment/Request/GetTerm.pm
+    version: 0.06
+  Pangloss::Segment::Request::GetUser:
+    file: lib/Pangloss/Segment/Request/GetUser.pm
+    version: 0.06
+  Pangloss::Segment::Request::ListCategories:
+    file: lib/Pangloss/Segment/Request/ListCategories.pm
+    version: 0.06
+  Pangloss::Segment::Request::ListConcepts:
+    file: lib/Pangloss/Segment/Request/ListConcepts.pm
+    version: 0.06
+  Pangloss::Segment::Request::ListLanguages:
+    file: lib/Pangloss/Segment/Request/ListLanguages.pm
+    version: 0.06
+  Pangloss::Segment::Request::ListProofreaders:
+    file: lib/Pangloss/Segment/Request/ListProofreaders.pm
+    version: 0.06
+  Pangloss::Segment::Request::ListStatusCodes:
+    file: lib/Pangloss/Segment/Request/ListStatusCodes.pm
+    version: 0.06
+  Pangloss::Segment::Request::ListTerms:
+    file: lib/Pangloss/Segment/Request/ListTerms.pm
+    version: 0.06
+  Pangloss::Segment::Request::ListTranslators:
+    file: lib/Pangloss/Segment/Request/ListTranslators.pm
+    version: 0.06
+  Pangloss::Segment::Request::ListUsers:
+    file: lib/Pangloss/Segment/Request/ListUsers.pm
+    version: 0.06
+  Pangloss::Segment::Search:
+    file: lib/Pangloss/Segment/Search.pm
+    version: 0.06
+  Pangloss::Segment::SearchRequest::GetFromSession:
+    file: |-
+      lib/Pangloss/Segment/SearchRequest/GetFromSession.pm
+    version: 0.06
+  Pangloss::Segment::SearchRequest::SaveInSession:
+    file: |-
+      lib/Pangloss/Segment/SearchRequest/SaveInSession.pm
+    version: 0.06
+  Pangloss::Segment::SearchRequest::Session:
+    file: lib/Pangloss/Segment/SearchRequest/Session.pm
+    version: 0.06
+  Pangloss::Segment::SearchRequest::Update:
+    file: lib/Pangloss/Segment/SearchRequest/Update.pm
+    version: 0.06
+  Pangloss::Segment::ShowStore:
+    file: lib/Pangloss/Segment/ShowStore.pm
+  Pangloss::Segment::StoreRequest:
+    file: lib/Pangloss/Segment/StoreRequest.pm
+    version: 0.06
+  Pangloss::Segment::StoreURI:
+    file: lib/Pangloss/Segment/StoreURI.pm
+    version: 0.06
+  Pangloss::Segment::TemplateLoader:
+    file: lib/Pangloss/Segment/TemplateLoader.pm
+    version: 0.06
+  Pangloss::Segment::TemplateMapper:
+    file: lib/Pangloss/Segment/TemplateMapper.pm
+    version: 0.06
+  Pangloss::Segment::TemplateVars:
+    file: lib/Pangloss/Segment/TemplateVars.pm
+    version: 0.06
+  Pangloss::Segment::UserLoader:
+    file: lib/Pangloss/Segment/UserLoader.pm
+    version: 0.06
+  Pangloss::Shell:
+    file: lib/Pangloss/Shell.pm
+  Pangloss::Shell::Command:
+    file: lib/Pangloss/Shell/Command.pm
+    version: 0.06
+  Pangloss::StoredObject:
+    file: lib/Pangloss/StoredObject.pm
+    version: 0.06
+  Pangloss::StoredObject::Common:
+    file: lib/Pangloss/StoredObject/Common.pm
+    version: 0.06
+  Pangloss::StoredObject::Error:
+    file: lib/Pangloss/StoredObject/Error.pm
+    version: 0.06
+  Pangloss::Term:
+    file: lib/Pangloss/Term.pm
+    version: 0.06
+  Pangloss::Term::Error:
+    file: lib/Pangloss/Term/Error.pm
+    version: 0.06
+  Pangloss::Term::Status:
+    file: lib/Pangloss/Term/Status.pm
+    version: 0.06
+  Pangloss::Terms:
+    file: lib/Pangloss/Terms.pm
+    version: 0.06
+  Pangloss::User:
+    file: lib/Pangloss/User.pm
+    version: 0.06
+  Pangloss::User::Error:
+    file: lib/Pangloss/User/Error.pm
+    version: 0.06
+  Pangloss::User::Privileges:
+    file: lib/Pangloss/User/Privileges.pm
+    version: 0.06
+  Pangloss::Users:
+    file: lib/Pangloss/Users.pm
+    version: 0.06
+  Pangloss::Version:
+    file: lib/Pangloss/Version.pm
+    version: 0.06
+  Pangloss::WebApp:
+    file: lib/Pangloss/WebApp.pm
+    version: 0.06
+  Pangloss::WebApp::Standalone:
+    file: lib/Pangloss/WebApp/Standalone.pm
+    version: 0.06
+generated_by: Module::Build version 0.25

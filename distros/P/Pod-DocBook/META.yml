@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Pod-DocBook
+version:      1.2
+version_from: lib/Pod/DocBook.pm
+installdirs:  site
+requires:
+    Digest::MD5:                   0
+    Pod::ParseLink:                0
+    Pod::Parser:                   0
+    Text::ParseWords:              0
+    Text::Wrap:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

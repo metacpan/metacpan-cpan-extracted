@@ -1,0 +1,11 @@
+prefix=/usr
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: dirac
+Description: The BBC Dirac Video Codec
+Version: 1.0.2
+Libs: -L${libdir} -ldirac_encoder -ldirac_decoder -lm -lstdc++
+Cflags: -I${includedir}/dirac
+

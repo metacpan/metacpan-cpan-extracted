@@ -1,0 +1,69 @@
+NAME
+    Perl::AfterFork - reinitializes Perl's notion of $$ and getppid()
+
+SYNOPSIS
+      use Perl::AfterFork;
+      &Perl::AfterFork::reinit_pid;
+      &Perl::AfterFork::reinit_ppid;
+      &Perl::AfterFork::reinit_pidstatus;
+      &Perl::AfterFork::reinit;
+
+DESCRIPTION
+    Using Perl's "fork()" command or your libc's "fork()" function or even
+    your operating system's "fork" syscall does not do the same thing.
+
+    Since a process' PID does not change during it's life time Perl caches
+    the result of the "getpid" syscall using the once fetched PID each time
+    $$ is used. Hence after a successful "fork()" the internal PID-cache
+    must be invalidated. The same argument is valid for "glibc". It caches
+    the getpid(2) as well.
+
+    As for getppid(2), Perl is even caching that. In my opinion Perl is
+    doing wrong when caching the getppid(2) result at all since it can
+    change without further notice when the parent process dies.
+
+    Further Perl maintains an internal cache of spawned children for it's
+    "waitpid" implementation.
+
+    All these cached information can be reinitialized with this module.
+
+    reinit_pid
+        reinitializes the PID-cache
+
+    reinit_ppid
+        reinitializes the PPID-cache
+
+    reinit_pidstatus
+        reinitializes the waitpid-cache
+
+    reinit
+        reinitializes all 3 at once
+
+EXPORT
+    Not an Exporter.
+
+AUTHOR
+    Torsten Foertsch, <torsten.foertsch@gmx.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2005 by Torsten Foertsch
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.
+
+INSTALLATION
+     perl Makefile.PL
+     make
+     make test
+     make install
+
+DEPENDENCIES
+    *   "syscall( SYS_fork )" and "syscall( SYS_getpid )" are needed for
+        testing.
+
+    *   perl 5.8.0
+
+TESTED ON
+    *   Linux 2.6 with glibc 2.3.3
+

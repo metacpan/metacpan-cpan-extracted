@@ -1,0 +1,44 @@
+NAME
+    `POE::Future' - use Future with POE
+
+SYNOPSIS
+     use POE::Future;
+
+     my $future = POE::Future->new_delay( 10 )
+        ->then_done( "Hello, world!" );
+
+     say $future->get;
+
+DESCRIPTION
+    This subclass of Future integrates with POE, allowing the `await' method
+    to block until the future is ready. It allows `POE'-using code to be
+    written that returns `Future' instances, so that it can make full use of
+    `Future''s abilities, including Future::Utils, and also that modules
+    using it can provide a `Future'-based asynchronous interface of their
+    own.
+
+    For a full description on how to use Futures, see the Future
+    documentation.
+
+CONSTRUCTORS
+  $f = POE::Future->new
+    Returns a new leaf future instance, which will allow waiting for its
+    result to be made available, using the `await' method.
+
+  $f = POE::Future->new_delay( $after )
+    Returns a new leaf future instance which will become ready (with an
+    empty result) after the specified delay time.
+
+  $f = POE::Future->new_alarm( $at )
+    Returns a new leaf future instance which will become ready (with an
+    empty result) at the specified alarm time.
+
+    To create a delay or alarm timer that will fail instead of succeed, us
+    the `then_fail' method:
+
+     my $f = POE::Future->new_delay( 20 )
+        ->then_fail( "Timeout" );
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

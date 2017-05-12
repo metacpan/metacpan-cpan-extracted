@@ -1,0 +1,233 @@
+----------------------------
+Revision : 1.49 Date: 2010/09/02 14:53:43
+
+add dependency for Sys::Prctl
+
+----------------------------
+Revision : 1.48 Date: 2010/08/27 13:48:32
+
+add a \n after the PID in the pid file
+
+----------------------------
+Revision : 1.47 Date: 2010/08/18 16:57:07
+
+use Sys::Prctl in daemonize
+
+----------------------------
+Revision : 1.46 Date: 2010/08/06 12:18:19
+
+typo in error code/string
+
+----------------------------
+Revision : 1.45 Date: 2009/12/15 16:16:46
+
+use Sys::Prctl to allow real change of exposed name
+
+----------------------------
+Revision : 1.44 Date: 2009/12/9 08:50:40
+
+when child timeout, return the right code
+
+----------------------------
+Revision : 1.43 Date: 2009-12-7 10:03:14
+
+remove die when timeout
+ 
+----------------------------
+Revision : 1.42 Date : 2009/10/15 13:17:01
+
+replace die by carp
+ 
+----------------------------
+Revision : 1.40 Date : 2009/7/15 15:10:10
+
+correct the expirate return value 
+don't always clean_childs for each function
+
+----------------------------
+Revision : 1.35 Date : 2005/3/31 7:41:37
+
+put correct default value for some variables not initialised by constructor
+
+----------------------------
+Revision : 1.34 Date : 2005/3/16 13:38:28
+
+don't killall_childs when DESTROY
+
+----------------------------
+Revision : 1.33 Date : 2005/3/10 16:11:46
+
+correct code for killall_childs
+
+----------------------------
+Revision : 1.32 Date : 2005/3/10 16:11:25
+
+correct code for killall_childs
+
+----------------------------
+Revision : 1.31 Date : 2005/3/10 13:21:2
+
+add strict mode in fork_child to prevent fork if NAME or PID_FILE already present
+
+----------------------------
+Revision : 1.30 Date : 2005/3/9 8:52:6
+
+correct some documentation error
+
+----------------------------
+Revision : 1.29 Date : 2005/1/20 8:58:18
+
+add autoexpire for daemon
+
+----------------------------
+Revision : 1.28 Date : 2005/1/14 12:2:9
+
+correct test_name and test_pid
+use exists in place of defined
+test context call to return array or scalar
+
+----------------------------
+Revision : 1.27
+Date : 2005/1/11 10:21:44
+Author : 'fabrice'
+State : 'Exp'
+Lines : +106 -8
+Description :
+add a small example
+
+----------------------------
+Revision : 1.26 Date : 2005/1/10 15:59:57
+
+set an expiration_auto to auto kill a expired process
+create set_expiration and get_expiration functions
+
+----------------------------
+Revision : 1.25 Date : 2005/1/10 8:13:45
+
+use a timeout for expiration of function
+
+---------------------------
+Revision : 1.24 Date : 2005/1/5 15:42:41
+
+add start_time in process list and also for master 
+add expiration function
+add max_mem to test the free memory before forking
+
+----------------------------
+Revision : 1.23 Date : 2005/1/5 15:42:41
+
+add start_time in process list and also for master 
+
+----------------------------
+Revision : 1.22 Date : 2004/12/23 10:45:12
+
+do a clean_childs in pid_nbr, list_pids, list_names,test_name, test_pids
+
+----------------------------
+Revision : 1.21 Date : 2004/12/23 10:44:59
+
+die if forking with a PID file present and process RUNNING
+
+----------------------------
+Revision : 1.20 Date : 2004/12/18 20:21:19
+
+add a destructor (DESTROY)
+
+----------------------------
+Revision : 1.19 Date : 2004/12/18 20:4:54
+
+clean sample code
+
+----------------------------
+Revision : 1.18 Date : 2004/12/18 19:8:34
+
+correct the delete pid_file when killing
+
+----------------------------
+Revision : 1.17 Date : 2004/12/3 15:27:30
+ 
+use a name when daemonize
+
+----------------------------
+Revision : 1.16 Date : 2004/11/29 19:39:30
+
+clean code
+
+----------------------------
+Revision : 1.15 Date : 2004/11/29 16:55:7
+
+in killall_childs don't remove the sighandler
+don't call kill_child but do a kill and clan_childs (to keep list of pid if
+signal don't kill like HUP USR1 USR2
+
+----------------------------
+Revision : 1.14 Date : 2004/11/29 13:42:53
+
+in killall_childs send $signal to kill_child
+
+----------------------------
+Revision : 1.13 Date : 2004/11/18 13:59:6
+
+clean error in pid hash
+clean kill_childs
+clean doc
+
+----------------------------
+Revision : 1.12 Date : 2004/10/11 6:58:9
+
+clean code
+
+----------------------------
+Revision : 1.11 Date : 2004/10/1 13:27:36
+
+return for list_names and list_pids as ref
+
+----------------------------
+Revision : 1.10 Date : 2004/10/1 8:10:43
+
+create global internal object for PID and NAME to allow garbage child to
+delete child list
+
+----------------------------
+Revision : 1.9 Date : 2004/9/30 7:19:3
+
+corrrect signal handler in child
+
+----------------------------
+Revision : 1.8 Date : 2004/8/11 14:6:41
+
+put the name of process already running in error message
+
+----------------------------
+Revision : 1.7 Date : 2004/8/11 13:2:39
+
+correct pid_file management for the daemon
+
+----------------------------
+Revision : 1.6 Date : 2004/8/11 10:39:7
+
+chown on PID of daemon
+remove daemon PID when kill
+
+----------------------------
+Revision : 1.5 Date : 2004/8/11 9:6:28
+
+add test_name, test_pid, clean_childs function
+
+----------------------------
+Revision : 1.4 Date : 2004/8/6 9:58:22
+correct format of version
+
+----------------------------
+Revision : 1.3 Date : 2004/8/6 9:57:5
+
+update licence doc
+
+----------------------------
+Revision : 1.2 Date : 2004/8/6 9:49:39
+creator name to follow renaming of module
+
+----------------------------
+Revision : 1.1
+
+initial release with the name Proc::Forking

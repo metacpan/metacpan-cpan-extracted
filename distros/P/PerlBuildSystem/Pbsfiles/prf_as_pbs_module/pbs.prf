@@ -1,0 +1,38 @@
+
+
+=comment
+-sd .
+-sd $THEBIGO_ROOT
+-D PERL_TEST_MODULE=1
+-nh
+
+all
+=cut
+
+PrintDebug "Using default prf\n" ;
+
+AddTargets('1', '2') ;
+
+#~ AddCommandLineSwitches('-unknown_switch') ;
+AddCommandLineSwitches('-sd /') ;
+AddCommandLineSwitches('-ndpb') ;
+
+AddCommandLineSwitches
+	(
+	  '-dc'
+	, '-dsd'
+	) ;
+
+AddCommandLineDefinitions(DEBUG => 1) ;
+AddCommandLineDefinitions(SOMETHING => 'a string with spaces') ;
+
+AddCommandLineDefinitions
+	(
+	  DEBUG2 => 1
+	, SOMETHING2 => 'a string with spaces again'
+	) ;
+
+#------------------------------------------------------------------------
+
+1;
+

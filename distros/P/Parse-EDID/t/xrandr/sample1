@@ -1,0 +1,35 @@
+Screen 0: minimum 320 x 200, current 1280 x 800, maximum 8192 x 8192
+LVDS1 connected 1280x800+0+0 (normal left inverted right x axis y axis) 261mm x 163mm
+	EDID:
+		00ffffffffffff0006af14a100000000
+		01120103901a10780a50c59858528e27
+		25505400000001010101010101010101
+		010101010101ea1a007e502010303020
+		360005a31000001aea1a007e50201030
+		3020360005a31000001a000000fe0059
+		37343744804231323145573000000000
+		00000000000000000001010a202000a5
+	BACKLIGHT: 4 (0x00000004)	range:  (0,15)
+	Backlight: 4 (0x00000004)	range:  (0,15)
+	scaling mode:	Full aspect
+		supported: None         Full         Center       Full aspect 
+   1280x800       60.1*+
+   1024x768       60.0  
+   800x600        60.3     56.2  
+   640x480        59.9  
+VGA1 disconnected (normal left inverted right x axis y axis)
+HDMI1 disconnected (normal left inverted right x axis y axis)
+	Broadcast RGB:	Full
+		supported: Full         Limited 16:2
+	audio:	auto
+		supported: off          auto         on          
+DP1 disconnected (normal left inverted right x axis y axis)
+	Broadcast RGB:	Full
+		supported: Full         Limited 16:2
+	audio:	auto
+		supported: off          auto         on          
+DP2 disconnected (normal left inverted right x axis y axis)
+	Broadcast RGB:	Full
+		supported: Full         Limited 16:2
+	audio:	auto
+		supported: off          auto         on          

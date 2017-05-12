@@ -1,0 +1,401 @@
+ID   unknown; SV 1; linear; unassigned DNA; STD; UNC; 1080 BP.
+XX
+AC   unknown;
+XX
+DE   |||similar to unknown protein||chr_13|chr13|183
+XX
+FH   Key             Location/Qualifiers
+FH
+XX
+SQ   Sequence 1080 BP; 317 A; 218 C; 292 G; 253 T; 0 other;
+     atggacgaca aagaactcga aataccggta gaacattcca cggctttcgg tcagctcgtg        60
+     acgggtcccc cgggagcggg taaatcgacc tattgtcatg gcttacatca gttccttaca       120
+     gccatcggta gaccagtgca tatcatcaac ctcgatcctg cagtcccaaa ccctccgtat       180
+     ccatgctcta taaacatcac ggaactcatc acactcgaaa gtgttatgga ggaatacaat       240
+     ctaggaccga atggggcgat gctttattgt atagaattct tagaggccaa ttttgactgg       300
+     ctagtggaga ggctggatga ggtcttggct gaagaggggg ggaatggata tgtggtgttt       360
+     gatacgccgg gtcaagcaga gttatggacg aaccatgata gtttgaagaa cgtggtcgaa       420
+     aagttggtca agatggacta tagactagcg gctgtgcatc tcagcgacgc gcactacata       480
+     acagatgcct caaaattcat ctctgtagtt ttgctagctc ttcgggcgat gctgcaaatg       540
+     gaaatgccgc atttgaatgt gctcagcaaa atagatttga tatcaactta tggagagctc       600
+     ccgttcgact tgagctatta cacagaagtc caagatctgt catacttact gggcagtctg       660
+     gattcagacc ctcgaacagc aaagtaccac aagttaaata aagcgttggt agagcttata       720
+     gaaggctttt cattagtcgg atttcaaacc ctcgctgttg aggacaaaga atcaatgctt       780
+     aatatcgtcc gtcttgtcga taagatgacg ggctacatat ttattccgtc tggcgacctc       840
+     gaaggaacca acgccatcaa tacccaagct ctgtttggta gtgccatgtc gtcggcgaag       900
+     cttacaggaa gagcaggcgg ggacgtaaga gatgttcagg agagatggat ggataacaag       960
+     gaggcttggg atgaatggga gaagaaagaa tggaagagag aagcagagat aagagcccag      1020
+     atgggcactg gaataccaga agggatgaaa ggcggtgaag atgcggaaag tacaggtata      1080
+//
+ID   unknown; SV 1; linear; unassigned DNA; STD; UNC; 1041 BP.
+XX
+AC   unknown;
+XX
+DE   location=AgChr1:complement(140329..141372)
+XX
+FH   Key             Location/Qualifiers
+FH
+XX
+SQ   Sequence 1041 BP; 255 A; 244 C; 306 G; 236 T; 0 other;
+     atggcgtatg gacagattgt gataggtcca ccggggtctg ggaagtcgac atactgtaat        60
+     gggtgcagcc agttctttaa tgccatcggc agacacgctc ggatcgtgaa catggaccct       120
+     gcaaacgact cgctgcccta ccaatgcgat gtagacattc gagactttat tactctggag       180
+     gaaatcatga acgagcagca cctggggccc aacggagggc tggtgtatgc gtttgagtcg       240
+     gtggagcact cactgtcgct gtttgcgctg cagatcaaga cgctggtcaa ggatgagaac       300
+     gcatatctcg tctttgactg ccccggtcag gtggagctgt tcacgcatca ctcggcgctc       360
+     tccaagatat tccagcagct ggtgcgcgac ttggacctac gagtgtgcgt ggtgaacttg       420
+     atggacagca tctacattac atcgccgtcg cagtatgtct cggtactgct gctggcgctg       480
+     cgctcaatgt tgatgatgga cctgccccat attaacgttc tctctaagat cgatatgctg       540
+     agctcgtacg gcgacctgcc gttccggctc gactactata ccgaggtgca agacttggag       600
+     tatctgcaac cgcatattga acgcgaacac aagggagcca aggcgttgag gtaccgccga       660
+     ctaacggagg ccataggaga ggtggtttcg gacttcaacc tggtcgcctt cgaggtgctt       720
+     tgcgtcgatg acaaacagag catgatcaac ttgcaaagcg caatcgacaa ggccaatggt       780
+     tatatttttg gtgcctccga agttggtggc gatactgtgt gggcggaggc aacccgccag       840
+     ggcactgctg caattgaata tgacattcag gacagatgga tcgacaacaa ggacttttat       900
+     gacaaggagg aagaggctag gcgcaagaag ttacttgagg agcatgagct tctggagaaa       960
+     gaagttgatg tcaaccagga tgatgaatgg gaacgcgcag tgaaggaatg ggagtcccag      1020
+     cactctgtga acttcgttaa a                                                1041
+//
+ID   unknown; SV 1; linear; unassigned DNA; STD; UNC; 861 BP.
+XX
+AC   unknown;
+XX
+DE   hypothetical protein (53856 - 52862)
+XX
+FH   Key             Location/Qualifiers
+FH
+XX
+SQ   Sequence 861 BP; 239 A; 198 C; 222 G; 202 T; 0 other;
+     atgagtgagg atcaattggg tccgaacggc ggtgttttgt atgcgttgga agagctagag        60
+     gagaactttg acttcttgga ggaagggttg aaagagctcg gagaggacta tattatcttc       120
+     gattgtcccg gccaggtaga aattttcact caccattcgt ccttacggaa tatcttcttc       180
+     aagatccaga agatgggcta tagactaata gtactacacc taatcgactc ctacaacctc       240
+     accctgccat cgatgtacat ctcctctctt attctatgct tgcgtgccat gctccaaatg       300
+     gaccttccac atctcaacgt cctaacaaaa atcgataatt tgtccaatta tacttcgctg       360
+     cctttcaacc tagatttcta caccgaggtt caggacctta catacctcct cccccactta       420
+     gaggcagagt cctcccggct atcgcacgag aagttcggag cactgaacaa cgccatcatc       480
+     acactgattg aggagtttgg actcgtgggc ttcgaaacac tggctgtaga agataaaaag       540
+     agcatgatga atttgctccg ggccattgac cgcgcaagtg gatacgtgtt tgggcctgca       600
+     gaaggcgcaa atgactccgt ttggcaagtg gctgttcggg aaggaatggg gtccatggat       660
+     atccgtgata ttcaagagcg ttggatagat gccaaagacg agtacgatga gttggaacga       720
+     cggcagcgag aggaggagat aaaaaatcac cagcaagctg caacctacca ggcagggaac       780
+     gaggacgacg acgatgataa cgattacgaa ttcgggcgca ggatgcctgt accagacagt       840
+     ggagtgaaag tgatgcggaa g                                                 861
+//
+ID   unknown; SV 1; linear; unassigned DNA; STD; UNC; 1074 BP.
+XX
+AC   unknown;
+XX
+DE   hypothetical protein (258181 - 259340)
+XX
+FH   Key             Location/Qualifiers
+FH
+XX
+SQ   Sequence 1074 BP; 291 A; 265 C; 271 G; 247 T; 0 other;
+     atgcctttcg cgcaactcgt tctcggtagt ccgggctgcg gaaagagtac atactgtgat        60
+     ggcatacagc tgaccggtca agtgcatcag ttcctaggcg ccatcgggcg agcctgttca       120
+     gtcgtcaatc tcgatcctgc caacgatcat accaactacc ctgcagctct cgacattcgc       180
+     agtttgatta agctcgagga gattatgaaa gatgataaat taggacctaa tggcggcatc       240
+     ctgtatgccc tcgaagagtt ggaacacaat ttcgagtggt tggaagaagg actgaaagaa       300
+     ttcagcgaag actatattct tttcgactgt ccgggacaag tggaactata tacacaccac       360
+     aactccttgc gaaacatatt ctacaagctc cagaagattg gattcaggct tgtttccgtc       420
+     cacctctccg actccttctg cctcacgcaa ccgtcgttat acgtatcgaa cgtcctcctc       480
+     tcccttcgtg cgatgatcca gatggatatg ccacacataa atattctctc caagatcgac       540
+     aaagttgccg actacgacga actccctttc aacctcgatt actacacaga cgtggacgac       600
+     cttacatatt tgacacccca tcttgagaca gagtcgcccg ctctgaggag tgagaaattc       660
+     ggcaagctca acgaggcgat tgcgaatctg atcgagagct acggtctggt gcgctatgaa       720
+     gtcctggctg tcgagaacaa gaaaagcatg atgcatatcc tccgtgtcat tgaccgtgct       780
+     ggtggatacg tctttggtag tgctgaagga gccaatgata cagtctggtc agttgccatg       840
+     aggaacgagt cgtccatgtt gggggtgcag gacatccaag agcgttggat cgaccaaaag       900
+     gtggaatatg atcaaatgga gcgtgaggcc gaagaagaac aggcgcgcat ccaagaagaa       960
+     caagccatgg agatggaaca atcacagcca cctcctgcgc cgacaggtgg catggatcct      1020
+     gattttggtg acatgacggt gcccaaagat agtgggatca aagtagttag aaag            1074
+//
+ID   unknown; SV 1; linear; unassigned DNA; STD; UNC; 945 BP.
+XX
+AC   unknown;
+XX
+DE   hypothetical protein similar to (NCU09745.1) hypothetical protein (25629 -
+DE   24026)
+XX
+FH   Key             Location/Qualifiers
+FH
+XX
+SQ   Sequence 945 BP; 238 A; 241 C; 254 G; 212 T; 0 other;
+     atgggatttc taggcgcaat agggagagca tgttccgtag taaaccttga cccggccaat        60
+     gaccatacga gctatccatg tgccctcgac atacgaaatc ttgtcacgct ggaggaaatc       120
+     atgggagacg acaatttggg gccaaacggt ggcatcctct acgctattga agagctggag       180
+     cataactttg agtggttgga agatggtctg aaagagcttg gggacgacta catactattc       240
+     gactgcccgg gccaggtcga gctgtacaca catcacaatt cattgcgcaa tatcttcttc       300
+     aagttacaaa agctcggcta cagacttgtg gttgttcacc tctcggacag catttgcctc       360
+     actcaaccat cgttgtacat ctcgaatctc ctcctcgctt tgcgcgccat gctccagatg       420
+     gatctttccc atgtcaatgt cctcaccaaa atcgacaagg tgtcttcata tgacagacta       480
+     gccttcaacc tcgactttta taccgaggtc cacgatcttt cgtacctcct ccccgagctc       540
+     gaagccgaga atccgtcgct acgcagcgaa aagttcgcca agctaaaccg agccgtcgca       600
+     aacttgattg aagactttgg gctcgtccgg ttcgaagtct tggctgtcga gaataagaaa       660
+     agtatgatgc atttgctccg ggtcctcgat cgtgccaacg ggtacgtttt tggtggggcc       720
+     gagggagcca acgacaccgt ttggcaagta gccatgcgca acgagggctc cctgatgggg       780
+     gtccaagata tccaggagcg ctggatcgat aacaaagagg cttatgacga gatggagcag       840
+     cgtgaatggg aggaacaggt caaggcacaa gaagccatgg ccgaagccga tgcagcagct       900
+     gctgaagagg gcgacgatga cttgatggga ggcccaggtg ctcga                       945
+//
+ID   unknown; SV 1; linear; unassigned DNA; STD; UNC; 1029 BP.
+XX
+AC   unknown;
+XX
+DE   (NCU09745.1) hypothetical protein (81475 - 83184)
+XX
+FH   Key             Location/Qualifiers
+FH
+XX
+SQ   Sequence 1029 BP; 250 A; 283 C; 273 G; 223 T; 0 other;
+     atgacctccc cactgccagt gcagcagttt atgggcgcca tcgggcgaca atgctcggta        60
+     gtcaacctcg accctgcgaa cgaccacacc aactacccat gcgcgctcga cattcgcgac       120
+     cttgtcactt tggaggagat tatggcagac gacaaattgg gtcccaatgg cggtattctg       180
+     tacgcacttg aagagctgga aaataacatg gaatggctcg agaacggcct caaggagctt       240
+     ggagaagact atgtgctttt tgactgccct ggtcaagtcg agctctacac ccaccacaac       300
+     tcgttacgca acatctttta ccggttacag aagctgggct acaggctggt agttgtccac       360
+     ctttccgact gcttctgcct cacacaacca tcgctctaca tttccaacgt cctcctctct       420
+     ttgcgcgcca tgttgcaaat ggaccttccc cacatcaacg tcctgaccaa gattgacaag       480
+     atctcgtcct acgatcctct tccattcaac ctcgactatt acaccgaagt acaagaccta       540
+     cggtacctca tgccgtccct cgacgcggaa tcgcctgccc tgaagaaagg caagttcacc       600
+     aagcttaacg aggccgttgc gaacatggtt gagcagttcg gccttgtcag cttcgaggtg       660
+     ctggcagtcg agaacaagaa gagtatgatg catctgttgc gcgtgattga ccgtgcaagt       720
+     gggtacgtct ttggcggcgc tgagggaacg aacgacaccg tctggcaggt tgccatgcgc       780
+     aacgagtcat cattgcccga tgctcttgat attcaagaga ggtggatcga tagcaaagaa       840
+     gagtatgacg agatggagcg gaaggaggag gaagaacaag aaaaactgcg ggcggagcag       900
+     gcacgggccg ctgaagaagc aggtctcggt gacggctcgg tccctggagt ggcgccacag       960
+     ttcaccagtg gctcgggaat ccgtgtgacg cttagcctag tggccgcttt taccaaatat      1020
+     agcgatctt                                                              1029
+//
+ID   unknown; SV 1; linear; unassigned DNA; STD; UNC; 945 BP.
+XX
+AC   unknown;
+XX
+DE   SPAC144.07c conserved eukaryotic protein; ATP-binding protein; similar to
+DE   S. cerevisiae YOR262W
+XX
+FH   Key             Location/Qualifiers
+FH
+XX
+SQ   Sequence 945 BP; 293 A; 152 C; 209 G; 291 T; 0 other;
+     atgccatttt gtcaagtggt cgttggacct ccgggttctg ggaaatcaac ttactgtttc        60
+     ggaatgtacc aattattatc tgccatagga aggagtagta ttatcgtcaa tcttgaccca       120
+     gcaaatgact ttatcaaata cccatgcgca attgatattc gtaaagttct cgatgttgag       180
+     atgatccaaa aagactatga tttaggacca aatggagcac ttatttatgc tatggaagca       240
+     attgaatatc acgttgaatg gttgcttaag gagctaaaaa agcatcgaga ttcatatgtg       300
+     atatttgatt gccctggtca agttgagtta tttacaaacc ataattcctt acaaaaaata       360
+     atcaaaactt tggaaaagga actggattat agacctgtgt ccgtacaact tgtagatgca       420
+     tattgctgca cgaatccttc tgcatatgtt agtgcactgc ttgtttgcct aaaggggatg       480
+     cttcagctgg acatgccaca tgtaaatatt ttgtcgaagg ctgatttgct ttgtacgtat       540
+     ggaactttac caatgaaact agattttttt accgaagtac aagacctttc atatttggcg       600
+     cctttgcttg atagagataa acgtcttcag cgctatagtg atttaaacaa agctatttgt       660
+     gaacttgttg aagattttaa tcttgtttct tttgaagttg ttgcagtaga aaataaagcc       720
+     agtatgttac gtgttcttcg aaaaatcgat caagcaggtg gatatgcata tggatctaca       780
+     gaaattggtg gtgatgccgt ttgggtgaat gccgttcgtc aaggtggaga ccctcttcaa       840
+     ggtatttcgc ctcaggaaag atggattgac aagaaagagg aatatgacaa atatgaatgg       900
+     gaattagagc aaaaatcgac catggacgaa gatgaaaatg aaggg                       945
+//
+ID   unknown; SV 1; linear; unassigned DNA; STD; UNC; 1041 BP.
+XX
+AC   unknown;
+XX
+DE   YOR262W, Contig c635 67551-68594
+XX
+FH   Key             Location/Qualifiers
+FH
+XX
+SQ   Sequence 1041 BP; 327 A; 153 C; 253 G; 308 T; 0 other;
+     atgccttttg ctcagattgt tattggaccc ccgggttcag ggaagtctac gtattgtaac        60
+     ggatgttcac aattttttaa tgctattggg agacattctc aggtggtaaa tatggatccc       120
+     gccaatgatg ccttacctta tccgtgtgct gtggatatca gagattttat aactttggaa       180
+     gagatcatga aagagcaaca cttgggccct aatggtggtt tgatgtatgc cgttgaatct       240
+     ctagataagt ccattgattt atttatacta cagatcaaat cacttgtaga agaagagaag       300
+     gcatatgttg tgtttgactg cccgggacaa gttgagctgt ttacgcatca ttcttcatta       360
+     ttcagcattt tcaagaaatt agaaaaagaa ctagatatga gattctgtgt ggtgaatttg       420
+     attgattgtt tttacatgac atctccttca caatatgtct cgattttgct cctggcatta       480
+     aggtctatgc tgatgatgga cctgccccat atcaacgtct tttcgaagat agataagttg       540
+     aaatcatatg gagaattgcc atttagatta gattattata cagaagttca agatttggat       600
+     tatttggagc cgtatattga aaaagaaggt tctggtgcac tgggaaaaag atatagcaaa       660
+     ttgactgaaa cgattagtga gctggtttct gattttaacc tggtttcctt tgaagttttg       720
+     gctgtggatg acaaagaaag tatgataaat ctccagggtg ttattgataa agccaatggt       780
+     tacatatttg gtgcatctga agtgggcggc gacacggtat gggccgaggc ctcgagagaa       840
+     ggtgcattgc tagcaagcta tgatattcaa gataggtgga tagataataa agaaaaatat       900
+     gataaagaag aacaagagaa acgggctgca atggtgaaag agcaggaact gcaaaataaa       960
+     gaggttaatg tagacgaaga agacgagtgg gaaaatgcac taaacgactg ggaagaaaaa      1020
+     caaggcacag attttgtcag g                                                1041
+//
+ID   unknown; SV 1; linear; unassigned DNA; STD; UNC; 1041 BP.
+XX
+AC   unknown;
+XX
+DE   YOR262W, Contig c692 40768-41811
+XX
+FH   Key             Location/Qualifiers
+FH
+XX
+SQ   Sequence 1041 BP; 345 A; 157 C; 245 G; 294 T; 0 other;
+     atgccatttg cccaaattgt tatcggaccc cccggttcag gaaaatcaac atactgtaac        60
+     gggtgttctc aatttttcaa cgccatcggc aggcatggcc aaatagtgaa catggatcca       120
+     gctaatgatg ctctaccata tccatgtgca gtagacattc gagattttgt gactctggag       180
+     gagattatgc aagagcaaca actgggcccc aatggagggt tgatgtatgc tgtggaatcg       240
+     ttagatgaat ccatcgatct tttcatacta caaataaaat ctctagttca agaggagaag       300
+     gcatatttag tctttgattg tcctggacaa gtagagttgt ttactcatca ttcatctctg       360
+     ttcaaaatct tcaaaaaatt ggaaaaggaa ctagatatgc gattttgtgt ggtgaatttg       420
+     attgattctt tctatattac ctccccatca cagtatgttt ccattttgct gttggctttg       480
+     agatctatgt taatgatgga cctaccgcaa atcaatgttt tctccaagat tgatatgctg       540
+     aaatcctatg gagaactacc ttttagattg gattattaca cagaagtgca agatttagat       600
+     tatttacagc catttattga gaaggagagt tccagtgttt tgggtagaag atatagcaag       660
+     ttaacagaaa cgattagtga attggtttcc gattttaatt tggtctcatt tgaagtctta       720
+     gctgtagatg ataaacaaag catgattaat ttacaaagtg tagtagacaa ggctaatgga       780
+     tatatatttg gagcatctga agtaggtggt gatactgttt gggcagaagc cacgcgagaa       840
+     ggtgcaatga tggtaaatta tgatatacag gacagatgga tagataacaa agaaaagtac       900
+     gatgaagagg agagaaaaag acaagaggaa caagccaaag agcagaacat gcaagaaaag       960
+     gaggtagacg tggataatga ggacgaatgg gaaaaggcat tgaaggattg ggaagaaaaa      1020
+     caaggaacag gctatgtaag g                                                1041
+//
+ID   unknown; SV 1; linear; unassigned DNA; STD; UNC; 1041 BP.
+XX
+AC   unknown;
+XX
+DE   YOR262W, Contig c2277 4093-5136
+XX
+FH   Key             Location/Qualifiers
+FH
+XX
+SQ   Sequence 1041 BP; 316 A; 170 C; 248 G; 307 T; 0 other;
+     atgccctttg gtcagattgt tatcggccct cctggttcag gaaagtctac ctattgtaat        60
+     ggttgctccc agttttttaa tgctgtcggt agacatgccc aagtaatcaa catggatcca       120
+     gcaaatgatt cgttacctta cccatgtgcc gttgacattc gagatttcat caccttagag       180
+     gaaattatga cagaacagca gctggggcct aatggtggat tgatgtacgc cctagaatct       240
+     ttggataaat caatcgactt atttgttttg cagatcaaat cactagttca ggatgaacat       300
+     gcttacgtag tatttgattg tccggggcaa gtggagcttt ttacgcacca ttcgtccttg       360
+     ttccgcatat tcaagaagtt ggaaagagaa ctagatatga ggttatgcgt ggttaattta       420
+     atcgattgtt tttacatcac ctctccttca cagtatgtct ctattctttt gctagctttg       480
+     aggtcgatgc tgatgatgga cttaccacac attaatgtct tttctaaaat tgatttgttg       540
+     aaatcctacg gtgagctgcc attccgacta gattattata ccgaagttca agagctagat       600
+     tacttgaagc cacatattga caaggaaggg agcagcgtcc ttggaaggaa atatagtagg       660
+     ttgacagaaa ccattagtga actggtttct gactttaatc tggtttcctt tgaagttttg       720
+     tgtgttgatg ataagcagag catgatcaat ttgcaaagta ttgtggataa agcaaatggt       780
+     tacatatttg gtgtttctga gatcggtgga gatacggtat gggcagaggc aacgcgacaa       840
+     ggcagtgcaa ttgctaatta cgacattcaa gagagatgga tagataataa agatatgtac       900
+     gacagagagg aacaggaaaa acgtgaacag ttgctcaaag aagaagagct acagaataaa       960
+     gaagtagacg tggataaagg tgatgagtgg gaaaatgctt taaaagaatg ggaagaaaag      1020
+     caaggcatga gttatgtaaa a                                                1041
+//
+ID   unknown; SV 1; linear; unassigned DNA; STD; UNC; 1041 BP.
+XX
+AC   unknown;
+XX
+DE   YOR262W, Contig c1703 9292-10335 reverse complement
+XX
+FH   Key             Location/Qualifiers
+FH
+XX
+SQ   Sequence 1041 BP; 335 A; 159 C; 244 G; 303 T; 0 other;
+     atgccatttg ctcaaattgt tatcggccca ccaggctcgg gaaagtcaac gtattgtaac        60
+     gggtgttcgc agttcttcaa cgccattgga agacattctc aagtggtgaa tatggatccc       120
+     gctaatgatg ctttgcctta tccgtgtgct gtagatatta gagattttat aactttggaa       180
+     gaggttatgc aggagcaaca gttgggtcct aatggtggtt taatgtatgc cgttgaatcc       240
+     ctagataact ccattgatct attcatatta cagatcaagt cacttgtaga agaagaaaag       300
+     gcctaccttg tgtttgactg tcctggacaa gttgagctat tcacgcacca ttcatcttta       360
+     tttagcattt tcaagaaaat ggagaaagaa ttggatatga gattctgtgt cgtaaacttg       420
+     attgattgct tttatatgac atctccttct cagtatgttt caattttgct actggcatta       480
+     aggtccatgc taatgatgga tttgcctcac ataaacgttt tttccaaaat agatatgtta       540
+     aaatcatatg gggaattacc cttcagattg gattattata cagaggtcca ggagctagat       600
+     catttggagc catatattga aaaggaaggc tctagcgttc taggaaaaaa atatagtaag       660
+     ttgactgaaa cgatcaaaga attagtctcc gattttaact tagtttcttt tgaggttctg       720
+     tccgtggatg acaaagaaag tatgataaat ctccagggtg ttattgataa agcgaatggc       780
+     tacatattcg gagcatccga agttggaggt gatacagtgt gggccgaagc ttcgagagaa       840
+     ggtgcattgt tagaaaacta cgacatacag gataggtgga tagataataa agaaacgtat       900
+     gataaagaag aacaagagaa gcgtgcatcg ctgttaaaag aacaagaact gcagaataaa       960
+     acggttgatg tgaaagaaga agatgaatgg gaaaatgcat taaaggagtg ggaagaaaag      1020
+     caagatacgg agtttgtcag a                                                1041
+//
+ID   unknown; SV 1; linear; unassigned DNA; STD; UNC; 1041 BP.
+XX
+AC   unknown;
+XX
+DE   YOR262W, Contig c1103 447-1490 reverse complement
+XX
+FH   Key             Location/Qualifiers
+FH
+XX
+SQ   Sequence 1041 BP; 326 A; 156 C; 245 G; 314 T; 0 other;
+     atgccgtttg ctcagattgt tattggccca ccgggttcag gcaagtccac ttattgtaac        60
+     ggctgctcac agttcttcaa tgccattggg agacattctc aggtggtgaa catggatccc       120
+     gctaatgatg ctttgcctta tccttgtgct gtggatatca gagattttat aacgttggaa       180
+     gagattatgc aagagcaaca gttaggcccc aatggtggtt taatgtatgc agtcgaatcc       240
+     ttggataagt ctattgattt gtttttatta cagatcaaat cgcttgtaga agaagaaaaa       300
+     gcctatcttg tattcgactg tccaggccag gtcgagttat ttactcatca ctcatcctta       360
+     ttcaatatat ttaagaaaat ggagaaagaa ttggacatga ggttctgtgt aataaacttg       420
+     attgactgtt tttacatgac gtcaccctca caatatgtct caattttact gcttgcacta       480
+     agatccatgt tgatgatgga tctgccccac ataaatgttt tttctaagat agatatgttg       540
+     aaatcatatg gagaactacc atttagacta gattattata cagaggtaca ggatctagat       600
+     tatttggaac cgtatattga aaaagaaggc tctagtgtat taggaaagaa atacaataag       660
+     ttgaccgacg caatcaaaga gcttgtttct gattttaact tggtttcctt tgaggttttg       720
+     tccgtggatg acaaagaaag tatgataaat ctccagggtg tgattgataa agcaaatggc       780
+     tacatatttg gtgcgtctga ggttggtggt gatacagtgt gggcagaggc ttctagggaa       840
+     ggtgctcttt taacaagtta cgatattcaa gataggtgga tagataataa ggaaaagtat       900
+     gacaaagaag aagaagagaa acgtgtaatc ttgttaaaag agcaagagct gcaaaataaa       960
+     gcagttgacg tgaatgaaga cgatgagtgg gaaagtgcgc tcaaggaatg ggaagaaaaa      1020
+     caaggtatgg attttgttag a                                                1041
+//
+ID   unknown; SV 1; linear; unassigned DNA; STD; UNC; 1041 BP.
+XX
+AC   unknown;
+XX
+DE   YOR262W, Contig c261 8817-9860
+XX
+FH   Key             Location/Qualifiers
+FH
+XX
+SQ   Sequence 1041 BP; 331 A; 164 C; 241 G; 305 T; 0 other;
+     atgccctttg ctcaaattgt tattggccca ccgggttcag gaaaatcaac ctattgcaac        60
+     ggctgttcac agtttttcaa tgccattgga agacattctc aggtagtaaa tatggaccct       120
+     gctaatgatg cgttacctta cccatgtgct gtggatattc gagattttat aactttggag       180
+     gagattatgc aagagcaaca gttaggcccc aatggtggtt tggtgtatgc tgttgaatcc       240
+     ttggataagt ccattgactt gttcatatta caaatcaagt cgcttgtaga agaagaaaag       300
+     gcatatctcg tatttgactg tcccggacaa gtggagttat ttactcatca ctcatcttta       360
+     ttcagcattt ttaagaaaat ggaaaaagaa ttggacatga gattctgtgt agtaaatttg       420
+     atagactgtt tttacatgac ttctccttca caatacatct ccattttgct actcgcatta       480
+     aggtctatgt taatgatgga tctaccccac attaacgttt tttctaagat agatatgttg       540
+     aaatcctacg gggaattacc ctttagatta gattattata cagaggttca ggatctagat       600
+     tatttggagc catatatcga aaaggaaggc tctagtgtac tgggaaagaa atatagcaag       660
+     ttaactgaga caatcaaaga gcttgtttca gatttcaatc tggtttcatt tgaggtcctg       720
+     tctgtggatg ataaagaaag tatgataaat cttcaaggtg ttatagataa agcaaatggc       780
+     tacatattcg gcgcatctga agttggcggt gatacagttt gggctgaggc ctctagagaa       840
+     ggtgcattac tagcaaatta cgacattcag gacagatgga tagacaataa agagaagtac       900
+     gataaagagg aagaagagaa acgcgcggcg ttgctaaaag aacaagagtt gcaaaataaa       960
+     gccgttgatg tgaatgaaga ggatgagtgg gaaaatgcgc tgaaggaatg ggaagaaaaa      1020
+     cagggtacgg atttcgttag a                                                1041
+//
+ID   unknown; SV 1; linear; unassigned DNA; STD; UNC; 1041 BP.
+XX
+AC   unknown;
+XX
+DE   YOR262W SGDID:S0005788, Chr XV from 817289-818332
+XX
+FH   Key             Location/Qualifiers
+FH
+XX
+SQ   Sequence 1041 BP; 335 A; 161 C; 239 G; 306 T; 0 other;
+     atgcccttcg ctcagattgt tattggtcca ccaggttcag ggaagtcaac ctattgcaac        60
+     ggctgctcac agttcttcaa tgccatcgga agacattccc aggtagtgaa tatggatcct       120
+     gctaatgatg ccttacctta cccatgcgct gtggatattc gtgattttat aacattagag       180
+     gagatcatgc aagagcaaca gttaggccct aatggaggtt tgatgtatgc tgttgaatca       240
+     ttggataatt ctattgattt gttcatttta cagatcaagt cacttgtaga agaagaaaaa       300
+     gcatatcttg tattcgactg tccgggccaa gtggagctat ttactcatca ctcatctttg       360
+     ttcaacatct ttaaaaaaat ggaaaaggaa ttggacatta ggttttgtgt tgtaaatttg       420
+     attgactgtt tttacatgac atccccttca caatatatct cgattttgtt acttgcattg       480
+     aggtctatgt taatgatgga tctccctcac atcaacgttt tttctaaaat agatatgctg       540
+     aaatcatacg gagaattacc ctttagatta gactattata cagaggtcca ggatctggat       600
+     tatttggagc catatattga aaaggaaggc tctagtgtac tgggaaagaa atatagcaag       660
+     ttaactgaaa caatcaaaga gctagtctca gatttcaact tagtatcatt tgaggttttg       720
+     tccgtggatg acaaagaaag tatgataaat cttcaaggtg ttatagataa agcaaatggc       780
+     tacatattcg gcgcatccga agttggtggt gataccgtgt gggctgaggc ttcgcgagaa       840
+     ggtgcattaa tagcgaatta cgacattcaa gacaggtgga tagacaataa agagaagtat       900
+     gataaagaag aagaagaaaa acgtacggcg ttgttaaaag aacaagaatt gcaaaataaa       960
+     gctgttgatg tgaatgaaga agatgagtgg gaaaatgcgc tgaaggagtg ggaagagaaa      1020
+     caaggaatgg attttgttag g                                                1041
+//

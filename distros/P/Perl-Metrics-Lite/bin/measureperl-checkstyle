@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Getopt::Long ();
+use Perl::Metrics::Lite;
+use Perl::Metrics::Lite::Report::CheckStyle;
+use Pod::Usage;
+
+our $VERSION = "0.05";
+
+Getopt::Long::GetOptions(
+    'h|help'                        => \my $help,
+    'verbose'                       => \my $verbose,
+    'l|max_sub_lines=i'             => \my $max_sub_lines,
+    'c|max_sub_mccabe_complexity=i' => \my $max_sub_mccabe_complexity,
+    'd|directory=s@'                => \my $directories
+) or pod2usage();
+pod2usage() if $help;
+
+main();
+exit;
+
+sub main {
+    report();
+}
+
+sub report {
+    my $reporter = Perl::Metrics::Lite::Report::CheckStyle->new(
+        max_sub_lines             => $max_sub_lines             || 60,
+        max_sub_mccabe_complexity => $max_sub_mccabe_complexity || 10
+    );
+    my $analzyer = Perl::Metrics::Lite->new( report_module => $reporter );
+    my $analysis = $analzyer->analyze_files(@$directories);
+    $analzyer->report($analysis);
+}
+
+__END__
+
+=head1 NAME
+
+measureperl-checkstyle - count lines, packages, subs and complexity of Perl files.
+
+=head1 SYNOPSIS
+
+ measureperl-checkstyle --max_sub_lines 100 --max_sub_mccabe_complexity 10 --directory lib
+
+=head1 REQUIRED ARGUMENTS
+
+At least one file or directory path must be supplied.
+
+=cut

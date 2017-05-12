@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Plack-Middleware-AdaptFilehandleRead,
+version 0.003:
+
+  Let you use a filehandle in the response body that has ->read but not ->getline
+
+This software is copyright (c) 2014 by John Napiorkowski.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

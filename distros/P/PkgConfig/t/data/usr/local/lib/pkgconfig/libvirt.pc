@@ -1,0 +1,11 @@
+prefix=/usr/local
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: libvirt
+Version: 0.7.6
+Description: libvirt library
+Requires:
+Libs: -L${libdir} -lvirt -lpthread 
+Cflags: -I${includedir}

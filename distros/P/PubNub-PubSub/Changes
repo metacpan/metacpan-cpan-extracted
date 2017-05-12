@@ -1,0 +1,28 @@
+Revision history for PubNub-PubSub
+
+{{$NEXT}}
+
+0.08  2014-11-01 12:18:59 CST
+        - add new params for Publish V2
+
+0.07  2014-09-16 21:24:39 CST
+        - all use LWP::UserAgent, publish callback API changes.
+
+0.06  2014-09-15 17:34:06 CST
+        - rewrite history to support v2 http://www.pubnub.com/docs/javascript/api/reference.html#history
+
+0.05  2014-09-11 16:02:08 CST
+        - more elegant methods to call (API Changes, I bet you haven't use the latest version in such short time.)
+
+0.04  2014-09-11 14:55:35 CST
+        - API Changes. publish only accepts messages and all others should be passed into ->new
+        - use one connection for all publish no matter how many times it's called
+
+0.03  2014-09-09 16:57:12 CST
+        - fix the some old perl? pass more args to the __r sub
+
+0.02  2014-09-05 19:16:43 CST
+        - for old Mojo version
+
+0.01  2014-09-04 09:38:13 CST
+        - Initial release

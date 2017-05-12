@@ -1,0 +1,16 @@
+lib/Parse/DebControl.pm
+t/10objects.t
+t/20new.t
+t/30parse.t
+t/31stripcomments.t
+t/32trygzip.t
+t/33parseweb.t
+t/40write.t
+t/41writegzip.t
+t/42writefile.t
+t/50pod.t
+t/51podcoverage.t
+Makefile.PL
+MANIFEST
+CHANGES
+META.yml                                 Module meta-data (added by MakeMaker)

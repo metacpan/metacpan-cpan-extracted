@@ -1,0 +1,12 @@
+<!-- DTD for simple PPr documents -->
+
+<!ELEMENT presentation ( slide+ ) >
+  <!ATTLIST presentation
+		title		CDATA	#REQUIRED
+		geometry	CDATA	#IMPLIED
+		imagesizebase	CDATA	#IMPLIED
+		exporter	CDATA	#IMPLIED
+  >
+
+<!ENTITY % slide SYSTEM "ppr-slide.dtd">
+%slide;

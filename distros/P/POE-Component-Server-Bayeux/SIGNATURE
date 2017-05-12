@@ -1,0 +1,65 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5254924b05660d26ae432ad1a0fc2c8286fc7b11 Build.PL
+SHA1 688a0630047b93c31c9c2a8d7e6db60fdcfd8a25 Changes
+SHA1 5b80eae571bf9274d48485db165002b335d4d3a0 MANIFEST
+SHA1 b21b3dff435009ae768f875ca7e9c756f59363f5 META.yml
+SHA1 77e450d85db6d9d5a4cb9dbb54901a8f3c9324f3 Makefile.PL
+SHA1 57d6cf5e0696cfc6679969fe1f3100c9743fd96e README
+SHA1 f92174e8e6889d253a7da93bb58401cf9866c509 htdocs/examples/chat/chat.css
+SHA1 6e1da6e2983063616cf10df2f0b30c7cf8b0d987 htdocs/examples/chat/chat.js
+SHA1 846e19f4d1606deea5aa18030b7058017252b2cb htdocs/examples/chat/index.html
+SHA1 61ef0ebe760a7b5c7407852be9588b979a7c7847 htdocs/examples/chatmagnets/index.html
+SHA1 48336526f756e6f6b9099dcd158252322332f42e htdocs/examples/chatmagnets/phrases.js
+SHA1 da37eeade6dadc2b2017b47b80a6c2cb95d6c874 htdocs/examples/dojo/README.txt
+SHA1 78eca91113531d432f3c632a14dfaab5118499b1 htdocs/examples/dojo/dojo/dojo.js
+SHA1 c61fcd2a0701cb199d155b19b3041490e66e8805 htdocs/examples/dojo/dojo/dojo.js.uncompressed.js
+SHA1 fbdbd3f5cfb798d6715def8056535d4a0c4e0f14 htdocs/examples/dojo/dojox/cometd.js
+SHA1 4fb9649918149004e6776fa8bce5feceec83b72a htdocs/examples/dojo/dojox/cometd.js.uncompressed.js
+SHA1 27a36472f9ae599d61a7efd4d6e519e4ae80002f htdocs/examples/dojo/dojox/cometd/timestamp.js
+SHA1 3c8c5640b0a761fe2ebbd81ce1ebe3ccb9e49bf2 htdocs/examples/dojo/dojox/cometd/timesync.js
+SHA1 e035a934e91d2234b54479bd5bce393a04433db1 htdocs/examples/echo/index.html
+SHA1 b157377a0905b9beda2f5fd4d9ffc1c97d2dc1b7 htdocs/examples/timesync/index.html
+SHA1 bb655c4ad355d40e270fc56936dce3bdcd0c25e4 htdocs/index.html
+SHA1 282365fcee19cabd7f3c55a61727cda02959d9a8 lib/POE/Component/Client/Bayeux.pm
+SHA1 13ff2916543ee3a320d04d09573a4c02971088ca lib/POE/Component/Client/Bayeux/Transport.pm
+SHA1 8f7acf41d2871994420b97accd067c381a65862c lib/POE/Component/Client/Bayeux/Transport/LongPolling.pm
+SHA1 648919393d6a5cf4d1f50d8cbe52ff6ae00ddd67 lib/POE/Component/Client/Bayeux/Utilities.pm
+SHA1 37b795a6c3d9b996db9235b61c4ab8acde664571 lib/POE/Component/Server/Bayeux.pm
+SHA1 ded90cbad32a18bef247e6f55991c32199a9b2a8 lib/POE/Component/Server/Bayeux/Client.pm
+SHA1 48b8f4e2d13ba33503aadf628b6a7f5fddaa2990 lib/POE/Component/Server/Bayeux/Message.pm
+SHA1 5e39e64aa656484f740de6e08dd4207c5ecf814f lib/POE/Component/Server/Bayeux/Message/Factory.pm
+SHA1 3d94ba1f89bad233c88c9a76586bf9bb8e8edc46 lib/POE/Component/Server/Bayeux/Message/Invalid.pm
+SHA1 ec1ed18906767dd5fa8324a7da69ea6f4171547e lib/POE/Component/Server/Bayeux/Message/Meta.pm
+SHA1 5235b7fdec04c9877a6dd81ddb2dc8b50e827ae0 lib/POE/Component/Server/Bayeux/Message/Publish.pm
+SHA1 292a300fd79877e1d3fcb9b0631bd7b42cb20102 lib/POE/Component/Server/Bayeux/Message/Service.pm
+SHA1 a69fe8784c287af2291783b358f35e03b81fa3e8 lib/POE/Component/Server/Bayeux/Request.pm
+SHA1 6adf6a3b3552fa3c6f951b5e9cd2bb6234da33b1 lib/POE/Component/Server/Bayeux/Utilities.pm
+SHA1 c44a8ee0bc9b88220b063d7af23fcbe38d7e980a t/acls.t
+SHA1 b4348ab7eab8dfd8376ab65d35bd9e4fb4ab7d24 t/channel_matching.t
+SHA1 a787c03bd81bdead63a67ab720528853f26c2389 t/server_client.t
+SHA1 42147aa63333f9944fe402842669dc08b9ec8710 t/services.t
+SHA1 f4779bef5ed658acec3c9fc028cb5f21de651677 testbin/cli_client.pl
+SHA1 9b6f05c5c12e79428ac6688c952d90a9a0a18499 testbin/client.pl
+SHA1 931a7be4e50f103c561ee6e4684a473b4710e210 testbin/server.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkso+LEACgkQHHIpFH/pKkIxfQCfXHwRLcBWEtQYhzVZlnhfTWb8
+X5MAn2bhP/Y+dpWWLBn7ARKE5ubblFOM
+=6/NI
+-----END PGP SIGNATURE-----

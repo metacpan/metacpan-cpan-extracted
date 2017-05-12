@@ -1,0 +1,43 @@
+---
+abstract: 'emulate a run-down server for development'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+  Plack::Builder: '0'
+  Plack::Test: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build: '0.40'
+  Module::Build::Pluggable: '0'
+  Module::Build::Pluggable::CPANfile: '0.05'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Devel-ForceResponse
+provides:
+  Plack::Middleware::Devel::ForceResponse:
+    file: lib/Plack/Middleware/Devel/ForceResponse.pm
+    version: '0.01'
+requires:
+  HTTP::Status: '0'
+  Plack::Middleware: '0'
+  Plack::Response: '0'
+  Plack::Util::Accessor: '0'
+  parent: '0'
+  perl: '5.008005'
+  strict: '0'
+  warnings: '0'
+resources:
+  IRC:
+    url: irc://chat.freenode.org/#bayadev
+    web: http://webchat.freenode.net/?channels=%23bayadev
+  bugtracker: http://github.com/bayashi/Plack-Middleware-Devel-ForceResponse/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Plack-Middleware-Devel-ForceResponse
+version: '0.01'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

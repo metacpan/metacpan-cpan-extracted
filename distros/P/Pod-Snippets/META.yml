@@ -1,0 +1,25 @@
+---
+name: Pod-Snippets
+version: 0.14
+author:
+  - 'Dominique Quatravaux <domq@cpan.org>'
+abstract: |-
+  Extract and reformat snippets of POD so as to use them
+  in a unit test (or other Perl code)
+license: perl
+requires:
+  Pod::Parser: 0
+provides:
+  Pod::Snippets:
+    file: lib/Pod/Snippets.pm
+    version: 0.14
+  Pod::Snippets::LineFeeder:
+    file: lib/Pod/Snippets.pm
+    version: 0.14
+  Pod::Snippets::_Parser:
+    file: lib/Pod/Snippets.pm
+    version: 0.14
+  Pod::Snippets::_Snippet:
+    file: lib/Pod/Snippets.pm
+    version: 0.14
+generated_by: Module::Build version 0.26

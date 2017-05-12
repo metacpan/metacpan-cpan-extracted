@@ -1,0 +1,68 @@
+%{
+=head1 SYNOPSIS
+
+This example shows how the dynamic conflict resolution
+technique makes possible to change the behavior of the parser
+at the programmer's command.
+
+Compile it with:
+
+    eyapp -C dynamicgrammar.eyp 
+
+Run with:
+
+    $ ./dynamicgrammar.pm -f input_for_dynamicgrammar.txt 
+
+The file C<input_for_dynamicgrammar.txt> contains:
+
+            2-1-1 # left: 0
+            RIGHT
+            2-1-1 # right: 2
+            LEFT
+            3-1-1 # left: 1
+            RIGHT
+            3-1-1 # right: 3
+
+=head1 SEE ALSO
+
+File C<examples/debuggingtut/dynamicgrammar0.eyp> is similar
+to this grammar, but the shift-reduce conflict is left unsolved
+
+=cut
+
+my $reduce = 1;
+%}
+
+%whites /(\s*(?:#.*)?\s*)/
+%token NUM = /(\d+)/
+
+%conflict leftORright {
+  # reduce if $reduce and next token is '-'
+  if ($reduce && m{\G(?=-)}gc) 
+       { $self->YYSetReduce('-', ':M' ); }
+  else { $self->YYSetShift('-'); }
+}
+
+%expect 1
+
+%%
+p: c * {} ; 
+
+c:
+      $expr { print "$expr\n" }
+    | RIGHT { $reduce = 0}
+    | LEFT  { $reduce = 1}
+
+;
+
+expr: 
+      '(' $expr ')'  { $expr } 
+    | %name :M
+      expr.left                         %PREC leftORright
+                '-' expr.right          %PREC leftORright
+         { $left - $right }
+
+    | NUM
+;
+
+%%

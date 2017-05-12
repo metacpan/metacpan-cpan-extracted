@@ -1,0 +1,32 @@
+INSTALLATION
+============
+
+In order to install Perlilog on a UNIX system, just go:
+
+perl Makefile.PL
+make
+make install (as root)
+
+On systems with no GNU make, you should copy the "lib" directory's content
+(including its subdirectory, but *not* the "lib" folder itself) to one of
+the Perl library directories.
+
+You can get a list of possible directories by typing:
+
+perl -e "print join ',', @INC"
+
+Usually, you'd prefer those which include the word "site", but it's a matter
+of taste.
+
+USE WITHOUT INSTALLATION
+========================
+
+If installation of Perlilog among the system files is undesired or
+impossible, you may copy "lib" directory's content to anywhere. Then,
+we tell Perl where it can find the files with a command-line switch:
+
+* perl -w -IC:\perlilog try1.pl on Windows-based systems, assuming that
+Perlilog.pm and the subdirectories were put in C:\perlilog\.
+* perl -w -I/home/myself/perlilog try1.pl on UNIX/Linux systems,
+assuming that Perlilog.pm and the subdirectories were put in
+/home/myself/perlilog/.

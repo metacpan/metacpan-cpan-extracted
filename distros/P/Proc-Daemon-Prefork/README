@@ -1,0 +1,121 @@
+NAME
+    Proc::Daemon::Prefork - Create preforking, autoreloading daemon
+
+VERSION
+    This document describes version 0.70 of Proc::Daemon::Prefork (from Perl
+    distribution Proc-Daemon-Prefork), released on 2014-12-11.
+
+METHODS
+  new(%args)
+    Arguments:
+
+    *   require_root => BOOL (default 0)
+
+        If true, bails out if not running as root.
+
+    *   error_log_path (required if daemonize=1)
+
+    *   access_log_path => STR (required if daemonize=1)
+
+    *   pid_path => STR (required if daemonize=1)
+
+    *   scoreboard_path => STR (default none)
+
+        If not set, no scoreboard file will be created/updated. Scoreboard
+        file is used to communicate between parent and child processes.
+        Autoadjustment of number of processes, for example, requires this
+        (see max_children for more details).
+
+    *   daemonize => BOOL (default 1)
+
+    *   prefork => INT (default 3, 0 means a nonforking/single-threaded
+        daemon)
+
+        This is like the StartServers setting in Apache webserver (the
+        prefork MPM), the number of children processes to prefork.
+
+    *   max_children => INT (default 150)
+
+        This is like the MaxClients setting in Apache webserver. Initially
+        the number of children spawned will follow the 'prefork' setting. If
+        while serving requests, all children are busy, parent will
+        automatically increase the number of children gradually until
+        'max_children'. If afterwards these children are idle, they will be
+        gradually killed off until there are 'prefork' number of children
+        again.
+
+        Note that for this to function, scoreboard_path must be defined
+        since the parent needs to communicate with children.
+
+    *   auto_reload_check_every => INT (default undef, meaning never)
+
+        In seconds.
+
+    *   auto_reload_handler => CODEREF (required if auto_reload_check_every
+        is set)
+
+    *   after_init => CODEREF (default none)
+
+        Run after the daemon initializes itself (daemonizes, writes PID
+        file, etc), before spawning children. You usually bind to sockets
+        here (if your daemon is a network server).
+
+    *   on_client_disconnect => CODEREF
+
+        Do something after socket connection between client and child
+        process is closed. This requires scoreboard (see "scoreboard_path"
+        argument) to record all the children's PIDs, and also the "netstat"
+        command and Parse::Netstat module to check for connections.
+
+        This can be used, for example, to kill child process (cancel job) on
+        disconnect.
+
+        Will be called for each child server being disconnected. Code will
+        receive a hash containing: "pid", "proto", "local_host",
+        "local_port", "foreign_host", "foreign_port".
+
+        Note that monitoring connections is done every few seconds by the
+        parent process, so this code will not be run immediately after
+        closing of connection.
+
+        Currently only works for TCP connections and not Unix connections,
+        due to lack of information provided by "netstat" for Unix
+        connections.
+
+    *   main_loop* => CODEREF
+
+        Run at the beginning of each child process. This is the main loop
+        for your daemon. You usually do this in your main loop routine:
+
+         for(my $i=1; $i<=$MAX_REQUESTS_PER_CHILD; $i++) {
+             # accept loop, or process job loop
+         }
+
+    *   before_shutdown => CODEREF (optional)
+
+        Run before killing children and shutting down.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Proc-Daemon-Prefork>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-SHARYANTO-Proc-Daemon-Prefork>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Proc-Daemon-Prefork>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

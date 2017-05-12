@@ -1,0 +1,14 @@
+# Change file for Plack::Middleware::Cached
+
+0.15 2014-01-02
+    - fixed test (thanks to Piotr Roszatycki)
+
+0.14 2013-12-28
+    - support streaming API (thanks to Piotr Roszatycki)
+
+0.13 2012-09-04
+
+0.12 2011-07-18
+
+0.11 2011-06-28
+    - First public version at CPAN

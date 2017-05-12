@@ -1,0 +1,8 @@
+riap_access_log_dir: /home/steven
+riap_access_log_prefix: dbi2http-riap_access.log
+#riap_access_log_size: 10485760
+#riap_access_log_histories: 10
+
+db_dsn: dbi:SQLite:dbname=/home/steven/sqlite3.db
+db_user: ~
+db_password: ~

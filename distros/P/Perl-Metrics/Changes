@@ -1,0 +1,38 @@
+Revision history for Perl extension Perl-Metrics
+
+0.09 Sat  1 Nov 2008
+	- Adding a missing dependency on File::Find::Rule::Perl
+
+0.08 Sat 10 May 2008
+	- Updated to Module::Install 0.73
+	- Updated test scripts and bundled author tests
+	- Canonicalise paths so Win32 works properly
+	- Some optimisations to use CPAN::Mini::Extract better
+
+0.07 Sun 10 Feb 2008
+	- Updated to Module::Install 0.68
+
+0.06 Sun Jun  4 2006
+	- Moved from Sourceforge CVS to collaborative SVN
+	- Cleaned up tests and dependencies
+	- Updgraded to Module::Install 0.62
+
+0.05 Sun Nov 13 2005
+	- Various tweaks and bug fixes
+
+0.04 Wed Nov  8 2005
+	- Added an undocumented tracing option
+	- Added a custom cascading delete for files
+	  When the last file for a hex_id is deleted, so are its metrics
+
+0.03 Thu Oct  6 2005
+	- There was a bug in PPI 1.102 functions we need.
+	- Updated dependency to PPI 1.103
+
+0.02 Wed Oct  5 2005
+	- Released for initial public review.
+	- Got connection and database creation working.
+	- Doesn't do anything yet, but the database does exist.
+
+0.01 Mon Oct  3 2005
+	- Experimental internal release

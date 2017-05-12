@@ -1,0 +1,11 @@
+%{
+use base q{DebugTail}; 
+%}
+
+%%
+S:                 { print "S -> epsilon\n" }
+    |   'a' S 'b'  { print "S -> a S b\n" }
+;
+%%
+
+__PACKAGE__->main('Provide a statement like "a a b b" and press <CR><CTRL-D>: ') unless caller;

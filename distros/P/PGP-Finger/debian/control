@@ -1,0 +1,16 @@
+Source: pgpfinger
+Section: perl
+Priority: optional
+Maintainer: Markus Benning <ich@markusbenning.de>
+Build-Depends: debhelper (>= 8)
+Build-Depends-Indep: perl
+Standards-Version: 3.9.2
+Homepage: http://search.cpan.org/dist/PGP-Finger/
+
+Package: pgpfinger
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}
+Description: retrieve PGP keys from different sources
+ (no description was found)
+ .
+ This description was automagically extracted from the module by dh-make-perl.

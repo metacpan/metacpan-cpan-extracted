@@ -1,0 +1,237 @@
+
+=head1 NAME
+
+ Plugins::API - Inter-plugin callback API
+
+=head1 SYNOPSIS
+
+ use Plugins::API;
+
+ my $api = new Plugins::API;
+
+ $api->api( methodname1 => \%options1, methodname2 => \%options2, ... );
+
+ $api->plugins ($plugins_object);
+
+ @handlers = $api->handlers;
+
+ $api->invoke('methodname', @args);
+
+ $api->autoregister($self);
+
+ $api->register($self, [\%options], methodname1 => \&method1, methodname2 => \&method2, ...)
+
+ $api->disable('ClassName');
+ $api->disable($object);
+
+=head1 DESCRIPTION
+
+Plugins::API provides a framework for modules to rendevous with each other
+at runtime.  It's designed to work with the L<Plugins> module but it does
+not depend upon L<Plugins> and could be used without it.
+
+The basic idea is that you describe a invocation interface with the
+C<api()> method and then you register methods for later callback.
+A method callback requires an object (unless it's a class method) and
+when you register a method, Plugins::API keeps a reference to the object
+for use when making the callback.
+
+A registered method is called a I<handler> in the rest of this document.
+
+=head1 METHODS
+
+Plugins::API objects are created with the C<new()> method so that will be
+documented first:
+
+=over 4
+
+=item new([\%options,] [@api])
+
+Options for C<new()> are passed as a reference to a hash.  It's
+optional.  Also option is an interface specification like what 
+is passed to the C<api()> method (below).
+
+The options supported are:
+
+=over 15
+
+=item autoregister =E<gt> $self
+
+Automaticlly register class methods (see C<autoregister()> below).
+
+=item plugins =E<gt> $plugins
+
+Just like calling C<plugins()> (below).
+
+=back
+
+=item api(%interface)
+
+The C<api()> call creates the published interfaces that Plugins::API
+users use to invoke each other.
+
+Pass in key/value pairs.  The key is the interface name and the value
+is a refernece to a hash of options for that callback.  The supported
+options are:
+
+=over 4
+
+=item first_only =E<gt> 1
+
+If there are handlers for this callback only call the first one on the list.
+
+=item first_defined =E<gt> 1
+
+If there are multiple handlers for this callback,
+call them in sequence until one of them returns a value that is 
+not undef.  This only works in scalar context.
+
+=item combine_returns =E<gt> 1
+
+If there are multiple handlers for this callback,
+call them all in sequence and return a flattened list of all the
+return values.
+
+=item array_returns =E<gt> 1
+
+When invoked, return an array whose elements are references to
+arrays which are the return values from each of the handlers
+for this callback.
+
+=item exit_test =E<gt> \&test_function
+
+After each call to a handler for this callback, call 
+the test_function to see if we should stop invoking
+more handlers:
+
+ ($quit_if_true, @return_value) = test_function(
+	\@last_handler_return, 
+	\@array_of_handler_returns,
+	\@flattend_array_of_handler_returns,
+	wantarray)
+
+=back
+
+=item autoregister($self)
+
+Autoregister will compare the methods of C<$self> to the 
+callbacks defined by C<api()> and register $self's methods 
+as handlers if any of $self's methods have the same name
+as a callback.
+
+=item register($self, [\%options,] %handlers)
+
+Register binds methods to the interface.  Pass in callback
+names as keys and code references as values.  It is not required
+that the API method name was not previously defined.
+
+If $self is undefined then the code references will be 
+called as functions rather than methods.  
+
+The options supported by C<register()> are:
+
+=over 10
+
+=item first
+
+Normally new handlers are added to the end of the list of
+handlers for the callback.  With this option, the handlers
+will be added to the beginning of the list.
+
+=item replace
+
+Normally new handlers are added to the end of the list of
+handlers for the callback.  With this option, the handlers
+will replace the current list.
+
+=back
+
+=item invoke($callback, [@args)
+
+This causes all of the handlers for C<$callback> to be
+called in turn and the return value from the last handler
+to be returned.  Some of this behavior can be changed with
+calls to C<api()>.
+
+Plugins::API has an C<AUTOLOAD> function that hands off to
+C<invoke()>.  Thus all callbacks look like they're methods
+for Plugins::API.
+
+=item disable($object)
+=item disable('CLASS')
+
+Handlers can be turned off with C<disable()>.  Turning off
+a class disables all objects in the class.  There is no
+re-enable function at this time.
+
+=item plugins($plugins)
+
+Plugins::API works with the L<Plugins> module.  If a 
+L<Plugins>s object has been registered with C<plugins()>, then
+any C<invoke()> of a callback also do a C<Plugins::invoke()> 
+on the C<$plugins> object.
+
+=item handlers($callback)
+
+This returns a list of the un-disabled handlers for a callback.
+Handlers are objects in the Plugins::API::Handler class.  They
+support the following methods:
+
+=over 4
+
+=item call(@args)
+
+Call the function or method with C<@args>.
+
+=item object()
+
+Return the object or class that the function is a method for.  
+Returns an empty list if there is no object or class.
+
+=item method()
+
+Returns a code reference for the function.
+
+=back
+
+=back
+
+=head1 EXAMPLES
+
+See the code for L<SyslogScan::Daemon::SpamDetector>.
+
+=head1 MEMORY LEAKS
+
+Plugins::API uses C<Scalar::Util::weaken()> on object referneces and
+on C<$plugins> so that it will not cause reference loops.
+
+=head1 RESERVED METHOD NAMES
+
+Since Plugins::API uses C<AUTOLOAD> so that you can say 
+
+ $api->foobar()
+
+where C<foobar> is a callback, you need to avoid naming 
+your callbacks the same as Plugins::API methods.  In
+addition to the methods documented above, please don't have
+callbacks named:
+
+ callhandlers()
+ newhandler()
+
+=head1 SEE ALSO
+
+L<Plugins>
+
+=head1 THANK THE AUTHOR
+
+If you find this module useful and wish to show your appreciation to the
+author, please give me a Request-For-Quote on your next high-speed 
+internet pipe order.  I have good pricing for T1s, T3s, OC3s etc.
+
+=head1 LICENSE
+
+Copyright (C) 2006, David Muir Sharnoff <muir@idiom.com>. 
+This module may be used and redistributed on the same terms as Perl
+itself.
+ 

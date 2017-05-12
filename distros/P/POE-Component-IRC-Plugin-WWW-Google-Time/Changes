@@ -1,0 +1,10 @@
+Revision history for POE-Component-IRC-Plugin-WWW-Google-Time
+
+0.0102  2013-12-02
+        - Minor fixes to comply with the specs and Kwalitee game
+        - Added autogeneration of README from POD
+        - Moved author tests to xt/
+
+0.0101  2008-10-11
+        - First version, released on an unsuspecting world.
+

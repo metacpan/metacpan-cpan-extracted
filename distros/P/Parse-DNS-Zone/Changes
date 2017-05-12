@@ -1,0 +1,97 @@
+Changes in Parse::DNS::Zone
+
+0.60 2016-11-11
+- Handle backslash escaped comment characters. Patch by Daniel
+  Donckers
+- Adhere to CPAN::Changes::Spec for the changelog
+
+0.51 2015-02-18
+- Bump minimum Perl version to 5.10. The 0.5 release of
+  Parse::DNS::Zone included usage of features introduced in
+  Perl 5.10, so this is only documentating that fact.
+- Declare vcs repository (and preferred issue tracker):
+    https://github.com/olof/Parse-DNS-Zone
+
+0.5 2015-02-15
+- Add support for loading zones from strings. Read the POD and
+  use the new constructor parameter "zonestr" to pass in the
+  complete zone as a string. A new basepath parameter to the
+  constructor is added so that $INCLUDE statements may still
+  work.
+
+  Suggested by Daniel J. Wright. Solves rt.cpan.org #101719.
+
+- Tweak MANIFEST.SKIP and regenerate MANIFEST. This should solve
+  warnings like:
+
+   ==> MISMATCHED content between MANIFEST and distribution files! <==
+
+  Reported by Daniel J. Wright.
+
+- Skip Test::Distribution tests by default. Enable by running with
+  RELEASE_TESTING=y.
+
+  Reported by Daniel J. Wright. Solves rt.cpan.org #101794.
+
+- Fix double appended root dot issue when $ORIGIN is "."
+
+0.42 2011-07-10
+[Documentation]
+- Changed the GPL text in LICENSE to GPL-1
+
+  Note that this isn't a change in what license the module is
+  released under. It is, and has always been, Artistic License
+  or GPL-1 or later.
+
+- Documented availability (CPAN, Github) in POD and README
+- Converted Changes to plaintext from POD
+- Converted Contributors to plaintext from POD
+
+[Bugs]
+- RT #69283: Not possible to not have defined $TTL within the zone
+             Thanks Sebastian Hagedorn for reporting it!
+
+[Tests]
+- Added tests for case insensitivity
+- Added test for commented out RRs
+- Added test for not having set $TTL (RT #69283)
+
+0.41 2011-01-07
+- Origin is now appended in RDATA (thanks to Sebastian Hagedorn)
+- Some minor documentation fixes
+
+0.4 2010-11-21   API Breakage!
+- get_rdata returns a list of complete RRset in list context.
+  B<Please be aware that this may break existing code.> Sorry :-(
+
+* Fixes to documentation (new mail address, <olof@cpan.org>)
+
+0.3 2010-04-18
+- Added real tests (t/03-parser.t)
+- Possibility to get either class, ttl or rdata when calling
+  get_rdata(). (Thanks to Mark J. Reed)
+- Fixed a bug with get_dupes(), trying to int() on an arrayref
+  instead of the array (Thanks to Mark J. Reed)
+- Fixed bugs in documentation
+- Fixed RFC compliance bug, not supporting the format
+  "<name> <class> <ttl> <type> <rdata>"
+
+0.23 2009-11-15  Never released!
+- Added a LICENSE file
+- Added POD tests
+
+0.22 2009-11-14
+- Fixed a bug where you can't use @ as an argument to get_rdata
+- Fixed bug where no parsing of arguments is done on get_rrs and
+  exists
+
+0.21 2009-11-14
+- First published version
+- Fixed a bug in $origin parsing, not possible to have dots in it
+
+0.20 2009-11-13
+- Fixed support for multiple RRs with same type for same name
+- Testing with Test::Distribution
+
+0.1 2009-09-13
+ - Packaged the module

@@ -1,0 +1,13 @@
+# Test pipeline configuration file
+---
+search-packages:
+  - not yet functional...
+pipeline:
+  - Test::Segment
+  - TestSeg
+  - a sub pipe:
+      - another sub pipe:
+          - Test::Segment
+      - Test::Segment: { foo: "bar" }
+cleanups:
+  - Test::Segment: { foo: "baz" }

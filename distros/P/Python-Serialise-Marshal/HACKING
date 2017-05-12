@@ -1,0 +1,8 @@
+Feel free to play around with this and send me packages.
+
+I've included the script (maketest) and input file (test.suite)
+that I use to generate the tests. Modify test.suite and run
+
+	./maketest test.suite 
+
+in this directory to add, remove or modify tests.

@@ -1,0 +1,37 @@
+NAME
+    Plack::App::CocProxy - proxy requests and replace by local file
+
+SYNOPSIS
+      use Plack::App::CocProxy;
+      Plack::App::CocProxy->new(root => 'files');
+
+    or you can use this like:
+
+      $ twiggy -MPlack::App::CocProxy -e 'Plack::App::CocProxy->new(root=>".")->to_app' -p 5432
+
+    or you can use installed simple script:
+
+      $ cocproxy # is same as above
+
+DESCRIPTION
+    Plack::App::CocProxy arrogates requests and redirect to local file under
+    rules based on request-URI.
+
+    Example(root=>"."):
+
+      http://example.com/
+      => ./index.html => ./example.com/index.html => (original url)
+
+      http://example.com/foo/bar.html
+      => ./bar.html => ./example.com/foo/bar.html => ./example.com/bar.html => ./foo/bar.html => (original url)
+
+AUTHOR
+    cho45 <cho45@lowreal.net>
+
+SEE ALSO
+    Plack::App::Proxy, Plack::App::File, Plack
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

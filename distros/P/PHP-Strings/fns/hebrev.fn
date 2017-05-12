@@ -1,0 +1,1 @@
+docs: Use the L<Encode> module to convert between character encodings.

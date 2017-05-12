@@ -1,0 +1,17 @@
+#!/usr/local/bin/perl -w
+###########################################
+# sudo-simulator simulator
+###########################################
+use strict;
+use Term::ReadKey;
+
+$|=1;
+print "$0\n";
+
+my $user = "womper";
+print "[sudo] password for $user:";
+
+  # oops someone forgot to turn off 'echo'
+my $pw1 = <STDIN>;
+
+print "Haw haw, tricked you.\n";

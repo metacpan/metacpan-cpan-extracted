@@ -1,0 +1,13 @@
+#!/usr/local/bin/perl 
+
+use warnings;
+use strict;
+
+use Pod::Peapod::Base;
+
+my $obj=Pod::Peapod::Base->new;
+
+local $/;
+my $string = <>;
+
+$obj->parse_string_document($string);

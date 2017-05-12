@@ -1,0 +1,131 @@
+NAME
+    Pod::AxPoint - Generate AxPoint XML slideshow from POD source.
+
+SYNOPSIS
+     use Pod::AxPoint;
+     my $ax = new Pod::AxPoint;
+     print $ax->process($pod);
+
+DESCRIPTION
+    Pod::AxPoint converts POD input to AxPoint XML, which can be used to
+    generate HTML Slideshows.
+
+    The script pod2axpoint delivered with Pod::AxPoint provides a
+    commandline frontend for the module.
+
+    There is another script for this purpose on cpan,
+    podslides-ax-magicpoint-0.01, but this creates a xslt transformation and
+    doesn't support everything of AxPoint. That's why I wrote my own.
+
+METHODS
+  new()
+    This creates a new Pod::AxPoint object.
+
+  process($pod)
+    This actually generates the AxPoint slideshow from the supplied POD
+    string. Look at the POD section for details about the POD format.
+
+    Returns the slideshow as single string containing the AxPoint XML code.
+
+  syntax(%syntax)
+    You may call this before calling process() to overwrite the internal
+    syntax map for mapping from POD to XHTML.
+
+    This is the default:
+
+     %syntax = (
+                  head1       => "title",
+                  head2       => "title",
+                  text        => "plain",
+                  verbatim    => "source-code",
+                  b           => "b",
+                  i           => "i",
+                  c           => "source-code",
+                  f           => "i",
+                  g           => "image",
+                  list_number => "list",
+                  list_bullet => "list",
+                  list_text   => "list",
+                  item_number => "point",
+                  item_bullet => "point",
+                  item_text   => "point",
+                  table       => "table",
+                  row         => "row",
+                  cell        => "col",
+                  );
+
+    You are encouraged to keep this mapping as is.
+
+POD
+    Beside the known perlpod markup some exceptions has been made:
+
+    *   Only the title =head1 is supported currently.
+
+    *   Images can be included using the tag G<image.png>.
+
+    *   Plain XML code can be included using the xml formatter, eg:
+
+         =begin xml
+ 
+         <title>Blah</title>
+ 
+         =end xml
+
+        This way you add the required metadata block to your slide.
+
+DEPENDENCIES
+    Pod::Tree perl module is required.
+
+    AxPoint is required. I used the FreeBSD port:
+
+     /usr/ports/print/axpoint (axpoint-1.50)
+
+    Beside axpoint you need Pod::Tree for parsing POD.
+
+    AxPoint itself has a lot of dependencies, here are all the (FreeBSD)
+    packages were installed:
+
+     axpoint-1.50                   XML Based Presentations
+     docbook-xml-4.2_1              XML version of the DocBook DTD
+     expat-2.0.0_1                  XML 1.0 parser written in C
+     fontconfig-2.3.2_6,1           An XML-based font configuration API for X Windows
+     libxml2-2.6.27                 XML parser library for GNOME
+     p5-XML-Filter-BufferText-1.01  Filter to put all characters() in one event
+     p5-XML-Filter-XSLT-0.03        XSLT as a SAX Filter
+     p5-XML-LibXML-1.62001          Interface to Gnome libxml2 library
+     p5-XML-LibXML-Common-0.13      Routines and Constants common for XML::LibXML and XML::GDOM
+     p5-XML-LibXSLT-1.59            Perl interface to the GNOME XSLT library
+     p5-XML-NamespaceSupport-1.09_1 A simple generic namespace support class
+     p5-XML-Parser-2.34_2           Perl extension interface to James Clark's XML parser, expat
+     p5-XML-SAX-0.15                Simple API for XML
+     p5-XML-SAX-Expat-0.38          Simple API for XML
+     p5-XML-SAX-Writer-0.50         SAX2 XML Writer
+     sdocbook-xml-1.1,1             "Simplified" DocBook XML DTD
+     xmlcatmgr-2.2                  SGML and XML catalog manager
+
+    If you're not on FreeBSD try cpan or install all the stuff manually -
+    which is annoying.
+
+    Last but not least: try FreeBSD.
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2007 Thomas Linden
+
+    This tool is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+BUGS AND LIMITATIONS
+    See rt.cpan.org for current bugs, if any.
+
+INCOMPATIBILITIES
+    None known.
+
+DIAGNOSTICS
+    To debug pod2axpoint use debug() or the perl debugger, see perldebug.
+
+AUTHOR
+    Thomas Linden <tlinden |AT| cpan.org>
+
+VERSION
+    0.04
+

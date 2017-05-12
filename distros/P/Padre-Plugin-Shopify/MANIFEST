@@ -1,0 +1,10 @@
+Build.PL
+lib/Padre/Plugin/Shopify.pm
+lib/Padre/Plugin/Shopify/Document.pm
+lib/Padre/Plugin/Shopify/Task.pm
+MANIFEST
+META.json
+META.yml
+scripts/theme_translation.pl
+share/icons/16x16/logo.png
+share/shopifytheme.txt

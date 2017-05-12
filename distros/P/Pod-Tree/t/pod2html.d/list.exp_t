@@ -1,0 +1,270 @@
+<html>
+ <head>
+  <base href="">
+  <link href="" rel="stylesheet" type="text/css">
+  <title>Lists</title>
+ </head>
+ <body bgcolor="#ffffff" text="#000000">
+<h1>TEMPLATE</h1>
+black is the color of my true love's hair
+  
+  <H1><A NAME="NAME">NAME
+
+</A></H1>
+
+<P>Lists
+
+</P><H2><A NAME="Bullet">Bullet
+
+</A></H2>
+<UL>
+<LI>foo
+
+</LI>
+<LI>bar
+
+</LI>
+<LI>baz
+
+</LI>
+</UL>
+<H2><A NAME="Number">Number
+
+</A></H2>
+<OL>
+<LI>foo
+
+</LI>
+<LI>bar
+
+</LI>
+<LI>baz
+
+</LI>
+</OL>
+<H2><A NAME="Text">Text
+
+</A></H2>
+<DL><DT><A NAME="do">do
+
+</A></DT>
+<DD>
+a deer, a female deer
+
+</DD>
+<DT><A NAME="ray">ray
+
+</A></DT>
+<DD>
+a drop of goden sun
+
+</DD>
+<DT><A NAME="me">me
+
+</A></DT>
+<DD>
+me, a name, I call myself
+
+</DD>
+<DT><A NAME="fa">fa
+
+</A></DT>
+<DD>
+a long, long way to run
+
+</DD>
+</DL>
+<DL><DT><A NAME="*%20do">* do
+
+</A></DT>
+<DD>
+a deer, a female deer
+
+</DD>
+<DT><A NAME="*%20ray">* ray
+
+</A></DT>
+<DD>
+a drop of goden sun
+
+</DD>
+</DL>
+<DL><DT><A NAME="3%20me">3 me
+
+</A></DT>
+<DD>
+me, a name, I call myself
+
+</DD>
+<DT><A NAME="4%20fa">4 fa
+
+</A></DT>
+<DD>
+a long, long way to run
+
+</DD>
+</DL>
+<H2><A NAME="Siblings">Siblings
+
+</A></H2>
+<UL>
+<LI>
+<P>Star 1 Para 1
+
+</P>
+<P>Star 1 Para 2
+
+</P>
+<P>Star 1 Para 3
+
+</P></LI>
+<LI>
+<P>Star 2
+
+</P>
+<PRE>	Star 2 Verbatim 1
+	Star 2 Verbatim 2
+	Star 2 Verbatim 3</PRE>
+</LI>
+<LI>Star 3
+
+</LI>
+</UL>
+<H2><A NAME="Markups">Markups
+
+</A></H2>
+<DL><DT><A NAME="term%201">term 1
+
+</A></DT>
+<DD>
+definition 1
+
+</DD>
+<DT><A NAME="term%202"><I>term 2</I>
+
+</A></DT>
+<DD>
+<CODE>definition 2</CODE>
+
+</DD>
+<DT><A NAME="term%203"><I>term <B>3</B></I>
+
+</A></DT>
+<DD>
+definition&nbsp;3
+
+</DD>
+</DL>
+<H2><A NAME="Nested">Nested
+
+</A></H2>
+<UL>
+<LI>
+<P>Level 1, Star 1 of 2
+
+
+</P><UL>
+<LI>Level 2, Star 1 of 2
+
+</LI>
+<LI>Level 2, Star 2 of 2
+
+</LI>
+</UL>
+</LI>
+<LI><OL>
+<LI>Level 2, Number 1 of 2
+
+</LI>
+<LI>Level 2, Number 2 of 2
+
+</LI>
+</OL>
+</LI>
+</UL>
+<DL><DT><A NAME="Level%201%2c%20term%201%20of%202">Level 1, term 1 of 2
+
+
+</A></DT>
+<DD>
+<UL>
+<LI>Level 2, Star 1 of 3
+
+</LI>
+<LI>Level 2, Star 2 of 3
+
+</LI>
+<LI>Level 2, Star 3 of 3
+
+</LI>
+</UL>
+</DD>
+<DT><A NAME="Level%201%2c%20term%202%20of%202">Level 1, term 2 of 2
+
+
+</A></DT>
+<DD>
+<UL>
+<LI>
+<P>Level 2, Star 1 of 3
+
+
+</P><OL>
+<LI>Level 3, Number 1 of 2
+
+</LI>
+<LI>Level 3, Number 2 of 2
+
+</LI>
+</OL>
+</LI>
+<LI>Level 2, Star 2 of 3
+
+</LI>
+<LI>Level 2, Star 3 of 3
+
+</LI>
+</UL>
+</DD>
+</DL>
+<H2><A NAME="Pathological">Pathological
+
+</A></H2>
+<UL>
+<LI>Over 8
+
+</LI>
+</UL>
+<UL>
+<LI>Star 1
+
+</LI>
+<LI>Number 2
+
+</LI>
+<DT><A NAME="Term%203">Term 3
+
+</A></DT>
+<DD>
+Definition 3
+
+</DD>
+</UL>
+
+<P>Empty
+
+</P>
+<P>No Items
+
+</P><UL>
+<LI>Star 1
+
+</LI>
+<LI>No =back
+
+
+</LI>
+</UL>
+
+ </body>
+</html>

@@ -1,0 +1,3 @@
+requires 'Pcore', v0.22.2;
+requires 'AnyEvent::RipeRedis';
+requires 'AnyEvent::RipeRedis::Cluster';

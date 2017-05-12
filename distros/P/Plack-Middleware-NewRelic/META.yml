@@ -1,0 +1,34 @@
+---
+abstract: 'Plack middleware for NewRelic APM instrumentation'
+author:
+  - 'Ali Anari <ali@anari.me>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.035, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-NewRelic
+requires:
+  CHI: '0'
+  Method::Signatures: '0'
+  Moo: '0'
+  NewRelic::Agent: '0'
+  Plack::Middleware: '0'
+  Plack::Request: '0'
+  Plack::Util: '0'
+  parent: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/aanari/Plack-Middleware-NewRelic/issues
+  repository: git://github.com/aanari/Plack-Middleware-NewRelic.git
+version: '0.0502'

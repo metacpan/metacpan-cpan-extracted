@@ -1,0 +1,21 @@
+=pod
+
+foo
+
+=for filter=perl $A++; # this works too
+
+bar
+__RESULT__
++perl
+<html><body bgcolor="#ffffff">
+<p>foo</p>
+<pre><span class="i">$A</span>++<span class="sc">;</span> <span class="c"># this works too</span></pre>
+<p>bar</p>
+</body></html>
+__RESULT__
+-perl
+<html><body bgcolor="#ffffff">
+<p>foo</p>
+<pre>$A++; # this works too</pre>
+<p>bar</p>
+</body></html>

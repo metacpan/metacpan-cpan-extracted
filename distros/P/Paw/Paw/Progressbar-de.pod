@@ -1,0 +1,27 @@
+=head1 Button Widget
+
+B<$pb=Paw::Progressbar->new( \$variable, [$from], [$to], [$blocks], [$color], [$name] );>
+
+B<Parameter>
+
+  variable => Referenz auf ein Skalar welches durch den
+	          Progrssbar repraesentiert werden soll
+
+  from     => der Minimum Wert (default ist 0)
+
+  to       => der Maximum Wert (default ist 100)
+
+  blocks   => Die Anzahl der Bloecke zwischen
+              Minimum und Maximum (default ist 10)
+
+  name     => Name des Progressbar [optional]
+
+  $color   => Das Farbpaar (colorpair) muss mit
+              Curses::init_pair(pair_nr, COLOR_fg, COLOR_bg)
+              erzeugt werden[optional]
+
+B<Beispiel>
+
+  $pb=Paw::Progressbar->new( from=>-10, to=>10, blocks=>25, color=>3 );
+
+

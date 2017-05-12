@@ -1,0 +1,29 @@
+[AGENT]
+
+Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.8.1.12) Gecko/20080129 Iceweasel/2.0.0.12 (Debian-2.0.0.12-1)
+
+'parser'           => 'firefox',
+'strength'         => 'U',
+'os'               => 'Linux i686',
+'extras'           => ['X11','Debian-2.0.0.12-1'],
+'version_raw'      => '2.0.0.12',
+'lang'             => 'en-US',
+'mozilla'          => ['1.8.1.12','1.008001012'],
+'version'          => '2.000000012',
+'name'             => 'Firefox',
+'toolkit'          => ['Gecko','20080129','20080129.000']
+
+[AGENT]
+
+Mozilla/5.0 (X11; U; Linux i686 (x86_64); de; rv:1.8.1.19) Gecko/20081202 Iceweasel/2.0.0.19 (Debian-2.0.0.19-0etch1)
+
+extras          => [ 'X11', 'Debian-2.0.0.19-0etch1' ],
+lang            => 'de',
+mozilla         => [ '1.8.1.19', '1.008001019' ],
+name            => 'Firefox',
+os              => 'Linux i686 x86_64 ',
+parser          => 'firefox',
+strength        => 'U',
+toolkit         => [ 'Gecko', '20081202', '20081202.000' ],
+version         => '2.000000019',
+version_raw     => '2.0.0.19',

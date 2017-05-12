@@ -1,0 +1,30 @@
+=begin filter ppi
+
+    # a longer piece of code
+    use strict;
+
+    my $A; # must declare
+
+    $A++;
+
+=end filter
+__RESULT__
++ppi
+<html><body bgcolor="#ffffff">
+<pre>    <span class="comment"># a longer piece of code
+    </span><span class="keyword">use</span> <span class="pragma">strict</span><span class="structure">;</span>
+
+    <span class="keyword">my</span> <span class="symbol">$A</span><span class="structure">;</span> <span class="comment"># must declare</span>
+
+    <span class="symbol">$A</span><span class="operator">++</span><span class="structure">;</span></pre>
+</body></html>
+__RESULT__
+-ppi
+<html><body bgcolor="#ffffff">
+<pre>    # a longer piece of code
+    use strict;
+
+    my $A; # must declare
+
+    $A++;</pre>
+</body></html>

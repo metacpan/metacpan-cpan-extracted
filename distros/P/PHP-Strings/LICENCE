@@ -1,0 +1,17 @@
+LICENCE FOR PHP::Strings 0.28
+
+PHP::Strings modifications from version 0.27 are 
+copyright © Petras Kudaras, 2004. All rights reserved.
+
+LICENCE FOR PHP::Strings 0.27
+
+PHP::Strings is copyright © Iain Truskett, 2003. All rights
+reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.000 or,
+at your option, any later version of Perl 5 you may have available.
+
+The full text of the licences can be found in the Artistic and
+COPYING files included with this module, or in perlartistic and
+perlgpl as supplied with Perl 5.8.1 and later.

@@ -1,0 +1,448 @@
+? backup
+? Apache
+? temp
+? old
+? Makefile
+? PhotoIndex/blib
+? PhotoIndex/Makefile
+? PhotoIndex/pm_to_blib
+? PhotoIndex/PhotoIndex.c
+? PhotoIndex/PhotoIndex.bs
+
+RCS file: /home/cvsroot/PhotoIndex/Changes,v
+Working file: Changes
+head: 1.4
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 4;	selected revisions: 4
+description:
+----------------------------
+revision 1.4
+date: 2002/07/10 21:40:21;  author: myneid;  state: Exp;  lines: +12 -4
+new log
+----------------------------
+revision 1.3
+date: 2002/07/10 21:31:58;  author: myneid;  state: Exp;  lines: +47 -13
+added new cvslog
+----------------------------
+revision 1.2
+date: 2001/10/26 18:11:10;  author: myneid;  state: Exp;  lines: +168 -1
+Damn it i cant get this version number stuff down
+----------------------------
+revision 1.1
+date: 2001/10/26 17:14:36;  author: myneid;  state: Exp;
+Modified to proper perl module syntax
+=============================================================================
+
+RCS file: /home/cvsroot/PhotoIndex/MANIFEST,v
+Working file: MANIFEST
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2001/10/26 17:14:36;  author: myneid;  state: Exp;
+Modified to proper perl module syntax
+=============================================================================
+
+RCS file: /home/cvsroot/PhotoIndex/Makefile.PL,v
+Working file: Makefile.PL
+head: 1.3
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 3;	selected revisions: 3
+description:
+----------------------------
+revision 1.3
+date: 2002/07/10 22:42:11;  author: myneid;  state: Exp;  lines: +2 -2
+took out Image Magick because it was giving too much trouble and replaced it with Imager which is available at cpan and was much easier to install
+----------------------------
+revision 1.2
+date: 2002/02/12 15:25:57;  author: myneid;  state: Exp;  lines: +21 -0
+added checking for Image::Magick
+----------------------------
+revision 1.1
+date: 2001/10/26 17:14:36;  author: myneid;  state: Exp;
+Modified to proper perl module syntax
+=============================================================================
+
+RCS file: /home/cvsroot/PhotoIndex/PhotoIndex.pm,v
+Working file: PhotoIndex.pm
+head: 1.19
+branch:
+locks: strict
+access list:
+symbolic names:
+	dev: 1.1.1.1
+	myneid: 1.1.1
+keyword substitution: kv
+total revisions: 20;	selected revisions: 20
+description:
+----------------------------
+revision 1.19
+date: 2002/07/10 22:42:12;  author: myneid;  state: Exp;  lines: +18 -3
+took out Image Magick because it was giving too much trouble and replaced it with Imager which is available at cpan and was much easier to install
+----------------------------
+revision 1.18
+date: 2002/07/10 21:39:54;  author: myneid;  state: Exp;  lines: +8 -2
+still debugging create index problem
+----------------------------
+revision 1.17
+date: 2002/07/10 21:30:01;  author: myneid;  state: Exp;  lines: +8 -7
+Fixed HUGE bug that was causeing this to not work at all (stupid infinate loop)
+----------------------------
+revision 1.16
+date: 2002/02/13 04:46:51;  author: myneid;  state: Exp;  lines: +4 -3
+minor bug fixes
+----------------------------
+revision 1.15
+date: 2002/02/11 23:01:17;  author: myneid;  state: Exp;  lines: +3 -2
+added an undef to the $image of type Image::Magick because it doesnt destroy memory
+----------------------------
+revision 1.14
+date: 2001/10/29 18:05:28;  author: myneid;  state: Exp;  lines: +41 -2
+Finished documentation
+----------------------------
+revision 1.13
+date: 2001/10/26 22:50:07;  author: myneid;  state: Exp;  lines: +29 -11
+Integral update, part done with documentation
+----------------------------
+revision 1.12
+date: 2001/10/26 21:13:28;  author: myneid;  state: Exp;  lines: +2 -2
+Ok i tghink i got it this time, man i'm dumb
+----------------------------
+revision 1.11
+date: 2001/10/26 18:11:38;  author: myneid;  state: Exp;  lines: +3 -3
+stuff
+----------------------------
+revision 1.10
+date: 2001/10/26 18:11:10;  author: myneid;  state: Exp;  lines: +2 -2
+Damn it i cant get this version number stuff down
+----------------------------
+revision 1.9
+date: 2001/10/26 17:50:37;  author: myneid;  state: Exp;  lines: +2 -2
+Still with the versions
+----------------------------
+revision 1.8
+date: 2001/10/26 17:48:24;  author: myneid;  state: Exp;  lines: +2 -4
+Finalized version numbering
+----------------------------
+revision 1.7
+date: 2001/10/26 17:32:06;  author: myneid;  state: Exp;  lines: +5 -2
+Updated version code
+----------------------------
+revision 1.6
+date: 2001/10/26 17:14:37;  author: myneid;  state: Exp;  lines: +77 -4
+Modified to proper perl module syntax
+----------------------------
+revision 1.5
+date: 2001/10/17 20:22:56;  author: myneid;  state: Exp;  lines: +10 -3
+fixed create_new_index because it was still making the old way
+----------------------------
+revision 1.4
+date: 2001/09/29 00:29:55;  author: myneid;  state: Exp;  lines: +66 -25
+wow a good version of photoindex , description stuff done
+----------------------------
+revision 1.3
+date: 2001/08/25 18:25:00;  author: myneid;  state: Exp;  lines: +22 -9
+Fixored the title and the edit_photos page by puting the edit photo directive in the query string duh!
+modified the style sheet a bit too for the header, although it still needs more modifying
+----------------------------
+revision 1.2
+date: 2001/08/25 07:10:18;  author: myneid;  state: Exp;  lines: +59 -20
+Ugh, still working on edit_photos, i added the code to do teh directory indexing with edit_photos/ at the end of the uri, not working yet though, i need to change the uri or something or each img tag  whatever i'm tired, fix it.
+----------------------------
+revision 1.1
+date: 2001/08/16 03:43:05;  author: myneid;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2001/08/16 03:43:05;  author: myneid;  state: Exp;  lines: +0 -0
+PhotoIndex.pm mod_perl handler for having a photo album Initial Import
+=============================================================================
+
+RCS file: /home/cvsroot/PhotoIndex/PhotoIndex.xs,v
+Working file: PhotoIndex.xs
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2001/10/26 18:04:19;  author: myneid;  state: Exp;
+added PhotoIndex.xs duh!
+=============================================================================
+
+RCS file: /home/cvsroot/PhotoIndex/install.sh,v
+Working file: install.sh
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	dev: 1.1.1.1
+	myneid: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2001/08/16 03:43:05;  author: myneid;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2001/08/16 03:43:05;  author: myneid;  state: Exp;  lines: +0 -0
+PhotoIndex.pm mod_perl handler for having a photo album Initial Import
+=============================================================================
+
+RCS file: /home/cvsroot/PhotoIndex/test.pl,v
+Working file: test.pl
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2001/10/26 17:14:37;  author: myneid;  state: Exp;
+Modified to proper perl module syntax
+=============================================================================
+
+RCS file: /home/cvsroot/PhotoIndex/Changes,v
+Working file: PhotoIndex/Changes
+head: 1.4
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 4;	selected revisions: 4
+description:
+----------------------------
+revision 1.4
+date: 2002/07/10 21:40:21;  author: myneid;  state: Exp;  lines: +12 -4
+new log
+----------------------------
+revision 1.3
+date: 2002/07/10 21:31:58;  author: myneid;  state: Exp;  lines: +47 -13
+added new cvslog
+----------------------------
+revision 1.2
+date: 2001/10/26 18:11:10;  author: myneid;  state: Exp;  lines: +168 -1
+Damn it i cant get this version number stuff down
+----------------------------
+revision 1.1
+date: 2001/10/26 17:14:36;  author: myneid;  state: Exp;
+Modified to proper perl module syntax
+=============================================================================
+
+RCS file: /home/cvsroot/PhotoIndex/MANIFEST,v
+Working file: PhotoIndex/MANIFEST
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2001/10/26 17:14:36;  author: myneid;  state: Exp;
+Modified to proper perl module syntax
+=============================================================================
+
+RCS file: /home/cvsroot/PhotoIndex/Makefile.PL,v
+Working file: PhotoIndex/Makefile.PL
+head: 1.3
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 3;	selected revisions: 3
+description:
+----------------------------
+revision 1.3
+date: 2002/07/10 22:42:11;  author: myneid;  state: Exp;  lines: +2 -2
+took out Image Magick because it was giving too much trouble and replaced it with Imager which is available at cpan and was much easier to install
+----------------------------
+revision 1.2
+date: 2002/02/12 15:25:57;  author: myneid;  state: Exp;  lines: +21 -0
+added checking for Image::Magick
+----------------------------
+revision 1.1
+date: 2001/10/26 17:14:36;  author: myneid;  state: Exp;
+Modified to proper perl module syntax
+=============================================================================
+
+RCS file: /home/cvsroot/PhotoIndex/PhotoIndex.pm,v
+Working file: PhotoIndex/PhotoIndex.pm
+head: 1.19
+branch:
+locks: strict
+access list:
+symbolic names:
+	dev: 1.1.1.1
+	myneid: 1.1.1
+keyword substitution: kv
+total revisions: 20;	selected revisions: 20
+description:
+----------------------------
+revision 1.19
+date: 2002/07/10 22:42:12;  author: myneid;  state: Exp;  lines: +18 -3
+took out Image Magick because it was giving too much trouble and replaced it with Imager which is available at cpan and was much easier to install
+----------------------------
+revision 1.18
+date: 2002/07/10 21:39:54;  author: myneid;  state: Exp;  lines: +8 -2
+still debugging create index problem
+----------------------------
+revision 1.17
+date: 2002/07/10 21:30:01;  author: myneid;  state: Exp;  lines: +8 -7
+Fixed HUGE bug that was causeing this to not work at all (stupid infinate loop)
+----------------------------
+revision 1.16
+date: 2002/02/13 04:46:51;  author: myneid;  state: Exp;  lines: +4 -3
+minor bug fixes
+----------------------------
+revision 1.15
+date: 2002/02/11 23:01:17;  author: myneid;  state: Exp;  lines: +3 -2
+added an undef to the $image of type Image::Magick because it doesnt destroy memory
+----------------------------
+revision 1.14
+date: 2001/10/29 18:05:28;  author: myneid;  state: Exp;  lines: +41 -2
+Finished documentation
+----------------------------
+revision 1.13
+date: 2001/10/26 22:50:07;  author: myneid;  state: Exp;  lines: +29 -11
+Integral update, part done with documentation
+----------------------------
+revision 1.12
+date: 2001/10/26 21:13:28;  author: myneid;  state: Exp;  lines: +2 -2
+Ok i tghink i got it this time, man i'm dumb
+----------------------------
+revision 1.11
+date: 2001/10/26 18:11:38;  author: myneid;  state: Exp;  lines: +3 -3
+stuff
+----------------------------
+revision 1.10
+date: 2001/10/26 18:11:10;  author: myneid;  state: Exp;  lines: +2 -2
+Damn it i cant get this version number stuff down
+----------------------------
+revision 1.9
+date: 2001/10/26 17:50:37;  author: myneid;  state: Exp;  lines: +2 -2
+Still with the versions
+----------------------------
+revision 1.8
+date: 2001/10/26 17:48:24;  author: myneid;  state: Exp;  lines: +2 -4
+Finalized version numbering
+----------------------------
+revision 1.7
+date: 2001/10/26 17:32:06;  author: myneid;  state: Exp;  lines: +5 -2
+Updated version code
+----------------------------
+revision 1.6
+date: 2001/10/26 17:14:37;  author: myneid;  state: Exp;  lines: +77 -4
+Modified to proper perl module syntax
+----------------------------
+revision 1.5
+date: 2001/10/17 20:22:56;  author: myneid;  state: Exp;  lines: +10 -3
+fixed create_new_index because it was still making the old way
+----------------------------
+revision 1.4
+date: 2001/09/29 00:29:55;  author: myneid;  state: Exp;  lines: +66 -25
+wow a good version of photoindex , description stuff done
+----------------------------
+revision 1.3
+date: 2001/08/25 18:25:00;  author: myneid;  state: Exp;  lines: +22 -9
+Fixored the title and the edit_photos page by puting the edit photo directive in the query string duh!
+modified the style sheet a bit too for the header, although it still needs more modifying
+----------------------------
+revision 1.2
+date: 2001/08/25 07:10:18;  author: myneid;  state: Exp;  lines: +59 -20
+Ugh, still working on edit_photos, i added the code to do teh directory indexing with edit_photos/ at the end of the uri, not working yet though, i need to change the uri or something or each img tag  whatever i'm tired, fix it.
+----------------------------
+revision 1.1
+date: 2001/08/16 03:43:05;  author: myneid;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2001/08/16 03:43:05;  author: myneid;  state: Exp;  lines: +0 -0
+PhotoIndex.pm mod_perl handler for having a photo album Initial Import
+=============================================================================
+
+RCS file: /home/cvsroot/PhotoIndex/PhotoIndex.xs,v
+Working file: PhotoIndex/PhotoIndex.xs
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2001/10/26 18:04:19;  author: myneid;  state: Exp;
+added PhotoIndex.xs duh!
+=============================================================================
+
+RCS file: /home/cvsroot/PhotoIndex/install.sh,v
+Working file: PhotoIndex/install.sh
+head: 1.1
+branch: 1.1.1
+locks: strict
+access list:
+symbolic names:
+	dev: 1.1.1.1
+	myneid: 1.1.1
+keyword substitution: kv
+total revisions: 2;	selected revisions: 2
+description:
+----------------------------
+revision 1.1
+date: 2001/08/16 03:43:05;  author: myneid;  state: Exp;
+branches:  1.1.1;
+Initial revision
+----------------------------
+revision 1.1.1.1
+date: 2001/08/16 03:43:05;  author: myneid;  state: Exp;  lines: +0 -0
+PhotoIndex.pm mod_perl handler for having a photo album Initial Import
+=============================================================================
+
+RCS file: /home/cvsroot/PhotoIndex/test.pl,v
+Working file: PhotoIndex/test.pl
+head: 1.1
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 1;	selected revisions: 1
+description:
+----------------------------
+revision 1.1
+date: 2001/10/26 17:14:37;  author: myneid;  state: Exp;
+Modified to proper perl module syntax
+=============================================================================

@@ -1,0 +1,14 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Perlipse.pm
+lib/Perlipse/SourceParser.pm
+lib/Perlipse/SourceParser/AST.pm
+lib/Perlipse/SourceParser/Utils.pm
+lib/Perlipse/SourceParser/VisitorDelegate.pm
+lib/Perlipse/SourceParser/Visitors/Package.pm
+lib/Perlipse/SourceParser/Visitors/Subroutine.pm
+t/001_load.t

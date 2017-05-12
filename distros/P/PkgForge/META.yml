@@ -1,0 +1,72 @@
+---
+name: PkgForge
+version: v1.4.8
+author:
+  - 'Stephen Quinney <squinney@inf.ed.ac.uk>'
+abstract: Tools for building packages from source
+license: gpl
+resources:
+  license: http://opensource.org/licenses/gpl-license.php
+build_requires:
+  Test::Exception: 0
+  Test::File: 1.24
+  Test::More: 0.87
+requires:
+  Data::UUID::Base64URLSafe: 0
+  Digest::SHA1: 0
+  Email::Valid: 0
+  File::Find::Rule: 0
+  File::HomeDir: 0
+  Module::Find: 0
+  Moose: 0.57
+  MooseX::App::Cmd: 0.09
+  MooseX::ConfigFromFile: 0
+  MooseX::Getopt: 0
+  MooseX::Types: 0.21
+  RPM2: 0
+  Readonly: 0
+  UNIVERSAL::require: 0
+  YAML::Syck: 0
+  perl: v5.8.8
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Moose::Meta::Attribute::Custom::Trait::PkgForge::Directory:
+    file: lib/PkgForge/Meta/Attribute/Trait/Directory.pm
+  Moose::Meta::Attribute::Custom::Trait::PkgForge::Serialise:
+    file: lib/PkgForge/Meta/Attribute/Trait/Serialise.pm
+  PkgForge::App:
+    file: lib/PkgForge/App.pm
+    version: v1.4.8
+  PkgForge::App::Submit:
+    file: lib/PkgForge/App/Submit.pm
+    version: v1.4.8
+  PkgForge::ConfigFile:
+    file: lib/PkgForge/ConfigFile.pm
+    version: v1.4.8
+  PkgForge::Job:
+    file: lib/PkgForge/Job.pm
+    version: v1.4.8
+  PkgForge::Meta::Attribute::Trait::Directory:
+    file: lib/PkgForge/Meta/Attribute/Trait/Directory.pm
+  PkgForge::Meta::Attribute::Trait::Serialise:
+    file: lib/PkgForge/Meta/Attribute/Trait/Serialise.pm
+  PkgForge::Source:
+    file: lib/PkgForge/Source.pm
+    version: v1.4.8
+  PkgForge::Source::SRPM:
+    file: lib/PkgForge/Source/SRPM.pm
+    version: v1.4.8
+  PkgForge::SourceUtils:
+    file: lib/PkgForge/SourceUtils.pm
+    version: v1.4.8
+  PkgForge::Types:
+    file: lib/PkgForge/Types.pm
+    version: v1.4.8
+  PkgForge::Utils:
+    file: lib/PkgForge/Utils.pm
+    version: v1.4.8
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

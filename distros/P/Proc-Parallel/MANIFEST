@@ -1,0 +1,15 @@
+bin/do.hosts
+bin/rkill
+CHANGELOG
+lib/Proc/Parallel.pm
+lib/Proc/Parallel/RemoteKiller.pm
+lib/Proc/Parallel/Unreliable.pm
+lib/RPC/ToWorker/Callback.pm
+lib/RPC/ToWorker.pm
+Makefile.PL
+MANIFEST
+META.yml
+t/data/testcluster
+t/dohosts.t
+t/toworker.t
+README

@@ -1,0 +1,40 @@
+second%%space%%template %%INCLUDE:./t/tmpl/3.tmpl%%
+%%INCLUDE:./t/tmpl/3.tmpl%%
+
+%%globaltag%%
+%%braces:ARG(:.)%%
+
+{{ bl1
+	 In block 1
+	 {{ bl2
+		 In block 2 %%tag1%%
+		 {{ bl3
+			 IN block 3 %%DP%% %%DCL%% %%DCR%% %%!bl5%%
+		 }}
+		 In block 2 again
+
+		He
+{{ bl4
+l
+}}
+o
+
+}}
+	 
+	 %%!bl5%%
+	   }}   	
+
+>>
+{{ !bl5
+	{{ bl6
+		{{bl7
+	hidden block %%DP%% %%DCL%% %%DCR%%
+		}}
+%%globaltag%%
+		{{bl8
+block8
+		}}
+	}}
+}}<<
+
+=========

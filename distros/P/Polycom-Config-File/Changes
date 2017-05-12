@@ -1,0 +1,14 @@
+Revision history for Perl extension Polycom::Config::File
+
+0.01  Wed Jan 28 11:00:00 2010
+    - original version
+
+0.02  Tue Feb 23 11:00:00 2010
+    - fixed problems with META.yml and documentation
+
+0.03  Tue Feb 23 21:00:00 2010
+    - made the pod unit tests optional if the necessary modules are not present
+
+0.04  Tue Sept 25 21:00:00 2010
+    - small changes to improve Kwalitee
+

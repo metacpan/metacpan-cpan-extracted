@@ -1,0 +1,30 @@
+NAME
+    POE::Loop::IO_Async - IO::Async event loop support for POE
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+    See POE::Loop.
+
+DESCRIPTION
+    POE::Loop::IO_Async implements the interface documented in POE::Loop.
+    Therefore it has no documentation of its own. Please see POE::Loop for
+    more details.
+
+SEE ALSO
+    POE
+
+    POE::Loop
+
+    IO::Async
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

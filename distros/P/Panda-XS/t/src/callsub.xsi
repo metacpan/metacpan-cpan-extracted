@@ -1,0 +1,84 @@
+MODULE = Panda::XS                PACKAGE = Panda::XS::Test
+PROTOTYPES: DISABLE
+
+void call_sub_void (const char* name, AV* args_av = NULL) {
+    SV** args = args_av ? AvARRAY(args_av) : NULL;
+    I32 items = args_av ? (AvFILLp(args_av)+1) : 0;
+    CV* cv = get_cv(name, 0);
+    if (!cv) croak("no sub");
+    xs::call_sub_void(aTHX_ cv, args, items);
+}
+
+SV* call_sub_scalar (const char* name, AV* args_av = NULL, bool discard = false) {
+    SV** args = args_av ? AvARRAY(args_av) : NULL;
+    I32 items = args_av ? (AvFILLp(args_av)+1) : 0;
+    I32 flags = 0;
+    if (discard) flags |= G_DISCARD;
+    CV* cv = get_cv(name, 0);
+    if (!cv) croak("no sub");
+    RETVAL = xs::call_sub_scalar(aTHX_ cv, args, items, flags);
+    if (RETVAL) SvREFCNT_inc(RETVAL);
+    else RETVAL = newSVpvs("NULL");
+}
+
+int call_sub_list (const char* name, AV* aret, int maxret, AV* args_av = NULL, bool discard = false) {
+    SV** args = args_av ? AvARRAY(args_av) : NULL;
+    I32 items = args_av ? (AvFILLp(args_av)+1) : 0;
+    I32 flags = 0;
+    if (discard) flags |= G_DISCARD;
+    CV* cv = get_cv(name, 0);
+    if (!cv) croak("no sub");
+    if (!aret) croak("no array");
+    SV* ret[maxret > 0 ? maxret : 1];
+    RETVAL = xs::call_sub_list(aTHX_ cv, ret, maxret, args, items, flags);
+    for (int i = 0; i < RETVAL; ++i) av_push(aret, SvREFCNT_inc(ret[i]));
+}
+
+AV* call_sub_av (const char* name, AV* args_av = NULL, bool discard = false) {
+    SV** args = args_av ? AvARRAY(args_av) : NULL;
+    I32 items = args_av ? (AvFILLp(args_av)+1) : 0;
+    I32 flags = 0;
+    if (discard) flags |= G_DISCARD;
+    CV* cv = get_cv(name, 0);
+    if (!cv) croak("no sub");
+    RETVAL = xs::call_sub_av(aTHX_ cv, args, items, flags);
+    if (!RETVAL) XSRETURN_UNDEF;
+    SvREFCNT_inc(RETVAL);
+}
+
+void call_method_void (SV* obj, const char* name, AV* args_av = NULL) {
+    SV** args = args_av ? AvARRAY(args_av) : NULL;
+    I32 items = args_av ? (AvFILLp(args_av)+1) : 0;
+    xs::call_method_void(aTHX_ obj, name, strlen(name), args, items);
+}
+
+SV* call_method_scalar (SV* obj, const char* name, AV* args_av = NULL, bool discard = false) {
+    SV** args = args_av ? AvARRAY(args_av) : NULL;
+    I32 items = args_av ? (AvFILLp(args_av)+1) : 0;
+    I32 flags = 0;
+    if (discard) flags |= G_DISCARD;
+    RETVAL = xs::call_method_scalar(aTHX_ obj, name, strlen(name), args, items, flags);
+    if (RETVAL) SvREFCNT_inc(RETVAL);
+    else RETVAL = newSVpvs("NULL");
+}
+
+int call_method_list (SV* obj, const char* name, AV* aret, int maxret, AV* args_av = NULL, bool discard = false) {
+    SV** args = args_av ? AvARRAY(args_av) : NULL;
+    I32 items = args_av ? (AvFILLp(args_av)+1) : 0;
+    I32 flags = 0;
+    if (discard) flags |= G_DISCARD;
+    if (!aret) croak("no array");
+    SV* ret[maxret > 0 ? maxret : 1];
+    RETVAL = xs::call_method_list(aTHX_ obj, name, strlen(name), ret, maxret, args, items, flags);
+    for (int i = 0; i < RETVAL; ++i) av_push(aret, SvREFCNT_inc(ret[i]));
+}
+
+AV* call_method_av (SV* obj, const char* name, AV* args_av = NULL, bool discard = false) {
+    SV** args = args_av ? AvARRAY(args_av) : NULL;
+    I32 items = args_av ? (AvFILLp(args_av)+1) : 0;
+    I32 flags = 0;
+    if (discard) flags |= G_DISCARD;
+    RETVAL = xs::call_method_av(aTHX_ obj, name, strlen(name), args, items, flags);
+    if (!RETVAL) XSRETURN_UNDEF;
+    SvREFCNT_inc(RETVAL);
+}

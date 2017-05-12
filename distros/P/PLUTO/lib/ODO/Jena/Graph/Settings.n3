@@ -1,0 +1,64 @@
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix jena: <http://jena.hpl.hp.com/2003/04/DB#> .
+@prefix odoj: <http://ibm-slrp.sourceforge.net/uris/odo/2007/01/jena-graph-schema#> .
+@prefix odo: <http://ibm-slrp.sourceforge.net/uris/odo/2007/01/#> .
+
+odoj:Settings rdf:type rdfs:Class ;
+	rdfs:label "Settings" ;
+	rdfs:isDefinedBy <http://ibm-slrp.sourceforge.net/uris/odo/2007/01/jena-graph-schema#> .
+
+jena:GraphName rdf:type rdf:Property ;
+	rdfs:label "GraphName" ;
+	rdfs:domain odoj:Settings ;
+	rdfs:isDefinedBy <http://jena.hpl.hp.com/2003/04/DB#> .
+jena:GraphPrefix rdf:type rdf:Property ;
+	rdfs:label "GraphPrefix" ;
+	rdfs:domain odoj:Settings ;
+	rdfs:isDefinedBy <http://jena.hpl.hp.com/2003/04/DB#> .
+jena:GraphType rdf:type rdf:Property ;
+	rdfs:label "GraphType" ;
+	rdfs:domain odoj:Settings ;
+	rdfs:isDefinedBy <http://jena.hpl.hp.com/2003/04/DB#> .
+jena:GraphId rdf:type rdf:Property ;
+	rdfs:label "GraphId" ;
+	rdfs:domain odoj:Settings ;
+	rdfs:isDefinedBy <http://jena.hpl.hp.com/2003/04/DB#> .
+jena:GraphLSet rdf:type rdf:Property ;
+	rdfs:label "GraphLSet" ;
+	rdfs:domain odoj:Settings ;
+	rdfs:range jena:LSet ;
+	rdfs:isDefinedBy <http://jena.hpl.hp.com/2003/04/DB#> .
+
+jena:LSet rdf:type rdfs:Class ;
+	rdfs:label "LSet" ;
+	rdfs:isDefinedBy <http://jena.hpl.hp.com/2003/04/DB#> .
+jena:LSetName rdf:type rdf:Property;
+	rdfs:label "LSetName" ;
+	rdfs:domain jena:LSet ;
+	rdfs:isDefinedBy <http://jena.hpl.hp.com/2003/04/DB#> .
+jena:LSetType rdf:type rdf:Property;
+	rdfs:label "LSetType" ;
+	rdfs:domain jena:LSet ;
+	rdfs:isDefinedBy <http://jena.hpl.hp.com/2003/04/DB#> .
+jena:LSetPSet rdf:type rdf:Property;
+	rdfs:label "LSetPSet" ;
+	rdfs:domain jena:LSet ;
+	rdfs:range jena:PSet ;
+	rdfs:isDefinedBy <http://jena.hpl.hp.com/2003/04/DB#> .
+
+jena:PSet rdf:type rdfs:Class ;
+	rdfs:label "PSet" ;
+	rdfs:isDefinedBy <http://jena.hpl.hp.com/2003/04/DB#> .
+jena:PSetName rdf:type rdf:Property;
+	rdfs:label "PSetName" ;
+	rdfs:domain jena:PSet ;
+	rdfs:isDefinedBy <http://jena.hpl.hp.com/2003/04/DB#> .
+jena:PSetType rdf:type rdf:Property;
+	rdfs:label "PSetType" ;
+	rdfs:domain jena:PSet ;
+	rdfs:isDefinedBy <http://jena.hpl.hp.com/2003/04/DB#> .
+jena:PSetTable rdf:type rdf:Property;
+	rdfs:label "PSetTable" ;
+	rdfs:domain jena:PSet ;
+	rdfs:isDefinedBy <http://jena.hpl.hp.com/2003/04/DB#> .	

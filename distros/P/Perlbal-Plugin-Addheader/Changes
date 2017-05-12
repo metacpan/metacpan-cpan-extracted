@@ -1,0 +1,9 @@
+Revision history for Perlbal-Plugin-Addheader
+
+0.01    2009-08-14
+        First version.
+
+0.02    2012-04-04
+        Allows addheader to work with reverse_proxy role
+        Fixed regex to parse header
+

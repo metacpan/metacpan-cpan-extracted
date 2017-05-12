@@ -1,0 +1,14 @@
+ChangeLog
+Makefile.PL
+pdlmaker.plm
+MANIFEST
+MANIFEST.SKIP
+README.txt
+EditDistance.pd			# EditDistance.pm
+EditDistance.pm
+t/00_basic.t
+t/01_distance.t
+t/common.plt
+META.yml			Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+GENERATED/PDL/EditDistance.pm            mod=PDL::EditDistance pd=EditDistance.pd (added by pdlpp_mkgen)

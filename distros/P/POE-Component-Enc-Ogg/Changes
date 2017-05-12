@@ -1,0 +1,17 @@
+Revision history for Perl extension POE::Component::Enc::OggVorbis.
+
+1.01  Tue Jun  3 22:20:08 2003
+  - original version; created by h2xs 1.22 with options
+    -XA -n POE::Component::Enc::OggVorbis
+1.02  Tue Oct 28 21:51:00 2003
+  - Renamed to POE::Component::Enc::Ogg
+1.03  Sun Apr 25 21:07:19 2004
+  - Croaks if input file not specified
+  - Minor documentation improvements
+1.04  Sun May 30 22:50:00 2004
+  - Now can encode direct from a file in flac format, using flac(1)
+    as a decoder front-end pipe
+  - Croaks if input file name is not .wav or .flac
+  - Croaks if input file does not exist
+1.05  Mon May 31 08:10:55 2004
+  - test2.flac was missing from the MANIFEST

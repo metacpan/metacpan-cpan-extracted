@@ -1,0 +1,51 @@
+---
+abstract: 'Interface for Thermal and some dot-matrix and inkjet Printers that support ESC-POS specification (Deprecated) - Use L<Printer::ESCPOS> instead'
+author:
+  - 'Shantanu Bhadoria (shantanu@cpan.org)'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Printer-Thermal
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+    - inc
+  package:
+    - DB
+provides:
+  Printer::Thermal:
+    file: lib/Printer/Thermal.pm
+    version: 0.29
+requires:
+  Device::SerialPort: 0
+  IO::File: 0
+  IO::Socket: 0
+  Moose: 0
+  POSIX: 0
+  Time::HiRes: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/shantanubhadoria/perl-printer-thermal/issues
+  homepage: https://metacpan.org/release/Printer-Thermal
+  repository: git://github.com/shantanubhadoria/perl-printer-thermal.git
+version: 0.29
+x_contributors:
+  - 'Shantanu Bhadoria <shantanu att cpan dott org>'
+x_deprecated: 1

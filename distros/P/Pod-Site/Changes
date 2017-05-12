@@ -1,0 +1,74 @@
+Revision history for Perl extension Pod::Site.
+
+0.56  2015-08-15T01:26:56Z
+      - Fix --favicon-uri parameter. Contributed by Arthur Axel fREW Schmidt.
+      - Fixed test failures on Windows.
+
+0.55  2015-07-30T22:53:55Z
+      - Added versions to Pod::Site::Search and Pod::Site::XHTML so that CPAN
+        will index them properly (it failed the 0.54 upload).
+
+0.54  2015-07-30T22:18:43Z
+      - Fixed "Useless use of \E" warning in `t/base.t`.
+      - Fixed test failures matching list items.
+      - Added `--favicon-uri` to optionally link to a favicon. Contributed
+        by Arthur Axel fREW Schmidt.
+      - Switch from Module::Build::ModuleInfo, which is no longer available,
+        to Module::Metadata, its replacement. This is used solely to find
+        module versions.
+      - Added missing dependencies to Build.PL.
+      - Removed the Pod tests from the distribution.
+
+0.53  2011-11-29T17:44:06Z
+      - Fixed a CSS issue where a `<pre>` block inside a list was getting the
+        first letter of its first line chopped off. Also, on Firefox, the text
+        of list items was appearing a line below the bullet, which was on a
+        horizontal line by itself. Thanks to Phillip Smith and Andrew Dunstan
+        for the reports.
+      - Added encoding detection to the description parsing in `get_desc()`.
+        Thanks to Masahiro Honma for the pull request.
+      - Properly parse class names with digits in them. Thanks to Masahiro
+        Honma for the pull request.
+      - Removed deprecated use of `qw(...)` as parentheses, which generates
+        warnings on Perl 5.14.
+
+0.52  2010-04-13T21:56:53
+      - Require File::Path 2.07, as that seems to be the earliest release
+        supporting `remove_tree()`.
+
+0.51  2010-04-13T16:24:24
+      - Updated build to add Pod to `bin/podsite` when creating the
+        distribution, rather than at install time. This should allow the
+        documentation to also show up on Perldoc sites.
+      - Updated the `README`.
+      - Added "Support" section to the docs.
+
+0.50  2010-04-12T21:08:39
+      - Changed name from Pod::Browser and pod_browser to Pod::Site and
+        podsite.
+      - Completely rewritten using pure CSS and JavaScript/jQuery solution, as
+        well as reliance on more recent versions of Pod::Simple that have been
+        updated to support the thigns we needed. The previous unreleased
+        versions are hardly worth noting anymore.
+
+0.30  [Unreleased]
+      - Added --app-name to the docs & make it required. Patch from Dave
+        Rolsky.
+      - Added --css-path, --js-path, & --img-path, which all default to the
+        current hard-coded options. The last one doesn't do anything yet,
+        since there's no processing of the css file. Patch from Dave Rolsky.
+      - Added --example-module. Patch from Dave Rolsky.
+      - Added call to mkpath($doc_root) before trying to write to it. Patch
+        from Dave Rolsky.
+      - No longer tries to generate docs for bin/ unless it exists. Patch
+        from Dave Rolsky.
+      - Don't look in blib/. Patch from Dave Rolsky.
+      - Fixed code that prevented classes with the same base file name from
+        being included in the output.
+      - Switched from Mason-based to JavaScript based. Added --base-uri to
+        specify the base URI for the browser.
+      - Switched to using Pod::Simple::XHTML, distributed with Pod::Simple
+        3.06, and no longer requiring a patch.
+
+0.20  [Unreleased]
+      - Initial version.

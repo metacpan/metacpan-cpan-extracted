@@ -1,0 +1,66 @@
+{
+   "abstract" : "Manipulate physics units and dimensions.",
+   "author" : [
+      "Christopher Maloney <voldrani@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Physics-Unit",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Physics::Unit" : {
+         "file" : "lib/Physics/Unit.pm",
+         "version" : "0.54"
+      },
+      "Physics::Unit::Scalar" : {
+         "file" : "lib/Physics/Unit/Scalar.pm",
+         "version" : "0.54"
+      },
+      "Physics::Unit::Script" : {
+         "file" : "lib/Physics/Unit/Script.pm",
+         "version" : "0.54"
+      },
+      "Physics::Unit::Script::GenPages" : {
+         "file" : "lib/Physics/Unit/Script/GenPages.pm",
+         "version" : "0.54"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Klortho/Physics-Unit/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Klortho/Physics-Unit"
+      }
+   },
+   "version" : "0.54",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

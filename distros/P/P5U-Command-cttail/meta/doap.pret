@@ -1,0 +1,19 @@
+# This file contains general metadata about the project.
+
+@prefix : <http://usefulinc.com/ns/doap#>.
+
+`P5U-Command-cttail`
+	:programming-language "Perl" ;
+	:shortdesc            "grep through the last 1000 cpan testers reports";
+	:homepage             <https://metacpan.org/release/P5U-Command-cttail>;
+	:download-page        <https://metacpan.org/release/P5U-Command-cttail>;
+	:repository           [ a :HgRepository; :browse <https://bitbucket.org/tobyink/p5-p5u-pommand-cttail> ];
+	:bug-database         <http://rt.cpan.org/Dist/Display.html?Queue=P5U-Command-cttail>;
+	:created              2013-03-06;
+	:license              <http://dev.perl.org/licenses/>;
+	:maintainer           cpan:TOBYINK;
+	:developer            cpan:TOBYINK.
+
+<http://dev.perl.org/licenses/>
+	dc:title  "the same terms as the perl 5 programming language system itself".
+

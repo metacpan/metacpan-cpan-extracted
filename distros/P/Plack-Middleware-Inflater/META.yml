@@ -1,0 +1,27 @@
+---
+abstract: 'Inflate gzipped PSGI requests'
+author:
+  - 'Fabrice Gabolde <fgabolde@weborama.com>'
+build_requires:
+  Plack::Test: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-Inflater
+requires:
+  IO::Scalar: '0'
+  IO::Uncompress::Gunzip: '0'
+  Plack::Middleware: '0'
+  Plack::Util: '0'
+  Plack::Util::Accessor: '0'
+  perl: '5.012'
+resources:
+  bugtracker: https://github.com/weborama/Plack-Middleware-Inflater/issues
+  repository: git://github.com/weborama/Plack-Middleware-Inflater.git
+version: '0.001'

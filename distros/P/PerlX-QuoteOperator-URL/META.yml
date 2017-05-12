@@ -1,0 +1,37 @@
+---
+abstract: 'Quote-like operator returning http request for the URL provided.'
+author:
+  - 'Barry Walsh, C<< <draegtun at cpan.org> >>'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0'
+  URI::file: '0'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, Dist::Milla version v1.0.14, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: PerlX-QuoteOperator-URL
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  LWP::Simple: '0'
+  PerlX::QuoteOperator: '0.05'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/draegtun/PerlX-QuoteOperator-URL/issues
+  homepage: https://github.com/draegtun/PerlX-QuoteOperator-URL
+  repository: https://github.com/draegtun/PerlX-QuoteOperator-URL.git
+version: '1.02'
+x_contributors:
+  - 'Barry Walsh <draegtun@googlemail.com>'
+  - 'Brian Rossmajer <BrianRossmajer@users.noreply.github.com>'

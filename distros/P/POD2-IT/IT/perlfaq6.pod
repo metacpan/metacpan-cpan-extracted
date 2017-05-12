@@ -1,0 +1,950 @@
+=head1 NOME
+
+perlfaq6 - Espressioni Regolari ($Revision: 1.14 $, $Date: 2006/02/11 03:50:44 $)
+
+=head1 DESCRIZIONE
+
+Questa sezione E<egrave> soprendentemente breve poichE<eacute> il resto delle FAQ
+E<egrave> inquinato da risposte riguardanti le espressioni regolari. Per
+esempio, la decodifica di una URL oppure il controllo se una stringa E<egrave>
+un numero sono operazione gestite tramite espressioni regolari, ma quelle
+risposte si trovano da altre parti (in L<perlfaq9>: "Come decodifico o creo
+quei %-codici sul web?" e L<perlfaq4>: "Come si fa a determinare se uno
+scalare E<egrave> un numero/naturale/intero/in virgola mobile?", per essere
+precisi).
+
+=head2 Come posso sperare di usare le espressioni regolari senza creare codice illeggibile e non manutenibile?
+X<regex, leggibile> X<regexp, leggibile>
+X<espressione regolare, leggibile> X</x>
+
+Ci sono tre tecniche che posso rendere le espressioni regolari manutenibili
+e comprensibili.
+
+=over 4
+
+=item Commenti all'esterno dell'espressione regolare
+
+Descrivete quello che fate e come lo fate, usando i normali commenti del Perl
+
+    # trasforma una linea nella prima parola di essa, seguita da
+    # un segno di "due punti" e il numero di caratteri del resto della
+    # linea
+    s/^(\w+)(.*)/ lc($1) . ":" . length($2) /meg;
+
+=item Commenti interni all'espressione regolare
+
+Il modificatore C</x> fa in modo che gli spazi vengano ignorati
+all'interno di un'espressione regolare (fatta eccezione per
+le classi di caratteri), inoltre permette di usare i normali
+commenti. Come potete immaginare, gli spazi e i commenti
+aiutano molto.
+
+C</x> vi consente di trasformare questo:
+
+    s{<(?:[^>'"]*|".*?"|'.*?')+>}{}gs;
+
+in questo:
+
+    s{ <                 # parentesi angolare aperta
+        (?:              # raggruppamento senza la creazione di riferimento
+                         #   all'indietro
+             [^>'"] *    # 0 o piu` cose che non sono un >, ne' un ' ne' un "
+                |        #    o altrimenti
+             ".*?"       # una sezione tra doppi apici (match non-greedy)
+                |        #    o altrimenti
+             '.*?'       # una sezione tra apici singoli (match non-greedy)
+        ) +              #   il tutto una o piu` volte
+       >                 # parentesi angolare chiusa
+    }{}gsx;              # sostituisci con nulla, cioe` cancella
+
+Non E<egrave> chiaro come un brano di prosa, ma E<egrave> molto utile per
+descrivere il significato di ciascuna parte del pattern.
+
+=item Delimitatori differenti
+
+BenchE<eacute> normalmente pensiamo a pattern delimitati da caratteri C</>,
+essi possono essere delimitati da quasi qualunque carattere.
+perlre descrive questo aspetto. Ad esempio, l'istruzione C<s///> usata
+sopra usa le parentesi come delimitatori. Scegliere un altro
+delimitatore puE<ograve> evitare la necessitE<agrave> di marcare il carattere
+affinchE<eacute> sia interpretato letteralmente:
+
+    s/\/usr\/local/\/usr\/share/g;    # cattiva scelta del delimitatore
+    s#/usr/local#/usr/share#g;        # scelta migliore
+
+=back
+
+=head2 Sto avendo dei problemi nel fare il match su piE<ugrave> di una linea. Cosa c'E<egrave> di sbagliato?
+X<regex, multilinea> X<regexp, multilinea> X<espressione regolare, multilinea>
+
+O non avete piE<ugrave> di una linea nella stringa che state prendendo in
+considerazione (verosimilmente), oppure non state usando il modificatore/i
+corretto nel vostro pattern (forse).
+
+Ci sono molti modi per ottenere dei dati con piE<ugrave> linee in una
+stringa. Se volete che ciE<ograve> avvenga automaticamente mentre leggete
+l'input, vorrete impostare $/ (verosimilmente a '' per i paragrafi oppure
+ad C<undef> per l'intero file) per darvi la possibilitaE<agrave> di leggere
+piE<ugrave> di una riga alla volta.
+
+Leggete L<perlre>: vi aiuterE<agrave> a decidere quale tra C</s> e C</m>
+(oppure entrambi) potreste voler usare: C</s> permette al punto di includere i
+ritorni a capo e C</m> permette al segno d'omissione (C<^>, NdT) ed al simbolo
+del dollaro di effettuare il match in prossimitE<agrave> di un
+ritorno a capo, non solo alla fine della stringa. Dovete tuttavia
+assicurarvi di avere veramente una stringa con piE<ugrave> linee.
+
+Per esempio, questo programma individua le parole duplicate, anche se esse
+sono ripartite tra le interruzioni di linea (ma non se lo sono tra le
+interruzioni dei paragrafi). Per questo esempio non ci serve C</s>,
+perchE<eacute> non stiamo usando il punto in un'espressione regolare
+che vogliamo attraversi i confini di linea. Non ci serve neppure C</m>
+perchE<eacute> non vogliamo che il segno d'omissione o il simbolo del
+dollaro effettuino il match in un qualsiasi punto all'interno del
+record vicino ai ritorni a capo. Ma E<egrave> imperativo che $/ sia
+impostato a qualcosa di diverso rispetto al valore predefinito, altrimenti
+non riusciremo mai a leggere un record composto da piE<ugrave> linee.
+
+    $/ = '';  		# memorizza piu` dell'intero paragrafo, non solo una linea
+    while ( <> ) {
+	while ( /\b([\w'-]+)(\s+\1)+\b/gi ) {  	# la parola inizia con un carattere alfanumerico
+	    print "$1 e` un duplicato, al paragrafo $.\n";
+	}
+   }
+
+Qui c'E<egrave> il codice che trova le frasi che iniziano con "From " ["da", NdT]
+(che dovrebbe essere storpiato da molti programmi di posta):
+
+    $/ = '';  		# memorizza piu` dell'intero paragrafo, non solo una linea
+    while ( <> ) {
+	while ( /^From /gm ) { # /m fa si` che ^ effettui un match vicino a \n
+	    print "primo from nel paragrafo $.\n";
+	}
+    }
+
+Qui c'E<egrave> il codice che trova ogni cosa tra START [inizio, NdT] ed
+END [fine, NdT] nel paragrafo:
+
+    undef $/;  		# memorizza l'intero file, non solo una linea od un paragrafo
+    while ( <> ) {
+	while ( /START(.*?)END/sgm ) { # /s fa si` che il . attraversi i confini di linea
+	    print "$1\n";
+	}
+    }
+
+=head2 Come posso tirar fuori le linee tra due pattern che sono loro stessi su linee diverse?
+X<..>
+
+Potete usare l'esotico operatore C<..> (documentato in L<perlop>):
+
+    perl -ne 'print if /INIZIO/ .. /FINE/' file1 file2 ...
+
+Se volevate il testo e non le linee, avreste dovuto usare:
+
+    perl -0777 -ne 'print "$1\n" while /INIZIO(.*?)FINE/gs' file1 file2 ...
+
+Ma se volete occorrenze innestate [inglese "nested", NdT] di
+C<INIZIO> e C<FINE>, vi scontrerete con il problema descritto nella
+domanda contenuta in questa sezione a proposito della ricerca di
+corrispondenze di testo bilanciato.
+
+Ecco un altro esempio d'uso di C<..>:
+
+    while (<>) {
+        $nell_header =   1  .. /^$/;
+        $nel_corpo   = /^$/ .. eof();
+    # ora scegliete
+    } continue {
+        reset if eof();    # mette a posto $.
+    }
+
+=head2 Ho messo un'espressione regolare in $/ ma non ha funzionato. Cosa c'E<egrave> di sbagliato?
+X<$/, regex in> X<$INPUT_RECORD_SEPARATOR, regex in>
+X<$RS, regex in>
+
+Fino a Perl 5.8.0, $/ deve essere una stringa. Questo potrebbe cambiare nel
+5.10, ma non ci sperate. Fino ad allora, potete usare questi esempi se davvero
+ne avete bisogno.
+
+Se avete File::Stream, questo E<egrave> semplice.
+
+	 use File::Stream;
+         my $stream = File::Stream->new(
+                  $filehandle,
+                  separator => qr/\s*,\s*/,
+         );
+
+	 print "$_\n" while <$stream>;
+
+Se non avete File::Stream, dovete fare un po' piE<ugrave> di lavoro.
+
+Potete usare la forma a quattro argomenti di sysread per aggiungere ininterrottamente
+in un buffer. Dopo che avete aggiunto al buffer, controllate se avete una
+linea completa (usando la vostra espressione regolare).
+
+       local $_ = "";
+       while( sysread FH, $_, 8192, lunghezza ) {
+          while( s/^((?s).*?)il_vostro_pattern/ ) {
+             my $record = $1;
+             # qui vanno le cose da fare.
+          }
+       }
+
+Potete fare la stessa cosa con il foreach ed un match usando il flag c e
+l'anchor \G, se non vi importa che il vostro intero file sia in memoria
+alla fine. 
+
+       local $_ = "".
+       while( sysread FH, $_, 8192, lunghezza ) {
+          foreach my $record ( m/\G((?s).*?)il_vostro_pattern/gc ) {
+             # qui vanno le cose da fare.
+          }
+          substr( $_, 0, pos ) = "" if pos;
+       }
+
+=head2 Come posso effettuare delle sostituzioni non tenendo conto di maiuscole e minuscole nel lato sinistro e tenendone invece conto nel lato destro?
+X<replace, case preserving> X<sostituire, case preserving>
+X<sostituzione, case preserving> X<s, case preserving>
+
+Ecco una deliziosa soluzione a-la Perl di Larry Rosler. Essa sfrutta le
+proprietE<agrave> a livello di bit dello xor sulle stringhe ASCII
+
+    $_= "questo e` un TEsT";
+
+    $vecchio = 'test';
+    $nuovo = 'successo';
+
+    s{(\Q$vecchio\E)}
+     { uc $nuovo | (uc $1 ^ $1) .
+	(uc(substr $1, -1) ^ substr $1, -1) x
+	    (length($nuovo) - length $1)
+     }egi;
+
+    print;
+
+E qui sotto forma di subroutine, modellata in base a quanto sopra:
+
+    sub preserva_maiuscole_minuscole($$) {
+        my ($vecchio, $nuovo) = @_;
+        my $maschera = uc $vecchio ^ $vecchio;
+
+        uc $nuovo | $maschera .
+            substr($maschera, -1) x (length($nuovo) - length($vecchio))        
+    }
+
+    $a = "questo e` un TEsT";
+    $a =~ s/(test)/preserva_maiuscole_minuscole($1, "successo")/egi;
+    print "$a\n";
+
+Questo stampa:
+
+    questo e` un SUcCESSO
+
+Come alternativa, per mantenere le maiuscole/minuscole della parola
+sostituita se E<egrave> piE<ugrave> lunga dell'originale, potete usare
+questo codice, di Jeff Pinyan:
+
+    sub preserva_maiuscole_minuscole {
+      my ($partenza, $arrivo) = @_;
+      my ($lp, $la) = map length, @_;
+
+      if ($la < $lp) { $partenza = substr $partenza, 0, $la }
+      else { $partenza .= substr $arrivo, $lp }
+
+      return uc $arrivo | ($partenza ^ uc $partenza);
+    }
+
+Questo cambia la frase in "questo e` un SUcCesso".
+
+Tanto per mostrare che i programmatori C possono scrivere C in un qualunque
+linguaggio di programmazione, se preferite una soluzione maggiormente in
+stile C, il seguente script fa sE<igrave> che le sostituzioni abbiano le
+stesse maiuscole/minuscole, lettera per lettera, dell'originale (PuE<ograve>
+anche capitare che questo venga eseguito circa il 240% piE<ugrave>
+lentamente di quello che fa la soluzione a-la Perl). Se la sostituzione
+ha piE<ugrave> caratteri della stringa che si sta sostituendo, le
+maiuscole/minuscole dell'ultimo carattere sono usate per il resto della
+sostituzione.
+
+    # Originale di Nathan Torkington, rimaneggiato da Jeffrey Friedl
+    #
+    sub preserva_miuscole_minuscole($$)
+    {
+        my ($vecchio, $nuovo) = @_;
+        my ($stato) = 0; # 0 = nessun cambiamento; 1 = lc; 2 = uc
+        my ($i, $lungvecchio, $lungnuovo, $c) = (0, length($vecchio), length($nuovo));
+        my ($lung) = $lungvecchio < $lungnuovo ? $lungvecchio : $lungnuovo;
+
+        for ($i = 0; $i < $lung; $i++) {
+            if ($c = substr($vecchio, $i, 1), $c =~ /[\W\d_]/) {
+                $stato = 0;
+            } elsif (lc $c eq $c) {
+                substr($nuovo, $i, 1) = lc(substr($nuovo, $i, 1));
+                $stato = 1;
+            } else {
+                substr($nuovo, $i, 1) = uc(substr($nuovo, $i, 1));
+                $stato = 2;
+            }
+        }
+        # termina con ogni nuovo rimanente (per quando nuovo e` piu` lungo di vecchio)
+        if ($lungnuovo > $lungvecchio) {
+            if ($stato == 1) {
+                substr($nuovo, $lungvecchio) = lc(substr($nuovo, $lungvecchio));
+            } elsif ($state == 2) {
+                substr($nuovo, $lungvecchio) = uc(substr($nuovo, $lungvecchio));
+            }
+        }
+        return $nuovo;
+    }
+
+=head2 Come si puE<ograve> far fare a C<\w> un match del set di caratteri nazionale?
+X<\w>
+
+Inserite C<use locale;> nel vostro script. La classe di caratteri \w E<egrave>
+presa dal locale corrente.
+
+Consultate L<perllocale> per dettagli.
+
+=head2 Come si puE<ograve> creare una versione localizzata di C</[a-zA-Z]/>?
+X<alpha>
+
+Potete utilizzare la sintassi POSIX per le classi di caratteri
+C</[[:alpha:]]/>, documentata in L<perlre>.
+
+Indipendentemente dal locale in cui vi trovate, i caratteri alfabetici
+sono i caratteri in \w senza le cifre e l'underscore. A Livello di
+espressione regolare, ciE<ograve> significa C</[^\W\d_]/>. Il suo complemento,
+i caratteri non-alfabetici, E<egrave> rappresentato da tutto ciE<ograve>
+che E<egrave> contenuto in \W con aggiunte le cifre e l'underscore,
+o C</[\W\d_]/>.
+
+=head2 Come si puE<ograve> fare il quote di una variabile da usare in una regex?
+X<regex, escaping> X<regexp, escaping> X<espressione regolare, escaping>
+
+Il parser del Perl espanderE<agrave> i riferimenti a $variabile e @variabile
+in espressioni regolari a meno che il delimitatore sia un singolo quote [un
+apice, NdT]. Ricordate inoltre che il lato destro di una sostituzione
+C<s///> viene considerato come una stringa doppiamente quotata (delimitata
+da virgolette, NdT) (si veda L<perlop> per maggiori dettagli). Ricordate
+anche che ogni carattere speciale delle regex avrE<agrave> affetto, a meno
+che non si preceda la sostituzione con \Q. Di seguito un esempio:
+
+    $stringa = "Placido P. Octopus";
+    $regex  = "P.";
+
+    $stringa =~ s/$regex/Polyp/;
+    # $stringa e` ora "Polypacido P. Octopus"
+
+Siccome C<.> E<egrave> un carattere speciale per quanto riguarda le
+espressioni regolari, e puE<ograve> trovare qualsiasi carattere, la
+regex C<P.> qui ha trovato il <Pl> contenuto nella stringa originale.
+
+Per effettuare l'escaping del significato speciale di C<.>, utilizziamo
+C<\Q>:
+
+    $stringa = "Placido P. Octopus";
+    $regex  = "P.";
+
+    $stringa =~ s/\Q$regex/Polyp/;
+    # $string e` ora "Placido Polyp Octopus"
+
+L'utilizzo di C<\Q> fa si che il <.> contenuto nell'espressione regolare
+sia trattato come un carattere regolare, cosicchE<eacute> C<P.> possa
+trovare una C<P> seguita da un punto.
+
+=head2 A cosa serve realmente C</o>?
+X</o>
+
+L'uso di una variabile in un match di un'espressione regolare forza una
+rivalutazione (e probabilmente ricompilazione) ogni qualvolta ci si imbatte
+nell'espressione regolare. Il modificatore C</o> vincola la regex la prima
+volta che viene usata. Questo avviene sempre in una espressione regolare
+costante, ed infatti il pattern viene compilato nel formato interno al
+momento della compilazione dell'intero programma.
+
+L'uso di C</o> E<egrave> irrilevante a meno che l'interpolazione di variabili
+non venga utilizzata nel pattern e, se E<egrave> cosE<igrave>, il motore
+delle regex non saprE<agrave> nE<eacute> si interesserE<agrave> di eventuali
+variazione delle variabili dopo la I<primissima> valutazione del pattern.
+
+C</o> viene usato spesso per ottenere un ulteriore grado di efficienza,
+non eseguendo le valutazioni successive quando sapete che la cosa non
+avrE<agrave> importanza (perchE<eacute> sapete che le variabili
+non cambieranno), oppure, piE<ugrave> di rado, quando non volete che
+la regex si accorga se le variabili cambiano.
+
+Per esempio, ecco un programma "paragrep":
+
+    $/ = '';  # modalita` paragrafo
+    $pat = shift;
+    while (<>) {
+        print if /$pat/o;
+    }
+
+=head2 Come faccio ad usare un'espressione regolare per togliere da un file i commenti in stile C?
+
+BenchE<eacute> ciE<ograve> possa effettivamente essere realizzato, E<egrave>
+molto piE<ugrave> difficile di quanto potreste pensare. Per esempio, questo
+programma di una sola riga
+
+    perl -0777 -pe 's{/\*.*?\*/}{}gs' pippo.c
+
+funzionerE<agrave> in molti casi, ma non in tutti. Vedete, E<egrave> troppo
+ingenuo per certi tipi di programmi C, in particolare quelli che 
+contengono ciE<ograve> che sembrano essere commenti all'interno di stringhe
+incluse tra virgolette. Per questo, avreste bisogno di qualcosa come questo,
+creato da Jeffrey Friedl ed in seguito modificato da Fred Curtis.
+
+    $/ = undef;
+    $_ = <>;
+    s#/\*[^*]*\*+([^/*][^*]*\*+)*/|("(\\.|[^"\\])*"|'(\\.|[^'\\])*'|.[^/"'\\]*)#defined $2 ? $2 : ""#gse;
+    print;
+
+Questo, naturalmente, potrebbe essere piE<ugrave> leggibile con il
+modificatore C</x>, aggiungendovi spazi e commenti. Eccolo espanso, per
+cortese concessione di Fred Curtis.
+
+    s{
+       /\*         ##  Inizio di un commento /* ... */
+       [^*]*\*+    ##  Non-* seguito da 1-o-piu` *
+       (
+         [^/*][^*]*\*+
+       )*          ##  0-o-piu` cose che non iniziano con /
+                   ##    ma terminano con '*'
+       /           ##  Fine di un commento of /* ... */
+     |         ##     OPPURE  diverse cose che non sono commenti:
+       (
+         "           ##  Inizio di una stringa " ... "
+         (
+           \\.           ##  Carattere preceduto da \
+         |               ##    OPPURE
+           [^"\\]        ##  Non "\
+         )*
+         "           ##  Fine di una stringa " ... "
+       |         ##     OPPURE
+         '           ##  Inizio di una stringa ' ... '
+         (
+           \\.           ##  Carattere preceduto da \
+         |               ##    OPPURE
+           [^'\\]        ##  Non '\
+         )*
+         '           ##  Fine di una stringa ' ... '
+       |         ##     OPPURE
+         .           ##  Qualsiasi altro carattere
+         [^/"'\\]*   ##  Caratteri che non sono l'inizio di un commento, non cominciano una stringa, non sono il carattere \
+       )
+     }{defined $2 ? $2 : ""}gxse;
+
+Una piccola modifica rimuove anche i commenti C++:
+
+    s#/\*[^*]*\*+([^/*][^*]*\*+)*/|//[^\n]*|("(\\.|[^"\\])*"|'(\\.|[^'\\])*'|.[^/"'\\]*)#defined $2 ? $2 : ""#gse;
+
+=head2 Posso usare le espressioni regolari di Perl per fare il match di testo bilanciato?
+X<regex, fare il match di testo bilanciato> X<regexp, fare il match di testo bilanciato>
+X<espressione regolare, fare il match di testo bilanciato>
+
+Storicamente, le espressioni regolari di Perl non erano in grado di fare
+il match di testo bilanciato. Dalle piE<ugrave> recenti versioni di perl,
+inclusa la 5.6.1, sono state aggiunte caratteristiche sperimentali che
+rendono possibile la sua realizzazione. Consultate la documentazione per il
+costrutto (??{ }) nelle recenti pagine di perlre per vedere un esempio di
+parentesi bilanciate che eseguono un match. Assicuratevi di prestare
+speciale attenzione agli avvertimenti presenti nel manuale prima di
+utilizzare questa caratteristica.
+
+CPAN contiene molti moduli che possono essere utili per effettuare match
+di testo dipendenti dal contesto. Damian Conway fornisce alcuni utili
+pattern in Regexp::Common. Il modulo Text::Balanced fornisce una soluzione
+generale a questo problema.
+
+Una delle comuni applicazioni del match di testo bilanciato E<egrave>
+lavorare con XML e HTML. Sono a disposizione molti moduli che supportano
+queste esigenze. Due esempi sono HTML::Parser e XML::Parser. Ce ne sono
+molti altri.
+
+Un'elaborata subroutine (esclusivamente per ASCII a 7 bit) per estrarre
+singoli caratteri bilanciati ed eventualmente annidati, come C<`> e C<'>,
+C<{> e C<}> oppure C<(> e C<)>, puE<ograve> essere trovata all'indirizzo
+http://www.cpan.org/authors/id/TOMC/scripts/pull_quotes.gz .
+
+Il modulo C::Scan su CPAN contiene anch'esso tali subroutine per uso
+interno, ma non sono documentate.
+
+=head2 Cosa significa che un'espressione regolare E<egrave> avida (greedy)? Come posso evitarlo?
+X<greedy> X<avida>
+
+La maggior parte delle persone pensano che le espressioni regolari avide
+effettuino piE<ugrave> match possibili. Tecnicamente parlando, sono
+effettivamente i quantificatori (C<?>, C<*>, C<+>, C<{}>) ad essere avidi,
+piuttosto che l'intero pattern; il Perl preferisce un'aviditE<agrave> locale e
+un'immediata gratificazione rispetto ad una aviditE<agrave> generale.
+Per ottenere versioni non avide degli stessi quantificatori,
+usate (C<??>, C<*?>, C<+?>, C<{}?>).
+
+Un esempio:
+
+        $s1 = $s2 = "Ho molto molto freddo";
+        $s1 =~ s/mo.*o //;      # Ho freddo
+        $s2 =~ s/mo.*?o //;     # Ho molto freddo
+
+Notate come la seconda sostituzione abbia fermato il match non appena
+ha trovato "o ". Il quantificatore C<*?> in realtE<agrave> dice al
+motore delle espressioni regolari di trovare una corrispondenza il
+piE<ugrave> presto possibile e di passare il controllo a qualsiasi cosa
+si trovi nella linea che segue, come fareste se steste giocando con una
+patata bollente.
+
+=head2 Come faccio ad elaborare ciascuna parola di ogni linea?
+X<parola>
+
+Usate la funzione split:
+
+    while (<>) {
+        foreach $parola ( split ) {
+            # qui fate qualcosa con $parola
+        }
+    }
+
+Notate che non si tratta di una parola nel senso della lingua inglese
+(e nemmeno di quella italiana ovviamente, NdT): E<egrave> soltanto un
+raggruppamento di caratteri consecutivi che non sono spazi.
+
+Per lavorare solo con sequenze alfanumeriche (che includono il carattere
+underscore ("_", NdT) ), potreste considerare l'utilizzo di
+
+    while (<>) {
+        foreach $parola (m/(\w+)/g) {
+            # qui fate qualcosa con $parola
+        }
+    }
+
+=head2 Come posso stampare un sommario in base alla frequenza delle parole oppure delle linee?
+
+Per fare questo, dovete analizzare sintatticamente ogni parola nel flusso
+di input. Faremo finta che per parola intendiate un gruppo di caratteri
+alfabetici, trattini o apostrofi, piuttosto che l'idea di parola senza
+spazi, data nel quesito precedente:
+
+    while (<>) {
+        while ( /(\b[^\W_\d][\w'-]+\b)/g ) {   # non prende "`pecora'"
+            $visti{$1}++;
+        }
+    }
+    while ( ($parola, $conta) = each %visti ) {
+        print "$conta $parola\n";
+    }
+
+Se volete fare la stessa cosa per le linee, non dovreste aver bisogno di
+un'espressione regolare:
+
+    while (<>) {
+        $visti{$_}++;
+    }
+    while ( ($linea, $conta) = each %visti ) {
+        print "$conta $linea";
+    }
+
+Se volete che l'output sia ordinato, consultate L<perlfaq4>:
+"Come si ordina un hash (opzionalmente per valore invece che per chiave)?"
+
+=head2 Come posso fare un match approssimato?
+X<match, approssimato> X<matching, approssimato>
+
+Date un'occhiata al modulo String::Approx disponibile su CPAN.
+
+=head2 Come posso fare, in maniera efficiente, un match di piE<ugrave> espressioni regolari alla volta?
+X<regex, efficienza> X<regexp, efficienza>
+X<espressione regolare, efficienza>
+
+(contributo di brian d foy )
+
+Evitando di chiedere al Perl di compilare una espressione regolare 
+ogni qualvolta volete effettuarne il match. In questo esempio, perl deve 
+ricompilare l'espressione regolare per ogni iterazione del ciclo foreach(), 
+visto che non ha modo di conoscere cosa sarE<agrave> $pattern.
+
+    @pattern = qw( foo bar baz );
+    
+    LINE: while( <> ) 
+    	{
+		foreach $pattern ( @pattern ) 
+		{
+	    		print if /\b$pattern\b/i;
+	    		next LINE;
+	   	}
+	}
+
+L'operatore qr// comparE<igrave> nel perl 5.005. Esso compila 
+una espressione regolare, ma non la usa. Quando utilizzate la 
+versione precompilata della espressione regolare, il perl compie 
+meno lavoro. In questo esempio, si E<egrave> inserito un map() per 
+convertire ogni pattern nella sua forma precompilata. Il resto dello 
+script E<egrave> lo stesso, ma piE<ugrave> veloce.
+
+    @pattern = map { qr/\b$_\b/i } qw( pippo pluto paperino );
+
+    LINE: while( <> ) 
+    	{
+		foreach $pattern ( @pattern ) 
+		{
+	    		print if /\b$pattern\b/i;
+	    		next LINE;
+	   	}
+	}
+
+In alcuni casi, potreste essere in grado di comporre diversi pattern in 
+una singola espressione regolare. Tuttavia fate attenzione a situazioni che 
+richiedono il backtracking.
+
+	$espres_reg = join '|', qw( pippo pluto paperino );
+
+    LINE: while( <> ) 
+    	{
+		print if /\b(?:espres_reg)\b/i;
+	}
+
+Per maggiori dettagli sull'efficienza delle espressioni regolari, consultate 
+Mastering Regular Expressions di Jeffrey Freidl. Egli spiega come funziona il 
+motore delle espressioni regolari e perchE<eacute> alcuni pattern sono 
+sorprendentemente inefficienti. Una volta che avete capito come il perl 
+usa le espressioni regolari, potete regolarle per le singole situazioni.
+
+=head2 PerchE<eacute> non mi funzionano le ricerche del limite di una parola effettuate con C<\b>?
+
+(contributo di brian d foy)
+
+Assicuratevi di conoscere cosa significhi davvero \b: E<egrave> il confine tra un 
+carattere di una parola, \w, e qualcosa che non E<egrave> il caratter di una parola.
+Questa cosa che non E<egrave> il carattere di una parola potrebbe essere \W ma puE<ograve> 
+essere anche l'inizio o la fine della stringa.
+
+Non E<egrave> il confine tra spazi e non-spazi, e non sono quelle cose tra le parole 
+che usiamo per creare frasi.
+
+Con il gergo delle espressioni regolari, un confine di parola (\b) E<egrave> una "zero width assertion" 
+[asserzione di ampiezza zero, NdT], che sta a significare che non rappresenta un carattere nella 
+stringa ma una condizione in una certa posizione.
+
+Per l'espressione regolare, /\bPerl\b/, ci deve essere un confine di parola prima della "P" e dopo la "l".
+Fino a che qualcosa di diverso da un carattere di parola precede la "P" e segue la "l", il pattern 
+effetuerE<agrave> il match. Queste stringhe effettuano il match con /\bPerl\b/.
+
+	"Perl"    # nessun carattere di parola prima di P o dopo l
+	"Perl "   # come il precedente (lo spazio non e` un carattere di parola)
+	"'Perl'"  # il carattere ' non e` un carattere di parola)
+	"Perl's"  # nessun carattere di parola prima di P, nessun carattere di parola dopo "l"
+
+Queste stringhe non effettuano il match con /\bPerl\b/.
+
+	"Perl_"   # _ e` un carattere di parola!
+	"Perler"  # nessun carattere di parola prima di P ma uno dopo l
+
+Tuttavia non dovete usare \b per effettuare il match di parole. Potete cercare i caratteri non-parola 
+con ai lati dei caratterei di parola. Queste stringhe effettuano il match /\b'\b/.
+
+	"don't"   # il carattere ' ha ai lati "n" e "t"
+	"qep'a'"  # il carattere ' ha ai lati "p" e "a"
+
+Queste stringhe effettueranno il match con /\b'\b/.
+
+	"foo'"    # non c'e` alcun carattere di parola dopo la non-parola '
+
+Per specificare che non ci dovrebbe essere un confine di parola, potete anche usare 
+il complementare di \b, \B.
+
+Nel patter /\Bam\B/, ci deve essere un carattere di parola prima della "a" 
+e dopo la "m". Queste stringhe effettueranno il match con /\Bam\B/:
+
+	"llama"   # "am" ha ai lati dei caratteri di parola
+	"Samuel"  # stessa cosa
+	
+Queste non stringhe effettueranno il match con /\Bam\B/
+
+	"Sam"      # non c'e` confine di parola prima di "a", ma ce n'e` uno dopo "m"
+	"I am Sam" # "am" ha ai lati dei caratteri di non-parola
+
+
+=head2 PerchE<eacute> utilizzare $&, $` o $' rallenta il mio programma?
+X<$MATCH> X<$&> X<$POSTMATCH> X<$'> X<$PREMATCH> X<$`>
+
+(contributo di Anno Siegel)
+
+Quando Perl si accorge che vi occorre una di queste variabili, ovunque nel
+vostro programma, le fornisce in ogni operazione di 'pattern matching'
+[corrispondenza/ricerca di uno schema, NdT].
+Questo significa che su ogni pattern match, l'intera stringa verrE<agrave>
+copiata, una parte di essa in $`, un'altra in $& e un'altra in $'.
+Dunque la penalitE<agrave> E<egrave> estremamente severa con stringhe lunghe e pattern di cui
+si ha spesso un match. Se potete, evitate di usare $&, $' e $`, ma se non potete
+evitarlo, una volta che le avete usate allora usatele quanto volete, perchE<eacute> ne avete
+giE<agrave> pagato il prezzo. Tenete presente che alcuni algoritmi
+apprezzano molto l'uso di queste variabili. A partire dalla versione 5.005,
+la variabile $& non E<egrave> cosE<igrave> "costosa" quanto le altre due.
+
+A partire dal Perl 5.6.1, le variabili speciali @- e @+ possono rimpiazzare come funzionalitE<agrave>
+$`, $& e $'. Questi array contengono dei puntatori all'inizio e fine di ogni match (consultate perlvar
+per l'intera faccenda), dunque vi danno essenzialmente la stessa informazione ma senza rischiare di
+copiare troppe stringhe.
+
+=head2 A cosa serve C<\G> in un'espressione regolare?
+X<\G>
+
+Usate l'anchor C<\G> per iniziare il prossimo match sulla stessa stringa
+dove E<egrave> finito l'ultimo match. Il motore delle espressioni regolari,
+con questa anchor, non puE<ograve> tralasciare alcun carattere per trovare
+il prossimo match, dunque C<\G> E<egrave> analogo all'anchor dell'inzio
+di stringa, C<^>. L'anchor C<\G> viene usato tipicamente con il flag g.
+Esso utilizza il valore di pos() per decidere la posizione da cui far partire
+il match seguente. Come l'operatore di match che esegue match consecutivi,
+esso aggiorna pos() con la posizione del successivo carattere dopo l'ultimo
+match (oppure il primo carattere del match successivo, dipende da come
+preferite vedere la cosa). Ogni stringa ha il proprio valore di pos().
+
+Supponiamo vogliate fare un match di coppie consecutive di cifre in una
+stringa come "1122a4" e finire di cercare quando trovate caratteri che
+non sono cifre. Volete trovare C<11> e C<22> ma la lettera <a> appare
+tra C<22> e C<44> e volete fermarvi alla C<a>. Una semplice ricerca delle
+coppie di cifre salta la C<a> e trova C<44>.
+
+    $_ = "1122a44";
+    my @coppie = m/(\d\d)/g;   # qw( 11 22 44 )
+
+Se utilizzate l'anchor \G, forzate la ricerca dopo C<22> ad iniziare dalla
+C<a>. L'espressione regolare non puE<ograve> effettuare alcun match
+lE<igrave>, poichE<eacute> non trova una cifra, e dunque la ricerca
+successiva fallisce e l'operatore di matching ritorna le coppie che
+ha trovato in precedenza.
+
+    $_ = "1122a44";
+    my @coppie = m/\G(\d\d)/g; # qw( 11 22 )
+
+Potete anche usare l'anchor C<\G> in un contesto scalare. Avete
+ugualmente bisogno del flag C<g>.
+
+    $_ = "1122a44";
+    while( m/\G(\d\d)/g )
+        {
+        print "Trovato $1\n";
+        }
+       
+Dopo che il match fallisce alla lettera C<a>, il perl reinizializza pos()
+ed il successivo match sulla stessa stringa parte all'inizio.
+
+    $_ = "1122a44";
+    while( m/\G(\d\d)/g )
+        {
+        print "Trovato $1\n";
+        }
+    print "Trovato $1 dopo il while" if m/(\d\d)/g; # trova "11"
+
+Potete disabilitare il reinizializzarsi di pos() in caso di fallimento
+utilizzando il flag C<c>. Match successivi iniziano dove finisce l'ultimo
+match che ha avuto successo (il valore di pos()) anche se nel frattempo
+E<egrave> fallito un match sulla stessa stringa. In questo caso, il match
+dopo il ciclo while() inizia alla a (dove si E<egrave> fermato l'ultimo
+match) e poichE<eacute> non usa alcuna anchor, puE<ograve> tralasciare
+la C<a> per trovare "44".
+
+    $_ = "1122a44";
+    while( m/\G(\d\d)/gc )
+        {
+        print "Trovato $1\n";
+        }
+    print "Trovato $1 dopo il while" if m/(\d\d)/g; # trova "44"
+
+Tipicamente si usa l'anchor C<\G> con il flag C<c> quando si vuole tentare
+un match differente se ne fallisce uno, come in un analizzatore lessicale.
+Jeffrey Friedl offre questo esempio che funziona sul 5.004 o successivi.
+
+    while (<>) {
+      chomp;
+      ANALIZZATORE_SINTATTICO: {
+           m/ \G( \d+\b    )/gcx   && do { print "numero: $1\n";  redo; };
+           m/ \G( \w+      )/gcx   && do { print "parola:   $1\n"; redo; };
+           m/ \G( \s+      )/gcx   && do { print "spazio:  $1\n";  redo; };
+           m/ \G( [^\w\d]+ )/gcx   && do { print "altro:  $1\n";  redo; };
+      }
+    }
+
+Per ogni linea, il ciclo dell'ANALIZZATORE_SINTATTICO prima cerca di
+effettuare il match di una serie di cifre seguite da un confine di parola.
+Questo match deve iniziare alla posizione dove l'ultimo match ha terminato
+(oppure all'inizio della stringa nel primo match). PoichE<eacute>
+C<m/ \G( \d+\b )/gcx> utilizza il flag C<c>, se la stringa non soddisfa
+l'espressione regolare, il perl non reinizializza pos() ed il match
+successivo inizia alla stessa posizione per tentare un pattern differente.
+
+=head2 Le espressioni regolari del Perl sono DFA o NFA? Sono aderenti allo standard POSIX?
+X<DFA> X<NFA> X<POSIX>
+
+Nonostante sia vero che le espressioni regolari del Perl assomiglino ai
+DFA (Deterministic Finite Automata, Automa Deterministico a Stati Finiti)
+del programma egrep(1), in pratica sono implementate come NFA
+(Non-deterministic Finite Automata, Automa Non-deterministico a Stati
+Finiti) per consentire il backtracking e il backreferencing (*). E non
+sono nello stile di POSIX, perchE<eacute> queste garantiscono il
+comportamento del caso peggiore in tutti i casi (sembra che qualcuno
+preferisca garanzie di coerenza, anche quando ciE<ograve> che viene
+garantito E<egrave> la lentezza). Consultate il libro "Mastering Regular
+Expressions" [Padroneggiare le espressioni regolari, NdT] (O'Reilly) di 
+Jeffrey Friedl per tutti i dettagli che potete mai sperare di conoscere 
+sulla questione (il riferimento completo al libro si trova nella pagina 
+L<perlfaq2>).
+
+(*) NdT: il backreferencing E<egrave> l'utilizzo di riferimenti a subpattern
+usati in precedenza nella stessa espressione, come in C</(d)1/>.
+
+=head2 Cosa c'E<egrave> di sbagliato ad usare grep o map in un contesto vuoto? 
+X<grep>
+
+Il problema E<egrave> che grep costruisce una lista, senza badare al
+contesto. Questo significa che lascerete a Perl tutti i grattacapi
+relativi alla costruzione di una lista, per poi buttarla via. Se la lista
+E<egrave> grande, sprecherete tempo e spazio. Se il vostro obiettivo
+E<egrave> quello di iterare nella lista allora usate un ciclo for opportuno.
+
+In perl piE<ugrave> vecchi del 5.8.1, anche map soffre di questo problema. Ma
+a partire da perl 5.8.1 questo problema E<egrave> stato risolto, e map
+riconosce il contesto in cui viene utilizzato - in contesto
+vuoto non viene costruita alcuna lista.
+
+=head2 Come posso effettuare il match di stringhe contenenti caratteri multibyte?
+X<regex, e caratteri multibyte> X<regexp, e caratteri multibyte>
+X<espressione regolare, e caratteri multibyte>
+
+A partire da Perl 5.6, il Perl ha avuto un certo livello di supporto ai
+caratteri multibyte. Si raccomanda il Perl 5.8 o successivo. Le raccolte di
+caratteri multibyte supportate includono Unicode e le codifiche precedenti
+(per questioni di compatibilitE<agrave> attraverso il modulo Encode.
+Consultate L<perluniintro>, L<perlunicode>, ed L<Encode>.
+
+Se siete E<egrave> fermi alle vecchie versioni di Perl, potete fare
+Unicode con il modulo C<Unicode::String> e la conversione di caratteri
+usando i moduli C<Unicode::Map8> e C<Unicode::Map>. Se si stanno usando
+codici giapponesi, potreste provare ad utilizzare jperl 5.005_03.
+
+Infine, il seguente insieme di approcci viene fornito da Jeffrey Friedl,
+il cui articolo sul numero #5 di The Perl Journal parla di questo stesso
+argomento.
+
+Supponiamo abbiate qualche strano codice Marziano nel quale le coppie di
+lettere maiuscole ASCII codificano le singole lettere Marziane
+(cioE<egrave> i due byte "CV" formano una singola lettera Marziana,
+come pure fanno i due byte "SG", "VS", "XX", ecc.). Gli altri byte
+rappresentano singoli caratteri, proprio come in ASCII.
+
+Dunque, la stringa in marziano "Io sono CVSGXX!" utilizza 15 byte
+per codificare i dodici caratteri 'I', 'o', ' ', 's', 'o', 'n', 'o', ' ',
+'CV', 'SG', 'XX', '!'.
+
+Ora, diciamo che si vuole cercare il singolo carattere C</GX/>. Perl non
+conosce il Marziano, dunque troverE<agrave> i due byte "GX" nella stringa
+"Io sono CVSGXX!", anche se quel carattere non E<egrave> lE<igrave>:
+gli assomiglia solamente perchE<eacute> "SG" E<egrave> vicino a "XX",
+ma non c'E<egrave> alcun vero "GX". Questo E<egrave> un grosso problema.
+
+Qui di seguito ci sono alcuni modi, tutti gravosi, per occuparsi di
+ciE<ograve>:
+
+    $marziano =~ s/([A-Z][A-Z])/ $1 /g; # Ci si assicura che i byte
+                                        # "marziani" adiacenti
+                                        # non siano ancora adiacenti
+
+    print "GX trovato!" if $marziano =~ /GX/;
+
+Oppure cosE<igrave>:
+
+    @caratteri = $marziano =~ m/([A-Z][A-Z]|[^A-Z])/g;
+    # quanto scritto sopra e` concettualmente
+    # simile a:    @caratteri = $testo =~ m/(.)/g;
+    #
+    foreach $carattere (@caratteri) {
+        print "GX trovato!", last if $carattere eq 'GX';
+    }
+
+Oppure cosE<igrave>:
+
+    while ($marziano =~ m/\G([A-Z][A-Z]|.)/gs) {# \G E<egrave> probabilmente inutile
+        print "GX trovato!\n", last if $1 eq 'GX';
+    }
+
+Ecco un altro modo, un po' meno ripido, per risolvere il problema,
+opera di Bejamin Goldberg, che usa una zero-width negative look-behind assertion 
+[asserzione negativa di ampiezza zero con ricerca all'indietro, NdT]
+
+	print "GX trovato!\n" if	$marziano =~ m/
+		   (?<![A-Z])
+		   (?:[A-Z][A-Z])*?
+		   GX
+		/x;
+
+Questa soluzione ha successo se il carattere "marziano" GX E<egrave>
+contenuto nella stringa, mentre fallisce in tutti gli altri casi. Se
+non vi garba l'utilizzo di (?!>), una zero-width negative
+look-behind assertion, potete sostituire (?!<[A-Z]) con
+(?:^|[^A-Z]).
+
+Questo sistema ha l'effetto collaterale di inserire la cosa sbagliata
+din $-[0] e $+[0], ma di solito si puE<ograve> aggirare questo problema.
+
+=head2 Come faccio a trovare corrispondenze ad un pattern inserito dall'utente?
+
+Beh, se si tratta veramente di un pattern, allora usate semplicemente:
+
+    chomp($pattern = <STDIN>);
+    if ($linea =~ /$pattern/) { }
+
+Alternativamente, poichE<eacute> non E<egrave> garantito che quella che
+l'utente ha inserito sia un'espressione regolare valida, catturate
+l'eccezione in questo modo:
+
+    if (eval { $linea =~ /$pattern/ }) { }
+
+Se quello che volete fare in realtE<agrave> si riduce alla ricerca di una
+stringa, e non di un pattern, allora dovreste usare la funzione index(),
+che E<egrave> fatta per la ricerca di stringhe, oppure, se non potete fare
+a meno di usare un pattern dove non serve, assicuratevi di usare
+C<\Q>...C<\E>, documentato in L<perlre>.
+
+    $pattern = <STDIN>;
+    open (FILE, $input) or die "Non posso aprire il file $input: $!";
+    while (<FILE>) {
+        print if /\Q$pattern\E/;
+    }
+    close FILE;
+
+=head1 AUTORE E COPYRIGHT
+
+Copyright (c) 1997-2006 Tom Christiansen, Nathan Torkington e altri autori menzionati.
+Tutti i diritti riservati.
+
+Questa documentazione E<egrave> libera; potete ridistribuirla e/o modificarla
+secondo gli stessi termini applicati al Perl.
+
+Indipendentemente dalle modalitE<agrave> di distribuzione, tutti gli esempi di
+codice in questo file sono rilasciati al pubblico dominio. Potete, e siete
+incoraggiati a farlo, utilizzare il presente codice o qualunque forma
+derivata da esso nei vostri programmi per divertimento o per profitto.
+Un semplice commento nel codice che dia riconoscimento alle FAQ sarebbe
+cortese ma non E<egrave> obbligatorio.
+
+=head1 TRADUZIONE
+
+=head2 Versione
+
+La versione su cui si basa questa traduzione E<egrave> ottenibile con:
+
+   perl -MPOD2::IT -e print_pod perlfaq6
+
+Per maggiori informazioni sul progetto di traduzione in italiano si veda
+L<http://pod2it.sourceforge.net/> .
+
+=head2 Traduttore
+
+Traduzione a cura di Michele Beltrame.
+
+=head2 Revisore
+
+Revisione a cura di Michele Beltrame.
+
+=cut

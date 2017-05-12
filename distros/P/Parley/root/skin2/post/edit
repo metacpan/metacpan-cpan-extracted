@@ -1,0 +1,69 @@
+<div style="margin-top:10px;"></div>
+<div class="thread_header">
+    <a href="forum/view?forum=[% current_forum.id %]">[% current_forum.name %]</a>
+    &nbsp;:&nbsp;
+    [%l('Edit')%]
+    &nbsp;:&nbsp;
+    [% ForumCode.escape(current_post.thread.subject) %]
+</div>
+<div style="margin-top:10px;"></div>
+
+[% IF messages %]
+<p>
+    <ul>
+        [% FOREACH message IN messages %]
+            <li>[% message %]</li>
+        [% END %]
+    </ul>
+</p>
+[% END %]
+
+[% IF authed_user.id != current_post.creator_id %]
+Editing [% current_post.creator.forum_name %]'s post
+[% END %]
+
+<form action="post/edit?post=[% current_post.id %]" method="POST" name="new_thread">
+    <table>
+        <tbody>
+            <tr>
+                <td class="thread_add_message"> [%l('Message')%] </td>
+                <td>
+                    <textarea id="thread_message" name="post_message" cols="60" rows="10" class="post_message" />[% current_post.message %]</textarea>
+                </td>
+            </tr>
+
+            [% IF authed_user.id != current_post.creator_id %]
+            <tr>
+                <td>&nbsp;</td>
+                <td>
+                    <input type="checkbox" name="lock_post" id="lock_post" value="1" />
+                    <label for="lock_post">
+                        [%l('ADMIN LOCK POST')%]
+                    </label>
+                </td>
+            </tr>
+            [% END %]
+
+            <tr>
+                <td>&nbsp;</td>
+                <td style="text-align: center;">
+                    <input type="button" value="[%l('Preview')%]" name="post_reply" class="" id="message_preview" />
+                    <input type="submit" value="[%l('Update Reply')%]" name="post_update"    class="input_button" />
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</form>
+
+<!-- message preview majick -->
+<script type="text/javascript" src="[%c.uri_for('/static/MessagePreview-min.js')%]"></script>
+<script type="text/javascript">
+    var MessagePreview = new ParleyMessagePreview();
+
+    MessagePreview.config.label_preview = '[%l('Preview')%]';
+    MessagePreview.config.label_edit    = '[%l('Edit')%]';
+    MessagePreview.config.post_url      = "[%c.uri_for('/forumcode/preview')%]";
+
+    MessagePreview.init();
+</script>
+<!-- (end) message preview majick -->

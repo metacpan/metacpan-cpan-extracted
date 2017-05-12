@@ -1,0 +1,3 @@
+docs: |
+    Use the C<s///> operator instead. See L<perlop> and L<perlre> for
+    details.

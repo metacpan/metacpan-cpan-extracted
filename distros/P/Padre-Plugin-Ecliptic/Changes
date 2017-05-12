@@ -1,0 +1,170 @@
+Changes for Padre-Plugin-Ecliptic
+
+0.23   2010.12.06
+	Restored missing POT/PO translation sources (Damyan Ivanov, AZAWAWI)
+
+0.22   2010.10.29
+	Removed Test::NeedsDisplay dependency (AZAWAWI)
+
+0.21   2010.10.27
+	t/00-load.t is magically injected by [@PadrePlugin] via [LoadTests] (AZAWAWI)
+
+0.20   2010.10.23
+	Switched to Dist::Zilla
+	Fixed Compatibility with the latest Padre
+	Share directory is now accessible via File::ShareDir
+
+0.19  2009.12.17
+
+	Fixed ticket:471 "Ecliptic Quick Module Access should use CPAN::SQLite::Search"
+
+0.18  2009.8.24
+
+	Removed stupid code from Ecliptic :)
+	Reverting back to _sharedir until we get the Module::Build a sharedir
+	Quick Fix is now in Padre 0.44 core
+	Updated Arabic translation
+
+0.17  2009.8.17
+
+	Depends on Padre 0.43 in Build.PL
+	Moved the following to Padre 0.43 core:
+		Open resource dialog
+		Quick menu access dialog
+		Open in file browser action (integrated with directory browser)
+	remove private _sharedir and use the one provided by the parent class (szabgab)
+	Reuse Padre::Wx::Main help method (szabgab)
+	Renamed to the new Padre 0.43 PO naming scheme
+	POD fixes.
+	Updated translations:
+		German translation (Sewi++)
+		French translation (jquelin++)
+
+0.16  2009.8.2
+
+	Updated translations:
+		Arabic
+		Brazilian portuguese (garu++)
+		French (jquelin++)
+		Dutch (ddn123456++)
+		Japanese (ishigaki++)
+	Implemented background searching in "Open resource"
+	Added/Updated copyright/license for all the files
+	"Open Resource" is truly a non-modal dialog and is smaller/easier to put on 
+		the side
+	Use plugin's icon on all dialogs...
+	'Borrowed' some code to open files from Padre's Directory browser. 
+	More UI final touches on "Open Resource"... more simpler...
+	Handle Padre crash while calling a Padre action that should be called at that moment
+		e.g. no documents...
+	Display currently searched directory beside "Open Resource" dialog title
+	Added an options popup menu for skip VCS and MANIFEST.SKIP
+	"Open Resource" now respects MANIFEST.SKIP if it exists in project directory.
+	You can now copy the file path.
+	Selecting multiple files displays the number of files selected.
+	Open Resource status label should display files paths all the time mimicking Eclipse's behavior.
+	Changed "Open in Explorer" to "Open in File Browser" to be more less-win32 centric (El_Che++)
+	Make sure the menu event is really valid code before calling it
+	Quick Menu Access shall not crash anymore... A dream finally comes true.
+	Depends on Padre 0.42 for the Padre Actions API
+	Perl tidy and old code cleanup
+
+0.15  2009.7.20
+
+	- Ignore blib directory as well.
+	- require Locale::Msgfmt 0.14
+	- Ignore the blib directory as well (szabgab++).
+	- Fixed ticket:456 "Ecliptic: quick menu access empty filter does not show 
+		anything".
+	- Unified behavior on quick menu, module and outline access.
+	- Updated Arabic translation.
+	- Keep the recently-opened 20 resources available when 
+		you first open the "Open Resource" dialog. Productivity starts here.
+
+0.14  2009.6.29
+
+	- Only require Locale::Msgfmt when building the .mo files (RSN)
+
+0.13  2009.6.27
+
+	- Depends on Locale::Msgfmt to build the .mo files at install time (RSN, Ryan52++)
+
+0.12  2009.6.24
+
+	- Quick fix dialog has less size/position hard-coding. Takes a smaller font 
+		than editor's line text height (i.e. works with CTRL +/-)
+	- Ctrl+~ is out, Ctrl + Shift + 1 is now used for quick fix to be easier
+		to use on uk/german keyboard shortcuts.
+	- various POD fixes
+	- POD shortcut update (e.g. Ctrl-3 => CTRL + 3)
+	- a white background with a simple border like in Eclipse
+	- Handled 'no filename' crash
+	- Do nothing to exit the dialog when "No suggestion" is selected...
+
+0.11  2009.6.21
+
+	- Implemented "Quick Fix" popup list box which finds its list via 
+		Padre::Document::SubClass->event_on_quick_fix.
+	- Renamed List Key bindings into Quick Assist.
+
+0.10  2009.6.10
+
+	- Fixed "Open in Explorer" to work in KDE and GNOME
+	- Updated translations:
+		Arabic
+		French (jquelin++)
+
+0.09  2009.6.10
+
+	- Implemented "Open in Explorer" action
+	- POD fixes
+	- Removing bad code. Padre::Current->main is now plugin->main
+	- _T -> Wx::gettext. Alias++
+
+0.08  2009.6.4
+
+	- Implemented "List of key bindings" as detailed in ticket:379
+	- Added translation:
+		Polish (therek).
+
+0.07  2009.5.31
+
+	- [Open Resource] resource path is now shown in the status label.
+	- Fixed a couple of GTK assertions
+	- Any double-click event on list-box-es have now the same as pressing the OK button [garu++].
+	- Avoid the debug assertion by ignoring the root item.
+
+0.06  2009.5.31
+
+	- Implemented "Quick Module Access" dialog.
+	- Fixed 'Use of uninitialized value' on linux in
+		"Open Resource" dialog (garu++)
+	- Fixed the Kaboom bug in quick menu access in list box selection
+
+0.05  2009.5.31
+
+	- Implemented "Quick Outline Access" dialog.
+	- Added translations:
+		French (jquelin).
+		Brazilian Portuguese (garu).
+		Dutch (Dirk De Nijs).
+
+0.04  2009.5.30
+
+	- Implemented "Quick Menu Access" dialog.
+	- Standard minimum size and centering for all dialogs.
+	- Fixed a status message in "Open Resource" dialog.
+	- Added Arabic translation.
+
+0.03  2009.5.29
+
+	- More POD fixes.
+	- The "Open Resource" dialog has an ignore CVS/.svn/.git folders checkbox.
+
+0.02  2009.5.28
+
+	- Implemented "Open Resource" dialog.
+
+0.01  2009.5.28
+
+	- Initial release to CPAN.

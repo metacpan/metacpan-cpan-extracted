@@ -1,0 +1,29 @@
+---
+abstract: 'Plack module for the ScientiaMobile WURFL Cloud Service'
+author:
+  - 'Alessandro Ranellucci <aar@cpan.org>'
+build_requires:
+  HTTP::Request::Common: 0
+  Plack::Middleware::Debug: 0
+  Test::Fatal: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120630'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-WURFL-ScientiaMobile
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Moo: 0.009004
+  Net::WURFL::ScientiaMobile: 0
+  Plack: 0.9957
+  Try::Tiny: 0
+  URI::Escape: 0
+version: 0.01

@@ -1,0 +1,81 @@
+# Portuguese translations for Padre-Plugin-LaTeX package.
+# Copyright (C) 2011 THE Padre-Plugin-LaTeX'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Padre-Plugin-LaTeX package.
+# garu <garu@cpan.org>, 2011.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Padre-Plugin-LaTeX\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-03-09 18:29+0100\n"
+"PO-Revision-Date: 2011-05-15 01:43-0300\n"
+"Last-Translator: Breno G. de Oliveira <garu@cpan.org>\n"
+"Language-Team: Brazilian Portuguese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: lib/Padre/Plugin/LaTeX.pm:47
+msgid "About"
+msgstr "Sobre"
+
+#: lib/Padre/Plugin/LaTeX.pm:142
+#, perl-format
+msgid "Could not find file '%s'."
+msgstr "Não foi possível encontrar arquivo '%s'."
+
+#: lib/Padre/Plugin/LaTeX.pm:40
+msgid "Create/Update PDF"
+msgstr "Criar/Atualizar PDF"
+
+#: lib/Padre/Plugin/LaTeX.pm:88
+msgid "Creating PDF files is only supported for LaTeX documents."
+msgstr "Criação de PDF só é possível para documentos LaTeX."
+
+#: lib/Padre/Plugin/LaTeX.pm:44
+msgid "Find Symbol/Special Character"
+msgstr "Encontrar Símbolo/Caractere Especial"
+
+#: lib/Padre/Plugin/LaTeX.pm:14
+msgid "LaTeX"
+msgstr "LaTeX"
+
+#: lib/Padre/Plugin/LaTeX.pm:59
+msgid "LaTeX Plug-in"
+msgstr "Plugin LaTeX"
+
+#: lib/Padre/Plugin/LaTeX.pm:62
+#, perl-format
+msgid ""
+"LaTeX support for Padre\n"
+"\n"
+"For syntax highlighting of BibTeX files install the Kate plugin: Padre::Plugin::Kate\n"
+"\n"
+"Copyright 2010, 2011 %s\n"
+"This plug-in is free software; you can redistribute it and/or modify it under the same terms as Padre.\n"
+msgstr ""
+"Suporte LaTeX no Padre\n"
+"\n"
+"Para coloração de sintaxe de arquivos BibTex instale o plugin Kate: Padre::Plugin::Kate\n"
+"\n"
+"Copyright-2010, 2011 %s\n"
+"Este Plugin é software livre; você pode redistribuir e/ou modificá-lo sob os mesmos termos do Padre.\n"
+
+#: lib/Padre/Plugin/LaTeX.pm:42
+msgid "Run BibTeX"
+msgstr "Executar BibTeX"
+
+#: lib/Padre/Plugin/LaTeX.pm:114
+msgid "Running BibTeX is only supported for LaTeX documents."
+msgstr "Execução do BibTeX só é possível para documentos LaTeX."
+
+#: lib/Padre/Plugin/LaTeX.pm:41
+msgid "View PDF"
+msgstr "Visualizar PDF"
+
+#: lib/Padre/Plugin/LaTeX.pm:134
+msgid "Viewing PDF files is only supported for LaTeX documents."
+msgstr "Visualizar PDF só é permitido para documentos LaTeX."
+

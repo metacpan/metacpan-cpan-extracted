@@ -1,0 +1,278 @@
+NAME
+    POE::Component::NomadJukebox - Event-based contol of Nomad Jukebox
+    players
+
+SYNOPSIS
+            use POE qw(COmponent::NomadJukebox);
+            use Data::Dumper;
+        
+            POE::Session->create(
+                    inline_states => {
+                            _start => sub {
+                                    POE::Component::NomadJukebox->create({ alias => 'njb' });
+                            },
+                            njb_started => sub {
+                                    $_[KERNEL]->post(njb => 'discover');
+                            },
+                            njb_discover => sub {
+                                    my ($kernel, $heap, $devlist) = @_[KERNEL, HEAP, ARG0];
+
+                                    unless (ref($devlist)) {
+                                            print "Failed to find Nomad Jukebox, is it on?\n";
+                                            $kernel->post(njb => 'shutdown');
+                                            return;
+                                    }
+                        
+                                    # open the first device
+                                    # pass the device id to open
+                                    $kernel->post(njb => 'open' => $devlist->[0]->{DEVID});         
+                            },
+                            njb_opened => sub {
+                                    my $kernel = $_[KERNEL];
+                                    $kernel->post(njb => 'disk_usage');
+                                    $kernel->post(njb => 'track_list');
+                            },
+                            njb_disk_usage => sub {
+                                    my ($kernel, $heap, $info) = @_[KERNEL, HEAP, ARG0];
+                
+                                    unless (ref($info) eq 'HASH') {
+                                            print "Failed to get disk usage\n";
+                                            return;
+                                    }
+                                    my $used = $info->{TOTAL} - $info->{FREE};
+                                    print "Total:$info->{TOTAL} bytes Free:$info->{FREE} bytes Used:$used bytes\n";
+                                    $kernel->post(njb => 'shutdown');
+                            },
+                            njb_track_list => sub {
+                                    my ($kernel, $heap, $tracks) = @_[KERNEL, HEAP, ARG0];
+        
+                                    $kernel->post(njb => 'shutdown');
+                                
+                                    unless (ref($tracks) eq 'ARRAY') {
+                                            print "Failed to get track list\n";
+                                            return;
+                                    }
+                                    print "There are ".scalar(@$tracks)." tracks\n";
+                                
+                                    print Data::Dumper->Dump([$tracks]);
+                            },
+                            njb_closed => sub {
+                                    print "Nomad Jukebox closed\n";
+                            },
+                    },
+            );
+
+            $poe_kernel->run();
+
+DESCRIPTION
+    POE::Component::NomadJukebox - Event-based contol of Nomad Jukebox
+    players using the libnjb api located at http://libnjb.sourceforge.net/
+
+    This module _requires_ libnjb and you may need to be root, or change
+    your usb device access permissions.
+
+METHODS
+  create({ alias => 'njb', progress => 'njb_progress' })
+    Creates a session to handle the Nomad Jukebox device. You can specify
+    two options: alias, what to call the session, and progress, what event
+    should be fired during a file transfer.
+
+EVENTS
+    All these events can be called with $kernel->call(), and the return
+    values are usually undef on error, or an id in the case of send_track or
+    send_file.
+
+  discover
+    Locates all connected, and turned on, Nomad Jukebox devices. Fires
+    njb_discover event with an array ref of hash refs with info about each
+    device in the keys to the parent session or undef if it failed to find
+    any devices.
+
+  open => <device_id>
+    This will open the device specified by the device_id from the discover
+    event. You MUST do this before sending any other events that operate on
+    the device. This fires the njb_opened event to the parent on success
+    with the device id as ARG0 and 1 as ARG1. On failure to open the device,
+    ARG1 for the njb_open event will be undef.
+
+  track_list
+    Requests the track list from the device. It fires njb_track_list with an
+    array ref of hash refs. Each hash ref has info about the track. ID is
+    the important key for other events like play, and get_track. If you pass
+    a 1 as ARG0 to track_list, extended tags will be turned on, but it will
+    be much slower. (AND IT BLOCKS LONGER)
+
+  play_list
+    Requests the play list from the device. It fires njb_play_list with an
+    array ref of hash refs. Each hash ref has info about the track. ID is
+    the important key for other events like play, and get_track.
+
+    Here's an example of a playlist dump, notice that I have a playlist with
+    no valid tracks. Make sure you account for these end cases. The array in
+    the TRACKS key is a list of track ID's from the track_list. The STATE
+    key 0 is new, 1 is unchanged, 2 is change name, 3 change tracks. I'm not
+    sure what 2 and 3 mean yet.
+
+            {
+                    'TRACKS' => [],
+                    'ID' => 71520,
+                    'NAME' => 'Audio Tour',
+                    'STATE' => 1
+            },
+            {
+                    'TRACKS' => [
+                            390228,
+                            430204,
+                            517265,
+                            515625,
+                            516250,
+                            514989,
+                            513963,
+                            517909,
+                            516878,
+                            511915
+                    ],
+                    'ID' => 727376,
+                    'NAME' => 'aaa',
+                    'STATE' => 3
+            }
+
+  file_list
+    Requests the file list from the device. It fires njb_file_list with an
+    array ref of hash refs. Each hash ref has info about the file. ID is the
+    important key for other events like get_file, delete_file.
+
+  get_track => { <track_hashref> } => </path/to/file.mp3>
+    This event will retrieve the track specified by the track hashref from
+    the track_list event and it will save it to the path specified. The full
+    directory path should exist, it will not create it for you. The track
+    hash ref should have the TAG key (for speed) or the ID key, all others
+    are not used.
+
+  close
+    Releases control of the device. You probably want to use the shutdown
+    event. This fires the njb_closed event to the parent.
+
+  set_owner => 'owner name'
+    Allows you to set the owner's name. Fires njb_set_owner with the owner
+    info sent in ARG0 and the return value in ARG1.
+
+  get_owner
+    Fires njb_owner event back to parent with owner info in ARG0.
+
+  send_track => '/path/to/file.mp3' or send_track => <hashref track info>
+    This will send a file to the Nomad Jukebox. You can specify the full
+    path to the file, and allow the component to extract the mp3 tags (using
+    MP3::Tag), or you can specify them yourself with a hashref with the
+    following keys:
+
+            FILE => '/path/to/file.mp3',
+            CODEC => 'MP3', # MP3, WMA, or WAV
+            TITLE => 'Title of song',
+            TRACK => '6',
+            ARTIST => 'Art Ist',
+            ALBUM => 'POEtry',
+            GENRE => 'Rock'
+
+    It will fire the send_track event to the parent session with the track
+    info in a hash ref as ARG0 and the trackid as ARG1 on success. On
+    failure ARG1 will be undef and ARG2 _might_ have an error string.
+
+  send_file => { FILE => '/path/to/file.tar.gz', NAME => 'file.tar.gz' }
+    This will send a file to the Nomad Jukebox. It will fire event
+    njb_send_file with the file hash ref as ARG0 and the fileid as ARG1. On
+    failure, ARG1 will be undef, and ARG2 _might_ have an error string.
+
+  get_file => { ID => <ID> } => </path/to/file.tar.gz>
+    This event will retrieve the file specified by the ID in the hash ref
+    and it will save it to the path specified. The full directory path
+    should exist, it will not create it for you. I used a hash ref so I
+    could expand the file selection at a later time, (ie. by NAME). It fires
+    njb_get_file with the hash ref as ARG0 the file path as ARG1 and the
+    return value as ARG2.
+
+  play => <ID>
+    Starts a track specified by <ID> you can get this id by looking at the
+    ID key of a track in the track list. See the track_list event. Fires
+    njb_play event back to parent session. ARG0 is the <ID> and ARG1 is the
+    return value.
+
+  stop
+    Stops playback, and it fires njb_stop event back to parent session. The
+    return value is in ARG0.
+
+  pause
+    Pauses playback, and it fires njb_pause event back to parent session.
+    The return value is in ARG0.
+
+  resume
+    Resumes playback, and it fires njb_resume event back to parent session.
+    The return value is in ARG0.
+
+  seek_track => <position>
+    Seeks playing track to <position>. It fires njb_seek_track event back to
+    parent session.
+
+  set_tmpdir => '/tmp/path'
+    Allows you to set the temp directory. Fires njb_set_tmpdir with the temp
+    dir in ARG0 and the return value in ARG1.
+
+  get_tmpdir
+    Fires njb_tmpdir event back to parent with temp dir in ARG0.
+
+  shutdown
+    Releases control of the Nomad Jukebox with close() and ends the session.
+    This DOES NOT shutdown the actual device, just the component.
+
+  delete_play_list => <plid>
+    Allows you to delete a playlist. Fires njb_delete_play_list with the
+    playlist id in ARG0 and the return value in ARG1.
+
+  delete_track => <trackid>
+    Allows you to delete a track. Fires njb_delete_track with the playlist
+    id in ARG0 and the return value in ARG1.
+
+  delete_file => <fileid>
+    Allows you to delete a file. Fires njb_delete_file with ehe file id in
+    ARG0 and the return value in ARG1.
+
+  disk_usage
+    Requests the disk usage from the device. It fires njb_disk_usage with a
+    hash ref, with keys TOTAL, and FREE, both in bytes. ARG0 will be undef
+    instead of a hash ref on error. This event can also be called, it
+    returns total, and free in an array context, and undef on error.
+
+  adjust_sound => <type> => <value>
+    Changes various aspects of sound from the device. It fires
+    njb_adjust_sound with the return value. The types: volume, bass, treble,
+    muting, midrange, midfreq, eax, eaxamt, headphone, rear, and eqstatus.
+    **NOTE: only volume is supported by libnjb, so don't expect any of the
+    others to work until somone updates libnjb with this ability.
+
+UNSOLICTED EVENTS
+    During file transfers, the njb_progress event (or other event specified
+    to create()) will be fired throughout the transfer with ARG1 being the
+    total bytes, and ARG0 being the amount of bytes transferred.
+
+EXAMPLES
+    See the examples directory for working code to get you started. I'll add
+    more example scripts at a later time.
+
+AUTHOR
+    David Davis, <xantus@cpan.org>
+
+THANKS
+    Anthony Taylor for PerlNJB, I based the driver on his unfinished api.
+
+BUGS
+    Probably. Send the author an email about the error.
+
+    During file transfers, the poe engine may slow down a bit. I will
+    probably fix this by changing transfers to fork beforehand.
+
+TODO
+    There are some more api functions I need to cover.
+
+SEE ALSO
+    perl(1), MP3::Tag
+

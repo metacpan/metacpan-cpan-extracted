@@ -1,0 +1,41 @@
+POE::Component::Generic is POE component that provides non-blocking access
+to a blocking object. 
+
+It works by forking of a sub-process with POE::Wheel::Run to do the work The
+blocking object is created in the child process, which waits for method
+calls from the parent.
+
+It is intended for people who want to use an object that blocks from
+POE with as little pain as possible.
+
+
+NOTE: It has come to our attention that POE::Component::Generic does not
+always function correctly on Windows.  We do not have the skills nor the
+time to debug this issue.  We would be very pleased if you would solve this
+for us.
+
+
+POE::Component::Generic can be installed the usual ways:
+
+Through the CPAN shell:
+
+	perl -MCPAN -e 'install "POE::Component::Generic"'
+
+Or by downloading it and running the usual commands:
+
+	perl Makefile.PL
+	make test
+	make install
+
+It is possible to configure some of the test cases by passing arguments to
+Makefile.PL.
+
+    perl Makefile.PL --help
+
+
+The project needs your help.  If you're interested, please contact
+Philip Gwyn at gwyn-at-cpan.org.
+
+Thank you.
+
+

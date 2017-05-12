@@ -1,0 +1,122 @@
+NAME
+    PITA::Image - PITA Guest Manager for inside system images
+
+SYNOPSIS
+    A typical startup script
+
+      #!/usr/bin/perl
+      
+  use strict;
+      use IPC::Run3;
+      use PITA::Image;
+      
+  # Wrap the main actions in an eval to catch errors
+      eval {
+          # Configure the image manager
+          my $manager = PITA::Image->new(
+              injector => '/mnt/hbd1',
+              workarea => '/tmp',
+          );
+          $manager->add_platform(
+              scheme => 'perl5',
+              path   => '', # Default system Perl
+          );
+          $manager->add_platform(
+              scheme => 'perl5',
+              path   => '/opt/perl5-6-1/bin/perl'
+          );
+      
+      # Run the tasks
+          $manager->run;
+      
+      # Report the results
+          $manager->report;
+      };
+      
+  # Shut down the computer on completion or failure
+      run3( [ 'shutdown', '-h', '0' ], \undef );
+      
+  exit(0);
+
+    And a typical configuration image.conf
+
+      class=PITA::Image
+      version=0.10
+      support=http://10.0.2.2/
+      
+  [ task ]
+      task=Test
+      scheme=perl5.make
+      path=/usr/bin/perl
+      request=request-512311.conf
+
+DESCRIPTION
+    While most of the PITA system exists outside the guest images and tries
+    to have as little interaction with them as possible, there is one part
+    that needs to be run from inside it.
+
+    The "PITA::Image" class lives inside the image and has the
+    responsibility of accepting the injector directory at startup, executing
+    the requested tasks, and then shutting down the (virtual) computer.
+
+Setting up a Testing Image
+    Each image that will be set up will require a bit of customization, as
+    the entire point of this type of testing is that every environment is
+    different.
+
+    However, by keeping most of the functionality in the "PITA::Image" and
+    PITA::Scheme classes, all you should need to do is to arrange for a
+    relatively simple Perl script to be launched, that feeds some initial
+    configuration to to a new "PITA::Image" object.
+
+    And it should do the rest.
+
+METHODS
+  new
+      my $manager = PITA::Image->new(
+          injector => '/mnt/hdb1',
+          workarea => '/tmp',
+      );
+
+    The "new" creates a new image manager. It takes two named parameters.
+
+    injector
+        The required "injector" param is a platform-specific path to the
+        root of the already-mounted /dev/hdb1 partition (or the equivalent
+        on your operating system). The image configuration is expected to
+        exist at image.conf within this directory.
+
+    workarea
+        The optional "workarea" param provides a directory writable by the
+        current user that can be used to hold any files and do any
+        processing in during the running of the image tasks.
+
+        If you do not provide a value, "File::Temp::tempdir()" will be used
+        to find a default usable directory.
+
+    Returns a new "PITA::Image" object, or dies on error.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PITA-Image>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>, <http://ali.as/>
+
+SEE ALSO
+    The Perl Image Testing Architecture (<http://ali.as/pita/>)
+
+    PITA, PITA::XML, PITA::Scheme
+
+COPYRIGHT
+    Copyright 2005 - 2011 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

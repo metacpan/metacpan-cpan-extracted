@@ -1,0 +1,8 @@
+ToDo (in not particular order)
+------------------------------
+
+- More style checks
+- Option parsing in puppet-tidy.pl which passes known
+  flags to puppettidy(), including:
+  - list of supported checks
+  - enable/disable checks

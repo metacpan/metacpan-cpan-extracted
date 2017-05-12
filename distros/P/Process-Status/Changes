@@ -1,0 +1,20 @@
+Revision history for Process-Status
+
+0.007     2015-11-25 23:15:24-05:00 America/New_York
+        - add assert_ok method
+
+0.006     2015-11-03 10:29:45-05:00 America/New_York
+        - document as_string (thanks, Alexander Karelas!)
+
+0.005     2014-06-26 15:58:45-04:00 America/New_York
+        - remove bizarre mis-use of pid_t; it's now status_code
+
+0.003     2014-04-01 14:33:56-04:00 America/New_York
+        - handle negative $? better (it's what you get if you say
+          `this-does-not-exist`)
+
+0.002     2013-12-31 12:34:55 America/New_York
+        - tweaks here and there, mostly add ->as_string
+
+0.001     2013-12-30 12:19:59 America/New_York
+        - first release

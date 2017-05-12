@@ -1,0 +1,15 @@
+Revision history for Perl extension Plosurin.
+
+TODO:
+  - Verbose errors
+  - Special Characters, i.e. {sp}
+  - {if}, {for}, {switch}, {css}, {msg}, {literal}
+
+0.1 10 Jun 2012
+    + {foreach}, {call}, {print} commands
+    + Expression grammars
+
+0.0_2 6th Dec 2011
+    + add import from pod6 files {import}
+0.0_1
+    + initial release of Plosurin suite

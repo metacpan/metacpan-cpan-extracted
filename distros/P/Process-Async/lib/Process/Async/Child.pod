@@ -1,0 +1,63 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Process::Async::Child
+at lib/Process/Async/Child.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Process::Async::Child - L<IO::Async::Process> subclass for handling communication between parent and worker
+
+=head1 VERSION
+
+version 0.003
+
+=head1 DESCRIPTION
+
+See L<Process::Async>.
+
+=head1 METHODS
+
+=head2 send_command
+
+Helper for sending a command.
+
+=head2 on_read
+
+The read handler for processing messages sent by the child process.
+
+=head2 on_finish
+
+Handle finish events.
+
+=head2 on_exception
+
+Handle exceptions.
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Process>
+
+L<configure|IO::Async::Process/configure>, L<configure_fd|IO::Async::Process/configure_fd>, L<errno|IO::Async::Process/errno>, L<errstr|IO::Async::Process/errstr>, L<exception|IO::Async::Process/exception>, L<exitstatus|IO::Async::Process/exitstatus>, L<fd|IO::Async::Process/fd>, L<is_exited|IO::Async::Process/is_exited>, L<is_running|IO::Async::Process/is_running>, L<kill|IO::Async::Process/kill>, L<notifier_name|IO::Async::Process/notifier_name>, L<pid|IO::Async::Process/pid>, L<stderr|IO::Async::Process/stderr>, L<stdin|IO::Async::Process/stdin>, L<stdio|IO::Async::Process/stdio>, L<stdout|IO::Async::Process/stdout>
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2014-2015. Licensed under the same terms as Perl itself.

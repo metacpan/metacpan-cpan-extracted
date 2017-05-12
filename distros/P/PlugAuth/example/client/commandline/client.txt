@@ -1,0 +1,16 @@
+% plugauthclient auth
+Username for  at localhost :  [default joe] bogus
+Password: 
+[ERROR] 2012/11/30 12:17:16 Client.pm (733) Error trying to GET http://user:*****@localhost:3000/auth : 403 Forbidden
+[ERROR] 2012/11/30 12:17:16 Client.pm (737) not ok
+[ERROR] 2012/11/30 12:17:16 Command.pm (253) Forbidden
+% plugauthclient auth
+Username for  at localhost :  [default joe] optimus
+Password: 
+--- ok
+% plugauthclient authz primus GET /some/user/resource
+[ERROR] 2012/11/30 12:19:11 Client.pm (733) Error trying to GET http://localhost:3000/authz/user/primus/GET/some/user/resource : 403 Forbidden
+[ERROR] 2012/11/30 12:19:11 Client.pm (737) unauthorized : primus cannot GET /some/user/resource
+[ERROR] 2012/11/30 12:19:11 Command.pm (253) Forbidden
+% plugauthclient authz optimus GET /some/user/resource
+--- ok

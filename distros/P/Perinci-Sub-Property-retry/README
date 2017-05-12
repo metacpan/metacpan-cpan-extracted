@@ -1,0 +1,63 @@
+SYNOPSIS
+
+     # in function metadata
+     retry => 3,
+    
+     # more detailed
+     retry => {n=>3, delay=>10, success_statuses=>/^(2..|3..)$/},
+
+DESCRIPTION
+
+    This property specifies retry behavior.
+
+    Values: a hash containing these keys:
+
+      * n => INT (default: 0)
+
+      Number of retries, default is 0 which means no retry.
+
+      * delay => INT (default: 0)
+
+      Number of seconds to wait before each retry, default is 0 which means
+      no wait between retries.
+
+      * success_statuses => REGEX (default: '^(2..|304)$')
+
+      Which status is considered success.
+
+      * fatal_statuses => REGEX
+
+      If set, specify that status matching this should be considered fatal
+      and no retry should be attempted.
+
+      * non_fatal_statuses => REGEX
+
+      If set, specify that status not matching this should be considered
+      fatal and no retry should be attempted.
+
+      * fatal_messages => REGEX
+
+      If set, specify that message matching this should be considered fatal
+      and no retry should be attempted.
+
+      * non_fatal_messages => REGEX
+
+      If set, specify that message not matching this should be considered
+      fatal and no retry should be attempted.
+
+    Property value can also be an integer (specifying just 'n').
+
+    If function does not return enveloped result (result_naked=0), which
+    means there is no status returned, a function is assumed to fail only
+    when it dies.
+
+    This property's wrapper implementation currently uses a simple loop
+    around the eval block.
+
+    It also pass a special argument to the function -retries so that
+    function can be aware about retries.
+
+SEE ALSO
+
+    Perinci
+

@@ -1,0 +1,50 @@
+{
+   "abstract" : "Parse digital client certificates for Perl's PSGI web servers.",
+   "author" : [
+      "Keith Carangelo <mail@kcaran.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Plack-Middleware-ClientCert",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Plack::Middleware" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Plack::Test" : "0",
+            "Plack::Util" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kcaran/Plack-Middleware-ClientCert/issues"
+      },
+      "homepage" : "https://github.com/kcaran/Plack-Middleware-ClientCert",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kcaran/Plack-Middleware-ClientCert.git",
+         "web" : "https://github.com/kcaran/Plack-Middleware-ClientCert"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::XS version 3.02"
+}
+

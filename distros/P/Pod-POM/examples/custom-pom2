@@ -1,0 +1,114 @@
+#!/usr/bin/perl -w
+#
+# This program demonstrates how you can easily write a custom 
+# processor for converting Pod documents to the format of your
+# choice in the style of your choice.
+#
+# Written by Ron Savage <ron@savage.net.au> with some minor 
+# changes by Andy Wardley <abw@kfs.org>. 
+#
+# Also check out Ron's Perl pages for his own version of this 
+# script, fancy-pom2.pl, which is likely to be further advanced
+# and more recently updated:
+#
+#   http://savage.net.au/Perl.html#fancy-pom2.pl
+#
+
+use Pod::POM;
+use File::Basename;
+
+my $BGCOLOR = '#80C0ff';
+
+my $program = basename($0);
+my $format;
+
+die usage() if grep(/^--?h(elp)?$/, @ARGV);
+
+my $file = shift
+    || die "usage: $program podfile\n";
+
+# create a Pod::POM parser
+my $parser = Pod::POM->new( warn => 1 )
+    || die "$Pod::POM::ERROR\n";
+
+# parse the file to build a POM 
+my $pom = $parser->parse_file($file)
+    || die $parser->error(), "\n";
+
+my (@toc, @content);
+
+# get each =head1 to make a table of content
+for my $head1 ($pom->head1()) {
+    push(@toc, My::View->print($head1->title()) );
+}
+
+# generate HTML for table of contents 
+@toc = map { 
+    my $name = $_;
+    $name =~ s/\W+/_/g;
+    "<tr><td align=\"center\"><a href=\"#$name\">$_</a></td></tr>\n" 
+} @toc;
+
+# generate HTML for page content
+@content = My::View->print($pom);
+
+# cleanup file name to use as title
+$file =~ s|\\|/|g;
+$file =~ s|.*/||;
+$file = $1 if ($file =~ /^(.+)\..+$/);
+$file = ucfirst lc $file;
+
+# print!
+print <<EOF;
+<a name="top"></a>
+
+<div align="center">
+
+  <h1>Table of Contents</h1>
+
+  <table bgcolor="$BGCOLOR" summary="Table of Contents">
+  @toc
+  </table>
+
+  <h1>$file</h1>
+
+  <table bgcolor="$BGCOLOR" summary="Body">
+    <tr>
+      <td align="left">@content</td>
+    </tr>
+    <tr>
+      <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td><a href="#top">Top of page</a></td>
+    </tr>
+  </table>
+
+</div>
+EOF
+
+
+#------------------------------------------------------------------------
+# Here we define a custom view as a subclass of Pod::POM::View::HTML.
+# You can add any methods here like view_head2(), view_over(), etc., 
+# to implement different handlers for different elements in the document.
+#------------------------------------------------------------------------
+
+package My::View;
+
+use parent qw( Pod::POM::View::HTML );
+
+sub view_head1
+{
+    my($self, $item) = @_;
+
+    # convert non-word characters in name to _
+    my $title = $item->title->present($self);
+    my $name  = $title;
+    $name =~ s/\W+/_/g;
+
+    return "<h2><a name=\"$name\">$title</a></h2>\n\n"
+	 . $item->content->present($self);
+}
+
+

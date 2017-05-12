@@ -1,0 +1,54 @@
+1.05     2016-09-12
+
+- Added MooseX::Role::Parameterized to the list of modules which are
+  recognized by the RequireCleanNamespace policy.
+
+
+1.04     2015-10-07
+
+- Added a new policy, ProhibitLazyBuild. PR #5 by Kieren Diment.
+
+
+1.03     2015-05-31
+
+- Make Perl::Critic::Policy::Moose::RequireCleanNamespace ignore use
+  statements of the form "use Moose ()". Since this doesn't import anything,
+  there's nothing to clean. PR #3 by Noel Maddy.
+
+
+1.02     2015-04-21
+
+- Make all policies accept an "equivalent_modules" config parameter. If you
+  have an in-house My::Moose, specify that as an equivalent module and the
+  policies will check the code that uses My::Moose.
+
+- Added MooseX::Role::Parameterized as a default equivalent module where this
+  made sense.
+
+- Changed ProhibitNewMethod to work better with a single file containing
+  multiple packages.
+  
+
+1.01     2015-01-10
+
+- Allow "use namespace::autoclean" to satisfy the RequireCleanNamespace policy
+  by default. In addition, you can provide your own list of "cleaners" as a
+  configuration option.
+
+
+1.00     2015-01-10
+
+- No changes from the last release, just making this official.
+
+
+0.999_002  2009-05-15
+
+- New Moose::ProhibitMultipleWiths and Moose::ProhibitNewMethod policies.
+
+- The list of modules that RequireCleanNamespace looks for is customizable and
+  Moose::Util::TypeConstraints has been added to the default list.
+
+
+0.999_001  2008-10-30
+
+- Initial release.

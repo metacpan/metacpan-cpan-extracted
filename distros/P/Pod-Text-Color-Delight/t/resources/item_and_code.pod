@@ -1,0 +1,11 @@
+=over
+
+=item C<$foo = "bar">
+
+=item foo
+
+=item C<$bar = "baz">
+
+=back
+
+C<$bar = "baz">

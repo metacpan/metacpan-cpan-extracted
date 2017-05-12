@@ -1,0 +1,63 @@
+{
+   "abstract" : "A POE abstraction layer for conciseness and simplicity",
+   "author" : [
+      "Adam Kennedy <adamk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.04, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "POE-Declare",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.62",
+            "Test::Exception" : "0.27",
+            "Test::More" : "0.80",
+            "Test::NoWarnings" : "0.084",
+            "Test::POE::Stopping" : "1.09"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.62"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::ISA" : "0.33",
+            "Class::Inspector" : "1.22",
+            "Class::XSAccessor" : "1.10",
+            "List::Util" : "1.19",
+            "POE" : "1.310",
+            "Params::Util" : "1.00",
+            "Scalar::Util" : "1.19",
+            "perl" : "5.008007"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://svn.ali.as/cpan/trunk/POE-Declare"
+      },
+      "x_ChangeLog" : "http://fisheye2.atlassian.com/changelog/cpan/trunk/POE-Declare"
+   },
+   "version" : "0.59",
+   "x_module_name" : "POE::Declare"
+}

@@ -1,0 +1,147 @@
+1.02	Fri Sep 19 15:06:44 GMT 2003
+	Key:	fixed brackets bug in text strings
+		fixed spacing bug between entries
+		line wrapping now uses seperate methods
+		entries now multi-line units
+	Style:	fixed dashed bar outline bug
+		added dashes control to bar and point
+		fixed bar_outer/inner PostScript bug
+
+1.00	Wed May 14 12:53:51 GMT 2003
+	Changed licencing terms
+	Key:	Promoted to beta
+	Paper:	Promoted to beta
+		Handles negative scales correctly
+	Style:	Promoted to beta
+		Fixed bug in number_value()
+
+0.05    April 2003
+	Bar:	PostScript code for key items changed
+	Key:	Text labels now wrap;
+		Font options now sub-hashes
+	Paper:	ps_functions now a class method
+		Better support for minor grid lines
+	Style:  Removed yellow/cyan/mauve sequences
+		Added color sequence
+		points x/y offset added
+		new shapes: north/south/west/east arrows
+	XY:	Added split_data()
+
+0.01	Fri Oct 11 11:50:13 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n PostScript::Graph::...
+
+
+Revision history for Perl extension PostScript::Graph::Paper.
+
+0.08	Wed Nov 20 11:36:32 GMT 2002
+	Corrected tests so they don't fail
+
+0.07	Tue Nov 12 12:28:45 GMT 2002
+	more flexible SI unit grouping to show pence as well as 1000's
+
+0.06	Sun Oct 20 11:08:38 GMT 2002
+	now uses PostScript::File
+
+0.05	Wed Oct 16 13:24:09 GMT 2002
+	added support for Graph::Stock, namely
+	no_drawing and draw_fn options,
+	axis_labels will return and accept altered values
+	draw_scales() may be called seperately from new()
+
+0.04	Sat Oct 12 18:17:43 GMT 2002
+	fixed logic for bar chart display
+	changed option 'paper' to 'layout'
+
+0.03	Fri Oct 11 13:01:26 GMT 2002
+	Namespace changed from PostScript::GraphPaper
+
+0.02	Mon Oct  7 09:02:52 GMT 2002
+	changed options: chart now gpaper
+	added subdivisions to init_bar
+
+0.01	Fri Sep 27 16:05:00 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n PostScript::GraphPaper
+
+
+Revision history for Perl extension PostScript::Graph::Style.
+
+
+0.05	Wed Nov 20 11:22:32 GMT 2002
+	Changed Sequence defaults
+	Sequence no longer keeps track of style changes
+	Sequence reset mechanism changed
+	Corrected width defaults in Style
+	write() now uses PostScript::File to track style changes
+	support for user defined labels for styles added
+	Corrected failing test
+
+0.03	Sun Nov 10 10:16:08 GMT 2002
+	use PostScript::File
+	changed StyleSequence to PostScript::Graph::Sequence
+	outer 'color' option now 'use_color'
+	fixed 'previous_style' bug
+	added 'use_line' etc methods
+	'ps_functions' now a class function
+
+0.02	Sun Oct  6 11:24:28 GMT 2002
+	added StyleSequence
+	now only sets changes rather than all settings
+	
+0.01	Fri Oct  4 18:26:12 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n PostScript-GraphStyle-0.01
+
+
+Revision history for Perl extension PostScript::Graph::Key
+
+0.04	Sun Nov 10 10:25:50 GMT 2002
+	'ps_functions' now a class method
+
+0.03	Sun Oct 20 11:24:20 GMT 2002
+	now uses PostScript::File
+
+0.02	Fri Oct 11 14:49:19 GMT 2002
+	Namespace changed from PostScript::GraphKey
+
+0.01	Fri Oct  4 18:26:21 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n PostScript-GraphKey-0.01
+
+
+Revision history for Perl module PostScript::Graph::XY
+
+0.03	Fri Oct 11 19:45:31 GMT 2002
+	Namespace change from PostScript::XYChart
+	Support alterations in Style interface
+	StyleSequence changed to PostScript::Graph::Sequence
+	'ps_functions' now a class method
+
+0.02	Mon Oct  7 09:00:38 GMT 2002
+	Options changed: chart->gpaper
+	    removed scatter
+	    added chart=>show_points
+	    added chart=>show_lines
+	build_chart now accepts line and file data
+
+0.01	Fri Oct  4 18:26:34 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n PostScript-XYChart-0.01
+
+
+Revision history for Perl extension PostScript::Graph::Bar.
+
+0.03	Sun Nov 10 10:29:53 GMT 2002
+	StyleSequence changed to PostScript::Graph::Sequence
+
+0.02	Sun Oct 20 11:42:22 GMT 2002
+	Documentation added
+	misc bug fixes
+	now uses PostScript::File
+	tests added
+
+0.01	Fri Oct 11 11:50:07 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n PostScript::Graph::Bar
+

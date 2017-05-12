@@ -1,0 +1,12 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_use.t
+t/01_main.t
+t/02_badval.t
+TA.pd
+TODO
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

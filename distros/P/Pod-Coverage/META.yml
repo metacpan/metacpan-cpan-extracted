@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Pod-Coverage
+version:            0.23
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Devel::Symdump:  2.01
+    Pod::Find:       0.21
+    Pod::Parser:     1.13
+    Test::More:      0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

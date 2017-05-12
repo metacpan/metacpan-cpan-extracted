@@ -1,0 +1,166 @@
+PBS/PBS version 
+===============
+
+Older presentation available at L<http://khemir.net/pnw_2004/>
+
+
+B<PBS>/I<pbs.pl> is a build utility/module in the same spirit as  'make'.
+
+PBS is among the new generation build systems:
+
+rake: L<http://rake.rubyforge.org/>
+scons
+...
+
+
+This module is pure perl. It is tested on linux and windows.
+
+Special thanks go to Todd Merritt, author of Batch::PBS, to
+allow us to use 'PBS' as namespace.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+INTRODUCTION
+
+I<pbs.pl> is a build utility which uses Perl exclusively for defining rules.
+
+If you have used 'make', I<pbs> should be easy to understand and use.
+
+This is a beta (a developper) release of I<pbs> but this software has been
+used for three years and I use it right now in a very serious project which
+has 800 pbsfiles, 11000 nodes and  3 millions C code lines.
+
+I<pbs> will continue to grow and I hope to get some help from the Open source 
+community. I<pbs> has a limiting licence please read I<licence.txt>.
+
+The biggest limitation is the lack of documentation but we are working on this
+issue. You can have a look at the slide presentation I made at the Nordic
+Perl Workshop in 2004. Some things have changed since then but it will give you
+a nice overview.
+
+I<pbs> has a test suite consisting of over 700 tests. We still work to make the 
+coverage better.
+
+Look at the test directory for some simple examples.
+
+I hope this release will tickle your curiosity anf that we will hear from you.
+
+TODO
+
+Short time:
+
+Write documentation.
+Gather some help.
+Create a web site, a mailing list, a bug tracker, faq, irc, ...
+
+Long time:
+
+Reduce the memory usage.
+Perfect the test suite.
+More speed (though the caching scheme we use today is very satisfying)
+Find some solutions for making it faster on windows (same code big difference!)
+
+Create a companion configuration and installation utility.
+
+I am already planning next version of PBS (the 1.XX series) and there is some
+material to think about in the TODO file.
+
+CAUTION
+
+Backup your source code! An error in your build sytem or in this build utility
+might leave you without anything to work on.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Data::TreeDumper    => '0.20',
+Getopt::Long        => '2.32',
+Cwd                 => '2.06',
+Data::Dumper        => '2.12',
+File::Basename      => '2.71',
+Tie::Hash::Indexed  => '0.03',
+Devel::Depend::Cpp  => '0.05',
+Devel::Depend::Cl   => '0.01',
+Devel::Cycle        => '0',
+File::MkTemp        => '0',
+GraphViz            => '0',
+Math::Pari          => '0',
+Net::Telnet         => '0',
+Net::SSH::Perl      => '0',
+Pod::Simple::Search => '0',
+Data::Compare       => '0',
+Test::Class         => '0',
+Test::Cmd           => '0',
+Term::ProgressBar   => '0',
+File::Copy::Recursive => '0',
+File::Spec          => '0',
+
+Term::ANSIColor => ?
+Text::Balanced => ?
+
+* Math::Pari is required for remote compilation via SSH. This might not install
+easily on Windows.
+
+* Devel::Depend::Cpp is needed to depend C source on linux.
+
+* Devel::Depend::Cl is needed to depend C source on windows.
+
+* Data::TreeDumper on CPAN works in linux only. Mail me for a patch
+or wait a short time for the comming update (within hours or days)
+
+COVERAGE (0.28_11)
+
+----------------------------------- ------ ------ ------ ------ ------ ------
+File                                  stmt branch   cond    sub   time  total
+----------------------------------- ------ ------ ------ ------ ------ ------
+Attributes                            85.7    n/a    n/a   80.0    0.1   84.2
+Build                                 80.8   61.9   41.3   95.7    0.9   73.1
+Forked                                83.0   53.0   42.9  100.0    0.0   75.4
+ForkedNodeBuilder                     91.1   63.2   33.3  100.0    0.0   84.7
+Check                                 80.5   56.2   43.5   95.0    1.3   71.3
+Config                                67.3   50.0   59.5   65.4    1.7   61.8
+Constants                            100.0    n/a    n/a  100.0    0.2  100.0
+Cyclic                                95.7   50.0   33.3  100.0    0.1   90.5
+Debug                                 15.6    0.0    0.0   37.0    0.1   11.6
+DefaultBuild                          85.1   59.3   40.0  100.0    0.7   77.0
+Depend                                74.9   55.4   51.0  100.0    1.4   68.1
+Digest                                61.3   47.0   19.7   79.1    1.1   55.1
+Distributor                           79.4   28.6   40.0   93.3    0.0   72.5
+Documentation                         18.6    0.0    0.0   51.9    0.1   15.5
+FrontEnd                              81.1   46.6   39.1   88.9    0.5   68.8
+Graph                                 56.0   39.1   36.0   90.9    0.0   50.5
+Html                                  27.3    0.0    0.0   78.6    0.0   25.7
+Snapshots                             31.4    0.0    0.0   91.7    0.0   32.8
+GraphViz                              64.9   51.9   35.4   87.5    0.0   58.7
+Information                           79.1   66.2   61.5   84.6    0.5   74.6
+Log                                   73.1   47.8   59.3   87.5    0.9   68.6
+Output                                57.8   50.0   44.2   72.4   20.1   54.6
+PBS                                   80.2   52.1   41.2   96.7    1.4   72.2
+PBSConfig                             77.0   54.3   51.4   96.2   33.9   69.0
+PBSConfigSwitches                     65.8    7.7   42.9   81.2    4.5   57.4
+Plugin                                89.7   57.1   80.0   93.8   20.5   81.8
+PostBuild                             38.2    6.7    0.0   75.0    0.1   32.5
+Rules                                 69.3   54.8   45.5   81.5    0.5   66.0
+Generators                            71.1   60.6   43.1   92.3    1.5   67.3
+Shell                                 83.0   41.7   20.0   92.9    6.9   75.0
+Triggers                              78.7   47.2   11.1   94.4    0.2   70.8
+Warp1_5                               89.9   78.0   80.0   95.8    0.6   86.9
+----------------------------------- ------ ------ ------ ------ ------ ------
+Total                                 69.0   48.4   39.9   85.9  100.0   62.9
+----------------------------------- ------ ------ ------ ------ ------ ------
+
+BUG REPORTS
+
+http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PerlBuildSystem
+
+Copyright (C) 2003-2008 Khemir Nadim ibn Hamouda. <nadim@khemir.net>
+

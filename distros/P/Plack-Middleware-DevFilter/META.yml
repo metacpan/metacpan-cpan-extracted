@@ -1,0 +1,31 @@
+---
+abstract: 'filter a content for detecting environment'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Plack-Middleware-DevFilter
+provides:
+  Plack::Middleware::DevFilter:
+    file: lib/Plack/Middleware/DevFilter.pm
+    version: 0.01
+requires:
+  Carp: 0
+  Imager: 0
+  Plack::Middleware: 0
+  Plack::Util: 0
+  Plack::Util::Accessor: 0
+  perl: 5.008001
+resources:
+  bugtracker: http://github.com/bayashi/Plack-Middleware-DevFilter/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Plack-Middleware-DevFilter
+version: 0.01

@@ -1,0 +1,66 @@
+[
+ {
+  "type": "directive",
+  "tag": "EXTM3U"
+ },
+ {
+  "type": "directive",
+  "tag": "EXT-X-TARGETDURATION",
+  "value": "10"
+ },
+ {
+  "type": "directive",
+  "tag": "EXT-X-ALLOW-CACHE",
+  "value": "YES"
+ },
+ {
+  "type": "directive",
+  "tag": "EXT-X-VERSION",
+  "value": "2"
+ },
+ {
+  "type": "directive",
+  "tag": "EXT-X-MEDIA-SEQUENCE",
+  "value": "1"
+ },
+ {
+  "type": "directive",
+  "tag": "EXTINF",
+  "value": "10,"
+ },
+ {
+  "type": "item",
+  "value": "http://svtplay6c-f.example.net/i/world/open/20121215/1215811-016A/FRAGA_DOKTORN_H-016A-6d7a"
+ },
+ {
+  "type": "directive",
+  "tag": "EXTINF",
+  "value": "10,"
+ },
+ {
+  "type": "item",
+  "value": "http://svtplay6c-f.example.net/i/world/open/20121215/1215811-016A/FRAGA_DOKTORN_H-016A-6d7b"
+ },
+ {
+  "type": "directive",
+  "tag": "EXTINF",
+  "value": "10,"
+ },
+ {
+  "type": "item",
+  "value": "http://svtplay6c-f.example.net/i/world/open/20121215/1215811-016A/FRAGA_DOKTORN_H-016A-6d7c"
+ },
+ {
+  "type": "directive",
+  "tag": "EXTINF",
+  "value": "7,"
+ },
+ {
+  "type": "item",
+  "value": "http://svtplay6c-f.example.net/i/world/open/20121215/1215811-016A/FRAGA_DOKTORN_H-016A-6d7d"
+ },
+ {
+  "type": "directive",
+  "tag": "EXT-X-ENDLIST"
+ }
+]

@@ -1,0 +1,110 @@
+NAME
+    Perlbal::Plugin::ExpandSSL - Add a custom header according to the SSL of
+    a service
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+    This plugin adds a custom header according to information it reads off
+    the SSL certificate of a service you've configured.
+
+    Since Perlbal speaks plain HTTP to backends (while being able to serve
+    HTTPS to clients), the backend does not know whether the client tried to
+    reach HTTPS or HTTP.
+
+    This plugin reads the certificate Perlbal is configured to serve the
+    user, and adds an according header to the backend so it knows.
+
+    In your Perlbal configuration:
+
+        LOAD ExpandSSL
+
+        CREATE SERVICE https_balancer
+          SET role          = reverse_proxy
+          SET pool          = machines
+          SET plugins       = ExpandSSL
+          SET enable_ssl    = on
+          SET ssl_key_file  = /etc/perlbal/certs/mydomain.key
+          SET ssl_cert_file = /etc/perlbal/certs/mydomain.crt
+          SET plugins       = ExpandSSL
+
+SUBROUTINES/METHODS
+  register
+    Register a service hook to run a callback to build a registry of headers
+    for each request.
+
+  build_registry
+    The is the function being called to create the registry. It starts by
+    decoding the cert file and then building the registry using a hardcoded
+    headers hash.
+
+    Don't like it? Patches are welcome! :)
+
+  serialize_pem
+    Takes a PEM-formatted certification file (the type you give Perlbal or
+    your regular webserver to serve to the client) and returns only the Base
+    64 portion of it.
+
+    Basicaly it removed the header and footer in a clean manner.
+
+  expand_ssl
+    Sets the special headers from the registry. This uses the
+    *start_proxy_request* hook.
+
+  unregister
+    Clears up the registry.
+
+  load
+    Nothing.
+
+  unload
+    Nothing.
+
+AUTHOR
+    Sawyer X, "<xsawyerx at cpan.org>"
+
+BUGS
+    This plugin is on Github and you can file issues on:
+
+    <http://github.com/xsawyerx/perlbal-plugin-expandssl/issues>
+
+SUPPORT
+    This module sports 100% test coverage, but in case you have more
+    issues...
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Perlbal::Plugin::ExpandSSL
+
+    You can also look for information at:
+
+    *   Github issue tracker:
+
+        <http://github.com/xsawyerx/perlbal-plugin-expandssl/issues>
+
+    *   Github page:
+
+        <http://github.com/xsawyerx/perlbal-plugin-expandssl>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Perlbal-Plugin-ExpandSSL>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Perlbal-Plugin-ExpandSSL>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Perlbal-Plugin-ExpandSSL/>
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Sawyer X.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

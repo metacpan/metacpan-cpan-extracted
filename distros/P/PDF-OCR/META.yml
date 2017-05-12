@@ -1,0 +1,33 @@
+--- #YAML:1.0
+name:               PDF-OCR
+version:            1.11
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 1
+    Cwd:                  3
+    File::Copy:           2
+    File::Find::Rule:     0.30
+    File::Path:           1
+    File::Slurp:          0
+    File::Spec:           3.24
+    File::Which:          0.05
+    Image::OCR::Tesseract:  1.13
+    LEOCHARRE::CLI:       1.18
+    PDF::API2:            2.015
+    PDF::Burst:           1.10
+    PDF::GetImages:       1.01
+    Smart::Comments:      1.0.2
+    Test::Simple:         0.7
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.48
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

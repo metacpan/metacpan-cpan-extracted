@@ -1,0 +1,28 @@
+---
+abstract: 'Gtk event loop support for POE.'
+author:
+  - 'Rocco Caputo <rcaputo@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  POE::Test::Loops: 1.352
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  POE::Test::Loops: 1.352
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: POE-Loop-Gtk
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Gtk: 0.7009
+  POE: 1.356
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/rcaputo/poe-loop-gtk.git
+version: 1.306

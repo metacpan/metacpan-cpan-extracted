@@ -1,0 +1,32 @@
+Purple was written by Chris Dent and Eugene Eric Kim.
+
+Purple Numbers are a direct descendant of the "statement identifiers"
+in the original hypertext system, Doug Engelbart's NLS/Augment.
+Engelbart was the first to suggest publishing these numbers in HTML
+documents.  His daughter, Christina, suggested making them purple.
+
+Eugene Eric Kim wrote the first tools for automatically generating and
+maintaining purple numbers in documents.
+
+  http://www.eekim.com/software/purple/
+
+Kim and Chris Dent continued to build on this idea in PurpleWiki.
+Dent wrote the original transclusion code in PurpleWiki, and Dent and
+Gerry Gleason wrote most of the code for handling purple numbers.
+
+  http://purplewiki.blueoxen.net/
+
+Our starting point for this code was Matthew O'Connor's post to the
+PurpleWiki development list on October 12, 2005:
+
+  http://purplewiki.blueoxen.net/forums/devel/2005-10/msg00024.html
+
+Kim would like to thank the good folks at El Sombrero in Seattle for
+putting up with Kim and Dent for several hours while they coded away.
+This code would not have been possible without the aid of their
+special macho margaritas.
+
+Many more folks have contributed to the evolution of Purple Numbers.
+For more on this sordid and exciting tale, see:
+
+  http://purple.blueoxen.net/

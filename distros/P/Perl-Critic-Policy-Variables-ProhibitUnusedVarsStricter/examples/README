@@ -1,0 +1,12 @@
+This directory contains examples for the ProhibitUnusedVarsStricter
+Perl-Critic policy. The files are:
+
+README - This file.
+
+unused-vars - This is a script that executes the
+    ProhibitUnusedVarsStricter policy. It is more or less
+    equivalent to
+    $ perlcritic --single ProhibitUnusedVarsStricter
+    but has its own configuration file. Use
+    $ unused-vars --help
+    for the documentation.

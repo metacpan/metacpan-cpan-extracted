@@ -1,0 +1,21 @@
+
+Parse::Fedora::Packages - Parse Fedora package information
+
+Look at the pod documentation for further details.
+
+Installation in the standar way
+
+perl Makefile.PL
+make
+make test
+make install
+
+
+or
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+

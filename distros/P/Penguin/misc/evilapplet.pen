@@ -1,0 +1,13 @@
+Penguin 2.5a P3.0
+checksum
+untitled program
+mapthecat <map@amicus.com>
+Transparent
+%%%delimiter%%%
+#!/usr/bin/perl
+
+$fish = `/bin/date`;
+print "fish are $fish\n";
+5;
+
+%%%delimiter%%%

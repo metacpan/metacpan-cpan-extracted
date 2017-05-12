@@ -1,0 +1,97 @@
+
+
+<HTML>
+<HEAD>
+<TITLE>PPresenter; Beginners; DDay</TITLE>
+
+<BODY BGCOLOR=#FFFFFF TEXT=#000000>
+
+<TABLE WIDTH=100%>
+<TR><TD WIDTH=15% VALIGN=top><IMG SRC=../../images/ppresenter.png WIDTH=150 HEIGHT=170></TD>
+    <TD ALIGN=center><H1>The Day</H1></TD></TR>
+<TR><TD VALIGN=top>
+
+<A HREF=../../index.html>PPresenter</A><BR>
+<A HREF=../../manual.html>Manual</A><BR>
+<A HREF=../index.html>Tutorials</A><BR>
+<A HREF=index.html>Beginners</A><BR>
+<P>
+<A HREF=define.html>Subject</A><BR>
+<A HREF=design.html>Design</A><BR>
+<A HREF=create.html>Creation</A><BR>
+<A HREF=style.html>Styles</A><BR>
+<A HREF=slide.html>Adding Slides</A><BR>
+<A HREF=change.html>Changing&nbsp;defaults</A><BR>
+<A HREF=timing.html>Timing</A><BR>
+<A HREF=tagging.html>Tagging</A><BR>
+<B>DDay</B><BR>
+
+    </TD><TD VALIGN=top>
+
+The day of the presentation.  Unfortunately, PPresenter is not that widespread
+(yet) that the organisation will have it installed on their systems.  You
+will have to use your own laptop.  Test your laptop with the equipment provided
+by the organization.
+<P>
+It would be best to have foils of your presentation, too.  Unfortunately, PPresenter
+cannot create large printouts yet.  Full-sized prints with acceptable
+quality are not foreseen in the near future.
+<P>
+Check the quality of the text.  By default, PPresenter expects output to a
+lcd-projector.  You can easily change the default settings (colour and
+backdrop) by specifying a different device to the
+<A HREF=../../viewport/index.html>viewport</A>:
+<PRE>
+   my $show = PPresenter->new;
+   $show->change
+       ( viewport =&gt; 'default'
+       , -device  =&gt; 'beamer'
+       );
+   $show->addSlide(...)
+</PRE>
+
+<P>
+PPresenter will scale text and images automatically to the available screensize.
+But you still should check if it works.  Go through all of your slides,
+and see if all fits nice.  You may need some minor adjustments (when the
+screensize differes from the size you designed it for)
+<P>
+On the moment your presentation starts, do not forget to press `<CODE>g</CODE>'
+to start the timer.
+
+<H3><A NAME=first>First time?</A></H3>
+If you are on for your first time, then you may have benevit from the next
+list:
+<UL>
+<LI>Be on time (best a few hours early to get in the mood)
+<LI>Have enough sleep in the night before.
+<LI>Do not drink coffee or carbonated drinks in the hour before you
+    have to speak.
+<LI>Go to the toilet just before the presentation.
+<LI>Do not put your hands in your pockets (you'll get sweaty hands)
+<LI>Discuss your presentation with the organizers (hall attendant).
+<LI>People do not mind if you have to interrupt your speach for a minute or
+    more, for instance when you microphone breaks down: they always have
+    things to look-up or speak about with their neighbour.
+<LI>Bring businesscards to hand-out.
+</UL>
+
+<H3><A NAME=afterwards>After the presentation</A></H3>
+<A HREF="mailto:ask@ppresenter.org">Send me a mail</A> and tell me
+how to improve these guidelines.  Success!
+
+<P>
+Back to <A HREF=../index.html>Tutorials</A>.
+<TR><TD>&nbsp;</TD>
+    <TD VALIGN=top>
+
+<HR NOSHADE>
+Portable Presenter is written and maintained by
+<A HREF=http://mark.overmeer.net>Mark Overmeer</A>.
+Copyright (C) 2000-2002, Free Software Foundation FSF.
+
+
+    </TD></TR>
+</TABLE>
+</HTML>
+

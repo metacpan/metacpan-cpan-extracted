@@ -1,0 +1,173 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with Protocol::UWSGI
+at lib/Protocol/UWSGI.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+Protocol::UWSGI - handle the UWSGI wire protocol
+
+=head1 VERSION
+
+Version 1.000
+
+=head1 SYNOPSIS
+
+ use strict;
+ use warnings;
+ use Protocol::UWSGI qw(:all);
+ # Encode...
+ my $req = build_request(
+   uri    => 'http://localhost',
+   method => 'GET',
+   remote => '1.2.3.4:1234',
+ );
+ # ... and decode again
+ warn "URI was " . uri_from_env(
+   extract_frame(\$req)
+ );
+
+=head1 DESCRIPTION
+
+Provides protocol-level support for UWSGI packet generation/decoding, as
+defined by L<http://uwsgi-docs.readthedocs.org/en/latest/Protocol.html>.
+Currently expects to deal with PSGI data (modifier 1 == 5), although this
+may be extended later if there's any demand for the other packet types.
+
+This is unlikely to be useful in an application - it's intended to provide
+support for dealing with the protocol in an existing framework: it deals
+with the abstract protocol only, and has no network transport handling at
+all. Try L<Net::Async::UWSGI> for an implementation that actually does
+something useful.
+
+Typically you'd create a UNIX socket and listen for requests, passing
+any data to the L</extract_frame> function and handling the resulting
+data if that function returns something other than undef:
+
+ # Detect read - first packet is usually the UWSGI header, everything
+ # after that would be the HTTP request body if there is one:
+ sub on_read {
+   my ($self, $buffref) = @_;
+   while(my $pkt = extract_frame($buffref)) {
+     $self->handle_uwsgi($pkt);
+   }
+ }
+
+ # and probably an EOF handler to detect client hangup
+ # sub on_eof { ... }
+
+=head1 IMPLEMENTATION - Server
+
+A server implementation typically accepts requests from a reverse
+proxy, such as nginx, and returns HTTP responses.
+
+Import the :server tag to get L</uri_from_env>, L</extract_frame>
+and in future maybe L</psgi_from_env> functions:
+
+ use Protocol::UWSGI qw(:server);
+
+=head1 IMPLEMENTATION - Client
+
+A client implementation typically accepts HTTP requests and converts
+them to UWSGI for passing to a UWSGI-capable application.
+
+Import the :client tag to get L</build_request>:
+
+ use Protocol::UWSGI qw(:client);
+
+=head1 FUNCTIONS
+
+If you're handling incoming UWSGI requests, you'll need to instantiate
+via L</new> then decode the request using L</extract_frame>.
+
+If you're making UWSGI requests against an external UWSGI server,
+that'll be L</build_request>.
+
+Just want to decode captured traffic? L</extract_frame> again.
+
+=head2 extract_frame
+
+Attempts to extract a single UWSGI packet from the given buffer (which
+should be passed as a scalar ref, e.g.
+
+ my $buffref = \"...";
+ my $req = Protocol::UWSGI->extract_frame($buffref)
+   or die "could not find UWSGI frame";
+
+If we had enough data for a packet, that packet will be removed from
+the buffer and returned. There may be additional packet data that
+can be extracted, or non-UWSGI data such as HTTP request body.
+
+If this returns undef, there's not enough data to process - in this case,
+the buffer is guaranteed not to be modified.
+
+This may be called as a class method or an instance method.
+The instance state will remain unchanged after calling this method.
+
+Note that there is no constructor provided in this
+class - if you want to call this as an instance method,
+you'll need to bless manually or be applying this as
+a role/mixin.
+
+=head2 bytes_required
+
+Returns the number of additional bytes we'll need in order to proceed.
+
+If zero, this means we should be able to extract a valid frame.
+
+=head2 build_request
+
+Builds an UWSGI request using the given modifier, defaulting
+to modifier1 == 5 and modifier2 == 0, i.e. PSGI request.
+
+Takes the following named parameters:
+
+=over 4
+
+=item * modifier1 - the modifier1 value, defaults to 5 if not provided
+
+=item * modifier2 - the modifier2 value, defaults to 0 if not provided
+
+=item * method - the HTTP request method
+
+=item * uri - which L<URI> we're requesting, can be passed as a plain string
+in which case we'll upgrade to a L<URI> object internally
+
+=item * headers - a hashref of HTTP headers, e.g. { 'Content-Type' => 'text/html' }
+
+=back
+
+Returns a scalar containing packet data or raises an exception on failure.
+
+=head2 extract_modifier
+
+Used internally to extract and handle the modifier-specific data.
+
+=head2 uri_from_env
+
+Returns a L<URI> object parsed from a request ("environment").
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<Exporter>
+
+L<as_heavy|Exporter/as_heavy>, L<export|Exporter/export>, L<export_fail|Exporter/export_fail>, L<export_ok_tags|Exporter/export_ok_tags>, L<export_tags|Exporter/export_tags>, L<export_to_level|Exporter/export_to_level>, L<import|Exporter/import>, L<require_version|Exporter/require_version>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2013-2014. Licensed under the same terms as Perl itself.

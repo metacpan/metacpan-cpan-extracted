@@ -1,0 +1,56 @@
+TODO:
+ - Grab some tests from URI::ToDisk ? 
+ - $rsc->location as an alias for $rsc->loc ?
+ - $rsc->abstract to return a Path::Abstract object based on $dir, $path ?
+
+0.072 Monday February 23 12:23:47 PST 2009:
+ - Removed Build.PL
+ - Updated MANIFEST
+
+0.071 Saturday February 21 21:12:11 PST 2009:
+ - Conversion to github
+ - Modified use of Path::Abstract to disable warning
+
+0.070 Saturday January 19 10:39:12 PST 2008:
+ - Changed build process over to Module::Install
+ - Fixed failing tests on Win32 (rep. RENEEB)
+
+0.06 Saturday August 25 15:58:44 PDT 2007:
+ - Make sure ->base->loc, ->base->dir, and ->base->uri are in the right format when changing
+ - More documentation: Description and rationale in Path/Resource.pm
+ - More documentation for Path::Resource::Base
+ - This is comprehensive release, as all major functionality is documented with examples
+
+0.06 Tuesday August 21 00:17:48 PDT 2007:
+ - More documentation
+ - Cleaned up some Path::Resource::Base processing
+ - $rsc->base->uri should now return the original uri passed in
+
+0.05 Thursday August 09 18:39:47 PDT 2007:
+ - $rsc->path will not return a path clone instead of the original
+ - More documentation
+ - Change to using Class::Accessor::Fast
+
+0.042 Sunday August 05 11:39:28 PDT 2007:
+
+0.041 Saturday August 04 19:59:45 PDT 2007 
+ - Minor change to Build.PL: Test::Lazy requirement
+
+0.04 Monday July 30 11:29:31 PDT 2007:
+ - Only prepend path in file/dir/loc if it is non-empty
+
+0.03 Tuesday June 26 20:02:47 PDT 2007:
+ - Rewrite using Path::Abstract
+
+0.01_4 2007-4-27:
+ - More documentation
+
+0.01_3 2007-2-25:
+ - New "Changes" format (big release, I know)
+ 
+0.01_2 2007-2-16:
+ - Some documentation coverage
+ - Fully functional with tests
+
+0.01_1 2007-2:
+ - Initial release

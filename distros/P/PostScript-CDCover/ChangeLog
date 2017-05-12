@@ -1,0 +1,71 @@
+0.9 2004-03-23
+
+        * Now uses a configuration file for default values of parameters. No
+          need to edit the source code anymore.
+        * Added a Makefile to ease the installation process. The default is to
+          install in /usr/local but this can be overriden when invoking make.
+          Re-read the INSTALL file for details.
+        * Changed the default for --root to /media/cdrom instead of /cdrom
+          (for compliance with the Filesystem Hierarchy Standard)
+          http://www.pathname.com/fhs/pub/fhs-2.3.html#MEDIAMOUNTPOINT
+        * Omitting the --title now results in using --root instead, i.e., the
+          top directory will be printed as the CD's title. Thanks to Terry
+          Gliedt for suggesting this.
+        * Now uses ISO-8859-15 (or Latin9) enconding instead of ISO-8859-1
+          (Latin1).  This is the recommended encoding for use in Western
+          Europe as it features the Euro sign and some French
+          not-so-common-but-still-needed characters, it is harmless for
+          countries using a European language (like in America).  The rest of
+          the world was unhappy with ISO-8859-1 anyway.
+        * Bugfix: an empty title used to cause a division by zero in the
+          PostScript code (bug introduced in release 0.8)
+
+0.8 2004-02-24
+
+        * Added switches --color, --cd-color and --folder-color to generate
+          colored output.
+        * Long titles are now scaled down enough to fit in the page width,
+          instead of being simply truncated.
+        Thanks to Michael M. Tung for suggesting these two enhancements.
+
+0.7 2004-02-12
+
+        * Added switch --mp3 to replace filenames with song title when ID3
+          tags are available.
+
+0.6 2004-02-05
+
+	* Prints one of the side labels upside down so that the box side reads
+          always good however it is put on the shelf.
+        * Code cleanup.
+	* Added switch --separator to add a column separator line
+	* Added switch --minwidth to eliminate too narrow columns. When the
+          room available on the right is below this limit, next column is sent
+          to the next page (only useful with --columns=0)
+
+0.5 - 2004-02-04
+
+        * Bugfix: Added $File::Find::dont_use_nlink = 1 to prevent problem
+          with older versions of File::Find (File::Find would not recurse
+          through non Unix filesystems, notably ISO9660 CD-ROMs).
+
+0.4 - 2004-02-02
+
+	* Added switch --all to force printing even empty pages
+
+0.3 - 2004-02-02
+
+	* Setting --columns=0 now makes the widths of columns automatic, i.e.,
+          they take just enough room for the longest filename to fit. Still,
+          the right most column on a page can be too narrow, in which case the
+          long filenames are truncated.
+        * Code cleanup
+
+0.2 - 2004-01-30
+
+	* Added --columns option to print out more (or less) than the default
+          2 columns.
+
+0.1 - 2004-01-29
+
+	* Initial release

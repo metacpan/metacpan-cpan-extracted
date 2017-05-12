@@ -1,0 +1,4 @@
+This is the examples folder.
+
+inline-data.sps is an example of a PSPP program that loads inline data.
+external-data.sps is an example of a PSPP program that load external data (data.csv)

@@ -1,0 +1,37 @@
+Changes
+examples/placeholder.pl
+INSTALL.SKIP
+lib/Pod/WordML.pm
+lib/Pod/WordML/AddisonWesley.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/convert_pod.t
+t/lib/transform_file.pl
+t/load.t
+t/pod.t
+t/test_manifest
+test-corpus/curly-quotes.pod
+test-corpus/curly-quotes.xml
+test-corpus/entities.pod
+test-corpus/entities.xml
+test-corpus/headings.pod
+test-corpus/headings.xml
+test-corpus/item-with-interior.pod
+test-corpus/item-with-interior.xml
+test-corpus/multi-para.pod
+test-corpus/multi-para.xml
+test-corpus/over-item.pod
+test-corpus/over-item.xml
+test-corpus/simple-para.pod
+test-corpus/simple-para.xml
+test-corpus/single-h1.pod
+test-corpus/single-h1.xml
+test-corpus/test.xml
+test-corpus/verbatim.pod
+test-corpus/verbatim.xml
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

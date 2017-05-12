@@ -1,0 +1,192 @@
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+NAME
+    PIX::Walker - Process Cisco PIX configs and 'walk' access-lists
+
+SYNOPSIS
+    PIX::Walker is an object that allows you to process PIX (and ASA) firewall
+    configs and 'walk' an access-list for matches. PIX OS versions 6 and 7 are
+    supported. Note, ACL's that use the 'interface' keyword will not match
+    properly since there is no way for the Walker to match an IP to an
+    interface, at least not yet.
+
+    'Loose' ACL matching performed. This means that you can specify as little as
+    a single IP to match what line(s) that IP would match in the ACL on the
+    firewall. Or you can provide every detail including source/dest IPs, ports,
+    and protocol to match a specific line of an ACL. Loose matching allows you
+    to see potential lines in a large ruleset that a single source or
+    destination IP might match.
+
+    More than just the first line match can be returned. If your search criteria
+    can technically match multiple lines they will all be returned. This is
+    useful for seeing extra matches in your ACL that might also match and can
+    help you optimize your ACL.
+
+EXAMPLE
+      use PIX::Walker;
+
+      my $config = "... firewall config buffer or filename ...";
+      my $fw = new PIX::Walker($config);
+      my $acl = $fw->acl("outside_access") || die("ACL does not exist");
+
+      my $matched = 0;
+      # search each line of the ACL for possible matches
+      foreach my $line ($acl->lines) {
+        if ($line->match(
+            source => "10.0.1.100", 
+            dest => "192.168.1.3", 
+            dport => "80",          # dest port
+            proto => "tcp")) {
+          if (!$matched++) {
+            print "Matched ACL " . $acl->name .
+              " (" . $acl->elements . " ACE)\n";
+          }
+          print $line->print, "\n";
+        }
+      }
+
+METHODS
+    new($config, [$not_a_file])
+
+            Returns a new PIX::Walker object using the $config string passed in.
+            The configuration is processed and broken out into various objects
+            automatically.
+
+            The $config string is either a full string buffer containing the
+            configuration of a firewall or is used as a filename to read the
+            configuration from, using various filename formats (tried with and
+            without any extension on the filename)
+
+                    * {$config}
+                    * {$config}.conf
+        
+            If $not_a_file is true then the $config string is never checked
+            against the file system.
+
+    acl($name)
+
+            Returns an PIX::Accesslist object for the ACL named by $name.
+
+    acls()
+
+            Returns an array of access-list strings for each access-list found
+            in the firewall configuration. Returns undef if there is no matching
+            ACL. Use walker->acl('acl_name') to retrieve the actual
+            PIX::Accesslist object.
+
+    add_acl($name, [\@conf])
+
+            Add's an access-list object to the PIX::Walker object. $conf is an
+            arrayref of the configuration lines that make up the access-list and
+            can be empty.
+
+    add_obj($name, $type, [\@conf])
+
+            Add's an object-group object to the PIX::Walker object. $conf is an
+            arrayref of the configuration lines that make up the object-group
+            and can be empty.
+
+    alias($alias)
+
+            Returns the IP of the alias given in $alias. If no alias is found
+            than the string is returned unchanged.
+
+    findip($ip, [$trace])
+
+            Matches the IP to an existing network-group. Does not validate it
+            within any ACL. If a single group is matched a scalar is returned
+            with the name, otherwise an array reference is returned containing
+            all matches.
+
+            * *$ip* is an IP address to look for.
+
+            * *$trace* is an optional reference to a trace buffer.
+
+            If an IP is found in a nested group the trace will allow you to find
+            out where it was nested. See tracedump() for more information.
+
+    findport($port, [$trace])
+
+            Matches the PORT to an existing service-group. Does not validate it
+            within any ACL. If a single group is matched a scalar is returned
+            with the name, otherwise an array reference is returned containing
+            all matches.
+
+            * *$port* is the PORT to look for.
+
+            * *$trace* is an optional reference to a trace buffer.
+
+            If a PORT is found in a nested group the trace will allow you to
+            find out where it was nested. See tracedump() for more information.
+
+    obj($name)
+
+            Returns an PIX::Object object for the object-group that matches the
+            $name given.
+
+    objs([$type])
+
+            Returns an array of object-group strings for each object-group found
+            in the firewall configuration. If $type is specified only groups
+            matching that type are returned.
+
+            Returns undef if there are no object-groups. Use
+            walker->obj('obj_name') to retreive the actual PIX::Object object.
+
+    portnum($port)
+
+            Returns the port NUMBER of the port name given. This function will
+            DIE() if the port name is not known. This is harsh because the
+            routines that use this function will not work if a single port
+            lookup fails (not being able to lookup a port number can cause some
+            of your acl searching to fail). This function is meant to be used
+            internally only.
+
+    tracedump($trace)
+
+            Prints out the trace dump given. This will allow you to see where
+            IP's and PORT's are being matched within their object-groups even if
+            they are nested.
+
+                        $matched = $fw->findip($ip, $trace);
+                        $fw->tracedump($trace);
+
+AUTHOR
+            Jason Morriss <lifo 101 at - gmail dot com>
+
+BUGS
+            Please report any bugs or feature requests to "bug-pix-walker at
+            rt.cpan.org", or through the web interface at
+            <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=PIX-Walker>. I will
+            be notified, and then you'll automatically be notified of progress
+            on your bug as I make changes.
+
+SUPPORT
+                perldoc PIX::Walker
+
+                perldoc PIX::Accesslist
+                perldoc PIX::Accesslist::Line
+
+                perldoc PIX::Object
+                perldoc PIX::Object::network
+                perldoc PIX::Object::service
+                perldoc PIX::Object::protocol
+                perldoc PIX::Object::icmp_type
+
+ACKNOWLEDGEMENTS
+            Peter Vargo - For pushing me to make this module and for supplying
+            me with endless ideas.
+
+COPYRIGHT & LICENSE
+            Copyright 2006-2008 Jason Morriss, all rights reserved.
+
+            This program is free software; you can redistribute it and/or modify
+            it under the same terms as Perl itself.
+

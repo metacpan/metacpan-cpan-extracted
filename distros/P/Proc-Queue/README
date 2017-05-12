@@ -1,0 +1,29 @@
+Proc/Queue
+==========
+
+Proc::Queue limits the number of forked processes that can
+be running concurrently.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+   Time::Hires will be used if available.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001, 2002, 2003, 2005 Salvador Fandiño García
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

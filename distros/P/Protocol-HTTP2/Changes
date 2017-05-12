@@ -1,0 +1,181 @@
+Revision history for Perl extension Protocol-HTTP2
+
+1.08 2016-09-27T12:57:26Z
+    - implemented on_error callback for request
+    - fixed bug: incorrect handling of negative window size (thanks to Daniil
+      Bondarev for patch #2)
+    - fixed bug: last chunk of blocked data can be sent several times
+    - size of flow control window updated with current value of
+      SETTINGS_INITIAL_WINDOW_SIZE
+
+1.07 2016-03-03T20:44:19Z
+    - implemented ping() method for client and server
+    - implemented trailer headers support
+    - fixed some error codes
+    - improved header table size handling
+
+1.06 2016-02-22T08:56:19Z
+    - implemented keepalive option for client (#1)
+    - explicit connection closing for client  (#1)
+    - fixed MAX_PAYLOAD_SIZE constant value (thanks to Francisco Obispo for
+      bugreport)
+
+1.05 2015-12-24T12:40:10Z
+    - support for request body
+    - new client/server examples with IO::Socket::SSL
+
+1.04 2015-07-10T20:19:19Z
+    - fixed bug: Chrome send ':path' as literal header, make exception for
+      pseudo headers in header check
+    - make exceptions for RST_STREAM frames in state_machine
+    - fixed debuging level
+
+1.03 2015-07-09T21:09:54Z
+    - reworked enqueue() method, implemented enqueue_raw()
+    - return error when CONTINUATION frames interrupted by other frames
+    - check length of RST_STREAM and WINDOW_UPDATE frames
+    - implemented validation rules for settings SETTINGS_ENABLE_PUSH and
+      SETTINGS_INITIAL_WINDOW_SIZE
+    - update flow control window size on active streams when receive
+      SETTINGS_INITIAL_WINDOW_SIZE
+    - fixed bug: now send ack on empty settings
+    - fixed bug: flow control window for sended frames used to be initialized
+      with wrong value
+    - strict validation of headers
+    - check for explicit content-length header to match size of received DATA
+      frames
+    - control for maximum concurent streams
+    - fixed tests
+
+1.02 2015-06-22T17:27:01Z
+    - fixed leaks test
+
+1.01 2015-06-21T14:17:54Z
+    - fixed leaks in Server/Client code
+    - new test to check leaks
+    - updated examples with tls
+
+1.00 2015-05-16T18:51:09Z
+    - HTTP/2 is RFC 7540
+    - HPACK  is RFC 7541
+    - updated protocol id string ("h2", "h2c"), dropped old interop id strings
+
+0.16 2015-04-05T20:41:49Z
+    - update status (beta)
+    - add wiki link
+    - implemented server streaming
+    - implemented client downloading, request cancelling
+
+0.15 2015-02-26T20:39:20Z
+    - Splited settings for decoder/encoder
+    - Allow to setup custom settings in Server/Client constructor
+    - Fixed bug with settings packing/unpacking
+    - Dropper Log::Dispatch dependency
+    - updated HPACK to draft 12
+
+0.14 2015-02-11T14:03:22Z
+    - updated HTTP/2 to draft 17
+    - updated HPACK  to draft 11
+
+0.13 2014-12-01T07:56:43Z
+    - updated HTTP/2 to draft 16
+    - added draft_interop version (14) for interoperability
+
+0.12 2014-10-28T12:18:22Z
+    - updated HTTP/2 to draft 15
+
+0.11 2014-08-14T12:07:48Z
+    - dropped Hash::MultiValue requirement
+    - fixed HPACK
+    - fixed HPACK test
+
+0.10 2014-07-31T21:25:59Z
+    - updated HTTP/2 to draft 14
+    - updated HPACK to draft 09
+    - fixed tests
+
+0.09 2014-07-08T13:16:24Z
+
+    - another fix for 09_client_server_tcp.t (check features of Net::SSLeay)
+    - updated extract_* scripts
+    - updated HTTP/2 to draft 13
+      - removed ALTSVC and BLOCKED frames
+      - removed DATA frames comression support
+      - PAD_HIGH, PAD_LOW flags are replaced by PADDED
+      - settings changed from 8-bit to 16-bit unsigned integer
+    - updated HPACK to draft 08
+      - updated huffman codes table
+      - updated static table
+    - fixed tests
+
+0.08 2014-05-17T09:59:07Z
+
+    - fixed test 09_client_server_tcp.t
+    - fixed *_COMPRESS_DATA constants
+    - fixed blocked data handling
+    - allow zero-sized DATA frames
+    - fixed HPACK encoding: evicting and refrence set emptying
+    - added Protocol::HTTP2::Server POD
+    - fixed upgrade (added required header :scheme)
+
+0.07 2014-05-15T13:14:32Z
+
+    - implemented PRIOIRITY encoder/decoder
+    - update HEADERS implementation (priority handling)
+    - remove old flags PRIORITY_GROUP, PRIORITY_DEPENDENCY
+    - added tcp test
+    - update cpanfile (TCP::Test and other test deps)
+    - implemented ALTSVC encoder/decoder
+    - updated Protocol::HTTP2 POD
+    - added Protocol::HTTP2::Client POD
+
+0.06 2014-05-13T17:51:16Z
+
+    - switch to Module::Build::Tiny
+    - implemented PING encoder/decoder
+    - fixed Rst_stream - unneeded state manipulation
+    - internal PH2Test test module
+    - implemented PUSH_PROMISE encoder
+    - implemented push for Server
+    - add Server's push in server-tls-anyevent.pl example
+    - process state of encoded frame after putting it on a queue
+
+0.05 2014-05-11T11:19:57Z
+
+    - implemented flow control
+    - implemented WINDOW_UPDATE encoder/decoder
+    - fixed MAX_PAYLOAD_SIZE constant
+    - fixed runtime error in RST_STREAM
+    - required MIME::Base64 >= 3.11 (encode_base64url and decode_base64url)
+    - HTTP/1.1 Upgrade for client
+
+0.04 2014-05-08T18:22:24Z
+
+    - enable Upgrade in server-anyevent.pl example
+    - implemented HTTP/1.1 Upgrade (server)
+    - fixed build/tests on windows
+    - update cpanfile (Net::SSLeay > 1.45 for NPN)
+    - update state doc
+
+0.03 2014-05-07T18:05:50Z
+
+    - client-tls-anyevent.pl with NPN/ALPN support and server's push handling
+    - fixed error handling (send only one GOAWAY)
+    - fixed PUSH_RPOMISE/CONTINUATION state and headers handling
+    - implemented PUSH_PROMISE decoder
+    - implemented RST_STREAM encoder
+    - server-tls-anyevent.pl with NPN/ALPN support
+    - fixed Connection's send(): set END_STREAM flag for last DATA frame
+    - fixed HEADERS/CONTINUATION logic
+    - pending state change until all CONTINUATION frames received
+    - fixed author
+
+0.02 2014-05-05T20:24:31Z
+
+    - implemented CONTINUATION frame decoding
+    - docs: table about frame types, flags and stream id
+
+0.01 2014-04-27T08:51:15Z
+
+    - original version
+

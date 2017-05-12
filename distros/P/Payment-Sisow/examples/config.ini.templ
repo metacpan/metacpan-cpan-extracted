@@ -1,0 +1,16 @@
+[daemon]
+# other user than "root" is adviced
+user		= wwwrun
+group		= www
+workdir		= /tmp/sisow-client-test
+pid_file	= /tmp/sisow-client-test.pid
+
+[sisow]
+# collect these fields from the Sisow customer website
+# be sure that "testing allowed" is turned on in that interface!
+merchant_id	= #REQUIRED#
+merchant_key	= #REQUIRED#
+
+[http]
+# hostname/post must be reacheable from the outside
+host		= example.com:3331

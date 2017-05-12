@@ -1,0 +1,98 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: P5U
+Upstream-Contact: Toby Inkster <tobyink@cpan.org>
+Source: https://metacpan.org/release/P5U
+
+Files: CREDITS
+ Changes
+ LICENSE
+ MANIFEST.SKIP
+ META.ttl
+ Makefile.PL
+ README
+ TODO
+ bin/p5u
+ lib/P5U/Command.pm
+ lib/P5U/Command/About.pm
+ lib/P5U/Command/Aliases.pm
+ lib/P5U/Command/AutoProve.pm
+ lib/P5U/Command/Commands.pm
+ lib/P5U/Command/DebianRelease.pm
+ lib/P5U/Command/Reprove.pm
+ lib/P5U/Command/TestPod.pm
+ lib/P5U/Command/Testers.pm
+ lib/P5U/Command/Version.pm
+ lib/P5U/Command/Whois.pm
+ meta/changes.ttl
+ meta/doap.ttl
+ meta/makefile.ttl
+ t/01basic.t
+Copyright: Unknown
+License: Unknown
+
+Files: lib/P5U.pm
+ lib/P5U/Lib/AutoProve.pm
+ lib/P5U/Lib/DebianRelease.pm
+ lib/P5U/Lib/TestPod.pm
+ lib/P5U/Lib/Testers.pm
+ lib/P5U/Lib/Version.pm
+ lib/P5U/Lib/Whois.pm
+ lib/P5U/Tutorial/Development.pod
+Copyright: This software is copyright (c) 2012-2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install.pm
+ inc/Module/Install/Include.pm
+ inc/Module/Install/Metadata.pm
+ inc/Module/Install/Scripts.pm
+Copyright: Copyright 2002 - 2012 Brian Ingerson, Audrey Tang and Adam Kennedy.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/TrustMetaYml.pm
+ inc/Module/Package/Dist/RDF.pm
+Copyright: This software is copyright (c) 2011-2012 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Makefile.pm
+Copyright: Copyright 2002, 2003, 2004 Audrey Tang and Brian Ingerson.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Package.pm
+Copyright: Copyright (c) 2011. Ingy doet Net.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: COPYRIGHT
+Copyright: None
+License: public-domain
+Comment: This file! Automatically generated.
+
+Files: inc/Module/Install/Contributors.pm
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/Module/Install/Base.pm
+Copyright: Copyright 2003, 2004 by Audrey Tang <autrijus@autrijus.org>.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: lib/P5U/Lib/Reprove.pm
+Copyright: This software is copyright (c) 2011-2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: inc/YAML/Tiny.pm
+Copyright: Copyright 2006 - 2012 Adam Kennedy.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2013 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2013 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989
+

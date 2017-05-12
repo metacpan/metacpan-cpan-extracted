@@ -1,0 +1,30 @@
+PerlIO::via::csv
+================
+
+This package implements a PerlIO layer. In emulating an IO stream for
+spreadsheets (e.g. Excel files), it converts the spreadsheet into CSV
+(comma-separated values) format.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+  perl Makefile.PL
+  make
+  make test
+  make install  (probably as root)
+
+
+DEPENDENCIES
+
+This module runs only with perl 5.8.1 or higher with perlio enabled.
+It requires Spreadsheet::ExcelParser and Spreadsheet::Read.
+
+
+COPYRIGHT AND LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Copyright (C) 2009 Scott Lanning <slanning@cpan.org>

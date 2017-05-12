@@ -1,0 +1,10 @@
+name: PerlIO-via-symlink
+version: 0.05
+abstract: PerlIO layer for symlinks
+author: Chia-liang Kao <clkao@clkao.org>
+license: perl
+distribution_type: module
+no_index:
+  directory:
+    - inc
+generated_by: Module::Install version 0.36

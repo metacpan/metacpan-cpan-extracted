@@ -1,0 +1,391 @@
+## name Double-quoted non-SQL string.
+## failures 0
+## cut
+
+my $string = "Hello $world";
+
+## name Single-quoted SQL string with an escaped variable.
+## failures 0
+## cut
+
+my $sql = 'SELECT * FROM table WHERE $field = 1';
+
+## name Single-quoted SQL string.
+## failures 0
+## cut
+
+my $sql = 'SELECT * FROM table';
+
+## name Double-quoted SQL string without interpolated variables.
+## failures 0
+## cut
+
+my $sql = "SELECT * FROM table";
+
+## name Double-quoted SQL string with an interpolated scalar.
+## failures 1
+## cut
+
+my $sql = "SELECT * FROM $table";
+
+## name Double-quoted SQL string with an interpolated array element.
+## failures 1
+## cut
+
+my $sql = "SELECT * FROM $table[0] WHERE field = 'value'";
+
+## name Double-quoted SQL string with an interpolated hash element.
+## failures 1
+## cut
+
+my $sql = "SELECT * FROM $table{'name'}";
+
+## name qq-quoted SQL string with an interpolated scalar.
+## failures 1
+## cut
+
+my $sql = qq|
+	SELECT *
+	FROM $table
+	WHERE $field = 'value'
+|;
+
+## name Double-quoted SQL string with multiple variables.
+## failures 1
+## cut
+
+my $sql = "
+	SELECT $field_name
+	FROM $table
+";
+
+## name Double-quoted SQL string with multiple variables (whitelisted).
+## failures 0
+## cut
+
+my $sql = "
+	SELECT $field_name
+	FROM $table
+"; ## SQL safe ($field_name $table)
+
+## name Double-quoted SQL string with multiple variables (partially whitelisted).
+## failures 1
+## cut
+
+my $sql = "
+	SELECT $field_name
+	FROM $table
+"; ## SQL safe ($table)
+
+## name Double-quoted SQL string with a nested data structure.
+## failures 1
+## cut
+
+my $sql = "
+	SELECT $tables->{'table'}->{'fields'}->[0]
+	FROM table
+";
+
+## name Double-quoted SQL string with a nested data structure (whitelisted).
+## failures 0
+## cut
+
+my $sql = "
+	SELECT $tables->{'table'}->{'fields'}->[0]
+	FROM table
+"; ## SQL safe ($tables->{'table'}->{'fields'}->[0])
+
+## name Heredoc with multiple variables.
+## failures 1
+## cut
+
+my $heredoc = <<__HERE__
+	SELECT $field_name
+	FROM $table
+__HERE__
+
+## name (GH-14) Heredoc with variable in last line.
+## failures 1
+## cut
+
+my $heredoc = <<__HERE__
+	SELECT
+	FROM $table
+__HERE__
+
+## name (GH-14) Double-quoted heredoc with variable in last line.
+## failures 1
+## cut
+
+my $heredoc = <<"HERE"
+	SELECT
+	FROM $table
+HERE
+
+## name Double-quoted heredoc with multiple variables.
+## failures 1
+## cut
+
+my $heredoc = <<"HERE"
+	SELECT $field_name
+	FROM $table
+HERE
+
+## name Single-quoted heredoc with multiple variables.
+## failures 0
+## cut
+
+my $heredoc = <<'HERE'
+	SELECT $field_name
+	FROM $table
+HERE
+
+## name Heredoc with multiple variables (whitelisted).
+## failures 0
+## cut
+
+my $heredoc = <<__HERE__; ## SQL safe ($field_name $table)
+	SELECT $field_name
+	FROM $table
+__HERE__
+
+## name Concatenated variable on multiple lines.
+## failures 1
+## cut
+
+my $sql = 'SELECT * FROM '
+	. $table
+	. ' WHERE test = 1';
+
+## name Concatenated variable.
+## failures 1
+## cut
+
+my $sql = 'SELECT * FROM ' . $table;
+
+## name Concatenated single-quoted strings.
+## failures 0
+## cut
+
+my $sql = 'SELECT * ' . 'FROM table_name';
+
+## name SQL-safe comments between concatenations (single comment).
+## failures 0
+## cut
+
+my $sql = "SELECT $fields " . ## SQL safe ($fields)
+	'FROM table_name';
+
+## name SQL-safe comments between concatenations (multiple comments).
+## failures 0
+## cut
+
+my $sql = "SELECT $fields " ## SQL safe ($fields)
+	. "FROM $table_name"      ## SQL safe($table_name)
+	. 'WHERE field = 1';
+
+## name SQL-safe comments between concatenations (no interpolation in first string).
+## failures 0
+## cut
+
+my $sql = "SELECT field2 "
+	. "FROM $table_name" ## SQL safe($table_name)
+	. 'WHERE field = 1';
+
+## name Concatenation with a function call.
+## failures 1
+## cut
+
+my $sql = "SELECT field2 "
+	. "FROM "
+	. get_table_name()
+	. 'WHERE field = 1';
+
+## name Concatenation with a function call marked as safe.
+## failures 0
+## cut
+
+my $sql = "SELECT field2 "
+	. "FROM "
+	. get_table_name() ## SQL safe (&get_table_name)
+	. 'WHERE field = 1';
+
+## name String as part of a list with variables in some list elements.
+## failures 0
+## cut
+
+my ( $value ) = $dbh->selectrow_array( 'SELECT function(?)', undef, $input );
+
+## name Non-SQL string with a SQL keyword in non-leading position.
+## failures 0
+## cut
+
+my $sql = "The information will UPDATE in $delay hours";
+
+## name Concatenated variables listed as safe.
+## failures 0
+## cut
+
+$sql .= "UPDATE table_name." . $self->{service} . " SET deleted_at = NOW() WHERE id = " . $map->{system_id} . " AND deleted_at IS NULL"; ## SQL safe ( $self->{service} $map->{system_id} )
+
+## name Deeply nested concatenated variable not listed as safe.
+## failures 1
+## cut
+
+$sql .= "UPDATE table_name." . $self{service}->[0]->{'test'};
+
+## name Deeply nested concatenated variable not specifically listed as safe.
+## failures 1
+## cut
+
+$sql .= "UPDATE table_name." . $self{service}->[0]->{'test'}; ## SQL safe ($self)
+
+## name Deeply nested concatenated variable listed as safe with a different syntax.
+## failures 1
+## cut
+
+$sql .= "UPDATE table_name." . $self{service}->[0]->{'test'}; ## SQL safe ($self{'service'}->[0]->{'test'})
+
+## name Deeply nested concatenated variable listed as safe.
+## failures 0
+## cut
+
+$sql .= "UPDATE table_name." . $self{service}->[0]->{'test'}; ## SQL safe ($self{service}->[0]->{'test'})
+
+## name Use of quote_identifier().
+## failures 0
+## cut
+
+$sql = "UPDATE " . $dbh->quote_identifier($table_name) . " SET ";
+
+## name Use of quote().
+## failures 0
+## cut
+
+$sql = "UPDATE table_name SET field = " . $dbh->quote($value) . "WHERE field = 1";
+
+## name Partial use of quote() and quote_identifier().
+## failures 1
+## cut
+
+$sql = "UPDATE " . $dbh->quote_identifier($table_name) . " SET field = " . $dbh->quote($value) . "WHERE field = $test";
+
+## name Safe variables with space in the hash key names.
+## failures 0
+## cut
+
+$sql .= "UPDATE table_name." . $self{'service name'}->[0]->{'test name'}; ## SQL safe ($self{'service name'}->[0]->{'test name'})
+
+## name Comma-separated safe variables.
+## failures 0
+## cut
+
+my $sql = "
+	SELECT $self{'service name'}->[0]->{'test name'}
+	FROM $table
+"; ## SQL safe ($self{'service name'}->[0]->{'test name'}, $table)
+
+## name Ternary operator (GH-12).
+## failures 0
+## cut
+
+my $a = 1;
+my $x = $a ? 'update' : $b;
+
+## name Ternary operator with possible SQL injection (true case).
+## failures 1
+## cut
+
+$test
+	? 'update' . ' ' . $table
+	: $var;
+
+## name Ternary operator with possible SQL injection (false case).
+## failures 1
+## cut
+
+$test
+	? $var
+	: 'update' . ' ' . $table;
+
+## name Ternary operator with possible SQL injections (both cases).
+## failures 2
+## cut
+
+$test
+	? 'insert into ' . $table
+	: 'update' . ' ' . $table;
+
+## name Class method call.
+## failures 1
+## cut
+
+my $sql = "select * from " . Acme::XYZ->method($table);
+
+## name Class method call marked as safe.
+## failures 0
+## cut
+
+my $sql = "select * from "
+	. Acme::XYZ->method($table); ## SQL safe (&Acme::XYZ::method)
+
+## name Class method call (with spacing).
+## failures 1
+## cut
+
+my $sql = "select * from " . Acme::XYZ
+	->method($table);
+
+## name Class method call (with spacing) marked as safe.
+## failures 0
+## cut
+
+my $sql = "select * from " . Acme::XYZ ## SQL safe (&Acme::XYZ::method)
+	->method($table);
+
+## name Function call to a different namespace.
+## failures 1
+## cut
+
+my $sql = "select * from " . Acme::XYZ::method($table);
+
+## name Function call to a different namespace marked as safe.
+## failures 0
+## cut
+
+my $sql = "select * from "
+	. Acme::XYZ::method($table); ## SQL safe (&Acme::XYZ::method)
+
+## name Mix safe variables and safe functions.
+## failures 0
+## cut
+
+my $sql = "select $var from " . method( $table ) . " where $where"; ## SQL safe ($var &method $where)
+
+## name Custom safe functions.
+## parms { safe_functions => 'Acme::XYZ::method' }
+## failures 0
+## cut
+
+my $sql = "select * from " . Acme::XYZ::method($table);
+
+## name Prohibit all quoting methods.
+## parms { quoting_methods => '' }
+## failures 1
+## cut
+
+$sql = "UPDATE table_name SET field = " . $dbh->quote($value) . "WHERE field = 1";
+
+## name Custom quoting method.
+## parms { quoting_methods => 'test' }
+## failures 0
+## cut
+
+$sql = "UPDATE table_name SET field = " . $dbh->test($value) . "WHERE field = 1";
+
+## name Custom quoting method, ensure that defaults are disabled.
+## parms { quoting_methods => 'test' }
+## failures 1
+## cut
+
+$sql = "UPDATE table_name SET field = " . $dbh->test($value) . "WHERE field = " . $dbh->quote($value2);

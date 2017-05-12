@@ -1,0 +1,22 @@
+---
+abstract: 'Child Process Leash to make sure the child process wont get lost with their parent.'
+author:
+  - 'Michael Vu <email@michael.vu>'
+build_requires:
+  Sub::Override: '0'
+  Test::More: '0'
+  Time::Out: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: restrictive
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Process-Child-Leash
+requires:
+  Mouse: '0'
+  Proc::Killfam: '0'
+  Unix::PID: '0'
+version: '1.00'

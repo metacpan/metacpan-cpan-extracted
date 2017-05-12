@@ -1,0 +1,9 @@
+%token NUM = /(\d+)/
+%%
+A:
+      /* empty */
+    | NUM 'NUM' 
+;
+
+%%
+

@@ -1,0 +1,21 @@
+This is the PerlKDE alpha README.
+
+PerlKDE is a Perl interface to the K Desktop Environment API.
+For installation instructions, see the INSTALL file.
+You must have Qt-1.4x and KDE-1.1.1 installed before installing
+PerlKDE.
+
+Qt homepage: http://www.troll.no/
+KDE homepage: http://www.kde.org/
+
+Don't bother looking for documentation in this module, there is none.
+If you have any questions, comments, suggestions or bug-fixes,
+please e-mail me, Ashley Winters, at jql@accessone.com.
+
+PerlKDE is mostly distributed under the LGPL, and is not distributed under
+the QPL license. Since this is a Qt-1.x application as defined by the Qt
+Free Software License, the obligitory notification:
+
+PerlKDE requires the Qt library, which is copyright
+Troll Tech AS.  Freely distributable programs may generally
+use Qt for free, see README.QT for details

@@ -1,0 +1,28 @@
+---
+abstract: 'Add TO_JSON to your packages without the boilerplate'
+author:
+  - 'Andy Gorman <agorman@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Package-JSONable
+requires:
+  Carp: 0
+  JSON: 0
+  List::MoreUtils: 0
+  Scalar::Util: 0
+resources:
+  bugtracker: https://github.com/agorman/Package-JSONable/issues
+  repository: git://github.com/agorman/Package-JSONable.git
+version: 0.001

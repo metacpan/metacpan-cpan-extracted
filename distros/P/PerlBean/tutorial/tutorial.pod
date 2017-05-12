@@ -1,0 +1,482 @@
+=over
+
+=item By
+
+Vincenzo Zocca
+
+=item Creation
+
+Sun Feb 16 20:29:26 CEST 2003
+
+=item Update
+
+Thu Sep  4 06:42:32 CEST 2003
+
+
+=back
+
+=head1 0 USAGE NOTE
+
+Although PerlBean produces decent code (decent enough for the author that is),
+PerlBean is still under development.
+
+The code generation has impoved significantly since the first versions of
+PerlBean -which have been removed from CPAN- but still I expect more
+impovements. See the TODO list.
+
+=head1 1 INTRODUCTION
+
+Most OO designs contain objects with a I<bean like(*)> structure and
+-optionally- some kind of logic. Although the bean capabilities in an object
+are -or should be- trivial, programming them takes a non proportional amount
+of time. Also, documenting inheritance of attributes and methods is tedious
+at best.
+
+The modules in the PerlBean hierarchy are to make the life of a Perl OO
+programmer easier. They allow to setup classes with attributes and logic
+methods. These classes can be put into a bean collection and the Perl code for
+the classes is generated. The basic class documentation and the documentation
+of the attribute and method inheritance is generated.
+
+At the time of writing (Thu Sep  4 06:42:32 CEST 2003), this package has already
+proved itself very useful for my professional purposes. I can code more in
+less time, I produce higher quality code, I find it easier to keep a conceptual
+overview of my projects and I take better advantage of OO paradigm altogether.
+
+For the code to mature I 1) use it to generate itself and 2) use it to develop
+other projects and feed my findings back into the code.
+Currently I am at the point where the TODO list grows bigger but the items in
+it get more and more details.
+
+=over
+
+=item (*)
+
+The term "bean" is borrowed from Java. In this context it is important to
+know that beans are objects with attributes (or properties) which are
+accessible through methods like "get", "set" etc...
+
+=back
+
+=head1 2 A PERL BEAN COLLECTION
+
+C<PerlBean> represents a Perl module and contains information on the package.
+Its descriptions, attributes, methods etc...
+
+A I<PerlBean Collection> is a collection of C<PerlBean>s.
+
+For this tutorial we'll develop a simple class hierarchy for geometrical shapes. The I<PerlBean Collection> will consist of the abstract C<Shape>, the implementations of classes C<Square> and C<Circle> and the C<Rectangle> subclass of C<Square>. This class hierarchy isn't exactly rocket science -it isn't even necessarily logical- but it serves the tutorial purpose.
+
+=head2 2.1 Class diagram for shapes
+
+                +------------+
+                |   Shape    |
+       + - - - -+ (abstract) +- - - - +
+       |        |------------|        |
+                |------------|        
+       |        |   area()   |        |
+      / \       +------------+       / \
+     +-+-+                          +---+
+       |                              |
+                                       
+       |                              |
+ +-----+------+               +-------+----+
+ |   Square   |               |   Circle   |
+ |------------|               |------------|
+ |   width    |               |   radius   |
+ |------------|               |------------|
+ |   area()   |               |   area()   |
+ +-----+------+               +------------+
+       |
+      / \
+     +---+
+       |
+ +-----+------+
+ | Rectangle  |
+ |------------|
+ |   width    |
+ |   height   |
+ |------------|
+ |   area()   |
+ +------------+
+
+=head2 2.2 Programming of the classes using C<PerlBean>
+
+The C<example.1.pl> program generates code for the C<Shape> packages.
+
+=head3 2.2.1 PerlBean collection
+
+First, a C<PerlBean::Collection> is created which is used throughout the program. A collection-wide license is specified at construction.
+
+ use PerlBean::Collection;
+ my $coll = PerlBean::Collection->new( {
+     license => <<EOF,
+ This code is licensed under B<GNU GENERAL PUBLIC LICENSE>.
+ Details on L<http://gnu.org>.
+ EOF
+ } );
+
+=head3 2.2.2 PerlBean attribute factory
+
+Then, a C<PerlBean::Attribute::Factory> is created which is used to create attributes (C<PerlBean::Attribute(*)> objects) throughout the program.
+
+=over
+
+=item (*)
+
+C<PerlBean::Attribute> objects are an implementation of C<PerlBean::Method::Factory>. That is, C<PerlBean::Attribute> objects on their turn create C<PerlBean::Method> objects.
+
+=back
+
+ use PerlBean::Attribute::Factory;
+ my $fact = PerlBean::Attribute::Factory->new();
+
+=head3 2.2.3 C<Shape> PerlBean
+
+The first C<Shape> C<PerlBean> is created and added to the collection. At creation the package name, a short description and the abstract are specified. Read the C<PerlBean> documentation for the details.
+
+ use PerlBean;
+ my $shape = PerlBean->new ( {
+     package => 'Shape',
+     short_description => 'geometrical shape package',
+     abstract => 'geometrical shape package',
+     autoloaded => 0,
+ } );
+ $coll->add_perl_bean( $shape );
+
+=head3 2.2.4 C<area()> interface method
+
+The interface method C<area()> is created and added to the C<Shape> C<PerlBean>.  At creation the method name, the method description and the fact that the method is an interface is specified. Again, read the documentation for the details.
+
+ use PerlBean::Method;
+ my $meth = PerlBean::Method->new( {
+     method_name => 'area',
+     interface => 1,
+     description => <<EOF,
+ Calculates the area of the C<Shape> object.
+ EOF
+ } );
+ $shape->add_method( $meth );
+
+
+=head3 2.2.5 C<Circle> PerlBean
+
+Now the C<Circle> C<PerlBean> is created and added to the collection. The creation and addition to the collection is almost identical to C<Shape>. The C<base> attribute is specified to tell that C<Circle> is a subclass -or implementation- of C<Shape>.
+
+ my $circle = PerlBean->new ( {
+     package => 'Circle',
+     base => [ qw( Shape ) ],
+     short_description => 'circle shape',
+     description => "circle shape\n",
+     abstract => 'circle shape',
+     autoloaded => 0,
+ } );
+ $coll->add_perl_bean( $circle );
+
+=head3 2.2.6 C<Circle> C<radius> attribute
+
+A C<radius> attribute is created and added to the C<Circle> C<PerlBean>. At creation the attribute name, a short description and a regular expression to which the attribute's values must match (C<^\d*(\.\d+)?$>) are specified. The documentation of C<PerlBean::Attribute::Factory> has all the details for this part of the process.
+
+ my $radius = $fact->create_attribute( {
+     method_factory_name => 'radius',
+     short_description => 'the shape\'s radius',
+     allow_rx => [ qw( ^\d*(\.\d+)?$ ) ],
+ } );
+ $circle->add_method_factory( $radius );
+
+=head3 2.2.7 C<Circle> C<area()> method
+
+The implementation of method C<area()> is created and added to the C<Circle> C<PerlBean>.  At creation the method name and its body are specified. The description is copied from the interface when the code is generated.
+
+ # Make the Circle area() method add it to the Circle PerlBean
+ use PerlBean::Method;
+ my $area_circle = PerlBean::Method->new( {
+     method_name => 'area',
+     body => <<EOF,
+     my \$self = shift;
+ 
+     return( 2 * 3.1415926 * \$self->get_radius() );
+ EOF
+ } );
+ $circle->add_method( $area_circle );
+
+=head3 2.2.8 C<Square> with a C<width> attribute and an C<area()> method
+
+This is much like 2.2.5 - 2.2.7 but then for C<Square>.
+
+ my $square = PerlBean->new ( {
+     package => 'Square',
+     base => [ qw( Shape ) ],
+     short_description => 'square shape',
+     abstract => 'square shape',
+     autoloaded => 0,
+ } );
+ $coll->add_perl_bean( $square );
+
+ my $width = $fact->create_attribute( {
+     method_factory_name => 'width',
+     short_description => 'the shape\'s width',
+     allow_rx => [ qw( ^\d*(\.\d+)?$ ) ],
+ } );
+ $square->add_method_factory( $width );
+
+ use PerlBean::Method;
+ my $area_square = PerlBean::Method->new( {
+     method_name => 'area',
+     body => <<EOF,
+     my \$self = shift;
+ 
+     return( \$self->get_width() * \$self->get_width() );
+ EOF
+ } );
+ $square->add_method( $area_square );
+
+=head3 2.2.9 C<Rectangle> with a C<height> attribute and an C<area()> method
+
+C<Rectangle> is a subclass from C<Square>. It inherits the C<width> attribute, has an additional C<height> attribute and a different implementation of C<area()>.
+
+The C<Rectangle> PerlBean which is a subclass of C<Square>.
+
+ my $rectangle = PerlBean->new ( {
+     package => 'Rectangle',
+     base => [ qw( Square ) ],
+     short_description => 'rectangle shape',
+     abstract => 'rectangle shape',
+     autoloaded => 0,
+ } );
+ $coll->add_perl_bean( $rectangle );
+
+The C<height> attribute.
+
+ my $height = $fact->create_attribute( {
+     method_factory_name => 'height',
+     short_description => 'the shape\'s height',
+     allow_rx => [ qw( ^\d*(\.\d+)?$ ) ],
+ } );
+ $rectangle->add_method_factory( $height );
+
+The C<area()> method
+
+ use PerlBean::Method;
+ my $area_rectangle = PerlBean::Method->new( {
+     method_name => 'area',
+     body => <<EOF,
+     my \$self = shift;
+ 
+     return( \$self->get_width() * \$self->get_height() );
+ EOF
+ } );
+ $rectangle->add_method( $area_rectangle );
+
+=head3 2.2.10 Code generation
+
+The code is generated in directory C<example.1>
+
+ # The directory name
+ my $dir = 'example.1';
+
+ # Remove the old directory
+ system ("rm -rf $dir");
+
+ # Make the directory
+ mkdir($dir);
+
+ # Write the collection
+ $coll->write($dir);
+
+=head3 2.2.11 Documentation check
+
+Check out the documentation of the PerlBeans. Try replacing C<Shape> with C<Circle>, C<Rectangle> or C<Square>.
+
+ pod2man example.1/Shape.pm | nroff -man|less
+
+ pod2man example.1/Shape.pm | nroff -man|less -r
+
+ pod2html example.1/Shape.pm > example.1/Shape.html
+
+=head3 2.2.12 Test the generated code
+
+Program C<example.1.test.pl> tests the classes C<Circle>, C<Rectangle> and C<Square>.
+
+ use strict;
+ use lib qw( example.1 );
+ 
+ use Circle;
+ my $circle = Circle->new( {
+     radius => 1,
+ } );
+ print 'Circle with radius ', $circle->get_radius(),
+       ' has an area of ', $circle->area(), "\n";
+ 
+ use Square;
+ my $square = Square->new( {
+     width => 1,
+ } );
+ print 'Square with width ', $square->get_width(),
+       ' has an area of ', $square->area(), "\n";
+ 
+ use Rectangle;
+ my $rectangle = Rectangle->new( {
+     width => 1,
+     height => 2,
+ } );
+ print 'Rectangle with width ', $rectangle->get_width(),
+       ' and with height ', $rectangle->get_height(),
+       ' has an area of ', $rectangle->area(), "\n";
+
+=head1 3 ATTRIBUTES
+
+So far in the example from chapter 2 plain attributes were used (C<radius>, C<width> and C<height>). The only I<advanced> feature used is the C<allow_rx> attribute when creating the attributes with the attribute factory.
+
+But there is more. More attribute types and more features. The attribute factory knows how to select the correct attribute class and how to instantiate it.
+
+=head2 3.1 C<PerlBean::Attribute::Single>
+
+So far we used the C<SINGLE> attribute type which has C<set...> and C<get...> methods. The implementing class is called C<PerlBean::Attribute::Single>.
+
+=head2 3.2 C<PerlBean::Attribute::Boolean>
+
+The C<BOOLEAN> attribute type has methods C<set...> and C<is...> and treats the value slightly different. The implementing class is called C<PerlBean::Attribute::Boolean>.
+
+=head2 3.3 C<PerlBean::Attribute::Multi>
+
+The attribute type C<MULTI> is intended to contain array and hash derivatives and there are several classes that implement those. The implementing interface class is called C<PerlBean::Attribute::Multi>.
+
+=head2 3.3.1 C<PerlBean::Attribute::Multi::Ordered>
+
+The C<PerlBean::Attribute::Multi::Ordered> class is obtained by specifying the attributes C<type =E<gt> 'MULTI> and C<ordered =E<gt> 1> to the attribute factory. It implements a I<plain> ordered list that can hold values in an ordered fashion.
+
+=head2 3.3.2 C<PerlBean::Attribute::Multi::Unique>
+
+The C<PerlBean::Attribute::Multi::Unique> class is obtained by specifying the attributes C<type =E<gt> 'MULTI> and C<unique =E<gt> 1> to the factory. It implements a I<plain> hash that can unique values (that is, any value is allowed to occur only once) in an unordered fashion.
+
+=head2 3.3.3 C<PerlBean::Attribute::Multi::Unique::Ordered>
+
+The C<PerlBean::Attribute::Multi::Unique::Ordered> is a hybrid of C<PerlBean::Attribute::Multi::Ordered> and C<PerlBean::Attribute::Multi::Unique> and is obtained by specifying the attributes C<type =E<gt> 'MULTI>, C<ordered =E<gt> 1> and C<unique =E<gt> 1>. It implements an ordered list that can hold unique values.
+
+=head2 3.3.4 C<PerlBean::Attribute::Multi::Unique::Associative>
+
+The C<PerlBean::Attribute::Multi::Unique::Associative> class is obtained by specifying the attributes C<type =E<gt> 'MULTI>, C<unique =E<gt> 1> and C<associative =E<gt> 1> to the factory. It is a refinement of C<PerlBean::Attribute::Multi::Unique> and associates unique keys to values. Well, this is actually even more a I<plain> hash than C<PerlBean::Attribute::Multi::Unique>.
+
+=head2 3.3.5 C<PerlBean::Attribute::Multi::Unique::Associative::MethodKey>
+
+The C<PerlBean::Attribute::Multi::Unique::Associative::MethodKey> class is obtained by specifying the attributes C<type =E<gt> 'MULTI>, C<unique =E<gt> 1>, C<associative =E<gt> 1> and C<method_key =E<gt> E<lt>method-keyE<gt>>to the factory. It is similar to C<PerlBean::Attribute::Multi::Unique::Associative> but it takes the keys from the values by calling a method on the values. Very handy if you want to list objects by their keys.
+
+=head2 3.3.6 Example containing all attribute types
+
+Program C<example.2.pl> contains a PerlBean collection with one PerlBean in it with all kinds of attributes. It doesn't do anything particularly useful other that serving the example purpose. Check out the program, the generated documentation and the generated code.
+
+=head1 4 CONSTRUCTORS
+
+The examples in the previous sections had C<PerlBean::Method> objects. Well, there is also the C<PerlBean::Method::Constructor> class that is an I<empty> subclass of C<PerlBean::Method>. Methods defined as C<PerlBean::Method::Constructor> have the same properties as C<PerlBean::Method> objects. They can be added to a C<PerlBean> using the C<add_method()> method. The only difference with C<PerlBean::Method> objects is that the documentation is written in the C<METHODS> section.
+
+
+=head1 5 A FEW WORDS ON INHERITANCE
+
+PerlBean takes inheritance into account when generating documentation and code. As Perl supports multiple inheritance, so does PerlBean.
+
+Descriptions of methods and attributes are passed from superclass to subclass in a -hopefully- intuitive manner.
+
+The string C<__SUPER_POD__> in descriptions is replaced with the description of the superclass. Most of the time you will not need this feature -which actually may need a few extra words in the documentation.
+
+For interface methods a default method is implemented in the class where they are defined that merely throws an exception. This is to signal bad usage of the generated module.
+
+=head1 6 STYLE
+
+The default style is as defined in C<perlstyle>. It can however be changed at
+will.
+
+The style is controlled though the C<PerlBean::Style> modules. The singleton instance of C<PerlBean::Style> is used to format the generated code.
+
+Example 3 calls the code from example 1 but changes the Style:
+
+=over
+
+=item * Method names in camel case
+
+=item * Block opening brace on new line
+
+=item * Space between function and brace
+
+=item * Tab indentation
+
+=back
+
+The code to make the style change looks like:
+
+ use strict;
+ use PerlBean::Style;
+ 
+ my $style = PerlBean::Style->instance();
+ 
+ $style->set_method_factory_name_to_method_base_filter(\&mbase_flt);
+ $style->set_method_operation_filter(\&op_ftl);
+ $style->set_str_pre_block_open_curl("\n__IND_BLOCK__");
+ $style->set_str_between_function_and_parenthesis(' ');
+ $style->set_indent("\t");
+ 
+ require 'example.1.pl';
+ 
+ sub mbase_flt {
+     my $ret = '';
+     foreach my $attr_part ( split(/_+/, shift) ) {
+         $ret .= ucfirst($attr_part);
+     }
+     return($ret);
+ }
+ 
+ sub op_ftl {
+     return( ucfirst(shift) );
+ }
+
+B<NOTE:> The C<PerlBean::Method> objects are B<NOT> affected by C<PerlBean::Style>.
+
+The C<PerlBean::Style> instance is obtained through the C<instance()> method.
+
+C<set_method_factory_name_to_method_base_filter()> allows to set the subroutine that converts an attribute name to the method base.
+
+C<set_method_operation_filter()> allows to set the subroutine that formats the method operation.
+
+C<set_str_pre_block_open_curl()> allows to set the string printed before the opening curly of a multi-line BLOCK.
+
+C<set_str_between_function_and_parenthesis()> allows to set the string between function name and its opening parenthesis.
+
+C<set_indent()> allows to set the string used for ONE indentation.
+
+Check out the code and see for yourself.
+
+=head1 7 SYMBOLS
+
+The C<PerlBean::Symbol> class allows for symbols to be declared that are global
+to the package.
+
+Exporting of the symbols is also handeled by C<PerlBean::Symbol>.
+
+The tag description for exporting is handeled by
+C<PerlBean::Described::ExportTag>.
+
+=head1 8 DEPENDENCIES
+
+Code dependencies (e.g. I<import, require and use>) can be specified through
+packages C<PerlBean::Dependency::Import>, C<PerlBean::Dependency::Require> and
+C<PerlBean::Dependency::Use>.
+
+The dependency clases are listed at the top of the package.
+
+=head1 9 AUTOLOADING
+
+By default C<PerlBean> generates autoloaded code. You can switch the
+C<autoloaded> attribute off in C<PerlBean> objects to generated plain Perl
+code. See also the examples.
+
+=head1 10 GET INVOLVED
+
+B<Your comments are valuable!>
+
+As I am working at this project on my own there's the usual chance my vision is limited in several areas. That may show in certain bits of -generated- code.
+Particularly in this area, I'm interested in your feedback.
+
+Bug reports are welcome too.
+
+Vincenzo Zocca
+L<mailto:Vincenzo@Zocca.DO.NOT.SPAM.com>

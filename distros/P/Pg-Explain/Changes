@@ -1,0 +1,122 @@
+Revision history for Pg-Explain
+
+0.73    2016/02/08
+        - Add anonymization of grouping keys
+
+0.72    2015/10/13
+        - Add anonymization of subquery scan names
+
+0.71    2014/06/04
+        - Fix missing dependency, no functional changes
+
+0.70    2014/06/03
+        - Allow parsing of plans without timing information, per request from Karl Bartel
+
+0.69    2014/06/08
+        - Anonymize CTE names, per gripe from Brian Dunavant
+
+0.68    2013/10/01
+        - Fix extracting of table/index info from "Index Only Scan" nodes from
+        YAML/XML/JSON explains.
+        Bug reported by David Wheeler (justatheory)
+
+0.67    2013/05/24
+        - Fix anonymization of Index Only Scans
+        - Fix perlcritic tests
+
+0.66    2013/03/30
+        - Fix anonymization of One-time filter: lines.
+
+0.65    2012/11/08
+        - Fix anonymization of tables in explains of modifying queries (insert/update/delete)
+        - Fix anonymization of function names in function scans
+
+0.64    2012/08/22
+        - Fix handling of really large number of estimated rows (over 2^53)
+
+0.63    2012/07/08
+        - Anonymize names of files used by foreign tables
+        - Anonymize names of foreign tables
+        - Anonymize names of columns when dealing with EXPLAIN ANALYZE VERBOSE output with "Output: a, b, c" lines
+
+0.62    2012/01/31
+        - Stop anonymize from changing typecasts to standard pg types
+
+0.61    2011/06/20
+        - Add handling of plans with trailing " character, but without leading " character.
+
+0.60    2011/06/11
+        - Added anonymization of plans.
+        - Make it possible to generate textual plan from parsed one
+
+0.54    2011/05/31
+        - Make the parsing run fast in Mojolicious environment
+        - Fix MANIFEST.SKIP to include .git
+
+0.53    2011/05/19
+        - Allow explain lines to be inside ' characters (some client does that, not sure which)
+        - Add missing "use Carp;"
+
+0.52    2011/04/30
+        - Fix for handling windows-style end-of-line markers in pgAdmin output.
+          Bug reported by Dave Jarvis.
+
+0.51    2011/03/26
+        - Fix calculation of exclusive time of nodes with CTE
+
+0.50    2011/03/26
+        - Add support for CTE in plans
+
+        2011/03/25
+        - Add ability to parse XML plans
+        - Add ability to parse JSON plans
+        - Add ability to parse YAML plans
+        - Add filter to make it possible to parse explains from pgAdmin3
+
+0.20    2011/03/19
+        - Remove usage of Moose. It's faster, and will not cause unrelated test failures in CPAN reports.
+
+0.11    2010/12/16 23:34
+        - Improve calculation of exclusive times, plus minor fixes [patch by filip.rembialkowski@gmail.com].
+
+0.10    2010-03-17 14:15:59
+        - Add handling for new "SubPlan" lines, which contain numeric ID of scan.
+
+0.09    2009-05-27 13:15
+        - Fix exclusive time calculations
+        - Make PE::Node understand Bitmap scans (heap and index)
+        - Add proper handling of nodes that were "never executed"
+        - Add ->is_analyzed method to PE::Node to make it easy to distinguish between EXPLAIN and EXPLAIN ANALYZE nodes
+
+0.08    2008-11-24 21:11
+        - Add missing documentation
+
+0.07    2008-11-18 11:42
+        - Added missing dependancy - responsible for most of fails in cpan tests
+        - Changed the way to detect error thrown by autodie when opening file fails
+        - Renamed test plans to make them sort nicely
+        - New functionality: PE::Node->total_inclusive_time
+        - New functionality: PE::Node->total_exclusive_time
+        - New tests
+
+0.06    2008-11-15 21:27
+        Name changed to Pg::Explain after conversation on IRC. Main points:
+        - Pg is shorter
+        - Pg already exists
+        - Pg is used already by PostgreSQL related modules
+
+0.05    2008-11-11 17:01
+        Add handling of init and subplans. Added more test. Refactorig of parsing method. Basic functionality done.
+
+0.04    2008-10-27 00:40
+        Add handling of subnodes. Add extraction of scan info for "Index Scan Backward" nodes.
+
+0.03    2008-10-26 21:25
+        Make it parse index scans, handle basic extra-info, remove dependency on YAML, and make tests using Test::Deep.
+
+0.02    2008-10-19 20:07
+        More tests, and changes to make it more Moose-way
+
+0.01    2008-10-19 15:56
+        First version, Not much of functionality now, but builds, and passes simple test.
+

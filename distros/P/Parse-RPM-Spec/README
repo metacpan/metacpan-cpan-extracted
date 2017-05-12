@@ -1,0 +1,56 @@
+Parse::RPM::Spec
+----------------
+
+WHAT IS Parse::RPM::Spec?
+
+Parse::RPM::Spec is a Perl module which models RPM spec files.
+
+HOW DO I INSTALL IT?
+
+Parse::RPM::Spec uses the standard Perl module architecture and can therefore
+be installed using the standard Perl method which, in brief, goes something
+like this:
+
+  gzip -cd Parse-RPM-Spec-X.XX.tar.gz | tar xvf -
+  cd Parse-RPM-Spec-X.XX
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+Where X.XX is the version number of the module which you are installing.
+
+You can also install it using either the CPAN shell (cpan) or the CPANPLUS
+shell (cpanp). RPMs of this package will be available at
+http://rpm.mag-sol.com/.
+
+WHERE IS THE DOCUMENTATION?
+
+All of the documentation is currently in POD format in the Parse.pm file. If
+you install the module using the standard method you should be able to read
+it by typing:
+
+  perldoc Parse::RPM::Spec
+
+at a comand prompt.
+
+LATEST VERSION
+
+The latest version of this module will always be available from CPAN.
+
+  http://search.cpan.org/dist/Parse-RPM-Spec/
+
+COPYRIGHT
+
+Copyright (C) 2008-9, Magnum Solutions Ltd.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+ANYTHING ELSE?
+
+If you have any further questions, please contact the author.
+
+AUTHOR
+
+Dave Cross <dave@mag-sol.com>

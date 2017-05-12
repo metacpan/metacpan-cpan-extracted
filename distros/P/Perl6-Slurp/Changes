@@ -1,0 +1,87 @@
+Revision history for Perl extension Perl6::Slurp.
+0.01  Wed Nov 26 21:58:48 2003
+    - original version; created by h2xs 1.22 with options
+        -A -P -X -f -n Perl6::Slurp
+
+
+
+0.02    Tue Mar  9 03:00:44 2004
+
+    - Cleaned up some redundant vestigal code (thanks Steffen)
+
+    - Updated internals to mirror interface changes in Perl6::Export
+
+
+
+0.03    Thu Mar 11 04:46:22 2004
+
+    - Updated Makefile.PL to note Perl6::Export 0.07 dependency
+
+    - Added correct behaviour when no source specified
+
+
+
+
+0.005000  Thu Feb  9 07:03:26 2012
+
+    - Fixed handling of slurp()
+
+    - Removed dependency of English locale in errors.t
+      (thanks to all those who reported it)
+
+    - Tweaked ipc.t to placate Windows (thanks John)
+
+    - Disabled implicit open failure warnings (thanks Kevin)
+
+    - Cleaned up code and commented
+
+    - Improved performance significantly for chomped cases
+
+    - Updated Makefile.PL and added Build.pl
+
+
+0.050000  Thu Feb  9 15:30:53 2012
+
+    - No feature changes: update to fix version number regression
+
+
+0.051000  Thu Jun 14 20:52:15 2012
+
+    - Tweaked error.t to placate Windows (thanks mascip)
+
+
+0.051001  Fri Jul 27 07:58:08 2012
+
+    - Doc tweak (thanks John)
+
+
+
+0.051003  Sat Feb  9 11:59:34 2013
+
+    - Documented limitations of C<slurp> on certain platforms
+      (e.g. no piped opens under Windows).
+
+    - Allowed layer options to have parenthesized args
+      (Thanks Kevin)
+
+    - Handle File::Temp filehandles correctly (thanks Kevin)
+
+
+
+
+0.051004  Wed Jan 22 17:24:31 2014
+
+    * De-documented spurious dependency on Perl6::Export
+      (thanks, Andrew)
+
+    * De-typo-ficated source
+      (thanks, dsteinbrunner)
+
+    * Made file-based tests independent, so they can run in parallel
+      (thanks Kent!)
+
+
+0.051005  Sat Feb 22 19:38:25 2014
+
+    * Removed illegal assignments to $/ under 5.20+
+      (thanks, Kent)

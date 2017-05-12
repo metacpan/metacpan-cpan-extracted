@@ -1,0 +1,199 @@
+Revision history for POE::Component::EasyDBI.
+
+1.28
+    - Update documentation
+    - Revert DBD::AnyData tests and skip them
+    - Switch from Error to Try::Tiny (Olivier Mengué)
+
+1.27 Fri Jan 30 2015
+    - Updated prereqs
+
+1.26 Thu Jan 29 2015
+    - Fixed changelog, added dates
+    - Switched to Minilla
+    - Modified tests to use DBD::SQLite instead of DBD::AnyData
+    - Removed DBD::AnyData from test prereqs as it fails many tests
+
+1.25 Sun Jan 25 2015
+    - Fix synopsis RT #27863
+    - Add method action RT #68497, document it
+    - Update documentation
+    - Use Test::Requires to simplify code (Olivier Mengué)
+    - Add full prereqs (Olivier Mengué)
+    - Refactor and add $VERSION check for each EUMM option (Olivier Mengué)
+    - Repo fixes, makefile cleanup (Olivier Mengué)
+
+1.24 Sun Jan 13 2013
+    - Updated EasyDBI.pm to properly handle the case where the sending session
+      != event session (Stephan Jauernick)
+    - Fixed RT #45212, fix warnings in tests (Chris Williams)
+    - Fixed RT #32449, don't remove alias until child has been shut down
+      (Andy Grundman)
+    - Fixed RT #32448, setup_wheel should be called with call (Andy Grundman)
+    - Fixed RT #32447, combo query does not pass-through args (Andy Grundman)
+    - Fixed RT #30248, cpan install fails due to missing prereq
+    - Fixed RT #38456, typo in manpage 
+    - Added print_queue sub 
+
+1.23 Tue Sep 25 2007
+    - alt_fork can be the path to your perl binary
+      useful for forking inside of another app, like irssi
+      thank you imMute for the patch
+    - fixed event ref usage, blessed callbacks will work now
+
+1.22 Thu Jun 27 2007
+    - fixed skip number in test 2, make test would fail if sqlite wasn't
+      installed
+
+1.21 Wed Jun 27 2007
+    - fixed several misplaced parens, fixing errors that were just '1'
+      thanks Brett Paden!
+
+1.20 Thu Apr 15 2007
+    - dbh->errstr can return '' with some DBD's, fixed thanks to dorian
+
+1.19 Wed Apr 11 2007
+    - added ability to pass blessed subs as an event callback
+    - added test with bless sub
+
+1.18 Dev version, not released
+
+1.17 Dev version, not released
+
+1.16 Fri Feb 23 2007
+    - proper child reaping added
+    - object methods for all query types added
+    - 3rd test for the new object methods added
+
+1.15 Wed Jun 21 2006
+    - added parens around map, thanks Roman Parparov
+
+1.14 Wed Jun 07 2006
+    - fixed kill 9 signal
+        thanks to Roman for finding that
+
+1.13 Tue May 09 2006
+    - added insert_id support for sqlite
+
+1.12 DEV RELEASE
+    - added combo command, not documented
+
+1.11 Tue Apr 26 2006
+    - Happy birthday to me
+    - Removed the bind function in subprocess to gain speed
+
+1.10 DEV RELEASE
+    - looks like int binding didn't quite work, so I removed it. If you miss this, email me!
+
+1.09 Wed Feb 08 2006
+    -  fixed test count, if you didn't have DBD::SQLite, t/2.t would fail
+
+1.08 Sun Jan 29 2006
+    - added rows key to more queries, it returns number of rows affected (TODO on docs)
+
+1.07 Sat Jan 28 2006
+    - I inadvertently disabled support for code refs in events
+    - added a test for code refs in events
+    - stopwatch is now set when a query is sent to the subprocess, not when it enters the que
+    - changed query binding, so you can bind using ints without the quoting  ie, LIMIT ?,?
+    
+1.06 Fri Jan 20 2006
+	- added CHLD handling
+
+1.05 Sat Oct 29 2005
+	- removed SELECT checking so queries like SHOW TABLES will work
+
+1.04 Sat Aug 13 2005
+	- fixed misuse of wantarray, I had it backwards. Duh!
+
+1.03 Tue Aug 02 2005
+	- fixed minor bug with 'connected' option, thanks Jason Lavold
+
+1.02 Thu Jun 30 2005
+	- added stopwatch option
+	- added contrib to MANIFEST so make dist picks it up
+
+1.01 Thu Jun 30 2005
+	- fixed alias_remove stupidness
+
+1.00 Thu May 26 2005
+	- fixed t/2.t, test skipped 12 intead of 13 if SQLite wasn't installed
+	- added prereq for POE .3101 if MSWin3
+
+0.15 Fri May 20 2005
+	- added commit/begin_work/rollback actions
+	- added tests for commit and begin_work (needs improved tests)
+	- added commit/begin_work post and pre events to actions
+
+0.14 Fri May 20 2005
+	- Chris Williams submitted a patch to get EasyDBI to work on MSWin32
+	- Added test using SQLite
+
+0.13 Tue Apr 26 2005
+	- added arrayarray, and a test for it, but tests are still disabled
+	
+0.12 Sun Apr 24 2005
+	- fixed alt_fork param, v.11 was unreleased anyway
+
+0.11 Sun Apr 24 2005
+	- added option alt_fork that runs the database connection in a 
+		seperate process but not forked. Thanks Apocalypse
+	- fixed version in Subprocess.pm
+
+0.10 Wed Mar 16 2005
+	- moved select(STDERR) stuff to main() in subprocess.pm, oops :)
+	- added object methods, new() returns an object
+	- disabled DBD::AnyData tests because DBD::File is broken
+	- fixed docs
+	- documented arbitrary data passing
+	
+
+0.09 Wed Dec 22 2004
+	- fixed bug in error checking on inserts
+	- documeted max_retries => -1
+
+0.08 Mon Nov 15 2004
+	- added func and method to subprocess
+	- fixed the variables that were suppose to be passed to the subprocess
+	- added documentation for func
+	- fixed a shutdown bug
+	- fixed insert not working correctly
+	- added anon subs and postback ablitiy to event param
+	- fixed bug where a statement handle would hang around in db_insert
+	- added insert key to insert function, it can be an array ref of hashes
+		or a hash
+	- added no_cache option
+	- moved docs around and improved them
+	- added extra tests if DBD::AnyData is installed
+
+0.07 Tue Oct 19 2004
+	- added signal ignores for INT HUP TERM into subprocess
+		now a ctrl-c (int) can be handled correctly by a script
+		using easydbi
+
+0.06 Tue Oct 19 2004
+	- fixed typo of connect_error event
+	- added connected parameter
+	- added an oracle error check to subprocess
+
+0.05 Tue Oct 19 2004
+	- added create method, it just calls new
+	- added insert query type
+	- bumped up the DBI required version to 1.38
+		because of the last_insert_id use for inserts
+	- added better reconnect handling
+	- added several options for reconnecting
+	- objectized the subprocess, it's more efficient
+
+0.04 Thu Sep 23 2004
+	- added ability to specify session id
+
+0.03 Mon Jan 02 2004
+	- 'bout time I fixed that bug that came from using SimpleDBI as my base :)
+
+0.02 Mon Nov 24 2003
+	- Fixed docs, README and Changes
+
+0.01 Mon Nov 24 2003
+	- First work based off SimpleDBI, but with easier to more data structures
+	and query chunks, and documented each query type

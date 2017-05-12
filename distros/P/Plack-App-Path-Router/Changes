@@ -1,0 +1,41 @@
+Revision history for Plack-App-Path-Router
+
+0.08  2015-01-17
+
+    - Change 'handle_exception' so that it rethrows exception by
+      default, rather than returning it.
+
+0.07 2015-01-13
+    - Add 'handle_exception' method to
+      Plack::App::Path::Router::Custom, to provide more granular
+      control over response handling. (John Anderson)
+
+    - Fix bug in component value extraction where a zero valued
+      compotent would match but not extract properly. (John Anderson)
+
+0.06  2014-09-01
+    - return 404 via handle_response too
+      (thanks to John "genehack" Anderson for this fix)
+
+0.05  2012-04-20
+    - Add Plack::App::Path::Router::Custom, which gives more control
+      over exactly how things are passed into and out of the match target
+    - Converted to Dist::Zilla
+
+0.04  2011-01-12
+    - Add Plack::App::Path::Router::PSGI, which allows you
+      to dispatch to pure PSGI apps as targets
+      - added the t/050_basic_psgi.t and t/051_basic_psgi_w_obj.t
+        for this
+
+0.03  2010-01-13
+    - storing the Path::Router instance, match and other
+      details in 'plack.router' instead of 'psgix.router'
+      as per discussions with miyagawa on #plack
+
+0.02  2010-01-07
+    - adding support for custom request classes
+      - added tests for this
+
+0.01  2009-12-10
+    - First release of this module.

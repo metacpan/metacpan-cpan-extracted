@@ -1,0 +1,56 @@
+3.20  Tue Mar 31 22:19:32 PDT 2015
+    - Updated to support call metadata feature in RPC::ExtDirect 3.20
+    - Added unit tests
+    - RPC::ExtDirect dependency bumped to 3.20
+
+3.02  Sun Jan 18 12:26:56 PST 2015
+    - Updated CDN links in examples to Ext JS 4.2.1 instead of
+      outdated and no longer supported 4.0.2a.
+    - No code changes.
+
+3.01  Mon Oct 27 17:54:02 PDT 2014
+    - Fixed a bug  with wrong utf-8 encoding that caused grief
+      to IE8 users (Github issue #1)
+    - Some test fixes and improvements for Windows environment
+    - Miscellaneous doc fixes and touch-ups
+    - RPC::ExtDirect dependency bumped to 3.02
+
+3.0   Thu Jun 12 19:12:56 PDT 2014
+    - Updated to accommodate for the changes in RPC::ExtDirect 3.0
+    - Many bug fixes, the bulk of the test data moved to the core
+    - More documentation
+
+2.01  Fri Mar 8  21:24:38 2013
+    - Added a way to specify class overrides for RPC::ExtDirect.
+      No major changes.
+
+2.00  Mon Jun 18 14:36:33 2012
+    - Updated code, documentation and test suite to accommodate
+      for new features in RPC::ExtDirect 2.00.
+
+1.10  Mon Oct 17 00:43:11 2011
+    - Fixed a (small) bug: extType parameter in form-based remoting
+      calls was not caught and cleaned out before passing data hash
+      to Method for execution.
+
+1.03  Tue Oct  4 21:37:23 2011
+    - Bumped required RPC::ExtDirect version to 1.20.
+
+1.02  Sat Oct  1 20:55:27 2011
+    - Turned on debugging in examples/app.psgi; since exception
+      handling works properly now, there's no sense in turning
+      it off anymore.
+
+      Updated examples.pl to include fresh-built module
+      Plack::Middleware::ExtDirect so that examples could be
+      tried without installing the module.
+
+      Bumped required RPC::ExtDirect version to 1.10.
+
+1.01  Fri Sep 30 10:22:33 2011
+    - Minor changes to documentation.
+    - Made sure ExtJS examples are clearly marked
+      as being (c) Sencha Inc.
+
+1.00  Thu Sep 29 18:27:55 2011
+	- original version.

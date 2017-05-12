@@ -1,0 +1,38 @@
+---
+abstract: 'Highly flexible CSV parser including column names (field names) manipulation'
+author:
+  - 'Uwe Sarnowski <uwes at cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  File::Spec: 0.80
+  Test::More: 0.47
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+keywords:
+  - columns
+  - 'field name'
+  - fieldnames
+  - columnname
+  - columnnames
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Parse-CSV-Colnames
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  IO::File: 0
+  Params::Util: 0.17
+  Parse::CSV: 1.00
+  Text::CSV_XS: 0.23
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.07

@@ -1,0 +1,101 @@
+#!/usr/bin/perl -w
+use strict;
+
+use lib qw(blib/lib blib/arch);
+# BEGIN { sub POE::Kernel::TRACE_EVENTS () { 1 };}
+use POE qw(Session);
+use POE::Component::IKC::Client;
+use POE::Component::IKC::Responder;
+
+my $NAME="Client$$";
+
+my $first=1;
+
+### Send a request to the time-server
+sub server_io
+{
+    my($kernel, $msg)=@_;
+}
+
+$|++;
+print "Creating sessions...\n";
+
+POE::Component::IKC::Client->spawn(
+        unix=>($ENV{TMPDIR}||$ENV{TEMP}||'/tmp').'/userver',    
+        name=>$NAME,
+        subscribe=>[qw(poe://*/timeserver)],
+);
+
+POE::Session->new(
+        _start=>sub 
+        {
+            my($kernel)=$_[KERNEL];
+            $kernel->sig('USR1', 'hup');
+            $kernel->alias_set('me');
+
+            create_ikc_responder(); # make sure the Responder exists
+            $kernel->post('IKC', 'publish', 'me', [qw(pulse)]);
+            $kernel->post('IKC', 'monitor', '*', 
+                {register=>'remote_register', unregister=>'remote_unregister',
+                 subscribe=>'remote_subscribe'});
+        },
+
+        ### Called when we connect to the time server
+        remote_register=>sub
+        {
+            my($kernel, $name, $real_name, $real)=@_[KERNEL, ARG0, ARG1, ARG2];
+            warn "* connection to $real_name", ($real ? '' : ' (alias)'), "\n";
+            return unless $real_name eq 'Pulse';
+            print "***** Connected to $name ($real_name)\n";
+            $kernel->yield('time');
+        },
+
+        ### Called when we connect to the time server
+        remote_subscribe=>sub
+        {
+            my($kernel, $name, $real_name, $what)=@_[KERNEL, ARG0, ARG1, ARG4];
+
+            return unless $real_name eq 'Pulse';
+            $kernel->post('poe://*/timeserver', 'connect', 
+                            "poe://$NAME/me/pulse");
+            print "***** Subscribed to things on $real_name\n";
+        },
+        ### Called when we disconnect to the time server
+        remote_unregister=>sub
+        {
+            my($kernel, $name, $real_name, $real)=@_[KERNEL, ARG0, ARG1, ARG2];
+            warn "* disconnection from $real_name", ($real ? '' : ' (alias)'), "\n";
+            return unless $real_name eq 'Pulse';
+            die "****** Disconnected from $real_name\n";
+        },
+
+        hup=>sub
+        {
+            my($kernel)=$_[KERNEL];
+            print "Got USR1\n";
+            $kernel->post('poe://Pulse/timeserver', 'disconnect', 
+                          "poe://$NAME/me/pulse");
+            return 1;
+        },
+        # output a . when the pulse is sent
+        # output a + if it took longer then a second to get from 
+        # the timerserver
+        pulse=>sub { print ($_[ARG0] eq localtime() ? '|' : '+'); },
+
+        'time'=>sub 
+        {
+            my($kernel, $time)=@_[KERNEL, ARG0];
+            if($time) {
+                print "\n|||||| Foreign time is $time\n";
+                $kernel->delay('time', 60);
+            } else {
+                $kernel->call('IKC', 'call',
+                                 'poe://Pulse/timeserver/time', '', 
+                                 'poe:/me/time');
+            }
+        },
+    );
+
+print "Running client...\n";
+$poe_kernel->run();
+

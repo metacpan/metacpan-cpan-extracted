@@ -1,0 +1,29 @@
+Revision history for Perl module Parallel::Scoreboard
+
+0.08 2016-12-12
+ - do not report failure if temporary directory is created by another process #11
+ - do not call `use_test_base` #10
+
+0.07 2015-01-26
+ - do not include MYMETA.* in the distribution
+
+0.06 2015-01-26
+ - create workspace directory by using mkpath instead of mkdir (tolid)
+ - fixed a warning that could occur during global destruction when an attribute in the scoreboard object was destroyed before the object itself (Dave Rolsky)
+
+0.05 2014-04-09
+ - when cleaning up obsolete scoreboard files, ignore errors when another process cleaned up the file at the same time (Karen Etheridge)
+
+0.04 2013-08-19
+ - fix seek error (thanks to hirose31)
+ - support non-numeric ids (thanks to hirose31)
+
+0.03 2011-01-24
+ - added callback "worker_id" that can be used for distiguishing workers other than using pids
+
+0.02 2010-07-04
+ - fix incompatibility with Solaris (LOCK_EX not possible on read-only file handles)
+ - scripts may now call fork(2) after calling Parallel::Scoreboard::update()
+
+0.01 2010-07-02
+ - initial release

@@ -1,0 +1,198 @@
+NAME
+    POE::Component::TFTPd - A tftp-server, implemented through POE
+
+VERSION
+    0.0302
+
+SYNOPSIS
+     POE::Session->create(
+         inline_states => {
+             _start        => sub {
+                 POE::Component::TFTPd->create;
+                 $_[KERNEL]->post($alias => 'start');
+             },
+             tftpd_init    => sub {
+                 my($client, $fh) = ($_[ARG0], undef);
+                 open($fh, "<", $client->filename) if($client->rrq);
+                 open($fh, ">", $client->filename) if($client->wrq);
+                 $client->{'fh'} = $fh;
+             },
+             tftpd_done    => sub {
+                 my $client = $_[ARG0];
+                 close $client->{'fh'};
+             },
+             tftpd_send    => sub {
+                 my $client = $_[ARG0];
+                 if ($client->{'fh'}) {
+                     seek $client->{'fh'}, $client->last_block * $client->block_size, 0;
+                     read $client->{'fh'}, my $data, $client->block_size;
+                     $_[KERNEL]->post($alias => send_data => $client, $data);
+                 }
+             },
+             tftpd_receive => sub {
+                 my($client, $data) = @_[ARG0,ARG1];
+                 print { $client->{'fh'} } $data;
+                 $_[KERNEL]->post($alias => send_ack => $client);
+             },
+             tftpd_log     => sub {
+                 my($level, $client, $msg) = @_[ARG0..ARG2];
+                 warn(sprintf "%s - %s:%i - %s\n",
+                     $level, $client->address, $client->port, $msg,
+                 );
+             },
+         },
+     );
+
+METHODS
+  create(%args)
+    Component constructor.
+
+    Args:
+
+     Name        => default   # Comment
+     --------------------------------------------------------------------
+     alias       => TFTPd     # Alias for the POE session
+     address     => 127.0.0.1 # Address to listen to
+     port        => 69        # Port to listen to
+     timeout     => 10        # Seconds between block sent and ACK
+     retries     => 3         # How many retries before giving up on host
+     max_clients => undef     # Maximum concurrent connections
+
+  clients
+    Returns a hash-ref, containing all the clients:
+
+     $client_id => $client_obj
+
+    See "POE::Component::TFTPd::Client" for details
+
+  max_clients
+    Pointer to max number of concurrent clients:
+
+     print $self->max_clients;
+     $self->max_clients = 4;
+
+  retries
+    Pointer to the number of retries:
+
+     print $self->retries;
+     $self->retries = 4;
+
+  timeout
+    Pointer to the timeout in seconds:
+
+     print $self->timeout;
+     $self->timeout = 4;
+
+  address
+    Returns the address the server listens to.
+
+  alias
+    The alias for the POE session.
+
+  kernel
+    Method alias for $_[KERNEL].
+
+  port
+    Returns the local port
+
+  sender
+    Returns the sender session.
+
+  server
+    Returns the server: "POE::Wheel::UDP".
+
+  session
+    Returns this session.
+
+  cleanup
+     1. Logs that the server is done with the client
+     2. deletes the client from C<$self-E<gt>clients>
+     3. Calls C<tftpd_done> event in sender session
+
+  log
+    Calls SENDER with event name 'tftpd_log' and these arguments:
+
+      $_[ARG0] = $level
+      $_[ARG1] = $client
+      $_[ARG2] = $msg
+
+    $level is the same as "Log::Log4perl" use.
+
+STATES
+  start
+    Starts the server, by setting up "POE::Wheel::UDP".
+
+  stop
+    Stops the TFTPd server, by deleting the UDP wheel.
+
+  check_connections
+    Checks for connections that have timed out, and destroys them. This is
+    done periodically, every second.
+
+  input
+    Takes some input, figure out the opcode and pass the request on to the
+    next stage.
+
+     opcode | event    | method
+     -------|----------|-------------
+     rrq    | init_rrq | init_request
+     wrq    | init_wrq | init_request
+     ack    | get_ack  | get_data
+     data   | get_data | get_data
+
+  send_data => $client, $data
+    Sends data to the client. Used for both ACK and DATA. It resends data
+    automatically on failure, and decreases "$client->retries".
+
+  get_data => $client, $data
+    Handles both ACK and DATA packets.
+
+    If correct packet-number:
+
+     1. Logs the packet number
+     2. Calls C<tftpd_receive> / C<tftpd_send> in sender session
+
+    On failure:
+
+     1. Logs failure
+     2. Resends the last packet
+
+  init_request => $args, $opcode, $data
+     1. Checks if max_clients limit is reached. If not, sets up
+
+      $client->filename  = $file;    # the filename to read/write
+      $client->mode      = uc $mode; # only OCTET is valid
+      $client->rfc       = [ ... ];
+      $client->timestamp = time;
+
+     2. Calls C<tftpd_init> in sender session.
+
+     3. Calls C<tftpd_send> in sender session, if read-request from client
+
+  send_error => $client, $error_key [, $args]
+    Sends an error to the client.
+
+     $error_key referes to C<%TFTP_ERROR>
+     $args is an array ref that can be used to replace %x in the error string
+
+FUNCTIONS
+  TFTP_MIN_BLKSIZE
+  TFTP_MAX_BLKSIZE
+  TFTP_MIN_TIMEOUT
+  TFTP_MAX_TIMEOUT
+  TFTP_DEFAULT_PORT
+  TFTP_OPCODE_RRQ
+  TFTP_OPCODE_WRQ
+  TFTP_OPCODE_DATA
+  TFTP_OPCODE_ACK
+  TFTP_OPCODE_ERROR
+  TFTP_OPCODE_OACK
+AUTHOR
+    Jan Henning Thorsen, "<jhthorsen-at-cpan-org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2007 Jan Henning Thorsen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

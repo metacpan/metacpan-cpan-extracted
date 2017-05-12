@@ -1,0 +1,57 @@
+---
+abstract: 'Block XSRF Attacks with minimal changes to your app'
+author:
+  - 'Chisel <chisel@chizography.net>'
+build_requires:
+  Carp: '0'
+  Data::Printer: '0'
+  FindBin::libs: '0'
+  HTTP::Cookies: '0'
+  HTTP::Message::PSGI: '0'
+  HTTP::Request: '0'
+  HTTP::Request::Common: '0'
+  HTTP::Response: '0'
+  LWP::UserAgent: '0'
+  Log::Dispatch: '0'
+  Plack::Builder: '0'
+  Plack::Request: '0'
+  Plack::Session::State::Cookie: '0'
+  Plack::Test: '0'
+  Sub::Exporter: '0'
+  Test::More: '0'
+  Test::UseAllModules: '0'
+  Try::Tiny: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Plack-Middleware-XSRFBlock
+requires:
+  Digest::HMAC_SHA1: '0'
+  HTML::Escape: '0'
+  HTML::Parser: '0'
+  HTTP::Status: '0'
+  Plack::Middleware: '0'
+  Plack::Response: '0'
+  Plack::Util: '0'
+  Plack::Util::Accessor: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/chiselwright/Plack-Middleware-XSRFBlock/issues
+  repository: git://github.com/chiselwright/plack-middleware-xsrfblock.git
+version: 0.0.11
+x_contributors:
+  - 'Chisel <chisel.wright@net-a-porter.com>'
+  - 'Chisel Wright <chisel@chizography.net>'
+  - 'Daniel Perrett <dp13@sanger.ac.uk>'
+  - 'Matthew Ryall <matt.ryall@gmail.com>'
+  - 'Matthias Zeichmann <matthias.zeichmann@gmail.com>'
+  - 'Michael Kröll <michael.kroell@geizhals.at>'
+  - 'Sebastian Willert <willert@gmail.com>'
+  - 'William Wolf <throughnothing@gmail.com>'

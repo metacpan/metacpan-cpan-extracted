@@ -1,0 +1,8 @@
+0.03 2014-12-13T12:38:25Z
+    - Add ability to expire cookie that sit on a path
+
+0.02 Wed Feb 19 11:31:00 GMT 2014
+    - Fixed embarassing bug triggered by streaming responses
+
+0.01 Tue Feb 18 10:33:24 GMT 2014
+    - initial release
